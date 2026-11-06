@@ -7,7 +7,7 @@
 //   điện thoại thầy #d-<trạng thái>[-toi|-sang] 390×844
 // Ảnh JPG tự hạ chất lượng tới khi ≤ 150 KB. Soát: lỗi trang · tràn ngang · đích bấm < 44 px (chỉ màn có nút thật: máy em, điện thoại thầy).
 import { createServer } from 'node:http'
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { createRequire } from 'node:module'
 
@@ -15,6 +15,7 @@ const VE = resolve(import.meta.dirname)
 const GOC = resolve(VE, '../..')
 const RA = join(VE, 'anh')
 mkdirSync(RA, { recursive: true })
+for (const f of readdirSync(RA)) if (f.endsWith('.jpg')) rmSync(join(RA, f))
 const { chromium } = createRequire(join(GOC, 'package.json'))('playwright')
 
 const than = readFileSync(join(VE, 'nguyen-mau.html'), 'utf8')
@@ -47,12 +48,12 @@ async function chup(ten, ma, { w, h, dpr = 1, toi = false, kiemNut = true }) {
 }
 
 // 1) Bảng chiếu 1920×1080 — nền tối và nền sáng của máy chiếu.
-const BANG = [['01', 'bat-dau'], ['02', 'cho'], ['03', 'tra-loi'], ['04', 'mo'], ['05', 'ds-mo'], ['06', 'tln-mo'], ['07', 'tu-luan'], ['08', 'ket-tinh'], ['09', 'tong-ket'], ['10', 'chan']]
+const BANG = [['01', 'bat-dau'], ['02', 'cho'], ['03', 'tra-loi'], ['04', 'goi'], ['05', 'mo'], ['06', 'ds-mo'], ['07', 'tln-mo'], ['08', 'tu-luan'], ['09', 'ket-tinh'], ['10', 'tong-ket'], ['11', 'chan']]
 for (const [so, pha] of BANG) for (const nen of ['toi', 'sang']) await chup(`b${so}-bang-${pha}-${nen}`, `b-${pha}-${nen}`, { w: 1920, h: 1080, kiemNut: false })
-await chup('b11-bang-mo-may-yeu', 'b-mo-toi-yeu', { w: 1920, h: 1080, kiemNut: false })
+await chup('b12-bang-mo-may-yeu', 'b-mo-toi-yeu', { w: 1920, h: 1080, kiemNut: false })
 
 // 2) Máy em — 390 dọc cả sáng/tối; trạng thái chính thêm 844 ngang và 1440 máy tính.
-const HS = [['01', 'nghi'], ['02', 'chon'], ['03', 'da-gui'], ['04', 'dung'], ['05', 'sai'], ['06', 'giai'], ['07', 'cho'], ['08', 'xong'], ['09', 'ds'], ['10', 'tln'], ['11', 'tu-luan'], ['12', 'mat-mang']]
+const HS = [['01', 'nghi'], ['02', 'chon'], ['03', 'da-gui'], ['04', 'dung'], ['05', 'sai'], ['06', 'giai'], ['07', 'cho'], ['08', 'xong'], ['09', 'ds'], ['10', 'tln'], ['11', 'tu-luan'], ['12', 'mat-mang'], ['13', 'duoc-goi'], ['14', 'du-doan'], ['15', 'roi'], ['00', 'nhap-ma']]
 for (const [so, tt] of HS) for (const toi of [false, true]) await chup(`h${so}-may-em-${tt}-390-${toi ? 'toi' : 'sang'}`, `h-${tt}-${toi ? 'toi' : 'sang'}`, { w: 390, h: 844, dpr: 1.25, toi })
 for (const [so, tt] of [['02', 'chon'], ['04', 'dung']]) for (const [kho, w, h] of [['844-ngang', 844, 390], ['1440-may-tinh', 1440, 900]]) for (const toi of [false, true]) await chup(`h${so}-may-em-${tt}-${kho}-${toi ? 'toi' : 'sang'}`, `h-${tt}-${toi ? 'toi' : 'sang'}`, { w, h, toi })
 

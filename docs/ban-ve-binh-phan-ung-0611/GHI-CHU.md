@@ -1,55 +1,95 @@
-# Bình Phản Ứng: cả lớp cùng làm câu thầy đang chiếu (đặc tả 7 mục + bản vẽ, 06/11/2026, CHỜ THẦY DUYỆT)
+# Bình Phản Ứng: điểm danh, cả lớp cùng làm câu thầy chiếu, gọi lên bảng, thi đua đội, vinh danh (đặc tả 7 mục + bản vẽ, 06/11/2026, CHỜ THẦY DUYỆT)
 
-Thầy 06/11: «đề xuất tất cả phần chiếu đề lên bảng, khi chiếu đề nào thì học sinh ở dưới nhận được đề trên app của mình hiện full màn hình giống với các chặng, học sinh chọn đáp án thì hiện lên bảng … thiết kế một hoạt hoạ hay trò chơi gì đó siêu đẹp siêu cuốn … Đề xuất cho tôi trước khi tôi duyệt build».
+## Thầy yêu cầu (06/11, theo thứ tự)
+1. «đề xuất tất cả phần chiếu đề lên bảng, khi chiếu đề nào thì học sinh ở dưới nhận được đề trên app của mình hiện full màn hình giống với các chặng, học sinh chọn đáp án thì hiện lên bảng … thiết kế một hoạt hoạ hay trò chơi gì đó siêu đẹp siêu cuốn … Đề xuất cho tôi trước khi tôi duyệt build»
+2. «học sinh ko thoát được màn hình, nếu thoát có cảnh báo trên màn chiếu ngay. Một hoạt hoạ đẹp hấp dẫn sau khi tất cả học sinh chọn xong để gọi 1 học sinh phù hợp nhất với câu đó lên bảng dựa vào toàn bộ lịch sử làm bài trên app của hs đó, ghi rõ lý do vì sao chọn lên bảng»
+3. «thiết kế toàn bộ phần lên bảng phải khiến học sinh thi đua nhau hú hét, hấp dẫn hơn nữa»
+4. «bỏ kiểu điểm danh hiện tại, thiết kế lại toàn bộ cho phù hợp với hiện tại game lên bảng này»
+5. «bỏ từ mẻ đi, chuyển thành lượt» · «phần vinh danh làm cho kiểu đẹp và rực rỡ hơn nữa» · «vẽ vector cho siêu nét nhé»
 
-- **Bản chạy thử có hoạt hoạ thật**: `nguyen-mau.html`. Đây cũng là trang Artifact gửi thầy. Lớp mô phỏng 32 em tự chạy 4 mẻ; thầy chạm được vào máy em để tự chơi.
-- **Ảnh Chromium thật**: `anh/` (57 ảnh). Chụp lại bằng `node docs/ban-ve-binh-phan-ung-0611/chup.mjs`, không cần build.
+## Bản vẽ
+- **Bản chạy thử có hoạt hoạ thật:** `nguyen-mau.html`, cũng là trang Artifact gửi thầy.
+  - Lớp mô phỏng 32 em tự chạy trọn buổi: điểm danh → 4 lượt → tổng kết.
+  - Thầy chạm được vào máy em để tự chơi.
+- **Ảnh Chromium thật:** `anh/` (67 ảnh). Chụp lại bằng `node docs/ban-ve-binh-phan-ung-0611/chup.mjs`, không cần build.
   - Bảng chiếu 1920×1080, nền máy chiếu tối và sáng.
   - Máy em 390 dọc, 844 ngang, 1440 máy tính, sáng và tối.
   - Điện thoại thầy.
-- **Soát** (`soat.txt`): 0 lỗi trang · 0 tràn ngang · 0 đích bấm < 44 px.
+- **Soát:**
+  - `soat.txt`: 0 lỗi trang · 0 tràn ngang · 0 đích bấm < 44 px.
+  - Một vòng tự chạy trọn buổi có hoạt hoạ (không giảm chuyển động): 0 lỗi trang; trang 390 px không tràn.
+- **Vector:**
+  - Ngọc, huy hiệu đội, ngọn lửa ở màn vinh danh là SVG.
+  - Bình cầu, ống nghiệm, ngọn lửa đua là đường vẽ canvas, vẽ lại theo đúng độ phân giải màn × mật độ điểm ảnh. Máy chiếu 4K vẫn nét, không phóng ảnh.
 - **Chưa build gì** trong `src/` và `server/`.
 
-## 0. Ý tưởng trò chơi (một câu)
-Mỗi em là một **ô nguyên tố** trên «bảng tuần hoàn lớp» ở chân bảng chiếu, giữa bảng là một **bình cầu**.
-- **Em gửi đáp án:** một giọt sáng bay từ ô của em vào bình, bình đầy dần. Trên bảng chưa ai biết em chọn gì.
-- **Thầy mở đáp án:**
-  - Bình rót sang các **ống nghiệm** A·B·C·D theo đúng số em chọn mỗi phương án.
-  - Ống đúng **đổi màu như chất chỉ thị** và bắn tinh thể.
-  - Ô của các em đúng **kết tinh** lần lượt từ em nhanh nhất; 3 em nhanh nhất có huy hiệu 1·2·3.
-- **Sau mỗi mẻ:** Bảng kết tinh xếp hạng theo tinh thể.
-- **Cuối buổi:** Tổng kết có bục ba viên ngọc.
+## 0. Ý tưởng một câu và từ mới
+- **Đội:** mỗi em thuộc một trong **bốn đội màu thử ngọn lửa**: Natri vàng · Kali tím · Đồng xanh lục lam · Canxi đỏ cam. Đây là màu thật của phép thử ngọn lửa, dùng biến màu sẵn có `--tr-sao`, `--tr-tim`, `--tr-tin`, `--tr-chu-y`.
+- **Bảng chiếu:**
+  - Chân bảng là «bảng tuần hoàn lớp»: mỗi em một ô nguyên tố, vạch màu đội.
+  - Giữa bảng là bình cầu; em gửi đáp án thì một giọt sáng bay vào bình.
+- **Vòng một lượt:** cả lớp gửi xong → electron nhảy qua các ô rồi dừng ở **một em được mời lên bảng**, kèm lý do → cả lớp **đoán** bạn đúng hay sai và **tiếp sức** bằng điện thoại.
+- **Mở đáp án:** bình rót sang **ống nghiệm** theo số em chọn; ống đúng **đổi màu như chất chỉ thị**; ô em đúng **kết tinh**.
+- **Sau mỗi lượt:** bốn đội **đua ngọn lửa**.
+- **Cuối buổi:** **vinh danh** đội vô địch và ba em kết tinh nhiều nhất.
 
-Bản sắc là phòng thí nghiệm Hoá (bình cầu, ống nghiệm, chất chỉ thị, kết tinh, bảng tuần hoàn), không vay giao diện trò đố vui có sẵn.
+Bản sắc là phòng thí nghiệm Hoá, không vay giao diện trò đố vui có sẵn.
 
-**Từ mới đề nghị thêm vào bảng A2** (`docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`). «Chặng / ván / ải / hiệp / lượt» đã có chủ nên không dùng.
+**Từ mới đề nghị thêm vào bảng A2** (`docs/CHUAN-TU-NGU-VA-GIAO-DIEN.md`):
 
-| Khái niệm | Từ chuẩn | Không dùng |
+| Khái niệm | Từ chuẩn | Ghi chú / không dùng |
 |---|---|---|
-| Hoạt động cả lớp cùng làm câu thầy đang chiếu | **Bình Phản Ứng** | đố vui, quiz, «Phản ứng dây chuyền» (đã là băng combo chặng) |
-| Một câu trong hoạt động | **Mẻ** («Mẻ 2/4») | câu đố, vòng, lượt, chặng |
-| Điểm trong buổi | **tinh thể** («+145 tinh thể») | điểm, EXP, xu |
-| Bảng xếp hạng giữa các mẻ | **Bảng kết tinh** | leaderboard |
+| Hoạt động cả lớp cùng làm câu thầy chiếu | **Bình Phản Ứng** | không dùng «Phản ứng dây chuyền» (đã là băng combo chặng) |
+| Một câu trong hoạt động | **Lượt** («Lượt 2/4», «Lượt tiếp») | thầy chốt 06/11, bỏ «mẻ». App thầy đã có «lượt/ngày» ở chiến dịch; hai nơi khác màn nên không lẫn |
+| Điểm trong buổi | **tinh thể** («+145 tinh thể») | không dùng điểm, EXP, xu |
+| Bốn nhóm thi đua | **Đội Natri · Đội Kali · Đội Đồng · Đội Canxi** | không dùng tổ, nhóm, team |
+| Bảng xếp hạng đội sau mỗi lượt | **Đua ngọn lửa** | không dùng leaderboard |
+| Màn cuối buổi | **Vinh danh** (tiêu đề «Vô địch buổi hôm nay») | — |
+| Cả lớp đoán bạn trên bảng / bấm cổ vũ | **Đoán** · **Tiếp sức** | — |
+| Cả lớp đúng từ 75% | **Vượt năng lượng hoạt hoá** (cả lớp +30 tinh thể) | — |
 
 ## 1. Mục tiêu sư phạm + ai dùng
-- **Thầy (máy chiếu + điện thoại):**
-  - Biết ngay cả lớp hiểu câu đang chiếu tới đâu: bao nhiêu em chọn từng phương án, đáp số sai nào hay gặp.
-  - Từ đó chọn chữa luôn (phím C «Chiếu chữa mẻ này») hay đi tiếp.
-  - Không phải gọi từng em.
-- **Học sinh (app):**
+- **Thầy:**
+  - Biết ngay cả lớp hiểu câu đang chiếu tới đâu.
+  - Gọi đúng em cần lên bảng mà không phải nghĩ.
+  - Chữa luôn (phím C) hay đi tiếp.
+- **Học sinh:**
   - Mọi em đều phải làm, không chỉ em lên bảng.
   - Làm trên máy mình, giống chặng nên không phải học cách dùng mới.
-  - Biết ngay mình đúng hay sai, xem lời giải theo sơ đồ cột dọc (`docs/tu-duy-day-hoa-thay-2610.md`).
-- **Cảm giác cần đạt:**
-  - Hồi hộp lúc chờ mở đáp án; vỡ oà khi ống nghiệm đổi màu.
-  - Em sai không bị bêu tên.
-  - Nhịp nhanh: một mẻ ≈ 1–1,5 phút.
-- **Phụ huynh:** không có màn riêng. Câu em sai đi vào lịch ôn lại như mọi lượt luyện, nếu thầy chọn ghi hồ sơ (mục 8).
+  - Biết ngay đúng sai, xem lời giải theo sơ đồ cột dọc (`docs/tu-duy-day-hoa-thay-2610.md`).
+  - Lúc bạn lên bảng vẫn có việc: đoán và tiếp sức.
+- **Cảm giác cần đạt: hú hét.**
+  - Đua đội từ lúc điểm danh.
+  - Electron nhảy chọn người lên bảng.
+  - Tia lửa tiếp sức bay lên bảng.
+  - Ống nghiệm đổi màu, lửa đội vượt nhau.
+  - Cả lớp cùng nổ khi vượt năng lượng hoạt hoá.
+  - Em sai không bị bêu tên; chỉ em rời màn mới hiện tên.
+- **Nhịp:** một lượt ≈ 1,5–2 phút gồm cả lên bảng.
+- **Phụ huynh:** không có màn riêng (xem quyết định 1, mục 8).
 
 ## 2. Bố cục
 
-### 2.1 Điểm vào: MỘT phím cho mọi tờ chiếu
-Cả năm nơi chiếu đề hiện nay đều dựng tờ chiếu bằng `taoHtmlMayChieu` (`src/lib/html-may-chieu.ts`). Vì vậy chỉ cần thêm một phím **L «Cả lớp làm»** (kèm nút cùng tên ở thanh dưới tờ chiếu) là phủ hết:
+### 2.1 Điểm danh mới = mở màn Bình Phản Ứng (thay hai bản chiếu điểm danh hiện tại)
+- **Bỏ khỏi màn chiếu:**
+  - `BanChieuDiemDanh` A (thẻ em theo bậc) và B (Nhịp học của lớp);
+  - mã chiếu cũ `TamPhuChieuMa` ở bước điểm danh.
+- **Giữ nguyên luồng ghi:**
+  - mở buổi, mã 6 số, lệnh `/hs/diem-danh`, bảng `buoi_hoc_diem_danh`;
+  - thầy thêm / bớt em bằng tay;
+  - khôi phục khi thoát (sửa 06/11).
+- **Bảng chiếu `b02`:**
+  - Trái: «Vào lớp: mở app, nhập mã» + QR + 6 số lớn + «Vừa vào lớp» (hai em mới nhất, chip đội, «+10», giờ vào).
+  - Phải: «Đội nào đủ quân trước?» + bốn ngọn lửa đội cao dần theo số bạn đã vào («Natri 8/8»). Đội đủ quân đầu tiên được nhãn «+50 tinh thể».
+  - Chân: bảng tuần hoàn lớp, em chưa vào thì mờ.
+  - Phím: Space «Xong điểm danh · bắt đầu lượt 1» · V Danh sách vắng · H Ẩn tên · Esc Kết thúc buổi.
+- **Máy em:**
+  - `h00` nhập mã: 6 ô + bàn phím số + nút QR. **Một mã cho cả điểm danh lẫn Bình Phản Ứng**, em không phải nhập hai lần.
+  - `h01` đã vào: giờ vào, thẻ đội «Đội Natri · 8/8 bạn đã vào», tinh thể đội có nhờ vào sớm.
+- **Danh sách điểm danh trong app thầy** (`DiemDanhBuoi` / `Buoc1DiemDanh`) vẫn còn để sửa tay; chỉ phần chiếu và chữ đổi theo đội.
+
+### 2.2 Điểm vào lượt: MỘT phím cho mọi tờ chiếu
+Cả năm nơi chiếu đề dựng tờ chiếu bằng `taoHtmlMayChieu` (`src/lib/html-may-chieu.ts`). Chỉ cần thêm phím **L «Cả lớp làm»** (kèm nút cùng tên) là phủ hết:
 
 | Nơi chiếu | Tệp gọi tờ chiếu |
 |---|---|
@@ -58,131 +98,168 @@ Cả năm nơi chiếu đề hiện nay đều dựng tờ chiếu bằng `taoHt
 | Chiếu chữa sau ca | `src/components/ca-thi/dung-to-chua-ca.ts` |
 | Cần thầy chữa / câu sai trên lớp | `src/components/chua-cau-sai/CauCanChuaTrenLop.tsx` |
 | Tờ chiếu chiến dịch | `src/components/chien-dich/to-chieu.ts` |
-| Điện thoại điều khiển máy chiếu | `src/screens/DieuKhienToChieuScreen.tsx`: thêm nút «Cả lớp làm», «Mở đáp án», «Mẻ tiếp» |
 
-Bấm L mở hộp «Cả lớp làm câu này» (ảnh `b01`). Hộp có:
-- số em có mặt theo điểm danh và số em đang mở app;
-- thời gian mỗi mẻ: 30 / **60** / 90 giây / không giới hạn;
-- công tắc «Hiện tên em trả lời đúng trên bảng»;
-- dòng kiểm câu: «Câu này không thuộc ca kiểm tra nào đang giữ, gửi xuống máy được»;
-- nút chính «Gửi xuống máy 28 em».
+- **Cầu nối:** phím L đi từ tờ chiếu (iframe) ra app thầy qua `src/lib/to-chieu-cau-noi.ts` có sẵn.
+- **Hộp «Cả lớp làm câu này»** (ảnh `b01`):
+  - số em có mặt;
+  - thời gian mỗi lượt;
+  - công tắc hiện tên em đúng;
+  - dòng kiểm câu bị giữ;
+  - nút «Gửi xuống máy 28 em».
+- **Điện thoại thầy** (`DieuKhienToChieuScreen`): thêm «Cả lớp làm», «Mở đáp án», «Lượt tiếp», «Đạt / Chưa đạt», «Chọn em khác». Nối **thẳng** tới phòng `PhongBinhPhanUng` bằng vé thầy, không đi đường `/gv/to-chieu/*`.
 
-Những câu tiếp theo trên cùng tờ chiếu, thầy bấm → rồi L, hoặc «Mẻ tiếp» trên điện thoại.
+### 2.3 Bảng chiếu trong một lượt (16:9, nền máy chiếu của tờ chiếu)
+- **Đang trả lời (`b03`):**
+  - Trái: đề + phương án cỡ máy chiếu.
+  - Phải: bình cầu có vòng thời gian êm + «23/32 em đã gửi». Đây là điểm nhấn.
+  - Chân: ô em đã gửi sáng xanh; em đúng ≥ 2 lượt liền có **ngọn lửa nhỏ màu đội** trên ô.
+- **Gọi lên bảng (`b04`):**
+  - Electron nhảy qua 6 ô ứng viên, chậm dần, có tiếng tích, rồi dừng; ô nổ tinh thể.
+  - Thẻ lớn «Mời em lên bảng»: nguyên tử màu đội, tên to, «Vì sao chọn em» ba dòng.
+  - Đáy thẻ: «Cả lớp đoán trên máy» (vạch + «19 bạn đoán làm đúng · 7 chưa đúng») và ô «Tiếp sức Đội Canxi 46». Tia lửa bay từ ô các bạn cùng đội lên thẻ.
+  - Phím: D Đạt (đội +200) · F Chưa đạt · N Chọn em khác · Space Mở đáp án.
+- **Mở đáp án (`b05`–`b07`):**
+  - Trắc nghiệm: ống A–D.
+  - Đúng–sai: 4 cặp ống Đ/S.
+  - Trả lời ngắn: 3 đáp số hay gặp + «Khác».
+  - Thanh trên có chip «Lên bảng: Thanh Sơn · Đạt · Đội Canxi +200».
+  - Lớp đúng ≥ 75%: băng vàng «Vượt năng lượng hoạt hoá! … cả lớp +30 tinh thể» + pháo tinh thể.
+- **Đua ngọn lửa (`b09`):**
+  - Bốn đèn đốt, ngọn lửa đội cao theo tinh thể và vượt nhau có hoạt hoạ.
+  - Dưới mỗi đèn: điểm, «+430 lượt này · hạng 4».
+  - Phải: 6 em kết tinh nhiều nhất.
+- **Vinh danh (`b10`, SVG):**
+  - Tia sáng màu đội vô địch xoay chậm sau lưng.
+  - Huy hiệu ngọc đội («K», «Na», «Cu», «Ca») + «Vô địch buổi hôm nay · Đội Kali · 2705 tinh thể».
+  - Bục 1-2-3 với ba viên ngọc mặt cắt lấp lánh (vàng, xanh, cam), nổi bồng bềnh, sao lấp lánh, pháo tinh thể rơi.
+  - Trái: «Đua ngọn lửa» xếp 4 đội.
+  - Phải: «Cả lớp hôm nay» (% đúng, lượt khó nhất · phím C chiếu chữa, em gửi đúng nhanh nhất).
+- **Rời màn (`b03`):**
+  - Băng cam rung ngay ở đầu bảng: «Thảo My vừa rời màn hình · lần 1 · Đội Đồng −20 tinh thể».
+  - Ô của em viền cam, nhãn «Rời màn».
 
-### 2.2 Bảng chiếu, 16:9, dùng nền máy chiếu của tờ chiếu (tối hoặc sáng)
-- **Thanh trên:** Bình Phản Ứng · «Mẻ 2/4» · lớp và bài · mã vào lớp (ở phòng chờ) hoặc đồng hồ «0:41» (hổ phách khi dưới 12 giây).
-- **Trái 57%:** đề + phương án cỡ chữ máy chiếu (đề 40 px, phương án 34 px trên khung 1920). Cỡ chữ theo cài đặt cỡ chữ của tờ chiếu.
-- **Phải 34%:** bình cầu có vòng đồng hồ quanh bầu, con số lớn «23/32 em đã gửi». Đây là **điểm nhấn duy nhất** khi đang trả lời.
-  - Lúc mở đáp án, chỗ này thành giá ống nghiệm. Dưới mỗi ống: chữ cái, «19 em», nhãn «Đáp án».
-- **Chân:** bảng tuần hoàn lớp, 16 cột.
-  - Mỗi ô có số thứ tự, kí hiệu 2 chữ, tên hai chữ cuối.
-  - Lớp tới 48 em là 3 hàng; trên 48 em gom (mục 5).
-- **Dải phím mờ dưới cùng:** Space Mở đáp án · + Thêm 15 giây · → Mẻ tiếp · K Bảng kết tinh · G Lời giải · C Chiếu chữa mẻ này · H Ẩn tên · Esc Kết thúc.
-
-### 2.3 Máy em, giống màn chặng (dùng lại `LamCau` / `ManLamBaiTap` cùng bảng màu «Trong» `--tr-*`)
-- **Điện thoại dọc:**
-  - Thanh trên: «Bình Phản Ứng · Mẻ 2/4 · Thầy đang chiếu» + đồng hồ.
-  - Dưới thanh trên là vạch thời gian; tiếp đến đề, rồi phương án dạng thẻ lớn của chặng.
-  - Nút chính «Gửi đáp án» ở đáy, trong tầm ngón cái.
-- **Ngang và máy tính:** hai cột như chặng ngang. Đề bên trái, phương án bên phải, nút đáy canh theo cột phải.
-- **Không có nút thoát.** Em đang làm chặng thì chặng được lưu nguyên chỗ; xong buổi bấm «Về chặng đang làm · Chặng 3».
-
-### 2.4 Điện thoại thầy (điều khiển máy chiếu)
-- Thẻ số «23 / 32 em đã gửi» + vạch tiến độ.
-- Nút chính «Mở đáp án»; nút phụ «Thêm 15 giây», «Bỏ mẻ này».
-- Danh sách «Chưa gửi (9)».
-- Sau khi mở: biểu đồ cột A–D, nút chính «Mẻ tiếp», nút phụ «Bảng kết tinh», «Chiếu chữa mẻ này», danh sách «Chưa đúng · chỉ thầy thấy».
+### 2.4 Máy em (giống màn chặng, dùng lại `LamCau` / `ManLamBaiTap`, bảng màu «Trong» `--tr-*`)
+- **Thanh trên:** «Bình Phản Ứng · Lượt 2/4 · Đội Natri» + đồng hồ êm. **Không có nút thoát.**
+- **Dọc:** đề, rồi phương án dạng thẻ lớn của chặng, nút «Gửi đáp án» ở đáy.
+- **Ngang / máy tính:** hai cột như chặng ngang.
+- **Được gọi (`h13`):** «Em được mời lên bảng!» + «Vì sao thầy chọn em» + «Đội Natri đang tiếp sức em: 46 lượt».
+- **Bạn khác lên bảng (`h14`):**
+  - Thẻ bạn được gọi.
+  - «Em đoán bạn ấy làm đúng không?» với hai nút lớn; đoán đúng +20 tinh thể.
+  - Nút đáy màu đội «Tiếp sức Đội Natri · 6/10»: mỗi chạm bắn một tia lửa lên bảng.
+- **Rời màn rồi quay lại (`h15`):** «Em vừa rời màn hình · Thầy đã thấy trên bảng · Đội Natri bị trừ 20 tinh thể» + «Quay lại lượt đang làm».
 
 ## 3. Trạng thái (ảnh trong `anh/`)
 | Trạng thái | Bảng chiếu | Máy em | Ảnh |
 |---|---|---|---|
-| Thầy bấm L | Hộp «Cả lớp làm câu này» trên tờ chiếu | — | `b01` |
-| Phòng chờ (chỉ lần đầu, nếu thầy mở từ phòng chờ) | Mã 4 số lớn, ô sáng dần khi em vào, «28/32 em đã vào» | «Em đã vào lớp · thầy chiếu câu nào, câu đó tự hiện ở đây» | `b02`, `h01` |
-| Đang trả lời | Bình đầy dần, ô em đã gửi sáng xanh, đồng hồ | Chọn → «Gửi đáp án» | `b03`, `h02` |
-| Đã gửi | — | Khoá phương án, nguyên tử quay, «Đã gửi sau 8 giây · Nhìn lên bảng nhé · 24/32 bạn đã gửi» | `h03` |
-| Mở đáp án · Trắc nghiệm | Ống nghiệm A–D theo số em chọn, ống đúng đổi màu, ô em đúng kết tinh | Tấm đáy «Chính xác! +145 tinh thể · nhanh thứ 5 cả lớp» hoặc «Chưa đúng · Đáp án đúng: A. 12,95 gam» + «Xem lời giải» | `b04`, `h04`, `h05`, `h06` |
-| Mở đáp án · Đúng–sai | 4 cặp ống Đ/S, mỗi ý ghi Đúng/Sai | Mỗi ý 2 nút Đúng · Sai; kết quả «Em đúng 3/4 ý» | `b05`, `h09` |
-| Mở đáp án · Trả lời ngắn | Ống theo 3 đáp số hay gặp + «Khác» (vd 1,24 · 2,48 · 0,62) | Bàn phím số kiểu chặng | `b06`, `h10` |
-| Câu tự luận | Bình đếm «31/32 em làm xong», không ống nghiệm, Space hiện lời giải | «Câu này thầy chữa trên bảng, máy không chấm» + nút «Em làm xong» | `b07`, `h11` |
-| Bảng kết tinh | 8 em nhiều tinh thể nhất, lên/xuống hạng, «17/32 em đúng mẻ 2» | «Hạng 6/32 · 412 tinh thể · lên 2 hạng · Mẻ 3 sắp tới» | `b08`, `h07` |
-| Tổng kết | Bục 3 viên ngọc, «Cả lớp đúng 50% · Mẻ khó nhất: Mẻ 4 · Nhanh nhất: …», phím C chiếu chữa mẻ khó nhất | «Xong Bình Phản Ứng · 3/4 mẻ đúng · 412 tinh thể · hạng 6/32» + «Về chặng đang làm» | `b09`, `h08` |
-| Đang có ca kiểm tra mở | Hộp «Chưa mở được Bình Phản Ứng … sẽ làm gián đoạn bài thi của các em» | Không nhận gì | `b10` |
-| Máy yếu / giảm chuyển động | Không hạt bay, không phát sáng, không mảnh tinh thể; ống hiện ngay | Không nguyên tử quay, không mảnh bung | `b11` |
-| Mất mạng | Ô em rớt mạng vẫn giữ trạng thái đã gửi | Dải cam «Mất kết nối, đang nối lại… Đáp án em chọn vẫn giữ trên máy, nối lại là gửi.» | `h12` |
-| Đang tải | Tờ chiếu giữ nguyên tới khi phòng mở (≤ 1 s); nút L hiện «Đang mở…» | Khung xương chặng | — |
-| Lỗi mở phòng | Hộp báo lý do thật + «Thử lại» (máy chủ không trả lời / câu bị giữ / tắt công tắc) | — | — |
-| Rỗng (lớp 0 em có mặt) | Hộp L: «Chưa có em nào có mặt theo điểm danh hôm nay. Em vẫn vào được bằng mã 4827.» | — | — |
+| Điểm danh | Mã + QR, lửa 4 đội, vừa vào lớp | Nhập mã → «Em đã vào lớp lúc 19:17» + thẻ đội | `b02`, `h00`, `h01` |
+| Thầy bấm L | Hộp «Cả lớp làm câu này» | — | `b01` |
+| Đang trả lời | Bình đầy dần, ô sáng, lửa chuỗi | Chọn → Gửi | `b03`, `h02` |
+| Đã gửi | — | Khoá, nguyên tử quay, «Đã gửi sau 8 giây» | `h03` |
+| Gọi lên bảng | Electron nhảy → thẻ lý do, đoán, tiếp sức | Được gọi / Đoán + Tiếp sức | `b04`, `h13`, `h14` |
+| Mở đáp án · 3 kiểu câu | Ống nghiệm, ô kết tinh, chip lên bảng, băng năng lượng hoạt hoá | Đúng / Chưa đúng + Xem lời giải | `b05`–`b07`, `h04`–`h06`, `h09`, `h10` |
+| Câu tự luận | Đếm «làm xong», không ống nghiệm | «Em làm xong» | `b08`, `h11` |
+| Đua ngọn lửa | 4 đèn đốt + 6 em đầu | «Hạng 6/32 · lên 2 hạng» | `b09`, `h07` |
+| Vinh danh | Đội vô địch + bục ngọc | Tổng kết của em + «Về chặng đang làm» | `b10`, `h08` |
+| Đang có ca kiểm tra mở | Hộp chặn | Không nhận | `b11` |
+| Máy yếu / giảm chuyển động | Không hạt, không phát sáng, vẽ tĩnh | Không nguyên tử quay | `b12` |
+| Rời màn | Băng cam + ô «Rời màn» | Màn cảnh báo khi quay lại | `b03`, `h15` |
+| Mất mạng | Ô giữ trạng thái đã gửi | Dải cam «Mất kết nối, đang nối lại…» | `h12` |
+| Đang tải | Nút L «Đang mở…» (≤ 1 s) | Khung xương chặng | — |
+| Lỗi mở phòng | Hộp báo lý do thật + «Thử lại» | — | — |
+| Chưa điểm danh | Hộp L: «Chưa điểm danh hôm nay: gửi tới cả lớp đang mở app» | — | — |
 
 ## 4. Dữ liệu và máy chủ
 
-### Câu và đáp án (đáp án không xuống máy trước khi mở)
-- Thầy bấm «Gửi xuống máy». App thầy gửi `POST /gv/bpu/mo { lop, qid, thoiGian, hienTen }` (dùng chung token thầy như mọi lệnh `/gv/*`).
-- Worker đọc trong MỘT `batch` D1:
-  - danh sách em của lớp;
-  - điểm danh hôm nay;
-  - ca đang mở của lớp;
-  - câu đó có đang bị giữ không: giữ cho ca chưa công bố, ca đang mở, hay Bài tập về nhà có điểm. Dùng lại đúng hàm kiểm câu tạm giữ đã có ở `server/src/kiem-tra-ca-nhan.ts`.
-- Nội dung câu lấy từ kho R2 `kho/<ma_de>.json` (đã có đệm).
-- Worker giao cho **Durable Object mới `PhongBinhPhanUng`**: `idFromName('bpu:<mã 4 số>')`, WebSocket ngủ đông, lớp SQLite, cùng mẫu `PhongDauIon`.
-  - Đáp án chỉ nằm trong phòng.
-  - Máy em nhận `{t:'cau', de, phuongAn, loai, han}`, **không có đáp án**, không có `dm`. Ngoại lệ niêm phong của câu luyện tập KHÔNG áp dụng ở đây.
-- Em gửi `{t:'tra', me, chon}`. Phòng chấm ngay bằng đáp án đang giữ, rồi chỉ báo bảng chiếu «em X đã gửi», không báo em chọn gì.
-- Thầy bấm «Mở đáp án»: phòng **khoá nhận bài trước**, rồi mới phát:
-  - `{t:'mo', dapAn, thongKe}` tới bảng chiếu;
-  - kết quả riêng tới từng máy em: đúng/sai, tinh thể, hạng nhanh, lời giải.
+### Mở phòng
+- App thầy gửi `POST /gv/bpu/mo { buoiId, qids, thoiGian, hienTen }`.
+- Worker đọc MỘT `batch` D1 gồm 5 câu lệnh, 1 đợt chờ:
+  1. danh sách em của lớp;
+  2. `buoi_hoc_diem_danh` của buổi (`trang_thai='co_mat'`);
+  3. ca đang mở của lớp;
+  4. em đang có lượt thi `dang_lam`;
+  5. dữ liệu gọi lên bảng của **mọi câu trên tờ chiếu** (xem dưới).
+- **Câu bị giữ:**
+  - Tách phần kiểm câu trong `kiemNguon` (`server/src/kiem-tra-ca-nhan.ts`, hiện là hàm nội bộ) thành hàm dùng chung.
+  - Hàm này gộp `protectedQuestions` (câu bảo vệ cho ca chưa công bố / ca đang mở), `docCauBtvnChuaNop` (Bài tập về nhà chưa nộp) và `readGameScope`.
+- **Nội dung câu:** kho R2 `kho/<ma_de>.json` (đã có đệm).
+- **Phòng:** Durable Object mới **`PhongBinhPhanUng`**, `idFromName('bpu:<buoiId>')`, WebSocket ngủ đông, lớp SQLite, cùng mẫu `PhongDauIon`. Luật thuần ở `server/src/bpu-phong.ts`, test được không cần Cloudflare.
 
-### Đưa câu tới máy em ngay lập tức
-- Phòng phát `{t:'bpu', ma}` qua **kênh đẩy có sẵn** của từng em (WebSocket trên ngăn `NganHocSinh`, `server/src/kenh-day.ts`):
-  - chỉ tới em có mặt theo điểm danh;
-  - các lệnh gọi chạy song song bằng `Promise.all`, 0 truy vấn D1;
-  - tin loại `bpu` **đi thẳng, bỏ khoảng gom 1,2 s** (`CHO_PHAT_MS`).
-- Máy em nhận tin thì nạp lười mảnh `ManBinhPhanUng`, xin vé phòng (HMAC 2 phút, mẫu `dau-ion-ve.ts`) và nối WebSocket tới phòng.
-- Em chưa mở app thì ngăn của em nhớ «phòng đang mở» trong bộ nhớ; em mở app, kênh vừa nối là nhận ngay.
-- **Đường dự phòng:** mã 4 số trên bảng; em nhập ở app (Bình Phản Ứng → nhập mã). Chỉ em thuộc lớp mới vào được.
-- **Không dùng** đường `/gv/to-chieu/*` (Map trong isolate, hỏi 650 ms, không bền) cho phía học sinh.
-- **Công tắc tắt nhanh:** biến Worker `TAT_BPU`. `TAT_KENH_DAY` bật thì chỉ còn đường mã 4 số.
+### Đáp án không xuống máy em trước khi mở
+- Máy em nhận `{t:'cau', de, phuongAn, loai, han}`, không đáp án, không `dm`. Ngoại lệ niêm phong câu luyện tập không áp dụng.
+- Em gửi `{t:'tra', luot, chon}`. Phòng chấm ngay bằng đáp án đang giữ; bảng chỉ biết «đã gửi».
+- Mở đáp án: **khoá nhận bài trước**, rồi mới phát `{t:'mo', dapAn, thongKe}` cho bảng và kết quả riêng cho từng máy.
+
+### Đưa câu tới máy em ngay
+- Phòng phát `{t:'bpu', buoi}` qua kênh đẩy sẵn có của từng em (WebSocket trên ngăn `NganHocSinh`, `server/src/kenh-day.ts`):
+  - các lệnh gọi song song, 0 D1;
+  - tin `bpu` **bỏ khoảng gom 1,2 s** (`CHO_PHAT_MS`).
+- Ngăn em ghi «phòng đang mở» vào `ctx.storage` kèm hạn 3 giờ (vẫn 0 D1). Em mở app sau, kênh vừa nối là nhận ngay.
+- Phần nhận tin ở máy em: `src/lib/kenh-day.ts` đang được `StudentPortalScreen` **nạp lười** (`import('../lib/kenh-day')`). Thêm nhánh `bpu` gọi `import()` mảnh `ManBinhPhanUng`, nên byte mở `/hs` không tăng.
+- Không dùng `/gv/to-chieu/*` (Map trong isolate, hỏi 650 ms) cho học sinh hay cho nút điều khiển BPU.
+- Công tắc: `TAT_BPU`. `TAT_KENH_DAY` bật thì em vào bằng mã 6 số trên bảng.
+
+### Điểm danh mới
+- `/hs/diem-danh` giữ nguyên. Ghi xong thì Worker báo phòng của buổi (một lời gọi DO, 0 D1 thêm), để bảng hiện em vào lớp **ngay** thay vì chờ nhịp 5 giây.
+- Thưởng vào sớm và đủ quân nằm trong phòng.
+
+### Rời màn
+- App đã có sẵn cách bắt rời màn ở màn thi (`ExamTakeScreen`: `visibilitychange`). Dùng cùng cách:
+  - nghe `visibilitychange`, `pagehide`, `blur`;
+  - khi được hỗ trợ thì xin **toàn màn hình** (`requestFullscreen`) và nghe `fullscreenchange`.
+- Rời màn thì gửi `{t:'roi'}` (hoặc phòng thấy kết nối rớt quá 3 giây không có lý do mạng); bảng báo trong ≤ 1 s.
+- **Nói thật:** trình duyệt không cho chặn tuyệt đối việc thoát. App bỏ nút thoát, bật toàn màn hình, rời là bảng hiện tên và đội bị trừ.
+
+### Gọi lên bảng (dựa trên lịch sử làm bài)
+- **Dùng lại lõi chọn em đã thầy chốt 21/10:** `src/lib/chon-em-phan-tang.ts` (ba tầng theo khả năng đúng chính câu ấy, ghép tầng theo mức độ câu, ưu tiên em lâu chưa lên bảng, mỗi em một lần, chế độ Trộn / Chắc đúng / Ngẫu nhiên).
+- **Nguồn dữ liệu:** `/gv/ung-vien-chieu` đang trả `p`, `daDung`, `daSai`, `soLanLenBang14`, `lanCuoiLenBang`.
+- **Thêm trường chỉ-thêm** cho dòng lý do: `soCauDang`, `dungDang` (số câu cùng dạng đã làm / đúng trên app), `lanGanDang` (ngày, đúng hay vướng). Tính trong cùng `Promise.all` của lệnh.
+- Lệnh này thuộc **làn Codex** («người gọi»): Claude thêm trường kèm test khoá luồng Codex, ghi Nhật ký trước, Codex soát PR.
+- **Thêm vào phòng:**
+  - bỏ em đang rời màn và em vắng;
+  - câu tự luận vẫn gọi được (thầy chủ động).
+- **Lý do trên bảng:** ba dòng, lời lẽ nhẹ:
+  - «Thông hiểu hợp với em: dạng «Amine tác dụng với acid» em đã làm 15 câu trên app, đúng 11.»
+  - «Lần gần nhất gặp dạng này (02/11) em làm đúng: lên giảng lại cho cả lớp.»
+  - «11 ngày chưa lên bảng.»
+- **Điện thoại thầy** thấy thêm: tầng, `p`, bước hay vướng (quyết định 2).
+- **Đạt / Chưa đạt:** ghi vào sổ lên bảng sẵn có (bảng `len_bang`).
 
 ### Lưu kết quả
-- Cuối buổi (Esc hoặc phòng hết hạn 10 phút không ai thao tác), phòng ghi MỘT `batch` D1 vào bảng mới **`bpu_luot`**: `(ma_phong, sbd, qid, me, chon_json, dung, giay, tinh_the, luc)`.
-- Migration **chỉ thêm** `server/migration-0611-binh-phan-ung.sql`; DO migration `bpu-v1` trong `wrangler.toml`.
-- Nếu thầy chọn «ghi vào hồ sơ» (mục 8), cùng batch thêm sự kiện học như một lượt luyện, để câu sai vào lịch ôn lại.
-
-### Những gì chưa có, cần thêm
-- Lệnh máy chủ: `/gv/bpu/mo`, `/gv/bpu/ve`, `/hs/bpu/ve`, `GET /bpu/phong?ve=…` (nâng cấp WebSocket).
-- DO `PhongBinhPhanUng` + luật thuần `server/src/bpu-phong.ts` (test được không cần Cloudflare, như `dau-ion-phong.ts`).
-- Loại tin `bpu` trong `kenh-day.ts`.
-- Bảng `bpu_luot`.
+- Cuối buổi, phòng ghi MỘT `batch` D1 vào bảng mới **`bpu_luot`**: `(buoi_id, sbd, qid, luot, chon_json, dung, giay, tinh_the, doi, roi_man, len_bang, luc)`.
+- Migration **chỉ thêm** `server/migration-0611-binh-phan-ung.sql`; DO migration `bpu-v1`.
+- **Đội cố định cả tháng:** bảng chỉ-thêm `bpu_doi (lop, thang, sbd, doi)`, chia rắn bò theo sức học lúc đầu tháng. Thầy đổi được.
 
 ## 5. Ngoại lệ
 | Tình huống | Xử lý |
 |---|---|
-| **Em đang làm bài thi / ở phòng chờ ca / đang làm kiểm tra cá nhân** | KHÔNG BAO GIỜ bị cướp màn. App bỏ qua tin `bpu`. Máy chủ cũng không phát tới em đang có lượt `dang_lam`. Em xong bài mới thấy dòng nhỏ «Thầy đang chiếu Bình Phản Ứng · Vào lớp». |
-| **Lớp đang có ca kiểm tra mở** | Hộp chặn trên tờ chiếu (ảnh `b10`), không mở phòng. Đây là một trong ba điều phải dừng ở `CLAUDE.md`. |
-| **Câu đang bị giữ cho ca chưa công bố / ca đang mở / Bài tập về nhà có điểm** | Chặn gửi, ghi lý do. Chiếu thì vẫn chiếu như cũ: gửi xuống máy mạnh hơn chiếu vì em chụp màn hình được. |
-| **Câu tự luận** | Không chấm trên máy. Em làm ra giấy, bấm «Em làm xong»; bảng chỉ đếm số em xong, Space hiện lời giải. Kênh rút đề tự động vẫn không rút tự luận (`src/lib/cau-tu-luan.ts`); ở đây thầy chủ động chọn nên được, đúng như Gọi lên bảng. |
-| **Em đang làm dở chặng** | Lưu nguyên trạng chặng: câu đang làm, đáp án đang chọn, đồng hồ. Xong buổi về đúng chỗ đó. |
-| **Hết giờ** | Phòng tự khoá; em chưa gửi thì «Em chưa gửi kịp», không tinh thể, không ghi sai vào hồ sơ. |
-| **Mất mạng giữa chừng** | Đáp án đã chọn giữ trên máy. Nối lại trước khi khoá thì gửi, giờ tính theo lúc em bấm (có chặn: không sớm hơn lúc nhận câu). Nối lại sau khi khoá thì báo «Gửi muộn, không tính». |
-| **Bấm lặp / hai máy cùng một em** | Phòng nhận lần gửi đầu tiên theo (sbd, mẻ), các lần sau bỏ qua; máy thứ hai thấy «Em đã gửi ở máy khác». |
-| **Chữ / công thức dài** | Máy em cuộn trong vùng đề, nút gửi luôn ở đáy. Bảng chiếu tự giảm cỡ chữ như tờ chiếu, giữ ≥ 28 px. Ảnh trong đề hiện đúng như tờ chiếu. |
-| **Lớp đông** | Tới 48 em: 3 hàng ô. 49–96 em: ô thu nhỏ chỉ còn kí hiệu, tên hiện khi kết tinh. Hai lớp ghép: chung một phòng, ô chia nhóm theo lớp. |
-| **Số đột biến** (cả lớp chọn một phương án, hoặc 0 em gửi) | Ống cao nhất luôn 88% chiều cao, ống 0 em vẫn vẽ vỏ; 0 em gửi thì không rót, chỉ hiện đáp án. |
-| **Máy yếu** (`ddh.mayYeu`) / giảm chuyển động | Tắt hạt bay, bọt, mảnh tinh thể, phát sáng; mọi chuyển cảnh tức thì (ảnh `b11`). Bảng chiếu canvas 2D chỉ vẽ khi có thay đổi. |
-| **Em đổi tab / tắt màn** | Vẫn được tính; quay lại thấy câu đang mở. Bảng không báo em rời app. |
-| **Thầy đóng tờ chiếu giữa chừng** | Phòng sống 10 phút rồi tự kết thúc + ghi kết quả; máy em hiện «Thầy đã kết thúc» và về chỗ cũ. |
-| **Em không có mặt nhưng nhập mã** | Thuộc lớp thì vào được và được ghi «vào bằng mã»; không thuộc lớp thì từ chối. |
+| **Em đang thi / phòng chờ ca / kiểm tra cá nhân** | KHÔNG BAO GIỜ bị cướp màn. App bỏ qua tin `bpu`; máy chủ không phát tới em có lượt `dang_lam`. |
+| **Lớp đang có ca kiểm tra mở** | Hộp chặn (`b11`), không mở phòng. Đây là điều phải dừng ở `CLAUDE.md`. |
+| **Câu bị giữ** (ca chưa công bố / ca mở / Bài tập về nhà có điểm) | Chặn gửi, ghi lý do; chiếu vẫn chiếu như cũ. |
+| **Câu tự luận** | Không chấm trên máy; «Em làm xong»; vẫn gọi lên bảng được. Kênh rút tự động vẫn không rút tự luận (`src/lib/cau-tu-luan.ts`). |
+| **Em đang làm dở chặng** | Lưu nguyên trạng, xong buổi về đúng chỗ. Đây là **ngoại lệ có chủ ý với luật C14** («không bật hộp thoại khi người dùng đang làm việc khác»): thầy yêu cầu câu hiện đầy màn hình trên máy cả lớp. |
+| **Em rời màn nhiều lần** | Mỗi lần một băng cam, đếm «lần 2, lần 3»; trừ đội mỗi lần (quyết định 4). Rời quá 3 lần thì ô em ghi «Rời màn ×3» tới hết lượt. |
+| **Mất mạng ≠ rời màn** | Kết nối rớt mà máy vẫn hiện màn (không có `visibilitychange`) thì là mất mạng: không báo rời màn, không trừ. Đáp án giữ trên máy, nối lại thì gửi. |
+| **Hết giờ** | Phòng tự khoá; em chưa gửi thì không tinh thể, không ghi sai vào hồ sơ. |
+| **Bấm lặp / hai máy** | Nhận lần gửi đầu theo (sbd, lượt). Tiếp sức tối đa 10 lần mỗi em mỗi lượt. Mỗi em đoán một lần. |
+| **Không còn ứng viên lên bảng** (mọi em đã lên) | Cho lên lần hai, ghi «lên lần 2 trong buổi» như lõi đã có. |
+| **Chữ / công thức dài** | Máy em cuộn trong vùng đề. Bảng tự giảm cỡ chữ, giữ ≥ 28 px. |
+| **Lớp đông** | Tới 48 em: 3 hàng ô. 49–96 em: ô chỉ còn kí hiệu. Đội vẫn 4. |
+| **Đội lệch số người có mặt** | Xếp hạng theo tinh thể trung bình mỗi bạn có mặt (quyết định 5). |
+| **Máy yếu / giảm chuyển động** | Tắt hạt, bọt, mảnh, phát sáng, tia xoay, ngọc nổi; electron nhảy thành hiện thẳng em được gọi (`b12`). |
+| **Thầy đóng tờ chiếu giữa chừng** | Phòng sống 10 phút rồi tự kết thúc + ghi kết quả; máy em về chỗ cũ. |
 
 ## 6. Chi phí máy chủ
-- **Mở phòng:** 1 đợt chờ D1 (một `batch` 4 câu lệnh) + 1 lần đọc R2 có đệm. Không thêm vòng chờ nối tiếp.
-- **Mỗi mẻ:** 0 truy vấn D1. Mọi việc nằm trong phòng DO.
-  - Tin WebSocket ≈ số em + 1 cho mỗi sự kiện (câu, gửi, mở).
-  - Kết nối ngủ đông: lúc chờ không đánh thức phòng.
-- **Đẩy tới máy em:** N lời gọi DO song song (N = số em có mặt, ~30–45), 0 D1.
-- **Kết thúc:** 1 `batch` ghi D1 (`bpu_luot` + sự kiện học nếu bật).
-- **Lệnh nóng hiện có** (`complete`, `ktcn-start`, chốt chặng, `ktcn-nop`, sảnh): không đổi, đợt chờ giữ nguyên.
+- **Mở phòng:** 1 đợt chờ D1 (batch 5 lệnh) + 1 đọc R2 có đệm.
+- **Mỗi lượt:** 0 D1. Gọi lên bảng dùng dữ liệu đã đọc lúc mở phòng cho mọi câu của tờ chiếu. Tin WebSocket ≈ số em + 1 mỗi sự kiện.
+  - Tiếp sức gom 250 ms rồi mới gửi lên bảng, nên 40 em chạm liên tục vẫn ≤ 4 tin/giây tới bảng.
+- **Điểm danh:** giữ nguyên lệnh cũ + 1 lời gọi DO.
+- **Kết thúc:** 1 batch ghi D1.
+- **Lệnh nóng hiện có:** không đổi.
 - **Tải app:**
-  - Máy em: mảnh `ManBinhPhanUng` nạp lười chỉ khi có tin; dùng lại `LamCau` đã nằm trong mảnh chặng. **Byte mở `/hs` không tăng.** Phần nhận tin nằm trong mảnh kênh đẩy đang nạp lười.
-  - Bảng chiếu: mảnh `BangBinhPhanUng`, canvas 2D, không three.js. Chỉ máy thầy dùng, đưa vào `globIgnores` (`vite.config.ts`) để precache không vượt 170 tệp / 3000 KB.
+  - Máy em: mảnh `ManBinhPhanUng` nạp lười khi có tin. Byte mở `/hs` không tăng.
+  - Bảng chiếu: mảnh `BangBinhPhanUng` (canvas 2D + SVG, không three.js), chỉ máy thầy dùng, đưa vào `globIgnores`.
+  - Bỏ `BanChieuDiemDanh` (1023 dòng) và `ban-chieu-diem-danh.css` khỏi đường mở thì app thầy nhẹ đi.
 
 ## 7. Nghiệm thu đo bằng máy
 - **Test vitest mới:**
@@ -190,51 +267,53 @@ Những câu tiếp theo trên cùng tờ chiếu, thầy bấm → rồi L, ho�
     - chấm 3 kiểu câu;
     - khoá trước khi phát đáp án;
     - **máy em không nhận đáp án trước khi mở**;
-    - gửi lặp và hai máy chỉ tính lần đầu;
-    - tinh thể = 100 + tối đa 50 theo nhanh (Đúng–sai 25 mỗi ý);
-    - hết giờ;
-    - nối lại.
-  - `tests/bpu-ve-0611.test.ts`: vé HMAC, hạn 2 phút, em ngoài lớp bị từ chối.
-  - `tests/bpu-chan-ca-0611.test.ts`:
-    - ca đang mở thì chặn;
-    - em đang có lượt `dang_lam` thì không nhận tin;
-    - câu giữ cho ca / Bài tập về nhà có điểm thì chặn;
-    - câu tự luận thì chế độ «Em làm xong».
-  - `tests/bpu-kenh-day-0611.test.ts`: tin `bpu` đi thẳng, không gom 1,2 s; `TAT_BPU` / `TAT_KENH_DAY` tắt sạch.
-  - `tests/bpu-may-em-0611.test.tsx`:
-    - đủ trạng thái máy em;
-    - lưu và trả chặng đang làm;
-    - chữ theo bảng A2;
-    - không nút thoát giữa mẻ.
-  - `tests/bpu-to-chieu-0611.test.ts`: phím L có ở tờ chiếu của cả 5 nơi chiếu; điện thoại thầy có Mở đáp án / Mẻ tiếp.
+    - gửi lặp / hai máy;
+    - tinh thể (đúng 100 + tối đa 50 nhanh; Đúng–sai 25/ý; vượt năng lượng hoạt hoá +30; đội lên bảng Đạt +200; đoán đúng +20; vào sớm +10; đủ quân đầu +50; rời màn −20);
+    - hết giờ; nối lại.
+  - `tests/bpu-goi-len-bang-0611.test.ts`:
+    - dùng `chon-em-phan-tang` đúng tầng theo mức độ câu;
+    - bỏ em rời màn / vắng;
+    - lý do ba dòng không có nhãn năng lực;
+    - mỗi em một lần.
+  - `tests/bpu-roi-man-0611.test.ts`: rời màn báo ≤ 1 s; mất mạng không bị tính rời màn; trừ đội đúng.
+  - `tests/bpu-diem-danh-0611.test.ts`:
+    - `/hs/diem-danh` giữ hợp đồng cũ;
+    - báo phòng ngay;
+    - chia đội rắn bò cân bằng;
+    - đội cố định trong tháng.
+  - `tests/bpu-chan-ca-0611.test.ts`: ca mở thì chặn; em `dang_lam` không nhận; câu bị giữ thì chặn; tự luận thì «Em làm xong».
+  - `tests/bpu-kenh-day-0611.test.ts`: tin `bpu` không gom 1,2 s; `ctx.storage` có hạn; công tắc tắt sạch.
+  - `tests/bpu-may-em-0611.test.tsx`: đủ trạng thái máy em; lưu / trả chặng; không nút thoát; chữ theo bảng A2 (không còn «mẻ»).
+  - `tests/bpu-to-chieu-0611.test.ts`: phím L ở cả 5 nơi chiếu; điện thoại thầy có nút BPU.
 - **Cổng chung:**
   - `tsc`;
-  - toàn bộ vitest so theo tên với `main`;
-  - `npm run build && npm run kiem:toc-do` 0 đỏ (byte mở `/hs` `/gv` `/ph` không tăng, đợt chờ D1 lệnh nóng không tăng);
+  - toàn bộ vitest so tên với `main`;
+  - `npm run build && npm run kiem:toc-do` 0 đỏ;
   - `npm run kiem:mau-giu` 0;
-  - `node scripts/kiem-sw.mjs` đạt;
+  - `node scripts/kiem-sw.mjs`;
   - `npm run kiem:co-tep`.
-- **Ảnh Chromium sau khi build:** cùng bộ trạng thái như `anh/`, 0 lỗi trang, 0 tràn, 0 đích bấm < 44 px.
-- **Sau gộp:** tác tử `toc-do` đo trước/sau (byte mở, chạm được, bấm phương án, khung cuộn CPU ×4/×6, đợt chờ D1). Chưa nhanh hơn thì chưa báo xong.
+- **Ảnh Chromium sau build:** cùng bộ như `anh/`, 0 lỗi trang, 0 tràn, 0 đích bấm < 44 px. Thêm một ảnh vinh danh ở 3840×2160 để kiểm độ nét vector.
+- **Sau gộp:** tác tử `toc-do` đo trước/sau. Chưa nhanh hơn thì chưa báo xong.
 
 ## 8. Thầy cần chọn (bước 3)
-1. **Tinh thể có cộng vào EXP không?** Đề xuất: KHÔNG; tinh thể chỉ tính trong buổi. EXP là luật thầy đã khoá. Kết quả đúng/sai **có** ghi vào hồ sơ như một lượt luyện, do máy chủ chấm, để câu sai vào lịch ôn lại.
-2. **Tên ai hiện trên bảng?** Đề xuất: chỉ ô em đúng sáng lên (kết tinh) + huy hiệu 1·2·3 cho 3 em nhanh nhất; em sai không bị đánh dấu; phím H ẩn mọi tên. Bảng kết tinh hiện 8 em đầu. Riêng «Chiếu chữa sau ca» vẫn giữ cách hiện tên em sai màu trung tính như thầy đã chốt 01/11.
-3. **Đồng hồ:** mặc định 60 giây, chọn 30 / 60 / 90 / không giới hạn; thầy mở đáp án sớm được, thêm 15 giây được.
-4. **Gửi rồi có được đổi?** Đề xuất: không đổi.
-5. **Ai nhận câu:** em có mặt theo điểm danh hôm nay + em thuộc lớp nhập mã.
+1. **Tinh thể có cộng vào EXP không?** Đề xuất KHÔNG (EXP là luật thầy đã khoá); kết quả đúng/sai ghi hồ sơ như một lượt luyện, câu sai vào lịch ôn lại.
+2. **Lý do gọi lên bảng hiện tới đâu trên màn chiếu?** Đề xuất bảng hiện ba dòng nhẹ (dạng, số câu đã làm/đúng, số ngày chưa lên bảng); khả năng đúng và bước hay vướng chỉ trên điện thoại thầy. Thẻ cũ của lõi chọn em ghi «Không đưa lên bản chiếu», nay thầy yêu cầu «ghi rõ lý do» nên cần thầy chốt mức.
+3. **Đồng hồ:** luật C14 cấm «đếm ngược gây sợ ngoài màn kiểm tra». Bản vẽ đã bỏ đổi màu cam / nháy, chỉ còn vòng êm. Mặc định 60 giây hay «Không giới hạn»?
+4. **Rời màn:** trừ đội −20 tinh thể mỗi lần + hiện tên trên bảng. Thầy muốn mức khác?
+5. **Chia đội:** cố định cả tháng, chia rắn bò theo sức học, xếp hạng theo tinh thể trung bình mỗi bạn có mặt?
+6. **Gửi rồi có được đổi?** Đề xuất không.
 
 ## 9. Ai build (bước 4)
-- **Claude** làm toàn bộ tệp mới:
-  - máy chủ: DO, luật, lệnh, migration;
-  - máy em: `ManBinhPhanUng`;
-  - bảng chiếu: `BangBinhPhanUng`;
-  - các test.
-- **Chạm tệp ngoài làn, mỗi chỗ chỉ thêm, ghi Nhật ký trước khi sửa:**
-  - `html-may-chieu.ts`: phím L + nút. Làn cũ của Code 1, phiên đã vắng.
-  - `DieuKhienToChieuScreen.tsx`: 3 nút.
-  - `kenh-day.ts`: loại tin `bpu`.
-  - `server/src/index.ts`: định tuyến.
-  - `wrangler.toml`: DO.
-  - `vite.config.ts`: `globIgnores`.
-- **Chiếu chữa sau ca** (`dung-to-chua-ca.ts`) thuộc làn Codex: chỉ được phím L đi qua tờ chiếu chung, không đổi luồng của Codex. Codex soát PR.
+- **Claude:** toàn bộ tệp mới:
+  - máy chủ: DO `PhongBinhPhanUng`, `bpu-phong.ts`, lệnh `/gv/bpu/*` `/hs/bpu/*`, 2 migration chỉ-thêm;
+  - mảnh `ManBinhPhanUng`, `BangBinhPhanUng`;
+  - test.
+- **Thay màn chiếu điểm danh:** `day-hoc/BanChieuDiemDanh*`, `Buoc1DiemDanh` thuộc làn Claude. Phiên khác (Antigravity) vừa sửa 06/11, nên ghi Nhật ký trước khi thay.
+- **Chạm ngoài làn, chỉ thêm, ghi Nhật ký trước:**
+  - `html-may-chieu.ts` (phím L, làn cũ Code 1 đã vắng);
+  - `to-chieu-cau-noi.ts`;
+  - `DieuKhienToChieuScreen.tsx`;
+  - `kenh-day.ts` (cả máy chủ lẫn máy em);
+  - `server/src/index.ts`, `wrangler.toml`, `vite.config.ts`;
+  - `kiem-tra-ca-nhan.ts` (tách hàm kiểm câu, làn Codex).
+- **Làn Codex:** `/gv/ung-vien-chieu` (thêm trường) và `kiem-tra-ca-nhan.ts`. Codex soát PR.

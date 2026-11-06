@@ -119,7 +119,8 @@ button:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
     linear-gradient(150deg, var(--b-luoi) 12%, transparent 12.5%, transparent 87%, var(--b-luoi) 87.5%, var(--b-luoi)),
     linear-gradient(90deg, var(--b-luoi) 2%, transparent 2.5%, transparent 97%, var(--b-luoi) 97.5%);
   background-size: 80px 140px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); mask-image: linear-gradient(180deg, #000, transparent 70%); }
-#bangVe { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+#bangVe, #bangVeTren { position: absolute; inset: 0; width: 1920px; height: 1080px; }
+#bangVeTren { pointer-events: none; z-index: 7; }
 .b-tren { position: absolute; left: 64px; right: 64px; top: 30px; height: 60px; display: flex; align-items: center; gap: 22px; }
 .b-logo { display: flex; align-items: center; gap: 14px; font-size: 32px; font-weight: 800; letter-spacing: -0.01em; }
 .b-logo svg { width: 46px; height: 46px; }
@@ -195,9 +196,9 @@ button:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
 .b-xh-hang:nth-child(2) .h { color: var(--tr-sao); }
 .b-tk { position: absolute; inset: 112px 64px 250px; display: grid; grid-template-columns: 1fr; justify-items: center; align-content: start; gap: 18px; }
 .b-tk h2 { margin: 0; font-size: 50px; letter-spacing: -0.01em; }
-.b-buc { display: flex; align-items: flex-end; gap: 40px; height: 540px; }
+.b-buc { display: flex; align-items: flex-end; gap: 40px; height: 450px; }
 .b-buc > div { width: 300px; display: grid; justify-items: center; gap: 12px; }
-.b-buc .ngoc { width: 118px; aspect-ratio: 0.82; clip-path: polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%); background: linear-gradient(160deg, var(--tr-trang-ngoc, #ffffff) -20%, var(--m) 45%, color-mix(in srgb, var(--m) 60%, #000) 110%); }
+.b-buc .ngoc { width: 96px; aspect-ratio: 0.82; clip-path: polygon(50% 0, 100% 28%, 100% 72%, 50% 100%, 0 72%, 0 28%); background: linear-gradient(160deg, var(--tr-trang-ngoc, #ffffff) -20%, var(--m) 45%, color-mix(in srgb, var(--m) 60%, #000) 110%); }
 .b-buc .ten-to { font-size: 34px; font-weight: 800; white-space: nowrap; }
 .b-buc .diem-to { font-size: 26px; color: var(--tr-chu-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .b-buc .bac { width: 100%; border-radius: 22px 22px 0 0; display: grid; place-items: center; font-size: 64px; font-weight: 800; color: var(--tr-chu-3); background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); }
@@ -218,6 +219,145 @@ button:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
 .b-hop .tick { display: flex; align-items: center; gap: 14px; font-size: 26px; }
 .b-hop .tick i { width: 34px; height: 34px; border-radius: 9px; background: var(--tr-hs); display: grid; place-items: center; color: #1b1938; font-style: normal; font-weight: 900; }
 .b-mo-den { position: absolute; inset: 0; background: rgba(10, 10, 20, 0.55); }
+
+/* ── Thi đua (06/11 tối): đội theo màu thử ngọn lửa, lửa chuỗi, rời màn, gọi lên bảng, đua ngọn lửa ── */
+.o::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 5px; height: 4px; border-radius: 3px; background: var(--doi); opacity: 0.9; }
+.o.chay::before { content: ""; position: absolute; left: 50%; top: -24px; width: 26px; height: 34px; margin-left: -13px; border-radius: 50% 50% 46% 46% / 62% 62% 38% 38%;
+  background: radial-gradient(circle at 50% 72%, #ffffff 0 16%, var(--doi) 46%, transparent 74%); animation: lua 0.45s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes lua { to { transform: scaleY(1.18) translateY(-2px); opacity: 0.85; } }
+.o.roi { box-shadow: inset 0 0 0 3px var(--tr-chu-y), 0 0 26px color-mix(in srgb, var(--tr-chu-y) 60%, transparent); }
+.o.roi .ky { color: var(--tr-chu-y); }
+.o .nhan-roi { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); padding: 1px 10px; border-radius: 8px; background: var(--tr-chu-y); color: #1b1938; font-size: 14px; font-weight: 800; white-space: nowrap; }
+.o.ung { box-shadow: inset 0 0 0 3px var(--tr-chu-2); }
+.o.soi, .o.duoc-goi { z-index: 3; transform: translateY(-16px) scale(1.14); background: var(--doi); box-shadow: 0 0 0 4px var(--tr-nen), 0 0 44px var(--doi); }
+.o.soi .ky, .o.soi .ten, .o.soi .so, .o.duoc-goi .ky, .o.duoc-goi .ten, .o.duoc-goi .so { color: #1b1938; }
+.b-toast { position: absolute; left: 50%; top: 100px; transform: translateX(-50%); z-index: 6; display: flex; align-items: center; gap: 14px; padding: 12px 28px 12px 14px; border-radius: 20px;
+  background: var(--tr-chu-y); color: #1b1938; font-size: 28px; font-weight: 800; white-space: nowrap; box-shadow: 0 24px 60px -24px rgba(0,0,0,.7); animation: rung 0.45s ease-in-out 2; }
+.b-toast::before { content: "!"; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: #1b1938; color: var(--tr-chu-y); font-weight: 900; }
+@keyframes rung { 25% { transform: translateX(calc(-50% - 10px)); } 75% { transform: translateX(calc(-50% + 10px)); } }
+.b-kich { position: absolute; left: 50%; top: 100px; transform: translateX(-50%); z-index: 6; padding: 12px 30px; border-radius: 20px; background: var(--tr-sao); color: #1b1938; font-size: 30px; font-weight: 900; white-space: nowrap; box-shadow: 0 0 60px var(--tr-sao); opacity: 0; transition: opacity 0.4s 2.2s; }
+.b-kich.hien { opacity: 1; }
+.b-goi { position: absolute; left: 250px; top: 120px; width: 1420px; height: 690px; z-index: 4; display: grid; grid-template-columns: 380px minmax(0, 1fr); gap: 48px; padding: 48px 56px; border-radius: 40px;
+  background: var(--tr-mat); box-shadow: inset 0 0 0 4px var(--doi), 0 0 90px color-mix(in srgb, var(--doi) 45%, transparent); }
+.g-trai { display: grid; justify-items: center; align-content: center; gap: 26px; }
+.g-ng { position: relative; width: 300px; height: 300px; display: grid; place-items: center; }
+.g-ng b { width: 200px; height: 200px; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: #1b1938; font-size: 96px; font-weight: 900; box-shadow: 0 0 80px var(--doi); }
+.g-ng .quy { position: absolute; inset: 0; border-radius: 50%; border: 4px solid color-mix(in srgb, var(--doi) 60%, transparent); animation: quay 2.6s linear infinite; }
+.g-ng .quy::after { content: ""; position: absolute; top: -10px; left: 50%; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--tr-chu); }
+.g-ng .quy.hai { inset: 26px; transform: rotate(60deg); animation-duration: 1.8s; animation-direction: reverse; }
+.g-doi { padding: 8px 24px; border-radius: 999px; background: var(--doi); color: #1b1938; font-size: 30px; font-weight: 900; }
+.g-phai { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.g-mat { font-size: 30px; font-weight: 700; color: var(--tr-chu-2); }
+.g-ten { font-size: 76px; font-weight: 900; letter-spacing: -0.02em; line-height: 1.05; }
+.g-vi { margin-top: 10px; font-size: 22px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tr-chu-3); }
+.b-goi ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.b-goi li { position: relative; padding-left: 36px; font-size: 29px; line-height: 1.35; }
+.b-goi li::before { content: ""; position: absolute; left: 4px; top: 12px; width: 16px; height: 16px; transform: rotate(45deg); border-radius: 3px; background: var(--doi); }
+.g-duoi { margin-top: auto; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 28px; align-items: end; }
+.g-dd { display: grid; gap: 8px; font-size: 24px; color: var(--tr-chu-2); }
+.g-dd b { color: var(--tr-chu); }
+.g-thanh { height: 22px; border-radius: 12px; background: var(--tr-mat-3); overflow: hidden; }
+.g-thanh i { display: block; height: 100%; background: var(--tr-dung); border-radius: 12px; transition: width 0.3s; }
+.g-ts { display: grid; justify-items: center; padding: 14px; border-radius: 22px; background: color-mix(in srgb, var(--doi) 18%, var(--tr-mat)); font-size: 22px; font-weight: 700; color: var(--tr-chu-2); }
+.g-ts b { font-size: 58px; font-weight: 900; color: var(--tr-chu); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.b-dua { position: absolute; left: 64px; top: 118px; width: 1090px; }
+.b-dua h2 { margin: 0; font-size: 46px; letter-spacing: -0.01em; }
+.b-dua p { margin: 4px 0 0; font-size: 24px; color: var(--tr-chu-2); }
+.b-dua-nhan { position: absolute; top: 700px; width: 240px; margin-left: -120px; text-align: center; display: grid; }
+.b-dua-nhan b { font-size: 28px; white-space: nowrap; }
+.b-dua-nhan b::before { content: ""; display: inline-block; width: 16px; height: 16px; margin-right: 10px; border-radius: 50%; background: var(--doi); }
+.b-dua-nhan span { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.b-dua-nhan small { font-size: 19px; color: var(--tr-chu-3); white-space: nowrap; }
+.b-top { position: absolute; left: 1240px; top: 124px; width: 616px; display: grid; gap: 10px; }
+.b-top h3 { margin: 0 0 6px; font-size: 32px; }
+.b-top-hang { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px; height: 66px; padding: 0 22px; border-radius: 18px; background: var(--tr-mat); box-shadow: inset 6px 0 0 var(--doi), inset 0 0 0 2px var(--tr-vien); font-size: 28px; }
+.b-top-hang .h { font-weight: 800; color: var(--tr-chu-3); text-align: center; }
+.b-top-hang .t { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-top-hang .d { font-weight: 800; font-variant-numeric: tabular-nums; }
+.b-tk-phu { font-size: 26px; color: var(--tr-chu-2); margin-top: -10px; }
+.ng-tu.to { width: 124px; height: 124px; }
+.ng-tu.to .nhan-ng { width: 80px; height: 80px; font-size: 30px; background: var(--doi); color: #1b1938; box-shadow: 0 0 30px var(--doi); }
+.m-ban { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 18px; background: var(--tr-mat); box-shadow: inset 0 0 0 3px var(--doi); }
+.m-ban .nhan-ng { flex: none; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: #1b1938; font-weight: 900; font-size: 22px; }
+.m-ban b { display: block; font-size: 18px; font-weight: 900; }
+.m-ban span { font-size: 14px; color: var(--tr-chu-2); font-weight: 700; }
+.m-hoi { margin: 8px 0 0; font-size: 19px; font-weight: 900; }
+.m-hai { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.m-hai button { min-height: 64px; border: 2px solid var(--tr-vien); border-radius: 16px; background: var(--tr-mat); box-shadow: 0 4px 0 var(--tr-vien); font-size: 17px; font-weight: 900; }
+.m-hai button.chon { border-color: var(--tr-hs); background: var(--tr-hs-nhat); box-shadow: 0 4px 0 var(--tr-hs-day); }
+.m-nho { margin: 0; font-size: 14px; color: var(--tr-chu-2); font-weight: 700; }
+.m-nut.m-tiep-nut { min-height: 64px; background: var(--doi); color: #1b1938; box-shadow: 0 5px 0 color-mix(in srgb, var(--doi) 60%, #000); font-size: 19px; }
+.m-canh { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--tr-chu-y); color: #1b1938; font-size: 48px; font-weight: 900; }
+
+/* ── Điểm danh mới = mở màn Bình Phản Ứng (06/11 tối: thầy «bỏ kiểu điểm danh hiện tại, thiết kế lại cho phù hợp game lên bảng») ── */
+.b-dd { position: absolute; left: 64px; top: 118px; width: 1090px; height: 700px; display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: auto auto auto 1fr; column-gap: 44px; row-gap: 16px; }
+.b-dd h2 { grid-column: 1 / -1; margin: 0; font-size: 54px; letter-spacing: -0.02em; line-height: 1.1; }
+.b-dd .phu { grid-column: 1 / -1; margin: 0; font-size: 25px; color: var(--tr-chu-2); }
+.b-qr { width: 260px; height: 260px; padding: 18px; border-radius: 26px; background: #ffffff; display: grid; grid-template-columns: repeat(25, 1fr); }
+.b-qr i { background: #1b1938; } .b-qr i.t { background: transparent; }
+.b-dd-ma { display: grid; gap: 14px; align-content: start; min-width: 0; }
+.b-dd-ma .nhan { font-size: 24px; font-weight: 700; color: var(--tr-chu-3); letter-spacing: 0.06em; text-transform: uppercase; }
+.b-dd-so { display: flex; gap: 12px; }
+.b-dd-so span { display: grid; place-items: center; width: 104px; height: 132px; border-radius: 22px; background: var(--tr-mat); box-shadow: inset 0 0 0 3px var(--tr-vien-2); font-size: 86px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.b-dd-so span.gach { width: 22px; background: none; box-shadow: none; color: var(--tr-chu-3); font-size: 60px; }
+.b-vua { grid-column: 1 / -1; align-self: end; display: grid; gap: 10px; }
+.b-vua .nhan { font-size: 22px; font-weight: 800; color: var(--tr-chu-3); letter-spacing: 0.06em; text-transform: uppercase; }
+.b-vua-hang { display: flex; align-items: center; gap: 16px; height: 62px; padding: 0 20px; border-radius: 18px; background: var(--tr-mat); box-shadow: inset 6px 0 0 var(--doi), inset 0 0 0 2px var(--tr-vien); font-size: 28px; white-space: nowrap; }
+.b-vua-hang b { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.b-vua-hang .chip { padding: 2px 12px; border-radius: 10px; background: var(--doi); color: #1b1938; font-size: 20px; font-weight: 800; }
+.b-vua-hang .gio { margin-left: auto; color: var(--tr-chu-3); font-size: 22px; font-variant-numeric: tabular-nums; }
+.b-vua-hang .cong { color: var(--tr-dung-chu); font-weight: 800; font-size: 22px; }
+.b-dd-phai { position: absolute; left: 1200px; top: 118px; width: 656px; }
+.b-dd-phai h3 { margin: 0; font-size: 32px; }
+.b-dd-phai p.du-quan { display: inline-block; margin-top: 10px; padding: 6px 18px; border-radius: 14px; background: var(--doi); color: #1b1938; font-weight: 900; font-size: 24px; box-shadow: 0 0 40px var(--doi); } .b-dd-phai p { margin: 4px 0 0; font-size: 22px; color: var(--tr-chu-2); }
+.b-dd-doi { position: absolute; top: 590px; width: 150px; margin-left: -75px; text-align: center; display: grid; }
+.b-dd-doi b { font-size: 24px; white-space: nowrap; }
+.b-dd-doi span { font-size: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.b-dd-doi small { font-size: 18px; color: var(--tr-chu-3); white-space: nowrap; }
+.b-dd-doi.du span { color: var(--tr-dung-chu); }
+.b-dd-dem { position: absolute; left: 1200px; width: 656px; top: 724px; text-align: center; font-size: 28px; color: var(--tr-chu-2); white-space: nowrap; }
+.b-dd-dem b { font-size: 64px; color: var(--tr-chu); font-variant-numeric: tabular-nums; vertical-align: -4px; margin-right: 6px; }
+.b-kich.doi-mau { background: var(--doi); box-shadow: 0 0 60px var(--doi); opacity: 1; transition: none; }
+.m-ma { display: flex; justify-content: center; gap: 8px; }
+.m-ma span { display: grid; place-items: center; width: 44px; height: 58px; border-radius: 12px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien-2); font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.m-ma span.dang { box-shadow: inset 0 0 0 3px var(--tr-hs); }
+.m-doi-the { width: 100%; display: grid; gap: 6px; padding: 14px; border-radius: 16px; background: var(--tr-mat); box-shadow: inset 0 0 0 3px var(--doi); text-align: left; }
+.m-doi-the b { font-size: 18px; font-weight: 900; } .m-doi-the span { font-size: 14.5px; color: var(--tr-chu-2); font-weight: 700; }
+.m-doi-the .vach { height: 10px; border-radius: 6px; background: var(--tr-mat-3); overflow: hidden; } .m-doi-the .vach i { display: block; height: 100%; background: var(--doi); }
+
+/* ── Vinh danh (06/11 tối: thầy «phần vinh danh làm cho đẹp và rực rỡ hơn nữa · vẽ vector cho siêu nét») — toàn SVG, không ảnh ── */
+.vd { position: absolute; inset: 0; overflow: hidden; }
+.vd-tia { position: absolute; left: 210px; top: -330px; width: 1500px; height: 1500px; -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 62%); mask-image: radial-gradient(circle, #000 18%, transparent 62%); }
+.vd-tia g { transform-box: view-box; transform-origin: center; animation: quay 80s linear infinite; }
+.vd-tia path { fill: var(--doi); fill-opacity: calc(var(--b-quang) * 0.42); }
+.vd-dau { position: absolute; left: 0; right: 0; top: 102px; display: flex; justify-content: center; align-items: center; gap: 30px; }
+.vd-huy { width: 132px; filter: drop-shadow(0 0 28px var(--doi)); animation: noi 2.6s ease-in-out infinite alternate; }
+.vd-mat { font-size: 24px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: var(--tr-chu-2); }
+.vd-dau h2 { margin: 2px 0 8px; font-size: 92px; font-weight: 900; letter-spacing: -0.025em; line-height: 1; text-shadow: 0 0 46px color-mix(in srgb, var(--doi) calc(var(--b-quang) * 120%), transparent); }
+.vd-diem { display: inline-block; padding: 6px 20px; border-radius: 999px; background: var(--doi); color: #1b1938; font-size: 28px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.vd-buc { position: absolute; left: 500px; width: 920px; bottom: 82px; display: flex; align-items: flex-end; justify-content: center; gap: 24px; }
+.vd-cot { width: 280px; display: grid; justify-items: center; gap: 8px; }
+.vd-ngoc { position: relative; display: grid; place-items: center; }
+.vd-ngoc > svg:first-child { width: 100%; filter: drop-shadow(0 0 30px var(--m)); animation: noi 3s ease-in-out infinite alternate; }
+.vd-cot:nth-child(1) .vd-ngoc > svg:first-child { animation-delay: -1s; } .vd-cot:nth-child(3) .vd-ngoc > svg:first-child { animation-delay: -2s; }
+@keyframes noi { to { transform: translateY(-12px); } }
+.vd-sao { position: absolute; width: 30px; height: 30px; animation: lap 2.2s ease-in-out infinite; }
+@keyframes lap { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 45% { transform: scale(1) rotate(45deg); opacity: 1; } }
+.vd-ten { font-size: 38px; font-weight: 900; white-space: nowrap; }
+.vd-phu { font-size: 22px; color: var(--tr-chu-2); white-space: nowrap; font-variant-numeric: tabular-nums; margin-top: -6px; }
+.vd-bac { width: 100%; border-radius: 26px 26px 0 0; display: grid; place-items: center; background: linear-gradient(180deg, color-mix(in srgb, var(--m) 58%, var(--tr-mat)), color-mix(in srgb, var(--m) 10%, var(--tr-mat)));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--m) 70%, transparent), 0 -10px 60px -10px color-mix(in srgb, var(--m) 55%, transparent); }
+.vd-bac span { font-size: 100px; font-weight: 900; color: var(--tr-chu); line-height: 1; }
+.vd-ben { position: absolute; top: 330px; width: 400px; display: grid; gap: 12px; }
+.vd-ben h3 { margin: 0 0 4px; font-size: 26px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--tr-chu-3); }
+.vd-doi { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px; height: 78px; padding: 0 22px 0 16px; border-radius: 20px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: 28px; }
+.vd-doi:first-of-type { box-shadow: inset 0 0 0 3px var(--doi), 0 0 40px color-mix(in srgb, var(--doi) 40%, transparent); }
+.vd-doi b { font-weight: 800; white-space: nowrap; } .vd-doi span { font-weight: 900; font-variant-numeric: tabular-nums; }
+.vd-lua { width: 40px; height: 56px; transform-origin: 50% 100%; animation: lua 0.5s ease-in-out infinite alternate; }
+.vd-so { display: grid; gap: 2px; padding: 16px 22px; border-radius: 20px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.vd-so b { font-size: 40px; font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; } .vd-so span { font-size: 21px; color: var(--tr-chu-2); }
+@media (prefers-reduced-motion: reduce) { .vd-tia g, .vd-huy, .vd-ngoc > svg, .vd-sao, .vd-lua { animation: none !important; } .vd-sao { opacity: 1; transform: none; } }
+.tuc-thi .vd-sao { opacity: 1; transform: none; }
 
 /* ───────────── MÁY HỌC SINH (390×844) ───────────── */
 .may { position: absolute; left: 0; top: 0; width: 390px; height: 844px; transform-origin: 0 0; display: flex; flex-direction: column; overflow: hidden;
@@ -351,7 +491,7 @@ html.chup-h .vo-may-trong, html.chup-d .vo-may-trong { border-radius: 0; }
 html.chup-h .may, html.chup-d .dk { position: relative; width: 100%; height: 100%; transform: none !important; }
 html.chup .bang * , html.chup .may * { transition: none !important; }
 .tuc-thi * { transition: none !important; animation: none !important; }
-@media (prefers-reduced-motion: reduce) { .o, .b-pa > div, .b-ong, .b-ds-nhan, .b-xh-hang .thanh i, .m-pa, .m-tien i { transition: none !important; } .manh, .ng-tu .quy { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .o.chay::before, .b-toast, .g-ng .quy { animation: none !important; } .o, .b-pa > div, .b-ong, .b-ds-nhan, .b-xh-hang .thanh i, .m-pa, .m-tien i { transition: none !important; } .manh, .ng-tu .quy { animation: none !important; } }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -363,7 +503,7 @@ html.chup .bang * , html.chup .may * { transition: none !important; }
 <div class="trang">
   <header class="dau">
     <h1><svg aria-hidden="true"><use href="#binh"/></svg>Bình Phản Ứng</h1>
-    <p>Bản vẽ chạy thử để thầy Đỗ Đại Học duyệt. Thầy chiếu câu nào, câu đó hiện đầy màn hình trên app của cả lớp. Em nào gửi đáp án, một giọt sáng bay từ ô tên em vào bình cầu trên bảng. Thầy mở đáp án, chất lỏng chia vào bốn ống nghiệm, ống đúng đổi màu và kết tinh. Lớp mô phỏng 32 em, tên và số liệu đều là giả.</p>
+    <p>Bản vẽ chạy thử để thầy Đỗ Đại Học duyệt. Điểm danh mở màn, bốn đội màu ngọn lửa thi đua. Thầy chiếu câu nào, câu đó hiện đầy màn hình trên app của cả lớp. Cả lớp gửi xong thì gọi một em lên bảng kèm lý do. Mở đáp án, ống nghiệm đổi màu, các đội đua lửa, cuối buổi vinh danh. Lớp mô phỏng 32 em, tên và số liệu đều là giả. Hình vẽ đều là vector nên máy chiếu nào cũng nét.</p>
   </header>
 
   <section class="dk-ban" aria-label="Điều khiển bản vẽ">
@@ -375,12 +515,14 @@ html.chup .bang * , html.chup .may * { transition: none !important; }
     </div>
     <div class="dk-hang"><span class="dk-nhan">Bước</span>
       <button class="dk-nut" data-buoc="bat-dau">Thầy bấm L trên tờ chiếu</button>
-      <button class="dk-nut" data-buoc="cho">Phòng chờ</button>
+      <button class="dk-nut" data-buoc="cho">Điểm danh</button>
       <button class="dk-nut" data-buoc="tra-loi">Cả lớp trả lời</button>
+      <button class="dk-nut" data-buoc="goi">Gọi lên bảng</button>
       <button class="dk-nut" data-buoc="mo">Mở đáp án</button>
       <button class="dk-nut" data-buoc="ket-tinh">Bảng kết tinh</button>
       <button class="dk-nut" data-buoc="tong-ket">Tổng kết</button>
       <button class="dk-nut" data-buoc="chan">Khi đang có ca mở</button>
+      <button class="dk-nut" data-buoc="roi">Một em thoát màn</button>
     </div>
     <div class="dk-hang"><span class="dk-nhan">Kiểu câu</span>
       <button class="dk-nut" data-loai="tn" aria-pressed="true">Trắc nghiệm</button>
@@ -403,6 +545,7 @@ html.chup .bang * , html.chup .may * { transition: none !important; }
         <div class="bang-san" id="bangSan">
           <canvas id="bangVe" width="1920" height="1080" aria-hidden="true"></canvas>
           <div id="bangNoi"></div>
+          <canvas id="bangVeTren" width="1920" height="1080" aria-hidden="true"></canvas>
         </div>
       </div>
       <div class="chu-thich">Bảng chiếu 1920 × 1080 (co lại cho vừa trang). Bấm các nút «Bước» để xem từng trạng thái.</div>
@@ -417,16 +560,18 @@ html.chup .bang * , html.chup .may * { transition: none !important; }
   </section>
 
   <section class="giai-thich" aria-label="Cách chơi">
-    <div class="buoc"><h3><span class="so-buoc">1</span>Thầy chiếu</h3><p>Ở bất kỳ tờ chiếu nào (Gọi lên bảng, Dạy học, Chiếu chữa sau ca, Cần thầy chữa, tờ chiếu chiến dịch), thầy bấm phím L hoặc nút «Cả lớp làm». Câu đang chiếu được gửi xuống máy mọi em có mặt.</p></div>
-    <div class="buoc"><h3><span class="so-buoc">2</span>Em làm trên máy</h3><p>Câu hiện đầy màn hình giống chặng, có đồng hồ. Em chọn rồi gửi một lần. Trên bảng chỉ biết em đã gửi, chưa ai biết em chọn gì, để không nhìn đáp án của nhau.</p></div>
-    <div class="buoc"><h3><span class="so-buoc">3</span>Mở đáp án và kết tinh</h3><p>Thầy bấm Space: chất lỏng chia vào các ống nghiệm theo số em chọn, ống đúng đổi màu, ô của em đúng kết tinh theo thứ tự nhanh nhất. Sau vài mẻ có Bảng kết tinh và Tổng kết.</p></div>
+    <div class="buoc"><h3><span class="so-buoc">1</span>Điểm danh là mở màn</h3><p>Em nhập mã 6 số trên bảng (hoặc quét QR): vừa điểm danh vừa vào Bình Phản Ứng. Mỗi em thuộc một trong bốn đội màu ngọn lửa: Natri, Kali, Đồng, Canxi. Vào sớm được +10 tinh thể cho đội; đội đủ quân đầu tiên được +50.</p></div>
+    <div class="buoc"><h3><span class="so-buoc">2</span>Cả lớp làm, không ai thoát</h3><p>Thầy bấm L trên bất kỳ tờ chiếu nào: câu hiện đầy màn hình trên máy mọi em, giống chặng. Em gửi đáp án thì một giọt sáng bay vào bình cầu. Em rời màn là bảng hiện tên ngay và đội của em bị trừ 20 tinh thể.</p></div>
+    <div class="buoc"><h3><span class="so-buoc">3</span>Gọi lên bảng, mở đáp án, vinh danh</h3><p>Cả lớp gửi xong: electron nhảy qua các ô rồi dừng ở em hợp với câu nhất, kèm lý do lấy từ lịch sử làm bài. Cả lớp đoán bạn đúng hay sai và tiếp sức bằng điện thoại. Mở đáp án, ống nghiệm đổi màu, các đội đua ngọn lửa, cuối buổi vinh danh.</p></div>
   </section>
   <section class="can-chon">
     <h2>Thầy cần chọn trước khi em làm</h2>
     <ol>
-      <li><b>Tinh thể có cộng vào EXP không?</b> Em đề xuất không cộng: tinh thể chỉ tính trong buổi. Kết quả đúng sai vẫn ghi vào hồ sơ của em như một lượt luyện, do máy chủ chấm.</li>
-      <li><b>Tên ai hiện trên bảng?</b> Em đề xuất chỉ ô của em đúng sáng lên và 3 em nhanh nhất có huy hiệu. Em sai không bị đánh dấu. Phím H ẩn mọi tên.</li>
-      <li><b>Đồng hồ mỗi mẻ:</b> em đề xuất mặc định 60 giây, thầy chọn được 30 / 60 / 90 giây hoặc không giới hạn. Thầy mở đáp án sớm được.</li>
+      <li><b>Tinh thể có cộng vào EXP không?</b> Em đề xuất không cộng: tinh thể chỉ tính trong buổi. Kết quả đúng sai vẫn ghi vào hồ sơ như một lượt luyện, do máy chủ chấm.</li>
+      <li><b>Lý do gọi lên bảng hiện trên màn chiếu tới đâu?</b> Em đề xuất bảng hiện ba dòng lời lẽ nhẹ nhàng (dạng câu, số câu đã làm và đúng, mấy ngày chưa lên bảng). Con số chi tiết như khả năng đúng hay bước hay sai chỉ hiện trên điện thoại thầy.</li>
+      <li><b>Đồng hồ mỗi lượt:</b> chuẩn giao diện C14 cấm đếm ngược gây sợ ngoài ca kiểm tra, nên bản vẽ dùng đồng hồ êm (không đổi màu, không nháy). Mặc định 60 giây hay không giới hạn?</li>
+      <li><b>Thoát màn trừ đội bao nhiêu?</b> Em đề xuất −20 tinh thể mỗi lần và hiện tên trên bảng. Trình duyệt không chặn được tuyệt đối việc thoát, nên app bật toàn màn hình, bỏ nút thoát, rời là báo ngay.</li>
+      <li><b>Chia đội:</b> em đề xuất đội cố định cả tháng, chia đều theo sức học. Xếp hạng đội theo tinh thể trung bình mỗi bạn có mặt, để đội có bạn vắng không bị thiệt.</li>
       <li><b>Gửi rồi có được đổi không?</b> Em đề xuất không đổi, để em không chờ nhìn bạn.</li>
     </ol>
   </section>
@@ -440,12 +585,12 @@ const TEN = ['Nguyễn Minh Anh','Trần Gia Bảo','Lê Khánh Chi','Phạm Đ�
 const boDau = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')
 const CAU = {
   tn: [
-    { muc: 'Nhận biết', de: 'Chất nào sau đây là amine bậc hai?', pa: ['CH₃NH₂', 'CH₃NHCH₃', '(CH₃)₃N', 'C₆H₅NH₂'], dung: 1, kho: 0.9 },
-    { muc: 'Thông hiểu', de: 'Cho 9,3 gam aniline (C₆H₅NH₂) tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là', pa: ['12,95 gam', '11,85 gam', '12,25 gam', '14,05 gam'], dung: 0, kho: 0.66 },
+    { muc: 'Nhận biết', dang: 'Bậc của amine', de: 'Chất nào sau đây là amine bậc hai?', pa: ['CH₃NH₂', 'CH₃NHCH₃', '(CH₃)₃N', 'C₆H₅NH₂'], dung: 1, kho: 0.9 },
+    { muc: 'Thông hiểu', dang: 'Amine tác dụng với acid', de: 'Cho 9,3 gam aniline (C₆H₅NH₂) tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là', pa: ['12,95 gam', '11,85 gam', '12,25 gam', '14,05 gam'], dung: 0, kho: 0.66 },
   ],
-  ds: { muc: 'Thông hiểu', de: 'Cho các phát biểu về methylamine (CH₃NH₂):', y: ['Là chất khí ở điều kiện thường.', 'Dung dịch làm phenolphthalein hoá hồng.', 'Có lực base yếu hơn aniline.', 'Tác dụng với HCl tạo muối CH₃NH₃Cl.'], dung: [true, true, false, true], kho: 0.8 },
-  tln: { muc: 'Vận dụng', de: 'Đốt cháy hoàn toàn 0,1 mol ethylamine (C₂H₅NH₂), thu được V lít khí N₂ (đkc). Giá trị của V là bao nhiêu? (làm tròn đến hàng phần trăm)', dung: '1,24', sai: ['2,48', '1,12', '2,24', '0,62'], kho: 0.42 },
-  tl: { muc: 'Vận dụng', de: 'Viết phương trình hoá học chứng minh aniline có tính base yếu hơn methylamine. Giải thích vì sao.' },
+  ds: { muc: 'Thông hiểu', dang: 'Tính chất của methylamine', de: 'Cho các phát biểu về methylamine (CH₃NH₂):', y: ['Là chất khí ở điều kiện thường.', 'Dung dịch làm phenolphthalein hoá hồng.', 'Có lực base yếu hơn aniline.', 'Tác dụng với HCl tạo muối CH₃NH₃Cl.'], dung: [true, true, false, true], kho: 0.8 },
+  tln: { muc: 'Vận dụng', dang: 'Đốt cháy amine', de: 'Đốt cháy hoàn toàn 0,1 mol ethylamine (C₂H₅NH₂), thu được V lít khí N₂ (đkc). Giá trị của V là bao nhiêu? (làm tròn đến hàng phần trăm)', dung: '1,24', sai: ['2,48', '1,12', '2,24', '0,62'], kho: 0.42 },
+  tl: { muc: 'Vận dụng', dang: 'So sánh lực base', de: 'Viết phương trình hoá học chứng minh aniline có tính base yếu hơn methylamine. Giải thích vì sao.' },
 }
 const MAU_PA = ['--tr-tin', '--tr-sao', '--tr-tim', '--tr-hs']
 const CHU_LOAI = { tn: 'Trắc nghiệm', ds: 'Đúng–sai', tln: 'Trả lời ngắn', tl: 'Tự luận · làm ra giấy' }
@@ -456,13 +601,17 @@ let hat = 7
 const ngau = () => { hat |= 0; hat = (hat + 0x6d2b79f5) | 0; let t = Math.imul(hat ^ (hat >>> 15), 1 | hat); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296 }
 const HS = TEN.map((ten, i) => { const p = ten.split(' '); const cuoi = boDau(p[p.length - 1]); return { i, ten, ngan: p.slice(-2).join(' '), ky: cuoi[0].toUpperCase() + (cuoi[1] || '').toLowerCase(), suc: 0.42 + ngau() * 0.55, vao: false, tra: null, diem: 0, dungSo: 0, hangCu: i + 1, ketMe: [] } })
 const EM = HS[0]
+// Bốn đội theo màu thử ngọn lửa: Na vàng · K tím · Cu xanh lục lam · Ca đỏ cam. Chia rắn bò theo sức học ⇒ bốn đội ngang sức.
+const DOI = [{ ten: 'Đội Natri', mau: '--tr-sao' }, { ten: 'Đội Kali', mau: '--tr-tim' }, { ten: 'Đội Đồng', mau: '--tr-tin' }, { ten: 'Đội Canxi', mau: '--tr-chu-y' }]
+;[...HS].sort((a, b) => b.suc - a.suc).forEach((h, k) => { const v = Math.floor(k / 4), r = k % 4; h.doi = v % 2 === 0 ? r : 3 - r; h.chuoi = 0; h.roi = 0; h.roiMe = false })
 
 // ── Trạng thái ──
-const S = { pha: 'cho', me: 0, loai: 'tn', cau: null, nen: 'toi', yeu: matchMedia('(prefers-reduced-motion: reduce)').matches, an: false, am: false, tuChay: true, chup: false, xem: 'ca-hai',
-  tBatDau: 0, tSim: 0, khoa: false, emChon: null, emGui: false, emTuChon: false, giai: false, matMang: false, hsTrang: null, dkTrang: null, ketQua: null }
+const S = { pha: 'khoi', me: 0, loai: 'tn', cau: null, nen: 'toi', yeu: matchMedia('(prefers-reduced-motion: reduce)').matches, an: false, am: false, tuChay: true, chup: false, xem: 'ca-hai',
+  tBatDau: 0, tSim: 0, khoa: false, emChon: null, emGui: false, emTuChon: false, giai: false, matMang: false, hsTrang: null, dkTrang: null, ketQua: null,
+  doiThuong: [0, 0, 0, 0], doiTruoc: [0, 0, 0, 0], daGoi: [], goi: null, kich: false, toast: null, daRoi: false, emDuDoan: null, emTiep: 0, vuaVao: [], doiDu: null }
 const $ = (s, g = document) => g.querySelector(s)
 const bangNoi = $('#bangNoi'), mayEl = $('#may'), dkEl = $('#dk'), bang = $('#bang')
-const ve = $('#bangVe').getContext('2d')
+const ve = $('#bangVe').getContext('2d'), ve2 = $('#bangVeTren').getContext('2d')
 let hen = []
 const henGio = (ms, f) => { const id = setTimeout(f, ms); hen.push(id); return id }
 const xoaHen = () => { hen.forEach(clearTimeout); hen = [] }
@@ -482,11 +631,13 @@ function keu(kieu) {
     const not = (f, d, tre = 0, loai = 'sine', g = 0.06) => { const o = am.createOscillator(), v = am.createGain(); o.type = loai; o.frequency.setValueAtTime(f, t + tre); v.gain.setValueAtTime(0, t + tre); v.gain.linearRampToValueAtTime(g, t + tre + 0.01); v.gain.exponentialRampToValueAtTime(0.0001, t + tre + d); o.connect(v).connect(am.destination); o.start(t + tre); o.stop(t + tre + d + 0.05) }
     if (kieu === 'giot') { not(1200 + Math.random() * 500, 0.09, 0, 'sine', 0.035) }
     if (kieu === 'mo') { [523, 659, 784, 1047].forEach((f, k) => not(f, 0.5, k * 0.09, 'triangle', 0.05)) }
+    if (kieu === 'tich') { not(1500, 0.05, 0, 'square', 0.018) }
+    if (kieu === 'roi') { not(330, 0.25, 0, 'sawtooth', 0.04); not(247, 0.35, 0.18, 'sawtooth', 0.04) }
     if (kieu === 'tinh') { not(2093 + Math.random() * 600, 0.25, 0, 'sine', 0.025) }
   } catch { /* trình duyệt chặn âm thanh */ }
 }
 
-// ── Mô phỏng câu trả lời của cả lớp cho một mẻ ──
+// ── Mô phỏng câu trả lời của cả lớp cho một lượt ──
 function lapCau(loai, i) {
   const c = loai === 'tn' ? CAU.tn[i ?? 0] : CAU[loai]
   return { loai, ...c }
@@ -500,7 +651,7 @@ function moPhong(cau) {
     else if (cau.loai === 'ds') { chon = cau.dung.map((d) => (ngau() < p + 0.08 ? d : !d)) }
     else if (cau.loai === 'tln') { const r = ngau(); chon = r < p ? cau.dung : r < p + (1 - p) * 0.5 ? cau.sai[0] : r < p + (1 - p) * 0.8 ? cau.sai[1] : cau.sai[2 + Math.floor(ngau() * 2)] }
     else { chon = 'xong' }
-    h.ke = { chon, t }
+    h.ke = { chon, t: h.vao ? t : 999 }
     h.tra = null
   })
 }
@@ -522,10 +673,10 @@ const BINH = { x: 1528, y: 470, r: 188, co: 46, mieng: 196 }
 const viTriO = (i) => { const w = (1792 - 15 * 10) / 16; return { x: 64 + (i % 16) * (w + 10) + w / 2, y: 840 + Math.floor(i / 16) * 90 + 40 } }
 
 // ── Hoạt ảnh canvas ──
-const A = { muc: 0, mucDich: 0, hat: [], bot: [], manh: [], roi: [], mo0: 0, ong: [], ongDich: [], ketT: 0, tLan: 0 }
+const A = { muc: 0, mucDich: 0, hat: [], bot: [], manh: [], roi: [], mo0: 0, ong: [], ongDich: [], ketT: 0, tLan: 0, doiHien: [0, 0, 0, 0], ddHien: [0, 0, 0, 0] }
 function mauCSS(ten) { return getComputedStyle(bang).getPropertyValue(ten).trim() || '#888' }
 let BANG_MAU = {}
-function docMau() { BANG_MAU = { tin: mauCSS('--tr-tin'), hs: mauCSS('--tr-hs'), dung: mauCSS('--tr-dung'), sao: mauCSS('--tr-sao'), tim: mauCSS('--tr-tim'), chuY: mauCSS('--tr-chu-y'), vien: mauCSS('--tr-vien-2'), chu: mauCSS('--tr-chu'), chu3: mauCSS('--tr-chu-3'), nen: mauCSS('--tr-nen'), mat: mauCSS('--tr-mat') } }
+function docMau() { BANG_MAU = { tin: mauCSS('--tr-tin'), hs: mauCSS('--tr-hs'), dung: mauCSS('--tr-dung'), sao: mauCSS('--tr-sao'), tim: mauCSS('--tr-tim'), chuY: mauCSS('--tr-chu-y'), vien: mauCSS('--tr-vien-2'), chu: mauCSS('--tr-chu'), chu3: mauCSS('--tr-chu-3'), nen: mauCSS('--tr-nen'), mat: mauCSS('--tr-mat'), doi0: mauCSS('--tr-sao'), doi1: mauCSS('--tr-tim'), doi2: mauCSS('--tr-tin'), doi3: mauCSS('--tr-chu-y') } }
 const MAU_ONG = () => [BANG_MAU.tin, BANG_MAU.sao, BANG_MAU.tim, BANG_MAU.hs]
 function hex2rgb(h) { const m = h.replace('#', ''); const n = parseInt(m.length === 3 ? m.split('').map((c) => c + c).join('') : m, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255] }
 function tron(a, b, t) { const x = hex2rgb(a), y = hex2rgb(b); return `rgb(${x.map((v, k) => Math.round(ghep(v, y[k], t))).join(',')})` }
@@ -545,7 +696,7 @@ function veBinh(c, now, alpha = 1, mucHien = A.muc) {
     const con = kep(1 - S.tSim / T_ME), a0 = -Math.PI / 2 + 0.36, a1 = -Math.PI / 2 - 0.36 + Math.PI * 2
     c.lineCap = 'round'; c.lineWidth = 12; c.strokeStyle = moMau(BANG_MAU.vien, 0.6)
     c.beginPath(); c.arc(b.x, b.y, b.r + 30, a0, a1); c.stroke()
-    c.strokeStyle = con < 0.2 ? BANG_MAU.chuY : BANG_MAU.tin
+    c.strokeStyle = BANG_MAU.tin
     if (quang) { c.shadowColor = c.strokeStyle; c.shadowBlur = 18 }
     c.beginPath(); c.arc(b.x, b.y, b.r + 30, a0, ghep(a0, a1, con)); c.stroke(); c.shadowBlur = 0
   }
@@ -628,6 +779,7 @@ function bungManh(x, y, n, mau, luc = 1) {
 let truoc = performance.now()
 function khung(now) {
   const dt = Math.min(0.05, (now - truoc) / 1000); truoc = now
+  const tl = S.tiLe || 1; ve.setTransform(tl, 0, 0, tl, 0, 0); ve2.setTransform(tl, 0, 0, tl, 0, 0)
   ve.clearRect(0, 0, 1920, 1080)
   A.muc += (A.mucDich - A.muc) * (S.yeu || S.chup ? 1 : Math.min(1, dt * 4))
   if (!S.yeu && !S.chup) {
@@ -636,7 +788,9 @@ function khung(now) {
     A.bot.forEach((b) => { b.y -= b.v * dt; b.x += Math.sin(now * 0.004 + b.r) * 0.3 }); A.bot = A.bot.filter((b) => b.y > mY + 4)
   }
   for (const o of A.ong) o.hHien += (o.hDich - o.hHien) * (S.yeu || S.chup ? 1 : Math.min(1, dt * 6))
-  if (S.pha === 'cho' || S.pha === 'tra-loi' || S.pha === 'ket-tinh') veBinh(ve, now)
+  if (S.pha === 'tra-loi') veBinh(ve, now)
+  if (S.pha === 'cho') veDiemDanh(ve, now, dt)
+  if (S.pha === 'ket-tinh') veDua(ve, now, dt)
   if (S.pha === 'mo') {
     const p = kep((now - A.mo0) / 2600)
     if (S.loai === 'tl') veBinh(ve, now)
@@ -646,7 +800,7 @@ function khung(now) {
     const m = [BANG_MAU.dung, BANG_MAU.tin, BANG_MAU.sao, BANG_MAU.hs][Math.floor(Math.random() * 4)]
     A.manh.push({ x: Math.random() * 1920, y: -20, vx: (Math.random() - 0.5) * 60, vy: 120 + Math.random() * 120, q: Math.random() * 6, vq: (Math.random() - 0.5) * 4, s: 7 + Math.random() * 9, tuoi: 0, song: 7, mau: m, nang: 0.02 })
   }
-  veHat(ve, now); veManh(ve, dt)
+  ve2.clearRect(0, 0, 1920, 1080); veHat(ve2, now); veManh(ve2, dt)
   if (!S.chup) requestAnimationFrame(khung)
 }
 
@@ -671,7 +825,7 @@ function dungBang() {
       ${phimBang([['G', 'Giải'], ['T', 'Thống kê lớp'], ['B', 'Bút'], ['L', 'Cả lớp làm', true], ['Tab', 'Tổng quan'], ['?', 'Phím']])}</div>`
     if (S.pha === 'bat-dau') h += `<div class="b-mo-den"></div><div class="b-hop" style="left:520px;top:180px;width:880px">
       <h3>Cả lớp làm câu này</h3><p>Câu đang chiếu sẽ hiện đầy màn hình trên máy <b>28 em có mặt</b> theo điểm danh hôm nay. 25 em đang mở app sẽ nhận ngay; em khác nhận khi mở app.</p>
-      <div class="dong">Thời gian mỗi mẻ</div><div class="seg"><span>30 giây</span><span class="chon">60 giây</span><span>90 giây</span><span>Không giới hạn</span></div>
+      <div class="dong">Thời gian mỗi lượt</div><div class="seg"><span>30 giây</span><span class="chon">60 giây</span><span>90 giây</span><span>Không giới hạn</span></div>
       <div class="tick"><i>✓</i>Hiện tên em trả lời đúng trên bảng</div>
       <div class="dong">Câu này không thuộc ca kiểm tra nào đang giữ, gửi xuống máy được.</div>
       <div class="nut-to">Gửi xuống máy 28 em</div></div>`
@@ -682,45 +836,70 @@ function dungBang() {
   }
   if (S.pha === 'cho') {
     const vao = HS.filter((x) => x.vao).length
-    h = tren(`<div class="b-pill">Phòng chờ</div>`) + `<div class="b-ma">Mã vào lớp <b>4827</b></div></div>
-      <div class="b-de b-cho"><h2>Cả lớp mở app học sinh</h2><p>Thầy chiếu câu nào, câu đó tự hiện trên máy em.</p>
-        <p style="margin-top:34px;font-size:28px">Máy chưa tự hiện? Vào app, chọn <b>Bình Phản Ứng</b>, nhập mã:</p><div class="b-ma-to"><span>4</span><span>8</span><span>2</span><span>7</span></div></div>
-      <div class="b-phai"><div class="b-dem"><b id="bDem">${vao}</b>/${tong} em đã vào</div></div>`
-      + oHtml() + phimBang([['Space', 'Bắt đầu mẻ 1', true], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']])
-  } else if (S.pha === 'tra-loi' || S.pha === 'mo') {
+    const vua = S.vuaVao.slice(-2).reverse().map((i) => HS[i])
+    const qr = qrHtml()
+    h = tren(`<div class="b-pill">Điểm danh</div>`) + `<div class="b-lop" style="color:var(--tr-chu-3)">Buổi 19:30 · Thứ Sáu 06/11</div></div>
+      <div class="b-dd"><h2>Vào lớp: mở app, nhập mã</h2><p class="phu">Một mã cho cả điểm danh lẫn Bình Phản Ứng. Vào trước 19:30: +10 tinh thể cho đội.</p>
+        <div class="b-qr" aria-label="Mã QR điểm danh">${qr}</div>
+        <div class="b-dd-ma"><span class="nhan">Mã điểm danh</span><div class="b-dd-so"><span>4</span><span>8</span><span>2</span><span class="gach">·</span><span>7</span><span>1</span><span>5</span></div><span class="nhan" style="text-transform:none;letter-spacing:0;font-weight:600">Hoặc quét mã QR bằng app học sinh.</span></div>
+        <div class="b-vua"><span class="nhan">Vừa vào lớp</span>${vua.map((x) => `<div class="b-vua-hang" style="--doi:var(${DOI[x.doi].mau})"><b>${S.an ? 'Em số ' + (x.i + 1) : x.ten}</b><span class="chip">${DOI[x.doi].ten}</span><span class="cong">+10</span><span class="gio">${x.gioVao || '19:24'}</span></div>`).join('')}</div></div>
+      <div class="b-dd-phai"><h3>Đội nào đủ quân trước?</h3>${S.doiDu != null ? `<p class="du-quan" style="--doi:var(${DOI[S.doiDu].mau})">${DOI[S.doiDu].ten} đủ quân đầu tiên · +50 tinh thể</p>` : '<p>Mỗi bạn vào lớp, lửa đội ấy cao thêm. Đội đủ quân đầu tiên +50 tinh thể.</p>'}</div>
+      ${DOI.map((d, k) => { const so = HS.filter((x) => x.doi === k && x.vao).length, tong = HS.filter((x) => x.doi === k).length; return `<div class="b-dd-doi ${so === tong ? 'du' : ''}" style="left:${1290 + k * 140}px;--doi:var(${d.mau})"><b>${d.ten.replace('Đội ', '')}</b><span>${so}/${tong}</span><small>${S.doiThuong[k] >= 0 ? '+' : ''}${S.doiThuong[k]} tinh thể</small></div>` }).join('')}
+      <div class="b-dd-dem"><b id="bDem">${vao}</b>/${tong} em có mặt</div>`
+      + oHtml() + phimBang([['Space', 'Xong điểm danh · bắt đầu lượt 1', true], ['V', 'Danh sách vắng'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc buổi']])
+  } else if (S.pha === 'tra-loi' || S.pha === 'mo' || S.pha === 'goi') {
     const da = HS.filter((x) => x.tra).length
     const gioCon = T_ME - S.tSim
-    h = tren(`<div class="b-pill">Mẻ ${S.me + 1}/${LICH.length}</div>`) + (c.loai === 'tl' || S.pha === 'mo' ? '' : `<div class="b-gio" id="bGio" ${gioCon < 12 ? 'data-gap' : ''}>${gio(gioCon)}</div>`) + `</div>
+    const g = S.goi, hg = g ? HS[g.i] : null
+    const chipGoi = S.pha === 'mo' && hg ? `<div class="b-pill" style="box-shadow:inset 0 0 0 3px var(${DOI[hg.doi].mau})">Lên bảng: ${hg.ngan}${g.dat === true ? ` · Đạt · ${DOI[hg.doi].ten} +200` : g.dat === false ? ' · Chưa đạt' : ''}</div>` : ''
+    h = tren(`<div class="b-pill">Lượt ${S.me + 1}/${LICH.length}</div>`) + chipGoi + (c.loai === 'tl' || S.pha !== 'tra-loi' ? '' : `<div class="b-gio" id="bGio">${gio(gioCon)}</div>`) + `</div>
       <div class="b-de" id="bDe">${deHtml(c)}</div><div class="b-phai" id="bPhai">${S.pha === 'mo' && c.loai !== 'tl' ? ongHtml() : `<div class="b-dem"><b id="bDem">${da}</b>/${tong} em ${c.loai === 'tl' ? 'làm xong' : 'đã gửi'}</div>`}</div>`
-      + oHtml() + phimBang(S.pha === 'mo' ? [['→', `Mẻ tiếp`, true], ['K', 'Bảng kết tinh'], ['G', 'Lời giải'], ['C', 'Chiếu chữa mẻ này'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']] : [['Space', c.loai === 'tl' ? 'Hiện lời giải' : 'Mở đáp án', true], ['+', 'Thêm 15 giây'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']])
+      + oHtml()
+      + (S.pha === 'mo' && S.kich ? `<div class="b-kich hien-sau">Vượt năng lượng hoạt hoá! ${S.ketQua ? S.ketQua.thuTu.length : 0}/${tong} em đúng · cả lớp +30 tinh thể</div>` : '')
+      + (S.pha === 'goi' && g && g.hien ? theGoiHtml() : '')
+      + (S.toast ? `<div class="b-toast" id="bToast" role="status">${S.toast}</div>` : '')
+      + phimBang(S.pha === 'mo' ? [['→', 'Lượt tiếp', true], ['K', 'Bảng kết tinh'], ['G', 'Lời giải'], ['C', 'Chiếu chữa lượt này'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']]
+        : S.pha === 'goi' ? [['D', 'Đạt · đội +200', true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ['Esc', 'Kết thúc']]
+        : [['Space', 'Gọi lên bảng', true], ['M', c.loai === 'tl' ? 'Hiện lời giải' : 'Mở đáp án ngay'], ['+', 'Thêm 15 giây'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']])
   } else if (S.pha === 'ket-tinh') {
-    const xep = [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i), max = Math.max(1, xep[0].diem)
-    const dung = HS.filter((x) => x.tra && laDung(S.cau, x.tra.chon)).length
-    h = tren(`<div class="b-pill">Sau mẻ ${S.me + 1}/${LICH.length}</div>`) + `</div>
-      <div class="b-de b-xh"><h2>Bảng kết tinh</h2>${xep.slice(0, 8).map((x, k) => { const d = x.hangCu == null ? 0 : x.hangCu - (k + 1); return `<div class="b-xh-hang"><span class="h">${k + 1}</span><span class="t">${S.an ? 'Em số ' + (x.i + 1) : x.ngan}</span><span class="thanh"><i style="--w:${S.chup || S.yeu ? (x.diem / max) * 100 : 0}%" data-w="${(x.diem / max) * 100}"></i></span><span class="d">${x.diem} <small>tinh thể</small></span><span class="doi ${d < 0 ? 'xuong' : ''}">${d > 0 ? 'lên ' + d : d < 0 ? 'xuống ' + -d : ''}</span></div>` }).join('')}</div>
-      <div class="b-phai"><div class="b-dem"><b>${dung}</b>/${tong} em đúng mẻ ${S.me + 1}</div></div>` + oHtml()
-      + phimBang([['→', S.me + 1 < LICH.length ? `Mẻ ${S.me + 2}` : 'Tổng kết', true], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']])
+    const xep = [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i)
+    const thu = [0, 1, 2, 3].sort((a, b) => diemDoi(b) - diemDoi(a))
+    h = tren(`<div class="b-pill">Sau lượt ${S.me + 1}/${LICH.length}</div>`) + `</div>
+      <div class="b-dua"><h2>Đua ngọn lửa</h2><p>Thử màu ngọn lửa: mỗi đội một màu, đội càng nhiều tinh thể lửa càng cao.</p></div>
+      ${DOI.map((d, k) => { const t = diemDoi(k) - S.doiTruoc[k]; return `<div class="b-dua-nhan" style="left:${210 + k * 255}px;--doi:var(${d.mau})"><b>${d.ten}</b><span>${diemDoi(k)}</span><small>${t >= 0 ? '+' : ''}${t} lượt này · hạng ${thu.indexOf(k) + 1}</small></div>` }).join('')}
+      <div class="b-top"><h3>Kết tinh nhiều nhất</h3>${xep.slice(0, 6).map((x, k) => `<div class="b-top-hang" style="--doi:var(${DOI[x.doi].mau})"><span class="h">${k + 1}</span><span class="t">${S.an ? 'Em số ' + (x.i + 1) : x.ngan}</span><span class="d">${x.diem}</span></div>`).join('')}</div>` + oHtml()
+      + phimBang([['→', S.me + 1 < LICH.length ? `Lượt ${S.me + 2}` : 'Tổng kết', true], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']])
   } else if (S.pha === 'tong-ket') {
     const xep = [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i)
+    const thu = [0, 1, 2, 3].sort((a, b) => diemDoi(b) - diemDoi(a)), vo = thu[0], dv = DOI[vo]
     const tyLe = Math.round((HS.reduce((s, x) => s + x.dungSo, 0) / (HS.length * LICH.length)) * 100)
-    const top = [xep[1], xep[0], xep[2]], cao = [230, 300, 180], m = ['--tr-tin', '--tr-dung', '--tr-sao']
-    h = tren(`<div class="b-pill">Tổng kết · ${LICH.length} mẻ</div>`) + `</div>
-      <div class="b-tk"><h2>Ba em kết tinh nhiều nhất</h2><div class="b-buc">${top.map((x, k) => `<div><div class="ngoc" style="--m:var(${m[k]})"></div><div class="ten-to">${S.an ? 'Em số ' + (x.i + 1) : x.ngan}</div><div class="diem-to">${x.diem} tinh thể · đúng ${x.dungSo}/${LICH.length}</div><div class="bac" style="height:${cao[k] - 120}px">${[2, 1, 3][k]}</div></div>`).join('')}</div>
-      <div class="b-tk-so"><div>Cả lớp đúng <b>${tyLe}%</b></div><div>Mẻ khó nhất: <b>Mẻ 4</b> · ${HS.filter((x) => x.ketMe && x.ketMe[3]).length || 12}/${HS.length} em đúng</div><div>Nhanh nhất: <b>Lê Khánh Chi</b> · 3,2 giây</div></div></div>`
-      + oHtml() + phimBang([['C', 'Chiếu chữa Mẻ 4', true], ['R', 'Chơi lại'], ['Esc', 'Đóng']])
+    const top = [xep[1], xep[0], xep[2]], hang = [2, 1, 3], mau = ['--tr-tin', '--tr-sao', '--tr-chu-y'], co = [150, 196, 128], cao = [190, 250, 140]
+    const sao = (k) => [[8, 18, 0], [80, 6, 0.7], [92, 62, 1.3], [2, 70, 1.8]].map(([x, y, d]) => `<svg class="vd-sao" viewBox="-10 -10 20 20" style="left:${x}%;top:${y}%;animation-delay:${d + k * 0.4}s" aria-hidden="true"><path d="M0-10C1.2-1.2 1.2-1.2 10 0C1.2 1.2 1.2 1.2 0 10C-1.2 1.2-1.2 1.2-10 0C-1.2-1.2-1.2-1.2 0-10Z" fill="#ffffff"/></svg>`).join('')
+    const tia = Array.from({ length: 24 }, (_, k) => { const a0 = (k * 15 * Math.PI) / 180, a1 = a0 + (7 * Math.PI) / 180; return `<path d="M0 0L${(Math.cos(a0) * 100).toFixed(2)} ${(Math.sin(a0) * 100).toFixed(2)}L${(Math.cos(a1) * 100).toFixed(2)} ${(Math.sin(a1) * 100).toFixed(2)}Z"/>` }).join('')
+    const kho = LICH.reduce((b, _, m) => { const n = HS.filter((x) => x.ketMe[m]).length; return n < b.n ? { m, n } : b }, { m: 0, n: 1e9 })
+    h = tren(`<div class="b-pill">Tổng kết · ${LICH.length} lượt</div>`) + `</div>
+      <div class="vd" style="--doi:var(${dv.mau})">
+        <svg class="vd-tia" viewBox="-100 -100 200 200" aria-hidden="true"><g>${tia}</g></svg>
+        <div class="vd-dau"><div class="vd-huy">${gemSvg(`var(${dv.mau})`, KY_DOI[vo])}</div><div><div class="vd-mat">Vô địch buổi hôm nay</div><h2>${dv.ten}</h2><span class="vd-diem">${diemDoi(vo)} tinh thể</span></div></div>
+        <div class="vd-ben" style="left:64px"><h3>Đua ngọn lửa</h3>${thu.map((d) => `<div class="vd-doi" style="--doi:var(${DOI[d].mau})">${luaSvg()}<b>${DOI[d].ten}</b><span>${diemDoi(d)}</span></div>`).join('')}</div>
+        <div class="vd-buc">${top.map((x, k) => `<div class="vd-cot" style="--m:var(${mau[k]})"><div class="vd-ngoc" style="width:${co[k]}px">${gemSvg('var(--m)')}${sao(k)}</div><div class="vd-ten">${S.an ? 'Em số ' + (x.i + 1) : x.ngan}</div><div class="vd-phu">${x.diem} tinh thể · đúng ${x.dungSo}/${LICH.length} lượt</div><div class="vd-bac" style="height:${cao[k]}px"><span>${hang[k]}</span></div></div>`).join('')}</div>
+        <div class="vd-ben" style="right:64px"><h3>Cả lớp hôm nay</h3><div class="vd-so"><b>${tyLe}%</b><span>câu trả lời đúng</span></div><div class="vd-so"><b>Lượt ${kho.m + 1}</b><span>khó nhất · ${kho.n}/${HS.length} em đúng · phím C chiếu chữa</span></div><div class="vd-so"><b>Lê Khánh Chi</b><span>gửi đúng nhanh nhất · 3,2 giây</span></div></div>
+      </div>` + phimBang([['C', `Chiếu chữa Lượt ${kho.m + 1}`, true], ['R', 'Chơi lại'], ['Esc', 'Đóng']])
   }
   bangNoi.innerHTML = h
-  if (S.pha === 'ket-tinh' && !S.chup && !S.yeu) requestAnimationFrame(() => requestAnimationFrame(() => bangNoi.querySelectorAll('.thanh i').forEach((i) => { i.style.setProperty('--w', i.dataset.w + '%') })))
-  capNhatO()
+    capNhatO()
 }
-function oHtml() { return `<div class="b-bth" id="bBth">${HS.map((x) => `<div class="o" data-i="${x.i}"><span class="so">${x.i + 1}</span><span class="ky">${x.ky}</span><span class="ten">${x.ngan}</span></div>`).join('')}</div>` }
+function oHtml() { return `<div class="b-bth" id="bBth">${HS.map((x) => `<div class="o" data-i="${x.i}" style="--doi:var(${DOI[x.doi].mau})"><span class="so">${x.i + 1}</span><span class="ky">${x.ky}</span><span class="ten">${x.ngan}</span></div>`).join('')}</div>` }
 function capNhatO() {
   const dung = S.ketQua ? S.ketQua.thuTu : []
   bangNoi.querySelectorAll('.o').forEach((o) => {
     const x = HS[+o.dataset.i]
     o.className = 'o'
-    o.querySelector('.hc')?.remove()
-    if (S.pha === 'cho' && !x.vao) o.classList.add('chua-vao')
+    o.querySelector('.hc')?.remove(); o.querySelector('.nhan-roi')?.remove()
+    if (S.pha !== 'cho' && S.pha !== 'tong-ket' && x.chuoi >= 2) o.classList.add('chay')
+    if (x.roiMe && (S.pha === 'tra-loi' || S.pha === 'goi')) { o.classList.add('roi'); const n = document.createElement('span'); n.className = 'nhan-roi'; n.textContent = 'Rời màn'; o.appendChild(n) }
+    if (S.pha === 'goi' && S.goi) { if (S.goi.hien && x.i === S.goi.i) o.classList.add('duoc-goi'); else if (!S.goi.hien && S.goi.ung.includes(x.i)) o.classList.add('ung') }
+    if (!x.vao) o.classList.add('chua-vao')
     if (S.pha === 'tra-loi' && x.tra) o.classList.add('da-tra')
     if ((S.pha === 'mo' || S.pha === 'ket-tinh' || S.pha === 'tong-ket') && S.ketQua && S.cau.loai !== 'tl') {
       const k = dung.indexOf(x.i)
@@ -744,14 +923,25 @@ const svgBinh = '<svg aria-hidden="true"><use href="#binh"/></svg>'
 function dungMay() {
   const c = S.cau, tr = S.hsTrang || trangMay()
   const gioCon = T_ME - S.tSim
-  const tren = (phu) => `<div class="m-tren">${svgBinh}<div class="m-tieu"><b>Bình Phản Ứng</b><span>${phu}</span></div>${tr === 'cau' || tr === 'da-gui' ? (c.loai === 'tl' ? '' : `<div class="m-gio" ${gioCon < 12 ? 'data-gap' : ''} aria-label="Còn ${gio(gioCon)}">${gio(gioCon)}</div>`) : ''}</div>`
+  const tren = (phu) => `<div class="m-tren">${svgBinh}<div class="m-tieu"><b>Bình Phản Ứng</b><span>${phu}</span></div>${tr === 'cau' || tr === 'da-gui' ? (c.loai === 'tl' ? '' : `<div class="m-gio" aria-label="Còn ${gio(gioCon)}">${gio(gioCon)}</div>`) : ''}</div>`
   let h = ''
-  if (tr === 'nghi') {
+  if (tr === 'nhap-ma') {
+    const go = '4827'
+    h = tren('Điểm danh buổi 19:30') + `<div class="m-than"><div class="m-giua" style="margin:0;padding-top:8px"><h3>Nhập mã trên bảng</h3><p>Một mã cho cả điểm danh lẫn Bình Phản Ứng.</p></div>
+      <div class="m-ma">${[0, 1, 2, 3, 4, 5].map((k) => `<span class="${k === go.length ? 'dang' : ''}">${go[k] || ''}</span>`).join('')}</div>
+      <div class="m-phim">${['1', '2', '3', '4', '5', '6', '7', '8', '9', 'QR', '0', 'Xoá'].map((p) => `<button aria-label="${p === 'Xoá' ? 'Xoá một số' : p === 'QR' ? 'Quét mã QR' : p}">${p}</button>`).join('')}</div></div>
+      <div class="m-day"><button class="m-nut" disabled>Vào lớp</button></div>`
+  } else if (tr === 'nghi') {
+    const d = DOI[EM.doi], so = HS.filter((x) => x.doi === EM.doi && x.vao).length, tong = HS.filter((x) => x.doi === EM.doi).length
+    h = tren(`Đã điểm danh · ${d.ten}`) + `<div class="m-than"><div class="m-giua"><div class="ng-tu to" style="--doi:var(${d.mau})"><div class="quy"></div><div class="quy hai"></div><div class="nhan-ng">${EM.ky}</div></div><h3>Em đã vào lớp lúc ${EM.gioVao || '19:24'}</h3>
+      <div class="m-doi-the" style="--doi:var(${d.mau})"><b>${d.ten} · ${so}/${tong} bạn đã vào</b><div class="vach"><i style="width:${(so / tong) * 100}%"></i></div><span>Đội đang có ${S.doiThuong[EM.doi]} tinh thể nhờ vào lớp sớm.</span></div>
+      <p>Thầy chiếu câu nào, câu đó tự hiện ở đây. Em giữ màn này; rời màn là thầy thấy trên bảng.</p></div></div>`
+  } else if (tr === 'nghi-cu') {
     h = tren('Chờ thầy chiếu câu') + `<div class="m-than"><div class="m-giua"><div class="ng-tu"><div class="quy"></div><div class="quy hai"></div><div class="nhan-ng">${EM.ky}</div></div><h3>Em đã vào lớp</h3><p>Thầy chiếu câu nào, câu đó tự hiện ở đây. Em cứ để máy mở.</p></div></div>`
   } else if (tr === 'cau' || tr === 'da-gui' || tr === 'dung' || tr === 'sai' || tr === 'giai') {
     const khoa = tr !== 'cau'
     const daMo = tr === 'dung' || tr === 'sai' || tr === 'giai'
-    h = tren(`Mẻ ${S.me + 1}/${LICH.length} · Thầy đang chiếu`)
+    h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${DOI[EM.doi].ten}`)
     if (!daMo && c.loai !== 'tl') h += `<div class="m-tien"><i style="--w:${kep(gioCon / T_ME) * 100}%"></i></div>`
     if (S.matMang) h += `<div class="m-bao" role="status">Mất kết nối, đang nối lại… Đáp án em chọn vẫn giữ trên máy, nối lại là gửi.</div>`
     h += `<div class="m-than"><div class="m-chip">${CHU_LOAI[c.loai]} · ${c.muc}</div><div class="m-de">${c.de}</div>`
@@ -764,14 +954,22 @@ function dungMay() {
     if (tr === 'cau') h += `<div class="m-day"><button class="m-nut" id="nutGui" ${duTra() ? '' : 'disabled'}>${c.loai === 'tl' ? 'Em làm xong' : 'Gửi đáp án'}</button></div>`
     else if (tr === 'da-gui') h += `<div class="m-day"><div class="m-gui"><div class="ng-tu"><div class="quy"></div><div class="quy hai"></div><div class="nhan-ng">${EM.ky}</div></div><b>${c.loai === 'tl' ? 'Đã báo thầy em làm xong' : `Đã gửi sau ${Math.round(EM.tra ? EM.tra.t : 7)} giây`}</b><span>Nhìn lên bảng nhé · ${HS.filter((x) => x.tra).length}/${HS.length} bạn đã ${c.loai === 'tl' ? 'xong' : 'gửi'}</span></div></div>`
     else h += ketHtml(c, tr)
+  } else if (tr === 'du-doan' || tr === 'duoc-goi') {
+    const g = S.goi, hg = HS[g.i], d = DOI[hg.doi], cung = hg.doi === EM.doi
+    if (tr === 'duoc-goi') h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${d.ten}`) + `<div class="m-than"><div class="m-giua"><div class="ng-tu to" style="--doi:var(${d.mau})"><div class="quy"></div><div class="quy hai"></div><div class="nhan-ng">${EM.ky}</div></div><h3>Em được mời lên bảng!</h3><p>Câu đang chiếu trên bảng. Em lên trình bày cho cả lớp nhé.</p></div><div class="m-giai"><b>Vì sao thầy chọn em</b>${g.lyDo.map((l) => `<span>${l}</span>`).join('')}</div><div class="m-the">${d.ten} đang tiếp sức em: <b id="mTiep">${g.tiep}</b> lượt</div></div>`
+    else h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${DOI[EM.doi].ten}`) + `<div class="m-than"><div class="m-ban" style="--doi:var(${d.mau})"><div class="nhan-ng">${hg.ky}</div><div><b>${hg.ten}</b><span>${d.ten} · đang lên bảng</span></div></div>
+      <p class="m-hoi">Em đoán bạn ấy làm đúng không?</p><div class="m-hai"><button data-dd="1" class="${S.emDuDoan === 1 ? 'chon' : ''}">Làm đúng</button><button data-dd="0" class="${S.emDuDoan === 0 ? 'chon' : ''}">Chưa đúng</button></div><p class="m-nho">Đoán đúng +20 tinh thể cho em. Mỗi lần chạm nút dưới, một tia lửa bay lên bảng tới bạn ấy.</p></div>
+      <div class="m-day"><button class="m-nut m-tiep-nut" id="nutTiep" style="--doi:var(${d.mau})" ${S.emTiep >= 10 ? 'disabled' : ''}>${cung ? `Tiếp sức ${d.ten}` : 'Cổ vũ bạn ấy'} · ${S.emTiep}/10</button></div>`
+  } else if (tr === 'roi') {
+    h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${DOI[EM.doi].ten}`) + `<div class="m-than"><div class="m-giua"><div class="m-canh">!</div><h3>Em vừa rời màn hình</h3><p>Thầy đã thấy trên bảng. ${DOI[EM.doi].ten} bị trừ 20 tinh thể.</p><p style="font-size:14px">Trong Bình Phản Ứng em ở lại màn này tới khi thầy kết thúc.</p></div></div><div class="m-day"><button class="m-nut" id="nutQuayLai">Quay lại lượt đang làm</button></div>`
   } else if (tr === 'cho') {
     const xep = [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i), hang = xep.indexOf(EM) + 1, doi = EM.hangCu == null ? 0 : EM.hangCu - hang
-    h = tren(`Sau mẻ ${S.me + 1}/${LICH.length}`) + `<div class="m-than"><div class="m-giua"><p>Nhìn lên bảng · Bảng kết tinh</p><div class="m-hang">Hạng ${hang}<small>/${HS.length}</small></div><p>${EM.diem} tinh thể${doi > 0 ? ` · lên ${doi} hạng` : ''}</p><div class="m-the" style="margin-top:8px">${S.me + 1 < LICH.length ? `Mẻ ${S.me + 2} sắp tới, câu sẽ tự hiện.` : 'Thầy sắp tổng kết buổi.'}</div></div></div>`
+    h = tren(`Sau lượt ${S.me + 1}/${LICH.length}`) + `<div class="m-than"><div class="m-giua"><p>Nhìn lên bảng · Bảng kết tinh</p><div class="m-hang">Hạng ${hang}<small>/${HS.length}</small></div><p>${EM.diem} tinh thể${doi > 0 ? ` · lên ${doi} hạng` : ''}</p><div class="m-the" style="margin-top:8px">${S.me + 1 < LICH.length ? `Lượt ${S.me + 2} sắp tới, câu sẽ tự hiện.` : 'Thầy sắp tổng kết buổi.'}</div></div></div>`
   } else if (tr === 'xong') {
     const xep = [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i), hang = xep.indexOf(EM) + 1
     h = tren('Đã xong buổi hôm nay') + `<div class="m-than"><div class="m-giua"><div class="ng-tu"><div class="quy"></div><div class="quy hai"></div><div class="nhan-ng">${EM.ky}</div></div><h3>Xong Bình Phản Ứng</h3>
-      <div class="m-luoi"><div><b>${EM.dungSo}/${LICH.length}</b><span>mẻ đúng</span></div><div><b>${EM.diem}</b><span>tinh thể</span></div><div><b>${hang}/${HS.length}</b><span>hạng</span></div></div>
-      <p style="font-size:14px">Tinh thể chỉ tính trong buổi này. Câu em làm sai đã vào lịch ôn lại.</p></div></div>
+      <div class="m-luoi"><div><b>${EM.dungSo}/${LICH.length}</b><span>lượt đúng</span></div><div><b>${EM.diem}</b><span>tinh thể</span></div><div><b>${hang}/${HS.length}</b><span>hạng</span></div></div>
+      <p style="font-size:14px">Tinh thể chỉ tính trong buổi này.</p></div></div>
       <div class="m-day"><button class="m-nut" id="nutVe">Về chặng đang làm · Chặng 3</button></div>`
   }
   mayEl.innerHTML = h
@@ -782,6 +980,7 @@ function trangMay() {
   if (S.pha === 'cho' || S.pha === 'bat-dau' || S.pha === 'chan') return 'nghi'
   if (S.pha === 'tra-loi') return S.emGui ? 'da-gui' : 'cau'
   if (S.pha === 'mo') { if (S.cau.loai === 'tl') return 'da-gui'; if (S.giai) return 'giai'; return EM.tra && laDung(S.cau, EM.tra.chon) ? 'dung' : 'sai' }
+  if (S.pha === 'goi') return S.goi && S.goi.i === EM.i ? 'duoc-goi' : 'du-doan'
   if (S.pha === 'ket-tinh') return 'cho'
   return 'xong'
 }
@@ -814,18 +1013,18 @@ function bungCss() {
 // ── Điện thoại thầy ──
 function dungDk() {
   const c = S.cau, da = HS.filter((x) => x.tra).length, tr = S.dkTrang || (S.pha === 'mo' ? 'mo' : 'tra-loi')
-  let h = `<div class="dk-tren"><div><b>Điều khiển máy chiếu</b><br><span>Bình Phản Ứng · 12A1 · Mẻ ${S.me + 1}/${LICH.length}</span></div></div>`
+  let h = `<div class="dk-tren"><div><b>Điều khiển máy chiếu</b><br><span>Bình Phản Ứng · 12A1 · Lượt ${S.me + 1}/${LICH.length}</span></div></div>`
   if (tr === 'tra-loi') {
     const chua = HS.filter((x) => !x.tra).map((x) => x.ngan)
     h += `<div class="dk-the"><div class="dong"><span>${CHU_LOAI[c.loai]} · ${c.muc}</span><span>còn ${gio(T_ME - S.tSim)}</span></div><div class="so">${da}<small> / ${HS.length} em đã gửi</small></div><div class="thanh"><i style="--w:${(da / HS.length) * 100}%"></i></div></div>
-      <button class="dk-chinh">Mở đáp án</button><div class="dk-phu"><button>Thêm 15 giây</button><button>Bỏ mẻ này</button></div>
+      <button class="dk-chinh">Mở đáp án</button><div class="dk-phu"><button>Thêm 15 giây</button><button>Bỏ lượt này</button></div>
       <div class="dk-ds"><h5>Chưa gửi (${chua.length})</h5><div class="chips">${chua.map((t) => `<span>${t}</span>`).join('')}</div></div>`
   } else {
     const dem = [0, 0, 0, 0]; HS.forEach((x) => { if (x.tra && c.loai === 'tn') dem[x.tra.chon]++ })
     const max = Math.max(1, ...dem), dung = HS.filter((x) => x.tra && laDung(c, x.tra.chon)).length
     h += `<div class="dk-the"><div class="dong"><span>Đã mở đáp án</span><span>${CHU_LOAI[c.loai]}</span></div><div class="so">${dung}<small> / ${HS.length} em đúng</small></div>
       ${c.loai === 'tn' ? `<div class="dk-ong">${dem.map((d, k) => `<div><i class="${k === c.dung ? 'dung' : ''}" style="height:${(d / max) * 84 + 4}px"></i><b>${'ABCD'[k]}</b><span>${d} em</span></div>`).join('')}</div>` : ''}</div>
-      <button class="dk-chinh">Mẻ tiếp · Mẻ ${Math.min(LICH.length, S.me + 2)}</button><div class="dk-phu"><button>Bảng kết tinh</button><button>Chiếu chữa mẻ này</button></div>
+      <button class="dk-chinh">Lượt tiếp · Lượt ${Math.min(LICH.length, S.me + 2)}</button><div class="dk-phu"><button>Bảng kết tinh</button><button>Chiếu chữa lượt này</button></div>
       <div class="dk-ds"><h5>Chưa đúng (${HS.length - dung}) · chỉ thầy thấy</h5><div class="chips">${HS.filter((x) => !(x.tra && laDung(c, x.tra.chon))).slice(0, 14).map((x) => `<span>${x.ngan}</span>`).join('')}</div></div>`
   }
   h += `<button class="dk-cuoi">Kết thúc Bình Phản Ứng</button>`
@@ -836,13 +1035,14 @@ function dungDk() {
 function datMau() { dungBang(); dungMay(); if (S.xem === 'dk' || S.dkTrang) dungDk() }
 function phaCho(tinh = false) {
   xoaHen(); S.pha = 'cho'; S.me = 0; S.ketQua = null; A.ong = []; A.mucDich = 0
-  HS.forEach((h) => { h.vao = false; h.diem = 0; h.dungSo = 0; h.tra = null; h.hangCu = h.i + 1; h.ketMe = [] })
+  HS.forEach((h) => { h.vao = false; h.diem = 0; h.dungSo = 0; h.tra = null; h.hangCu = h.i + 1; h.ketMe = [] }); datLaiDiem()
   S.cau = lapCau('tn', 0)
   const thuTu = HS.map((h) => h.i).sort(() => ngau() - 0.5)
-  if (tinh) { thuTu.slice(0, 28).forEach((i) => (HS[i].vao = true)); A.mucDich = 28 / HS.length * 0.85; datMau(); return }
+  S.vuaVao = []; S.doiDu = null
+  if (tinh) { thuTu.slice(0, 28).forEach((i, k) => vaoLop(i, k, true)); datMau(); return }
   datMau()
-  thuTu.forEach((i, k) => henGio(250 + k * 100, () => { HS[i].vao = true; const so = HS.filter((x) => x.vao).length; A.mucDich = so / HS.length * 0.85; const d = $('#bDem'); if (d) d.textContent = so; capNhatO(); bayHat(i, BANG_MAU.hs, null, 650) }))
-  if (S.tuChay) henGio(4800, () => phaTraLoi())
+  thuTu.slice(0, 30).forEach((i, k) => henGio(300 + k * 190, () => { vaoLop(i, k); if (S.pha === 'cho') { dungBang(); if (S.hsTrang == null && i === EM.i) dungMay() } }))
+  if (S.tuChay) henGio(7600, () => phaTraLoi())
 }
 function bayHat(i, mau, dich, d = 900, xong) {
   if (S.yeu || S.chup) { xong && xong(); return }
@@ -852,11 +1052,11 @@ function bayHat(i, mau, dich, d = 900, xong) {
 }
 function phaTraLoi(tinh = false, loaiEp) {
   xoaHen()
-  if (S.pha === 'cho' || S.pha === 'bat-dau' || S.pha === 'chan' || S.pha === 'tong-ket') { HS.forEach((h) => (h.vao = true)); if (S.pha !== 'cho') { HS.forEach((h) => { h.diem = 0; h.dungSo = 0; h.hangCu = h.i + 1; h.ketMe = [] }); S.me = 0 } }
+  if (S.pha === 'cho' || S.pha === 'khoi' || S.pha === 'bat-dau' || S.pha === 'chan' || S.pha === 'tong-ket') { if (S.pha !== 'cho') HS.forEach((h) => (h.vao = true)); if (S.pha !== 'cho') { HS.forEach((h) => { h.diem = 0; h.dungSo = 0; h.hangCu = h.i + 1; h.ketMe = [] }); datLaiDiem(); S.me = 0 } }
   const l = loaiEp ? { loai: loaiEp, i: loaiEp === 'tn' ? 1 : undefined } : LICH[S.me]
   if (loaiEp) S.me = { tn: 1, ds: 2, tln: 3 }[loaiEp] ?? S.me
   S.loai = l.loai; S.cau = lapCau(l.loai, l.i); moPhong(S.cau)
-  S.pha = 'tra-loi'; S.ketQua = null; S.khoa = false; S.emChon = null; S.emGui = false; S.emTuChon = false; S.giai = false; S.tSim = 0; A.ong = []; A.mucDich = 0; A.muc = 0
+  S.pha = 'tra-loi'; S.ketQua = null; S.khoa = false; S.goi = null; S.toast = null; S.daRoi = false; S.emDuDoan = null; S.emTiep = 0; HS.forEach((h) => (h.roiMe = false)); S.emChon = null; S.emGui = false; S.emTuChon = false; S.giai = false; S.tSim = 0; A.ong = []; A.mucDich = 0; A.muc = 0
   danhDauLoai()
   if (tinh) {
     S.tSim = 19
@@ -875,10 +1075,11 @@ function phaTraLoi(tinh = false, loaiEp) {
       if (!h.tra && h.ke.t <= S.tSim) { h.tra = { ...h.ke, cho: true }; bayHat(h.i, S.cau.loai === 'tl' ? BANG_MAU.hs : BANG_MAU.tin, null, 900, () => { A.mucDich = HS.filter((x) => x.tra).length / HS.length * 0.85 }); capNhatSo() }
     })
     if (S.tuChay && !S.emTuChon && !S.emGui && S.tSim > 8.5) emTuDong()
+    if (S.tuChay && !S.daRoi && S.me === 1 && S.tSim > 14) { S.daRoi = true; emRoi(HS[11]) }
     capNhatGio()
-    const het = HS.every((x) => x.tra) || S.tSim >= T_ME
-    if (het && S.tuChay) { henGio(1300, () => phaMo()); return }
-    if (S.tSim >= T_ME) { phaMo(); return }
+    const het = HS.every((x) => x.tra || !x.vao) || S.tSim >= T_ME
+    if (het && S.tuChay) { henGio(1300, () => phaGoi()); return }
+    if (S.tSim >= T_ME) return
     henGio(100, nhip)
   }
   nhip()
@@ -887,8 +1088,8 @@ function danhDauLoai() { document.querySelectorAll('[data-loai]').forEach((b) =>
 function capNhatSo() { const d = $('#bDem'), da = HS.filter((x) => x.tra).length; if (d) d.textContent = da; capNhatO(); if (S.emGui || S.pha !== 'tra-loi') { const s = mayEl.querySelector('.m-gui span'); if (s) s.textContent = `Nhìn lên bảng nhé · ${da}/${HS.length} bạn đã ${S.cau.loai === 'tl' ? 'xong' : 'gửi'}` } if (S.xem === 'dk') dungDk() }
 function capNhatGio() {
   const con = T_ME - S.tSim, g = $('#bGio')
-  if (g) { g.textContent = gio(con); g.toggleAttribute('data-gap', con < 12) }
-  const m = mayEl.querySelector('.m-gio'); if (m) { m.textContent = gio(con); m.toggleAttribute('data-gap', con < 12) }
+  if (g) g.textContent = gio(con)
+  const m = mayEl.querySelector('.m-gio'); if (m) m.textContent = gio(con)
   const t = mayEl.querySelector('.m-tien i'); if (t) t.style.setProperty('--w', kep(con / T_ME) * 100 + '%')
 }
 function emTuDong() {
@@ -909,11 +1110,16 @@ function guiEm() {
 }
 function chotKetQua() {
   const c = S.cau
+  S.doiTruoc = [0, 1, 2, 3].map(diemDoi)
   const coDiem = HS.some((h) => h.diem > 0)
   HS.forEach((h) => (h.hangCu = coDiem ? [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i).indexOf(h) + 1 : null))
   const dung = HS.filter((h) => h.tra && laDung(c, h.tra.chon)).sort((a, b) => a.tra.t - b.tra.t).map((h) => h.i)
   HS.forEach((h) => { const d = diemCua(c, h.tra); h.diem += d; const ok = h.tra && laDung(c, h.tra.chon); if (ok) h.dungSo++; h.ketMe[S.me] = !!ok })
   S.ketQua = { thuTu: dung }
+  HS.forEach((h) => { h.chuoi = h.ketMe[S.me] ? (h.chuoi || 0) + 1 : 0 })
+  S.kich = c.loai !== 'tl' && dung.length / HS.length >= 0.75
+  if (S.kich) HS.forEach((h) => (h.diem += 30))
+  if (S.goi && !S.goi.daCong) { S.goi.daCong = true; if (S.goi.dat) S.doiThuong[HS[S.goi.i].doi] += 200; S.daGoi.push(S.goi.i) }
   // ống nghiệm
   const ong = []
   if (c.loai === 'tn') {
@@ -934,9 +1140,9 @@ function chotKetQua() {
   A.ong = ong
 }
 function phaMo(tinh = false) {
-  xoaHen(); if (S.pha !== 'tra-loi') phaTraLoi(true, S.loai)
+  xoaHen(); S.toast = null; if (S.pha !== 'tra-loi' && S.pha !== 'goi') phaTraLoi(true, S.loai)
   S.khoa = true
-  if (tinh) HS.forEach((h) => { if (!h.tra) h.tra = { ...h.ke } })
+  if (tinh) HS.forEach((h) => { if (!h.tra && h.vao) h.tra = { ...h.ke } })
   S.pha = 'mo'; chotKetQua()
   A.mo0 = performance.now()
   if (!tinh && !S.yeu) {
@@ -951,7 +1157,7 @@ function phaMo(tinh = false) {
       }, 450 + k * 32)
     })
     if (S.cau.loai === 'ds') setTimeout(() => A.ong.forEach((o) => (o.hDich = o.hDich0)), 700)
-    setTimeout(() => { if (S.pha !== 'mo') return; const o = A.ong.find((x) => x.dung); if (o) { A.ong.filter((x) => x.dung).forEach((x) => bungManh(x.x, 300, S.cau.loai === 'ds' ? 10 : 46, BANG_MAU.dung, S.cau.loai === 'ds' ? 0.5 : 1)) } keu('mo') }, 1850)
+    setTimeout(() => { if (S.pha !== 'mo') return; const o = A.ong.find((x) => x.dung); if (o) { A.ong.filter((x) => x.dung).forEach((x) => bungManh(x.x, 300, S.cau.loai === 'ds' ? 10 : 46, BANG_MAU.dung, S.cau.loai === 'ds' ? 0.5 : 1)) } keu('mo'); if (S.kich) for (let k = 0; k < 6; k++) bungManh(200 + k * 300, 820, 18, [BANG_MAU.sao, BANG_MAU.dung, BANG_MAU.tin][k % 3], 1.1) }, 1850)
   }
   datMau()
   const lamMoCau = () => {
@@ -973,13 +1179,14 @@ function phaKetTinh(tinh = false) {
 function phaTongKet(tinh = false) {
   xoaHen()
   if (tinh || S.pha !== 'ket-tinh') {
-    // dựng nhanh cả 4 mẻ
-    HS.forEach((h) => { h.diem = 0; h.dungSo = 0; h.ketMe = [] })
+    // dựng nhanh cả 4 lượt
+    HS.forEach((h) => { h.diem = 0; h.dungSo = 0; h.ketMe = []; h.vao = true }); datLaiDiem()
     LICH.forEach((l, m) => { S.me = m; S.loai = l.loai; S.cau = lapCau(l.loai, l.i); moPhong(S.cau); HS.forEach((h) => (h.tra = { ...h.ke })); chotKetQua() })
     danhDauLoai()
   }
   S.pha = 'tong-ket'; A.ong = []
   datMau()
+  if (!S.yeu && !S.chup) [[700, '--tr-tin'], [960, '--tr-sao'], [1220, '--tr-chu-y']].forEach(([x, m], k) => setTimeout(() => bungManh(x, 640, 60, mauCSS(m), 1.3), 300 + k * 260))
   if (S.tuChay) henGio(9000, () => phaCho())
 }
 function phaTinh(ten) {
@@ -989,17 +1196,176 @@ function phaTinh(ten) {
   else if (ten === 'tra-loi') { if (S.chup || !S.tuChay) phaTraLoi(true, S.loai); else phaTraLoi(false, S.loai) }
   else if (ten === 'mo') { if (S.pha !== 'tra-loi') phaTraLoi(true, S.loai); phaMo(S.chup) }
   else if (ten === 'ket-tinh') {
-    if (S.chup || S.pha !== 'mo') { xoaHen(); HS.forEach((h) => { h.vao = true; h.diem = 0; h.dungSo = 0; h.ketMe = [] }); [0, 1].forEach((m) => { S.me = m; S.loai = 'tn'; S.cau = lapCau('tn', m); moPhong(S.cau); HS.forEach((h) => (h.tra = { ...h.ke })); chotKetQua() }); S.pha = 'mo'; danhDauLoai() }
+    if (S.chup || S.pha !== 'mo') { xoaHen(); HS.forEach((h) => { h.vao = true; h.diem = 0; h.dungSo = 0; h.ketMe = [] }); datLaiDiem(); [0, 1].forEach((m) => { S.me = m; if (m === 1) S.goi = { i: 12, dat: true }; S.loai = 'tn'; S.cau = lapCau('tn', m); moPhong(S.cau); HS.forEach((h) => (h.tra = { ...h.ke })); chotKetQua() }); S.pha = 'mo'; danhDauLoai() }
     phaKetTinh(S.chup)
   }
+  else if (ten === 'goi') { if (S.pha !== 'tra-loi' && S.pha !== 'goi') phaTraLoi(true, S.loai); phaGoi(S.chup) }
+  else if (ten === 'roi') { if (S.pha !== 'tra-loi') phaTraLoi(true, S.loai); emRoi(EM, true); S.hsTrang = 'roi'; dungMay() }
   else if (ten === 'tong-ket') phaTongKet(true)
 }
 
+// ── Thi đua: đội, rời màn, gọi lên bảng ──
+function vaoLop(i, k, tinh = false) {
+  const h = HS[i]; if (h.vao) return
+  h.vao = true; h.gioVao = `19:${String(12 + Math.floor(k / 2)).padStart(2, '0')}`; S.vuaVao.push(i); S.doiThuong[h.doi] += 10
+  if (S.doiDu == null && HS.filter((x) => x.doi === h.doi).every((x) => x.vao)) { S.doiDu = h.doi; S.doiThuong[h.doi] += 50; if (!tinh) { keu('mo'); bungManh(1290 + h.doi * 140, 300, 30, BANG_MAU['doi' + h.doi], 0.7) } }
+  if (!tinh) { keu('giot'); const a = viTriO(i); A.hat.push({ t0: performance.now(), d: 900, mau: BANG_MAU['doi' + h.doi], vet: [], p: [a.x, a.y, a.x, 640, 1290 + h.doi * 140, 420, 1290 + h.doi * 140, 470] }) }
+}
+function datLaiDiem() { S.doiThuong = [0, 0, 0, 0]; S.doiTruoc = [0, 0, 0, 0]; S.daGoi = []; S.goi = null; S.kich = false; HS.forEach((h) => { h.chuoi = 0; h.roi = 0; h.roiMe = false }) }
+function diemDoi(d) { return HS.reduce((s, h) => s + (h.doi === d ? h.diem : 0), 0) + S.doiThuong[d] }
+function emRoi(h, giu = false) {
+  h.roi++; h.roiMe = true; S.doiThuong[h.doi] -= 20
+  S.toast = `${h.ngan} vừa rời màn hình · lần ${h.roi} · ${DOI[h.doi].ten} −20 tinh thể`; keu('roi')
+  $('#bToast')?.remove(); bangNoi.insertAdjacentHTML('beforeend', `<div class="b-toast" id="bToast" role="status">${S.toast}</div>`); capNhatO()
+  if (!giu) henGio(5500, () => { S.toast = null; $('#bToast')?.remove() })
+}
+const ngayChuaLen = (h) => 3 + ((h.i * 5) % 11)
+function chonUngVien(boQua = []) {
+  const tang = S.cau.muc === 'Nhận biết' ? 0 : S.cau.muc === 'Thông hiểu' ? 1 : 2
+  const xep = [...HS].sort((a, b) => a.suc - b.suc), n = xep.length
+  const tangCua = (h) => { const k = xep.indexOf(h); return k < n / 3 ? 0 : k < (2 * n) / 3 ? 1 : 2 }
+  const ds = HS.filter((h) => h.tra && !h.roiMe && !S.daGoi.includes(h.i) && !boQua.includes(h.i))
+  let uu = ds.filter((h) => tangCua(h) === tang); if (uu.length < 3) uu = ds
+  const w = (h) => 1 + ngayChuaLen(h) / 3
+  const ung = [...uu].sort((a, b) => w(b) - w(a) || a.i - b.i).slice(0, 6)
+  let x = ngau() * ung.reduce((s, h) => s + w(h), 0), chon = ung[0]
+  for (const h of ung) { x -= w(h); if (x < 0) { chon = h; break } }
+  return { ds: ung.sort((a, b) => a.i - b.i), chon }
+}
+function lyDo(h) {
+  const c = S.cau, n = 6 + Math.floor(h.suc * 14), d = Math.round(n * (0.35 + h.suc * 0.55)), ngay = `0${1 + (h.i % 4)}/11`
+  return [`${c.muc} hợp với em: dạng «${c.dang}» em đã làm ${n} câu trên app, đúng ${d}.`,
+    h.suc > 0.62 ? `Lần gần nhất gặp dạng này (${ngay}) em làm đúng: lên giảng lại cho cả lớp.` : `Lần gần nhất gặp dạng này (${ngay}) em còn vướng một bước: lên bảng gỡ cùng thầy.`,
+    `${ngayChuaLen(h)} ngày chưa lên bảng.`]
+}
+function phaGoi(tinh = false, boQua = [], emEp = null) {
+  xoaHen(); if (S.pha !== 'tra-loi' && S.pha !== 'goi') phaTraLoi(true, S.loai)
+  if (tinh) HS.forEach((h) => { if (!h.tra && h.vao) h.tra = { ...h.ke } })
+  S.pha = 'goi'; S.khoa = true; S.toast = null
+  const u = chonUngVien(boQua), chon = emEp || u.chon || HS.find((h) => !S.daGoi.includes(h.i)) || HS[0]
+  if (!u.ds.includes(chon)) u.ds.push(chon)
+  S.goi = { i: chon.i, ung: u.ds.map((h) => h.i), lyDo: lyDo(chon), duDoan: [0, 0], tiep: 0, dat: null, hien: tinh || S.yeu }
+  if (tinh) { S.goi.duDoan = [19, 7]; S.goi.tiep = 46 }
+  datMau()
+  if (!S.goi.hien) quayChon(); else if (!tinh) coVu()
+  if (S.tuChay && !tinh) henGio(S.yeu ? 6000 : 11000, () => { if (S.pha === 'goi') { S.goi.dat = ngau() < 0.75; phaMo() } })
+}
+function quayChon() {
+  const g = S.goi, ds = g.ung, buoc = ds.length * 3 + ds.indexOf(g.i)
+  let t = 0
+  for (let k = 0; k <= buoc; k++) {
+    t += 70 + Math.pow(k / buoc, 2.6) * 430
+    const i = ds[k % ds.length], la = k === buoc
+    henGio(t, () => {
+      if (S.goi !== g) return
+      bangNoi.querySelectorAll('.o.soi').forEach((o) => o.classList.remove('soi'))
+      bangNoi.querySelector(`.o[data-i="${i}"]`)?.classList.add('soi')
+      keu(la ? 'mo' : 'tich')
+      if (la) { const p = viTriO(i); bungManh(p.x, p.y - 30, 44, BANG_MAU['doi' + HS[i].doi], 0.8); henGio(800, () => { if (S.goi !== g) return; g.hien = true; dungBang(); dungMay(); coVu() }) }
+    })
+  }
+}
+function coVu() {
+  const g = S.goi; if (!g) return
+  const doi = HS[g.i].doi, ban = HS.filter((h) => h.doi === doi && h.i !== g.i)
+  const nhip = () => {
+    if (S.pha !== 'goi' || S.goi !== g) return
+    if (g.duDoan[0] + g.duDoan[1] < HS.length - 1 && Math.random() < 0.6) g.duDoan[Math.random() < 0.72 ? 0 : 1]++
+    if (ban.length && Math.random() < 0.85) { const b = ban[Math.floor(Math.random() * ban.length)]; g.tiep++; tiepSuc(b.i) }
+    capNhatThe(); henGio(140, nhip)
+  }
+  nhip()
+}
+function tiepSuc(i) { if (S.yeu || S.chup) return; const a = viTriO(i), mau = BANG_MAU['doi' + HS[i].doi]; A.hat.push({ t0: performance.now(), d: 800, mau, vet: [], p: [a.x, a.y, a.x, 640, 560, 560, 496, 427] }) }
+function capNhatThe() {
+  const g = S.goi; if (!g) return
+  const t = g.duDoan[0] + g.duDoan[1] || 1, e = (id, v) => { const x = $('#' + id); if (x) x.textContent = v }
+  e('gDung', g.duDoan[0]); e('gSai', g.duDoan[1]); e('gTiep', g.tiep); e('mTiep', g.tiep)
+  const th = $('#gThanh'); if (th) th.style.width = (g.duDoan[0] / t) * 100 + '%'
+}
+function theGoiHtml() {
+  const g = S.goi, h = HS[g.i], d = DOI[h.doi], t = g.duDoan[0] + g.duDoan[1] || 1
+  return `<div class="b-mo-den" style="bottom:250px"></div><div class="b-goi" style="--doi:var(${d.mau})">
+    <div class="g-trai"><div class="g-ng"><div class="quy"></div><div class="quy hai"></div><b>${h.ky}</b></div><div class="g-doi">${d.ten}</div></div>
+    <div class="g-phai"><div class="g-mat">Mời em lên bảng</div><div class="g-ten">${S.an ? 'Em số ' + (h.i + 1) : h.ten}</div>
+      <div class="g-vi">Vì sao chọn em</div><ul>${g.lyDo.map((l) => `<li>${l}</li>`).join('')}</ul>
+      <div class="g-duoi"><div class="g-dd"><span>Cả lớp đoán trên máy</span><div class="g-thanh"><i id="gThanh" style="width:${(g.duDoan[0] / t) * 100}%"></i></div><span><b id="gDung">${g.duDoan[0]}</b> bạn đoán làm đúng · <b id="gSai">${g.duDoan[1]}</b> chưa đúng</span></div>
+      <div class="g-ts"><span>Tiếp sức ${d.ten}</span><b id="gTiep">${g.tiep}</b></div></div></div></div>`
+}
+function veDua(c, now, dt) {
+  const max = Math.max(1, ...[0, 1, 2, 3].map(diemDoi))
+  for (let d = 0; d < 4; d++) {
+    A.doiHien[d] += (diemDoi(d) - A.doiHien[d]) * (S.yeu || S.chup ? 1 : Math.min(1, dt * 2.2))
+    const x = 210 + d * 255, day = 640, h = 70 + (400 * Math.max(0, A.doiHien[d])) / max
+    c.fillStyle = moMau(BANG_MAU.chu, 0.2); c.fillRect(x - 60, day + 40, 120, 14)
+    c.fillStyle = moMau(BANG_MAU.chu, 0.5); c.fillRect(x - 13, day, 26, 42)
+    c.fillStyle = moMau(BANG_MAU.chu, 0.75); c.fillRect(x - 18, day - 6, 36, 8)
+    veLua(c, x, day - 6, h, BANG_MAU['doi' + d], now, d)
+  }
+}
+function veLua(c, x, y, h, mau, now, k) {
+  const rung = S.yeu || S.chup ? 1 : 1 + Math.sin(now * 0.012 + k) * 0.04 + Math.sin(now * 0.027 + k * 2) * 0.03
+  const H = h * rung, W = Math.min(120, 50 + h * 0.13)
+  c.save(); if (!S.yeu) { c.shadowColor = mau; c.shadowBlur = 50 }
+  const g = c.createLinearGradient(0, y - H, 0, y); g.addColorStop(0, moMau(mau, 0)); g.addColorStop(0.28, moMau(mau, 0.8)); g.addColorStop(0.82, mau); g.addColorStop(1, '#ffffff')
+  c.fillStyle = g; c.beginPath(); c.moveTo(x, y - H)
+  c.bezierCurveTo(x + W * 0.25, y - H * 0.6, x + W * 0.62, y - H * 0.3, x + W * 0.5, y - H * 0.08); c.quadraticCurveTo(x + W * 0.4, y, x, y)
+  c.quadraticCurveTo(x - W * 0.4, y, x - W * 0.5, y - H * 0.08); c.bezierCurveTo(x - W * 0.62, y - H * 0.3, x - W * 0.25, y - H * 0.6, x, y - H); c.fill()
+  c.shadowBlur = 0; const g2 = c.createLinearGradient(0, y - H * 0.45, 0, y); g2.addColorStop(0, 'rgba(255,255,255,0)'); g2.addColorStop(1, 'rgba(255,255,255,0.85)')
+  c.fillStyle = g2; c.beginPath(); c.moveTo(x, y - H * 0.45); c.quadraticCurveTo(x + W * 0.22, y - H * 0.12, x, y); c.quadraticCurveTo(x - W * 0.22, y - H * 0.12, x, y - H * 0.45); c.fill()
+  c.restore()
+  if (!S.yeu && !S.chup && Math.random() < 0.5) A.manh.push({ x: x + (Math.random() - 0.5) * W * 0.5, y: y - H * 0.7, vx: (Math.random() - 0.5) * 40, vy: -120 - Math.random() * 120, q: 0, vq: 3, s: 4 + Math.random() * 4, tuoi: 0, song: 0.9, mau, nang: -0.1 })
+}
+
+function veDiemDanh(c, now, dt) {
+  for (let d = 0; d < 4; d++) {
+    const tong = HS.filter((x) => x.doi === d).length, so = HS.filter((x) => x.doi === d && x.vao).length
+    A.ddHien[d] += (so / tong - A.ddHien[d]) * (S.yeu || S.chup ? 1 : Math.min(1, dt * 3))
+    const x = 1290 + d * 140, day = 520, h = 30 + 250 * A.ddHien[d]
+    c.fillStyle = moMau(BANG_MAU.chu, 0.2); c.fillRect(x - 44, day + 34, 88, 12)
+    c.fillStyle = moMau(BANG_MAU.chu, 0.5); c.fillRect(x - 11, day, 22, 36)
+    c.fillStyle = moMau(BANG_MAU.chu, 0.75); c.fillRect(x - 15, day - 6, 30, 7)
+    veLua(c, x, day - 6, h, BANG_MAU['doi' + d], now, d)
+  }
+}
+function qrHtml() {
+  let hq = 9; const r = () => { hq = (hq * 1103515245 + 12345) & 0x7fffffff; return hq / 0x7fffffff }
+  const o = []
+  for (let y = 0; y < 25; y++) for (let x = 0; x < 25; x++) {
+    const goc = (a, b) => x >= a && x < a + 7 && y >= b && y < b + 7
+    let den
+    const trongGoc = goc(0, 0) ? [0, 0] : goc(18, 0) ? [18, 0] : goc(0, 18) ? [0, 18] : null
+    if (trongGoc) { const dx = x - trongGoc[0], dy = y - trongGoc[1]; den = dx === 0 || dx === 6 || dy === 0 || dy === 6 || (dx >= 2 && dx <= 4 && dy >= 2 && dy <= 4) }
+    else if ((x === 7 || y === 7) && (x < 8 && y < 8) || (x === 17 && y < 8) || (y === 17 && x < 8) || (x === 7 && y > 16) || (y === 7 && x > 16)) den = false
+    else den = r() < 0.48
+    o.push(`<i${den ? '' : ' class="t"'}></i>`)
+  }
+  return o.join('')
+}
+
+const KY_DOI = ['Na', 'K', 'Cu', 'Ca']
+function gemSvg(fill, chu = '') {
+  return `<svg viewBox="0 0 100 120" aria-hidden="true" style="--g:${fill}"><polygon points="50,2 96,30 96,90 50,118 4,90 4,30" style="fill:var(--g)"/>
+    <polygon points="50,2 96,30 74,40 50,26 26,40 4,30" fill="#ffffff" fill-opacity=".55"/><polygon points="96,30 96,90 74,80 74,40" fill="#ffffff" fill-opacity=".16"/>
+    <polygon points="4,30 26,40 26,80 4,90" fill="#ffffff" fill-opacity=".34"/><polygon points="4,90 26,80 50,94 74,80 96,90 50,118" fill="#000000" fill-opacity=".24"/>
+    <polygon points="26,40 50,26 74,40 74,80 50,94 26,80" fill="#ffffff" fill-opacity=".08"/><polygon points="26,40 50,26 50,58" fill="#ffffff" fill-opacity=".38"/>
+    <polygon points="50,94 74,80 50,118" fill="#000000" fill-opacity=".12"/>
+    <polygon points="50,2 96,30 96,90 50,118 4,90 4,30" fill="none" stroke="#ffffff" stroke-opacity=".7" stroke-width="1.4" stroke-linejoin="round"/>
+    ${chu ? `<text x="50" y="72" text-anchor="middle" font-size="${chu.length > 1 ? 32 : 40}" font-weight="900" fill="#1b1938" font-family="Be Vietnam Pro, sans-serif">${chu}</text>` : ''}</svg>`
+}
+const luaSvg = () => `<svg class="vd-lua" viewBox="0 0 40 56" aria-hidden="true"><path d="M20 2C27 14 37 22 37 36A17 17 0 0 1 3 36C3 24 12 17 20 2Z" style="fill:var(--doi)"/><path d="M20 22C24 30 28 33 28 41A8 8 0 0 1 12 41C12 34 16 30 20 22Z" fill="#ffffff" fill-opacity=".85"/></svg>`
+
 // ── Co giãn sân khấu + máy ──
+function datCanvas(k) {
+  const dpr = Math.min(3, window.devicePixelRatio || 1), w = Math.max(1, Math.round(1920 * k * dpr)), h = Math.max(1, Math.round(1080 * k * dpr))
+  for (const cv of [$('#bangVe'), $('#bangVeTren')]) if (cv.width !== w) { cv.width = w; cv.height = h }
+  S.tiLe = w / 1920
+}
 function coGian() {
-  const k = bang.clientWidth / 1920; $('#bangSan').style.transform = `scale(${k})`
+  const k = bang.clientWidth / 1920; $('#bangSan').style.transform = `scale(${k})`; datCanvas(k)
   if (!S.chup) { const w = $('#voMayTrong').clientWidth, kk = w / 390; mayEl.style.transform = `scale(${kk})`; dkEl.style.transform = `scale(${kk})` }
-  if (S.chup && document.documentElement.classList.contains('chup-b')) { const kb = Math.min(innerWidth / 1920, innerHeight / 1080); $('#bangSan').style.transform = `scale(${kb})` }
+  if (S.chup && document.documentElement.classList.contains('chup-b')) { const kb = Math.min(innerWidth / 1920, innerHeight / 1080); $('#bangSan').style.transform = `scale(${kb})`; datCanvas(kb) }
+  if (S.chup) requestAnimationFrame((t) => khung(t))
 }
 new ResizeObserver(coGian).observe(bang)
 new ResizeObserver(coGian).observe($('#voMayTrong'))
@@ -1010,6 +1376,9 @@ mayEl.addEventListener('click', (e) => {
   if (b.dataset.pa != null) { S.emChon = +b.dataset.pa; S.emTuChon = true; dungMay() }
   else if (b.dataset.y != null) { S.emChon = S.emChon || [null, null, null, null]; S.emChon[+b.dataset.y] = b.dataset.v === '1'; S.emTuChon = true; dungMay() }
   else if (b.dataset.phim) { S.emTuChon = true; const p = b.dataset.phim, cu = S.emChon || ''; S.emChon = p === 'Xoá' ? cu.slice(0, -1) : (cu + p).slice(0, 8); dungMay() }
+  else if (b.dataset.dd != null) { S.emDuDoan = +b.dataset.dd; dungMay() }
+  else if (b.id === 'nutTiep') { if (S.emTiep < 10) { S.emTiep++; if (S.goi) { S.goi.tiep++; capNhatThe() } tiepSuc(EM.i); keu('tich'); dungMay() } }
+  else if (b.id === 'nutQuayLai') { S.hsTrang = null; dungMay() }
   else if (b.id === 'nutGui') guiEm()
   else if (b.id === 'nutGiai') { S.giai = !S.giai; S.hsTrang = null; dungMay() }
   else if (b.id === 'nutVe') { phaCho() }
@@ -1032,10 +1401,14 @@ batTat('#nutAn', (v) => { S.an = v; dungBang() })
 batTat('#nutAm', (v) => { S.am = v; keu('mo') })
 addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input,textarea')) return
-  if (e.key === ' ') { e.preventDefault(); if (S.pha === 'cho') phaTraLoi(); else if (S.pha === 'tra-loi') phaMo(); }
+  const k = e.key.toLowerCase()
+  if (e.key === ' ') { e.preventDefault(); if (S.pha === 'cho') phaTraLoi(); else if (S.pha === 'tra-loi') phaGoi(); else if (S.pha === 'goi') phaMo() }
+  else if (k === 'm' && (S.pha === 'tra-loi' || S.pha === 'goi')) phaMo()
+  else if ((k === 'd' || k === 'f') && S.pha === 'goi') { S.goi.dat = k === 'd'; phaMo() }
+  else if (k === 'n' && S.pha === 'goi') { const bo = [S.goi.i]; S.pha = 'tra-loi'; phaGoi(false, bo) }
   else if (e.key === 'ArrowRight') { if (S.pha === 'mo' || S.pha === 'ket-tinh') { if (S.me + 1 < LICH.length) { S.me++; phaTraLoi() } else phaTongKet() } }
   else if (e.key.toLowerCase() === 'k' && S.pha === 'mo') phaKetTinh()
-  else if (e.key.toLowerCase() === 'h') $('#nutAn').click()
+  else if (k === 'h') $('#nutAn').click()
 })
 
 // ── Chế độ chụp: #b-<pha>[-toi|-sang][-yeu] · #h-<trạng thái>[-toi|-sang] · #d-<trạng thái>[-toi|-sang] ──
@@ -1054,11 +1427,15 @@ function chayChup(hash) {
     S.loai = l
     if (p === 'tra-loi' && l === 'tl') { phaTraLoi(true, 'tl'); HS.forEach((h, k) => { if (k % 7 !== 3 && k < 26) h.tra = { chon: 'xong', t: 10 } }); dungBang() }
     else phaTinh(p)
+    if (p === 'tra-loi' && l === 'tn') { HS.forEach((h, k) => { if (k % 5 === 2) h.chuoi = 3 }); emRoi(HS[11], true) }
   } else if (loai === 'h') {
-    const map = { chon: ['tn', 'cau'], 'da-gui': ['tn', 'da-gui'], dung: ['tn', 'dung'], sai: ['tn', 'sai'], giai: ['tn', 'giai'], cho: ['tn', 'cho'], xong: ['tn', 'xong'], 'mat-mang': ['tn', 'cau'], ds: ['ds', 'cau'], tln: ['tln', 'cau'], 'tu-luan': ['tl', 'cau'], nghi: ['tn', 'nghi'] }
+    const map = { chon: ['tn', 'cau'], 'da-gui': ['tn', 'da-gui'], dung: ['tn', 'dung'], sai: ['tn', 'sai'], giai: ['tn', 'giai'], cho: ['tn', 'cho'], xong: ['tn', 'xong'], 'mat-mang': ['tn', 'cau'], ds: ['ds', 'cau'], tln: ['tln', 'cau'], 'tu-luan': ['tl', 'cau'], nghi: ['tn', 'nghi'], 'nhap-ma': ['tn', 'nhap-ma'], 'duoc-goi': ['tn', 'duoc-goi'], 'du-doan': ['tn', 'du-doan'], roi: ['tn', 'roi'] }
     const [l, t] = map[tt] || ['tn', 'cau']
     S.loai = l
-    if (t === 'nghi') phaCho(true)
+    if (t === 'nghi') { phaCho(true); if (!EM.vao) vaoLop(0, 3, true) }
+    else if (t === 'nhap-ma') { phaCho(true); S.hsTrang = 'nhap-ma' }
+    else if (t === 'duoc-goi' || t === 'du-doan') { phaTraLoi(true, 'tn'); phaGoi(true, [], t === 'duoc-goi' ? EM : HS.find((h) => h.doi === EM.doi && h !== EM)); S.emDuDoan = 1; S.emTiep = 6; S.hsTrang = t }
+    else if (t === 'roi') { phaTraLoi(true, 'tn'); emRoi(EM, true); S.hsTrang = 'roi' }
     else if (t === 'cho') phaTinh('ket-tinh')
     else if (t === 'xong') phaTongKet(true)
     else {
@@ -1068,7 +1445,7 @@ function chayChup(hash) {
       if (l === 'tln') S.emChon = '1,24'
       if (tt === 'mat-mang') S.matMang = true
       if (t === 'da-gui') { S.emGui = true; EM.tra = { chon: 0, t: 7.2 } }
-      if (t === 'dung' || t === 'sai' || t === 'giai') { EM.ke = { chon: S.emChon, t: 6.4 }; EM.tra = null; HS.forEach((h) => { if (!h.tra) h.tra = { ...h.ke } }); EM.tra = { chon: S.emChon, t: 6.4 }; S.pha = 'tra-loi'; S.khoa = true; S.pha = 'mo'; chotKetQua(); S.giai = t === 'giai' }
+      if (t === 'dung' || t === 'sai' || t === 'giai') { EM.ke = { chon: S.emChon, t: 6.4 }; EM.tra = null; HS.forEach((h) => { if (!h.tra && h.vao) h.tra = { ...h.ke } }); EM.tra = { chon: S.emChon, t: 6.4 }; S.pha = 'tra-loi'; S.khoa = true; S.pha = 'mo'; chotKetQua(); S.giai = t === 'giai' }
       S.hsTrang = t === 'giai' ? 'giai' : t
     }
     dungMay()
