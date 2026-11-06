@@ -18,7 +18,7 @@ const CHU_CHAT = /[A-Za-z0-9₀-₉⁰-⁹()[\]]/
 
 /** Chuỗi chữ ⇒ nguyên chuỗi (không có gì cần bọc) hoặc mảng nút. `truoc` / `sau`
  * là kí tự kề bên ngoài chuỗi (đoạn chỉ số, số mũ…), rỗng nếu hết khúc. */
-function trinhBayCongThuc(v: string, truoc = '', sau = ''): string | (string | JSX.Element)[] {
+function congThuc(v: string, truoc = '', sau = ''): string | (string | JSX.Element)[] {
   if (!RE_CAN_TRINH_BAY.test(v) && !(v[0] === 'l' && /[CAT]/.test(truoc))) return v
   const ra: (string | JSX.Element)[] = []
   let tu = 0
@@ -48,6 +48,7 @@ function trinhBayCongThuc(v: string, truoc = '', sau = ''): string | (string | J
   return ra
 }
 
+const giuNguyen = (v: string): string => v
 const RE_KHONG = /(^|[^\p{L}\p{M}\p{N}])(kh(?:ô|o\u0302)ng)(?![\p{L}\p{M}\p{N}])/giu // nhóm bắt ký tự đứng trước thay cho nhìn-lùi (iPhone iOS < 16.4 không chạy)
 const RE_KHONG_NHANH = /kh(?:ô|o\u0302)ng/i
 const TU_GHEP = /^\s+(khí|màu|mùi|vị|gian|đổi|no|phân cực|bão hòa|bão hoà|đáng kể)(?![\p{L}\p{M}\p{N}])/u
@@ -64,6 +65,9 @@ export function laKhongNhan(v: string, i: number, n: number): boolean {
 
 /** Chuỗi chữ ⇒ nguyên chuỗi hoặc mảng nút: «không» phủ định bọc `ct-khong`, phần còn lại qua luật phương trình như cũ. */
 export function trinhBayChu(v: string, truoc = '', sau = ''): string | (string | JSX.Element)[] {
+  // MÀN THI link /t (data-trong='hs' mà KHÔNG có data-ht2 của cổng): chỉ «không» (thầy 07/11), bỏ span trình bày phương trình — tác tử tốc độ đo
+  // 800 ChemText ×4 CPU +20 ms vì span thêm; cổng học sinh (data-ht2) và test (không data-trong) giữ trình bày đủ như 27/10.
+  const g = document.documentElement, trinhBayCongThuc = g.dataset.trong === 'hs' && !g.hasAttribute('data-ht2') ? giuNguyen : congThuc
   if (!RE_KHONG_NHANH.test(v)) return trinhBayCongThuc(v, truoc, sau)
   const ra: (string | JSX.Element)[] = []
   let tu = 0

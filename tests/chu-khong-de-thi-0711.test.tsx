@@ -27,16 +27,31 @@ describe('«không» trong đề thi', () => {
     }
   })
 
-  it('app học sinh / màn thi (data-trong=hs): thân đề bọc «không» phủ định, «không màu» bỏ qua, chữ giữ nguyên', () => {
+  it('màn thi link /t (data-trong=hs, KHÔNG data-ht2): chỉ bọc «không» phủ định, không thêm span phương trình; «không màu» bỏ qua; chữ giữ nguyên', () => {
     document.documentElement.dataset.trong = 'hs'
     try {
       expect(camNeuHs()).toBe(true)
       const c = ve()
       expect([...c.querySelectorAll('div.cau-de .ct-khong')].map((x) => x.textContent?.normalize('NFC'))).toEqual(['không'])
-      expect(c.querySelector('.ct-l')?.textContent).toBe('HCl')
+      expect(c.querySelector('.ct-l')).toBeNull()
       expect(c.textContent).toBe(DE)
     } finally {
       delete document.documentElement.dataset.trong
+    }
+  })
+
+  it('cổng học sinh (data-trong=hs + data-ht2): «không» + trình bày phương trình đủ (HCl có «l» đuôi)', () => {
+    const g = document.documentElement
+    g.dataset.trong = 'hs'
+    g.setAttribute('data-ht2', '')
+    try {
+      const c = ve()
+      expect(c.querySelectorAll('.ct-khong')).toHaveLength(1)
+      expect(c.querySelector('.ct-l')?.textContent).toBe('HCl')
+      expect(c.textContent).toBe(DE)
+    } finally {
+      delete g.dataset.trong
+      g.removeAttribute('data-ht2')
     }
   })
 })
