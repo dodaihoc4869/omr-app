@@ -1,0 +1,43 @@
+{
+  "i": 135,
+  "hashNguon": "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303",
+  "fileNguon": "anh/18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303.png",
+  "nguoiSoat": "cau_truc_4",
+  "questions": [
+    {
+      "qid": "DB-12-B1-P1-D1-II-188",
+      "de": "Cho hai chất hữu cơ mạch hở E, F có cùng thành phần nguyên tố: 40,00%C;6,67%H và 53,33%O về khối lượng. Trên phổ MS, peak ion phân tử của E và F đều nhỏ hơn 100. Cho phổ IR của E và F: Đun nóng E, F với dung dịch NaOH dư đều tạo ra sản phẩm gồm hai chất hữu cơ. Trong đó sản phẩm của F có chứa alcohol đa chức.",
+      "refs": [
+        {
+          "hash": "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303",
+          "where": "DB-12-B1-P1-D1-II-188.hinh.0.du_lieu",
+          "hashDataUrl": "dff175b3c47e678d2f1297410a9d7804019ac299f35300055eea59886f0a235a"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B3-D1-II-4",
+      "de": "Cho hai chất hữu cơ mạch hở E, F có cùng thành phần nguyên tố: 40,00%C;6,67%H và 53,33%O về khối lượng. Trên phổ MS, peak ion phân tử của E và F đều nhỏ hơn 100. Cho phổ IR của E và F: Đun nóng E, F với dung dịch NaOH dư đều tạo ra sản phẩm gồm hai chất hữu cơ. Trong đó sản phẩm của F có chứa alcohol đa chức.",
+      "refs": [
+        {
+          "hash": "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303",
+          "where": "DH-12-C1-B3-D1-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "dff175b3c47e678d2f1297410a9d7804019ac299f35300055eea59886f0a235a"
+        }
+      ]
+    }
+  ],
+  "daMoRiengNativeFull": [
+    "135hash18588f…5303",
+    "1033hashb93c0c…ef0f1"
+  ],
+  "zooms135": [
+    "/workspace/scratch/cau4-211-IR135-Ezoom.png",
+    "/workspace/scratch/cau4-211-IR135-Fzoom.png"
+  ],
+  "actualRender185": "/workspace/scratch/cau4-211-IR185-fresh.png",
+  "hashSvg185": "cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615",
+  "doiChieu": "Cùng2IRcurves/tips/extrema/shoulders/fingerprint,native135scaled~0.722từ1033. Eframe13545,11..505,243vsbase90,43..727,364;Fframe562,15..1015,247vsbase805,49..1434,368. Xnonlinearspacing4000/3000/2000/1500/1000/500giữ,ticksmajor/minor/y0..100/labelsE-F/2titlesĐộ truyền qua(%)vàSố sóng(cm−1)đồngnội dung. 2EdeepvalleysvàFdoublefingerprintdipsđủ,khônggộp/normtheory.",
+  "batDong": "Không thấybấtđồngdata/text;PNGresize/sharpnesskhác,khôngpixelidentical. KhôngpHashadmit.",
+  "ketQua": "ĐủbằngchứngdùngchungactualSVG185saunative2sourcevàfreshChromiumrender,đợimetadata135exacthashtoghiproof."
+}

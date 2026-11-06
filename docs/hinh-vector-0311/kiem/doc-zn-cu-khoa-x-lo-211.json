@@ -1,0 +1,190 @@
+{
+  "i": 142,
+  "hash": "191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577",
+  "fileNguon": "anh/191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-zinc211-zoom.png",
+  "questions": [
+    {
+      "qid": "12-C6-B19-II-14",
+      "de": "Nhúng thanh kẽm và thanh đồng (không tiếp xúc với nhau) vào cốc đựng dung dịch H₂SO₄ loãng. Nối thanh kẽm và thanh đồng bằng dây dẫn (có một khoá X) như hình sau:",
+      "refs": [
+        {
+          "hash": "191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577",
+          "where": "12-C6-B19-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "6b2939d5db62091e5fa11571a2827dda3a35defb3649522e232086b92cdfed9b"
+        }
+      ]
+    }
+  ],
+  "refCountActual": 1,
+  "geometry": {
+    "note": "Sourceonly1publicqid inprovidedmanifest,khôngbịa2refs. Nativeanchors1–2pxapprox.",
+    "beaker": {
+      "wall": [
+        [
+          172,
+          162
+        ],
+        [
+          172,
+          355
+        ],
+        [
+          176,
+          370
+        ],
+        [
+          188,
+          379
+        ],
+        [
+          370,
+          379
+        ],
+        [
+          385,
+          372
+        ],
+        [
+          392,
+          355
+        ],
+        [
+          392,
+          162
+        ]
+      ],
+      "surfaceY": 269,
+      "openTop": true,
+      "noRimEllipse": true
+    },
+    "electrodes": [
+      {
+        "rect": [
+          203,
+          150,
+          223,
+          360
+        ],
+        "label": "Zn",
+        "labelAt": [
+          224,
+          122
+        ]
+      },
+      {
+        "rect": [
+          340,
+          149,
+          360,
+          360
+        ],
+        "label": "Cu",
+        "labelAt": [
+          331,
+          121
+        ]
+      }
+    ],
+    "wireArc": {
+      "from": [
+        213,
+        150
+      ],
+      "cubicAnchors": [
+        [
+          174,
+          135
+        ],
+        [
+          171,
+          103
+        ],
+        [
+          199,
+          82
+        ],
+        [
+          239,
+          64
+        ],
+        [
+          286,
+          62
+        ],
+        [
+          333,
+          68
+        ],
+        [
+          374,
+          84
+        ],
+        [
+          384,
+          105
+        ],
+        [
+          381,
+          124
+        ],
+        [
+          350,
+          149
+        ]
+      ],
+      "to": [
+        350,
+        149
+      ],
+      "noDirectionArrow": true
+    },
+    "keyX": {
+      "circle": [
+        215,
+        76,
+        8
+      ],
+      "inside": "crossX2diagonals",
+      "label": "Khóa X",
+      "labelAt": [
+        146,
+        52
+      ],
+      "noLeader": true,
+      "noOpenGapOrLeverAdded": true
+    },
+    "liquidTexture": "Horizontalgraydashes4rows~282/309/336/362clippedbehindwhiteelectrodes,NOTparticles/H2bubbles.",
+    "labels": [
+      {
+        "text": "dung dịch",
+        "at": [
+          94,
+          235
+        ]
+      },
+      {
+        "text": "H₂SO₄",
+        "at": [
+          94,
+          269
+        ],
+        "leader": [
+          [
+            107,
+            284
+          ],
+          [
+            186,
+            320
+          ]
+        ]
+      }
+    ],
+    "counts": "2electrodes/1closedcurvedwire/1circle-crossswitch/1openbeaker;noextra+/−/battery/bubbles/electronarrows.",
+    "sourceInstructionData": "Stemasksquestionsaboutcircuit;donotsolve/addpolarityorpredictgas."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

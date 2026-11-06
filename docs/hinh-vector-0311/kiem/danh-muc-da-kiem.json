@@ -694,6 +694,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303": {
+      "tep": "ir-hai-panel-ddh-cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615.svg",
+      "hashSvg": "cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615",
+      "byteSvg": 79694,
+      "byteGzip": 17761,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "0ccb5d5b1660ba243671e13736c278fc42f7428680c445b029594bc55570d0c7": {
       "tep": "tai-che-ddh-0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8.svg",
       "hashSvg": "0776509fa21c771b283489ff1f55ce9bbf3734a80ca78ffe640694ce2151c0f8",
@@ -7129,6 +7138,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577": {
+      "tep": "zn-cu-khoa-x-ddh-83b29b279b875fb9d70c1c89aff7fe0c188b9d6f51ed9cd05dc1b6962eacbf27.svg",
+      "hashSvg": "83b29b279b875fb9d70c1c89aff7fe0c188b9d6f51ed9cd05dc1b6962eacbf27",
+      "byteSvg": 14243,
+      "byteGzip": 4398,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "f8fb0793580a20e441af19c3251aa8acd1b82aed91d89de8c1d8f9da27ca168b": {
       "tep": "phan-ung-ddh-50c4de1384431a0a28d63f42d3b1f64c97feb1cf81c4fc2112912261a2a96566.svg",
       "hashSvg": "50c4de1384431a0a28d63f42d3b1f64c97feb1cf81c4fc2112912261a2a96566",
@@ -11369,6 +11387,20 @@
       ]
     },
     {
+      "qid": "12-C6-B19-II-14",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577",
+          "where": "12-C6-B19-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "6b2939d5db62091e5fa11571a2827dda3a35defb3649522e232086b92cdfed9b",
+          "vector": "zn-cu-khoa-x-ddh-83b29b279b875fb9d70c1c89aff7fe0c188b9d6f51ed9cd05dc1b6962eacbf27.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C7-B24-I-31",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -15301,6 +15333,20 @@
           "where": "DB-12-B1-P1-D1-II-185.hinh.0.du_lieu",
           "hashDataUrl": "5f3667821c19079cdf403283af585a5c0a4739c8e9d3d116d5780705b24bf9ed",
           "vector": "bat-su-khuay-ddh-5294f205a967384672a97523f6c3c3b12457ba99293602de88da7b3a6810d9aa.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-II-188",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303",
+          "where": "DB-12-B1-P1-D1-II-188.hinh.0.du_lieu",
+          "hashDataUrl": "dff175b3c47e678d2f1297410a9d7804019ac299f35300055eea59886f0a235a",
+          "vector": "ir-hai-panel-ddh-cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615.svg"
         }
       ]
     },
@@ -21703,6 +21749,20 @@
       ]
     },
     {
+      "qid": "DH-12-C1-B3-D1-II-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303",
+          "where": "DH-12-C1-B3-D1-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "dff175b3c47e678d2f1297410a9d7804019ac299f35300055eea59886f0a235a",
+          "vector": "ir-hai-panel-ddh-cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C1-B3-D1-III-5",
       "duMoiHinh": false,
       "soHinhNguon": 2,
@@ -25139,6 +25199,7 @@
     "12-C4-B13-II-21",
     "12-C4-B13-III-27",
     "12-C6-B20-III-1",
+    "12-C6-B19-II-14",
     "12-C7-B24-I-31",
     "12-KT-C1-D1-I-16",
     "12-KT-C1-D1-II-4",
@@ -25374,6 +25435,7 @@
     "DB-12-B1-P1-D1-III-161",
     "DB-12-B1-P1-D1-I-183",
     "DB-12-B1-P1-D1-II-185",
+    "DB-12-B1-P1-D1-II-188",
     "DB-12-B1-P2-D1-II-4",
     "DB-12-B1-P2-D1-II-45",
     "DB-12-B1-P2-D1-II-55",
@@ -25774,6 +25836,7 @@
     "DH-12-C1-B2-III-9",
     "DH-12-C1-B3-D1-I-1",
     "DH-12-C1-B3-D1-I-3",
+    "DH-12-C1-B3-D1-II-4",
     "DH-12-C2-B4-DT-III-8",
     "DH-12-C2-B4-DT-III-10",
     "DH-12-C1-B3-D2-II-3",
