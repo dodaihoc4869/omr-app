@@ -1,0 +1,40 @@
+[
+  {
+    "i": 267,
+    "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+    "fileNguon": "anh/2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea.png",
+    "svg": "bang-amine-ddh-22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6.svg",
+    "hashSvg": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
+    "byteSvg": 63027,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C34-D1-III-1",
+        "de": "Ghép công thức cấu tạo của amine ở cột (A) với tên và bậc amine của chúng ở cột (B) trong bảng ở hình dưới, thành một dãy số theo thứ tự a), b), c).",
+        "refs": [
+          {
+            "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+            "where": "12-KT-C34-D1-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-285",
+        "de": "Ghép công thức cấu tạo của amine ở cột (A) với tên và bậc amine của chúng ở cột (B) trong bảng ở hình dưới, thành một dãy số theo thứ tự a), b), c).",
+        "refs": [
+          {
+            "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+            "where": "DB-12-B8-D1-III-285.hinh.0.du_lieu",
+            "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3structures/Ph3DOUBLE/NH2-H2N-H3C-CH3-NHliteral/alltablechoices-a-b-c/3numbers/2headersdam/grid/noaddedanswers/nofixaminebậcba/DDHpath.",
+    "hashSvgDaSoat": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

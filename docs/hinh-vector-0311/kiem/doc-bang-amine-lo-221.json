@@ -1,0 +1,321 @@
+{
+  "i": 267,
+  "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+  "fileNguon": "anh/2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-amine221-m1.png",
+    "/workspace/scratch/cau4-amine221-m2.png",
+    "/workspace/scratch/cau4-amine221-m3.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C34-D1-III-1",
+      "maDe": "12-KT-C34-D1",
+      "de": "Ghép công thức cấu tạo của amine ở cột (A) với tên và bậc amine của chúng ở cột (B) trong bảng ở hình dưới, thành một dãy số theo thứ tự a), b), c).",
+      "hinh": [
+        {
+          "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+          "where": "12-KT-C34-D1-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-285",
+      "maDe": "DB-12-B8-D1",
+      "de": "Ghép công thức cấu tạo của amine ở cột (A) với tên và bậc amine của chúng ở cột (B) trong bảng ở hình dưới, thành một dãy số theo thứ tự a), b), c).",
+      "hinh": [
+        {
+          "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+          "where": "DB-12-B8-D1-III-285.hinh.0.du_lieu",
+          "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox. TablesmatchingPAtextclassificationmustkeepwronglookingbậcba;noanswerlink/reorder.",
+    "table": {
+      "outer": [
+        47,
+        52,
+        1169,
+        633
+      ],
+      "verticalDividerX": 579,
+      "horizontalYs": [
+        96,
+        241,
+        437
+      ],
+      "headerA": "Cột (A)",
+      "headerB": "Cột (B)",
+      "headerAnchors": [
+        [
+          313,
+          74
+        ],
+        [
+          874,
+          74
+        ]
+      ],
+      "headerWeight": "boldtrueDDH",
+      "numbers": [
+        {
+          "text": "(1)",
+          "at": [
+            216,
+            220
+          ]
+        },
+        {
+          "text": "(2)",
+          "at": [
+            234,
+            415
+          ]
+        },
+        {
+          "text": "(3)",
+          "at": [
+            209,
+            612
+          ]
+        }
+      ]
+    },
+    "molecules": [
+      {
+        "row": 1,
+        "ringVertices": [
+          [
+            249,
+            140
+          ],
+          [
+            294,
+            112
+          ],
+          [
+            340,
+            140
+          ],
+          [
+            340,
+            196
+          ],
+          [
+            294,
+            224
+          ],
+          [
+            249,
+            196
+          ]
+        ],
+        "doubleInner": [
+          [
+            257,
+            147,
+            257,
+            190
+          ],
+          [
+            294,
+            122,
+            332,
+            145
+          ],
+          [
+            294,
+            213,
+            332,
+            190
+          ]
+        ],
+        "label": "NH₂",
+        "labelAnchor": [
+          401,
+          113
+        ],
+        "bond": [
+          [
+            340,
+            140
+          ],
+          [
+            374,
+            119
+          ]
+        ],
+        "target": "Nfirst",
+        "counts": "6C1N,3ringdoubles,nocircle"
+      },
+      {
+        "row": 2,
+        "implicitCvertices": [
+          [
+            328,
+            305
+          ],
+          [
+            381,
+            305
+          ],
+          [
+            408,
+            352
+          ]
+        ],
+        "startLabel": "H₂N",
+        "startAnchor": [
+          286,
+          260
+        ],
+        "NrightBond": [
+          [
+            310,
+            273
+          ],
+          [
+            328,
+            305
+          ]
+        ],
+        "endLabel": "H₃C",
+        "endAnchor": [
+          365,
+          402
+        ],
+        "CrightBond": [
+          [
+            408,
+            352
+          ],
+          [
+            390,
+            385
+          ]
+        ],
+        "counts": "4C1N=3implicitC+H3Ctext,allSINGLE"
+      },
+      {
+        "row": 3,
+        "implicitCvertices": [
+          [
+            308,
+            500
+          ],
+          [
+            364,
+            500
+          ]
+        ],
+        "labels": [
+          {
+            "text": "H₃C",
+            "anchor": [
+              263,
+              550
+            ],
+            "bond": [
+              [
+                288,
+                533
+              ],
+              [
+                308,
+                500
+              ]
+            ],
+            "target": "Cright"
+          },
+          {
+            "text": "CH₃",
+            "anchor": [
+              408,
+              455
+            ],
+            "bond": [
+              [
+                364,
+                500
+              ],
+              [
+                383,
+                467
+              ]
+            ],
+            "target": "Cfirst"
+          },
+          {
+            "text": "NH",
+            "anchor": [
+              402,
+              550
+            ],
+            "bondFromC": [
+              [
+                364,
+                500
+              ],
+              [
+                384,
+                533
+              ]
+            ],
+            "target": "Nfirst"
+          },
+          {
+            "text": "H₃C",
+            "anchor": [
+              347,
+              598
+            ],
+            "bond": [
+              [
+                384,
+                562
+              ],
+              [
+                373,
+                582
+              ]
+            ],
+            "target": "Cright"
+          }
+        ],
+        "counts": "5C1N=2implicitC+3CH3text,1NH-Hliteral,allSINGLE"
+      }
+    ],
+    "rightRows": [
+      {
+        "text": "a) N-methylbutan-2-amine; amine bậc ba",
+        "anchor": [
+          874,
+          168
+        ]
+      },
+      {
+        "text": "b) butan-1-amine; amine bậc một",
+        "anchor": [
+          874,
+          339
+        ]
+      },
+      {
+        "text": "c) benzenamine; amine bậc một",
+        "anchor": [
+          874,
+          536
+        ]
+      }
+    ],
+    "critical": "Keepa)bậcbaEXACTnotsecondarycorrect;NOmappingofrow1tocthererelabel/allprintedordermuststay. 3moleculesNOcharges/wedges/CIP/captionextra;H3CvsCH3targetsCcorrect,H2NtargetNright/NHtargetNfirst.",
+    "noAdded": "Nooctetdot/amineordernamesinstructures/arrowsmatchlines/answerarray."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

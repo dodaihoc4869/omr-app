@@ -1,0 +1,42 @@
+[
+  {
+    "i": 273,
+    "hash": "2e6696b5e058d4b7c82eb649a9415b526d32f6ed5f09f143a63d0bcd3b4ef68f",
+    "fileNguon": "anh/2e6696b5e058d4b7c82eb649a9415b526d32f6ed5f09f143a63d0bcd3b4ef68f.png",
+    "svg": "disaccharide-cheo-ddh-3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16.svg",
+    "hashSvg": "3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16",
+    "byteSvg": 12863,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D2-II-124",
+        "de": "Lactose, còn gọi là đường sữa, là một loại đường disaccharide được tạo thành từ một phân tử glucose và một phân tử galactose liên kết với nhau. Lactose chủ yếu được tìm thấy trong sữa và các sản phẩm từ sữa, như phô mai và sữa chua.\nĐây là nguồn cung cấp năng lượng quan trọng, đặc biệt là cho trẻ sơ sinh và trẻ nhỏ.\nTuy nhiên, một số người gặp khó khăn trong việc tiêu hóa lactose do thiếu enzyme lactase, dẫn đến tình trạng không dung nạp lactose, gây ra các triệu chứng như đầy bụng và tiêu chảy khi tiêu thụ các sản phẩm chứa lactose.\nTrong công nghiệp thực phẩm, lactose được sử dụng như một chất làm ngọt nhẹ và cũng đóng vai trò quan trọng trong việc lên men các sản phẩm từ sữa. Cho công thức cấu tạo của lactose như bên.",
+        "refs": [
+          {
+            "hash": "2e6696b5e058d4b7c82eb649a9415b526d32f6ed5f09f143a63d0bcd3b4ef68f",
+            "where": "DB-12-B4-D2-II-124.hinh.0.du_lieu",
+            "hashDataUrl": "dd1eead01b33122627328a735e9aa2fde96b3c9d07fb9f75a752a554352a5761"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B5-II-17",
+        "de": "Lactose, còn gọi là đường sữa, là một loại đường disaccharide được tạo thành từ một phân tử glucose và một phân tử galactose liên kết với nhau. Lactose chủ yếu được tìm thấy trong sữa và các sản phẩm từ sữa, như phô mai và sữa chua.\nĐây là nguồn cung cấp năng lượng quan trọng, đặc biệt là cho trẻ sơ sinh và trẻ nhỏ.\nTuy nhiên, một số người gặp khó khăn trong việc tiêu hóa lactose do thiếu enzyme lactase, dẫn đến tình trạng không dung nạp lactose, gây ra các triệu chứng như đầy bụng và tiêu chảy khi tiêu thụ các sản phẩm chứa lactose.\nTrong công nghiệp thực phẩm, lactose được sử dụng như một chất làm ngọt nhẹ và cũng đóng vai trò quan trọng trong việc lên men các sản phẩm từ sữa. Cho công thức cấu tạo của lactose như bên.",
+        "refs": [
+          {
+            "hash": "2e6696b5e058d4b7c82eb649a9415b526d32f6ed5f09f143a63d0bcd3b4ef68f",
+            "where": "DH-12-C2-B5-II-17.hinh.0.du_lieu",
+            "hashDataUrl": "dd1eead01b33122627328a735e9aa2fde96b3c9d07fb9f75a752a554352a5761"
+          }
+        ]
+      }
+    ],
+    "geometryBaseSource": 48,
+    "canvasNguon": "Hai bản quét có tỷ lệ/bố cục lề khác, không pixel identical; kiểm riêng toàn nội dung.",
+    "ghiChuDung": "2sixringschéo/12C11O/6OH2CH2OH/2ringO+verticalbridgeO/4TAPER2horizontalbold/lowerC4OH-UP/upperC1OH-UP/0Hnums-captionadded/DDHpath;khôngpHashapprove.",
+    "hashSvgDaSoat": "3447d0e44a9d02c1da2ba293aed2745926f26da18ffb9340f19d668f648f4d16",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
