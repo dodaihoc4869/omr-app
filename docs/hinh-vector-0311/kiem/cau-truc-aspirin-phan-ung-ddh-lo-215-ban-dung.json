@@ -1,0 +1,40 @@
+[
+  {
+    "i": 176,
+    "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+    "fileNguon": "anh/1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021.png",
+    "svg": "aspirin-phan-ung-ddh-cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08.svg",
+    "hashSvg": "cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08",
+    "byteSvg": 24953,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B1-P1-D1-II-151",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành acid salicylic. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+            "where": "DB-12-B1-P1-D1-II-151.hinh.0.du_lieu",
+            "hashDataUrl": "7da696bb1ae3cc5480af9337b1fa5554bc099334ed21ad706e066b6dbde428f9"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B1-P1-II-13",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành acid salicylic. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+            "where": "DH-12-C1-B1-P1-II-13.hinh.0.du_lieu",
+            "hashDataUrl": "7da696bb1ae3cc5480af9337b1fa5554bc099334ed21ad706e066b6dbde428f9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2orthohexagons2aromaticcircles/OOCCH3literal-C2O2/2COOH/OH/+H2O⇌CH3COOH/Hsup+-t°/2captionsAspirin-Salicylicacid/noextra-byproducts-charges/DDHpath.",
+    "hashSvgDaSoat": "cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

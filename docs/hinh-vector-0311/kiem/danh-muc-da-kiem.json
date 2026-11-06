@@ -1729,6 +1729,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021": {
+      "tep": "aspirin-phan-ung-ddh-cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08.svg",
+      "hashSvg": "cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08",
+      "byteSvg": 24953,
+      "byteGzip": 4546,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565": {
       "tep": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg",
       "hashSvg": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
@@ -2112,6 +2121,15 @@
       "hashSvg": "034cac7d1b2887a89458544e61caf48d6e2c840260d6e40a2a1a1bfa41d49e98",
       "byteSvg": 17701,
       "byteGzip": 5113,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da": {
+      "tep": "dien-di-ban-dau-ddh-0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f.svg",
+      "hashSvg": "0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f",
+      "byteSvg": 34512,
+      "byteGzip": 7031,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -6837,6 +6855,15 @@
       "hashSvg": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f",
       "byteSvg": 4541,
       "byteGzip": 1654,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1": {
+      "tep": "dien-di-ba-vet-ddh-e6b4e49154bdc93aced360553b5f017973ad4b5e3186b0c3ddb7e27eb7801842.svg",
+      "hashSvg": "e6b4e49154bdc93aced360553b5f017973ad4b5e3186b0c3ddb7e27eb7801842",
+      "byteSvg": 20869,
+      "byteGzip": 4793,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -15368,6 +15395,20 @@
       ]
     },
     {
+      "qid": "DB-12-B1-P1-D1-II-151",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+          "where": "DB-12-B1-P1-D1-II-151.hinh.0.du_lieu",
+          "hashDataUrl": "7da696bb1ae3cc5480af9337b1fa5554bc099334ed21ad706e066b6dbde428f9",
+          "vector": "aspirin-phan-ung-ddh-cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B1-P1-D1-II-153",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -17564,6 +17605,26 @@
           "where": "DB-12-B9-P1-D1-I-205.hinh.3.du_lieu",
           "hashDataUrl": "36338884e155053874b95215fb73b0b137ebdce8820f4cbc926ae2c82508757c",
           "vector": "cau-truc-ddh-f49cad9d4b57ce270850fb26a2eb75dee143f924589542c1d871496102b7302e.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P1-D1-I-215",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+          "where": "DB-12-B9-P1-D1-I-215.hinh.0.du_lieu",
+          "hashDataUrl": "9de5026a8827909c2e7eeeafddbf8f51d0689272b5bdb93e673878c02c1efe12",
+          "vector": "dien-di-ban-dau-ddh-0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f.svg"
+        },
+        {
+          "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+          "where": "DB-12-B9-P1-D1-I-215.hinh.1.du_lieu",
+          "hashDataUrl": "30bf9aecbf20253b8957843a1ae85b1c8600eb59b9aa77af207c8aab5a186a7f",
+          "vector": "dien-di-ba-vet-ddh-e6b4e49154bdc93aced360553b5f017973ad4b5e3186b0c3ddb7e27eb7801842.svg"
         }
       ]
     },
@@ -21262,6 +21323,20 @@
       ]
     },
     {
+      "qid": "DH-12-C1-B1-P1-II-13",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+          "where": "DH-12-C1-B1-P1-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "7da696bb1ae3cc5480af9337b1fa5554bc099334ed21ad706e066b6dbde428f9",
+          "vector": "aspirin-phan-ung-ddh-cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C1-B1-P1-II-14",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -23790,6 +23865,26 @@
       ]
     },
     {
+      "qid": "DH-12-C3-B9-P1-I-65",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+          "where": "DH-12-C3-B9-P1-I-65.hinh.0.du_lieu",
+          "hashDataUrl": "9de5026a8827909c2e7eeeafddbf8f51d0689272b5bdb93e673878c02c1efe12",
+          "vector": "dien-di-ban-dau-ddh-0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f.svg"
+        },
+        {
+          "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+          "where": "DH-12-C3-B9-P1-I-65.hinh.1.du_lieu",
+          "hashDataUrl": "30bf9aecbf20253b8957843a1ae85b1c8600eb59b9aa77af207c8aab5a186a7f",
+          "vector": "dien-di-ba-vet-ddh-e6b4e49154bdc93aced360553b5f017973ad4b5e3186b0c3ddb7e27eb7801842.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C3-B9-P1-I-67",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -25619,6 +25714,7 @@
     "DB-12-B1-P1-D1-I-111",
     "DB-12-B1-P1-D1-I-123",
     "DB-12-B1-P1-D1-I-145",
+    "DB-12-B1-P1-D1-II-151",
     "DB-12-B1-P1-D1-II-153",
     "DB-12-B1-P1-D1-II-158",
     "DB-12-B1-P1-D1-III-161",
@@ -25753,6 +25849,7 @@
     "DB-12-B9-P1-D1-I-195",
     "DB-12-B9-P1-D1-I-199",
     "DB-12-B9-P1-D1-I-205",
+    "DB-12-B9-P1-D1-I-215",
     "DB-12-B9-P1-D1-I-216",
     "DB-12-B9-P1-D1-I-217",
     "DB-12-B9-P1-D1-I-223",
@@ -25991,6 +26088,7 @@
     "DH-12-C1-B1-P1-I-85",
     "DH-12-C1-B1-P1-II-10",
     "DH-12-C1-B1-P1-II-12",
+    "DH-12-C1-B1-P1-II-13",
     "DH-12-C1-B1-P1-II-14",
     "DH-12-C1-B1-P1-II-20",
     "DH-12-C1-B1-P1-II-28",
@@ -26145,6 +26243,7 @@
     "DH-12-C3-B9-P1-I-47",
     "DH-12-C3-B9-P1-I-48",
     "DH-12-C3-B9-P1-I-64",
+    "DH-12-C3-B9-P1-I-65",
     "DH-12-C3-B9-P1-I-67",
     "DH-12-C3-B9-P1-I-68",
     "DH-12-C3-B9-P1-I-74",

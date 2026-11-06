@@ -1,0 +1,277 @@
+{
+  "i": 177,
+  "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+  "fileNguon": "anh/1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-electrophoresis177-zoom.png",
+  "questions": [
+    {
+      "qid": "DB-12-B9-P1-D1-I-215",
+      "de": "Một thí nghiệm được mô tả như hình bên dưới: Thứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+      "refs": [
+        {
+          "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+          "where": "DB-12-B9-P1-D1-I-215.hinh.1.du_lieu",
+          "hashDataUrl": "30bf9aecbf20253b8957843a1ae85b1c8600eb59b9aa77af207c8aab5a186a7f"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B9-P1-I-65",
+      "de": "Một thí nghiệm được mô tả như hình bên dưới: Thứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+      "refs": [
+        {
+          "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+          "where": "DH-12-C3-B9-P1-I-65.hinh.1.du_lieu",
+          "hashDataUrl": "30bf9aecbf20253b8957843a1ae85b1c8600eb59b9aa77af207c8aab5a186a7f"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;graybandtexturesnotparticlecounts,notalias1275withpH6.",
+    "supply": {
+      "rect": [
+        263,
+        2,
+        393,
+        61
+      ],
+      "text": "Nguồn điện",
+      "textAt": [
+        330,
+        32
+      ],
+      "terminalDots": [
+        [
+          254,
+          31,
+          7
+        ],
+        [
+          401,
+          31,
+          7
+        ]
+      ],
+      "minus": [
+        253,
+        14
+      ],
+      "plus": [
+        402,
+        12
+      ],
+      "polarity": "−LEFT+RIGHT"
+    },
+    "wireLeft": {
+      "from": [
+        254,
+        32
+      ],
+      "anchors": [
+        [
+          132,
+          32
+        ],
+        [
+          96,
+          46
+        ],
+        [
+          76,
+          75
+        ],
+        [
+          77,
+          102
+        ],
+        [
+          95,
+          127
+        ],
+        [
+          132,
+          141
+        ],
+        [
+          193,
+          141
+        ]
+      ],
+      "to": [
+        193,
+        141
+      ]
+    },
+    "wireRight": {
+      "from": [
+        401,
+        32
+      ],
+      "anchors": [
+        [
+          525,
+          32
+        ],
+        [
+          559,
+          46
+        ],
+        [
+          581,
+          76
+        ],
+        [
+          579,
+          103
+        ],
+        [
+          558,
+          128
+        ],
+        [
+          525,
+          141
+        ],
+        [
+          463,
+          141
+        ]
+      ],
+      "to": [
+        463,
+        141
+      ]
+    },
+    "mainFrame": [
+      168,
+      76,
+      489,
+      206
+    ],
+    "electrodeLines": [
+      {
+        "line": [
+          193,
+          100,
+          193,
+          182
+        ],
+        "label": "cathode",
+        "labelAt": [
+          208,
+          91
+        ],
+        "minus": [
+          181,
+          108
+        ]
+      },
+      {
+        "line": [
+          463,
+          100,
+          463,
+          182
+        ],
+        "label": "anode",
+        "labelAt": [
+          460,
+          91
+        ],
+        "plus": [
+          475,
+          107
+        ]
+      }
+    ],
+    "bars": [
+      [
+        255,
+        100,
+        269,
+        179
+      ],
+      [
+        323,
+        100,
+        337,
+        179
+      ],
+      [
+        390,
+        100,
+        404,
+        179
+      ]
+    ],
+    "barStyle": "3vệtđiệndiaminoacidphẳnggray#A1A1A1,khôngphảithanhkimloại/khônggradientgợichấtliệu. Sourcegraygrainskhôngparticlecount.",
+    "barLeaders": [
+      {
+        "label": "(1)",
+        "labelAt": [
+          184,
+          248
+        ],
+        "line": [
+          [
+            191,
+            234
+          ],
+          [
+            249,
+            182
+          ]
+        ]
+      },
+      {
+        "label": "(2)",
+        "labelAt": [
+          329,
+          248
+        ],
+        "line": [
+          [
+            328,
+            235
+          ],
+          [
+            328,
+            182
+          ]
+        ]
+      },
+      {
+        "label": "(3)",
+        "labelAt": [
+          465,
+          248
+        ],
+        "line": [
+          [
+            460,
+            234
+          ],
+          [
+            404,
+            182
+          ]
+        ]
+      }
+    ],
+    "otherLabel": {
+      "text": "Kết thúc",
+      "at": [
+        36,
+        85
+      ],
+      "note": "NativeleftedgeKnear0,keepfullwordnoinferredextracharacters."
+    },
+    "counts": "3bars/2terminaldots/2wireloops/1powerbox/2electrodeverticallines/2pairs−+/3parenthesizedbarlabels+3leaders/NOpH6/caption/liquidcolor/arrows.",
+    "occlusion": "Wireslooparoundframeouterandcrossframeleft/rightat141,connecteachverticalelectrodebar;doNOTjoinleft/rightwiresornodeto3graybands.",
+    "critical": "Publicdeasksaminoacidvệtorder:3grayregionslàVỆT,khôngmetalbars. Khônggiảibài/gántênaminoacid. Existingrectelectrodescathode/anodeandwiretopologyremainliteral."
+  },
+  "verdict": "Đọcsource/đốichiếufreshflatgraySVGnew;old85e8gradientclassificationrevokednotadmitted."
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "i": 453,
+    "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+    "fileNguon": "anh/522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da.png",
+    "svg": "dien-di-ban-dau-ddh-0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f.svg",
+    "hashSvg": "0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f",
+    "byteSvg": 34512,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B9-P1-D1-I-215",
+        "de": "Một thí nghiệm được mô tả như hình bên dưới: Thứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+        "refs": [
+          {
+            "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+            "where": "DB-12-B9-P1-D1-I-215.hinh.0.du_lieu",
+            "hashDataUrl": "9de5026a8827909c2e7eeeafddbf8f51d0689272b5bdb93e673878c02c1efe12"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-I-65",
+        "de": "Một thí nghiệm được mô tả như hình bên dưới: Thứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+        "refs": [
+          {
+            "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+            "where": "DH-12-C3-B9-P1-I-65.hinh.0.du_lieu",
+            "hashDataUrl": "9de5026a8827909c2e7eeeafddbf8f51d0689272b5bdb93e673878c02c1efe12"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1grayband/closedrectcell/cathode−LEFT-anode+RIGHT/2roundterminals/sourceboxminusLplusR/wires/1leader/MôitrườngcópH=6/Ala-Lys-Glu/Nguồnđiện-Banđầu/noliquid-added/DDHpath.",
+    "hashSvgDaSoat": "0a840618b59269ef1220a571d8ab217af376db803a65281ea36ba0ae781bb67f",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

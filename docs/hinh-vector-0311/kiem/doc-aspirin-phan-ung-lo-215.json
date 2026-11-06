@@ -1,0 +1,235 @@
+{
+  "i": 176,
+  "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+  "fileNguon": "anh/1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-aspirin215-zoom.png",
+  "questions": [
+    {
+      "qid": "DB-12-B1-P1-D1-II-151",
+      "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành acid salicylic. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+      "refs": [
+        {
+          "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+          "where": "DB-12-B1-P1-D1-II-151.hinh.0.du_lieu",
+          "hashDataUrl": "7da696bb1ae3cc5480af9337b1fa5554bc099334ed21ad706e066b6dbde428f9"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B1-P1-II-13",
+      "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành acid salicylic. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+      "refs": [
+        {
+          "hash": "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021",
+          "where": "DH-12-C1-B1-P1-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "7da696bb1ae3cc5480af9337b1fa5554bc099334ed21ad706e066b6dbde428f9"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;reactantOOCCH3literalMUSTnotfixchemtheory.",
+    "reactant": {
+      "ringVertices": [
+        [
+          8,
+          121
+        ],
+        [
+          56,
+          94
+        ],
+        [
+          106,
+          121
+        ],
+        [
+          106,
+          177
+        ],
+        [
+          56,
+          205
+        ],
+        [
+          8,
+          177
+        ]
+      ],
+      "circle": [
+        56,
+        150,
+        27
+      ],
+      "topSubstituent": {
+        "text": "OOCCH₃",
+        "anchor": [
+          112,
+          33
+        ],
+        "bond": [
+          [
+            56,
+            94
+          ],
+          [
+            56,
+            56
+          ]
+        ],
+        "target": "FIRSTO",
+        "critical": "2O+2CbeforeH3:O O C C H3,notOOCH3/notOCOCH3/notCOOCH3."
+      },
+      "sideSubstituent": {
+        "text": "COOH",
+        "anchor": [
+          200,
+          87
+        ],
+        "bond": [
+          [
+            106,
+            121
+          ],
+          [
+            143,
+            100
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      "caption": "Aspirin",
+      "captionAnchor": [
+        102,
+        253
+      ]
+    },
+    "product": {
+      "ringVertices": [
+        [
+          743,
+          112
+        ],
+        [
+          791,
+          85
+        ],
+        [
+          841,
+          112
+        ],
+        [
+          841,
+          168
+        ],
+        [
+          791,
+          196
+        ],
+        [
+          743,
+          168
+        ]
+      ],
+      "circle": [
+        791,
+        140,
+        27
+      ],
+      "topSubstituent": {
+        "text": "OH",
+        "anchor": [
+          802,
+          25
+        ],
+        "bond": [
+          [
+            791,
+            85
+          ],
+          [
+            791,
+            48
+          ]
+        ],
+        "target": "Oleft"
+      },
+      "sideSubstituent": {
+        "text": "COOH",
+        "anchor": [
+          934,
+          78
+        ],
+        "bond": [
+          [
+            841,
+            112
+          ],
+          [
+            878,
+            90
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      "caption": "Salicylic acid",
+      "captionAnchor": [
+        806,
+        253
+      ]
+    },
+    "plusSigns": [
+      [
+        324,
+        136
+      ],
+      [
+        1044,
+        132
+      ]
+    ],
+    "H2O": {
+      "text": "H₂O",
+      "anchor": [
+        403,
+        135
+      ]
+    },
+    "CH3COOH": {
+      "text": "CH₃COOH",
+      "anchor": [
+        1165,
+        132
+      ]
+    },
+    "equilibrium": {
+      "upper": [
+        519,
+        136,
+        644,
+        136
+      ],
+      "upperDirection": "RIGHT",
+      "lower": [
+        644,
+        146,
+        519,
+        146
+      ],
+      "lowerDirection": "LEFT",
+      "condition": "H⁺, t°",
+      "conditionAnchor": [
+        580,
+        123
+      ],
+      "plusSup": true,
+      "commaBaseline": true,
+      "degreeSup": true
+    },
+    "counts": "2benzeneCIRCLES/2COOH/1reactantOOCCH3/1productOH/1equilibriumpair/2pluses/1H2O/1CH3COOH/2captions,0wedges/chargeexceptconditionH+;NOKekulearomatic3doubleadded.",
+    "noAdded": "NoOOCCH3reorder/theorycorrection/alpha1label/coefficients/extraH/conditiontranslations."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

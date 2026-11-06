@@ -1,0 +1,237 @@
+{
+  "i": 453,
+  "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+  "fileNguon": "anh/522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-initial453-labelzoom.png",
+  "questions": [
+    {
+      "qid": "DB-12-B9-P1-D1-I-215",
+      "maDe": "DB-12-B9-P1-D1",
+      "de": "Một thí nghiệm được mô tả như hình bên dưới: Thứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+      "hinh": [
+        {
+          "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+          "where": "DB-12-B9-P1-D1-I-215.hinh.0.du_lieu",
+          "hashDataUrl": "9de5026a8827909c2e7eeeafddbf8f51d0689272b5bdb93e673878c02c1efe12"
+        },
+        {
+          "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+          "where": "DB-12-B9-P1-D1-I-215.hinh.1.du_lieu",
+          "hashDataUrl": "30bf9aecbf20253b8957843a1ae85b1c8600eb59b9aa77af207c8aab5a186a7f"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B9-P1-I-65",
+      "maDe": "DH-12-C3-B9-P1",
+      "de": "Một thí nghiệm được mô tả như hình bên dưới: Thứ tự các amino acid ứng các vệt được đánh dấu (1), (2), (3) là",
+      "hinh": [
+        {
+          "hash": "522db1ea2927fdebe22966738da203feaa908459051c23040dd56ca3ecd7e7da",
+          "where": "DH-12-C3-B9-P1-I-65.hinh.0.du_lieu",
+          "hashDataUrl": "9de5026a8827909c2e7eeeafddbf8f51d0689272b5bdb93e673878c02c1efe12"
+        },
+        {
+          "hash": "1e9a44c613c53a831d642904515b353e99744f5a54957e92ba98da3a6a8268d1",
+          "where": "DH-12-C3-B9-P1-I-65.hinh.1.du_lieu",
+          "hashDataUrl": "30bf9aecbf20253b8957843a1ae85b1c8600eb59b9aa77af207c8aab5a186a7f"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "sourceCanvas": [
+      664,
+      240
+    ],
+    "mainFrame": [
+      173,
+      75,
+      494,
+      205
+    ],
+    "supply": {
+      "box": [
+        268,
+        1,
+        398,
+        60
+      ],
+      "text": "Nguồn điện",
+      "at": [
+        335,
+        31
+      ],
+      "dots": [
+        [
+          259,
+          30,
+          7
+        ],
+        [
+          406,
+          30,
+          7
+        ]
+      ],
+      "minus": [
+        258,
+        13
+      ],
+      "plus": [
+        407,
+        11
+      ]
+    },
+    "wireLeft": [
+      [
+        259,
+        31
+      ],
+      [
+        137,
+        31
+      ],
+      [
+        102,
+        45
+      ],
+      [
+        81,
+        74
+      ],
+      [
+        82,
+        101
+      ],
+      [
+        100,
+        126
+      ],
+      [
+        137,
+        140
+      ],
+      [
+        198,
+        140
+      ]
+    ],
+    "wireRight": [
+      [
+        406,
+        31
+      ],
+      [
+        530,
+        31
+      ],
+      [
+        564,
+        45
+      ],
+      [
+        586,
+        75
+      ],
+      [
+        584,
+        102
+      ],
+      [
+        563,
+        127
+      ],
+      [
+        530,
+        140
+      ],
+      [
+        468,
+        140
+      ]
+    ],
+    "electrodes": [
+      {
+        "line": [
+          198,
+          99,
+          198,
+          181
+        ],
+        "label": "cathode",
+        "at": [
+          213,
+          90
+        ],
+        "minus": [
+          186,
+          107
+        ]
+      },
+      {
+        "line": [
+          468,
+          99,
+          468,
+          181
+        ],
+        "label": "anode",
+        "at": [
+          465,
+          90
+        ],
+        "plus": [
+          480,
+          106
+        ]
+      }
+    ],
+    "singleBand": [
+      329,
+      99,
+      343,
+      178
+    ],
+    "bandType": "VỆTđiệndiaminoacid,flatgray,notmetalbar/gradient",
+    "labels": [
+      {
+        "text": "Ban đầu",
+        "at": [
+          36,
+          84
+        ]
+      },
+      {
+        "text": "Môi trường có pH = 6",
+        "at": [
+          339,
+          192
+        ]
+      },
+      {
+        "text": "Vệt có chứa Ala, Lys, Glu",
+        "at": [
+          558,
+          230
+        ],
+        "leader": [
+          [
+            346,
+            153
+          ],
+          [
+            557,
+            215
+          ]
+        ],
+        "sourceLastChar": "LastuGluatrightedge664partiallyclippedrightstemBUTleftstem,bottomcurve,rightstemremainlegibleu;nootherletter/punctuationclaimedbeyondGlu."
+      }
+    ],
+    "noAdded": "No(1)(2)(3)/barleaders/ionnamesanswer/arrows/liquidfill/captionperiod. Singleinitialbandonly.",
+    "mapping": "Same2qid hinh.0=453BANĐẦU thenhinh.1=177KẾTTHÚC,keepwhere/order/answersunchanged."
+  },
+  "verdict": "Đọcsource,Gluđọctừvisibleglyphcóclippededgechứkhôngsuyorderaminoacid/chưaactualSVGreview."
+}

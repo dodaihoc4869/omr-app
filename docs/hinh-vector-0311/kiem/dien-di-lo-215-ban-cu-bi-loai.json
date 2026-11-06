@@ -1,0 +1,14 @@
+{
+  "i": 177,
+  "hashSvg": "85e8f4e3b8fce74491f30ae43cc977a8621e72aaed81a82733e954b33d920817",
+  "trangThai": "bi-loai-phan-loai",
+  "ketQua": "Cần sửa: public stems gọi các vệt amino acid; sửa tên điện phân/ba thanh và bỏ gradient gợi kim loại. Bản cũ không đưa manifest.",
+  "proofHinhHocCu": [
+    {
+      "i": 177,
+      "hashSvg": "85e8f4e3b8fce74491f30ae43cc977a8621e72aaed81a82733e954b33d920817",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở native/full+zoom3x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-215-bars-fresh.png). Đủ3verticalgraybands/rectcell/2electrodeverticals/cathode−LEFT/anode+RIGHT,sourceboxNguồn điện−LEFT+RIGHT/2grayterminaldots/2outerwireloopsconnectđúngelectrodeskhôngnốitới3bands. ĐủKết thúc(16fitkhôngchạmleftloop)/3parenthesized(1)(2)(3)+3leaders đúngbandorder;greytexturekhônggánparticle/ioncount. KhôngthêmpH6/arrows/liquidcolor/aminoacidnames/đápán,khôngalias1275. DDHpath tựchứa khôngfallback/text/image,mọi nhãn/wires/glyph cógapkhôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata,khôngchọne73b15cũ."
+    }
+  ]
+}
