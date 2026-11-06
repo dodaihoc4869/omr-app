@@ -193,3 +193,14 @@
 @container (max-width: 700px) {
   .dd1-vua-ds[data-co-muc] .dd1-ov { row-gap: 6px; }
 }
+/* 06/11 (thầy chốt bỏ 12 bậc lười chăm, hiện nhịp học trực quan): dải 10 ô ngày + chuỗi / bỏ liền + câu hôm nay */
+.dd1-vua-nhip-hang, .dd1-vua-nhip { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-width: 0; }
+.dd1-vua-dai { display: inline-flex; align-items: center; gap: 2px; }
+.dd1-vua-dai > i { display: inline-block; width: 6px; height: 12px; border-radius: 2px; background: var(--gvm-vien); }
+.dd1-vua-dai > i[data-loai='du'] { background: var(--gvm-xl); }
+.dd1-vua-dai > i[data-loai='thieu-it'] { background: var(--gvm-hp); }
+.dd1-vua-dai > i[data-loai='thieu-nhieu'] { background: var(--gvm-ho); }
+.dd1-vua-dai > i[data-loai='khong-lam'] { background: transparent; box-shadow: inset 0 0 0 1.5px var(--gvm-ho); }
+.dd1-vua-bo { font-size: 12px; font-weight: 600; color: var(--gvm-chu-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dd1-vua-bo[data-loai='bo'] { color: var(--gvm-ho-dam); }
+.dd1-vua-bo[data-loai='chuoi'] { color: var(--gvm-xl-dam); }

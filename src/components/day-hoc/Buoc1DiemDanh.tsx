@@ -20,11 +20,11 @@ import { dinhDangMa } from '../../lib/them-phut-api'
 import { duongQr, taoQr } from '../../lib/ma-qr'
 import { layNhipHoc } from '../../lib/nhip-hoc-thay'
 import { chuMucLamEm, coDauHieu, layMucLamLo, tiLeSaiVoi, TOI_DA_EM_MUC_LAM_LO, TREO_TO, type LocMucLam, type MucLamEm } from '../../lib/muc-lam-lo-api'
-import { chuChip, chuNutEm, gioDd, khoaNhom, khoiEm, ngayNganDd, nhipTheoSbd, soNhom, TEN_NHOM, thongKeBuoi, THU_TU_NHOM, type CheDoChieu, type EmBuoi, type TrangThaiNhip } from '../../lib/diem-danh-nhip'
-import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
-import type { DiemDanhBuoi } from './DiemDanhBuoi'
+import { chuChip, chuNutEm, gioDd, khoaNhom, khoiEm, ngayNganDd, nhipTheoSbd, soNgayBo, soNhom, TEN_NHOM, thongKeBuoi, THU_TU_NHOM, type CheDoChieu, type EmBuoi, type TrangThaiNhip } from '../../lib/diem-danh-nhip'
 import ChipBac from '../bac-cham-chi/ChipBac'
-import { chuBacSo } from '../bac-cham-chi/bac'
+import type { EmHoSo } from '../chien-dich/HoSoLamCauEm'
+void ChipBac
+import type { DiemDanhBuoi } from './DiemDanhBuoi'
 import './diem-danh-buoc1.css'
 import '../../styles/trong-gv-diem-danh.css' // «Trong» 26/10 — chỉ áp khi <html data-trong="gv">
 
@@ -36,10 +36,11 @@ export const SO_VUA_DIEM_DANH = 6
 /** Ô em vắng: hiện sẵn mọi em đang Lười (tối đa ngần này), không có em Lười thì 3 tên đầu; còn lại mở bằng "Xem N em vắng còn lại". */
 const TOI_DA_TEN_VANG = 8
 
-/** Nhịp học (một lệnh cho mọi em) khi `bat`; `tai()` đọc lại (mở bản chiếu Nhịp học ⇒ số hôm nay mới nhất). Lỗi ⇒ giữ số cũ + câu nói thật. */
+/** Nhịp học (một lệnh cho mọi em) khi `bat`; `tai()` đọc lại (mở bản chiếu Nhịp học ⇒ số hôm nay mới nhất). Lỗi ⇒ giữ số cũ + câu nói thật, tự thử lại tối đa 3 lần. */
 export function useNhipBuoi(bat: boolean): TrangThaiNhip & { tai: () => Promise<void> } {
   const [st, setSt] = useState<TrangThaiNhip>({ kq: null, dangTai: false, loi: '' })
   const lan = useRef(0)
+  const soThu = useRef(0)
   const tai = useCallback(async () => {
     const l = ++lan.current
     setSt((c) => ({ ...c, dangTai: true }))
@@ -50,15 +51,25 @@ export function useNhipBuoi(bat: boolean): TrangThaiNhip & { tai: () => Promise<
       r = { ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' }
     }
     if (l !== lan.current) return
+    if (r.ok) soThu.current = 0
     setSt((c) => (r.ok ? { kq: r.du, dangTai: false, loi: '' } : { kq: c.kq, dangTai: false, loi: r.chu }))
   }, [])
   useEffect(() => {
     if (!bat) return
+    soThu.current = 0
     void tai()
     return () => {
       lan.current++
     }
   }, [bat, tai])
+  useEffect(() => {
+    if (!bat || st.kq !== null || !st.loi || st.dangTai || soThu.current >= 3) return
+    const hen = setTimeout(() => {
+      soThu.current++
+      void tai()
+    }, 3500)
+    return () => clearTimeout(hen)
+  }, [bat, st.kq, st.loi, st.dangTai, tai])
   return { ...st, tai }
 }
 
@@ -585,6 +596,9 @@ export default function Buoc1DiemDanh({
                       {vua.map((e) => {
                         const k = khoaNhom(e)
                         const d = mucLo.theoEm.get(e.sbd)
+                        const bo = k === 'luoi' ? soNgayBo(e.nhip) : 0
+                        const hn = e.nhip?.homNay
+                        const oQua = (e.nhip?.o ?? []).filter((x) => !x.homNay && x.loai !== 'chua-vao').slice(-10)
                         const chipNhom = (
                           <span className="dd1-chip" data-nhom={k}>
                             {chuChip(e)}
@@ -592,7 +606,7 @@ export default function Buoc1DiemDanh({
                         )
                         return (
                           <li key={e.sbd}>
-                            <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e, e.bacCham ? chuBacSo(e.bacCham.bac) : undefined)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})${d ? `. ${chuMucLamEm(d)}` : ''}`}>
+                            <button type="button" className="dd1-vua-dong" onClick={(ev) => moEm(e, ev.currentTarget)} aria-label={`${chuNutEm(e)} (điểm danh ${gioDd(e.luc)}${e.cach === 'thay' ? ', thầy thêm' : ''})${d ? `. ${chuMucLamEm(d)}` : ''}`}>
                               <span className="dd1-vua-gio">{gioDd(e.luc)}</span>
                               <span className="dd1-vua-em">
                                 <span className="dd1-vua-ten-hang">
@@ -604,15 +618,30 @@ export default function Buoc1DiemDanh({
                                     </span>
                                   )}
                                 </span>
-                                {e.bacCham ? (
-                                  // 13/10: có bậc ⇒ chip bậc nhỏ (biểu tượng + số bậc, tên đầy đủ trong title) ngay cạnh chip nhóm
-                                  <span className="bcc-hang">
-                                    {chipNhom}
-                                    <ChipBac bac={e.bacCham.bac} nho />
-                                  </span>
-                                ) : (
-                                  chipNhom
-                                )}
+                                <span className="dd1-vua-nhip-hang">
+                                  {chipNhom}
+                                  {e.nhip && (
+                                    <span className="dd1-vua-nhip" aria-hidden="true">
+                                      {oQua.length > 0 && (
+                                        <span className="dd1-vua-dai">
+                                          {oQua.map((x) => (
+                                            <i key={x.ngay} data-loai={x.loai} />
+                                          ))}
+                                        </span>
+                                      )}
+                                      {bo > 0 ? (
+                                        <small className="dd1-vua-bo">bỏ {bo} ngày liền</small>
+                                      ) : e.nhip.chuoiDuGanNhat > 0 ? (
+                                        <small>chuỗi {e.nhip.chuoiDuGanNhat} ngày</small>
+                                      ) : null}
+                                      {hn && hn.muc > 0 && (
+                                        <small>
+                                          hôm nay {hn.lam}/{hn.muc} câu
+                                        </small>
+                                      )}
+                                    </span>
+                                  )}
+                                </span>
                               </span>
                               {coCotMuc && (
                                 <>

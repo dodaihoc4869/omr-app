@@ -154,7 +154,7 @@ describe('không còn emoji ở mọi chỗ hiện bậc', () => {
     for (const o of container.querySelectorAll('.bcc-dem-o')) expect(o.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe(o.getAttribute('data-bac'))
     expect(container.querySelector('.bcc-o[data-hien] svg.bcc-hh')!.getAttribute('data-bac')).toBe('3')
   })
-  it('tờ chiếu điểm danh: chip từng em + dải chú giải dùng huy hiệu, không emoji, không nút bấm bậc', () => {
+  it('tờ chiếu điểm danh: thẻ từng em + dòng em không emoji, bỏ 12 bậc lười chăm, không nút bấm bậc', () => {
     const BUOI = { id: 'BH-1', ten: 'Buổi học 12/10 · 12A1', lop: '12A1', moLuc: '2026-10-12T10:50:00Z', hetHan: '2026-10-13T10:50:00Z', dongLuc: null, dangMo: true }
     const CO_MAT = ['A1', 'A3', 'A4'].map((sbd, i) => ({ sbd, hoTen: DS_EM.find((e) => e.sbd === sbd)!.hoTen, luc: `2026-10-12T10:5${i}:00Z`, cach: 'ma' as const }))
     const TT: TrangThaiBuoi = { buoi: BUOI, ma: '482915', doiMaLuc: 1, coMat: CO_MAT, siSo: DS_EM.length, lopEm: DS_EM.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, tenLop: '12A1' })) }
@@ -163,14 +163,10 @@ describe('không còn emoji ở mọi chỗ hiện bậc', () => {
         <BanChieuDiemDanh cheDo={cheDo} tt={TT} tk={thongKeBuoi(TT, nhipTheoSbd(KQ))} nhip={{ kq: KQ, dangTai: false, loi: '' }} goc="https://app.test" matKetNoi={false} hoSoMo={false}
           onDoiCheDo={() => {}} onDong={() => {}} onMoEm={() => {}} onThuLaiNhip={() => {}} />,
       )
-      // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q): bản A nay là thẻ em (huy hiệu lớn) + thang 12 bậc `.ddc-thang` thay chip nhỏ + dải `.bcc-dem`
-      // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng, thầy chốt): A = thẻ `.ddv-the` + dải 12 bậc `.ddv-thang`; B = huy hiệu đầu mỗi dòng em (không còn dải chú giải 12 bậc)
-      const phan = [...document.querySelectorAll('.ddv-the, .ddv-thang, .ddv-dong-em')]
+      const phan = [...document.querySelectorAll('.ddv-the, .ddv-dong-em')]
       expect(phan.length).toBeGreaterThan(1)
       expect(EMOJI.test(phan.map((x) => x.textContent).join(''))).toBe(false)
-      if (cheDo === 'diem-danh') expect(document.querySelectorAll('.ddv-thang svg.bcc-hh')).toHaveLength(12)
-      else expect(document.querySelectorAll('.ddv-dong-em .ddv-dong-hh svg.bcc-hh').length).toBeGreaterThan(0)
-      expect(document.querySelector('.bcc-dem-nut, .bcc-nut')).toBeNull()
+      expect(document.querySelector('.ddv-thang, svg.bcc-hh, .bcc-dem-nut, .bcc-nut')).toBeNull()
       unmount()
     }
   })

@@ -1291,6 +1291,7 @@ export async function danhDauNghiHoc(env: Env, b: Record<string, unknown>): Prom
     const sau = await env.DB.prepare('SELECT trang_thai FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ trang_thai: string | null }>()
     if (!sau) return { ok: false, error: 'Không tìm thấy học sinh' }
     if (sau.trang_thai === 'khoa') return { ok: false, error: 'Học sinh đang bị khóa; không đổi trạng thái' }
+    ;(await import('./nhip-hoc')).xoaDemNhipHoc()
     return { ok: true, sbd, daNghi: false, trangThai: sau.trang_thai ?? '', daKhoiPhuc: Number(r.meta?.changes ?? 0) > 0 }
   }
   const em = await env.DB.prepare(
@@ -1311,6 +1312,7 @@ export async function danhDauNghiHoc(env: Env, b: Record<string, unknown>): Prom
   ])
   const sau = await env.DB.prepare('SELECT trang_thai FROM hoc_sinh WHERE sbd = ?').bind(sbd).first<{ trang_thai: string }>()
   if (sau?.trang_thai !== 'da_nghi') return { ok: false, error: 'Trạng thái đã thay đổi; hãy tải lại hồ sơ' }
+  ;(await import('./nhip-hoc')).xoaDemNhipHoc()
   return { ok: true, sbd, daNghi: true, trangThai: 'da_nghi' }
 }
 

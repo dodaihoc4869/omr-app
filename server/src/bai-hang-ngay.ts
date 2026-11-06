@@ -236,17 +236,16 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
   const ra = new Map<string, NgayBaiEm[]>()
   const baoMot = (chu: string) => { if (!canhBao.includes(chu)) canhBao.push(chu) }
   const kt=await import('./kiem-tra-ca-nhan'), batKt=await kt.coKtCn(env)
-  for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) {
-    const lo = em.slice(i, i + LO_EM_BAI_HANG_NGAY)
+  const dsLo: EmGoc[][] = []
+  for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) dsLo.push(em.slice(i, i + LO_EM_BAI_HANG_NGAY))
+  await Promise.all(dsLo.map(async (lo) => {
     const goi = lo.filter((e) => e.goi7Tu !== null && e.goi7Tu <= den)
     const ht = lo.filter((e) => e.goi7Tu === null || e.goi7Tu > tu)
     const { tuGoi, denHt } = khoangDocTheoCheDo(lo, tu, den)
     const j = (ds: readonly EmGoc[]) => JSON.stringify(ds.map((e) => e.sbd))
     const rong = Promise.resolve([] as Row[])
-    const kRows=await hoi(env,`SELECT ${kt.COT_META_KT} FROM kiem_tra_ca_nhan k WHERE sbd IN(SELECT value FROM json_each(?)) AND ngay BETWEEN ? AND ? AND trang_thai<>'cho_nguon' AND (?=1 OR nop_luc IS NOT NULL OR ngay<?) AND ${kt.sqlKhongBaoTriBo('k',Date.now())}`,j(lo),tu,den,batKt?1:0,homNay)
-    if(kRows===null&&batKt)throw new LoiDocSo('Không đọc được lịch kiểm tra riêng của các em.')
-    const ktNgay=new Map((kRows??[]).map(r=>[`${r.sbd}|${r.ngay}`,kt.tomTatKt(r,Date.parse(homNay+'T12:00:00+07:00'))]))
-    const [rTrong, rTruoc, rGoi, rGap, rKh, rLuot, rMuc7, rQuota7] = await Promise.all([
+    const [kRows, rTrong, rTruoc, rGoi, rGap, rKh, rLuot, rMuc7, rQuota7] = await Promise.all([
+      hoi(env,`SELECT ${kt.COT_META_KT} FROM kiem_tra_ca_nhan k WHERE sbd IN(SELECT value FROM json_each(?)) AND ngay BETWEEN ? AND ? AND trang_thai<>'cho_nguon' AND (?=1 OR nop_luc IS NOT NULL OR ngay<?) AND ${kt.sqlKhongBaoTriBo('k',Date.now())}`,j(lo),tu,den,batKt?1:0,homNay),
       hoi(env, SQL_CHOT_TRONG, j(lo), tu, den),
       hoi(env, SQL_CHOT_TRUOC, j(lo), tu),
       goi.length ? hoi(env, SQL_DEM_GOI7, j(goi), tuGoi, den) : rong,
@@ -256,6 +255,8 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
       goi.length ? hoi(env, SQL_MUC_GOI7, j(goi), tuGoi, den) : rong,
       goi.length ? hoi(env, SQL_QUOTA_GOI7, j(goi), tuGoi, den, homNay) : rong,
     ])
+    if(kRows===null&&batKt)throw new LoiDocSo('Không đọc được lịch kiểm tra riêng của các em.')
+    const ktNgay=new Map((kRows??[]).map(r=>[`${r.sbd}|${r.ngay}`,kt.tomTatKt(r,Date.parse(homNay+'T12:00:00+07:00'))]))
     // Sổ chính hỏng ⇒ cả lệnh báo lỗi (không trả số sai). Bảng kế hoạch không đọc được ⇒ lượt kế hoạch cũng không đọc được: chỉ cảnh báo.
     if (rGoi === null || (rLuot === null && rKh !== null)) throw new LoiDocSo('Không đọc được sổ học của các em.')
     if (rTrong === null || rTruoc === null) baoMot('Chưa đọc được mức đã chốt theo ngày — mọi ô dùng mức ước tính theo quy tắc hiện hành.')
@@ -289,7 +290,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
         return { ...(test?.baiNgayToiThieu?{kiemTra:test}:{}),ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))
     }
-  }
+  }))
   return ra
 }
 

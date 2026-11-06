@@ -141,13 +141,19 @@
 .ddv-the-hh { position: relative; display: grid; place-items: center; width: max(calc(50 * var(--u)), 30px); height: max(calc(50 * var(--u)), 30px); }
 .ddv-the-hh > svg, .ddv-the-hh > span:first-child { width: 100%; height: 100%; }
 .ddv-the-hh-trong { display: grid; place-items: center; border-radius: 50%; border: 2px dashed var(--ddc-moi); color: var(--km-chu-phu); font-weight: 800; font-size: max(calc(22 * var(--u)), 13px); }
+.ddv-the-hh-trong[data-co-so] { border-style: solid; border-color: var(--ddc-cham); background: var(--ddc-cham-nen); color: var(--ddc-cham-chu); }
+.ddv-the-hh-trong[data-co-so][data-nhom='chua-deu'] { border-color: var(--ddc-deu); background: var(--ddc-deu-nen); color: var(--ddc-deu-chu); }
+.ddv-the-hh-trong[data-co-so][data-nhom='luoi'] { border-color: var(--ddc-luoi); background: var(--ddc-luoi-nen); color: var(--ddc-luoi-chu); }
 .ddv-the-so { position: absolute; right: -4px; bottom: -4px; min-width: max(calc(24 * var(--u)), 16px); height: max(calc(24 * var(--u)), 16px); padding: 0 4px; border-radius: 999px; background: var(--km-chu); color: var(--km-nen); font-size: max(calc(14 * var(--u)), 10px); display: grid; place-items: center; font-variant-numeric: tabular-nums; }
-.ddv-the-chu { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.ddv-the-chu { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ddv-the-ten { font-size: max(calc(24 * var(--u)), 14px); line-height: 1.15; overflow-wrap: anywhere; }
-.ddv-the-bac { font-size: max(calc(17 * var(--u)), 11px); font-weight: 700; color: var(--ddc-cham-chu); }
+.ddv-the-bac { font-size: max(calc(16 * var(--u)), 11px); font-weight: 700; color: var(--ddc-cham-chu); }
 .ddv-the[data-nhom='chua-deu'] .ddv-the-bac { color: var(--ddc-deu-chu); }
 .ddv-the[data-nhom='luoi'] .ddv-the-bac { color: var(--ddc-luoi-chu); }
 .ddv-the[data-nhom='moi'] .ddv-the-bac, .ddv-the[data-nhom='chua-co'] .ddv-the-bac { color: var(--km-chu-phu); }
+.ddv-the-nhip { display: flex; flex-wrap: wrap; align-items: center; gap: 3px 6px; margin-top: 1px; }
+.ddv-the-nhip .ddv-ngay i { width: max(calc(8 * var(--u)), 5px); height: max(calc(14 * var(--u)), 9px); border-radius: 2px; }
+.ddv-the-so-lieu { font-size: max(calc(15 * var(--u)), 10.5px); color: var(--km-chu-phu); font-variant-numeric: tabular-nums; }
 .ddv-the-phu { font-size: max(calc(15 * var(--u)), 10px); color: var(--km-chu-phu); }
 .ddv-the-vua, .ddv-the-dau { position: absolute; top: 0; transform: translateY(-50%); right: calc(12 * var(--u)); display: inline-flex; align-items: center; gap: 4px; padding: 1px max(calc(10 * var(--u)), 6px); border-radius: 999px; background: var(--ddc-vang); color: var(--km-nen); font-size: max(calc(14 * var(--u)), 10px); font-weight: 800; }
 .ddv-the-dau { background: var(--km-chu); }
@@ -169,7 +175,7 @@
 .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-lan-the { grid-template-columns: repeat(auto-fill, minmax(max(calc(210 * var(--u)), 128px), 1fr)); gap: 4px; }
 .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the { padding: 2px 8px; gap: 6px; }
 .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-hh { width: max(calc(30 * var(--u)), 22px); height: max(calc(30 * var(--u)), 22px); }
-.ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-so, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-bac, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-vua, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-dau { display: none; }
+.ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-so, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-bac, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-nhip, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-vua, .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-dau { display: none; }
 .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-the-ten { font-size: max(calc(19 * var(--u)), 12px); }
 .ddv-man:is([data-nac='3'],[data-nac='4'],[data-nac='5']) .ddv-lan-nhan b { font-size: max(calc(21 * var(--u)), 13px); }
 .ddv-man:is([data-nac='4'],[data-nac='5']) .ddv-lan { display: grid; grid-template-columns: max(calc(110 * var(--u)), 70px) minmax(0, 1fr); align-items: start; padding: 4px 8px 6px; gap: 4px; }

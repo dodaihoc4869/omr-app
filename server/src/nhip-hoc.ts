@@ -75,8 +75,9 @@ const SQL_VAO_TAO = 'SELECT sbd, tao_luc AS t FROM hoc_sinh WHERE sbd IN (SELECT
  *  (một em) — cùng ngày vào với Nhịp học của thầy. */
 export async function docNgayVao(env: Env, em: readonly EmGoc[], tu: string): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) {
-    const lo = em.slice(i, i + LO_EM_BAI_HANG_NGAY)
+  const dsLo: EmGoc[][] = []
+  for (let i = 0; i < em.length; i += LO_EM_BAI_HANG_NGAY) dsLo.push(em.slice(i, i + LO_EM_BAI_HANG_NGAY))
+  await Promise.all(dsLo.map(async (lo) => {
     const j = JSON.stringify(lo.map((e) => e.sbd))
     const [tao, ...dauVet] = await Promise.all([hoi(env, SQL_VAO_TAO, j), ...SQL_VAO_DAU_VET.map((q) => hoi(env, q, j))])
     const nguon = new Map<string, string[]>()
@@ -86,7 +87,7 @@ export async function docNgayVao(env: Env, em: readonly EmGoc[], tu: string): Pr
     for (const x of tao ?? []) them(str(x.sbd), ngayTaoTaiKhoan(x.t))
     for (const r of dauVet) for (const x of r ?? []) them(str(x.sbd), str(x.d).slice(0, 10) || null)
     for (const e of lo) ra.set(e.sbd, ngayVaoCuaEm(tu, nguon.get(e.sbd) ?? []))
-  }
+  }))
   return ra
 }
 

@@ -147,22 +147,22 @@
 [data-trong] .tr-dd { display: flex; flex-direction: column; gap: 8px; flex: none; margin: 0 0 2px; padding: 12px; border: 2px solid color-mix(in srgb, var(--tr-tin) 45%, transparent); border-radius: 18px; background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
 [data-trong] .tr-dd-dau { display: flex; align-items: center; gap: 8px; font-size: 15px; line-height: 1.3; }
 [data-trong] .tr-dd-h { display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 10px; background: var(--tr-tin-chu); color: var(--tr-trang); }
-[data-trong] .tr-dd-dau b { flex: 1; min-width: 0; font-size: 16px; font-weight: 900; color: var(--tr-chu); }
-[data-trong] .tr-dd-dau span:not(.tr-dd-h) { font-size: 12.5px; font-weight: 800; white-space: nowrap; }
+[data-trong] .tr-dd-dau b { flex: 1; min-width: 0; font-size: 16px; color: var(--tr-chu); }
+[data-trong] .tr-dd-dau span:not(.tr-dd-h) { font-size: 12.5px; white-space: nowrap; }
 [data-trong] .tr-dd-o { position: relative; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
 [data-trong] .tr-dd-o input { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; opacity: 0; font-size: 16px; }
 [data-trong] .tr-dd-o > span:not(.sr-only) {
   display: grid; place-items: center; height: 44px; border: 1px solid var(--tr-vien-2); border-radius: 10px; background: var(--tr-mat);
-  color: var(--tr-chu); font-size: 20px; font-weight: 800;
+  color: var(--tr-chu); font-size: 20px;
 }
 [data-trong] .tr-dd-o:focus-within > span[data-dang] { border-color: var(--tr-tin); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tr-tin) 22%, transparent); }
 [data-trong] .tr-dd-o:has(input[aria-invalid='true']) > span:not(.sr-only) { border-color: var(--tr-sai); }
-[data-trong] .tr-dd-nut { min-height: 44px; border: 0; border-radius: 12px; background: var(--tr-tin-chu); color: var(--tr-trang); font-size: 16px; font-weight: 900; box-shadow: 0 3px 0 color-mix(in srgb, var(--tr-tin-chu) 55%, var(--tr-chu)); }
+[data-trong] .tr-dd-nut { min-height: 44px; border: 0; border-radius: 12px; background: var(--tr-tin-chu); color: var(--tr-trang); font-size: 16px; box-shadow: 0 3px 0 color-mix(in srgb, var(--tr-tin-chu) 55%, var(--tr-chu)); }
 [data-trong] .tr-dd-nut:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 color-mix(in srgb, var(--tr-tin-chu) 55%, var(--tr-chu)); }
 [data-trong] .tr-dd-nut:disabled { opacity: 0.55; cursor: default; }
 [data-trong] .tr-dd :is(.tr-dd-phu, .tr-dd-loi) { margin: 0; font-size: 12.5px; line-height: 1.4; color: var(--tr-chu-2); }
-[data-trong] .tr-dd .tr-dd-loi { font-weight: 600; color: var(--tr-sai-chu); }
-[data-trong] .tr-dd .tr-dd-phu b { font-weight: 900; color: var(--tr-tin-chu); }
+[data-trong] .tr-dd .tr-dd-loi { color: var(--tr-sai-chu); }
+[data-trong] .tr-dd .tr-dd-phu b { color: var(--tr-tin-chu); }
 [data-trong] .tr-dd[data-tt='xong'] { gap: 2px; padding: 10px 12px; border-color: transparent; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
 [data-trong] .tr-dd[data-tt='xong'] .tr-dd-dau b { color: var(--tr-dung-chu); }
 /* NGANG (điện thoại ngang thấp): đầu menu trải ngang; không điểm danh ⇒ 6 mục lưới 2 cột × 3 hàng; có thẻ điểm danh ⇒ cột trái thẻ, cột phải 6 mục.

@@ -281,7 +281,7 @@ describe('thầy · Nhịp học cả lớp', () => {
   })
 })
 
-describe('tờ chiếu điểm danh (thầy 13/10: "Hiện bậc trên màn chiếu luôn nhé")', () => {
+describe('tờ chiếu điểm danh (06/11: bỏ 12 bậc lười chăm trên màn điểm danh, hiện nhịp học trực quan)', () => {
   const BUOI = { id: 'BH-1', ten: 'Buổi học 12/10 · 12A1', lop: '12A1', moLuc: '2026-10-12T10:50:00Z', hetHan: '2026-10-13T10:50:00Z', dongLuc: null, dangMo: true }
   const CO_MAT = ['A1', 'A3', 'A4', 'A6'].map((sbd, i) => ({ sbd, hoTen: DS_EM.find((e) => e.sbd === sbd)!.hoTen, luc: `2026-10-12T10:5${i}:00Z`, cach: 'ma' as const }))
   const TT: TrangThaiBuoi = { buoi: BUOI, ma: '482915', doiMaLuc: 1, coMat: CO_MAT, siSo: 6, lopEm: DS_EM.map((e) => ({ sbd: e.sbd, hoTen: e.hoTen, tenLop: '12A1' })) }
@@ -290,32 +290,23 @@ describe('tờ chiếu điểm danh (thầy 13/10: "Hiện bậc trên màn chi�
       <BanChieuDiemDanh cheDo={cheDo} tt={TT} tk={thongKeBuoi(TT, nhipTheoSbd(kq))} nhip={{ kq, dangTai: false, loi: '' }} goc="https://app.test" matKetNoi={false} hoSoMo={false}
         onDoiCheDo={() => {}} onDong={() => {}} onMoEm={() => {}} onThuLaiNhip={() => {}} />,
     )
-  // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — bản A thành lưới THẺ em theo bậc, bản vẽ thầy duyệt): chip nhỏ trong ô ⇒ huy hiệu lớn + số bậc của thẻ;
-  // dải chú giải 12 ô ⇒ thang 12 bậc dạng bậc thềm (`.ddc-thang`); câu đọc màn hình thêm điểm chăm sau bậc. Test đầy đủ: tests/man-chieu-dot19-1310q.
-  // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng docs/ban-ve-chieu-diem-danh-2310, thầy chốt): thẻ `.ddv-the`, dải 12 bậc `.ddv-thang`; bản B mỗi dòng em có HUY HIỆU
-  // (không còn dải chú giải 12 bậc trên bản B — số em mỗi bậc đã ở bản A).
-  it('bản A: mỗi thẻ em có huy hiệu đúng bậc (em mới vào không huy hiệu bậc); dải 12 bậc đếm đúng số em có mặt mỗi bậc', () => {
+  it('bản A: mỗi thẻ em hiện nhóm + dải ngày + số đủ mức (không còn 12 bậc lười chăm)', () => {
     ve('diem-danh')
     const o = [...document.querySelectorAll<HTMLButtonElement>('.ddv-the')]
     expect(o).toHaveLength(4)
+    expect(document.querySelector('.ddv-thang, svg.bcc-hh, .ddv-the-so, .ddv-the-dau')).toBeNull()
+    const tk = thongKeBuoi(TT, nhipTheoSbd(KQ))
     for (const nut of o) {
-      const e = DS_EM.find((x) => nut.textContent!.includes(x.hoTen))!
-      const hh = nut.querySelector('svg.bcc-hh')
-      if (e.bacCham) {
-        expect(hh!.getAttribute('data-bac')).toBe(String(e.bacCham.bac))
-        expect(nut.querySelector('.ddv-the-so')!.textContent).toBe(`${e.bacCham.bac}`)
-        expect(nut.getAttribute('aria-label')).toContain(`, Bậc ${e.bacCham.bac}/12 · ${BAC_CHAM_CHI[e.bacCham.bac - 1]!.ten}, điểm chăm ${e.bacCham.diem} — mở hồ sơ làm bài`)
-      } else expect(hh).toBeNull()
+      const e = tk.coMat.find((x) => nut.textContent!.includes(x.hoTen))!
+      expect(nut.getAttribute('aria-label')).toBe(chuNutEm(e))
+      expect(nut.querySelector('.ddv-the-nhip .ddv-ngay')).not.toBeNull()
     }
-    const dai = screen.getByRole('group', { name: 'Số em có mặt ở mỗi bậc, từ Lười đến Chăm' })
-    const dem = demTheoBac(DS_EM.filter((e) => CO_MAT.some((c) => c.sbd === e.sbd)).map((e) => ({ bacCham: e.bacCham })))
-    expect([...dai.querySelectorAll('.ddv-thang-o.bcc > b')].map((b) => Number(b.textContent))).toEqual(dem)
-    expect(dem.reduce((a, b) => a + b, 0)).toBe(3)
   })
-  it('bản B: dòng em có huy hiệu đúng bậc', () => {
+  it('bản B: dòng em hiện dải ngày + số đủ mức, không còn huy hiệu 12 bậc', () => {
     ve('nhip-lop')
     const dongA4 = [...document.querySelectorAll('.ddv-dong-em')].find((x) => x.textContent!.includes('Duy Khang'))!
-    expect(dongA4.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe(String(DS_EM[3]!.bacCham!.bac))
+    expect(dongA4.querySelector('svg.bcc-hh')).toBeNull()
+    expect(dongA4.querySelector('.ddv-ngay')).not.toBeNull()
   })
   it('máy chủ cũ ⇒ không huy hiệu, không dải; câu đọc màn hình y như trước', () => {
     const cu = { ...KQ, em: DS_EM.map(boBac) }

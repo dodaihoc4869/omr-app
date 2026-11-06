@@ -1209,12 +1209,12 @@ const coKhoiDiemDanh = (tt: DiemDanh['tt']) => tt.loai === 'cho' || tt.loai === 
 function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<DiemDanh, 'tt' | 'ma' | 'setMa' | 'loi' | 'setLoi' | 'dangGui' | 'gui' | 'oNhap'>) {
   if (tt.loai === 'cho') return (
     <form className="tr-dd" aria-label="Điểm danh buổi học" onSubmit={(e) => { e.preventDefault(); void gui(ma) }}>
-      <div className="tr-dd-dau"><span className="tr-dd-h" aria-hidden="true"><QrCode size={20} /></span><b>Điểm danh buổi học</b></div>
+      <div className="tr-dd-dau"><span className="tr-dd-h" aria-hidden="true"><QrCode size={20} /></span><b>Điểm danh buổi học</b>{tt.buoi?.lop && <span>{tt.buoi.lop}</span>}</div>
       <label className="tr-dd-o">
         <span className="sr-only">Mã 6 số trên máy chiếu</span>
         <input ref={oNhap} value={ma} onChange={(e) => { setMa(e.target.value.replace(/\D/g, '').slice(0, 6)); setLoi('') }}
           inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]*" maxLength={6} aria-invalid={!!loi} aria-describedby={loi ? 'tr-dd-loi' : undefined} />
-        {Array.from({ length: 6 }, (_, i) => <span key={i} aria-hidden="true" data-dang={i === Math.min(ma.length, 5) || undefined}>{ma[i] ?? ''}</span>)}
+        {Array.from({ length: 6 }, (_, i) => <span key={i} aria-hidden="true" data-co={ma[i] ? '' : undefined} data-dang={i === Math.min(ma.length, 5) || undefined}>{ma[i] ?? ''}</span>)}
       </label>
       <button type="submit" className="tr-dd-nut" disabled={dangGui || ma.length !== 6}>{dangGui ? 'Đang gửi…' : 'Điểm danh'}</button>
       {loi && <p id="tr-dd-loi" className="tr-dd-loi" role="alert">{loi}</p>}

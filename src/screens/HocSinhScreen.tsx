@@ -662,6 +662,9 @@ export default function HocSinhScreen() {
           moHocPhi={(sbd, hoTen) => setHopHocPhi({ sbd, hoTen })}
           datLaiMatKhau={hoiDatLaiMatKhau}
           dangResetMk={dangResetMk}
+          onKhoiPhucNghi={(sbd) => void doiTrangThaiNghiHoc(sbd, false)}
+          onHoiNghiHoc={hoiNghiHoc}
+          dangDoiNghiHoc={dangDoiNghiHoc}
           nutDau={
             <>
               <NutDongBoDanhSach
@@ -873,7 +876,21 @@ export default function HocSinhScreen() {
                     <Nhan tone={toneXepLoai(e.diemGanNhat)}>{e.diemGanNhat === null ? 'chưa có điểm' : classify(e.diemGanNhat)}</Nhan>
                     {!e.hoTen && <Nhan tone="cam">chưa có tên</Nhan>}
                     {e.trangThai === 'ngoai_danh_sach' && <Nhan tone="do">ngoài danh sách</Nhan>}
-                    {e.trangThai === 'da_nghi' && <Nhan tone="do">đã nghỉ</Nhan>}
+                    {e.trangThai === 'da_nghi' && (
+                      <>
+                        <Nhan tone="do">đã nghỉ</Nhan>
+                        <button
+                          type="button"
+                          onClick={() => void doiTrangThaiNghiHoc(e.sbd, false)}
+                          disabled={dangDoiNghiHoc}
+                          aria-label={`Tick khôi phục trạng thái đi học lại cho ${e.hoTen || `SBD ${e.sbd}`}`}
+                          className="tap-target hs-nut-vien"
+                          style={{ minHeight: 32, padding: '2px 10px', fontSize: 'var(--cx-1)' }}
+                        >
+                          ✓ Khôi phục
+                        </button>
+                      </>
+                    )}
                     {e.soCa === 0 && <Nhan tone="xam">chưa thi ca nào</Nhan>}
                   </span>
 

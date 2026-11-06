@@ -7,7 +7,7 @@
 //   · chia trang 25 em. Không đổi dữ liệu, không đổi lệnh: mọi thao tác gọi ĐÚNG hàm sẵn có của HocSinhScreen.
 // Cột "Hôm nay" đọc lệnh sẵn có `/gv/chien-dich` (danh-sach → bang của các Hành trình đang chạy) — chỉ đọc; đọc hỏng thì cột ghi "—", không số giả.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { MoreHorizontal, RefreshCw, Search } from 'lucide-react'
+import { Check, MoreHorizontal, RefreshCw, Search } from 'lucide-react'
 import type { EmTomTat } from '../lib/exam-api'
 import { conThieu, dinhDangTien, hocPhiCuaEm, TEN_TRANG_THAI, trangThaiCuaEm, type HocPhiEm, type TongHocPhi as Tong, type TrangThaiHocPhi } from '../lib/hoc-phi'
 import { danhSach, docBang } from '../components/chien-dich/api'
@@ -82,6 +82,9 @@ export interface PropsDanhSachV2 {
   moHocPhi: (sbd: string, hoTen: string) => void
   datLaiMatKhau: (sbd: string, hoTen: string) => void
   dangResetMk: boolean
+  onKhoiPhucNghi?: (sbd: string, hoTen: string) => void
+  onHoiNghiHoc?: (sbd: string, hoTen: string) => void
+  dangDoiNghiHoc?: boolean
   /** Hai nút đầu màn (Dán link danh sách · Thêm học sinh) — HocSinhScreen dựng, giữ nguyên lệnh. */
   nutDau: ReactNode
   /** Bảng tổng học phí (không hàng chip lọc) — đặt dưới bảng em. */
@@ -89,7 +92,7 @@ export interface PropsDanhSachV2 {
 }
 
 /** Nút ⋯ một em: thực đơn thao tác. Esc đóng và trả focus về nút; bấm ra ngoài đóng. */
-function ThaoTacEm({ e, so, hocPhiChu, onMo, coHocPhi, dangResetMk }: { e: EmTomTat; so: string; hocPhiChu: string; coHocPhi: boolean; dangResetMk: boolean; onMo: (viec: 'ho-so' | 'bao-cao' | 'lich-su' | 'hoc-phi' | 'mat-khau') => void }) {
+function ThaoTacEm({ e, so, hocPhiChu, onMo, coHocPhi, dangResetMk, coNghiHoc, dangDoiNghiHoc }: { e: EmTomTat; so: string; hocPhiChu: string; coHocPhi: boolean; dangResetMk: boolean; coNghiHoc?: boolean; dangDoiNghiHoc?: boolean; onMo: (viec: 'ho-so' | 'bao-cao' | 'lich-su' | 'hoc-phi' | 'mat-khau' | 'nghi-hoc') => void }) {
   const [mo, setMo] = useState(false)
   const nut = useRef<HTMLButtonElement>(null)
   const thucDon = useRef<HTMLDivElement>(null)
@@ -142,6 +145,11 @@ function ThaoTacEm({ e, so, hocPhiChu, onMo, coHocPhi, dangResetMk }: { e: EmTom
           <button type="button" role="menuitem" disabled={dangResetMk} onClick={() => chon('mat-khau')}>
             {dangResetMk ? 'Đang đặt lại mật khẩu…' : 'Đặt lại mật khẩu'}
           </button>
+          {coNghiHoc && (
+            <button type="button" role="menuitem" disabled={dangDoiNghiHoc} onClick={() => chon('nghi-hoc')}>
+              {e.trangThai === 'da_nghi' ? '✓ Khôi phục đi học lại' : 'Đánh dấu nghỉ học'}
+            </button>
+          )}
         </div>
       )}
     </span>
@@ -150,6 +158,7 @@ function ThaoTacEm({ e, so, hocPhiChu, onMo, coHocPhi, dangResetMk }: { e: EmTom
 
 export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
   const [trang, setTrang] = useState(0)
+  const [chiDaNghi, setChiDaNghi] = useState(false)
   const [nhip, setNhip] = useState<Map<string, NhipEm> | null>(null)
   const [loiNhip, setLoiNhip] = useState(false)
 
@@ -163,12 +172,15 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
     }
   }, [])
 
+  const soDaNghi = useMemo(() => (p.ds ?? []).filter((e) => e.trangThai === 'da_nghi').length, [p.ds])
+  const dsHien = useMemo(() => (chiDaNghi ? p.dsLoc.filter((e) => e.trangThai === 'da_nghi') : p.dsLoc), [p.dsLoc, chiDaNghi])
+
   // Đổi bộ lọc ⇒ về trang đầu.
-  useEffect(() => setTrang(0), [p.timKiem, p.khoiLoc, p.lopLoc, p.locHocPhi])
-  const soTrang = Math.max(1, Math.ceil(p.dsLoc.length / SO_EM_MOT_TRANG))
+  useEffect(() => setTrang(0), [p.timKiem, p.khoiLoc, p.lopLoc, p.locHocPhi, chiDaNghi])
+  const soTrang = Math.max(1, Math.ceil(dsHien.length / SO_EM_MOT_TRANG))
   const trangHien = Math.min(trang, soTrang - 1)
   const dau = trangHien * SO_EM_MOT_TRANG
-  const dsTrang = useMemo(() => p.dsLoc.slice(dau, dau + SO_EM_MOT_TRANG), [p.dsLoc, dau])
+  const dsTrang = useMemo(() => dsHien.slice(dau, dau + SO_EM_MOT_TRANG), [dsHien, dau])
 
   const soLop = p.dsLop.length
   const chuLoi = p.loi ? lyDoDeHieu(p.loi) : ''
@@ -227,6 +239,17 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
               ))}
             </select>
           </label>
+          {(soDaNghi > 0 || chiDaNghi) && (
+            <button
+              type="button"
+              className="gvhs-loc-nghi tt-nhan"
+              aria-pressed={chiDaNghi}
+              onClick={() => setChiDaNghi((v) => !v)}
+              title="Lọc học sinh đang ở trạng thái Đã nghỉ để tick khôi phục đi học lại"
+            >
+              Đã nghỉ · {soDaNghi} em
+            </button>
+          )}
           <button type="button" className="gvhs-tai-lai tt-nhan" onClick={p.onTaiLai} disabled={p.dangTai} aria-label="Tải lại danh sách học sinh" title="Tải lại danh sách">
             <RefreshCw size={18} aria-hidden="true" className={p.dangTai ? 'gvhs-quay' : undefined} />
           </button>
@@ -252,7 +275,7 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
               </span>
             ))}
           </div>
-        ) : p.dsLoc.length === 0 ? (
+        ) : dsHien.length === 0 ? (
           !chuLoi && <p className="gvv2-trong gvhs-trong">{p.ds.length === 0 ? 'Chưa em nào có tên trong danh sách. Bấm "Dán link danh sách" hoặc "Thêm học sinh"; em vào thi một ca cũng tự có tên ở đây.' : 'Không có em nào khớp bộ lọc.'}</p>
         ) : (
           <table className="gvhs-bang">
@@ -294,8 +317,23 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
                             {!e.hoTen && ' · chưa có tên'}
                             {e.trangThai === 'ngoai_danh_sach' && ' · ngoài danh sách'}
                             {e.trangThai === 'da_nghi' && (
-                              <span className="font-bold" style={{ color: 'var(--do)', marginLeft: 6 }}>
-                                · Đã nghỉ
+                              <span className="gvhs-cum-nghi">
+                                <span className="font-bold" style={{ color: 'var(--do)', marginLeft: 6 }}>
+                                  · Đã nghỉ
+                                </span>
+                                {p.onKhoiPhucNghi && (
+                                  <button
+                                    type="button"
+                                    className="gvhs-nut-khoi-phuc tt-nhan"
+                                    disabled={p.dangDoiNghiHoc}
+                                    onClick={() => p.onKhoiPhucNghi?.(e.sbd, e.hoTen)}
+                                    aria-label={`Tick khôi phục trạng thái đi học lại cho ${ten}`}
+                                    title="Tick khôi phục trạng thái đang học"
+                                  >
+                                    <Check size={14} aria-hidden="true" />
+                                    <span>Khôi phục</span>
+                                  </button>
+                                )}
                               </span>
                             )}
                           </small>
@@ -353,12 +391,17 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
                         coHocPhi={!!p.hocPhi}
                         hocPhiChu={p.hocPhi ? (tt === 'con_thieu' ? `Thiếu ${dinhDangTien(conThieu(hp))}` : TEN_TRANG_THAI[tt]) : 'chưa tải'}
                         dangResetMk={p.dangResetMk}
+                        coNghiHoc={!!(p.onKhoiPhucNghi || p.onHoiNghiHoc)}
+                        dangDoiNghiHoc={p.dangDoiNghiHoc}
                         onMo={(viec) => {
                           if (viec === 'ho-so') p.moHoSo(e.sbd, 'tong-quan')
                           else if (viec === 'bao-cao') p.moHoSo(e.sbd, 'bao-cao')
                           else if (viec === 'lich-su') p.moHoSo(e.sbd, 'lich-su')
                           else if (viec === 'hoc-phi') p.moHocPhi(e.sbd, e.hoTen)
-                          else p.datLaiMatKhau(e.sbd, e.hoTen)
+                          else if (viec === 'nghi-hoc') {
+                            if (e.trangThai === 'da_nghi') p.onKhoiPhucNghi?.(e.sbd, e.hoTen)
+                            else p.onHoiNghiHoc?.(e.sbd, e.hoTen)
+                          } else p.datLaiMatKhau(e.sbd, e.hoTen)
                         }}
                       />
                     </td>
@@ -369,10 +412,10 @@ export default function HocSinhDanhSachV2(p: PropsDanhSachV2) {
           </table>
         )}
 
-        {p.dsLoc.length > SO_EM_MOT_TRANG && (
+        {dsHien.length > SO_EM_MOT_TRANG && (
           <nav className="gvhs-trang" aria-label="Chia trang danh sách học sinh">
             <span className="gvv2-so">
-              Em {dau + 1}–{Math.min(dau + SO_EM_MOT_TRANG, p.dsLoc.length)} trên {p.dsLoc.length}
+              Em {dau + 1}–{Math.min(dau + SO_EM_MOT_TRANG, dsHien.length)} trên {dsHien.length}
             </span>
             <span className="gvhs-trang-nut">
               <button type="button" className="gvv2-nut-vien tt-nhan" disabled={trangHien === 0} onClick={() => setTrang(trangHien - 1)}>

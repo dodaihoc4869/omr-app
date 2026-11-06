@@ -29,6 +29,20 @@
 }
 .gvhs-chon select:disabled { cursor: not-allowed; color: var(--gvm-chu-3); }
 .gvhs-chon:focus-within { border-color: var(--gvm-xd); box-shadow: 0 0 0 3px var(--gvm-xd-nen); }
+.gvhs-loc-nghi {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px;
+  border: 1px solid var(--gvm-vien); border-radius: var(--r-nho, 12px); background: var(--gvm-mat);
+  color: var(--gvm-chu-2); font: inherit; font-size: var(--t-than, 15px); cursor: pointer; touch-action: manipulation;
+}
+.gvhs-loc-nghi[aria-pressed='true'] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); border-color: var(--gvm-ho-dam); }
+.gvhs-cum-nghi { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.gvhs-nut-khoi-phuc {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 28px; padding: 2px 10px;
+  border: 1px solid var(--gvm-xl-dam); border-radius: var(--r-vien, 999px);
+  background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); font: inherit; font-size: 12px; cursor: pointer; touch-action: manipulation;
+}
+.gvhs-nut-khoi-phuc:hover:not(:disabled) { opacity: 0.9; }
+.gvhs-nut-khoi-phuc:disabled { opacity: 0.5; cursor: not-allowed; }
 .gvhs-tai-lai {
   display: grid; place-items: center; width: 44px; height: 44px; margin-left: auto; border: 1px solid var(--gvm-vien); border-radius: var(--r-nho, 12px);
   background: var(--gvm-mat); color: var(--gvm-chu-2); cursor: pointer; touch-action: manipulation;

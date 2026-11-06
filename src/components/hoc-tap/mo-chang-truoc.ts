@@ -27,7 +27,12 @@ export function moChangTruoc(token: string, goi: typeof goiHoa2 = goiHoa2, now: 
   if (dangCo && dangCo.token === token && now - dangCo.luc < TUOI_MO_TRUOC_MS) return
   const p = goi('hoc-tap-start', token, {}, GIAY_CHO_MO_CHANG)
   const muc: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } = { token, luc: now, p }
-  p.then((r) => { if (r && r.ok === true && Array.isArray(r.questions)) muc.kq = r }, () => {}) // lỗi để lượt dùng xử lý (gọi lại)
+  p.then((r) => {
+    if (r && r.ok === true && Array.isArray(r.questions)) {
+      muc.kq = r
+      if (batGoi) setTimeout(() => { void napGoiNgay(token, goi) }, 600)
+    }
+  }, () => {}) // lỗi để lượt dùng xử lý (gọi lại)
   dangCo = muc
 }
 
@@ -186,17 +191,14 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
 }
 
 function luuKinhTuGoi(kinh: Record<string, unknown>, ngay: string, luc: number): void {
-  try {
-    const cu = (docJson('ddh.kinh.v1') ?? {}) as Record<string, { dm?: string; ngay?: string; luc?: number }>
-    const moi: Record<string, { dm: string; ngay: string; luc?: number }> = {}
-    for (const [k, v] of Object.entries(cu)) if (v && v.ngay === ngay && typeof v.dm === 'string') moi[k] = { dm: v.dm, ngay, ...(v.luc ? { luc: v.luc } : {}) }
-    for (const [q, dm] of Object.entries(kinh)) {
-      if (typeof dm === 'string' && dm.includes('.')) moi[q] = { dm, ngay }
-      else if (dm === '' && !moi[q]?.dm) moi[q] = { dm: '', ngay, luc }
-    }
-    const ds = Object.entries(moi)
-    ghiJson('ddh.kinh.v1', ds.length > 600 ? Object.fromEntries(ds.slice(-600)) : moi)
-  } catch { /* bỏ */ }
+  const cu = (docJson('ddh.kinh.v1') ?? {}) as Record<string, { dm?: string; ngay?: string; luc?: number }>
+  const moi: Record<string, { dm: string; ngay: string; luc?: number }> = {}
+  for (const [k, v] of Object.entries(cu)) if (v?.ngay === ngay && typeof v.dm === 'string') moi[k] = v as { dm: string; ngay: string; luc?: number }
+  for (const [q, dm] of Object.entries(kinh)) {
+    if (typeof dm === 'string' && dm.includes('.')) moi[q] = { dm, ngay }
+    else if (dm === '' && !moi[q]?.dm) moi[q] = { dm: '', ngay, luc }
+  }
+  ghiJson('ddh.kinh.v1', moi)
 }
 
 /** Nạp sẵn ẢNH ĐỀ của chặng kế (hình đề, thân câu, hình phương án / ý — không hình lời giải) lúc máy rảnh: mở chặng là hình có ngay, mạng yếu không chờ tải. */

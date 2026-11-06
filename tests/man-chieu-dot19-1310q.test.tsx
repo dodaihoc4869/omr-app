@@ -114,46 +114,36 @@ describe('phép thuần (chieu-bac.ts + luoiDiemDanh)', () => {
   })
 })
 
-describe('bản chiếu A — thẻ em theo bậc', () => {
-  it('4 làn theo nhóm, trong làn xếp theo bậc; thẻ có huy hiệu + số bậc + tên bậc; số chi tiết ở chú thích; «Dẫn đầu lớp» trên em cao nhất', () => {
+describe('bản chiếu A — thẻ em theo nhóm + nhịp học trực quan (06/11: bỏ 12 bậc lười chăm)', () => {
+  it('làn theo nhóm; thẻ hiện nhóm + dải ngày + số đủ mức / chuỗi trực tiếp trên thẻ (không còn 12 bậc lười chăm)', () => {
     render(<BanChieuDiemDanh {...props()} />)
     expect([...chieu().querySelectorAll('.ddv-lan')].map((x) => x.getAttribute('data-nhom'))).toEqual(['cham', 'chua-deu', 'luoi', 'moi', 'chua-co'])
     expect([...chieu().querySelectorAll('.ddv-lan-nhan')].map((x) => x.textContent)).toEqual([
-      'Chăm3 embậc 8–12', 'Chưa đều1 embậc 6–7', 'Lười1 embậc 1–5', 'Mới1 emchưa đủ 3 ngày', 'Chưa có số1 emchưa có số nhịp học',
+      'Chăm3 em', 'Chưa đều1 em', 'Lười1 em', 'Mới1 emchưa đủ 3 ngày', 'Chưa có số1 emchưa có số nhịp học',
     ])
     const o = the()
     expect(o.map(tenThe)).toEqual(['Vũ Thanh Bình', 'Chu Hải Chi', 'Lê Minh An', 'Đỗ Mai Giang', 'Hoàng Đức Duy', 'Quách Gia Linh', 'Phạm Hà'])
     const [b, c, , g, d] = o
-    expect(b!.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe('12')
-    expect(b!.querySelector('.ddv-the-so')!.textContent).toBe('12')
-    expect(b!.querySelector('.ddv-the-bac')!.textContent).toBe('Thần Chăm Chỉ Tối Thượng')
-    expect(b!.getAttribute('title')).toBe('Vũ Thanh Bình · điểm danh lúc 17:50 · điểm chăm 99/100 · đủ mức 11/11 ngày · chuỗi 12 ngày liền')
-    expect(b!.getAttribute('aria-label')).toBe('Vũ Thanh Bình, Chăm, đủ mức 11/11 ngày, Bậc 12/12 · Thần Chăm Chỉ Tối Thượng, điểm chăm 99 — mở hồ sơ làm bài')
-    expect(b!.querySelector('.ddv-the-dau')!.textContent).toBe('Dẫn đầu lớp')
-    expect(chieu().querySelectorAll('.ddv-the-dau')).toHaveLength(1)
-    expect(c!.querySelector('.ddv-the-bac')!.textContent).toBe('Cao Thủ Chăm Chỉ')
-    expect(g!.querySelector('.ddv-the-bac')!.textContent).toBe('Đại Sư Cân Bằng')
-    expect(d!.querySelector('.ddv-the-bac')!.textContent).toBe('Lười Vô Cực')
+    expect(chieu().querySelector('svg.bcc-hh, .ddv-the-so, .ddv-the-dau, .ddv-thang')).toBeNull()
+    expect(b!.querySelector('.ddv-the-bac')!.textContent).toBe('Chăm')
+    expect(b!.querySelector('.ddv-the-nhip .ddv-the-so-lieu')!.textContent).toContain('Đủ 11/11 ngày · chuỗi 12')
+    expect(b!.getAttribute('title')).toBe('Vũ Thanh Bình · điểm danh lúc 17:50 · đủ mức 11/11 ngày · chuỗi 12 ngày liền')
+    expect(b!.getAttribute('aria-label')).toBe('Vũ Thanh Bình, Chăm, đủ mức 11/11 ngày — mở hồ sơ làm bài')
+    expect(c!.querySelector('.ddv-the-bac')!.textContent).toBe('Chăm')
+    expect(g!.querySelector('.ddv-the-bac')!.textContent).toBe('Chưa đều')
+    expect(d!.querySelector('.ddv-the-bac')!.textContent).toBe('Lười')
+    expect(d!.querySelector('.ddv-the-nhip .ddv-the-so-lieu')!.textContent).toContain('Đủ 0/11 ngày · thoát 0/6')
     expect(d!.getAttribute('title')).toContain('thoát Lười 0/6 ngày liền')
-    expect(d!.className).toContain('bcc')
-    expect(d!.getAttribute('data-bac')).toBe('1')
-    // thẻ gọn: không còn ba dòng số chữ nhỏ
     expect(chieu().querySelector('.ddc-the-dong, .ddc-the-diem')).toBeNull()
   })
 
-  it('dải 12 bậc: số em có mặt mỗi bậc, ô trống mờ, ô Mới (chưa xếp bậc)', () => {
+  it('không còn dải 12 bậc trên màn chiếu điểm danh', () => {
     render(<BanChieuDiemDanh {...props()} />)
-    const thang = within(chieu()).getByRole('group', { name: 'Số em có mặt ở mỗi bậc, từ Lười đến Chăm' })
-    const o = [...thang.querySelectorAll('.ddv-thang-o')]
-    expect(o).toHaveLength(13)
-    expect(o.map((x) => x.querySelector('b')!.textContent)).toEqual(['1', '0', '0', '0', '0', '0', '1', '0', '0', '2', '0', '1', '2'])
-    expect(o.filter((x) => x.hasAttribute('data-rong')).map((x) => x.getAttribute('data-bac'))).toEqual(['2', '3', '4', '5', '6', '8', '9', '11'])
-    expect(o[11]!.querySelector('svg.bcc-hh')!.getAttribute('data-bac')).toBe('12')
-    expect(o[11]!.textContent).toContain('em ở Bậc 12/12 · Thần Chăm Chỉ Tối Thượng')
-    expect(o[12]!.textContent).toBe('Mới2 em chưa xếp bậc')
+    expect(within(chieu()).queryByRole('group', { name: 'Số em có mặt ở mỗi bậc, từ Lười đến Chăm' })).toBeNull()
+    expect(chieu().querySelector('.ddv-thang')).toBeNull()
   })
 
-  it('«Vừa vào lớp»: ba em điểm danh mới nhất (mới nhất trên cùng, nổi bật), có giờ; bấm ⇒ hồ sơ đúng em', () => {
+  it('«Vừa vào lớp»: ba em điểm danh mới nhất (mới nhất trên cùng, nổi bật), có giờ và nhịp học; bấm ⇒ hồ sơ đúng em', () => {
     const p = props()
     render(<BanChieuDiemDanh {...p} />)
     const vv = within(chieu()).getByRole('region', { name: 'Vừa vào lớp' })
@@ -161,13 +151,13 @@ describe('bản chiếu A — thẻ em theo bậc', () => {
     expect(dong.map((x) => x.querySelector('.ddv-moi-chu b')!.textContent)).toEqual(['Phạm Hà', 'Quách Gia Linh', 'Hoàng Đức Duy'])
     expect(dong.map((x) => x.querySelector('time')!.textContent)).toEqual(['17:56', '17:55', '17:54'])
     expect(dong[0]!.hasAttribute('data-dau')).toBe(true)
-    expect(dong[2]!.querySelector('.ddv-moi-chu span')!.textContent).toBe('Bậc 1 · Lười Vô Cực')
+    expect(dong[2]!.querySelector('.ddv-moi-chu span')!.textContent).toBe('Lười · Đủ 0/11 ngày')
     fireEvent.click(dong[1]!)
     expect(p.onMoEm).toHaveBeenCalledWith(expect.objectContaining({ sbd: 'E' }), dong[1])
     expect(within(chieu()).queryByRole('region', { name: 'Bậc cao nhất lớp' })).toBeNull()
   })
 
-  it('em chưa xếp bậc có thẻ riêng (Mới · chưa có số), không huy hiệu bậc; vẫn bấm mở hồ sơ', () => {
+  it('em chưa xếp nhóm có thẻ riêng (Mới · chưa có số), không huy hiệu bậc; vẫn bấm mở hồ sơ', () => {
     const p = props()
     render(<BanChieuDiemDanh {...p} />)
     const o = the()
@@ -176,7 +166,7 @@ describe('bản chiếu A — thẻ em theo bậc', () => {
     expect(moi.className).not.toContain('bcc')
     expect(moi.querySelector('svg.bcc-hh, .ddv-the-so')).toBeNull()
     expect(moi.querySelector('.ddv-the-hh-trong')!.textContent).toBe('M')
-    expect(moi.querySelector('.ddv-the-bac')!.textContent).toBe('Chưa xếp bậc')
+    expect(moi.querySelector('.ddv-the-bac')!.textContent).toBe('Mới vào lớp')
     expect(moi.getAttribute('title')).toContain('đã có số 1/3 ngày')
     const ghep = o.find((b) => tenThe(b) === 'Phạm Hà')!
     expect(ghep.getAttribute('data-nhom')).toBe('chua-co')
@@ -194,18 +184,16 @@ describe('bản chiếu A — thẻ em theo bậc', () => {
     expect(chieu().querySelector('.ddc-noi')).toBeNull()
   })
 
-  it('em MỚI vào trong lượt làm mới ⇒ thẻ nổi "Vừa điểm danh" (bậc, ba số, câu lên bậc) ~4 giây rồi tự gỡ; thẻ khác mờ trong lúc nổi', () => {
+  it('em MỚI vào trong lượt làm mới ⇒ thẻ nổi "Vừa điểm danh" (nhóm, số đủ mức, chuỗi) ~4 giây rồi tự gỡ; thẻ khác mờ trong lúc nổi', () => {
     vi.useFakeTimers()
     const { rerender } = render(<BanChieuDiemDanh {...props()} />)
     const coMoi = [...CO_MAT, { sbd: 'H', hoTen: 'Phan Quang Huy', luc: luc(58), cach: 'ma' as const }]
     rerender(<BanChieuDiemDanh {...props({}, KQ, coMoi)} />)
     const noi = within(chieu()).getByRole('status', { name: /^Phan Quang Huy vừa điểm danh lúc 17:58/ })
-    expect(noi.getAttribute('data-bac')).toBe('11')
+    expect(noi.getAttribute('data-nhom')).toBe('cham')
     expect(noi.querySelector('.ddc-noi-nhan')!.textContent).toBe('Vừa điểm danh · 17:58')
-    expect(noi.querySelector('.ddc-noi-bac')!.textContent).toBe('Bậc 11/12 · Chiến Thần Năng Suất')
-    expect([...noi.querySelectorAll('.ddc-noi-so > span')].map((x) => x.textContent)).toEqual(['Điểm chăm93/100', 'Đủ mức11/11 ngày', 'Chuỗi đủ mức12 ngày liền'])
-    expect(noi.querySelector('.ddc-noi-cau')!.textContent).toBe('Còn 5 điểm chăm nữa lên Bậc 12 · Thần Chăm Chỉ Tối Thượng')
-    expect(noi.querySelector('.ddc-noi-ke svg.bcc-hh')!.getAttribute('data-bac')).toBe('12')
+    expect(noi.querySelector('.ddc-noi-bac')!.textContent).toBe('Nhóm Chăm')
+    expect([...noi.querySelectorAll('.ddc-noi-so > span')].map((x) => x.textContent)).toEqual(['Đủ mức11/11 ngày', 'Chuỗi đủ mức12 ngày liền', 'Hôm nay24/24 câu'])
     expect(chieu().querySelector('.ddv-lop-hn')!.hasAttribute('data-noi')).toBe(true)
     expect(the().filter((b) => b.hasAttribute('data-noi')).map(tenThe)).toEqual(['Phan Quang Huy'])
     // làm mới trả cùng danh sách ⇒ không nổi lại, thẻ vẫn giữ
@@ -232,8 +220,8 @@ describe('bản chiếu A — thẻ em theo bậc', () => {
     expect(p.onDoiCheDo).toHaveBeenCalledTimes(2)
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(p.onDong).toHaveBeenCalledTimes(1)
-    // chân: luật bậc
-    expect(chieu().querySelector('.ddv-chan .ddv-chu-giai')!.textContent).toContain('Lười 1–5 thoát khi đủ mức 6 ngày liền')
+    // chân: luật nhóm nhịp học
+    expect(chieu().querySelector('.ddv-chan .ddv-chu-giai')!.textContent).toContain('thoát khi đủ mức 6 ngày liền')
   })
 
   it('mất kết nối vẫn hiện; tấm hồ sơ đang mở ⇒ không nghe phím', () => {

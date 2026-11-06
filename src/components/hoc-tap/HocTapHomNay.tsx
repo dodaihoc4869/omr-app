@@ -134,14 +134,7 @@ export default function HocTapHomNay(p: Props) {
   // Gói cả ngày (mo-chang-truoc.ts, thầy 29/10 & 06/11): máy em đã có chặng trong gói ⇒ `moChangTruoc` không gọi máy chủ; chưa có gói cả ngày ⇒ sau 1,2 s tải sẵn trọn
   // các chặng + đáp án mã hoá `dm` + lời giải Kính mã hoá `kinh` xuống máy để mọi chặng trong ngày mở và chấm 0 ms tại máy, không gọi lại D1.
   useEffect(() => {
-    if (!coTheHoc || !p.token) return
-    const token = p.token
-    let h = 0
-    void import('./ManLamBaiTap').then((m) => {
-      m.moChangTruoc(token)
-      h = window.setTimeout(() => { void m.napGoiNgay(token) }, 1200)
-    }).catch(() => {})
-    return () => { if (h) window.clearTimeout(h) }
+    if (coTheHoc && p.token) { const token = p.token; void import('./ManLamBaiTap').then((m) => m.moChangTruoc(token)).catch(() => {}) }
   }, [coTheHoc, p.token])
 
   // Tấm "Của em": Esc đóng, focus vào tấm khi mở và trả về ảnh đại diện khi đóng.
@@ -187,8 +180,7 @@ export default function HocTapHomNay(p: Props) {
     const eKiemSau = kiem && !kiemHomNay && <Suspense fallback={null}><TheKiemTraCaNhan du={kiem} onMo={p.onKiemTra} disabled={p.coCa} /></Suspense>
     const eMoiSua = <TheMoiTuSua so={soSua} token={p.token} onChua={p.onChua} />
     const eGoi7 = goi7 && <TheGoi7 du={goi7} />
-    const eThieu = !!ht?.conThieu && <div className="ht-thong-bao">Hôm nay còn thiếu {ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.</div>
-    const eGiu = !!sanh?.tamGiuCa && <div className="ht-thong-bao">Một số câu đang được giữ cho ca kiểm tra.</div>
+    const ghi = [ht?.conThieu ? `Hôm nay còn thiếu ${ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.` : '', sanh?.tamGiuCa ? 'Một số câu đang được giữ cho ca kiểm tra.' : ''].filter(Boolean)
     const mot = !!MotTrang
     return <div className="ht-app ht2" data-nguon={p.nguon} data-mot={mot || undefined}>
     {trong && MenuDoc ? <MenuDoc muc={muc} ds={MENU} onMuc={(id) => setMuc(id as Muc)} coCa={p.coCa} onThi={p.onThi} thongBao={mot ? undefined : p.thongBao} dangTai={p.dangTai} onTaiLai={p.onTaiLai}
@@ -213,16 +205,10 @@ export default function HocTapHomNay(p: Props) {
 
         {MotTrang ? <MotTrang muc={muc} hs={p} ten={p.ten} thongBao={p.thongBao} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
           coCa={p.coCa} onThi={p.onThi} token={p.token} soSua={soSua} onChua={() => p.onChua()} hinhSua={hinhTuSua()} kiem={kiem} ngayKiem={ngayKiem} onKiemTra={p.onKiemTra}
-          soBaiTap={p.soBaiTap} coBaiTap={p.coBaiTap} onBaiTap={p.onBaiTap}
-          ghi={[ht?.conThieu ? `Hôm nay còn thiếu ${ht.conThieu} câu phù hợp. Em vẫn làm được phần đã có.` : '', sanh?.tamGiuCa ? 'Một số câu đang được giữ cho ca kiểm tra.' : ''].filter(Boolean)} />
+          soBaiTap={p.soBaiTap} coBaiTap={p.coBaiTap} onBaiTap={p.onBaiTap} ghi={ghi} />
           : muc === 'hom-nay' && <>
-          {/* Thầy 12/10: "gộp 2 phần làm bài này vào làm một … tập trung vào việc nhắc học sinh làm bao nhiêu câu" — MỘT thẻ thay vòng "Mục tiêu hôm nay"
-              và bảng "Nhịp học của em": Còn N câu · vạch chặng · MỘT nút học · Nhịp học gọn (lỗi ⇒ ẩn gọn). */}
-          {/* Đợt 20 (bản vẽ docs/ban-ve-dot20): ngày kiểm tra ⇒ thẻ kiểm tra là khối CHÍNH; ngày khác (sắp đến / đang chuẩn bị) ⇒ thẻ phụ NẰM SAU khối học.
-              Thầy 14/10 ("khi nào tới lịch kiểm tra thì hiển bảng đó lên đầu và mở nút bắt đầu kiểm tra"): ngày kiểm tra có kèm kế hoạch học nhẹ cũng đưa thẻ
-              kiểm tra (nút Làm bài kiểm tra) lên ĐẦU, khối học nhẹ nằm sau. */}
           {eKiem}
-          {!ngayKiem && <>{eHomNay}{eKiemSau}{eMoiSua}{eGoi7}{eThieu}{eGiu}{nhomOnSua}</>}
+          {!ngayKiem && <>{eHomNay}{eKiemSau}{eMoiSua}{eGoi7}{ghi.map((g) => <div key={g} className="ht-thong-bao">{g}</div>)}{nhomOnSua}</>}
         </>}
 
         {!mot && (muc === 'hanh-trinh' || muc === 'on-lai') && <Suspense fallback={<div className="ht2-cho-tab" role="status" aria-busy="true" aria-label="Đang mở" />}>
