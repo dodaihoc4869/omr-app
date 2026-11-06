@@ -1,0 +1,192 @@
+{
+  "i": 425,
+  "hash": "4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27",
+  "nativeSize": [
+    640,
+    287
+  ],
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27.png",
+  "questions": [
+    {
+      "qid": "12-KT-C2-D5-I-7",
+      "maDe": "12-KT-C2-D5",
+      "de": "Carbohydrate X có công thức cấu tạo dưới đây. Nhận định nào đúng khi nói về X?",
+      "hinh": [
+        {
+          "hash": "4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27",
+          "where": "12-KT-C2-D5-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "80088b6fbf4234f014b98c3055a5a4a4f7f8ff604e7efc3308977e51173904e7"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-227",
+      "maDe": "DB-12-B5-D2",
+      "de": "Carbohydrate X có công thức cấu tạo dưới đây. Nhận định nào đúng khi nói về X?",
+      "hinh": [
+        {
+          "hash": "4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27",
+          "where": "DB-12-B5-D2-I-227.hinh.0.du_lieu",
+          "hashDataUrl": "80088b6fbf4234f014b98c3055a5a4a4f7f8ff604e7efc3308977e51173904e7"
+        }
+      ]
+    }
+  ],
+  "sourceReviewed": [
+    "native full/3x",
+    "wave ROI 12x + threshold180 pixel extents"
+  ],
+  "geometry": {
+    "rings": [
+      {
+        "C1": [
+          250,
+          164
+        ],
+        "C2": [
+          202,
+          200
+        ],
+        "C3": [
+          127,
+          200
+        ],
+        "C4": [
+          79,
+          164
+        ],
+        "C5": [
+          127,
+          130
+        ],
+        "ringO": [
+          205,
+          126
+        ],
+        "C6": [
+          127,
+          100
+        ],
+        "C6OH": [
+          179,
+          72
+        ],
+        "OH": {
+          "C2": "down",
+          "C3": "up",
+          "C4": "down"
+        },
+        "numbers": "1..6 each once"
+      },
+      {
+        "C1": [
+          491,
+          164
+        ],
+        "C2": [
+          442,
+          200
+        ],
+        "C3": [
+          367,
+          200
+        ],
+        "C4": [
+          319,
+          164
+        ],
+        "C5": [
+          367,
+          130
+        ],
+        "ringO": [
+          443,
+          126
+        ],
+        "C6": [
+          367,
+          100
+        ],
+        "C6OH": [
+          419,
+          72
+        ],
+        "OH": {
+          "C1": "right via wavy bond; OH superscript (1)",
+          "C2": "down",
+          "C3": "up"
+        },
+        "numbers": "1..6 each once"
+      }
+    ],
+    "bridge": "left C1 down-right to O near285,199; O up-right to right C4",
+    "labels": {
+      "OH": 8,
+      "ringO": 2,
+      "bridgeO": 1,
+      "carbonNumbers": 12,
+      "standaloneH": 0,
+      "CH2Text": 0,
+      "caption": null
+    },
+    "frontBonds": "4 tapered diagonals total;2 bold front horizontals; rear bonds thin uniform",
+    "C6": "bare carbon vertex at bent branch; two segments C5 up to endpoint C6 then up-right to OH; no extra CH2 text",
+    "wave": {
+      "start": [
+        491,
+        164
+      ],
+      "end": [
+        525,
+        164
+      ],
+      "upperCrests": [
+        [
+          495,
+          160
+        ],
+        [
+          504,
+          160
+        ],
+        [
+          512,
+          160
+        ],
+        [
+          520,
+          160
+        ]
+      ],
+      "lowerTroughs": [
+        [
+          500,
+          165
+        ],
+        [
+          508,
+          165
+        ],
+        [
+          516,
+          165
+        ]
+      ],
+      "topology": "single continuous nonclosed wavy line; 4 crests and3 intervening troughs; ends descending toward baseline, no closed cycles",
+      "evidence": "native threshold180 x492..525 y160..165; opened12x source crop"
+    },
+    "OHsuperscript": "literal OH with (1) superscript to upper right of H; not carbon number1 or footnote added externally"
+  },
+  "publicRefs": "Both public stems ask identification of carbohydrate X formula; all image labels are figure data. No answers/solutions consulted.",
+  "status": "Đạt exact SVG sau fresh actual review",
+  "actualReview": {
+    "i": 425,
+    "hashSvg": "83f6b4ead35a0da1abfa9f2d0469edc5b1ea748e0359995fb822b4db31544426",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native full/3x/wave12x và tự render fresh Chromium exact SVG. Đúng hai Haworth, 12 nhãn số C, 8OH/2ringO/1bridgeO, mọi hướng OH và cầu O, 4 nét taper/2 ngang đậm, 2C6 bare bent endpoints không thêm CH2/H. Nét lượn phải C1 liên tục đúng 4 đỉnh/3 đáy giữa, OH superscript (1) nguyên văn; không stub thừa ở right C4. Các chữ/nét có gap, không chạm/cắt/tràn. Đối chiếu hai public stems/refs, không thêm đáp án.",
+    "byteSvg": 18552,
+    "actualSvgReviewed": true,
+    "render": "/workspace/scratch/disaccharide425-228-83f6b4ea-chromium.png",
+    "sourceHash": "4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27"
+  }
+}

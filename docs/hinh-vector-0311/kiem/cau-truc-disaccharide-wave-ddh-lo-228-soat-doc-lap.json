@@ -1,0 +1,14 @@
+[
+  {
+    "i": 425,
+    "hashSvg": "83f6b4ead35a0da1abfa9f2d0469edc5b1ea748e0359995fb822b4db31544426",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native full/3x/wave12x và tự render fresh Chromium exact SVG. Đúng hai Haworth, 12 nhãn số C, 8OH/2ringO/1bridgeO, mọi hướng OH và cầu O, 4 nét taper/2 ngang đậm, 2C6 bare bent endpoints không thêm CH2/H. Nét lượn phải C1 liên tục đúng 4 đỉnh/3 đáy giữa, OH superscript (1) nguyên văn; không stub thừa ở right C4. Các chữ/nét có gap, không chạm/cắt/tràn. Đối chiếu hai public stems/refs, không thêm đáp án.",
+    "byteSvg": 18552,
+    "actualSvgReviewed": true,
+    "render": "/workspace/scratch/disaccharide425-228-83f6b4ea-chromium.png",
+    "sourceHash": "4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27",
+    "hash": "4c3ed15d4b87187b59361af3f10f576e40be5af690109cc838688f14777eee27",
+    "hashSvgDaSoat": "83f6b4ead35a0da1abfa9f2d0469edc5b1ea748e0359995fb822b4db31544426"
+  }
+]
