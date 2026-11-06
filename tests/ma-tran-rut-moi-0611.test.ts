@@ -5,8 +5,8 @@
 import { describe, expect, it } from 'vitest'
 import { MA_TRAN_RUT_MOI, demTheoO, oMaTran, xepTheoMaTran } from '../server/src/ma-tran-rut-moi'
 import { MA_TRAN_HOA_2026 } from '../src/lib/ma-tran-hoa-2026'
-import { chonGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
-import { lapKeHoachNgay, phatLaiCau, type CauSrs, type TrangThaiCau } from '../server/src/srs2-loi'
+import { chonGoi7, congNgay7, quotaGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
+import { lapKeHoachNgay, phatLaiCau, type CauSrs, type HangEm, type TrangThaiCau } from '../server/src/srs2-loi'
 
 const O = ['I|biet', 'I|hieu', 'I|van_dung', 'II|hieu', 'II|van_dung', 'III|biet', 'III|hieu', 'III|van_dung'] as const
 const W: Record<string, number> = { 'I|biet': 11, 'I|hieu': 4, 'I|van_dung': 3, 'II|hieu': 3, 'II|van_dung': 1, 'III|biet': 1, 'III|hieu': 2, 'III|van_dung': 3 }
@@ -129,5 +129,45 @@ describe('chiến dịch game (lapKeHoachNgay)', () => {
       const n = demTheoO(da, oCua)
       for (const o of O) expect(Math.abs((n.get(o) ?? 0) - (W[o]! * da.length) / 28)).toBeLessThan(1)
     }
+  })
+})
+
+// THẦY HỎI 06/11: «vẫn đảm bảo câu mới được phủ đúng hạn chứ» — ma trận chỉ đổi câu NÀO trong quota, quota vẫn chia số câu chưa gặp cho số ngày còn ⇒
+// mọi câu mới vẫn được giao trước hạn. Khoá trên đường MA TRẬN (mặc định máy chủ), kho lệch ma trận (ô thiếu / ô thừa, câu chưa sẵn sàng).
+describe('phủ câu mới đúng hạn trên đường ma trận', () => {
+  /** Kho lệch hẳn ma trận: nhiều Phần III, ít Phần I Biết, có câu chưa gắn mức. */
+  const khoLech = (n: number) => Array.from({ length: n }, (_, i) => ({
+    qid: `L${String(i).padStart(3, '0')}`, phan: (['I', 'III', 'III', 'II', 'I'] as const)[i % 5], mucDo: ['VD', 'TH', null, 'NB', 'VDC', 'TH', 'VD'][i % 7] ?? null,
+  }))
+  it.each([[127, 7], [60, 3], [200, 10], [41, 1]])('Gói 7: kho %i câu, %i ngày — hết hạn thì đã gặp mọi câu (cả câu chưa sẵn sàng)', (n, soNgay) => {
+    const cau: CauGoi7[] = khoLech(n).map((c) => ({ ...c, group: c.qid, maDe: 'x', version: 'v1', kho: false, tinhToan: false, kyNang: ['a'] }))
+    const ids = cau.map((c) => c.qid)
+    const sanSang = new Set(ids.filter((_, i) => i % 6 !== 0)) // 1/6 câu chưa sẵn sàng ⇒ vẫn phải được giao (tiếp cận)
+    const batDau = '2026-11-06', han = congNgay7(batDau, soNgay - 1)
+    const daGap = new Set<string>()
+    for (let k = 0; k < soNgay; k++) {
+      const ngay = congNgay7(batDau, k)
+      const quota = quotaGoi7(n - daGap.size, ngay, han)
+      const r = chonGoi7({ cau, daGap: new Set(daGap), daLamNgay: new Set(), quotaCon: 0, sanSang, chan: new Set(), sua: [], on: [], ngay, chiTrongMuc: true,
+        mucTieuNgay: quota, nhomPhu: [{ qids: ids, quota }] })
+      expect(r.viec.length).toBe(Math.min(quota, n - daGap.size))
+      for (const v of r.viec) daGap.add(v.qid)
+    }
+    expect(daGap.size).toBe(n)
+  })
+  it.each([undefined, 'L1', 'L2', 'L3', 'L4'] as const)('chiến dịch game (hạng %s): mọi câu mới giao hết trước hạn − 3 ngày', (h) => {
+    const HAN = '2026-11-15' // 10 ngày từ 06/11 ⇒ câu mới phải xong trước 13/11
+    const cau: CauSrs[] = khoLech(170).map((c) => ({ ...c, dang: `D${c.qid.charCodeAt(3) % 3}` }))
+    const tt = new Map<string, TrangThaiCau>(cau.map((c) => [c.qid, phatLaiCau(c.qid, [], HAN)]))
+    const hang = h ? { hangTheoDang: { D0: h, D1: h, D2: h } as Record<string, HangEm>, hangChung: h as HangEm } : {}
+    let k = 0
+    for (; k < 10; k++) {
+      const homNay = congNgay7('2026-11-06', k)
+      const kh = lapKeHoachNgay(cau, tt, { homNay, hanNop: HAN, tranNgay: 40, tranHuyetChien: 40, raiDeu: true, ...hang })
+      for (const q of kh.dao) if (tt.get(q)!.laMoi) tt.set(q, { ...tt.get(q)!, laMoi: false, henOn: null })
+      if ([...tt.values()].every((t) => !t.laMoi)) break
+    }
+    expect([...tt.values()].filter((t) => t.laMoi).length).toBe(0)
+    expect(k).toBeLessThanOrEqual(6) // xong muộn nhất ngày thứ 7 (12/11) — trước ba ngày ôn cuối
   })
 })

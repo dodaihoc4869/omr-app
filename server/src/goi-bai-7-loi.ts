@@ -1,5 +1,5 @@
 // Gói bài 7 ngày: phủ câu gốc, tự làm và hiểu kiến thức là ba bằng chứng khác nhau.
-import { bamMt, demTheoO, oMaTran, xepTheoMaTran } from './ma-tran-rut-moi'
+import { bamMt, oMaTran, xepTheoMaTran } from './ma-tran-rut-moi'
 export type VaiGoi7 = 'moi' | 'sua' | 'on' | 'tiep_can' | 'chua'
 export interface CauGoi7 {
   qid: string; maDe: string; maTo?: string; soCau?:number; version: string; group: string; phan: 'I' | 'II' | 'III'
@@ -23,6 +23,7 @@ export const quotaGoi7 = (chuaGap: number, ngay: string, han: string): number =>
 export const mucNgayGoi7 = (toiThieuTang: number, tongQuota: number): number =>
   Math.max(Math.max(0, Math.floor(Number(toiThieuTang) || 0)), Math.max(0, Math.floor(Number(tongQuota) || 0)))
 
+const DEM_CAU7 = new WeakMap<CauGoi7, { ngay: string; bm: number; o: string }>()
 /** Quota phủ bài không bị tỷ lệ ôn/sửa ăn mất. Câu chưa sẵn sàng chỉ mở học có hỗ trợ. */
 export function chonGoi7(a: {
   cau: readonly CauGoi7[]; daGap: ReadonlySet<string>; daLamNgay: ReadonlySet<string>
@@ -48,25 +49,38 @@ export function chonGoi7(a: {
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
   // CÂU MỚI THEO MA TRẬN ĐỀ 2026 (thầy 06/11, bỏ «dễ trước khó sau»): trong một ô (phần × mức) — sẵn sàng trước, trọng số OMNI, hoà xoay theo ngày;
   // giữa các ô — `xepTheoMaTran`, đếm cả câu mới đã rút những ngày trước của CÙNG nhóm ⇒ ô ít câu không dồn về cuối. Số câu mới mỗi ngày giữ nguyên.
-  // Tốc độ máy chủ: băm xoay + so chuỗi chỉ tính MỘT lần trên cả kho; mỗi nhóm phụ chỉ lọc rồi xếp theo hạng số nguyên đã có (cùng thứ tự với xếp lại từ đầu).
-  const hoaDem = new Map<string, number>()
-  const hoa = (q: CauGoi7) => { if (!a.ngay) return 0; let h = hoaDem.get(q.qid); if (h === undefined) { h = bamMt(`${a.ngay}|${q.qid}`); hoaDem.set(q.qid, h) } return h }
-  const hang = (x: CauGoi7, y: CauGoi7) => Number(!a.sanSang.has(x.qid))-Number(!a.sanSang.has(y.qid)) ||
-    (a.trongSo?.[y.qid]??0)-(a.trongSo?.[x.qid]??0) || hoa(x) - hoa(y) || x.qid.localeCompare(y.qid)
-  const hangSo = new Map<CauGoi7, number>()
-  a.cau.slice().sort(hang).forEach((q, i) => hangSo.set(q, i))
-  const theoHang = (x: CauGoi7, y: CauGoi7) => hangSo.get(x)! - hangSo.get(y)!
-  const oCua = (q: CauGoi7) => oMaTran(q.phan, q.mucDo)
+  // Tốc độ máy chủ (luật tốc độ 13/10 — không chậm hơn bản cũ): khoá hạng (sẵn sàng, trọng số, băm xoay) và ô ma trận tính MỘT lần mỗi câu vào mảng số,
+  // sắp chỉ số MỘT lần cho cả kho; mỗi nhóm phụ lấy câu của nhóm rồi sắp theo hạng số đã có (cùng thứ tự với sắp lại từ đầu).
+  const N = a.cau.length, ss = new Uint8Array(N), ts = new Float64Array(N), bm = new Uint32Array(N), oQ: string[] = new Array(N)
+  const viTriQ = new Map<CauGoi7, number>()
+  for (let i = 0; i < N; i++) {
+    const q = a.cau[i]!
+    viTriQ.set(q, i); ss[i] = a.sanSang.has(q.qid) ? 0 : 1; ts[i] = a.trongSo?.[q.qid] ?? 0
+    // Đệm theo đối tượng câu (một lượt lập gọi chonGoi7 nhiều lần trên CÙNG mảng câu): băm xoay theo ngày + ô ma trận chỉ tính lần đầu.
+    let d = DEM_CAU7.get(q)
+    if (!d || d.ngay !== (a.ngay ?? '')) { d = { ngay: a.ngay ?? '', bm: a.ngay ? bamMt(`${a.ngay}|${q.qid}`) : 0, o: oMaTran(q.phan, q.mucDo) }; DEM_CAU7.set(q, d) }
+    bm[i] = d.bm; oQ[i] = d.o
+  }
+  const cmpI = (x: number, y: number) => ss[x]! - ss[y]! || ts[y]! - ts[x]! || bm[x]! - bm[y]! || a.cau[x]!.qid.localeCompare(a.cau[y]!.qid)
+  const thuTu = Array.from({ length: N }, (_, i) => i).sort(cmpI), hangI = new Int32Array(N)
+  for (let r = 0; r < N; r++) hangI[thuTu[r]!] = r
+  const oCua = (q: CauGoi7) => oQ[viTriQ.get(q)!]!
   const truocNay = (id: string) => a.daGap.has(id) && !a.gapHomNay?.has(id)
-  const xepMoi = (ds: readonly CauGoi7[]): CauGoi7[] => xepTheoMaTran(
-    ds.filter(q => !truocNay(q.qid) && !a.chan.has(q.qid) && !a.chan.has(q.group)).sort(theoHang), oCua, demTheoO(ds.filter(q => truocNay(q.qid)), oCua),
-  ).filter(q => !a.daGap.has(q.qid))
-  const moi = xepMoi(a.cau)
+  const boChan = (q: CauGoi7) => a.chan.has(q.qid) || a.chan.has(q.group)
+  /** `ds` ĐÃ theo hạng. */
+  const xepMoi = (ds: readonly CauGoi7[]): CauGoi7[] => {
+    const ung: CauGoi7[] = [], da = new Map<string, number>()
+    for (const q of ds) { if (truocNay(q.qid)) { const o = oCua(q); da.set(o, (da.get(o) ?? 0) + 1) } else if (!boChan(q)) ung.push(q) }
+    return xepTheoMaTran(ung, oCua, da).filter(q => !a.daGap.has(q.qid))
+  }
+  const moi = xepMoi(thuTu.map(i => a.cau[i]!))
   const phu:CauGoi7[]=[],daChon=new Set<string>()
   let thieuPhu=0
   if(a.nhomPhu?.length){
     const theoQid=new Map(a.cau.map(q=>[q.qid,q] as const))
-    for(const g of a.nhomPhu){const ids=new Set(g.qids),con=Math.max(0,g.quota-[...daChon].filter(id=>ids.has(id)).length),chon=xepMoi([...ids].flatMap(id=>theoQid.get(id)??[])).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
+    for(const g of a.nhomPhu){const ids=new Set(g.qids),con=Math.max(0,g.quota-[...daChon].filter(id=>ids.has(id)).length)
+      const cuaNhom=[...ids].flatMap(id=>theoQid.get(id)??[]).sort((x,y)=>hangI[viTriQ.get(x)!]!-hangI[viTriQ.get(y)!]!)
+      const chon=xepMoi(cuaNhom).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
   }else {phu.push(...moi.slice(0,a.quotaCon));thieuPhu=Math.max(0,a.quotaCon-moi.length)}
   for (const q of a.chiTrongMuc ? phu.slice(0, muc) : phu) {
     const huongDan = !a.sanSang.has(q.qid)
