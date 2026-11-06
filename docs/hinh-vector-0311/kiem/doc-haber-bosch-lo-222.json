@@ -1,0 +1,409 @@
+{
+  "i": 285,
+  "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+  "fileNguon": "anh/30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-haber222-coolerzoom.png",
+  "questions": [
+    {
+      "qid": "11-C2-B5-I-4",
+      "de": "Cho sơ đồ thiết bị tổng hợp ammonia trong công nghiệp theo quá trình Haber – Bosch.\nPhát biểu nào sau đây không đúng?",
+      "refs": [
+        {
+          "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+          "where": "11-C2-B5-I-4.hinh.0.du_lieu",
+          "hashDataUrl": "ce8c42e7c33e0f254c864585e4dd2ed74a46151063d88b6fc949735523524cf1"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B5-D1-I-1",
+      "de": "Cho sơ đồ thiết bị tổng hợp ammonia trong công nghiệp theo quá trình Haber – Bosch.\nPhát biểu nào sau đây không đúng?",
+      "refs": [
+        {
+          "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+          "where": "DB-11-B5-D1-I-1.hinh.0.du_lieu",
+          "hashDataUrl": "ce8c42e7c33e0f254c864585e4dd2ed74a46151063d88b6fc949735523524cf1"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;coil12horizontalrunsnotparticles.",
+    "labels": [
+      {
+        "text": "H₂ + N₂",
+        "at": [
+          76,
+          158
+        ]
+      },
+      {
+        "text": "H₂ + N₂",
+        "at": [
+          346,
+          35
+        ]
+      },
+      {
+        "text": "Bộ phận nén",
+        "at": [
+          128,
+          87
+        ],
+        "leader": [
+          [
+            152,
+            104
+          ],
+          [
+            152,
+            160
+          ]
+        ]
+      },
+      {
+        "text": "Tháp tổng hợp",
+        "at": [
+          138,
+          252
+        ],
+        "leader": [
+          [
+            223,
+            251
+          ],
+          [
+            262,
+            251
+          ]
+        ]
+      },
+      {
+        "text": "Chất xúc tác",
+        "at": [
+          331,
+          325
+        ],
+        "leader": [
+          [
+            324,
+            299
+          ],
+          [
+            324,
+            261
+          ]
+        ]
+      },
+      {
+        "text": "Tháp làm lạnh",
+        "at": [
+          647,
+          175
+        ],
+        "leader": [
+          [
+            558,
+            178
+          ],
+          [
+            521,
+            178
+          ]
+        ]
+      },
+      {
+        "text": "NH₃",
+        "at": [
+          477,
+          262
+        ]
+      },
+      {
+        "text": "Ammonia lỏng",
+        "at": [
+          592,
+          370
+        ],
+        "leader": [
+          [
+            511,
+            368
+          ],
+          [
+            480,
+            368
+          ]
+        ]
+      }
+    ],
+    "compressor": {
+      "circle": [
+        152,
+        187,
+        27
+      ],
+      "innerCircle": [
+        152,
+        187,
+        7
+      ]
+    },
+    "feedPipe": {
+      "upper": [
+        49,
+        180,
+        125,
+        180
+      ],
+      "lower": [
+        49,
+        195,
+        125,
+        195
+      ]
+    },
+    "compressorToReactor": {
+      "walls": [
+        [
+          154,
+          180,
+          208,
+          180
+        ],
+        [
+          154,
+          195,
+          262,
+          195
+        ],
+        [
+          223,
+          180,
+          262,
+          180
+        ]
+      ],
+      "recycleJoin": "Vertical208/223joinsmainfeedat180,noisolatedgap."
+    },
+    "reactor": {
+      "roundedRect": [
+        262,
+        100,
+        389,
+        282
+      ],
+      "fill": "yellow",
+      "catalystStrip": [
+        313,
+        101,
+        334,
+        281
+      ],
+      "catalystColor": "brownbeige"
+    },
+    "reactorToCooler": {
+      "walls": [
+        [
+          389,
+          228,
+          428,
+          228
+        ],
+        [
+          389,
+          241,
+          428,
+          241
+        ]
+      ]
+    },
+    "recyclePipe": {
+      "outer": [
+        [
+          208,
+          180
+        ],
+        [
+          208,
+          76
+        ],
+        [
+          211,
+          65
+        ],
+        [
+          223,
+          59
+        ],
+        [
+          465,
+          59
+        ],
+        [
+          476,
+          65
+        ],
+        [
+          480,
+          76
+        ],
+        [
+          480,
+          101
+        ]
+      ],
+      "inner": [
+        [
+          223,
+          180
+        ],
+        [
+          223,
+          83
+        ],
+        [
+          226,
+          76
+        ],
+        [
+          232,
+          74
+        ],
+        [
+          456,
+          74
+        ],
+        [
+          463,
+          77
+        ],
+        [
+          465,
+          83
+        ],
+        [
+          465,
+          101
+        ]
+      ],
+      "color": "whitegraydoublewallblackoutline"
+    },
+    "cooler": {
+      "roundedRect": [
+        428,
+        100,
+        521,
+        279
+      ],
+      "gradient": "TOPred→middlemaroon→bottomnavyblue;NH3compartmentGRAYy250..279",
+      "coil": {
+        "horizontalRunYs": [
+          116,
+          128,
+          139,
+          150,
+          161,
+          173,
+          184,
+          195,
+          206,
+          218,
+          229,
+          241
+        ],
+        "leftUturnCount": 6,
+        "rightUturnCount": 5,
+        "xLeftApprox": 437,
+        "xRightApprox": 513,
+        "inOutEndX": 537,
+        "color": "palecyanwithgray-blueoutline",
+        "note": "12runs/11Uturns,externalendsbothRIGHT,noarrowscoil."
+      },
+      "outletNeck": [
+        465,
+        279,
+        480,
+        295
+      ],
+      "valve": "Ovalverticalbody455295..493330withDIAGONALwhitehandlecapsule447322→489295",
+      "bottomPipeWalls": [
+        [
+          465,
+          330,
+          465,
+          357
+        ],
+        [
+          480,
+          330,
+          480,
+          357
+        ]
+      ],
+      "drip": "Onepalebluegrayteardropsilhouette~473365,noadditionaldrops."
+    },
+    "blackFlowArrows": [
+      {
+        "from": [
+          58,
+          188
+        ],
+        "to": [
+          113,
+          188
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          224,
+          188
+        ],
+        "to": [
+          258,
+          188
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          390,
+          234
+        ],
+        "to": [
+          425,
+          234
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          372,
+          67
+        ],
+        "to": [
+          315,
+          67
+        ],
+        "dir": "LEFT"
+      },
+      {
+        "from": [
+          215,
+          100
+        ],
+        "to": [
+          215,
+          154
+        ],
+        "dir": "DOWN"
+      }
+    ],
+    "counts": "2H2+N2labels/5blackheads/1compressor/1reactorstrip/1cooler12runcoil/1valve+1teardropshape;noequation/pressuretempnumbers/extraarrows.",
+    "critical": "ExactAmmonia lỏngEnglishfirstword,notAmoniacrewrite;NH3onlybottomgray;catalyststripnotaddFeformula/theory. Allleadersnotflowheads."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

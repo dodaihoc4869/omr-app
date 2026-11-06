@@ -1,0 +1,22 @@
+[
+  {
+    "i": 275,
+    "hashSvg": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: ĐãmởRIÊNG275/225nativefull,12ringzooms3x,glyphm/n+branch4xcả2nguồn,đọcđủ4publicrefs/stems;tựfresh-renderChromiumexactSVG53455B/hashe6bb7b68vàmởactualfull1x/2rowzooms2x. Đủ6rings/30Hđơn5mỗiring(gồmC5Hdown)/15OH/5CH₂OHgắnCđầu+1CH₂/5externalO. BranchupperRIGHTC1→O→CH₂(C6)bottomMIDDLE→C5đúng,khôngđổisanggóckhác;endOHtopLEFTC4down/bottomLEFTC4down/bottomRIGHTC1down. TOPbracketm/BOTTOMbracketnđúngglyphvàcrosslinks;12frontdiagonalsuniformkhôngtaper,6ngangbold. GapsquanhOH/H/CH2/textm-n/bridgeO/phầnbranchsạch,khôngchạm/cắt/tràn;khôngthêmtên/charge/Cnumbering/ellipsis.",
+    "sourceHash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+    "fileNguon": "anh/2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866.png",
+    "svg": "polysaccharide-phan-nhanh-ddh-e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b.svg",
+    "byteSvg": 53455,
+    "baseI": 225,
+    "baseHash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+    "actualRender": "/workspace/scratch/branched222-e6bb7b68-chromium.png",
+    "actualRowZooms": [
+      "/workspace/scratch/branched222-e6bb7b68-top-2x.png",
+      "/workspace/scratch/branched222-e6bb7b68-bottom-2x.png"
+    ],
+    "renderMethod": "FreshChromiumPlaywright exactSVGbytes inDOM,locatorSVG screenshot deviceScaleFactor2;SHA256source/base/SVGverified.",
+    "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+    "hashSvgDaSoat": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b"
+  }
+]

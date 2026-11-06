@@ -1,0 +1,524 @@
+{
+  "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+  "file": "anh/2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866.png",
+  "mime": "image/png",
+  "bytes": 32363,
+  "i": 275,
+  "questions": [
+    {
+      "qid": "12-C2-B6-D2-I-33",
+      "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chin.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+          "where": "12-C2-B6-D2-I-33.hinh.0.du_lieu",
+          "hashDataUrl": "b296a3fba99e6940a3bf6c8818fb457f5d0b2abf7e51e4daac4cdd36c8605a54",
+          "publicPosition": {
+            "where": "12-C2-B6-D2-I-33.hinh.0.du_lieu",
+            "hashDataUrl": "b296a3fba99e6940a3bf6c8818fb457f5d0b2abf7e51e4daac4cdd36c8605a54",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-113",
+      "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chin.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+          "where": "DB-12-B4-D3-I-113.hinh.0.du_lieu",
+          "hashDataUrl": "b296a3fba99e6940a3bf6c8818fb457f5d0b2abf7e51e4daac4cdd36c8605a54",
+          "publicPosition": {
+            "where": "DB-12-B4-D3-I-113.hinh.0.du_lieu",
+            "hashDataUrl": "b296a3fba99e6940a3bf6c8818fb457f5d0b2abf7e51e4daac4cdd36c8605a54",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "nativeSize": [
+    1309,
+    562
+  ],
+  "fileNguon": "anh/2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866.png",
+  "baseI": 225,
+  "baseHash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+  "baseFile": "anh/26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4.png",
+  "baseNativeSize": [
+    1235,
+    534
+  ],
+  "baseQuestions": [
+    {
+      "qid": "12-KT-C2-D3-I-17",
+      "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chín.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+          "where": "12-KT-C2-D3-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84",
+          "publicPosition": {
+            "where": "12-KT-C2-D3-I-17.hinh.0.du_lieu",
+            "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-156",
+      "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chín.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+      "refs": [
+        {
+          "hash": "26aeade244c7dd9029e4b3d97d4365c9295cb7e312556ccfedd88edaa4cee2e4",
+          "where": "DB-12-B4-D3-I-156.hinh.0.du_lieu",
+          "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84",
+          "publicPosition": {
+            "where": "DB-12-B4-D3-I-156.hinh.0.du_lieu",
+            "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "baseSvg": "polysaccharide-phan-nhanh-ddh-e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b.svg",
+  "hashSvgDaMo": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b",
+  "byteSvg": 53455,
+  "daMo2NativeFull": true,
+  "daMo12RingZooms3x": true,
+  "daMoGlyphm_n_branch4xBoth": true,
+  "units": [
+    {
+      "unit": 1,
+      "row": "top",
+      "position": "left",
+      "nodesApprox": {
+        "C4": [
+          62,
+          143
+        ],
+        "C5": [
+          111,
+          94
+        ],
+        "ringO": [
+          179,
+          95
+        ],
+        "C1": [
+          230,
+          143
+        ],
+        "C2": [
+          179,
+          195
+        ],
+        "C3": [
+          111,
+          195
+        ]
+      },
+      "substituents": {
+        "C4": "Hup,OHdown(end)",
+        "C5": "CH2OHup(Cfirstanchor),Hdown",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "Hup,bridgeOdownright"
+      },
+      "standaloneH": 5,
+      "front": "Haiđườngchéotrướcrộngđều,KHÔNGTAPER;ngangC3–C2đậmriêng. Đãsoátzoom3xRIÊNGmỗiringcả2source."
+    },
+    {
+      "unit": 2,
+      "row": "top",
+      "position": "middle",
+      "nodesApprox": {
+        "C4": [
+          341,
+          142
+        ],
+        "C5": [
+          391,
+          94
+        ],
+        "ringO": [
+          460,
+          94
+        ],
+        "C1": [
+          509,
+          142
+        ],
+        "C2": [
+          460,
+          193
+        ],
+        "C3": [
+          391,
+          193
+        ]
+      },
+      "substituents": {
+        "C4": "Hup,bridgeOdownleft",
+        "C5": "CH2OHup(Cfirstanchor),Hdown",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "Hup,bridgeOdownright"
+      },
+      "standaloneH": 5,
+      "front": "Haiđườngchéotrướcrộngđều,KHÔNGTAPER;ngangC3–C2đậmriêng. Đãsoátzoom3xRIÊNGmỗiringcả2source."
+    },
+    {
+      "unit": 3,
+      "row": "top",
+      "position": "right",
+      "nodesApprox": {
+        "C4": [
+          625,
+          143
+        ],
+        "C5": [
+          674,
+          94
+        ],
+        "ringO": [
+          742,
+          95
+        ],
+        "C1": [
+          791,
+          143
+        ],
+        "C2": [
+          742,
+          195
+        ],
+        "C3": [
+          674,
+          195
+        ]
+      },
+      "substituents": {
+        "C4": "Hup,bridgeOdownleft",
+        "C5": "CH2OHup(Cfirstanchor),Hdown",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "Hup,bridgeOdownright"
+      },
+      "standaloneH": 5,
+      "front": "Haiđườngchéotrướcrộngđều,KHÔNGTAPER;ngangC3–C2đậmriêng. Đãsoátzoom3xRIÊNGmỗiringcả2source."
+    },
+    {
+      "unit": 4,
+      "row": "bottom",
+      "position": "left",
+      "nodesApprox": {
+        "C4": [
+          514,
+          408
+        ],
+        "C5": [
+          563,
+          357
+        ],
+        "ringO": [
+          632,
+          359
+        ],
+        "C1": [
+          682,
+          408
+        ],
+        "C2": [
+          632,
+          461
+        ],
+        "C3": [
+          563,
+          461
+        ]
+      },
+      "substituents": {
+        "C4": "Hup,OHdown(end)",
+        "C5": "CH2OHup(Cfirstanchor),Hdown",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "Hup,bridgeOdownright"
+      },
+      "standaloneH": 5,
+      "front": "Haiđườngchéotrướcrộngđều,KHÔNGTAPER;ngangC3–C2đậmriêng. Đãsoátzoom3xRIÊNGmỗiringcả2source."
+    },
+    {
+      "unit": 5,
+      "row": "bottom",
+      "position": "middle",
+      "nodesApprox": {
+        "C4": [
+          793,
+          406
+        ],
+        "C5": [
+          841,
+          355
+        ],
+        "ringO": [
+          910,
+          357
+        ],
+        "C1": [
+          960,
+          406
+        ],
+        "C2": [
+          910,
+          459
+        ],
+        "C3": [
+          841,
+          459
+        ]
+      },
+      "substituents": {
+        "C4": "Hup,bridgeOdownleft",
+        "C5": "CH2up(branchC6),Hdown",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "Hup,bridgeOdownright"
+      },
+      "standaloneH": 5,
+      "front": "Haiđườngchéotrướcrộngđều,KHÔNGTAPER;ngangC3–C2đậmriêng. Đãsoátzoom3xRIÊNGmỗiringcả2source."
+    },
+    {
+      "unit": 6,
+      "row": "bottom",
+      "position": "right",
+      "nodesApprox": {
+        "C4": [
+          1076,
+          408
+        ],
+        "C5": [
+          1127,
+          357
+        ],
+        "ringO": [
+          1195,
+          358
+        ],
+        "C1": [
+          1245,
+          408
+        ],
+        "C2": [
+          1195,
+          461
+        ],
+        "C3": [
+          1127,
+          461
+        ]
+      },
+      "substituents": {
+        "C4": "Hup,bridgeOdownleft",
+        "C5": "CH2OHup(Cfirstanchor),Hdown",
+        "C3": "OHup,Hdown",
+        "C2": "Hup,OHdown",
+        "C1": "Hup,OHdown(end)"
+      },
+      "standaloneH": 5,
+      "front": "Haiđườngchéotrướcrộngđều,KHÔNGTAPER;ngangC3–C2đậmriêng. Đãsoátzoom3xRIÊNGmỗiringcả2source."
+    }
+  ],
+  "counts": {
+    "rings": 6,
+    "standaloneH": 30,
+    "OH": 15,
+    "CH2OH": 5,
+    "CH2": 1,
+    "externalO": 5,
+    "ringO": 6,
+    "frontUniformDiagonals": 12,
+    "frontBoldHorizontals": 6,
+    "bracketPairs": 2,
+    "ellipsis": 0,
+    "caption": 0
+  },
+  "externalOApprox": [
+    [
+      284,
+      183
+    ],
+    [
+      564,
+      182
+    ],
+    [
+      845,
+      183
+    ],
+    [
+      735,
+      448
+    ],
+    [
+      1015,
+      447
+    ]
+  ],
+  "branch": {
+    "from": "topRIGHTC1→externalO→C6(CH2)ofbottomMIDDLE→bottomMIDDLEC5",
+    "upperOApprox": [
+      845,
+      183
+    ],
+    "upperVerticalBondApprox": [
+      [
+        845,
+        196
+      ],
+      [
+        844,
+        298
+      ]
+    ],
+    "CH2LabelApprox": [
+      853,
+      313
+    ],
+    "lowerBondApprox": [
+      [
+        841,
+        327
+      ],
+      [
+        841,
+        355
+      ]
+    ],
+    "literal": "CH₂,KHÔNGCH₂OHởđây;branchvàoC6củavòngdướigiữa,khôngC4/C1/đổivòngdướiphải"
+  },
+  "brackets": {
+    "top": {
+      "leftApprox": [
+        [
+          325,
+          32
+        ],
+        [
+          315,
+          32
+        ],
+        [
+          315,
+          254
+        ],
+        [
+          325,
+          254
+        ]
+      ],
+      "rightApprox": [
+        [
+          585,
+          35
+        ],
+        [
+          595,
+          35
+        ],
+        [
+          595,
+          258
+        ],
+        [
+          585,
+          258
+        ]
+      ],
+      "glyph": "m",
+      "glyphPositionApprox": [
+        607,
+        263
+      ]
+    },
+    "bottom": {
+      "leftApprox": [
+        [
+          776,
+          295
+        ],
+        [
+          766,
+          295
+        ],
+        [
+          766,
+          518
+        ],
+        [
+          776,
+          518
+        ]
+      ],
+      "rightApprox": [
+        [
+          1035,
+          298
+        ],
+        [
+          1046,
+          298
+        ],
+        [
+          1046,
+          522
+        ],
+        [
+          1035,
+          522
+        ]
+      ],
+      "glyph": "n",
+      "glyphPositionApprox": [
+        1055,
+        527
+      ]
+    },
+    "literal": "Topm/bottomnđãxemglyph4x;khôngđảovịtrí/khôngthaythànhsốhaylũythừa."
+  },
+  "endOH": [
+    "topLEFTC4down",
+    "bottomLEFTC4down",
+    "bottomRIGHTC1down"
+  ],
+  "caption": [],
+  "noExtraData": [
+    "tênXtrongfigure",
+    "amylopectincaption",
+    "Cnumbering",
+    "nêmtaper",
+    "charge",
+    "arrow",
+    "dottedcontinuation"
+  ],
+  "comparison": "ĐãsoRIÊNG2nativefull/12ringzooms/6glyphbranchzooms vàfreshactualexistingSVG198full1x+top/bottom2x. Mọiatom/label/HOdirection/bond/branch/bracketkhớp;kháckíchthướcvàmargin,khôngkhácnộidung. Khôngdùngtênhayranking/pHash.",
+  "actualRender": "/workspace/scratch/branched222-e6bb7b68-chromium.png",
+  "actual1x": "/workspace/scratch/branched222-e6bb7b68-1x.png",
+  "actualRowZooms": [
+    "/workspace/scratch/branched222-e6bb7b68-top-2x.png",
+    "/workspace/scratch/branched222-e6bb7b68-bottom-2x.png"
+  ],
+  "nguoiDocNguon": "soat_nguon_2",
+  "verdict": "Đạt dùng chung exacthashe6bb7b68cho275;khôngaliasbằngfingerprint."
+}

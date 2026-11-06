@@ -1,0 +1,42 @@
+[
+  {
+    "i": 275,
+    "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+    "fileNguon": "anh/2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866.png",
+    "svg": "polysaccharide-phan-nhanh-ddh-e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b.svg",
+    "hashSvg": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b",
+    "byteSvg": 53455,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D2-I-33",
+        "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chin.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+            "where": "12-C2-B6-D2-I-33.hinh.0.du_lieu",
+            "hashDataUrl": "b296a3fba99e6940a3bf6c8818fb457f5d0b2abf7e51e4daac4cdd36c8605a54"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-113",
+        "de": "Quan sát hình sau đây:\nCho các phát biểu sau:\n(a) X có nhiều trong trái cây chin.\n(b) X có cấu trúc mạch phân nhánh.\n(c) X có vị ngọt hơn glucose.\n(d) X chiếm tỉ lệ lớn trong thành phần gạo nếp.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "2eac7fa27ff347ba01a32772fcc838cd9ed170df1f0441313aea96b85d7ef866",
+            "where": "DB-12-B4-D3-I-113.hinh.0.du_lieu",
+            "hashDataUrl": "b296a3fba99e6940a3bf6c8818fb457f5d0b2abf7e51e4daac4cdd36c8605a54"
+          }
+        ]
+      }
+    ],
+    "geometryBaseSource": 225,
+    "canvasNguon": "Hai bản quét khác tỷ lệ, không pixel identical; kiểm riêng mọi nét trước dùng chung.",
+    "ghiChuDung": "6rings30H15OH/5CH2OH+1CH2/5externalO/branchlowerMIDDLEC6/2bracketsTOPmBOTTOMn/uniformdiags6bold/endOH/noX-captionadded/DDHpath;khôngphashapprove.",
+    "hashSvgDaSoat": "e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
