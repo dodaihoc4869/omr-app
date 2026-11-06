@@ -54,6 +54,15 @@ async function dinhKinh(env: Env, sbd: string, chang: readonly { questions: unkn
   return import('./loi-giai-kinh').then((m) => m.kinhChoGoiNgay(env, sbd, qids, now)).catch(() => ({}))
 }
 
+/** Kính + hình vẽ lại của các câu trong gói — HAI câu D1 chạy SONG SONG (một đợt chờ, như khi chỉ có Kính). */
+async function dinhKem(env: Env, sbd: string, chang: readonly { questions: unknown[] }[], now: number): Promise<{ kinh: Record<string, string>; hinhVe: { ban: Record<string, unknown[]>; hoi: string[] } }> {
+  const [kinh, hinhVe] = await Promise.all([
+    dinhKinh(env, sbd, chang, now),
+    import('./hinh-ve').then((m) => m.hinhVeChoGoiNgay(env, chang.flatMap((c) => c.questions))).catch(() => ({ ban: {}, hoi: [] as string[] })),
+  ])
+  return { kinh, hinhVe }
+}
+
 /** Lập gói cả ngày cho em. Không có kế hoạch / thầy tạm dừng ⇒ gói rỗng. `caNgay`: lập trọn ngày (tối đa 8 chặng = 48 câu + Kính). */
 export async function goiNgay7(env: Env, sbd: string, now: number, caNgay = false): Promise<Record<string, unknown>> {
   if (!goiNgayBat(sbd)) return { ok: true, tat: true, sbd }
@@ -68,7 +77,7 @@ export async function goiNgay7(env: Env, sbd: string, now: number, caNgay = fals
     const ve = await niemMa(env, aadVe(sbd, ban.ngay), { r: c.refs, g: c.goiIds }, now, HAN_NIEM_CHUAN_BI_MS)
     if (ve) {
       const chang = [{ ve, questions: c.questions as Record<string, unknown>[] }]
-      return { ok: true, sbd, ngay: ban.ngay, luc: now, chang, goi7: c.goi7, tuBanSan: true, kinh: await dinhKinh(env, sbd, chang, now) }
+      return { ok: true, sbd, ngay: ban.ngay, luc: now, chang, goi7: c.goi7, tuBanSan: true, ...(await dinhKem(env, sbd, chang, now)) }
     }
   }
   const soChang = caNgay ? SO_CHANG_CA_NGAY : SO_CHANG_GOI
@@ -86,7 +95,7 @@ export async function goiNgay7(env: Env, sbd: string, now: number, caNgay = fals
     if (!ve) return { ok: false, error: 'Chưa lập được gói bài hôm nay.' }
     chang.push({ ve, questions })
   }
-  return { ok: true, sbd, ngay: x.ngay, luc: now, chang, goi7: x.goi7, kinh: await dinhKinh(env, sbd, chang, now) }
+  return { ok: true, sbd, ngay: x.ngay, luc: now, chang, goi7: x.goi7, ...(await dinhKem(env, sbd, chang, now)) }
 }
 
 /** Mở phiên từ gói. `b.ves` (hoặc `b.ve` của máy em cũ) = các bộ ref niêm phong (≤ 4 chặng của gói — máy em ghép câu còn lại cho đủ một chặng); `b.qids` (tuỳ chọn) =

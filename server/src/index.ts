@@ -202,7 +202,8 @@ async function traLoiNopBtvn(nop:()=>Promise<Response>):Promise<Response> {
 async function raChua(res: Response): Promise<Response> { return ra(await res.json(), res.status) }
 
 function laThay(req: Request, env: Env, body: Record<string, unknown>): boolean {
-  const gui = String(body.secret ?? req.headers.get('x-ma-bi-mat') ?? '').trim()
+  // `x-omr-secret`: cùng mã, tên đầu mục để bộ giữ khoá của phiên Claude Code đám mây tự cắm (máy vẽ hình chạy không cần biến OMR_MA_BI_MAT — 06/11).
+  const gui = String(body.secret ?? req.headers.get('x-ma-bi-mat') ?? req.headers.get('x-omr-secret') ?? '').trim()
   return gui.length > 0 && gui === String(env.MA_BI_MAT ?? '').trim()
 }
 

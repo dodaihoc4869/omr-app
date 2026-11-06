@@ -76,6 +76,19 @@ describe('kho gói cả ngày', () => {
     expect(raw.tn1?.dm).toBe('iv1.ct1')
     expect(raw.tn2?.dm).toBe('')
   })
+
+  it('gói cả ngày mang theo `hinhVe` ⇒ hình vẽ lại có sẵn trên máy, hinhVeCua không gọi /hs/hinh-ve (06/11)', async () => {
+    const canh = { phienBan: 1, tieuDe: 'Công thức chiếu Fischer', canh: { loai: 'fischer', dau: 'CHO', cuoi: 'CH2OH', hang: [['H', 'OH'], ['HO', 'H']] } }
+    const { hinhVeCua } = await import('../src/lib/hinh-ve/tai') // nạp TRƯỚC gói: kho trong bộ nhớ đã đọc ⇒ vẫn phải thấy cảnh gói ghi sau
+    expect(await hinhVeCua('tn-truoc')).toEqual([])
+    await napGoiNgay('tk', vi.fn(async () => ({ ...goiMau(), hinhVe: { ban: { tn1: [canh] }, hoi: ['tn1', 'tn2'] } })))
+    const api = await import('../src/lib/loi-giai-api')
+    const goiHs = vi.spyOn(api, 'goiHs')
+    expect((await hinhVeCua('tn1')).map((h) => h.canh.loai)).toEqual(['fischer'])
+    expect(await hinhVeCua('tn2')).toEqual([])
+    expect(goiHs).not.toHaveBeenCalled()
+    goiHs.mockRestore()
+  })
 })
 
 describe('màn làm bài mở chặng từ gói', () => {

@@ -45,7 +45,7 @@ const TOI_DA_HIEN = 150
 /** Buổi thầy đang xem gần nhất — chỉ dùng trong cùng ngày (giờ VN). */
 const KHOA_BUOI_NHO = 'ddh.gv.buoi-xem'
 const ngayVn = () => new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10)
-const laTest = typeof process !== 'undefined' && !!process.env?.VITEST
+const laTest = !!(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 function docBuoiNho(): string {
   if (laTest) return ''
   try {

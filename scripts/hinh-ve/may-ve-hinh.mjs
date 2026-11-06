@@ -29,14 +29,17 @@ const SO_ANH = Math.max(1, Math.min(8, Number(lay('--so', '5')) || 5))
 const MODEL = lay('--model', '')
 const THU_MUC_LAM = process.env.OMR_THU_MUC_LAM_HINH || path.join(GOC, '.may-ve-hinh')
 const SECRET = (process.env.OMR_MA_BI_MAT || '').trim()
-if (!SECRET) { console.error('Thiếu biến OMR_MA_BI_MAT'); process.exit(2) }
+// OMR_MA_QUA_PROXY=1 (06/11): phiên đám mây có khoá «x-omr-secret» lưu ở môi trường — bộ proxy tự cắm mã vào lệnh gửi máy chủ, máy vẽ KHÔNG giữ mã.
+const QUA_PROXY = process.env.OMR_MA_QUA_PROXY === '1'
+if (!SECRET && !QUA_PROXY) { console.error('Thiếu biến OMR_MA_BI_MAT (hoặc đặt OMR_MA_QUA_PROXY=1 khi môi trường đã lưu khoá x-omr-secret)'); process.exit(2) }
+const DAU_MA = SECRET ? { 'x-ma-bi-mat': SECRET } : {}
 
 const ngu = (ms) => new Promise((r) => setTimeout(r, ms))
 const gio = () => new Date().toLocaleTimeString('vi-VN', { hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })
 const docJson = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')) } catch { return null } }
 async function goi(duong, body, lan = 0) {
   try {
-    const r = await fetch(`${MAY_CHU}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': SECRET }, body: JSON.stringify(body), signal: AbortSignal.timeout(120_000) })
+    const r = await fetch(`${MAY_CHU}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', ...DAU_MA }, body: JSON.stringify(body), signal: AbortSignal.timeout(120_000) })
     const j = await r.json().catch(() => ({ ok: false, error: `máy chủ trả ${r.status}` }))
     if (r.status >= 500 && lan < 4) { await ngu(3000 * 2 ** lan); return goi(duong, body, lan + 1) }
     return j

@@ -121,6 +121,7 @@ it('em có bản sẵn (cron) còn dùng được ⇒ gói lấy đúng chặng 
   expect(goiCaNgay.tuBanSan).toBeUndefined()
   expect(goiCaNgay.chang.length).toBeGreaterThan(1)
   expect(typeof goiCaNgay.kinh).toBe('object')
+  expect((goiCaNgay as unknown as { hinhVe?: { ban: object; hoi: string[] } }).hinhVe).toMatchObject({ ban: {}, hoi: [] }) // 06/11: hình vẽ lại đi kèm gói (kho thử không có ảnh đề)
 })
 
 it('máy em ghép câu của hai chặng trong gói (`ves` + `qids`) ⇒ phiên đúng các câu ấy, tối đa 6; một `ve` hỏng ⇒ GOI_CU', async () => {

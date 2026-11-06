@@ -185,6 +185,7 @@ export function napGoiNgay(token: string, goi: typeof goiHoa2 = goiHoa2, now: nu
     ghiJson(khoaGoi(r.sbd), g)
     ghiJson(KHOA_CUA, { sbd: r.sbd, t: duoiToken(token) })
     if (r.kinh && typeof r.kinh === 'object') luuKinhTuGoi(r.kinh as Record<string, unknown>, r.ngay, now)
+    if (r.hinhVe && typeof r.hinhVe === 'object') luuHinhVeTuGoi(r.hinhVe as { ban?: unknown; hoi?: unknown }, now)
     napAnhSan(chang.flatMap((c) => c.questions).slice(0, CAU_MOI_CHANG_GOI * 2))
   }).catch(() => {}).finally(() => { napDang = null })
   return napDang
@@ -199,6 +200,18 @@ function luuKinhTuGoi(kinh: Record<string, unknown>, ngay: string, luc: number):
     else if (dm === '' && !moi[q]?.dm) moi[q] = { dm: '', ngay, luc }
   }
   ghiJson('ddh.kinh.v1', moi)
+}
+
+/** Hình của đề VẼ LẠI đi kèm gói (thầy 06/11 «tải sẵn cho app hs»): ghi thẳng vào kho `ddh.hv.v1` của `lib/hinh-ve/tai.ts` (cùng khuôn `{h, ms}`) ⇒ mở câu là có
+ *  hình, không gọi `/hs/hinh-ve`. Câu đã hỏi mà chưa có cảnh ⇒ ghi «chưa có» (tai.ts tự hỏi lại sau 30 phút). Ghi trực tiếp để KHÔNG kéo tai.ts vào mảnh mở app. */
+function luuHinhVeTuGoi(hv: { ban?: unknown; hoi?: unknown }, ms: number): void {
+  const ban = hv.ban && typeof hv.ban === 'object' ? (hv.ban as Record<string, unknown>) : {}
+  const hoi = Array.isArray(hv.hoi) ? hv.hoi.filter((q): q is string => typeof q === 'string' && !!q) : []
+  if (!hoi.length) return
+  const kho = (docJson('ddh.hv.v1') ?? {}) as Record<string, { h: unknown[]; ms: number }>
+  for (const q of hoi) { const h = ban[q]; delete kho[q]; kho[q] = { h: Array.isArray(h) ? h : [], ms } }
+  const ds = Object.entries(kho)
+  ghiJson('ddh.hv.v1', ds.length > 300 ? Object.fromEntries(ds.slice(-300)) : kho)
 }
 
 /** Nạp sẵn ẢNH ĐỀ của chặng kế (hình đề, thân câu, hình phương án / ý — không hình lời giải) lúc máy rảnh: mở chặng là hình có ngay, mạng yếu không chờ tải. */

@@ -187,6 +187,33 @@ function gomCanh(rows: readonly Obj[] | undefined): Record<string, unknown[]> {
   return ra
 }
 
+/**
+ * Cảnh đạt cho các câu trong GÓI BÀI CẢ NGÀY (thầy 06/11 «tải sẵn cho app hs»): đi kèm `hoc-tap-goi-ngay` để máy em có hình vẽ lại sẵn, không gọi `/hs/hinh-ve`.
+ * Chỉ hỏi câu có ảnh CỦA ĐỀ. MỘT câu D1, chạy song song với Kính (không thêm đợt chờ nối tiếp). Lỗi ⇒ {} (máy em tự xin lười như cũ).
+ * Trả `{ ban, hoi }`: `hoi` = mọi qid đã hỏi (câu không có cảnh ⇒ máy em ghi «chưa có», khỏi hỏi lại).
+ * Gói cả ngày đã qua cổng «hôm nay chỉ làm kiểm tra» (game-v2.ts) và bộ lọc câu bảo vệ của kế hoạch — cùng phạm vi với Kính đi kèm gói.
+ */
+export async function hinhVeChoGoiNgay(env: Env, questions: readonly unknown[]): Promise<{ ban: Record<string, unknown[]>; hoi: string[] }> {
+  const vao: string[] = []
+  for (const q of questions) {
+    if (!q || typeof q !== 'object') continue
+    const o = q as { qid?: unknown; hinhAnh?: unknown }
+    const qid = str(o.qid).slice(0, 200)
+    const coDe = Array.isArray(o.hinhAnh) && o.hinhAnh.some((h) => h && typeof h === 'object' && laViTriDe(str((h as { viTri?: unknown }).viTri)))
+    if (qid && coDe && !vao.includes(qid)) vao.push(qid)
+  }
+  if (!vao.length) return { ban: {}, hoi: [] }
+  try {
+    const { qidTraSoDo } = await import('./loi-giai-so-do')
+    const tra = new Map(vao.map((q) => [q, qidTraSoDo(q)]))
+    const r = await sqlHinhTheoQid(env, [...new Set([...tra.values()].flat())]).all<Obj>()
+    const goc = gomCanh(r.results)
+    const ban: Record<string, unknown[]> = {}
+    for (const q of vao) { const h = (tra.get(q) ?? [q]).map((x) => goc[x]).find(Boolean); if (h) ban[q] = h }
+    return { ban, hoi: vao }
+  } catch { return { ban: {}, hoi: [] } }
+}
+
 /** `/gv/hinh-ve {qids}` — app thầy / màn chiếu (sau cổng mã bí mật). */
 export async function gvHinhVe(env: Env, b: Obj) {
   await damBaoBangHinh(env)

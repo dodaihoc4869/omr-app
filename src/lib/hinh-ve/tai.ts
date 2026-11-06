@@ -14,8 +14,18 @@ function kho(): Luu {
   try { const v = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}'); nho = v && typeof v === 'object' ? (v as Luu) : {} } catch { nho = {} }
   return nho
 }
+/** Đọc MỚI từ đĩa: gói cả ngày (mo-chang-truoc.ts) có thể đã ghi cảnh sau khi tệp này nạp. */
+function docDia(): Luu {
+  try { const v = JSON.parse(localStorage.getItem(KHOA_LUU) || '{}'); return v && typeof v === 'object' ? (v as Luu) : {} } catch { return {} }
+}
 function luu(): void {
-  try { const ds = Object.entries(kho()); if (ds.length > 300) nho = Object.fromEntries(ds.slice(-300)); localStorage.setItem(KHOA_LUU, JSON.stringify(nho)) } catch { /* hết chỗ / chặn lưu */ }
+  try {
+    // Gộp với đĩa (giữ bản mới hơn) để không xoá cảnh gói cả ngày vừa ghi.
+    const dia = docDia(), bo = kho()
+    for (const [q, x] of Object.entries(dia)) if (x && typeof x.ms === 'number' && (!bo[q] || bo[q]!.ms < x.ms)) bo[q] = x
+    const ds = Object.entries(bo); nho = ds.length > 300 ? Object.fromEntries(ds.slice(-300)) : bo
+    localStorage.setItem(KHOA_LUU, JSON.stringify(nho))
+  } catch { /* hết chỗ / chặn lưu */ }
 }
 const conHan = (x: { h: unknown[]; ms: number } | undefined) => !!x && Date.now() - x.ms < (x.h.length ? HAN_CO : HAN_KHONG)
 const lamSach = (h: unknown[]): HinhVeLai[] => h.map(hinhVeDungDuoc).filter((x): x is HinhVeLai => !!x)
@@ -45,6 +55,8 @@ function xinGom(qid: string): Promise<void> {
 export async function hinhVeCua(qid: string): Promise<HinhVeLai[]> {
   const x = kho()[qid]
   if (conHan(x)) return lamSach(x!.h)
+  const d = docDia()[qid] // gói cả ngày đã tải sẵn sau lần đọc đầu
+  if (conHan(d)) { kho()[qid] = d!; return lamSach(d!.h) }
   await xinGom(qid)
   return lamSach(kho()[qid]?.h ?? [])
 }
