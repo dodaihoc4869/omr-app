@@ -1775,7 +1775,7 @@
     "caption": [],
     "nguoiDocNguon": "cau_truc_6",
     "daMoNguonDayDu": true,
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "bi-loai-lo-220-thieu-nhan-CH3-literal",
     "svg": "cau-truc-ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5.svg",
     "hashSvg": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
     "byteSvg": 5082,
@@ -1786,7 +1786,8 @@
     "hashSvgDaSoat": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
     "nguoiSoat": "soat_hinh_vector",
     "phuongPhapSoat": "Mở riêng nguồn đúng hash và PNG mới, đối chiếu kết nối/số C/nhóm chức/điện tích/caption; không xác nhận từ thumbnail hoặc chỉ từ SMILES.",
-    "suaMaHoa": "Chỉ sửa khai báo XML sang UTF-8; so raster trước/sau đúng0pixel khác."
+    "suaMaHoa": "Chỉ sửa khai báo XML sang UTF-8; so raster trước/sau đúng0pixel khác.",
+    "lyDoLoai": "Graphamphetaminekhôngsai,nhưngkhônggiữCH3explicitvàbốcụcnguồn1347;thu hồi cho source1347đểthaybảnliteralđãsoátmới."
   },
   {
     "i": 1367,

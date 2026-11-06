@@ -1,0 +1,40 @@
+[
+  {
+    "i": 253,
+    "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+    "fileNguon": "anh/2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31.png",
+    "svg": "monolaurate-ddh-81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1.svg",
+    "hashSvg": "81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1",
+    "byteSvg": 15322,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B5-II-16",
+        "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+        "refs": [
+          {
+            "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+            "where": "12-C2-B5-II-16.hinh.0.du_lieu",
+            "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-II-52",
+        "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+        "refs": [
+          {
+            "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+            "where": "DB-12-B5-D2-II-52.hinh.0.du_lieu",
+            "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "H3C(H2C)9H2C literal/ester2O/sixring+five/7OH-HO/4TAPER2horizontalbold/fiveRing2CH2OHimplicit+sixRingesterifiedCH2/noextraH-stereo-caption/DDHpath.",
+    "hashSvgDaSoat": "81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

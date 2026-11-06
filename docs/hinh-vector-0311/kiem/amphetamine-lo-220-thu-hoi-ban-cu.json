@@ -1,0 +1,65 @@
+{
+  "ketQua": "Cần sửa literal-source1347/259: CH3explicit+NH2down; bản cũ cùng graph nhưng bỏ nhãnCH3. Không phán sai graphcho mọi nguồn khác. Thu hồi source1347,kiểm riêng hashmới1347+259.",
+  "metadataCu": [
+    {
+      "file": "cau-truc-lo-3-ban-dung.json",
+      "rowCu": {
+        "i": 1347,
+        "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+        "fileNguon": "anh/f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46.png",
+        "smiles": "CC(N)Cc1ccccc1",
+        "caption": [],
+        "nguoiDocNguon": "cau_truc_6",
+        "daMoNguonDayDu": true,
+        "trangThai": "da-soat-doc-lap",
+        "svg": "cau-truc-ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5.svg",
+        "hashSvg": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
+        "byteSvg": 5082,
+        "smilesChuan": "CC(N)Cc1ccccc1",
+        "congThuc": "C9H13N",
+        "soNguyenTuNang": 10,
+        "rdkit": "2026.09.1",
+        "hashSvgDaSoat": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
+        "nguoiSoat": "soat_hinh_vector",
+        "phuongPhapSoat": "Mở riêng nguồn đúng hash và PNG mới, đối chiếu kết nối/số C/nhóm chức/điện tích/caption; không xác nhận từ thumbnail hoặc chỉ từ SMILES.",
+        "suaMaHoa": "Chỉ sửa khai báo XML sang UTF-8; so raster trước/sau đúng0pixel khác."
+      }
+    },
+    {
+      "file": "cau-truc-phong-ddh-lo-15-ban-dung.json",
+      "rowCu": {
+        "i": 1347,
+        "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+        "fileNguon": "anh/f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46.png",
+        "smiles": "CC(N)Cc1ccccc1",
+        "caption": [],
+        "nguoiDocNguon": "cau_truc_6",
+        "daMoNguonDayDu": true,
+        "trangThai": "da-soat-doc-lap",
+        "phongApp": true,
+        "font": "DDH Rounded",
+        "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+        "svg": "cau-truc-ddh-115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29.svg",
+        "hashSvg": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
+        "byteSvg": 5797,
+        "smilesChuan": "CC(N)Cc1ccccc1",
+        "congThuc": "C9H13N",
+        "soNguyenTuNang": 10,
+        "rdkit": "2026.09.1",
+        "hashSvgDaSoat": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
+        "nguoiSoat": "soat_hinh_vector"
+      }
+    }
+  ],
+  "proofCuDaThuHoi": [
+    {
+      "i": 1347,
+      "hashSvg": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
+      "nguoiSoat": "soat_hinh_vector",
+      "ketQua": "Đạt: Phenyl-CH2-CH(NH2)-CH3 đúng,không thêm stereo; DDH rõ.",
+      "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+      "hashSvgDaSoat": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29"
+    }
+  ],
+  "gioiHanThuHoi": "Chỉsource1347(old115f6)khônggiữCH3literal;source259khôngđượcduyệttừold. Old115f6vẫncònselectedchosource1233df82e6…3642cóNH2explicitvàmethylimplicit,khôngphánsaigraphnàychocảmọinguồn. Rootđãmởnative1233riêng."
+}

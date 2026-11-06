@@ -1900,6 +1900,24 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46": {
+      "tep": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg",
+      "hashSvg": "64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721",
+      "byteSvg": 3190,
+      "byteGzip": 1281,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770": {
+      "tep": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg",
+      "hashSvg": "64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721",
+      "byteSvg": 3190,
+      "byteGzip": 1281,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "c7640157e5b9dab49b5c721bdfe60880a390cb4bf68f4c5add785e5bcd7b16d3": {
       "tep": "enzyme-ph-ddh-be6962fca4141300cd3efc3cfb584b64e006f4730a7d7845f5cc1dc75bc1e220.svg",
       "hashSvg": "be6962fca4141300cd3efc3cfb584b64e006f4730a7d7845f5cc1dc75bc1e220",
@@ -3871,15 +3889,6 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
-    "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46": {
-      "tep": "cau-truc-ddh-115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29.svg",
-      "hashSvg": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
-      "byteSvg": 5797,
-      "byteGzip": 1269,
-      "trangThai": "cau-truc-da-soat-doc-lap",
-      "canNenSang": true,
-      "font": "DDH Rounded"
-    },
     "f71ee0b4b71105ec001d18a36bafeba252ccc092d5cf90692abd06deaf70d0a8": {
       "tep": "cau-truc-ddh-ec84658eb1d93a3e06e56fa566b7119a59b7a37636d7a2e2a600e1102450f87a.svg",
       "hashSvg": "ec84658eb1d93a3e06e56fa566b7119a59b7a37636d7a2e2a600e1102450f87a",
@@ -5604,6 +5613,15 @@
       "hashSvg": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
       "byteSvg": 50092,
       "byteGzip": 14321,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31": {
+      "tep": "monolaurate-ddh-81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1.svg",
+      "hashSvg": "81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1",
+      "byteSvg": 15322,
+      "byteGzip": 2161,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -9896,6 +9914,20 @@
       ]
     },
     {
+      "qid": "12-C2-B5-II-16",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+          "where": "12-C2-B5-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028",
+          "vector": "monolaurate-ddh-81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B5-III-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -10546,6 +10578,20 @@
           "where": "12-C3-B8-D1-I-89.hinh.0.du_lieu",
           "hashDataUrl": "18e28a88ce8cd06dcca27704211dd02a3d24a6c52c9a9b77f6288fcc741ee65f",
           "vector": "soi-tick-ddh-3f19c5ad80f68c9c476bb3e0ed98fc431f8ba655cdd92c5b277283e073f0cf4b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B8-D2-I-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+          "where": "12-C3-B8-D2-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "19f949494961d030d5e23f843cefe2d8265268d76efe313f2953835a6436e682",
+          "vector": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg"
         }
       ]
     },
@@ -17446,6 +17492,20 @@
       ]
     },
     {
+      "qid": "DB-12-B5-D2-II-52",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+          "where": "DB-12-B5-D2-II-52.hinh.0.du_lieu",
+          "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028",
+          "vector": "monolaurate-ddh-81b2b0381c10736e30094b265b79f4a8f082a494571ca3657d319115b02080a1.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B5-D2-III-55",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -18116,6 +18176,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D1-I-103",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+          "where": "DB-12-B8-D1-I-103.hinh.0.du_lieu",
+          "hashDataUrl": "19f949494961d030d5e23f843cefe2d8265268d76efe313f2953835a6436e682",
+          "vector": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B8-D1-II-122",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -18637,7 +18711,7 @@
           "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
           "where": "DB-12-B8-D1-I-369.hinh.0.du_lieu",
           "hashDataUrl": "44d7e8612270e32852149ad4322cbc8f3b29dcd647a0cc1d1ec0f8369b35b604",
-          "vector": "cau-truc-ddh-115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29.svg"
+          "vector": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg"
         }
       ]
     },
@@ -23451,7 +23525,7 @@
           "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
           "where": "DH-12-C3-B8-I-83.hinh.0.du_lieu",
           "hashDataUrl": "44d7e8612270e32852149ad4322cbc8f3b29dcd647a0cc1d1ec0f8369b35b604",
-          "vector": "cau-truc-ddh-115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29.svg"
+          "vector": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg"
         }
       ]
     },
@@ -25701,6 +25775,7 @@
     "12-C2-B4-D2-II-13",
     "12-C2-B4-D2-III-38",
     "12-C2-B5-II-15",
+    "12-C2-B5-II-16",
     "12-C2-B5-III-4",
     "12-C2-B6-D1-II-3",
     "12-C2-B6-D1-I-100",
@@ -25746,6 +25821,7 @@
     "12-C3-B8-D1-I-82",
     "12-C3-B8-D1-I-84",
     "12-C3-B8-D1-I-89",
+    "12-C3-B8-D2-I-5",
     "12-C3-B8-D2-II-17",
     "12-C3-B8-D2-II-19",
     "12-C3-B8-D2-III-8",
@@ -26168,6 +26244,7 @@
     "DB-12-B6-D1-II-51",
     "DB-12-B6-D1-I-84",
     "DB-12-B6-D2-II-41",
+    "DB-12-B5-D2-II-52",
     "DB-12-B5-D2-III-55",
     "DB-12-B5-D2-III-165",
     "DB-12-B5-D2-I-217",
@@ -26212,6 +26289,7 @@
     "DB-12-B8-D1-I-81",
     "DB-12-B8-D1-I-83",
     "DB-12-B8-D1-I-88",
+    "DB-12-B8-D1-I-103",
     "DB-12-B8-D1-II-122",
     "DB-12-B8-D1-III-133",
     "DB-12-B8-D1-III-148",
@@ -28057,16 +28135,6 @@
         "hashSvg": "c3a94a7739b764b25148b42c7e044b72d891b517ac5a2830ac980334560b3531",
         "byteSvg": 1744,
         "byteGzip": 707,
-        "trangThai": "cau-truc-da-soat-doc-lap",
-        "canNenSang": true
-      }
-    ],
-    "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46": [
-      {
-        "tep": "cau-truc-ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5.svg",
-        "hashSvg": "ff8df241c3b8638c686b4bde63808980f2079728491058df63ab8d72ae1626c5",
-        "byteSvg": 5082,
-        "byteGzip": 1091,
         "trangThai": "cau-truc-da-soat-doc-lap",
         "canNenSang": true
       }

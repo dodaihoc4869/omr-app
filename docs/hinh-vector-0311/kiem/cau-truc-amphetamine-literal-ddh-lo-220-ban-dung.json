@@ -1,0 +1,80 @@
+[
+  {
+    "i": 1347,
+    "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+    "fileNguon": "anh/f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46.png",
+    "svg": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg",
+    "hashSvg": "64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721",
+    "byteSvg": 3190,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-I-369",
+        "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1: 3.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+            "where": "DB-12-B8-D1-I-369.hinh.0.du_lieu",
+            "hashDataUrl": "44d7e8612270e32852149ad4322cbc8f3b29dcd647a0cc1d1ec0f8369b35b604"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-I-83",
+        "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1: 3.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "f3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46",
+            "where": "DH-12-C3-B8-I-83.hinh.0.du_lieu",
+            "hashDataUrl": "44d7e8612270e32852149ad4322cbc8f3b29dcd647a0cc1d1ec0f8369b35b604"
+          }
+        ]
+      }
+    ],
+    "geometryBaseSource": 1347,
+    "ghiChuDung": "PhLEFT/3aromaticDOUBLE/CH3EXPLICITupperright-Cfirst/NH2DOWN-Nfirst/nocharges-stereo-caption/DDHpath;259croppeduppermatches1347fullsamepublicstem,missingbottomđọcTRỰCTIẾP1347KHÔNGđoántheory/khôngsửaảnhimmutable.",
+    "hashSvgDaSoat": "64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721",
+    "nguoiSoat": "cau_truc_4"
+  },
+  {
+    "i": 259,
+    "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+    "fileNguon": "anh/2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770.png",
+    "svg": "amphetamine-literal-ddh-64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721.svg",
+    "hashSvg": "64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721",
+    "byteSvg": 3190,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-I-5",
+        "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1 : 3.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+            "where": "12-C3-B8-D2-I-5.hinh.0.du_lieu",
+            "hashDataUrl": "19f949494961d030d5e23f843cefe2d8265268d76efe313f2953835a6436e682"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-I-103",
+        "de": "Amphetamine (còn được gọi là hồng phiến) là một dạng chất ma tuý có tác dụng gây kích thích thần kinh, tăng cường sức chịu đựng, tăng cảm giác hưng phấn, nếu sử dụng quá liều sẽ gây nghiện, dẫn đến lạm dụng; ảnh hưởng xấu đến hệ thần kinh; gây rối loạn nhịp tim, tăng hoặc giảm huyết áp; gây rối loạn nhịp thở, co giật; suy nhược cơ thể. Amphetamine có cấu tạo như sau:\nCho các phát biểu sau đây:\n(a) 1 mol amphetamine tác dụng tối đa với 1 mol HCl.\n(b) Amphetamine là amine bậc 2.\n(c) Đốt cháy hoàn toàn 0,1 mol amphetamine thu được 0,1 mol N₂.\n(d) Công thức phân tử của amphetamine C₉H₁₂N.\n(e) Ở điều kiện thích hợp, amphetamine có thể tham gia phản ứng cộng H₂ theo tỷ lệ mol 1 : 3.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "2ca5723dcc6a244b502fc4d34a8aab0e98c8ef8f0765a6ed0e55be6511eb7770",
+            "where": "DB-12-B8-D1-I-103.hinh.0.du_lieu",
+            "hashDataUrl": "19f949494961d030d5e23f843cefe2d8265268d76efe313f2953835a6436e682"
+          }
+        ]
+      }
+    ],
+    "geometryBaseSource": 1347,
+    "ghiChuDung": "PhLEFT/3aromaticDOUBLE/CH3EXPLICITupperright-Cfirst/NH2DOWN-Nfirst/nocharges-stereo-caption/DDHpath;259croppeduppermatches1347fullsamepublicstem,missingbottomđọcTRỰCTIẾP1347KHÔNGđoántheory/khôngsửaảnhimmutable.",
+    "hashSvgDaSoat": "64f38be76ae19a17d0f73b4f162ba7040f1348b1fd8f7ded8ae9c28cba964721",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

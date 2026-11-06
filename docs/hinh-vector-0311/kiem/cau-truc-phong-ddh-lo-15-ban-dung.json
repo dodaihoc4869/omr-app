@@ -1871,7 +1871,7 @@
     "caption": [],
     "nguoiDocNguon": "cau_truc_6",
     "daMoNguonDayDu": true,
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "bi-loai-lo-220-thieu-nhan-CH3-literal",
     "phongApp": true,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
@@ -1883,7 +1883,8 @@
     "soNguyenTuNang": 10,
     "rdkit": "2026.09.1",
     "hashSvgDaSoat": "115f6f94de935c73a8c31c65f207c80d889c1008b96dfd7bd292c38f34061a29",
-    "nguoiSoat": "soat_hinh_vector"
+    "nguoiSoat": "soat_hinh_vector",
+    "lyDoLoai": "Graphamphetaminekhôngsai,nhưngkhônggiữCH3explicitvàbốcụcnguồn1347;thu hồi cho source1347đểthaybảnliteralđãsoátmới."
   },
   {
     "i": 1367,

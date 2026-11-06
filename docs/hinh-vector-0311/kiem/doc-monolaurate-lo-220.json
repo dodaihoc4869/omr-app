@@ -1,0 +1,434 @@
+{
+  "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+  "file": "anh/2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31.png",
+  "mime": "image/png",
+  "bytes": 9196,
+  "i": 253,
+  "questions": [
+    {
+      "qid": "12-C2-B5-II-16",
+      "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+      "refs": [
+        {
+          "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+          "where": "12-C2-B5-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028",
+          "position": {
+            "where": "12-C2-B5-II-16.hinh.0.du_lieu",
+            "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-II-52",
+      "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+      "refs": [
+        {
+          "hash": "2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31",
+          "where": "DB-12-B5-D2-II-52.hinh.0.du_lieu",
+          "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028",
+          "position": {
+            "where": "DB-12-B5-D2-II-52.hinh.0.du_lieu",
+            "hashDataUrl": "0c52f4bf497b47bbbc976715f3bcf20a826fb395bbcfe948b594fb9fa2a36028",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "fileNguon": "anh/2b641494d128f5f4f987ab878d47ee7c4de1e7519e579853d13942ea45710b31.png",
+  "nativeSize": [
+    471,
+    213
+  ],
+  "daMoNativeFullVaZoom3x": true,
+  "zooms": [
+    "/workspace/scratch/monolaurate220-ester-4x.png",
+    "/workspace/scratch/monolaurate220-sixring-4x.png",
+    "/workspace/scratch/monolaurate220-fivering-4x.png"
+  ],
+  "caption": [],
+  "alkylLabel": {
+    "literal": "H₃C(H₂C)₉H₂C",
+    "nativeApproxBounds": [
+      4,
+      54,
+      143,
+      76
+    ],
+    "order": "H3C rồi ngoặc(H2C)subscript9 rồi H2C;KHÔNGđổiCH3(CH2)9CH2hoặctựkhaitriển."
+  },
+  "ester": {
+    "carbonylCarbon": [
+      162,
+      49
+    ],
+    "carbonylOlabelCenter": [
+      163,
+      19
+    ],
+    "doubleBonds": [
+      [
+        [
+          159,
+          30
+        ],
+        [
+          159,
+          48
+        ]
+      ],
+      [
+        [
+          165,
+          30
+        ],
+        [
+          165,
+          48
+        ]
+      ]
+    ],
+    "leftBond": [
+      [
+        145,
+        58
+      ],
+      [
+        162,
+        49
+      ]
+    ],
+    "rightBondToO": [
+      [
+        162,
+        49
+      ],
+      [
+        178,
+        58
+      ]
+    ],
+    "esterOlabelCenter": [
+      189,
+      64
+    ],
+    "toSugarViaCH2": [
+      [
+        [
+          200,
+          65
+        ],
+        [
+          220,
+          69
+        ]
+      ],
+      [
+        [
+          220,
+          69
+        ],
+        [
+          220,
+          95
+        ]
+      ]
+    ],
+    "note": "MộtđỉnhCH2ẩn tại220,69 nốiesterO→C5vòng6;khôngthêmnhãnCH2ởđỉnhnày;giữcarbonylOphíatrênvàC=O2nét."
+  },
+  "sixRing": {
+    "nodesApprox": {
+      "C4": [
+        200,
+        122
+      ],
+      "C5": [
+        220,
+        95
+      ],
+      "O": [
+        262,
+        95
+      ],
+      "C1": [
+        283,
+        122
+      ],
+      "C2": [
+        263,
+        149
+      ],
+      "C3": [
+        220,
+        149
+      ]
+    },
+    "substituents": [
+      {
+        "on": "C4",
+        "label": "HO",
+        "direction": "DOWN",
+        "bond": [
+          [
+            200,
+            122
+          ],
+          [
+            200,
+            152
+          ]
+        ],
+        "labelApprox": [
+          192,
+          166
+        ],
+        "bondTo": "OởphíaphảichữHO"
+      },
+      {
+        "on": "C3",
+        "label": "OH",
+        "direction": "UP",
+        "bond": [
+          [
+            220,
+            149
+          ],
+          [
+            220,
+            133
+          ]
+        ],
+        "labelApprox": [
+          226,
+          120
+        ],
+        "bondTo": "OởphíatráichữOH"
+      },
+      {
+        "on": "C2",
+        "label": "OH",
+        "direction": "DOWN",
+        "bond": [
+          [
+            263,
+            149
+          ],
+          [
+            263,
+            173
+          ]
+        ],
+        "labelApprox": [
+          270,
+          185
+        ]
+      }
+    ],
+    "front": {
+      "left": "TAPERhẹpC4rộngC3",
+      "right": "TAPERhẹpC1rộngC2",
+      "horizontal": "C3–C2đậmrộngđều"
+    },
+    "explicitHCount": 0
+  },
+  "glycosidic": {
+    "OlabelCenter": [
+      308,
+      160
+    ],
+    "bonds": [
+      [
+        [
+          283,
+          122
+        ],
+        [
+          301,
+          148
+        ]
+      ],
+      [
+        [
+          318,
+          148
+        ],
+        [
+          332,
+          122
+        ]
+      ]
+    ],
+    "direction": "C1vòng6→Oởdướigiữa→đỉnhtráivòng5;khôngtrực tiếpnối2carbon"
+  },
+  "fiveRing": {
+    "nodesApprox": {
+      "left": [
+        332,
+        122
+      ],
+      "O": [
+        374,
+        103
+      ],
+      "right": [
+        414,
+        122
+      ],
+      "frontRight": [
+        398,
+        154
+      ],
+      "frontLeft": [
+        349,
+        154
+      ]
+    },
+    "substituents": [
+      {
+        "on": "left",
+        "kind": "CH2OHẩnđỉnh",
+        "label": "HO",
+        "bonds": [
+          [
+            [
+              332,
+              122
+            ],
+            [
+              332,
+              96
+            ]
+          ],
+          [
+            [
+              332,
+              96
+            ],
+            [
+              321,
+              90
+            ]
+          ]
+        ],
+        "labelApprox": [
+          303,
+          84
+        ],
+        "note": "GiữHOtráilinkđầuphảitớiO,khônginCH2OHchữ"
+      },
+      {
+        "on": "frontLeft",
+        "label": "OH",
+        "direction": "DOWN",
+        "bond": [
+          [
+            349,
+            154
+          ],
+          [
+            349,
+            177
+          ]
+        ],
+        "labelApprox": [
+          355,
+          190
+        ]
+      },
+      {
+        "on": "frontRight",
+        "label": "HO",
+        "direction": "UP",
+        "bond": [
+          [
+            398,
+            154
+          ],
+          [
+            398,
+            140
+          ]
+        ],
+        "labelApprox": [
+          391,
+          132
+        ],
+        "note": "BondtớiOởphảicủachữHO,khôngđổiOHkhiđặtanchor"
+      },
+      {
+        "on": "right",
+        "kind": "CH2OHẩnđỉnh",
+        "label": "OH",
+        "bonds": [
+          [
+            [
+              414,
+              122
+            ],
+            [
+              414,
+              158
+            ]
+          ],
+          [
+            [
+              414,
+              158
+            ],
+            [
+              430,
+              169
+            ]
+          ]
+        ],
+        "labelApprox": [
+          447,
+          176
+        ],
+        "note": "MộtđỉnhCH2tạibend414,158,khôngbỏsegmentđứnghaythêmCH2OHlabel"
+      }
+    ],
+    "front": {
+      "left": "TAPERhẹpđỉnhleft,rộngfrontLeft",
+      "right": "TAPERhẹpđỉnhright,rộngfrontRight",
+      "horizontal": "frontLeft–frontRightđậmrộngđều"
+    },
+    "explicitHCount": 0
+  },
+  "counts": {
+    "sixMemberRing": 1,
+    "fiveMemberRing": 1,
+    "standaloneSugarH": 0,
+    "sugarOH_HO": 7,
+    "OHlabels": 4,
+    "HOlabels": 3,
+    "ringO": 2,
+    "glycosidicO": 1,
+    "esterO": 1,
+    "carbonylO": 1,
+    "totalPrintedOContainingGroups": 12,
+    "frontTaper": 4,
+    "frontBoldHorizontal": 2,
+    "condensedAlkylLabels": 1
+  },
+  "notPresent": [
+    "standaloneHởcarbonđường",
+    "Cnumbering",
+    "ellipsis/brackets",
+    "têncaption",
+    "charge",
+    "CIPletters",
+    "arrowheads",
+    "thêmHởđầuđỉnhCH2"
+  ],
+  "critical": "Khôngalias/khôngtựsuycôngthức từtên. GiữH3C(H2C)9H2C,7OH/HOvàhướnggắnO,2CH2OHẩnđỉnhởvòng5,C5CH2esterẩnđỉnhởvòng6,4taper+2ngangbold;khôngthêm30Hnhư47.",
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đọcnguồn,chưađạtSVG"
+}

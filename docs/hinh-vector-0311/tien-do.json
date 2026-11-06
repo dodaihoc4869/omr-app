@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1131 câu đủ mọi hình+DDH/7 một phần;818 nguồn→566 SVG;9997785byte/gzip1882529;610 nguồn còn lại.",
-    "viecNenLamTiep": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;253saccharosemonolauraterootđãmởnativeCHƯAgeometry-CHƯAdựng;ƯU TIÊN259amphetaminePNGcắtmấtđáy:readonlytìmbảnFULLf3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46/cùng2publicstemsDB-12-B8-D1-I-369-DH-12-C3-B8-I-83/uppergeometrymatch;1347đãmanifestSVG115f6f94/5797BKHÔNGdựngtrùng,cầnfreshactual+soát259riêng;rootđãmởfull,sourceonlyproofdoc-amphetamine259-source-only-lo-219.jsonCHƯASVG-CHƯAĐẠTkhôngtựalias;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "loVuaXong": "1135 câu đủ mọi hình+DDH/7 một phần;820 nguồn→568 SVG;10016297byte/gzip1885971;608 nguồn còn lại.",
+    "viecNenLamTiep": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn253/259/1347/225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;267/270/273mớiCHỈranking2refsCHƯAmởnative-CHƯAdựng;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/main6be67aa0chưagộp;khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp từ1131câu/566SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
+    "lyDo": "Tiếp từ1135câu/568SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 818,
-    "soSvgRieng": 566,
-    "soCauDungHinh": 1138,
-    "soCauDuMoiHinh": 1131,
+    "soAnhNguon": 820,
+    "soSvgRieng": 568,
+    "soCauDungHinh": 1142,
+    "soCauDuMoiHinh": 1135,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 9997785,
-    "byteGzip": 1882529,
-    "soAnhNguonConLai": 610,
+    "byteSvg": 10016297,
+    "byteGzip": 1885971,
+    "soAnhNguonConLai": 608,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "219mọichữ/DDH Rounded path tự chứa/khôngfallback.",
+    "loMoi": "220mọichữ/DDH Rounded path tự chứa/khôngfallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 818,
-    "soCauDuHinhVaPhong": 1131,
+    "soNguon": 820,
+    "soCauDuHinhVaPhong": 1135,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "219",
-    "ketQua": "1131 câu đủ mọi hình+DDH/7 một phần;818 nguồn→566 SVG;9997785byte/gzip1882529;610 nguồn còn lại.",
-    "suaLoi": "225branched6Haworth/30H15OH/5CH2OH+1CH2/branchlowerMIDDLEC6/5externalO/2bracketpairsTOPmBOTTOMn/frontdiagsUNIFORM6horizontalbold.2653Haworthchéo/15H8OH/3CH2OH/2bridgeO/6TAPER3horizontalbold/leftOHdown-rightOHup/brackets7 000literal. Nativefull+zoom/publicrefs/freshactualChromium/exacthash soát độc lập;khôngalias/noanswer/noextraX-caption/DDHpath.",
-    "tiepTheo": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;253saccharosemonolauraterootđãmởnativeCHƯAgeometry-CHƯAdựng;ƯU TIÊN259amphetaminePNGcắtmấtđáy:readonlytìmbảnFULLf3f6a910d977b78470e1d028bae650c6ef285ae3c54d3d8d1a03bb8112008a46/cùng2publicstemsDB-12-B8-D1-I-369-DH-12-C3-B8-I-83/uppergeometrymatch;1347đãmanifestSVG115f6f94/5797BKHÔNGdựngtrùng,cầnfreshactual+soát259riêng;rootđãmởfull,sourceonlyproofdoc-amphetamine259-source-only-lo-219.jsonCHƯASVG-CHƯAĐẠTkhôngtựalias;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
-    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build219/speed21/21/Chromium566/566/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
+    "lo": "220",
+    "ketQua": "1135 câu đủ mọi hình+DDH/7 một phần;820 nguồn→568 SVG;10016297byte/gzip1885971;608 nguồn còn lại.",
+    "suaLoi": "1347amphetaminevẽlạiCH3EXPLICITupperright/NH2DOWN/PhLEFT/3double/nocharge-stereo;259croppedsoRIÊNGnative259+full1347samepublicquestion/freshactualSVGmới/khôngđoánmissingbottom. Thu hồi1347oldlo3-lo15SVG115f6bỏCH3literal,giữnguyênlịchsử/khôngphánsaigraphmọinguồn.253monolaurateH3C(H2C)9H2C-literal/ester2O/6ring+5ring/7OH-HO/4TAPER2bold/implicitCH2branches/noextraH-caption. Nativefull+zoom/publicrefs/freshactualChromium/exacthash soát độc lập.",
+    "tiepTheo": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn253/259/1347/225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;267/270/273mớiCHỈranking2refsCHƯAmởnative-CHƯAdựng;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build220/speed21/21/Chromium568/568/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
   }
 }
