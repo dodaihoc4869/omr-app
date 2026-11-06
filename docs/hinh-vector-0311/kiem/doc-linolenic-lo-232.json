@@ -1,0 +1,233 @@
+{
+  "i": 465,
+  "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055.png",
+  "nativeSize": [
+    319,
+    315
+  ],
+  "reviewed": [
+    "native full3x with every vertex counted"
+  ],
+  "questions": [
+    {
+      "qid": "12-C1-B3-D1-II-1",
+      "maDe": "12-C1-B3-D1",
+      "de": "Alpha-linolenic acid (ALA) là một hợp chất thiết yếu, cơ thể không thể tự tổng hợp và phải được cung cấp qua chế độ ăn uống. ALA có vai trò quan trọng trong duy trì sức khoẻ tim mạch và hỗ trợ chức năng não bộ. ALA có công thức cấu tạo sau đây:",
+      "hinh": [
+        {
+          "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+          "where": "12-C1-B3-D1-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a3f35ca346fea919a390e5c88f66630556b0bf10359a700560d4addfb344e567"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D3-II-1",
+      "maDe": "12-C1-B1-D3",
+      "de": "Alpha-linolenic acid (ALA) là một hợp chất thiết yếu, cơ thể không thể tự tổng hợp và phải được cung cấp qua chế độ ăn uống. ALA có vai trò quan trọng trong duy trì sức khoẻ tim mạch và hỗ trợ chức năng não bộ. ALA có công thức cấu tạo sau đây:",
+      "hinh": [
+        {
+          "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+          "where": "12-C1-B1-D3-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a3f35ca346fea919a390e5c88f66630556b0bf10359a700560d4addfb344e567"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "carbons": [
+      {
+        "C": 1,
+        "xy": [
+          84,
+          73
+        ]
+      },
+      {
+        "C": 2,
+        "xy": [
+          84,
+          118
+        ]
+      },
+      {
+        "C": 3,
+        "xy": [
+          44,
+          141
+        ]
+      },
+      {
+        "C": 4,
+        "xy": [
+          44,
+          186
+        ]
+      },
+      {
+        "C": 5,
+        "xy": [
+          84,
+          209
+        ]
+      },
+      {
+        "C": 6,
+        "xy": [
+          84,
+          254
+        ]
+      },
+      {
+        "C": 7,
+        "xy": [
+          123,
+          277
+        ]
+      },
+      {
+        "C": 8,
+        "xy": [
+          163,
+          254
+        ]
+      },
+      {
+        "C": 9,
+        "xy": [
+          203,
+          277
+        ]
+      },
+      {
+        "C": 10,
+        "xy": [
+          243,
+          254
+        ]
+      },
+      {
+        "C": 11,
+        "xy": [
+          243,
+          209
+        ]
+      },
+      {
+        "C": 12,
+        "xy": [
+          282,
+          186
+        ]
+      },
+      {
+        "C": 13,
+        "xy": [
+          282,
+          141
+        ]
+      },
+      {
+        "C": 14,
+        "xy": [
+          243,
+          118
+        ]
+      },
+      {
+        "C": 15,
+        "xy": [
+          243,
+          73
+        ]
+      },
+      {
+        "C": 16,
+        "xy": [
+          203,
+          50
+        ]
+      },
+      {
+        "C": 17,
+        "xy": [
+          163,
+          73
+        ]
+      },
+      {
+        "C": 18,
+        "xy": [
+          163,
+          118
+        ]
+      }
+    ],
+    "bonds": "Single continuous open chain C1-C2-...-C18; C18 is free terminal endpoint, no C18-C1/C2 bond.",
+    "doubleBonds": [
+      [
+        9,
+        10
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        15,
+        16
+      ]
+    ],
+    "innerLines": {
+      "9=10": "parallel inner segment approx204,264→234,248",
+      "12=13": "inner vertical approx273,148→273,181",
+      "15=16": "inner slant approx234,78→204,60"
+    },
+    "carboxyl": {
+      "carbon": [
+        84,
+        73
+      ],
+      "OlabelNear": [
+        44,
+        50
+      ],
+      "carbonylDouble": "two diagonal up-left lines from C1 region toward O atapprox58,56 and57,65, two lines kept",
+      "OHlabelNear": [
+        130,
+        50
+      ],
+      "singleToOH": "fromC1 up-right to107,58"
+    },
+    "stereochemistry": "At each of three visible C=C, adjacent carbon-chain substituents lie on same side (cis/Z drawing); preserve literal coiled geometry and offsets. No wedge/dash/stereo text.",
+    "counts": {
+      "C": 18,
+      "O": 2,
+      "CCdouble": 3,
+      "COdouble": 1,
+      "explicitStandaloneH": 0,
+      "captions": 0,
+      "carbonNumbersPrinted": 0
+    },
+    "lineStyle": "plain uniform skeletal thin-ish gray/black raster lines, no wedge/taper notation",
+    "openGap": "free terminalC18 approx163,118 remains isolated from acidC2approx84,118 by~79px; do not close ring"
+  },
+  "cautions": [
+    "Not linoleic2C=C; exactly3C=C.",
+    "Carbon numbers in report are analysis-only; do not print them.",
+    "Do not add H/CH3/COOH textual formula/caption; source only O and OH labels.",
+    "No image answer or solution consulted."
+  ],
+  "status": "Đạt exact SVG sau actual review",
+  "actualReview": {
+    "i": 465,
+    "hashSvg": "fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG3x và mở lại native3x đối chiếu từng vertex cùng hai public refs. Đủ18C, freeC18/mạch hở không cyclic,3C=C đúng vị trí9=10/12=13/15=16 và các inneroffsets/same-side drawing; carbonylO hai nét/OH đúng. Chữ O/OH DDH đậm bằng paths, có gap với liên kết; không thêm H/sốC/caption. Không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 1800,
+    "render": "/workspace/scratch/linolenic465-232-fee3fb0a-chromium.png",
+    "sourceHash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055"
+  }
+}

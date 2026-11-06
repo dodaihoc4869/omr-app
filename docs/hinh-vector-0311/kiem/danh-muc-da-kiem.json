@@ -5590,6 +5590,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055": {
+      "tep": "linolenic-ddh-fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612.svg",
+      "hashSvg": "fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612",
+      "byteSvg": 1800,
+      "byteGzip": 700,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2": {
       "tep": "khep-be-mat-ddh-bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df.svg",
       "hashSvg": "bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df",
@@ -9086,6 +9095,20 @@
       ]
     },
     {
+      "qid": "12-C1-B3-D1-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+          "where": "12-C1-B3-D1-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a3f35ca346fea919a390e5c88f66630556b0bf10359a700560d4addfb344e567",
+          "vector": "linolenic-ddh-fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C1-B3-D1-II-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -9286,6 +9309,20 @@
           "where": "12-C1-B1-D3-I-75.hinh.0.du_lieu",
           "hashDataUrl": "959a6ae55a57390ddd7c1060cf599fb4780caae1dbb29045c79cddeb319b12b1",
           "vector": "phan-ung-va-k-ddh-4209eee0a0bdc449535303e9438c8cd5100c26630d04def3a806334a7632d7bd.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D3-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+          "where": "12-C1-B1-D3-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a3f35ca346fea919a390e5c88f66630556b0bf10359a700560d4addfb344e567",
+          "vector": "linolenic-ddh-fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612.svg"
         }
       ]
     },
@@ -26310,6 +26347,7 @@
     "12-BD7-19-III-5",
     "12-C1-B3-D1-I-1",
     "12-C1-B3-D1-I-2",
+    "12-C1-B3-D1-II-1",
     "12-C1-B3-D1-II-4",
     "12-C1-B3-D1-III-5",
     "12-C1-B1-D3-I-1",
@@ -26322,6 +26360,7 @@
     "12-C1-B1-D3-I-71",
     "12-C1-B1-D3-I-72",
     "12-C1-B1-D3-I-75",
+    "12-C1-B1-D3-II-1",
     "12-C1-B1-D3-II-2",
     "12-C1-B1-D3-II-3",
     "12-C1-B1-D3-II-9",

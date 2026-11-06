@@ -1,0 +1,40 @@
+[
+  {
+    "i": 465,
+    "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+    "fileNguon": "anh/54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055.png",
+    "svg": "linolenic-ddh-fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612.svg",
+    "hashSvg": "fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612",
+    "byteSvg": 1800,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B3-D1-II-1",
+        "de": "Alpha-linolenic acid (ALA) là một hợp chất thiết yếu, cơ thể không thể tự tổng hợp và phải được cung cấp qua chế độ ăn uống. ALA có vai trò quan trọng trong duy trì sức khoẻ tim mạch và hỗ trợ chức năng não bộ. ALA có công thức cấu tạo sau đây:",
+        "refs": [
+          {
+            "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+            "where": "12-C1-B3-D1-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "a3f35ca346fea919a390e5c88f66630556b0bf10359a700560d4addfb344e567"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D3-II-1",
+        "de": "Alpha-linolenic acid (ALA) là một hợp chất thiết yếu, cơ thể không thể tự tổng hợp và phải được cung cấp qua chế độ ăn uống. ALA có vai trò quan trọng trong duy trì sức khoẻ tim mạch và hỗ trợ chức năng não bộ. ALA có công thức cấu tạo sau đây:",
+        "refs": [
+          {
+            "hash": "54772107eb2e02514a88803d0e9d3115e847a1228894e7faba923612b5c4f055",
+            "where": "12-C1-B1-D3-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "a3f35ca346fea919a390e5c88f66630556b0bf10359a700560d4addfb344e567"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18Cinclcarbonyl+17implicit/3CCdouble+1COdouble/COOHexplicitO-OHdamthật/coiledOPENchainfreeC18/noaddedH-caption-numbers/DDHpath.",
+    "hashSvgDaSoat": "fee3fb0ac73aec1613038ce8461b411439e08c18d6815ddcc8fb63f11139b612",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
