@@ -1,0 +1,277 @@
+{
+  "hash": "3e68127762f2403bdd000291a73544ff1efc529ec6429ee34a6b6db1695f4ee8",
+  "file": "anh/3e68127762f2403bdd000291a73544ff1efc529ec6429ee34a6b6db1695f4ee8.png",
+  "mime": "image/png",
+  "bytes": 40555,
+  "i": 352,
+  "questions": [
+    {
+      "qid": "10-C1-B3-D2-II-6",
+      "de": "Cho mô hình nguyên tử theo Rutherford – Bohr (hình a) và cấu trúc nguyên tử aluminium theo Rutherford – Bohr (hình b).",
+      "refs": [
+        {
+          "hash": "3e68127762f2403bdd000291a73544ff1efc529ec6429ee34a6b6db1695f4ee8",
+          "where": "10-C1-B3-D2-II-6.hinh.0.du_lieu",
+          "hashDataUrl": "8a9101b4dadb4066a39de967ab6a1d41c202ef6e32586f0f7a7af99aced3831b",
+          "publicPosition": {
+            "where": "10-C1-B3-D2-II-6.hinh.0.du_lieu",
+            "hashDataUrl": "8a9101b4dadb4066a39de967ab6a1d41c202ef6e32586f0f7a7af99aced3831b",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-100",
+      "de": "Cho mô hình nguyên tử theo Rutherford – Bohr (hình a) và cấu trúc nguyên tử aluminium theo Rutherford – Bohr (hình b).",
+      "refs": [
+        {
+          "hash": "3e68127762f2403bdd000291a73544ff1efc529ec6429ee34a6b6db1695f4ee8",
+          "where": "DB-10-B1-D1-II-100.hinh.0.du_lieu",
+          "hashDataUrl": "8a9101b4dadb4066a39de967ab6a1d41c202ef6e32586f0f7a7af99aced3831b",
+          "publicPosition": {
+            "where": "DB-10-B1-D1-II-100.hinh.0.du_lieu",
+            "hashDataUrl": "8a9101b4dadb4066a39de967ab6a1d41c202ef6e32586f0f7a7af99aced3831b",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "nativeSize": [
+    854,
+    375
+  ],
+  "fileNguon": "anh/3e68127762f2403bdd000291a73544ff1efc529ec6429ee34a6b6db1695f4ee8.png",
+  "daMoNativeFullVaZoom": true,
+  "zooms": [
+    "/workspace/scratch/bohr226-a-zoom.png",
+    "/workspace/scratch/bohr226-b-zoom.png",
+    "/workspace/scratch/bohr226-leftedge-zoom.png",
+    "/workspace/scratch/bohr226-bottom-zoom.png",
+    "/workspace/scratch/bohr226-rightedge-zoom.png"
+  ],
+  "panelA": {
+    "label": "a)",
+    "centerApprox": [
+      233,
+      175
+    ],
+    "shells": 4,
+    "radiiApprox": [
+      48,
+      72,
+      95,
+      119
+    ],
+    "nucleus": {
+      "center": [
+        233,
+        175
+      ],
+      "radiusApprox": 24,
+      "text": "+Z",
+      "fill": "gray",
+      "ZItalic": true
+    },
+    "shellNumbers": [
+      {
+        "literal": "1",
+        "atApprox": [
+          233,
+          130
+        ]
+      },
+      {
+        "literal": "2",
+        "atApprox": [
+          233,
+          105
+        ]
+      },
+      {
+        "literal": "3",
+        "atApprox": [
+          233,
+          81
+        ]
+      },
+      {
+        "literal": "4",
+        "atApprox": [
+          233,
+          57
+        ]
+      }
+    ],
+    "topCircleGaps": "Mỗi arc trên có khoảngtrắngquanhglyph1/2/3/4;khôngvẽnétcirclexuyênsố. Glyphmaskwidth~15px quanhx233,khôngtựthêmn=.",
+    "leaders": [
+      {
+        "literal": "Lớp N",
+        "fromApprox": [
+          277,
+          64
+        ],
+        "toApprox": [
+          375,
+          64
+        ],
+        "on": "outer4"
+      },
+      {
+        "literal": "Lớp M",
+        "fromApprox": [
+          277,
+          91
+        ],
+        "toApprox": [
+          375,
+          91
+        ],
+        "on": "shell3"
+      },
+      {
+        "literal": "Lớp L",
+        "fromApprox": [
+          274,
+          117
+        ],
+        "toApprox": [
+          375,
+          117
+        ],
+        "on": "shell2"
+      },
+      {
+        "literal": "Lớp K",
+        "fromApprox": [
+          271,
+          147
+        ],
+        "toApprox": [
+          375,
+          147
+        ],
+        "on": "shell1"
+      },
+      {
+        "literal": "Hạt nhân",
+        "fromApprox": [
+          257,
+          175
+        ],
+        "toApprox": [
+          375,
+          175
+        ],
+        "on": "coreedge"
+      }
+    ],
+    "electronMarkers": 0,
+    "arrowheads": 0
+  },
+  "panelB": {
+    "label": "b)",
+    "centerApprox": [
+      617,
+      161
+    ],
+    "shells": 3,
+    "radiiApprox": [
+      54,
+      80,
+      110
+    ],
+    "nucleus": {
+      "center": [
+        617,
+        161
+      ],
+      "radiusApprox": 24,
+      "text": "+13",
+      "fill": "gray"
+    },
+    "visibleElectrons": {
+      "inner": [
+        [
+          617,
+          107
+        ],
+        [
+          617,
+          215
+        ]
+      ],
+      "middle": [
+        [
+          617,
+          82
+        ],
+        [
+          673,
+          105
+        ],
+        [
+          696,
+          161
+        ],
+        [
+          673,
+          217
+        ],
+        [
+          617,
+          241
+        ],
+        [
+          560,
+          217
+        ],
+        [
+          538,
+          161
+        ],
+        [
+          560,
+          105
+        ]
+      ],
+      "outer": [
+        [
+          617,
+          52
+        ],
+        [
+          726,
+          161
+        ],
+        [
+          617,
+          271
+        ]
+      ]
+    },
+    "countsReadFromImage": [
+      2,
+      8,
+      3
+    ],
+    "totalVisible": 13,
+    "markerRadiusApprox": 5,
+    "rule": "Đếmvisibleđãmởzoom4x,khôngsuytừAl/13. Ngoài3electronởN/E/S,bỏtrốngW;khôngredistributeđềutronglýthuyết. Khôngdấuâmhaylabelmớitrênmarkers."
+  },
+  "outsidePDF": {
+    "left": "Cột chữ/cáckýK,Lrờisátméptrái,cáctừbịcắt,khôngleadergắnvàopanelA.",
+    "right": "Fragmentchữsátmépphảibịcắt,khônggắnpoint/legend.",
+    "bottom": "Dòngseriftoởdưới a)/b),topvàđầu/đuôibịcắt;fragmentcóthểđọc…năng lượng bằng nhau.,nhưngkhôngphụchồiphầnkhônghiện.",
+    "evidenceOfLayout": "3mépđềucócột/dòngtextcropped,độc lậpvới2panelvàlabela/b;khôngphảilabelshell/markertrongdiagram.",
+    "missingEvidence": "Cả2publicstemchỉgọimôhìnha/b;khônglặpfragmentnănglượngbằngnhau. Chưacófullpublicphátbiểutươngứngxácnhậnfragmentđãđượcgiữởapp. Khôngđủđểkhẳngđịnhbỏdòngdướikhôngmấtdữliệu.",
+    "disposition": "CHƯA ĐẠT: không cho phép bỏ toàn bộ mép PDF trong candidate tại thời điểm này. Không phục hồi text cắt/không đoán; chờ bằng chứng publiccontext bổ sung."
+  },
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Chỉnguồn;chưađạt352/khôngadmit"
+}

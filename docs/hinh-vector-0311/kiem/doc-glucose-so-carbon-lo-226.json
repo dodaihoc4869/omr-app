@@ -1,0 +1,254 @@
+{
+  "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+  "file": "anh/41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439.png",
+  "mime": "image/png",
+  "bytes": 4664,
+  "i": 372,
+  "questions": [
+    {
+      "qid": "12-C2-B4-D1-I-11",
+      "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose dưới đây:\nNhóm –OH hemiacetal là –OH gắn ở carbon số mấy?",
+      "refs": [
+        {
+          "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+          "where": "12-C2-B4-D1-I-11.hinh.0.du_lieu",
+          "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7",
+          "publicPosition": {
+            "where": "12-C2-B4-D1-I-11.hinh.0.du_lieu",
+            "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-1",
+      "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose dưới đây:\nNhóm –OH hemiacetal là –OH gắn ở carbon số mấy?",
+      "refs": [
+        {
+          "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+          "where": "DB-12-B5-D2-I-1.hinh.0.du_lieu",
+          "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7",
+          "publicPosition": {
+            "where": "DB-12-B5-D2-I-1.hinh.0.du_lieu",
+            "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "nativeSize": [
+    324,
+    312
+  ],
+  "fileNguon": "anh/41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439.png",
+  "daMoNativeFullVaZoom4x": true,
+  "zoom": "/workspace/scratch/glucose372-226-4x.png",
+  "nodesApprox": {
+    "C1": [
+      268,
+      161
+    ],
+    "C2": [
+      202,
+      207
+    ],
+    "C3": [
+      108,
+      207
+    ],
+    "C4": [
+      47,
+      161
+    ],
+    "C5": [
+      110,
+      115
+    ],
+    "ringO": [
+      202,
+      115
+    ],
+    "C6": [
+      110,
+      78
+    ]
+  },
+  "numberLabels": [
+    {
+      "literal": "1",
+      "at": [
+        276,
+        144
+      ]
+    },
+    {
+      "literal": "2",
+      "at": [
+        187,
+        229
+      ]
+    },
+    {
+      "literal": "3",
+      "at": [
+        111,
+        231
+      ]
+    },
+    {
+      "literal": "4",
+      "at": [
+        36,
+        155
+      ]
+    },
+    {
+      "literal": "5",
+      "at": [
+        93,
+        105
+      ]
+    },
+    {
+      "literal": "6",
+      "at": [
+        98,
+        68
+      ]
+    }
+  ],
+  "OH": [
+    {
+      "on": "C1",
+      "direction": "DOWN",
+      "bond": [
+        [
+          268,
+          161
+        ],
+        [
+          268,
+          205
+        ]
+      ],
+      "labelCenterApprox": [
+        269,
+        218
+      ],
+      "literalPlacement": "Oglyphlệchtráibondnhưnative,khôngcầnchữa theoanchorchuẩn."
+    },
+    {
+      "on": "C2",
+      "direction": "DOWN",
+      "bond": [
+        [
+          202,
+          207
+        ],
+        [
+          202,
+          246
+        ]
+      ],
+      "labelCenterApprox": [
+        211,
+        261
+      ]
+    },
+    {
+      "on": "C3",
+      "direction": "UP",
+      "bond": [
+        [
+          108,
+          207
+        ],
+        [
+          108,
+          168
+        ]
+      ],
+      "labelCenterApprox": [
+        124,
+        156
+      ]
+    },
+    {
+      "on": "C4",
+      "direction": "DOWN",
+      "bond": [
+        [
+          47,
+          161
+        ],
+        [
+          47,
+          198
+        ]
+      ],
+      "labelCenterApprox": [
+        61,
+        212
+      ]
+    },
+    {
+      "on": "C6",
+      "direction": "UP-RIGHT",
+      "bond": [
+        [
+          110,
+          78
+        ],
+        [
+          135,
+          59
+        ]
+      ],
+      "labelCenterApprox": [
+        160,
+        46
+      ]
+    }
+  ],
+  "C6Rule": "C5→barevertexC6→OH;C6khôngghiCH2hoặcCH2OH,nênkhôngthêmtext. Giữđỉnhvà2nétđơn.",
+  "front": {
+    "left": "TAPERhẹpC4rộngC3",
+    "right": "TAPERhẹpC1rộngC2",
+    "horizontal": "C3–C2boldrộngđều"
+  },
+  "counts": {
+    "sixRing": 1,
+    "OH": 5,
+    "ringO": 1,
+    "carbonNumbers": 6,
+    "standaloneH": 0,
+    "CH2text": 0,
+    "CH2OHtext": 0,
+    "frontTaper": 2,
+    "frontBoldHorizontal": 1
+  },
+  "caption": [],
+  "notPresent": [
+    "Hởcarbon",
+    "CIPletters",
+    "mũitên",
+    "charge",
+    "ellipsis",
+    "brackets",
+    "answerCnumber"
+  ],
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đãđọcnguồn,chưađạtSVG",
+  "actualSvgReview": {
+    "hashSvg": "91b5fee3fef0a08d053442b7f3166712417ef5775fae133489bedb33b0faea88",
+    "byteSvg": 9089,
+    "actualRender": "/workspace/scratch/glucose372-226-91b5fee3-chromium.png",
+    "verdict": "Đạt,đọcsourcevàactualđộclập."
+  }
+}
