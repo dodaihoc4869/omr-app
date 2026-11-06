@@ -1,0 +1,40 @@
+[
+  {
+    "i": 111,
+    "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+    "fileNguon": "anh/14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2.png",
+    "svg": "pha-loang-acid-ddh-ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e.svg",
+    "hashSvg": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
+    "byteSvg": 91761,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B8-D1-I-52",
+        "de": "Các hình ảnh dưới đây mô tả cách pha loãng H₂SO₄ đặc: Hình ảnh mô tả đúng cách pha loãng acid đảm bảo an toàn là",
+        "refs": [
+          {
+            "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+            "where": "DB-11-B8-D1-I-52.hinh.0.du_lieu",
+            "hashDataUrl": "bf6bd6c8265e91fa6ecc684c315e8825a168573dd0ad7153e9d2991cf4094e97"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B8-I-42",
+        "de": "Các hình ảnh dưới đây mô tả cách pha loãng H₂SO₄ đặc: Hình ảnh mô tả đúng cách pha loãng acid đảm bảo an toàn là",
+        "refs": [
+          {
+            "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+            "where": "DH-11-C2-B8-I-42.hinh.0.du_lieu",
+            "hashDataUrl": "bf6bd6c8265e91fa6ecc684c315e8825a168573dd0ad7153e9d2991cf4094e97"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4panels/4receiver4tiltedbeakers/3rodsONLY1-2-4/allleaders-labels/Hinh1..4truebold/4captionsliteral/noaddedliquids-flowlines-answer/DDHpath.",
+    "hashSvgDaSoat": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

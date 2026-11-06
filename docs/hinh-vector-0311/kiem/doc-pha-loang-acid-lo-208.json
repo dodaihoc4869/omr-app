@@ -1,0 +1,639 @@
+{
+  "i": 111,
+  "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+  "fileNguon": "anh/14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-dilution208-firstzoom.png",
+  "questions": [
+    {
+      "qid": "DB-11-B8-D1-I-52",
+      "de": "Các hình ảnh dưới đây mô tả cách pha loãng H₂SO₄ đặc: Hình ảnh mô tả đúng cách pha loãng acid đảm bảo an toàn là",
+      "refs": [
+        {
+          "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+          "where": "DB-11-B8-D1-I-52.hinh.0.du_lieu",
+          "hashDataUrl": "bf6bd6c8265e91fa6ecc684c315e8825a168573dd0ad7153e9d2991cf4094e97"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B8-I-42",
+      "de": "Các hình ảnh dưới đây mô tả cách pha loãng H₂SO₄ đặc: Hình ảnh mô tả đúng cách pha loãng acid đảm bảo an toàn là",
+      "refs": [
+        {
+          "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+          "where": "DH-11-C2-B8-I-42.hinh.0.du_lieu",
+          "hashDataUrl": "bf6bd6c8265e91fa6ecc684c315e8825a168573dd0ad7153e9d2991cf4094e97"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;NOvisibleliquidlevels/droplets/flowarrows,donotadd.",
+    "panels": [
+      {
+        "title": "Hình 1",
+        "titleAt": [
+          179,
+          17
+        ],
+        "titleWeight": "bold",
+        "receiverPath": [
+          [
+            137,
+            119
+          ],
+          [
+            146,
+            124
+          ],
+          [
+            146,
+            193
+          ],
+          [
+            149,
+            198
+          ],
+          [
+            203,
+            198
+          ],
+          [
+            207,
+            194
+          ],
+          [
+            207,
+            120
+          ],
+          [
+            137,
+            119
+          ]
+        ],
+        "tiltedBeakerOutline": [
+          [
+            190,
+            102
+          ],
+          [
+            240,
+            56
+          ],
+          [
+            241,
+            63
+          ],
+          [
+            286,
+            117
+          ],
+          [
+            288,
+            122
+          ],
+          [
+            282,
+            128
+          ],
+          [
+            245,
+            155
+          ],
+          [
+            240,
+            157
+          ],
+          [
+            235,
+            151
+          ],
+          [
+            196,
+            103
+          ],
+          [
+            190,
+            103
+          ]
+        ],
+        "rod": {
+          "rect": [
+            184,
+            54,
+            190,
+            195
+          ],
+          "topRounded": true,
+          "fill": "gray"
+        },
+        "labels": [
+          {
+            "text": "Đũa thủy tinh",
+            "at": [
+              69,
+              68
+            ],
+            "leader": [
+              [
+                136,
+                70
+              ],
+              [
+                184,
+                86
+              ]
+            ]
+          },
+          {
+            "text": "H₂O",
+            "at": [
+              337,
+              82
+            ],
+            "leader": [
+              [
+                313,
+                86
+              ],
+              [
+                265,
+                118
+              ]
+            ]
+          },
+          {
+            "text": "H₂SO₄ đặc",
+            "at": [
+              298,
+              180
+            ],
+            "leader": [
+              [
+                249,
+                182
+              ],
+              [
+                200,
+                182
+              ]
+            ]
+          }
+        ],
+        "caption": "Rót từ từ và khuấy nhẹ.",
+        "captionAt": [
+          156,
+          223
+        ]
+      },
+      {
+        "title": "Hình 2",
+        "titleAt": [
+          714,
+          22
+        ],
+        "titleWeight": "bold",
+        "receiverPath": [
+          [
+            663,
+            122
+          ],
+          [
+            672,
+            127
+          ],
+          [
+            672,
+            196
+          ],
+          [
+            675,
+            201
+          ],
+          [
+            730,
+            201
+          ],
+          [
+            734,
+            197
+          ],
+          [
+            734,
+            122
+          ],
+          [
+            663,
+            122
+          ]
+        ],
+        "tiltedBeakerOutline": [
+          [
+            717,
+            105
+          ],
+          [
+            767,
+            60
+          ],
+          [
+            768,
+            67
+          ],
+          [
+            813,
+            121
+          ],
+          [
+            815,
+            126
+          ],
+          [
+            809,
+            131
+          ],
+          [
+            771,
+            159
+          ],
+          [
+            766,
+            161
+          ],
+          [
+            761,
+            155
+          ],
+          [
+            723,
+            106
+          ],
+          [
+            717,
+            106
+          ]
+        ],
+        "rod": {
+          "rect": [
+            711,
+            57,
+            717,
+            198
+          ],
+          "topRounded": true,
+          "fill": "gray"
+        },
+        "labels": [
+          {
+            "text": "Đũa thủy tinh",
+            "at": [
+              582,
+              86
+            ],
+            "leader": [
+              [
+                647,
+                89
+              ],
+              [
+                711,
+                89
+              ]
+            ]
+          },
+          {
+            "text": "H₂SO₄ đặc",
+            "at": [
+              837,
+              70
+            ],
+            "leader": [
+              [
+                807,
+                89
+              ],
+              [
+                792,
+                121
+              ]
+            ]
+          },
+          {
+            "text": "H₂O",
+            "at": [
+              607,
+              182
+            ],
+            "leader": [
+              [
+                631,
+                185
+              ],
+              [
+                695,
+                185
+              ]
+            ]
+          }
+        ],
+        "caption": "Rót từ từ và khuấy nhẹ.",
+        "captionAt": [
+          701,
+          228
+        ]
+      },
+      {
+        "title": "Hình 3",
+        "titleAt": [
+          131,
+          278
+        ],
+        "titleWeight": "bold",
+        "receiverPath": [
+          [
+            59,
+            366
+          ],
+          [
+            68,
+            371
+          ],
+          [
+            68,
+            439
+          ],
+          [
+            71,
+            445
+          ],
+          [
+            125,
+            445
+          ],
+          [
+            130,
+            440
+          ],
+          [
+            130,
+            365
+          ],
+          [
+            59,
+            366
+          ]
+        ],
+        "tiltedBeakerOutline": [
+          [
+            106,
+            344
+          ],
+          [
+            161,
+            298
+          ],
+          [
+            162,
+            305
+          ],
+          [
+            208,
+            359
+          ],
+          [
+            209,
+            364
+          ],
+          [
+            203,
+            369
+          ],
+          [
+            167,
+            397
+          ],
+          [
+            162,
+            399
+          ],
+          [
+            157,
+            393
+          ],
+          [
+            116,
+            344
+          ],
+          [
+            106,
+            344
+          ]
+        ],
+        "rod": null,
+        "labels": [
+          {
+            "text": "H₂SO₄ đặc",
+            "at": [
+              298,
+              363
+            ],
+            "leader": [
+              [
+                187,
+                364
+              ],
+              [
+                250,
+                364
+              ]
+            ]
+          },
+          {
+            "text": "H₂O",
+            "at": [
+              196,
+              428
+            ],
+            "leader": [
+              [
+                107,
+                428
+              ],
+              [
+                171,
+                428
+              ]
+            ]
+          }
+        ],
+        "caption": "Rót và không khuấy.",
+        "captionAt": [
+          148,
+          472
+        ]
+      },
+      {
+        "title": "Hình 4",
+        "titleAt": [
+          711,
+          287
+        ],
+        "titleWeight": "bold",
+        "receiverPath": [
+          [
+            678,
+            378
+          ],
+          [
+            687,
+            383
+          ],
+          [
+            687,
+            452
+          ],
+          [
+            690,
+            457
+          ],
+          [
+            745,
+            457
+          ],
+          [
+            749,
+            453
+          ],
+          [
+            749,
+            378
+          ],
+          [
+            678,
+            378
+          ]
+        ],
+        "tiltedBeakerOutline": [
+          [
+            731,
+            359
+          ],
+          [
+            782,
+            313
+          ],
+          [
+            783,
+            320
+          ],
+          [
+            828,
+            374
+          ],
+          [
+            830,
+            379
+          ],
+          [
+            824,
+            384
+          ],
+          [
+            787,
+            412
+          ],
+          [
+            782,
+            414
+          ],
+          [
+            777,
+            408
+          ],
+          [
+            737,
+            360
+          ],
+          [
+            731,
+            360
+          ]
+        ],
+        "rod": {
+          "rect": [
+            725,
+            315,
+            731,
+            454
+          ],
+          "topRounded": true,
+          "fill": "gray"
+        },
+        "labels": [
+          {
+            "text": "Đũa thủy tinh",
+            "at": [
+              596,
+              343
+            ],
+            "leader": [
+              [
+                661,
+                343
+              ],
+              [
+                725,
+                343
+              ]
+            ]
+          },
+          {
+            "text": "H₂SO₄ đặc",
+            "at": [
+              839,
+              312
+            ],
+            "leader": [
+              [
+                822,
+                327
+              ],
+              [
+                807,
+                375
+              ]
+            ]
+          },
+          {
+            "text": "H₂O",
+            "at": [
+              623,
+              441
+            ],
+            "leader": [
+              [
+                647,
+                442
+              ],
+              [
+                710,
+                442
+              ]
+            ]
+          }
+        ],
+        "caption": "Rót mạnh và khuấy.",
+        "captionAt": [
+          689,
+          475
+        ]
+      }
+    ],
+    "counts": "4tiltedbeakers/4receivers/3rodsONLYpanels1,2,4/4boldtitles/4captionlines/3rodlabels/4H₂SO₄đặclabels/4H₂Olabels,0flowarrows/0drops/0liquidlevelpatterns.",
+    "occlusion": "Rodforegroundoverreceivermouthandtiltedspoutcontact;tiltedbeakerplainwhitebehindrod/forwardrightreceiveredge;allleadersfinegraywithoutarrowheads. Panel3NOrod.",
+    "critical": "WrongchoiceHình1waterpouredtowardacidkeptliteral,doNOTfixlabelsorcaptiontheory/safetysolution;publicstemquestionnotinstruction."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
