@@ -49,6 +49,18 @@ function congThuc(v: string, truoc = '', sau = ''): string | (string | JSX.Eleme
 }
 
 const giuNguyen = (v: string): string => v
+// MÀN THI link /t (data-trong='hs' mà KHÔNG có data-ht2 của cổng): chỉ «không» (thầy 07/11), bỏ span trình bày phương trình — tác tử tốc độ đo
+// 800 ChemText ×4 CPU +20 ms vì span thêm; cổng học sinh (data-ht2) và test (không data-trong) giữ trình bày đủ như 27/10.
+// Đọc thuộc tính <html> MỘT lần mỗi nhịp vẽ (nhớ tới hết microtask) thay vì mỗi khúc chữ — màn thi ~800 khúc / lượt vẽ.
+let nhoCheDo: typeof congThuc | null = null
+function cheDo(): typeof congThuc {
+  if (!nhoCheDo) {
+    const g = document.documentElement
+    nhoCheDo = g.dataset.trong === 'hs' && !g.hasAttribute('data-ht2') ? giuNguyen : congThuc
+    queueMicrotask(() => { nhoCheDo = null })
+  }
+  return nhoCheDo
+}
 const RE_KHONG = /(^|[^\p{L}\p{M}\p{N}])(kh(?:ô|o\u0302)ng)(?![\p{L}\p{M}\p{N}])/giu // nhóm bắt ký tự đứng trước thay cho nhìn-lùi (iPhone iOS < 16.4 không chạy)
 const RE_KHONG_NHANH = /kh(?:ô|o\u0302)ng/i
 const TU_GHEP = /^\s+(khí|màu|mùi|vị|gian|đổi|no|phân cực|bão hòa|bão hoà|đáng kể)(?![\p{L}\p{M}\p{N}])/u
@@ -65,9 +77,7 @@ export function laKhongNhan(v: string, i: number, n: number): boolean {
 
 /** Chuỗi chữ ⇒ nguyên chuỗi hoặc mảng nút: «không» phủ định bọc `ct-khong`, phần còn lại qua luật phương trình như cũ. */
 export function trinhBayChu(v: string, truoc = '', sau = ''): string | (string | JSX.Element)[] {
-  // MÀN THI link /t (data-trong='hs' mà KHÔNG có data-ht2 của cổng): chỉ «không» (thầy 07/11), bỏ span trình bày phương trình — tác tử tốc độ đo
-  // 800 ChemText ×4 CPU +20 ms vì span thêm; cổng học sinh (data-ht2) và test (không data-trong) giữ trình bày đủ như 27/10.
-  const g = document.documentElement, trinhBayCongThuc = g.dataset.trong === 'hs' && !g.hasAttribute('data-ht2') ? giuNguyen : congThuc
+  const trinhBayCongThuc = cheDo()
   if (!RE_KHONG_NHANH.test(v)) return trinhBayCongThuc(v, truoc, sau)
   const ra: (string | JSX.Element)[] = []
   let tu = 0
