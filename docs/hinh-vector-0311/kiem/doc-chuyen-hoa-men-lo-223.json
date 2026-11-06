@@ -1,0 +1,220 @@
+{
+  "hash": "3412a711dbf23e5dae2977be97397bea80996ebc966da459b439bf6e5aedeabb",
+  "file": "anh/3412a711dbf23e5dae2977be97397bea80996ebc966da459b439bf6e5aedeabb.png",
+  "mime": "image/png",
+  "bytes": 7795,
+  "i": 303,
+  "questions": [
+    {
+      "qid": "DB-12-B4-D2-I-132",
+      "de": "Cho sơ đồ chuyển hóa sau: Các chất X, Y thỏa mãn sơ đồ trên lần lượt là",
+      "refs": [
+        {
+          "hash": "3412a711dbf23e5dae2977be97397bea80996ebc966da459b439bf6e5aedeabb",
+          "where": "DB-12-B4-D2-I-132.hinh.0.du_lieu",
+          "hashDataUrl": "ec5735fe2bf31d2d78de37bbcacdd10005edd31a351ce6ce987716dd1c1d5e2b",
+          "publicPosition": {
+            "where": "DB-12-B4-D2-I-132.hinh.0.du_lieu",
+            "hashDataUrl": "ec5735fe2bf31d2d78de37bbcacdd10005edd31a351ce6ce987716dd1c1d5e2b",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B6-I-62",
+      "de": "Cho sơ đồ chuyển hóa sau: Các chất X, Y thỏa mãn sơ đồ trên lần lượt là",
+      "refs": [
+        {
+          "hash": "3412a711dbf23e5dae2977be97397bea80996ebc966da459b439bf6e5aedeabb",
+          "where": "DH-12-C2-B6-I-62.hinh.0.du_lieu",
+          "hashDataUrl": "ec5735fe2bf31d2d78de37bbcacdd10005edd31a351ce6ce987716dd1c1d5e2b",
+          "publicPosition": {
+            "where": "DH-12-C2-B6-I-62.hinh.0.du_lieu",
+            "hashDataUrl": "ec5735fe2bf31d2d78de37bbcacdd10005edd31a351ce6ce987716dd1c1d5e2b",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "fileNguon": "anh/3412a711dbf23e5dae2977be97397bea80996ebc966da459b439bf6e5aedeabb.png",
+  "nativeSize": [
+    1024,
+    99
+  ],
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/chuyenhoa223-part1-4x.png",
+    "/workspace/scratch/chuyenhoa223-part2-4x.png",
+    "/workspace/scratch/chuyenhoa223-part3-4x.png"
+  ],
+  "sequence": [
+    "CO₂ + H₂O",
+    "X",
+    "Y",
+    "C₂H₅OH"
+  ],
+  "arrows": [
+    {
+      "from": "CO₂ + H₂O",
+      "to": "X",
+      "direction": "RIGHT",
+      "shaftApprox": [
+        [
+          226,
+          52
+        ],
+        [
+          420,
+          52
+        ]
+      ],
+      "tipApprox": [
+        432,
+        52
+      ],
+      "above": {
+        "literal": "ánh sáng",
+        "approxBounds": [
+          275,
+          13,
+          395,
+          39
+        ]
+      },
+      "below": {
+        "literal": "chất diệp lục",
+        "approxBounds": [
+          249,
+          64,
+          420,
+          95
+        ]
+      }
+    },
+    {
+      "from": "X",
+      "to": "Y",
+      "direction": "RIGHT",
+      "shaftApprox": [
+        [
+          478,
+          56
+        ],
+        [
+          654,
+          56
+        ]
+      ],
+      "tipApprox": [
+        668,
+        56
+      ],
+      "above": {
+        "literal": "+ H₂O",
+        "approxBounds": [
+          523,
+          14,
+          609,
+          47
+        ]
+      },
+      "below": {
+        "literal": "men amylase",
+        "approxBounds": [
+          482,
+          66,
+          659,
+          96
+        ]
+      }
+    },
+    {
+      "from": "Y",
+      "to": "C₂H₅OH",
+      "direction": "RIGHT",
+      "shaftApprox": [
+        [
+          711,
+          57
+        ],
+        [
+          853,
+          57
+        ]
+      ],
+      "tipApprox": [
+        867,
+        57
+      ],
+      "above": {
+        "literal": "men rượu",
+        "approxBounds": [
+          715,
+          17,
+          843,
+          47
+        ]
+      },
+      "below": null
+    }
+  ],
+  "formulaDetails": {
+    "leftCO2": "CO rồi2subscript",
+    "leftWater": "H rồi2subscript rồiO;dấucộnggiữagiữaCO2vàH2O",
+    "secondCondition": "+H2O códấucộngđầu,2subscript",
+    "final": "C rồi2subscript,H rồi5subscript,OHliềncuối. KHÔNGC2H6O,khôngCH3CH2OHtựchuẩnhoá.",
+    "superscripts": []
+  },
+  "counts": {
+    "singleRightArrows": 3,
+    "arrowheads": 3,
+    "unknownLabels": 2,
+    "reversibleArrows": 0,
+    "caption": 0
+  },
+  "conditionsLiteral": [
+    "ánh sáng",
+    "chất diệp lục",
+    "+ H₂O",
+    "men amylase",
+    "men rượu"
+  ],
+  "positions": {
+    "leftFormulaApprox": [
+      5,
+      35
+    ],
+    "XApprox": [
+      441,
+      38
+    ],
+    "YApprox": [
+      676,
+      40
+    ],
+    "finalFormulaApprox": [
+      874,
+      39
+    ]
+  },
+  "notPresent": [
+    "tên/chấtthayX-Y",
+    "C6H12O6/C6H10O5",
+    "hệsốtrướcCO2/H2O/sảnphẩm",
+    "O2hoặcCO2sảnphẩm",
+    "t⁰/pH/nhiệtđộ",
+    "charge",
+    "caption/title",
+    "brackets",
+    "arrowdưới/phảnứngđảo"
+  ],
+  "critical": "KhônggiảiX/Ytừlýthuyết. Giữ5textblockconditionsđúngtrên/dưới3arrow;đúngdấuvàsubscript,khôngthêmmenởarrow1hoặcthaymenamylasebằngenzymechung.",
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đãđọcnguồn,chưađạtSVG"
+}

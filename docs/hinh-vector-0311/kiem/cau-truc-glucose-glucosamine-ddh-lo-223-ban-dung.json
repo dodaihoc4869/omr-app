@@ -1,0 +1,40 @@
+[
+  {
+    "i": 299,
+    "hash": "33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb",
+    "fileNguon": "anh/33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb.png",
+    "svg": "glucose-glucosamine-ddh-b6583318cdd10c960edd7352c78ccd4b6c06164d674e994d6c414f3d098d5164.svg",
+    "hashSvg": "b6583318cdd10c960edd7352c78ccd4b6c06164d674e994d6c414f3d098d5164",
+    "byteSvg": 35078,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-II-34",
+        "de": "Glucosamine đóng vai trò quan trọng trong việc duy trì và phát triển sụn trong khớp cơ thể người. Quan sát công thức cấu tạo của glucose và glucosamine dưới đây:",
+        "refs": [
+          {
+            "hash": "33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb",
+            "where": "12-C3-B8-D2-II-34.hinh.0.du_lieu",
+            "hashDataUrl": "a95dfae437539d9876a374b2bd800379dad2688042956cdbd3d377aa5fc90041"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-II-184",
+        "de": "Glucosamine đóng vai trò quan trọng trong việc duy trì và phát triển sụn trong khớp cơ thể người. Quan sát công thức cấu tạo của glucose và glucosamine dưới đây:",
+        "refs": [
+          {
+            "hash": "33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb",
+            "where": "DB-12-B8-D1-II-184.hinh.0.du_lieu",
+            "hashDataUrl": "a95dfae437539d9876a374b2bd800379dad2688042956cdbd3d377aa5fc90041"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2Haworth/10H/12Cnums/2CH2OH/7OH+NH2-C2DOWNright/βC1OHUPboth/4weakTAPER2horizontalbold/2captionslowercase/noextraH-DDHpath.",
+    "hashSvgDaSoat": "b6583318cdd10c960edd7352c78ccd4b6c06164d674e994d6c414f3d098d5164",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

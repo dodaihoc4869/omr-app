@@ -1,0 +1,412 @@
+{
+  "i": 299,
+  "hash": "33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb",
+  "fileNguon": "anh/33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-glucosamine223-zoom.png",
+    "/workspace/scratch/cau4-glucosamine223-front1.png",
+    "/workspace/scratch/cau4-glucosamine223-front2.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C3-B8-D2-II-34",
+      "de": "Glucosamine đóng vai trò quan trọng trong việc duy trì và phát triển sụn trong khớp cơ thể người. Quan sát công thức cấu tạo của glucose và glucosamine dưới đây:",
+      "refs": [
+        {
+          "hash": "33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb",
+          "where": "12-C3-B8-D2-II-34.hinh.0.du_lieu",
+          "hashDataUrl": "a95dfae437539d9876a374b2bd800379dad2688042956cdbd3d377aa5fc90041"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-II-184",
+      "de": "Glucosamine đóng vai trò quan trọng trong việc duy trì và phát triển sụn trong khớp cơ thể người. Quan sát công thức cấu tạo của glucose và glucosamine dưới đây:",
+      "refs": [
+        {
+          "hash": "33a1405b7456c02797ec9e791c1c0f665a97e25748cab1f843ba2fd6bcce1adb",
+          "where": "DB-12-B8-D1-II-184.hinh.0.du_lieu",
+          "hashDataUrl": "a95dfae437539d9876a374b2bd800379dad2688042956cdbd3d377aa5fc90041"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox,bothβOHup,notaddGreekcaptions.",
+    "units": [
+      {
+        "ring": {
+          "C4": [
+            65,
+            187
+          ],
+          "C5": [
+            123,
+            128
+          ],
+          "O": [
+            203,
+            128
+          ],
+          "C1": [
+            263,
+            187
+          ],
+          "C2": [
+            205,
+            241
+          ],
+          "C3": [
+            123,
+            241
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "at": [
+            162,
+            79
+          ],
+          "bond": [
+            [
+              123,
+              128
+            ],
+            [
+              123,
+              96
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "C1OHup": {
+          "text": "OH",
+          "at": [
+            275,
+            124
+          ],
+          "bond": [
+            [
+              263,
+              187
+            ],
+            [
+              263,
+              144
+            ]
+          ]
+        },
+        "C4OHdown": {
+          "text": "OH",
+          "at": [
+            76,
+            239
+          ],
+          "bond": [
+            [
+              65,
+              187
+            ],
+            [
+              65,
+              221
+            ]
+          ]
+        },
+        "C3OHup": {
+          "text": "OH",
+          "at": [
+            135,
+            200
+          ],
+          "bond": [
+            [
+              123,
+              241
+            ],
+            [
+              123,
+              212
+            ]
+          ]
+        },
+        "C2down": {
+          "text": "OH",
+          "at": [
+            220,
+            292
+          ],
+          "bond": [
+            [
+              205,
+              241
+            ],
+            [
+              205,
+              274
+            ]
+          ],
+          "target": "Oleft"
+        },
+        "Hlabels": [
+          {
+            "on": "C4up",
+            "at": [
+              65,
+              127
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              123,
+              165
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              123,
+              296
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              205,
+              192
+            ]
+          },
+          {
+            "on": "C1down",
+            "at": [
+              263,
+              242
+            ]
+          }
+        ],
+        "numbers": {
+          "1": [
+            276,
+            173
+          ],
+          "2": [
+            221,
+            256
+          ],
+          "3": [
+            110,
+            259
+          ],
+          "4": [
+            52,
+            187
+          ],
+          "5": [
+            111,
+            118
+          ],
+          "6": [
+            123,
+            59
+          ]
+        },
+        "caption": "glucose",
+        "captionAt": [
+          173,
+          343
+        ],
+        "frontStyle": "2TAPERfrontthinC4/C1wideC3/C2+horizontalbold(native4xseparate)"
+      },
+      {
+        "ring": {
+          "C4": [
+            680,
+            176
+          ],
+          "C5": [
+            738,
+            119
+          ],
+          "O": [
+            817,
+            119
+          ],
+          "C1": [
+            877,
+            176
+          ],
+          "C2": [
+            820,
+            233
+          ],
+          "C3": [
+            738,
+            233
+          ]
+        },
+        "CH2OH": {
+          "text": "CH₂OH",
+          "at": [
+            777,
+            70
+          ],
+          "bond": [
+            [
+              738,
+              119
+            ],
+            [
+              738,
+              87
+            ]
+          ],
+          "target": "Cfirst"
+        },
+        "C1OHup": {
+          "text": "OH",
+          "at": [
+            889,
+            113
+          ],
+          "bond": [
+            [
+              877,
+              176
+            ],
+            [
+              877,
+              133
+            ]
+          ]
+        },
+        "C4OHdown": {
+          "text": "OH",
+          "at": [
+            691,
+            228
+          ],
+          "bond": [
+            [
+              680,
+              176
+            ],
+            [
+              680,
+              210
+            ]
+          ]
+        },
+        "C3OHup": {
+          "text": "OH",
+          "at": [
+            750,
+            192
+          ],
+          "bond": [
+            [
+              738,
+              233
+            ],
+            [
+              738,
+              204
+            ]
+          ]
+        },
+        "C2down": {
+          "text": "NH₂",
+          "at": [
+            835,
+            284
+          ],
+          "bond": [
+            [
+              820,
+              233
+            ],
+            [
+              820,
+              266
+            ]
+          ],
+          "target": "Nfirst"
+        },
+        "Hlabels": [
+          {
+            "on": "C4up",
+            "at": [
+              680,
+              116
+            ]
+          },
+          {
+            "on": "C5down",
+            "at": [
+              738,
+              156
+            ]
+          },
+          {
+            "on": "C3down",
+            "at": [
+              738,
+              288
+            ]
+          },
+          {
+            "on": "C2up",
+            "at": [
+              820,
+              184
+            ]
+          },
+          {
+            "on": "C1down",
+            "at": [
+              877,
+              231
+            ]
+          }
+        ],
+        "numbers": {
+          "1": [
+            891,
+            164
+          ],
+          "2": [
+            836,
+            247
+          ],
+          "3": [
+            725,
+            249
+          ],
+          "4": [
+            667,
+            175
+          ],
+          "5": [
+            725,
+            110
+          ],
+          "6": [
+            737,
+            49
+          ]
+        },
+        "caption": "glucosamine",
+        "captionAt": [
+          785,
+          337
+        ],
+        "frontStyle": "2TAPERfrontthinC4/C1wideC3/C2+horizontalbold(native4xseparate)"
+      }
+    ],
+    "counts": "2sixrings/12Cnums/10Hlabels/2CH₂OH-Cfirst/7OHstandalone(4left3right)+1NH₂-Nfirst/4TAPERfront+2horizontalbold/2captionslowercaseglucose-glucosamine.",
+    "critical": "Separatefront4xconfirmsdiagonalbroadenstofoot(~2→5px),NOTuniform2pxmodel. NH2replacesC2OHrightonly,C1OHUP-Hdownbothsource,allOHliteralOHnotHO,NOcharges/CIP/arrows/captionextra."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
