@@ -7,12 +7,12 @@
 export type PhanCau = 'I' | 'II' | 'III'
 export type PhaLuot = 'tra-loi' | 'goi' | 'lam-bang' | 'mo'
 
-/** Bốn đội màu thử ngọn lửa: Na vàng · K tím (dùng biến chàm --tr-hs) · Cu xanh lục lam · Ca đỏ cam. */
+/** Bốn đội màu thử ngọn lửa: Na vàng · K tím · Cu xanh lam · Ca cam (biến --tr-doi-* ở trong.css, cùng giá trị ở hai app). */
 export const DOI_BPU = [
-  { ten: 'Đội Natri', ky: 'Na', mau: '--tr-sao' },
-  { ten: 'Đội Kali', ky: 'K', mau: '--tr-hs' },
-  { ten: 'Đội Đồng', ky: 'Cu', mau: '--tr-tin' },
-  { ten: 'Đội Canxi', ky: 'Ca', mau: '--tr-chu-y' },
+  { ten: 'Đội Natri', ky: 'Na', mau: '--tr-doi-na' },
+  { ten: 'Đội Kali', ky: 'K', mau: '--tr-doi-k' },
+  { ten: 'Đội Đồng', ky: 'Cu', mau: '--tr-doi-cu' },
+  { ten: 'Đội Canxi', ky: 'Ca', mau: '--tr-doi-ca' },
 ] as const
 
 export const KJ = {
@@ -272,10 +272,10 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
 }
 
 export const diemDoi = (st: TrangThaiPhong, d: number): number => st.ds.reduce((s, e) => s + (e.doi === d ? e.kj : 0), 0) + (st.doiThuong[d] ?? 0)
-/** Xếp hạng đội theo kJ TRUNG BÌNH mỗi bạn có mặt (đội có bạn vắng không thiệt), hoà ⇒ tổng lớn hơn. */
+/** Xếp hạng đội theo TỔNG kJ (con số hiện trên bảng — cả lớp nhìn là hiểu); hoà ⇒ trung bình mỗi bạn có mặt cao hơn. Chia đội lệch nhau tối đa 1 bạn. */
 export function xepDoi(st: TrangThaiPhong): { doi: number; tong: number; coMat: number; tb: number }[] {
   return [0, 1, 2, 3].map((d) => { const coMat = st.ds.filter((e) => e.doi === d && e.vao).length, tong = diemDoi(st, d); return { doi: d, tong, coMat, tb: coMat ? tong / coMat : tong } })
-    .sort((a, b) => b.tb - a.tb || b.tong - a.tong || a.doi - b.doi)
+    .sort((a, b) => b.tong - a.tong || b.tb - a.tb || a.doi - b.doi)
 }
 export const xepEm = (st: TrangThaiPhong): EmPhong[] => [...st.ds].filter((e) => e.vao).sort((a, b) => b.kj - a.kj || a.ten.localeCompare(b.ten))
 

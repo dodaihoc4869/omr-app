@@ -108,10 +108,10 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     expect(st.ds[0]!.roi).toBe(2)
     expect(st.luot!.roiMe).toEqual(['S1'])
   })
-  it('xếp đội theo trung bình mỗi bạn có mặt', () => {
+  it('xếp đội theo tổng kJ (con số hiện trên bảng)', () => {
     const st = phong()
     const x = xepDoi(st)
     expect(x).toHaveLength(4)
-    expect(x[0]!.tb).toBeGreaterThanOrEqual(x[3]!.tb)
+    expect(x[0]!.tong).toBeGreaterThanOrEqual(x[3]!.tong)
   })
 })

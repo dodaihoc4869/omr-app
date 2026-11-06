@@ -24,7 +24,7 @@ const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); retur
 const gioPhut = (ms: number | null) => { if (!ms) return ''; const d = new Date(ms); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }
 const mauDoi = (d: number) => `var(${DOI_BPU[d]?.mau ?? '--tr-tin'})`
 const diemDoi = (v: ViewBang, d: number) => v.ds.reduce((s, e) => s + (e.doi === d ? e.kj : 0), 0) + (v.doiThuong[d] ?? 0)
-const xepDoi = (v: ViewBang) => [0, 1, 2, 3].map((d) => { const coMat = v.ds.filter((e) => e.doi === d && e.vao).length, tong = diemDoi(v, d); return { d, tong, tb: coMat ? tong / coMat : tong } }).sort((a, b) => b.tb - a.tb || b.tong - a.tong)
+const xepDoi = (v: ViewBang) => [0, 1, 2, 3].map((d) => { const coMat = v.ds.filter((e) => e.doi === d && e.vao).length, tong = diemDoi(v, d); return { d, tong, tb: coMat ? tong / coMat : tong } }).sort((a, b) => b.tong - a.tong || b.tb - a.tb)
 
 /** Vị trí tâm ô thứ i trên sân khấu (lưới 16 cột; đông hơn 48 em ⇒ 24 cột). */
 function viTriO(i: number, cot: number) { const w = (1792 - (cot - 1) * 10) / cot; return { x: 64 + (i % cot) * (w + 10) + w / 2, y: 840 + Math.floor(i / cot) * 90 + 40 } }
@@ -272,7 +272,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, onD
     const vua = v.vuaVao.slice(-2).reverse().map((s) => ds.find((e) => e.sbd === s)).filter(Boolean) as Em[]
     noi = (
       <>
-        {tren(<div className="bb-pill">Điểm danh</div>, <div className="bb-lop mo">{v.lop ? `Lớp ${v.lop}` : ''}</div>)}
+        {tren(<div className="bb-pill">Điểm danh</div>)}
         <div className="bb-dd">
           <h2>Vào lớp: mở app, nhập mã</h2>
           <p className="phu">Một mã cho cả điểm danh lẫn Bình Phản Ứng. Mỗi bạn vào lớp: +{KJ.vaoLop} kJ cho đội.</p>
