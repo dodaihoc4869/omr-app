@@ -131,6 +131,8 @@ html.may-yeu[data-trong] .ht-thanh { background: var(--tr-nen); backdrop-filter:
 [data-trong] .bcc[data-bac='12'] { --bac: var(--tr-sao); }
 
 /* ── 10. Chữ mảnh toàn app (06/11): mọi màn hiển thị chữ mảnh không in đậm (500), giữ nguyên chữ xanh bấm ra khối lượng (.gyc-v.gyc-cham). ── */
-[data-trong] *:not(.gyc-cham, .gyc-cham *) { font-weight: 500 !important; }
+/*    06/11 chiều (thầy: «app hs … in đậm những chỗ cần thiết như Duolingo, riêng phần đề để chữ mảnh, chỉ in đậm chữ Không») ⇒ app HỌC SINH ra khỏi luật
+      này: chữ đậm theo từng màn như trước; đề + phương án vẫn mảnh 500 (trong-hs.css `.duo :is(.ht2-lam-de-chu, .ht2-lam-pa)`), «không» phủ định đậm. */
+[data-trong]:not([data-trong='hs']) *:not(.gyc-cham, .gyc-cham *) { font-weight: 500 !important; }
 
 

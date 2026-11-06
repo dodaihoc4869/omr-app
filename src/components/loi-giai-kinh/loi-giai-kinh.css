@@ -421,5 +421,5 @@ html.may-yeu .lgk-dp-o[data-sang] { transform: none; }
 html.may-yeu .lgk-dd-phan { transition: transform .2s; }
 .lgk-dt-chat { text-transform: none; letter-spacing: 0; font-size: 15px; color: var(--tr-chu); margin-left: 4px; }
 /* 06/11: chữ hiển thị trong tấm lời giải kính cũng dùng chữ mảnh (500 — mặt Đề), giữ nguyên chữ xanh bấm ra khối lượng (.gyc-v.gyc-cham). */
-.lgk *:not(.gyc-cham):not(.gyc-cham *) { font-weight: 500 !important; }
+:root:not([data-trong='hs']) .lgk *:not(.gyc-cham):not(.gyc-cham *) { font-weight: 500 !important; } /* app học sinh: đậm chỗ cần thiết (thầy 06/11 chiều) */
 .lgk .gyc-v.gyc-cham, .lgk .gyc-v.gyc-cham * { color: var(--tr-tin-chu); font-weight: 700 !important; }
