@@ -6355,6 +6355,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82": {
+      "tep": "glucose-sorbitol-ddh-23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78.svg",
+      "hashSvg": "23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78",
+      "byteSvg": 23552,
+      "byteGzip": 3435,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1f21749c722a82184b8f3920fd3766e3487a13a170c9c4c8a62b25564792534c": {
       "tep": "lewis-nitric-ddh-83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a.svg",
       "hashSvg": "83f0e8f45a6cdf4544be4b7fff7dc0a0620522aac9d7e583c6494a2a072fcf3a",
@@ -12627,6 +12636,20 @@
       ]
     },
     {
+      "qid": "12-KT-C2-D4-I-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+          "where": "12-KT-C2-D4-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "10523b6aaea9a0941440f2f68930f787f47aa927ee3126205691f75c68291a2b",
+          "vector": "glucose-sorbitol-ddh-23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D4-II-1",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -17119,6 +17142,20 @@
           "where": "DB-12-B4-D3-I-156.hinh.0.du_lieu",
           "hashDataUrl": "534e65612746271d72a1fc0d59b7a6464174763348d667a0b2820c14be629e84",
           "vector": "polysaccharide-phan-nhanh-ddh-e6bb7b685fd35ee774ed627cb5663a3b2cdf27b9a7d02efb41817d27a0cd924b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-158",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+          "where": "DB-12-B4-D3-I-158.hinh.0.du_lieu",
+          "hashDataUrl": "10523b6aaea9a0941440f2f68930f787f47aa927ee3126205691f75c68291a2b",
+          "vector": "glucose-sorbitol-ddh-23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78.svg"
         }
       ]
     },
@@ -26426,6 +26463,7 @@
     "12-KT-C1234-D2-I-2",
     "12-KT-C1234-D2-I-5",
     "12-KT-C2-D4-I-3",
+    "12-KT-C2-D4-I-5",
     "12-KT-C2-D4-II-1",
     "12-KT-C2-D4-II-4",
     "12-KT-C2-D3-I-9",
@@ -26698,6 +26736,7 @@
     "DB-12-B4-D3-I-152",
     "DB-12-B4-D3-I-155",
     "DB-12-B4-D3-I-156",
+    "DB-12-B4-D3-I-158",
     "DB-12-B4-D3-II-166",
     "DB-12-B4-D3-I-176",
     "DB-12-B4-D3-I-187",

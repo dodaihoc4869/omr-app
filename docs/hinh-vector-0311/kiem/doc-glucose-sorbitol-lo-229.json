@@ -1,0 +1,172 @@
+{
+  "i": 388,
+  "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82.png",
+  "nativeSize": [
+    1085,
+    501
+  ],
+  "reviewed": [
+    "native full",
+    "2x full",
+    "separate 3x left/right atom panels"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C2-D4-I-5",
+      "maDe": "12-KT-C2-D4",
+      "de": "Cho phản ứng chuyển hoá Glucose → Sorbitol theo sơ đồ dưới đây. Tác nhân (A) thích hợp cho phản ứng trên là (điều kiện phản ứng, xúc tác có đủ)",
+      "hinh": [
+        {
+          "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+          "where": "12-KT-C2-D4-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "10523b6aaea9a0941440f2f68930f787f47aa927ee3126205691f75c68291a2b"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-158",
+      "maDe": "DB-12-B4-D3",
+      "de": "Cho phản ứng chuyển hoá Glucose → Sorbitol theo sơ đồ dưới đây. Tác nhân (A) thích hợp cho phản ứng trên là (điều kiện phản ứng, xúc tác có đủ)",
+      "hinh": [
+        {
+          "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+          "where": "DB-12-B4-D3-I-158.hinh.0.du_lieu",
+          "hashDataUrl": "10523b6aaea9a0941440f2f68930f787f47aa927ee3126205691f75c68291a2b"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "left": {
+      "axisX": 539,
+      "topBareC1": [
+        539,
+        90
+      ],
+      "carbonyl": "two thin parallel rising-right lines to O near586,64; first starts539,90 ends574,70; second starts548,95 ends581,76",
+      "explicitAldehydeH": false,
+      "rows": [
+        {
+          "y": 145,
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "y": 199,
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "y": 254,
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "y": 309,
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "bottomBareC6": [
+        539,
+        363
+      ],
+      "bottomBondToOH": "slants down-right to573,383; OH near597,391",
+      "caption": "Glucose",
+      "captionStyleSource": "italic",
+      "captionNear": [
+        566,
+        439
+      ]
+    },
+    "right": {
+      "axisX": 933,
+      "topBareC1": [
+        933,
+        91
+      ],
+      "topBondToOH": "single line up-right to967,71; OH near990,65; no CH2/H2C text",
+      "rows": [
+        {
+          "y": 146,
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "y": 200,
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "y": 255,
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "y": 310,
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "bottomBareC6": [
+        933,
+        364
+      ],
+      "bottomBondToOH": "single line down-right to967,384; OH near991,392",
+      "caption": "Sorbitol",
+      "captionStyleSource": "italic",
+      "captionNear": [
+        983,
+        439
+      ]
+    },
+    "arrow": {
+      "start": [
+        668,
+        234
+      ],
+      "end": [
+        823,
+        234
+      ],
+      "direction": "RIGHT",
+      "heads": 1,
+      "label": "A",
+      "labelNear": [
+        740,
+        209
+      ],
+      "parentheses": false,
+      "below": null
+    },
+    "totals": {
+      "carbonSkeleton": 12,
+      "O": 12,
+      "OHlabels": 11,
+      "explicitStandaloneH": 8,
+      "carbonNumbers": 0,
+      "CH2labels": 0,
+      "arrowheads": 1
+    },
+    "stereochemistry": "Both Fischer rows OH right,left,right,right top to bottom; do not mirror or normalize. Source has no wedges/dashes or center C labels.",
+    "whiteMargins": "Large blank source left margin; no cropped print/data outside drawing."
+  },
+  "cautions": [
+    "No explicit aldehyde H; do not add CHO label or H to top C1.",
+    "Terminal carbons are bare vertices; do not replace with CH2OH text.",
+    "Keep A literal with no parentheses, do not identify agent.",
+    "Caption Glucose/Sorbitol capital initials; all labels public data."
+  ],
+  "status": "Đạt exact SVG sau fresh actual review",
+  "actualReview": {
+    "i": 388,
+    "hashSvg": "23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG và mở nativefull/2x/riêng từng panel3x; đối chiếu đủ hai public refs. Hai Fischer giữ OH phải-trái-phải-phải, đủ8H riêng/11OH+1carbonylO,12C bare vertices, carbonyl hai nét không H aldehyde. Glucose C6/sorbitol C1,C6 bẻ tới OH không thêm CH2 hay H; một right arrow/nhãn A không ngoặc, captions Glucose/Sorbitol đúng và nghiêng bằng paths. Chữ/nét có gap, không chạm/cắt/tràn; không giải A.",
+    "byteSvg": 23552,
+    "actualSvgReviewed": true,
+    "render": "/workspace/scratch/glucose-sorbitol388-229-23182b5d-chromium.png",
+    "sourceHash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82"
+  }
+}

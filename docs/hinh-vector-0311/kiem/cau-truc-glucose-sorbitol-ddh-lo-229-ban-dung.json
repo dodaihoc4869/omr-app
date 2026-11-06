@@ -1,0 +1,40 @@
+[
+  {
+    "i": 388,
+    "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+    "fileNguon": "anh/453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82.png",
+    "svg": "glucose-sorbitol-ddh-23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78.svg",
+    "hashSvg": "23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78",
+    "byteSvg": 23552,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D4-I-5",
+        "de": "Cho phản ứng chuyển hoá Glucose → Sorbitol theo sơ đồ dưới đây. Tác nhân (A) thích hợp cho phản ứng trên là (điều kiện phản ứng, xúc tác có đủ)",
+        "refs": [
+          {
+            "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+            "where": "12-KT-C2-D4-I-5.hinh.0.du_lieu",
+            "hashDataUrl": "10523b6aaea9a0941440f2f68930f787f47aa927ee3126205691f75c68291a2b"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-158",
+        "de": "Cho phản ứng chuyển hoá Glucose → Sorbitol theo sơ đồ dưới đây. Tác nhân (A) thích hợp cho phản ứng trên là (điều kiện phản ứng, xúc tác có đủ)",
+        "refs": [
+          {
+            "hash": "453d5e8e46f850e8c9ce6a21d0a0f0ac9d00af4bbd80c10588ac626d60187d82",
+            "where": "DB-12-B4-D3-I-158.hinh.0.du_lieu",
+            "hashDataUrl": "10523b6aaea9a0941440f2f68930f787f47aa927ee3126205691f75c68291a2b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2Fischer12implicitC/8standaloneH/11OH+1aldehydeOdouble/2RLRR/bareterminalC-OH/RIGHTarrowA/Glucose-SorbitolDDHpathsnghiêng/noaddedaldehydeH-condition-answer/DDHpath.",
+    "hashSvgDaSoat": "23182b5dcdb1d14b67e7bb6429fca05105b8929952c1b4fdc7c6e250814bba78",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
