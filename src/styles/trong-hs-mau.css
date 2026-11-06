@@ -114,7 +114,7 @@ html[data-trong='hs'] div.fixed.inset-0.overflow-y-auto:not([class*='bg-']) { ba
    Duolingo); biểu tượng hình kín (lửa, cúp, huy hiệu, bình…) tô lót 20% cùng màu nét ⇒ khối đặc, sắc. Chỉ đụng nét mặc định / fill="none":
    biểu tượng đã tự đặt nét hay tô đặc giữ nguyên. */
 html[data-trong='hs'] svg.lucide[stroke-width='2'] { stroke-width: 2.5px; }
-html[data-trong='hs'] :is(.lucide-flame, .lucide-award, .lucide-trophy, .lucide-target, .lucide-sparkles, .lucide-flask-conical, .lucide-heart, .lucide-book-open)[fill='none'] { fill: color-mix(in oklab, currentColor 20%, transparent); }
+html[data-trong='hs'] :is(.lucide-flame, .lucide-award, .lucide-trophy, .lucide-target, .lucide-sparkles, .lucide-flask-conical)[fill='none'] { fill: color-mix(in oklab, currentColor 20%, transparent); }
 /* KHUNG CỔNG (StudentPortalScreen `min-h-screen bg-slate-50`) tô --slate-50 NGÀ (#f5f4ef, bảng chung tokens.css) che kín nền loang ⇒ cả app xỉn
    (đo 06/11 bằng elementFromPoint: lớp đặc duy nhất giữa thẻ và body). Trong suốt ⇒ thấy nền gần trắng --tr-nen + loang (máy yếu cũng thấy: loang là dải màu tĩnh). */
 html[data-trong='hs'] .min-h-screen.bg-slate-50 { background-color: transparent; }
