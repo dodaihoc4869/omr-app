@@ -100,11 +100,19 @@ export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
   const buoiId = buoiHop(b.buoiId), qid = str(b.qid).trim().slice(0, 200)
   if (!buoiId || !qid) return { ok: false, error: 'Thiếu buổi hoặc câu.' }
   const hanGiay = Math.max(0, Math.min(600, Math.round(Number(b.hanGiay) || 0)))
-  const [dong, phucVu, dangThi] = await Promise.all([
+  // Đọc SONG SONG (không thêm vòng chờ nối tiếp): câu · câu bảo vệ · em đang thi · lớp của buổi + lớp các em có mặt · ca đang mở.
+  const [dong, phucVu, dangThi, buoiR, lopEmR, caR] = await Promise.all([
     env.DB.prepare(`SELECT q.json AS json ${TU_CHI_MUC_GAME} LIMIT 1`).bind(JSON.stringify([qid])).first<Row>(),
     qidPhucVuDuoc(env, [qid]),
     env.DB.prepare("SELECT DISTINCT sbd FROM luot WHERE trang_thai = 'dang_lam'").all<Row>().catch(() => ({ results: [] as Row[] })),
+    env.DB.prepare('SELECT lop FROM buoi_hoc WHERE id = ?').bind(buoiId).first<Row>().catch(() => null),
+    env.DB.prepare("SELECT DISTINCT TRIM(COALESCE(h.lop, '')) AS lop FROM buoi_hoc_diem_danh d JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ?").bind(buoiId).all<Row>().catch(() => ({ results: [] as Row[] })),
+    env.DB.prepare("SELECT ma_ca, TRIM(COALESCE(lop, '')) AS lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi'").all<Row>().catch(() => ({ results: [] as Row[] })),
   ])
+  // Lớp có ca kiểm tra mở (mở SAU lúc điểm danh) ⇒ KHÔNG gửi câu: không cướp màn em đang ở phòng chờ / đang thi (CLAUDE.md «đang có ca thi mở»).
+  const lopCua = new Set([str(buoiR?.lop).trim(), ...(lopEmR.results ?? []).map((x) => str(x.lop))].filter(Boolean))
+  const caMo = (caR.results ?? []).find((c) => lopCua.has(str(c.lop)))
+  if (caMo) return { ok: false, lyDo: 'ca-mo', error: `Lớp đang có ca kiểm tra mở (${str(caMo.ma_ca)}). Chưa gửi câu xuống máy em để không làm gián đoạn bài thi.` }
   if (!dong?.json) return { ok: false, lyDo: 'khong-co', error: 'Câu này không có trong kho của app nên chưa gửi xuống máy em được. Thầy vẫn chiếu và chữa như thường.' }
   if (phucVu.biBaoVe.includes(qid) || !phucVu.kiemDuocBaoVe) return { ok: false, lyDo: 'bao-ve', error: 'Câu này đang được giữ cho ca kiểm tra nên chưa gửi xuống máy em được.' }
   let q: PrivateQuestion
