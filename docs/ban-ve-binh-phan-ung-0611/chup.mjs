@@ -48,7 +48,7 @@ async function chup(ten, ma, { w, h, dpr = 1, toi = false, kiemNut = true }) {
 }
 
 // 1) Bảng chiếu 1920×1080 — nền tối và nền sáng của máy chiếu.
-const BANG = [['01', 'bat-dau'], ['02', 'cho'], ['03', 'tra-loi'], ['04', 'goi'], ['05', 'mo'], ['06', 'ds-mo'], ['07', 'tln-mo'], ['08', 'tu-luan'], ['09', 'ket-tinh'], ['10', 'tong-ket'], ['11', 'chan']]
+const BANG = [['01', 'bat-dau'], ['02', 'cho'], ['03', 'tra-loi'], ['04', 'goi'], ['04b', 'lam-bang'], ['05', 'mo'], ['06', 'ds-mo'], ['07', 'tln-mo'], ['08', 'tu-luan'], ['09', 'ket-tinh'], ['10', 'tong-ket'], ['11', 'chan']]
 for (const [so, pha] of BANG) for (const nen of ['toi', 'sang']) await chup(`b${so}-bang-${pha}-${nen}`, `b-${pha}-${nen}`, { w: 1920, h: 1080, kiemNut: false })
 await chup('b12-bang-mo-may-yeu', 'b-mo-toi-yeu', { w: 1920, h: 1080, kiemNut: false })
 

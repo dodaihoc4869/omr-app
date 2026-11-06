@@ -359,6 +359,20 @@ button:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { .vd-tia g, .vd-huy, .vd-ngoc > svg, .vd-sao, .vd-lua { animation: none !important; } .vd-sao { opacity: 1; transform: none; } }
 .tuc-thi .vd-sao { opacity: 1; transform: none; }
 
+/* ── Em làm trên bảng (06/11 khuya, thầy «sau khi chọn được học sinh lên bảng thì chiếu đề như thế nào»): đề hiện lại đủ như tờ chiếu, thẻ tên thu về góc cột phải, dưới là chỗ viết ── */
+.b-lb { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 14px; }
+.b-lb-the { display: flex; align-items: center; gap: 18px; padding: 16px 20px; border-radius: 24px; background: var(--tr-mat); box-shadow: inset 0 0 0 3px var(--doi), 0 0 40px color-mix(in srgb, var(--doi) 35%, transparent); }
+.b-lb-the .ng { flex: none; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: #1b1938; font-size: 40px; font-weight: 900; box-shadow: 0 0 30px var(--doi); }
+.b-lb-the .mat { font-size: 20px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tr-chu-3); }
+.b-lb-the b { display: block; font-size: 40px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.b-lb-the span { font-size: 22px; color: var(--tr-chu-2); font-weight: 700; }
+.b-lb-viet { border-radius: 24px; border: 3px dashed var(--tr-vien-2); display: grid; place-items: center; color: var(--tr-chu-3); font-size: 26px; text-align: center; padding: 20px; }
+.b-lb-dai { display: flex; align-items: center; gap: 16px; padding: 12px 18px; border-radius: 18px; background: var(--tr-mat-2); font-size: 22px; color: var(--tr-chu-2); white-space: nowrap; }
+.b-lb-dai .vach { flex: 1; height: 14px; border-radius: 8px; background: var(--tr-mat-3); overflow: hidden; min-width: 60px; }
+.b-lb-dai .vach i { display: block; height: 100%; background: var(--tr-dung); }
+.b-lb-dai b { color: var(--tr-chu); font-variant-numeric: tabular-nums; }
+.b-lb-dai .ts { padding: 4px 12px; border-radius: 10px; background: var(--doi); color: #1b1938; font-weight: 900; }
+
 /* ───────────── MÁY HỌC SINH (390×844) ───────────── */
 .may { position: absolute; left: 0; top: 0; width: 390px; height: 844px; transform-origin: 0 0; display: flex; flex-direction: column; overflow: hidden;
   background: var(--tr-nen); color: var(--tr-chu); font-family: var(--chu-tron); font-size: 16px; }
@@ -518,6 +532,7 @@ html.chup .bang * , html.chup .may * { transition: none !important; }
       <button class="dk-nut" data-buoc="cho">Điểm danh</button>
       <button class="dk-nut" data-buoc="tra-loi">Cả lớp trả lời</button>
       <button class="dk-nut" data-buoc="goi">Gọi lên bảng</button>
+      <button class="dk-nut" data-buoc="lam-bang">Em làm trên bảng</button>
       <button class="dk-nut" data-buoc="mo">Mở đáp án</button>
       <button class="dk-nut" data-buoc="ket-tinh">Bảng kết tinh</button>
       <button class="dk-nut" data-buoc="tong-ket">Tổng kết</button>
@@ -847,19 +862,20 @@ function dungBang() {
       ${DOI.map((d, k) => { const so = HS.filter((x) => x.doi === k && x.vao).length, tong = HS.filter((x) => x.doi === k).length; return `<div class="b-dd-doi ${so === tong ? 'du' : ''}" style="left:${1290 + k * 140}px;--doi:var(${d.mau})"><b>${d.ten.replace('Đội ', '')}</b><span>${so}/${tong}</span><small>${S.doiThuong[k] >= 0 ? '+' : ''}${S.doiThuong[k]} tinh thể</small></div>` }).join('')}
       <div class="b-dd-dem"><b id="bDem">${vao}</b>/${tong} em có mặt</div>`
       + oHtml() + phimBang([['Space', 'Xong điểm danh · bắt đầu lượt 1', true], ['V', 'Danh sách vắng'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc buổi']])
-  } else if (S.pha === 'tra-loi' || S.pha === 'mo' || S.pha === 'goi') {
+  } else if (S.pha === 'tra-loi' || S.pha === 'mo' || S.pha === 'goi' || S.pha === 'lam-bang') {
     const da = HS.filter((x) => x.tra).length
     const gioCon = T_ME - S.tSim
     const g = S.goi, hg = g ? HS[g.i] : null
     const chipGoi = S.pha === 'mo' && hg ? `<div class="b-pill" style="box-shadow:inset 0 0 0 3px var(${DOI[hg.doi].mau})">Lên bảng: ${hg.ngan}${g.dat === true ? ` · Đạt · ${DOI[hg.doi].ten} +200` : g.dat === false ? ' · Chưa đạt' : ''}</div>` : ''
     h = tren(`<div class="b-pill">Lượt ${S.me + 1}/${LICH.length}</div>`) + chipGoi + (c.loai === 'tl' || S.pha !== 'tra-loi' ? '' : `<div class="b-gio" id="bGio">${gio(gioCon)}</div>`) + `</div>
-      <div class="b-de" id="bDe">${deHtml(c)}</div><div class="b-phai" id="bPhai">${S.pha === 'mo' && c.loai !== 'tl' ? ongHtml() : `<div class="b-dem"><b id="bDem">${da}</b>/${tong} em ${c.loai === 'tl' ? 'làm xong' : 'đã gửi'}</div>`}</div>`
+      <div class="b-de" id="bDe">${deHtml(c)}</div><div class="b-phai" id="bPhai">${S.pha === 'lam-bang' && g ? lamBangHtml() : S.pha === 'mo' && c.loai !== 'tl' ? ongHtml() : `<div class="b-dem"><b id="bDem">${da}</b>/${tong} em ${c.loai === 'tl' ? 'làm xong' : 'đã gửi'}</div>`}</div>`
       + oHtml()
       + (S.pha === 'mo' && S.kich ? `<div class="b-kich hien-sau">Vượt năng lượng hoạt hoá! ${S.ketQua ? S.ketQua.thuTu.length : 0}/${tong} em đúng · cả lớp +30 tinh thể</div>` : '')
       + (S.pha === 'goi' && g && g.hien ? theGoiHtml() : '')
       + (S.toast ? `<div class="b-toast" id="bToast" role="status">${S.toast}</div>` : '')
       + phimBang(S.pha === 'mo' ? [['→', 'Lượt tiếp', true], ['K', 'Bảng kết tinh'], ['G', 'Lời giải'], ['C', 'Chiếu chữa lượt này'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']]
-        : S.pha === 'goi' ? [['D', 'Đạt · đội +200', true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ['Esc', 'Kết thúc']]
+        : S.pha === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ['Esc', 'Kết thúc']]
+        : S.pha === 'lam-bang' ? [['D', 'Đạt · đội +200', true], ['F', 'Chưa đạt'], ['B', 'Bút'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ['Esc', 'Kết thúc']]
         : [['Space', 'Gọi lên bảng', true], ['M', c.loai === 'tl' ? 'Hiện lời giải' : 'Mở đáp án ngay'], ['+', 'Thêm 15 giây'], ['H', 'Ẩn tên'], ['Esc', 'Kết thúc']])
   } else if (S.pha === 'ket-tinh') {
     const xep = [...HS].sort((a, b) => b.diem - a.diem || a.i - b.i)
@@ -898,7 +914,7 @@ function capNhatO() {
     o.querySelector('.hc')?.remove(); o.querySelector('.nhan-roi')?.remove()
     if (S.pha !== 'cho' && S.pha !== 'tong-ket' && x.chuoi >= 2) o.classList.add('chay')
     if (x.roiMe && (S.pha === 'tra-loi' || S.pha === 'goi')) { o.classList.add('roi'); const n = document.createElement('span'); n.className = 'nhan-roi'; n.textContent = 'Rời màn'; o.appendChild(n) }
-    if (S.pha === 'goi' && S.goi) { if (S.goi.hien && x.i === S.goi.i) o.classList.add('duoc-goi'); else if (!S.goi.hien && S.goi.ung.includes(x.i)) o.classList.add('ung') }
+    if ((S.pha === 'goi' || S.pha === 'lam-bang') && S.goi) { if ((S.goi.hien || S.pha === 'lam-bang') && x.i === S.goi.i) o.classList.add('duoc-goi'); else if (!S.goi.hien && S.goi.ung.includes(x.i)) o.classList.add('ung') }
     if (!x.vao) o.classList.add('chua-vao')
     if (S.pha === 'tra-loi' && x.tra) o.classList.add('da-tra')
     if ((S.pha === 'mo' || S.pha === 'ket-tinh' || S.pha === 'tong-ket') && S.ketQua && S.cau.loai !== 'tl') {
@@ -958,7 +974,7 @@ function dungMay() {
     const g = S.goi, hg = HS[g.i], d = DOI[hg.doi], cung = hg.doi === EM.doi
     if (tr === 'duoc-goi') h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${d.ten}`) + `<div class="m-than"><div class="m-giua"><div class="ng-tu to" style="--doi:var(${d.mau})"><div class="quy"></div><div class="quy hai"></div><div class="nhan-ng">${EM.ky}</div></div><h3>Em được mời lên bảng!</h3><p>Câu đang chiếu trên bảng. Em lên trình bày cho cả lớp nhé.</p></div><div class="m-giai"><b>Vì sao thầy chọn em</b>${g.lyDo.map((l) => `<span>${l}</span>`).join('')}</div><div class="m-the">${d.ten} đang tiếp sức em: <b id="mTiep">${g.tiep}</b> lượt</div></div>`
     else h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${DOI[EM.doi].ten}`) + `<div class="m-than"><div class="m-ban" style="--doi:var(${d.mau})"><div class="nhan-ng">${hg.ky}</div><div><b>${hg.ten}</b><span>${d.ten} · đang lên bảng</span></div></div>
-      <p class="m-hoi">Em đoán bạn ấy làm đúng không?</p><div class="m-hai"><button data-dd="1" class="${S.emDuDoan === 1 ? 'chon' : ''}">Làm đúng</button><button data-dd="0" class="${S.emDuDoan === 0 ? 'chon' : ''}">Chưa đúng</button></div><p class="m-nho">Đoán đúng +20 tinh thể cho em. Mỗi lần chạm nút dưới, một tia lửa bay lên bảng tới bạn ấy.</p></div>
+      <p class="m-hoi">Em đoán bạn ấy làm đúng không?</p><div class="m-hai"><button data-dd="1" class="${S.emDuDoan === 1 ? 'chon' : ''}">Làm đúng</button><button data-dd="0" class="${S.emDuDoan === 0 ? 'chon' : ''}">Chưa đúng</button></div><p class="m-nho">Đoán đúng +20 tinh thể cho em. Mỗi lần chạm nút dưới, một tia lửa bay lên bảng tới bạn ấy.</p><div class="m-chip">Đề trên bảng · chỉ xem</div><div class="m-de" style="font-size:16px">${S.cau.de}</div></div>
       <div class="m-day"><button class="m-nut m-tiep-nut" id="nutTiep" style="--doi:var(${d.mau})" ${S.emTiep >= 10 ? 'disabled' : ''}>${cung ? `Tiếp sức ${d.ten}` : 'Cổ vũ bạn ấy'} · ${S.emTiep}/10</button></div>`
   } else if (tr === 'roi') {
     h = tren(`Lượt ${S.me + 1}/${LICH.length} · ${DOI[EM.doi].ten}`) + `<div class="m-than"><div class="m-giua"><div class="m-canh">!</div><h3>Em vừa rời màn hình</h3><p>Thầy đã thấy trên bảng. ${DOI[EM.doi].ten} bị trừ 20 tinh thể.</p><p style="font-size:14px">Trong Bình Phản Ứng em ở lại màn này tới khi thầy kết thúc.</p></div></div><div class="m-day"><button class="m-nut" id="nutQuayLai">Quay lại lượt đang làm</button></div>`
@@ -980,7 +996,7 @@ function trangMay() {
   if (S.pha === 'cho' || S.pha === 'bat-dau' || S.pha === 'chan') return 'nghi'
   if (S.pha === 'tra-loi') return S.emGui ? 'da-gui' : 'cau'
   if (S.pha === 'mo') { if (S.cau.loai === 'tl') return 'da-gui'; if (S.giai) return 'giai'; return EM.tra && laDung(S.cau, EM.tra.chon) ? 'dung' : 'sai' }
-  if (S.pha === 'goi') return S.goi && S.goi.i === EM.i ? 'duoc-goi' : 'du-doan'
+  if (S.pha === 'goi' || S.pha === 'lam-bang') return S.goi && S.goi.i === EM.i ? 'duoc-goi' : 'du-doan'
   if (S.pha === 'ket-tinh') return 'cho'
   return 'xong'
 }
@@ -1140,7 +1156,7 @@ function chotKetQua() {
   A.ong = ong
 }
 function phaMo(tinh = false) {
-  xoaHen(); S.toast = null; if (S.pha !== 'tra-loi' && S.pha !== 'goi') phaTraLoi(true, S.loai)
+  xoaHen(); S.toast = null; if (S.pha !== 'tra-loi' && S.pha !== 'goi' && S.pha !== 'lam-bang') phaTraLoi(true, S.loai)
   S.khoa = true
   if (tinh) HS.forEach((h) => { if (!h.tra && h.vao) h.tra = { ...h.ke } })
   S.pha = 'mo'; chotKetQua()
@@ -1199,6 +1215,7 @@ function phaTinh(ten) {
     if (S.chup || S.pha !== 'mo') { xoaHen(); HS.forEach((h) => { h.vao = true; h.diem = 0; h.dungSo = 0; h.ketMe = [] }); datLaiDiem(); [0, 1].forEach((m) => { S.me = m; if (m === 1) S.goi = { i: 12, dat: true }; S.loai = 'tn'; S.cau = lapCau('tn', m); moPhong(S.cau); HS.forEach((h) => (h.tra = { ...h.ke })); chotKetQua() }); S.pha = 'mo'; danhDauLoai() }
     phaKetTinh(S.chup)
   }
+  else if (ten === 'lam-bang') { if (S.pha !== 'tra-loi' && S.pha !== 'goi') phaTraLoi(true, S.loai); if (S.pha !== 'goi') phaGoi(true); xoaHen(); phaLamBang() }
   else if (ten === 'goi') { if (S.pha !== 'tra-loi' && S.pha !== 'goi') phaTraLoi(true, S.loai); phaGoi(S.chup) }
   else if (ten === 'roi') { if (S.pha !== 'tra-loi') phaTraLoi(true, S.loai); emRoi(EM, true); S.hsTrang = 'roi'; dungMay() }
   else if (ten === 'tong-ket') phaTongKet(true)
@@ -1247,8 +1264,18 @@ function phaGoi(tinh = false, boQua = [], emEp = null) {
   S.goi = { i: chon.i, ung: u.ds.map((h) => h.i), lyDo: lyDo(chon), duDoan: [0, 0], tiep: 0, dat: null, hien: tinh || S.yeu }
   if (tinh) { S.goi.duDoan = [19, 7]; S.goi.tiep = 46 }
   datMau()
-  if (!S.goi.hien) quayChon(); else if (!tinh) coVu()
-  if (S.tuChay && !tinh) henGio(S.yeu ? 6000 : 11000, () => { if (S.pha === 'goi') { S.goi.dat = ngau() < 0.75; phaMo() } })
+  if (!S.goi.hien) quayChon(); else if (!tinh) { coVu(); henGio(4200, () => { if (S.pha === 'goi') phaLamBang() }) }
+}
+function phaLamBang() {
+  const g = S.goi; if (!g) return
+  S.pha = 'lam-bang'; g.hien = true; dungBang(); dungMay()
+  if (S.tuChay) henGio(S.yeu ? 4000 : 7500, () => { if (S.pha === 'lam-bang' && S.goi === g) { g.dat = ngau() < 0.75; phaMo() } })
+}
+function lamBangHtml() {
+  const g = S.goi, h = HS[g.i], d = DOI[h.doi], t = g.duDoan[0] + g.duDoan[1] || 1
+  return `<div class="b-lb" style="--doi:var(${d.mau})"><div class="b-lb-the"><div class="ng">${h.ky}</div><div style="min-width:0"><div class="mat">Đang làm trên bảng</div><b>${S.an ? 'Em số ' + (h.i + 1) : h.ten}</b><span>${d.ten}</span></div></div>
+    <div class="b-lb-viet">Chỗ em viết lời giải<br>Phím B: bút viết lên màn</div>
+    <div class="b-lb-dai"><span><b id="gDung">${g.duDoan[0]}</b> đoán đúng · <b id="gSai">${g.duDoan[1]}</b> chưa</span><span class="vach"><i id="gThanh" style="width:${(g.duDoan[0] / t) * 100}%"></i></span><span class="ts">Tiếp sức <span id="gTiep">${g.tiep}</span></span></div></div>`
 }
 function quayChon() {
   const g = S.goi, ds = g.ung, buoc = ds.length * 3 + ds.indexOf(g.i)
@@ -1261,7 +1288,7 @@ function quayChon() {
       bangNoi.querySelectorAll('.o.soi').forEach((o) => o.classList.remove('soi'))
       bangNoi.querySelector(`.o[data-i="${i}"]`)?.classList.add('soi')
       keu(la ? 'mo' : 'tich')
-      if (la) { const p = viTriO(i); bungManh(p.x, p.y - 30, 44, BANG_MAU['doi' + HS[i].doi], 0.8); henGio(800, () => { if (S.goi !== g) return; g.hien = true; dungBang(); dungMay(); coVu() }) }
+      if (la) { const p = viTriO(i); bungManh(p.x, p.y - 30, 44, BANG_MAU['doi' + HS[i].doi], 0.8); henGio(800, () => { if (S.goi !== g) return; g.hien = true; dungBang(); dungMay(); coVu(); henGio(4200, () => { if (S.pha === 'goi' && S.goi === g) phaLamBang() }) }) }
     })
   }
 }
@@ -1269,14 +1296,14 @@ function coVu() {
   const g = S.goi; if (!g) return
   const doi = HS[g.i].doi, ban = HS.filter((h) => h.doi === doi && h.i !== g.i)
   const nhip = () => {
-    if (S.pha !== 'goi' || S.goi !== g) return
+    if ((S.pha !== 'goi' && S.pha !== 'lam-bang') || S.goi !== g) return
     if (g.duDoan[0] + g.duDoan[1] < HS.length - 1 && Math.random() < 0.6) g.duDoan[Math.random() < 0.72 ? 0 : 1]++
     if (ban.length && Math.random() < 0.85) { const b = ban[Math.floor(Math.random() * ban.length)]; g.tiep++; tiepSuc(b.i) }
     capNhatThe(); henGio(140, nhip)
   }
   nhip()
 }
-function tiepSuc(i) { if (S.yeu || S.chup) return; const a = viTriO(i), mau = BANG_MAU['doi' + HS[i].doi]; A.hat.push({ t0: performance.now(), d: 800, mau, vet: [], p: [a.x, a.y, a.x, 640, 560, 560, 496, 427] }) }
+function tiepSuc(i) { if (S.yeu || S.chup) return; const a = viTriO(i), mau = BANG_MAU['doi' + HS[i].doi]; const [dx, dy] = S.pha === 'lam-bang' ? [1266, 222] : [496, 427]; A.hat.push({ t0: performance.now(), d: 800, mau, vet: [], p: [a.x, a.y, a.x, 640, (a.x + dx) / 2, 560, dx, dy] }) }
 function capNhatThe() {
   const g = S.goi; if (!g) return
   const t = g.duDoan[0] + g.duDoan[1] || 1, e = (id, v) => { const x = $('#' + id); if (x) x.textContent = v }
@@ -1402,10 +1429,11 @@ batTat('#nutAm', (v) => { S.am = v; keu('mo') })
 addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input,textarea')) return
   const k = e.key.toLowerCase()
-  if (e.key === ' ') { e.preventDefault(); if (S.pha === 'cho') phaTraLoi(); else if (S.pha === 'tra-loi') phaGoi(); else if (S.pha === 'goi') phaMo() }
-  else if (k === 'm' && (S.pha === 'tra-loi' || S.pha === 'goi')) phaMo()
-  else if ((k === 'd' || k === 'f') && S.pha === 'goi') { S.goi.dat = k === 'd'; phaMo() }
-  else if (k === 'n' && S.pha === 'goi') { const bo = [S.goi.i]; S.pha = 'tra-loi'; phaGoi(false, bo) }
+  if (e.key === ' ') { e.preventDefault(); if (S.pha === 'cho') phaTraLoi(); else if (S.pha === 'tra-loi') phaGoi(); else if (S.pha === 'goi' || S.pha === 'lam-bang') phaMo() }
+  else if (k === 'm' && (S.pha === 'tra-loi' || S.pha === 'goi' || S.pha === 'lam-bang')) phaMo()
+  else if ((k === 'd' || k === 'f') && (S.pha === 'goi' || S.pha === 'lam-bang')) { S.goi.dat = k === 'd'; phaMo() }
+  else if (e.key === 'Enter' && S.pha === 'goi') phaLamBang()
+  else if (k === 'n' && (S.pha === 'goi' || S.pha === 'lam-bang')) { const bo = [S.goi.i]; S.pha = 'tra-loi'; phaGoi(false, bo) }
   else if (e.key === 'ArrowRight') { if (S.pha === 'mo' || S.pha === 'ket-tinh') { if (S.me + 1 < LICH.length) { S.me++; phaTraLoi() } else phaTongKet() } }
   else if (e.key.toLowerCase() === 'k' && S.pha === 'mo') phaKetTinh()
   else if (k === 'h') $('#nutAn').click()
