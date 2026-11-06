@@ -15,3 +15,5 @@ export default katex
 export { chuanBiLatex, dungCongThuc } from './chem-latex'
 // Đầu dòng + in đậm của chữ đề (thầy 01/11) — cùng mảnh lười này.
 export { veDe } from './chem-tang-cuong'
+// Trình bày chữ app học sinh (khoảng quanh toán tử, «l» có đuôi, «không» phủ định) — 07/11: cắm cùng KaTeX để MÀN THI cũng có (chỉ khi data-trong='hs').
+import './chem-trinh-bay'

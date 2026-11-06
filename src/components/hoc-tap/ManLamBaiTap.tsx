@@ -3,7 +3,7 @@ import { lazy, startTransition, Suspense, useEffect, useLayoutEffect, useRef, us
 import { TheChonCach } from './TheChonCach'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
-import '../../lib/chem-trinh-bay' // thầy 27/10: phương trình rõ ràng (khoảng hẹp quanh toán tử, ⇌ cỡ chữ, «l» có đuôi) — chỉ app học sinh
+// Trình bày phương trình + «không» phủ định (lib/chem-trinh-bay.tsx) — 07/11 nạp cùng gói KaTeX (katex-goi.ts), không import ở đây nữa (một mảnh, không thêm tên mảnh vào bảng nạp trước).
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { ghiNhoKetQuaSanh, goiHoa2, type KetQuaSanh } from '../hoa2/api'
