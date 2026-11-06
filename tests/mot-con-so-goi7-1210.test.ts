@@ -228,8 +228,11 @@ describe('Ca 2 · Gói 7, lịch câu mới 3 < mức tầng', () => {
   })
 
   it('mức đã chốt KHÔNG nhảy trong ngày (lịch gói đổi giữa ngày vẫn đọc lại số chốt); ngày mới chốt lại', async () => {
-    const k = await khoGoi7(18)
+    // 06/11: kho 60 câu (trước 18) — ca này khoá «lịch đổi giữa ngày», kho phải ĐỦ câu; kho 18 < mức 24 nay hạ đúng về 18 (ca «kho thiếu» ở trên).
+    const k = await khoGoi7(60)
     const s0 = await sanh(k.env, k.token, NOW)
+    expect(s0.goi7.goi[0]!.quota).toBe(10) // 60 câu chưa gặp / 6 ngày
+    expect(s0.theLuc.con).toBe(24) // kho đủ: kế hoạch đúng mức, không hạ
     expect(s0.goi7.toiThieu).toBe(24)
     k.d.sql.prepare("UPDATE goi_bai_7_ngay SET quota=40 WHERE sbd='S1' AND ngay=?").run(HOM_NAY) // lịch đổi giữa ngày
     const s = await sanh(k.env, k.token, NOW + 5 * PHUT)
@@ -237,7 +240,7 @@ describe('Ca 2 · Gói 7, lịch câu mới 3 < mức tầng', () => {
     expect(s.goi7.toiThieu).toBe(24) // số đã chốt
     expect((await ngayBaiCuaMotEm(k.env, 'S1', HOM_NAY, HOM_NAY, HOM_NAY))![0]).toMatchObject({ mucToiThieu: 24, nguonMuc: 'da-chot' })
     await sanh(k.env, k.token, NOW + 86_400_000)
-    expect(mucChot(k, 'S1', '2026-10-13')).toMatchObject({ quota: 4, muc: 24 }) // 18 câu chưa gặp / 5 ngày
+    expect(mucChot(k, 'S1', '2026-10-13')).toMatchObject({ quota: 12, muc: 24 }) // 60 câu chưa gặp / 5 ngày
   })
 })
 
