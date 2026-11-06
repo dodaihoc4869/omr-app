@@ -163,7 +163,9 @@ describe('Ca 2 · Gói 7, lịch câu mới 3 < mức tầng', () => {
     const s = await sanh(k.env, k.token, HQ)
     expect(s.goi7.toiThieu).toBe(24)
     const viec = (await lapGoi7(k.env, 'S1', HQ + PHUT))!.plan.viec
-    for (const [i, v] of viec.slice(0, 22).entries()) await lam(k.env, 'S1', qidGoc(v.qid), HQ + (2 + i) * PHUT, i % 4 !== 1, { cauVersion: 'v1' })
+    // 06/11 (rút câu mới theo ma trận 2026): kế hoạch hôm qua dồn nhiều câu Nhận biết hơn thứ tự cũ ⇒ đúng 3/4 thì em vững ≥ 80% nhóm tầng 1 và LÊN tầng 2
+    // (mức 30 > 28 câu bài 40 câu còn xếp được). Kịch bản này cần em còn ở tầng 1 ⇒ đúng xen kẽ (1/2).
+    for (const [i, v] of viec.slice(0, 22).entries()) await lam(k.env, 'S1', qidGoc(v.qid), HQ + (2 + i) * PHUT, i % 2 === 0, { cauVersion: 'v1' })
     return k
   }
   it('M = mức tầng (lịch 3 nhỏ hơn); kế hoạch = M − đã làm câu, 3 câu mới theo lịch đứng đầu; mọi phía cùng số — hôm nay và hôm qua (22/24 thiếu 2)', async () => {

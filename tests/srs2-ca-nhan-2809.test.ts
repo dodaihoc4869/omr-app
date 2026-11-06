@@ -32,7 +32,9 @@ function moPhong(cau: CauSrs[], tc: Omit<TuyChonKeHoach, 'homNay' | 'hanNop'>, s
   const ngay: { so: number[]; ds: CauSrs[]; theoDang: Map<string, number[]> }[] = []
   for (let k = 0; k < soNgay; k++) {
     // Trần Huyết Chiến = trần ngày: đo đúng quota câu mới, không để Huyết Chiến nới trần.
-    const kh = lapKeHoachNgay(cau, tt, { homNay: ngayThu(k), hanNop: HAN, tranHuyetChien: tc.tranNgay, ...tc })
+    // 06/11: máy chủ rút câu mới theo MA TRẬN đề 2026 (tests/ma-tran-rut-moi-0611.test.ts); tệp này khoá luật bốc theo hạng 28/09 khi TẮT ma trận
+    // (`giuThuTuMoiCu`) — luật ấy nay chỉ còn là hạng câu TRONG một ô ma trận.
+    const kh = lapKeHoachNgay(cau, tt, { homNay: ngayThu(k), hanNop: HAN, tranHuyetChien: tc.tranNgay, giuThuTuMoiCu: true, ...tc })
     const ds = kh.dao.map((q) => theoCau.get(q)!).filter((c) => tt.get(c.qid)!.laMoi)
     const so = [0, 0, 0, 0]
     const theoDang = new Map<string, number[]>()

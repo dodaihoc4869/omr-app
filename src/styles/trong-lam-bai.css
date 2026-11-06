@@ -401,6 +401,12 @@
 [data-trong] .duo .ht2-lam-de { padding: 0; border: 0; background: none; box-shadow: none; gap: 12px; }
 [data-trong] .duo .ht2-lam-de-chu { font-size: 21px; font-weight: 700; line-height: 1.5; }
 [data-trong] .duo .ht2-lam-de-chu > b:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* thầy 06/11: «riêng phần đề để chữ mảnh, chỉ in đậm chữ Không cần thiết trong đề» — thân đề giữ mặt mảnh 500 (trong-hs.css); chữ «không» phủ định
+   (ct-khong, lib/chem-trinh-bay.tsx) in đậm 900 CHỈ trong khung đề; phương án, lời giải không đổi. */
+html:root[data-trong='hs'] .ht2-lam-de-chu .ct-khong { font-weight: 900; }
+/* 06/11: màn học tập cổng học sinh ra khỏi luật «chữ mảnh toàn app» (trong.css mục 10) — riêng NỘI DUNG ĐỀ THI mở trong cổng (ExamTakeScreen) và
+   Kiểm tra ôn tập (ThiDuo) giữ y nguyên mảnh 500 như trước: không đụng chữ đề thi. */
+html:root[data-ht2] .thi-noi-dung *:not(.gyc-cham, .gyc-cham *) { font-weight: 500 !important; }
 /* phương án: ô lớn, viền dày có gờ đáy */
 [data-trong] .duo .ht2-lam-tn { display: grid; gap: 12px; }
 [data-trong] .duo .duo-tra[data-luoi] .ht2-lam-tn { grid-template-columns: repeat(2, minmax(0, 1fr)); }

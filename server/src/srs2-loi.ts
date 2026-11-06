@@ -12,6 +12,7 @@
 // kế hoạch Y HỆT bản trước (khoá bằng tests/omni-3-ke-hoach-chot-cu.test.ts, 30 kịch bản).
 import { THAM_SO_OMNI } from './omni-kieu'
 import { thaySlotOnHoiThay } from './hoi-thay-thay-slot'
+import { demTheoO, oMaTran, xepTheoMaTran } from './ma-tran-rut-moi'
 
 export type Phan = 'I' | 'II' | 'III'
 
@@ -277,6 +278,11 @@ export interface TuyChonKeHoach {
    * KHÔNG đổi số câu mới mỗi ngày. Câu vắng trong bảng ⇒ trọng số 0.
    */
   trongSoCau?: Readonly<Record<string, number>>
+  /**
+   * TẮT MA TRẬN câu mới (06/11). Vắng (mọi đường máy chủ) ⇒ câu mới trong quota rút theo tỉ lệ ma trận đề 2026 (`ma-tran-rut-moi.ts`), thứ tự cũ
+   * (`trongSoCau` / `bocCauMoiCaNhan` / `xepCauMoi`) chỉ còn là hạng TRONG một ô. true ⇒ y hệt bản trước 06/11 (bảng chốt hành vi cũ trong test).
+   */
+  giuThuTuMoiCu?: boolean
   /** Mã dạng ĐÃ VỮNG của em: câu MỚI chiến dịch của các dạng này KHÔNG bắt buộc — bỏ khỏi câu mới, quota và khối lượng (vẫn nằm trong `cau` cho Thử sức thêm). Câu ôn/nợ không miễn. */
   dangVung?: readonly string[]
   /**
@@ -769,12 +775,16 @@ function lapKeHoachNgayCoBan(cau: readonly CauSrs[], trangThai: ReadonlyMap<stri
   // Bốc câu mới cá nhân hoá (thầy 28/09): chỉ khi có `hangTheoDang` (và không có trọng số OMNI); số câu mới/ngày giữ nguyên quota.
   const hangCua = (c: CauSrs): HangEm => tc.hangTheoDang?.[c.dang ?? ''] ?? tc.hangChung ?? 'L2'
   const chonMoi: CauSrs[] = []
+  const oSrs = (c: CauSrs) => oMaTran(c.phan, c.mucDo)
   nhom.forEach((g, i) => {
     const ds = moiXep[i]!
     const thuTuMoi = tc.hangTheoDang && !tc.trongSoCau
       ? bocCauMoiCaNhan(ds, layMoi[i]!, g.D > NGAY_DEM ? g.D - NGAY_DEM : 1, hangCua, nhieu ? cauChienDich.filter((c) => nhomCua(c) === i) : cauChienDich)
       : ds
-    chonMoi.push(...thuTuMoi.slice(0, layMoi[i]! + themMoi[i]!))
+    // MA TRẬN ĐỀ 2026 (thầy 06/11, bỏ «dễ trước khó sau»): thứ tự trên chỉ còn là hạng TRONG một ô (phần × mức); giữa các ô theo tỉ lệ ma trận, đếm cả
+    // câu mới của chiến dịch này em đã làm ⇒ ô ít câu không dồn về cuối. Số câu mới (`layMoi` + `themMoi`) giữ nguyên.
+    const daRut = tc.giuThuTuMoiCu ? undefined : demTheoO(cauChienDich.filter((c) => nhomCua(c) === i && !tt(c).laMoi), oSrs)
+    chonMoi.push(...(tc.giuThuTuMoiCu ? thuTuMoi : xepTheoMaTran(thuTuMoi, oSrs, daRut)).slice(0, layMoi[i]! + themMoi[i]!))
   })
   const chonOn = [...no.slice(0, layNo + themNo), ...cungCo.slice(0, layCungCo), ...duyTri.slice(0, layDuyTri)]
   // Ôn bài cũ: câu chưa gặp đi với câu mới (Đảo); câu đã gặp đi như câu ôn (Phần II ⇒ Đảo, còn lại ⇒ Đoàn).

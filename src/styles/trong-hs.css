@@ -33,7 +33,7 @@
 :root[data-trong='hs'][data-ht2] :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
 /* «Đề cho nét thanh hơn» (thầy 27/10, ảnh màn làm câu): chữ đề + phương án dùng mặt Đề (500), màu chữ đậm vừa --tr-chu để nét thanh mà vẫn rõ;
    chữ chạm được (tô màu, goi-y-cham) giữ đậm hơn một bậc — mặt Đậm (xin 700). */
-:root[data-trong='hs'][data-ht2] .duo :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }
+:root[data-trong='hs'][data-ht2] :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; } /* 06/11: mọi màn làm câu (cả Tự sửa, KT cá nhân), không riêng .duo */
 :root[data-trong='hs'][data-ht2] .duo .ht2-lam-de-chu { color: var(--tr-chu); }
 :root[data-trong='hs'][data-ht2] .gyc-v.gyc-cham { font-weight: 700; }
 :root[data-trong='hs'][data-ht2] .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; } /* phương án SỐ (câu tính) vẫn là số ⇒ Đậm */

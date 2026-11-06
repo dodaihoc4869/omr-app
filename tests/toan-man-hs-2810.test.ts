@@ -17,7 +17,7 @@ describe('manifest app học sinh: toàn màn, màu nền đúng app', () => {
     expect(m.start_url).toBe('./hs')
   })
   it('theme_color / background_color = nền sáng app học sinh (--tr-nen), không còn trắng lệch nền', () => {
-    expect(nenSang).toBe('#f6f6fc')
+    expect(nenSang).toBe('#fafaff') // 06/11 thầy «sáng hẳn»: nền gần trắng
     expect(m.theme_color).toBe(nenSang)
     expect(m.background_color).toBe(nenSang)
   })

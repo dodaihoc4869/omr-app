@@ -34,8 +34,12 @@ describe('OMNI 3 · cờ tắt ⇒ hồ sơ, kế hoạch, Sảnh y hệt bản 
     expect(bam(chupHoSo(hs))).toBe(KY_VONG.hoSoS1)
     expect(JSON.stringify(await sanh2(env, 'S1', T_SANG))).toBe(KY_VONG.sanhS1)
     const { kh } = await layKeHoachHomNay(env, 'S1', T_SANG + 1000)
-    expect(JSON.stringify(kh)).toBe(KY_VONG.khS1)
-    const q1 = kh.dao[0]!.replace(/#\d+$/, ''), q2 = (kh.doan[0] ?? kh.dao[1]!).replace(/#\d+$/, '')
+    // 06/11 (thầy: câu mới rút theo MA TRẬN đề 2026, mọi đường): cùng câu, cùng số; chỉ thứ tự Đảo (đan xen sau khi chọn) theo thứ tự câu mới mới ⇒ so Đảo
+    // KHÔNG theo thứ tự, mọi trường khác từng ký tự. Lượt làm sau dùng ĐÚNG câu đầu của ảnh chụp cũ để các ảnh chụp kế tiếp còn so được.
+    const cu = JSON.parse(KY_VONG.khS1) as typeof kh
+    const boThuTu = (x: typeof kh) => JSON.stringify({ ...x, dao: [...x.dao].sort(), ...('conDao' in x ? { conDao: [...(x as { conDao: string[] }).conDao].sort() } : {}) })
+    expect(boThuTu(kh)).toBe(boThuTu(cu))
+    const q1 = cu.dao[0]!.replace(/#\d+$/, ''), q2 = (kh.doan[0] ?? cu.dao[1]!).replace(/#\d+$/, '')
     await lam(env, 'S1', q1, T_SANG + 60_000, true)
     await lam(env, 'S1', q2, T_SANG + 120_000, false)
     expect(JSON.stringify(await sanh2(env, 'S1', T_SANG + 180_000))).toBe(KY_VONG.sanhS1Lan2)
