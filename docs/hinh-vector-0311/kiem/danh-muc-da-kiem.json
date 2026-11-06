@@ -5995,6 +5995,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4": {
+      "tep": "rutherford-man-chan-ddh-a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636.svg",
+      "hashSvg": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636",
+      "byteSvg": 83109,
+      "byteGzip": 12705,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "baf052db1cbbfb73a2c37cd22b37fe1f0d23d30ab27989d24f5d820700385d6f": {
       "tep": "haworth-so-ddh-444921e7940498e28a36a15e0b8d79e0b328accda35ae5ffa4b91c32ff5627df.svg",
       "hashSvg": "444921e7940498e28a36a15e0b8d79e0b328accda35ae5ffa4b91c32ff5627df",
@@ -7210,6 +7219,20 @@
           "where": "10-C1-B1-I-50.hinh.0.du_lieu",
           "hashDataUrl": "7556dd2fa14066ef67768c50e05f5f6d027c5c4ae17b059de5d8ac0a2b2abb1d",
           "vector": "nguyen-tu-ddh-66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B1-I-58",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+          "where": "10-C1-B1-I-58.hinh.0.du_lieu",
+          "hashDataUrl": "881d6728218caf6e181c980526e2fb8e66bc16d3ed813ac7995a7bdf213b286e",
+          "vector": "rutherford-man-chan-ddh-a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636.svg"
         }
       ]
     },
@@ -13186,6 +13209,20 @@
           "where": "DB-10-B1-D1-I-43.hinh.0.du_lieu",
           "hashDataUrl": "7556dd2fa14066ef67768c50e05f5f6d027c5c4ae17b059de5d8ac0a2b2abb1d",
           "vector": "nguyen-tu-ddh-66e18baf05c3cd4658c1c4ffe8c885284702b98d6fbd3e876293684540e7c21c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-I-47",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+          "where": "DB-10-B1-D1-I-47.hinh.0.du_lieu",
+          "hashDataUrl": "881d6728218caf6e181c980526e2fb8e66bc16d3ed813ac7995a7bdf213b286e",
+          "vector": "rutherford-man-chan-ddh-a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636.svg"
         }
       ]
     },
@@ -24841,6 +24878,7 @@
   "cauDuMoiHinh": [
     "10-C1-B1-I-48",
     "10-C1-B1-I-50",
+    "10-C1-B1-I-58",
     "10-C1-B1-II-3",
     "10-C1-B1-II-5",
     "10-C1-B1-III-18",
@@ -25213,6 +25251,7 @@
     "DB-10-B2-D2-III-131",
     "DB-10-B1-D1-I-41",
     "DB-10-B1-D1-I-43",
+    "DB-10-B1-D1-I-47",
     "DB-10-B1-D1-II-56",
     "DB-10-B1-D1-II-58",
     "DB-10-B1-D1-III-77",

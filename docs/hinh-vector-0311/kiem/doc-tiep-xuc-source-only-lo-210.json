@@ -1,0 +1,674 @@
+{
+  "i": 119,
+  "hash": "1691492903f7b5f0c80e40e5f9648acfccb66a937634417142397b1103216b59",
+  "fileNguon": "anh/1691492903f7b5f0c80e40e5f9648acfccb66a937634417142397b1103216b59.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-contact210-reactorzoom.png",
+    "/workspace/scratch/cau4-contact210-rightzoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "DB-11-B8-D5-II-15",
+      "de": "Sulfuric acid (H₂SO₄) là hợp chất quan trọng trong công nghiệp hoá chất, được sử dụng nhiều trong sản xuất phân bón, khai khoáng, chế biến dầu mỏ,…Trong công nghiệp, sulfuric acid 98% được sản xuất từ sulfur theo phương pháp tiếp xúc, được mô tả như hình dưới đây:",
+      "refs": [
+        {
+          "hash": "1691492903f7b5f0c80e40e5f9648acfccb66a937634417142397b1103216b59",
+          "where": "DB-11-B8-D5-II-15.hinh.0.du_lieu",
+          "hashDataUrl": "6fba6bbaff9a3bc5c5711028e5825cf7c7c7a24175266a72d05d8579877cd49b"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B9-D2-II-2",
+      "de": "Sulfuric acid (H₂SO₄) là hợp chất quan trọng trong công nghiệp hoá chất, được sử dụng nhiều trong sản xuất phân bón, khai khoáng, chế biến dầu mỏ,…Trong công nghiệp, sulfuric acid 98% được sản xuất từ sulfur theo phương pháp tiếp xúc, được mô tả như hình dưới đây:",
+      "refs": [
+        {
+          "hash": "1691492903f7b5f0c80e40e5f9648acfccb66a937634417142397b1103216b59",
+          "where": "DH-11-C2-B9-D2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "6fba6bbaff9a3bc5c5711028e5825cf7c7c7a24175266a72d05d8579877cd49b"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;pipewallsdouble lavender/graystroke;notreactionanswers.",
+    "labels": [
+      {
+        "text": "Sulfur  (S)",
+        "at": [
+          77,
+          74
+        ],
+        "color": "red"
+      },
+      {
+        "text": "Lò đốt",
+        "at": [
+          32,
+          153
+        ],
+        "rotation": "vertical",
+        "color": "black"
+      },
+      {
+        "text": "Không khí khô, sạch",
+        "at": [
+          108,
+          234
+        ],
+        "color": "red"
+      },
+      {
+        "text": "SO₂",
+        "at": [
+          192,
+          142
+        ],
+        "color": "red"
+      },
+      {
+        "text": "Khí SO₂ + O₂",
+        "at": [
+          351,
+          16
+        ],
+        "color": "red"
+      },
+      {
+        "text": "SO₃",
+        "at": [
+          456,
+          98
+        ],
+        "color": "red"
+      },
+      {
+        "text": "Lò tầng chứa xúc tác",
+        "at": [
+          361,
+          203
+        ],
+        "color": "black"
+      },
+      {
+        "text": "V₂O₅ ở 450 - 500°C",
+        "at": [
+          358,
+          226
+        ],
+        "color": "black"
+      },
+      {
+        "text": "X",
+        "at": [
+          625,
+          38
+        ],
+        "color": "red"
+      },
+      {
+        "text": "Y",
+        "at": [
+          595,
+          181
+        ],
+        "color": "red"
+      },
+      {
+        "text": "Nước",
+        "at": [
+          523,
+          231
+        ],
+        "color": "red"
+      },
+      {
+        "text": "H₂SO₄ 98%",
+        "at": [
+          791,
+          237
+        ],
+        "color": "red"
+      },
+      {
+        "text": "Khí dư",
+        "at": [
+          774,
+          32
+        ],
+        "color": "black"
+      },
+      {
+        "text": "tạp chất...",
+        "at": [
+          788,
+          52
+        ],
+        "color": "black"
+      }
+    ],
+    "stageCaptions": [
+      {
+        "text": "Giai đoạn 1",
+        "at": [
+          125,
+          288
+        ],
+        "redDoubleArrow": [
+          20,
+          270,
+          217,
+          270
+        ]
+      },
+      {
+        "text": "Giai đoạn 2",
+        "at": [
+          356,
+          288
+        ],
+        "redDoubleArrow": [
+          244,
+          270,
+          465,
+          270
+        ]
+      },
+      {
+        "text": "Giai đoạn 3",
+        "at": [
+          617,
+          288
+        ],
+        "redDoubleArrow": [
+          516,
+          270,
+          754,
+          270
+        ]
+      }
+    ],
+    "dashedSeparators": [
+      [
+        233,
+        16,
+        233,
+        264
+      ],
+      [
+        480,
+        18,
+        480,
+        264
+      ]
+    ],
+    "stage1": {
+      "vesselBbox": [
+        88,
+        114,
+        160,
+        182
+      ],
+      "upperPort": [
+        [
+          57,
+          120
+        ],
+        [
+          57,
+          139
+        ],
+        [
+          63,
+          146
+        ],
+        [
+          89,
+          146
+        ]
+      ],
+      "lowerPort": [
+        [
+          57,
+          190
+        ],
+        [
+          57,
+          173
+        ],
+        [
+          64,
+          165
+        ],
+        [
+          89,
+          165
+        ]
+      ],
+      "number1": [
+        123,
+        135
+      ]
+    },
+    "gasTo2": {
+      "centerline": [
+        [
+          160,
+          160
+        ],
+        [
+          293,
+          160
+        ],
+        [
+          299,
+          151
+        ],
+        [
+          299,
+          41
+        ],
+        [
+          306,
+          37
+        ],
+        [
+          389,
+          37
+        ],
+        [
+          395,
+          42
+        ],
+        [
+          395,
+          67
+        ]
+      ],
+      "doubleWallsGapApprox": 10,
+      "doNotStraightenElbows": true
+    },
+    "reactor2": {
+      "bbox": [
+        361,
+        66,
+        432,
+        179
+      ],
+      "number2": [
+        391,
+        141
+      ],
+      "alternatingBaffles": {
+        "leftY": [
+          85,
+          101,
+          117,
+          133,
+          149,
+          165
+        ],
+        "rightY": [
+          77,
+          93,
+          109,
+          125,
+          141,
+          157,
+          173
+        ],
+        "xLeftStart": 363,
+        "xCenter": 396,
+        "xRightEnd": 431
+      },
+      "captionLeader": [
+        [
+          333,
+          191
+        ],
+        [
+          333,
+          173
+        ],
+        [
+          382,
+          173
+        ]
+      ]
+    },
+    "pipe2to3": {
+      "walls": [
+        [
+          432,
+          109,
+          590,
+          109
+        ],
+        [
+          432,
+          121,
+          590,
+          121
+        ]
+      ],
+      "thenUpperPort3": [
+        [
+          590,
+          109
+        ],
+        [
+          590,
+          102
+        ],
+        [
+          610,
+          102
+        ]
+      ],
+      "thenLowerPort3": [
+        [
+          590,
+          121
+        ],
+        [
+          590,
+          164
+        ]
+      ]
+    },
+    "absorber3": {
+      "outlineApprox": [
+        [
+          590,
+          102
+        ],
+        [
+          610,
+          102
+        ],
+        [
+          619,
+          96
+        ],
+        [
+          619,
+          84
+        ],
+        [
+          628,
+          84
+        ],
+        [
+          628,
+          96
+        ],
+        [
+          638,
+          102
+        ],
+        [
+          659,
+          102
+        ],
+        [
+          659,
+          109
+        ],
+        [
+          709,
+          109
+        ],
+        [
+          709,
+          121
+        ],
+        [
+          659,
+          121
+        ],
+        [
+          659,
+          149
+        ],
+        [
+          629,
+          169
+        ],
+        [
+          629,
+          194
+        ],
+        [
+          619,
+          194
+        ],
+        [
+          619,
+          167
+        ],
+        [
+          590,
+          167
+        ]
+      ],
+      "number3": [
+        618,
+        144
+      ],
+      "blueLiquidRegion": "lowerlobey147..166irregularsurface/graytextureabove,sourcetextureNOTparticlecount",
+      "Xport": "topverticalneck61984/62884"
+    },
+    "tank4": {
+      "outlineApprox": [
+        [
+          558,
+          205
+        ],
+        [
+          590,
+          205
+        ],
+        [
+          590,
+          195
+        ],
+        [
+          659,
+          195
+        ],
+        [
+          659,
+          211
+        ],
+        [
+          677,
+          211
+        ],
+        [
+          685,
+          218
+        ],
+        [
+          685,
+          237
+        ],
+        [
+          675,
+          237
+        ],
+        [
+          675,
+          222
+        ],
+        [
+          659,
+          220
+        ],
+        [
+          659,
+          234
+        ],
+        [
+          589,
+          234
+        ],
+        [
+          589,
+          213
+        ],
+        [
+          558,
+          213
+        ]
+      ],
+      "number4": [
+        623,
+        221
+      ],
+      "liquid": "paleblueinsidey210..232",
+      "YisTextOnly": "Yat595181,noYarrowadded"
+    },
+    "chimney5": {
+      "outline": [
+        [
+          701,
+          176
+        ],
+        [
+          720,
+          46
+        ],
+        [
+          738,
+          46
+        ],
+        [
+          758,
+          176
+        ]
+      ],
+      "number5": [
+        726,
+        141
+      ],
+      "fume": "Gray/purpledashedwavyoutlineabovetop46,donotassignparticles/counts.",
+      "pipe3to5": "twohorizontalwalls659109→710109/659121→708121"
+    },
+    "blackFlowArrows": [
+      {
+        "from": [
+          60,
+          84
+        ],
+        "to": [
+          60,
+          114
+        ],
+        "dir": "DOWN"
+      },
+      {
+        "from": [
+          63,
+          221
+        ],
+        "to": [
+          63,
+          191
+        ],
+        "dir": "UP"
+      },
+      {
+        "from": [
+          169,
+          160
+        ],
+        "to": [
+          215,
+          160
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          325,
+          37
+        ],
+        "to": [
+          365,
+          37
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          434,
+          115
+        ],
+        "to": [
+          475,
+          115
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          624,
+          58
+        ],
+        "to": [
+          624,
+          78
+        ],
+        "dir": "DOWN"
+      },
+      {
+        "from": [
+          645,
+          115
+        ],
+        "to": [
+          682,
+          115
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          624,
+          178
+        ],
+        "to": [
+          624,
+          205
+        ],
+        "dir": "DOWN"
+      },
+      {
+        "from": [
+          518,
+          208
+        ],
+        "to": [
+          550,
+          208
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "from": [
+          672,
+          240
+        ],
+        "to": [
+          710,
+          240
+        ],
+        "dir": "RIGHT"
+      }
+    ],
+    "counts": "5apparatusnumbers1..5/10blackflowarrows/3reddouble-stagearrows/2dashedseparators/X-Yliteral;noequation/answerX-Y/byproductsadded."
+  },
+  "verdict": "CHƯA ĐẠT/NGUỒN CHƯA RÕ: grayflecks/bubbles vùng3 vàfume khôngđủbằngchứngtopology/count;rootđãdừngdựng119đểkhôngđoán. SourceonlygeometrykhôngchứngnhậnSVG."
+}

@@ -1,0 +1,477 @@
+{
+  "i": 131,
+  "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+  "fileNguon": "anh/17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-rutherford131-rayszoom.png",
+  "questions": [
+    {
+      "qid": "10-C1-B1-I-58",
+      "de": "Quan sát hình vẽ sau mô tả thí nghiệm tìm ra hạt nhân nguyên tử vào năm 1911 của nhà vật lí người New Zealand là E. Rutherford.\nHãy cho biết phát biểu đúng?",
+      "refs": [
+        {
+          "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+          "where": "10-C1-B1-I-58.hinh.0.du_lieu",
+          "hashDataUrl": "881d6728218caf6e181c980526e2fb8e66bc16d3ed813ac7995a7bdf213b286e"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-I-47",
+      "de": "Quan sát hình vẽ sau mô tả thí nghiệm tìm ra hạt nhân nguyên tử vào năm 1911 của nhà vật lí người New Zealand là E. Rutherford.\nHãy cho biết phát biểu đúng?",
+      "refs": [
+        {
+          "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+          "where": "DB-10-B1-D1-I-47.hinh.0.du_lieu",
+          "hashDataUrl": "881d6728218caf6e181c980526e2fb8e66bc16d3ed813ac7995a7bdf213b286e"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–3pxapprox;distinctsource24/193notalias.",
+    "labels": [
+      {
+        "text": "Hạt alpha bị bật",
+        "at": [
+          117,
+          86
+        ]
+      },
+      {
+        "text": "ngược trở lại",
+        "at": [
+          104,
+          110
+        ]
+      },
+      {
+        "text": "Chùm hạt alpha",
+        "at": [
+          165,
+          222
+        ]
+      },
+      {
+        "text": "Nguồn hạt alpha",
+        "at": [
+          103,
+          324
+        ]
+      },
+      {
+        "text": "Chì",
+        "at": [
+          349,
+          358
+        ]
+      },
+      {
+        "text": "Màn chắn",
+        "at": [
+          535,
+          355
+        ]
+      },
+      {
+        "text": "Lá vàng",
+        "at": [
+          547,
+          200
+        ]
+      },
+      {
+        "text": "Hạt alpha xuyên thẳng",
+        "at": [
+          712,
+          61
+        ]
+      },
+      {
+        "text": "Hạt alpha bị lệch",
+        "at": [
+          738,
+          212
+        ]
+      }
+    ],
+    "caption": "Thí nghiệm bắn phá lá vàng bằng các hạt alpha của Rutherford",
+    "captionAnchor": [
+      420,
+      468
+    ],
+    "sourceLabelWeight": "allboldblack",
+    "leaders": [
+      {
+        "label": "backscatter",
+        "from": [
+          190,
+          99
+        ],
+        "to": [
+          279,
+          139
+        ]
+      },
+      {
+        "label": "beam",
+        "from": [
+          241,
+          223
+        ],
+        "to": [
+          286,
+          292
+        ]
+      },
+      {
+        "label": "source",
+        "from": [
+          180,
+          327
+        ],
+        "to": [
+          219,
+          327
+        ]
+      },
+      {
+        "label": "lead",
+        "from": [
+          327,
+          358
+        ],
+        "to": [
+          270,
+          331
+        ]
+      },
+      {
+        "label": "screen",
+        "from": [
+          487,
+          350
+        ],
+        "to": [
+          448,
+          317
+        ]
+      },
+      {
+        "label": "gold",
+        "from": [
+          507,
+          202
+        ],
+        "to": [
+          476,
+          200
+        ]
+      },
+      {
+        "label": "straight",
+        "from": [
+          609,
+          62
+        ],
+        "to": [
+          570,
+          93
+        ]
+      },
+      {
+        "label": "deflect",
+        "from": [
+          661,
+          208
+        ],
+        "to": [
+          618,
+          167
+        ]
+      }
+    ],
+    "foil": {
+      "polygon": [
+        [
+          417,
+          120
+        ],
+        [
+          485,
+          166
+        ],
+        [
+          485,
+          261
+        ],
+        [
+          417,
+          212
+        ]
+      ],
+      "fill": "GRAYnotgoldas24",
+      "mask": "Scatterraysbehindfoilmaskedinsidequad. Incomingrayfrontvisibleintofrom417208to445190."
+    },
+    "scatterRays": [
+      {
+        "visible": [
+          307,
+          159,
+          417,
+          184
+        ],
+        "head": [
+          307,
+          159
+        ],
+        "dir": "LEFTbackscatter"
+      },
+      {
+        "visible": [
+          485,
+          167,
+          552,
+          117
+        ],
+        "head": [
+          552,
+          117
+        ],
+        "dir": "UPRIGHT"
+      },
+      {
+        "visible": [
+          485,
+          182,
+          608,
+          156
+        ],
+        "head": [
+          608,
+          156
+        ],
+        "dir": "RIGHT"
+      },
+      {
+        "visible": [
+          485,
+          221,
+          532,
+          254
+        ],
+        "head": [
+          532,
+          254
+        ],
+        "dir": "DOWNRIGHT"
+      }
+    ],
+    "incoming": {
+      "from": [
+        226,
+        334
+      ],
+      "to": [
+        445,
+        190
+      ],
+      "visibleGapPart": [
+        [
+          280,
+          299
+        ],
+        [
+          445,
+          190
+        ]
+      ],
+      "type": "ONEgraylineNOarrowhead/NOparallelbounds"
+    },
+    "PbBlock": {
+      "vertices": [
+        [
+          202,
+          301
+        ],
+        [
+          241,
+          276
+        ],
+        [
+          280,
+          300
+        ],
+        [
+          280,
+          350
+        ],
+        [
+          241,
+          377
+        ],
+        [
+          202,
+          350
+        ]
+      ],
+      "sourceHoleEllipse": [
+        222,
+        337,
+        14,
+        19
+      ],
+      "dot": [
+        227,
+        333,
+        5
+      ],
+      "fill": "grayshaded3faces"
+    },
+    "screen": {
+      "outerBbox": [
+        265,
+        40,
+        634,
+        330
+      ],
+      "innerBackArcApprox": [
+        [
+          274,
+          180
+        ],
+        [
+          301,
+          145
+        ],
+        [
+          349,
+          116
+        ],
+        [
+          414,
+          99
+        ],
+        [
+          472,
+          99
+        ],
+        [
+          535,
+          113
+        ],
+        [
+          585,
+          138
+        ],
+        [
+          625,
+          178
+        ]
+      ],
+      "frontWallApprox": [
+        [
+          337,
+          247
+        ],
+        [
+          386,
+          263
+        ],
+        [
+          441,
+          270
+        ],
+        [
+          495,
+          265
+        ],
+        [
+          550,
+          248
+        ],
+        [
+          595,
+          220
+        ],
+        [
+          630,
+          183
+        ],
+        [
+          634,
+          229
+        ],
+        [
+          620,
+          268
+        ],
+        [
+          583,
+          297
+        ],
+        [
+          531,
+          318
+        ],
+        [
+          469,
+          330
+        ],
+        [
+          406,
+          327
+        ],
+        [
+          368,
+          318
+        ],
+        [
+          337,
+          306
+        ]
+      ],
+      "openingEdges": [
+        [
+          311,
+          228,
+          311,
+          282
+        ],
+        [
+          337,
+          247,
+          337,
+          306
+        ]
+      ],
+      "leftWallApprox": [
+        [
+          265,
+          178
+        ],
+        [
+          270,
+          224
+        ],
+        [
+          286,
+          256
+        ],
+        [
+          311,
+          282
+        ],
+        [
+          311,
+          228
+        ]
+      ],
+      "occlusion": "Incomingthroughfront-leftgapnotthroughwalls;frontwallmasklowergeometry,raysfoilmasked.",
+      "color": "graynochargesadded"
+    },
+    "counts": "4scatterarrowheads/0roundendpoint/1incomingline/3Pbfaces/1ellipticalhole/foilgray/alllabels+caption;NOalias24with5heads+dot/goldfoil/diamondhole."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}
