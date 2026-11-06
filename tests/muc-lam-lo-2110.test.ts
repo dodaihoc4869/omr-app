@@ -153,10 +153,12 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
 
   it('đường lệnh thầy `/gv/muc-lam-lo` chạy qua cổng thầy (trả `ok` + số của từng em); không có mã thầy ⇒ bị chặn', async () => {
     const d = dungDuLieu()
-    const r = (await goiWorker(worker, d.env as unknown as Env, '/gv/muc-lam-lo', { sbds: ['S2'] }, true)) as { ok: boolean; em: Record<string, MucLamEmLo> }
+    // Đường lệnh dùng giờ THẬT (không nhận BAY_GIO): cửa sổ 14 ngày tính tới hôm nay ⇒ dữ liệu mẫu tháng 10 trôi ra ngoài khung từ ~04/11
+    // (bom hẹn giờ, đỏ từ trước nền 02/11). Ghim `den` = ngày của BAY_GIO — lệnh chấp nhận `den` ≤ hôm nay (muc-lam-lo.ts `gvMucLamLo`).
+    const r = (await goiWorker(worker, d.env as unknown as Env, '/gv/muc-lam-lo', { sbds: ['S2'], den: '2026-10-21' }, true)) as { ok: boolean; em: Record<string, MucLamEmLo> }
     expect(r.ok).toBe(true)
     expect(r.em.S2!.soDo).toBe(2)
-    const khong = await goiWorker(worker, d.env as unknown as Env, '/gv/muc-lam-lo', { sbds: ['S2'] }, false)
+    const khong = await goiWorker(worker, d.env as unknown as Env, '/gv/muc-lam-lo', { sbds: ['S2'], den: '2026-10-21' }, false)
     expect(JSON.stringify(khong)).not.toContain('"soDo"')
   })
 

@@ -17,6 +17,9 @@ export const GIAY_CHO_MO_CHANG = 40
 let dangCo: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } | null = null
 /** Bộ test mặc định TẮT (lượt mở trước sống theo mô-đun ⇒ test sau dùng nhầm máy chủ giả của test trước); test của tính năng bật bằng `batMoChangTruoc(true)`. */
 let bat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
+/** Gói cả ngày: bộ test mặc định TẮT (như `bat`: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`.
+ *  Khai báo ở đầu tệp vì `moChangTruoc` (ngay dưới) đọc nó — luật no-use-before-define, mốc lint chỉ hạ. */
+let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 export function batMoChangTruoc(b: boolean): void { bat = b; dangCo = null }
 
 /** Bắt đầu mở chặng trước cho `token` (đã có lượt còn hạn cho token này ⇒ không gọi thêm). Không bao giờ ném.
@@ -142,8 +145,6 @@ const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string
 /** Bộ câu đã ghi xuống máy lần cuối (theo sbd) — cùng mảng ⇒ khỏi ghi lại đề. */
 const cauDaGhi = new Map<string, unknown>()
 let napDang: Promise<void> | null = null, napCuoi = { token: '', luc: 0 }
-/** Bộ test mặc định TẮT (như `bat` ở trên: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
-let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 const duoiToken = (t: string) => t.slice(-16)
 const docJson = (k: string): unknown => { try { return JSON.parse(localStorage.getItem(k) || 'null') } catch { return null } }
 const ghiJson = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* đầy / bị chặn: vẫn dùng bản trong bộ nhớ */ } }

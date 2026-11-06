@@ -29,6 +29,9 @@ const MUC_CHUAN: Record<string, MucMt> = {
   VDC: 'van_dung', 'Vận dụng cao': 'van_dung', van_dung_cao: 'van_dung',
 }
 
+/** Đệm (phần, mức thô) → ô — khai báo TRƯỚC `oMaTran` (luật no-use-before-define, mốc lint chỉ hạ). */
+const DEM_O = new Map<string, string>()
+
 /**
  * Ô ma trận của một câu. Mức VDC gộp vào Vận dụng. Câu CHƯA GẮN MỨC ⇒ Hiểu (mức có ở cả ba phần — tự chốt, ghi rõ). Ô trọng số 0 (Phần II Biết)
  * ⇒ ô dương gần nhất cùng phần (Hiểu), không thì câu ấy nằm cuối mãi. Phần lạ ⇒ Phần I.
@@ -45,7 +48,6 @@ export function oMaTran(phan: string | null | undefined, mucDo: string | null | 
   if (DEM_O.size < 256) DEM_O.set(k, o)
   return o
 }
-const DEM_O = new Map<string, string>()
 
 const THU_TU_O = (Object.keys(MA_TRAN_RUT_MOI) as PhanMt[]).flatMap((p) => (Object.keys(MA_TRAN_RUT_MOI[p]) as MucMt[]).map((m) => `${p}|${m}`))
 const trongSoO = (o: string): number => { const [p, m] = o.split('|') as [PhanMt, MucMt]; return MA_TRAN_RUT_MOI[p]?.[m] ?? 0 }

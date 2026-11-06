@@ -150,7 +150,9 @@ describe('CauDaLam — theo bản vẽ HS-CauDaLam', () => {
     await screen.findByText(/Thuỷ phân hoàn toàn 8,8 gam/)
     expect(goiTheo('/game-v2/hoa2-cau-chi-tiet')).toHaveLength(1) // đã có chi tiết ⇒ không hỏi lại
     const mo = container.querySelector('.h2-the-mo') as HTMLElement
-    expect(mo.querySelector('.m3 .loi-giai')).not.toBeNull()
+    // 4ea63d8 (thầy 03/11 «lời giải cũ ẩn về nút thu gọn»): đang mở gói Kính ⇒ khung chờ, KHÔNG hiện lời giải cũ trước;
+    // máy không có bản Kính ⇒ lời giải cũ hiện SAU nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    await waitFor(() => expect(mo.querySelector('.m3 .loi-giai')).not.toBeNull())
     expect(within(mo).getByText('LỜI GIẢI')).toBeTruthy()
     expect(within(mo).getByText('Kiến thức cốt lõi')).toBeTruthy()
     expect(mo.querySelectorAll('.lg-y').length).toBe(4)

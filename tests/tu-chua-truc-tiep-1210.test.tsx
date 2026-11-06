@@ -111,7 +111,8 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     // Bước 3: đáp án đúng + lời giải từng bước + đối chiếu lần làm lại
     expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
     expect(screen.getByText('Đáp án đúng').nextSibling?.textContent).toBe('A')
-    expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
+    // 4ea63d8 (thầy 03/11): lời giải cũ chỉ hiện khi máy không có bản Kính — sau nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    expect(await screen.findByText(/0,1 × 82/)).toBeTruthy()
     expect(screen.getByText('Lần em tự làm lại').nextSibling?.textContent).toBe('C · chưa đúng')
     fireEvent.click(screen.getAllByRole('button', { name: 'Sang câu khác' })[0]!)
     expect(veNgoai).toHaveBeenCalled()
@@ -140,7 +141,8 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     chuaLoDapAn()
     fireEvent.click(screen.getByRole('button', { name: 'Em chưa làm được · xem lời giải' }))
     expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
-    expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
+    // 4ea63d8 (thầy 03/11): lời giải cũ chỉ hiện khi máy không có bản Kính — sau nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    expect(await screen.findByText(/0,1 × 82/)).toBeTruthy()
     expect(nutBuoc(/Đáp án và lời giải/).getAttribute('aria-current')).toBe('step')
   })
 

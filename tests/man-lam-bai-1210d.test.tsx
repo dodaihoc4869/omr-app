@@ -93,7 +93,8 @@ describe('màn làm bài', () => {
     expect(within(screen.getByRole('region', { name: 'Ý a, đúng' })).getByText('Em chọn Đúng · đáp án Đúng')).toBeTruthy()
     expect(screen.getByText(/B đứng trước C nên tính acid/)).toBeTruthy() // giải thích ý sai mở sẵn (công thức tách thẻ sub)
     fireEvent.click(screen.getByRole('button', { name: 'Xem lời giải đầy đủ cả 4 ý' }))
-    expect(screen.getByText('Tính phi kim tăng dần trong chu kì.')).toBeTruthy()
+    // 4ea63d8 (thầy 03/11): lời giải cũ chỉ hiện khi máy không có bản Kính — sau nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    expect(await screen.findByText('Tính phi kim tăng dần trong chu kì.')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Sửa câu này' })).toBeTruthy(); expect(onCapNhat).toHaveBeenCalledOnce()
   })
   it('Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi "-1,5"', async () => {
@@ -116,7 +117,8 @@ describe('màn làm bài', () => {
     expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ answer: '-1,5' }), 15)
     fireEvent.click(phim.queryByRole('button', { name: '1' }) ?? document.body) // bàn phím đã thu sau khi nộp
     expect(screen.queryByRole('group', { name: 'Bàn phím số' })).toBeNull()
-    expect(screen.getByText('Bảo toàn nguyên tố N.')).toBeTruthy()
+    // 4ea63d8 (thầy 03/11): lời giải cũ chỉ hiện khi máy không có bản Kính — sau nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    expect(await screen.findByText('Bảo toàn nguyên tố N.')).toBeTruthy()
   })
   it('Trắc nghiệm: 4 ô role=radio, "Nộp câu · đã chọn B"; sau khi nộp đánh dấu ô em chọn / đáp án', async () => {
     moMan([TN])
@@ -129,7 +131,8 @@ describe('màn làm bài', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Nộp câu · đã chọn B' }))
     await screen.findByText('Đúng · tự làm')
     expect(screen.getByText('Em chọn · đáp án')).toBeTruthy()
-    expect(screen.getByText('N liên kết với 2 gốc hydrocarbon.')).toBeTruthy()
+    // 4ea63d8 (thầy 03/11): lời giải cũ chỉ hiện khi máy không có bản Kính — sau nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    expect(await screen.findByText('N liên kết với 2 gốc hydrocarbon.')).toBeTruthy()
     expect(screen.queryByRole('button', { name: 'Sửa câu này' })).toBeNull()
     expect(screen.getByRole('button', { name: /Kết thúc chặng/ })).toBeTruthy()
   })

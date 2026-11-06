@@ -96,7 +96,8 @@ describe('ManLamBaiTap theo khổ màn (chỉ đổi chỗ đặt)', () => {
     expect(typeof (duLieu as { msLam: unknown }).msLam).toBe('number')
     expect(container.querySelector('.ht2-lam-khung')?.hasAttribute('data-ket')).toBe(true)
     // lời giải vẫn ở cột đề (bên trái)
-    expect(within(screen.getByRole('main')).getByText(/N liên kết hai gốc/)).toBeTruthy()
+    // 4ea63d8 (thầy 03/11): lời giải cũ chỉ hiện khi máy không có bản Kính — sau nhịp xin gói (~40 ms gom + nạp lười) ⇒ chờ, không đòi có ngay.
+    expect(await within(screen.getByRole('main')).findByText(/N liên kết hai gốc/)).toBeTruthy()
     await waitFor(() => expect(within(phai).getByRole('button', { name: /Kết thúc chặng/ })).toBeTruthy())
     // xong chặng: màn tổng kết giữ bố cục cũ — cột phải chỉ còn nút, không kéo theo phản hồi câu cuối
     fireEvent.click(within(phai).getByRole('button', { name: /Kết thúc chặng/ }))
