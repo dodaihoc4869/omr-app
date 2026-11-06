@@ -1,0 +1,120 @@
+{
+  "i": 148,
+  "hashNguon": "1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7",
+  "fileNguon": "anh/1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7.png",
+  "nguoiSoat": "cau_truc_4",
+  "questions": [
+    {
+      "qid": "DB-11-B2-D3-II-142",
+      "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+      "refs": [
+        {
+          "hash": "1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7",
+          "where": "DB-11-B2-D3-II-142.hinh.0.du_lieu",
+          "hashDataUrl": "b97b949920df0689043d0bc63d1d0ac523f4cfaf98337e7f400643ec374b03ec"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B2-II-9",
+      "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+      "refs": [
+        {
+          "hash": "1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7",
+          "where": "DH-11-C1-B2-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "b97b949920df0689043d0bc63d1d0ac523f4cfaf98337e7f400643ec374b03ec"
+        }
+      ]
+    }
+  ],
+  "nativeSourcesOpenedSeparately": [
+    "148hash1a3a1d…90db7",
+    "1259hashe4bb3007…e0aee"
+  ],
+  "nativeLemonZooms": [
+    "/workspace/scratch/cau4-148-lemonzoom.png",
+    "/workspace/scratch/cau4-1259-lemonzoom.png"
+  ],
+  "actualFreshChromium": "/workspace/scratch/cau4-148-alias163-fresh.png",
+  "hashSvg": "d605de992e5c8ef28ece5848fe0564faa43bef17096915f14df4021129daa27a",
+  "map": [
+    [
+      0,
+      "Pin",
+      "battery minusleft/plusright"
+    ],
+    [
+      1,
+      "Acid dạ dày",
+      "stomach"
+    ],
+    [
+      2,
+      "Chanh",
+      "singlelemonwedge"
+    ],
+    [
+      3,
+      "Giấm",
+      "bottle"
+    ],
+    [
+      4,
+      "Cà chua",
+      "tomato"
+    ],
+    [
+      5,
+      "Coffee",
+      "liddedcoffeecup"
+    ],
+    [
+      6,
+      "Sữa",
+      "bottle"
+    ],
+    [
+      7,
+      "Nước",
+      "splash"
+    ],
+    [
+      8,
+      "Máu",
+      "testtube"
+    ],
+    [
+      9,
+      "Baking Soda",
+      "tub"
+    ],
+    [
+      10,
+      "Viên thuốc dạ dày",
+      "stomach+tablet"
+    ],
+    [
+      11,
+      "Dung dịch Ammonia",
+      "flask"
+    ],
+    [
+      12,
+      "Xà phòng",
+      "soap+decorativebubbles"
+    ],
+    [
+      13,
+      "Chất tẩy",
+      "handledbottle"
+    ],
+    [
+      14,
+      "Chất thông cống",
+      "sink"
+    ]
+  ],
+  "doiChieu": "Cùng15label/icon/15cell0..14/alternatingtop-bottomconnectors. Source148/1259resizeprintpalette/sharpnessdifferentNOTpixelidentical. Lemonzoomx6confirmedONEwedgeeach,nodifferentcounttopology;Coffee/BakingSoda/Ammoniaallliteralnamesmatch. Pinpolarityminusleftplusrightsame. Allother15iconsmatchednativefullseparately,packagingtinyfloraldecorationnotreadableformula/name.",
+  "batDong": "KhôngbấtđồngpHdata/labels/iconcategory/connectortopology;printcolorandwatermarkscandifferent,notpHashapproval.",
+  "ketQua": "Đạt dùngchungactualSVG163aftermanualsource148+1259+freshSVG."
+}

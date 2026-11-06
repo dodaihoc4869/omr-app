@@ -1,0 +1,583 @@
+{
+  "i": 151,
+  "hash": "1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241",
+  "fileNguon": "anh/1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-glucose213-toplabel.png",
+    "/workspace/scratch/cau4-glucose213-alphazoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C2-B4-D2-II-13",
+      "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+      "refs": [
+        {
+          "hash": "1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241",
+          "where": "12-C2-B4-D2-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "513efeac97951f28cd12ff88f33c111e2fc41f6d4ce81ac5a345b55b3a4dfeb5"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-II-78",
+      "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+      "refs": [
+        {
+          "hash": "1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241",
+          "where": "DB-12-B4-D3-II-78.hinh.0.du_lieu",
+          "hashDataUrl": "513efeac97951f28cd12ff88f33c111e2fc41f6d4ce81ac5a345b55b3a4dfeb5"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox. TopcaptiontypoEXACThemiacetaNOl,notcroppedbyedge.",
+    "alpha": {
+      "nodes": {
+        "C4": [
+          64,
+          172
+        ],
+        "C5": [
+          121,
+          129
+        ],
+        "O": [
+          207,
+          130
+        ],
+        "C1": [
+          265,
+          172
+        ],
+        "C2": [
+          207,
+          214
+        ],
+        "C3": [
+          121,
+          214
+        ]
+      },
+      "CH2OH": {
+        "text": "CH₂OH",
+        "at": [
+          164,
+          92
+        ],
+        "bond": [
+          [
+            121,
+            129
+          ],
+          [
+            121,
+            108
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      "OH": [
+        {
+          "on": "C4down",
+          "text": "OH",
+          "at": [
+            75,
+            215
+          ],
+          "bond": [
+            [
+              64,
+              172
+            ],
+            [
+              64,
+              198
+            ]
+          ]
+        },
+        {
+          "on": "C3up",
+          "text": "OH",
+          "at": [
+            133,
+            182
+          ],
+          "bond": [
+            [
+              121,
+              214
+            ],
+            [
+              121,
+              195
+            ]
+          ]
+        },
+        {
+          "on": "C2down",
+          "text": "OH",
+          "at": [
+            219,
+            256
+          ],
+          "bond": [
+            [
+              207,
+              214
+            ],
+            [
+              207,
+              239
+            ]
+          ]
+        },
+        {
+          "on": "C1down",
+          "text": "OH",
+          "at": [
+            276,
+            212
+          ],
+          "bond": [
+            [
+              265,
+              172
+            ],
+            [
+              265,
+              191
+            ]
+          ]
+        }
+      ],
+      "H": [
+        {
+          "at": [
+            64,
+            134
+          ]
+        },
+        {
+          "at": [
+            121,
+            157
+          ]
+        },
+        {
+          "at": [
+            121,
+            255
+          ]
+        },
+        {
+          "at": [
+            207,
+            181
+          ]
+        },
+        {
+          "at": [
+            265,
+            137
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          277,
+          172
+        ],
+        "2": [
+          218,
+          228
+        ],
+        "3": [
+          132,
+          228
+        ],
+        "4": [
+          54,
+          173
+        ],
+        "5": [
+          111,
+          126
+        ],
+        "6": [
+          121,
+          69
+        ]
+      },
+      "front": "C4→C3TAPERthinC4wideC3,C3–C2boldhorizontal,C2→C1TAPERwideC2thinC1"
+    },
+    "beta": {
+      "nodes": {
+        "C4": [
+          614,
+          172
+        ],
+        "C5": [
+          671,
+          129
+        ],
+        "O": [
+          757,
+          130
+        ],
+        "C1": [
+          815,
+          172
+        ],
+        "C2": [
+          757,
+          214
+        ],
+        "C3": [
+          671,
+          214
+        ]
+      },
+      "CH2OH": {
+        "text": "CH₂OH",
+        "at": [
+          714,
+          92
+        ],
+        "bond": [
+          [
+            671,
+            129
+          ],
+          [
+            671,
+            108
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      "OH": [
+        {
+          "on": "C4down",
+          "text": "OH",
+          "at": [
+            625,
+            215
+          ],
+          "bond": [
+            [
+              614,
+              172
+            ],
+            [
+              614,
+              198
+            ]
+          ]
+        },
+        {
+          "on": "C3up",
+          "text": "OH",
+          "at": [
+            683,
+            182
+          ],
+          "bond": [
+            [
+              671,
+              214
+            ],
+            [
+              671,
+              195
+            ]
+          ]
+        },
+        {
+          "on": "C2down",
+          "text": "OH",
+          "at": [
+            769,
+            256
+          ],
+          "bond": [
+            [
+              757,
+              214
+            ],
+            [
+              757,
+              239
+            ]
+          ]
+        },
+        {
+          "on": "C1up",
+          "text": "OH",
+          "at": [
+            826,
+            131
+          ],
+          "bond": [
+            [
+              815,
+              172
+            ],
+            [
+              815,
+              151
+            ]
+          ]
+        }
+      ],
+      "H": [
+        {
+          "at": [
+            614,
+            134
+          ]
+        },
+        {
+          "at": [
+            671,
+            157
+          ]
+        },
+        {
+          "at": [
+            671,
+            255
+          ]
+        },
+        {
+          "at": [
+            757,
+            181
+          ]
+        },
+        {
+          "at": [
+            815,
+            212
+          ]
+        }
+      ],
+      "numbers": {
+        "1": [
+          827,
+          172
+        ],
+        "2": [
+          768,
+          228
+        ],
+        "3": [
+          682,
+          228
+        ],
+        "4": [
+          604,
+          173
+        ],
+        "5": [
+          661,
+          126
+        ],
+        "6": [
+          671,
+          69
+        ]
+      },
+      "front": "C4→C3TAPERthinC4wideC3,C3–C2boldhorizontal,C2→C1TAPERwideC2thinC1"
+    },
+    "open": {
+      "top": "CHO",
+      "topAt": [
+        456,
+        63
+      ],
+      "topNumber1": [
+        431,
+        39
+      ],
+      "spineX": 433,
+      "rowCentersY": [
+        99,
+        135,
+        170,
+        206
+      ],
+      "rows": [
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "HO",
+          "right": "H"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        },
+        {
+          "left": "H",
+          "right": "OH"
+        }
+      ],
+      "leftBondEndX": 405,
+      "rightBondEndX": 459,
+      "terminal": "CH₂OH",
+      "terminalAt": [
+        474,
+        249
+      ],
+      "terminalBondEndY": 232,
+      "numbers": {
+        "1": [
+          431,
+          39
+        ],
+        "2": [
+          423,
+          89
+        ],
+        "3": [
+          423,
+          125
+        ],
+        "4": [
+          423,
+          161
+        ],
+        "5": [
+          423,
+          197
+        ],
+        "6": [
+          424,
+          227
+        ]
+      },
+      "noSeparateAldehydeH": true
+    },
+    "equilibria": [
+      {
+        "upper": [
+          293,
+          166,
+          356,
+          166
+        ],
+        "dir": "RIGHT",
+        "lower": [
+          356,
+          174,
+          293,
+          174
+        ],
+        "dirLower": "LEFT"
+      },
+      {
+        "upper": [
+          523,
+          169,
+          587,
+          169
+        ],
+        "dir": "RIGHT",
+        "lower": [
+          587,
+          177,
+          523,
+          177
+        ],
+        "dirLower": "LEFT"
+      }
+    ],
+    "OHBoxes": [
+      {
+        "rect": [
+          248,
+          191,
+          309,
+          230
+        ],
+        "rounded": true,
+        "stroke": "DOTTEDblack",
+        "contains": "alphaC1OHdown",
+        "label": "OH hemiacetal",
+        "labelAt": [
+          332,
+          285
+        ],
+        "leader": [
+          [
+            302,
+            266
+          ],
+          [
+            283,
+            233
+          ]
+        ],
+        "arrowhead": "tip283233towardsboxbottom"
+      },
+      {
+        "rect": [
+          795,
+          112,
+          858,
+          152
+        ],
+        "rounded": true,
+        "stroke": "DOTTEDblack",
+        "contains": "betaC1OHup",
+        "label": "OH hemiaceta",
+        "labelAt": [
+          810,
+          48
+        ],
+        "leader": [
+          [
+            800,
+            64
+          ],
+          [
+            822,
+            108
+          ]
+        ],
+        "arrowhead": "tip822108towardsboxtop",
+        "critical": "NOlaftera,confirmedmacro6xwithblanktillrightedge."
+      }
+    ],
+    "captions": [
+      {
+        "text": "α-glucose",
+        "at": [
+          149,
+          302
+        ]
+      },
+      {
+        "text": "glucose",
+        "at": [
+          474,
+          312
+        ]
+      },
+      {
+        "text": "β-glucose",
+        "at": [
+          727,
+          303
+        ]
+      }
+    ],
+    "counts": "18carbonnumbers/14separateHlabels(5+4+5)/3CH₂OHtext+1CHO/4TAPER2bold/2equilibriumpairs/2dottedOHboxes/2arrowleaders/3captions;nonewCIP/H/CHOCexplicit."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

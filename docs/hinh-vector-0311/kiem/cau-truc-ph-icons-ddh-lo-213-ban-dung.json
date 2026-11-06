@@ -1,0 +1,716 @@
+[
+  {
+    "i": 148,
+    "hash": "1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7",
+    "fileNguon": "anh/1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7.png",
+    "canvas": [
+      978,
+      427
+    ],
+    "daMoNative": true,
+    "kind": "pH-products-illustration",
+    "pHMap": [
+      {
+        "pH": 0,
+        "label": "Pin",
+        "icon": "battery"
+      },
+      {
+        "pH": 1,
+        "label": "Acid dạ dày",
+        "icon": "stomach"
+      },
+      {
+        "pH": 2,
+        "label": "Chanh",
+        "icon": "lemon"
+      },
+      {
+        "pH": 3,
+        "label": "Giấm",
+        "icon": "bottle"
+      },
+      {
+        "pH": 4,
+        "label": "Cà chua",
+        "icon": "tomato"
+      },
+      {
+        "pH": 5,
+        "label": "Coffee",
+        "icon": "coffee cup"
+      },
+      {
+        "pH": 6,
+        "label": "Sữa",
+        "icon": "milk bottle"
+      },
+      {
+        "pH": 7,
+        "label": "Nước",
+        "icon": "water splash"
+      },
+      {
+        "pH": 8,
+        "label": "Máu",
+        "icon": "blood tube"
+      },
+      {
+        "pH": 9,
+        "label": "Baking Soda",
+        "icon": "white tub"
+      },
+      {
+        "pH": 10,
+        "label": "Viên thuốc dạ dày",
+        "icon": "stomach tablets"
+      },
+      {
+        "pH": 11,
+        "label": "Dung dịch Ammonia",
+        "icon": "conical flask"
+      },
+      {
+        "pH": 12,
+        "label": "Xà phòng",
+        "icon": "soap"
+      },
+      {
+        "pH": 13,
+        "label": "Chất tẩy",
+        "icon": "detergent bottle"
+      },
+      {
+        "pH": 14,
+        "label": "Chất thông cống",
+        "icon": "drain"
+      }
+    ],
+    "notes": "15ôpH0..14liềntừđỏ→cam→vàng→xanhlá→xanhdương→tím,mỗisốtrắng. 15iconvòngtrònminhhọatươngứng,đượcnốibằngthanhdọcvềôpH;iconsxếpxen kẽpHchẵnhàngDƯỚI/pHlẻhàngTRÊN. GiữtextCoffee/BakingSoda/AmmoniaEnglishđúngcapitalizationkhôngdịch. Đâyillustrationicon,nophoto. CácgiátrịpHminhhọakhôngsửatheokiếnthứcphổbiến.",
+    "questions": [
+      {
+        "qid": "DB-11-B2-D3-II-142",
+        "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+        "refs": [
+          {
+            "hash": "1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7",
+            "where": "DB-11-B2-D3-II-142.hinh.0.du_lieu",
+            "hashDataUrl": "b97b949920df0689043d0bc63d1d0ac523f4cfaf98337e7f400643ec374b03ec"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B2-II-9",
+        "de": "Hình vẽ sau đây giới thiệu các giá trị pH của một số sản phẩm hàng ngày:",
+        "refs": [
+          {
+            "hash": "1a3a1d7a1b238a86447f998f482c23796a84e37f7e52721ab3876bbe59990db7",
+            "where": "DH-11-C1-B2-II-9.hinh.0.du_lieu",
+            "hashDataUrl": "b97b949920df0689043d0bc63d1d0ac523f4cfaf98337e7f400643ec374b03ec"
+          }
+        ]
+      }
+    ],
+    "geometry155": {
+      "canvas": [
+        978,
+        427
+      ],
+      "barTop": 315,
+      "barBottom": 391,
+      "items": [
+        {
+          "pH": 0,
+          "label": "Pin",
+          "icon": "battery",
+          "barCellApprox": [
+            55,
+            315,
+            111,
+            391
+          ],
+          "numberAnchor": [
+            83,
+            360
+          ],
+          "iconCircle": [
+            83,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              83,
+              291
+            ],
+            [
+              83,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            83,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 1,
+          "label": "Acid dạ dày",
+          "icon": "stomach",
+          "barCellApprox": [
+            111,
+            315,
+            167,
+            391
+          ],
+          "numberAnchor": [
+            139,
+            360
+          ],
+          "iconCircle": [
+            139,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              139,
+              156
+            ],
+            [
+              139,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            139,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 2,
+          "label": "Chanh",
+          "icon": "lemon",
+          "barCellApprox": [
+            170,
+            315,
+            226,
+            391
+          ],
+          "numberAnchor": [
+            198,
+            360
+          ],
+          "iconCircle": [
+            198,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              198,
+              291
+            ],
+            [
+              198,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            198,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 3,
+          "label": "Giấm",
+          "icon": "bottle",
+          "barCellApprox": [
+            227,
+            315,
+            283,
+            391
+          ],
+          "numberAnchor": [
+            255,
+            360
+          ],
+          "iconCircle": [
+            255,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              255,
+              156
+            ],
+            [
+              255,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            255,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 4,
+          "label": "Cà chua",
+          "icon": "tomato",
+          "barCellApprox": [
+            286,
+            315,
+            342,
+            391
+          ],
+          "numberAnchor": [
+            314,
+            360
+          ],
+          "iconCircle": [
+            314,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              314,
+              291
+            ],
+            [
+              314,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            314,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 5,
+          "label": "Coffee",
+          "icon": "coffee cup",
+          "barCellApprox": [
+            345,
+            315,
+            401,
+            391
+          ],
+          "numberAnchor": [
+            373,
+            360
+          ],
+          "iconCircle": [
+            373,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              373,
+              156
+            ],
+            [
+              373,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            373,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 6,
+          "label": "Sữa",
+          "icon": "milk bottle",
+          "barCellApprox": [
+            403,
+            315,
+            459,
+            391
+          ],
+          "numberAnchor": [
+            431,
+            360
+          ],
+          "iconCircle": [
+            431,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              431,
+              291
+            ],
+            [
+              431,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            431,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 7,
+          "label": "Nước",
+          "icon": "water splash",
+          "barCellApprox": [
+            460,
+            315,
+            516,
+            391
+          ],
+          "numberAnchor": [
+            488,
+            360
+          ],
+          "iconCircle": [
+            488,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              488,
+              156
+            ],
+            [
+              488,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            488,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 8,
+          "label": "Máu",
+          "icon": "blood tube",
+          "barCellApprox": [
+            519,
+            315,
+            575,
+            391
+          ],
+          "numberAnchor": [
+            547,
+            360
+          ],
+          "iconCircle": [
+            547,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              547,
+              291
+            ],
+            [
+              547,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            547,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 9,
+          "label": "Baking Soda",
+          "icon": "white tub",
+          "barCellApprox": [
+            575,
+            315,
+            631,
+            391
+          ],
+          "numberAnchor": [
+            603,
+            360
+          ],
+          "iconCircle": [
+            603,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              603,
+              156
+            ],
+            [
+              603,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            603,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 10,
+          "label": "Viên thuốc dạ dày",
+          "icon": "stomach tablets",
+          "barCellApprox": [
+            634,
+            315,
+            690,
+            391
+          ],
+          "numberAnchor": [
+            662,
+            360
+          ],
+          "iconCircle": [
+            662,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              662,
+              291
+            ],
+            [
+              662,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            662,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 11,
+          "label": "Dung dịch Ammonia",
+          "icon": "conical flask",
+          "barCellApprox": [
+            693,
+            315,
+            749,
+            391
+          ],
+          "numberAnchor": [
+            721,
+            360
+          ],
+          "iconCircle": [
+            721,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              721,
+              156
+            ],
+            [
+              721,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            721,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 12,
+          "label": "Xà phòng",
+          "icon": "soap",
+          "barCellApprox": [
+            751,
+            315,
+            807,
+            391
+          ],
+          "numberAnchor": [
+            779,
+            360
+          ],
+          "iconCircle": [
+            779,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              779,
+              291
+            ],
+            [
+              779,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            779,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 13,
+          "label": "Chất tẩy",
+          "icon": "detergent bottle",
+          "barCellApprox": [
+            808,
+            315,
+            864,
+            391
+          ],
+          "numberAnchor": [
+            836,
+            360
+          ],
+          "iconCircle": [
+            836,
+            109,
+            47
+          ],
+          "connector": [
+            [
+              836,
+              156
+            ],
+            [
+              836,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            836,
+            52
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        },
+        {
+          "pH": 14,
+          "label": "Chất thông cống",
+          "icon": "drain",
+          "barCellApprox": [
+            867,
+            315,
+            923,
+            391
+          ],
+          "numberAnchor": [
+            895,
+            360
+          ],
+          "iconCircle": [
+            895,
+            244,
+            47
+          ],
+          "connector": [
+            [
+              895,
+              291
+            ],
+            [
+              895,
+              315
+            ]
+          ],
+          "labelAnchor": [
+            895,
+            186
+          ],
+          "note": "2labeldòngnếuph11Dungdịch/Ammonia,ph10Viênthuốc/dạdày,ph14Chất/thôngcống."
+        }
+      ],
+      "labelLineOverrides": {
+        "11": [
+          [
+            "Dung dịch",
+            [
+              721,
+              35
+            ]
+          ],
+          [
+            "Ammonia",
+            [
+              721,
+              55
+            ]
+          ]
+        ],
+        "10": [
+          [
+            "Viên thuốc",
+            [
+              662,
+              165
+            ]
+          ],
+          [
+            "dạ dày",
+            [
+              662,
+              186
+            ]
+          ]
+        ],
+        "14": [
+          [
+            "Chất",
+            [
+              895,
+              165
+            ]
+          ],
+          [
+            "thông cống",
+            [
+              895,
+              186
+            ]
+          ]
+        ]
+      }
+    },
+    "requiredIcons": "0whitebatteryminusleft/plusright;1orangeanatomicalstomach;2lemonslice;3glassvinegarbottle;4redtomatogreencalyx;5browncoffee-takeawaycupgraylid;6whitemilkbottle;7watersplash;8redbloodtesttubewithcap;9whitebakingsodatub;10stomach+whitetablets;11Erlenammonialiquid;12soapbar+bubbles;13whitecleaningjughandle;14graydraintray. VectorstylecóthểđồngbộmẫunhưngKHÔNGbỏicon/đổinhãnđểnhanh.",
+    "literalEnglish": "Coffee,Baking Soda,Dung dịch Ammonia giữnguyênkhôngdịch/thaybrand.Khôngtựthêmacid/base/neutralregionsnếunguồnkhôngcó.",
+    "svg": "ph-icons-ddh-d605de992e5c8ef28ece5848fe0564faa43bef17096915f14df4021129daa27a.svg",
+    "hashSvg": "d605de992e5c8ef28ece5848fe0564faa43bef17096915f14df4021129daa27a",
+    "byteSvg": 78097,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "Ứng viên dùng chung163 sau so RIÊNG148/1259:15pHcells0..14/15manualicons/alllabels/connectors/DDHpath. Chờ exacthashactualreview, không tự duyệt.",
+    "canvasNguon": [
+      914,
+      392
+    ],
+    "geometryBaseSource": 1259,
+    "hashSvgDaSoat": "d605de992e5c8ef28ece5848fe0564faa43bef17096915f14df4021129daa27a",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

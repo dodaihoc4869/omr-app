@@ -1,0 +1,40 @@
+[
+  {
+    "i": 151,
+    "hash": "1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241",
+    "fileNguon": "anh/1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241.png",
+    "svg": "glucose-hemiacetal-ddh-9ea7f9bc83f2994c3baf64e05ef183448b3ea751b63479c147e5eaf162deac30.svg",
+    "hashSvg": "9ea7f9bc83f2994c3baf64e05ef183448b3ea751b63479c147e5eaf162deac30",
+    "byteSvg": 63298,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-II-13",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "hash": "1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241",
+            "where": "12-C2-B4-D2-II-13.hinh.0.du_lieu",
+            "hashDataUrl": "513efeac97951f28cd12ff88f33c111e2fc41f6d4ce81ac5a345b55b3a4dfeb5"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-II-78",
+        "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình sau:",
+        "refs": [
+          {
+            "hash": "1a852678d4df801d7ec70233c6a630c999bb3bf309669c8c9997b0784d36c241",
+            "where": "DB-12-B4-D3-II-78.hinh.0.du_lieu",
+            "hashDataUrl": "513efeac97951f28cd12ff88f33c111e2fc41f6d4ce81ac5a345b55b3a4dfeb5"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "α-open-β/18Cnums/allH-OH/CHO-CH2OHcondensed/FischerRLRR/4TAPER2horizontalbold/2equilibriumpairs/3captions/2dottedOHboxes2leaders/bottomOHhemiacetal-topOHhemiacetaliteralNOl/DDHpath.",
+    "hashSvgDaSoat": "9ea7f9bc83f2994c3baf64e05ef183448b3ea751b63479c147e5eaf162deac30",
+    "nguoiSoat": "cau_truc_4"
+  }
+]
