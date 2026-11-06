@@ -1,0 +1,250 @@
+{
+  "i": 341,
+  "hash": "3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24",
+  "fileNguon": "anh/3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zoom": "/workspace/scratch/cau4-ethanol224-graphzoom.png",
+  "questions": [
+    {
+      "qid": "12-C2-B4-D2-II-15",
+      "de": "Nấm men là chất xúc tác cho phản ứng lên men rượu trong điều kiện không có khí oxygen. Quá trình lên men là một quá trình tỏa nhiệt. Từ 250 gam glucose, thực hiện quá trình lên men rượu trong phòng thí nghiệm, kết quả biểu thị theo đồ thị bên. Kết quả nghiên cứu nhận thấy:\n- Tốc độ phản ứng tăng lên và dung dịch trở nên đặc và ấm hơn.\n- Từ ngày thứ 10, phản ứng hầu như dừng lại dù trong dung dịch vẫn còn glucose.",
+      "refs": [
+        {
+          "hash": "3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24",
+          "where": "12-C2-B4-D2-II-15.hinh.0.du_lieu",
+          "hashDataUrl": "8ad307af5aeb7ae428f89212c1597d4de5dd4574917e12bf914518cc495ec6f3"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-27",
+      "de": "Nấm men là chất xúc tác cho phản ứng lên men rượu trong điều kiện không có khí oxygen. Quá trình lên men là một quá trình tỏa nhiệt. Từ 250 gam glucose, thực hiện quá trình lên men rượu trong phòng thí nghiệm, kết quả biểu thị theo đồ thị bên. Kết quả nghiên cứu nhận thấy:\n- Tốc độ phản ứng tăng lên và dung dịch trở nên đặc và ấm hơn.\n- Từ ngày thứ 10, phản ứng hầu như dừng lại dù trong dung dịch vẫn còn glucose.",
+      "refs": [
+        {
+          "hash": "3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24",
+          "where": "DB-12-B4-D2-II-27.hinh.0.du_lieu",
+          "hashDataUrl": "8ad307af5aeb7ae428f89212c1597d4de5dd4574917e12bf914518cc495ec6f3"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;pixelanchorsNOTnewmoledata,noroundingtotheory.",
+    "outerFrame": [
+      37,
+      36,
+      648,
+      365
+    ],
+    "plotAxis": {
+      "vertical": [
+        203,
+        64,
+        203,
+        239
+      ],
+      "bottom": [
+        203,
+        239,
+        604,
+        239
+      ],
+      "arrows": false,
+      "extraTopRightFrame": false
+    },
+    "horizontalGridYs": [
+      64,
+      108,
+      151,
+      195,
+      239
+    ],
+    "gridFromX": 203,
+    "gridToX": 604,
+    "yTickStubs": [
+      [
+        195,
+        64,
+        203,
+        64
+      ],
+      [
+        195,
+        108,
+        203,
+        108
+      ],
+      [
+        195,
+        151,
+        203,
+        151
+      ],
+      [
+        195,
+        195,
+        203,
+        195
+      ],
+      [
+        195,
+        239,
+        203,
+        239
+      ]
+    ],
+    "yLabels": [
+      {
+        "text": "2",
+        "at": [
+          173,
+          69
+        ]
+      },
+      {
+        "text": "1.5",
+        "at": [
+          165,
+          113
+        ]
+      },
+      {
+        "text": "1",
+        "at": [
+          173,
+          156
+        ]
+      },
+      {
+        "text": "0.5",
+        "at": [
+          165,
+          200
+        ]
+      },
+      {
+        "text": "0",
+        "at": [
+          173,
+          244
+        ]
+      }
+    ],
+    "xLabels": [
+      {
+        "text": "0",
+        "at": [
+          203.0,
+          271
+        ]
+      },
+      {
+        "text": "2",
+        "at": [
+          260.28,
+          271
+        ]
+      },
+      {
+        "text": "4",
+        "at": [
+          317.56,
+          271
+        ]
+      },
+      {
+        "text": "6",
+        "at": [
+          374.84000000000003,
+          271
+        ]
+      },
+      {
+        "text": "8",
+        "at": [
+          432.12,
+          271
+        ]
+      },
+      {
+        "text": "10",
+        "at": [
+          489.4,
+          271
+        ]
+      },
+      {
+        "text": "12",
+        "at": [
+          546.6800000000001,
+          271
+        ]
+      },
+      {
+        "text": "14",
+        "at": [
+          603.96,
+          271
+        ]
+      }
+    ],
+    "xTickMarks": "NONEbelowbaseline,numberlabelsONLY;nostemsadded",
+    "piecewisePolylineVertices": [
+      [
+        204,
+        237
+      ],
+      [
+        260,
+        188
+      ],
+      [
+        374,
+        141
+      ],
+      [
+        432,
+        109
+      ],
+      [
+        489,
+        66
+      ],
+      [
+        604,
+        66
+      ]
+    ],
+    "lineStyle": "graythick~6px,straightsegments+continuousplateau10..14,NOmarkers/noextradata",
+    "xTitle": {
+      "text": "Ngày",
+      "anchor": [
+        611,
+        347
+      ],
+      "weight": "bold"
+    },
+    "yTitle": {
+      "lines": [
+        "số mol ethyl",
+        "alcohol"
+      ],
+      "rotation": -90,
+      "anchors": [
+        [
+          91,
+          155
+        ],
+        [
+          124,
+          155
+        ]
+      ],
+      "weight": "bold"
+    },
+    "counts": "8Xlabels0,2,4,6,8,10,12,14/5Ylabels0,0.5,1,1.5,2DOTDECIMAL/5horizontalgridlines/1outerrect/1polyline6vertices/2titlesbold.",
+    "critical": "Kinksnear2/6/8/10nativepixels188/141/109/66,mustnotroundto0.5/1/1.5theory. Sourceytitleethylnotalcoholnameethanolrewrite. Noverticalgrid/xtickmarks/arrow/endmarker/legend/newnumbers."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

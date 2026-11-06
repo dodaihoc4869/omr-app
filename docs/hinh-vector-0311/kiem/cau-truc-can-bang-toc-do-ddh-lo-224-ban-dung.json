@@ -1,0 +1,40 @@
+[
+  {
+    "i": 322,
+    "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+    "fileNguon": "anh/376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197.png",
+    "svg": "can-bang-toc-do-ddh-6ee1afc718a27138a2937b280ac8828d5ba3de784ff1bb8bac0cddc8b664ceb9.svg",
+    "hashSvg": "6ee1afc718a27138a2937b280ac8828d5ba3de784ff1bb8bac0cddc8b664ceb9",
+    "byteSvg": 23970,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-8",
+        "de": "Đồ thị dưới đây biểu diễn sự thay đổi tốc độ phản ứng thuận và phản ứng nghịch theo thời gian của phản ứng:\nA(g) ⇌ B(g).\nChọn mô tả đúng?",
+        "refs": [
+          {
+            "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+            "where": "11-C1-B1-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "a350fa511a2c56fb561eed462df7334d2aa317404b3da03c94502e6ced8a6b55"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-8",
+        "de": "Đồ thị dưới đây biểu diễn sự thay đổi tốc độ phản ứng thuận và phản ứng nghịch theo thời gian của phản ứng:\nA(g) ⇌ B(g).\nChọn mô tả đúng?",
+        "refs": [
+          {
+            "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+            "where": "DB-11-B1-D1-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "a350fa511a2c56fb561eed462df7334d2aa317404b3da03c94502e6ced8a6b55"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2axesheads/no0tick-units/2curves(a)(b)join256221→sharedplateau505221/3textlabels/DDHpath;croppeditalicbottomdescriptionnondatađượcloạisauđọcall2publicrefs-stems/khôngphụchồiphầncắt.",
+    "hashSvgDaSoat": "6ee1afc718a27138a2937b280ac8828d5ba3de784ff1bb8bac0cddc8b664ceb9",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

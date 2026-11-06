@@ -1,0 +1,259 @@
+{
+  "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+  "file": "anh/376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197.png",
+  "mime": "image/png",
+  "bytes": 19055,
+  "i": 322,
+  "questions": [
+    {
+      "qid": "11-C1-B1-I-8",
+      "de": "Đồ thị dưới đây biểu diễn sự thay đổi tốc độ phản ứng thuận và phản ứng nghịch theo thời gian của phản ứng:\nA(g) ⇌ B(g).\nChọn mô tả đúng?",
+      "refs": [
+        {
+          "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+          "where": "11-C1-B1-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "a350fa511a2c56fb561eed462df7334d2aa317404b3da03c94502e6ced8a6b55",
+          "publicPosition": {
+            "where": "11-C1-B1-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "a350fa511a2c56fb561eed462df7334d2aa317404b3da03c94502e6ced8a6b55",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-I-8",
+      "de": "Đồ thị dưới đây biểu diễn sự thay đổi tốc độ phản ứng thuận và phản ứng nghịch theo thời gian của phản ứng:\nA(g) ⇌ B(g).\nChọn mô tả đúng?",
+      "refs": [
+        {
+          "hash": "376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197",
+          "where": "DB-11-B1-D1-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "a350fa511a2c56fb561eed462df7334d2aa317404b3da03c94502e6ced8a6b55",
+          "publicPosition": {
+            "where": "DB-11-B1-D1-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "a350fa511a2c56fb561eed462df7334d2aa317404b3da03c94502e6ced8a6b55",
+            "viTri": "sau_de",
+            "truong": "hinh",
+            "congKhaiTruocNop": true
+          }
+        }
+      ]
+    }
+  ],
+  "fileNguon": "anh/376fe26a3db26928e1fa6a8549aa75382a580da670ab290bfd50a8aa48917197.png",
+  "nativeSize": [
+    605,
+    433
+  ],
+  "daMoNativeFullVaZoom3x": true,
+  "zooms": [
+    "/workspace/scratch/tocdo224-full3x.png",
+    "/workspace/scratch/tocdo224-bottom3x.png"
+  ],
+  "geometry": {
+    "axes": {
+      "originApprox": [
+        65,
+        372
+      ],
+      "x": {
+        "label": "Thời gian",
+        "shaftApprox": [
+          [
+            65,
+            373
+          ],
+          [
+            557,
+            373
+          ]
+        ],
+        "arrowTipApprox": [
+          571,
+          373
+        ],
+        "labelApproxBounds": [
+          271,
+          378,
+          369,
+          401
+        ]
+      },
+      "y": {
+        "label": "Tốc độ phản ứng",
+        "shaftApprox": [
+          [
+            65,
+            373
+          ],
+          [
+            65,
+            48
+          ]
+        ],
+        "arrowTipApprox": [
+          65,
+          35
+        ],
+        "labelRotatedApproxBounds": [
+          27,
+          123,
+          55,
+          283
+        ]
+      },
+      "arrowheadCount": 2,
+      "ticks": [],
+      "originLabel": null,
+      "units": []
+    },
+    "curves": [
+      {
+        "label": "(a)",
+        "labelApproxBounds": [
+          147,
+          111,
+          193,
+          144
+        ],
+        "kind": "liềngiảmtừmứccaophíatrái,tớichỗgặpcân bằng",
+        "pixelAnchorsApprox": [
+          [
+            65,
+            72
+          ],
+          [
+            95,
+            108
+          ],
+          [
+            128,
+            140
+          ],
+          [
+            163,
+            170
+          ],
+          [
+            198,
+            195
+          ],
+          [
+            232,
+            212
+          ],
+          [
+            256,
+            221
+          ]
+        ]
+      },
+      {
+        "label": "(b)",
+        "labelApproxBounds": [
+          152,
+          289,
+          199,
+          322
+        ],
+        "kind": "liềntăngtừgốctrục,tớichỗgặpcân bằng",
+        "pixelAnchorsApprox": [
+          [
+            65,
+            372
+          ],
+          [
+            92,
+            339
+          ],
+          [
+            128,
+            302
+          ],
+          [
+            164,
+            271
+          ],
+          [
+            198,
+            246
+          ],
+          [
+            232,
+            229
+          ],
+          [
+            256,
+            221
+          ]
+        ]
+      }
+    ],
+    "equilibrium": {
+      "joinApprox": [
+        256,
+        221
+      ],
+      "flatSegmentApprox": [
+        [
+          256,
+          221
+        ],
+        [
+          505,
+          221
+        ]
+      ],
+      "sharedFlat": "Haiđườngtrùngmộtplateaunằmngang,khôngtách2mứccânbằng",
+      "label": "Trạng thái cân bằng",
+      "labelApproxBounds": [
+        316,
+        190,
+        508,
+        216
+      ]
+    },
+    "notPresent": [
+      "0/Oatgốc",
+      "numericvalues",
+      "axisunits",
+      "xticks/yticks",
+      "verticalguide/nétđứt",
+      "kýhiệuv+/v−",
+      "t1/t2",
+      "tênchấtA/Btrênđường",
+      "côngthứcphảnứngtrongfigure"
+    ]
+  },
+  "bottomCroppedItalic": {
+    "boundsApprox": [
+      0,
+      409,
+      604,
+      432
+    ],
+    "visibleUnambiguousFragment": "đổi tốc độ phản ứng thuận và phản ứng",
+    "otherParts": "Đầudòngvàđuôidòngra khỏi canvas,phầnchânchữcũngbịcắt. Khôngtựphụchồichữnghịchhaytoàncâuởđâytừstem.",
+    "classification": "Dòngmôtảin/PDFngoàiphầngraph,trùngngữcảnhđãcóđủtrongstemcả2refs;khôngphải dữliệu/nhãncurve/captionchấtsố.",
+    "evidence": [
+      {
+        "kind": "nativePlacement",
+        "detail": "Nằm dưới nhãn trục Thời gian,có khoảngtrắng riêng,kíytựnghiêngserifkhácnhãnaxes;khôngleader/bond/điểm gắn với đườngcurves."
+      },
+      {
+        "kind": "bothPublicStems",
+        "detail": "Cả11-C1-B1-I-8 vàDB-11-B1-D1-I-8 đều nguyênvăn: Đồ thị dưới đây biểu diễn sự thay đổi tốc độ phản ứng thuận và phản ứng nghịch theo thời gian của phản ứng: A(g) ⇌ B(g). Chọn mô tả đúng? Fragmentnhìnthấy chỉlặpcụmđó;fullstemởappđãgiữthôngtinnày."
+      },
+      {
+        "kind": "noUniqueData",
+        "detail": "Fragmentkhôngcógiátrị/đơnvị/khoảngthờigian/mapping(a)/(b)/điềukiệnbổsungnàongoàistem. Haiqidsdùngcùnghashvàđềukhônggọidòngmô tảđó nhưmộtdata/legendcầnđọc."
+      }
+    ],
+    "disposition": "Đủ bằng chứng loại dòng mô tả trùng đề bị crop khỏi vectorfigure. GiữđủnhãnTốc độ phản ứng/Thời gian/(a)/(b)/Trạng thái cân bằng;khôngthaycropbằngtextphụchồitựđoán.",
+    "notFullSvgApproval": true
+  },
+  "nguoiDocNguon": "soat_nguon_2",
+  "trangThai": "Đãđọcnguồn+2publicrefs;đượcloạibottomprintnondata nhưnêu,bảndựngSVGvẫnchưaduyệt."
+}
