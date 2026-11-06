@@ -1,0 +1,295 @@
+{
+  "i": 152,
+  "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+  "fileNguon": "anh/1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb.png",
+  "nguoiDoc": "cau_truc_4",
+  "daMoNativeFull": true,
+  "zooms": [
+    "/workspace/scratch/cau4-isotope212-ringzoom.png",
+    "/workspace/scratch/cau4-isotope212-labelzoom.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-C2-B4-D2-II-8",
+      "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+      "refs": [
+        {
+          "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+          "where": "12-C2-B4-D2-II-8.hinh.0.du_lieu",
+          "hashDataUrl": "8e4c76cb6ad9375a6b0f404c424c4528450f56ec5c4ec9320eb995d7905bc972"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-9",
+      "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+      "refs": [
+        {
+          "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+          "where": "DB-12-B4-D2-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "8e4c76cb6ad9375a6b0f404c424c4528450f56ec5c4ec9320eb995d7905bc972"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "note": "Nativeanchors1–2pxapprox;noanswerA/x/ycomputed.",
+    "ring": {
+      "C4": [
+        65,
+        134
+      ],
+      "C5": [
+        131,
+        81
+      ],
+      "O": [
+        233,
+        81
+      ],
+      "C1": [
+        302,
+        134
+      ],
+      "C2": [
+        234,
+        185
+      ],
+      "C3": [
+        131,
+        185
+      ]
+    },
+    "groups": [
+      {
+        "text": "CH₂OH",
+        "at": [
+          167,
+          45
+        ],
+        "bond": [
+          [
+            131,
+            81
+          ],
+          [
+            131,
+            60
+          ]
+        ],
+        "target": "Cfirst"
+      },
+      {
+        "text": "OH",
+        "on": "C4down",
+        "at": [
+          75,
+          170
+        ],
+        "bond": [
+          [
+            65,
+            134
+          ],
+          [
+            65,
+            158
+          ]
+        ]
+      },
+      {
+        "text": "OH",
+        "on": "C3up",
+        "at": [
+          142,
+          149
+        ],
+        "bond": [
+          [
+            131,
+            185
+          ],
+          [
+            131,
+            162
+          ]
+        ]
+      },
+      {
+        "text": "OH",
+        "on": "C2down",
+        "at": [
+          244,
+          222
+        ],
+        "bond": [
+          [
+            234,
+            185
+          ],
+          [
+            234,
+            208
+          ]
+        ]
+      },
+      {
+        "text": "OH",
+        "on": "C1down",
+        "at": [
+          312,
+          169
+        ],
+        "bond": [
+          [
+            302,
+            134
+          ],
+          [
+            302,
+            158
+          ]
+        ]
+      }
+    ],
+    "Hlabels": [
+      {
+        "at": [
+          65,
+          97
+        ],
+        "bond": [
+          [
+            65,
+            134
+          ],
+          [
+            65,
+            111
+          ]
+        ]
+      },
+      {
+        "at": [
+          131,
+          117
+        ],
+        "bond": [
+          [
+            131,
+            81
+          ],
+          [
+            131,
+            106
+          ]
+        ]
+      },
+      {
+        "at": [
+          131,
+          220
+        ],
+        "bond": [
+          [
+            131,
+            185
+          ],
+          [
+            131,
+            208
+          ]
+        ]
+      },
+      {
+        "at": [
+          234,
+          148
+        ],
+        "bond": [
+          [
+            234,
+            185
+          ],
+          [
+            234,
+            161
+          ]
+        ]
+      },
+      {
+        "at": [
+          302,
+          101
+        ],
+        "bond": [
+          [
+            302,
+            134
+          ],
+          [
+            302,
+            114
+          ]
+        ]
+      }
+    ],
+    "frontStyle": "C4–C3TAPERthinC4wideC3/C3–C2boldhorizontal/C2–C1TAPERwideC2thinC1;noCIPtext.",
+    "plusSigns": [
+      [
+        385,
+        133
+      ],
+      [
+        972,
+        133
+      ]
+    ],
+    "methanol": {
+      "literal": "H₃C–¹⁸O–H",
+      "anchor": [
+        504,
+        134
+      ],
+      "isotope18": "SUPbeforeO,NOTbeforeC",
+      "bonds": [
+        "H3C–18O",
+        "O–H"
+      ]
+    },
+    "arrow": {
+      "from": [
+        622,
+        135
+      ],
+      "to": [
+        767,
+        135
+      ],
+      "dir": "RIGHT",
+      "top": "HCl khan",
+      "topAnchor": [
+        679,
+        108
+      ]
+    },
+    "product": {
+      "A": "A",
+      "Aweight": "bold",
+      "formula": "(C₇HₓOᵧ)",
+      "anchor": [
+        882,
+        134
+      ],
+      "xy": "LOWERCASEsubscriptvariablesnotvalues,7subscriptinteger",
+      "byproduct": "H₂O",
+      "byproductAnchor": [
+        1034,
+        136
+      ]
+    },
+    "counts": "1sixring/5Hlabels/1CH2OHtext/4OHstandalone/2TAPER+1horizontalbold/2pluses/1rightarrow/1Avariableformula/1H2O,noCnumbers/caption.",
+    "critical": "SourceallringOHnotHO;keep5explicitH. 18isoxygenisotopeonly,noadditional18C/H2Oisotopelabel/theoryanswer."
+  },
+  "verdict": "Đọcsource,chưaactualSVGreview."
+}

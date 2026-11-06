@@ -1,0 +1,40 @@
+[
+  {
+    "i": 152,
+    "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+    "fileNguon": "anh/1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb.png",
+    "svg": "phan-ung-isotope-ddh-19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b.svg",
+    "hashSvg": "19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b",
+    "byteSvg": 23455,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-II-8",
+        "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+        "refs": [
+          {
+            "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+            "where": "12-C2-B4-D2-II-8.hinh.0.du_lieu",
+            "hashDataUrl": "8e4c76cb6ad9375a6b0f404c424c4528450f56ec5c4ec9320eb995d7905bc972"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-9",
+        "de": "Tiến hành nghiên cứu phản ứng giữa glucose với methanol (xúc tác HCl khan) trong đó nguyên tử oxygen trong phân tử methanol là đồng vị ¹⁸O, các nguyên tử trong glucose là đồng vị ¹²C; ¹H và ¹⁶O và trong methanol là đồng vị ¹²C; ¹H. Kết quả thí nghiệm thu được như sau:",
+        "refs": [
+          {
+            "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+            "where": "DB-12-B4-D2-II-9.hinh.0.du_lieu",
+            "hashDataUrl": "8e4c76cb6ad9375a6b0f404c424c4528450f56ec5c4ec9320eb995d7905bc972"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Haworth6C5H/CH2OH-Cfirst/allOH/2TAPER1horizontalbold/+H3C-18O-H/HClkhan/RIGHTarrow/A(C7HxOy)+H2O/x-yLatinDDHsubbaseline/noanswer/DDHpath.",
+    "hashSvgDaSoat": "19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

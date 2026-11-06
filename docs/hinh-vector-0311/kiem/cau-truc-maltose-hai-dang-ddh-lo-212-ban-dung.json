@@ -1,0 +1,45 @@
+[
+  {
+    "i": 149,
+    "hash": "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5",
+    "fileNguon": "anh/1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5.png",
+    "svg": "maltose-hai-dang-ddh-a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2.svg",
+    "hashSvg": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2",
+    "byteSvg": 23573,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D2-II-40",
+        "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp lên men tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+        "refs": [
+          {
+            "hash": "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5",
+            "where": "12-C2-B6-D2-II-40.hinh.0.du_lieu",
+            "hashDataUrl": "aaad9d12ad47615261a94d518aa22a5cc1a4bbef74b1f40234a2005dae1c26f3"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-56",
+        "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp lên men tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+        "refs": [
+          {
+            "hash": "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5",
+            "where": "DB-12-B4-D2-II-56.hinh.0.du_lieu",
+            "hashDataUrl": "aaad9d12ad47615261a94d518aa22a5cc1a4bbef74b1f40234a2005dae1c26f3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Ứng viên dùng chung200 sau so RIÊNG149/64:2panels3rings+open/Clabel-Haldehyde/allOH/8taper4bold/(I)(II)/DDHpath. Chờ exacthashactualreview.",
+    "canvasNguon": [
+      995,
+      282
+    ],
+    "geometryBaseSource": 64,
+    "hashSvgDaSoat": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2",
+    "nguoiSoat": "cau_truc_4"
+  }
+]

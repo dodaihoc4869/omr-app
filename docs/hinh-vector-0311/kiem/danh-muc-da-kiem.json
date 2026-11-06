@@ -442,6 +442,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5": {
+      "tep": "maltose-hai-dang-ddh-a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2.svg",
+      "hashSvg": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2",
+      "byteSvg": 23573,
+      "byteGzip": 2066,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a3f1f296bda5eeaabd3d4e6d1949472b41174665d13ec544ae1ea81d021c6baa": {
       "tep": "polymer-ddh-7d2ed750809c16cfcdf47b157ecccc965714d2ba1eda09d07cbb6b010660d293.svg",
       "hashSvg": "7d2ed750809c16cfcdf47b157ecccc965714d2ba1eda09d07cbb6b010660d293",
@@ -564,6 +573,15 @@
       "hashSvg": "d84ef4e03a3f6070bbce393940dffb1a26bd01587edaa7673f1680f83232e672",
       "byteSvg": 20205,
       "byteGzip": 2123,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb": {
+      "tep": "phan-ung-isotope-ddh-19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b.svg",
+      "hashSvg": "19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b",
+      "byteSvg": 23455,
+      "byteGzip": 4162,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -9571,6 +9589,20 @@
       ]
     },
     {
+      "qid": "12-C2-B4-D2-II-8",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+          "where": "12-C2-B4-D2-II-8.hinh.0.du_lieu",
+          "hashDataUrl": "8e4c76cb6ad9375a6b0f404c424c4528450f56ec5c4ec9320eb995d7905bc972",
+          "vector": "phan-ung-isotope-ddh-19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B4-D2-II-9",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -9787,6 +9819,20 @@
           "where": "12-C2-B6-D2-II-39.hinh.1.du_lieu",
           "hashDataUrl": "032bbf95bee205accae24e26dcff683be5c5797ef7bb4b3600754a63a7937efa",
           "vector": "cellulose-ba-ghe-ddh-8860d10f38dbd2a0c805b45228a84bdd2139bdcfbd6823918d3e7a8a857a5d64.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C2-B6-D2-II-40",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5",
+          "where": "12-C2-B6-D2-II-40.hinh.0.du_lieu",
+          "hashDataUrl": "aaad9d12ad47615261a94d518aa22a5cc1a4bbef74b1f40234a2005dae1c26f3",
+          "vector": "maltose-hai-dang-ddh-a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2.svg"
         }
       ]
     },
@@ -16631,6 +16677,20 @@
       ]
     },
     {
+      "qid": "DB-12-B4-D2-II-9",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
+          "where": "DB-12-B4-D2-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "8e4c76cb6ad9375a6b0f404c424c4528450f56ec5c4ec9320eb995d7905bc972",
+          "vector": "phan-ung-isotope-ddh-19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B4-D2-II-10",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -16711,6 +16771,20 @@
           "where": "DB-12-B4-D2-II-43.hinh.0.du_lieu",
           "hashDataUrl": "ffdfa11a712937fa58c30c30a68670ef391e1ea8bdf8c576a7892bb0c7583763",
           "vector": "lewis-nitric-ddh-43541ed9e7b5bdf9fc9f85f049b8732f5eb15319ace8c9fa0976c305125dae97.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-56",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5",
+          "where": "DB-12-B4-D2-II-56.hinh.0.du_lieu",
+          "hashDataUrl": "aaad9d12ad47615261a94d518aa22a5cc1a4bbef74b1f40234a2005dae1c26f3",
+          "vector": "maltose-hai-dang-ddh-a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2.svg"
         }
       ]
     },
@@ -25077,6 +25151,7 @@
     "12-C2-B4-D1-I-61",
     "12-C2-B4-D1-I-63",
     "12-C2-B4-D1-II-6",
+    "12-C2-B4-D2-II-8",
     "12-C2-B4-D2-II-9",
     "12-C2-B4-D2-II-10",
     "12-C2-B4-D2-I-2",
@@ -25091,6 +25166,7 @@
     "12-C2-B6-D2-II-14",
     "12-C2-B6-D2-II-27",
     "12-C2-B6-D2-II-39",
+    "12-C2-B6-D2-II-40",
     "12-C2-B7-D1-I-5",
     "12-C2-B7-D1-I-16",
     "12-C3-B10-D2-II-11",
@@ -25509,12 +25585,14 @@
     "DB-12-B4-D3-I-264",
     "DB-12-B4-D2-I-4",
     "DB-12-B4-D2-I-8",
+    "DB-12-B4-D2-II-9",
     "DB-12-B4-D2-II-10",
     "DB-12-B4-D2-II-11",
     "DB-12-B4-D2-I-23",
     "DB-12-B4-D2-III-28",
     "DB-12-B4-D2-II-38",
     "DB-12-B4-D2-II-43",
+    "DB-12-B4-D2-II-56",
     "DB-12-B4-D2-I-61",
     "DB-12-B4-D2-II-66",
     "DB-12-B4-D2-II-93",

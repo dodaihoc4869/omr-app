@@ -1,5 +1,5 @@
 {
-  "ngay": "2116-11-05",
+  "ngay": "2126-11-05",
   "nguon": {
     "soDe": 321,
     "soCau": 17042,
@@ -60,8 +60,8 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1099 câu đủ mọi hình+DDH/7 một phần;801 nguồn→552 SVG;9603742byte/gzip1828590;627 nguồn còn lại.",
-    "viecNenLamTiep": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "loVuaXong": "1103 câu đủ mọi hình+DDH/7 một phần;803 nguồn→553 SVG;9627197byte/gzip1832752;625 nguồn còn lại.",
+    "viecNenLamTiep": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
     "canhBaoCheckpoint": "Giữworktree/commitmớihơn. Origin/mainab81c625chưagộp;khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp từ1099câu/552SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
+    "lyDo": "Tiếp từ1103câu/553SVG;chỉtắt khi toànphạmviđạt/vàoapp/kiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 801,
-    "soSvgRieng": 552,
-    "soCauDungHinh": 1106,
-    "soCauDuMoiHinh": 1099,
+    "soAnhNguon": 803,
+    "soSvgRieng": 553,
+    "soCauDungHinh": 1110,
+    "soCauDuMoiHinh": 1103,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 9603742,
-    "byteGzip": 1828590,
-    "soAnhNguonConLai": 627,
+    "byteSvg": 9627197,
+    "byteGzip": 1832752,
+    "soAnhNguonConLai": 625,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,20 +101,20 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "211mọichữ/DDH Rounded path tự chứa/khôngfallback.",
+    "loMoi": "212mọichữ/DDH Rounded path tự chứa/khôngfallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true
   },
   "daDatPhongApp": {
-    "soNguon": 801,
-    "soCauDuHinhVaPhong": 1099,
+    "soNguon": 803,
+    "soCauDuHinhVaPhong": 1103,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "211",
-    "ketQua": "1099 câu đủ mọi hình+DDH/7 một phần;801 nguồn→552 SVG;9603742byte/gzip1828590;627 nguồn còn lại.",
-    "suaLoi": "142 dựng mới Zn-Cu/KhóaXcirclecross/curvedwire/Ubeaker/liquidpattern/alllabels-nocharge;135 IR-E/F so RIÊNG135/1033 native và freshSVG185 dùng chung sau kiểm từngcurve-tip-tick/nonlinearXspacing/DDHpath. Exacthashsoátđộc lập.",
-    "tiepTheo": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
-    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build211/speed21/21/Chromium552/552/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
+    "lo": "212",
+    "ketQua": "1103 câu đủ mọi hình+DDH/7 một phần;803 nguồn→553 SVG;9627197byte/gzip1832752;625 nguồn còn lại.",
+    "suaLoi": "152 dựng mới Haworth/allH-OH/2taper1bold/+H3C-18O-H/HClkhan/arrow/A(C7HxOy)+H2O/x-yLatinDDHsubbaseline/noanswer;149 so RIÊNG149/64 và freshSVG200 dùng chung sau kiểm từngatom-bond-stereo/captions/3OHgaps/DDHpath. Exacthashsoátđộc lập.",
+    "tiepTheo": "119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build212/speed21/21/Chromium553/553/hashXML/path/ASTđạt;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy."
   }
 }
