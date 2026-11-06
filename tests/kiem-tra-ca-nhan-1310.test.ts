@@ -305,3 +305,10 @@ it('mô phỏng không DDL/lập lịch/ghi sổ',async()=>{
  expect(k.d.sql.prepare('SELECT COUNT(*) n FROM kiem_tra_ca_nhan').get()).toMatchObject({n:0})
  vi.restoreAllMocks()
 })
+it('nộp toàn bài tự chốt mọi chặng chưa chốt (không chặn em vì chặng đang mở)',async()=>{
+ const k=await kho();await lapKtCn(k.env,'S1',NOW);const r=(await docKtCn(k.env,'S1',NOW))!,id=String(r.id),now=Number(r.mo_luc)+5000
+ await ktCnAction(k.env,'S1','hoc-tap-ktcn-start',{id,chang:0},now)
+ const res=await ktCnAction(k.env,'S1','hoc-tap-ktcn-nop',{id},now+1000)
+ expect(res.ok).toBe(true)
+ expect(k.d.sql.prepare('SELECT chot_luc FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=0').get(id)).toMatchObject({chot_luc:now+1000})
+})

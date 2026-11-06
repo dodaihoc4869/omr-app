@@ -215,7 +215,11 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  // Câu đang làm cũng nhớ trên máy: mở lại chặng về đúng câu ấy (kể cả sau khi bản nháp đã đồng bộ lên máy chủ).
  useEffect(()=>{if(stt!==null&&han)try{localStorage.setItem(`ktcn:vt:${sbd}:${id}:${stt}`,String(viTri));const raw=localStorage.getItem(key);if(raw){const o=JSON.parse(raw);if(o&&o.han===han&&o.viTri!==viTri)localStorage.setItem(key,JSON.stringify({...o,viTri}))}}catch{/* không cản làm bài */}},[viTri,stt,han])
  const ve=async()=>{xoaKtcnDangLam(sbd);if(stt!==null){setBusy(true);try{await save();onVe();ra()}catch(e){if(laLoiTamThoi(e)){onVe();ra()}else setLoi(chuCuaLoi(e,'Chưa lưu được bài.'))}finally{setBusy(false)}}else{onVe();ra()}}
- const nop=async()=>{if(tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});const t=nhan(r);setKet(await ketTu(r));ra();if(!(typeof t.diem==='number'&&t.diem<5))setMung(n=>n+1)}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
+ const nowMay=Date.now()+offset,changNay=stt!==null?chang.find(c=>c.stt===stt):undefined,giayChang=changNay?.giay||0
+ const dangChay=chang.find(c=>!c.daChot&&c.han!==null&&c.han>nowMay)
+ const soChot=chang.filter(c=>c.daChot).length,xongHet=chang.length>0&&soChot===chang.length
+ const dau=chang.find(c=>!c.daChot)
+ const nop=async()=>{if(!xongHet&&tt&&tt.daTra<tt.tong&&!await hoiXacNhan({tieuDe:'Nộp bài kiểm tra?',noiDung:`Còn ${tt.con} câu chưa trả lời. Nộp bài sẽ chốt kết quả hiện tại.`,nhanDongY:'Nộp bài',nhanKhong:'Làm tiếp',vo:'m3'}))return;setBusy(true);setLoi('');try{const r=await goiHoa2('hoc-tap-ktcn-nop',token,{id,...thanGoiKt(sbd,id)});const t=nhan(r);setKet(await ketTu(r));ra();if(!(typeof t.diem==='number'&&t.diem<5))setMung(n=>n+1)}catch(e){setLoi(chuCuaLoi(e,'Chưa nộp được bài.'))}finally{setBusy(false)}}
  const [loc,setLoc]=useState<Loc>('tat-ca')
  // Tấm hỏi nộp đang mở mà chặng đã đóng / hết giờ (lượt tự chốt đi trước) ⇒ trả «không» và đóng tấm.
  useEffect(()=>{if(hoiNop&&(stt===null||hetGio)){hoiNop(false);setHoiNop(null)}},[stt,hetGio,hoiNop])
@@ -233,10 +237,6 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
  }
  useEffect(()=>{if(!duo)return;const f=(e:KeyboardEvent)=>phimDuo.current(e);window.addEventListener('keydown',f);return()=>window.removeEventListener('keydown',f)},[duo])
  const q=cs[viTri]
- const nowMay=Date.now()+offset,changNay=stt!==null?chang.find(c=>c.stt===stt):undefined,giayChang=changNay?.giay||0
- const dangChay=chang.find(c=>!c.daChot&&c.han!==null&&c.han>nowMay)
- const soChot=chang.filter(c=>c.daChot).length,xongHet=chang.length>0&&soChot===chang.length
- const dau=chang.find(c=>!c.daChot)
  const daTraChang=cs.filter(c=>daTraDu(c,tra[c.qid])).length
  const dsCau=(nho:boolean)=><div className={nho?'ktcn-nav ktcn-nav-dt':'ktcn-nav'} role="group" aria-label="Các câu trong chặng">{cs.map((c,i)=><button type="button" key={c.qid} aria-current={viTri===i||undefined} data-co={daTraDu(c,tra[c.qid])?'':undefined} aria-label={`Câu ${i+1}${daTraDu(c,tra[c.qid])?' · đã trả lời':''}`} onClick={()=>setViTri(i)}>{i+1}</button>)}</div>
  const tieuDe=stt!==null?<><b>Chặng {stt+1}/{chang.length||stt+1}</b><small>Câu {viTri+1}/{cs.length}</small></>:<><b>Kiểm tra ôn tập</b>{tt&&<small>{thuNgay(tt.ngay)}</small>}</>
@@ -333,7 +333,7 @@ export default function ManKiemTraCaNhan({token,sbd,id,onVe,onCapNhat,onVa,ban}:
     </li>})}</ol>
    <div className="ktcn-nop" data-xong={xongHet||undefined}>
     <p>{xongHet?`Em đã xong cả ${chang.length} chặng. Nộp toàn bài để xem kết quả.`:`Xong cả ${chang.length||tt.soChang} chặng thì nộp toàn bài. Nộp sớm vẫn được — câu bỏ trống tính là chưa trả lời.`}</p>
-    <button type="button" className={xongHet?'ktcn-nut-chinh':'ktcn-nut-phu'} onClick={()=>void nop()} disabled={busy||!!dangChay}>Nộp toàn bài</button>
+    <button type="button" className={xongHet?'ktcn-nut-chinh':'ktcn-nut-phu'} onClick={()=>void nop()} disabled={busy||!!dangChay}>{busy?'Đang nộp…':'Nộp toàn bài'}</button>
     {dangChay&&<p className="ktcn-ch-ghi">Nộp chặng {dangChay.stt+1} trước khi nộp toàn bài.</p>}
    </div>
    </div>

@@ -301,8 +301,8 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
   if (action==='hoc-tap-ktcn-nop') {
     // Không nhận đáp án ở lệnh nộp; chỉ chốt bản nháp đã lưu đúng giờ ở máy chủ.
     if (!r.nop_luc) {
-      const active=await env.DB.prepare('SELECT 1 AS co FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND chot_luc IS NULL AND han>? LIMIT 1').bind(r.id,now).first()
-      if (active) throw new Error('Em nộp chặng đang làm trước khi nộp toàn bài.')
+      // Tự động chốt mọi chặng chưa chốt (kể cả chặng dở/quá hạn): nộp toàn bài là hoàn tất toàn bộ chặng.
+      await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=COALESCE(chot_luc,?) WHERE bai_id=? AND chot_luc IS NULL').bind(now,r.id).run()
       r=await chotKtCn(env,r,now)
     } else r=await chotKtCn(env,r,now)
     return {ok:true,kiemTra:tomTatKt(r,now),...await ketGonKt(env,s(r.id),sbd,de(r).cau,await ketQuaKt(env,r,now),b)}
@@ -365,11 +365,11 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
 async function ketQuaKt(env: Env, r: Row, now: number) {
   const d0=de(r), t=tra(r)
   // câu TẠM GIỮ (đang bảo vệ cho ca thi chưa công bố, đổi nguồn…): KHÔNG hiện đề / đáp án / lời giải trong phần chữa — lộ đáp án câu đang bảo vệ là cấm (03/11)
-  const giu=await kiemNguon(env,s(r.sbd),d0.cau)
+  const giu=await kiemNguon(env,s(r.sbd),d0.cau).catch(()=>new Set<string>())
   const d={...d0,cau:d0.cau.filter(c=>!giu.has(c.q.qid))}
   // Phần chữa tới SAU receipt nộp: không để hai dấu giờ cùng mili giây phủ nhận lượt tự làm vừa chốt.
   const xemLuc=Math.max(now,Number(r.nop_luc)+1)
-  await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc) SELECT ?,value,? FROM json_each(?)').bind(r.sbd,new Date(xemLuc).toISOString(),JSON.stringify(d.cau.map(c=>c.q.qid))).run()
+  await env.DB.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,luc) SELECT ?,value,? FROM json_each(?)').bind(r.sbd,new Date(xemLuc).toISOString(),JSON.stringify(d.cau.map(c=>c.q.qid))).run().catch(()=>{})
   const bang=new Map<string,{daKiem:boolean;dung:boolean}>()
   for (const c of d.cau) {
     if (!duTraKt(c.q.phan,t[c.q.qid]??'')) continue

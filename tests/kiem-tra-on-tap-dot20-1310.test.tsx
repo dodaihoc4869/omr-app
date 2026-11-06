@@ -135,3 +135,21 @@ it('kết quả: điểm, số câu đúng đếm từ máy chủ, lọc "Cần 
   expect(ds.textContent).toContain('Câu 2')
   expect(screen.getByRole('button', { name: 'Chưa trả lời · 1' })).toBeTruthy()
 })
+
+it('xong cả N chặng còn câu bỏ trống: bấm Nộp toàn bài gửi ngay hoc-tap-ktcn-nop, KHÔNG bật hộp hỏi Làm tiếp', async () => {
+  api.mockImplementation(async (action: string) => action === 'hoc-tap-ktcn-trang-thai'
+    ? TRANG([
+      { stt: 0, soCau: 6, giay: 780, han: now - 1000, daChot: true, daTra: 6 },
+      { stt: 1, soCau: 6, giay: 780, han: now - 1000, daChot: true, daTra: 5 },
+      { stt: 2, soCau: 6, giay: 780, han: now - 1000, daChot: true, daTra: 6 },
+    ], { daTra: 17, con: 1, soChang: 3, tong: 18 })
+    : action === 'hoc-tap-ktcn-nop'
+      ? { ok: true, kiemTra: { ...kt, daTra: 17, con: 1, nopLuc: now, trangThai: 'da_nop', diem: 9.4 }, ketQua: { bai: [], cau: [], chu: 'Xong' } }
+      : { ok: true })
+  render(<ManKiemTra token="t" sbd="S1" id="kt-S1" onVe={noop} onCapNhat={noop} />)
+  expect(await screen.findByText(/Em đã xong cả 3 chặng/)).toBeTruthy()
+  const nutNop = screen.getByRole('button', { name: 'Nộp toàn bài' })
+  fireEvent.click(nutNop)
+  expect(screen.queryByRole('alertdialog')).toBeNull()
+  await waitFor(() => expect(api.mock.calls.some((c) => c[0] === 'hoc-tap-ktcn-nop')).toBe(true))
+})
