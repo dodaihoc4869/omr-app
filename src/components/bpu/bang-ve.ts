@@ -36,7 +36,7 @@ export const tronMau = (a: string, b: string, t: number) => { const x = docRgb(a
 
 export function docMauBang(goc: Element): MauBang {
   const cs = getComputedStyle(goc), v = (n: string) => cs.getPropertyValue(n).trim() || cs.getPropertyValue('--tr-chu').trim()
-  return { tin: v('--tr-tin'), hs: v('--tr-hs'), dung: v('--tr-dung'), sao: v('--tr-sao'), chuY: v('--tr-chu-y'), vien: v('--tr-vien-2'), chu: v('--tr-chu'), mat: v('--tr-mat'), giay: v('--giay'), doi: [v('--tr-doi-na'), v('--tr-doi-k'), v('--tr-doi-cu'), v('--tr-doi-ca')] }
+  return { tin: v('--tr-tin'), hs: v('--tr-hs'), dung: v('--tr-dung'), sao: v('--tr-sao'), chuY: v('--tr-chu-y'), vien: v('--tr-vien-2'), chu: v('--tr-chu'), mat: v('--tr-mat'), giay: v('--giay'), doi: [v('--p-cam'), v('--p-tim-2'), v('--p-xanh'), v('--p-do')] }
 }
 
 export class VeBang {

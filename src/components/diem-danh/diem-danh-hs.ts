@@ -50,8 +50,6 @@ export function useDiemDanhHs(token: string, bat = true) {
       setDangGui(false)
       if (r.ok) {
         setTt({ loai: 'xong', buoi: r.buoi, luc: Date.now() })
-        // Bình Phản Ứng (06/11): điểm danh = vào lớp ⇒ mở màn chờ của buổi (cùng một mã, em không nhập lần hai).
-        void import('../bpu/gan-hs').then((m) => m.moBpuHs(token, r.buoi.id)).catch(() => {})
         setMa('')
         setMo(false)
       } else {

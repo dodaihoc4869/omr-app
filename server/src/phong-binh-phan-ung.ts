@@ -89,6 +89,8 @@ export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> 
   if (caMo) return { ok: false, lyDo: 'ca-mo', error: `Lớp đang có ca kiểm tra mở (${str(caMo.ma_ca)}). Gửi câu xuống máy lúc này sẽ làm gián đoạn bài thi của các em. Ca đóng xong thầy mở lại.` }
   const r = await goiPhong(env, buoiId, '/khoi', { buoiId, lop: lopBuoi || str(buoi.ten), ds: [...ds.values()] })
   if (!r.ok) return r
+  // Em đã điểm danh trước khi thầy mở bảng ⇒ kênh đẩy mở màn chờ trên máy các em.
+  await baoMayCacEm(env, [...ds.values()].filter((x) => x.coMat).map((x) => x.sbd), 'bpu').catch(() => 0)
   return { ok: true, buoiId, ve: await kyVeBpu(env.MA_BI_MAT, { b: buoiId, s: '', v: 'gv', h: nay + HAN_VE_BPU_MS }), soEm: ds.size }
 }
 
@@ -138,11 +140,13 @@ export async function hsBpuCuaEm(env: Env, b: Row, nay = Date.now()): Promise<Ro
   return { ok: true, buoiId, ve: await kyVeBpu(env.MA_BI_MAT, { b: buoiId, s: sbd, v: 'hs', h: nay + HAN_VE_BPU_MS }) }
 }
 
-/** Em vừa điểm danh bằng mã ⇒ báo phòng của buổi (nếu đang mở) để bảng hiện em vào lớp NGAY. Không lỗi ra ngoài. */
+/** Em vừa điểm danh bằng mã ⇒ báo phòng của buổi (nếu đang mở) để bảng hiện em vào lớp NGAY, rồi qua kênh đẩy mở màn chờ Bình Phản Ứng trên máy em
+ *  (máy em không phải sửa gì ở phần điểm danh). Phòng chưa mở ⇒ thôi. Không lỗi ra ngoài. */
 export async function baoPhongVaoLop(env: Env, buoiId: unknown, sbd: string): Promise<void> {
   const id = buoiHop(buoiId)
   if (!bpuBat(env) || !id || !sbd) return
-  await goiPhong(env, id, '/vao', { sbd }).catch(() => null)
+  const r = await goiPhong(env, id, '/vao', { sbd }).catch(() => null)
+  if (r?.ok) await baoMayCacEm(env, [sbd], 'bpu').catch(() => 0)
 }
 
 /** `GET /bpu/phong?ve=…` (nâng cấp WebSocket): kiểm vé ở Worker rồi chuyển vào phòng với vai đã kiểm. */
@@ -251,7 +255,7 @@ export class PhongBinhPhanUng {
     }
     const st = await this.doc()
     if (!st || st.ketThuc) return json({ ok: false, lyDo: 'chua-mo', error: 'Phòng chưa mở. Thầy bấm mở Bình Phản Ứng trước.' })
-    if (u.pathname === '/vao') { if (L.vaoLop(st, str(b.sbd), nay)) { await this.luu(); this.phat() } return json({ ok: true }) }
+    if (u.pathname === '/vao') { const co = L.vaoLop(st, str(b.sbd), nay); if (co) { await this.luu(); this.phat() } return json({ ok: co }) }
     if (u.pathname === '/luot') {
       const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null }, nay)
       await this.luu(); this.phat()

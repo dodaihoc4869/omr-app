@@ -7,12 +7,12 @@
 export type PhanCau = 'I' | 'II' | 'III'
 export type PhaLuot = 'tra-loi' | 'goi' | 'lam-bang' | 'mo'
 
-/** Bốn đội màu thử ngọn lửa: Na vàng · K tím · Cu xanh lam · Ca cam (biến --tr-doi-* ở trong.css, cùng giá trị ở hai app). */
+/** Bốn đội màu thử ngọn lửa: Na vàng cam · K tím · Cu xanh lục (đúng màu ngọn lửa đồng) · Ca đỏ — biến màu CỐ ĐỊNH sẵn có ở tokens.css (không đổi theo nền, cùng giá trị ở bảng chiếu và máy em; không thêm byte vào tờ màu lúc mở app). */
 export const DOI_BPU = [
-  { ten: 'Đội Natri', ky: 'Na', mau: '--tr-doi-na' },
-  { ten: 'Đội Kali', ky: 'K', mau: '--tr-doi-k' },
-  { ten: 'Đội Đồng', ky: 'Cu', mau: '--tr-doi-cu' },
-  { ten: 'Đội Canxi', ky: 'Ca', mau: '--tr-doi-ca' },
+  { ten: 'Đội Natri', ky: 'Na', mau: '--p-cam' },
+  { ten: 'Đội Kali', ky: 'K', mau: '--p-tim-2' },
+  { ten: 'Đội Đồng', ky: 'Cu', mau: '--p-xanh' },
+  { ten: 'Đội Canxi', ky: 'Ca', mau: '--p-do' },
 ] as const
 
 export const KJ = {

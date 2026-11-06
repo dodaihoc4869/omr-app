@@ -8,8 +8,6 @@
    Lùi nhanh một máy: localStorage ddh.trong = 'tat'. Tương phản đo 26/10: chữ phụ #475467 ≥ 7,0 và chữ mờ #5d6679 ≥ 5,2 trên cả ba nền sáng;
    chữ trắng trên nút chính HS #15803d 5,0 · GV #2563eb 5,2; nền tối dùng chữ đậm #0c111d trên nút sáng (≥ 5,8). */
 :root {
-  /* Bình Phản Ứng (thầy duyệt bản vẽ 06/11, docs/ban-ve-binh-phan-ung-0611): 4 đội màu thử ngọn lửa — Na vàng · K tím · Cu xanh lam · Ca cam; CÙNG giá trị ở bảng chiếu (app thầy) lẫn máy em. */
-  --tr-doi-na: #ffbf35; --tr-doi-k: #f373ce; --tr-doi-cu: #00bed8; --tr-doi-ca: #ff8c51;
   --tr-nen: #f6f7f9; --tr-mat: #ffffff; --tr-mat-2: #f2f4f7; --tr-mat-3: #e9ecf1; --tr-vien: #e6e8ec; --tr-vien-2: #d0d5dd;
   --tr-chu: #101828; --tr-chu-2: #475467; --tr-chu-3: #5d6679; --tr-trang: #ffffff;
   --tr-dung: #12b76a; --tr-dung-nhat: #ecfdf3; --tr-dung-chu: #067647;
@@ -26,7 +24,6 @@
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --tr-doi-na: #ffc735; --tr-doi-k: #e17beb; --tr-doi-cu: #00bfd4; --tr-doi-ca: #ff9447;
     --tr-nen: #0c111d; --tr-mat: #161b26; --tr-mat-2: #1f242f; --tr-mat-3: #2a303c; --tr-vien: #262c38; --tr-vien-2: #363d4b;
     --tr-chu: #f5f5f6; --tr-chu-2: #cecfd2; --tr-chu-3: #a3a6ad; --tr-trang: #0c111d;
     --tr-dung: #32d583; --tr-dung-nhat: #053321; --tr-dung-chu: #75e0a7;
