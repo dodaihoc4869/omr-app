@@ -233,7 +233,7 @@ export class PhongBinhPhanUng {
       const t = l.tra[e.sbd]
       if (!t) continue
       const k = l.ketQua[e.sbd]
-      cu.push({ buoi_id: st.buoiId, sbd: e.sbd, qid: l.qid, luot: l.so, chon: t.chon, dung: k?.dung ? 1 : 0, giay: Math.round(t.t / 100) / 10, kj: k?.kj ?? 0, doi: e.doi, roi: l.roiMe.includes(e.sbd) ? 1 : 0, len_bang: l.goi?.sbd === e.sbd ? (l.goi.dat ? 2 : 1) : 0, luc })
+      cu.push({ buoi_id: st.buoiId, sbd: e.sbd, qid: l.qid, luot: l.so, chon: t.kb ? '?' : t.chon, dung: k?.dung ? 1 : 0, giay: Math.round(t.t / 100) / 10, kj: k?.kj ?? 0, doi: e.doi, roi: l.roiMe.includes(e.sbd) ? 1 : 0, len_bang: l.goi?.sbd === e.sbd ? (l.goi.dat ? 2 : 1) : 0, luc })
     }
     await this.ctx.storage.put('ghi', cu.slice(-4000))
   }
@@ -315,7 +315,7 @@ export class PhongBinhPhanUng {
     if (a.v === 'hs') {
       const s = a.s
       if (j.t === 'tra') {
-        const r = L.nhanTra(st, s, str(j.chon), nay)
+        const r = L.nhanTra(st, s, str(j.chon), nay, j.kb === true)
         this.gui(ws, JSON.stringify({ t: 'tra-kq', ...r }))
         doi = r.ok
       } else if (j.t === 'roi') doi = L.roiMan(st, s, nay)

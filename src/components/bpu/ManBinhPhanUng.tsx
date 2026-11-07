@@ -43,6 +43,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   const [chon, setChon] = useState('')
   const [baoTra, setBaoTra] = useState('')
   const [vuaRoi, setVuaRoi] = useState(false)
+  // «Em chưa biết làm»: bấm lần đầu ⇒ hỏi lại (3 giây), bấm lần hai mới gửi — tránh chạm nhầm.
+  const [hoiKb, setHoiKb] = useState(false)
+  useEffect(() => { if (!hoiKb) return; const h = setTimeout(() => setHoiKb(false), 3000); return () => clearTimeout(h) }, [hoiKb])
   const [nay, setNay] = useState(() => Date.now())
   const ws = useRef<WebSocket | null>(null)
   const dung = useRef(false)
@@ -104,7 +107,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   }, [token, buoiId])
 
   // Lượt mới ⇒ xoá lựa chọn cũ.
-  useEffect(() => { if (soLuot !== luotChon.current) { luotChon.current = soLuot; setChon(''); setBaoTra('') } }, [soLuot])
+  useEffect(() => { if (soLuot !== luotChon.current) { luotChon.current = soLuot; setChon(''); setBaoTra(''); setHoiKb(false) } }, [soLuot])
 
   // Đồng hồ êm (không đổi màu, không nháy — luật C14).
   const coHan = !!v?.luot?.han && v.luot.pha === 'tra-loi'
@@ -139,6 +142,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   const q = (l?.cau ?? null) as unknown as Question | null
   const duChon = !!l && (l.tuLuan || (l.phan === 'II' ? /^[DS]{4}$/.test(chon) : chon.trim().length > 0))
   const guiTra = () => { if (!l || !duChon) return; gui({ t: 'tra', chon: l.tuLuan ? 'xong' : chon }); xinToanMan() }
+  const chuaBiet = () => { if (!l) return; if (!hoiKb) { setHoiKb(true); return } setHoiKb(false); gui({ t: 'tra', kb: true }); xinToanMan() }
   const phimSo = (p: string) => setChon((c) => (p === '−' ? (c.startsWith('-') ? c.slice(1) : '-' + c) : (c + p).slice(0, 8)))
 
   const tren = (phu: string) => (
@@ -200,6 +204,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
     }
   } else if (q) {
     const daGui = !!l.emTra
+    const kb = !!l.emTra?.kb
     const daMo = l.pha === 'mo'
     const chonHien = daGui ? l.emTra!.chon : chon
     than = (
@@ -218,13 +223,20 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
       const roiNho = <button type="button" className="bpu-roi-nho" onClick={onDong}>Rời Bình Phản Ứng</button>
       const k = l.ketQua
       const chuDung = l.tuLuan ? '' : l.phan === 'II' ? (l.dung ?? '').split('').map((x, i) => `${'abcd'[i]}) ${x === 'D' ? 'Đúng' : 'Sai'}`).join(' · ') : String(l.dung ?? '')
-      if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p>{roiNho}</div>
+      if (kb) day = <div className="bpu-ket" role="status"><h4>Cảm ơn em đã thành thật</h4><p>{l.tuLuan ? '' : `+${k?.kj ?? KJ.thanhThat} kJ thành thật. Đáp án đúng: ${chuDung}. `}Nhìn lên bảng xem thầy chữa để lần sau em làm được nhé.</p>{roiNho}</div>
+      else if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p>{roiNho}</div>
       else if (k?.dung) day = <div className="bpu-ket dung" role="status"><h4>{l.phan === 'II' ? 'Đúng cả 4 ý!' : 'Chính xác!'}</h4><p>+{k.kj} kJ{k.nhanh ? ` · nhanh thứ ${k.nhanh} cả lớp` : ''} · hạng {e.hang}/{e.soEm}</p>{roiNho}</div>
       else day = <div className="bpu-ket sai" role="status"><h4>{l.emTra ? 'Chưa đúng' : 'Em chưa gửi kịp'}</h4><p>{l.phan === 'II' && k ? `Em đúng ${k.soY ?? 0}/4 ý · +${k.kj} kJ. ` : ''}Đáp án đúng: {chuDung}</p>{roiNho}</div>
     } else if (daGui) {
-      day = <div className="bpu-gui"><NguyenTu ky={kyHieu(e.ten)} doi={doi} /><b>{l.tuLuan ? 'Đã báo thầy em làm xong' : `Đã gửi sau ${Math.round(l.emTra!.t / 1000)} giây`}</b><span>Nhìn lên bảng nhé · {l.daGui}/{l.coMat} bạn đã {l.tuLuan ? 'xong' : 'gửi'}</span></div>
+      day = <div className="bpu-gui"><NguyenTu ky={kyHieu(e.ten)} doi={doi} /><b>{kb ? 'Em đã báo: chưa biết làm' : l.tuLuan ? 'Đã báo thầy em làm xong' : `Đã gửi sau ${Math.round(l.emTra!.t / 1000)} giây`}</b><span>Nhìn lên bảng nhé · {l.daGui}/{l.coMat} bạn đã {l.tuLuan ? 'xong' : 'gửi'}</span></div>
     } else {
-      day = <button type="button" className="bpu-nut" disabled={!duChon} onClick={guiTra}>{l.tuLuan ? 'Em làm xong' : 'Gửi đáp án'}</button>
+      day = (
+        <div className="bpu-hai-nut">
+          <button type="button" className="bpu-nut" disabled={!duChon} onClick={guiTra}>{l.tuLuan ? 'Em làm xong' : 'Gửi đáp án'}</button>
+          <button type="button" className={`bpu-nut phu bpu-kb${hoiKb ? ' hoi' : ''}`} onClick={chuaBiet} aria-live="polite">{hoiKb ? 'Bấm lần nữa để báo thầy' : 'Em chưa biết làm'}</button>
+          <p className="nho">Thành thật +{KJ.thanhThat} kJ, không bị gọi lên bảng. Đoán bừa sai thì 0 kJ.</p>
+        </div>
+      )
     }
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 

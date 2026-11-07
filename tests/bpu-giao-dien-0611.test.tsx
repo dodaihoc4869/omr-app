@@ -46,6 +46,22 @@ describe('máy em', () => {
     expect(await screen.findByRole('button', { name: 'Về chặng đang làm' })).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/tinh thể|mẻ/i)
   })
+  it('«Em chưa biết làm»: bấm hai lần mới gửi cờ kb; sau đó hiện «Em đã báo: chưa biết làm»', async () => {
+    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
+    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    const nut = await screen.findByRole('button', { name: 'Em chưa biết làm' })
+    act(() => { nut.click() })
+    expect(ws.gui.some((t) => t.includes('"kb":true'))).toBe(false)
+    act(() => { screen.getByRole('button', { name: 'Bấm lần nữa để báo thầy' }).click() })
+    expect(ws.gui.some((t) => t.includes('"kb":true'))).toBe(true)
+    nhanTra(st, 'S1', '', T0 + 1000, true); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Em đã báo: chưa biết làm')).toBeTruthy()
+    moDapAn(st, T0 + 5000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Cảm ơn em đã thành thật')).toBeTruthy()
+  })
   it('em được gọi lên bảng thấy lý do', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
     render(<Man token="tok" buoiId="b1" onDong={() => {}} />)

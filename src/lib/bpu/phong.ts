@@ -25,6 +25,8 @@ export const KJ = {
   lenBangDat: 200,
   doanDung: 20,
   roiMan: -20,
+  /** «Em chưa biết làm» (thầy 07/11 «để học sinh thành thật»): +20 kJ cho em, không bị gọi lên bảng; đoán bừa sai thì 0 kJ và vẫn có thể được gọi. */
+  thanhThat: 20,
 } as const
 export const NGUONG_KICH_HOAT = 0.75
 export const TIEP_SUC_TOI_DA = 10
@@ -44,7 +46,8 @@ export interface EmPhong {
   roi: number
   daLenBang: number
 }
-export interface TraLoi { chon: string; t: number }
+/** `kb` = em bấm «Em chưa biết làm» (cờ riêng, KHÔNG giả làm một lựa chọn ⇒ không bao giờ được chấm là đúng). */
+export interface TraLoi { chon: string; t: number; kb?: boolean }
 export interface GoiLenBang {
   sbd: string
   lyDo: string[]
@@ -52,7 +55,7 @@ export interface GoiLenBang {
   tiep: Record<string, number>
   dat: boolean | null
 }
-export interface KetQuaEm { dung: boolean; soY: number | null; kj: number; nhanh: number | null }
+export interface KetQuaEm { dung: boolean; soY: number | null; kj: number; nhanh: number | null; kb?: boolean }
 export interface LuotPhong {
   so: number
   qid: string
@@ -174,7 +177,7 @@ export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLu
 
 export type LyDoTuChoi = 'khong-co-luot' | 'da-khoa' | 'het-gio' | 'da-gui' | 'la' | 'rong'
 /** Nhận đáp án: chỉ lần gửi ĐẦU theo (sbd, lượt); quá hạn (+2 s) ⇒ từ chối. Em chưa điểm danh mà gửi ⇒ tính là vào lớp. */
-export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: number): { ok: true } | { ok: false; ly: LyDoTuChoi } {
+export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: number, kb = false): { ok: true } | { ok: false; ly: LyDoTuChoi } {
   const l = st.luot
   if (!l) return { ok: false, ly: 'khong-co-luot' }
   if (l.pha !== 'tra-loi') return { ok: false, ly: 'da-khoa' }
@@ -182,10 +185,10 @@ export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: numb
   const e = em(st, sbd)
   if (!e) return { ok: false, ly: 'la' }
   if (l.tra[sbd]) return { ok: false, ly: 'da-gui' }
-  const v = l.tuLuan ? 'xong' : String(chon ?? '').trim().slice(0, 40)
-  if (!v) return { ok: false, ly: 'rong' }
+  const v = kb ? '' : l.tuLuan ? 'xong' : String(chon ?? '').trim().slice(0, 40)
+  if (!v && !kb) return { ok: false, ly: 'rong' }
   if (!e.vao) vaoLop(st, sbd, nay)
-  l.tra[sbd] = { chon: v, t: Math.max(0, nay - l.batDau) }
+  l.tra[sbd] = kb ? { chon: '', t: Math.max(0, nay - l.batDau), kb: true } : { chon: v, t: Math.max(0, nay - l.batDau) }
   st.capNhat = nay
   return { ok: true }
 }
@@ -258,11 +261,13 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
   if (!l || l.pha === 'mo') return false
   l.pha = 'mo'
   const kq: Record<string, KetQuaEm> = {}
-  const dungTheoGio = Object.entries(l.tra).filter(([, t]) => chamTra(l, t.chon, chamSo).dung).sort((a, b) => a[1].t - b[1].t).map(([s]) => s)
+  const dungTheoGio = Object.entries(l.tra).filter(([, t]) => !t.kb && chamTra(l, t.chon, chamSo).dung).sort((a, b) => a[1].t - b[1].t).map(([s]) => s)
   const thoiLuong = l.han != null ? l.han - l.batDau : 60_000
   for (const e of st.ds) {
     const t = l.tra[e.sbd]
     if (!t) { if (!l.tuLuan) e.chuoi = 0; continue }
+    // Chưa biết làm: +20 kJ thành thật (câu tự luận 0), không chấm, không cộng nhanh; chuỗi đúng giữ nguyên (không phạt sự thành thật).
+    if (t.kb) { const kj = l.tuLuan ? 0 : KJ.thanhThat; e.kj += kj; kq[e.sbd] = { dung: false, soY: 0, kj, nhanh: null, kb: true }; continue }
     const c = chamTra(l, t.chon, chamSo)
     const nhanh = Math.round(KJ.nhanhToiDa * Math.max(0, 1 - t.t / Math.max(1, thoiLuong)))
     let kj = 0
@@ -307,8 +312,9 @@ export function viewBang(st: TrangThaiPhong) {
     luot: l ? {
       so: l.so, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, batDau: l.batDau, han: l.han, pha: l.pha, roiMe: l.roiMe, kich: l.kich,
       daGui: Object.keys(l.tra),
+      chuaBiet: Object.entries(l.tra).filter(([, t]) => t.kb).map(([s]) => s),
       goi: l.goi ? { sbd: l.goi.sbd, lyDo: l.goi.lyDo, dat: l.goi.dat, doanDung: Object.values(l.goi.duDoan).filter((v) => v === 1).length, doanSai: Object.values(l.goi.duDoan).filter((v) => v === 0).length, tiep: tongTiep(l.goi) } : null,
-      ...(l.pha === 'mo' ? { dung: l.dung, chon: Object.fromEntries(Object.entries(l.tra).map(([s, t]) => [s, t.chon])), ketQua: l.ketQua } : {}),
+      ...(l.pha === 'mo' ? { dung: l.dung, chon: Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, t.chon])), ketQua: l.ketQua } : {}),
     } : null,
   }
 }

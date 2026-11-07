@@ -154,3 +154,26 @@ describe('hai đội khi lớp ít em (thầy 07/11 «dưới 12 bạn thì ch�
     expect(st.soDoi).toBe(4)
   })
 })
+
+describe('«Em chưa biết làm» (thầy 07/11 «để học sinh thành thật»)', () => {
+  it('cờ riêng: khoá như đã gửi, không bao giờ chấm đúng, +20 kJ thành thật; đoán sai 0 kJ; không lộ đáp án trước khi mở', () => {
+    const st = phong(); moLuot(st, cauTN, T0)
+    expect(nhanTra(st, 'S1', '', T0 + 1000, true)).toEqual({ ok: true })
+    expect(nhanTra(st, 'S1', 'B', T0 + 2000)).toEqual({ ok: false, ly: 'da-gui' })
+    nhanTra(st, 'S2', 'A', T0 + 1000)
+    expect(viewBang(st).luot!.chuaBiet).toEqual(['S1'])
+    expect(viewBang(st).luot!.daGui).toContain('S1')
+    expect(JSON.stringify(viewEm(st, 'S1'))).not.toContain('"dung"')
+    expect(JSON.stringify(viewBang(st))).not.toContain('"dung"')
+    moDapAn(st, T0 + 5000, chamSo)
+    expect(st.luot!.ketQua!.S1).toMatchObject({ dung: false, kb: true, kj: KJ.thanhThat, nhanh: null })
+    expect(st.luot!.ketQua!.S2!.kj).toBe(0)
+    expect(viewBang(st).luot!.chon).toEqual({ S2: 'A' }) // ống nghiệm không đếm «chưa biết» vào phương án nào
+  })
+  it('Đúng–sai: chưa biết không được tính ý nào đúng', () => {
+    const st = phong(); moLuot(st, { ...cauTN, phan: 'II', dung: 'SSSS' }, T0)
+    nhanTra(st, 'S1', '', T0 + 1000, true)
+    moDapAn(st, T0 + 5000, chamSo)
+    expect(st.luot!.ketQua!.S1).toMatchObject({ dung: false, soY: 0, kj: KJ.thanhThat })
+  })
+})

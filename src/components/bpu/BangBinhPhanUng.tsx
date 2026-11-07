@@ -181,6 +181,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   }, [tenGoi, hien, L])
   const coMat = ds.filter((e) => e.vao)
   const daGui = new Set(l?.daGui ?? [])
+  const chuaBietS = new Set(l?.chuaBiet ?? [])
 
   // Sân khấu co theo màn + canvas.
   useLayoutEffect(() => {
@@ -247,7 +248,10 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     if (!v?.luot || dangGoi) return
     const lc = v.luot
     setDangGoi(true)
-    const ungVien = v.ds.filter((e) => e.vao && !lc.roiMe.includes(e.sbd) && !boQua.includes(e.sbd))
+    // Em báo «chưa biết làm» KHÔNG bị gọi (thầy 07/11: khuyến khích thành thật); cả lớp đều chưa biết ⇒ gọi trong cả lớp như cũ.
+    const kbSet = new Set(lc.chuaBiet ?? [])
+    const tatCa = v.ds.filter((e) => e.vao && !lc.roiMe.includes(e.sbd) && !boQua.includes(e.sbd))
+    const ungVien = tatCa.some((e) => !kbSet.has(e.sbd)) ? tatCa.filter((e) => !kbSet.has(e.sbd)) : tatCa
     const m = await layEmChieu([lc.qid], ungVien.map((e) => e.sbd), new Set(ungVien.map((e) => e.sbd)), v.lop, boQua.length ? new Map([[lc.qid, new Set(boQua)]]) : undefined, { kenh: 'bpu' } as never).catch(() => new Map())
     const list = (m.get(lc.qid) ?? []) as { sbd: string; loai: 'da_dung' | 'du_bao' | 'chua_co'; soSai?: number; soLan14?: number; lanCuoiLenBang?: string | null }[]
     const chon = list[0] ?? (ungVien.length ? { sbd: ungVien[Math.floor(Math.random() * ungVien.length)]!.sbd, loai: 'chua_co' as const } : null)
@@ -321,7 +325,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const o = hien.map((e) => {
     const lop = ['bb-o']
     if (!e.vao) lop.push('chua-vao')
-    if (man === 'tra-loi' && daGui.has(e.sbd)) lop.push('da-tra')
+    if (man === 'tra-loi' && chuaBietS.has(e.sbd)) lop.push('chua-biet')
+    else if (man === 'tra-loi' && daGui.has(e.sbd)) lop.push('da-tra')
     if (man !== 'diem-danh' && man !== 'vinh-danh' && e.chuoi >= 2) lop.push('chay')
     if ((man === 'tra-loi' || man === 'goi' || man === 'lam-bang') && l?.roiMe.includes(e.sbd)) lop.push('roi')
     if (ung?.ds.includes(e.sbd)) lop.push(ung.soi === e.sbd ? 'soi' : 'ung')
@@ -415,7 +420,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
               <div className="dai"><span><b>{g.doanDung}</b> đoán đúng · <b>{g.doanSai}</b> chưa</span><span className="vach"><i style={{ width: `${(g.doanDung / Math.max(1, g.doanDung + g.doanSai)) * 100}%` }} /></span><span className="ts">Tiếp sức {g.tiep}</span></div>
             </div>
           ) : man === 'mo' && !l.tuLuan ? ongNhan.map((x) => <div key={x.nhan} className="bb-ong" style={{ left: x.x - 1200 }}><div className="nhan">{x.nhan}</div><div className="dem">{x.dem} em</div>{x.dung ? <div className="the">Đáp án</div> : null}</div>)
-            : <div className="bb-dem"><b>{daGuiN}</b>/{coMat.length} em {l.tuLuan ? 'làm xong' : 'đã gửi'}</div>}
+            : <div className="bb-dem"><b>{daGuiN}</b>/{coMat.length} em {l.tuLuan ? 'làm xong' : 'đã gửi'}{chuaBietS.size ? <span className="kb">trong đó {chuaBietS.size} em chưa biết làm</span> : null}</div>}
+          {man === 'mo' && !l.tuLuan && chuaBietS.size ? <div className="bb-kb-mo">{chuaBietS.size} em chưa biết làm · thầy chữa kĩ câu này</div> : null}
         </div>
         {luoi(o)}
         {man === 'mo' && l.kich ? <div className="bb-kich">Vượt năng lượng hoạt hoá! {Object.values(l.ketQua ?? {}).filter((x) => x.dung).length}/{coMat.length} em đúng · cả lớp +{KJ.kichHoat} kJ</div> : null}

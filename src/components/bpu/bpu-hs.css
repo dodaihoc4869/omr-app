@@ -73,6 +73,11 @@
 .bpu-ket.dung h4 { color: var(--tr-dung-chu); }
 .bpu-ket.sai h4 { color: var(--tr-sai-chu); }
 .bpu-ket p { margin: 0; font-size: 15.5px; font-weight: 700; }
+.bpu-hai-nut { display: grid; gap: 8px; }
+.bpu-hai-nut .nho { text-align: center; font-size: 13px; }
+.bpu-kb { min-height: 46px; font-size: 16px; }
+.bpu-kb.hoi { box-shadow: inset 0 0 0 2px var(--tr-chu-y); color: var(--tr-chu-y-chu); background: var(--tr-chu-y-nhat); }
+@media (orientation: landscape) and (min-width: 700px) { .bpu-hai-nut { grid-template-columns: 2fr 1fr; align-items: center; } .bpu-hai-nut .nho { grid-column: 1 / -1; } }
 .bpu-roi-nho { justify-self: start; min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--tr-chu-2); font-size: 14px; font-weight: 700; text-decoration: underline; cursor: pointer; }
 @media (orientation: landscape) and (min-width: 700px) {
   .bpu-hs-than { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; column-gap: 28px; padding-inline: 28px; }
