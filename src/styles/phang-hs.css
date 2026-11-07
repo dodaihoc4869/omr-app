@@ -273,3 +273,6 @@ html[data-trong='hs']:not(#_) :is(.duo-lenh > h2, .kb-viec h2) { line-height: 1.
    (nhãn in hoa 0,23–0,28 · chữ thân 0,18 · tiêu đề 0,145) rồi dựng lại bằng DDH Rounded (phông app rộng nét hơn ⇒ khớp khoảng trống, KHÔNG khớp bề rộng dòng
    — khớp bề rộng làm chữ dính). Kết quả: nhãn IN HOA + nút +0,06em (≈ 0,9px ở 15px, ngang Duolingo); chữ thân, tiêu đề 0; giãn dòng thân 1,5. */
 html[data-trong='hs']:not(#_) :is(.kb-nhan, .duo-nhan, .duo-3 p, .da-bai small, .da-ban-go, .da-bang .nut-to) { letter-spacing: .06em !important; }
+/* 07/11 thầy «bỏ thanh dọc cuộn này đi»: dải kết quả (đúng / sai) vẫn cuộn được khi lời dài nhưng KHÔNG hiện thanh cuộn hệ thống (máy tính hiện thanh xám thô) */
+html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu) { scrollbar-width: none !important; }
+html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu)::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
