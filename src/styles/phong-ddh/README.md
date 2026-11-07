@@ -9,7 +9,7 @@ Không dùng, không chép đường nét của phông Duolingo (Feather, DIN Ne
 | Tệp | Kiểu | Dùng cho |
 | --- | --- | --- |
 | `ddh-rounded-de-{latin,vietnamese}.woff2` | Đề (gốc Regular 400 làm đậm 3/1000 em, `font-weight: 100 549`) | chữ đề, phương án, chữ thân |
-| `ddh-rounded-dam-{latin,vietnamese}.woff2` | Đậm (gốc Bold 700 làm đậm 8/1000 em, `font-weight: 550 1000`) | tiêu đề, nút, nhãn, số, chữ chạm được |
+| `ddh-rounded-dam-{latin,vietnamese}.woff2` | Đậm (07/11: gốc **Medium 500** làm đậm 10/1000 em — trước là Bold 700 + 8; `font-weight: 550 1000`) | tiêu đề, nút, nhãn, số, chữ chạm được |
 
 Độ đậm hiệu chỉnh theo số đo trên ảnh Duolingo: tỉ lệ «bề dày nét đứng / chiều cao chữ x» (chữ IN HOA, số: / chiều cao chữ hoa)
 Đề 0,157 (Duolingo 0,157), Đậm 0,261 tiêu đề / 0,199 nút IN HOA (Duolingo 0,257 / 0,202). Gốc M+ không nội suy được giữa các độ đậm ⇒
@@ -20,4 +20,8 @@ cả hai: chữ thường cao +3 %, chỉ số dưới hạ dưới chân dòng,
 chia mảnh latin / vietnamese.
 
 Tạo lại: `python3 scripts/tao-phong-ddh-rounded.py <thư mục TTF gốc> src/styles/phong-ddh` (cần fonttools, brotli, skia-pathops;
-TTF gốc: github.com/google/fonts, `ofl/mplusrounded1c/MPLUSRounded1c-Regular.ttf`, `-Bold.ttf`). Khai báo `@font-face`: `src/styles/trong-hs.css`.
+TTF gốc: github.com/google/fonts, `ofl/mplusrounded1c/MPLUSRounded1c-Regular.ttf`, `-Medium.ttf`). Khai báo `@font-face`: `src/styles/trong-hs.css`.
+
+**07/11 (thầy: «những chỗ chữ đậm chỉ đậm hơn một chút giống Duolingo, đo kĩ»):** đo bề dày nét chữ I / chiều cao chữ hoa:
+Đề 0,129; Đậm cũ 0,218 (gấp 1,7 — quá nặng); Đậm mới 0,180 (gấp 1,4 — tỉ lệ chữ đậm / chữ thường trên ảnh Duolingo thầy gửi).
+Hai tệp phông vẫn TĨNH: mọi `font-weight` 550–1000 hiện cùng một mặt Đậm này.

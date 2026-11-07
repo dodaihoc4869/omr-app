@@ -40,11 +40,13 @@ LATIN = (khoang(0x20, 0x7E) + LATIN1 + [0x394, 0x3B1, 0x3B2]
          + khoang(0x2190, 0x2193) + [0x21C4, 0x21CC, 0x2212, 0x2264, 0x2265])
 
 NET_DE = float(os.environ.get('DDH_NET_DE', 3))     # đơn vị (1/1000 em) dời mỗi bên — số đo chốt ở bảng tỉ lệ
-NET_DAM = float(os.environ.get('DDH_NET_DAM', 8))
+# 07/11 thầy «chữ đậm chỉ đậm hơn một chút giống Duolingo»: mặt Đậm dựng từ M+ MEDIUM làm đậm 10 (cũ: Bold + 8) — bề dày nét I / chiều cao chữ hoa
+# 0,180 (Đề 0,129 ⇒ gấp 1,4 như chữ đậm / chữ thường của Duolingo trên ảnh thầy gửi; cũ 0,218 = gấp 1,7).
+NET_DAM = float(os.environ.get('DDH_NET_DAM', 10))
 KIEU = {
   'de': dict(tep='MPLUSRounded1c-Regular.ttf', net=NET_DE, sx=1.03, theo=12, kxh=1.03, dam=400, ten='De', hien='Đề',
              l_mac_dinh=True, mot_chan=True),
-  'dam': dict(tep='MPLUSRounded1c-Bold.ttf', net=NET_DAM, sx=0.96, theo=-15, kxh=1.03, dam=700, ten='Dam', hien='Đậm',
+  'dam': dict(tep=os.environ.get('DDH_TEP_DAM', 'MPLUSRounded1c-Medium.ttf'), net=NET_DAM, sx=0.96, theo=-15, kxh=1.03, dam=700, ten='Dam', hien='Đậm',
               l_mac_dinh=False, mot_chan=False),
 }
 XH = 520  # chiều cao chữ thường của gốc (x, u, n… 0–520)

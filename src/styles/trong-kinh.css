@@ -16,7 +16,7 @@ html[data-trong='hs'] .kb-hero[data-du] .kb-nhan { color: var(--tr-tim-chu); }
 html[data-trong='hs'] .kb-so { font-size: clamp(52px, 17vw, 72px); font-weight: 800; line-height: .92; letter-spacing: -.04em; color: var(--tr-chu); white-space: nowrap; font-variant-numeric: tabular-nums; }
 html[data-trong='hs'] .kb-so small { font-size: .36em; font-weight: 750; letter-spacing: -.01em; color: var(--tr-chu-3); margin-left: 3px; }
 html[data-trong='hs'] .kb-hero[data-du] .kb-so { color: var(--tr-tim-chu); }
-html[data-trong='hs'] .kb-dong-hero { margin: 6px 0 0; font-size: 15px; font-weight: 650; line-height: 1.35; color: var(--tr-chu-2); }
+html[data-trong='hs'] .kb-dong-hero { margin: 6px 0 0; font-size: 15px; font-weight: 500; line-height: 1.35; color: var(--tr-chu-2); }
 html[data-trong='hs'] .kb-bai { margin: 6px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; font-size: 14px; font-weight: 650; color: var(--tr-chu-3); }
 html[data-trong='hs'] .kb-bai small { flex-basis: 100%; font-size: 12.5px; font-weight: 700; }
 html[data-trong='hs'] .kb-bai b { color: var(--tr-chu); font-weight: 800; font-size: 15px; }
@@ -69,7 +69,7 @@ html[data-trong='hs'] .kb-banh svg path { fill: color-mix(in oklab, currentColor
 html[data-trong='hs'] .kb-banh > svg + svg { position: relative; inset: auto; width: 24px; height: 24px; }
 html[data-trong='hs'] .kb-cta .kb-giua { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
 html[data-trong='hs'] .kb-cta .kb-giua b { font-size: 19px; font-weight: 800; line-height: 1.15; }
-html[data-trong='hs'] .kb-cta .kb-phu { font-size: 14.5px; font-weight: 650; line-height: 1.3; }
+html[data-trong='hs'] .kb-cta .kb-phu { font-size: 14.5px; font-weight: 500; line-height: 1.3; }
 
 /* ── VIỆC HÔM NAY: danh sách ô tích (Things 3) ── */
 html[data-trong='hs'] .kb-viec { padding: 8px; border-radius: 30px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); }
@@ -96,7 +96,7 @@ html[data-trong='hs'] .kb-dong[data-tt='dang'][data-sac='chu-y'] { box-shadow: i
 html[data-trong='hs'] .kb-dong[data-tt='dang'] .kb-tich { box-shadow: none; }
 html[data-trong='hs'] .kb-giua { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.3; }
 html[data-trong='hs'] .kb-giua b { font-size: 16.5px; font-weight: 750; }
-html[data-trong='hs'] .kb-phu { font-size: 13.5px; font-weight: 600; color: var(--tr-chu-3); }
+html[data-trong='hs'] .kb-phu { font-size: 13.5px; font-weight: 500; color: var(--tr-chu-3); } /* 07/11: dòng phụ chữ thường như Duolingo */
 html[data-trong='hs'] .kb-dem { flex: none; min-width: 26px; height: 26px; padding: 0 8px; border-radius: 13px; display: grid; place-items: center; font-size: 13.5px; font-weight: 800; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
 html[data-trong='hs'] .kb-dong[data-sac='chu-y'] .kb-dem { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
 html[data-trong='hs'] .kb-viec { scroll-margin-top: 24px; }
