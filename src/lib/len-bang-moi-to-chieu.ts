@@ -162,6 +162,7 @@ body.mc .mc-thanh #mc-len-bang{min-height:calc(var(--u)*2.5)}
 .mc-nut-phim.mc-bat kbd{background:var(--mc-thanh2);color:var(--mc-bang-chu)}
 .mc-nut-phim[hidden]{display:none}
 @media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]):not([data-k="C"]):not([data-k="X"]):not([data-k="P"]) .mc-nut-chu{display:none}}
+#mc-st-nut .mc-nut-chu,.mc-nut-phim[data-k="B"] .mc-nut-chu{display:none}
 /* Nút G, D, K luôn hiện chữ, nổi bật dễ bấm */
 body.mc .mc-phim-nhom [data-k="C"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="X"] .mc-nut-chu,

@@ -52,6 +52,7 @@ export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
   // Tờ VỪA MỞ (cửa sổ tờ mới) ⇒ vào thẳng Bình Phản Ứng gần như ngay (thầy 07/11 «bấm mở tờ chiếu load luôn vào bình phản ứng»);
   // mở lại đúng câu đang chạy thì bảng nối lại lượt cũ (BangBinhPhanUng), không đẻ lượt mới.
   const toMoi = !!o.nguon && o.nguon !== nguonTo
+  if (toMoi) nghiDen = 0 // thầy vừa mở tờ = ý muốn rõ ⇒ bỏ khoảng tạm nghỉ tự mở (như «Câu tiếp»)
   if (o.nguon) nguonTo = o.nguon
   if (henTu) clearTimeout(henTu)
   return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, toMoi ? Math.min(choTuDongMs, 250) : choTuDongMs) })
