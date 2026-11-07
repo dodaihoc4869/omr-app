@@ -1,0 +1,42 @@
+{
+  "metadata": [
+    {
+      "i": 657,
+      "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+      "fileNguon": "anh/7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785.png",
+      "svg": "dien-di-ba-vet-ddh-7cd86cb14756d7e90c1790907587fd68e31743e3cd9b9baec2d370f9ecff7771.svg",
+      "hashSvg": "7cd86cb14756d7e90c1790907587fd68e31743e3cd9b9baec2d370f9ecff7771",
+      "byteSvg": 10851,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+      "trangThai": "cho-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C3-B9-D3-I-19",
+          "de": "Khi đặt dung dịch ở pH = 6 gồm glycine, lysine và glutamic acid (được kí hiệu ngẫu nhiên là X, Y, Z) trong điện trường thì xảy ra hiện tượng điện di như sau: Nhận định nào sau đây là đúng?",
+          "refs": [
+            {
+              "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+              "where": "12-C3-B9-D3-I-19.hinh.0.du_lieu",
+              "hashDataUrl": "b1e4c11b25be5489312d112ae0e3cfc8365cc6051f8837d77d3fb20b1e43f2c7"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B9-P1-D2-I-45",
+          "de": "Khi đặt dung dịch ở pH = 6 gồm glycine, lysine và glutamic acid (được kí hiệu ngẫu nhiên là X, Y, Z) trong điện trường thì xảy ra hiện tượng điện di như sau: Nhận định nào sau đây là đúng?",
+          "refs": [
+            {
+              "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+              "where": "DB-12-B9-P1-D2-I-45.hinh.0.du_lieu",
+              "hashDataUrl": "b1e4c11b25be5489312d112ae0e3cfc8365cc6051f8837d77d3fb20b1e43f2c7"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3solidblackcirclesXYZwhitebold/outerrect/2terminalcirclesPLUSLEFTMINUSRIGHT/2shortwires/Cực dương-Cực âm/noextra dash-startline-arrow-pH-answer/DDHpath."
+    }
+  ],
+  "ketQua": "Cần sửa: root mở actual V5 thấy cuối Cực dương sát vòng terminal trái; không chọn hash này."
+}

@@ -1,0 +1,12 @@
+[
+  {
+    "i": 657,
+    "hashSvg": "7cd86cb14756d7e90c1790907587fd68e31743e3cd9b9baec2d370f9ecff7771",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Cần sửa: Tự fresh Chromium V5 exact SVG và mở FULL/crop; chữ g cuối Cực dương chồng vào viền terminal trái, khác native có gap. Không đổi dữ kiện nhưng phải dời label.",
+    "actualSvgReviewed": true,
+    "byteSvg": 10851,
+    "render": "/workspace/scratch/657-v5-254-actual.png",
+    "detail": "/workspace/scratch/657-v5-254-touch.png"
+  }
+]
