@@ -52,6 +52,19 @@ describe('mở bảng từ tờ chiếu', () => {
     expect(document.querySelector('[data-bang]')!.getAttribute('data-qid')).toBe('q3')
     m.dongBang()
   })
+  it('tờ VỪA MỞ (cửa sổ tờ mới) ⇒ vào thẳng bảng gần như ngay, không chờ 1,5 giây; đổi câu trên cùng tờ vẫn chờ', async () => {
+    vi.resetModules()
+    const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(5000)
+    buoi.ds = [{ id: 'moi', moLuc: gio(1) }]
+    const to = { postMessage: () => {} } as unknown as Window
+    await m.moBangTuToChieu('q1', { tuDong: true, nguon: to })
+    await new Promise((r) => setTimeout(r, 20))
+    expect(document.querySelector('[data-bang]')?.getAttribute('data-qid')).toBe('q1')
+    void m.moBangTuToChieu('q2', { tuDong: true, nguon: to })
+    await new Promise((r) => setTimeout(r, 400))
+    expect(document.querySelector('[data-bang]')?.getAttribute('data-qid')).toBe('q1')
+    m.dongBang()
+  })
   it('không có buổi: tin tự động im lặng; bấm P thì báo thầy mở điểm danh', async () => {
     vi.resetModules()
     const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(0)

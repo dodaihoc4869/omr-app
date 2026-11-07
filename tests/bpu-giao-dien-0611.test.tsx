@@ -5,7 +5,8 @@ import { goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, view
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 const traMo = vi.hoisted(() => ({ v: { ok: true, du: { ok: true, ve: 've-thay' } } as Record<string, unknown> }))
-vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async () => traMo.v }))
+const goiLenhGhi = vi.hoisted(() => vi.fn())
+vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: async (...a: unknown[]) => { goiLenhGhi(...a); return traMo.v } }))
 vi.mock('../src/lib/ung-vien-chieu', () => ({ layEmChieu: async () => new Map() }))
 
 class WsGia { static ds: WsGia[] = []; readyState = 1; gui: string[] = []; onopen?: () => void; onmessage?: (e: { data: string }) => void; onclose?: () => void; onerror?: () => void
@@ -129,5 +130,26 @@ describe('bảng chiếu', () => {
     window.removeEventListener('keydown', toNghe)
     const o = document.querySelector('.bb-o .ten')!
     expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
+  })
+  it('mở lại tờ / bấm P trên ĐÚNG câu đang chạy ⇒ nối lại lượt cũ (không mở lượt mới); câu khác hoặc P sau khi mở đáp án ⇒ lượt mới', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    const soLuot = () => goiLenhGhi.mock.calls.filter((c) => c[0] === '/gv/bpu/luot').length
+    const st = phong(); moLuot(st, cau, T0)
+    goiLenhGhi.mockClear()
+    const a = render(<Bang buoiId="b1" qid="q1" luot={1} tuDong onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    WsGia.ds[0]!.nhan(viewBang(st))
+    expect(await screen.findByText(/em đã gửi/)).toBeTruthy()
+    expect(soLuot()).toBe(0)
+    a.rerender(<Bang buoiId="b1" qid="q1" luot={2} onDong={() => {}} />)
+    expect(soLuot()).toBe(0)
+    a.rerender(<Bang buoiId="b1" qid="q2" luot={3} tuDong onDong={() => {}} />)
+    await waitFor(() => expect(soLuot()).toBe(1))
+    moDapAn(st, T0 + 3000, chamSo); WsGia.ds[0]!.nhan(viewBang(st))
+    a.rerender(<Bang buoiId="b1" qid="q1" luot={4} tuDong onDong={() => {}} />)
+    expect(soLuot()).toBe(1)
+    a.rerender(<Bang buoiId="b1" qid="q1" luot={5} onDong={() => {}} />)
+    await waitFor(() => expect(soLuot()).toBe(2))
+    a.unmount()
   })
 })

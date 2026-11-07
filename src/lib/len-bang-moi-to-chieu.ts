@@ -161,13 +161,16 @@ body.mc .mc-thanh #mc-len-bang{min-height:calc(var(--u)*2.5)}
 .mc-nut-phim.mc-bat{background:var(--mc-bang-chu);color:var(--mc-thanh2)}
 .mc-nut-phim.mc-bat kbd{background:var(--mc-thanh2);color:var(--mc-bang-chu)}
 .mc-nut-phim[hidden]{display:none}
-@media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]):not([data-k="C"]):not([data-k="X"]) .mc-nut-chu{display:none}}
+@media(max-width:1100px){.mc-nut-phim:not([data-k="G"]):not([data-k="D"]):not([data-k="K"]):not([data-k="C"]):not([data-k="X"]):not([data-k="P"]) .mc-nut-chu{display:none}}
 /* Nút G, D, K luôn hiện chữ, nổi bật dễ bấm */
 body.mc .mc-phim-nhom [data-k="C"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="X"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="G"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="D"] .mc-nut-chu,
+body.mc .mc-phim-nhom [data-k="P"] .mc-nut-chu,
 body.mc .mc-phim-nhom [data-k="K"] .mc-nut-chu{display:inline!important;font-weight:700;margin-left:2px}
+body.mc .mc-phim-nhom [data-k="P"]{background:var(--mc-bang-chu);color:var(--mc-thanh2)}
+body.mc .mc-phim-nhom [data-k="P"] kbd{background:var(--mc-thanh2);color:var(--mc-bang-chu)}
 body.mc .mc-phim-nhom [data-k="G"]{background:rgba(217,119,6,.18);border:1.5px solid rgb(245,158,11);color:rgb(254,243,199)}
 body.mc .mc-phim-nhom [data-k="G"] kbd{background:rgb(245,158,11);color:rgb(27,26,23);font-weight:900}
 body.mc .mc-phim-nhom [data-k="G"].mc-bat{background:rgb(217,119,6);border-color:rgb(251,191,36);color:rgb(255,255,255);box-shadow:0 0 12px rgba(245,158,11,.5)}
@@ -1055,7 +1058,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
 
   // ── ĐIỀU KHIỂN ──
   function toiDot(k) { if (window.__mcDen) window.__mcDen(Math.max(0, Math.min(soDot() - 1, k))); baoNhanh('Đợt ' + (chiSo() + 1) + ' / ' + soDot(), 900); }
-  // "THẦY CHỮA" (05/10): bấm nút ẩn của đợt (cầu nối gửi app ghi); đợt đã thầy chữa thì không gọi em, không chấm em — phím L / D / K chỉ nhắc.
+  // "THẦY CHỮA" (05/10): bấm nút ẩn của đợt (cầu nối gửi app ghi); đợt đã thầy chữa: L / D / K chỉ nhắc.
   function thayChua() {
     if (!body.classList.contains('mc-noi')) { baoNhanh('Tờ chưa nối với app thầy — chưa ghi được'); return; }
     var d = dot(), n = d ? d.querySelector('.mc-thay-chua[data-trang="cho"] .mc-thay-chua-nut') : null;
@@ -1067,7 +1070,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   document.addEventListener('mc-vao-dot', dongSai); // tờ vừa nối app (cầu nối): hiện nút chỉ dùng được khi có app
   document.addEventListener('mc-thay-chua', function () { veThanh(); baoNhanh('Đã ghi: Thầy chữa — không gọi em'); });
   function thayChuaDot() { var d = dot(); return !!(d && d.hasAttribute && d.hasAttribute('data-thay-chua')); }
-  // BÌNH PHẢN ỨNG: vào đợt mới (07/11 tự động) / phím P ⇒ báo app câu + giây ước tính (máy chủ kẹp 60–180 s); app chỉ mở khi có buổi đang mở.
+  // BÌNH PHẢN ỨNG: vào đợt mới (tự động) / nút P ⇒ báo app câu + giây (máy chủ kẹp 60–180 s).
   function giayDot(d) { var n = d && d.querySelector && d.querySelector('[data-giay],[data-lam]'); return n ? +(n.getAttribute('data-giay') || n.getAttribute('data-lam')) || 0 : 0; }
   function dichApp() { return window.parent && window.parent !== window ? window.parent : window.opener; }
   var daTuGui = -1;
@@ -1075,7 +1078,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     var d = dot(), q = d && d.getAttribute && d.getAttribute('data-qid');
     if (!q) { if (!tuDong) baoNhanh('Câu này chưa gửi xuống máy em được'); return; }
     var dich = dichApp();
-    if (!dich) { if (!tuDong) baoNhanh('Mở tờ chiếu từ app thầy để dùng Cả lớp làm'); return; }
+    if (!dich) { if (!tuDong) baoNhanh('Mở tờ chiếu từ app thầy để dùng Bình Phản Ứng'); return; }
     daTuGui = chiSo();
     try { dich.postMessage({ nguon: 'to-chieu', loai: 'bpu', qid: q, giay: giayDot(d), tuDong: !!tuDong }, '*'); if (!tuDong) baoNhanh('Đang gửi câu xuống máy cả lớp…'); } catch (e) { if (!tuDong) baoNhanh('Chưa gửi được, thầy thử lại'); }
   }

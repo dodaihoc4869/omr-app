@@ -166,6 +166,9 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
   const [daGan, setDaGan] = useState<ReadonlySet<HoatDong>>(() => new Set())
   const [lanCuon, setLanCuon] = useState(0)
   const [choBamDauGio, setChoBamDauGio] = useState(false)
+  const [choMoLai, setChoMoLai] = useState(false)
+  /** Nút «Chiếu lên bảng» thầy bấm gần nhất ở bước 3 (Chữa câu khó không có nút «Mở lại tờ chiếu» riêng). */
+  const nutChieu = useRef<HTMLButtonElement | null>(null)
   const [xongDauGio, setXongDauGio] = useState(false)
   const [demDauGio, setDemDauGio] = useState({ goi: 0, dat: 0, chuaDat: 0 })
   const [ttDay, setTtDay] = useState({ day: false, tick: false })
@@ -254,6 +257,20 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
     if (!nut.disabled) nut.click()
   })
 
+  /** Bước «Đang chiếu» › «Mở lại tờ chiếu» (thầy 07/11 «bấm mở tờ chiếu load luôn vào bình phản ứng»): về khối hoạt động và BẤM LUÔN nút mở lại tờ
+   *  ⇒ tờ mở ⇒ bảng Bình Phản Ứng tự đè lên, nối lại lượt đang chạy. Chỉ bấm nút KHÔNG gọi em mới: «Mở lại tờ chiếu…» (Đầu giờ, Dạy học) hoặc
+   *  «Chiếu lên bảng» vừa bấm của Chữa câu khó (dựng lại đúng tờ ấy); không có thì chỉ hiện khối để thầy chọn. */
+  const moLaiTo = useCallback(() => { dat(3); setChoMoLai(true) }, [dat])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!choMoLai || buoc !== 3) return
+    setChoMoLai(false)
+    const khoi = khung.current?.querySelector<HTMLElement>(`[data-hd="${hd}"]`)
+    const nut = [...(khoi?.querySelectorAll<HTMLButtonElement>('button') ?? [])].find((b) => /^\s*Mở lại tờ chiếu/.test(b.textContent ?? ''))
+      ?? (hd === 'chua-cau' && nutChieu.current?.isConnected && /^\s*Chiếu lên bảng\s*$/.test(nutChieu.current.textContent ?? '') ? nutChieu.current : null)
+    if (nut && !nut.disabled) nut.click()
+  })
+
   const siSo = dd.tt?.siSo ?? null
   const chuCoMat = `${coMat}${siSo ? `/${siSo}` : ''} em có mặt`
   const vang = chuVang(dd)
@@ -320,7 +337,8 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
         </section>
 
         {/* BƯỚC 3 — CHỌN CÂU & CHIẾU: khối của hoạt động (đã mở thì giữ gắn, chỉ ẩn). */}
-        <section className="gvv2-hd-buoc" data-buoc-ht={3} data-mo={buoc === 3} hidden={buoc !== 3} aria-label="Bước 3 · Chọn câu & chiếu">
+        <section className="gvv2-hd-buoc" data-buoc-ht={3} data-mo={buoc === 3} hidden={buoc !== 3} aria-label="Bước 3 · Chọn câu & chiếu"
+          onClickCapture={(e) => { const b = (e.target as HTMLElement).closest?.('button'); if (b && /Chiếu lên bảng/.test(b.textContent ?? '')) nutChieu.current = b }}>
           <div className="gvv2-hd-dau3">
             <button type="button" className="gvv2-nut-vien" onClick={() => dat(2)}>
               <ChevronLeft size={18} aria-hidden="true" /> Đổi hoạt động
@@ -362,7 +380,7 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
         <section className="gvv2-hd-buoc" data-buoc-ht={4} data-mo={buoc === 4} hidden={buoc !== 4} aria-label="Bước 4 · Đang chiếu">
           {buoc === 4 && dd.idBuoi && buoiMo ? (
             <Suspense fallback={<XuongBuoc nhan="Đang nối màn chiếu" cao={220} />}>
-              <DangChieuBpu buoiId={dd.idBuoi} onVe={() => dat(2)} onMoTo={hd ? () => dat(3) : undefined} />
+              <DangChieuBpu buoiId={dd.idBuoi} onVe={() => dat(2)} onMoTo={hd ? moLaiTo : undefined} />
             </Suspense>
           ) : buoc === 4 ? (
             <p className="gvv2-ht-can">Chưa mở buổi — điểm danh ở bước 1 trước. <button type="button" className="gvv2-nut-vien" onClick={() => dat(1)}>Về bước 1</button></p>

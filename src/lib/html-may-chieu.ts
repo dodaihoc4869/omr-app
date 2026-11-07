@@ -1112,7 +1112,7 @@ const JS_MAY_CHIEU = `
  * Dựng tờ máy chiếu từ danh sách ô bảng, MỘT ô một đợt (bản vẽ 28/09: bỏ đợt đôi ½ bảng).
  */
 export function taoHtmlMayChieu(dsO: OBang[], tuyChonGoc: TuyChonMayChieu = {}): string {
-  ngheBpuToChieu() // Bình Phản Ứng: phím P «Cả lớp làm» của tờ này mở bảng + gửi câu xuống máy cả lớp
+  ngheBpuToChieu() // Bình Phản Ứng: phím / nút P «Bình Phản Ứng» của tờ này mở bảng + gửi câu xuống máy cả lớp
   // Chuẩn hoá mã phiên MỘT lần rồi mọi chỗ cùng đọc: mã rỗng/toàn ký tự lạ = KHÔNG có cầu nối (không nút, không mã).
   const maPhien = chuanMaPhien(tuyChonGoc.cauNoi?.maPhien)
   const tuyChon: TuyChonMayChieu = { ...tuyChonGoc, cauNoi: maPhien ? { maPhien } : undefined }
@@ -1149,7 +1149,7 @@ ${coAiSai ? '    <button type="button" class="mc-nut-phim" data-k="X" hidden><kb
 ${tuyChon.chuaBai ? `    ${NUT_GOI}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="G"><kbd>G</kbd><span class="mc-nut-chu">Giải</span></button>
     <button type="button" class="mc-nut-phim" data-k="T"><kbd>T</kbd><span class="mc-nut-chu">Thống kê</span></button>
 ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class="mc-nut-phim" data-k="B"><kbd>B</kbd><span class="mc-nut-chu">Bút</span></button>
-    <button type="button" class="mc-nut-phim" data-k="P" title="Bình Phản Ứng: câu đang chiếu hiện trên máy cả lớp"><kbd>P</kbd><span class="mc-nut-chu">Cả lớp làm</span></button>
+    <button type="button" class="mc-nut-phim" data-k="P" title="Bình Phản Ứng: câu đang chiếu hiện trên máy cả lớp"><kbd>P</kbd><span class="mc-nut-chu">Bình Phản Ứng</span></button>
     <button type="button" class="mc-nut-phim" data-k="Tab"><kbd>Tab</kbd><span class="mc-nut-chu">Tổng quan</span></button>
     <button type="button" class="mc-nut-phim" data-k="?"><kbd>?</kbd><span class="mc-nut-chu">Phím</span></button>
   </div>

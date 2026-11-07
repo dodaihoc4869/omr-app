@@ -19,7 +19,10 @@ vi.mock('../src/lib/exam-db', async (goc) => ({
 }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 // Mục Chữa bài có test riêng (làn Chữa bài) — ở đây chỉ kiểm đường nối.
-vi.mock('../src/components/chien-dich/TheCanThayChua', () => ({ default: () => <p>Giả: mục Chữa bài</p> }))
+const { chieuChua } = vi.hoisted(() => ({ chieuChua: vi.fn() }))
+vi.mock('../src/components/chien-dich/TheCanThayChua', () => ({
+  default: () => <><p>Giả: mục Chữa bài</p><button type="button" onClick={() => { chieuChua(); window.dispatchEvent(new CustomEvent('bpu-dang-chieu')) }}>Chiếu lên bảng</button></>,
+}))
 
 import { useSoDemGv, type TheHanhTrinh } from '../src/lib/so-dem-gv'
 import { buocMacDinh, chuBuoi, chuDemGiao, dongBaiDangGiao, goiDangGiao, trangThaiBuoc } from '../src/components/chien-dich/buoi-day-ui'
@@ -164,6 +167,18 @@ describe('các bước buổi dạy: MỘT điểm danh, đồng bộ mọi máy
     expect(lenh('/gv/omni', 'co-doc')).toHaveLength(0)
   })
 
+  it('Đang chiếu › «Mở lại tờ chiếu» ⇒ về khối hoạt động và BẤM LUÔN nút chiếu vừa dùng (tờ mở ⇒ bảng Bình Phản Ứng tự đè lên) — thầy 07/11', async () => {
+    chieuChua.mockReset()
+    const { container } = render(<TheBaiDaDay />)
+    await waitFor(() => expect(dangMo(container, 2)).toBe(true))
+    fireEvent.click(the(container, /^Chữa câu khó/))
+    fireEvent.click(await within(buoc(container, 3)).findByRole('button', { name: 'Chiếu lên bảng' }))
+    expect(chieuChua).toHaveBeenCalledTimes(1)
+    await waitFor(() => expect(dangMo(container, 4)).toBe(true))
+    fireEvent.click(await within(buoc(container, 4)).findByRole('button', { name: 'Mở lại tờ chiếu' }))
+    await waitFor(() => expect(chieuChua).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(dangMo(container, 4)).toBe(true))
+  })
   it('Kiểm tra đầu giờ: thẻ từng em, Đạt / Chưa đạt đi đường /gv/dau-gio cham; thẻ hoạt động báo đã gọi', async () => {
     const { container } = render(<TheBaiDaDay />)
     await waitFor(() => expect(dangMo(container, 2)).toBe(true))

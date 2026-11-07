@@ -1,5 +1,5 @@
 // BÌNH PHẢN ỨNG — BẢNG CHIẾU (máy thầy, toàn màn qua portal). Bản vẽ thầy duyệt: docs/ban-ve-binh-phan-ung-0611 (ảnh b01–b12), nguyên mẫu nguyen-mau.html.
-// Mở từ (1) bước Điểm danh (thay bản chiếu điểm danh cũ — điểm danh là MỞ MÀN trò chơi) hoặc (2) phím P «Cả lớp làm» trên mọi tờ chiếu (câu đang chiếu).
+// Mở từ (1) bước Điểm danh (thay bản chiếu điểm danh cũ — điểm danh là MỞ MÀN trò chơi) hoặc (2) phím / nút P «Bình Phản Ứng» trên mọi tờ chiếu (câu đang chiếu).
 // Nối phòng `PhongBinhPhanUng` bằng vé thầy (`/gv/bpu/mo`), nhận `viewBang` mỗi khi có thay đổi. Gọi lên bảng: lõi chọn em đã chốt (`layEmChieu`), lý do 3 dòng
 // từ dữ liệu thật (src/lib/bpu/ly-do.ts). TỰ ĐỘNG (07/11): tờ chuyển câu ⇒ lượt mới, giờ theo câu (máy chủ kẹp 60–180 s); bảng → / «Câu tiếp» ⇒ tờ sang câu sau.
 // Phím: → ← · Space · Enter · D · F · N · M · K · V · H · ? · Esc. Mảnh chỉ máy thầy ⇒ nằm ngoài precache (vite.config globIgnores).
@@ -160,12 +160,16 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     return () => { dung = true; clearTimeout(hen); clearInterval(ping); try { ws.current?.close() } catch { /* đã đóng */ } ws.current = null }
   }, [buoiId, onTat])
 
-  // Phím P trên tờ chiếu ⇒ mở lượt cho câu đang chiếu (một lần mỗi lần bấm).
+  // Phím / nút P trên tờ chiếu ⇒ mở lượt cho câu đang chiếu (một lần mỗi lần bấm).
   useEffect(() => {
     if (!qid || !v) return
     const khoa = `${qid}|${luot}`
     if (daMoLuot.current === khoa) return
     daMoLuot.current = khoa
+    // Mở lại tờ / bấm P trên ĐÚNG câu đang chạy (Esc rồi mở lại, thầy 07/11) ⇒ nối lại lượt đang có, không chốt-mở lượt mới (giữ giờ, giữ bài các em đã gửi).
+    // Câu đã mở đáp án: tin tự động chỉ nối lại; thầy bấm P thì hỏi lại cả lớp (lượt mới).
+    const dang = v.luot
+    if (dang && dang.qid === qid && (dang.pha !== 'mo' || tuDongRef.current)) return
     setManPhu(null); setUng(null)
     void goiLenh('/gv/bpu/luot', { buoiId, qid, hanGiay: giay && giay > 0 ? giay : HAN_GIAY_MAC_DINH }, 'Máy chủ chưa có Bình Phản Ứng.').then((r) => {
       const chu = !r.ok ? r.chu : r.du.ok === false ? String(r.du.error ?? 'Chưa gửi được câu xuống máy em.') : ''

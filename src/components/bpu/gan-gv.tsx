@@ -49,9 +49,12 @@ export function datChoTuDong(ms: number): void { choTuDongMs = ms }
 type TuyChonMo = { giay?: number; tuDong?: boolean; nguon?: Window | null }
 export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
   if (o.tuDong !== true) return moThat(qid, o)
+  // Tờ VỪA MỞ (cửa sổ tờ mới) ⇒ vào thẳng Bình Phản Ứng gần như ngay (thầy 07/11 «bấm mở tờ chiếu load luôn vào bình phản ứng»);
+  // mở lại đúng câu đang chạy thì bảng nối lại lượt cũ (BangBinhPhanUng), không đẻ lượt mới.
+  const toMoi = !!o.nguon && o.nguon !== nguonTo
   if (o.nguon) nguonTo = o.nguon
   if (henTu) clearTimeout(henTu)
-  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, choTuDongMs) })
+  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, toMoi ? Math.min(choTuDongMs, 250) : choTuDongMs) })
 }
 async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true

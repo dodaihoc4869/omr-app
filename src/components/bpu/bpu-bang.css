@@ -23,7 +23,7 @@
 /* Đề */
 .bb-de { position: absolute; left: 64px; top: 128px; width: 1090px; height: 690px; display: flex; flex-direction: column; gap: 22px; z-index: 2; }
 .bb-chip { align-self: flex-start; padding: 6px 18px; border-radius: 12px; background: var(--tr-mat-2); color: var(--tr-chu-2); font-size: 22px; font-weight: 600; }
-.bb-de-chu { flex: 1 1 auto; min-height: 140px; font-size: 40px; line-height: 1.42; font-weight: 600; overflow-y: auto; overscroll-behavior: contain; padding-right: 18px;
+.bb-de-chu { flex: 1 1 auto; min-height: 140px; font-size: 46px; line-height: 1.4; font-weight: 600; overflow-y: auto; overscroll-behavior: contain; padding-right: 18px;
   scrollbar-width: auto; scrollbar-color: var(--tr-vien-2) transparent; } /* đề dài: thanh cuộn (chuột / phím ↓ ↑); khối cao tới sát dải tên */
 .bb-de-chu::-webkit-scrollbar { width: 14px; }
 .bb-de-chu::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--tr-vien-2); }
