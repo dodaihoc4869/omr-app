@@ -25,3 +25,10 @@ TTF gốc: github.com/google/fonts, `ofl/mplusrounded1c/MPLUSRounded1c-Regular.t
 **07/11 (thầy: «những chỗ chữ đậm chỉ đậm hơn một chút giống Duolingo, đo kĩ»):** đo bề dày nét chữ I / chiều cao chữ hoa:
 Đề 0,129; Đậm cũ 0,218 (gấp 1,7 — quá nặng); Đậm mới 0,180 (gấp 1,4 — tỉ lệ chữ đậm / chữ thường trên ảnh Duolingo thầy gửi).
 Hai tệp phông vẫn TĨNH: mọi `font-weight` 550–1000 hiện cùng một mặt Đậm này.
+
+**07/11 tối — bản v5 (thầy chốt «chốt font chữ v5»), đo trên ảnh Duolingo thầy gửi:**
+- Đậm dựng từ Medium làm đậm 26, Đề từ Regular làm đậm 12; Đậm rộng ×0,98, khoảng chữ −18, chữ thường cao ×1,069; Đề rộng ×1,01.
+- Hệ số rộng riêng từng chữ (HEP) và lề trái / phải từng chữ (LE): 14 khe chữ của tiêu đề «Đâu là "cà phê"?» bằng đúng Duolingo, cả dòng 452 / 447 px.
+- «a» có đuôi hất + bụng tròn (DUOI_A) ở cả hai kiểu.
+- Dấu mũ / huyền / sắc vẽ lại bằng nét đều hai đầu tròn (VE_DAU): mũ 22 px rộng, 11 px cao, hở 3 px trên chữ (bằng Duolingo ở cùng cỡ); dấu ghép (ầ ấ ẩ…) giữ chỗ, không chạm mũ.
+- Số mặc định nằm sẵn trong `scripts/tao-phong-ddh-rounded.py` (biến môi trường `DDH_*` chỉ để thử). Tổng 4 tệp 34 076 B.
