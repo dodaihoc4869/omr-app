@@ -233,7 +233,7 @@
 
 /* ── MÁY GẬP MỞ / MÁY TÍNH BẢNG / MÁY TÍNH (cao > 500) — MỘT CỘT GIỮA kiểu Duolingo (thầy chốt 07/11, bản vẽ docs/ban-ve-bo-cuc-rong-0711):
  * hàng trên (× · thanh tiến độ dài · nguyên tử) rộng ≤ 1080 giữa · cột ≤ 660 (lệnh · giám thị + đề · phương án) căn giữa dọc, đề dài ⇒ cả cột cuộn ·
- * DẢI ĐÁY cố định full màn, vạch mảnh trên: «Trợ giúp» trái · «Kiểm tra» 240px phải · kết quả = dải tô màu full màn (chữ trái, nút phải).
+ * DẢI ĐÁY cố định full màn, vạch mảnh trên: «Trợ giúp» trái · «Kiểm tra» phải (rộng ≥ 150 như Duolingo) · kết quả = dải tô màu full màn (chữ trái, nút phải).
  * Điện thoại xoay ngang (cao ≤ 500) GIỮ hai cột (khối trên). !important ở đây để thắng luật hai cột chung phía trên + luật cũ trong trong-lam-bai.css. ── */
 @media (orientation: landscape) and (min-width: 640px) and (min-height: 501px), (min-width: 700px) and (min-aspect-ratio: 10/13) and (min-height: 501px) {
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
@@ -274,14 +274,14 @@
   }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day > .duo-giua { width: var(--cn-hang) !important; max-width: none; margin: 0 !important; padding: 0 !important; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) > .duo-giua { flex-direction: row !important; justify-content: flex-end; align-items: center; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) .duo-nut { width: 240px !important; min-height: 54px; margin: 0 !important; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day:not(.duo-ket) .duo-nut { width: auto !important; min-width: 150px; min-height: 50px; margin: 0 !important; } /* cỡ nút Duolingo đo 07/11 */
   /* KẾT QUẢ: dải tô màu full màn — chữ trái, «Hỏi thầy · Tiếp tục» phải */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket { max-height: 46dvh; padding: 22px 0 calc(24px + env(safe-area-inset-bottom)) !important; overflow-y: auto; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket[data-tt=dung] { background: var(--tr-dung-nhat) !important; box-shadow: 0 -2px 0 var(--tr-dung-nut) !important; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket[data-tt=sai] { background: var(--tr-sai-nhat) !important; box-shadow: 0 -2px 0 var(--tr-sai) !important; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket > .duo-giua { display: grid !important; grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: 40px; height: auto; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket > .duo-giua > .duo-kq { grid-column: 1 !important; min-width: 0; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket > .duo-giua > .duo-hang-nut { grid-column: 2 !important; grid-template-columns: auto 240px !important; gap: 12px; align-self: end; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket > .duo-giua > .duo-hang-nut { grid-column: 2 !important; grid-template-columns: auto auto !important; gap: 12px; align-self: end; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-day.duo-ket .duo-kq-chu { max-width: 640px; }
   /* «TRỢ GIÚP» (bóng đèn đầu cột đề) xuống TRÁI dải đáy như «Bỏ qua» của Duolingo: nút phụ viền có chữ; tấm trợ giúp mở LÊN trên; có kết quả ⇒ ẩn
      (dải kết quả có «Hỏi thầy» riêng) */
