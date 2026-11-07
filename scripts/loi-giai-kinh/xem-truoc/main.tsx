@@ -16,7 +16,7 @@ const ds = [
   { phan: 'III', dapAn: '13,2', em: '17,6', de: 'Đun nóng 12 gam acetic acid với 13,8 gam ethanol (xúc tác H2SO4 đặc), hiệu suất 75%. Khối lượng ethyl acetate thu được là bao nhiêu gam?' },
 ] as const
 const soCau = Number(new URLSearchParams(location.search).get('cau') || '1')
-const i = soCau === 5 ? 1 : soCau === 6 ? 2 : Math.max(0, Math.min(2, soCau - 1))
+const i = soCau >= 7 ? 0 : soCau === 5 ? 1 : soCau === 6 ? 2 : Math.max(0, Math.min(2, soCau - 1))
 // ?cau=4: câu GỌI TÊN (lysine) — xem cảnh danh-phap theo ba bước của thầy (03/11)
 const DP = {
   cotLoi: { chu: 'Gọi tên theo công thức của thầy: **nhánh + mạch chính + liên kết + chức**. Amino acid: COOH là chức chính, C của COOH là số 1, NH₂ là nhánh **amino**.', chip: [{ nhan: 'Đánh số', chu: 'chức → π → nhánh' }, { nhan: 'Đơn chức', chu: 'bỏ e' }] },
@@ -33,9 +33,16 @@ const DT = { canh: { loai: 'do-tan', chat: 'CuSO4', S: [{ t: 80, S: 55 }, { t: 2
   { nhan: 'Dung dịch bão hoà ở 80 °C', ct: 55, nuoc: 100, baoHoa: 80 },
   { nhan: 'Tách ra: 60,66 g CuSO4·5H2O', ct: 38.82, nuoc: 21.84, tachRa: true },
   { nhan: 'Còn lại: dung dịch bão hoà ở 20 °C', ct: 16.18, nuoc: 78.16, baoHoa: 20 }] } }
-const d = soCau === 4 ? ds[0] : soCau === 5 ? ds[1] : soCau === 6 ? ds[2] : ds[i]!
+// ?cau=7: cảnh ĐỒNG PHÂN C4H8 (cấu tạo + hình học) · ?cau=8: ester C4H8O2 (bảng phần cố định) · ?cau=9: ancol C4H10O (OH chỉ C no) — thầy 08/11
+const DPH7 = { dongPhan: { ctpt: 'C_4H_8', nguyenTu: { C: 4, H: 8 }, K: 1, tachK: 'K gốc = 1, không có O ⇒ **một nối đôi C=C** (alkene)', hoi: 'dong-phan',
+  mach: [{ so: '4', khung: { chinh: 4, nhanh: [] }, dat: [{ loai: 'doi', nhan: 'C=C' }], soChat: 2 }, { so: '3+1', khung: { chinh: 3, nhanh: [{ o: 2, dai: 1 }] }, dat: [{ loai: 'doi', nhan: 'C=C' }], soChat: 1 }], tong: 4 } }
+const DPH8 = { dongPhan: { ctpt: 'C_4H_8O_2', nguyenTu: { C: 4, H: 8, O: 2 }, K: 1, tachK: 'Hai O, K = 1 = K chức của COO ⇒ **ester no, đơn chức**', hoi: 'cau-tao',
+  bang: { loai: 'este', tieuDe: 'Cố định COO, chia 3 C còn lại cho R và R′', cot: [], hang: [{ phan: [0, 3], soCach: [1, 2], tich: 2 }, { phan: [1, 2], soCach: [1, 1], tich: 1 }, { phan: [2, 1], soCach: [1, 1], tich: 1 }] }, tong: 4 } }
+const DPH9 = { dongPhan: { ctpt: 'C_4H_10O', nguyenTu: { C: 4, H: 10, O: 1 }, K: 0, tachK: 'Một O, K = 0 ⇒ **alcohol** (hoặc ether) no', hoi: 'cau-tao',
+  mach: [{ so: '4', khung: { chinh: 4, nhanh: [] }, dat: [{ loai: 'oh', nhan: 'OH' }], soChat: 2 }, { so: '3+1', khung: { chinh: 3, nhanh: [{ o: 2, dai: 1 }] }, dat: [{ loai: 'oh', nhan: 'OH' }], soChat: 2 }], tong: 4 } }
+const d = soCau >= 7 ? ds[0] : soCau === 4 ? ds[0] : soCau === 5 ? ds[1] : soCau === 6 ? ds[2] : ds[i]!
 const PT = { cotLoi: { congThuc: 'H_2N-CH_2-COOH + C_2H_5OH + HCl → ClH_3N-CH_2-COOC_2H_5 + H_2O', chu: 'COOH của glycine ester hoá với OH của ethyl alcohol, mất một H₂O; có HCl nên nhóm NH₂ **nhận H⁺**.', chip: [{ nhan: 'COOH + OH', chu: 'ester hoá, mất H₂O' }] } }
-const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : soCau === 5 ? DD : soCau === 6 ? DT : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
+const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : soCau === 5 ? DD : soCau === 6 ? DT : soCau === 7 ? DPH7 : soCau === 8 ? DPH8 : soCau === 9 ? DPH9 : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
 document.body.style.background = 'var(--tr-nen)'
 // ?hop=1: hộp «Lời giải» của màn làm bài (thanh tiêu đề + nút «Lời giải thu gọn» sát nút đóng); ?mo=1 bấm mở sẵn.
 export function Hop() {

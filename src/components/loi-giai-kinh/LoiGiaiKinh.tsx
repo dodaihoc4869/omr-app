@@ -9,6 +9,7 @@ import { ChuTron, CongThuc } from '../goi-y-cham/so-do-thay'
 import { themTheNho } from '../../lib/loi-giai-kinh/the-nho'
 import { chuSgk } from '../../lib/loi-giai-kinh/kiem'
 import { THAN_CHU_DUNG } from '../../lib/loi-giai-kinh/than-chu-dung'
+import CanhDongPhan from './CanhDongPhan'
 import './loi-giai-kinh.css'
 
 /** Chữ có **in đậm** + công thức (ChemText / chỉ số `_`). */
@@ -47,6 +48,7 @@ export default function LoiGiaiKinh({ ban, dapAn, emTraLoi, perm, luaChon, de, c
           <CotLoi ban={ban} />
           {ban.phim.length >= 2 && <Phim ban={ban} />}
           {ban.canh && <Canh canh={ban.canh} />}
+          {ban.dongPhan && <CanhDongPhan dp={ban.dongPhan} />}
           {(ban.buoc?.length || ban.phepTinh?.length) ? <PhepTinh ban={ban} /> : null}
           <ThayGiang ban={ban} />
         </div>

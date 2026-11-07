@@ -68,7 +68,47 @@ export type CanhKinh =
       S: { t: number; S: number }[]
       hang: { nhan: string; ct: number; nuoc: number; baoHoa?: number; tachRa?: boolean }[]
     }
-export const MANH_TEN = ['nhanh', 'mach', 'lien-ket', 'chuc', 'goc-ancol', 'goc-acid'] as const
+/** ĐỒNG PHÂN (thầy 08/11 «từ giờ phần đồng phân phải qua skill này», docs/skill-dong-phan-thay/SKILL.md). Trường RIÊNG `dongPhan` (không nằm trong
+ *  `canh`: app cũ gặp `canh.loai` lạ sẽ vẽ nhầm cảnh so sánh) — app cũ bỏ qua trường lạ. Mọi con số máy chủ TÍNH LẠI (src/lib/loi-giai-kinh/dong-phan.ts). */
+export type DatDP = 'nhom' | 'oh' | 'doi' | 'ba' | 'xeton' | 'chen'
+/** khung carbon của một mạch đại số: mạch chính `chinh` C + nhánh thẳng `dai` C gắn ở C số `o` */
+export interface KhungDP { chinh: number; nhanh: { o: number; dai: number }[] }
+export interface MachDP {
+  /** phép tính mạch đại số: «4», «3+1», «5+1+1» (số đầu = mạch chính) */
+  so: string
+  khung: KhungDP
+  /** 1–2 thứ cắm lên khung: nhom (răng giả cần một H: Cl, CHO, COOH, NH2…) · oh (OH: chỉ C no, mỗi C một OH) · doi / ba (nối đôi / ba) ·
+   *  xeton (nhóm CO giữa mạch) · chen (O / NH chen vào liên kết C–C: ete, amine bậc 2) */
+  dat: { loai: DatDP; nhan: string }[]
+  /** chỉ các tổ hợp (số thứ tự liệt kê) thoả điều kiện đề; vắng = mọi tổ hợp */
+  chon?: number[]
+  /** điều kiện đề khi có `chon` (vd «ancol bậc I») */
+  loc?: string
+  soChat: number
+}
+export interface BangDP {
+  /** este: R (được là H) – R′ · amin: các gốc quanh N · aren: các nhánh trên vòng (2 nhánh × 3 vị trí o, m, p) · khac: đếm chay (peptide, chất béo) */
+  loai: 'este' | 'amin' | 'aren' | 'khac'
+  tieuDe: string
+  cot: string[]
+  hang: { phan: number[]; soCach: number[]; tich: number; ghi?: string }[]
+}
+export interface DongPhanKinh {
+  /** «C_4H_8O» */
+  ctpt: string
+  nguyenTu: { C: number; H: number; N?: number; X?: number; O?: number }
+  K: number
+  /** tách K gốc / K chức, một câu */
+  tachK?: string
+  /** đề hỏi: cau-tao (chỉ công thức cấu tạo) · dong-phan (tính cả hình học) */
+  hoi: 'cau-tao' | 'dong-phan'
+  /** đề cho sẵn mạch C (vd «monochloro hoá butane»): chỉ xét đúng khung đề cho — không bắt đủ mọi mạch đại số; một câu nói vì sao */
+  khungCoDinh?: string
+  mach?: MachDP[]
+  bang?: BangDP
+  tong: number
+}
+export const MANH_TEN =['nhanh', 'mach', 'lien-ket', 'chuc', 'goc-ancol', 'goc-acid'] as const
 export type ManhTen = (typeof MANH_TEN)[number]
 export const MAU_LOP = ['trong', 'xanh', 'cam', 'vang', 'hong', 'tim', 'nau', 'trang-duc'] as const
 export type MauLop = (typeof MAU_LOP)[number]
@@ -95,6 +135,8 @@ export interface BanKinh {
   /** phim thầy dẫn: 3–6 nhịp */
   phim: NhipPhim[]
   canh?: CanhKinh
+  /** câu viết / đếm đồng phân: K → mạch đại số → hình học → cộng (thầy 08/11) */
+  dongPhan?: DongPhanKinh
   /** thần chú: CHỈ chữ có trong bảng thần chú của thầy (máy chủ đối chiếu) */
   thanChu: string[]
   /** một câu thầy nói NGUYÊN VĂN, có trong mục kiến thức đã gửi máy soạn (máy chủ đối chiếu), không kèm video */

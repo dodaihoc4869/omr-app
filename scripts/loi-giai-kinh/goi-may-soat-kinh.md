@@ -19,6 +19,10 @@ Mỗi bản trong lô ĐÃ qua máy kiểm (đủ khối, khớp đáp án kho, 
    8–10 ⇒ VIIIB; 11–12 ⇒ a + b − 10); chu kì = số lớp; ô = Z. Bản chỉ nói «thuộc nhóm VIB» mà không dạy cách ra ⇒ THIẾU.
    Dạng DANH PHÁP / gọi tên: phải có công thức thầy (nhánh + mạch chính + liên kết + chức; đánh số chức → π → nhánh; đơn chức bỏ e) trong `cotLoi`,
    `phim` đi đúng Ba bước, và có `canh` `danh-phap` (xem `goi-may-soan-kinh.md`). Thiếu một trong ba ⇒ SỬA.
+   Dạng ĐỒNG PHÂN (viết / đếm đồng phân, số công thức cấu tạo, hình học — thầy 08/11 «từ giờ phần đồng phân phải qua skill này»): đọc `skill-dong-phan.md`.
+   Bản cũ soạn TRƯỚC 08/11 ⇒ LUÔN **sua**: soạn lại theo skill (tính K → mạch đại số → đối xứng / hoá trị → hình học → cộng) và PHẢI có khối `dongPhan`
+   (mục ĐỒNG PHÂN của `goi-may-soan-kinh.md`). Câu chỉ hỏi lý thuyết đồng phân: sửa `cotLoi` / `lyDo` theo skill nếu chưa đúng, không bắt buộc `dongPhan`.
+   Bản KHÔNG phải dạng đồng phân (chỉ dính chữ) ⇒ soát như thường.
    Dạng ĐIỆN DI và ĐỘ TAN: soát theo mục 6 và 7 phần TRA BÀI GIẢNG của `goi-may-soan-kinh.md` (chuỗi pH ↔ pI → nhận / nhường H⁺ → cộng điện tích → cực;
    độ tan: hàng chuẩn 100 g nước, bảo toàn chất tan + nước). Thiếu chuỗi ⇒ SỬA.
 4. Soát phát biểu khoa học: câu nào sai SGK Kết nối tri thức (kể cả câu chép từ lời thầy nhưng dùng sai phạm vi — xem mục 5 TRA BÀI GIẢNG) ⇒ SAI.
@@ -42,6 +46,6 @@ Mỗi bản trong lô ĐÃ qua máy kiểm (đủ khối, khớp đáp án kho, 
 
 ## Cách làm cả lô
 1. Đọc `goi-may-soan-kinh.md`, `vi-du-kinh.json`, `than-chu.json`, `tu-duy-day-hoa.md` một lần.
-2. Từng câu theo mục Soát. Viết tệp bằng Write (không viết script; Bash chỉ chạy `node kiem.mjs`, `node lay-muc.mjs`).
+2. Từng câu theo mục Soát. Viết tệp bằng Write (không viết script; Bash chỉ chạy `node kiem.mjs`, `node lay-muc.mjs`, `node dong-phan.mjs`).
 3. Chạy `node kiem.mjs` khi có bản sửa (dòng của câu không sửa báo «CHƯA CÓ» là bình thường).
 4. Trả lời cuối đúng 1 dòng: số câu giữ / sửa / cần thầy.

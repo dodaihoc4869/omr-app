@@ -79,6 +79,37 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
     BẮT BUỘC cho câu ĐỘ TAN định lượng. App vẽ hàng chuẩn 100 g nước rồi từng hàng thật theo tỉ lệ gam. Hàng `baoHoa: t` phải có ct/nước·100 = S(t) (±1 %);
     kết tinh: 3 hàng «trước · tách ra (`tachRa`) · còn lại», máy kiểm trước = tách ra + còn lại cho CẢ chất tan lẫn nước. Tinh thể ngậm nước: tách thành phần chất tan
     và phần nước của tinh thể (ghi khối lượng tinh thể trong `nhan`).
+- `dongPhan` — BẮT BUỘC cho MỌI câu VIẾT / ĐẾM đồng phân, số công thức cấu tạo, đồng phân hình học (thầy 08/11 «từ giờ phần đồng phân phải qua skill này»).
+  ĐỌC `skill-dong-phan.md` TRƯỚC (skill của thầy) và giải đúng HAI BƯỚC của thầy: tính K → mạch đại số; đối xứng + hoá trị; nhổ răng; hình học; phần cố định + quy tắc nhân.
+  `cotLoi`, `phim`, `hayNham`, `theNho` cũng phải theo skill (phim: nhịp 1 tính K, nhịp 2 lập mạch đại số, các nhịp sau đếm từng mạch / bảng, nhịp cuối cộng + hình học).
+  App vẽ khối này thành cảnh hoạt hoạ (điểm sáng chạy qua từng vị trí, vị trí trùng mờ đi, thừa hoá trị chớp đỏ, lật cis–trans, cộng tổng) + bàn em tự đặt. MÁY TÍNH LẠI MỌI SỐ.
+  ```json
+  { "ctpt": "C_4H_8", "nguyenTu": { "C": 4, "H": 8 }, "K": 1, "tachK": "K gốc = 1, không có O ⇒ **một nối đôi C=C**", "hoi": "dong-phan",
+    "mach": [ { "so": "4",   "khung": { "chinh": 4, "nhanh": [] },               "dat": [ { "loai": "doi", "nhan": "C=C" } ], "soChat": 2 },
+              { "so": "3+1", "khung": { "chinh": 3, "nhanh": [ { "o": 2, "dai": 1 } ] }, "dat": [ { "loai": "doi", "nhan": "C=C" } ], "soChat": 1 } ],
+    "tong": 4 }
+  ```
+  - `nguyenTu`: C, H (+ N, X = số halogen, O); `K` = (2C + 2 + N − H − X) / 2 (máy tính lại). `hoi`: `"cau-tao"` khi đề hỏi công thức cấu tạo (KHÔNG cộng hình học),
+    `"dong-phan"` khi đề hỏi đồng phân (cộng hình học: mỗi nối đôi có MỖI đầu gắn hai nhóm khác nhau cộng thêm 1 — máy tự tìm).
+  - `mach`: mỗi phần tử là MỘT khung carbon cụ thể. `so` = phép tính mạch đại số («5+1»: số đầu mạch chính, số sau nhánh). Mạch 5+1 có hai khung (nhánh ở carbon số 2 và số 3)
+    ⇒ hai phần tử cùng `so`. `khung.chinh` = số C mạch chính (PHẢI là mạch dài nhất), `nhanh` = `[{ "o": carbon số mấy của mạch chính, "dai": số C của nhánh thẳng }]`.
+    Khung chỉ gồm các C còn lại SAU khi tách nhóm chức cố định (vd anđehit C4H8O: CHO là răng giả cắm lên khung 3 C; ancol C4H10O: OH cắm lên khung 4 C).
+  - `dat`: 1–2 thứ cắm lên khung: `nhom` (răng giả cần một H: Cl, Br, CHO, COOH, NH2, CN…), `oh` (OH: chỉ C no, mỗi C một OH), `doi` / `ba` (nối đôi / ba),
+    `xeton` (nhóm CO giữa mạch, nhan "CO"), `chen` (O / NH chen vào liên kết C–C: ether, amine bậc hai). Hai thứ cùng loại = «nhổ hai răng thật, cắm hai răng giả».
+  - Máy liệt kê MỌI tổ hợp vị trí theo thứ tự, loại thừa hoá trị, gộp chất trùng do đối xứng, rồi so với `soChat`. Chạy `node dong-phan.mjs ra/<tên>.json` để xem bảng liệt kê
+    (số thứ tự #, chất mới / trùng / thừa, công thức thu gọn, hình học) — dùng bảng đó để viết `phim` cho khớp. Máy kiểm thêm: không được QUÊN khung nào còn điền được,
+    không trùng khung, cộng đủ = `tong`, và `tong` = đáp án kho (Phần III; Phần I khi phương án đúng là một số).
+  - Đề CHO SẴN mạch carbon (monochloro hoá butane, cộng HBr vào but-1-ene, thế vào isopentane…): chỉ ghi đúng khung đề cho và thêm
+    `"khungCoDinh": "Phản ứng thế không đổi mạch: butane là mạch 4"` (một câu vì sao). Không có trường này máy bắt đủ MỌI mạch đại số của số C đó.
+  - Đề có điều kiện (ancol bậc I, chất tráng bạc, tác dụng Na…): thêm `"chon": [số # thoả điều kiện]` và `"loc": "điều kiện"` vào khung đó; `soChat` = số chất khác nhau trong `chon`.
+  - Phần cố định (ester, amine, arene, peptide, chất béo) dùng `bang` thay hoặc cùng `mach`:
+    `{ "loai": "este"|"amin"|"aren"|"khac", "tieuDe": "Cố định COO, chia 3 C còn lại cho R và R′", "cot": [], "hang": [ { "phan": [số C từng phần], "soCach": [số gốc từng phần], "tich": số chất, "ghi"? } ] }`.
+    Số gốc no: H (0 C) 1 · CH3 1 · C2H5 1 · C3H7 2 · C4H9 4 · C5H11 8. Ester: phan = [C của R (0 = HCOO), C của R′ (≥ 1)], tich = tích. Amine: phan = C từng gốc quanh N
+    (bậc 1 một gốc; bậc 2 hai gốc; bậc 3 ba gốc), gốc cùng số C đổi chỗ không nhân thêm. Arene: phan = C từng nhánh trên vòng; hai nhánh × 3 vị trí (o, m, p);
+    ba nhánh giống nhau 3. `khac` (peptide 3! = 6, chất béo): `soCach` là các thừa số, tich = tích. Gốc không no / có điều kiện riêng: ghi `ghi` (máy chỉ kiểm tích).
+  - Câu Phần II có MỘT ý đếm đồng phân: `dongPhan` cho ý đó (không cần khớp đáp án). Câu chỉ HỎI LÝ THUYẾT về đồng phân (khái niệm, glucose và fructose là đồng phân…):
+    không cần `dongPhan`, nhưng `cotLoi` / `lyDo` vẫn theo skill. Câu có vòng (cycloalkane) mà khung không vẽ được: dùng `bang` loại `khac`.
+  - K viết K HOA (thầy: «Bước 1 các em tính K»). Công thức thu gọn kiểu SGK: CH3-CH=CH-CH3, CH3-COO-CH3.
 - `thanChu`: mảng chữ thần chú — CHỈ chép ĐÚNG CHỮ trường `chu` trong `than-chu.json`, chỉ khi đúng chuyện câu đang hỏi. Không có thì `[]`. Tuyệt đối không tự đặt thần chú.
 - `thayNoi` (tuỳ chọn): MỘT câu chép NGUYÊN VĂN từ `noi` của một mục trong `.muc.json`, hợp ý bài. Không có câu hợp thì bỏ trường. Không sửa chữ (chỉ được sửa axit→acid, bazơ→base, este→ester, ancol→alcohol, oxit→oxide, amin→amine, anđehit→aldehyde). Sửa thuật ngữ thì máy chủ không khớp ⇒ thà chép nguyên.
 - `meo` (tuỳ chọn): chép NGUYÊN VĂN `meo` của mục hợp ý.
@@ -101,7 +132,7 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
 ## Luật chữ (máy kiểm, sai là trượt)
 1. KHÔNG dùng dấu ngoặc kép kiểu Pháp (hai dấu nhọn). Chữ cần nhấn viết **in đậm** bằng hai dấu sao. Thẻ HTML chỉ được `<b> <i> <sub> <sup>` (thường không cần).
 2. Công thức viết thường như đề: H2SO4, Fe2O3, CH3COOC2H5 (app tự hạ chỉ số); ion có điện tích: `Fe^{3+}`, `SO_4^{2-}`; chỉ số chữ: `C_nH_{2n}O_2`. Mũi tên `→`, `⇌`.
-3. KHÔNG dùng: độ bất bão hoà, k = …, "độ không no" (ngoài SGK KNTT) — dùng cách thầy: "cứ mất đi 1 H2 thì hình thành 1 π", đếm π của gốc và chức.
+3. KHÔNG dùng tên "độ bất bão hoà", "độ không no", k thường. Được dùng **K** (K hoa = số π + số vòng, thầy 08/11: «Bước 1 các em tính K»); đếm π của gốc và chức theo skill đồng phân.
    KHÔNG ẩn dụ tiền / nhà / giàu / thuế (thầy đã bỏ). KHÔNG chữ "AI". Không rào đón, không khen sáo, câu ngắn.
 4. Thuật ngữ SGK 2018: acid, base, oxide, ester, alcohol, aldehyde, amine, saccharose, glucose… Số thập phân dấu phẩy trong chữ.
 5. KHÔNG đổi đáp án kho. KHÔNG bịa số liệu (chỉ số trong đề + nguyên tử khối phổ thông: H 1, C 12, N 14, O 16, Na 23, Mg 24, Al 27, S 32, Cl 35,5, K 39, Ca 40, Fe 56, Cu 64, Zn 65, Ag 108, Ba 137; đề cho khác thì dùng của đề; đkc 24,79 L/mol, đktc 22,4 theo chữ của đề).
@@ -110,6 +141,6 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
 ## Cách làm cả lô
 1. Đọc `vi-du-kinh.json`, `than-chu.json`, `tu-duy-day-hoa.md` một lần.
 2. Từng câu: đọc `vao/<tên>.json` + `vao/<tên>.muc.json` (+ ảnh). TRA BÀI GIẢNG (mục trên) bằng Grep `muc-luc.txt` + `node lay-muc.mjs`. TỰ GIẢI TRƯỚC theo cách thầy,
-   đối chiếu `dapAn` kho, rồi mới viết `ra/<tên>.json` bằng công cụ Write. KHÔNG viết script sinh tệp: Bash chỉ chạy được `node kiem.mjs` và `node lay-muc.mjs`.
+   đối chiếu `dapAn` kho, rồi mới viết `ra/<tên>.json` bằng công cụ Write. KHÔNG viết script sinh tệp: Bash chỉ chạy được `node kiem.mjs`, `node lay-muc.mjs` và `node dong-phan.mjs`.
 3. Chạy `node kiem.mjs`. Sửa mọi dòng TRƯỢT / THIẾU / LỆCH rồi chạy lại (tối đa 3 vòng mỗi tệp). Dòng "bỏ khối" nghĩa là thần chú / câu thầy nói / mẹo không khớp nguồn: chép lại đúng chữ nguồn hoặc bỏ trường.
 4. Trả lời cuối đúng 1 dòng: số câu ĐẠT / tổng, số câu `nghiDapAn`.
