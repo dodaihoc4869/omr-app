@@ -147,7 +147,8 @@ describe('thẻ Bài hằng ngày', () => {
     render(<ChienDichScreen />)
     expect(screen.queryAllByRole('tab')).toHaveLength(0)
     expect(screen.queryByText('Bài hằng ngày')).toBeNull()
-    expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 07/11 (các bước buổi dạy): khối Dạy học chỉ nạp khi thầy chọn thẻ ⇒ kiểm trang bước đã dựng.
+    expect(await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })).toBeTruthy()
     await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-hang-ngay')).toHaveLength(0)
   })
