@@ -217,6 +217,24 @@
    "khai": "background: var(--kinh-mat)",
    "n": 1,
    "ly_do": "07/11 thầy: thanh tiến độ kính trong hơn (mặt 55 %)"
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "background: var(--bb-nen, var(--tr-mat))",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt bong bóng Mol theo cảm xúc (docs/ban-ve-bong-bi-0711) — luật chuyển sang src/styles/bong-mol.css"
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "border-color: var(--bb-vien, var(--tr-vien-2))",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt bong bóng Mol theo cảm xúc (docs/ban-ve-bong-bi-0711) — luật chuyển sang src/styles/bong-mol.css"
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "color: var(--bb-chu, var(--tr-chu))",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt bong bóng Mol theo cảm xúc (docs/ban-ve-bong-bi-0711) — luật chuyển sang src/styles/bong-mol.css"
   }
  ]
 }

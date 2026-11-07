@@ -401,14 +401,11 @@
 [data-trong] .duo .ht2-lam-de { padding: 0; border: 0; background: none; box-shadow: none; gap: 12px; }
 [data-trong] .duo .ht2-lam-de-chu { font-size: 21px; font-weight: 700; line-height: 1.5; }
 [data-trong] .duo .ht2-lam-de-chu > b:first-child { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-/* thầy 06/11: «riêng phần đề để chữ mảnh, chỉ in đậm chữ Không cần thiết trong đề» — thân đề giữ mặt mảnh 500 (trong-hs.css); chữ «không» phủ định
-   (ct-khong, lib/chem-trinh-bay.tsx) in đậm 900 CHỈ trong khung đề; phương án, lời giải không đổi. */
+/* 06/11: «không» phủ định (ct-khong, lib/chem-trinh-bay.tsx) đậm chỉ trong thân đề */
 html:root[data-trong='hs'] .ht2-lam-de-chu .ct-khong { font-weight: 900; }
-/* 06/11: màn học tập cổng học sinh ra khỏi luật «chữ mảnh toàn app» (trong.css mục 10) — riêng NỘI DUNG ĐỀ THI mở trong cổng (ExamTakeScreen) và
-   Kiểm tra ôn tập (ThiDuo) giữ y nguyên mảnh 500 như trước: không đụng chữ đề thi. */
+/* 06/11: đề thi trong cổng / Kiểm tra ôn tập giữ chữ mảnh (trong.css mục 10) */
 html:root[data-ht2] .thi-noi-dung *:not(.gyc-cham, .gyc-cham *) { font-weight: 500 !important; }
-/* 07/11 (thầy: «in đậm chữ không trong đề thi nữa»): «không» phủ định trong THÂN ĐỀ thi (TheCau `div.cau-de` — màn thi /t, thi trong cổng, Kiểm tra ôn tập)
-   đậm 900; thắng luật chữ mảnh !important (trong.css mục 10 + dòng trên). Phương án / đáp án hiện sau nộp (span.cau-de) giữ mảnh. */
+/* 07/11: «không» trong thân đề thi (TheCau div.cau-de) đậm, thắng luật chữ mảnh */
 html:root[data-trong='hs'] div.cau-de .ct-khong { font-weight: 900 !important; }
 /* phương án: ô lớn, viền dày có gờ đáy */
 [data-trong] .duo .ht2-lam-tn { display: grid; gap: 12px; }
@@ -1221,10 +1218,7 @@ html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] .ht2-lam-pa-ma, html[data-t
    (1) thanh trên của màn làm câu / sửa câu: bỏ nền trắng 76 % (luật `.duo:not([data-xong]) > .duo-tren` mạnh hơn luật kính cũ) — trong suốt, thấy dải loang;
    (2) thanh tiến độ: mảnh 10 px, rãnh kính nhạt có viền mảnh (0 % không còn là «ống rỗng» to), khổ rộng tối đa 560 px;
    (3) khổ rộng (haiCotLam): nút chính của dải đáy gọn tối đa 340 px, giữa cột trả lời — điện thoại giữ nút rộng cho dễ bấm. */
-/* 07/11 thầy (ảnh thanh tiến độ màn làm câu): «làm một nền kính mờ ở nền thanh này» ⇒ kính như thanh công cụ dưới (--kinh-mat + --kinh-mo), mép đáy mảnh;
-   máy yếu: --kinh-mo = none, --kinh-mat = mặt đặc (trong-hs-mau.css) ⇒ nền đặc, không làm mờ. */
-/* 07/11 lần 2 (thầy, ảnh máy tính: «cái nền làm xấu quá, làm cho trong hơn tinh tế hơn; bản xoay ngang và máy tính bo vừa hết chỗ thanh thôi»):
-   kính TRONG hơn (mặt 55 %), mép sáng 1 px thay vạch đáy xám, bóng rất nhẹ; khổ rộng: viên thuốc ôm vừa X + dải tiến độ + bộ đếm (dưới, trong @media). */
+/* 07/11 thầy: thanh tiến độ kính trong (55 %); khổ rộng: viên thuốc ôm vừa nội dung (trong @media dưới); máy yếu nền đặc */
 html[data-trong='hs'] .duo:not([data-xong]) > .duo-tren, html[data-trong='hs'] .duo-kt:not([data-xong]) > .duo-kt-tren { background: color-mix(in oklab, var(--tr-mat) 55%, transparent); border: 0;
   box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 6px 18px -16px var(--tr-phu); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo); }
 html.may-yeu[data-trong='hs'] .duo:not([data-xong]) > .duo-tren, html.may-yeu[data-trong='hs'] .duo-kt:not([data-xong]) > .duo-kt-tren { background: var(--tr-mat); }
@@ -1232,8 +1226,7 @@ html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) { height: 10
 html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i { height: 100%; border-radius: 5px; box-shadow: none; background: linear-gradient(90deg, color-mix(in oklab, var(--tr-hs) 75%, var(--tr-trang)), var(--tr-hs-day)); }
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   html[data-trong='hs'] .duo-tren > .duo-thanh { max-width: 560px; }
-  /* viên thuốc kính ôm vừa nội dung thanh (thầy 07/11): không kéo hết chiều ngang lưới */
-  /* :not(#_) nâng độ ưu tiên để thắng luật lưới chặng ngang (trong-chang-ngang.css: width 100 %, margin 0) */
+  /* :not(#_) thắng luật lưới chặng ngang (trong-chang-ngang.css) */
   html[data-trong='hs'] .duo:not([data-xong]):not(#_) > .duo-tren, html[data-trong='hs'] .duo-kt:not([data-xong]):not(#_) > .duo-kt-tren { width: fit-content; max-width: calc(100% - 24px); justify-self: start; align-self: start;
     min-height: 0; margin: 8px 12px 0; padding: 6px 18px 6px 6px; border-radius: 999px; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 8px 22px -16px var(--tr-phu); }
   html[data-trong='hs'] .duo:not([data-xong]):not(#_) > .duo-tren > .duo-thanh { width: min(560px, 46vw); flex: none; }

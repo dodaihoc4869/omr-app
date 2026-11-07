@@ -580,8 +580,5 @@ html[data-vua-mo] *, html[data-vua-mo] *::before, html[data-vua-mo] *::after { a
 /* 03/11 (thầy «Mol to lên · bong bóng vừa chữ, màu theo cảm xúc»): bong bóng không giãn (bi.css flex-grow 1), bề rộng do src/lib/bong-vua-chu.ts đo; màu theo data-cx. */
 html[data-trong='hs'] .kb-mol { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; margin: -8px 0 2px -10px; min-width: 0; }
 html[data-trong='hs'] .kb-mol .bi { flex: none; }
-html[data-trong='hs'] .kb-mol .kb-mol-bong { position: relative; flex: 0 1 auto; margin: 0; padding: 9px 14px; max-width: 100%; min-width: 0; font-size: 15px; line-height: 1.35; border-radius: 18px 18px 18px 6px; text-wrap: balance; }
-html[data-trong='hs'] .kb-mol .kb-mol-bong::before { display: block; left: -7px; top: calc(50% - 6px); bottom: auto; width: 12px; height: 12px; transform: rotate(45deg); }
-html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx], html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx]::before {
-  background: var(--bb-nen, var(--tr-mat)); border-color: var(--bb-vien, var(--tr-vien-2)); color: var(--bb-chu, var(--tr-chu)); transition: background-color .3s, border-color .3s, color .3s; }
+/* bong bóng Mol theo cảm xúc (07/11): src/styles/bong-mol.css — nạp ngay sau tệp này trong TrongHs.tsx (cùng mảnh, không thêm tệp) */
 

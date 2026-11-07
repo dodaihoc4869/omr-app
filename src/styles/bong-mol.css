@@ -1,0 +1,21 @@
+/* BONG BÓNG MOL THEO CẢM XÚC (thầy chốt 07/11, bản vẽ docs/ban-ve-bong-bi-0711): ĐỒNG NHẤT — viền 2 px + gờ cứng 3 px, cùng đệm / cỡ / độ đậm chữ,
+   mặt đặc (bỏ kính); MỖI CẢM XÚC MỘT HÌNH KHUNG: chào bo đều · vui viên thuốc · khen bo tròn + sao lấp lánh · nghĩ / ngủ đám mây + đuôi hai chấm ·
+   buồn góc dưới xệ + đuôi giọt nước · dỗi vuông hơn, hơi nghiêng · bực góc so le · cáu / rất cáu so le gắt, viền dày. Màu: --bb-* (trong-hs.css). */
+html[data-trong='hs'] .kb-mol .kb-mol-bong { position: relative; flex: 0 1 auto; margin: 0; padding: 10px 16px; max-width: 100%; min-width: 0; font-size: 15px; font-weight: 600; line-height: 1.35;
+  border: 2px solid var(--bb-vien, var(--tr-vien)); border-radius: 22px; background: var(--bb-nen, var(--tr-mat)); color: var(--bb-chu, var(--tr-chu)); box-shadow: 0 3px 0 var(--bb-vien, var(--tr-vien));
+  text-wrap: balance; transition: background-color .3s, border-color .3s, color .3s; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong::before { display: block; left: -8px; top: calc(50% - 7px); bottom: auto; width: 13px; height: 13px; border: 0;
+  border-left: 2px solid var(--bb-vien, var(--tr-vien)); border-bottom: 2px solid var(--bb-vien, var(--tr-vien)); border-radius: 0 0 0 4px; background: var(--bb-nen, var(--tr-mat)); transform: rotate(45deg); }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='vui'] { border-radius: 999px; padding-inline: 20px; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='khen'] { border-radius: 26px; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='khen']::after { content: '✦'; position: absolute; top: -13px; right: 12px; font-size: 18px; line-height: 1; color: var(--bb-vien); text-shadow: 14px 6px 0 var(--bb-vien); pointer-events: none; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu']) { border-radius: 46% 54% 48% 52% / 62% 56% 64% 58%; padding: 12px 20px; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu'])::before { left: -14px; top: auto; bottom: 8px; width: 11px; height: 11px; border: 2px solid var(--bb-vien); border-radius: 50%; transform: none; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu'])::after { content: ''; position: absolute; left: -24px; bottom: 0; width: 6px; height: 6px; border: 2px solid var(--bb-vien); border-radius: 50%; background: var(--bb-nen); }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='buon'] { border-radius: 24px 24px 26px 8px; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='buon']::before { left: -9px; top: auto; bottom: 4px; width: 12px; height: 12px; border: 2px solid var(--bb-vien); border-radius: 0 50% 50% 50%; transform: rotate(-30deg); }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='doi'] { border-radius: 14px; transform: rotate(-1.5deg); }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='buc'] { border-radius: 10px 24px 10px 24px; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='cau'], [data-cx='ratCau']) { border-width: 3px; border-radius: 6px 22px 6px 22px; box-shadow: 0 4px 0 var(--bb-vien); }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='cau'], [data-cx='ratCau'])::before { border-left-width: 3px; border-bottom-width: 3px; border-radius: 0; }
+@media (prefers-color-scheme: dark) { html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu']) { --bb-vien: var(--tr-chu-3); } }
