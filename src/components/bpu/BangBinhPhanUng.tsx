@@ -230,6 +230,18 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     for (const [sbd, r] of rong) if (r * chung > cho) rieng.set(sbd, Math.max(11, Math.floor(cho / r)))
     return { chung, rieng }
   }, [tenGoi, hien, L])
+  // ĐO THẬT TỪNG Ô (thầy 07/11 «tên học sinh vẫn bị cắt»): ước lượng bằng canvas có thể lệch (phông app chưa tải xong, máy chiếu khác cỡ) ⇒ sau khi vẽ,
+  // ô nào chữ còn tràn (rộng / cao) thì hạ cỡ chữ RIÊNG ô đó từng px tới khi vừa (tối thiểu 10 px). Chạy lại khi danh sách / lưới đổi và khi phông tải xong.
+  const vuaTen = useCallback(() => {
+    const ds = goc.current?.querySelectorAll<HTMLElement>('.bb-bth .bb-o .ten')
+    ds?.forEach((el) => {
+      const toi = (el.parentElement?.clientWidth ?? 0) - 16 // bề ngang KHUNG ô trừ vạch màu đội + lề
+      let co = parseFloat(getComputedStyle(el).fontSize) || 24
+      while ((el.scrollWidth > toi || el.scrollHeight > el.clientHeight + 1) && co > 10) { co -= 1; el.style.fontSize = `${co}px` }
+    })
+  }, [])
+  useLayoutEffect(vuaTen, [vuaTen, hien, tenGoi, L, coChu, v?.luot?.pha])
+  useEffect(() => { let tat = false; void document.fonts?.ready.then(() => { if (!tat) vuaTen() }); return () => { tat = true } }, [vuaTen, hien.length])
   const coMat = ds.filter((e) => e.vao)
   const daGui = new Set(l?.daGui ?? [])
   const chuaBietS = new Set(l?.chuaBiet ?? [])
