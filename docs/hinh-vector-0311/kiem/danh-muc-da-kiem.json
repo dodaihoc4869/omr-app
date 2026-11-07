@@ -325,6 +325,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04": {
+      "tep": "polymer-ba-doan-ddh-feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9.svg",
+      "hashSvg": "feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9",
+      "byteSvg": 13190,
+      "byteGzip": 2169,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc": {
       "tep": "do-thi-ddh-a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1.svg",
       "hashSvg": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1",
@@ -2819,10 +2828,10 @@
       "font": "DDH Rounded"
     },
     "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f": {
-      "tep": "capron-phan-ung-ddh-c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875.svg",
-      "hashSvg": "c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875",
-      "byteSvg": 13388,
-      "byteGzip": 3844,
+      "tep": "capron-phan-ung-ddh-bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2.svg",
+      "hashSvg": "bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2",
+      "byteSvg": 13771,
+      "byteGzip": 4042,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -8976,7 +8985,7 @@
           "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
           "where": "12-BD7-18-II-2.hinh.0.du_lieu",
           "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a",
-          "vector": "capron-phan-ung-ddh-c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875.svg"
+          "vector": "capron-phan-ung-ddh-bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2.svg"
         }
       ]
     },
@@ -12254,7 +12263,7 @@
           "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
           "where": "12-C4-B13-II-2.hinh.0.du_lieu",
           "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a",
-          "vector": "capron-phan-ung-ddh-c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875.svg"
+          "vector": "capron-phan-ung-ddh-bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2.svg"
         }
       ]
     },
@@ -13923,6 +13932,20 @@
           "where": "12-KT-C4-D2-III-6.hinh.0.du_lieu",
           "hashDataUrl": "2e371926e9d91d26639da1eab7062b4fcaf765ed1dc7a6c739981726e2c2b172",
           "vector": "dieu-che-caprolactam-ddh-4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D4-I-14",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
+          "where": "12-KT-C4-D4-I-14.hinh.0.du_lieu",
+          "hashDataUrl": "63dd765252fb5d90f8a9a1cec9a1a27668c2c8261b7fa9679f08afea735a7741",
+          "vector": "polymer-ba-doan-ddh-feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9.svg"
         }
       ]
     },
@@ -27488,6 +27511,7 @@
     "12-KT-C4-D2-I-9",
     "12-KT-C4-D2-I-14",
     "12-KT-C4-D2-III-6",
+    "12-KT-C4-D4-I-14",
     "12-KT-C4-D3-II-1",
     "12-KT-C4-D5-I-1",
     "12-KT-C4-D5-II-2",

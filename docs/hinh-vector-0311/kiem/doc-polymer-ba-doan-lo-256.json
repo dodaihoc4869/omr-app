@@ -1,0 +1,48 @@
+{
+  "hashNguon": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
+  "questions": [
+    {
+      "qid": "12-KT-C4-D4-I-14",
+      "de": "Nhựa ABS được sử dụng rộng rãi để sản xuất đồ chơi trẻ em, có công thức cấu tạo như hình dưới đây.\nĐể sản xuất ABS, không cần sử dụng loại nguyên liệu nào dưới đây?",
+      "refs": [
+        {
+          "hash": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
+          "where": "12-KT-C4-D4-I-14.hinh.0.du_lieu",
+          "hashDataUrl": "63dd765252fb5d90f8a9a1cec9a1a27668c2c8261b7fa9679f08afea735a7741"
+        }
+      ]
+    }
+  ],
+  "canvas": [
+    820,
+    254
+  ],
+  "backboneTokens": [
+    "CH₂",
+    "CH",
+    "CH₂",
+    "CH",
+    "CH",
+    "CH₂",
+    "CH₂",
+    "CH"
+  ],
+  "branches": {
+    "firstCH": "CNdown",
+    "lastCH": "phenylDown"
+  },
+  "carbonTotal": 15,
+  "nitrogenTotal": 1,
+  "CCdoubleBackbone": 1,
+  "phenylDouble": 3,
+  "parenthesesPairs": 3,
+  "subscripts": [
+    "a",
+    "b",
+    "c"
+  ],
+  "conditions": [],
+  "nativeRead": "FULL và zoom",
+  "noTheoryAnswer": true,
+  "proof": "cau-truc-polymer-ba-doan-ddh-lo-256-soat-doc-lap.json"
+}

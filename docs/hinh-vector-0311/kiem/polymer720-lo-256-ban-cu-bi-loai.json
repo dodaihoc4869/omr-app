@@ -1,0 +1,30 @@
+{
+  "metadata": [
+    {
+      "i": 720,
+      "hash": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
+      "fileNguon": "anh/1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04.png",
+      "svg": "polymer-ba-doan-ddh-bf14842df22687baf635afdf6fd4e084999b385684e1ca0fb1d70f3ac38c808f.svg",
+      "hashSvg": "bf14842df22687baf635afdf6fd4e084999b385684e1ca0fb1d70f3ac38c808f",
+      "byteSvg": 13178,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "cho-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-KT-C4-D4-I-14",
+          "de": "Nhựa ABS được sử dụng rộng rãi để sản xuất đồ chơi trẻ em, có công thức cấu tạo như hình dưới đây.\nĐể sản xuất ABS, không cần sử dụng loại nguyên liệu nào dưới đây?",
+          "refs": [
+            {
+              "hash": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
+              "where": "12-KT-C4-D4-I-14.hinh.0.du_lieu",
+              "hashDataUrl": "63dd765252fb5d90f8a9a1cec9a1a27668c2c8261b7fa9679f08afea735a7741"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "8backboneC/4CH2+4CH/1CCdouble/middleCH=CH/branchCNdown+phenyl6C3doubleDown/3roundpairs+abcsub/noextra n-answer-caption."
+    }
+  ],
+  "ketQua": "Cần sửa: root actual thấy Z đóng vòng Ph về đầu nhánh CH tạo đường chéo thừa. Tách subpath vòng tại C đỉnh; giữ nhánh và6vertices."
+}

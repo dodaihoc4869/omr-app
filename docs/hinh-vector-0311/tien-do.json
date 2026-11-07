@@ -60,9 +60,9 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1214 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;861 nguồn→604SVG;11146791byte/localgzip2059773;567 nguồn chưa xử lý. V5:12SVG/13nguồn/25câuđủ;chờ592SVG/848nguồn.",
-    "viecNenLamTiep": "Ưu tiênV5:592SVG/848nguồn trong dong-bo-font-main-lo-255.json;12SVG/25câuđủV5.Khôngoldproofduyệthashmới/khôngtựmiễn168SVGkhôngexplicitDDH. Vẫnhoànthiệnnguồnmớimỗilượt;568nguồncũtrừ717còn567chưaxửlý. Giữmọihold119/352/59/1391/209/1014vàmọisửaliteralgeometryđãchốt. Toànkhođạtmớitíchhợp-offline-pháthành;mainmớinhất/fullTHEOTÊN/cathi/khôngdeploychồngbắtbuộc.",
-    "canhBaoCheckpoint": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Main0c3421d5chưagộp/4WOFF2READMEkhớp. Build255/speed21/21/Chromium604/604/hashXMLpathAST/SW14/14/serverTSCđạt. SizeNỀNđỏ297644Bnguyênbytekhôngnângmốc;MàusoMain449viPhạm/79tệpchecker(78srcdiff),lôkhôngsửasrc/fontfiles. Full253nhánh16581/main83ebec7516725đỏ14/24+targeted0lỗimớicòntáihiệnCHỈhistory,khôngclaimhếtflaky/khôngthayfullmainmớinhấttrướcmerge-deploy. Lô255chỉbuilder/assets/docs nênkhôngfulllại."
+    "loVuaXong": "1215 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;862 nguồn→605SVG;11160364byte/localgzip2062140;566 nguồn chưa xử lý. V5:14SVG/15nguồn/28câuđủ;chờ591SVG/847nguồn.",
+    "viecNenLamTiep": "Ưu tiênV5:591SVG/847nguồn trong dong-bo-font-main-lo-256.json;14SVG/28câuđủV5.Khôngoldproofduyệthashmới/khôngtựmiễn168SVGkhôngexplicitDDH. Vẫnhoànthiệnnguồnmớimỗilượt;567nguồncũtrừ720còn566chưaxửlý. Giữmọihold119/352/59/1391/209/1014vàmọisửaliteralgeometryđãchốt. Toànkhođạtmớitíchhợp-offline-pháthành;mainmớinhất/fullTHEOTÊN/cathi/khôngdeploychồngbắtbuộc.",
+    "canhBaoCheckpoint": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Main5dd321bcchưagộp/4WOFF2READMEkhớp. Build256/speed21/21/Chromium605/605/hashXMLpathAST/SW14/14/serverTSCđạt. SizeNỀNđỏ297644Bnguyênbytekhôngnângmốc;MàusoMain449viPhạm/79tệpchecker(78srcdiff),lôkhôngsửasrc/fontfiles. Full253nhánh16581/main83ebec7516725đỏ14/24+targeted0lỗimớicòntáihiệnCHỈhistory,khôngclaimhếtflaky/khôngthayfullmainmớinhấttrướcmerge-deploy. Lô256chỉbuilder/assets/docs nênkhôngfulllại."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 861,
-    "soSvgRieng": 604,
-    "soCauDungHinh": 1221,
-    "soCauDuMoiHinh": 1214,
+    "soAnhNguon": 862,
+    "soSvgRieng": 605,
+    "soCauDungHinh": 1222,
+    "soCauDuMoiHinh": 1215,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 11146791,
-    "byteGzip": 2059773,
-    "soAnhNguonConLai": 567,
+    "byteSvg": 11160364,
+    "byteGzip": 2062140,
+    "soAnhNguonConLai": 566,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,36 +101,36 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "255:V5chỉ12SVGđãsoát;toànkhochưađồngbộ",
+    "loMoi": "256:V5chỉ14SVGđãsoát;toànkhochưađồngbộ",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": false,
     "chenhLechMain": {
-      "main": "0c3421d52ea2dbbe3fe6916c10d290c6cd9d2c02",
-      "proof": "kiem/dong-bo-font-main-lo-255.json",
+      "main": "5dd321bc4fe0ae8d174d2c094024815e679d1a71",
+      "proof": "kiem/dong-bo-font-main-lo-256.json",
       "fontVersion": "v5",
       "deIdentical": true,
       "damIdentical": true,
       "fontFilesSynced": true,
       "regularHash": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
       "boldHash": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
-      "migratedSelectedSvg": 12,
-      "remainingSelectedSvg": 592,
-      "remainingSourceHashes": 848,
-      "soCauDuMoiHinhV5": 25,
+      "migratedSelectedSvg": 14,
+      "remainingSelectedSvg": 591,
+      "remainingSourceHashes": 847,
+      "soCauDuMoiHinhV5": 28,
       "chuaDongBoMain": true,
-      "scopeCounts": "1214 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;861 nguồn→604SVG;11146791byte/localgzip2059773;567 nguồn chưa xử lý. V5:12SVG/13nguồn/25câuđủ;chờ592SVG/848nguồn."
+      "scopeCounts": "1215 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;862 nguồn→605SVG;11160364byte/localgzip2062140;566 nguồn chưa xử lý. V5:14SVG/15nguồn/28câuđủ;chờ591SVG/847nguồn."
     }
   },
   "daDatPhongApp": {
-    "soNguon": 861,
-    "soCauDuHinhVaPhong": 1214,
+    "soNguon": 862,
+    "soCauDuHinhVaPhong": 1215,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "255",
-    "ketQua": "1214 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;861 nguồn→604SVG;11146791byte/localgzip2059773;567 nguồn chưa xử lý. V5:12SVG/13nguồn/25câuđủ;chờ592SVG/848nguồn.",
-    "suaLoi": "717vẽmới:3molecules/18C3O2N/2COdouble1CNdouble/2sixrings1sevenringNH/oximeOHupright/2RIGHTheads/NH2OH-H2SO4literal/3lowercasecaptionscyclohexanone-cyclohexanoxime-caprolactam/noaddedanswer-temp-H2O. NativeFULL3x-molzooms/allpublicrefs/freshactualChromiumexact4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047/27228Bđạtđộclập,khép1câu. 540dựnglạiV5giữ3orbits13dots2-8-3outerTOPLEFTBOTTOMNOnewRIGHTdot/bluecore+13/noextra layernums-caption. ĐãsoátRIÊNGnativeFULL-allrefs-freshactualexacthashmới. NgoàichữđậmEXACT. Khôngcộngfont-onlythànhnguồn/câumới.",
-    "tiepTheo": "Ưu tiênV5:592SVG/848nguồn trong dong-bo-font-main-lo-255.json;12SVG/25câuđủV5.Khôngoldproofduyệthashmới/khôngtựmiễn168SVGkhôngexplicitDDH. Vẫnhoànthiệnnguồnmớimỗilượt;568nguồncũtrừ717còn567chưaxửlý. Giữmọihold119/352/59/1391/209/1014vàmọisửaliteralgeometryđãchốt. Toànkhođạtmớitíchhợp-offline-pháthành;mainmớinhất/fullTHEOTÊN/cathi/khôngdeploychồngbắtbuộc.",
-    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Main0c3421d5chưagộp/4WOFF2READMEkhớp. Build255/speed21/21/Chromium604/604/hashXMLpathAST/SW14/14/serverTSCđạt. SizeNỀNđỏ297644Bnguyênbytekhôngnângmốc;MàusoMain449viPhạm/79tệpchecker(78srcdiff),lôkhôngsửasrc/fontfiles. Full253nhánh16581/main83ebec7516725đỏ14/24+targeted0lỗimớicòntáihiệnCHỈhistory,khôngclaimhếtflaky/khôngthayfullmainmớinhấttrướcmerge-deploy. Lô255chỉbuilder/assets/docs nênkhôngfulllại."
+    "lo": "256",
+    "ketQua": "1215 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;862 nguồn→605SVG;11160364byte/localgzip2062140;566 nguồn chưa xử lý. V5:14SVG/15nguồn/28câuđủ;chờ591SVG/847nguồn.",
+    "suaLoi": "720vẽmới:8backbone4CH2+4CH/middleCH=CH/nhánhCNdown+Phdown3double/3roundpairs+abcsub/noaddedn-answer-caption. NativeFULL3x-allpublicrefs-freshactualChromiumexactfeda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9đạtđộclập,khép1câu. Rootactualcandidatebf14842đóngZPhvềđầunhánhCHtạodiagonalthừa:đãlưunegativeriêngvàsửaduytáchsubpathMởđỉnhvòng/giữ6vertices+nhánh;khôngchọnoldhash. 685dựnglạiV5giữ7memberNHlactamCO/coefficientn/1RIGHThead/xúc tác,t°/polymerHN-[CH2]5-CO/2roundparentheses+nsub/(1)farRIGHT/noextraH2O-answer. SoátRIÊNGnativeFULL-allrefs-freshactualnewhash;ngoàichữV5EXACT.Khôngcộngfont-onlythànhnguồn/câumới.",
+    "tiepTheo": "Ưu tiênV5:591SVG/847nguồn trong dong-bo-font-main-lo-256.json;14SVG/28câuđủV5.Khôngoldproofduyệthashmới/khôngtựmiễn168SVGkhôngexplicitDDH. Vẫnhoànthiệnnguồnmớimỗilượt;567nguồncũtrừ720còn566chưaxửlý. Giữmọihold119/352/59/1391/209/1014vàmọisửaliteralgeometryđãchốt. Toànkhođạtmớitíchhợp-offline-pháthành;mainmớinhất/fullTHEOTÊN/cathi/khôngdeploychồngbắtbuộc.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Main5dd321bcchưagộp/4WOFF2READMEkhớp. Build256/speed21/21/Chromium605/605/hashXMLpathAST/SW14/14/serverTSCđạt. SizeNỀNđỏ297644Bnguyênbytekhôngnângmốc;MàusoMain449viPhạm/79tệpchecker(78srcdiff),lôkhôngsửasrc/fontfiles. Full253nhánh16581/main83ebec7516725đỏ14/24+targeted0lỗimớicòntáihiệnCHỈhistory,khôngclaimhếtflaky/khôngthayfullmainmớinhấttrướcmerge-deploy. Lô256chỉbuilder/assets/docs nênkhôngfulllại."
   }
 }
