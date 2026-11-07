@@ -196,7 +196,7 @@ function dungChat(kd: KhungDung, dat: readonly { loai: DatDP; nhan: string }[], 
     for (const v of conC.slice(0, -1)) chu += `(${lkNhanh(u, v)}${viet(v, u)})`
     return chu + lk(u, tiep) + viet(tiep, u)
   }
-  const lkNhanh = (u: number, v: number) => { const x = lk(u, v); return x === '-' ? '' : x.startsWith('-') ? x.slice(1) : x }
+  function lkNhanh(u: number, v: number): string { const x = lk(u, v); return x === '-' ? '' : x.startsWith('-') ? x.slice(1) : x }
   function vietMach(): string {
     const parts: string[] = []
     for (let i = 0; i < kd.chinh; i++) {
