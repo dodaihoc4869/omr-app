@@ -389,7 +389,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
           {man === 'lam-bang' && g && goiEm ? (
             <div className="bb-lb" style={{ ['--doi' as string]: mauDoi(goiEm.doi) }}>
               <div className="the"><div className="ng">{kyHieu(goiEm.ten)}</div><div className="chu"><div className="mat">Đang làm trên bảng</div><b>{an ? ten(goiEm) : goiEm.ten}</b><span>{DOI_BPU[goiEm.doi]?.ten}</span></div></div>
-              <div className="viet">Chỗ em viết lời giải<br />Phím B trên tờ chiếu: bút viết lên màn</div>
+              <div className="viet">Em giải trên bảng lớp<br />Thầy chấm: <b>D</b> Đạt · <b>F</b> Chưa đạt</div>
               <div className="dai"><span><b>{g.doanDung}</b> đoán đúng · <b>{g.doanSai}</b> chưa</span><span className="vach"><i style={{ width: `${(g.doanDung / Math.max(1, g.doanDung + g.doanSai)) * 100}%` }} /></span><span className="ts">Tiếp sức {g.tiep}</span></div>
             </div>
           ) : man === 'mo' && !l.tuLuan ? ongNhan.map((x) => <div key={x.nhan} className="bb-ong" style={{ left: x.x - 1200 }}><div className="nhan">{x.nhan}</div><div className="dem">{x.dem} em</div>{x.dung ? <div className="the">Đáp án</div> : null}</div>)
