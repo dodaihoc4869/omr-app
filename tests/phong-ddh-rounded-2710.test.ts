@@ -50,7 +50,7 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
   })
 
   it('chỉ app học sinh dùng; --sans/--serif/--tp-f trỏ DDH Rounded; thân 500 (Đề), chữ chạm / tiêu đề / nút (Đậm), khoảng chữ nhãn đo theo Duolingo', () => {
-    expect(HS).toMatch(/:root\[data-trong='hs'\] \{ --sans: 'DDH Rounded'[^;]*; --serif: 'DDH Rounded'/) // SỬA CÓ CHỦ ĐÍCH 08/11: mọi màn HS, không cần data-ht2
+    expect(HS).toMatch(/:root\[data-trong='hs'\] \{ --sans: 'Be Vietnam Pro'[^;]*; --serif: 'Be Vietnam Pro'/) // SỬA CÓ CHỦ ĐÍCH 08/11: mọi màn HS, không cần data-ht2
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] body { font-weight: 500; }")
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }") // 06/11: mọi màn làm câu, không riêng .duo
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo .ht2-lam-de-chu { color: var(--tr-chu); }")
@@ -58,7 +58,7 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo .duo-tra[data-so] .ht2-lam-pa { font-weight: 800; }")
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo-nhan { letter-spacing: .02em; }")
     expect(HS).toMatch(/:where\(h1, h2, h3, button, b, strong, th, dd\) \{ font-weight: 800; \}/)
-    expect(doc('src/styles/trong-thuong-gon.css')).toMatch(/--tp-f: 'DDH Rounded'/)
+    expect(doc('src/styles/trong-thuong-gon.css')).toMatch(/--tp-f: 'Be Vietnam Pro'/) // SỬA CÓ CHỦ ĐÍCH 08/11: thầy «đổi app hs sang phông Be Vietnam Pro»
   })
 
   it('dấu chồng: tiêu đề xuống hàng được giãn dòng ≥ 1,3', () => {
@@ -81,8 +81,8 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
     expect(m).not.toBeNull()
     const nguon = m![0].slice(m![0].indexOf('/^assets') + 1, m![0].lastIndexOf('$/.test') + 1)
     const re = new RegExp(nguon)
-    expect(re.test('assets/ddh-rounded-dam-latin-AbCd1234.woff2')).toBe(true)
-    expect(re.test('assets/ddh-rounded-de-vietnamese-AbCd_234.woff2')).toBe(true)
+    expect(re.test('assets/be-vietnam-pro-latin-700-normal-AbCd1234.woff2')).toBe(true) // SỬA CÓ CHỦ ĐÍCH 08/11: phông app HS = Be Vietnam Pro
+    expect(re.test('assets/be-vietnam-pro-vietnamese-400-normal-AbCd_234.woff2')).toBe(true)
     expect(re.test('assets/baloo-2-latin-800-normal-AbCd1234.woff2')).toBe(true)
     expect(re.test('assets/m-plus-rounded-1c-latin-800-normal-AbCd1234.woff2')).toBe(false)
     expect(vite).toContain("'**/ddh-rounded-*.woff2'")

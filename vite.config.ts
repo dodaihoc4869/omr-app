@@ -145,7 +145,7 @@ function napTruocManEm(): Plugin {
         const ngoai =(ds: string[], bo: string[]) => ds.filter((t) => !bo.includes(t))
         const phongHs = Object.values(goi)
           .map((x) => (x as { fileName: string }).fileName)
-          .filter((f) => /^assets\/(?:ddh-rounded-(?:de|dam)-(?:latin|vietnamese)|baloo-2-(?:latin|vietnamese)-(?:700|800)-normal)-[\w-]+\.woff2$/.test(f))
+          .filter((f) => /^assets\/(?:be-vietnam-pro-(?:latin|vietnamese)-(?:400|600|700)-normal|baloo-2-(?:latin|vietnamese)-(?:700|800)-normal)-[\w-]+\.woff2$/.test(f))
           .sort()
           .map((f) => goc + f)
         // 28/10 («vẫn chưa tức thì»): mảnh trình bày «Trong» của Lộ trình (TrongHs + CSS) — trước đây chỉ tải SAU khi mảnh cổng chạy (nạp nối đuôi).

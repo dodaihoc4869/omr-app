@@ -249,7 +249,7 @@
  * ĐÈ mục 4 (đứng sau, cùng độ ưu tiên) — không xoá khai báo cũ nào. ── */
 /* 5a. Chữ mảnh: đề, phương án, ý Đúng–Sai, ô số dùng mặt «Đề» (500) của ĐĐH Rounded — như màn làm chặng; đổi lựa chọn chỉ đổi màu / viền (không đổi độ
  * đậm ⇒ chữ không nhảy dòng khi chọn). Nhãn câu, nút chính, đồng hồ, số câu giữ mặt Đậm. */
-[data-trong='hs'] .duo-kt-thi { font-family: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --kt-gt-w: 120px; }
+[data-trong='hs'] .duo-kt-thi { font-family: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --kt-gt-w: 120px; }
 [data-trong='hs'] .duo-kt-thi .cau-de { font-weight: 500; line-height: 1.55; }
 [data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau :is(.pa-hang, .pa-ma, .y-hang, .y-ma) { font-weight: 500; }
 [data-trong='hs'] .m3.duo-kt-trang .duo-kt-thi .the-cau .y-nut button:is(:first-of-type, :nth-of-type(2)) { font-weight: 500; }

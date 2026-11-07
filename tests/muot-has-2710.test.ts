@@ -95,7 +95,7 @@ describe('độ mượt 27/10: luật :has() không bắt tính lại kiểu c�
   it('phông tròn cổng học sinh: :root[data-ht2] do HocTapHomNay / ManTuChua gắn (không :root:has(.ht2))', () => {
     const css = khongChuThich(readFileSync(join(GOC, 'src/styles/trong-hs.css'), 'utf8'))
     expect(css).not.toContain(':has(.ht2)')
-    expect(css).toContain(":root[data-trong='hs'] { --sans: 'DDH Rounded'") // SỬA CÓ CHỦ ĐÍCH 08/11: phông ĐĐH mọi màn HS (thầy «ép font ddh lên mọi máy»), vẫn không :has() ở gốc
+    expect(css).toContain(":root[data-trong='hs'] { --sans: 'Be Vietnam Pro'") // SỬA CÓ CHỦ ĐÍCH 08/11: phông ĐĐH mọi màn HS (thầy «ép font ddh lên mọi máy»), vẫn không :has() ở gốc
     expect(readFileSync(join(GOC, 'src/components/hoc-tap/HocTapHomNay.tsx'), 'utf8')).toMatch(/export default function HocTapHomNay\(p: Props\) \{\n {2}useDanhDauHt2\(\)/)
     expect(readFileSync(join(GOC, 'src/components/hoc-tap/ManTuChua.tsx'), 'utf8')).toContain('useDanhDauHt2()')
   })

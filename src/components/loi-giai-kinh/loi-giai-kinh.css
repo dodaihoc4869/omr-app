@@ -282,7 +282,7 @@ html.may-yeu .lgk-tg-than { animation: none; }
 /* ĐÚNG BẢN MẪU (thầy 03/11 «font chữ khác nhau so với bản vẽ và không có nền bóng đẹp như bản mẫu»): phông tròn ĐĐH Rounded của app học sinh
    (@font-face ở trong-hs.css) + NỀN LOANG ba màu chất chỉ thị sau các tấm kính (docs/ban-ve-ban-sac-hs-0211/v2/kinh.css `body`). Nền ĐẶC (--tr-nen) ⇒
    chữ của màn phía sau không còn lộ qua tấm kính. Chỉ biến màu sẵn có. */
-.lgk, .lgk-boc, .duo-lg-the:has(.lgk-boc) { font-family: 'DDH Rounded Kinh', 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+.lgk, .lgk-boc, .duo-lg-the:has(.lgk-boc) { font-family: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
 .lgk-boc, [data-trong='hs'] .duo-lg-the:has(.lgk-boc) {
   background:
     radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs) 42%, transparent), transparent 72%),

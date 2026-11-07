@@ -30,7 +30,9 @@
    27/10 MƯỢT: đọc `<html data-ht2>` (màn `.ht2` tự gắn — useDanhDauHt2 trong HocTapHomNay.tsx) thay `:root:has(.ht2)` — :has() ở gốc làm tính lại kiểu cả trang. */
 /* 08/11 thầy «ép font ddh lên mọi máy mọi trình duyệt»: phông ĐĐH ở MỌI màn app học sinh (cũ chỉ khi có <html data-ht2> ⇒ màn làm câu mở riêng
    rơi về phông máy); `block` thay `optional` ⇒ trình duyệt CHỜ phông ĐĐH (tệp 11 KB, có sẵn trong bộ nhớ đệm sau lần đầu) thay vì bỏ qua cả phiên. */
-:root[data-trong='hs'] { --sans: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
+/* 08/11 thầy «đổi app hs sang phông Be Vietnam Pro, giữ nguyên cỡ chữ cách dòng giống Duolingo»: phông chữ = Be Vietnam Pro (cùng app thầy, nạp sẵn
+   400/600/700 ở main.tsx); cỡ, khoảng chữ, dãn dòng đo theo Duolingo giữ nguyên. @font-face ĐĐH ở trên giữ cho bảng Bình Phản Ứng / màn chiếu. */
+:root[data-trong='hs'] { --sans: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; --serif: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; }
 :root[data-trong='hs'][data-ht2] body { font-weight: 500; }
 :root[data-trong='hs'][data-ht2] :where(h1, h2, h3, button, b, strong, th, dd) { font-weight: 800; }
 /* «Đề cho nét thanh hơn» (thầy 27/10, ảnh màn làm câu): chữ đề + phương án dùng mặt Đề (500), màu chữ đậm vừa --tr-chu để nét thanh mà vẫn rõ;
