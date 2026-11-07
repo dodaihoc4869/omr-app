@@ -1,0 +1,40 @@
+[
+  {
+    "i": 506,
+    "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+    "fileNguon": "anh/5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64.png",
+    "svg": "polymer-1000-ddh-2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0.svg",
+    "hashSvg": "2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0",
+    "byteSvg": 28520,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D2-I-11",
+        "de": "Cấu trúc phân tử của chất X được biểu diễn như hình dưới. Chất X là",
+        "refs": [
+          {
+            "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+            "where": "12-KT-C123-D2-I-11.hinh.0.du_lieu",
+            "hashDataUrl": "a4851a643e8336c7a2cb35ab7d53439186954fae13eaf88e43db3c46e89d5b6a"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-I-188",
+        "de": "Cấu trúc phân tử của chất X được biểu diễn như hình dưới. Chất X là",
+        "refs": [
+          {
+            "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+            "where": "DB-12-B5-D2-I-188.hinh.0.du_lieu",
+            "hashDataUrl": "a4851a643e8336c7a2cb35ab7d53439186954fae13eaf88e43db3c46e89d5b6a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3horizontalHaworth/18C15H8OH3CH2OH3ringO2bridgeO=16O/6TAPER3bold/bracketsONLYmiddlering-notbridgeO/literal1000NOspace-n/terminalOHleftdown-rightdown/noCnums-caption-extraH/DDHpath.",
+    "hashSvgDaSoat": "2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

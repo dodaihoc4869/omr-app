@@ -1,0 +1,245 @@
+{
+  "i": 506,
+  "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64.png",
+  "nativeSize": [
+    907,
+    324
+  ],
+  "reviewed": [
+    "nativefull2x",
+    "frontbonds5x",
+    "bracket/middle3x"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C123-D2-I-11",
+      "maDe": "12-KT-C123-D2",
+      "de": "Cấu trúc phân tử của chất X được biểu diễn như hình dưới. Chất X là",
+      "hinh": [
+        {
+          "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+          "where": "12-KT-C123-D2-I-11.hinh.0.du_lieu",
+          "hashDataUrl": "a4851a643e8336c7a2cb35ab7d53439186954fae13eaf88e43db3c46e89d5b6a"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-188",
+      "maDe": "DB-12-B5-D2",
+      "de": "Cấu trúc phân tử của chất X được biểu diễn như hình dưới. Chất X là",
+      "hinh": [
+        {
+          "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+          "where": "DB-12-B5-D2-I-188.hinh.0.du_lieu",
+          "hashDataUrl": "a4851a643e8336c7a2cb35ab7d53439186954fae13eaf88e43db3c46e89d5b6a"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "rings": [
+      {
+        "vertices": {
+          "C4": [
+            55,
+            163
+          ],
+          "C5": [
+            115,
+            118
+          ],
+          "C3": [
+            115,
+            207
+          ],
+          "C2": [
+            209,
+            207
+          ],
+          "C1": [
+            271,
+            163
+          ]
+        },
+        "ringO": [
+          209,
+          119
+        ],
+        "branches": {
+          "C4up": "H",
+          "C4down": "OH",
+          "C5up": "CH₂OH (anchor C)",
+          "C5down": "H",
+          "C3up": "OH",
+          "C3down": "H",
+          "C2up": "H",
+          "C2down": "OH",
+          "C1up": "H",
+          "C1downright": "bridgeO"
+        },
+        "CH2OHnear": [
+          146,
+          75
+        ]
+      },
+      {
+        "vertices": {
+          "C4": [
+            339,
+            163
+          ],
+          "C5": [
+            399,
+            118
+          ],
+          "C3": [
+            399,
+            207
+          ],
+          "C2": [
+            493,
+            207
+          ],
+          "C1": [
+            555,
+            163
+          ]
+        },
+        "ringO": [
+          493,
+          119
+        ],
+        "branches": {
+          "C4up": "H",
+          "C4downleft": "bridgeO",
+          "C5up": "CH₂OH (anchor C)",
+          "C5down": "H",
+          "C3up": "OH",
+          "C3down": "H",
+          "C2up": "H",
+          "C2down": "OH",
+          "C1up": "H",
+          "C1downright": "bridgeO"
+        },
+        "CH2OHnear": [
+          430,
+          75
+        ]
+      },
+      {
+        "vertices": {
+          "C4": [
+            624,
+            162
+          ],
+          "C5": [
+            684,
+            118
+          ],
+          "C3": [
+            684,
+            207
+          ],
+          "C2": [
+            777,
+            207
+          ],
+          "C1": [
+            839,
+            162
+          ]
+        },
+        "ringO": [
+          777,
+          118
+        ],
+        "branches": {
+          "C4up": "H",
+          "C4downleft": "bridgeO",
+          "C5up": "CH₂OH (anchor C)",
+          "C5down": "H",
+          "C3up": "OH",
+          "C3down": "H",
+          "C2up": "H",
+          "C2down": "OH",
+          "C1up": "H",
+          "C1down": "OH"
+        },
+        "CH2OHnear": [
+          715,
+          75
+        ]
+      }
+    ],
+    "bridgeO": [
+      {
+        "center": [
+          304,
+          188
+        ],
+        "from": "ring1C1 diagonaldownright",
+        "to": "ring2C4 diagonalup right"
+      },
+      {
+        "center": [
+          589,
+          188
+        ],
+        "from": "ring2C1 diagonaldownright",
+        "to": "ring3C4 diagonalup right"
+      }
+    ],
+    "frontStyle": "6 tapered diagonals total (C4->C3 andC1->C2 each ring) widen toward frontvertices;3bold horizontalC3-C2. Rear bonds thin uniform.",
+    "brackets": {
+      "left": {
+        "verticalX": 323,
+        "topY": 48,
+        "bottomY": 274,
+        "hooksRightToX": 340
+      },
+      "right": {
+        "verticalX": 575,
+        "topY": 48,
+        "bottomY": 274,
+        "hooksLeftToX": 558
+      },
+      "contents": "ONLY middle ring including itsCH2OH/H/OH; left bridgeO304 andrightbridgeO589 outside. Verticalbrackets cross incoming/outgoing diagonal single bonds.",
+      "subscript": "1000",
+      "subscriptNear": [
+        601,
+        275
+      ],
+      "noSpace": "1000 literal, not1 000 or n"
+    },
+    "counts": {
+      "Hstandalone": 15,
+      "OHlabels": 8,
+      "CH2OHlabels": 3,
+      "ringO": 3,
+      "bridgeO": 2,
+      "Ototal": 16,
+      "taper": 6,
+      "boldHorizontal": 3,
+      "carbonNumbersPrinted": 0,
+      "caption": 0
+    },
+    "terminalGroups": "leftmostC4OHdown/rightmostC1OHdown, no ellipsis/endO beyondOH"
+  },
+  "cautions": [
+    "Do not add C numbers from analysis.",
+    "No alias to angled chains/bracketn or different explicitH.",
+    "No interpretation/answerX."
+  ],
+  "status": "Đạt exact SVG sau actual review",
+  "actualReview": {
+    "i": 506,
+    "hashSvg": "2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x mở full; đối chiếu nativefull2x/front5x/bracket3x và hai public refs. Đủ18C/15H/8OH/3CH2OH/16O,3ringO/2bridgeO và mọi hướng H/OH đúng;6TAPER3bold giữ nguồn. Brackets ONLYmiddle không ôm bridgeO, vị trí crossing bonds đúng, subscript1000 nguyên văn không thêm n/space. Các labels/bonds gaps rõ, không chạm/cắt/tràn/giảiX.",
+    "actualSvgReviewed": true,
+    "byteSvg": 28520,
+    "render": "/workspace/scratch/polymer506-237-2953dfe5-chromium.png",
+    "sourceHash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64"
+  }
+}

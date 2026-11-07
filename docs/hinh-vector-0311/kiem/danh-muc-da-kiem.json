@@ -2521,6 +2521,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64": {
+      "tep": "polymer-1000-ddh-2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0.svg",
+      "hashSvg": "2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0",
+      "byteSvg": 28520,
+      "byteGzip": 1895,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a7d554899fc246f3df01f53c36716d273fa9f48e59d75c7946e3a51ae5295283": {
       "tep": "hoi-luu-ddh-9a718aace019c4f85124115e174899f39d72e2ee2131739983b4f72d1d40bb60.svg",
       "hashSvg": "9a718aace019c4f85124115e174899f39d72e2ee2131739983b4f72d1d40bb60",
@@ -12605,6 +12614,20 @@
       ]
     },
     {
+      "qid": "12-KT-C123-D2-I-11",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+          "where": "12-KT-C123-D2-I-11.hinh.0.du_lieu",
+          "hashDataUrl": "a4851a643e8336c7a2cb35ab7d53439186954fae13eaf88e43db3c46e89d5b6a",
+          "vector": "polymer-1000-ddh-2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C1234-D1-I-3",
       "duMoiHinh": true,
       "soHinhNguon": 5,
@@ -18139,6 +18162,20 @@
           "where": "DB-12-B5-D2-III-165.hinh.0.du_lieu",
           "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c",
           "vector": "disaccharide-stereo-ddh-fbe6f74d069444f3c3591eb5c1d606118eaee8ad58589d6f5f403af0bc41767c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-188",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "5d7646e610ca22a24a3b003a3dff78ed42fe218eaadcaa097bb8f51349dd4d64",
+          "where": "DB-12-B5-D2-I-188.hinh.0.du_lieu",
+          "hashDataUrl": "a4851a643e8336c7a2cb35ab7d53439186954fae13eaf88e43db3c46e89d5b6a",
+          "vector": "polymer-1000-ddh-2953dfe50951d724b806fe3e14f99a6e90f334fd6e6757b43ab350bce84218c0.svg"
         }
       ]
     },
@@ -26717,6 +26754,7 @@
     "12-KT-C123-D2-I-2",
     "12-KT-C123-D2-I-8",
     "12-KT-C123-D2-I-10",
+    "12-KT-C123-D2-I-11",
     "12-KT-C1234-D1-I-3",
     "12-KT-C1234-D1-I-10",
     "12-KT-C1234-D1-I-15",
@@ -27054,6 +27092,7 @@
     "DB-12-B5-D2-II-52",
     "DB-12-B5-D2-III-55",
     "DB-12-B5-D2-III-165",
+    "DB-12-B5-D2-I-188",
     "DB-12-B5-D2-I-217",
     "DB-12-B5-D2-II-222",
     "DB-12-B5-D2-I-224",
