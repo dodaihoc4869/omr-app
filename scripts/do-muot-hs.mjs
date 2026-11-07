@@ -40,7 +40,7 @@ const RA = arg('ra', '')
 const MAY_CHU_MS = Number(arg('may-chu-ms', '60'))
 // Luồng NDJSON (chấm nhanh «Kiểm tra» 28/10): dòng 1 đi sau DONG1_MS, dòng cuối sau MAY_CHU_MS (máy chủ giả: dòng 1 = chấm từ bộ nhớ, dòng cuối = sau các đợt D1).
 const DONG1_MS = Number(arg('dong1-ms', '10'))
-const MAN = { width: 360, height: 740 }
+const _kh = arg('khung', '360x740').split('x').map(Number); const MAN = { width: _kh[0], height: _kh[1] } // --khung=1280x800 (đo khổ rộng)
 const MANG_GIA_DS = {
   // DevTools «Fast 3G» (= «Slow 4G» của Lighthouse): 562,5 ms RTT, 1,44 Mb/s xuống.
   fast3g: { offline: false, latency: 562.5, downloadThroughput: (1.6 * 1024 * 1024 * 0.9) / 8, uploadThroughput: (750 * 1024 * 0.9) / 8 },
