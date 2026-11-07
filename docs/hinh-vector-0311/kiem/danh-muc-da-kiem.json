@@ -307,6 +307,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d": {
+      "tep": "pvc-tuan-hoan-ddh-43047cf7592b384a00e5fefad55bbf3012a3eb0c5068a2c1241a0d7db30ba35b.svg",
+      "hashSvg": "43047cf7592b384a00e5fefad55bbf3012a3eb0c5068a2c1241a0d7db30ba35b",
+      "byteSvg": 26929,
+      "byteGzip": 3208,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "831d51e3deec870a02f7ebb5f1f2197152fa2cb7e9ebf86e86c5df24be45148f": {
       "tep": "soi-ddh-d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527.svg",
       "hashSvg": "d1a88ece6af784f7df5ccb98c86c45ab87ec5a72bae6cdf7d3b42a432f1fb527",
@@ -2963,10 +2972,10 @@
       "font": "DDH Rounded"
     },
     "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626": {
-      "tep": "bang-lysine-ddh-cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056.svg",
-      "hashSvg": "cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056",
-      "byteSvg": 42363,
-      "byteGzip": 8401,
+      "tep": "bang-lysine-ddh-585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687.svg",
+      "hashSvg": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687",
+      "byteSvg": 43954,
+      "byteGzip": 9073,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -11624,7 +11633,7 @@
           "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
           "where": "12-C3-B9-D1-I-97.hinh.0.du_lieu",
           "hashDataUrl": "e0d212ab463dae23e2de3bd753cd84ff96e6f9dabc5332774f7f96b08a057865",
-          "vector": "bang-lysine-ddh-cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056.svg"
+          "vector": "bang-lysine-ddh-585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687.svg"
         }
       ]
     },
@@ -13969,6 +13978,20 @@
           "where": "12-KT-C4-D4-II-2.hinh.0.du_lieu",
           "hashDataUrl": "65f0769e64d52c4d247d3fea05081acd635431d23b1875dec5cd21d00a307203",
           "vector": "phenolic-vong-tron-ddh-a33359c682150e76bf60be99f2c5edbaa4732f0fda45483ad49ddb45bd35cb13.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D4-III-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d",
+          "where": "12-KT-C4-D4-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "b09a7d2d5474852bc1b43abbec30db67f059fbc773df64a2bb165d9d2454fb0e",
+          "vector": "pvc-tuan-hoan-ddh-43047cf7592b384a00e5fefad55bbf3012a3eb0c5068a2c1241a0d7db30ba35b.svg"
         }
       ]
     },
@@ -18978,7 +19001,7 @@
           "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
           "where": "DB-12-B9-P1-D1-I-63.hinh.0.du_lieu",
           "hashDataUrl": "e0d212ab463dae23e2de3bd753cd84ff96e6f9dabc5332774f7f96b08a057865",
-          "vector": "bang-lysine-ddh-cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056.svg"
+          "vector": "bang-lysine-ddh-585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687.svg"
         }
       ]
     },
@@ -27536,6 +27559,7 @@
     "12-KT-C4-D2-III-6",
     "12-KT-C4-D4-I-14",
     "12-KT-C4-D4-II-2",
+    "12-KT-C4-D4-III-4",
     "12-KT-C4-D3-II-1",
     "12-KT-C4-D5-I-1",
     "12-KT-C4-D5-II-2",

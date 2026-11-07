@@ -1,0 +1,36 @@
+{
+  "hashNguon": "5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d",
+  "questions": [
+    {
+      "qid": "12-KT-C4-D4-III-4",
+      "de": "Trong công nghiệp, poly(vinyl chloride) được sản xuất từ ethylene và chlorine theo sơ đồ trong hình dưới đây.\nGiả thiết lượng Cl₂ bị thất thoát là 2% thì khối lượng Cl₂ cần lấy để sản xuất được 10 tấn PVC là m tấn.\nGiá trị m bằng bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+      "refs": [
+        {
+          "hash": "5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d",
+          "where": "12-KT-C4-D4-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "b09a7d2d5474852bc1b43abbec30db67f059fbc773df64a2bb165d9d2454fb0e"
+        }
+      ]
+    }
+  ],
+  "canvas": [
+    1459,
+    289
+  ],
+  "arrowheads": {
+    "right": 3,
+    "up": 1
+  },
+  "feedback": "HClUtoCl2",
+  "conditions": [
+    "t°",
+    "xt, t°",
+    "+ O₂, t°",
+    "- H₂O"
+  ],
+  "verticalClBonds": 3,
+  "parenthesesPairs": 1,
+  "subscript": "n",
+  "nativeRead": "FULL và zoom",
+  "proof": "cau-truc-pvc-tuan-hoan-ddh-lo-258-soat-doc-lap.json"
+}

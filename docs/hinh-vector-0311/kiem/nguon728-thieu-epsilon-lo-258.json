@@ -1,0 +1,21 @@
+{
+  "hashNguon": "900539346bfefe7ed0f249dffd9090c64ee229c07e12556927dfae8a656b425e",
+  "daMoNativeFull": true,
+  "questions": [
+    {
+      "qid": "12-KT-C4-D3-I-7",
+      "de": "Polycaproamide được tổng hợp theo phản ứng trong hình dưới đây. Polycaproamide được điều chế bằng phản ứng",
+      "refs": [
+        {
+          "hash": "900539346bfefe7ed0f249dffd9090c64ee229c07e12556927dfae8a656b425e",
+          "where": "12-KT-C4-D3-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "d9a5f248d702feaf95771466ed0050cb88bcf7662561b28b6590f0d16380be2f"
+        }
+      ]
+    }
+  ],
+  "fontHash": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+  "glyphMissing": "ε U+03B5",
+  "ketQua": "Chưa đạt/chưa dựng: caption ε-aminocaproic acid cần epsilon thiếu trong font V5 app; không fallback hoặc tự đổi chữ,khôngmanifest/khôngcount.",
+  "actualSvgReviewed": false
+}

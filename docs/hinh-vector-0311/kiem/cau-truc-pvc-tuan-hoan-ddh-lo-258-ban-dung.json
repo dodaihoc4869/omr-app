@@ -1,0 +1,29 @@
+[
+  {
+    "i": 726,
+    "hash": "5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d",
+    "fileNguon": "anh/5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d.png",
+    "svg": "pvc-tuan-hoan-ddh-43047cf7592b384a00e5fefad55bbf3012a3eb0c5068a2c1241a0d7db30ba35b.svg",
+    "hashSvg": "43047cf7592b384a00e5fefad55bbf3012a3eb0c5068a2c1241a0d7db30ba35b",
+    "byteSvg": 26929,
+    "font": "DDH Rounded",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D4-III-4",
+        "de": "Trong công nghiệp, poly(vinyl chloride) được sản xuất từ ethylene và chlorine theo sơ đồ trong hình dưới đây.\nGiả thiết lượng Cl₂ bị thất thoát là 2% thì khối lượng Cl₂ cần lấy để sản xuất được 10 tấn PVC là m tấn.\nGiá trị m bằng bao nhiêu? (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "hash": "5bd4cc64541874682e78f567ab7abdda233a3af621d116db593f3daef68b2b2d",
+            "where": "12-KT-C4-D4-III-4.hinh.0.du_lieu",
+            "hashDataUrl": "b09a7d2d5474852bc1b43abbec30db67f059fbc773df64a2bb165d9d2454fb0e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3RIGHTarrows1UPfeedback/HClreturnUtoCl2/+O2,t°abovebottomline/-H2Obelow/3verticalClbonds/1roundpair+nsub/literalCH2=CH2+Cl2→CH2CH2→HCl+CH2=CHCl→polymer/noextra coeff-answer.",
+    "hashSvgDaSoat": "43047cf7592b384a00e5fefad55bbf3012a3eb0c5068a2c1241a0d7db30ba35b",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
