@@ -64,3 +64,30 @@ html[data-trong='hs'] :is(.kb-cta, .duo .duo-nut, .kb-chip, .tp-tr-o, .duo-dong,
 html[data-trong='hs'] .tr-menu-ds { overflow: hidden !important; }
 html[data-trong='hs'] .tr-menu-ds > .tr-menu-muc { border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
 html[data-trong='hs'] .tr-menu-ds > .tr-menu-muc:not(:last-child) { box-shadow: 0 1px 0 var(--kt-net) !important; }
+/* 07/11 thầy «các hàng hơi dính nhau»: mỗi hàng Việc hôm nay đã là một viên kính riêng ⇒ cách nhau 8px, bỏ vạch ngăn cũ (vạch nằm sát mép viên kính trông như dính) */
+html[data-trong='hs'] .kb-viec-ds { gap: 8px !important; }
+html[data-trong='hs'] .kb-o + .kb-o { box-shadow: none !important; }
+/* ── MŨI NHỌN BONG BÓNG (thầy 07/11 «sửa những cái mũi tên này cho đồng nhất với bong bóng, sửa ở mọi chỗ xuất hiện») ──
+   Mũi cũ = ô vuông xoay đặc, viền 2px ⇒ trên thân kính 1px thành HÌNH THOI khác màu đè lên thân. Nay mọi mũi (Mol góc trên · Mol cạnh đường mọi hướng ·
+   Mol trên Lộ trình · đề cạnh giám thị): CÙNG mặt (màu thân + vệt sáng mép trái) + CÙNG khung mảnh với thân; CHỈ vẽ NỬA NGOÀI (cắt chéo, lấn 3px qua khung
+   thân để che mép) ⇒ liền một khối. Bong bóng Mol cạnh đường + trên Lộ trình theo luôn chuẩn kính mảnh như Mol góc trên. */
+html[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx] { border-width: 1px !important; background: var(--kt-loe), color-mix(in oklab, var(--bb-nen, var(--tr-mat)) 90%, transparent) !important;
+  box-shadow: var(--kt-mep), 0 10px 22px -14px color-mix(in oklab, var(--bb-vien, var(--tr-vien)) 70%, transparent) !important; }
+html[data-trong='hs'] .bi-loi-boc:not([data-ben]) .bi-loi-bong:not(.kb-mol-bong) { border: 0 !important; background: var(--kt-nen) !important; box-shadow: var(--kt-khung) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:not(:is([data-cx='nghi'], [data-cx='ngu'], [data-cx='buon']))::before,
+html[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx]::before,
+html[data-trong='hs'] .bi-loi-boc:not([data-ben]) .bi-loi-bong:not(.kb-mol-bong)::before,
+html[data-trong='hs'] .duo-gt-bong::before {
+  --kt-duoi: color-mix(in oklab, var(--tr-hs-tren) calc(var(--kt-s) * .55), transparent);
+  border-top: 0 !important; border-right: 0 !important; border-left-width: 1px !important; border-bottom-width: 1px !important; border-radius: 0 0 0 3px !important;
+  background: linear-gradient(var(--kt-duoi), var(--kt-duoi)), color-mix(in oklab, var(--bb-nen, var(--tr-mat)) 90%, transparent) !important;
+  clip-path: polygon(0 0, 3px 0, 100% calc(100% - 3px), 100% 100%, 0 100%) !important; }
+html[data-trong='hs'] .bi-loi-boc:not([data-ben]) .bi-loi-bong:not(.kb-mol-bong)::before, html[data-trong='hs'] .duo-gt-bong::before { border-color: var(--kt-net) !important;
+  background: linear-gradient(var(--kt-duoi), var(--kt-duoi)), linear-gradient(color-mix(in oklab, var(--tr-hs) var(--kt-a), transparent), color-mix(in oklab, var(--tr-hs) var(--kt-a), transparent)), color-mix(in oklab, var(--tr-mat) var(--kt-mat), transparent) !important; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='cau'], [data-cx='ratCau'])::before { border-left-width: 2px !important; border-bottom-width: 2px !important; }
+html[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong:is([data-cx='cau'], [data-cx='ratCau']) { border-width: 2px !important; }
+html[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong:is([data-cx='cau'], [data-cx='ratCau'])::before { border-left-width: 2px !important; border-bottom-width: 2px !important; }
+/* nghĩ / ngủ (hai chấm mây) và buồn (giọt nước) giữ HÌNH riêng, nhưng cùng khung mảnh 1px + cùng mặt kính; giọt nước dời ra ngoài, chỉ chạm mép thân (không đè lên thân) */
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu'], [data-cx='buon'])::before,
+html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu'])::after { border-width: 1px !important; background: var(--kt-loe), color-mix(in oklab, var(--bb-nen, var(--tr-mat)) 90%, transparent) !important; }
+html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='buon']::before { left: -15px !important; }
