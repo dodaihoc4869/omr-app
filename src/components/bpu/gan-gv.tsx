@@ -1,20 +1,64 @@
-// BÌNH PHẢN ỨNG — GẮN BẢNG CHIẾU KHI THẦY BẤM P «Cả lớp làm» TRÊN TỜ CHIẾU (nạp lười từ src/lib/bpu/nghe-to-chieu.ts — không nằm trong khung app thầy).
-// Lấy buổi điểm danh đang mở ⇒ mở bảng đè lên tờ chiếu và mở lượt cho câu đang chiếu; bấm P lần nữa (câu khác) ⇒ lượt mới trên cùng bảng.
+// BÌNH PHẢN ỨNG — GẮN BẢNG CHIẾU TỪ TỜ CHIẾU (nạp lười từ src/lib/bpu/nghe-to-chieu.ts — không nằm trong khung app thầy).
+// Tờ vào đợt mới (TỰ ĐỘNG, thầy 07/11) hoặc thầy bấm P ⇒ lấy buổi điểm danh đang mở ⇒ mở bảng đè lên tờ và mở lượt cho câu đang chiếu (giây ước tính của câu).
+// Bảng bấm «Câu tiếp» / ← → ⇒ nhắn ngược tờ đổi đợt ⇒ tờ báo câu mới ⇒ lượt mới trên cùng bảng.
+// Tin tự động mà không có buổi đang mở / phòng không mở được / câu không gửi được ⇒ KHÔNG che tờ: đóng bảng, báo một lần, thầy chữa trên tờ như thường.
 import { createRoot, type Root } from 'react-dom/client'
-import { buoiDangMo } from '../../lib/buoi-hoc-api'
+import { buoiDangMo, type BuoiHoc } from '../../lib/buoi-hoc-api'
 import { useAppStore } from '../../store/appStore'
 import BangBinhPhanUng from './BangBinhPhanUng'
 
 let goc: Root | null = null
 let khung: HTMLDivElement | null = null
 let dem = 0
+let nguonTo: Window | null = null
+/** Buổi đang mở đọc gần nhất (tin tự động mỗi lần chuyển câu ⇒ không hỏi máy chủ mỗi đợt). */
+let buoiNho: { ds: BuoiHoc[]; luc: number } | null = null
+/** Phòng không mở được / máy chủ tắt ⇒ tạm không tự mở lại tới mốc này (thầy vẫn bấm P được). Thầy đóng bảng (Esc) thì không nghỉ: tờ chỉ báo khi ĐỔI câu. */
+let nghiDen = 0
+const NHO_BUOI_MS = 60_000
+const GAN_DAY_MS = 4 * 3_600_000
 
-export async function moBangTuToChieu(qid: string): Promise<void> {
-  const r = await buoiDangMo()
-  const buoi = r.ok ? r.du[0] : undefined
-  if (!buoi) { useAppStore.getState().showToast(r.ok ? 'Chưa có buổi điểm danh đang mở. Thầy mở Điểm danh trước, các em vào lớp bằng mã rồi bấm P.' : r.chu, 'warn'); return }
+async function layBuoi(tuDong: boolean): Promise<string | null> {
+  let ds = tuDong && buoiNho && Date.now() - buoiNho.luc < NHO_BUOI_MS ? buoiNho.ds : null
+  if (!ds) {
+    const r = await buoiDangMo()
+    if (!r.ok) { if (!tuDong) useAppStore.getState().showToast(r.chu, 'warn'); return null }
+    ds = r.du
+    buoiNho = { ds, luc: Date.now() }
+  }
+  // Tin TỰ ĐỘNG chỉ theo buổi mở trong 4 giờ gần nhất: thầy quên kết thúc buổi sáng thì tối chiếu lớp khác KHÔNG đẩy câu xuống máy các em lớp sáng (đang ở nhà).
+  const id = (tuDong ? ds.find((b) => Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id : ds[0]?.id) ?? null
+  if (!id && !tuDong) useAppStore.getState().showToast('Chưa có buổi điểm danh đang mở. Thầy mở Điểm danh trước, các em vào lớp bằng mã.', 'warn')
+  return id
+}
+
+export async function moBangTuToChieu(qid: string, o: { giay?: number; tuDong?: boolean; nguon?: Window | null } = {}): Promise<void> {
+  const tuDong = o.tuDong === true
+  if (tuDong && Date.now() < nghiDen) return
+  const buoiId = await layBuoi(tuDong)
+  if (!buoiId) return
+  if (o.nguon) nguonTo = o.nguon
   dem += 1
   if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
-  goc!.render(<BangBinhPhanUng buoiId={buoi.id} qid={qid} luot={dem} onDong={dongBang} onTat={() => { dongBang(); useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }} />)
+  // Phòng không mở được (ca mở, mất mạng) ⇒ tạm nghỉ tự mở 5 phút; chỉ CÂU này không gửi được ⇒ không nghỉ (câu sau vẫn tự gửi).
+  const khongMo = (chu: string, caPhong: boolean) => { dongBang(); if (caPhong) nghiDen = Date.now() + 5 * 60_000; useAppStore.getState().showToast(chu, 'warn') }
+  goc!.render(
+    <BangBinhPhanUng
+      buoiId={buoiId} qid={qid} luot={dem} giay={o.giay} tuDong={tuDong}
+      onDong={dongBang}
+      onToi={toiCau}
+      onKhongMo={khongMo}
+      onTat={() => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }}
+    />,
+  )
+}
+/** Bảng ⇒ tờ: sang câu sau (d = 1) / câu trước (d = -1). */
+export function toiCau(d: 1 | -1): void {
+  nghiDen = 0
+  try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'toi', d }, '*') } catch { /* tờ đã đóng */ }
+}
+/** Tờ báo đã hết câu theo hướng d. */
+export function baoHetCau(d: 1 | -1): void {
+  useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
 export function dongBang(): void { goc?.unmount(); goc = null; khung?.remove(); khung = null }

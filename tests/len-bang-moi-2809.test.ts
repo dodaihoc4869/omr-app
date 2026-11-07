@@ -352,3 +352,24 @@ describe('thống kê lớp (phím T) — số gộp, không tên em', () => {
     expect(thongKeHtml(null)).toBe('')
   })
 })
+
+describe('BÌNH PHẢN ỨNG TỰ ĐỘNG (thầy 07/11 «bấm chuyển câu … tự gửi xuống máy học sinh»)', () => {
+  it('tờ mở ⇒ báo app câu đầu kèm giây; chuyển câu ⇒ báo câu mới; bảng nhắn «toi» ⇒ tờ sang câu; P = gửi tay', () => {
+    const { w, phim, guiLen } = moTo([o('S1', 'Nguyễn An'), o('S2', 'Trần Bình'), o('S3', 'Lê Chi')], { cauNoi: true })
+    const bpu = () => guiLen.filter((m) => m.loai === 'bpu')
+    expect(bpu()).toHaveLength(1)
+    expect(bpu()[0]).toMatchObject({ nguon: 'to-chieu', qid: 'DE-I-S1', tuDong: true })
+    expect(Number(bpu()[0]!.giay)).toBeGreaterThan(0)
+    phim('ArrowRight')
+    expect(bpu().at(-1)).toMatchObject({ qid: 'DE-I-S2', tuDong: true })
+    const truoc = bpu().length
+    w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'toi', d: 1 }, source: w.parent as unknown as MessageEventSource }))
+    expect(bpu().at(-1)).toMatchObject({ qid: 'DE-I-S3' })
+    expect(bpu().length).toBe(truoc + 1)
+    // Hết câu ⇒ tờ báo app, không gửi lại câu cũ.
+    w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'toi', d: 1 }, source: w.parent as unknown as MessageEventSource }))
+    expect(guiLen.at(-1)).toMatchObject({ loai: 'bpu-het', d: 1 })
+    phim('p')
+    expect(bpu().at(-1)).toMatchObject({ qid: 'DE-I-S3', tuDong: false })
+  })
+})

@@ -76,8 +76,10 @@ describe('bảng chiếu', () => {
     expect(await screen.findByText('Đang làm trên bảng')).toBeTruthy()
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
     expect(await screen.findByText('Đáp án')).toBeTruthy()
+    // 07/11: không còn phím X «Kết thúc buổi chơi» (một chỗ kết thúc: «Kết thúc buổi học»); V mở vinh danh.
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'x' })) })
-    expect(ws.gui.some((t) => t.includes('ket-thuc'))).toBe(true)
+    expect(ws.gui.some((t) => t.includes('ket-thuc'))).toBe(false)
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'v' })) })
     expect(await screen.findByText('Vô địch buổi hôm nay')).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/tinh thể|Cần kèm/)
   })
@@ -89,5 +91,21 @@ describe('bảng chiếu', () => {
     expect(screen.getByText('Vào lớp: mở app, nhập mã')).toBeTruthy()
     await waitFor(() => expect(onTat).toHaveBeenCalled())
     traMo.v = { ok: true, du: { ok: true, ve: 've-thay' } }
+  })
+  it('chuyển câu: → và nút «Câu tiếp» báo tờ sang câu sau; lưới hiện tên gọi đủ chữ', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    const onToi = vi.fn()
+    render(<Bang buoiId="b1" qid="q1" luot={1} giay={150} tuDong onDong={() => {}} onToi={onToi} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const st = phong(); moLuot(st, cau, T0); WsGia.ds[0]!.nhan(viewBang(st))
+    expect(await screen.findByText(/em đã gửi/)).toBeTruthy()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' })) })
+    expect(onToi).toHaveBeenLastCalledWith(1)
+    act(() => { screen.getByRole('button', { name: /Câu tiếp/ }).click() })
+    expect(onToi).toHaveBeenCalledTimes(2)
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' })) })
+    expect(onToi).toHaveBeenLastCalledWith(-1)
+    const o = document.querySelector('.bb-o .ten')!
+    expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
   })
 })

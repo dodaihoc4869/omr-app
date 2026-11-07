@@ -19,8 +19,15 @@ declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: strin
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
 export const DUONG_PHONG_BPU = '/bpu/phong'
-/** Phòng tự kết thúc + ghi kết quả sau 45 phút không ai thao tác. */
-export const NGHI_MS = 45 * 60_000
+/** Phòng SỐNG CÙNG BUỔI (thầy 07/11 «giữ nguyên … cho đến khi tôi bấm kết thúc buổi học»): chỉ tự kết thúc khi thầy không thao tác 24 giờ
+ *  (= hạn buổi `HAN_BUOI_MS`). Trước đây 45 phút ⇒ thầy giảng lâu là phòng đóng, mở lại mất kJ / lượt / «vừa vào lớp». */
+export const NGHI_MS = 24 * 3_600_000
+/** Lượt chưa mở đáp án quá hạn trả lời + 15 phút ⇒ phòng tự mở đáp án (máy em không bị giữ ở màn làm khi thầy quên). */
+export const TU_MO_MS = 15 * 60_000
+/** Giờ trả lời mỗi câu (thầy 07/11 «thời gian tự tính chuẩn cho từng câu, tối đa 3 phút»): kẹp 60–180 giây; không gửi ⇒ 90 giây. */
+export const kepGiay = (v: unknown): number => { const n = Math.round(Number(v)); return Number.isFinite(n) && n > 0 ? Math.max(60, Math.min(180, n)) : 90 }
+/** Mốc phòng tự mở đáp án của lượt đang làm. */
+const mocTuMo = (l: { han: number | null; batDau: number }): number => (l.han ?? l.batDau + 180_000) + TU_MO_MS
 export const HAN_VE_BPU_MS = 6 * 3_600_000
 export const bpuBat = (env: Env): boolean => !!env.PHONG_BPU && !env.TAT_BPU && !!env.MA_BI_MAT
 
@@ -99,7 +106,7 @@ export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
   if (!bpuBat(env)) return { ok: false, lyDo: 'tat', error: 'Bình Phản Ứng đang tắt.' }
   const buoiId = buoiHop(b.buoiId), qid = str(b.qid).trim().slice(0, 200)
   if (!buoiId || !qid) return { ok: false, error: 'Thiếu buổi hoặc câu.' }
-  const hanGiay = Math.max(0, Math.min(600, Math.round(Number(b.hanGiay) || 0)))
+  const hanGiay = kepGiay(b.hanGiay)
   // Đọc SONG SONG (không thêm vòng chờ nối tiếp): câu · câu bảo vệ · em đang thi · lớp của buổi + lớp các em có mặt · ca đang mở.
   const [dong, phucVu, dangThi, buoiR, lopEmR, caR] = await Promise.all([
     env.DB.prepare(`SELECT q.json AS json ${TU_CHI_MUC_GAME} LIMIT 1`).bind(JSON.stringify([qid])).first<Row>(),
@@ -189,12 +196,19 @@ export class PhongBinhPhanUng {
     if (this.st === undefined) this.st = (await this.ctx.storage.get<L.TrangThaiPhong>('st')) ?? null
     return this.st
   }
-  /** Lưu trạng thái; `henNghi` = việc của THẦY (mở phòng, mở lượt, lệnh bảng) ⇒ hẹn lại mốc tự kết thúc 45 phút. Việc của em (gửi, rời màn, tiếp sức) KHÔNG
-   *  kéo dài phòng — thầy quên đóng thì phòng vẫn tự kết thúc, máy em không bị giữ. */
+  /** Lưu trạng thái; `henNghi` = việc của THẦY (mở phòng, mở lượt, lệnh bảng) ⇒ hẹn lại: lượt đang làm ⇒ mốc tự mở đáp án; không ⇒ mốc tự kết thúc 24 giờ.
+   *  Việc của em (gửi, rời màn, tiếp sức) KHÔNG kéo dài phòng. */
   private async luu(henNghi = true): Promise<void> {
     if (!this.st) return
     await this.ctx.storage.put('st', this.st)
-    if (henNghi && !this.st.ketThuc) await this.ctx.storage.setAlarm(Date.now() + NGHI_MS)
+    if (henNghi && !this.st.ketThuc) await this.ctx.storage.setAlarm(this.st.luot && this.st.luot.pha !== 'mo' ? mocTuMo(this.st.luot) : Date.now() + NGHI_MS)
+  }
+  /** Lượt đang làm chưa mở đáp án ⇒ mở + xếp ghi (thầy chuyển câu thẳng, hoặc quá mốc tự mở). */
+  private async chotLuot(st: L.TrangThaiPhong, nay: number): Promise<boolean> {
+    if (!st.luot || st.luot.pha === 'mo') return false
+    const doi = L.moDapAn(st, nay, chamSo)
+    if (doi) await this.xepGhi(st)
+    return doi
   }
   private gui(ws: WsMayChu, d: string): void { try { ws.send(d) } catch { /* kết nối vừa đóng */ } }
   private phat(): void {
@@ -277,6 +291,8 @@ export class PhongBinhPhanUng {
       return json({ ok: co })
     }
     if (u.pathname === '/luot') {
+      // Thầy chuyển câu khi lượt trước chưa mở đáp án ⇒ chốt lượt trước (chấm, cộng kJ, ghi) rồi mới mở lượt mới — không mất điểm của các em.
+      await this.chotLuot(st, nay)
       const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null }, nay)
       await this.luu(); this.phat()
       return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })
@@ -320,5 +336,18 @@ export class PhongBinhPhanUng {
 
   async webSocketClose(): Promise<void> { /* rời màn do máy em tự báo; mất mạng không bị tính */ }
   async webSocketError(): Promise<void> { /* như trên */ }
-  async alarm(): Promise<void> { await this.ketThucBuoi() }
+  /** Hẹn giờ: lượt đang làm quá mốc ⇒ tự mở đáp án rồi hẹn mốc 24 giờ; chưa tới mốc ⇒ hẹn lại; không còn lượt mở ⇒ hết 24 giờ không thao tác ⇒ kết thúc. */
+  async alarm(): Promise<void> {
+    const st = await this.doc()
+    if (!st || st.ketThuc) return
+    const nay = Date.now(), l = st.luot
+    if (l && l.pha !== 'mo') {
+      if (nay < mocTuMo(l)) { await this.ctx.storage.setAlarm(mocTuMo(l)); return }
+      await this.chotLuot(st, nay)
+      await this.ctx.storage.put('st', st); this.phat()
+      await this.ctx.storage.setAlarm(nay + NGHI_MS)
+      return
+    }
+    await this.ketThucBuoi()
+  }
 }
