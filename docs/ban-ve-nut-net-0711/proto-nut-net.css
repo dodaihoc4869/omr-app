@@ -1,0 +1,70 @@
+/* BẢN VẼ «NÚT SIÊU NÉT KIỂU DUOLINGO + MÀU TƯƠI HƠN» (07/11) — chỉ chèn khi chụp, chưa vào mã. */
+:root[data-trong='hs'] {
+  --tr-nen: #ffffff;
+  --n-chinh: #6c71ff; --n-chinh-go: #4d4bd1;
+  --n-dung: #00c289; --n-dung-go: #00976b;
+  --n-sai: #f13972; --n-sai-go: #be2357;
+  --n-vien: #e4e4eb; --n-vien-go: #d6d6df;
+  --n-mat: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-trong='hs'] { --tr-nen: #16161f; --n-vien: #3a3a50; --n-vien-go: #272737; --n-mat: #23233a; --n-chinh: #7c80ff; --n-chinh-go: #4d4bd1; }
+}
+html[data-trong='hs'] body { -webkit-font-smoothing: antialiased; }
+
+/* ── NÚT CHÍNH: mặt đặc tươi + GỜ CỨNG 3D (không bóng mờ) ── */
+html[data-trong='hs'] .kb-cta {
+  background: var(--n-chinh) !important; border-radius: 20px !important;
+  box-shadow: 0 6px 0 var(--n-chinh-go) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  transition: transform 80ms, box-shadow 80ms;
+}
+html[data-trong='hs'] .kb-cta:active { transform: translateY(6px); box-shadow: 0 0 0 var(--n-chinh-go) !important; }
+html[data-trong='hs'] .kb-cta * { color: #fff !important; }
+html[data-trong='hs'] .kb-cta b, html[data-trong='hs'] .kb-cta strong { font-weight: 900 !important; letter-spacing: -.01em; }
+
+html[data-trong='hs'] .ht-app .duo-nut {
+  background: var(--n-chinh) !important; color: #fff !important; border-radius: 16px !important; min-height: 54px;
+  box-shadow: 0 5px 0 var(--n-chinh-go) !important; text-transform: uppercase; letter-spacing: .06em; font-weight: 900 !important; font-size: 17px !important;
+}
+html[data-trong='hs'] .ht-app .duo-nut:active { transform: translateY(5px); box-shadow: none !important; }
+html[data-trong='hs'] .duo-ket[data-tt=dung] .duo-nut { background: var(--n-dung) !important; box-shadow: 0 5px 0 var(--n-dung-go) !important; }
+html[data-trong='hs'] .duo-ket[data-tt=sai] .duo-nut { background: var(--n-sai) !important; box-shadow: 0 5px 0 var(--n-sai-go) !important; }
+html[data-trong='hs'] .ht-app .duo-nut:disabled { background: var(--n-vien) !important; color: var(--tr-chu-3) !important; box-shadow: 0 5px 0 var(--n-vien-go) !important; }
+
+/* ── Ô PHƯƠNG ÁN: mặt đặc trắng, viền 2 px nguyên điểm ảnh + gờ 4 px ── */
+html[data-trong='hs'] .duo .ht2-lam-pa:not([data-ket]) {
+  background: var(--n-mat) !important; border: 0 !important; border-radius: 18px !important;
+  box-shadow: inset 0 0 0 2px var(--n-vien), 0 4px 0 var(--n-vien) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+}
+html[data-trong='hs'] .duo .ht2-lam-pa[aria-checked=true] {
+  background: var(--tr-hs-nhat) !important; color: var(--tr-hs-chu) !important;
+  box-shadow: inset 0 0 0 2px var(--n-chinh), 0 4px 0 var(--n-chinh) !important;
+}
+html[data-trong='hs'] .duo .ht2-lam-pa:not([data-ket]) .ht2-lam-pa-ma { border: 2px solid var(--n-vien) !important; border-radius: 10px !important; background: var(--n-mat) !important; box-shadow: none !important; }
+html[data-trong='hs'] .duo .ht2-lam-pa[aria-checked=true] .ht2-lam-pa-ma { border-color: var(--n-chinh) !important; color: var(--n-chinh) !important; }
+
+/* ── NÚT PHỤ / CHIP: mặt đặc, viền 2 px + gờ 3 px ── */
+html[data-trong='hs'] :is(.m3-tb-chuong, .duo-dong, .duo-den, .lg-nut-hoi-thay, .tp-tr-o, .tp-tr-muc, .kb-chip) {
+  background: var(--n-mat) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  box-shadow: inset 0 0 0 2px var(--n-vien), 0 3px 0 var(--n-vien) !important; border: 0 !important;
+}
+
+/* ── THẺ (vẫn kính) nhưng mép NÉT: vòng 2 px + gờ 4 px thay viền 1 px mờ ── */
+html[data-trong='hs'] :is(.kb-hero, div.kb-viec, section.kb-viec) {
+  box-shadow: inset 0 0 0 2px var(--n-vien), 0 4px 0 var(--n-vien) !important;
+}
+html[data-trong='hs'] .kb-dong[aria-current], html[data-trong='hs'] .kb-dong:has(+ *)[data-dang] { box-shadow: inset 0 0 0 2px var(--n-chinh) !important; }
+
+/* ── THANH CÔNG CỤ: mục đang chọn = ô viền 2 px màu chính như Duolingo ── */
+html[data-trong='hs'] .kb-thanh-muc[aria-current='page'], html[data-trong='hs'] .tr-ray-muc[aria-current='page'] {
+  background: var(--tr-hs-nhat) !important; box-shadow: inset 0 0 0 2px var(--n-chinh) !important; color: var(--n-chinh) !important;
+}
+
+/* ── BIỂU TƯỢNG trong nút: nét 2,75 ── */
+html[data-trong='hs'] :is(button, a) svg.lucide { stroke-width: 2.75px !important; }
+
+/* ── SAU KHI NỘP: đúng / sai / phương án khác — giữ màu trạng thái, viền 2 px + gờ 4 px cùng họ màu ── */
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket] { border: 0 !important; border-radius: 18px !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=dung] { background: var(--tr-dung-nhat) !important; box-shadow: inset 0 0 0 2px var(--n-dung), 0 4px 0 var(--n-dung) !important; }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] { background: var(--tr-sai-nhat) !important; box-shadow: inset 0 0 0 2px var(--n-sai), 0 4px 0 var(--n-sai) !important; }
+html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=mo] { background: var(--n-mat) !important; box-shadow: inset 0 0 0 2px var(--n-vien), 0 4px 0 var(--n-vien) !important; }
