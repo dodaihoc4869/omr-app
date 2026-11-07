@@ -39,7 +39,7 @@
   /* NÂNG CẤP THẨM MỸ APP HỌC SINH (bản vẽ ve-moi/nang-cap; thầy 27/10 «Bạn tự chốt sao cho tốt nhất build luôn đi»): tối RIÊNG app học sinh kiểu Duolingo —
      bộ B «Chất chỉ thị», tối đo theo Duolingo 28/10, 07/11 thầy «nền tối theo màu Duolingo dịu mắt» ⇒ xanh than: nền #141e24, thẻ #202f36, viền #37464f, chữ #f1f7fb; màu nhấn giữ bảng tối ở trên (đã rực). CHỈ THÊM (đè theo độ ưu tiên), ít biến nhất có thể
      vì tờ này nằm trong lượt mở cả ba app (luật tốc độ: +≤ 64 byte nén mỗi đường). */
-  :root[data-trong='hs'] { --tr-nen: #141e24; --tr-mat: #202f36; --tr-mat-2: #263840; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #52656d; --tr-chu: #f1f7fb; }
+  :root[data-trong='hs'] { --tr-nen: #131f24; --tr-mat: #202f36; --tr-mat-2: #263840; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #52656d; --tr-chu: #f1f7fb; }
 }
 
 /* ── 1. Màu chính theo vai ─────────────────────────────────────────────────────────────────────────────────────── */

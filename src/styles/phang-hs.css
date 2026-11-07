@@ -282,3 +282,21 @@ html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa:is([data-ket=dung], [data
 @media (prefers-color-scheme: dark) {
   html[data-trong='hs']:not(#_):not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) .ht2-lam-pa-ma { color: var(--tr-trang) !important; }
 }
+
+/* 07/11 thầy (ảnh Duolingo) «nền bên trong các khung giữ nguyên nền của toàn trang, vẽ xung quanh khung như Duolingo»: đo ảnh — trong khung = nền trang,
+   viền 2px màu viền (Duolingo swan = --tr-vien), bo 16, khung cách nhau 16. Mọi KHUNG + ô đáp án: nền trong suốt + viền 2px; ô đang chọn / đúng / sai:
+   viền đổi màu + tô nhạt bên trong (không vòng chồng). Nút tô màu, bong bóng Mol theo cảm xúc, chip giữ nguyên. */
+html[data-trong='hs']:not(#_):not(#_) :is(.kb-hero, section.kb-viec, div.kb-viec, .kb-the-ruong, .tr-dd, .da-bang, .dm-the, .duo .ht2-lam-ds, .duo .ht2-lam-the, .m3-phong .vtf,
+  .tr-menu-ds, .duo-ket-the, .vh-man, .da-ban, .bi-loi-bong:not(.kb-mol-bong), .duo .ht2-lam-de, .duo-kt-thi .ht2-lam-de, .duo-gt-bong) {
+  background: transparent !important; border: 2px solid var(--tr-vien) !important; border-radius: 16px !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-gt-bong .ht2-lam-de { border: 0 !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-gt-bong::before { background: var(--tr-nen) !important; border-left: 2px solid var(--tr-vien) !important; border-bottom: 2px solid var(--tr-vien) !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa) { background: transparent !important; border: 2px solid var(--tr-vien) !important; border-radius: 16px !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) { background: var(--tr-hs-nhat) !important; border-color: var(--tr-hs-nut) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa[data-ket=dung] { background: var(--tr-dung-nhat) !important; border-color: var(--tr-dung-nut) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa[data-ket=sai] { background: var(--tr-sai-nhat) !important; border-color: var(--tr-sai) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa:not([data-ket]):not([aria-checked='true']) .ht2-lam-pa-ma { background: transparent !important; border: 2px solid var(--tr-vien) !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.kb-viec, .tr-menu-ds) { overflow: hidden; }
+/* khung đề chữ L quanh giám thị (SVG): cũng chỉ viền 2px, trong = nền trang */
+html[data-trong='hs']:not(#_):not(#_) .duo-gt-vien path { fill: transparent !important; stroke: var(--tr-vien) !important; stroke-width: 2px !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-gt-san[data-l] .duo-gt-bong { border-color: transparent !important; }

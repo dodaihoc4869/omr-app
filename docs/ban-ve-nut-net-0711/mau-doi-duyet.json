@@ -379,6 +379,12 @@
    "khai": "background: var(--tr-dung-nhat) !important",
    "n": 1,
    "ly_do": "07/11 thầy (ảnh Duolingo) «đúng sai chỉ đổi màu chữ, giữ nguyên nền»: dải kết quả nền thẻ trung tính"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-nen: #141e24",
+   "n": 1,
+   "ly_do": "07/11 khuya thầy «vào hẳn trang Duolingo đo chính xác màu nền»: bảng màu chính thức trong mã Duolingo — snow tối #131f24"
   }
  ]
 }
