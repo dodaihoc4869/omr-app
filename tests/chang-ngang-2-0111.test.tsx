@@ -63,7 +63,7 @@ describe('luật hai cột — một nguồn, không khe', () => {
   })
   it('mọi @media của trong-chang-ngang.css chỉ bật TRONG vùng hai cột (dọc không đổi); hai bậc thấp ≤ 500 | cao > 500 phủ kín vùng hai cột', () => {
     const ds = cacMedia(CSS)
-    expect(ds.length).toBeGreaterThanOrEqual(6)
+    expect(ds.length).toBeGreaterThanOrEqual(4) // 07/11: cao > 500 gộp một khối một cột (bỏ bậc 1100 / 1700)
     const thap = ds.find((m) => m.endsWith('(max-height: 500px)'))!, cao = ds.find((m) => m.includes('(min-height: 501px)') && !m.includes('1100px'))!
     const ratThap = ds.find((m) => m.endsWith('(max-height: 380px)'))!
     expect([thap, cao, ratThap].every(Boolean)).toBe(true)

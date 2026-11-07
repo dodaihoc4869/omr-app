@@ -58,7 +58,7 @@ export function TroGiupDuo({ children }: { children: ReactNode }) {
     <div ref={goc} className="duo-tg" hidden={!co}>
       <button ref={nutTg} type="button" className="duo-den" aria-label={coGoi && !daXem ? 'Trợ giúp, có gợi ý chưa xem' : 'Trợ giúp'} aria-expanded={mo} aria-controls={id}
         data-moi={(coGoi && !daXem) || undefined} onClick={() => { phanHoi('chon'); setMo((v) => !v) }}>
-        <Lightbulb size={22} aria-hidden="true" />
+        <Lightbulb size={22} aria-hidden="true" /><span className="duo-tg-chu" aria-hidden="true">Trợ giúp</span>
       </button>
       {/* chọn một mục ⇒ mục chạy việc của nó (cùng lượt sự kiện) rồi tấm đóng */}
       <div ref={tam} id={id} className="duo-tg-tam" role="group" aria-label="Trợ giúp của câu này" hidden={!mo}

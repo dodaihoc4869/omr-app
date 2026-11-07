@@ -3,6 +3,7 @@
  * (chỉ transform / opacity). Nạp qua @import trong styles/trong-lam-bai.css. Chỉ biến màu «Trong» có sẵn. */
 [data-trong] .duo-tg { position: relative; flex: none; margin-left: auto; }
 [data-trong] .duo-tg[hidden] { display: none; }
+[data-trong] .duo-tg-chu { display: none; } /* chữ «Trợ giúp» chỉ hiện khi nút xuống dải đáy khổ rộng (trong-chang-ngang.css) */
 [data-trong] .duo-tg .duo-den { position: relative; -webkit-tap-highlight-color: transparent; transition: transform .08s ease; }
 [data-trong='hs'] .duo-tg .duo-den:active { transform: translateY(2px); }
 [data-trong] .duo-tg .duo-den[data-moi]::after {
