@@ -3,7 +3,7 @@
 // → sơ đồ + MỘT phép tính bấm từng số → thầy giảng (thần chú · thầy nói · mẹo) → vì sao từng phương án / ý → chỗ hay nhầm (đoán rồi lật) → tự trả lời trước
 // → thẻ nhớ (tự vào hộp thẻ 5 ngăn). Bố cục theo BỀ RỘNG KHUNG CHỨA (container query): hẹp một cột, rộng hai cột (tấm lời giải ở cột phải khi xoay ngang
 // vẫn một cột; trang rộng / Fold mở / máy tính hai cột). Chuyển động chỉ transform / opacity ≤ 280 ms, một lượt; máy yếu / giảm chuyển động chỉ hiện dần.
-import { Fragment, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import type { BanKinh, CanhKinh, PhanKinh } from '../../lib/loi-giai-kinh/kieu'
 import { ChuTron, CongThuc } from '../goi-y-cham/so-do-thay'
 import { themTheNho } from '../../lib/loi-giai-kinh/the-nho'
@@ -42,6 +42,7 @@ export default function LoiGiaiKinh({ ban, dapAn, emTraLoi, perm, luaChon, de, c
       <div className="lgk-luoi">
         <div className="lgk-cot">
           {emTraLoi !== undefined && <KetQuaEm phan={phan} dapAn={dapAn} em={emTraLoi} />}
+          <MucLuc />
           {de && <div className="lgk-de"><b>Đề</b>{de}</div>}
           <CotLoi ban={ban} />
           {ban.phim.length >= 2 && <Phim ban={ban} />}
@@ -74,12 +75,36 @@ function KetQuaEm({ phan, dapAn, em }: { phan: PhanKinh; dapAn: string; em: stri
     phu = sai.length ? `Sai ý ${sai.join(', ')}. Xem lý do từng ý bên dưới.` : 'Cả bốn ý đều đúng.'
   } else { dung = !!emChu && emChu.replace(/\s/g, '') === dapAn.replace(/\s/g, ''); tieuDe = emChu ? `Em trả lời ${emChu} · đáp án ${dapAn}` : `Đáp số ${dapAn}` }
   if (!phu) phu = dung ? 'Em làm đúng. Đọc lại cách thầy dẫn để nhớ lâu.' : 'Xem lại từng bước dưới đây.'
+  // 07/11 vòng 2 (5 skill, thầy duyệt): KẾT LUẬN TRƯỚC — Phần I / III: nhãn «Đáp án / Đáp số» + đáp án TO, câu em trả lời nhỏ (gạch khi sai);
+  // Phần II giữ «Em đúng n/4 ý». Nội dung không đổi, chỉ thứ bậc chữ.
+  const dapChu = phan === 'I' ? dapAn.toUpperCase() : phan === 'III' ? dapAn : ''
+  const emHien = phan === 'I' ? emChu.toUpperCase() : emChu
   return (
     <div className="lgk-kq" data-tt={dung ? 'dung' : 'sai'}>
       <span className="lgk-oi" aria-hidden="true">{dung ? '✓' : '✕'}</span>
-      <span className="lgk-giua"><b>{tieuDe}</b><span>{phu}</span></span>
+      <span className="lgk-giua">{dapChu
+        ? <><span className="lgk-kq-nhan">{phan === 'III' ? 'Đáp số' : 'Đáp án'}</span><b className="lgk-kq-so" aria-label={tieuDe}>{dapChu}</b>
+          {emHien && <span className="lgk-kq-em">{phan === 'I' ? 'Em chọn ' : 'Em trả lời '}{dung ? emHien : <s>{emHien}</s>}</span>}</>
+        : <b>{tieuDe}</b>}<span>{phu}</span></span>
     </div>
   )
+}
+
+/** 07/11 vòng 2 (5 skill): MỤC LỤC DÍNH đầu lời giải — chip nhảy tới từng thẻ (tên ngắn theo nhãn thẻ). Ít hơn 3 thẻ ⇒ không hiện. */
+const TEN_NGAN: Record<string, string> = { 'Kiến thức cốt lõi': 'Cốt lõi', 'Thầy dẫn từng bước': 'Từng bước', 'Sơ đồ và phép tính': 'Phép tính', 'Thầy giảng dạng này': 'Thầy giảng', 'Vì sao chọn, vì sao không chọn': 'Vì sao', 'Từng ý': 'Từng ý' }
+function MucLuc() {
+  const ref = useRef<HTMLElement>(null)
+  const [ds, setDs] = useState<{ el: HTMLElement; ten: string }[]>([])
+  useEffect(() => {
+    const goc = ref.current?.closest('.lgk')
+    if (!goc) return
+    setDs([...goc.querySelectorAll<HTMLElement>('section.lgk-the[aria-label]')].map((el) => { const n = el.getAttribute('aria-label') ?? ''; return { el, ten: TEN_NGAN[n] ?? n } }))
+  }, [])
+  const nhay = (el: HTMLElement) => {
+    const yen = document.documentElement.classList.contains('may-yeu') || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({ block: 'start', behavior: yen ? 'auto' : 'smooth' })
+  }
+  return <nav ref={ref} className="lgk-muc" aria-label="Mục lục lời giải">{ds.length >= 3 && ds.map((x, i) => <button key={i} type="button" onClick={() => nhay(x.el)}>{x.ten}</button>)}</nav>
 }
 
 function CotLoi({ ban }: { ban: BanKinh }) {
