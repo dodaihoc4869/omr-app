@@ -3,10 +3,12 @@
  *  ≤ 12 em ⇒ một hàng. Ô bám đáy sân khấu (trên đáy 16 px), rộng chia đều 1856 px (lề 32 px — dải tên rộng nhất có thể để chữ to). Cỡ chữ do bảng đo theo ô (chữ đơn dài nhất nằm trọn một dòng). */
 // Đáy dải tên chừa 60 px (thầy 07/11, ảnh máy chiếu: cửa sổ không toàn màn hình ⇒ thanh tác vụ Windows che đáy, chữ ô tên bị cắt).
 export const DAY_LUOI = 1004, KHE = 6, TRAI_LUOI = 32, RONG_LUOI = 1856, CAO_O = 76
+/** Đang toàn màn hình (không còn thanh tác vụ che) ⇒ dải tên sát đáy, đề được thêm chỗ (thầy 07/11 «phần tên học sinh đẩy hẳn xuống cuối»). */
+export const DAY_LUOI_TOAN_MAN = 1066
 export interface Luoi { cot: number; hang: number; w: number; h: number; top: number }
-export function boLuoi(n: number): Luoi {
+export function boLuoi(n: number, day = DAY_LUOI): Luoi {
   const so = Math.max(1, n), cot = so <= 12 ? Math.max(8, so) : Math.ceil(so / 2), hang = Math.ceil(so / cot), h = CAO_O
-  return { cot, hang, w: (RONG_LUOI - (cot - 1) * KHE) / cot, h, top: DAY_LUOI - (hang * h + (hang - 1) * KHE) }
+  return { cot, hang, w: (RONG_LUOI - (cot - 1) * KHE) / cot, h, top: day - (hang * h + (hang - 1) * KHE) }
 }
 /** Tên gọi trên ô: chữ cuối của họ tên («Đỗ Đại Học» ⇒ «Học»); trùng trong lớp ⇒ hai chữ cuối («Minh Anh»); vẫn trùng ⇒ thêm số thứ tự. */
 export function tenGoiLop(ds: { sbd: string; ten: string }[]): Map<string, string> {

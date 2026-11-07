@@ -65,6 +65,18 @@ describe('mở bảng từ tờ chiếu', () => {
     expect(document.querySelector('[data-bang]')?.getAttribute('data-qid')).toBe('q1')
     m.dongBang()
   })
+  it('bấm «Câu tiếp» trên bảng ⇒ câu kế mở sau 0,25 s (không chờ 1,5 s)', async () => {
+    vi.resetModules()
+    const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(5000)
+    buoi.ds = [{ id: 'moi', moLuc: gio(1) }]
+    const to = { postMessage: () => {} } as unknown as Window
+    await m.moBangTuToChieu('q1', { tuDong: true, nguon: to })
+    m.toiCau(1)
+    await m.moBangTuToChieu('q2', { tuDong: true, nguon: to })
+    await new Promise((r) => setTimeout(r, 20))
+    expect(document.querySelector('[data-bang]')?.getAttribute('data-qid')).toBe('q2')
+    m.dongBang()
+  })
   it('không có buổi: tin tự động im lặng; bấm P thì báo thầy mở điểm danh', async () => {
     vi.resetModules()
     const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(0)

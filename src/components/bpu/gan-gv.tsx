@@ -44,6 +44,8 @@ async function layBuoi(tuDong: boolean): Promise<string | null> {
 /** Tin TỰ ĐỘNG chờ ngần này rồi mới mở lượt; tin mới hơn huỷ tin đang chờ ⇒ mở lại tờ / lật nhanh qua nhiều câu KHÔNG đẻ lượt rỗng (cố vấn 07/11). */
 let choTuDongMs = 1500
 let henTu: ReturnType<typeof setTimeout> | null = null
+/** Thầy vừa bấm «Câu tiếp» / ← → trên bảng (hay máy điều khiển) ⇒ tin tự động KẾ TIẾP là câu thầy chủ động chọn: chờ 0,25 s thay 1,5 s (thầy 07/11 «chuyển câu tiếp chậm»). */
+let tiepNgay = false
 /** Cho test: đổi thời gian chờ. */
 export function datChoTuDong(ms: number): void { choTuDongMs = ms }
 type TuyChonMo = { giay?: number; tuDong?: boolean; nguon?: Window | null }
@@ -55,7 +57,9 @@ export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
   if (toMoi) nghiDen = 0 // thầy vừa mở tờ = ý muốn rõ ⇒ bỏ khoảng tạm nghỉ tự mở (như «Câu tiếp»)
   if (o.nguon) nguonTo = o.nguon
   if (henTu) clearTimeout(henTu)
-  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, toMoi ? Math.min(choTuDongMs, 250) : choTuDongMs) })
+  const nhanh = toMoi || tiepNgay
+  tiepNgay = false
+  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, nhanh ? Math.min(choTuDongMs, 250) : choTuDongMs) })
 }
 async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true
@@ -88,6 +92,7 @@ export function giaiTrenTo(): void {
 /** Bảng ⇒ tờ: sang câu sau (d = 1) / câu trước (d = -1). */
 export function toiCau(d: 1 | -1): void {
   nghiDen = 0
+  tiepNgay = true
   try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'toi', d }, '*') } catch { /* tờ đã đóng */ }
 }
 /** Tờ báo đã hết câu theo hướng d. */

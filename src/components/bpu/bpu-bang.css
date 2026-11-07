@@ -9,7 +9,7 @@
 .bb-dong { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); top: max(12px, env(safe-area-inset-top, 0px)); z-index: 2; min-width: 64px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 12px;
   background: var(--tr-mat-2); color: var(--tr-chu-2); font: 600 15px var(--sans); opacity: 0.35; cursor: pointer; }
 .bb-dong:hover, .bb-dong:focus-visible { opacity: 1; }
-.bb-tren { position: absolute; left: 64px; right: 64px; top: 30px; height: 60px; display: flex; align-items: center; gap: 22px; z-index: 3; }
+.bb-tren { position: absolute; left: 64px; right: 150px; /* chừa nút «Đóng» (cố định góc màn) — ảnh máy chiếu 07/11: «Đóng» đè «Phím» */ top: 30px; height: 60px; display: flex; align-items: center; gap: 22px; z-index: 3; }
 .bb-logo { display: flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 800; letter-spacing: -0.01em; white-space: nowrap; }
 .bb-logo .bpu-lua { width: 34px; height: 46px; --doi: var(--tr-tin); }
 .bb-pill { padding: 8px 20px; border-radius: 999px; background: var(--tr-mat-2); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: 26px; font-weight: 700; white-space: nowrap; }
@@ -21,9 +21,11 @@
 .bb-cho h2 { margin: 0; font-size: 56px; }
 .bb-cho p { margin: 0; font-size: 28px; color: var(--tr-chu-2); max-width: 1200px; }
 /* Đề */
-.bb-de { position: absolute; left: 64px; top: 128px; width: 1090px; height: 690px; display: flex; flex-direction: column; gap: 22px; z-index: 2; }
+.bb-de { --k: 1; position: absolute; left: 64px; top: 112px; width: 1090px; height: 690px; display: flex; flex-direction: column; gap: calc(22px * var(--k)); z-index: 2; }
+.bb-de.doi { opacity: 0.3; transition: opacity 0.12s; } /* vừa bấm sang câu: đề cũ mờ ngay tới khi câu mới về */
+/* --k: hệ số co chữ (BangBinhPhanUng đo): đề + phương án dài co cho VỪA khung, không tràn đè dải tên (ảnh máy chiếu 07/11 «thẻ dính chữ»). */
 .bb-chip { align-self: flex-start; padding: 6px 18px; border-radius: 12px; background: var(--tr-mat-2); color: var(--tr-chu-2); font-size: 22px; font-weight: 600; }
-.bb-de-chu { flex: 1 1 auto; min-height: 140px; font-size: 46px; line-height: 1.4; font-weight: 600; overflow-y: auto; overscroll-behavior: contain; padding-right: 18px;
+.bb-de-chu { flex: 1 1 auto; min-height: 140px; font-size: calc(50px * var(--k)); line-height: 1.4; font-weight: 600; overflow-y: auto; overscroll-behavior: contain; padding-right: 18px;
   scrollbar-width: auto; scrollbar-color: var(--tr-vien-2) transparent; } /* đề dài: thanh cuộn (chuột / phím ↓ ↑); khối cao tới sát dải tên */
 .bb-de-chu::-webkit-scrollbar { width: 14px; }
 .bb-de-chu::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--tr-vien-2); }
@@ -39,15 +41,15 @@
 .bb-dong-chu { margin: 0; text-wrap: pretty; }
 .bb-de-chu sub { font-size: 0.65em; }
 .bb-anh { max-width: 100%; max-height: 260px; border-radius: 12px; background: var(--giay); }
-.bb-pa { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: auto; }
-.bb-pa > div { --mau: var(--tr-tin); display: flex; align-items: center; gap: 20px; min-height: 116px; padding: 18px 26px; border-radius: 24px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: 34px; font-weight: 600; min-width: 0; transition: opacity 0.3s, box-shadow 0.3s, background-color 0.3s; }
+.bb-pa { display: grid; grid-template-columns: 1fr 1fr; gap: calc(20px * var(--k)); margin-top: auto; }
+.bb-pa > div { --mau: var(--tr-tin); display: flex; align-items: center; gap: 20px; min-height: calc(116px * var(--k)); padding: calc(18px * var(--k)) 26px; border-radius: 24px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: calc(34px * var(--k)); font-weight: 600; min-width: 0; transition: opacity 0.3s, box-shadow 0.3s, background-color 0.3s; }
 .bb-pa > div > span { min-width: 0; }
 .bb-pa i { flex: none; display: grid; place-items: center; width: 62px; height: 62px; border-radius: 18px; font-style: normal; font-weight: 800; font-size: 32px; color: var(--mau); box-shadow: inset 0 0 0 4px var(--mau); }
 .bb-pa > div.dung { box-shadow: inset 0 0 0 5px var(--tr-dung); background: color-mix(in srgb, var(--tr-dung) 16%, var(--tr-mat)); transition-delay: 1.8s; }
 .bb-pa > div.dung i { background: var(--tr-dung); color: var(--tr-nen); box-shadow: none; }
 .bb-pa > div.mo { opacity: 0.42; transition-delay: 1.8s; }
-.bb-ds { display: grid; gap: 14px; margin-top: auto; }
-.bb-ds > div { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: center; gap: 18px; padding: 14px 22px; border-radius: 20px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: 30px; font-weight: 600; }
+.bb-ds { display: grid; gap: calc(14px * var(--k)); margin-top: auto; }
+.bb-ds > div { display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; align-items: center; gap: 18px; padding: calc(14px * var(--k)) 22px; border-radius: 20px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: calc(30px * var(--k)); font-weight: 600; }
 .bb-ds i { font-style: normal; font-weight: 800; color: var(--tr-chu-3); }
 .bb-ds .kq { font-size: 26px; font-weight: 800; padding: 6px 16px; border-radius: 12px; background: color-mix(in srgb, var(--tr-dung) 20%, var(--tr-mat)); color: var(--tr-dung-chu); white-space: nowrap; }
 .bb-tln { margin-top: auto; display: flex; align-items: center; gap: 22px; padding: 22px 28px; border-radius: 24px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: 30px; color: var(--tr-chu-2); }
@@ -247,3 +249,15 @@ html.may-yeu .bb-o.cung-doi::before { animation: none; opacity: 0.5; }
   .bpu-sao { opacity: 1; transform: none; }
 }
 html.may-yeu .bpu-bang * { animation: none !important; transition: none !important; }
+/* ĐÚNG–SAI · MỞ ĐÁP ÁN (thầy 07/11 «rối quá, làm đơn giản đẹp»): 4 dòng gọn thay 8 ống — ý · đáp án · thanh tỉ lệ em làm đúng · số em. */
+.bb-dskq { position: absolute; left: 0; right: 0; top: 40px; display: grid; gap: 22px; animation: bb-hien 0.4s both; }
+.bb-dskq > div { display: grid; grid-template-columns: 56px 128px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 18px; row-gap: 10px; align-items: center; padding: 20px 24px; border-radius: 22px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.bb-dskq .y { grid-row: span 2; font-size: 40px; font-weight: 800; color: var(--tr-chu-2); }
+.bb-dskq .da { grid-row: span 2; justify-self: start; padding: 8px 18px; border-radius: 14px; font-size: 30px; font-weight: 800; }
+.bb-dskq .da.d { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); box-shadow: inset 0 0 0 2px var(--tr-dung); }
+.bb-dskq .da.s { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); box-shadow: inset 0 0 0 2px var(--tr-sai); }
+.bb-dskq .thanh { height: 16px; border-radius: 9px; background: var(--tr-mat-3); overflow: hidden; }
+.bb-dskq .thanh i { display: block; height: 100%; border-radius: 9px; background: var(--tr-dung); transition: width 0.8s ease-out; }
+.bb-dskq .so { font-size: 26px; color: var(--tr-chu-2); font-variant-numeric: tabular-nums; }
+.bb-dskq .so b { color: var(--tr-chu); font-size: 32px; }
+.bb-tren .bb-chip { align-self: center; }

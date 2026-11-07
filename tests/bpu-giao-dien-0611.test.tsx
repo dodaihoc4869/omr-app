@@ -131,6 +131,29 @@ describe('bảng chiếu', () => {
     const o = document.querySelector('.bb-o .ten')!
     expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
   })
+  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án ⇒ phương án tự hiện; Đúng–sai ⇒ 4 dòng kết quả', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewBang(st))
+    await screen.findByText(/em đã gửi/)
+    expect(document.querySelector('.bb-pa')).toBeNull()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'm' })) })
+    expect(document.querySelectorAll('.bb-pa > div')).toHaveLength(4)
+    expect(ws.gui.some((t) => t.includes('"mo"'))).toBe(false)
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'm' })) })
+    expect(document.querySelector('.bb-pa')).toBeNull()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' })) })
+    expect(ws.gui.some((t) => t.includes('"mo"'))).toBe(true)
+    moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
+    await waitFor(() => expect(document.querySelectorAll('.bb-pa > div')).toHaveLength(4))
+    const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
+    moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); nhanTra(st, 'S2', 'DSSD', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewBang(st))
+    const kq = await screen.findByLabelText('Kết quả từng ý')
+    expect([...kq.querySelectorAll('.so')].map((x) => x.textContent)).toEqual(['2/2 em đúng', '2/2 em đúng', '2/2 em đúng', '1/2 em đúng'])
+    expect([...kq.querySelectorAll('.da')].map((x) => x.textContent)).toEqual(['Đúng', 'Sai', 'Sai', 'Đúng'])
+  })
   it('mở lại tờ / bấm P trên ĐÚNG câu đang chạy ⇒ nối lại lượt cũ (không mở lượt mới); câu khác hoặc P sau khi mở đáp án ⇒ lượt mới', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
     const soLuot = () => goiLenhGhi.mock.calls.filter((c) => c[0] === '/gv/bpu/luot').length
