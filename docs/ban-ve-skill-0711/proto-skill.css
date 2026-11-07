@@ -1,0 +1,39 @@
+/* BẢN VẼ «THIẾT KẾ BẰNG 5 SKILL» (07/11) — chỉ để vẽ, đè phang-hs.css. Giữ mọi điều thầy đã chốt (nền xanh than, phẳng Apple, nút Duolingo 50/14/15 in hoa,
+   giãn dòng 1,6, màu --tr-*). Skill dùng để tinh chỉnh phân cấp, khoảng trống, chữ, trạng thái, chuyển động. */
+
+/* [plan-design-review · Pass 1 Kiến trúc thông tin] màn làm câu: bỏ khoảng trống ~64px giữa lệnh và đề (hàng chờ lời giám thị luôn giữ chỗ dù không nói).
+   Bong bóng giám thị vẫn NỔI đè lên nhãn khi xuất hiện (luật 02/11) ⇒ hàng chỉ cần 8px. */
+html[data-trong='hs']:not(#_):not(#_) .duo-gt-loi-o:not(:has(> .gt-loi)) { min-height: 8px !important; padding-bottom: 0 !important; }
+
+/* [frontend-design · tránh «nhãn IN HOA giãn chữ» — dấu hiệu trang máy làm] nhãn trên số lớn: chữ thường câu, đậm vừa, không giãn chữ.
+   (Nút giữ IN HOA — thầy chốt theo Duolingo.) */
+html[data-trong='hs']:not(#_):not(#_) .kb-nhan { text-transform: none !important; letter-spacing: 0 !important; font-size: 15px !important; font-weight: 600 !important; }
+
+/* [apple-design §15 Chữ] chữ to giãn âm, chữ nhỏ giữ 0; phân cấp bằng ĐỘ ĐẬM + cỡ + giãn dòng thành bộ */
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-lenh > h2, .kb-viec h2, .duo-kq-chu h2, .kb-chao, .dm-chao) { letter-spacing: -0.012em !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-lenh > h2 { font-size: 22px !important; font-weight: 750 !important; }
+
+/* [frontend-design · «lỗi là lúc chỉ đường, không phải tâm trạng»] dải SAI: tiêu đề «Chưa đúng» mang màu; đáp án đúng là THÔNG TIN ⇒ chữ thường màu chữ chính,
+   17px đậm vừa (trước: 20px hồng đậm 4 dòng — như la mắng). Dòng thưởng thu nhỏ một bậc. */
+html[data-trong='hs']:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-kq-chu p > b { font-size: 17px !important; font-weight: 650 !important; line-height: 1.5 !important; color: var(--tr-chu) !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-ket .tp-kq { transform: scale(.92); transform-origin: left center; }
+html[data-trong='hs']:not(#_):not(#_) .duo-ket .duo-kq-chu > .duo-ct-dau h2 { font-size: 24px !important; }
+
+/* [emil-design-eng · «Nút phải phản hồi khi nhấn»] co .97 khi nhấn, CHỈ transform (composite — animation-performance), 160ms ease-out mạnh;
+   ô đáp án co .985; hover chỉ trên thiết bị có chuột. Máy yếu + giảm chuyển động: tắt. */
+html[data-trong='hs']:not(#_):not(#_) { --ease-ra: cubic-bezier(0.23, 1, 0.32, 1); }
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut, .kb-dong, .duo .ht2-lam-pa) { transition: transform 160ms var(--ease-ra) !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut):active:not(:disabled) { transform: scale(.97) !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.kb-dong, .duo .ht2-lam-pa):active:not(:disabled) { transform: scale(.985) !important; }
+@media (prefers-reduced-motion: reduce) { html[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut, .kb-dong, .duo .ht2-lam-pa) { transition: none !important; transform: none !important; } }
+html.may-yeu[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut, .kb-dong, .duo .ht2-lam-pa) { transition: none !important; }
+
+/* [ui-ux-pro-max · checklist: «Focus states visible», «Touch spacing ≥ 8px»] vòng tiêu điểm bàn phím rõ, đồng nhất; khe giữa ô đáp án ≥ 10px */
+html[data-trong='hs']:not(#_):not(#_) :is(button, a, [role='radio'], [role='button']):focus-visible { outline: 2px solid var(--tr-hs-chu) !important; outline-offset: 2px !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-tn { gap: 10px !important; }
+
+/* [plan-design-review · Pass 6 + ui-ux «Progress indicators»] thanh tiến độ: đoạn đã qua đậm hơn, đoạn chưa tới nhạt (đọc «mấy / mấy» ngay) */
+html[data-trong='hs']:not(#_):not(#_) .duo-tren .duo-thanh:has(> .duo-doan) { gap: 4px !important; }
+
+/* [plan-design-review · Pass 7] tấm Lời giải: thử kéo cao 70% ⇒ lời giải ngắn để lại khoảng trống lớn — BỎ; chỉ chỉnh tiêu đề cỡ tiêu đề app */
+html[data-trong='hs']:not(#_):not(#_) .duo-lg-dau > b { font-size: 18px !important; letter-spacing: -0.01em !important; }

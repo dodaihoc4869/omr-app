@@ -367,6 +367,18 @@
    "khai": "--cn-le: max(24px, calc((100% - var(--cn-rong)) / 2))",
    "n": 1,
    "ly_do": "07/11 thầy chốt bố cục khổ rộng (một cột giữa kiểu Duolingo, docs/ban-ve-bo-cuc-rong-0711): bỏ lề hai cột"
+  },
+  {
+   "tep": "src/styles/phang-hs.css",
+   "khai": "background: var(--tr-sai-nhat) !important",
+   "n": 1,
+   "ly_do": "07/11 thầy (ảnh Duolingo) «đúng sai chỉ đổi màu chữ, giữ nguyên nền»: dải kết quả nền thẻ trung tính"
+  },
+  {
+   "tep": "src/styles/phang-hs.css",
+   "khai": "background: var(--tr-dung-nhat) !important",
+   "n": 1,
+   "ly_do": "07/11 thầy (ảnh Duolingo) «đúng sai chỉ đổi màu chữ, giữ nguyên nền»: dải kết quả nền thẻ trung tính"
   }
  ]
 }

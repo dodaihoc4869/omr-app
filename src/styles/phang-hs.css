@@ -71,8 +71,10 @@ html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut button[aria-pressed='true'] { 
 html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut button[aria-pressed='true']:nth-child(2) { background: var(--tr-sai) !important; }
 
 /* ── DẢI KẾT QUẢ: phẳng tô nhạt ── */
-html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=dung] { background: var(--tr-dung-nhat) !important; box-shadow: none !important; }
-html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=sai] { background: var(--tr-sai-nhat) !important; box-shadow: none !important; }
+/* 07/11 thầy (ảnh Duolingo): «đúng sai chỉ đổi màu chữ, giữ nguyên nền» ⇒ dải kết quả nền THẺ trung tính (--tr-mat, đúng màu dải Duolingo tối), chữ + vòng
+   biểu tượng + nút mang màu đúng / sai; vòng biểu tượng nền trang */
+html[data-trong='hs']:not(#_) .duo-day.duo-ket:is([data-tt=dung], [data-tt=sai]) { background: var(--tr-mat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo-day.duo-ket:is([data-tt=dung], [data-tt=sai]) .duo-kq-o { background: var(--tr-nen) !important; }
 
 /* ── THANH TIẾN ĐỘ: phẳng ── */
 html[data-trong='hs']:not(#_) .duo-tren > .duo-thanh:not(:has(> .duo-doan)) { height: 8px !important; border-radius: 4px !important; background: var(--tr-mat-3) !important; box-shadow: none !important; }
@@ -121,6 +123,9 @@ html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=sai] .ht2-lam-pa-ma { ba
 @media (prefers-color-scheme: dark) {
   html[data-trong='hs']:not(#_) :is(.kb-cta:is([data-sac='hs'], :not([data-sac])), .vtf-nut, .tcl-nut-chinh, .tr-dd-nut, .duo-day:not(.duo-ket) .duo-nut:not(:disabled)) { background-color: var(--tr-hs-chu) !important; color: var(--tr-trang) !important; }
   html[data-trong='hs']:not(#_) .kb-cta:is([data-sac='hs'], :not([data-sac])) * { color: inherit !important; }
+  /* 07/11 thầy «màu này (hồng Sửa lỗi) đang bị chói quá, làm tươi nhưng không chói»: nút tô hồng / cam ở tối dùng tông PASTEL tươi (cùng kiểu chàm sáng) */
+  html[data-trong='hs']:not(#_) :is(.kb-cta[data-sac='sai'], .duo-ket[data-tt=sai] .duo-nut) { background-color: var(--tr-sai-chu) !important; color: var(--tr-trang) !important; }
+  html[data-trong='hs']:not(#_) .kb-cta[data-sac='chu-y'] { background-color: var(--tr-chu-y-chu) !important; color: var(--tr-trang) !important; }
   html[data-trong='hs']:not(#_) .bi-loi-bong[data-cx='chao'] { --bb-nen: var(--tr-hs-chu); --bb-vien: var(--tr-hs-chu); --bb-chu: var(--tr-trang); color: var(--tr-trang) !important; }
   html[data-trong='hs']:not(#_) .bi-loi-bong[data-cx='chao'] * { color: inherit !important; }
 }
@@ -136,7 +141,7 @@ html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { backgrou
 html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b { background: none !important; box-shadow: none !important; padding-left: 4px !important; font-size: 18px !important; font-weight: 800 !important; color: var(--tr-chu) !important; }
 html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau :is(.duo-dong, .lgk-tg-vien) { background: var(--tr-mat) !important; box-shadow: none !important; border: 0 !important; color: var(--tr-chu) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien { font-size: 14px !important; font-weight: 700 !important; border-radius: 12px !important; white-space: nowrap !important; }
-html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien * { white-space: nowrap !important; }
+html[data-trong='hs']:not(#_) .duo-lg-dau .lgk-tg-vien { white-space: nowrap !important; } /* con thừa kế; bỏ :has + * (tests/muot-has-2710) */
 
 /* THẺ */
 html[data-trong='hs']:not(#_) .lgk-the { padding: 16px !important; gap: 12px !important; border-radius: 20px !important; background: var(--tr-mat) !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
@@ -235,3 +240,45 @@ html[data-trong='hs']:not(#_) .kb-chip[data-k='lua'] { --kb-chip-mau: var(--tr-s
 html[data-trong='hs']:not(#_) .kb-chip[data-k='nt'] { --kb-chip-mau: var(--tr-nguyen-tu); }
 html[data-trong='hs']:not(#_) .kb-chip[data-k='tt'] { --kb-chip-mau: var(--tr-tim); }
 html[data-trong='hs']:not(#_) .kb-chip > span svg { width: 17px; height: 17px; }
+
+/* 07/11 thầy «đo toàn bộ kích thước nút của Duolingo áp dụng chính xác vào app — cho đồng bộ». Đo điểm ảnh trên ảnh thầy gửi (tỉ lệ ảnh: thanh bên 256px = 378
+   điểm ⇒ 1,48; dải kết quả: nút 50px = 89 điểm ⇒ 1,78): nút cao 50 (Duolingo mặt 46 + gờ 4; app phẳng ⇒ 50 liền), bo 14, chữ 15/700 IN HOA giãn .06em, đệm
+   ngang 16; nút dải đáy khổ rộng rộng tối thiểu 150 (vừa chữ). Mọi nút chính / phụ cùng một cỡ. */
+html[data-trong='hs']:not(#_) :is(.duo-nut, .vtf-nut, .tcl-nut-chinh, .tr-dd-nut, .duo-hang-nut > a, .duo-hang-nut > button, .lg-nut-hoi-thay) {
+  min-height: 50px !important; border-radius: 14px !important; font-size: 15px !important; font-weight: 700 !important; letter-spacing: .06em !important; text-transform: uppercase !important; padding-inline: 16px !important; }
+@media (orientation: landscape) and (min-width: 640px) and (min-height: 501px), (min-width: 700px) and (min-aspect-ratio: 10/13) and (min-height: 501px) {
+  html[data-trong='hs']:not(#_) .duo-day .duo-nut { width: auto !important; min-width: 150px !important; }
+  html[data-trong='hs']:not(#_) .duo-lenh > .duo-tg { min-height: 50px !important; border-radius: 14px !important; font-size: 15px !important; font-weight: 700 !important; letter-spacing: .06em !important; text-transform: uppercase !important; padding-inline: 16px !important; }
+}
+/* điện thoại xoay ngang (cao ≤ 500): dải kết quả một hàng chật ⇒ «Hỏi thầy» chỉ còn biểu tượng (ô 50 × 50 cùng cỡ nút), tiêu đề không xuống dòng */
+@media (orientation: landscape) and (max-height: 500px) {
+  html[data-trong='hs']:not(#_) .duo-ket .lg-nut-hoi-thay { width: 50px !important; min-width: 50px !important; padding: 0 !important; justify-content: center; }
+  html[data-trong='hs']:not(#_) .duo-ket .lg-nut-hoi-thay > span { display: none !important; }
+  html[data-trong='hs']:not(#_) .duo-ket h2 { white-space: nowrap; }
+}
+/* 07/11 thầy «dấu x làm đơn giản như thế này, bỏ ô tròn» (ảnh Duolingo): nút × thanh trên chỉ còn nét × xám mảnh, không nền / viền; vùng chạm 44 giữ nguyên */
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-tren, .duo-kt-tren) > .duo-dong { background: none !important; box-shadow: none !important; border: 0 !important; color: color-mix(in oklab, var(--tr-chu) 42%, transparent) !important; }
+html[data-trong='hs']:not(#_) :is(.duo-tren, .duo-kt-tren) > .duo-dong svg { width: 26px; height: 26px; stroke-width: 2.25; }
+
+/* 07/11 thầy «đo khoảng cách dòng rồi áp dụng vào app cho chuẩn» — đo ảnh trang chủ Duolingo (tỉ lệ 1,36: thanh bên 256 = 348 điểm): chữ đoạn ~17px,
+   hai đường chân chữ cách 37 điểm = 27,2px; chữ thân Duolingo cao chữ hoa 13,2px = phông DDH Rounded cỡ 18px ⇒ giãn dòng 1,5 (đo lại 07/11 khuya); tiêu đề thẻ ~1,25. Áp: mọi CHỮ ĐOẠN (đề, lời giải, kết quả, lời Mol, mô tả thẻ) 1,5;
+   phương án / ý đúng–sai 1,5 (ô bấm gọn mà vẫn thoáng); tiêu đề lệnh 1,25. */
+html[data-trong='hs']:not(#_) :is(.ht2-lam-de-chu, .duo-kq-chu p, .duo-ghi, .kb-dong-hero, .bi-loi-bong, .gt-loi,
+  .lgk-de, .lgk-tra, .lgk-meo, .lgk-bong, .lgk-ct-chu, .lgk-nhip p, .lgk-bay-m p, .lgk-giai-so p, .lgk-kiem p) { line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_):not(#_) .ht-app.ht2-lam.duo .ht2-lam-de-chu { line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa, .ht2-lam-y-chu) { line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) :is(.duo-lenh > h2, .kb-viec h2) { line-height: 1.25 !important; }
+
+/* 07/11 khuya thầy «xem độ dãn cách các chữ và độ dãn dòng đo chính xác theo Duolingo»: đo KHOẢNG TRỐNG giữa con chữ / chiều cao chữ hoa trên ảnh Duolingo
+   (nhãn in hoa 0,23–0,28 · chữ thân 0,18 · tiêu đề 0,145) rồi dựng lại bằng DDH Rounded (phông app rộng nét hơn ⇒ khớp khoảng trống, KHÔNG khớp bề rộng dòng
+   — khớp bề rộng làm chữ dính). Kết quả: nhãn IN HOA + nút +0,06em (≈ 0,9px ở 15px, ngang Duolingo); chữ thân, tiêu đề 0; giãn dòng thân 1,5. */
+html[data-trong='hs']:not(#_) :is(.kb-nhan, .duo-nhan, .duo-3 p, .da-bai small, .da-ban-go, .da-bang .nut-to) { letter-spacing: .06em !important; }
+/* 07/11 thầy «bỏ thanh dọc cuộn này đi»: dải kết quả (đúng / sai) vẫn cuộn được khi lời dài nhưng KHÔNG hiện thanh cuộn hệ thống (máy tính hiện thanh xám thô) */
+html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu) { scrollbar-width: none !important; }
+html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu)::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+/* 07/11 đo độ rõ chữ trên app thật: chữ cái đáp án trên vòng tô màu ĐÚNG ở tối chỉ 1,9:1 (trắng trên lục) ⇒ chữ trên vòng tô màu dùng --tr-trang
+   (sáng: trắng như cũ · tối: chữ sẫm như nút Duolingo); vòng đang chọn ở tối cũng chữ sẫm (cũ trắng trên chàm 3,7:1) */
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa:is([data-ket=dung], [data-ket=sai]) .ht2-lam-pa-ma { color: var(--tr-trang) !important; }
+@media (prefers-color-scheme: dark) {
+  html[data-trong='hs']:not(#_):not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) .ht2-lam-pa-ma { color: var(--tr-trang) !important; }
+}
