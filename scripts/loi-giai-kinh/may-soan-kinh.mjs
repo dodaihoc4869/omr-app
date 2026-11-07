@@ -218,7 +218,9 @@ async function motLuongSoat(luong) {
   for (;;) {
     const lo = await goi('/kho/loi-giai-kinh/soat-viec', { so: SO_CAU, uuTien: UU_TIEN, ...(CHI_BO.length ? { chiBo: CHI_BO } : {}), ...(CO_CHU.length ? { coChu: CO_CHU } : {}), ...(SOAT_LAI ? { soatLaiTruoc: SOAT_LAI } : {}) })
     if (!lo.ok) { console.log(`[${gio()}] soát ${luong}: lỗi nhận việc: ${String(lo.error).slice(0, 120)}`); await ngu(60_000); continue }
-    if (lo.het || !lo.viec?.length) { console.log(`[${gio()}] soát ${luong}: hết bản cần soát`); return }
+    // Lô rỗng mà chưa «het»: luồng khác vừa giành hết bản của chương này (4 luồng cùng nhận một lúc) ⇒ nghỉ chút rồi nhận lại, KHÔNG dừng luồng.
+    if (!lo.het && !lo.viec?.length) { await ngu(5000 + luong * 3000); continue }
+    if (lo.het) { console.log(`[${gio()}] soát ${luong}: hết bản cần soát`); return }
     const viec = co('--thu') ? lo.viec.slice(0, 3) : lo.viec
     const { dir, tep } = dungLo({ ...lo, viec }, luong, 'soat')
     demSoat.lo++
