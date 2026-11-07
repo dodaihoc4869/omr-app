@@ -8,7 +8,7 @@
   html[data-trong='hs']:not(#_) .tr-menu-ray.kb-thanh .kb-thanh-ds { width: 256px; height: 100%; box-sizing: border-box; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px;
     padding: calc(32px + env(safe-area-inset-top)) 16px 96px calc(16px + env(safe-area-inset-left)); border-radius: 0 !important; background: var(--tr-nen) !important; box-shadow: inset -2px 0 0 var(--tr-vien) !important; }
   html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc { flex-direction: row; justify-content: flex-start; gap: 20px; width: 100%; height: 54px; padding: 0 16px; border-radius: 12px;
-    font-size: 15px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--tr-chu-2); }
+    font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--tr-chu-2); }
   html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc > svg { flex: none; width: 30px; height: 30px; }
   html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc[aria-current='page'] { background: color-mix(in oklab, var(--tr-hs) 10%, transparent) !important; box-shadow: inset 0 0 0 2px var(--tr-hs) !important; color: var(--tr-hs-chu) !important; }
   html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc:hover:not([aria-current='page']) { background: var(--tr-mat) !important; }
