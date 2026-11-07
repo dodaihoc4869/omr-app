@@ -4,7 +4,7 @@
    trong-lam-bai.css (nạp sau) — đúng y bản vẽ. Nút chính GIỮ màu riêng (chàm / lục / hồng…) dưới lớp kính. Chỉ biến --tr-* / --bb-* / --gt-loi-*. */
 :root[data-trong='hs'] { --kt-s: 100%; --kt-s2: 40%; --kt-s3: 70%; --kt-mat: 52%; --kt-a: 13%;
   --kt-net: color-mix(in oklab, var(--tr-hs-day) 24%, var(--tr-vien)); }
-@media (prefers-color-scheme: dark) { :root[data-trong='hs'] { --kt-s: 24%; --kt-s2: 10%; --kt-s3: 16%; --kt-mat: 60%; --kt-a: 12%; --kt-net: color-mix(in oklab, var(--tr-hs-day) 30%, var(--tr-vien-2)); } }
+@media (prefers-color-scheme: dark) { :root[data-trong='hs'] { --kt-s: 14%; --kt-s2: 0%; --kt-s3: 10%; --kt-mat: 60%; --kt-a: 7%; --kt-net: color-mix(in oklab, var(--tr-hs-day) 30%, var(--tr-vien-2)); } }
 html[data-trong='hs'] { --kt-trang: color-mix(in oklab, var(--tr-hs-tren) var(--kt-s), transparent);
   --kt-loe: linear-gradient(118deg, var(--kt-trang), transparent 30%, transparent 56%, color-mix(in oklab, var(--tr-hs-tren) var(--kt-s2), transparent) 64%, transparent 74%);
   --kt-anh: linear-gradient(135deg, color-mix(in oklab, var(--tr-hs) var(--kt-a), transparent), color-mix(in oklab, var(--tr-tin) var(--kt-a), transparent) 55%, color-mix(in oklab, var(--tr-tim) var(--kt-a), transparent));
@@ -20,7 +20,7 @@ html[data-trong='hs'] .duo-gt-bong .ht2-lam-de { background: none !important; bo
 html[data-trong='hs'] .duo .ht2-lam-ds .ht2-lam-y + .ht2-lam-y { border-top: 1px solid var(--kt-net) !important; }
 
 /* ── NÚT PHỤ / Ô CHỌN / CHIP / PHÍM ── */
-html[data-trong='hs'] :is(.duo-dong, .duo-den, .m3-tb-chuong, .kb-chip, .tp-tr-o, .tp-tr-muc, .tr-menu-muc, .kb-dong, .lg-nut-hoi-thay, .tr-dd-nut, .duo .ht2-lam-pa:not([data-ket]):not([aria-checked='true']), .ht2-lam-phim button, .duo-hang-nut > a, .duo-hang-nut > button:not(.duo-nut), .m3-phong .m3-thanh-tren > button, .kb-mo-ruong) {
+html[data-trong='hs'] :is(.duo-dong, .duo-den, .m3-tb-chuong, .kb-chip, .tp-tr-o, .tp-tr-muc, .kb-dong, .lg-nut-hoi-thay, .duo .ht2-lam-pa:not([data-ket]):not([aria-checked='true']), .ht2-lam-phim button, .duo-hang-nut > a, .duo-hang-nut > button:not(.duo-nut), .m3-phong .m3-thanh-tren > button, .kb-mo-ruong) {
   border: 0 !important; background: var(--kt-nen) !important; box-shadow: var(--kt-khung) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 html[data-trong='hs'] .duo .ht2-lam-pa:not([data-ket]) .ht2-lam-pa-ma { border: 1px solid var(--kt-net) !important; background: color-mix(in oklab, var(--tr-mat) 55%, transparent) !important; box-shadow: inset 0 1px 0 var(--kt-trang) !important; }
 /* đang chọn / mục đang mở: kính chàm, khung mảnh chàm */
@@ -33,7 +33,7 @@ html[data-trong='hs'] .duo .ht2-lam-y-nut button[aria-pressed='true'] { backgrou
 html[data-trong='hs'] .duo .ht2-lam-y-nut button[aria-pressed='true']:nth-child(2) { background: var(--kt-loe), color-mix(in oklab, var(--tr-sai) 88%, transparent) !important; box-shadow: var(--kt-mep), 0 0 0 1px var(--tr-sai-day), 0 8px 18px -10px color-mix(in oklab, var(--tr-sai) 60%, transparent) !important; }
 
 /* ── NÚT CHÍNH: GIỮ màu riêng từng nút (chàm / lục / hồng…), phủ kính: vệt sáng chéo + nửa trên sáng + mép trên sáng + khung mảnh sẫm + quầng mềm — không gờ ── */
-html[data-trong='hs'] :is(.kb-cta, .duo-nut:not(:disabled), .vtf-nut, .tcl-nut-chinh) {
+html[data-trong='hs'] :is(.kb-cta, .duo-nut:not(:disabled), .vtf-nut, .tcl-nut-chinh, .tr-dd-nut) {
   background-image: var(--kt-loe), linear-gradient(180deg, color-mix(in oklab, var(--tr-hs-tren) 24%, transparent), transparent 65%) !important;
   box-shadow: inset 0 1px 0 color-mix(in oklab, var(--tr-hs-tren) 55%, transparent), 0 0 0 1px color-mix(in oklab, var(--tr-chu) 22%, transparent), 0 12px 24px -14px color-mix(in oklab, var(--tr-chu) 45%, transparent) !important; }
 html[data-trong='hs'] .duo-nut:disabled { background: var(--kt-nen) !important; box-shadow: var(--kt-khung) !important; color: var(--tr-chu-3) !important; }
@@ -60,3 +60,7 @@ html[data-trong='hs'] .gt-loi::after { top: calc(100% - 1px) !important; }
 /* bấm: không còn gờ ⇒ co nhẹ thay lún (giảm chuyển động: không co) */
 html[data-trong='hs'] :is(.kb-cta, .duo .duo-nut, .kb-chip, .tp-tr-o, .duo-dong, .duo-den, .m3-tb-chuong):active:not(:disabled), html[data-trong='hs'] .duo .duo-nut[data-lun]:not(:disabled) { transform: scale(.98) !important; }
 @media (prefers-reduced-motion: reduce) { html[data-trong='hs'] :is(.kb-cta, .duo .duo-nut, .kb-chip, .tp-tr-o, .duo-dong, .duo-den, .m3-tb-chuong):active:not(:disabled), html[data-trong='hs'] .duo .duo-nut[data-lun]:not(:disabled) { transform: none !important; } }
+/* tấm Thêm (thầy 07/11 «chỗ này xấu quá»: khung kính lồng khung kính, viền chồng): cả danh sách MỘT khung kính, mục phẳng + vạch mảnh kiểu danh sách iPhone */
+html[data-trong='hs'] .tr-menu-ds { overflow: hidden !important; }
+html[data-trong='hs'] .tr-menu-ds > .tr-menu-muc { border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
+html[data-trong='hs'] .tr-menu-ds > .tr-menu-muc:not(:last-child) { box-shadow: 0 1px 0 var(--kt-net) !important; }
