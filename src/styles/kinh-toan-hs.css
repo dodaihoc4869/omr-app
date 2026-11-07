@@ -4,7 +4,7 @@
    trong-lam-bai.css (nạp sau) — đúng y bản vẽ. Nút chính GIỮ màu riêng (chàm / lục / hồng…) dưới lớp kính. Chỉ biến --tr-* / --bb-* / --gt-loi-*. */
 :root[data-trong='hs'] { --kt-s: 100%; --kt-s2: 40%; --kt-s3: 70%; --kt-mat: 52%; --kt-a: 13%;
   --kt-net: color-mix(in oklab, var(--tr-hs-day) 24%, var(--tr-vien)); }
-@media (prefers-color-scheme: dark) { :root[data-trong='hs'] { --kt-s: 14%; --kt-s2: 0%; --kt-s3: 10%; --kt-mat: 60%; --kt-a: 7%; --kt-net: color-mix(in oklab, var(--tr-hs-day) 30%, var(--tr-vien-2)); } }
+@media (prefers-color-scheme: dark) { :root[data-trong='hs'] { --kt-s: 14%; --kt-s2: 0%; --kt-s3: 10%; --kt-mat: 60%; --kt-a: 7%; --kt-net: color-mix(in oklab, var(--tr-hs-day) 16%, var(--tr-vien)); } } /* 07/11 tối xanh than: khung mảnh sáng rõ như viền Duolingo */
 html[data-trong='hs'] { --kt-trang: color-mix(in oklab, var(--tr-hs-tren) var(--kt-s), transparent);
   --kt-loe: linear-gradient(118deg, var(--kt-trang), transparent 30%, transparent 56%, color-mix(in oklab, var(--tr-hs-tren) var(--kt-s2), transparent) 64%, transparent 74%);
   --kt-anh: linear-gradient(135deg, color-mix(in oklab, var(--tr-hs) var(--kt-a), transparent), color-mix(in oklab, var(--tr-tin) var(--kt-a), transparent) 55%, color-mix(in oklab, var(--tr-tim) var(--kt-a), transparent));
@@ -91,3 +91,11 @@ html[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong:is([data-cx='ca
 html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu'], [data-cx='buon'])::before,
 html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu'])::after { border-width: 1px !important; background: var(--kt-loe), color-mix(in oklab, var(--bb-nen, var(--tr-mat)) 90%, transparent) !important; }
 html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='buon']::before { left: -15px !important; }
+/* 07/11 thầy «nền tối theo màu Duolingo, dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi»: dải loang dưới nền tối dịu lại để tông xanh than lộ ra
+   (kính vẫn thấy loang nhẹ; html:root vì trong-hs-mau.css còn được @import lại trong mảnh lười trong-lam-bai nạp SAU); mục thanh điều hướng đang chọn: chữ chàm SÁNG (--tr-hs-chu, 8:1 — Duolingo mục chọn 6,4:1) thay chàm đậm 3,6:1 */
+@media (prefers-color-scheme: dark) { html:root[data-trong='hs'] { --kinh-loang:
+    radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs-nut) 22%, transparent), transparent 72%),
+    radial-gradient(55% 32% at 98% 22%, color-mix(in oklab, var(--tr-tin) 18%, transparent), transparent 72%),
+    radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 16%, transparent), transparent 72%),
+    radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 12%, transparent), transparent 72%); } }
+html[data-trong='hs'] .kb-thanh .kb-thanh-muc.kb-thanh-muc[aria-current='page'] { color: var(--tr-hs-chu) !important; }
