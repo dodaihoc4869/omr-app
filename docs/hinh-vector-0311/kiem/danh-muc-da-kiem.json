@@ -2530,6 +2530,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72": {
+      "tep": "glucose-hemiacetal-ddh-8dc17277259a872bb7cb221ad770073e0d44d1cfeef31d113b06985fe935e116.svg",
+      "hashSvg": "8dc17277259a872bb7cb221ad770073e0d44d1cfeef31d113b06985fe935e116",
+      "byteSvg": 62518,
+      "byteGzip": 6901,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "0cfd73b72f0975f9c99da573505c4c75dc0c64479e80b2e34e6c198e94bf2963": {
       "tep": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg",
       "hashSvg": "651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b",
@@ -12779,6 +12788,20 @@
       ]
     },
     {
+      "qid": "12-KT-C2-D4-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72",
+          "where": "12-KT-C2-D4-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "348f336b11f6a84b1065269207919f425a512719bbac4a20a98d211a5291c66e",
+          "vector": "glucose-hemiacetal-ddh-8dc17277259a872bb7cb221ad770073e0d44d1cfeef31d113b06985fe935e116.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D4-II-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -18093,6 +18116,20 @@
           "where": "DB-12-B5-D2-I-217.hinh.0.du_lieu",
           "hashDataUrl": "d03e318151bd030f8478ed5a0ef6d7602bc0557cbfb7e4c7f93099f347d3a717",
           "vector": "glucose-c6-ddh-8282151d59121234380c7055ee9898332ce1248fc795d32e72be5273b580afba.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-II-222",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72",
+          "where": "DB-12-B5-D2-II-222.hinh.0.du_lieu",
+          "hashDataUrl": "348f336b11f6a84b1065269207919f425a512719bbac4a20a98d211a5291c66e",
+          "vector": "glucose-hemiacetal-ddh-8dc17277259a872bb7cb221ad770073e0d44d1cfeef31d113b06985fe935e116.svg"
         }
       ]
     },
@@ -26655,6 +26692,7 @@
     "12-KT-C2-D4-I-3",
     "12-KT-C2-D4-I-5",
     "12-KT-C2-D4-II-1",
+    "12-KT-C2-D4-II-2",
     "12-KT-C2-D4-II-4",
     "12-KT-C2-D3-I-9",
     "12-KT-C2-D3-I-17",
@@ -26978,6 +27016,7 @@
     "DB-12-B5-D2-III-55",
     "DB-12-B5-D2-III-165",
     "DB-12-B5-D2-I-217",
+    "DB-12-B5-D2-II-222",
     "DB-12-B5-D2-I-224",
     "DB-12-B5-D2-I-227",
     "DB-12-B5-D2-II-233",

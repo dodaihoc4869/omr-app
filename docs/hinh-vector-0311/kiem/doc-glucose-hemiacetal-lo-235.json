@@ -1,0 +1,261 @@
+{
+  "i": 473,
+  "hash": "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72.png",
+  "nativeSize": [
+    895,
+    340
+  ],
+  "reviewed": [
+    "nativefull",
+    "left3x",
+    "middle3x",
+    "right3x"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C2-D4-II-2",
+      "maDe": "12-KT-C2-D4",
+      "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình dưới đây.",
+      "hinh": [
+        {
+          "hash": "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72",
+          "where": "12-KT-C2-D4-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "348f336b11f6a84b1065269207919f425a512719bbac4a20a98d211a5291c66e"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-II-222",
+      "maDe": "DB-12-B5-D2",
+      "de": "Glucose là loại monosaccharide phổ biến và có nhiều ứng dụng. Glucose tồn tại chủ yếu ở hai dạng mạch vòng là α-glucose và β-glucose. Trong dung dịch, hai dạng mạch vòng này có thể chuyển hoá lẫn nhau thông qua dạng mạch hở như hình dưới đây.",
+      "hinh": [
+        {
+          "hash": "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72",
+          "where": "DB-12-B5-D2-II-222.hinh.0.du_lieu",
+          "hashDataUrl": "348f336b11f6a84b1065269207919f425a512719bbac4a20a98d211a5291c66e"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "leftRing": {
+      "vertices": {
+        "C1": [
+          264,
+          172
+        ],
+        "C2": [
+          211,
+          208
+        ],
+        "C3": [
+          127,
+          208
+        ],
+        "C4": [
+          77,
+          172
+        ],
+        "C5": [
+          127,
+          134
+        ]
+      },
+      "ringO": [
+        209,
+        134
+      ],
+      "branches": {
+        "C1up": "H",
+        "C1down": "OH inside dotted box",
+        "C2up": "H",
+        "C2down": "OH",
+        "C3up": "OH",
+        "C3down": "H",
+        "C4up": "H",
+        "C4down": "OH",
+        "C5up": "CH₂OH",
+        "C5down": "H"
+      },
+      "carbonNumbers": "1rightC1,2rightbelowC2,3rightbelowC3,4leftC4,5leftC5,6above C ofCH2OH",
+      "caption": "α-glucose",
+      "captionNear": [
+        157,
+        293
+      ]
+    },
+    "middle": {
+      "type": "Fischer",
+      "axisX": 423,
+      "top": "CHO literal; number1 above C, no separate aldehyde O-double or explicit H",
+      "topLabelNear": [
+        448,
+        65
+      ],
+      "rows": [
+        {
+          "y": 101,
+          "left": "H",
+          "right": "OH",
+          "number": "2 upper-left"
+        },
+        {
+          "y": 135,
+          "left": "HO",
+          "right": "H",
+          "number": "3 upper-left"
+        },
+        {
+          "y": 169,
+          "left": "H",
+          "right": "OH",
+          "number": "4 upper-left"
+        },
+        {
+          "y": 204,
+          "left": "H",
+          "right": "OH",
+          "number": "5 upper-left"
+        }
+      ],
+      "bottom": "CH₂OH literal,number6 left above C at411,222; vertical ends229",
+      "bottomLabelNear": [
+        466,
+        243
+      ],
+      "caption": "glucose",
+      "captionNear": [
+        465,
+        299
+      ]
+    },
+    "rightRing": {
+      "vertices": {
+        "C1": [
+          784,
+          165
+        ],
+        "C2": [
+          732,
+          202
+        ],
+        "C3": [
+          648,
+          202
+        ],
+        "C4": [
+          597,
+          165
+        ],
+        "C5": [
+          648,
+          128
+        ]
+      },
+      "ringO": [
+        731,
+        127
+      ],
+      "branches": {
+        "C1up": "OH inside dotted box",
+        "C1down": "H",
+        "C2up": "H",
+        "C2down": "OH",
+        "C3up": "OH",
+        "C3down": "H",
+        "C4up": "H",
+        "C4down": "OH",
+        "C5up": "CH₂OH",
+        "C5down": "H"
+      },
+      "carbonNumbers": "1rightC1,2rightbelowC2,3rightbelowC3,4leftC4,5leftC5,6above C ofCH2OH",
+      "caption": "β-glucose",
+      "captionNear": [
+        706,
+        288
+      ]
+    },
+    "frontBonds": "4 tapered diagonals: both C4->C3 and C1->C2 in each ring widen toward front vertices;2bold front horizontals. No uniform diagonal rendering.",
+    "dottedOHBoxes": [
+      {
+        "boxApprox": [
+          248,
+          186,
+          308,
+          222
+        ],
+        "rounded": true,
+        "leader": "fromlowerlabel near301,260 toheadnear279,222 pointsup-left",
+        "label": "OH hemiacetal",
+        "labelNear": [
+          329,
+          275
+        ]
+      },
+      {
+        "boxApprox": [
+          767,
+          112,
+          831,
+          146
+        ],
+        "rounded": true,
+        "leader": "fromupperlabel near771,56 toheadnear794,103 pointsdown-right",
+        "label": "OH hemiacetal",
+        "labelNear": [
+          783,
+          47
+        ]
+      }
+    ],
+    "equilibriumPairs": [
+      {
+        "xStart": 290,
+        "xEnd": 349,
+        "upperY": 165,
+        "lowerY": 174,
+        "upperHead": "RIGHT halfhead",
+        "lowerHead": "LEFT halfhead"
+      },
+      {
+        "xStart": 510,
+        "xEnd": 568,
+        "upperY": 165,
+        "lowerY": 173,
+        "upperHead": "RIGHT halfhead",
+        "lowerHead": "LEFT halfhead"
+      }
+    ],
+    "captionsStyle": "lowercase glucose throughout; α/β Greek italic in source, center glucose upright serif; keep lexical case and Greek",
+    "counts": {
+      "carbonNumbers": 18,
+      "standaloneH": 14,
+      "CH2OHlabels": 3,
+      "CHOlabels": 1,
+      "OHorHOseparate": 12,
+      "ringO": 2,
+      "dottedBoxes": 2,
+      "leadersWithHead": 2,
+      "equilibriumHalfHeads": 4,
+      "taper": 4,
+      "boldHorizontal": 2
+    }
+  },
+  "cautions": [
+    "Both OH hemiacetal labels include final lowercase l, unlike other source151.",
+    "No explicit aldehyde H or separate C=O source106 style; keep CHO literal.",
+    "Do not add answer/isomer names beyond source captions."
+  ],
+  "status": "Đạt exact final SVG sau actual review",
+  "actualReview": {
+    "i": 473,
+    "hashSvg": "8dc17277259a872bb7cb221ad770073e0d44d1cfeef31d113b06985fe935e116",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact final SVG2x, mở actualfull và đối chiếu nativefull/ba panel3x cùng hai public refs. Đủ18nums/14H/3CH2OH/CHOcondensed, OH Fischer RLRR, mọi ringH/OHorientation đúng.4TAPER2bold,2 dotted rounded OH boxes/2leaders cóhead,2 equilibrium pairs đúng. Hai nhãn EXACT OH hemiacetal đủ final l,lowercase α-glucose/glucose/β-glucose đúng. Số2/3 α đã cógap với nhánh, không chạm/cắt/tràn; không thêm explicit aldehydeH hay đápán.",
+    "actualSvgReviewed": true,
+    "byteSvg": 62518,
+    "render": "/workspace/scratch/glucose473-235-8dc17277-chromium.png",
+    "sourceHash": "56a556ea35abc49f2798711fa29eb36c1ae7308d36f11c39708f5a70682c5d72"
+  }
+}
