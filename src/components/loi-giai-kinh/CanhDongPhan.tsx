@@ -37,7 +37,8 @@ export default function CanhDongPhan({ dp }: { dp: DongPhanKinh }) {
     if (mach.length) {
       const soC = mach[0]!.kq.kd.cha.length
       const cacSo = [...new Set(mach.map((x) => x.m.so))]
-      ds.push({ loai: 'dai-so', chu: `**Bước 2 · lập mạch đại số** cho ${soC} C: viết phép tính trước — **${cacSo.join(' | ')}**. Số đầu là mạch chính, số sau là nhánh.` })
+      ds.push({ loai: 'dai-so', chu: dp.khungCoDinh ? `**Bước 2 · mạch đại số** cho ${soC} C: đề cho sẵn mạch — chỉ xét **${cacSo.join(' | ')}**. ${dp.khungCoDinh}`
+        : `**Bước 2 · lập mạch đại số** cho ${soC} C: viết phép tính trước — **${cacSo.join(' | ')}**. Số đầu là mạch chính, số sau là nhánh.` })
       mach.forEach((x, i) => ds.push({ loai: 'mach', i, chu: `Mạch **${x.m.so}**: đánh số các vị trí rồi điền **${x.m.dat.map((d) => d.nhan).join(' + ')}** lần lượt — trùng chưa? thừa gạch chưa?` }))
     }
     if (dp.bang) ds.push({ loai: 'bang', chu: `**Phần cố định**: ${dp.bang.tieuDe} — mỗi dòng nhân số cách của từng phần.` })

@@ -771,10 +771,10 @@ function dungChat(kd, dat, viTri) {
     for (const v of conC.slice(0, -1)) chu += `(${lkNhanh(u, v)}${viet(v, u)})`;
     return chu + lk(u, tiep) + viet(tiep, u);
   }
-  const lkNhanh = (u, v) => {
+  function lkNhanh(u, v) {
     const x = lk(u, v);
     return x === "-" ? "" : x.startsWith("-") ? x.slice(1) : x;
-  };
+  }
   function vietMach() {
     const parts = [];
     for (let i = 0; i < kd.chinh; i++) {
@@ -950,8 +950,9 @@ function docDongPhan(x) {
   }
   if (mach.length > 12) return hong("quá 12 khung");
   const nhom = /* @__PURE__ */ new Map();
+  const khungCoDinh = s(x.khungCoDinh, 140);
   for (const m of mach) {
-    if (m.chon) continue;
+    if (m.chon || khungCoDinh) continue;
     const kd = dungKhung(m.khung);
     const ky = `${kd.cha.length}#${m.dat.map((d) => `${d.loai}:${d.nhan}`).join("|")}`;
     nhom.set(ky, [...nhom.get(ky) ?? [], m]);
@@ -983,7 +984,7 @@ function docDongPhan(x) {
   if (!mach.length && !bang) return hong("cần ít nhất một mạch đại số hoặc một bảng phần cố định");
   const tong = tongMach + tongBang + (hoi === "dong-phan" ? tongHH : 0);
   if (Number(x.tong) !== tong) return hong(`cộng lại được ${tong}${hoi === "dong-phan" && tongHH ? ` (có ${tongHH} hình học)` : ""} chứ không phải ${s(x.tong, 6)}`);
-  return { dp: { ctpt, nguyenTu, K, ...s(x.tachK, 160) ? { tachK: s(x.tachK, 160) } : {}, hoi, ...mach.length ? { mach } : {}, ...bang ? { bang } : {}, tong }, loi: null };
+  return { dp: { ctpt, nguyenTu, K, ...s(x.tachK, 160) ? { tachK: s(x.tachK, 160) } : {}, hoi, ...khungCoDinh ? { khungCoDinh } : {}, ...mach.length ? { mach } : {}, ...bang ? { bang } : {}, tong }, loi: null };
 }
 function khungTuCha(cha) {
   const ke = keCua(cha), n = cha.length;

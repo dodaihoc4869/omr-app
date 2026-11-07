@@ -42,6 +42,7 @@ describe('kiểm khối dongPhan', () => {
     expect(docDongPhan({ ...DP4, K: 2 }).loi).toMatch(/K = /)
     expect(docDongPhan({ ...DP4, tong: 5 }).loi).toMatch(/cộng lại được 4/)
     expect(docDongPhan({ ...DP4, hoi: 'cau-tao', tong: 3 }).loi).toBeNull()
+    expect(docDongPhan({ ...DP4, mach: [DP4.mach[0]], tong: 3, khungCoDinh: 'đề cho sẵn mạch 4' }).loi).toBeNull() // đề cho sẵn mạch
     expect(docDongPhan({ ...DP4, mach: [DP4.mach[0], { ...DP4.mach[1], so: '4' }] }).loi).toMatch(/phép tính phải là 3\+1/)
     expect(docDongPhan({ ...DP4, mach: [{ ...DP4.mach[0], khung: k(3, [{ o: 1, dai: 1 }]), so: '3+1' }, DP4.mach[1]] }).loi).toMatch(/mạch dài nhất/)
   })

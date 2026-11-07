@@ -99,6 +99,8 @@ Thầy: «có câu xác định nhóm trong bảng tuần hoàn ko đưa kiến 
   - Máy liệt kê MỌI tổ hợp vị trí theo thứ tự, loại thừa hoá trị, gộp chất trùng do đối xứng, rồi so với `soChat`. Chạy `node dong-phan.mjs ra/<tên>.json` để xem bảng liệt kê
     (số thứ tự #, chất mới / trùng / thừa, công thức thu gọn, hình học) — dùng bảng đó để viết `phim` cho khớp. Máy kiểm thêm: không được QUÊN khung nào còn điền được,
     không trùng khung, cộng đủ = `tong`, và `tong` = đáp án kho (Phần III; Phần I khi phương án đúng là một số).
+  - Đề CHO SẴN mạch carbon (monochloro hoá butane, cộng HBr vào but-1-ene, thế vào isopentane…): chỉ ghi đúng khung đề cho và thêm
+    `"khungCoDinh": "Phản ứng thế không đổi mạch: butane là mạch 4"` (một câu vì sao). Không có trường này máy bắt đủ MỌI mạch đại số của số C đó.
   - Đề có điều kiện (ancol bậc I, chất tráng bạc, tác dụng Na…): thêm `"chon": [số # thoả điều kiện]` và `"loc": "điều kiện"` vào khung đó; `soChat` = số chất khác nhau trong `chon`.
   - Phần cố định (ester, amine, arene, peptide, chất béo) dùng `bang` thay hoặc cùng `mach`:
     `{ "loai": "este"|"amin"|"aren"|"khac", "tieuDe": "Cố định COO, chia 3 C còn lại cho R và R′", "cot": [], "hang": [ { "phan": [số C từng phần], "soCach": [số gốc từng phần], "tich": số chất, "ghi"? } ] }`.

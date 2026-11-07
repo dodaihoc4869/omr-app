@@ -102,6 +102,8 @@ export interface DongPhanKinh {
   tachK?: string
   /** đề hỏi: cau-tao (chỉ công thức cấu tạo) · dong-phan (tính cả hình học) */
   hoi: 'cau-tao' | 'dong-phan'
+  /** đề cho sẵn mạch C (vd «monochloro hoá butane»): chỉ xét đúng khung đề cho — không bắt đủ mọi mạch đại số; một câu nói vì sao */
+  khungCoDinh?: string
   mach?: MachDP[]
   bang?: BangDP
   tong: number

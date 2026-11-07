@@ -381,7 +381,8 @@ export function docDongPhan(x: unknown): KetDongPhan {
   if (mach.length > 12) return hong('quá 12 khung')
   // quên mạch: mỗi nhóm (cùng số C, cùng thứ cắm, không lọc) phải đủ mọi khung còn điền được
   const nhom = new Map<string, MachDP[]>()
-  for (const m of mach) { if (m.chon) continue; const kd = dungKhung(m.khung)!; const ky = `${kd.cha.length}#${m.dat.map((d) => `${d.loai}:${d.nhan}`).join('|')}`; nhom.set(ky, [...(nhom.get(ky) ?? []), m]) }
+  const khungCoDinh = s(x.khungCoDinh, 140)
+  for (const m of mach) { if (m.chon || khungCoDinh) continue; const kd = dungKhung(m.khung)!; const ky = `${kd.cha.length}#${m.dat.map((d) => `${d.loai}:${d.nhan}`).join('|')}`; nhom.set(ky, [...(nhom.get(ky) ?? []), m]) }
   for (const [ky, ds] of nhom) {
     const n = Number(ky.split('#')[0])
     const co = new Set(ds.map((m) => dangChuanKhung(dungKhung(m.khung)!.cha)))
@@ -408,7 +409,7 @@ export function docDongPhan(x: unknown): KetDongPhan {
   if (!mach.length && !bang) return hong('cần ít nhất một mạch đại số hoặc một bảng phần cố định')
   const tong = tongMach + tongBang + (hoi === 'dong-phan' ? tongHH : 0)
   if (Number(x.tong) !== tong) return hong(`cộng lại được ${tong}${hoi === 'dong-phan' && tongHH ? ` (có ${tongHH} hình học)` : ''} chứ không phải ${s(x.tong, 6)}`)
-  return { dp: { ctpt, nguyenTu, K, ...(s(x.tachK, 160) ? { tachK: s(x.tachK, 160) } : {}), hoi, ...(mach.length ? { mach } : {}), ...(bang ? { bang } : {}), tong }, loi: null }
+  return { dp: { ctpt, nguyenTu, K, ...(s(x.tachK, 160) ? { tachK: s(x.tachK, 160) } : {}), hoi, ...(khungCoDinh ? { khungCoDinh } : {}), ...(mach.length ? { mach } : {}), ...(bang ? { bang } : {}), tong }, loi: null }
 }
 
 /** Cây khung bất kỳ ⇒ khung mạch chính + nhánh thẳng (null nếu nhánh phân nhánh — chỉ gặp từ C10). */

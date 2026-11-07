@@ -110,7 +110,7 @@ console.log(banTinDongPhan(x.dongPhan ?? x))
 
 // ---------------------------------------------------------------- dựng lô
 const BO_KIEM_LO = `import fs from 'node:fs'
-import { THAN_CHU } from './kiem-kinh.bundle.mjs'
+import { THAN_CHU, kiemBanKinh, kiemCong } from './kiem-kinh.bundle.mjs'
 let dat = 0, tong = 0
 for (const f of fs.readdirSync('vao').filter((x) => x.endsWith('.json') && !x.endsWith('.muc.json') && !x.endsWith('.ban.json')).sort()) {
   tong++
