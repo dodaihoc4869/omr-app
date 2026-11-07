@@ -18,6 +18,8 @@ export interface TienDoSua {
   changTiep?: number
   /** Cả ngày: câu đã xong (kể cả câu này khi khép) / tổng câu hôm nay. */
   homNay?: { xong: number; tong: number }
+  /** Nơi em quay về khi rời câu (07/11 thầy «bỏ màn sửa lỗi, bấm nút đỏ vào thẳng câu» ⇒ «Hôm nay»). Vắng ⇒ «Tự sửa lỗi». */
+  noiVe?: string
 }
 
 /** Khung Duo dùng chung của màn sửa câu: thanh trên (X + thanh tiến độ) · thân · đáy. Dùng cả lúc đang mở câu / báo lỗi (ManChuaCauSai). */

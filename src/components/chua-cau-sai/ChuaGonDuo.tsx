@@ -168,8 +168,8 @@ export default function ChuaGonDuo(p: PropsChuaGonDuo) {
     return (
       <KhungDuoSua goc={goc} onVe={p.onVe} pct={100} nhanThanh="" xong
         day={<div className="duo-day" data-xong=""><div className="duo-giua">
-          <button ref={nutChinh} type="button" className="duo-nut" onClick={() => { phanHoi('chon'); p.onTiep() }}>{!tienDo.conSau ? 'Về Tự sửa lỗi' : tienDo.changTiep ? `Sửa tiếp chặng ${tienDo.changTiep}` : 'Sửa tiếp'}</button>
-          {tienDo.conSau && <div className="duo-bo"><button type="button" className="duo-lien" onClick={p.onVe}>Nghỉ, về Tự sửa lỗi</button></div>}
+          <button ref={nutChinh} type="button" className="duo-nut" onClick={() => { phanHoi('chon'); p.onTiep() }}>{!tienDo.conSau ? `Về ${tienDo.noiVe ?? 'Tự sửa lỗi'}` : tienDo.changTiep ? `Sửa tiếp chặng ${tienDo.changTiep}` : 'Sửa tiếp'}</button>
+          {tienDo.conSau && <div className="duo-bo"><button type="button" className="duo-lien" onClick={p.onVe}>Nghỉ, về {tienDo.noiVe ?? 'Tự sửa lỗi'}</button></div>}
         </div></div>}>
         <section className="duo-xong" aria-label="Kết quả chặng sửa lỗi">
           <div className="duo-xong-bi"><Bi cam="mung" size={148} /></div>

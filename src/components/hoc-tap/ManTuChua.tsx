@@ -158,7 +158,9 @@ export function tienDoSua(viec: KieuViecHomNay | null | undefined, qid: string):
 
 type Chon = { qid: string; ten?: string; kiemHoiThay?: boolean; /** câu mở thẳng KHÔNG có trong danh sách: mở không được thì về danh sách kèm lời báo */ thu?: boolean }
 
-export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: string; qid?: string; onVe: () => void; onTuLuyen?: () => void }) {
+/** `thang` (07/11 thầy «bỏ luôn màn sửa lỗi này đi, bấm nút đỏ sửa lỗi là vào thẳng câu luôn»): KHÔNG vẽ màn danh sách Việc hôm nay — mở thẳng câu cần sửa kế
+ *  tiếp; rời câu / hết câu ⇒ về Hôm nay (`onVe`). Cổng học sinh luôn bật; vắng (test cũ, màn khác) ⇒ giữ danh sách như trước. */
+export default function ManTuChua({ token, qid, thang, onVe, onTuLuyen }: { token: string; qid?: string; thang?: boolean; onVe: () => void; onTuLuyen?: () => void }) {
   useDanhDauHt2() // <html data-ht2> (xem HocTapHomNay.tsx)
   const [chon, setChon] = useState<Chon | null>(() => (qid ? null : docTuSuaChon(docSbdHs())))
   // mô-đun màn sửa câu đã về lúc mở màn này ⇒ vẽ thẳng (cố định suốt đời màn: đổi kiểu giữa chừng sẽ dựng lại màn sửa)
@@ -212,6 +214,13 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const daDuHomNay = !!viec && viec.tong > 0 && !viec.tiep
   const xongHomNayQ = useMemo(() => new Set((viec?.muc ?? []).filter((x) => x.xong).map((x) => x.m.qid)), [viec])
   const [baoDu, setBaoDu] = useState(false)
+  // MỞ THẲNG: có Việc hôm nay ⇒ mở ngay câu chưa xong kế tiếp; xong hết hôm nay ⇒ về Hôm nay. Chờ câu mở thẳng (`doi`) / có lời báo ⇒ để luồng cũ lo.
+  const moThang = !!thang && !chon && !bao && !doi && !!viec && viec.tong > 0
+  useEffect(() => {
+    if (!moThang || !viec) return
+    if (viec.tiep) setChon({ qid: viec.tiep.m.qid, kiemHoiThay: viec.tiep.m.kiemHoiThay })
+    else onVe()
+  }, [moThang, viec]) // eslint-disable-line react-hooks/exhaustive-deps
   // 29/10 (thầy «Mở câu quá lâu»): câu CHƯA XONG kế tiếp của Việc hôm nay (khác câu đang mở) ⇒ mở sẵn ở máy chủ lúc em còn xem danh sách / làm câu trước; bấm vào là có ngay.
   // Trễ 1,2 giây để không tranh lượt với chính lần mở em vừa bấm.
   const tiepNap = viec?.muc.find((x) => !x.xong && !x.m.kiemHoiThay && x.m.qid !== chon?.qid)?.m.qid
@@ -309,7 +318,10 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   if (chon) {
     const d = dong.find((x) => goc(x.m.qid) === goc(chon.qid))
     const ten = d?.ten ?? chon.ten ?? (cdl.get(goc(chon.qid))?.tenDang || undefined)
-    const veDanhSach = () => { if (sbd) luuTuSuaChon(sbd, null); lang.current = true; choDongBoViTri.current = true; setChon(null); setLan((n) => n + 1) }
+    const veDanhSach = thang
+      // mở thẳng: rời câu ⇒ về Hôm nay; tải mới lặng để bản nhớ chung (số câu ở Hôm nay) cập nhật
+      ? () => { if (sbd) luuTuSuaChon(sbd, null); void taiTuSuaLoi(token, { moi: true }).catch(() => {}); onVe() }
+      : () => { if (sbd) luuTuSuaChon(sbd, null); lang.current = true; choDongBoViTri.current = true; setChon(null); setLan((n) => n + 1) }
     if (chon.kiemHoiThay) return (
       <div ref={gocRef} className="ht-app ht2 tcl-man m3">
         <header className="ht-thanh tcl-dau-trang"><button type="button" className="ht-nut-phu" onClick={veDanhSach}><ArrowLeft size={18} aria-hidden="true" />Quay lại danh sách</button><strong className="tcl-dau-trang-ten">Kiểm lại câu đã sửa</strong></header>
@@ -327,7 +339,7 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
             qid={chon.qid}
             tenCau={ten}
             onVe={veDanhSach}
-            tienDo={tienDoSua(viec, chon.qid)}
+            tienDo={thang ? (() => { const t = tienDoSua(viec, chon.qid); return t && { ...t, noiVe: 'Hôm nay' } })() : tienDoSua(viec, chon.qid)}
             onTiep={viec ? () => {
               // Chữa câu gọn (25/10): câu vừa khép đã ghi "xong phần" trên máy ⇒ dựng lại việc hôm nay và mở THẲNG câu kế; hết câu ⇒ về danh sách.
               const v = dungViecHomNay(kq, Date.now(), sbd).viec
@@ -351,6 +363,8 @@ export default function ManTuChua({ token, qid, onVe, onTuLuyen }: { token: stri
   const daHien = new Set(dong.map((d) => goc(d.m.qid)))
   const kiemRieng = kq?.trangThai === 'bat' ? (kq.kiemLaiHoiThay ?? []).filter((m) => !daHien.has(goc(m.qid))).slice(0, 12) : []
   const dangMoThang = !!doi && (!kq || kq.trangThai === 'bat')
+  // mở thẳng: không vẽ danh sách — chỉ một dòng chờ trong tích tắc effect mở câu (hoặc về Hôm nay)
+  if (moThang || (thang && !kq && !bao)) return <div ref={gocRef} className="ht-app ht2 tcl-man"><p className="ht-noi-dung tcl-cho-mo" role="status"><span className="chu-cho-tre">Đang mở câu…</span></p></div>
   return (
     <div ref={gocRef} className="ht-app ht2 tcl-man">
       <header className="ht-thanh tcl-dau-trang">
