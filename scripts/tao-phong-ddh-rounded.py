@@ -447,7 +447,7 @@ def ve_dau(f, cm, k, d):
     gl.coordinates = GlyphCoordinates(moi); gl.flags = bytearray(fl); gl.endPtsOfContours = en; gl.numberOfContours = len(en)
     gl.recalcBounds(g); sua.append(n)
 
-LE = _json.loads(os.environ.get('DDH_LE', r'''{"Dam":{"Đ":[0,36],"u":[18,0],"l":[0,-18],"c":[18,-18],"p":[18,0],"e":[18,0],"\"":[18,55,45],"?":[-73,0]},"De":{"f":[-27,-27],"e":[18,9],"t":[0,-54]}}'''))  # {"Dam":{"u":[18,-18],"\"":[18,55,45]}} — lề trái/phải (đơn vị) cả họ chữ (a, à, â…); số thứ ba: nới khe giữa hai nét của dấu nháy
+LE = _json.loads(os.environ.get('DDH_LE', r'''{"Dam":{"Đ":[0,36],"u":[18,0],"l":[0,-18],"c":[18,-18],"p":[18,0],"e":[18,0],"\"":[18,55,45],"?":[-73,0]},"De":{"f":[-27,-27],"e":[18,9],"t":[0,-54]," ":[0,-105]}}'''))  # {"Dam":{"u":[18,-18],"\"":[18,55,45]}} — lề trái/phải (đơn vị) cả họ chữ (a, à, â…); số thứ ba: nới khe giữa hai nét của dấu nháy
 
 def chinh_le(f, cm, d):
   """Khoảng cách từng cặp chữ đo theo Duolingo: dời chữ sang phải L đơn vị và cộng L+R vào bề rộng."""

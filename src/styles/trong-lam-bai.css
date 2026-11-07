@@ -143,7 +143,7 @@
 [data-trong] .kq-kinh .xd-phan__thanh i { background: var(--tr-chinh); }
 [data-trong] .kq-kinh .xd-nut { border-radius: 12px; font-weight: 600; }
 [data-trong] .kq-kinh .xd-nut--chu { color: var(--tr-chu-2); }
-[data-trong] .kq-kinh .kq-the h3 { font-size: 16px; font-weight: 600; }
+[data-trong] .kq-kinh .kq-the h3 { font-size: 19px; font-weight: 600; }
 [data-trong] .kq-cau { grid-template-columns: repeat(6, minmax(0, 1fr)); }
 [data-trong] .kq-cau > * { aspect-ratio: auto; min-height: 44px; font-size: 14px; font-weight: 600; }
 /* Khổ hẹp (360 px): 6 cột + khe 6 px ⇒ ô 43 px < vùng chạm 44 px — khe 4 px ⇒ ô ≥ 44 px (27/10). */
@@ -313,7 +313,7 @@
 [data-trong] .tcl-the-lam[data-nhom='can'] { border-color: transparent; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
 [data-trong] .tcl-man .ht2-dong-bt { width: 40px; height: 40px; flex-basis: 40px; border-radius: 10px; }
 [data-trong] .tcl-man .ht2-dong-bt[data-sac=vang] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
-[data-trong] .tcl-man .tcl-nhom-dau h2 { font-size: 16px; font-weight: 700; }
+[data-trong] .tcl-man .tcl-nhom-dau h2 { font-size: 19px; font-weight: 700; }
 
 /* ── 8. KIỂM TRA ÔN TẬP (ManKiemTraCaNhan, khối .ktcn-man): nhấn chàm → màu app; nút chính phẳng; thẻ đầu trang phẳng (bỏ dải màu loang). ── */
 [data-trong] .ktcn-man { --tim: var(--tr-chinh); --tim-nen: var(--tr-chinh-nhat); --lg-nhan: var(--tr-chinh-nut); --muc-nguoc: var(--tr-tren-chinh); background: var(--tr-nen); }

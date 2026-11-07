@@ -32,3 +32,4 @@ Hai tệp phông vẫn TĨNH: mọi `font-weight` 550–1000 hiện cùng một 
 - «a» có đuôi hất + bụng tròn (DUOI_A) ở cả hai kiểu.
 - Dấu mũ / huyền / sắc vẽ lại bằng nét đều hai đầu tròn (VE_DAU): mũ 22 px rộng, 11 px cao, hở 3 px trên chữ (bằng Duolingo ở cùng cỡ); dấu ghép (ầ ấ ẩ…) giữ chỗ, không chạm mũ.
 - Số mặc định nằm sẵn trong `scripts/tao-phong-ddh-rounded.py` (biến môi trường `DDH_*` chỉ để thử). Tổng 4 tệp 34 076 B.
+- Khoảng trắng giữa từ (Đề) −105 đơn vị: khe từ trung bình 7,8 = Duolingo 7,8 px (đoạn «Hoàn thành thêm 3 bài học…», cùng chiều cao chữ x). Tổng 4 tệp 34 172 B.

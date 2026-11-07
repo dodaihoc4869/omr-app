@@ -43,6 +43,7 @@
 /* 07/11 phông v5 (thầy «khoảng cách chữ, khoảng cách dòng đồng bộ chuẩn Duolingo»), đo ảnh màn Duolingo trên phông v5 cùng chiều cao chữ hoa:
    tiêu đề / tên menu chữ thường ≈ 0 (bỏ −.01/−.02em cũ); nút + nhãn IN HOA ≈ .02em (bỏ .04/.05/.06em cũ); đoạn chữ hai dòng: bước dòng / chiều cao
    chữ x = 3,08 ⇒ 1,65 trên phông này (sai số đo ±0,1). Chỉ chữ đề (đoạn nhiều dòng); khổ ngang giữ luật riêng (thấp màn). */
+/* Cỡ chữ theo tỉ lệ Duolingo (chữ thân 17): tiêu đề thẻ 19 (×1,10), tiêu đề lớn 23 (×1,33), nút IN HOA 16, nhãn IN HOA nhỏ 14 (×0,84). */
 :root[data-trong='hs'][data-ht2] .ht2-lam-de-chu.ht2-lam-de-chu { line-height: 1.65; } /* lặp lớp ⇒ thắng luật .duo / .de-gian */
 /* PHÔNG 27/10 · DẤU CHỒNG: ĐĐH Rounded (như M PLUS gốc) có dấu chồng chữ hoa cao (Ổ đỉnh 1,06 em) và chân chữ sâu (g, ặ −0,23 em) ⇒ tiêu đề CÓ THỂ xuống hàng mà giãn
    dòng < 1,3 thì dấu dòng dưới chạm chân chữ dòng trên (đo mực hai dòng, phông 700 và 800: 1,25 còn chạm «gậy ặ ợ / Ỗ Ổ Ở Ữ», 1,3 hết chạm).
@@ -217,7 +218,7 @@
   --nhe-xanh: var(--tr-dung-chu); --nhe-cam: var(--tr-chu-y-chu); --nhe-do: var(--tr-sai-chu);
 }
 [data-trong] :is(.tr-the-dau, .ht2-nhom > h2) { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
-[data-trong] .ht2 :is(.tr-the-dau h2, .ht2-nhom > h2) { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.4; letter-spacing: 0; }
+[data-trong] .ht2 :is(.tr-the-dau h2, .ht2-nhom > h2) { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.4; letter-spacing: 0; }
 
 /* ── Ôn và sửa / Kết quả: MỘT thẻ, dòng ngăn bằng đường mảnh ── */
 [data-trong='hs'] .ht2-noi-dung > .ht2-nhom, [data-trong='hs'] .tr-hn-luoi .ht2-nhom {
@@ -269,7 +270,7 @@
 [data-trong] .htn-lo > .htn-nut { grid-area: nut; }
 [data-trong] .htn-lo > :not(.htn-lo-dau, .htn-thang, .htn-nut) { grid-column: 1 / -1; }
 [data-trong] .htn-lo .ht2-nhan { font-size: 13px; font-weight: 500; color: var(--tr-chu-3); }
-[data-trong] .htn-lo-dau h2 { font-size: 18px; font-weight: 600; letter-spacing: 0; }
+[data-trong] .htn-lo-dau h2 { font-size: 19px; font-weight: 600; letter-spacing: 0; }
 [data-trong] .htn-lo-dau h2 b { color: var(--tr-chinh-chu); }
 [data-trong] .htn-nut { width: auto; max-width: none; min-height: 44px; padding: 0 18px; border-radius: 12px; background: var(--tr-chinh-nut); color: var(--tr-tren-chinh); font-size: 15px; font-weight: 600; box-shadow: var(--tr-bong-1); }
 [data-trong] .htn-nut[data-phu] { border: 1px solid var(--tr-vien-2); background: var(--tr-mat); color: var(--tr-chu); }
@@ -292,7 +293,7 @@
 [data-trong] .htn-thang li[data-tt='vung'] small { color: var(--tr-dung-chu); }
 [data-trong] .htn-thang li[data-tt='dang'] small { color: var(--tr-chinh-chu); font-weight: 600; }
 [data-trong] .htn-bai-nhom { gap: 0; overflow: hidden; }
-[data-trong] .htn-bai-nhom > h2 { margin: 0; padding: 16px 20px 8px; font-size: 16px; font-weight: 600; }
+[data-trong] .htn-bai-nhom > h2 { margin: 0; padding: 16px 20px 8px; font-size: 19px; font-weight: 600; }
 [data-trong] .htn-bai-nhom > h2 span { color: var(--tr-chu-3); font-weight: 500; }
 [data-trong] .htn-bai {
   display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(150px, 1fr) auto; align-items: center; gap: 8px 24px; padding: 14px 20px;
@@ -343,7 +344,7 @@
    danh sách gọn một thẻ, mã nội bộ (#mã ca) không hiện trên màn em, màu nghĩa cố định. ── */
 [data-trong='hs'] :is(.m3-sheet, .m3-phong) { background: var(--tr-nen); }
 [data-trong='hs'] .m3-sheet > main { max-width: 960px; }
-[data-trong] .m3-sheet :is(.btm-h, .mom-h, .lsc-h) { font-size: 22px; font-weight: 700; letter-spacing: 0; }
+[data-trong] .m3-sheet :is(.btm-h, .mom-h, .lsc-h) { font-size: 23px; font-weight: 700; letter-spacing: 0; }
 [data-trong] .m3-sheet :is(.btm-the, .mom-the, .mom-cau, .mom-dong-ho, .mom-nop, .lsc-ds) {
   border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); color: var(--tr-chu);
 }
@@ -394,7 +395,7 @@
 [data-trong] .m3-phong .vtf { padding: 24px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
 [data-trong] .m3-phong .vtf-dau { align-items: flex-start; text-align: left; }
 [data-trong] .m3-phong .vtf-bt { display: none; }
-[data-trong] .m3-phong .vtf-h { font-size: 22px; letter-spacing: 0; }
+[data-trong] .m3-phong .vtf-h { font-size: 23px; letter-spacing: 0; }
 [data-trong] .m3-phong .vtf-nhan { font-size: 13px; font-weight: 600; color: var(--tr-chu); }
 [data-trong] .m3-phong .vtf-nhap { min-height: 48px; border: 1px solid var(--tr-vien-2); border-radius: 12px; background: var(--tr-mat); font-size: 16px; }
 [data-trong] .m3-phong .vtf-nhap--ma { text-align: left; }
@@ -621,7 +622,7 @@
 [data-trong] .da-tuan i[data-d] { background: var(--tr-sao); }
 [data-trong] .da-tuan i[data-nay] { outline: 3px solid var(--tr-sao); outline-offset: 2px; }
 [data-trong] .dm-the { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); box-shadow: var(--tr-bong-1); }
-[data-trong] .dm-the h3 { margin: 0; font-size: 17px; font-weight: 800; }
+[data-trong] .dm-the h3 { margin: 0; font-size: 19px; font-weight: 800; }
 [data-trong] .dm-the .mo { font-size: 13.5px; line-height: 1.45; color: var(--tr-chu-2); }
 [data-trong] .dm-dong { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0; border: 0; background: none; color: var(--tr-chu); font: inherit; font-size: 15px; text-align: left; }
 [data-trong] button.dm-dong { cursor: pointer; border-radius: 12px; }
