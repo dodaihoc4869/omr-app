@@ -1,0 +1,41 @@
+[
+  {
+    "i": 608,
+    "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+    "fileNguon": "anh/70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142.png",
+    "svg": "paracetamol-phan-ung-ddh-ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e.svg",
+    "hashSvg": "ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e",
+    "byteSvg": 39342,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D1-III-6",
+        "de": "Paracetamol còn được gọi là acetaminophen, là một loại thuốc có tác dụng hạ sốt và giảm đau. Paracetamol có thể tổng hợp trực tiếp từ 4-aminophenol và acetic anhydride theo phương trình trong hình dưới đây.\nĐể sản xuất 10 000 hộp paracetamol (quy cách 10 vỉ, mỗi vỉ 10 viên, mỗi viên hàm lượng 500 mg) với hiệu suất cả quá trình đạt 70% cần sử dụng m kg 4-aminophenol (độ tinh khiết 98%).\nGiá trị của m là bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+        "refs": [
+          {
+            "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+            "where": "12-KT-C3-D1-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "fe361a3ae5f2859c39bf85a5fc37b3c78b13534b842c03f472ff78c59b6213e8"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-256",
+        "de": "Paracetamol còn được gọi là acetaminophen, là một loại thuốc có tác dụng hạ sốt và giảm đau. Paracetamol có thể tổng hợp trực tiếp từ 4-aminophenol và acetic anhydride theo phương trình trong hình dưới đây.\nĐể sản xuất 10 000 hộp paracetamol (quy cách 10 vỉ, mỗi vỉ 10 viên, mỗi viên hàm lượng 500 mg) với hiệu suất cả quá trình đạt 70% cần sử dụng m kg 4-aminophenol (độ tinh khiết 98%).\nGiá trị của m là bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+        "refs": [
+          {
+            "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+            "where": "DB-12-B8-D1-III-256.hinh.0.du_lieu",
+            "hashDataUrl": "fe361a3ae5f2859c39bf85a5fc37b3c78b13534b842c03f472ff78c59b6213e8"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2Ph3doubleeach/anhydride2COdoubleO/amideHNliteralCOdoubleCH3/2OH/NH2/CH3COOH/4lowercasecaptions/2plus1RIGHThead/noaddedconditions-answer/DDHpath.",
+    "hashSvgDaSoat": "ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

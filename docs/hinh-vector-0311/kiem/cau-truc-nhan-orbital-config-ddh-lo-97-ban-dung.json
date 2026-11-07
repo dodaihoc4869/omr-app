@@ -41,16 +41,17 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg",
-    "hashSvg": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
-    "byteSvg": 42327,
+    "svg": "nhan-orbital-config-ddh-0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2.svg",
+    "hashSvg": "0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2",
+    "byteSvg": 42464,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữnhộng/637mg/500mg;3sCHỈ1↑;Rkhông4s,Tgiữ1−,đủdấuchấmcuốidòng. Chữthường/đậmtừfontapp,khôngfauxitalic/bold.",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
-    "hashSvgDaSoat": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
-    "nguoiSoat": "cau_truc_6"
+    "hashSvgDaSoat": "0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
   },
   {
     "i": 1360,
@@ -114,16 +115,17 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "nhan-orbital-config-ddh-eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347.svg",
-    "hashSvg": "eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347",
-    "byteSvg": 7383,
+    "svg": "nhan-orbital-config-ddh-60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f.svg",
+    "hashSvg": "60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f",
+    "byteSvg": 7373,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữnhộng/637mg/500mg;3sCHỈ1↑;Rkhông4s,Tgiữ1−,đủdấuchấmcuốidòng. Chữthường/đậmtừfontapp,khôngfauxitalic/bold.",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
-    "hashSvgDaSoat": "eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347",
-    "nguoiSoat": "cau_truc_6"
+    "hashSvgDaSoat": "60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
   },
   {
     "i": 340,

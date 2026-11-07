@@ -1,0 +1,202 @@
+{
+  "i": 608,
+  "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142.png",
+  "nativeSize": [
+    1090,
+    362
+  ],
+  "reviewed": [
+    "nativeFULL2x/allmoleculelabels/captionsread"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C3-D1-III-6",
+      "maDe": "12-KT-C3-D1",
+      "de": "Paracetamol còn được gọi là acetaminophen, là một loại thuốc có tác dụng hạ sốt và giảm đau. Paracetamol có thể tổng hợp trực tiếp từ 4-aminophenol và acetic anhydride theo phương trình trong hình dưới đây.\nĐể sản xuất 10 000 hộp paracetamol (quy cách 10 vỉ, mỗi vỉ 10 viên, mỗi viên hàm lượng 500 mg) với hiệu suất cả quá trình đạt 70% cần sử dụng m kg 4-aminophenol (độ tinh khiết 98%).\nGiá trị của m là bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+      "hinh": [
+        {
+          "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+          "where": "12-KT-C3-D1-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "fe361a3ae5f2859c39bf85a5fc37b3c78b13534b842c03f472ff78c59b6213e8"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-256",
+      "maDe": "DB-12-B8-D1",
+      "de": "Paracetamol còn được gọi là acetaminophen, là một loại thuốc có tác dụng hạ sốt và giảm đau. Paracetamol có thể tổng hợp trực tiếp từ 4-aminophenol và acetic anhydride theo phương trình trong hình dưới đây.\nĐể sản xuất 10 000 hộp paracetamol (quy cách 10 vỉ, mỗi vỉ 10 viên, mỗi viên hàm lượng 500 mg) với hiệu suất cả quá trình đạt 70% cần sử dụng m kg 4-aminophenol (độ tinh khiết 98%).\nGiá trị của m là bao nhiêu? (Làm tròn kết quả đến phần nguyên).",
+      "hinh": [
+        {
+          "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+          "where": "DB-12-B8-D1-III-256.hinh.0.du_lieu",
+          "hashDataUrl": "fe361a3ae5f2859c39bf85a5fc37b3c78b13534b842c03f472ff78c59b6213e8"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "reactant1": {
+      "ringVertices": [
+        [
+          105,
+          169
+        ],
+        [
+          136,
+          151
+        ],
+        [
+          167,
+          169
+        ],
+        [
+          167,
+          202
+        ],
+        [
+          136,
+          220
+        ],
+        [
+          105,
+          202
+        ]
+      ],
+      "doubleEdges": "leftvertical,upperright,lowerright (3Kekule,noaromaticcircle)",
+      "top": "NH₂ literal Nattachedtoringtopviaverticalbond approx136,129→136,151",
+      "bottom": "OHdownfrom136,220→136,243 toOHnear144,257",
+      "caption": "4-aminophenol",
+      "captionNear": [
+        137,
+        315
+      ]
+    },
+    "reactant2": {
+      "carbonylCarbons": [
+        [
+          338,
+          192
+        ],
+        [
+          398,
+          192
+        ]
+      ],
+      "middleO": [
+        368,
+        209
+      ],
+      "terminalLabels": "H₃Cleft near293,210;CH₃right near439,210",
+      "carbonylO": "OaboveeachcarbonylCnear337,156 and397,156;twoverticalbonds each",
+      "connectivity": "H3C-C(=O)-O-C(=O)-CH3 zigzag,3O total",
+      "caption": "acetic anhydride",
+      "captionNear": [
+        373,
+        315
+      ]
+    },
+    "arrow": {
+      "start": [
+        514,
+        188
+      ],
+      "end": [
+        622,
+        188
+      ],
+      "head": "RIGHT",
+      "heads": 1,
+      "conditions": null
+    },
+    "product1": {
+      "ringVertices": [
+        [
+          684,
+          167
+        ],
+        [
+          715,
+          149
+        ],
+        [
+          746,
+          167
+        ],
+        [
+          746,
+          201
+        ],
+        [
+          715,
+          219
+        ],
+        [
+          684,
+          201
+        ]
+      ],
+      "doubleEdges": "leftvertical,upperright,lowerright (3Kekule)",
+      "topAmide": "HN literal (Hleft,Nright),verticalbond fromringC715149 up~715125 toNnear714114; Nup-rightbond tocarbonylC74496; C=Oup twoverticalstoO74462; C-CH3single down-right toCH3near787114",
+      "bottom": "OHfromringbottomdown near715241/OHnear722255",
+      "caption": "paracetamol",
+      "captionNear": [
+        728,
+        315
+      ]
+    },
+    "product2": {
+      "formula": "CH₃COOH",
+      "near": [
+        949,
+        181
+      ],
+      "caption": "acetic acid",
+      "captionNear": [
+        954,
+        315
+      ]
+    },
+    "plusSigns": [
+      {
+        "near": [
+          229,
+          186
+        ],
+        "between": "4-aminophenol andanhydride"
+      },
+      {
+        "near": [
+          839,
+          182
+        ],
+        "between": "paracetamol andacid"
+      }
+    ],
+    "counts": {
+      "phenylRings": 2,
+      "KekuleDoubles": 6,
+      "carbonylDoublesDrawn": 3,
+      "arrowHeads": 1,
+      "plus": 2,
+      "captions": 4
+    },
+    "captionCase": "All lowercase words:4-aminophenol/acetic anhydride/paracetamol/acetic acid;sourceboldserifcaption appearance",
+    "noExtra": [
+      "NoNH replacement ofHNliteral",
+      "No phases/conditions/coefficients/charge/stereoadded",
+      "Aceticacid printedcondensedCH3COOH not expand",
+      "Noanswer/productioncalculation"
+    ]
+  },
+  "status": "Đạt exactSVG sauactualreview",
+  "actualReview": {
+    "i": 608,
+    "hashSvg": "ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởlạinativeFULL2x/allmols-captions/all2publicrefs.2Ph3doubleeach/2anhydrideCOdouble+bridgeO/amideHNliteral-Nanchor/COdoubleCH3/reactantNH2/bothOH/CH3COOH đủ.4lowercasecaptionsactualbold/1RIGHThead2plus/noextra conditions-phases-charge-stereo đúng. Fontgaps khôngchạm/cắt/tràn/noanswer.",
+    "actualSvgReviewed": true,
+    "byteSvg": 39342,
+    "render": "/workspace/scratch/paracetamol608-248-ebeab48f.png"
+  }
+}

@@ -1883,19 +1883,19 @@
       "font": "DDH Rounded"
     },
     "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565": {
-      "tep": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg",
-      "hashSvg": "1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409",
-      "byteSvg": 42327,
-      "byteGzip": 8404,
+      "tep": "nhan-orbital-config-ddh-0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2.svg",
+      "hashSvg": "0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2",
+      "byteSvg": 42464,
+      "byteGzip": 8443,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
     },
     "f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390": {
-      "tep": "nhan-orbital-config-ddh-eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347.svg",
-      "hashSvg": "eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347",
-      "byteSvg": 7383,
-      "byteGzip": 1652,
+      "tep": "nhan-orbital-config-ddh-60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f.svg",
+      "hashSvg": "60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f",
+      "byteSvg": 7373,
+      "byteGzip": 1636,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -2904,6 +2904,15 @@
       "hashSvg": "cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056",
       "byteSvg": 42363,
       "byteGzip": 8401,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142": {
+      "tep": "paracetamol-phan-ung-ddh-ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e.svg",
+      "hashSvg": "ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e",
+      "byteSvg": 39342,
+      "byteGzip": 5173,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -13230,6 +13239,20 @@
       ]
     },
     {
+      "qid": "12-KT-C3-D1-III-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+          "where": "12-KT-C3-D1-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "fe361a3ae5f2859c39bf85a5fc37b3c78b13534b842c03f472ff78c59b6213e8",
+          "vector": "paracetamol-phan-ung-ddh-ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C3-D3-I-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -14539,7 +14562,7 @@
           "hash": "f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390",
           "where": "DB-10-B1-D1-II-205.hinh.0.du_lieu",
           "hashDataUrl": "2905ce534c893b27fd6dba1b9d80ad5ba4d41bd9f5adb654595b3ad2e8bc2c2c",
-          "vector": "nhan-orbital-config-ddh-eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347.svg"
+          "vector": "nhan-orbital-config-ddh-60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f.svg"
         }
       ]
     },
@@ -19019,7 +19042,7 @@
           "hash": "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565",
           "where": "DB-12-B9-P1-D1-I-223.hinh.0.du_lieu",
           "hashDataUrl": "6410dde0ad2cf3bd3c62e8680aabff869d8a6c952e9d260c68bf22f443590652",
-          "vector": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg"
+          "vector": "nhan-orbital-config-ddh-0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2.svg"
         }
       ]
     },
@@ -19486,6 +19509,20 @@
           "where": "DB-12-B8-D1-I-247.hinh.0.du_lieu",
           "hashDataUrl": "fb60017b1f8a051ea1faa67351279dd4a8af61fc42ddafd9c2cc6becae22ee5a",
           "vector": "cau-truc-ddh-da72d9d01bb8970c8112f8ecbd2bfa422a2448d0b33bed7685d4563fc78888bf.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-256",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "70a4ff274f825ee57f0a69f28785dd06be24f313617124d67032bdcf38806142",
+          "where": "DB-12-B8-D1-III-256.hinh.0.du_lieu",
+          "hashDataUrl": "fe361a3ae5f2859c39bf85a5fc37b3c78b13534b842c03f472ff78c59b6213e8",
+          "vector": "paracetamol-phan-ung-ddh-ebeab48f2f9db11e2e3e7062d9b90e4be09e1baab135f2c9cf7513ceb471760e.svg"
         }
       ]
     },
@@ -21635,7 +21672,7 @@
           "hash": "f60bf7d35f9e4ec76a4350a37cf65aa69c028b6ba654ec61dbbfe56ee7282390",
           "where": "DH-10-C1-B3-II-22.hinh.0.du_lieu",
           "hashDataUrl": "2905ce534c893b27fd6dba1b9d80ad5ba4d41bd9f5adb654595b3ad2e8bc2c2c",
-          "vector": "nhan-orbital-config-ddh-eeb5bda9bca2ef77322594e91a4d100c423f278b8afe86362d6a33b716e83347.svg"
+          "vector": "nhan-orbital-config-ddh-60daa920c1cf034794f7d8891899c9d0c2ea7e364bd14a03cc363c8e4846c57f.svg"
         }
       ]
     },
@@ -25527,7 +25564,7 @@
           "hash": "f4f7b22b19489642ca15e4d982f03ac203813886d36b5df70bbfe3bcc9027565",
           "where": "DH-12-C3-B9-P1-I-79.hinh.0.du_lieu",
           "hashDataUrl": "6410dde0ad2cf3bd3c62e8680aabff869d8a6c952e9d260c68bf22f443590652",
-          "vector": "nhan-orbital-config-ddh-1f5d2faaff9a85c9c0911c71f62892c42d65b9801c1851b1f850c090ab93b409.svg"
+          "vector": "nhan-orbital-config-ddh-0b6cd4f6db0c03fb1b4a896658c5f639a94f874672e76c8264df2c4c504893f2.svg"
         }
       ]
     },
@@ -27156,6 +27193,7 @@
     "12-KT-C2-D5-II-3",
     "12-KT-C2-D5-II-4",
     "12-KT-C3-D1-I-8",
+    "12-KT-C3-D1-III-6",
     "12-KT-C3-D3-I-4",
     "12-KT-C3-D3-I-11",
     "12-KT-C3-D3-II-2",
@@ -27545,6 +27583,7 @@
     "DB-12-B8-D1-I-241",
     "DB-12-B8-D1-I-246",
     "DB-12-B8-D1-I-247",
+    "DB-12-B8-D1-III-256",
     "DB-12-B8-D1-I-257",
     "DB-12-B8-D1-III-272",
     "DB-12-B8-D1-I-275",
