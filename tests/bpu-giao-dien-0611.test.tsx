@@ -124,13 +124,15 @@ describe('bảng chiếu', () => {
     expect(await screen.findByText('Vô địch buổi hôm nay')).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/tinh thể|Cần kèm/)
   })
-  it('bước điểm danh: mã + QR hiện ngay; phòng không mở được (lớp có ca mở) ⇒ lùi bản chiếu cũ', async () => {
+  it('SỬA CÓ CHỦ ĐÍCH 07/11 (thầy «vẫn bị nhảy vào màn điểm danh cũ, bỏ hẳn đi»): phòng không mở được ⇒ KHÔNG lùi bản chiếu cũ; bảng giữ mã + QR, báo lỗi', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
     traMo.v = { ok: true, du: { ok: false, lyDo: 'ca-mo', error: 'Lớp đang có ca kiểm tra mở.' } }
     const onTat = vi.fn()
     render(<Bang buoiId="b1" ma="482715" linkQr="https://app/hs?diem-danh=482715" onDong={() => {}} onTat={onTat} />)
     expect(screen.getByText('Vào lớp: mở app, nhập mã')).toBeTruthy()
-    await waitFor(() => expect(onTat).toHaveBeenCalled())
+    expect(await screen.findByText(/Lớp đang có ca kiểm tra mở/)).toBeTruthy()
+    expect(onTat).not.toHaveBeenCalled()
+    expect(screen.getByRole('img', { name: 'Mã QR điểm danh' })).toBeTruthy()
     traMo.v = { ok: true, du: { ok: true, ve: 've-thay' } }
   })
   it('chuyển câu: → và nút «Câu tiếp» báo tờ sang câu sau; lưới hiện tên gọi đủ chữ', async () => {

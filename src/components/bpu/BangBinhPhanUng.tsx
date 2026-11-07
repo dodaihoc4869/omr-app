@@ -154,15 +154,15 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     async function noi() {
       const r = await goiLenh('/gv/bpu/mo', { buoiId }, 'Máy chủ chưa có Bình Phản Ứng.')
       if (dung) return
-      // Mở từ bước Điểm danh mà phòng không mở được (mất mạng, lớp có ca mở, máy chủ tắt) ⇒ LÙI bản chiếu điểm danh cũ: mã điểm danh luôn chiếu được.
-      if ((!r.ok || r.du.ok === false) && laDiemDanh.current) { onTat?.(); return }
+      // Mở từ bước Điểm danh mà phòng chưa mở được (mất mạng, lớp có ca mở, máy chủ tắt): KHÔNG lùi bản chiếu cũ nữa (thầy 07/11 «bỏ hẳn đi») —
+      // bảng vẫn chiếu mã + QR (mã do app thầy truyền vào), báo một dòng và tự thử lại.
       // Tin tự động mà chưa có bảng nào trên màn ⇒ không che tờ bằng màn lỗi: báo một dòng, đóng bảng.
       if (!r.ok && tuDongRef.current && !daCoTin) { khongMoRef.current?.(`Chưa gửi được câu xuống máy em: ${r.chu}`, true); return }
       if (!r.ok) { setLoi({ chu: r.chu }); hen = setTimeout(() => void noi(), 8000); return }
       if (r.du.ok === false) {
-        if (r.du.lyDo === 'tat') { onTat?.(); return }
+        if (r.du.lyDo === 'tat' && !laDiemDanh.current) { onTat?.(); return }
         if (tuDongRef.current) { khongMoRef.current?.(String(r.du.error ?? 'Chưa mở được Bình Phản Ứng.'), true); return }
-        setLoi({ chu: String(r.du.error ?? 'Chưa mở được Bình Phản Ứng.'), chan: r.du.lyDo === 'ca-mo' }); return
+        setLoi({ chu: String(r.du.error ?? 'Chưa mở được Bình Phản Ứng.'), chan: r.du.lyDo === 'ca-mo' }); if (laDiemDanh.current) hen = setTimeout(() => void noi(), 15000); return
       }
       setLoi(null)
       const goc0 = (await layDiaChiMayChu('')) || 'https://omr.ttadodaihoc.workers.dev'
@@ -170,7 +170,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       ws.current = w
       w.onopen = () => { lan = 0; w.send('{"t":"chao"}'); clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000) }
       w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') { daCoTin = true; setV(m as unknown as ViewBang) } else if (m.t === 'dk') { const l = (m as { lenh?: string }).lenh, d = dkRef.current; if (l === 'toi') d.onToi?.(1); else if (l === 'lui') d.onToi?.(-1); else if (l === 'giai') d.onGiai?.() } } catch { /* bỏ qua */ } }
-      w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (dung) return; if (laDiemDanh.current && !daCoTin && lan >= 2) { onTat?.(); return } hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
+      w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (dung) return; hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     }
     void noi()
@@ -419,6 +419,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         {DOI_BPU.slice(0, dsDoi(v).length).map((d, i) => { const so = ds.filter((e) => e.doi === i && e.vao).length, tong = ds.filter((e) => e.doi === i).length; return <div key={d.ten} className={`bb-dd-doi${so === tong && tong ? ' du' : ''}`} style={{ left: X_LUA_DD[i], ['--doi' as string]: mauDoi(i) }}><b>{d.ten.replace('Đội ', '')}</b><span>{so}/{tong}</span><small>{v.doiThuong[i]} kJ</small></div> })}
         <div className="bb-dd-dem"><b>{coMat.length}</b>/{ds.length} em có mặt</div>
         {luoi(o)}
+        {loi ? <div className="bb-toast loi" role="alert">{loi.chu} · mã điểm danh vẫn dùng được</div> : null}
         {phim([['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Đóng bảng']], 'Chiếu đề lên bảng: mỗi lần chuyển câu, câu tự gửi xuống máy các em có mặt, giờ tự tính theo câu (tối đa 3 phút).')}
       </>
     )

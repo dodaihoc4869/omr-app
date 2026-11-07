@@ -13,8 +13,9 @@ import type { EmNhipHoc } from '../server/src/nhip-hoc-kieu'
 const { goi } = vi.hoisted(() => ({ goi: vi.fn() }))
 vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (duong: string, body: Record<string, unknown>) => goi(duong, body) }))
 vi.mock('../src/components/hop-thoai', () => ({ hoiXacNhan: async () => true }))
-// 06/11: bản chiếu điểm danh mặc định là bảng Bình Phản Ứng; tệp này khoá bản chiếu CŨ A/B (đường lùi khi máy chủ tắt `TAT_BPU`) ⇒ giả lập máy chủ tắt.
-vi.mock('../src/components/bpu/BangBinhPhanUng', async () => { const { useEffect } = await import('react'); return { default: function BangGiaTat({ onTat }: { onTat?: () => void }) { useEffect(() => { onTat?.() }, [onTat]); return null } } })
+// 06/11: bản chiếu điểm danh mặc định là bảng Bình Phản Ứng. SỬA CÓ CHỦ ĐÍCH 07/11: không còn đường lùi bản chiếu cũ A (kể cả khi máy chủ tắt) ⇒
+// giả bảng bằng một khối có mã (gọi onTat để chắc app KHÔNG lùi bản cũ dù bảng báo tắt).
+vi.mock('../src/components/bpu/BangBinhPhanUng', async () => { const { useEffect } = await import('react'); return { default: function BangGia({ onTat, ma }: { onTat?: () => void; ma?: string | null }) { useEffect(() => { onTat?.() }, [onTat]); return <div data-bang-gia="">Bảng Bình Phản Ứng · mã {ma}</div> } } })
 vi.mock('../src/components/chien-dich/HoSoLamCauEm', () => ({
   default: (p: { em: { sbd: string; ten: string; lop?: string; khoi: string | null }; onDong: () => void }) => (
     <div role="dialog" aria-label="Hồ sơ làm bài">
@@ -220,57 +221,24 @@ describe('bước 1 Điểm danh (bản vẽ GV-DiemDanh)', () => {
     coBuoi = false
     render(<Khung />)
     fireEvent.click(await screen.findByRole('button', { name: 'Điểm danh' }))
-    const chieu = await screen.findByRole('dialog', { name: 'Bản chiếu điểm danh' })
+    // SỬA CÓ CHỦ ĐÍCH 07/11 (thầy «vẫn bị nhảy vào màn điểm danh cũ, bỏ hẳn đi»): chiếu điểm danh = bảng Bình Phản Ứng (mã + QR), kể cả khi
+    // phòng chưa mở được — KHÔNG còn lùi bản chiếu điểm danh cũ.
+    await screen.findByText(/Bảng Bình Phản Ứng · mã 482915/)
     expect(lenh('/gv/buoi-hoc', 'mo')).toHaveLength(1)
-    expect(within(chieu).getByText('482 915')).toBeTruthy()
+    expect(screen.queryByRole('dialog', { name: 'Bản chiếu điểm danh' })).toBeNull()
     expect(screen.queryByRole('dialog', { name: 'Chiếu mã điểm danh' })).toBeNull()
   })
 })
 
-describe('bản chiếu A — đang điểm danh', () => {
-  it('ô tên tô theo nhóm + "đủ mức x/y ngày"; em không có số ⇒ không màu nhóm; em vừa vào viền vàng; bấm tên ⇒ hồ sơ đúng SBD; Esc lúc tấm mở không đóng bản chiếu', async () => {
+// SỬA CÓ CHỦ ĐÍCH 07/11 (thầy «vẫn bị nhảy vào màn điểm danh cũ, bỏ hẳn đi»): bản chiếu A (điểm danh cũ) không còn đường mở — «Chiếu điểm danh»
+// LUÔN là bảng Bình Phản Ứng (mã + QR + dải tên em có mặt; ô tên, đội, kJ có test riêng tests/bpu-giao-dien-0611 · bpu-luoi-0711).
+describe('chiếu điểm danh = bảng Bình Phản Ứng', () => {
+  it('«Chiếu điểm danh» ⇒ bảng Bình Phản Ứng có mã + QR; KHÔNG mở bản chiếu điểm danh cũ (kể cả khi phòng chưa mở được)', async () => {
     await veBuoc1()
     fireEvent.click(screen.getByRole('button', { name: 'Chiếu điểm danh' }))
-    const chieu = await screen.findByRole('dialog', { name: 'Bản chiếu điểm danh' })
-    expect(within(chieu).getByText('Điểm danh đầu giờ')).toBeTruthy() // chữ hoa bằng CSS (bản nền sáng 23/10)
-    expect(within(chieu).getByRole('status', { name: 'Có mặt 6 trên 9 em' })).toBeTruthy()
-    expect(within(chieu).getByRole('img', { name: 'Mã QR điểm danh' })).toBeTruthy()
-    const o = within(within(chieu).getByRole('group', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
-    // SỬA CÓ CHỦ ĐÍCH 23/10 (bản nền sáng, thầy chốt): thẻ chỉ tên + tên nhóm/bậc; "Đủ mức x/y ngày" chuyển vào chú thích (title) — cuối lớp không đọc được chữ nhỏ.
-    // SỬA CÓ CHỦ ĐÍCH 13/10 (đợt 19 làn Q — ô tên ⇒ THẺ em: dòng nhóm + "Đủ mức x/y ngày" riêng; máy chủ này chưa gửi bậc nên thẻ tô theo nhóm
-    // như cũ; nhãn "Vừa vào" + viền vàng cho BA em vào muộn nhất theo bản vẽ thầy duyệt, không còn một em)
-    expect(
-      o.map((b) => [b.querySelector('.ddv-the-ten')?.textContent, b.getAttribute('data-nhom'), b.querySelector('.ddv-the-bac')?.textContent, (b.getAttribute('title') ?? '').split(' · ').slice(2).join(' · ')]),
-    ).toEqual([
-      ['Nguyễn Minh Anh', 'cham', 'Chăm', 'đủ mức 11/11 ngày · chuỗi 12 ngày liền'],
-      ['Trần Gia Bảo', 'cham', 'Chăm', expect.stringMatching(/^đủ mức 10\/11 ngày/)],
-      ['Đỗ Mai Phương', 'chua-deu', 'Chưa đều', expect.stringMatching(/^đủ mức 6\/11 ngày/)],
-      ['Hoàng Đức Huy', 'luoi', 'Lười', 'đủ mức 0/11 ngày · thoát Lười 0/6 ngày liền'],
-      ['Quách Gia Linh', 'moi', 'Mới vào lớp', 'đã có số 1/3 ngày'],
-      ['Phạm Hà', 'chua-co', 'Chưa có số', ''],
-    ])
-    expect(o[5]!.getAttribute('title')).toBe(`Phạm Hà · điểm danh lúc ${gioDd(luc(56))}`)
-    expect(o.filter((b) => b.hasAttribute('data-moi')).map((b) => b.querySelector('.ddv-the-ten')?.textContent)).toEqual(['Hoàng Đức Huy', 'Quách Gia Linh', 'Phạm Hà'])
-    expect([...chieu.querySelectorAll('.ddv-lan-nhan')].map((x) => x.querySelector('b')!.textContent + ' ' + x.querySelector('span')!.textContent)).toEqual(['Chăm 2 em', 'Chưa đều 1 em', 'Lười 1 em', 'Mới 1 em', 'Chưa có số 1 em'])
-    expect(chieu.querySelector('.ddv-chan')?.textContent).toContain('thoát khi đủ mức 6 ngày liền')
-    // «Vừa vào lớp» (thay khối Bậc cao nhất lớp): bấm dòng em ⇒ hồ sơ như bấm thẻ — đã kiểm ở tests/man-chieu-dot19-1310q
-    fireEvent.click(o[3]!)
-    const ho = await screen.findByRole('dialog', { name: 'Hồ sơ làm bài' })
-    expect(ho.textContent).toContain('S4')
-    fireEvent.keyDown(window, { key: 'Escape' })
-    expect(screen.getByRole('dialog', { name: 'Bản chiếu điểm danh' })).toBeTruthy()
-    fireEvent.click(within(ho).getByRole('button', { name: 'Đóng hồ sơ' }))
-    fireEvent.keyDown(window, { key: 'Escape' })
+    await screen.findByText(/Bảng Bình Phản Ứng · mã/)
+    await new Promise((r) => setTimeout(r, 30))
     expect(screen.queryByRole('dialog', { name: 'Bản chiếu điểm danh' })).toBeNull()
-  })
-
-  it('phím → ⇒ bản chiếu Nhịp học của lớp (đọc lại Nhịp học)', async () => {
-    await veBuoc1()
-    fireEvent.click(screen.getByRole('button', { name: 'Chiếu điểm danh' }))
-    await screen.findByRole('dialog', { name: 'Bản chiếu điểm danh' })
-    fireEvent.keyDown(window, { key: 'ArrowRight' })
-    expect(await screen.findByRole('dialog', { name: 'Bản chiếu nhịp học của lớp 12A1' })).toBeTruthy()
-    await waitFor(() => expect(lenh('/gv/nhip-hoc')).toHaveLength(2))
   })
 })
 
@@ -333,7 +301,7 @@ describe('bản chiếu B — Nhịp học của lớp', () => {
     expect(screen.queryByRole('dialog', { name: /Bản chiếu/ })).toBeNull()
   })
 
-  it('máy chủ chưa có lệnh Nhịp học ⇒ tên vẫn hiện (không màu nhóm) ở bản chiếu A; bản chiếu B nói thật + Thử lại', async () => {
+  it('máy chủ chưa có lệnh Nhịp học ⇒ bản chiếu B nói thật + Thử lại', async () => {
     goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/nhip-hoc') return { ok: false, loai: 'chua_co_lenh', chu: 'Máy chủ chưa có lệnh Nhịp học — cần đẩy bản máy chủ mới.' }
       if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [BUOI] } }
@@ -343,12 +311,8 @@ describe('bản chiếu B — Nhịp học của lớp', () => {
     render(<Khung />)
     await screen.findByText(/Chưa có nhóm Chăm \/ Lười: Máy chủ chưa có lệnh Nhịp học/)
     expect(screen.getByText('Vắng 4 em')).toBeTruthy()
-    fireEvent.click(screen.getByRole('button', { name: 'Chiếu điểm danh' }))
-    const a = await screen.findByRole('dialog', { name: 'Bản chiếu điểm danh' })
-    const o = within(within(a).getByRole('group', { name: 'Bấm tên em để mở hồ sơ làm bài' })).getAllByRole('button')
-    expect(o).toHaveLength(6)
-    expect(o.every((b) => b.getAttribute('data-nhom') === 'chua-co')).toBe(true)
-    fireEvent.keyDown(window, { key: 'ArrowRight' })
+    // 07/11: bỏ bản chiếu A ⇒ vào thẳng bản chiếu B bằng nút chính
+    fireEvent.click(screen.getByRole('button', { name: 'Xong điểm danh · chiếu Nhịp học của lớp' }))
     const b = await screen.findByRole('dialog', { name: 'Bản chiếu nhịp học của lớp 12A1' })
     expect(await within(b).findByText(/Chưa tải được nhịp học của lớp: Máy chủ chưa có lệnh Nhịp học/)).toBeTruthy()
     expect(within(b).getByRole('button', { name: 'Thử lại' })).toBeTruthy()

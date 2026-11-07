@@ -284,7 +284,6 @@ export default function Buoc1DiemDanh({
   const bang = useMemo(() => nhipTheoSbd(nhip.kq), [nhip.kq])
   const tk = useMemo(() => thongKeBuoi(tt, bang), [tt, bang])
   const [banChieu, setBanChieu] = useState<CheDoChieu | null>(null)
-  const [bpuTat, setBpuTat] = useState(false)
   const [hoSo, setHoSo] = useState<EmHoSo | null>(null)
   const [moVua, setMoVua] = useState(false)
   const [moVang, setMoVang] = useState(false)
@@ -702,9 +701,9 @@ export default function Buoc1DiemDanh({
         )}
       </section>
 
-      {banChieu === 'diem-danh' && tt && !bpuTat && !!tt.buoi.id ? (
+      {banChieu === 'diem-danh' && tt && !!tt.buoi.id ? ( // thầy 07/11: chiếu điểm danh LUÔN là bảng Bình Phản Ứng, bỏ hẳn bản chiếu cũ
         <Suspense fallback={null}>
-          <BangBinhPhanUng buoiId={tt.buoi.id} ma={tt.ma} linkQr={tt.ma ? linkDiemDanh(goc, tt.ma) : null} onDong={dongChieu} onTat={() => setBpuTat(true)} />
+          <BangBinhPhanUng buoiId={tt.buoi.id} ma={tt.ma} linkQr={tt.ma ? linkDiemDanh(goc, tt.ma) : null} onDong={dongChieu} />
         </Suspense>
       ) : banChieu && tt && (
         <Suspense fallback={null}>
