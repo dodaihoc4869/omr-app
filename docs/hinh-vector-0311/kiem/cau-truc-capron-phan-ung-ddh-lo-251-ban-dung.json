@@ -1,0 +1,40 @@
+[
+  {
+    "i": 685,
+    "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+    "fileNguon": "anh/7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f.png",
+    "svg": "capron-phan-ung-ddh-c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875.svg",
+    "hashSvg": "c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875",
+    "byteSvg": 13388,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-BD7-18-II-2",
+        "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học (1) như hình:",
+        "refs": [
+          {
+            "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+            "where": "12-BD7-18-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a"
+          }
+        ]
+      },
+      {
+        "qid": "12-C4-B13-II-2",
+        "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học (1) như hình:",
+        "refs": [
+          {
+            "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+            "where": "12-C4-B13-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7memberlactamring-NH-COdouble/coefficientn/1RIGHThead/xúc tác,t°/polymerliteralHN–[CH2]5–CO/2roundparentheses+nsub/(1)right/noextraH2O-conditions-answer/DDHpath.",
+    "hashSvgDaSoat": "c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

@@ -1,10 +1,13 @@
 [
   {
     "i": 64,
-    "hashSvg": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt sau sửa: Đã mở nguồn native/full+2macropanels,đọc2publicstemsrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-200-final-fresh.png) và3macroOHnộiVỪAsửa. Cả3glyphOđãcógapvớireardiagonal,ring2C3footx345/C2x424 đúngsource,khôngthayatomattachments/stereo. GiữpanelI2rings/panelIIring+open,mỗi12C11O/6OHstandalone+2terminalimplicitC–OH,2bridgeO nốivàođúngleft-rightvertices. AldehydeII1Hexplicit/C=Ochéoup/Hdownrightgiữ,noHextra/CH₂OHtext/numbers/equilibriumarrow. 4drawingunitsđều2taperfront+horizontalbold,total8taper4bold;2captions(I)(II)DDHđậm thậtgiữtheopublicstemsEXPLICITcall. DDHpath tựchứa khôngfallback/text/image,allglyph/bondgapskhôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata. Negative3b9fgiữriêng.",
+    "hashSvg": "a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở RIÊNG nguồn FULL/zoom và toàn bộ public stems/refs, tự fresh Chromium exact sharedSVG rồi mở actual. Hai panel (I)/(II), 3 vòng và 1 mạch hở; mọi OH đúng chiều, đầu C6 không thêm CH₂, aldehyde có H, 8 taper/4 nét ngang đậm, 2 O cầu; caption DDH đậm đúng. Không chạm/cắt/tràn, không thêm đáp án.",
+    "actualSvgReviewed": true,
+    "byteSvg": 23467,
+    "render": "/workspace/scratch/font251-64-actual.png",
     "hash": "0c76fb96a3ea6ed26b904baa727b6a9780ce40554edee5c88dc43f4f05dc37db",
-    "hashSvgDaSoat": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2"
+    "hashSvgDaSoat": "a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab"
   }
 ]

@@ -296,15 +296,19 @@
         ]
       }
     ],
-    "daCoManifestTaiCheckpoint": false,
-    "svg": "nong-do-hno3-ddh-c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77.svg",
-    "hashSvg": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
-    "byteSvg": 50092,
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "nong-do-hno3-ddh-c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77.svg",
+    "hashSvgDaChon": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
+    "svg": "nong-do-hno3-ddh-b6cb4b18a267ddb70bd7bfb5b7437e2f63f81c0efdf5bf6c7de30f4b0aed1dac.svg",
+    "hashSvg": "b6cb4b18a267ddb70bd7bfb5b7437e2f63f81c0efdf5bf6c7de30f4b0aed1dac",
+    "byteSvg": 50349,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "5PCHIPcurvesnativeanchors/10dashedguides+Yticks/4Xticks/3Ylabels/2axisarrows/all5curvelabels/NH4sup+/CsubHNO3/molLsup-1/noanswer.",
-    "hashSvgDaSoat": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "b6cb4b18a267ddb70bd7bfb5b7437e2f63f81c0efdf5bf6c7de30f4b0aed1dac",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "1f47ab27b1260afbc3d2fcf21261f3f1fd7340e7"
   }
 ]

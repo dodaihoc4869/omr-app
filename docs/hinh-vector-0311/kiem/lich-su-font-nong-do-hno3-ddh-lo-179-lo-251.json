@@ -1,0 +1,323 @@
+{
+  "metadata": [
+    {
+      "i": 1028,
+      "hash": "b870c7568e7c64e8245dc20b5720734c2c328cc9d3d27e83ff38312d3b3cfdb2",
+      "fileNguon": "anh/b870c7568e7c64e8245dc20b5720734c2c328cc9d3d27e83ff38312d3b3cfdb2.png",
+      "canvas": [
+        973,
+        548
+      ],
+      "daMoNative": true,
+      "kind": "nitric-acid-five-product-curves",
+      "xLabel": "C_HNO₃ (mol L⁻¹)",
+      "yLabel": "Hàm lượng sản phẩm khử",
+      "xTickLabels": [
+        "4,02",
+        "8,06",
+        "9,75",
+        "12,2"
+      ],
+      "yTickLabels": [
+        "0",
+        "5",
+        "10"
+      ],
+      "curves": [
+        {
+          "label": "NH₄⁺",
+          "samples": [
+            [
+              167,
+              146
+            ],
+            [
+              220,
+              163
+            ],
+            [
+              280,
+              199
+            ],
+            [
+              340,
+              243
+            ],
+            [
+              390,
+              293
+            ],
+            [
+              429,
+              347
+            ],
+            [
+              450,
+              403
+            ],
+            [
+              461,
+              453
+            ]
+          ]
+        },
+        {
+          "label": "N₂",
+          "samples": [
+            [
+              167,
+              395
+            ],
+            [
+              220,
+              392
+            ],
+            [
+              280,
+              367
+            ],
+            [
+              320,
+              340
+            ],
+            [
+              350,
+              326
+            ],
+            [
+              390,
+              339
+            ],
+            [
+              440,
+              379
+            ],
+            [
+              490,
+              421
+            ],
+            [
+              541,
+              453
+            ]
+          ]
+        },
+        {
+          "label": "N₂O",
+          "samples": [
+            [
+              167,
+              419
+            ],
+            [
+              220,
+              409
+            ],
+            [
+              280,
+              393
+            ],
+            [
+              340,
+              382
+            ],
+            [
+              400,
+              373
+            ],
+            [
+              460,
+              369
+            ],
+            [
+              510,
+              370
+            ],
+            [
+              550,
+              389
+            ],
+            [
+              585,
+              423
+            ],
+            [
+              615,
+              453
+            ]
+          ]
+        },
+        {
+          "label": "NO",
+          "samples": [
+            [
+              167,
+              281
+            ],
+            [
+              220,
+              275
+            ],
+            [
+              280,
+              263
+            ],
+            [
+              340,
+              244
+            ],
+            [
+              400,
+              217
+            ],
+            [
+              440,
+              194
+            ],
+            [
+              480,
+              145
+            ],
+            [
+              520,
+              105
+            ],
+            [
+              553,
+              94
+            ],
+            [
+              585,
+              102
+            ],
+            [
+              623,
+              127
+            ]
+          ]
+        },
+        {
+          "label": "NO₂",
+          "samples": [
+            [
+              167,
+              438
+            ],
+            [
+              220,
+              433
+            ],
+            [
+              280,
+              418
+            ],
+            [
+              340,
+              393
+            ],
+            [
+              400,
+              362
+            ],
+            [
+              460,
+              319
+            ],
+            [
+              520,
+              266
+            ],
+            [
+              575,
+              195
+            ],
+            [
+              623,
+              128
+            ]
+          ]
+        }
+      ],
+      "geometry": {
+        "origin": [
+          166,
+          453
+        ],
+        "xHead": [
+          934,
+          453
+        ],
+        "yHead": [
+          166,
+          58
+        ],
+        "xTickPixels": [
+          312,
+          461,
+          541,
+          615
+        ],
+        "guideYs": [
+          420,
+          383,
+          347,
+          309,
+          273,
+          236,
+          200,
+          165,
+          129,
+          93
+        ],
+        "guideXrange": [
+          166,
+          670
+        ]
+      },
+      "notes": "5curveđenliền,10guidehorizđứt;YKHÔNG%unit. GiữNH₄⁺superscript+,N₂/N₂O/NO/NO₂labelsứngcurve. NOhumpđỉnh10rồigiảm,NO₂tăngendgầnNO;N₂peak~3,5rồivề0ở9,75;NH₄⁺về0ở8,06;N₂Ovề0ở12,2. Sampleschỉpixelreadnativekhôngthêmnumberschem/answers. Khônggiảsửaxmisscalibration.",
+      "questions": [
+        {
+          "qid": "11-C2-B6-II-2",
+          "de": "Khi Fe phản ứng với HNO₃ với nồng độ khác nhau, hàm lượng sản phẩm khử với nồng độ nitric acid được thể hiện trong Hình 2.2.",
+          "refs": [
+            {
+              "where": "11-C2-B6-II-2.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DB-11-B6-D2-II-5",
+          "de": "Khi Fe phản ứng với HNO₃ với nồng độ khác nhau, hàm lượng sản phẩm khử với nồng độ nitric acid được thể hiện trong Hình 2.2.",
+          "refs": [
+            {
+              "where": "DB-11-B6-D2-II-5.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daCoManifestTaiCheckpoint": false,
+      "svg": "nong-do-hno3-ddh-c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77.svg",
+      "hashSvg": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
+      "byteSvg": 50092,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "5PCHIPcurvesnativeanchors/10dashedguides+Yticks/4Xticks/3Ylabels/2axisarrows/all5curvelabels/NH4sup+/CsubHNO3/molLsup-1/noanswer.",
+      "hashSvgDaSoat": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "oldPositive": [
+    {
+      "i": 1028,
+      "hashSvg": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở PNGnative/full và TỰfreshactualSVGChromium(setContentđúngbyte,ảnhscratch/cau4-179-fresh.png). Đối5curve/crossings/extrema/endpoints:NH4+giảmđến9,75;N2đỉnhgần4,02rồivề0ở8,06;N2Oplateauthấprồivề0ở12,2;NOtăngđỉnh10rồigiảm;NO2tăngđếngiaonhauNOcuốiphải đúnghìnhnguồn. Đủ10dashedguides/Ytickmarks-labels0,5,10/4Xticklabels4,02;8,06;9,75;12,2;labelsNO/NO2/N2O/N2/NH4sup+,CsubHNO3(mol L−1)/2axisarrows đúng. DDHpath/subsup/gapskhôngchạm-cắt-tràn,SHA256khớp;khôngsuytheory/giảibài.",
+      "hash": "b870c7568e7c64e8245dc20b5720734c2c328cc9d3d27e83ff38312d3b3cfdb2",
+      "hashSvgDaSoat": "c0749d57dfdbf69f3e47d72c5084350c6b8c124b4900221fc8ec450331e1fe77"
+    }
+  ],
+  "gioiHan": "Lịch sửfontcũ/khôngduyệthashmới;sharedSVGphảisoáttừngnative."
+}

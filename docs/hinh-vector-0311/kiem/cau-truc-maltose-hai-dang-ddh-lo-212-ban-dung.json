@@ -3,9 +3,9 @@
     "i": 149,
     "hash": "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5",
     "fileNguon": "anh/1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5.png",
-    "svg": "maltose-hai-dang-ddh-a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2.svg",
-    "hashSvg": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2",
-    "byteSvg": 23573,
+    "svg": "maltose-hai-dang-ddh-a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab.svg",
+    "hashSvg": "a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab",
+    "byteSvg": 23467,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -39,7 +39,9 @@
       282
     ],
     "geometryBaseSource": 64,
-    "hashSvgDaSoat": "a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "1f47ab27b1260afbc3d2fcf21261f3f1fd7340e7"
   }
 ]

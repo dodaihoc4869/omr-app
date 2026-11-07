@@ -1,0 +1,184 @@
+{
+  "i": 685,
+  "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+  "nativeSize": [
+    778,
+    183
+  ],
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f.png",
+  "status": "Đã mở nguồn FULL và zoom; source-only, chưa SVG/chưa Đạt",
+  "questions": [
+    {
+      "qid": "12-BD7-18-II-2",
+      "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học (1) như hình:",
+      "refs": [
+        {
+          "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+          "where": "12-BD7-18-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B13-II-2",
+      "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học (1) như hình:",
+      "refs": [
+        {
+          "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+          "where": "12-C4-B13-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "coefficient": {
+      "text": "n",
+      "bboxApprox": [
+        28,
+        104,
+        42,
+        122
+      ]
+    },
+    "ring": {
+      "members": 7,
+      "verticesClockwiseApprox": [
+        [
+          76,
+          70
+        ],
+        [
+          114,
+          70
+        ],
+        [
+          "NH",
+          148,
+          115
+        ],
+        [
+          120,
+          151
+        ],
+        [
+          73,
+          154
+        ],
+        [
+          48,
+          130
+        ],
+        [
+          48,
+          100
+        ]
+      ],
+      "carbonVertices": 6,
+      "nitrogen": "NH theo thứ tự N trái H phải, không HN",
+      "bonds": "7 liên kết vòng đơn; hai đoạn đến N ngắt đúng vùng chữ; carbonyl ở đỉnh trên phải (114,70)",
+      "carbonyl": {
+        "doubleBondApprox": [
+          [
+            114,
+            70,
+            122,
+            58
+          ],
+          [
+            117,
+            71,
+            125,
+            59
+          ]
+        ],
+        "oxygenBBoxApprox": [
+          121,
+          36,
+          144,
+          58
+        ]
+      },
+      "stereo": "Không nêm/nét đứt/vòng tròn"
+    },
+    "arrow": {
+      "heads": 1,
+      "direction": "RIGHT",
+      "shaftApprox": [
+        197,
+        115,
+        329,
+        115
+      ],
+      "headApprox": [
+        337,
+        115
+      ],
+      "aboveText": "xúc tác, t⁰",
+      "note": "Dấu nhỏ dạng vòng tròn trên t, không thêm C/độ nhiệt; không có điều kiện dưới mũi tên"
+    },
+    "polymer": {
+      "literal": "—(HN – [CH₂]₅ – CO)—ₙ",
+      "textOrder": [
+        "HN",
+        "–",
+        "[CH₂]₅",
+        "–",
+        "CO"
+      ],
+      "squareBrackets": "Chỉ bao CH₂; số 5 bên ngoài ngoặc vuông dưới dòng",
+      "roundParentheses": "Bao toàn HN – [CH₂]₅ – CO; n dưới bên phải ngoài ngoặc tròn",
+      "continuationBondsApprox": [
+        [
+          358,
+          114,
+          383,
+          114
+        ],
+        [
+          607,
+          114,
+          635,
+          114
+        ]
+      ],
+      "leftParenApprox": [
+        369,
+        90,
+        383,
+        140
+      ],
+      "rightParenApprox": [
+        608,
+        88,
+        622,
+        141
+      ],
+      "note": "Giữ HN literal, CO condensed không khai triển C=O; không đổi ngoặc vuông thành (CH₂), không thêm H/sản phẩm/phase"
+    },
+    "equationNumber": {
+      "text": "(1)",
+      "bboxApprox": [
+        705,
+        98,
+        741,
+        124
+      ]
+    },
+    "caption": "Không tên chất/caption khác; chỉ (1)",
+    "layout": "Một hàng ngang; vòng trái, điều kiện trên mũi tên, polymer giữa-phải, (1) xa bên phải"
+  },
+  "opened": [
+    "/workspace/scratch/capron685-native4x.png",
+    "/workspace/scratch/capron685-repeat5x.png"
+  ],
+  "actualReview": {
+    "i": 685,
+    "hashSvg": "c2abbe3eef1a69f511ce99214bbb82eaf31b2f2904dbb50035336c33431e8875",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở nguồn native FULL/4x/repeat5x và cả 2 public stems/refs; tự fresh Chromium exact SVG rồi mở actual FULL3x. Đúng vòng 7 thành viên với NH và C=O, hệ số n, 1 mũi tên phải, literal xúc tác, t°; polymer HN – [CH₂]₅ – CO với ngoặc vuông chỉ CH₂, ngoặc tròn toàn repeat/n dưới phải và (1). Không thêm chất/phase/caption hay sửa theo lý thuyết; chữ/nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 13388,
+    "render": "/workspace/scratch/capron685-251-actual.png"
+  }
+}
