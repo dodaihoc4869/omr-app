@@ -1,0 +1,19 @@
+/* HÔM NAY KHỔ RỘNG KIỂU DUOLINGO (thầy 07/11 «đo và làm bố cục trên máy tính, xoay ngang, fold cho chuẩn như Duolingo»; số đo: docs/ban-ve-bo-cuc-hn-rong-0711/
+   DO-DUOLINGO.md). Rộng ≥ 1240 (máy tính): THANH BÊN 256 có nhãn (mục cao 54, bo 12, biểu tượng 30, chữ 15/700 IN HOA, mục
+   chọn viền 2px), nội dung = cột giữa ≤ 610 + khe 48 + cột phải 320–380, đặt giữa phần còn lại. Hẹp hơn (Fold, máy tính bảng, điện thoại ngang: cột giữa
+   chỉ còn < 500 nếu có thanh 256 — Duolingo cũng thu dưới ~1160) giữ ray biểu tượng như
+   Duolingo thu gọn. Nạp sau phang-hs.css (dòng 3 bo-cuc-hn.css) ⇒ cùng độ ưu tiên `:not(#_)` thì tờ này thắng. Chỉ biến màu --tr-*. */
+@media (min-width: 1240px) and (min-height: 501px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs']:not(#_) .tr-menu-ray.kb-thanh { top: 0; bottom: 0; left: 0; transform: none; width: 256px; }
+  html[data-trong='hs']:not(#_) .tr-menu-ray.kb-thanh .kb-thanh-ds { width: 256px; height: 100%; box-sizing: border-box; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 8px;
+    padding: calc(32px + env(safe-area-inset-top)) 16px 96px calc(16px + env(safe-area-inset-left)); border-radius: 0 !important; background: var(--tr-nen) !important; box-shadow: inset -2px 0 0 var(--tr-vien) !important; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc { flex-direction: row; justify-content: flex-start; gap: 20px; width: 100%; height: 54px; padding: 0 16px; border-radius: 12px;
+    font-size: 15px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--tr-chu-2); }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc > svg { flex: none; width: 30px; height: 30px; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc[aria-current='page'] { background: color-mix(in oklab, var(--tr-hs) 10%, transparent) !important; box-shadow: inset 0 0 0 2px var(--tr-hs) !important; color: var(--tr-hs-chu) !important; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc:hover:not([aria-current='page']) { background: var(--tr-mat) !important; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-ai.kb-thanh-ai { position: absolute; left: calc(32px + env(safe-area-inset-left)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 54px; height: 54px; }
+  html[data-trong='hs']:not(#_) .tr-menu { left: 264px; }
+  html[data-trong='hs']:not(#_) .dm-khung { max-width: none; margin: 0; padding-left: calc(256px + 48px + env(safe-area-inset-left)); padding-right: 48px; }
+  html[data-trong='hs']:not(#_) .dm-khung .da-vo:has(> .kb-cot-trai) { grid-template-columns: minmax(0, 610px) minmax(320px, 380px); justify-content: center; column-gap: 48px; row-gap: 24px; padding-top: 32px; }
+}
