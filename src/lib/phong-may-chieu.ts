@@ -11,7 +11,7 @@ const LA = 'U+0000-00FF, U+0394, U+03B1-03B2, U+2000-206F, U+2070-208F, U+20AC, 
 /** Chuỗi phông dùng chung: phông app trước, phông hệ thống lùi sau (kí tự ngoài bộ phông vẫn hiện). */
 export const PHONG_APP = "'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif"
 
-/** CSS đặt SAU mọi CSS của tờ: khai phông + ép mọi chữ của tờ dùng phông app. */
+/** CSS đặt ĐẦU tờ: khai phông + ép mọi chữ của tờ dùng phông app (`!important` ⇒ thắng CSS đặt sau). */
 export function cssPhongMayChieu(): string {
   const tuyet = (u: string) => { try { return new URL(u, globalThis.location?.href).href } catch { return u } }
   const mat = (u: string, w: string, r: string) => `@font-face{font-family:'DDH Rounded';font-style:normal;font-weight:${w};font-display:swap;src:url('${tuyet(u)}') format('woff2');unicode-range:${r}}`
