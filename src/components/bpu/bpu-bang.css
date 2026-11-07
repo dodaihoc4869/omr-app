@@ -285,4 +285,4 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 .bb-ong.gon b { color: var(--tr-chu); font-weight: 800; }
 .bb-ong.gon.dung, .bb-ong.gon.dung b { color: var(--tr-dung-chu); font-weight: 800; }
 /* Em viết lên bảng (pha «làm bảng», thầy 07/11): chỉ VÙNG EM VIẾT (nửa phải, mép trái do bảng tính theo cỡ sân khấu) đen — đề bên trái vẫn sáng. */
-.bpu-bang .bb-tat-man { position: fixed; top: 0; right: 0; bottom: 0; z-index: 10; background: black; cursor: pointer; }
+.bpu-bang .bb-tat-man { position: fixed; top: 0; right: 0; bottom: 0; z-index: 10; background: var(--p-muc); cursor: pointer; } /* mực chuẩn (gần đen) — luật giữ màu: không thêm màu thô */
