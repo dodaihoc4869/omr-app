@@ -1,0 +1,41 @@
+[
+  {
+    "i": 594,
+    "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+    "fileNguon": "anh/6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626.png",
+    "svg": "bang-lysine-ddh-cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056.svg",
+    "hashSvg": "cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056",
+    "byteSvg": 42363,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D1-I-97",
+        "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂·HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc: Thành phần dinh dưỡng trong 1 viên nhộng – Hàm lượng L-Lysine 500 mg (gồm 637 mg L-Lysine Hydrochloride).\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+        "refs": [
+          {
+            "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+            "where": "12-C3-B9-D1-I-97.hinh.0.du_lieu",
+            "hashDataUrl": "e0d212ab463dae23e2de3bd753cd84ff96e6f9dabc5332774f7f96b08a057865"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D1-I-63",
+        "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂·HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc: Thành phần dinh dưỡng trong 1 viên nhộng – Hàm lượng L-Lysine 500 mg (gồm 637 mg L-Lysine Hydrochloride).\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+        "refs": [
+          {
+            "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+            "where": "DB-12-B9-P1-D1-I-63.hinh.0.du_lieu",
+            "hashDataUrl": "e0d212ab463dae23e2de3bd753cd84ff96e6f9dabc5332774f7f96b08a057865"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2boldheadings/4regularlabels/outerrect2horizontalrules/allliteralL-Lysine500mg637mgL-LysineHydrochloride/Trong1viênnhộng/noaddedcaption-data-answer/DDHpath.",
+    "hashSvgDaSoat": "cb2a0fdfc86c3cefe69b55c0c838fabb0996de4a8d7ed6343010d9587b6c3056",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
