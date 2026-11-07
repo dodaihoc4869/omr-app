@@ -182,7 +182,10 @@ export async function hsBpuCuaEm(env: Env, b: Row, nay = Date.now()): Promise<Ro
 export async function baoPhongVaoLop(env: Env, buoiId: unknown, sbd: string): Promise<void> {
   const id = buoiHop(buoiId)
   if (!bpuBat(env) || !id || !sbd) return
-  await goiPhong(env, id, '/vao', { sbd }).catch(() => null)
+  // Kèm HỌ TÊN (thầy 07/11: buổi «Mọi lớp» ⇒ phòng mở không có sẵn danh sách lớp ⇒ em điểm danh không hiện trên bảng): phòng tự thêm em chưa có trong
+  // danh sách (tự chia đội). Chạy nền sau câu trả lời điểm danh — một lệnh D1 nhỏ, không thêm vòng chờ cho em.
+  const h = await env.DB.prepare('SELECT ho_ten FROM hoc_sinh WHERE sbd = ? LIMIT 1').bind(sbd).first<Row>().catch(() => null)
+  await goiPhong(env, id, '/vao', { sbd, ten: str(h?.ho_ten) || sbd }).catch(() => null)
 }
 /** Kết thúc phòng của buổi (thầy kết thúc buổi học). Phòng chưa từng mở ⇒ không làm gì. */
 export async function dongPhongBpu(env: Env, buoiId: unknown): Promise<void> {
@@ -307,7 +310,7 @@ export class PhongBinhPhanUng {
       if (!st || st.ketThuc || st.buoiId !== str(b.buoiId)) {
         if (st?.ketThuc) await this.ghiD1()
         st = L.taoPhong({ buoiId: str(b.buoiId), lop: str(b.lop), nay, ds })
-      } else for (const x of ds) { if (!st.ds.some((e) => e.sbd === x.sbd)) L.vaoLop(st, x.sbd, x.luc ?? nay, x.ten); if (x.coMat) L.vaoLop(st, x.sbd, x.luc ?? nay) }
+      } else for (const x of ds) { if (!st.ds.some((e) => e.sbd === x.sbd)) L.themEm(st, x.sbd, x.ten); if (x.coMat) L.vaoLop(st, x.sbd, x.luc ?? nay) } // em mới của lớp: thêm (CHƯA vào) — trước đây thêm là tính luôn có mặt
       this.st = st
       await this.luu(); this.phat()
       return json({ ok: true })
@@ -315,7 +318,7 @@ export class PhongBinhPhanUng {
     const st = await this.doc()
     if (!st || st.ketThuc) return json({ ok: false, lyDo: 'chua-mo', error: 'Phòng chưa mở. Thầy bấm mở Bình Phản Ứng trước.' })
     if (u.pathname === '/vao') {
-      const co = L.vaoLop(st, str(b.sbd), nay)
+      const co = L.vaoLop(st, str(b.sbd), nay, str(b.ten) || undefined)
       // Em vừa điểm danh ⇒ kênh đẩy mở màn chờ trên máy em (phòng gửi — không phải ngăn của em gọi lại chính nó).
       if (co) { await this.luu(false); this.phat(); this.ctx.waitUntil(baoMayCacEm(this.env, [str(b.sbd)], 'bpu').catch(() => 0)) }
       return json({ ok: co })

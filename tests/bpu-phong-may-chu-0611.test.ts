@@ -107,6 +107,17 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     expect(con).toBeGreaterThan(120_000 + 14 * 60_000)
     expect(con).toBeLessThan(120_000 + 16 * 60_000)
   })
+  it('buổi «Mọi lớp» (phòng mở không có danh sách lớp): em điểm danh kèm họ tên ⇒ phòng tự thêm em, có mặt, hiện trên bảng (thầy 07/11)', async () => {
+    const { p, post } = taoPhong()
+    await post('/khoi', { buoiId: 'b7', lop: 'Buổi học 07/11/2026', ds: [] })
+    expect((await post('/vao', { sbd: '12121212', ten: 'Đỗ Đại Học' })).ok).toBe(true)
+    expect((await post('/vao', { sbd: '99999999' })).ok).toBe(false) // không tên, không có trong danh sách ⇒ như cũ
+    const st = (p as unknown as { st: { ds: { sbd: string; ten: string; vao: boolean }[] } }).st
+    expect(st.ds.map((e) => [e.sbd, e.ten, e.vao])).toEqual([['12121212', 'Đỗ Đại Học', true]])
+    // thầy mở lại bảng: em mới của lớp (chưa điểm danh) được thêm nhưng CHƯA có mặt
+    await post('/khoi', { buoiId: 'b7', lop: 'L', ds: [{ sbd: 'S9', ten: 'Lê Chi', coMat: false, luc: null }] })
+    expect(st.ds.find((e) => e.sbd === 'S9')?.vao).toBe(false)
+  })
   it('tiến trình buổi (bước + hoạt động): lưu trong phòng, ghi sau thắng ghi trước, dữ liệu sai bị từ chối', async () => {
     const { post } = taoPhong()
     expect((await post('/tt-doc', {})).tt).toBeNull()

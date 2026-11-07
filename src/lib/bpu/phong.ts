@@ -146,6 +146,12 @@ export function taoPhong(o: { buoiId: string; lop: string; nay: number; ds: read
 const em = (st: TrangThaiPhong, sbd: string): EmPhong | undefined => st.ds.find((x) => x.sbd === sbd)
 
 /** Em điểm danh / vào phòng: +10 kJ cho đội; đội đủ quân đầu tiên +50. Em lạ (không thuộc lớp) ⇒ false. */
+/** Thêm em vào danh sách phòng (chưa vào lớp) nếu chưa có — tự chia đội như em vào muộn. */
+export function themEm(st: TrangThaiPhong, sbd: string, ten: string): void {
+  if (!sbd || em(st, sbd)) return
+  const doi = chiaDoi([...st.ds.map((x) => x.sbd), sbd], st.thang, soDoiCua(st)).get(sbd) ?? 0
+  st.ds.push({ sbd, ten: ten || sbd, doi, vao: false, luc: null, kj: 0, dungSo: 0, chuoi: 0, roi: 0, daLenBang: 0 })
+}
 export function vaoLop(st: TrangThaiPhong, sbd: string, nay: number, ten?: string): boolean {
   let e = em(st, sbd)
   if (!e) {
