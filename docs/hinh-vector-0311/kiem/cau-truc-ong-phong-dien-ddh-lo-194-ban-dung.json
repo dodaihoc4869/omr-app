@@ -3,9 +3,9 @@
     "i": 36,
     "hash": "0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7",
     "fileNguon": "anh/0730f7837bde8a5f413205fe4ca422ad495c4bc8a2da8a01b9aca5ef493427f7.png",
-    "svg": "ong-phong-dien-ddh-f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555.svg",
-    "hashSvg": "f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555",
-    "byteSvg": 26303,
+    "svg": "ong-phong-dien-ddh-f686bfd1e4392ba6862d55704b3d5057b65e8298f2bc455a7480a56ac0f2ea44.svg",
+    "hashSvg": "f686bfd1e4392ba6862d55704b3d5057b65e8298f2bc455a7480a56ac0f2ea44",
+    "byteSvg": 26305,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "Capsuleyellow/2electrodes/3raysRIGHT/−LEFT+RIGHT/sourceboxred−LEFT+RIGHT/2wires/4labelsleaders/noelectrondots/noVnumber/DDHpath.",
-    "hashSvgDaSoat": "f68611fd65544bd538148883e5f3ac0657fca1ee7a25c8f8a2899610fa687555",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "f686bfd1e4392ba6862d55704b3d5057b65e8298f2bc455a7480a56ac0f2ea44",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "633f794b7854df2ab3d9174398e9402e3663194d"
   }
 ]

@@ -104,15 +104,19 @@
         ]
       }
     ],
-    "daCoManifestTaiCheckpoint": false,
-    "svg": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg",
-    "hashSvg": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
-    "byteSvg": 35128,
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg",
+    "hashSvgDaChon": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
+    "svg": "ms-sulfur-ddh-d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b.svg",
+    "hashSvg": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b",
+    "byteSvg": 35146,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
-    "ghiChuDung": "8peaksnativeheight/frame3sides/noextraMzpeaklabels/noheightnormalization/Y0..120/X30..270/Msup+256/DDHpath.",
-    "hashSvgDaSoat": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
-    "nguoiSoat": "cau_truc_4"
+    "ghiChuDung": "9peaksnativeheight/frame3sides/noextraMzpeaklabels/noheightnormalization/Y0..120/X30..270/Msup+256/DDHpath.",
+    "hashSvgDaSoat": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "633f794b7854df2ab3d9174398e9402e3663194d"
   }
 ]

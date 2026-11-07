@@ -1,10 +1,15 @@
 [
   {
     "i": 1195,
-    "hashSvg": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mởPNGnative/full và TỰfreshactualSVGrenderChromium(setContentđúngbyte,ảnhscratch/cau4-178-fresh.png). Đối8peaknativex160y92,204253,249204,295163,345254,392295,434129,442248/cùngbaseline305:giữđúngvịtrí-heightpixelkhôngnormalize/mztheorythêm. Frame3sideskhôngtopedge/khôngtickmarkthêm(nguồnchỉlabels),X30..270bước30/Y0..120bước20/2titles/Msup+256đúng. Mépphải504làframekhôngpeak,khôngbịasốmassriêng. DDHpath/gaps/bốcụckhôngcắt-chạm-tràn,SHA256khớp.",
+    "hashSvg": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact finalSVG3x mở full, mở lại nativeFULL2x và ALLbaseline4x, đối chiếu từng9peak gồmweakx438top291baseline305 nayđủ;8peaks còn lại giữđúng pixelheight/xposition. Không tự thêm scatteredscan noise thànhpeaks. Frameleft-bottom-right khôngtópedge,9X30..270/7Y0..120labels/noextra tickstems/2axislabels/[M+]sup=256literalfontđậm đúng. Đủhai publicrefs;không suyion/abundance/đápán. Không chữ/nét chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 35146,
+    "render": "/workspace/scratch/ms1195-font241-d6b740d1.png",
+    "nativeMacro": "/workspace/scratch/ms1195-nativebaseline4x.png",
+    "oldNegative": "/workspace/scratch/ms1195-font241-bi-loai.json",
     "hash": "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955",
-    "hashSvgDaSoat": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6"
+    "hashSvgDaSoat": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b"
   }
 ]

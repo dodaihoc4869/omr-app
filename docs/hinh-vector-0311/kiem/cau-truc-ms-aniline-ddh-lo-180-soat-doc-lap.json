@@ -1,10 +1,13 @@
 [
   {
     "i": 806,
-    "hashSvg": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mởPNGnative/full+zoomRIÊNG2dảibaseline và TỰfreshactualSVGChromium(setContentđúngbyte,ảnhscratch/cau4-180-fresh.png). Đối11label28/30/39/41/46/52/63/66/74/78/93,từngbarlabelled/unlabelled/near93barcao vàbarbaseline giữheightpixel/vịtrínguồn;khôngđánhgiádựatracemask. Tinygraystrokesx307/486/505/575/608giữđúngkhônggánmz,khônglấynhãnnoise làmheight. Đủ2blueaxes/X20/40/60/80/Y50/100/2titles/captiontrianglepink+Phổ khối lượng của anilinedamDDH;không0/Mmarker/frame/grid/thêm%peak. DDHpath/gaps/nocutoverlap/SHA256khớp.",
+    "hashSvg": "496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: NativeFULL2x/actualFULL2x/mọi publicrefs,peaklabels28/30/39/41/46/52/63/66/74/78/93 cùngpeaksweak/baseline/ticks20-40-60-80/50-100/ylabel/triangularcaption đúng;không thêmionlabels. Tự fresh Chromium exact newSVG; repo chỉđọc.",
+    "actualSvgReviewed": true,
+    "byteSvg": 45378,
+    "render": "/workspace/scratch/font241-806-new.png",
     "hash": "95b813c93b53365f6fc1b24723ad9f8a0a6333264d36686517b51c0c8c749917",
-    "hashSvgDaSoat": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4"
+    "hashSvgDaSoat": "496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7"
   }
 ]

@@ -48,10 +48,12 @@
         ]
       }
     ],
-    "daCoManifestTaiCheckpoint": false,
-    "svg": "ms-aniline-ddh-5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4.svg",
-    "hashSvg": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4",
-    "byteSvg": 45734,
+    "daCoManifestTaiCheckpoint": true,
+    "svgDaChon": "ms-aniline-ddh-5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4.svg",
+    "hashSvgDaChon": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4",
+    "svg": "ms-aniline-ddh-496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7.svg",
+    "hashSvg": "496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7",
+    "byteSvg": 45378,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -222,7 +224,9 @@
       ]
     ],
     "ghiChuDung": "11labelledpeaks+unlabelledvạchgiữpixel/2blueaxes/X20-40-60-80/Y50-100/no0/noM/captiontriangle/DDHpath. Tinybaselinegraystrokeskeptat307486505575608,khônggánmz/khôngsuytheory.",
-    "hashSvgDaSoat": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "633f794b7854df2ab3d9174398e9402e3663194d"
   }
 ]

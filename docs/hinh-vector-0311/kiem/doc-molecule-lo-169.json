@@ -712,6 +712,13 @@
           248,
           305
         ]
+      ],
+      "weakBarsPixels": [
+        [
+          438,
+          291,
+          305
+        ]
       ]
     },
     "molecularLabel": "[M⁺] = 256",
@@ -740,8 +747,9 @@
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
     "daCoManifestTaiCheckpoint": true,
-    "svgDaChon": "ms-sulfur-ddh-c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6.svg",
-    "hashSvgDaChon": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6"
+    "svgDaChon": "ms-sulfur-ddh-d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b.svg",
+    "hashSvgDaChon": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b",
+    "dinhChinhLo241": "Native có9peaks; bổ sung weakpeakx438y291..305 đãđọctrựctiếp/zoom. Positive178c60b44/candidatefontc86d34thiếupeakTHUHỒI,xemms1195-lo-241-ban-cu-bi-loai.jsonvàproofd6b740 mới. Khôngsuygiátrịm/zchopeak."
   },
   {
     "i": 806,
@@ -794,8 +802,8 @@
     ],
     "chiLaDuLieuDungChuaSoatRender": true,
     "daCoManifestTaiCheckpoint": true,
-    "svgDaChon": "ms-aniline-ddh-5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4.svg",
-    "hashSvgDaChon": "5c4e4a3a0afae4f30f8c028da7b2b35742d9e22548abff646c8fe2479d8800a4"
+    "svgDaChon": "ms-aniline-ddh-496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7.svg",
+    "hashSvgDaChon": "496b985f41b97b3c899f55f8064fe29d0e29d0cb7741776b10b361c8ed39a5c7"
   },
   {
     "i": 1028,

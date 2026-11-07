@@ -1,0 +1,310 @@
+{
+  "i": 413,
+  "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f.png",
+  "nativeSize": [
+    964,
+    151
+  ],
+  "reviewed": [
+    "nativefull2x",
+    "middlepalette/texture5x",
+    "all14cells andtickpairs counted"
+  ],
+  "questions": [
+    {
+      "qid": "DB-11-B2-D3-II-146",
+      "maDe": "DB-11-B2-D3",
+      "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+          "where": "DB-11-B2-D3-II-146.hinh.0.du_lieu",
+          "hashDataUrl": "da87ceac2c9784669bb36eb9145f874780cc5acea84ef79d3172c80e6e516d1f"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B2-II-16",
+      "maDe": "DH-11-C1-B2",
+      "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+      "hinh": [
+        {
+          "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+          "where": "DH-11-C1-B2-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "da87ceac2c9784669bb36eb9145f874780cc5acea84ef79d3172c80e6e516d1f"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "rects": [
+      {
+        "pH": 1,
+        "bounds": [
+          106,
+          56,
+          157,
+          104
+        ],
+        "centerX": 132,
+        "medianInteriorRGB": "#b74f75"
+      },
+      {
+        "pH": 2,
+        "bounds": [
+          166,
+          56,
+          217,
+          104
+        ],
+        "centerX": 192,
+        "medianInteriorRGB": "#ff6378"
+      },
+      {
+        "pH": 3,
+        "bounds": [
+          226,
+          56,
+          277,
+          104
+        ],
+        "centerX": 252,
+        "medianInteriorRGB": "#ff9965"
+      },
+      {
+        "pH": 4,
+        "bounds": [
+          286,
+          56,
+          337,
+          104
+        ],
+        "centerX": 312,
+        "medianInteriorRGB": "#ffc766"
+      },
+      {
+        "pH": 5,
+        "bounds": [
+          346,
+          56,
+          397,
+          104
+        ],
+        "centerX": 372,
+        "medianInteriorRGB": "#ffd565"
+      },
+      {
+        "pH": 6,
+        "bounds": [
+          406,
+          56,
+          457,
+          104
+        ],
+        "centerX": 432,
+        "medianInteriorRGB": "#fff965"
+      },
+      {
+        "pH": 7,
+        "bounds": [
+          466,
+          56,
+          517,
+          104
+        ],
+        "centerX": 492,
+        "medianInteriorRGB": "#dcce72"
+      },
+      {
+        "pH": 8,
+        "bounds": [
+          526,
+          56,
+          577,
+          104
+        ],
+        "centerX": 552,
+        "medianInteriorRGB": "#a4b77d"
+      },
+      {
+        "pH": 9,
+        "bounds": [
+          586,
+          56,
+          637,
+          104
+        ],
+        "centerX": 612,
+        "medianInteriorRGB": "#829976"
+      },
+      {
+        "pH": 10,
+        "bounds": [
+          646,
+          56,
+          697,
+          104
+        ],
+        "centerX": 672,
+        "medianInteriorRGB": "#6f8d7e"
+      },
+      {
+        "pH": 11,
+        "bounds": [
+          706,
+          56,
+          757,
+          104
+        ],
+        "centerX": 732,
+        "medianInteriorRGB": "#748d89"
+      },
+      {
+        "pH": 12,
+        "bounds": [
+          766,
+          56,
+          817,
+          104
+        ],
+        "centerX": 792,
+        "medianInteriorRGB": "#52839e"
+      },
+      {
+        "pH": 13,
+        "bounds": [
+          826,
+          56,
+          877,
+          104
+        ],
+        "centerX": 852,
+        "medianInteriorRGB": "#534f9a"
+      },
+      {
+        "pH": 14,
+        "bounds": [
+          886,
+          56,
+          937,
+          104
+        ],
+        "centerX": 912,
+        "medianInteriorRGB": "#584c94"
+      }
+    ],
+    "palette": "1magenta/2rose/3orange/4apricot/5goldyellow/6brightyellow/7yellowolive/8lightgreen/9graygreen/10green-gray/11bluegray/12blue/13indigo/14purpleindigo",
+    "ticks": {
+      "top": {
+        "count": 14,
+        "yFrom": 45,
+        "yTo": 56,
+        "x": [
+          132,
+          192,
+          252,
+          312,
+          372,
+          432,
+          492,
+          552,
+          612,
+          672,
+          732,
+          792,
+          852,
+          912
+        ]
+      },
+      "bottom": {
+        "count": 14,
+        "yFrom": 104,
+        "yTo": 117,
+        "x": [
+          132,
+          192,
+          252,
+          312,
+          372,
+          432,
+          492,
+          552,
+          612,
+          672,
+          732,
+          792,
+          852,
+          912
+        ]
+      },
+      "total": 28,
+      "noMinorTicks": true
+    },
+    "labels": {
+      "topLeft": "[H⁺]",
+      "belowTopLeft": "(mol/L)",
+      "bottomLeft": "pH",
+      "pHnumbers": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "numbersNearY": 136,
+      "upperValues": [
+        {
+          "text": "10⁻¹",
+          "near": [
+            132,
+            27
+          ]
+        },
+        {
+          "text": "10⁻⁷",
+          "near": [
+            492,
+            27
+          ]
+        },
+        {
+          "text": "10⁻¹⁴",
+          "near": [
+            912,
+            27
+          ]
+        }
+      ],
+      "superscripts": "Hplus superscript insidebrackets; exponents−1/−7/−14 superscript, no unitprefix errors"
+    },
+    "counts": {
+      "rects": 14,
+      "numericBottomLabels": 14,
+      "numericUpperLabels": 3,
+      "tickStems": 28
+    },
+    "texture": "Source cells contain gradient/flatband/diagonal scan shading e.g7two-tones and8diagonal lighterband; these do not represent extra rectangles/ticks/particles/data. Treat eachpH as exactlyone rectangle; palette sampled medians are rendering color guidance, not quantitativechemicaldata.",
+    "layout": "rectangles separated whitegap~9px;all equalheight,centers regular60px;titleunitatleft outsidebar;noaxislineconnecting ticks/noarrows/noextra captions"
+  },
+  "status": "Đạt exactSVG saufreshactualreview",
+  "actualReview": {
+    "i": 413,
+    "hashSvg": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG3x mởFULL; mở lại nativeFULL2x và ba sections4x/texture5x/all2publicrefs.14rects1..14/28tickstems(14top14bottom)/3upper10sup−1,−7,−14/[Hsup+](mol/L)/pH đúng. Palette thứtự/tone7yellowleft-oliveright/8diagonalband/11verticalshade đúng; coi shadingkhôngdata/ticks/particles. Labels-powerbaseline/superscript/gaps rõ, không chạm/cắt/tràn/noextraicons-alias.",
+    "actualSvgReviewed": true,
+    "byteSvg": 23421,
+    "render": "/workspace/scratch/ph413-241-e297f8e1.png",
+    "sourceHash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f"
+  }
+}

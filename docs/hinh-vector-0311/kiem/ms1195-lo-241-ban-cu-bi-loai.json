@@ -1,0 +1,19 @@
+[
+  {
+    "i": 1195,
+    "hashSvg": "c86d34cd0df391b66e88ab7b374f44c875feb29f116a4fd0335f3af0737edfb9",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Cần sửa: NativeFULL2x+zoom soactual exactSVG thiếu mộtweakpeak giữa cột256vàcộtphải: native x~438,y~291..305 (cao14px),nét rõliềnbaseline. Sourcecrop ms1195-nativedetail.png vàactualcrop ms1195-actualdetail.png. Không suy ion/abundance;giữđúngnétnguồn trướcĐạt. Tự fresh Chromium exact newSVG; repo chỉđọc.",
+    "actualSvgReviewed": true,
+    "byteSvg": 35074,
+    "render": "/workspace/scratch/font241-1195-new.png"
+  },
+  {
+    "i": 1195,
+    "hashSvg": "c60b4416d3658ecbdda44d9ce92f96f9ad1f8ab3e4a9a7b73d51e6c24c0a37e6",
+    "nguoiSoat": "soat_nguon_2",
+    "trangThai": "THU HỒI",
+    "ketQua": "Cần sửa: Thu hồi positive cũ cau_truc_4 trong lich-su-font-ms-sulfur-ddh-lo-178-lo-241.json do8peakgeometry bỏ weakpeak rõx438 top291 baseline305. Không xác nhận actualoldhash từ phiên này; bằng chứng nativefull/zoom và newSVG cùnggeometry thiếupeak đã mở.",
+    "actualSvgReviewed": false
+  }
+]

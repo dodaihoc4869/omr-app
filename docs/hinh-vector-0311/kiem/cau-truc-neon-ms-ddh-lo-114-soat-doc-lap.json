@@ -1,10 +1,13 @@
 [
   {
     "i": 1187,
-    "hashSvg": "94f8e79243e364230b8e6c5f03d96ade24b73fc60c055f490b1bbb34f65f7476",
-    "nguoiSoat": "soat_hinh_vector",
-    "ketQua": "Đạt: Đã mở PNG native794x660 và SVG render thật, kiểm thêm pixel cột native: đỉnh x371/y71..72, x388/y526, x403.5/y481 với baseline535 giữ nguyên; không chuẩn hóa chiều cao theo%. Đỉnh21 rất nhỏ vẫn đủ và leaderarrow tới đúng đỉnh. Isotope20/21/22 nằm trên10 trước Ne; đủ90,0%/1,0%/9,0%. Xticks0label/10/20/30/40, yticks25/50/75/100, Tỉ lệ % số nguyên tử, m/z với(*) trên, caption Hình2.4.Phổ khối lượng của neon đúng. Không thêm grid/axisarrow/giá trị. DDH de và dam thật cho caption đầu, tự chứa path không text/image/fallback; glyph/leader/peak không chạm/cắt/tràn. Hash byte thực khớp metadata.",
+    "hashSvg": "97f5187a1df1c8e73204cc32517ce7e7241ab7409aaea5a7a7a656696484d1d2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: NativeFULL2x/actualFULL2x/all3publicrefs,3peaks20/21/22 với90,0%/1,0%/9,0% vàisotopic20/21/22 over10Ne,weak21leaderhead/y25-50-75-100/x0-10-20-30-40/m/z(*)sup/captionHình2.4.đậm đúng. Tự fresh Chromium exact newSVG; repo chỉđọc.",
+    "actualSvgReviewed": true,
+    "byteSvg": 50077,
+    "render": "/workspace/scratch/font241-1187-new.png",
     "hash": "d7215c3023b7f9b1b0fc204f8edaee1f39663f4f9c7afe3a1c4f5981dc832dbd",
-    "hashSvgDaSoat": "94f8e79243e364230b8e6c5f03d96ade24b73fc60c055f490b1bbb34f65f7476"
+    "hashSvgDaSoat": "97f5187a1df1c8e73204cc32517ce7e7241ab7409aaea5a7a7a656696484d1d2"
   }
 ]
