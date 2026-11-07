@@ -37,15 +37,21 @@ function NguyenTu({ ky, doi, to }: { ky: string; doi: number; to?: boolean }) {
   )
 }
 
-export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: string; buoiId?: string | null; onDong: () => void }) {
+/** GIỮ NỐI SẴN (thầy 07/11 «gửi câu tức thì»): `giuNoi` ⇒ màn nối phòng ngay khi em điểm danh xong rồi nằm ẨN; thầy mở lượt mới ⇒ tự hiện tức thì
+ *  (không nạp, không xin vé lại). «Rời» ⇒ ẩn (vẫn nối), lượt sau lại tự hiện. `mo` đổi ⇒ hiện ngay (nút «Vào Bình Phản Ứng» / kênh đẩy).
+ *  `chan()` đúng (đang thi / phòng chờ / kiểm tra cá nhân) ⇒ KHÔNG tự hiện. */
+export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, mo = 1, chan }: { token: string; buoiId?: string | null; onDong: () => void; giuNoi?: boolean; mo?: number; chan?: () => boolean }) {
+  const [an, setAn] = useState(giuNoi && mo <= 0)
+  const boLuot = useRef(-1)
+  useEffect(() => { if (mo > 0) setAn(false) }, [mo])
+
   const [v, setV] = useState<ViewEm | null>(null)
+  /** Rời: màn giữ nối thì chỉ ẩn (lượt hiện tại coi như đã xem); không thì đóng hẳn. */
+  const roi = () => { if (!giuNoi) { onDong(); return } boLuot.current = v?.luot?.so ?? 0; setAn(true) }
   const [tt, setTt] = useState<'noi' | 'mat-mang' | 'chua-mo' | 'khong-buoi' | 'tat' | 'ok'>('noi')
   const [chon, setChon] = useState('')
   const [baoTra, setBaoTra] = useState('')
   const [vuaRoi, setVuaRoi] = useState(false)
-  // «Em chưa biết làm»: bấm lần đầu ⇒ hỏi lại (3 giây), bấm lần hai mới gửi — tránh chạm nhầm.
-  const [hoiKb, setHoiKb] = useState(false)
-  useEffect(() => { if (!hoiKb) return; const h = setTimeout(() => setHoiKb(false), 3000); return () => clearTimeout(h) }, [hoiKb])
   const [nay, setNay] = useState(() => Date.now())
   const ws = useRef<WebSocket | null>(null)
   const dung = useRef(false)
@@ -107,7 +113,10 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   }, [token, buoiId])
 
   // Lượt mới ⇒ xoá lựa chọn cũ.
-  useEffect(() => { if (soLuot !== luotChon.current) { luotChon.current = soLuot; setChon(''); setBaoTra(''); setHoiKb(false) } }, [soLuot])
+  useEffect(() => { if (soLuot !== luotChon.current) { luotChon.current = soLuot; setChon(''); setBaoTra('') } }, [soLuot])
+  // Đang ẩn (giữ nối) mà thầy mở lượt mới ⇒ hiện ngay — trừ khi em đang thi / ở phòng chờ / làm kiểm tra cá nhân.
+  const coLuot = !!v?.luot
+  useEffect(() => { if (an && coLuot && soLuot > boLuot.current && !v?.ketThuc && !chan?.()) setAn(false) }, [an, coLuot, soLuot, v?.ketThuc, chan])
 
   // Đồng hồ êm (không đổi màu, không nháy — luật C14).
   const coHan = !!v?.luot?.han && v.luot.pha === 'tra-loi'
@@ -115,7 +124,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
 
   // RỜI MÀN: CHỈ khi đang có lượt chưa mở đáp án (đang làm / bạn lên bảng). Ẩn app ≥ 2 giây ⇒ báo phòng một lần; quay lại ⇒ màn cảnh báo; nút Back bị giữ.
   // Lúc chờ giữa các lượt em rời được (nút «Rời Bình Phản Ứng», không phạt) ⇒ thầy quên kết thúc hay mở ca kiểm tra thì em không bị kẹt.
-  const dangChoi = !!v?.luot && v.luot.pha !== 'mo' && !v.ketThuc
+  const dangChoi = !an && !!v?.luot && v.luot.pha !== 'mo' && !v.ketThuc
   useEffect(() => {
     if (!dangChoi) return
     let hen: ReturnType<typeof setTimeout> | undefined
@@ -142,7 +151,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
   const q = (l?.cau ?? null) as unknown as Question | null
   const duChon = !!l && (l.tuLuan || (l.phan === 'II' ? /^[DS]{4}$/.test(chon) : chon.trim().length > 0))
   const guiTra = () => { if (!l || !duChon) return; gui({ t: 'tra', chon: l.tuLuan ? 'xong' : chon }); xinToanMan() }
-  const chuaBiet = () => { if (!l) return; if (!hoiKb) { setHoiKb(true); return } setHoiKb(false); gui({ t: 'tra', kb: true }); xinToanMan() }
+  // HẾT GIỜ mà em chưa gửi (thầy 07/11): khoá, câu để trống — không gửi muộn, không đoán bừa.
+  const hetGio = !!l?.han && l.pha === 'tra-loi' && nay >= l.han && !l.emTra
   const phimSo = (p: string) => setChon((c) => (p === '−' ? (c.startsWith('-') ? c.slice(1) : '-' + c) : (c + p).slice(0, 8)))
 
   const tren = (phu: string) => (
@@ -178,7 +188,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
         <div className="bpu-doi-the" style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau})` }}><b>{tenDoi} · {v.doi.so}/{v.doi.tong} bạn đã vào</b><div className="vach"><i style={{ width: `${(v.doi.so / Math.max(1, v.doi.tong)) * 100}%` }} /></div><span>Đội đang có {v.doi.kj} kJ.</span></div>
         <p>Thầy chiếu câu nào, câu đó tự hiện ở đây. Đang làm câu mà rời màn là thầy thấy trên bảng.</p></div>
     )
-    day = <button type="button" className="bpu-nut phu" onClick={onDong}>Rời Bình Phản Ứng</button>
+    day = <button type="button" className="bpu-nut phu" onClick={roi}>Rời Bình Phản Ứng</button>
   } else if ((l.pha === 'goi' || l.pha === 'lam-bang') && l.goi) {
     const g = l.goi, cung = g.doi === doi
     if (g.sbd === e.sbd) {
@@ -212,15 +222,15 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
         <span className="m3-chip bpu-chip">{l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'}</span>
         {LC ? <LC.DeCau q={q} stt={l.so} /> : <p className="bpu-de-tho">{q.text}</p>}
         {l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
-          : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={daGui || daMo} />
-          : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={daGui || daMo} />
-          : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!daGui && !daMo ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
+          : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={daGui || daMo || hetGio} />
+          : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={daGui || daMo || hetGio} />
+          : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!daGui && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
         {baoTra ? <div className="bpu-bao" role="status">{baoTra}</div> : null}
         {tt === 'mat-mang' ? <div className="bpu-bao" role="status">Mất kết nối, đang nối lại… Đáp án em chọn vẫn giữ trên máy, nối lại là gửi.</div> : null}
       </>
     )
     if (daMo) {
-      const roiNho = <button type="button" className="bpu-roi-nho" onClick={onDong}>Rời Bình Phản Ứng</button>
+      const roiNho = <button type="button" className="bpu-roi-nho" onClick={roi}>Rời Bình Phản Ứng</button>
       const k = l.ketQua
       const chuDung = l.tuLuan ? '' : l.phan === 'II' ? (l.dung ?? '').split('').map((x, i) => `${'abcd'[i]}) ${x === 'D' ? 'Đúng' : 'Sai'}`).join(' · ') : String(l.dung ?? '')
       if (kb) day = <div className="bpu-ket" role="status"><h4>Cảm ơn em đã thành thật</h4><p>{l.tuLuan ? '' : `+${k?.kj ?? KJ.thanhThat} kJ thành thật. Đáp án đúng: ${chuDung}. `}Nhìn lên bảng xem thầy chữa để lần sau em làm được nhé.</p>{roiNho}</div>
@@ -232,14 +242,14 @@ export default function ManBinhPhanUng({ token, buoiId, onDong }: { token: strin
     } else {
       day = (
         <div className="bpu-hai-nut">
-          <button type="button" className="bpu-nut" disabled={!duChon} onClick={guiTra}>{l.tuLuan ? 'Em làm xong' : 'Gửi đáp án'}</button>
-          <button type="button" className={`bpu-nut phu bpu-kb${hoiKb ? ' hoi' : ''}`} onClick={chuaBiet} aria-live="polite">{hoiKb ? 'Bấm lần nữa để báo thầy' : 'Em chưa biết làm'}</button>
-          <p className="nho">Thành thật +{KJ.thanhThat} kJ, không bị gọi lên bảng. Đoán bừa sai thì 0 kJ.</p>
+          {hetGio ? <p className="bpu-bao" role="status">Hết giờ — câu này để trống. Nhìn lên bảng nhé.</p>
+            : <button type="button" className="bpu-nut" disabled={!duChon} onClick={guiTra}>{l.tuLuan ? 'Em làm xong' : 'Gửi đáp án'}</button>}
         </div>
       )
     }
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
+  if (an) return null
   return createPortal(
     <div className="bpu-hs m3" role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onPointerDown={xinToanMan}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}

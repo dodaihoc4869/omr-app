@@ -47,21 +47,45 @@ describe('máy em', () => {
     expect(await screen.findByRole('button', { name: 'Về chặng đang làm' })).toBeTruthy()
     expect(document.body.textContent).not.toMatch(/tinh thể|mẻ/i)
   })
-  it('«Em chưa biết làm»: bấm hai lần mới gửi cờ kb; sau đó hiện «Em đã báo: chưa biết làm»', async () => {
+  it('SỬA CÓ CHỦ ĐÍCH 07/11 — bỏ «Em chưa biết làm» + «Thành thật +20 kJ»; hết giờ chưa gửi ⇒ khoá, câu để trống', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
     render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
     const ws = WsGia.ds[0]!
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    const nut = await screen.findByRole('button', { name: 'Em chưa biết làm' })
-    act(() => { nut.click() })
-    expect(ws.gui.some((t) => t.includes('"kb":true'))).toBe(false)
-    act(() => { screen.getByRole('button', { name: 'Bấm lần nữa để báo thầy' }).click() })
-    expect(ws.gui.some((t) => t.includes('"kb":true'))).toBe(true)
-    nhanTra(st, 'S1', '', T0 + 1000, true); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByText('Em đã báo: chưa biết làm')).toBeTruthy()
-    moDapAn(st, T0 + 5000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByText('Cảm ơn em đã thành thật')).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: /chưa biết làm/ })).toBeNull()
+    expect(document.body.textContent).not.toMatch(/Thành thật|\+20 kJ/)
+    moLuot(st, cau, Date.now() - 120_000); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText(/Hết giờ — câu này để trống/)).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Gửi đáp án' })).toBeNull()
+  })
+  it('GIỮ NỐI SẴN (gửi câu tức thì): ẩn khi chưa có lượt, lượt mới ⇒ tự hiện; «Rời» ⇒ ẩn (vẫn nối); lượt sau lại hiện; đang thi ⇒ không tự hiện', async () => {
+    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
+    let thi = false
+    const onDong = vi.fn()
+    render(<Man token="tok" buoiId="b1" onDong={onDong} giuNoi mo={0} chan={() => thi} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!
+    const st = phong(); ws.nhan(viewEm(st, 'S1'))
+    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
+    moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    act(() => { screen.getByRole('button', { name: 'Rời Bình Phản Ứng' }).click() })
+    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
+    expect(onDong).not.toHaveBeenCalled()
+    expect(WsGia.ds).toHaveLength(1) // vẫn một kết nối, không nối lại
+    moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }) })
+    // đang thi ⇒ lượt mới KHÔNG tự hiện
+    moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    act(() => { screen.getByRole('button', { name: 'Rời Bình Phản Ứng' }).click() })
+    thi = true
+    moLuot(st, { ...cau, qid: 'q3' }, T0 + 15000); ws.nhan(viewEm(st, 'S1'))
+    await new Promise((r) => setTimeout(r, 30))
+    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
   })
   it('em được gọi lên bảng thấy lý do', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')

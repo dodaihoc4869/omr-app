@@ -44,7 +44,7 @@ async function layBuoi(tuDong: boolean): Promise<string | null> {
 /** Tin TỰ ĐỘNG chờ ngần này rồi mới mở lượt; tin mới hơn huỷ tin đang chờ ⇒ mở lại tờ / lật nhanh qua nhiều câu KHÔNG đẻ lượt rỗng (cố vấn 07/11). */
 let choTuDongMs = 1500
 let henTu: ReturnType<typeof setTimeout> | null = null
-/** Thầy vừa bấm «Câu tiếp» / ← → trên bảng (hay máy điều khiển) ⇒ tin tự động KẾ TIẾP là câu thầy chủ động chọn: chờ 0,25 s thay 1,5 s (thầy 07/11 «chuyển câu tiếp chậm»). */
+/** Thầy vừa bấm «Câu tiếp» / ← → trên bảng (hay máy điều khiển) ⇒ tin tự động KẾ TIẾP là câu thầy chủ động chọn: gửi NGAY, không chờ (thầy 07/11 «gửi câu tức thì»). */
 let tiepNgay = false
 /** Cho test: đổi thời gian chờ. */
 export function datChoTuDong(ms: number): void { choTuDongMs = ms }
@@ -59,7 +59,7 @@ export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
   if (henTu) clearTimeout(henTu)
   const nhanh = toMoi || tiepNgay
   tiepNgay = false
-  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, nhanh ? Math.min(choTuDongMs, 250) : choTuDongMs) })
+  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, nhanh ? 0 : choTuDongMs) })
 }
 async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true
