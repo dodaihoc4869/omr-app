@@ -11,7 +11,7 @@ def first(x,y,t,z=27):return F.label(x-F.advance(t[0],z)/2,y,t,z,'start')
 def last(x,y,t,z=27):return F.label(x+F.advance(t[-1],z)/2,y,t,z,'end')
 b=line('M47 52H1169V633H47ZM579 52V633M47 96H1169M47 241H1169M47 437H1169',1.2)
 b+=F.label(313,84,'Cột (A)',32,weight='dam')+F.label(874,84,'Cột (B)',32,weight='dam')
-b+=F.label(884,178,'a) N-methylbutan-2-amine; amine bậc ba',26)+F.label(874,350,'b) butan-1-amine; amine bậc một',28)+F.label(874,545,'c) benzenamine; amine bậc một',28)
+b+=F.label(884,178,'a) N-mehtylbutan-2-amine; amine bậc ba',26)+F.label(874,350,'b) butan-1-amine; amine bậc một',28)+F.label(874,545,'c) benzenamine; amine bậc một',28)
 # Ba cấu trúc giữ hướng liên kết và các nhóm được ghi rõ trong nguồn.
 b+=line('M249 140L294 112L340 140V196L294 224L249 196ZM294 122L331 145M257 145V191M331 191L294 214M340 140L373 120')+first(388,123,'NH₂')
 b+=line('M309 272L328 305H381L407 352L389 384')+last(301,270,'H₂N')+last(381,411,'H₃C')

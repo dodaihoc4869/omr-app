@@ -3,9 +3,9 @@
     "i": 197,
     "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
     "fileNguon": "anh/215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc.png",
-    "svg": "lewis-bon-cong-thuc-ddh-c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b.svg",
-    "hashSvg": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
-    "byteSvg": 13819,
+    "svg": "lewis-bon-cong-thuc-ddh-0a3ca1b6bc64f992dcf318d3acb5256e42f0494b18abc1262193f44b3eb00cff.svg",
+    "hashSvg": "0a3ca1b6bc64f992dcf318d3acb5256e42f0494b18abc1262193f44b3eb00cff",
+    "byteSvg": 13590,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "4formulas/31electrondots/4numberlabelsdamthật/allatoms-bondsliteral/nochargesadded/noanswer/DDHpath.",
-    "hashSvgDaSoat": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "0a3ca1b6bc64f992dcf318d3acb5256e42f0494b18abc1262193f44b3eb00cff",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

@@ -3,9 +3,9 @@
     "i": 401,
     "hash": "46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5",
     "fileNguon": "anh/46baafa20f0b39e1d27f51e90547a33c835ea038991faa819b300348e2c928b5.png",
-    "svg": "bang-amine-khong-khung-ddh-83770f56f5a840dd3f412c3863fd5a64735c7d54293845ab97fc1613f3998013.svg",
-    "hashSvg": "83770f56f5a840dd3f412c3863fd5a64735c7d54293845ab97fc1613f3998013",
-    "byteSvg": 57428,
+    "svg": "bang-amine-khong-khung-ddh-b50c1cc01ecb8ed34a8849142aa5a51cbe567aa3d5a7b49f633eefb2628aeb2f.svg",
+    "hashSvg": "b50c1cc01ecb8ed34a8849142aa5a51cbe567aa3d5a7b49f633eefb2628aeb2f",
+    "byteSvg": 57105,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "3structures/Ph3DOUBLE/H2N-N-Hliteral/2headersdam/3numberlabelsnormal/a)bậchai-b)c)bậcmột/allhyphens-semicolon/noGRID-noaddedCH3labels-answer/DDHpath.",
-    "hashSvgDaSoat": "83770f56f5a840dd3f412c3863fd5a64735c7d54293845ab97fc1613f3998013",
-    "nguoiSoat": "soat_nguon_2"
+    "hashSvgDaSoat": "b50c1cc01ecb8ed34a8849142aa5a51cbe567aa3d5a7b49f633eefb2628aeb2f",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

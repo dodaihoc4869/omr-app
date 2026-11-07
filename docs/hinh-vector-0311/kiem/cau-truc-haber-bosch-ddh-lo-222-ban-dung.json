@@ -3,9 +3,9 @@
     "i": 285,
     "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
     "fileNguon": "anh/30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03.png",
-    "svg": "haber-bosch-ddh-a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd.svg",
-    "hashSvg": "a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd",
-    "byteSvg": 41177,
+    "svg": "haber-bosch-ddh-b652dbc372ef9e48f8f922e893128073cfe92760614cf523b0ae3b5bcc20b41b.svg",
+    "hashSvg": "b652dbc372ef9e48f8f922e893128073cfe92760614cf523b0ae3b5bcc20b41b",
+    "byteSvg": 41022,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "5flowheads/12coilruns6leftU5rightU/2coilexternalendsRIGHT/recycleloop/compressor/2towers-catalyststrip/sourcecolors-gradient/NH3graybottom/1valve1dropletsilhouette/alllabelsDDHdam/noextraformula-counts/DDHpath.",
-    "hashSvgDaSoat": "a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "b652dbc372ef9e48f8f922e893128073cfe92760614cf523b0ae3b5bcc20b41b",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

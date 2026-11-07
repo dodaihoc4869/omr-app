@@ -1,18 +1,14 @@
 [
   {
     "i": 217,
-    "hashSvg": "5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888",
+    "hashSvg": "e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Đã mở nativefull/zoom3x và tự fresh-render Chromium đúng SVG54451B/hash5f9dc942 rồi mở actual2x+1x. Đủ4anode/cùngbusbarcực+,cực−nốithànhgraphite,bểthép/lótgraphite/bathgray/lớpnhômtrắng/1ốngrỗngcong vàchekhuấtđúng. Đủ2Graphite,Alumina +/criolite nóng chảy,Nhôm nóng chảy,Bể điện phân bằng thép,Hình15.1.Mô hình quy trình Hall – Héroult;giữé,criolitevàcaptionprefixđậmDDHthật. Hai leadertrái đãcógaprõ,khôngđèchữ/pipe/layer;khôngcắt/tràn. Texturegraylàinbóngnền,khôngparticlecount/khôngthêmhạtbubbles.",
-    "svg": "hall-heroult-ddh-5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888.svg",
-    "byteSvg": 54451,
-    "fileNguon": "anh/25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5.png",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualfull, mởriêng nativeFULL2x và mọi publicrefs/stems. 4anodes/+LEFT−RIGHT/steelouter-graphiteU-graybath-whiteAl/pipe đúng. HaiGraphite/criolite nóng chảy/Hall–Héroult nguyên văn; captionprefix Hình15.1.đậm thật/fontbể14 và leaders cógap rõ. Không chữ/nét chạm/cắt/tràn, không thêm đáp án.",
+    "actualSvgReviewed": true,
+    "byteSvg": 54514,
+    "render": "/workspace/scratch/font239-217-new.png",
     "sourceHash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
-    "actualRender": "/workspace/scratch/hall217-5f9dc942-chromium.png",
-    "actualRender1x": "/workspace/scratch/hall217-5f9dc942-chromium-1x.png",
-    "renderMethod": "FreshChromiumPlaywright:setContentexactSVGbytes,locatorSVG screenshot,deviceScaleFactor2; SHA256verified trước/sau.",
-    "oldHashReviewed": false,
     "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
-    "hashSvgDaSoat": "5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888"
+    "hashSvgDaSoat": "e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c"
   }
 ]

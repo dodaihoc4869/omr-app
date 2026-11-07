@@ -3,9 +3,9 @@
     "i": 341,
     "hash": "3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24",
     "fileNguon": "anh/3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24.png",
-    "svg": "do-thi-ethyl-alcohol-ddh-a429d2ae5b0a7754dfdbc37f74945ec91bbbdac515d7fc0917b20010eca68520.svg",
-    "hashSvg": "a429d2ae5b0a7754dfdbc37f74945ec91bbbdac515d7fc0917b20010eca68520",
-    "byteSvg": 20672,
+    "svg": "do-thi-ethyl-alcohol-ddh-1d20cc3cfce2caac48fb000d28f24f64e3cb1927a691d30d4b2b0709e32936c5.svg",
+    "hashSvg": "1d20cc3cfce2caac48fb000d28f24f64e3cb1927a691d30d4b2b0709e32936c5",
+    "byteSvg": 20365,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "literalgraypolylineverticespixels204237-260188-374141-432109-48966-60466/8XlabelsNOXtickstems/5Ytickstubs-gridlines/decimalDOT/outerframe/rotated2lineboldytitle-Ngàydam/noextraarrows-markers-values/DDHpath.",
-    "hashSvgDaSoat": "a429d2ae5b0a7754dfdbc37f74945ec91bbbdac515d7fc0917b20010eca68520",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "1d20cc3cfce2caac48fb000d28f24f64e3cb1927a691d30d4b2b0709e32936c5",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

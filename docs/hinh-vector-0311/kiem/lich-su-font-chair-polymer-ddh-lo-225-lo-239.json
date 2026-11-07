@@ -1,0 +1,62 @@
+{
+  "lyDo": "Lịch sử positive theo snapshot WOFF2 cũ; không duyệt hash mới font main4490e4d2",
+  "metadata": [
+    {
+      "i": 343,
+      "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+      "fileNguon": "anh/3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4.png",
+      "svg": "chair-polymer-ddh-5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8.svg",
+      "hashSvg": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8",
+      "byteSvg": 19630,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C2-B6-D2-II-28",
+          "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+          "refs": [
+            {
+              "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+              "where": "12-C2-B6-D2-II-28.hinh.0.du_lieu",
+              "hashDataUrl": "36869afb1a922f082cb5778caa9ea144ad7db396a2866929c3bc27626eaae417"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B4-D2-II-44",
+          "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+          "refs": [
+            {
+              "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+              "where": "DB-12-B4-D2-II-44.hinh.0.du_lieu",
+              "hashDataUrl": "36869afb1a922f082cb5778caa9ea144ad7db396a2866929c3bc27626eaae417"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3rings/3CH2OH6OH0H/3LEFTtaper3horizontalbold3RIGHTthinUNIFORM/middleC4+C1literal3strokeGAPS/ONLYnums1-4/left3dotsNOO/rightO+3dots/noextraH-caption-brackets/DDHpath.",
+      "hashSvgDaSoat": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 343,
+      "hashSvg": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Đãmởnativefull3x/3ringfront4x/C4-C1gaps10x/number1-4zoom5x vàđọc2publicrefs;rồitựfresh-renderChromiumexactSVG19630B/hash5b577f3avàmởactualfull1x/3x. Đủ3rings/3CH₂OH/6OH/3ringO+2bridgeO+1rightterminalO,NOstandaloneH. MỗiringchỉLEFTdiagonalTAPERhẹpC4rộngC3/ngangC3–C2bold/RIGHTfrontmảnhuniformkhôngtaper. MiddleC4vàC1giữ3nétgapliteral,khôngnốitheotheory;carbonnumsCHỈ1ởleftC1và4ởmiddleC4. LEFT3dotNOO,RIGHTterminalO+3dot,khôngcaption/bracket/endOH/tênthêm. Allglyphanchor/gapsđúng,sạchkhôngchạm/cắt/tràn.",
+      "sourceHash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+      "fileNguon": "anh/3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4.png",
+      "svg": "chair-polymer-ddh-5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8.svg",
+      "byteSvg": 19630,
+      "actualRender": "/workspace/scratch/chair225-5b577f3a-chromium.png",
+      "actual1x": "/workspace/scratch/chair225-5b577f3a-1x.png",
+      "renderMethod": "FreshChromiumPlaywright exactSVGbytes inDOM,locatorSVG screenshot deviceScaleFactor3;SHA256source/SVGverified.",
+      "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
+      "hashSvgDaSoat": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8"
+    }
+  ],
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "b3987d506cfa58e89806f686fbc3122f7ff7253e"
+}

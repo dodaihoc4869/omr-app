@@ -1,0 +1,55 @@
+{
+  "lyDo": "Lịch sử font đậm cũ, không dùng duyệt hash mới",
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "b3987d506cfa58e89806f686fbc3122f7ff7253e",
+  "metadata": [
+    {
+      "i": 285,
+      "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+      "fileNguon": "anh/30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03.png",
+      "svg": "haber-bosch-ddh-a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd.svg",
+      "hashSvg": "a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd",
+      "byteSvg": 41177,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "11-C2-B5-I-4",
+          "de": "Cho sơ đồ thiết bị tổng hợp ammonia trong công nghiệp theo quá trình Haber – Bosch.\nPhát biểu nào sau đây không đúng?",
+          "refs": [
+            {
+              "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+              "where": "11-C2-B5-I-4.hinh.0.du_lieu",
+              "hashDataUrl": "ce8c42e7c33e0f254c864585e4dd2ed74a46151063d88b6fc949735523524cf1"
+            }
+          ]
+        },
+        {
+          "qid": "DB-11-B5-D1-I-1",
+          "de": "Cho sơ đồ thiết bị tổng hợp ammonia trong công nghiệp theo quá trình Haber – Bosch.\nPhát biểu nào sau đây không đúng?",
+          "refs": [
+            {
+              "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+              "where": "DB-11-B5-D1-I-1.hinh.0.du_lieu",
+              "hashDataUrl": "ce8c42e7c33e0f254c864585e4dd2ed74a46151063d88b6fc949735523524cf1"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "5flowheads/12coilruns6leftU5rightU/2coilexternalendsRIGHT/recycleloop/compressor/2towers-catalyststrip/sourcecolors-gradient/NH3graybottom/1valve1dropletsilhouette/alllabelsDDHdam/noextraformula-counts/DDHpath.",
+      "hashSvgDaSoat": "a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 285,
+      "hashSvg": "a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở native/full+cooler4x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-222-haber-fresh.png),mởactualtopology3xsoportsđộclập. Đúng5blackflowheads(feedRIGHT/reactorinRIGHT/reactoroutRIGHT/recycleTOPLEFT/verticalDOWN),recycleTjunctionOPEN/compressorCopening/reactorleft-rightports+coolerentrytop-left/bottomoutletOPENkhôngclosedwallblocking. Coolercoil12horizontalruns/6leftU+5rightU/2externalendsRIGHT,khôngaddedcoilflowarrows;2towersyellowreactor/catalyststripbeige/red→maroon→navycooler/lowerNH3gray/valve+1teardropsilhouette giữsourcekhôngđoánhạtgiọt. All8labelsDDHđậmthậtH₂+N₂2positions,Bộ phận nén,Tháp tổng hợp,Chất xúc tác,Tháp làm lạnh,NH₃,Ammonia lỏngđúngsubscripts/wording/leaders. NocatalystFeformula/pressure-temperature/newdataadded. Internalgradient/path tựchứa/noimage/fontfallback/gapskhôngchạm/cắt/tràn,exactSHA256hiệntạikhớpmetadata;khôngadmitoldclosedportdb67.",
+      "hash": "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03",
+      "hashSvgDaSoat": "a768dae8ff5b8231a9880e513271402cdeb71fb0225f4af79e96bf28839467cd"
+    }
+  ]
+}

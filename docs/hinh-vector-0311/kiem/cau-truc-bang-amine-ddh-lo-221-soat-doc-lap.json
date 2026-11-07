@@ -1,10 +1,13 @@
 [
   {
     "i": 267,
-    "hashSvg": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: Mở source267native/full+3moleculemacros4x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-221-table-fresh.png). Đúng2colheadersCột(A)/Cột(B)DDHđậm thật/3numbersregular(1)(2)(3)/allborders-dividerrows. Mol1Ph3double/NH₂-Nfirst;mol2H₂N-Nright/3implicitC+H₃C-Cright=4C1N;mol3H₃Cleft-Cright/CH₃top-Cfirst/NH-Nfirst/H₃Cbottom-Cright=5C1N,từngbond/gapsliteralđúngsource. RightrowsEXACTa) N-methylbutan-2-amine; amine bậc ba,b) butan-1-amine; amine bậc một,c) benzenamine; amine bậc một,đủhyphens/semicolons/accents. GiữbậcbaPAprintedkhôngsửatheory/khôngnốimappinganswer/reorder/extraaminecaption. DDHpath tựchứa khôngfallback/text/image,glyph/subscript/gridgapskhôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata.",
+    "hashSvg": "c9fc5660de4138323cb11d4d8ce22ea5b286ed1f4927f3a1612fd157f7b7d099",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact finalSVG2x mở full và mở lại native/name5x. Literal a) N-mehtylbutan-2-amine; amine bậc ba nay đúng thứ tự h/t nguyên văn source. Ba cấu trúc đúng orientation/bonds/3Phdouble/H2N/NH/CH3H3Canchors,sốC/nhánh;GRID/headerbold/nhãn1..3/b)c)bậcmột đúng. Đủ hai public stems/refs;không sửa phươngánsai theo theory;không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 62703,
+    "render": "/workspace/scratch/font239-267-c9fc5660-new.png",
     "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
-    "hashSvgDaSoat": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6"
+    "hashSvgDaSoat": "c9fc5660de4138323cb11d4d8ce22ea5b286ed1f4927f3a1612fd157f7b7d099"
   }
 ]

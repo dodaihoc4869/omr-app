@@ -3,9 +3,9 @@
     "i": 267,
     "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
     "fileNguon": "anh/2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea.png",
-    "svg": "bang-amine-ddh-22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6.svg",
-    "hashSvg": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
-    "byteSvg": 63027,
+    "svg": "bang-amine-ddh-c9fc5660de4138323cb11d4d8ce22ea5b286ed1f4927f3a1612fd157f7b7d099.svg",
+    "hashSvg": "c9fc5660de4138323cb11d4d8ce22ea5b286ed1f4927f3a1612fd157f7b7d099",
+    "byteSvg": 62703,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "3structures/Ph3DOUBLE/NH2-H2N-H3C-CH3-NHliteral/alltablechoices-a-b-c/3numbers/2headersdam/grid/noaddedanswers/nofixaminebậcba/DDHpath.",
-    "hashSvgDaSoat": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "c9fc5660de4138323cb11d4d8ce22ea5b286ed1f4927f3a1612fd157f7b7d099",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

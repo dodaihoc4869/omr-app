@@ -3,9 +3,9 @@
     "i": 343,
     "hash": "3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4",
     "fileNguon": "anh/3cf43c1fcf1288ca1441eb285f0293df19520bde0d4a2ae1684b50096bf712a4.png",
-    "svg": "chair-polymer-ddh-5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8.svg",
-    "hashSvg": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8",
-    "byteSvg": 19630,
+    "svg": "chair-polymer-ddh-f6bad58c7fae467342a103338ddc56183be449c12ea6676f1f780cb18ba8c69a.svg",
+    "hashSvg": "f6bad58c7fae467342a103338ddc56183be449c12ea6676f1f780cb18ba8c69a",
+    "byteSvg": 19654,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "3rings/3CH2OH6OH0H/3LEFTtaper3horizontalbold3RIGHTthinUNIFORM/middleC4+C1literal3strokeGAPS/ONLYnums1-4/left3dotsNOO/rightO+3dots/noextraH-caption-brackets/DDHpath.",
-    "hashSvgDaSoat": "5b577f3a707f87472a80475442b23621ab7b3e88634e25eed97b696b5b2605b8",
-    "nguoiSoat": "soat_nguon_2"
+    "hashSvgDaSoat": "f6bad58c7fae467342a103338ddc56183be449c12ea6676f1f780cb18ba8c69a",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

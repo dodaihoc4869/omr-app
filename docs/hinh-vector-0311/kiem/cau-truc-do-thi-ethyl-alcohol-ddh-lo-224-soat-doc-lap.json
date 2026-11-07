@@ -1,10 +1,13 @@
 [
   {
     "i": 341,
-    "hashSvg": "a429d2ae5b0a7754dfdbc37f74945ec91bbbdac515d7fc0917b20010eca68520",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: Mở source341native/full+graph3x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-224-ethanol-fresh.png). Giữliteralgraypiecewiseline204237→260188→374141→432109→48966→60466,kinks2/6/8/10vàplateau10..14đúngsource,pixelanchorsKHÔNGbiếnsốđodatahaynormalizevềtick2. Đủ8Xlabels0,2,4,6,8,10,12,14/NOXtickmarks,5Ylabels0,0.5,1,1.5,2DOTdecimals/5Ystubs+horizontalgrid/outerrectframe;noverticalgrid/arrows/markers/legend/charttop-rightframeextra. Rotated2linetitleEXACTsố mol ethyl/alcoholvàNgàyDDHđậm thật,sourcegraylinesgiữ. DDHpath tựchứa khôngfallback/text/image,axes/text/linegapskhôngchạm/cắt/tràn;exactSHA256thựckhớpmetadata.",
+    "hashSvg": "1d20cc3cfce2caac48fb000d28f24f64e3cb1927a691d30d4b2b0709e32936c5",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x/nativeFULL2x/all2publicrefs. 6vertices/8XlabelsNOtickstems/5YdecimalDOTlabels/5Hguides/outerframe/rotatedbold2lines số mol ethyl-alcohol/Ngày đúng nguồn. Không chạm/cắt/tràn/solve.",
+    "actualSvgReviewed": true,
+    "byteSvg": 20365,
+    "render": "/workspace/scratch/font239-341-new.png",
     "hash": "3cc7d992ffc43196906bb619bbda4d46780256b6d9351d14d9daa87b36b05d24",
-    "hashSvgDaSoat": "a429d2ae5b0a7754dfdbc37f74945ec91bbbdac515d7fc0917b20010eca68520"
+    "hashSvgDaSoat": "1d20cc3cfce2caac48fb000d28f24f64e3cb1927a691d30d4b2b0709e32936c5"
   }
 ]

@@ -3,9 +3,9 @@
     "i": 217,
     "hash": "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5",
     "fileNguon": "anh/25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5.png",
-    "svg": "hall-heroult-ddh-5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888.svg",
-    "hashSvg": "5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888",
-    "byteSvg": 54451,
+    "svg": "hall-heroult-ddh-e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c.svg",
+    "hashSvg": "e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c",
+    "byteSvg": 54514,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "4anodes/plusleft-minusright/steelshell-graphitelining-graymelt-whitelowerlayer/2wallpipe/alllabels-criolite-captionliteral/DDHpath;grayprinttexturekhôngparticlecount.",
-    "hashSvgDaSoat": "5f9dc9422699ed4fb8e53479b3616049d427346997e71e57674fca5f4f74f888",
-    "nguoiSoat": "soat_nguon_2"
+    "hashSvgDaSoat": "e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

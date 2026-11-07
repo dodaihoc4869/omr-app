@@ -1,0 +1,43 @@
+[
+  {
+    "i": 520,
+    "hash": "610b7b7388fb641224fc4f9bbe9566c45b06a8b9bf16d210da217c0d0fedb0ff",
+    "fileNguon": "anh/610b7b7388fb641224fc4f9bbe9566c45b06a8b9bf16d210da217c0d0fedb0ff.png",
+    "svg": "chair-polymer-ddh-f6bad58c7fae467342a103338ddc56183be449c12ea6676f1f780cb18ba8c69a.svg",
+    "hashSvg": "f6bad58c7fae467342a103338ddc56183be449c12ea6676f1f780cb18ba8c69a",
+    "byteSvg": 19654,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B6-D2-II-45",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "hash": "610b7b7388fb641224fc4f9bbe9566c45b06a8b9bf16d210da217c0d0fedb0ff",
+            "where": "12-C2-B6-D2-II-45.hinh.0.du_lieu",
+            "hashDataUrl": "944f3321a473b93bab423613d45fbdbc89566ff41c2587b1d36e0b979594d037"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-57",
+        "de": "Tại một nhà máy sản xuất rượu, cứ 10 tấn tinh bột (chứa 6,85% tạp chất trơ) sẽ sản xuất được 7,21 m³ dung dịch ethanol 40° (cho khối lượng riêng của ethanol nguyên chất là 0,789 g/cm³). Tinh bột là một polysaccharide gồm nhiều gốc α-glucose liên kết với nhau tạo ra hai dạng mạch amylose và amylopectin. Dưới đây là một đoạn cấu tạo của tinh bột:",
+        "refs": [
+          {
+            "hash": "610b7b7388fb641224fc4f9bbe9566c45b06a8b9bf16d210da217c0d0fedb0ff",
+            "where": "DB-12-B4-D2-II-57.hinh.0.du_lieu",
+            "hashDataUrl": "944f3321a473b93bab423613d45fbdbc89566ff41c2587b1d36e0b979594d037"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3rings/3CH2OH6OH0H/3LEFTtaper3horizontalbold3RIGHTthinUNIFORM/middleC4+C1literal3strokeGAPS/ONLYnums1-4/left3dotsNOO/rightO+3dots/noextraH-caption-brackets/DDHpath.",
+    "coSoDungChung": "doc-chair-polymer-dung-chung-lo-239.json",
+    "hashSvgDaSoat": "f6bad58c7fae467342a103338ddc56183be449c12ea6676f1f780cb18ba8c69a",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "lyDo": "Lịch sử font đậm cũ, không dùng duyệt hash mới",
+  "metadata": [
+    {
+      "i": 197,
+      "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+      "fileNguon": "anh/215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc.png",
+      "svg": "lewis-bon-cong-thuc-ddh-c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b.svg",
+      "hashSvg": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
+      "byteSvg": 13819,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "DB-11-B6-D2-III-66",
+          "de": "Trong các công thức dưới đây: Có bao nhiêu công thức không thỏa mãn quy tắc octet?",
+          "refs": [
+            {
+              "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+              "where": "DB-11-B6-D2-III-66.hinh.0.du_lieu",
+              "hashDataUrl": "e0a11c46f2e6e030dea50c787a0c0077ec43f1cb2c5af226a19ff3b2bf61558f"
+            }
+          ]
+        },
+        {
+          "qid": "DH-11-C2-B6-III-6",
+          "de": "Trong các công thức dưới đây: Có bao nhiêu công thức không thỏa mãn quy tắc octet?",
+          "refs": [
+            {
+              "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+              "where": "DH-11-C2-B6-III-6.hinh.0.du_lieu",
+              "hashDataUrl": "e0a11c46f2e6e030dea50c787a0c0077ec43f1cb2c5af226a19ff3b2bf61558f"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "4formulas/31electrondots/4numberlabelsdamthật/allatoms-bondsliteral/nochargesadded/noanswer/DDHpath.",
+      "hashSvgDaSoat": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 197,
+      "hashSvg": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở source197native/full+wholezoom/panel2-4macro8x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-217-lewis-fresh.png),mởactual3xđếmtừngdot. Đủ31dots=4panel1+11panel2+2panel3+14panel4;Npanel2SINGLEDOTTOP,khôngtựthêmsecondlonepair;Npanel4NOdots. Panel1N≡Nendpairs2each;panel2Oleftdouble4dots/Orightsingle6dots;NH3panel3Ntop2/Hleft-right-down;panel4N=Otop4dotsleft-right/N–Oleft6dots3diagonalpairs/N–OHright4dotstop-bottom vàOHbond đúngsource. Allatom/bondorder/topology/nochargesliteralgiữPAkhôngchữaoctettheory/đápán. 4parenthesizednumbersDDHđậm thật,path tựchứa/noimage/fontfallback,mọidots/atom/bondgapskhôngchạm/cắt/tràn;exactSHA256thựckhớpmetadata.",
+      "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
+      "hashSvgDaSoat": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b"
+    }
+  ],
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "b3987d506cfa58e89806f686fbc3122f7ff7253e"
+}

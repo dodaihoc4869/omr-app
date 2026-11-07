@@ -1,0 +1,56 @@
+{
+  "lyDo": "Thu hồi positive cũ22ef2 do chữ nguồn N-mehtyl bị chuẩn hóa sai thành N-methyl, ngoài thayfont. Không chọn22ef2 hoặc a750641c.",
+  "metadata": [
+    {
+      "i": 267,
+      "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+      "fileNguon": "anh/2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea.png",
+      "svg": "bang-amine-ddh-22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6.svg",
+      "hashSvg": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
+      "byteSvg": 63027,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-KT-C34-D1-III-1",
+          "de": "Ghép công thức cấu tạo của amine ở cột (A) với tên và bậc amine của chúng ở cột (B) trong bảng ở hình dưới, thành một dãy số theo thứ tự a), b), c).",
+          "refs": [
+            {
+              "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+              "where": "12-KT-C34-D1-III-1.hinh.0.du_lieu",
+              "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-III-285",
+          "de": "Ghép công thức cấu tạo của amine ở cột (A) với tên và bậc amine của chúng ở cột (B) trong bảng ở hình dưới, thành một dãy số theo thứ tự a), b), c).",
+          "refs": [
+            {
+              "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+              "where": "DB-12-B8-D1-III-285.hinh.0.du_lieu",
+              "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3structures/Ph3DOUBLE/NH2-H2N-H3C-CH3-NHliteral/alltablechoices-a-b-c/3numbers/2headersdam/grid/noaddedanswers/nofixaminebậcba/DDHpath.",
+      "hashSvgDaSoat": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 267,
+      "hashSvg": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở source267native/full+3moleculemacros4x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-221-table-fresh.png). Đúng2colheadersCột(A)/Cột(B)DDHđậm thật/3numbersregular(1)(2)(3)/allborders-dividerrows. Mol1Ph3double/NH₂-Nfirst;mol2H₂N-Nright/3implicitC+H₃C-Cright=4C1N;mol3H₃Cleft-Cright/CH₃top-Cfirst/NH-Nfirst/H₃Cbottom-Cright=5C1N,từngbond/gapsliteralđúngsource. RightrowsEXACTa) N-methylbutan-2-amine; amine bậc ba,b) butan-1-amine; amine bậc một,c) benzenamine; amine bậc một,đủhyphens/semicolons/accents. GiữbậcbaPAprintedkhôngsửatheory/khôngnốimappinganswer/reorder/extraaminecaption. DDHpath tựchứa khôngfallback/text/image,glyph/subscript/gridgapskhôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata.",
+      "hash": "2d931f4f91072ec53bd61fd0fcfde4d826a551948226ccdfa761ea596a5168ea",
+      "hashSvgDaSoat": "22ef2ad9e1fc47937c1af1690441059e3011241b2521c64b89b42dbf63648bd6"
+    }
+  ],
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "b3987d506cfa58e89806f686fbc3122f7ff7253e",
+  "positiveCuDaThuHoi": true
+}

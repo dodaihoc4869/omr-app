@@ -3,9 +3,9 @@
     "i": 118,
     "hash": "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb",
     "fileNguon": "anh/1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb.png",
-    "svg": "methylphenidate-ddh-d5180b7089e2ad7ab1f57dc3ea623b919b98c9ac89ac58b41a2eb73c52f70e68.svg",
-    "hashSvg": "d5180b7089e2ad7ab1f57dc3ea623b919b98c9ac89ac58b41a2eb73c52f70e68",
-    "byteSvg": 18275,
+    "svg": "methylphenidate-ddh-0c70e7456f5a851e67d7de97b3a1f227b28f324a62a80bc08c7ee548ebddef1d.svg",
+    "hashSvg": "0c70e7456f5a851e67d7de97b3a1f227b28f324a62a80bc08c7ee548ebddef1d",
+    "byteSvg": 18004,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "Benzene3double/Nsixring/COOCH3/ClH2Nliteral/nocharges-stereo/branches/captionEnglishdamWOFF2/DDHpath.",
-    "hashSvgDaSoat": "d5180b7089e2ad7ab1f57dc3ea623b919b98c9ac89ac58b41a2eb73c52f70e68",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "0c70e7456f5a851e67d7de97b3a1f227b28f324a62a80bc08c7ee548ebddef1d",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "4490e4d23fbec9466012821220a26cdf914cf2bf"
   }
 ]

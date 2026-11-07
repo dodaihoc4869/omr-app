@@ -317,5 +317,6 @@
     "critical": "Keepa)bậcbaEXACTnotsecondarycorrect;NOmappingofrow1tocthererelabel/allprintedordermuststay. 3moleculesNOcharges/wedges/CIP/captionextra;H3CvsCH3targetsCcorrect,H2NtargetNright/NHtargetNfirst.",
     "noAdded": "Nooctetdot/amineordernamesinstructures/arrowsmatchlines/answerarray."
   },
-  "verdict": "Đọcsource,chưaactualSVGreview."
+  "verdict": "Đọcsource,chưaactualSVGreview.",
+  "dinhChinhLo239": "Nguồn in literal N-mehtylbutan-2-amine (h trước t), không phải N-methyl. Positive SVG22ef2 cũ thu hồi. Xem amine267-lo-239-ban-cu-bi-loai.json và proof exacthash mới lo239; vẫn giữ amine bậc ba."
 }

@@ -1,0 +1,37 @@
+{
+  "lo": 239,
+  "chromium": "589/589",
+  "hashXmlSelfcontainedAst": true,
+  "build": true,
+  "speed": "21/21",
+  "precache": "170/2613.23KiB",
+  "main": "5d89cd4d",
+  "woff2Diff": false,
+  "gioiHan": "SizegateđỏNỀNindex.ts;chưaallrepođạt/chưatíchhợp/offlineapp/pháthành",
+  "mainFull": "5d89cd4d629b3496bd92cf5e50a7477776593f6e",
+  "fontMainPending": "51SVG/57nguồn còn lại;10SVG+source520đãsoátexacthashmới",
+  "serviceWorker": "14/14",
+  "serverTsc": true,
+  "colorAgainstMain": {
+    "viPham": 205,
+    "baseline": true,
+    "proof": "mau-main-lo-239-nen.json"
+  },
+  "indexTs": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf",
+    "redBaseline": true,
+    "proof": "co-tep-lo-167-nen.json"
+  },
+  "fullVitest": {
+    "proof": "full-vitest-lo-239.json",
+    "branchTests": 16581,
+    "mainTests": 16709,
+    "branchFailed": 14,
+    "mainFailed": 17,
+    "fullRunNewFailedNames": 1,
+    "unresolvedAfterTargetedRechecks": 0,
+    "allRepoGreen": false
+  },
+  "checkMau": "0 hex ngoài token"
+}

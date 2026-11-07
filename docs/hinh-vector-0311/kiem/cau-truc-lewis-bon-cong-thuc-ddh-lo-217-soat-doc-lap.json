@@ -1,10 +1,14 @@
 [
   {
     "i": 197,
-    "hashSvg": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: Mở source197native/full+wholezoom/panel2-4macro8x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-217-lewis-fresh.png),mởactual3xđếmtừngdot. Đủ31dots=4panel1+11panel2+2panel3+14panel4;Npanel2SINGLEDOTTOP,khôngtựthêmsecondlonepair;Npanel4NOdots. Panel1N≡Nendpairs2each;panel2Oleftdouble4dots/Orightsingle6dots;NH3panel3Ntop2/Hleft-right-down;panel4N=Otop4dotsleft-right/N–Oleft6dots3diagonalpairs/N–OHright4dotstop-bottom vàOHbond đúngsource. Allatom/bondorder/topology/nochargesliteralgiữPAkhôngchữaoctettheory/đápán. 4parenthesizednumbersDDHđậm thật,path tựchứa/noimage/fontfallback,mọidots/atom/bondgapskhôngchạm/cắt/tràn;exactSHA256thựckhớpmetadata.",
+    "hashSvg": "0a3ca1b6bc64f992dcf318d3acb5256e42f0494b18abc1262193f44b3eb00cff",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact newSVG3x, mở nativeFULL3x và hai public stems/refs. Đếm literal31dots=4+11+2+14;panel1 NtripleN,2dots mỗi đầu;panel2 OdoubleNsingleO,leftO4dots/rightO6/N đúng1dot;panel3 H-N-H/N-Hdown,N2dots;panel4 NdoubleOtop/singleOleft/singleO-Hright,topO4/leftO6/rightO4,NNOdots. Bốn nhãn(1)..(4)fontđậm mới đúng; không sửa phương án sai theo lý thuyết. Chữ/nét/dots không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 13590,
+    "render": "/workspace/scratch/lewis197-font239-0a3ca1b6-chromium.png",
+    "sourceHash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
     "hash": "215ff8d1773c9fa7dfb4e3694af4cae56acc9582d7b99ca3be07ad76aac66efc",
-    "hashSvgDaSoat": "c7716bd3e1da8dfee7c4340f7c08fb51107f0084156df61ee7c16a25185d1e9b"
+    "hashSvgDaSoat": "0a3ca1b6bc64f992dcf318d3acb5256e42f0494b18abc1262193f44b3eb00cff"
   }
 ]
