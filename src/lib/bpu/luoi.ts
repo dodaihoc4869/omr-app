@@ -1,7 +1,8 @@
 // BÌNH PHẢN ỨNG — LƯỚI TÊN TRÊN BẢNG CHIẾU (thuần, có test tests/bpu-luoi-0711.test.ts). Sân khấu 1920×1080.
 /** LƯỚI TÊN (thầy 07/11): chỉ các em CÓ MẶT, TỐI ĐA HAI HÀNG như bản vẽ («danh sách học sinh có mặt tự động điều chỉnh chỉ hiện tối đa hai hàng»);
  *  ≤ 12 em ⇒ một hàng. Ô bám đáy sân khấu (trên đáy 16 px), rộng chia đều 1856 px (lề 32 px — dải tên rộng nhất có thể để chữ to). Cỡ chữ do bảng đo theo ô (chữ đơn dài nhất nằm trọn một dòng). */
-export const DAY_LUOI = 1064, KHE = 6, TRAI_LUOI = 32, RONG_LUOI = 1856, CAO_O = 78
+// Đáy dải tên chừa 60 px (thầy 07/11, ảnh máy chiếu: cửa sổ không toàn màn hình ⇒ thanh tác vụ Windows che đáy, chữ ô tên bị cắt).
+export const DAY_LUOI = 1004, KHE = 6, TRAI_LUOI = 32, RONG_LUOI = 1856, CAO_O = 76
 export interface Luoi { cot: number; hang: number; w: number; h: number; top: number }
 export function boLuoi(n: number): Luoi {
   const so = Math.max(1, n), cot = so <= 12 ? Math.max(8, so) : Math.ceil(so / 2), hang = Math.ceil(so / cot), h = CAO_O

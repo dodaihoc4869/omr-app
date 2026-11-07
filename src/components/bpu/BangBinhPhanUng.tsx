@@ -94,6 +94,10 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const [manPhu, setManPhu] = useState<'dua' | 'vinh-danh' | null>(null)
   const [an, setAn] = useState(false)
   const [moPhim, setMoPhim] = useState(false)
+  // TOÀN MÀN HÌNH (thầy 07/11, ảnh máy chiếu: thanh tác vụ Windows che đáy bảng) — nút / phím F; trình duyệt chỉ cho khi thầy bấm.
+  const [toanMan, setToanMan] = useState(() => typeof document !== 'undefined' && !!document.fullscreenElement)
+  useEffect(() => { const doi = () => setToanMan(!!document.fullscreenElement); document.addEventListener('fullscreenchange', doi); return () => document.removeEventListener('fullscreenchange', doi) }, [])
+  const doiToanMan = useCallback(() => { try { if (document.fullscreenElement) void document.exitFullscreen?.(); else void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* trình duyệt không hỗ trợ */ } }, [])
   const [nay, setNay] = useState(() => Date.now())
   const [toast, setToast] = useState<string | null>(null)
   const [ung, setUng] = useState<{ ds: string[]; soi: string | null } | null>(null)
@@ -294,6 +298,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       if (e.key === 'Escape') { e.preventDefault(); if (moPhim) setMoPhim(false); else if (manPhu) setManPhu(null); else onDong(); return }
       if (e.key === '?') { setMoPhim((m) => !m); return }
       if (kk === 'g' && onGiai) { e.preventDefault(); onGiai(); return }
+      if (kk === 'f') { e.preventDefault(); doiToanMan(); return }
       // CHUYỂN CÂU (thầy 07/11 «tôi chỉ việc chiếu lên bảng rồi bấm chuyển câu»): tờ sang câu ⇒ tự gửi câu mới; lượt cũ chưa mở đáp án ⇒ máy chủ tự chốt.
       if ((e.key === 'ArrowRight' || e.key === 'PageDown') && onToi) { e.preventDefault(); onToi(1); return }
       if ((e.key === 'ArrowLeft' || e.key === 'PageUp') && onToi) { e.preventDefault(); onToi(-1); return }
@@ -311,7 +316,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     }
     window.addEventListener('keydown', phim, true)
     return () => window.removeEventListener('keydown', phim, true)
-  }, [man, manPhu, moPhim, gui, goiLen, onDong, onToi, onGiai, l?.goi, yeu])
+  }, [man, manPhu, moPhim, gui, goiLen, onDong, onToi, onGiai, l?.goi, yeu, doiToanMan])
 
   const q = (l?.cau ?? null) as unknown as Question | null
   const ten = (e: Em | undefined) => (!e ? '' : an ? `Em số ${ds.indexOf(e) + 1}` : tenNgan(e.ten))
@@ -320,6 +325,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const tren = (giua: React.ReactNode, phai?: React.ReactNode) => (
     <div className="bb-tren"><div className="bb-logo"><Lua />Bình Phản Ứng</div>{giua}<div className="bb-lop">{v?.lop ?? ''}</div><div className="bb-gian" />{phai}
       {onToi && man !== 'diem-danh' ? <button type="button" className="bb-tiep" onClick={() => onToi(1)}>Câu tiếp<kbd>→</kbd></button> : null}
+      {!toanMan && <button type="button" className="bb-hoi" onClick={doiToanMan}><kbd>F</kbd>Toàn màn hình</button>}
       <button type="button" className="bb-hoi" onClick={() => setMoPhim((m) => !m)} aria-expanded={moPhim}><kbd>?</kbd>Phím</button></div>
   )
   const phim = (dsP: [string, string, boolean?][], ghi?: string) => (moPhim ? <div className="bb-phim" role="note">{dsP.map(([a, b, noi]) => <span key={a} className={noi ? 'noi' : ''}><kbd>{a}</kbd>{b}</span>)}{ghi ? <p>{ghi}</p> : null}</div> : null)

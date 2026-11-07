@@ -11,7 +11,7 @@ describe('lưới tên', () => {
       expect(L.hang).toBeLessThanOrEqual(2)
       if (n <= 12) expect(L.hang).toBe(1)
       expect(L.top + L.hang * L.h + (L.hang - 1) * KHE).toBeLessThanOrEqual(DAY_LUOI)
-      expect(L.top).toBeGreaterThan(880)
+      expect(L.top).toBeGreaterThan(830)
       expect(L.cot * L.w + (L.cot - 1) * KHE).toBeLessThanOrEqual(RONG_LUOI + 0.01)
     }
   })
