@@ -82,6 +82,8 @@ export interface TrangThaiPhong {
   soLuot: number
   doiThuong: number[]
   doiDu: number | null
+  /** Số đội (thầy 07/11 «dưới 12 bạn thì chỉ tạo 2 đội»): 2 | 4. Phòng lưu trước bản này không có ⇒ 4. */
+  soDoi?: number
   vuaVao: string[]
   lichSu: TomTatLuot[]
   ketThuc: boolean
@@ -94,12 +96,24 @@ function bam(s: string): number {
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0 }
   return h >>> 0
 }
-/** Chia đội CỐ ĐỊNH CẢ THÁNG: xếp sbd theo băm (sbd + tháng) rồi chia rắn bò 0-1-2-3-3-2-1-0 ⇒ bốn đội lệch nhau tối đa 1 bạn. */
-export function chiaDoi(dsSbd: readonly string[], thang: string): Map<string, number> {
+/** Chia đội CỐ ĐỊNH CẢ THÁNG: xếp sbd theo băm (sbd + tháng) rồi chia rắn bò 0-1-2-3-3-2-1-0 ⇒ các đội lệch nhau tối đa 1 bạn.
+ *  Hai đội: cùng thứ tự, đội = (đội bốn) mod 2 ⇒ {Natri+Đồng}, {Kali+Canxi} — gộp từ bốn đội ra đúng hai đội đều. */
+export function chiaDoi(dsSbd: readonly string[], thang: string, soDoi = 4): Map<string, number> {
   const xep = [...new Set(dsSbd)].sort((a, b) => bam(a + '|' + thang) - bam(b + '|' + thang) || a.localeCompare(b))
   const ra = new Map<string, number>()
-  xep.forEach((s, k) => { const v = Math.floor(k / 4), r = k % 4; ra.set(s, v % 2 === 0 ? r : 3 - r) })
+  xep.forEach((s, k) => { const v = Math.floor(k / 4), r = k % 4, d = v % 2 === 0 ? r : 3 - r; ra.set(s, soDoi === 2 ? d % 2 : d) })
   return ra
+}
+/** Dưới ngần này em ⇒ hai đội. */
+export const IT_EM_HAI_DOI = 12
+export const soDoiCua = (st: Pick<TrangThaiPhong, 'soDoi'>): number => (st.soDoi === 2 ? 2 : 4)
+/** Gộp bốn đội thành hai (lượt đầu mà có mặt dưới 12 em): em đổi đội = đội mod 2, kJ thưởng đội cộng dồn — không mất điểm điểm danh. */
+export function gopHaiDoi(st: TrangThaiPhong): void {
+  if (soDoiCua(st) === 2) return
+  for (const e of st.ds) e.doi = e.doi % 2
+  st.doiThuong = [(st.doiThuong[0] ?? 0) + (st.doiThuong[2] ?? 0), (st.doiThuong[1] ?? 0) + (st.doiThuong[3] ?? 0)]
+  if (st.doiDu != null) st.doiDu = st.doiDu % 2
+  st.soDoi = 2
 }
 export const thangCua = (nay: number): string => {
   const d = new Date(nay + 7 * 3_600_000)
@@ -115,11 +129,12 @@ export function kyHieu(ten: string): string {
 
 export function taoPhong(o: { buoiId: string; lop: string; nay: number; ds: readonly { sbd: string; ten: string; coMat: boolean; luc?: number | null }[] }): TrangThaiPhong {
   const thang = thangCua(o.nay)
-  const doi = chiaDoi(o.ds.map((x) => x.sbd), thang)
+  const soDoi = o.ds.length < IT_EM_HAI_DOI ? 2 : 4
+  const doi = chiaDoi(o.ds.map((x) => x.sbd), thang, soDoi)
   const st: TrangThaiPhong = {
     buoiId: o.buoiId, lop: o.lop, thang, mo: o.nay,
     ds: o.ds.map((x) => ({ sbd: x.sbd, ten: x.ten || x.sbd, doi: doi.get(x.sbd) ?? 0, vao: false, luc: null, kj: 0, dungSo: 0, chuoi: 0, roi: 0, daLenBang: 0 })),
-    luot: null, soLuot: 0, doiThuong: [0, 0, 0, 0], doiDu: null, vuaVao: [], lichSu: [], ketThuc: false, capNhat: o.nay,
+    luot: null, soLuot: 0, doiThuong: Array(soDoi).fill(0), doiDu: null, soDoi, vuaVao: [], lichSu: [], ketThuc: false, capNhat: o.nay,
   }
   const coMat = [...o.ds].filter((x) => x.coMat).sort((a, b) => (a.luc ?? 0) - (b.luc ?? 0))
   for (const x of coMat) vaoLop(st, x.sbd, x.luc ?? o.nay)
@@ -132,7 +147,7 @@ export function vaoLop(st: TrangThaiPhong, sbd: string, nay: number, ten?: strin
   let e = em(st, sbd)
   if (!e) {
     if (!ten) return false
-    const doi = chiaDoi([...st.ds.map((x) => x.sbd), sbd], st.thang).get(sbd) ?? 0
+    const doi = chiaDoi([...st.ds.map((x) => x.sbd), sbd], st.thang, soDoiCua(st)).get(sbd) ?? 0
     e = { sbd, ten, doi, vao: false, luc: null, kj: 0, dungSo: 0, chuoi: 0, roi: 0, daLenBang: 0 }
     st.ds.push(e)
   }
@@ -146,6 +161,8 @@ export function vaoLop(st: TrangThaiPhong, sbd: string, nay: number, ten?: strin
 }
 
 export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLuan: boolean; cau: Record<string, unknown>; dung: string; hanGiay: number | null }, nay: number): LuotPhong {
+  // Lượt đầu mà lớp có mặt dưới 12 em ⇒ hai đội (linh hoạt theo số em thật sự có mặt; từ lượt hai đội đã chốt, không đổi giữa buổi).
+  if (st.soLuot === 0 && st.ds.filter((e) => e.vao).length < IT_EM_HAI_DOI) gopHaiDoi(st)
   st.soLuot += 1
   st.luot = {
     so: st.soLuot, qid: c.qid, phan: c.phan, tuLuan: c.tuLuan, cau: c.cau, dung: c.dung, batDau: nay,
@@ -275,7 +292,7 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
 export const diemDoi = (st: TrangThaiPhong, d: number): number => st.ds.reduce((s, e) => s + (e.doi === d ? e.kj : 0), 0) + (st.doiThuong[d] ?? 0)
 /** Xếp hạng đội theo TỔNG kJ (con số hiện trên bảng — cả lớp nhìn là hiểu); hoà ⇒ trung bình mỗi bạn có mặt cao hơn. Chia đội lệch nhau tối đa 1 bạn. */
 export function xepDoi(st: TrangThaiPhong): { doi: number; tong: number; coMat: number; tb: number }[] {
-  return [0, 1, 2, 3].map((d) => { const coMat = st.ds.filter((e) => e.doi === d && e.vao).length, tong = diemDoi(st, d); return { doi: d, tong, coMat, tb: coMat ? tong / coMat : tong } })
+  return Array.from({ length: soDoiCua(st) }, (_, d) => d).map((d) => { const coMat = st.ds.filter((e) => e.doi === d && e.vao).length, tong = diemDoi(st, d); return { doi: d, tong, coMat, tb: coMat ? tong / coMat : tong } })
     .sort((a, b) => b.tong - a.tong || b.tb - a.tb || a.doi - b.doi)
 }
 export const xepEm = (st: TrangThaiPhong): EmPhong[] => [...st.ds].filter((e) => e.vao).sort((a, b) => b.kj - a.kj || a.ten.localeCompare(b.ten))
@@ -285,7 +302,7 @@ export function viewBang(st: TrangThaiPhong) {
   const l = st.luot
   return {
     t: 'bang' as const,
-    buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, vuaVao: st.vuaVao, lichSu: st.lichSu,
+    buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, soDoi: soDoiCua(st), vuaVao: st.vuaVao, lichSu: st.lichSu,
     ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, chuoi: e.chuoi, roi: e.roi, daLenBang: e.daLenBang })),
     luot: l ? {
       so: l.so, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, batDau: l.batDau, han: l.han, pha: l.pha, roiMe: l.roiMe, kich: l.kich,

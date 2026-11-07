@@ -1,20 +1,19 @@
 // Bình Phản Ứng — lưới tên trên bảng chiếu (thầy 07/11: 68 em thì 3 hàng tràn xuống thanh phím, chữ chồng nhau; mỗi ô phải hiện đủ tên gọi).
 import { describe, expect, it } from 'vitest'
-import { DAY_LUOI, DINH_LUOI, KHE, RONG_LUOI, boLuoi, tenGoiLop } from '../src/lib/bpu/luoi'
+import { DAY_LUOI, KHE, RONG_LUOI, boLuoi, tenGoiLop } from '../src/lib/bpu/luoi'
 import { kepGiay } from '../server/src/phong-binh-phan-ung'
 
 describe('lưới tên', () => {
-  it('mọi sĩ số 1–120: lưới nằm gọn trong dải, đủ ô, ô đủ rộng cho tên gọi', () => {
+  it('chỉ em có mặt, TỐI ĐA HAI HÀNG (thầy 07/11); ≤ 12 em một hàng; lưới nằm gọn dưới đáy sân khấu', () => {
     for (let n = 1; n <= 120; n++) {
       const L = boLuoi(n)
       expect(L.cot * L.hang).toBeGreaterThanOrEqual(n)
-      expect(L.top).toBeGreaterThanOrEqual(DINH_LUOI)
+      expect(L.hang).toBeLessThanOrEqual(2)
+      if (n <= 12) expect(L.hang).toBe(1)
       expect(L.top + L.hang * L.h + (L.hang - 1) * KHE).toBeLessThanOrEqual(DAY_LUOI)
+      expect(L.top).toBeGreaterThan(880)
       expect(L.cot * L.w + (L.cot - 1) * KHE).toBeLessThanOrEqual(RONG_LUOI + 0.01)
-      if (n <= 100) { expect(L.w).toBeGreaterThanOrEqual(64); expect(L.h).toBeGreaterThanOrEqual(40) }
     }
-    const L68 = boLuoi(68)
-    expect(L68.w).toBeGreaterThan(85) // «Nguyên» không bị cắt ở lớp 68 em
   })
   it('tên gọi: chữ cuối; trùng thì hai chữ cuối; vẫn trùng thì thêm số', () => {
     const m = tenGoiLop([

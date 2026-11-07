@@ -17,6 +17,13 @@ let buoiNho: { ds: BuoiHoc[]; luc: number } | null = null
 let nghiDen = 0
 const NHO_BUOI_MS = 60_000
 const GAN_DAY_MS = 4 * 3_600_000
+/** Buổi bước Điểm danh của máy này đang xem hôm nay (giờ VN) — cùng khoá `DiemDanhBuoi.tsx`. */
+function buoiDangXem(): string {
+  try {
+    const v = JSON.parse(localStorage.getItem('ddh.gv.buoi-xem') || 'null') as { id?: unknown; n?: unknown } | null
+    return v && v.n === new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10) && typeof v.id === 'string' ? v.id : ''
+  } catch { return '' }
+}
 
 async function layBuoi(tuDong: boolean): Promise<string | null> {
   let ds = tuDong && buoiNho && Date.now() - buoiNho.luc < NHO_BUOI_MS ? buoiNho.ds : null
@@ -26,8 +33,10 @@ async function layBuoi(tuDong: boolean): Promise<string | null> {
     ds = r.du
     buoiNho = { ds, luc: Date.now() }
   }
-  // Tin TỰ ĐỘNG chỉ theo buổi mở trong 4 giờ gần nhất: thầy quên kết thúc buổi sáng thì tối chiếu lớp khác KHÔNG đẩy câu xuống máy các em lớp sáng (đang ở nhà).
-  const id = (tuDong ? ds.find((b) => Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id : ds[0]?.id) ?? null
+  // Tin TỰ ĐỘNG chỉ theo buổi mở trong 4 giờ gần nhất HOẶC buổi máy này đang xem hôm nay (bước Điểm danh nhớ `ddh.gv.buoi-xem`): thầy quên kết thúc
+  // buổi sáng thì tối chiếu lớp khác KHÔNG đẩy câu xuống máy các em lớp sáng (đang ở nhà); buổi dài hơn 4 giờ mà thầy vẫn đang dạy thì vẫn chạy.
+  const nho = buoiDangXem()
+  const id = (tuDong ? ds.find((b) => b.id === nho || Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id : ds[0]?.id) ?? null
   if (!id && !tuDong) useAppStore.getState().showToast('Chưa có buổi điểm danh đang mở. Thầy mở Điểm danh trước, các em vào lớp bằng mã.', 'warn')
   return id
 }

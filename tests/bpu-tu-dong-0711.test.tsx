@@ -31,6 +31,16 @@ describe('mở bảng từ tờ chiếu', () => {
     expect(b.getAttribute('data-giay')).toBe('120')
     m2.dongBang()
   })
+  it('buổi mở quá 4 giờ nhưng máy này đang xem hôm nay (bước Điểm danh) ⇒ vẫn tự mở', async () => {
+    vi.resetModules()
+    const m = await import('../src/components/bpu/gan-gv')
+    localStorage.setItem('ddh.gv.buoi-xem', JSON.stringify({ id: 'sang', n: new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10) }))
+    buoi.ds = [{ id: 'sang', moLuc: gio(5) }]
+    await m.moBangTuToChieu('q3', { tuDong: true })
+    await new Promise((r) => setTimeout(r, 20))
+    expect(document.querySelector('[data-bang]')?.getAttribute('data-bang')).toBe('sang')
+    localStorage.removeItem('ddh.gv.buoi-xem')
+  })
   it('không có buổi: tin tự động im lặng; bấm P thì báo thầy mở điểm danh', async () => {
     vi.resetModules()
     const m = await import('../src/components/bpu/gan-gv')

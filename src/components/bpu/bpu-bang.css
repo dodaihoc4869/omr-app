@@ -23,7 +23,19 @@
 /* Đề */
 .bb-de { position: absolute; left: 64px; top: 128px; width: 1090px; height: 690px; display: flex; flex-direction: column; gap: 22px; z-index: 2; }
 .bb-chip { align-self: flex-start; padding: 6px 18px; border-radius: 12px; background: var(--tr-mat-2); color: var(--tr-chu-2); font-size: 22px; font-weight: 600; }
-.bb-de-chu { font-size: 40px; line-height: 1.42; font-weight: 600; max-height: 300px; overflow: hidden; }
+.bb-de-chu { flex: 1 1 auto; min-height: 140px; font-size: 40px; line-height: 1.42; font-weight: 600; overflow-y: auto; overscroll-behavior: contain; padding-right: 18px;
+  scrollbar-width: auto; scrollbar-color: var(--tr-vien-2) transparent; } /* đề dài: thanh cuộn (chuột / phím ↓ ↑); khối cao tới sát dải tên */
+.bb-de-chu::-webkit-scrollbar { width: 14px; }
+.bb-de-chu::-webkit-scrollbar-thumb { border-radius: 8px; background: var(--tr-vien-2); }
+.bb-de-chu sup { font-size: 0.65em; }
+/* Mũi tên phản ứng (markup chung .mt của app) cỡ theo chữ bảng chiếu: dài ~1,6 em, nét 3 px, đầu mũi tên 9 px. */
+.bpu-bang .mt { margin: 0 0.28em; }
+.bpu-bang .mt-than { min-width: 1.6em; border-top-width: 3px; margin: 6px 0; }
+.bpu-bang .mt-tran .mt-than { min-width: 1.6em; }
+.bpu-bang .mt-than::after, .bpu-bang .mt-than::before { top: -7.5px; border-width: 6px; }
+.bpu-bang .mt-hai { height: 9px; border-bottom-width: 3px; }
+.bpu-bang .mt-hai::before { top: 3px; }
+.bb-pa, .bb-ds, .bb-tln { flex: none; }
 .bb-dong-chu { margin: 0; text-wrap: pretty; }
 .bb-de-chu sub { font-size: 0.65em; }
 .bb-anh { max-width: 100%; max-height: 260px; border-radius: 12px; background: var(--giay); }
@@ -55,7 +67,7 @@
 .bb-o::after { content: ""; position: absolute; left: 0; top: 9px; bottom: 9px; width: 6px; border-radius: 0 4px 4px 0; background: var(--doi); opacity: 0.95; }
 /* Ô TÊN (thầy 07/11): chỉ tên gọi, một cỡ chữ cho cả lưới (--co), hai chữ («Minh Anh») xuống hai dòng; không còn số / kí hiệu chồng lên nhau. */
 
-.bb-o .ten { padding: 0 6px 0 10px; font-size: var(--co, 24px); font-weight: 800; line-height: 1.04; letter-spacing: -0.01em; color: var(--tr-chu); text-align: center; overflow-wrap: normal; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; }
+.bb-o .ten { padding: 0 4px 0 9px; font-size: var(--co, 24px); font-weight: 800; line-height: 1.04; letter-spacing: -0.025em; color: var(--tr-chu); text-align: center; overflow-wrap: normal; word-break: keep-all; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; max-width: 100%; }
 .bb-o.chua-vao { background: transparent; box-shadow: inset 0 0 0 2px var(--tr-vien-2); }
 .bb-o.chua-vao::after { opacity: 0.25; }
 .bb-o.chua-vao .ten { color: var(--tr-chu-3); font-weight: 700; }
@@ -71,6 +83,13 @@
 .bb-o.roi .ten { color: var(--tr-chu-y); }
 .bb-o .nhan-roi { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); padding: 1px 10px; border-radius: 8px; background: var(--tr-chu-y); color: var(--p-muc); font-size: 14px; font-weight: 800; white-space: nowrap; }
 .bb-o.ung { box-shadow: inset 0 0 0 3px var(--tr-chu-2); }
+/* Em lên bảng ⇒ CẢ ĐỘI sáng lên (thầy 07/11): nền + viền + quầng màu đội, nhịp sáng nhẹ (chỉ opacity của lớp ::before). */
+.bb-o.cung-doi { background: color-mix(in srgb, var(--doi) 24%, var(--tr-mat)); box-shadow: inset 0 0 0 3px var(--doi), 0 0 26px color-mix(in srgb, var(--doi) 55%, transparent); }
+.bb-o.cung-doi::before { content: ""; position: absolute; inset: -3px; border-radius: 18px; box-shadow: 0 0 34px var(--doi); opacity: 0; animation: bb-doi-sang 1.6s ease-in-out infinite; pointer-events: none; }
+.bb-o.cung-doi .ten { color: var(--tr-chu); }
+@keyframes bb-doi-sang { 50% { opacity: 0.85; } }
+@media (prefers-reduced-motion: reduce) { .bb-o.cung-doi::before { animation: none; opacity: 0.5; } }
+html.may-yeu .bb-o.cung-doi::before { animation: none; opacity: 0.5; }
 .bb-o.soi, .bb-o.duoc-goi { z-index: 3; transform: translateY(-16px) scale(1.14); background: var(--doi); box-shadow: 0 0 0 4px var(--tr-nen), 0 0 44px var(--doi); transition-delay: 0s; }
 .bb-o.soi .ten, .bb-o.duoc-goi .ten { color: var(--p-muc); }
 .bb-o .hc { position: absolute; top: -12px; right: -8px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--tr-sao); color: var(--p-muc); font-size: 19px; font-weight: 800; box-shadow: 0 0 0 3px var(--tr-nen); }

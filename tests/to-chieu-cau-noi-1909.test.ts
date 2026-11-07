@@ -228,8 +228,10 @@ describe('tờ chiếu chạy thật — mở RIÊNG (không qua app)', () => {
 describe('tờ chiếu chạy thật — bắt tay với màn giáo viên', () => {
   it('gửi SAN_SANG kèm mã phiên ngay khi mở, tới đúng gốc của cha; nút VẪN ẨN cho tới khi có KET_NOI', () => {
     const t = moTo()
-    expect(t.gui).toHaveLength(1)
-    expect(t.gui[0]).toEqual({ m: { type: TIN_TO_CHIEU.SAN_SANG, maPhien: MA }, o: GOC })
+    // 07/11: tờ còn báo câu đang chiếu cho Bình Phản Ứng (`loai: 'bpu'`) — không thuộc cầu nối, bỏ ra khi đếm tin bắt tay.
+    const cauNoi = t.gui.filter((x) => (x.m as { loai?: string }).loai !== 'bpu')
+    expect(cauNoi).toHaveLength(1)
+    expect(cauNoi[0]).toEqual({ m: { type: TIN_TO_CHIEU.SAN_SANG, maPhien: MA }, o: GOC })
     expect(t.doc.body.classList.contains('mc-noi')).toBe(false)
     expect(t.doc.querySelectorAll('.mc-cham')).toHaveLength(2) // có trong DOM nhưng CSS ẩn (display:none) tới khi kết nối
   })

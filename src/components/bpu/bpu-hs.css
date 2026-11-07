@@ -1,6 +1,7 @@
 /* BÌNH PHẢN ỨNG — màn máy em (bản vẽ docs/ban-ve-binh-phan-ung-0611 h00–h15). Chỉ biến màu sẵn có: --tr-* (trong.css / trong-hs-mau.css), --giay (trắng cố định),
    --p-muc (mực cố định trên nền màu đội). Đội: --doi do nơi dùng gán (--tr-sao / --tr-hs / --tr-tin / --tr-chu-y). Chuyển động chỉ transform/opacity, tắt khi giảm chuyển động. */
 .bpu-hs { position: fixed; inset: 0; z-index: 2147482000; display: flex; flex-direction: column; background: var(--tr-nen); color: var(--tr-chu); overscroll-behavior: contain;
+  font-family: 'DDH Rounded', var(--sans); /* phông màn học tập / chặng của app học sinh (trong-hs.css) — đồng bộ dù em đang ở màn nào */
   padding-top: env(safe-area-inset-top, 0px); padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 .bpu-hs button { touch-action: manipulation; font: inherit; }
 .bpu-hs-tren { display: flex; align-items: center; gap: 10px; padding: 14px 16px 10px; }
