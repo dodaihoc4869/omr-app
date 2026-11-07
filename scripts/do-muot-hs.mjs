@@ -324,7 +324,7 @@ async function trangMoi(ctx, loi) {
   return { p, cdp }
 }
 
-const LO_TRINH = 're=^Học tiếp'
+const LO_TRINH = '.kb-cta' // 07/11: nút chính Hôm nay «Bắt đầu / Học tiếp · Chặng N» (chữ «Học tiếp» khớp nhầm hàng Việc hôm nay ⇒ vào chặng quá giờ)
 const PHUONG_AN = '[role="radio"]'
 const NUT_KIEM = 're=^(Kiểm tra|Nộp câu)'
 const NUT_TIEP = 're=^(Tiếp tục|Câu tiếp theo)$'
@@ -510,7 +510,9 @@ try {
     if (i === 1) await batHoSo(cdp, 'tiep')
     t0 = await bayGio(p)
     await cham(p, NUT_TIEP)
-    const t2 = await (await p.waitForFunction((truoc) => { const s = [...document.querySelectorAll('[role="radio"]')].map((e) => e.textContent).join('|'); return s && s !== truoc ? performance.now() : 0 }, truoc, { polling: 16, timeout: 60000 })).jsonValue()
+    // 07/11: chặng hết câu (dữ liệu giả 6 câu/chặng) ⇒ màn «xong chặng» không còn phương án ⇒ trả -1 và dừng vòng đo (trước: chờ câu thứ 7 tới quá giờ ⇒ cả lượt đo LỖI)
+    const t2 = await (await p.waitForFunction((truoc) => { const s = [...document.querySelectorAll('[role="radio"]')].map((e) => e.textContent).join('|'); if (s && s !== truoc) return performance.now(); return !s && [...document.querySelectorAll('button')].some((b) => /^Học tiếp chặng|^Về Hôm nay/.test(b.textContent.trim())) ? -1 : 0 }, truoc, { polling: 16, timeout: 60000 })).jsonValue()
+    if (t2 < 0) break
     await p.waitForTimeout(800)
     d = await layDo(p)
     if (i === 1) await inHoSo(cdp, 'tiep')
