@@ -66,15 +66,16 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "glucose-dong-vi-ddh-93013b9f1fbb5ada4075ac6f3fa9b7fcaff38098c81814fa2954c5ff88771e3a.svg",
-    "hashSvg": "93013b9f1fbb5ada4075ac6f3fa9b7fcaff38098c81814fa2954c5ff88771e3a",
-    "byteSvg": 24583,
+    "svg": "glucose-dong-vi-ddh-821ed2d06119c99a2bf16a9a5b3214b3010c6138bf4a00d7634740d3f52f6b78.svg",
+    "hashSvg": "821ed2d06119c99a2bf16a9a5b3214b3010c6138bf4a00d7634740d3f52f6b78",
+    "byteSvg": 24589,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "GiữmọiH/OHhướngvòngtheosource;18suptrướcO/không18C;C7HxOygiữx/ybiếnpathLatinởvịtrísubscript,khôngfallbackglyphsubx/y;AđậmWOFF2thật.",
-    "hashSvgDaSoat": "93013b9f1fbb5ada4075ac6f3fa9b7fcaff38098c81814fa2954c5ff88771e3a",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "821ed2d06119c99a2bf16a9a5b3214b3010c6138bf4a00d7634740d3f52f6b78",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "572fa39ce3edfd8abd83dcc5df49b46faf2a2ca6"
   }
 ]

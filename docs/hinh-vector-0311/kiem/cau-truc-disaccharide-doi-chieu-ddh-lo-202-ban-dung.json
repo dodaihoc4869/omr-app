@@ -3,9 +3,9 @@
     "i": 73,
     "hash": "0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df",
     "fileNguon": "anh/0ea2d853eeaf3d420361bc7e85bc98572359ad43a93a9b52f874fd9c4c7ce1df.png",
-    "svg": "disaccharide-doi-chieu-ddh-1a4396c12613b9d44c9661c45f36c8defa52dd10808e0515ae2182d46d1ec86e.svg",
-    "hashSvg": "1a4396c12613b9d44c9661c45f36c8defa52dd10808e0515ae2182d46d1ec86e",
-    "byteSvg": 85390,
+    "svg": "disaccharide-doi-chieu-ddh-3b26d0ca21a3530976eb320a030e29b7b2b33bd1ccf6c1b1ac3995f7f9abe6ff.svg",
+    "hashSvg": "3b26d0ca21a3530976eb320a030e29b7b2b33bd1ccf6c1b1ac3995f7f9abe6ff",
+    "byteSvg": 85282,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "2panels/3sixrings1five/24Cnumbers/allH-OH-CH2OH-HOCH2/2bridgeO/2leaderarrows/2glycosidecaptions/2bottomcaptions/4lowerhorizontalbold/uniformdiagonals/DDHpath.",
-    "hashSvgDaSoat": "1a4396c12613b9d44c9661c45f36c8defa52dd10808e0515ae2182d46d1ec86e",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "3b26d0ca21a3530976eb320a030e29b7b2b33bd1ccf6c1b1ac3995f7f9abe6ff",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "572fa39ce3edfd8abd83dcc5df49b46faf2a2ca6"
   }
 ]

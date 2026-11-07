@@ -3,9 +3,9 @@
     "i": 2,
     "hash": "0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629",
     "fileNguon": "anh/0069e29920cf864e2d9ee63e924d3e01231d347e00c847bb41dc6a352e961629.png",
-    "svg": "fructose-nhan-so-ddh-49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654.svg",
-    "hashSvg": "49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654",
-    "byteSvg": 43782,
+    "svg": "fructose-nhan-so-ddh-85ab3023e418c3750f7195a1af5ae092d53eb28271a1cad7095b4dfe86182816.svg",
+    "hashSvg": "85ab3023e418c3750f7195a1af5ae092d53eb28271a1cad7095b4dfe86182816",
+    "byteSvg": 43603,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "3forms/18nums/allringHexplicit/CH2OHleftC6textCfirstNOTHOCH2/αC2CH2OHupOHdown/βOHupCH2OHdown/HOupC3/HupC4/4taper2bold/2⇌/captions(1)(2)(3)truebold/noalias1046.",
-    "hashSvgDaSoat": "49e58d9c5d4ed86c0f73ac5a2d6541086d73b3d80c2de487fdc461ed163a2654",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "85ab3023e418c3750f7195a1af5ae092d53eb28271a1cad7095b4dfe86182816",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "572fa39ce3edfd8abd83dcc5df49b46faf2a2ca6"
   }
 ]

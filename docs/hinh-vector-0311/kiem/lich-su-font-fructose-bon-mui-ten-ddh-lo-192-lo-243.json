@@ -1,0 +1,55 @@
+{
+  "lyDo": "Lịch sử font đậm cũ;không duyệt hash mới",
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "c91eab09737101f067ba4ca74355bec1872eba33",
+  "metadata": [
+    {
+      "i": 13,
+      "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+      "fileNguon": "anh/01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed.png",
+      "svg": "fructose-bon-mui-ten-ddh-7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241.svg",
+      "hashSvg": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241",
+      "byteSvg": 13279,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C2-B4-D2-I-2",
+          "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+          "refs": [
+            {
+              "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+              "where": "12-C2-B4-D2-I-2.hinh.0.du_lieu",
+              "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B4-D3-I-66",
+          "de": "Trong công thức của fructose ở hình dưới đây: Nhóm-OH hemiketal là nhóm -OH được đánh số",
+          "refs": [
+            {
+              "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+              "where": "DB-12-B4-D3-I-66.hinh.0.du_lieu",
+              "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "5ring/Otop/2CH2OH/all3H/HO-C3up-OH-C4down/C2OHdownCH2OHup/2taper+horizontalbold/4arrowslabelsdam1..4NOTCnumbers/arrow2bondO-C2literal/noCaption/DDHpath.",
+      "hashSvgDaSoat": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 13,
+      "hashSvg": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở native/full vàzoom3x nguồn,tựfreshChromium actualSVG (/workspace/scratch/cau4-192-fresh.png). Giữ5memberring/6C6O/2CH₂OHgắnvàoCfirst/3Hexplicit,C3HOupgắnvàoOright/C4Hup-OHdown/C5CH₂OHup-Hdown/C2CH₂OHup-OHdown. Đúng2taperfront+horizontalbold và4arrows/4nhãn1..4DDHđậm thật(KHÔNGcarbonnums). Arrow2literalshaftcrossesO-ring–C2bond/tipbelowbondnhưsource,khôngdờivàoOH;1nhắmOHanomerdown/3OHlowerleft/4CH₂OHup-right,khôngsửaPAhaytínhđápán. Nocaption/CIP/Hmới. DDHpath tựchứa khôngfallback/text/image,allglyph/bondgaps khôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata.",
+      "hash": "01ece4fc016efadb4afb6af1d3160e9c21da3102418c9b65ae813f01480e20ed",
+      "hashSvgDaSoat": "7befec1b81a0c94db385015fc88d1d99650fbf27f5a315df9a58ca0f483dc241"
+    }
+  ]
+}
