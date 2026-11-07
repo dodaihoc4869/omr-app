@@ -39,6 +39,7 @@ import '../../styles/trong-hs.css'
 import '../../styles/trong-hs-ngang.css' // NGANG + MÁY TÍNH 27/10: chỉ bố cục, nạp SAU trong-hs.css
 import '../../styles/trong-kinh.css' // HỆ KÍNH 02/11: Hôm nay + thanh nổi + tấm Thêm — nạp SAU hai tờ trên (cùng mảnh, không thêm tệp)
 import '../../styles/bong-mol.css' // 07/11 bong bóng Mol theo cảm xúc (thầy chốt docs/ban-ve-bong-bi-0711) — sau trong-kinh.css, cùng mảnh
+import '../../styles/bo-cuc-hn.css' // 07/11 bố cục khổ rộng thầy duyệt (docs/ban-ve-bo-cuc-hn-0711) — sau bong-mol.css, cùng mảnh
 import '../../styles/khong-xuong-hs.css' // thầy 03/11 «màn nào load hiện khung xương … xoá sạch»: khối giữ chỗ lúc tải trong suốt (cùng mảnh, không thêm tệp)
 // THƯỞNG PHẠT (gộp đợt 3, 26/10 — src/components/thuong/CAM-VAO.md): thanh trên ThanhThuong vẽ NGAY từ bản lưu máy (nhỏ, cùng mảnh «Trong»); mọi màn
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.

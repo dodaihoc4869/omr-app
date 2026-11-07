@@ -1,0 +1,24 @@
+/* BỐ CỤC KHỔ RỘNG «chuyên nghiệp, đơn giản, tinh tế» (thầy duyệt 07/11, bản vẽ docs/ban-ve-bo-cuc-hn-0711) — máy tính, Fold mở, điện thoại xoay ngang.
+   Nạp ngay sau trong-kinh.css + bong-mol.css trong TrongHs.tsx (cùng mảnh, không thêm tệp tải). Điện thoại dọc: không đổi.
+   (1) ray điều hướng áp sát mép trái, cao hết màn, mục xếp từ trên; (2) khung nội dung giữa phần còn lại, rộng tối đa 1120 px;
+   (3) Hôm nay: hàng chào + chuông trải 2 cột, thẻ mức + nút chính (cột 1) và Việc hôm nay + Rương (cột 2) cùng mép trên, khoảng đều. */
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] .tr-menu-ray.kb-thanh { top: 0; bottom: 0; left: 0; transform: none; }
+  html[data-trong='hs'] .tr-menu-ray.kb-thanh .kb-thanh-ds { height: 100%; justify-content: flex-start; gap: 6px; box-sizing: border-box;
+    padding: calc(20px + env(safe-area-inset-top)) 8px calc(20px + env(safe-area-inset-bottom)) calc(8px + env(safe-area-inset-left));
+    border-radius: 0 28px 28px 0; box-shadow: inset -1px 0 0 var(--tr-vien), 6px 0 24px -20px var(--tr-phu); }
+  html[data-trong='hs'] .dm-khung { box-sizing: border-box; width: 100%; max-width: 1120px; margin-inline: auto; padding-left: calc(112px + env(safe-area-inset-left)); padding-right: 32px; }
+  html[data-trong='hs'] .dm-khung:has(.kb-cot-phai) { grid-template-columns: minmax(0, 1fr); }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) { grid-template-columns: minmax(0, 1.15fr) minmax(320px, 1fr); column-gap: 24px; row-gap: 20px; align-items: start; max-width: none; margin: 0; padding-top: 20px; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) > .kb-cot-trai { display: contents; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) .kb-dau { grid-column: 1 / -1; grid-row: 1; margin: 0; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) .kb-hero { grid-column: 1; grid-row: 2; margin: 0; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) .da-bai-moc { display: none; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) .kb-cta { grid-column: 1; grid-row: 3; margin: 0; }
+  html[data-trong='hs'] .dm-khung .da-vo:has(> .kb-cot-trai) > .kb-cot-phai { grid-column: 2; grid-row: 2 / span 3; gap: 20px; margin: 0; align-self: start; }
+}
+/* điện thoại xoay ngang (thấp): ray hẹp chỉ biểu tượng, khung sát hơn */
+@media (orientation: landscape) and (max-height: 500px) {
+  html[data-trong='hs'] .dm-khung { padding-left: calc(88px + env(safe-area-inset-left)); padding-right: 20px; }
+  html[data-trong='hs'] .tr-menu-ray.kb-thanh .kb-thanh-ds { padding-top: calc(12px + env(safe-area-inset-top)); padding-bottom: calc(12px + env(safe-area-inset-bottom)); padding-right: 6px; }
+}
