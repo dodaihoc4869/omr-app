@@ -1,0 +1,113 @@
+/* BẢN VẼ «THIẾT KẾ BẰNG 5 SKILL» (07/11) — chỉ để vẽ, đè phang-hs.css. Giữ mọi điều thầy đã chốt (nền xanh than, phẳng Apple, nút Duolingo 50/14/15 in hoa,
+   giãn dòng 1,6, màu --tr-*). Skill dùng để tinh chỉnh phân cấp, khoảng trống, chữ, trạng thái, chuyển động. */
+
+/* [plan-design-review · Pass 1 Kiến trúc thông tin] màn làm câu: bỏ khoảng trống ~64px giữa lệnh và đề (hàng chờ lời giám thị luôn giữ chỗ dù không nói).
+   Bong bóng giám thị vẫn NỔI đè lên nhãn khi xuất hiện (luật 02/11) ⇒ hàng chỉ cần 8px. */
+html[data-trong='hs']:not(#_):not(#_) .duo-gt-loi-o:not(:has(> .gt-loi)) { min-height: 8px !important; padding-bottom: 0 !important; }
+
+/* [frontend-design · tránh «nhãn IN HOA giãn chữ» — dấu hiệu trang máy làm] nhãn trên số lớn: chữ thường câu, đậm vừa, không giãn chữ.
+   (Nút giữ IN HOA — thầy chốt theo Duolingo.) */
+html[data-trong='hs']:not(#_):not(#_) .kb-nhan { text-transform: none !important; letter-spacing: 0 !important; font-size: 15px !important; font-weight: 600 !important; }
+
+/* [apple-design §15 Chữ] chữ to giãn âm, chữ nhỏ giữ 0; phân cấp bằng ĐỘ ĐẬM + cỡ + giãn dòng thành bộ */
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-lenh > h2, .kb-viec h2, .duo-kq-chu h2, .kb-chao, .dm-chao) { letter-spacing: -0.012em !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-lenh > h2 { font-size: 22px !important; font-weight: 750 !important; }
+
+/* [frontend-design · «lỗi là lúc chỉ đường, không phải tâm trạng»] dải SAI: tiêu đề «Chưa đúng» mang màu; đáp án đúng là THÔNG TIN ⇒ chữ thường màu chữ chính,
+   17px đậm vừa (trước: 20px hồng đậm 4 dòng — như la mắng). Dòng thưởng thu nhỏ một bậc. */
+html[data-trong='hs']:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-kq-chu p > b { font-size: 17px !important; font-weight: 650 !important; line-height: 1.5 !important; color: var(--tr-chu) !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-ket .tp-kq { transform: scale(.92); transform-origin: left center; }
+html[data-trong='hs']:not(#_):not(#_) .duo-ket .duo-kq-chu > .duo-ct-dau h2 { font-size: 24px !important; }
+
+/* [emil-design-eng · «Nút phải phản hồi khi nhấn»] co .97 khi nhấn, CHỈ transform (composite — animation-performance), 160ms ease-out mạnh;
+   ô đáp án co .985; hover chỉ trên thiết bị có chuột. Máy yếu + giảm chuyển động: tắt. */
+html[data-trong='hs']:not(#_):not(#_) { --ease-ra: cubic-bezier(0.23, 1, 0.32, 1); }
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut, .kb-dong, .duo .ht2-lam-pa) { transition: transform 160ms var(--ease-ra) !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut):active:not(:disabled) { transform: scale(.97) !important; }
+html[data-trong='hs']:not(#_):not(#_) :is(.kb-dong, .duo .ht2-lam-pa):active:not(:disabled) { transform: scale(.985) !important; }
+@media (prefers-reduced-motion: reduce) { html[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut, .kb-dong, .duo .ht2-lam-pa) { transition: none !important; transform: none !important; } }
+html.may-yeu[data-trong='hs']:not(#_):not(#_) :is(.duo-nut, .kb-cta, .lg-nut-hoi-thay, .duo-hang-nut > button, .tr-dd-nut, .kb-dong, .duo .ht2-lam-pa) { transition: none !important; }
+
+/* [ui-ux-pro-max · checklist: «Focus states visible», «Touch spacing ≥ 8px»] vòng tiêu điểm bàn phím rõ, đồng nhất; khe giữa ô đáp án ≥ 10px */
+html[data-trong='hs']:not(#_):not(#_) :is(button, a, [role='radio'], [role='button']):focus-visible { outline: 2px solid var(--tr-hs-chu) !important; outline-offset: 2px !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-tn { gap: 10px !important; }
+
+/* [plan-design-review · Pass 6 + ui-ux «Progress indicators»] thanh tiến độ: đoạn đã qua đậm hơn, đoạn chưa tới nhạt (đọc «mấy / mấy» ngay) */
+html[data-trong='hs']:not(#_):not(#_) .duo-tren .duo-thanh:has(> .duo-doan) { gap: 4px !important; }
+
+/* [plan-design-review · Pass 7] tấm Lời giải: thử kéo cao 70% ⇒ lời giải ngắn để lại khoảng trống lớn — BỎ; chỉ chỉnh tiêu đề cỡ tiêu đề app */
+html[data-trong='hs']:not(#_):not(#_) .duo-lg-dau > b { font-size: 18px !important; letter-spacing: -0.01em !important; }
+
+/* ═══════════════ VÒNG 2 (07/11 khuya — thầy «có tăng chỉ số lên cao hơn nữa không») ═══════════════ */
+/* P = html[data-trong='hs']:not(#_):not(#_) — đè phang-hs.css + vòng 1 */
+
+/* [Pass 5 · Hệ thiết kế] tấm Thêm cùng ngôn ngữ thẻ với Hôm nay: nền tấm = nền trang, mỗi nhóm một thẻ --tr-mat bo 20, khe 12;
+   4 ô số gộp MỘT thẻ, ngăn bằng vạch mảnh (trước: 4 viên rời khác màu nền) */
+html[data-trong='hs']:not(#_):not(#_) nav.tr-menu .kb-them-tieu { font-size: 18px !important; font-weight: 800 !important; letter-spacing: -0.012em !important; }
+html[data-trong='hs']:not(#_):not(#_) nav.tr-menu .tp-tr { gap: 0 !important; background: transparent !important; border: 2px solid var(--tr-vien) !important; border-radius: 16px !important; overflow: hidden; }
+html[data-trong='hs']:not(#_):not(#_) nav.tr-menu .tp-tr > :is(.tp-tr-o, .tp-tr-muc) { background: transparent !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) nav.tr-menu .tp-tr > .tp-tr-o { box-shadow: inset 2px 0 0 var(--tr-vien) !important; }
+
+/* [Pass 4 · Dấu ấn riêng (frontend-design: «ground in the subject»)] chặng đã xong = huy hiệu LỤC GIÁC (vòng benzen) thay vòng tròn chung chung */
+html[data-trong='hs']:not(#_):not(#_) .kb-dong[data-tt='xong'] .kb-tich { border-radius: 0 !important; clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0 50%); }
+
+/* [Pass 4 · bỏ chuỗi «A · B»] tách thật: nhãn nhỏ + chip (vẽ bằng ve-*.js — cần sửa TSX: TrongHs.tsx dòng chào / nút chính) */
+html[data-trong='hs']:not(#_):not(#_) .ve-chip { display: inline-flex; align-items: center; height: 22px; margin-left: 8px; padding: 0 7px; border-radius: 8px; background: transparent; border: 2px solid var(--tr-vien); color: var(--tr-chu-2); font-size: 13px; font-weight: 700; vertical-align: 1px; }
+html[data-trong='hs']:not(#_):not(#_) .ve-tren { display: block; font-size: 12px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; opacity: .72; margin-bottom: 2px; }
+html[data-trong='hs']:not(#_):not(#_) .kb-cta .ve-chip { background: color-mix(in oklab, currentColor 14%, transparent); border-color: transparent; color: inherit; }
+
+/* [Pass 2 · Trạng thái] ĐANG CHẤM: nút mờ nhẹ + vòng quay nhỏ (CHỈ transform — animation-performance), không đổi cỡ nút */
+html[data-trong='hs']:not(#_):not(#_) .duo-nut:is([data-cho], [data-ve-cham]) { opacity: .78; pointer-events: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; }
+html[data-trong='hs']:not(#_):not(#_) .duo-nut:is([data-cho], [data-ve-cham])::before { content: ''; width: 16px; height: 16px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: ve-quay .7s linear infinite; }
+@keyframes ve-quay { to { transform: rotate(360deg); } }
+/* MẤT MẠNG / LỖI GỬI: dải báo dưới thanh trên, nói điều em cần biết + một việc làm được */
+html[data-trong='hs']:not(#_):not(#_) .ve-bao { position: fixed; z-index: 30; left: 12px; right: 12px; top: calc(60px + env(safe-area-inset-top)); z-index: 2000; display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px 10px 14px; border-radius: 14px; background: var(--tr-mat-2); color: var(--tr-chu); font-size: 14px; line-height: 1.4; box-shadow: 0 8px 24px -12px var(--tr-phu); }
+html[data-trong='hs']:not(#_):not(#_) .ve-bao b { color: var(--tr-chu-y-chu); }
+html[data-trong='hs']:not(#_):not(#_) .ve-bao button { flex: none; min-height: 40px; padding: 0 12px; border: 0; border-radius: 12px; background: var(--tr-mat-3); color: var(--tr-chu); font: inherit; font-weight: 700; }
+html[data-trong='hs']:not(#_):not(#_) .ve-bao span { flex: 1; }
+/* TRỐNG: Hôm nay chưa có việc */
+html[data-trong='hs']:not(#_):not(#_) .ve-trong { display: grid; justify-items: center; gap: 8px; padding: 20px 16px 22px; text-align: center; color: var(--tr-chu-2); font-size: 15px; line-height: 1.5; }
+html[data-trong='hs']:not(#_):not(#_) .ve-trong b { color: var(--tr-chu); font-size: 17px; }
+html[data-trong='hs']:not(#_):not(#_) .ve-trong svg { width: 44px; height: 44px; color: var(--tr-hs-chu); }
+html[data-trong='hs']:not(#_):not(#_) .ve-trong button { margin-top: 6px; min-height: 44px; padding: 0 18px; border: 2px solid var(--tr-vien); border-radius: 16px; background: transparent; color: var(--tr-chu); font: inherit; font-size: 15px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+
+/* [Pass 3 · Cảm xúc] MỘT khoảnh khắc mừng khi ĐÚNG: biểu tượng ✓ nảy 1 lần (0,6 → 1,12 → 1) + một vệt sáng lướt qua dải, tổng ≤ 400ms,
+   chỉ transform / opacity (emil-design-eng: ease-out mạnh, apple-design: lò xo không nảy quá); máy yếu + giảm chuyển động: tắt */
+html[data-trong='hs']:not(#_):not(#_) .duo-ket[data-tt=dung] .duo-ct-dau .duo-tick { animation: ve-nay 380ms cubic-bezier(.34, 1.56, .64, 1) both; animation-delay: var(--ve-t, 0ms); animation-play-state: var(--ve-p, running); transform-origin: 50% 50%; }
+html[data-trong='hs']:not(#_):not(#_) .duo-day.duo-ket[data-tt=dung] { overflow: hidden; }
+html[data-trong='hs']:not(#_):not(#_) .duo-day.duo-ket[data-tt=dung]::after { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in oklab, var(--tr-dung) 34%, transparent) 50%, transparent 70%);
+  transform: translateX(-100%); animation: ve-luot 400ms cubic-bezier(.23, 1, .32, 1) both; animation-delay: var(--ve-t, 0ms); animation-play-state: var(--ve-p, running); }
+@keyframes ve-nay { 0% { transform: scale(.6); opacity: .4; } 60% { transform: scale(1.12); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes ve-luot { 0% { transform: translateX(-100%); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateX(100%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { html[data-trong='hs']:not(#_):not(#_) .duo-ket[data-tt=dung] .duo-ct-dau .duo-tick, html[data-trong='hs']:not(#_):not(#_) .duo-day.duo-ket[data-tt=dung]::after { animation: none; } }
+html.may-yeu[data-trong='hs']:not(#_):not(#_) .duo-ket[data-tt=dung] .duo-ct-dau .duo-tick, html.may-yeu[data-trong='hs']:not(#_):not(#_) .duo-day.duo-ket[data-tt=dung]::after { animation: none; }
+
+/* [Pass 1 · Kiến trúc thông tin — Lời giải] KẾT LUẬN TRƯỚC: thẻ đáp án trung tính, số đáp án to (chữ chính), câu em trả lời nhỏ;
+   hàng mục lục dính dưới tiêu đề (Cốt lõi · Từng bước · Phương trình · Bẫy · Tự kiểm) để nhảy tới; công thức nổi */
+html[data-trong='hs']:not(#_):not(#_) .lgk-kq { background: transparent !important; border: 2px solid var(--tr-vien) !important; border-radius: 16px !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) .ve-dap { display: block !important; font-size: 13px !important; font-weight: 700 !important; letter-spacing: .02em !important; text-transform: uppercase !important; color: var(--tr-chu-3) !important; }
+html[data-trong='hs']:not(#_):not(#_) .ve-dap-so { display: block !important; font-size: 26px !important; font-weight: 800 !important; line-height: 1.15 !important; letter-spacing: -0.02em !important; color: var(--tr-dung-chu) !important; }
+html[data-trong='hs']:not(#_):not(#_) .ve-dap-em { display: block !important; margin-top: 2px !important; font-size: 14px !important; color: var(--tr-chu-2) !important; }
+html[data-trong='hs']:not(#_):not(#_) .ve-dap-em s { color: var(--tr-sai-chu); text-decoration-thickness: 1.5px; }
+html[data-trong='hs']:not(#_):not(#_) .ve-lg-nav { position: sticky; top: 0; z-index: 3; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -20px 10px; padding: 8px 20px; background: var(--tr-nen); box-shadow: 0 1px 0 var(--tr-vien); }
+html[data-trong='hs']:not(#_):not(#_) .ve-lg-nav a { flex: none; display: inline-flex; align-items: center; min-height: 36px; padding: 0 12px; border-radius: 12px; background: transparent; border: 2px solid var(--tr-vien); color: var(--tr-chu-2); font-size: 14px; font-weight: 700; text-decoration: none; }
+html[data-trong='hs']:not(#_):not(#_) .ve-lg-nav a[aria-current] { background: var(--tr-hs-nhat); border-color: var(--tr-hs-nut); color: var(--tr-hs-chu); }
+html[data-trong='hs']:not(#_):not(#_) .lgk-ct-chu { font-size: 17px !important; }
+html[data-trong='hs']:not(#_):not(#_) .duo-lg-dau { padding-right: 12px !important; }
+
+/* [Pass 6 · Trợ năng] chữ to hệ điều hành (130%) / khổ 320: nút chính xuống dòng gọn, chip số không tràn, tiêu đề không cắt */
+html[data-trong='hs']:not(#_):not(#_) .kb-chip-h { flex-wrap: wrap; }
+html[data-trong='hs']:not(#_):not(#_) :is(.kb-cta .kb-giua b, .kb-cta .kb-phu) { overflow-wrap: anywhere; }
+html[data-trong='hs']:not(#_):not(#_) .duo-nut { white-space: normal; text-wrap: balance; }
+/* (chỉ để vẽ khung hình: bộ chụp tắt hoạt ảnh ⇒ dựng tĩnh đúng giá trị keyframe tại 0 / 160 / 400 ms) */
+html[data-trong='hs']:not(#_):not(#_) .ve-luot-tinh { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(100deg, transparent 30%, color-mix(in oklab, var(--tr-dung) 34%, transparent) 50%, transparent 70%); }
+/* [Pass 6] chữ phóng 130%: «12 /40 câu» tự xuống dòng thay vì đè lên ống nghiệm; cột chữ không tràn sang hình */
+html[data-trong='hs']:not(#_):not(#_) .kb-hero-chu { min-width: 0; }
+html[data-trong='hs']:not(#_):not(#_) .kb-so { flex-wrap: wrap; row-gap: 0; }
+html[data-trong='hs']:not(#_):not(#_) .kb-dau-giua h1 { text-wrap: balance; }
+/* giữ giãn dòng chữ đoạn theo phông v5 (1,65) cho dòng đáp án đúng vòng 1 đã thu nhỏ */
+html[data-trong='hs']:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-kq-chu p > b { line-height: 1.65 !important; }
+/* [Pass 5] thẻ trong Lời giải theo CÙNG chuẩn khung app (trong suốt + viền 2px --tr-vien, bo 16) — trước: thẻ tô đặc khác phần còn lại */
+html[data-trong='hs']:not(#_):not(#_) .lgk-the { background: transparent !important; border: 2px solid var(--tr-vien) !important; border-radius: 16px !important; box-shadow: none !important; }
