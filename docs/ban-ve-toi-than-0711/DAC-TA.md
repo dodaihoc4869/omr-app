@@ -15,7 +15,8 @@ Thầy 07/11:
 | Chữ chính | #effafd | 15,9:1 |
 | Chữ phụ | #dae4ea | 13,1:1 |
 | Chữ màu: lam / lục / tím | #52bcec / #5fc61b / #c889f2 | 7,8 / 7,7 / 6,7:1 |
-| Chữ đậm trên mặt tô rực (lục) | — | 2,1:1 (Duolingo giữ màu tươi, chữ to đậm) |
+| Chữ trắng trên dải tiêu đề lục (banner) | — | 2,1:1 |
+| Chữ trên NÚT hành động («Tạo hồ sơ») | chữ SẪM #0f2412 trên lục #94d434 | 9,2:1 |
 | Nút | lục #92d332 · lam #48bff9, gờ sẫm hơn | — |
 
 ## Áp vào app học sinh (tối)
@@ -29,4 +30,5 @@ Thầy 07/11:
 ## Đo trên app thật
 Bộ đo chạy ở scratchpad (tp-kich.cjs + tp-do.py): nền lấy từ ảnh đã ẩn chữ, màu chữ trộn đúng độ mờ.
 - **Kết quả:** chữ thường trên thẻ / trang ≥ 7:1 ở mọi chỗ. Chữ màu đậm từ 6,2:1 trở lên.
-- **Còn lại có chủ ý:** chữ trắng đậm trên mặt tô chàm rực đạt 3,2–4,2:1. Duolingo giữ chữ trắng trên lục tươi ở 2,1:1.
+- **CHƯA đạt chuẩn Duolingo (chờ thầy chọn):** chữ trắng đậm trên nút / bong bóng tô chàm rực đạt 3,2–4,2:1. Nút hành động Duolingo dùng mặt sáng + chữ SẪM (9,2:1). Cách gần Duolingo nhất là mặt chàm sáng hơn + chữ sẫm, đổi hình rõ nên phải vẽ cho thầy chọn trước.
+- **Ảnh tối trong docs/ban-ve-phang-0711 và docs/ban-ve-bo-cuc-rong-0711:** chụp trên bản cũ nền tím, CHƯA phải nền xanh than.

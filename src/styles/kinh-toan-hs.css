@@ -69,7 +69,7 @@ html[data-trong='hs'] .kb-viec-ds { gap: 8px !important; }
 html[data-trong='hs'] .kb-o + .kb-o { box-shadow: none !important; }
 /* ── MŨI NHỌN BONG BÓNG (thầy 07/11 «sửa những cái mũi tên này cho đồng nhất với bong bóng, sửa ở mọi chỗ xuất hiện») ──
    Mũi cũ = ô vuông xoay đặc, viền 2px ⇒ trên thân kính 1px thành HÌNH THOI khác màu đè lên thân. Nay mọi mũi (Mol góc trên · Mol cạnh đường mọi hướng ·
-   Mol trên Lộ trình · đề cạnh giám thị): CÙNG mặt (màu thân + vệt sáng mép trái) + CÙNG khung mảnh với thân; CHỈ vẽ NỬA NGOÀI (cắt chéo, lấn 3px qua khung
+   Mol trên Lộ trình · đề cạnh giám thị): CÙNG mặt (màu thân + vệt sáng mép trái) + CÙNG khung mảnh với thân; CHỈ vẽ NỬA NGOÀI (cắt chéo, lấn 2,2px qua khung
    thân để che mép) ⇒ liền một khối. Bong bóng Mol cạnh đường + trên Lộ trình theo luôn chuẩn kính mảnh như Mol góc trên. */
 html[data-trong='hs'] .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx] { border-width: 1px !important; background: var(--kt-loe), color-mix(in oklab, var(--bb-nen, var(--tr-mat)) 90%, transparent) !important;
   box-shadow: var(--kt-mep), 0 10px 22px -14px color-mix(in oklab, var(--bb-vien, var(--tr-vien)) 70%, transparent) !important; }
@@ -81,7 +81,7 @@ html[data-trong='hs'] .duo-gt-bong::before {
   --kt-duoi: color-mix(in oklab, var(--tr-hs-tren) calc(var(--kt-s) * .55), transparent);
   border-top: 0 !important; border-right: 0 !important; border-left-width: 1px !important; border-bottom-width: 1px !important; border-radius: 0 0 0 3px !important;
   background: linear-gradient(var(--kt-duoi), var(--kt-duoi)), color-mix(in oklab, var(--bb-nen, var(--tr-mat)) 90%, transparent) !important;
-  clip-path: polygon(0 0, 3px 0, 100% calc(100% - 3px), 100% 100%, 0 100%) !important; }
+  clip-path: polygon(0 0, 2.2px 0, 100% calc(100% - 2.2px), 100% 100%, 0 100%) !important; }
 html[data-trong='hs'] .bi-loi-boc:not([data-ben]) .bi-loi-bong:not(.kb-mol-bong)::before, html[data-trong='hs'] .duo-gt-bong::before { border-color: var(--kt-net) !important;
   background: linear-gradient(var(--kt-duoi), var(--kt-duoi)), linear-gradient(color-mix(in oklab, var(--tr-hs) var(--kt-a), transparent), color-mix(in oklab, var(--tr-hs) var(--kt-a), transparent)), color-mix(in oklab, var(--tr-mat) var(--kt-mat), transparent) !important; }
 html[data-trong='hs'] .kb-mol .kb-mol-bong:is([data-cx='cau'], [data-cx='ratCau'])::before { border-left-width: 2px !important; border-bottom-width: 2px !important; }
@@ -99,3 +99,9 @@ html[data-trong='hs'] .kb-mol .kb-mol-bong[data-cx='buon']::before { left: -15px
     radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 16%, transparent), transparent 72%),
     radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 12%, transparent), transparent 72%); } }
 html[data-trong='hs'] .kb-thanh .kb-thanh-muc.kb-thanh-muc[aria-current='page'] { color: var(--tr-hs-chu) !important; }
+/* 07/11 mũi nhọn lời giám thị (.gt-loi) cũng liền thân: thân có vòng mảnh 1px tông đậm ⇒ ::before = cùng hình mũi, to hơn 1px, tông đậm, nằm SAU ::after (màu thân) */
+html[data-trong='hs'] .gt-loi:not([data-cam])::before { display: block !important; top: 100% !important; left: calc(var(--gt-loi-duoi, 40px) - 1px); width: 16px; height: 13px;
+  background: var(--gt-loi-day) !important; clip-path: path('M0 0 H16 L9.7 10.6 Q8 12.8 6.3 10.6 Z'); }
+/* mũi khung đề cạnh giám thị: cắt ĐÚNG mép ngoài vòng mảnh (lấn 2,2px ⇒ không chồng hai lớp kính bên trong thân — chồng lớp là thành vạch) + vệt sáng
+   ngang chỗ mép trái thân */
+html[data-trong='hs'] .duo-gt-bong::before { --kt-duoi: color-mix(in oklab, var(--tr-hs-tren) calc(var(--kt-s) * .8), transparent); }
