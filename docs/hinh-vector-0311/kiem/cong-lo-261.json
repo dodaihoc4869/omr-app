@@ -1,0 +1,19 @@
+{
+  "lo": 261,
+  "chromium": "608/608",
+  "hashXmlSelfcontainedAst": true,
+  "build": true,
+  "speed": "21/21",
+  "precache": "170/2613.23KiB",
+  "serviceWorker": "14/14",
+  "serverTsc": true,
+  "mainFetched": "9ef450efab9ddc369ed708eb1f2b650c4a69712e",
+  "fontVersion": "v5-a-0811",
+  "fontScope": "1215 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;865 nguồn→608SVG;11259648byte/localgzip2073740;563 nguồn chưa đạt. Font-a:24SVG/25nguồn/42câuđủ;chờ584SVG/840nguồn.",
+  "fullVitestThisBatch": true,
+  "fullProof": "full-vitest-lo-261.json",
+  "sizeBaselineRed": true,
+  "colorBaselineRed": true,
+  "glyphFontBlocker": "font-a-o-nguyen-to-lo-261-ban-bi-loai.json + o-nguyen-to-old-positive-lo-261-thu-hoi.json",
+  "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Main9ef450efchưagộp/4WOFF2READMEfont-aKHỚP. Build261/speed21/21/Chromium608/608/hashXMLpathAST/SW14/14/serverTSCđạt. SizeNỀNđỏ297644Bnguyênbytekhôngnângmốc;MàusoMain497viPhạm/84tệpchecker(83srcdiff),lôchỉđổifontfilesREADMEkhớpmain/khôngsửaappCSS-TSX-harness. Full261nhánh16581/main16732đỏ17/6;soTHEOTÊN/newcòntáihiện=8,GIỮfullđỏ+recheck/khôngclaimhếtflaky. Proof full-vitest-lo-261.json. Blockerglyphfont/path807468658phảixửlýtrướcmerge/deploy;khôngallrepođạt."
+}

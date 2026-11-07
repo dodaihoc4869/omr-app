@@ -1,0 +1,56 @@
+{
+  "metadata": [
+    {
+      "i": 594,
+      "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+      "fileNguon": "anh/6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626.png",
+      "svg": "bang-lysine-ddh-585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687.svg",
+      "hashSvg": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687",
+      "byteSvg": 43954,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C3-B9-D1-I-97",
+          "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂·HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc: Thành phần dinh dưỡng trong 1 viên nhộng – Hàm lượng L-Lysine 500 mg (gồm 637 mg L-Lysine Hydrochloride).\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+          "refs": [
+            {
+              "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+              "where": "12-C3-B9-D1-I-97.hinh.0.du_lieu",
+              "hashDataUrl": "e0d212ab463dae23e2de3bd753cd84ff96e6f9dabc5332774f7f96b08a057865"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B9-P1-D1-I-63",
+          "de": "Lysine là một amino acid thiết yếu, quan trọng cho sự phát triển và phục hồi cơ bắp, nên được dùng bổ sung cho người tập thể hình dưới dạng viên nén chứa thành phần chính là lysine hydrochloride (C₆H₁₄N₂O₂·HCl).\nMột công ty dược phẩm sản xuất loại viên nén này, thông tin của mỗi viên thuốc: Thành phần dinh dưỡng trong 1 viên nhộng – Hàm lượng L-Lysine 500 mg (gồm 637 mg L-Lysine Hydrochloride).\nĐể sản xuất 3 triệu viên thuốc trên cần tối thiểu bao nhiêu tấn lysine biết hiệu suất phản ứng tính theo lysine là 95%?",
+          "refs": [
+            {
+              "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+              "where": "DB-12-B9-P1-D1-I-63.hinh.0.du_lieu",
+              "hashDataUrl": "e0d212ab463dae23e2de3bd753cd84ff96e6f9dabc5332774f7f96b08a057865"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "2boldheadings/4regularlabels/outerrect2horizontalrules/allliteralL-Lysine500mg637mgL-LysineHydrochloride/Trong1viênnhộng/noaddedcaption-data-answer/DDHpath.",
+      "hashSvgDaSoat": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 594,
+      "hashSvg": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Đã mở RIÊNG native594 FULL và đọc đủ 2 public stems/refs, tự fresh Chromium exact V5 newSVG rồi mở actual FULL3x. 6 blocks đúng case/hyphen/parentheses: Thành phần dinh dưỡng; Trong 1 viên nhộng; Hàm lượng; L-Lysine; 500 mg; (gồm 637 mg L-Lysine Hydrochloride). Đúng 2 headings bold thật/4regular/outerrect/2rules, không thêm period/caption/đáp án. V5 diacritics/glyph/layout không chạm/cắt/tràn; không alias1352.",
+      "actualSvgReviewed": true,
+      "byteSvg": 43954,
+      "render": "/workspace/scratch/lysine594-v5-258-actual.png",
+      "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
+      "hashSvgDaSoat": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687"
+    }
+  ]
+}

@@ -1,0 +1,359 @@
+{
+  "oldMetadata": [
+    {
+      "i": 807,
+      "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+      "fileNguon": "anh/95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e.png",
+      "canvas": [
+        216,
+        227
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "7",
+        "14,007",
+        "N",
+        "Nitrogen"
+      ],
+      "notes": "Ôgócbo,nềnxámsáng,ô vuônggóctrêntráitốihơnchứa7.14,007trênphải,Ndậmlớngiữa,Nitrogendưới. Giữdấuphẩy;khôngthêmcấuhìnhelectron.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-194",
+          "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-194.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B9-D2-I-7",
+          "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B9-D2-I-7.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911.svg",
+      "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
+      "byteSvg": 7358,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    },
+    {
+      "i": 764,
+      "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+      "fileNguon": "anh/8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6.png",
+      "canvas": [
+        250,
+        244
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "15",
+        "30.974",
+        "P",
+        "Phosphorus",
+        "[Ne]3s²3p³",
+        "Nonmetal"
+      ],
+      "notes": "Ôvuôngboxanhđậm,viềntrắngđôi.Chữtrắng:15trêntrái,30.974trênphải,Pgiữa,tênPhosphorus,[Ne]3s²3p³,Nonmetaldưới. Giữdấuchấmvàcapitalization.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-14",
+          "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-14.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-I-5",
+          "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-I-5.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff.svg",
+      "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+      "byteSvg": 18061,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    },
+    {
+      "i": 468,
+      "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+      "fileNguon": "anh/55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9.png",
+      "canvas": [
+        250,
+        252
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "11",
+        "22.990",
+        "Na",
+        "Sodium",
+        "[Ne]3s¹",
+        "Alkali metal"
+      ],
+      "notes": "Boxanhđậm,viềntrắngđôi.Chữtrắng:11trêntrái,22.990trênphải,Nagiữa,tênSodium,[Ne]3s¹,Alkalimetaldưới. Giữdấuchấmvàsuperscript1.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-45",
+          "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-45.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-I-42",
+          "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-I-42.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df.svg",
+      "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
+      "byteSvg": 16112,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    },
+    {
+      "i": 658,
+      "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+      "fileNguon": "anh/7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016.png",
+      "canvas": [
+        205,
+        233
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "79",
+        "196,97",
+        "Au",
+        "Gold"
+      ],
+      "notes": "Khungxámvuôngnềntrắng;ôxámnhạtfillsgóctrêntráichứa79đậm.196,97trênphải,Aumàuxámgiữa,Goldxámdưới. Giữdấuphẩy.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-II-62",
+          "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-II-62.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-II-3",
+          "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-II-3.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3.svg",
+      "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
+      "byteSvg": 6758,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    }
+  ],
+  "verdicts": [
+    {
+      "i": 807,
+      "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền nhỏ trong nét N lớn. Có sẵn ở oldSVG, nhỏ hơn font-a nhưng không biến mất. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
+      "actualSvgReviewed": true,
+      "byteSvg": 7358,
+      "render": "/workspace/scratch/oldglyph261-807-actual.png",
+      "detail": "/workspace/scratch/oldglyph261-807-macro.png"
+    },
+    {
+      "i": 764,
+      "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt / GIỮ oldpositive: Đã tự fresh actual OLD hash và mở FULL; không thấy lỗi glyph riêng rõ ở764, dữ liệu/case/configsup30.974/15/P/Phosphorus/Nonmetal/màu-frame đúng. Không suy fail764 từ glyph của3nguồn khác. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
+      "actualSvgReviewed": true,
+      "byteSvg": 18061,
+      "render": "/workspace/scratch/oldglyph261-764-actual.png"
+    },
+    {
+      "i": 468,
+      "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền trong N và một lỗ kim nhỏ ở chân a. Olda không có vết khuyết lớn như newfont-a nhưng vẫn có lỗ riêng thực thấy. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
+      "actualSvgReviewed": true,
+      "byteSvg": 16112,
+      "render": "/workspace/scratch/oldglyph261-468-actual.png",
+      "detail": "/workspace/scratch/oldglyph261-468-macro.png"
+    },
+    {
+      "i": 658,
+      "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền nhỏ ở đỉnh A lớn. Có sẵn ở oldSVG. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
+      "actualSvgReviewed": true,
+      "byteSvg": 6758,
+      "render": "/workspace/scratch/oldglyph261-658-actual.png",
+      "detail": "/workspace/scratch/oldglyph261-658-macro.png"
+    }
+  ],
+  "reason": "FreshactualoldSVGđãxácnhậnlỗkimN-A-a;thu hồipositive3nguồn807/468/658,764giữoldpositiveđãsoátriêng.",
+  "affectedQuestions": [
+    {
+      "qid": "DB-10-B5-D1-I-45",
+      "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+      "refs": [
+        {
+          "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+          "where": "DB-10-B5-D1-I-45.hinh.0.du_lieu",
+          "hashDataUrl": "abeeae5f5161f883a16570507340ccdc8a05614bb3fe14f669df92a7fa22103d"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B5-D1-II-62",
+      "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+      "refs": [
+        {
+          "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+          "where": "DB-10-B5-D1-II-62.hinh.0.du_lieu",
+          "hashDataUrl": "daec63d377bfbce82343bd759db6ff10ab3eff786b36eae8703399282fdafd0e"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B5-D1-I-194",
+      "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+      "refs": [
+        {
+          "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+          "where": "DB-10-B5-D1-I-194.hinh.0.du_lieu",
+          "hashDataUrl": "46c8135d5c55315e42ec3c261c261567c31e708a02e955b3e26750f198288e4f"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C2-B5-I-42",
+      "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+      "refs": [
+        {
+          "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+          "where": "DH-10-C2-B5-I-42.hinh.0.du_lieu",
+          "hashDataUrl": "abeeae5f5161f883a16570507340ccdc8a05614bb3fe14f669df92a7fa22103d"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C2-B5-II-3",
+      "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+      "refs": [
+        {
+          "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+          "where": "DH-10-C2-B5-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "daec63d377bfbce82343bd759db6ff10ab3eff786b36eae8703399282fdafd0e"
+        }
+      ]
+    },
+    {
+      "qid": "DH-10-C2-B9-D2-I-7",
+      "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+      "refs": [
+        {
+          "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+          "where": "DH-10-C2-B9-D2-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "46c8135d5c55315e42ec3c261c261567c31e708a02e955b3e26750f198288e4f"
+        }
+      ]
+    }
+  ],
+  "affectedFullQuestions": 6,
+  "evidenceImages": [
+    {
+      "file": "glyph-807-old-lo-261.jpg",
+      "sha256": "f3097e3cca02adeedc68b05acd3464c46a7ae39482cc49297bbfb0c914821be1",
+      "bytes": 47453
+    },
+    {
+      "file": "glyph-468-font-a-lo-261.jpg",
+      "sha256": "9b05a25ef4953b0cf106c12371e932384350790e3e7b76f9817165133aad4436",
+      "bytes": 87680
+    },
+    {
+      "file": "glyph-658-old-lo-261.jpg",
+      "sha256": "b2eadf72562d91b16a18805229f4343d819e7caf960b48127516e33a6f026ba2",
+      "bytes": 58074
+    },
+    {
+      "file": "glyph-658-font-a-lo-261.jpg",
+      "sha256": "6f6a62333faf58ece7bb241385e9b41c10577ced310209a7c5e7832a241b7621",
+      "bytes": 58054
+    },
+    {
+      "file": "glyph-468-old-lo-261.jpg",
+      "sha256": "1fa4d98cf0937c3192549ff41a2e78edd708de82c875cafba70e92745e7cccb9",
+      "bytes": 84320
+    },
+    {
+      "file": "glyph-807-font-a-lo-261.jpg",
+      "sha256": "57b7149f10ac6340123190626d1468f29f7368dacb0e93e66bec2680fdb78373",
+      "bytes": 48012
+    }
+  ]
+}

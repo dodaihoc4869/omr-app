@@ -1,0 +1,56 @@
+{
+  "metadata": [
+    {
+      "i": 657,
+      "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+      "fileNguon": "anh/7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785.png",
+      "svg": "dien-di-ba-vet-ddh-5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e.svg",
+      "hashSvg": "5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e",
+      "byteSvg": 10850,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C3-B9-D3-I-19",
+          "de": "Khi đặt dung dịch ở pH = 6 gồm glycine, lysine và glutamic acid (được kí hiệu ngẫu nhiên là X, Y, Z) trong điện trường thì xảy ra hiện tượng điện di như sau: Nhận định nào sau đây là đúng?",
+          "refs": [
+            {
+              "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+              "where": "12-C3-B9-D3-I-19.hinh.0.du_lieu",
+              "hashDataUrl": "b1e4c11b25be5489312d112ae0e3cfc8365cc6051f8837d77d3fb20b1e43f2c7"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B9-P1-D2-I-45",
+          "de": "Khi đặt dung dịch ở pH = 6 gồm glycine, lysine và glutamic acid (được kí hiệu ngẫu nhiên là X, Y, Z) trong điện trường thì xảy ra hiện tượng điện di như sau: Nhận định nào sau đây là đúng?",
+          "refs": [
+            {
+              "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+              "where": "DB-12-B9-P1-D2-I-45.hinh.0.du_lieu",
+              "hashDataUrl": "b1e4c11b25be5489312d112ae0e3cfc8365cc6051f8837d77d3fb20b1e43f2c7"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3solidblackcirclesXYZwhitebold/outerrect/2terminalcirclesPLUSLEFTMINUSRIGHT/2shortwires/Cực dương-Cực âm/noextra dash-startline-arrow-pH-answer/DDHpath.",
+      "hashSvgDaSoat": "5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 657,
+      "hashSvg": "5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Mở lại native FULL và đủ public refs, tự fresh Chromium exact V5 hash SAU sửa và mở actual FULL3x. Nhãn Cực dương đã tách khỏi terminal bằng khoảng hở rõ; mọi 3 XYZ trắng trên vòng đặc/khung/2 terminals +trái −phải/2dây/Cực âm nguyên văn giữ đúng. Không thêm pH/arrow/startline/đáp án, không chạm/cắt/tràn. Negative candidate7cd86 giữ riêng.",
+      "actualSvgReviewed": true,
+      "byteSvg": 10850,
+      "render": "/workspace/scratch/657-v5-254-moi-actual.png",
+      "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+      "hashSvgDaSoat": "5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e"
+    }
+  ]
+}

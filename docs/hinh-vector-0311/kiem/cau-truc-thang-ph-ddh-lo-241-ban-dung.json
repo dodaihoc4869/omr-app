@@ -7,7 +7,7 @@
     "hashSvg": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a",
     "byteSvg": 23509,
     "font": "DDH Rounded",
-    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -35,6 +35,6 @@
     ],
     "ghiChuDung": "14cells14numbers1..14/28tickstems/ONLY10sup-1,-7,-14/[Hsup+](mol/L)/pH/allDDHpath/noextraaxis-ticks-values/shading-printtexture-notdata.",
     "hashSvgDaSoat": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a",
-    "nguoiSoat": "soat_nguon_2"
+    "nguoiSoat": "soat_nguon_3"
   }
 ]

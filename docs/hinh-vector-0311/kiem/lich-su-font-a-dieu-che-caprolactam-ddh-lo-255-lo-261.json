@@ -1,0 +1,44 @@
+{
+  "metadata": [
+    {
+      "i": 717,
+      "hash": "ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e",
+      "fileNguon": "anh/ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e.png",
+      "svg": "dieu-che-caprolactam-ddh-4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047.svg",
+      "hashSvg": "4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047",
+      "byteSvg": 27228,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-KT-C4-D2-III-6",
+          "de": "Caprolactam được tổng hợp từ cuối thế kỉ XIX. Hiện nay, nhu cầu sản xuất caprolactam trên thế giới khoảng 10 triệu tấn mỗi năm, 90% trong đó dùng để tổng hợp tơ capron. Trong công nghiệp, caprolactam được điều chế theo sơ đồ trong hình dưới đây.\nĐể sản xuất 10 triệu tấn caprolactam, cần sử dụng bao nhiêu triệu tấn cyclohexanone (giả sử hiệu suất trung bình của cả quá trình trên là 60%)? (Kết quả làm tròn đến hàng phần mười.)",
+          "refs": [
+            {
+              "hash": "ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e",
+              "where": "12-KT-C4-D2-III-6.hinh.0.du_lieu",
+              "hashDataUrl": "2e371926e9d91d26639da1eab7062b4fcaf765ed1dc7a6c739981726e2c2b172"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3molecules/18C3O2N/2COdouble1CNdouble/2sixrings1sevenringNH/oximeOHupright/2RIGHTarrowheads/NH2OH-H2SO4literal/3lowercasecaptions/noanswer-temp-extraH2O.",
+      "hashSvgDaSoat": "4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 717,
+      "hashSvg": "4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Đã mở native FULL/3x và đọc toàn bộ public questions.de/refs; tự fresh Chromium exact SVG rồi mở actual FULL3x và zoom gap NH₂OH/arrowhead. Đúng 3 vòng6–6–7/18C3O2N, 2COdouble/1CNdouble, N–OH lên phải/N–H phải, 2 RIGHT heads/conditions NH₂OH và H₂SO₄, 3 captions lowercase nguyên văn cyclohexanone/cyclohexanoxime/caprolactam. DDH V5, glyph và nét có gap, không cắt/tràn/thêm nhiệt độ/H₂O/đáp án.",
+      "actualSvgReviewed": true,
+      "byteSvg": 27228,
+      "render": "/workspace/scratch/caprolactam717-255-actual.png",
+      "hash": "ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e",
+      "hashSvgDaSoat": "4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047"
+    }
+  ]
+}

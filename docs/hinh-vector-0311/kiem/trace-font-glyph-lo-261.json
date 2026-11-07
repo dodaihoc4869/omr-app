@@ -1,0 +1,73 @@
+{
+  "scope": "Read-only repo; chỉ ghi scratch. Không sửa font/converter/không duyệt SVG mới.",
+  "main": "9ef450efab9ddc369ed708eb1f2b650c4a69712e",
+  "fontCommit": "e316e6b5",
+  "head": "4c086d4b1b9acf4573327734f3b587fdc72b720e",
+  "evidence": "docs/hinh-vector-0311/kiem/doi-chieu-font-dom-svg-lo-261.json: DOM exact WOFF2 và SVG cùng lỗN/A/khuyếta; loại trừ giả thuyết chỉconverter làm lỗi, chưa định vị chính xác bước gây lỗi.",
+  "actualFont": {
+    "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+    "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+    "glyphStats": {
+      "N": {
+        "glyph": "N",
+        "contours": 1,
+        "bbox": [
+          71,
+          -26,
+          642,
+          756
+        ]
+      },
+      "A": {
+        "glyph": "A",
+        "contours": 2,
+        "bbox": [
+          10,
+          -26,
+          652,
+          756
+        ]
+      },
+      "a": {
+        "glyph": "a",
+        "contours": 2,
+        "bbox": [
+          39,
+          -36,
+          609,
+          592
+        ]
+      }
+    }
+  },
+  "hotspots": [
+    {
+      "source": "origin/main:scripts/tao-phong-ddh-rounded.py:189-215",
+      "function": "lam_dam",
+      "finding": "Dời từng điểm raw glyf theo pháp tuyến/miter rồi round; áp cả on-curve và off-curve controls như polygon, không curve-aware offset/boolean simplify/overlap cleanup sau offset. Góc lõm/nối nét có thể tự giao hoặc tạo khe nhỏ; đây giả thuyết có cơ sở code, chưa chứng minh nhân quả N/A. NET_DAM mặc định26, gọi sau them_duoi_a."
+    },
+    {
+      "source": "origin/main:scripts/tao-phong-ddh-rounded.py:300-331",
+      "function": "dung_lai_a",
+      "finding": "simplify/fixwinding; difference rectangle cắt thân cũ; union vòng+đuôi; Cu2Qu tolerance1 reverse_direction=True; tiếp đó lam_dam và bien_doi round. Có nhiều điểm cần khoanh vùng khuyết chân a, không kết luận boolean/Cu2Qu là nguyên nhân trước khi ablation."
+    },
+    {
+      "source": "origin/main:scripts/tao-phong-ddh-rounded.py:217-241",
+      "function": "bien_doi",
+      "finding": "Co ngang/chỉnh chiều cao piecewise tại XH520 và round mọi controlpoint; có thể ảnh hưởng vùng cực nhỏ. Cần so trước/sau, chưa quy lỗi."
+    },
+    {
+      "source": "origin/main:scripts/tao-phong-ddh-rounded.py:400-407",
+      "function": "_hop_nhanh",
+      "finding": "Comment hiện có cảnh báo removeOverlaps toàn chữ làm hỏng lỗ A; không xem comment là bằng chứng tự nó chứng minh lỗi hiện tại."
+    }
+  ],
+  "converter": "HEAD:scripts/phong-vector-0311.py:9-15 WOFF2→TTF/merge;22-35 HarfBuzz+SVGPathPen xuất outline trực tiếp khôngsimplify/threshold. HEAD..origin/main tệp converter không có trên main nên diff hiện deletedfile, không phải bằng chứng main đã sửa converter.",
+  "howToProve": [
+    "Tái tạo font nguồn đúng TTF/env/hash; lưu scratch snapshots trước/sau them_duoi_a/lam_dam/bien_doi/subset; không đổi repo.",
+    "Native Chromium @font-face unique family/checkloaded/exacthash ở cả de/dam và nhiều cỡ thật+macro, so ảnh glyphN/A/a/Na; đối counter hợp lệ với lỗ nhỏ, không chỉ metadata font-family.",
+    "Với snapshot đầu tiên lỗi, kiểm curve-aware selfintersection/winding hoặc raster connected components của miền trắng kín. N hiện1contour,A2contours,a2contours: chưa có extra tiny contours độc lập; không thể suy không lỗ từ contourcount.",
+    "So sourceTTF/WOFF2/mergedTTF/SVG cùng exactglyph vàfillrule; ablation net=0 trongscratch để kiểmlam_dam, không sửa phát hành hay tựcleancontour trước tìmnguyênnhân."
+  ],
+  "conclusion": "Ưu tiên kiểm lam_dam (dời controlpoints raw+miter+round) vì ảnh hưởng đồng thời N/A/a và không cleanup sau offset; a còn đường boolean rebuild riêng. Đây vị trí nghi vấn, chưa kết luận nguyên nhân khi chưa có snapshot ablation và proof render từng bước."
+}

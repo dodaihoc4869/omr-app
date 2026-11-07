@@ -1,0 +1,29 @@
+[
+  {
+    "i": 743,
+    "hash": "1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9",
+    "fileNguon": "anh/1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9.png",
+    "svg": "pvac-pva-ddh-3a96a11d28f2c40c54675aea6ca7f71a06e99e17edfdc557f8fa57e05ce7f24f.svg",
+    "hashSvg": "3a96a11d28f2c40c54675aea6ca7f71a06e99e17edfdc557f8fa57e05ce7f24f",
+    "byteSvg": 20367,
+    "font": "DDH Rounded",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D5-II-4",
+        "de": "Poly(vinyl alcohol) (viết tắt là PVA) được dùng làm chất kết dính, sợi vinylon, vật liệu ứng dụng trong y tế,... Poly(vinyl acetate) (viết tắt là PVAc) được sử dụng phổ biến làm keo dán gỗ, keo dán giấy,... PVAc và PVA được tổng hợp theo sơ đồ sau đây:",
+        "refs": [
+          {
+            "hash": "1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9",
+            "where": "12-KT-C4-D5-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "9411e4287e0313912506d5110e9ddd42fd6c701942356d258d42e25f76a5975e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "HC≡CH→X→PVAc→PVA/3RIGHTheads/3numberlabels/conditions+CH3COOH;xt,t°,p;+NaOH,t°/casePVAc/noaddedformulaX-answer.",
+    "hashSvgDaSoat": "3a96a11d28f2c40c54675aea6ca7f71a06e99e17edfdc557f8fa57e05ce7f24f",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

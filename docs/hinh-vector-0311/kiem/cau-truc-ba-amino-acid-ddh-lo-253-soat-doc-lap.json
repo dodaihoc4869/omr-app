@@ -1,13 +1,17 @@
 [
   {
     "i": 711,
-    "hashSvg": "d19195ac4bd031c672caf4b83be985ee4c50f8e1abee0579c6f56755d70c211a",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Soát MỚI font V5, đã tự fresh Chromium exact hash mới và mở actual FULL3x; mở lại native FULL từng nguồn, public refs đã đọc đầy đủ. 13C/8O/6N, 4COdouble/1CNdouble, Arg N cầu có H riêng/NH/H₂N/NH₂, Glu HO/OH và Gly COchéo/OH, 4 nums/3 captions đúng. Chữ regular/bold V5 không chạm/cắt/tràn, không thêm đáp án. Không tái dùng positive font cũ.",
-    "actualSvgReviewed": true,
-    "byteSvg": 36993,
-    "render": "/workspace/scratch/fontv5-253-711-actual.png",
+    "hashSvg": "f5b0c83c638c971aefc7ebe8428e3ce21fedd21253baa7188a1908d699da9cf7",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Soát mới bộ font chữ a, đã mở riêng native FULL và đọc đủ public questions.de/refs; tự fresh Chromium từ chính bytes SVG SHA256 đã kiểm, mở actual FULL. Arg–Glu–Gly đúngthứtự;13C/8O/6N,4C=O và1C=NH;Arg nhánh3CH2 giữaNH vàCα,Glu2CH2;H2N/NH/H/NH2/OH/HO nguyên nguồn;4nhãn(1)/(2) neo đúng nhóm,3caption Arginine (Arg)/Glutamic acid (Glu)/Glycine (Gly) đúngcase. Carbonyl/bondstubs/H/O/N và khoảng chữ không chạm/cắt;không thêmcharge/stereo. SVG path-only, không text/image fallback.",
+    "render": "/workspace/scratch/fonta261-711-f5b0c83c638c971aefc7ebe8428e3ce21fedd21253baa7188a1908d699da9cf7.png",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhongDam": null,
+    "publicQids": [
+      "12-KT-C123-D2-II-3",
+      "DB-12-B9-P2-D2-II-76"
+    ],
     "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
-    "hashSvgDaSoat": "d19195ac4bd031c672caf4b83be985ee4c50f8e1abee0579c6f56755d70c211a"
+    "hashSvgDaSoat": "f5b0c83c638c971aefc7ebe8428e3ce21fedd21253baa7188a1908d699da9cf7"
   }
 ]

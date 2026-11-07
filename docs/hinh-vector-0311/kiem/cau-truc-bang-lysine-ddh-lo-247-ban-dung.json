@@ -3,12 +3,12 @@
     "i": 594,
     "hash": "6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626",
     "fileNguon": "anh/6e485397148c3ef35dd2cd8bbb29dc876eb452343f9138922daef1ac76a9e626.png",
-    "svg": "bang-lysine-ddh-585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687.svg",
-    "hashSvg": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687",
-    "byteSvg": 43954,
+    "svg": "bang-lysine-ddh-a2d0b34d5da94fc02e6ecd79b3881459bfd0240af2bb2c4513da23c0e00db97b.svg",
+    "hashSvg": "a2d0b34d5da94fc02e6ecd79b3881459bfd0240af2bb2c4513da23c0e00db97b",
+    "byteSvg": 44632,
     "font": "DDH Rounded",
-    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
-    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -35,7 +35,7 @@
       }
     ],
     "ghiChuDung": "2boldheadings/4regularlabels/outerrect2horizontalrules/allliteralL-Lysine500mg637mgL-LysineHydrochloride/Trong1viênnhộng/noaddedcaption-data-answer/DDHpath.",
-    "hashSvgDaSoat": "585094142f0a1f31d8bb8a8e2133251b65bc5742243286ce420baeaffaeea687",
+    "hashSvgDaSoat": "a2d0b34d5da94fc02e6ecd79b3881459bfd0240af2bb2c4513da23c0e00db97b",
     "nguoiSoat": "soat_nguon_2"
   }
 ]

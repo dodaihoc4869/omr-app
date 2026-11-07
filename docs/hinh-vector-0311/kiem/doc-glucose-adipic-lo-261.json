@@ -1,0 +1,29 @@
+{
+  "hashNguon": "95710609f02476234ea139f061362ce564de1aedba50b0f54c088a079c0d497d",
+  "questions": [
+    {
+      "qid": "12-KT-C4-D5-III-6",
+      "de": "Ngày nay, các nhà khoa học nghiên cứu thành công tổng hợp adipic acid từ glucose theo sơ đồ ở hình dưới.\nTrong công nghiệp, adipic acid được dùng để sản xuất poly(hexamethylene adipamide) bằng phản ứng trùng ngưng giữa hexamethylenediamine và adipic acid với hiệu suất đạt 90% (hiệu suất tính theo adipic acid). Poly(hexamethylene adipamide) tạo ra được dùng để sản xuất chỉ nha khoa dùng trong y học.\nKhối lượng glucose dùng để sản xuất 309 kg chỉ nha khoa (chứa 90% poly(hexamethylene adipamide)) là m kg.\nGiá trị m bằng bao nhiêu? (Kết quả làm tròn đến hàng đơn vị).",
+      "refs": [
+        {
+          "hash": "95710609f02476234ea139f061362ce564de1aedba50b0f54c088a079c0d497d",
+          "where": "12-KT-C4-D5-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "b28cd0e34d9f832b9872399e5db81dae0aca6eaee4827fa588593123ea7b16ca"
+        }
+      ]
+    }
+  ],
+  "canvas": [
+    1154,
+    135
+  ],
+  "literal": "Glucose→HOOC–CH=CH–CH=CH–COOH→Adipic acid",
+  "conditions": [
+    "enzyme",
+    "H=80%",
+    "+H₂",
+    "H=75%"
+  ],
+  "rightArrowheads": 2,
+  "proof": "cau-truc-glucose-adipic-ddh-lo-261-soat-doc-lap.json"
+}

@@ -3,11 +3,11 @@
     "i": 556,
     "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
     "fileNguon": "anh/6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971.png",
-    "svg": "xa-phong-hoa-ddh-6eb3298868dda577502c201faaddd3fcb24638a647a9ebaf95d2a58d6260f6ae.svg",
-    "hashSvg": "6eb3298868dda577502c201faaddd3fcb24638a647a9ebaf95d2a58d6260f6ae",
-    "byteSvg": 32238,
+    "svg": "xa-phong-hoa-ddh-597bcdbc85406faee156f637c2cafec87b4fb08b89fe4bdc9bf8a81bec17fba7.svg",
+    "hashSvg": "597bcdbc85406faee156f637c2cafec87b4fb08b89fe4bdc9bf8a81bec17fba7",
+    "byteSvg": 32906,
     "font": "DDH Rounded",
-    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,7 @@
       }
     ],
     "ghiChuDung": "Ba C15H31COOCH2/CH/CH2;hai verticalbonds+glycerolCH2OH-CHOH-CH2OH;3NaOH/3C15H31COONa/1RIGHThead/t°literal/noextra phases-caption-answer/DDHpath.",
-    "hashSvgDaSoat": "6eb3298868dda577502c201faaddd3fcb24638a647a9ebaf95d2a58d6260f6ae",
+    "hashSvgDaSoat": "597bcdbc85406faee156f637c2cafec87b4fb08b89fe4bdc9bf8a81bec17fba7",
     "nguoiSoat": "soat_nguon_2"
   }
 ]

@@ -1,0 +1,44 @@
+{
+  "main": "9ef450efab9ddc369ed708eb1f2b650c4a69712e",
+  "fontCommit": "e316e6b5",
+  "changes": [
+    {
+      "file": "src/styles/phong-ddh/README.md",
+      "oldHash": "938cfc0e952b7cb07461d0b4382b0ae97ff1a571f4f77311be7fd2aa35363a70",
+      "newHash": "ec4955e577cfa8352a3fe7b67288141354896f3949e50f14f5bcd4726945f4ce",
+      "oldBytes": 3664,
+      "newBytes": 4025
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "oldHash": "70eff5433cfa0f05c8d728551bfd06e1b511c827031cbeaf7cbbdc9a29091edf",
+      "newHash": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+      "oldBytes": 11464,
+      "newBytes": 11560
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2",
+      "oldHash": "0c45ddf49bd11ed2866b0aa444eca681365898f0d6ca85cf2ce4195f948383f2",
+      "newHash": "080aca217c83352f2743274f154b983e9a0c7e155152a9239ebaa8b69f03790a",
+      "oldBytes": 5680,
+      "newBytes": 5704
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "oldHash": "04aae18cd9629cf401499163be881ad737992e7224ad7eb3ceac3f23a72cbab1",
+      "newHash": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+      "oldBytes": 11456,
+      "newBytes": 11476
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2",
+      "oldHash": "752b2828513847248a2be6eb5f0cdda782a0ba63f6136716264f10e6bdea5a1f",
+      "newHash": "26b34c70e2830e992830e8dd54bf957e3f1aa331880edbcea9721b4548f90f29",
+      "oldBytes": 5572,
+      "newBytes": 5656
+    }
+  ],
+  "note": "Chữ a dựng lại; chỉ nhập file riêng,khôngcheckout/gộp;oldproofchỉhistory,newhashcầnsoátmới.",
+  "normalHash": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+  "boldHash": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93"
+}

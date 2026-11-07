@@ -1,0 +1,56 @@
+{
+  "metadata": [
+    {
+      "i": 540,
+      "hash": "65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57",
+      "fileNguon": "anh/65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57.png",
+      "svg": "bohr-ba-lop-ddh-d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507.svg",
+      "hashSvg": "d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507",
+      "byteSvg": 3028,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "DB-10-B1-D1-I-192",
+          "de": "Cho cấu trúc nguyên tử aluminium theo mô hình Rutherford – Bohr như sau: Lớp ngoài cùng của nguyên tử aluminium có bao nhiêu electron?",
+          "refs": [
+            {
+              "hash": "65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57",
+              "where": "DB-10-B1-D1-I-192.hinh.0.du_lieu",
+              "hashDataUrl": "df42d77f1ab81924fcfda088381c77786a8399abc16e91c68eceb9593a3a4e8a"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C1-B3-I-35",
+          "de": "Cho cấu trúc nguyên tử aluminium theo mô hình Rutherford – Bohr như sau: Lớp ngoài cùng của nguyên tử aluminium có bao nhiêu electron?",
+          "refs": [
+            {
+              "hash": "65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57",
+              "where": "DH-10-C1-B3-I-35.hinh.0.du_lieu",
+              "hashDataUrl": "df42d77f1ab81924fcfda088381c77786a8399abc16e91c68eceb9593a3a4e8a"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3continuousorbits/13solid-orange-dots/directcount2+8+3/outerTOP-LEFT-BOTTOM-NOrightdot/bluecore+13actualDDHdam/noaddedcharge-shellnumbers-elementname-arrows-caption/0externalfont.",
+      "hashSvgDaSoat": "d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 540,
+      "hashSvg": "d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Đã mở riêng native FULL, đọc cả 2 public stems/refs, tự fresh Chromium exact SVG V5 rồi mở actual FULL3x. Đếm trực tiếp 13 chấm 2 trong/8 giữa/3 ngoài; từng vị trí đúng, ngoài TOP/LEFT/BOTTOM, không thêm RIGHTdot. 3 quỹ đạo liên tục bị chấm che đúng nguồn, core xanh +13 DDH V5 đậm đủ gap, không thêm layernums/tên/caption/charge khác. Không cắt/tràn.",
+      "actualSvgReviewed": true,
+      "byteSvg": 3028,
+      "render": "/workspace/scratch/bohr540-v5-255-actual.png",
+      "hash": "65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57",
+      "hashSvgDaSoat": "d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507"
+    }
+  ]
+}

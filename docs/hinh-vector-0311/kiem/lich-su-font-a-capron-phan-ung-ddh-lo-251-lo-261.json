@@ -1,0 +1,55 @@
+{
+  "metadata": [
+    {
+      "i": 685,
+      "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+      "fileNguon": "anh/7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f.png",
+      "svg": "capron-phan-ung-ddh-bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2.svg",
+      "hashSvg": "bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2",
+      "byteSvg": 13771,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-BD7-18-II-2",
+          "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học (1) như hình:",
+          "refs": [
+            {
+              "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+              "where": "12-BD7-18-II-2.hinh.0.du_lieu",
+              "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a"
+            }
+          ]
+        },
+        {
+          "qid": "12-C4-B13-II-2",
+          "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học (1) như hình:",
+          "refs": [
+            {
+              "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+              "where": "12-C4-B13-II-2.hinh.0.du_lieu",
+              "hashDataUrl": "c3f2fdec78747fe4c3ced1dae0849795e2133cce3f4648a2fabff6c44c340d8a"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "7memberlactamring-NH-COdouble/coefficientn/1RIGHThead/xúc tác,t°/polymerliteralHN–[CH2]5–CO/2roundparentheses+nsub/(1)right/noextraH2O-conditions-answer/DDHpath.",
+      "hashSvgDaSoat": "bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 685,
+      "hashSvg": "bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Soát lại V5, mở riêng native FULL/zoom và đọc đủ 2 public stems/refs, tự fresh Chromium exact SVG rồi mở actual FULL3x. Vòng7member NH/lactamCOdouble/hệ số n đúng; 1 RIGHT head và xúc tác,t°; repeat literal HN–[CH₂]₅–CO với squarebrackets chỉ CH₂/5sub, 2 roundparentheses+nsub và (1) farRIGHT. Không thêm H₂O/condition/đáp án; V5 glyph/nét không chạm/cắt/tràn. Không tái dùng proof font cũ.",
+      "actualSvgReviewed": true,
+      "byteSvg": 13771,
+      "render": "/workspace/scratch/capron685-v5-256-actual.png",
+      "hash": "7f23bb400331776fade83a314fbf4a97b9018a3c7bc899165813dc5d88b8be9f",
+      "hashSvgDaSoat": "bfa1880b59be5acdbed7c452f9e058778ef9e3eab42340ec92896428d7e662d2"
+    }
+  ]
+}

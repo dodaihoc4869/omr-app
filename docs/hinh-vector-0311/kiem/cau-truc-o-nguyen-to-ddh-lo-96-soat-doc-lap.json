@@ -3,44 +3,41 @@
     "i": 807,
     "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 7/14,007/N/Nitrogen với comma,grayroundedcell-darktopLeftsubcell;khôngcấuhìnhthêm. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+    "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền nhỏ trong nét N lớn. Có sẵn ở oldSVG, nhỏ hơn font-a nhưng không biến mất. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
     "actualSvgReviewed": true,
     "byteSvg": 7358,
-    "render": "/workspace/scratch/final245-807-new.png",
-    "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
-    "hashSvgDaSoat": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911"
-  },
-  {
-    "i": 764,
-    "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 15/30.974/P/Phosphorus/[Ne]3s²3p³/Nonmetal vớiDOT,superscript2/3,darkblue-white doubleborder. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
-    "actualSvgReviewed": true,
-    "byteSvg": 18061,
-    "render": "/workspace/scratch/final245-764-new.png",
-    "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
-    "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff"
+    "render": "/workspace/scratch/oldglyph261-807-actual.png",
+    "detail": "/workspace/scratch/oldglyph261-807-macro.png"
   },
   {
     "i": 468,
     "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 11/22.990/Na/Sodium/[Ne]3s¹/Alkali metal vớiDOT/sup1,darkblue-white doubleborder. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+    "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền trong N và một lỗ kim nhỏ ở chân a. Olda không có vết khuyết lớn như newfont-a nhưng vẫn có lỗ riêng thực thấy. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
     "actualSvgReviewed": true,
     "byteSvg": 16112,
-    "render": "/workspace/scratch/final245-468-new.png",
-    "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
-    "hashSvgDaSoat": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df"
+    "render": "/workspace/scratch/oldglyph261-468-actual.png",
+    "detail": "/workspace/scratch/oldglyph261-468-macro.png"
   },
   {
     "i": 658,
     "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 79/196,97/Au/Gold vớicomma,grayframewhitecell/topLeftgraysubcell/Au-Goldgray. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+    "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền nhỏ ở đỉnh A lớn. Có sẵn ở oldSVG. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
     "actualSvgReviewed": true,
     "byteSvg": 6758,
-    "render": "/workspace/scratch/final245-658-new.png",
-    "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
-    "hashSvgDaSoat": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3"
+    "render": "/workspace/scratch/oldglyph261-658-actual.png",
+    "detail": "/workspace/scratch/oldglyph261-658-macro.png"
+  },
+  {
+    "i": 764,
+    "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt / GIỮ oldpositive: Đã tự fresh actual OLD hash và mở FULL; không thấy lỗi glyph riêng rõ ở764, dữ liệu/case/configsup30.974/15/P/Phosphorus/Nonmetal/màu-frame đúng. Không suy fail764 từ glyph của3nguồn khác. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
+    "actualSvgReviewed": true,
+    "byteSvg": 18061,
+    "render": "/workspace/scratch/oldglyph261-764-actual.png",
+    "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+    "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff"
   }
 ]

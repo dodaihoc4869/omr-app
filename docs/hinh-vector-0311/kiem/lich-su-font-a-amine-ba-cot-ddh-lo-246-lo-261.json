@@ -1,0 +1,55 @@
+{
+  "metadata": [
+    {
+      "i": 582,
+      "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+      "fileNguon": "anh/6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253.png",
+      "svg": "amine-ba-cot-ddh-6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291.svg",
+      "hashSvg": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291",
+      "byteSvg": 20503,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-KT-C123-D2-I-14",
+          "de": "Trong dung dịch, các amine đều có khả năng tác dụng với nước ở các mức độ khác nhau. Phản ứng của các amine với nước xảy ra thuận nghịch với hằng số cân bằng là Kc.\nBiểu đồ ở hình dưới biểu diễn giá trị pKc ở 25°C, với pKc bằng trừ logarit của Kc, của một số amine.\nỞ 25°C, nhận định nào sau đây đúng?",
+          "refs": [
+            {
+              "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+              "where": "12-KT-C123-D2-I-14.hinh.0.du_lieu",
+              "hashDataUrl": "39c1bbb043d5ac7c4a596c236cf23c910d9244dfa2cc0dfe30a4add9f12cf28b"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B8-D1-I-241",
+          "de": "Trong dung dịch, các amine đều có khả năng tác dụng với nước ở các mức độ khác nhau. Phản ứng của các amine với nước xảy ra thuận nghịch với hằng số cân bằng là Kc.\nBiểu đồ ở hình dưới biểu diễn giá trị pKc ở 25°C, với pKc bằng trừ logarit của Kc, của một số amine.\nỞ 25°C, nhận định nào sau đây đúng?",
+          "refs": [
+            {
+              "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+              "where": "DB-12-B8-D1-I-241.hinh.0.du_lieu",
+              "hashDataUrl": "39c1bbb043d5ac7c4a596c236cf23c910d9244dfa2cc0dfe30a4add9f12cf28b"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "3graybars/3dashedguides/2axisheads/literal9,40-3,37-3,23/Aniline-Dimethylamine-Ethylamine/noaddedzero-ticks-units-title-answer/DDHpath.",
+      "hashSvgDaSoat": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 582,
+      "hashSvg": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Soát lại V5, mở riêng native FULL và đọc đủ 2 public refs, tự fresh Chromium exact newSVG rồi mở actual FULL3x. Đúng 3 graybars/top96–323–299/baseline427, 3 guides OVERbarfill từ92 có gap axis đến các rightedges215/379/536, labels literal9,40/3,37/3,23 và Aniline/Dimethylamine/Ethylamine, 2 axisheads. Không thêm0/unit/title/ticks hay normalize barheights theo số. V5 chữ/nét không chạm/cắt/tràn.",
+      "actualSvgReviewed": true,
+      "byteSvg": 20503,
+      "render": "/workspace/scratch/amine582-v5-257-actual.png",
+      "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+      "hashSvgDaSoat": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291"
+    }
+  ]
+}

@@ -2,11 +2,15 @@
   {
     "i": 413,
     "hashSvg": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Đã mở RIÊNG native FULL/2x, đọc đủ 2 public stems/refs; tự fresh Chromium exact V5 SVG rồi mở actual FULL3x. Đủ14rectangles/14nums1..14/28tickstems14trên14dưới; chỉ3top10sup−1/−7/−14, [Hsup+] (mol/L) và pH đúng case. Palette/thứ tự màu giữ, cell7two-tone/8diagonalband/11verticalshade; printtexture không bị biến thành ticks/data. Không thêm scaleicons/units/values hay đáp án, V5 glyph không chạm/cắt/tràn.",
-    "actualSvgReviewed": true,
-    "byteSvg": 23509,
-    "render": "/workspace/scratch/thangph413-v5-260-actual.png",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Soát mới bộ font chữ a, đã mở riêng native FULL và đọc đủ public questions.de/refs; tự fresh Chromium từ chính bytes SVG SHA256 đã kiểm, mở actual FULL. Đủ14ô màu/1..14 và28tick14trên14dưới; chỉ10⁻¹/10⁻⁷/10⁻¹⁴ ởtrên;[H⁺](mol/L),pH đúngcase. Vị trí số/ticks/3mốc cùng palette, ô7hai màu/8dải chéo/11bóng đứng giữ; chữ không chạm/cắt. SVG path-only, không text/image fallback.",
+    "render": "/workspace/scratch/fonta261-413-4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a.png",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhongDam": null,
+    "publicQids": [
+      "DB-11-B2-D3-II-146",
+      "DH-11-C1-B2-II-16"
+    ],
     "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
     "hashSvgDaSoat": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a"
   }

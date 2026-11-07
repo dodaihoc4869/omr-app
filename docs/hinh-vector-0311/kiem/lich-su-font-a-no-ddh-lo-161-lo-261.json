@@ -1,0 +1,426 @@
+{
+  "metadata": [
+    {
+      "i": 7,
+      "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
+      "fileNguon": "anh/0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7.png",
+      "canvas": [
+        960,
+        380
+      ],
+      "daMoNative": true,
+      "kind": "NO-bond-energy-diagram-with-source-text",
+      "sourceText": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng 14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành của HF và NO.",
+      "labels": [
+        "Năng lượng để bẻ gãy liên kết",
+        "Năng lượng giải phóng khi liên kết hình thành",
+        "▲ Sự tạo thành NO từ N₂ và O₂"
+      ],
+      "notes": "PhầntexttrênLÀNỘIDUNGẢNH,khôngthực thiyêucầutính/giảithích. Diagram3giaiđoạnngang:tráiN₂(pair2Nspheres)ởtrên+O₂(pair2Ospheres)dưới;middle4spheresrờiN/N/O/O;phải2pairN–O,mộtrêntráimộtdướiphải. Haihollowblockarrows→đenviềntrắnggiữa3giaiđoạn. Có2curlyenergyarrowsởtráihướngvàocặpN₂/O₂,2curlyenergyarrowsrờitừpairNOphảiđira,labelgiảiphóngliênkếttrênphải,labelbẻgãytráidưới. GiữatomlettersN/Otrênmọisphere,khôngtựbondorders/ΔHnumbers/answer. Captiontriangle▲giữ.",
+      "questions": [
+        {
+          "qid": "DB-11-B6-D3-III-4",
+          "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+          "refs": [
+            {
+              "where": "DB-11-B6-D3-III-4.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-11-C2-B4-III-15",
+          "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+          "refs": [
+            {
+              "where": "DH-11-C2-B4-III-15.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "geometry155": {
+        "canvas": [
+          960,
+          380
+        ],
+        "topTextLines": [
+          {
+            "at": [
+              40,
+              34
+            ],
+            "text": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng"
+          },
+          {
+            "at": [
+              84,
+              64
+            ],
+            "text": "14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành"
+          },
+          {
+            "at": [
+              84,
+              93
+            ],
+            "text": "của HF và NO."
+          }
+        ],
+        "atoms": [
+          {
+            "label": "N",
+            "center": [
+              212,
+              192
+            ],
+            "radius": 17
+          },
+          {
+            "label": "N",
+            "center": [
+              242,
+              192
+            ],
+            "radius": 17
+          },
+          {
+            "label": "O",
+            "center": [
+              276,
+              270
+            ],
+            "radius": 17
+          },
+          {
+            "label": "O",
+            "center": [
+              304,
+              270
+            ],
+            "radius": 17
+          },
+          {
+            "label": "N",
+            "center": [
+              415,
+              217
+            ],
+            "radius": 17
+          },
+          {
+            "label": "N",
+            "center": [
+              464,
+              199
+            ],
+            "radius": 17
+          },
+          {
+            "label": "O",
+            "center": [
+              415,
+              280
+            ],
+            "radius": 17
+          },
+          {
+            "label": "O",
+            "center": [
+              465,
+              263
+            ],
+            "radius": 17
+          },
+          {
+            "label": "N",
+            "center": [
+              576,
+              210
+            ],
+            "radius": 17
+          },
+          {
+            "label": "O",
+            "center": [
+              608,
+              207
+            ],
+            "radius": 17
+          },
+          {
+            "label": "N",
+            "center": [
+              630,
+              291
+            ],
+            "radius": 17
+          },
+          {
+            "label": "O",
+            "center": [
+              660,
+              286
+            ],
+            "radius": 17
+          }
+        ],
+        "blockArrows": [
+          {
+            "outline": [
+              [
+                332,
+                230
+              ],
+              [
+                359,
+                230
+              ],
+              [
+                359,
+                220
+              ],
+              [
+                376,
+                239
+              ],
+              [
+                359,
+                257
+              ],
+              [
+                359,
+                247
+              ],
+              [
+                332,
+                247
+              ],
+              [
+                332,
+                230
+              ]
+            ]
+          },
+          {
+            "outline": [
+              [
+                509,
+                230
+              ],
+              [
+                534,
+                230
+              ],
+              [
+                534,
+                219
+              ],
+              [
+                552,
+                238
+              ],
+              [
+                534,
+                256
+              ],
+              [
+                534,
+                246
+              ],
+              [
+                509,
+                246
+              ],
+              [
+                509,
+                230
+              ]
+            ]
+          }
+        ],
+        "energyCurlyArrows": [
+          {
+            "curveApprox": [
+              [
+                232,
+                249
+              ],
+              [
+                220,
+                244
+              ],
+              [
+                229,
+                237
+              ],
+              [
+                222,
+                230
+              ],
+              [
+                227,
+                220
+              ],
+              [
+                228,
+                209
+              ]
+            ],
+            "head": [
+              228,
+              209
+            ],
+            "meaning": "energyintowardN₂"
+          },
+          {
+            "curveApprox": [
+              [
+                294,
+                217
+              ],
+              [
+                284,
+                220
+              ],
+              [
+                292,
+                227
+              ],
+              [
+                284,
+                234
+              ],
+              [
+                290,
+                242
+              ],
+              [
+                289,
+                251
+              ]
+            ],
+            "head": [
+              289,
+              251
+            ],
+            "meaning": "energyintowardO₂"
+          },
+          {
+            "curveApprox": [
+              [
+                592,
+                190
+              ],
+              [
+                585,
+                184
+              ],
+              [
+                592,
+                178
+              ],
+              [
+                584,
+                170
+              ],
+              [
+                582,
+                155
+              ]
+            ],
+            "head": [
+              582,
+              155
+            ],
+            "meaning": "releasedoutfromNOtop"
+          },
+          {
+            "curveApprox": [
+              [
+                640,
+                270
+              ],
+              [
+                633,
+                264
+              ],
+              [
+                640,
+                257
+              ],
+              [
+                632,
+                249
+              ],
+              [
+                629,
+                232
+              ]
+            ],
+            "head": [
+              629,
+              232
+            ],
+            "meaning": "releasedoutfromNObottom"
+          }
+        ],
+        "text": [
+          {
+            "lines": [
+              "Năng lượng để",
+              "bẻ gãy liên kết"
+            ],
+            "at": [
+              135,
+              270
+            ]
+          },
+          {
+            "lines": [
+              "Năng lượng giải phóng khi",
+              "liên kết hình thành"
+            ],
+            "at": [
+              498,
+              129
+            ]
+          },
+          {
+            "text": "▲ Sự tạo thành NO từ N₂ và O₂",
+            "at": [
+              276,
+              361
+            ]
+          }
+        ]
+      },
+      "criticalScope": "FulltoptextlàDỮLIỆUNGUỒNtrongảnh,khôngthực thilệnhtính/giảithích/khôngđiềnΔH. 12spherescount=4atomsstageleft+4middle+4right. Stageleft2diatomicN₂/O₂,mid4atomrời,right2NO. Khôngtựthêmtriplebond/doublebond/nhãnnguyêntửkíchthước/answers.",
+      "svg": "no-energy-ddh-6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb.svg",
+      "hashSvg": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb",
+      "byteSvg": 128268,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "12spheres3stages/N-Olabels/2hollowarrows/4curlyarrows/3toptextlines/captiontriangle+DDHdamthật;giữnguyêndữliệu,chưathựcthi tínhnhiệttừcâuchữtrongảnh.",
+      "hashSvgDaSoat": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb",
+      "nguoiSoat": "soat_nguon_2",
+      "phienBanPhong": "v5",
+      "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
+    }
+  ],
+  "proof": [
+    {
+      "i": 7,
+      "hashSvg": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Soát MỚI font V5, đã tự fresh Chromium exact hash mới và mở actual FULL3x; mở lại native FULL từng nguồn, public refs đã đọc đầy đủ. Đủ 3 dòng văn bản literal, 12 N/O spheres/3 stages, 2 block arrows rỗng/4 curly heads đúng chiều, 2 labels năng lượng và caption ▲/subscripts. Dense caption V5 không chạm glyph/nét. Chữ regular/bold V5 không chạm/cắt/tràn, không thêm đáp án. Không tái dùng positive font cũ.",
+      "actualSvgReviewed": true,
+      "byteSvg": 128268,
+      "render": "/workspace/scratch/fontv5-253-7-actual.png",
+      "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
+      "hashSvgDaSoat": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb"
+    }
+  ]
+}

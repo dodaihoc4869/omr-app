@@ -1,13 +1,13 @@
 [
   {
     "i": 7,
-    "hashSvg": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb",
+    "hashSvg": "7021efea5515a7e411813b0bc4f02358de8d4e266b036a933404d909aa00773c",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Soát MỚI font V5, đã tự fresh Chromium exact hash mới và mở actual FULL3x; mở lại native FULL từng nguồn, public refs đã đọc đầy đủ. Đủ 3 dòng văn bản literal, 12 N/O spheres/3 stages, 2 block arrows rỗng/4 curly heads đúng chiều, 2 labels năng lượng và caption ▲/subscripts. Dense caption V5 không chạm glyph/nét. Chữ regular/bold V5 không chạm/cắt/tràn, không thêm đáp án. Không tái dùng positive font cũ.",
+    "ketQua": "Đạt: Mở RIÊNG nativeFULL/allpublicrefs, tự fresh Chromium exactcurrenthash rồi mở actualFULL3x từngSVG. 3 dòng fulltext nguồn giữ nguyên (không thực thi câu tính), 12 spheres N/O/3stages, 4curly đúng chiều/2hollow arrows, 2energylabels và ▲caption/subscripts đúng. Font-a glyph/spacing không chạm/cắt/tràn; không dùng oldproof để duyệt mới.",
     "actualSvgReviewed": true,
-    "byteSvg": 128268,
-    "render": "/workspace/scratch/fontv5-253-7-actual.png",
+    "byteSvg": 136054,
+    "render": "/workspace/scratch/fonta261b-7-actual.png",
     "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
-    "hashSvgDaSoat": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb"
+    "hashSvgDaSoat": "7021efea5515a7e411813b0bc4f02358de8d4e266b036a933404d909aa00773c"
   }
 ]

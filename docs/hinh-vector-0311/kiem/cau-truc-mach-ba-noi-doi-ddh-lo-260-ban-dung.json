@@ -7,7 +7,7 @@
     "hashSvg": "8a9f85716b9b3862504660b51262c7bee8f3c6e88ad4ce0c94096ba42b0702d6",
     "byteSvg": 17863,
     "font": "DDH Rounded",
-    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -24,6 +24,6 @@
     ],
     "ghiChuDung": "15C=6explicitC+6CH2+3CH3/3explicitH/3CCdouble/CH3up-down-upHup-down-up/2freeends/noextra brackets-n-caption-answer.",
     "hashSvgDaSoat": "8a9f85716b9b3862504660b51262c7bee8f3c6e88ad4ce0c94096ba42b0702d6",
-    "nguoiSoat": "soat_nguon_2"
+    "nguoiSoat": "soat_hinh_vector"
   }
 ]

@@ -2,11 +2,13 @@
   {
     "i": 372,
     "hashSvg": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Soát MỚI V5, mở RIÊNG từng native FULL và mọi public refs, tự fresh Chromium 2 SVG đúng hash rồi mở actual4x. 372 đủ nums1..6/5OH+ringO/0H/0CH₂; C6 bare bẻ góc-OH, C1OH offset nguồn giữ, 2 taper/1 bold đúng. Không lỗi glyph/cắt/tràn/đáp án thêm; không dùng oldpositive.",
-    "actualSvgReviewed": true,
-    "byteSvg": 9109,
-    "render": "/workspace/scratch/v5-253-372-actual.png",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Soát mới font-a; mở riêng native FULL và đọc toàn bộ public questions.de/refs. Tự fresh Chromium exact SVG bytes, kiểm SHA256 và mở actual FULL. Sáu số1..6 đúng vị trí;C1OH xuống và offset ngang đúng nguồn,C2OHxuống/C3OHlên/C4OHxuống;C5nhánh lên C6bare bẻgóc tớiOH.5OH+ringO,không thêmH/CH2OH;2taper+1boldfront đúngphối cảnh;O/nhãn liênkết không chạm/cắt. DDH path-only không fallback.",
+    "render": "/workspace/scratch/fonta261extra-372-832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732.png",
+    "publicQids": [
+      "12-C2-B4-D1-I-11",
+      "DB-12-B5-D2-I-1"
+    ],
     "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
     "hashSvgDaSoat": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732"
   }

@@ -1,13 +1,15 @@
 [
   {
     "i": 657,
-    "hashSvg": "5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Mở lại native FULL và đủ public refs, tự fresh Chromium exact V5 hash SAU sửa và mở actual FULL3x. Nhãn Cực dương đã tách khỏi terminal bằng khoảng hở rõ; mọi 3 XYZ trắng trên vòng đặc/khung/2 terminals +trái −phải/2dây/Cực âm nguyên văn giữ đúng. Không thêm pH/arrow/startline/đáp án, không chạm/cắt/tràn. Negative candidate7cd86 giữ riêng.",
-    "actualSvgReviewed": true,
-    "byteSvg": 10850,
-    "render": "/workspace/scratch/657-v5-254-moi-actual.png",
+    "hashSvg": "753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: Soát mới font-a; mở riêng native FULL và đọc toàn bộ public questions.de/refs. Tự fresh Chromium exact SVG bytes, kiểm SHA256 và mở actual FULL. Đúng khung kín,3đĩaXYZchữtrắng,thứtựtrái→phảiXYZ;terminal+trái/−phải và2shortwires. Cực dương x20 cógap trước terminaltrái,Cực âm phải đúngcase;khôngchạm/cắt. Khôngthêm startline/dash/arrows/pH/tênchất/đápán. DDH path-only không fallback.",
+    "render": "/workspace/scratch/fonta261extra-657-753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064.png",
+    "publicQids": [
+      "12-C3-B9-D3-I-19",
+      "DB-12-B9-P1-D2-I-45"
+    ],
     "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
-    "hashSvgDaSoat": "5870a7ecf9447b62b640e41a0240446f88692e4328b5b168273ab1d7f668685e"
+    "hashSvgDaSoat": "753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064"
   }
 ]

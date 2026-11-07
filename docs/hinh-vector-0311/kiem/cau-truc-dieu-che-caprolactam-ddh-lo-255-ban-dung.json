@@ -3,11 +3,11 @@
     "i": 717,
     "hash": "ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e",
     "fileNguon": "anh/ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e.png",
-    "svg": "dieu-che-caprolactam-ddh-4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047.svg",
-    "hashSvg": "4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047",
-    "byteSvg": 27228,
+    "svg": "dieu-che-caprolactam-ddh-829b90aeae62259df98db3d3631b8488fdc3a19e13503bee584bab2af0b0fc86.svg",
+    "hashSvg": "829b90aeae62259df98db3d3631b8488fdc3a19e13503bee584bab2af0b0fc86",
+    "byteSvg": 28898,
     "font": "DDH Rounded",
-    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -23,7 +23,7 @@
       }
     ],
     "ghiChuDung": "3molecules/18C3O2N/2COdouble1CNdouble/2sixrings1sevenringNH/oximeOHupright/2RIGHTarrowheads/NH2OH-H2SO4literal/3lowercasecaptions/noanswer-temp-extraH2O.",
-    "hashSvgDaSoat": "4d9ef0699a65a4456e66ac2939f7377f7fdf65d67b857ff0b22daf328ec6f047",
+    "hashSvgDaSoat": "829b90aeae62259df98db3d3631b8488fdc3a19e13503bee584bab2af0b0fc86",
     "nguoiSoat": "soat_nguon_2"
   }
 ]

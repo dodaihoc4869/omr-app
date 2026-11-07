@@ -1,0 +1,58 @@
+{
+  "metadata": [
+    {
+      "i": 372,
+      "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+      "fileNguon": "anh/41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439.png",
+      "svg": "glucose-so-carbon-ddh-832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732.svg",
+      "hashSvg": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732",
+      "byteSvg": 9109,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-C2-B4-D1-I-11",
+          "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose dưới đây:\nNhóm –OH hemiacetal là –OH gắn ở carbon số mấy?",
+          "refs": [
+            {
+              "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+              "where": "12-C2-B4-D1-I-11.hinh.0.du_lieu",
+              "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B5-D2-I-1",
+          "de": "Cho công thức cấu tạo dạng mạch vòng α-glucose dưới đây:\nNhóm –OH hemiacetal là –OH gắn ở carbon số mấy?",
+          "refs": [
+            {
+              "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+              "where": "DB-12-B5-D2-I-1.hinh.0.du_lieu",
+              "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "singleHaworth/nums1..6/5OH+ringO/0H-0CH2OH/2taper1bold/C6bentbareendpoint-OH/keepallsourcepositions/DDHpath.",
+      "hashSvgDaSoat": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732",
+      "nguoiSoat": "soat_nguon_2",
+      "phienBanPhong": "v5",
+      "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
+    }
+  ],
+  "proof": [
+    {
+      "i": 372,
+      "hashSvg": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Soát MỚI V5, mở RIÊNG từng native FULL và mọi public refs, tự fresh Chromium 2 SVG đúng hash rồi mở actual4x. 372 đủ nums1..6/5OH+ringO/0H/0CH₂; C6 bare bẻ góc-OH, C1OH offset nguồn giữ, 2 taper/1 bold đúng. Không lỗi glyph/cắt/tràn/đáp án thêm; không dùng oldpositive.",
+      "actualSvgReviewed": true,
+      "byteSvg": 9109,
+      "render": "/workspace/scratch/v5-253-372-actual.png",
+      "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
+      "hashSvgDaSoat": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732"
+    }
+  ]
+}

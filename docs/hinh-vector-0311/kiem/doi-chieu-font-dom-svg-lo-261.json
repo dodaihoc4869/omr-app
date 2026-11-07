@@ -1,0 +1,89 @@
+{
+  "proof": {
+    "nguoiSoat": "soat_nguon_2",
+    "method": "Tự fresh Chromium @font-face từ exact current Latin WOFF2 base64; font family riêng DDHTest/font-weight700/font-size180; await document.fonts.ready và check true; cùng trang soDOMnative với exactSVGnegative. Mở FULL từng3 và macroA/Na.",
+    "fontFile": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+    "hashFont": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+    "fontBytes": 11560,
+    "fontNativeVsConverter": "Lỗi hiện cả DOM render trực tiếp current WOFF2 và SVGpath; vì vậy KHÔNG phải lỗi chỉ do phong-vector conversion. Bằng chứng raster nativeDOM xác nhận font/render nguồn đã có hiện tượng; không tự suy nguyên nhân contour cụ thể.",
+    "rows": [
+      {
+        "i": 807,
+        "hashSvg": "c82d267ad7a63852088db4cda02db63985c21f13593d8d2e5427addab95fcf9f",
+        "nativeDomFontLoaded": true,
+        "fontSizeCSSpx": 180,
+        "fontWeight": 700,
+        "actualFull": "/workspace/scratch/dom-svg261-807.jpg",
+        "domMacro": "/workspace/scratch/dom-svg261-807-dommacro.jpg",
+        "imageBytes": [
+          50997,
+          29234
+        ],
+        "conclusion": "N native DOM cũng có2lỗ kim cùng vùng nối nét nhưSVGpath."
+      },
+      {
+        "i": 468,
+        "hashSvg": "9e165a812f58e580f8531b71af276bfb96236dfc9186f8a09aef6f3c447a8d0a",
+        "nativeDomFontLoaded": true,
+        "fontSizeCSSpx": 180,
+        "fontWeight": 700,
+        "actualFull": "/workspace/scratch/dom-svg261-468.jpg",
+        "domMacro": "/workspace/scratch/dom-svg261-468-dommacro.jpg",
+        "imageBytes": [
+          80771,
+          55939
+        ],
+        "conclusion": "Na native DOM cũng có2lỗ kim N và vết khuyết tam giác chân a nhưSVGpath."
+      },
+      {
+        "i": 658,
+        "hashSvg": "4b25a2fabce052acb50866b90b634c86f4d465b7fd87d27de5d39c4b1d0576ad",
+        "nativeDomFontLoaded": true,
+        "fontSizeCSSpx": 180,
+        "fontWeight": 700,
+        "actualFull": "/workspace/scratch/dom-svg261-658.jpg",
+        "domMacro": "/workspace/scratch/dom-svg261-658-dommacro.jpg",
+        "imageBytes": [
+          59413,
+          27406
+        ],
+        "conclusion": "A native DOM cũng có2lỗ kim nhỏ vùng đỉnh nhưSVGpath."
+      }
+    ],
+    "scope": "Chỉ đọc repo/scratch mới; không sửa font app/converter, không đổi verdict SVG cũ, không có newpositive."
+  },
+  "committedEvidence": [
+    {
+      "file": "font-dom-807-dommacro-lo-261.jpg",
+      "sha256": "5ea5f35583acba4c94d6e792ec9516842a0da3985a0219f5abb8be75239943d8",
+      "bytes": 29234
+    },
+    {
+      "file": "font-dom-468-lo-261.jpg",
+      "sha256": "ae971ff14259654f0c44080575acbdec7c43098d99a429d85c1db90ab4e2392c",
+      "bytes": 80771
+    },
+    {
+      "file": "font-dom-468-dommacro-lo-261.jpg",
+      "sha256": "b1408c650043b2196d6acd37def19eb4f45b9b4352eea5430a380acfcc0a5e4b",
+      "bytes": 55939
+    },
+    {
+      "file": "font-dom-807-lo-261.jpg",
+      "sha256": "e4be83a94618a91bfd898eaf27d501eeb51d08603e4c896fcee379cfa022802e",
+      "bytes": 50997
+    },
+    {
+      "file": "font-dom-658-dommacro-lo-261.jpg",
+      "sha256": "1cb89ea9eede6e29f7559f09464a9e74ecbdf208fbb9b7903e097fb55c178139",
+      "bytes": 27406
+    },
+    {
+      "file": "font-dom-658-lo-261.jpg",
+      "sha256": "b5eb61cf07cbf9a65d3d30857123bd0d4d722333d5f60905bd023a4ed7dd2bd5",
+      "bytes": 59413
+    }
+  ],
+  "ketLuan": "DOM@font-faceWOFF2thậtvàSVGpathcùnglỗN/A/khuyếta.Khôngphảilỗiriengconverter;blockerfontmaintrướcmerge/deploy.KhôngváriêngSVGđểchefont.",
+  "gioiHan": "ActualDOMWOFF2vàSVGpathcùnghiệntượng.Nguyênnhâncontour/hintingchưaphântích;khôngđổriêngconverter/khôngkhẳngđịnhcơchếntạolỗ."
+}

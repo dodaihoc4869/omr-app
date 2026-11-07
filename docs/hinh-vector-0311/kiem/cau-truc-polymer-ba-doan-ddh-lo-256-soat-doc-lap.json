@@ -1,13 +1,10 @@
 [
   {
     "i": 720,
-    "hashSvg": "feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Đã mở native FULL/3x và toàn bộ public questions.de/refs, tự fresh Chromium exact SVG MỚI feda3e rồi mở actual FULL3x. Đủ 8 backboneC: CH₂–CH | CH₂–CH=CH–CH₂ | CH₂–CH, 4CH₂+4CH; CN xuống neo C segment1, Ph xuống segment3 gồm vòng6/3Kekule đúng trái-trên/phải-dọc/trái-dưới. Không diagonal thừa từ CH vào vòng; 3 cặp ngoặc tròn a/b/c dưới đúng, lines qua ngoặc giữ join theo nguồn. DDH V5/subscripts/gaps không chạm/cắt/tràn, không đáp án thêm. Oldbf148 không xem được actual vì metadata đã đổi khi checkhash, không cấp proof old.",
-    "actualSvgReviewed": true,
-    "byteSvg": 13190,
-    "render": "/workspace/scratch/polymer720-256-actual.png",
+    "hashSvg": "15692b4708a4118107d560066e58444aa2aaca8bee7514f437e5a7216a196be2",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Mở RIÊNG nativeFULL/all public refs sau_de/publictrue và fresh actual Chromium FULL từ exact SVG bytes hiện tại sau rerunfonta. 8backboneC=4CH2+4CH,middleCH=CH;CNdown vàphenyl6C3doubleDown,3roundpairs/abcsub đúng; a mới giữ đọc rõ không đè bond. DDH snapshot9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1 theo main e316e6b5, path tự chứa không text/image/fallback; dữ kiện/layout giữ đúng không thêmcaption/answer/charge. Không chạm/cắt/tràn. So lịch sử hash feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9; actual current hash khớp metadata.",
     "hash": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
-    "hashSvgDaSoat": "feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9"
+    "hashSvgDaSoat": "15692b4708a4118107d560066e58444aa2aaca8bee7514f437e5a7216a196be2"
   }
 ]

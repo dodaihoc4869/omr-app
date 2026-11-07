@@ -1,0 +1,262 @@
+{
+  "metadata": [
+    {
+      "i": 807,
+      "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+      "fileNguon": "anh/95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e.png",
+      "canvas": [
+        216,
+        227
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "7",
+        "14,007",
+        "N",
+        "Nitrogen"
+      ],
+      "notes": "Ôgócbo,nềnxámsáng,ô vuônggóctrêntráitốihơnchứa7.14,007trênphải,Ndậmlớngiữa,Nitrogendưới. Giữdấuphẩy;khôngthêmcấuhìnhelectron.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-194",
+          "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-194.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B9-D2-I-7",
+          "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B9-D2-I-7.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911.svg",
+      "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
+      "byteSvg": 7358,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    },
+    {
+      "i": 764,
+      "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+      "fileNguon": "anh/8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6.png",
+      "canvas": [
+        250,
+        244
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "15",
+        "30.974",
+        "P",
+        "Phosphorus",
+        "[Ne]3s²3p³",
+        "Nonmetal"
+      ],
+      "notes": "Ôvuôngboxanhđậm,viềntrắngđôi.Chữtrắng:15trêntrái,30.974trênphải,Pgiữa,tênPhosphorus,[Ne]3s²3p³,Nonmetaldưới. Giữdấuchấmvàcapitalization.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-14",
+          "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-14.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-I-5",
+          "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-I-5.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff.svg",
+      "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+      "byteSvg": 18061,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    },
+    {
+      "i": 468,
+      "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+      "fileNguon": "anh/55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9.png",
+      "canvas": [
+        250,
+        252
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "11",
+        "22.990",
+        "Na",
+        "Sodium",
+        "[Ne]3s¹",
+        "Alkali metal"
+      ],
+      "notes": "Boxanhđậm,viềntrắngđôi.Chữtrắng:11trêntrái,22.990trênphải,Nagiữa,tênSodium,[Ne]3s¹,Alkalimetaldưới. Giữdấuchấmvàsuperscript1.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-45",
+          "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-45.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-I-42",
+          "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-I-42.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df.svg",
+      "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
+      "byteSvg": 16112,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    },
+    {
+      "i": 658,
+      "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+      "fileNguon": "anh/7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016.png",
+      "canvas": [
+        205,
+        233
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "79",
+        "196,97",
+        "Au",
+        "Gold"
+      ],
+      "notes": "Khungxámvuôngnềntrắng;ôxámnhạtfillsgóctrêntráichứa79đậm.196,97trênphải,Aumàuxámgiữa,Goldxámdưới. Giữdấuphẩy.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-II-62",
+          "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-II-62.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-II-3",
+          "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-II-3.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3.svg",
+      "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
+      "byteSvg": 6758,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    }
+  ],
+  "proof": [
+    {
+      "i": 807,
+      "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 7/14,007/N/Nitrogen với comma,grayroundedcell-darktopLeftsubcell;khôngcấuhìnhthêm. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+      "actualSvgReviewed": true,
+      "byteSvg": 7358,
+      "render": "/workspace/scratch/final245-807-new.png",
+      "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+      "hashSvgDaSoat": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911"
+    },
+    {
+      "i": 764,
+      "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 15/30.974/P/Phosphorus/[Ne]3s²3p³/Nonmetal vớiDOT,superscript2/3,darkblue-white doubleborder. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+      "actualSvgReviewed": true,
+      "byteSvg": 18061,
+      "render": "/workspace/scratch/final245-764-new.png",
+      "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+      "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff"
+    },
+    {
+      "i": 468,
+      "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 11/22.990/Na/Sodium/[Ne]3s¹/Alkali metal vớiDOT/sup1,darkblue-white doubleborder. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+      "actualSvgReviewed": true,
+      "byteSvg": 16112,
+      "render": "/workspace/scratch/final245-468-new.png",
+      "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+      "hashSvgDaSoat": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df"
+    },
+    {
+      "i": 658,
+      "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởriêngnativeFULL2x/mọi publicrefs. 79/196,97/Au/Gold vớicomma,grayframewhitecell/topLeftgraysubcell/Au-Goldgray. Literalcase/color/layout/truebold/fontgaps khôngchạm/cắt/tràn;khôngtheoryfix.",
+      "actualSvgReviewed": true,
+      "byteSvg": 6758,
+      "render": "/workspace/scratch/final245-658-new.png",
+      "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+      "hashSvgDaSoat": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3"
+    }
+  ]
+}

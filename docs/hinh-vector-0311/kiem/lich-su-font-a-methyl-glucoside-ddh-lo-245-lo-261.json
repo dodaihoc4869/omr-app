@@ -1,0 +1,58 @@
+{
+  "metadata": [
+    {
+      "i": 548,
+      "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+      "fileNguon": "anh/673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a.png",
+      "svg": "methyl-glucoside-ddh-81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4.svg",
+      "hashSvg": "81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4",
+      "byteSvg": 6723,
+      "font": "DDH Rounded",
+      "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "12-KT-C2-D2-III-2",
+          "de": "Ở dạng cấu tạo mạch vòng, nhóm OH hemiacetal của glucose tác dụng với methanol khi có mặt HCl khan, tạo thành methyl glucoside có công thức cấu tạo cho ở hình dưới.\nTổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+          "refs": [
+            {
+              "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+              "where": "12-KT-C2-D2-III-2.hinh.0.du_lieu",
+              "hashDataUrl": "9f5fb403498b15ef55e0fc0b1b48cd591e01a356bfb6d6b2597fce26c5cafef7"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B4-D2-III-86",
+          "de": "Ở dạng cấu tạo mạch vòng, nhóm OH hemiacetal của glucose tác dụng với methanol khi có mặt HCl khan, tạo thành methyl glucoside có công thức cấu tạo cho ở hình dưới.\nTổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+          "refs": [
+            {
+              "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+              "where": "DB-12-B4-D2-III-86.hinh.0.du_lieu",
+              "hashDataUrl": "9f5fb403498b15ef55e0fc0b1b48cd591e01a356bfb6d6b2597fce26c5cafef7"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "singleHaworth/4OH+ringO+OCH3DOWN/0H-0Cnums-0CH2OH/2taper1bold/C6barebentOH/noextra captions/DDHpath.",
+      "hashSvgDaSoat": "81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4",
+      "nguoiSoat": "soat_nguon_2",
+      "phienBanPhong": "v5",
+      "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+      "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
+    }
+  ],
+  "proof": [
+    {
+      "i": 548,
+      "hashSvg": "81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Soát MỚI V5, mở RIÊNG từng native FULL và mọi public refs, tự fresh Chromium 2 SVG đúng hash rồi mở actual4x. 4OH/ringO/OCH₃ xuống, C6 bare bẻ góc-OH, 0H/0nums/0CH₂ text, 2 taper/1 bold; so nguồn548 và631 RIÊNG cùng data/layout. Chỗ bond xuống sát O đã zoom nguồn xác nhận cũng tiếp O, không thêm sai liên kết. Không lỗi glyph/cắt/tràn/đáp án thêm; không dùng oldpositive.",
+      "actualSvgReviewed": true,
+      "byteSvg": 6723,
+      "render": "/workspace/scratch/v5-253-548-actual.png",
+      "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+      "hashSvgDaSoat": "81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4"
+    }
+  ]
+}

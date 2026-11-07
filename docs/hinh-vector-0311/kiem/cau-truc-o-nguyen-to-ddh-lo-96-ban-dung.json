@@ -45,11 +45,12 @@
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "bi-loai-sau-soat-lai",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
     "hashSvgDaSoat": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
     "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d",
+    "lyDoLoai": "Lỗ glyph N/A/a actualold vàfont-a;proof o-nguyen-to-old-positive-lo-261-thu-hoi.json"
   },
   {
     "i": 764,
@@ -153,11 +154,12 @@
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "bi-loai-sau-soat-lai",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
     "hashSvgDaSoat": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
     "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d",
+    "lyDoLoai": "Lỗ glyph N/A/a actualold vàfont-a;proof o-nguyen-to-old-positive-lo-261-thu-hoi.json"
   },
   {
     "i": 658,
@@ -205,10 +207,11 @@
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "trangThai": "da-soat-doc-lap",
+    "trangThai": "bi-loai-sau-soat-lai",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
     "hashSvgDaSoat": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
     "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d",
+    "lyDoLoai": "Lỗ glyph N/A/a actualold vàfont-a;proof o-nguyen-to-old-positive-lo-261-thu-hoi.json"
   }
 ]
