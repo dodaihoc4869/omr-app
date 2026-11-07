@@ -379,6 +379,24 @@
    "khai": "background: var(--tr-dung-nhat) !important",
    "n": 1,
    "ly_do": "07/11 thầy (ảnh Duolingo) «đúng sai chỉ đổi màu chữ, giữ nguyên nền»: dải kết quả nền thẻ trung tính"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-nen: #141e24",
+   "n": 1,
+   "ly_do": "07/11 khuya thầy «vào hẳn trang Duolingo đo chính xác màu nền»: bảng màu chính thức trong mã Duolingo — snow tối #131f24"
+  },
+  {
+   "tep": "src/styles/phang-hs.css",
+   "khai": "--ph-nen: var(--tr-mat-2)",
+   "n": 1,
+   "ly_do": "07/11 khuya thầy «nền sáng lấy chuẩn luôn của Duolingo»: bảng màu chính thức Duolingo — snow #fff (nền trang), polar #f7f7f7, swan #e5e5e5"
+  },
+  {
+   "tep": "src/styles/phang-hs.css",
+   "khai": "--tr-nen: var(--tr-mat-2)",
+   "n": 1,
+   "ly_do": "07/11 khuya thầy «nền sáng lấy chuẩn luôn của Duolingo»: bảng màu chính thức Duolingo — snow #fff (nền trang), polar #f7f7f7, swan #e5e5e5"
   }
  ]
 }

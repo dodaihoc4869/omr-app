@@ -10,7 +10,7 @@
    Màu chính (--tr-hs, chàm) TÁCH khỏi màu đúng (--tr-dung, lục ngọc): Lộ trình, menu, rương, Bi đọc --tr-hs (khối cuối tệp); nút «Tiếp tục» ở dải đúng đọc
    --tr-dung-nut. --tr-*-day = gờ đáy nút 3D. Tương phản đo bằng scripts/do-tuong-phan-hs.mjs (bảng in ra khi chạy). */
 :root[data-trong='hs'] {
-  --tr-nen: #ffffff; --tr-mat: #ffffff; --tr-mat-2: #f3f3fd; --tr-mat-3: #e1e1f1; --tr-vien: #d9d9e5; --tr-vien-2: #c6c6d4;
+  --tr-nen: #ffffff; --tr-mat: #ffffff; --tr-mat-2: #f7f7f7; --tr-mat-3: #e5e5e5; --tr-vien: #e5e5e5; --tr-vien-2: #c6c6d4; /* 07/11 khuya: sáng theo bảng màu chính thức Duolingo — snow #fff · polar #f7f7f7 · swan #e5e5e5 */
   --tr-chu: #1b1938; --tr-chu-2: #3a385e; --tr-chu-3: #47456d; /* 07/11 chữ mờ ≥ 7:1 trên kính (cũ #4f4d75 ≈ 6,9) */ --tr-trang: #ffffff;
   --tr-dung: #00d396; --tr-dung-nhat: #c2ffdd; --tr-dung-chu: #007c58; --tr-dung-nut: #00c993; --tr-dung-day: #009e73;
   --tr-sai: #f90072; --tr-sai-nhat: #ffe3e7; --tr-sai-chu: #c70b5b; --tr-sai-day: #c60059;
@@ -30,8 +30,8 @@
 @media (prefers-color-scheme: dark) {
   :root[data-trong='hs'] {
     /* 07/11 thầy «làm nền tối theo màu kiểu này (Duolingo) để nhìn dịu mắt, vẫn giữ nguyên kính»: nền / thẻ / viền / chữ sang tông XANH THAN Duolingo tối
-       (đo ảnh thầy gửi: nền #141e24 · viền #39464a · chữ #effafd 15,9:1 · chữ phụ #dae4ea 13,1:1); chữ mờ sáng hơn ⇒ ≥ 7:1 trên mặt kính thật (đo scripts: docs/ban-ve-toi-than-0711) */
-    --tr-nen: #141e24; --tr-mat: #202f36; --tr-mat-2: #263840; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #1a282e;
+       (bảng màu chính thức trong mã Duolingo, 07/11 khuya: snow #131f24 · polar #202f36 · swan #37464f · eel #f1f7fb · wolf #dce6ec); chữ mờ sáng hơn ⇒ ≥ 7:1 trên mặt kính thật (đo scripts: docs/ban-ve-toi-than-0711) */
+    --tr-nen: #131f24; --tr-mat: #202f36; --tr-mat-2: #263840; --tr-mat-3: #37464f; --tr-vien: #37464f; --tr-vien-2: #1a282e;
     --tr-chu: #f1f7fb; --tr-chu-2: #dce6ec; --tr-chu-3: #c4d0d6; --tr-trang: #131f24;
     --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-dung-nut: #00d497; --tr-dung-day: #00aa76;
     --tr-sai: #f7498f; --tr-sai-nhat: #43272f; --tr-sai-chu: #ff9bba; --tr-sai-day: #cc146f;
