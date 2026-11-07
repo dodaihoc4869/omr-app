@@ -18,6 +18,8 @@ let dangCo: { token: string; luc: number; p: Promise<KetQuaMo>; kq?: KetQuaMo } 
 /** Bộ test mặc định TẮT (lượt mở trước sống theo mô-đun ⇒ test sau dùng nhầm máy chủ giả của test trước); test của tính năng bật bằng `batMoChangTruoc(true)`. */
 let bat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 export function batMoChangTruoc(b: boolean): void { bat = b; dangCo = null }
+/** Bộ test mặc định TẮT (như `bat`: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
+let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 
 /** Bắt đầu mở chặng trước cho `token` (đã có lượt còn hạn cho token này ⇒ không gọi thêm). Không bao giờ ném.
  *  Gói cả ngày (dưới): máy em đã có chặng trong gói ⇒ KHÔNG mở trước bằng `hoc-tap-start` (màn làm bài hiện câu từ gói, không cần lượt ấy). */
@@ -142,8 +144,6 @@ const nhoGoi = new Map<string, GoiNgay>(), nhoXong = new Map<string, { n: string
 /** Bộ câu đã ghi xuống máy lần cuối (theo sbd) — cùng mảng ⇒ khỏi ghi lại đề. */
 const cauDaGhi = new Map<string, unknown>()
 let napDang: Promise<void> | null = null, napCuoi = { token: '', luc: 0 }
-/** Bộ test mặc định TẮT (như `bat` ở trên: các test cũ đếm đúng số lệnh gửi máy chủ); test của gói bật bằng `batGoiNgay(true)`. */
-let batGoi = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
 const duoiToken = (t: string) => t.slice(-16)
 const docJson = (k: string): unknown => { try { return JSON.parse(localStorage.getItem(k) || 'null') } catch { return null } }
 const ghiJson = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { /* đầy / bị chặn: vẫn dùng bản trong bộ nhớ */ } }

@@ -385,3 +385,7 @@ html[data-trong='hs']:not(#_):not(#_) .duo-nut { white-space: normal; text-wrap:
 html[data-trong='hs']:not(#_):not(#_) .kb-hero-chu { min-width: 0; }
 html[data-trong='hs']:not(#_):not(#_) .kb-so { flex-wrap: wrap; row-gap: 0; }
 html[data-trong='hs']:not(#_):not(#_) .kb-dau-giua h1 { text-wrap: balance; }
+
+/* 07/11 khuya — tác tử tốc độ đo: «Tiếp tục» ở máy yếu chậm 48 → 184 ms (×6) sau khi nút chính phẳng. Máy yếu: nút chính KHÔNG đổi dáng khi nhấn / lún
+   (không transform), chỉ giữ màu ⇒ lượt chạm không phải vẽ lại lớp nút. */
+html.may-yeu[data-trong='hs']:not(#_):not(#_) .duo .duo-nut:is([data-lun], :active) { transform: none !important; }

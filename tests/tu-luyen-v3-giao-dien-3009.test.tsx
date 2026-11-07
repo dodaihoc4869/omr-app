@@ -94,7 +94,7 @@ describe('Chấm từng câu', () => {
     expect(goi.length).toBe(1)
     expect(goi[0]!.body).toMatchObject({ luotId: 'tl_abcdef01', qid: 'q1', traLoi: 'B' })
     expect(screen.getByText('Đúng')).toBeTruthy()
-    expect(screen.getByText(/Chọn B vì ester no đơn chức/)).toBeTruthy()
+    expect(await screen.findByText(/Chọn B vì ester no đơn chức/)).toBeTruthy() // lời giải tải lười (React.lazy, #786) ⇒ chờ
     expect(screen.getByRole('button', { name: 'Câu tiếp' })).toBeTruthy()
     expect(screen.getAllByRole('button', { name: 'Kiểm tra câu này' }).length).toBe(1) // câu 2 chưa chấm, chưa lộ gì
     expect(document.querySelector('#tlu-lam-q2')!.textContent).not.toContain('Chọn B')

@@ -35,7 +35,7 @@ describe('index.html: tràn vùng tai thỏ + thanh trạng thái cùng màu n�
     expect(html).toMatch(/<meta name="viewport" content="[^"]*viewport-fit=cover/)
   })
   it('vai hs viết theme-color sáng / tối theo --tr-nen, TRƯỚC thẻ chung', () => {
-    expect(nenToi).toBe('#1a1a29')
+    expect(nenToi).toBe('#131f24') // thầy 07/11: nền tối = snow Duolingo (bảng màu chính thức trong mã duolingo.com)
     const sang = html.indexOf(`media="(prefers-color-scheme: light)" content="${nenSang}"`)
     const toi = html.indexOf(`media="(prefers-color-scheme: dark)" content="${nenToi}"`)
     const chung = html.indexOf('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />') // thẻ chung tĩnh (07/11: nền HS cũng #ffffff ⇒ so đúng thẻ tĩnh)

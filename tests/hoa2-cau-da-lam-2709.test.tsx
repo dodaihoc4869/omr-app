@@ -150,6 +150,7 @@ describe('CauDaLam — theo bản vẽ HS-CauDaLam', () => {
     await screen.findByText(/Thuỷ phân hoàn toàn 8,8 gam/)
     expect(goiTheo('/game-v2/hoa2-cau-chi-tiet')).toHaveLength(1) // đã có chi tiết ⇒ không hỏi lại
     const mo = container.querySelector('.h2-the-mo') as HTMLElement
+    await within(mo).findByText('LỜI GIẢI') // lời giải bọc Kính tải lười (#786) ⇒ chờ
     expect(mo.querySelector('.m3 .loi-giai')).not.toBeNull()
     expect(within(mo).getByText('LỜI GIẢI')).toBeTruthy()
     expect(within(mo).getByText('Kiến thức cốt lõi')).toBeTruthy()

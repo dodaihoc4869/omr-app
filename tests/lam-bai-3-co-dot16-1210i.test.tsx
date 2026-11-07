@@ -96,7 +96,7 @@ describe('ManLamBaiTap theo khổ màn (chỉ đổi chỗ đặt)', () => {
     expect(typeof (duLieu as { msLam: unknown }).msLam).toBe('number')
     expect(container.querySelector('.ht2-lam-khung')?.hasAttribute('data-ket')).toBe(true)
     // lời giải vẫn ở cột đề (bên trái)
-    expect(within(screen.getByRole('main')).getByText(/N liên kết hai gốc/)).toBeTruthy()
+    expect(await within(screen.getByRole('main')).findByText(/N liên kết hai gốc/)).toBeTruthy() // lời giải tải lười (React.lazy, #786) ⇒ chờ
     await waitFor(() => expect(within(phai).getByRole('button', { name: /Kết thúc chặng/ })).toBeTruthy())
     // xong chặng: màn tổng kết giữ bố cục cũ — cột phải chỉ còn nút, không kéo theo phản hồi câu cuối
     fireEvent.click(within(phai).getByRole('button', { name: /Kết thúc chặng/ }))

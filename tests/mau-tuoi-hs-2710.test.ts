@@ -16,9 +16,9 @@ describe('màu tươi app học sinh 27/10', () => {
   const bang = docBang(mau) as { sang: Record<string, string>; toi: Record<string, string> }
 
   // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị» (sáng bằng Duolingo) — khoá đầy đủ ở tests/mau-chat-chi-thi-hs-2710.test.ts
-  it('bảng học sinh là bộ B «Chất chỉ thị» (chàm + lục ngọc), nền tối đêm chàm', () => {
+  it('bảng học sinh là bộ B «Chất chỉ thị» (chàm + lục ngọc), nền tối xanh than Duolingo (thầy 07/11)', () => {
     expect(bang.sang).toMatchObject({ '--tr-hs-nut': '#584dff', '--tr-hs-go': '#3f00dc', '--tr-dung': '#00d396', '--tr-nen': '#ffffff', '--tr-mat': '#ffffff' }) // 07/11 v2 thầy chốt «tươi hết mức»: chàm điện, nền trắng
-    expect(bang.toi).toMatchObject({ '--tr-nen': '#1a1a29', '--tr-mat': '#262738', '--tr-chu': '#f1f0ff' })
+    expect(bang.toi).toMatchObject({ '--tr-nen': '#131f24', '--tr-mat': '#202f36', '--tr-chu': '#f1f7fb' }) // thầy 07/11: snow / polar / eel tối chính thức của Duolingo
   })
 
   it.each(['sang', 'toi'] as const)('mọi cặp chữ/nền đạt ngưỡng tương phản (%s)', (che) => {
