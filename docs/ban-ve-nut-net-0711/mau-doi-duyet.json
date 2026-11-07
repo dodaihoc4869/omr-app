@@ -355,6 +355,18 @@
    "khai": "--tr-vien-2: #52536a",
    "n": 1,
    "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong-chang-ngang.css",
+   "khai": "--cn-le: max(20px, calc((100% - var(--cn-rong)) / 2))",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt bố cục khổ rộng (một cột giữa kiểu Duolingo, docs/ban-ve-bo-cuc-rong-0711): bỏ lề hai cột"
+  },
+  {
+   "tep": "src/styles/trong-chang-ngang.css",
+   "khai": "--cn-le: max(24px, calc((100% - var(--cn-rong)) / 2))",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt bố cục khổ rộng (một cột giữa kiểu Duolingo, docs/ban-ve-bo-cuc-rong-0711): bỏ lề hai cột"
   }
  ]
 }

@@ -130,13 +130,13 @@ describe('tờ trong-chang-ngang.css — chỉ màn làm chặng, chỉ ngang / 
     expect(k).toMatch(/\[data-ket\] :is\(\.duo-cot-de, \.duo-than > \.duo-cuon\[data-cot='de'\]\) \{ grid-row: 2 \/ 4; \}/)
     expect(k).toMatch(/> \.duo-day\.duo-ket \{[^}]*grid-column: 1 \/ -1; grid-row: 4;/)
   })
-  it('máy tính: bề rộng tổng tối đa 1240px căn giữa, cột đề rộng hơn (dòng đề 60–70 ký tự), thẻ kết quả ở cột phải; lời giải tấm bên phải không phủ đề', () => {
+  it('máy tính / Fold / máy tính bảng (cao > 500): MỘT CỘT GIỮA kiểu Duolingo (thầy chốt 07/11) — hàng trên ≤ 1080, cột ≤ 660, dải đáy cố định «Trợ giúp» trái · «Kiểm tra» 240px phải, kết quả = dải full màn; lời giải tấm bên phải không phủ đề', () => {
     const s = boChu(CSS)
-    expect(s).toContain('--cn-rong: 1240px; --cn-le: max(20px, calc((100% - var(--cn-rong)) / 2));')
-    expect(s).toContain('--cn-le: max(24px, calc((100% - var(--cn-rong)) / 2));')
-    expect(s).toContain('grid-template-columns: minmax(0, 1.32fr) minmax(340px, 1fr);')
-    expect(s).toMatch(/\[data-hai-cot\]:not\(\[data-xong\]\) \.duo-cot-de \.ht2-lam-de-chu \{ font-size: 19px; line-height: 1\.6; \}/)
-    expect(s).toMatch(/> \.duo-day\.duo-ket \{[^}]*max-height: 52dvh;[^}]*border-radius: 20px;/)
+    expect(s).toContain('--cn-hang: min(1080px, calc(100% - 64px)); --cn-cot: min(660px, calc(100% - 48px));')
+    expect(s).toMatch(/> \.duo-day \{[^}]*position: fixed !important;/)
+    expect(s).toMatch(/> \.duo-day:not\(\.duo-ket\) \.duo-nut \{ width: 240px !important;/)
+    expect(s).toMatch(/\.duo-lenh > \.duo-tg \{ position: fixed;/)
+    expect(s).toMatch(/padding: 0 var\(--gyc-cot-phai, 0px\)/)
     expect(s).toMatch(/\.duo-lg \{ justify-content: flex-end;[^}]*pointer-events: none; \}/)
   })
   it('phương trình dài giữ ô cuộn ngang `.ct-dai` (không bẻ dòng) — chỉ thêm thanh mảnh + bóng mép', () => {
