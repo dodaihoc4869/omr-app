@@ -1,6 +1,7 @@
 // GIAO DIỆN «TRONG» · APP HỌC SINH — phần trình bày RIÊNG của bản vẽ thầy chốt 26/10 (ve-moi/hs-mot-trang*.html, hs-menu-phai.html; từ 26/10 tối: ve-moi/dm-*.html —
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
+import { ChuNutChinh, ViecTrong } from './nut-chinh-chu'
 import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
@@ -1139,7 +1140,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
           cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
-      {dauKinh(<><p>{ngayTuan()}{hs?.lop ? ` · ${hs.lop}` : ''}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
+      {dauKinh(<><p>{ngayTuan()}{hs?.lop ? <span className="kb-lop">{hs.lop}</span> : null}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
       <section className="kb-hero" data-du={duNgay || undefined} aria-label={`Tổng câu hôm nay${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>
         {loiLuaBi && <LoiBi key={`g${loiLuaBi[2]}`} cam={loiLuaBi[0]} loi={loiLuaBi[1]} cap={capLua} chanNgon={!!cn} goc />}
@@ -1178,11 +1179,12 @@ export function MotTrangHs(p: PropsMotTrang) {
       {(() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d) return null; const Ic = HINH_NUT[d.loai]
         return <button type="button" className="kb-cta" data-sac={SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
-          <span className="kb-giua"><b>{(() => { const v = d.bong ?? d.pop.nut!.chu, t = d.loai === 'hoc' ? tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu; return v === t ? t : `${v} · ${t}` })()}</b><span className="kb-phu">{d.loai === 'hoc' ? `${p.tenBai || 'Bài học hôm nay'} · ${phuDong(d).replace(/^.*· (còn \d+ câu)$/, '$1')}` : phuDong(d)}</span></span>
+          <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? p.tenBai || 'Bài học hôm nay' : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
       </div><div className="kb-cot-phai">
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
         <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
+      {so && !p.dangTai && !nut.length && <ViecTrong />}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {!(!so && p.dangTai) && <TheRuong ds={nut} token={p.token} tq={tq} onNhiemVu={() => moTp('nhiem-vu')} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
