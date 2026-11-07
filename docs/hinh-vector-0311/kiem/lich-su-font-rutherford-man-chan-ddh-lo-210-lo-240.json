@@ -1,0 +1,55 @@
+{
+  "lyDo": "Lịch sử theo font đậm cũ;không dùng duyệt hash mới",
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "d7d6b30fb98395619e62647c471feaf5ed2368c8",
+  "metadata": [
+    {
+      "i": 131,
+      "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+      "fileNguon": "anh/17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4.png",
+      "svg": "rutherford-man-chan-ddh-a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636.svg",
+      "hashSvg": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636",
+      "byteSvg": 83109,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "10-C1-B1-I-58",
+          "de": "Quan sát hình vẽ sau mô tả thí nghiệm tìm ra hạt nhân nguyên tử vào năm 1911 của nhà vật lí người New Zealand là E. Rutherford.\nHãy cho biết phát biểu đúng?",
+          "refs": [
+            {
+              "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+              "where": "10-C1-B1-I-58.hinh.0.du_lieu",
+              "hashDataUrl": "881d6728218caf6e181c980526e2fb8e66bc16d3ed813ac7995a7bdf213b286e"
+            }
+          ]
+        },
+        {
+          "qid": "DB-10-B1-D1-I-47",
+          "de": "Quan sát hình vẽ sau mô tả thí nghiệm tìm ra hạt nhân nguyên tử vào năm 1911 của nhà vật lí người New Zealand là E. Rutherford.\nHãy cho biết phát biểu đúng?",
+          "refs": [
+            {
+              "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+              "where": "DB-10-B1-D1-I-47.hinh.0.du_lieu",
+              "hashDataUrl": "881d6728218caf6e181c980526e2fb8e66bc16d3ed813ac7995a7bdf213b286e"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "Open3Dscreen/Pb3faces-sourcehole/graygoldfoil/incidentbeam+4rayheads/alllabels-leaders/captiondam/internalgradients/DDHpath.",
+      "hashSvgDaSoat": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 131,
+      "hashSvg": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở source131native/full+rayzoom3x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-210-fresh.png). Giữ4scatterheadsONLY(1back,1upperright,1right,1lowerright),ONEincidentline/noarrowhead/NOroundenddot;scatterraysmaskedbehindgrayfoilquad,incidentvisibleintocentralfoil đúngsource. Pbblock3faces/ellipticalsourcehole/graydotkhôngdiamond;screenopening/frontwallocclusionđúng,khôngalias24/1935heads+dot/goldfoil. AllVietnamese labels/leaders/captiongiữwordingalpha,nofictitiouscharges/particles. Nguồn hạt alpha/Chùm hạt alphaanchorendmới cógapsleaderscreen;DDHcaptionđậmthật/path tựchứa khôngfallback/text/image,mọinhãnkhôngcắt/tràn/chạm. ExactSHA256hiệntạikhớpmetadata,khôngchọn446bcũ. Khôngchứngnhậnsource119chưarõcùnglô.",
+      "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
+      "hashSvgDaSoat": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636"
+    }
+  ]
+}

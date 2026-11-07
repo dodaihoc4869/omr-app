@@ -3,9 +3,9 @@
     "i": 142,
     "hash": "191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577",
     "fileNguon": "anh/191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577.png",
-    "svg": "zn-cu-khoa-x-ddh-83b29b279b875fb9d70c1c89aff7fe0c188b9d6f51ed9cd05dc1b6962eacbf27.svg",
-    "hashSvg": "83b29b279b875fb9d70c1c89aff7fe0c188b9d6f51ed9cd05dc1b6962eacbf27",
-    "byteSvg": 14243,
+    "svg": "zn-cu-khoa-x-ddh-d5fb047a577a2495d0f8ab9834851451399b97b4ed5921b06f74383564773731.svg",
+    "hashSvg": "d5fb047a577a2495d0f8ab9834851451399b97b4ed5921b06f74383564773731",
+    "byteSvg": 14188,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -23,7 +23,9 @@
       }
     ],
     "ghiChuDung": "Zn-Cu2electrodes/Ubeaker/horizontalliquidpattern/curvedwire/circlecrossswitch/KhóaX-dungdịchH2SO4/leader/nocharge-bubblesadded/DDHpath.",
-    "hashSvgDaSoat": "83b29b279b875fb9d70c1c89aff7fe0c188b9d6f51ed9cd05dc1b6962eacbf27",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "d5fb047a577a2495d0f8ab9834851451399b97b4ed5921b06f74383564773731",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "8da95ae11ffa751f59eb581f851aabbb19ba3c42"
   }
 ]

@@ -1,0 +1,57 @@
+{
+  "lyDo": "Lịch sử theo font đậm cũ;không dùng duyệt hash mới",
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "d7d6b30fb98395619e62647c471feaf5ed2368c8",
+  "metadata": [
+    {
+      "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+      "mime": "image/png",
+      "bytes": 26080,
+      "i": 65,
+      "questions": [
+        {
+          "qid": "12-KT-C2-D2-II-3",
+          "de": "Tiến hành thí nghiệm thuỷ phân cellulose (bông) bằng dung dịch acid H₂SO₄ 70% như hình mô tả sau đây. Dung dịch Y có chứa hỗn hợp các monosaccharide, disaccharide, trisaccharide,… do phản ứng thuỷ phân xảy ra chưa hoàn toàn.",
+          "refs": [
+            {
+              "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+              "where": "12-KT-C2-D2-II-3.hinh.0.du_lieu",
+              "hashDataUrl": "df246153454600191543331a6ec3b3de65c4027bf81fcbb885233194fc09e33f"
+            }
+          ]
+        },
+        {
+          "qid": "DB-12-B6-D1-II-47",
+          "de": "Tiến hành thí nghiệm thuỷ phân cellulose (bông) bằng dung dịch acid H₂SO₄ 70% như hình mô tả sau đây. Dung dịch Y có chứa hỗn hợp các monosaccharide, disaccharide, trisaccharide,… do phản ứng thuỷ phân xảy ra chưa hoàn toàn.",
+          "refs": [
+            {
+              "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+              "where": "DB-12-B6-D1-II-47.hinh.0.du_lieu",
+              "hashDataUrl": "df246153454600191543331a6ec3b3de65c4027bf81fcbb885233194fc09e33f"
+            }
+          ]
+        }
+      ],
+      "svg": "thuy-phan-cellulose-ddh-f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d.svg",
+      "hashSvg": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d",
+      "byteSvg": 104386,
+      "fileNguon": "anh/0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b.png",
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "3beakers/openmouth/liquidtexture/rod/cotton/2stirarrowheads/4leaders/alllabels/3captions/H2SO470%/X-Ytruebold/NaHCO3/DDHpath.",
+      "hashSvgDaSoat": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 65,
+      "hashSvg": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở native/full+firstzoom5x/2publicstemsrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-201-fresh.png). Đủ3openbeakers/liquidlevels/dashtexturegray,rod2wallroundtop dài/cottonwhitelobed/2headstirellipseđúngsource;khônggántexturethànhparticlecount/bubbleshayreactiondata. Đúngalllabels+leaderskhuấy nhẹ,bông,dung dịch H₂SO₄ 70%,dung dịch đồng nhất(dung dịch X),dung dịch Y;X/YDDHđậm thật. Đủcaptions(a)Sơ đồ tiến hành thí nghiệm,(b)Dung dịch thu được sau khi thủy phân,(c)Trung hòa acid trong dung dịch sau khi thủy phân bằng NaHCO₃. Allsubscripts/period/sourcewordinggiữ,khôngthêmamounts/catalyst/đápán. DDHpath tựchứa khôngfallback/text/image,glyph/leaders/walls khôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata.",
+      "hash": "0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b",
+      "hashSvgDaSoat": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d"
+    }
+  ]
+}

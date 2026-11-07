@@ -1,0 +1,233 @@
+{
+  "i": 494,
+  "hash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377.png",
+  "nativeSize": [
+    647,
+    429
+  ],
+  "reviewed": [
+    "nativefull2x",
+    "power4x",
+    "eachbulb4x"
+  ],
+  "questions": [
+    {
+      "qid": "11-C1-B2-D1-II-5",
+      "maDe": "11-C1-B2-D1",
+      "de": "Chuẩn bị ba cốc: cốc (1) đựng dung dịch HCl 0,1M, cốc (2) đựng dung dịch CH₃COOH 0,1M, cốc (3) đựng nước nguyên chất và lắp bộ dụng cụ như hình dưới đây. Nối các đầu dây dẫn điện với cùng một nguồn điện.",
+      "hinh": [
+        {
+          "hash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377",
+          "where": "11-C1-B2-D1-II-5.hinh.0.du_lieu",
+          "hashDataUrl": "e2c3d22dc74a8fd17e2d6053e0f4902d114491c69c89cee0ccab521a2c351c51"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B2-D2-II-54",
+      "maDe": "DB-11-B2-D2",
+      "de": "Chuẩn bị ba cốc: cốc (1) đựng dung dịch HCl 0,1M, cốc (2) đựng dung dịch CH₃COOH 0,1M, cốc (3) đựng nước nguyên chất và lắp bộ dụng cụ như hình dưới đây. Nối các đầu dây dẫn điện với cùng một nguồn điện.",
+      "hinh": [
+        {
+          "hash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377",
+          "where": "DB-11-B2-D2-II-54.hinh.0.du_lieu",
+          "hashDataUrl": "e2c3d22dc74a8fd17e2d6053e0f4902d114491c69c89cee0ccab521a2c351c51"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "classification": "grayscale laboratory schematic, not photo; source raster shading does not encode brightness differences",
+    "power": {
+      "frontPolygon": [
+        [
+          275,
+          81
+        ],
+        [
+          426,
+          94
+        ],
+        [
+          426,
+          149
+        ],
+        [
+          275,
+          130
+        ]
+      ],
+      "topPolygon": [
+        [
+          275,
+          81
+        ],
+        [
+          324,
+          74
+        ],
+        [
+          466,
+          84
+        ],
+        [
+          426,
+          94
+        ]
+      ],
+      "sidePolygon": [
+        [
+          426,
+          94
+        ],
+        [
+          466,
+          84
+        ],
+        [
+          466,
+          136
+        ],
+        [
+          426,
+          149
+        ]
+      ],
+      "shading": "front light-midgray,side darkergray,topnearwhite",
+      "terminals": [
+        [
+          286,
+          108
+        ],
+        [
+          300,
+          109
+        ],
+        [
+          343,
+          113
+        ],
+        [
+          356,
+          115
+        ],
+        [
+          402,
+          120
+        ],
+        [
+          416,
+          122
+        ]
+      ],
+      "terminalCount": 6,
+      "pairs": 3,
+      "label": "Nguồn điện",
+      "labelNear": [
+        458,
+        48
+      ],
+      "labelLeader": "thin line from~425,73 to~386,86 on topface; no arrowhead",
+      "noPrintedPolarity": true
+    },
+    "cups": [
+      {
+        "i": 1,
+        "centerX": 128,
+        "lidY": 226,
+        "baseY": 347,
+        "bulbCenter": [
+          105,
+          181
+        ],
+        "electrodeX": [
+          141,
+          161
+        ],
+        "caption": "(1)",
+        "captionNear": [
+          129,
+          375
+        ]
+      },
+      {
+        "i": 2,
+        "centerX": 310,
+        "lidY": 226,
+        "baseY": 347,
+        "bulbCenter": [
+          287,
+          181
+        ],
+        "electrodeX": [
+          323,
+          343
+        ],
+        "caption": "(2)",
+        "captionNear": [
+          310,
+          375
+        ]
+      },
+      {
+        "i": 3,
+        "centerX": 490,
+        "lidY": 226,
+        "baseY": 347,
+        "bulbCenter": [
+          466,
+          181
+        ],
+        "electrodeX": [
+          504,
+          524
+        ],
+        "caption": "(3)",
+        "captionNear": [
+          491,
+          375
+        ]
+      }
+    ],
+    "cupStyle": "three cylindrical open-wall outlines under oval double-rim lid, elliptic liquid surface at~262,baseoval at~335; rear lowerbase arcs lightly dashed/occluded; no volumetric numbers/tickmarks",
+    "electrodes": "two gray vertical rods each cup, lid terminals~208..226; rods belowlid~246..329,flat roundedbottom;6total",
+    "bulbs": "3glass bulb pear/oval shells,graycentralcap and narrow vertical U-like white internalstem through darkborder tobase; rounddoubleellipse socket; no added coil/rays/brightness distinction. Preserve visible stem, do not invent wire loops inside glass.",
+    "localWires": "Each bulbbase right contact loops up/right then down to LEFT electrode lidterminal. Source left bulb contact also short curved exteriorstroke left ofglass; rightbulb has similar shortleftstroke.",
+    "powerWires": [
+      {
+        "pair": "left286/300",
+        "to": "cup1",
+        "paths": "one smooth longwire fromleftport to~270,140 through~180,169 endingglassside~121,177;other fromrightport via~262,159→205,203→170,202→163,208/right electrode"
+      },
+      {
+        "pair": "middle343/356",
+        "to": "cup2",
+        "paths": "one from343,118 down~342,146 then352,166 curvestobulbside~294,199;other356,119→350,146→371,177→369,189→344,193→343,207/right electrode"
+      },
+      {
+        "pair": "right402/416",
+        "to": "cup3",
+        "paths": "one402,125 verticalto402,177 curve right to440,199 thenbulbbaseleft~449,202;other416,126→423,165→445,181 endsnearleftglassside withsmallvisiblegap. Additional upperrightglass~485,189 segment→523,193→524,208/right electrode appears separate in source; do NOT force continuity acrossglass by theory."
+      }
+    ],
+    "wireCaution": "Literal crossing/occlusion and gaps near bulbglass vary perpanel; source isnot idealized connection diagram. Preserve sourcevisible lines rather than rewiring for theory.",
+    "noExtra": [
+      "NoHCl/CH3COOH/water labels in image",
+      "No signs+/−,brightnessglows,rays,voltages,ticks",
+      "No alias318 missing3Dpowerbox",
+      "No caption beyondNguồn điện and(1)(2)(3)"
+    ]
+  },
+  "status": "Đạt exact finalSVG sauactualreview",
+  "actualReview": {
+    "i": 494,
+    "hashSvg": "cceeae07e9a81af1f095ab1900945fef1083e9d58cf816320486962072f99354",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact final SVG3x mở actualFULL; mở lại nativeFULL2x/power4x/eachbulb4x cùng hai publicrefs/stems.3Dpowerbox/6ports/3pairs/3cups6rods3bulbsUstem/shading/ellipses/dashedrearbase đúng;pair402 đếnbulb3leftbase,pair416 đếnnearleftglassGAP vàseparaterightglass485189→rightrod giữ literal,không nối theo theory. TitleNguồnđiện24/leadernohead/(1)(2)(3)/cup3center490-bulb466 đúnglayout. Không thêmrays/brightness/polarity/ticks/chemical labels;không chữ/nét chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 18081,
+    "render": "/workspace/scratch/circuit494-240-cceeae07-chromium.png",
+    "sourceHash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377"
+  }
+}

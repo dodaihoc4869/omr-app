@@ -86,15 +86,16 @@
         ]
       }
     ],
-    "svg": "so-do-hop-chat-ddh-85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258.svg",
-    "hashSvg": "85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258",
-    "byteSvg": 49815,
+    "svg": "so-do-hop-chat-ddh-cae8485459235345da7e7975e7f182a0134c44a0659a94800904e073c54ded3f.svg",
+    "hashSvg": "cae8485459235345da7e7975e7f182a0134c44a0659a94800904e073c54ded3f",
+    "byteSvg": 49785,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữ7box/5arrow/nhánhgấpvuông/haiđầuvàonút5/5label/4điềukiện,tấtcảX/T/Y/Q/Zlàbiếnkhônggiảitên. Giữ(g)/(s)/(l),nềnmàu.",
-    "hashSvgDaSoat": "85905b07c962dd4bf3f9c01f31e3050b90ef66a8ebecc620f27675c0a9ec4258",
-    "nguoiSoat": "soat_hinh_vector"
+    "hashSvgDaSoat": "cae8485459235345da7e7975e7f182a0134c44a0659a94800904e073c54ded3f",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "8da95ae11ffa751f59eb581f851aabbb19ba3c42"
   }
 ]

@@ -1,0 +1,41 @@
+[
+  {
+    "i": 494,
+    "hash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377",
+    "fileNguon": "anh/5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377.png",
+    "svg": "ba-coc-nguon-dien-ddh-cceeae07e9a81af1f095ab1900945fef1083e9d58cf816320486962072f99354.svg",
+    "hashSvg": "cceeae07e9a81af1f095ab1900945fef1083e9d58cf816320486962072f99354",
+    "byteSvg": 18081,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C1-B2-D1-II-5",
+        "de": "Chuẩn bị ba cốc: cốc (1) đựng dung dịch HCl 0,1M, cốc (2) đựng dung dịch CH₃COOH 0,1M, cốc (3) đựng nước nguyên chất và lắp bộ dụng cụ như hình dưới đây. Nối các đầu dây dẫn điện với cùng một nguồn điện.",
+        "refs": [
+          {
+            "hash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377",
+            "where": "11-C1-B2-D1-II-5.hinh.0.du_lieu",
+            "hashDataUrl": "e2c3d22dc74a8fd17e2d6053e0f4902d114491c69c89cee0ccab521a2c351c51"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B2-D2-II-54",
+        "de": "Chuẩn bị ba cốc: cốc (1) đựng dung dịch HCl 0,1M, cốc (2) đựng dung dịch CH₃COOH 0,1M, cốc (3) đựng nước nguyên chất và lắp bộ dụng cụ như hình dưới đây. Nối các đầu dây dẫn điện với cùng một nguồn điện.",
+        "refs": [
+          {
+            "hash": "5b7a52e2077e567f8d44896203f009a6e91ab34a97c5faa6f5b641b42edb3377",
+            "where": "DB-11-B2-D2-II-54.hinh.0.du_lieu",
+            "hashDataUrl": "e2c3d22dc74a8fd17e2d6053e0f4902d114491c69c89cee0ccab521a2c351c51"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3Dpowerbox6terminals/3cups6rods3bulbs/Ustems/3localwireloops/literalrightbulbwiregaps/4labelsDDHpath/noaddedbrightness-rays-ions-polarity-ticks/hiddenbasearcnotparticlecount.",
+    "hashSvgDaSoat": "cceeae07e9a81af1f095ab1900945fef1083e9d58cf816320486962072f99354",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

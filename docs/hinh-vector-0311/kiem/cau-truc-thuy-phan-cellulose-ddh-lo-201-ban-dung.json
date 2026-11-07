@@ -28,15 +28,17 @@
         ]
       }
     ],
-    "svg": "thuy-phan-cellulose-ddh-f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d.svg",
-    "hashSvg": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d",
-    "byteSvg": 104386,
+    "svg": "thuy-phan-cellulose-ddh-ad5dfea032f3f11bf5e0aac0b7e0a8cd57a087c0d23a4c770363607e1e5d59e4.svg",
+    "hashSvg": "ad5dfea032f3f11bf5e0aac0b7e0a8cd57a087c0d23a4c770363607e1e5d59e4",
+    "byteSvg": 104394,
     "fileNguon": "anh/0c9ac40930023c578717a5301c9151b16ee54b44ac31b1cb2cad629e5c659c9b.png",
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "3beakers/openmouth/liquidtexture/rod/cotton/2stirarrowheads/4leaders/alllabels/3captions/H2SO470%/X-Ytruebold/NaHCO3/DDHpath.",
-    "hashSvgDaSoat": "f2cce413b6df7bb6d9b5e794dc991cba6281b9a1ecdee9fb0d91ff523e51d00d",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "ad5dfea032f3f11bf5e0aac0b7e0a8cd57a087c0d23a4c770363607e1e5d59e4",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "8da95ae11ffa751f59eb581f851aabbb19ba3c42"
   }
 ]

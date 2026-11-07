@@ -3,9 +3,9 @@
     "i": 131,
     "hash": "17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4",
     "fileNguon": "anh/17db6ed26194b54f495bf9caca1ecb1044fe47c1473e63808bfb3d97fcd521a4.png",
-    "svg": "rutherford-man-chan-ddh-a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636.svg",
-    "hashSvg": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636",
-    "byteSvg": 83109,
+    "svg": "rutherford-man-chan-ddh-4fdb77cd89811211ae4f591720ac70155675523dfb1e0abb5ae27dec1dd60193.svg",
+    "hashSvg": "4fdb77cd89811211ae4f591720ac70155675523dfb1e0abb5ae27dec1dd60193",
+    "byteSvg": 83328,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "Open3Dscreen/Pb3faces-sourcehole/graygoldfoil/incidentbeam+4rayheads/alllabels-leaders/captiondam/internalgradients/DDHpath.",
-    "hashSvgDaSoat": "a023e5fcd17044b64865c3bdcee2f2ca78aeb57fe392a01b55f27376a2fe6636",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "4fdb77cd89811211ae4f591720ac70155675523dfb1e0abb5ae27dec1dd60193",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "8da95ae11ffa751f59eb581f851aabbb19ba3c42"
   }
 ]
