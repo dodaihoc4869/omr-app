@@ -221,7 +221,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const coChu = useMemo(() => {
     let ctx: CanvasRenderingContext2D | null = null
     try { ctx = document.createElement('canvas').getContext('2d') } catch { /* jsdom */ }
-    if (ctx) ctx.font = `800 100px 'DDH Rounded', ${getComputedStyle(document.body).fontFamily || 'sans-serif'}`
+    if (ctx) ctx.font = `800 100px 'Be Vietnam Pro', ${getComputedStyle(document.body).fontFamily || 'sans-serif'}`
     const rong = new Map<string, number>()
     for (const e of hien) { const t = tenGoi.get(e.sbd) ?? ''; rong.set(e.sbd, Math.max(1.4, ...t.split(' ').map((w) => (ctx ? ctx.measureText(w).width / 100 : w.length * 0.62) * 0.97))) }
     const xep = [...rong.values()].sort((a, b) => a - b), p85 = xep[Math.min(xep.length - 1, Math.floor(xep.length * 0.85))] ?? 2
