@@ -44,6 +44,9 @@
    tiêu đề / tên menu chữ thường ≈ 0 (bỏ −.01/−.02em cũ); nút + nhãn IN HOA ≈ .02em (bỏ .04/.05/.06em cũ); đoạn chữ hai dòng: bước dòng / chiều cao
    chữ x = 3,08 ⇒ 1,65 trên phông này (sai số đo ±0,1). Chỉ chữ đề (đoạn nhiều dòng); khổ ngang giữ luật riêng (thấp màn). */
 /* Cỡ chữ theo tỉ lệ Duolingo (chữ thân 17): tiêu đề thẻ 19 (×1,10), tiêu đề lớn 23 (×1,33), nút IN HOA 16, nhãn IN HOA nhỏ 14 (×0,84). */
+/* Đề = phương án = ý đúng–sai cùng cỡ chữ thân Duolingo 17px (thầy 08/11 «cỡ chữ đáp án và đề bằng nhau»), mọi khổ + mọi màn làm câu.
+   !important: thắng các luật cỡ riêng theo khổ (ngang / rộng / hẹp). Phương án SỐ (to, đậm) và chữ dưới hình phương án giữ luật riêng. */
+:root[data-trong='hs'] .ht2-lam :is(.ht2-lam-de-chu, .ht2-lam-pa:not(.duo-tra[data-so] .ht2-lam-pa), .ht2-lam-y-chu) { font-size: 17px !important; }
 :root[data-trong='hs'][data-ht2] .ht2-lam-de-chu.ht2-lam-de-chu { line-height: 1.65; } /* lặp lớp ⇒ thắng luật .duo / .de-gian */
 /* PHÔNG 27/10 · DẤU CHỒNG: ĐĐH Rounded (như M PLUS gốc) có dấu chồng chữ hoa cao (Ổ đỉnh 1,06 em) và chân chữ sâu (g, ặ −0,23 em) ⇒ tiêu đề CÓ THỂ xuống hàng mà giãn
    dòng < 1,3 thì dấu dòng dưới chạm chân chữ dòng trên (đo mực hai dòng, phông 700 và 800: 1,25 còn chạm «gậy ặ ợ / Ỗ Ổ Ở Ữ», 1,3 hết chạm).
