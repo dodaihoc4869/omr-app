@@ -31,6 +31,10 @@ const diemDoi = (v: ViewBang, d: number) => v.ds.reduce((s, e) => s + (e.doi ===
 const xepDoi = (v: ViewBang) => dsDoi(v).map((d) => { const coMat = v.ds.filter((e) => e.doi === d && e.vao).length, tong = diemDoi(v, d); return { d, tong, tb: coMat ? tong / coMat : tong } }).sort((a, b) => b.tong - a.tong || b.tb - a.tb)
 
 /** Vị trí tâm ô thứ i trên sân khấu. */
+/** Ống «chibi» (thầy 07/11 «ống thí nghiệm làm ngắn lại, chibi hơn»): miệng 300 → đáy 590 (cũ 150 → 640), rộng 104. Nhãn dưới đáy. */
+const ONG_GON = { top: 300, day: 590 }
+const HANG_DS = [{ top: 150, day: 350 }, { top: 425, day: 625 }] as const
+const X_DS = (i: number) => 1340 + i * 140
 function viTriO(i: number, L: Luoi) { return { x: TRAI_LUOI + (i % L.cot) * (L.w + KHE) + L.w / 2, y: L.top + Math.floor(i / L.cot) * (L.h + KHE) + L.h / 2 } }
 
 function Ngoc({ mau, chu }: { mau: string; chu?: string }) {
@@ -558,10 +562,6 @@ function dungOng(l: NonNullable<ViewBang['luot']>, vb: VeBang): OngVe[] {
   const nhom = nhomTln(l), max = Math.max(1, ...nhom.map((x) => x.dem))
   return nhom.map((x, i) => ({ x: 1300 + i * 152, w: 104, mau: mauPa[i]!, dung: x.dung, h: x.dem / max, ...ONG_GON }))
 }
-/** Ống «chibi» (thầy 07/11 «ống thí nghiệm làm ngắn lại, chibi hơn»): miệng 300 → đáy 590 (cũ 150 → 640), rộng 104. Nhãn dưới đáy. */
-const ONG_GON = { top: 300, day: 590 }
-const HANG_DS = [{ top: 150, day: 350 }, { top: 425, day: 625 }] as const
-const X_DS = (i: number) => 1340 + i * 140
 function nhomTln(l: NonNullable<ViewBang['luot']>) {
   const dem = new Map<string, number>(), kq = l.ketQua ?? {}
   let soDung = 0

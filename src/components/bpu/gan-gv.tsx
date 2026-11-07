@@ -96,8 +96,9 @@ let choGiai: ((html: string) => void) | null = null
 export function layGiai(): Promise<string> {
   choGiai?.('')
   return new Promise((xong) => {
-    const h = setTimeout(() => { if (choGiai === tra) choGiai = null; xong('') }, 1500)
+    let h: ReturnType<typeof setTimeout> | undefined
     const tra = (html: string) => { clearTimeout(h); xong(html) }
+    h = setTimeout(() => { if (choGiai === tra) choGiai = null; xong('') }, 1500)
     choGiai = tra
     try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'lay-giai' }, '*') } catch { tra('') }
   })

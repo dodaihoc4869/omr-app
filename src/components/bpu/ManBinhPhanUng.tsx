@@ -64,7 +64,6 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const chuaMo = useRef(false)
   const soLuot = v?.luot?.so ?? 0
   const [LC, setLC] = useState<MangChang | null>(null)
-  const [LG, setLG] = useState<LoiGiaiCauKieu | null>(null)
   useEffect(() => { let huy = false; void import('../hoc-tap/ManLamBaiTap').then((m) => { if (!huy) setLC(m.PHAN_CAU_CHANG) }).catch(() => {}); return () => { huy = true } }, [])
 
   const gui = useCallback((t: Tin) => {
@@ -116,9 +115,6 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, buoiId])
 
-  // Mở đáp án ⇒ nạp khối lời giải thu gọn của màn làm bài (mảnh LamCau — đã nạp cùng phương án).
-  const moDa = v?.luot?.pha === 'mo'
-  useEffect(() => { if (!moDa || LG) return; let huy = false; void import('../hoc-tap/LamCau').then((m) => { if (!huy) setLG(() => m.LoiGiaiCau as unknown as LoiGiaiCauKieu) }).catch(() => {}); return () => { huy = true } }, [moDa, LG])
   // Lượt mới ⇒ xoá lựa chọn cũ.
   useEffect(() => { if (soLuot !== luotChon.current) { luotChon.current = soLuot; setChon(''); setBaoTra('') } }, [soLuot])
   // Đang ẩn (giữ nối) mà thầy mở lượt mới ⇒ hiện ngay — trừ khi em đang thi / ở phòng chờ / làm kiểm tra cá nhân.
@@ -232,9 +228,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={daGui || daMo || hetGio} />
           : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={daGui || daMo || hetGio} />
           : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!daGui && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
-        {daMo && !l.tuLuan && l.dung && LG ? (
+        {daMo && !l.tuLuan && l.dung && LC ? (
           <div className="bpu-loi-giai"><Suspense fallback={<div aria-busy="true" style={{ minHeight: 120 }} />}>
-            <LoiGiaiKinhHs qid={String(l.qid ?? q.qid)} phan={l.phan} choices={q.choices} ideas={q.ideas} dapAn={l.dung} em={chonHien || undefined} duPhong={<LG q={q} solution={l.giai?.solution ?? null} dapAn={l.dung} hinhLoiGiai={(l.giai?.anh ?? []) as Question['hinhAnh']} />} />
+            <LoiGiaiKinhHs qid={String(l.qid ?? q.qid)} phan={l.phan} choices={q.choices} ideas={q.ideas} dapAn={l.dung} em={chonHien || undefined} duPhong={<LoiGiaiDuPhong LG={LC.LoiGiaiCau as unknown as LoiGiaiCauKieu} q={q} solution={l.giai?.solution ?? null} dapAn={l.dung} hinhLoiGiai={(l.giai?.anh ?? []) as Question['hinhAnh']} />} />
           </Suspense></div>
         ) : null}
         {baoTra ? <div className="bpu-bao" role="status">{baoTra}</div> : null}
@@ -272,3 +268,6 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     document.body,
   )
 }
+
+/** Lời giải thu gọn (dự phòng khi câu chưa có bản Kính) — khối `LoiGiaiCau` lấy qua mảnh chặng đã nạp (không tách mảnh mới ⇒ precache không phình). */
+function LoiGiaiDuPhong({ LG, ...p }: { LG: LoiGiaiCauKieu; q: Question; solution: unknown; dapAn: string; hinhLoiGiai?: Question['hinhAnh'] }) { return <LG {...p} /> }

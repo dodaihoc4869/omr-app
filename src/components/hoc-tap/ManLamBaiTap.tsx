@@ -1396,4 +1396,4 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
 // Bình Phản Ứng (06/11) dùng lại phần hiện câu của chặng QUA mảnh này, nạp động (một hằng của chính mảnh — KHÔNG `export … from`, vì tái xuất làm bộ đóng
 // gói chia lại mảnh dùng chung ⇒ thêm tệp precache + byte mở).
 // oxlint-disable-next-line react/only-export-components
-export const PHAN_CAU_CHANG = { DeCau, ChonTracNghiem, ChonDungSai, OTraLoiNgan, ChemText }
+export const PHAN_CAU_CHANG = { DeCau, ChonTracNghiem, ChonDungSai, OTraLoiNgan, ChemText, LoiGiaiCau }
