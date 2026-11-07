@@ -98,6 +98,16 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const [toanMan, setToanMan] = useState(() => typeof document !== 'undefined' && !!document.fullscreenElement)
   useEffect(() => { const doi = () => setToanMan(!!document.fullscreenElement); document.addEventListener('fullscreenchange', doi); return () => document.removeEventListener('fullscreenchange', doi) }, [])
   const doiToanMan = useCallback(() => { try { if (document.fullscreenElement) void document.exitFullscreen?.(); else void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* trình duyệt không hỗ trợ */ } }, [])
+  // TỰ TOÀN MÀN HÌNH (thầy 07/11 «màn này full màn hình luôn, full cả lúc gọi hs lên bảng»): xin ngay khi bảng mở (vừa có thao tác bấm Chiếu / chuyển câu —
+  // trình duyệt chỉ cho trong vài giây sau thao tác); bị từ chối ⇒ lần chạm / bấm phím đầu tiên trên bảng sẽ bật. Mọi màn (trả lời, gọi, làm bảng…) chung một bảng.
+  const xinToanMan = useCallback(() => { try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }, [])
+  useEffect(() => {
+    xinToanMan()
+    const lai = (e: Event) => { if (e instanceof KeyboardEvent && (e.key === 'Escape' || e.key.toLowerCase() === 'f')) return; if (!document.fullscreenElement) xinToanMan() }
+    window.addEventListener('pointerdown', lai, true)
+    window.addEventListener('keydown', lai, true)
+    return () => { window.removeEventListener('pointerdown', lai, true); window.removeEventListener('keydown', lai, true) }
+  }, [xinToanMan])
   const [nay, setNay] = useState(() => Date.now())
   const [toast, setToast] = useState<string | null>(null)
   const [ung, setUng] = useState<{ ds: string[]; soi: string | null } | null>(null)
