@@ -40,7 +40,7 @@ const RA = arg('ra', '')
 const MAY_CHU_MS = Number(arg('may-chu-ms', '60'))
 // Luồng NDJSON (chấm nhanh «Kiểm tra» 28/10): dòng 1 đi sau DONG1_MS, dòng cuối sau MAY_CHU_MS (máy chủ giả: dòng 1 = chấm từ bộ nhớ, dòng cuối = sau các đợt D1).
 const DONG1_MS = Number(arg('dong1-ms', '10'))
-const MAN = { width: 360, height: 740 }
+const _kh = arg('khung', '360x740').split('x').map(Number); const MAN = { width: _kh[0], height: _kh[1] } // --khung=1280x800 (đo khổ rộng)
 const MANG_GIA_DS = {
   // DevTools «Fast 3G» (= «Slow 4G» của Lighthouse): 562,5 ms RTT, 1,44 Mb/s xuống.
   fast3g: { offline: false, latency: 562.5, downloadThroughput: (1.6 * 1024 * 1024 * 0.9) / 8, uploadThroughput: (750 * 1024 * 0.9) / 8 },
@@ -324,7 +324,7 @@ async function trangMoi(ctx, loi) {
   return { p, cdp }
 }
 
-const LO_TRINH = 're=^Học tiếp'
+const LO_TRINH = '.kb-cta' // 07/11: nút chính Hôm nay «Bắt đầu / Học tiếp · Chặng N» (chữ «Học tiếp» khớp nhầm hàng Việc hôm nay ⇒ vào chặng quá giờ)
 const PHUONG_AN = '[role="radio"]'
 const NUT_KIEM = 're=^(Kiểm tra|Nộp câu)'
 const NUT_TIEP = 're=^(Tiếp tục|Câu tiếp theo)$'
@@ -510,7 +510,9 @@ try {
     if (i === 1) await batHoSo(cdp, 'tiep')
     t0 = await bayGio(p)
     await cham(p, NUT_TIEP)
-    const t2 = await (await p.waitForFunction((truoc) => { const s = [...document.querySelectorAll('[role="radio"]')].map((e) => e.textContent).join('|'); return s && s !== truoc ? performance.now() : 0 }, truoc, { polling: 16, timeout: 60000 })).jsonValue()
+    // 07/11: chặng hết câu (dữ liệu giả 6 câu/chặng) ⇒ màn «xong chặng» không còn phương án ⇒ trả -1 và dừng vòng đo (trước: chờ câu thứ 7 tới quá giờ ⇒ cả lượt đo LỖI)
+    const t2 = await (await p.waitForFunction((truoc) => { const s = [...document.querySelectorAll('[role="radio"]')].map((e) => e.textContent).join('|'); if (s && s !== truoc) return performance.now(); return !s && [...document.querySelectorAll('button')].some((b) => /^Học tiếp chặng|^Về Hôm nay/.test(b.textContent.trim())) ? -1 : 0 }, truoc, { polling: 16, timeout: 60000 })).jsonValue()
+    if (t2 < 0) break
     await p.waitForTimeout(800)
     d = await layDo(p)
     if (i === 1) await inHoSo(cdp, 'tiep')

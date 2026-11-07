@@ -85,6 +85,9 @@ export function BungDung({ loai = 'dung', chonO = '.ht2-lam-pa[data-ket=dung], .
   const ref = useRef<HTMLSpanElement>(null)
   useEffect(() => {
     const tam = ref.current?.closest<HTMLElement>('.duo-ket')
+    // 07/11 vòng 2 (thầy duyệt «có rung khi đúng»): rung nhẹ 15 ms MỘT lần khi đúng — rung không phải chuyển động nên không theo «giảm chuyển động»;
+    // máy yếu tắt; máy không có rung (iPhone Safari…) bỏ qua êm.
+    if (tam && loai === 'dung' && !document.documentElement.classList.contains('may-yeu')) { try { navigator.vibrate?.(15) } catch { /* bỏ qua */ } }
     if (!tam || yenLang()) return
     const goc = tam.closest('.ht-app, .duo, main') ?? document
     // Dựng SAU lần vẽ đầu của dải: «Kiểm tra» là sự kiện rời rạc ⇒ React chạy effect NGAY, trước khi trình duyệt vẽ; dựng ~30 mây / hạt + đo bố cục ở đây

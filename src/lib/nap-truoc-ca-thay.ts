@@ -29,7 +29,7 @@ const mangYeu = (): boolean => {
   return !!c && (c.saveData === true || /^(slow-)?2g$/.test(c.effectiveType ?? ''))
 }
 const nghi = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
-const ranh = () => new Promise<void>((r) => { const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback; ric ? ric(() => r(), { timeout: 1500 }) : setTimeout(r, 200) })
+const ranh = () => new Promise<void>((r) => { const ric = (window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback; if (ric) ric(() => r(), { timeout: 1500 }); else setTimeout(r, 200) })
 
 async function napMotCa(ma: string, url: string, mat: string): Promise<boolean> {
   const bankCu = await loadSessionTeacherBank(ma)

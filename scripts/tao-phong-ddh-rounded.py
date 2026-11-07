@@ -289,16 +289,51 @@ def dat_ten(f, k):
   f['head'].fontRevision = 1.0
   if 'post' in f: f['post'].formatType = 3.0
 
-DUOI_A = _json.loads(os.environ.get('DDH_DUOI_A', '''{"Dam":{"x0":455,"y0":52,"x1":522,"y1":92,"r":42,"them":40,"bung":{"cx":262,"cy":172,"rx":124,"ry":98}},"De":{"x0":432,"y0":38,"x1":486,"y1":66,"r":34,"them":30,"bung":{"cx":252,"cy":160,"rx":118,"ry":96}}}'''))  # {"x0":430,"y0":50,"x1":485,"y1":58,"r":50,"them":40} — đuôi hất chân phải chữ «a»
+DUOI_A = _json.loads(os.environ.get('DDH_DUOI_A', '''{"Dam": {"x0": 440, "y0": 46, "x1": 515, "y1": 70, "r": 40, "them": 40, "vong": {"ngoai": [239, 162, 191, 172], "trong": [248, 166, 130, 110], "cat_x": 372, "cat_y": 350}}, "De": {"x0": 426, "y0": 36, "x1": 492, "y1": 52, "r": 36, "them": 30, "vong": {"ngoai": [236, 158, 184, 168], "trong": [252, 160, 136, 110], "cat_x": 388, "cat_y": 345}}}'''))  # {"x0":430,"y0":50,"x1":485,"y1":58,"r":50,"them":40} — đuôi hất chân phải chữ «a»
 DAU = _json.loads(os.environ.get('DDH_DAU', '''{"nang":62,"co":0.85}'''))       # {"nang":60,"co":0.92} — nâng dấu trên (đơn vị) + co chiều cao dấu
 
 def ho_chu(cm, chu):
   """Mọi glyph có chữ gốc `chu` (a, à, á, â, ầ…)."""
   return sorted({n for cp, n in cm.items() if unicodedata.normalize('NFD', chr(cp))[0] == chu})
 
+def dung_lai_a(f, ds, d):
+  """08/11 (thầy «kiểm tra chữ a»): bụng «a» gốc M+ hình lá nghiêng, làm đậm xong thành khối dày + lỗ nhỏ, đuôi như chấm rời. Dựng lại kiểu Duolingo:
+  bỏ bụng cũ (vùng x < cat_x, −60 < y < cat_y — không chạm dấu nặng ạ), thay VÒNG BỤNG bầu dục nét đều bằng nét đứng, đuôi viên thuốc LIỀN chân nét đứng."""
+  import pathops
+  from fontTools.pens.cu2quPen import Cu2QuPen
+  g = f['glyf']; hm = f['hmtx']; v = d['vong']
+  def elip(cx, cy, rx, ry, nguoc=False, N=48):
+    q = pathops.Path(); pen = q.getPen()
+    pts = [(cx + rx * math.cos(2 * math.pi * i / N), cy + ry * math.sin(2 * math.pi * i / N)) for i in range(N)]
+    if nguoc: pts = pts[::-1]
+    pen.moveTo(pts[0])
+    for pt in pts[1:]: pen.lineTo(pt)
+    pen.closePath(); return q
+  def hinh_chu_nhat(xa, ya, xb, yb):
+    q = pathops.Path(); pen = q.getPen(); pen.moveTo((xa, ya)); pen.lineTo((xb, ya)); pen.lineTo((xb, yb)); pen.lineTo((xa, yb)); pen.closePath(); return q
+  cxo, cyo, rxo, ryo = v['ngoai']
+  vai = hinh_chu_nhat(cxo, cyo, v['cat_x'] + 12, cyo + ryo)  # vai phải: mép trên bụng chạy ngang vào nét đứng (không khía)
+  vong = pathops.op(pathops.op(elip(*v['ngoai']), vai, pathops.PathOp.UNION), elip(*v['trong']), pathops.PathOp.DIFFERENCE)
+  x0, y0, x1, y1, rr = d['x0'], d['y0'], d['x1'], d['y1'], d['r']
+  goc = math.atan2(y1 - y0, x1 - x0); N = 14
+  vien = [(x1 + rr * math.cos(goc - math.pi / 2 + math.pi * i / N), y1 + rr * math.sin(goc - math.pi / 2 + math.pi * i / N)) for i in range(N + 1)]
+  vien += [(x0 + rr * math.cos(goc + math.pi / 2 + math.pi * i / N), y0 + rr * math.sin(goc + math.pi / 2 + math.pi * i / N)) for i in range(N + 1)]
+  duoi = pathops.Path(); pen = duoi.getPen(); pen.moveTo(vien[0])
+  for pt in vien[1:]: pen.lineTo(pt)
+  pen.closePath()
+  for n in ds:
+    goc_p = pathops.Path(); g[n].draw(goc_p.getPen(), g)
+    goc_p.simplify(fix_winding=True)
+    con = pathops.op(goc_p, hinh_chu_nhat(-100, -60, v['cat_x'], v['cat_y']), pathops.PathOp.DIFFERENCE)
+    con = pathops.op(con, vong, pathops.PathOp.UNION)
+    con = pathops.op(con, duoi, pathops.PathOp.UNION)
+    tp = TTGlyphPen(g); con.draw(Cu2QuPen(tp, 1.0, reverse_direction=True))
+    g[n] = tp.glyph(); adv, lsb = hm[n]; hm[n] = (adv + d.get('them', 0), lsb)
+
 def them_duoi_a(f, cm, d):
   """Đuôi «a» kiểu Duolingo: nét tròn (viên thuốc) từ chân nét đứng phải hất sang phải, hơi lên; gộp vào chữ (bỏ chồng nét)."""
   g = f['glyf']; hm = f['hmtx']; ds = ho_chu(cm, 'a'); ds = [n for n in ds if not g[n].isComposite()]
+  if d.get('vong'): return dung_lai_a(f, ds, d)
   x0, y0, x1, y1, rr = d['x0'], d['y0'], d['x1'], d['y1'], d['r']
   goc = math.atan2(y1 - y0, x1 - x0); N = 14
   vien = [(x1 + rr * math.cos(goc - math.pi / 2 + math.pi * i / N), y1 + rr * math.sin(goc - math.pi / 2 + math.pi * i / N)) for i in range(N + 1)]

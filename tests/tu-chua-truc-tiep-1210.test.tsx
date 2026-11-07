@@ -111,7 +111,7 @@ describe('Chữa trực tiếp câu gốc khi thiếu bài luyện từng bướ
     // Bước 3: đáp án đúng + lời giải từng bước + đối chiếu lần làm lại
     expect(await screen.findByText('Đáp án đúng')).toBeTruthy()
     expect(screen.getByText('Đáp án đúng').nextSibling?.textContent).toBe('A')
-    expect(screen.getByText(/0,1 × 82/)).toBeTruthy()
+    expect(await screen.findByText(/0,1 × 82/)).toBeTruthy() // lời giải tải lười (React.lazy, #786) ⇒ chờ
     expect(screen.getByText('Lần em tự làm lại').nextSibling?.textContent).toBe('C · chưa đúng')
     fireEvent.click(screen.getAllByRole('button', { name: 'Sang câu khác' })[0]!)
     expect(veNgoai).toHaveBeenCalled()

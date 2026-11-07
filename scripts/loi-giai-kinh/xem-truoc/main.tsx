@@ -45,7 +45,7 @@ const PT = { cotLoi: { congThuc: 'H_2N-CH_2-COOH + C_2H_5OH + HCl → ClH_3N-CH_
 const ban = { ...(mau as unknown[])[i] as object, ...(soCau === 4 ? DP : soCau === 5 ? DD : soCau === 6 ? DT : soCau === 7 ? DPH7 : soCau === 8 ? DPH8 : soCau === 9 ? DPH9 : {}), ...(new URLSearchParams(location.search).get('pt') ? PT : {}), qid: `mau-${i + 1}`, phienBan: 1, phan: d.phan } as unknown as BanKinh
 document.body.style.background = 'var(--tr-nen)'
 // ?hop=1: hộp «Lời giải» của màn làm bài (thanh tiêu đề + nút «Lời giải thu gọn» sát nút đóng); ?mo=1 bấm mở sẵn.
-function Hop() {
+export function Hop() {
   const [khe, setKhe] = useState<HTMLElement | null>(null)
   const cu = <section className="ht2-lam-loi-giai" aria-label="Lời giải"><p>n acid = 12/60 = 0,2 mol; n ethanol = 0,3 mol ⇒ acid hết.</p><p>m ester = 0,2 × 88 × 75% = <b>13,2 gam</b>.</p></section>
   const pt = new URLSearchParams(location.search).get('pt') === '1'
@@ -61,7 +61,7 @@ function Hop() {
   )
 }
 // ?chieu=N: TỜ CHIẾU thật (taoHtmlMayChieu) với bản Kính mẫu N — xem lời giải mới trên máy chiếu (thầy 03/11), bấm sẵn «Hiện lời giải».
-function Chieu() {
+export function Chieu() {
   const [html, setHtml] = useState('')
   useEffect(() => { void (async () => {
     const { taoHtmlMayChieu } = await import('../../../src/lib/html-may-chieu')
