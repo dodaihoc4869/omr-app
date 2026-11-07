@@ -97,7 +97,7 @@ for (const f of fs.readdirSync('vao').filter((x) => x.endsWith('.json') && !x.en
   const luaChon = v.phan === 'I' ? Object.fromEntries((v.y || []).map((y) => [y.id, String(y.t || '').replace(/<[^>]*>/g, ' ')])) : undefined
   const kiemSo = ({ soDo, buoc, ketQua }) => { const k = kiemCong({ qid: v.qid, phienBan: 1, deNoiGi: '', ...(soDo ? { soDo } : {}), buoc, ...(ketQua ? { ketQua } : {}) }, { phan: v.phan, dapAn, ...(luaChon ? { luaChon } : {}) }); return { ok: k.ket === 'dat' || k.ket === 'lo_dap_an', lyDo: k.lyDo } }
   const nguon = { thanChu: THAN_CHU.map((t) => t.chu), thayNoi: muc.flatMap((m) => m.noi || []), meo: muc.map((m) => m.meo).filter(Boolean) }
-  const k = v.tuLuan ? kiemBanKinh(ban, { phan: 'III', dapAn: String(v.dapAn?.kq ?? ''), qid: v.qid, nguon, tuLuan: true }) : kiemBanKinh(ban, { phan: v.phan, dapAn, qid: v.qid, kiemSo, nguon })
+  const k = v.tuLuan ? kiemBanKinh(ban, { phan: 'III', dapAn: String(v.dapAn?.kq ?? ''), qid: v.qid, nguon, tuLuan: true, chatDongPhan: true }) : kiemBanKinh(ban, { phan: v.phan, dapAn, qid: v.qid, kiemSo, nguon, chatDongPhan: true, ...(luaChon ? { luaChon } : {}) })
   if (k.ket === 'dat') dat++
   console.log(f + ': ' + (k.ket === 'dat' ? 'ĐẠT' : k.ket.toUpperCase() + ' · ' + k.lyDo) + (k.boKhoi.length ? '\\n   ! bỏ khối: ' + k.boKhoi.join('; ') : ''))
 }

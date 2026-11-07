@@ -193,7 +193,8 @@ export async function nopBanKinh(env: Env, b: Obj) {
     // Lời giải Kính chỉ hiện SAU khi nộp ⇒ «lộ đáp án» của gợi ý trước nộp không áp dụng.
     return { ok: k.ket === 'dat' || k.ket === 'lo_dap_an', ...(k.lyDo ? { lyDo: k.lyDo } : {}) }
   }
-  const kq = kiemBanKinh(b.ban, tuLuan ? { phan, dapAn: str((vao.dapAn as Obj | undefined)?.kq), qid, nguon, tuLuan: true } : { phan, dapAn: ht.c.dapAn, qid, nguon, kiemSo })
+  const kq = kiemBanKinh(b.ban, tuLuan ? { phan, dapAn: str((vao.dapAn as Obj | undefined)?.kq), qid, nguon, tuLuan: true, chatDongPhan: true }
+    : { phan, dapAn: ht.c.dapAn, qid, nguon, kiemSo, chatDongPhan: true, ...(luaChon ? { luaChon: luaChon as Record<string, string> } : {}) })
   const nghi = str(b.nghiDapAn)
   const nay = new Date().toISOString()
   const ban = kq.ban ?? { qid }

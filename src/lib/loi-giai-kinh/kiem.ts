@@ -4,6 +4,7 @@
 // Thần chú / câu thầy nói / mẹo KHÔNG có trong nguồn ⇒ chỉ BỎ khối đó (không đánh trượt cả bản) — máy chủ không tin chữ mô hình tự nhận là của thầy.
 import { HINH_NHIP, MANH_TEN, MAU_LOP, PHIEN_BAN_KINH, type BanKinh, type CanhKinh, type CongKinh, type HayNham, type LyDoKinh, type NhipPhim, type PhanKinh, type PhepTinhKinh, type TheNho } from './kieu'
 import { tinhBieuThuc } from '../loi-giai-kiem'
+import { docDongPhan } from './dong-phan'
 import type { BuocTinh, SoDo } from '../goi-y-cham/kieu'
 
 type Obj = Record<string, unknown>
@@ -23,7 +24,9 @@ export const chuanDoiChieu = (t: string): string => chuSgk(t.normalize('NFC')).t
 const RE_CAM: readonly [RegExp, string][] = [
   [/[«»]/u, 'có dấu «» (thầy: bỏ, in đậm thay)'],
   [/tiền(?! chất)|giàu|nghèo|thuế|nhà (?:thằng|bạn|giàu|nghèo)/iu, 'dùng ẩn dụ tiền / nhà (thầy đã bỏ)'],
-  [/bất bão hoà|bất bão hòa|độ không no|\bk\s*=\s*\d/iu, 'dùng độ bất bão hoà k (ngoài SGK Kết nối tri thức)'],
+  // Thầy 08/11 (skill đồng phân): «Bước 1 các em tính K» — K HOA (số π + số vòng) được dùng; vẫn cấm tên gọi «độ bất bão hoà» và k thường.
+  [/bất bão hoà|bất bão hòa|độ không no/iu, 'dùng tên độ bất bão hoà (ngoài SGK Kết nối tri thức) — gọi là K'],
+  [/(^|[^\p{L}\p{N}])k\s*=\s*\d/u, 'dùng k thường — thầy viết K hoa'],
   [/\bA\.?I\b|trí tuệ nhân tạo/u, 'có chữ AI'],
   [/<\/?(?!(?:b|i|sub|sup)>)[a-z][a-z0-9]*(?:\s[^<>]*)?>/iu, 'có thẻ HTML ngoài b/i/sub/sup'],
 ]
@@ -53,6 +56,10 @@ export interface NguCanhKinh {
   /** CÂU TỰ LUẬN (thầy 03/11 «câu tự luận giải luôn để lời giải hiện trên máy chiếu»): không có phương án / ý để khớp; `dapAn` = đáp số THAM CHIẾU của kho
    *  (đáp án / kết quả lời giải kho nếu là một số) hoặc rỗng. Mọi phép tính vẫn tính lại; có đáp số tham chiếu ⇒ mục `laDapSo` phải khớp. */
   tuLuan?: boolean
+  /** chữ phương án gốc (Phần I) — có thì tổng đồng phân phải khớp phương án đúng khi phương án là một số */
+  luaChon?: Readonly<Record<string, string>>
+  /** máy chủ / máy soạn: khối đồng phân sai ⇒ đánh lệch để soạn lại (app: chỉ bỏ khối) */
+  chatDongPhan?: boolean
 }
 
 export interface KetQuaKiemKinh { ket: CongKinh; lyDo: string; ban: BanKinh | null; boKhoi: string[] }
@@ -156,6 +163,12 @@ function docBuoc(x: unknown): BuocTinh[] | undefined {
   return b as BuocTinh[]
 }
 
+/** Phương án chỉ là một số nguyên («4», «4.», «4 chất») ⇒ số; còn lại null. */
+function soTrongPhuongAn(t: string | undefined): number | null {
+  const m = /^\s*(\d{1,3})\s*(?:chất|đồng phân|công thức)?\s*\.?\s*$/u.exec(String(t ?? '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' '))
+  return m ? Number(m[1]) : null
+}
+
 /** Đọc số kiểu Việt («13,2», «1.000,5», «2,5.10^-3») ⇒ number; không đọc được ⇒ null. */
 export function docSoViet(raw: string): number | null {
   const t = raw.replace(/\s+/g, '').replace(/^\+(?=\d)/, '').replace(/[×x·]10\^?\(?(-?\d+)\)?/u, 'e$1').replace(/\.(?=\d{3}(?!\d))/g, '').replace(',', '.')
@@ -229,11 +242,15 @@ export function kiemBanKinh(tho: unknown, ctx: NguCanhKinh): KetQuaKiemKinh {
   const canhTho = tho.canh
   const canh = canhTho === undefined || canhTho === null ? null : docCanh(canhTho)
   if (canhTho && !canh) boKhoi.push('cảnh minh hoạ sai khuôn')
+  let loiDongPhan: string | null = null
+  const dpKq = tho.dongPhan === undefined || tho.dongPhan === null ? null : docDongPhan(tho.dongPhan)
+  if (dpKq?.loi) { loiDongPhan = `khối đồng phân: ${dpKq.loi}`; boKhoi.push(loiDongPhan) }
+  const dongPhan = dpKq?.dp ?? null
   const soDo = docSoDo(tho.soDo)
   const buoc = docBuoc(tho.buoc)
   const phepTinh = docPhepTinh(tho.phepTinh)
   const ban: BanKinh = {
-    qid: ctx.qid, phienBan: PHIEN_BAN_KINH, phan: ctx.phan, cotLoi, phim, ...(canh ? { canh } : {}), thanChu,
+    qid: ctx.qid, phienBan: PHIEN_BAN_KINH, phan: ctx.phan, cotLoi, phim, ...(canh ? { canh } : {}), ...(dongPhan ? { dongPhan } : {}), thanChu,
     ...(thayNoi ? { thayNoi } : {}), ...(meo ? { meo } : {}), lyDo,
     ...(soDo ? { soDo } : {}), ...(buoc ? { buoc } : {}), ...(phepTinh ? { phepTinh } : {}), ...(s(tho.ketQua, 40) ? { ketQua: s(tho.ketQua, 40) } : {}),
     ...(s(tho.kiemLai, 260) ? { kiemLai: s(tho.kiemLai, 260) } : {}), hayNham, tuHoi, theNho,
@@ -250,6 +267,12 @@ export function kiemBanKinh(tho: unknown, ctx: NguCanhKinh): KetQuaKiemKinh {
   const cam = chuCam(ban)
   if (cam) return { ket: 'thieu', lyDo: cam, ban, boKhoi }
   if (thieu.length) return { ket: 'thieu', lyDo: `thiếu: ${thieu.join(', ')}`, ban, boKhoi }
+  // ---- đồng phân: máy chủ tính lại mọi số; tổng phải khớp đáp án kho (Phần III / phương án đúng là một số)
+  if (ctx.chatDongPhan && loiDongPhan) return { ket: 'lech', lyDo: loiDongPhan, ban, boKhoi }
+  if (dongPhan && ctx.chatDongPhan && !ctx.tuLuan) {
+    const dapSo = ctx.phan === 'III' ? docSoViet(ctx.dapAn) : ctx.phan === 'I' && ctx.luaChon ? soTrongPhuongAn(ctx.luaChon[ctx.dapAn.trim().toUpperCase()]) : null
+    if (dapSo !== null && dapSo !== dongPhan.tong) return { ket: 'lech', lyDo: `khối đồng phân: tổng ${dongPhan.tong} khác đáp án kho ${dapSo}`, ban, boKhoi }
+  }
   // ---- khớp đáp án kho
   const theoKho = dungTheoKho(ctx.phan, ctx.dapAn)
   if (ctx.tuLuan) {
