@@ -75,11 +75,13 @@ export interface PropsBang {
   onToi?: (d: 1 | -1) => void
   /** Phím G: đóng bảng, tờ hiện lời giải thu gọn. */
   onGiai?: () => void
+  /** Xin tờ HTML lời giải thu gọn của câu đang chiếu ⇒ hiện NGAY TRÊN BẢNG (rỗng ⇒ lùi `onGiai`: về tờ). */
+  layGiai?: () => Promise<string>
   /** `caPhong` = cả phòng không mở được (ca mở, mất mạng); không = chỉ câu này không gửi được. */
   onKhongMo?: (chu: string, caPhong: boolean) => void
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onGiai, onKhongMo }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
   const laDiemDanh = useRef(!qid)
@@ -90,11 +92,20 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   // Điều khiển từ xa (bước «Đang chiếu» trên máy thầy khác): phòng chuyển lệnh tới bảng ⇒ bảng nào nối tờ chiếu thì làm.
   /** Vừa bấm sang câu (→ ← / «Câu tiếp» / máy điều khiển) ⇒ đề cũ mờ NGAY tới khi lượt mới về (thầy 07/11 «chuyển câu tiếp chậm»). */
   const [dangSang, setDangSang] = useState(false)
-  /** THẺ PHƯƠNG ÁN (thầy 07/11 «4 đáp án ẩn đi, bấm M thì hiện»): mặc định ẩn để đề chiếm nhiều chỗ nhất; mở đáp án thì tự hiện (thấy phương án đúng). */
+  /** THẺ PHƯƠNG ÁN (thầy 07/11 «4 đáp án ẩn đi, bấm M thì hiện»): mặc định ẩn để đề chiếm nhiều chỗ nhất; mở đáp án cũng KHÔNG tự hiện — kết quả nằm cột phải, bên trái chỉ đề (thầy 07/11). */
   const [hienPa, setHienPa] = useState(false)
   const sangCau = useCallback((d: 1 | -1) => { setDangSang(true); onToi?.(d) }, [onToi])
-  const dkRef = useRef({ onToi: sangCau, onGiai })
-  dkRef.current = { onToi: sangCau, onGiai }
+  /** LỜI GIẢI TRÊN BẢNG (thầy 07/11 «bấm lời giải lại hiện bảng chiếu cũ»): G / nút / máy điều khiển ⇒ hộp lời giải thu gọn đè chỗ đề; G lần nữa ẩn. */
+  const [giai, setGiai] = useState<string | null>(null)
+  const giaiRef = useRef<HTMLDivElement>(null)
+  const coGiai = !!(layGiai || onGiai)
+  const batGiai = useCallback(async () => {
+    if (giai != null) { setGiai(null); return }
+    const html = layGiai ? await layGiai() : ''
+    if (html.trim()) setGiai(html); else onGiai?.()
+  }, [giai, layGiai, onGiai])
+  const dkRef = useRef({ onToi: sangCau, onGiai: batGiai as () => void })
+  dkRef.current = { onToi: sangCau, onGiai: () => void batGiai() }
   const [loi, setLoi] = useState<{ chu: string; chan?: boolean } | null>(null)
   const [manPhu, setManPhu] = useState<'dua' | 'vinh-danh' | null>(null)
   const [an, setAn] = useState(false)
@@ -269,8 +280,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   useEffect(() => { if (!v?.luot || chuDe) return; let con = true; void import('../../lib/html-may-chieu').then((m) => { if (con) setChuDe(() => m.chuDeChieu) }).catch(() => {}); return () => { con = false } }, [v?.luot, chuDe])
   // Đề dài: cuộn về đầu mỗi lượt mới.
   useEffect(() => { deRef.current?.scrollTo?.({ top: 0 }) }, [l?.so])
-  useEffect(() => { setDangSang(false); setHienPa(false) }, [l?.so])
-  useEffect(() => { if (man === 'mo') setHienPa(true) }, [man])
+  useEffect(() => { setDangSang(false); setHienPa(false); setGiai(null) }, [l?.so])
   useEffect(() => { if (!dangSang) return; const h = setTimeout(() => setDangSang(false), 6000); return () => clearTimeout(h) }, [dangSang])
   // CO CHỮ CHO VỪA KHUNG (ảnh máy chiếu 07/11: phương án dài tràn xuống đè dải tên ⇒ «thẻ dính chữ»): hạ --k từng nấc tới khi đề + phương án nằm trọn
   // khung (tối thiểu 0,6; còn dài nữa thì riêng đề cuộn). Đo lại khi đổi câu / pha / cỡ khung và khi phông nạp xong.
@@ -332,13 +342,13 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       // Esc chỉ đóng BẢNG (thầy 07/11 «bấm esc xong không có chỗ mở lại tờ chiếu»): chặn lan ⇒ khung tờ chiếu bên dưới không đóng theo.
       if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); if (moPhim) setMoPhim(false); else if (manPhu) setManPhu(null); else onDong(); return }
       if (e.key === '?') { setMoPhim((m) => !m); return }
-      if (kk === 'g' && onGiai) { e.preventDefault(); onGiai(); return }
+      if (kk === 'g' && coGiai) { e.preventDefault(); void batGiai(); return }
       if (kk === 'f' && man !== 'goi' && man !== 'lam-bang') { e.preventDefault(); doiToanMan(); return } // gọi / làm bảng: F = Chưa đạt
       // CHUYỂN CÂU (thầy 07/11 «tôi chỉ việc chiếu lên bảng rồi bấm chuyển câu»): tờ sang câu ⇒ tự gửi câu mới; lượt cũ chưa mở đáp án ⇒ máy chủ tự chốt.
       if ((e.key === 'ArrowRight' || e.key === 'PageDown') && onToi) { e.preventDefault(); sangCau(1); return }
       if ((e.key === 'ArrowLeft' || e.key === 'PageUp') && onToi) { e.preventDefault(); sangCau(-1); return }
       // ↓ ↑ cuộn đề dài.
-      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && deRef.current) { e.preventDefault(); const d = deRef.current; d.scrollBy?.({ top: (e.key === 'ArrowDown' ? 0.6 : -0.6) * d.clientHeight, behavior: yeu ? 'auto' : 'smooth' }); return }
+      if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && (giaiRef.current || deRef.current)) { e.preventDefault(); const d = (giaiRef.current ?? deRef.current)!; d.scrollBy?.({ top: (e.key === 'ArrowDown' ? 0.6 : -0.6) * d.clientHeight, behavior: yeu ? 'auto' : 'smooth' }); return }
       if (e.key === ' ') { e.preventDefault(); if (man === 'tra-loi') void goiLen(); else if (man === 'goi' || man === 'lam-bang') gui({ t: 'mo' }); return }
       if (e.key === 'Enter' && man === 'goi') { gui({ t: 'lam-bang' }); return }
       if ((kk === 'd' || kk === 'f') && (man === 'goi' || man === 'lam-bang')) { gui({ t: 'dat', v: kk === 'd' }); setTimeout(() => gui({ t: 'mo' }), 150); return }
@@ -352,7 +362,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     }
     window.addEventListener('keydown', phim, true)
     return () => window.removeEventListener('keydown', phim, true)
-  }, [man, manPhu, moPhim, gui, goiLen, onDong, onToi, sangCau, onGiai, l?.goi, yeu, doiToanMan])
+  }, [man, manPhu, moPhim, gui, goiLen, onDong, onToi, sangCau, coGiai, batGiai, l?.goi, yeu, doiToanMan])
 
   const q = (l?.cau ?? null) as unknown as Question | null
   const ten = (e: Em | undefined) => (!e ? '' : an ? `Em số ${ds.indexOf(e) + 1}` : tenNgan(e.ten))
@@ -452,8 +462,9 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     const dsKq = man === 'mo' && !l.tuLuan && l.dung && l.phan === 'II' ? ketQuaDs(l) : null
     noi = (
       <>
-        {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{!l.tuLuan && l.phan !== 'III' ? <button type="button" className="bb-hoi" aria-pressed={hienPa} onClick={() => setHienPa((h) => !h)}><kbd>M</kbd>{hienPa ? 'Ẩn phương án' : 'Phương án'}</button> : null}{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}</>)}
-        <div className={`bb-de${dangSang ? ' doi' : ''}`} ref={khungDe} style={{ height: L.top - 20 - 112 }}>
+        {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{!l.tuLuan && l.phan !== 'III' ? <button type="button" className="bb-hoi" aria-pressed={hienPa} onClick={() => setHienPa((h) => !h)}><kbd>M</kbd>{hienPa ? 'Ẩn phương án' : 'Phương án'}</button> : null}{coGiai ? <button type="button" className="bb-hoi" aria-pressed={giai != null} onClick={() => void batGiai()}><kbd>G</kbd>{giai != null ? 'Ẩn lời giải' : 'Lời giải'}</button> : null}{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}</>)}
+        {giai != null ? <div className="bb-giai" ref={giaiRef} tabIndex={-1} role="region" aria-label="Lời giải thu gọn" style={{ height: L.top - 20 - 112 }} dangerouslySetInnerHTML={{ __html: giai }} /> : null}
+        <div className={`bb-de${dangSang ? ' doi' : ''}`} ref={khungDe} style={{ height: L.top - 20 - 112, visibility: giai != null ? 'hidden' : undefined }}>
           <div className="bb-de-chu" ref={deRef} tabIndex={-1}><Chu t={q.text} f={chuDe} />{q.thanCauImg ? <img className="bb-anh" src={q.thanCauImg} alt={`Đề câu ${l.so}`} /> : null}</div>
           {hienPa && l.phan === 'I' && !l.tuLuan ? <div className="bb-pa">{(q.choices ?? []).slice(0, 4).map((c, i) => { const chu = 'ABCD'[i]!; return <div key={chu} className={man === 'mo' && l.dung ? (l.dung.toUpperCase() === chu ? 'dung' : 'mo') : ''} style={{ ['--mau' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)', 'var(--tr-hs)'][i] }}><i>{chu}</i><span><Chu t={c} f={chuDe} mot /></span></div> })}</div> : null}
           {hienPa && l.phan === 'II' && !l.tuLuan ? <div className="bb-ds">{(q.ideas ?? []).slice(0, 4).map((y, i) => <div key={i}><i>{'abcd'[i]})</i><span><Chu t={y} f={chuDe} mot /></span></div>)}</div> : null}
@@ -489,10 +500,10 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         ) : null}
         {toast ? <div className="bb-toast" role="status">{toast}</div> : null}
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
-        {phim(man === 'mo' ? [...TIEP, ['K', 'Đua ngọn lửa'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
+        {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...TIEP, ['K', 'Đua ngọn lửa'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
           : man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
           : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : [['Space', 'Gọi lên bảng ngay', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(onGiai ? [['G', 'Lời giải thu gọn trên tờ'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
+          : [['Space', 'Gọi lên bảng ngay', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
         'Tự động: hết giờ hoặc cả lớp gửi xong ⇒ gọi một em lên bảng. Chuyển câu khi chưa mở đáp án ⇒ máy tự chấm câu cũ.')}
       </>
     )

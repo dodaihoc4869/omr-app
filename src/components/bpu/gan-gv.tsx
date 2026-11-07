@@ -77,6 +77,7 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
       onDong={dongBang}
       onToi={toiCau}
       onGiai={giaiTrenTo}
+      layGiai={layGiai}
       onKhongMo={khongMo}
       onTat={() => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }}
     />,
@@ -89,6 +90,19 @@ export function giaiTrenTo(): void {
   dongBang()
   try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'giai' }, '*'); nguonTo?.focus() } catch { /* tờ đã đóng */ }
 }
+/** LỜI GIẢI TRÊN BẢNG (thầy 07/11 «bấm lời giải lại hiện bảng chiếu cũ»): xin tờ HTML lời giải thu gọn của đợt đang chiếu (tờ dựng sẵn — cùng nội dung,
+ *  không thêm lệnh máy chủ); tờ không trả lời trong 1,5 s / đã đóng ⇒ chuỗi rỗng. */
+let choGiai: ((html: string) => void) | null = null
+export function layGiai(): Promise<string> {
+  choGiai?.('')
+  return new Promise((xong) => {
+    const h = setTimeout(() => { if (choGiai === tra) choGiai = null; xong('') }, 1500)
+    const tra = (html: string) => { clearTimeout(h); xong(html) }
+    choGiai = tra
+    try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'lay-giai' }, '*') } catch { tra('') }
+  })
+}
+export function nhanGiai(html: string): void { const f = choGiai; choGiai = null; f?.(html) }
 /** Bảng ⇒ tờ: sang câu sau (d = 1) / câu trước (d = -1). */
 export function toiCau(d: 1 | -1): void {
   nghiDen = 0

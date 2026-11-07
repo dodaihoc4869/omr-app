@@ -6,6 +6,8 @@ import { createRef } from 'react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 const phanHoi = vi.hoisted(() => vi.fn())
 vi.mock('../src/lib/phan-hoi', () => ({ phanHoi }))
+const moBpuHs = vi.hoisted(() => vi.fn(() => true))
+vi.mock('../src/components/bpu/gan-hs', () => ({ moBpuHs }))
 import { MenuDocTrong, MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
 
@@ -413,6 +415,9 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     expect(await screen.findByText('Đã điểm danh')).toBeTruthy()
     expect(screen.getByText('Buổi 26/10 · 12A1')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Thêm' })).toBeTruthy()
+    // thầy 07/11: em bị văng ⇒ vào lại Bình Phản Ứng ngay từ khối «Đã điểm danh»
+    fireEvent.click(screen.getByRole('button', { name: 'Vào Bình Phản Ứng' }))
+    await waitFor(() => expect(moBpuHs).toHaveBeenCalledWith('tk', 'B1'))
   })
 
   it('không có buổi ⇒ KHÔNG có khối Điểm danh; QR ?diem-danh= vẫn tự gửi một lần và mở menu', async () => {

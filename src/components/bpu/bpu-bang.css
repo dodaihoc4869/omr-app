@@ -261,3 +261,16 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 .bb-dskq .so { font-size: 26px; color: var(--tr-chu-2); font-variant-numeric: tabular-nums; }
 .bb-dskq .so b { color: var(--tr-chu); font-size: 32px; }
 .bb-tren .bb-chip { align-self: center; }
+/* LỜI GIẢI THU GỌN TRÊN BẢNG (thầy 07/11): đè đúng chỗ đề, cuộn ↓ ↑; nội dung = khối lời giải của tờ (lớp sol-*). */
+.bb-giai { position: absolute; left: 64px; top: 112px; width: 1090px; z-index: 4; overflow-y: auto; overscroll-behavior: contain; padding: 26px 34px; border-radius: 24px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: 32px; line-height: 1.45; animation: bb-giai-vao 0.35s ease-out both; scrollbar-width: auto; scrollbar-color: var(--tr-vien-2) transparent; }
+@keyframes bb-giai-vao { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.bb-giai .sol-label { margin: 18px 0 6px; font-size: 22px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: var(--tr-chu-3); }
+.bb-giai .sol-tieu { margin-top: 0; color: var(--tr-tin-chu); }
+.bb-giai .sol-cot-loi { padding: 12px 18px; border-radius: 14px; background: var(--tr-tin-nhat); }
+.bb-giai .sol-pa { display: flex; gap: 12px; align-items: baseline; margin: 6px 0; }
+.bb-giai .sol-dau.dung { color: var(--tr-dung-chu); font-weight: 800; }
+.bb-giai .sol-dau.sai { color: var(--tr-sai-chu); font-weight: 800; }
+.bb-giai .sol-step { margin: 6px 0; }
+.bb-giai .sol-dap, .bb-giai .sol-ket { margin-top: 14px; font-weight: 700; color: var(--tr-dung-chu); }
+.bb-giai img { max-width: 100%; border-radius: 12px; background: var(--giay); }
+@media (prefers-reduced-motion: reduce) { .bb-giai { animation: none; } }

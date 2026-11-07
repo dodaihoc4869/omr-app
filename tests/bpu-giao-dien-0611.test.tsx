@@ -131,7 +131,7 @@ describe('bảng chiếu', () => {
     const o = document.querySelector('.bb-o .ten')!
     expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
   })
-  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án ⇒ phương án tự hiện; Đúng–sai ⇒ 4 dòng kết quả', async () => {
+  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án KHÔNG tự hiện phương án bên trái; Đúng–sai ⇒ 4 dòng kết quả', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
     render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -147,12 +147,35 @@ describe('bảng chiếu', () => {
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'o' })) })
     expect(ws.gui.some((t) => t.includes('"mo"'))).toBe(true)
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
-    await waitFor(() => expect(document.querySelectorAll('.bb-pa > div')).toHaveLength(4))
+    await screen.findByText('Đáp án')
+    expect(document.querySelector('.bb-pa')).toBeNull() // bên trái chỉ đề; kết quả ở cột phải
     const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
     moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); nhanTra(st, 'S2', 'DSSD', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewBang(st))
     const kq = await screen.findByLabelText('Kết quả từng ý')
     expect([...kq.querySelectorAll('.so')].map((x) => x.textContent)).toEqual(['2/2 em đúng', '2/2 em đúng', '2/2 em đúng', '1/2 em đúng'])
     expect([...kq.querySelectorAll('.da')].map((x) => x.textContent)).toEqual(['Đúng', 'Sai', 'Sai', 'Đúng'])
+  })
+  it('G ⇒ lời giải thu gọn hiện NGAY TRÊN BẢNG (G lần nữa ẩn); tờ không có lời giải ⇒ lùi về tờ', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    const onGiai = vi.fn()
+    let html = '<div class="sol-label sol-tieu">Lời giải</div><div class="sol-text">Amine bậc hai có một nguyên tử H trên N.</div>'
+    render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} onGiai={onGiai} layGiai={async () => html} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const st = phong(); moLuot(st, cau, T0); WsGia.ds[0]!.nhan(viewBang(st))
+    await screen.findByText(/em đã gửi/)
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'g' })) })
+    expect(await screen.findByRole('region', { name: 'Lời giải thu gọn' })).toBeTruthy()
+    expect(screen.getByText(/một nguyên tử H trên N/)).toBeTruthy()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'g' })) })
+    await waitFor(() => expect(screen.queryByRole('region', { name: 'Lời giải thu gọn' })).toBeNull())
+    // máy điều khiển (bước Đang chiếu) bấm «Lời giải» ⇒ cùng đường
+    act(() => { WsGia.ds[0]!.onmessage?.({ data: JSON.stringify({ t: 'dk', lenh: 'giai' }) }) })
+    expect(await screen.findByRole('region', { name: 'Lời giải thu gọn' })).toBeTruthy()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'g' })) })
+    html = ''
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'g' })) })
+    await waitFor(() => expect(onGiai).toHaveBeenCalledTimes(1))
+    expect(onGiai).toHaveBeenCalledTimes(1)
   })
   it('mở lại tờ / bấm P trên ĐÚNG câu đang chạy ⇒ nối lại lượt cũ (không mở lượt mới); câu khác hoặc P sau khi mở đáp án ⇒ lượt mới', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')

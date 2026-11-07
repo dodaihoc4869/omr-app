@@ -452,7 +452,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function u() { return Math.min(window.innerWidth, window.innerHeight * 16 / 9) / 100; }
   function tao(tag, cls, cha) { var e = document.createElement(tag); if (cls) e.className = cls; if (cha) cha.appendChild(e); return e; }
   function thoat(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  // Tên nơi làm HIỆN trên tờ (cả lớp nhìn thấy) — thầy 12/10: bỏ tên trò chơi Đảo/Đoàn/Bi-a, dùng đúng bộ tên của app học sinh
+  // Tên nơi làm HIỆN trên tờ (thầy 12/10): đúng bộ tên của app học sinh
   // (src/lib/nhan-nguon-lan.ts). Máy chủ vẫn gửi nhãn cũ; màu theo nhóm (MAU_NOI) vẫn tính trên nhãn gốc.
   var TEN_NOI = [['Bát Linh Đảo', 'Học theo kế hoạch'], ['Đoàn Hộ Tống', 'Ôn theo kế hoạch'], ['Bi-a Phản Ứng', 'Luyện tập trước đây'], ['Đảo', 'Học theo kế hoạch'], ['Đoàn', 'Ôn theo kế hoạch'], ['Bi-a', 'Luyện tập trước đây']];
   function tenNguon(s) {
@@ -925,7 +925,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function giayChu(g) { return g < 600 ? g + ' giây' : saiThoiLuong(g); }
   function pipHtml(n) { var h = '<span class="mc-pip" aria-hidden="true">'; for (var k = 1; k <= 4; k++) h += '<i' + (k <= n ? ' class="b"' : '') + '></i>'; return h + '</span>'; }
   var TEN_MUC = [null, 'Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'];
-  // Mức làm (thầy 21/10): MÁY CHỦ xếp từng lượt (mucLam = ma · giay · giayDoc · sanNghi · ranh2/3/4) — tờ chỉ vẽ lại, KHÔNG biết tỉ lệ nào. Khoảng giây ghi ở đầu mỗi làn lấy từ lượt "đại diện" (cách tính phổ biến nhất của câu).
+  // Mức làm (thầy 21/10): MÁY CHỦ xếp từng lượt (mucLam = ma · giay · giayDoc · sanNghi · ranh2/3/4) — tờ chỉ vẽ lại, KHÔNG biết tỉ lệ nào. Khoảng giây đầu làn lấy từ lượt "đại diện".
   function ranhDaiDien(ds) {
     var dem = {}, tot = null, max = 0;
     ds.forEach(function (x) {
@@ -1012,7 +1012,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     chonCotAiSai();
     $$(sai, '.mc-ai-tab button').forEach(function (b) { b.addEventListener('click', function () { doiTheAiSai(b.getAttribute('data-tab')); }); });
   }
-  // Tên không đủ chỗ ⇒ viết tắt chữ đệm (đo sau khi vẽ xong); vẫn dài ⇒ bỏ hẳn chữ đệm (họ + tên). Đặt lại tên đủ trước mỗi lần đo.
+  // Tên không đủ chỗ ⇒ viết tắt chữ đệm; vẫn dài ⇒ bỏ chữ đệm. Đặt lại tên đủ trước mỗi lần đo.
   function vuaTenAiSai() {
     $$(sai, '.mc-pl b').forEach(function (b) {
       var f = b.getAttribute('data-f'); if (f != null) b.textContent = f;
@@ -1089,6 +1089,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     var m = e.data;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'giai') { moLoiGiai(true); return; }
+    if (m.lenh === 'lay-giai') { var g = dot() && dot().querySelector('.mc-giai'); e.source.postMessage({ nguon: 'to-chieu', loai: 'bpu-giai', html: g ? g.innerHTML : '' }, '*'); return; }
     if (m.lenh === 'toi') { var k = chiSo() + (m.d < 0 ? -1 : 1); if (k < 0 || k >= soDot()) { try { e.source.postMessage({ nguon: 'to-chieu', loai: 'bpu-het', d: m.d < 0 ? -1 : 1 }, '*'); } catch (x) { /* app đã đóng */ } return; } toiDot(k); }
   });
   function lenh(k) {

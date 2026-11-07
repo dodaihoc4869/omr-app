@@ -17,6 +17,8 @@ export function ngheBpuToChieu(): void {
     if (!tuKhung && e.origin !== window.location.origin && e.origin !== 'null') return
     const d = e.data as { nguon?: unknown; loai?: unknown; d?: unknown } | null
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-het') { void import('../../components/bpu/gan-gv').then((m) => m.baoHetCau(d.d === -1 ? -1 : 1)).catch(() => {}); return }
+    // Lời giải thu gọn của đợt đang chiếu (bảng hỏi khi thầy bấm G — hiện ngay trên bảng, không về tờ).
+    if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-giai') { const h = (e.data as { html?: unknown }).html; void import('../../components/bpu/gan-gv').then((m) => m.nhanGiai(typeof h === 'string' ? h : '')).catch(() => {}); return }
     if (!laTinBpu(e.data)) return
     const tin = e.data, nguon = e.source as Window | null
     void import('../../components/bpu/gan-gv').then((m) => m.moBangTuToChieu(tin.qid, { giay: Number(tin.giay) || 0, tuDong: tin.tuDong === true, nguon })).catch(() => {})

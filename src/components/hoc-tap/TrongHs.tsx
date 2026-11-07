@@ -11,6 +11,7 @@ import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { Props as PropsHomNayCu } from './HocTapHomNay'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/diem-danh-hs'
+import NutVaoBpu from '../bpu/NutVaoBpu'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
 import { Bi, SU_KIEN_LUA_CAP, type CamBi } from '../linh-vat/Bi'
 // LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): luật + lời (hàm thuần) · sổ câu được tính trên máy · biểu tượng tab + chấm số.
@@ -1208,7 +1209,7 @@ const tenBuoi = (b: BuoiCuaEm) => { const n = ngayGon(b.ten); return `${n === b.
  *  xanh (+ giờ em vừa bấm trên máy này) · không có buổi ⇒ ẨN HẲN (trả null). App chưa có máy quét QR riêng ⇒ em quét QR bằng máy ảnh điện thoại như cũ. */
 type DiemDanh = ReturnType<typeof useDiemDanhHs>
 const coKhoiDiemDanh = (tt: DiemDanh['tt']) => tt.loai === 'cho' || tt.loai === 'xong' || !!tt.daXong
-function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<DiemDanh, 'tt' | 'ma' | 'setMa' | 'loi' | 'setLoi' | 'dangGui' | 'gui' | 'oNhap'>) {
+function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap, token }: Pick<DiemDanh, 'tt' | 'ma' | 'setMa' | 'loi' | 'setLoi' | 'dangGui' | 'gui' | 'oNhap'> & { token: string }) {
   if (tt.loai === 'cho') return (
     <form className="tr-dd" aria-label="Điểm danh buổi học" onSubmit={(e) => { e.preventDefault(); void gui(ma) }}>
       <div className="tr-dd-dau"><span className="tr-dd-h" aria-hidden="true"><QrCode size={20} /></span><b>Điểm danh buổi học</b>{tt.buoi?.lop && <span>{tt.buoi.lop}</span>}</div>
@@ -1229,6 +1230,7 @@ function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<
     <section className="tr-dd" data-tt="xong" aria-label="Điểm danh buổi học">
       <div className="tr-dd-dau"><CheckCircle2 size={20} aria-hidden="true" /><b>Đã điểm danh</b>{xong.luc > 0 && <span>{hai(new Date(xong.luc).getHours())}:{hai(new Date(xong.luc).getMinutes())}</span>}</div>
       <p className="tr-dd-phu">{tenBuoi(xong.buoi)}</p>
+      <NutVaoBpu token={token} buoiId={xong.buoi.id} />
     </section>
   )
 }
@@ -1238,7 +1240,7 @@ function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<
  *  rồi đúng 6 mục, mỗi mục một ô biểu tượng màu riêng: Lộ trình · Luyện tập · Thành tích · Ca kiểm tra (= Vào ca kiểm tra; ẩn khi ca đang mở vì Lộ trình đã
  *  có nút vào ca) · Hỏi A.I Đỗ Đại Học (mở ĐÚNG tấm chat của BongBongAiDdh, sự kiện `ddh:mo-ai`; chỉ hiện khi kênh bật — `<html data-ai-ddh>`) · Cài đặt
  *  (trượt sang tấm con: Âm thanh, Rung, Cập nhật bài học, Của em — cùng nút, cùng hành vi cũ).
- *  Buổi mở mà em chưa điểm danh ⇒ nút «Thêm» thò «Điểm danh»; QR gửi xong / hỏng ⇒ menu tự mở. Chạm ngoài / chọn mục / Esc / cuộn ⇒ thu lại.
+ *  Buổi mở mà em chưa điểm danh ⇒ nút «Thêm» thò «Điểm danh»; QR xong / hỏng ⇒ menu tự mở. Chạm ngoài / chọn / Esc / cuộn ⇒ thu.
  *  Menu luôn gắn trong DOM (ẩn bằng CSS) để tấm thông báo mở từ đây không mất. */
 // Biểu tượng chỉ màn «Trong» dùng — vẽ nội tuyến (nét như lucide) để không kéo thêm vào mảnh biểu tượng chung của app thầy / màn thi (luật tốc độ).
 const IconNet = ({ d, size = 20 }: { d: string[]; size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d.map((x) => <path key={x} d={x} />)}</svg>
@@ -1356,12 +1358,11 @@ export function MenuDocTrong(p: {
         {/* Chuông = ĐÚNG phần tử ThongBaoHocSinh (số chưa đọc, tấm thông báo); bấm ⇒ menu thu, tấm thông báo vẫn hiện (CSS giữ tấm hiện). */}
         {p.thongBao && <div className="tr-menu-tb" onClickCapture={(e) => { if ((e.target as Element).closest?.('.m3-tb-chuong')) { cham(); dong(false) } }}>{p.thongBao}</div>}
       </div>
-      {coDd && <KhoiDiemDanh tt={tt} ma={ma} setMa={setMa} loi={loi} setLoi={setLoi} dangGui={dangGui} gui={gui} oNhap={oNhap} />}
+      {coDd && <KhoiDiemDanh tt={tt} ma={ma} setMa={setMa} loi={loi} setLoi={setLoi} dangGui={dangGui} gui={gui} oNhap={oNhap} token={p.token!} />}
       {/* SỐ CỦA EM (thầy 27/10 «để dọc xuống thẳng hàng cách đều dưới cái chuông»): cột dọc bên phải 6 mục, cùng trục với chuông — MotTrangHs vẽ portal vào
           đây (useChoSo); chưa có số ⇒ rỗng, menu giữ một cột như cũ */}
       <div ref={oSo} id="tr-menu-dem" className="tr-menu-dem" />
       <div className="tr-menu-ds" hidden={cai}>
-        {/* thầy 07/11: Điểm danh luôn có ⇒ bấm hiện 6 ô mã */}
         {p.token && !coDd && <button type="button" className="tr-menu-muc" onClick={chon(() => { setTt({ loai: 'cho', buoi: null }); setTimeout(() => oNhap.current?.focus()) })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><QrCode size={20} /></span>Điểm danh</button>}
         {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" data-hien={id === 'on-lai' || undefined} onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
         {/* thầy 02/11 khuya: Kiểm tra lên thanh nổi ⇒ tấm Thêm hiện Luyện tập (dòng MENU_DUO «on-lai», data-hien — trong-kinh.css), bỏ Ca kiểm tra; bỏ

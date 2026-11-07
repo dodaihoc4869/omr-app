@@ -374,5 +374,9 @@ describe('BÌNH PHẢN ỨNG TỰ ĐỘNG (thầy 07/11 «bấm chuyển câu �
     // Bảng đang che tờ: phím G trên bảng ⇒ tờ mở lời giải của câu đang chiếu.
     w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'giai' }, source: w.parent as unknown as MessageEventSource }))
     expect(w.__mcTrangThai().lgMo).toBe(true)
+    // Bảng xin lời giải để hiện NGAY TRÊN BẢNG (thầy 07/11): tờ trả HTML khối lời giải thu gọn của đợt đang chiếu.
+    w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'lay-giai' }, source: w.parent as unknown as MessageEventSource }))
+    expect(guiLen.at(-1)).toMatchObject({ nguon: 'to-chieu', loai: 'bpu-giai' })
+    expect(String(guiLen.at(-1)!.html)).toContain('sol-label')
   })
 })
