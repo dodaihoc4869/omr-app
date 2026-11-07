@@ -235,6 +235,84 @@
    "khai": "color: var(--bb-chu, var(--tr-chu))",
    "n": 1,
    "ly_do": "07/11 thầy chốt bong bóng Mol theo cảm xúc (docs/ban-ve-bong-bi-0711) — luật chuyển sang src/styles/bong-mol.css"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-mat)",
+   "n": 3,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-dung-nhat)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-sai-nhat)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "border: 2px solid var(--tr-vien)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2px var(--tr-vien), 0 4px 0 var(--tr-vien-2)",
+   "n": 2,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-hs-nhat)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2px var(--tr-hs-nut), 0 4px 0 var(--tr-hs-nut)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "border-color: var(--tr-hs-nut)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2px var(--tr-dung-nut), 0 4px 0 var(--tr-dung-nut)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2px var(--tr-sai), 0 4px 0 var(--tr-sai)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 1px var(--kinh-vien-2)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: linear-gradient(90deg, color-mix(in oklab, var(--tr-hs) 75%, var(--tr-trang)), var(--tr-hs-day))",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 8px 22px -16px var(--tr-phu)",
+   "n": 1,
+   "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
   }
  ]
 }
