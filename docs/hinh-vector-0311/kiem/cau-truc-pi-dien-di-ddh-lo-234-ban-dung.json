@@ -1,0 +1,40 @@
+[
+  {
+    "i": 485,
+    "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+    "fileNguon": "anh/5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c.png",
+    "svg": "pi-dien-di-ddh-a47760459ae5eb5978acd6905d5625d3f315fab1d7b36417233e68c9cd560256.svg",
+    "hashSvg": "a47760459ae5eb5978acd6905d5625d3f315fab1d7b36417233e68c9cd560256",
+    "byteSvg": 80895,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C3-D3-I-11",
+        "de": "Trong dung dịch, giá trị pH mà tại đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực có tổng điện tích bằng 0 được gọi là pI. Cho công thức, kí hiệu và giá trị pI của ba amino acid trong hình thứ nhất dưới đây: Glu (pI = 3,1), Gly (pI = 6,0), Arg (pI = 10,8).\nTiến hành phương pháp điện di dung dịch gồm ba amino acid trên tại giá trị pH = 6,0 thu được kết quả như hình thứ hai.\nCác kí hiệu X, Y, Z tương ứng với các amino acid là",
+        "refs": [
+          {
+            "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+            "where": "12-KT-C3-D3-I-11.hinh.0.du_lieu",
+            "hashDataUrl": "d36f8527b6691c06b206fbffbc70868e728ca732afb0b277ccdc7247617df678"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P1-D2-I-72",
+        "de": "Trong dung dịch, giá trị pH mà tại đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực có tổng điện tích bằng 0 được gọi là pI. Cho công thức, kí hiệu và giá trị pI của ba amino acid trong hình thứ nhất dưới đây: Glu (pI = 3,1), Gly (pI = 6,0), Arg (pI = 10,8).\nTiến hành phương pháp điện di dung dịch gồm ba amino acid trên tại giá trị pH = 6,0 thu được kết quả như hình thứ hai.\nCác kí hiệu X, Y, Z tương ứng với các amino acid là",
+        "refs": [
+          {
+            "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+            "where": "DB-12-B9-P1-D2-I-72.hinh.0.du_lieu",
+            "hashDataUrl": "d36f8527b6691c06b206fbffbc70868e728ca732afb0b277ccdc7247617df678"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3molecules5+2+9C/8O3N/1phenyl3CCdouble+4COdouble/HO-OH-NH2-H2Nliteral/EXACTAgrcaption-pIdecimalcomma/printedfullsentence/plusLEFTminusRIGHT/3dotsY-X-Z/6dashcomponents/UParrow-Tuyếnxuấtphátnghiêng/NOanswer-noaddedcharges/DDHpath.",
+    "hashSvgDaSoat": "a47760459ae5eb5978acd6905d5625d3f315fab1d7b36417233e68c9cd560256",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

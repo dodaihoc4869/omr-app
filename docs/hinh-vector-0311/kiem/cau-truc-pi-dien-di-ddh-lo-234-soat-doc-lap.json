@@ -1,0 +1,14 @@
+[
+  {
+    "i": 485,
+    "hashSvg": "a47760459ae5eb5978acd6905d5625d3f315fab1d7b36417233e68c9cd560256",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x, mở full và crops molecules/diagram, đối chiếu nativefull/zooms/pixelruns cùng hai public refs. Đúng mọi C/NH2/H2N/HO/OH,3 phenyl doubles và4 carbonyl doubles; giữ EXACT Agr (pI = 10,8), Glu/Gly,pIcase/decimal commas. Giữ đầy đủ sentence printed không thêm chấm. Diagram +LEFT/−RIGHT/Y-X-Z, X lệch trái dashedline,6visible dash components có dot occlusion/edgepartials, UParrow và Tuyến xuất phát nghiêng đúng. Không chạm/cắt/tràn, không sửa lý thuyết/giảiAA.",
+    "actualSvgReviewed": true,
+    "byteSvg": 80895,
+    "render": "/workspace/scratch/pi485-234-a4776045-chromium.png",
+    "sourceHash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+    "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+    "hashSvgDaSoat": "a47760459ae5eb5978acd6905d5625d3f315fab1d7b36417233e68c9cd560256"
+  }
+]

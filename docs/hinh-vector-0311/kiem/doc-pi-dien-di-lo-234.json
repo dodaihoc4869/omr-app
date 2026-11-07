@@ -1,0 +1,294 @@
+{
+  "i": 485,
+  "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c.png",
+  "nativeSize": [
+    1481,
+    595
+  ],
+  "reviewed": [
+    "nativefull",
+    "molecules2x",
+    "diagram2x",
+    "dashed centerline pixel scan"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C3-D3-I-11",
+      "maDe": "12-KT-C3-D3",
+      "de": "Trong dung dịch, giá trị pH mà tại đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực có tổng điện tích bằng 0 được gọi là pI. Cho công thức, kí hiệu và giá trị pI của ba amino acid trong hình thứ nhất dưới đây: Glu (pI = 3,1), Gly (pI = 6,0), Arg (pI = 10,8).\nTiến hành phương pháp điện di dung dịch gồm ba amino acid trên tại giá trị pH = 6,0 thu được kết quả như hình thứ hai.\nCác kí hiệu X, Y, Z tương ứng với các amino acid là",
+      "hinh": [
+        {
+          "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+          "where": "12-KT-C3-D3-I-11.hinh.0.du_lieu",
+          "hashDataUrl": "d36f8527b6691c06b206fbffbc70868e728ca732afb0b277ccdc7247617df678"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P1-D2-I-72",
+      "maDe": "DB-12-B9-P1-D2",
+      "de": "Trong dung dịch, giá trị pH mà tại đó amino acid tồn tại chủ yếu ở dạng ion lưỡng cực có tổng điện tích bằng 0 được gọi là pI. Cho công thức, kí hiệu và giá trị pI của ba amino acid trong hình thứ nhất dưới đây: Glu (pI = 3,1), Gly (pI = 6,0), Arg (pI = 10,8).\nTiến hành phương pháp điện di dung dịch gồm ba amino acid trên tại giá trị pH = 6,0 thu được kết quả như hình thứ hai.\nCác kí hiệu X, Y, Z tương ứng với các amino acid là",
+      "hinh": [
+        {
+          "hash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c",
+          "where": "DB-12-B9-P1-D2-I-72.hinh.0.du_lieu",
+          "hashDataUrl": "d36f8527b6691c06b206fbffbc70868e728ca732afb0b277ccdc7247617df678"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "molecules": [
+      {
+        "caption": "Glu (pI = 3,1)",
+        "captionNear": [
+          401,
+          259
+        ],
+        "chainCarbons": [
+          [
+            300,
+            123
+          ],
+          [
+            354,
+            154
+          ],
+          [
+            409,
+            123
+          ],
+          [
+            464,
+            154
+          ],
+          [
+            519,
+            123
+          ]
+        ],
+        "substituents": "C1leftHO via diagonal bond to254,149; C1=O up two vertical lines x296/303 y74..123 toO299,57; C5=O up x515/522 y74..123 toO519,57; C5-OH slant right to563,149 OH582,151; alphaC4-NH2 down bond464,154→464,203 toNH2near478,216",
+        "formulaRead": "HOOC-CH2-CH2-CH(NH2)-COOH, no charge/stereo"
+      },
+      {
+        "caption": "Gly (pI = 6,0)",
+        "captionNear": [
+          797,
+          259
+        ],
+        "carbons": [
+          [
+            782,
+            167
+          ],
+          [
+            837,
+            135
+          ]
+        ],
+        "substituents": "H2N left near711,133 toC782,167 via739,142; carbonyl double up x833/840 y87..135 toO837,70; OHright near901,164 via880,160",
+        "formulaRead": "H2N-CH2-C(=O)-OH, no charge/stereo"
+      },
+      {
+        "caption": "Agr (pI = 10,8)",
+        "captionNear": [
+          1121,
+          259
+        ],
+        "ringVertices": [
+          [
+            999,
+            122
+          ],
+          [
+            1037,
+            100
+          ],
+          [
+            1075,
+            122
+          ],
+          [
+            1075,
+            166
+          ],
+          [
+            1037,
+            188
+          ],
+          [
+            999,
+            166
+          ]
+        ],
+        "doubleBonds": "left vertical,upper-right diagonal,lower-right diagonal; three Kekule, no circle",
+        "sideChainCarbons": [
+          [
+            1114,
+            100
+          ],
+          [
+            1152,
+            122
+          ],
+          [
+            1191,
+            100
+          ]
+        ],
+        "substituents": "ringrightupperC1075,122→CH2vertex1114,100→alphaC1152,122→carbonylC1191,100; alphaNH2down bond1152,122→1152,151 toNH2near1168,165; C=Oup x1188/1194 y70..100 toO1191,54; C-OHdownright to1218,116/OH1238,120",
+        "formulaRead": "phenyl-CH2-CH(NH2)-COOH; caption remains Agr despite different public stem Arg, do not normalize"
+      }
+    ],
+    "pICase": "Image pI uses lowercase p plus vertical uppercase I form; public stems explicitly pI. Decimal comma preserved.",
+    "printedSentence": "Tiến hành phương pháp điện di dung dịch gồm ba amino acid trên tại giá trị pH = 6,0 thu được kết quả",
+    "printedSentenceBoundsApprox": [
+      28,
+      282,
+      1446,
+      318
+    ],
+    "sentenceMustKeep": "Full line is printed image data; retain even though publicstem overlaps it, no added period or như hình thứ hai.",
+    "diagram": {
+      "rectangle": [
+        378,
+        366,
+        1097,
+        494
+      ],
+      "positiveLeft": {
+        "text": "Cực",
+        "textNear": [
+          291,
+          429
+        ],
+        "circle": [
+          341,
+          430,
+          15
+        ],
+        "sign": "+"
+      },
+      "negativeRight": {
+        "text": "Cực",
+        "textNear": [
+          1143,
+          429
+        ],
+        "circle": [
+          1189,
+          430,
+          15
+        ],
+        "sign": "−"
+      },
+      "spots": [
+        {
+          "center": [
+            465,
+            433
+          ],
+          "radius": 8,
+          "label": "Y",
+          "labelNear": [
+            465,
+            474
+          ]
+        },
+        {
+          "center": [
+            753,
+            433
+          ],
+          "radius": 8,
+          "label": "X",
+          "labelNear": [
+            733,
+            474
+          ],
+          "labelOffset": "X left of dashedline, not directly centered under dot"
+        },
+        {
+          "center": [
+            1029,
+            433
+          ],
+          "radius": 8,
+          "label": "Z",
+          "labelNear": [
+            1029,
+            474
+          ]
+        }
+      ],
+      "dashedLine": {
+        "x": 752,
+        "fromY": 366,
+        "toY": 494,
+        "visibleBlackRunsAtX751to753": [
+          [
+            366,
+            371
+          ],
+          [
+            385,
+            399
+          ],
+          [
+            415,
+            440
+          ],
+          [
+            445,
+            458
+          ],
+          [
+            474,
+            480
+          ],
+          [
+            487,
+            493
+          ]
+        ],
+        "note": "6 visible components at scan, third includes center spot. Top/bottom partial join rectangle; preserve literal segment positions, do not infer regular dash count behind dot."
+      },
+      "arrow": {
+        "direction": "UP",
+        "heads": 1,
+        "start": [
+          751,
+          538
+        ],
+        "tip": [
+          751,
+          508
+        ]
+      },
+      "caption": "Tuyến xuất phát",
+      "captionStyle": "italic",
+      "captionNear": [
+        754,
+        553
+      ]
+    },
+    "noExtra": [
+      "No assignments of X/Y/Z to amino acids",
+      "No changed Agr→Arg label",
+      "No charges on molecules",
+      "No caption period/added phase labels"
+    ]
+  },
+  "status": "Đạt exact SVG sau actual review",
+  "actualReview": {
+    "i": 485,
+    "hashSvg": "a47760459ae5eb5978acd6905d5625d3f315fab1d7b36417233e68c9cd560256",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x, mở full và crops molecules/diagram, đối chiếu nativefull/zooms/pixelruns cùng hai public refs. Đúng mọi C/NH2/H2N/HO/OH,3 phenyl doubles và4 carbonyl doubles; giữ EXACT Agr (pI = 10,8), Glu/Gly,pIcase/decimal commas. Giữ đầy đủ sentence printed không thêm chấm. Diagram +LEFT/−RIGHT/Y-X-Z, X lệch trái dashedline,6visible dash components có dot occlusion/edgepartials, UParrow và Tuyến xuất phát nghiêng đúng. Không chạm/cắt/tràn, không sửa lý thuyết/giảiAA.",
+    "actualSvgReviewed": true,
+    "byteSvg": 80895,
+    "render": "/workspace/scratch/pi485-234-a4776045-chromium.png",
+    "sourceHash": "5a037dd77f8feec5c44f5006b12ec8b7f87fb29610e7a16a38372923dddfc25c"
+  }
+}
