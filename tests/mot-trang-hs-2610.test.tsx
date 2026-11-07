@@ -434,6 +434,23 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     expect(screen.getByRole('button', { name: 'Thêm' })).toBeTruthy()
   })
 
+  it('chưa thấy buổi mở ⇒ mục «Điểm danh» luôn có trong tấm Thêm; bấm ⇒ 6 ô mã, gửi bằng ĐÚNG lệnh /hs/diem-danh', async () => {
+    const f = vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.endsWith('/hs/diem-danh')) { expect(JSON.parse(String(init?.body))).toEqual({ token: 'tk', ma: '482915' }); return traLoi({ ok: true, buoi: { id: 'B1', ten: 'Buổi học 07/11/2026', lop: '12A1', daDiemDanh: true } }) }
+      return traLoi({ ok: true, buoi: null })
+    })
+    vi.stubGlobal('fetch', f)
+    menu()
+    fireEvent.click(screen.getByRole('button', { name: 'Thêm' }))
+    expect(screen.queryByRole('form', { name: 'Điểm danh buổi học' })).toBeNull()
+    fireEvent.click(within(nav()).getByRole('button', { name: 'Điểm danh' }))
+    const khoi = await screen.findByRole('form', { name: 'Điểm danh buổi học' })
+    expect(within(nav()).queryAllByRole('button', { name: 'Điểm danh' }).filter((b) => b.classList.contains('tr-menu-muc'))).toHaveLength(0)
+    fireEvent.change(within(khoi).getByLabelText('Mã 6 số trên máy chiếu'), { target: { value: '482915' } })
+    fireEvent.click(within(khoi).getByRole('button', { name: 'Điểm danh' }))
+    expect(await screen.findByText('Đã điểm danh')).toBeTruthy()
+  })
+
   it('đúng 6 mục theo thứ tự, mỗi mục một ô biểu tượng; chuông ở đầu menu; Ca kiểm tra gọi onThi (ẩn khi ca đang mở); chạm mục ⇒ phanHoi(chon)', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => traLoi({ ok: true, buoi: null })))
     phanHoi.mockClear()
@@ -441,7 +458,8 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     const { unmount } = menu({ moDiemDanh: false, onThi, onMuc })
     const muc = () => within(nav()).getAllByRole('button').filter((b) => b.classList.contains('tr-menu-muc'))
     // thầy 02/11 khuya «Đổi vị trí Luyện tập bằng Kiểm tra, bỏ dòng a.i đỗ đại học»: tấm Thêm còn Luyện tập (hiện) + Cài đặt; Kiểm tra lên thanh nổi
-    expect(muc().map((b) => b.textContent)).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Cài đặt'])
+    // SỬA CÓ CHỦ ĐÍCH 07/11 — thầy «cho nút điểm danh hiện sẵn vào phần thêm luôn»: chưa thấy buổi mở ⇒ mục «Điểm danh» đứng đầu tấm Thêm.
+    expect(muc().map((b) => b.textContent)).toEqual(['Điểm danh', 'Hôm nay', 'Luyện tập', 'Thành tích', 'Cài đặt'])
     expect(within(nav()).getByRole('button', { name: 'Luyện tập' }).hasAttribute('data-hien')).toBe(true)
     expect(muc().every((b) => b.querySelector('.tr-menu-o'))).toBe(true)
     expect(within(nav()).getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')

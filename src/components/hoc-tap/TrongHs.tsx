@@ -1238,10 +1238,8 @@ function KhoiDiemDanh({ tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap }: Pick<
  *  rồi đúng 6 mục, mỗi mục một ô biểu tượng màu riêng: Lộ trình · Luyện tập · Thành tích · Ca kiểm tra (= Vào ca kiểm tra; ẩn khi ca đang mở vì Lộ trình đã
  *  có nút vào ca) · Hỏi A.I Đỗ Đại Học (mở ĐÚNG tấm chat của BongBongAiDdh, sự kiện `ddh:mo-ai`; chỉ hiện khi kênh bật — `<html data-ai-ddh>`) · Cài đặt
  *  (trượt sang tấm con: Âm thanh, Rung, Cập nhật bài học, Của em — cùng nút, cùng hành vi cũ).
- *  Thu gọn = MỘT vạch nhỏ giữa mép phải (chấm đỏ khi có tin chưa đọc — CSS :has đọc số của chuông thật); buổi đang mở mà em chưa điểm danh ⇒ vạch thò thẻ
- *  dọc «Điểm danh» (bấm ⇒ menu mở, tiêu điểm vào ô mã); mã QR gửi xong / gửi hỏng ⇒ menu tự mở. Chạm ngoài / chọn mục / Esc / cuộn trang ⇒ thu lại
- *  (Esc ở tấm Cài đặt ⇒ về 6 mục trước). Mở ⇒ tiêu điểm vào mục đầu; đóng ⇒ trả tiêu điểm về vạch. Menu luôn gắn trong DOM (ẩn bằng CSS) để tấm thông
- *  báo mở từ đây không mất. */
+ *  Buổi mở mà em chưa điểm danh ⇒ nút «Thêm» thò «Điểm danh»; QR gửi xong / hỏng ⇒ menu tự mở. Chạm ngoài / chọn mục / Esc / cuộn ⇒ thu lại.
+ *  Menu luôn gắn trong DOM (ẩn bằng CSS) để tấm thông báo mở từ đây không mất. */
 // Biểu tượng chỉ màn «Trong» dùng — vẽ nội tuyến (nét như lucide) để không kéo thêm vào mảnh biểu tượng chung của app thầy / màn thi (luật tốc độ).
 const IconNet = ({ d, size = 20 }: { d: string[]; size?: number }) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d.map((x) => <path key={x} d={x} />)}</svg>
 const Volume2 = ({ size }: { size?: number }) => <IconNet size={size} d={['M11 5 6 9H2v6h4l5 4z', 'M15.5 8.5a5 5 0 0 1 0 7', 'M19 5a10 10 0 0 1 0 14']} />
@@ -1300,7 +1298,7 @@ export function MenuDocTrong(p: {
   const the = useRef<HTMLElement>(null)
   const nutCai = useRef<HTMLButtonElement>(null)
   const nutLui = useRef<HTMLButtonElement>(null)
-  const { tt, ma, setMa, loi, setLoi, dangGui, gui, oNhap, mo: ddMoLoi, tuQr } = useDiemDanhHs(p.token ?? '', p.moDiemDanh && !!p.token)
+  const { tt, setTt, ma, setMa, loi, setLoi, dangGui, gui, oNhap, mo: ddMoLoi, tuQr } = useDiemDanhHs(p.token ?? '', p.moDiemDanh && !!p.token)
   const ddMo = tt.loai === 'cho'
   const coDd = !!p.token && coKhoiDiemDanh(tt)
   const dong = (traVe: boolean) => { setMo(false); if (traVe) nut.current?.focus() }
@@ -1363,6 +1361,8 @@ export function MenuDocTrong(p: {
           đây (useChoSo); chưa có số ⇒ rỗng, menu giữ một cột như cũ */}
       <div ref={oSo} id="tr-menu-dem" className="tr-menu-dem" />
       <div className="tr-menu-ds" hidden={cai}>
+        {/* thầy 07/11: Điểm danh luôn có ⇒ bấm hiện 6 ô mã */}
+        {p.token && !coDd && <button type="button" className="tr-menu-muc" onClick={chon(() => { setTt({ loai: 'cho', buoi: null }); setTimeout(() => oNhap.current?.focus()) })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><QrCode size={20} /></span>Điểm danh</button>}
         {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" data-hien={id === 'on-lai' || undefined} onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
         {/* thầy 02/11 khuya: Kiểm tra lên thanh nổi ⇒ tấm Thêm hiện Luyện tập (dòng MENU_DUO «on-lai», data-hien — trong-kinh.css), bỏ Ca kiểm tra; bỏ
             «Hỏi A.I Đỗ Đại Học» (đã có nút A.I riêng ngoài thanh) */}
