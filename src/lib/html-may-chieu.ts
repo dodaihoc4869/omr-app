@@ -146,6 +146,9 @@ function ngayVn(d: Date): string {
  * tới khi thầy bấm — nếu không thì chiếu lên là cả lớp đọc được đáp án trước
  * khi em kịp cầm phấn. */
 /** Preserve explicit author line breaks without interpreting arbitrary HTML. */
+/** Bỏ các DÒNG chú thích `// …` (chỉ dòng mà sau khoảng trắng là `//`) khỏi mã nhúng vào tờ — mã nguồn giữ chú thích, máy chiếu không phải tải
+ *  ~7,5 KB chữ giải thích (tác tử tốc độ 07/11). Chú thích cuối dòng sau mã giữ nguyên (không đoán chuỗi). */
+const boChuThich = (js: string): string => js.replace(/^[ \t]*\/\/.*(?:\r?\n|$)/gm, '')
 export function chuDeChieu(s?: string): string {
   if (!s) return ''
   return s.replace(/\r\n?/g,'\n').replace(/<br\s*\/?\s*>/gi,'\n').split('\n').map(line=>chuHtml(line)).join('<br>')
@@ -1167,5 +1170,5 @@ ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class=
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
 <style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style><style>${CSS_LOI_GIAI_GON}</style>${tuyChon.chuaBai ? `<style>${CSS_CHUA_BAI}</style>` : ''}${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
 <body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${tuyChon.chuaBai ? ' data-chua-bai' : ''}${maPhien ? ` data-cau-noi="${maPhien}"` : ''}${nganSach > 0 ? ` data-ngan-sach="${nganSach}"` : ''}>${than}
-<script>${JS_MAY_CHIEU}</script><script>${jsBoCuc()}</script>${maPhien ? `<script>${jsCauNoiToChieu()}</script>` : ''}<script>${jsLenBangMoi({ cauNoi: Boolean(maPhien) })}</script>${tuyChon.chuaBai ? `<script>${JS_CHUA_BAI}</script>` : ''}</body></html>`
+<script>${boChuThich(JS_MAY_CHIEU)}</script><script>${boChuThich(jsBoCuc())}</script>${maPhien ? `<script>${boChuThich(jsCauNoiToChieu())}</script>` : ''}<script>${boChuThich(jsLenBangMoi({ cauNoi: Boolean(maPhien) }))}</script>${tuyChon.chuaBai ? `<script>${boChuThich(JS_CHUA_BAI)}</script>` : ''}</body></html>`
 }
