@@ -60,9 +60,9 @@
       "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
     ],
     "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1191 câu đủ mọi hình+DDH/7 một phần;848 nguồn→593 SVG;10834226byte/gzip2008403;580 nguồn còn lại.",
-    "viecNenLamTiep": "Ưu tiên dựng lại/soát exacthash 35SVG/41nguồn còn lại trong dong-bo-font-main-lo-243.json; đã nhậpfontmain vàsoát26SVG,cóhistoryoldhash/proofmới riêng. Không chọnproofoldfontđểduyệthashmới. Vẫn hoàn thiện thêm hình thật mỗi lượt.119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn540/530/413/494/520/521/506/490/473/485/481/465/440/385/388/425/401/372/318/343/341/322/299/303/275/285/267/273/253/259/1347/225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;282compositeballstickraster+HaworthmaltoserootđãmởnativeCHƯAphânloạiđộclập-CHƯAdựng/khôngvẽgiảraster;301photocompositeforest-flower-logpile-rootđãmởnativeCHƯAphânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcộngsốvẽ;352RutherfordBohrcandidateCHƯAĐẠTdoPDFfragmentdướichưađủbằngchứngloại;403carboncloudrootmớiCHỈmởnativeCHƯAgeometry-CHƯAdựng/khôngđoáncount;529carboncloudrootmớiCHỈmởnative-chưađếmđượcallnucleons/khôngalias403;356giặtrửa4panelsrootmới mởnativeCHƯAgeometry-CHƯAdựng-CHƯAĐạt/khôngalias;270mớiCHỈranking2refsCHƯAmởnative-CHƯAdựng;461photoMướpĐắngrootmớiCHỈmởnativechưa phânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcount;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
-    "canhBaoCheckpoint": "Giữworktree/commitmới. Main572fa39cchưagộp;4WOFF2khớp,35SVG/41nguồncũchờdựnglại-soátlại. Màu241khácmain/66tệpnền+sizegateđỏNỀN. Full239lịchsử;phảisoMAINmớinhấttrướcmerge/deploy. Khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
+    "loVuaXong": "1193 câu đủ mọi hình+DDH/7 một phần;849 nguồn→594 SVG;10865809byte/gzip2011689;579 nguồn còn lại.",
+    "viecNenLamTiep": "Ưu tiên dựng lại/soát exacthash 33SVG/39nguồn còn lại trong dong-bo-font-main-lo-244.json; đã nhậpfontmain vàsoát28SVG,cóhistoryoldhash/proofmới riêng. Không chọnproofoldfontđểduyệthashmới. Vẫn hoàn thiện thêm hình thật mỗi lượt.119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn556/540/530/413/494/520/521/506/490/473/485/481/465/440/385/388/425/401/372/318/343/341/322/299/303/275/285/267/273/253/259/1347/225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;282compositeballstickraster+HaworthmaltoserootđãmởnativeCHƯAphânloạiđộclập-CHƯAdựng/khôngvẽgiảraster;301photocompositeforest-flower-logpile-rootđãmởnativeCHƯAphânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcộngsốvẽ;352RutherfordBohrcandidateCHƯAĐẠTdoPDFfragmentdướichưađủbằngchứngloại;403carboncloudrootmớiCHỈmởnativeCHƯAgeometry-CHƯAdựng/khôngđoáncount;529carboncloudrootmớiCHỈmởnative-chưađếmđượcallnucleons/khôngalias403;356giặtrửa4panelsrootmới mởnativeCHƯAgeometry-CHƯAdựng-CHƯAĐạt/khôngalias;270mớiCHỈranking2refsCHƯAmởnative-CHƯAdựng;461photoMướpĐắngrootmớiCHỈmởnativechưa phânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcount;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "canhBaoCheckpoint": "Giữworktree/commitmới. Main966f3fb8chưagộp;4WOFF2khớp,33SVG/39nguồncũchờdựnglại-soátlại. Màu241khácmain/66tệpnền+sizegateđỏNỀN. Full239lịchsử;phảisoMAINmớinhấttrướcmerge/deploy. Khôngpháthànhkhichưatoànphạmvi/cổng/offlineappđạt."
   },
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
@@ -70,7 +70,7 @@
     "lich": "moi-gio",
     "mucTieu": "Tự vẽ, soát, sửa, tích hợp và kiểm bản sống đến khi đạt; tự tắt khi hoàn tất",
     "thongBao": "Chỉ khi hoàn tất, có lỗi chặn thực sự hoặc cần hành động của thầy",
-    "lyDo": "Tiếp từ1191câu/593SVG;35SVGfontchờsoát.Chỉtắt khitoànphạmviđạt/vàoapp/kiểmbảnsống."
+    "lyDo": "Tiếp từ1193câu/594SVG;33SVGfontchờsoát.Chỉtắt khitoànphạmviđạt/vàoapp/kiểmbảnsống."
   },
   "loOrbitalDaSoat": {
     "soAnhNguon": 23,
@@ -79,14 +79,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 848,
-    "soSvgRieng": 593,
-    "soCauDungHinh": 1198,
-    "soCauDuMoiHinh": 1191,
+    "soAnhNguon": 849,
+    "soSvgRieng": 594,
+    "soCauDungHinh": 1200,
+    "soCauDuMoiHinh": 1193,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 10834226,
-    "byteGzip": 2008403,
-    "soAnhNguonConLai": 580,
+    "byteSvg": 10865809,
+    "byteGzip": 2011689,
+    "soAnhNguonConLai": 579,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -101,32 +101,32 @@
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
     "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "243 mọi chữ/DDH Rounded path tự chứa/không fallback.",
+    "loMoi": "244mọichữ/DDH Rounded path tự chứa/khôngfallback.",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": true,
     "chenhLechMain": {
-      "main": "572fa39ce3edfd8abd83dcc5df49b46faf2a2ca6",
-      "proof": "kiem/dong-bo-font-main-lo-243.json",
+      "main": "966f3fb85c2732d3c1a4aa14f3942d5cb2b8b2ab",
+      "proof": "kiem/dong-bo-font-main-lo-244.json",
       "deIdentical": true,
       "damIdentical": true,
       "fontFilesSynced": true,
-      "migratedSelectedSvg": 26,
-      "remainingSelectedSvg": 35,
-      "remainingSourceHashes": 41,
+      "migratedSelectedSvg": 28,
+      "remainingSelectedSvg": 33,
+      "remainingSourceHashes": 39,
       "chuaDongBoMain": true,
-      "scopeCounts": "Bộ trộn snapshot đã soát:26SVG trong dong-bo-font-main-lo-243.json vànewsource520/494/413/530/540theofontmain;41nguồnđậmcũchưachứngnhậnfontmain.1191khôngphảitoànbộkhớpfontmain."
+      "scopeCounts": "Bộ trộn snapshot đã soát:28SVG trong dong-bo-font-main-lo-244.json vànewsource520/494/413/530/540/556theofontmain;39nguồnđậmcũchưachứngnhậnfontmain.1193khôngphảitoànbộkhớpfontmain."
     }
   },
   "daDatPhongApp": {
-    "soNguon": 848,
-    "soCauDuHinhVaPhong": 1191,
+    "soNguon": 849,
+    "soCauDuHinhVaPhong": 1193,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
   },
   "loMoiNhat": {
-    "lo": "243",
-    "ketQua": "1191 câu đủ mọi hình+DDH/7 một phần;848 nguồn→593 SVG;10834226byte/gzip2008403;580 nguồn còn lại.",
-    "suaLoi": "540 vẽ mới:3 vòng liên tục/13 electron đúng từng vị trí2-8-3,ngoàiTOP-LEFT-BOTTOM/bluecore+13DDHđậm/khôngthêmRIGHTdot-layernums-name-caption. NativeFULL-all13positions-all2publicrefs vàfreshactualChromium3x/exact6763a1c9…27f79 đạtđộc lập,khép2câu. Font4SVG2/13/73/1222 dựnglại vàsoát nativeFULL-publicrefs-freshactual-exacthashmớiđạt;hìnhhọcngoàiboldEXACT. Giữ73UNIFORMdiags và1222TAPER/18supO. Cộngdồn26/61SVGfontmớiquasoát,còn35SVG/41nguồncũ. Khôngcộngfont-onlythànhnguồn/câumới.",
-    "tiepTheo": "Ưu tiên dựng lại/soát exacthash 35SVG/41nguồn còn lại trong dong-bo-font-main-lo-243.json; đã nhậpfontmain vàsoát26SVG,cóhistoryoldhash/proofmới riêng. Không chọnproofoldfontđểduyệthashmới. Vẫn hoàn thiện thêm hình thật mỗi lượt.119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn540/530/413/494/520/521/506/490/473/485/481/465/440/385/388/425/401/372/318/343/341/322/299/303/275/285/267/273/253/259/1347/225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;282compositeballstickraster+HaworthmaltoserootđãmởnativeCHƯAphânloạiđộclập-CHƯAdựng/khôngvẽgiảraster;301photocompositeforest-flower-logpile-rootđãmởnativeCHƯAphânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcộngsốvẽ;352RutherfordBohrcandidateCHƯAĐẠTdoPDFfragmentdướichưađủbằngchứngloại;403carboncloudrootmớiCHỈmởnativeCHƯAgeometry-CHƯAdựng/khôngđoáncount;529carboncloudrootmớiCHỈmởnative-chưađếmđượcallnucleons/khôngalias403;356giặtrửa4panelsrootmới mởnativeCHƯAgeometry-CHƯAdựng-CHƯAĐạt/khôngalias;270mớiCHỈranking2refsCHƯAmởnative-CHƯAdựng;461photoMướpĐắngrootmớiCHỈmởnativechưa phânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcount;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
-    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build243/speed21/21/Chromium593/593/hashXML/path/AST/SW14/14/serverTSCđạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;MàusoMain572fa39c241khácbiệtnền/66tệp,lônàykhôngsửasrc. Full239nhánh16581/main5d89cd4d16709làmốclịchsử,khôngthayfulltestMAINmớinhấttrướcmerge/deploy.35SVG/41nguồnchưakhớpfontmain;khôngallrepođạt."
+    "lo": "244",
+    "ketQua": "1193 câu đủ mọi hình+DDH/7 một phần;849 nguồn→594 SVG;10865809byte/gzip2011689;579 nguồn còn lại.",
+    "suaLoi": "556vẽmới:3C15H31COOCH2/CH/CH2+3NaOH→3C15H31COONa+CH2OH/CHOH/CH2OH;4liênkếtC-CđúngCcenter/1RIGHThead/tcircleliteral/noextra phases-caption-answer. NativeFULL-bondszooms/all2refs/freshactualChromium2x/exact6a79302d…25efĐạtđộclập,khép2câu. RootactualsửaCanchortrướcsoát,oldfb08bịloại. Font2SVG568/925soátlại từngnative-full-publicrefs-freshactual-exacthashmới.925pháthiệnnativeE_b lowercaseb,đãsửaB→b/thu hồioldpositiveuppercaseBvàcandidate53c85;giữ945kJ/mol/3ống/2cầuvàngoàichữđậmexacttrừglyphblowercaseđãkhai.568giữ3highlightsvàng/dottedđỏ/dashedđỏvàalllabels. Cộngdồn28/61fontmain,còn33SVG/39nguồn.Khôngcộngfont-only/sửalạithànhnguồn/câumới.",
+    "tiepTheo": "Ưu tiên dựng lại/soát exacthash 33SVG/39nguồn còn lại trong dong-bo-font-main-lo-244.json; đã nhậpfontmain vàsoát28SVG,cóhistoryoldhash/proofmới riêng. Không chọnproofoldfontđểduyệthashmới. Vẫn hoàn thiện thêm hình thật mỗi lượt.119 vẫn chưa đạt do grayflecks-fume, không đoán/không dựng. Nguồn556/540/530/413/494/520/521/506/490/473/485/481/465/440/385/388/425/401/372/318/343/341/322/299/303/275/285/267/273/253/259/1347/225/265/213/247/197/217/180/189/198/176/177/453/160/148/151/149/152/135/142/131/118/111/110/106/101/99/93/73/65/64/58/49/48/47/590/43đãđạtđừngtrùng. Tiếpnguồndùng2câuchưađạt4/71/74/79/129/145/250glucosetwoOHhemiacetal+bottomprintedtextrootđãmởnativeCHƯAgeometry-CHƯAdựng/khôngalias151topmissingl;282compositeballstickraster+HaworthmaltoserootđãmởnativeCHƯAphânloạiđộclập-CHƯAdựng/khôngvẽgiảraster;301photocompositeforest-flower-logpile-rootđãmởnativeCHƯAphânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcộngsốvẽ;352RutherfordBohrcandidateCHƯAĐẠTdoPDFfragmentdướichưađủbằngchứngloại;403carboncloudrootmớiCHỈmởnativeCHƯAgeometry-CHƯAdựng/khôngđoáncount;529carboncloudrootmớiCHỈmởnative-chưađếmđượcallnucleons/khôngalias403;356giặtrửa4panelsrootmới mởnativeCHƯAgeometry-CHƯAdựng-CHƯAĐạt/khôngalias;270mớiCHỈranking2refsCHƯAmởnative-CHƯAdựng;461photoMướpĐắngrootmớiCHỈmởnativechưa phânloạiđộclập/GIỮrasterkhôngvẽgiả-khôngcount;nguồn2refmới...socảhashmanifest/đọcnativefull-stemrefs/rankingchỉgợiýkhôngduyệtalias.37photoMướpĐắng;40compositecorn-can+labelsCHƯAsoátphânloạiđộclập/cầngiữrasterđúngbằngchứng.4bộrửakhíSO2-chấtTCHƯAdựng,hạtpatternmờkhônggáncount.138/753/1305ảnhthậtcầnsoátphânloạiđộclậpGIỮrasterkhôngvẽgiả. Giữharness167/mốc/đỏcũ;sizegateđỏNỀNindex.tsphảixửlýtrướcgộp/deploy. Mainmớinhất/fulltestTHEOTÊN/cathi/offlineappbắtbuộc.1014/209/59/1391chưađạt.",
+    "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build244/speed21/21/Chromium594/594/hashXML/path/AST/SW14/14/serverTSCđạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;MàusoMain966f3fb8241khácbiệtnền/66tệp,lônàykhôngsửasrc. Full239nhánh16581/main5d89cd4d16709làmốclịchsử,khôngthayfulltestMAINmớinhấttrướcmerge/deploy.33SVG/39nguồnchưakhớpfontmain;khôngallrepođạt."
   }
 }

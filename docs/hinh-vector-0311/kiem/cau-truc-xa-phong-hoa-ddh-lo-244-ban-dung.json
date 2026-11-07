@@ -1,0 +1,40 @@
+[
+  {
+    "i": 556,
+    "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
+    "fileNguon": "anh/6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971.png",
+    "svg": "xa-phong-hoa-ddh-6a79302dbc26ca8336c4dbc0da916164e392e8ff3a85ca9a3775cd30301f25ef.svg",
+    "hashSvg": "6a79302dbc26ca8336c4dbc0da916164e392e8ff3a85ca9a3775cd30301f25ef",
+    "byteSvg": 31789,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D2-I-2",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
+            "where": "12-KT-C1-D2-I-2.hinh.0.du_lieu",
+            "hashDataUrl": "64d22b99b2897334a53e911925c1212d6e27f7d45c119337cee528d10eb3eb55"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-I-101",
+        "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+        "refs": [
+          {
+            "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
+            "where": "DB-12-B1-P1-D1-I-101.hinh.0.du_lieu",
+            "hashDataUrl": "64d22b99b2897334a53e911925c1212d6e27f7d45c119337cee528d10eb3eb55"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Ba C15H31COOCH2/CH/CH2;hai verticalbonds+glycerolCH2OH-CHOH-CH2OH;3NaOH/3C15H31COONa/1RIGHThead/t°literal/noextra phases-caption-answer/DDHpath.",
+    "hashSvgDaSoat": "6a79302dbc26ca8336c4dbc0da916164e392e8ff3a85ca9a3775cd30301f25ef",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

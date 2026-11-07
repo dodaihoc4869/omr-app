@@ -24,15 +24,16 @@
       }
     ],
     "daTrongManifestSauKhiGuiDotDau": false,
-    "svg": "butanone-khoanh-ddh-7fd96b24a6d4a58d390d72b6e75f03bc3427ce90a3c673f5f34f3355b8703c54.svg",
-    "hashSvg": "7fd96b24a6d4a58d390d72b6e75f03bc3427ce90a3c673f5f34f3355b8703c54",
-    "byteSvg": 8723,
+    "svg": "butanone-khoanh-ddh-c8f8430bd7f0a0f9e2d4749319a1b030bb512131614a4e01f52318df1d44aa2b.svg",
+    "hashSvg": "c8f8430bd7f0a0f9e2d4749319a1b030bb512131614a4e01f52318df1d44aa2b",
+    "byteSvg": 8525,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "A nềnvàngbo gócbaoC2H5COkhôngCH3;BovalCHẤMđỏC2H5;CovalNÉTĐỨTđỏCOCH3cắtởmépdướinhưsource.3nhãnđậmthậtDDH/khôngcharge.",
-    "hashSvgDaSoat": "7fd96b24a6d4a58d390d72b6e75f03bc3427ce90a3c673f5f34f3355b8703c54",
-    "nguoiSoat": "soat_hinh_vector"
+    "hashSvgDaSoat": "c8f8430bd7f0a0f9e2d4749319a1b030bb512131614a4e01f52318df1d44aa2b",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "966f3fb85c2732d3c1a4aa14f3942d5cb2b8b2ab"
   }
 ]

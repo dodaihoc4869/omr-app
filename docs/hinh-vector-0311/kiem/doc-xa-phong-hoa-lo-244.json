@@ -1,0 +1,174 @@
+{
+  "i": 556,
+  "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971.png",
+  "nativeSize": [
+    1192,
+    253
+  ],
+  "reviewed": [
+    "nativeFULL2x/nativeFULL",
+    "leftCanchorbonds4x",
+    "rightCanchorbonds4x"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C1-D2-I-2",
+      "maDe": "12-KT-C1-D2",
+      "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+      "hinh": [
+        {
+          "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
+          "where": "12-KT-C1-D2-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "64d22b99b2897334a53e911925c1212d6e27f7d45c119337cee528d10eb3eb55"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-I-101",
+      "maDe": "DB-12-B1-P1-D1",
+      "de": "Cho phản ứng được biểu diễn thông qua phương trình hoá học sau: Phản ứng trên thuộc loại phản ứng nào sau đây?",
+      "hinh": [
+        {
+          "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
+          "where": "DB-12-B1-P1-D1-I-101.hinh.0.du_lieu",
+          "hashDataUrl": "64d22b99b2897334a53e911925c1212d6e27f7d45c119337cee528d10eb3eb55"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "leftRows": [
+      {
+        "text": "C₁₅H₃₁COOCH₂",
+        "near": [
+          164,
+          53
+        ]
+      },
+      {
+        "text": "C₁₅H₃₁COOCH",
+        "near": [
+          152,
+          124
+        ]
+      },
+      {
+        "text": "C₁₅H₃₁COOCH₂",
+        "near": [
+          157,
+          196
+        ]
+      }
+    ],
+    "leftBonds": [
+      [
+        227,
+        70,
+        227,
+        100
+      ],
+      [
+        225,
+        143,
+        225,
+        174
+      ]
+    ],
+    "leftBondAnchors": "vertical connecting C of terminal CH2/CH/CH2, not H or subscript2 or esterO. Slight source xoffset2px preserved approximately.",
+    "reagent": {
+      "text": "+ 3NaOH",
+      "near": [
+        404,
+        126
+      ]
+    },
+    "arrow": {
+      "start": [
+        539,
+        128
+      ],
+      "end": [
+        608,
+        128
+      ],
+      "direction": "RIGHT",
+      "heads": 1,
+      "above": "t⁰",
+      "aboveNear": [
+        576,
+        112
+      ],
+      "superscript": "source small raised circle/0 after t; retain literal source thermalannotation, no extra catalysts"
+    },
+    "salt": {
+      "text": "3C₁₅H₃₁COONa",
+      "near": [
+        802,
+        124
+      ]
+    },
+    "plusNear": [
+      970,
+      128
+    ],
+    "rightRows": [
+      {
+        "text": "CH₂OH",
+        "near": [
+          1091,
+          53
+        ]
+      },
+      {
+        "text": "CHOH",
+        "near": [
+          1087,
+          124
+        ]
+      },
+      {
+        "text": "CH₂OH",
+        "near": [
+          1091,
+          196
+        ]
+      }
+    ],
+    "rightBonds": [
+      [
+        1045,
+        70,
+        1045,
+        100
+      ],
+      [
+        1042,
+        144,
+        1042,
+        174
+      ]
+    ],
+    "rightBondAnchors": "C ofCH2OH/CHOH/CH2OH atleft of label, not O/H/subscript",
+    "counts": {
+      "leftRows": 3,
+      "leftVerticalSingleBonds": 2,
+      "rightRows": 3,
+      "rightVerticalSingleBonds": 2,
+      "rightArrowheads": 1,
+      "plusSigns": 2
+    },
+    "layout": "left3rowtriester +3NaOH midbaseline→salt +glycerol3rows, no caption/labelsXYZ/nocharge/noexplicitC=O lines because condensed COO literal",
+    "subscripts": "15 and31 each of3leftrows+product;2onfirst/thirdleftCH2 andrightCH2OH;coeff3 baseline notsubscript;NaOH nocharge"
+  },
+  "status": "Đạt exactfinalSVG sauactualreview",
+  "actualReview": {
+    "i": 556,
+    "hashSvg": "6a79302dbc26ca8336c4dbc0da916164e392e8ff3a85ca9a3775cd30301f25ef",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact finalSVG2x mởactualFULL, nativeFULL2x/FULL,left-rightCanchorbonds4x/all2publicrefs.3leftC15H31COOCH2-CH-CH2/2C-Cverticalbonds nayđúngterminalCcenter,x236.532;rightCH2OH-CHOH-CH2OH/2C-Cbonds đúngCcenterx1046.7. +3NaOH/1RIGHThead/t raisedcircle-smallzero/3C15H31COONa/+glycerylformula nguyên văn,subscripts15/31/2 vàcoeffs đúng;khôngphases/caption/answers. Fontgaps khôngchạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 31789,
+    "render": "/workspace/scratch/final244-556-new.png"
+  }
+}

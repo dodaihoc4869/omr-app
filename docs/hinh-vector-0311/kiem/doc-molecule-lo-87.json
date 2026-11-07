@@ -477,7 +477,7 @@
     "circle": false,
     "caption": [],
     "smiles": "N#N",
-    "notes": "Môhình2quảcầuxanhgắnNtrắng,baốngxámnối3liênkếtgiữa2N chéo lênphải;captionphải E_B (N≡N) = 945 kJ/mol vớiBsubscript. Khôngtựđổi945hayđơnvị;kýhiệubondtrongcaptionlà≡. GiữmôhìnhchứkhôngchỉvẽSMILESnétphẳng.",
+    "notes": "Môhình2quảcầuxanhgắnNtrắng,baốngxámnối3liênkếtgiữa2N chéo lênphải;captionphải E_b (N≡N) = 945 kJ/mol vớiblowercasesubscript. Khôngtựđổi945hayđơnvị;kýhiệubondtrongcaptionlà≡. GiữmôhìnhchứkhôngchỉvẽSMILESnétphẳng.",
     "questions": [
       {
         "qid": "DH-11-C2-B4-II-9",
@@ -501,7 +501,10 @@
       "literalFormulaOnly": false,
       "modelWithCaption": true
     },
-    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới."
+    "labelHandling": "Giữcaption/header/nhãnđãliệtkê;khôngtựđặttênmoleculehoặcđánhnhãnPDFmới.",
+    "errataLo244": "Mởnative15x:chỉsốblowercase,thu hồioldpositiveuppercaseB;giữ945kJ/mol vàbaống.",
+    "svgDaChon": "nitrogen-model-ddh-688040a623890c2eafbefc119a70654aaa5004bad1317c6957a120ddc503cdea.svg",
+    "hashSvgDaChon": "688040a623890c2eafbefc119a70654aaa5004bad1317c6957a120ddc503cdea"
   },
   {
     "i": 136,
