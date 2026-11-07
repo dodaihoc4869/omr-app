@@ -34,14 +34,17 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5.svg",
-    "hashSvg": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
-    "byteSvg": 5519,
+    "svg": "bang-o-ddh-d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4.svg",
+    "hashSvg": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4",
+    "byteSvg": 5540,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
-    "hashSvgDaSoat": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4",
+    "nguoiSoat": "soat_nguon_2",
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
   },
   {
     "i": 229,
@@ -78,16 +81,17 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2.svg",
-    "hashSvg": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
-    "byteSvg": 6328,
+    "svg": "bang-o-ddh-45137b580333855da269eb0811e1542e94584c3c8cd26922792d4fb83e66f735.svg",
+    "hashSvg": "45137b580333855da269eb0811e1542e94584c3c8cd26922792d4fb83e66f735",
+    "byteSvg": 6531,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "hashSvgDaSoat": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+    "hashSvgDaSoat": "45137b580333855da269eb0811e1542e94584c3c8cd26922792d4fb83e66f735",
     "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e"
   },
   {
     "i": 83,
@@ -150,15 +154,16 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d.svg",
-    "hashSvg": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
-    "byteSvg": 88299,
+    "svg": "bang-o-ddh-0060571ae8da07266f7fe01c1cd99665426d62c7ecf6292cc3e47e831ba3e1b1.svg",
+    "hashSvg": "0060571ae8da07266f7fe01c1cd99665426d62c7ecf6292cc3e47e831ba3e1b1",
+    "byteSvg": 92500,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "hashSvgDaSoat": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
+    "hashSvgDaSoat": "0060571ae8da07266f7fe01c1cd99665426d62c7ecf6292cc3e47e831ba3e1b1",
     "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e"
   }
 ]

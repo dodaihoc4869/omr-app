@@ -1,0 +1,43 @@
+[
+  {
+    "i": 711,
+    "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+    "fileNguon": "anh/845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509.png",
+    "svg": "ba-amino-acid-ddh-d19195ac4bd031c672caf4b83be985ee4c50f8e1abee0579c6f56755d70c211a.svg",
+    "hashSvg": "d19195ac4bd031c672caf4b83be985ee4c50f8e1abee0579c6f56755d70c211a",
+    "byteSvg": 36993,
+    "font": "DDH Rounded",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D2-II-3",
+        "de": "Thuỷ phân không hoàn toàn một đoạn phân tử insulin, thu được peptide X là Glu-Arg-Gly.\nCông thức cấu tạo và kí hiệu một số nhóm chức của các amino acid cho ở hình dưới.",
+        "refs": [
+          {
+            "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+            "where": "12-KT-C123-D2-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "b0ee61387567260898f6f0f27091acb60ec8d7ed04e3d95b21b34e78f0b47a32"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D2-II-76",
+        "de": "Thuỷ phân không hoàn toàn một đoạn phân tử insulin, thu được peptide X là Glu-Arg-Gly.\nCông thức cấu tạo và kí hiệu một số nhóm chức của các amino acid cho ở hình dưới.",
+        "refs": [
+          {
+            "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+            "where": "DB-12-B9-P2-D2-II-76.hinh.0.du_lieu",
+            "hashDataUrl": "b0ee61387567260898f6f0f27091acb60ec8d7ed04e3d95b21b34e78f0b47a32"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3moleculesArg-Glu-Gly/13C8O6N/4COdouble+1CNdouble/H2N-NH-N-H-NH2literal/4numbers(1)(2)/3captionscase/noextra charges-stereo-arrows-answer/DDHpath.",
+    "hashSvgDaSoat": "d19195ac4bd031c672caf4b83be985ee4c50f8e1abee0579c6f56755d70c211a",
+    "nguoiSoat": "soat_nguon_2",
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
+  }
+]

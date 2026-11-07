@@ -3,11 +3,11 @@
     "i": 631,
     "hash": "74ba82282a78b83d44a537a1f4e1fcd212a671b8901beaa09d5558f086ec9ea4",
     "fileNguon": "anh/74ba82282a78b83d44a537a1f4e1fcd212a671b8901beaa09d5558f086ec9ea4.png",
-    "svg": "methyl-glucoside-ddh-04771c56cb1dfba255864e35917d51eefb6a9649d82265664d6203bb6ca3d525.svg",
-    "hashSvg": "04771c56cb1dfba255864e35917d51eefb6a9649d82265664d6203bb6ca3d525",
-    "byteSvg": 6710,
+    "svg": "methyl-glucoside-ddh-81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4.svg",
+    "hashSvg": "81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4",
+    "byteSvg": 6723,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,10 @@
       }
     ],
     "ghiChuDung": "Nguồn631đọcRIÊNGnativevà548/all4refs;chỉdùngchungsauđốichi tiết4OH-OCH3/stereo/bareC6/2TAPER1bold,khôngpHash/thumbnail. Scanlayoutshiftkhôngpixelidentical.",
-    "hashSvgDaSoat": "04771c56cb1dfba255864e35917d51eefb6a9649d82265664d6203bb6ca3d525",
-    "nguoiSoat": "soat_nguon_2"
+    "hashSvgDaSoat": "81a2ffb31c9e2c5bdfab3c37875067b138dabbbf4e870aac41b55c415625b4a4",
+    "nguoiSoat": "soat_nguon_2",
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
   }
 ]

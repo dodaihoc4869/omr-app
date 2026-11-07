@@ -1,0 +1,95 @@
+{
+  "main": "83ebec75bc29eb88d40c438898a717b58439be0e",
+  "branchCheckpointBefore": "f268d7b43d5334eb3e5c438560ba830c2e2e47a3",
+  "branchTests": 16581,
+  "mainTests": 16725,
+  "branchFailedTests": 14,
+  "mainFailedTests": 24,
+  "branchFailedNames": [
+    "tests/chon-luot-2109.test.ts :: MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt rỗng, tỉ lệ câu lặp thấp, không lặp trong ngày kho 330 câu: mọi lượt đủ 6 câu; câu lặp trong 7 ngày < 30 % (kho giả nhỏ); không nhóm nào lặp trong cùng một ngày; câu sai hôm nay không quay lại hôm nay",
+    "tests/chon-luot-2109.test.ts :: MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới kho NHỎ (7–20 câu) và em đã làm gần hết: vẫn trả đủ min(6, kho) câu, KHÔNG rỗng (thang nới: bậc + 1 → câu sai hôm nay cũng được lấy lại khi hết câu khác)",
+    "tests/chon-luot-2109.test.ts :: ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo \"chưa có câu vừa sức\" khi kho thật sự chỉ còn câu quá bậc",
+    "tests/chon-luot-2109.test.ts :: ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") loại \"khoi_dong\": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều, chỉ Phần I",
+    "tests/do-toi-uu-may-chu-2809.test.ts :: ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)",
+    "tests/hoa2-cau-da-lam-2709.test.tsx :: CauDaLam — theo bản vẽ HS-CauDaLam bấm thẻ ⇒ đề + LỜI GIẢI chuẩn của TheCau (Kiến thức cốt lõi, ✓✗ từng phương án) + lịch sử; chi tiết lấy qua hoa2-cau-chi-tiet cho câu đang lọc",
+    "tests/hom-nay-v2-2109.test.tsx :: OTraCuu — ô tra cứu lớn bấm vào gợi ý mở em; Esc đóng + xoá; 6 số ⇒ \"Mở ca kiểm tra mã …\"; không có ⇒ nói thật ngay trong ô; danh sách lớp trống ⇒ hướng dẫn nạp",
+    "tests/lam-bai-3-co-dot16-1210i.test.tsx :: ManLamBaiTap theo khổ màn (chỉ đổi chỗ đặt) máy tính 1440×900: phương án + ghi chú sang cột phải ngay trên nút Nộp; nộp gửi y nguyên lệnh cũ; dải kết quả đứng đầu cột phải",
+    "tests/man-lam-bai-1210d.test.tsx :: màn làm bài Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi \"-1,5\"",
+    "tests/man-lam-bai-1210d.test.tsx :: màn làm bài Trắc nghiệm: 4 ô role=radio, \"Nộp câu · đã chọn B\"; sau khi nộp đánh dấu ô em chọn / đáp án",
+    "tests/man-lam-bai-1210d.test.tsx :: màn làm bài Đúng–sai: chọn đủ 4 ý mới nộp; gửi \"DDDD\" đúng định dạng cũ; phản hồi từng ý + giải thích ý sai mở sẵn",
+    "tests/muc-lam-lo-2110.test.ts :: mức làm theo lô em (bảng điểm danh) đường lệnh thầy `/gv/muc-lam-lo` chạy qua cổng thầy (trả `ok` + số của từng em); không có mã thầy ⇒ bị chặn",
+    "tests/tu-chua-truc-tiep-1210.test.tsx :: Chữa trực tiếp câu gốc khi thiếu bài luyện từng bước không còn ngõ cụt: câu gốc + đáp án em chọn → tự làm lại (sai, thử thêm, vẫn sai) → đáp án + lời giải",
+    "tests/tu-luyen-v3-giao-dien-3009.test.tsx :: Chấm từng câu bật công tắc (nhớ theo máy) ⇒ Kiểm tra gửi đúng một câu, hiện Đúng + lời giải + Câu tiếp; câu đã chấm bị khoá"
+  ],
+  "mainFailedNames": [
+    "tests/chon-luot-2109.test.ts :: MÔ PHỎNG 60 em giả × 7 ngày × 3–6 lượt: không lượt rỗng, tỉ lệ câu lặp thấp, không lặp trong ngày kho 330 câu: mọi lượt đủ 6 câu; câu lặp trong 7 ngày < 30 % (kho giả nhỏ); không nhóm nào lặp trong cùng một ngày; câu sai hôm nay không quay lại hôm nay",
+    "tests/chon-luot-2109.test.ts :: MỐC 4 — KHÔNG LƯỢT RỖNG khi kho còn câu; thang nới kho NHỎ (7–20 câu) và em đã làm gần hết: vẫn trả đủ min(6, kho) câu, KHÔNG rỗng (thang nới: bậc + 1 → câu sai hôm nay cũng được lấy lại khi hết câu khác)",
+    "tests/chon-luot-2109.test.ts :: ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") KHÔNG lượt rỗng khi kho Đoàn thu hẹp còn ít câu (7–20 câu Phần I/III): trả đủ min(6, số câu ĐỦ BẬC) — Đoàn chỉ báo \"chưa có câu vừa sức\" khi kho thật sự chỉ còn câu quá bậc",
+    "tests/chon-luot-2109.test.ts :: ĐOÀN HỘ TỐNG dùng CÙNG bộ chọn với Đảo Đợt 2 (thầy 21/09 tối: \"đúng luật cá nhân hoá, nâng đỡ, chặn lặp\") loại \"khoi_dong\": 30 em × 7 ngày × 4 chặng — mỗi chặng đủ 6 câu, KHÔNG Phần II, không nhóm nào lặp trong ngày, bậc ≤ bậc em + 1, câu chưa gặp ≥ 3 khi kho còn nhiều, chỉ Phần I",
+    "tests/dem-phan-hoi-ngan-3110.test.ts :: đệm phản hồi lệnh hỏi định kỳ trong ngăn em vừa có lệnh GHI (mở chặng) ⇒ đệm của em bỏ ngay; lần sau đọc lại D1",
+    "tests/dem-phan-hoi-ngan-3110.test.ts :: đệm phản hồi lệnh hỏi định kỳ trong ngăn mọi đường trong danh sách: lần hai trong hạn không chạm D1 (nếu lần đầu không ghi), thân y hệt; serverNow làm mới",
+    "tests/gv-trung-tu-0910.test.tsx :: Học sinh 2.0 (bản vẽ GV-HocSinh) nút ⋯: thực đơn gom thao tác của một em (đúng hàm cũ); Esc đóng và trả focus",
+    "tests/hoa2-cau-da-lam-2709.test.tsx :: CauDaLam — theo bản vẽ HS-CauDaLam bấm thẻ ⇒ đề + LỜI GIẢI chuẩn của TheCau (Kiến thức cốt lõi, ✓✗ từng phương án) + lịch sử; chi tiết lấy qua hoa2-cau-chi-tiet cho câu đang lọc",
+    "tests/hom-nay-v2-2109.test.tsx :: OTraCuu — ô tra cứu lớn bấm vào gợi ý mở em; Esc đóng + xoá; 6 số ⇒ \"Mở ca kiểm tra mã …\"; không có ⇒ nói thật ngay trong ô; danh sách lớp trống ⇒ hướng dẫn nạp",
+    "tests/hop-thoai-app-2809.test.tsx :: hoiXacNhan nằm trong vỏ màu đúng app: app thầy `.m3.vo-thay`, app HS/PH `.m3` — vỏ `display: contents`, gỡ khi đóng",
+    "tests/khong-dung-bien-truoc-khi-khai.test.ts :: Không đọc biến trước khi khai báo KHÔNG có chỗ vi phạm nào ngoài danh sách đã rà soát",
+    "tests/khong-has-goc-ht-app-0211.test.ts :: không :has() trên gốc .ht-app (02/11) mọi tờ CSS trong src/",
+    "tests/lam-bai-3-co-dot16-1210i.test.tsx :: ManLamBaiTap theo khổ màn (chỉ đổi chỗ đặt) máy tính 1440×900: phương án + ghi chú sang cột phải ngay trên nút Nộp; nộp gửi y nguyên lệnh cũ; dải kết quả đứng đầu cột phải",
+    "tests/man-lam-bai-1210d.test.tsx :: màn làm bài Trả lời ngắn: 4 ô + bàn phím số riêng, KHÔNG có ô nhập (không bật bàn phím điện thoại); phím máy tính vẫn nhập; gửi \"-1,5\"",
+    "tests/man-lam-bai-1210d.test.tsx :: màn làm bài Trắc nghiệm: 4 ô role=radio, \"Nộp câu · đã chọn B\"; sau khi nộp đánh dấu ô em chọn / đáp án",
+    "tests/man-lam-bai-1210d.test.tsx :: màn làm bài Đúng–sai: chọn đủ 4 ý mới nộp; gửi \"DDDD\" đúng định dạng cũ; phản hồi từng ý + giải thích ý sai mở sẵn",
+    "tests/mau-chat-chi-thi-hs-2710.test.ts :: bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10) chữ trên nút không kém cặp Duolingo cũ; chữ màu ≥ 4,5 trên thẻ và nền nhạt — toi",
+    "tests/mau-chat-chi-thi-hs-2710.test.ts :: bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10) nền tối không dùng #131f24 (cả bảng lười lẫn dòng tối học sinh trong trong.css)",
+    "tests/mau-chat-chi-thi-hs-2710.test.ts :: bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10) tối đo theo Duolingo: nền / thẻ / viền đúng bậc L; đáy 3D = mặt − 0,116 cùng sắc; mặt tô sáng như bản sáng",
+    "tests/mau-tuoi-hs-2710.test.ts :: màu tươi app học sinh 27/10 bảng học sinh là bộ B «Chất chỉ thị» (chàm + lục ngọc), nền tối đêm chàm",
+    "tests/muc-lam-lo-2110.test.ts :: mức làm theo lô em (bảng điểm danh) đường lệnh thầy `/gv/muc-lam-lo` chạy qua cổng thầy (trả `ok` + số của từng em); không có mã thầy ⇒ bị chặn",
+    "tests/toan-man-hs-2810.test.ts :: index.html: tràn vùng tai thỏ + thanh trạng thái cùng màu nền học sinh vai hs viết theme-color sáng / tối theo --tr-nen, TRƯỚC thẻ chung",
+    "tests/tu-chua-truc-tiep-1210.test.tsx :: Chữa trực tiếp câu gốc khi thiếu bài luyện từng bước không còn ngõ cụt: câu gốc + đáp án em chọn → tự làm lại (sai, thử thêm, vẫn sai) → đáp án + lời giải",
+    "tests/tu-luyen-v3-giao-dien-3009.test.tsx :: Chấm từng câu bật công tắc (nhớ theo máy) ⇒ Kiểm tra gửi đúng một câu, hiện Đúng + lời giải + Câu tiếp; câu đã chấm bị khoá"
+  ],
+  "newFailedNames": [
+    "tests/do-toi-uu-may-chu-2809.test.ts :: ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)"
+  ],
+  "newFailedSuites": [],
+  "branchFailedSuites": [],
+  "mainFailedSuites": [],
+  "newFailuresDetails": [
+    {
+      "name": "tests/do-toi-uu-may-chu-2809.test.ts :: ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)",
+      "file": "tests/do-toi-uu-may-chu-2809.test.ts",
+      "testFullName": "ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)",
+      "failureMessages": [
+        "AssertionError: expected 4 to be less than or equal to 3\n    at /workspace/omr-vector/tests/do-toi-uu-may-chu-2809.test.ts:70:19\n    at file:///workspace/omr-app/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "duration": 424.853967
+    }
+  ],
+  "newNamesMissingOnMain": [],
+  "branchReportSha256": "063b1a808af3d4cf415857d651304c9e93be63cd06177281f9301953183515bb",
+  "mainReportSha256": "868322e55a8896a2d4c516cddbe19b0533f70695aed0e50426a1222cae92f547",
+  "branchFontDiffSha256": "a52a90ba352481fd8a9106a24a382f4dbeda633aef2cfe33a5c7c5f90acf44d3",
+  "fullRunRedKept": true,
+  "rechecks": [
+    {
+      "label": "branch",
+      "test": "tests/do-toi-uu-may-chu-2809.test.ts :: ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)",
+      "status": "passed",
+      "duration": 204.97406200000023,
+      "numTotalTests": 5,
+      "numFailedTests": 0,
+      "reportSha256": "0bf3a9631593960751108281ccfb4fc9a5bb794abfa0c3d06276446e656accb6"
+    },
+    {
+      "label": "main",
+      "test": "tests/do-toi-uu-may-chu-2809.test.ts :: ĐO vòng D1 (in ra để so trước/sau) Sảnh hoa2 (mở lần 2 trong ngày: kế hoạch đã chốt)",
+      "status": "passed",
+      "duration": 192.39858099999992,
+      "numTotalTests": 5,
+      "numFailedTests": 0,
+      "reportSha256": "7817f889122b73a6d02a3bf698e2ca2eb9745828b704ad3a37d3ac6131258481"
+    }
+  ],
+  "unresolvedNewFailedNames": [],
+  "gioiHan": "Fullnhánh/main83ebec75theoTÊNtrêncùngmáy,2lượtchạysongsong.Giữmọiđỏ/kếtquảfullkhôngthaybằngtargetedrerun.Khôngclaimhếtflaky.Font-onlyappdelta4WOFF2+READMEcủamain,khôngsửaappcode/harness/mốc.Chưagộp/chưadeploy;mainmớinhất/fulltest/examwindowbắtbuộctrướcpháthành.",
+  "recheckMethod": "Chạyriêngđúngmộttên,lầnlượtnhánhrồimain,khôngsửaapp/test/harness/mốc.Giữfullđỏ,kếtquảrerunkhôngchứngminhhếtflaky."
+}

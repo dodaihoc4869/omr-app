@@ -1,0 +1,199 @@
+{
+  "metadata": [
+    {
+      "i": 170,
+      "hash": "1cff56dd7ec1d21ea72530e629574c2957da373bffd2ce4ebad2c59627d49451",
+      "fileNguon": "anh/1cff56dd7ec1d21ea72530e629574c2957da373bffd2ce4ebad2c59627d49451.png",
+      "daMoPNG": true,
+      "nhom": "o-nguyen-to",
+      "noiDung": {
+        "top": "9",
+        "center": "F",
+        "name": "Fluorine",
+        "bottom": "19"
+      },
+      "notes": "Ô dọc nền xanh nhạt,viền đen. 9ởtrên giữa,F lớn giữa,Fluorine dướiF,19 dưới cùng;khôngđổi19 thành18,998.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-III-79",
+          "de": "Cho ô nguyên tố fluorine như sau: Vị trí ô nguyên tố fluorine trong bảng tuần hoàn là bao nhiêu?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-III-79.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-III-5",
+          "de": "Cho ô nguyên tố fluorine như sau: Vị trí ô nguyên tố fluorine trong bảng tuần hoàn là bao nhiêu?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-III-5.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "svg": "bang-o-ddh-31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5.svg",
+      "hashSvg": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
+      "byteSvg": 5519,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "hashSvgDaSoat": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
+      "nguoiSoat": "cau_truc_4"
+    },
+    {
+      "i": 229,
+      "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
+      "fileNguon": "anh/27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36.png",
+      "daMoPNG": true,
+      "nhom": "o-nguyen-to",
+      "noiDung": {
+        "topLeft": "6",
+        "center": "C",
+        "name": "Carbon",
+        "bottom": "12.011"
+      },
+      "notes": "Khung đen chữnhật gầnvuông,nền sáng.6ởgóc trêntrái,C đậm lớn giữa,Carbon nhỏ dưới,12.011 dưới cùng. Giữdấuchấm.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-II-63",
+          "de": "Hình bên dưới mô tả ô nguyên tố của carbon trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-II-63.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-II-4",
+          "de": "Hình bên dưới mô tả ô nguyên tố của carbon trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-II-4.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "svg": "bang-o-ddh-8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2.svg",
+      "hashSvg": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+      "byteSvg": 6328,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "hashSvgDaSoat": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
+    },
+    {
+      "i": 83,
+      "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
+      "fileNguon": "anh/10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac.png",
+      "daMoPNG": true,
+      "nhom": "bang",
+      "table": [
+        [
+          "Loại đồ uống",
+          "Năng lượng (kJ)",
+          "Carbohydrate (g)",
+          "Chất béo (g)",
+          "Protein (g)",
+          "Calcium (mg)"
+        ],
+        [
+          "Sữa nguyên chất",
+          "273",
+          "4,6",
+          "3,7",
+          "3,5",
+          "124"
+        ],
+        [
+          "Sữa tách béo",
+          "201",
+          "4,7",
+          "1,8",
+          "3,6",
+          "124"
+        ],
+        [
+          "Sữa không kem",
+          "150",
+          "4,8",
+          "0,3",
+          "3,6",
+          "130"
+        ],
+        [
+          "Sữa hạnh nhân",
+          "105",
+          "3,1",
+          "0,1",
+          "0,5",
+          "124"
+        ]
+      ],
+      "notes": "6cột/5hàng tổng;headerđậm,unitxuốngdòng trongcùngô;giữmọidấuphẩy,tênSữa không kemnguyênvăn;khôngtựđổi thànhsữa táchkem.",
+      "questions": [
+        {
+          "qid": "VIP27-C3-B10-II-4",
+          "de": "Sữa là nguồn cung cấp protein phong phú (chủ yếu là casein). Bảng dữ liệu dưới đây thể hiện hàm lượng dinh dưỡng (trên 1 đơn vị khối lượng) của một số loại đồ uống từ sữa và thực vật (năng lượng kJ; carbohydrate g; chất béo g; protein g; calcium mg):\n• Sữa nguyên chất: 273; 4,6; 3,7; 3,5; 124.\n• Sữa tách béo: 201; 4,7; 1,8; 3,6; 124.\n• Sữa không kem: 150; 4,8; 0,3; 3,6; 130.\n• Sữa hạnh nhân: 105; 3,1; 0,1; 0,5; 124.",
+          "refs": [
+            {
+              "where": "VIP27-C3-B10-II-4.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "svg": "bang-o-ddh-7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d.svg",
+      "hashSvg": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+      "byteSvg": 88299,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+      "hashSvgDaSoat": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+      "nguoiSoat": "soat_nguon_2",
+      "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
+    }
+  ],
+  "oldPositive": [
+    {
+      "i": 170,
+      "hashSvg": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Giữ9/F/Fluorine/19 đúngnguồn,khôngđổi19thành18,998;nềnnhạtvàkhungđủ. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+      "hash": "1cff56dd7ec1d21ea72530e629574c2957da373bffd2ce4ebad2c59627d49451",
+      "hashSvgDaSoat": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5"
+    },
+    {
+      "i": 229,
+      "hashSvg": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởRIÊNGnativeFULL2x/allpublicrefs. 6topLeft/Ccenterbold/Carboncase/12.011DOTbottom/frame đúng. Khôngthêmcấuhình/units/commaconversion. Fontbold/layout/spacinggaps khôngchạm/cắt/tràn/noanswer.",
+      "actualSvgReviewed": true,
+      "byteSvg": 6328,
+      "render": "/workspace/scratch/font249-229-new.png",
+      "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
+      "hashSvgDaSoat": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2"
+    },
+    {
+      "i": 83,
+      "hashSvg": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởRIÊNGnativeFULL2x/allpublicrefs. 6columns5rows/grid/6boldheadersunits đúng;4dataRows giữfullnames và273;4,6;3,7;3,5;124 /201;4,7;1,8;3,6;124 /150;4,8;0,3;3,6;130 /105;3,1;0,1;0,5;124. Khôngôtrốngbịđiền/thêm,nodroppedzero/changedcomma. Fontbold/layout/spacinggaps khôngchạm/cắt/tràn/noanswer.",
+      "actualSvgReviewed": true,
+      "byteSvg": 88299,
+      "render": "/workspace/scratch/font249-83-new.png",
+      "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
+      "hashSvgDaSoat": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d"
+    }
+  ],
+  "gioiHan": "Lịch sửfonttrướcv5;khôngduyệthashv5."
+}

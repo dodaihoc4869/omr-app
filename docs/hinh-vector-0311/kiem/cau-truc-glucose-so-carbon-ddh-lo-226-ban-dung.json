@@ -3,11 +3,11 @@
     "i": 372,
     "hash": "41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439",
     "fileNguon": "anh/41cb593a84e8e1100620ff47828d3bcbe46d3150d0ca44fdda95b72e102aa439.png",
-    "svg": "glucose-so-carbon-ddh-91b5fee3fef0a08d053442b7f3166712417ef5775fae133489bedb33b0faea88.svg",
-    "hashSvg": "91b5fee3fef0a08d053442b7f3166712417ef5775fae133489bedb33b0faea88",
-    "byteSvg": 9089,
+    "svg": "glucose-so-carbon-ddh-832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732.svg",
+    "hashSvg": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732",
+    "byteSvg": 9109,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,10 @@
       }
     ],
     "ghiChuDung": "singleHaworth/nums1..6/5OH+ringO/0H-0CH2OH/2taper1bold/C6bentbareendpoint-OH/keepallsourcepositions/DDHpath.",
-    "hashSvgDaSoat": "91b5fee3fef0a08d053442b7f3166712417ef5775fae133489bedb33b0faea88",
-    "nguoiSoat": "soat_nguon_2"
+    "hashSvgDaSoat": "832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732",
+    "nguoiSoat": "soat_nguon_2",
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
   }
 ]

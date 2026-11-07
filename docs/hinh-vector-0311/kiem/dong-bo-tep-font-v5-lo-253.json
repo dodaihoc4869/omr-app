@@ -1,0 +1,50 @@
+{
+  "main": "83ebec75bc29eb88d40c438898a717b58439be0e",
+  "fontCommit": "4990be3703345b1a665ded88dc1f546fd2bf51ca",
+  "files": [
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "oldSha": "a0c185b120fb0aee12871547b5915120cfffe240ba204aefbee05afc48dc59fc",
+      "newSha": "04aae18cd9629cf401499163be881ad737992e7224ad7eb3ceac3f23a72cbab1",
+      "oldByte": 11372,
+      "newByte": 11456
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2",
+      "oldSha": "2f71f4ebd8bbf9229ee8ccdee06221feea5d1e4c239e580e5fddc186d2f23734",
+      "newSha": "752b2828513847248a2be6eb5f0cdda782a0ba63f6136716264f10e6bdea5a1f",
+      "oldByte": 5756,
+      "newByte": 5572
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2",
+      "oldSha": "f8e2c35056b5e9a845d955d8eb5e24b931d2536a27aec4c7a5d96830e981e5eb",
+      "newSha": "0c45ddf49bd11ed2866b0aa444eca681365898f0d6ca85cf2ce4195f948383f2",
+      "oldByte": 5724,
+      "newByte": 5680
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "oldSha": "bff44e2a2e58c2ad45f2d5e85d120ddee4a7519e4505fcf0567d9ec6828c8f45",
+      "newSha": "70eff5433cfa0f05c8d728551bfd06e1b511c827031cbeaf7cbbdc9a29091edf",
+      "oldByte": 11348,
+      "newByte": 11464
+    }
+  ],
+  "gioiHan": "Chỉ nhập4WOFF2riêngkhôngcheckout/khônggộpmain.Cảde/damđổi,v5toànkhovẫnchờdựnglạisoáttừngexacthash.",
+  "readme": {
+    "file": "src/styles/phong-ddh/README.md",
+    "oldSha": "5376a815c4178e91b59c9e4a1ff0da645a62449188f530fb97d7d76f0942719b",
+    "newSha": "938cfc0e952b7cb07461d0b4382b0ae97ff1a571f4f77311be7fd2aa35363a70",
+    "identicalToMain": true
+  },
+  "cmapMergedDe": {
+    "α": true,
+    "β": true,
+    "Δ": true,
+    "ₓ": false,
+    "ᵣ": false,
+    "ᵧ": false
+  },
+  "missingSubscriptPolicy": "Thiếuᵣₓᵧ:LatinrxyDDHnhỏ+baselinepath,khôngfallback."
+}

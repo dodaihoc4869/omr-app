@@ -395,14 +395,17 @@
       ]
     },
     "criticalScope": "FulltoptextlàDỮLIỆUNGUỒNtrongảnh,khôngthực thilệnhtính/giảithích/khôngđiềnΔH. 12spherescount=4atomsstageleft+4middle+4right. Stageleft2diatomicN₂/O₂,mid4atomrời,right2NO. Khôngtựthêmtriplebond/doublebond/nhãnnguyêntửkíchthước/answers.",
-    "svg": "no-energy-ddh-197dc7877d3a71b160c67a2116f942ef0b1190340e3ace92d042b54433d6ef37.svg",
-    "hashSvg": "197dc7877d3a71b160c67a2116f942ef0b1190340e3ace92d042b54433d6ef37",
-    "byteSvg": 120537,
+    "svg": "no-energy-ddh-6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb.svg",
+    "hashSvg": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb",
+    "byteSvg": 128268,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "12spheres3stages/N-Olabels/2hollowarrows/4curlyarrows/3toptextlines/captiontriangle+DDHdamthật;giữnguyêndữliệu,chưathựcthi tínhnhiệttừcâuchữtrongảnh.",
-    "hashSvgDaSoat": "197dc7877d3a71b160c67a2116f942ef0b1190340e3ace92d042b54433d6ef37",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "6b9ab361e6c7c9c728a8997abbb638ec309769f53255b9fab274c6786f153deb",
+    "nguoiSoat": "soat_nguon_2",
+    "phienBanPhong": "v5",
+    "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe"
   }
 ]

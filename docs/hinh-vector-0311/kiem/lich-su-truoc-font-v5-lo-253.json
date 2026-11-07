@@ -1,0 +1,1406 @@
+[
+  {
+    "file": "cau-truc-ba-amino-acid-ddh-lo-253-ban-dung.json",
+    "metadata": [
+      {
+        "i": 711,
+        "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+        "fileNguon": "anh/845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509.png",
+        "svg": "ba-amino-acid-ddh-bede0fd4da4f116ba6bb8f42b908341ce7644600ed75728e0f4360cb1e9bcea7.svg",
+        "hashSvg": "bede0fd4da4f116ba6bb8f42b908341ce7644600ed75728e0f4360cb1e9bcea7",
+        "byteSvg": 36504,
+        "font": "DDH Rounded",
+        "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+        "trangThai": "da-soat-doc-lap",
+        "questions": [
+          {
+            "qid": "12-KT-C123-D2-II-3",
+            "de": "Thuỷ phân không hoàn toàn một đoạn phân tử insulin, thu được peptide X là Glu-Arg-Gly.\nCông thức cấu tạo và kí hiệu một số nhóm chức của các amino acid cho ở hình dưới.",
+            "refs": [
+              {
+                "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+                "where": "12-KT-C123-D2-II-3.hinh.0.du_lieu",
+                "hashDataUrl": "b0ee61387567260898f6f0f27091acb60ec8d7ed04e3d95b21b34e78f0b47a32"
+              }
+            ]
+          },
+          {
+            "qid": "DB-12-B9-P2-D2-II-76",
+            "de": "Thuỷ phân không hoàn toàn một đoạn phân tử insulin, thu được peptide X là Glu-Arg-Gly.\nCông thức cấu tạo và kí hiệu một số nhóm chức của các amino acid cho ở hình dưới.",
+            "refs": [
+              {
+                "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+                "where": "DB-12-B9-P2-D2-II-76.hinh.0.du_lieu",
+                "hashDataUrl": "b0ee61387567260898f6f0f27091acb60ec8d7ed04e3d95b21b34e78f0b47a32"
+              }
+            ]
+          }
+        ],
+        "ghiChuDung": "3moleculesArg-Glu-Gly/13C8O6N/4COdouble+1CNdouble/H2N-NH-N-H-NH2literal/4numbers(1)(2)/3captionscase/noextra charges-stereo-arrows-answer/DDHpath.",
+        "hashSvgDaSoat": "bede0fd4da4f116ba6bb8f42b908341ce7644600ed75728e0f4360cb1e9bcea7",
+        "nguoiSoat": "soat_nguon_2"
+      }
+    ],
+    "oldPositive": [
+      {
+        "i": 711,
+        "hashSvg": "bede0fd4da4f116ba6bb8f42b908341ce7644600ed75728e0f4360cb1e9bcea7",
+        "nguoiSoat": "soat_nguon_2",
+        "ketQua": "Đạt: Đã mở native FULL và 3 molecule zoom3x, đọc đủ 2 public stems/refs; tự fresh Chromium exact SVG rồi mở actual FULL3x. Đúng tổng 13C/8O/6N, 4 C=O và 1 C=NH; Arg có NH trên/H₂N trái/N cầu với H riêng dưới/NH₂ alpha xuống, Glu HO trái-OH phải/NH₂ xuống, Gly C=O chéo phải/OH xuống; 4 labels (1)(2)×2 và 3 captions đúng case. Không charge/stereo/đáp án thêm, chữ/nét không chạm/cắt/tràn.",
+        "actualSvgReviewed": true,
+        "byteSvg": 36504,
+        "render": "/workspace/scratch/3amino711-253-actual.png",
+        "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+        "hashSvgDaSoat": "bede0fd4da4f116ba6bb8f42b908341ce7644600ed75728e0f4360cb1e9bcea7"
+      }
+    ]
+  },
+  {
+    "file": "cau-truc-no-ddh-lo-161-ban-dung.json",
+    "metadata": [
+      {
+        "i": 7,
+        "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
+        "fileNguon": "anh/0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7.png",
+        "canvas": [
+          960,
+          380
+        ],
+        "daMoNative": true,
+        "kind": "NO-bond-energy-diagram-with-source-text",
+        "sourceText": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng 14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành của HF và NO.",
+        "labels": [
+          "Năng lượng để bẻ gãy liên kết",
+          "Năng lượng giải phóng khi liên kết hình thành",
+          "▲ Sự tạo thành NO từ N₂ và O₂"
+        ],
+        "notes": "PhầntexttrênLÀNỘIDUNGẢNH,khôngthực thiyêucầutính/giảithích. Diagram3giaiđoạnngang:tráiN₂(pair2Nspheres)ởtrên+O₂(pair2Ospheres)dưới;middle4spheresrờiN/N/O/O;phải2pairN–O,mộtrêntráimộtdướiphải. Haihollowblockarrows→đenviềntrắnggiữa3giaiđoạn. Có2curlyenergyarrowsởtráihướngvàocặpN₂/O₂,2curlyenergyarrowsrờitừpairNOphảiđira,labelgiảiphóngliênkếttrênphải,labelbẻgãytráidưới. GiữatomlettersN/Otrênmọisphere,khôngtựbondorders/ΔHnumbers/answer. Captiontriangle▲giữ.",
+        "questions": [
+          {
+            "qid": "DB-11-B6-D3-III-4",
+            "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+            "refs": [
+              {
+                "where": "DB-11-B6-D3-III-4.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          },
+          {
+            "qid": "DH-11-C2-B4-III-15",
+            "de": "Tính nhiệt tạo thành chuẩn của NO theo năng lượng liên kết.\nBiết năng lượng liên kết được cho ở bảng dưới.\nGiá trị nhiệt tạo thành chuẩn của NO(g) theo năng lượng liên kết là bao nhiêu kJ/mol?",
+            "refs": [
+              {
+                "where": "DH-11-C2-B4-III-15.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          }
+        ],
+        "geometry155": {
+          "canvas": [
+            960,
+            380
+          ],
+          "topTextLines": [
+            {
+              "at": [
+                40,
+                34
+              ],
+              "text": "14.5. Tính nhiệt tạo thành chuẩn của HF và NO dựa vào năng lượng liên kết (Bảng"
+            },
+            {
+              "at": [
+                84,
+                64
+              ],
+              "text": "14.1 SGK), của F₂, H₂, HF, N₂, O₂, NO. Giải thích sự khác nhau về nhiệt tạo thành"
+            },
+            {
+              "at": [
+                84,
+                93
+              ],
+              "text": "của HF và NO."
+            }
+          ],
+          "atoms": [
+            {
+              "label": "N",
+              "center": [
+                212,
+                192
+              ],
+              "radius": 17
+            },
+            {
+              "label": "N",
+              "center": [
+                242,
+                192
+              ],
+              "radius": 17
+            },
+            {
+              "label": "O",
+              "center": [
+                276,
+                270
+              ],
+              "radius": 17
+            },
+            {
+              "label": "O",
+              "center": [
+                304,
+                270
+              ],
+              "radius": 17
+            },
+            {
+              "label": "N",
+              "center": [
+                415,
+                217
+              ],
+              "radius": 17
+            },
+            {
+              "label": "N",
+              "center": [
+                464,
+                199
+              ],
+              "radius": 17
+            },
+            {
+              "label": "O",
+              "center": [
+                415,
+                280
+              ],
+              "radius": 17
+            },
+            {
+              "label": "O",
+              "center": [
+                465,
+                263
+              ],
+              "radius": 17
+            },
+            {
+              "label": "N",
+              "center": [
+                576,
+                210
+              ],
+              "radius": 17
+            },
+            {
+              "label": "O",
+              "center": [
+                608,
+                207
+              ],
+              "radius": 17
+            },
+            {
+              "label": "N",
+              "center": [
+                630,
+                291
+              ],
+              "radius": 17
+            },
+            {
+              "label": "O",
+              "center": [
+                660,
+                286
+              ],
+              "radius": 17
+            }
+          ],
+          "blockArrows": [
+            {
+              "outline": [
+                [
+                  332,
+                  230
+                ],
+                [
+                  359,
+                  230
+                ],
+                [
+                  359,
+                  220
+                ],
+                [
+                  376,
+                  239
+                ],
+                [
+                  359,
+                  257
+                ],
+                [
+                  359,
+                  247
+                ],
+                [
+                  332,
+                  247
+                ],
+                [
+                  332,
+                  230
+                ]
+              ]
+            },
+            {
+              "outline": [
+                [
+                  509,
+                  230
+                ],
+                [
+                  534,
+                  230
+                ],
+                [
+                  534,
+                  219
+                ],
+                [
+                  552,
+                  238
+                ],
+                [
+                  534,
+                  256
+                ],
+                [
+                  534,
+                  246
+                ],
+                [
+                  509,
+                  246
+                ],
+                [
+                  509,
+                  230
+                ]
+              ]
+            }
+          ],
+          "energyCurlyArrows": [
+            {
+              "curveApprox": [
+                [
+                  232,
+                  249
+                ],
+                [
+                  220,
+                  244
+                ],
+                [
+                  229,
+                  237
+                ],
+                [
+                  222,
+                  230
+                ],
+                [
+                  227,
+                  220
+                ],
+                [
+                  228,
+                  209
+                ]
+              ],
+              "head": [
+                228,
+                209
+              ],
+              "meaning": "energyintowardN₂"
+            },
+            {
+              "curveApprox": [
+                [
+                  294,
+                  217
+                ],
+                [
+                  284,
+                  220
+                ],
+                [
+                  292,
+                  227
+                ],
+                [
+                  284,
+                  234
+                ],
+                [
+                  290,
+                  242
+                ],
+                [
+                  289,
+                  251
+                ]
+              ],
+              "head": [
+                289,
+                251
+              ],
+              "meaning": "energyintowardO₂"
+            },
+            {
+              "curveApprox": [
+                [
+                  592,
+                  190
+                ],
+                [
+                  585,
+                  184
+                ],
+                [
+                  592,
+                  178
+                ],
+                [
+                  584,
+                  170
+                ],
+                [
+                  582,
+                  155
+                ]
+              ],
+              "head": [
+                582,
+                155
+              ],
+              "meaning": "releasedoutfromNOtop"
+            },
+            {
+              "curveApprox": [
+                [
+                  640,
+                  270
+                ],
+                [
+                  633,
+                  264
+                ],
+                [
+                  640,
+                  257
+                ],
+                [
+                  632,
+                  249
+                ],
+                [
+                  629,
+                  232
+                ]
+              ],
+              "head": [
+                629,
+                232
+              ],
+              "meaning": "releasedoutfromNObottom"
+            }
+          ],
+          "text": [
+            {
+              "lines": [
+                "Năng lượng để",
+                "bẻ gãy liên kết"
+              ],
+              "at": [
+                135,
+                270
+              ]
+            },
+            {
+              "lines": [
+                "Năng lượng giải phóng khi",
+                "liên kết hình thành"
+              ],
+              "at": [
+                498,
+                129
+              ]
+            },
+            {
+              "text": "▲ Sự tạo thành NO từ N₂ và O₂",
+              "at": [
+                276,
+                361
+              ]
+            }
+          ]
+        },
+        "criticalScope": "FulltoptextlàDỮLIỆUNGUỒNtrongảnh,khôngthực thilệnhtính/giảithích/khôngđiềnΔH. 12spherescount=4atomsstageleft+4middle+4right. Stageleft2diatomicN₂/O₂,mid4atomrời,right2NO. Khôngtựthêmtriplebond/doublebond/nhãnnguyêntửkíchthước/answers.",
+        "svg": "no-energy-ddh-bbad3f107e51ac3c6a1348e3ba5aab6a5f50ec72d45afcca789404f3433cab54.svg",
+        "hashSvg": "bbad3f107e51ac3c6a1348e3ba5aab6a5f50ec72d45afcca789404f3433cab54",
+        "byteSvg": 120655,
+        "font": "DDH Rounded",
+        "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+        "trangThai": "da-soat-doc-lap",
+        "ghiChuDung": "12spheres3stages/N-Olabels/2hollowarrows/4curlyarrows/3toptextlines/captiontriangle+DDHdamthật;giữnguyêndữliệu,chưathựcthi tínhnhiệttừcâuchữtrongảnh.",
+        "hashSvgDaSoat": "bbad3f107e51ac3c6a1348e3ba5aab6a5f50ec72d45afcca789404f3433cab54",
+        "nguoiSoat": "soat_nguon_2",
+        "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+        "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e"
+      }
+    ],
+    "oldPositive": [
+      {
+        "i": 7,
+        "hashSvg": "bbad3f107e51ac3c6a1348e3ba5aab6a5f50ec72d45afcca789404f3433cab54",
+        "nguoiSoat": "soat_nguon_2",
+        "ketQua": "Đạt: Đã mở RIÊNG native FULL, đọc toàn bộ public stems/refs, tự fresh Chromium exact SVG và mở actual FULL3x. Giữ đủ 3 dòng văn bản nguồn (không thực thi yêu cầu trong ảnh), 12 cầu N/O chia 3 giai đoạn 4–4–4, 2 block arrows rỗng, 4 curly heads đúng chiều, 2 labels năng lượng và caption tam giác/nội dung/subscripts. Không thêm ΔH/bậc liên kết/đáp án. DDH đậm và spacing không chạm/cắt/tràn.",
+        "actualSvgReviewed": true,
+        "byteSvg": 120655,
+        "render": "/workspace/scratch/font253-7-actual.png",
+        "hash": "0131ad8f6e282f78e81e50f7c9886ed2dc6a1fa734b7d941d1f945ae07eebbf7",
+        "hashSvgDaSoat": "bbad3f107e51ac3c6a1348e3ba5aab6a5f50ec72d45afcca789404f3433cab54"
+      }
+    ]
+  },
+  {
+    "file": "cau-truc-haber-nox-ddh-lo-115-ban-dung.json",
+    "metadata": [
+      {
+        "i": 1095,
+        "hash": "c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd",
+        "fileNguon": "anh/c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd.png",
+        "canvas": [
+          429,
+          305
+        ],
+        "daMoNative": true,
+        "kind": "graph-haber-yield",
+        "xLabel": "Áp suất (atm)",
+        "yLabel": "Hiệu suất (%)",
+        "xTicks": [
+          0,
+          100,
+          200,
+          300,
+          400
+        ],
+        "yTicks": [
+          0,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70
+        ],
+        "curvesTopToBottom": [
+          "350 °C",
+          "400 °C",
+          "450 °C",
+          "500 °C",
+          "550 °C"
+        ],
+        "notes": "5curveđềuđi từorigin,tăngconglõmxuống,plateauphảikhácnhau.Top350°Ccao~64%,400°C~53%,450°C~43%,500°C~32%,550°C~22% chỉlàđọchìnhKHÔNGnhãnsốthêm. Mỗiđườngphảicóchấmrỗng ởx~450atm (native329) rồinốingangđếnhộpxámlabelnhiệtđộ trắng. Gridchấmx/ytheobước50atm/10%,tickxchỉ0..400. Khôngtựthêm450xtick. Phảibảođảm5labelđúngthứtự/curvenốirõ.",
+        "questions": [
+          {
+            "qid": "DB-11-B5-D1-II-22",
+            "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+            "refs": [
+              {
+                "where": "DB-11-B5-D1-II-22.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          },
+          {
+            "qid": "DB-11-B5-D1-II-29",
+            "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+            "refs": [
+              {
+                "where": "DB-11-B5-D1-II-29.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          },
+          {
+            "qid": "DH-11-C2-B5-II-18",
+            "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+            "refs": [
+              {
+                "where": "DH-11-C2-B5-II-18.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          },
+          {
+            "qid": "DH-11-C2-B9-D1-II-1",
+            "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+            "refs": [
+              {
+                "where": "DH-11-C2-B9-D1-II-1.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          }
+        ],
+        "axes": {
+          "origin": [
+            45,
+            275
+          ],
+          "xArrowHead": [
+            366,
+            275
+          ],
+          "yArrowHead": [
+            45,
+            4
+          ],
+          "xTicks": [
+            [
+              0,
+              45
+            ],
+            [
+              100,
+              108
+            ],
+            [
+              200,
+              171
+            ],
+            [
+              300,
+              234
+            ],
+            [
+              400,
+              297
+            ]
+          ],
+          "yTicks": [
+            [
+              0,
+              275
+            ],
+            [
+              10,
+              239
+            ],
+            [
+              20,
+              204
+            ],
+            [
+              30,
+              169
+            ],
+            [
+              40,
+              134
+            ],
+            [
+              50,
+              100
+            ],
+            [
+              60,
+              65
+            ],
+            [
+              70,
+              30
+            ]
+          ],
+          "xLabelAnchor": [
+            372,
+            291
+          ],
+          "yLabelAnchor": [
+            8,
+            155
+          ]
+        },
+        "grid": {
+          "style": "dotted grey",
+          "verticalXs": [
+            45,
+            77,
+            108,
+            140,
+            171,
+            203,
+            234,
+            266,
+            297,
+            329,
+            360
+          ],
+          "horizontalYs": [
+            30,
+            65,
+            100,
+            134,
+            169,
+            204,
+            239,
+            275
+          ]
+        },
+        "curves": [
+          {
+            "label": "350 °C",
+            "samples": [
+              [
+                45,
+                275
+              ],
+              [
+                60,
+                204
+              ],
+              [
+                80,
+                168
+              ],
+              [
+                100,
+                143
+              ],
+              [
+                140,
+                108
+              ],
+              [
+                180,
+                85
+              ],
+              [
+                220,
+                69
+              ],
+              [
+                260,
+                59
+              ],
+              [
+                300,
+                53
+              ],
+              [
+                329,
+                53
+              ],
+              [
+                359,
+                53
+              ]
+            ],
+            "endOpenCircle": [
+              329,
+              53
+            ],
+            "legendBox": [
+              365,
+              39,
+              420,
+              66
+            ],
+            "legendNotch": [
+              358,
+              53
+            ],
+            "legendTextAnchor": [
+              392,
+              53
+            ]
+          },
+          {
+            "label": "400 °C",
+            "samples": [
+              [
+                45,
+                275
+              ],
+              [
+                60,
+                216
+              ],
+              [
+                80,
+                185
+              ],
+              [
+                100,
+                165
+              ],
+              [
+                140,
+                136
+              ],
+              [
+                180,
+                116
+              ],
+              [
+                220,
+                103
+              ],
+              [
+                260,
+                95
+              ],
+              [
+                300,
+                90
+              ],
+              [
+                329,
+                89
+              ],
+              [
+                359,
+                89
+              ]
+            ],
+            "endOpenCircle": [
+              329,
+              89
+            ],
+            "legendBox": [
+              365,
+              75,
+              420,
+              102
+            ],
+            "legendNotch": [
+              358,
+              89
+            ],
+            "legendTextAnchor": [
+              392,
+              89
+            ]
+          },
+          {
+            "label": "450 °C",
+            "samples": [
+              [
+                45,
+                275
+              ],
+              [
+                60,
+                227
+              ],
+              [
+                80,
+                202
+              ],
+              [
+                100,
+                185
+              ],
+              [
+                140,
+                162
+              ],
+              [
+                180,
+                146
+              ],
+              [
+                220,
+                136
+              ],
+              [
+                260,
+                129
+              ],
+              [
+                300,
+                125
+              ],
+              [
+                329,
+                125
+              ],
+              [
+                359,
+                125
+              ]
+            ],
+            "endOpenCircle": [
+              329,
+              125
+            ],
+            "legendBox": [
+              365,
+              111,
+              420,
+              138
+            ],
+            "legendNotch": [
+              358,
+              125
+            ],
+            "legendTextAnchor": [
+              392,
+              125
+            ]
+          },
+          {
+            "label": "500 °C",
+            "samples": [
+              [
+                45,
+                275
+              ],
+              [
+                60,
+                238
+              ],
+              [
+                80,
+                220
+              ],
+              [
+                100,
+                207
+              ],
+              [
+                140,
+                189
+              ],
+              [
+                180,
+                177
+              ],
+              [
+                220,
+                168
+              ],
+              [
+                260,
+                163
+              ],
+              [
+                300,
+                160
+              ],
+              [
+                329,
+                161
+              ],
+              [
+                359,
+                161
+              ]
+            ],
+            "endOpenCircle": [
+              329,
+              161
+            ],
+            "legendBox": [
+              365,
+              147,
+              420,
+              174
+            ],
+            "legendNotch": [
+              358,
+              161
+            ],
+            "legendTextAnchor": [
+              392,
+              161
+            ]
+          },
+          {
+            "label": "550 °C",
+            "samples": [
+              [
+                45,
+                275
+              ],
+              [
+                60,
+                250
+              ],
+              [
+                80,
+                237
+              ],
+              [
+                100,
+                228
+              ],
+              [
+                140,
+                216
+              ],
+              [
+                180,
+                207
+              ],
+              [
+                220,
+                202
+              ],
+              [
+                260,
+                198
+              ],
+              [
+                300,
+                196
+              ],
+              [
+                329,
+                196
+              ],
+              [
+                359,
+                196
+              ]
+            ],
+            "endOpenCircle": [
+              329,
+              196
+            ],
+            "legendBox": [
+              365,
+              182,
+              420,
+              209
+            ],
+            "legendNotch": [
+              358,
+              196
+            ],
+            "legendTextAnchor": [
+              392,
+              196
+            ]
+          }
+        ],
+        "curveCount": 5,
+        "evidence": "Mởnative1095riêng;đen/xámcurveđượcso16cộtpixelvớigridphânbiệt. Cácsamplelàgeometrypixel,khôngtựin%sốtrêncurve. x329làcirclechấmrỗngcógridđứngcắt,khôngnhầmgridvớipeak.",
+        "svg": "haber-nox-ddh-0690a66bdbcf32f16314ddf41fcbbd23350df5c7f3a9efa1e2d0d8cc9fd83464.svg",
+        "hashSvg": "0690a66bdbcf32f16314ddf41fcbbd23350df5c7f3a9efa1e2d0d8cc9fd83464",
+        "byteSvg": 60561,
+        "font": "DDH Rounded",
+        "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+        "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+        "trangThai": "da-soat-doc-lap",
+        "ghiChuDung": "PCHIPquaanchorsnative,nochuẩnhoáhóahọc.1095đủ5curve/5circlemở/5legend350..550°C/grid/ticks.1330đủ3curve/4guideY+guideverticalt1/từnglabel/color.",
+        "hashSvgDaSoat": "0690a66bdbcf32f16314ddf41fcbbd23350df5c7f3a9efa1e2d0d8cc9fd83464",
+        "nguoiSoat": "soat_nguon_2",
+        "dongBoPhongMain": "83ebec75bc29eb88d40c438898a717b58439be0e"
+      },
+      {
+        "i": 1330,
+        "hash": "f0ff7a9971369d5005a08982236acd16ba6091ca5f61339473ee3ae0950015c4",
+        "fileNguon": "anh/f0ff7a9971369d5005a08982236acd16ba6091ca5f61339473ee3ae0950015c4.png",
+        "canvas": [
+          945,
+          601
+        ],
+        "daMoNative": true,
+        "kind": "graph-three-concentration",
+        "xLabel": "Thời gian phản ứng",
+        "yLabel": "Nồng độ (M)",
+        "yTicks": [
+          "0",
+          "0,5",
+          "1,0",
+          "1,5",
+          "2,0"
+        ],
+        "notes": "Curve(1)đen giảm từ2,0→plateau~1,2;curve(2)xám giảm từ2,0→plateau0,5;curve(3)đen tăng từorigin→plateau1,5. Giữnhãn(1)trênnhánhgiảmđen,(2)trênnhánhgiảmxámgiữa,(3)trênnhánhtăngphải. 4dóngngangđứt y0,5/1,0/1,5/2,0. t₁xtickduynhấtvàđườngdóngdọcđứttừtrụcXđếnngãcurve(2)/(3) khoảngy0,9 (khôngtựépvào1,0). Hai curveđen(1)/(3)cắtnhautạixlớnhơnt₁. Khôngnốinhầm3curve/khôngđổi0,5thành0,68.",
+        "questions": [
+          {
+            "qid": "11-C1-B1-II-18",
+            "de": "Cho phản ứng thuận nghịch sau:\n2NO (g) + O₂ (g) ⇌ 2NO₂ (g) (*).\nCho biết thành phần ban đầu chỉ có NO và O₂. Sự thay đổi nồng độ các chất theo thời gian phản ứng được biểu diễn bởi đồ thị trong Hình 1.2.",
+            "refs": [
+              {
+                "where": "11-C1-B1-II-18.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          },
+          {
+            "qid": "DB-11-B1-D1-II-81",
+            "de": "Cho phản ứng thuận nghịch sau:\n2NO (g) + O₂ (g) ⇌ 2NO₂ (g) (*).\nCho biết thành phần ban đầu chỉ có NO và O₂. Sự thay đổi nồng độ các chất theo thời gian phản ứng được biểu diễn bởi đồ thị trong Hình 1.2.",
+            "refs": [
+              {
+                "where": "DB-11-B1-D1-II-81.hinh.0.du_lieu",
+                "viTri": "sau_de"
+              }
+            ]
+          }
+        ],
+        "axes": {
+          "origin": [
+            168,
+            450
+          ],
+          "xArrowHead": [
+            779,
+            450
+          ],
+          "yArrowHead": [
+            168,
+            71
+          ],
+          "xTicks": [
+            {
+              "value": "0",
+              "at": [
+                168,
+                450
+              ]
+            },
+            {
+              "value": "t₁",
+              "at": [
+                274,
+                450
+              ]
+            }
+          ],
+          "yTicks": [
+            [
+              "2,0",
+              174
+            ],
+            [
+              "1,5",
+              245
+            ],
+            [
+              "1,0",
+              315
+            ],
+            [
+              "0,5",
+              385
+            ]
+          ],
+          "xLabelAnchor": [
+            616,
+            489
+          ],
+          "yLabelAnchor": [
+            88,
+            293
+          ]
+        },
+        "guides": [
+          {
+            "from": [
+              168,
+              174
+            ],
+            "to": [
+              758,
+              174
+            ],
+            "style": "dashed"
+          },
+          {
+            "from": [
+              168,
+              245
+            ],
+            "to": [
+              758,
+              245
+            ],
+            "style": "dashed"
+          },
+          {
+            "from": [
+              168,
+              315
+            ],
+            "to": [
+              758,
+              315
+            ],
+            "style": "dashed"
+          },
+          {
+            "from": [
+              168,
+              385
+            ],
+            "to": [
+              758,
+              385
+            ],
+            "style": "dashed"
+          },
+          {
+            "from": [
+              274,
+              450
+            ],
+            "to": [
+              274,
+              329
+            ],
+            "style": "dashed"
+          }
+        ],
+        "curves": [
+          {
+            "label": "(1)",
+            "color": "black",
+            "labelAnchor": [
+              248,
+              210
+            ],
+            "samples": [
+              [
+                168,
+                174
+              ],
+              [
+                180,
+                186
+              ],
+              [
+                220,
+                221
+              ],
+              [
+                275,
+                255
+              ],
+              [
+                350,
+                278
+              ],
+              [
+                425,
+                284
+              ],
+              [
+                500,
+                286
+              ],
+              [
+                600,
+                286
+              ],
+              [
+                700,
+                284
+              ],
+              [
+                750,
+                284
+              ]
+            ]
+          },
+          {
+            "label": "(2)",
+            "color": "grey",
+            "labelAnchor": [
+              466,
+              346
+            ],
+            "samples": [
+              [
+                168,
+                174
+              ],
+              [
+                180,
+                204
+              ],
+              [
+                220,
+                271
+              ],
+              [
+                250,
+                306
+              ],
+              [
+                275,
+                330
+              ],
+              [
+                300,
+                342
+              ],
+              [
+                350,
+                355
+              ],
+              [
+                400,
+                360
+              ],
+              [
+                450,
+                366
+              ],
+              [
+                500,
+                370
+              ],
+              [
+                600,
+                376
+              ],
+              [
+                700,
+                380
+              ],
+              [
+                758,
+                381
+              ]
+            ]
+          },
+          {
+            "label": "(3)",
+            "color": "black",
+            "labelAnchor": [
+              686,
+              225
+            ],
+            "samples": [
+              [
+                168,
+                450
+              ],
+              [
+                180,
+                435
+              ],
+              [
+                220,
+                387
+              ],
+              [
+                250,
+                352
+              ],
+              [
+                275,
+                329
+              ],
+              [
+                300,
+                309
+              ],
+              [
+                350,
+                278
+              ],
+              [
+                400,
+                263
+              ],
+              [
+                450,
+                257
+              ],
+              [
+                500,
+                254
+              ],
+              [
+                600,
+                250
+              ],
+              [
+                700,
+                247
+              ],
+              [
+                748,
+                247
+              ]
+            ]
+          }
+        ],
+        "curveCount": 3,
+        "crossings": [
+          [
+            "(2)",
+            "(3)",
+            [
+              275,
+              330
+            ]
+          ],
+          [
+            "(1)",
+            "(3)",
+            [
+              350,
+              278
+            ]
+          ]
+        ],
+        "evidence": "Native1330riêng,kiểmpixelblack/greyđểgiữ3curvephânbiệt;C1C3crosssaut₁khôngtrùngt₁. Curve2làxámđậm,hìnhnguồnyaxisnotperfectlinear;anchorslàpixelkhôngdữliệuhóahọcthêm.",
+        "svg": "haber-nox-ddh-c537285517eb6752234c0d7c5f18aa2bc3c97d488a1007881aaf0a137698ad35.svg",
+        "hashSvg": "c537285517eb6752234c0d7c5f18aa2bc3c97d488a1007881aaf0a137698ad35",
+        "byteSvg": 46755,
+        "font": "DDH Rounded",
+        "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+        "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+        "trangThai": "da-soat-doc-lap",
+        "ghiChuDung": "PCHIPquaanchorsnative,nochuẩnhoáhóahọc.1095đủ5curve/5circlemở/5legend350..550°C/grid/ticks.1330đủ3curve/4guideY+guideverticalt1/từnglabel/color.",
+        "hashSvgDaSoat": "c537285517eb6752234c0d7c5f18aa2bc3c97d488a1007881aaf0a137698ad35",
+        "nguoiSoat": "soat_hinh_vector"
+      }
+    ],
+    "oldPositive": [
+      {
+        "i": 1330,
+        "hashSvg": "c537285517eb6752234c0d7c5f18aa2bc3c97d488a1007881aaf0a137698ad35",
+        "nguoiSoat": "soat_hinh_vector",
+        "ketQua": "Đạt: Đã mở RIÊNG PNG native và SVG render thật, đọc PCHIP anchors/generator. Đủ3 curves: (1)đen giảm rồi plateau dương hơi nhích lên cuối;(2)xám giảm sát0,5;(3)đen tăng từ0 lên gần1,5. Crossing(1)/(3) và(2)/(3), vị trí t1 giữ nguồn; không chuẩn hóa về lý thuyết. Đủ4 guide ngang0,5/1,0/1,5/2,0 và guide đứng tại t1 tới khoảng1,0, tick ngắn dưới trục tại t1,0,t₁,Nồng độ(M),Thời gian phản ứng và hai arrow. Nhãn(1)/(2)/(3) không đè nét. DDH de/dam thật tự chứa path không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp metadata.",
+        "hash": "f0ff7a9971369d5005a08982236acd16ba6091ca5f61339473ee3ae0950015c4",
+        "hashSvgDaSoat": "c537285517eb6752234c0d7c5f18aa2bc3c97d488a1007881aaf0a137698ad35"
+      },
+      {
+        "i": 1095,
+        "hashSvg": "0690a66bdbcf32f16314ddf41fcbbd23350df5c7f3a9efa1e2d0d8cc9fd83464",
+        "nguoiSoat": "soat_nguon_2",
+        "ketQua": "Đạt: Đã mở RIÊNG native FULL, đọc toàn bộ public stems/refs, tự fresh Chromium exact SVG và mở actual FULL3x. Giữ 5 curves từ origin/5 chấm rỗng/5 legend 350–550 °C đúng thứ tự, plateaus/kinks/grid/ticks 0..400 và 0..70/2 axesheads/Áp suất (atm)/Hiệu suất (%). Không thêm tick450 hay dữ liệu/phần trăm trên curves. DDH đậm và spacing không chạm/cắt/tràn.",
+        "actualSvgReviewed": true,
+        "byteSvg": 60561,
+        "render": "/workspace/scratch/font253-1095-actual.png",
+        "hash": "c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd",
+        "hashSvgDaSoat": "0690a66bdbcf32f16314ddf41fcbbd23350df5c7f3a9efa1e2d0d8cc9fd83464"
+      }
+    ]
+  }
+]

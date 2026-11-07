@@ -1,32 +1,35 @@
 [
   {
     "i": 170,
-    "hashSvg": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Giữ9/F/Fluorine/19 đúngnguồn,khôngđổi19thành18,998;nềnnhạtvàkhungđủ. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+    "hashSvg": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Soát riêng V5, đã mở từng native FULL/allpublic stems-refs, tự fresh Chromium exact hash rồi mở actual FULL3x. Ô Fluorine nền xanh nhạt, 9/F/Fluorine/19 đúng case và số, không đổi19. Không cắt/tràn hay thêm dữ kiện. Không dùng oldproof249.",
+    "actualSvgReviewed": true,
+    "byteSvg": 5540,
+    "render": "/workspace/scratch/v5-253-obang-170-actual.png",
     "hash": "1cff56dd7ec1d21ea72530e629574c2957da373bffd2ce4ebad2c59627d49451",
-    "hashSvgDaSoat": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5"
+    "hashSvgDaSoat": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4"
   },
   {
     "i": 229,
-    "hashSvg": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+    "hashSvg": "45137b580333855da269eb0811e1542e94584c3c8cd26922792d4fb83e66f735",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởRIÊNGnativeFULL2x/allpublicrefs. 6topLeft/Ccenterbold/Carboncase/12.011DOTbottom/frame đúng. Khôngthêmcấuhình/units/commaconversion. Fontbold/layout/spacinggaps khôngchạm/cắt/tràn/noanswer.",
+    "ketQua": "Đạt: Soát riêng V5, đã mở từng native FULL/allpublic stems-refs, tự fresh Chromium exact hash rồi mở actual FULL3x. Ô Carbon 6 trên trái/C đậm/Carbon/12.011 dấu chấm đúng; khoảng hở với viền đủ. Không cắt/tràn hay thêm dữ kiện. Không dùng oldproof249.",
     "actualSvgReviewed": true,
-    "byteSvg": 6328,
-    "render": "/workspace/scratch/font249-229-new.png",
+    "byteSvg": 6531,
+    "render": "/workspace/scratch/v5-253-obang-229-actual.png",
     "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
-    "hashSvgDaSoat": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2"
+    "hashSvgDaSoat": "45137b580333855da269eb0811e1542e94584c3c8cd26922792d4fb83e66f735"
   },
   {
     "i": 83,
-    "hashSvg": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+    "hashSvg": "0060571ae8da07266f7fe01c1cd99665426d62c7ecf6292cc3e47e831ba3e1b1",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởRIÊNGnativeFULL2x/allpublicrefs. 6columns5rows/grid/6boldheadersunits đúng;4dataRows giữfullnames và273;4,6;3,7;3,5;124 /201;4,7;1,8;3,6;124 /150;4,8;0,3;3,6;130 /105;3,1;0,1;0,5;124. Khôngôtrốngbịđiền/thêm,nodroppedzero/changedcomma. Fontbold/layout/spacinggaps khôngchạm/cắt/tràn/noanswer.",
+    "ketQua": "Đạt: Soát riêng V5, đã mở từng native FULL/allpublic stems-refs, tự fresh Chromium exact hash rồi mở actual FULL3x. Bảng 6 cột/5 hàng; 4 tên đồ uống, 6 headers/units và đủ 20 numeric entries so từng ô đúng native, giữ comma/0,3–0,1–0,5/130; grid và chữ không chạm. Không cắt/tràn hay thêm dữ kiện. Không dùng oldproof249.",
     "actualSvgReviewed": true,
-    "byteSvg": 88299,
-    "render": "/workspace/scratch/font249-83-new.png",
+    "byteSvg": 92500,
+    "render": "/workspace/scratch/v5-253-obang-83-actual.png",
     "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
-    "hashSvgDaSoat": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d"
+    "hashSvgDaSoat": "0060571ae8da07266f7fe01c1cd99665426d62c7ecf6292cc3e47e831ba3e1b1"
   }
 ]

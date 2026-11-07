@@ -1,0 +1,30 @@
+{
+  "lo": 253,
+  "chromium": "602/602",
+  "hashXmlSelfcontainedAst": true,
+  "build": true,
+  "speed": "21/21",
+  "precache": "170/2613.23KiB",
+  "serviceWorker": "14/14",
+  "serverTsc": true,
+  "checkMau": "0hexngoàitoken",
+  "mainFull": "83ebec75bc29eb88d40c438898a717b58439be0e",
+  "woff2Diff": false,
+  "fontVersion": "v5",
+  "fontV5Done": "8SVG/9nguồn/19câuđủmọihình",
+  "fontMainPending": "594SVG/850nguồn",
+  "fullVitestThisBatch": true,
+  "fullVitestProof": "full-vitest-lo-253.json",
+  "colorAgainstMain": {
+    "viPham": 436,
+    "baseline": true,
+    "proof": "mau-main-lo-253-nen.json"
+  },
+  "indexTs": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf",
+    "redBaseline": true,
+    "proof": "co-tep-lo-167-nen.json"
+  },
+  "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build253V5/speed21/21/Chromium602/602/hashXML/path/AST/SW14/14/serverTSCđạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;MàusoMain83ebec75436viPhạmnền/75tệpđượccổngso(74srcdiff). Lôchỉđổiassets/builder/docs+4fontWOFF2READMEkhớpmain,khôngđổiappcode/màu/harness. Full253nhánh16581/main16725:đỏ14/24;proofsoTÊNfull-vitest-lo-253.json.1tênD1đỏkhácmaintrongfull,chạyriênglầnlượtnhánh-mainđềuđạt/0lỗimớicòntáihiện.Khôngsửaapp/test/harness/mốc;giữmọifullđỏ/khôngclaimhếtflaky.594SVG/850nguồnV5chưađạt;khôngallrepođạt."
+}

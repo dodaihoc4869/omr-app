@@ -1,0 +1,191 @@
+{
+  "i": 711,
+  "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+  "nativeSize": [
+    1187,
+    284
+  ],
+  "status": "source-only đã đọc FULL/3 mol zoom3x, chưa SVG/chưa Đạt",
+  "questions": [
+    {
+      "qid": "12-KT-C123-D2-II-3",
+      "de": "Thuỷ phân không hoàn toàn một đoạn phân tử insulin, thu được peptide X là Glu-Arg-Gly.\nCông thức cấu tạo và kí hiệu một số nhóm chức của các amino acid cho ở hình dưới.",
+      "refs": [
+        {
+          "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+          "where": "12-KT-C123-D2-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "b0ee61387567260898f6f0f27091acb60ec8d7ed04e3d95b21b34e78f0b47a32"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P2-D2-II-76",
+      "de": "Thuỷ phân không hoàn toàn một đoạn phân tử insulin, thu được peptide X là Glu-Arg-Gly.\nCông thức cấu tạo và kí hiệu một số nhóm chức của các amino acid cho ở hình dưới.",
+      "refs": [
+        {
+          "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
+          "where": "DB-12-B9-P2-D2-II-76.hinh.0.du_lieu",
+          "hashDataUrl": "b0ee61387567260898f6f0f27091acb60ec8d7ed04e3d95b21b34e78f0b47a32"
+        }
+      ]
+    }
+  ],
+  "panels": [
+    {
+      "caption": "Arginine (Arg)",
+      "captionBoxApprox": [
+        174,
+        212,
+        350,
+        239
+      ],
+      "carbons": 6,
+      "nitrogens": 4,
+      "oxygens": 2,
+      "connectivity": "H₂N–C(=NH)–NH–CH₂–CH₂–CH₂–CH(NH₂)–C(=O)–OH",
+      "visibleAtoms": "H₂N trái; NH trên nối đôi thẳng đứng Cguanidine; N bên phải Cguanidine có H RIÊNG ở dưới (N trên H, không chữ NH cùng dòng); NH₂ alpha hướng xuống; carbonyl O lên và OH phải",
+      "verticesApprox": [
+        [
+          170,
+          105
+        ],
+        [
+          250,
+          105
+        ],
+        [
+          291,
+          127
+        ],
+        [
+          331,
+          105
+        ],
+        [
+          371,
+          127
+        ],
+        [
+          411,
+          105
+        ]
+      ],
+      "otherBonds": "guanidineC170105→N~208127;Nright→250105;C170105→H₂Nleft;doubleC170105→NHup;alpha371127→NH₂down",
+      "labels": [
+        {
+          "text": "(1)",
+          "xy": [
+            100,
+            94
+          ],
+          "target": "H₂N trái guanidine"
+        },
+        {
+          "text": "(2)",
+          "xy": [
+            320,
+            166
+          ],
+          "target": "NH₂ alpha"
+        }
+      ],
+      "stereo": "không wedge/dash/charge"
+    },
+    {
+      "caption": "Glutamic acid (Glu)",
+      "captionBoxApprox": [
+        579,
+        210,
+        823,
+        237
+      ],
+      "carbons": 5,
+      "nitrogens": 1,
+      "oxygens": 4,
+      "connectivity": "HO–C(=O)–CH₂–CH₂–CH(NH₂)–C(=O)–OH",
+      "verticesApprox": [
+        [
+          636,
+          102
+        ],
+        [
+          676,
+          124
+        ],
+        [
+          716,
+          102
+        ],
+        [
+          756,
+          124
+        ],
+        [
+          796,
+          102
+        ]
+      ],
+      "visibleAtoms": "HO trái H trước O (O neo bond), 2Ocarbonyl hướng lên, NH₂ alpha xuống, OH phải",
+      "labels": [
+        {
+          "text": "(1)",
+          "xy": [
+            577,
+            150
+          ],
+          "target": "HO trái"
+        },
+        {
+          "text": "(2)",
+          "xy": [
+            821,
+            154
+          ],
+          "target": "OH phải"
+        }
+      ],
+      "stereo": "không wedge/dash/charge"
+    },
+    {
+      "caption": "Glycine (Gly)",
+      "captionBoxApprox": [
+        949,
+        216,
+        1116,
+        242
+      ],
+      "carbons": 2,
+      "nitrogens": 1,
+      "oxygens": 2,
+      "connectivity": "H₂N–CH₂–C(=O)–OH",
+      "verticesApprox": [
+        [
+          1015,
+          102
+        ],
+        [
+          1055,
+          124
+        ]
+      ],
+      "visibleAtoms": "H₂N trái nối C1015102; C1055124=O chéo lên phải bằng 2 nét; OH thẳng xuống; không thêm CH₂ text",
+      "labels": [],
+      "stereo": "không wedge/dash/charge"
+    }
+  ],
+  "layout": "3 phân tử ngang trái/phải, captions Titlecase không đậm thấy rõ; 4 labels tổng (1)(2)×2; không arrows/plus/numcarbon/charges",
+  "opened": [
+    "/workspace/scratch/3amino711-Arg3x.png",
+    "/workspace/scratch/3amino711-Glu3x.png",
+    "/workspace/scratch/3amino711-Gly3x.png"
+  ],
+  "actualReview": {
+    "i": 711,
+    "hashSvg": "bede0fd4da4f116ba6bb8f42b908341ce7644600ed75728e0f4360cb1e9bcea7",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native FULL và 3 molecule zoom3x, đọc đủ 2 public stems/refs; tự fresh Chromium exact SVG rồi mở actual FULL3x. Đúng tổng 13C/8O/6N, 4 C=O và 1 C=NH; Arg có NH trên/H₂N trái/N cầu với H riêng dưới/NH₂ alpha xuống, Glu HO trái-OH phải/NH₂ xuống, Gly C=O chéo phải/OH xuống; 4 labels (1)(2)×2 và 3 captions đúng case. Không charge/stereo/đáp án thêm, chữ/nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 36504,
+    "render": "/workspace/scratch/3amino711-253-actual.png"
+  }
+}
