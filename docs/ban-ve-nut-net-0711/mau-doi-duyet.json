@@ -313,6 +313,48 @@
    "khai": "box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 8px 22px -16px var(--tr-phu)",
    "n": 1,
    "ly_do": "07/11 thầy chốt kính lóng lánh bản A (không gờ) cho khung đề + ô đáp án, thanh tiến độ kính, khổ rộng bỏ nền dưới thanh (docs/ban-ve-kinh-lanh-0711)"
+  },
+  {
+   "tep": "src/styles/kinh-toan-hs.css",
+   "khai": "--kt-net: color-mix(in oklab, var(--tr-hs-day) 30%, var(--tr-vien-2))",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-nen: #1a1a29",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-mat: #262738",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-mat-2: #2c2d40",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-mat-3: #414157",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-vien: #414157",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
+  },
+  {
+   "tep": "src/styles/trong.css",
+   "khai": "--tr-vien-2: #52536a",
+   "n": 1,
+   "ly_do": "07/11 thầy «làm nền tối theo màu Duolingo (xanh than) để nhìn dịu mắt, vẫn giữ kính» + «sáng rõ nét căng màu tươi như Duolingo» — đo ảnh Duolingo tối thầy gửi (docs/ban-ve-toi-than-0711)"
   }
  ]
 }

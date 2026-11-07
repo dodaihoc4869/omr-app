@@ -1,0 +1,126 @@
+/* APP HỌC SINH PHẲNG KIỂU APPLE (thầy 07/11 «CHỐT TẤT CẢ BUILD VÀ ĐẨY LÊN BẢN SỐNG»; bản vẽ docs/ban-ve-phang-0711) — trên nền tối XANH THAN Duolingo
+   (docs/ban-ve-toi-than-0711). Nạp bằng @import cuối bo-cuc-hn.css (mảnh TrongHs). Bộ chọn mang `:not(#_)` (độ ưu tiên mức ID) + !important ⇒ thắng mọi
+   tờ kính cũ kể cả tờ nạp lười trong-lam-bai (nạp sau) mà không phải sửa từng tờ. Thẻ đặc không viền không bóng, danh sách nhóm iOS, nút phẳng đặc,
+   ô đáp án đặc (bỏ bóng mờ 24px ⇒ bấm nhanh hơn trên máy yếu), thanh tiến độ phẳng, bong bóng Mol kiểu iMessage. Chỉ biến màu sẵn có. */
+html[data-trong='hs']:not(#_) {
+  --ph-nen: var(--tr-mat-2); --ph-the: var(--tr-mat); --ph-phu: var(--tr-mat-2); --ph-vach: var(--tr-vien);
+  --kinh-loang: linear-gradient(transparent, transparent);
+  /* tắt mọi lớp kính: vệt sáng, ánh màu, mép vát, khung */
+  --kt-loe: linear-gradient(transparent, transparent); --kt-anh: linear-gradient(transparent, transparent);
+  --kt-nen: var(--ph-the); --kt-mep: 0 0 0 0 transparent; --kt-khung: 0 0 0 0 transparent; --kt-net: var(--ph-vach);
+  --kt-chon: 0 0 0 2px var(--tr-hs-nut);
+  --kl-loe: linear-gradient(transparent, transparent); --kl-anh: linear-gradient(transparent, transparent);
+  --kl-mat-kinh: var(--ph-the); --kl-mep: 0 0 0 0 transparent; --kl-vien: 0 0 0 0 transparent; --kl-trang: transparent;
+  --kinh-mat: var(--ph-the); --kinh-mat-dam: var(--ph-the); --kinh-ve: var(--ph-the); --kinh-vien: transparent; --kinh-vien-2: transparent; --kinh-bong: 0 0 0 0 transparent;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-trong='hs']:not(#_) { --ph-nen: var(--tr-nen); --ph-the: var(--tr-mat); --ph-phu: var(--tr-mat-2); --ph-vach: var(--tr-mat-3); }
+}
+html[data-trong='hs']:not(#_) body { background-color: var(--ph-nen) !important; }
+html[data-trong='hs']:not(#_) body::before { background: none !important; }
+html[data-trong='hs']:not(#_) div.fixed.inset-0.overflow-y-auto:not([class*='bg-']) { background-color: var(--ph-nen) !important; background-image: none !important; }
+
+/* ── THẺ: đặc, không viền, không bóng, bo 20 ── */
+html[data-trong='hs']:not(#_) :is(.kb-hero, section.kb-viec, div.kb-viec, .kb-the-ruong, .tr-dd, .da-bang, .dm-the, .duo .ht2-lam-ds, .duo .ht2-lam-the, .m3-phong .vtf, .tr-menu-ds, .duo-ket-the, .vh-man, .da-ban, .bi-loi-bong:not(.kb-mol-bong)) {
+  border: 0 !important; border-radius: 20px !important; background: var(--ph-the) !important; box-shadow: none !important; }
+/* đề câu hỏi: thẻ đặc */
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-de, .duo-kt-thi .ht2-lam-de, .duo-gt-bong) { border: 0 !important; border-radius: 20px !important; background: var(--ph-the) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo-gt-bong .ht2-lam-de { background: none !important; }
+html[data-trong='hs']:not(#_) .duo-gt-bong::before { border: 0 !important; background: var(--ph-the) !important; clip-path: polygon(0 0, 3px 0, 100% calc(100% - 3px), 100% 100%, 0 100%) !important; }
+
+/* ── DANH SÁCH NHÓM iOS: Việc hôm nay ── */
+html[data-trong='hs']:not(#_) .kb-viec { padding: 6px 0 6px !important; }
+html[data-trong='hs']:not(#_) .kb-viec h2 { padding: 10px 18px 8px !important; font-weight: 700 !important; }
+html[data-trong='hs']:not(#_) .kb-viec-ds { gap: 0 !important; padding: 0 6px !important; }
+html[data-trong='hs']:not(#_) .kb-o { position: relative; }
+html[data-trong='hs']:not(#_) .kb-o + .kb-o { box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-o + .kb-o::before { content: ''; position: absolute; left: 68px; right: 12px; top: 0; height: 1px; background: var(--ph-vach); pointer-events: none; }
+html[data-trong='hs']:not(#_) .kb-o:has(> .kb-dong[data-tt='dang'])::before, html[data-trong='hs']:not(#_) .kb-o:has(> .kb-dong[data-tt='dang']) + .kb-o::before { opacity: 0; }
+html[data-trong='hs']:not(#_) .kb-dong { border-radius: 14px !important; background: transparent !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) :is(.kb-dong[aria-current], .kb-dong[data-tt='dang']) { background: var(--tr-hs-nhat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-dong[data-tt='dang'][data-sac='tin'] { background: var(--tr-tin-nhat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-dong[data-tt='dang'][data-sac='sai'] { background: var(--tr-sai-nhat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-dong .kb-tich { box-shadow: none !important; }
+
+/* ── Tấm Thêm: danh sách nhóm ── */
+html[data-trong='hs']:not(#_) .tr-menu-ds > .tr-menu-muc { background: none !important; box-shadow: none !important; border: 0 !important; }
+html[data-trong='hs']:not(#_) .tr-menu-ds > .tr-menu-muc:not(:last-child) { box-shadow: inset 0 -1px 0 var(--ph-vach) !important; }
+
+/* ── NÚT PHỤ / CHIP: tô xám nhạt, không viền ── */
+html[data-trong='hs']:not(#_) :is(.duo-dong, .duo-den, .m3-tb-chuong, .kb-chip, .tp-tr-o, .tp-tr-muc, .lg-nut-hoi-thay, .ht2-lam-phim button, .duo-hang-nut > a, .duo-hang-nut > button:not(.duo-nut), .m3-phong .m3-thanh-tren > button, .kb-mo-ruong) {
+  border: 0 !important; background: var(--ph-phu) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-hero .kb-chip { background: var(--ph-nen) !important; }
+
+/* ── NÚT CHÍNH: phẳng đặc, giữ màu riêng ── */
+html[data-trong='hs']:not(#_) :is(.kb-cta, .duo-nut, .vtf-nut, .tcl-nut-chinh, .tr-dd-nut) { background-image: none !important; box-shadow: none !important; border: 0 !important; border-radius: 16px !important; }
+html[data-trong='hs']:not(#_) .duo-nut:disabled { background: var(--ph-phu) !important; color: var(--tr-chu-3) !important; }
+html[data-trong='hs']:not(#_) :is(.kb-cta, .duo-nut, .vtf-nut, .tcl-nut-chinh, .tr-dd-nut)::before, html[data-trong='hs']:not(#_) :is(.kb-cta, .duo-nut)::after { box-shadow: none !important; }
+
+/* ── Ô ĐÁP ÁN: thẻ đặc; chọn = tô nhạt chàm + vòng 2px ── */
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa) { border: 0 !important; border-radius: 16px !important; background: var(--ph-the) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa) .ht2-lam-pa-ma { border: 0 !important; border-radius: 50% !important; background: var(--ph-phu) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) { background: var(--tr-hs-nhat) !important; box-shadow: inset 0 0 0 2px var(--tr-hs-nut) !important; }
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) .ht2-lam-pa-ma { background: var(--tr-hs-nut) !important; color: var(--tr-hs-tren) !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=dung] { background: var(--tr-dung-nhat) !important; box-shadow: inset 0 0 0 2px var(--tr-dung-nut) !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=sai] { background: var(--tr-sai-nhat) !important; box-shadow: inset 0 0 0 2px var(--tr-sai) !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=mo] { background: var(--ph-the) !important; box-shadow: none !important; }
+/* Đúng / Sai: điều khiển phân đoạn iOS */
+html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut { background: var(--ph-phu) !important; box-shadow: none !important; border-radius: 12px !important; padding: 3px !important; gap: 3px !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut button { background: transparent !important; box-shadow: none !important; border-radius: 9px !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut button[aria-pressed='true'] { background: var(--tr-dung-nut) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut button[aria-pressed='true']:nth-child(2) { background: var(--tr-sai) !important; }
+
+/* ── DẢI KẾT QUẢ: phẳng tô nhạt ── */
+html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=dung] { background: var(--tr-dung-nhat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=sai] { background: var(--tr-sai-nhat) !important; box-shadow: none !important; }
+
+/* ── THANH TIẾN ĐỘ: phẳng ── */
+html[data-trong='hs']:not(#_) .duo-tren > .duo-thanh:not(:has(> .duo-doan)) { height: 8px !important; border-radius: 4px !important; background: var(--tr-mat-3) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i { border-radius: 4px !important; background: var(--tr-hs-nut) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i::after { display: none !important; }
+/* thanh trên màn làm câu: phẳng */
+html[data-trong='hs']:not(#_) :is(.duo:not([data-xong]) > .duo-tren, .duo-kt:not([data-xong]) > .duo-kt-tren) { background: var(--ph-nen) !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* ── BONG BÓNG MOL kiểu iMessage: mặt đặc, không viền, mũi liền ── */
+html[data-trong='hs']:not(#_) .kb-mol .kb-mol-bong, html[data-trong='hs']:not(#_) .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx] {
+  border-color: transparent !important; border-width: 0 !important; background: var(--bb-nen, var(--ph-the)) !important; box-shadow: none !important; padding: 10px 16px !important; }
+html[data-trong='hs']:not(#_) .kb-mol .kb-mol-bong::before, html[data-trong='hs']:not(#_) .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx]::before, html[data-trong='hs']:not(#_) .bi-loi-boc:not([data-ben]) .bi-loi-bong:not(.kb-mol-bong)::before {
+  border: 0 !important; background: var(--bb-nen, var(--ph-the)) !important; }
+html[data-trong='hs']:not(#_) .kb-mol .kb-mol-bong::after { color: var(--bb-vien) !important; }
+html[data-trong='hs']:not(#_) .kb-mol .kb-mol-bong:is([data-cx='nghi'], [data-cx='ngu']) :is(*)::after { border: 0 !important; }
+/* giám thị nói: phẳng */
+html[data-trong='hs']:not(#_) .gt-loi { box-shadow: none !important; background: var(--gt-loi-nen) !important; }
+
+/* ── THANH BÊN / THANH DƯỚI ── */
+html[data-trong='hs']:not(#_) :is(.kb-thanh-muc[aria-current='page'], .tr-ray-muc[aria-current='page']) { background: var(--tr-hs-nhat) !important; box-shadow: none !important; }
+
+/* ── THANH CHUYỂN MÀN (dưới / ray trái): viên đặc phẳng, bóng rất nhẹ; mục đang chọn tô nhạt, không vòng ── */
+html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-ds { background: var(--ph-the) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+  box-shadow: 0 0 0 1px var(--ph-vach), 0 8px 24px -12px var(--tr-phu) !important; }
+html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc { box-shadow: none !important; background: transparent !important; }
+html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.kb-thanh-muc[aria-current='page'] { background: var(--tr-hs-nhat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-chip { border: 0 !important; outline: 0 !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-chip::before, html[data-trong='hs']:not(#_) .kb-chip::after { display: none !important; }
+html[data-trong='hs']:not(#_) .tr-menu-o { box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .kb-dong > .da-dem.kb-dem { background: transparent !important; box-shadow: none !important; }
+/* tấm Thêm: nền tấm xám nhóm, các nhóm bên trong là thẻ trắng (như Cài đặt iOS) */
+html[data-trong='hs']:not(#_) nav.tr-menu { background: var(--ph-nen) !important; box-shadow: 0 -8px 30px -12px var(--tr-phu) !important; }
+html[data-trong='hs']:not(#_) nav.tr-menu :is(.tp-tr-o, .tp-tr-muc) { background: var(--ph-the) !important; box-shadow: none !important; border-radius: 14px !important; }
+html[data-trong='hs']:not(#_) nav.tr-menu :is(.tr-dd, .tr-menu-ds) { background: var(--ph-the) !important; border-radius: 16px !important; }
+/* đề dài chữ L quanh giám thị: thẻ đặc chữ nhật, bỏ nét viền khuyết */
+html[data-trong='hs']:not(#_) .duo-gt-vien path { fill: var(--ph-the) !important; stroke: transparent !important; }
+html[data-trong='hs']:not(#_) .kb-dong[data-tt='dang'] :is(.kb-dem, .da-dem) { background: transparent !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .duo-day.duo-ket { border: 0 !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=dung] .ht2-lam-pa-ma { background: var(--tr-dung-nut) !important; color: var(--tr-hs-tren) !important; }
+html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=sai] .ht2-lam-pa-ma { background: var(--tr-sai) !important; color: var(--tr-hs-tren) !important; }
+/* sáng: «nền trang» toàn app = xám nhóm (mọi dải dính / nền màn con đọc --tr-nen đổi theo) */
+@media not (prefers-color-scheme: dark) { html[data-trong='hs']:not(#_) { --tr-nen: var(--tr-mat-2); } }
+
+/* TỐI: nút chính chàm SÁNG + chữ SẪM như nút Duolingo («Tạo hồ sơ»: chữ sẫm trên lục sáng 9,2:1) ⇒ chữ trên nút chàm ~9:1 (cũ chữ trắng 3,2:1);
+   bong bóng Mol «chào» cùng kiểu */
+@media (prefers-color-scheme: dark) {
+  html[data-trong='hs']:not(#_) :is(.kb-cta:is([data-sac='hs'], :not([data-sac])), .vtf-nut, .tcl-nut-chinh, .tr-dd-nut, .duo-day:not(.duo-ket) .duo-nut:not(:disabled)) { background-color: var(--tr-hs-chu) !important; color: var(--tr-trang) !important; }
+  html[data-trong='hs']:not(#_) .kb-cta:is([data-sac='hs'], :not([data-sac])) * { color: inherit !important; }
+  html[data-trong='hs']:not(#_) .bi-loi-bong[data-cx='chao'] { --bb-nen: var(--tr-hs-chu); --bb-vien: var(--tr-hs-chu); --bb-chu: var(--tr-trang); color: var(--tr-trang) !important; }
+  html[data-trong='hs']:not(#_) .bi-loi-bong[data-cx='chao'] * { color: inherit !important; }
+}

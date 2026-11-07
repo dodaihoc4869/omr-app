@@ -1,4 +1,5 @@
 @import './kinh-toan-hs.css'; /* 07/11 kính lóng lánh + khung mảnh chuẩn chung (docs/ban-ve-kinh-toan-0711) — cùng mảnh TrongHs, sau trong-kinh + bong-mol */
+@import './phang-hs.css'; /* 07/11 thầy chốt app HS PHẲNG kiểu Apple (docs/ban-ve-phang-0711) — đè kính bằng độ ưu tiên mức ID */
 /* BỐ CỤC KHỔ RỘNG «chuyên nghiệp, đơn giản, tinh tế» (thầy duyệt 07/11, bản vẽ docs/ban-ve-bo-cuc-hn-0711) — máy tính, Fold mở, điện thoại xoay ngang.
    Nạp ngay sau trong-kinh.css + bong-mol.css trong TrongHs.tsx (cùng mảnh, không thêm tệp tải). Điện thoại dọc: không đổi.
    (1) ray điều hướng áp sát mép trái, cao hết màn, mục xếp từ trên; (2) khung nội dung giữa phần còn lại, rộng tối đa 1120 px;
