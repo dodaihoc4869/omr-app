@@ -228,6 +228,7 @@ async function motLuongSoat(luong) {
     if (!kq.ok) console.log(`[${gio()}] soát ${luong}: phiên lỗi (${kq.giay}s) ${kq.loi.replace(/\d{4,}/g, '…').slice(0, 160)}`)
     if (kq.hetHan) { console.log(`[${gio()}] soát ${luong}: có vẻ hết hạn mức Claude — nghỉ 30 phút`); await ngu(1_800_000) }
     const dong = { giu: 0, sua: 0, loi: 0 }
+    if (tep.every(({ ten }) => !fs.existsSync(path.join(dir, 'soat', ten)))) console.log(`[${gio()}] soát ${luong}: phiên không ghi kết quả nào (${kq.giay}s): ${String(kq.ketQua ?? kq.loi ?? '').replace(/\s+/g, ' ').slice(0, 200)}`)
     for (const { ten, vao } of tep) {
       const s = docJson(path.join(dir, 'soat', ten))
       if (!s || !['giu', 'sua'].includes(s.ket)) { demSoat.thieuKq++; continue } // không có kết quả ⇒ hết 45 phút tự trả lại hàng soát
