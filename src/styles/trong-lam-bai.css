@@ -1223,11 +1223,20 @@ html[data-trong='hs'] .duo .ht2-lam-pa[data-ket=sai] .ht2-lam-pa-ma, html[data-t
    (3) khổ rộng (haiCotLam): nút chính của dải đáy gọn tối đa 340 px, giữa cột trả lời — điện thoại giữ nút rộng cho dễ bấm. */
 /* 07/11 thầy (ảnh thanh tiến độ màn làm câu): «làm một nền kính mờ ở nền thanh này» ⇒ kính như thanh công cụ dưới (--kinh-mat + --kinh-mo), mép đáy mảnh;
    máy yếu: --kinh-mo = none, --kinh-mat = mặt đặc (trong-hs-mau.css) ⇒ nền đặc, không làm mờ. */
-html[data-trong='hs'] .duo:not([data-xong]) > .duo-tren, html[data-trong='hs'] .duo-kt:not([data-xong]) > .duo-kt-tren { background: var(--kinh-mat); border: 0; box-shadow: inset 0 -1px 0 var(--kinh-vien-2), 0 8px 24px -20px var(--tr-phu); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo); }
+/* 07/11 lần 2 (thầy, ảnh máy tính: «cái nền làm xấu quá, làm cho trong hơn tinh tế hơn; bản xoay ngang và máy tính bo vừa hết chỗ thanh thôi»):
+   kính TRONG hơn (mặt 55 %), mép sáng 1 px thay vạch đáy xám, bóng rất nhẹ; khổ rộng: viên thuốc ôm vừa X + dải tiến độ + bộ đếm (dưới, trong @media). */
+html[data-trong='hs'] .duo:not([data-xong]) > .duo-tren, html[data-trong='hs'] .duo-kt:not([data-xong]) > .duo-kt-tren { background: color-mix(in oklab, var(--tr-mat) 55%, transparent); border: 0;
+  box-shadow: inset 0 -1px 0 color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 6px 18px -16px var(--tr-phu); -webkit-backdrop-filter: var(--kinh-mo); backdrop-filter: var(--kinh-mo); }
+html.may-yeu[data-trong='hs'] .duo:not([data-xong]) > .duo-tren, html.may-yeu[data-trong='hs'] .duo-kt:not([data-xong]) > .duo-kt-tren { background: var(--tr-mat); }
 html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) { height: 10px; border: 0; border-radius: 5px; background: var(--kinh-ve); box-shadow: inset 0 0 0 1px var(--kinh-vien-2); overflow: hidden; }
 html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i { height: 100%; border-radius: 5px; box-shadow: none; background: linear-gradient(90deg, color-mix(in oklab, var(--tr-hs) 75%, var(--tr-trang)), var(--tr-hs-day)); }
 @media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
   html[data-trong='hs'] .duo-tren > .duo-thanh { max-width: 560px; }
+  /* viên thuốc kính ôm vừa nội dung thanh (thầy 07/11): không kéo hết chiều ngang lưới */
+  /* :not(#_) nâng độ ưu tiên để thắng luật lưới chặng ngang (trong-chang-ngang.css: width 100 %, margin 0) */
+  html[data-trong='hs'] .duo:not([data-xong]):not(#_) > .duo-tren, html[data-trong='hs'] .duo-kt:not([data-xong]):not(#_) > .duo-kt-tren { width: fit-content; max-width: calc(100% - 24px); justify-self: start; align-self: start;
+    min-height: 0; margin: 8px 12px 0; padding: 6px 18px 6px 6px; border-radius: 999px; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-mat) 70%, transparent), 0 8px 22px -16px var(--tr-phu); }
+  html[data-trong='hs'] .duo:not([data-xong]):not(#_) > .duo-tren > .duo-thanh { width: min(560px, 46vw); flex: none; }
   html[data-trong='hs'] .duo-day:not(.duo-ket) > .duo-giua > .duo-nut { width: min(100%, 340px); margin-inline: auto; }
 }
 
