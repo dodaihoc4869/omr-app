@@ -3,9 +3,9 @@
     "i": 111,
     "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
     "fileNguon": "anh/14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2.png",
-    "svg": "pha-loang-acid-ddh-ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e.svg",
-    "hashSvg": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
-    "byteSvg": 91761,
+    "svg": "pha-loang-acid-ddh-ba50e7062c4c00a7dcacb9422f43a32ae444c37f261e130843b79490f8467a1a.svg",
+    "hashSvg": "ba50e7062c4c00a7dcacb9422f43a32ae444c37f261e130843b79490f8467a1a",
+    "byteSvg": 91840,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "4panels/4receiver4tiltedbeakers/3rodsONLY1-2-4/allleaders-labels/Hinh1..4truebold/4captionsliteral/noaddedliquids-flowlines-answer/DDHpath.",
-    "hashSvgDaSoat": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "ba50e7062c4c00a7dcacb9422f43a32ae444c37f261e130843b79490f8467a1a",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "5528d2b87e81525ef32fd7c900402691618b7749"
   }
 ]

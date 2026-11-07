@@ -3,9 +3,9 @@
     "i": 152,
     "hash": "1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb",
     "fileNguon": "anh/1a9e6fce0562ad626bdbc6a6d1b34666e05326955d98a8d7471880d36595a0cb.png",
-    "svg": "phan-ung-isotope-ddh-19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b.svg",
-    "hashSvg": "19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b",
-    "byteSvg": 23455,
+    "svg": "phan-ung-isotope-ddh-a18d2295151cd4a3cfc08c8f180506cda5e3647881cf495deff647182231e31a.svg",
+    "hashSvg": "a18d2295151cd4a3cfc08c8f180506cda5e3647881cf495deff647182231e31a",
+    "byteSvg": 23461,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -34,7 +34,9 @@
       }
     ],
     "ghiChuDung": "Haworth6C5H/CH2OH-Cfirst/allOH/2TAPER1horizontalbold/+H3C-18O-H/HClkhan/RIGHTarrow/A(C7HxOy)+H2O/x-yLatinDDHsubbaseline/noanswer/DDHpath.",
-    "hashSvgDaSoat": "19b55ea01bddad7e8b69f713432f0628a14501fed0900aede0cd1041c978238b",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "a18d2295151cd4a3cfc08c8f180506cda5e3647881cf495deff647182231e31a",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "5528d2b87e81525ef32fd7c900402691618b7749"
   }
 ]

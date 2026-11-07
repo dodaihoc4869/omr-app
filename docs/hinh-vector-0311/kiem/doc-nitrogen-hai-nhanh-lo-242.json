@@ -1,0 +1,300 @@
+{
+  "i": 530,
+  "hash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16.png",
+  "nativeSize": [
+    800,
+    179
+  ],
+  "reviewed": [
+    "nativeFULL2x/alltop-bottomliteral labels"
+  ],
+  "questions": [
+    {
+      "qid": "DB-11-B5-D1-II-28",
+      "maDe": "DB-11-B5-D1",
+      "de": "Sơ đồ phản ứng sau đây cho thấy rõ vai trò của thiên nhiên và con người trong việc vận chuyển nitrogen từ khí quyển vào trong đất, cung cấp nguồn phân đạm cho cây cối:",
+      "hinh": [
+        {
+          "hash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16",
+          "where": "DB-11-B5-D1-II-28.hinh.0.du_lieu",
+          "hashDataUrl": "b49c06ee50a43490686186d4d592524298d15ce690549e5447672310b0c27d54"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B6-II-17",
+      "maDe": "DH-11-C2-B6",
+      "de": "Sơ đồ phản ứng sau đây cho thấy rõ vai trò của thiên nhiên và con người trong việc vận chuyển nitrogen từ khí quyển vào trong đất, cung cấp nguồn phân đạm cho cây cối:",
+      "hinh": [
+        {
+          "hash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16",
+          "where": "DH-11-C2-B6-II-17.hinh.0.du_lieu",
+          "hashDataUrl": "b49c06ee50a43490686186d4d592524298d15ce690549e5447672310b0c27d54"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "startLabel": {
+      "text": "N₂",
+      "near": [
+        24,
+        99
+      ]
+    },
+    "fork": [
+      {
+        "from": [
+          47,
+          94
+        ],
+        "bend": [
+          91,
+          45
+        ],
+        "to": [
+          163,
+          45
+        ],
+        "head": "RIGHT at163,45",
+        "step": "(1)",
+        "above": "+ (X)",
+        "belowNear": [
+          129,
+          64
+        ]
+      },
+      {
+        "from": [
+          47,
+          94
+        ],
+        "bend": [
+          91,
+          142
+        ],
+        "to": [
+          163,
+          142
+        ],
+        "head": "RIGHT at163,142",
+        "step": "(5)",
+        "above": "+ H₂",
+        "belowNear": [
+          132,
+          160
+        ]
+      }
+    ],
+    "topLabels": [
+      {
+        "text": "NO",
+        "near": [
+          193,
+          44
+        ]
+      },
+      {
+        "text": "NO₂",
+        "near": [
+          333,
+          44
+        ]
+      },
+      {
+        "text": "Y",
+        "near": [
+          490,
+          43
+        ]
+      },
+      {
+        "text": "Ca(NO₃)₂",
+        "near": [
+          650,
+          43
+        ]
+      }
+    ],
+    "topLinks": [
+      {
+        "step": "(2)",
+        "from": [
+          222,
+          46
+        ],
+        "to": [
+          295,
+          46
+        ],
+        "above": "+ (X)",
+        "belowNear": [
+          259,
+          66
+        ]
+      },
+      {
+        "step": "(3)",
+        "from": [
+          375,
+          47
+        ],
+        "to": [
+          466,
+          47
+        ],
+        "above": "+ (X) + H₂O",
+        "belowNear": [
+          410,
+          67
+        ]
+      },
+      {
+        "step": "(4)",
+        "from": [
+          509,
+          43
+        ],
+        "to": [
+          580,
+          43
+        ],
+        "above": "+ (Z)",
+        "belowNear": [
+          547,
+          62
+        ]
+      }
+    ],
+    "bottomLabels": [
+      {
+        "text": "M",
+        "near": [
+          187,
+          142
+        ]
+      },
+      {
+        "text": "NO",
+        "near": [
+          306,
+          142
+        ]
+      },
+      {
+        "text": "NO₂",
+        "near": [
+          436,
+          141
+        ]
+      },
+      {
+        "text": "Y",
+        "near": [
+          582,
+          141
+        ]
+      },
+      {
+        "text": "NH₄NO₃",
+        "near": [
+          733,
+          141
+        ]
+      }
+    ],
+    "bottomLinks": [
+      {
+        "step": "(6)",
+        "from": [
+          207,
+          143
+        ],
+        "to": [
+          279,
+          143
+        ],
+        "above": "+ (X)",
+        "belowNear": [
+          244,
+          162
+        ]
+      },
+      {
+        "step": "(7)",
+        "from": [
+          334,
+          143
+        ],
+        "to": [
+          406,
+          143
+        ],
+        "above": "+ (X)",
+        "belowNear": [
+          374,
+          162
+        ]
+      },
+      {
+        "step": "(8)",
+        "from": [
+          472,
+          141
+        ],
+        "to": [
+          564,
+          141
+        ],
+        "above": "+ (X) + H₂O",
+        "belowNear": [
+          508,
+          162
+        ]
+      },
+      {
+        "step": "(9)",
+        "from": [
+          602,
+          139
+        ],
+        "to": [
+          674,
+          139
+        ],
+        "above": "+ (M)",
+        "belowNear": [
+          640,
+          159
+        ]
+      }
+    ],
+    "heads": "9 total ALL RIGHT; forkdiagonals have no arrowhead; only rightmost horizontalarrowhead each step",
+    "counts": {
+      "heads": 9,
+      "stepNumbers": 9,
+      "topFormulaNodes": 4,
+      "bottomFormulaNodes": 5,
+      "sharedN2": 1
+    },
+    "conditionLiteral": "Parentheses around every X/Z/M in above-arrowconditions; no parentheses in target Y/M labels; no catalysts/t°/p/coefficients/sourcephase labels. H2 andH2O digits subscripts. Ca(NO3)2 outer2sub,inner3sub;NH4NO3 subs4/3.",
+    "noExtra": [
+      "No arrow between topY andbottomY",
+      "No vertical connection atNO/NO2",
+      "No identification of X/Y/Z/M or extraformulas",
+      "No caption/answer"
+    ]
+  },
+  "status": "Đạt exactSVG sauactualreview",
+  "actualReview": {
+    "i": 530,
+    "hashSvg": "9b5e2e475b6b75a94059880f2e097bd1987b78c39c4b680b0db87f15f0b7b3eb",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG3x mởactualFULL, mởlạinativeFULL2x/alltop-bottomliteral labels và hai publicrefs/stems. Đúng2branches/9RIGHTheads/nums(1)..(9)/forkdiagonalsnoheads.9conditionsliteralgiữ+ (X),H2,H2O,+ (Z),+ (M) vàparentheses;targetsNO/NO2/M/Y/Ca(NO3)2/NH4NO3/subscripts đúng. Khôngextra phases/catalyst/temp/caption/answerXYZM. Fontpaths/gaps khôngchạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 42216,
+    "render": "/workspace/scratch/nitrogen530-242-9b5e2e47.png",
+    "sourceHash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16"
+  }
+}

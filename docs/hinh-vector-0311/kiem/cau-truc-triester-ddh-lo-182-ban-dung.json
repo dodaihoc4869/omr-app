@@ -3,9 +3,9 @@
     "i": 1214,
     "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
     "fileNguon": "anh/dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d.png",
-    "svg": "triester-ddh-bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467.svg",
-    "hashSvg": "bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467",
-    "byteSvg": 22039,
+    "svg": "triester-ddh-ceab169f37e5ddc78a33fd16dbf67e102983d3b682f3dc77f20c0660a6a323af.svg",
+    "hashSvg": "ceab169f37e5ddc78a33fd16dbf67e102983d3b682f3dc77f20c0660a6a323af",
+    "byteSvg": 21866,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
@@ -351,7 +351,9 @@
         ]
       ]
     },
-    "hashSvgDaSoat": "bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "ceab169f37e5ddc78a33fd16dbf67e102983d3b682f3dc77f20c0660a6a323af",
+    "nguoiSoat": "soat_nguon_2",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "dongBoPhongMain": "5528d2b87e81525ef32fd7c900402691618b7749"
   }
 ]

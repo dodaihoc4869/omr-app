@@ -1,0 +1,40 @@
+[
+  {
+    "i": 530,
+    "hash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16",
+    "fileNguon": "anh/641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16.png",
+    "svg": "nitrogen-hai-nhanh-ddh-9b5e2e475b6b75a94059880f2e097bd1987b78c39c4b680b0db87f15f0b7b3eb.svg",
+    "hashSvg": "9b5e2e475b6b75a94059880f2e097bd1987b78c39c4b680b0db87f15f0b7b3eb",
+    "byteSvg": 42216,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-II-28",
+        "de": "Sơ đồ phản ứng sau đây cho thấy rõ vai trò của thiên nhiên và con người trong việc vận chuyển nitrogen từ khí quyển vào trong đất, cung cấp nguồn phân đạm cho cây cối:",
+        "refs": [
+          {
+            "hash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16",
+            "where": "DB-11-B5-D1-II-28.hinh.0.du_lieu",
+            "hashDataUrl": "b49c06ee50a43490686186d4d592524298d15ce690549e5447672310b0c27d54"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B6-II-17",
+        "de": "Sơ đồ phản ứng sau đây cho thấy rõ vai trò của thiên nhiên và con người trong việc vận chuyển nitrogen từ khí quyển vào trong đất, cung cấp nguồn phân đạm cho cây cối:",
+        "refs": [
+          {
+            "hash": "641e4ecaa477c9e1b1e9f37d6c250f99508df13b2a394734b6b8d6d4a6b4ad16",
+            "where": "DH-11-C2-B6-II-17.hinh.0.du_lieu",
+            "hashDataUrl": "b49c06ee50a43490686186d4d592524298d15ce690549e5447672310b0c27d54"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2branches9RIGHTheads9numbers1..9/all9conditionsliteral/Ca(NO3)2-NH4NO3subs/N2-M-NO-NO2-Y/NOanswers-X-Y-Z-M/noaddedphase-temperature-catalyst-caption/DDHpath.",
+    "hashSvgDaSoat": "9b5e2e475b6b75a94059880f2e097bd1987b78c39c4b680b0db87f15f0b7b3eb",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

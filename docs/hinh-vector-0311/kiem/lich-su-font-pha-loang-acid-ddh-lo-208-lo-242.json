@@ -1,0 +1,55 @@
+{
+  "lyDo": "Lịch sử font đậm cũ;không duyệt hash mới",
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "2f756e84605ab9f4189ee81b4810ddb760e560ba",
+  "metadata": [
+    {
+      "i": 111,
+      "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+      "fileNguon": "anh/14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2.png",
+      "svg": "pha-loang-acid-ddh-ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e.svg",
+      "hashSvg": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
+      "byteSvg": 91761,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "DB-11-B8-D1-I-52",
+          "de": "Các hình ảnh dưới đây mô tả cách pha loãng H₂SO₄ đặc: Hình ảnh mô tả đúng cách pha loãng acid đảm bảo an toàn là",
+          "refs": [
+            {
+              "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+              "where": "DB-11-B8-D1-I-52.hinh.0.du_lieu",
+              "hashDataUrl": "bf6bd6c8265e91fa6ecc684c315e8825a168573dd0ad7153e9d2991cf4094e97"
+            }
+          ]
+        },
+        {
+          "qid": "DH-11-C2-B8-I-42",
+          "de": "Các hình ảnh dưới đây mô tả cách pha loãng H₂SO₄ đặc: Hình ảnh mô tả đúng cách pha loãng acid đảm bảo an toàn là",
+          "refs": [
+            {
+              "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+              "where": "DH-11-C2-B8-I-42.hinh.0.du_lieu",
+              "hashDataUrl": "bf6bd6c8265e91fa6ecc684c315e8825a168573dd0ad7153e9d2991cf4094e97"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "4panels/4receiver4tiltedbeakers/3rodsONLY1-2-4/allleaders-labels/Hinh1..4truebold/4captionsliteral/noaddedliquids-flowlines-answer/DDHpath.",
+      "hashSvgDaSoat": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 111,
+      "hashSvg": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: Mở native/full+firstzoom4x/2publicrefs;tựfreshChromiumactualSVG (/workspace/scratch/cau4-208-fresh.png). Đủ4receivers+4tiltedbeakersplainwhite/3rodsonly1-2-4,spoutcontact/rodforegroundovermouthđúngsource;panel3NOrod. Noaddedflowline/droplets/liquidlevel/arrows. All4titlesHình1..4DDHđậm thật/3Đũa thủy tinhlabels/4H₂O/4H₂SO₄ đặc+leaders/subscriptsđúngphânvịtrí;PAHình1giữwaterpourer-acidreceiverkhôngsửatheory/giảibài. Captions1-2Rót từ từ và khuấy nhẹ.,3Rót và không khuấy.,4Rót mạnh và khuấy.đủpunctuation. Firstrodlabelsize17fitcanvas;DDHpath tựchứa khôngfallback/text/image,mọiglyph/wall/leader cógapkhôngchạm/cắt/tràn;exactSHA256hiệntạikhớpmetadata,khôngchọn6a52cũ.",
+      "hash": "14f4d42f3e492158763ea1fdb96a998e805e6350610759d87ac34d9815a446f2",
+      "hashSvgDaSoat": "ef376398dfb5a90865d0e0816676c0b8dc6079037704a01981de0afaa874ca9e"
+    }
+  ]
+}

@@ -1,10 +1,14 @@
 [
   {
     "i": 1214,
-    "hashSvg": "bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: Đã mở lại native/full riêng và tự render actual SVG hiện tại bằng Chromium (/workspace/scratch/cau4-182-fresh.png), đối chiếu geometry đã đọc độc lập. Giữ literal cả bất nhất nguồn: ester top14C/middle13C/bottom15C; Z14C/T15C gồm carbonylC của COONa. Đủ kink trước double của T; middle double C7=C8 tính từ carbonyl, hai nhánh kề down; T hai nhánh kề double down. Đúng 3C glycerol dọc, 6O ester/3 carbonyl, 3OH sản phẩmY, +3NaOH/t°/mũi tên/2Z/+ và captions(X)(Y)(Z)(T). Không sửa cân bằng/tên acid/charge/H/caption mới. DDH glyph path tự chứa, font không fallback, nhãn/nét có khoảng hở, không chạm/cắt/tràn. Exact SHA256 thực khớp metadata.",
+    "hashSvg": "ceab169f37e5ddc78a33fd16dbf67e102983d3b682f3dc77f20c0660a6a323af",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL; mởriêng nativeFULL2x và mọi publicrefs/stems. BaesterallC=O/vertices/endpoints/doublepositions/midC=C,3NaOH/t°oneRIGHTarrow/glycerol3OH/2Zcoefficient/Tdouble/COONaliterals/(X)(Y)(Z)(T) đúng;noextracharges/answers. Fontpaths/spacinggaps không chạm/cắt/tràn;khôngtheoryfix.",
+    "actualSvgReviewed": true,
+    "byteSvg": 21866,
+    "render": "/workspace/scratch/font242-1214-new.png",
+    "sourceHash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
     "hash": "dc5ab4189af556323a11c8fea6473de14ec8d272e7eb1c8d16b4370da436b61d",
-    "hashSvgDaSoat": "bc05605a8f4e13c14122ea06b5cf3aadd023f6cca328407a0f9b85c7dcb8d467"
+    "hashSvgDaSoat": "ceab169f37e5ddc78a33fd16dbf67e102983d3b682f3dc77f20c0660a6a323af"
   }
 ]

@@ -1,0 +1,64 @@
+{
+  "lyDo": "Lịch sử font đậm cũ;không duyệt hash mới",
+  "fontCu": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+  "checkpointCu": "2f756e84605ab9f4189ee81b4810ddb760e560ba",
+  "metadata": [
+    {
+      "i": 1032,
+      "hash": "b90f29e283875fec0b797036b9658e406a9e95c78cca602647f715d75508ae77",
+      "fileNguon": "anh/b90f29e283875fec0b797036b9658e406a9e95c78cca602647f715d75508ae77.png",
+      "canvas": [
+        189,
+        105
+      ],
+      "daMoNative": true,
+      "kind": "pie-3d",
+      "labels": [
+        {
+          "text": "78%",
+          "color": "green-dark",
+          "sector": "green-large"
+        },
+        {
+          "text": "21%",
+          "color": "white",
+          "sector": "blue-medium"
+        }
+      ],
+      "notes": "3sectormàu3Dellipsepie:tophugexanhlá78%,topxanhdươngphảiphíatrước21%,mộtnêmĐỎrấtmảnhgiữa2mảngởtráiphíatrước.KHÔNGnhãn1%trênsectormỏng,trongsourcekhôngcó1%haylegend.Nềntrắng,thân3Dthấycáccạnhdọcsâuxuống,cùngsector3Dcolors;giữ2label78/21khôngtựthêmN₂/O₂/khíkhác. Đãzoom5xxácnhậnkhông1%.",
+      "questions": [
+        {
+          "qid": "DH-11-C2-B4-III-1",
+          "de": "Ở dạng đơn chất, nitrogen chiếm khoảng bao nhiêu phần trăm thể tích của không khí?",
+          "refs": [
+            {
+              "where": "DH-11-C2-B4-III-1.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauKhiGuiDotDau": false,
+      "svg": "pie-3d-ddh-d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f.svg",
+      "hashSvg": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f",
+      "byteSvg": 4541,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ3sector3Dgreen/blue/thinred;CHỈ78%và21%,KHÔNGthêm1%/legend/tênkhí/axis. Màu+gradientbámnguồn,nhãnDDHdamthật.",
+      "hashSvgDaSoat": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "soatCu": [
+    {
+      "i": 1032,
+      "hashSvg": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đãfreshmởPNGnative/full+actualSVGbảnsửahiệntại;3sector3Dgreenlarge/bluefrontmedium/thinredfrontleft đúnghướng/tỷlệnguồn,CHỈ78%green/21%white,không1%/legend/tênkhí. Mặtđỉnh-thânliền,blue/redbody dùngchungouterbottom khôngcònviềngreen dướibluebody,khôngkhegreen giữabluebody/top. DDHboldWOFF2thật/path-only/gapskhôngcắt-chạm-tràn,SHA256khớp.",
+      "hash": "b90f29e283875fec0b797036b9658e406a9e95c78cca602647f715d75508ae77",
+      "hashSvgDaSoat": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f"
+    }
+  ]
+}

@@ -35,15 +35,16 @@
       }
     ],
     "daTrongManifestSauKhiGuiDotDau": false,
-    "svg": "pie-3d-ddh-d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f.svg",
-    "hashSvg": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f",
-    "byteSvg": 4541,
+    "svg": "pie-3d-ddh-06d325720a9390024bdfdd289be721da73d211e5974cc9f51fbf85d9a365a911.svg",
+    "hashSvg": "06d325720a9390024bdfdd289be721da73d211e5974cc9f51fbf85d9a365a911",
+    "byteSvg": 4676,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữ3sector3Dgreen/blue/thinred;CHỈ78%và21%,KHÔNGthêm1%/legend/tênkhí/axis. Màu+gradientbámnguồn,nhãnDDHdamthật.",
-    "hashSvgDaSoat": "d0ecb72b468f196bf5ba7e07c4edd833a2c784c160edd818679cdb36f9eca87f",
-    "nguoiSoat": "cau_truc_4"
+    "hashSvgDaSoat": "06d325720a9390024bdfdd289be721da73d211e5974cc9f51fbf85d9a365a911",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "5528d2b87e81525ef32fd7c900402691618b7749"
   }
 ]
