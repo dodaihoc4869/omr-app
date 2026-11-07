@@ -204,7 +204,9 @@ describe('các bước buổi dạy: MỘT điểm danh, đồng bộ mọi máy
     })
     const { container, unmount } = render(<TheBaiDaDay />)
     await waitFor(() => expect(dangMo(container, 1)).toBe(true))
-    expect((within(buoc(container, 1)).getByRole('button', { name: 'Xong điểm danh →' }) as HTMLButtonElement).disabled).toBe(true)
+    // 07/11 (thầy «bỏ luôn phần này»): chưa mở buổi ⇒ KHÔNG có thanh «Xong điểm danh», không ô chọn lớp — chỉ nút «Điểm danh»
+    expect(within(buoc(container, 1)).queryByRole('button', { name: 'Xong điểm danh →' })).toBeNull()
+    expect(within(buoc(container, 1)).queryByText('Lớp học hôm nay')).toBeNull()
     fireEvent.click(within(thuocCua()).getByRole('button', { name: /^Hôm nay làm gì\?/ }))
     await waitFor(() => expect(dangMo(container, 2)).toBe(true))
     expect(buoc(container, 2).textContent).toContain('Chưa mở buổi')

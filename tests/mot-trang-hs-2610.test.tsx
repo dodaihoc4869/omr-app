@@ -464,7 +464,9 @@ describe('Menu dọc «Một trang» — MENU 6 MỤC (thầy 27/10): Điểm da
     const muc = () => within(nav()).getAllByRole('button').filter((b) => b.classList.contains('tr-menu-muc'))
     // thầy 02/11 khuya «Đổi vị trí Luyện tập bằng Kiểm tra, bỏ dòng a.i đỗ đại học»: tấm Thêm còn Luyện tập (hiện) + Cài đặt; Kiểm tra lên thanh nổi
     // SỬA CÓ CHỦ ĐÍCH 07/11 — thầy «cho nút điểm danh hiện sẵn vào phần thêm luôn»: chưa thấy buổi mở ⇒ mục «Điểm danh» đứng đầu tấm Thêm.
-    expect(muc().map((b) => b.textContent)).toEqual(['Điểm danh', 'Hôm nay', 'Luyện tập', 'Thành tích', 'Cài đặt'])
+    // 07/11 (ảnh thầy: tấm «Thêm» ẩn 3 mục đầu ⇒ Điểm danh đứng đầu bị ẩn): Điểm danh đứng TRÊN Cài đặt, có data-hien (luôn hiện trong tấm)
+    expect(muc().map((b) => b.textContent)).toEqual(['Hôm nay', 'Luyện tập', 'Thành tích', 'Điểm danh', 'Cài đặt'])
+    expect(muc()[3]!.hasAttribute('data-hien')).toBe(true)
     expect(within(nav()).getByRole('button', { name: 'Luyện tập' }).hasAttribute('data-hien')).toBe(true)
     expect(muc().every((b) => b.querySelector('.tr-menu-o'))).toBe(true)
     expect(within(nav()).getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')

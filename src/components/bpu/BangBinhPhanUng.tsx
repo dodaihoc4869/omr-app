@@ -210,7 +210,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const coChu = useMemo(() => {
     let ctx: CanvasRenderingContext2D | null = null
     try { ctx = document.createElement('canvas').getContext('2d') } catch { /* jsdom */ }
-    if (ctx) ctx.font = `800 100px ${getComputedStyle(document.body).fontFamily || 'sans-serif'}`
+    if (ctx) ctx.font = `800 100px 'DDH Rounded', ${getComputedStyle(document.body).fontFamily || 'sans-serif'}`
     const rong = new Map<string, number>()
     for (const e of hien) { const t = tenGoi.get(e.sbd) ?? ''; rong.set(e.sbd, Math.max(1.4, ...t.split(' ').map((w) => (ctx ? ctx.measureText(w).width / 100 : w.length * 0.62) * 0.97))) }
     const xep = [...rong.values()].sort((a, b) => a - b), p85 = xep[Math.min(xep.length - 1, Math.floor(xep.length * 0.85))] ?? 2
@@ -242,7 +242,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     let c: CanhBang = { loai: 'trong' }
     if (man === 'diem-danh') c = { loai: 'lua', x: X_LUA_DD, day: 520, cao: 250, nen: 30, giaTri: dsDoi(v).map((d) => { const t = ds.filter((e) => e.doi === d).length; return t ? ds.filter((e) => e.doi === d && e.vao).length / t : 0 }) }
     else if (man === 'tra-loi' && l) c = { loai: 'binh', muc: coMat.length ? (daGui.size / coMat.length) * 0.85 : 0, con: l.han ? Math.max(0, (l.han - nay) / Math.max(1, l.han - l.batDau)) : null }
-    else if (man === 'mo' && l && !l.tuLuan && l.phan !== 'II') c = { loai: 'ong', mo0: vb.canh.loai === 'ong' ? (vb.canh as Extract<CanhBang, { loai: 'ong' }>).mo0 : performance.now(), ong: dungOng(l, vb) }
+    else if (man === 'mo' && l && !l.tuLuan) c = { loai: 'ong', mo0: vb.canh.loai === 'ong' ? (vb.canh as Extract<CanhBang, { loai: 'ong' }>).mo0 : performance.now(), ong: dungOng(l, vb) }
     else if (man === 'mo' && l?.tuLuan) c = { loai: 'binh', muc: coMat.length ? (daGui.size / coMat.length) * 0.85 : 0, con: null }
     else if (man === 'dua') c = { loai: 'lua', x: X_LUA_DUA, day: 640, cao: 400, nen: 70, giaTri: dsDoi(v).map((d) => Math.max(0, diemDoi(v, d))) }
     vb.canh = c
@@ -458,8 +458,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     const chip = man === 'mo' && g && goiEm ? <div className="bb-pill" style={{ boxShadow: `inset 0 0 0 3px ${mauDoi(goiEm.doi)}` }}>Lên bảng: {ten(goiEm)}{g.dat === true ? ` · Đạt · ${DOI_BPU[goiEm.doi]?.ten} +${KJ.lenBangDat}` : g.dat === false ? ' · Chưa đạt' : ''}</div> : null
     const dem = new Map<string, number>()
     if (l.chon) for (const c of Object.values(l.chon)) dem.set(c, (dem.get(c) ?? 0) + 1)
-    const ongNhan = man === 'mo' && !l.tuLuan && l.dung && l.phan !== 'II' ? nhanOng(l, ve.current) : []
-    const dsKq = man === 'mo' && !l.tuLuan && l.dung && l.phan === 'II' ? ketQuaDs(l) : null
+    const ongNhan = man === 'mo' && !l.tuLuan && l.dung ? nhanOng(l, ve.current) : []
     noi = (
       <>
         {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{!l.tuLuan && l.phan !== 'III' ? <button type="button" className="bb-hoi" aria-pressed={hienPa} onClick={() => setHienPa((h) => !h)}><kbd>M</kbd>{hienPa ? 'Ẩn phương án' : 'Phương án'}</button> : null}{coGiai ? <button type="button" className="bb-hoi" aria-pressed={giai != null} onClick={() => void batGiai()}><kbd>G</kbd>{giai != null ? 'Ẩn lời giải' : 'Lời giải'}</button> : null}{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}</>)}
@@ -478,11 +477,9 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
               <div className="viet">Em giải trên bảng lớp<br />Thầy chấm: <b>D</b> Đạt · <b>F</b> Chưa đạt</div>
               <div className="dai"><span><b>{g.doanDung}</b> đoán đúng · <b>{g.doanSai}</b> chưa</span><span className="vach"><i style={{ width: `${(g.doanDung / Math.max(1, g.doanDung + g.doanSai)) * 100}%` }} /></span><span className="ts">Tiếp sức {g.tiep}</span></div>
             </div>
-          ) : dsKq ? (
-            <div className="bb-dskq" aria-label="Kết quả từng ý">{dsKq.map((y) => (
-              <div key={y.y}><b className="y">{y.y})</b><span className={`da ${y.dung ? 'd' : 's'}`}>{y.dung ? 'Đúng' : 'Sai'}</span>
-                <span className="thanh"><i style={{ width: `${y.tong ? (y.dat / y.tong) * 100 : 0}%` }} /></span><span className="so"><b>{y.dat}</b>/{y.tong} em đúng</span></div>))}</div>
-          ) : man === 'mo' && !l.tuLuan ? ongNhan.map((x) => <div key={x.nhan} className="bb-ong" style={{ left: x.x - 1200 }}><div className="nhan">{x.nhan}</div><div className="dem">{x.dem} em</div>{x.dung ? <div className="the">Đáp án</div> : null}</div>)
+          ) : man === 'mo' && !l.tuLuan ? <>{l.phan === 'II' ? <><span className="bb-hang-ds" style={{ top: HANG_DS[0].top + 100 - 128 }}>Đúng</span><span className="bb-hang-ds" style={{ top: HANG_DS[1].top + 100 - 128 }}>Sai</span></> : null}{ongNhan.map((x, k) => x.gon
+              ? <div key={k} className={`bb-ong gon${x.dung ? ' dung' : ''}`} style={{ left: x.x - 1200, top: x.y }}><b>{x.nhan}</b> {x.dem} em</div>
+              : <div key={k} className="bb-ong" style={{ left: x.x - 1200, top: x.y }}><div className="nhan">{x.nhan}</div><div className="dem">{x.dem} em</div>{x.dung ? <div className="the">Đáp án</div> : null}</div>)}</>
             : <div className="bb-dem"><b>{daGuiN}</b>/{coMat.length} em {l.tuLuan ? 'làm xong' : 'đã gửi'}{chuaBietS.size ? <span className="kb">trong đó {chuaBietS.size} em chưa biết làm</span> : null}</div>}
           {man === 'mo' && !l.tuLuan && chuaBietS.size ? <div className="bb-kb-mo">{chuaBietS.size} em chưa biết làm · thầy chữa kĩ câu này</div> : null}
         </div>
@@ -538,15 +535,21 @@ function ChuHoa({ t }: { t: string }) {
 /** Ống nghiệm theo số em chọn: Trắc nghiệm A–D; Đúng–sai 4 cặp Đ/S; Trả lời ngắn 3 đáp số hay gặp + «Khác». */
 function dungOng(l: NonNullable<ViewBang['luot']>, vb: VeBang): OngVe[] {
   const chon = Object.values(l.chon ?? {}), dung = (l.dung ?? '').toUpperCase(), M = vb.mau, mauPa = [M.tin, M.sao, M.chuY, M.hs]
-  if (l.phan === 'I') { const dem = 'ABCD'.split('').map((c) => chon.filter((x) => x.toUpperCase() === c).length), max = Math.max(1, ...dem); return dem.map((d, i) => ({ x: 1300 + i * 152, w: 86, mau: mauPa[i]!, dung: 'ABCD'[i] === dung, h: d / max })) }
+  if (l.phan === 'I') { const dem = 'ABCD'.split('').map((c) => chon.filter((x) => x.toUpperCase() === c).length), max = Math.max(1, ...dem); return dem.map((d, i) => ({ x: 1300 + i * 152, w: 104, mau: mauPa[i]!, dung: 'ABCD'[i] === dung, h: d / max, ...ONG_GON })) }
   if (l.phan === 'II') {
     const ra: OngVe[] = []
-    for (let i = 0; i < 4; i++) { const soD = chon.filter((x) => x.toUpperCase()[i] === 'D').length, soS = chon.filter((x) => x.toUpperCase()[i] === 'S').length, n = Math.max(1, chon.length); ra.push({ x: 1260 + i * 150, w: 46, mau: M.tin, dung: dung[i] === 'D', h: soD / n }, { x: 1320 + i * 150, w: 46, mau: M.chuY, dung: dung[i] === 'S', h: soS / n }) }
+    // HAI HÀNG (thầy 07/11 «đúng sai tách làm 2 ống nghiệm trên dưới cho đỡ rối»): hàng trên = số em chọn Đúng, hàng dưới = chọn Sai; cột = ý a–d.
+    for (let i = 0; i < 4; i++) { const soD = chon.filter((x) => x.toUpperCase()[i] === 'D').length, n = Math.max(1, chon.length); ra.push({ x: X_DS(i), w: 84, mau: M.tin, dung: dung[i] === 'D', h: soD / n, ...HANG_DS[0] }) }
+    for (let i = 0; i < 4; i++) { const soS = chon.filter((x) => x.toUpperCase()[i] === 'S').length, n = Math.max(1, chon.length); ra.push({ x: X_DS(i), w: 84, mau: M.chuY, dung: dung[i] === 'S', h: soS / n, ...HANG_DS[1] }) }
     return ra
   }
   const nhom = nhomTln(l), max = Math.max(1, ...nhom.map((x) => x.dem))
-  return nhom.map((x, i) => ({ x: 1300 + i * 152, w: 86, mau: mauPa[i]!, dung: x.dung, h: x.dem / max }))
+  return nhom.map((x, i) => ({ x: 1300 + i * 152, w: 104, mau: mauPa[i]!, dung: x.dung, h: x.dem / max, ...ONG_GON }))
 }
+/** Ống «chibi» (thầy 07/11 «ống thí nghiệm làm ngắn lại, chibi hơn»): miệng 300 → đáy 590 (cũ 150 → 640), rộng 104. Nhãn dưới đáy. */
+const ONG_GON = { top: 300, day: 590 }
+const HANG_DS = [{ top: 150, day: 350 }, { top: 425, day: 625 }] as const
+const X_DS = (i: number) => 1340 + i * 140
 function nhomTln(l: NonNullable<ViewBang['luot']>) {
   const dem = new Map<string, number>(), kq = l.ketQua ?? {}
   let soDung = 0
@@ -554,15 +557,10 @@ function nhomTln(l: NonNullable<ViewBang['luot']>) {
   const sai = [...dem.entries()].sort((a, b) => b[1] - a[1])
   return [{ nhan: String(l.dung ?? ''), dem: soDung, dung: true }, ...sai.slice(0, 2).map(([n, d]) => ({ nhan: n, dem: d, dung: false })), { nhan: 'Khác', dem: sai.slice(2).reduce((s, x) => s + x[1], 0), dung: false }]
 }
-/** Đúng–sai khi mở đáp án (thầy 07/11 «chỗ này rối quá, làm đơn giản đẹp»): 4 dòng a–d · đáp án Đúng / Sai · bao nhiêu em làm đúng ý đó (thay 8 ống). */
-function ketQuaDs(l: NonNullable<ViewBang['luot']>): { y: string; dung: boolean; dat: number; tong: number }[] {
-  const chon = Object.values(l.chon ?? {}).map((x) => x.toUpperCase()), dung = (l.dung ?? '').toUpperCase()
-  return [0, 1, 2, 3].map((i) => ({ y: 'abcd'[i]!, dung: dung[i] === 'D', dat: chon.filter((x) => x[i] === dung[i]).length, tong: chon.length }))
-}
-function nhanOng(l: NonNullable<ViewBang['luot']>, vb: VeBang | null): { x: number; nhan: string; dem: number; dung: boolean }[] {
+function nhanOng(l: NonNullable<ViewBang['luot']>, vb: VeBang | null): { x: number; y?: number; gon?: boolean; nhan: string; dem: number; dung: boolean }[] {
   const chon = Object.values(l.chon ?? {}), dung = (l.dung ?? '').toUpperCase()
-  if (l.phan === 'I') return 'ABCD'.split('').map((c, i) => ({ x: 1300 + i * 152, nhan: c, dem: chon.filter((x) => x.toUpperCase() === c).length, dung: c === dung }))
-  if (l.phan === 'II') return [0, 1, 2, 3].flatMap((i) => [{ x: 1260 + i * 150, nhan: `${'abcd'[i]}) Đ`, dem: chon.filter((x) => x.toUpperCase()[i] === 'D').length, dung: dung[i] === 'D' }, { x: 1320 + i * 150, nhan: `${'abcd'[i]}) S`, dem: chon.filter((x) => x.toUpperCase()[i] === 'S').length, dung: dung[i] === 'S' }])
+  if (l.phan === 'I') return 'ABCD'.split('').map((c, i) => ({ x: 1300 + i * 152, y: ONG_GON.day - 128 + 14, nhan: c, dem: chon.filter((x) => x.toUpperCase() === c).length, dung: c === dung }))
+  if (l.phan === 'II') return ['D', 'S'].flatMap((k, h) => [0, 1, 2, 3].map((i) => ({ x: X_DS(i), y: HANG_DS[h]!.day - 128 + 8, gon: true, nhan: `${'abcd'[i]})`, dem: chon.filter((x) => x.toUpperCase()[i] === k).length, dung: dung[i] === k })))
   void vb
-  return nhomTln(l).map((x, i) => ({ x: 1300 + i * 152, ...x }))
+  return nhomTln(l).map((x, i) => ({ x: 1300 + i * 152, y: ONG_GON.day - 128 + 14, ...x }))
 }

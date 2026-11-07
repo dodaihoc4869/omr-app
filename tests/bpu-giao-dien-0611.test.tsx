@@ -131,7 +131,7 @@ describe('bảng chiếu', () => {
     const o = document.querySelector('.bb-o .ten')!
     expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
   })
-  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án KHÔNG tự hiện phương án bên trái; Đúng–sai ⇒ 4 dòng kết quả', async () => {
+  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án KHÔNG tự hiện phương án bên trái; Đúng–sai ⇒ hai hàng ống Đúng / Sai', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
     render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -151,9 +151,11 @@ describe('bảng chiếu', () => {
     expect(document.querySelector('.bb-pa')).toBeNull() // bên trái chỉ đề; kết quả ở cột phải
     const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
     moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); nhanTra(st, 'S2', 'DSSD', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewBang(st))
-    const kq = await screen.findByLabelText('Kết quả từng ý')
-    expect([...kq.querySelectorAll('.so')].map((x) => x.textContent)).toEqual(['2/2 em đúng', '2/2 em đúng', '2/2 em đúng', '1/2 em đúng'])
-    expect([...kq.querySelectorAll('.da')].map((x) => x.textContent)).toEqual(['Đúng', 'Sai', 'Sai', 'Đúng'])
+    // Đúng–sai: HAI HÀNG ống (thầy 07/11) — hàng Đúng rồi hàng Sai, mỗi ống «ý) N em»; ống của đáp án đúng có lớp `dung`.
+    await screen.findByText('Sai')
+    const o = [...document.querySelectorAll('.bb-ong.gon')]
+    expect(o.map((x) => x.textContent)).toEqual(['a) 2 em', 'b) 0 em', 'c) 0 em', 'd) 1 em', 'a) 0 em', 'b) 2 em', 'c) 2 em', 'd) 1 em'])
+    expect(o.map((x) => x.classList.contains('dung'))).toEqual([true, false, false, true, false, true, true, false])
   })
   it('G ⇒ lời giải thu gọn hiện NGAY TRÊN BẢNG (G lần nữa ẩn); tờ không có lời giải ⇒ lùi về tờ', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')

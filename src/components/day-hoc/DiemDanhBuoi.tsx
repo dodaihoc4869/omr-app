@@ -278,18 +278,18 @@ export function BuocDiemDanh({
   dd,
   soBuoc = 1,
   idTieuDe = 'dh-b1',
-  khoaLop = false,
   thanh = false,
   onSangDauGio,
 }: {
   dd: DiemDanhBuoi
   soBuoc?: number
   idTieuDe?: string
+  /** Không còn dùng (07/11 bỏ ô chọn lớp) — giữ cho nơi gọi cũ. */
   khoaLop?: boolean
   thanh?: boolean
   onSangDauGio?: () => void
 }) {
-  const { dsLop, lopChon, setLopChon, tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, setLopThem, dangThem, goc, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong } = dd
+  const { tt, dangTaiBuoi, loiBuoi, dangMo, chieuMa, setChieuMa, themMo, setThemMo, timEm, setTimEm, emThem, setEmThem, setLopThem, dangThem, goc, batDauDiemDanh, hoiPhongCho, ketThuc, botEm, themEm, moThem, coMat, coMatMap, dsLopThem, lopLoc, emLoc, buoiXong } = dd
   const dsCoMat = (
     <ul className="dh-chip-ds" aria-label="Học sinh có mặt">
       {coMat.map((e) => (
@@ -306,7 +306,8 @@ export function BuocDiemDanh({
       ))}
     </ul>
   )
-  // Chưa có buổi / buổi đã kết thúc ⇒ chọn lớp + mở buổi mới.
+  // Chưa có buổi / buổi đã kết thúc ⇒ MỘT nút «Điểm danh»: mở buổi + chiếu mã (thầy 07/11 bỏ ô chọn lớp — buổi mở theo lớp mặc định của màn,
+  // trống = mọi lớp; em điểm danh ở «Thêm › Điểm danh» trên máy em).
   const khoiMo: ReactNode =
     !dangTaiBuoi && (!tt || buoiXong) ? (
       <div className="dh-hang">
@@ -315,18 +316,6 @@ export function BuocDiemDanh({
             {loiBuoi}
           </p>
         )}
-        <label className="dh-chon-lop">
-          <span>Lớp học hôm nay</span>
-          <select value={lopChon} onChange={(e) => setLopChon(e.target.value)} disabled={khoaLop}>
-            <option value="">Mọi lớp (em lớp nào cũng điểm danh được)</option>
-            {lopChon && !dsLop.some((l) => l.tenLop === lopChon) && <option value={lopChon}>{lopChon}</option>}
-            {dsLop.map((l) => (
-              <option key={l.tenLop} value={l.tenLop}>
-                {l.tenLop} · {l.soEm} em
-              </option>
-            ))}
-          </select>
-        </label>
         <button type="button" className="m3-nut-chinh dh-nut" onClick={() => void batDauDiemDanh()} disabled={dangMo}>
           <UserCheck size={18} aria-hidden="true" /> {dangMo ? 'Đang mở buổi…' : 'Điểm danh'}
         </button>

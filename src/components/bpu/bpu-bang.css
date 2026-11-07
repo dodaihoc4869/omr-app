@@ -1,6 +1,11 @@
 /* BÌNH PHẢN ỨNG — BẢNG CHIẾU (máy thầy). Sân khấu 1920×1080 co theo màn (transform). Chép từ nguyên mẫu thầy duyệt (docs/ban-ve-binh-phan-ung-0611/nguyen-mau.html).
    CHỈ biến màu sẵn có: --tr-* (trong.css), --giay (trắng cố định), --p-muc (mực cố định trên nền màu đội). Đội: --doi do mã gán. Chuyển động: transform/opacity. */
-.bpu-bang { position: fixed; inset: 0; z-index: 2147482500; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; font-family: var(--sans); }
+/* Phông app «DDH Rounded» (thầy 07/11 «ép font chữ của app lên màn chiếu»): cùng tệp phông của app học sinh (trong-hs.css), khai lại vì app thầy không nạp tệp đó. */
+@font-face { font-family: 'DDH Rounded'; font-style: normal; font-weight: 100 549; font-display: swap; src: url('../../styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'DDH Rounded'; font-style: normal; font-weight: 100 549; font-display: swap; src: url('../../styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0394, U+03B1-03B2, U+2000-206F, U+2070-208F, U+20AC, U+2103, U+2190-2193, U+21C4, U+21CC, U+2212, U+2264-2265, U+FEFF, U+FFFD; }
+@font-face { font-family: 'DDH Rounded'; font-style: normal; font-weight: 550 1000; font-display: swap; src: url('../../styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'); unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB; }
+@font-face { font-family: 'DDH Rounded'; font-style: normal; font-weight: 550 1000; font-display: swap; src: url('../../styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+0394, U+03B1-03B2, U+2000-206F, U+2070-208F, U+20AC, U+2103, U+2190-2193, U+21C4, U+21CC, U+2212, U+2264-2265, U+FEFF, U+FFFD; }
+.bpu-bang { position: fixed; inset: 0; z-index: 2147482500; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; --sans: 'DDH Rounded', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, sans-serif; font-family: var(--sans); }
 .bb-san { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 50% 50%; overflow: hidden;
   background-color: var(--tr-nen);
   background-image: radial-gradient(circle at 80% 42%, color-mix(in srgb, var(--tr-tin) 14%, transparent), transparent 34%), radial-gradient(circle at 12% 110%, color-mix(in srgb, var(--tr-hs) 14%, transparent), transparent 40%); }
@@ -274,3 +279,8 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 .bb-giai .sol-dap, .bb-giai .sol-ket { margin-top: 14px; font-weight: 700; color: var(--tr-dung-chu); }
 .bb-giai img { max-width: 100%; border-radius: 12px; background: var(--giay); }
 @media (prefers-reduced-motion: reduce) { .bb-giai { animation: none; } }
+/* Ống chibi + Đúng–sai hai hàng (thầy 07/11): nhãn hàng bên trái, nhãn ống một dòng; ống đúng: chữ xanh đậm (ống phát sáng trên canvas). */
+.bb-hang-ds { position: absolute; left: -18px; transform: translateY(-50%); padding: 6px 14px; border-radius: 12px; background: var(--tr-mat-2); color: var(--tr-chu-2); font-size: 26px; font-weight: 800; animation: bb-hien 0.4s 0.6s both; }
+.bb-ong.gon { width: 130px; margin-left: -65px; font-size: 24px; color: var(--tr-chu-2); white-space: nowrap; font-variant-numeric: tabular-nums; animation-delay: 1.2s; }
+.bb-ong.gon b { color: var(--tr-chu); font-weight: 800; }
+.bb-ong.gon.dung, .bb-ong.gon.dung b { color: var(--tr-dung-chu); font-weight: 800; }

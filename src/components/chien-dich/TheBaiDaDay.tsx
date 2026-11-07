@@ -297,12 +297,12 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
         {/* BƯỚC 1 — ĐIỂM DANH (khối sẵn có) + «Xong điểm danh». */}
         <section className="gvv2-hd-buoc" data-buoc-ht={1} data-mo={buoc === 1} hidden={buoc !== 1} aria-label="Bước 1 · Điểm danh">
           <BuocDiemDanh dd={dd} soBuoc={1} idTieuDe="bd-b1" thanh onSangDauGio={sangDauGio} />
-          <div className="gvv2-hd-day">
-            <span className="gvv2-so">{dd.tt ? <><b>{chuCoMat}</b>{vang ? ` · ${vang}` : ''} · em đến muộn vẫn nhập mã được tới khi kết thúc buổi</> : 'Mở buổi, chiếu mã cho em điểm danh.'}</span>
+          {dd.tt && <div className="gvv2-hd-day">
+            <span className="gvv2-so"><b>{chuCoMat}</b>{vang ? ` · ${vang}` : ''} · em đến muộn vẫn nhập mã được tới khi kết thúc buổi</span>
             <button type="button" className="m3-nut-chinh" disabled={!buoiMo} onClick={() => dat(2)}>
               Xong điểm danh →
             </button>
-          </div>
+          </div>}
         </section>
 
         {/* BƯỚC 2 — HÔM NAY LÀM GÌ? */}

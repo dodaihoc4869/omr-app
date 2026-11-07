@@ -8,7 +8,8 @@ export type CanhBang =
   | { loai: 'ong'; ong: OngVe[]; mo0: number }
   | { loai: 'lua'; giaTri: number[]; x: number[]; day: number; cao: number; nen: number }
 
-export interface OngVe { x: number; w: number; mau: string; dung: boolean; h: number }
+/** top / day: miệng / đáy ống trên sân khấu (mặc định 150 / 640 — ống dài cũ). Ống «chibi» ngắn mập + Đúng–sai hai hàng (thầy 07/11). */
+export interface OngVe { x: number; w: number; mau: string; dung: boolean; h: number; top?: number; day?: number }
 export interface MauBang { tin: string; hs: string; dung: string; sao: string; chuY: string; vien: string; chu: string; mat: string; giay: string; doi: string[] }
 
 type Hat = { t0: number; d: number; mau: string; vet: [number, number][]; p: number[]; xong?: () => void }
@@ -162,12 +163,12 @@ export class VeBang {
       const dich = this.yeu || p > 0.35 ? o.h : 0
       this.ongHien[i] = (this.ongHien[i] ?? 0) + (dich - (this.ongHien[i] ?? 0)) * (this.yeu ? 1 : Math.min(1, dt * 3))
       const rise = this.yeu ? 1 : deo(kep((p - 0.05) / 0.3))
-      const top = 150 + (1 - rise) * 120, day = 640 + (1 - rise) * 120, w = o.w, x = o.x
+      const top = (o.top ?? 150) + (1 - rise) * 120, day = (o.day ?? 640) + (1 - rise) * 120, w = o.w, x = o.x
       const doi = this.yeu ? 1 : kep((p - 0.7) / 0.14), hien = o.dung && (this.yeu || p > 0.7)
       const mau = o.dung ? tronMau(o.mau, M.dung, doi) : p > 0.7 || this.yeu ? tronMau(o.mau, M.vien, doi * 0.75) : o.mau
       c.save(); c.globalAlpha = rise
       c.save(); c.beginPath(); c.moveTo(x - w / 2, top); c.lineTo(x - w / 2, day - w / 2); c.arc(x, day - w / 2, w / 2, Math.PI, 0, true); c.lineTo(x + w / 2, top); c.closePath(); c.clip()
-      const h = this.ongHien[i]! * (day - top - 40) * 0.88
+      const h = this.ongHien[i]! * (day - top - 24) * 0.9
       if (h > 0) {
         c.fillStyle = mau; c.fillRect(x - w / 2, day - h, w, h + 2)
         c.fillStyle = moMau(M.giay, 0.35); c.fillRect(x - w / 2, day - h, w, 5)

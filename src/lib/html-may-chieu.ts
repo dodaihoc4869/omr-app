@@ -21,6 +21,7 @@ import {experimentHtml,experimentOriginal} from './experiments/render'
 import { ngheBpuToChieu } from './bpu/nghe-to-chieu'
 import { chuPhuongAn } from './anh-phuong-an'
 import type { CauLuyen } from './bai-tap-pdf'
+import { cssPhongMayChieu } from './phong-may-chieu' // thầy 07/11: phông app trên màn chiếu
 import { CSS_PHIEU, anhHtml, bangHtml, chuHtml, dapAnChu, hinhTaiViTri, oGiaiHtml, thoat } from './html-phieu'
 import { noiDungTuCauLuyen, thoiGianCau } from './thoi-gian-len-bang'
 import { CSS_LOI_GIAI_GON } from './to-chieu-loi-giai-gon'
@@ -1168,7 +1169,7 @@ ${tuyChon.chuaBai ? `    ${NUT_THU_GON}\n` : ''}    <button type="button" class=
   return `<!DOCTYPE html>
 <html lang="vi" data-projector="matte-light" data-sang><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${thoat(tuyChon.tenBuoi || 'Gọi lên bảng')} — tờ máy chiếu</title>
-<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style><style>${CSS_LOI_GIAI_GON}</style>${tuyChon.chuaBai ? `<style>${CSS_CHUA_BAI}</style>` : ''}${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}</head>
+<style>${CSS_PHIEU}</style><style>${CSS_MAY_CHIEU}</style><style>${CSS_BO_CUC}</style><style>${CSS_GIAO_DIEN_TO_CHIEU}</style><style>${CSS_LEN_BANG_MOI}</style><style>${CSS_LOI_GIAI_GON}</style>${tuyChon.chuaBai ? `<style>${CSS_CHUA_BAI}</style>` : ''}${maPhien ? `<style>${CSS_CAU_NOI_TO_CHIEU}</style><style>${CSS_GIAO_DIEN_NUT_CHAM}</style>` : ''}<style>${cssPhongMayChieu()}</style></head>
 <body class="mc${tuyChon.dayHoc ? ' mc-day-hoc' : ''}"${tuyChon.chuaBai ? ' data-chua-bai' : ''}${maPhien ? ` data-cau-noi="${maPhien}"` : ''}${nganSach > 0 ? ` data-ngan-sach="${nganSach}"` : ''}>${than}
 <script>${boChuThich(JS_MAY_CHIEU)}</script><script>${boChuThich(jsBoCuc())}</script>${maPhien ? `<script>${boChuThich(jsCauNoiToChieu())}</script>` : ''}<script>${boChuThich(jsLenBangMoi({ cauNoi: Boolean(maPhien) }))}</script>${tuyChon.chuaBai ? `<script>${boChuThich(JS_CHUA_BAI)}</script>` : ''}</body></html>`
 }
