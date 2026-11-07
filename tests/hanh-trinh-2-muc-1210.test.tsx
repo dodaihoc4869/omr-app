@@ -93,90 +93,95 @@ afterEach(() => {
 
 const buoc = (c: HTMLElement, so: number) => c.querySelector<HTMLElement>(`[data-buoc-ht="${so}"]`)!
 const dangMo = (c: HTMLElement, so: number) => buoc(c, so)?.getAttribute('data-mo') === 'true'
+const the = (c: HTMLElement, ten: RegExp) => within(buoc(c, 2)).getByRole('button', { name: ten, hidden: true })
+const thuocCua = () => screen.getByRole('navigation', { name: 'Các bước của buổi dạy' })
 
-describe('một trang 4 bước + khoá cũ', () => {
-  it('không còn thẻ / mục; thước 4 bước; tiêu đề phụ mới; số cần chữa ở bước 4; không nút ở đầu màn', async () => {
+// SỬA CÓ CHỦ ĐÍCH 07/11 — thầy duyệt bản vẽ docs/ban-ve-buoc-day-0711 («duyệt, build luôn»): đường thẳng 4 bước Điểm danh → Hôm nay làm gì? (thẻ hoạt
+// động) → Chọn câu & chiếu (khối sẵn có của hoạt động) → Đang chiếu; bước + hoạt động đồng bộ mọi máy qua máy chủ (thay phần nhớ theo máy).
+describe('các bước buổi dạy + khoá cũ', () => {
+  it('thước 4 bước mới; tiêu đề phụ mới; số cần chữa trên thẻ Chữa câu khó; không nút ở đầu màn', async () => {
     useSoDemGv.getState().datSo({ canThayChua: 6 })
     const { container } = render(<HanhTrinhV2 />)
     const thuoc = await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })
     expect(screen.queryAllByRole('tab')).toHaveLength(0)
-    expect(screen.queryByRole('tablist')).toBeNull()
-    expect(within(thuoc).getAllByRole('button').map((b) => b.querySelector('.gvv2-ht-ten-dai')?.textContent)).toEqual(['Điểm danh', 'Gọi lên bảng đầu giờ', 'Dạy học', 'Chữa câu khó & tính toán'])
-    expect(screen.getByText('Điểm danh trước — bước 2, 3, 4 dùng chung danh sách có mặt, thầy mở bước nào tuỳ việc.')).toBeTruthy()
+    expect(within(thuoc).getAllByRole('button').filter((b) => b.querySelector('.gvv2-ht-ten-dai')).map((b) => b.querySelector('.gvv2-ht-ten-dai')?.textContent)).toEqual(['Điểm danh', 'Hôm nay làm gì?', 'Chọn câu & chiếu', 'Đang chiếu'])
+    expect(screen.getByText(/^Điểm danh → chọn hoạt động → chọn câu, chiếu lên bảng → trên lớp chỉ cần bấm Câu tiếp/)).toBeTruthy()
     expect(container.querySelector('.gvv2-dau button')).toBeNull()
-    expect(buoc(container, 4).textContent).toContain('6 chỗ học sinh cần chữa')
+    expect(buoc(container, 2).textContent).toContain('6 chỗ cần chữa')
+    // một chỗ kết thúc buổi trên thước
+    await waitFor(() => expect(within(thuoc).getByRole('button', { name: 'Kết thúc buổi học' })).toBeTruthy())
   })
 
-  it('khoá cũ không gãy: can-chua / chua-bai ⇒ mở bước 4; dau-gio ⇒ bước 2; khoá khác ⇒ theo điểm danh', async () => {
+  it('khoá cũ không gãy: can-chua / chua-bai ⇒ bước 3 · Chữa câu khó; dau-gio ⇒ bước 3 · Kiểm tra đầu giờ; khoá khác ⇒ theo điểm danh', async () => {
     const bang: [TheHanhTrinh | string, 2 | 4 | null][] = [
       ['day-hoc', null], ['chua-bai', 4], ['can-chua', 4], ['dau-gio', 2], ['goi-7', null], ['nhip', null], ['bai-hang-ngay', null], ['chien-dich', null], ['la', null],
     ]
     for (const [k, so] of bang) expect(buocHanhTrinh(k), k).toBe(so)
     const r = render(<HanhTrinhV2 theDau="can-chua" />)
     expect(await screen.findByText('Giả: mục Chữa bài')).toBeTruthy()
-    expect(dangMo(r.container, 4)).toBe(true)
+    expect(dangMo(r.container, 3)).toBe(true)
     r.unmount()
     const r2 = render(<HanhTrinhV2 theDau="dau-gio" />)
     await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })
-    expect(dangMo(r2.container, 2)).toBe(true)
+    await waitFor(() => expect(dangMo(r2.container, 3)).toBe(true))
+    expect(r2.container.querySelector('[data-hd="dau-gio"]')!.hasAttribute('hidden')).toBe(false)
   })
 })
 
-describe('trang 4 bước: MỘT điểm danh, bước độc lập', () => {
-  it('MỘT điểm danh dùng chung; có em có mặt ⇒ mở bước 2; bước khác thu một dòng nhưng vẫn gắn; bước 4 chỉ nạp khi mở; không còn Tick bài', async () => {
+describe('các bước buổi dạy: MỘT điểm danh, đồng bộ mọi máy', () => {
+  it('MỘT điểm danh dùng chung; có em có mặt ⇒ bước 2 «Hôm nay làm gì?»; chọn thẻ ⇒ bước 3 khối hoạt động, khối đã mở vẫn gắn; tiến trình ghi lên máy chủ', async () => {
     const { container } = render(<TheBaiDaDay />)
     await waitFor(() => expect(dangMo(container, 2)).toBe(true))
-    await screen.findByRole('heading', { level: 2, name: 'Gọi lên bảng đầu giờ' })
-    // một điểm danh: Kiểm tra đầu giờ + Dạy học nhận `dd` ⇒ không tự hỏi buổi
+    await screen.findByRole('heading', { level: 2, name: 'Hôm nay làm gì?' })
     expect(lenh('/gv/buoi-hoc', 'dang-mo')).toHaveLength(1)
     expect([...container.querySelectorAll('[data-buoc-ht]')].map((b) => b.getAttribute('data-buoc-ht'))).toEqual(['1', '2', '3', '4'])
-    // bước 1 thu: tóm tắt có mặt / sĩ số + tên em vắng của LỚP buổi (em lớp khác không tính vắng)
-    await waitFor(() => expect(buoc(container, 1).querySelector('.gvv2-ht-dong')!.textContent).toContain('2/3 em có mặt · Vắng: Bùi Quang Minh'))
-    expect(within(buoc(container, 1)).getByRole('button', { name: 'Mở lại bước 1 · Điểm danh' })).toBeTruthy()
-    // bước 1 vẫn gắn (ẩn) — một bước Điểm danh duy nhất
-    expect(container.querySelectorAll('[data-buoc-ht="1"] .gvv2-ht-than[hidden]')).toHaveLength(1)
+    await waitFor(() => expect(buoc(container, 2).textContent).toContain('2/3 em có mặt'))
     expect((screen.getByRole('combobox', { name: 'Buổi dạy' }) as HTMLSelectElement).value).toBe('BH-12')
-    const muc = () => [...screen.getByRole('navigation', { name: 'Các bước của buổi dạy' }).querySelectorAll('li[data-tt]')].map((l) => l.getAttribute('data-tt'))
+    const muc = () => [...thuocCua().querySelectorAll('li[data-tt]')].map((l) => l.getAttribute('data-tt'))
     expect(muc()).toEqual(['xong', 'dang', 'cho', 'cho'])
-    // bước 4 chưa nạp; không còn Tick bài, không đọc cờ OMNI
+    // chưa chọn hoạt động ⇒ chưa nạp khối nào; không Tick bài, không đọc cờ OMNI
     expect(screen.queryByText('Giả: mục Chữa bài')).toBeNull()
+    expect(container.querySelector('[data-hd]')).toBeNull()
     expect(screen.queryByText('Tick bài vừa dạy')).toBeNull()
-    expect(container.querySelector('[data-khoi="buoc-tick-bai"]')).toBeNull()
-    // mở bước 3: bước 2 thu nhưng vẫn gắn (giữ em đang gọi)
-    fireEvent.click(within(buoc(container, 3)).getByRole('button', { name: 'Mở bước 3 · Dạy học' }))
+    // chọn Kiểm tra đầu giờ ⇒ bước 3, khối gọi lên bảng; tiến trình ghi lên máy chủ
+    fireEvent.click(the(container, /^Kiểm tra đầu giờ/))
     await waitFor(() => expect(dangMo(container, 3)).toBe(true))
-    expect(dangMo(container, 2)).toBe(false)
-    expect(buoc(container, 2).querySelector('[data-khoi="buoc-dau-gio"]')).toBeTruthy()
-    await screen.findByRole('heading', { level: 2, name: 'Dạy học' })
-    expect(muc()).toEqual(['xong', 'cho', 'dang', 'cho'])
-    // mở bước 4 từ thước ⇒ nạp lúc này
-    fireEvent.click(within(screen.getByRole('navigation', { name: 'Các bước của buổi dạy' })).getAllByRole('button')[3]!)
+    expect(container.querySelector('[data-khoi="buoc-dau-gio"]')).toBeTruthy()
+    await waitFor(() => expect(lenh('/gv/buoi-hoc', 'tien-trinh').at(-1)?.[1]).toMatchObject({ id: 'BH-12', tienTrinh: { buoc: 3, hoatDong: 'dau-gio' } }))
+    // đổi sang Dạy học: khối Kiểm tra đầu giờ vẫn gắn (ẩn) — giữ em đang gọi
+    fireEvent.click(within(buoc(container, 3)).getByRole('button', { name: /Đổi hoạt động/ }))
+    await waitFor(() => expect(dangMo(container, 2)).toBe(true))
+    fireEvent.click(the(container, /^Dạy học/))
+    await waitFor(() => expect(dangMo(container, 3)).toBe(true))
+    expect(container.querySelector('[data-hd="dau-gio"]')!.hasAttribute('hidden')).toBe(true)
+    expect(container.querySelector('[data-hd="day-hoc"]')!.hasAttribute('hidden')).toBe(false)
+    expect(muc()).toEqual(['xong', 'xong', 'dang', 'cho'])
+    // Chữa câu khó chỉ nạp khi chọn
+    expect(screen.queryByText('Giả: mục Chữa bài')).toBeNull()
+    fireEvent.click(within(buoc(container, 3)).getByRole('button', { name: /Đổi hoạt động/ }))
+    fireEvent.click(the(container, /^Chữa câu khó/))
     expect(await screen.findByText('Giả: mục Chữa bài')).toBeTruthy()
-    expect(dangMo(container, 4)).toBe(true)
     expect(lenh('/gv/omni', 'co-doc')).toHaveLength(0)
-    // bước thầy mở lần trước được nhớ theo buổi
-    expect(localStorage.getItem('ddh.hanhTrinh.buoc.BH-12')).toBe('4')
   })
 
-  it('bước 2 gọi lên bảng: thẻ từng em, Đạt / Chưa đạt đi đường /gv/dau-gio cham; chấm hết ⇒ thước báo xong', async () => {
-    render(<TheBaiDaDay />)
+  it('Kiểm tra đầu giờ: thẻ từng em, Đạt / Chưa đạt đi đường /gv/dau-gio cham; thẻ hoạt động báo đã gọi', async () => {
+    const { container } = render(<TheBaiDaDay />)
+    await waitFor(() => expect(dangMo(container, 2)).toBe(true))
+    fireEvent.click(the(container, /^Kiểm tra đầu giờ/))
     const buoc2 = await screen.findByRole('region', { name: 'Gọi lên bảng đầu giờ' })
     await within(buoc2).findByText('Đặng Quốc Việt')
     expect(within(buoc2).getByText('Đã ghi: Đạt')).toBeTruthy()
     expect(within(buoc2).getByText('Lịch sử câu này: Đúng 08/10 (Học theo kế hoạch)')).toBeTruthy()
     expect(within(buoc2).getByRole('button', { name: 'Chiếu lên bảng' })).toBeTruthy()
-    // hai em có mặt đều đã được gọi ⇒ nút Gọi thêm nói thật và khoá
     expect(within(buoc2).getByRole('button', { name: 'Đã gọi hết em có mặt' }).hasAttribute('disabled')).toBe(true)
-    expect(within(buoc2).getByRole('button', { name: /Kết thúc kiểm tra/ })).toBeTruthy()
     expect(within(buoc2).getAllByRole('checkbox', { name: /Thầy đã chữa/ })).toHaveLength(2)
     fireEvent.click(within(buoc2).getByRole('button', { name: 'Quốc Việt: Đạt' }))
     await waitFor(() => expect(lenh('/gv/dau-gio', 'cham').map(([, b]) => b)).toEqual([expect.objectContaining({ buoiId: 'BH-12', sbd: 'S2', qid: 'Q-5', dat: true })]))
     await waitFor(() => expect(within(buoc2).getAllByText('Đã ghi: Đạt')).toHaveLength(2))
-    const thuoc = screen.getByRole('navigation', { name: 'Các bước của buổi dạy' })
-    await waitFor(() => expect(within(thuoc).getByText('Xong · Đạt 2/2')).toBeTruthy())
+    await waitFor(() => expect(buoc(container, 2).textContent).toContain('Đã gọi 2 em · Đạt 2'))
   })
 
-  it('chưa ai điểm danh ⇒ mở bước 1; bước 3 vẫn mở được (độc lập); bước 2 nói cần điểm danh + "Về bước 1"; nhớ bước theo buổi', async () => {
+  it('chưa mở buổi ⇒ bước 1; vẫn chọn được Dạy học; Kiểm tra đầu giờ nói cần điểm danh + «Về bước 1»; máy khác / tải lại về đúng bước từ máy chủ', async () => {
     goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [] } }
       if (duong === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 3, sbd: [] }] } }
@@ -184,21 +189,28 @@ describe('trang 4 bước: MỘT điểm danh, bước độc lập', () => {
     })
     const { container, unmount } = render(<TheBaiDaDay />)
     await waitFor(() => expect(dangMo(container, 1)).toBe(true))
-    expect(buoc(container, 2).textContent).toContain('Cần danh sách có mặt ở bước 1')
-    fireEvent.click(within(buoc(container, 3)).getByRole('button', { name: 'Mở bước 3 · Dạy học' }))
-    await waitFor(() => expect(dangMo(container, 3)).toBe(true))
-    fireEvent.click(within(buoc(container, 2)).getByRole('button', { name: 'Mở bước 2 · Gọi lên bảng đầu giờ' }))
+    expect((within(buoc(container, 1)).getByRole('button', { name: 'Xong điểm danh →' }) as HTMLButtonElement).disabled).toBe(true)
+    fireEvent.click(within(thuocCua()).getByRole('button', { name: /^Hôm nay làm gì\?/ }))
     await waitFor(() => expect(dangMo(container, 2)).toBe(true))
-    expect(within(buoc(container, 2)).getByText('Chưa có danh sách có mặt — điểm danh ở bước 1 trước.')).toBeTruthy()
-    fireEvent.click(within(buoc(container, 2)).getByRole('button', { name: 'Về bước 1' }))
+    expect(buoc(container, 2).textContent).toContain('Chưa mở buổi')
+    fireEvent.click(the(container, /^Kiểm tra đầu giờ/))
+    await waitFor(() => expect(dangMo(container, 3)).toBe(true))
+    expect(within(buoc(container, 3)).getByText('Chưa có danh sách có mặt — điểm danh ở bước 1 trước.')).toBeTruthy()
+    fireEvent.click(within(container.querySelector<HTMLElement>('[data-hd="dau-gio"]')!).getByRole('button', { name: 'Về bước 1' }))
     await waitFor(() => expect(dangMo(container, 1)).toBe(true))
+    expect(lenh('/gv/buoi-hoc', 'tien-trinh')).toHaveLength(0) // chưa có buổi ⇒ không ghi
     unmount()
 
-    // có buổi + em có mặt + đã nhớ bước 3 ⇒ vào màn mở bước 3
+    // máy chủ có tiến trình (máy thầy khác vừa chọn Dạy học / tải lại) ⇒ vào màn mở đúng bước 3 · Dạy học
     mayChu()
-    localStorage.setItem('ddh.hanhTrinh.buoc.BH-12', '3')
+    const goc = goi.getMockImplementation()!
+    goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+      const r = (await goc(duong, b)) as { ok: boolean; du: Record<string, unknown> }
+      return duong === '/gv/buoi-hoc' && b.action === 'xem' ? { ...r, du: { ...r.du, tienTrinh: { buoc: 3, hoatDong: 'day-hoc', luc: NOW } } } : r
+    })
     const r = render(<TheBaiDaDay />)
     await waitFor(() => expect(dangMo(r.container, 3)).toBe(true))
+    expect(r.container.querySelector('[data-hd="day-hoc"]')!.hasAttribute('hidden')).toBe(false)
   })
 })
 
@@ -250,7 +262,7 @@ describe('bảng Bài đang giao', () => {
     expect(dong[1]!.textContent).toContain('còn 6 ngày')
     // SỬA CÓ CHỦ ĐÍCH 13/10: chỉ một lệnh gọn cho cả bảng, không đọc từng đề/học sinh.
     expect(lenh('/gv/goi-bai-7').map(([, b]) => b)).toEqual([{ action: 'tong_hop' }])
-    fireEvent.click(within(vung).getByRole('button', { name: 'Câu nhiều em sai của các bài này nằm ở bước 4 Chữa câu khó ›' }))
+    fireEvent.click(within(vung).getByRole('button', { name: 'Câu nhiều em sai của các bài này: sang Chữa câu khó & tính toán ›' }))
     expect(sang).toHaveBeenCalledTimes(1)
   })
 
@@ -274,13 +286,14 @@ describe('bảng Bài đang giao', () => {
     expect(await screen.findByText(/Chưa lớp nào đang có bài giao\. Bấm “Bổ sung bài hôm nay” ở màn Hôm nay/)).toBeTruthy()
   })
 
-  it('trong Hành trình: lối "Câu nhiều em sai … bước 4 Chữa câu khó ›" (cuối bước 3) mở bước 4', async () => {
-    localStorage.setItem('ddh.hanhTrinh.buoc.BH-12', '3')
+  it('trong Hành trình: lối "Câu nhiều em sai … sang Chữa câu khó" (cuối khối Dạy học) mở hoạt động Chữa câu khó', async () => {
     const { container } = render(<HanhTrinhV2 />)
-    fireEvent.click(await screen.findByRole('button', { name: 'Câu nhiều em sai của các bài này nằm ở bước 4 Chữa câu khó ›' }, { timeout: 4000 }))
+    await waitFor(() => expect(dangMo(container, 2)).toBe(true))
+    fireEvent.click(the(container, /^Dạy học/))
+    fireEvent.click(await screen.findByRole('button', { name: 'Câu nhiều em sai của các bài này: sang Chữa câu khó & tính toán ›' }, { timeout: 4000 }))
     expect(await screen.findByText('Giả: mục Chữa bài')).toBeTruthy()
-    expect(dangMo(container, 4)).toBe(true)
-    expect(dangMo(container, 3)).toBe(false)
+    expect(dangMo(container, 3)).toBe(true)
+    expect(container.querySelector('[data-hd="day-hoc"]')!.hasAttribute('hidden')).toBe(true)
   })
 })
 

@@ -107,4 +107,25 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     expect(con).toBeGreaterThan(120_000 + 14 * 60_000)
     expect(con).toBeLessThan(120_000 + 16 * 60_000)
   })
+  it('tiến trình buổi (bước + hoạt động): lưu trong phòng, ghi sau thắng ghi trước, dữ liệu sai bị từ chối', async () => {
+    const { post } = taoPhong()
+    expect((await post('/tt-doc', {})).tt).toBeNull()
+    await post('/tt-ghi', { tt: { buoc: 3, hoatDong: 'day-hoc', luc: 200 } })
+    await post('/tt-ghi', { tt: { buoc: 2, hoatDong: '', luc: 100 } }) // máy chậm gửi bản cũ hơn ⇒ không đè
+    expect((await post('/tt-doc', {})).tt).toEqual({ buoc: 3, hoatDong: 'day-hoc', luc: 200 })
+    expect((await post('/tt-ghi', { tt: { buoc: 9, hoatDong: 'x', luc: 300 } })).ok).toBe(false)
+    await post('/tt-ghi', { tt: { buoc: 4, hoatDong: 'day-hoc', luc: 300 } })
+    expect((await post('/tt-doc', {})).tt).toMatchObject({ buoc: 4 })
+  })
+  it('điều khiển từ xa: máy thầy gửi «dk» ⇒ mọi bảng khác nhận; máy em gửi thì không có tác dụng', async () => {
+    const { p, noi, post } = taoPhong()
+    await post('/khoi', { buoiId: 'b6', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1 }] })
+    const dienThoai = await noi('gv'), bang = await noi('gv'), em = await noi('hs', 'S1')
+    await p.webSocketMessage(dienThoai as never, JSON.stringify({ t: 'dk', lenh: 'toi' }))
+    expect(bang.tin.at(-1)).toBe('{"t":"dk","lenh":"toi"}')
+    expect(dienThoai.tin.some((t) => t.includes('"dk"'))).toBe(false)
+    const truoc = bang.tin.length
+    await p.webSocketMessage(em as never, JSON.stringify({ t: 'dk', lenh: 'toi' }))
+    expect(bang.tin.length).toBe(truoc)
+  })
 })

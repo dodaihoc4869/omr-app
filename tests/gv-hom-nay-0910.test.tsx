@@ -453,6 +453,8 @@ describe('màn Hôm nay của thầy — số từ API', () => {
 // "Bổ sung bài" nay ở bước 4 của mục 1 (không còn nút ở đầu màn) — kiểm ở tests/hanh-trinh-2-muc-1210.test.tsx.
 // SỬA CÓ CHỦ ĐÍCH 21/10 — thầy (bản vẽ docs/ban-ve-hanh-trinh-2110 đã duyệt): bỏ hai mục; Hành trình là MỘT trang 4 bước (Điểm danh · Gọi lên bảng đầu
 // giờ · Dạy học · Chữa câu khó & tính toán); Tick bài rời Hành trình thành hộp "Bổ sung bài hôm nay" — kiểm chi tiết ở tests/hanh-trinh-2-muc-1210.test.tsx.
+// SỬA CÓ CHỦ ĐÍCH 07/11 — thầy duyệt bản vẽ docs/ban-ve-buoc-day-0711 («duyệt, build luôn»): đường thẳng Điểm danh → Hôm nay làm gì? (thẻ hoạt
+// động) → Chọn câu & chiếu → Đang chiếu. Khối hoạt động chỉ nạp khi thầy chọn thẻ; khoá cũ can-chua ⇒ bước 3 · Chữa câu khó.
 describe('Hành trình: một trang 4 bước', () => {
   it('không còn mục; không nút chính ở đầu màn; không còn Nhịp hôm nay / Chiến dịch đã giao / ba thẻ khối; bước 4 mở ra là danh sách Học sinh cần chữa', async () => {
     mayChu()
@@ -460,7 +462,7 @@ describe('Hành trình: một trang 4 bước', () => {
     const { container } = render(<HanhTrinhV2 />)
     const thuoc = await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })
     expect(screen.queryAllByRole('tab')).toHaveLength(0)
-    expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
+    expect(within(thuoc).getAllByRole('button').map((b) => b.querySelector('.gvv2-ht-ten-dai')?.textContent)).toEqual(['Điểm danh', 'Hôm nay làm gì?', 'Chọn câu & chiếu', 'Đang chiếu'])
     expect(screen.queryByRole('region', { name: 'Chỉ số hôm nay' })).toBeNull()
     expect(screen.queryByRole('radiogroup', { name: 'Chọn khối' })).toBeNull()
     expect(container.querySelector('.gvv2-khoi-nut, .gvv2-kpi, .gvv2-bang')).toBeNull()
@@ -468,19 +470,22 @@ describe('Hành trình: một trang 4 bước', () => {
     expect(screen.queryByRole('button', { name: 'Giao theo bài' })).toBeNull()
     // trang không đọc bảng/nhịp chiến dịch nào của máy chủ khi bước 4 chưa mở
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
-    expect(within(thuoc).getByText('7 chỗ')).toBeTruthy()
-
-    fireEvent.click(within(thuoc).getByRole('button', { name: /^Chữa câu khó & tính toán/ }))
+    const b2 = container.querySelector<HTMLElement>('[data-buoc-ht="2"]')!
+    expect(within(b2).getByText('7 chỗ')).toBeTruthy()
+    // Dạy học chỉ nạp khi thầy chọn thẻ
+    expect(screen.queryByText('Giả: Bài hôm nay')).toBeNull()
+    fireEvent.click(within(b2).getByRole('button', { name: /^Chữa câu khó & tính toán/, hidden: true }))
     expect(await screen.findByRole('region', { name: 'Học sinh cần chữa' })).toBeTruthy()
+    expect(container.querySelector('[data-buoc-ht="3"]')!.getAttribute('data-mo')).toBe('true')
     expect(screen.queryByRole('button', { name: 'Bổ sung bài' })).toBeNull()
-    // danh sách đọc xong (8 chỗ: gồm cả bước cuối, thẻ nút thắt, kèm riêng) ⇒ số trên thước và thanh bên khớp số trong danh sách
-    await waitFor(() => expect(within(thuoc).getByText('8 chỗ')).toBeTruthy())
+    // danh sách đọc xong (8 chỗ: gồm cả bước cuối, thẻ nút thắt, kèm riêng) ⇒ số trên thẻ hoạt động và thanh bên khớp số trong danh sách
+    await waitFor(() => expect(within(b2).getByText('8 chỗ')).toBeTruthy())
     expect(useSoDemGv.getState().canThayChua).toBe(8)
   })
 
   it('lối cũ boSungBai ⇒ mở hộp Bổ sung bài hôm nay ngay trên màn; không yêu cầu ⇒ không hộp', async () => {
     const { unmount } = render(<HanhTrinhV2 />)
-    await screen.findByText('Giả: Bài hôm nay')
+    await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })
     expect(screen.queryByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeNull()
     unmount()
     render(<HanhTrinhV2 boSungBai />)
@@ -494,7 +499,7 @@ describe('Hành trình: một trang 4 bước', () => {
     useSoDemGv.getState().datMoHanhTrinh({ the: 'can-chua' })
     const { unmount, container } = render(<ChienDichScreen />)
     expect(await screen.findByRole('region', { name: 'Học sinh cần chữa' })).toBeTruthy()
-    expect(container.querySelector('[data-buoc-ht="4"]')!.getAttribute('data-mo')).toBe('true')
+    expect(container.querySelector('[data-buoc-ht="3"]')!.getAttribute('data-mo')).toBe('true')
     await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
     unmount()
 

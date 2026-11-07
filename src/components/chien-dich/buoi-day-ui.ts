@@ -5,7 +5,7 @@
 //   · bước mở mặc định khi vào màn; chữ của ô "Buổi dạy";
 //   · bảng "Bài đang giao": gói bài 7 ngày còn hạn (lệnh `/gv/goi-bai-7`, máy chủ `server/src/goi-bai-7-thay.ts`) ⇒ một dòng mỗi lớp/gói, hai tỉ lệ
 //     "Đã gặp câu gốc" ⊇ "Đã tự làm" cộng đúng như `tomTatLop` của thẻ Bài mới trong 7 ngày (không bịa số; lớp chưa em nào nhận ⇒ không tỉ lệ).
-import type { BuoiHoc } from '../../lib/buoi-hoc-api'
+import type { BuoiHoc, HoatDongBuoi } from '../../lib/buoi-hoc-api'
 import { chuConLai, phanTram, tomTatLop, type DuGoi7, type GoiDu } from './goi7-ui'
 import { ngayNgan, thuDu, thuNgan } from './bai-hang-ngay-ui'
 
@@ -91,4 +91,16 @@ export function chuHanDong(han: string, homNay: string): { ngan: string; con: st
 export function chuDemGiao(dong: readonly Pick<DongBaiDangGiao, 'lop'>[]): string {
   const soLop = new Set(dong.map((d) => d.lop)).size
   return dong.length === soLop ? `${soLop} lớp` : `${dong.length} bài ở ${soLop} lớp`
+}
+
+// ------------------------------------------------------------------ các bước buổi dạy (07/11, bản vẽ docs/ban-ve-buoc-day-0711 thầy duyệt)
+export const TEN_BUOC_DAY = ['Điểm danh', 'Hôm nay làm gì?', 'Chọn câu & chiếu', 'Đang chiếu'] as const
+export const TEN_NGAN_BUOC_DAY = ['Điểm danh', 'Hoạt động', 'Chọn câu', 'Đang chiếu'] as const
+/** Bước + hoạt động mở khi vào màn (chưa có tiến trình trên máy chủ): lối vào chỉ định thắng (Hôm nay › Cần thầy chữa ⇒ chữa câu; khoá cũ
+ *  `dau-gio` ⇒ kiểm tra đầu giờ); chưa em có mặt ⇒ bước 1; có rồi ⇒ bước 2. Còn đang tìm buổi ⇒ null (tránh mở bước 1 rồi nhảy). */
+export function buocVaoMan(o: { buocDau: SoBuoc | null; dangTai: boolean; coMat: number }): { buoc: SoBuoc; hd: HoatDongBuoi } | null {
+  if (o.buocDau === 4) return { buoc: 3, hd: 'chua-cau' }
+  if (o.buocDau === 2) return { buoc: 3, hd: 'dau-gio' }
+  if (o.dangTai) return null
+  return o.coMat > 0 ? { buoc: 2, hd: '' } : { buoc: 1, hd: '' }
 }

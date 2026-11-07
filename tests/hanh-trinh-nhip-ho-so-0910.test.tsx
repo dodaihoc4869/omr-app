@@ -154,7 +154,8 @@ describe('Hành trình: thẻ Nhịp học', () => {
     render(<ChienDichScreen />)
     expect(screen.queryAllByRole('tab')).toHaveLength(0)
     expect(screen.queryByText(/^(Nhịp học|Bài hằng ngày|Bài mới trong 7 ngày|Kiểm tra đầu giờ)$/)).toBeNull()
-    expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 07/11 (các bước buổi dạy): khối Dạy học chỉ nạp khi thầy chọn thẻ ⇒ kiểm trang bước đã dựng.
+    expect(await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })).toBeTruthy()
     await waitFor(() => expect(useSoDemGv.getState().moHanhTrinh).toBeNull())
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
   })
@@ -166,7 +167,8 @@ describe('bấm một em ⇒ tấm Lịch sử làm câu', () => {
   it('HanhTrinhV2 là trang 4 bước và KHÔNG đọc nhịp (Nhịp học đã sang màn Hôm nay)', async () => {
     mayChu()
     render(<HanhTrinhV2 />)
-    expect(await screen.findByText('Giả: Bài hôm nay')).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 07/11 (các bước buổi dạy): khối Dạy học chỉ nạp khi thầy chọn thẻ ⇒ kiểm trang bước đã dựng.
+    expect(await screen.findByRole('navigation', { name: 'Các bước của buổi dạy' })).toBeTruthy()
     expect(screen.queryAllByRole('tab')).toHaveLength(0)
     expect(m.goi.mock.calls.some(([d]) => d === '/gv/chien-dich')).toBe(false)
   })

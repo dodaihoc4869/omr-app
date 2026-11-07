@@ -33,7 +33,8 @@ function mayChu() {
     if (duong === '/gv/lop') return { ok: true, du: { ok: true, lop: [{ tenLop: '12A1', khoi: '12', soEm: 2, sbd: [] }] } }
     if (duong === '/gv/buoi-hoc' && b.action === 'dang-mo') return { ok: true, du: { ok: true, buoi: [BUOI] } }
     if (duong === '/gv/buoi-hoc' && b.action === 'gan-day') return { ok: false, loai: 'chua_co_lenh', chu: 'lệnh lạ' }
-    if (duong === '/gv/buoi-hoc') return { ok: true, du: { ok: true, buoi: BUOI, ma: '482915', doiMaLuc: 1, coMat: [{ sbd: 'S1', hoTen: 'Lê Khánh Vy', luc: BUOI.moLuc, cach: 'ma' }], siSo: 2, lopEm: [] } }
+    // 07/11: tiến trình buổi (bước + hoạt động) đọc từ máy chủ, đồng bộ mọi máy — thay phần nhớ bước theo máy cũ.
+    if (duong === '/gv/buoi-hoc') return { ok: true, du: { ok: true, buoi: BUOI, ma: '482915', doiMaLuc: 1, coMat: [{ sbd: 'S1', hoTen: 'Lê Khánh Vy', luc: BUOI.moLuc, cach: 'ma' }], siSo: 2, lopEm: [], tienTrinh: { buoc: 3, hoatDong: 'day-hoc', luc: 1 } } }
     if (duong === '/gv/omni' && b.action === 'co-doc') return co === 'loi' ? { ok: false, loai: 'mang', chu: 'Không nối được máy chủ.' } : { ok: true, du: { ok: true, co } }
     if (duong === '/gv/bai-da-day' && b.action === 'danh-sach') return { ok: true, du: { ok: true, bai: [], choBaiMoi: null } }
     if (duong === '/gv/bai-da-day' && b.action === 'xem-truoc') return { ok: true, du: { ok: true, soCau: 2, soTuLuan: 0, hanNop: '2026-10-28', D: 7, luotCan: 20, sucChua: 280, duLuot: 2, tongEm: 2, duDiem8: null, quaTai: [], theLucNgay: 40 } }

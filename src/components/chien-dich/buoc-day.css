@@ -1,0 +1,68 @@
+/* CÁC BƯỚC BUỔI DẠY (bản vẽ docs/ban-ve-buoc-day-0711, thầy duyệt 07/11). Chỉ biến màu sẵn có của app thầy (--gvm-*, tokens.css — sáng + tối). */
+.gvv2-hd .gvv2-hd-buoc { display: grid; gap: 16px; min-width: 0; }
+.gvv2-hd .gvv2-ht-cac-buoc { display: flex !important; flex-direction: column; align-items: stretch !important; gap: 16px; } /* một cột theo bản vẽ (lưới hai cột cũ của trang 4 bước không dùng nữa) */
+.gvv2-hd .gvv2-hd-buoc[hidden] { display: none; }
+
+/* Dải đồng bộ + Kết thúc buổi học trên ô buổi dạy. */
+.gvv2-ht-dong-bo { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); font-size: 13px; font-weight: 600; }
+.gvv2-ht-dong-bo::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gvm-xl); }
+.gvv2-ht-dong-bo[data-loi] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.gvv2-ht-dong-bo[data-loi]::before { background: var(--gvm-ho); }
+.gvv2-ht-ket-thuc { min-height: 40px; color: var(--gvm-hp-dam); border-color: var(--gvm-hp); }
+/* Một chỗ kết thúc buổi (bản vẽ màn 6): ẩn nút «Kết thúc buổi» cũ trong khối Điểm danh khi nằm trong các bước buổi dạy. */
+.gvv2-hd [data-buoc-ht="1"] .m3-nut-chu.dh-nut { display: none; }
+
+/* Thanh dưới bước 1: tóm tắt + «Xong điểm danh». */
+.gvv2-hd-day { position: sticky; bottom: 12px; z-index: 3; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; padding: 12px 16px; border-radius: 18px; background: var(--gvm-mat); border: 1px solid var(--gvm-vien); box-shadow: var(--gvm-bong); }
+.gvv2-hd-day > span { flex: 1 1 260px; min-width: 0; color: var(--gvm-chu-2); font-size: 15px; }
+.gvv2-hd-day > .m3-nut-chinh { min-height: 48px; padding: 0 22px; }
+
+/* Bước 2: Hôm nay làm gì? */
+.gvv2-hd-da-dd { display: flex; align-items: flex-start; gap: 8px; margin: 0; padding: 12px 16px; border-radius: 16px; background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); font-size: 15px; }
+.gvv2-hd-h2 { margin: 6px 0 0; font-size: 24px; font-weight: 800; color: var(--gvm-chu); }
+.gvv2-hd-phu { margin: 0; color: var(--gvm-chu-2); font-size: 15px; }
+.gvv2-hd-the-luoi { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.gvv2-hd-the { display: flex; align-items: flex-start; gap: 14px; min-height: 120px; padding: 18px; border-radius: 20px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); color: var(--gvm-chu); text-align: left; font: inherit; cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s; }
+.gvv2-hd-the:hover, .gvv2-hd-the:focus-visible { border-color: var(--gvm-xd); box-shadow: var(--gvm-bong); transform: translateY(-2px); }
+.gvv2-hd-the[data-chon] { border-color: var(--gvm-xd); box-shadow: inset 0 0 0 2px var(--gvm-xd); }
+.gvv2-hd-the-icon { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--gvm-xd-nen); color: var(--gvm-xd-dam); }
+.gvv2-hd-the-chu { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.gvv2-hd-the-chu b { font-size: 17px; font-weight: 800; }
+.gvv2-hd-the-chu > span { font-size: 14px; color: var(--gvm-chu-2); line-height: 1.4; }
+.gvv2-hd-the-so { color: var(--gvm-chu) !important; }
+.gvv2-hd-da-lam { color: var(--gvm-xl-dam); font-weight: 700; }
+.gvv2-hd-the-mui { flex: none; align-self: center; font-size: 22px; color: var(--gvm-xd); }
+
+/* Bước 3: đầu khối hoạt động. */
+.gvv2-hd-dau3 { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.gvv2-hd-dau3 > .gvv2-nut-vien { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; }
+.gvv2-hd-dau3 > b { font-size: 18px; color: var(--gvm-chu); }
+.gvv2-hd-goi-y { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--gvm-chu-2); }
+
+/* Bước 4: Đang chiếu. */
+.gvv2-dc { display: grid; gap: 18px; padding: 20px; border-radius: 24px; border: 1px solid var(--gvm-vien); background: var(--gvm-mat); }
+.gvv2-dc-dau { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.gvv2-dc-dau h2 { margin: 0; flex: 1; font-size: 20px; font-weight: 800; color: var(--gvm-chu); }
+.gvv2-dc-cham { width: 12px; height: 12px; border-radius: 50%; background: var(--gvm-chu-3); }
+.gvv2-dc-cham.song { background: var(--gvm-hp); box-shadow: 0 0 0 4px var(--gvm-hp-nen); animation: gvv2-dc-nhip 1.4s ease-in-out infinite; }
+@keyframes gvv2-dc-nhip { 50% { opacity: 0.45; } }
+.gvv2-dc-dong-bo { padding: 4px 12px; border-radius: 999px; background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); font-size: 13px; font-weight: 600; }
+.gvv2-dc-dong-bo[data-loi] { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
+.gvv2-dc-than { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.gvv2-dc-vong { --p: 1; flex: none; width: 140px; height: 140px; border-radius: 50%; display: grid; place-content: center; text-align: center;
+  background: radial-gradient(closest-side, var(--gvm-mat) 82%, transparent 83%), conic-gradient(var(--gvm-xd) calc(var(--p) * 360deg), var(--gvm-mat-2) 0); }
+.gvv2-dc-vong b { font-size: 34px; font-weight: 800; color: var(--gvm-chu); font-variant-numeric: tabular-nums; }
+.gvv2-dc-vong span { font-size: 12.5px; color: var(--gvm-chu-2); }
+.gvv2-dc-chu { flex: 1 1 240px; min-width: 0; display: grid; gap: 6px; }
+.gvv2-dc-nhan { font-size: 14px; color: var(--gvm-chu-2); font-weight: 600; }
+.gvv2-dc-pha { font-size: 24px; font-weight: 800; color: var(--gvm-chu); }
+.gvv2-dc-vach { height: 10px; border-radius: 6px; background: var(--gvm-mat-2); overflow: hidden; }
+.gvv2-dc-vach i { display: block; height: 100%; background: var(--gvm-xl); border-radius: 6px; transition: width 0.4s; }
+.gvv2-dc-goi-y { margin: 0; font-size: 15px; color: var(--gvm-chu-2); line-height: 1.5; }
+.gvv2-dc-nut { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.gvv2-dc-nut > button { min-height: 48px; }
+.gvv2-dc-tiep { grid-column: 1 / -1; min-height: 72px !important; font-size: 20px; }
+@media (max-width: 560px) { .gvv2-dc-nut { grid-template-columns: 1fr 1fr; } .gvv2-dc-nut > button:last-child { grid-column: 1 / -1; } .gvv2-dc-vong { width: 116px; height: 116px; } }
+@media (prefers-reduced-motion: reduce) { .gvv2-dc-cham.song { animation: none; } .gvv2-hd-the { transition: none; } }
+html.may-yeu .gvv2-dc-cham.song { animation: none; }

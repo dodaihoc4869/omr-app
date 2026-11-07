@@ -66,7 +66,7 @@ export default function HanhTrinhV2({ theDau = 'day-hoc', boSungBai = false, kho
       <header className="gvv2-dau">
         <div className="gvv2-dau-chu">
           <h1 className="gvv2-h1">Hành trình giỏi Hóa</h1>
-          <p className="gvv2-phu">Điểm danh trước — bước 2, 3, 4 dùng chung danh sách có mặt, thầy mở bước nào tuỳ việc.</p>
+          <p className="gvv2-phu">Điểm danh → chọn hoạt động → chọn câu, chiếu lên bảng → trên lớp chỉ cần bấm Câu tiếp. Mọi máy cùng một tiến trình tới khi kết thúc buổi.</p>
         </div>
       </header>
 

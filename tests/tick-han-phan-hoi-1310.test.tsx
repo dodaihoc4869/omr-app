@@ -67,10 +67,12 @@ it('trong bước Dạy học thật và form cha: lưu/Enter không submit ho�
     return { ok: false, chu: 'Chưa có dữ liệu.' }
   })
   const { container } = render(<div onClick={bamCha}><form onSubmit={e => { e.preventDefault(); submit() }}><TheBaiDaDay /></form></div>)
-  // SỬA CÓ CHỦ ĐÍCH 21/10 (Hành trình một trang 4 bước): Bài đang giao nằm cuối bước 3 "Dạy học" — chưa ai điểm danh thì trang mở bước 1, thầy mở bước 3.
-  fireEvent.click(await screen.findByRole('button', { name: 'Mở bước 3 · Dạy học' }))
+  // SỬA CÓ CHỦ ĐÍCH 07/11 (các bước buổi dạy, bản vẽ docs/ban-ve-buoc-day-0711): Bài đang giao nằm cuối khối Dạy học — chưa ai điểm danh thì trang
+  // mở bước 1; thầy sang «Hôm nay làm gì?» rồi chọn thẻ Dạy học.
+  fireEvent.click(await screen.findByRole('button', { name: /^Hôm nay làm gì\?/ }))
+  fireEvent.click(await screen.findByRole('button', { name: /^Dạy học/ }))
   const o = await sua(), table = container.querySelector('table')
-  const buoc4 = () => container.querySelector('[data-buoc-ht="4"]')!.getAttribute('data-mo')
+  const buoc4 = () => (container.querySelector('[data-buoc-ht="3"]')!.getAttribute('data-mo') === 'true' ? 'false' : 'true') // vẫn ở khối Dạy học, không chuyển bước
   bamCha.mockClear()
   fireEvent.keyDown(o, { key: 'Enter' })
   expect(submit).not.toHaveBeenCalled(); expect(bamCha).not.toHaveBeenCalled(); expect(chuyen).not.toHaveBeenCalled(); expect(buoc4()).toBe('false')

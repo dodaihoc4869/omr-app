@@ -46,10 +46,21 @@ export interface TrangThaiBuoi {
   lopEm: EmLop[] | null
   /** (24/10) SBD em vắng CÓ PHÉP (máy chủ gửi mảng; máy chủ cũ không gửi). Đọc bằng `dsCoPhep` ở app thầy. */
   coPhep?: unknown
+  /** (07/11) Tiến trình buổi dạy đồng bộ mọi máy thầy: bước đang mở + hoạt động; `luc` = mốc máy ghi (ghi sau thắng). Máy chủ cũ không gửi. */
+  tienTrinh?: TienTrinhBuoi | null
 }
+export type HoatDongBuoi = '' | 'dau-gio' | 'day-hoc' | 'chua-cau'
+export interface TienTrinhBuoi { buoc: 1 | 2 | 3 | 4; hoatDong: HoatDongBuoi; luc: number }
 
 const chu = (v: unknown): string => (typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '')
 const so = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null)
+export function docTienTrinh(v: unknown): TienTrinhBuoi | null {
+  const o = v && typeof v === 'object' ? (v as Record<string, unknown>) : null
+  if (!o) return null
+  const buoc = so(o.buoc), luc = so(o.luc), hd = chu(o.hoatDong)
+  if (!(buoc === 1 || buoc === 2 || buoc === 3 || buoc === 4) || !luc || !['', 'dau-gio', 'day-hoc', 'chua-cau'].includes(hd)) return null
+  return { buoc, hoatDong: hd as HoatDongBuoi, luc }
+}
 const doiTuong = (v: unknown): Record<string, unknown> => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {})
 
 export function docBuoi(v: unknown): BuoiHoc | null {
@@ -76,7 +87,7 @@ export function docTrangThai(j: Record<string, unknown>): TrangThaiBuoi | null {
     .filter((x) => chu(x.sbd))
     .map((x) => ({ sbd: chu(x.sbd), hoTen: chu(x.hoTen), luc: chu(x.luc), cach: x.cach === 'thay' ? ('thay' as const) : ('ma' as const) }))
   const lopEm = Array.isArray(j.lopEm) ? j.lopEm.map(doiTuong).filter((x) => chu(x.sbd)).map((x) => ({ sbd: chu(x.sbd), hoTen: chu(x.hoTen), tenLop: chu(x.tenLop) })) : null
-  return { buoi, ma: /^\d{6}$/.test(chu(j.ma)) ? chu(j.ma) : null, doiMaLuc: so(j.doiMaLuc), coMat, siSo: so(j.siSo), lopEm, coPhep: j.coPhep }
+  return { buoi, ma: /^\d{6}$/.test(chu(j.ma)) ? chu(j.ma) : null, doiMaLuc: so(j.doiMaLuc), coMat, siSo: so(j.siSo), lopEm, coPhep: j.coPhep, tienTrinh: docTienTrinh(j.tienTrinh) }
 }
 
 const KHONG_CO_LENH = 'Máy chủ chưa có lệnh Điểm danh buổi học — cần đẩy bản máy chủ mới.'
@@ -93,6 +104,8 @@ export const xemBuoiHoc = (id: string, kemLop = false) => lenhBuoi({ action: 'xe
 export const themEmBuoi = (id: string, sbd: string[]) => lenhBuoi({ action: 'them-em', id, sbd })
 export const botEmBuoi = (id: string, sbd: string) => lenhBuoi({ action: 'bot-em', id, sbd })
 export const dongBuoiHoc = (id: string) => lenhBuoi({ action: 'dong', id })
+/** Ghi tiến trình buổi (bước + hoạt động) ⇒ mọi máy thầy khác thấy ở nhịp làm mới kế tiếp; tải lại vẫn về đúng chỗ. */
+export const ghiTienTrinhBuoi = (id: string, tienTrinh: TienTrinhBuoi) => lenhBuoi({ action: 'tien-trinh', id, tienTrinh })
 
 export async function buoiDangMo(): Promise<KetQuaLenh<BuoiHoc[]>> {
   const r = await goiLenh('/gv/buoi-hoc', { action: 'dang-mo' }, KHONG_CO_LENH)

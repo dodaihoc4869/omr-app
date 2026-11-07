@@ -393,7 +393,7 @@ export default function BangBaiDangGiao({ onMoChuaBai }: { onMoChuaBai?: () => v
           {conNua > 0 && <p className="dh-phu">Còn {conNua} bài đang giao khác (bảng hiện {TOI_DA_DONG_GIAO} bài hạn nộp gần nhất).</p>}
           {onMoChuaBai && (
             <button type="button" className="gvv2-nut-chu gvv2-bdg-sang" onClick={onMoChuaBai}>
-              Câu nhiều em sai của các bài này nằm ở bước 4 Chữa câu khó ›
+              Câu nhiều em sai của các bài này: sang Chữa câu khó &amp; tính toán ›
             </button>
           )}
         </>

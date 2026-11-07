@@ -20,6 +20,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { gameIdentity } from './game-v2-auth'
 import { ngayVnCua } from './srs2-d1'
 import { tenLopCuaEm } from './ten-lop'
+import { docTienTrinh, ghiTienTrinh } from './phong-binh-phan-ung'
 
 type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
@@ -199,6 +200,12 @@ export async function gvBuoiHoc(env: Env, b: Row, nowMs: number = Date.now()): P
     return xemBuoi(env, id, nowMs, false)
   }
 
+  // Tiến trình buổi dạy (bước + hoạt động) — đồng bộ mọi máy thầy, lưu trong phòng của buổi (07/11).
+  if (action === 'tien-trinh') {
+    if (!str(buoi.dong_luc)) await ghiTienTrinh(env, id, b.tienTrinh)
+    return xemBuoi(env, id, nowMs, false)
+  }
+
   if (action === 'dong') {
     if (!str(buoi.dong_luc)) await env.DB.prepare('UPDATE buoi_hoc SET dong_luc = ?, cap_nhat_luc = ? WHERE id = ?').bind(nay, nay, id).run()
     return xemBuoi(env, id, nowMs, false)
@@ -213,10 +220,11 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
   if (!r) return { ok: false, error: 'Không tìm thấy buổi học này.' }
   const buoi = buoiRa(r, nowMs)
   // Một đợt chờ: dòng điểm danh (có mặt + vắng có phép, 24/10) song song với danh sách cả trường.
-  const [rDd, moiEm] = await Promise.all([
+  const [rDd, moiEm, tienTrinh] = await Promise.all([
     hoi(env, "SELECT d.sbd, d.luc, d.cach, d.trang_thai, h.ho_ten FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ? AND d.trang_thai IN ('co_mat', 'co_phep') ORDER BY d.luc, d.sbd", id).then((x) => x ?? []),
     // Cả trường (em chưa khoá) — app thầy lọc theo lớp thầy chọn ở khối "Thêm em chưa điểm danh được" (em học ghép lớp khác vẫn thêm được).
     emCuaLop(env, ''),
+    buoi.dangMo ? docTienTrinh(env, id) : Promise.resolve(null),
   ])
   const rCo = rDd.filter((x) => str(x.trang_thai) === 'co_mat')
   const lop = buoi.lop ? moiEm.filter((e) => e.tenLop === buoi.lop) : moiEm
@@ -229,6 +237,7 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
     coPhep: rDd.filter((x) => str(x.trang_thai) === 'co_phep').map((x) => str(x.sbd)),
     siSo: buoi.lop ? lop.length : null,
     ...(kemLop ? { lopEm: moiEm.slice(0, 600) } : {}),
+    ...(tienTrinh ? { tienTrinh } : {}),
   }
 }
 

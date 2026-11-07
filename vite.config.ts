@@ -370,6 +370,7 @@ export default defineConfig({
         globIgnores: [
           // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.
           '**/BangBinhPhanUng-*.{js,css}',
+          '**/DangChieuBpu-*.{js,css}', // bước «Đang chiếu» của Hành trình (07/11) — mảnh lười máy thầy, ngoài precache
           '**/gan-gv-*.{js,css}',
           '**/gan-hs-*.{js,css}',
           // Màn máy em cũng ra kho chạy-lúc: chỉ mở khi lớp đang chơi (cần mạng sẵn) ⇒ không làm phình lượt cài.
