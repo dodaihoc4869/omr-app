@@ -1,0 +1,309 @@
+{
+  "i": 521,
+  "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78.png",
+  "nativeSize": [
+    1123,
+    695
+  ],
+  "reviewed": [
+    "nativefull",
+    "title3x",
+    "xaxis3x",
+    "ylabel3x"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C2-D5-II-3",
+      "maDe": "12-KT-C2-D5",
+      "de": "Từ dung dịch glucose 45 gam/L, thực hiện quá trình lên men rượu trong phòng thí nghiệm, kết quả nồng độ ethanol theo thời gian được biểu thị theo đồ thị dưới đây.",
+      "hinh": [
+        {
+          "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+          "where": "12-KT-C2-D5-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "9bf6408796f4bb14aa99a08ffccd18fa6a4c1681990b1aa86a7eb4d18ff2646d"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-97",
+      "maDe": "DB-12-B4-D2",
+      "de": "Từ dung dịch glucose 45 gam/L, thực hiện quá trình lên men rượu trong phòng thí nghiệm, kết quả nồng độ ethanol theo thời gian được biểu thị theo đồ thị dưới đây.",
+      "hinh": [
+        {
+          "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+          "where": "DB-12-B4-D2-II-97.hinh.0.du_lieu",
+          "hashDataUrl": "9bf6408796f4bb14aa99a08ffccd18fa6a4c1681990b1aa86a7eb4d18ff2646d"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "title": "Nồng độ Ethanol (C₂H₅OH) theo thời gian",
+    "titleNear": [
+      590,
+      71
+    ],
+    "titleSubscripts": "2 and5 smaller lowered; OH normal",
+    "xlabel": "Thời gian (giờ)",
+    "xlabelNear": [
+      590,
+      644
+    ],
+    "ylabel": "Nồng độ Ethanol (g/L)",
+    "ylabelRotation": -90,
+    "ylabelNear": [
+      67,
+      348
+    ],
+    "axes": {
+      "yaxisX": 111,
+      "yaxisFromY": 88,
+      "yaxisToY": 608,
+      "xaxisY": 608,
+      "xaxisFromX": 111,
+      "xaxisToX": 1069,
+      "arrowheads": 0,
+      "extraTopRightSpines": false,
+      "CRITICAL": "xaxis at608 is22px below y0grid/point at586; preserve literal offset, do not normalize origin; first pointx154 is43px right ofyaxis"
+    },
+    "xTicks": [
+      {
+        "label": "0",
+        "x": 154,
+        "atY": 608
+      },
+      {
+        "label": "6",
+        "x": 278,
+        "atY": 608
+      },
+      {
+        "label": "12",
+        "x": 403,
+        "atY": 608
+      },
+      {
+        "label": "18",
+        "x": 527,
+        "atY": 608
+      },
+      {
+        "label": "24",
+        "x": 651,
+        "atY": 608
+      },
+      {
+        "label": "30",
+        "x": 776,
+        "atY": 608
+      },
+      {
+        "label": "42",
+        "x": 1025,
+        "atY": 608
+      }
+    ],
+    "yTicks": [
+      {
+        "label": "0",
+        "y": 586,
+        "atX": 111
+      },
+      {
+        "label": "2",
+        "y": 544,
+        "atX": 111
+      },
+      {
+        "label": "4",
+        "y": 503,
+        "atX": 111
+      },
+      {
+        "label": "6",
+        "y": 462,
+        "atX": 111
+      },
+      {
+        "label": "8",
+        "y": 420,
+        "atX": 111
+      },
+      {
+        "label": "10",
+        "y": 378,
+        "atX": 111
+      },
+      {
+        "label": "12",
+        "y": 337,
+        "atX": 111
+      },
+      {
+        "label": "14",
+        "y": 296,
+        "atX": 111
+      },
+      {
+        "label": "16",
+        "y": 254,
+        "atX": 111
+      },
+      {
+        "label": "18",
+        "y": 212,
+        "atX": 111
+      },
+      {
+        "label": "20",
+        "y": 171,
+        "atX": 111
+      },
+      {
+        "label": "22",
+        "y": 130,
+        "atX": 111
+      },
+      {
+        "label": "24",
+        "y": 88,
+        "atX": 111
+      }
+    ],
+    "grid": {
+      "horizontalY": [
+        586,
+        544,
+        503,
+        461,
+        420,
+        378,
+        337,
+        295,
+        254,
+        212,
+        171,
+        129,
+        88
+      ],
+      "horizontalFromX": 111,
+      "horizontalToX": 1069,
+      "verticalX": [
+        154,
+        278,
+        403,
+        527,
+        651,
+        776,
+        1025
+      ],
+      "verticalFromY": 88,
+      "verticalToY": 608,
+      "style": "lightgray fine dashed, both orientations; no extra vertical tick36/grid36"
+    },
+    "points": [
+      {
+        "data": [
+          0,
+          0
+        ],
+        "pixel": [
+          154,
+          586
+        ],
+        "radius": 4
+      },
+      {
+        "data": [
+          6,
+          6
+        ],
+        "pixel": [
+          278,
+          461
+        ],
+        "radius": 4
+      },
+      {
+        "data": [
+          12,
+          11
+        ],
+        "pixel": [
+          403,
+          358
+        ],
+        "radius": 4
+      },
+      {
+        "data": [
+          18,
+          17
+        ],
+        "pixel": [
+          527,
+          233
+        ],
+        "radius": 4
+      },
+      {
+        "data": [
+          24,
+          20
+        ],
+        "pixel": [
+          651,
+          171
+        ],
+        "radius": 4
+      },
+      {
+        "data": [
+          30,
+          21
+        ],
+        "pixel": [
+          776,
+          150
+        ],
+        "radius": 4
+      },
+      {
+        "data": [
+          42,
+          21
+        ],
+        "pixel": [
+          1025,
+          150
+        ],
+        "radius": 4
+      }
+    ],
+    "curve": "Six straight connecting line segments, not smoothed; final30..42h horizontal at21. No extra point36h.",
+    "counts": {
+      "markers": 7,
+      "Xlabels": 7,
+      "Ylabels": 13,
+      "segments": 6
+    },
+    "tickStyle": "short inward dark ticks ataxis, no arrows/no additional numeric labels"
+  },
+  "cautions": [
+    "Pixel coords are source drawing geometry, not additional experimental data.",
+    "Do not infer fermentation completion/time/output beyond displayed points.",
+    "Keep nonzero gap between xaxis baseline and0 horizontalgrid."
+  ],
+  "status": "Đạt exact SVG sau actual review",
+  "actualReview": {
+    "i": 521,
+    "hashSvg": "16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x mở full, đối chiếu nativefull/title-xaxis-ylabel3x và hai public refs. Đúng7markers(0,0),(6,6),(12,11),(18,17),(24,20),(30,21),(42,21),6straightsegments/finalplateau;7Xlabels13Ylabels/13H7Vdashedguides vàticks đủ. Giữ offset y0grid586 vs xaxis608=22px, x0point154 vs yaxis111=43px. Title C2H5OH subscripts2/5, literalcase/units đúng; no arrows/extradata. Không chữ/nét chạm/cắt/tràn, không giải toán.",
+    "actualSvgReviewed": true,
+    "byteSvg": 51617,
+    "render": "/workspace/scratch/ethanol521-238-16817d68-chromium.png",
+    "sourceHash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78"
+  }
+}

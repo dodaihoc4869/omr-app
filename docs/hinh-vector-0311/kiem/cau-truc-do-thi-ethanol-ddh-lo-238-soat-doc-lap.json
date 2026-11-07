@@ -1,0 +1,14 @@
+[
+  {
+    "i": 521,
+    "hashSvg": "16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x mở full, đối chiếu nativefull/title-xaxis-ylabel3x và hai public refs. Đúng7markers(0,0),(6,6),(12,11),(18,17),(24,20),(30,21),(42,21),6straightsegments/finalplateau;7Xlabels13Ylabels/13H7Vdashedguides vàticks đủ. Giữ offset y0grid586 vs xaxis608=22px, x0point154 vs yaxis111=43px. Title C2H5OH subscripts2/5, literalcase/units đúng; no arrows/extradata. Không chữ/nét chạm/cắt/tràn, không giải toán.",
+    "actualSvgReviewed": true,
+    "byteSvg": 51617,
+    "render": "/workspace/scratch/ethanol521-238-16817d68-chromium.png",
+    "sourceHash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+    "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+    "hashSvgDaSoat": "16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50"
+  }
+]

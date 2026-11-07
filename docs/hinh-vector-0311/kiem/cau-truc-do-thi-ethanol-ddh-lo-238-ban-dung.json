@@ -1,0 +1,40 @@
+[
+  {
+    "i": 521,
+    "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+    "fileNguon": "anh/61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78.png",
+    "svg": "do-thi-ethanol-ddh-16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50.svg",
+    "hashSvg": "16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50",
+    "byteSvg": 51617,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D5-II-3",
+        "de": "Từ dung dịch glucose 45 gam/L, thực hiện quá trình lên men rượu trong phòng thí nghiệm, kết quả nồng độ ethanol theo thời gian được biểu thị theo đồ thị dưới đây.",
+        "refs": [
+          {
+            "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+            "where": "12-KT-C2-D5-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "9bf6408796f4bb14aa99a08ffccd18fa6a4c1681990b1aa86a7eb4d18ff2646d"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-II-97",
+        "de": "Từ dung dịch glucose 45 gam/L, thực hiện quá trình lên men rượu trong phòng thí nghiệm, kết quả nồng độ ethanol theo thời gian được biểu thị theo đồ thị dưới đây.",
+        "refs": [
+          {
+            "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+            "where": "DB-12-B4-D2-II-97.hinh.0.du_lieu",
+            "hashDataUrl": "9bf6408796f4bb14aa99a08ffccd18fa6a4c1681990b1aa86a7eb4d18ff2646d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7markers6segments/7Xlabels0-6-12-18-24-30-42/13Ylabels0..24step2/lastplateau21/0gridy586-Xaxis608OFFSET22px-GIỮ/yaxisx111-x0point154/13H7Vdashedgrids/7X13Ytickstems/all3literaltexts-C2H5OHsubs/DDHpath/noadded36tick-values-arrows.",
+    "hashSvgDaSoat": "16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

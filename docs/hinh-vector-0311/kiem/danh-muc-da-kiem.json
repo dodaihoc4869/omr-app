@@ -5635,6 +5635,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78": {
+      "tep": "do-thi-ethanol-ddh-16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50.svg",
+      "hashSvg": "16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50",
+      "byteSvg": 51617,
+      "byteGzip": 7017,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2": {
       "tep": "khep-be-mat-ddh-bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df.svg",
       "hashSvg": "bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df",
@@ -12996,6 +13005,20 @@
       ]
     },
     {
+      "qid": "12-KT-C2-D5-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+          "where": "12-KT-C2-D5-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "9bf6408796f4bb14aa99a08ffccd18fa6a4c1681990b1aa86a7eb4d18ff2646d",
+          "vector": "do-thi-ethanol-ddh-16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D5-II-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -17892,6 +17915,20 @@
           "where": "DB-12-B4-D2-II-93.hinh.0.du_lieu",
           "hashDataUrl": "7de3876d25cbc1459f37ef73f1da81b7e1757a72027e5f7962ad419aac9bb260",
           "vector": "maltose-hai-dang-ddh-a74431eff0bfe52864cd855e29d53c0e5e16e57dd7d6673f22495c26056a74d2.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D2-II-97",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "61330fe26e90de67951c5c2396386a64b76b24ec8bb25bccb46b3b952bc9ff78",
+          "where": "DB-12-B4-D2-II-97.hinh.0.du_lieu",
+          "hashDataUrl": "9bf6408796f4bb14aa99a08ffccd18fa6a4c1681990b1aa86a7eb4d18ff2646d",
+          "vector": "do-thi-ethanol-ddh-16817d68b6fab75138b542ac94a1053b5f810a16b6ad6f15b2214a64cfe15b50.svg"
         }
       ]
     },
@@ -26777,6 +26814,7 @@
     "12-KT-C2-D5-I-1",
     "12-KT-C2-D5-I-7",
     "12-KT-C2-D5-II-1",
+    "12-KT-C2-D5-II-3",
     "12-KT-C2-D5-II-4",
     "12-KT-C3-D1-I-8",
     "12-KT-C3-D3-I-4",
@@ -27074,6 +27112,7 @@
     "DB-12-B4-D2-I-61",
     "DB-12-B4-D2-II-66",
     "DB-12-B4-D2-II-93",
+    "DB-12-B4-D2-II-97",
     "DB-12-B4-D2-I-102",
     "DB-12-B4-D2-II-106",
     "DB-12-B4-D2-II-107",
