@@ -1,0 +1,90 @@
+/* BẢN THỬ «LỜI GIẢI KÍNH PHẲNG» (07/11, thầy: «lời giải kính điều chỉnh lại cỡ chữ mọi thứ giống với app hs đã điều chỉnh, vẽ lại giao diện phẳng siêu đẹp»).
+   Chỉ để vẽ. Cùng chuẩn app HS phẳng (src/styles/phang-hs.css): nền nhóm (--tr-nen), thẻ đặc --tr-mat không viền không bóng bo 20, mặt phụ --tr-mat-2,
+   chọn / đúng / sai = tô nhạt (không vòng); cỡ chữ theo app: nhãn 13/700, chữ chính 16/600 dòng 1,5, tiêu điểm 17–19/700, công thức 28–34/800. */
+html[data-trong='hs']:not(#_) :is(.lgk, .lgk-boc) {
+  --lgk-kinh: var(--tr-mat); --lgk-dam: var(--tr-mat-2); --lgk-vien: transparent; --lgk-bong: 0 0 0 0 transparent; --lgk-mo: none;
+  font-family: inherit !important; }
+/* tấm lời giải: nền nhóm đặc, bỏ dải loang; thanh đầu đặc + vạch mảnh */
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) { background: var(--tr-nen) !important; font-family: inherit !important; border-radius: 20px 20px 0 0 !important; box-shadow: 0 -10px 30px -16px var(--tr-phu) !important; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { background: var(--tr-nen) !important; box-shadow: 0 1px 0 var(--tr-vien) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; pointer-events: auto !important; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b { background: none !important; box-shadow: none !important; padding-left: 4px !important; font-size: 18px !important; font-weight: 800 !important; color: var(--tr-chu) !important; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau :is(.duo-dong, .lgk-tg-vien) { background: var(--tr-mat) !important; box-shadow: none !important; border: 0 !important; color: var(--tr-chu) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien { font-size: 14px !important; font-weight: 700 !important; border-radius: 12px !important; white-space: nowrap !important; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien * { white-space: nowrap !important; }
+
+/* THẺ */
+html[data-trong='hs']:not(#_) .lgk-the { padding: 16px !important; gap: 12px !important; border-radius: 20px !important; background: var(--tr-mat) !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-trong='hs']:not(#_) .lgk-luoi, html[data-trong='hs']:not(#_) .lgk-cot { gap: 12px !important; }
+html[data-trong='hs']:not(#_) .lgk-nhan { font-size: 13px !important; font-weight: 700 !important; letter-spacing: .04em !important; color: var(--tr-chu-3) !important; }
+html[data-trong='hs']:not(#_) .lgk-nhan[data-sac='sai'] { color: var(--tr-sai-chu) !important; }
+html[data-trong='hs']:not(#_) .lgk-dem { font-size: 13px !important; font-weight: 700 !important; }
+
+/* KẾT QUẢ EM: dải tô nhạt, không vòng */
+html[data-trong='hs']:not(#_) .lgk-kq { border-radius: 16px !important; box-shadow: none !important; padding: 12px 14px !important; }
+html[data-trong='hs']:not(#_) .lgk-kq[data-tt='sai'] { background: var(--tr-sai-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-kq[data-tt='dung'] { background: var(--tr-dung-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-oi { width: 36px !important; height: 36px !important; border-radius: 50% !important; font-size: 18px !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .lgk-kq b { font-size: 17px !important; }
+html[data-trong='hs']:not(#_) .lgk-kq .lgk-giua > span { font-size: 14px !important; }
+
+/* KIẾN THỨC CỐT LÕI: công thức vừa tầm, chữ như đề */
+html[data-trong='hs']:not(#_) .lgk-ct-to { font-size: clamp(28px, 8cqi, 34px) !important; }
+html[data-trong='hs']:not(#_) .lgk-ct-chu { font-size: 17px !important; font-weight: 700 !important; line-height: 1.45 !important; }
+html[data-trong='hs']:not(#_) .lgk-chip { min-height: 30px !important; padding: 4px 12px !important; border-radius: 10px !important; font-size: 14px !important; font-weight: 600 !important; background: var(--tr-mat-2) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .lgk-de { font-size: 15px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+
+/* THẦY DẪN TỪNG BƯỚC: số bước tròn tô nhạt, chữ 16/600 */
+html[data-trong='hs']:not(#_) .lgk-vach button::before { background: var(--tr-mat-3) !important; }
+html[data-trong='hs']:not(#_) .lgk-nhip-hinh { width: 52px !important; height: 52px !important; border-radius: 16px !important; }
+html[data-trong='hs']:not(#_) .lgk-nhip-hinh b { right: -5px !important; bottom: -5px !important; width: 24px !important; height: 24px !important; font-size: 13px !important; background: var(--tr-mat) !important; color: var(--tr-hs-chu) !important; box-shadow: 0 0 0 2px var(--tr-hs-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-hinh { width: 28px !important; height: 28px !important; }
+html[data-trong='hs']:not(#_) .lgk-nhip p { font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; padding-top: 2px !important; }
+html[data-trong='hs']:not(#_) .lgk-nhip p :is(small, span) { font-size: 14px !important; }
+html[data-trong='hs']:not(#_) :is(.lgk-loi) { font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) .lgk-so-tron { width: 26px !important; height: 26px !important; font-size: 13px !important; background: var(--tr-hs-nhat) !important; color: var(--tr-hs-chu) !important; }
+
+/* NÚT PHỤ (Dừng · Xem câu trả lời · …): tô xám, bo 12 */
+html[data-trong='hs']:not(#_) :is(.lgk-nut, .lgk-nut-kinh, .lgk-tac button) { min-height: 44px !important; border-radius: 12px !important; background: var(--tr-mat-2) !important; box-shadow: none !important; font-size: 15px !important; font-weight: 700 !important; color: var(--tr-hs-chu) !important; }
+html[data-trong='hs']:not(#_) .lgk-tac button[aria-pressed='true'] { background: var(--tr-hs-nut) !important; color: var(--tr-hs-tren) !important; }
+
+/* THẦY GIẢNG / MẸO / BONG BÓNG */
+html[data-trong='hs']:not(#_) .lgk-bong { border-radius: 16px 16px 16px 6px !important; background: var(--tr-mat-2) !important; box-shadow: none !important; font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) :is(.lgk-bong, .lgk-meo, .lgk-bay-m, .lgk-tl-m, .lgk-tc) small { font-size: 12.5px !important; font-weight: 700 !important; }
+html[data-trong='hs']:not(#_) .lgk-meo { border-radius: 16px !important; font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+
+/* VÌ SAO CHỌN · VÌ SAO KHÔNG: hàng tô nhạt (đúng lục nhạt, em chọn sai hồng nhạt, còn lại xám), không vòng */
+html[data-trong='hs']:not(#_) .lgk-ly-dong { border-radius: 16px !important; padding: 12px 14px 12px 12px !important; background: var(--tr-mat-2) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .lgk-ly-dong[data-dung] { background: var(--tr-dung-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-ly-dong[data-em-sai] { background: var(--tr-sai-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-ky { width: 32px !important; height: 32px !important; font-size: 14px !important; }
+html[data-trong='hs']:not(#_) .lgk-ly-dong:not([data-dung]):not([data-em-sai]) .lgk-ky { background: var(--tr-mat) !important; }
+html[data-trong='hs']:not(#_) .lgk-ly-dong :is(p, span:not(.lgk-ky)) { font-size: 15px !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) .lgk-ly-dong > div > :first-child, html[data-trong='hs']:not(#_) .lgk-ly-dong b { font-size: 16px !important; font-weight: 700 !important; }
+
+/* CHỖ HAY NHẦM · EM TỰ TRẢ LỜI · THẺ NHỚ */
+html[data-trong='hs']:not(#_) :is(.lgk-bay-m, .lgk-tl-m) { border-radius: 16px !important; }
+html[data-trong='hs']:not(#_) :is(.lgk-bay > button, .lgk-the-lat > button) { border-radius: 16px !important; }
+html[data-trong='hs']:not(#_) .lgk-bay-m p { font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) .lgk-tl-t { background: var(--tr-hs-nhat) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .lgk-tl-s { background: var(--tr-mat-2) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_) .lgk-tl-tra { font-size: 19px !important; line-height: 1.4 !important; }
+html[data-trong='hs']:not(#_) .lgk-tra { border-radius: 16px !important; background: var(--tr-mat-2) !important; box-shadow: none !important; font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) .lgk-tc { border-radius: 16px !important; }
+html[data-trong='hs']:not(#_) .lgk-tc b { font-size: 18px !important; }
+
+/* KHỐI TÍNH / SƠ ĐỒ: mặt phụ phẳng */
+html[data-trong='hs']:not(#_) :is(.lgk-ss > div, .lgk-sd-chat, .lgk-pt-dong, .lgk-giai-so > div[data-goi], .lgk-cb-ve, .lgk-on) { box-shadow: none !important; border-radius: 16px !important; background: var(--tr-mat-2) !important; }
+html[data-trong='hs']:not(#_) .lgk-sd-chat[data-hoi], html[data-trong='hs']:not(#_) .lgk-cb-ve[data-sang] { background: var(--tr-hs-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-giai-so > div { border-radius: 16px !important; }
+html[data-trong='hs']:not(#_) .lgk-giai-so p { font-size: 16px !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) .lgk-pt-dong { font-size: 17px !important; }
+html[data-trong='hs']:not(#_) .lgk-so-to { font-size: 17px !important; border-radius: 12px !important; }
+html[data-trong='hs']:not(#_) .lgk-kiem { border-radius: 16px !important; background: var(--tr-dung-nhat) !important; }
+html[data-trong='hs']:not(#_) .lgk-kiem p { font-size: 16px !important; font-weight: 600 !important; line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) .lgk-dang-co { border-radius: 12px !important; font-size: 15px !important; }
+
+/* LỜI GIẢI THU GỌN (mở) + Hỏi thầy */
+html[data-trong='hs']:not(#_) .lgk-tg { border-radius: 20px !important; background: var(--tr-mat) !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) .lg-nut-hoi-thay { background: var(--tr-mat-2) !important; box-shadow: none !important; border: 0 !important; border-radius: 12px !important; }
+html[data-trong='hs']:not(#_) .duo-lg-dau .lgk-tg-dai > span { display: inline !important; } html[data-trong='hs']:not(#_) .duo-lg-dau .lgk-tg-dai > span + span::before { content: ' '; }
+html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b { flex: none !important; font-size: 16px !important; white-space: nowrap !important; overflow: visible !important; } html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien { font-size: 13px !important; padding: 0 8px 0 10px !important; gap: 2px !important; min-width: 0 !important; }

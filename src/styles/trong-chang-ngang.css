@@ -239,8 +239,10 @@
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) {
     --cn-hang: min(1080px, calc(100% - 64px)); --cn-cot: min(660px, calc(100% - 48px)); --cn-day: 100px; --cn-lg-rong: max(380px, 42%);
     display: flex !important; flex-direction: column; align-items: center; height: 100dvh; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
-    padding: 0 var(--gyc-cot-phai, 0px) calc(var(--cn-day) + 24px) 0 !important; scrollbar-width: thin; /* gợi ý chấm mở cột phải ⇒ cột giữa dời trái */
+    padding: 0 max(var(--gyc-cot-phai, 0px), var(--cn-lg-cho, 0px)) calc(var(--cn-day) + 24px) 0 !important; scrollbar-width: thin; /* gợi ý chấm / lời giải mở cột phải ⇒ cột giữa dời trái */
   }
+  /* 07/11 mở LỜI GIẢI (tấm phải rộng --cn-lg-rong): cột giữa dời trái, không bị tấm che */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]):has(.duo-lg-the) { --cn-lg-cho: var(--cn-lg-rong); }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]):has(> .duo-ket) { padding-bottom: 46dvh !important; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren {
     position: relative !important; top: auto; flex: none; align-self: center !important; width: var(--cn-hang) !important; max-width: none; margin: 0 !important; padding: 22px 0 0 !important; min-height: 0;
