@@ -276,3 +276,9 @@ html[data-trong='hs']:not(#_) :is(.kb-nhan, .duo-nhan, .duo-3 p, .da-bai small, 
 /* 07/11 thầy «bỏ thanh dọc cuộn này đi»: dải kết quả (đúng / sai) vẫn cuộn được khi lời dài nhưng KHÔNG hiện thanh cuộn hệ thống (máy tính hiện thanh xám thô) */
 html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu) { scrollbar-width: none !important; }
 html[data-trong='hs']:not(#_) :is(.duo-ket .duo-kq, .duo-day.duo-ket, .duo-ket .duo-kq-chu)::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; }
+/* 07/11 đo độ rõ chữ trên app thật: chữ cái đáp án trên vòng tô màu ĐÚNG ở tối chỉ 1,9:1 (trắng trên lục) ⇒ chữ trên vòng tô màu dùng --tr-trang
+   (sáng: trắng như cũ · tối: chữ sẫm như nút Duolingo); vòng đang chọn ở tối cũng chữ sẫm (cũ trắng trên chàm 3,7:1) */
+html[data-trong='hs']:not(#_):not(#_) .duo .ht2-lam-pa:is([data-ket=dung], [data-ket=sai]) .ht2-lam-pa-ma { color: var(--tr-trang) !important; }
+@media (prefers-color-scheme: dark) {
+  html[data-trong='hs']:not(#_):not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa)[aria-checked='true']:not([data-ket]) .ht2-lam-pa-ma { color: var(--tr-trang) !important; }
+}
