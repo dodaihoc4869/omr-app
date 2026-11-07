@@ -97,6 +97,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   /** TẮT VÙNG EM VIẾT (thầy 07/11 «tắt máy chiếu ở phần học sinh viết lên bảng» · «chỉ tắt phần hs lên bảng làm thôi»): pha «làm bảng» ⇒ nửa phải
    *  (cột kết quả) đen — máy chiếu không rọi lên chỗ em viết, đề bên trái vẫn sáng; phím D / F / N / Space vẫn chạy; B (hoặc chạm) bật lại, B lần nữa tắt. */
   const [batLai, setBatLai] = useState(false)
+  const batLaiRef = useRef(false)
+  batLaiRef.current = batLai
   const sangCau = useCallback((d: 1 | -1) => { setDangSang(true); onToi?.(d) }, [onToi])
   /** LỜI GIẢI TRÊN BẢNG (thầy 07/11 «bấm lời giải lại hiện bảng chiếu cũ»): G / nút / máy điều khiển ⇒ hộp lời giải thu gọn đè chỗ đề; G lần nữa ẩn. */
   const [giai, setGiai] = useState<string | null>(null)
@@ -203,6 +205,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
 
   const l = v?.luot ?? null
   const man: Man = manPhu ?? (!l ? 'diem-danh' : l.pha)
+  /** Em đang viết bảng và thầy chưa bật lại vùng phải ⇒ vùng phải tối, chỉ còn thẻ góc + hiệu ứng tiếp sức. */
+  const vietBang = man === 'lam-bang' && !batLai && !moPhim
   const ds = v?.ds ?? []
   // Dải tên: CHỈ các em có mặt (thầy 07/11), tối đa hai hàng; thứ tự giữ theo danh sách lớp.
   const hien = useMemo(() => (v?.ds ?? []).filter((e) => e.vao), [v?.ds])
@@ -270,7 +274,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     }
     if (l2?.goi && l1?.goi && l1.so === l2.so && l2.goi.tiep > l1.goi.tiep) {
       const ban = v.ds.filter((e) => e.doi === v.ds.find((x) => x.sbd === l2.goi!.sbd)?.doi && e.sbd !== l2.goi!.sbd && e.vao)
-      const den = l2.pha === 'lam-bang' ? { x: 1266, y: 222 } : { x: 496, y: 427 }
+      // Em đang viết bảng (vùng phải tắt) ⇒ tia lửa bay vào THẺ GÓC trên phải; bật lại màn ⇒ thẻ cột phải như cũ.
+      const den = l2.pha === 'lam-bang' ? (batLaiRef.current ? { x: 1266, y: 222 } : { x: 1612, y: 112 }) : { x: 496, y: 427 }
       for (let n = 0; n < Math.min(6, l2.goi.tiep - l1.goi.tiep); n++) { const b = ban[Math.floor(Math.random() * ban.length)]; if (b) vb.bayHat(viTriO(idx.get(b.sbd)!, L), den, vb.mau.doi[b.doi]!, 800) }
     }
     if (l2?.pha === 'mo' && l1?.pha !== 'mo' && !l2.tuLuan) {
@@ -513,15 +518,14 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   }
 
   return createPortal(
-    <div ref={goc} className="bpu-bang" role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" tabIndex={-1}>
+    <div ref={goc} className={`bpu-bang${vietBang ? ' viet-bang' : ''}`} style={vietBang ? { ['--mep' as string]: `calc(50% + ${(1180 - 960) * k}px)` } : undefined} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" tabIndex={-1}>
       <div ref={san} className="bb-san" style={{ transform: `translate(-50%, -50%) scale(${k})` }}>
         <canvas ref={cv} className="bb-ve" aria-hidden="true" />
         {noi}
+        {vietBang && l?.goi && goiEm ? <VungVietBang g={l.goi} em={goiEm} tenHien={(e: Em) => (an ? ten(e) : e.ten)} onBat={() => setBatLai(true)} /> : null}
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />
       </div>
       <button type="button" className="bb-dong" onClick={onDong} aria-label="Đóng bảng Bình Phản Ứng">Đóng</button>
-      {/* Chỉ tắt VÙNG EM VIẾT (bên phải, từ mép cột đề tới hết màn); đề bên trái vẫn sáng (thầy 07/11 «chỉ tắt phần hs lên bảng làm thôi»). */}
-      {man === 'lam-bang' && !batLai && !moPhim ? <div className="bb-tat-man" role="status" aria-label="Vùng em viết tạm tắt chiếu. B hoặc chạm để bật lại" style={{ left: `calc(50% + ${(1180 - 960) * k}px)` }} onClick={() => setBatLai(true)} /> : null}
     </div>,
     document.body,
   )
@@ -571,4 +575,19 @@ function nhanOng(l: NonNullable<ViewBang['luot']>, vb: VeBang | null): { x: numb
   if (l.phan === 'II') return ['D', 'S'].flatMap((k, h) => [0, 1, 2, 3].map((i) => ({ x: X_DS(i), y: HANG_DS[h]!.day - 128 + 8, gon: true, nhan: `${'abcd'[i]})`, dem: chon.filter((x) => x.toUpperCase()[i] === k).length, dung: dung[i] === k })))
   void vb
   return nhomTln(l).map((x, i) => ({ x: 1300 + i * 152, y: ONG_GON.day - 128 + 14, ...x }))
+}
+
+/** VÙNG EM VIẾT (thầy 07/11 «chỉ tắt phần hs lên bảng làm thôi» · «vẫn hiện thẻ hs lên bảng ở góc trên chỗ màu đen, làm cho tinh tế, hiệu ứng tiếp sức
+ *  vẫn hiện đầy đủ để hs thấy phấn khích»): nửa phải tối (máy chiếu gần như không rọi lên chỗ em viết) — góc trên một thẻ nhỏ: chấm đội · tên · đội ·
+ *  SỐ TIẾP SỨC lớn (mỗi lượt tiếp sức: số nảy + thẻ bừng sáng); tia lửa từ ô các bạn bay vào thẻ (canvas trên cùng vẫn vẽ trên vùng tối). Chạm ⇒ bật lại. */
+function VungVietBang({ g, em, tenHien, onBat }: { g: NonNullable<NonNullable<ViewBang['luot']>['goi']>; em: Em; tenHien: (e: Em) => string; onBat: () => void }) {
+  return (
+    <div className="bb-den" role="status" aria-label="Vùng em viết tạm tắt chiếu. B hoặc chạm để bật lại" onClick={onBat} style={{ ['--doi' as string]: mauDoi(em.doi) }}>
+      <div key={g.tiep} className={`bb-goc${g.tiep > 0 ? ' nay' : ''}`}>
+        <div className="ng">{kyHieu(em.ten)}</div>
+        <div className="chu"><span className="mat">Đang lên bảng</span><b>{tenHien(em)}</b><span className="doi">{DOI_BPU[em.doi]?.ten}</span></div>
+        <div className="ts"><b>{g.tiep}</b><span>tiếp sức</span></div>
+      </div>
+    </div>
+  )
 }

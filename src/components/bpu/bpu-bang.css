@@ -284,5 +284,25 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 .bb-ong.gon { width: 130px; margin-left: -65px; font-size: 24px; color: var(--tr-chu-2); white-space: nowrap; font-variant-numeric: tabular-nums; animation-delay: 1.2s; }
 .bb-ong.gon b { color: var(--tr-chu); font-weight: 800; }
 .bb-ong.gon.dung, .bb-ong.gon.dung b { color: var(--tr-dung-chu); font-weight: 800; }
-/* Em viết lên bảng (pha «làm bảng», thầy 07/11): chỉ VÙNG EM VIẾT (nửa phải, mép trái do bảng tính theo cỡ sân khấu) đen — đề bên trái vẫn sáng. */
-.bpu-bang .bb-tat-man { position: fixed; top: 0; right: 0; bottom: 0; z-index: 10; background: var(--p-muc); cursor: pointer; } /* mực chuẩn (gần đen) — luật giữ màu: không thêm màu thô */
+/* VÙNG EM VIẾT (thầy 07/11): nửa phải tối, ngay dưới lớp hiệu ứng (canvas .tren z 9) ⇒ tia lửa tiếp sức vẫn bay trên nền tối; khoảng thừa ngoài sân khấu
+   bên phải cũng tối (--mep = mép trái vùng tối trên màn). Màu: mực chuẩn --p-muc; chữ trắng cố định --giay; viền / sáng theo màu đội --doi. */
+.bpu-bang.viet-bang { --mep: 61.5%; background: linear-gradient(to right, var(--tr-nen) var(--mep), var(--p-muc) var(--mep)); }
+.bb-den { position: absolute; left: 1180px; top: 0; width: 740px; height: 1080px; z-index: 8; background: var(--p-muc); cursor: pointer; }
+.bb-goc { position: absolute; top: 26px; right: 26px; width: 560px; display: flex; align-items: center; gap: 18px; padding: 14px 18px 14px 14px; border-radius: 24px;
+  background: color-mix(in srgb, var(--doi) 12%, var(--p-muc)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--doi) 70%, transparent), 0 0 34px color-mix(in srgb, var(--doi) 30%, transparent); color: var(--giay); }
+.bb-goc .ng { flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); font-size: 28px; font-weight: 900; box-shadow: 0 0 22px var(--doi); }
+.bb-goc .chu { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.bb-goc .mat { font-size: 15px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in srgb, var(--giay) 60%, transparent); }
+.bb-goc .chu b { font-size: 32px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bb-goc .doi { font-size: 17px; font-weight: 700; color: var(--doi); }
+.bb-goc .ts { flex: none; display: grid; justify-items: center; min-width: 108px; padding: 6px 12px; border-radius: 18px; background: color-mix(in srgb, var(--doi) 22%, transparent); }
+.bb-goc .ts b { font-size: 48px; font-weight: 900; line-height: 1; color: var(--doi); font-variant-numeric: tabular-nums; text-shadow: 0 0 18px var(--doi); }
+.bb-goc .ts span { font-size: 15px; font-weight: 800; color: color-mix(in srgb, var(--giay) 70%, transparent); }
+/* Mỗi lượt tiếp sức (key đổi ⇒ chạy lại): thẻ bừng sáng + số nảy. */
+.bb-goc.nay { animation: bb-goc-sang 0.9s ease-out; }
+.bb-goc.nay .ts b { animation: bb-ts-nay 0.5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes bb-goc-sang { 0% { box-shadow: inset 0 0 0 3px var(--doi), 0 0 80px var(--doi); } 100% { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--doi) 70%, transparent), 0 0 34px color-mix(in srgb, var(--doi) 30%, transparent); } }
+@keyframes bb-ts-nay { 0% { transform: scale(1.6); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .bb-goc.nay, .bb-goc.nay .ts b { animation: none; } }
+html.may-yeu .bb-goc.nay, html.may-yeu .bb-goc.nay .ts b { animation: none; }
+.bpu-bang.viet-bang .bb-dong { display: none; } /* thẻ góc đứng chỗ nút Đóng — Esc vẫn đóng */
