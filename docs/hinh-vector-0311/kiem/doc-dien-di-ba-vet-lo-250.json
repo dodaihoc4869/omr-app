@@ -1,0 +1,152 @@
+{
+  "i": 657,
+  "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785.png",
+  "nativeSize": [
+    734,
+    212
+  ],
+  "reviewed": [
+    "nativeFULL3x/allshapes-labelsliteral"
+  ],
+  "questions": [
+    {
+      "qid": "12-C3-B9-D3-I-19",
+      "maDe": "12-C3-B9-D3",
+      "de": "Khi đặt dung dịch ở pH = 6 gồm glycine, lysine và glutamic acid (được kí hiệu ngẫu nhiên là X, Y, Z) trong điện trường thì xảy ra hiện tượng điện di như sau: Nhận định nào sau đây là đúng?",
+      "hinh": [
+        {
+          "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+          "where": "12-C3-B9-D3-I-19.hinh.0.du_lieu",
+          "hashDataUrl": "b1e4c11b25be5489312d112ae0e3cfc8365cc6051f8837d77d3fb20b1e43f2c7"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P1-D2-I-45",
+      "maDe": "DB-12-B9-P1-D2",
+      "de": "Khi đặt dung dịch ở pH = 6 gồm glycine, lysine và glutamic acid (được kí hiệu ngẫu nhiên là X, Y, Z) trong điện trường thì xảy ra hiện tượng điện di như sau: Nhận định nào sau đây là đúng?",
+      "hinh": [
+        {
+          "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
+          "where": "DB-12-B9-P1-D2-I-45.hinh.0.du_lieu",
+          "hashDataUrl": "b1e4c11b25be5489312d112ae0e3cfc8365cc6051f8837d77d3fb20b1e43f2c7"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "outerRectangle": [
+      219,
+      45,
+      553,
+      165
+    ],
+    "rectangleStyle": "blackthickborderwhiteinside,notrounded",
+    "spots": [
+      {
+        "center": [
+          268,
+          105
+        ],
+        "radiusApprox": 28,
+        "fill": "solidblack",
+        "label": "X",
+        "labelColor": "white",
+        "bold": true
+      },
+      {
+        "center": [
+          386,
+          105
+        ],
+        "radiusApprox": 28,
+        "fill": "solidblack",
+        "label": "Y",
+        "labelColor": "white",
+        "bold": true
+      },
+      {
+        "center": [
+          504,
+          105
+        ],
+        "radiusApprox": 28,
+        "fill": "solidblack",
+        "label": "Z",
+        "labelColor": "white",
+        "bold": true
+      }
+    ],
+    "terminals": [
+      {
+        "center": [
+          192,
+          105
+        ],
+        "radiusApprox": 20,
+        "fill": "white",
+        "outline": "black",
+        "sign": "+",
+        "signBaseline": "center",
+        "label": "Cực dương",
+        "labelNear": [
+          99,
+          106
+        ],
+        "labelBold": true
+      },
+      {
+        "center": [
+          581,
+          105
+        ],
+        "radiusApprox": 20,
+        "fill": "white",
+        "outline": "black",
+        "sign": "−",
+        "signBaseline": "center",
+        "label": "Cực âm",
+        "labelNear": [
+          653,
+          106
+        ],
+        "labelBold": true
+      }
+    ],
+    "shortWires": [
+      [
+        212,
+        105,
+        219,
+        105
+      ],
+      [
+        553,
+        105,
+        561,
+        105
+      ]
+    ],
+    "counts": {
+      "largeSolidBlackCircles": 3,
+      "terminalCircle": 2,
+      "shortWires": 2,
+      "outerRectangle": 1,
+      "labels": 5
+    },
+    "noExtra": [
+      "No dashedstartline/arrow/movementtrail",
+      "No pH6/amineidentity/origin/name fromstem",
+      "No 3smalldots outsideorbelowlabels",
+      "No alias485differentdiagram",
+      "No partialPDFcaption/clipping"
+    ]
+  },
+  "status": "Source-only geometry, SVG not reviewed",
+  "actualReview": {
+    "hashSvg": "8c0b1c18c9ccdbeec93abcb41723e7ccb8294b81cee007bb8b9c4ca29a181887",
+    "render": "/workspace/scratch/dien-di657-250-actual.png",
+    "ketQua": "Đạt: Đã đọc riêng native FULL/zoom và cả 2 public stems/refs, tự fresh Chromium exact SVG rồi mở actual FULL3x. Giữ đủ 3 vòng tròn đặc X/Y/Z trắng theo thứ tự, khung chữ nhật, 2 vòng cực + trái/− phải và 2 dây ngắn. Hai nhãn Cực dương/Cực âm đúng nguyên văn DDH đậm, không thêm pH/mũi tên/vạch xuất phát/đáp án. Không chạm/cắt/tràn."
+  }
+}

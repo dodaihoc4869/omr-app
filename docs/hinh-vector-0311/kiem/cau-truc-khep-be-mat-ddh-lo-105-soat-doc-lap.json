@@ -1,37 +1,5 @@
 [
   {
-    "i": 836,
-    "hashSvg": "bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở RIÊNG từngPNGnative+SVG renderthật,đọcfullcontext trongdoc-khep-cau-lo-105.json. Đủ8headngoài/8tailvàotâm cógap,giữA.đọcđượctừglyphcắtmép/fullsetA-D+stem/ref,suykhôngtheoindex. Khôngnốiphântử/mấttail/charge/labelsthêm,gapsđủ/khôngcắtchạmtràn;DDHde-damthật/path-only/SHA256khớpfilehiệnhành.",
-    "hash": "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2",
-    "hashSvgDaSoat": "bdccfd4f711578d8c48571c3491eeccaf8cd7971e00ef25890f066b27f1cc6df"
-  },
-  {
-    "i": 1103,
-    "hashSvg": "28f984a7521b323b94341043b39edcaeafc1bd0154815e0227baaae07614310c",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở RIÊNG từngPNGnative+SVG renderthật,đọcfullcontext trongdoc-khep-cau-lo-105.json. Đủ8phântử2cột4hàng/headluânphiênđúngsource;giữB.từglyphnative/fullsetA-D+stem/ref. Khôngnốiphântử/mấttail/charge/labelsthêm,gapsđủ/khôngcắtchạmtràn;DDHde-damthật/path-only/SHA256khớpfilehiệnhành.",
-    "hash": "c6a110666ed7737fae5896fa74579b06c44ad5264e1481e8e2951a7e43371fb8",
-    "hashSvgDaSoat": "28f984a7521b323b94341043b39edcaeafc1bd0154815e0227baaae07614310c"
-  },
-  {
-    "i": 312,
-    "hashSvg": "771a7ca0fd737425547bb84e53db66d09f9194c54130f093ed9365e868f2d896",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở RIÊNG từngPNGnative+SVG renderthật,đọcfullcontext trongdoc-khep-cau-lo-105.json. Đủ4cardinalheadtrong/4diagonalheadngoài,8tailrời,giữC.từglyphnative/fullsetA-D+stem/ref. Khôngnốiphântử/mấttail/charge/labelsthêm,gapsđủ/khôngcắtchạmtràn;DDHde-damthật/path-only/SHA256khớpfilehiệnhành.",
-    "hash": "35e64befc51150d5655a25626b1ad7d084ccc463efc396f9deb26bab0858d9dd",
-    "hashSvgDaSoat": "771a7ca0fd737425547bb84e53db66d09f9194c54130f093ed9365e868f2d896"
-  },
-  {
-    "i": 1055,
-    "hashSvg": "e4bb874cd587fc681c590fae0e30f26c0438b3f49bcec8a4a0bb03d1b3f1ef7d",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở RIÊNG từngPNGnative+SVG renderthật,đọcfullcontext trongdoc-khep-cau-lo-105.json. Đủ8headtrong/8tailra ngoài/tâmrỗng,giữD.từglyphnative/fullsetA-D+stem/ref. Khôngnốiphântử/mấttail/charge/labelsthêm,gapsđủ/khôngcắtchạmtràn;DDHde-damthật/path-only/SHA256khớpfilehiệnhành.",
-    "hash": "beb9c0f7677ed118bedf10042a9cdd0037b494269fc13544e4e5e971430ce6a8",
-    "hashSvgDaSoat": "e4bb874cd587fc681c590fae0e30f26c0438b3f49bcec8a4a0bb03d1b3f1ef7d"
-  },
-  {
     "i": 891,
     "hashSvg": "4975b3117ccc7afce272d1c85d59c3636bee6632a3a648284fb3dfd8233fabd1",
     "nguoiSoat": "cau_truc_4",
@@ -62,5 +30,49 @@
     "ketQua": "Đạt: đã mở RIÊNG từngPNGnative+SVG renderthật,đọcfullcontext trongdoc-khep-cau-lo-105.json. Đủ3headRỖNGdướibiên/3tailTHẲNGtrên/chạmđỉnhheadtạibiên,3nhãnKhôngkhí/Bềmặtphânchia/Nướcđúngsource;khôngmũitênnhãn/thêmheadtailname. Khôngnốiphântử/mấttail/charge/labelsthêm,gapsđủ/khôngcắtchạmtràn;DDHde-damthật/path-only/SHA256khớpfilehiệnhành.",
     "hash": "bbbe56e8a33225bb49067f2b1512e5404f5941cbd9b04bb0c716da62255bc8ac",
     "hashSvgDaSoat": "d87a0d1eff0c074ed8735de34e17a8d515ab34de988e244f77d0f8e312b0763e"
+  },
+  {
+    "i": 836,
+    "hashSvg": "f0bf96bb10a7347471c8ac97519f48b6d1fd82bc4a81ba5dfcc187c8ceb05f70",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native FULL và đọc toàn bộ public refs, tự render Chromium đúng hash rồi mở actual riêng. 8 đầu ngoài, 8 đuôi hướng tâm; A. Giữ hướng/count, caption DDH đậm và dấu chấm; nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 3103,
+    "render": "/workspace/scratch/font250-836-new.png",
+    "hash": "9a7db2630e9d23f7ce9d40311c4923a7cbb68ef4dac758baa6acef3bcf2a28e2",
+    "hashSvgDaSoat": "f0bf96bb10a7347471c8ac97519f48b6d1fd82bc4a81ba5dfcc187c8ceb05f70"
+  },
+  {
+    "i": 1103,
+    "hashSvg": "d6a018a4f972444983b976d99faedcc2c771e122bf7ea50d2991eb9721b09040",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native FULL và đọc toàn bộ public refs, tự render Chromium đúng hash rồi mở actual riêng. 4 hàng × 2 cột, 8 đầu/đuôi đổi chiều từng hàng đúng nguồn; B. Giữ hướng/count, caption DDH đậm và dấu chấm; nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 3186,
+    "render": "/workspace/scratch/font250-1103-new.png",
+    "hash": "c6a110666ed7737fae5896fa74579b06c44ad5264e1481e8e2951a7e43371fb8",
+    "hashSvgDaSoat": "d6a018a4f972444983b976d99faedcc2c771e122bf7ea50d2991eb9721b09040"
+  },
+  {
+    "i": 312,
+    "hashSvg": "22544616ee09f198e940f52b291f770e6606499e1ae9d138b6fce002e5ddc09e",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native FULL và đọc toàn bộ public refs, tự render Chromium đúng hash rồi mở actual riêng. 4 đầu chéo ngoài và 4 đầu trục trong, đủ 8 đuôi; C. Giữ hướng/count, caption DDH đậm và dấu chấm; nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 3018,
+    "render": "/workspace/scratch/font250-312-new.png",
+    "hash": "35e64befc51150d5655a25626b1ad7d084ccc463efc396f9deb26bab0858d9dd",
+    "hashSvgDaSoat": "22544616ee09f198e940f52b291f770e6606499e1ae9d138b6fce002e5ddc09e"
+  },
+  {
+    "i": 1055,
+    "hashSvg": "e9ca78ec530ce9394453b55e36ea6d9b8a12e3d09d87ecc27a6fbe9da590d966",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native FULL và đọc toàn bộ public refs, tự render Chromium đúng hash rồi mở actual riêng. 8 đầu trong và 8 đuôi hướng ngoài; D. Giữ hướng/count, caption DDH đậm và dấu chấm; nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 2933,
+    "render": "/workspace/scratch/font250-1055-new.png",
+    "hash": "beb9c0f7677ed118bedf10042a9cdd0037b494269fc13544e4e5e971430ce6a8",
+    "hashSvgDaSoat": "e9ca78ec530ce9394453b55e36ea6d9b8a12e3d09d87ecc27a6fbe9da590d966"
   }
 ]
