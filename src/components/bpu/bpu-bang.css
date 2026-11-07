@@ -284,3 +284,5 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 .bb-ong.gon { width: 130px; margin-left: -65px; font-size: 24px; color: var(--tr-chu-2); white-space: nowrap; font-variant-numeric: tabular-nums; animation-delay: 1.2s; }
 .bb-ong.gon b { color: var(--tr-chu); font-weight: 800; }
 .bb-ong.gon.dung, .bb-ong.gon.dung b { color: var(--tr-dung-chu); font-weight: 800; }
+/* Em viết lên bảng (pha «làm bảng», thầy 07/11): màn đen hoàn toàn — máy chiếu không rọi lên chỗ em viết. B / chạm ⇒ bật lại. */
+.bpu-bang .bb-tat-man { position: fixed; inset: 0; z-index: 10; background: black; cursor: pointer; }

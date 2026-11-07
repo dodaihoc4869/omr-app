@@ -115,6 +115,13 @@ describe('bảng chiếu', () => {
     expect(screen.getByText('Lý do B')).toBeTruthy()
     lamBang(st, T0); ws.nhan(viewBang(st))
     expect(await screen.findByText('Đang làm trên bảng')).toBeTruthy()
+    // 07/11: em viết lên bảng ⇒ màn đen (máy chiếu không rọi lên chỗ em viết); B bật lại, B lần nữa tắt
+    const tat = () => screen.queryByRole('status', { name: /Màn chiếu tạm tắt/ })
+    expect(tat()).toBeTruthy()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b' })) })
+    expect(tat()).toBeNull()
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'b' })) })
+    expect(tat()).toBeTruthy()
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
     expect(await screen.findByText('Đáp án')).toBeTruthy()
     // 07/11: không còn phím X «Kết thúc buổi chơi» (một chỗ kết thúc: «Kết thúc buổi học»); V mở vinh danh.

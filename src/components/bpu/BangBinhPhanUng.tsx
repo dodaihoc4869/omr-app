@@ -94,6 +94,9 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const [dangSang, setDangSang] = useState(false)
   /** THẺ PHƯƠNG ÁN (thầy 07/11 «4 đáp án ẩn đi, bấm M thì hiện»): mặc định ẩn để đề chiếm nhiều chỗ nhất; mở đáp án cũng KHÔNG tự hiện — kết quả nằm cột phải, bên trái chỉ đề (thầy 07/11). */
   const [hienPa, setHienPa] = useState(false)
+  /** TẮT MÀN KHI EM VIẾT LÊN BẢNG (thầy 07/11 «tắt máy chiếu ở phần học sinh viết lên bảng»): pha «làm bảng» ⇒ màn đen hoàn toàn (máy chiếu không
+   *  rọi lên chỗ em viết); phím D / F / N / Space vẫn chạy; B (hoặc chạm màn) bật lại màn để xem đề, B lần nữa tắt. */
+  const [batLai, setBatLai] = useState(false)
   const sangCau = useCallback((d: 1 | -1) => { setDangSang(true); onToi?.(d) }, [onToi])
   /** LỜI GIẢI TRÊN BẢNG (thầy 07/11 «bấm lời giải lại hiện bảng chiếu cũ»): G / nút / máy điều khiển ⇒ hộp lời giải thu gọn đè chỗ đề; G lần nữa ẩn. */
   const [giai, setGiai] = useState<string | null>(null)
@@ -281,6 +284,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   // Đề dài: cuộn về đầu mỗi lượt mới.
   useEffect(() => { deRef.current?.scrollTo?.({ top: 0 }) }, [l?.so])
   useEffect(() => { setDangSang(false); setHienPa(false); setGiai(null) }, [l?.so])
+  useEffect(() => { setBatLai(false) }, [man])
   useEffect(() => { if (!dangSang) return; const h = setTimeout(() => setDangSang(false), 6000); return () => clearTimeout(h) }, [dangSang])
   // CO CHỮ CHO VỪA KHUNG (ảnh máy chiếu 07/11: phương án dài tràn xuống đè dải tên ⇒ «thẻ dính chữ»): hạ --k từng nấc tới khi đề + phương án nằm trọn
   // khung (tối thiểu 0,6; còn dài nữa thì riêng đề cuộn). Đo lại khi đổi câu / pha / cỡ khung và khi phông nạp xong.
@@ -352,6 +356,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       if (e.key === ' ') { e.preventDefault(); if (man === 'tra-loi') void goiLen(); else if (man === 'goi' || man === 'lam-bang') gui({ t: 'mo' }); return }
       if (e.key === 'Enter' && man === 'goi') { gui({ t: 'lam-bang' }); return }
       if ((kk === 'd' || kk === 'f') && (man === 'goi' || man === 'lam-bang')) { gui({ t: 'dat', v: kk === 'd' }); setTimeout(() => gui({ t: 'mo' }), 150); return }
+      if (kk === 'b' && man === 'lam-bang') { setBatLai((x) => !x); return }
       if (kk === 'n' && (man === 'goi' || man === 'lam-bang') && l?.goi) { void goiLen([l.goi.sbd]); return }
       if (kk === 'm' && l && !l.tuLuan && l.phan !== 'III') { setHienPa((h) => !h); return }
       if (kk === 'o' && (man === 'tra-loi' || man === 'goi' || man === 'lam-bang')) { gui({ t: 'mo' }); return } // «Mở đáp án ngay» (trước là M — M nay hiện / ẩn phương án)
@@ -500,7 +505,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
         {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...TIEP, ['K', 'Đua ngọn lửa'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
           : man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
+          : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt màn (em viết bảng)' : 'Bật lại màn chiếu'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
           : [['Space', 'Gọi lên bảng ngay', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
         'Tự động: hết giờ hoặc cả lớp gửi xong ⇒ gọi một em lên bảng. Chuyển câu khi chưa mở đáp án ⇒ máy tự chấm câu cũ.')}
       </>
@@ -515,6 +520,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />
       </div>
       <button type="button" className="bb-dong" onClick={onDong} aria-label="Đóng bảng Bình Phản Ứng">Đóng</button>
+      {man === 'lam-bang' && !batLai && !moPhim ? <div className="bb-tat-man" role="status" aria-label="Màn chiếu tạm tắt — em đang viết lên bảng. B hoặc chạm màn để bật lại" onClick={() => setBatLai(true)} /> : null}
     </div>,
     document.body,
   )
