@@ -211,6 +211,12 @@
    "khai": "box-shadow: inset 0 -1px 0 var(--kinh-vien-2), 0 8px 24px -20px var(--tr-phu)",
    "n": 1,
    "ly_do": "07/11 thầy: thanh tiến độ kính trong hơn, viên thuốc ôm vừa nội dung"
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--kinh-mat)",
+   "n": 1,
+   "ly_do": "07/11 thầy: thanh tiến độ kính trong hơn (mặt 55 %)"
   }
  ]
 }
