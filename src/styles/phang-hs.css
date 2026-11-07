@@ -141,7 +141,7 @@ html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau { backgrou
 html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau > b { background: none !important; box-shadow: none !important; padding-left: 4px !important; font-size: 18px !important; font-weight: 800 !important; color: var(--tr-chu) !important; }
 html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau :is(.duo-dong, .lgk-tg-vien) { background: var(--tr-mat) !important; box-shadow: none !important; border: 0 !important; color: var(--tr-chu) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien { font-size: 14px !important; font-weight: 700 !important; border-radius: 12px !important; white-space: nowrap !important; }
-html[data-trong='hs']:not(#_) .duo-lg-the:has(.lgk-boc) > .duo-lg-dau .lgk-tg-vien * { white-space: nowrap !important; }
+html[data-trong='hs']:not(#_) .duo-lg-dau .lgk-tg-vien { white-space: nowrap !important; } /* con thừa kế; bỏ :has + * (tests/muot-has-2710) */
 
 /* THẺ */
 html[data-trong='hs']:not(#_) .lgk-the { padding: 16px !important; gap: 12px !important; border-radius: 20px !important; background: var(--tr-mat) !important; box-shadow: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
