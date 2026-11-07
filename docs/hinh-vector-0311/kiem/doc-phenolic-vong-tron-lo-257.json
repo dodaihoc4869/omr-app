@@ -1,0 +1,32 @@
+{
+  "hashNguon": "ff99f5fc3539a5e99c7468bd2201595c9434bf831d4748c00b2a2dd706afff07",
+  "questions": [
+    {
+      "qid": "12-KT-C4-D4-II-2",
+      "de": "Nhựa phenol formaldehyde (PPF) hay nhựa phenolic là các polymer tổng hợp phổ biến với nhiều ứng dụng trong các ngành công nghiệp. PPF được sử dụng rộng rãi để sản xuất các sản phẩm đúc bao gồm bóng bi-a, mặt bàn trong phòng thí nghiệm, làm chất phủ và chất kết dính, có công thức hoá học như hình dưới đây.",
+      "refs": [
+        {
+          "hash": "ff99f5fc3539a5e99c7468bd2201595c9434bf831d4748c00b2a2dd706afff07",
+          "where": "12-KT-C4-D4-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "65f0769e64d52c4d247d3fea05081acd635431d23b1875dec5cd21d00a307203"
+        }
+      ]
+    }
+  ],
+  "canvas": [
+    387,
+    222
+  ],
+  "carbonTotal": 7,
+  "oxygenTotal": 1,
+  "ringVertices": 6,
+  "aromaticCircle": 1,
+  "explicitDouble": 0,
+  "OH": "top-Oanchor",
+  "CH2": "right",
+  "horizontalStubs": 3,
+  "parenthesesPairs": 1,
+  "subscript": "n",
+  "nativeRead": "FULL và zoom",
+  "proof": "cau-truc-phenolic-vong-tron-ddh-lo-257-soat-doc-lap.json"
+}

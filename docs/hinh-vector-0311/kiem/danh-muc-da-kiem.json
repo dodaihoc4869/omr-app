@@ -929,10 +929,10 @@
       "font": "DDH Rounded"
     },
     "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253": {
-      "tep": "amine-ba-cot-ddh-7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072.svg",
-      "hashSvg": "7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072",
-      "byteSvg": 20039,
-      "byteGzip": 4086,
+      "tep": "amine-ba-cot-ddh-6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291.svg",
+      "hashSvg": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291",
+      "byteSvg": 20503,
+      "byteGzip": 4165,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -2445,6 +2445,15 @@
       "hashSvg": "49f4dafc8435fc447b54b01956764fdece4c5acb70ee019bfe19ce3c4f5f587f",
       "byteSvg": 27980,
       "byteGzip": 6637,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "ff99f5fc3539a5e99c7468bd2201595c9434bf831d4748c00b2a2dd706afff07": {
+      "tep": "phenolic-vong-tron-ddh-a33359c682150e76bf60be99f2c5edbaa4732f0fda45483ad49ddb45bd35cb13.svg",
+      "hashSvg": "a33359c682150e76bf60be99f2c5edbaa4732f0fda45483ad49ddb45bd35cb13",
+      "byteSvg": 3349,
+      "byteGzip": 1311,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -12943,7 +12952,7 @@
           "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
           "where": "12-KT-C123-D2-I-14.hinh.0.du_lieu",
           "hashDataUrl": "39c1bbb043d5ac7c4a596c236cf23c910d9244dfa2cc0dfe30a4add9f12cf28b",
-          "vector": "amine-ba-cot-ddh-7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072.svg"
+          "vector": "amine-ba-cot-ddh-6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291.svg"
         }
       ]
     },
@@ -13946,6 +13955,20 @@
           "where": "12-KT-C4-D4-I-14.hinh.0.du_lieu",
           "hashDataUrl": "63dd765252fb5d90f8a9a1cec9a1a27668c2c8261b7fa9679f08afea735a7741",
           "vector": "polymer-ba-doan-ddh-feda3e013225b8a925b93432a81fe0f94138680ba29fa2589057e994731f70f9.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D4-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ff99f5fc3539a5e99c7468bd2201595c9434bf831d4748c00b2a2dd706afff07",
+          "where": "12-KT-C4-D4-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "65f0769e64d52c4d247d3fea05081acd635431d23b1875dec5cd21d00a307203",
+          "vector": "phenolic-vong-tron-ddh-a33359c682150e76bf60be99f2c5edbaa4732f0fda45483ad49ddb45bd35cb13.svg"
         }
       ]
     },
@@ -19715,7 +19738,7 @@
           "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
           "where": "DB-12-B8-D1-I-241.hinh.0.du_lieu",
           "hashDataUrl": "39c1bbb043d5ac7c4a596c236cf23c910d9244dfa2cc0dfe30a4add9f12cf28b",
-          "vector": "amine-ba-cot-ddh-7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072.svg"
+          "vector": "amine-ba-cot-ddh-6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291.svg"
         }
       ]
     },
@@ -27512,6 +27535,7 @@
     "12-KT-C4-D2-I-14",
     "12-KT-C4-D2-III-6",
     "12-KT-C4-D4-I-14",
+    "12-KT-C4-D4-II-2",
     "12-KT-C4-D3-II-1",
     "12-KT-C4-D5-I-1",
     "12-KT-C4-D5-II-2",

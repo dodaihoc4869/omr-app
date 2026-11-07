@@ -1,13 +1,13 @@
 [
   {
     "i": 582,
-    "hashSvg": "7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072",
+    "hashSvg": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291",
     "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Tự fresh Chromium exactfinalSVG2x mởactualFULL, mởlạinativeFULL2x/alllabels-guides vàhai publicrefs.3graybars đúngliteralheights96/323/299baseline427,3commalabels9,40/3,37/3,23 vàAniline/Dimethylamine/Ethylamine đúng.3guidesx92gapaxis→ownbarrightedge,OVERbarfill giữ;axes2heads/nozero-unit-title-ticks thêm. Fontgaps khôngchạm/cắt/tràn,khôngnormalizevalueheight/giảiđápán.",
+    "ketQua": "Đạt: Soát lại V5, mở riêng native FULL và đọc đủ 2 public refs, tự fresh Chromium exact newSVG rồi mở actual FULL3x. Đúng 3 graybars/top96–323–299/baseline427, 3 guides OVERbarfill từ92 có gap axis đến các rightedges215/379/536, labels literal9,40/3,37/3,23 và Aniline/Dimethylamine/Ethylamine, 2 axisheads. Không thêm0/unit/title/ticks hay normalize barheights theo số. V5 chữ/nét không chạm/cắt/tràn.",
     "actualSvgReviewed": true,
-    "byteSvg": 20039,
-    "render": "/workspace/scratch/amine582-246-final.png",
+    "byteSvg": 20503,
+    "render": "/workspace/scratch/amine582-v5-257-actual.png",
     "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
-    "hashSvgDaSoat": "7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072"
+    "hashSvgDaSoat": "6cd7f2b271d20219ffe290752f8c02584c860e9d3b951de31ebda2388b7b0291"
   }
 ]

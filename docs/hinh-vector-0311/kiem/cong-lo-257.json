@@ -1,0 +1,17 @@
+{
+  "lo": 257,
+  "chromium": "606/606",
+  "hashXmlSelfcontainedAst": true,
+  "build": true,
+  "speed": "21/21",
+  "precache": "170/2613.23KiB",
+  "serviceWorker": "14/14",
+  "serverTsc": true,
+  "mainFetched": "1a8deee5c3010dd5c44c6b9ca95e51ebc87e3242",
+  "fontV5": "1216 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;863 nguồn→606SVG;11164177byte/localgzip2063530;565 nguồn chưa xử lý. V5:16SVG/17nguồn/31câuđủ;chờ590SVG/846nguồn.",
+  "fullVitestThisBatch": false,
+  "fullHistory": "full-vitest-lo-253.json",
+  "sizeBaselineRed": true,
+  "colorBaselineRed": true,
+  "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Main1a8deee5chưagộp/4WOFF2READMEkhớp. Build257/speed21/21/Chromium606/606/hashXMLpathAST/SW14/14/serverTSCđạt. SizeNỀNđỏ297644Bnguyênbytekhôngnângmốc;MàusoMain449viPhạm/79tệpchecker(78srcdiff),lôkhôngsửasrc/fontfiles. Full253nhánh16581/main83ebec7516725đỏ14/24+targeted0lỗimớicòntáihiệnCHỈhistory,khôngclaimhếtflaky/khôngthayfullmainmớinhấttrướcmerge-deploy. Lô257chỉbuilder/assets/docs nênkhôngfulllại."
+}
