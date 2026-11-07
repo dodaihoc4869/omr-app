@@ -9,18 +9,24 @@
   },
   {
     "i": 229,
-    "hashSvg": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Giữ6góctrái/Cđậm/Carbon/12.011 dùngdấuchấm;C/6 dùngđúngglyphdam WOFF2khôngfaux-bold. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+    "hashSvg": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởRIÊNGnativeFULL2x/allpublicrefs. 6topLeft/Ccenterbold/Carboncase/12.011DOTbottom/frame đúng. Khôngthêmcấuhình/units/commaconversion. Fontbold/layout/spacinggaps khôngchạm/cắt/tràn/noanswer.",
+    "actualSvgReviewed": true,
+    "byteSvg": 6328,
+    "render": "/workspace/scratch/font249-229-new.png",
     "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
-    "hashSvgDaSoat": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6"
+    "hashSvgDaSoat": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2"
   },
   {
     "i": 83,
-    "hashSvg": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Đủ6cột5hàng/header2tầngđậm;mọiô273/4,6/3,7/3,5/124;201/4,7/1,8/3,6/124;150/4,8/0,3/3,6/130;105/3,1/0,1/0,5/124 đúngnguồn. GiữkJ/g/mg/dấuphẩy/tênSữa không kem,khôngđổitên. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+    "hashSvg": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactnewSVG2x mởactualFULL, mởRIÊNGnativeFULL2x/allpublicrefs. 6columns5rows/grid/6boldheadersunits đúng;4dataRows giữfullnames và273;4,6;3,7;3,5;124 /201;4,7;1,8;3,6;124 /150;4,8;0,3;3,6;130 /105;3,1;0,1;0,5;124. Khôngôtrốngbịđiền/thêm,nodroppedzero/changedcomma. Fontbold/layout/spacinggaps khôngchạm/cắt/tràn/noanswer.",
+    "actualSvgReviewed": true,
+    "byteSvg": 88299,
+    "render": "/workspace/scratch/font249-83-new.png",
     "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
-    "hashSvgDaSoat": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40"
+    "hashSvgDaSoat": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d"
   }
 ]

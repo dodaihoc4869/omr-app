@@ -78,15 +78,16 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6.svg",
-    "hashSvg": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6",
-    "byteSvg": 6330,
+    "svg": "bang-o-ddh-8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2.svg",
+    "hashSvg": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+    "byteSvg": 6328,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
-    "hashSvgDaSoat": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6",
-    "nguoiSoat": "cau_truc_4"
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "hashSvgDaSoat": "8bf3accf85d230295900fb2b566e2ebcb58d621907232f665049ac9a6c7d0de2",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
   },
   {
     "i": 83,
@@ -149,14 +150,15 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40.svg",
-    "hashSvg": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40",
-    "byteSvg": 88838,
+    "svg": "bang-o-ddh-7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d.svg",
+    "hashSvg": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+    "byteSvg": 88299,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
-    "hashSvgDaSoat": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40",
-    "nguoiSoat": "cau_truc_4"
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "hashSvgDaSoat": "7db507bfa4fd09115eac0535c92d3a2aeeaf1274e713890bd907905fe1f2e76d",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "0613a6ba1807bfe2757d537a375c91495e6cdcbd"
   }
 ]

@@ -1,0 +1,147 @@
+{
+  "metadata": [
+    {
+      "i": 229,
+      "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
+      "fileNguon": "anh/27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36.png",
+      "daMoPNG": true,
+      "nhom": "o-nguyen-to",
+      "noiDung": {
+        "topLeft": "6",
+        "center": "C",
+        "name": "Carbon",
+        "bottom": "12.011"
+      },
+      "notes": "Khung đen chữnhật gầnvuông,nền sáng.6ởgóc trêntrái,C đậm lớn giữa,Carbon nhỏ dưới,12.011 dưới cùng. Giữdấuchấm.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-II-63",
+          "de": "Hình bên dưới mô tả ô nguyên tố của carbon trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-II-63.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-II-4",
+          "de": "Hình bên dưới mô tả ô nguyên tố của carbon trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-II-4.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "svg": "bang-o-ddh-4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6.svg",
+      "hashSvg": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6",
+      "byteSvg": 6330,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+      "hashSvgDaSoat": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6",
+      "nguoiSoat": "cau_truc_4"
+    },
+    {
+      "i": 83,
+      "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
+      "fileNguon": "anh/10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac.png",
+      "daMoPNG": true,
+      "nhom": "bang",
+      "table": [
+        [
+          "Loại đồ uống",
+          "Năng lượng (kJ)",
+          "Carbohydrate (g)",
+          "Chất béo (g)",
+          "Protein (g)",
+          "Calcium (mg)"
+        ],
+        [
+          "Sữa nguyên chất",
+          "273",
+          "4,6",
+          "3,7",
+          "3,5",
+          "124"
+        ],
+        [
+          "Sữa tách béo",
+          "201",
+          "4,7",
+          "1,8",
+          "3,6",
+          "124"
+        ],
+        [
+          "Sữa không kem",
+          "150",
+          "4,8",
+          "0,3",
+          "3,6",
+          "130"
+        ],
+        [
+          "Sữa hạnh nhân",
+          "105",
+          "3,1",
+          "0,1",
+          "0,5",
+          "124"
+        ]
+      ],
+      "notes": "6cột/5hàng tổng;headerđậm,unitxuốngdòng trongcùngô;giữmọidấuphẩy,tênSữa không kemnguyênvăn;khôngtựđổi thànhsữa táchkem.",
+      "questions": [
+        {
+          "qid": "VIP27-C3-B10-II-4",
+          "de": "Sữa là nguồn cung cấp protein phong phú (chủ yếu là casein). Bảng dữ liệu dưới đây thể hiện hàm lượng dinh dưỡng (trên 1 đơn vị khối lượng) của một số loại đồ uống từ sữa và thực vật (năng lượng kJ; carbohydrate g; chất béo g; protein g; calcium mg):\n• Sữa nguyên chất: 273; 4,6; 3,7; 3,5; 124.\n• Sữa tách béo: 201; 4,7; 1,8; 3,6; 124.\n• Sữa không kem: 150; 4,8; 0,3; 3,6; 130.\n• Sữa hạnh nhân: 105; 3,1; 0,1; 0,5; 124.",
+          "refs": [
+            {
+              "where": "VIP27-C3-B10-II-4.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "svg": "bang-o-ddh-23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40.svg",
+      "hashSvg": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40",
+      "byteSvg": 88838,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
+      "hashSvgDaSoat": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40",
+      "nguoiSoat": "cau_truc_4"
+    }
+  ],
+  "oldPositive": [
+    {
+      "i": 170,
+      "hashSvg": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Giữ9/F/Fluorine/19 đúngnguồn,khôngđổi19thành18,998;nềnnhạtvàkhungđủ. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+      "hash": "1cff56dd7ec1d21ea72530e629574c2957da373bffd2ce4ebad2c59627d49451",
+      "hashSvgDaSoat": "31456817e20951dc1e50086b911bd0649fad0ca1240967672299ec3fd5c769c5"
+    },
+    {
+      "i": 229,
+      "hashSvg": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Giữ6góctrái/Cđậm/Carbon/12.011 dùngdấuchấm;C/6 dùngđúngglyphdam WOFF2khôngfaux-bold. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+      "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
+      "hashSvgDaSoat": "4107baf31b727d94be44a127be2ba1c5975b1001804cf350d4cb296e0632d9f6"
+    },
+    {
+      "i": 83,
+      "hashSvg": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Đủ6cột5hàng/header2tầngđậm;mọiô273/4,6/3,7/3,5/124;201/4,7/1,8/3,6/124;150/4,8/0,3/3,6/130;105/3,1/0,1/0,5/124 đúngnguồn. GiữkJ/g/mg/dấuphẩy/tênSữa không kem,khôngđổitên. Đốichiếu hashde/dam với2cặpWOFF2app vàđọc pipeline/proofkiểmphông;DDHpath-only/khôngchạm/cắt/tràn,SHA256khớp.",
+      "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
+      "hashSvgDaSoat": "23baec5f5448a1475300e028dedd42ee365a30339ad768725fa49cea9bcaae40"
+    }
+  ],
+  "gioiHan": "Lịch sửfontcũ/khôngduyệthashmới;170regularhashkhôngđổi/giữmetadata-proof."
+}
