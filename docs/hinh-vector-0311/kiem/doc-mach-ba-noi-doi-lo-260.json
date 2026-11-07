@@ -1,0 +1,40 @@
+{
+  "hashNguon": "0222514952c491c9343f2175ce749276ec03c0f4b5758e38bd3da9b6e24cdf01",
+  "questions": [
+    {
+      "qid": "12-KT-C4-D5-I-14",
+      "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X ở hình dưới. Tên gọi của polymer X là",
+      "refs": [
+        {
+          "hash": "0222514952c491c9343f2175ce749276ec03c0f4b5758e38bd3da9b6e24cdf01",
+          "where": "12-KT-C4-D5-I-14.hinh.0.du_lieu",
+          "hashDataUrl": "206d74522d82afc8605b8110dd5d46af9a405334bfe3ef8d4ebd56a9574adbb9"
+        }
+      ]
+    }
+  ],
+  "canvas": [
+    1076,
+    295
+  ],
+  "Ctokens": 6,
+  "CH2": 6,
+  "CH3": 3,
+  "carbonTotal": 15,
+  "explicitH": 3,
+  "CCdouble": 3,
+  "CH3positions": [
+    "up",
+    "down",
+    "up"
+  ],
+  "Hpositions": [
+    "up",
+    "down",
+    "up"
+  ],
+  "freeEnds": 2,
+  "noBracket": true,
+  "noCaption": true,
+  "proof": "cau-truc-mach-ba-noi-doi-ddh-lo-260-soat-doc-lap.json"
+}

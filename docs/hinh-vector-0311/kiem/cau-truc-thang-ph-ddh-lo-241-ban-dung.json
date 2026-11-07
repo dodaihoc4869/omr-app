@@ -3,11 +3,11 @@
     "i": 413,
     "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
     "fileNguon": "anh/493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f.png",
-    "svg": "thang-ph-ddh-e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0.svg",
-    "hashSvg": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0",
-    "byteSvg": 23421,
+    "svg": "thang-ph-ddh-4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a.svg",
+    "hashSvg": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a",
+    "byteSvg": 23509,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,7 @@
       }
     ],
     "ghiChuDung": "14cells14numbers1..14/28tickstems/ONLY10sup-1,-7,-14/[Hsup+](mol/L)/pH/allDDHpath/noextraaxis-ticks-values/shading-printtexture-notdata.",
-    "hashSvgDaSoat": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0",
+    "hashSvgDaSoat": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a",
     "nguoiSoat": "soat_nguon_2"
   }
 ]

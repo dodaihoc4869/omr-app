@@ -1,0 +1,56 @@
+{
+  "metadata": [
+    {
+      "i": 413,
+      "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+      "fileNguon": "anh/493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f.png",
+      "svg": "thang-ph-ddh-e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0.svg",
+      "hashSvg": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0",
+      "byteSvg": 23421,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "questions": [
+        {
+          "qid": "DB-11-B2-D3-II-146",
+          "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+          "refs": [
+            {
+              "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+              "where": "DB-11-B2-D3-II-146.hinh.0.du_lieu",
+              "hashDataUrl": "da87ceac2c9784669bb36eb9145f874780cc5acea84ef79d3172c80e6e516d1f"
+            }
+          ]
+        },
+        {
+          "qid": "DH-11-C1-B2-II-16",
+          "de": "Thang màu pH và nồng độ mol của ion H⁺ trong dung dịch được mô tả ở hình dưới đây:",
+          "refs": [
+            {
+              "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+              "where": "DH-11-C1-B2-II-16.hinh.0.du_lieu",
+              "hashDataUrl": "da87ceac2c9784669bb36eb9145f874780cc5acea84ef79d3172c80e6e516d1f"
+            }
+          ]
+        }
+      ],
+      "ghiChuDung": "14cells14numbers1..14/28tickstems/ONLY10sup-1,-7,-14/[Hsup+](mol/L)/pH/allDDHpath/noextraaxis-ticks-values/shading-printtexture-notdata.",
+      "hashSvgDaSoat": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0",
+      "nguoiSoat": "soat_nguon_2"
+    }
+  ],
+  "proof": [
+    {
+      "i": 413,
+      "hashSvg": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: Tự fresh Chromium exact SVG3x mởFULL; mở lại nativeFULL2x và ba sections4x/texture5x/all2publicrefs.14rects1..14/28tickstems(14top14bottom)/3upper10sup−1,−7,−14/[Hsup+](mol/L)/pH đúng. Palette thứtự/tone7yellowleft-oliveright/8diagonalband/11verticalshade đúng; coi shadingkhôngdata/ticks/particles. Labels-powerbaseline/superscript/gaps rõ, không chạm/cắt/tràn/noextraicons-alias.",
+      "actualSvgReviewed": true,
+      "byteSvg": 23421,
+      "render": "/workspace/scratch/ph413-241-e297f8e1.png",
+      "sourceHash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+      "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
+      "hashSvgDaSoat": "e297f8e1e2a2487b98f45faee3a2e70b572cbaec1596bdcb34da7fba98cd36a0"
+    }
+  ]
+}
