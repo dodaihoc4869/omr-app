@@ -39,7 +39,7 @@ function moTo(dsO: OBang[], opt: { cauNoi?: boolean; giam?: boolean } = {}) {
       }
     },
   })
-  const w = dom.window as unknown as Window & typeof globalThis & { __mcXepTrang: () => void; __mcLenh: (k: string) => void }
+  const w = dom.window as unknown as Window & typeof globalThis & { __mcXepTrang: () => void; __mcLenh: (k: string) => void; __mcTrangThai: () => { lgMo: boolean } }
   const doc = dom.window.document
   const phim = (key: string) => doc.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key, bubbles: true }))
   const tuCha = (data: Record<string, unknown>) => w.dispatchEvent(new dom.window.MessageEvent('message', { data: { maPhien: MA, ...data }, origin: GOC, source: cha as unknown as MessageEventSource }))
@@ -371,5 +371,8 @@ describe('BÌNH PHẢN ỨNG TỰ ĐỘNG (thầy 07/11 «bấm chuyển câu �
     expect(guiLen.at(-1)).toMatchObject({ loai: 'bpu-het', d: 1 })
     phim('p')
     expect(bpu().at(-1)).toMatchObject({ qid: 'DE-I-S3', tuDong: false })
+    // Bảng đang che tờ: phím G trên bảng ⇒ tờ mở lời giải của câu đang chiếu.
+    w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'giai' }, source: w.parent as unknown as MessageEventSource }))
+    expect(w.__mcTrangThai().lgMo).toBe(true)
   })
 })

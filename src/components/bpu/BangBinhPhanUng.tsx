@@ -73,11 +73,13 @@ export interface PropsBang {
   onTat?: () => void
   /** Bảng ⇒ tờ: câu sau (1) / câu trước (-1). Không có (mở từ Điểm danh) ⇒ không hiện «Câu tiếp». */
   onToi?: (d: 1 | -1) => void
+  /** Phím G: đóng bảng, tờ hiện lời giải thu gọn. */
+  onGiai?: () => void
   /** `caPhong` = cả phòng không mở được (ca mở, mất mạng); không = chỉ câu này không gửi được. */
   onKhongMo?: (chu: string, caPhong: boolean) => void
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onKhongMo }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onGiai, onKhongMo }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
   const laDiemDanh = useRef(!qid)
@@ -85,6 +87,9 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   tuDongRef.current = tuDong
   const khongMoRef = useRef(onKhongMo)
   khongMoRef.current = onKhongMo
+  // Điều khiển từ xa (bước «Đang chiếu» trên máy thầy khác): phòng chuyển lệnh tới bảng ⇒ bảng nào nối tờ chiếu thì làm.
+  const dkRef = useRef({ onToi, onGiai })
+  dkRef.current = { onToi, onGiai }
   const [loi, setLoi] = useState<{ chu: string; chan?: boolean } | null>(null)
   const [manPhu, setManPhu] = useState<'dua' | 'vinh-danh' | null>(null)
   const [an, setAn] = useState(false)
@@ -133,7 +138,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       const w = new WebSocket(`${goc0.replace(/^http/, 'ws')}/bpu/phong?ve=${encodeURIComponent(String(r.du.ve))}`)
       ws.current = w
       w.onopen = () => { lan = 0; w.send('{"t":"chao"}'); clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000) }
-      w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') { daCoTin = true; setV(m as unknown as ViewBang) } } catch { /* bỏ qua */ } }
+      w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') { daCoTin = true; setV(m as unknown as ViewBang) } else if (m.t === 'dk') { const l = (m as { lenh?: string }).lenh, d = dkRef.current; if (l === 'toi') d.onToi?.(1); else if (l === 'lui') d.onToi?.(-1); else if (l === 'giai') d.onGiai?.() } } catch { /* bỏ qua */ } }
       w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (dung) return; if (laDiemDanh.current && !daCoTin && lan >= 2) { onTat?.(); return } hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     }
@@ -288,6 +293,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       const kk = e.key.toLowerCase()
       if (e.key === 'Escape') { e.preventDefault(); if (moPhim) setMoPhim(false); else if (manPhu) setManPhu(null); else onDong(); return }
       if (e.key === '?') { setMoPhim((m) => !m); return }
+      if (kk === 'g' && onGiai) { e.preventDefault(); onGiai(); return }
       // CHUYỂN CÂU (thầy 07/11 «tôi chỉ việc chiếu lên bảng rồi bấm chuyển câu»): tờ sang câu ⇒ tự gửi câu mới; lượt cũ chưa mở đáp án ⇒ máy chủ tự chốt.
       if ((e.key === 'ArrowRight' || e.key === 'PageDown') && onToi) { e.preventDefault(); onToi(1); return }
       if ((e.key === 'ArrowLeft' || e.key === 'PageUp') && onToi) { e.preventDefault(); onToi(-1); return }
@@ -305,7 +311,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     }
     window.addEventListener('keydown', phim, true)
     return () => window.removeEventListener('keydown', phim, true)
-  }, [man, manPhu, moPhim, gui, goiLen, onDong, onToi, l?.goi, yeu])
+  }, [man, manPhu, moPhim, gui, goiLen, onDong, onToi, onGiai, l?.goi, yeu])
 
   const q = (l?.cau ?? null) as unknown as Question | null
   const ten = (e: Em | undefined) => (!e ? '' : an ? `Em số ${ds.indexOf(e) + 1}` : tenNgan(e.ten))
@@ -325,8 +331,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const o = hien.map((e) => {
     const lop = ['bb-o']
     if (!e.vao) lop.push('chua-vao')
-    if (man === 'tra-loi' && chuaBietS.has(e.sbd)) lop.push('chua-biet')
-    else if (man === 'tra-loi' && daGui.has(e.sbd)) lop.push('da-tra')
+    // TẾ NHỊ TRƯỚC LỚP (luật cứng của thầy): ô em «chưa biết làm» trông như «đã gửi»; bảng chỉ hiện CON SỐ.
+    if (man === 'tra-loi' && daGui.has(e.sbd)) lop.push('da-tra')
     if (man !== 'diem-danh' && man !== 'vinh-danh' && e.chuoi >= 2) lop.push('chay')
     if ((man === 'tra-loi' || man === 'goi' || man === 'lam-bang') && l?.roiMe.includes(e.sbd)) lop.push('roi')
     if (ung?.ds.includes(e.sbd)) lop.push(ung.soi === e.sbd ? 'soi' : 'ung')
@@ -440,7 +446,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         {phim(man === 'mo' ? [...TIEP, ['K', 'Đua ngọn lửa'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
           : man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
           : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : [['Space', 'Gọi lên bảng ngay', true], ['M', l.tuLuan ? 'Hiện lời giải' : 'Mở đáp án ngay'], ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
+          : [['Space', 'Gọi lên bảng ngay', true], ['M', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(onGiai ? [['G', 'Lời giải thu gọn trên tờ'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
         'Tự động: hết giờ hoặc cả lớp gửi xong ⇒ gọi một em lên bảng. Chuyển câu khi chưa mở đáp án ⇒ máy tự chấm câu cũ.')}
       </>
     )

@@ -14,14 +14,14 @@ afterEach(async () => { (await import('../src/components/bpu/gan-gv')).dongBang(
 describe('mở bảng từ tờ chiếu', () => {
   it('buổi mở 6 giờ trước ⇒ tin tự động KHÔNG mở bảng, không báo; buổi mới ⇒ mở với câu + giây', async () => {
     vi.resetModules()
-    const m = await import('../src/components/bpu/gan-gv')
+    const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(0)
     buoi.ds = [{ id: 'cu', moLuc: gio(6) }]
     await m.moBangTuToChieu('q1', { tuDong: true, giay: 120 })
     await new Promise((r) => setTimeout(r, 20))
     expect(document.querySelector('[data-bang]')).toBeNull()
     expect(toast).not.toHaveBeenCalled()
     vi.resetModules()
-    const m2 = await import('../src/components/bpu/gan-gv')
+    const m2 = await import('../src/components/bpu/gan-gv'); m2.datChoTuDong(0)
     buoi.ds = [{ id: 'moi', moLuc: gio(1) }, { id: 'cu', moLuc: gio(6) }]
     await m2.moBangTuToChieu('q2', { tuDong: true, giay: 120 })
     await new Promise((r) => setTimeout(r, 20))
@@ -33,7 +33,7 @@ describe('mở bảng từ tờ chiếu', () => {
   })
   it('buổi mở quá 4 giờ nhưng máy này đang xem hôm nay (bước Điểm danh) ⇒ vẫn tự mở', async () => {
     vi.resetModules()
-    const m = await import('../src/components/bpu/gan-gv')
+    const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(0)
     localStorage.setItem('ddh.gv.buoi-xem', JSON.stringify({ id: 'sang', n: new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10) }))
     buoi.ds = [{ id: 'sang', moLuc: gio(5) }]
     await m.moBangTuToChieu('q3', { tuDong: true })
@@ -41,9 +41,20 @@ describe('mở bảng từ tờ chiếu', () => {
     expect(document.querySelector('[data-bang]')?.getAttribute('data-bang')).toBe('sang')
     localStorage.removeItem('ddh.gv.buoi-xem')
   })
+  it('lật nhanh: tin tự động mới huỷ tin đang chờ ⇒ chỉ mở MỘT lượt cho câu cuối', async () => {
+    vi.resetModules()
+    const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(40)
+    buoi.ds = [{ id: 'moi', moLuc: gio(1) }]
+    void m.moBangTuToChieu('q1', { tuDong: true }); void m.moBangTuToChieu('q2', { tuDong: true })
+    await m.moBangTuToChieu('q3', { tuDong: true })
+    await new Promise((r) => setTimeout(r, 20))
+    expect(document.querySelectorAll('[data-bang]')).toHaveLength(1)
+    expect(document.querySelector('[data-bang]')!.getAttribute('data-qid')).toBe('q3')
+    m.dongBang()
+  })
   it('không có buổi: tin tự động im lặng; bấm P thì báo thầy mở điểm danh', async () => {
     vi.resetModules()
-    const m = await import('../src/components/bpu/gan-gv')
+    const m = await import('../src/components/bpu/gan-gv'); m.datChoTuDong(0)
     buoi.ds = []
     await m.moBangTuToChieu('q1', { tuDong: true })
     expect(toast).not.toHaveBeenCalled()

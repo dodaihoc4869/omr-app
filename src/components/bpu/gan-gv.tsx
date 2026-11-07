@@ -41,7 +41,19 @@ async function layBuoi(tuDong: boolean): Promise<string | null> {
   return id
 }
 
-export async function moBangTuToChieu(qid: string, o: { giay?: number; tuDong?: boolean; nguon?: Window | null } = {}): Promise<void> {
+/** Tin TỰ ĐỘNG chờ ngần này rồi mới mở lượt; tin mới hơn huỷ tin đang chờ ⇒ mở lại tờ / lật nhanh qua nhiều câu KHÔNG đẻ lượt rỗng (cố vấn 07/11). */
+let choTuDongMs = 1500
+let henTu: ReturnType<typeof setTimeout> | null = null
+/** Cho test: đổi thời gian chờ. */
+export function datChoTuDong(ms: number): void { choTuDongMs = ms }
+type TuyChonMo = { giay?: number; tuDong?: boolean; nguon?: Window | null }
+export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
+  if (o.tuDong !== true) return moThat(qid, o)
+  if (o.nguon) nguonTo = o.nguon
+  if (henTu) clearTimeout(henTu)
+  return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, choTuDongMs) })
+}
+async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true
   if (tuDong && Date.now() < nghiDen) return
   const buoiId = await layBuoi(tuDong)
@@ -56,10 +68,18 @@ export async function moBangTuToChieu(qid: string, o: { giay?: number; tuDong?: 
       buoiId={buoiId} qid={qid} luot={dem} giay={o.giay} tuDong={tuDong}
       onDong={dongBang}
       onToi={toiCau}
+      onGiai={giaiTrenTo}
       onKhongMo={khongMo}
       onTat={() => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }}
     />,
   )
+  // Màn Hành trình (bước «Chọn câu & chiếu») nghe để sang bước «Đang chiếu».
+  try { window.dispatchEvent(new CustomEvent('bpu-dang-chieu', { detail: { buoiId } })) } catch { /* trình duyệt cũ */ }
+}
+/** Phím G trên bảng: đóng bảng, tờ mở lời giải thu gọn của câu đang chiếu (bảng che tờ nên phím không tới được tờ). */
+export function giaiTrenTo(): void {
+  dongBang()
+  try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'giai' }, '*'); nguonTo?.focus() } catch { /* tờ đã đóng */ }
 }
 /** Bảng ⇒ tờ: sang câu sau (d = 1) / câu trước (d = -1). */
 export function toiCau(d: 1 | -1): void {

@@ -177,3 +177,19 @@ describe('«Em chưa biết làm» (thầy 07/11 «để học sinh thành thậ
     expect(st.luot!.ketQua!.S1).toMatchObject({ dung: false, soY: 0, kj: KJ.thanhThat })
   })
 })
+
+describe('lượt rỗng (thầy lật nhanh qua câu)', () => {
+  it('mở đáp án lượt không ai gửi: không đụng chuỗi, không vào tổng kết; chuyển câu khi lượt rỗng ⇒ không đánh số mới', async () => {
+    const { boLuotRong } = await import('../src/lib/bpu/phong')
+    const st = phong(); moLuot(st, cauTN, T0)
+    nhanTra(st, 'S1', 'B', T0 + 1000); moDapAn(st, T0 + 2000, chamSo)
+    expect(st.ds[0]!.chuoi).toBe(1)
+    moLuot(st, cauTN, T0 + 3000)
+    expect(boLuotRong(st)).toBe(true)
+    expect(st.soLuot).toBe(1)
+    moLuot(st, cauTN, T0 + 4000)
+    moDapAn(st, T0 + 5000, chamSo)
+    expect(st.ds[0]!.chuoi).toBe(1)
+    expect(st.lichSu).toHaveLength(1)
+  })
+})

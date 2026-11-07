@@ -163,6 +163,14 @@ export function vaoLop(st: TrangThaiPhong, sbd: string, nay: number, ten?: strin
   return true
 }
 
+/** Lượt đang mở mà CHƯA em nào gửi, chưa gọi ai ⇒ bỏ (không đánh số mới cho câu kế tiếp). Trả true nếu đã bỏ. */
+export function boLuotRong(st: TrangThaiPhong): boolean {
+  const l = st.luot
+  if (!l || l.pha === 'mo' || l.goi || Object.keys(l.tra).length) return false
+  st.luot = null
+  st.soLuot = Math.max(0, st.soLuot - 1)
+  return true
+}
 export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLuan: boolean; cau: Record<string, unknown>; dung: string; hanGiay: number | null }, nay: number): LuotPhong {
   // Lượt đầu mà lớp có mặt dưới 12 em ⇒ hai đội (linh hoạt theo số em thật sự có mặt; từ lượt hai đội đã chốt, không đổi giữa buổi).
   if (st.soLuot === 0 && st.ds.filter((e) => e.vao).length < IT_EM_HAI_DOI) gopHaiDoi(st)
@@ -260,6 +268,8 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
   const l = st.luot
   if (!l || l.pha === 'mo') return false
   l.pha = 'mo'
+  // LƯỢT RỖNG (không em nào gửi — thầy lật qua câu): không đụng chuỗi đúng của ai, không ghi vào tổng kết (tỉ lệ đúng, «lượt khó nhất»).
+  if (!Object.keys(l.tra).length && !l.goi) { l.ketQua = {}; st.capNhat = nay; return true }
   const kq: Record<string, KetQuaEm> = {}
   const dungTheoGio = Object.entries(l.tra).filter(([, t]) => !t.kb && chamTra(l, t.chon, chamSo).dung).sort((a, b) => a[1].t - b[1].t).map(([s]) => s)
   const thoiLuong = l.han != null ? l.han - l.batDau : 60_000

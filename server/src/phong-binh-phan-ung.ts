@@ -62,6 +62,28 @@ async function goiPhong(env: Env, buoiId: string, duong: string, than: unknown):
   return (await r.json().catch(() => ({ ok: false, error: 'Phòng không trả lời.' }))) as Row
 }
 
+// ── TIẾN TRÌNH BUỔI DẠY (thầy 07/11 «load lại phải giữ nguyên, đồng bộ mọi thiết bị cho đến khi tôi bấm kết thúc buổi học») ──
+// Bước đang mở + hoạt động thầy chọn của buổi, lưu trong storage của CHÍNH phòng buổi (không bảng D1 mới, không vòng chờ D1). Mỗi máy thầy đọc kèm
+// nhịp `xem` 5 giây (song song với các lệnh D1 của `xem`). Ghi sau thắng ghi trước theo `luc` của máy ghi.
+export interface TienTrinhBuoi { buoc: number; hoatDong: string; luc: number }
+const HOAT_DONG = new Set(['', 'dau-gio', 'day-hoc', 'chua-cau'])
+export function chuanTienTrinh(v: unknown): TienTrinhBuoi | null {
+  const x = (v ?? null) as Row | null
+  if (!x || typeof x !== 'object') return null
+  const buoc = Math.round(Number(x.buoc)), luc = Math.round(Number(x.luc)), hoatDong = str(x.hoatDong)
+  if (!(buoc >= 1 && buoc <= 4) || !Number.isFinite(luc) || luc <= 0 || !HOAT_DONG.has(hoatDong)) return null
+  return { buoc, hoatDong, luc }
+}
+export async function docTienTrinh(env: Env, buoiId: string): Promise<TienTrinhBuoi | null> {
+  if (!env.PHONG_BPU || !buoiHop(buoiId)) return null
+  try { const r = await goiPhong(env, buoiHop(buoiId)!, '/tt-doc', {}); return chuanTienTrinh(r.tt) } catch { return null }
+}
+export async function ghiTienTrinh(env: Env, buoiId: string, tt: unknown): Promise<TienTrinhBuoi | null> {
+  const t = chuanTienTrinh(tt)
+  if (!env.PHONG_BPU || !buoiHop(buoiId) || !t) return null
+  try { const r = await goiPhong(env, buoiHop(buoiId)!, '/tt-ghi', { tt: t }); return chuanTienTrinh(r.tt) } catch { return null }
+}
+
 // ── Lệnh Worker ──
 /** `POST /gv/bpu/mo { buoiId }` (sau chốt mã bí mật): dựng / cập nhật phòng của buổi từ danh sách lớp + điểm danh (MỘT batch D1), chặn khi lớp có ca kiểm tra mở. */
 export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> {
@@ -271,6 +293,14 @@ export class PhongBinhPhanUng {
     if (req.method !== 'POST') return json({ ok: false }, 405)
     const b = (await req.json().catch(() => ({}))) as Row
     const nay = Date.now()
+    if (u.pathname === '/tt-doc') return json({ ok: true, tt: (await this.ctx.storage.get('tt')) ?? null })
+    if (u.pathname === '/tt-ghi') {
+      const moi = chuanTienTrinh(b.tt), cu = chuanTienTrinh(await this.ctx.storage.get('tt'))
+      if (!moi) return json({ ok: false })
+      if (cu && cu.luc > moi.luc) return json({ ok: true, tt: cu })
+      await this.ctx.storage.put('tt', moi)
+      return json({ ok: true, tt: moi })
+    }
     if (u.pathname === '/khoi') {
       const ds = (Array.isArray(b.ds) ? b.ds : []) as { sbd: string; ten: string; coMat: boolean; luc: number | null }[]
       let st = await this.doc()
@@ -292,7 +322,7 @@ export class PhongBinhPhanUng {
     }
     if (u.pathname === '/luot') {
       // Thầy chuyển câu khi lượt trước chưa mở đáp án ⇒ chốt lượt trước (chấm, cộng kJ, ghi) rồi mới mở lượt mới — không mất điểm của các em.
-      await this.chotLuot(st, nay)
+      if (!L.boLuotRong(st)) await this.chotLuot(st, nay)
       const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null }, nay)
       await this.luu(); this.phat()
       return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })
@@ -328,6 +358,8 @@ export class PhongBinhPhanUng {
       else if (j.t === 'dat') doi = L.chamLenBang(st, j.v === true, nay)
       else if (j.t === 'mo') { doi = L.moDapAn(st, nay, chamSo); if (doi) await this.xepGhi(st) }
       else if (j.t === 'ket-thuc') { await this.ketThucBuoi(); return }
+      // ĐIỀU KHIỂN TỪ XA (bước «Đang chiếu» trên máy thầy khác — điện thoại): chuyển tới mọi bảng đang mở; bảng nào nối tờ chiếu thì làm.
+      else if (j.t === 'dk' && (j.lenh === 'toi' || j.lenh === 'lui' || j.lenh === 'giai')) { const d = JSON.stringify({ t: 'dk', lenh: j.lenh }); for (const w of this.ctx.getWebSockets('gv')) if (w !== ws) this.gui(w, d); return }
     }
     if (!doi) return
     await this.luu(a.v === 'gv')

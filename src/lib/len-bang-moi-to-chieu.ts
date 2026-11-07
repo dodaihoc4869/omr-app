@@ -1084,6 +1084,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   window.addEventListener('message', function (e) {
     var m = e.data;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
+    if (m.lenh === 'giai') { moLoiGiai(true); return; }
     if (m.lenh === 'toi') { var k = chiSo() + (m.d < 0 ? -1 : 1); if (k < 0 || k >= soDot()) { try { e.source.postMessage({ nguon: 'to-chieu', loai: 'bpu-het', d: m.d < 0 ? -1 : 1 }, '*'); } catch (x) { /* app đã đóng */ } return; } toiDot(k); }
   });
   function lenh(k) {
