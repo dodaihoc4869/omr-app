@@ -18,7 +18,7 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
     expect(mat).toHaveLength(4)
     for (const m of mat) {
       expect(m).toContain("font-family: 'DDH Rounded'")
-      expect(m).toContain('font-display: optional')
+      expect(m).toContain('font-display: block') // SỬA CÓ CHỦ ĐÍCH 08/11: thầy «ép font ddh lên mọi máy mọi trình duyệt» (cũ optional)
       expect(m).toMatch(/unicode-range: U\+/)
       expect(m).toMatch(/url\('\.\/phong-ddh\/ddh-rounded-(de|dam)-(latin|vietnamese)\.woff2'\)/)
     }
@@ -50,7 +50,7 @@ describe('phông riêng ĐĐH Rounded app học sinh 27/10', () => {
   })
 
   it('chỉ app học sinh dùng; --sans/--serif/--tp-f trỏ DDH Rounded; thân 500 (Đề), chữ chạm / tiêu đề / nút (Đậm), khoảng chữ nhãn đo theo Duolingo', () => {
-    expect(HS).toMatch(/:root\[data-trong='hs'\]\[data-ht2\] \{ --sans: 'DDH Rounded'[^;]*; --serif: 'DDH Rounded'/)
+    expect(HS).toMatch(/:root\[data-trong='hs'\] \{ --sans: 'DDH Rounded'[^;]*; --serif: 'DDH Rounded'/) // SỬA CÓ CHỦ ĐÍCH 08/11: mọi màn HS, không cần data-ht2
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] body { font-weight: 500; }")
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] :is(.ht2-lam-de-chu, .ht2-lam-pa) { font-weight: 500; }") // 06/11: mọi màn làm câu, không riêng .duo
     expect(HS).toContain(":root[data-trong='hs'][data-ht2] .duo .ht2-lam-de-chu { color: var(--tr-chu); }")
