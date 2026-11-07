@@ -37,7 +37,7 @@ export const CAP = [
   ['--tr-sao-chu', '--tr-sao-nhat', 4.5, 'chuỗi ngày / nền vàng nhạt'], ['--tr-sao-chu', '--tr-mat', 4.5, 'số chuỗi / thẻ'],
   ['--tr-hs-chu', '--tr-hs-nhat', 4.5, 'chip / tab đang chọn'],
   ['--tr-hs-tren', '--tr-hs-nut', 3, 'chữ ĐẬM trên nút chính (KIỂM TRA, TIẾP TỤC)'],
-  ['--tr-trang', '--tr-dung-nut', 3, 'chữ đậm trên huy hiệu xanh lá'], ['--tr-trang', '--tr-sai', 3, 'chữ đậm trên nút / huy hiệu đỏ'],
+  ['--tr-trang', '--tr-dung-nut', 2, 'chữ đậm trên huy hiệu xanh lá (07/11 thầy chốt v2 «tươi hết mức»: ngưỡng 2 = ngang xanh lá Duolingo 2,09)'], ['--tr-trang', '--tr-sai', 3, 'chữ đậm trên nút / huy hiệu đỏ'],
   ['--tr-trang', '--tr-tin-chu', 4.5, 'chữ trên nút xanh dương đậm'], ['--tr-trang', '--tr-chu-y-nut', 3, 'chữ đậm trên ô cam'],
 ]
 

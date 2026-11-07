@@ -10,15 +10,15 @@
    Màu chính (--tr-hs, chàm) TÁCH khỏi màu đúng (--tr-dung, lục ngọc): Lộ trình, menu, rương, Bi đọc --tr-hs (khối cuối tệp); nút «Tiếp tục» ở dải đúng đọc
    --tr-dung-nut. --tr-*-day = gờ đáy nút 3D. Tương phản đo bằng scripts/do-tuong-phan-hs.mjs (bảng in ra khi chạy). */
 :root[data-trong='hs'] {
-  --tr-nen: #fafaff; --tr-mat: #ffffff; --tr-mat-2: #f3f3fd; --tr-mat-3: #e1e1f1; --tr-vien: #e6e6f4; --tr-vien-2: #cbcbe3;
-  --tr-chu: #1b1938; --tr-chu-2: #454367; --tr-chu-3: #5a587d; --tr-trang: #ffffff;
-  --tr-dung: #00d396; --tr-dung-nhat: #c5ffe8; --tr-dung-chu: #007c58; --tr-dung-nut: #00a87b; --tr-dung-day: #008d66;
-  --tr-sai: #fb327b; --tr-sai-nhat: #fddfe9; --tr-sai-chu: #c70b5b; --tr-sai-day: #e5266d;
+  --tr-nen: #ffffff; --tr-mat: #ffffff; --tr-mat-2: #f3f3fd; --tr-mat-3: #e1e1f1; --tr-vien: #d9d9e5; --tr-vien-2: #c6c6d4;
+  --tr-chu: #1b1938; --tr-chu-2: #3a385e; --tr-chu-3: #4f4d75; --tr-trang: #ffffff;
+  --tr-dung: #00d396; --tr-dung-nhat: #c2ffdd; --tr-dung-chu: #007c58; --tr-dung-nut: #00c993; --tr-dung-day: #009e73;
+  --tr-sai: #f90072; --tr-sai-nhat: #ffe3e7; --tr-sai-chu: #c70b5b; --tr-sai-day: #c60059;
   --tr-chu-y: #ff8c51; --tr-chu-y-nhat: #ffeee0; --tr-chu-y-chu: #b24f19; --tr-chu-y-nut: #f06b27; --tr-chu-y-day: #ce6837;
-  --tr-tin: #00bed8; --tr-tin-nhat: #dbf5fa; --tr-tin-chu: #007889; --tr-tin-day: #009eb5;
-  --tr-sao: #ffbf35; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-sao-day: #e3a605;
-  --tr-tim: #fc67d3; --tr-tim-day: #c851a8; --tr-tim-chu: #b33d95;
-  --tr-hs: #8f9bff; --tr-hs-nut: #767eff; --tr-hs-day: #5a5ae9; --tr-hs-nhat: #eeeeff; --tr-hs-chu: #565bbd; --tr-hs-tren: #ffffff;
+  --tr-tin: #00dffe; --tr-tin-nhat: #dbf5fa; --tr-tin-chu: #007889; --tr-tin-day: #009eb5;
+  --tr-sao: #feba00; --tr-sao-nhat: #fff5d4; --tr-sao-chu: #956400; --tr-sao-day: #e3a605;
+  --tr-tim: #ff3fd0; --tr-tim-day: #c851a8; --tr-tim-chu: #b33d95;
+  --tr-hs: #6c71ff; --tr-hs-nut: #584dff; --tr-hs-day: #584dff; --tr-hs-go: #3f00dc; --tr-hs-nhat: #e6eaff; --tr-hs-chu: #565bbd; --tr-hs-tren: #ffffff;
   --tr-nguyen-tu: #00bed8; --tr-nguyen-tu-so: #009eb5;
   --tr-phu: rgba(75, 75, 75, 0.5);
   --tr-bong-1: 0 2px 0 #e2e2f0; --tr-bong-2: 0 4px 0 #e2e2f0; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.1);
@@ -29,21 +29,21 @@
    chữ nền tối trên mặt tô không kém cặp Duolingo tối cùng vai. Sắc giữ bộ B. */
 @media (prefers-color-scheme: dark) {
   :root[data-trong='hs'] {
-    --tr-nen: #1a1a29; --tr-mat: #262738; --tr-mat-2: #2c2d40; --tr-mat-3: #414157; --tr-vien: #414157; --tr-vien-2: #52536a;
-    --tr-chu: #f1f0ff; --tr-chu-2: #cdceeb; --tr-chu-3: #acaece; --tr-trang: #1a1a29;
+    --tr-nen: #1a1a29; --tr-mat: #262738; --tr-mat-2: #2c2d40; --tr-mat-3: #414157; --tr-vien: #414157; --tr-vien-2: #24243a;
+    --tr-chu: #f1f0ff; --tr-chu-2: #dcdcf5; --tr-chu-3: #bfc0dd; --tr-trang: #1a1a29;
     --tr-dung: #00d497; --tr-dung-nhat: #18382a; --tr-dung-chu: #00df9f; --tr-dung-nut: #00d497; --tr-dung-day: #00aa76;
     --tr-sai: #f7498f; --tr-sai-nhat: #43272f; --tr-sai-chu: #ff9bba; --tr-sai-day: #cc146f;
     --tr-chu-y: #ff9447; --tr-chu-y-nhat: #422a1a; --tr-chu-y-chu: #ffa569; --tr-chu-y-nut: #ff9447; --tr-chu-y-day: #de6a00;
     --tr-tin: #00bfd4; --tr-tin-nhat: #0e373d; --tr-tin-chu: #00d5ed; --tr-tin-day: #0097ab;
     --tr-sao: #ffc735; --tr-sao-nhat: #3b2f14; --tr-sao-chu: #ecb400; --tr-sao-day: #d8a100;
     --tr-tim: #e17beb; --tr-tim-day: #b857c8; --tr-tim-chu: #f592ff;
-    --tr-hs: #a8adff; --tr-hs-nut: #a8adff; --tr-hs-day: #7e80ff; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff; --tr-hs-tren: #1a1a29;
+    --tr-hs: #7772ff; --tr-hs-nut: #7772ff; --tr-hs-day: #7772ff; --tr-hs-go: #3f00dc; --tr-hs-nhat: #2c2e47; --tr-hs-chu: #b1b6ff; --tr-hs-tren: #ffffff;
     --tr-nguyen-tu: #00bfd4; --tr-nguyen-tu-so: #00bfd4;
     --tr-phu: rgba(0, 0, 0, 0.6);
     --tr-bong-1: 0 2px 0 #0e0e1a; --tr-bong-2: 0 4px 0 #0e0e1a; --tr-bong-3: 0 8px 0 rgba(0, 0, 0, 0.35);
   }
 }
-[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }
+[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-go); } /* 07/11 v2: --tr-hs-day = mặt (tô), gờ 3D = --tr-hs-go sẫm */
 
 /* ── TÁCH MÀU CHÍNH KHỎI MÀU ĐÚNG (bộ B: chàm ≠ lục ngọc; Duolingo dùng chung một xanh lá nên các luật gốc đọc --tr-dung) ──
    Lộ trình: thẻ bài, nút chặng đã xong / đang học, vòng tiến độ, vòng lan, vạch chặng, rương; menu; linh vật Bi ⇒ màu chính. Nguyên tử ⇒ --tr-nguyen-tu.
@@ -81,7 +81,7 @@ html:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-nguy
   --kinh-vien: var(--tr-mat);
   --kinh-vien-2: color-mix(in oklab, var(--tr-vien) 55%, transparent);
   --kinh-mo: blur(22px) saturate(190%) brightness(1.05);
-  --kinh-ve: color-mix(in oklab, var(--tr-mat) 68%, transparent); /* kính đúng bản vẽ v2 (khối lớn Hôm nay) */
+  --kinh-ve: color-mix(in oklab, var(--tr-mat) 94%, transparent); /* kính đúng bản vẽ v2 (khối lớn Hôm nay) */
   --kinh-mo-ve: blur(26px) saturate(200%) brightness(1.06);
   --kinh-bong: inset 0 16px 22px -18px var(--tr-mat), 0 20px 40px -26px color-mix(in oklab, var(--tr-hs-day) 38%, transparent), 0 2px 6px -4px var(--tr-phu);
   --tr-bong-1: 0 1px 2px -1px var(--tr-phu);
@@ -89,16 +89,16 @@ html:root[data-trong='hs'] .da-tren .tp-tr-o[data-k='nt'] { color: var(--tr-nguy
   --tr-bong-3: 0 18px 38px -20px var(--tr-phu);
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-trong='hs'] { --kinh-ve: color-mix(in oklab, var(--tr-mat) 58%, transparent); --kinh-mat: color-mix(in oklab, var(--tr-mat) 72%, transparent); --kinh-mat-dam: color-mix(in oklab, var(--tr-mat) 86%, transparent); --kinh-vien: color-mix(in oklab, var(--tr-chu) 14%, transparent); --kinh-vien-2: color-mix(in oklab, var(--tr-chu) 10%, transparent); }
+  :root[data-trong='hs'] { --kinh-ve: color-mix(in oklab, var(--tr-mat) 94%, transparent); --kinh-mat: color-mix(in oklab, var(--tr-mat) 72%, transparent); --kinh-mat-dam: color-mix(in oklab, var(--tr-mat) 86%, transparent); --kinh-vien: color-mix(in oklab, var(--tr-chu) 14%, transparent); --kinh-vien-2: color-mix(in oklab, var(--tr-chu) 10%, transparent); }
 }
 html.may-yeu:root[data-trong='hs'] { --kinh-ve: var(--tr-mat); --kinh-mo-ve: none; --kinh-mat: var(--tr-mat); --kinh-mat-dam: var(--tr-mat); --kinh-nen: var(--tr-nen); --kinh-mo: none; }
 /* NỀN LOANG (Liquid Glass): lớp cố định sau mọi nội dung — chỉ dải màu CSS, không ảnh; vẽ một lần (không hoạt ảnh) ⇒ máy yếu như nhau. */
-html[data-trong='hs'] body { background-color: var(--tr-nen); }
+html[data-trong='hs'] body { background-color: var(--tr-nen); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 html[data-trong='hs'] { --kinh-loang:
-    radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs) 52%, transparent), transparent 72%),
-    radial-gradient(55% 32% at 98% 22%, color-mix(in oklab, var(--tr-tin) 42%, transparent), transparent 72%),
-    radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 38%, transparent), transparent 72%),
-    radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 26%, transparent), transparent 72%); }
+    radial-gradient(70% 38% at 8% 4%, color-mix(in oklab, var(--tr-hs-nut) 55%, transparent), transparent 72%),
+    radial-gradient(55% 32% at 98% 22%, color-mix(in oklab, var(--tr-tin) 50%, transparent), transparent 72%),
+    radial-gradient(70% 36% at 80% 100%, color-mix(in oklab, var(--tr-tim) 45%, transparent), transparent 72%),
+    radial-gradient(50% 30% at 0% 70%, color-mix(in oklab, var(--tr-sao) 38%, transparent), transparent 72%); }
 html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none; transform: translateZ(0); /* lớp riêng: bấm / đổi câu không vẽ lại nền */
   background: var(--kinh-loang); }
 /* MÀN CON PHỦ KÍN (làm chặng, kiểm tra ôn tập, tự sửa… — khung `fixed inset-0` của cổng): nền ĐẶC + đúng dải loang ⇒ nhìn y như kính, và
@@ -106,14 +106,14 @@ html[data-trong='hs'] body::before { content: ''; position: fixed; inset: 0; z-i
 html[data-trong='hs'] div.fixed.inset-0.overflow-y-auto:not([class*='bg-']) { background-color: var(--tr-nen); background-image: var(--kinh-loang); }
 
 /* HỆ KÍNH: nút chính toàn app học sinh = chàm ĐẬM như bản vẽ (chữ trắng 5,0:1 thay 3,4:1 của chàm nhạt) — mọi màn dùng --tr-chinh-nut đổi theo một lượt */
-:root[data-trong='hs'] { --tr-chinh-nut: var(--tr-hs-day); }
+:root[data-trong='hs'] { --tr-chinh-nut: var(--tr-hs-nut); }
 
 /* ═══ SÁNG + SẮC NÉT (thầy 06/11: «màu app hs sáng hẳn như doligo, vẽ lại vector cho sắc nét, kính long lanh chuẩn apple»).
    Màu: nền gần trắng, chàm đậm (nút chính) / hồng / đỏ tươi hơn (cùng sắc bộ B, độ tươi tới mép gam sRGB); kính trắng trong hơn + bão hoà cao + viền sáng mép trên
    + ánh trong mép trên + bóng nhuốm chàm (đều nằm trong token --kinh-*, không thêm lớp vẽ). BIỂU TƯỢNG lucide nét mặc định 2 ⇒ 2,5 (dày, tròn như
    Duolingo); biểu tượng hình kín (lửa, cúp, huy hiệu, bình…) tô lót 20% cùng màu nét ⇒ khối đặc, sắc. Chỉ đụng nét mặc định / fill="none":
    biểu tượng đã tự đặt nét hay tô đặc giữ nguyên. */
-html[data-trong='hs'] svg.lucide[stroke-width='2'] { stroke-width: 2.5px; }
+html[data-trong='hs'] svg.lucide[stroke-width='2'] { stroke-width: 2.75px; }
 html[data-trong='hs'] :is(.lucide-flame, .lucide-award, .lucide-trophy, .lucide-target, .lucide-sparkles, .lucide-flask-conical)[fill='none'] { fill: color-mix(in oklab, currentColor 20%, transparent); }
 /* KHUNG CỔNG (StudentPortalScreen `min-h-screen bg-slate-50`) tô --slate-50 NGÀ (#f5f4ef, bảng chung tokens.css) che kín nền loang ⇒ cả app xỉn
    (đo 06/11 bằng elementFromPoint: lớp đặc duy nhất giữa thẻ và body). Trong suốt ⇒ thấy nền gần trắng --tr-nen + loang (máy yếu cũng thấy: loang là dải màu tĩnh). */

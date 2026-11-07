@@ -17,7 +17,7 @@ describe('màu tươi app học sinh 27/10', () => {
 
   // 27/10 thầy duyệt bộ màu riêng B «Chất chỉ thị» (sáng bằng Duolingo) — khoá đầy đủ ở tests/mau-chat-chi-thi-hs-2710.test.ts
   it('bảng học sinh là bộ B «Chất chỉ thị» (chàm + lục ngọc), nền tối đêm chàm', () => {
-    expect(bang.sang).toMatchObject({ '--tr-hs-nut': '#767eff', '--tr-dung': '#00d396', '--tr-nen': '#fafaff', '--tr-mat': '#ffffff' }) // 06/11 nền gần trắng (thầy «sáng hẳn»)
+    expect(bang.sang).toMatchObject({ '--tr-hs-nut': '#584dff', '--tr-hs-go': '#3f00dc', '--tr-dung': '#00d396', '--tr-nen': '#ffffff', '--tr-mat': '#ffffff' }) // 07/11 v2 thầy chốt «tươi hết mức»: chàm điện, nền trắng
     expect(bang.toi).toMatchObject({ '--tr-nen': '#1a1a29', '--tr-mat': '#262738', '--tr-chu': '#f1f0ff' })
   })
 
@@ -43,7 +43,7 @@ describe('màu tươi app học sinh 27/10', () => {
     expect(lam).toContain(":root[data-trong='hs'] .duo-nut { box-shadow: inset 0 -4px 0 var(--tr-chinh-day); }")
     expect(lam).toContain(":root[data-trong='hs'] .duo-nut[data-sac=do] { box-shadow: inset 0 -4px 0 var(--tr-sai-day); }")
     expect(hs).toMatch(/:root\[data-trong='hs'\] \.da-nut::before \{ background: var\(--n-d/)
-    expect(mau).toContain("[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-day); }")
+    expect(mau).toContain("[data-trong='hs'] { --tr-chinh-day: var(--tr-hs-go); }")
   })
 
   it('linh vật Bi chuyển động (mảnh cũ) khai tông ở svg; 28/10: CSS vẽ hình Bi bình cầu trong bi.css đã gỡ (Cú Ngọc thay hình)', () => {

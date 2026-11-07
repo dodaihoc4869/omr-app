@@ -1,0 +1,210 @@
+{
+ "ghi_chu": "07/11 thầy «chốt» bản vẽ v2 nút siêu nét (docs/ban-ve-nut-net-0711/DAC-TA.md): khai báo cũ (bóng mờ, mặt kính, màu mặt nút cũ) được phép biến mất đúng n lần — dùng ở scripts/kiem-mau-giu-nguyen.mjs",
+ "bo": [
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong)",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "background: var(--tr-hs-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: 0 18px 32px -16px var(--tr-hs-day), inset 0 1px 0 color-mix(in oklab, var(--tr-mat) 35%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: 0 18px 32px -16px var(--tr-tin-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "background: var(--tr-sai-chu)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: 0 18px 32px -16px var(--tr-sai-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "background: var(--tr-chu-y-chu)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: 0 18px 32px -16px var(--tr-chu-y-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "color: var(--tr-hs-chu)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "background: var(--kinh-mat-dam)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "background: var(--kinh-ve)",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-vien) 60%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-kinh.css",
+   "khai": "box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: transparent",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "border: 0",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: none",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-mat-2)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--kinh-ve)",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-vien-2) 80%, transparent), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--kinh-mat-dam)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2.5px var(--tr-hs-day), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-hs-day)",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "color: var(--tr-hs-tren)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: color-mix(in oklab, var(--tr-dung-nhat) 85%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2.5px var(--tr-dung-nut), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-dung-chu)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: color-mix(in oklab, var(--tr-sai-nhat) 85%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2.5px var(--tr-sai), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: var(--tr-sai-chu)",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: color-mix(in oklab, var(--tr-mat) 45%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 1.5px var(--kinh-vien-2)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: 0 14px 26px -14px var(--tr-hs-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: color-mix(in oklab, var(--tr-dung-nhat) 88%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-dung) 50%, transparent), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "background: color-mix(in oklab, var(--tr-sai-nhat) 90%, transparent)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-sai) 45%, transparent), var(--kinh-bong)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: 0 14px 26px -14px var(--tr-dung-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: 0 14px 26px -14px var(--tr-sai-day)",
+   "n": 2
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: 0 14px 26px -14px var(--tr-tin-day)",
+   "n": 1
+  },
+  {
+   "tep": "src/styles/trong-lam-bai.css",
+   "khai": "box-shadow: inset 0 0 0 1.5px var(--tr-sao), 0 10px 22px -14px var(--tr-phu)",
+   "n": 1
+  }
+ ]
+}

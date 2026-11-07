@@ -17,7 +17,7 @@ describe('manifest app học sinh: toàn màn, màu nền đúng app', () => {
     expect(m.start_url).toBe('./hs')
   })
   it('theme_color / background_color = nền sáng app học sinh (--tr-nen), không còn trắng lệch nền', () => {
-    expect(nenSang).toBe('#fafaff') // 06/11 thầy «sáng hẳn»: nền gần trắng
+    expect(nenSang).toBe('#ffffff') // 07/11 v2 thầy chốt: nền trắng hẳn
     expect(m.theme_color).toBe(nenSang)
     expect(m.background_color).toBe(nenSang)
   })
@@ -38,7 +38,7 @@ describe('index.html: tràn vùng tai thỏ + thanh trạng thái cùng màu n�
     expect(nenToi).toBe('#1a1a29')
     const sang = html.indexOf(`media="(prefers-color-scheme: light)" content="${nenSang}"`)
     const toi = html.indexOf(`media="(prefers-color-scheme: dark)" content="${nenToi}"`)
-    const chung = html.indexOf('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"')
+    const chung = html.indexOf('<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />') // thẻ chung tĩnh (07/11: nền HS cũng #ffffff ⇒ so đúng thẻ tĩnh)
     expect(sang).toBeGreaterThan(0)
     expect(toi).toBeGreaterThan(0)
     expect(sang).toBeLessThan(chung)

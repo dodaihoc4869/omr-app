@@ -67,15 +67,20 @@ const SAC_B: Record<Che, Record<string, string>> = {
 // họ «sai» nền sáng xoay −8,7° (giữ sắc B 14,8° thì ΔE00 với #ff4b4b chỉ 8,7); mọi màu khác lệch sắc ≤ 1°
 const LECH_SAC: Record<string, number> = { 'sang:sai': -8.7, 'sang:sai-day': -8.7 }
 const lechSac = (a: number, b: number) => ((a - b + 540) % 360) - 180
+// 07/11 thầy CHỐT bản vẽ v2 (docs/ban-ve-nut-net-0711) «tươi hết mức có thể»: các màu tô dưới đây BỎ luật «L ±0,03 Duolingo», thay bằng
+// «giữ sắc B và độ tươi ≥ 97 % trần gam sRGB ở đúng L ấy» (màu tươi nhất màn hình vẽ được); ngưỡng chữ trên nút theo bản vẽ (mục 5 đặc tả).
+const V2: Record<Che, Set<string>> = { sang: new Set(['hs', 'hs-nut', 'hs-day', 'dung-nut', 'dung-day', 'sai', 'sai-day', 'tin', 'sao', 'tim']), toi: new Set(['hs', 'hs-nut']) }
+const NGUONG_V2: Record<string, number> = { 'sang:dung-nut': 2, 'toi:hs-nut': 3 }
 
 describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10)', () => {
   it.each(['sang', 'toi'] as const)('màu tô giữ sắc B, L ±0,03 và C ≥ 90 %% Duolingo (hoặc chạm trần gam) — %s', (che) => {
     const sai: string[] = []
     for (const [k, duo] of Object.entries(DUO[che])) {
       const moi = bang[che][`--tr-${k}`]!, d = oklch(duo), m = oklch(moi), b = oklch(SAC_B[che][k]!)
-      if (Math.abs(m.L - d.L) > 0.03 + 1e-3) sai.push(`${k} L ${m.L.toFixed(3)} vs ${d.L.toFixed(3)}`)
+      if (V2[che].has(k)) { if (m.C < 0.97 * tranGam(m.L, m.h)) sai.push(`${k} v2 C ${m.C.toFixed(3)} < 97 % trần gam ${tranGam(m.L, m.h).toFixed(3)}`) }
+      else if (Math.abs(m.L - d.L) > 0.03 + 1e-3) sai.push(`${k} L ${m.L.toFixed(3)} vs ${d.L.toFixed(3)}`)
       if (Math.abs(lechSac(m.h, b.h) - (LECH_SAC[`${che}:${k}`] ?? 0)) > 1.2) sai.push(`${k} sắc ${m.h.toFixed(1)} vs B ${b.h.toFixed(1)}`)
-      if (m.C < Math.min(0.9 * d.C, 0.97 * tranGam(m.L, m.h))) sai.push(`${k} C ${m.C.toFixed(3)} < ${(0.9 * d.C).toFixed(3)} (trần gam ${tranGam(m.L, m.h).toFixed(3)})`)
+      if (!V2[che].has(k) && m.C < Math.min(0.9 * d.C, 0.97 * tranGam(m.L, m.h))) sai.push(`${k} C ${m.C.toFixed(3)} < ${(0.9 * d.C).toFixed(3)} (trần gam ${tranGam(m.L, m.h).toFixed(3)})`)
     }
     expect(sai).toEqual([])
   })
@@ -89,7 +94,10 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
     expect(Math.abs(L('nen') - 0.225)).toBeLessThanOrEqual(0.01)
     expect(Math.abs(L('mat') - 0.28)).toBeLessThanOrEqual(0.01)
     expect(Math.abs(L('vien') - 0.385)).toBeLessThanOrEqual(0.01)
-    for (const [mat, day] of [['hs', 'hs-day'], ['dung', 'dung-day'], ['sai', 'sai-day'], ['chu-y', 'chu-y-day'], ['tin', 'tin-day'], ['sao', 'sao-day'], ['tim', 'tim-day']]) {
+    // v2: --tr-hs-day = mặt tô, gờ 3D chàm = --tr-hs-go (sẫm hơn ≥ 0,1 cùng họ)
+    expect(L('hs') - L('hs-go')).toBeGreaterThanOrEqual(0.1)
+    expect(Math.abs(lechSac(oklch(t['--tr-hs']!).h, oklch(t['--tr-hs-go']!).h))).toBeLessThanOrEqual(6)
+    for (const [mat, day] of [['dung', 'dung-day'], ['sai', 'sai-day'], ['chu-y', 'chu-y-day'], ['tin', 'tin-day'], ['sao', 'sao-day'], ['tim', 'tim-day']]) {
       expect(Math.abs(L(mat!) - L(day!) - 0.116), `${mat}/${day}`).toBeLessThanOrEqual(0.012)
       expect(Math.abs(lechSac(oklch(t[`--tr-${mat}`]!).h, oklch(t[`--tr-${day}`]!).h)), `${mat}/${day} cùng họ`).toBeLessThanOrEqual(6)
       expect(L(mat!), `${mat} sáng như bản sáng`).toBeGreaterThanOrEqual(0.64)
@@ -101,7 +109,8 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
   it.each(['sang', 'toi'] as const)('chữ trên nút không kém cặp Duolingo cũ; chữ màu ≥ 4,5 trên thẻ và nền nhạt — %s', (che) => {
     const t = bang[che], tren = t['--tr-hs-tren']!, trenDuo = che === 'sang' ? '#ffffff' : '#131f24'
     const ks = che === 'sang' ? ['hs-nut', 'dung-nut', 'sai', 'sai-day', 'chu-y-nut', 'tin-day', 'tim'] : ['hs-nut', 'dung-nut', 'sai', 'chu-y-nut', 'tin', 'sao', 'tim']
-    for (const k of ks) expect(tuongPhan(tren, t[`--tr-${k}`]!), k).toBeGreaterThanOrEqual(tuongPhan(trenDuo, DUO[che][k]!) - 1e-9)
+    // 07/11 v2: chữ trên nút chàm = --tr-hs-tren (tối nay TRẮNG trên chàm điện), nút khác = --tr-trang (như cũ)
+    for (const k of ks) expect(tuongPhan(k === 'hs-nut' ? tren : t['--tr-trang']!, t[`--tr-${k}`]!), k).toBeGreaterThanOrEqual(NGUONG_V2[`${che}:${k}`] ?? tuongPhan(trenDuo, DUO[che][k]!) - 1e-9)
     for (const k of ['hs', 'dung', 'sai', 'chu-y', 'tin', 'sao']) {
       expect(tuongPhan(t[`--tr-${k}-chu`]!, t['--tr-mat']!), `${k}-chu/mat`).toBeGreaterThanOrEqual(4.5)
       expect(tuongPhan(t[`--tr-${k}-chu`]!, t[`--tr-${k}-nhat`]!), `${k}-chu/nhat`).toBeGreaterThanOrEqual(4.5)
