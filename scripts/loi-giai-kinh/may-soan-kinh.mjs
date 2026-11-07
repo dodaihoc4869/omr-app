@@ -35,14 +35,17 @@ const MODEL = lay('--model', '')
 const BO = lay('--bo', '')
 const THU_MUC_LAM = process.env.OMR_THU_MUC_LAM || path.join(GOC, '.may-soan-kinh')
 const SECRET = (process.env.OMR_MA_BI_MAT || '').trim()
-if (!SECRET) { console.error('Thiếu biến OMR_MA_BI_MAT.'); process.exit(2) }
+// Phiên đám mây: bộ giữ khoá của môi trường tự gắn mã vào đầu `x-omr-secret` (không để mã trong biến) ⇒ OMR_MA_QUA_PROXY=1.
+const QUA_PROXY = process.env.OMR_MA_QUA_PROXY === '1'
+if (!SECRET && !QUA_PROXY) { console.error('Thiếu biến OMR_MA_BI_MAT (hoặc OMR_MA_QUA_PROXY=1).'); process.exit(2) }
+const DAU_MA = SECRET ? { 'x-ma-bi-mat': SECRET } : {}
 
 const ngu = (ms) => new Promise((r) => setTimeout(r, ms))
 const gio = () => new Date().toLocaleTimeString('vi-VN', { hour12: false, timeZone: 'Asia/Ho_Chi_Minh' })
 const docJson = (f) => { try { return JSON.parse(fs.readFileSync(f, 'utf8')) } catch { return null } }
 async function goi(duong, body, lan = 0) {
   try {
-    const r = await fetch(`${MAY_CHU}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ma-bi-mat': SECRET }, body: JSON.stringify(body), signal: AbortSignal.timeout(120_000) })
+    const r = await fetch(`${MAY_CHU}${duong}`, { method: 'POST', headers: { 'content-type': 'application/json', ...DAU_MA }, body: JSON.stringify(body), signal: AbortSignal.timeout(120_000) })
     const j = await r.json().catch(() => ({ ok: false, error: `máy chủ trả ${r.status}` }))
     if (r.status >= 500 && lan < 4) { await ngu(3000 * 2 ** lan); return goi(duong, body, lan + 1) }
     return j
@@ -83,6 +86,27 @@ function chonMuc(v, toiDa = 6) {
   }).filter((x) => x.d > 0).sort((a, b) => b.d - a.d)
   return diem.slice(0, toiDa).map((x) => x.m)
 }
+
+// ---------------------------------------------------------------- skill ĐỒNG PHÂN của thầy (08/11 «từ giờ phần đồng phân phải qua skill này»)
+const SKILL_DP = fs.readFileSync(path.join(GOC, 'docs/skill-dong-phan-thay/SKILL.md'), 'utf8')
+const RE_DP = /đồng phân|công thức cấu tạo|cis|trans|hình học|nhổ răng/i
+const MUC_DP = { id: 'MDP0811', bai: 'SKILL ĐỒNG PHÂN CỦA THẦY (08/11/2026)', ten: 'Viết và đếm đồng phân: tính K rồi lập mạch đại số',
+  buoc: ['Tính K = (2C + 2 + N − H − X) / 2; đếm O trước để biết mấy nhóm chức; tách K gốc + K chức.', 'Lập mạch đại số: viết phép tính trước, vẽ hình sau (số đầu mạch chính, số sau nhánh).',
+    'Giải mã từng mạch thành khung C, điền răng giả / nối đôi từng vị trí; vị trí đối xứng chỉ tính một; C quá 4 gạch thì không điền được.',
+    'Đếm cấu tạo xong mới xét hình học: tách nối đôi, mỗi đầu gắn hai nhóm khác nhau thì cộng thêm 1.', 'Phần cố định (COO, N, vòng benzen): chia C còn lại, mỗi dòng nhân số gốc.'],
+  meo: 'Thầy đã số hoá phần đồng phân thành toán học.',
+  nham: 'Đếm hai vị trí đối xứng thành hai chất; quên một mạch đại số; điền làm C 5 gạch; cộng cả cis lẫn trans vào công thức gốc (chỉ cộng 1); cho nối ba có hình học; đếm enol hoặc hai OH một C; đề hỏi cấu tạo mà cộng hình học.',
+  noi: ['Bước 1 các em tính gì ra? Tính K. Bước 2 là sử dụng mạch đại số', 'Thầy đã số hoá phần đồng phân thành toán học', 'Trong hoá hữu cơ, đối xứng dịch ra là giống nhau',
+    'Để lại cái lợi để còn cắm răng giả', 'Nhổ hai răng thật, cắm hai răng giả', 'Chỗ này với chỗ này làm sao giống nhau?', 'Hai đầu này khác nhau chưa?', 'Trùng chưa?'] }
+const laCauDongPhan = (v) => RE_DP.test([v.deTho || v.de, ...(v.y || []).map((y) => y.t), JSON.stringify(v.banHienTai?.cotLoi ?? '')].join(' '))
+const DONG_PHAN_MJS = `// node dong-phan.mjs ra/<tên>.json — liệt kê mọi vị trí của từng mạch (chất mới / trùng / thừa hoá trị) và tổng máy tính lại cho khối dongPhan.
+import fs from 'node:fs'
+import { banTinDongPhan } from './kiem-kinh.bundle.mjs'
+const f = process.argv[2]
+if (!f) { console.log('Dùng: node dong-phan.mjs ra/<tên>.json'); process.exit(1) }
+let x; try { x = JSON.parse(fs.readFileSync(f, 'utf8')) } catch (e) { console.log('Không đọc được ' + f + ': ' + e.message); process.exit(1) }
+console.log(banTinDongPhan(x.dongPhan ?? x))
+`
 
 // ---------------------------------------------------------------- dựng lô
 const BO_KIEM_LO = `import fs from 'node:fs'
@@ -139,6 +163,7 @@ function dungLo(lo, luong, cheDo = 'soan') {
     }).filter(Boolean)
     const { banHienTai, ...vao } = { ...v, hinh }
     const muc = chonMuc(v)
+    if (laCauDongPhan(v)) muc.unshift(MUC_DP)
     fs.writeFileSync(path.join(dir, 'vao', ten), JSON.stringify(vao, null, 1))
     if (banHienTai) fs.writeFileSync(path.join(dir, 'vao', ten.replace(/\.json$/, '.ban.json')), JSON.stringify(banHienTai, null, 1))
     fs.writeFileSync(path.join(dir, 'vao', ten.replace(/\.json$/, '.muc.json')), JSON.stringify(muc, null, 1))
@@ -147,6 +172,8 @@ function dungLo(lo, luong, cheDo = 'soan') {
   fs.writeFileSync(path.join(dir, 'than-chu.json'), JSON.stringify(THAN_CHU, null, 1))
   fs.writeFileSync(path.join(dir, 'muc-luc.txt'), MUC_LUC)
   fs.writeFileSync(path.join(dir, 'lay-muc.mjs'), LAY_MUC)
+  fs.writeFileSync(path.join(dir, 'skill-dong-phan.md'), SKILL_DP)
+  fs.writeFileSync(path.join(dir, 'dong-phan.mjs'), DONG_PHAN_MJS)
   for (const f of ['goi-may-soan-kinh.md', 'vi-du-kinh.json', 'tu-duy-day-hoa.md', 'kiem-kinh.bundle.mjs', ...(cheDo === 'soat' ? ['goi-may-soat-kinh.md'] : [])]) fs.copyFileSync(path.join(DAY, f), path.join(dir, f))
   if (cheDo === 'soat') fs.mkdirSync(path.join(dir, 'soat'), { recursive: true })
   fs.writeFileSync(path.join(dir, 'kiem.mjs'), BO_KIEM_LO)
@@ -160,7 +187,7 @@ function moiTruongPhienSoan() {
 const NHAC = (n) => `Đọc goi-may-soan-kinh.md trong thư mục hiện tại và làm đúng. Lô này có ${n} câu trong vao/ (mỗi câu kèm tệp .muc.json). Với từng câu: tra muc-luc.txt, lấy đủ mục bài giảng đúng dạng bài bằng node lay-muc.mjs, rồi ghi lời giải vào ra/ (cùng tên tệp), chạy node kiem.mjs, sửa tới khi ĐẠT. Trả lời cuối đúng 1 dòng.`
 const NHAC_SOAT = (n) => `Đọc goi-may-soat-kinh.md trong thư mục hiện tại và làm đúng (nó dẫn sang goi-may-soan-kinh.md khi phải soạn lại). Lô này có ${n} bản lời giải đã đạt cần soát (vao/<tên>.json = câu, vao/<tên>.ban.json = bản hiện tại). Ghi kết quả soát từng câu vào soat/<tên>.json; bản phải sửa thì ghi bản mới vào ra/<tên>.json và chạy node kiem.mjs tới khi ĐẠT. Trả lời cuối đúng 1 dòng.`
 function chayClaude(dir, soCau, cheDo = 'soan') {
-  const thamSo = ['-p', '--output-format', 'json', '--permission-mode', 'dontAsk', '--allowedTools', 'Read,Write,Edit,Glob,Grep,Bash(node kiem.mjs),Bash(node kiem.mjs:*),Bash(node lay-muc.mjs:*)', '--max-turns', String(60 + soCau * (cheDo === 'soat' ? 18 : 16))]
+  const thamSo = ['-p', '--output-format', 'json', '--permission-mode', 'dontAsk', '--allowedTools', 'Read,Write,Edit,Glob,Grep,Bash(node kiem.mjs),Bash(node kiem.mjs:*),Bash(node lay-muc.mjs:*),Bash(node dong-phan.mjs:*)', '--max-turns', String(60 + soCau * (cheDo === 'soat' ? 18 : 16))]
   if (MODEL) thamSo.push('--model', MODEL)
   return new Promise((xong) => {
     const t0 = Date.now()
