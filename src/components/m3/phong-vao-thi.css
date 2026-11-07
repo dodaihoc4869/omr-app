@@ -1,4 +1,4 @@
-/* Tấm phủ "Vào phòng thi" (cổng học sinh). Màu chỉ đọc biến --m3-*. */
+/* Tấm phủ "Vào phòng thi" (cổng học sinh). Màu chỉ đọc biến --m3-* (riêng khối [data-trong=hs] cuối tệp đọc biến app học sinh). */
 .m3-phong {
   position: fixed;
   inset: 0;
@@ -17,3 +17,9 @@
   padding-top: max(8px, env(safe-area-inset-top));
   margin-left: -12px;
 }
+/* App học sinh (thầy 07/11, docs/ban-ve-kinh-lanh-0711): thanh trên thu gọn ôm chữ — viên thuốc kính bo mềm thay dải trắng vuông (đọc biến --tr-* / --kinh-* của app em) */
+[data-trong='hs'] .m3-phong .m3-thanh-tren { top: max(8px, env(safe-area-inset-top)); width: fit-content; max-width: 100%; min-height: 0; margin: max(8px, env(safe-area-inset-top)) 0 12px;
+  padding: 5px 20px 5px 5px; gap: 12px; border-radius: 999px; background: color-mix(in oklab, var(--tr-mat) 86%, transparent);
+  box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), 0 10px 26px -18px color-mix(in oklab, var(--tr-hs-day) 55%, transparent); }
+[data-trong='hs'] .m3-phong .m3-thanh-tren > button { width: 44px; height: 44px; min-width: 44px; border: 0; border-radius: 50%; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien); }
+[data-trong='hs'] .m3-phong .m3-thanh-tren-ten { flex: none; font-size: 18px; }

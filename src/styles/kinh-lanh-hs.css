@@ -1,0 +1,16 @@
+/* App học sinh — KÍNH LÓNG LÁNH (thầy 07/11, docs/ban-ve-kinh-lanh-0711). Nạp qua @import trong trong-lam-bai.css (mảnh lười). */
+/* KÍNH LÓNG LÁNH (thầy chốt bản A 07/11, docs/ban-ve-kinh-lanh-0711): mặt trong + ánh tím–lam–hồng + mép vát sáng + vệt sáng chéo, không gờ, không làm mờ (luật TỐC ĐỘ dưới) */
+html[data-trong='hs'] { --kl-s: 100%; --kl-s2: 40%; --kl-s3: 70%; --kl-mat: 44%; --kl-v: 22%; --kl-v2: 28%; --kl-a: 15%; }
+@media (prefers-color-scheme: dark) { html[data-trong='hs'] { --kl-s: 26%; --kl-s2: 10%; --kl-s3: 18%; --kl-mat: 58%; --kl-v: 30%; --kl-v2: 36%; --kl-a: 14%; } }
+html[data-trong='hs'] { --kl-trang: color-mix(in oklab, var(--tr-hs-tren) var(--kl-s), transparent);
+  --kl-loe: linear-gradient(118deg, var(--kl-trang), transparent 30%, transparent 56%, color-mix(in oklab, var(--tr-hs-tren) var(--kl-s2), transparent) 64%, transparent 74%);
+  --kl-anh: linear-gradient(135deg, color-mix(in oklab, var(--tr-hs) var(--kl-a), transparent), color-mix(in oklab, var(--tr-tin) var(--kl-a), transparent) 55%, color-mix(in oklab, var(--tr-tim) var(--kl-a), transparent));
+  --kl-mat-kinh: color-mix(in oklab, var(--tr-mat) var(--kl-mat), transparent);
+  --kl-mep: inset 1.5px 1.5px 0 var(--kl-trang), inset -1px -1.5px 0 color-mix(in oklab, var(--tr-hs-tren) var(--kl-s3), transparent);
+  --kl-vien: 0 0 0 1px color-mix(in oklab, var(--tr-hs-day) var(--kl-v), transparent); }
+/* 07/11 thầy: thanh tiến độ kính — rãnh trong, phần xanh là kính màu có vệt sáng (docs/ban-ve-kinh-lanh-0711) */
+html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) { height: 10px; border: 0; border-radius: 5px; background: color-mix(in oklab, var(--tr-mat) 35%, transparent); overflow: hidden;
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-hs-day) 18%, transparent), inset 0 1px 2px color-mix(in oklab, var(--tr-hs-go) 20%, transparent), 0 1px 0 color-mix(in oklab, var(--tr-mat) 85%, transparent); }
+html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i { height: 100%; border-radius: 5px; box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--tr-hs-day) 45%, transparent), inset 0 -2px 3px -1px color-mix(in oklab, var(--tr-hs-go) 35%, transparent);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--tr-hs-tren) 50%, transparent), transparent 60%), linear-gradient(90deg, color-mix(in oklab, var(--tr-hs) 60%, transparent), color-mix(in oklab, var(--tr-hs-day) 82%, transparent)); }
+html[data-trong='hs'] .duo-tren > .duo-thanh:not(:has(> .duo-doan)) > i::after { top: 2px; left: 6px; right: 6px; height: 2px; background: color-mix(in oklab, var(--tr-hs-tren) 80%, transparent); }
