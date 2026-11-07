@@ -1,0 +1,45 @@
+{
+  "hashNguon": "ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e",
+  "canvas": [
+    820,
+    356
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C4-D2-III-6",
+      "de": "Caprolactam được tổng hợp từ cuối thế kỉ XIX. Hiện nay, nhu cầu sản xuất caprolactam trên thế giới khoảng 10 triệu tấn mỗi năm, 90% trong đó dùng để tổng hợp tơ capron. Trong công nghiệp, caprolactam được điều chế theo sơ đồ trong hình dưới đây.\nĐể sản xuất 10 triệu tấn caprolactam, cần sử dụng bao nhiêu triệu tấn cyclohexanone (giả sử hiệu suất trung bình của cả quá trình trên là 60%)? (Kết quả làm tròn đến hàng phần mười.)",
+      "refs": [
+        {
+          "hash": "ebd51738484df2eee9e02198e0bf2fdcf7edfa0c15dc2333d4e5ea3ec7aacf7e",
+          "where": "12-KT-C4-D2-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "2e371926e9d91d26639da1eab7062b4fcaf765ed1dc7a6c739981726e2c2b172"
+        }
+      ]
+    }
+  ],
+  "nativeRead": "FULL và zoom3 cấu trúc",
+  "rings": [
+    6,
+    6,
+    7
+  ],
+  "carbonCount": 18,
+  "oxygenCount": 3,
+  "nitrogenCount": 2,
+  "carbonylDouble": 2,
+  "oximeCNDouble": 1,
+  "nhExplicit": true,
+  "oximeOH": "up-right",
+  "conditions": [
+    "NH₂OH",
+    "H₂SO₄"
+  ],
+  "captions": [
+    "cyclohexanone",
+    "cyclohexanoxime",
+    "caprolactam"
+  ],
+  "arrowheads": 2,
+  "sourceImmutable": true,
+  "proof": "cau-truc-dieu-che-caprolactam-ddh-lo-255-soat-doc-lap.json"
+}

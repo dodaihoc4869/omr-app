@@ -3,12 +3,12 @@
     "i": 540,
     "hash": "65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57",
     "fileNguon": "anh/65ac6e267d32414b9a38437d05135ad6bc807417a3db13c2b44d916f0125bc57.png",
-    "svg": "bohr-ba-lop-ddh-6763a1c95e3dd27ee0398659ddad5425c9d30304613eb948ca5740c02cb27f79.svg",
-    "hashSvg": "6763a1c95e3dd27ee0398659ddad5425c9d30304613eb948ca5740c02cb27f79",
-    "byteSvg": 3015,
+    "svg": "bohr-ba-lop-ddh-d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507.svg",
+    "hashSvg": "d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507",
+    "byteSvg": 3028,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "hashPhong": "948386519cc441a5fee77173bee78f4dc6b335df418d432661a3cb2b2e08cc1e",
+    "hashPhongDam": "96276c963a17854326f96f8b7242cb9cc72f76d7c9b5062c834a748e83f613fe",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -35,7 +35,7 @@
       }
     ],
     "ghiChuDung": "3continuousorbits/13solid-orange-dots/directcount2+8+3/outerTOP-LEFT-BOTTOM-NOrightdot/bluecore+13actualDDHdam/noaddedcharge-shellnumbers-elementname-arrows-caption/0externalfont.",
-    "hashSvgDaSoat": "6763a1c95e3dd27ee0398659ddad5425c9d30304613eb948ca5740c02cb27f79",
+    "hashSvgDaSoat": "d4a4f8ea1efabb551443ef7796b7a19d91aeeeba73ba83cd322342d652fed507",
     "nguoiSoat": "soat_nguon_2"
   }
 ]
