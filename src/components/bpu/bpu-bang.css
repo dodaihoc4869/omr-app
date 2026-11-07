@@ -45,7 +45,10 @@
 .bb-pa, .bb-ds, .bb-tln { flex: none; }
 .bb-dong-chu { margin: 0; text-wrap: pretty; }
 .bb-de-chu sub { font-size: 0.65em; }
-.bb-anh { max-width: 100%; max-height: 260px; border-radius: 12px; background: var(--giay); }
+.bb-anh { display: block; max-width: 100%; max-height: calc(440px * var(--k, 1)); margin: 14px 0 4px; border-radius: 12px; background: var(--giay); object-fit: contain; } /* thầy 07/11: đủ hình; cao theo hệ số co chữ, quá khung thì cuộn */
+.bb-bang { margin: 14px 0 4px; border-collapse: collapse; font-size: 0.72em; }
+.bb-bang th, .bb-bang td { padding: 6px 14px; border: 2px solid var(--tr-vien-2); text-align: center; }
+.bb-bang th { background: var(--tr-mat-2); }
 .bb-pa { display: grid; grid-template-columns: 1fr 1fr; gap: calc(20px * var(--k)); margin-top: auto; }
 .bb-pa > div { --mau: var(--tr-tin); display: flex; align-items: center; gap: 20px; min-height: calc(116px * var(--k)); padding: calc(18px * var(--k)) 26px; border-radius: 24px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); font-size: calc(34px * var(--k)); font-weight: 600; min-width: 0; transition: opacity 0.3s, box-shadow 0.3s, background-color 0.3s; }
 .bb-pa > div > span { min-width: 0; }
@@ -306,3 +309,4 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 @media (prefers-reduced-motion: reduce) { .bb-goc.nay, .bb-goc.nay .ts b { animation: none; } }
 html.may-yeu .bb-goc.nay, html.may-yeu .bb-goc.nay .ts b { animation: none; }
 .bpu-bang.viet-bang .bb-dong { display: none; } /* thẻ góc đứng chỗ nút Đóng — Esc vẫn đóng */
+.bb-tren .bb-chip { flex: none; white-space: nowrap; } /* chip loại câu không bị ép xuống hai dòng */

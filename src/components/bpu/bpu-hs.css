@@ -89,3 +89,4 @@
 }
 @media (prefers-reduced-motion: reduce) { .bpu-ng .quy, .bpu-hs-xuong { animation: none; } }
 html.may-yeu .bpu-ng .quy { animation: none; }
+.bpu-loi-giai { margin-top: 16px; } /* lời giải Kính / thu gọn sau khi thầy mở đáp án (07/11) */

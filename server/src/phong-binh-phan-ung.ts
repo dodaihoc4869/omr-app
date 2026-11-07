@@ -147,7 +147,9 @@ export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
   let q: PrivateQuestion
   try { q = JSON.parse(str(dong.json)) as PrivateQuestion } catch { return { ok: false, error: 'Không đọc được câu này.' } }
   const tuLuan = phucVu.tuLuan.includes(qid)
-  const r = await goiPhong(env, buoiId, '/luot', { qid, phan: q.phan, tuLuan, cau: cauCongKhai(q), dung: tuLuan ? '' : str(q.correct), hanGiay: tuLuan ? 0 : hanGiay })
+  // Lời giải + ảnh lời giải gửi vào PHÒNG (giữ trong phòng; phòng chỉ đưa ra máy em sau khi mở đáp án — viewEm).
+  const giai = { solution: (q as { solution?: unknown }).solution ?? null, anh: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai') }
+  const r = await goiPhong(env, buoiId, '/luot', { qid, phan: q.phan, tuLuan, cau: cauCongKhai(q), dung: tuLuan ? '' : str(q.correct), hanGiay: tuLuan ? 0 : hanGiay, giai })
   if (!r.ok) return r
   const tru = new Set((dangThi.results ?? []).map((x) => str(x.sbd)))
   const coMat = (Array.isArray(r.coMat) ? (r.coMat as unknown[]).map(str) : []).filter((s) => !tru.has(s))
@@ -326,7 +328,7 @@ export class PhongBinhPhanUng {
     if (u.pathname === '/luot') {
       // Thầy chuyển câu khi lượt trước chưa mở đáp án ⇒ chốt lượt trước (chấm, cộng kJ, ghi) rồi mới mở lượt mới — không mất điểm của các em.
       if (!L.boLuotRong(st)) await this.chotLuot(st, nay)
-      const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null }, nay)
+      const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null, giai: (b.giai ?? null) as L.LuotPhong['giai'] }, nay)
       await this.luu(); this.phat()
       return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })
     }

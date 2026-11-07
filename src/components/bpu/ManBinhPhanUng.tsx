@@ -2,7 +2,7 @@
 // Câu hiện ĐẦY MÀN HÌNH giống chặng (dùng lại DeCau / ChonTracNghiem / ChonDungSai / OTraLoiNgan). KHÔNG có nút thoát giữa buổi; em ẩn app ≥ 2 giây ⇒ báo phòng
 // «rời màn» (bảng hiện tên, đội −20 kJ). Mất mạng KHÔNG tính là rời màn: đáp án đã chọn giữ trên máy, nối lại thì gửi.
 // Máy em chỉ nhận `viewEm` từ phòng — không có đáp án tới khi thầy mở. Màn chặng đang làm vẫn nằm nguyên bên dưới (tấm phủ), xong buổi về đúng chỗ.
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ComponentType } from 'react'
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type ViewEm } from '../../lib/bpu/phong'
@@ -10,6 +10,9 @@ import type { Question } from '../../game/than-thu-v2/core'
 // Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
 type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
 import './bpu-hs.css'
+// LỜI GIẢI SAU KHI MỞ ĐÁP ÁN (thầy 07/11): đúng khối lời giải của màn làm bài — có bản Kính ⇒ Kính + nút «Lời giải thu gọn»; chưa có ⇒ lời giải thu gọn đầy đủ.
+const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
+type LoiGiaiCauKieu = ComponentType<{ q: Question; solution: unknown; dapAn: string; hinhLoiGiai?: Question['hinhAnh'] }>
 
 const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
 const LUI_MS = [1500, 3000, 6000, 12000, 20000]
@@ -61,6 +64,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const chuaMo = useRef(false)
   const soLuot = v?.luot?.so ?? 0
   const [LC, setLC] = useState<MangChang | null>(null)
+  const [LG, setLG] = useState<LoiGiaiCauKieu | null>(null)
   useEffect(() => { let huy = false; void import('../hoc-tap/ManLamBaiTap').then((m) => { if (!huy) setLC(m.PHAN_CAU_CHANG) }).catch(() => {}); return () => { huy = true } }, [])
 
   const gui = useCallback((t: Tin) => {
@@ -112,6 +116,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, buoiId])
 
+  // Mở đáp án ⇒ nạp khối lời giải thu gọn của màn làm bài (mảnh LamCau — đã nạp cùng phương án).
+  const moDa = v?.luot?.pha === 'mo'
+  useEffect(() => { if (!moDa || LG) return; let huy = false; void import('../hoc-tap/LamCau').then((m) => { if (!huy) setLG(() => m.LoiGiaiCau as unknown as LoiGiaiCauKieu) }).catch(() => {}); return () => { huy = true } }, [moDa, LG])
   // Lượt mới ⇒ xoá lựa chọn cũ.
   useEffect(() => { if (soLuot !== luotChon.current) { luotChon.current = soLuot; setChon(''); setBaoTra('') } }, [soLuot])
   // Đang ẩn (giữ nối) mà thầy mở lượt mới ⇒ hiện ngay — trừ khi em đang thi / ở phòng chờ / làm kiểm tra cá nhân.
@@ -225,6 +232,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={daGui || daMo || hetGio} />
           : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={daGui || daMo || hetGio} />
           : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!daGui && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
+        {daMo && !l.tuLuan && l.dung && LG ? (
+          <div className="bpu-loi-giai"><Suspense fallback={<div aria-busy="true" style={{ minHeight: 120 }} />}>
+            <LoiGiaiKinhHs qid={String(l.qid ?? q.qid)} phan={l.phan} choices={q.choices} ideas={q.ideas} dapAn={l.dung} em={chonHien || undefined} duPhong={<LG q={q} solution={l.giai?.solution ?? null} dapAn={l.dung} hinhLoiGiai={(l.giai?.anh ?? []) as Question['hinhAnh']} />} />
+          </Suspense></div>
+        ) : null}
         {baoTra ? <div className="bpu-bao" role="status">{baoTra}</div> : null}
         {tt === 'mat-mang' ? <div className="bpu-bao" role="status">Mất kết nối, đang nối lại… Đáp án em chọn vẫn giữ trên máy, nối lại là gửi.</div> : null}
       </>

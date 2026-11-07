@@ -73,6 +73,8 @@ export interface LuotPhong {
   goi: GoiLenBang | null
   ketQua: Record<string, KetQuaEm> | null
   kich: boolean
+  /** LỜI GIẢI (thầy 07/11: máy em hiện lời giải Kính / thu gọn sau khi mở đáp án): lời giải kho + ảnh lời giải — CHỈ trong phòng, chỉ ra máy em khi pha «mo». */
+  giai?: { solution: unknown; anh: { src: string; viTri: string; alt?: string }[] } | null
 }
 export interface TomTatLuot { so: number; qid: string; soDung: number; soGui: number; tuLuan: boolean }
 export interface TrangThaiPhong {
@@ -177,13 +179,13 @@ export function boLuotRong(st: TrangThaiPhong): boolean {
   st.soLuot = Math.max(0, st.soLuot - 1)
   return true
 }
-export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLuan: boolean; cau: Record<string, unknown>; dung: string; hanGiay: number | null }, nay: number): LuotPhong {
+export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLuan: boolean; cau: Record<string, unknown>; dung: string; hanGiay: number | null; giai?: LuotPhong['giai'] }, nay: number): LuotPhong {
   // Lượt đầu mà lớp có mặt dưới 12 em ⇒ hai đội (linh hoạt theo số em thật sự có mặt; từ lượt hai đội đã chốt, không đổi giữa buổi).
   if (st.soLuot === 0 && st.ds.filter((e) => e.vao).length < IT_EM_HAI_DOI) gopHaiDoi(st)
   st.soLuot += 1
   st.luot = {
     so: st.soLuot, qid: c.qid, phan: c.phan, tuLuan: c.tuLuan, cau: c.cau, dung: c.dung, batDau: nay,
-    han: c.hanGiay && c.hanGiay > 0 ? nay + c.hanGiay * 1000 : null, pha: 'tra-loi', tra: {}, roiMe: [], goi: null, ketQua: null, kich: false,
+    han: c.hanGiay && c.hanGiay > 0 ? nay + c.hanGiay * 1000 : null, pha: 'tra-loi', tra: {}, roiMe: [], goi: null, ketQua: null, kich: false, giai: c.giai ?? null,
   }
   st.capNhat = nay
   return st.luot
@@ -351,7 +353,7 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
       so: l.so, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, batDau: l.batDau, han: l.han, pha: l.pha,
       daGui: Object.keys(l.tra).length, coMat: st.ds.filter((x) => x.vao).length,
       emTra: l.tra[sbd] ?? null, goi,
-      ...(l.pha === 'mo' ? { dung: l.dung, ketQua: l.ketQua?.[sbd] ?? null, soDung: Object.values(l.ketQua ?? {}).filter((k) => k.dung).length } : {}),
+      ...(l.pha === 'mo' ? { dung: l.dung, ketQua: l.ketQua?.[sbd] ?? null, soDung: Object.values(l.ketQua ?? {}).filter((k) => k.dung).length, qid: l.qid, giai: l.giai ?? null } : {}),
     } : null,
   }
 }

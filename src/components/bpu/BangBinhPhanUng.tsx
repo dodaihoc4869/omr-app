@@ -475,7 +475,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{!l.tuLuan && l.phan !== 'III' ? <button type="button" className="bb-hoi" aria-pressed={hienPa} onClick={() => setHienPa((h) => !h)}><kbd>M</kbd>{hienPa ? 'Ẩn phương án' : 'Phương án'}</button> : null}{coGiai ? <button type="button" className="bb-hoi" aria-pressed={giai != null} onClick={() => void batGiai()}><kbd>G</kbd>{giai != null ? 'Ẩn lời giải' : 'Lời giải'}</button> : null}{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}</>)}
         {giai != null ? <div className="bb-giai" ref={giaiRef} tabIndex={-1} role="region" aria-label="Lời giải thu gọn" style={{ height: L.top - 20 - 112 }} dangerouslySetInnerHTML={{ __html: giai }} /> : null}
         <div className={`bb-de${dangSang ? ' doi' : ''}`} ref={khungDe} style={{ height: L.top - 20 - 112, visibility: giai != null ? 'hidden' : undefined }}>
-          <div className="bb-de-chu" ref={deRef} tabIndex={-1}><Chu t={q.text} f={chuDe} />{q.thanCauImg ? <img className="bb-anh" src={q.thanCauImg} alt={`Đề câu ${l.so}`} /> : null}</div>
+          <div className="bb-de-chu" ref={deRef} tabIndex={-1}><Chu t={q.text} f={chuDe} /><HinhDe q={q} so={l.so} f={chuDe} onTai={coVua} /></div>
           {hienPa && l.phan === 'I' && !l.tuLuan ? <div className="bb-pa">{(q.choices ?? []).slice(0, 4).map((c, i) => { const chu = 'ABCD'[i]!; return <div key={chu} className={man === 'mo' && l.dung ? (l.dung.toUpperCase() === chu ? 'dung' : 'mo') : ''} style={{ ['--mau' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)', 'var(--tr-hs)'][i] }}><i>{chu}</i><span><Chu t={c} f={chuDe} mot /></span></div> })}</div> : null}
           {hienPa && l.phan === 'II' && !l.tuLuan ? <div className="bb-ds">{(q.ideas ?? []).slice(0, 4).map((y, i) => <div key={i}><i>{'abcd'[i]})</i><span><Chu t={y} f={chuDe} mot /></span></div>)}</div> : null}
           {l.phan === 'III' && !l.tuLuan ? <div className="bb-tln">Em nhập đáp số trên máy{man === 'mo' && l.dung ? <b>{l.dung}</b> : null}</div> : null}
@@ -589,5 +589,19 @@ function VungVietBang({ g, em, tenHien, onBat }: { g: NonNullable<NonNullable<Vi
         <div className="ts"><b>{g.tiep}</b><span>tiếp sức</span></div>
       </div>
     </div>
+  )
+}
+
+/** HÌNH + BẢNG CỦA ĐỀ (thầy 07/11 «đề phải hiện đủ cả hình ảnh, dài quá thì có thanh cuộn»): cùng thứ tự đề máy em (LamCau `DeCau`) — hình thân câu ·
+ *  bảng số liệu · ảnh đính kèm · hình «sau đề» · hình «cuối câu». Ảnh lời giải (`sau_loi_giai`) KHÔNG có trong câu công khai. Ảnh tải xong ⇒ đo lại cỡ chữ. */
+function HinhDe({ q, so, f, onTai }: { q: Question; so: number; f: ((s: string) => string) | null; onTai: () => void }) {
+  const ds = [q.thanCauImg, q.imageDataUrl, ...(q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_de' || h.viTri === 'cuoi_cau' || h.viTri === 'than_cau').map((h) => h.src)].filter((x): x is string => !!x)
+  const bang = q.table && q.table.length ? q.table : null
+  if (!ds.length && !bang) return null
+  return (
+    <>
+      {bang ? <table className="bb-bang"><tbody>{bang.map((r, i) => <tr key={i}>{r.map((c, j) => (i === 0 ? <th key={j}><Chu t={c} f={f} mot /></th> : <td key={j}><Chu t={c} f={f} mot /></td>))}</tr>)}</tbody></table> : null}
+      {[...new Set(ds)].map((src, i) => <img key={i} className="bb-anh" src={src} alt={`Hình câu ${so}`} onLoad={onTai} />)}
+    </>
   )
 }
