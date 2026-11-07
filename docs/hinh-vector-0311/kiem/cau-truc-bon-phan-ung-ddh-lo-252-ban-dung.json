@@ -1,0 +1,29 @@
+[
+  {
+    "i": 687,
+    "hash": "7f532a0f9678b09f0935ab441ce927eca11d555ed657f5faee2387546a199923",
+    "fileNguon": "anh/7f532a0f9678b09f0935ab441ce927eca11d555ed657f5faee2387546a199923.png",
+    "svg": "bon-phan-ung-ddh-0d539b20221c107fd0bdbb095010908e7b47dc70b13f5acea763cd9467a720b7.svg",
+    "hashSvg": "0d539b20221c107fd0bdbb095010908e7b47dc70b13f5acea763cd9467a720b7",
+    "byteSvg": 54551,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KSCL1-2201-III-6",
+        "de": "Cho các phản ứng sau (hình):\n(1) $\\ce{CH4 + Cl2 ->[askt] CH3Cl + HCl}$\n(2) $\\ce{CH2=CH2 + Br2 -> CH2Br-CH2Br}$\n(3) n $\\ce{CH2=CH2}$ (ethylene) →(t°, xt, p) $\\ce{(-CH2-CH2-)_n}$ (polyethylene, PE)\n(4) $\\ce{CH3-CH3 ->[t°, xt] CH2=CH2 + H2}$\nSắp xếp số tương ứng của mỗi phản ứng theo thứ tự: phản ứng thế, phản ứng tách, phản ứng cộng, phản ứng trùng hợp (Ví dụ: 1234, 3214…).",
+        "refs": [
+          {
+            "hash": "7f532a0f9678b09f0935ab441ce927eca11d555ed657f5faee2387546a199923",
+            "where": "VIP27-BDT-KSCL1-2201-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "1b869998d0e1bad5eba666cfbedd9de0e6e3283d1f97780184dbd5fcc5524186"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4reactions4RIGHTheads/askt/tSUP0-xt-p/tSUP0-xt/ethylene-polyethylene(PE)/parenthesesnsub/literal(3)BELOWLEFT/noextra coefficients-conditions-answer/DDHpath.",
+    "hashSvgDaSoat": "0d539b20221c107fd0bdbb095010908e7b47dc70b13f5acea763cd9467a720b7",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

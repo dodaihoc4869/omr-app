@@ -1,0 +1,115 @@
+{
+  "i": 687,
+  "hash": "7f532a0f9678b09f0935ab441ce927eca11d555ed657f5faee2387546a199923",
+  "nativeSize": [
+    634,
+    349
+  ],
+  "status": "Source-only đã mở FULL/3x; chưa SVG/chưa Đạt",
+  "questions": [
+    {
+      "qid": "VIP27-BDT-KSCL1-2201-III-6",
+      "de": "Cho các phản ứng sau (hình):\n(1) $\\ce{CH4 + Cl2 ->[askt] CH3Cl + HCl}$\n(2) $\\ce{CH2=CH2 + Br2 -> CH2Br-CH2Br}$\n(3) n $\\ce{CH2=CH2}$ (ethylene) →(t°, xt, p) $\\ce{(-CH2-CH2-)_n}$ (polyethylene, PE)\n(4) $\\ce{CH3-CH3 ->[t°, xt] CH2=CH2 + H2}$\nSắp xếp số tương ứng của mỗi phản ứng theo thứ tự: phản ứng thế, phản ứng tách, phản ứng cộng, phản ứng trùng hợp (Ví dụ: 1234, 3214…).",
+      "refs": [
+        {
+          "hash": "7f532a0f9678b09f0935ab441ce927eca11d555ed657f5faee2387546a199923",
+          "where": "VIP27-BDT-KSCL1-2201-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "1b869998d0e1bad5eba666cfbedd9de0e6e3283d1f97780184dbd5fcc5524186"
+        }
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "label": "(1)",
+      "labelXY": [
+        5,
+        28
+      ],
+      "literal": "CH₄ + Cl₂ → CH₃Cl + HCl",
+      "arrow": [
+        235,
+        31,
+        336,
+        31
+      ],
+      "above": "askt",
+      "head": "RIGHT open chevron",
+      "note": "askt lowercase nguyên văn, không giãn thành ánh sáng; sản phẩm CH₃Cl"
+    },
+    {
+      "label": "(2)",
+      "labelXY": [
+        5,
+        68
+      ],
+      "literal": "CH₂=CH₂ + Br₂ → CH₂Br-CH₂Br",
+      "arrow": [
+        310,
+        69,
+        340,
+        69
+      ],
+      "above": null,
+      "head": "RIGHT open chevron"
+    },
+    {
+      "label": "(3)",
+      "labelXY": [
+        5,
+        240
+      ],
+      "literal": "n CH₂=CH₂ → (—CH₂—CH₂—)ₙ",
+      "arrow": [
+        253,
+        142,
+        388,
+        142
+      ],
+      "above": "t⁰, xt, p",
+      "head": "RIGHT solid triangular",
+      "captions": [
+        {
+          "text": "ethylene",
+          "bboxApprox": [
+            100,
+            182,
+            233,
+            208
+          ]
+        },
+        {
+          "text": "polyethylene (PE)",
+          "bboxApprox": [
+            408,
+            208,
+            631,
+            235
+          ]
+        }
+      ],
+      "parentheses": "Round, leftx418..433 y120..179; rightx590..606; n outside lower-right",
+      "note": "(3) ở DƯỚI bên trái của khối, không đặt cùng baseline reaction; productcontinuation xuyên ngoặc hai bên. Source t có số 0 superscript thuôn, không thêm C."
+    },
+    {
+      "label": "(4)",
+      "labelXY": [
+        5,
+        322
+      ],
+      "literal": "CH₃-CH₃ → CH₂=CH₂ + H₂",
+      "arrow": [
+        201,
+        325,
+        305,
+        325
+      ],
+      "above": "t⁰,xt",
+      "head": "RIGHT open chevron"
+    }
+  ],
+  "layout": "4 reaction blocks: rows1/2 sát đầu; row3 cao với 2 captions và (3) thấp; khoảng trắng lớn trước row4; 4 mũi tên phải; không thêm phase/đáp án",
+  "opened": [
+    "/workspace/scratch/4phanung687-native3x.png"
+  ]
+}

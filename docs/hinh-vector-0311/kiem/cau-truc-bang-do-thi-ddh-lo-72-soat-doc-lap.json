@@ -1,26 +1,32 @@
 [
   {
-    "i": 1318,
-    "hashSvg": "826bfa7b805952d03f10221df0c46771991aaeaac07a513d5ac9eda111c4aeb5",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Đủ6cột/2tầngheadermerge/5dòng;Cốc1..5/C2H5OH3%,5%,7%,9%,11%;cácôCH3COOH banđầu đều0,0%;ngày5=0,8/1,0/0,5/0,1/0,0%;ngày10=1,8/2,5/1,5/0,3/0,0%;ngày15=2,2/3,5/2,8/0,6/0,1%;giữ%/dấuphẩy/chỉsố/đậm. HashphôngDDHthường/đậm đốichiếuWOFF2app,path-only/khôngchạm/cắt/tràn/SHA256khớp.",
-    "hash": "eed4e5a4900792fa1f83a4673ac26f4e84388c5d3afbef26c101b3dcf3000856",
-    "hashSvgDaSoat": "826bfa7b805952d03f10221df0c46771991aaeaac07a513d5ac9eda111c4aeb5"
-  },
-  {
-    "i": 1190,
-    "hashSvg": "3c9991342166808e748cec8bf2b06a821734a78e6c44b3df11e31d686560592b",
-    "nguoiSoat": "cau_truc_4",
-    "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. Đúng5điểm(25;180),(35;90),(37;60),(55;150),(70;300),trục t(giây)/Nhiệt độ(°C),X/Ytỉlệthật,nốiTHẲNG/cácguidesnétđứt/marker/nhãnsốđúng;khôngnhãnchạmcurve. HashphôngDDHthường/đậm đốichiếuWOFF2app,path-only/khôngchạm/cắt/tràn/SHA256khớp.",
-    "hash": "d75fe868315dec9455869d528bf1a133317840af9b12a531cabbe379f1aa633f",
-    "hashSvgDaSoat": "3c9991342166808e748cec8bf2b06a821734a78e6c44b3df11e31d686560592b"
-  },
-  {
     "i": 361,
     "hashSvg": "5c377c3e2d95f4ac016507b6cb7ba6cbfa161d4cadfd16d94e60a4d4efaf4fdc",
     "nguoiSoat": "cau_truc_4",
     "ketQua": "Đạt: đã mở từng PNGnguồn+renderSVGthật. (a)giảmplateauthấp,(b)tăngtừgốcplateaucao,giaođúngt1/cùngngangtừt2,4guide t1<t2<t3<t4;Nồngđộ/Thờigian/2arrow,không0mới. HashphôngDDHthường/đậm đốichiếuWOFF2app,path-only/khôngchạm/cắt/tràn/SHA256khớp.",
     "hash": "3fcedad51de51f5faf65271a7c871ac317f639f814ccc718e5746031f85ab2d6",
     "hashSvgDaSoat": "5c377c3e2d95f4ac016507b6cb7ba6cbfa161d4cadfd16d94e60a4d4efaf4fdc"
+  },
+  {
+    "i": 1318,
+    "hashSvg": "178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã mở native FULL, đọc public stem/refs, fresh Chromium exact SVG rồi mở actual. Giữ đủ 6 cột/5 hàng, 2 header gộp dọc và CH₃COOH gộp 4 cột, mọi số/dấu phẩy/%/subscripts, header và số cốc đậm. Không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 104874,
+    "render": "/workspace/scratch/font252-1318-actual.png",
+    "hash": "eed4e5a4900792fa1f83a4673ac26f4e84388c5d3afbef26c101b3dcf3000856",
+    "hashSvgDaSoat": "178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e"
+  },
+  {
+    "i": 1190,
+    "hashSvg": "6d301e2001ad1ae7a912fa19fdf0336075396959d24ccbcd1b309d29b4d72c4a",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG mới, mở actual FULL và native FULL/crops, toàn bộ public refs đã đọc. 5 điểm (25;180)/(35;90)/(37;60)/(55;150)/(70;300), 4 đoạn thẳng, 5 guide ngang+5 dọc/2 heads/alllabels-units khớp. Nhãn (35;90) mới tách guide25 và không chạm diagonal. Không cắt/tràn/thêm dữ kiện.",
+    "actualSvgReviewed": true,
+    "byteSvg": 39462,
+    "render": "/workspace/scratch/fix252-1-actual.png",
+    "hash": "d75fe868315dec9455869d528bf1a133317840af9b12a531cabbe379f1aa633f",
+    "hashSvgDaSoat": "6d301e2001ad1ae7a912fa19fdf0336075396959d24ccbcd1b309d29b4d72c4a"
   }
 ]

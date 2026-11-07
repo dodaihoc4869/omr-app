@@ -73,15 +73,16 @@
         ]
       }
     ],
-    "svg": "bang-do-thi-ddh-826bfa7b805952d03f10221df0c46771991aaeaac07a513d5ac9eda111c4aeb5.svg",
-    "hashSvg": "826bfa7b805952d03f10221df0c46771991aaeaac07a513d5ac9eda111c4aeb5",
-    "byteSvg": 104678,
+    "svg": "bang-do-thi-ddh-178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e.svg",
+    "hashSvg": "178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e",
+    "byteSvg": 104874,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
-    "hashSvgDaSoat": "826bfa7b805952d03f10221df0c46771991aaeaac07a513d5ac9eda111c4aeb5",
-    "nguoiSoat": "cau_truc_4"
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "hashSvgDaSoat": "178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "5f29173363a716bcc606560a211b80591a47f374"
   },
   {
     "i": 1190,
@@ -148,15 +149,16 @@
         ]
       }
     ],
-    "svg": "bang-do-thi-ddh-3c9991342166808e748cec8bf2b06a821734a78e6c44b3df11e31d686560592b.svg",
-    "hashSvg": "3c9991342166808e748cec8bf2b06a821734a78e6c44b3df11e31d686560592b",
-    "byteSvg": 39489,
+    "svg": "bang-do-thi-ddh-6d301e2001ad1ae7a912fa19fdf0336075396959d24ccbcd1b309d29b4d72c4a.svg",
+    "hashSvg": "6d301e2001ad1ae7a912fa19fdf0336075396959d24ccbcd1b309d29b4d72c4a",
+    "byteSvg": 39462,
     "font": "DDH Rounded",
     "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021",
-    "hashSvgDaSoat": "3c9991342166808e748cec8bf2b06a821734a78e6c44b3df11e31d686560592b",
-    "nguoiSoat": "cau_truc_4"
+    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "hashSvgDaSoat": "6d301e2001ad1ae7a912fa19fdf0336075396959d24ccbcd1b309d29b4d72c4a",
+    "nguoiSoat": "soat_nguon_2",
+    "dongBoPhongMain": "5f29173363a716bcc606560a211b80591a47f374"
   },
   {
     "i": 361,

@@ -33,7 +33,7 @@ for v in[25,35,37,55,70]:b+=F.label(x(v)+(-10 if v==35 else 10 if v==37 else 0),
 for v in[60,90,150,180,300]:b+=F.label(110,y(v)+8,str(v),26,'end')
 b+=F.label(115,678,'0',26,'end')+F.label(130,35,'t (giây)',28)+F.label(1430,748,'Nhiệt độ (°C)',30,'end')
 for a,c,label in zip([25,35,37,55,70],[180,90,60,150,300],source[1190]['pointLabels']):
- if a==35:xx,yy,anchor=x(a)-45,y(c)-10,'end'
+ if a==35:xx,yy,anchor=x(a)-35,y(c)-10,'end'
  elif a==37:xx,yy,anchor=x(a)+30,y(c)+35,'start'
  elif a==55:xx,yy,anchor=x(a)+30,y(c)+8,'start'
  else:xx,yy,anchor=x(a),y(c)-30,'middle'

@@ -1,0 +1,12 @@
+[
+  {
+    "i": 1190,
+    "hashSvg": "3c9991342166808e748cec8bf2b06a821734a78e6c44b3df11e31d686560592b",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Cần sửa / THU HỒI positive cũ: Đã tự fresh Chromium old exact SVG và mở macro actual; guide dọc x25 chạm/xuyên dấu mở ngoặc nhãn (35;90), giống lỗi trước sửa của font mới. Native nhãn có khoảng hở. Positive cũ không được dùng lại.",
+    "actualSvgReviewed": true,
+    "byteSvg": 39489,
+    "render": "/workspace/scratch/fix252-2-actual.png",
+    "detail": "/workspace/scratch/font252-1190-old-label.png"
+  }
+]
