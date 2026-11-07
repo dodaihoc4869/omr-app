@@ -1247,7 +1247,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     // CHẶNG NGANG 01/11 (styles/trong-chang-ngang.css): `data-chang` = gốc riêng màn làm chặng (màn thi / kiểm tra / sửa câu dùng chung lớp .duo KHÔNG đổi);
     // `data-phan` = loại câu (đúng–sai dành cột trả lời rộng hơn); `data-ket` = dải kết quả đang hiện (đang chấm / đã chấm) ⇒ điện thoại ngang chừa hàng đáy cho dải;
     // `data-chon-cach` = câu mới chờ chọn «Học cách giải» / «Tự làm câu này» ⇒ hai nút xếp dọc giữa cột phải (máy gập mở, xoay ngang — thầy 01/11).
-    return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-chang="" data-phan={q?.phan} data-ket={!xong && (!!k || cham) ? '' : undefined} data-chon-cach={!xong && choChonCach ? '' : undefined} data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={k ? tt : undefined}>
+    return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-chang="" data-phan={q?.phan} data-ket={!xong && (!!k || cham) ? '' : undefined} data-lg={moLoiGiai && k && !k.choThay ? '' : undefined} data-chon-cach={!xong && choChonCach ? '' : undefined} data-hai-cot={deDai || undefined} data-xong={xong || undefined} data-tt={k ? tt : undefined}>
       {!xong && <header className="duo-tren">
         {/* thầy 27/10 (video Duolingo): đúng liền ≥ 2 câu ⇒ nhãn nhỏ «COMBO ×N» ngay TRÊN thanh tiến độ, số theo chuỗi */}
         {chuoi >= 2 && !laLamLai && <span key={chuoi} className="duo-combo-nhan" aria-hidden="true">COMBO ×{chuoi}</span>}

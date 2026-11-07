@@ -204,7 +204,7 @@ C.mucLuc = (ds, hienTai = 0) => `<nav class="xd-muc-luc" aria-label="Các mục 
 C.mucLucHS = (i = 0) => C.mucLuc([['ket-qua', 'Kết quả'], ['ba-phan', 'Ba phần'], ['theo-dang', 'Theo dạng bài'], ['cau-xem-lai', 'Câu cần xem lại'], ['buoc-tiep', 'Bước tiếp theo'], ['tien-bo', 'Tiến bộ']], i)
 
 /** Một dòng ca trong danh sách. */
-C.ca = (c, { doc = 'em' } = {}) => {
+C.ca = (c) => {
   if (c.tt === 'ok') return `<li><a class="xd-ca" href="#"><div class="xd-ca__ten-o"><h3 class="xd-ca__ten">${c.ten}</h3><p class="xd-ca__ngay">${c.ngay}</p></div><div class="xd-ca__diem"><div><b>${so(c.diem)}</b><small>trên 10 điểm</small></div>${ic('phai', true)}</div><div class="xd-ca__chi">${C.chipCongBo('ok')}<span class="xd-chip xd-so">Đúng ${c.dung}/${c.tong} câu</span>${c.ss === null ? '<span class="xd-chip">Ca đầu tiên</span>' : `<span class="xd-chip xd-chip--ok xd-so">${ic('tang')}+${so(c.ss)} điểm</span>`}</div></a></li>`
   const nhan = c.tt === 'lop' ? `Đã nộp ${c.nop}/${c.si} em — điểm hiện khi cả lớp nộp` : 'Thầy sẽ công bố sau'
   return `<li><a class="xd-ca xd-ca--khoa" href="#"><div class="xd-ca__ten-o"><h3 class="xd-ca__ten">${c.ten}</h3><p class="xd-ca__ngay">${c.ngay}</p></div><div class="xd-ca__diem"><div><b>Chưa có</b><small>điểm</small></div>${ic('phai', true)}</div><div class="xd-ca__chi">${C.chipCongBo(c.tt)}<span class="xd-chip xd-so">${nhan}</span></div></a></li>`

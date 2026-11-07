@@ -242,8 +242,8 @@
     padding: 0 max(var(--gyc-cot-phai, 0px), var(--cn-lg-cho, 0px)) calc(var(--cn-day) + 24px) 0 !important; scrollbar-width: thin; /* gợi ý chấm / lời giải mở cột phải ⇒ cột giữa dời trái */
   }
   /* 07/11 mở LỜI GIẢI (tấm phải rộng --cn-lg-rong): cột giữa dời trái, không bị tấm che */
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]):has(.duo-lg-the) { --cn-lg-cho: var(--cn-lg-rong); }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]):has(> .duo-ket) { padding-bottom: 46dvh !important; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-lg] { --cn-lg-cho: var(--cn-lg-rong); } /* data-lg = tấm lời giải mở (ManLamBaiTap) — không :has trên gốc .ht-app */
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-ket] { padding-bottom: 46dvh !important; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) > .duo-tren {
     position: relative !important; top: auto; flex: none; align-self: center !important; width: var(--cn-hang) !important; max-width: none; margin: 0 !important; padding: 22px 0 0 !important; min-height: 0;
     gap: 20px; background: none !important; box-shadow: none !important;
@@ -286,7 +286,7 @@
   /* «TRỢ GIÚP» (bóng đèn đầu cột đề) xuống TRÁI dải đáy như «Bỏ qua» của Duolingo: nút phụ viền có chữ; tấm trợ giúp mở LÊN trên; có kết quả ⇒ ẩn
      (dải kết quả có «Hỏi thầy» riêng) */
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-lenh > .duo-tg { position: fixed; z-index: 7; left: calc((100% - var(--cn-hang)) / 2); bottom: calc(23px + env(safe-area-inset-bottom)); margin: 0; }
-  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]):has(> .duo-ket) .duo-lenh > .duo-tg { display: none; }
+  :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong])[data-ket] .duo-lenh > .duo-tg { display: none; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-tg > .duo-den { display: inline-flex; align-items: center; gap: 10px; width: auto; height: 54px; padding: 0 22px 0 18px; border-radius: 16px; font-size: 15px; font-weight: 800; letter-spacing: .02em; text-transform: uppercase; color: var(--tr-chu-2); }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-tg .duo-tg-chu { display: inline; }
   :root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-tg > .duo-tg-tam { top: auto; bottom: calc(100% + 10px); right: auto; left: 0; transform-origin: 23px 100%; }

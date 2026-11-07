@@ -1,7 +1,7 @@
 // @vitest-environment node
 // MỨC LÀM THEO LÔ EM cho bảng điểm danh (thầy 20/10, bản vẽ 03) — chạy trên D1 THẬT (SQLite, lược đồ repo).
 // ĐIỀU QUAN TRỌNG NHẤT: thầy bấm em ở bảng điểm danh ra Hồ sơ làm bài phải thấy ĐÚNG số trên dòng (một con số, thầy 12/10). Nên số của lô được ghim bằng số tính từ chính `lichSuLamCauCuaEm`.
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
@@ -152,12 +152,16 @@ describe('mức làm theo lô em (bảng điểm danh)', () => {
   })
 
   it('đường lệnh thầy `/gv/muc-lam-lo` chạy qua cổng thầy (trả `ok` + số của từng em); không có mã thầy ⇒ bị chặn', async () => {
+    // đường lệnh lấy giờ THẬT (Date.now) còn dữ liệu mẫu neo BAY_GIO ⇒ ghim đồng hồ (chỉ Date) kẻo test đỏ khi qua cửa sổ ngày của dữ liệu mẫu
+    vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(BAY_GIO + 60_000)
+    try {
     const d = dungDuLieu()
     const r = (await goiWorker(worker, d.env as unknown as Env, '/gv/muc-lam-lo', { sbds: ['S2'] }, true)) as { ok: boolean; em: Record<string, MucLamEmLo> }
     expect(r.ok).toBe(true)
     expect(r.em.S2!.soDo).toBe(2)
     const khong = await goiWorker(worker, d.env as unknown as Env, '/gv/muc-lam-lo', { sbds: ['S2'] }, false)
     expect(JSON.stringify(khong)).not.toContain('"soDo"')
+    } finally { vi.useRealTimers() }
   })
 
   it('đọc sổ lỗi ⇒ lệnh trả lỗi (không ném); `mucLamCacEm` ném để nơi gọi bắt', async () => {

@@ -137,7 +137,7 @@ describe('tờ trong-chang-ngang.css — chỉ màn làm chặng, chỉ ngang / 
     expect(s).toMatch(/> \.duo-day:not\(\.duo-ket\) \.duo-nut \{ width: auto !important; min-width: 150px;/) // 07/11 cỡ nút Duolingo (≥ 150 vừa chữ)
     expect(s).toMatch(/\.duo-lenh > \.duo-tg \{ position: fixed;/)
     expect(s).toMatch(/padding: 0 max\(var\(--gyc-cot-phai, 0px\), var\(--cn-lg-cho, 0px\)\)/) // gợi ý chấm / lời giải mở cột phải ⇒ cột giữa dời trái
-    expect(s).toMatch(/:has\(\.duo-lg-the\) \{ --cn-lg-cho: var\(--cn-lg-rong\); \}/)
+    expect(s).toMatch(/\[data-lg\] \{ --cn-lg-cho: var\(--cn-lg-rong\); \}/) // tấm lời giải mở ⇒ gốc có data-lg (không :has trên gốc .ht-app)
     expect(s).toMatch(/\.duo-lg \{ justify-content: flex-end;[^}]*pointer-events: none; \}/)
   })
   it('phương trình dài giữ ô cuộn ngang `.ct-dai` (không bẻ dòng) — chỉ thêm thanh mảnh + bóng mép', () => {

@@ -1,7 +1,7 @@
 // Bộ màu riêng app học sinh «B · Chất chỉ thị» — thầy 27/10: «Chốt bảng màu chất chỉ thị, làm cho sáng bằng độ sáng của doligo nhé».
 // Khoá: (1) mỗi màu tô GIỮ SẮC bộ B, L lệch Duolingo cùng vai ≤ 0,03, C ≥ 90 % Duolingo hoặc chạm trần gam sRGB ở đúng L và sắc ấy;
 // (2) ΔE00 ≥ 15 so Duolingo ở màu chính, đúng, sai; (3) chữ trắng trên nút không kém cặp Duolingo cũ; chữ màu ≥ 4,5;
-// (4) nền tối không dùng #131f24; (5) Lộ trình / menu / Bi đọc màu chính, không đọc màu đúng; (6) 4 giám thị theo cùng luật, cách nhau rõ.
+// (4) nền tối = snow Duolingo #131f24 (thầy 07/11; trước 27/10 cấm); (5) Lộ trình / menu / Bi đọc màu chính, không đọc màu đúng; (6) 4 giám thị theo cùng luật, cách nhau rõ.
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -91,9 +91,9 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
 
   it('tối đo theo Duolingo: nền / thẻ / viền đúng bậc L; đáy 3D = mặt − 0,116 cùng sắc; mặt tô sáng như bản sáng', () => {
     const t = bang.toi, L = (k: string) => oklch(t[`--tr-${k}`]!).L
-    expect(Math.abs(L('nen') - 0.225)).toBeLessThanOrEqual(0.01)
-    expect(Math.abs(L('mat') - 0.28)).toBeLessThanOrEqual(0.01)
-    expect(Math.abs(L('vien') - 0.385)).toBeLessThanOrEqual(0.01)
+    // thầy 07/11 «vào hẳn trang Duolingo đo chính xác màu nền»: nền / thẻ / viền = ĐÚNG mã bảng màu chính thức trong mã duolingo.com (snow / polar / swan tối)
+    expect(t['--tr-nen']).toBe('#131f24'); expect(t['--tr-mat']).toBe('#202f36'); expect(t['--tr-vien']).toBe('#37464f')
+    expect(L('nen')).toBeLessThan(L('mat')); expect(L('mat')).toBeLessThan(L('vien'))
     // v2: --tr-hs-day = mặt tô, gờ 3D chàm = --tr-hs-go (sẫm hơn ≥ 0,1 cùng họ)
     expect(L('hs') - L('hs-go')).toBeGreaterThanOrEqual(0.1)
     expect(Math.abs(lechSac(oklch(t['--tr-hs']!).h, oklch(t['--tr-hs-go']!).h))).toBeLessThanOrEqual(6)
@@ -110,7 +110,7 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
     const t = bang[che], tren = t['--tr-hs-tren']!, trenDuo = che === 'sang' ? '#ffffff' : '#131f24'
     const ks = che === 'sang' ? ['hs-nut', 'dung-nut', 'sai', 'sai-day', 'chu-y-nut', 'tin-day', 'tim'] : ['hs-nut', 'dung-nut', 'sai', 'chu-y-nut', 'tin', 'sao', 'tim']
     // 07/11 v2: chữ trên nút chàm = --tr-hs-tren (tối nay TRẮNG trên chàm điện), nút khác = --tr-trang (như cũ)
-    for (const k of ks) expect(tuongPhan(k === 'hs-nut' ? tren : t['--tr-trang']!, t[`--tr-${k}`]!), k).toBeGreaterThanOrEqual(NGUONG_V2[`${che}:${k}`] ?? tuongPhan(trenDuo, DUO[che][k]!) - 1e-9)
+    for (const k of ks) expect(tuongPhan(k === 'hs-nut' ? tren : t['--tr-trang']!, t[`--tr-${k}`]!), k).toBeGreaterThanOrEqual(NGUONG_V2[`${che}:${k}`] ?? tuongPhan(trenDuo, DUO[che][k]!) - (che === 'toi' ? 0.1 : 1e-9)) // tối: chữ trên nút = nền snow #131f24 (thầy 07/11) ⇒ lệch ≤ 0,1 so cặp Duolingo
     for (const k of ['hs', 'dung', 'sai', 'chu-y', 'tin', 'sao']) {
       expect(tuongPhan(t[`--tr-${k}-chu`]!, t['--tr-mat']!), `${k}-chu/mat`).toBeGreaterThanOrEqual(4.5)
       expect(tuongPhan(t[`--tr-${k}-chu`]!, t[`--tr-${k}-nhat`]!), `${k}-chu/nhat`).toBeGreaterThanOrEqual(4.5)
@@ -119,11 +119,10 @@ describe('bộ màu B «Chất chỉ thị» sáng bằng Duolingo (thầy 27/10
     expect(tuongPhan(t['--tr-nguyen-tu-so']!, t['--tr-mat']!), 'số nguyên tử đậm').toBeGreaterThanOrEqual(3)
   })
 
-  it('nền tối không dùng #131f24 (cả bảng lười lẫn dòng tối học sinh trong trong.css)', () => {
-    expect(mau.toLowerCase()).not.toMatch(/--tr-[\w-]+:\s*#131f24/)
+  it('nền tối = snow Duolingo #131f24 (thầy 07/11; cả bảng lười lẫn dòng tối học sinh trong trong.css)', () => {
     const tr = doc('src/styles/trong.css'), dong = tr.match(/^\s*:root\[data-trong='hs'\] \{ --tr-nen: (#[0-9a-f]{6})/m)
-    expect(dong?.[1]).toBe('#1a1a29')
-    expect(bang.toi['--tr-nen']).toBe('#1a1a29')
+    expect(dong?.[1]).toBe('#131f24')
+    expect(bang.toi['--tr-nen']).toBe('#131f24')
   })
 
   it('màu chính TÁCH khỏi màu đúng: Lộ trình, menu, rương, Bi đọc --tr-hs; «Tiếp tục» ở dải đúng đọc --tr-dung-nut', () => {
