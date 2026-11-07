@@ -94,8 +94,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   const [dangSang, setDangSang] = useState(false)
   /** THẺ PHƯƠNG ÁN (thầy 07/11 «4 đáp án ẩn đi, bấm M thì hiện»): mặc định ẩn để đề chiếm nhiều chỗ nhất; mở đáp án cũng KHÔNG tự hiện — kết quả nằm cột phải, bên trái chỉ đề (thầy 07/11). */
   const [hienPa, setHienPa] = useState(false)
-  /** TẮT MÀN KHI EM VIẾT LÊN BẢNG (thầy 07/11 «tắt máy chiếu ở phần học sinh viết lên bảng»): pha «làm bảng» ⇒ màn đen hoàn toàn (máy chiếu không
-   *  rọi lên chỗ em viết); phím D / F / N / Space vẫn chạy; B (hoặc chạm màn) bật lại màn để xem đề, B lần nữa tắt. */
+  /** TẮT VÙNG EM VIẾT (thầy 07/11 «tắt máy chiếu ở phần học sinh viết lên bảng» · «chỉ tắt phần hs lên bảng làm thôi»): pha «làm bảng» ⇒ nửa phải
+   *  (cột kết quả) đen — máy chiếu không rọi lên chỗ em viết, đề bên trái vẫn sáng; phím D / F / N / Space vẫn chạy; B (hoặc chạm) bật lại, B lần nữa tắt. */
   const [batLai, setBatLai] = useState(false)
   const sangCau = useCallback((d: 1 | -1) => { setDangSang(true); onToi?.(d) }, [onToi])
   /** LỜI GIẢI TRÊN BẢNG (thầy 07/11 «bấm lời giải lại hiện bảng chiếu cũ»): G / nút / máy điều khiển ⇒ hộp lời giải thu gọn đè chỗ đề; G lần nữa ẩn. */
@@ -505,7 +505,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
         {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...TIEP, ['K', 'Đua ngọn lửa'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
           : man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt màn (em viết bảng)' : 'Bật lại màn chiếu'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
+          : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt vùng em viết' : 'Bật lại vùng em viết'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
           : [['Space', 'Gọi lên bảng ngay', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
         'Tự động: hết giờ hoặc cả lớp gửi xong ⇒ gọi một em lên bảng. Chuyển câu khi chưa mở đáp án ⇒ máy tự chấm câu cũ.')}
       </>
@@ -520,7 +520,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />
       </div>
       <button type="button" className="bb-dong" onClick={onDong} aria-label="Đóng bảng Bình Phản Ứng">Đóng</button>
-      {man === 'lam-bang' && !batLai && !moPhim ? <div className="bb-tat-man" role="status" aria-label="Màn chiếu tạm tắt — em đang viết lên bảng. B hoặc chạm màn để bật lại" onClick={() => setBatLai(true)} /> : null}
+      {/* Chỉ tắt VÙNG EM VIẾT (bên phải, từ mép cột đề tới hết màn); đề bên trái vẫn sáng (thầy 07/11 «chỉ tắt phần hs lên bảng làm thôi»). */}
+      {man === 'lam-bang' && !batLai && !moPhim ? <div className="bb-tat-man" role="status" aria-label="Vùng em viết tạm tắt chiếu. B hoặc chạm để bật lại" style={{ left: `calc(50% + ${(1180 - 960) * k}px)` }} onClick={() => setBatLai(true)} /> : null}
     </div>,
     document.body,
   )
