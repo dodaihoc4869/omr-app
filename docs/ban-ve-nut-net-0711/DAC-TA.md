@@ -1,5 +1,7 @@
 # Đặc tả — App học sinh: màu tươi hơn + NÚT SIÊU NÉT kiểu Duolingo (07/11)
 
+> **BẢN v2** (thầy: «tươi hơn nữa và sắc nét hơn nữa, tươi hết mức có thể») — ảnh `v2/`, CSS `v2/proto-nut-net-v2.css`. Xem mục «v2» cuối tệp; bảng màu dưới đây là v1.
+
 Thầy 07/11: «màu toàn app sáng hơn tươi hơn xuất sắc hơn nữa, quan trọng là các nút phải siêu nét, làm mọi cách vẽ siêu nét như doligo. Vẽ cho tôi xem trước rồi build.»
 
 Bản vẽ = app THẬT (bản dựng main d55a122) chạy với máy chủ giả, CSS thử nghiệm `proto-nut-net.css` chèn lúc chụp. Chromium 360×740, 390×844, 768×1024, sáng + tối.
@@ -63,3 +65,36 @@ Byte tải: khi build sẽ SỬA THẲNG các luật nút đang có, thay bóng 
 - `npm run kiem:toc-do` 0 đỏ; `npm run kiem:mau-giu` 0; `scripts/do-tuong-phan-hs.mjs` đạt (trừ ngoại lệ lục ở mục 5 nếu thầy chốt màu Duolingo).
 - Ảnh Chromium: 0 lỗi trang, 0 tràn ngang, 0 đích bấm < 44 px.
 - Tác tử tốc độ: cuộn và bấm không chậm hơn bản trước.
+
+## v2 — tươi hết mức + sắc nét hơn (thầy 07/11, sau v1)
+
+| Ảnh `v2/` | Nội dung |
+|---|---|
+| `01`–`03-truoc-v1-v2-*.jpg` | TRƯỚC · v1 · v2 (Hôm nay, làm câu, kết quả), 390 sáng |
+| `04-truoc-v2-toi-390.jpg` | Tối: trước · v2 (3 màn) |
+| `05`–`08-v2-<360|768>-<sáng|tối>-3-man.jpg` | v2 đủ 3 màn ở khổ 360 và 768 |
+
+**Màu: độ tươi đẩy tới mép gam sRGB (màu tươi nhất màn hình hiển thị được ở đúng độ sáng ấy).**
+
+| Vai | v1 | v2 |
+|---|---|---|
+| Chàm chính (nút, chọn, tiến độ) | `#6c71ff` | `#584dff` (5,4:1 với chữ trắng) |
+| Gờ chàm | `#4d4bd1` | `#3f00dc` |
+| Lục đúng | `#00c289` | `#00ca85` (≈ xanh lá Duolingo) |
+| Đỏ sai | `#f13972` | `#f9006c` |
+| Lam ngọc / vàng / hồng | màu cũ | `#00dffe`, `#feba00`, `#ff3fd0` |
+| Nền nhạt khi chọn / đúng / sai | màu cũ | `#e6eaff`, `#c2ffdd`, `#ffe3e7` |
+
+Màu dùng chung (dấu tích, vòng tiến độ, chấm) cũng đổi sang chàm điện, cho đồng bộ. Nền loang đậm màu hơn (55 / 50 / 45 / 38 %).
+
+**Nét:**
+- Viền xám sẫm hơn `#d9d9e5`, gờ `#c6c6d4`, để mép tách hẳn khỏi nền.
+- Thẻ lớn và khung đề: mặt gần đặc (94 %), BỎ làm mờ phía sau. Lớp mờ là thứ làm mép nhoè.
+- Biểu tượng trong nút: nét 3.
+- Chữ nút: 900.
+- Dải kết quả có vạch màu 2 px ở mép trên.
+
+Lưu ý:
+- **Xanh lá:** muốn tươi hơn `#00ca85` nữa thì chữ trắng trên nút «TIẾP TỤC» gần như không đọc được (1,6–1,8:1).
+- **Thanh công cụ nổi:** vẫn là kính (thầy chốt 02/11), không đổi.
+- **Bộ màu B:** thầy đã duyệt 27/10 và có test khoá độ sáng ±0,03 theo Duolingo. v2 sẽ cập nhật test theo màu mới khi thầy chốt.
