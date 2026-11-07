@@ -1,0 +1,247 @@
+{
+  "metadata": [
+    {
+      "i": 807,
+      "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+      "fileNguon": "anh/95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e.png",
+      "canvas": [
+        216,
+        227
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "7",
+        "14,007",
+        "N",
+        "Nitrogen"
+      ],
+      "notes": "Ôgócbo,nềnxámsáng,ô vuônggóctrêntráitốihơnchứa7.14,007trênphải,Ndậmlớngiữa,Nitrogendưới. Giữdấuphẩy;khôngthêmcấuhìnhelectron.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-194",
+          "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-194.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B9-D2-I-7",
+          "de": "Hình dưới là ô nguyên tố của nitrogen (N). Phát biểu nào dưới đây là không đúng?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B9-D2-I-7.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-1ebc0fdfe073c0482b6d0c5497634333ebda20438fe5da94dcc91cad7735b680.svg",
+      "hashSvg": "1ebc0fdfe073c0482b6d0c5497634333ebda20438fe5da94dcc91cad7735b680",
+      "byteSvg": 7262,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "1ebc0fdfe073c0482b6d0c5497634333ebda20438fe5da94dcc91cad7735b680",
+      "nguoiSoat": "cau_truc_4",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021"
+    },
+    {
+      "i": 764,
+      "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+      "fileNguon": "anh/8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6.png",
+      "canvas": [
+        250,
+        244
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "15",
+        "30.974",
+        "P",
+        "Phosphorus",
+        "[Ne]3s²3p³",
+        "Nonmetal"
+      ],
+      "notes": "Ôvuôngboxanhđậm,viềntrắngđôi.Chữtrắng:15trêntrái,30.974trênphải,Pgiữa,tênPhosphorus,[Ne]3s²3p³,Nonmetaldưới. Giữdấuchấmvàcapitalization.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-14",
+          "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-14.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-I-5",
+          "de": "Ô nguyên tố trong bảng tuần hoàn không cho biết thông tin nào sau đây?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-I-5.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-d51184c73aecd65cda75bf873cd2d747dcd9249b7fcf578c3ea8bc64fc05c828.svg",
+      "hashSvg": "d51184c73aecd65cda75bf873cd2d747dcd9249b7fcf578c3ea8bc64fc05c828",
+      "byteSvg": 18244,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "d51184c73aecd65cda75bf873cd2d747dcd9249b7fcf578c3ea8bc64fc05c828",
+      "nguoiSoat": "cau_truc_4",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021"
+    },
+    {
+      "i": 468,
+      "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+      "fileNguon": "anh/55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9.png",
+      "canvas": [
+        250,
+        252
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "11",
+        "22.990",
+        "Na",
+        "Sodium",
+        "[Ne]3s¹",
+        "Alkali metal"
+      ],
+      "notes": "Boxanhđậm,viềntrắngđôi.Chữtrắng:11trêntrái,22.990trênphải,Nagiữa,tênSodium,[Ne]3s¹,Alkalimetaldưới. Giữdấuchấmvàsuperscript1.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-I-45",
+          "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-I-45.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-I-42",
+          "de": "Hình bên là ô nguyên tố của Sodium. Phát biểu nào đưới đây không đúng?",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-I-42.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-302b276bb6e00b3f355307116603567a91db3a4568ef81e4180d8eab7138b44b.svg",
+      "hashSvg": "302b276bb6e00b3f355307116603567a91db3a4568ef81e4180d8eab7138b44b",
+      "byteSvg": 16162,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "302b276bb6e00b3f355307116603567a91db3a4568ef81e4180d8eab7138b44b",
+      "nguoiSoat": "cau_truc_4",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021"
+    },
+    {
+      "i": 658,
+      "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+      "fileNguon": "anh/7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016.png",
+      "canvas": [
+        205,
+        233
+      ],
+      "daMoNative": true,
+      "kind": "element-cell",
+      "text": [
+        "79",
+        "196,97",
+        "Au",
+        "Gold"
+      ],
+      "notes": "Khungxámvuôngnềntrắng;ôxámnhạtfillsgóctrêntráichứa79đậm.196,97trênphải,Aumàuxámgiữa,Goldxámdưới. Giữdấuphẩy.",
+      "questions": [
+        {
+          "qid": "DB-10-B5-D1-II-62",
+          "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DB-10-B5-D1-II-62.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        },
+        {
+          "qid": "DH-10-C2-B5-II-3",
+          "de": "Hình bên dưới mô tả ô nguyên tố của vàng (gold) trong bảng tuần hoàn các nguyên tố hóa học.",
+          "refs": [
+            {
+              "where": "DH-10-C2-B5-II-3.hinh.0.du_lieu",
+              "viTri": "sau_de"
+            }
+          ]
+        }
+      ],
+      "daTrongManifestSauDotDau": false,
+      "svg": "o-nguyen-to-ddh-d4da3193541a9af662bd8712744835dff2f1705776314b50a7951942b8d98e27.svg",
+      "hashSvg": "d4da3193541a9af662bd8712744835dff2f1705776314b50a7951942b8d98e27",
+      "byteSvg": 6726,
+      "font": "DDH Rounded",
+      "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+      "trangThai": "da-soat-doc-lap",
+      "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
+      "hashSvgDaSoat": "d4da3193541a9af662bd8712744835dff2f1705776314b50a7951942b8d98e27",
+      "nguoiSoat": "cau_truc_4",
+      "hashPhongDam": "bc7f6b30e18313d8770157b1e6a9541964e4a43fdcfaa8b393476d8c7f7a2021"
+    }
+  ],
+  "oldPositive": [
+    {
+      "i": 807,
+      "hashSvg": "1ebc0fdfe073c0482b6d0c5497634333ebda20438fe5da94dcc91cad7735b680",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở RIÊNG từng PNGnative+renderSVGthật. 7/N/Nitrogen/14,007dấuphẩy,nềnxámbo góc/vùngsốtrêntráiđậmxám đúng. Đã đọcscript dựngweightdam vàđốichiếuhash2cặpWOFF2app;DDHregular/damglyphthậtpath-only tựchứa,đủô/khung/nềnmàunguồn,khôngchạm/cắt/tràn/SHA256khớp.",
+      "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+      "hashSvgDaSoat": "1ebc0fdfe073c0482b6d0c5497634333ebda20438fe5da94dcc91cad7735b680"
+    },
+    {
+      "i": 764,
+      "hashSvg": "d51184c73aecd65cda75bf873cd2d747dcd9249b7fcf578c3ea8bc64fc05c828",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở RIÊNG từng PNGnative+renderSVGthật. 15/P/Phosphorus/30.974dấuchấm,[Ne]3s²3p³/Nonmetal đúng;khungbo góctrắng/nềnxanh. Đã đọcscript dựngweightdam vàđốichiếuhash2cặpWOFF2app;DDHregular/damglyphthậtpath-only tựchứa,đủô/khung/nềnmàunguồn,khôngchạm/cắt/tràn/SHA256khớp.",
+      "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
+      "hashSvgDaSoat": "d51184c73aecd65cda75bf873cd2d747dcd9249b7fcf578c3ea8bc64fc05c828"
+    },
+    {
+      "i": 468,
+      "hashSvg": "302b276bb6e00b3f355307116603567a91db3a4568ef81e4180d8eab7138b44b",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở RIÊNG từng PNGnative+renderSVGthật. 11/Na/Sodium/22.990dấuchấm,[Ne]3s¹/Alkali metal đúng;khungbo góctrắng/nềnxanh. Đã đọcscript dựngweightdam vàđốichiếuhash2cặpWOFF2app;DDHregular/damglyphthậtpath-only tựchứa,đủô/khung/nềnmàunguồn,khôngchạm/cắt/tràn/SHA256khớp.",
+      "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+      "hashSvgDaSoat": "302b276bb6e00b3f355307116603567a91db3a4568ef81e4180d8eab7138b44b"
+    },
+    {
+      "i": 658,
+      "hashSvg": "d4da3193541a9af662bd8712744835dff2f1705776314b50a7951942b8d98e27",
+      "nguoiSoat": "cau_truc_4",
+      "ketQua": "Đạt: đã mở RIÊNG từng PNGnative+renderSVGthật. 79/Au/Gold/196,97dấuphẩy đúng,Au/Goldxám/nềnsố79xám/khungvuôngxám. Đã đọcscript dựngweightdam vàđốichiếuhash2cặpWOFF2app;DDHregular/damglyphthậtpath-only tựchứa,đủô/khung/nềnmàunguồn,khôngchạm/cắt/tràn/SHA256khớp.",
+      "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+      "hashSvgDaSoat": "d4da3193541a9af662bd8712744835dff2f1705776314b50a7951942b8d98e27"
+    }
+  ],
+  "gioiHan": "Lịch sửfontcũ/khôngduyệthashmới."
+}

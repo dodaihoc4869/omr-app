@@ -1,0 +1,40 @@
+[
+  {
+    "i": 548,
+    "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+    "fileNguon": "anh/673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a.png",
+    "svg": "methyl-glucoside-ddh-04771c56cb1dfba255864e35917d51eefb6a9649d82265664d6203bb6ca3d525.svg",
+    "hashSvg": "04771c56cb1dfba255864e35917d51eefb6a9649d82265664d6203bb6ca3d525",
+    "byteSvg": 6710,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C2-D2-III-2",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm OH hemiacetal của glucose tác dụng với methanol khi có mặt HCl khan, tạo thành methyl glucoside có công thức cấu tạo cho ở hình dưới.\nTổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+            "where": "12-KT-C2-D2-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "9f5fb403498b15ef55e0fc0b1b48cd591e01a356bfb6d6b2597fce26c5cafef7"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D2-III-86",
+        "de": "Ở dạng cấu tạo mạch vòng, nhóm OH hemiacetal của glucose tác dụng với methanol khi có mặt HCl khan, tạo thành methyl glucoside có công thức cấu tạo cho ở hình dưới.\nTổng số nguyên tử có trong một phân tử methyl α-glucoside là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "673f5c9ab9c64f59ef0a927e69bd17f854ebda30b953625f0decfd35da5be32a",
+            "where": "DB-12-B4-D2-III-86.hinh.0.du_lieu",
+            "hashDataUrl": "9f5fb403498b15ef55e0fc0b1b48cd591e01a356bfb6d6b2597fce26c5cafef7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "singleHaworth/4OH+ringO+OCH3DOWN/0H-0Cnums-0CH2OH/2taper1bold/C6barebentOH/noextra captions/DDHpath.",
+    "hashSvgDaSoat": "04771c56cb1dfba255864e35917d51eefb6a9649d82265664d6203bb6ca3d525",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
