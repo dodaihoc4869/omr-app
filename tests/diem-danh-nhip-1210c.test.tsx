@@ -209,10 +209,11 @@ describe('bước 1 Điểm danh (bản vẽ GV-DiemDanh)', () => {
     await screen.findByText('Vắng 4 em — 2 em đang Lười')
     fireEvent.click(screen.getByRole('button', { name: 'Kết thúc buổi' }))
     await waitFor(() => expect(lenh('/gv/buoi-hoc', 'dong')).toHaveLength(1))
-    expect(await screen.findByText('Đã kết thúc')).toBeTruthy()
-    expect(screen.getByText('Buổi đã kết thúc — mã hết hiệu lực')).toBeTruthy()
-    // buổi đã kết thúc ⇒ lại có ô mở buổi mới (nút chính "Điểm danh")
-    expect(screen.getByRole('button', { name: 'Điểm danh' })).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 07/11 (thầy «sau khi bấm kết thúc ngay lập tức hoàn về phần điểm danh, không hiện danh sách đã điểm danh trước đó»):
+    // kết thúc ⇒ về ngay ô mở buổi mới (nút chính "Điểm danh"); KHÔNG còn danh sách / mã của buổi vừa đóng.
+    expect(await screen.findByRole('button', { name: 'Điểm danh' })).toBeTruthy()
+    expect(screen.queryByText('Buổi đã kết thúc — mã hết hiệu lực')).toBeNull()
+    expect(screen.queryByText(/Vắng 4 em/)).toBeNull()
   })
 
   it('chưa có buổi: "Điểm danh" mở buổi rồi TỰ CHIẾU bản chiếu đang điểm danh (không còn tấm chiếu mã cũ)', async () => {

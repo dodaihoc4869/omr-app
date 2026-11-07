@@ -97,7 +97,7 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
     void layLopThay().then((r) => con && r.ok && setDsLop(r.du.lop))
     void (async () => {
       // THOÁT RA VÀO LẠI (thầy 06/11 «Thoát ra ko lưu điểm danh»):
-      // Ưu tiên buổi đang mở trên máy chủ; nếu không có buổi đang mở thì khôi phục lại buổi đã xem hôm nay (kể cả vừa kết thúc).
+      // Ưu tiên buổi đang mở trên máy chủ; không có thì khôi phục buổi đã xem hôm nay — buổi đó đã kết thúc thì bỏ (07/11, hiệu ứng bên dưới).
       let r = await buoiDangMo()
       if (!r.ok && r.loai !== 'chua_co_lenh') r = await buoiDangMo()
       if (!con) return
@@ -118,9 +118,15 @@ export function useDiemDanhBuoi(tuyChon: TuyChonDiemDanhBuoi = {}) {
     }
   }, [chiNoiBuoiCungLop, lopMacDinh])
   // Nhớ buổi đang xem (theo ngày) ⇒ thoát ra / tải lại vẫn về đúng danh sách điểm danh này.
+  // BUỔI ĐÃ KẾT THÚC (thầy 07/11 «sau khi bấm kết thúc ngay lập tức hoàn về phần điểm danh, không hiện danh sách đã điểm danh trước đó»): bỏ buổi đó
+  // NGAY (máy bấm, máy khác khi làm mới thấy buổi đóng, tải lại) ⇒ màn về «Lớp học hôm nay · Điểm danh» để mở buổi mới; danh sách vẫn lưu trên máy chủ.
   useEffect(() => {
-    if (idBuoi) ghiBuoiNho(idBuoi)
-  }, [idBuoi])
+    if (tt && !tt.buoi.dangMo) {
+      setTt(null)
+      setChieuMa(false)
+      if (!laTest) { try { if (docBuoiNho() === tt.buoi.id) localStorage.removeItem(KHOA_BUOI_NHO) } catch { /* máy chặn lưu */ } }
+    } else if (idBuoi) ghiBuoiNho(idBuoi)
+  }, [tt, idBuoi])
 
   const capNhat = useCallback(
     (x: TrangThaiBuoi) =>
