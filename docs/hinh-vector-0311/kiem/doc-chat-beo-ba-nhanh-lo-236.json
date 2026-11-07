@@ -1,0 +1,579 @@
+{
+  "i": 490,
+  "hash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef.png",
+  "nativeSize": [
+    942,
+    340
+  ],
+  "reviewed": [
+    "native2x all vertices/ends individually counted"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C123-D1-III-5",
+      "maDe": "12-KT-C123-D1",
+      "de": "Hydrogen hoá chất béo lỏng để chuyển thành chất béo rắn là quá trình phá vỡ các liên kết C=C để chuyển thành các liên kết C−C. Cho công thức cấu tạo của triglyceride X ở hình dưới. Chất béo E có chứa X và các triglyceride no.\nHydrogen hoá hoàn toàn 10 kg E thu được tối đa 10,05 kg chất béo no.\nThành phần phần trăm theo khối lượng của X có trong E là bao nhiêu phần trăm? (Làm tròn kết quả đến hàng phần mười).",
+      "hinh": [
+        {
+          "hash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef",
+          "where": "12-KT-C123-D1-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "d9f2d566168a03b15a1564131f6b537b8c2e1b9f166abf9a92c007be94539476"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P2-D3-III-17",
+      "maDe": "DB-12-B1-P2-D3",
+      "de": "Hydrogen hoá chất béo lỏng để chuyển thành chất béo rắn là quá trình phá vỡ các liên kết C=C để chuyển thành các liên kết C−C. Cho công thức cấu tạo của triglyceride X ở hình dưới. Chất béo E có chứa X và các triglyceride no.\nHydrogen hoá hoàn toàn 10 kg E thu được tối đa 10,05 kg chất béo no.\nThành phần phần trăm theo khối lượng của X có trong E là bao nhiêu phần trăm? (Làm tròn kết quả đến hàng phần mười).",
+      "hinh": [
+        {
+          "hash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef",
+          "where": "DB-12-B1-P2-D3-III-17.hinh.0.du_lieu",
+          "hashDataUrl": "d9f2d566168a03b15a1564131f6b537b8c2e1b9f166abf9a92c007be94539476"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "glycerol": {
+      "labels": [
+        {
+          "text": "CH₂",
+          "Cnear": [
+            75,
+            128
+          ]
+        },
+        {
+          "text": "CH",
+          "Cnear": [
+            75,
+            185
+          ]
+        },
+        {
+          "text": "CH₂",
+          "Cnear": [
+            75,
+            245
+          ]
+        }
+      ],
+      "verticalBonds": [
+        [
+          73,
+          142,
+          73,
+          170
+        ],
+        [
+          74,
+          200,
+          74,
+          230
+        ]
+      ],
+      "horizontalBondsToO": "top approx116..137 at127;middle106..135 at184;bottom116..137 at245; C backbone anchors left letter C x74, not right H/subscript",
+      "esterOlabels": [
+        [
+          150,
+          128
+        ],
+        [
+          149,
+          185
+        ],
+        [
+          149,
+          245
+        ]
+      ],
+      "esterOtoCarbonyl": "single slant up-right top165,120→191,105;middle162,176→189,161;bottom162,238→189,223"
+    },
+    "acylChains": [
+      {
+        "row": "top",
+        "carbonCount": 16,
+        "carbons": [
+          {
+            "C": 1,
+            "xy": [
+              191,
+              105
+            ]
+          },
+          {
+            "C": 2,
+            "xy": [
+              232,
+              128
+            ]
+          },
+          {
+            "C": 3,
+            "xy": [
+              270,
+              105
+            ]
+          },
+          {
+            "C": 4,
+            "xy": [
+              310,
+              128
+            ]
+          },
+          {
+            "C": 5,
+            "xy": [
+              350,
+              105
+            ]
+          },
+          {
+            "C": 6,
+            "xy": [
+              390,
+              128
+            ]
+          },
+          {
+            "C": 7,
+            "xy": [
+              430,
+              105
+            ]
+          },
+          {
+            "C": 8,
+            "xy": [
+              470,
+              128
+            ]
+          },
+          {
+            "C": 9,
+            "xy": [
+              510,
+              105
+            ]
+          },
+          {
+            "C": 10,
+            "xy": [
+              550,
+              128
+            ]
+          },
+          {
+            "C": 11,
+            "xy": [
+              590,
+              105
+            ]
+          },
+          {
+            "C": 12,
+            "xy": [
+              630,
+              128
+            ]
+          },
+          {
+            "C": 13,
+            "xy": [
+              670,
+              105
+            ]
+          },
+          {
+            "C": 14,
+            "xy": [
+              710,
+              128
+            ]
+          },
+          {
+            "C": 15,
+            "xy": [
+              750,
+              105
+            ]
+          },
+          {
+            "C": 16,
+            "xy": [
+              790,
+              128
+            ]
+          }
+        ],
+        "CCdouble": [],
+        "carbonylO": [
+          191,
+          64
+        ],
+        "COdouble": "two vertical lines186/194 from77to105"
+      },
+      {
+        "row": "middle",
+        "carbonCount": 18,
+        "carbons": [
+          {
+            "C": 1,
+            "xy": [
+              189,
+              161
+            ]
+          },
+          {
+            "C": 2,
+            "xy": [
+              228,
+              184
+            ]
+          },
+          {
+            "C": 3,
+            "xy": [
+              269,
+              160
+            ]
+          },
+          {
+            "C": 4,
+            "xy": [
+              309,
+              184
+            ]
+          },
+          {
+            "C": 5,
+            "xy": [
+              350,
+              160
+            ]
+          },
+          {
+            "C": 6,
+            "xy": [
+              389,
+              184
+            ]
+          },
+          {
+            "C": 7,
+            "xy": [
+              429,
+              160
+            ]
+          },
+          {
+            "C": 8,
+            "xy": [
+              468,
+              184
+            ]
+          },
+          {
+            "C": 9,
+            "xy": [
+              509,
+              160
+            ]
+          },
+          {
+            "C": 10,
+            "xy": [
+              554,
+              160
+            ]
+          },
+          {
+            "C": 11,
+            "xy": [
+              594,
+              184
+            ]
+          },
+          {
+            "C": 12,
+            "xy": [
+              634,
+              160
+            ]
+          },
+          {
+            "C": 13,
+            "xy": [
+              674,
+              184
+            ]
+          },
+          {
+            "C": 14,
+            "xy": [
+              714,
+              160
+            ]
+          },
+          {
+            "C": 15,
+            "xy": [
+              754,
+              184
+            ]
+          },
+          {
+            "C": 16,
+            "xy": [
+              794,
+              160
+            ]
+          },
+          {
+            "C": 17,
+            "xy": [
+              834,
+              184
+            ]
+          },
+          {
+            "C": 18,
+            "xy": [
+              874,
+              160
+            ]
+          }
+        ],
+        "CCdouble": [
+          [
+            9,
+            10
+          ]
+        ],
+        "innerLines": [
+          [
+            516,
+            169,
+            548,
+            169
+          ]
+        ],
+        "carbonylO": [
+          189,
+          126
+        ],
+        "COdouble": "two vertical lines185/192 from140to161"
+      },
+      {
+        "row": "bottom",
+        "carbonCount": 18,
+        "carbons": [
+          {
+            "C": 1,
+            "xy": [
+              189,
+              223
+            ]
+          },
+          {
+            "C": 2,
+            "xy": [
+              228,
+              246
+            ]
+          },
+          {
+            "C": 3,
+            "xy": [
+              269,
+              223
+            ]
+          },
+          {
+            "C": 4,
+            "xy": [
+              309,
+              246
+            ]
+          },
+          {
+            "C": 5,
+            "xy": [
+              350,
+              223
+            ]
+          },
+          {
+            "C": 6,
+            "xy": [
+              389,
+              246
+            ]
+          },
+          {
+            "C": 7,
+            "xy": [
+              429,
+              223
+            ]
+          },
+          {
+            "C": 8,
+            "xy": [
+              468,
+              246
+            ]
+          },
+          {
+            "C": 9,
+            "xy": [
+              509,
+              223
+            ]
+          },
+          {
+            "C": 10,
+            "xy": [
+              554,
+              223
+            ]
+          },
+          {
+            "C": 11,
+            "xy": [
+              594,
+              246
+            ]
+          },
+          {
+            "C": 12,
+            "xy": [
+              635,
+              223
+            ]
+          },
+          {
+            "C": 13,
+            "xy": [
+              680,
+              223
+            ]
+          },
+          {
+            "C": 14,
+            "xy": [
+              720,
+              246
+            ]
+          },
+          {
+            "C": 15,
+            "xy": [
+              760,
+              223
+            ]
+          },
+          {
+            "C": 16,
+            "xy": [
+              805,
+              223
+            ]
+          },
+          {
+            "C": 17,
+            "xy": [
+              845,
+              246
+            ]
+          },
+          {
+            "C": 18,
+            "xy": [
+              886,
+              223
+            ]
+          }
+        ],
+        "CCdouble": [
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "innerLines": [
+          [
+            516,
+            230,
+            548,
+            230
+          ],
+          [
+            642,
+            230,
+            674,
+            230
+          ],
+          [
+            768,
+            230,
+            800,
+            230
+          ]
+        ],
+        "carbonylO": [
+          189,
+          184
+        ],
+        "COdouble": "two vertical lines185/192 from199to223"
+      }
+    ],
+    "alkeneGeometry": "All drawn double bonds horizontal plateau; adjacent chain substituents both below each plateau. Preserve literal geometry, no stereo wedges/text.",
+    "counts": {
+      "acylCarbon": 52,
+      "glycerolCarbon": 3,
+      "totalCarbon": 55,
+      "O": 6,
+      "COdouble": 3,
+      "CCdouble": 4,
+      "CH2text": 2,
+      "CHtext": 1,
+      "standaloneH": 0,
+      "printedCarbonNumbers": 0
+    },
+    "caption": "(X)",
+    "captionNear": [
+      434,
+      277
+    ],
+    "terminalEndpoints": "all three rightmost endpoints free, no CH3 labels/no additional endpoint C",
+    "noExtra": [
+      "No atom numbers from this analysis should print",
+      "No inferred fatty acid names",
+      "No hydrogenation calculations or answer"
+    ]
+  },
+  "status": "Đạt exact SVG sau actual review",
+  "actualReview": {
+    "i": 490,
+    "hashSvg": "c2733599f6adc5abd758efed186b2b6d4be5507a34eba0211e55acd318991d15",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exact SVG2x, mở full và zoom riêng nét đôi cuối bottom; đối chiếu native2x đếm từng vertex/end cùng hai public refs.55C=3glycerol+16top+18middle+18bottom,6O/3COdouble/4CCdouble (0top/1middle/3bottom) đúng vị trí và offsets. GlycerolCH2-CH-CH2/Oanchors/esterbonds đúng, mọi đầu mạch free;caption(X)literal, không thêmH/CH3/answers. Chữ/nét không chạm/cắt/tràn.",
+    "actualSvgReviewed": true,
+    "byteSvg": 9000,
+    "render": "/workspace/scratch/fat490-236-c2733599-chromium.png",
+    "detail": "/workspace/scratch/fat490-lastdouble-detail.png",
+    "sourceHash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef"
+  }
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "i": 490,
+    "hash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef",
+    "fileNguon": "anh/5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef.png",
+    "svg": "chat-beo-ba-nhanh-ddh-c2733599f6adc5abd758efed186b2b6d4be5507a34eba0211e55acd318991d15.svg",
+    "hashSvg": "c2733599f6adc5abd758efed186b2b6d4be5507a34eba0211e55acd318991d15",
+    "byteSvg": 9000,
+    "font": "DDH Rounded",
+    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D1-III-5",
+        "de": "Hydrogen hoá chất béo lỏng để chuyển thành chất béo rắn là quá trình phá vỡ các liên kết C=C để chuyển thành các liên kết C−C. Cho công thức cấu tạo của triglyceride X ở hình dưới. Chất béo E có chứa X và các triglyceride no.\nHydrogen hoá hoàn toàn 10 kg E thu được tối đa 10,05 kg chất béo no.\nThành phần phần trăm theo khối lượng của X có trong E là bao nhiêu phần trăm? (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef",
+            "where": "12-KT-C123-D1-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "d9f2d566168a03b15a1564131f6b537b8c2e1b9f166abf9a92c007be94539476"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P2-D3-III-17",
+        "de": "Hydrogen hoá chất béo lỏng để chuyển thành chất béo rắn là quá trình phá vỡ các liên kết C=C để chuyển thành các liên kết C−C. Cho công thức cấu tạo của triglyceride X ở hình dưới. Chất béo E có chứa X và các triglyceride no.\nHydrogen hoá hoàn toàn 10 kg E thu được tối đa 10,05 kg chất béo no.\nThành phần phần trăm theo khối lượng của X có trong E là bao nhiêu phần trăm? (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "5ae2bfb1fedcbf84c9e5d8f39257bdfafd6c41f009ae3831fda942162e21d8ef",
+            "where": "DB-12-B1-P2-D3-III-17.hinh.0.du_lieu",
+            "hashDataUrl": "d9f2d566168a03b15a1564131f6b537b8c2e1b9f166abf9a92c007be94539476"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "55C=3glycerol+16/18/18acyl/6O/3COdouble4CCdouble/top0middle1bottom3CCdouble/CH2-CH-CH2-Oliteral/3freeends/(X)caption/noaddedHconditions-answer/DDHpath.",
+    "hashSvgDaSoat": "c2733599f6adc5abd758efed186b2b6d4be5507a34eba0211e55acd318991d15",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]
