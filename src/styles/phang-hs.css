@@ -303,3 +303,13 @@ html[data-trong='hs']:not(#_):not(#_) .duo-gt-san[data-l] .duo-gt-bong { border-
 
 /* 07/11 khuya — ĐỒNG BỘ với phông ĐĐH Rounded v5 (commit 3bc9b13 phiên vigilant-lamport, đo Duolingo trên phông MỚI): nhãn + nút IN HOA .02em, chữ đoạn
    giãn dòng 1,65 (bước dòng / chiều cao chữ x = 3,08). Số .06em / 1,5 ở trên đo trên phông CŨ ⇒ đã thay bằng số phông v5. */
+
+/* 07/11 khuya thầy «làm phẳng đẹp lại nữa (3 ô ngày · nguyên tử · tinh thể); cái mũi tên ở bong bóng cho liền mạch đồng bộ với bong bóng»:
+   - 3 ô: MỘT viên phẳng, nền trong (trùng nền trang) + viền 2px như mọi khung, bo 12, cao 36; số + biểu tượng giữ màu riêng (hết viên lồng viên).
+   - Mũi bong bóng Mol: bong bóng nay tô đặc một màu ⇒ mũi CÙNG màu, KHÔNG cắt nửa / không viền ⇒ phần đè lên thân hoà làm một, liền mạch. */
+html[data-trong='hs']:not(#_):not(#_) .kb-chip, html[data-trong='hs']:not(#_):not(#_) .kb-hero .kb-chip { height: auto !important; padding: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; outline: 0 !important; }
+html[data-trong='hs']:not(#_):not(#_) .kb-chip > span { height: 36px !important; padding: 0 12px 0 10px !important; border-radius: 12px !important; background: transparent !important;
+  border: 2px solid var(--tr-vien) !important; box-shadow: none !important; }
+html[data-trong='hs']:not(#_):not(#_) .kb-mol .kb-mol-bong:not(:is([data-cx='nghi'], [data-cx='ngu'], [data-cx='buon']))::before,
+html[data-trong='hs']:not(#_):not(#_) .bi-loi-boc[data-ben] .bi-loi .bi-loi-bong[data-cx]::before {
+  clip-path: none !important; border: 0 !important; border-radius: 3px !important; box-shadow: none !important; background: var(--bb-nen, var(--tr-mat)) !important; }
