@@ -1,0 +1,29 @@
+{
+  "lo": 246,
+  "chromium": "596/596",
+  "hashXmlSelfcontainedAst": true,
+  "build": true,
+  "speed": "21/21",
+  "precache": "170/2613.23KiB",
+  "serviceWorker": "14/14",
+  "serverTsc": true,
+  "checkMau": "0hexngoàitoken",
+  "mainFull": "87d15a581b55c484cb2065f60abfd17ba8e56b71",
+  "woff2Diff": false,
+  "fontMainPending": "25SVG/31nguồncũ,cộngdồn36SVGđãsoátmainfont",
+  "fullVitestThisBatch": false,
+  "fullVitestPriorProof": "full-vitest-lo-239.json",
+  "reasonNoFullThisBatch": "Chỉasset/builder riêng/docs,khôngđổisrc-app/font/sharedcode.FulltheotênvớiMAINmớinhấtbắtbuộctrướcmerge/deploy.",
+  "colorAgainstMain": {
+    "viPham": 321,
+    "baseline": true,
+    "proof": "mau-main-lo-246-nen.json"
+  },
+  "indexTs": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf",
+    "redBaseline": true,
+    "proof": "co-tep-lo-167-nen.json"
+  },
+  "gioiHan": "Chưa tích hợp/chưa reload offline app/chưa phát hành. Build246/speed21/21/Chromium596/596/hashXML/path/AST/SW14/14/serverTSCđạt. SizegateđỏNỀNindex.tsnguyênbytekhôngnângmốc;MàusoMain87d15a58321khácbiệtnền/70tệp,lônàykhôngsửasrc. Full239nhánh16581/main5d89cd4d16709làmốclịchsử,khôngthayfulltestMAINmớinhấttrướcmerge/deploy.25SVG/31nguồnchưakhớpfontmain;khôngallrepođạt."
+}

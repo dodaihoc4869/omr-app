@@ -1,0 +1,167 @@
+{
+  "i": 582,
+  "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253.png",
+  "nativeSize": [
+    634,
+    501
+  ],
+  "reviewed": [
+    "nativeFULL2x/all3bars-labels-guides directlyread"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C123-D2-I-14",
+      "maDe": "12-KT-C123-D2",
+      "de": "Trong dung dịch, các amine đều có khả năng tác dụng với nước ở các mức độ khác nhau. Phản ứng của các amine với nước xảy ra thuận nghịch với hằng số cân bằng là Kc.\nBiểu đồ ở hình dưới biểu diễn giá trị pKc ở 25°C, với pKc bằng trừ logarit của Kc, của một số amine.\nỞ 25°C, nhận định nào sau đây đúng?",
+      "hinh": [
+        {
+          "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+          "where": "12-KT-C123-D2-I-14.hinh.0.du_lieu",
+          "hashDataUrl": "39c1bbb043d5ac7c4a596c236cf23c910d9244dfa2cc0dfe30a4add9f12cf28b"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-I-241",
+      "maDe": "DB-12-B8-D1",
+      "de": "Trong dung dịch, các amine đều có khả năng tác dụng với nước ở các mức độ khác nhau. Phản ứng của các amine với nước xảy ra thuận nghịch với hằng số cân bằng là Kc.\nBiểu đồ ở hình dưới biểu diễn giá trị pKc ở 25°C, với pKc bằng trừ logarit của Kc, của một số amine.\nỞ 25°C, nhận định nào sau đây đúng?",
+      "hinh": [
+        {
+          "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
+          "where": "DB-12-B8-D1-I-241.hinh.0.du_lieu",
+          "hashDataUrl": "39c1bbb043d5ac7c4a596c236cf23c910d9244dfa2cc0dfe30a4add9f12cf28b"
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "axes": {
+      "origin": [
+        87,
+        427
+      ],
+      "verticalEnd": [
+        87,
+        49
+      ],
+      "horizontalEnd": [
+        590,
+        427
+      ],
+      "heads": 2,
+      "directions": [
+        "UP",
+        "RIGHT"
+      ],
+      "labels": null,
+      "zeroLabel": false,
+      "ticks": null
+    },
+    "bars": [
+      {
+        "bounds": [
+          156,
+          96,
+          215,
+          427
+        ],
+        "label": "Aniline",
+        "labelNear": [
+          185,
+          448
+        ],
+        "value": "9,40",
+        "valueNear": [
+          66,
+          95
+        ]
+      },
+      {
+        "bounds": [
+          319,
+          323,
+          379,
+          427
+        ],
+        "label": "Dimethylamine",
+        "labelNear": [
+          349,
+          448
+        ],
+        "value": "3,23",
+        "valueNear": [
+          65,
+          323
+        ]
+      },
+      {
+        "bounds": [
+          478,
+          299,
+          536,
+          427
+        ],
+        "label": "Ethylamine",
+        "labelNear": [
+          507,
+          448
+        ],
+        "value": "3,37",
+        "valueNear": [
+          66,
+          297
+        ]
+      }
+    ],
+    "guides": [
+      {
+        "y": 96,
+        "startX": 92,
+        "endX": 215,
+        "style": "blackfinehorizontalshortdashes",
+        "value": "9,40"
+      },
+      {
+        "y": 299,
+        "startX": 92,
+        "endX": 536,
+        "style": "blackfinehorizontalshortdashes",
+        "value": "3,37"
+      },
+      {
+        "y": 323,
+        "startX": 92,
+        "endX": 379,
+        "style": "blackfinehorizontalshortdashes",
+        "value": "3,23"
+      }
+    ],
+    "occlusion": "guides drawn overgraybars,including throughbar1 at299/323,not hidden behindfill;topguides run to rightedgeownbar",
+    "barsStyle": "solidmediumgrayrectangles equalwidthabout59px,nooutlined3D/gradient/dataannotationsabovebars",
+    "counts": {
+      "bars": 3,
+      "horizontalDashedGuides": 3,
+      "numericLabels": 3,
+      "categoryLabels": 3,
+      "axisHeads": 2
+    },
+    "literalDecimals": "comma decimal 9,40 /3,37 /3,23,keeptrailingzero9,40;noDOTconversion",
+    "layoutWarning": "Barheights sourced frompixelgeometry,doNOTnormalizeaxisfromvalues;noaxisunit/title/pKc/25°Caddedfromstem.",
+    "noExtra": [
+      "No0label/gridvert/tickmarks",
+      "No legend/caption/colorsbyamine",
+      "No answer/basicityinference"
+    ]
+  },
+  "status": "Đạt exactfinalSVG sauactualreview",
+  "actualReview": {
+    "i": 582,
+    "hashSvg": "7b303a0b7a2ba39d69a034d2339c6ae57e8997ca794f814f0b23383f3ab28072",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Tự fresh Chromium exactfinalSVG2x mởactualFULL, mởlạinativeFULL2x/alllabels-guides vàhai publicrefs.3graybars đúngliteralheights96/323/299baseline427,3commalabels9,40/3,37/3,23 vàAniline/Dimethylamine/Ethylamine đúng.3guidesx92gapaxis→ownbarrightedge,OVERbarfill giữ;axes2heads/nozero-unit-title-ticks thêm. Fontgaps khôngchạm/cắt/tràn,khôngnormalizevalueheight/giảiđápán.",
+    "actualSvgReviewed": true,
+    "byteSvg": 20039,
+    "render": "/workspace/scratch/amine582-246-final.png"
+  }
+}
