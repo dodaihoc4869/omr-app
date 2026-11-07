@@ -60,9 +60,9 @@
 .gvv2-dc-vach { height: 10px; border-radius: 6px; background: var(--gvm-mat-2); overflow: hidden; }
 .gvv2-dc-vach i { display: block; height: 100%; background: var(--gvm-xl); border-radius: 6px; transition: width 0.4s; }
 .gvv2-dc-goi-y { margin: 0; font-size: 15px; color: var(--gvm-chu-2); line-height: 1.5; }
-.gvv2-dc-nut { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.gvv2-dc-nut { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
 .gvv2-dc-nut > button { min-height: 48px; }
 .gvv2-dc-tiep { grid-column: 1 / -1; min-height: 72px !important; font-size: 20px; }
-@media (max-width: 560px) { .gvv2-dc-nut { grid-template-columns: 1fr 1fr; } .gvv2-dc-nut > button:last-child { grid-column: 1 / -1; } .gvv2-dc-vong { width: 116px; height: 116px; } }
+@media (max-width: 560px) { .gvv2-dc-nut { grid-template-columns: 1fr 1fr; } .gvv2-dc-vong { width: 116px; height: 116px; } }
 @media (prefers-reduced-motion: reduce) { .gvv2-dc-cham.song { animation: none; } .gvv2-hd-the { transition: none; } }
 html.may-yeu .gvv2-dc-cham.song { animation: none; }

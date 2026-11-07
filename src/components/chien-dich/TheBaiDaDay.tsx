@@ -362,7 +362,7 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
         <section className="gvv2-hd-buoc" data-buoc-ht={4} data-mo={buoc === 4} hidden={buoc !== 4} aria-label="Bước 4 · Đang chiếu">
           {buoc === 4 && dd.idBuoi && buoiMo ? (
             <Suspense fallback={<XuongBuoc nhan="Đang nối màn chiếu" cao={220} />}>
-              <DangChieuBpu buoiId={dd.idBuoi} onVe={() => dat(2)} />
+              <DangChieuBpu buoiId={dd.idBuoi} onVe={() => dat(2)} onMoTo={hd ? () => dat(3) : undefined} />
             </Suspense>
           ) : buoc === 4 ? (
             <p className="gvv2-ht-can">Chưa mở buổi — điểm danh ở bước 1 trước. <button type="button" className="gvv2-nut-vien" onClick={() => dat(1)}>Về bước 1</button></p>

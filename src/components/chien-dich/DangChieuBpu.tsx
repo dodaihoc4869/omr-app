@@ -11,7 +11,7 @@ import type { ViewBang } from '../../lib/bpu/phong'
 const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
 const PHA: Record<string, string> = { 'tra-loi': 'Cả lớp đang làm', goi: 'Đang mời em lên bảng', 'lam-bang': 'Em đang làm trên bảng', mo: 'Đã mở đáp án' }
 
-export default function DangChieuBpu({ buoiId, onVe }: { buoiId: string; onVe: () => void }) {
+export default function DangChieuBpu({ buoiId, onVe, onMoTo }: { buoiId: string; onVe: () => void; onMoTo?: () => void }) {
   const [v, setV] = useState<ViewBang | null>(null)
   const [loi, setLoi] = useState('')
   const [nay, setNay] = useState(() => Date.now())
@@ -83,6 +83,7 @@ export default function DangChieuBpu({ buoiId, onVe }: { buoiId: string; onVe: (
         <button type="button" className="m3-nut-chinh gvv2-dc-tiep" disabled={!l || khoa} onClick={() => lenh('toi')}>Câu tiếp →</button>
         <button type="button" className="gvv2-nut-vien" disabled={!l || khoa} onClick={() => lenh('lui')}>← Câu trước</button>
         <button type="button" className="gvv2-nut-vien" disabled={!l} onClick={() => lenh('giai')}>Lời giải</button>
+        {onMoTo && <button type="button" className="gvv2-nut-vien" onClick={onMoTo}>Mở lại tờ chiếu</button>}
         <button type="button" className="gvv2-nut-vien" onClick={onVe}>Về chọn hoạt động</button>
       </div>
     </section>

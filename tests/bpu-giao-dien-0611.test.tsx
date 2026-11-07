@@ -121,6 +121,12 @@ describe('bảng chiếu', () => {
     expect(onToi).toHaveBeenCalledTimes(2)
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' })) })
     expect(onToi).toHaveBeenLastCalledWith(-1)
+    // Esc chỉ đóng bảng: không lan tới khung tờ chiếu bên dưới (thầy 07/11 «bấm esc xong không có chỗ mở lại tờ chiếu»)
+    const toNghe = vi.fn()
+    window.addEventListener('keydown', toNghe)
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })) })
+    expect(toNghe).not.toHaveBeenCalled()
+    window.removeEventListener('keydown', toNghe)
     const o = document.querySelector('.bb-o .ten')!
     expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
   })

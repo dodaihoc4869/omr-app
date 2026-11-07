@@ -305,7 +305,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     const phim = (e: KeyboardEvent) => {
       if ((e.target as HTMLElement | null)?.closest?.('input,textarea')) return
       const kk = e.key.toLowerCase()
-      if (e.key === 'Escape') { e.preventDefault(); if (moPhim) setMoPhim(false); else if (manPhu) setManPhu(null); else onDong(); return }
+      // Esc chỉ đóng BẢNG (thầy 07/11 «bấm esc xong không có chỗ mở lại tờ chiếu»): chặn lan ⇒ khung tờ chiếu bên dưới không đóng theo.
+      if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); if (moPhim) setMoPhim(false); else if (manPhu) setManPhu(null); else onDong(); return }
       if (e.key === '?') { setMoPhim((m) => !m); return }
       if (kk === 'g' && onGiai) { e.preventDefault(); onGiai(); return }
       if (kk === 'f') { e.preventDefault(); doiToanMan(); return }
