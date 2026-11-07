@@ -259,3 +259,12 @@ html[data-trong='hs']:not(#_) :is(.duo-nut, .vtf-nut, .tcl-nut-chinh, .tr-dd-nut
 /* 07/11 thầy «dấu x làm đơn giản như thế này, bỏ ô tròn» (ảnh Duolingo): nút × thanh trên chỉ còn nét × xám mảnh, không nền / viền; vùng chạm 44 giữ nguyên */
 html[data-trong='hs']:not(#_):not(#_) :is(.duo-tren, .duo-kt-tren) > .duo-dong { background: none !important; box-shadow: none !important; border: 0 !important; color: color-mix(in oklab, var(--tr-chu) 42%, transparent) !important; }
 html[data-trong='hs']:not(#_) :is(.duo-tren, .duo-kt-tren) > .duo-dong svg { width: 26px; height: 26px; stroke-width: 2.25; }
+
+/* 07/11 thầy «đo khoảng cách dòng rồi áp dụng vào app cho chuẩn» — đo ảnh trang chủ Duolingo (tỉ lệ 1,36: thanh bên 256 = 348 điểm): chữ đoạn ~17px,
+   hai đường chân chữ cách 37 điểm = 27px ⇒ giãn dòng 1,6; tiêu đề thẻ ~1,25. Áp: mọi CHỮ ĐOẠN (đề, lời giải, kết quả, lời Mol, mô tả thẻ) 1,6;
+   phương án / ý đúng–sai 1,5 (ô bấm gọn mà vẫn thoáng); tiêu đề lệnh 1,25. */
+html[data-trong='hs']:not(#_) :is(.ht2-lam-de-chu, .duo-kq-chu p, .duo-ghi, .kb-dong-hero, .bi-loi-bong, .gt-loi,
+  .lgk-de, .lgk-tra, .lgk-meo, .lgk-bong, .lgk-ct-chu, .lgk-nhip p, .lgk-bay-m p, .lgk-giai-so p, .lgk-kiem p) { line-height: 1.6 !important; }
+html[data-trong='hs']:not(#_):not(#_) .ht-app.ht2-lam.duo .ht2-lam-de-chu { line-height: 1.6 !important; }
+html[data-trong='hs']:not(#_) :is(.duo .ht2-lam-pa, .duo-kt-thi .ht2-lam-pa, .ht2-lam-y-chu) { line-height: 1.5 !important; }
+html[data-trong='hs']:not(#_) :is(.duo-lenh > h2, .kb-viec h2) { line-height: 1.25 !important; }
