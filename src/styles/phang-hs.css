@@ -116,7 +116,7 @@ html[data-trong='hs']:not(#_) .duo-day.duo-ket { border: 0 !important; }
 html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=dung] .ht2-lam-pa-ma { background: var(--tr-dung-nut) !important; color: var(--tr-hs-tren) !important; }
 html[data-trong='hs']:not(#_) .duo .ht2-lam-pa[data-ket=sai] .ht2-lam-pa-ma { background: var(--tr-sai) !important; color: var(--tr-hs-tren) !important; }
 /* sáng: «nền trang» toàn app = xám nhóm (mọi dải dính / nền màn con đọc --tr-nen đổi theo) */
-/* (bỏ 07/11 khuya: nền sáng = snow Duolingo #fff — không còn đổi --tr-nen sang xám nhóm) */
+/* (bỏ 07/11 khuya: nền sáng = snow Duolingo, trắng — không còn đổi --tr-nen sang xám nhóm) */
 
 /* TỐI: nút chính chàm SÁNG + chữ SẪM như nút Duolingo («Tạo hồ sơ»: chữ sẫm trên lục sáng 9,2:1) ⇒ chữ trên nút chàm ~9:1 (cũ chữ trắng 3,2:1);
    bong bóng Mol «chào» cùng kiểu */
