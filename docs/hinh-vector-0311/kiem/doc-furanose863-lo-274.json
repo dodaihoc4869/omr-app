@@ -1,0 +1,253 @@
+{
+  "i": 863,
+  "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53.png",
+  "size": [
+    397,
+    267
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C2-B4-D1-I-32",
+      "de": "Monosaccharide X có công thức cấu tạo như sau:\nTên gọi của X là",
+      "refs": [
+        {
+          "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+          "where": "12-C2-B4-D1-I-32.hinh.0.du_lieu",
+          "hashDataUrl": "5e1961989e80736525ca00abfede28b0a4b75e6962b550665798c4941bc4ee16"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-23",
+      "de": "Monosaccharide X có công thức cấu tạo như sau:\nTên gọi của X là",
+      "refs": [
+        {
+          "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+          "where": "DB-12-B4-D3-I-23.hinh.0.du_lieu",
+          "hashDataUrl": "5e1961989e80736525ca00abfede28b0a4b75e6962b550665798c4941bc4ee16"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+5x/all2refs actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "ringVertices": {
+      "leftBackC": [
+        52,
+        119
+      ],
+      "leftFrontC": [
+        95,
+        162
+      ],
+      "rightFrontC": [
+        235,
+        162
+      ],
+      "rightBackC": [
+        277,
+        119
+      ],
+      "ringOcenter": [
+        165,
+        85
+      ]
+    },
+    "backBonds": [
+      [
+        [
+          52,
+          119
+        ],
+        [
+          149,
+          91
+        ]
+      ],
+      [
+        [
+          179,
+          91
+        ],
+        [
+          229,
+          105
+        ]
+      ],
+      [
+        [
+          238,
+          108
+        ],
+        [
+          277,
+          119
+        ]
+      ]
+    ],
+    "occlusion": "RingObondtowardrightBackC MUSTGAP x230..237 near y105..108 behind verticalOHbranchatx235. NOjoint there;verticalbranchfrontRightC goes162→99. Keeprearlineleftsegment/rightsegment distinct.",
+    "frontTapers": [
+      {
+        "narrow": [
+          52,
+          119
+        ],
+        "broadEdge": [
+          [
+            91,
+            156
+          ],
+          [
+            99,
+            168
+          ]
+        ],
+        "direction": "widenatleftFrontC"
+      },
+      {
+        "narrow": [
+          277,
+          119
+        ],
+        "broadEdge": [
+          [
+            231,
+            156
+          ],
+          [
+            239,
+            168
+          ]
+        ],
+        "direction": "widenatrightFrontC"
+      }
+    ],
+    "frontBoldHorizontal": [
+      [
+        95,
+        162
+      ],
+      [
+        235,
+        162
+      ]
+    ],
+    "labels": [
+      {
+        "text": "CH₂OH",
+        "bbox": [
+          41,
+          44,
+          135,
+          75
+        ],
+        "bond": [
+          [
+            52,
+            119
+          ],
+          [
+            52,
+            74
+          ]
+        ],
+        "anchor": "FIRST Ctop-left;branchUPleftBackC"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          264,
+          39,
+          311,
+          68
+        ],
+        "bond": [
+          [
+            277,
+            119
+          ],
+          [
+            277,
+            73
+          ]
+        ],
+        "anchor": "Ofirst;branchUPrightBackC"
+      },
+      {
+        "text": "CH₂OH",
+        "bbox": [
+          264,
+          178,
+          361,
+          211
+        ],
+        "bond": [
+          [
+            277,
+            119
+          ],
+          [
+            277,
+            175
+          ]
+        ],
+        "anchor": "FIRST C;branchDOWNrightBackC"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          220,
+          65,
+          266,
+          96
+        ],
+        "bond": [
+          [
+            235,
+            162
+          ],
+          [
+            235,
+            99
+          ]
+        ],
+        "anchor": "Ofirst;branchUPfrontRightC"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          82,
+          201,
+          129,
+          230
+        ],
+        "bond": [
+          [
+            95,
+            162
+          ],
+          [
+            95,
+            200
+          ]
+        ],
+        "anchor": "Ofirst;branchDOWNfrontLeftC"
+      },
+      {
+        "text": "O",
+        "bbox": [
+          153,
+          72,
+          178,
+          99
+        ]
+      }
+    ],
+    "counts": "4ringC+2CH2OH_C=6C;1ringO+3freeOH+2CH2OH_O=6O.2CH2OH/3freeOH/0explicitH/0carbonnums/0caption/0arrow/0charge.",
+    "style": "2frontTAPER+1boldhorizontal;otheruniformthin. Do not addH/stereolabel/name/answer. Preserveup/downsourceevenifknownsugar."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px;countsfromsource notname.",
+  "actualSvgReviewed": false
+}

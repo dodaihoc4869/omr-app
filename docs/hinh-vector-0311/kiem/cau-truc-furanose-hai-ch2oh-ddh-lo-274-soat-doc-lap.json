@@ -1,0 +1,15 @@
+[
+  {
+    "i": 863,
+    "hashSvg": "30e1d52933a7eaf1d5d452b10c186703512179dcde5705cbc05afce659cd90ec",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Tự mởnativeFULL/all2publicrefs12-C2-B4-D1-I-32 vàDB-12-B4-D3-I-23 hinh.0/sau_de/publictrue;freshactualChromiumFULL3x exactSHA+macrorearbondOHgap/CH2OHanchors. Vòng5 gồm4C+O,2CH2OH leftup/rightdown và3OH rightup/front-rightup/front-leftdown=6C6O;giữH chỉ trong nhóm nguồn. Hai cạnh taper nhọn ởrearvertices/rộngfrontvertices,một frontbold ngang,không tựCIP/double. Rearbond phíaO→rightC ngắt rõ saufrontOHstem,không tạo junction giả;mọiCH2OHbond gắn Cđầu chữ,OH gắnO,không chạmglyph. KhôngextraH/charge/caption/labels/answer. DDHpath tựchứa không text/image/fallback;gaps/crop/overflow sạch. Hashbytes khớpmetadata;đốiđộc lập khôngsuyrootreview.",
+    "render": "/workspace/scratch/soat263-863.png",
+    "macro": [
+      "/workspace/scratch/863-rearbond.png",
+      "/workspace/scratch/863-ch2oh.png"
+    ],
+    "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+    "hashSvgDaSoat": "30e1d52933a7eaf1d5d452b10c186703512179dcde5705cbc05afce659cd90ec"
+  }
+]

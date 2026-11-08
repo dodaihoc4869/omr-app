@@ -1,0 +1,40 @@
+[
+  {
+    "i": 863,
+    "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+    "fileNguon": "anh/9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53.png",
+    "svg": "furanose-hai-ch2oh-ddh-30e1d52933a7eaf1d5d452b10c186703512179dcde5705cbc05afce659cd90ec.svg",
+    "hashSvg": "30e1d52933a7eaf1d5d452b10c186703512179dcde5705cbc05afce659cd90ec",
+    "byteSvg": 8518,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D1-I-32",
+        "de": "Monosaccharide X có công thức cấu tạo như sau:\nTên gọi của X là",
+        "refs": [
+          {
+            "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+            "where": "12-C2-B4-D1-I-32.hinh.0.du_lieu",
+            "hashDataUrl": "5e1961989e80736525ca00abfede28b0a4b75e6962b550665798c4941bc4ee16"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-23",
+        "de": "Monosaccharide X có công thức cấu tạo như sau:\nTên gọi của X là",
+        "refs": [
+          {
+            "hash": "9d67a770bfcd66c025f7ff6ed341b1d2494180e500e097348f709e1343183a53",
+            "where": "DB-12-B4-D3-I-23.hinh.0.du_lieu",
+            "hashDataUrl": "5e1961989e80736525ca00abfede28b0a4b75e6962b550665798c4941bc4ee16"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5memberring4C1O+2CH2OH+3freeOH=6C6O/2TAPER1boldhorizontal/rearO-rightbondGAPbehindfrontOHvertical/nojunction/noexplicitH-nums-caption-answer.",
+    "hashSvgDaSoat": "30e1d52933a7eaf1d5d452b10c186703512179dcde5705cbc05afce659cd90ec",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
