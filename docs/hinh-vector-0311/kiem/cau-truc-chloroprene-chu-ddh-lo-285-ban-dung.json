@@ -1,0 +1,29 @@
+[
+  {
+    "i": 999,
+    "hash": "b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46",
+    "fileNguon": "anh/b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46.png",
+    "svg": "chloroprene-chu-ddh-44fdd0b7c84fe0508c7c12ca29a38be4d8a623cbd6b81cad86ff723e64d14c56.svg",
+    "hashSvg": "44fdd0b7c84fe0508c7c12ca29a38be4d8a623cbd6b81cad86ff723e64d14c56",
+    "byteSvg": 26224,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C4-B13-III-26",
+        "de": "Cao su chloroprene có thể tổng hợp từ acetylene theo sơ đồ: Cần bao nhiêu tấn acetylene để sản xuất 1 tấn cao su chloroprene?\nGiả sử hiệu suất phản ứng trùng hợp là 78%. (Kết quả làm tròn đến hàng phần trăm).",
+        "refs": [
+          {
+            "hash": "b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46",
+            "where": "12-C4-B13-III-26.hinh.0.du_lieu",
+            "hashDataUrl": "824af17f54674156e9c2dc1f48031c5cc9aed492b9ebb0e9c3dc63030e8c6733"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4textnodes6lines/3openVRIGHT/Acetylene→vinyl acetylene(C4H4)→chloroprene→cao su chloroprene/2sub4/regularDDH/case-literal/noaddedformula-condition-yield-answer.",
+    "hashSvgDaSoat": "44fdd0b7c84fe0508c7c12ca29a38be4d8a623cbd6b81cad86ff723e64d14c56",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

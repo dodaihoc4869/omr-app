@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1013,
+    "hash": "b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20",
+    "fileNguon": "anh/b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20.png",
+    "svg": "ky-hieu-pet-ddh-e2c72312c1f59c4235d70e730dfaf82cd430a364badb50712cf83cabb86b194f.svg",
+    "hashSvg": "e2c72312c1f59c4235d70e730dfaf82cd430a364badb50712cf83cabb86b194f",
+    "byteSvg": 2276,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C34-D2-I-11",
+        "de": "Poly(ethylene terephthalate), viết tắt là PET, là một polymer được điều chế từ terephthalic acid và ethylene glycol. PET được sử dụng để sản xuất tơ, chai đựng nước uống, hộp đựng thực phẩm.\nĐể thuận lợi cho việc nhận biết, sử dụng và tái chế thì các đồ nhựa làm từ vật liệu chứa PET thường được in kí hiệu như hình dưới.\nNhận định nào sau đây không đúng?",
+        "refs": [
+          {
+            "hash": "b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20",
+            "where": "12-KT-C34-D2-I-11.hinh.0.du_lieu",
+            "hashDataUrl": "eb3b33b4fe9c3f4ec48e5294820d76da00c1b361316c2fdcea038312a2e5fff3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3separatefilledcurvedCLOCKWISEarrows/3integralheads/center1actualdam/PETbelowactualdam/flatblack/noaddedcircle-triangle-charge-caption-answer.",
+    "hashSvgDaSoat": "e2c72312c1f59c4235d70e730dfaf82cd430a364badb50712cf83cabb86b194f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

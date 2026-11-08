@@ -1,0 +1,172 @@
+{
+  "i": 999,
+  "hash": "b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46.png",
+  "size": [
+    1106,
+    145
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C4-B13-III-26",
+      "de": "Cao su chloroprene có thể tổng hợp từ acetylene theo sơ đồ: Cần bao nhiêu tấn acetylene để sản xuất 1 tấn cao su chloroprene?\nGiả sử hiệu suất phản ứng trùng hợp là 78%. (Kết quả làm tròn đến hàng phần trăm).",
+      "allHinh": [
+        {
+          "hash": "b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46",
+          "where": "12-C4-B13-III-26.hinh.0.du_lieu",
+          "hashDataUrl": "824af17f54674156e9c2dc1f48031c5cc9aed492b9ebb0e9c3dc63030e8c6733"
+        }
+      ],
+      "missingHashes": [
+        "b3ea0e1e5831d63be8ae31c21236e23d1bab6dedaa07e8ebb6e8c63d1bc19e46"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhmissingonlythishash=>1full/noPartial.",
+  "review": "NativeFULL+3x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "nodes": [
+      {
+        "text": "Acetylene",
+        "bbox": [
+          30,
+          37,
+          164,
+          67
+        ],
+        "style": "regularuprightcapitalAonly"
+      },
+      {
+        "text": "vinyl acetylene",
+        "bbox": [
+          302,
+          36,
+          501,
+          68
+        ],
+        "below": {
+          "text": "(C₄H₄)",
+          "bbox": [
+            339,
+            77,
+            422,
+            110
+          ]
+        },
+        "style": "regularuprightlowercase;sub4bothinsidebalancedroundparentheses"
+      },
+      {
+        "text": "chloroprene",
+        "bbox": [
+          639,
+          35,
+          797,
+          67
+        ],
+        "style": "regularuprightlowercase"
+      },
+      {
+        "text": "cao su\nchloroprene",
+        "lineBboxes": [
+          [
+            938,
+            27,
+            1028,
+            55
+          ],
+          [
+            909,
+            75,
+            1069,
+            105
+          ]
+        ],
+        "style": "regularuprightlowercase2lines,endnodecenter~990"
+      }
+    ],
+    "arrows": [
+      {
+        "shaft": [
+          [
+            194,
+            52
+          ],
+          [
+            279,
+            52
+          ]
+        ],
+        "openVhead": [
+          [
+            269,
+            44
+          ],
+          [
+            279,
+            52
+          ],
+          [
+            269,
+            60
+          ]
+        ]
+      },
+      {
+        "shaft": [
+          [
+            529,
+            51
+          ],
+          [
+            613,
+            51
+          ]
+        ],
+        "openVhead": [
+          [
+            603,
+            43
+          ],
+          [
+            613,
+            51
+          ],
+          [
+            603,
+            59
+          ]
+        ]
+      },
+      {
+        "shaft": [
+          [
+            818,
+            50
+          ],
+          [
+            903,
+            50
+          ]
+        ],
+        "openVhead": [
+          [
+            893,
+            42
+          ],
+          [
+            903,
+            50
+          ],
+          [
+            893,
+            58
+          ]
+        ]
+      }
+    ],
+    "counts": "4textnodes5linesincludingfinaltwolines+1formula(C4H4)belowsecond,3RIGHTopenVheads. NoaddedCHtriple/polymerformula/Cl/HCl/yield78%/caption/answer/conditions/stepnumbers."
+  },
+  "coordinateMeaning": "Nativepixelsapprox1–2px,literalwordcase/linebreakpreserved.",
+  "actualSvgReviewed": false
+}

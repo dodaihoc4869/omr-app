@@ -1,0 +1,107 @@
+{
+  "i": 1013,
+  "hash": "b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20.png",
+  "size": [
+    273,
+    323
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C34-D2-I-11",
+      "de": "Poly(ethylene terephthalate), viết tắt là PET, là một polymer được điều chế từ terephthalic acid và ethylene glycol. PET được sử dụng để sản xuất tơ, chai đựng nước uống, hộp đựng thực phẩm.\nĐể thuận lợi cho việc nhận biết, sử dụng và tái chế thì các đồ nhựa làm từ vật liệu chứa PET thường được in kí hiệu như hình dưới.\nNhận định nào sau đây không đúng?",
+      "allHinh": [
+        {
+          "hash": "b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20",
+          "where": "12-KT-C34-D2-I-11.hinh.0.du_lieu",
+          "hashDataUrl": "eb3b33b4fe9c3f4ec48e5294820d76da00c1b361316c2fdcea038312a2e5fff3"
+        }
+      ],
+      "missingHashes": [
+        "b6020478d310e28d5745ed1cf5e3db55ebd6b3cec2754a2f505c9d2f158f4f20"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhmissingonlythishash=>1full/noPartial.",
+  "review": "NativeFULL+4x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "classification": "Flatblacktypographicrecyclingiconnotphoto;vectorredrawallowed,literal1PETand3arrowdirectionsrequired.",
+  "geometry": {
+    "labels": [
+      {
+        "text": "1",
+        "bbox": [
+          119,
+          110,
+          146,
+          178
+        ],
+        "bold": true,
+        "note": "nootherdigit;largecenter1withsmallupperleftflag,NOcirclearound1"
+      },
+      {
+        "text": "PET",
+        "bbox": [
+          88,
+          242,
+          192,
+          282
+        ],
+        "bold": true,
+        "note": "Alluppercaseuprightactualblackbold,singlelinecenter140"
+      }
+    ],
+    "arrows": [
+      {
+        "name": "upper",
+        "direction": "UPthenDOWNRIGHT,clockwise",
+        "outlineApprox": "M85 106 L115 59 C126 42 142 41 154 52 C164 62 172 78 182 91 L193 86 L186 114 L159 105 L169 99 L148 68 C140 60 134 63 127 73 L100 115 Z",
+        "bbox": [
+          85,
+          45,
+          193,
+          115
+        ],
+        "headTip": [
+          186,
+          114
+        ]
+      },
+      {
+        "name": "lowerLeft",
+        "direction": "LEFTthenUPRIGHT,clockwise",
+        "outlineApprox": "M131 196 L131 214 H84 C61 214 47 202 47 183 C47 171 60 151 68 138 L59 132 L85 124 L92 151 L82 146 L67 172 C60 184 67 196 83 196 Z",
+        "bbox": [
+          47,
+          124,
+          132,
+          214
+        ],
+        "headTip": [
+          85,
+          124
+        ]
+      },
+      {
+        "name": "lowerRight",
+        "direction": "DOWNthenLEFT,clockwise",
+        "outlineApprox": "M186 127 L201 119 L224 158 C239 184 231 202 212 210 C206 213 199 214 193 214 H164 V226 L143 207 L164 188 V196 H193 C208 196 219 188 209 172 Z",
+        "bbox": [
+          143,
+          119,
+          232,
+          226
+        ],
+        "headTip": [
+          143,
+          207
+        ]
+      }
+    ],
+    "gaps": "THREEseparatearrowpolygonsnotclosedtriangle:upper→leftgapnear(90,120),upper→rightgapnear(190,117),bottomgapx132..143 at~205. Keepwhitearoundcenter1 andPETseparatedbelow~16px.",
+    "counts": "3blackcurvedarrows/3headtips/1digit1/1PETlabel;NOextraR/resinname/circle/charge/caption/answer.",
+    "style": "Nooutlinearoundblackshapes,solidfill;sourceedgesroundedcurvesnotrigidtriangle/arrowsnotloopwithcontinuousjoin."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,outlinedpathsaproxreadableliteralshape;actualnewSVGrequiresfreshcomparebeforeadmit.",
+  "actualSvgReviewed": false
+}
