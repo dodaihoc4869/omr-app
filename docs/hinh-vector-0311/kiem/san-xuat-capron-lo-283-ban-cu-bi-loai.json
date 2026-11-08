@@ -1,0 +1,28 @@
+[
+  {
+    "i": 967,
+    "hash": "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440",
+    "fileNguon": "anh/adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440.png",
+    "svg": "san-xuat-capron-ddh-adab2cf919e31b4cd78ed7fb362e643c1f9da6105161979baf134123906a5982.svg",
+    "hashSvg": "adab2cf919e31b4cd78ed7fb362e643c1f9da6105161979baf134123906a5982",
+    "byteSvg": 42032,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "bi-loai-truoc-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D5-II-3",
+        "de": "Tơ capron là polymer có tính dai, bền, mềm óng mượt, ít thấm nước, mau khô. Bên cạnh ứng dụng trong ngành may mặc, tơ capron còn được sử dụng làm dây cáp, đan lưới, chế tạo các chi tiết máy… Một quy trình sản xuất tơ capron từ cyclohexanol được thực hiện theo sơ đồ sau:",
+        "refs": [
+          {
+            "hash": "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440",
+            "where": "12-KT-C4-D5-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "60dbc4a19c74fa03f772f820be40509fa4cec195a5a85ba76d8d4ef574b65bc9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4structures/6-6-7rings/5bareCH2polymer/3COdouble/3filledRIGHTheads/3stepnums/[O]/+NH2OH/xt,t°/squarepair+nsub/EXACTCyclohexanol-Cyclohexanon-Caprolactam-Tơcapron/noaddedoxime-H2O-condition-answer.",
+    "lyDo": "Rootactual phát hiện4captiondùngregular;sourceALL4actualdam. Khôngadmitoldhash;finalchỉđổicaptionsactualdam/size26 giữmọinétkhác."
+  }
+]

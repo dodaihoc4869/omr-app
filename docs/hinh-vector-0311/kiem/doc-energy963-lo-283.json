@@ -1,0 +1,113 @@
+{
+  "i": 963,
+  "hash": "ad3cef1274df18a25b1c25e52253c784b9fa972d4a17e7d736ebfa012cc4f887",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ad3cef1274df18a25b1c25e52253c784b9fa972d4a17e7d736ebfa012cc4f887.png",
+  "size": [
+    587,
+    434
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "10-C5-B17-II-5",
+      "de": "Đường sucrose (C₁₂H₂₂O₁₁) là một đường đôi. Trong môi trường acid ở dạ dày và ở nhiệt độ cơ thể, sucrose bị thuỷ phân thành glucose (C₆H₁₂O₆) và fructose (C₆H₁₂O₆), sau đó bị oxi hoá bởi oxygen tạo thành CO₂ và H₂O. Sơ đồ thay đổi năng lượng hoá học của phản ứng cho ở hình dưới.",
+      "allHinh": [
+        {
+          "hash": "ad3cef1274df18a25b1c25e52253c784b9fa972d4a17e7d736ebfa012cc4f887",
+          "where": "10-C5-B17-II-5.hinh.0.du_lieu",
+          "hashDataUrl": "f11b0d2912e7b18f05a9a66d27743cd63c531e9b005a36a1a05057a6df4d4467"
+        }
+      ],
+      "missingHashes": [
+        "ad3cef1274df18a25b1c25e52253c784b9fa972d4a17e7d736ebfa012cc4f887"
+      ]
+    }
+  ],
+  "fullClosure": "Only1qid/1hinh/onlymissingthishash=>1full/noextraPartial.",
+  "review": "NativeFULL+4x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "axes": "Origin(78,349);Yshaft78,349→78,43;UPopenVhead(70,65),(78,43),(85,65). Xshaft78,349→534,349;RIGHTopenVhead(514,341),(534,349),(514,357). No0/ticks/numericvalues/axisunits.",
+    "plateaus": [
+      {
+        "line": [
+          [
+            78,
+            119
+          ],
+          [
+            287,
+            119
+          ]
+        ],
+        "label": {
+          "text": "C₆H₁₂O₆ + O₂",
+          "bbox": [
+            102,
+            75,
+            267,
+            109
+          ],
+          "style": "BOLDupright,sub6/12/6/2;plusbaseline. Reopened6xH/C/Ostemsvisuallymatchboldserif."
+        }
+      },
+      {
+        "line": [
+          [
+            360,
+            291
+          ],
+          [
+            535,
+            291
+          ]
+        ],
+        "labelAbove": {
+          "text": "Sản phẩm",
+          "bbox": [
+            389,
+            251,
+            507,
+            281
+          ],
+          "style": "BOLDupright;reopened6xSảnphẩmthickserif"
+        },
+        "labelBelow": {
+          "text": "CO₂ + H₂O",
+          "bbox": [
+            383,
+            304,
+            510,
+            335
+          ],
+          "style": "BOLDupright,sub2/2;reopened6x"
+        }
+      }
+    ],
+    "yTitle": {
+      "text": "Năng lượng hoá học",
+      "bbox": [
+        44,
+        91,
+        69,
+        328
+      ],
+      "rotation": -90,
+      "style": "BOLDupright"
+    },
+    "xTitle": {
+      "text": "Tiến trình phản ứng",
+      "bbox": [
+        303,
+        365,
+        535,
+        393
+      ],
+      "style": "BOLDupright"
+    },
+    "counts": "2axes2openheads/2horizontalenergylevels/5textblocksincluding2formulas2axislabels1Sảnphẩm. Nojoiningcurve/verticaltransition/deltaH/coefficient/units/zero/ticks/caption/answeradded.",
+    "note": "UpperplateauconnectsYaxisexactly;lowerproductplateaufloatingrightnotconnectedaxis;donotaddconnectors."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,graphlevelsnotnumericenergyvalues.",
+  "actualSvgReviewed": false,
+  "weightConfirmation": "All5textblocksvisuallyBOLDuprightsource;6xmacros963-toplabel6x/963-productlabels6x actuallyopened. Earlierregularuncertaintyremovedaftermacro."
+}

@@ -1,0 +1,515 @@
+{
+  "i": 967,
+  "hash": "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440.png",
+  "size": [
+    1426,
+    264
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C4-D5-II-3",
+      "de": "Tơ capron là polymer có tính dai, bền, mềm óng mượt, ít thấm nước, mau khô. Bên cạnh ứng dụng trong ngành may mặc, tơ capron còn được sử dụng làm dây cáp, đan lưới, chế tạo các chi tiết máy… Một quy trình sản xuất tơ capron từ cyclohexanol được thực hiện theo sơ đồ sau:",
+      "allHinh": [
+        {
+          "hash": "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440",
+          "where": "12-KT-C4-D5-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "60dbc4a19c74fa03f772f820be40509fa4cec195a5a85ba76d8d4ef574b65bc9"
+        }
+      ],
+      "missingHashes": [
+        "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhonlymissingthishash=>1full/noPartial.",
+  "review": "NativeFULL+2x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "cyclohexanol": {
+      "vertices": [
+        [
+          97,
+          103
+        ],
+        [
+          136,
+          81
+        ],
+        [
+          176,
+          103
+        ],
+        [
+          176,
+          148
+        ],
+        [
+          136,
+          170
+        ],
+        [
+          97,
+          148
+        ]
+      ],
+      "OHlabel": {
+        "text": "OH",
+        "bbox": [
+          203,
+          65,
+          246,
+          91
+        ]
+      },
+      "OHbond": [
+        [
+          176,
+          103
+        ],
+        [
+          201,
+          87
+        ]
+      ],
+      "caption": {
+        "text": "Cyclohexanol",
+        "bbox": [
+          60,
+          185,
+          215,
+          212
+        ],
+        "bold": true
+      }
+    },
+    "cyclohexanone": {
+      "vertices": [
+        [
+          369,
+          102
+        ],
+        [
+          407,
+          80
+        ],
+        [
+          447,
+          102
+        ],
+        [
+          447,
+          147
+        ],
+        [
+          407,
+          169
+        ],
+        [
+          369,
+          147
+        ]
+      ],
+      "COdouble": [
+        [
+          [
+            447,
+            99
+          ],
+          [
+            472,
+            84
+          ]
+        ],
+        [
+          [
+            450,
+            105
+          ],
+          [
+            477,
+            90
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          476,
+          65,
+          499,
+          89
+        ]
+      },
+      "caption": {
+        "text": "Cyclohexanon",
+        "bbox": [
+          328,
+          183,
+          490,
+          210
+        ],
+        "bold": true,
+        "note": "EXACTnofinale,notCyclohexanone"
+      }
+    },
+    "lactam": {
+      "verticesFromCO": [
+        [
+          717,
+          90
+        ],
+        [
+          678,
+          68
+        ],
+        [
+          636,
+          86
+        ],
+        [
+          625,
+          129
+        ],
+        [
+          651,
+          168
+        ],
+        [
+          697,
+          168
+        ]
+      ],
+      "NHlabel": {
+        "text": "NH",
+        "bbox": [
+          715,
+          122,
+          756,
+          146
+        ]
+      },
+      "Nbonds": [
+        [
+          [
+            717,
+            90
+          ],
+          [
+            723,
+            120
+          ]
+        ],
+        [
+          [
+            697,
+            168
+          ],
+          [
+            714,
+            149
+          ]
+        ]
+      ],
+      "COdouble": [
+        [
+          [
+            716,
+            86
+          ],
+          [
+            741,
+            72
+          ]
+        ],
+        [
+          [
+            720,
+            93
+          ],
+          [
+            746,
+            79
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          747,
+          55,
+          770,
+          80
+        ]
+      },
+      "caption": {
+        "text": "Caprolactam",
+        "bbox": [
+          614,
+          181,
+          757,
+          210
+        ],
+        "bold": true
+      }
+    },
+    "polymer": {
+      "NHlabel": {
+        "text": "NH",
+        "bbox": [
+          1033,
+          88,
+          1072,
+          111
+        ]
+      },
+      "leftStub": [
+        [
+          998,
+          134
+        ],
+        [
+          1030,
+          112
+        ]
+      ],
+      "verticesAfterN": [
+        [
+          1102,
+          129
+        ],
+        [
+          1141,
+          106
+        ],
+        [
+          1183,
+          128
+        ],
+        [
+          1223,
+          105
+        ],
+        [
+          1264,
+          127
+        ],
+        [
+          1304,
+          106
+        ]
+      ],
+      "Nbond": [
+        [
+          1075,
+          111
+        ],
+        [
+          1102,
+          129
+        ]
+      ],
+      "COdouble": [
+        [
+          [
+            1300,
+            106
+          ],
+          [
+            1300,
+            71
+          ]
+        ],
+        [
+          [
+            1308,
+            106
+          ],
+          [
+            1308,
+            71
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          1293,
+          45,
+          1316,
+          69
+        ]
+      },
+      "rightStub": [
+        [
+          1304,
+          106
+        ],
+        [
+          1353,
+          127
+        ]
+      ],
+      "squareBrackets": [
+        "M103456H1015V150H1034",
+        "M132354H1342V148H1323"
+      ],
+      "nSub": {
+        "text": "n",
+        "bbox": [
+          1348,
+          137,
+          1365,
+          158
+        ]
+      },
+      "caption": {
+        "text": "Tơ capron",
+        "bbox": [
+          1123,
+          165,
+          1241,
+          192
+        ],
+        "bold": true
+      }
+    },
+    "arrows": [
+      {
+        "shaft": [
+          [
+            206,
+            126
+          ],
+          [
+            348,
+            126
+          ]
+        ],
+        "filledhead": [
+          [
+            329,
+            118
+          ],
+          [
+            348,
+            126
+          ],
+          [
+            329,
+            134
+          ]
+        ],
+        "above": {
+          "text": "[O]",
+          "bbox": [
+            258,
+            88,
+            298,
+            117
+          ]
+        },
+        "below": {
+          "text": "(1)",
+          "bbox": [
+            257,
+            134,
+            290,
+            163
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            467,
+            123
+          ],
+          [
+            607,
+            123
+          ]
+        ],
+        "filledhead": [
+          [
+            588,
+            115
+          ],
+          [
+            607,
+            123
+          ],
+          [
+            588,
+            131
+          ]
+        ],
+        "above": {
+          "text": "+NH₂OH",
+          "bbox": [
+            495,
+            94,
+            594,
+            121
+          ]
+        },
+        "below": {
+          "text": "(2)",
+          "bbox": [
+            521,
+            133,
+            556,
+            161
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            799,
+            113
+          ],
+          [
+            943,
+            113
+          ]
+        ],
+        "filledhead": [
+          [
+            924,
+            105
+          ],
+          [
+            943,
+            113
+          ],
+          [
+            924,
+            121
+          ]
+        ],
+        "above": {
+          "text": "xt, t°",
+          "bbox": [
+            850,
+            80,
+            910,
+            108
+          ]
+        },
+        "below": {
+          "text": "(3)",
+          "bbox": [
+            852,
+            124,
+            886,
+            153
+          ]
+        }
+      }
+    ],
+    "counts": "4structures6/6/7/polymer;each6C,1O (4Ototal),lactam/polymerNH2Ntotal;3COdouble,3RIGHTfilledheads,3indices,3conditions,4captionsBOLD. Polymersquarebracketnotround;5bareCH2thenCO. Nooximeintermediate/waterproduct/tempnumber/stoichnreactant/extraansweradded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,visibleliteralnotcorrectedtheory.",
+  "actualSvgReviewed": false
+}

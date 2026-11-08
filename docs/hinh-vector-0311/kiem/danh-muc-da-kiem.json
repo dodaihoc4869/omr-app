@@ -3592,6 +3592,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440": {
+      "tep": "san-xuat-capron-ddh-4722c11d75e593566447211cb8a99a8f5c94457a0eba91d2b045914275778c15.svg",
+      "hashSvg": "4722c11d75e593566447211cb8a99a8f5c94457a0eba91d2b045914275778c15",
+      "byteSvg": 41215,
+      "byteGzip": 6859,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "01818a91aa8ba7178a6488db185db06c17fbeb82c1fe479a05a58e1583d31947": {
       "tep": "hai-surfactant-ddh-7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534.svg",
       "hashSvg": "7ece4c47e4c5ed8dd493d3a830b218c3a418cf7401c69beac56d1481545ed534",
@@ -5883,6 +5892,15 @@
       "hashSvg": "e2c218bc7b3052b3b3e119236365cb358ecd4a8f2790aee4436c2c936e3f1cd6",
       "byteSvg": 4055,
       "byteGzip": 1355,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "ad3cef1274df18a25b1c25e52253c784b9fa972d4a17e7d736ebfa012cc4f887": {
+      "tep": "nang-luong-hai-muc-ddh-83710cd4e1f3757701a43b69a58f5b10c7cc9e848e266951c7d8d01f86a8ba38.svg",
+      "hashSvg": "83710cd4e1f3757701a43b69a58f5b10c7cc9e848e266951c7d8d01f86a8ba38",
+      "byteSvg": 35689,
+      "byteGzip": 7321,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -8665,6 +8683,20 @@
           "where": "10-C3-B12-I-2.hinh.0.du_lieu",
           "hashDataUrl": "aa9beedcf28930aedc7ce8cdd75ced7db26083b1e0f6bb806ce83f2c2ac238d1",
           "vector": "nhom-orbital-ddh-183561c54722d5e1bce7d8826df486f77bd41d92cbf5426dc73e98249edd6c49.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C5-B17-II-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ad3cef1274df18a25b1c25e52253c784b9fa972d4a17e7d736ebfa012cc4f887",
+          "where": "10-C5-B17-II-5.hinh.0.du_lieu",
+          "hashDataUrl": "f11b0d2912e7b18f05a9a66d27743cd63c531e9b005a36a1a05057a6df4d4467",
+          "vector": "nang-luong-hai-muc-ddh-83710cd4e1f3757701a43b69a58f5b10c7cc9e848e266951c7d8d01f86a8ba38.svg"
         }
       ]
     },
@@ -14651,6 +14683,20 @@
           "where": "12-KT-C4-D5-II-2.hinh.0.du_lieu",
           "hashDataUrl": "d0e3a5c104b0f37c92443dfc30719c0e2da436c932d09b154a5859408af814aa",
           "vector": "cau-truc-ddh-ba57b0f6839f56862076e8a77bc81c15dfa64f67cf107414f114467876596476.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D5-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "adaa1e5e128ecce0cdd3e74adb785d631bf2c398293285107ca7db6d4c1c0440",
+          "where": "12-KT-C4-D5-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "60dbc4a19c74fa03f772f820be40509fa4cec195a5a85ba76d8d4ef574b65bc9",
+          "vector": "san-xuat-capron-ddh-4722c11d75e593566447211cb8a99a8f5c94457a0eba91d2b045914275778c15.svg"
         }
       ]
     },
@@ -28219,6 +28265,7 @@
     "10-C1-B3-D2-III-15",
     "10-C1-B3-D2-III-19",
     "10-C3-B12-I-2",
+    "10-C5-B17-II-5",
     "10-C6-B19-I-5",
     "10-C6-B19-II-3",
     "11-C1-B1-I-5",
@@ -28599,6 +28646,7 @@
     "12-KT-C4-D5-I-4",
     "12-KT-C4-D5-I-14",
     "12-KT-C4-D5-II-2",
+    "12-KT-C4-D5-II-3",
     "12-KT-C4-D5-II-4",
     "12-KT-C4-D5-III-5",
     "12-KT-C4-D5-III-6",
