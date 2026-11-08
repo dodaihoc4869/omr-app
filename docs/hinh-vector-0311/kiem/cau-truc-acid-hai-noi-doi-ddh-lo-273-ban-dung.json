@@ -1,0 +1,29 @@
+[
+  {
+    "i": 854,
+    "hash": "9c148a9f92a3daf60da31e6fd5ef4e769c5f18446939bb965f4147e0c3c46844",
+    "fileNguon": "anh/9c148a9f92a3daf60da31e6fd5ef4e769c5f18446939bb965f4147e0c3c46844.png",
+    "svg": "acid-hai-noi-doi-ddh-4051c8e635ac6536eb5b9030c14de66e0d2b8adb48f64b4119f7f37754c7ad00.svg",
+    "hashSvg": "4051c8e635ac6536eb5b9030c14de66e0d2b8adb48f64b4119f7f37754c7ad00",
+    "byteSvg": 2253,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D4-III-1",
+        "de": "Các acid béo không no có thể phân loại dưới dạng acid omega – n.\nTrong đó n là vị trí xuất hiện liên kết đôi đầu tiên trong mạch carbron khi đánh số thứ tự từ nhóm methyl (-CH3).\nAcid béo X có công thức được biểu diễn dưới đây thuộc acid béo “omega” với giá trị n bằng mấy?",
+        "refs": [
+          {
+            "hash": "9c148a9f92a3daf60da31e6fd5ef4e769c5f18446939bb965f4147e0c3c46844",
+            "where": "12-KT-C1-D4-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "ba86d9e33fc299ee31a0a5c648b97e6ae2559c8594a7444bd57e848bd78c2dda"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "17bareCvertices+condensedCOOHfirstCanchor=18C2O/2flatCCdouble/leftfreeend/allthinuniform/noexpandedCOOH-noaddedH-caption-n-omega-answer.",
+    "hashSvgDaSoat": "4051c8e635ac6536eb5b9030c14de66e0d2b8adb48f64b4119f7f37754c7ad00",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

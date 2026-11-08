@@ -1,0 +1,174 @@
+{
+  "i": 854,
+  "hash": "9c148a9f92a3daf60da31e6fd5ef4e769c5f18446939bb965f4147e0c3c46844",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9c148a9f92a3daf60da31e6fd5ef4e769c5f18446939bb965f4147e0c3c46844.png",
+  "size": [
+    739,
+    151
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C1-D4-III-1",
+      "de": "Các acid béo không no có thể phân loại dưới dạng acid omega – n.\nTrong đó n là vị trí xuất hiện liên kết đôi đầu tiên trong mạch carbron khi đánh số thứ tự từ nhóm methyl (-CH3).\nAcid béo X có công thức được biểu diễn dưới đây thuộc acid béo “omega” với giá trị n bằng mấy?",
+      "refs": [
+        {
+          "hash": "9c148a9f92a3daf60da31e6fd5ef4e769c5f18446939bb965f4147e0c3c46844",
+          "where": "12-KT-C1-D4-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "ba86d9e33fc299ee31a0a5c648b97e6ae2559c8594a7444bd57e848bd78c2dda"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x actualopened/all1publicref;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "carbonVerticesZeroIndexFreeLeft": [
+      [
+        65,
+        113
+      ],
+      [
+        95,
+        63
+      ],
+      [
+        125,
+        113
+      ],
+      [
+        154,
+        63
+      ],
+      [
+        184,
+        113
+      ],
+      [
+        214,
+        63
+      ],
+      [
+        273,
+        63
+      ],
+      [
+        302,
+        113
+      ],
+      [
+        331,
+        63
+      ],
+      [
+        390,
+        63
+      ],
+      [
+        420,
+        113
+      ],
+      [
+        449,
+        63
+      ],
+      [
+        479,
+        113
+      ],
+      [
+        508,
+        63
+      ],
+      [
+        538,
+        113
+      ],
+      [
+        568,
+        63
+      ],
+      [
+        596,
+        113
+      ]
+    ],
+    "lastBondToCOOH": [
+      [
+        596,
+        113
+      ],
+      [
+        614,
+        80
+      ]
+    ],
+    "condensedLabel": {
+      "text": "COOH",
+      "bbox": [
+        610,
+        48,
+        711,
+        76
+      ],
+      "anchor": "FIRST C atleftcenter~624,y62,notOH/Oend;lastbondendsbelowleftofCwithgap"
+    },
+    "CCdoubleBonds": [
+      {
+        "indices": [
+          5,
+          6
+        ],
+        "outer": [
+          [
+            214,
+            63
+          ],
+          [
+            273,
+            63
+          ]
+        ],
+        "inner": [
+          [
+            218,
+            69
+          ],
+          [
+            269,
+            69
+          ]
+        ]
+      },
+      {
+        "indices": [
+          8,
+          9
+        ],
+        "outer": [
+          [
+            331,
+            63
+          ],
+          [
+            390,
+            63
+          ]
+        ],
+        "inner": [
+          [
+            335,
+            69
+          ],
+          [
+            386,
+            69
+          ]
+        ]
+      }
+    ],
+    "counts": "17bareCvertices+1CcondensedCOOH=18C2O.2CCdouble,COOHcondensednoexpandedCOdouble.1freeleftendpoint,noCH3/Hliteral.",
+    "style": "Allblackuniformthin;flatdoubletopwithinnerbelow/neighborsdown;nocircles/wedge/stereoexplicit/charge/carbonnums/labelsX/caption/arrow/omegaansweradded."
+  },
+  "coordinateMeaning": "Nativepixelcenterlineapprox1–2px;carboncountfromverticesnotfattyacidname.",
+  "actualSvgReviewed": false
+}

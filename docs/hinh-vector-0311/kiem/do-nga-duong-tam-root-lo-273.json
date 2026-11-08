@@ -1,0 +1,506 @@
+[
+  {
+    "style": "de",
+    "mode": "R4",
+    "glyph": "Ẫ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      151.9310302734375,
+      1021.0,
+      548.0714111328125,
+      1160.0
+    ],
+    "tildeHeight": 139.0
+  },
+  {
+    "style": "de",
+    "mode": "R4",
+    "glyph": "ẫ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      122.9310302734375,
+      860.0,
+      519.0714111328125,
+      999.0
+    ],
+    "tildeHeight": 139.0
+  },
+  {
+    "style": "de",
+    "mode": "R4",
+    "glyph": "Ễ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      123.92857360839844,
+      1021.0,
+      520.0714111328125,
+      1160.0
+    ],
+    "tildeHeight": 139.0
+  },
+  {
+    "style": "de",
+    "mode": "R4",
+    "glyph": "ễ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      109.92857360839844,
+      860.0,
+      506.0714416503906,
+      999.0
+    ],
+    "tildeHeight": 139.0
+  },
+  {
+    "style": "de",
+    "mode": "R4",
+    "glyph": "Ỗ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      181.92857360839844,
+      1021.0,
+      578.0689697265625,
+      1160.0
+    ],
+    "tildeHeight": 139.0
+  },
+  {
+    "style": "de",
+    "mode": "R4",
+    "glyph": "ỗ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      101.92857360839844,
+      860.0,
+      498.0714416503906,
+      999.0
+    ],
+    "tildeHeight": 139.0
+  },
+  {
+    "style": "de",
+    "mode": "wave24",
+    "glyph": "Ẫ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      151.9310302734375,
+      1021.0,
+      548.0714111328125,
+      1139.0
+    ],
+    "tildeHeight": 118.0
+  },
+  {
+    "style": "de",
+    "mode": "wave24",
+    "glyph": "ẫ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      122.9310302734375,
+      860.0,
+      519.0714111328125,
+      978.0
+    ],
+    "tildeHeight": 118.0
+  },
+  {
+    "style": "de",
+    "mode": "wave24",
+    "glyph": "Ễ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      123.9285888671875,
+      1021.0,
+      520.0714111328125,
+      1139.0
+    ],
+    "tildeHeight": 118.0
+  },
+  {
+    "style": "de",
+    "mode": "wave24",
+    "glyph": "ễ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      109.92855834960938,
+      860.0,
+      506.07147216796875,
+      978.0
+    ],
+    "tildeHeight": 118.0
+  },
+  {
+    "style": "de",
+    "mode": "wave24",
+    "glyph": "Ỗ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      181.9285888671875,
+      1021.0,
+      578.0689697265625,
+      1139.0
+    ],
+    "tildeHeight": 118.0
+  },
+  {
+    "style": "de",
+    "mode": "wave24",
+    "glyph": "ỗ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      101.92855834960938,
+      860.0,
+      498.07147216796875,
+      978.0
+    ],
+    "tildeHeight": 118.0
+  },
+  {
+    "style": "de",
+    "mode": "wave12",
+    "glyph": "Ẫ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      151.9310302734375,
+      1021.0,
+      548.0714111328125,
+      1121.0
+    ],
+    "tildeHeight": 100.0
+  },
+  {
+    "style": "de",
+    "mode": "wave12",
+    "glyph": "ẫ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      122.9310302734375,
+      860.0,
+      519.0714111328125,
+      960.0
+    ],
+    "tildeHeight": 100.0
+  },
+  {
+    "style": "de",
+    "mode": "wave12",
+    "glyph": "Ễ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      123.9285888671875,
+      1021.0,
+      520.0714111328125,
+      1121.0
+    ],
+    "tildeHeight": 100.0
+  },
+  {
+    "style": "de",
+    "mode": "wave12",
+    "glyph": "ễ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      109.92855834960938,
+      860.0,
+      506.07147216796875,
+      960.0
+    ],
+    "tildeHeight": 100.0
+  },
+  {
+    "style": "de",
+    "mode": "wave12",
+    "glyph": "Ỗ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      181.9285888671875,
+      1021.0,
+      578.0689697265625,
+      1121.0
+    ],
+    "tildeHeight": 100.0
+  },
+  {
+    "style": "de",
+    "mode": "wave12",
+    "glyph": "ỗ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 82,
+    "tildeBounds": [
+      101.92855834960938,
+      860.0,
+      498.07147216796875,
+      960.0
+    ],
+    "tildeHeight": 100.0
+  },
+  {
+    "style": "dam",
+    "mode": "R4",
+    "glyph": "Ẫ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      124.81818389892578,
+      984.0,
+      555.3829956054688,
+      1160.0
+    ],
+    "tildeHeight": 176.0
+  },
+  {
+    "style": "dam",
+    "mode": "R4",
+    "glyph": "ẫ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      72.81394958496094,
+      902.0,
+      502.39129638671875,
+      1078.0
+    ],
+    "tildeHeight": 176.0
+  },
+  {
+    "style": "dam",
+    "mode": "R4",
+    "glyph": "Ễ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      96.81394958496094,
+      1036.0,
+      526.3912963867188,
+      1212.0
+    ],
+    "tildeHeight": 176.0
+  },
+  {
+    "style": "dam",
+    "mode": "R4",
+    "glyph": "ễ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      84.81818389892578,
+      902.0,
+      515.3829956054688,
+      1078.0
+    ],
+    "tildeHeight": 176.0
+  },
+  {
+    "style": "dam",
+    "mode": "R4",
+    "glyph": "Ỗ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      155.81394958496094,
+      1046.0,
+      585.3912963867188,
+      1222.0
+    ],
+    "tildeHeight": 176.0
+  },
+  {
+    "style": "dam",
+    "mode": "R4",
+    "glyph": "ỗ",
+    "centerlineControlAmplitude": null,
+    "strokeDiameter": null,
+    "tildeBounds": [
+      76.81394958496094,
+      902.0,
+      506.39129638671875,
+      1078.0
+    ],
+    "tildeHeight": 176.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave24",
+    "glyph": "Ẫ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      124.81817626953125,
+      984.0,
+      555.3829956054688,
+      1140.0
+    ],
+    "tildeHeight": 156.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave24",
+    "glyph": "ẫ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      72.81396484375,
+      902.0,
+      502.39129638671875,
+      1058.0
+    ],
+    "tildeHeight": 156.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave24",
+    "glyph": "Ễ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      96.81396484375,
+      1036.0,
+      526.3912963867188,
+      1192.0
+    ],
+    "tildeHeight": 156.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave24",
+    "glyph": "ễ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      84.81817626953125,
+      902.0,
+      515.3829956054688,
+      1058.0
+    ],
+    "tildeHeight": 156.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave24",
+    "glyph": "Ỗ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      155.81396484375,
+      1046.0,
+      585.3912963867188,
+      1202.0
+    ],
+    "tildeHeight": 156.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave24",
+    "glyph": "ỗ",
+    "centerlineControlAmplitude": 24,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      76.81396484375,
+      902.0,
+      506.39129638671875,
+      1058.0
+    ],
+    "tildeHeight": 156.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave12",
+    "glyph": "Ẫ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      124.81817626953125,
+      984.0,
+      555.3829956054688,
+      1122.0
+    ],
+    "tildeHeight": 138.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave12",
+    "glyph": "ẫ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      72.81396484375,
+      902.0,
+      502.39129638671875,
+      1040.0
+    ],
+    "tildeHeight": 138.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave12",
+    "glyph": "Ễ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      96.81396484375,
+      1036.0,
+      526.3912963867188,
+      1174.0
+    ],
+    "tildeHeight": 138.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave12",
+    "glyph": "ễ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      84.81817626953125,
+      902.0,
+      515.3829956054688,
+      1040.0
+    ],
+    "tildeHeight": 138.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave12",
+    "glyph": "Ỗ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      155.81396484375,
+      1046.0,
+      585.3912963867188,
+      1184.0
+    ],
+    "tildeHeight": 138.0
+  },
+  {
+    "style": "dam",
+    "mode": "wave12",
+    "glyph": "ỗ",
+    "centerlineControlAmplitude": 12,
+    "strokeDiameter": 120,
+    "tildeBounds": [
+      76.81396484375,
+      902.0,
+      506.39129638671875,
+      1040.0
+    ],
+    "tildeHeight": 138.0
+  }
+]
