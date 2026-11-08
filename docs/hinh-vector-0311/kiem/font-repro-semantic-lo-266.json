@@ -1,0 +1,58 @@
+{
+  "dependencies": {
+    "python": "3.12.14",
+    "fonttools": "4.61.1",
+    "skia-pathops": "0.9.2",
+    "brotli": "1.2.1"
+  },
+  "generatorInputSHA": "a988a8998429eb87f6d79449cefed36d13a8597a950cc3399c95c8b503e0b027",
+  "sourceFonts": {
+    "MPLUSRounded1c-Regular.ttf": "b75708b53e45b06d17d470aeeca5b766e3d1b3999f03f13ec4eb863ca846c14c",
+    "MPLUSRounded1c-Medium.ttf": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70"
+  },
+  "designEnvironment": {},
+  "admissible": false,
+  "scope": "Chỉ scratch semanticmũ+ngã sáu họ, chưaadopt/chưaápdụngclipping-NFDfix",
+  "files": {
+    "ddh-rounded-de-latin.woff2": {
+      "sha": "38121418565f250878a8bf1faaf5ca4bd42bf0c67f692fbc007fcb3c7272ce7f",
+      "previousSHA": "44def6d1ca8e6a67ee0ed2bac465d00e21d9c297e52a4b85b2a2feb90e9ae2d9",
+      "currentProductionSHA": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "changedCPvsR2": [],
+      "hmtxDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "sha": "79ac06947ccf3c0f98d3d80a281e7f7e232c5194dc35955acbcc2670475c0e41",
+      "previousSHA": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "currentProductionSHA": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "changedCPvsR2": [
+        7851,
+        7876,
+        7877,
+        7894,
+        7895
+      ],
+      "hmtxDiff": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "sha": "b05f91df85a43215ab5b5dfc37154fe3ab3ab77a181c34115e3f7c950d5775d4",
+      "previousSHA": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "currentProductionSHA": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "changedCPvsR2": [
+        7851,
+        7876,
+        7877,
+        7894,
+        7895
+      ],
+      "hmtxDiff": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "sha": "2e09265f4518aa31e0e6aada455cc55a9c4c1be662773209c826e8d5f4d58e8a",
+      "previousSHA": "c6063a8e349005bdb11a3a6bfaca339ea8d7a9cc7c5efc5bfe30edd5a04a6f98",
+      "currentProductionSHA": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "changedCPvsR2": [],
+      "hmtxDiff": []
+    }
+  }
+}

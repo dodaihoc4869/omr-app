@@ -1,0 +1,40 @@
+[
+  {
+    "i": 777,
+    "hash": "918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2",
+    "fileNguon": "anh/918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2.png",
+    "svg": "ritalin-ester-hoa-ddh-cb4b2b9334154729d49f8b1759aeefa73fcf9ae63b13f7ba07825e5ee29a6154.svg",
+    "hashSvg": "cb4b2b9334154729d49f8b1759aeefa73fcf9ae63b13f7ba07825e5ee29a6154",
+    "byteSvg": 41403,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B8-D2-III-34",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ). Mỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ:\nRitalinic acid hydrochloride (C₆H₅-CH(COOH)-C₅H₉NH·HCl, M = 255,5) + CH₃OH/HCl → methylphenidate hydrochloride (C₆H₅-CH(COOCH₃)-C₅H₉NH·HCl, M = 269,5).\nĐể sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+        "refs": [
+          {
+            "hash": "918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2",
+            "where": "12-C3-B8-D2-III-34.hinh.0.du_lieu",
+            "hashDataUrl": "5ce31d06bec853ecce56e1f92d2c999714b3ec84410f2bb0de8e9a6f8cbde60a"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-152",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ). Mỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ:\nRitalinic acid hydrochloride (C₆H₅-CH(COOH)-C₅H₉NH·HCl, M = 255,5) + CH₃OH/HCl → methylphenidate hydrochloride (C₆H₅-CH(COOCH₃)-C₅H₉NH·HCl, M = 269,5).\nĐể sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+        "refs": [
+          {
+            "hash": "918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2",
+            "where": "DB-12-B8-D1-III-152.hinh.0.du_lieu",
+            "hashDataUrl": "5ce31d06bec853ecce56e1f92d2c999714b3ec84410f2bb0de8e9a6f8cbde60a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "HASH918d2741 riêng/left13C2O1N1Cl-right14C2O1N1Cl/2Ph3doubleeach+2piperidine6member/2ClH2NliteralNanchor/nocharge-stereo/COOHfirstC→COOCH3firstC/1RIGHThead/+CH3OH-HClslash/2captionsuppercaseRleft-lowercaseright/noextraH2O-temp-phase-answer.",
+    "hashSvgDaSoat": "cb4b2b9334154729d49f8b1759aeefa73fcf9ae63b13f7ba07825e5ee29a6154",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

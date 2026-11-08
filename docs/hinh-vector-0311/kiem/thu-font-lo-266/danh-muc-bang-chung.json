@@ -1,0 +1,324 @@
+{
+  "productionAdopted": false,
+  "globalFontAdmitted": false,
+  "fonts": [
+    {
+      "stage": "r3",
+      "file": "docs/hinh-vector-0311/kiem/thu-font-lo-266/r3-hold-global/unified-de.woff2",
+      "sha": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "bytes": 22440
+    },
+    {
+      "stage": "r3",
+      "file": "docs/hinh-vector-0311/kiem/thu-font-lo-266/r3-hold-global/unified-dam.woff2",
+      "sha": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "bytes": 22596
+    },
+    {
+      "stage": "r4",
+      "file": "docs/hinh-vector-0311/kiem/thu-font-lo-266/r4-hold-global/unified-de.woff2",
+      "sha": "ec3c249d69edb5e97f3079b7a19f9f485739f8cf2e8152edea25107370658e37",
+      "bytes": 22448
+    },
+    {
+      "stage": "r4",
+      "file": "docs/hinh-vector-0311/kiem/thu-font-lo-266/r4-hold-global/unified-dam.woff2",
+      "sha": "c5f78fb3b1b7c81683b170c1ae8adaf24fd0b9b0f2022d6d4e068deb2b0ee123",
+      "bytes": 22568
+    }
+  ],
+  "screenshots": [
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7850.png",
+      "sourceSHA": "438bd9eee8853e96902aecd348bf750cf7df3088477ff6bd346ebfa98a8f7219",
+      "jpg": "font-r3-lo-266-panel-dam-7850.jpg",
+      "bytes": 24992
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7851.png",
+      "sourceSHA": "9e1a9ade6d3141383bfcaf11742b6b66928f7592b0695196ae84c4503a817645",
+      "jpg": "font-r3-lo-266-panel-dam-7851.jpg",
+      "bytes": 25041
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7852.png",
+      "sourceSHA": "d144f066ba6918b7a6c96758c0d0f55ac6a0c73acb7ca8b98b3c222207952dd6",
+      "jpg": "font-r3-lo-266-panel-dam-7852.jpg",
+      "bytes": 24342
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7858.png",
+      "sourceSHA": "f1d70f66d84d7762e2186e3344336aad198912fcd29c918d05bfde99bf77485d",
+      "jpg": "font-r3-lo-266-panel-dam-7858.jpg",
+      "bytes": 24507
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7860.png",
+      "sourceSHA": "dda59f60c752f9d93d79651bfa9ede35b6d079f98ddb8b2bc9aa246ffc3bfe66",
+      "jpg": "font-r3-lo-266-panel-dam-7860.jpg",
+      "bytes": 24802
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7862.png",
+      "sourceSHA": "a8d48408c72552eb0e0fedc2f34c612fdc9d78279f490227230860dea21224ba",
+      "jpg": "font-r3-lo-266-panel-dam-7862.jpg",
+      "bytes": 24371
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7876.png",
+      "sourceSHA": "6f8ab94e53cfcf8cb5028f51b00d35c14a9d7ac705c14a96d7aede57cdd29bab",
+      "jpg": "font-r3-lo-266-panel-dam-7876.jpg",
+      "bytes": 22728
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7877.png",
+      "sourceSHA": "a0498e1ef72842f3c668b72eaa5b4d318535bbcf0a7946d9b1b12004b3840045",
+      "jpg": "font-r3-lo-266-panel-dam-7877.jpg",
+      "bytes": 24229
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7894.png",
+      "sourceSHA": "e61870964ec227703935449f1c9a4410b5c70da343e59da3690c7f400f70bc93",
+      "jpg": "font-r3-lo-266-panel-dam-7894.jpg",
+      "bytes": 26401
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-dam-7895.png",
+      "sourceSHA": "c201d514bb8cac133902b26bc9c084c6f39f5d7a28e3636b4571a5fa6510b11b",
+      "jpg": "font-r3-lo-266-panel-dam-7895.jpg",
+      "bytes": 24543
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7850.png",
+      "sourceSHA": "7bf4d6e0fc8ddcdb005d410e5ef605323abfee5c95d02eb499413b4b3b322be4",
+      "jpg": "font-r3-lo-266-panel-de-7850.jpg",
+      "bytes": 25487
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7851.png",
+      "sourceSHA": "c928aca1e53db6768743a4b45e1a3743838340ba8d351cfb1ad917120bdd10f1",
+      "jpg": "font-r3-lo-266-panel-de-7851.jpg",
+      "bytes": 24615
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7852.png",
+      "sourceSHA": "767a985bc20f873fcb1dde8e78eb3a9fad922f97162da868529d1b7105908d8a",
+      "jpg": "font-r3-lo-266-panel-de-7852.jpg",
+      "bytes": 24089
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7858.png",
+      "sourceSHA": "e3eff1351d3d474c9e4d47d6becfb687477ccbeab880a15baa7d90879982d9c2",
+      "jpg": "font-r3-lo-266-panel-de-7858.jpg",
+      "bytes": 24605
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7860.png",
+      "sourceSHA": "89c1a212d533ee7d60cb591f131ff4b58e1dab8609c84f481ebbb1f7d0e68cbe",
+      "jpg": "font-r3-lo-266-panel-de-7860.jpg",
+      "bytes": 24889
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7862.png",
+      "sourceSHA": "1d9a962b1ba4c806927cea43917b5f842fe979be70862489c9b2b0ad4bbd1092",
+      "jpg": "font-r3-lo-266-panel-de-7862.jpg",
+      "bytes": 24079
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7876.png",
+      "sourceSHA": "ac1682393cfa67f9894c87f049a917bd734e353dcbb22d13676e48e0d08c07f0",
+      "jpg": "font-r3-lo-266-panel-de-7876.jpg",
+      "bytes": 22118
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7877.png",
+      "sourceSHA": "7a3ca71fb95d4a5d95e7d545e9127391e12f1a3e64132effdb1df23d4f4101ab",
+      "jpg": "font-r3-lo-266-panel-de-7877.jpg",
+      "bytes": 23476
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7894.png",
+      "sourceSHA": "c358833748e0805a67499a100a951aef686eb5377c2e4cea5d2b8161a7e17f7b",
+      "jpg": "font-r3-lo-266-panel-de-7894.jpg",
+      "bytes": 26701
+    },
+    {
+      "stage": "r3",
+      "sourceFull": "/workspace/scratch/coverage266-r3/panel-de-7895.png",
+      "sourceSHA": "a347ecad06850e0290a7b44e1775b2399bb547a8cb7482dfb7d923037eb5a7e9",
+      "jpg": "font-r3-lo-266-panel-de-7895.jpg",
+      "bytes": 23811
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/appclip-override-true.png",
+      "sourceSHA": "5e11dcbb55c42492905171faf8616c40b0b1c06b92f18fd82e1f134df0141218",
+      "jpg": "font-r4-lo-266-appclip-override-true.jpg",
+      "bytes": 14706
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7850.png",
+      "sourceSHA": "438bd9eee8853e96902aecd348bf750cf7df3088477ff6bd346ebfa98a8f7219",
+      "jpg": "font-r4-lo-266-panel-dam-7850.jpg",
+      "bytes": 24992
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7851.png",
+      "sourceSHA": "9e1a9ade6d3141383bfcaf11742b6b66928f7592b0695196ae84c4503a817645",
+      "jpg": "font-r4-lo-266-panel-dam-7851.jpg",
+      "bytes": 25041
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7852.png",
+      "sourceSHA": "d144f066ba6918b7a6c96758c0d0f55ac6a0c73acb7ca8b98b3c222207952dd6",
+      "jpg": "font-r4-lo-266-panel-dam-7852.jpg",
+      "bytes": 24342
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7858.png",
+      "sourceSHA": "f1d70f66d84d7762e2186e3344336aad198912fcd29c918d05bfde99bf77485d",
+      "jpg": "font-r4-lo-266-panel-dam-7858.jpg",
+      "bytes": 24507
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7860.png",
+      "sourceSHA": "dda59f60c752f9d93d79651bfa9ede35b6d079f98ddb8b2bc9aa246ffc3bfe66",
+      "jpg": "font-r4-lo-266-panel-dam-7860.jpg",
+      "bytes": 24802
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7862.png",
+      "sourceSHA": "a8d48408c72552eb0e0fedc2f34c612fdc9d78279f490227230860dea21224ba",
+      "jpg": "font-r4-lo-266-panel-dam-7862.jpg",
+      "bytes": 24371
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7876.png",
+      "sourceSHA": "af74deafb2c0c91aa811a949608c6ababebe83fae14f20ab5e0eea0e63fd6ad4",
+      "jpg": "font-r4-lo-266-panel-dam-7876.jpg",
+      "bytes": 23633
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7877.png",
+      "sourceSHA": "a0498e1ef72842f3c668b72eaa5b4d318535bbcf0a7946d9b1b12004b3840045",
+      "jpg": "font-r4-lo-266-panel-dam-7877.jpg",
+      "bytes": 24229
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7894.png",
+      "sourceSHA": "56d85ed6d1dd938649b2d8c453c1414989e32a4266479f0f3ee5b94142d1d417",
+      "jpg": "font-r4-lo-266-panel-dam-7894.jpg",
+      "bytes": 27291
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-dam-7895.png",
+      "sourceSHA": "c201d514bb8cac133902b26bc9c084c6f39f5d7a28e3636b4571a5fa6510b11b",
+      "jpg": "font-r4-lo-266-panel-dam-7895.jpg",
+      "bytes": 24543
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7850.png",
+      "sourceSHA": "7bf4d6e0fc8ddcdb005d410e5ef605323abfee5c95d02eb499413b4b3b322be4",
+      "jpg": "font-r4-lo-266-panel-de-7850.jpg",
+      "bytes": 25487
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7851.png",
+      "sourceSHA": "c928aca1e53db6768743a4b45e1a3743838340ba8d351cfb1ad917120bdd10f1",
+      "jpg": "font-r4-lo-266-panel-de-7851.jpg",
+      "bytes": 24615
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7852.png",
+      "sourceSHA": "767a985bc20f873fcb1dde8e78eb3a9fad922f97162da868529d1b7105908d8a",
+      "jpg": "font-r4-lo-266-panel-de-7852.jpg",
+      "bytes": 24089
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7858.png",
+      "sourceSHA": "e3eff1351d3d474c9e4d47d6becfb687477ccbeab880a15baa7d90879982d9c2",
+      "jpg": "font-r4-lo-266-panel-de-7858.jpg",
+      "bytes": 24605
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7860.png",
+      "sourceSHA": "89c1a212d533ee7d60cb591f131ff4b58e1dab8609c84f481ebbb1f7d0e68cbe",
+      "jpg": "font-r4-lo-266-panel-de-7860.jpg",
+      "bytes": 24889
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7862.png",
+      "sourceSHA": "1d9a962b1ba4c806927cea43917b5f842fe979be70862489c9b2b0ad4bbd1092",
+      "jpg": "font-r4-lo-266-panel-de-7862.jpg",
+      "bytes": 24079
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7876.png",
+      "sourceSHA": "ac1682393cfa67f9894c87f049a917bd734e353dcbb22d13676e48e0d08c07f0",
+      "jpg": "font-r4-lo-266-panel-de-7876.jpg",
+      "bytes": 22118
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7877.png",
+      "sourceSHA": "7a3ca71fb95d4a5d95e7d545e9127391e12f1a3e64132effdb1df23d4f4101ab",
+      "jpg": "font-r4-lo-266-panel-de-7877.jpg",
+      "bytes": 23476
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7894.png",
+      "sourceSHA": "c358833748e0805a67499a100a951aef686eb5377c2e4cea5d2b8161a7e17f7b",
+      "jpg": "font-r4-lo-266-panel-de-7894.jpg",
+      "bytes": 26701
+    },
+    {
+      "stage": "r4",
+      "sourceFull": "/workspace/scratch/coverage266-r4/panel-de-7895.png",
+      "sourceSHA": "a347ecad06850e0290a7b44e1775b2399bb547a8cb7482dfb7d923037eb5a7e9",
+      "jpg": "font-r4-lo-266-panel-de-7895.jpg",
+      "bytes": 23811
+    }
+  ],
+  "scripts": {
+    "thu-nghiem-ngu-nghia-dau-ddh-lo-266-0311.py": "60d0e86b1d16f598a504725764df564dfd643df1caad73562c8f25113bc9339b",
+    "thu-nghiem-nfd-ddh-lo-266-0311.py": "9d676461afd59bba0c1278d39c25def0dc6c5977ea0e0231371f13a5acd6cff3"
+  },
+  "gioiHan": "R3DamỄ/Ỗcontactnegativegiữ;R4target20glyphpositive/CDP16custom/pixel6strings=0nhưngclipvẫnbad,KHÔNGadmitglobal/app. ArchiveWOFF2làđúngbyteđãreview. ReproWOFF2timestampkháckhôngđượctựgánoldpositivechohashmới. JPGnhẹchỉevidence;readonlymởtừngPNGactualFULLgốc,khôngthumbnailduyệt."
+}

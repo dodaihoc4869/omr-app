@@ -1,0 +1,1113 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "productionAdopt": false,
+  "globalVerdict": "HOLD: DamỄ/DamỖ chạm mũ-thân; clipping app chưa giải quyết",
+  "generator": {
+    "path": "/workspace/scratch/lo266/semantic-generator.py",
+    "sha": "59a4927aa6597bef94184af0473eaf70998f399ba96cc979bccefaf52d1dadea"
+  },
+  "fonts": {
+    "de": {
+      "mergeSuccess": true,
+      "dedupCodepoints": [
+        768,
+        769,
+        770,
+        771,
+        772,
+        774,
+        776,
+        777,
+        795,
+        803,
+        809
+      ],
+      "bytes": 22440,
+      "sha": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "checks": [
+        {
+          "text": "ẪẫỄễỖỗ",
+          "shapingEqualNFCNFD": true,
+          "gid0": false
+        },
+        {
+          "text": "ẬẲẴẶ",
+          "shapingEqualNFCNFD": true,
+          "gid0": false
+        },
+        {
+          "text": "ẮỀỔỠỰ",
+          "shapingEqualNFCNFD": true,
+          "gid0": false
+        }
+      ]
+    },
+    "dam": {
+      "mergeSuccess": true,
+      "dedupCodepoints": [
+        768,
+        769,
+        770,
+        771,
+        772,
+        774,
+        776,
+        777,
+        795,
+        803,
+        809
+      ],
+      "bytes": 22596,
+      "sha": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "checks": [
+        {
+          "text": "ẪẫỄễỖỗ",
+          "shapingEqualNFCNFD": true,
+          "gid0": false
+        },
+        {
+          "text": "ẬẲẴẶ",
+          "shapingEqualNFCNFD": true,
+          "gid0": false
+        },
+        {
+          "text": "ẮỀỔỠỰ",
+          "shapingEqualNFCNFD": true,
+          "gid0": false
+        }
+      ]
+    }
+  },
+  "rows": [
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7850.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "ẫ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7851.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7876.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "ễ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7877.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7894.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "ỗ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7895.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "Ậ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7852.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "Ẳ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7858.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "Ẵ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7860.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "de",
+      "glyph": "Ặ",
+      "hashFont": "55a6e30e9ea15c433a2475660d42f22ed68c6e77932d2d40caac36c9e89721c9",
+      "actual": "/workspace/scratch/coverage266-r3/panel-de-7862.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7850.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "ẫ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7851.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7876.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Cần sửa: mũ chạm thân tạo ô tam giác kín, thấy rõ DOM và SVG tại32/72/200"
+    },
+    {
+      "style": "dam",
+      "glyph": "ễ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7877.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7894.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Cần sửa: mũ chạm thân tạo ô tam giác kín, thấy rõ DOM và SVG tại32/72/200"
+    },
+    {
+      "style": "dam",
+      "glyph": "ỗ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7895.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ậ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7852.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẳ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7858.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẵ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7860.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    },
+    {
+      "style": "dam",
+      "glyph": "Ặ",
+      "hashFont": "1762ebb9302104320940b703ab3feeb0e249dee6ad1c2f686ed7656330f23c00",
+      "actual": "/workspace/scratch/coverage266-r3/panel-dam-7862.png",
+      "sizes": [
+        14,
+        16,
+        18,
+        24,
+        32,
+        72,
+        200
+      ],
+      "ketQua": "Đạt giới hạn hình glyph: thân sạch; mũ/ngã tách, không pinhole. Breve connected nguồn củaẲ/Ẵ không tự coi lỗi. Không bao gồm clipping app."
+    }
+  ],
+  "cdp": {
+    "proof": [
+      {
+        "w": 400,
+        "i": 0,
+        "form": "NFC",
+        "text": "ẪẫỄễỖỗ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 6
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 0,
+        "form": "NFD",
+        "text": "ẪẫỄễỖỗ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 6
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 1,
+        "form": "NFC",
+        "text": "ẬẲẴẶ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 4
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 1,
+        "form": "NFD",
+        "text": "ẬẲẴẶ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 4
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 2,
+        "form": "NFC",
+        "text": "ε Ā Ä A̩",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 8
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 2,
+        "form": "NFD",
+        "text": "ε Ā Ä A̩",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 8
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 3,
+        "form": "NFC",
+        "text": "ẮỀỔỠỰ đ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 7
+          }
+        ]
+      },
+      {
+        "w": 400,
+        "i": 3,
+        "form": "NFD",
+        "text": "ẮỀỔỠỰ đ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded De",
+            "postScriptName": "DDHRounded-De",
+            "isCustomFont": true,
+            "glyphCount": 7
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 0,
+        "form": "NFC",
+        "text": "ẪẫỄễỖỗ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 6
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 0,
+        "form": "NFD",
+        "text": "ẪẫỄễỖỗ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 6
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 1,
+        "form": "NFC",
+        "text": "ẬẲẴẶ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 4
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 1,
+        "form": "NFD",
+        "text": "ẬẲẴẶ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 4
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 2,
+        "form": "NFC",
+        "text": "ε Ā Ä A̩",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 8
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 2,
+        "form": "NFD",
+        "text": "ε Ā Ä A̩",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 8
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 3,
+        "form": "NFC",
+        "text": "ẮỀỔỠỰ đ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 7
+          }
+        ]
+      },
+      {
+        "w": 700,
+        "i": 3,
+        "form": "NFD",
+        "text": "ẮỀỔỠỰ đ",
+        "fonts": [
+          {
+            "familyName": "DDH Rounded Dam",
+            "postScriptName": "DDHRounded-Dam",
+            "isCustomFont": true,
+            "glyphCount": 7
+          }
+        ]
+      }
+    ],
+    "constraints": [
+      {
+        "w": 400,
+        "size": 14,
+        "lineHeight": "normal",
+        "boxHeight": 20,
+        "baselinePx": 15,
+        "maxInkAscentFontUnits": 1071.4285714285713
+      },
+      {
+        "w": 400,
+        "size": 14,
+        "lineHeight": "1.2",
+        "boxHeight": 16.796875,
+        "baselinePx": 13,
+        "maxInkAscentFontUnits": 928.5714285714286
+      },
+      {
+        "w": 400,
+        "size": 14,
+        "lineHeight": "1.5",
+        "boxHeight": 21,
+        "baselinePx": 16,
+        "maxInkAscentFontUnits": 1142.857142857143
+      },
+      {
+        "w": 400,
+        "size": 14,
+        "lineHeight": "1.3",
+        "boxHeight": 18.1875,
+        "baselinePx": 14,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 14,
+        "lineHeight": "1.35",
+        "boxHeight": 18.890625,
+        "baselinePx": 14,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 16,
+        "lineHeight": "normal",
+        "boxHeight": 23,
+        "baselinePx": 17,
+        "maxInkAscentFontUnits": 1062.5
+      },
+      {
+        "w": 400,
+        "size": 16,
+        "lineHeight": "1.2",
+        "boxHeight": 19.1875,
+        "baselinePx": 15,
+        "maxInkAscentFontUnits": 937.5
+      },
+      {
+        "w": 400,
+        "size": 16,
+        "lineHeight": "1.5",
+        "boxHeight": 24,
+        "baselinePx": 18,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 400,
+        "size": 16,
+        "lineHeight": "1.3",
+        "boxHeight": 20.796875,
+        "baselinePx": 16,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 16,
+        "lineHeight": "1.35",
+        "boxHeight": 21.59375,
+        "baselinePx": 16,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 18,
+        "lineHeight": "normal",
+        "boxHeight": 27,
+        "baselinePx": 20,
+        "maxInkAscentFontUnits": 1111.111111111111
+      },
+      {
+        "w": 400,
+        "size": 18,
+        "lineHeight": "1.2",
+        "boxHeight": 21.59375,
+        "baselinePx": 17,
+        "maxInkAscentFontUnits": 944.4444444444445
+      },
+      {
+        "w": 400,
+        "size": 18,
+        "lineHeight": "1.5",
+        "boxHeight": 27,
+        "baselinePx": 20,
+        "maxInkAscentFontUnits": 1111.111111111111
+      },
+      {
+        "w": 400,
+        "size": 18,
+        "lineHeight": "1.3",
+        "boxHeight": 23.390625,
+        "baselinePx": 18,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 18,
+        "lineHeight": "1.35",
+        "boxHeight": 24.296875,
+        "baselinePx": 18,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 24,
+        "lineHeight": "normal",
+        "boxHeight": 36,
+        "baselinePx": 27,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 400,
+        "size": 24,
+        "lineHeight": "1.2",
+        "boxHeight": 28.796875,
+        "baselinePx": 23,
+        "maxInkAscentFontUnits": 958.3333333333334
+      },
+      {
+        "w": 400,
+        "size": 24,
+        "lineHeight": "1.5",
+        "boxHeight": 36,
+        "baselinePx": 27,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 400,
+        "size": 24,
+        "lineHeight": "1.3",
+        "boxHeight": 31.1875,
+        "baselinePx": 24,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 24,
+        "lineHeight": "1.35",
+        "boxHeight": 32.390625,
+        "baselinePx": 25,
+        "maxInkAscentFontUnits": 1041.6666666666667
+      },
+      {
+        "w": 400,
+        "size": 32,
+        "lineHeight": "normal",
+        "boxHeight": 47,
+        "baselinePx": 35,
+        "maxInkAscentFontUnits": 1093.75
+      },
+      {
+        "w": 400,
+        "size": 32,
+        "lineHeight": "1.2",
+        "boxHeight": 38.390625,
+        "baselinePx": 31,
+        "maxInkAscentFontUnits": 968.75
+      },
+      {
+        "w": 400,
+        "size": 32,
+        "lineHeight": "1.5",
+        "boxHeight": 48,
+        "baselinePx": 36,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 400,
+        "size": 32,
+        "lineHeight": "1.3",
+        "boxHeight": 41.59375,
+        "baselinePx": 32,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 400,
+        "size": 32,
+        "lineHeight": "1.35",
+        "boxHeight": 43.1875,
+        "baselinePx": 33,
+        "maxInkAscentFontUnits": 1031.25
+      },
+      {
+        "w": 700,
+        "size": 14,
+        "lineHeight": "normal",
+        "boxHeight": 20,
+        "baselinePx": 15,
+        "maxInkAscentFontUnits": 1071.4285714285713
+      },
+      {
+        "w": 700,
+        "size": 14,
+        "lineHeight": "1.2",
+        "boxHeight": 16.796875,
+        "baselinePx": 13,
+        "maxInkAscentFontUnits": 928.5714285714286
+      },
+      {
+        "w": 700,
+        "size": 14,
+        "lineHeight": "1.5",
+        "boxHeight": 21,
+        "baselinePx": 16,
+        "maxInkAscentFontUnits": 1142.857142857143
+      },
+      {
+        "w": 700,
+        "size": 14,
+        "lineHeight": "1.3",
+        "boxHeight": 18.1875,
+        "baselinePx": 14,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 14,
+        "lineHeight": "1.35",
+        "boxHeight": 18.890625,
+        "baselinePx": 14,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 16,
+        "lineHeight": "normal",
+        "boxHeight": 23,
+        "baselinePx": 17,
+        "maxInkAscentFontUnits": 1062.5
+      },
+      {
+        "w": 700,
+        "size": 16,
+        "lineHeight": "1.2",
+        "boxHeight": 19.1875,
+        "baselinePx": 15,
+        "maxInkAscentFontUnits": 937.5
+      },
+      {
+        "w": 700,
+        "size": 16,
+        "lineHeight": "1.5",
+        "boxHeight": 24,
+        "baselinePx": 18,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 700,
+        "size": 16,
+        "lineHeight": "1.3",
+        "boxHeight": 20.796875,
+        "baselinePx": 16,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 16,
+        "lineHeight": "1.35",
+        "boxHeight": 21.59375,
+        "baselinePx": 16,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 18,
+        "lineHeight": "normal",
+        "boxHeight": 27,
+        "baselinePx": 20,
+        "maxInkAscentFontUnits": 1111.111111111111
+      },
+      {
+        "w": 700,
+        "size": 18,
+        "lineHeight": "1.2",
+        "boxHeight": 21.59375,
+        "baselinePx": 17,
+        "maxInkAscentFontUnits": 944.4444444444445
+      },
+      {
+        "w": 700,
+        "size": 18,
+        "lineHeight": "1.5",
+        "boxHeight": 27,
+        "baselinePx": 20,
+        "maxInkAscentFontUnits": 1111.111111111111
+      },
+      {
+        "w": 700,
+        "size": 18,
+        "lineHeight": "1.3",
+        "boxHeight": 23.390625,
+        "baselinePx": 18,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 18,
+        "lineHeight": "1.35",
+        "boxHeight": 24.296875,
+        "baselinePx": 18,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 24,
+        "lineHeight": "normal",
+        "boxHeight": 36,
+        "baselinePx": 27,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 700,
+        "size": 24,
+        "lineHeight": "1.2",
+        "boxHeight": 28.796875,
+        "baselinePx": 23,
+        "maxInkAscentFontUnits": 958.3333333333334
+      },
+      {
+        "w": 700,
+        "size": 24,
+        "lineHeight": "1.5",
+        "boxHeight": 36,
+        "baselinePx": 27,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 700,
+        "size": 24,
+        "lineHeight": "1.3",
+        "boxHeight": 31.1875,
+        "baselinePx": 24,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 24,
+        "lineHeight": "1.35",
+        "boxHeight": 32.390625,
+        "baselinePx": 25,
+        "maxInkAscentFontUnits": 1041.6666666666667
+      },
+      {
+        "w": 700,
+        "size": 32,
+        "lineHeight": "normal",
+        "boxHeight": 47,
+        "baselinePx": 35,
+        "maxInkAscentFontUnits": 1093.75
+      },
+      {
+        "w": 700,
+        "size": 32,
+        "lineHeight": "1.2",
+        "boxHeight": 38.390625,
+        "baselinePx": 31,
+        "maxInkAscentFontUnits": 968.75
+      },
+      {
+        "w": 700,
+        "size": 32,
+        "lineHeight": "1.5",
+        "boxHeight": 48,
+        "baselinePx": 36,
+        "maxInkAscentFontUnits": 1125
+      },
+      {
+        "w": 700,
+        "size": 32,
+        "lineHeight": "1.3",
+        "boxHeight": 41.59375,
+        "baselinePx": 32,
+        "maxInkAscentFontUnits": 1000
+      },
+      {
+        "w": 700,
+        "size": 32,
+        "lineHeight": "1.35",
+        "boxHeight": 43.1875,
+        "baselinePx": 33,
+        "maxInkAscentFontUnits": 1031.25
+      }
+    ]
+  },
+  "pixelEquivalence": {
+    "faces": [
+      {
+        "w": 400,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 10458
+      },
+      {
+        "w": 400,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 6080
+      },
+      {
+        "w": 400,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 6321
+      },
+      {
+        "w": 700,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 11338
+      },
+      {
+        "w": 700,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 7979
+      },
+      {
+        "w": 700,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 11290
+      }
+    ],
+    "unified-faces": [
+      {
+        "w": 400,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 400,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 400,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 0
+      }
+    ]
+  },
+  "limits": [
+    "Fresh unified R3 generated sourceTTF/sameparams+epsilon+11marks; dedup Unicode cmap only before Merger",
+    "Full20 separate actual DOM/SVG panels opened; target glyphs only, no fullfont admission",
+    "CSS1.3 visible panels do not prove hidden app clipping resolved. Previous measured app constraints still apply."
+  ],
+  "repro": [
+    "/workspace/scratch/coverage266-r3-build.py",
+    "/workspace/scratch/coverage266-r3-merge.py",
+    "/workspace/scratch/coverage266-r3-review.py",
+    "/workspace/scratch/coverage266-r3-panels.cjs",
+    "/workspace/scratch/coverage266-r3-browser.cjs",
+    "/workspace/scratch/coverage266-r3-equivalence.cjs"
+  ]
+}

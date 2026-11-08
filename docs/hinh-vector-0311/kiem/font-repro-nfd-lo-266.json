@@ -1,0 +1,118 @@
+{
+  "admissible": false,
+  "productionChanged": false,
+  "generatorSHA": "95c81819c3af75294bd8b698d82e8463856016427b20805c698ba79efc2a0d3e",
+  "dependencies": {
+    "python": "3.12.14",
+    "fonttools": "4.61.1",
+    "uharfbuzz": "0.57.0",
+    "skia-pathops": "0.9.2",
+    "brotli": "1.2.1"
+  },
+  "marks": [
+    768,
+    769,
+    770,
+    771,
+    772,
+    774,
+    776,
+    777,
+    795,
+    803,
+    809
+  ],
+  "weights": {
+    "de": {
+      "overlapCmapDedup": [
+        768,
+        769,
+        770,
+        771,
+        772,
+        774,
+        776,
+        777,
+        795,
+        803,
+        809
+      ],
+      "duplicateGlyphsOutlineAndMetricsExact": true,
+      "sourceSubsets": {
+        "latin": {
+          "sha": "21160fb8f4f3044b10a328d2ae4fd3fc526d8bffcfa31a86651233293b44fd2f",
+          "bytes": 21840
+        },
+        "vietnamese": {
+          "sha": "4107ad666d8f071553a244f2cdd7a2b82e18773772fd63942dee7ab2c4fa8c1f",
+          "bytes": 5844
+        }
+      },
+      "unifiedSHA": "a2ed6006df5c585a281a9796b832365b1f88baa367bb9ac9d1c4d356f60cc803",
+      "unifiedBytes": 22428,
+      "checks": [
+        {
+          "text": "ẪẫỄễỖỗ",
+          "shapingEqual": true,
+          "gid0": false
+        },
+        {
+          "text": "ẬẲẴẶ",
+          "shapingEqual": true,
+          "gid0": false
+        },
+        {
+          "text": "ẮỀỔỠỰ",
+          "shapingEqual": true,
+          "gid0": false
+        }
+      ]
+    },
+    "dam": {
+      "overlapCmapDedup": [
+        768,
+        769,
+        770,
+        771,
+        772,
+        774,
+        776,
+        777,
+        795,
+        803,
+        809
+      ],
+      "duplicateGlyphsOutlineAndMetricsExact": true,
+      "sourceSubsets": {
+        "latin": {
+          "sha": "b60003c72710fe4d54c6999c673b91c1b386c3f098b0fd0ce435f12c2f6c6400",
+          "bytes": 21968
+        },
+        "vietnamese": {
+          "sha": "502727b1c979c886633f6e17012695c50a72edeee28b7723813dc6af2e2347c2",
+          "bytes": 5824
+        }
+      },
+      "unifiedSHA": "827aa7a169cf71ef23163c48e0d3bf3b26b39a2ff10ceb79e7ba73b65a47c896",
+      "unifiedBytes": 22560,
+      "checks": [
+        {
+          "text": "ẪẫỄễỖỗ",
+          "shapingEqual": true,
+          "gid0": false
+        },
+        {
+          "text": "ẬẲẴẶ",
+          "shapingEqual": true,
+          "gid0": false
+        },
+        {
+          "text": "ẮỀỔỠỰ",
+          "shapingEqual": true,
+          "gid0": false
+        }
+      ]
+    }
+  },
+  "gioiHan": "Chỉ thử scratch. Soát shaping NFC/NFD giới hạn6chuỗi; không suy browserpixel/nofallback/toànfont/clip hoặc sourcefigureapproval từ cmap/shaping. Cần freshChromium+CDP/read-onlyexacthash riêng."
+}

@@ -1,0 +1,38 @@
+{
+  "admissible": false,
+  "scope": "Chỉ scratch semanticmũ+ngã sáu họ, chưaadopt/chưaápdụngclipping-NFDfix",
+  "files": {
+    "ddh-rounded-de-latin.woff2": {
+      "sha": "76d2b3ac189b1ed12bf42913831fe9a572d074da7cb5f6183df7fb0cfa4ef401",
+      "changedCPvsR2": [],
+      "hmtxDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "sha": "705b4cf84a44b67061b2c38eb05077b256c6fbee7eda5b372b777b8886d7d662",
+      "changedCPvsR2": [
+        7851,
+        7876,
+        7877,
+        7894,
+        7895
+      ],
+      "hmtxDiff": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "sha": "44d9368db72bfb426af56f6134ff7ce3d2314ae08774c1e1602d60d9ac7514ba",
+      "changedCPvsR2": [
+        7851,
+        7876,
+        7877,
+        7894,
+        7895
+      ],
+      "hmtxDiff": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "sha": "42a412f28e43df6f0f26381d16542ae10313212a7bb5cc2ee4e8c69e505c04d3",
+      "changedCPvsR2": [],
+      "hmtxDiff": []
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "de": {
+    "mergeSuccess": true,
+    "dedupCodepoints": [
+      768,
+      769,
+      770,
+      771,
+      772,
+      774,
+      776,
+      777,
+      795,
+      803,
+      809
+    ],
+    "bytes": 22448,
+    "sha": "ec3c249d69edb5e97f3079b7a19f9f485739f8cf2e8152edea25107370658e37",
+    "checks": [
+      {
+        "text": "ẪẫỄễỖỗ",
+        "shapingEqualNFCNFD": true,
+        "gid0": false
+      },
+      {
+        "text": "ẬẲẴẶ",
+        "shapingEqualNFCNFD": true,
+        "gid0": false
+      },
+      {
+        "text": "ẮỀỔỠỰ",
+        "shapingEqualNFCNFD": true,
+        "gid0": false
+      }
+    ]
+  },
+  "dam": {
+    "mergeSuccess": true,
+    "dedupCodepoints": [
+      768,
+      769,
+      770,
+      771,
+      772,
+      774,
+      776,
+      777,
+      795,
+      803,
+      809
+    ],
+    "bytes": 22568,
+    "sha": "c5f78fb3b1b7c81683b170c1ae8adaf24fd0b9b0f2022d6d4e068deb2b0ee123",
+    "checks": [
+      {
+        "text": "ẪẫỄễỖỗ",
+        "shapingEqualNFCNFD": true,
+        "gid0": false
+      },
+      {
+        "text": "ẬẲẴẶ",
+        "shapingEqualNFCNFD": true,
+        "gid0": false
+      },
+      {
+        "text": "ẮỀỔỠỰ",
+        "shapingEqualNFCNFD": true,
+        "gid0": false
+      }
+    ]
+  }
+}

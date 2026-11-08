@@ -1,0 +1,66 @@
+{
+  "faces": [
+    {
+      "w": 400,
+      "text": "ẪẫỄễỖỗ",
+      "differentPixelChannels": 10458
+    },
+    {
+      "w": 400,
+      "text": "ẬẲẴẶ",
+      "differentPixelChannels": 6080
+    },
+    {
+      "w": 400,
+      "text": "ẮỀỔỠỰ",
+      "differentPixelChannels": 6321
+    },
+    {
+      "w": 700,
+      "text": "ẪẫỄễỖỗ",
+      "differentPixelChannels": 11411
+    },
+    {
+      "w": 700,
+      "text": "ẬẲẴẶ",
+      "differentPixelChannels": 7979
+    },
+    {
+      "w": 700,
+      "text": "ẮỀỔỠỰ",
+      "differentPixelChannels": 11290
+    }
+  ],
+  "unified-faces": [
+    {
+      "w": 400,
+      "text": "ẪẫỄễỖỗ",
+      "differentPixelChannels": 0
+    },
+    {
+      "w": 400,
+      "text": "ẬẲẴẶ",
+      "differentPixelChannels": 0
+    },
+    {
+      "w": 400,
+      "text": "ẮỀỔỠỰ",
+      "differentPixelChannels": 0
+    },
+    {
+      "w": 700,
+      "text": "ẪẫỄễỖỗ",
+      "differentPixelChannels": 0
+    },
+    {
+      "w": 700,
+      "text": "ẬẲẴẶ",
+      "differentPixelChannels": 0
+    },
+    {
+      "w": 700,
+      "text": "ẮỀỔỠỰ",
+      "differentPixelChannels": 0
+    }
+  ]
+}

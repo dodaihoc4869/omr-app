@@ -1,0 +1,312 @@
+{
+  "i": 777,
+  "hash": "918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2.png",
+  "size": [
+    1051,
+    367
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C3-B8-D2-III-34",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ). Mỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ:\nRitalinic acid hydrochloride (C₆H₅-CH(COOH)-C₅H₉NH·HCl, M = 255,5) + CH₃OH/HCl → methylphenidate hydrochloride (C₆H₅-CH(COOCH₃)-C₅H₉NH·HCl, M = 269,5).\nĐể sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+      "refs": [
+        {
+          "hash": "918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2",
+          "where": "12-C3-B8-D2-III-34.hinh.0.du_lieu",
+          "hashDataUrl": "5ce31d06bec853ecce56e1f92d2c999714b3ec84410f2bb0de8e9a6f8cbde60a"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-152",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ). Mỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ:\nRitalinic acid hydrochloride (C₆H₅-CH(COOH)-C₅H₉NH·HCl, M = 255,5) + CH₃OH/HCl → methylphenidate hydrochloride (C₆H₅-CH(COOCH₃)-C₅H₉NH·HCl, M = 269,5).\nĐể sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+      "refs": [
+        {
+          "hash": "918d27418a2f6a52769194d32367ef605359187bb0c1bfbd37b22ebf7a169cc2",
+          "where": "DB-12-B8-D1-III-152.hinh.0.du_lieu",
+          "hashDataUrl": "5ce31d06bec853ecce56e1f92d2c999714b3ec84410f2bb0de8e9a6f8cbde60a"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x actualopened; all2publicrefs read. Source-only chưaSVG/chưaĐạt.",
+  "coordinateMeaning": "Pixelnative, approximatecenterline1–2px; preserve literal formula, notnormalize via chemistry/name.",
+  "geometry": {
+    "left": {
+      "phenylVertices": [
+        [
+          59,
+          172
+        ],
+        [
+          113,
+          141
+        ],
+        [
+          167,
+          172
+        ],
+        [
+          167,
+          233
+        ],
+        [
+          113,
+          264
+        ],
+        [
+          59,
+          233
+        ]
+      ],
+      "phenylInnerDoubleBonds": [
+        [
+          [
+            66,
+            178
+          ],
+          [
+            66,
+            227
+          ]
+        ],
+        [
+          [
+            113,
+            149
+          ],
+          [
+            160,
+            176
+          ]
+        ],
+        [
+          [
+            113,
+            256
+          ],
+          [
+            160,
+            229
+          ]
+        ]
+      ],
+      "centralCH": [
+        220,
+        141
+      ],
+      "bonds": [
+        "Phrightupper167,172→central220,141",
+        "central220,141→piperidine273,172",
+        "central220,141→220,94 whereCOOHfirstCanchor"
+      ],
+      "carboxylLabel": {
+        "text": "COOH",
+        "bbox": [
+          210,
+          68,
+          282,
+          90
+        ],
+        "anchor": "First C at~220 above verticalbond. Condensed noexplicitCOdouble/H."
+      },
+      "piperidineVertices": [
+        [
+          273,
+          172
+        ],
+        [
+          326,
+          141
+        ],
+        [
+          380,
+          172
+        ],
+        [
+          380,
+          233
+        ],
+        [
+          326,
+          264
+        ]
+      ],
+      "Nlabel": {
+        "text": "ClH₂N",
+        "bbox": [
+          212,
+          222,
+          281,
+          246
+        ],
+        "Ncenter": [
+          273,
+          234
+        ]
+      },
+      "Nbonds": [
+        "273,172→273,221 vertical endsaboveN",
+        "Nrightgap ends~285,241→326,264 diagonal; do notanchorCl/H"
+      ],
+      "caption": {
+        "text": "Ritalinic acid hydrochloride",
+        "bbox": [
+          100,
+          307,
+          377,
+          333
+        ],
+        "style": "regular upright, uppercaseRonly"
+      }
+    },
+    "right": {
+      "phenylVertices": [
+        [
+          605,
+          169
+        ],
+        [
+          658,
+          138
+        ],
+        [
+          712,
+          169
+        ],
+        [
+          712,
+          231
+        ],
+        [
+          658,
+          261
+        ],
+        [
+          605,
+          231
+        ]
+      ],
+      "phenylInnerDoubleBonds": [
+        [
+          [
+            612,
+            176
+          ],
+          [
+            612,
+            224
+          ]
+        ],
+        [
+          [
+            658,
+            146
+          ],
+          [
+            705,
+            173
+          ]
+        ],
+        [
+          [
+            658,
+            253
+          ],
+          [
+            705,
+            227
+          ]
+        ]
+      ],
+      "centralCH": [
+        765,
+        138
+      ],
+      "bonds": [
+        "Ph712,169→central765,138",
+        "central765,138→piperidine818,169",
+        "central765,138→765,91 firstCanchorCOOCH3"
+      ],
+      "carboxylLabel": {
+        "text": "COOCH₃",
+        "bbox": [
+          754,
+          66,
+          851,
+          89
+        ],
+        "anchor": "First Ccenter765; no expandedC=O added."
+      },
+      "piperidineVertices": [
+        [
+          818,
+          169
+        ],
+        [
+          871,
+          138
+        ],
+        [
+          925,
+          169
+        ],
+        [
+          925,
+          231
+        ],
+        [
+          871,
+          261
+        ]
+      ],
+      "Nlabel": {
+        "text": "ClH₂N",
+        "bbox": [
+          757,
+          220,
+          826,
+          244
+        ],
+        "Ncenter": [
+          818,
+          231
+        ]
+      },
+      "Nbonds": [
+        "818,169→818,219 aboveN",
+        "Nrightgap~830,239→871,261"
+      ],
+      "caption": {
+        "text": "methylphenidate hydrochloride",
+        "bbox": [
+          631,
+          302,
+          943,
+          328
+        ],
+        "style": "regular upright allinitiallowercase"
+      }
+    },
+    "reaction": {
+      "arrow": "ONE RIGHTfilledhead,shaft(412,202)→(577,202),headtriangle~(555,196),(577,202),(555,208)",
+      "condition": {
+        "text": "+ CH₃OH/HCl",
+        "bbox": [
+          408,
+          163,
+          557,
+          186
+        ],
+        "style": "regular,actualsubscript3/slash/lowercasel inHCl,leadingplusabove shaft;no separateplusoutsidethecondition"
+      }
+    },
+    "counts": "Left13C2O1N1Cl;right14C2O1N1Cl. Eachphenyl3innerdouble;eachpiperidine6member5C+N;total6visiblephenyldoubles. NOstereo/wedges/charges/counteriondots/explicitringH added. No brackets/numberlabels/temperature/phase/waterproduct."
+  },
+  "uncertainties": [
+    "Boundsapprox1–2px scan; labels clearly readable. Chemicalprotonation notrewritten:sourceClH2Nliteral preserved even though naming suggests salt."
+  ],
+  "actualSvgReviewed": false
+}
