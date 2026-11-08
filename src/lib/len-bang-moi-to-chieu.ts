@@ -18,6 +18,7 @@
 //
 // TỆP NÀY KHÔNG CÓ MÃ MÀU "#rrggbb" (luật `check:mau`) — chỉ rgb()/rgba().
 import { thoat } from './html-phieu'
+import { JS_LEN_BANG_BPU } from './len-bang-bpu-to-chieu'
 import type { ThongKeLopCau } from './thong-ke-lop-cau'
 export { thongKeLopCau, type ThongKeLopCau } from './thong-ke-lop-cau'
 
@@ -672,7 +673,9 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   if (nhom) nhom.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-k]'); if (b) lenh(b.getAttribute('data-k')); });
 
   // ── D / K: ghi Đạt / Chưa đạt qua cầu nối (ô đầu tiên chưa ghi của đợt) ──
+${JS_LEN_BANG_BPU}
   function cham(dat) {
+    if (chamBpu(dat)) return;
     if (pha() === 'cho' && window.__mcLenBang) {
       window.__mcLenBang();
     }
@@ -802,7 +805,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
     var p = Math.max(0, Math.min(100, Math.round(t.exp / t.moc * 100)));
     return '<div class="mc-exp-cap" aria-label="Cấp ' + t.cap + ': ' + t.exp + ' trên ' + t.moc + ' EXP để lên cấp ' + (t.cap + 1) + '"><div class="mc-exp-dong"><b>Cấp ' + t.cap + '</b><span>' + t.exp.toLocaleString('vi-VN') + ' / ' + t.moc.toLocaleString('vi-VN') + ' EXP · lên cấp ' + (t.cap + 1) + '</span></div><div class="mc-exp-ray"><i style="width:' + p + '%"></i></div></div>';
   }
-  // ── Mức làm 1–4 trong bảng chi tiết em (thầy 21/10: "bấm vào chi tiết là phải hiện đủ trên màn chiếu"): máy chủ gửi mucLam từng lần làm (ma · giay · giayDoc · sanNghi · ranh2/3/4 …) và cachLam14 (đếm 14 ngày); tờ chỉ vẽ lại. ──
+  // ── Mức làm 1–4 trong bảng chi tiết em (thầy 21/10): máy chủ gửi mucLam từng lần làm và cachLam14 (14 ngày); tờ chỉ vẽ lại. ──
   var TEN_MUC_CT = [null, 'Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'];
   function pipCt(n) { var q = '<span class="mc-pip" aria-hidden="true">'; for (var k = 1; k <= 4; k++) q += '<i' + (k <= n ? ' class="b"' : '') + '></i>'; return q + '</span>'; }
   /** Chip "Mức làm N" (lon = kèm tên mức); ma = 0 ⇒ "Chưa có số đo" nét đứt; uoc ⇒ "≈ Mức làm N" (xếp từ giây đồng hồ cũ / ước tính). */
@@ -925,7 +928,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function giayChu(g) { return g < 600 ? g + ' giây' : saiThoiLuong(g); }
   function pipHtml(n) { var h = '<span class="mc-pip" aria-hidden="true">'; for (var k = 1; k <= 4; k++) h += '<i' + (k <= n ? ' class="b"' : '') + '></i>'; return h + '</span>'; }
   var TEN_MUC = [null, 'Chưa đọc hết đề', 'Đọc xong, chưa kịp nghĩ', 'Có nghĩ', 'Làm kỹ'];
-  // Mức làm (thầy 21/10): MÁY CHỦ xếp từng lượt (mucLam = ma · giay · giayDoc · sanNghi · ranh2/3/4) — tờ chỉ vẽ lại, KHÔNG biết tỉ lệ nào. Khoảng giây đầu làn lấy từ lượt "đại diện".
+  // Mức làm (thầy 21/10): MÁY CHỦ xếp từng lượt — tờ chỉ vẽ lại, KHÔNG biết tỉ lệ nào. Khoảng giây đầu làn lấy từ lượt «đại diện».
   function ranhDaiDien(ds) {
     var dem = {}, tot = null, max = 0;
     ds.forEach(function (x) {
@@ -1088,6 +1091,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   window.addEventListener('message', function (e) {
     var m = e.data;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
+    if (m.lenh === 'len-bang') { lenBangBpu(m.em); return; }
     if (m.lenh === 'giai') { moLoiGiai(true); return; }
     if (m.lenh === 'lay-giai') { var g = dot() && dot().querySelector('.mc-giai'); e.source.postMessage({ nguon: 'to-chieu', loai: 'bpu-giai', html: g ? g.innerHTML : '' }, '*'); return; }
     if (m.lenh === 'toi') { var k = chiSo() + (m.d < 0 ? -1 : 1); if (k < 0 || k >= soDot()) { try { e.source.postMessage({ nguon: 'to-chieu', loai: 'bpu-het', d: m.d < 0 ? -1 : 1 }, '*'); } catch (x) { /* app đã đóng */ } return; } toiDot(k); }

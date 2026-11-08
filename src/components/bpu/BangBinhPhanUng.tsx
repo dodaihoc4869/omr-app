@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom'
 import { goiLenh } from '../../lib/goi-lenh-thay'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { taoQr } from '../../lib/ma-qr'
+import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { DOI_BPU, KJ, kyHieu, tenNgan, type ViewBang } from '../../lib/bpu/phong'
 import { lyDoLenBang } from '../../lib/bpu/ly-do'
 import { DAY_LUOI, DAY_LUOI_TOAN_MAN, KHE, TRAI_LUOI, boLuoi, tenGoiLop, type Luoi } from '../../lib/bpu/luoi'
@@ -83,9 +84,13 @@ export interface PropsBang {
   layGiai?: () => Promise<string>
   /** `caPhong` = cả phòng không mở được (ca mở, mất mạng); không = chỉ câu này không gửi được. */
   onKhongMo?: (chu: string, caPhong: boolean) => void
+  /** (08/11) Gọi em xong ⇒ giao em cho TỜ CHIẾU CŨ (màn lên bảng nguyên bản); trả false ⇒ không có tờ, bảng tự lo như cũ. */
+  lenBangTo?: (em: { sbd: string; ten: string }) => boolean
+  /** (08/11) Đăng kí nơi nhận «Đạt / Chưa đạt» thầy bấm trên tờ ⇒ bảng ghi kết quả + mở đáp án. */
+  dangKyChamTo?: (f: ((dat: boolean) => void) | null) => void
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
   const laDiemDanh = useRef(!qid)
@@ -225,7 +230,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     const rong = new Map<string, number>()
     for (const e of hien) { const t = tenGoi.get(e.sbd) ?? ''; rong.set(e.sbd, Math.max(1.4, ...t.split(' ').map((w) => (ctx ? ctx.measureText(w).width / 100 : w.length * 0.62) * 0.97))) }
     const xep = [...rong.values()].sort((a, b) => a - b), p85 = xep[Math.min(xep.length - 1, Math.floor(xep.length * 0.85))] ?? 2
-    const cho = L.w - 14, chung = Math.floor(Math.max(13, Math.min(30, L.h * 0.4, cho / p85)))
+    const cho = L.w - 14, chung = Math.floor(Math.max(13, Math.min(36, L.h * 0.47, cho / p85))) // 08/11 «chữ quá nhỏ»: tới 36 px (cũ 30)
     const rieng = new Map<string, number>()
     for (const [sbd, r] of rong) if (r * chung > cho) rieng.set(sbd, Math.max(11, Math.floor(cho / r)))
     return { chung, rieng }
@@ -237,7 +242,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     ds?.forEach((el) => {
       const toi = (el.parentElement?.clientWidth ?? 0) - 16 // bề ngang KHUNG ô trừ vạch màu đội + lề
       let co = parseFloat(getComputedStyle(el).fontSize) || 24
-      while ((el.scrollWidth > toi || el.scrollHeight > el.clientHeight + 1) && co > 10) { co -= 1; el.style.fontSize = `${co}px` }
+      // Cao: chỉ tính là tràn khi dư hơn ⅓ dòng (dấu tiếng Việt của Be Vietnam Pro nhô 1–2 px trên dòng — cũ +1 px ⇒ co mọi tên về 20 px, ảnh 08/11).
+      while ((el.scrollWidth > toi || el.scrollHeight > el.clientHeight + co * 0.35) && co > 10) { co -= 1; el.style.fontSize = `${co}px` }
     })
   }, [])
   useLayoutEffect(vuaTen, [vuaTen, hien, tenGoi, L, coChu, v?.luot?.pha])
@@ -322,6 +328,12 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   useEffect(() => { if (man !== 'tra-loi' || !l?.han) return; const h = setInterval(() => setNay(Date.now()), 500); return () => clearInterval(h) }, [man, l?.han])
 
   // GỌI LÊN BẢNG: lõi chọn em đã chốt ⇒ electron nhảy qua ứng viên ⇒ gửi phòng. Lỗi đọc ⇒ rút đều trong các em đã gửi.
+  // Thầy bấm Đạt / Chưa đạt trên tờ cũ ⇒ ghi như phím D / F của bảng rồi mở đáp án (bảng đã hiện lại).
+  useEffect(() => {
+    if (!dangKyChamTo) return
+    dangKyChamTo((dat) => { gui({ t: 'dat', v: dat }); setTimeout(() => gui({ t: 'mo' }), 150) })
+    return () => dangKyChamTo(null)
+  }, [dangKyChamTo, gui])
   const goiLen = useCallback(async (boQua: string[] = []) => {
     if (!v?.luot || dangGoi) return
     const lc = v.luot
@@ -337,7 +349,11 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     const cauMuc = (lc.cau as { mucDo?: string | null }).mucDo
     const ly = lyDoLenBang(chon, { mucDo: cauMuc, giayGui: null, nowMs: Date.now() })
     const dsUng = [...new Set([...list.slice(0, 6).map((x) => x.sbd), chon.sbd])]
-    const xong = () => { setUng(null); setDangGoi(false); gui({ t: 'goi', sbd: chon.sbd, lyDo: ly }) }
+    const xong = () => {
+      setUng(null); setDangGoi(false); gui({ t: 'goi', sbd: chon.sbd, lyDo: ly })
+      // 08/11: có tờ chiếu ⇒ màn lên bảng là màn CŨ của tờ (thầy «bỏ màn chiếu mới»); máy em vẫn sang pha làm bảng như cũ.
+      if (lenBangTo?.({ sbd: chon.sbd, ten: v.ds.find((e) => e.sbd === chon.sbd)?.ten ?? chon.sbd })) setTimeout(() => gui({ t: 'lam-bang' }), 300)
+    }
     if (yeu || dsUng.length < 2) { xong(); return }
     const buoc = dsUng.length * 3 + dsUng.indexOf(chon.sbd)
     let t = 0
@@ -347,7 +363,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
       setTimeout(() => { setUng({ ds: dsUng, soi: s }); if (la) { const vb = ve.current, i = hien.findIndex((e) => e.sbd === s); if (vb && i >= 0) vb.bungManh(viTriO(i, L).x, viTriO(i, L).y - 30, 44, vb.mau.doi[v.ds[i]!.doi]!, 0.8); setTimeout(xong, 800) } }, t)
     }
     setUng({ ds: dsUng, soi: null })
-  }, [v, dangGoi, gui, yeu, L, hien])
+  }, [v, dangGoi, gui, yeu, L, hien, lenBangTo])
 
   // Cả lớp gửi xong ⇒ tự gọi lên bảng.
   useEffect(() => {
@@ -534,7 +550,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
   }
 
   return createPortal(
-    <div ref={goc} className={`bpu-bang${vietBang ? ' viet-bang' : ''}`} style={vietBang ? { ['--mep' as string]: `calc(50% + ${(1180 - 960) * k}px)` } : undefined} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" tabIndex={-1}>
+    <div ref={goc} className={`bpu-bang${vietBang ? ' viet-bang' : ''}`} style={vietBang ? { ...MAU_CHIEU, ['--mep' as string]: `calc(50% + ${(1180 - 960) * k}px)` } : MAU_CHIEU} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" tabIndex={-1}>
       <div ref={san} className="bb-san" style={{ transform: `translate(-50%, -50%) scale(${k})` }}>
         <canvas ref={cv} className="bb-ve" aria-hidden="true" />
         {noi}

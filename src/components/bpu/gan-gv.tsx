@@ -15,6 +15,8 @@ let nguonTo: Window | null = null
 let buoiNho: { ds: BuoiHoc[]; luc: number } | null = null
 /** Phòng không mở được / máy chủ tắt ⇒ tạm không tự mở lại tới mốc này (thầy vẫn bấm P được). Thầy đóng bảng (Esc) thì không nghỉ: tờ chỉ báo khi ĐỔI câu. */
 let nghiDen = 0
+/** Nơi bảng nhận «Đạt / Chưa đạt» thầy bấm trên tờ cũ (bảng tự đăng kí khi dựng). */
+let nhanCham: ((dat: boolean) => void) | null = null
 const NHO_BUOI_MS = 60_000
 const GAN_DAY_MS = 4 * 3_600_000
 /** Buổi bước Điểm danh của máy này đang xem hôm nay (giờ VN) — cùng khoá `DiemDanhBuoi.tsx`. */
@@ -78,6 +80,8 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
       onToi={toiCau}
       onGiai={giaiTrenTo}
       layGiai={layGiai}
+      lenBangTo={lenBangTo}
+      dangKyChamTo={(f) => { nhanCham = f }}
       onKhongMo={khongMo}
       onTat={() => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }}
     />,
@@ -114,4 +118,20 @@ export function toiCau(d: 1 | -1): void {
 export function baoHetCau(d: 1 | -1): void {
   useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
-export function dongBang(): void { goc?.unmount(); goc = null; khung?.remove(); khung = null }
+export function dongBang(): void { goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null }
+/** LÊN BẢNG BẰNG TỜ CŨ (thầy 08/11 «gọi hs lên bảng thì chuyển về màn chiếu cũ … bấm đạt hoặc ko đạt thì tự động chuyển sang bình phản ứng»):
+ *  bảng ẨN (giữ nối phòng + trạng thái), tờ chạy màn lên bảng nguyên bản cho em bảng vừa chọn. Không có tờ ⇒ false (bảng tự lo như cũ). */
+export function lenBangTo(em: { sbd: string; ten: string }): boolean {
+  if (!nguonTo || !khung) return false
+  try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten } }, '*') } catch { return false }
+  khung.style.display = 'none'
+  try { nguonTo.focus() } catch { /* tờ chặn */ }
+  return true
+}
+/** Tờ báo thầy đã chấm em lên bảng ⇒ hiện lại bảng, bảng ghi kết quả + mở đáp án. */
+export function chamTuTo(dat: boolean): void {
+  if (!khung) return
+  khung.style.display = ''
+  nhanCham?.(dat)
+  khung.querySelector<HTMLElement>('.bpu-bang')?.focus()
+}

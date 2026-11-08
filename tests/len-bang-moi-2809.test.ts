@@ -380,3 +380,23 @@ describe('BÌNH PHẢN ỨNG TỰ ĐỘNG (thầy 07/11 «bấm chuyển câu �
     expect(String(guiLen.at(-1)!.html)).toContain('sol-label')
   })
 })
+
+describe('LÊN BẢNG BẰNG TỜ CŨ khi Bình Phản Ứng gọi em (thầy 08/11)', () => {
+  it('bảng nhắn «len-bang» ⇒ tờ đặt tên em vào thẻ, chạy màn gọi tên cũ; D ⇒ báo bảng «bpu-cham» Đạt, không ghi qua cầu nối cho em đã xếp lịch', () => {
+    const { w, doc, phim, guiLen } = moTo([o('S1', 'Nguyễn An')], { cauNoi: true })
+    const truoc = guiLen.length
+    w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: 'X9', ten: 'Lê Thu Hà' } }, source: w.parent as unknown as MessageEventSource }))
+    const the = doc.querySelector('.mc-dot .mc-em[id]')!
+    expect(the.querySelector('.mc-ten')!.textContent).toBe('Lê Thu Hà')
+    expect(['goi', 'chua']).toContain(doc.body.getAttribute('data-pha')) // giảm chuyển động ⇒ bỏ màn gọi tên, vào thẳng chữa
+    phim('d')
+    const moi = guiLen.slice(truoc)
+    expect(moi.filter((m) => m.loai === 'bpu-cham')).toEqual([{ nguon: 'to-chieu', loai: 'bpu-cham', dat: true }])
+    expect(moi.filter((m) => m.type && m.type !== 'ddh-mc-trang-thai')).toEqual([]) // không ghi kết quả qua cầu nối (chỉ còn tin báo trạng thái tờ)
+  })
+  it('chữ tên em do app gửi chỉ đi vào textContent (không chèn HTML)', () => {
+    const { w, doc } = moTo([o('S1', 'Nguyễn An')], { cauNoi: true })
+    w.dispatchEvent(new w.MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: 'X9', ten: '<img src=x onerror=alert(1)>' } }, source: w.parent as unknown as MessageEventSource }))
+    expect(doc.querySelector('.mc-dot .mc-em[id] img')).toBeNull()
+  })
+})

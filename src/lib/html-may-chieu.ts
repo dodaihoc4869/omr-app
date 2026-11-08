@@ -877,6 +877,7 @@ const JS_MAY_CHIEU = `
   window.__mcSoDot = function () { return dots.length; };
   window.__mcDen = den;
   window.__mcLenBang = lenBang;
+  window.__mcVaoLai = function () { huyGoi(); dotDangVao = -1; ve(); }; // 08/11 Bình Phản Ứng giao em: về «chờ gọi» của đợt (thẻ tên mới)
   window.__mcBatLoiGiai = function (mo) {
     if (window.__mcMoLoiGiai) return window.__mcMoLoiGiai(mo);
     var page = dots[i];

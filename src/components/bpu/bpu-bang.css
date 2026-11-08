@@ -306,3 +306,29 @@ html.may-yeu .bpu-bang * { animation: none !important; transition: none !importa
 html.may-yeu .bb-goc.nay, html.may-yeu .bb-goc.nay .ts b { animation: none; }
 .bpu-bang.viet-bang .bb-dong { display: none; } /* thẻ góc đứng chỗ nút Đóng — Esc vẫn đóng */
 .bb-tren .bb-chip { flex: none; white-space: nowrap; } /* chip loại câu không bị ép xuống hai dòng */
+
+/* ═══ 08/11 NỀN DỊU MẮT + CHỮ TO (thầy duyệt bản vẽ docs/ban-ve-bpu-giay-0811, phương án B «bảng tối + tấm giấy» như tờ chiếu cũ) ═══
+   Chỉ đè biến màu bằng bảng màu tờ cũ (--tr-chieu-*, định nghĩa ở styles/trong.css) — bố cục giữ nguyên. Đề, lời giải, ô tên em là tấm giấy ấm. */
+.bpu-bang {
+  --tr-nen: var(--tr-chieu-bang); --tr-chu: var(--tr-chieu-giay);
+  --tr-chu-2: color-mix(in srgb, var(--tr-chieu-giay) 78%, transparent); --tr-chu-3: color-mix(in srgb, var(--tr-chieu-giay) 58%, transparent);
+  --tr-mat: var(--tr-chieu-mat); --tr-mat-2: var(--tr-chieu-mat-2); --tr-mat-3: var(--tr-chieu-mat-3);
+  --tr-vien: color-mix(in srgb, var(--tr-chieu-giay) 16%, transparent); --tr-vien-2: color-mix(in srgb, var(--tr-chieu-giay) 30%, transparent);
+  --tr-tin: var(--tr-chieu-nhan-toi); --giay: var(--tr-chieu-giay);
+}
+.bpu-bang .bb-san { background-image: none; }
+.bpu-bang :is(.bb-de, .bb-giai) {
+  --tr-chu: var(--tr-chieu-chu); --tr-chu-2: color-mix(in srgb, var(--tr-chieu-chu) 86%, var(--tr-chieu-giay)); --tr-chu-3: var(--tr-chieu-phu);
+  --tr-mat: color-mix(in srgb, var(--tr-chieu-giay) 55%, var(--tr-trang)); --tr-mat-2: var(--tr-chieu-the);
+  --tr-vien: color-mix(in srgb, var(--tr-chieu-chu) 16%, transparent); --tr-vien-2: color-mix(in srgb, var(--tr-chieu-chu) 30%, transparent); --tr-tin: var(--tr-chieu-nhan);
+  color: var(--tr-chieu-chu);
+}
+.bpu-bang .bb-de { left: 40px; top: 104px; width: 1150px; padding: 26px 30px 26px 34px; box-sizing: border-box; border-radius: 30px; background: var(--tr-chieu-giay); }
+.bpu-bang .bb-o { --tr-chu: var(--tr-chieu-chu); --tr-chu-3: var(--tr-chieu-phu); --tr-mat: var(--tr-chieu-giay); --tr-vien: color-mix(in srgb, var(--tr-chieu-chu) 16%, transparent); --tr-tin: var(--tr-chieu-nhan); }
+.bpu-bang .bb-o.chua-vao .ten { color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); }
+/* Chữ to (ảnh máy chiếu 08/11 «chữ quá nhỏ»): ý / phương án = cỡ đề; nhãn đầu màn to hơn. Tên em: cỡ chung tới 36 px (BangBinhPhanUng `coChu`). */
+.bpu-bang .bb-de-chu { font-size: calc(46px * var(--k)); font-weight: 500; }
+.bpu-bang .bb-ds > div { grid-template-columns: 64px minmax(0, 1fr) auto; padding: calc(10px * var(--k)) 22px; font-size: calc(46px * var(--k)); font-weight: 500; }
+.bpu-bang .bb-pa > div { font-size: calc(46px * var(--k)); font-weight: 500; }
+.bpu-bang :is(.bb-pill, .bb-lop) { font-size: 30px; }
+.bpu-bang .bb-chip { font-size: 26px; }
