@@ -1,0 +1,160 @@
+{
+  "i": 885,
+  "hash": "a17654e391b9512883e0aac69b29476dadc94618ebb1cf5e198d7c943bd8828f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a17654e391b9512883e0aac69b29476dadc94618ebb1cf5e198d7c943bd8828f.png",
+  "size": [
+    307,
+    310
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C8-B27-I-17",
+      "de": "Phức chất [Pt(NH₃)₄]²⁺ có cấu trúc như hình bên. Phức chất [Pt(NH₃)₄]²⁺ có dạng hình học nào?",
+      "refs": [
+        {
+          "hash": "a17654e391b9512883e0aac69b29476dadc94618ebb1cf5e198d7c943bd8828f",
+          "where": "12-C8-B27-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "9663560630d67eaa5c9109b90ed612e95d6331961c619b4d6809ee5bfb64bb15"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+5x/all1publicref actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "nodes": [
+      {
+        "label": "Pt",
+        "center": [
+          155,
+          159
+        ],
+        "radii": [
+          28,
+          28
+        ],
+        "labelBBox": [
+          139,
+          145,
+          171,
+          173
+        ]
+      },
+      {
+        "label": "NH₃",
+        "center": [
+          155,
+          62
+        ],
+        "radii": [
+          26,
+          26
+        ],
+        "labelBBox": [
+          133,
+          50,
+          179,
+          76
+        ]
+      },
+      {
+        "label": "NH₃",
+        "center": [
+          58,
+          159
+        ],
+        "radii": [
+          26,
+          26
+        ],
+        "labelBBox": [
+          36,
+          148,
+          81,
+          172
+        ]
+      },
+      {
+        "label": "NH₃",
+        "center": [
+          251,
+          159
+        ],
+        "radii": [
+          26,
+          26
+        ],
+        "labelBBox": [
+          230,
+          148,
+          275,
+          173
+        ]
+      },
+      {
+        "label": "NH₃",
+        "center": [
+          155,
+          254
+        ],
+        "radii": [
+          26,
+          26
+        ],
+        "labelBBox": [
+          133,
+          242,
+          180,
+          269
+        ]
+      }
+    ],
+    "bonds": [
+      [
+        [
+          155,
+          88
+        ],
+        [
+          155,
+          131
+        ]
+      ],
+      [
+        [
+          84,
+          159
+        ],
+        [
+          127,
+          159
+        ]
+      ],
+      [
+        [
+          183,
+          159
+        ],
+        [
+          225,
+          159
+        ]
+      ],
+      [
+        [
+          155,
+          187
+        ],
+        [
+          155,
+          228
+        ]
+      ]
+    ],
+    "fill": "ALL5nodesflatlightgrayapprox#d0d0d0 withthinmediumgrayoutlineapprox#888. Bondsdarkgrayuniformthin. Nodesoccludebondinside,noextrafulllinesacrossnodefaces.",
+    "font": "AllnodelabelsBOLDuprightblack;NH3actualsub3. CentralPtcasecapitalP/lowert.",
+    "counts": "5graycircles/4cardinalsinglebonds/1Pt4N12H;NOcharges/brackets/wedges/hash/arrows/formulacaption/nameextra. DoNOTadd2+fromstemtoimage;sourcecirclemodelhasnone."
+  },
+  "coordinateMeaning": "Nativepixelapprox1px,notgeometryanswerinference.",
+  "actualSvgReviewed": false
+}

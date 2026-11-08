@@ -1,0 +1,987 @@
+{
+  "nguoiDoc": "soat_nguon_3",
+  "repoModified": false,
+  "productionAdopt": false,
+  "candidateCreated": false,
+  "verdict": "INVALID: sourceẫ semantic indices wrong; superseded by corrected277 report",
+  "measurements": [
+    {
+      "asset": "de-originalTTF",
+      "glyph": "Ẫ",
+      "advance": 658,
+      "curveBounds": {
+        "body": [
+          30.076923370361328,
+          0.0,
+          627.923095703125,
+          730.0
+        ],
+        "tilde": [
+          144.90475463867188,
+          918.0,
+          512.0999755859375,
+          1052.0
+        ],
+        "hat": [
+          163.2142791748047,
+          760.0,
+          493.9230651855469,
+          903.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 329.00000953674316,
+        "tilde": 328.5023651123047,
+        "hat": 328.5686721801758
+      },
+      "tildeMinusBody": -0.49764442443847656,
+      "hatMinusBody": -0.4313373565673828,
+      "tildeMinusHat": -0.06630706787109375,
+      "pairSeparationOverAdvance": 0.00010077061986488413,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-originalTTF",
+      "glyph": "ẫ",
+      "advance": 534,
+      "curveBounds": {
+        "body": [
+          82.9047622680664,
+          583.0,
+          450.34783935546875,
+          913.0
+        ],
+        "tilde": [
+          127.0,
+          53.0,
+          387.0,
+          275.0
+        ],
+        "hat": [
+          50.0,
+          -10.0,
+          464.0,
+          530.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 266.6263008117676,
+        "tilde": 257.0,
+        "hat": 257.0
+      },
+      "tildeMinusBody": -9.626300811767578,
+      "hatMinusBody": -9.626300811767578,
+      "tildeMinusHat": 0.0,
+      "pairSeparationOverAdvance": 0.0,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-originalTTF",
+      "glyph": "Ễ",
+      "advance": 587,
+      "curveBounds": {
+        "body": [
+          85.0,
+          0.0,
+          512.0,
+          730.0
+        ],
+        "tilde": [
+          115.9047622680664,
+          918.0,
+          483.34783935546875,
+          1052.0
+        ],
+        "hat": [
+          134.2142791748047,
+          760.0,
+          464.9230651855469,
+          903.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 298.5,
+        "tilde": 299.6263008117676,
+        "hat": 299.5686721801758
+      },
+      "tildeMinusBody": 1.1263008117675781,
+      "hatMinusBody": 1.0686721801757812,
+      "tildeMinusHat": 0.057628631591796875,
+      "pairSeparationOverAdvance": 9.817484087188564e-05,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-originalTTF",
+      "glyph": "ễ",
+      "advance": 524,
+      "curveBounds": {
+        "body": [
+          40.0,
+          -10.0,
+          479.0540466308594,
+          530.0
+        ],
+        "tilde": [
+          83.9047622680664,
+          780.0,
+          451.34783935546875,
+          913.0
+        ],
+        "hat": [
+          99.5999984741211,
+          583.0,
+          435.5714416503906,
+          750.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 259.5270233154297,
+        "tilde": 267.6263008117676,
+        "hat": 267.58572006225586
+      },
+      "tildeMinusBody": 8.09927749633789,
+      "hatMinusBody": 8.058696746826172,
+      "tildeMinusHat": 0.04058074951171875,
+      "pairSeparationOverAdvance": 7.744417845747853e-05,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-originalTTF",
+      "glyph": "Ỗ",
+      "advance": 714,
+      "curveBounds": {
+        "body": [
+          40.0,
+          -10.0,
+          674.0,
+          740.0
+        ],
+        "tilde": [
+          172.90475463867188,
+          918.0,
+          540.3478393554688,
+          1052.0
+        ],
+        "hat": [
+          191.2142791748047,
+          760.0,
+          521.923095703125,
+          903.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 357.0,
+        "tilde": 356.6262969970703,
+        "hat": 356.56868743896484
+      },
+      "tildeMinusBody": -0.3737030029296875,
+      "hatMinusBody": -0.43131256103515625,
+      "tildeMinusHat": 0.05760955810546875,
+      "pairSeparationOverAdvance": 8.068565560990021e-05,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-originalTTF",
+      "glyph": "ỗ",
+      "advance": 556,
+      "curveBounds": {
+        "body": [
+          40.0,
+          -10.0,
+          516.0,
+          530.0
+        ],
+        "tilde": [
+          93.9047622680664,
+          780.0,
+          461.34783935546875,
+          913.0
+        ],
+        "hat": [
+          110.42857360839844,
+          583.0,
+          445.5714416503906,
+          750.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 278.0,
+        "tilde": 277.6263008117676,
+        "hat": 278.00000762939453
+      },
+      "tildeMinusBody": -0.3736991882324219,
+      "hatMinusBody": 7.62939453125e-06,
+      "tildeMinusHat": -0.3737068176269531,
+      "pairSeparationOverAdvance": 0.0006721345640772538,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-R4",
+      "glyph": "Ẫ",
+      "advance": 701,
+      "curveBounds": {
+        "body": [
+          36.27777862548828,
+          -12.0,
+          664.2000122070312,
+          742.0
+        ],
+        "tilde": [
+          151.9310302734375,
+          1021.0,
+          548.0714111328125,
+          1160.0
+        ],
+        "hat": [
+          165.0,
+          810.0,
+          534.0,
+          980.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 350.23889541625977,
+        "tilde": 350.001220703125,
+        "hat": 349.5
+      },
+      "tildeMinusBody": -0.23767471313476562,
+      "hatMinusBody": -0.7388954162597656,
+      "tildeMinusHat": 0.501220703125,
+      "pairSeparationOverAdvance": 0.0007150081356990015,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-R4",
+      "glyph": "ẫ",
+      "advance": 674,
+      "curveBounds": {
+        "body": [
+          63.0,
+          -22.0,
+          629.0,
+          558.0
+        ],
+        "tilde": [
+          122.9310302734375,
+          860.0,
+          519.0714111328125,
+          999.0
+        ],
+        "hat": [
+          136.0,
+          649.0,
+          505.0,
+          819.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 346.0,
+        "tilde": 321.001220703125,
+        "hat": 320.5
+      },
+      "tildeMinusBody": -24.998779296875,
+      "hatMinusBody": -25.5,
+      "tildeMinusHat": 0.501220703125,
+      "pairSeparationOverAdvance": 0.0007436508948442137,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-R4",
+      "glyph": "Ễ",
+      "advance": 629,
+      "curveBounds": {
+        "body": [
+          92.0,
+          -12.0,
+          547.0,
+          742.0
+        ],
+        "tilde": [
+          123.92857360839844,
+          1021.0,
+          520.0714111328125,
+          1160.0
+        ],
+        "hat": [
+          137.0,
+          810.0,
+          506.0,
+          980.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 319.5,
+        "tilde": 321.99999237060547,
+        "hat": 321.5
+      },
+      "tildeMinusBody": 2.4999923706054688,
+      "hatMinusBody": 2.0,
+      "tildeMinusHat": 0.49999237060546875,
+      "pairSeparationOverAdvance": 0.0007949004302153717,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-R4",
+      "glyph": "ễ",
+      "advance": 592,
+      "curveBounds": {
+        "body": [
+          64.0,
+          -22.0,
+          532.0454711914062,
+          558.0
+        ],
+        "tilde": [
+          109.92857360839844,
+          860.0,
+          506.0714416503906,
+          999.0
+        ],
+        "hat": [
+          123.0,
+          649.0,
+          492.0,
+          819.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 298.0227355957031,
+        "tilde": 308.00000762939453,
+        "hat": 307.5
+      },
+      "tildeMinusBody": 9.977272033691406,
+      "hatMinusBody": 9.477264404296875,
+      "tildeMinusHat": 0.5000076293945312,
+      "pairSeparationOverAdvance": 0.0008446074820853568,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-R4",
+      "glyph": "Ỗ",
+      "advance": 757,
+      "curveBounds": {
+        "body": [
+          46.0,
+          -22.0,
+          711.0,
+          752.0
+        ],
+        "tilde": [
+          181.92857360839844,
+          1021.0,
+          578.0689697265625,
+          1160.0
+        ],
+        "hat": [
+          195.0,
+          810.0,
+          564.0,
+          980.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 378.5,
+        "tilde": 379.99877166748047,
+        "hat": 379.5
+      },
+      "tildeMinusBody": 1.4987716674804688,
+      "hatMinusBody": 1.0,
+      "tildeMinusHat": 0.49877166748046875,
+      "pairSeparationOverAdvance": 0.0006588793493797474,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-R4",
+      "glyph": "ỗ",
+      "advance": 598,
+      "curveBounds": {
+        "body": [
+          46.0,
+          -22.0,
+          551.0,
+          558.0
+        ],
+        "tilde": [
+          101.92857360839844,
+          860.0,
+          498.0714416503906,
+          999.0
+        ],
+        "hat": [
+          115.0,
+          649.0,
+          484.0,
+          819.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 298.5,
+        "tilde": 300.00000762939453,
+        "hat": 299.5
+      },
+      "tildeMinusBody": 1.5000076293945312,
+      "hatMinusBody": 1.0,
+      "tildeMinusHat": 0.5000076293945312,
+      "pairSeparationOverAdvance": 0.0008361331595226275,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-originalTTF",
+      "glyph": "Ẫ",
+      "advance": 661,
+      "curveBounds": {
+        "body": [
+          26.81818199157715,
+          0.0,
+          633.5789184570312,
+          730.0
+        ],
+        "tilde": [
+          136.73333740234375,
+          912.0,
+          522.5806274414062,
+          1057.0
+        ],
+        "hat": [
+          157.27777099609375,
+          760.0,
+          503.5789489746094,
+          895.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 330.1985502243042,
+        "tilde": 329.656982421875,
+        "hat": 330.42835998535156
+      },
+      "tildeMinusBody": -0.5415678024291992,
+      "hatMinusBody": 0.22980976104736328,
+      "tildeMinusHat": -0.7713775634765625,
+      "pairSeparationOverAdvance": 0.0011669857238677194,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-originalTTF",
+      "glyph": "ẫ",
+      "advance": 544,
+      "curveBounds": {
+        "body": [
+          73.72413635253906,
+          580.0,
+          459.28570556640625,
+          925.0
+        ],
+        "tilde": [
+          152.0,
+          75.0,
+          372.0,
+          262.0
+        ],
+        "hat": [
+          47.0,
+          -10.0,
+          477.0,
+          530.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 266.50492095947266,
+        "tilde": 262.0,
+        "hat": 262.0
+      },
+      "tildeMinusBody": -4.504920959472656,
+      "hatMinusBody": -4.504920959472656,
+      "tildeMinusHat": 0.0,
+      "pairSeparationOverAdvance": 0.0,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-originalTTF",
+      "glyph": "Ễ",
+      "advance": 594,
+      "curveBounds": {
+        "body": [
+          82.0,
+          0.0,
+          522.0,
+          730.0
+        ],
+        "tilde": [
+          108.72413635253906,
+          912.0,
+          494.28570556640625,
+          1058.0
+        ],
+        "hat": [
+          129.08570861816406,
+          760.0,
+          474.9142761230469,
+          895.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 302.0,
+        "tilde": 301.50492095947266,
+        "hat": 301.99999237060547
+      },
+      "tildeMinusBody": -0.49507904052734375,
+      "hatMinusBody": -7.62939453125e-06,
+      "tildeMinusHat": -0.4950714111328125,
+      "pairSeparationOverAdvance": 0.000833453554095644,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-originalTTF",
+      "glyph": "ễ",
+      "advance": 529,
+      "curveBounds": {
+        "body": [
+          37.0,
+          -10.0,
+          487.0526428222656,
+          530.0
+        ],
+        "tilde": [
+          78.72413635253906,
+          780.0,
+          464.28570556640625,
+          925.0
+        ],
+        "hat": [
+          95.44444274902344,
+          580.0,
+          448.5555419921875,
+          750.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 262.0263214111328,
+        "tilde": 271.50492095947266,
+        "hat": 271.99999237060547
+      },
+      "tildeMinusBody": 9.478599548339844,
+      "hatMinusBody": 9.973670959472656,
+      "tildeMinusHat": -0.4950714111328125,
+      "pairSeparationOverAdvance": 0.0009358627809693998,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-originalTTF",
+      "glyph": "Ỗ",
+      "advance": 724,
+      "curveBounds": {
+        "body": [
+          37.0,
+          -10.0,
+          687.0,
+          740.0
+        ],
+        "tilde": [
+          168.72413635253906,
+          912.0,
+          554.2857055664062,
+          1057.0
+        ],
+        "hat": [
+          189.08570861816406,
+          760.0,
+          534.914306640625,
+          895.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 362.0,
+        "tilde": 361.50492095947266,
+        "hat": 362.00000762939453
+      },
+      "tildeMinusBody": -0.49507904052734375,
+      "hatMinusBody": 7.62939453125e-06,
+      "tildeMinusHat": -0.495086669921875,
+      "pairSeparationOverAdvance": 0.0006838213672954075,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-originalTTF",
+      "glyph": "ỗ",
+      "advance": 564,
+      "curveBounds": {
+        "body": [
+          37.0,
+          -10.0,
+          527.0,
+          530.0
+        ],
+        "tilde": [
+          88.72413635253906,
+          780.0,
+          474.28570556640625,
+          925.0
+        ],
+        "hat": [
+          105.44444274902344,
+          580.0,
+          458.5555419921875,
+          750.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 282.0,
+        "tilde": 281.50492095947266,
+        "hat": 281.99999237060547
+      },
+      "tildeMinusBody": -0.49507904052734375,
+      "hatMinusBody": -7.62939453125e-06,
+      "tildeMinusHat": -0.4950714111328125,
+      "pairSeparationOverAdvance": 0.0008777861899517953,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-R4",
+      "glyph": "Ẫ",
+      "advance": 681,
+      "curveBounds": {
+        "body": [
+          16.88461685180664,
+          -26.0,
+          663.0333251953125,
+          756.0
+        ],
+        "tilde": [
+          124.81818389892578,
+          984.0,
+          555.3829956054688,
+          1160.0
+        ],
+        "hat": [
+          140.0,
+          734.0,
+          540.0,
+          924.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 339.95897102355957,
+        "tilde": 340.10058975219727,
+        "hat": 340.0
+      },
+      "tildeMinusBody": 0.1416187286376953,
+      "hatMinusBody": 0.04102897644042969,
+      "tildeMinusHat": 0.10058975219726562,
+      "pairSeparationOverAdvance": 0.00014770888722065437,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-R4",
+      "glyph": "ẫ",
+      "advance": 628,
+      "curveBounds": {
+        "body": [
+          39.0,
+          -36.0,
+          609.0,
+          592.0
+        ],
+        "tilde": [
+          72.81394958496094,
+          902.0,
+          502.39129638671875,
+          1078.0
+        ],
+        "hat": [
+          88.0,
+          652.0,
+          488.0,
+          842.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 324.0,
+        "tilde": 287.60262298583984,
+        "hat": 288.0
+      },
+      "tildeMinusBody": -36.397377014160156,
+      "hatMinusBody": -36.0,
+      "tildeMinusHat": -0.39737701416015625,
+      "pairSeparationOverAdvance": 0.0006327659461148985,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-R4",
+      "glyph": "Ễ",
+      "advance": 615,
+      "curveBounds": {
+        "body": [
+          71.0,
+          -26.0,
+          554.0,
+          756.0
+        ],
+        "tilde": [
+          96.81394958496094,
+          1036.0,
+          526.3912963867188,
+          1212.0
+        ],
+        "hat": [
+          112.0,
+          786.0,
+          512.0,
+          976.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 312.5,
+        "tilde": 311.60262298583984,
+        "hat": 312.0
+      },
+      "tildeMinusBody": -0.8973770141601562,
+      "hatMinusBody": -0.5,
+      "tildeMinusHat": -0.39737701416015625,
+      "pairSeparationOverAdvance": 0.0006461414864392784,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-R4",
+      "glyph": "ễ",
+      "advance": 569,
+      "curveBounds": {
+        "body": [
+          45.0,
+          -36.0,
+          537.0377197265625,
+          592.0
+        ],
+        "tilde": [
+          84.81818389892578,
+          902.0,
+          515.3829956054688,
+          1078.0
+        ],
+        "hat": [
+          101.0,
+          652.0,
+          500.0,
+          842.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 291.01885986328125,
+        "tilde": 300.10058975219727,
+        "hat": 300.5
+      },
+      "tildeMinusBody": 9.081729888916016,
+      "hatMinusBody": 9.48114013671875,
+      "tildeMinusHat": -0.3994102478027344,
+      "pairSeparationOverAdvance": 0.0007019512263668442,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-R4",
+      "glyph": "Ỗ",
+      "advance": 742,
+      "curveBounds": {
+        "body": [
+          27.0,
+          -36.0,
+          715.0,
+          766.0
+        ],
+        "tilde": [
+          155.81394958496094,
+          1046.0,
+          585.3912963867188,
+          1222.0
+        ],
+        "hat": [
+          171.0,
+          796.0,
+          571.0,
+          986.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 371.0,
+        "tilde": 370.60262298583984,
+        "hat": 371.0
+      },
+      "tildeMinusBody": -0.39737701416015625,
+      "hatMinusBody": 0.0,
+      "tildeMinusHat": -0.39737701416015625,
+      "pairSeparationOverAdvance": 0.0005355485366039842,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "dam-R4",
+      "glyph": "ỗ",
+      "advance": 586,
+      "curveBounds": {
+        "body": [
+          27.0,
+          -36.0,
+          558.0,
+          592.0
+        ],
+        "tilde": [
+          76.81394958496094,
+          902.0,
+          506.39129638671875,
+          1078.0
+        ],
+        "hat": [
+          92.0,
+          652.0,
+          492.0,
+          842.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 292.5,
+        "tilde": 291.60262298583984,
+        "hat": 292.0
+      },
+      "tildeMinusBody": -0.8973770141601562,
+      "hatMinusBody": -0.5,
+      "tildeMinusHat": -0.39737701416015625,
+      "pairSeparationOverAdvance": 0.0006781177716043622,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-269",
+      "glyph": "Ẫ",
+      "advance": 701,
+      "curveBounds": {
+        "body": [
+          36.27777862548828,
+          -12.0,
+          664.2000122070312,
+          742.0
+        ],
+        "tilde": [
+          151.9310302734375,
+          860.0,
+          548.0714111328125,
+          999.0
+        ],
+        "hat": [
+          165.0,
+          700.0,
+          534.0,
+          870.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 350.23889541625977,
+        "tilde": 350.001220703125,
+        "hat": 349.5
+      },
+      "tildeMinusBody": -0.23767471313476562,
+      "hatMinusBody": -0.7388954162597656,
+      "tildeMinusHat": 0.501220703125,
+      "pairSeparationOverAdvance": 0.0007150081356990015,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-276",
+      "glyph": "Ẫ",
+      "advance": 701,
+      "curveBounds": {
+        "body": [
+          36.27777862548828,
+          -12.0,
+          664.2000122070312,
+          742.0
+        ],
+        "tilde": [
+          151.9310302734375,
+          860.0,
+          548.0714111328125,
+          999.0
+        ],
+        "hat": [
+          165.0,
+          700.0,
+          534.0,
+          870.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 350.23889541625977,
+        "tilde": 350.001220703125,
+        "hat": 349.5
+      },
+      "tildeMinusBody": -0.23767471313476562,
+      "hatMinusBody": -0.7388954162597656,
+      "tildeMinusHat": 0.501220703125,
+      "pairSeparationOverAdvance": 0.0007150081356990015,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    },
+    {
+      "asset": "de-276",
+      "glyph": "Ỗ",
+      "advance": 757,
+      "curveBounds": {
+        "body": [
+          46.0,
+          -22.0,
+          711.0,
+          752.0
+        ],
+        "tilde": [
+          0.9285717010498047,
+          860.0,
+          397.0689697265625,
+          999.0
+        ],
+        "hat": [
+          312.0,
+          765.0,
+          681.0,
+          935.0
+        ]
+      },
+      "bboxCenterX": {
+        "body": 378.5,
+        "tilde": 198.99877071380615,
+        "hat": 496.5
+      },
+      "tildeMinusBody": -179.50122928619385,
+      "hatMinusBody": 118.0,
+      "tildeMinusHat": -297.50122928619385,
+      "pairSeparationOverAdvance": 0.3930003028879707,
+      "offsetDefinition": "curveinkboundsmidpoint; not area centroid or opticalgate"
+    }
+  ],
+  "summary": {
+    "sourceMaxAbsTildeHatCenterDifference": 0.7713775634765625,
+    "R4MaxAbsTildeHatCenterDifference": 0.501220703125,
+    "DeA269pairSeparation": 0.501220703125,
+    "DeO276pairSeparation": 297.50122928619385,
+    "DeA269PairSepAdvanceFraction": 0.0007150081356990015,
+    "DeO276PairSepAdvanceFraction": 0.3930003028879707
+  },
+  "designFindings": [
+    "Across12sourceTTFfamilyglyphs, tilde/hatcurvebboxcenters agree within0.772fontunits (rounding/sourceopticaltinyvariation); R4within0.502. They formoneverticallyalignedaccentstack. This is observation, not newlymandatedthreshold.",
+    "DeẪ269 maintains originalrelativehorizontalplacement: markpairseparation0.501units,bodyoffsets−0.238/−0.739;onlyYtranslation changes. Itsactualpositive doesnotrequire abandoning sourcecenteredstack.",
+    "DeỖ276 pairseparation297.501units=39.30%advance;tilde−179.501 andhat+118unitsrelativebody. This quantifies parent/agentactualdesignnegative as splittingoneaccentstackintotwohorizontalanchors.",
+    "Bodybboxcenter is not universalopticalcenter: source lowercaseẫ has sourceoffset−9.626De/−4.505Dam and R4−25/−36aftertail/widthtransform; sourceễ about+8..10. Hence do NOT enforce zerobodyoffset or arbitraryunifiedabsoluteXgate. Pairalignmentwithsamebase/sourceis morefaithfuldescriptiveevidence.",
+    "Usefulfuturecriterionforreview: comparetilde-to-hat relationshipwithsameglyphsource andneighborfamily; showbothwholeword/appsize andmacro. Smalljointshiftcouldretainstack but independentoppositemarkshiftchangesobserveddesign. No numericpassgateintroduced."
+  ],
+  "boundedConclusion": [
+    "No new geometry repair justified bycenteringmeasurementsalone. They explain why276clearancepositivewasdesignnegative, withoutclaimingglobalimpossible.",
+    "No grids/offset/shrink/flatten/rotate rerun; no newWOFF. Old269positive and276negative remain boundtotheiractualhashes.",
+    "Any nextrepair wouldneed fullstroke/gaps and source-likepairalignment together, plusactual12ink/readability/NFD/CDP; measurementdoesnotprove suchrepair exists."
+  ],
+  "assetHashes": {
+    "/workspace/scratch/lo269/unified-de.woff2": "0fa021440f18da5b3021a074dfa65e5a404d42a72ec7f06fc9cdf96893f68c61",
+    "/workspace/scratch/lo276/unified-de.woff2": "504267fe4ec8f037cdd960005e6eba2be43e3c083867bc4839ba41b93933ca09",
+    "/workspace/scratch/glyph263/source/MPLUSRounded1c-Regular.ttf": "b75708b53e45b06d17d470aeeca5b766e3d1b3999f03f13ec4eb863ca846c14c",
+    "/workspace/scratch/glyph263/source/MPLUSRounded1c-Medium.ttf": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70"
+  },
+  "repro": "measure-centering.py",
+  "limits": [
+    "BBoxmidpointsofselectedexactcurves, not area-centroid or computedopticaljudgment. No bboxcollision predicate.",
+    "No newlyrenderedfontclaim; visualreferences are prioractualexactassets, not transferrednewSHA."
+  ],
+  "invalid": true,
+  "supersededBy": "soat-can-tam-dau-lo-277-hold.json"
+}

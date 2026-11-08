@@ -1,0 +1,29 @@
+[
+  {
+    "i": 885,
+    "hash": "a17654e391b9512883e0aac69b29476dadc94618ebb1cf5e198d7c943bd8828f",
+    "fileNguon": "anh/a17654e391b9512883e0aac69b29476dadc94618ebb1cf5e198d7c943bd8828f.png",
+    "svg": "pt-bon-ammine-ddh-3a35a9ab9c5254e08ab934ed78f90a8a3ff94d58e9a56b020298ebdfbd0bd62c.svg",
+    "hashSvg": "3a35a9ab9c5254e08ab934ed78f90a8a3ff94d58e9a56b020298ebdfbd0bd62c",
+    "byteSvg": 7647,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C8-B27-I-17",
+        "de": "Phức chất [Pt(NH₃)₄]²⁺ có cấu trúc như hình bên. Phức chất [Pt(NH₃)₄]²⁺ có dạng hình học nào?",
+        "refs": [
+          {
+            "hash": "a17654e391b9512883e0aac69b29476dadc94618ebb1cf5e198d7c943bd8828f",
+            "where": "12-C8-B27-I-17.hinh.0.du_lieu",
+            "hashDataUrl": "9663560630d67eaa5c9109b90ed612e95d6331961c619b4d6809ee5bfb64bb15"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5flatgraycircles/1Pt4NH3allactualdam/4cardinalordinarySINGLEthinuniform/1Pt4N12H/noaddedcharge2plus-brackets-wedge-hash-arrows-caption-answer.",
+    "hashSvgDaSoat": "3a35a9ab9c5254e08ab934ed78f90a8a3ff94d58e9a56b020298ebdfbd0bd62c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
