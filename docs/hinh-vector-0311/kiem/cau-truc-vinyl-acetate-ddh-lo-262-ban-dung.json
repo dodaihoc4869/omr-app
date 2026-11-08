@@ -1,0 +1,29 @@
+[
+  {
+    "i": 744,
+    "hash": "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa",
+    "fileNguon": "anh/c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa.png",
+    "svg": "vinyl-acetate-ddh-7d0bf70890fd68aa5e2b24c2fc19b9e2a9e9575e5490b22f9e86fb641f6942f7.svg",
+    "hashSvg": "7d0bf70890fd68aa5e2b24c2fc19b9e2a9e9575e5490b22f9e86fb641f6942f7",
+    "byteSvg": 37820,
+    "font": "DDH Rounded",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D5-III-5",
+        "de": "Poly(vinyl acetate) (kí hiệu là PVA) được điều chế từ ethylene theo sơ đồ ở hình dưới.\nHiệu suất phản ứng (1), (2), (3) lần lượt là 90%; 80% và 95%.\nKhối lượng ethylene (theo tấn) cần lấy để sản xuất được 10 tấn PVA là bao nhiêu? (Làm tròn kết quả đến hàng phần trăm).",
+        "refs": [
+          {
+            "hash": "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa",
+            "where": "12-KT-C4-D5-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "e7a6bb8d6ee67cf13da6fed54f071a08d22e9d9100f626ec66dd190fa3b4ee32"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "CH2=CH2→CH3COOH→CH3COOCH=CH2→Poly(vinyl acetate)); giữ hai ngoặc đóng nguyên bản/3RIGHTheads/3nums/conditionsliteral/noanswer.",
+    "hashSvgDaSoat": "7d0bf70890fd68aa5e2b24c2fc19b9e2a9e9575e5490b22f9e86fb641f6942f7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

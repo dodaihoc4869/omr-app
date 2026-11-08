@@ -1,0 +1,8 @@
+#!/usr/bin/env node
+// Chỉ bằng chứng DOM thử nghiệm; truyền rõ mô-đun Playwright và Chromium.
+// node render-reproduce.js FONT_DIR OUT_DIR PLAYWRIGHT_MODULE CHROMIUM_EXECUTABLE
+const fs=require('fs'),path=require('path');
+const [fontDir,outDir,pw,executablePath]=process.argv.slice(2);
+if(!executablePath)throw Error('Usage: FONT_DIR OUT_DIR PLAYWRIGHT_MODULE CHROMIUM_EXECUTABLE');
+const {chromium}=require(pw);
+(async()=>{fs.mkdirSync(outDir,{recursive:true});const r=JSON.parse(fs.readFileSync(path.join(fontDir,'reproduction.json')));const b=await chromium.launch({executablePath,args:['--no-sandbox','--disable-dev-shm-usage']});const evidence=[];for(const n of Object.keys(r.stages)){const f=fs.readFileSync(path.join(fontDir,n+'.woff2'));const page=await b.newPage({viewport:{width:900,height:330},deviceScaleFactor:2});await page.setContent(`<style>@font-face{font-family:Stage;src:url(data:font/woff2;base64,${f.toString('base64')});font-weight:700}body{margin:0;background:#355c73;color:white}h3{font:18px sans-serif;margin:10px}div{font:700 200px Stage;line-height:1.3;letter-spacing:45px;text-align:center}</style><h3>${n}</h3><div>N A a</div>`);await page.evaluate(()=>document.fonts.ready);const loaded=await page.evaluate(()=>document.fonts.check('700 200px Stage'));if(!loaded)throw Error('Font failed '+n);const file=path.join(outDir,n+'.jpg');await page.screenshot({path:file,type:'jpeg',quality:78});const bytes=fs.statSync(file).size;if(bytes>150000)throw Error('Image exceeds150KB '+file);evidence.push({stage:n,file,bytes,loaded});await page.close()}const browserVersion=b.version();await b.close();fs.writeFileSync(path.join(outDir,'dom-render.json'),JSON.stringify({browserVersion,fontSizeCSSpx:200,dpr:2,evidence,admissible:false},null,2));})();

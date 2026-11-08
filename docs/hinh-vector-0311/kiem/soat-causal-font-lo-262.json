@@ -1,0 +1,66 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "readOnlyRepo": true,
+  "fontModified": false,
+  "sourceReport": "/workspace/scratch/dieu-tra-glyph-causal-lo262.json",
+  "experimentScript": "/workspace/scratch/glyph262/experiment.py",
+  "imagesOpenedIndividually": [
+    "/workspace/scratch/glyph262/0-source.jpg",
+    "/workspace/scratch/glyph262/1-after-a.jpg",
+    "/workspace/scratch/glyph262/2-after-offset.jpg",
+    "/workspace/scratch/glyph262/3-after-transform.jpg",
+    "/workspace/scratch/glyph262/4-no-offset.jpg",
+    "/workspace/scratch/glyph262/5-curve-aware-experiment.jpg"
+  ],
+  "independentReconstruction": "Executed experiment in memory only: disabled snap writes and removed final report write. All six reconstructed NAa outlines equal saved stages. Final stage3 outlines equal actual current root WOFF2 exactly.",
+  "matchesActualCurrentGlyphExact": {
+    "N": true,
+    "A": true,
+    "a": true
+  },
+  "reconstructedStageMatchesSaved": {
+    "0-source": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "1-after-a": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "2-after-offset": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "3-after-transform": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "4-no-offset": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "5-curve-aware-experiment": {
+      "N": true,
+      "A": true,
+      "a": true
+    }
+  },
+  "sourceShaVerified": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70",
+  "generatorPrefixShaVerified": "37f2ba37f2ced44e8515930f15f97470b44ba097f2862a40832b2dcbcc66bd62",
+  "causalAssessment": "Supported for these three current glyphs: original and after-a N/A clean; each gains two pinhole/seam artifacts immediately after rawpoint lam_dam, before bien_doi. Offset-disabled ablation retains identical transform/spacing but not those artifacts. a after-a already has a notch at join; lam_dam enlarges it into triangular seam. Thus do not claim every imperfection of a originated in lam_dam.",
+  "mechanism": "lam_dam iterates raw glyf coordinates without distinguishing on/off-curve points and applies polygon neighbor-normal shift; this is not an offset of quadratic curve geometry. In-memory pipeline confirms source+a-rebuild→offset→transform order.",
+  "candidateAssessment": "Curve-aware stroke2net round cap/join plus union, conic/quadratic conversion, no area-threshold filtering. Viewed actual stage5 looks clean for N/A/a at reported200CSSpx; current/trial advances+LSB and bbox equal for all3. Metrics were copied from current deliberately, not independent evidence of whole-font metric preservation.",
+  "candidateAdmissible": false,
+  "limits": [
+    "Only NAa Dam subset, not complete DDH font or De style.",
+    "No independent full-font/compound/diacritic/anchor/kerning validation or normal app-size grayscale/subpixel raster review.",
+    "JPEG evidence does not establish absence of smaller artifacts at every size; no claim of universal typographic equivalence.",
+    "No production font modification or approval."
+  ],
+  "ketQua": "Đạt đối với lập luận causal giới hạn3glyph; không duyệt candidate làm font toàn bộ."
+}

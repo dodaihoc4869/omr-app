@@ -1,0 +1,124 @@
+{
+  "i": 744,
+  "hashNguon": "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa",
+  "actualSourceSha256": "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa",
+  "fileNguon": "anh/c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa.png",
+  "canvas": [
+    1395,
+    140
+  ],
+  "nguoiDoc": "soat_nguon_3",
+  "sourceOnly": true,
+  "nativeFullOpened": true,
+  "zoomOpened": [
+    "/workspace/scratch/vinyl744-source-zoom.png",
+    "/workspace/scratch/vinyl744-product-crop.png",
+    "/workspace/scratch/vinyl744-conditions-crop.png"
+  ],
+  "inApprovedCatalogByExactHash": false,
+  "questions": [
+    {
+      "qid": "12-KT-C4-D5-III-5",
+      "maDe": "12-KT-C4-D5",
+      "de": "Poly(vinyl acetate) (kí hiệu là PVA) được điều chế từ ethylene theo sơ đồ ở hình dưới.\nHiệu suất phản ứng (1), (2), (3) lần lượt là 90%; 80% và 95%.\nKhối lượng ethylene (theo tấn) cần lấy để sản xuất được 10 tấn PVA là bao nhiêu? (Làm tròn kết quả đến hàng phần trăm).",
+      "hinh": [
+        {
+          "hash": "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa",
+          "where": "12-KT-C4-D5-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "e7a6bb8d6ee67cf13da6fed54f071a08d22e9d9100f626ec66dd190fa3b4ee32"
+        }
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "text": "CH₂=CH₂",
+      "bounds": [
+        48,
+        55,
+        142,
+        34
+      ]
+    },
+    {
+      "text": "CH₃COOH",
+      "bounds": [
+        344,
+        55,
+        140,
+        34
+      ]
+    },
+    {
+      "text": "CH₃COOCH=CH₂",
+      "bounds": [
+        727,
+        55,
+        247,
+        34
+      ]
+    },
+    {
+      "text": "Poly(vinyl acetate))",
+      "bounds": [
+        1084,
+        53,
+        252,
+        40
+      ],
+      "openingParenCount": 1,
+      "closingParenCount": 2,
+      "notes": "Product source visibly has TWO adjacent closing parentheses: inner smaller ) followed outer taller ). One opening parenthesis after Poly. Preserve exact typo; do not normalize to Poly(vinyl acetate)."
+    }
+  ],
+  "arrows": [
+    {
+      "from": [
+        197,
+        73
+      ],
+      "to": [
+        338,
+        73
+      ],
+      "direction": "right",
+      "above": "+O₂/xt, tᵒ",
+      "below": "(1)"
+    },
+    {
+      "from": [
+        489,
+        73
+      ],
+      "to": [
+        722,
+        73
+      ],
+      "direction": "right",
+      "above": "+O₂+CH₂=CH₂/xt, tᵒ",
+      "below": "(2)"
+    },
+    {
+      "from": [
+        979,
+        73
+      ],
+      "to": [
+        1080,
+        73
+      ],
+      "direction": "right",
+      "above": "xt, tᵒ",
+      "below": "(3)"
+    }
+  ],
+  "literalNotes": [
+    "All three arrows have ONE right-pointing head, no reversible arrow.",
+    "Small raised ring/o after t in each condition; use superscript small o glyph representation matching source (tᵒ), not an added numeric temperature.",
+    "Conditions retain slash before xt in arrows1/2, plus signs exactly as displayed and comma after xt.",
+    "Numeric labels (1),(2),(3) BELOW arrows; no yields90/80/95% printed in image; those appear only in public stem and must not be added.",
+    "Product is literal text, no polymer bracket/repeatunit or newn, no rearranging product to PVA.",
+    "Source-only reading, not SVG approval; no answer or solution read."
+  ],
+  "repoModified": false
+}

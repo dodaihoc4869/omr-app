@@ -1,0 +1,760 @@
+{
+  "sourceTTF": "/workspace/scratch/glyph262/MPLUSRounded1c-Medium.ttf",
+  "sourceSHA": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70",
+  "generatorSHA": "37f2ba37f2ced44e8515930f15f97470b44ba097f2862a40832b2dcbcc66bd62",
+  "settings": {
+    "tep": "MPLUSRounded1c-Medium.ttf",
+    "net": 26.0,
+    "sx": 0.98,
+    "theo": 32.96,
+    "kxh": 1.069,
+    "dam": 700,
+    "ten": "Dam",
+    "hien": "Đậm",
+    "l_mac_dinh": true,
+    "mot_chan": false
+  },
+  "matchesActualCurrentGlyphExact": {
+    "N": true,
+    "A": true,
+    "a": true
+  },
+  "stages": {
+    "0-source": {
+      "sha": "e21b7c75150a0a36927a6e2a0a7f40d9cb261048192bb536818083c0d19a7f63",
+      "metrics": {
+        "N": [
+          694,
+          82
+        ],
+        "A": [
+          642,
+          29
+        ],
+        "a": [
+          544,
+          47
+        ]
+      },
+      "glyphBounds": {
+        "N": {
+          "bbox": [
+            82,
+            0,
+            612,
+            730
+          ],
+          "contours": 1
+        },
+        "A": {
+          "bbox": [
+            22,
+            0,
+            620,
+            730
+          ],
+          "contours": 2
+        },
+        "a": {
+          "bbox": [
+            47,
+            -10,
+            477,
+            530
+          ],
+          "contours": 2
+        }
+      }
+    },
+    "1-after-a": {
+      "sha": "2ed6deed05de2169933f08951ea43653b5be614b3bf43a859e9f0cbcad030a4c",
+      "metrics": {
+        "N": [
+          694,
+          82
+        ],
+        "A": [
+          642,
+          29
+        ],
+        "a": [
+          584,
+          47
+        ]
+      },
+      "glyphBounds": {
+        "N": {
+          "bbox": [
+            82,
+            0,
+            612,
+            730
+          ],
+          "contours": 1
+        },
+        "A": {
+          "bbox": [
+            22,
+            0,
+            620,
+            730
+          ],
+          "contours": 2
+        },
+        "a": {
+          "bbox": [
+            48,
+            -10,
+            555,
+            530
+          ],
+          "contours": 2
+        }
+      }
+    },
+    "2-after-offset": {
+      "sha": "319578c7c88219e92a1891ba9079f72c8c5cf7fbb70282e8084e97aea4cbd8fd",
+      "metrics": {
+        "N": [
+          694,
+          82
+        ],
+        "A": [
+          642,
+          29
+        ],
+        "a": [
+          584,
+          47
+        ]
+      },
+      "glyphBounds": {
+        "N": {
+          "bbox": [
+            56,
+            -26,
+            638,
+            756
+          ],
+          "contours": 1
+        },
+        "A": {
+          "bbox": [
+            -7,
+            -26,
+            649,
+            756
+          ],
+          "contours": 2
+        },
+        "a": {
+          "bbox": [
+            22,
+            -36,
+            581,
+            556
+          ],
+          "contours": 2
+        }
+      }
+    },
+    "3-after-transform": {
+      "sha": "5a429c2de2e550f3884efd3f2d1db2d4417c27021fbbbedb16f8636cbe59f777",
+      "metrics": {
+        "N": [
+          713,
+          71
+        ],
+        "A": [
+          662,
+          10
+        ],
+        "a": [
+          628,
+          39
+        ]
+      },
+      "glyphBounds": {
+        "N": {
+          "bbox": [
+            71,
+            -26,
+            642,
+            756
+          ],
+          "contours": 1
+        },
+        "A": {
+          "bbox": [
+            10,
+            -26,
+            652,
+            756
+          ],
+          "contours": 2
+        },
+        "a": {
+          "bbox": [
+            39,
+            -36,
+            609,
+            592
+          ],
+          "contours": 2
+        }
+      }
+    },
+    "4-no-offset": {
+      "sha": "306620cb241f31611e7db18531b06327b5f5508df0668732d8933b3e082fa4f6",
+      "metrics": {
+        "N": [
+          713,
+          97
+        ],
+        "A": [
+          662,
+          38
+        ],
+        "a": [
+          628,
+          65
+        ]
+      },
+      "glyphBounds": {
+        "N": {
+          "bbox": [
+            97,
+            0,
+            616,
+            730
+          ],
+          "contours": 1
+        },
+        "A": {
+          "bbox": [
+            38,
+            0,
+            624,
+            730
+          ],
+          "contours": 2
+        },
+        "a": {
+          "bbox": [
+            65,
+            -10,
+            582,
+            566
+          ],
+          "contours": 2
+        }
+      }
+    },
+    "5-curve-aware-experiment": {
+      "sha": "6fb2add85bdb8656cd06515c9f99ce7c4c181de17356f459c7d2ca5867a4380f",
+      "metrics": {
+        "N": [
+          713,
+          71
+        ],
+        "A": [
+          662,
+          10
+        ],
+        "a": [
+          628,
+          39
+        ]
+      },
+      "glyphBounds": {
+        "N": {
+          "bbox": [
+            71,
+            -26,
+            642,
+            756
+          ],
+          "contours": 1
+        },
+        "A": {
+          "bbox": [
+            10,
+            -26,
+            652,
+            756
+          ],
+          "contours": 2
+        },
+        "a": {
+          "bbox": [
+            39,
+            -36,
+            609,
+            592
+          ],
+          "contours": 2
+        }
+      }
+    }
+  },
+  "scope": "Scratch experiments only, no font candidate approved; curve-aware union no tiny-contour threshold.",
+  "findings": {
+    "causal": "N/A source and aftera clean; first 2 pinholes each appear immediately after lam_dam, before bien_doi. NOOFFSET ablation applies same transform/spacing without lam_dam and has no pinholes. Same current glyph exact reconstruct establishes causal offset stage for current defects. a afterrebuild shows tail join notch but offset produces the enlarged white/blue triangular seam; NOOFFSET and curveaware variants do not show offset seam.",
+    "candidateApproach": "Replace raw on/offcurve point normal shifts by curve-aware outward dilation (stroke width2net ROUNDjoin then union to original fill), before existing transform/spacing. Scratch stage5 tested with pathops, convertConicsToQuads(0.1), Cu2Qu tolerance0.5; no tiny-contour filter/area threshold. Rendered N/A/a visually clean at200CSSpx.",
+    "metrics": "Experiment stage5 sets advance/LSB EXACT same as current stage3 for N/A/a. Design preserved source/rebuilta outlines, same net26 target, same sx/kxh/HEP. Bounds may differ due better curveoffset and roundjoin; do not autoaccept as final match.",
+    "scope": "Only three glyph causal trial, not fullfont approval. Need full glyphs/diacritics/compound tests and app sizes/raster/SVG independent review before any productionfont change."
+  },
+  "sourceURL": "https://raw.githubusercontent.com/google/fonts/main/ofl/mplusrounded1c/MPLUSRounded1c-Medium.ttf",
+  "imageEvidence": [
+    {
+      "stage": "0-source",
+      "jpg": "/workspace/scratch/glyph262/0-source.jpg",
+      "bytes": 24338,
+      "openedFreshDOMActual": true
+    },
+    {
+      "stage": "1-after-a",
+      "jpg": "/workspace/scratch/glyph262/1-after-a.jpg",
+      "bytes": 24663,
+      "openedFreshDOMActual": true
+    },
+    {
+      "stage": "2-after-offset",
+      "jpg": "/workspace/scratch/glyph262/2-after-offset.jpg",
+      "bytes": 25481,
+      "openedFreshDOMActual": true
+    },
+    {
+      "stage": "3-after-transform",
+      "jpg": "/workspace/scratch/glyph262/3-after-transform.jpg",
+      "bytes": 26273,
+      "openedFreshDOMActual": true
+    },
+    {
+      "stage": "4-no-offset",
+      "jpg": "/workspace/scratch/glyph262/4-no-offset.jpg",
+      "bytes": 25064,
+      "openedFreshDOMActual": true
+    },
+    {
+      "stage": "5-curve-aware-experiment",
+      "jpg": "/workspace/scratch/glyph262/5-curve-aware-experiment.jpg",
+      "bytes": 27725,
+      "openedFreshDOMActual": true
+    }
+  ],
+  "metricAndBBoxEqualityCurrentVsExperimental": {
+    "N": {
+      "metricsEqual": true,
+      "bboxEqual": true
+    },
+    "A": {
+      "metricsEqual": true,
+      "bboxEqual": true
+    },
+    "a": {
+      "metricsEqual": true,
+      "bboxEqual": true
+    }
+  },
+  "admissible": false,
+  "conclusionVietnamese": "Đã tái tạo EXACT outline N/A/a currentfont. Nguồn Medium sạch; ngay sau lam_dam xuất hiện2lỗN/2lỗA và seam a lớn hơn; chưa qua bien_doi. Ablation bỏlam_dam nhưng giữtransform sạch, xác nhận causal rawpoint-offset. Thử curve-aware dilation+union không threshold đã mởDOM sạch3glyph, advance/LSB vàbbox cả3 khớp current; chưa đủ fullfont/kíchthướcapp để admit, không sửa font chính.",
+  "reproduction": {
+    "inputs": {
+      "source": {
+        "path": "/workspace/scratch/glyph262/MPLUSRounded1c-Medium.ttf",
+        "sha256": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70"
+      },
+      "generator": {
+        "path": "/workspace/scratch/font-generator-main262.py",
+        "sha256": "2b6b776eb7eac1b8af8719edf1ff2fa1b029918b8f6f00a284c1dc82077e24a4"
+      },
+      "actual": {
+        "path": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+        "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de"
+      }
+    },
+    "scriptSHA": "903821107035d39502b9b0abd0cdb6c1d75d1b1642999ad8263185bf6042e993",
+    "executedGeneratorPrefixSHA": "37f2ba37f2ced44e8515930f15f97470b44ba097f2862a40832b2dcbcc66bd62",
+    "dependencies": {
+      "python": "3.12.14",
+      "fonttools": "4.61.1",
+      "skia-pathops": "0.9.2",
+      "brotli": "1.2.1"
+    },
+    "DDHEnvironment": {},
+    "settings": {
+      "tep": "MPLUSRounded1c-Medium.ttf",
+      "net": 26.0,
+      "sx": 0.98,
+      "theo": 32.96,
+      "kxh": 1.069,
+      "dam": 700,
+      "ten": "Dam",
+      "hien": "Đậm",
+      "l_mac_dinh": true,
+      "mot_chan": false
+    },
+    "matchesActualCurrentGlyphExact": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "stages": {
+      "0-source": {
+        "sha": "31c169028573d76d583bdfc7a15436bbac2d72ec360d422c83d3727d5ee79cff",
+        "metrics": {
+          "N": [
+            694,
+            82
+          ],
+          "A": [
+            642,
+            29
+          ],
+          "a": [
+            544,
+            47
+          ]
+        },
+        "glyphBounds": {
+          "N": [
+            82,
+            0,
+            612,
+            730
+          ],
+          "A": [
+            22,
+            0,
+            620,
+            730
+          ],
+          "a": [
+            47,
+            -10,
+            477,
+            530
+          ]
+        }
+      },
+      "1-after-a": {
+        "sha": "d3f5004d1dc6332751bedb774a1ccec1cb1498e2b44cbbf3da9f4e777c72c8f2",
+        "metrics": {
+          "N": [
+            694,
+            82
+          ],
+          "A": [
+            642,
+            29
+          ],
+          "a": [
+            584,
+            47
+          ]
+        },
+        "glyphBounds": {
+          "N": [
+            82,
+            0,
+            612,
+            730
+          ],
+          "A": [
+            22,
+            0,
+            620,
+            730
+          ],
+          "a": [
+            48,
+            -10,
+            555,
+            530
+          ]
+        }
+      },
+      "2-after-offset": {
+        "sha": "3b70f105088bcc27e5ebb9d4fdfa05fcc2c80edb56f7d788888ea857c650d824",
+        "metrics": {
+          "N": [
+            694,
+            82
+          ],
+          "A": [
+            642,
+            29
+          ],
+          "a": [
+            584,
+            47
+          ]
+        },
+        "glyphBounds": {
+          "N": [
+            56,
+            -26,
+            638,
+            756
+          ],
+          "A": [
+            -7,
+            -26,
+            649,
+            756
+          ],
+          "a": [
+            22,
+            -36,
+            581,
+            556
+          ]
+        }
+      },
+      "3-after-transform": {
+        "sha": "a7dc6f528eb910264933e161cea8e1b49a17097d02a217bd70c7d11bddc67ff5",
+        "metrics": {
+          "N": [
+            713,
+            71
+          ],
+          "A": [
+            662,
+            10
+          ],
+          "a": [
+            628,
+            39
+          ]
+        },
+        "glyphBounds": {
+          "N": [
+            71,
+            -26,
+            642,
+            756
+          ],
+          "A": [
+            10,
+            -26,
+            652,
+            756
+          ],
+          "a": [
+            39,
+            -36,
+            609,
+            592
+          ]
+        }
+      },
+      "4-no-offset": {
+        "sha": "2cd388032558f67f640175fd2ac497d3b35d6e3b9e407847b04ec336dfc5aa0c",
+        "metrics": {
+          "N": [
+            713,
+            97
+          ],
+          "A": [
+            662,
+            38
+          ],
+          "a": [
+            628,
+            65
+          ]
+        },
+        "glyphBounds": {
+          "N": [
+            97,
+            0,
+            616,
+            730
+          ],
+          "A": [
+            38,
+            0,
+            624,
+            730
+          ],
+          "a": [
+            65,
+            -10,
+            582,
+            566
+          ]
+        }
+      },
+      "5-curve-aware-experiment": {
+        "sha": "5da34436b60a5ddf48a39c7c750c1c35eb2b9b25a710ec4f1f86b238fddaf652",
+        "metrics": {
+          "N": [
+            713,
+            71
+          ],
+          "A": [
+            662,
+            10
+          ],
+          "a": [
+            628,
+            39
+          ]
+        },
+        "glyphBounds": {
+          "N": [
+            71,
+            -26,
+            642,
+            756
+          ],
+          "A": [
+            10,
+            -26,
+            652,
+            756
+          ],
+          "a": [
+            39,
+            -36,
+            609,
+            592
+          ]
+        }
+      }
+    },
+    "metricAndBBoxEqualityCurrentVsExperimental": {
+      "N": {
+        "metricsEqual": true,
+        "bboxEqual": true
+      },
+      "A": {
+        "metricsEqual": true,
+        "bboxEqual": true
+      },
+      "a": {
+        "metricsEqual": true,
+        "bboxEqual": true
+      }
+    },
+    "admissible": false,
+    "scope": "Three glyph causal experiment only; no font/subset published; no tiny-contour or area threshold. Current hmtx explicitly preserved for experiment5; bbox independently compared. Full glyph/diacritic/app-size independent review still required."
+  },
+  "reproduceScript": {
+    "path": "/workspace/scratch/glyph262/reproduce.py",
+    "sha256": "903821107035d39502b9b0abd0cdb6c1d75d1b1642999ad8263185bf6042e993"
+  },
+  "renderReproduceScript": {
+    "path": "/workspace/scratch/glyph262/render-reproduce.js",
+    "sha256": "c39743d1cfc00deeee166ef90c5e543a4804bbed07553ee304d9e23a25027c19"
+  },
+  "generatorWholeSHA": "2b6b776eb7eac1b8af8719edf1ff2fa1b029918b8f6f00a284c1dc82077e24a4",
+  "dependencyVersions": {
+    "python": "3.12.14",
+    "fonttools": "4.61.1",
+    "skia-pathops": "0.9.2",
+    "brotli": "1.2.1"
+  },
+  "reproductionDOM": {
+    "browserVersion": "151.0.7922.173",
+    "fontSizeCSSpx": 200,
+    "dpr": 2,
+    "evidence": [
+      {
+        "stage": "0-source",
+        "file": "/workspace/scratch/glyph262/reprocheck/dom/0-source.jpg",
+        "bytes": 24338,
+        "loaded": true
+      },
+      {
+        "stage": "1-after-a",
+        "file": "/workspace/scratch/glyph262/reprocheck/dom/1-after-a.jpg",
+        "bytes": 24663,
+        "loaded": true
+      },
+      {
+        "stage": "2-after-offset",
+        "file": "/workspace/scratch/glyph262/reprocheck/dom/2-after-offset.jpg",
+        "bytes": 25481,
+        "loaded": true
+      },
+      {
+        "stage": "3-after-transform",
+        "file": "/workspace/scratch/glyph262/reprocheck/dom/3-after-transform.jpg",
+        "bytes": 26273,
+        "loaded": true
+      },
+      {
+        "stage": "4-no-offset",
+        "file": "/workspace/scratch/glyph262/reprocheck/dom/4-no-offset.jpg",
+        "bytes": 25064,
+        "loaded": true
+      },
+      {
+        "stage": "5-curve-aware-experiment",
+        "file": "/workspace/scratch/glyph262/reprocheck/dom/5-curve-aware-experiment.jpg",
+        "bytes": 27725,
+        "loaded": true
+      }
+    ],
+    "admissible": false
+  },
+  "command": "PYTHONPATH=<pathops install if not global> python reproduce.py --source <MPLUSRounded1c-Medium.ttf> --generator <exact generator.py> --actual <current bold Latin.woff2> --out <scratch out>; node render-reproduce.js <out> <out/dom> <playwright module path> <chromium executable>",
+  "repoReproduction": {
+    "python": "scripts/thu-nghiem-glyph-ddh-lo-262-0311.py",
+    "pythonSHA": "d3e8a676d3980c1374fd5a1b2083bbd6a84439c2b45c7d51bac63b41255415f0",
+    "renderer": "scripts/render-thu-nghiem-glyph-ddh-lo-262.cjs",
+    "rendererSHA": "10799ece1381121a9d58ef67bcd5beb73bd9160d4dcaf166015820c906cdc0ce",
+    "generatorGit": "6de23191d2583ef9f997dd0e80703bb2e7484611:scripts/tao-phong-ddh-rounded.py",
+    "admissible": false,
+    "scope": "3 glyph NAa, bold only at200px;metrics copied deliberately;no appfont modification."
+  },
+  "repoEvidence": [
+    {
+      "stage": "0-source",
+      "file": "glyph-causal-lo-262-0-source.jpg",
+      "sha": "aea7395dc90ba821b1591144c76b02e2c7025ef4c600eb2b343b03ceb8d9a0c0",
+      "bytes": 24338
+    },
+    {
+      "stage": "1-after-a",
+      "file": "glyph-causal-lo-262-1-after-a.jpg",
+      "sha": "6978e5c763bb79e13b75f1b6c6cedeccd768c51e94c211d0d1fd2764033c1e3a",
+      "bytes": 24663
+    },
+    {
+      "stage": "2-after-offset",
+      "file": "glyph-causal-lo-262-2-after-offset.jpg",
+      "sha": "a9fd538aab511df037147105377324fd32b73dfb55771c990fbf7736f6a83185",
+      "bytes": 25481
+    },
+    {
+      "stage": "3-after-transform",
+      "file": "glyph-causal-lo-262-3-after-transform.jpg",
+      "sha": "5decd25e606c23ce6476ff59e64f9756927bd19871c3cb3afb0006fa7d0d7c06",
+      "bytes": 26273
+    },
+    {
+      "stage": "4-no-offset",
+      "file": "glyph-causal-lo-262-4-no-offset.jpg",
+      "sha": "03c4162174b36e5970ac7b52c6db25ec4bc5171de8c9e2e5eb949443af6e981f",
+      "bytes": 25064
+    },
+    {
+      "stage": "5-curve-aware-experiment",
+      "file": "glyph-causal-lo-262-5-curve-aware-experiment.jpg",
+      "sha": "9cae2bee5df7fb3096e1f3803cb0009c7e8038ceb23e019fd6e2ceaf5ebb8f2b",
+      "bytes": 27725
+    }
+  ],
+  "rootReproduction": {
+    "matchesCurrentOutline": {
+      "N": true,
+      "A": true,
+      "a": true
+    },
+    "metricsAndBoundsEqual": true,
+    "admissible": false
+  }
+}
