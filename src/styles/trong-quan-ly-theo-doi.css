@@ -162,3 +162,8 @@
 @media (max-width: 760px) {
   [data-trong='gv'] [data-vung='theo-doi-ca'] .ct-hang-chip { flex-wrap: wrap; overflow-x: visible; }
 }
+/* 08/11 thêm giờ từng em: nhãn «Còn mm:ss» của riêng em (đỏ khi < 5 phút) + dấu «+N′» phút thầy đã thêm riêng */
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-em .ct-gio-em { display: inline-flex; align-items: center; gap: 4px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); font-variant-numeric: tabular-nums; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-em .ct-gio-em.sap-het { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-em .ct-gio-them { margin-left: 2px; padding: 0 5px; border-radius: 999px; background: var(--tr-mat); color: var(--tr-dung-chu); font-size: 12px; }
+[data-trong='gv'] [data-vung='theo-doi-ca'] .ct-em.c-xd { cursor: pointer; }

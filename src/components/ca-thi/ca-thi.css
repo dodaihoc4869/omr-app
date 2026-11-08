@@ -2019,3 +2019,37 @@ table.ct-bang {
 .ct-ls .s { background: var(--gvm-ho-nen); color: var(--gvm-ho-dam); }
 .ct-ls .d { background: var(--gvm-xl-nen); color: var(--gvm-xl-dam); }
 .ct-xep-sai { margin: 0 0 10px; min-height: 36px; }
+
+/* THÊM GIỜ CHO TỪNG EM (thầy 08/11, docs/ban-ve-them-gio-em-0811): tấm đáy (điện thoại) / hộp giữa (≥ 720 px); chỉ biến «Trong» --tr-*. */
+.tg-nen { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in srgb, var(--tr-chu) 38%, transparent); }
+.tg-tam { position: relative; width: 100%; max-width: 560px; max-height: 92dvh; overflow: auto; padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; background: var(--tr-mat); color: var(--tr-chu); box-shadow: var(--tr-bong-3); font-family: var(--sans); }
+.tg-tay { display: block; width: 40px; height: 5px; margin: 0 auto 10px; border-radius: 999px; background: var(--tr-vien-2); }
+.tg-dau { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tg-nho { margin: 0; color: var(--tr-chinh-chu); font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; }
+.tg-dau h2 { margin: 2px 0 0; font-size: 22px; font-weight: 700; line-height: 1.25; }
+.tg-phu { margin: 4px 0 0; color: var(--tr-chu-3); font-size: 14px; }
+.tg-dong { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 12px; background: var(--tr-mat-2); color: var(--tr-chu-2); cursor: pointer; }
+.tg-dong-ho { display: flex; align-items: center; gap: 12px; margin: 16px 0 14px; padding: 14px 16px; border-radius: 16px; background: var(--tr-chinh-nhat); color: var(--tr-chinh-chu); }
+.tg-dong-ho.sap-het { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+.tg-dong-ho div { display: flex; flex-direction: column; }
+.tg-dong-ho b { font-size: 26px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tg-dong-ho span { font-size: 14px; font-weight: 500; }
+.tg-chon { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.tg-o { min-height: 76px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; border: 2px solid var(--tr-vien); border-bottom-width: 4px; border-radius: 16px; background: var(--tr-mat); color: var(--tr-chu); cursor: pointer; font-family: inherit; }
+.tg-o b { font-size: 26px; font-weight: 700; color: var(--tr-chinh-chu); }
+.tg-o span { font-size: 14px; color: var(--tr-chu-3); }
+.tg-o:hover:not(:disabled) { border-color: var(--tr-chinh); }
+.tg-o:disabled { opacity: .45; cursor: not-allowed; }
+.tg-ghi { margin: 12px 0 0; color: var(--tr-chu-3); font-size: 14px; line-height: 1.5; }
+.tg-hoi p { margin: 0 0 12px; font-size: 17px; line-height: 1.5; }
+.tg-hang { display: flex; flex-wrap: wrap; gap: 10px; }
+.tg-to { flex: 1 1 200px; min-height: 52px; justify-content: center; font-size: 16px; }
+.tg-xong { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: 16px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+.tg-xong p { margin: 0; font-size: 16px; font-weight: 500; line-height: 1.45; }
+.tg-loi { margin: 12px 0 0; padding: 14px 16px; border-radius: 16px; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); font-size: 15px; line-height: 1.45; }
+.tg-ho-so { display: block; width: 100%; min-height: 44px; margin-top: 14px; border: 0; background: none; color: var(--tr-chinh-chu); font: 600 15px/1 var(--sans); cursor: pointer; }
+@media (min-width: 720px) {
+  .tg-nen { align-items: center; }
+  .tg-tam { border-radius: 24px; padding: 20px 24px 22px; }
+  .tg-tay { display: none; }
+}

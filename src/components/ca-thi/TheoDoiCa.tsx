@@ -2,7 +2,7 @@
 // (Đang làm xanh dương · Đã nộp xanh lục · Chưa vào hổ phách · Cảnh báo hồng) + thanh cả lớp; lưới thẻ từng em có lọc; "Cần thầy xử lý" (khoá bài → Mở khoá sẵn có;
 // rời màn; chưa vào); Việc nhanh (Chiếu mã, Đóng cửa vào, Kết thúc ca — cả hai HỎI LẠI ở hộp xác nhận của màn cha). Chỉ VẼ số màn cha đã đếm; mọi lệnh đi qua hàm sẵn có của màn cha.
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { AlertTriangle, BarChart3, Copy, DoorClosed, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
+import { AlertTriangle, BarChart3, Clock, Copy, DoorClosed, Lock, MonitorPlay, RefreshCw, Users } from 'lucide-react'
 import { soVn } from '../../lib/ket-qua-sau-nop'
 import { gioMayChu } from '../../lib/gio-may-chu'
 import './ca-thi.css'
@@ -18,6 +18,10 @@ export interface EmTheoDoi {
   soLanRoiMan: number
   tongGiayRoiMan: number
   diem: number | null
+  /** Mốc hết giờ RIÊNG của em (ms, giờ máy chủ) — em vào muộn hết muộn hơn; vắng / null = không hiện đồng hồ riêng. */
+  hetLucMs?: number | null
+  /** Phút thầy đã thêm RIÊNG cho em này (08/11). */
+  themPhutEm?: number
 }
 export interface TheoDoiCaProps {
   tenCa: string
@@ -61,6 +65,8 @@ export interface TheoDoiCaProps {
   onLamMoi: () => void
   onMoKhoa: (sbd: string) => void
   onXemEm: (sbd: string) => void
+  /** (08/11) Chạm em ĐANG LÀM ⇒ mở tấm Thêm giờ cho riêng em đó (vắng ⇒ mở hồ sơ như cũ). */
+  onThemGioEm?: (sbd: string) => void
   onChieuMa: () => void
   onKetThuc: () => void
   /** Đóng cửa vào (máy chủ `/gv/dong-cua-vao`); vắng ⇒ không vẽ nút. Màn cha HỎI LẠI trước khi gọi. */
@@ -70,6 +76,7 @@ export interface TheoDoiCaProps {
   dangLamNgay: number
 }
 
+const mmss = (g: number) => `${String(Math.floor(g / 60)).padStart(2, '0')}:${String(g % 60).padStart(2, '0')}`
 const TEN_TT: Record<TrangThaiEmTd, string> = { dang_lam: 'Đang làm', da_nop: 'Đã nộp', khoa: 'Bị khoá', cho_thi_lai: 'Chờ thi lại', chua_vao: 'Chưa vào' }
 const MAU_TT: Record<TrangThaiEmTd, string> = { dang_lam: 'c-xd', da_nop: 'c-xl', khoa: 'c-ho', cho_thi_lai: 'c-tim', chua_vao: 'c-hp' }
 const NHAN_TT: Record<TrangThaiEmTd, string> = { dang_lam: 'n-xd', da_nop: 'n-xl', khoa: 'n-ho', cho_thi_lai: 'n-tim', chua_vao: 'n-hp' }
@@ -91,6 +98,17 @@ function useGiayCon(hetLucMs: number | null | undefined): number | null | undefi
   return Math.floor((hetLucMs - bay) / 1000)
 }
 
+/** Giờ máy chủ nhích mỗi giây (chỉ chạy khi có đồng hồ riêng cần vẽ). */
+function useBay(chay: boolean): number {
+  const [bay, setBay] = useState(() => gioMayChu())
+  useEffect(() => {
+    if (!chay) return
+    const t = setInterval(() => setBay(gioMayChu()), 1000)
+    return () => clearInterval(t)
+  }, [chay])
+  return bay
+}
+
 export default function TheoDoiCa(p: TheoDoiCaProps) {
   const [loc, setLoc] = useState<Loc>('tat_ca')
   // NHÃN «SAI N LẦN · ĐÚNG M LẦN» (thầy 03/11): đọc MỘT lần khi mở ca (+ khi thầy bấm «Làm mới»), không theo nhịp 20 giây; xếp em sai nhiều nhất lên trước.
@@ -104,6 +122,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
     return () => { huy = true }
   }, [layLichSu, maCa, p.em.length]) // đọc lại khi số em đổi (em mới vào có câu trong ca)
   const giayTuDem = useGiayCon(p.hetLucMs)
+  const bayMs = useBay(p.em.some((e) => e.tt === 'dang_lam' && typeof e.hetLucMs === 'number'))
   const conGiay = giayTuDem === undefined ? p.conGiay : giayTuDem
   const dangLam = p.em.filter((e) => e.tt === 'dang_lam')
   const daNop = p.em.filter((e) => e.tt === 'da_nop' || e.tt === 'khoa')
@@ -283,7 +302,7 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
             </div>
           </div>
           <p className="ct-ghi" style={{ margin: '0 0 10px' }}>
-            Chạm thẻ em để mở hồ sơ: cho thi lại, mở khoá, cho vào bằng máy khác nằm ở đó.
+            {p.onThemGioEm ? 'Chạm em đang làm để thêm giờ riêng cho em đó. Chạm em khác để mở hồ sơ: cho thi lại, mở khoá, cho vào bằng máy khác.' : 'Chạm thẻ em để mở hồ sơ: cho thi lại, mở khoá, cho vào bằng máy khác nằm ở đó.'}
           </p>
           {lichSu && (
             <button type="button" className="ct-chip ct-xep-sai" aria-pressed={xepSai} onClick={() => setXepSai((v) => !v)}>
@@ -295,10 +314,17 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
           ) : (
             <div className="ct-o-em">
               {dsLoc.map((e) => (
-                <button key={e.sbd} type="button" className={`ct-em ${MAU_TT[e.tt]}${e.tt === 'khoa' ? ' canh' : ''}`} onClick={() => p.onXemEm(e.sbd)} disabled={e.tt === 'chua_vao'}>
+                <button key={e.sbd} type="button" className={`ct-em ${MAU_TT[e.tt]}${e.tt === 'khoa' ? ' canh' : ''}`} onClick={() => (e.tt === 'dang_lam' && p.onThemGioEm ? p.onThemGioEm(e.sbd) : p.onXemEm(e.sbd))} disabled={e.tt === 'chua_vao'}>
                   <div className="h">
                     <span className="ten">{e.hoTen || '(chưa có tên)'}</span>
-                    <span className={`ct-nhan ${NHAN_TT[e.tt]}`}>{TEN_TT[e.tt]}</span>
+                    {e.tt === 'dang_lam' && typeof e.hetLucMs === 'number' ? (
+                      <span className={`ct-nhan ct-gio-em${e.hetLucMs - bayMs < 5 * 60_000 ? ' sap-het' : ''}`}>
+                        <Clock size={14} aria-hidden="true" /> Còn {mmss(Math.max(0, Math.floor((e.hetLucMs - bayMs) / 1000)))}
+                        {e.themPhutEm ? <b className="ct-gio-them">+{e.themPhutEm}′</b> : null}
+                      </span>
+                    ) : (
+                      <span className={`ct-nhan ${NHAN_TT[e.tt]}`}>{TEN_TT[e.tt]}</span>
+                    )}
                   </div>
                   <span className="sbd so">SBD {e.sbd}</span>
                   {lichSu?.[e.sbd] && (lichSu[e.sbd]![0] > 0 || lichSu[e.sbd]![1] > 0) && (

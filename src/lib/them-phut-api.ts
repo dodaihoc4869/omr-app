@@ -73,3 +73,31 @@ export function cauKetQuaThemPhut(k: KetQuaThemPhut): string {
 export function dinhDangMa(ma: string): string {
   return String(ma).replace(/\s+/g, '').replace(/(\d{3})(?=\d)/g, '$1 ')
 }
+
+/** THÊM GIỜ CHO MỘT EM (thầy 08/11) — `POST /ca/them-phut-em {maCa, sbd, phut}`: chỉ cộng hạn của em đó, trần 30 phút mỗi em. Không giả thành công. */
+export const PHUT_THEM_EM_TOI_DA = 30
+export interface KetQuaThemPhutEm { phut: number; themPhutEm: number; hetGioLuc: string }
+export async function themPhutEm(maCa: string, sbd: string, phut: number): Promise<KetQuaThemPhutEm> {
+  const [ch, secret] = await Promise.all([layCauHinhMayChu(), loadTeacherSecret()])
+  if (!ch.URL) throw new Error('Chưa kết nối được máy chủ — chưa cộng giờ cho em.')
+  const dk = new AbortController()
+  const hen = setTimeout(() => dk.abort(), HAN_GIAY * 1000)
+  let res: Response
+  try {
+    res = await fetch(`${ch.URL}/ca/them-phut-em`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-ma-bi-mat': secret || '' },
+      body: JSON.stringify({ maCa, sbd, phut }),
+      signal: dk.signal,
+    })
+  } catch (e) {
+    throw new Error((e as { name?: string })?.name === 'AbortError' ? TRA_LOI_CHAM : MAT_MANG)
+  } finally {
+    clearTimeout(hen)
+  }
+  if (res.status === 404) throw new Error('Máy chủ chưa có lệnh thêm giờ cho từng em — chưa cộng giờ.')
+  let j: Record<string, unknown> = {}
+  try { j = (await res.json()) as Record<string, unknown> } catch { throw new Error('Máy chủ trả lời không đọc được — chưa chắc đã cộng giờ, xem đồng hồ của em rồi hãy bấm lại.') }
+  if (!res.ok || j.ok !== true) throw new Error(String(j.error || j.loi || 'Máy chủ không cho thêm giờ.'))
+  return { phut: Number(j.phut) || phut, themPhutEm: Number(j.themPhutEm) || 0, hetGioLuc: String(j.hetGioLuc ?? '') }
+}

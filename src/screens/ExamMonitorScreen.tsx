@@ -44,6 +44,8 @@ import KhoiThoiGianCa from '../components/KhoiThoiGianCa'
 import TamPhuChieuMa, { gopEmDaVao } from '../components/TamPhuChieuMa'
 import { moTaCaChieuMa } from '../lib/mo-ta-ca-chieu-ma'
 import { themPhutCa, cauKetQuaThemPhut } from '../lib/them-phut-api'
+import { hanRiengEm } from '../lib/them-gio-em'
+import { TamThemGio } from '../components/ca-thi/ThemGioEm'
 import ThanhTabCa, { type MucTabCa } from '../components/ThanhTabCa'
 import { demCauDaLam, tongSoCauCa } from '../lib/con-lai-ca'
 import './ca-thi-m3.css'
@@ -333,6 +335,7 @@ export default function ExamMonitorScreen() {
   // luôn mạnh–yếu và soạn được phiếu gửi phụ huynh — không phải nhớ số báo danh
   // rồi sang tab Học sinh tìm lại.
   const [sbdHoSo, setSbdHoSo] = useState('')
+  const [sbdThemGio, setSbdThemGio] = useState('') // 08/11 thêm giờ riêng em
   const setScreen = useAppStore((s) => s.setScreen)
   const classList = useAppStore((s) => s.classList)
   const maCaTheoDoi = useAppStore((s) => s.maCaTheoDoi)
@@ -698,7 +701,7 @@ export default function ExamMonitorScreen() {
     const em = lop.find((e) => e.sbd === sbdHoSo)
     return em ? tinhBaoCaoMotEm(em, lop, nguonCauTuNganHang(bank)) : null
   }, [sbdHoSo, khoaBaoCaoLop])
-  // Máy thầy KHÔNG có bảng chấm của em (chưa có đáp án của ca) ⇒ hỏi máy chủ `/gv/bao-cao-ca-em` (có kho câu) để điền các khối còn trống (dạng, câu cần xem lại). Có bảng chấm ⇒ không hỏi.
+  // Máy thầy chưa có bảng chấm của em ⇒ hỏi máy chủ `/gv/bao-cao-ca-em` điền các khối còn trống. Có bảng chấm ⇒ không hỏi.
   // Không có lệnh / lỗi ⇒ giữ nguyên số ở máy.
   const [baoCaoEmMay, setBaoCaoEmMay] = useState<{ khoa: string; may: BaoCaoEmMayChu } | null>(null)
   const khoaEmMay = chiTiet && sbdHoSo ? `${chiTiet.ca.maCa}|${sbdHoSo}` : ''
@@ -754,7 +757,7 @@ export default function ExamMonitorScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- khoá quyết định lúc hỏi lại
   }, [canBaoCao, khoaBcMay])
   // CHIẾU CHỮA BÀI SAU CA (thầy chốt 01/11, docs/ban-ve-chieu-chua-ca-0111): câu có em chưa đúng, xếp khó → dễ, cùng mức sai nhiều → ít; tên em chưa đúng ở
-  // góc tờ chiếu. CHỈ dùng bảng chấm từng câu đã có ở máy này (cùng nguồn «Câu cả lớp sai nhiều nhất») — không gọi mạng; tính khi ca đã đóng, nhớ theo khoá báo cáo.
+  // góc tờ chiếu. Chỉ dùng bảng chấm từng câu ở máy này — không gọi mạng; tính khi ca đã đóng.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- khoá `khoaBaoCaoLop` quyết định lúc nào tính lại
   const emBaoCaoDong = useMemo(() => (caDaDong && chiTiet && teacherBank?.length ? dungEmChoBaoCao(dungNganHangBaoCao()) : null), [caDaDong, chiTiet?.ca.maCa, khoaBaoCaoLop])
   const cauChuaCa = useMemo(
@@ -861,8 +864,8 @@ export default function ExamMonitorScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dsEm])
 
-  // Ca đang mở và còn em đang làm → tự tải lại mỗi 20 giây (theo dõi gần thời gian thực). Nhịp THEO LUẬT app thầy (src/lib/nhip-may-thay.ts): tab ẩn thì dừng, không gọi chồng (trước đây
-  // `setInterval` trần: một lượt chậm 20 s dồn thêm lượt, lỗi cũng cứ 20 s một lần), lỗi ⇒ lùi dần 30 → 60 → 120 s. Vòng chạy MỘT mạch (không dựng lại mỗi lần chiTiet đổi).
+  // Ca đang mở còn em làm → tự tải lại mỗi 20 giây, theo luật nhịp app thầy (src/lib/nhip-may-thay.ts): tab ẩn dừng, không gọi chồng,
+  // lỗi lùi dần 30 → 60 → 120 s. Vòng chạy MỘT mạch (không dựng lại mỗi lần chiTiet đổi).
   const conDangLam = !!chiTiet && chiTiet.luot.some((l) => l.trangThai === 'dang_lam')
   const maCaTheoDoiNen = chiTiet?.ca.maCa
   useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), BANG_NHIP_THAY.theoDoiCa, conDangLam, TUY_CHON_NHIP_THAY.theoDoiCa)
@@ -872,7 +875,7 @@ export default function ExamMonitorScreen() {
   const dangPhongCho = !!chiTiet?.ca.phongCho && !chiTiet?.ca.batDauThiLuc
   useNhipThay(() => (maCaTheoDoiNen ? tai(maCaTheoDoiNen, true) : true), NHIP_PHONG_CHO_THAY, dangPhongCho && !chieuMa, TUY_CHON_NHIP_THAY.phongCho)
 
-  // NHỊP SỐNG — THỜI GIAN THỰC (thầy 29/09: "phần trên cho đồng bộ trực tiếp thời gian thực luôn"). Ca ĐANG MỞ đã bấm Bắt đầu (hoặc không phòng chờ) ⇒ hỏi lệnh NHẸ
+  // NHỊP SỐNG — THỜI GIAN THỰC (thầy 29/09). Ca ĐANG MỞ đã bấm Bắt đầu (hoặc không phòng chờ) ⇒ hỏi lệnh NHẸ
   // `/ca/nhip` 3 s/lần (tab ẩn dừng, không chồng, lỗi lùi 10 → 20 s): tiến độ từng em đổi từ mốc `sau` phủ ngay lên thẻ em; dấu vết đổi (em vào / nộp / bị khoá,
   // thêm phút, đóng cửa) ⇒ tải lại cả ca, cách lần tải đầy trước ≥ 4 s. Vòng 20 s ở trên vẫn chạy làm lưới an toàn. Chi tiết + ước tải: src/lib/nhip-song-ca.ts.
   const [tienDoSong, setTienDoSong] = useState<Record<string, TienDoSong>>({})
@@ -2036,6 +2039,7 @@ export default function ExamMonitorScreen() {
                     soLanRoiMan: phu.soLanRoiMan,
                     tongGiayRoiMan: e.moiNhat.tongGiayRoiMan,
                     diem: e.diem ?? null,
+                    ...hanRiengEm(e.moiNhat, chiTiet.ca as never),
                   }
                 }),
                 ...emChuaVao.map((sbd): EmTheoDoi => ({ sbd, hoTen: classList.find((c) => c.sbd === sbd)?.hoTen || '', tt: 'chua_vao', daLam: null, tongCau: null, soLanRoiMan: 0, tongGiayRoiMan: 0, diem: null })),
@@ -2051,6 +2055,7 @@ export default function ExamMonitorScreen() {
                 setSbdHoSo(sbd)
               }}
               onXemEm={(sbd) => setSbdHoSo(sbd)}
+              onThemGioEm={chiTiet.ca.trangThai === 'mo' && chiTiet.ca.loai !== 'baitap' ? setSbdThemGio : undefined}
               onChieuMa={() => setChieuMa(true)}
               onKetThuc={() => {
                 setHoiKhoa(true)
@@ -2485,6 +2490,9 @@ export default function ExamMonitorScreen() {
         />
       )}
 
+      {chiTiet && sbdThemGio && (
+        <TamThemGio ca={chiTiet.ca} ds={dsEm} sbd={sbdThemGio} lamMoi={() => tai(chiTiet.ca.maCa)} dong={() => setSbdThemGio('')} hoSo={(sbd) => { setSbdThemGio(''); setSbdHoSo(sbd) }} />
+      )}
       {chiTiet && (moBaoCao !== null || !!sbdHoSo) && (
         <BaoCaoChiTiet
           maCa={chiTiet.ca.maCa}

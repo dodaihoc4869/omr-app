@@ -56,7 +56,7 @@ import {parentNews,refreshDailyNews} from './parent-news'
 import {phCanhBaoXem,phCapMa,phDemTruyCap,phKeHoach,phXacDinh} from './ph-truy-cap'
 import {homNayThay} from './hom-nay-thay'
 import {gvKeHoachEm} from './gv-ke-hoach-em'
-import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa} from './them-phut'
+import {docPhutCaDaThem,phutKhongHaSauKhiThem,themPhutCa,themPhutEm} from './them-phut'
 import { doiTenHocSinh } from './doi-ten-hoc-sinh'
 import { capNhatTrangThaiToChieu, guiLenhToChieu, layLenhMoiToChieu, layPhienToChieu, taoHoacCapNhatPhienToChieu } from './to-chieu-remote'
 import {chuanBiChamLaiCa} from './cham-lai-ca'
@@ -4167,6 +4167,8 @@ const boXuLy = {
       if (p === '/ca/nhip') return ra(await nhipCa(env, b))
       // THÊM PHÚT cho ca đang chạy (docs/hop-dong-them-phut-2109.md): chỉ cộng, trần 30 phút mỗi ca.
       if (p === '/ca/them-phut') return ra(await themPhutCa(env, b))
+      // THÊM GIỜ CHO MỘT EM (thầy 08/11): chỉ cộng hạn lượt của em đó, trần 30 phút mỗi em.
+      if (p === '/ca/them-phut-em') return ra(await themPhutEm(env, b))
       // ĐỔI TÊN một học sinh (docs/hop-dong-doi-ten-hoc-sinh-2109.md): chỉ cột tên, 5 bảng; giữ phieu/chan_vao.
       if (p === '/hoc-sinh/doi-ten') return ra(await doiTenHocSinh(env, b))
       if (p === '/diem') return ghiDiemMoi(env, b)
