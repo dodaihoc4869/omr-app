@@ -1,0 +1,35 @@
+# ĐẾM CÂU SONG SINH TRONG KHO (CHỈ ĐỌC) — thầy 08/11: "hiện tại câu song sinh trong app là bao nhiêu, mỗi câu gốc có bao nhiêu câu song sinh".
+# Chỉ SELECT đếm số trên D1 thật (bảng cau_bo_tro + de_kho) — không in đề, đáp án, lời giải, không đụng dữ liệu học sinh. KHÔNG `d1 export`.
+name: Đếm câu song sinh (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/vigilant-lamport-mxyrg8]
+    paths: ['.github/workflows/do-song-sinh-0811.yml']
+permissions:
+  contents: read
+jobs:
+  doc:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đếm (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          N="CASE WHEN song_sinh_json IS NULL OR song_sinh_json = '' THEN 0 WHEN json_valid(song_sinh_json) AND json_type(song_sinh_json) = 'array' THEN json_array_length(song_sinh_json) ELSE -1 END"
+          K="CASE WHEN qid_mau LIKE '%-10-%' OR qid_mau LIKE '10-%' THEN '10' WHEN qid_mau LIKE '%-11-%' OR qid_mau LIKE '11-%' THEN '11' WHEN qid_mau LIKE '%-12-%' OR qid_mau LIKE '12-%' THEN '12' ELSE '?' END"
+          q() { npx -y wrangler@4 d1 execute omr --remote --json --command "$1" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];console.log('## $2');for(const x of r)console.log(JSON.stringify(x))})"; }
+          q "SELECT COUNT(*) AS so_dong_hoc_lieu, SUM(CASE WHEN ($N) > 0 THEN 1 ELSE 0 END) AS so_cau_goc_co_song_sinh, SUM(CASE WHEN ($N) > 0 THEN ($N) ELSE 0 END) AS tong_ban_song_sinh FROM cau_bo_tro" "TONG"
+          q "SELECT ($N) AS so_song_sinh_moi_cau, COUNT(*) AS so_cau_goc FROM cau_bo_tro GROUP BY 1 ORDER BY 1" "PHAN_BO"
+          q "SELECT ($K) AS khoi, SUM(CASE WHEN ($N) > 0 THEN 1 ELSE 0 END) AS cau_goc_co_ss, SUM(CASE WHEN ($N) > 0 THEN ($N) ELSE 0 END) AS ban_ss FROM cau_bo_tro GROUP BY 1 ORDER BY 1" "THEO_KHOI"
+          q "SELECT COUNT(*) AS so_de, SUM(so_cau) AS tong_cau_trong_cac_de FROM de_kho WHERE COALESCE(da_xoa,0) = 0" "KHO_DE"
+          q "SELECT substr(MAX(cap_nhat_luc),1,16) AS ban_song_sinh_moi_nhat FROM cau_bo_tro WHERE ($N) > 0" "MOI_NHAT"
