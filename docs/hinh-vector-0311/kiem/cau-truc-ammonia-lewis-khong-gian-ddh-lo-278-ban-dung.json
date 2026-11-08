@@ -1,0 +1,40 @@
+[
+  {
+    "i": 901,
+    "hash": "a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe",
+    "fileNguon": "anh/a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe.png",
+    "svg": "ammonia-lewis-khong-gian-ddh-f54d34840dfd23bf5e7cf769facc72b3252fbb745c521b567b35b129ec2bbb6b.svg",
+    "hashSvg": "f54d34840dfd23bf5e7cf769facc72b3252fbb745c521b567b35b129ec2bbb6b",
+    "byteSvg": 46055,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D2-II-61",
+        "de": "Hình 5.1 dưới đây mô tả công thức Lewis và dạng hình học của phân tử ammonia.",
+        "refs": [
+          {
+            "hash": "a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe",
+            "where": "DB-11-B5-D2-II-61.hinh.0.du_lieu",
+            "hashDataUrl": "d3b272f9c277eead2003b4349633c9ae91fef2c0159d39b2dd2105a9193fb12a"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-II-1",
+        "de": "Hình 5.1 dưới đây mô tả công thức Lewis và dạng hình học của phân tử ammonia.",
+        "refs": [
+          {
+            "hash": "a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe",
+            "where": "DH-11-C2-B5-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "d3b272f9c277eead2003b4349633c9ae91fef2c0159d39b2dd2105a9193fb12a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2N6H/3bondseach/ONLY2dotsaboveaN/a)b)italic/bLEFTboldUNIFORM-downfilledTAPERnarrowN-rightgradedhash/wholecaptionitalic-prefixactualdam/exactHình 5.1. Công thức Lewis (a) và dạng hình học (b) của phân tử ammonia/noaddedlonepairb-charge-angle-answer.",
+    "hashSvgDaSoat": "f54d34840dfd23bf5e7cf769facc72b3252fbb745c521b567b35b129ec2bbb6b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

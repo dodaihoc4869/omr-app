@@ -1,0 +1,174 @@
+{
+  "i": 892,
+  "hash": "a38a3e7f8a4cbb38355529c1346d89b232509ef9f11e6faec758c4c76b2ea156",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a38a3e7f8a4cbb38355529c1346d89b232509ef9f11e6faec758c4c76b2ea156.png",
+  "size": [
+    1340,
+    232
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C3-B9-II-3",
+      "de": "Trong y sinh và kiểm nghiệm y khoa, kỹ thuật điện di trên giấy thấm (phủ dung dịch đệm) được dùng để phân tách hỗn hợp amino acid dựa trên sự khác nhau về điểm đẳng điện (pI). Tại giá trị pH = pI, amino acid tồn tại chủ yếu ở dạng ion lưỡng cực (tổng điện tích bằng 0) và không di chuyển trong điện trường. Nếu pH < pI, amino acid tích điện dương và di chuyển về cực âm (cathode); ngược lại nếu pH > pI, amino acid tích điện âm và di chuyển về cực dương (anode).\nĐối với amino acid có chuỗi bên trung tính, pI được tính bằng trung bình cộng các giá trị $pK_a$ của nhóm α-COOH và nhóm α-$\\ce{NH3+}$. Đối với amino acid có chuỗi bên phân cực mang điện tích, pI được tính bằng trung bình cộng của hai giá trị $pK_a$ ở hai bên của dạng ion lưỡng cực.\nBảng giá trị pKa (pK₁ của α-COOH; pK₂ của α-$\\ce{NH3+}$; pK_R của chuỗi bên):\n• Glutamic acid: 2,19; 9,67; 4,25 (nhóm $\\ce{-COOH}$).\n• Glycine: 2,35; 9,78; —.\n• Lysine: 2,18; 8,95; 10,53 (nhóm $\\ce{-NH3+}$).\nXét thí nghiệm điện di hỗn hợp 3 amino acid này trong dung dịch đệm có pH = 6,0.",
+      "refs": [
+        {
+          "hash": "a38a3e7f8a4cbb38355529c1346d89b232509ef9f11e6faec758c4c76b2ea156",
+          "where": "VIP27-C3-B9-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "036cc62ca72703cef2b020218cfd912b4e29a6b8f12ab3a7493d17ced1a7591a"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+2x/all1publicref thựcđọc;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "grid": "Horizontalblacklines y1/42/124/165/229 spanx0..1333;verticalinternalx223/598/946,outerRIGHTx1333 y1..229. NativeLEFTedgecroppedatx0, noindependentverticalleftstrokevisible; do notinfermissingcolumn.",
+    "headers": [
+      {
+        "text": "Amino acid",
+        "center": [
+          111,
+          23
+        ],
+        "bold": true
+      },
+      {
+        "text": "pKa của α-COOH (pK₁)",
+        "center": [
+          410,
+          23
+        ],
+        "bold": true,
+        "note": "aBASELINEinliteralpKa,1SUBinparenthesis;alphaGreekbold"
+      },
+      {
+        "text": "pKa của α-NH₃⁺ (pK₂)",
+        "center": [
+          772,
+          23
+        ],
+        "bold": true,
+        "note": "NH3sub3plussup,2subinparenthesis;aBASELINE"
+      },
+      {
+        "text": "pKa của chuỗi bên (pK_R)",
+        "center": [
+          1139,
+          23
+        ],
+        "bold": true,
+        "note": "R UPPERCASE SUBSCRIPT; underscore only semanticnotation, renderpK then subscriptR, NOvisibleunderscore. aBASELINE"
+      }
+    ],
+    "rows": [
+      {
+        "name": "Glutamic\nacid",
+        "nameStyle": "BOLDupright2lines",
+        "nameCenters": [
+          [
+            111,
+            65
+          ],
+          [
+            111,
+            106
+          ]
+        ],
+        "cells": [
+          {
+            "text": "2,19",
+            "center": [
+              410,
+              66
+            ]
+          },
+          {
+            "text": "9,67",
+            "center": [
+              772,
+              66
+            ]
+          },
+          {
+            "text": "4,25 (nhóm - COOH )",
+            "center": [
+              1139,
+              72
+            ],
+            "notes": "nhómITALIConly,numbers/formulaCOOHregularupright;sourcehyphenminusbeforeCOOH slightlyraised relativeword;parenthesesbalanced. Do not addcharge."
+          }
+        ]
+      },
+      {
+        "name": "Glycine",
+        "nameStyle": "BOLDupright",
+        "nameCenters": [
+          [
+            111,
+            147
+          ]
+        ],
+        "cells": [
+          {
+            "text": "2,35",
+            "center": [
+              410,
+              147
+            ]
+          },
+          {
+            "text": "9,78",
+            "center": [
+              772,
+              147
+            ]
+          },
+          {
+            "text": "—",
+            "center": [
+              1139,
+              147
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Lysine",
+        "nameStyle": "BOLDupright",
+        "nameCenters": [
+          [
+            111,
+            189
+          ]
+        ],
+        "cells": [
+          {
+            "text": "2,18",
+            "center": [
+              410,
+              189
+            ]
+          },
+          {
+            "text": "8,95",
+            "center": [
+              772,
+              189
+            ]
+          },
+          {
+            "text": "10,53 (nhóm - NH₃⁺)",
+            "center": [
+              1139,
+              207
+            ],
+            "notes": "nhómITALIC;NH3sub3plussup;hyphenminuspre-NH3,numbers/formulaupright;parenthesesbalanced."
+          }
+        ]
+      }
+    ],
+    "counts": "4columns/4rowsincludingheader/4headersbold/3AAnamesbold/8numericalvaluesALLcommadecimal+1emdash/3rowlabels/2nhómitalic/Greekalpha2/NH3plusheader+Lyscell/PKsubs1,2,UPPERR. NoaddedpI/values/answer/title/unit."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,formulaliteralnoacidbaseanswer.",
+  "actualSvgReviewed": false
+}

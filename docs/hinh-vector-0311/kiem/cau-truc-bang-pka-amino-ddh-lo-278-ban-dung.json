@@ -1,0 +1,29 @@
+[
+  {
+    "i": 892,
+    "hash": "a38a3e7f8a4cbb38355529c1346d89b232509ef9f11e6faec758c4c76b2ea156",
+    "fileNguon": "anh/a38a3e7f8a4cbb38355529c1346d89b232509ef9f11e6faec758c4c76b2ea156.png",
+    "svg": "bang-pka-amino-ddh-d6702d819b7be008f44d61bf71dbba35d5050523b82d144a76d18fd2e97e53e7.svg",
+    "hashSvg": "d6702d819b7be008f44d61bf71dbba35d5050523b82d144a76d18fd2e97e53e7",
+    "byteSvg": 77875,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B9-II-3",
+        "de": "Trong y sinh và kiểm nghiệm y khoa, kỹ thuật điện di trên giấy thấm (phủ dung dịch đệm) được dùng để phân tách hỗn hợp amino acid dựa trên sự khác nhau về điểm đẳng điện (pI). Tại giá trị pH = pI, amino acid tồn tại chủ yếu ở dạng ion lưỡng cực (tổng điện tích bằng 0) và không di chuyển trong điện trường. Nếu pH < pI, amino acid tích điện dương và di chuyển về cực âm (cathode); ngược lại nếu pH > pI, amino acid tích điện âm và di chuyển về cực dương (anode).\nĐối với amino acid có chuỗi bên trung tính, pI được tính bằng trung bình cộng các giá trị $pK_a$ của nhóm α-COOH và nhóm α-$\\ce{NH3+}$. Đối với amino acid có chuỗi bên phân cực mang điện tích, pI được tính bằng trung bình cộng của hai giá trị $pK_a$ ở hai bên của dạng ion lưỡng cực.\nBảng giá trị pKa (pK₁ của α-COOH; pK₂ của α-$\\ce{NH3+}$; pK_R của chuỗi bên):\n• Glutamic acid: 2,19; 9,67; 4,25 (nhóm $\\ce{-COOH}$).\n• Glycine: 2,35; 9,78; —.\n• Lysine: 2,18; 8,95; 10,53 (nhóm $\\ce{-NH3+}$).\nXét thí nghiệm điện di hỗn hợp 3 amino acid này trong dung dịch đệm có pH = 6,0.",
+        "refs": [
+          {
+            "hash": "a38a3e7f8a4cbb38355529c1346d89b232509ef9f11e6faec758c4c76b2ea156",
+            "where": "VIP27-C3-B9-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "036cc62ca72703cef2b020218cfd912b4e29a6b8f12ab3a7493d17ced1a7591a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4columns4rows/4headers3AAnamesactualdam/8commadecimal1emdash/2nhómitalic/2alpha/NH3sub-plusSup/headerpKaBASELINEa/pKsub1-2-UPPERR/noleftverticalrestoration/noaddedpI-unit-title-answer.",
+    "hashSvgDaSoat": "d6702d819b7be008f44d61bf71dbba35d5050523b82d144a76d18fd2e97e53e7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

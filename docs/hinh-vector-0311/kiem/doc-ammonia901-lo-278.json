@@ -1,0 +1,272 @@
+{
+  "i": 901,
+  "hash": "a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe.png",
+  "size": [
+    1158,
+    247
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-11-B5-D2-II-61",
+      "de": "Hình 5.1 dưới đây mô tả công thức Lewis và dạng hình học của phân tử ammonia.",
+      "refs": [
+        {
+          "hash": "a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe",
+          "where": "DB-11-B5-D2-II-61.hinh.0.du_lieu",
+          "hashDataUrl": "d3b272f9c277eead2003b4349633c9ae91fef2c0159d39b2dd2105a9193fb12a"
+        }
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B5-II-1",
+      "de": "Hình 5.1 dưới đây mô tả công thức Lewis và dạng hình học của phân tử ammonia.",
+      "refs": [
+        {
+          "hash": "a595bc8007c602f48369a113c539c68b2a60398ae3b923b3217f18891d2eb4fe",
+          "where": "DH-11-C2-B5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "d3b272f9c277eead2003b4349633c9ae91fef2c0159d39b2dd2105a9193fb12a"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x+stereo10x/all2publicrefs thựcđọc;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "panelA": {
+      "labels": [
+        {
+          "text": "N",
+          "bbox": [
+            441,
+            14,
+            469,
+            43
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            369,
+            14,
+            395,
+            44
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            514,
+            14,
+            541,
+            44
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            441,
+            88,
+            468,
+            117
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            399,
+            36
+          ],
+          [
+            437,
+            36
+          ]
+        ],
+        [
+          [
+            472,
+            36
+          ],
+          [
+            510,
+            36
+          ]
+        ],
+        [
+          [
+            455,
+            57
+          ],
+          [
+            455,
+            89
+          ]
+        ]
+      ],
+      "lonePair": "TWOsolidblackdotsaboveN,centers(450,6),(460,6),r~4;topat2notclipped. Do not addlonepairb.",
+      "panelLabel": {
+        "text": "a)",
+        "bbox": [
+          448,
+          147,
+          483,
+          182
+        ],
+        "italic": true
+      }
+    },
+    "panelB": {
+      "labels": [
+        {
+          "text": "N",
+          "bbox": [
+            713,
+            14,
+            741,
+            45
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            645,
+            75,
+            671,
+            104
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            778,
+            78,
+            805,
+            107
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            714,
+            105,
+            740,
+            135
+          ]
+        }
+      ],
+      "leftBond": "BolduniformSOLIDdiagonal from(707,54)to(677,80),width~5px;NOTtapertrianglegivenconstantwidthsource.",
+      "downBond": "FILLEDtapertriangle narrowtip(727,61),broadedge(722,99)..(732,99),widensDOWNtowardsH.",
+      "rightBond": "HASHEDtaperfrom(747,54)to(773,77),smallnearN/broadnearH. Native10xmacroretained totracegradedshortsegments; do notreplacewithfullplainline.",
+      "panelLabel": {
+        "text": "b)",
+        "bbox": [
+          714,
+          147,
+          747,
+          182
+        ],
+        "italic": true
+      },
+      "rightHashTrace": {
+        "nativeROI": [
+          742,
+          48,
+          779,
+          84
+        ],
+        "nearest30x": "/workspace/scratch/901-hash30x-nearest.png",
+        "observedCount": 6,
+        "segmentsApprox": [
+          {
+            "center": [
+              747,
+              54
+            ],
+            "bounds": [
+              744,
+              51,
+              750,
+              57
+            ]
+          },
+          {
+            "center": [
+              751.5,
+              58.5
+            ],
+            "bounds": [
+              749,
+              56,
+              756,
+              62
+            ]
+          },
+          {
+            "center": [
+              756.5,
+              63
+            ],
+            "bounds": [
+              754,
+              60,
+              759,
+              67
+            ]
+          },
+          {
+            "center": [
+              761.5,
+              67
+            ],
+            "bounds": [
+              759,
+              64,
+              766,
+              72
+            ]
+          },
+          {
+            "center": [
+              766.5,
+              71.5
+            ],
+            "bounds": [
+              764,
+              68,
+              771,
+              77
+            ]
+          },
+          {
+            "center": [
+              773,
+              76.5
+            ],
+            "bounds": [
+              769,
+              73,
+              776,
+              82
+            ]
+          }
+        ],
+        "caveat": "Sixvisuallydistinctgradedblackswashes. Firstfiveadjacentsegments havegrayantialias bridges;someblack4-neighbor bridges (e.gsegments4/5) exist fromscan. ThusNOT6disconnectedcomponents;countfromrepeatedswashshape/widthprogression and visiblegaps,notthresholdconnectedcomponents. End6broadnearH. No7thdot orfullshaftadded."
+      }
+    },
+    "caption": {
+      "text": "Hình 5.1. Công thức Lewis (a) và dạng hình học (b) của phân tử ammonia",
+      "bbox": [
+        29,
+        207,
+        1146,
+        242
+      ],
+      "style": "WHOLELINEITALIC;prefixHình 5.1.BOLDITALIC;remainingregularitalic, notallbold. Periodafter1,noneafterammonia."
+    },
+    "counts": "2N6H across2panels/3bondseach/ONLY2dotsaboveaN/2panellabelsa)b)/1fullcaption. Nostereoextra/lonepairb/charge/angle/nameansweradded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px;describestyleliteralnotmolecularshapeanswer.",
+  "macro": "/workspace/scratch/901-stereo10x.png",
+  "actualSvgReviewed": false
+}
