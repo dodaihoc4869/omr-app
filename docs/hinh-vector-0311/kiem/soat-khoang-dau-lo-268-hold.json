@@ -1,0 +1,496 @@
+{
+  "nguoiDoc": "soat_nguon_3",
+  "repoModified": false,
+  "productionAdopt": false,
+  "candidateCreated": false,
+  "verdict": "HOLD: no sufficiently justified design candidate from unchanged full-size source marks under current constraints",
+  "geometry": [
+    {
+      "s": "de",
+      "ch": "Ẫ",
+      "advance": 701,
+      "bodyYmax": 742,
+      "bodyBounds": [
+        [
+          32,
+          -12,
+          669,
+          742
+        ],
+        [
+          238,
+          289,
+          459,
+          623
+        ]
+      ],
+      "marksBounds": [
+        [
+          151,
+          1021,
+          549,
+          1160
+        ],
+        [
+          165,
+          810,
+          534,
+          980
+        ]
+      ],
+      "markHeights": [
+        139,
+        170
+      ],
+      "markWidths": [
+        398,
+        369
+      ],
+      "headroomTo1000": 258,
+      "headroomTo970": 228,
+      "headroomTo930": 188,
+      "centeredStackMinTopNoGaps": 1051,
+      "sideBySideMinimumWidthNoGap": 767,
+      "actualCurveBounds": [
+        [
+          36.27777777777778,
+          -12,
+          664.2,
+          742.0
+        ],
+        [
+          238,
+          289,
+          459,
+          623
+        ],
+        [
+          151.93103448275863,
+          1021,
+          548.0714285714286,
+          1160
+        ],
+        [
+          165,
+          810,
+          534,
+          980
+        ]
+      ],
+      "actualMarkCurveHeights": [
+        139,
+        170
+      ],
+      "actualMarkCurveWidths": [
+        396.14039408866995,
+        369
+      ],
+      "actualCurveStackNoGapsTop": 1051.0
+    },
+    {
+      "s": "de",
+      "ch": "Ễ",
+      "advance": 629,
+      "bodyYmax": 742,
+      "bodyBounds": [
+        [
+          92,
+          -12,
+          547,
+          742
+        ]
+      ],
+      "marksBounds": [
+        [
+          123,
+          1021,
+          521,
+          1160
+        ],
+        [
+          137,
+          810,
+          506,
+          980
+        ]
+      ],
+      "markHeights": [
+        139,
+        170
+      ],
+      "markWidths": [
+        398,
+        369
+      ],
+      "headroomTo1000": 258,
+      "headroomTo970": 228,
+      "headroomTo930": 188,
+      "centeredStackMinTopNoGaps": 1051,
+      "sideBySideMinimumWidthNoGap": 767,
+      "actualCurveBounds": [
+        [
+          92,
+          -12,
+          547.0,
+          742
+        ],
+        [
+          123.92857142857143,
+          1021,
+          520.0714285714286,
+          1160
+        ],
+        [
+          137,
+          810,
+          506,
+          980
+        ]
+      ],
+      "actualMarkCurveHeights": [
+        139,
+        170
+      ],
+      "actualMarkCurveWidths": [
+        396.1428571428571,
+        369
+      ],
+      "actualCurveStackNoGapsTop": 1051
+    },
+    {
+      "s": "de",
+      "ch": "Ỗ",
+      "advance": 757,
+      "bodyYmax": 752,
+      "bodyBounds": [
+        [
+          153,
+          69,
+          604,
+          661
+        ],
+        [
+          46,
+          -22,
+          711,
+          752
+        ]
+      ],
+      "marksBounds": [
+        [
+          181,
+          1021,
+          579,
+          1160
+        ],
+        [
+          195,
+          810,
+          564,
+          980
+        ]
+      ],
+      "markHeights": [
+        139,
+        170
+      ],
+      "markWidths": [
+        398,
+        369
+      ],
+      "headroomTo1000": 248,
+      "headroomTo970": 218,
+      "headroomTo930": 178,
+      "centeredStackMinTopNoGaps": 1061,
+      "sideBySideMinimumWidthNoGap": 767,
+      "actualCurveBounds": [
+        [
+          153.0,
+          69.0,
+          604.0,
+          661.0
+        ],
+        [
+          46.0,
+          -22.0,
+          711.0,
+          752.0
+        ],
+        [
+          181.92857142857142,
+          1021,
+          578.0689655172414,
+          1160
+        ],
+        [
+          195,
+          810,
+          564,
+          980
+        ]
+      ],
+      "actualMarkCurveHeights": [
+        139,
+        170
+      ],
+      "actualMarkCurveWidths": [
+        396.14039408866995,
+        369
+      ],
+      "actualCurveStackNoGapsTop": 1061.0
+    },
+    {
+      "s": "dam",
+      "ch": "Ẫ",
+      "advance": 681,
+      "bodyYmax": 756,
+      "bodyBounds": [
+        [
+          11,
+          -26,
+          670,
+          756
+        ],
+        [
+          266,
+          306,
+          409,
+          544
+        ]
+      ],
+      "marksBounds": [
+        [
+          123,
+          984,
+          558,
+          1160
+        ],
+        [
+          140,
+          734,
+          540,
+          924
+        ]
+      ],
+      "markHeights": [
+        176,
+        190
+      ],
+      "markWidths": [
+        435,
+        400
+      ],
+      "headroomTo1000": 244,
+      "headroomTo970": 214,
+      "headroomTo930": 174,
+      "centeredStackMinTopNoGaps": 1122,
+      "sideBySideMinimumWidthNoGap": 835,
+      "actualCurveBounds": [
+        [
+          16.884615384615387,
+          -26,
+          663.0333333333333,
+          756
+        ],
+        [
+          266,
+          306,
+          409,
+          544
+        ],
+        [
+          124.81818181818181,
+          984,
+          555.3829787234042,
+          1160
+        ],
+        [
+          140,
+          734,
+          540,
+          924
+        ]
+      ],
+      "actualMarkCurveHeights": [
+        176,
+        190
+      ],
+      "actualMarkCurveWidths": [
+        430.5647969052224,
+        400
+      ],
+      "actualCurveStackNoGapsTop": 1122
+    },
+    {
+      "s": "dam",
+      "ch": "Ễ",
+      "advance": 615,
+      "bodyYmax": 756,
+      "bodyBounds": [
+        [
+          71,
+          -26,
+          554,
+          756
+        ]
+      ],
+      "marksBounds": [
+        [
+          95,
+          1036,
+          529,
+          1212
+        ],
+        [
+          112,
+          786,
+          512,
+          976
+        ]
+      ],
+      "markHeights": [
+        176,
+        190
+      ],
+      "markWidths": [
+        434,
+        400
+      ],
+      "headroomTo1000": 244,
+      "headroomTo970": 214,
+      "headroomTo930": 174,
+      "centeredStackMinTopNoGaps": 1122,
+      "sideBySideMinimumWidthNoGap": 834,
+      "actualCurveBounds": [
+        [
+          71,
+          -26,
+          554.0,
+          756
+        ],
+        [
+          96.81395348837209,
+          1036,
+          526.3913043478261,
+          1212
+        ],
+        [
+          112,
+          786,
+          512,
+          976
+        ]
+      ],
+      "actualMarkCurveHeights": [
+        176,
+        190
+      ],
+      "actualMarkCurveWidths": [
+        429.57735085945404,
+        400
+      ],
+      "actualCurveStackNoGapsTop": 1122
+    },
+    {
+      "s": "dam",
+      "ch": "Ỗ",
+      "advance": 742,
+      "bodyYmax": 766,
+      "bodyBounds": [
+        [
+          188,
+          106,
+          554,
+          624
+        ],
+        [
+          27,
+          -36,
+          715,
+          766
+        ]
+      ],
+      "marksBounds": [
+        [
+          154,
+          1046,
+          588,
+          1222
+        ],
+        [
+          171,
+          796,
+          571,
+          986
+        ]
+      ],
+      "markHeights": [
+        176,
+        190
+      ],
+      "markWidths": [
+        434,
+        400
+      ],
+      "headroomTo1000": 234,
+      "headroomTo970": 204,
+      "headroomTo930": 164,
+      "centeredStackMinTopNoGaps": 1132,
+      "sideBySideMinimumWidthNoGap": 834,
+      "actualCurveBounds": [
+        [
+          188.0,
+          106.0,
+          554.0,
+          624.0
+        ],
+        [
+          27.0,
+          -36.0,
+          715.0,
+          766.0
+        ],
+        [
+          155.81395348837208,
+          1046,
+          585.3913043478261,
+          1222
+        ],
+        [
+          171,
+          796,
+          571,
+          986
+        ]
+      ],
+      "actualMarkCurveHeights": [
+        176,
+        190
+      ],
+      "actualMarkCurveWidths": [
+        429.57735085945404,
+        400
+      ],
+      "actualCurveStackNoGapsTop": 1132.0
+    }
+  ],
+  "evidenceBasis": [
+    "Exact archivedR4 fonts; semanticbody/mark contour membership from auditedsource; curve-extrema BoundsPen, not area/bbox filter selecting/discarding nét",
+    "267actualinkpixels: R4 realclip; compact1 gives Dam styleloss and residual1pxclip; staleGSUB explanation independently excluded"
+  ],
+  "quantitativeFindings": [
+    "Fullsize De mark heights139+170=309, Dam176+190=366; capbody742..766, headroom to1000 only234..258. Even zero-gaps strictly vertically disjoint envelopes need top1051..1132. Positive opticalgap raises this further. This is vertical-envelope constraint, NOT proof no collision-free interleaving exists.",
+    "267uniform compact needs De0.566..0.594,Dam0.432..0.455; it proportionally thins rounded strokes and narrows accents. Same uppercase differs visibly from unchanged lowercase marks/brevefamilies. Keeping glyph body bold while markalmosthalfsize does not preserve relative design.",
+    "A horizontal fullmark side-by-side arrangement requires sumwidthDe767,Dam834..835 plusgap, versus advance615..757. With unchanged hmtx it spills into adjacentglyph space by10..220 units before safetygap. Could overhang, but dense uppercase strings need independent kerning/neighborcollision audit, and left/right reading of tilde+hat departs from source centeredverticaldesign.",
+    "Partial overlap of mark boundingboxes can be valid (asẪapex); do not claim bboxoverlap=inkcollision. An optimization maximizing interlocking nearbody would need exactcurve clearances and still preserve centeredsemanticappearance; no evidence that this fits real16 raster budget without heavy shrink."
+  ],
+  "concreteRecommendation": [
+    "Do not adopt a horizontal redesign solely to fit clipping. Preserve R4 scratch as clean semantic/body baseline, HOLD appglobalfont.",
+    "If typography direction allows a redesigned accent master, draw compact full-thickness tiltedmu/tilde masters together for whole family, retaining stroke diameter while reducing emptyinternalspacing/markamplitude; this is a deliberate new design requiring freshsource comparison and allmarkfamily review, not affine uniform scale repair. This departs from requested unchangedsource markdesign so not silently attempted.",
+    "If retaining current markdesign/metrics/CSS are all hard constraints, report actual blocker rather than claiming fontready. Any future alternative needs12caseactualinksamephase+NFC/NFD/CDP+wholefamilyreadability."
+  ],
+  "limits": [
+    "No global impossibility theorem; translation/interleaving exactpathsearch not performed, because no approved direction for semantic horizontal redesign.",
+    "No candidate created because plausible affine options fail design or clip evidence; no production/font/CSS/metrics changes."
+  ]
+}

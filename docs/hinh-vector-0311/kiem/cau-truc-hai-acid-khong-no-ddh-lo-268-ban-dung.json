@@ -1,0 +1,29 @@
+[
+  {
+    "i": 796,
+    "hash": "9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f",
+    "fileNguon": "anh/9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f.png",
+    "svg": "hai-acid-khong-no-ddh-83112f6998beb54ba55c9f77edf4eb707eaaeb7332e46e0ac0cbfd71b06aa510.svg",
+    "hashSvg": "83112f6998beb54ba55c9f77edf4eb707eaaeb7332e46e0ac0cbfd71b06aa510",
+    "byteSvg": 14450,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D4-III-3",
+        "de": "Trong thành phần của một số loại dầu thực vật như dầu hạt lanh, dầu đậu nành hoặc dầu hướng dương, có chứa ester của các acid không no linolenic acid (X), linoleic acid (Y) với glycerol (A).\nSố liên kết 𝜋 trong triester X2YA là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f",
+            "where": "12-KT-C1-D4-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "8ecf68dda1ddbe522797d4ddab6391298f33c39819fdaa2b0fc5f6da93de1a19"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2open18Cchains/36C4O/2COOH-OHright/top2CCdouble-bottom3CCdouble/2COdouble/18verticesEACHinclCO/freeLEFTends/captionEXACTLinoleic Acid-Linolenic Acid/noaddedH-nums-labelXYA-glycerol-triester-answer.",
+    "hashSvgDaSoat": "83112f6998beb54ba55c9f77edf4eb707eaaeb7332e46e0ac0cbfd71b06aa510",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

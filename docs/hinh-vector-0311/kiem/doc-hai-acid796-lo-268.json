@@ -1,0 +1,440 @@
+{
+  "i": 796,
+  "hash": "9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f.png",
+  "size": [
+    596,
+    295
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C1-D4-III-3",
+      "de": "Trong thành phần của một số loại dầu thực vật như dầu hạt lanh, dầu đậu nành hoặc dầu hướng dương, có chứa ester của các acid không no linolenic acid (X), linoleic acid (Y) với glycerol (A).\nSố liên kết 𝜋 trong triester X2YA là bao nhiêu?",
+      "refs": [
+        {
+          "hash": "9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f",
+          "where": "12-KT-C1-D4-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "8ecf68dda1ddbe522797d4ddab6391298f33c39819fdaa2b0fc5f6da93de1a19"
+        }
+      ]
+    }
+  ],
+  "review": "Read checkpoint267/tien-do; nativeFULL+4x actualopened/all1publicref. Source-only chưaSVG/chưaĐạt.",
+  "coordinateMeaning": "Pixelnative centerline approximate1–2px; vertexindexzero fromfreeleft, index17=carbonylC. Countsreadnative directly, notdeducedname/hydrogenation.",
+  "panels": [
+    {
+      "caption": "Linoleic Acid",
+      "captionStyle": "regular upright, capitalL andA, notitalic",
+      "captionBBox": [
+        231,
+        121,
+        365,
+        140
+      ],
+      "carbonVertices": [
+        [
+          53,
+          98
+        ],
+        [
+          78,
+          79
+        ],
+        [
+          104,
+          98
+        ],
+        [
+          129,
+          79
+        ],
+        [
+          155,
+          98
+        ],
+        [
+          180,
+          79
+        ],
+        [
+          207,
+          79
+        ],
+        [
+          235,
+          98
+        ],
+        [
+          261,
+          79
+        ],
+        [
+          288,
+          79
+        ],
+        [
+          315,
+          98
+        ],
+        [
+          341,
+          79
+        ],
+        [
+          367,
+          98
+        ],
+        [
+          392,
+          79
+        ],
+        [
+          418,
+          98
+        ],
+        [
+          443,
+          79
+        ],
+        [
+          469,
+          98
+        ],
+        [
+          494,
+          79
+        ]
+      ],
+      "CCDoubleBonds": [
+        {
+          "indices": [
+            5,
+            6
+          ],
+          "main": [
+            [
+              180,
+              79
+            ],
+            [
+              207,
+              79
+            ]
+          ],
+          "innerOffset": [
+            [
+              183,
+              84
+            ],
+            [
+              205,
+              84
+            ]
+          ],
+          "note": "Doubletopflat, neighborchains bothpointDOWN frombothends; preservegeometry."
+        },
+        {
+          "indices": [
+            8,
+            9
+          ],
+          "main": [
+            [
+              261,
+              79
+            ],
+            [
+              288,
+              79
+            ]
+          ],
+          "innerOffset": [
+            [
+              264,
+              84
+            ],
+            [
+              285,
+              84
+            ]
+          ]
+        }
+      ],
+      "carboxyl": {
+        "Cindex": 17,
+        "Olabel": {
+          "text": "O",
+          "center": [
+            494,
+            40
+          ]
+        },
+        "carbonylDouble": [
+          [
+            [
+              490,
+              79
+            ],
+            [
+              490,
+              49
+            ]
+          ],
+          [
+            [
+              498,
+              79
+            ],
+            [
+              498,
+              49
+            ]
+          ]
+        ],
+        "OHlabel": {
+          "text": "OH",
+          "bbox": [
+            508,
+            87,
+            544,
+            106
+          ]
+        },
+        "COHbond": [
+          [
+            494,
+            79
+          ],
+          [
+            508,
+            89
+          ]
+        ]
+      },
+      "counts": "18C2O;2CCdouble+1COdouble;freeleftendpoint noCH3/Hliteral."
+    },
+    {
+      "caption": "Linolenic Acid",
+      "captionStyle": "regular upright, capitalL andA, notitalic",
+      "captionBBox": [
+        272,
+        238,
+        417,
+        258
+      ],
+      "carbonVertices": [
+        [
+          56,
+          197
+        ],
+        [
+          81,
+          216
+        ],
+        [
+          106,
+          197
+        ],
+        [
+          131,
+          216
+        ],
+        [
+          157,
+          197
+        ],
+        [
+          182,
+          216
+        ],
+        [
+          209,
+          216
+        ],
+        [
+          237,
+          197
+        ],
+        [
+          263,
+          216
+        ],
+        [
+          289,
+          216
+        ],
+        [
+          316,
+          197
+        ],
+        [
+          342,
+          216
+        ],
+        [
+          369,
+          216
+        ],
+        [
+          395,
+          197
+        ],
+        [
+          421,
+          216
+        ],
+        [
+          446,
+          197
+        ],
+        [
+          471,
+          216
+        ],
+        [
+          496,
+          197
+        ]
+      ],
+      "CCDoubleBonds": [
+        {
+          "indices": [
+            5,
+            6
+          ],
+          "main": [
+            [
+              182,
+              216
+            ],
+            [
+              209,
+              216
+            ]
+          ],
+          "innerOffset": [
+            [
+              185,
+              211
+            ],
+            [
+              207,
+              211
+            ]
+          ],
+          "note": "Doublebottomflat, neighborsbothpointUP frombothends."
+        },
+        {
+          "indices": [
+            8,
+            9
+          ],
+          "main": [
+            [
+              263,
+              216
+            ],
+            [
+              289,
+              216
+            ]
+          ],
+          "innerOffset": [
+            [
+              266,
+              211
+            ],
+            [
+              287,
+              211
+            ]
+          ]
+        },
+        {
+          "indices": [
+            11,
+            12
+          ],
+          "main": [
+            [
+              342,
+              216
+            ],
+            [
+              369,
+              216
+            ]
+          ],
+          "innerOffset": [
+            [
+              345,
+              211
+            ],
+            [
+              367,
+              211
+            ]
+          ]
+        }
+      ],
+      "carboxyl": {
+        "Cindex": 17,
+        "Olabel": {
+          "text": "O",
+          "center": [
+            496,
+            158
+          ]
+        },
+        "carbonylDouble": [
+          [
+            [
+              492,
+              197
+            ],
+            [
+              492,
+              168
+            ]
+          ],
+          [
+            [
+              500,
+              197
+            ],
+            [
+              500,
+              168
+            ]
+          ]
+        ],
+        "OHlabel": {
+          "text": "OH",
+          "bbox": [
+            511,
+            205,
+            546,
+            224
+          ]
+        },
+        "COHbond": [
+          [
+            496,
+            197
+          ],
+          [
+            511,
+            208
+          ]
+        ]
+      },
+      "counts": "18C2O;3CCdouble+1COdouble;freeleftendpoint noCH3/Hliteral."
+    }
+  ],
+  "allCounts": "36C4O/5CCdouble+2COdouble/2freeleftendpoints/2rightOH/2captions. Noarrow/reaction/coefficient/stereo-wedges/charge/extraH/CH2labels/numberedC/origin/dataunits.",
+  "uncertainties": [
+    "Scangrayink+jitter notuniform exactvertexcoordinates; preserveflatdoublepositions/inneroffsetside/bondcount notcopytheory cis/translabels. Noobscuredbonds."
+  ],
+  "actualSvgReviewed": false
+}

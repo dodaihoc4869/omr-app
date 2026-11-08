@@ -39,7 +39,7 @@
     "soCauDungHinh": 8,
     "ketQua": "6/6 đạt soát độc lập"
   },
-  "tiepTuc": "Ưu tiên giải quyết clipping font thật,giữ thiết kế roundstroke/gaps/metrics. Compact267 bịloại vì dấu Đậm nhỏ/mảnh;khôngco thêmđểép xanh. Dùng actualink visible-hidden đồngpixelphase,khôngsuyCanvasascent=inkloss;R4vẫnBAD12cases. KhôngsửaOTclosure theo giảthuyết stalealias đãbácbỏ. Saufix cần fullatlas/allVN/compoundNFCNFD/CDPnofallback/ε/appsizes/lineheight/latestmain build-speed trướcadopt;chưaadoptR4/compact. ProdNAamr nguyênbyte,KHÔNGcopyrawmainfontlỗiđè. Sauadopt phải freshreadonly từngnative/allrefs/exactnewSVG. Tiếp583SVG/839sourcefont+552nguồn chưađạt;415explicit+168nonexplicit chưa phânloại.790/777/769/774hash9094 đãđạt đừngtrùng. Giữ mọi literal/atom/geometry/negativehistory/holds/photo-raster/harness167. Mỗi lượt thêm hình thật;toànphạmviđạt mới tíchhợp/tảisẵn/actualoffline/liveverify rồi tắt automation;hiện giữbật.",
+  "tiepTuc": "Ưu tiên giải quyết clipping font thật,giữ thiết kế roundstroke/gaps/metrics. Compact267 bịloại vì dấu Đậm nhỏ/mảnh;khôngco thêmđểép xanh. Dùng actualink visible-hidden đồngpixelphase,khôngsuyCanvasascent=inkloss;R4vẫnBAD12cases. KhôngsửaOTclosure theo giảthuyết stalealias đãbácbỏ. Saufix cần fullatlas/allVN/compoundNFCNFD/CDPnofallback/ε/appsizes/lineheight/latestmain build-speed trướcadopt;chưaadoptR4/compact. ProdNAamr nguyênbyte,KHÔNGcopyrawmainfontlỗiđè. Sauadopt phải freshreadonly từngnative/allrefs/exactnewSVG. Tiếp583SVG/839sourcefont+551nguồn chưađạt;415explicit+168nonexplicit chưa phânloại.796/790/777/769/774hash9094 đãđạt đừngtrùng. Giữ mọi literal/atom/geometry/negativehistory/holds/photo-raster/harness167. Mỗi lượt thêm hình thật;toànphạmviđạt mới tíchhợp/tảisẵn/actualoffline/liveverify rồi tắt automation;hiện giữbật. Đo268chỉbaodấu táchdọc/ngang,khôngglobalimpossibility/khôngva-nétproof. Tìmrepaircóthiếtkếfullstroke/gapsđúng,khônglặpuniformshrinknegative.",
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
     "trangThai": "dang-bat",
@@ -55,14 +55,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 876,
-    "soSvgRieng": 619,
-    "soCauDungHinh": 1240,
-    "soCauDuMoiHinh": 1233,
+    "soAnhNguon": 877,
+    "soSvgRieng": 620,
+    "soCauDungHinh": 1241,
+    "soCauDuMoiHinh": 1234,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 11647026,
-    "byteGzip": 2140486,
-    "soAnhNguonConLai": 552,
+    "byteSvg": 11661476,
+    "byteGzip": 2142887,
+    "soAnhNguonConLai": 551,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -76,8 +76,8 @@
     "nguon": "src/styles/phong-ddh",
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
-    "ghiChu": "1233 câu đủ mọi hình theo bộ trộn snapshot/7 partial;876 nguồn→619SVG;11647026byte/localgzip2140486;552 nguồn chưa đạt. FontNAamr36SVG/37nguồn/62câu đủ;còn583SVG/839nguồn(415explicitDDH+168nonexplicit chưa phânloại). Compact scratch chỉ co đều XY dấu của Ẫ/Ễ/Ỗ, body/hmtx/hhea/OS2 nguyên;20panel freshDOM/SVG giữ roundshape nhưng dấu Đậm quá nhỏ/mảnh=>BỊLOẠI thiết kế,khôngadopt. HB GID494/520/538 đúng cmap/ymax970/offset0;không staleGSUB/ccmpalias hay syntheticbold. Canvasascent KHÔNG actualinkloss: compact16De actualkhôngcắt,compact16Dam mất1inkrow;giữrawhistory/đínhchínhsuydiễn−1/−2. R4exact12cases actualvisible-hidden cùngpixelphase/CDPcustom/exactline-gap-override0% vẫn mất2..4inkrows;khôngđếmemptyrows. Isolatedrealstylesprobe KHÔNGmountedappE2E. Production4WOFF2NAamr35100B/generator/README/app/tests/harness nguyênbyte;R4vàcompactchưaadmitglobal. Khôngarea-filter/copyhmtx/épbox/đổiCSS-mốc-fixture.",
-    "loMoi": "267: currentNAamr36SVG37sources62full;compactnegative/R4actualinkclipHOLDglobal/produnchanged",
+    "ghiChu": "1234 câu đủ mọi hình theo bộ trộn snapshot/7 partial;877 nguồn→620SVG;11661476byte/localgzip2142887;551 nguồn chưa đạt. FontNAamr37SVG/38nguồn/63câu đủ;còn583SVG/839nguồn(415explicitDDH+168nonexplicit chưa phânloại). Đã thực thi CLI đo6glyph R4exacthash bằng BoundsPen extrema,khôngsửa font. Nétnguyênkíchthước:2marksDe139+170=309units/Dam176+190=366units,headroom tới1000chỉ234..258. Xếpbaodấu táchdọc zero-gap cầntop1051..1132;ngang táchbao cầnwidth~765..831soadvance615..757. Đây ràngbuộc riêngbaotách,KHÔNGchứngminh mọiinterleave bấtkhảthi/khôngsuybboxoverlap=inkcollision. Khôngtạocandidateaffine lặpcompact267designnegative;R4actualclipproof267vẫnHOLD. Muốngiữfullstroke màđổiamplitude/spacing cầnsoátmasterdấu cóchủý trêncảfamily,khôngtựclaimgiữthiếtkế bằngcođều. Prod4WOFF2NAamr35100B/README/generator/app/tests/harness nguyênbyte;R4/compact khôngadopt/globaladmit.",
+    "loMoi": "268: currentNAamr37SVG38sources63full;R4actualclipHOLD/compact267negative/produnchanged",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": false,
     "chenhLechMain": {
@@ -100,19 +100,19 @@
     }
   },
   "daDatPhongApp": {
-    "soNguon": 876,
-    "soCauDuHinhVaPhong": 1233,
+    "soNguon": 877,
+    "soCauDuHinhVaPhong": 1234,
     "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới.",
-    "currentFontSelectedSources": 37,
-    "currentFontFullQuestions": 62,
+    "currentFontSelectedSources": 38,
+    "currentFontFullQuestions": 63,
     "currentFontAllSelectedPassed": false
   },
   "loMoiNhat": {
-    "lo": "267",
-    "ketQua": "1233 câu đủ mọi hình theo bộ trộn snapshot/7 partial;876 nguồn→619SVG;11647026byte/localgzip2140486;552 nguồn chưa đạt. FontNAamr36SVG/37nguồn/62câu đủ;còn583SVG/839nguồn(415explicitDDH+168nonexplicit chưa phânloại).",
-    "suaLoi": "Vẽ mới790/hash9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414;SVGd64663a03836cd1ed005ad9cca2b7e9ca88a5cb2aacc50743c5233f653cdbef9/31291B,khép2câu.NativeFULL/amide6x/all2refs/freshactualChromium3x+readonlyexacthashĐạt.3phenyl9doubles/20C6O3N/3HO literal/NO2-NH2-NwithHbelowNO N-Hbond/carbonylsplitTOP2verticalraysNOtopbridge/2RIGHTheads/3italicDDHcaptionsParacetamolcapitalP/noaddedconditions-yield-answer. Khôngcộngfont-only.",
-    "font": "Compact scratch chỉ co đều XY dấu của Ẫ/Ễ/Ỗ, body/hmtx/hhea/OS2 nguyên;20panel freshDOM/SVG giữ roundshape nhưng dấu Đậm quá nhỏ/mảnh=>BỊLOẠI thiết kế,khôngadopt. HB GID494/520/538 đúng cmap/ymax970/offset0;không staleGSUB/ccmpalias hay syntheticbold. Canvasascent KHÔNG actualinkloss: compact16De actualkhôngcắt,compact16Dam mất1inkrow;giữrawhistory/đínhchínhsuydiễn−1/−2. R4exact12cases actualvisible-hidden cùngpixelphase/CDPcustom/exactline-gap-override0% vẫn mất2..4inkrows;khôngđếmemptyrows. Isolatedrealstylesprobe KHÔNGmountedappE2E. Production4WOFF2NAamr35100B/generator/README/app/tests/harness nguyênbyte;R4vàcompactchưaadmitglobal. Khôngarea-filter/copyhmtx/épbox/đổiCSS-mốc-fixture.",
-    "gioiHan": "Maindbe16d617a2bc9a51d8ff2b84085e9487984b41e chưa gộp. Build267/precache170/2613.23KiB/speed21/21/Chromium619/619/hashXMLpathSelfcontained/sourcePNGhash/PythonAST/SW14/14/serverTSC/checkmauđạt CHỈproductionfontcũ/assetgates;KHÔNGbuildfontR4vàoapp. AssetdecodeofflineKHÔNGappreloadoffline. SizeNỀN297644B/SHA6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf/khôngnângmốc. Mainvừađổidbe16d61,màuLATESTMAIN521viPhạm/94checkerfiles(98srcdiff=93app+5fontREADME),khôngsửamàu/apptrong267;497/88cũchỉhistory. Full263nhánh16581/16đỏ-main51116732/5đỏ+8baselinevẫnbắtbuộcxửlý/2commonbrowser26pendingCDN403GIỮhistory,khôngthaylatestmainfulltrướcmerge/release.267chỉbuilder/assets/docs/diagnosticCLI nênkhôngfulllại;fullLATESTMAIN/THEOTÊN/cathi/khôngdeploychồngtrướcmerge-deploybắtbuộc. Khôngđổitest/mốc/harness/appcodeđểchữađo. Chưatíchhợp/chưaactualappoffline/chưapháthành. Chưa tham vấn được cố vấn. Compact267 chỉ diagnostic scratch,khôngproduction/globalfont. Full263 vẫn là history,khôngthay latestmain fullTHEOTÊN trướcmerge/release.",
-    "tiepTheo": "Ưu tiên giải quyết clipping font thật,giữ thiết kế roundstroke/gaps/metrics. Compact267 bịloại vì dấu Đậm nhỏ/mảnh;khôngco thêmđểép xanh. Dùng actualink visible-hidden đồngpixelphase,khôngsuyCanvasascent=inkloss;R4vẫnBAD12cases. KhôngsửaOTclosure theo giảthuyết stalealias đãbácbỏ. Saufix cần fullatlas/allVN/compoundNFCNFD/CDPnofallback/ε/appsizes/lineheight/latestmain build-speed trướcadopt;chưaadoptR4/compact. ProdNAamr nguyênbyte,KHÔNGcopyrawmainfontlỗiđè. Sauadopt phải freshreadonly từngnative/allrefs/exactnewSVG. Tiếp583SVG/839sourcefont+552nguồn chưađạt;415explicit+168nonexplicit chưa phânloại.790/777/769/774hash9094 đãđạt đừngtrùng. Giữ mọi literal/atom/geometry/negativehistory/holds/photo-raster/harness167. Mỗi lượt thêm hình thật;toànphạmviđạt mới tíchhợp/tảisẵn/actualoffline/liveverify rồi tắt automation;hiện giữbật."
+    "lo": "268",
+    "ketQua": "1234 câu đủ mọi hình theo bộ trộn snapshot/7 partial;877 nguồn→620SVG;11661476byte/localgzip2142887;551 nguồn chưa đạt. FontNAamr37SVG/38nguồn/63câu đủ;còn583SVG/839nguồn(415explicitDDH+168nonexplicit chưa phânloại).",
+    "suaLoi": "Vẽ mới796/hash9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f;SVG83112f6998beb54ba55c9f77edf4eb707eaaeb7332e46e0ac0cbfd71b06aa510/14450B,khép1câu. NativeFULL/all1ref/freshactualChromium3x+2COOHmacros/root+readonlyexacthashĐạt.2open18Cchains/36C4O/top2bottom3CCdouble/2COdoublefeet2slopes/nohorizontalbridge/2OHright/freeLEFTends/captionEXACTLinoleic Acid-Linolenic Acid regularupright/noaddedH-nums-XYA-triester-answer. Khôngcộngfont-only.",
+    "font": "Đã thực thi CLI đo6glyph R4exacthash bằng BoundsPen extrema,khôngsửa font. Nétnguyênkíchthước:2marksDe139+170=309units/Dam176+190=366units,headroom tới1000chỉ234..258. Xếpbaodấu táchdọc zero-gap cầntop1051..1132;ngang táchbao cầnwidth~765..831soadvance615..757. Đây ràngbuộc riêngbaotách,KHÔNGchứngminh mọiinterleave bấtkhảthi/khôngsuybboxoverlap=inkcollision. Khôngtạocandidateaffine lặpcompact267designnegative;R4actualclipproof267vẫnHOLD. Muốngiữfullstroke màđổiamplitude/spacing cầnsoátmasterdấu cóchủý trêncảfamily,khôngtựclaimgiữthiếtkế bằngcođều. Prod4WOFF2NAamr35100B/README/generator/app/tests/harness nguyênbyte;R4/compact khôngadopt/globaladmit.",
+    "gioiHan": "Maindbe16d617a2bc9a51d8ff2b84085e9487984b41e chưa gộp. Build268/precache170/2613.23KiB/speed21/21/Chromium620/620/hashXMLpathSelfcontained/sourcePNGhash/PythonAST/SW14/14/serverTSC/checkmauđạt CHỈproductionfontcũ/assetgates;KHÔNGbuildfontR4vàoapp. AssetdecodeofflineKHÔNGappreloadoffline. SizeNỀN297644B/SHA6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf/khôngnângmốc. Mainvừađổidbe16d61,màuLATESTMAIN521viPhạm/94checkerfiles(98srcdiff=93app+5fontREADME),khôngsửamàu/apptrong268;497/88cũchỉhistory. Full263nhánh16581/16đỏ-main51116732/5đỏ+8baselinevẫnbắtbuộcxửlý/2commonbrowser26pendingCDN403GIỮhistory,khôngthaylatestmainfulltrướcmerge/release.268chỉbuilder/assets/docs/diagnosticCLI nênkhôngfulllại;fullLATESTMAIN/THEOTÊN/cathi/khôngdeploychồngtrướcmerge-deploybắtbuộc. Khôngđổitest/mốc/harness/appcodeđểchữađo. Chưatíchhợp/chưaactualappoffline/chưapháthành. Chưa tham vấn được cố vấn. Compact267 chỉ diagnostic scratch,khôngproduction/globalfont. Full263 vẫn là history,khôngthay latestmain fullTHEOTÊN trướcmerge/release. Lô268 thêm1nguồn/1câu;đo6glyphkhôngcandidatefontmới.",
+    "tiepTheo": "Ưu tiên giải quyết clipping font thật,giữ thiết kế roundstroke/gaps/metrics. Compact267 bịloại vì dấu Đậm nhỏ/mảnh;khôngco thêmđểép xanh. Dùng actualink visible-hidden đồngpixelphase,khôngsuyCanvasascent=inkloss;R4vẫnBAD12cases. KhôngsửaOTclosure theo giảthuyết stalealias đãbácbỏ. Saufix cần fullatlas/allVN/compoundNFCNFD/CDPnofallback/ε/appsizes/lineheight/latestmain build-speed trướcadopt;chưaadoptR4/compact. ProdNAamr nguyênbyte,KHÔNGcopyrawmainfontlỗiđè. Sauadopt phải freshreadonly từngnative/allrefs/exactnewSVG. Tiếp583SVG/839sourcefont+551nguồn chưađạt;415explicit+168nonexplicit chưa phânloại.796/790/777/769/774hash9094 đãđạt đừngtrùng. Giữ mọi literal/atom/geometry/negativehistory/holds/photo-raster/harness167. Mỗi lượt thêm hình thật;toànphạmviđạt mới tíchhợp/tảisẵn/actualoffline/liveverify rồi tắt automation;hiện giữbật. Đo268chỉbaodấu táchdọc/ngang,khôngglobalimpossibility/khôngva-nétproof. Tìmrepaircóthiếtkếfullstroke/gapsđúng,khônglặpuniformshrinknegative."
   }
 }
