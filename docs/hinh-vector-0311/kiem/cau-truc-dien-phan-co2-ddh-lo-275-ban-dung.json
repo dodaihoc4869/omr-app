@@ -1,0 +1,29 @@
+[
+  {
+    "i": 866,
+    "hash": "9da19abcde1f9c707fd1cd0b5cdfe5ca10aec06e9d7f3632f6b0ef3e2c39362b",
+    "fileNguon": "anh/9da19abcde1f9c707fd1cd0b5cdfe5ca10aec06e9d7f3632f6b0ef3e2c39362b.png",
+    "svg": "dien-phan-co2-ddh-e0127c0e7242f0b8f86672ec5b8f24a6bb3c6326bd9d64fc25c1f2111eaf2a19.svg",
+    "hashSvg": "e0127c0e7242f0b8f86672ec5b8f24a6bb3c6326bd9d64fc25c1f2111eaf2a19",
+    "byteSvg": 30238,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D5-III-6",
+        "de": "Điện phân khí carbon dioxide trong nước là một cách để tạo ra ethanol. Sơ đồ dưới đây cho thấy một bình điện phân CO₂ – H₂O. Chất điện li được sử dụng trong bình điện phân là dung dịch sodium bicarbonate, NaHCO₃ (aq). Phương trình phản ứng điện phân xảy ra như sau:\n2CO₂(g) + 3H₂O(l) → C₂H₅OH(l) + 3O₂(g).\nMột dòng điện 2,70 A được cho đi qua bình điện phân CO₂ – H₂O. Bình điện phân có hiệu suất 58%.\nTính thời gian cần thiết (theo phút) để bình này tiêu thụ 6,05·10⁻³ mol CO₂(g). (Làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "9da19abcde1f9c707fd1cd0b5cdfe5ca10aec06e9d7f3632f6b0ef3e2c39362b",
+            "where": "12-KT-C5-D5-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "96550298a2a3ebd61b818ebe0c60cf05e1f7b23fc734491b2ef24a46fa22dcca"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2graybars/outeropenbeaker+liquidlevel/openbottomgascollector2sideportends/wireseparatecrossarch/Nguồn+LEFT−RIGHT/CO2(g)LEFTarrow/NaHCO3(aq)/Điện cực graphite-Cu-Zn/2leaderheads/noaddedcharge-gasproducts-voltage-ticks-answer.",
+    "hashSvgDaSoat": "e0127c0e7242f0b8f86672ec5b8f24a6bb3c6326bd9d64fc25c1f2111eaf2a19",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

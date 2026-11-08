@@ -1,0 +1,140 @@
+{
+  "i": 866,
+  "hash": "9da19abcde1f9c707fd1cd0b5cdfe5ca10aec06e9d7f3632f6b0ef3e2c39362b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9da19abcde1f9c707fd1cd0b5cdfe5ca10aec06e9d7f3632f6b0ef3e2c39362b.png",
+  "size": [
+    565,
+    465
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C5-D5-III-6",
+      "de": "Điện phân khí carbon dioxide trong nước là một cách để tạo ra ethanol. Sơ đồ dưới đây cho thấy một bình điện phân CO₂ – H₂O. Chất điện li được sử dụng trong bình điện phân là dung dịch sodium bicarbonate, NaHCO₃ (aq). Phương trình phản ứng điện phân xảy ra như sau:\n2CO₂(g) + 3H₂O(l) → C₂H₅OH(l) + 3O₂(g).\nMột dòng điện 2,70 A được cho đi qua bình điện phân CO₂ – H₂O. Bình điện phân có hiệu suất 58%.\nTính thời gian cần thiết (theo phút) để bình này tiêu thụ 6,05·10⁻³ mol CO₂(g). (Làm tròn kết quả đến hàng phần mười).",
+      "refs": [
+        {
+          "hash": "9da19abcde1f9c707fd1cd0b5cdfe5ca10aec06e9d7f3632f6b0ef3e2c39362b",
+          "where": "12-KT-C5-D5-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "96550298a2a3ebd61b818ebe0c60cf05e1f7b23fc734491b2ef24a46fa22dcca"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+4x/all1publicref actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "cup": "Openrectthinblack pathM178174V412H402V174. Uppermeniscushorizontal y197,x178..402; WHITEinterior aboveandbelow,noliquidfillgradient/particles.",
+    "bars": [
+      {
+        "bounds": [
+          204,
+          134,
+          227,
+          380
+        ],
+        "fill": "flatgray~#aaa withthinwhiteinsetborder x207..224 y138..377"
+      },
+      {
+        "bounds": [
+          337,
+          134,
+          360,
+          380
+        ],
+        "fill": "samegray/whiteinsetborder"
+      }
+    ],
+    "sourceBox": {
+      "rect": [
+        254,
+        53,
+        315,
+        89
+      ],
+      "label": "Nguồn",
+      "bbox": [
+        260,
+        59,
+        308,
+        81
+      ]
+    },
+    "polarity": [
+      {
+        "text": "+",
+        "bbox": [
+          233,
+          52,
+          247,
+          66
+        ]
+      },
+      {
+        "text": "−",
+        "bbox": [
+          327,
+          57,
+          339,
+          65
+        ]
+      }
+    ],
+    "wires": "LEFT M215134V71H254;RIGHT M31571H348V134. Thinblack,upperrightwire crossesgasarch atx348,y102 withoutnode;keepasindependentsourcepaths.",
+    "gasPipe": "Singleoutlinedhood surroundingrightbar:LEFTwall x320,y279..130;arch from(320,130) C320114332102348102 C363102377115377130 V136 H400. SECONDpath from(400,149)H377V279. Openatbottom x320/377,y279,NOhorizbase. Sideportmouth x400,y136/149 (13pxgap),NOverticalclosinglineatmouth. Do not depict2walltubesthickerhood orarrowontoparch.",
+    "inletArrow": "LEFTfilledhead at(402,142),shaftto431,142;tip402,142/back412,136/148. CO2(g)labelright437..488,y135..154.",
+    "leaders": [
+      {
+        "label": "Điện cực\ngraphite",
+        "bbox": [
+          48,
+          243,
+          130,
+          293
+        ],
+        "shaft": [
+          [
+            138,
+            269
+          ],
+          [
+            204,
+            269
+          ]
+        ],
+        "head": "RIGHTfilledsmall at204,269/endbarleftboundary"
+      },
+      {
+        "label": "Điện cực\nCu-Zn",
+        "bbox": [
+          437,
+          265,
+          521,
+          312
+        ],
+        "shaft": [
+          [
+            429,
+            287
+          ],
+          [
+            360,
+            287
+          ]
+        ],
+        "head": "LEFTfilledsmall at360,287/endbarrightboundary"
+      }
+    ],
+    "liquidLabel": {
+      "text": "NaHCO₃(aq)",
+      "bbox": [
+        241,
+        386,
+        333,
+        406
+      ],
+      "style": "uprightformula+parenthesesactualsub3,notnewunitspace"
+    },
+    "counts": "2bars/1cup/1sourcebox/2wires/1openhoodsideport/3filledheads(1gas2leaders)/2polarityglyphs/4textblocksNguồn+2electrodes+electrolyteplusCO2gas=5labels. Noextra gasbubbles/chargeions/arrowdirection/equation/ethanolanswer/coefficients/phaseoutsideactualCO2(g)NaHCO3(aq)."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,topologyandliteralfromsource,nottheory.",
+  "actualSvgReviewed": false
+}
