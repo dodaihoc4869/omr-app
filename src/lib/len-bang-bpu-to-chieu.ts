@@ -11,10 +11,10 @@ export const JS_LEN_BANG_BPU = `
       var nua = d.querySelector('.mc-nua') || d;
       the = document.createElement('header'); the.className = 'mc-em'; the.id = 'em-bpu-' + chiSo(); the.hidden = true;
       the.innerHTML = '<div class="mc-em-trai"><div class="mc-em-hang1"><div class="mc-ten-hang"><span class="mc-ten"></span><span class="mc-dau-kq" hidden></span></div><div class="mc-phu"><span class="mc-sbd"></span></div></div></div>'
-        + (CHAM ? '<div class="mc-cham" data-cham="cho"><button type="button" class="mc-cham-nut" data-kq="1">Đạt</button><button type="button" class="mc-cham-nut" data-kq="0">Chưa đạt</button></div>' : '');
+        + (CHAM ? '<div class="' + CHAM.slice(1) + '" data-cham="cho"><button type="button" class="' + CHAM.slice(1) + '-nut" data-kq="1">Đạt</button><button type="button" class="' + CHAM.slice(1) + '-nut" data-kq="0">Chưa đạt</button></div>' : '');
       nua.insertBefore(the, nua.firstChild);
     }
-    Array.prototype.forEach.call(the.children, function (c) { if (!c.classList.contains('mc-em-trai') && !c.classList.contains('mc-cham')) c.style.display = 'none'; });
+    Array.prototype.forEach.call(the.children, function (c) { if (!c.classList.contains('mc-em-trai') && !(CHAM && c.matches(CHAM))) c.style.display = 'none'; });
     var t = the.querySelector('.mc-ten'); if (t) t.textContent = String(em.ten || em.sbd || '');
     var s = the.querySelector('.mc-sbd'); if (s) s.textContent = String(em.sbd || '');
     var cs = the.querySelector('.mc-cau-so'); if (cs) cs.style.display = 'none';
@@ -23,7 +23,7 @@ export const JS_LEN_BANG_BPU = `
     if (window.__mcLenBang) window.__mcLenBang();
   }
   document.addEventListener('click', function (e) {
-    var n = S.bpuLen && e.target && e.target.closest ? e.target.closest('.mc-cham-nut') : null;
+    var n = S.bpuLen && CHAM && e.target && e.target.closest ? e.target.closest(CHAM + '-nut') : null;
     if (!n) return;
     e.preventDefault(); e.stopPropagation(); cham(n.getAttribute('data-kq') === '1');
   }, true);
