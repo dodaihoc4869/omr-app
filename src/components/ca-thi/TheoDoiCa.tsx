@@ -83,21 +83,6 @@ const NHAN_TT: Record<TrangThaiEmTd, string> = { dang_lam: 'n-xd', da_nop: 'n-xl
 
 type Loc = 'tat_ca' | 'canh_bao' | 'chua_vao' | 'da_nop' | 'dang_lam'
 
-/** Giây còn lại tới `hetLucMs`, nhích mỗi giây theo giờ máy chủ. `hetLucMs` undefined ⇒ không chạy (dùng `conGiay` của màn cha). */
-function useGiayCon(hetLucMs: number | null | undefined): number | null | undefined {
-  const [bay, setBay] = useState(() => gioMayChu())
-  const chay = typeof hetLucMs === 'number'
-  useEffect(() => {
-    if (!chay) return
-    setBay(gioMayChu())
-    const t = setInterval(() => setBay(gioMayChu()), 1000)
-    return () => clearInterval(t)
-  }, [chay])
-  if (hetLucMs === undefined) return undefined
-  if (hetLucMs === null) return null
-  return Math.floor((hetLucMs - bay) / 1000)
-}
-
 /** Giờ máy chủ nhích mỗi giây (chỉ chạy khi có đồng hồ riêng cần vẽ). */
 function useBay(chay: boolean): number {
   const [bay, setBay] = useState(() => gioMayChu())
@@ -121,8 +106,9 @@ export default function TheoDoiCa(p: TheoDoiCaProps) {
     void layLichSu(maCa).then((d) => { if (!huy && d) setLichSu(d) }).catch(() => {})
     return () => { huy = true }
   }, [layLichSu, maCa, p.em.length]) // đọc lại khi số em đổi (em mới vào có câu trong ca)
-  const giayTuDem = useGiayCon(p.hetLucMs)
-  const bayMs = useBay(p.em.some((e) => e.tt === 'dang_lam' && typeof e.hetLucMs === 'number'))
+  // MỘT vòng 1 s cho cả đồng hồ vòng «phút còn lại» (29/09) lẫn đồng hồ riêng từng em (08/11) — theo gioMayChu(), không gọi máy chủ.
+  const bayMs = useBay(typeof p.hetLucMs === 'number' || p.em.some((e) => e.tt === 'dang_lam' && typeof e.hetLucMs === 'number'))
+  const giayTuDem = p.hetLucMs === undefined ? undefined : p.hetLucMs === null ? null : Math.floor((p.hetLucMs - bayMs) / 1000)
   const conGiay = giayTuDem === undefined ? p.conGiay : giayTuDem
   const dangLam = p.em.filter((e) => e.tt === 'dang_lam')
   const daNop = p.em.filter((e) => e.tt === 'da_nop' || e.tt === 'khoa')
