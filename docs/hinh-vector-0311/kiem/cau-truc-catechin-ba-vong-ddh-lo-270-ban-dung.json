@@ -1,0 +1,29 @@
+[
+  {
+    "i": 812,
+    "hash": "9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8",
+    "fileNguon": "anh/9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8.png",
+    "svg": "catechin-ba-vong-ddh-7e8fe0eb80284de6551b98724192aaa2b7a7591e6c61a58d35b29b91e7285db7.svg",
+    "hashSvg": "7e8fe0eb80284de6551b98724192aaa2b7a7591e6c61a58d35b29b91e7285db7",
+    "byteSvg": 6158,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C5-B21-II-3",
+        "de": "Catechin là một chất kháng oxi hoá mạnh, ức chế hoạt động của các gốc tự do nên có khả năng phòng chống bệnh ung thư, nhồi máu cơ tim. Trong lá chè tươi, catechin chiếm khoảng 25 – 35% tổng trọng lượng khô.\nCông thức cấu tạo của catechin cho như dưới đây:",
+        "refs": [
+          {
+            "hash": "9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8",
+            "where": "11-C5-B21-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "6d425f58fbfb8500b193a18d84cc3e750b1cc04802df7036bf0e3100bc43832c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "15C6O/2phenyl6innerdoubles/1ether6memberringfusedleft/5OH1literalHO4OH/2sharedvertices/ALLthinuniform/noH-stereo-wedge-charges-caption-answer.",
+    "hashSvgDaSoat": "7e8fe0eb80284de6551b98724192aaa2b7a7591e6c61a58d35b29b91e7285db7",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

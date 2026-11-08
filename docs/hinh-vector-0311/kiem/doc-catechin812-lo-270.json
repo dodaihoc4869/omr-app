@@ -1,0 +1,259 @@
+{
+  "i": 812,
+  "hash": "9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8.png",
+  "size": [
+    651,
+    393
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C5-B21-II-3",
+      "de": "Catechin là một chất kháng oxi hoá mạnh, ức chế hoạt động của các gốc tự do nên có khả năng phòng chống bệnh ung thư, nhồi máu cơ tim. Trong lá chè tươi, catechin chiếm khoảng 25 – 35% tổng trọng lượng khô.\nCông thức cấu tạo của catechin cho như dưới đây:",
+      "refs": [
+        {
+          "hash": "9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8",
+          "where": "11-C5-B21-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "6d425f58fbfb8500b193a18d84cc3e750b1cc04802df7036bf0e3100bc43832c"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x/all1ref actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "leftPhenylVertices": [
+      [
+        122,
+        182
+      ],
+      [
+        180,
+        149
+      ],
+      [
+        239,
+        182
+      ],
+      [
+        239,
+        250
+      ],
+      [
+        180,
+        283
+      ],
+      [
+        122,
+        250
+      ]
+    ],
+    "leftInnerDoubles": [
+      [
+        [
+          130,
+          188
+        ],
+        [
+          130,
+          245
+        ]
+      ],
+      [
+        [
+          181,
+          157
+        ],
+        [
+          230,
+          186
+        ]
+      ],
+      [
+        [
+          181,
+          274
+        ],
+        [
+          230,
+          245
+        ]
+      ]
+    ],
+    "heteroRing": "Sharededge239,182→239,250; after239,250→297,283→356,250→356,182; then356,182→311,157; gapOcenter297,152; Oleftgap284,157→239,182. No otherdouble.",
+    "rightPhenylVertices": [
+      [
+        415,
+        81
+      ],
+      [
+        473,
+        47
+      ],
+      [
+        532,
+        81
+      ],
+      [
+        532,
+        149
+      ],
+      [
+        473,
+        182
+      ],
+      [
+        415,
+        149
+      ]
+    ],
+    "rightInnerDoubles": [
+      [
+        [
+          423,
+          85
+        ],
+        [
+          473,
+          56
+        ]
+      ],
+      [
+        [
+          524,
+          87
+        ],
+        [
+          524,
+          143
+        ]
+      ],
+      [
+        [
+          423,
+          144
+        ],
+        [
+          473,
+          174
+        ]
+      ]
+    ],
+    "connectingBond": [
+      [
+        356,
+        182
+      ],
+      [
+        415,
+        149
+      ]
+    ],
+    "OHlabels": [
+      {
+        "text": "HO",
+        "bbox": [
+          33,
+          140,
+          74,
+          166
+        ],
+        "bond": [
+          [
+            122,
+            182
+          ],
+          [
+            77,
+            157
+          ]
+        ],
+        "anchor": "Oatright"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          169,
+          344,
+          210,
+          368
+        ],
+        "bond": [
+          [
+            180,
+            283
+          ],
+          [
+            180,
+            338
+          ]
+        ],
+        "anchor": "Oleft;verticalnear180"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          405,
+          276,
+          446,
+          301
+        ],
+        "bond": [
+          [
+            356,
+            250
+          ],
+          [
+            402,
+            277
+          ]
+        ],
+        "anchor": "Oleft"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          579,
+          39,
+          621,
+          63
+        ],
+        "bond": [
+          [
+            532,
+            81
+          ],
+          [
+            576,
+            55
+          ]
+        ],
+        "anchor": "Oleft"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          579,
+          174,
+          621,
+          199
+        ],
+        "bond": [
+          [
+            532,
+            149
+          ],
+          [
+            576,
+            175
+          ]
+        ],
+        "anchor": "Oleft"
+      }
+    ],
+    "counts": "15C6O=2phenyl12C+centralheteroring3newC1O+5OH. 6phenylinnerdoubles,5freeOH(1HO+4OH),1etherO. NoexplicitH/CH2 labels/stereo/wedges/charge/circle/carbonnums/arrows/caption/name added.",
+    "style": "Allblackuniformthinbond,notaper/bold. ClearnoStereo inbitmap even ifnamedcatechin."
+  },
+  "coordinateMeaning": "Nativepixel approximate1–2px, notinferstereochemistryfromname.",
+  "actualSvgReviewed": false
+}

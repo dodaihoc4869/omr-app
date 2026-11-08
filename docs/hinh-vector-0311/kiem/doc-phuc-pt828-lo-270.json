@@ -1,0 +1,262 @@
+{
+  "i": 828,
+  "hash": "994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e.png",
+  "size": [
+    1042,
+    251
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C8-B27-II-20",
+      "de": "Cho sơ đồ chuyển hoá sau: Biết rằng X, Y, Z đều là các phức chất vuông phẳng, đơn nhân.",
+      "refs": [
+        {
+          "hash": "994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e",
+          "where": "12-C8-B27-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "4370ec082b35f8dbeb93b41e238571afadf75de61ed00a9d6709c00192f055a1"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x+hashedbonds8x/all1publicref thựcđọc;source-only chưaSVG/chưaĐạt.",
+  "coordinateMeaning": "Pixelnativeapprox1–2px, exactliteral charge/conditionsnoanswer.",
+  "geometry": {
+    "labels": [
+      {
+        "text": "2K⁺",
+        "bbox": [
+          30,
+          115,
+          95,
+          154
+        ],
+        "note": "2baseline/Kbaseline/plussup,not2sup"
+      },
+      {
+        "text": "Pt",
+        "bbox": [
+          220,
+          112,
+          254,
+          143
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          126,
+          64,
+          160,
+          94
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          301,
+          64,
+          335,
+          94
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          126,
+          161,
+          160,
+          191
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          301,
+          162,
+          336,
+          193
+        ]
+      },
+      {
+        "text": "2−",
+        "bbox": [
+          360,
+          42,
+          408,
+          76
+        ],
+        "note": "whole2minusSUPoutsideupperrightbracket;nochargeonPtseparately"
+      },
+      {
+        "text": "X",
+        "bbox": [
+          574,
+          118,
+          606,
+          151
+        ]
+      },
+      {
+        "text": "Y",
+        "bbox": [
+          766,
+          118,
+          799,
+          151
+        ]
+      },
+      {
+        "text": "Z",
+        "bbox": [
+          957,
+          117,
+          985,
+          151
+        ]
+      }
+    ],
+    "brackets": "Leftsquare M126 56 H103 V207 H126;right M328 56 H351 V207 H328. No parenthesis.",
+    "bondStyle": "TwoTOPhashedwedges: tinynearCl broadnearPt. SIXvisible shortverticalhashbars perarm (macro8x) nofullshaft. Left roughlyx163,174,183,193,203,213 fromy86→116 withheightgrowing2→14px. Rightroughlyx254,263,272,280,289,297 fromy115→86 decreasingheight14→2px. Keep6perarm andgaps,notdotsorordinarydashedstroke.",
+    "bottomWedges": "Twofilledtriangles narrowPtend(215,143) toleftClend(163,163..179);narrowPtend(254,143) torightClend(295,162..178). Grayblackfill thinborder;do notswitchtaperdirection.",
+    "arrows": [
+      {
+        "shaft": [
+          [
+            424,
+            135
+          ],
+          [
+            553,
+            135
+          ]
+        ],
+        "openVhead": [
+          [
+            540,
+            125
+          ],
+          [
+            553,
+            135
+          ],
+          [
+            540,
+            145
+          ]
+        ],
+        "above": {
+          "text": "+4KI",
+          "bbox": [
+            456,
+            104,
+            523,
+            129
+          ]
+        },
+        "below": {
+          "text": "−4KCl",
+          "bbox": [
+            449,
+            141,
+            530,
+            162
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            624,
+            135
+          ],
+          [
+            744,
+            135
+          ]
+        ],
+        "openVhead": [
+          [
+            731,
+            125
+          ],
+          [
+            744,
+            135
+          ],
+          [
+            731,
+            145
+          ]
+        ],
+        "above": {
+          "text": "+NH₃",
+          "bbox": [
+            649,
+            105,
+            718,
+            129
+          ]
+        },
+        "below": {
+          "text": "−KI",
+          "bbox": [
+            661,
+            142,
+            709,
+            162
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            817,
+            135
+          ],
+          [
+            937,
+            135
+          ]
+        ],
+        "openVhead": [
+          [
+            924,
+            125
+          ],
+          [
+            937,
+            135
+          ],
+          [
+            924,
+            145
+          ]
+        ],
+        "above": {
+          "text": "+NH₃",
+          "bbox": [
+            842,
+            105,
+            911,
+            129
+          ]
+        },
+        "below": {
+          "text": "−KI",
+          "bbox": [
+            854,
+            142,
+            902,
+            162
+          ]
+        }
+      }
+    ],
+    "counts": "1Pt4Cl/2Kplus/outsidebracket2minus/2hashedwedges6barsEACH/2solidwedges/3RIGHTheads/3conditionsabove3below/X-Y-Zliteral. NOX/Y/Zstructures/answer/name/temperature/phase/captionadded.",
+    "literalSpacing": "Source+4KI/+NH3 hasleadingplus andsub3;minusbelowtruehorizontalminusnothyphenanswer;KClcaseupperKupperClowerl."
+  },
+  "macro": "/workspace/scratch/828-hashbonds8x.png",
+  "actualSvgReviewed": false
+}

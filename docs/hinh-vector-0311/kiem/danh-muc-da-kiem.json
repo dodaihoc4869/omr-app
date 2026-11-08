@@ -370,6 +370,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e": {
+      "tep": "phuc-pt-the-phoi-tu-ddh-0920af4840592299c53f98453b80350b9952c1bb3c71f2af345c6bcd03a4919e.svg",
+      "hashSvg": "0920af4840592299c53f98453b80350b9952c1bb3c71f2af345c6bcd03a4919e",
+      "byteSvg": 19393,
+      "byteGzip": 3392,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1b189161b82c399be4bb62c21e07b5aafee4038b0d20d6e049d48625e71892dc": {
       "tep": "do-thi-ddh-a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1.svg",
       "hashSvg": "a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1",
@@ -7840,6 +7849,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8": {
+      "tep": "catechin-ba-vong-ddh-7e8fe0eb80284de6551b98724192aaa2b7a7591e6c61a58d35b29b91e7285db7.svg",
+      "hashSvg": "7e8fe0eb80284de6551b98724192aaa2b7a7591e6c61a58d35b29b91e7285db7",
+      "byteSvg": 6158,
+      "byteGzip": 902,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "191e393a1cdd66f1cd8111cf5aff22e40b6e54101839a1ee995034b4fe6c1577": {
       "tep": "zn-cu-khoa-x-ddh-d5fb047a577a2495d0f8ab9834851451399b97b4ed5921b06f74383564773731.svg",
       "hashSvg": "d5fb047a577a2495d0f8ab9834851451399b97b4ed5921b06f74383564773731",
@@ -8929,6 +8947,20 @@
           "where": "11-C5-B21-I-15.hinh.3.du_lieu",
           "hashDataUrl": "689a49fa123b87e90f25fae25780ed3d54bfcc85ed6bfd30cea5fa63904c8d46",
           "vector": "cau-truc-ddh-70f08a6163f5ae346f12b72267643ce1044ff9f3abe25d3a3fe98f7100be6f0b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C5-B21-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9671112ca6ba5c48ea8dce8e5085edefab75c53865271acb72340cf19718ebf8",
+          "where": "11-C5-B21-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "6d425f58fbfb8500b193a18d84cc3e750b1cc04802df7036bf0e3100bc43832c",
+          "vector": "catechin-ba-vong-ddh-7e8fe0eb80284de6551b98724192aaa2b7a7591e6c61a58d35b29b91e7285db7.svg"
         }
       ]
     },
@@ -12589,6 +12621,20 @@
           "where": "12-C7-B24-I-31.hinh.0.du_lieu",
           "hashDataUrl": "bcda394609cbcf8e7a34fdbac6ab0260676093078cd4781eb1e42b9d934cc04a",
           "vector": "hoa-ddh-d2c1da52c4c531a9b64dfcd835a329d3064b40c3e2a4e48e6cae0deba0da8336.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C8-B27-II-20",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e",
+          "where": "12-C8-B27-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "4370ec082b35f8dbeb93b41e238571afadf75de61ed00a9d6709c00192f055a1",
+          "vector": "phuc-pt-the-phoi-tu-ddh-0920af4840592299c53f98453b80350b9952c1bb3c71f2af345c6bcd03a4919e.svg"
         }
       ]
     },
@@ -27644,6 +27690,7 @@
     "11-C5-B21-I-1",
     "11-C5-B21-I-7",
     "11-C5-B21-I-15",
+    "11-C5-B21-II-3",
     "11-C5-B21-III-4",
     "11-C4-ON-I-9",
     "11-C6-B24-I-1",
@@ -27881,6 +27928,7 @@
     "12-C6-B20-III-1",
     "12-C6-B19-II-14",
     "12-C7-B24-I-31",
+    "12-C8-B27-II-20",
     "12-KT-C1-D1-I-16",
     "12-KT-C1-D1-II-4",
     "12-KT-C1-D2-I-2",

@@ -1,0 +1,29 @@
+[
+  {
+    "i": 828,
+    "hash": "994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e",
+    "fileNguon": "anh/994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e.png",
+    "svg": "phuc-pt-the-phoi-tu-ddh-0920af4840592299c53f98453b80350b9952c1bb3c71f2af345c6bcd03a4919e.svg",
+    "hashSvg": "0920af4840592299c53f98453b80350b9952c1bb3c71f2af345c6bcd03a4919e",
+    "byteSvg": 19393,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C8-B27-II-20",
+        "de": "Cho sơ đồ chuyển hoá sau: Biết rằng X, Y, Z đều là các phức chất vuông phẳng, đơn nhân.",
+        "refs": [
+          {
+            "hash": "994ff4344ca92b36d98495759c99d8aa65f045eb940b426baa790e98a451cc0e",
+            "where": "12-C8-B27-II-20.hinh.0.du_lieu",
+            "hashDataUrl": "4370ec082b35f8dbeb93b41e238571afadf75de61ed00a9d6709c00192f055a1"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2Ksup+squarePtCl4sup2minus/2TOPhashedwedges6barseachNOfullshaft/taperbroadPt/2BOTTOMsolidwedgesnarrowPt/3openVRIGHTarrowheads/+4KI−4KCl;+NH3−KI;+NH3−KI/X-Y-Zliteral/noaddedproducts-answer-temperature-phase.",
+    "hashSvgDaSoat": "0920af4840592299c53f98453b80350b9952c1bb3c71f2af345c6bcd03a4919e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
