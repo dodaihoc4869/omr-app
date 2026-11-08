@@ -1,0 +1,40 @@
+[
+  {
+    "i": 915,
+    "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+    "fileNguon": "anh/a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8.png",
+    "svg": "bohr-aluminium915-ddh-7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e.svg",
+    "hashSvg": "7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e",
+    "byteSvg": 2537,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D1-I-32",
+        "de": "Cho cấu trúc nguyên tử aluminium theo mô hình Rutherford – Bohr như sau:\nLớp ngoài cùng của nguyên tử aluminium có bao nhiêu electron?",
+        "refs": [
+          {
+            "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+            "where": "10-C1-B3-D1-I-32.hinh.0.du_lieu",
+            "hashDataUrl": "1ca667596769039752c7f5c4b12a93b9efff8ccd58eca82a55d5de24569aa436"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-I-87",
+        "de": "Cho cấu trúc nguyên tử aluminium theo mô hình Rutherford – Bohr như sau:\nLớp ngoài cùng của nguyên tử aluminium có bao nhiêu electron?",
+        "refs": [
+          {
+            "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+            "where": "DB-10-B1-D1-I-87.hinh.0.du_lieu",
+            "hashDataUrl": "1ca667596769039752c7f5c4b12a93b9efff8ccd58eca82a55d5de24569aa436"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "RIÊNGsource915notalias540352/3continuousorbits13orangedots2-8-3literalcoords/outerTOPLEFTBOTTOMnoRIGHT/1bluecore+13brownactualdam/noaddedlayernums-KLM-name-arrow-answer.",
+    "hashSvgDaSoat": "7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

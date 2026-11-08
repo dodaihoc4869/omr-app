@@ -1,0 +1,189 @@
+{
+  "i": 913,
+  "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb.png",
+  "size": [
+    1082,
+    195
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C123-D1-II-2",
+      "de": "Hydrocarbon là nguồn nguyên liệu trong tổng hợp hữu cơ. Một trong các chuyển hoá hydrocarbon được biết đến là quá trình sản xuất xà phòng từ hydrocarbon no, mạch dài không phân nhánh. Quá trình được mô tả theo sơ đồ ở hình dưới.",
+      "refs": [
+        {
+          "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+          "where": "12-KT-C123-D1-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "ac1ee65965500d22624f9286cc878eb2feee391e8f53add28e45ddfc467c99f8"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-II-136",
+      "de": "Hydrocarbon là nguồn nguyên liệu trong tổng hợp hữu cơ. Một trong các chuyển hoá hydrocarbon được biết đến là quá trình sản xuất xà phòng từ hydrocarbon no, mạch dài không phân nhánh. Quá trình được mô tả theo sơ đồ ở hình dưới.",
+      "refs": [
+        {
+          "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+          "where": "DB-12-B2-D1-II-136.hinh.0.du_lieu",
+          "hashDataUrl": "ac1ee65965500d22624f9286cc878eb2feee391e8f53add28e45ddfc467c99f8"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x/all2publicrefs actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "formulas": [
+      {
+        "text": "R-CH₂-CH₂-R",
+        "bbox": [
+          50,
+          72,
+          229,
+          99
+        ]
+      },
+      {
+        "text": "R-COOH",
+        "bbox": [
+          383,
+          72,
+          503,
+          99
+        ]
+      },
+      {
+        "text": "R-COONa",
+        "bbox": [
+          671,
+          72,
+          806,
+          99
+        ]
+      }
+    ],
+    "caption": {
+      "text": "(sodium stearate)",
+      "bbox": [
+        818,
+        72,
+        1031,
+        101
+      ],
+      "style": "regularuprightlowercase,inlinewithfinalformula,noseparatebelowcaption"
+    },
+    "arrows": [
+      {
+        "shaft": [
+          [
+            249,
+            86
+          ],
+          [
+            377,
+            86
+          ]
+        ],
+        "openVhead": [
+          [
+            367,
+            79
+          ],
+          [
+            377,
+            86
+          ],
+          [
+            367,
+            94
+          ]
+        ],
+        "above": {
+          "text": "+ O₂ /xt",
+          "bbox": [
+            281,
+            63,
+            344,
+            80
+          ],
+          "note": "actualsub2,slashbeforext;noaddedtemp"
+        },
+        "below": {
+          "text": "-H₂O",
+          "bbox": [
+            293,
+            93,
+            335,
+            114
+          ]
+        },
+        "index": {
+          "text": "(1)",
+          "bbox": [
+            301,
+            125,
+            331,
+            147
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            523,
+            86
+          ],
+          [
+            657,
+            86
+          ]
+        ],
+        "openVhead": [
+          [
+            647,
+            79
+          ],
+          [
+            657,
+            86
+          ],
+          [
+            647,
+            94
+          ]
+        ],
+        "above": {
+          "text": "+ NaOH",
+          "bbox": [
+            554,
+            63,
+            624,
+            83
+          ]
+        },
+        "below": {
+          "text": "-H₂O",
+          "bbox": [
+            568,
+            93,
+            611,
+            114
+          ]
+        },
+        "index": {
+          "text": "(2)",
+          "bbox": [
+            582,
+            125,
+            612,
+            147
+          ]
+        }
+      }
+    ],
+    "counts": "3condensedRformulas/2RIGHTheadsopenV/2aboveconditions2belowwaterremoval2indices/1inlineparentheticalcaption. Noexpandedbonds/carbonchain/Rvalue/phase/yield/temperature/answeradded.",
+    "style": "Allregularuprightserifsource→DDHregular,hyphenbetweenR-CH2...literalkept;water2sub/O2sub."
+  },
+  "coordinateMeaning": "Nativepixelsapprox1–2px,literalnotstoichiometrynormalization.",
+  "actualSvgReviewed": false
+}

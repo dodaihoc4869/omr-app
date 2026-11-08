@@ -1,0 +1,40 @@
+[
+  {
+    "i": 913,
+    "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+    "fileNguon": "anh/a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb.png",
+    "svg": "hydrocarbon-xa-phong-ddh-775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65.svg",
+    "hashSvg": "775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65",
+    "byteSvg": 33462,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D1-II-2",
+        "de": "Hydrocarbon là nguồn nguyên liệu trong tổng hợp hữu cơ. Một trong các chuyển hoá hydrocarbon được biết đến là quá trình sản xuất xà phòng từ hydrocarbon no, mạch dài không phân nhánh. Quá trình được mô tả theo sơ đồ ở hình dưới.",
+        "refs": [
+          {
+            "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+            "where": "12-KT-C123-D1-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "ac1ee65965500d22624f9286cc878eb2feee391e8f53add28e45ddfc467c99f8"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B2-D1-II-136",
+        "de": "Hydrocarbon là nguồn nguyên liệu trong tổng hợp hữu cơ. Một trong các chuyển hoá hydrocarbon được biết đến là quá trình sản xuất xà phòng từ hydrocarbon no, mạch dài không phân nhánh. Quá trình được mô tả theo sơ đồ ở hình dưới.",
+        "refs": [
+          {
+            "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+            "where": "DB-12-B2-D1-II-136.hinh.0.du_lieu",
+            "hashDataUrl": "ac1ee65965500d22624f9286cc878eb2feee391e8f53add28e45ddfc467c99f8"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3condensedRformulasR-CH2-CH2-R→R-COOH→R-COONa/2RIGHTopenVheads/+O2slashxt/+NaOH/2minusH2O/indices1-2/inline(sodium stearate)regularcase/noaddedRvalue-expandedbonds-temp-phase-yield-answer.",
+    "hashSvgDaSoat": "775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,159 @@
+{
+  "i": 915,
+  "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8.png",
+  "size": [
+    352,
+    352
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "10-C1-B3-D1-I-32",
+      "de": "Cho cấu trúc nguyên tử aluminium theo mô hình Rutherford – Bohr như sau:\nLớp ngoài cùng của nguyên tử aluminium có bao nhiêu electron?",
+      "refs": [
+        {
+          "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+          "where": "10-C1-B3-D1-I-32.hinh.0.du_lieu",
+          "hashDataUrl": "1ca667596769039752c7f5c4b12a93b9efff8ccd58eca82a55d5de24569aa436"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-I-87",
+      "de": "Cho cấu trúc nguyên tử aluminium theo mô hình Rutherford – Bohr như sau:\nLớp ngoài cùng của nguyên tử aluminium có bao nhiêu electron?",
+      "refs": [
+        {
+          "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+          "where": "DB-10-B1-D1-I-87.hinh.0.du_lieu",
+          "hashDataUrl": "1ca667596769039752c7f5c4b12a93b9efff8ccd58eca82a55d5de24569aa436"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+4x/all2publicrefs actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "orbits": [
+      {
+        "center": [
+          177,
+          179
+        ],
+        "radii": [
+          53,
+          53
+        ]
+      },
+      {
+        "center": [
+          177,
+          179
+        ],
+        "radii": [
+          91,
+          91
+        ]
+      },
+      {
+        "center": [
+          177,
+          179
+        ],
+        "radii": [
+          132,
+          132
+        ]
+      }
+    ],
+    "orbitNote": "Threecontinuouscircleoutlinesorangebrown;coveredbydots. Scanroughedges notextrashells.",
+    "nucleus": {
+      "center": [
+        175,
+        179
+      ],
+      "radius": 29,
+      "fill": "flatlightblueapprox#9ebaff",
+      "label": "+13",
+      "labelBBox": [
+        157,
+        169,
+        193,
+        191
+      ],
+      "style": "boldserifsourcebrown text;colorapprox#916f4c;onlyliteralplus13(nocharge2+)"
+    },
+    "electronsByOrbit": [
+      {
+        "layer": "inner",
+        "centers": [
+          [
+            176,
+            128
+          ],
+          [
+            178,
+            231
+          ]
+        ]
+      },
+      {
+        "layer": "middle",
+        "centers": [
+          [
+            140,
+            98
+          ],
+          [
+            221,
+            101
+          ],
+          [
+            263,
+            144
+          ],
+          [
+            263,
+            211
+          ],
+          [
+            228,
+            253
+          ],
+          [
+            146,
+            261
+          ],
+          [
+            99,
+            223
+          ],
+          [
+            91,
+            151
+          ]
+        ]
+      },
+      {
+        "layer": "outer",
+        "centers": [
+          [
+            178,
+            47
+          ],
+          [
+            46,
+            183
+          ],
+          [
+            179,
+            310
+          ]
+        ]
+      }
+    ],
+    "dotStyle": "13solidflatORANGEdotsradius~8pixels;allNOminus/letter/electronlabels;slighttangentialscanjitter preserve centers notforceevenangulardistribution.",
+    "counts": "3orbits/13dots=2inner8middle3outer TOP-LEFT-BOTTOM,1bluecore+13. NOextraouterRIGHTdot/arrow/orbitnumbers/KLM/elementname/answercaption."
+  },
+  "coordinateMeaning": "Nativepixelapprox1px;dotcountdirectsource notaluminiumtheory.",
+  "actualSvgReviewed": false
+}

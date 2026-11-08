@@ -2557,6 +2557,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8": {
+      "tep": "bohr-aluminium915-ddh-7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e.svg",
+      "hashSvg": "7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e",
+      "byteSvg": 2537,
+      "byteGzip": 1008,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "30909a372d49d0206fbdd1efe07eb82921267cb477ff5353ca50ddd44e1c7c03": {
       "tep": "haber-bosch-ddh-b652dbc372ef9e48f8f922e893128073cfe92760614cf523b0ae3b5bcc20b41b.svg",
       "hashSvg": "b652dbc372ef9e48f8f922e893128073cfe92760614cf523b0ae3b5bcc20b41b",
@@ -7552,6 +7561,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb": {
+      "tep": "hydrocarbon-xa-phong-ddh-775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65.svg",
+      "hashSvg": "775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65",
+      "byteSvg": 33462,
+      "byteGzip": 5444,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "b90f29e283875fec0b797036b9658e406a9e95c78cca602647f715d75508ae77": {
       "tep": "pie-3d-ddh-06d325720a9390024bdfdd289be721da73d211e5974cc9f51fbf85d9a365a911.svg",
       "hashSvg": "06d325720a9390024bdfdd289be721da73d211e5974cc9f51fbf85d9a365a911",
@@ -8331,6 +8349,20 @@
           "where": "10-C1-B2-III-26.hinh.0.du_lieu",
           "hashDataUrl": "49a41de825bda3bbbd40b76d5ca534007f6b87621d17fc10d27811148e88a8a1",
           "vector": "ms-ddh-fdfc619e1fa023fc60aed9551b1d9669caaffb2ac06b12e7cf9a8639bfa4f19e.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B3-D1-I-32",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+          "where": "10-C1-B3-D1-I-32.hinh.0.du_lieu",
+          "hashDataUrl": "1ca667596769039752c7f5c4b12a93b9efff8ccd58eca82a55d5de24569aa436",
+          "vector": "bohr-aluminium915-ddh-7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e.svg"
         }
       ]
     },
@@ -13265,6 +13297,20 @@
       ]
     },
     {
+      "qid": "12-KT-C123-D1-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+          "where": "12-KT-C123-D1-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "ac1ee65965500d22624f9286cc878eb2feee391e8f53add28e45ddfc467c99f8",
+          "vector": "hydrocarbon-xa-phong-ddh-775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C123-D1-II-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -15129,6 +15175,20 @@
           "where": "DB-10-B1-D1-I-80.hinh.0.du_lieu",
           "hashDataUrl": "8b80d2bcf86c95c3584fae34b2e1bc81f2c5b4bd96d5020feeae10915bf9a642",
           "vector": "nguyen-tu-ddh-1e02356d541eef05973c6bdd7667cf644fbd2ad75af1271d1f1c7293c13f100f.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-I-87",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8",
+          "where": "DB-10-B1-D1-I-87.hinh.0.du_lieu",
+          "hashDataUrl": "1ca667596769039752c7f5c4b12a93b9efff8ccd58eca82a55d5de24569aa436",
+          "vector": "bohr-aluminium915-ddh-7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e.svg"
         }
       ]
     },
@@ -17705,6 +17765,20 @@
           "where": "DB-12-B2-D1-III-134.hinh.0.du_lieu",
           "hashDataUrl": "8501df8b951b3c4529016dc345967a7762ee4c0bc52c01fb6c82bda6050b7b14",
           "vector": "hinh-ddh-a16ff5ba57e72aa796bb153bca0319088fbfbce43428511681d8e40c80d80a4b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B2-D1-II-136",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a69caf8ed6c927cbdb21bdbfcdc4310e4e626db23ebc68d03a014db2748941cb",
+          "where": "DB-12-B2-D1-II-136.hinh.0.du_lieu",
+          "hashDataUrl": "ac1ee65965500d22624f9286cc878eb2feee391e8f53add28e45ddfc467c99f8",
+          "vector": "hydrocarbon-xa-phong-ddh-775d1ea80950e42f399d44432e834358a9e0d1b5ce607dec792cc25117e34c65.svg"
         }
       ]
     },
@@ -27907,6 +27981,7 @@
     "10-C1-B2-III-16",
     "10-C1-B2-III-24",
     "10-C1-B2-III-26",
+    "10-C1-B3-D1-I-32",
     "10-C1-B3-D1-I-33",
     "10-C1-B3-D1-I-62",
     "10-C1-B3-D2-I-2",
@@ -28218,6 +28293,7 @@
     "12-KT-C12-D2-III-4",
     "12-KT-C123-D1-I-1",
     "12-KT-C123-D1-I-5",
+    "12-KT-C123-D1-II-2",
     "12-KT-C123-D1-II-3",
     "12-KT-C123-D1-III-5",
     "12-KT-C123-D2-I-2",
@@ -28339,6 +28415,7 @@
     "DB-10-B1-D1-II-58",
     "DB-10-B1-D1-III-77",
     "DB-10-B1-D1-I-80",
+    "DB-10-B1-D1-I-87",
     "DB-10-B1-D1-I-95",
     "DB-10-B1-D1-I-96",
     "DB-10-B1-D1-II-99",
@@ -28494,6 +28571,7 @@
     "DB-12-B2-D1-II-128",
     "DB-12-B2-D1-III-129",
     "DB-12-B2-D1-III-134",
+    "DB-12-B2-D1-II-136",
     "DB-12-B2-D1-I-138",
     "DB-12-B2-D1-I-151",
     "DB-12-B2-D1-I-154",
