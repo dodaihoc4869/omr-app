@@ -1,3 +1,4 @@
+# Chạy: python3 -I lich28.py   (dự báo so giả lập: python3 -I kiem-du-bao.py)
 # v5 — ĐÚNG ĐỊNH NGHĨA CỦA THẦY. Chu kỳ một bài (từng em) =
 #   M ngày Mới  : làm HẾT câu mới của bài, mỗi ngày 28 câu đúng ma trận;
 #   R ngày Ôn   : đề kiểm tra ôn tập 28 câu phủ TOÀN BỘ bài cũ (mỗi bài cũ ≥ 1 câu/chu kỳ) — R = max(1, ⌈số bài đã học / 28⌉);
@@ -10,6 +11,7 @@ class Em:
     def __init__(s,p,seed,dang_o):
         s.p={o:p[MUC[o]] for o in O}; s.q={o:s.p[o]+0.5*(1-s.p[o]) for o in O}
         s.r=random.Random(seed); s.nhom={}; s.ngay=0; s.chuoi=''; s.dang_o=dang_o; s.thay=0; s.loi=0; s.bai_da=[]
+        s.vua_xong={o:[] for o in O}; s.mang={}; s.mang_max=0; s.mang_sinh=0
 def lam_de(em,t,kho,bai):
     de=[]
     if t=='M':
@@ -21,22 +23,32 @@ def lam_de(em,t,kho,bai):
             de+=[('sua',o,k) for k in ds]+[('cc',o,None)]*(W[o]-len(ds))
     else:
         cu=em.bai_da or [bai]
-        for o in O: de+=[('on',o,cu[(i+hash(o))%len(cu)]) for i in range(W[o])]
+        for o in O: de+=[('on',o,cu[(i+O.index(o))%len(cu)]) for i in range(W[o])]
     assert len(de)==28 and all(sum(1 for x in de if x[1]==o)==W[o] for o in O)
     for k,o,x in de:
         if k=='sua':
             n=em.nhom[x]
-            if em.r.random()<em.q[o]: del em.nhom[x]
+            if em.r.random()<em.q[o]: em.vua_xong[o].append((x,n['sai'])); del em.nhom[x]
             else:
                 n['sai']+=1
                 if n['sai']>=3: em.thay+=n['so']; del em.nhom[x]
-        elif k=='cc': pass
+        elif k=='cc':
+            # CỦNG CỐ: song sinh khác của nhóm vừa xong cùng ô (không có ⇒ song sinh câu đã làm của bài). Sai ⇒ MỞ LẠI nhóm, MANG SANG chu kỳ sau,
+            # không chặn chu kỳ này đóng; vẫn tính luật 3 lần sai.
+            if em.vua_xong[o]:
+                k2,sai=em.vua_xong[o].pop(0)
+                if em.r.random()>=em.q[o]:
+                    if sai+1>=3: em.thay+=1
+                    else: em.mang[k2]={'o':o,'tu':em.ngay,'sai':sai+1,'so':1}; em.mang_sinh+=1
+            elif em.r.random()>=em.p[o]:
+                d=(x,o,'cc',em.ngay); em.mang[d]={'o':o,'tu':em.ngay,'sai':0,'so':1}; em.mang_sinh+=1; em.loi+=1
         else:
             ok=em.r.random()<(em.p[o]-(0.05 if k=='on' else 0))
             if not ok:
                 d=(x,o,em.r.randrange(em.dang_o)); n=em.nhom.setdefault(d,{'o':o,'tu':em.ngay,'sai':0,'so':0}); n['so']+=1; em.loi+=1
     em.ngay+=1; em.chuoi+=t
 def mot_bai(em,N,bai):
+    em.nhom.update(em.mang); em.mang={}
     kho={o:W[o]*N//28 for o in O}; M=so_ngay_moi(kho); R=max(1,math.ceil(len(em.bai_da)/28)) if em.bai_da else 1
     bd=em.ngay; m=0
     while m<M:
@@ -44,7 +56,7 @@ def mot_bai(em,N,bai):
         if m%2==0 and m<M and em.nhom: lam_de(em,'S',kho,bai)
     for _ in range(R): lam_de(em,'O',kho,bai)
     while em.nhom: lam_de(em,'S',kho,bai)
-    em.bai_da.append(bai); return em.ngay-bd, M, R
+    em.bai_da.append(bai); em.mang_max=max(em.mang_max,len(em.mang)); return em.ngay-bd, M, R
 def du_bao(p,N,dang_o,so_bai_cu):
     """Công thức máy tính TRƯỚC cho từng em (kỳ vọng): nhóm lỗi theo ô = số dạng của ô có ít nhất 1 câu sai."""
     M=math.ceil(N/28); R=1 if so_bai_cu==0 else max(1,math.ceil(so_bai_cu/28)); S=0
@@ -63,9 +75,11 @@ for N in (56,112,168):
         kq=[]
         for s in range(1,31):
             em=Em(p,s,dang_o); ds=[mot_bai(em,N,b) for b in range(10)]
-            kq.append((ds,em.ngay,em.thay,em.loi))
+            kq.append((ds,em.ngay,em.thay,em.loi,em.mang_max))
         chu_ky=sorted(sum(d[0] for d in k[0][2:])/8 for k in kq); tb=chu_ky[15]; xau=chu_ky[28]
         thay=sum(k[2] for k in kq)/30; loi=sum(k[3] for k in kq)/30
         db=du_bao(p,N,dang_o,5)
         tre=tb-7
-        print(f"  {ten:10s} chu kỳ thực {tb:4.1f} ngày (95%: ≤{xau:4.1f}) · máy dự báo {db[3]} = M{db[0]}+Ô{db[1]}+S{db[2]} · chậm lớp {max(0,tre):3.1f} ngày/bài · {thay/max(loi,1):.0%} lỗi chuyển thầy")
+        mm=max(k[4] for k in kq)
+        print(f"  {ten:10s} nhóm mang sang tối đa {mm:2d} ·", end='')
+        print(f" chu kỳ thực {tb:4.1f} ngày (95%: ≤{xau:4.1f}) · chậm lớp {max(0,tre):3.1f} ngày/bài · {thay/max(loi,1):.0%} lỗi chuyển thầy")
