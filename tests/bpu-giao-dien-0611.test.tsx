@@ -142,6 +142,14 @@ describe('bảng chiếu', () => {
     expect(screen.getByRole('img', { name: 'Mã QR điểm danh' })).toBeTruthy()
     traMo.v = { ok: true, du: { ok: true, ve: 've-thay' } }
   })
+  it('08/11 thầy «bỏ đếm thời gian»: mở lượt KHÔNG giới hạn giờ (hanGiay 0) dù tờ gửi giây ước tính', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    goiLenhGhi.mockClear()
+    render(<Bang buoiId="b1" qid="q9" luot={1} giay={150} tuDong onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    act(() => { WsGia.ds[0]!.nhan(viewBang(phong())) })
+    await waitFor(() => expect(goiLenhGhi.mock.calls.find((c) => c[0] === '/gv/bpu/luot')?.[1]).toMatchObject({ qid: 'q9', hanGiay: 0 }))
+  })
   it('chuyển câu: → và nút «Câu tiếp» báo tờ sang câu sau; lưới hiện tên gọi đủ chữ', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
     const onToi = vi.fn()

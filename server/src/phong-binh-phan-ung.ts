@@ -128,7 +128,8 @@ export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
   if (!bpuBat(env)) return { ok: false, lyDo: 'tat', error: 'Bình Phản Ứng đang tắt.' }
   const buoiId = buoiHop(b.buoiId), qid = str(b.qid).trim().slice(0, 200)
   if (!buoiId || !qid) return { ok: false, error: 'Thiếu buổi hoặc câu.' }
-  const hanGiay = kepGiay(b.hanGiay)
+  // 08/11 thầy «bỏ đếm thời gian»: bảng gửi hanGiay = 0 ⇒ lượt KHÔNG giới hạn giờ (không đồng hồ, không tự khoá); số khác vẫn kẹp 60–180 như cũ.
+  const hanGiay = b.hanGiay === 0 ? 0 : kepGiay(b.hanGiay)
   // Đọc SONG SONG (không thêm vòng chờ nối tiếp): câu · câu bảo vệ · em đang thi · lớp của buổi + lớp các em có mặt · ca đang mở.
   const [dong, phucVu, dangThi, buoiR, lopEmR, caR] = await Promise.all([
     env.DB.prepare(`SELECT q.json AS json ${TU_CHI_MUC_GAME} LIMIT 1`).bind(JSON.stringify([qid])).first<Row>(),

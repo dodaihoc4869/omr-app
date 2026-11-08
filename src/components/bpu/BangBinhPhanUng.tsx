@@ -19,7 +19,6 @@ import './bpu-bang.css'
 
 type Man = 'diem-danh' | 'tra-loi' | 'goi' | 'lam-bang' | 'mo' | 'dua' | 'vinh-danh'
 type Em = ViewBang['ds'][number]
-const HAN_GIAY_MAC_DINH = 90
 const X_LUA_DD4 = [1290, 1430, 1570, 1710], X_LUA_DD2 = [1390, 1610]
 const X_LUA_DUA4 = [210, 465, 720, 975], X_LUA_DUA2 = [400, 785]
 /** Các đội đang chơi (2 khi lớp dưới 12 em, không thì 4). */
@@ -90,7 +89,7 @@ export interface PropsBang {
   dangKyChamTo?: (f: ((dat: boolean) => void) | null) => void
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, giay, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
   const laDiemDanh = useRef(!qid)
@@ -202,7 +201,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, gia
     const dang = v.luot
     if (dang && dang.qid === qid && (dang.pha !== 'mo' || tuDongRef.current)) return
     setManPhu(null); setUng(null)
-    void goiLenh('/gv/bpu/luot', { buoiId, qid, hanGiay: giay && giay > 0 ? giay : HAN_GIAY_MAC_DINH }, 'Máy chủ chưa có Bình Phản Ứng.').then((r) => {
+    void goiLenh('/gv/bpu/luot', { buoiId, qid, hanGiay: 0 /* 08/11 thầy «bỏ đếm thời gian»: lượt không giới hạn giờ */ }, 'Máy chủ chưa có Bình Phản Ứng.').then((r) => {
       const chu = !r.ok ? r.chu : r.du.ok === false ? String(r.du.error ?? 'Chưa gửi được câu xuống máy em.') : ''
       if (!chu) { setLoi(null); return }
       // Câu không gửi được (ngoài kho, câu giữ cho ca kiểm tra, ca mở): đóng bảng, thầy chữa trên tờ như thường; câu sau vẫn tự gửi.
