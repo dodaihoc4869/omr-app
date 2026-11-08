@@ -1,0 +1,141 @@
+{
+  "dependencies": {
+    "python": "3.12.14",
+    "fonttools": "4.61.1",
+    "skia-pathops": "0.9.2",
+    "brotli": "1.2.1"
+  },
+  "inputs": {
+    "generator": {
+      "path": "scripts/tao-phong-ddh-rounded.py",
+      "sha": "a988a8998429eb87f6d79449cefed36d13a8597a950cc3399c95c8b503e0b027"
+    }
+  },
+  "sourceFonts": {
+    "MPLUSRounded1c-Regular.ttf": "b75708b53e45b06d17d470aeeca5b766e3d1b3999f03f13ec4eb863ca846c14c",
+    "MPLUSRounded1c-Medium.ttf": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70"
+  },
+  "admissible": false,
+  "scope": "Scratch5A nesting+semantic tilde; chưa soát độc lập/chưa thay font chính",
+  "subsets": {
+    "ddh-rounded-de-latin.woff2": {
+      "actualSHA": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "candidateSHA": "41497863002e5e0249b43e75fb5fa914a4fea98e5de091627917949dbe25e84c",
+      "changedCP": [],
+      "metricMismatch": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "actualSHA": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "candidateSHA": "1962782656b2ccd713b07da17105a4a95b18dd8d5b917f023a45c8f15832baf7",
+      "changedCP": [
+        7850,
+        7852,
+        7858,
+        7860,
+        7862
+      ],
+      "metricMismatch": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "actualSHA": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "candidateSHA": "a7f05bcae2b8da19e3d8ac935ea87715d6f959f43259eb8d654a3a25e1796145",
+      "changedCP": [
+        7850,
+        7852,
+        7858,
+        7860,
+        7862
+      ],
+      "metricMismatch": [],
+      "bboxDiff": [
+        {
+          "cp": 7850,
+          "old": [
+            11,
+            -26,
+            801,
+            1322
+          ],
+          "new": [
+            11,
+            -26,
+            670,
+            1138
+          ]
+        }
+      ]
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "actualSHA": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "candidateSHA": "378f58325fadad8ce1e41acba8e9e874ce6e2a4891fd8aff6d1dfe6464ead314",
+      "changedCP": [],
+      "metricMismatch": [],
+      "bboxDiff": []
+    }
+  },
+  "generatorInputSHA": "a988a8998429eb87f6d79449cefed36d13a8597a950cc3399c95c8b503e0b027",
+  "experimentScriptSHA": "e9d8aaccb34c1d957a86ff7b5438d5c9c40ca716519ff1672d3a9e0af9ff66a0",
+  "independentReviewTarget": {
+    "admissible": false,
+    "scope": "Scratch5A nesting+semantic tilde; chưa soát độc lập/chưa thay font chính",
+    "subsets": {
+      "ddh-rounded-de-latin.woff2": {
+        "sha": "c95e8cb6fc4f5ed3c63571740b8a6628232bd8dd73e78d2850caca5eb41caaeb",
+        "changedCP": [],
+        "metricMismatch": [],
+        "bboxDiff": []
+      },
+      "ddh-rounded-de-vietnamese.woff2": {
+        "sha": "25180683e7e1a880d127bb2f06539babce58d28f0705dbf6854e5ccdbfd6522c",
+        "changedCP": [
+          7850,
+          7852,
+          7858,
+          7860,
+          7862
+        ],
+        "metricMismatch": [],
+        "bboxDiff": []
+      },
+      "ddh-rounded-dam-vietnamese.woff2": {
+        "sha": "4eccedce17d0bfb52e469310d01e353305ea66b513c6f8fcba739db8d4963557",
+        "changedCP": [
+          7850,
+          7852,
+          7858,
+          7860,
+          7862
+        ],
+        "metricMismatch": [],
+        "bboxDiff": [
+          {
+            "cp": 7850,
+            "old": [
+              11,
+              -26,
+              801,
+              1322
+            ],
+            "new": [
+              11,
+              -26,
+              670,
+              1138
+            ]
+          }
+        ]
+      },
+      "ddh-rounded-dam-latin.woff2": {
+        "sha": "c39ddf4a8a3226f37bc83b64c91d0f5d304af5ec36cd2fab979702c357ce4549",
+        "changedCP": [],
+        "metricMismatch": [],
+        "bboxDiff": []
+      }
+    }
+  },
+  "note": "Bản repro có timestamp WOFF2 khác; soát actual nhắm ĐÚNG candidateSHA trong independentReviewTarget, không gán proof cho byte repro. Chỉ5cp changed outlines, metrics tự giữ; DamẪ bỏwronghook nênbboxgiảm, khôngcopyhmtx/épbboxlỗi. Chưaadmitfont/global.",
+  "scriptRevision": "revision2; candidate1 history phải đọc negativeproof riêng, không tái gán review1 cho revision2",
+  "latestRevisionReport": "font-5a-candidate2-lo-264-chua-admit.json"
+}

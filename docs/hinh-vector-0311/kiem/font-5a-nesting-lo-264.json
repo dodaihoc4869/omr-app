@@ -1,0 +1,321 @@
+{
+  "de": {
+    "fallbackAudit": [
+      {
+        "char": "Ẫ",
+        "allContainmentPairs": [
+          [
+            3,
+            2
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          28,
+          20,
+          13,
+          28
+        ],
+        "counterMatches": [
+          2
+        ],
+        "containingOuterMatches": [
+          3
+        ],
+        "unique": true,
+        "bodyIndices": [
+          2,
+          3
+        ],
+        "remainingContourCount": 2
+      },
+      {
+        "char": "Ậ",
+        "allContainmentPairs": [
+          [
+            3,
+            2
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          20,
+          12,
+          14,
+          28
+        ],
+        "counterMatches": [],
+        "containingOuterMatches": [],
+        "unique": false,
+        "bodyIndices": [],
+        "remainingContourCount": 4
+      },
+      {
+        "char": "Ẳ",
+        "allContainmentPairs": [
+          [
+            2,
+            1
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          31,
+          13,
+          52
+        ],
+        "counterMatches": [
+          1
+        ],
+        "containingOuterMatches": [
+          2
+        ],
+        "unique": true,
+        "bodyIndices": [
+          1,
+          2
+        ],
+        "remainingContourCount": 1
+      },
+      {
+        "char": "Ẵ",
+        "allContainmentPairs": [
+          [
+            2,
+            1
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          28,
+          13,
+          52
+        ],
+        "counterMatches": [
+          1
+        ],
+        "containingOuterMatches": [
+          2
+        ],
+        "unique": true,
+        "bodyIndices": [
+          1,
+          2
+        ],
+        "remainingContourCount": 1
+      },
+      {
+        "char": "Ặ",
+        "allContainmentPairs": [
+          [
+            3,
+            2
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          20,
+          12,
+          13,
+          28
+        ],
+        "counterMatches": [
+          2
+        ],
+        "containingOuterMatches": [
+          3
+        ],
+        "unique": true,
+        "bodyIndices": [
+          2,
+          3
+        ],
+        "remainingContourCount": 2
+      }
+    ],
+    "tildeBeforeVeDau": {
+      "nfd": [
+        "0x41",
+        "0x302",
+        "0x303"
+      ],
+      "threshold": 737,
+      "aboveContours": 2,
+      "aboveContourBounds": [
+        [
+          151,
+          944,
+          548,
+          1079
+        ],
+        [
+          166,
+          810,
+          534,
+          952
+        ]
+      ],
+      "actualBranch": "muelse → sortedlowestcontourtreatedascircumflex"
+    }
+  },
+  "dam": {
+    "fallbackAudit": [
+      {
+        "char": "Ẫ",
+        "allContainmentPairs": [
+          [
+            3,
+            2
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          28,
+          24,
+          12,
+          33
+        ],
+        "counterMatches": [
+          2
+        ],
+        "containingOuterMatches": [
+          3
+        ],
+        "unique": true,
+        "bodyIndices": [
+          2,
+          3
+        ],
+        "remainingContourCount": 2
+      },
+      {
+        "char": "Ậ",
+        "allContainmentPairs": [
+          [
+            3,
+            2
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          26,
+          12,
+          12,
+          33
+        ],
+        "counterMatches": [
+          2
+        ],
+        "containingOuterMatches": [
+          3
+        ],
+        "unique": true,
+        "bodyIndices": [
+          2,
+          3
+        ],
+        "remainingContourCount": 2
+      },
+      {
+        "char": "Ẳ",
+        "allContainmentPairs": [
+          [
+            2,
+            1
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          31,
+          12,
+          51
+        ],
+        "counterMatches": [
+          1
+        ],
+        "containingOuterMatches": [
+          2
+        ],
+        "unique": true,
+        "bodyIndices": [
+          1,
+          2
+        ],
+        "remainingContourCount": 1
+      },
+      {
+        "char": "Ẵ",
+        "allContainmentPairs": [
+          [
+            2,
+            1
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          27,
+          12,
+          51
+        ],
+        "counterMatches": [
+          1
+        ],
+        "containingOuterMatches": [
+          2
+        ],
+        "unique": true,
+        "bodyIndices": [
+          1,
+          2
+        ],
+        "remainingContourCount": 1
+      },
+      {
+        "char": "Ặ",
+        "allContainmentPairs": [
+          [
+            3,
+            2
+          ]
+        ],
+        "uniqueNestedPair": true,
+        "contourPointCounts": [
+          18,
+          12,
+          12,
+          33
+        ],
+        "counterMatches": [
+          2
+        ],
+        "containingOuterMatches": [
+          3
+        ],
+        "unique": true,
+        "bodyIndices": [
+          2,
+          3
+        ],
+        "remainingContourCount": 2
+      }
+    ],
+    "tildeBeforeVeDau": {
+      "nfd": [
+        "0x41",
+        "0x302",
+        "0x303"
+      ],
+      "threshold": 751,
+      "aboveContours": 1,
+      "aboveContourBounds": [
+        [
+          122,
+          948,
+          558,
+          1115
+        ]
+      ],
+      "actualBranch": "mu+len(ds)==1+khac → xmNone → hooklookup U+Ả"
+    }
+  }
+}

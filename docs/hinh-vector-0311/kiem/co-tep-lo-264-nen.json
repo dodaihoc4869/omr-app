@@ -1,0 +1,6 @@
+{
+  "main": "a7251a3dc4da05f1f75f11dc747bbccf4c078c18",
+  "log": "\n> omr-app@0.0.0 kiem:co-tep\n> node scripts/kiem-co-tep.mjs\n\n✗ server/src/index.ts: 297644 B > mốc 295021 B + 2048 B — tách bớt sang tệp khác rồi mới đẩy\nkiem-co-tep: 1 tệp vượt (ngưỡng 60 KB, dư 2 KB trên mốc).\n",
+  "unchangedThisBatch": true,
+  "gatePassed": false
+}

@@ -1,0 +1,43 @@
+{
+  "productionFontChanged": false,
+  "globalAdmissible": false,
+  "fontCandidates": {
+    "candidate1-bi-loai": [
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate1-bi-loai/ddh-rounded-de-latin.woff2",
+        "sha": "c95e8cb6fc4f5ed3c63571740b8a6628232bd8dd73e78d2850caca5eb41caaeb"
+      },
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate1-bi-loai/ddh-rounded-de-vietnamese.woff2",
+        "sha": "25180683e7e1a880d127bb2f06539babce58d28f0705dbf6854e5ccdbfd6522c"
+      },
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate1-bi-loai/ddh-rounded-dam-vietnamese.woff2",
+        "sha": "4eccedce17d0bfb52e469310d01e353305ea66b513c6f8fcba739db8d4963557"
+      },
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate1-bi-loai/ddh-rounded-dam-latin.woff2",
+        "sha": "c39ddf4a8a3226f37bc83b64c91d0f5d304af5ec36cd2fab979702c357ce4549"
+      }
+    ],
+    "candidate2-chua-admit": [
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate2-chua-admit/ddh-rounded-de-latin.woff2",
+        "sha": "44def6d1ca8e6a67ee0ed2bac465d00e21d9c297e52a4b85b2a2feb90e9ae2d9"
+      },
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate2-chua-admit/ddh-rounded-de-vietnamese.woff2",
+        "sha": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef"
+      },
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate2-chua-admit/ddh-rounded-dam-vietnamese.woff2",
+        "sha": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96"
+      },
+      {
+        "file": "docs/hinh-vector-0311/kiem/thu-font-lo-264/candidate2-chua-admit/ddh-rounded-dam-latin.woff2",
+        "sha": "c6063a8e349005bdb11a3a6bfaca339ea8d7a9cc7c5efc5bfe30edd5a04a6f98"
+      }
+    ]
+  },
+  "gioiHan": "Chỉ font bằng chứng scratch; không trỏ app/converter/manifest vào thư mục này. Candidate1bịloạiẪ;candidate2chưaadmittoànfont/appsizes/corpus."
+}

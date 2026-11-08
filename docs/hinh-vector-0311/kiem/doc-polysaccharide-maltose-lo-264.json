@@ -1,0 +1,1030 @@
+[
+  {
+    "i": 758,
+    "hash": "8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9.png",
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DB-12-B4-D3-I-271",
+        "de": "Trong một loại polysaccharide, liên kết giữa các gốc glucose được biểu diễn như sau: Liên kết được xác định bằng mũi tên được gọi là",
+        "refs": [
+          {
+            "hash": "8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9",
+            "where": "DB-12-B4-D3-I-271.hinh.0.du_lieu",
+            "hashDataUrl": "f85f5ecc9f47d24742d2dee416a8bfd36d3bf5977a1262e87ba804610d36e3b3"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D2-I-12",
+        "de": "Trong một loại polysaccharide, liên kết giữa các gốc glucose được biểu diễn như sau: Liên kết được xác định bằng mũi tên được gọi là",
+        "refs": [
+          {
+            "hash": "8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9",
+            "where": "DH-12-C2-B7-D2-I-12.hinh.0.du_lieu",
+            "hashDataUrl": "f85f5ecc9f47d24742d2dee416a8bfd36d3bf5977a1262e87ba804610d36e3b3"
+          }
+        ]
+      }
+    ],
+    "review": "NativeFULL và zoom3x từng nguồn thực mở; source-only, chưaSVG/chưaĐạt.",
+    "actualSvgReviewed": false,
+    "coordinateMeaning": "Pixelnative, xright/ydown; nét scan approximate1–2px, không dữ liệu hóa học suy từ tên.",
+    "size": [
+      506,
+      93
+    ],
+    "literalLabels": [
+      {
+        "text": "O",
+        "center": [
+          136,
+          22
+        ]
+      },
+      {
+        "text": "O",
+        "center": [
+          178,
+          70
+        ]
+      },
+      {
+        "text": "O",
+        "center": [
+          273,
+          22
+        ]
+      },
+      {
+        "text": "O",
+        "center": [
+          318,
+          75
+        ]
+      },
+      {
+        "text": "O",
+        "center": [
+          412,
+          22
+        ]
+      },
+      {
+        "text": "O",
+        "center": [
+          458,
+          75
+        ]
+      }
+    ],
+    "geometry": {
+      "rings": [
+        {
+          "polyline": [
+            [
+              69,
+              51
+            ],
+            [
+              95,
+              23
+            ],
+            [
+              122,
+              23
+            ]
+          ],
+          "afterO": [
+            [
+              144,
+              35
+            ],
+            [
+              156,
+              51
+            ],
+            [
+              136,
+              75
+            ],
+            [
+              89,
+              75
+            ],
+            [
+              69,
+              51
+            ]
+          ]
+        },
+        {
+          "polyline": [
+            [
+              205,
+              51
+            ],
+            [
+              231,
+              23
+            ],
+            [
+              259,
+              23
+            ]
+          ],
+          "afterO": [
+            [
+              282,
+              35
+            ],
+            [
+              293,
+              51
+            ],
+            [
+              273,
+              75
+            ],
+            [
+              226,
+              75
+            ],
+            [
+              205,
+              51
+            ]
+          ]
+        },
+        {
+          "polyline": [
+            [
+              345,
+              51
+            ],
+            [
+              371,
+              23
+            ],
+            [
+              398,
+              23
+            ]
+          ],
+          "afterO": [
+            [
+              421,
+              35
+            ],
+            [
+              433,
+              51
+            ],
+            [
+              413,
+              75
+            ],
+            [
+              366,
+              75
+            ],
+            [
+              345,
+              51
+            ]
+          ]
+        }
+      ],
+      "bridges": "Rightvertex156,51→168,61; nextO178,70; O gap then191,62→205,51. Next293,51→307,64; O318,75; gap then330,64→345,51. Final433,51→447,64 thenO458,75 thenrightwave starts~470,78. Leftwave ends48,78 thenline→69,51.",
+      "arrow": "ONE filledRIGHT-DOWN/diagonalhead, shaft(337,5)→(307,54); head approx points(307,54),(310,39),(320,46). Points at bond fromring2rightvertex towardbridgeO; preserve not move to O center.",
+      "bondStyle": "All uniform thin black, no taper/bold/stereo/explicitH/OH/CH2OH/carbonnums/brackets/caption. Bare rings exactly source, do not fill missing substituents from theory.",
+      "waveEnds": "Bothfreeends wavy black. Exactcycles/endpoints must trace native raster/profile; do not turn into ellipsis or addedO. Leftwave spansx4..49,y75..81; rightx470..501,y72..80. Source3x provided.",
+      "wavePixelTrace": {
+        "method": "Native luminance<128 column darkpixel mean, y68..84; full profiles retained; extrema from observed black source not invented sine fit.",
+        "left": {
+          "start": [
+            3,
+            79
+          ],
+          "end": [
+            48,
+            77
+          ],
+          "upperCrests": [
+            [
+              8.5,
+              76
+            ],
+            [
+              16,
+              75
+            ],
+            [
+              23,
+              75.5
+            ],
+            [
+              30.5,
+              76
+            ],
+            [
+              38,
+              75.5
+            ],
+            [
+              45,
+              75.5
+            ]
+          ],
+          "lowerTroughs": [
+            [
+              5,
+              80.5
+            ],
+            [
+              12,
+              80
+            ],
+            [
+              19.5,
+              80
+            ],
+            [
+              27,
+              80.5
+            ],
+            [
+              34,
+              80
+            ],
+            [
+              41.5,
+              80
+            ]
+          ],
+          "count": "6uppercrests+6lowertroughs, starts lowerhalf; lastcrest45→end48 joins rising diagonal49..69, no newtrough."
+        },
+        "right": {
+          "start": [
+            470,
+            77.5
+          ],
+          "end": [
+            502,
+            75.5
+          ],
+          "upperCrests": [
+            [
+              475,
+              74.5
+            ],
+            [
+              481,
+              74
+            ],
+            [
+              487.5,
+              74.5
+            ],
+            [
+              494,
+              74.5
+            ],
+            [
+              500,
+              74
+            ]
+          ],
+          "lowerTroughs": [
+            [
+              472,
+              78
+            ],
+            [
+              478,
+              78.5
+            ],
+            [
+              484,
+              78
+            ],
+            [
+              491,
+              78
+            ],
+            [
+              497,
+              78.5
+            ]
+          ],
+          "count": "5uppercrests+5lowertroughs; end descending from uppercrest500 to502, not return mid by invented extension."
+        },
+        "profiles": {
+          "left": [
+            {
+              "x": 3,
+              "centerY": 79.0,
+              "yMin": 78,
+              "yMax": 80
+            },
+            {
+              "x": 4,
+              "centerY": 79.5,
+              "yMin": 78,
+              "yMax": 81
+            },
+            {
+              "x": 5,
+              "centerY": 80.5,
+              "yMin": 80,
+              "yMax": 81
+            },
+            {
+              "x": 6,
+              "centerY": 79.0,
+              "yMin": 77,
+              "yMax": 81
+            },
+            {
+              "x": 7,
+              "centerY": 78.0,
+              "yMin": 76,
+              "yMax": 80
+            },
+            {
+              "x": 8,
+              "centerY": 76.0,
+              "yMin": 75,
+              "yMax": 77
+            },
+            {
+              "x": 9,
+              "centerY": 76.0,
+              "yMin": 75,
+              "yMax": 77
+            },
+            {
+              "x": 10,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 11,
+              "centerY": 79.0,
+              "yMin": 77,
+              "yMax": 81
+            },
+            {
+              "x": 12,
+              "centerY": 80.0,
+              "yMin": 79,
+              "yMax": 81
+            },
+            {
+              "x": 13,
+              "centerY": 79.5,
+              "yMin": 78,
+              "yMax": 81
+            },
+            {
+              "x": 14,
+              "centerY": 78.0,
+              "yMin": 76,
+              "yMax": 80
+            },
+            {
+              "x": 15,
+              "centerY": 76.5,
+              "yMin": 75,
+              "yMax": 78
+            },
+            {
+              "x": 16,
+              "centerY": 75.0,
+              "yMin": 74,
+              "yMax": 76
+            },
+            {
+              "x": 17,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 18,
+              "centerY": 78.0,
+              "yMin": 76,
+              "yMax": 80
+            },
+            {
+              "x": 19,
+              "centerY": 80.0,
+              "yMin": 79,
+              "yMax": 81
+            },
+            {
+              "x": 20,
+              "centerY": 80.0,
+              "yMin": 79,
+              "yMax": 81
+            },
+            {
+              "x": 21,
+              "centerY": 79.0,
+              "yMin": 77,
+              "yMax": 81
+            },
+            {
+              "x": 22,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 23,
+              "centerY": 75.5,
+              "yMin": 74,
+              "yMax": 77
+            },
+            {
+              "x": 24,
+              "centerY": 76.5,
+              "yMin": 75,
+              "yMax": 78
+            },
+            {
+              "x": 25,
+              "centerY": 78.0,
+              "yMin": 76,
+              "yMax": 80
+            },
+            {
+              "x": 26,
+              "centerY": 79.5,
+              "yMin": 78,
+              "yMax": 81
+            },
+            {
+              "x": 27,
+              "centerY": 80.5,
+              "yMin": 80,
+              "yMax": 81
+            },
+            {
+              "x": 28,
+              "centerY": 79.0,
+              "yMin": 77,
+              "yMax": 81
+            },
+            {
+              "x": 29,
+              "centerY": 78.0,
+              "yMin": 76,
+              "yMax": 80
+            },
+            {
+              "x": 30,
+              "centerY": 76.0,
+              "yMin": 75,
+              "yMax": 77
+            },
+            {
+              "x": 31,
+              "centerY": 76.0,
+              "yMin": 75,
+              "yMax": 77
+            },
+            {
+              "x": 32,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 33,
+              "centerY": 79.0,
+              "yMin": 77,
+              "yMax": 81
+            },
+            {
+              "x": 34,
+              "centerY": 80.0,
+              "yMin": 79,
+              "yMax": 81
+            },
+            {
+              "x": 35,
+              "centerY": 79.5,
+              "yMin": 78,
+              "yMax": 81
+            },
+            {
+              "x": 36,
+              "centerY": 78.0,
+              "yMin": 76,
+              "yMax": 80
+            },
+            {
+              "x": 37,
+              "centerY": 76.5,
+              "yMin": 75,
+              "yMax": 78
+            },
+            {
+              "x": 38,
+              "centerY": 75.5,
+              "yMin": 74,
+              "yMax": 77
+            },
+            {
+              "x": 39,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 40,
+              "centerY": 79.0,
+              "yMin": 77,
+              "yMax": 81
+            },
+            {
+              "x": 41,
+              "centerY": 80.0,
+              "yMin": 79,
+              "yMax": 81
+            },
+            {
+              "x": 42,
+              "centerY": 80.0,
+              "yMin": 79,
+              "yMax": 81
+            },
+            {
+              "x": 43,
+              "centerY": 78.5,
+              "yMin": 77,
+              "yMax": 80
+            },
+            {
+              "x": 44,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 45,
+              "centerY": 75.5,
+              "yMin": 74,
+              "yMax": 77
+            },
+            {
+              "x": 46,
+              "centerY": 76.5,
+              "yMin": 75,
+              "yMax": 78
+            },
+            {
+              "x": 47,
+              "centerY": 77.0,
+              "yMin": 76,
+              "yMax": 78
+            },
+            {
+              "x": 48,
+              "centerY": 77.0,
+              "yMin": 76,
+              "yMax": 78
+            }
+          ],
+          "right": [
+            {
+              "x": 470,
+              "centerY": 77.5,
+              "yMin": 76,
+              "yMax": 79
+            },
+            {
+              "x": 471,
+              "centerY": 77.5,
+              "yMin": 76,
+              "yMax": 79
+            },
+            {
+              "x": 472,
+              "centerY": 78.0,
+              "yMin": 77,
+              "yMax": 79
+            },
+            {
+              "x": 473,
+              "centerY": 76.5,
+              "yMin": 74,
+              "yMax": 79
+            },
+            {
+              "x": 474,
+              "centerY": 75.0,
+              "yMin": 73,
+              "yMax": 77
+            },
+            {
+              "x": 475,
+              "centerY": 74.5,
+              "yMin": 73,
+              "yMax": 76
+            },
+            {
+              "x": 476,
+              "centerY": 75.5,
+              "yMin": 73,
+              "yMax": 78
+            },
+            {
+              "x": 477,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 478,
+              "centerY": 78.5,
+              "yMin": 78,
+              "yMax": 79
+            },
+            {
+              "x": 479,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 480,
+              "centerY": 76.0,
+              "yMin": 74,
+              "yMax": 78
+            },
+            {
+              "x": 481,
+              "centerY": 74.0,
+              "yMin": 73,
+              "yMax": 75
+            },
+            {
+              "x": 482,
+              "centerY": 75.0,
+              "yMin": 73,
+              "yMax": 77
+            },
+            {
+              "x": 483,
+              "centerY": 76.5,
+              "yMin": 74,
+              "yMax": 79
+            },
+            {
+              "x": 484,
+              "centerY": 78.0,
+              "yMin": 77,
+              "yMax": 79
+            },
+            {
+              "x": 485,
+              "centerY": 77.5,
+              "yMin": 76,
+              "yMax": 79
+            },
+            {
+              "x": 486,
+              "centerY": 76.0,
+              "yMin": 74,
+              "yMax": 78
+            },
+            {
+              "x": 487,
+              "centerY": 74.5,
+              "yMin": 73,
+              "yMax": 76
+            },
+            {
+              "x": 488,
+              "centerY": 74.5,
+              "yMin": 73,
+              "yMax": 76
+            },
+            {
+              "x": 489,
+              "centerY": 76.5,
+              "yMin": 74,
+              "yMax": 79
+            },
+            {
+              "x": 490,
+              "centerY": 77.5,
+              "yMin": 76,
+              "yMax": 79
+            },
+            {
+              "x": 491,
+              "centerY": 78.0,
+              "yMin": 77,
+              "yMax": 79
+            },
+            {
+              "x": 492,
+              "centerY": 76.5,
+              "yMin": 74,
+              "yMax": 79
+            },
+            {
+              "x": 493,
+              "centerY": 75.0,
+              "yMin": 73,
+              "yMax": 77
+            },
+            {
+              "x": 494,
+              "centerY": 74.5,
+              "yMin": 73,
+              "yMax": 76
+            },
+            {
+              "x": 495,
+              "centerY": 75.5,
+              "yMin": 73,
+              "yMax": 78
+            },
+            {
+              "x": 496,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 497,
+              "centerY": 78.5,
+              "yMin": 78,
+              "yMax": 79
+            },
+            {
+              "x": 498,
+              "centerY": 77.0,
+              "yMin": 75,
+              "yMax": 79
+            },
+            {
+              "x": 499,
+              "centerY": 75.5,
+              "yMin": 73,
+              "yMax": 78
+            },
+            {
+              "x": 500,
+              "centerY": 74.0,
+              "yMin": 73,
+              "yMax": 75
+            },
+            {
+              "x": 501,
+              "centerY": 74.5,
+              "yMin": 73,
+              "yMax": 76
+            },
+            {
+              "x": 502,
+              "centerY": 75.5,
+              "yMin": 75,
+              "yMax": 76
+            }
+          ]
+        }
+      }
+    },
+    "uncertainties": [
+      "Wave extrema pixelprofile now supplied; grayscale antialias centerline has subpixel precision limits, use full source/profile not idealized wavecycle estimate."
+    ]
+  },
+  {
+    "i": 769,
+    "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292.png",
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-II-2",
+        "de": "Cấu trúc phân tử dạng mạch vòng của maltose được cho như sau:",
+        "refs": [
+          {
+            "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+            "where": "VIP27-BDT-L7-0701-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "d26ec47d0bc5f6d77c7cc6281ee6f6ad8952d94cff9a7061b4e6aeb9e99d0ed4"
+          }
+        ]
+      }
+    ],
+    "review": "NativeFULL và zoom3x từng nguồn thực mở; source-only, chưaSVG/chưaĐạt.",
+    "actualSvgReviewed": false,
+    "coordinateMeaning": "Pixelnative, xright/ydown; nét scan approximate1–2px, không dữ liệu hóa học suy từ tên.",
+    "size": [
+      620,
+      360
+    ],
+    "literalLabels": [
+      {
+        "text": "Liên kết (x)",
+        "bbox": [
+          202,
+          8,
+          366,
+          38
+        ],
+        "bold": true
+      },
+      {
+        "text": "Hình. Dạng mạch vòng của maltose",
+        "bbox": [
+          68,
+          325,
+          549,
+          356
+        ],
+        "italic": true
+      }
+    ],
+    "geometry": {
+      "leftRing": {
+        "vertices": {
+          "C1": [
+            234,
+            180
+          ],
+          "C2": [
+            174,
+            240
+          ],
+          "C3": [
+            87,
+            240
+          ],
+          "C4": [
+            27,
+            180
+          ],
+          "C5": [
+            87,
+            119
+          ],
+          "ringO": [
+            171,
+            120
+          ]
+        },
+        "branches": {
+          "C1": [
+            "H up at234,123",
+            "bluebridge down-right"
+          ],
+          "C2": [
+            "H up174,185",
+            "OH down174,296"
+          ],
+          "C3": [
+            "OH up87,205",
+            "H down87,298"
+          ],
+          "C4": [
+            "H up27,126",
+            "OH down27,235"
+          ],
+          "C5": [
+            "CH2OH up87,70",
+            "H down87,159"
+          ]
+        },
+        "nums": [
+          [
+            1,
+            249,
+            162
+          ],
+          [
+            2,
+            191,
+            257
+          ],
+          [
+            3,
+            73,
+            260
+          ],
+          [
+            4,
+            13,
+            183
+          ],
+          [
+            5,
+            73,
+            110
+          ],
+          [
+            6,
+            87,
+            43
+          ]
+        ]
+      },
+      "rightRing": {
+        "vertices": {
+          "C1": [
+            580,
+            177
+          ],
+          "C2": [
+            520,
+            237
+          ],
+          "C3": [
+            434,
+            237
+          ],
+          "C4": [
+            373,
+            177
+          ],
+          "C5": [
+            434,
+            116
+          ],
+          "ringO": [
+            519,
+            117
+          ]
+        },
+        "branches": {
+          "C1": [
+            "H up580,120",
+            "redOH down580,239"
+          ],
+          "C2": [
+            "H up520,182",
+            "OH down520,294"
+          ],
+          "C3": [
+            "OH up434,200",
+            "H down434,294"
+          ],
+          "C4": [
+            "H up373,123",
+            "bluebridge down-left"
+          ],
+          "C5": [
+            "CH2OH up434,67",
+            "H down434,155"
+          ]
+        },
+        "nums": [
+          [
+            1,
+            597,
+            160
+          ],
+          [
+            2,
+            537,
+            254
+          ],
+          [
+            3,
+            420,
+            258
+          ],
+          [
+            4,
+            358,
+            180
+          ],
+          [
+            5,
+            420,
+            106
+          ],
+          [
+            6,
+            434,
+            40
+          ]
+        ]
+      },
+      "bridge": "Blue singlebonds leftC1(234,180)→(286,224), blueOcenter300,228, otherbluebond(314,224)→rightC4(373,177). Do not introduce bluearrowheads.",
+      "styles": "FOUR tapered frontdiagonals: left C4→C3 widening toC3, C1→C2 widening toC2; right C4→C3 wideningtoC3, C1→C2 wideningtoC2. TWO boldhorizontals C3–C2. Otherbonduniform. All12 Cnumbersblue; bridgeObondsblue; terminalrightC1OHred; allotheratomsblack.",
+      "arrow": "ONE thin blackleader with openVhead from(295,47)→(270,202), pointing leftbluebridgebond. Head~(259,190)/(270,202)/(280,194). Label Liên kết (x) above, noextra(x) atbond.",
+      "counts": "2sixrings;2ringO+bridgeO+7OH+2CH2OH O=12;2CH2OH,10explicitH outsideCH2OH,12nums. No extraC/H labels/endgroups."
+    },
+    "uncertainties": [
+      "Bounds/labelcoordinates approximate scan; stereodirections/counts read directly native+3x, not inferred from maltose name."
+    ]
+  }
+]

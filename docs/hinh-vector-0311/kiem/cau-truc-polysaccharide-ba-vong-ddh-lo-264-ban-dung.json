@@ -1,0 +1,40 @@
+[
+  {
+    "i": 758,
+    "hash": "8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9",
+    "fileNguon": "anh/8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9.png",
+    "svg": "polysaccharide-ba-vong-ddh-7107c67824894bc9fb2b1cb10ffad226e73e05086d91d431591f3b8c5a5e3696.svg",
+    "hashSvg": "7107c67824894bc9fb2b1cb10ffad226e73e05086d91d431591f3b8c5a5e3696",
+    "byteSvg": 4457,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B4-D3-I-271",
+        "de": "Trong một loại polysaccharide, liên kết giữa các gốc glucose được biểu diễn như sau: Liên kết được xác định bằng mũi tên được gọi là",
+        "refs": [
+          {
+            "hash": "8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9",
+            "where": "DB-12-B4-D3-I-271.hinh.0.du_lieu",
+            "hashDataUrl": "f85f5ecc9f47d24742d2dee416a8bfd36d3bf5977a1262e87ba804610d36e3b3"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B7-D2-I-12",
+        "de": "Trong một loại polysaccharide, liên kết giữa các gốc glucose được biểu diễn như sau: Liên kết được xác định bằng mũi tên được gọi là",
+        "refs": [
+          {
+            "hash": "8d3c2d210b6531dd587d3bba037f36a738c6ede9f4cf90e1cccc98720911f2c9",
+            "where": "DH-12-C2-B7-D2-I-12.hinh.0.du_lieu",
+            "hashDataUrl": "f85f5ecc9f47d24742d2dee416a8bfd36d3bf5977a1262e87ba804610d36e3b3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3bare rings6O/1diagonalfilledhead pointingbond/left6crest6troughright5crest5trough/nativeendpoints/allthinuniform/noH-OH-CH2OH-nums-bracket-caption-answer.",
+    "hashSvgDaSoat": "7107c67824894bc9fb2b1cb10ffad226e73e05086d91d431591f3b8c5a5e3696",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

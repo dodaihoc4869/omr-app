@@ -1,0 +1,99 @@
+{
+  "dependencies": {
+    "python": "3.12.14",
+    "fonttools": "4.61.1",
+    "skia-pathops": "0.9.2",
+    "brotli": "1.2.1"
+  },
+  "inputs": {
+    "generator": {
+      "path": "scripts/tao-phong-ddh-rounded.py",
+      "sha": "a988a8998429eb87f6d79449cefed36d13a8597a950cc3399c95c8b503e0b027"
+    }
+  },
+  "sourceFonts": {
+    "MPLUSRounded1c-Regular.ttf": "b75708b53e45b06d17d470aeeca5b766e3d1b3999f03f13ec4eb863ca846c14c",
+    "MPLUSRounded1c-Medium.ttf": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70"
+  },
+  "admissible": false,
+  "scope": "Scratch5A nesting+semantic tilde; chưa soát độc lập/chưa thay font chính",
+  "subsets": {
+    "ddh-rounded-de-latin.woff2": {
+      "actualSHA": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "candidateSHA": "44def6d1ca8e6a67ee0ed2bac465d00e21d9c297e52a4b85b2a2feb90e9ae2d9",
+      "changedCP": [],
+      "metricMismatch": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "actualSHA": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "candidateSHA": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "changedCP": [
+        7850,
+        7852,
+        7858,
+        7860,
+        7862
+      ],
+      "metricMismatch": [],
+      "bboxDiff": [
+        {
+          "cp": 7850,
+          "old": [
+            32,
+            -12,
+            669,
+            1079
+          ],
+          "new": [
+            32,
+            -12,
+            669,
+            1160
+          ]
+        }
+      ]
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "actualSHA": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "candidateSHA": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "changedCP": [
+        7850,
+        7852,
+        7858,
+        7860,
+        7862
+      ],
+      "metricMismatch": [],
+      "bboxDiff": [
+        {
+          "cp": 7850,
+          "old": [
+            11,
+            -26,
+            801,
+            1322
+          ],
+          "new": [
+            11,
+            -26,
+            670,
+            1160
+          ]
+        }
+      ]
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "actualSHA": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "candidateSHA": "c6063a8e349005bdb11a3a6bfaca339ea8d7a9cc7c5efc5bfe30edd5a04a6f98",
+      "changedCP": [],
+      "metricMismatch": [],
+      "bboxDiff": []
+    }
+  },
+  "independentGlyphProof": "soat-font-5a-revision2-lo-264.json",
+  "glyphCasesPassed": 10,
+  "productionAdopted": false,
+  "globalFontAdmitted": false,
+  "gioiHan": "10glyphriêngđãfreshDOM+SVGnewfontSHA;chưađạttấtcảfont/dấu/compound/metricslayoutởcỡapp/fullfont-gates/corpus;KHÔNGthayfontchínhhoặctựdùngoldproofduyệthashmới."
+}

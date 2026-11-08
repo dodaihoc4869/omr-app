@@ -1,0 +1,310 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "fontModified": false,
+  "candidateAdmissible": false,
+  "candidateInputSubsets": {
+    "ddh-rounded-de-latin.woff2": {
+      "sha": "c95e8cb6fc4f5ed3c63571740b8a6628232bd8dd73e78d2850caca5eb41caaeb",
+      "changedCP": [],
+      "metricDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "sha": "25180683e7e1a880d127bb2f06539babce58d28f0705dbf6854e5ccdbfd6522c",
+      "changedCP": [
+        7850,
+        7852,
+        7858,
+        7860,
+        7862
+      ],
+      "metricDiff": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "sha": "4eccedce17d0bfb52e469310d01e353305ea66b513c6f8fcba739db8d4963557",
+      "changedCP": [
+        7850,
+        7852,
+        7858,
+        7860,
+        7862
+      ],
+      "metricDiff": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "sha": "c39ddf4a8a3226f37bc83b64c91d0f5d304af5ec36cd2fab979702c357ce4549",
+      "changedCP": [],
+      "metricDiff": []
+    }
+  },
+  "method": "TựfreshChromiumNativeDOM@fontface từ4candidateWOFF2actual +SVGpathTTFmergecandidate;10cases32/72/200và10macro800,mởriêng20FULL. Cùngframeproductioncurrent/sourceMPLUSRegular-Medium/ASCIIA;Current/Raw/Sourcefontchecktrue từngcase.",
+  "results": [
+    {
+      "char": "Ẫ",
+      "cp": 7850,
+      "style": "de",
+      "weight": 400,
+      "ketQua": "Cần sửa: semanticmarkoverlap/duplicateoldmark",
+      "bodyPinhole": false,
+      "markFailure": true,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ. ĐềẪ2marks vẫnchồng40units:tilde[151,940,549,1079],newmu[165,810,534,980],actualgiaoX;khôngđạt.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/de-7850.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-de-7850.png"
+    },
+    {
+      "char": "Ậ",
+      "cp": 7852,
+      "style": "de",
+      "weight": 400,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/de-7852.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-de-7852.png"
+    },
+    {
+      "char": "Ẳ",
+      "cp": 7858,
+      "style": "de",
+      "weight": 400,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/de-7858.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-de-7858.png"
+    },
+    {
+      "char": "Ẵ",
+      "cp": 7860,
+      "style": "de",
+      "weight": 400,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/de-7860.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-de-7860.png"
+    },
+    {
+      "char": "Ặ",
+      "cp": 7862,
+      "style": "de",
+      "weight": 400,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/de-7862.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-de-7862.png"
+    },
+    {
+      "char": "Ẫ",
+      "cp": 7850,
+      "style": "dam",
+      "weight": 700,
+      "ketQua": "Cần sửa: semanticmarkoverlap/duplicateoldmark",
+      "bodyPinhole": false,
+      "markFailure": true,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ. ĐậmẪ3markcontours thayvì2semanticmarks:oldmu[136,734,546,921]lọtthan do734<threshold751;tilde[123,939,558,1115]vànewmu[140,948,540,1138]overlap176units. Actualtopblob và2hats;khôngđạt. Khôngchỉthiếugap,phảitáchloạibỏoldsemanticcircumflex khỏithan.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/dam-7850.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-dam-7850.png"
+    },
+    {
+      "char": "Ậ",
+      "cp": 7852,
+      "style": "dam",
+      "weight": 700,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/dam-7852.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-dam-7852.png"
+    },
+    {
+      "char": "Ẳ",
+      "cp": 7858,
+      "style": "dam",
+      "weight": 700,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/dam-7858.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-dam-7858.png"
+    },
+    {
+      "char": "Ẵ",
+      "cp": 7860,
+      "style": "dam",
+      "weight": 700,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/dam-7860.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-dam-7860.png"
+    },
+    {
+      "char": "Ặ",
+      "cp": 7862,
+      "style": "dam",
+      "weight": 700,
+      "ketQua": "Đạt riêngglyphcandidate saukiểmthực,khôngfontglobal",
+      "bodyPinhole": false,
+      "markFailure": false,
+      "observations": "ThânA/counter sạchpinhole ởmacro800;ởẲ/Ẵjointbreve liềnnguồn nay sạchseam;khôngmisplacedmark mới ởẬ/Ẳ/Ẵ/Ặ.",
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-candidate264/dam-7862.png",
+      "actualMacro": "/workspace/scratch/hold5-candidate264/macro-dam-7862.png"
+    }
+  ],
+  "summary": "8/10glyph riêng đạt;ẪĐề/Đậm chưađạt vìmarklayout;body10/10đãsạch. Khôngadoptcandidate/chưafontglobal.",
+  "fixProposal": [
+    "Ẫmarkselection cầnsource-semanticindices trướcoffset, khôngminYthreshold đểtáchbody/mark;Damoldcircumflexcrossbodytopkhôngđượcgiữtrongthan. Removeđúng2oldmarksemantics rồiđặtmu+tilde,khôngchạmbody đãsửa.",
+    "Dùng2distinctsemanticmarkcomponents vàkhehở dương giữa inkoutlines;De cầnkhe tildeminy >muymax;Damchỉ2marks,khôngoldmu. Khôngép currentwrongbbox hoặccopyhmtx.",
+    "Giữnegativehash251806…ĐềViet/4ecced…ĐậmViet, reviewmọihashmới sau sửa."
+  ],
+  "macroFrameCaveat": "Macro800códotbottom/topcut ởvàicase doframe dùngbodyfocus;FULL32/72/200 đủtoànglyph,khôngcoilàfontclipping."
+}

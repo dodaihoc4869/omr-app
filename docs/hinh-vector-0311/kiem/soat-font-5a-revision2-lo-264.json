@@ -1,0 +1,313 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "fontModified": false,
+  "globalFontAdmitted": false,
+  "productionAdopted": false,
+  "revision": "lo264revision2",
+  "inputSubsets": {
+    "ddh-rounded-de-latin.woff2": {
+      "sha": "44def6d1ca8e6a67ee0ed2bac465d00e21d9c297e52a4b85b2a2feb90e9ae2d9",
+      "changedCPvsCandidate1": [],
+      "metricDiffvsProduction": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "sha": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "changedCPvsCandidate1": [
+        7850
+      ],
+      "metricDiffvsProduction": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "sha": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "changedCPvsCandidate1": [
+        7850
+      ],
+      "metricDiffvsProduction": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "sha": "c6063a8e349005bdb11a3a6bfaca339ea8d7a9cc7c5efc5bfe30edd5a04a6f98",
+      "changedCPvsCandidate1": [],
+      "metricDiffvsProduction": []
+    }
+  },
+  "records": [
+    {
+      "char": "Ẫ",
+      "cp": 7850,
+      "style": "de",
+      "shaVietnamese": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "glyphContourBounds": [
+        [
+          32,
+          -12,
+          669,
+          742
+        ],
+        [
+          238,
+          289,
+          459,
+          623
+        ],
+        [
+          151,
+          1021,
+          549,
+          1160
+        ],
+        [
+          165,
+          810,
+          534,
+          980
+        ]
+      ],
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/de-7850.png",
+      "actualMacro": "/workspace/scratch/hold5-revision2-264/macro-de-7850.png"
+    },
+    {
+      "char": "Ậ",
+      "cp": 7852,
+      "style": "de",
+      "shaVietnamese": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/de-7852.png"
+    },
+    {
+      "char": "Ẳ",
+      "cp": 7858,
+      "style": "de",
+      "shaVietnamese": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/de-7858.png"
+    },
+    {
+      "char": "Ẵ",
+      "cp": 7860,
+      "style": "de",
+      "shaVietnamese": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/de-7860.png"
+    },
+    {
+      "char": "Ặ",
+      "cp": 7862,
+      "style": "de",
+      "shaVietnamese": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/de-7862.png"
+    },
+    {
+      "char": "Ẫ",
+      "cp": 7850,
+      "style": "dam",
+      "shaVietnamese": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "glyphContourBounds": [
+        [
+          11,
+          -26,
+          670,
+          756
+        ],
+        [
+          266,
+          306,
+          409,
+          544
+        ],
+        [
+          123,
+          984,
+          558,
+          1160
+        ],
+        [
+          140,
+          734,
+          540,
+          924
+        ]
+      ],
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/dam-7850.png",
+      "actualMacro": "/workspace/scratch/hold5-revision2-264/macro-dam-7850.png"
+    },
+    {
+      "char": "Ậ",
+      "cp": 7852,
+      "style": "dam",
+      "shaVietnamese": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/dam-7852.png"
+    },
+    {
+      "char": "Ẳ",
+      "cp": 7858,
+      "style": "dam",
+      "shaVietnamese": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/dam-7858.png"
+    },
+    {
+      "char": "Ẵ",
+      "cp": 7860,
+      "style": "dam",
+      "shaVietnamese": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/dam-7860.png"
+    },
+    {
+      "char": "Ặ",
+      "cp": 7862,
+      "style": "dam",
+      "shaVietnamese": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "ketQua": "Đạt riêngglyphR2 từactualMỚI: tựfreshChromiumDOM@fontfaceactual4WOFF2revision2+mergedSVG32/72/200vàmởRIÊNGFULL. Body/counterkhôngpinhole,seam0;dấu/casegiữđúng;Ẳ/Ẵjointbrevelàsourceconnectedthiếtkế,khôngseammới. Khe/gapsđủ,khôngmarkcollision/clip trongfullframes. Cóproductioncurrent/sourceMPLUS/ASCIIA đối chiếu thực. KHÔNGdùngR1rendercarrynewSHA.",
+      "freshLoad": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "actualDOMSVG": "/workspace/scratch/hold5-revision2-264/dam-7862.png"
+    }
+  ],
+  "other8Glyphs": "FreshChromiumDOM+SVG32/72/200R2đãtạoMỚIvàmởRIÊNGFULL8othercase;exactoutlinecomparisonR1làbằngchứngbổsung,khôngthayactualreview.",
+  "negativeRevision1Preserved": "/workspace/scratch/soat-5a-candidate-lo264.json",
+  "conclusion": "10/10glyphrevision2 đãsoátMỚIactualDOM+SVG32/72/200theoR2fontbytes/hash;2Ẫcóthêmmacro800MỚI. Đạtlimited5Avisualcheckpoint,chưafontglobal/prodadoption."
+}
