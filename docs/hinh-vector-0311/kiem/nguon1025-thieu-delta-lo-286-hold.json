@@ -1,0 +1,36 @@
+{
+  "lo": 286,
+  "i": 1025,
+  "hashNguon": "b8144be883a3baa0d8ad1b55aa30afd76decae02fa8a945c9c7b7bac803ca19b",
+  "trangThai": "source-only-hold",
+  "actualSvgReviewed": false,
+  "counted": false,
+  "fontFiles": [
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "bytes": 11648,
+      "deltaU03B4": false
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2",
+      "sha256": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "bytes": 5888,
+      "deltaU03B4": false
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2",
+      "sha256": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "bytes": 5948,
+      "deltaU03B4": false
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "bytes": 11616,
+      "deltaU03B4": false
+    }
+  ],
+  "diagnostic": "F.advance không xác minh cmap; F.label('δ⁻') raises ValueError Phông app thiếu ký tự ['δ']. Không dựng/admit SVG/không fallback/không đổi δ thành Latin/chưa tạo font candidate.",
+  "arrowCorrection": "Source-agent first filled claim incorrect; root+source independent native macros show closed hollow triangle/verticalleftbase/2slopingedges/lightinterior/shortshaftovershootRIGHT; source-only correction retained, no previous SVG positive."
+}

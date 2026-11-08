@@ -1,0 +1,350 @@
+{
+  "i": 1025,
+  "hash": "b8144be883a3baa0d8ad1b55aa30afd76decae02fa8a945c9c7b7bac803ca19b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b8144be883a3baa0d8ad1b55aa30afd76decae02fa8a945c9c7b7bac803ca19b.png",
+  "size": [
+    792,
+    245
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C5-B21-I-4",
+      "de": "Phương trình hoá học của phản ứng thuỷ phân ethyl bromide là:\nCH₃CH₂Br + NaOH → CH₃CH₂OH + NaBr (1).\nMột giai đoạn tạo thành sản phẩm trong cơ chế của phản ứng trên xảy ra như hình (*).\nNhận định nào sau đây đúng?",
+      "allHinh": [
+        {
+          "hash": "b8144be883a3baa0d8ad1b55aa30afd76decae02fa8a945c9c7b7bac803ca19b",
+          "where": "11-C5-B21-I-4.hinh.0.du_lieu",
+          "hashDataUrl": "9b83af7fdf1bfc8bc083dcbd3f414900e383fc37f58143ce9f9283e06ba7e1ac"
+        }
+      ],
+      "missingHashes": [
+        "b8144be883a3baa0d8ad1b55aa30afd76decae02fa8a945c9c7b7bac803ca19b"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhmissingonlythishash=>1full/noPartial.",
+  "review": "NativeFULL+4x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "transition": {
+      "brackets": [
+        "M5268H42V213H52",
+        "M31168H321V213H311"
+      ],
+      "labels": [
+        {
+          "text": "HO",
+          "bbox": [
+            64,
+            109,
+            113,
+            138
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            152,
+            109,
+            215,
+            142
+          ]
+        },
+        {
+          "text": "Br",
+          "bbox": [
+            256,
+            109,
+            287,
+            138
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            152,
+            174,
+            215,
+            208
+          ]
+        },
+        {
+          "text": "δ−",
+          "bbox": [
+            94,
+            79,
+            124,
+            101
+          ]
+        },
+        {
+          "text": "δ−",
+          "bbox": [
+            257,
+            79,
+            287,
+            101
+          ]
+        }
+      ],
+      "partialBonds": {
+        "leftThreeDashes": [
+          [
+            [
+              116,
+              121
+            ],
+            [
+              126,
+              121
+            ]
+          ],
+          [
+            [
+              130,
+              121
+            ],
+            [
+              140,
+              121
+            ]
+          ],
+          [
+            [
+              144,
+              121
+            ],
+            [
+              152,
+              121
+            ]
+          ]
+        ],
+        "rightThreeDashes": [
+          [
+            [
+              216,
+              121
+            ],
+            [
+              226,
+              121
+            ]
+          ],
+          [
+            [
+              230,
+              121
+            ],
+            [
+              240,
+              121
+            ]
+          ],
+          [
+            [
+              244,
+              121
+            ],
+            [
+              254,
+              121
+            ]
+          ]
+        ]
+      },
+      "verticalCC": [
+        [
+          166,
+          140
+        ],
+        [
+          166,
+          173
+        ]
+      ],
+      "trap": "CH2CENTRAL+CH3DOWNliteraldespitetransitionvalence;DO NOTchangeCH2toCH/fromtheory. δminuslabelsaboveHO/Br,notwholebracketcharge;NOoutsidebracketcharge."
+    },
+    "arrow": {
+      "shaft": [
+        [
+          344,
+          121
+        ],
+        [
+          413,
+          121
+        ]
+      ],
+      "closedHollowTriangle": [
+        [
+          394,
+          116
+        ],
+        [
+          394,
+          127
+        ],
+        [
+          406,
+          121
+        ]
+      ],
+      "fill": "WHITE/lightgrayinterior native,blackoutline3closededges. NOTsolidfill/openV.",
+      "shaftOvershoot": "Shaftends~413,y121 beyondtriangletip~406,121 by~7px;preservevisibleextension. Nearbaseleftshortscanwhitegap~391..393maybenativealiasing,donotclaimperfectconnectedpath.",
+      "nativeOwnMacro": "/workspace/scratch/1025-arrow30x-own.png"
+    },
+    "product": {
+      "labels": [
+        {
+          "text": "CH₃",
+          "bbox": [
+            433,
+            103,
+            493,
+            139
+          ]
+        },
+        {
+          "text": "C",
+          "bbox": [
+            536,
+            103,
+            557,
+            133
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            600,
+            104,
+            650,
+            136
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            536,
+            35,
+            558,
+            66
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            536,
+            171,
+            558,
+            202
+          ]
+        },
+        {
+          "text": "+",
+          "bbox": [
+            670,
+            109,
+            690,
+            130
+          ]
+        },
+        {
+          "text": "Br",
+          "bbox": [
+            713,
+            105,
+            746,
+            135
+          ]
+        },
+        {
+          "text": "−",
+          "bbox": [
+            746,
+            94,
+            761,
+            109
+          ],
+          "note": "BrchargeSUPnotbaselinebond"
+        }
+      ],
+      "bonds": [
+        [
+          [
+            496,
+            118
+          ],
+          [
+            534,
+            118
+          ]
+        ],
+        [
+          [
+            559,
+            118
+          ],
+          [
+            599,
+            118
+          ]
+        ],
+        [
+          [
+            547,
+            68
+          ],
+          [
+            547,
+            101
+          ]
+        ],
+        [
+          [
+            547,
+            134
+          ],
+          [
+            547,
+            169
+          ]
+        ]
+      ]
+    },
+    "counts": "Visible4C across2sides/1Brperside/1Oeachside;2δ−/1BrSUPminus;1squarepair/6dashsegments(3each)/1CLOSEDHOLLOWtriangleRIGHTarrowwithshaftovershoot. ProductCH3condensed+Hup+Hdown+OH;preserveexacttokensnotinferredcount. NoNa/chargeoutsidebracket/HOreorder/condition/answercaptionadded.",
+    "style": "Regularuprightblackactualsubs2/3;deltaGreekrequired(noLatinreplacement),sourcegraynoise/specklesnotatoms."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,literalformulaerrorspreserved,noanswerorvalencenormalization.",
+  "actualSvgReviewed": false,
+  "arrowCorrection": {
+    "oldIncorrect": {
+      "shaft": [
+        [
+          344,
+          121
+        ],
+        [
+          413,
+          121
+        ]
+      ],
+      "filledhead": [
+        [
+          398,
+          115
+        ],
+        [
+          413,
+          121
+        ],
+        [
+          398,
+          127
+        ]
+      ]
+    },
+    "reason": "Priorfilledclassificationincorrect;selfnative30xnearestshows3closededges/lightinterior/shaftovershoot. Rootcaught,freshsource-onlycorrected;NOpositiveSVGproofexists."
+  }
+}

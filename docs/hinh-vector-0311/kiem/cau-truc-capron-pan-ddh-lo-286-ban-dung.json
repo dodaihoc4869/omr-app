@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1043,
+    "hash": "bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d",
+    "fileNguon": "anh/bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d.png",
+    "svg": "capron-pan-ddh-19fd43d6eb58e4477fd47924521bc7a681ea9e9b1b7ee10feb54a82d1abefd4a.svg",
+    "hashSvg": "19fd43d6eb58e4477fd47924521bc7a681ea9e9b1b7ee10feb54a82d1abefd4a",
+    "byteSvg": 21189,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D1-II-3",
+        "de": "Tơ capron và polyacrylonitrile có công thức cấu tạo như hình dưới đây.",
+        "refs": [
+          {
+            "hash": "bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d",
+            "where": "12-KT-C4-D1-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "170d1e6d320e900120184b36d1183187921b251fcf04d5cb330ccb4ec43c9694"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2separatepolymers/HN-(CH2)5-COleft/CH2-CHwithCNDOWNright/2outerroundpairs+1innerroundpair/sub2-sub5-2nsub/4crossbracketfreeends/lowercasecapron-polyacrylonitrile/regularDDH/Canchors/noexpandedCOdouble-addedH-answer.",
+    "hashSvgDaSoat": "19fd43d6eb58e4477fd47924521bc7a681ea9e9b1b7ee10feb54a82d1abefd4a",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,233 @@
+{
+  "i": 1043,
+  "hash": "bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d.png",
+  "size": [
+    768,
+    245
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C4-D1-II-3",
+      "de": "Tơ capron và polyacrylonitrile có công thức cấu tạo như hình dưới đây.",
+      "allHinh": [
+        {
+          "hash": "bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d",
+          "where": "12-KT-C4-D1-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "170d1e6d320e900120184b36d1183187921b251fcf04d5cb330ccb4ec43c9694"
+        }
+      ],
+      "missingHashes": [
+        "bbdd63af031f6ca0565958120d330d3742bdeedf64450701c932afb71cd8e26d"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhonlymissingthishash=>1full/noPartial.",
+  "review": "NativeFULL+4x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "leftPolymer": {
+      "tokens": [
+        {
+          "text": "HN",
+          "bbox": [
+            91,
+            70,
+            139,
+            101
+          ]
+        },
+        {
+          "text": "(CH₂)₅",
+          "bbox": [
+            164,
+            67,
+            266,
+            106
+          ],
+          "note": "INNERroundparenthesesaroundCH2only;2suband5suboutsideinnerpair"
+        },
+        {
+          "text": "CO",
+          "bbox": [
+            270,
+            69,
+            322,
+            99
+          ],
+          "note": "CONDENSEDCO,noexpandedC=O"
+        }
+      ],
+      "mainBonds": [
+        [
+          [
+            47,
+            84
+          ],
+          [
+            89,
+            84
+          ]
+        ],
+        [
+          [
+            141,
+            83
+          ],
+          [
+            160,
+            83
+          ]
+        ],
+        [
+          [
+            253,
+            82
+          ],
+          [
+            268,
+            82
+          ]
+        ],
+        [
+          [
+            321,
+            78
+          ],
+          [
+            345,
+            78
+          ]
+        ]
+      ],
+      "outerRoundBracket": "LEFTcurvex77 y61..102;RIGHTcurvex328 y55..99. Nativeleftstubcrossesouterat77,84/rightstubcrossesouterat328,78;baselinejitterpreservelegibilitynotaddbonds.",
+      "nSub": {
+        "text": "n",
+        "bbox": [
+          342,
+          88,
+          355,
+          107
+        ]
+      },
+      "caption": {
+        "text": "capron",
+        "bbox": [
+          139,
+          181,
+          226,
+          208
+        ],
+        "style": "regularuprightlowercase"
+      }
+    },
+    "rightPolymer": {
+      "tokens": [
+        {
+          "text": "CH₂",
+          "bbox": [
+            523,
+            64,
+            588,
+            104
+          ],
+          "Ccenter": [
+            536,
+            84
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            612,
+            64,
+            658,
+            94
+          ],
+          "Ccenter": [
+            624,
+            84
+          ]
+        },
+        {
+          "text": "CN",
+          "bbox": [
+            614,
+            124,
+            664,
+            154
+          ],
+          "Ccenter": [
+            626,
+            140
+          ]
+        }
+      ],
+      "mainBonds": [
+        [
+          [
+            480,
+            84
+          ],
+          [
+            521,
+            84
+          ]
+        ],
+        [
+          [
+            590,
+            81
+          ],
+          [
+            610,
+            81
+          ]
+        ],
+        [
+          [
+            660,
+            84
+          ],
+          [
+            708,
+            84
+          ]
+        ]
+      ],
+      "CNbond": [
+        [
+          624,
+          95
+        ],
+        [
+          624,
+          120
+        ]
+      ],
+      "roundBracket": "LEFTcurvex500,y64..149;RIGHTcurvex680,y64..147,opensinward;bothcrossbackbonestubs,wholeCH2-CH(CN)inside.",
+      "nSub": {
+        "text": "n",
+        "bbox": [
+          686,
+          141,
+          699,
+          158
+        ]
+      },
+      "caption": {
+        "text": "polyacrylonitrile",
+        "bbox": [
+          517,
+          177,
+          708,
+          207
+        ],
+        "style": "regularuprightlowercase"
+      }
+    },
+    "counts": "2polymercondensedrepeats/3roundpairs(outerleft+innerCH2+outerright)/2nsub/1sub5/2CH2sub2/1CNdownbranch/2lowercasecaptions. NOsquarebrackets/drawnCOdouble/CNtriple/extraH/arrow/answer/namechange."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,tokenliteralpreservednoformulaexpansion.",
+  "actualSvgReviewed": false
+}

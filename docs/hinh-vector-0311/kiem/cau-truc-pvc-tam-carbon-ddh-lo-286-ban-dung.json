@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1021,
+    "hash": "b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d",
+    "fileNguon": "anh/b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d.png",
+    "svg": "pvc-tam-carbon-ddh-0d5b9845ddd18240b8f06244d9805efef6d81aa6d1a60572c2d00af57f7c79af.svg",
+    "hashSvg": "0d5b9845ddd18240b8f06244d9805efef6d81aa6d1a60572c2d00af57f7c79af",
+    "byteSvg": 13263,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C4-B12-I-22",
+        "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X: Tên gọi của polymer X là",
+        "refs": [
+          {
+            "hash": "b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d",
+            "where": "12-C4-B12-I-22.hinh.0.du_lieu",
+            "hashDataUrl": "12434929b18b2ab2ada64524d61664ecface0d52d768b171e7e858df8a4ad075"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8explicitC/4CH2alternating4CH/4Cldownat2-4-6-8/7horizontalCC+2freeends/4verticalCCl/regularDDH/Canchors/noaddedellipsis-bracket-n-name-answer.",
+    "hashSvgDaSoat": "0d5b9845ddd18240b8f06244d9805efef6d81aa6d1a60572c2d00af57f7c79af",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

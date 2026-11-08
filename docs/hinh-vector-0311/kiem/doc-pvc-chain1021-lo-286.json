@@ -1,0 +1,257 @@
+{
+  "i": 1021,
+  "hash": "b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d.png",
+  "size": [
+    645,
+    142
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C4-B12-I-22",
+      "de": "Cho cấu tạo của một đoạn mạch trong phân tử polymer X: Tên gọi của polymer X là",
+      "allHinh": [
+        {
+          "hash": "b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d",
+          "where": "12-C4-B12-I-22.hinh.0.du_lieu",
+          "hashDataUrl": "12434929b18b2ab2ada64524d61664ecface0d52d768b171e7e858df8a4ad075"
+        }
+      ],
+      "missingHashes": [
+        "b76724b3433dbf8d7138c2981c5fd9f15e339650712ad353806a3a6842926a9d"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhonlymissingthishash=>1full/noPartial.",
+  "review": "NativeFULL+4x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "backboneTokens": [
+      {
+        "text": "CH₂",
+        "bbox": [
+          45,
+          38,
+          104,
+          70
+        ],
+        "Ccenter": [
+          58,
+          52
+        ]
+      },
+      {
+        "text": "CH",
+        "bbox": [
+          121,
+          38,
+          168,
+          64
+        ],
+        "Ccenter": [
+          134,
+          52
+        ]
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          186,
+          38,
+          244,
+          70
+        ],
+        "Ccenter": [
+          198,
+          52
+        ]
+      },
+      {
+        "text": "CH",
+        "bbox": [
+          262,
+          38,
+          308,
+          64
+        ],
+        "Ccenter": [
+          275,
+          52
+        ]
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          326,
+          38,
+          385,
+          70
+        ],
+        "Ccenter": [
+          339,
+          52
+        ]
+      },
+      {
+        "text": "CH",
+        "bbox": [
+          403,
+          38,
+          449,
+          64
+        ],
+        "Ccenter": [
+          416,
+          52
+        ]
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          466,
+          38,
+          525,
+          70
+        ],
+        "Ccenter": [
+          479,
+          52
+        ]
+      },
+      {
+        "text": "CH",
+        "bbox": [
+          544,
+          38,
+          590,
+          64
+        ],
+        "Ccenter": [
+          557,
+          52
+        ]
+      }
+    ],
+    "horizontalBondsY": 53,
+    "horizontalSegmentsX": [
+      [
+        29,
+        44
+      ],
+      [
+        105,
+        119
+      ],
+      [
+        169,
+        184
+      ],
+      [
+        245,
+        260
+      ],
+      [
+        309,
+        325
+      ],
+      [
+        386,
+        401
+      ],
+      [
+        450,
+        464
+      ],
+      [
+        526,
+        542
+      ],
+      [
+        592,
+        609
+      ]
+    ],
+    "ClBranches": [
+      {
+        "text": "Cl",
+        "bbox": [
+          121,
+          84,
+          155,
+          109
+        ],
+        "bond": [
+          [
+            134,
+            65
+          ],
+          [
+            134,
+            82
+          ]
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          262,
+          84,
+          296,
+          109
+        ],
+        "bond": [
+          [
+            275,
+            65
+          ],
+          [
+            275,
+            82
+          ]
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          403,
+          86,
+          437,
+          111
+        ],
+        "bond": [
+          [
+            416,
+            66
+          ],
+          [
+            416,
+            84
+          ]
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          544,
+          88,
+          578,
+          113
+        ],
+        "bond": [
+          [
+            557,
+            66
+          ],
+          [
+            557,
+            86
+          ]
+        ]
+      }
+    ],
+    "counts": "8C12H4Cl via4CH2+4CH/4Cldownat2/4/6/8/9horizontalbondsincl2freeends/4verticalC-Clbonds. Noellipsis/brackets/n/caption/title/charge/answeradded.",
+    "styles": "Regularuprightformula/actual2sub/lowercasel inCl. Uniformthinblackbonds. Randomscanspecklesnotpartofstructure;not3dotterminal."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,glyphCcentersnotHanchors.",
+  "actualSvgReviewed": false
+}
