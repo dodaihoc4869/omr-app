@@ -17,6 +17,10 @@ export { default as PhongVaoThi } from './PhongVaoThi'
 export { default as VaoThiForm } from './bang-nhiem-vu/VaoThiForm'
 // 02/11 (sau PR 759): nhãn hạn nộp của danh sách Bài tập về nhà kiểu cũ (nhánh không-M3) — chỉ cổng học sinh nhập ⇒ vào thẳng mảnh này, không thêm tệp.
 export { default as NhanHanBaiTap } from './NhanHanBaiTap'
+// 02/11 (sau PR 786): đề + phương án màn làm Bài gia đình giao kiểu cũ — MomM3 ở mảnh này vốn dùng chung ⇒ không thêm tệp.
+export { MomQuestionStem, MomOption } from './MomQuestionMedia'
+// …và màn Ôn câu (LamCauOn — dùng chung MomQuestionMedia; trước là mảnh riêng + tờ kiểu riêng): gom về đây ⇒ precache bớt tệp, nạp sẵn lúc rảnh.
+export { default as LamCauOn } from './bang-nhiem-vu/LamCauOn'
 // Bong bóng A.I Đỗ Đại Học (24/10): cửa nạp nằm Ở ĐÂY (không ở StudentPortalScreen) ⇒ danh sách mảnh kèm của import() không vào lượt mở /hs; bong bóng vẫn là mảnh riêng ngoài precache.
 export const napBong = () => import('./ai-ddh/BongBongAiDdh')
 
