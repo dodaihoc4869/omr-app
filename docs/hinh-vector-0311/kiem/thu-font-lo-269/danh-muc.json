@@ -1,0 +1,18 @@
+{
+  "files": [
+    {
+      "file": "unified-de-partial-chua-admit.woff2",
+      "sha256": "0fa021440f18da5b3021a074dfa65e5a404d42a72ec7f06fc9cdf96893f68c61",
+      "bytes": 22384
+    },
+    {
+      "file": "unified-dam-partial-chua-admit.woff2",
+      "sha256": "0bd7fe68acbaccb2c7ef82894608562f18d27887c32b5a07c427da179893eef8",
+      "bytes": 22588
+    }
+  ],
+  "productionAdopt": false,
+  "globalAdmitted": false,
+  "scopedGlyphPositive": "DeẪ only",
+  "remainingFiveUppercaseStillBad": true
+}

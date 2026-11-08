@@ -1,0 +1,3533 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "productionAdopt": false,
+  "globalVerdict": "HOLD: boundedsearch onepartialsolution only",
+  "search": [
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 930,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 92,
+      "bodyClearPools": [
+        12,
+        15
+      ],
+      "markPairTests": 180,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -286.0
+          ],
+          [
+            0,
+            -120.0
+          ]
+        ],
+        "intersectionBounds": [
+          160.01187133789062,
+          729.0,
+          529.5388793945312,
+          860.4300537109375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            151.9310302734375,
+            550.0,
+            548.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 930,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 460,
+      "bodyClearPools": [
+        60,
+        66
+      ],
+      "markPairTests": 3960,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -276.0
+          ],
+          [
+            -24,
+            -105.0
+          ]
+        ],
+        "intersectionBounds": [
+          135.58885192871094,
+          739.0,
+          507.589111328125,
+          872.5691528320312
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            127.9310302734375,
+            550.0,
+            524.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 950,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 100,
+      "bodyClearPools": [
+        16,
+        19
+      ],
+      "markPairTests": 304,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -286.0
+          ],
+          [
+            0,
+            -120.0
+          ]
+        ],
+        "intersectionBounds": [
+          160.01187133789062,
+          729.0,
+          529.5388793945312,
+          860.4300537109375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            151.9310302734375,
+            550.0,
+            548.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 950,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 500,
+      "bodyClearPools": [
+        80,
+        86
+      ],
+      "markPairTests": 6880,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -276.0
+          ],
+          [
+            -24,
+            -105.0
+          ]
+        ],
+        "intersectionBounds": [
+          135.58885192871094,
+          739.0,
+          507.589111328125,
+          872.5691528320312
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            127.9310302734375,
+            550.0,
+            524.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 970,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 108,
+      "bodyClearPools": [
+        20,
+        23
+      ],
+      "markPairTests": 460,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -286.0
+          ],
+          [
+            0,
+            -120.0
+          ]
+        ],
+        "intersectionBounds": [
+          160.01187133789062,
+          729.0,
+          529.5388793945312,
+          860.4300537109375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            151.9310302734375,
+            550.0,
+            548.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 970,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 540,
+      "bodyClearPools": [
+        100,
+        106
+      ],
+      "markPairTests": 10600,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -276.0
+          ],
+          [
+            -24,
+            -105.0
+          ]
+        ],
+        "intersectionBounds": [
+          135.58885192871094,
+          739.0,
+          507.589111328125,
+          872.5691528320312
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            127.9310302734375,
+            550.0,
+            524.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 1000,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 120,
+      "bodyClearPools": [
+        26,
+        29
+      ],
+      "markPairTests": 754,
+      "best": {
+        "cost": 271.0,
+        "translations": [
+          [
+            0,
+            -161.0
+          ],
+          [
+            0,
+            -110.0
+          ]
+        ]
+      },
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -286.0
+          ],
+          [
+            0,
+            -120.0
+          ]
+        ],
+        "intersectionBounds": [
+          160.01187133789062,
+          729.0,
+          529.5388793945312,
+          860.4300537109375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            151.9310302734375,
+            550.0,
+            548.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ẫ",
+      "headroomTop": 1000,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 600,
+      "bodyClearPools": [
+        130,
+        136
+      ],
+      "markPairTests": 17680,
+      "best": {
+        "cost": 271.0,
+        "translations": [
+          [
+            0,
+            -161.0
+          ],
+          [
+            0,
+            -110.0
+          ]
+        ]
+      },
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -276.0
+          ],
+          [
+            -24,
+            -105.0
+          ]
+        ],
+        "intersectionBounds": [
+          135.58885192871094,
+          739.0,
+          507.589111328125,
+          872.5691528320312
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            127.9310302734375,
+            550.0,
+            524.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 930,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 92,
+      "bodyClearPools": [
+        8,
+        2
+      ],
+      "markPairTests": 16,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          130.9999542236328,
+          749.3740844726562,
+          511.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            123.92857360839844,
+            550.0,
+            520.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 930,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 460,
+      "bodyClearPools": [
+        40,
+        10
+      ],
+      "markPairTests": 400,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -266.0
+          ],
+          [
+            -24,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          106.99995422363281,
+          749.3740844726562,
+          487.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            99.92857360839844,
+            550.0,
+            496.0714416503906,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 950,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 100,
+      "bodyClearPools": [
+        12,
+        6
+      ],
+      "markPairTests": 72,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          130.9999542236328,
+          749.3740844726562,
+          511.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            123.92857360839844,
+            550.0,
+            520.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 950,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 500,
+      "bodyClearPools": [
+        60,
+        30
+      ],
+      "markPairTests": 1800,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -266.0
+          ],
+          [
+            -24,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          106.99995422363281,
+          749.3740844726562,
+          487.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            99.92857360839844,
+            550.0,
+            496.0714416503906,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 970,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 108,
+      "bodyClearPools": [
+        16,
+        10
+      ],
+      "markPairTests": 160,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          130.9999542236328,
+          749.3740844726562,
+          511.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            123.92857360839844,
+            550.0,
+            520.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 970,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 540,
+      "bodyClearPools": [
+        80,
+        50
+      ],
+      "markPairTests": 4000,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -266.0
+          ],
+          [
+            -24,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          106.99995422363281,
+          749.3740844726562,
+          487.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            99.92857360839844,
+            550.0,
+            496.0714416503906,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 1000,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 120,
+      "bodyClearPools": [
+        22,
+        16
+      ],
+      "markPairTests": 352,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          130.9999542236328,
+          749.3740844726562,
+          511.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            123.92857360839844,
+            550.0,
+            520.0714111328125,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ễ",
+      "headroomTop": 1000,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 600,
+      "bodyClearPools": [
+        110,
+        80
+      ],
+      "markPairTests": 8800,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -266.0
+          ],
+          [
+            -24,
+            -55.0
+          ]
+        ],
+        "intersectionBounds": [
+          106.99995422363281,
+          749.3740844726562,
+          487.9063720703125,
+          896.2386474609375
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            99.92857360839844,
+            550.0,
+            496.0714416503906,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 930,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 92,
+      "bodyClearPools": [
+        8,
+        4
+      ],
+      "markPairTests": 32,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -65.0
+          ]
+        ],
+        "intersectionBounds": [
+          188.9999542236328,
+          749.0,
+          569.1309814453125,
+          893.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            181.92857360839844,
+            550.0,
+            578.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 930,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 460,
+      "bodyClearPools": [
+        39,
+        18
+      ],
+      "markPairTests": 702,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -261.0
+          ],
+          [
+            -24,
+            -60.0
+          ]
+        ],
+        "intersectionBounds": [
+          164.9999542236328,
+          754.0,
+          545.1309814453125,
+          898.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            157.92857360839844,
+            550.0,
+            554.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 950,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 100,
+      "bodyClearPools": [
+        12,
+        8
+      ],
+      "markPairTests": 96,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -65.0
+          ]
+        ],
+        "intersectionBounds": [
+          188.9999542236328,
+          749.0,
+          569.1309814453125,
+          893.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            181.92857360839844,
+            550.0,
+            578.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 950,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 500,
+      "bodyClearPools": [
+        59,
+        38
+      ],
+      "markPairTests": 2242,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -261.0
+          ],
+          [
+            -24,
+            -60.0
+          ]
+        ],
+        "intersectionBounds": [
+          164.9999542236328,
+          754.0,
+          545.1309814453125,
+          898.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            157.92857360839844,
+            550.0,
+            554.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 970,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 108,
+      "bodyClearPools": [
+        16,
+        12
+      ],
+      "markPairTests": 192,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -65.0
+          ]
+        ],
+        "intersectionBounds": [
+          188.9999542236328,
+          749.0,
+          569.1309814453125,
+          893.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            181.92857360839844,
+            550.0,
+            578.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 970,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 540,
+      "bodyClearPools": [
+        79,
+        58
+      ],
+      "markPairTests": 4582,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -261.0
+          ],
+          [
+            -24,
+            -60.0
+          ]
+        ],
+        "intersectionBounds": [
+          164.9999542236328,
+          754.0,
+          545.1309814453125,
+          898.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            157.92857360839844,
+            550.0,
+            554.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 1000,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 120,
+      "bodyClearPools": [
+        22,
+        18
+      ],
+      "markPairTests": 396,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -266.0
+          ],
+          [
+            0,
+            -65.0
+          ]
+        ],
+        "intersectionBounds": [
+          188.9999542236328,
+          749.0,
+          569.1309814453125,
+          893.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -471.0,
+          "rawBounds": [
+            181.92857360839844,
+            550.0,
+            578.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "de",
+      "glyph": "Ỗ",
+      "headroomTop": 1000,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 12,
+      "bodyMarkTests": 600,
+      "bodyClearPools": [
+        109,
+        88
+      ],
+      "markPairTests": 9592,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -261.0
+          ],
+          [
+            -24,
+            -60.0
+          ]
+        ],
+        "intersectionBounds": [
+          164.9999542236328,
+          754.0,
+          545.1309814453125,
+          898.381103515625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -471.0,
+          "rawBounds": [
+            157.92857360839844,
+            550.0,
+            554.0689697265625,
+            689.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 930,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 80,
+      "bodyClearPools": [
+        0,
+        1
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -434.0,
+          "rawBounds": [
+            124.81818389892578,
+            550.0,
+            555.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 930,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 400,
+      "bodyClearPools": [
+        0,
+        1
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -434.0,
+          "rawBounds": [
+            100.81818389892578,
+            550.0,
+            531.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 950,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 88,
+      "bodyClearPools": [
+        2,
+        5
+      ],
+      "markPairTests": 10,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -219.0
+          ],
+          [
+            0,
+            6.0
+          ]
+        ],
+        "intersectionBounds": [
+          126.99974822998047,
+          752.0,
+          551.3876953125,
+          938.0205078125
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -434.0,
+          "rawBounds": [
+            124.81818389892578,
+            550.0,
+            555.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 950,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 440,
+      "bodyClearPools": [
+        8,
+        19
+      ],
+      "markPairTests": 152,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -12,
+            -214.0
+          ],
+          [
+            -24,
+            16.0
+          ]
+        ],
+        "intersectionBounds": [
+          102.99974822998047,
+          757.0,
+          529.000244140625,
+          947.5791015625
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -434.0,
+          "rawBounds": [
+            100.81818389892578,
+            550.0,
+            531.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 970,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 96,
+      "bodyClearPools": [
+        6,
+        9
+      ],
+      "markPairTests": 54,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -219.0
+          ],
+          [
+            0,
+            6.0
+          ]
+        ],
+        "intersectionBounds": [
+          126.99974822998047,
+          752.0,
+          551.3876953125,
+          938.0205078125
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -434.0,
+          "rawBounds": [
+            124.81818389892578,
+            550.0,
+            555.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 970,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 480,
+      "bodyClearPools": [
+        28,
+        39
+      ],
+      "markPairTests": 1092,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -209.0
+          ],
+          [
+            -24,
+            16.0
+          ]
+        ],
+        "intersectionBounds": [
+          102.99974822998047,
+          762.0,
+          527.3876953125,
+          948.0205078125
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -434.0,
+          "rawBounds": [
+            100.81818389892578,
+            550.0,
+            531.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 1000,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 108,
+      "bodyClearPools": [
+        12,
+        15
+      ],
+      "markPairTests": 180,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -219.0
+          ],
+          [
+            0,
+            6.0
+          ]
+        ],
+        "intersectionBounds": [
+          126.99974822998047,
+          752.0,
+          551.3876953125,
+          938.0205078125
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -434.0,
+          "rawBounds": [
+            124.81818389892578,
+            550.0,
+            555.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẫ",
+      "headroomTop": 1000,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 540,
+      "bodyClearPools": [
+        58,
+        69
+      ],
+      "markPairTests": 4002,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -209.0
+          ],
+          [
+            -24,
+            16.0
+          ]
+        ],
+        "intersectionBounds": [
+          102.99974822998047,
+          762.0,
+          527.3876953125,
+          948.0205078125
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -434.0,
+          "rawBounds": [
+            100.81818389892578,
+            550.0,
+            531.3829956054688,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 930,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 80,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -486.0,
+          "rawBounds": [
+            96.81394958496094,
+            550.0,
+            526.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 930,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 400,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -486.0,
+          "rawBounds": [
+            72.81394958496094,
+            550.0,
+            502.39129638671875,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 950,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 88,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -486.0,
+          "rawBounds": [
+            96.81394958496094,
+            550.0,
+            526.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 950,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 440,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -486.0,
+          "rawBounds": [
+            72.81394958496094,
+            550.0,
+            502.39129638671875,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 970,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 96,
+      "bodyClearPools": [
+        2,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -486.0,
+          "rawBounds": [
+            96.81394958496094,
+            550.0,
+            526.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 970,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 480,
+      "bodyClearPools": [
+        10,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -486.0,
+          "rawBounds": [
+            72.81394958496094,
+            550.0,
+            502.39129638671875,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 1000,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 108,
+      "bodyClearPools": [
+        8,
+        6
+      ],
+      "markPairTests": 48,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -251.0
+          ],
+          [
+            0,
+            -1.0
+          ]
+        ],
+        "intersectionBounds": [
+          98.99974822998047,
+          772.0946655273438,
+          525.000244140625,
+          967.9739379882812
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -486.0,
+          "rawBounds": [
+            96.81394958496094,
+            550.0,
+            526.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ễ",
+      "headroomTop": 1000,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 540,
+      "bodyClearPools": [
+        40,
+        30
+      ],
+      "markPairTests": 1200,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -251.0
+          ],
+          [
+            -24,
+            -1.0
+          ]
+        ],
+        "intersectionBounds": [
+          74.99974822998047,
+          772.0946655273438,
+          501.000244140625,
+          967.9739379882812
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -486.0,
+          "rawBounds": [
+            72.81394958496094,
+            550.0,
+            502.39129638671875,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 930,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 80,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -496.0,
+          "rawBounds": [
+            155.81394958496094,
+            550.0,
+            585.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 930,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 400,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -496.0,
+          "rawBounds": [
+            131.81394958496094,
+            550.0,
+            561.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 950,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 88,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -496.0,
+          "rawBounds": [
+            155.81394958496094,
+            550.0,
+            585.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 950,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 440,
+      "bodyClearPools": [
+        0,
+        0
+      ],
+      "markPairTests": 0,
+      "best": null,
+      "interMarkCollisionWitness": null,
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -496.0,
+          "rawBounds": [
+            131.81394958496094,
+            550.0,
+            561.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 970,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 96,
+      "bodyClearPools": [
+        2,
+        2
+      ],
+      "markPairTests": 4,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -261.0
+          ],
+          [
+            0,
+            -21.0
+          ]
+        ],
+        "intersectionBounds": [
+          157.999755859375,
+          772.0,
+          583.9874877929688,
+          964.3273315429688
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -496.0,
+          "rawBounds": [
+            155.81394958496094,
+            550.0,
+            585.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 970,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 480,
+      "bodyClearPools": [
+        9,
+        6
+      ],
+      "markPairTests": 54,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -256.0
+          ],
+          [
+            -24,
+            -16.0
+          ]
+        ],
+        "intersectionBounds": [
+          133.999755859375,
+          777.0,
+          559.9874877929688,
+          969.3273315429688
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -496.0,
+          "rawBounds": [
+            131.81394958496094,
+            550.0,
+            561.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 1000,
+      "xGrid": [
+        0
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 108,
+      "bodyClearPools": [
+        8,
+        8
+      ],
+      "markPairTests": 64,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            0,
+            -261.0
+          ],
+          [
+            0,
+            -21.0
+          ]
+        ],
+        "intersectionBounds": [
+          157.999755859375,
+          772.0,
+          583.9874877929688,
+          964.3273315429688
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": 0,
+          "dy": -496.0,
+          "rawBounds": [
+            155.81394958496094,
+            550.0,
+            585.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    },
+    {
+      "style": "dam",
+      "glyph": "Ỗ",
+      "headroomTop": 1000,
+      "xGrid": [
+        -24,
+        -12,
+        0,
+        12,
+        24
+      ],
+      "yGrid5MinMarkBottom": 550,
+      "curveGap": 26,
+      "bodyMarkTests": 540,
+      "bodyClearPools": [
+        39,
+        36
+      ],
+      "markPairTests": 1404,
+      "best": null,
+      "interMarkCollisionWitness": {
+        "translations": [
+          [
+            -24,
+            -256.0
+          ],
+          [
+            -24,
+            -16.0
+          ]
+        ],
+        "intersectionBounds": [
+          133.999755859375,
+          777.0,
+          559.9874877929688,
+          969.3273315429688
+        ]
+      },
+      "firstCollisionWitness": [
+        {
+          "type": "body-mark",
+          "mark": 0,
+          "dx": -24,
+          "dy": -496.0,
+          "rawBounds": [
+            131.81394958496094,
+            550.0,
+            561.3912963867188,
+            726.0
+          ]
+        }
+      ],
+      "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+      "strokeConicConversionTolerance": 0.01
+    }
+  ],
+  "candidate": {
+    "de": {
+      "sha": "0fa021440f18da5b3021a074dfa65e5a404d42a72ec7f06fc9cdf96893f68c61",
+      "edits": [
+        {
+          "style": "de",
+          "glyph": "Ẫ",
+          "headroomTop": 1000,
+          "xGrid": [
+            0
+          ],
+          "yGrid5MinMarkBottom": 550,
+          "curveGap": 12,
+          "bodyMarkTests": 120,
+          "bodyClearPools": [
+            26,
+            29
+          ],
+          "markPairTests": 754,
+          "best": {
+            "cost": 271.0,
+            "translations": [
+              [
+                0,
+                -161.0
+              ],
+              [
+                0,
+                -110.0
+              ]
+            ]
+          },
+          "interMarkCollisionWitness": {
+            "translations": [
+              [
+                0,
+                -286.0
+              ],
+              [
+                0,
+                -120.0
+              ]
+            ],
+            "intersectionBounds": [
+              160.01187133789062,
+              729.0,
+              529.5388793945312,
+              860.4300537109375
+            ]
+          },
+          "firstCollisionWitness": [
+            {
+              "type": "body-mark",
+              "mark": 0,
+              "dx": 0,
+              "dy": -471.0,
+              "rawBounds": [
+                151.9310302734375,
+                550.0,
+                548.0714111328125,
+                689.0
+              ]
+            }
+          ],
+          "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+          "strokeConicConversionTolerance": 0.01
+        }
+      ]
+    },
+    "dam": {
+      "sha": "0bd7fe68acbaccb2c7ef82894608562f18d27887c32b5a07c427da179893eef8",
+      "edits": []
+    }
+  },
+  "exactAudit": {
+    "de": {
+      "hmtxExact": true,
+      "hheaOS2Exact": true,
+      "changedGlyphs": [
+        "uni1EAA"
+      ]
+    },
+    "dam": {
+      "hmtxExact": true,
+      "hheaOS2Exact": true,
+      "changedGlyphs": []
+    }
+  },
+  "actualTargetOpened": "/workspace/scratch/lo269/panel-de-7850.png",
+  "actualTargetSizes": [
+    14,
+    16,
+    18,
+    24,
+    32,
+    72,
+    200
+  ],
+  "targetReadability": "DeẪ roundshape/strokethickness/relativeaspect preserved by translation only. Actual DOM+SVG noncontact at72/200, tight but mũ/ngã identifiable at14/16. No production/designadmission implied. Other5 not visuallyreapproved undernewhash; actual12inkimage opened.",
+  "actual12Ink": {
+    "hashes": {
+      "de": "0fa021440f18da5b3021a074dfa65e5a404d42a72ec7f06fc9cdf96893f68c61",
+      "dam": "0bd7fe68acbaccb2c7ef82894608562f18d27887c32b5a07c427da179893eef8"
+    },
+    "records": [
+      {
+        "w": 400,
+        "s": 14,
+        "lh": 1.3,
+        "ch": "Ẫ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 30,
+              "width": 150,
+              "height": 18.1875,
+              "top": 30,
+              "right": 150,
+              "bottom": 48.1875,
+              "left": 0
+            },
+            "baseline": 44,
+            "font": "14px / 18.2px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 30,
+              "width": 150,
+              "height": 18.1875,
+              "top": 30,
+              "right": 300,
+              "bottom": 48.1875,
+              "left": 150
+            },
+            "baseline": 44,
+            "font": "14px / 18.2px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [],
+        "actualHiddenLostRows": [],
+        "actualLostPixelCount": 0,
+        "lostDarknessSum": 0
+      },
+      {
+        "w": 400,
+        "s": 14,
+        "lh": 1.3,
+        "ch": "Ễ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 100,
+              "width": 150,
+              "height": 18.1875,
+              "top": 100,
+              "right": 150,
+              "bottom": 118.1875,
+              "left": 0
+            },
+            "baseline": 114,
+            "font": "14px / 18.2px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 100,
+              "width": 150,
+              "height": 18.1875,
+              "top": 100,
+              "right": 300,
+              "bottom": 118.1875,
+              "left": 150
+            },
+            "baseline": 114,
+            "font": "14px / 18.2px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 17,
+        "lostDarknessSum": 1807
+      },
+      {
+        "w": 400,
+        "s": 14,
+        "lh": 1.3,
+        "ch": "Ỗ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 170,
+              "width": 150,
+              "height": 18.1875,
+              "top": 170,
+              "right": 150,
+              "bottom": 188.1875,
+              "left": 0
+            },
+            "baseline": 184,
+            "font": "14px / 18.2px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 170,
+              "width": 150,
+              "height": 18.1875,
+              "top": 170,
+              "right": 300,
+              "bottom": 188.1875,
+              "left": 150
+            },
+            "baseline": 184,
+            "font": "14px / 18.2px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 15,
+        "lostDarknessSum": 1797
+      },
+      {
+        "w": 400,
+        "s": 16,
+        "lh": 1.35,
+        "ch": "Ẫ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 240,
+              "width": 150,
+              "height": 21.59375,
+              "top": 240,
+              "right": 150,
+              "bottom": 261.59375,
+              "left": 0
+            },
+            "baseline": 256,
+            "font": "16px / 21.6px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 240,
+              "width": 150,
+              "height": 21.59375,
+              "top": 240,
+              "right": 300,
+              "bottom": 261.59375,
+              "left": 150
+            },
+            "baseline": 256,
+            "font": "16px / 21.6px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [],
+        "actualHiddenLostRows": [],
+        "actualLostPixelCount": 0,
+        "lostDarknessSum": 0
+      },
+      {
+        "w": 400,
+        "s": 16,
+        "lh": 1.35,
+        "ch": "Ễ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 310,
+              "width": 150,
+              "height": 21.59375,
+              "top": 310,
+              "right": 150,
+              "bottom": 331.59375,
+              "left": 0
+            },
+            "baseline": 326,
+            "font": "16px / 21.6px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 310,
+              "width": 150,
+              "height": 21.59375,
+              "top": 310,
+              "right": 300,
+              "bottom": 331.59375,
+              "left": 150
+            },
+            "baseline": 326,
+            "font": "16px / 21.6px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 18,
+        "lostDarknessSum": 2197
+      },
+      {
+        "w": 400,
+        "s": 16,
+        "lh": 1.35,
+        "ch": "Ỗ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 380,
+              "width": 150,
+              "height": 21.59375,
+              "top": 380,
+              "right": 150,
+              "bottom": 401.59375,
+              "left": 0
+            },
+            "baseline": 396,
+            "font": "16px / 21.6px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 380,
+              "width": 150,
+              "height": 21.59375,
+              "top": 380,
+              "right": 300,
+              "bottom": 401.59375,
+              "left": 150
+            },
+            "baseline": 396,
+            "font": "16px / 21.6px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded De",
+                "postScriptName": "DDHRounded-De",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 18,
+        "lostDarknessSum": 2197
+      },
+      {
+        "w": 700,
+        "s": 14,
+        "lh": 1.3,
+        "ch": "Ẫ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 450,
+              "width": 150,
+              "height": 18.1875,
+              "top": 450,
+              "right": 150,
+              "bottom": 468.1875,
+              "left": 0
+            },
+            "baseline": 464,
+            "font": "700 14px / 18.2px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 450,
+              "width": 150,
+              "height": 18.1875,
+              "top": 450,
+              "right": 300,
+              "bottom": 468.1875,
+              "left": 150
+            },
+            "baseline": 464,
+            "font": "700 14px / 18.2px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 13,
+        "lostDarknessSum": 2305
+      },
+      {
+        "w": 700,
+        "s": 14,
+        "lh": 1.3,
+        "ch": "Ễ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 520,
+              "width": 150,
+              "height": 18.1875,
+              "top": 520,
+              "right": 150,
+              "bottom": 538.1875,
+              "left": 0
+            },
+            "baseline": 534,
+            "font": "700 14px / 18.2px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 520,
+              "width": 150,
+              "height": 18.1875,
+              "top": 520,
+              "right": 300,
+              "bottom": 538.1875,
+              "left": 150
+            },
+            "baseline": 534,
+            "font": "700 14px / 18.2px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 19,
+        "lostDarknessSum": 2445
+      },
+      {
+        "w": 700,
+        "s": 14,
+        "lh": 1.3,
+        "ch": "Ỗ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 590,
+              "width": 150,
+              "height": 18.1875,
+              "top": 590,
+              "right": 150,
+              "bottom": 608.1875,
+              "left": 0
+            },
+            "baseline": 604,
+            "font": "700 14px / 18.2px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 590,
+              "width": 150,
+              "height": 18.1875,
+              "top": 590,
+              "right": 300,
+              "bottom": 608.1875,
+              "left": 150
+            },
+            "baseline": 604,
+            "font": "700 14px / 18.2px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -3,
+          -2,
+          -1
+        ],
+        "actualLostPixelCount": 19,
+        "lostDarknessSum": 2392
+      },
+      {
+        "w": 700,
+        "s": 16,
+        "lh": 1.35,
+        "ch": "Ẫ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 660,
+              "width": 150,
+              "height": 21.59375,
+              "top": 660,
+              "right": 150,
+              "bottom": 681.59375,
+              "left": 0
+            },
+            "baseline": 676,
+            "font": "700 16px / 21.6px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 660,
+              "width": 150,
+              "height": 21.59375,
+              "top": 660,
+              "right": 300,
+              "bottom": 681.59375,
+              "left": 150
+            },
+            "baseline": 676,
+            "font": "700 16px / 21.6px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -4,
+          -3,
+          -2
+        ],
+        "actualHiddenLostRows": [
+          -4,
+          -3,
+          -2
+        ],
+        "actualLostPixelCount": 21,
+        "lostDarknessSum": 3382
+      },
+      {
+        "w": 700,
+        "s": 16,
+        "lh": 1.35,
+        "ch": "Ễ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 730,
+              "width": 150,
+              "height": 21.59375,
+              "top": 730,
+              "right": 150,
+              "bottom": 751.59375,
+              "left": 0
+            },
+            "baseline": 746,
+            "font": "700 16px / 21.6px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 730,
+              "width": 150,
+              "height": 21.59375,
+              "top": 730,
+              "right": 300,
+              "bottom": 751.59375,
+              "left": 150
+            },
+            "baseline": 746,
+            "font": "700 16px / 21.6px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -5,
+          -4,
+          -3,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -5,
+          -4,
+          -3,
+          -1
+        ],
+        "actualLostPixelCount": 27,
+        "lostDarknessSum": 3842
+      },
+      {
+        "w": 700,
+        "s": 16,
+        "lh": 1.35,
+        "ch": "Ỗ",
+        "boxes": [
+          {
+            "rect": {
+              "x": 0,
+              "y": 800,
+              "width": 150,
+              "height": 21.59375,
+              "top": 800,
+              "right": 150,
+              "bottom": 821.59375,
+              "left": 0
+            },
+            "baseline": 816,
+            "font": "700 16px / 21.6px ExactR4",
+            "overflow": "visible",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          },
+          {
+            "rect": {
+              "x": 150,
+              "y": 800,
+              "width": 150,
+              "height": 21.59375,
+              "top": 800,
+              "right": 300,
+              "bottom": 821.59375,
+              "left": 150
+            },
+            "baseline": 816,
+            "font": "700 16px / 21.6px ExactR4",
+            "overflow": "hidden",
+            "fonts": [
+              {
+                "familyName": "DDH Rounded Dam",
+                "postScriptName": "DDHRounded-Dam",
+                "isCustomFont": true,
+                "glyphCount": 1
+              }
+            ]
+          }
+        ],
+        "actualInkRowsOutsideBox": [
+          -5,
+          -4,
+          -3,
+          -1
+        ],
+        "actualHiddenLostRows": [
+          -5,
+          -4,
+          -3,
+          -1
+        ],
+        "actualLostPixelCount": 29,
+        "lostDarknessSum": 3993
+      }
+    ]
+  },
+  "NFCNFD": {
+    "unified-faces": [
+      {
+        "w": 400,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 400,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 400,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 0
+      }
+    ]
+  },
+  "CDP": [
+    {
+      "w": 400,
+      "i": 0,
+      "form": "NFC",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 0,
+      "form": "NFD",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 1,
+      "form": "NFC",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 1,
+      "form": "NFD",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 2,
+      "form": "NFC",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 2,
+      "form": "NFD",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 3,
+      "form": "NFC",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 3,
+      "form": "NFD",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 0,
+      "form": "NFC",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 0,
+      "form": "NFD",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 1,
+      "form": "NFC",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 1,
+      "form": "NFD",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 2,
+      "form": "NFC",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 2,
+      "form": "NFD",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 3,
+      "form": "NFC",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 3,
+      "form": "NFD",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "DeẪ only: fullsize marks translated tilde−161Y,mu−110Y; top999;12unit curveclearance exact boundedPathOps test. Actual14/1.3 and16/1.35 visiblevs hidden loses0inkpixels. This is counterexample to blanketclaim centeredfullmarks cannotfit.",
+    "Remaining5glyphs fail within tested placementgrid/headrooms/curveclearance only. No global impossibility claim.",
+    "No area threshold/bboxcollision used; body/marks from auditedsemantic membership. Exactfontquadraticcontours strokeconvertedconicapprox.01units, intersectionnonemptyverbs. Gapboundary numerics and5unitgrid limit searchproof.",
+    "12caseactualink confirmed remaining10font/size cases retainR4 losses; noCanvasproxy.",
+    "Only DeẪ actual panel reviewed; do not count old positives/newfontwholefamily as reviewed."
+  ],
+  "repro": [
+    "search.py",
+    "review.py",
+    "panels.cjs",
+    "browser.cjs",
+    "ink-render.cjs",
+    "ink-count.py",
+    "equivalence.cjs"
+  ]
+}

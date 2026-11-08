@@ -1,0 +1,19 @@
+{
+  "sha256": "9021bbb796b1c02402b4b5db701ee64863e8d1eb09665f02b0937179e8ff9128",
+  "hmtxExact": true,
+  "hheaOS2Exact": true,
+  "translations": [
+    [
+      0,
+      -161.0
+    ],
+    [
+      0,
+      -110.0
+    ]
+  ],
+  "targetYmax": 999,
+  "productionAdopt": false,
+  "globalAdmitted": false,
+  "oldRenderProofApplies": false
+}

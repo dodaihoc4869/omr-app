@@ -1,0 +1,587 @@
+{
+  "i": 801,
+  "hash": "95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a.png",
+  "size": [
+    1024,
+    273
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C1-B1-P2-II-14",
+      "de": "Chất béo đóng vai trò là nguồn cung cấp năng lượng cho cơ thể và được xem là nguồn dinh dưỡng quan trọng. Nhiều vitamin như A, D, E và K hoà tan tốt trong chất béo, nên chúng được vận chuyển và hấp thụ cùng với chất béo. Thành phần chính của chất béo là triglyceride. Cho triglyceride X có công thức cấu tạo như hình sau:",
+      "refs": [
+        {
+          "hash": "95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a",
+          "where": "DH-12-C1-B1-P2-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "1ed433d05e3cb1eb621c9a6371f343110894be99c0f69735e158f2f6cc9fb377"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+2x actualopened/all1publicrefread;source-only chưaSVG/chưaĐạt.",
+  "coordinateMeaning": "Nativepixels approximate1–2px, chainindex0=carbonylC through17freeendpoint;no chemistryinference.",
+  "geometry": {
+    "glycerol": [
+      {
+        "label": "H₂C",
+        "bbox": [
+          4,
+          76,
+          65,
+          105
+        ],
+        "Ccenter": [
+          54,
+          89
+        ],
+        "Olabel": {
+          "text": "O",
+          "center": [
+            109,
+            89
+          ]
+        },
+        "COsingle": [
+          [
+            70,
+            89
+          ],
+          [
+            93,
+            89
+          ]
+        ],
+        "OacylBond": [
+          [
+            124,
+            79
+          ],
+          [
+            158,
+            59
+          ]
+        ]
+      },
+      {
+        "label": "HC",
+        "bbox": [
+          19,
+          158,
+          65,
+          187
+        ],
+        "Ccenter": [
+          54,
+          171
+        ],
+        "Olabel": {
+          "text": "O",
+          "center": [
+            109,
+            171
+          ]
+        },
+        "COsingle": [
+          [
+            70,
+            171
+          ],
+          [
+            93,
+            171
+          ]
+        ],
+        "OacylBond": [
+          [
+            124,
+            161
+          ],
+          [
+            158,
+            141
+          ]
+        ]
+      },
+      {
+        "label": "H₂C",
+        "bbox": [
+          4,
+          240,
+          65,
+          269
+        ],
+        "Ccenter": [
+          54,
+          253
+        ],
+        "Olabel": {
+          "text": "O",
+          "center": [
+            109,
+            253
+          ]
+        },
+        "COsingle": [
+          [
+            70,
+            253
+          ],
+          [
+            93,
+            253
+          ]
+        ],
+        "OacylBond": [
+          [
+            124,
+            243
+          ],
+          [
+            158,
+            223
+          ]
+        ]
+      }
+    ],
+    "glycerolCCbonds": [
+      [
+        [
+          54,
+          107
+        ],
+        [
+          54,
+          154
+        ]
+      ],
+      [
+        [
+          54,
+          189
+        ],
+        [
+          54,
+          236
+        ]
+      ]
+    ],
+    "acylRows": [
+      {
+        "carbonVertices": [
+          [
+            158,
+            59
+          ],
+          [
+            206,
+            88
+          ],
+          [
+            254,
+            59
+          ],
+          [
+            301,
+            88
+          ],
+          [
+            349,
+            59
+          ],
+          [
+            397,
+            88
+          ],
+          [
+            444,
+            59
+          ],
+          [
+            492,
+            88
+          ],
+          [
+            540,
+            59
+          ],
+          [
+            587,
+            88
+          ],
+          [
+            635,
+            59
+          ],
+          [
+            683,
+            88
+          ],
+          [
+            730,
+            59
+          ],
+          [
+            778,
+            88
+          ],
+          [
+            825,
+            59
+          ],
+          [
+            873,
+            88
+          ],
+          [
+            921,
+            59
+          ],
+          [
+            968,
+            88
+          ]
+        ],
+        "CCdoubles": [],
+        "COdouble": [
+          [
+            [
+              154,
+              59
+            ],
+            [
+              154,
+              34
+            ]
+          ],
+          [
+            [
+              162,
+              59
+            ],
+            [
+              162,
+              34
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "center": [
+            158,
+            17
+          ]
+        },
+        "label": {
+          "text": "(1)",
+          "bbox": [
+            980,
+            53,
+            1023,
+            85
+          ]
+        }
+      },
+      {
+        "carbonVertices": [
+          [
+            158,
+            141
+          ],
+          [
+            206,
+            170
+          ],
+          [
+            254,
+            141
+          ],
+          [
+            301,
+            170
+          ],
+          [
+            349,
+            141
+          ],
+          [
+            397,
+            170
+          ],
+          [
+            444,
+            141
+          ],
+          [
+            492,
+            170
+          ],
+          [
+            540,
+            141
+          ],
+          [
+            589,
+            141
+          ],
+          [
+            638,
+            170
+          ],
+          [
+            684,
+            141
+          ],
+          [
+            731,
+            170
+          ],
+          [
+            779,
+            141
+          ],
+          [
+            826,
+            170
+          ],
+          [
+            874,
+            141
+          ],
+          [
+            921,
+            170
+          ],
+          [
+            968,
+            141
+          ]
+        ],
+        "CCdoubles": [
+          {
+            "indices": [
+              8,
+              9
+            ],
+            "inner": [
+              [
+                543,
+                150
+              ],
+              [
+                586,
+                150
+              ]
+            ]
+          }
+        ],
+        "COdouble": [
+          [
+            [
+              154,
+              141
+            ],
+            [
+              154,
+              116
+            ]
+          ],
+          [
+            [
+              162,
+              141
+            ],
+            [
+              162,
+              116
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "center": [
+            158,
+            99
+          ]
+        },
+        "label": {
+          "text": "(2)",
+          "bbox": [
+            980,
+            135,
+            1023,
+            166
+          ]
+        }
+      },
+      {
+        "carbonVertices": [
+          [
+            158,
+            223
+          ],
+          [
+            206,
+            251
+          ],
+          [
+            254,
+            223
+          ],
+          [
+            301,
+            251
+          ],
+          [
+            349,
+            223
+          ],
+          [
+            397,
+            251
+          ],
+          [
+            444,
+            223
+          ],
+          [
+            492,
+            251
+          ],
+          [
+            540,
+            223
+          ],
+          [
+            589,
+            223
+          ],
+          [
+            638,
+            251
+          ],
+          [
+            686,
+            223
+          ],
+          [
+            735,
+            223
+          ],
+          [
+            784,
+            251
+          ],
+          [
+            831,
+            223
+          ],
+          [
+            880,
+            223
+          ],
+          [
+            929,
+            251
+          ],
+          [
+            975,
+            223
+          ]
+        ],
+        "CCdoubles": [
+          {
+            "indices": [
+              8,
+              9
+            ],
+            "inner": [
+              [
+                543,
+                232
+              ],
+              [
+                586,
+                232
+              ]
+            ]
+          },
+          {
+            "indices": [
+              11,
+              12
+            ],
+            "inner": [
+              [
+                690,
+                232
+              ],
+              [
+                732,
+                232
+              ]
+            ]
+          },
+          {
+            "indices": [
+              14,
+              15
+            ],
+            "inner": [
+              [
+                835,
+                232
+              ],
+              [
+                876,
+                232
+              ]
+            ]
+          }
+        ],
+        "COdouble": [
+          [
+            [
+              154,
+              223
+            ],
+            [
+              154,
+              198
+            ]
+          ],
+          [
+            [
+              162,
+              223
+            ],
+            [
+              162,
+              198
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "center": [
+            158,
+            181
+          ]
+        },
+        "label": {
+          "text": "(3)",
+          "bbox": [
+            980,
+            217,
+            1023,
+            248
+          ]
+        }
+      }
+    ],
+    "counts": "57C=3glycerol+18*3acyl,6O=3esterO+3carbonylO;3COdouble4CCdouble;3freeRIGHTendpoints;H2C/HC/H2Ccaseorderliteral. Allchainsopen/noaddedCH3endlabels.",
+    "styles": "Blackuniformthinbonds;CCdoubleflatuppermain withlowerinnerline;nocharges/stereo/wedges/coefficient/arrow/title/captionaside3numbers. Noaddedanswer."
+  },
+  "actualSvgReviewed": false
+}

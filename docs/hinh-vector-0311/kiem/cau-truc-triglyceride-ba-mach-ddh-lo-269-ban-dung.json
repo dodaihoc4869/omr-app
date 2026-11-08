@@ -1,0 +1,29 @@
+[
+  {
+    "i": 801,
+    "hash": "95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a",
+    "fileNguon": "anh/95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a.png",
+    "svg": "triglyceride-ba-mach-ddh-c15dbc21d0887005780e27840d6fa61f3b566cbc1b73aa75d9ba44528fdd1eff.svg",
+    "hashSvg": "c15dbc21d0887005780e27840d6fa61f3b566cbc1b73aa75d9ba44528fdd1eff",
+    "byteSvg": 11870,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-14",
+        "de": "Chất béo đóng vai trò là nguồn cung cấp năng lượng cho cơ thể và được xem là nguồn dinh dưỡng quan trọng. Nhiều vitamin như A, D, E và K hoà tan tốt trong chất béo, nên chúng được vận chuyển và hấp thụ cùng với chất béo. Thành phần chính của chất béo là triglyceride. Cho triglyceride X có công thức cấu tạo như hình sau:",
+        "refs": [
+          {
+            "hash": "95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a",
+            "where": "DH-12-C1-B1-P2-II-14.hinh.0.du_lieu",
+            "hashDataUrl": "1ed433d05e3cb1eb621c9a6371f343110894be99c0f69735e158f2f6cc9fb377"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3acyl18Ceach+3glycerolC=57C6O/0-1-3CCdouble/3COdouble/3esterO/2glycerolCC/freeRIGHTends/literalH2C-HC-H2C-3labels1..3/noaddedH-alkenenums-stereo-arrow-caption-answer.",
+    "hashSvgDaSoat": "c15dbc21d0887005780e27840d6fa61f3b566cbc1b73aa75d9ba44528fdd1eff",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

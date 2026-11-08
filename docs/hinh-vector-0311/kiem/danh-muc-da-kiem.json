@@ -838,6 +838,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a": {
+      "tep": "triglyceride-ba-mach-ddh-c15dbc21d0887005780e27840d6fa61f3b566cbc1b73aa75d9ba44528fdd1eff.svg",
+      "hashSvg": "c15dbc21d0887005780e27840d6fa61f3b566cbc1b73aa75d9ba44528fdd1eff",
+      "byteSvg": 11870,
+      "byteGzip": 2214,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "063cf2885c96848e88be3c7cc19b1700087115a16152d02edfcc81c7ce02a10c": {
       "tep": "amino-ddh-c4b6aad1ba50df02073f7ea508c79caf675908dc2cffeeafe33d9bf094de0437.svg",
       "hashSvg": "c4b6aad1ba50df02073f7ea508c79caf675908dc2cffeeafe33d9bf094de0437",
@@ -1941,6 +1950,15 @@
       "hashSvg": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b",
       "byteSvg": 35146,
       "byteGzip": 7458,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae": {
+      "tep": "ph-amine-nguon798-ddh-2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691.svg",
+      "hashSvg": "2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691",
+      "byteSvg": 40568,
+      "byteGzip": 6659,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -19235,6 +19253,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D2-II-89",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+          "where": "DB-12-B8-D2-II-89.hinh.0.du_lieu",
+          "hashDataUrl": "1585328a302faeb653317a5181586736980f88efc9fe37baaaeec260362566ae",
+          "vector": "ph-amine-nguon798-ddh-2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B9-P1-D1-I-11",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -23849,6 +23881,20 @@
       ]
     },
     {
+      "qid": "DH-12-C1-B1-P2-II-14",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "95277f92029c88b0a7822528b9ba4cf578be50a5c93fcd337a6132040840f80a",
+          "where": "DH-12-C1-B1-P2-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "1ed433d05e3cb1eb621c9a6371f343110894be99c0f69735e158f2f6cc9fb377",
+          "vector": "triglyceride-ba-mach-ddh-c15dbc21d0887005780e27840d6fa61f3b566cbc1b73aa75d9ba44528fdd1eff.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C1-B1-P2-VD-I-1",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -25453,6 +25499,20 @@
           "where": "DH-12-C3-B8-II-24.hinh.0.du_lieu",
           "hashDataUrl": "22a3e7f8245eae0a96943f20e2d57204bb42a07399578743c204a7df28646724",
           "vector": "cau-truc-ddh-93b77b5b0f907b15792e39aa1945f697ac9c30d22a14061667f00d0050e0a80b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B8-II-25",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+          "where": "DH-12-C3-B8-II-25.hinh.0.du_lieu",
+          "hashDataUrl": "1585328a302faeb653317a5181586736980f88efc9fe37baaaeec260362566ae",
+          "vector": "ph-amine-nguon798-ddh-2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691.svg"
         }
       ]
     },
@@ -28230,6 +28290,7 @@
     "DB-12-B5-D2-II-340",
     "DB-12-B8-D2-II-26",
     "DB-12-B8-D2-II-27",
+    "DB-12-B8-D2-II-89",
     "DB-12-B9-P1-D1-I-11",
     "DB-12-B9-P1-D1-I-55",
     "DB-12-B9-P1-D1-I-56",
@@ -28527,6 +28588,7 @@
     "DH-12-C1-B1-P2-I-55",
     "DH-12-C1-B1-P2-I-56",
     "DH-12-C1-B1-P2-II-11",
+    "DH-12-C1-B1-P2-II-14",
     "DH-12-C1-B1-P2-VD-I-1",
     "DH-12-C1-B2-VD-II-1",
     "DH-12-C1-B2-VD-II-3",
@@ -28625,6 +28687,7 @@
     "DH-12-C3-B8-II-17",
     "DH-12-C3-B8-II-19",
     "DH-12-C3-B8-II-24",
+    "DH-12-C3-B8-II-25",
     "DH-12-C3-B8-II-26",
     "DH-12-C3-B8-II-29",
     "DH-12-C3-B8-III-6",

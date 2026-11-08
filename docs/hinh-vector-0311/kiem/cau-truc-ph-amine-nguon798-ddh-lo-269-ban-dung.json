@@ -1,0 +1,40 @@
+[
+  {
+    "i": 798,
+    "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+    "fileNguon": "anh/948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae.png",
+    "svg": "ph-amine-nguon798-ddh-2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691.svg",
+    "hashSvg": "2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691",
+    "byteSvg": 40568,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D2-II-89",
+        "de": "Một học sinh tiến hành thí nghiệm so sánh tính base trong dung dịch nước của một số amine và ammonia với dự đoán: “khi số nguyên tử carbon trong phân tử amine tăng thì tính base của amine tăng, pH của dung dịch amine trong nước tăng”.\nHọc sinh chuẩn bị các dung dịch nồng độ 0,1 M ở 25 °C của NH₃; CH₃NH₂; CH₃CH₂NH₂; (CH₃)₂NH; CH₃CH₂CH₂NH₂ rồi dùng máy đo pH. Kết quả cho ở đồ thị bên.",
+        "refs": [
+          {
+            "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+            "where": "DB-12-B8-D2-II-89.hinh.0.du_lieu",
+            "hashDataUrl": "1585328a302faeb653317a5181586736980f88efc9fe37baaaeec260362566ae"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-II-25",
+        "de": "Một học sinh tiến hành thí nghiệm so sánh tính base trong dung dịch nước của một số amine và ammonia với dự đoán: “khi số nguyên tử carbon trong phân tử amine tăng thì tính base của amine tăng, pH của dung dịch amine trong nước tăng”.\nHọc sinh chuẩn bị các dung dịch nồng độ 0,1 M ở 25 °C của NH₃; CH₃NH₂; CH₃CH₂NH₂; (CH₃)₂NH; CH₃CH₂CH₂NH₂ rồi dùng máy đo pH. Kết quả cho ở đồ thị bên.",
+        "refs": [
+          {
+            "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+            "where": "DH-12-C3-B8-II-25.hinh.0.du_lieu",
+            "hashDataUrl": "1585328a302faeb653317a5181586736980f88efc9fe37baaaeec260362566ae"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "HASH948799fa riêng đãđọcsource798/allrefs;khôngalias774;5cyanbars/11yticks11.0..12.0DOT/5xtickslabels/11H5Vgridbehind/5redguidesOVERfill/axisorigin11.0/pHrotated-Chất/4pointpalestarretain/nondata/noheads-title-legend-extraunits.",
+    "hashSvgDaSoat": "2ab7bdc69a49e32cbd4d97d0955034d33245a6bf89de5ab94357bd73141f1691",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

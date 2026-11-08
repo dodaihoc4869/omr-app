@@ -1,0 +1,174 @@
+{
+  "i": 798,
+  "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae.png",
+  "size": [
+    1024,
+    555
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B8-D2-II-89",
+      "de": "Một học sinh tiến hành thí nghiệm so sánh tính base trong dung dịch nước của một số amine và ammonia với dự đoán: “khi số nguyên tử carbon trong phân tử amine tăng thì tính base của amine tăng, pH của dung dịch amine trong nước tăng”.\nHọc sinh chuẩn bị các dung dịch nồng độ 0,1 M ở 25 °C của NH₃; CH₃NH₂; CH₃CH₂NH₂; (CH₃)₂NH; CH₃CH₂CH₂NH₂ rồi dùng máy đo pH. Kết quả cho ở đồ thị bên.",
+      "refs": [
+        {
+          "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+          "where": "DB-12-B8-D2-II-89.hinh.0.du_lieu",
+          "hashDataUrl": "1585328a302faeb653317a5181586736980f88efc9fe37baaaeec260362566ae"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B8-II-25",
+      "de": "Một học sinh tiến hành thí nghiệm so sánh tính base trong dung dịch nước của một số amine và ammonia với dự đoán: “khi số nguyên tử carbon trong phân tử amine tăng thì tính base của amine tăng, pH của dung dịch amine trong nước tăng”.\nHọc sinh chuẩn bị các dung dịch nồng độ 0,1 M ở 25 °C của NH₃; CH₃NH₂; CH₃CH₂NH₂; (CH₃)₂NH; CH₃CH₂CH₂NH₂ rồi dùng máy đo pH. Kết quả cho ở đồ thị bên.",
+      "refs": [
+        {
+          "hash": "948799fa5afb9c098bfe83f3ca764fdab936acff1c99bfc6b3fd3324d9f244ae",
+          "where": "DH-12-C3-B8-II-25.hinh.0.du_lieu",
+          "hashDataUrl": "1585328a302faeb653317a5181586736980f88efc9fe37baaaeec260362566ae"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL và2x riêng798 actualopened/all2publicrefs; source-only chưaSVG/chưaĐạt; khôngalias774.",
+  "coordinateMeaning": "Nativepixels approximate1px;valuesreadliteralYticks nottheory.",
+  "geometry": {
+    "axes": "Yx85,y14..501;Xy501,x85..1017,black,noheads/notoprightframe.",
+    "yLabels": [
+      {
+        "text": "11.0",
+        "centerY": 501.0,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.1",
+        "centerY": 452.3,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.2",
+        "centerY": 403.6,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.3",
+        "centerY": 354.9,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.4",
+        "centerY": 306.2,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.5",
+        "centerY": 257.5,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.6",
+        "centerY": 208.8,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.7",
+        "centerY": 160.1,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.8",
+        "centerY": 111.4,
+        "rightEdge": 79
+      },
+      {
+        "text": "11.9",
+        "centerY": 62.7,
+        "rightEdge": 79
+      },
+      {
+        "text": "12.0",
+        "centerY": 14.0,
+        "rightEdge": 79
+      }
+    ],
+    "yTicks": "11shortstemsx85..91atYlevels",
+    "xTicks": "5shortupstemsy501→494 at198/375/553/730/907",
+    "yTitle": {
+      "text": "pH",
+      "center": [
+        22,
+        258
+      ],
+      "rotation": -90
+    },
+    "xTitle": {
+      "text": "Chất",
+      "center": [
+        553,
+        541
+      ]
+    },
+    "bars": [
+      {
+        "label": "NH₃",
+        "bounds": [
+          127,
+          452,
+          269,
+          501
+        ],
+        "topLiteral": "11.1"
+      },
+      {
+        "label": "CH₃NH₂",
+        "bounds": [
+          305,
+          355,
+          446,
+          501
+        ],
+        "topLiteral": "11.3"
+      },
+      {
+        "label": "C₂H₅NH₂",
+        "bounds": [
+          482,
+          306,
+          623,
+          501
+        ],
+        "topLiteral": "11.4"
+      },
+      {
+        "label": "CH₃CH₂CH₂NH₂",
+        "bounds": [
+          659,
+          257,
+          801,
+          501
+        ],
+        "topLiteral": "11.5"
+      },
+      {
+        "label": "(CH₃)₂NH",
+        "bounds": [
+          836,
+          160,
+          978,
+          501
+        ],
+        "topLiteral": "11.7"
+      }
+    ],
+    "barStyle": "cyanfill subtlegraybluegradient nooutlines;opaqueoverlay hidesgraygrid,notredguides.",
+    "Xlabels": "Actualsubscriptnums;centerat5Xticks,y515baselineapprox;captionChấtseparatebelow.",
+    "grid": "11palegrayHlevels y501,452,403,355,306,257,209,160,111,63,14;5palegrayVx198/375/553/730/907. GridBEHINDbars. 5darkreddashedH OVERbars at452/355/306/257/160 fromx85to1017.",
+    "star": "Fourpointpaleblue/graystar retained inbar5 atcenter935,467,spanx917..953/y450..485. Notdata/nomarkerlabel.",
+    "counts": "5bars,11DOTYlabels11Yticks,5Xlabels5Xticks,11H5Vgrayguides,5redguides,1star,0heads/title/legend/addedunit. Origin11.0NOT0."
+  },
+  "uncertainties": [
+    "Similarfigure774hasdifferentsourcepixelsize;798reviewindependent,noaliasapprovalwithoutfreshactualnewhash."
+  ],
+  "actualSvgReviewed": false
+}
