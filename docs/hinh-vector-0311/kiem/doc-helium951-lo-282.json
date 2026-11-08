@@ -1,0 +1,141 @@
+{
+  "i": 951,
+  "hash": "ac3b635d923d6f5bd483c74e876247c266afd0212435420c9ac20d65c93e7e26",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ac3b635d923d6f5bd483c74e876247c266afd0212435420c9ac20d65c93e7e26.png",
+  "size": [
+    232,
+    210
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-10-B1-D1-II-199",
+      "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+      "allHinh": [
+        {
+          "hash": "ac3b635d923d6f5bd483c74e876247c266afd0212435420c9ac20d65c93e7e26",
+          "where": "DB-10-B1-D1-II-199.hinh.0.du_lieu",
+          "hashDataUrl": "f947b25bbf3fab30b1860dcb4e13d381fed803f0d25402377ebdf1f087b50f3c"
+        }
+      ],
+      "missingHashes": [
+        "ac3b635d923d6f5bd483c74e876247c266afd0212435420c9ac20d65c93e7e26"
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B3-II-1",
+      "de": "Cho mô hình chuyển động của electron trong nguyên tử helium dưới đây:",
+      "allHinh": [
+        {
+          "hash": "ac3b635d923d6f5bd483c74e876247c266afd0212435420c9ac20d65c93e7e26",
+          "where": "DH-10-C1-B3-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "f947b25bbf3fab30b1860dcb4e13d381fed803f0d25402377ebdf1f087b50f3c"
+        }
+      ],
+      "missingHashes": [
+        "ac3b635d923d6f5bd483c74e876247c266afd0212435420c9ac20d65c93e7e26"
+      ]
+    }
+  ],
+  "fullClosure": "2qidsEACH1hinh,missingonlythishash=>2full/noextraPartial.",
+  "review": "NativeFULL+5x/all2publicrefs/allq.hinh read;source-only chưaSVG/chưaĐạt.",
+  "classification": "Grayscalevectorlikeatommodel withshadedspheres,NOTphoto;shadingnativebutnotchemicaldata.",
+  "geometry": {
+    "orbit": {
+      "center": [
+        118,
+        102
+      ],
+      "radii": [
+        101,
+        101
+      ],
+      "stroke": "singlecontinuousgraythin~1.5px",
+      "bounds": [
+        17,
+        1,
+        219,
+        203
+      ]
+    },
+    "electrons": [
+      {
+        "center": [
+          43,
+          36
+        ],
+        "radius": 7.5
+      },
+      {
+        "center": [
+          194,
+          167
+        ],
+        "radius": 7.5
+      }
+    ],
+    "nucleusSpheres": [
+      {
+        "id": "upperLeft",
+        "center": [
+          111,
+          94
+        ],
+        "radius": 12,
+        "visibleBounds": [
+          99,
+          82,
+          123,
+          106
+        ]
+      },
+      {
+        "id": "upperRight",
+        "center": [
+          126,
+          93
+        ],
+        "radius": 10,
+        "visibleBounds": [
+          116,
+          83,
+          136,
+          103
+        ]
+      },
+      {
+        "id": "lowerLeft",
+        "center": [
+          110,
+          109
+        ],
+        "radius": 11,
+        "visibleBounds": [
+          99,
+          98,
+          121,
+          120
+        ]
+      },
+      {
+        "id": "lowerRight",
+        "center": [
+          125,
+          106
+        ],
+        "radius": 12,
+        "visibleBounds": [
+          113,
+          94,
+          137,
+          118
+        ]
+      }
+    ],
+    "occlusion": "4nucleusspheresoverlapin2x2cluster;lowerRightfrontoccludesinnerlowerpartupperRightandrightpartlowerLeft;upperLeftalsofrontatupperseam. Nativevisible4lobes notinventhiddenfifth. Electronscoverorbitlineattwooppositediagonalpositions.",
+    "shading": "Allgrayradialhighlightupper-right:electronsbrightspotnear45,34/196,165;upperLeftnear113,91/upperRight129,91/lowerRight128,103/lowerLeft112,108. Preserveasstylizedgraynotnewcolors/protonneutroncharge.",
+    "counts": "1orbit/2smallgrayballs/4nucleusgrayballs/NOlabels/dotscharge/+/−/arrows/name/number/captionadded. Do not addHe/theorynucleonmarks."
+  },
+  "coordinateMeaning": "Nativepixelapprox1px,spherecountsreadvisiblelobesnotheliumtheory.",
+  "actualSvgReviewed": false
+}

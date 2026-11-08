@@ -1,0 +1,187 @@
+{
+  "i": 943,
+  "hash": "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485.png",
+  "size": [
+    651,
+    184
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "10-C1-B3-D2-II-21",
+      "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+      "allHinh": [
+        {
+          "hash": "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485",
+          "where": "10-C1-B3-D2-II-21.hinh.0.du_lieu",
+          "hashDataUrl": "1df1c969dae702d36620a4d0c945dba0fe614730ede92b77e377b75725b0c19c"
+        }
+      ],
+      "missingHashes": [
+        "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485"
+      ]
+    },
+    {
+      "qid": "DB-10-B1-D1-II-102",
+      "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+      "allHinh": [
+        {
+          "hash": "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485",
+          "where": "DB-10-B1-D1-II-102.hinh.0.du_lieu",
+          "hashDataUrl": "1df1c969dae702d36620a4d0c945dba0fe614730ede92b77e377b75725b0c19c"
+        }
+      ],
+      "missingHashes": [
+        "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485"
+      ]
+    }
+  ],
+  "fullClosure": "2affectedqidsEACH1hinh/onlymissingthishash=>2full/noextraPartial.",
+  "review": "NativeFULL+4x/all2publicrefs/allq.hinh read;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "cells": [
+      {
+        "bounds": [
+          49,
+          46,
+          106,
+          99
+        ],
+        "arrows": [
+          "UP",
+          "DOWN"
+        ],
+        "arrowX": [
+          68,
+          87
+        ]
+      },
+      {
+        "bounds": [
+          192,
+          45,
+          248,
+          99
+        ],
+        "arrows": [
+          "UP",
+          "DOWN"
+        ],
+        "arrowX": [
+          210,
+          229
+        ]
+      },
+      {
+        "bounds": [
+          281,
+          45,
+          338,
+          99
+        ],
+        "arrows": [
+          "UP",
+          "DOWN"
+        ],
+        "arrowX": [
+          299,
+          318
+        ]
+      },
+      {
+        "bounds": [
+          338,
+          45,
+          394,
+          99
+        ],
+        "arrows": [
+          "UP",
+          "DOWN"
+        ],
+        "arrowX": [
+          355,
+          375
+        ]
+      },
+      {
+        "bounds": [
+          394,
+          45,
+          451,
+          99
+        ],
+        "arrows": [
+          "UP",
+          "DOWN"
+        ],
+        "arrowX": [
+          414,
+          434
+        ]
+      },
+      {
+        "bounds": [
+          559,
+          44,
+          615,
+          98
+        ],
+        "arrows": [
+          "UP"
+        ],
+        "arrowX": [
+          586
+        ]
+      }
+    ],
+    "arrowY": "UPshaftfromy83to55/headVx±7,y64;DOWNshaftfrom55to83/headVx±7,y75. AllopenVheads;3ssingleUPcenterx586 y81→54.",
+    "groups": "1s1box,2s1box,2p3ADJACENTboxes(sharedverticals338394),3s1box;notp3separatewithgaps.",
+    "labels": [
+      {
+        "text": "1s",
+        "bbox": [
+          57,
+          112,
+          91,
+          141
+        ],
+        "bold": true
+      },
+      {
+        "text": "2s",
+        "bbox": [
+          203,
+          111,
+          237,
+          141
+        ],
+        "bold": true
+      },
+      {
+        "text": "2p",
+        "bbox": [
+          349,
+          110,
+          386,
+          142
+        ],
+        "bold": true
+      },
+      {
+        "text": "3s",
+        "bbox": [
+          568,
+          109,
+          605,
+          139
+        ],
+        "bold": true
+      }
+    ],
+    "counts": "6boxes/11arrows=UPDOWNinfirst5boxes+UPinlast.3sONLY1UP despite stem12electron Mg;DO NOTfixPA to2arrows.4boldsubshelllabels noexponent/caption/charge/elementanswer."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px;counts literalnotconfigurationtheory.",
+  "actualSvgReviewed": false
+}

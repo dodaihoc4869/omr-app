@@ -1,0 +1,40 @@
+[
+  {
+    "i": 943,
+    "hash": "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485",
+    "fileNguon": "anh/aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485.png",
+    "svg": "orbital-sau-o-ddh-daf6e105b806e7af1da83c9ac538fa635bd7aeb7aab0e780d74582ddcd7abbd7.svg",
+    "hashSvg": "daf6e105b806e7af1da83c9ac538fa635bd7aeb7aab0e780d74582ddcd7abbd7",
+    "byteSvg": 5970,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D2-II-21",
+        "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+        "refs": [
+          {
+            "hash": "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485",
+            "where": "10-C1-B3-D2-II-21.hinh.0.du_lieu",
+            "hashDataUrl": "1df1c969dae702d36620a4d0c945dba0fe614730ede92b77e377b75725b0c19c"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B1-D1-II-102",
+        "de": "Magnesium được sử dụng nhiều trong công nghiệp để chế tạo các bộ phận của máy bay, ô tô,… Nguyên tử nguyên tố magnesium có 12 electron.",
+        "refs": [
+          {
+            "hash": "aa4dddc3a72b29416cd87d801d05724ed31ff49deabd1edb7cffb446956d5485",
+            "where": "DB-10-B1-D1-II-102.hinh.0.du_lieu",
+            "hashDataUrl": "1df1c969dae702d36620a4d0c945dba0fe614730ede92b77e377b75725b0c19c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "6boxes/11arrowsfirst5UPDOWNlast3sONLYUP/2p3adjacentcells/11openVheads/4actualdamlabels1s2s2p3s/noaddedsecond3selectron-exponent-element-caption-answer.",
+    "hashSvgDaSoat": "daf6e105b806e7af1da83c9ac538fa635bd7aeb7aab0e780d74582ddcd7abbd7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
