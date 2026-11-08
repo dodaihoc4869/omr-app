@@ -184,8 +184,8 @@ function moiTruongPhienSoan() {
   for (const k of Object.keys(env)) if (/^(CLAUDECODE|SESSION_INGRESS_URL|CLAUDE_CODE_(SESSION_ID|REMOTE_SESSION_ID|CHILD_SESSION|SYNC_SESSION_REFS|POST_FOR_SESSION_INGRESS_V2|MESSAGING_\w+))$/.test(k)) delete env[k]
   return env
 }
-const NHAC = (n) => `Đọc goi-may-soan-kinh.md trong thư mục hiện tại và làm đúng. Lô này có ${n} câu trong vao/ (mỗi câu kèm tệp .muc.json). Với từng câu: tra muc-luc.txt, lấy đủ mục bài giảng đúng dạng bài bằng node lay-muc.mjs, rồi ghi lời giải vào ra/ (cùng tên tệp), chạy node kiem.mjs, sửa tới khi ĐẠT. Trả lời cuối đúng 1 dòng.`
-const NHAC_SOAT = (n) => `Đọc goi-may-soat-kinh.md trong thư mục hiện tại và làm đúng (nó dẫn sang goi-may-soan-kinh.md khi phải soạn lại). Lô này có ${n} bản lời giải đã đạt cần soát (vao/<tên>.json = câu, vao/<tên>.ban.json = bản hiện tại). Ghi kết quả soát từng câu vào soat/<tên>.json; bản phải sửa thì ghi bản mới vào ra/<tên>.json và chạy node kiem.mjs tới khi ĐẠT. Trả lời cuối đúng 1 dòng.`
+const NHAC = (n) => `Đọc goi-may-soan-kinh.md trong thư mục hiện tại và làm đúng. Lô này có ${n} câu trong vao/ (mỗi câu kèm tệp .muc.json). Với từng câu: tra muc-luc.txt, lấy đủ mục bài giảng đúng dạng bài bằng node lay-muc.mjs, rồi ghi lời giải vào ra/ (cùng tên tệp), chạy node kiem.mjs, sửa tới khi ĐẠT. Lệnh Bash chỉ gõ ĐÚNG NGUYÊN DẠNG: node kiem.mjs · node lay-muc.mjs <tệp> <mã…> · node dong-phan.mjs ra/<tệp> — không cd, không 2>&1, không ống |, không && (gõ khác là bị chặn). Trả lời cuối đúng 1 dòng.`
+const NHAC_SOAT = (n) => `Đọc goi-may-soat-kinh.md trong thư mục hiện tại và làm đúng (nó dẫn sang goi-may-soan-kinh.md khi phải soạn lại). Lô này có ${n} bản lời giải đã đạt cần soát (vao/<tên>.json = câu, vao/<tên>.ban.json = bản hiện tại). Ghi kết quả soát từng câu vào soat/<tên>.json; bản phải sửa thì ghi bản mới vào ra/<tên>.json và chạy node kiem.mjs tới khi ĐẠT. Lệnh Bash chỉ gõ ĐÚNG NGUYÊN DẠNG: node kiem.mjs · node lay-muc.mjs <tệp> <mã…> · node dong-phan.mjs ra/<tệp> — không cd, không 2>&1, không ống |, không && (gõ khác là bị chặn). Trả lời cuối đúng 1 dòng.`
 function chayClaude(dir, soCau, cheDo = 'soan') {
   const thamSo = ['-p', '--output-format', 'json', '--permission-mode', 'dontAsk', '--allowedTools', 'Read,Write,Edit,Glob,Grep,Bash(node kiem.mjs),Bash(node kiem.mjs:*),Bash(node lay-muc.mjs:*),Bash(node dong-phan.mjs:*)', '--max-turns', String(60 + soCau * (cheDo === 'soat' ? 18 : 16))]
   if (MODEL) thamSo.push('--model', MODEL)
@@ -218,7 +218,9 @@ async function motLuongSoat(luong) {
   for (;;) {
     const lo = await goi('/kho/loi-giai-kinh/soat-viec', { so: SO_CAU, uuTien: UU_TIEN, ...(CHI_BO.length ? { chiBo: CHI_BO } : {}), ...(CO_CHU.length ? { coChu: CO_CHU } : {}), ...(SOAT_LAI ? { soatLaiTruoc: SOAT_LAI } : {}) })
     if (!lo.ok) { console.log(`[${gio()}] soát ${luong}: lỗi nhận việc: ${String(lo.error).slice(0, 120)}`); await ngu(60_000); continue }
-    if (lo.het || !lo.viec?.length) { console.log(`[${gio()}] soát ${luong}: hết bản cần soát`); return }
+    // Lô rỗng mà chưa «het»: luồng khác vừa giành hết bản của chương này (4 luồng cùng nhận một lúc) ⇒ nghỉ chút rồi nhận lại, KHÔNG dừng luồng.
+    if (!lo.het && !lo.viec?.length) { await ngu(5000 + luong * 3000); continue }
+    if (lo.het) { console.log(`[${gio()}] soát ${luong}: hết bản cần soát`); return }
     const viec = co('--thu') ? lo.viec.slice(0, 3) : lo.viec
     const { dir, tep } = dungLo({ ...lo, viec }, luong, 'soat')
     demSoat.lo++
@@ -226,6 +228,7 @@ async function motLuongSoat(luong) {
     if (!kq.ok) console.log(`[${gio()}] soát ${luong}: phiên lỗi (${kq.giay}s) ${kq.loi.replace(/\d{4,}/g, '…').slice(0, 160)}`)
     if (kq.hetHan) { console.log(`[${gio()}] soát ${luong}: có vẻ hết hạn mức Claude — nghỉ 30 phút`); await ngu(1_800_000) }
     const dong = { giu: 0, sua: 0, loi: 0 }
+    if (tep.every(({ ten }) => !fs.existsSync(path.join(dir, 'soat', ten)))) console.log(`[${gio()}] soát ${luong}: phiên không ghi kết quả nào (${kq.giay}s): ${String(kq.ketQua ?? kq.loi ?? '').replace(/\s+/g, ' ').slice(0, 200)}`)
     for (const { ten, vao } of tep) {
       const s = docJson(path.join(dir, 'soat', ten))
       if (!s || !['giu', 'sua'].includes(s.ket)) { demSoat.thieuKq++; continue } // không có kết quả ⇒ hết 45 phút tự trả lại hàng soát
