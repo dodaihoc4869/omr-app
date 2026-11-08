@@ -1,0 +1,811 @@
+{
+  "hashes": {
+    "de": "ec3c249d69edb5e97f3079b7a19f9f485739f8cf2e8152edea25107370658e37",
+    "dam": "c5f78fb3b1b7c81683b170c1ae8adaf24fd0b9b0f2022d6d4e068deb2b0ee123"
+  },
+  "records": [
+    {
+      "w": 400,
+      "s": 14,
+      "lh": 1.3,
+      "ch": "Ẫ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 30,
+            "width": 150,
+            "height": 18.1875,
+            "top": 30,
+            "right": 150,
+            "bottom": 48.1875,
+            "left": 0
+          },
+          "baseline": 44,
+          "font": "14px / 18.2px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 30,
+            "width": 150,
+            "height": 18.1875,
+            "top": 30,
+            "right": 300,
+            "bottom": 48.1875,
+            "left": 150
+          },
+          "baseline": 44,
+          "font": "14px / 18.2px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 14,
+      "lostDarknessSum": 1811
+    },
+    {
+      "w": 400,
+      "s": 14,
+      "lh": 1.3,
+      "ch": "Ễ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 100,
+            "width": 150,
+            "height": 18.1875,
+            "top": 100,
+            "right": 150,
+            "bottom": 118.1875,
+            "left": 0
+          },
+          "baseline": 114,
+          "font": "14px / 18.2px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 100,
+            "width": 150,
+            "height": 18.1875,
+            "top": 100,
+            "right": 300,
+            "bottom": 118.1875,
+            "left": 150
+          },
+          "baseline": 114,
+          "font": "14px / 18.2px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 17,
+      "lostDarknessSum": 1807
+    },
+    {
+      "w": 400,
+      "s": 14,
+      "lh": 1.3,
+      "ch": "Ỗ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 170,
+            "width": 150,
+            "height": 18.1875,
+            "top": 170,
+            "right": 150,
+            "bottom": 188.1875,
+            "left": 0
+          },
+          "baseline": 184,
+          "font": "14px / 18.2px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 170,
+            "width": 150,
+            "height": 18.1875,
+            "top": 170,
+            "right": 300,
+            "bottom": 188.1875,
+            "left": 150
+          },
+          "baseline": 184,
+          "font": "14px / 18.2px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 15,
+      "lostDarknessSum": 1797
+    },
+    {
+      "w": 400,
+      "s": 16,
+      "lh": 1.35,
+      "ch": "Ẫ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 240,
+            "width": 150,
+            "height": 21.59375,
+            "top": 240,
+            "right": 150,
+            "bottom": 261.59375,
+            "left": 0
+          },
+          "baseline": 256,
+          "font": "16px / 21.6px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 240,
+            "width": 150,
+            "height": 21.59375,
+            "top": 240,
+            "right": 300,
+            "bottom": 261.59375,
+            "left": 150
+          },
+          "baseline": 256,
+          "font": "16px / 21.6px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 19,
+      "lostDarknessSum": 2178
+    },
+    {
+      "w": 400,
+      "s": 16,
+      "lh": 1.35,
+      "ch": "Ễ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 310,
+            "width": 150,
+            "height": 21.59375,
+            "top": 310,
+            "right": 150,
+            "bottom": 331.59375,
+            "left": 0
+          },
+          "baseline": 326,
+          "font": "16px / 21.6px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 310,
+            "width": 150,
+            "height": 21.59375,
+            "top": 310,
+            "right": 300,
+            "bottom": 331.59375,
+            "left": 150
+          },
+          "baseline": 326,
+          "font": "16px / 21.6px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 18,
+      "lostDarknessSum": 2197
+    },
+    {
+      "w": 400,
+      "s": 16,
+      "lh": 1.35,
+      "ch": "Ỗ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 380,
+            "width": 150,
+            "height": 21.59375,
+            "top": 380,
+            "right": 150,
+            "bottom": 401.59375,
+            "left": 0
+          },
+          "baseline": 396,
+          "font": "16px / 21.6px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 380,
+            "width": 150,
+            "height": 21.59375,
+            "top": 380,
+            "right": 300,
+            "bottom": 401.59375,
+            "left": 150
+          },
+          "baseline": 396,
+          "font": "16px / 21.6px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded De",
+              "postScriptName": "DDHRounded-De",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 18,
+      "lostDarknessSum": 2197
+    },
+    {
+      "w": 700,
+      "s": 14,
+      "lh": 1.3,
+      "ch": "Ẫ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 450,
+            "width": 150,
+            "height": 18.1875,
+            "top": 450,
+            "right": 150,
+            "bottom": 468.1875,
+            "left": 0
+          },
+          "baseline": 464,
+          "font": "700 14px / 18.2px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 450,
+            "width": 150,
+            "height": 18.1875,
+            "top": 450,
+            "right": 300,
+            "bottom": 468.1875,
+            "left": 150
+          },
+          "baseline": 464,
+          "font": "700 14px / 18.2px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 13,
+      "lostDarknessSum": 2305
+    },
+    {
+      "w": 700,
+      "s": 14,
+      "lh": 1.3,
+      "ch": "Ễ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 520,
+            "width": 150,
+            "height": 18.1875,
+            "top": 520,
+            "right": 150,
+            "bottom": 538.1875,
+            "left": 0
+          },
+          "baseline": 534,
+          "font": "700 14px / 18.2px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 520,
+            "width": 150,
+            "height": 18.1875,
+            "top": 520,
+            "right": 300,
+            "bottom": 538.1875,
+            "left": 150
+          },
+          "baseline": 534,
+          "font": "700 14px / 18.2px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 19,
+      "lostDarknessSum": 2445
+    },
+    {
+      "w": 700,
+      "s": 14,
+      "lh": 1.3,
+      "ch": "Ỗ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 590,
+            "width": 150,
+            "height": 18.1875,
+            "top": 590,
+            "right": 150,
+            "bottom": 608.1875,
+            "left": 0
+          },
+          "baseline": 604,
+          "font": "700 14px / 18.2px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 590,
+            "width": 150,
+            "height": 18.1875,
+            "top": 590,
+            "right": 300,
+            "bottom": 608.1875,
+            "left": 150
+          },
+          "baseline": 604,
+          "font": "700 14px / 18.2px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -3,
+        -2,
+        -1
+      ],
+      "actualLostPixelCount": 19,
+      "lostDarknessSum": 2392
+    },
+    {
+      "w": 700,
+      "s": 16,
+      "lh": 1.35,
+      "ch": "Ẫ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 660,
+            "width": 150,
+            "height": 21.59375,
+            "top": 660,
+            "right": 150,
+            "bottom": 681.59375,
+            "left": 0
+          },
+          "baseline": 676,
+          "font": "700 16px / 21.6px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 660,
+            "width": 150,
+            "height": 21.59375,
+            "top": 660,
+            "right": 300,
+            "bottom": 681.59375,
+            "left": 150
+          },
+          "baseline": 676,
+          "font": "700 16px / 21.6px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -4,
+        -3,
+        -2
+      ],
+      "actualHiddenLostRows": [
+        -4,
+        -3,
+        -2
+      ],
+      "actualLostPixelCount": 21,
+      "lostDarknessSum": 3382
+    },
+    {
+      "w": 700,
+      "s": 16,
+      "lh": 1.35,
+      "ch": "Ễ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 730,
+            "width": 150,
+            "height": 21.59375,
+            "top": 730,
+            "right": 150,
+            "bottom": 751.59375,
+            "left": 0
+          },
+          "baseline": 746,
+          "font": "700 16px / 21.6px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 730,
+            "width": 150,
+            "height": 21.59375,
+            "top": 730,
+            "right": 300,
+            "bottom": 751.59375,
+            "left": 150
+          },
+          "baseline": 746,
+          "font": "700 16px / 21.6px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -5,
+        -4,
+        -3,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -5,
+        -4,
+        -3,
+        -1
+      ],
+      "actualLostPixelCount": 27,
+      "lostDarknessSum": 3842
+    },
+    {
+      "w": 700,
+      "s": 16,
+      "lh": 1.35,
+      "ch": "Ỗ",
+      "boxes": [
+        {
+          "rect": {
+            "x": 0,
+            "y": 800,
+            "width": 150,
+            "height": 21.59375,
+            "top": 800,
+            "right": 150,
+            "bottom": 821.59375,
+            "left": 0
+          },
+          "baseline": 816,
+          "font": "700 16px / 21.6px ExactR4",
+          "overflow": "visible",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        },
+        {
+          "rect": {
+            "x": 150,
+            "y": 800,
+            "width": 150,
+            "height": 21.59375,
+            "top": 800,
+            "right": 300,
+            "bottom": 821.59375,
+            "left": 150
+          },
+          "baseline": 816,
+          "font": "700 16px / 21.6px ExactR4",
+          "overflow": "hidden",
+          "fonts": [
+            {
+              "familyName": "DDH Rounded Dam",
+              "postScriptName": "DDHRounded-Dam",
+              "isCustomFont": true,
+              "glyphCount": 1
+            }
+          ]
+        }
+      ],
+      "actualInkRowsOutsideBox": [
+        -5,
+        -4,
+        -3,
+        -1
+      ],
+      "actualHiddenLostRows": [
+        -5,
+        -4,
+        -3,
+        -1
+      ],
+      "actualLostPixelCount": 29,
+      "lostDarknessSum": 3993
+    }
+  ],
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "productionAdopt": false,
+  "exactOverride": "line-gap-override:0%",
+  "actualImageOpened": true,
+  "noFallback": true,
+  "verdict": "HOLD confirmed actualinkloss all12cases under exactarchivedR4fonts, unchangedcomponentrelevantstyles. Canvas history preserved; counts here measured screenshotpixels, not Canvasascent.",
+  "countMethod": "Compare translated visible vs hidden crops at integeraligned x0/x150, same whitebg/blackink. Count each row with positive sourceink outsidebox and pixel darkness lost. Noncontiguous rows reported as list, never ceilascent assumed contiguous.",
+  "limits": "Isolated actualChromium componentstyle probe, not mountedapp E2E. Exact archived2unifiedWOFF2 only; no font/CSS edits."
+}

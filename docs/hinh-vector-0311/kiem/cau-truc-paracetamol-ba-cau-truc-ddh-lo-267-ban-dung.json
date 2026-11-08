@@ -1,0 +1,40 @@
+[
+  {
+    "i": 790,
+    "hash": "9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414",
+    "fileNguon": "anh/9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414.png",
+    "svg": "paracetamol-ba-cau-truc-ddh-d64663a03836cd1ed005ad9cca2b7e9ca88a5cb2aacc50743c5233f653cdbef9.svg",
+    "hashSvg": "d64663a03836cd1ed005ad9cca2b7e9ca88a5cb2aacc50743c5233f653cdbef9",
+    "byteSvg": 31291,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-427",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "hash": "9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414",
+            "where": "DB-12-B8-D1-III-427.hinh.0.du_lieu",
+            "hashDataUrl": "09504acc310f3392cd0b166503330215e5a41da755d32842ef9377727bd69f9e"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-III-30",
+        "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+        "refs": [
+          {
+            "hash": "9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414",
+            "where": "DH-12-C3-B8-III-30.hinh.0.du_lieu",
+            "hashDataUrl": "09504acc310f3392cd0b166503330215e5a41da755d32842ef9377727bd69f9e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "HASH9331104e riêng/3Ph9innerdoubles+1CO2verticalrays/SPLITtopjunctionnativeNOhorizontalbridge/20C6O3N/3literalHO-NO2-NH2-NoverHseparatenoNHbond-CH3/2RIGHTheads/3regularitaliccaptionscase/noaddedconditions-yield80-stereo-charges-answer.",
+    "hashSvgDaSoat": "d64663a03836cd1ed005ad9cca2b7e9ca88a5cb2aacc50743c5233f653cdbef9",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

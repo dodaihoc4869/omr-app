@@ -1,0 +1,706 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "diagnosticOnly": true,
+  "repoModified": false,
+  "productionAdopt": false,
+  "verdict": "HOLD: compact diagnostic shows tradeoff; not approved design/fullfont",
+  "fonts": {
+    "de": {
+      "path": "/workspace/scratch/lo267/unified-de.woff2",
+      "sha": "2f450177fb37c2c11e479164c24935b1444749e790b69e08c38d5ab326954dae",
+      "bytes": 22664,
+      "targets": [
+        {
+          "glyph": "Ẫ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.5942857142857143,
+          "bodyYmax": 742,
+          "oldMarkBoundsY": [
+            810,
+            1160
+          ],
+          "newMarkBoundsY": [
+            762,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 350.0
+        },
+        {
+          "glyph": "Ễ",
+          "bodyContourIndices": [
+            0
+          ],
+          "markContourIndices": [
+            1,
+            2
+          ],
+          "scaleUniformXY": 0.5942857142857143,
+          "bodyYmax": 742,
+          "oldMarkBoundsY": [
+            810,
+            1160
+          ],
+          "newMarkBoundsY": [
+            762,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 322.0
+        },
+        {
+          "glyph": "Ỗ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.5657142857142857,
+          "bodyYmax": 752,
+          "oldMarkBoundsY": [
+            810,
+            1160
+          ],
+          "newMarkBoundsY": [
+            772,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 380.0
+        }
+      ]
+    },
+    "dam": {
+      "path": "/workspace/scratch/lo267/unified-dam.woff2",
+      "sha": "da09ee0f7e4c0bee77d764272b992d3bb2cbc2b1ac02434c243ce42598b93061",
+      "bytes": 22940,
+      "targets": [
+        {
+          "glyph": "Ẫ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.45539906103286387,
+          "bodyYmax": 756,
+          "oldMarkBoundsY": [
+            734,
+            1160
+          ],
+          "newMarkBoundsY": [
+            776,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 340.5
+        },
+        {
+          "glyph": "Ễ",
+          "bodyContourIndices": [
+            0
+          ],
+          "markContourIndices": [
+            1,
+            2
+          ],
+          "scaleUniformXY": 0.45539906103286387,
+          "bodyYmax": 756,
+          "oldMarkBoundsY": [
+            786,
+            1212
+          ],
+          "newMarkBoundsY": [
+            776,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 312.0
+        },
+        {
+          "glyph": "Ỗ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.431924882629108,
+          "bodyYmax": 766,
+          "oldMarkBoundsY": [
+            796,
+            1222
+          ],
+          "newMarkBoundsY": [
+            786,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 371.0
+        }
+      ]
+    }
+  },
+  "exactAudit": {
+    "de": {
+      "hmtxExact": true,
+      "changedGlyphs": [
+        "uni1EAA",
+        "uni1EC4",
+        "uni1ED6"
+      ],
+      "metricsExact": true
+    },
+    "dam": {
+      "hmtxExact": true,
+      "changedGlyphs": [
+        "uni1EAA",
+        "uni1EC4",
+        "uni1ED6"
+      ],
+      "metricsExact": true
+    }
+  },
+  "actual20Opened": true,
+  "sizes": [
+    14,
+    16,
+    18,
+    24,
+    32,
+    72,
+    200
+  ],
+  "readability": {
+    "roundShape": "UniformXY preserves relative aspect and rounded contour design modulo integer rounding; no Y-only squeeze",
+    "de": "scale0.566..0.594; tiny but mũ/ngã still distinguishable in visible14/16.72/200 clearly smaller/thinner than body and unchanged lowercase family. Needs design decision",
+    "dam": "scale0.432..0.455; accent strokes/width much lighter and narrower relative to bold body;14/16 small mark distinction fragile. Not approved merely because no contact",
+    "contact": "6 compact glyphs actual DOM/SVG no contact; 14 other panels unchanged outlines freshly opened",
+    "connectedBreve": "Ẳ/Ẵ source-connected breve/body untouched; not cut by bbox to compact"
+  },
+  "cdpAllCustom": true,
+  "cdp": [
+    {
+      "w": 400,
+      "i": 0,
+      "form": "NFC",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 0,
+      "form": "NFD",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 1,
+      "form": "NFC",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 1,
+      "form": "NFD",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 2,
+      "form": "NFC",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 2,
+      "form": "NFD",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 3,
+      "form": "NFC",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    },
+    {
+      "w": 400,
+      "i": 3,
+      "form": "NFD",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 0,
+      "form": "NFC",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 0,
+      "form": "NFD",
+      "text": "ẪẫỄễỖỗ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 6
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 1,
+      "form": "NFC",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 1,
+      "form": "NFD",
+      "text": "ẬẲẴẶ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 4
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 2,
+      "form": "NFC",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 2,
+      "form": "NFD",
+      "text": "ε Ā Ä A̩",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 8
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 3,
+      "form": "NFC",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    },
+    {
+      "w": 700,
+      "i": 3,
+      "form": "NFD",
+      "text": "ẮỀỔỠỰ đ",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 7
+        }
+      ]
+    }
+  ],
+  "NFCNFD": {
+    "unified-faces": [
+      {
+        "w": 400,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 400,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 400,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẪẫỄễỖỗ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẬẲẴẶ",
+        "differentPixelChannels": 0
+      },
+      {
+        "w": 700,
+        "text": "ẮỀỔỠỰ",
+        "differentPixelChannels": 0
+      }
+    ]
+  },
+  "appClipExact0Override": [
+    {
+      "override": false,
+      "w": 400,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ẫ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 400,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ễ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 400,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ỗ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 400,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ẫ",
+      "baseline": 16,
+      "inkAscent": 17,
+      "top": -1
+    },
+    {
+      "override": false,
+      "w": 400,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ễ",
+      "baseline": 16,
+      "inkAscent": 17,
+      "top": -1
+    },
+    {
+      "override": false,
+      "w": 400,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ỗ",
+      "baseline": 16,
+      "inkAscent": 16,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 700,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ẫ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 700,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ễ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 700,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ỗ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": false,
+      "w": 700,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ẫ",
+      "baseline": 16,
+      "inkAscent": 18,
+      "top": -2
+    },
+    {
+      "override": false,
+      "w": 700,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ễ",
+      "baseline": 16,
+      "inkAscent": 18,
+      "top": -2
+    },
+    {
+      "override": false,
+      "w": 700,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ỗ",
+      "baseline": 16,
+      "inkAscent": 18,
+      "top": -2
+    },
+    {
+      "override": true,
+      "w": 400,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ẫ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 400,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ễ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 400,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ỗ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 400,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ẫ",
+      "baseline": 16,
+      "inkAscent": 17,
+      "top": -1
+    },
+    {
+      "override": true,
+      "w": 400,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ễ",
+      "baseline": 16,
+      "inkAscent": 17,
+      "top": -1
+    },
+    {
+      "override": true,
+      "w": 400,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ỗ",
+      "baseline": 16,
+      "inkAscent": 16,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 700,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ẫ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 700,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ễ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 700,
+      "size": 14,
+      "lineHeight": 1.3,
+      "glyph": "Ỗ",
+      "baseline": 14,
+      "inkAscent": 14,
+      "top": 0
+    },
+    {
+      "override": true,
+      "w": 700,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ẫ",
+      "baseline": 16,
+      "inkAscent": 18,
+      "top": -2
+    },
+    {
+      "override": true,
+      "w": 700,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ễ",
+      "baseline": 16,
+      "inkAscent": 18,
+      "top": -2
+    },
+    {
+      "override": true,
+      "w": 700,
+      "size": 16,
+      "lineHeight": 1.35,
+      "glyph": "Ỗ",
+      "baseline": 16,
+      "inkAscent": 18,
+      "top": -2
+    }
+  ],
+  "clipFinding": "14/1.3 compact6 top0 passes this isolated probe, 16/1.35 still De top−1 forẪ/Ễ and Dam top−2 all3.970 contour ymax does not guarantee actual raster fit. No CSS/metrics modified, no forcegreen",
+  "evidenceDir": "/workspace/scratch/lo267",
+  "limits": [
+    "Targeted6 uppercase only, not all marks/allfont. Source body semantic indices explicit from audited R4; other body/metrics exact.",
+    "No full app E2E; isolated actual component relevant styles/face0%descriptor",
+    "Further uniform shrinking would worsen bold relative style; keep HOLD rather than forcepassing"
+  ]
+}

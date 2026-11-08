@@ -1,0 +1,475 @@
+{
+  "i": 790,
+  "hash": "9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414.png",
+  "size": [
+    884,
+    191
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B8-D1-III-427",
+      "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+      "refs": [
+        {
+          "hash": "9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414",
+          "where": "DB-12-B8-D1-III-427.hinh.0.du_lieu",
+          "hashDataUrl": "09504acc310f3392cd0b166503330215e5a41da755d32842ef9377727bd69f9e"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B8-III-30",
+      "de": "Thuốc Paracetamol là một loại thuốc được sử dụng rất nhiều trong y học. Thuốc có tác dụng giảm đau, hạ sốt, tuy nhiên ít có tác dụng kháng viêm.\nThuốc Paracetamol được tổng hợp từ p-nitrophenol theo phương trình hóa học sau (biết hiệu suất của quá trình phản ứng đạt 80%): Để sản xuất 1,5 triệu viên thuốc paracetamol thì cần dùng bao nhiêu kg p-nitrophenol biết rằng mỗi viên thuốc chứa 500 mg Paracetamol (Lấy kết quả làm tròn đến số nguyên)",
+      "refs": [
+        {
+          "hash": "9331104e88af0c47d9a2cc2c54f0fa6a6b8c50a11ebec99b185687bf159f0414",
+          "where": "DH-12-C3-B8-III-30.hinh.0.du_lieu",
+          "hashDataUrl": "09504acc310f3392cd0b166503330215e5a41da755d32842ef9377727bd69f9e"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x andamide6x actualopened;source-only chưaSVG/chưaĐạt.",
+  "coordinateMeaning": "Pixelnative approximate1–2px, literal junctions preserved nottheorynormalized.",
+  "geometry": {
+    "molecules": [
+      {
+        "caption": "p-nitrophenol",
+        "captionStyle": "regularITALIC",
+        "captionBBox": [
+          38,
+          156,
+          174,
+          181
+        ],
+        "ringVertices": [
+          [
+            65,
+            41
+          ],
+          [
+            102,
+            19
+          ],
+          [
+            140,
+            41
+          ],
+          [
+            140,
+            83
+          ],
+          [
+            102,
+            105
+          ],
+          [
+            65,
+            83
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              73,
+              44
+            ],
+            [
+              102,
+              27
+            ]
+          ],
+          [
+            [
+              132,
+              47
+            ],
+            [
+              132,
+              78
+            ]
+          ],
+          [
+            [
+              73,
+              80
+            ],
+            [
+              102,
+              97
+            ]
+          ]
+        ],
+        "substituents": [
+          {
+            "label": "NO₂",
+            "bbox": [
+              168,
+              7,
+              209,
+              31
+            ],
+            "bond": [
+              [
+                140,
+                41
+              ],
+              [
+                162,
+                27
+              ]
+            ],
+            "anchor": "Nleft edge"
+          },
+          {
+            "label": "HO",
+            "bbox": [
+              6,
+              101,
+              38,
+              123
+            ],
+            "bond": [
+              [
+                65,
+                83
+              ],
+              [
+                41,
+                99
+              ]
+            ],
+            "anchor": "Oatright (HO literalnotOH)"
+          }
+        ],
+        "counts": "6C3O1N; nitrocondensedNO2 no explicitcharges/NOdouble added."
+      },
+      {
+        "caption": "p-aminophenol",
+        "captionStyle": "regularITALIC",
+        "captionBBox": [
+          323,
+          157,
+          467,
+          182
+        ],
+        "ringVertices": [
+          [
+            348,
+            43
+          ],
+          [
+            385,
+            21
+          ],
+          [
+            423,
+            43
+          ],
+          [
+            423,
+            85
+          ],
+          [
+            385,
+            107
+          ],
+          [
+            348,
+            85
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              356,
+              46
+            ],
+            [
+              385,
+              29
+            ]
+          ],
+          [
+            [
+              415,
+              49
+            ],
+            [
+              415,
+              80
+            ]
+          ],
+          [
+            [
+              356,
+              82
+            ],
+            [
+              385,
+              99
+            ]
+          ]
+        ],
+        "substituents": [
+          {
+            "label": "NH₂",
+            "bbox": [
+              448,
+              15,
+              489,
+              40
+            ],
+            "bond": [
+              [
+                423,
+                43
+              ],
+              [
+                444,
+                29
+              ]
+            ],
+            "anchor": "Nleft"
+          },
+          {
+            "label": "HO",
+            "bbox": [
+              289,
+              103,
+              321,
+              125
+            ],
+            "bond": [
+              [
+                348,
+                85
+              ],
+              [
+                325,
+                100
+              ]
+            ],
+            "anchor": "Oatright"
+          }
+        ],
+        "counts": "6C1O1N"
+      },
+      {
+        "caption": "Paracetamol",
+        "captionStyle": "regularITALIC uppercasePonly",
+        "captionBBox": [
+          685,
+          157,
+          806,
+          181
+        ],
+        "ringVertices": [
+          [
+            640,
+            44
+          ],
+          [
+            677,
+            22
+          ],
+          [
+            714,
+            44
+          ],
+          [
+            714,
+            87
+          ],
+          [
+            677,
+            109
+          ],
+          [
+            640,
+            87
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              648,
+              47
+            ],
+            [
+              677,
+              30
+            ]
+          ],
+          [
+            [
+              706,
+              50
+            ],
+            [
+              706,
+              81
+            ]
+          ],
+          [
+            [
+              648,
+              84
+            ],
+            [
+              677,
+              101
+            ]
+          ]
+        ],
+        "substituents": [
+          {
+            "label": "HO",
+            "bbox": [
+              581,
+              104,
+              614,
+              126
+            ],
+            "bond": [
+              [
+                640,
+                87
+              ],
+              [
+                617,
+                102
+              ]
+            ],
+            "anchor": "Oatright"
+          },
+          {
+            "label": "N",
+            "bbox": [
+              741,
+              16,
+              759,
+              37
+            ],
+            "bond": [
+              [
+                714,
+                44
+              ],
+              [
+                736,
+                30
+              ]
+            ],
+            "anchor": "Nleft"
+          },
+          {
+            "label": "H",
+            "bbox": [
+              741,
+              44,
+              759,
+              65
+            ],
+            "bond": null,
+            "note": "SeparateHbelowN; NOverticalN-Hbond visible. KeepN-over-Hlayout."
+          },
+          {
+            "label": "CH₃",
+            "bbox": [
+              835,
+              17,
+              877,
+              42
+            ],
+            "bond": [
+              [
+                805,
+                44
+              ],
+              [
+                831,
+                32
+              ]
+            ],
+            "anchor": "Cfirst"
+          },
+          {
+            "label": "O",
+            "bbox": [
+              791,
+              73,
+              810,
+              95
+            ],
+            "bond": "TwoverticalsC=O x795 and805,y44..69",
+            "note": "Nativecarbonyljunction is split at top: Nrightstub(766,31)→(795,44),thenleftlineV69;CH3leftstub(831,32)→(805,44),thenrightlineV69. Do not addhorizontalbridge/topvertexorN-Hline."
+          }
+        ],
+        "counts": "8C2O1N"
+      }
+    ],
+    "arrows": [
+      {
+        "shaft": [
+          [
+            203,
+            62
+          ],
+          [
+            288,
+            62
+          ]
+        ],
+        "filledhead": [
+          [
+            281,
+            58
+          ],
+          [
+            288,
+            62
+          ],
+          [
+            281,
+            66
+          ]
+        ]
+      },
+      {
+        "shaft": [
+          [
+            495,
+            63
+          ],
+          [
+            578,
+            63
+          ]
+        ],
+        "filledhead": [
+          [
+            571,
+            59
+          ],
+          [
+            578,
+            63
+          ],
+          [
+            571,
+            67
+          ]
+        ]
+      }
+    ],
+    "allCounts": "3Ph6vertices/9innerphenyldoubles+1carbonyl2lines;20C6O3N across3mols;2filledRIGHTheads;3italiccaptions. No charges/stereo/wedges/circles/conditions/catalysts/coefficients/products-extra/captionnumbers."
+  },
+  "uncertainties": [
+    "NativebrokenC=Otop is literalprintstyle, chemicallysamecarbonyl but do not silently normalizegeometry; actualamide6x retained for freshreview."
+  ],
+  "macro": "/workspace/scratch/790-amide6x.png",
+  "actualSvgReviewed": false
+}

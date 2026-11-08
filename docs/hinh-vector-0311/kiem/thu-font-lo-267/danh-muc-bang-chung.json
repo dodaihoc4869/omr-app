@@ -1,0 +1,135 @@
+{
+  "productionAdopted": false,
+  "globalAdmissible": false,
+  "fonts": [
+    {
+      "file": "docs/hinh-vector-0311/kiem/thu-font-lo-267/compact-de-bi-loai.woff2",
+      "sha": "2f450177fb37c2c11e479164c24935b1444749e790b69e08c38d5ab326954dae",
+      "bytes": 22664
+    },
+    {
+      "file": "docs/hinh-vector-0311/kiem/thu-font-lo-267/compact-dam-bi-loai.woff2",
+      "sha": "da09ee0f7e4c0bee77d764272b992d3bb2cbc2b1ac02434c243ce42598b93061",
+      "bytes": 22940
+    }
+  ],
+  "screenshots": [
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7876.png",
+      "sha": "a9193c147f41f112c42505f78aad8901f09a01e8d05547a71de0adad0ae6bf8b",
+      "jpg": "font-compact-lo-267-01-panel-dam-7876.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7894.png",
+      "sha": "918e0634503e018b86b855ff8f22f7341d74285d58ac9ff9d176d7cfba95274d",
+      "jpg": "font-compact-lo-267-02-panel-de-7894.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7877.png",
+      "sha": "a0498e1ef72842f3c668b72eaa5b4d318535bbcf0a7946d9b1b12004b3840045",
+      "jpg": "font-compact-lo-267-03-panel-dam-7877.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7876.png",
+      "sha": "27f4eb444145c2350724238066102825dd268d98f18d78dea21c9f15ac5725ba",
+      "jpg": "font-compact-lo-267-04-panel-de-7876.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7894.png",
+      "sha": "fe516090c870c926cd01ec690614cd57fb3d0fbed7c659fa4ac2a439eceb71d3",
+      "jpg": "font-compact-lo-267-05-panel-dam-7894.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7852.png",
+      "sha": "767a985bc20f873fcb1dde8e78eb3a9fad922f97162da868529d1b7105908d8a",
+      "jpg": "font-compact-lo-267-06-panel-de-7852.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7850.png",
+      "sha": "d7d53a0ae8c2e330d1a93abb3f46320562a12a73a97ff4ad28682f9cab6305ee",
+      "jpg": "font-compact-lo-267-07-panel-dam-7850.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7858.png",
+      "sha": "e3eff1351d3d474c9e4d47d6becfb687477ccbeab880a15baa7d90879982d9c2",
+      "jpg": "font-compact-lo-267-08-panel-de-7858.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7862.png",
+      "sha": "a8d48408c72552eb0e0fedc2f34c612fdc9d78279f490227230860dea21224ba",
+      "jpg": "font-compact-lo-267-09-panel-dam-7862.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7877.png",
+      "sha": "7a3ca71fb95d4a5d95e7d545e9127391e12f1a3e64132effdb1df23d4f4101ab",
+      "jpg": "font-compact-lo-267-10-panel-de-7877.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7862.png",
+      "sha": "1d9a962b1ba4c806927cea43917b5f842fe979be70862489c9b2b0ad4bbd1092",
+      "jpg": "font-compact-lo-267-11-panel-de-7862.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7860.png",
+      "sha": "89c1a212d533ee7d60cb591f131ff4b58e1dab8609c84f481ebbb1f7d0e68cbe",
+      "jpg": "font-compact-lo-267-12-panel-de-7860.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7851.png",
+      "sha": "c928aca1e53db6768743a4b45e1a3743838340ba8d351cfb1ad917120bdd10f1",
+      "jpg": "font-compact-lo-267-13-panel-de-7851.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7895.png",
+      "sha": "a347ecad06850e0290a7b44e1775b2399bb547a8cb7482dfb7d923037eb5a7e9",
+      "jpg": "font-compact-lo-267-14-panel-de-7895.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7860.png",
+      "sha": "dda59f60c752f9d93d79651bfa9ede35b6d079f98ddb8b2bc9aa246ffc3bfe66",
+      "jpg": "font-compact-lo-267-15-panel-dam-7860.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7895.png",
+      "sha": "c201d514bb8cac133902b26bc9c084c6f39f5d7a28e3636b4571a5fa6510b11b",
+      "jpg": "font-compact-lo-267-16-panel-dam-7895.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7852.png",
+      "sha": "d144f066ba6918b7a6c96758c0d0f55ac6a0c73acb7ca8b98b3c222207952dd6",
+      "jpg": "font-compact-lo-267-17-panel-dam-7852.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-de-7850.png",
+      "sha": "9073460e6ca68825670b11d02640bac976c81a228f4cd4f854e39ad598acd93e",
+      "jpg": "font-compact-lo-267-18-panel-de-7850.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7858.png",
+      "sha": "f1d70f66d84d7762e2186e3344336aad198912fcd29c918d05bfde99bf77485d",
+      "jpg": "font-compact-lo-267-19-panel-dam-7858.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/panel-dam-7851.png",
+      "sha": "9e1a9ade6d3141383bfcaf11742b6b66928f7592b0695196ae84c4503a817645",
+      "jpg": "font-compact-lo-267-20-panel-dam-7851.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/trace-dom.png",
+      "sha": "8a4e2700d067e992f3606a31d18a733467700037caafffa64d7ce7aeca5022dc",
+      "jpg": "font-compact-lo-267-21-trace-dom.jpg"
+    },
+    {
+      "source": "/workspace/scratch/lo267/appclip-override-true.png",
+      "sha": "f85b3931e1b021cea7ff1f185dbd05e843482ba6dcc9331812ffaa7a90d50c78",
+      "jpg": "font-compact-lo-267-22-appclip-override-true.jpg"
+    },
+    {
+      "source": "/workspace/scratch/r4-ink-recheck267/actual-visible-hidden.png",
+      "sha": "ac827054e8ac5ef0d5cff562c9e4d63d0ee8f9a44c6a5065cd87128bf3d7332e",
+      "jpg": "font-compact-lo-267-23-actual-visible-hidden.jpg"
+    }
+  ],
+  "scriptSHA": "7ae43c32d45621e256af3f0a0a8cc445e0594c8a77bc56a41762134f040a80b2",
+  "gioiHan": "Compactdiagnosticnegative: Dammarksquánhỏ/mảnh,sauactualpixeltraceDam16còn1inkrowlost;De16khôngclip dùCanvasbboxâm. R4actual12casesvẫninkclip,giữoldhistoryCanvasnhưngkhôngcoiascent=inkloss. ArchivefontđúngreviewSHA;reprotimestampkhácKHÔNGoldpositivegánnewhash."
+}

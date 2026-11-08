@@ -1,0 +1,933 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "diagnosticOnly": true,
+  "repoModified": false,
+  "fontModifiedSinceDiagnostic": false,
+  "HarfBuzz": {
+    "de": {
+      "UPM": 1000,
+      "weight": 400,
+      "fsSelection": 64,
+      "macStyle": 0,
+      "rows": [
+        {
+          "char": "Ẫ",
+          "form": "NFC",
+          "cmapName": "uni1EAA",
+          "shaped": [
+            {
+              "gid": 494,
+              "name": "uni1EAA",
+              "bbox": [
+                32,
+                -12,
+                669,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 701
+            }
+          ]
+        },
+        {
+          "char": "Ẫ",
+          "form": "NFD",
+          "cmapName": "uni1EAA",
+          "shaped": [
+            {
+              "gid": 494,
+              "name": "uni1EAA",
+              "bbox": [
+                32,
+                -12,
+                669,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 701
+            }
+          ]
+        },
+        {
+          "char": "Ễ",
+          "form": "NFC",
+          "cmapName": "uni1EC4",
+          "shaped": [
+            {
+              "gid": 520,
+              "name": "uni1EC4",
+              "bbox": [
+                92,
+                -12,
+                547,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 629
+            }
+          ]
+        },
+        {
+          "char": "Ễ",
+          "form": "NFD",
+          "cmapName": "uni1EC4",
+          "shaped": [
+            {
+              "gid": 520,
+              "name": "uni1EC4",
+              "bbox": [
+                92,
+                -12,
+                547,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 629
+            }
+          ]
+        },
+        {
+          "char": "Ỗ",
+          "form": "NFC",
+          "cmapName": "uni1ED6",
+          "shaped": [
+            {
+              "gid": 538,
+              "name": "uni1ED6",
+              "bbox": [
+                46,
+                -22,
+                711,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 757
+            }
+          ]
+        },
+        {
+          "char": "Ỗ",
+          "form": "NFD",
+          "cmapName": "uni1ED6",
+          "shaped": [
+            {
+              "gid": 538,
+              "name": "uni1ED6",
+              "bbox": [
+                46,
+                -22,
+                711,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 757
+            }
+          ]
+        }
+      ]
+    },
+    "dam": {
+      "UPM": 1000,
+      "weight": 700,
+      "fsSelection": 0,
+      "macStyle": 0,
+      "rows": [
+        {
+          "char": "Ẫ",
+          "form": "NFC",
+          "cmapName": "uni1EAA",
+          "shaped": [
+            {
+              "gid": 494,
+              "name": "uni1EAA",
+              "bbox": [
+                11,
+                -26,
+                670,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 681
+            }
+          ]
+        },
+        {
+          "char": "Ẫ",
+          "form": "NFD",
+          "cmapName": "uni1EAA",
+          "shaped": [
+            {
+              "gid": 494,
+              "name": "uni1EAA",
+              "bbox": [
+                11,
+                -26,
+                670,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 681
+            }
+          ]
+        },
+        {
+          "char": "Ễ",
+          "form": "NFC",
+          "cmapName": "uni1EC4",
+          "shaped": [
+            {
+              "gid": 520,
+              "name": "uni1EC4",
+              "bbox": [
+                71,
+                -26,
+                554,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 615
+            }
+          ]
+        },
+        {
+          "char": "Ễ",
+          "form": "NFD",
+          "cmapName": "uni1EC4",
+          "shaped": [
+            {
+              "gid": 520,
+              "name": "uni1EC4",
+              "bbox": [
+                71,
+                -26,
+                554,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 615
+            }
+          ]
+        },
+        {
+          "char": "Ỗ",
+          "form": "NFC",
+          "cmapName": "uni1ED6",
+          "shaped": [
+            {
+              "gid": 538,
+              "name": "uni1ED6",
+              "bbox": [
+                27,
+                -36,
+                715,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 742
+            }
+          ]
+        },
+        {
+          "char": "Ỗ",
+          "form": "NFD",
+          "cmapName": "uni1ED6",
+          "shaped": [
+            {
+              "gid": 538,
+              "name": "uni1ED6",
+              "bbox": [
+                27,
+                -36,
+                715,
+                970
+              ],
+              "xoff": 0,
+              "yoff": 0,
+              "advance": 742
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "browserCanvasActualPixels": [
+    {
+      "w": 400,
+      "s": 14,
+      "ch": "Ẫ",
+      "font": "14px Coverage",
+      "measuredAscent": 14,
+      "rasterAscent": 14,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 14,
+      "ch": "Ễ",
+      "font": "14px Coverage",
+      "measuredAscent": 14,
+      "rasterAscent": 14,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 14,
+      "ch": "Ỗ",
+      "font": "14px Coverage",
+      "measuredAscent": 14,
+      "rasterAscent": 14,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 16,
+      "ch": "Ẫ",
+      "font": "16px Coverage",
+      "measuredAscent": 17,
+      "rasterAscent": 16,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 16,
+      "ch": "Ễ",
+      "font": "16px Coverage",
+      "measuredAscent": 17,
+      "rasterAscent": 16,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 16,
+      "ch": "Ỗ",
+      "font": "16px Coverage",
+      "measuredAscent": 16,
+      "rasterAscent": 16,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 32,
+      "ch": "Ẫ",
+      "font": "32px Coverage",
+      "measuredAscent": 32,
+      "rasterAscent": 32,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 32,
+      "ch": "Ễ",
+      "font": "32px Coverage",
+      "measuredAscent": 32,
+      "rasterAscent": 32,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 32,
+      "ch": "Ỗ",
+      "font": "32px Coverage",
+      "measuredAscent": 32,
+      "rasterAscent": 32,
+      "rasterDescent": -1
+    },
+    {
+      "w": 400,
+      "s": 200,
+      "ch": "Ẫ",
+      "font": "200px Coverage",
+      "measuredAscent": 195,
+      "rasterAscent": 195,
+      "rasterDescent": 2
+    },
+    {
+      "w": 400,
+      "s": 200,
+      "ch": "Ễ",
+      "font": "200px Coverage",
+      "measuredAscent": 195,
+      "rasterAscent": 195,
+      "rasterDescent": 1
+    },
+    {
+      "w": 400,
+      "s": 200,
+      "ch": "Ỗ",
+      "font": "200px Coverage",
+      "measuredAscent": 195,
+      "rasterAscent": 195,
+      "rasterDescent": 3
+    },
+    {
+      "w": 700,
+      "s": 14,
+      "ch": "Ẫ",
+      "font": "bold 14px Coverage",
+      "measuredAscent": 14,
+      "rasterAscent": 14,
+      "rasterDescent": -1
+    },
+    {
+      "w": 700,
+      "s": 14,
+      "ch": "Ễ",
+      "font": "bold 14px Coverage",
+      "measuredAscent": 14,
+      "rasterAscent": 14,
+      "rasterDescent": -1
+    },
+    {
+      "w": 700,
+      "s": 14,
+      "ch": "Ỗ",
+      "font": "bold 14px Coverage",
+      "measuredAscent": 14,
+      "rasterAscent": 14,
+      "rasterDescent": -1
+    },
+    {
+      "w": 700,
+      "s": 16,
+      "ch": "Ẫ",
+      "font": "bold 16px Coverage",
+      "measuredAscent": 18,
+      "rasterAscent": 17,
+      "rasterDescent": -1
+    },
+    {
+      "w": 700,
+      "s": 16,
+      "ch": "Ễ",
+      "font": "bold 16px Coverage",
+      "measuredAscent": 18,
+      "rasterAscent": 17,
+      "rasterDescent": -1
+    },
+    {
+      "w": 700,
+      "s": 16,
+      "ch": "Ỗ",
+      "font": "bold 16px Coverage",
+      "measuredAscent": 18,
+      "rasterAscent": 17,
+      "rasterDescent": -1
+    },
+    {
+      "w": 700,
+      "s": 32,
+      "ch": "Ẫ",
+      "font": "bold 32px Coverage",
+      "measuredAscent": 31,
+      "rasterAscent": 31,
+      "rasterDescent": 0
+    },
+    {
+      "w": 700,
+      "s": 32,
+      "ch": "Ễ",
+      "font": "bold 32px Coverage",
+      "measuredAscent": 31,
+      "rasterAscent": 31,
+      "rasterDescent": 0
+    },
+    {
+      "w": 700,
+      "s": 32,
+      "ch": "Ỗ",
+      "font": "bold 32px Coverage",
+      "measuredAscent": 32,
+      "rasterAscent": 32,
+      "rasterDescent": 0
+    },
+    {
+      "w": 700,
+      "s": 200,
+      "ch": "Ẫ",
+      "font": "bold 200px Coverage",
+      "measuredAscent": 196,
+      "rasterAscent": 195,
+      "rasterDescent": 4
+    },
+    {
+      "w": 700,
+      "s": 200,
+      "ch": "Ễ",
+      "font": "bold 200px Coverage",
+      "measuredAscent": 196,
+      "rasterAscent": 195,
+      "rasterDescent": 4
+    },
+    {
+      "w": 700,
+      "s": 200,
+      "ch": "Ỗ",
+      "font": "bold 200px Coverage",
+      "measuredAscent": 196,
+      "rasterAscent": 196,
+      "rasterDescent": 6
+    }
+  ],
+  "DOMvisibleHiddenSynthesisNone": [
+    {
+      "rect": {
+        "x": 0,
+        "y": 30,
+        "width": 150,
+        "height": 21.59375,
+        "top": 30,
+        "right": 150,
+        "bottom": 51.59375,
+        "left": 0
+      },
+      "baseline": 46,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 150,
+        "y": 30,
+        "width": 150,
+        "height": 21.59375,
+        "top": 30,
+        "right": 300,
+        "bottom": 51.59375,
+        "left": 150
+      },
+      "baseline": 46,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 300,
+        "y": 30,
+        "width": 150,
+        "height": 21.59375,
+        "top": 30,
+        "right": 450,
+        "bottom": 51.59375,
+        "left": 300
+      },
+      "baseline": 46,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "none",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 0,
+        "y": 100,
+        "width": 150,
+        "height": 21.59375,
+        "top": 100,
+        "right": 150,
+        "bottom": 121.59375,
+        "left": 0
+      },
+      "baseline": 116,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 150,
+        "y": 100,
+        "width": 150,
+        "height": 21.59375,
+        "top": 100,
+        "right": 300,
+        "bottom": 121.59375,
+        "left": 150
+      },
+      "baseline": 116,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 300,
+        "y": 100,
+        "width": 150,
+        "height": 21.59375,
+        "top": 100,
+        "right": 450,
+        "bottom": 121.59375,
+        "left": 300
+      },
+      "baseline": 116,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "none",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 0,
+        "y": 170,
+        "width": 150,
+        "height": 21.59375,
+        "top": 170,
+        "right": 150,
+        "bottom": 191.59375,
+        "left": 0
+      },
+      "baseline": 186,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 150,
+        "y": 170,
+        "width": 150,
+        "height": 21.59375,
+        "top": 170,
+        "right": 300,
+        "bottom": 191.59375,
+        "left": 150
+      },
+      "baseline": 186,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 300,
+        "y": 170,
+        "width": 150,
+        "height": 21.59375,
+        "top": 170,
+        "right": 450,
+        "bottom": 191.59375,
+        "left": 300
+      },
+      "baseline": 186,
+      "font": "16px / 21.6px Coverage",
+      "fontSynthesis": "none",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded De",
+          "postScriptName": "DDHRounded-De",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 0,
+        "y": 240,
+        "width": 150,
+        "height": 21.59375,
+        "top": 240,
+        "right": 150,
+        "bottom": 261.59375,
+        "left": 0
+      },
+      "baseline": 256,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": -1
+    },
+    {
+      "rect": {
+        "x": 150,
+        "y": 240,
+        "width": 150,
+        "height": 21.59375,
+        "top": 240,
+        "right": 300,
+        "bottom": 261.59375,
+        "left": 150
+      },
+      "baseline": 256,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 300,
+        "y": 240,
+        "width": 150,
+        "height": 21.59375,
+        "top": 240,
+        "right": 450,
+        "bottom": 261.59375,
+        "left": 300
+      },
+      "baseline": 256,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "none",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": -1
+    },
+    {
+      "rect": {
+        "x": 0,
+        "y": 310,
+        "width": 150,
+        "height": 21.59375,
+        "top": 310,
+        "right": 150,
+        "bottom": 331.59375,
+        "left": 0
+      },
+      "baseline": 326,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": -1
+    },
+    {
+      "rect": {
+        "x": 150,
+        "y": 310,
+        "width": 150,
+        "height": 21.59375,
+        "top": 310,
+        "right": 300,
+        "bottom": 331.59375,
+        "left": 150
+      },
+      "baseline": 326,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 300,
+        "y": 310,
+        "width": 150,
+        "height": 21.59375,
+        "top": 310,
+        "right": 450,
+        "bottom": 331.59375,
+        "left": 300
+      },
+      "baseline": 326,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "none",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": -1
+    },
+    {
+      "rect": {
+        "x": 0,
+        "y": 380,
+        "width": 150,
+        "height": 21.59375,
+        "top": 380,
+        "right": 150,
+        "bottom": 401.59375,
+        "left": 0
+      },
+      "baseline": 396,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": -1
+    },
+    {
+      "rect": {
+        "x": 150,
+        "y": 380,
+        "width": 150,
+        "height": 21.59375,
+        "top": 380,
+        "right": 300,
+        "bottom": 401.59375,
+        "left": 150
+      },
+      "baseline": 396,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "weight style small-caps",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": 0
+    },
+    {
+      "rect": {
+        "x": 300,
+        "y": 380,
+        "width": 150,
+        "height": 21.59375,
+        "top": 380,
+        "right": 450,
+        "bottom": 401.59375,
+        "left": 300
+      },
+      "baseline": 396,
+      "font": "700 16px / 21.6px Coverage",
+      "fontSynthesis": "none",
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ],
+      "rasterTopRelativeBox": -1
+    }
+  ],
+  "findings": [
+    "No GSUB/ccmp alias: NFC/NFD all3 eachweight shape exactly cmap GIDs494/520/538; eachactualshapedglyf bboxymax970,zerooffset.",
+    "UPM1000;weight400/700;no sizeadjust descriptors. Dam OS2fsSelection0/macStyle0 despite700, but font-synthesis:none yields identical actual DOM raster. No evidence syntheticbold as cause.",
+    "Glyph instructions empty,no gasp/fpgm/prep/cvt tables. Smallsize browser raster bounds can differ from geometricbbox; exact Skia/FreeType gridfit mechanism not independently isolated.",
+    "IMPORTANT correction: Canvas actualBoundingBoxAscent is conservative compared to actualnonzeroalpha raster. At16 De measured17 but actualraster16 forẪ/Ễ;Dam measured18 actualraster17 all3. Therefore earlierDe−1 clip inference was overstatement; true standaloneDOM De fits top0, Dam actualtop−1 and hidden drops top row.",
+    "FreshDOM visible vs hidden vs font-synthesis:none opened: De3 alltop0;Dam3 visible−1/hidden0/synthesisnone−1. Actual clippingDam1px confirmed. No oldoutline alias found; do not repair generator OTclosure on this evidence.",
+    "Designnegative remains: compactDam marks too small/thin relativebold. No further shrinking to forcegreen; HOLD unchanged."
+  ],
+  "evidence": [
+    "trace-shaped.py",
+    "trace-shaped.json",
+    "trace-browser.cjs",
+    "trace-browser.json",
+    "trace-dom.cjs",
+    "trace-dom.json",
+    "trace-dom.png"
+  ]
+}

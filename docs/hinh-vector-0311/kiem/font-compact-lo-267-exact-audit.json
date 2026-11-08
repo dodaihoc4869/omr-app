@@ -1,0 +1,20 @@
+{
+  "de": {
+    "hmtxExact": true,
+    "changedGlyphs": [
+      "uni1EAA",
+      "uni1EC4",
+      "uni1ED6"
+    ],
+    "metricsExact": true
+  },
+  "dam": {
+    "hmtxExact": true,
+    "changedGlyphs": [
+      "uni1EAA",
+      "uni1EC4",
+      "uni1ED6"
+    ],
+    "metricsExact": true
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "admissible": false,
+  "diagnosticOnly": true,
+  "productionChanged": false,
+  "python": "3.12.14",
+  "fonts": {
+    "de": {
+      "inputSHA": "ec3c249d69edb5e97f3079b7a19f9f485739f8cf2e8152edea25107370658e37",
+      "outputSHA": "b7eae2bea7d70f044523f4035ce51d6d02603d1b549a993775d60bf400f0af0d",
+      "bytes": 22708,
+      "allHmtxUnchanged": true,
+      "targets": [
+        {
+          "glyph": "Ẫ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.5942857142857143,
+          "bodyYmax": 742,
+          "oldMarkBoundsY": [
+            810,
+            1160
+          ],
+          "newMarkBoundsY": [
+            762,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 350.0
+        },
+        {
+          "glyph": "Ễ",
+          "bodyContourIndices": [
+            0
+          ],
+          "markContourIndices": [
+            1,
+            2
+          ],
+          "scaleUniformXY": 0.5942857142857143,
+          "bodyYmax": 742,
+          "oldMarkBoundsY": [
+            810,
+            1160
+          ],
+          "newMarkBoundsY": [
+            762,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 322.0
+        },
+        {
+          "glyph": "Ỗ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.5657142857142857,
+          "bodyYmax": 752,
+          "oldMarkBoundsY": [
+            810,
+            1160
+          ],
+          "newMarkBoundsY": [
+            772,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 380.0
+        }
+      ]
+    },
+    "dam": {
+      "inputSHA": "c5f78fb3b1b7c81683b170c1ae8adaf24fd0b9b0f2022d6d4e068deb2b0ee123",
+      "outputSHA": "d904348b5c01dcf8d32cab7696e37ef31fa8ee9ad90e2d8a7e24ef24a3b76cf9",
+      "bytes": 22920,
+      "allHmtxUnchanged": true,
+      "targets": [
+        {
+          "glyph": "Ẫ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.45539906103286387,
+          "bodyYmax": 756,
+          "oldMarkBoundsY": [
+            734,
+            1160
+          ],
+          "newMarkBoundsY": [
+            776,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 340.5
+        },
+        {
+          "glyph": "Ễ",
+          "bodyContourIndices": [
+            0
+          ],
+          "markContourIndices": [
+            1,
+            2
+          ],
+          "scaleUniformXY": 0.45539906103286387,
+          "bodyYmax": 756,
+          "oldMarkBoundsY": [
+            786,
+            1212
+          ],
+          "newMarkBoundsY": [
+            776,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 312.0
+        },
+        {
+          "glyph": "Ỗ",
+          "bodyContourIndices": [
+            0,
+            1
+          ],
+          "markContourIndices": [
+            2,
+            3
+          ],
+          "scaleUniformXY": 0.431924882629108,
+          "bodyYmax": 766,
+          "oldMarkBoundsY": [
+            796,
+            1222
+          ],
+          "newMarkBoundsY": [
+            786,
+            970
+          ],
+          "gapBody": 20,
+          "xCenter": 371.0
+        }
+      ]
+    }
+  },
+  "gioiHan": "Bodycontourindices chỉđúngR4đãaudit/exactinputSHA,khôngarea/bboxclassify. CoXYđều giữtỉlệhìnhdấu/néttròn nhưngcóthểlàmquánhỏ/mảnh. Canvasbbox KHÔNGđồngnghĩaactualinkclipping; cầnactualDOMinkrows+SVG/CDP/newexacthash. Khôngđượcadoptthửnày."
+}
