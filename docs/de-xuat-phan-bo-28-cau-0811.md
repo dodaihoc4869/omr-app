@@ -1,100 +1,119 @@
-# ĐỀ XUẤT — Lịch 28 câu/ngày theo ma trận đề 2026 của thầy (08/11/2026)
+# ĐỀ XUẤT v3 — Mỗi ngày một đề 28 câu, cá nhân hoá theo bậc (08/11/2026)
 
-Trạng thái: **ĐỀ XUẤT, CHƯA BUILD.** Nguồn ma trận: tệp thầy gửi 08/11
-`ma_tran_dac_ta_sieu_chi_tiet_de_thi_hoa_2026_claude_blueprint.md` (mã đề 0326 & 0339), sau đây gọi là **blueprint**.
+Trạng thái: **ĐỀ XUẤT, CHƯA BUILD.** Bản này THAY bản v1/v2 (công thức chu kỳ M/R/S tự chọn ngày đã bỏ — mô phỏng ở mục 9 cho thấy nó làm em yếu kẹt ở ngày Sửa, câu mới bị bỏ đói).
+Nguồn ma trận: tệp blueprint thầy gửi 08/11 (mã đề 0326 & 0339).
 
-## 1. Ma trận chuẩn (lấy nguyên từ blueprint, đơn vị = CÂU)
+## 1. Mục tiêu sư phạm + ai dùng
+- Học sinh: mỗi ngày đúng **một đề 28 câu, đúng khuôn đề thi** (18 TN · 4 ĐS · 6 TLN, mức theo ma trận). Ngày nào cũng luyện đúng hình dạng đề thật; chỉ NGUỒN câu đổi theo loại ngày.
+- Phụ huynh: thấy loại ngày, điểm đề Ôn (thang 10 như thi), bậc của con và lý do.
+- Thầy: khi chọn bài thấy ngay bài cần mấy ngày Mới, từng bậc xong ngày nào, ô ma trận nào kho thiếu.
 
-### 1a. Phần × mức
-| Phần | Biết | Hiểu | Vận dụng | Tổng |
+## 2. Bảy luật (toàn bộ hệ thống)
+1. **Một ngày = một đề 28 câu đúng ma trận.** Không trộn loại ngày. Mọi kênh rút câu khác gộp vào con số 28 (mục 7).
+2. **Ba loại ngày:**
+   - **Mới:** câu chưa gặp của bài thầy chọn.
+   - **Ôn = đề kiểm tra ôn tập:** 28 vị trí theo chương ĐÃ học, dùng câu song sinh (đẳng cấu — cùng kiến thức, khác số liệu/đối tượng hỏi, đúng cách Bộ biến 0326 → 0339) của câu em đã làm; chưa có song sinh thì dùng câu gốc đã làm. Chấm thang 10 như thi.
+   - **Sửa:** mỗi lỗi sửa bằng **một câu song sinh** của câu sai (1 suất/lỗi); đúng ⇒ lỗi xong, sai ⇒ còn lỗi, lần sau song sinh khác. Câu chưa có song sinh ⇒ làm lại câu gốc sau khi đã xem lời giải (2 suất/lỗi).
+3. **Khung tuần theo bậc của từng em** (7 ngày = 7 đề = 196 câu):
+
+   | Bậc | Điều kiện (tỉ lệ ý đúng, 2 đề Ôn gần nhất) | Khung 7 ngày | Mới · Ôn · Sửa |
+   |---|---|---|---|
+   | A | ≥ 85 % | M M Ô M M S Ô | 4 · 2 · 1 |
+   | B | 65 – 85 % | M M S Ô M S Ô | 3 · 2 · 2 |
+   | C | < 65 % | M S Ô M S Ô S | 2 · 2 · 3 |
+
+   Sửa đặt ngay sau ngày Mới (lỗi còn nóng); hai ngày Ôn cách nhau ≥ 2 ngày. Bậc tính lại mỗi thứ Hai, mỗi lần đổi tối đa 1 bậc. Trước khi có đề Ôn: tính theo ngày Mới.
+4. **Câu mới xếp «phủ dạng trước»:** ngày Mới đầu của bài phủ mọi dạng của bài trước rồi mới lặp dạng. Em dừng ở đâu cũng không hổng dạng nào.
+5. **Số ngày hết câu mới của một bài:** M = ⌈N / 28⌉ (N = câu rút được: bỏ tự luận, bỏ ô 0, đã duyệt). Ô kho thiếu ⇒ bù song sinh cùng ô → câu cùng ô cùng chương kho chung; vẫn thiếu ⇒ báo thầy, không phá ma trận. Ô thừa ⇒ dự trữ chưa gặp cho ca kiểm tra trên lớp.
+6. **Trần lỗi tồn = 56 (2 ngày Sửa).** Vượt trần ⇒ lỗi cũ nhất chuyển sang kho Ôn (gặp lại bằng câu song sinh ở ngày Ôn), không mất.
+7. **Ma trận ở mọi đường rút** (mục 4): ngày Mới, Ôn, Sửa, mọi kiểu mở ca kiểm tra.
+
+## 3. Quyết định lớn thầy chốt: em bậc B/C có làm HẾT câu mới không?
+Số ngày lịch tính từ khi thầy chọn bài đến khi em làm xong câu mới (đếm theo khung ở luật 3):
+
+| M (ngày Mới của bài) | N ví dụ | Bậc A | Bậc B | Bậc C |
 |---|---|---|---|---|
-| I (18 câu) | 12 | 4 | 2 | 18 |
-| II (4 câu) | 0 | 2 | 2 | 4 |
-| III (6 câu) | 0 | 3 | 3 | 6 |
-| **Tổng** | **12** | **9** | **7** | **28** |
+| 2 | 56 câu | ngày 2 | ngày 2 | ngày 4 |
+| 4 | 112 câu | ngày 5 | ngày 8 | ngày 11 |
+| 6 | 168 câu | ngày 9 | ngày 12 | ngày 18 |
 
-- Phần I, III: đúng bảng 1.3 của blueprint.
-- Phần II: blueprint chấm mức theo **ý** (Biết 5 · Hiểu 7 · VD 4 trên 16 ý). Kho câu của app hiện chỉ gắn mức theo **cả câu** (cột `muc_do`), chưa có mức từng ý ⇒ tạm quy theo mức cao nhất của câu: C1 phức chất Hiểu, C2 tinh bột/cellulose Hiểu, C3 chuẩn độ VD, C4 chất béo VD ⇒ **0/2/2**. Giai đoạn 2: gắn mức từng ý rồi ép thêm 5/7/4 theo ý.
-- So với app đang chạy (I 11/4/3 · II 0/3/1 · III 1/2/3, app tự phân tích 4 đề cũ): thay toàn bộ.
+- **(a) Ai cũng làm hết câu mới.** Đúng ý «xong câu mới». Thầy chọn bài mới mỗi W ngày ⇒ em chậm dần: ví dụ M = 4, W = 7: bậc B chậm 1 ngày, bậc C chậm 4 ngày **mỗi bài**, cộng dồn.
+- **(b) Phủ dạng trước + kho bù.** Em làm câu mới của bài đến khi thầy chọn bài kế (đã phủ đủ dạng nhờ luật 4); phần còn lại vào **kho bù**, tự làm ở ngày Mới khi chưa có bài mới (thầy chưa chọn, nghỉ lễ). Em luôn làm cùng bài cả lớp đang học.
+- **Em đề xuất (b).** Em yếu làm bài 3 trong khi lớp học bài 6 thì học trên lớp và làm ở nhà rời nhau, lỗi chồng lỗi. Ngày Mới luôn phục vụ bài mới nhất chưa phủ dạng; phủ xong mới quay về kho bù bài cũ nhất.
 
-### 1b. Chương (28 vị trí — từ bảng 1.2 và 3.1–3.3, quy về mã chương của kho)
-| Lớp | Chương (mã kho) | Câu | Vị trí (mã 0326) · mức |
+## 4. Ma trận (lấy nguyên blueprint, đơn vị = câu)
+
+| Phần | Biết | Hiểu | Vận dụng |
 |---|---|---|---|
-| 10 | Nguyên tử `NGUYEN_TU` | 1 | P1.C10 Biết |
-| 10 | Bảng tuần hoàn `BANG_TUAN_HOAN` | 1 | P1.C16 Biết |
-| 11 | Cân bằng `CAN_BANG` | 3 | P1.C1 VD, P1.C2 VD, P2.C3 chuẩn độ VD |
-| 11 | Nitrogen – Sulfur `NITROGEN_SULFUR` | 1 | P3.C3 Haber-Bosch VD |
-| 11 | Đại cương hữu cơ `HUU_CO_DAI_CUONG` | 1 | P1.C11 Biết |
-| 11 | Hydrocarbon `HYDROCARBON` | 1 | P1.C9 Biết |
-| 11 | Carbonyl `CARBONYL_ACID` | 1 | P1.C12 Biết |
-| 12 | Ester – Lipid `ESTER` | 3 | P1.C3 Hiểu, P2.C4 VD, P3.C2 Hiểu |
-| 12 | Carbohydrate `CARBOHYDRATE` | 2 | P2.C2 Hiểu, P3.C4 VD |
-| 12 | Hợp chất nitrogen `HOP_CHAT_N` | 3 | P1.C4 Biết, P1.C5 Biết, P1.C18 Hiểu |
-| 12 | Polymer `POLYMER` | 2 | P1.C6 Biết, P3.C6 Hiểu |
-| 12 | Pin điện – Điện phân `DIEN_PHAN` | 4 | P1.C7 Biết, P1.C13 Hiểu, P1.C15 Biết, P3.C5 Hiểu |
-| 12 | Đại cương kim loại `KIM_LOAI` | 2 | P1.C8 Hiểu, P1.C17 Biết |
-| 12 | Nhóm IA, IIA `KIM_LOAI_IA_IIA` | 1 | P3.C1 xi măng VD |
-| 12 | Chuyển tiếp – Phức chất `PHUC_CHAT` | 2 | P1.C14 Biết, P2.C1 Hiểu |
+| I (18) | 12 | 4 | 2 |
+| II (4) | 0 | 2 | 2 |
+| III (6) | 0 | 3 | 3 |
 
-Kiểm: 28 câu; lớp 10 = 2, lớp 11 = 7, lớp 12 = 19; Biết 12 · Hiểu 9 · VD 7 — khớp 1a.
-Chương có **0 câu** trong blueprint: Liên kết, Năng lượng hoá học, Tốc độ phản ứng, Oxi hoá – khử, Halogen, Alcohol – Phenol.
+- Phần II blueprint chấm theo ý (5/7/4 trên 16 ý); kho chỉ gắn mức cả câu ⇒ tạm theo mức cao nhất của câu (0/2/2), giai đoạn 2 gắn mức từng ý.
+- Chương: 28 vị trí theo bảng 1.2 + 3.1–3.3 (lớp 10 = 2, lớp 11 = 7, lớp 12 = 19 câu); bảng đủ ở bản v2 (commit d5f97f1, mục 1b) — giữ nguyên.
+- Số câu bất kỳ: chia phần dư lớn nhất trên 7 ô, cộng dồn qua các lần rút (N = 10 → 4·1·1·1·1·1·1; N = 40 → 17·6·3·3·3·4·4, thứ tự I-B, I-H, I-VD, II-H, II-VD, III-H, III-VD).
+- Ngày Mới: phần × mức (một bài = một chương). Ngày Ôn: phần × mức × chương; vị trí của chương chưa học chuyển cho chương ĐÃ học **em yếu nhất** cùng phần × mức ⇒ cá nhân hoá. Ngày Sửa: phần × mức; ô thiếu lỗi ⇒ song sinh của lỗi vừa sửa xong cùng ô (củng cố).
+- Ca kiểm tra: mọi đường rút tự động qua `chiaMaTran` + `kiemMaTran`; lệch ⇒ không mở ca, hiện ô thiếu + «Tự bù». Đề thầy tự đưa nguyên bản ⇒ chỉ kiểm và báo lệch.
 
-### 1c. Chỗ blueprint tự mâu thuẫn — thầy chốt
-1. P2.C2 ý b mã 0339: bảng đối chiếu (dòng gốc 20) ghi «giữ nguyên hoàn toàn», đáp án Đ – Đ – S – S; mục 3.2 và bảng 7.2 ghi «tăng mạch» ⇒ Đ – **S** – S – S. Không ảnh hưởng ma trận, chỉ ảnh hưởng đáp án nếu nạp đề 0339.
-2. P1.C8 (bảo quản Na/K): bảng 1.2 xếp Chương 6 Đại cương kim loại, mục 3.1 ghi «Đại cương kim loại & Nhóm IA». Em theo bảng 1.2.
-- Đã tính lại các đáp số Phần II/III trong blueprint (xi măng 17,2 / 61,6; Haber 42,9; sấy đường 4,95 / 3,34; E° pin 0,64 / 0,48; chuẩn độ 10,13 và 5,96 mmol): đều đúng.
+## 5. Cá nhân hoá — chỗ nào riêng từng em
+- Bậc (khung tuần) theo điểm đề Ôn của chính em.
+- Câu trong từng vị trí Ôn: đến hạn ôn → dạng em sai nhiều → lâu chưa gặp.
+- Vị trí chuyển từ chương chưa học ⇒ chương em yếu nhất.
+- Ngày Sửa: lỗi của riêng em, cũ nhất trước, trong đúng ô.
+- Kho bù riêng (phương án b).
 
-## 2. Chia ma trận cho số câu bất kỳ
-- Một hàm chung `chiaMaTran(N, phạm vi chương)`; chia theo phần dư lớn nhất trên 7 ô phần × mức (thứ tự I-B, I-H, I-VD, II-H, II-VD, III-H, III-VD):
-  - N = 10 → 4·1·1·1·1·1·1 (I 6 · II 2 · III 2)
-  - N = 20 → 9·3·2·1·1·2·2 (I 14 · II 2 · III 4)
-  - N = 28 → 12·4·2·2·2·3·3
-  - N = 40 → 17·6·3·3·3·4·4 (I 26 · II 6 · III 8)
-- **Cộng dồn:** ô bị làm tròn xuống hôm nay được ưu tiên lần rút sau ⇒ cộng nhiều ngày đúng tỉ lệ, mỗi ô lệch ≤ 1 câu.
-- Chiều chương: chia theo bảng 1b, chỉ trên chương ĐÃ học; vị trí của chương chưa học chuyển cho chương đã học **cùng phần × mức**, theo tỉ trọng blueprint.
-- Câu thuộc ô 0 (Phần II Biết, Phần III Biết): không vào đường rút tự động (bản cũ đang đẩy lên Hiểu — sai nhãn, bỏ). Máy báo số câu này theo từng bài để thầy xem lại mức hoặc dùng ở Gọi lên bảng.
+## 6. Kênh rút câu hằng ngày đang có — xử lý để «chỉ 28»
+| Kênh | Xử lý |
+|---|---|
+| Gói 7 (`mucNgayGoi7` 24/30/36) | thay bằng khung tuần; ngày Mới đọc gói |
+| Sửa lỗi (`sua-loi-phan-bo` 12–36) | thay bằng ngày Sửa 28 |
+| Ôn srs2 / OMNI ôn bài cũ trộn 20 % | thôi trộn; chỉ cấp câu cho ngày Ôn |
+| Kiểm tra cá nhân (`chonChuKyKt2026`, làn Codex) | trở thành máy dựng đề ngày Ôn (đã có rút 28 câu theo ma trận + phủ kiến thức yếu) — đổi sang ma trận mới |
+| Kế hoạch ngày / chiến dịch game, OMNI thể lực | game là «vỏ» của đề hôm nay, không cấp câu riêng |
+| Chữa gọn niêm, chặng hành trình | nằm trong 28 (ngày Sửa / Mới) |
+| BTVN có điểm thầy giao | ngày đó BTVN là đề của ngày; khung lùi 1 ngày |
+| Ca kiểm tra trên lớp | ca là đề của ngày (tính như ngày Ôn); khung lùi 1 ngày |
+| Bình Phản Ứng, Gọi lên bảng | trên lớp, không tính |
+Khi build sẽ soát lại từng kênh còn sống trên bản thật trước khi tắt.
 
-## 3. Ba loại ngày, mỗi ngày đúng 28 câu, không trộn
-| Ngày | Nguồn | Ma trận |
+## 7. Giới hạn và rủi ro (nói thẳng)
+- **Câu song sinh:** máy hiện chỉ coi song sinh đủ dữ liệu ở Phần I và III (`songSinhDuDuLieu`); **Phần II chưa có song sinh**. Thiếu song sinh ⇒ Sửa tốn 2 suất/lỗi và mô phỏng cho thấy lỗi tồn bậc B/C tăng dần (mục 9). Cần đo độ phủ song sinh thật và giao Codex soạn bù (làn máy soạn câu song sinh).
+- **Ô Vận dụng chỉ 7 suất/ngày Sửa** trong khi lỗi dồn về Vận dụng ⇒ hàng lỗi Vận dụng chờ lâu hơn mô phỏng; trần lỗi (luật 6) giữ không phình.
+- **Đề Ôn có điểm** ⇒ theo luật đáp án, không xuống máy trước khi nộp: làm cả đề rồi mới chấm và xem chữa (như thi). Ngày Mới, Sửa vẫn chấm tức thì như hiện nay.
+- 28 câu/ngày cố định ⇒ thầy chọn bài nhanh hơn sức chứa thì bậc B/C chỉ làm được phần phủ dạng (phương án b).
+
+## 8. Dữ liệu, chi phí máy chủ, nghiệm thu
+- Dữ liệu: bảng mới chỉ-thêm `lich_28_em(sbd, ngay, loai, bac, de_json)` chốt đề của ngày một lần; `kho_bu_em(sbd, qid)`. Không xoá bảng cũ.
+- Máy chủ: chốt đề của ngày lúc em mở app lần đầu trong ngày, đọc song song, không thêm vòng chờ D1 nối tiếp (luật tốc độ).
+- Nghiệm thu bằng máy: test khoá 7 ô + 28 vị trí blueprint; 10 000 ngày giả lập mọi đề đúng ma trận; mỗi em mỗi ngày đúng 28; khung đúng bậc; không câu mới nào xuống ngày Ôn/Sửa; cổng tốc độ 0 đỏ.
+- Bản vẽ trước build: màn thầy «chọn bài → dự báo ngày theo bậc», thẻ loại ngày của học sinh, dòng phụ huynh.
+
+## 9. Mô phỏng (giả định, không phải dữ liệu thật)
+Giả định: bài 112 câu, thầy chọn 1 bài / 7 ngày, 6 tuần; câu Ôn đúng ít hơn câu Mới 5 điểm %; câu song sinh khi Sửa đúng hơn 15 điểm %. Mô hình kỳ vọng, không theo ô. Kịch bản: thư mục nháp phiên (`mo-phong*.py`).
+
+| Tỉ lệ đúng | Luật cũ «tự chọn loại ngày» | Khung tuần + sửa bằng song sinh |
 |---|---|---|
-| **Mới** | câu chưa gặp của bài thầy vừa chọn | phần × mức (một bài = một chương) |
-| **Ôn** | câu đã làm của TẤT CẢ bài cũ | phần × mức × chương (chương đã học) |
-| **Sửa** | câu em làm sai chưa tự sửa | phần × mức; ô thiếu bù câu song sinh của chính câu sai cùng ô |
+| 95 % | 24 Mới / 42 ngày, không nợ | bậc A, 112/112 câu mới mỗi bài, lỗi tồn 3 |
+| 85 % | nợ 168 câu mới | bậc A, 112/112, lỗi tồn 14 |
+| 70 % | nợ 336 câu mới | bậc B, 84/112, lỗi tồn 14 |
+| 55 % | chỉ 2 ngày Mới / 42 ngày | bậc C, 56/112, lỗi tồn 8 |
+| 40 % | chỉ 2 ngày Mới / 42 ngày | bậc C, 56/112, 18 lỗi/tuần chuyển sang Ôn |
 
-## 4. Số ngày cho mỗi bài (chu kỳ bài)
-- **M — ngày Mới** = ⌈N_bài / 28⌉ (N_bài = câu rút được: bỏ tự luận, bỏ ô 0, đã duyệt).
-  - Ô thiếu: bù (1) câu song sinh đã qua máy soát của câu cùng ô trong bài → (2) câu cùng ô, cùng chương trong kho chung chưa giao. Vẫn thiếu ⇒ **không phá ma trận**, báo «Bài X thiếu k câu ô Y».
-  - Ô thừa: giữ làm **dự trữ chưa gặp** cho đề kiểm tra (kiểm tra cần câu chưa gặp mới đo thật). Câu giữ lại cho ngày Mới ưu tiên phủ đủ dạng của bài.
-- **R — ngày Ôn** = 0 nếu bài đầu; còn lại max(⌈M/2⌉, ⌈câu ôn đến hạn của em / 28⌉), trần = M. Mỗi bài cũ có ít nhất 1 câu trong R ngày; ưu tiên câu đến hạn → chương em yếu nhất → bài lâu chưa ôn.
-- **S — ngày Sửa (riêng từng em)** = số ngày để ô nghẽn nhất sửa xong: max theo ô ⌈câu sai ô đó / suất ô đó mỗi ngày⌉, giữ cam kết 12 ngày sửa ≥ 80 %. Không có câu sai ⇒ S = 0. Có câu sai nhưng < 28 ⇒ bù câu song sinh của chính câu sai.
-- **Xếp ngày:** đan xen Mới · Mới · Ôn · Mới · Sửa …; không hai ngày Ôn/Sửa liền nhau; ngày cuối chu kỳ là Sửa.
-- **Cá nhân hoá:** M chung cả lớp; R chọn câu theo hồ sơ ôn từng em; S hoàn toàn riêng. Em vắng ⇒ câu mới còn lại dời sang ngày Mới kế tiếp của em, không dồn quá 28.
+Cùng khung nhưng Sửa bằng câu gốc (2 suất/lỗi, khi thiếu song sinh): lỗi tồn sau 6 tuần 104 (85 %), 166 (70 %), 208 (55 %) ⇒ song sinh là điều kiện để khung chạy tốt.
+Số thật cần đo khi build (chỉ đọc, gộp số): số câu mỗi gói bài, khoảng ngày giữa hai lần thầy chọn bài theo lớp, độ phủ song sinh theo ô.
 
-### Ví dụ giả định (số minh hoạ, không phải dữ liệu thật)
-Bài 100 câu, kho theo ô 40·22·10·8·4·7·9:
-- M = 4 ⇒ cần 48·16·8·8·8·12·12 = 112 câu.
-- Thiếu 20 (I-Biết 8, II-VD 4, III-Hiểu 5, III-VD 3) ⇒ bù song sinh. Thừa 8 (I-Hiểu 6, I-VD 2) ⇒ dự trữ kiểm tra. Kiểm: 100 − 8 + 20 = 112.
-- Bài thứ 5 ⇒ R = 2; em có 40 câu sai rải đều ô ⇒ S = 2 ⇒ chu kỳ 8 ngày; em không sai ⇒ 6 ngày.
+## 10. Thầy chốt
+1. Phương án (a) hay (b) ở mục 3 — em đề xuất (b).
+2. Ngưỡng bậc 85 % / 65 % và ba khung tuần ở luật 3.
+3. 6 chương 0 câu trong blueprint: đề kiểm tra mô phỏng ép tuyệt đối; ngày Ôn 90 % theo blueprint, 10 % cho chương 0 câu đã học (đề xuất từ bản v2).
+4. Phần II tạm theo mức cả câu (0/2/2).
+5. Mâu thuẫn trong blueprint: P2.C2 ý b mã 0339 (Đ hay S); P1.C8 thuộc Chương 6 hay Nhóm IA.
 
-## 5. Ca kiểm tra — mọi đường đều qua một cổng
-- Mọi đường rút tự động (đề chuẩn, kiểm tra cá nhân, đề riêng lấp lỗi `rut-de-v2`, ca thêm, luyện đề) gọi `chiaMaTran` rồi qua `kiemMaTran(de)`; lệch ⇒ **không mở ca**, hiện ô thiếu + nút «Tự bù».
-- Đề 28 câu phạm vi đủ chương: rút theo **28 vị trí** của bảng 1b (đúng chương + phần + mức); cùng cơ chế với đề gốc (vd P1.C4 ⇒ `HOP_CHAT_N.AMINE_CAU_TAO`) được ưu tiên, không bắt buộc.
-- Giả định: đề thầy tự đưa nguyên bản (đề in, đề scan) ⇒ máy chỉ kiểm và báo lệch, không đổi câu của thầy.
-
-## 6. Quyết định thầy cần chốt
-1. **6 chương có 0 câu trong blueprint** (Liên kết, Năng lượng, Tốc độ, Oxi hoá – khử, Halogen, Alcohol – Phenol). Ép tuyệt đối ⇒ các chương này không bao giờ vào ngày Ôn và đề kiểm tra tổng hợp (ngày Mới của bài thuộc chương đó vẫn chạy, theo phần × mức).
-   **Em đề xuất:** đề kiểm tra mô phỏng thi ép tuyệt đối bảng 1b; ngày Ôn giữ tuyệt đối phần × mức, còn chương thì 90 % theo bảng 1b, 10 % (≈ 3 câu/ngày) cho chương 0 câu đã học.
-2. Phần II tạm theo mức cả câu (0/2/2) cho tới khi gắn mức từng ý (mục 1a).
-3. Hai mâu thuẫn ở mục 1c.
-
-## 7. Giới hạn cần biết
-- 28 câu/ngày = 196 câu/tuần cho cả Mới + Ôn + Sửa. Dạy 2 bài/tuần × ~100 câu thì riêng câu mới đã hết tuần. Khi thầy chọn bài, máy hiện ngày dự kiến xong của từng lớp và cảnh báo khi nhịp chọn bài nhanh hơn sức chứa; bài mới xếp hàng, không cắt ngày Ôn/Sửa.
-- Ép ma trận ở ngày Sửa ⇒ câu sai mức Vận dụng (7 suất/ngày) chờ lâu hơn ⇒ S tính theo ô nghẽn nhất (mục 4).
-
-## 8. Thứ tự build (sau khi duyệt)
-1. `src/lib/ma-tran-chuan.ts` (bảng 1a + 1b, một nguồn duy nhất; ba bản cũ đọc từ đây) + `chiaMaTran` + test khoá đúng từng số blueprint.
-2. Lõi lịch chu kỳ (hàm thuần M/R/S + xếp ngày) + test.
-3. Gói 7 đổi sang lịch chu kỳ; ngày Ôn, ngày Sửa 28 câu.
-4. Cổng ma trận cho mọi đường mở ca.
-5. Màn thầy: khi chọn bài hiện «Bài X: 4 ngày mới · thiếu ô … · dự kiến xong dd/mm» (bản vẽ duyệt trước).
-6. Cổng tốc độ + tác tử toc-do, phát hành.
+## 11. Thứ tự build sau khi duyệt
+1. `src/lib/ma-tran-chuan.ts` + `chiaMaTran` / `kiemMaTran` + test khoá blueprint.
+2. Lõi thuần: bậc, khung tuần, xếp «phủ dạng trước», chọn câu từng loại ngày + test giả lập.
+3. Đo số thật (mục 9) và độ phủ song sinh; giao Codex soạn song sinh bù (ghi `docs/viec-giao-codex.md`).
+4. Nối Gói 7 / Sửa lỗi / Ôn vào khung; gộp các kênh ở mục 6.
+5. Cổng ma trận cho mọi đường mở ca.
+6. Bản vẽ màn thầy + thẻ học sinh → thầy duyệt → build giao diện.
+7. Cổng tốc độ + tác tử toc-do, phát hành.
