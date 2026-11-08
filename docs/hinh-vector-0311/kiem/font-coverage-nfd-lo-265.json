@@ -1,0 +1,95 @@
+{
+  "fonts": {
+    "sourceRegular": {
+      "sha": "b75708b53e45b06d17d470aeeca5b766e3d1b3999f03f13ec4eb863ca846c14c",
+      "cmap": {
+        "U+0302": true,
+        "U+0306": true,
+        "U+031B": true,
+        "U+0300": true,
+        "U+0301": true,
+        "U+0303": true,
+        "U+0304": true,
+        "U+0309": true,
+        "U+0323": true,
+        "U+03B5": true
+      }
+    },
+    "sourceMedium": {
+      "sha": "adfde1b6bae58719c4e0144612a94232e72fc5ca655c4722165fe88d06521a70",
+      "cmap": {
+        "U+0302": true,
+        "U+0306": true,
+        "U+031B": true,
+        "U+0300": true,
+        "U+0301": true,
+        "U+0303": true,
+        "U+0304": true,
+        "U+0309": true,
+        "U+0323": true,
+        "U+03B5": true
+      }
+    },
+    "r2-de-latin": {
+      "sha": "44def6d1ca8e6a67ee0ed2bac465d00e21d9c297e52a4b85b2a2feb90e9ae2d9",
+      "cmap": {
+        "U+0302": false,
+        "U+0306": false,
+        "U+031B": false,
+        "U+0300": false,
+        "U+0301": false,
+        "U+0303": false,
+        "U+0304": false,
+        "U+0309": false,
+        "U+0323": false,
+        "U+03B5": false
+      }
+    },
+    "r2-de-vietnamese": {
+      "sha": "f5313bfbc74da29dba715424c6d0a4db1c7dc76edbf82d02b1dd37eb381b94ef",
+      "cmap": {
+        "U+0302": false,
+        "U+0306": false,
+        "U+031B": false,
+        "U+0300": true,
+        "U+0301": true,
+        "U+0303": true,
+        "U+0304": true,
+        "U+0309": true,
+        "U+0323": true,
+        "U+03B5": false
+      }
+    },
+    "r2-dam-latin": {
+      "sha": "c6063a8e349005bdb11a3a6bfaca339ea8d7a9cc7c5efc5bfe30edd5a04a6f98",
+      "cmap": {
+        "U+0302": false,
+        "U+0306": false,
+        "U+031B": false,
+        "U+0300": false,
+        "U+0301": false,
+        "U+0303": false,
+        "U+0304": false,
+        "U+0309": false,
+        "U+0323": false,
+        "U+03B5": false
+      }
+    },
+    "r2-dam-vietnamese": {
+      "sha": "69283e319d93d56b92122605b62384673f297a139db3300b7eaf71b041fd8f96",
+      "cmap": {
+        "U+0302": false,
+        "U+0306": false,
+        "U+031B": false,
+        "U+0300": true,
+        "U+0301": true,
+        "U+0303": true,
+        "U+0304": true,
+        "U+0309": true,
+        "U+0323": true,
+        "U+03B5": false
+      }
+    }
+  },
+  "gioiHan": "Chỉcmap/sourcecoverageaudit,khôngrenderapproval. CDPactualNFDfallbackđãghi riêngsoat-toan-font-candidate2-lo-265-hold.json. KhôngtựNFCnormalizeđểnéyêucầuchữ/fontimmutable;thiếukýtựchưađượcfallback. Cầnkiểmfontsubsets+unicode-range+HarfBuzzmergerđúngsaufix,khônggiảmthreshold."
+}

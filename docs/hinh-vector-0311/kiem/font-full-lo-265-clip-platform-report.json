@@ -1,0 +1,864 @@
+{
+  "metrics": [
+    {
+      "id": "400-ht2-lam-tieu-Candidate-visible",
+      "baselineRelativeContent": 14,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 17,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ậ": {
+          "inkAscent": 15,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ẳ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ẵ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ặ": {
+          "inkAscent": 14,
+          "inkDescent": 4,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ễ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ễ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ỗ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        }
+      }
+    },
+    {
+      "id": "400-ht2-lam-tieu-Production-visible",
+      "baselineRelativeContent": 14,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ậ": {
+          "inkAscent": 15,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ẳ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ẵ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ặ": {
+          "inkAscent": 14,
+          "inkDescent": 4,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ễ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ễ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ỗ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        }
+      }
+    },
+    {
+      "id": "400-vh-cau-ten-Candidate-visible",
+      "baselineRelativeContent": 16,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 19,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ậ": {
+          "inkAscent": 17,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ẳ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ẵ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ặ": {
+          "inkAscent": 16,
+          "inkDescent": 4,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ễ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ễ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ỗ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        }
+      }
+    },
+    {
+      "id": "400-vh-cau-ten-Production-visible",
+      "baselineRelativeContent": 16,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ậ": {
+          "inkAscent": 17,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ẳ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ẵ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ặ": {
+          "inkAscent": 16,
+          "inkDescent": 4,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ễ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ễ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ỗ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        }
+      }
+    },
+    {
+      "id": "400-h1-like-Candidate-visible",
+      "baselineRelativeContent": 32,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 38,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -6,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ậ": {
+          "inkAscent": 33,
+          "inkDescent": 8,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ẳ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ẵ": {
+          "inkAscent": 36,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ặ": {
+          "inkAscent": 32,
+          "inkDescent": 8,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ễ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "ễ": {
+          "inkAscent": 31,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 1,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ỗ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "ỗ": {
+          "inkAscent": 31,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 1,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        }
+      }
+    },
+    {
+      "id": "400-h1-like-Production-visible",
+      "baselineRelativeContent": 32,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ậ": {
+          "inkAscent": 33,
+          "inkDescent": 8,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ẳ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ẵ": {
+          "inkAscent": 36,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ặ": {
+          "inkAscent": 32,
+          "inkDescent": 8,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ễ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "ễ": {
+          "inkAscent": 31,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 1,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ỗ": {
+          "inkAscent": 35,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "ỗ": {
+          "inkAscent": 31,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 1,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        }
+      }
+    },
+    {
+      "id": "700-ht2-lam-tieu-Candidate-visible",
+      "baselineRelativeContent": 14,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 17,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ậ": {
+          "inkAscent": 15,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ẳ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ẵ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ặ": {
+          "inkAscent": 15,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ễ": {
+          "inkAscent": 19,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -5,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ễ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ỗ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        }
+      }
+    },
+    {
+      "id": "700-ht2-lam-tieu-Production-visible",
+      "baselineRelativeContent": 14,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 19,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -5,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ậ": {
+          "inkAscent": 15,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ẳ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ẵ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ặ": {
+          "inkAscent": 15,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 18,
+          "contentHeight": 18.1875
+        },
+        "Ễ": {
+          "inkAscent": 19,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -5,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ễ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "Ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        },
+        "ỗ": {
+          "inkAscent": 14,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 15,
+          "contentHeight": 18.1875
+        }
+      }
+    },
+    {
+      "id": "700-vh-cau-ten-Candidate-visible",
+      "baselineRelativeContent": 16,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 19,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -3,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ậ": {
+          "inkAscent": 17,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ẳ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ẵ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ặ": {
+          "inkAscent": 17,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ễ": {
+          "inkAscent": 22,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -6,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ễ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ỗ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        }
+      }
+    },
+    {
+      "id": "700-vh-cau-ten-Production-visible",
+      "baselineRelativeContent": 16,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 22,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -6,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ậ": {
+          "inkAscent": 17,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ẳ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ẵ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ặ": {
+          "inkAscent": 17,
+          "inkDescent": 4,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 20,
+          "contentHeight": 21.59375
+        },
+        "Ễ": {
+          "inkAscent": 22,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -6,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ễ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "Ỗ": {
+          "inkAscent": 18,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -2,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        },
+        "ỗ": {
+          "inkAscent": 16,
+          "inkDescent": 1,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 17,
+          "contentHeight": 21.59375
+        }
+      }
+    },
+    {
+      "id": "700-h1-like-Candidate-visible",
+      "baselineRelativeContent": 32,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 38,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -6,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ậ": {
+          "inkAscent": 33,
+          "inkDescent": 8,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ẳ": {
+          "inkAscent": 36,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ẵ": {
+          "inkAscent": 36,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ặ": {
+          "inkAscent": 33,
+          "inkDescent": 8,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ễ": {
+          "inkAscent": 43,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -11,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "ễ": {
+          "inkAscent": 32,
+          "inkDescent": 2,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 34,
+          "contentHeight": 41.59375
+        },
+        "Ỗ": {
+          "inkAscent": 36,
+          "inkDescent": 2,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 34,
+          "contentHeight": 41.59375
+        },
+        "ỗ": {
+          "inkAscent": 32,
+          "inkDescent": 2,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 34,
+          "contentHeight": 41.59375
+        }
+      }
+    },
+    {
+      "id": "700-h1-like-Production-visible",
+      "baselineRelativeContent": 32,
+      "characters": {
+        "Ẫ": {
+          "inkAscent": 43,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -11,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ậ": {
+          "inkAscent": 33,
+          "inkDescent": 8,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ẳ": {
+          "inkAscent": 36,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ẵ": {
+          "inkAscent": 36,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "Ặ": {
+          "inkAscent": 33,
+          "inkDescent": 8,
+          "inkTopRelativeContent": -1,
+          "inkBottomRelativeContent": 40,
+          "contentHeight": 41.59375
+        },
+        "Ễ": {
+          "inkAscent": 43,
+          "inkDescent": 1,
+          "inkTopRelativeContent": -11,
+          "inkBottomRelativeContent": 33,
+          "contentHeight": 41.59375
+        },
+        "ễ": {
+          "inkAscent": 32,
+          "inkDescent": 2,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 34,
+          "contentHeight": 41.59375
+        },
+        "Ỗ": {
+          "inkAscent": 36,
+          "inkDescent": 2,
+          "inkTopRelativeContent": -4,
+          "inkBottomRelativeContent": 34,
+          "contentHeight": 41.59375
+        },
+        "ỗ": {
+          "inkAscent": 32,
+          "inkDescent": 2,
+          "inkTopRelativeContent": 0,
+          "inkBottomRelativeContent": 34,
+          "contentHeight": 41.59375
+        }
+      }
+    }
+  ],
+  "actual": {
+    "nfc": {
+      "fonts": [
+        {
+          "familyName": "DDH Rounded Dam",
+          "postScriptName": "DDHRounded-Dam",
+          "isCustomFont": true,
+          "glyphCount": 1
+        }
+      ]
+    },
+    "nfd": {
+      "fonts": [
+        {
+          "familyName": "Liberation Serif",
+          "postScriptName": "LiberationSerif-Bold",
+          "isCustomFont": false,
+          "glyphCount": 1
+        }
+      ]
+    },
+    "macron": {
+      "fonts": [
+        {
+          "familyName": "Liberation Serif",
+          "postScriptName": "LiberationSerif-Bold",
+          "isCustomFont": false,
+          "glyphCount": 1
+        }
+      ]
+    }
+  }
+}

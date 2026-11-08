@@ -1,0 +1,48 @@
+{
+  "i": 769,
+  "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+  "review": "Source-only đã mở lại nativeFULL+3x, đọc mọi publicrefs; chưa SVG/chưa Đạt.",
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-L7-0701-II-2",
+      "de": "Cấu trúc phân tử dạng mạch vòng của maltose được cho như sau:",
+      "refs": [
+        {
+          "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+          "where": "VIP27-BDT-L7-0701-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "d26ec47d0bc5f6d77c7cc6281ee6f6ad8952d94cff9a7061b4e6aeb9e99d0ed4"
+        }
+      ]
+    }
+  ],
+  "confirmed": {
+    "captionLiteral": "Hình. Dạng mạch vòng của maltose",
+    "captionStyle": "ITALIC toàn dòng, không chỉ Hình.; nét regular italic, không bold.",
+    "topLiteral": "Liên kết (x)",
+    "topStyle": "BOLD upright; lowercase x trong roundparentheses; không chữ x riêng tại liên kết.",
+    "numbers": "12 số blue, hai bộ1..6 theo vị trí native.",
+    "substituents": "2CH2OH;6freeOH gồm5đen+1đỏ tại rightC1down;10explicitH ngoàiCH2OH; totalO11.",
+    "styles": "4 TAPER frontdiagonals rộng ở lowerC2/C3; 2 boldhorizontal C3–C2; tất cả đoạnkhác uniform.",
+    "blue": "Hai bondbridge+O trungtâm và12Cnumsblue. Không bluearrow.",
+    "arrow": "1 thin blackleader/openVhead hướng xuống-leftbluebond; không filledhead.",
+    "directions": "C5 cả2 CH2OHup/Hdown; C3 OHup/Hdown; C2 Hup/OHdown; leftC4 Hup/OHdown; rightC4 Hup/bluebridge downleft; leftC1 Hup/bluebridge downright; rightC1 Hup/redOHdown."
+  },
+  "correctionsToDoc": [
+    {
+      "field": "geometry.counts",
+      "old": "7OH/O12",
+      "new": "6OH/O11",
+      "literalSites": [
+        "leftC2down",
+        "leftC3up",
+        "leftC4down",
+        "rightC1downRED",
+        "rightC2down",
+        "rightC3up"
+      ],
+      "rightC4": "NoOH;Hup+bluebridge only",
+      "evidence": "ReopenednativeFULL+3x; previous countstring incorrect though branches correct."
+    }
+  ],
+  "actualSvgReviewed": false
+}

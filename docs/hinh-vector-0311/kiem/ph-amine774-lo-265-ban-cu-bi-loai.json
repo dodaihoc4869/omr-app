@@ -1,0 +1,22 @@
+{
+  "hashNguon": "90940b7feb3548aa1483a2d664c919ce3a4735d5c1ea9cf95b8f26f8ac80b120",
+  "forbiddenHash": "d88dcb3f9c942f12640c32aa54a67762fb985527ee8cd0d59cea4df6f71116f6",
+  "ketQua": "Cần sửa: rootfreshactual3x thấy nhãn pH xoay chạm11.5 doadvanceDDH rộng; giảmDUYsize11Ylabels20→18 và dịchDUYpHcenterx20→18, giữmọibar/grid/redlevels/data/axis/tickstems/literal/star. Chưapositive/khôngmanifest.",
+  "secondCandidateHash": "1e312619ebf0205bf2d6831398b48f39f7ba3145c7f3308e5cd1e5f345bb6e77",
+  "secondReadonlyHistory": [
+    {
+      "i": 774,
+      "hashSvg": "1e312619ebf0205bf2d6831398b48f39f7ba3145c7f3308e5cd1e5f345bb6e77",
+      "nguoiSoat": "soat_nguon_2",
+      "ketQua": "Đạt: sourcehash90940b7feb3548aa1483a2d664c919ce3a4735d5c1ea9cf95b8f26f8ac80b120 xác minh, mở nativeFULL/readall2publicrefs và tự freshChromium3x exactSVG40579B. Đã mở actualFULL/pHgapmacro/Chấtgapmacro. Nămcyanbars đúngorigin11.0/top11.1,11.3,11.4,11.5,11.7 và đúngthứtự5formulas/subscripts. Đủ11DOTYlabels/11Ytickstems/5Xtickstems;11H5VgrayguidesBEHINDfill/5redguidesOVERfill. pHrotated rõ khoảngtrắng với11.5, Chất rõ khoảngtrắng vớiC2H5NH2; fourpointstar giữ đúng khôngbiến thànhdata. Khônghead/title/unitthêm, khôngglyphhole/chạm/cắt/tràn.",
+      "actualSvgReviewed": true,
+      "byteSvg": 40579,
+      "render": "/workspace/scratch/774-actual-lo265.jpg",
+      "macro": [
+        "/workspace/scratch/774-ph-gap-macro.jpg",
+        "/workspace/scratch/774-chat-gap-macro.jpg"
+      ]
+    }
+  ],
+  "secondRootFinding": "Readonlyactualthấyinkgap,nhưngrootactualbboxpHright47.872/11.5left47.544reserveoverlap0.328px,khôngđồngnghĩainkcollision. Rootchọnnớithêmkhoảngnhãn:+4pxYlabelanchor/-2pxpHcenter; giữplot/data/stems/starliteral. Chưaadmitvàkhôngchọnoldhash dùpositivehistoryriêng."
+}

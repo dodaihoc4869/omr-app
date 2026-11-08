@@ -1,0 +1,30 @@
+[
+  {
+    "i": 769,
+    "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+    "fileNguon": "anh/8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292.png",
+    "svg": "maltose-lien-ket-mau-ddh-da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08.svg",
+    "hashSvg": "da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08",
+    "byteSvg": 49327,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-II-2",
+        "de": "Cấu trúc phân tử dạng mạch vòng của maltose được cho như sau:",
+        "refs": [
+          {
+            "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+            "where": "VIP27-BDT-L7-0701-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "d26ec47d0bc5f6d77c7cc6281ee6f6ad8952d94cff9a7061b4e6aeb9e99d0ed4"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2rings12blueCnums/blueObridge2bonds/redterminalOH/2CH2OH10H6OH/4TAPER2bold/allstereo/1openVleader/Liên kết (x)actualdam/captionitalicDDHpath/noanswer.",
+    "hashSvgDaSoat": "da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

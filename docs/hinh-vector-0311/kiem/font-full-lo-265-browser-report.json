@@ -1,0 +1,458 @@
+[
+  {
+    "name": "atlas-de-00",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-01",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-02",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-03",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-04",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-05",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-06",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-de-07",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "families-de-lhnormal",
+    "type": "families",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "families-de-lh1.2",
+    "type": "families",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "families-de-lh1.5",
+    "type": "families",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "compound-de",
+    "type": "compound",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 6
+  },
+  {
+    "name": "atlas-dam-00",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-01",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-02",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-03",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-04",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-05",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 1,
+        "check": true
+      },
+      "Production": {
+        "loaded": 1,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-06",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "atlas-dam-07",
+    "type": "atlas",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "families-dam-lhnormal",
+    "type": "families",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "families-dam-lh1.2",
+    "type": "families",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "families-dam-lh1.5",
+    "type": "families",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 1
+  },
+  {
+    "name": "compound-dam",
+    "type": "compound",
+    "check": {
+      "Candidate": {
+        "loaded": 2,
+        "check": true
+      },
+      "Production": {
+        "loaded": 2,
+        "check": true
+      },
+      "Source": {
+        "loaded": 1,
+        "check": true
+      }
+    },
+    "files": 6
+  }
+]

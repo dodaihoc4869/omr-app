@@ -39,31 +39,7 @@
     "soCauDungHinh": 8,
     "ketQua": "6/6 đạt soát độc lập"
   },
-  "tiepTuc": {
-    "repo": "dodaihoc4869/omr-app",
-    "nhanh": "codex/ve-lai-hinh-kho-0311",
-    "worktree": "/workspace/omr-vector",
-    "nguon": "docs/hinh-vector-0311/nguon/kiem-ke.json",
-    "anhDaDoiChieu": "docs/hinh-vector-0311/kiem",
-    "thuTuTaiTao": [
-      "python -m pip install -r scripts/hinh-vector-0311-requirements.txt",
-      "python scripts/vector-hoa-hinh-0311.py",
-      "python scripts/raster-vector-0311.py",
-      "python scripts/kiem-net-vector-0311.py"
-    ],
-    "canhBao": [
-      "Không hạ ngưỡng kiểm tra chỉ để báo xanh.",
-      "Không coi 1390 ứng viên dò nét là bộ vẽ lại đạt yêu cầu: 1185 bản còn bị gắn cờ, cả 202 bản qua cổng hình học vẫn cần kiểm nội dung/phong cách.",
-      "Không tự sinh chi tiết không đọc được; tìm hình cùng nội dung tốt hơn trong kho hoặc giữ nguồn và nêu rõ mục chưa đạt.",
-      "Mẫu 3 hình được thầy duyệt; 6 công thức mới đã được agent mở từng nguồn đối chiếu độc lập, 6/6 đạt.",
-      "Thầy đã giao tự sửa và tích hợp khi đạt; không xin thầy duyệt lại từng lô.",
-      "Toàn kho còn chưa hoàn tất, app chưa thay hình; không báo đã xong hoặc đã triển khai."
-    ],
-    "danhMucDaKiem": "docs/hinh-vector-0311/kiem/danh-muc-da-kiem.json",
-    "loVuaXong": "1224 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;871 nguồn→614SVG;11479969byte/localgzip2113433;557 nguồn chưa đạt. FontNAamr:31SVG/32nguồn/53câu đủ;chờ583SVG/839nguồn.",
-    "viecNenLamTiep": "ƯUTIÊNsửa5uppercaseAvariantsẪẬẲẴẶ×2BADbodypinhole/Ẫwrongtilde-hat-hooktheosoat-5ahold-lo-263.json;đâybadthật,khôngchỉunmatched,KHÔNGtựmiễnvìcmap/byteunchanged. Giữ thiếtkế/metrics,nativeDOM+SVG/exactnewhash/readonlysaufix,khôngareathreshold/faux/fallback. FontNAamr b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8/1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6 giữbranchfixcốýaheadRAWMAIN;đừngcopy4WOFF2oldmainđèvàtáilỗ. Tiếp583SVG/839sourcefontcurrent+557sourcechưađạt;415explicit+168nonexplicitCHƯAphânloại/khôngtựmiễn. Mỗilượthoànthiệnthêmlôthật;750751đãđạt,749đãmanifestKHÔNGdựngtrùng,746747source-only/752mớimởnativeCHƯAgeometry-dựng-soát. 728εvẫnthiếu/noSVG/noCount. Giữmọinguyênvăn/geometry/negativehistory/holds/harness167. Khépfont+corpus+size+color+8testbaseline+browsergatestrướcmerge/deploy;toànphạmviđạtmớitíchhợp-prefetch-actualoffline-liveverify;automationgiữbật.",
-    "canhBaoCheckpoint": "Chưa tích hợp/chưa actual reload offline app/chưa phát hành. Main51139084chưa gộp. BuildNAamr/speed21/21/Chromium614/614/hashXMLpathselfcontained/sourcePNGhash/AST/SW14/14/serverTSCđạt;assetdecodeofflineKHÔNGappoffline. KnownASCIItopology10/10xanh,RAWMAINđốichứng10/10đỏ(chỉcontours,khôngfontglobal).5AẪẬẲẴẶ×2weightsBADthật(bodypinhole,Ẫwrongmarks)đãactualDOM/SVG/macromởriêng;epsilon728vẫnthiếu. SizeNỀNđỏ297644Bnguyênbyte/khôngnângmốc. MàusoMain497viPhạm/88checkerfiles(87appsrcdiff+5fontREADME=92srcdiff);lôchỉfont4WOFF2README/generator+builders/assets/docs/diagnosticCLI,khôngsửaappCSS-TSX-harness-tests-mốc. Full cuối nhánh16581/16đỏ-main16732/5đỏ;11tênsoRIÊNGLẦNLƯỢTbranch3pass8fail/main11pass/head3pass8fail:0introducedcòntáihiệndoriêng263,NHƯNG8baselinevẫnđỏtrướcmerge/deploy. Giữfullđỏ+mainDenied56/20suiteslịchsử+NAinterrupted;mainpropernpmciownworktreefixDeniedfont/12casepreflightxanh. Còn2suitebrowserchung26casespendingvìthiếuheadlessshell1234,CDNdownload403 Domain forbidden;khôngsửatest/harnessné/khôngclaimđủmọicasehayhếtflaky. Latestmain/fullTHEOTÊN/cathi/khôngdeploychồngbắtbuộctrướcmerge/release."
-  },
+  "tiepTuc": "Ưu tiên sửa font scratch theo3blockerthật265: semanticmũ+ngã choẫỄễỖỗ (khôngxmNone⇒hook/khônggiữoldhatởthan); glyphmarklayout vừa cỡappthật khôngcắt nhưnggiữthiếtkế/metricsđúng; fontsubsets+unicode-range+HarfBuzzmergerđủNFDmarks30230631Bvàε728,CDPnofallback. SourceTTFđãcóđủ,khôngfallback/đổichữ/area-threshold/hạgate. Candidate2giữ10glyphpositivegiớihạnnhưngHOLDglobal;khôngadoptchỉtừcmap/metrics/contour/byteidentical. Saufullfontpass/adoptphảifreshreadonlytừngnative-allrefs-exactSVGnewhash; khôngoldproofduyệthashmới. Tiếp583SVG/839sourcefont+554sourcechưađạt,415explicit+168nonexplicitCHƯAphânloại. 769/774hash9094đãđạt/đừngdựngtrùng;giữmọisửaatom/literal/geometry/negativehistory/holds/photo-raster/harness167. Mỗilượtthêmlôhìnhthật;toànphạmviđạtmớitíchhợp/tảisẵn/actualoffline/liveverified rồi tắt automation;hiệngiữbật.",
   "tuDongTiepTuc": {
     "id": "6ae96c39083081918a50bc48bc6c8d3e",
     "trangThai": "dang-bat",
@@ -79,14 +55,14 @@
     "ghiChu": "Giữ nguyên cả các phương án sai (↑↑/số ô) của đề; không biến thành đáp án đúng."
   },
   "tongDaDoiChieu": {
-    "soAnhNguon": 872,
-    "soSvgRieng": 615,
-    "soCauDungHinh": 1233,
-    "soCauDuMoiHinh": 1226,
+    "soAnhNguon": 874,
+    "soSvgRieng": 617,
+    "soCauDungHinh": 1236,
+    "soCauDuMoiHinh": 1229,
     "soCauMoiXongMotPhan": 7,
-    "byteSvg": 11484426,
-    "byteGzip": 2114396,
-    "soAnhNguonConLai": 556,
+    "byteSvg": 11574332,
+    "byteGzip": 2129695,
+    "soAnhNguonConLai": 554,
     "daTichHop": false
   },
   "cachDem": "soCauDuMoiHinh = đủ TẤT CẢ hình nguồn; soCauDungHinh chỉ là câu có ít nhất một hình đã đạt, không phải số câu hoàn tất.",
@@ -100,38 +76,43 @@
     "nguon": "src/styles/phong-ddh",
     "batBuocMoiHinh": true,
     "daHoanTatToanBo": false,
-    "ghiChu": "Bộ đangchọn đãđạtfontDDH/pathtựchứa vàsoátđộclập;toànkhochưahoàntất,khôngpháthànhbộchưađủ.",
-    "loMoi": "263:NAamr31SVGđãsoát;5A×2vẫnbad/toànkhochưađồngbộ",
+    "ghiChu": "Số tổng là bộ trộn snapshot đã soát từng hình; không đồng nghĩa toàn corpus/font hiện hành đã đạt. CurrentNAamr chỉ34SVG/35sources/58câu đủ;candidate2fullfontHOLD,khôngpháthànhbộchưađủ.",
+    "loMoi": "265:NAamr34SVG/35nguồn/58câu đủ đãsoát;candidate2HOLDglobal/chưaproductionadopt;toànkhochưađồngbộ",
     "congCu": "scripts/phong-vector-0311.py",
     "daChuyenHetBoDaVe": false,
     "chenhLechMain": {
-      "main": "51139084606deee3ec1e9ee2946de3e2c7c39a66",
-      "proof": "kiem/dong-bo-font-main-lo-263.json",
+      "main": "a7251a3dc4da05f1f75f11dc747bbccf4c078c18",
+      "proof": "kiem/dong-bo-font-main-lo-265.json",
       "fontVersion": "v5-bodyfix-NAamr-0811",
-      "deIdentical": true,
-      "damIdentical": true,
-      "fontFilesSynced": true,
+      "deIdentical": false,
+      "damIdentical": false,
+      "fontFilesSynced": false,
       "regularHash": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
       "boldHash": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
-      "migratedSelectedSvg": 31,
+      "migratedSelectedSvg": 34,
       "remainingSelectedSvg": 583,
       "remainingSourceHashes": 839,
-      "soCauDuMoiHinhV5": 53,
+      "soCauDuMoiHinhV5": 58,
       "chuaDongBoMain": true,
-      "scopeCounts": "1224 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;871 nguồn→614SVG;11479969byte/localgzip2113433;557 nguồn chưa đạt. FontNAamr:31SVG/32nguồn/53câu đủ;chờ583SVG/839nguồn.",
-      "intentionalBranchFontRepair": true
+      "scopeCounts": "1229 câu đủ mọi hình theo bộ trộn snapshot/7 partial; 874 nguồn→617 SVG; 11574332 byte/localgzip 2129695; 554 nguồn chưa đạt. FontNAamr:34uniqueSVG/35sources/58câu đủ; còn583selectedSVG/839sources (415explicitDDH+168nonexplicitCHƯAphânloại).",
+      "intentionalBranchFontRepair": true,
+      "fontFilesMatchDeclaredBranchProof": true
     }
   },
   "daDatPhongApp": {
-    "soNguon": 872,
-    "soCauDuHinhVaPhong": 1226,
-    "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới."
+    "soNguon": 874,
+    "soCauDuHinhVaPhong": 1229,
+    "ghiChu": "Các số tổngDaDoiChieu vẫn mô tả nội dung đã kiểm; bản cũ chưa đổi phông không được coi đạt yêu cầu phông mới.",
+    "currentFontSelectedSources": 35,
+    "currentFontFullQuestions": 58,
+    "currentFontAllSelectedPassed": false
   },
   "loMoiNhat": {
-    "lo": "264",
-    "ketQua": "1226câu đủ mọi hình/7partial;872nguồn→615SVG;11484426byte/localgzip2114396;556nguồnchưađạt. FontNAamr32SVG/33nguồn/55câuđủ;chờ583SVG/839nguồn.",
-    "suaLoi": "758vẽmới3bare rings6O/1diagonalfilledhead/left6crest6troughright5crest5trough/allthinuniform/noaddedH-OH-CH2OH-nums-caption-answer;nativeFULL/all2publicrefs/freshactualChromium3x exact7107c67824894bc9fb2b1cb10ffad226e73e05086d91d431591f3b8c5a5e3696/4457Bđạt,khép2câu. 769source-onlygeometry rõCHƯAdựng/soátSVG/khôngcount. Font5A10casesbody sạchtrongscratchcandidate1nhưng2ẪmarksBAD,negativegiữ;candidate2ĐạtRIÊNG10glyphsaufreshDOM4WOFF2+mergedSVG32/72/200mởFULLtừngcase,2Ẫmacros800;uniqueNFDAnestingpair+semantictildeÃ/removeoldmu/gap=t/2,metricsALLexactkhôngCOPY;Ẫbboxthayđổicóchủđíchbỏwronghook/táchdấu. CHƯAadmittoànfont/cỡapp/production,CHƯAđổifontchính. Khôngcộngfont-onlythànhnguồn/câumới.",
-    "tiepTheo": "Ưu tiên hoàn thiện kiểm toànfont/appsizes/diacritics/compound/lineheight vàreadonlyDOM+SVGexacthash cho candidate2 5A ởfont-5a-candidate2-lo-264-chua-admit.json. 10glyphriêngđạt KHÔNGfontglobal. Đừngtáidùngcandidate1bi-loai, khôngcopyrawmainfontđèNAamrprod. Chưaadoptcandidate2;prod4WOFF2NAamr35100Bgiữnguyên/các5Acurrentvẫnbad. Sauadoptfontmớiphảirender/read-onlytừngnative-allrefs-exactnewSVG,khôngoldproof/cmap/contour/tinbyteidenticalđểmiễn. Tiếp583SVG/839sourcefont+556sourcechưađạt;415explicitDDH+168nonexplicitCHƯAphânloại. 758đạt/769source-only2rings12nums7OH2CH2OH10Hbluebridge-redOHcaptionCHƯAdựng;750751749đãmanifestđừngdựngtrùng. Mỗilượtthêmlôhìnhthật;giữmọinegativehistory/holds/harness167. ε728vẫnthiếukhôngfallback/noSVG/noCount. Font+corpus+size+color+8baseline+browser/latestmainfullTHEOTÊN/cathi/khôngdeploychồngtrướcmerge/release;toànphạmviđạtmớitíchhợp/actualoffline/liveverify;automationbật.",
-    "gioiHan": "Lô264chỉbuilder/assets/docs/scratchexperimentCLI;productionfont/generator/app/tests/harnessKHÔNGđổi. Build264/speed21/21/Chromium615/615/sourcehashXMLpathAST/SW14/14/serverTSCđạt. Maina7251a3dc4da05f1f75f11dc747bbccf4c078c18chưagộp,màu497/88checkerfilesđỏNỀN,size297644BđỏNỀNkhôngđổi. Full26316/5+8persistentbaseline+2commonbrowsersuites26pendingCDN403GIỮ;khôngfulllại264vìchỉasset/docs/experimentkhôngđổiproductionshared. FullLATESTMAIN/THEOTÊN/cathi/khôngdeploychồngvẫnbắtbuộctrướcmerge/release. Currentfont5AactualBADvẫnHOLD,scratchkhôngadmittoànfont. Chưatíchhợp/chưaactualappoffline/chưapháthành. Chưa tham vấn được cố vấn. Candidate2chỉ10glyphriêngĐạt;admissibletoànfont/prodfalse. Đừngbáofontglobalđãđạt."
+    "lo": "265",
+    "ketQua": "1229 câu đủ mọi hình theo bộ trộn snapshot/7 partial; 874 nguồn→617 SVG; 11574332 byte/localgzip 2129695; 554 nguồn chưa đạt. FontNAamr:34uniqueSVG/35sources/58câu đủ; còn583selectedSVG/839sources (415explicitDDH+168nonexplicitCHƯAphânloại).",
+    "suaLoi": "Lô265 vẽ mới2nguồn, khép3câu. 769/hash8f8b6e8f…2292 SVGda5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08/49327B:2rings/12bluenums/blueO2bridgebonds/redrightC1OH/2CH2OH10H6freeOH11O/4TAPER2bold/1openVleader/Liên kết (x)actualdam/captionregularitalicDDHpath/noanswer. Root+readonlynativeFULL/all1ref/freshactualChromium3x đạt; sourcecountstring2647OH/O12 SAI,đãđínhchính6OH/O11vịtrícụthể/rightC4KHÔNGOH,khôngsuytừtên. Rootcandidate955b7OHdư/14fe4rightchạmbluebond bịloại;finalchỉbỏextraOH vàdịchsố4rightlên11px. 774ĐỊNHDANHhash90940b7feb3548aa1483a2d664c919ce3a4735d5c1ea9cf95b8f26f8ac80b120 (assetindex384,tránhi774trùng):SVGcbc0bfe068f49caeef46f312abd58cfa7cf27ba394299729269eb8688596a4d6/40579B:5cyanbars/11YDOT11.0..12.0/5Xformulae/11H5VgrayBEHIND/5redguidesOVERfill/axisorigin11.0/pHrotated-Chất/4pointpalestarretainednondata/noheads-title-legend-extraunits. RIÊNGnativeFULL/all2refs/freshactualChromium3x đạt; d88dpHchạmnegative,1e3readonlyinkgappositivehistoryKHÔNGchọn(rootbboxreserveoverlap0.328pxkhôngđồngnghĩainkcollision);finalYanchor+4/pHcenter−2 chừa5.67px,giữplot/data/levels/stems. Khôngcộngfont-onlythànhnguồn/câumới.",
+    "font": "Đãkiểm candidate2exact4WOFF2 từthu-font-lo-264/candidate2-chua-admit:45actualFULL(16atlas293cmap×2DOMSVG/6VNfamily5sizes14-16-18-24-32×LHnormal1.2-1.5/12compoundNFC-NFDprodsource/10spotbadmarks/1actualappclipfixture). Candidate2HOLD sharedfont,CHƯAadoptproduction/CHƯAadmittoànfont. 10glyph5Apositive264vẫngiớihạn; phát hiệnẫ/Ễ/ễ/Ỗ/ỗ×2chồngmũ-ngã/ĐậmỄỖdưhat+wronghook,sourceMPLUSsạch/outlinesEXACTprod=>inheritedkhôngR2newregression. Actualstylesht2-lam-tieu14/LH1.3/hidden,vh-cau-ten16/LH1.35/hidden:Ẫcắt3px;Deprod2pxnênR2tệhơn1px,Damprod5-6pxR2cảithiệnnhưngvẫncắt;khôngsửametrics/CSSđểchegate. CDPactualNFD A+0302+0303/A+0304=noncustomLiberationSerif trongDOM,NFCẪcustomDDH;fonts.checktrueKHÔNGnofallbackproof. SourceRegular+MediumCÓ302/306/31B/ε nhưngR2VNthiếu302/306/31B/ε,LatinthiếuALLcombiningmarks+ε;khôngtựNFCnormalizeđểnéyêucầufont/chữimmutable. RootscanselectedSVGcóresidualcharschỉ2OLDsnapshot1090và93;readonlymởRIÊNGnativeFULL/allrefs1+2/freshactualFULL3x/macros12xexactold9737…afba1/70f4…376c ĐẠT oldẫ/ỗtáchrõ,khôngthu hồi count/khônggáncurrentfont. Proofsoat-toan-font-candidate2-lo-265-hold.json+font-coverage-nfd-lo-265.json+soat-old-1090-93-lo-265.json. Production4WOFF2NAamr35100B+README/generator/appCSS/tests/harness NGUYÊNBYTE trong265;khôngcopyrawmainfontđèfix.",
+    "gioiHan": "Chưa tích hợp/chưa actual reload offline app/chưa phát hành. Maina7251a3dc4da05f1f75f11dc747bbccf4c078c18 chưa gộp. Build265/precache170/2613.23KiB/speed21/21/Chromium617/617/hashXMLpathselfcontained/sourcePNGhash/PythonAST/SW14/14/serverTSC/checkmau đạt. Assetdecodeoffline KHÔNGappoffline. SizeNỀN297644B/SHA6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf/khôngnângmốc. MàusoMAIN497viPhạm/88checkerfiles NỀNđỏ. Full263nhánh16581/16đỏ-main16732/5đỏ+11tênrecheckbranch3pass8fail/main11pass/head3pass8failsame8 GIỮ;8baselinevẫnbắtbuộcxửlýtrướcmerge/deploy.2commonbrowsersuites26pendingthiếuheadlessshell1234/CDN403giữ.265chỉbuilders/assets/docs nênkhôngfulllại,khôngthayfullLATESTMAIN/THEOTÊN/cathi/khôngdeploychồngtrướcmerge/release. Khôngđổitest/mốc/harness/appđểchữađo. Chưa tham vấn được cố vấn.",
+    "tiepTheo": "Ưu tiên sửa font scratch theo3blockerthật265: semanticmũ+ngã choẫỄễỖỗ (khôngxmNone⇒hook/khônggiữoldhatởthan); glyphmarklayout vừa cỡappthật khôngcắt nhưnggiữthiếtkế/metricsđúng; fontsubsets+unicode-range+HarfBuzzmergerđủNFDmarks30230631Bvàε728,CDPnofallback. SourceTTFđãcóđủ,khôngfallback/đổichữ/area-threshold/hạgate. Candidate2giữ10glyphpositivegiớihạnnhưngHOLDglobal;khôngadoptchỉtừcmap/metrics/contour/byteidentical. Saufullfontpass/adoptphảifreshreadonlytừngnative-allrefs-exactSVGnewhash; khôngoldproofduyệthashmới. Tiếp583SVG/839sourcefont+554sourcechưađạt,415explicit+168nonexplicitCHƯAphânloại. 769/774hash9094đãđạt/đừngdựngtrùng;giữmọisửaatom/literal/geometry/negativehistory/holds/photo-raster/harness167. Mỗilượtthêmlôhìnhthật;toànphạmviđạtmớitíchhợp/tảisẵn/actualoffline/liveverified rồi tắt automation;hiệngiữbật."
   }
 }

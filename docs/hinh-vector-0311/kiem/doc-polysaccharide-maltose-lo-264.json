@@ -1021,10 +1021,11 @@
       "bridge": "Blue singlebonds leftC1(234,180)→(286,224), blueOcenter300,228, otherbluebond(314,224)→rightC4(373,177). Do not introduce bluearrowheads.",
       "styles": "FOUR tapered frontdiagonals: left C4→C3 widening toC3, C1→C2 widening toC2; right C4→C3 wideningtoC3, C1→C2 wideningtoC2. TWO boldhorizontals C3–C2. Otherbonduniform. All12 Cnumbersblue; bridgeObondsblue; terminalrightC1OHred; allotheratomsblack.",
       "arrow": "ONE thin blackleader with openVhead from(295,47)→(270,202), pointing leftbluebridgebond. Head~(259,190)/(270,202)/(280,194). Label Liên kết (x) above, noextra(x) atbond.",
-      "counts": "2sixrings;2ringO+bridgeO+7OH+2CH2OH O=12;2CH2OH,10explicitH outsideCH2OH,12nums. No extraC/H labels/endgroups."
+      "counts": "2sixrings;2ringO+bridgeO+6freeOH+2CH2OH O=11;2CH2OH,10explicitH outsideCH2OH,12nums. No extraC/H labels/endgroups."
     },
     "uncertainties": [
       "Bounds/labelcoordinates approximate scan; stereodirections/counts read directly native+3x, not inferred from maltose name."
-    ]
+    ],
+    "corrigendum265": "Root+readonly mởlại nativeFULL3x: oldcountstring7OH12O sai;branches riêng trongdoc264đúng, chỉ6freeOH(leftC2/C3/C4,rightC1/C2/C3). RightC4 KHÔNGOH. ChưaSVGpositive/countnênkhôngthu hồi nguồn/câu."
   }
 ]

@@ -739,6 +739,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "90940b7feb3548aa1483a2d664c919ce3a4735d5c1ea9cf95b8f26f8ac80b120": {
+      "tep": "ph-amine-nam-cot-ddh-cbc0bfe068f49caeef46f312abd58cfa7cf27ba394299729269eb8688596a4d6.svg",
+      "hashSvg": "cbc0bfe068f49caeef46f312abd58cfa7cf27ba394299729269eb8688596a4d6",
+      "byteSvg": 40579,
+      "byteGzip": 6678,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "2385301a87f412eefce208bd23f840aa8af20a38ddec90e7dd1bff72734210c1": {
       "tep": "cap-amino-ddh-d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f.svg",
       "hashSvg": "d673684fd5fa43b30944494d46e711018e5245c177b75d54a00f3f02c4b0569f",
@@ -5775,6 +5784,15 @@
       "hashSvg": "257b3faf028de13bda6a377b66987c5e348a35a1af3dd18d874f80722f931a92",
       "byteSvg": 27962,
       "byteGzip": 6632,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292": {
+      "tep": "maltose-lien-ket-mau-ddh-da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08.svg",
+      "hashSvg": "da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08",
+      "byteSvg": 49327,
+      "byteGzip": 8621,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -11284,6 +11302,20 @@
           "where": "12-C3-B8-D2-II-19.hinh.0.du_lieu",
           "hashDataUrl": "8989969f84275d27330a2daf26286bbfba8e4a7b3ecd63b313edd998a577d36b",
           "vector": "cau-truc-b4b3a09f868564ed27da6fa7961569df097db590117b7eab9e349012d20faef0.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B8-D2-II-23",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "90940b7feb3548aa1483a2d664c919ce3a4735d5c1ea9cf95b8f26f8ac80b120",
+          "where": "12-C3-B8-D2-II-23.hinh.0.du_lieu",
+          "hashDataUrl": "6e842b1dc910da8ff27de8444cecb4c9892c34275c83dc041ee248c06d854f82",
+          "vector": "ph-amine-nam-cot-ddh-cbc0bfe068f49caeef46f312abd58cfa7cf27ba394299729269eb8688596a4d6.svg"
         }
       ]
     },
@@ -19134,6 +19166,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D2-II-27",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "90940b7feb3548aa1483a2d664c919ce3a4735d5c1ea9cf95b8f26f8ac80b120",
+          "where": "DB-12-B8-D2-II-27.hinh.0.du_lieu",
+          "hashDataUrl": "6e842b1dc910da8ff27de8444cecb4c9892c34275c83dc041ee248c06d854f82",
+          "vector": "ph-amine-nam-cot-ddh-cbc0bfe068f49caeef46f312abd58cfa7cf27ba394299729269eb8688596a4d6.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B9-P1-D1-I-11",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -26544,6 +26590,20 @@
       ]
     },
     {
+      "qid": "VIP27-BDT-L7-0701-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "8f8b6e8f413d9801537cf2df719b5dc145eb37ea6a199c4c554186235e952292",
+          "where": "VIP27-BDT-L7-0701-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "d26ec47d0bc5f6d77c7cc6281ee6f6ad8952d94cff9a7061b4e6aeb9e99d0ed4",
+          "vector": "maltose-lien-ket-mau-ddh-da5b12eded72e52c50a76c1fc8120c830f00b747654f698e32cc087c413d2d08.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-BDT-L4-0401-I-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -27580,6 +27640,7 @@
     "12-C3-B8-D2-I-5",
     "12-C3-B8-D2-II-17",
     "12-C3-B8-D2-II-19",
+    "12-C3-B8-D2-II-23",
     "12-C3-B8-D2-III-8",
     "12-C3-B8-D2-III-29",
     "12-C3-B8-D2-I-16",
@@ -28069,6 +28130,7 @@
     "DB-12-B5-D2-II-300",
     "DB-12-B5-D2-II-340",
     "DB-12-B8-D2-II-26",
+    "DB-12-B8-D2-II-27",
     "DB-12-B9-P1-D1-I-11",
     "DB-12-B9-P1-D1-I-55",
     "DB-12-B9-P1-D1-I-56",
@@ -28538,6 +28600,7 @@
     "VIP27-BDT-L7-0701-I-3",
     "VIP27-BDT-L7-0701-I-18",
     "VIP27-BDT-L7-0701-II-1",
+    "VIP27-BDT-L7-0701-II-2",
     "VIP27-BDT-L4-0401-I-3",
     "VIP27-BDT-L4-0401-I-6",
     "VIP27-BDT-L4-0401-II-3",

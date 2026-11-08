@@ -1,0 +1,9 @@
+{
+  "candidate1": "955b9775895d245f852c4e1988ba7825251cca0bc96ac43d0dd475432e3921f1",
+  "candidate2": "14fe96202e9bd6fc2ec66da24cdd1c0eed21b18237bc59147f5b320bab32acbc",
+  "ketQua": "Cần sửa/khôngmanifest: candidate1 root phát hiện lặpOHrightC4 do countstring nguồn sai7OH; đãbỏnhánh dư. Candidate2 root actual3x thấy số4phải chạm nét cầu xanh; dịch DUY số4 lên11pxgiữmọingeometry/literal/stereo khác. Chưa có positive cho2hash này.",
+  "forbiddenHashes": [
+    "955b9775895d245f852c4e1988ba7825251cca0bc96ac43d0dd475432e3921f1",
+    "14fe96202e9bd6fc2ec66da24cdd1c0eed21b18237bc59147f5b320bab32acbc"
+  ]
+}

@@ -1,0 +1,278 @@
+{
+  "admissible": false,
+  "productionFontChanged": false,
+  "exactReview": "soat-toan-font-candidate2-lo-265-hold.json",
+  "screenshots": [
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-00.png",
+      "sourceSHA": "4fb178660063685ffc83b0a01ce34e14b0c5021bbce1e30d9175462b4e81de6c",
+      "evidenceJpg": "font-full-lo-265-01-atlas-de-00.jpg",
+      "jpgBytes": 91395
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-01.png",
+      "sourceSHA": "29f5188ba45f9a29c9bcadd1b551aacccf34fd4aa0dcf5fa443a990efa6ddb79",
+      "evidenceJpg": "font-full-lo-265-02-atlas-de-01.jpg",
+      "jpgBytes": 98914
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-02.png",
+      "sourceSHA": "908fe90467f242378c39077fe08494a1d054c90ba1813f257f0198c75206b823",
+      "evidenceJpg": "font-full-lo-265-03-atlas-de-02.jpg",
+      "jpgBytes": 105017
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-03.png",
+      "sourceSHA": "cc3fc49a7876487b0095ae1a42f941a5bf9ad365d020438081926f8a8434adb2",
+      "evidenceJpg": "font-full-lo-265-04-atlas-de-03.jpg",
+      "jpgBytes": 118901
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-04.png",
+      "sourceSHA": "62805c7d082858091a213cfc03c1ec23a8b5acc42333bbafd1fa332866a96ce6",
+      "evidenceJpg": "font-full-lo-265-05-atlas-de-04.jpg",
+      "jpgBytes": 143486
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-05.png",
+      "sourceSHA": "731a7f542c4c5f8bf86ea515a2ed53345f2cec28c099882b908c52a2a1880b10",
+      "evidenceJpg": "font-full-lo-265-06-atlas-de-05.jpg",
+      "jpgBytes": 130549
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-06.png",
+      "sourceSHA": "5b0b8b574e80b68b92c263c94b391bfcf175121634c69eded296c11490353993",
+      "evidenceJpg": "font-full-lo-265-07-atlas-de-06.jpg",
+      "jpgBytes": 99622
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-de-07.png",
+      "sourceSHA": "4a2a66b70b7ac48453d4e92c1c4cf132f2c2aa4be31c22675d9e92ce7cf60daa",
+      "evidenceJpg": "font-full-lo-265-08-atlas-de-07.jpg",
+      "jpgBytes": 41012
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/families-de-lhnormal.png",
+      "sourceSHA": "355a331ecd0a27ccabafd5fde776869ee20b054a95f939a0ea499c5dc2402d36",
+      "evidenceJpg": "font-full-lo-265-09-families-de-lhnormal.jpg",
+      "jpgBytes": 139082
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/families-de-lh1.2.png",
+      "sourceSHA": "c3b1d0093a7e93b60c207aee687000455502438f1c4628da2261c2571cc587d9",
+      "evidenceJpg": "font-full-lo-265-10-families-de-lh1.2.jpg",
+      "jpgBytes": 143627
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/families-de-lh1.5.png",
+      "sourceSHA": "4489d9ee8d70ab1c9797b2e6d156e93bc638f1b944cd18f74cdd8417697ef540",
+      "evidenceJpg": "font-full-lo-265-11-families-de-lh1.5.jpg",
+      "jpgBytes": 139252
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-de-0.png",
+      "sourceSHA": "8198afd56d79eb181ce74f5f43f81d1d906d82f32780927415240e39e7e27d9c",
+      "evidenceJpg": "font-full-lo-265-12-compound-de-0.jpg",
+      "jpgBytes": 42714
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-de-1.png",
+      "sourceSHA": "ba4a7a6cc7ba044f43a5b5b9d6d38042445539479d6f54c781295afae40ad604",
+      "evidenceJpg": "font-full-lo-265-13-compound-de-1.jpg",
+      "jpgBytes": 42719
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-de-2.png",
+      "sourceSHA": "3ec663f70485e9535e680a94a491ccf2e559bab5a1fe84f71f5bc341af94d102",
+      "evidenceJpg": "font-full-lo-265-14-compound-de-2.jpg",
+      "jpgBytes": 41303
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-de-3.png",
+      "sourceSHA": "2a995d8774f8d8f1f591b52b869f2c1cb11c90de380275ee7bff85a26aae3180",
+      "evidenceJpg": "font-full-lo-265-15-compound-de-3.jpg",
+      "jpgBytes": 88640
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-de-4.png",
+      "sourceSHA": "cd46da43724b61fe37dd44c6fd983d83d7fc00c078f1bef836d390309cc454dd",
+      "evidenceJpg": "font-full-lo-265-16-compound-de-4.jpg",
+      "jpgBytes": 88545
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-de-5.png",
+      "sourceSHA": "a965d8b710c9b55543734ea36ad0833b5473575b9ad84602dc180c21d0965fe4",
+      "evidenceJpg": "font-full-lo-265-17-compound-de-5.jpg",
+      "jpgBytes": 80067
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/de-7851.png",
+      "sourceSHA": "99f8661cdf49e0bf350da0f89bb1416350af0921aa88958d343a48bc4a39f143",
+      "evidenceJpg": "font-full-lo-265-18-de-7851.jpg",
+      "jpgBytes": 48355
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/de-7876.png",
+      "sourceSHA": "fc54f7e48e3d442ae16b3e2c141a192cdf7996532030844f704ed8e87edeb8c0",
+      "evidenceJpg": "font-full-lo-265-19-de-7876.jpg",
+      "jpgBytes": 42911
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/de-7877.png",
+      "sourceSHA": "1ec7bb12e159e0384ffe3cf3e12b429e9ab5ee89b1533e1b603d4e42e97b3e6d",
+      "evidenceJpg": "font-full-lo-265-20-de-7877.jpg",
+      "jpgBytes": 46661
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/de-7894.png",
+      "sourceSHA": "58f0ef16a2f7646f1a1cd431d87afa4c92299385317c9714dd673afa6a5f4c47",
+      "evidenceJpg": "font-full-lo-265-21-de-7894.jpg",
+      "jpgBytes": 51526
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/de-7895.png",
+      "sourceSHA": "21cbf5d37475daf676c98b6ac552a76844f05c5fa43721caf980819ac5de3a32",
+      "evidenceJpg": "font-full-lo-265-22-de-7895.jpg",
+      "jpgBytes": 47336
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-00.png",
+      "sourceSHA": "926bef8b0a6b0b4899921378350860c0f8dd9a86c5c9f1b8220bbd48b235f6b5",
+      "evidenceJpg": "font-full-lo-265-23-atlas-dam-00.jpg",
+      "jpgBytes": 94897
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-01.png",
+      "sourceSHA": "16bd172280146ce94001377af715e18040b83661774d7041bc2ca5512aec3b26",
+      "evidenceJpg": "font-full-lo-265-24-atlas-dam-01.jpg",
+      "jpgBytes": 103203
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-02.png",
+      "sourceSHA": "a85dff9a5164e41a2f0564f4b9dd5a720eb0e5d17538a45b7f385c7e76e58886",
+      "evidenceJpg": "font-full-lo-265-25-atlas-dam-02.jpg",
+      "jpgBytes": 109176
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-03.png",
+      "sourceSHA": "5dfc7d0852fb34a7bc29b946a9397f8c99e405bad5e905b3e24ec039ab2c3b3a",
+      "evidenceJpg": "font-full-lo-265-26-atlas-dam-03.jpg",
+      "jpgBytes": 123799
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-04.png",
+      "sourceSHA": "ce69abb8f952f3b40a4001720ee328e38caf797dd4e3c329582362eb59644a32",
+      "evidenceJpg": "font-full-lo-265-27-atlas-dam-04.jpg",
+      "jpgBytes": 149032
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-05.png",
+      "sourceSHA": "6eafd95070fdc953e65fef499c1fbe2aad77bcf915a95b70d21e7a3eae562f07",
+      "evidenceJpg": "font-full-lo-265-28-atlas-dam-05.jpg",
+      "jpgBytes": 135933
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-06.png",
+      "sourceSHA": "0df5b7507c30048f293e7929b32d5bdbaf2e09c1f27e4f10cb8a3f153c598232",
+      "evidenceJpg": "font-full-lo-265-29-atlas-dam-06.jpg",
+      "jpgBytes": 103223
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/atlas-dam-07.png",
+      "sourceSHA": "59045cc88dfee262c3661aa06b3fd85e6c9a3d75c12248c70df466120a635463",
+      "evidenceJpg": "font-full-lo-265-30-atlas-dam-07.jpg",
+      "jpgBytes": 42419
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/families-dam-lhnormal.png",
+      "sourceSHA": "fb629cc9e4bd144f7dda1cce2f26fa77702c857a656609648125ac7e019dc2b9",
+      "evidenceJpg": "font-full-lo-265-31-families-dam-lhnormal.jpg",
+      "jpgBytes": 145597
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/families-dam-lh1.2.png",
+      "sourceSHA": "9b03262b7cd3cd4bad5ca6a6ae6ad6a4168e491e393e123965dba955e705984f",
+      "evidenceJpg": "font-full-lo-265-32-families-dam-lh1.2.jpg",
+      "jpgBytes": 136731
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/families-dam-lh1.5.png",
+      "sourceSHA": "775147b7cd4a7819253289800ba2dbd4fec7e5001b2365c48c8de3c6d42b0b5f",
+      "evidenceJpg": "font-full-lo-265-33-families-dam-lh1.5.jpg",
+      "jpgBytes": 146936
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-dam-0.png",
+      "sourceSHA": "87593ed444f27c2240d651d4d3aedb9c8451dc083f89ddaa7541b870acd33a03",
+      "evidenceJpg": "font-full-lo-265-34-compound-dam-0.jpg",
+      "jpgBytes": 44143
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-dam-1.png",
+      "sourceSHA": "7967548bd36b99fb96f1ab0a1cc47457df9a20e07c028a234eeff5221a19708d",
+      "evidenceJpg": "font-full-lo-265-35-compound-dam-1.jpg",
+      "jpgBytes": 44370
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-dam-2.png",
+      "sourceSHA": "d7b14c8b7a81d33187fcd4a4e90f7bf390ccf0ae03b4652e63b3bc39b7b96aa9",
+      "evidenceJpg": "font-full-lo-265-36-compound-dam-2.jpg",
+      "jpgBytes": 42597
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-dam-3.png",
+      "sourceSHA": "30809551b62e503318c73f4e5a7212b800208e5a82f23cb4107c0ad8a81e6b31",
+      "evidenceJpg": "font-full-lo-265-37-compound-dam-3.jpg",
+      "jpgBytes": 94767
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-dam-4.png",
+      "sourceSHA": "3221bfd5837a00bdf5bea845890358cf0c44950869da1289050cc2f799695e49",
+      "evidenceJpg": "font-full-lo-265-38-compound-dam-4.jpg",
+      "jpgBytes": 95165
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/compound-dam-5.png",
+      "sourceSHA": "cfbd6605e89c55cf70eb5aedafb7d37faf14dccebdd61c70292b745a19ef44d0",
+      "evidenceJpg": "font-full-lo-265-39-compound-dam-5.jpg",
+      "jpgBytes": 84330
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/dam-7851.png",
+      "sourceSHA": "1e2465b5cf88cc87e26d134ffea0f5897ef1a548d4d96dc2cb3bb07821f1c8c1",
+      "evidenceJpg": "font-full-lo-265-40-dam-7851.jpg",
+      "jpgBytes": 48359
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/dam-7876.png",
+      "sourceSHA": "3929afc9853619118c1f3bcf8994ab48fc3e9608fce1caf3bce12fbe58cf7049",
+      "evidenceJpg": "font-full-lo-265-41-dam-7876.jpg",
+      "jpgBytes": 47633
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/dam-7877.png",
+      "sourceSHA": "4f948496fbf9094916994952185a182baaa1a2766c269825aada8c1000351edd",
+      "evidenceJpg": "font-full-lo-265-42-dam-7877.jpg",
+      "jpgBytes": 46954
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/dam-7894.png",
+      "sourceSHA": "e3d4bb42b07eb619b27f422bd185daae8ba63e6d9eed838011bae5ca40db9e90",
+      "evidenceJpg": "font-full-lo-265-43-dam-7894.jpg",
+      "jpgBytes": 50852
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-marks/dam-7895.png",
+      "sourceSHA": "eeeac3c937ab00a0d53f78a6cbfdb4ebe2c7dc6ca4dee90e771dde170473c685",
+      "evidenceJpg": "font-full-lo-265-44-dam-7895.jpg",
+      "jpgBytes": 47290
+    },
+    {
+      "sourceFull": "/workspace/scratch/font265-review/app-clipping-probes.png",
+      "sourceSHA": "1bd60f2fe7526436c2bbb45fec38f5d188f510cba5f1b622abe764243a04d600",
+      "evidenceJpg": "font-full-lo-265-45-app-clipping-probes.jpg",
+      "jpgBytes": 148724
+    }
+  ],
+  "gioiHan": "Readonly đãmở45PNGactualFULL gốc trongscratch;JPGresize chỉbằngchứngnhẹ,khôngdùngthumbnailtựduyệt. Candidate2giữ10glyphpositivegiớihạn,khôngfontglobal/corpus/appapproval."
+}
