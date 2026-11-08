@@ -1,0 +1,594 @@
+[
+  {
+    "i": 561,
+    "hash": "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c.png",
+    "size": [
+      740,
+      212
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "11-C4-B17-I-15",
+        "de": "Phương trình hoá học của phản ứng monobromo hoá benzene được cho ở hình (1).\nGiai đoạn tạo thành sản phẩm trong cơ chế của phản ứng trên xảy ra như hình (*).\nNhận định nào sau đây là sai?",
+        "allHinh": [
+          {
+            "hash": "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+            "where": "11-C4-B17-I-15.hinh.0.du_lieu",
+            "hashDataUrl": "cf92a2a751f6a4f760e6324d18ebe043875c953276d964047a9b0a59e392877c"
+          },
+          {
+            "hash": "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c",
+            "where": "11-C4-B17-I-15.hinh.1.du_lieu",
+            "hashDataUrl": "0937a38e310122bfdd57ac007d92b74ab9c26ed332a8c8c9a7639d711ff8783b"
+          }
+        ],
+        "missingHashes": [
+          "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+          "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c"
+        ]
+      }
+    ],
+    "fullClosure": "Sameqid11-C4-B17-I-15hasTWOmissinghashes561+1065;BOTHmustadmitbefore1full,nevercountoneasfull.",
+    "review": "EachnativeFULL+4x/allpublicrefs/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+    "coordinateMeaning": "Nativepixelapprox1–2px,mechanismcurvesliteralnotanswerexplanation.",
+    "actualSvgReviewed": false,
+    "geometry": {
+      "leftPhVertices": [
+        [
+          35,
+          100
+        ],
+        [
+          77,
+          75
+        ],
+        [
+          117,
+          99
+        ],
+        [
+          117,
+          149
+        ],
+        [
+          76,
+          174
+        ],
+        [
+          35,
+          149
+        ]
+      ],
+      "leftInnerDoubles": [
+        [
+          [
+            43,
+            103
+          ],
+          [
+            77,
+            83
+          ]
+        ],
+        [
+          [
+            109,
+            105
+          ],
+          [
+            109,
+            143
+          ]
+        ],
+        [
+          [
+            43,
+            145
+          ],
+          [
+            76,
+            165
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "text": "+",
+          "bbox": [
+            148,
+            101,
+            167,
+            125
+          ]
+        },
+        {
+          "text": "Br₂",
+          "bbox": [
+            196,
+            101,
+            247,
+            133
+          ]
+        },
+        {
+          "text": "FeBr₃",
+          "bbox": [
+            305,
+            77,
+            376,
+            106
+          ]
+        },
+        {
+          "text": "Br",
+          "bbox": [
+            552,
+            52,
+            591,
+            83
+          ]
+        },
+        {
+          "text": "+",
+          "bbox": [
+            616,
+            101,
+            636,
+            125
+          ]
+        },
+        {
+          "text": "HBr",
+          "bbox": [
+            650,
+            99,
+            709,
+            128
+          ]
+        }
+      ],
+      "arrow": {
+        "shaft": [
+          [
+            272,
+            121
+          ],
+          [
+            403,
+            121
+          ]
+        ],
+        "headTip": [
+          403,
+          121
+        ],
+        "headBack": [
+          [
+            384,
+            115
+          ],
+          [
+            384,
+            127
+          ]
+        ],
+        "note": "Darktriangle/headnativegrayink;actualreviewmustzoomifhollowunclear."
+      },
+      "rightPhVertices": [
+        [
+          441,
+          98
+        ],
+        [
+          483,
+          73
+        ],
+        [
+          523,
+          98
+        ],
+        [
+          523,
+          147
+        ],
+        [
+          482,
+          172
+        ],
+        [
+          441,
+          147
+        ]
+      ],
+      "rightInnerDoubles": [
+        [
+          [
+            449,
+            103
+          ],
+          [
+            449,
+            141
+          ]
+        ],
+        [
+          [
+            484,
+            82
+          ],
+          [
+            516,
+            102
+          ]
+        ],
+        [
+          [
+            482,
+            164
+          ],
+          [
+            516,
+            143
+          ]
+        ]
+      ],
+      "Brbond": [
+        [
+          523,
+          98
+        ],
+        [
+          548,
+          82
+        ]
+      ],
+      "counts": "2Ph6innerdoubles/1arrow/2plus/Br2-FeBr3-Br-HBrliteral/nocharges/caption/temperatureadded."
+    }
+  },
+  {
+    "i": 1065,
+    "hash": "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c.png",
+    "size": [
+      954,
+      206
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "11-C4-B17-I-15",
+        "de": "Phương trình hoá học của phản ứng monobromo hoá benzene được cho ở hình (1).\nGiai đoạn tạo thành sản phẩm trong cơ chế của phản ứng trên xảy ra như hình (*).\nNhận định nào sau đây là sai?",
+        "allHinh": [
+          {
+            "hash": "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+            "where": "11-C4-B17-I-15.hinh.0.du_lieu",
+            "hashDataUrl": "cf92a2a751f6a4f760e6324d18ebe043875c953276d964047a9b0a59e392877c"
+          },
+          {
+            "hash": "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c",
+            "where": "11-C4-B17-I-15.hinh.1.du_lieu",
+            "hashDataUrl": "0937a38e310122bfdd57ac007d92b74ab9c26ed332a8c8c9a7639d711ff8783b"
+          }
+        ],
+        "missingHashes": [
+          "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+          "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c"
+        ]
+      }
+    ],
+    "fullClosure": "Sameqid11-C4-B17-I-15hasTWOmissinghashes561+1065;BOTHmustadmitbefore1full,nevercountoneasfull.",
+    "review": "EachnativeFULL+4x/allpublicrefs/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+    "coordinateMeaning": "Nativepixelapprox1–2px,mechanismcurvesliteralnotanswerexplanation.",
+    "actualSvgReviewed": false,
+    "geometry": {
+      "sigmaRingVertices": [
+        [
+          41,
+          89
+        ],
+        [
+          80,
+          66
+        ],
+        [
+          120,
+          90
+        ],
+        [
+          120,
+          136
+        ],
+        [
+          80,
+          161
+        ],
+        [
+          41,
+          137
+        ]
+      ],
+      "ringArc": "OPENhorseshoeapprox M88 80 C69 73 47 90 48 112 C48 134 66 151 84 149 C100 149 110 137 112 121. Endpointsupper88,80/lowerright112,121;gapUPPER-RIGHT. Notclosedcircle,NOT3doublebonds.",
+      "positive": {
+        "circleCenter": [
+          80,
+          113
+        ],
+        "radius": 12,
+        "plusPaths": [
+          [
+            [
+              73,
+              113
+            ],
+            [
+              87,
+              113
+            ]
+          ],
+          [
+            [
+              80,
+              106
+            ],
+            [
+              80,
+              120
+            ]
+          ]
+        ]
+      },
+      "sigmaSubstituents": {
+        "BrLabel": {
+          "text": "Br",
+          "bbox": [
+            132,
+            35,
+            168,
+            64
+          ]
+        },
+        "Brbond": [
+          [
+            120,
+            90
+          ],
+          [
+            132,
+            66
+          ]
+        ],
+        "Hlabel": {
+          "text": "H",
+          "bbox": [
+            145,
+            100,
+            171,
+            129
+          ]
+        },
+        "Hbond": [
+          [
+            120,
+            90
+          ],
+          [
+            144,
+            104
+          ]
+        ]
+      },
+      "reactantLabels": [
+        {
+          "text": "+",
+          "bbox": [
+            204,
+            103,
+            226,
+            128
+          ]
+        },
+        {
+          "text": "[FeBr₄]⁻",
+          "bbox": [
+            262,
+            102,
+            376,
+            137
+          ],
+          "note": "squarebrackets/sub4/minussupOUTSIDEright;FeBr4wholeanion,nochargesinside"
+        }
+      ],
+      "curvedArrows": [
+        {
+          "curve": "M365 102 C335 45 220 20 176 82 Q168 91 160 99",
+          "headTip": [
+            160,
+            99
+          ],
+          "note": "LONGcurveFROMnearFeBr4SUPminus→Htop;curvebroadarchmaxy~49;filledheadtowardsHNOTopposite",
+          "filledHeadApprox": [
+            [
+              160,
+              99
+            ],
+            [
+              162,
+              85
+            ],
+            [
+              168,
+              90
+            ]
+          ]
+        },
+        {
+          "curve": "M15494 Q14180 13084",
+          "headTip": [
+            129,
+            84
+          ],
+          "note": "SHORTcurvedheadlefttowardsringtoprightC-BrjunctionfromHbondarea;doNOTdrawarrowheadatH",
+          "filledHeadApprox": [
+            [
+              129,
+              84
+            ],
+            [
+              139,
+              81
+            ],
+            [
+              137,
+              88
+            ]
+          ]
+        }
+      ],
+      "straightArrow": {
+        "shaft": [
+          [
+            398,
+            121
+          ],
+          [
+            495,
+            121
+          ]
+        ],
+        "headTip": [
+          495,
+          121
+        ],
+        "headBack": [
+          [
+            477,
+            115
+          ],
+          [
+            477,
+            127
+          ]
+        ]
+      },
+      "rightPhVertices": [
+        [
+          544,
+          96
+        ],
+        [
+          584,
+          73
+        ],
+        [
+          624,
+          96
+        ],
+        [
+          624,
+          144
+        ],
+        [
+          584,
+          168
+        ],
+        [
+          544,
+          145
+        ]
+      ],
+      "rightInnerDoubles": [
+        [
+          [
+            552,
+            101
+          ],
+          [
+            552,
+            139
+          ]
+        ],
+        [
+          [
+            584,
+            81
+          ],
+          [
+            616,
+            100
+          ]
+        ],
+        [
+          [
+            584,
+            160
+          ],
+          [
+            616,
+            140
+          ]
+        ]
+      ],
+      "productBr": {
+        "text": "Br",
+        "bbox": [
+          650,
+          59,
+          688,
+          88
+        ],
+        "bond": [
+          [
+            624,
+            96
+          ],
+          [
+            647,
+            83
+          ]
+        ]
+      },
+      "productLabels": [
+        {
+          "text": "+",
+          "bbox": [
+            677,
+            112,
+            699,
+            136
+          ]
+        },
+        {
+          "text": "FeBr₃",
+          "bbox": [
+            724,
+            112,
+            804,
+            144
+          ]
+        },
+        {
+          "text": "+",
+          "bbox": [
+            825,
+            112,
+            846,
+            137
+          ]
+        },
+        {
+          "text": "HBr",
+          "bbox": [
+            858,
+            112,
+            919,
+            143
+          ]
+        }
+      ],
+      "counts": "2hexrings,leftinnerOPENhorseshoe+circledplus/right3doubles;3baselineplusoperators+1circledplus=4plussymbols;1Brattachedsp3C+Hleft/1Brproduct/[FeBr4]SUPminus/FeBr3+HBr;2smallfilledcurvedheads1straighthead. Noadditionalconditions/charges/arrows/name/answer.",
+      "macroActualNative": "/workspace/scratch/1065-mechanism5x.png"
+    }
+  }
+]

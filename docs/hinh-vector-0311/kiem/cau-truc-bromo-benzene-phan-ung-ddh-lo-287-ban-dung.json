@@ -1,0 +1,29 @@
+[
+  {
+    "i": 561,
+    "hash": "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+    "fileNguon": "anh/68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c.png",
+    "svg": "bromo-benzene-phan-ung-ddh-aec7fc3a6cd65a7a1440fcd402ac5f59ea6464c67398f77c279eb23dd1be42d5.svg",
+    "hashSvg": "aec7fc3a6cd65a7a1440fcd402ac5f59ea6464c67398f77c279eb23dd1be42d5",
+    "byteSvg": 7688,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C4-B17-I-15",
+        "de": "Phương trình hoá học của phản ứng monobromo hoá benzene được cho ở hình (1).\nGiai đoạn tạo thành sản phẩm trong cơ chế của phản ứng trên xảy ra như hình (*).\nNhận định nào sau đây là sai?",
+        "refs": [
+          {
+            "hash": "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+            "where": "11-C4-B17-I-15.hinh.0.du_lieu",
+            "hashDataUrl": "cf92a2a751f6a4f760e6324d18ebe043875c953276d964047a9b0a59e392877c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2phenyl6INNERdoubles/benzene+Br2→bromobenzene+HBr/1filledRIGHT/FeBr3ABOVE/2plus/allsubs2-3/regularDDH/noaddedconditions-yield-answer.",
+    "hashSvgDaSoat": "aec7fc3a6cd65a7a1440fcd402ac5f59ea6464c67398f77c279eb23dd1be42d5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

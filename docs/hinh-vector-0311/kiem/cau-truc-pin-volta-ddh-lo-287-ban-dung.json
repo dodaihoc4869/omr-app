@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1049,
+    "hash": "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034",
+    "fileNguon": "anh/bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034.png",
+    "svg": "pin-volta-ddh-5b4aec806e9c72dc29b0d03f43dc1e507bccd3e124f9fa730122163865ae2d6c.svg",
+    "hashSvg": "5b4aec806e9c72dc29b0d03f43dc1e507bccd3e124f9fa730122163865ae2d6c",
+    "byteSvg": 20755,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D5-II-4",
+        "de": "Pin Volta được nhà vật lí, hoá học Volta phát minh năm 1800 dựa trên khám phá của Galvani. Volta đã xếp những tấm kẽm (zinc) và đồng (copper) thành từng cặp xen kẽ với nhau, mỗi cặp ngăn cách nhau bởi những tấm bìa da xốp thấm đẫm dung dịch điện li (hình minh hoạ dưới đây). Cuối cùng, Volta nối điểm đầu với điểm cuối bằng một sợi dây dẫn và nhận thấy có một dòng điện chạy qua.",
+        "refs": [
+          {
+            "hash": "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034",
+            "where": "12-KT-C5-D5-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "c16e13a42926c636e4795ea2db5312aba62d2e3e9db4797f059484aaad374efd"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "6grayZinc6orangeCopper6bluecardlayers/2blackterminals/TOPcircledminusBOTTOMcircledplus/3leadersNOheads/5regularlabelLinesBìa tẩm-dung dịch-H2SO4-Zinc-Copper/sub2sub4/noaddedwire-voltage-reaction-answer.",
+    "hashSvgDaSoat": "5b4aec806e9c72dc29b0d03f43dc1e507bccd3e124f9fa730122163865ae2d6c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

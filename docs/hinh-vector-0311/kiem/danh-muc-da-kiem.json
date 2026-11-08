@@ -6148,6 +6148,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c": {
+      "tep": "bromo-benzene-phan-ung-ddh-aec7fc3a6cd65a7a1440fcd402ac5f59ea6464c67398f77c279eb23dd1be42d5.svg",
+      "hashSvg": "aec7fc3a6cd65a7a1440fcd402ac5f59ea6464c67398f77c279eb23dd1be42d5",
+      "byteSvg": 7688,
+      "byteGzip": 1964,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1241eaf0cb21af2b27c69d8ebc9cf9ea5458200de1d2fac6a5f42a214c136cc1": {
       "tep": "chiet-diethyl-ether-ddh-70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c.svg",
       "hashSvg": "70f4a364b9816581aefac28bd4d606c4cf1cc84d5c7b0c0f5577a6b0362e376c",
@@ -6967,6 +6976,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c": {
+      "tep": "bromo-benzene-co-che-ddh-f8462615f665e44a6de2669810453a6b0de4ef33310574d4a00b8ef787d12f43.svg",
+      "hashSvg": "f8462615f665e44a6de2669810453a6b0de4ef33310574d4a00b8ef787d12f43",
+      "byteSvg": 12390,
+      "byteGzip": 2552,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "8ee1083bffb46588288c1d0e64fd6e9265db847d86bfb098ac3df1f16ca6969a": {
       "tep": "nang-luong-ddh-17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8.svg",
       "hashSvg": "17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8",
@@ -7782,6 +7800,15 @@
       "hashSvg": "a65086afc2fad8003a2d7e0bbbf1a45c562d8b44d6f99710b6acfcbdcd35bcf2",
       "byteSvg": 6159,
       "byteGzip": 1684,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034": {
+      "tep": "pin-volta-ddh-5b4aec806e9c72dc29b0d03f43dc1e507bccd3e124f9fa730122163865ae2d6c.svg",
+      "hashSvg": "5b4aec806e9c72dc29b0d03f43dc1e507bccd3e124f9fa730122163865ae2d6c",
+      "byteSvg": 20755,
+      "byteGzip": 6119,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -9089,6 +9116,26 @@
           "where": "11-C4-B17-I-14.hinh.0.du_lieu",
           "hashDataUrl": "154314533b7f92569ef5d0d9abf15b47699a222b4721798a42c5fba4df605572",
           "vector": "cau-truc-ddh-b492290d7ec217d51ec9236a9d75fde31902eaeb44957af58a5ce8885cb08976.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C4-B17-I-15",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "68acc32fa343dbae80273d74d61b5b22f66e49d5b297ec7ead8e201655370e8c",
+          "where": "11-C4-B17-I-15.hinh.0.du_lieu",
+          "hashDataUrl": "cf92a2a751f6a4f760e6324d18ebe043875c953276d964047a9b0a59e392877c",
+          "vector": "bromo-benzene-phan-ung-ddh-aec7fc3a6cd65a7a1440fcd402ac5f59ea6464c67398f77c279eb23dd1be42d5.svg"
+        },
+        {
+          "hash": "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c",
+          "where": "11-C4-B17-I-15.hinh.1.du_lieu",
+          "hashDataUrl": "0937a38e310122bfdd57ac007d92b74ab9c26ed332a8c8c9a7639d711ff8783b",
+          "vector": "bromo-benzene-co-che-ddh-f8462615f665e44a6de2669810453a6b0de4ef33310574d4a00b8ef787d12f43.svg"
         }
       ]
     },
@@ -14919,6 +14966,20 @@
           "where": "12-KT-C5-D3-II-1.hinh.0.du_lieu",
           "hashDataUrl": "a320955d795763888949c68a3351d4c39ff3a670851111835087850cd51f078e",
           "vector": "pin-zn-cu-ddh-7466c3f98254818dea2c3d1684cfd79af437350d52bd1505004268f535486245.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C5-D5-II-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034",
+          "where": "12-KT-C5-D5-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "c16e13a42926c636e4795ea2db5312aba62d2e3e9db4797f059484aaad374efd",
+          "vector": "pin-volta-ddh-5b4aec806e9c72dc29b0d03f43dc1e507bccd3e124f9fa730122163865ae2d6c.svg"
         }
       ]
     },
@@ -28440,6 +28501,7 @@
     "11-C3-B10-I-5",
     "11-C4-B17-I-3",
     "11-C4-B17-I-14",
+    "11-C4-B17-I-15",
     "11-C4-B17-II-1",
     "11-C4-B17-II-2",
     "11-C3-B13-III-1",
@@ -28811,6 +28873,7 @@
     "12-KT-C5-D4-II-1",
     "12-KT-C5-D4-II-3",
     "12-KT-C5-D3-II-1",
+    "12-KT-C5-D5-II-4",
     "12-KT-C5-D5-III-6",
     "12-KT-C56-D2-I-16",
     "12-KT-C56-D2-I-17",

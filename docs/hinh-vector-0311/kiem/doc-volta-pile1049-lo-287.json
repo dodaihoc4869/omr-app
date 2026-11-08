@@ -1,0 +1,292 @@
+{
+  "i": 1049,
+  "hash": "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034.png",
+  "size": [
+    423,
+    448
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C5-D5-II-4",
+      "de": "Pin Volta được nhà vật lí, hoá học Volta phát minh năm 1800 dựa trên khám phá của Galvani. Volta đã xếp những tấm kẽm (zinc) và đồng (copper) thành từng cặp xen kẽ với nhau, mỗi cặp ngăn cách nhau bởi những tấm bìa da xốp thấm đẫm dung dịch điện li (hình minh hoạ dưới đây). Cuối cùng, Volta nối điểm đầu với điểm cuối bằng một sợi dây dẫn và nhận thấy có một dòng điện chạy qua.",
+      "allHinh": [
+        {
+          "hash": "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034",
+          "where": "12-KT-C5-D5-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "c16e13a42926c636e4795ea2db5312aba62d2e3e9db4797f059484aaad374efd"
+        }
+      ],
+      "missingHashes": [
+        "bdb70c5e116a5ede8424de2f16ecc0efc8678f15fdfd0889cb67d261ce2c9034"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhonlymissingthishash=>1full/noPartial.",
+  "review": "NativeFULL+4x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "grayZincPlates": [
+      [
+        210,
+        79,
+        365,
+        100
+      ],
+      [
+        210,
+        128,
+        365,
+        149
+      ],
+      [
+        210,
+        177,
+        365,
+        198
+      ],
+      [
+        210,
+        226,
+        365,
+        247
+      ],
+      [
+        210,
+        274,
+        365,
+        295
+      ],
+      [
+        210,
+        323,
+        365,
+        344
+      ]
+    ],
+    "orangeCopperPlates": [
+      [
+        210,
+        106,
+        365,
+        127
+      ],
+      [
+        210,
+        155,
+        365,
+        176
+      ],
+      [
+        210,
+        204,
+        365,
+        225
+      ],
+      [
+        210,
+        253,
+        365,
+        274
+      ],
+      [
+        210,
+        301,
+        365,
+        322
+      ],
+      [
+        210,
+        350,
+        365,
+        371
+      ]
+    ],
+    "blueCards": [
+      [
+        221,
+        100,
+        355,
+        106
+      ],
+      [
+        221,
+        149,
+        355,
+        155
+      ],
+      [
+        221,
+        198,
+        355,
+        204
+      ],
+      [
+        221,
+        247,
+        355,
+        253
+      ],
+      [
+        221,
+        295,
+        355,
+        301
+      ],
+      [
+        221,
+        344,
+        355,
+        350
+      ]
+    ],
+    "stackNote": "SixrepeatingGRAY→BLUECARD→ORANGEunits. Adjacentorange→nextgray TOUCH/nonebluecardbetween;thus6bluecardsNOT11. Roundedcorners~2px/blackoutline~1,gray#ccc/orange#f60/blue#009ad8. Nativeinsetgraywhitehighlightsdecorative,notextra layer.",
+    "terminals": [
+      [
+        280,
+        59,
+        295,
+        79
+      ],
+      [
+        280,
+        371,
+        295,
+        392
+      ]
+    ],
+    "terminalStyle": "Solidblackrectsbehindstacktopbottom,notconnectedsidetowire.",
+    "polarity": [
+      {
+        "circleCenter": [
+          317,
+          61
+        ],
+        "radius": 11,
+        "glyph": "−",
+        "path": [
+          [
+            308,
+            61
+          ],
+          [
+            326,
+            61
+          ]
+        ]
+      },
+      {
+        "circleCenter": [
+          317,
+          388
+        ],
+        "radius": 11,
+        "glyph": "+",
+        "paths": [
+          [
+            [
+              308,
+              388
+            ],
+            [
+              326,
+              388
+            ]
+          ],
+          [
+            [
+              317,
+              379
+            ],
+            [
+              317,
+              397
+            ]
+          ]
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Bìa tẩm\ndung dịch\nH₂SO₄",
+        "lineBboxes": [
+          [
+            67,
+            212,
+            148,
+            237
+          ],
+          [
+            67,
+            239,
+            158,
+            261
+          ],
+          [
+            67,
+            263,
+            133,
+            287
+          ]
+        ],
+        "style": "regularuprightactualsub2/4",
+        "leader": [
+          [
+            171,
+            249
+          ],
+          [
+            233,
+            249
+          ]
+        ],
+        "endpoint": "bluecard4x221..355,y247..253"
+      },
+      {
+        "text": "Zinc",
+        "bbox": [
+          114,
+          322,
+          162,
+          345
+        ],
+        "style": "regularuprightcapitalZonly",
+        "leader": [
+          [
+            171,
+            333
+          ],
+          [
+            233,
+            333
+          ]
+        ],
+        "endpoint": "grayplate6"
+      },
+      {
+        "text": "Copper",
+        "bbox": [
+          85,
+          348,
+          164,
+          373
+        ],
+        "style": "regularuprightcapitalConly",
+        "leader": [
+          [
+            171,
+            360
+          ],
+          [
+            233,
+            360
+          ]
+        ],
+        "endpoint": "orangeplate6"
+      }
+    ],
+    "counts": "6gray+6orangeplates/6bluecards/2blackterminals/2circledpolaritysymbols/3leaders/3labels. NOarrowhead/chargeontoplates/wire/sourceextra/caption/answeradded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1px,countsfromnativeNOTtexttheory.",
+  "actualSvgReviewed": false
+}
