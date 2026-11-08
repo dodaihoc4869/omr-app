@@ -1,0 +1,29 @@
+[
+  {
+    "i": 845,
+    "hash": "9b504c624c0fc7b49973715bb4474f1a6c1ccd445b2873a45aca337e071f5060",
+    "fileNguon": "anh/9b504c624c0fc7b49973715bb4474f1a6c1ccd445b2873a45aca337e071f5060.png",
+    "svg": "benzene-ethyl-styrene-ddh-d0cb32144c00cdd3a6b61ce09d86592e9a69e21303cc09b552bc592b774910f6.svg",
+    "hashSvg": "d0cb32144c00cdd3a6b61ce09d86592e9a69e21303cc09b552bc592b774910f6",
+    "byteSvg": 17764,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C4-B12-II-7",
+        "de": "Trong công nghiệp, Polymer A được sản xuất từ nguyên liệu ban đầu là benzene và ethylene thông qua một chuỗi các quá trình phản ứng được tóm tắt theo sơ đồ sau: Trong một quá trình tổng hợp, từ 22,2 L benzene (khối lượng riêng là 0,878 g mL⁻¹) thu được m kg A. Biết hiệu suất của toàn bộ quá trình tổng hợp (tính chung từ benzene đến polymer) là 80%.",
+        "refs": [
+          {
+            "hash": "9b504c624c0fc7b49973715bb4474f1a6c1ccd445b2873a45aca337e071f5060",
+            "where": "12-C4-B12-II-7.hinh.0.du_lieu",
+            "hashDataUrl": "9d20be33a491dadcd2a01a17566c021529c6b47c36bc544e7b400b88f47c2f6a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3phenyl9innerdouble/CH2CH3→CH=CH2firstCanchors/3openVRIGHTheads/CH2=CH2-xt-xt,t°,p/3stepnums1..3/Aactualdamliteral/noaddedH2-yield80%-polymeranswer-caption.",
+    "hashSvgDaSoat": "d0cb32144c00cdd3a6b61ce09d86592e9a69e21303cc09b552bc592b774910f6",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

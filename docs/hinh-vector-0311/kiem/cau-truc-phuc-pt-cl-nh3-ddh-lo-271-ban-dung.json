@@ -1,0 +1,29 @@
+[
+  {
+    "i": 846,
+    "hash": "9b5c68d0710927a02185c1588bdb14e533618c6ce73f6458156d5f36ed0aedd3",
+    "fileNguon": "anh/9b5c68d0710927a02185c1588bdb14e533618c6ce73f6458156d5f36ed0aedd3.png",
+    "svg": "phuc-pt-cl-nh3-ddh-7597ae4d04f4178de081998b305eeaf84a54e4306108cea82dd16b5bf82df7b3.svg",
+    "hashSvg": "7597ae4d04f4178de081998b305eeaf84a54e4306108cea82dd16b5bf82df7b3",
+    "byteSvg": 5606,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C8-B27-I-54",
+        "de": "Phức chất có công thức [PtCl₂(NH₃)₂] có cấu tạo như hình bên.\nPhát biểu nào dưới đây về phức chất trên là không đúng?",
+        "refs": [
+          {
+            "hash": "9b5c68d0710927a02185c1588bdb14e533618c6ce73f6458156d5f36ed0aedd3",
+            "where": "12-C8-B27-I-54.hinh.0.du_lieu",
+            "hashDataUrl": "331d92670203a8179386f52e840893c6fd19060a2b0aaefd18a34a5b61490454"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1Pt2Cl2N6H/4SINGLEthinuniformdiagonal/2ClLEFT2NH3RIGHT/Nanchors-NOT-H-or3/no-wedge-dash-bracket-charge-caption-arrow-answer.",
+    "hashSvgDaSoat": "7597ae4d04f4178de081998b305eeaf84a54e4306108cea82dd16b5bf82df7b3",
+    "nguoiSoat": "soat_nguon_2"
+  }
+]

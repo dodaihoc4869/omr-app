@@ -1,0 +1,123 @@
+{
+  "i": 846,
+  "hash": "9b5c68d0710927a02185c1588bdb14e533618c6ce73f6458156d5f36ed0aedd3",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9b5c68d0710927a02185c1588bdb14e533618c6ce73f6458156d5f36ed0aedd3.png",
+  "size": [
+    337,
+    248
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C8-B27-I-54",
+      "de": "Phức chất có công thức [PtCl₂(NH₃)₂] có cấu tạo như hình bên.\nPhát biểu nào dưới đây về phức chất trên là không đúng?",
+      "refs": [
+        {
+          "hash": "9b5c68d0710927a02185c1588bdb14e533618c6ce73f6458156d5f36ed0aedd3",
+          "where": "12-C8-B27-I-54.hinh.0.du_lieu",
+          "hashDataUrl": "331d92670203a8179386f52e840893c6fd19060a2b0aaefd18a34a5b61490454"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+4x/all1ref thựcđọc;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "labels": [
+      {
+        "text": "Pt",
+        "bbox": [
+          143,
+          112,
+          173,
+          138
+        ],
+        "center": [
+          158,
+          125
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          45,
+          51,
+          80,
+          77
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          45,
+          177,
+          80,
+          203
+        ]
+      },
+      {
+        "text": "NH₃",
+        "bbox": [
+          231,
+          48,
+          292,
+          83
+        ]
+      },
+      {
+        "text": "NH₃",
+        "bbox": [
+          231,
+          176,
+          292,
+          210
+        ]
+      }
+    ],
+    "bonds": [
+      [
+        [
+          82,
+          65
+        ],
+        [
+          143,
+          114
+        ]
+      ],
+      [
+        [
+          172,
+          114
+        ],
+        [
+          229,
+          63
+        ]
+      ],
+      [
+        [
+          83,
+          190
+        ],
+        [
+          143,
+          138
+        ]
+      ],
+      [
+        [
+          172,
+          138
+        ],
+        [
+          230,
+          189
+        ]
+      ]
+    ],
+    "anchorNotes": "Ptleft/rightglyphouterends withgaps;Clbondsstartatrightl,butPt–NH3bondendsleftofN,nottheH/3. UpperCl+lowerClbothLEFT;upperNH3+lowerNH3bothRIGHT.",
+    "counts": "1Pt2Cl2N6H(explicitvia2NH3 condensed).4ordinarySINGLEthinuniformdiagonalbonds,NOwedge/dash/hash/charge/bracket/circle/doublebond/caption/title/number/arrow/nameextra. Preservecisarrangementactualnotreorient."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,notinferredfromcomplexname.",
+  "actualSvgReviewed": false
+}

@@ -1,0 +1,491 @@
+{
+  "nguoiDoc": "soat_nguon_3",
+  "repoModified": false,
+  "fontCandidateCreated": false,
+  "productionAdopt": false,
+  "verdict": "HOLD; no causal evidence that curve-aware offset alone recovers needed verticalspace",
+  "sourceVsCurveAware": [
+    {
+      "style": "de",
+      "sourceGlyph": "Ã",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        135.90475463867188,
+        800.0,
+        504.0952453613281,
+        940.0
+      ],
+      "curveAwareDilatedBounds": [
+        123.8956298828125,
+        788.0,
+        516.101318359375,
+        952.0
+      ],
+      "sourceHeight": 140.0,
+      "curveAwareHeight": 164.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 139.4
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "ã",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        82.9047622680664,
+        590.0,
+        451.0952453613281,
+        730.0
+      ],
+      "curveAwareDilatedBounds": [
+        70.8956298828125,
+        578.0,
+        463.1012878417969,
+        742.0
+      ],
+      "sourceHeight": 140.0,
+      "curveAwareHeight": 164.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 139.4
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "Ẽ",
+      "sourceContour": 0,
+      "sourceCurveBounds": [
+        115.9047622680664,
+        800.0,
+        484.0952453613281,
+        940.0
+      ],
+      "curveAwareDilatedBounds": [
+        103.8956298828125,
+        788.0,
+        496.1012878417969,
+        952.0
+      ],
+      "sourceHeight": 140.0,
+      "curveAwareHeight": 164.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 139.4
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "ẽ",
+      "sourceContour": 0,
+      "sourceCurveBounds": [
+        83.9047622680664,
+        590.0,
+        452.0952453613281,
+        730.0
+      ],
+      "curveAwareDilatedBounds": [
+        71.8956298828125,
+        578.0,
+        464.1012878417969,
+        742.0
+      ],
+      "sourceHeight": 140.0,
+      "curveAwareHeight": 164.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 139.4
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "Õ",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        172.90475463867188,
+        800.0,
+        541.09521484375,
+        940.0
+      ],
+      "curveAwareDilatedBounds": [
+        160.8956298828125,
+        788.0,
+        553.089111328125,
+        952.0
+      ],
+      "sourceHeight": 140.0,
+      "curveAwareHeight": 164.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 139.4
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "õ",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        93.9047622680664,
+        590.0,
+        462.0952453613281,
+        730.0
+      ],
+      "curveAwareDilatedBounds": [
+        81.8956298828125,
+        578.0,
+        474.0890808105469,
+        742.0
+      ],
+      "sourceHeight": 140.0,
+      "curveAwareHeight": 164.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 139.4
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "Â",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        151.60000610351562,
+        790.0,
+        487.5714416503906,
+        957.0
+      ],
+      "curveAwareDilatedBounds": [
+        139.43092346191406,
+        778.0,
+        499.713623046875,
+        969.0
+      ],
+      "sourceHeight": 167.0,
+      "curveAwareHeight": 191.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 162.35
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "Ê",
+      "sourceContour": 0,
+      "sourceCurveBounds": [
+        131.60000610351562,
+        790.0,
+        467.5714416503906,
+        957.0
+      ],
+      "curveAwareDilatedBounds": [
+        119.43091583251953,
+        778.0,
+        479.713623046875,
+        969.0
+      ],
+      "sourceHeight": 167.0,
+      "curveAwareHeight": 191.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 162.35
+    },
+    {
+      "style": "de",
+      "sourceGlyph": "Ô",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        189.42857360839844,
+        790.0,
+        524.5714111328125,
+        957.0
+      ],
+      "curveAwareDilatedBounds": [
+        177.28636169433594,
+        778.0,
+        536.7136840820312,
+        969.0
+      ],
+      "sourceHeight": 167.0,
+      "curveAwareHeight": 191.0,
+      "net": 12,
+      "curveAwareHeightAfterExistingCo085": 162.35
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "Ã",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        127.92308044433594,
+        795.0,
+        514.27587890625,
+        950.0
+      ],
+      "curveAwareDilatedBounds": [
+        101.91663360595703,
+        769.0,
+        540.3046264648438,
+        976.0
+      ],
+      "sourceHeight": 155.0,
+      "curveAwareHeight": 207.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 175.95
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "ã",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        73.92308044433594,
+        585.0,
+        460.2758483886719,
+        740.0
+      ],
+      "curveAwareDilatedBounds": [
+        47.91663360595703,
+        559.0,
+        486.2821044921875,
+        766.0
+      ],
+      "sourceHeight": 155.0,
+      "curveAwareHeight": 207.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 175.95
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "Ẽ",
+      "sourceContour": 0,
+      "sourceCurveBounds": [
+        108.92308044433594,
+        795.0,
+        495.2758483886719,
+        950.0
+      ],
+      "curveAwareDilatedBounds": [
+        82.91663360595703,
+        769.0,
+        521.2821044921875,
+        976.0
+      ],
+      "sourceHeight": 155.0,
+      "curveAwareHeight": 207.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 175.95
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "ẽ",
+      "sourceContour": 0,
+      "sourceCurveBounds": [
+        78.92308044433594,
+        585.0,
+        465.2758483886719,
+        740.0
+      ],
+      "curveAwareDilatedBounds": [
+        52.91663360595703,
+        559.0,
+        491.2821044921875,
+        766.0
+      ],
+      "sourceHeight": 155.0,
+      "curveAwareHeight": 207.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 175.95
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "Õ",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        168.92308044433594,
+        795.0,
+        555.27587890625,
+        950.0
+      ],
+      "curveAwareDilatedBounds": [
+        142.9166259765625,
+        769.0,
+        581.2821044921875,
+        976.0
+      ],
+      "sourceHeight": 155.0,
+      "curveAwareHeight": 207.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 175.95
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "õ",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        88.92308044433594,
+        585.0,
+        475.2758483886719,
+        740.0
+      ],
+      "curveAwareDilatedBounds": [
+        62.91663360595703,
+        559.0,
+        501.2821044921875,
+        766.0
+      ],
+      "sourceHeight": 155.0,
+      "curveAwareHeight": 207.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 175.95
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "Â",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        144.44444274902344,
+        790.0,
+        498.20513916015625,
+        960.0
+      ],
+      "curveAwareDilatedBounds": [
+        118.44200897216797,
+        764.0,
+        524.2095336914062,
+        986.0
+      ],
+      "sourceHeight": 170.0,
+      "curveAwareHeight": 222.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 188.7
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "Ê",
+      "sourceContour": 0,
+      "sourceCurveBounds": [
+        125.44444274902344,
+        790.0,
+        478.5555419921875,
+        960.0
+      ],
+      "curveAwareDilatedBounds": [
+        99.44200897216797,
+        764.0,
+        504.5579833984375,
+        986.0
+      ],
+      "sourceHeight": 170.0,
+      "curveAwareHeight": 222.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 188.7
+    },
+    {
+      "style": "dam",
+      "sourceGlyph": "Ô",
+      "sourceContour": 2,
+      "sourceCurveBounds": [
+        185.44444274902344,
+        790.0,
+        538.5555419921875,
+        960.0
+      ],
+      "curveAwareDilatedBounds": [
+        159.44200134277344,
+        764.0,
+        564.5580444335938,
+        986.0
+      ],
+      "sourceHeight": 170.0,
+      "curveAwareHeight": 222.0,
+      "net": 26,
+      "curveAwareHeightAfterExistingCo085": 188.7
+    }
+  ],
+  "rawOffsetReproduction": [
+    {
+      "style": "de",
+      "glyph": "Ã",
+      "rawOffsetContourHeight": 164,
+      "net": 12.0
+    },
+    {
+      "style": "de",
+      "glyph": "ã",
+      "rawOffsetContourHeight": 164,
+      "net": 12.0
+    },
+    {
+      "style": "de",
+      "glyph": "Ẽ",
+      "rawOffsetContourHeight": 164,
+      "net": 12.0
+    },
+    {
+      "style": "de",
+      "glyph": "ẽ",
+      "rawOffsetContourHeight": 164,
+      "net": 12.0
+    },
+    {
+      "style": "de",
+      "glyph": "Õ",
+      "rawOffsetContourHeight": 164,
+      "net": 12.0
+    },
+    {
+      "style": "de",
+      "glyph": "õ",
+      "rawOffsetContourHeight": 164,
+      "net": 12.0
+    },
+    {
+      "style": "dam",
+      "glyph": "Ã",
+      "rawOffsetContourHeight": 207,
+      "net": 26.0
+    },
+    {
+      "style": "dam",
+      "glyph": "ã",
+      "rawOffsetContourHeight": 207,
+      "net": 26.0
+    },
+    {
+      "style": "dam",
+      "glyph": "Ẽ",
+      "rawOffsetContourHeight": 207,
+      "net": 26.0
+    },
+    {
+      "style": "dam",
+      "glyph": "ẽ",
+      "rawOffsetContourHeight": 207,
+      "net": 26.0
+    },
+    {
+      "style": "dam",
+      "glyph": "Õ",
+      "rawOffsetContourHeight": 207,
+      "net": 26.0
+    },
+    {
+      "style": "dam",
+      "glyph": "õ",
+      "rawOffsetContourHeight": 207,
+      "net": 26.0
+    }
+  ],
+  "actualSVGComparisonsOpened": [
+    "/workspace/scratch/lo271/de.png",
+    "/workspace/scratch/lo271/dam.png"
+  ],
+  "newCausalFindings": [
+    "Tilde rawoffsetsourceheight De140→164(net12),Dam155→207(net26), exactly same bboxheight as curve-awareROUNDstroke before laterpipeline. Therefore R4tildeheight139/176 is NOT because rawoffsetfailedtoexpand; it is laterexisting chinh_dau co0.85:164*.85≈139,207*.85≈176.",
+    "Existinggenerator already Y-compresses marks at chinh_dau; apparentflatnessvsoriginalTTF partly intentionalco0.85, not newlyintroducedsemanticrepair. Do not add furtherYcompression or claim curve-aware repair keepsoriginalshape exactly.",
+    "R4circumflex is generated from ve_mu capsulebranches d.w370/400,d.h170/190,t82/120, not sourceTTFcircumflex afterlam_dam. The capsulepolygon generator bypasses rawoffset forfinalmu entirely. Curve-aware lam_dam cannot causally repair itsheight.",
+    "Replacing generatedmu by originalsourcecurve-aware+existingco.85 gives De167+24 then*.85=162.35 vsR4170 (only~8unitsless),Dam170+52 then*.85=188.7 vsR4190 (~1unitless), while changing intendedflat-apexdesign to curvedsourceapex. No demonstrated remedy for5glyphclip.",
+    "Curve-awaretilde atsamestroke+sameexistingco gives139.4/175.95, sameheight asR4rounded139/176. ActualSVG shows marginalcurve shapevariation, no verticalsaving.",
+    "R4semantic stackgap r41/60 is deliberateplacementrule, not lam_dam spill; previous269270 searches alreadyreduced actualcurveclearance12/26 and still5boundedfail, so simplylabelinggapexcess doesnotprovidecandidate."
+  ],
+  "generatorEvidence": {
+    "raw_lam_dam": "semantic-r4-generator.py:190",
+    "chinh_dau": "semantic-r4-generator.py:421–444; DAUco0.85/nang62 at348",
+    "finalMu": "semantic-r4-generator.py:495–497; VE_DAUat445",
+    "semanticTilde": "semantic-r4-generator.py:531–538"
+  },
+  "limits": [
+    "Offsetcurvefamily was not globallyadmitted: shapecomparisonalone doesnotcertify allglyphs.",
+    "ProbeSVG uses explicit sourcecontourindices checkedfromsourcebodytopology; no area/bbox filter selectingdiscarding nét. Bounds onlymeasureselectedcurves.",
+    "No newWOFFcandidate since measuredspacegain insufficient and designchangeunsupported. No freshfontpositive invented fromoldproof.",
+    "This doesnotprove all alternative designmastersimpossible; only rulesout proposedoffset-only causalshortcut."
+  ],
+  "repro": [
+    "mark-probe.py",
+    "repro-raw.py",
+    "render-probe-existing-pipeline.py",
+    "render.cjs"
+  ]
+}

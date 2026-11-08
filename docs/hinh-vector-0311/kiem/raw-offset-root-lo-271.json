@@ -1,0 +1,74 @@
+[
+  {
+    "style": "de",
+    "glyph": "Ã",
+    "rawOffsetContourHeight": 164,
+    "net": 12.0
+  },
+  {
+    "style": "de",
+    "glyph": "ã",
+    "rawOffsetContourHeight": 164,
+    "net": 12.0
+  },
+  {
+    "style": "de",
+    "glyph": "Ẽ",
+    "rawOffsetContourHeight": 164,
+    "net": 12.0
+  },
+  {
+    "style": "de",
+    "glyph": "ẽ",
+    "rawOffsetContourHeight": 164,
+    "net": 12.0
+  },
+  {
+    "style": "de",
+    "glyph": "Õ",
+    "rawOffsetContourHeight": 164,
+    "net": 12.0
+  },
+  {
+    "style": "de",
+    "glyph": "õ",
+    "rawOffsetContourHeight": 164,
+    "net": 12.0
+  },
+  {
+    "style": "dam",
+    "glyph": "Ã",
+    "rawOffsetContourHeight": 207,
+    "net": 26.0
+  },
+  {
+    "style": "dam",
+    "glyph": "ã",
+    "rawOffsetContourHeight": 207,
+    "net": 26.0
+  },
+  {
+    "style": "dam",
+    "glyph": "Ẽ",
+    "rawOffsetContourHeight": 207,
+    "net": 26.0
+  },
+  {
+    "style": "dam",
+    "glyph": "ẽ",
+    "rawOffsetContourHeight": 207,
+    "net": 26.0
+  },
+  {
+    "style": "dam",
+    "glyph": "Õ",
+    "rawOffsetContourHeight": 207,
+    "net": 26.0
+  },
+  {
+    "style": "dam",
+    "glyph": "õ",
+    "rawOffsetContourHeight": 207,
+    "net": 26.0
+  }
+]

@@ -1,0 +1,395 @@
+{
+  "i": 845,
+  "hash": "9b504c624c0fc7b49973715bb4474f1a6c1ccd445b2873a45aca337e071f5060",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9b504c624c0fc7b49973715bb4474f1a6c1ccd445b2873a45aca337e071f5060.png",
+  "size": [
+    1001,
+    173
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C4-B12-II-7",
+      "de": "Trong công nghiệp, Polymer A được sản xuất từ nguyên liệu ban đầu là benzene và ethylene thông qua một chuỗi các quá trình phản ứng được tóm tắt theo sơ đồ sau: Trong một quá trình tổng hợp, từ 22,2 L benzene (khối lượng riêng là 0,878 g mL⁻¹) thu được m kg A. Biết hiệu suất của toàn bộ quá trình tổng hợp (tính chung từ benzene đến polymer) là 80%.",
+      "refs": [
+        {
+          "hash": "9b504c624c0fc7b49973715bb4474f1a6c1ccd445b2873a45aca337e071f5060",
+          "where": "12-C4-B12-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "9d20be33a491dadcd2a01a17566c021529c6b47c36bc544e7b400b88f47c2f6a"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x/all1ref actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "rings": [
+      {
+        "vertices": [
+          [
+            44,
+            77
+          ],
+          [
+            78,
+            57
+          ],
+          [
+            112,
+            77
+          ],
+          [
+            112,
+            116
+          ],
+          [
+            78,
+            136
+          ],
+          [
+            44,
+            116
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              51,
+              82
+            ],
+            [
+              51,
+              111
+            ]
+          ],
+          [
+            [
+              78,
+              64
+            ],
+            [
+              105,
+              80
+            ]
+          ],
+          [
+            [
+              78,
+              128
+            ],
+            [
+              105,
+              112
+            ]
+          ]
+        ]
+      },
+      {
+        "vertices": [
+          [
+            239,
+            81
+          ],
+          [
+            273,
+            61
+          ],
+          [
+            307,
+            81
+          ],
+          [
+            307,
+            120
+          ],
+          [
+            273,
+            140
+          ],
+          [
+            239,
+            120
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              246,
+              86
+            ],
+            [
+              246,
+              115
+            ]
+          ],
+          [
+            [
+              273,
+              68
+            ],
+            [
+              300,
+              84
+            ]
+          ],
+          [
+            [
+              273,
+              132
+            ],
+            [
+              300,
+              116
+            ]
+          ]
+        ],
+        "substituent": {
+          "text": "CH₂CH₃",
+          "bbox": [
+            328,
+            48,
+            450,
+            84
+          ],
+          "bond": [
+            [
+              307,
+              81
+            ],
+            [
+              327,
+              69
+            ]
+          ],
+          "anchor": "firstCcenter~340"
+        }
+      },
+      {
+        "vertices": [
+          [
+            588,
+            81
+          ],
+          [
+            622,
+            61
+          ],
+          [
+            656,
+            81
+          ],
+          [
+            656,
+            120
+          ],
+          [
+            622,
+            140
+          ],
+          [
+            588,
+            120
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              595,
+              86
+            ],
+            [
+              595,
+              115
+            ]
+          ],
+          [
+            [
+              622,
+              68
+            ],
+            [
+              649,
+              84
+            ]
+          ],
+          [
+            [
+              622,
+              132
+            ],
+            [
+              649,
+              116
+            ]
+          ]
+        ],
+        "substituent": {
+          "text": "CH=CH₂",
+          "bbox": [
+            679,
+            48,
+            809,
+            84
+          ],
+          "bond": [
+            [
+              656,
+              81
+            ],
+            [
+              677,
+              68
+            ]
+          ],
+          "anchor": "firstC"
+        }
+      }
+    ],
+    "arrows": [
+      {
+        "shaft": [
+          [
+            123,
+            97
+          ],
+          [
+            232,
+            97
+          ]
+        ],
+        "openVhead": [
+          [
+            220,
+            92
+          ],
+          [
+            232,
+            97
+          ],
+          [
+            220,
+            102
+          ]
+        ],
+        "above": {
+          "text": "CH₂=CH₂",
+          "bbox": [
+            126,
+            71,
+            214,
+            91
+          ]
+        },
+        "below": {
+          "text": "(1)",
+          "bbox": [
+            163,
+            101,
+            189,
+            124
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            460,
+            97
+          ],
+          [
+            570,
+            97
+          ]
+        ],
+        "openVhead": [
+          [
+            558,
+            92
+          ],
+          [
+            570,
+            97
+          ],
+          [
+            558,
+            102
+          ]
+        ],
+        "above": {
+          "text": "xt",
+          "bbox": [
+            498,
+            70,
+            520,
+            90
+          ]
+        },
+        "below": {
+          "text": "(2)",
+          "bbox": [
+            500,
+            101,
+            526,
+            124
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            825,
+            98
+          ],
+          [
+            936,
+            98
+          ]
+        ],
+        "openVhead": [
+          [
+            924,
+            93
+          ],
+          [
+            936,
+            98
+          ],
+          [
+            924,
+            103
+          ]
+        ],
+        "above": {
+          "text": "xt, t°, p",
+          "bbox": [
+            842,
+            70,
+            906,
+            92
+          ]
+        },
+        "below": {
+          "text": "(3)",
+          "bbox": [
+            862,
+            101,
+            888,
+            124
+          ]
+        }
+      }
+    ],
+    "finalLabel": {
+      "text": "A",
+      "bbox": [
+        942,
+        84,
+        969,
+        112
+      ]
+    },
+    "counts": "3Ph/9innerdouble;CH2CH3 andCH=CH2 condensedpositions;3RIGHTopenVheads3indices3aboveconditions. NoCO/charges/stereo/circle/caption/polymeranswer/80%yieldadded.",
+    "styles": "Alluniformblackthinlines;serifsourcelettering switchDDH butliteralcase/subscripts/supcircle retained."
+  },
+  "coordinateMeaning": "Nativepixel approximate1–2px,notanswerinference.",
+  "actualSvgReviewed": false
+}

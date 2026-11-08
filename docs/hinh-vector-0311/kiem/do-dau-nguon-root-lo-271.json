@@ -1,0 +1,362 @@
+[
+  {
+    "style": "de",
+    "sourceGlyph": "Ã",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      135.90475463867188,
+      800.0,
+      504.0952453613281,
+      940.0
+    ],
+    "curveAwareDilatedBounds": [
+      123.8956298828125,
+      788.0,
+      516.101318359375,
+      952.0
+    ],
+    "sourceHeight": 140.0,
+    "curveAwareHeight": 164.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "ã",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      82.9047622680664,
+      590.0,
+      451.0952453613281,
+      730.0
+    ],
+    "curveAwareDilatedBounds": [
+      70.8956298828125,
+      578.0,
+      463.1012878417969,
+      742.0
+    ],
+    "sourceHeight": 140.0,
+    "curveAwareHeight": 164.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "Ẽ",
+    "sourceContour": 0,
+    "sourceCurveBounds": [
+      115.9047622680664,
+      800.0,
+      484.0952453613281,
+      940.0
+    ],
+    "curveAwareDilatedBounds": [
+      103.8956298828125,
+      788.0,
+      496.1012878417969,
+      952.0
+    ],
+    "sourceHeight": 140.0,
+    "curveAwareHeight": 164.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "ẽ",
+    "sourceContour": 0,
+    "sourceCurveBounds": [
+      83.9047622680664,
+      590.0,
+      452.0952453613281,
+      730.0
+    ],
+    "curveAwareDilatedBounds": [
+      71.8956298828125,
+      578.0,
+      464.1012878417969,
+      742.0
+    ],
+    "sourceHeight": 140.0,
+    "curveAwareHeight": 164.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "Õ",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      172.90475463867188,
+      800.0,
+      541.09521484375,
+      940.0
+    ],
+    "curveAwareDilatedBounds": [
+      160.8956298828125,
+      788.0,
+      553.089111328125,
+      952.0
+    ],
+    "sourceHeight": 140.0,
+    "curveAwareHeight": 164.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "õ",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      93.9047622680664,
+      590.0,
+      462.0952453613281,
+      730.0
+    ],
+    "curveAwareDilatedBounds": [
+      81.8956298828125,
+      578.0,
+      474.0890808105469,
+      742.0
+    ],
+    "sourceHeight": 140.0,
+    "curveAwareHeight": 164.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "Â",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      151.60000610351562,
+      790.0,
+      487.5714416503906,
+      957.0
+    ],
+    "curveAwareDilatedBounds": [
+      139.43092346191406,
+      778.0,
+      499.713623046875,
+      969.0
+    ],
+    "sourceHeight": 167.0,
+    "curveAwareHeight": 191.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "Ê",
+    "sourceContour": 0,
+    "sourceCurveBounds": [
+      131.60000610351562,
+      790.0,
+      467.5714416503906,
+      957.0
+    ],
+    "curveAwareDilatedBounds": [
+      119.43091583251953,
+      778.0,
+      479.713623046875,
+      969.0
+    ],
+    "sourceHeight": 167.0,
+    "curveAwareHeight": 191.0,
+    "net": 12
+  },
+  {
+    "style": "de",
+    "sourceGlyph": "Ô",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      189.42857360839844,
+      790.0,
+      524.5714111328125,
+      957.0
+    ],
+    "curveAwareDilatedBounds": [
+      177.28636169433594,
+      778.0,
+      536.7136840820312,
+      969.0
+    ],
+    "sourceHeight": 167.0,
+    "curveAwareHeight": 191.0,
+    "net": 12
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "Ã",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      127.92308044433594,
+      795.0,
+      514.27587890625,
+      950.0
+    ],
+    "curveAwareDilatedBounds": [
+      101.91663360595703,
+      769.0,
+      540.3046264648438,
+      976.0
+    ],
+    "sourceHeight": 155.0,
+    "curveAwareHeight": 207.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "ã",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      73.92308044433594,
+      585.0,
+      460.2758483886719,
+      740.0
+    ],
+    "curveAwareDilatedBounds": [
+      47.91663360595703,
+      559.0,
+      486.2821044921875,
+      766.0
+    ],
+    "sourceHeight": 155.0,
+    "curveAwareHeight": 207.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "Ẽ",
+    "sourceContour": 0,
+    "sourceCurveBounds": [
+      108.92308044433594,
+      795.0,
+      495.2758483886719,
+      950.0
+    ],
+    "curveAwareDilatedBounds": [
+      82.91663360595703,
+      769.0,
+      521.2821044921875,
+      976.0
+    ],
+    "sourceHeight": 155.0,
+    "curveAwareHeight": 207.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "ẽ",
+    "sourceContour": 0,
+    "sourceCurveBounds": [
+      78.92308044433594,
+      585.0,
+      465.2758483886719,
+      740.0
+    ],
+    "curveAwareDilatedBounds": [
+      52.91663360595703,
+      559.0,
+      491.2821044921875,
+      766.0
+    ],
+    "sourceHeight": 155.0,
+    "curveAwareHeight": 207.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "Õ",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      168.92308044433594,
+      795.0,
+      555.27587890625,
+      950.0
+    ],
+    "curveAwareDilatedBounds": [
+      142.9166259765625,
+      769.0,
+      581.2821044921875,
+      976.0
+    ],
+    "sourceHeight": 155.0,
+    "curveAwareHeight": 207.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "õ",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      88.92308044433594,
+      585.0,
+      475.2758483886719,
+      740.0
+    ],
+    "curveAwareDilatedBounds": [
+      62.91663360595703,
+      559.0,
+      501.2821044921875,
+      766.0
+    ],
+    "sourceHeight": 155.0,
+    "curveAwareHeight": 207.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "Â",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      144.44444274902344,
+      790.0,
+      498.20513916015625,
+      960.0
+    ],
+    "curveAwareDilatedBounds": [
+      118.44200897216797,
+      764.0,
+      524.2095336914062,
+      986.0
+    ],
+    "sourceHeight": 170.0,
+    "curveAwareHeight": 222.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "Ê",
+    "sourceContour": 0,
+    "sourceCurveBounds": [
+      125.44444274902344,
+      790.0,
+      478.5555419921875,
+      960.0
+    ],
+    "curveAwareDilatedBounds": [
+      99.44200897216797,
+      764.0,
+      504.5579833984375,
+      986.0
+    ],
+    "sourceHeight": 170.0,
+    "curveAwareHeight": 222.0,
+    "net": 26
+  },
+  {
+    "style": "dam",
+    "sourceGlyph": "Ô",
+    "sourceContour": 2,
+    "sourceCurveBounds": [
+      185.44444274902344,
+      790.0,
+      538.5555419921875,
+      960.0
+    ],
+    "curveAwareDilatedBounds": [
+      159.44200134277344,
+      764.0,
+      564.5580444335938,
+      986.0
+    ],
+    "sourceHeight": 170.0,
+    "curveAwareHeight": 222.0,
+    "net": 26
+  }
+]
