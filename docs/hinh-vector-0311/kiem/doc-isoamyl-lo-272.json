@@ -1,0 +1,379 @@
+{
+  "i": 850,
+  "hash": "9bd83e1ae3ac6448887a5da75485044a74206cfeb6bcd440ea8376df88d8032a",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9bd83e1ae3ac6448887a5da75485044a74206cfeb6bcd440ea8376df88d8032a.png",
+  "size": [
+    1195,
+    210
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C1-B1-D3-II-8",
+      "de": "Một học sinh tiến hành tổng hợp isoamyl acetate (thành phần chính của dầu chuối) từ acetic acid và isoamyl alcohol theo phương trình ở hình dưới. Sau thí nghiệm, tiến hành phân tách sản phẩm và ghi phổ hồng ngoại của acetic acid, isoamyl alcohol và isoamyl acetate.\nSố sóng hấp thụ đặc trưng: O-H (alcohol) 3650-3200 cm⁻¹; O-H (carboxylic acid) 3300-2500 cm⁻¹; C=O (ester, carboxylic acid) 1780-1650 cm⁻¹.",
+      "refs": [
+        {
+          "hash": "9bd83e1ae3ac6448887a5da75485044a74206cfeb6bcd440ea8376df88d8032a",
+          "where": "12-C1-B1-D3-II-8.hinh.0.du_lieu",
+          "hashDataUrl": "8ac87249a886d75c6518566f54e3255361a8f7007a53f00c994a99de23f0b873"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x/all1publicref actualopened;source-only chưaSVG/chưaĐạt.",
+  "coordinateMeaning": "Nativepixel approximate1–2px;scientificliteralreadsource,notanswer.",
+  "geometry": {
+    "acid": {
+      "carbonylC": [
+        114,
+        96
+      ],
+      "labels": [
+        {
+          "text": "H₃C",
+          "bbox": [
+            35,
+            105,
+            92,
+            132
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            138,
+            104,
+            181,
+            130
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            102,
+            43,
+            127,
+            69
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            90,
+            110
+          ],
+          [
+            114,
+            96
+          ]
+        ],
+        [
+          [
+            114,
+            96
+          ],
+          [
+            137,
+            110
+          ]
+        ],
+        [
+          [
+            110,
+            96
+          ],
+          [
+            110,
+            70
+          ]
+        ],
+        [
+          [
+            118,
+            96
+          ],
+          [
+            118,
+            70
+          ]
+        ]
+      ],
+      "caption": {
+        "text": "Acetic acid",
+        "bbox": [
+          39,
+          140,
+          198,
+          170
+        ],
+        "style": "BOLD upright uppercaseAonly"
+      }
+    },
+    "reactantPlus": {
+      "text": "+",
+      "bbox": [
+        215,
+        104,
+        237,
+        127
+      ]
+    },
+    "alcohol": {
+      "labels": [
+        {
+          "text": "HO",
+          "bbox": [
+            284,
+            99,
+            329,
+            128
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            412,
+            36,
+            469,
+            68
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            446,
+            100,
+            502,
+            132
+          ]
+        }
+      ],
+      "carbonVertices": [
+        [
+          353,
+          92
+        ],
+        [
+          388,
+          112
+        ],
+        [
+          423,
+          92
+        ]
+      ],
+      "bonds": [
+        "OatrightHO→(353,92):from330,106",
+        "353,92→388,112→423,92",
+        "423,92→423,68 topCH3Canchor",
+        "423,92→446,106 rightCH3Canchor"
+      ],
+      "caption": {
+        "text": "Isoamyl alcohol",
+        "bbox": [
+          274,
+          141,
+          501,
+          176
+        ],
+        "style": "BOLD upright uppercaseIonly"
+      }
+    },
+    "equilibrium": {
+      "upperRightHalfArrow": "shaft(544,106)→(724,106);filledhalfhead tip724,106 back708,101 (no loweropenVstroke)",
+      "lowerLeftHalfArrow": "shaft(724,112)→(544,112);filledhalfhead tip544,112 back560,117 (no upperopenVstroke)",
+      "above": {
+        "text": "H₂SO₄ đặc, t°",
+        "bbox": [
+          562,
+          64,
+          708,
+          93
+        ]
+      },
+      "note": "Twoopposingparallelshaftsandtwohalfheads,NOTsinglebidirectionalheadononeshaft;temp literalraisedsmallcircle noextraxt."
+    },
+    "ester": {
+      "carbonylC": [
+        827,
+        102
+      ],
+      "labels": [
+        {
+          "text": "H₃C",
+          "bbox": [
+            749,
+            110,
+            802,
+            137
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            815,
+            49,
+            840,
+            75
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            849,
+            110,
+            877,
+            138
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            956,
+            46,
+            1014,
+            78
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            993,
+            109,
+            1050,
+            139
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            802,
+            117
+          ],
+          [
+            827,
+            102
+          ]
+        ],
+        [
+          [
+            823,
+            102
+          ],
+          [
+            823,
+            77
+          ]
+        ],
+        [
+          [
+            831,
+            102
+          ],
+          [
+            831,
+            77
+          ]
+        ],
+        [
+          [
+            827,
+            102
+          ],
+          [
+            849,
+            115
+          ]
+        ],
+        [
+          [
+            877,
+            115
+          ],
+          [
+            898,
+            101
+          ]
+        ],
+        [
+          [
+            898,
+            101
+          ],
+          [
+            933,
+            121
+          ]
+        ],
+        [
+          [
+            933,
+            121
+          ],
+          [
+            968,
+            101
+          ]
+        ],
+        [
+          [
+            968,
+            101
+          ],
+          [
+            968,
+            78
+          ]
+        ],
+        [
+          [
+            968,
+            101
+          ],
+          [
+            993,
+            115
+          ]
+        ]
+      ],
+      "caption": {
+        "text": "Isoamyl acetate",
+        "bbox": [
+          791,
+          143,
+          1017,
+          179
+        ],
+        "style": "BOLD upright uppercaseIonly"
+      }
+    },
+    "water": {
+      "plus": {
+        "text": "+",
+        "bbox": [
+          1072,
+          98,
+          1092,
+          119
+        ]
+      },
+      "label": {
+        "text": "H₂O",
+        "bbox": [
+          1104,
+          95,
+          1162,
+          126
+        ]
+      }
+    },
+    "counts": "Acetic2C2O+isoamyl5C1O⇌ester7C2O+H2O;2COdouble;2labelsH3C/4labelsCH3 total6condensedmethyl acrossreactantsproducts;3captionsbold;2opposinghalfheads;2plusliteral. NoH2SO4stoich/phase/yield/answeradded.",
+    "style": "Allstructurebondsuniformthinblack/noStereo/wedges/charges;actualcaptionsbold andconditionsregular."
+  },
+  "uncertainties": [
+    "Tinyunconnectedmark nearx578,y28 abovecondition appearsgrain,notchemicalsymbol; noadditionalcondition invented."
+  ],
+  "actualSvgReviewed": false
+}

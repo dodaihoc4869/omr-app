@@ -1,0 +1,150 @@
+{
+  "nguoiDoc": "soat_nguon_3",
+  "repoModified": false,
+  "productionAdopt": false,
+  "fontCandidateCreated": false,
+  "verdict": "HOLD: no new fontgeometry sufficiently justified by actualdesign evidence",
+  "newGeometryDiagnostic": "Change Vcenterline rise ONLY, keep stroke82/120 andwidth370/400 withroundcaps; nouniformscale/noYoutlinecompression. This is an opticalredesign diagnostic, not a repaired font.",
+  "diagnosticRows": [
+    {
+      "style": "de",
+      "width": 370,
+      "strokeDiameter": 82,
+      "hatHeight": 170,
+      "centerlineRise": 88,
+      "branchAngleDegrees": 31.429565614838516,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1075,
+      "degeneratesIntoBar": false
+    },
+    {
+      "style": "de",
+      "width": 370,
+      "strokeDiameter": 82,
+      "hatHeight": 140,
+      "centerlineRise": 58,
+      "branchAngleDegrees": 21.93848046770647,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1045,
+      "degeneratesIntoBar": false
+    },
+    {
+      "style": "de",
+      "width": 370,
+      "strokeDiameter": 82,
+      "hatHeight": 110,
+      "centerlineRise": 28,
+      "branchAngleDegrees": 11.003540851749504,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1015,
+      "degeneratesIntoBar": false
+    },
+    {
+      "style": "de",
+      "width": 370,
+      "strokeDiameter": 82,
+      "hatHeight": 82,
+      "centerlineRise": 0,
+      "branchAngleDegrees": 0.0,
+      "centeredSeparatedEnvelopeTopAtBodyE": 987,
+      "degeneratesIntoBar": true
+    },
+    {
+      "style": "dam",
+      "width": 400,
+      "strokeDiameter": 120,
+      "hatHeight": 190,
+      "centerlineRise": 70,
+      "branchAngleDegrees": 26.56505117707799,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1174,
+      "degeneratesIntoBar": false
+    },
+    {
+      "style": "dam",
+      "width": 400,
+      "strokeDiameter": 120,
+      "hatHeight": 160,
+      "centerlineRise": 40,
+      "branchAngleDegrees": 15.945395900922854,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1144,
+      "degeneratesIntoBar": false
+    },
+    {
+      "style": "dam",
+      "width": 400,
+      "strokeDiameter": 120,
+      "hatHeight": 140,
+      "centerlineRise": 20,
+      "branchAngleDegrees": 8.13010235415598,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1124,
+      "degeneratesIntoBar": false
+    },
+    {
+      "style": "dam",
+      "width": 400,
+      "strokeDiameter": 120,
+      "hatHeight": 120,
+      "centerlineRise": 0,
+      "branchAngleDegrees": 0.0,
+      "centeredSeparatedEnvelopeTopAtBodyE": 1104,
+      "degeneratesIntoBar": true
+    }
+  ],
+  "budgets": [
+    {
+      "style": "de",
+      "bodyYmax": 742,
+      "maxHatHeightForSeparatedStackTop1000": 95,
+      "strokeDiameter": 82,
+      "centerlineRiseBudget": 13,
+      "angleIfNonnegative": 5.1585517806060395
+    },
+    {
+      "style": "de",
+      "bodyYmax": 752,
+      "maxHatHeightForSeparatedStackTop1000": 85,
+      "strokeDiameter": 82,
+      "centerlineRiseBudget": 3,
+      "angleIfNonnegative": 1.193489423982035
+    },
+    {
+      "style": "dam",
+      "bodyYmax": 756,
+      "maxHatHeightForSeparatedStackTop1000": 16,
+      "strokeDiameter": 120,
+      "centerlineRiseBudget": -104,
+      "angleIfNonnegative": 0.0
+    },
+    {
+      "style": "dam",
+      "bodyYmax": 766,
+      "maxHatHeightForSeparatedStackTop1000": 6,
+      "strokeDiameter": 120,
+      "centerlineRiseBudget": -114,
+      "angleIfNonnegative": 0.0
+    }
+  ],
+  "actualSVGOpened": "mu-giu-net-lo-272.jpg",
+  "findings": [
+    "Reducing hatheight while keeping fullstroke works geometrically by reducing centerline rise/angle, but at thebudget needed for strictlyseparated centeredstack DeEhat<=95 allows only13unitrise/~5.2degrees; DeOhat<=85 only3unitrise/~1.2degrees. ActualFULLsvg H110alreadylooksnearbar, H82exactbar.",
+    "Dam separatedbudget hat<=16(E/A) or6(O), belowstroke120, impossible for thisspecificseparatedVmasterconstruction evenbeforepositivecenterlinerise. This is NOT globalimpossibility of interleaving/redesign.",
+    "Reasonable-looking partialflattening(H140De/H160Dam) retainsstroke but saves30units only; no measuredactual12casefontcandidate supports it solvingallremainingglyphs. Do not claim potential as outcome.",
+    "A differenttildecenterline/amplitude redesign could preserve fullstroke but it changes sourcewavefamily and semanticreadability; no approved/mastergeometry or evidence yet. Not silently created to forceclippinggreen.",
+    "Originaltranslation/interleave270 alreadyboundednegative; no oldgridrerun here. DeẪ269limitedpositive stays exactoldhash, not carriedforward."
+  ],
+  "limits": [
+    "DiagnosticSVG originalmarkshapes derivedfromsame _vien/_hop_nhanh generator withconstantt; noarea filter orfontfallback.",
+    "No newWOFFcandidate means no newfontadmission/actualfontpositive. SVGdiagnostic solelytests readabilityofpossiblemasterangles.",
+    "Headroom1000 used as designbudget only; actualraster14/16 mayneedmoremargin and mustbe independentlymeasured foranyfuturecandidate."
+  ],
+  "repro": [
+    "hat-stroke-budget.py",
+    "render.cjs"
+  ],
+  "rootReproduced": true,
+  "rootRowsMatch": true,
+  "diagnosticCli": "scripts/do-mu-giu-net-ddh-lo-272-0311.py",
+  "inputs": {
+    "generatorSha256": "95c81819c3af75294bd8b698d82e8463856016427b20805c698ba79efc2a0d3e",
+    "scope": "8 V-master diagnostics only; no fontcandidate, no globalimpossibility",
+    "productionAdopt": false
+  },
+  "rootInputRowsSha256": "7d8c8617a1b8cf1267684ee654f884797784a4b0b5fd3ce6d91dedc52789df0d"
+}

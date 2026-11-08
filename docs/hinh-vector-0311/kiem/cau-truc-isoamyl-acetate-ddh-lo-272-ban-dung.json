@@ -1,0 +1,29 @@
+[
+  {
+    "i": 850,
+    "hash": "9bd83e1ae3ac6448887a5da75485044a74206cfeb6bcd440ea8376df88d8032a",
+    "fileNguon": "anh/9bd83e1ae3ac6448887a5da75485044a74206cfeb6bcd440ea8376df88d8032a.png",
+    "svg": "isoamyl-acetate-ddh-b8d01cfd1ce138c5499c7ae8ba61dd40a8eec849a8b3113e8aac69bf6003a4d3.svg",
+    "hashSvg": "b8d01cfd1ce138c5499c7ae8ba61dd40a8eec849a8b3113e8aac69bf6003a4d3",
+    "byteSvg": 45614,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-II-8",
+        "de": "Một học sinh tiến hành tổng hợp isoamyl acetate (thành phần chính của dầu chuối) từ acetic acid và isoamyl alcohol theo phương trình ở hình dưới. Sau thí nghiệm, tiến hành phân tách sản phẩm và ghi phổ hồng ngoại của acetic acid, isoamyl alcohol và isoamyl acetate.\nSố sóng hấp thụ đặc trưng: O-H (alcohol) 3650-3200 cm⁻¹; O-H (carboxylic acid) 3300-2500 cm⁻¹; C=O (ester, carboxylic acid) 1780-1650 cm⁻¹.",
+        "refs": [
+          {
+            "hash": "9bd83e1ae3ac6448887a5da75485044a74206cfeb6bcd440ea8376df88d8032a",
+            "where": "12-C1-B1-D3-II-8.hinh.0.du_lieu",
+            "hashDataUrl": "8ac87249a886d75c6518566f54e3255361a8f7007a53f00c994a99de23f0b873"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Acetic acid+Isoamyl alcohol⇌Isoamyl acetate+H2O/2COdouble/2CH3branches/2opposingfilledhalfheads/H2SO4 đặc,t°/3actualdamcaptions-case/noadded-yield-phase-answer.",
+    "hashSvgDaSoat": "b8d01cfd1ce138c5499c7ae8ba61dd40a8eec849a8b3113e8aac69bf6003a4d3",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
