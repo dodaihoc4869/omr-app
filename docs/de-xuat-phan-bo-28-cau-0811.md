@@ -2,7 +2,7 @@
 
 Trạng thái: **ĐỀ XUẤT, CHƯA BUILD.** Thay v1–v3. Thầy chốt 08/11: mọi em làm hết câu mới, sửa hết, ôn hết ⇒ bỏ khung bậc A/B/C và kho bù của v3.
 Nguồn ma trận: blueprint thầy gửi 08/11 (mã đề 0326 & 0339). Bằng chứng: `docs/de-xuat-28-cau-mo-phong/` (giả lập từng câu, từng ngày).
-**Cách chọn câu Ôn, số ngày Ôn và quy trình Sửa: theo `docs/de-xuat-on-sua-0811.md` (thay mục 1 Ôn/Sửa, mục 3 R và phương án A/B ở dưới).**
+**Cách chọn câu Ôn, số ngày Ôn và quy trình Sửa: theo `docs/de-xuat-on-sua-0811.md` (thay mục 1 Ôn/Sửa, mục 3 R và phương án A/B ở dưới).** Chu kỳ = M ngày Mới + ngân sách Ôn (1 ngày/bài) + S ngày Sửa. Bảng số ngày mục 4 dưới đây tính khi CHƯA có quên (tỉ lệ đúng cố định); kiểm tải có tính quên ở tài liệu Ôn/Sửa cho em khá ~10–11 ngày, em yếu ~18 ngày một bài 112 câu (giả định).
 
 ## 1. Ba loại ngày — mỗi ngày đúng một đề 28 câu, đúng ma trận
 
