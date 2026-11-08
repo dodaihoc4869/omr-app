@@ -1,0 +1,312 @@
+{
+  "i": 983,
+  "hash": "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a.png",
+  "size": [
+    912,
+    309
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C3-B8-III-3",
+      "de": "Cho các thông tin ở cột A và cột B dưới đây (xem hình).\nHãy ghép các công thức cấu tạo của cột A với tên gọi tương ứng của cột B theo thứ tự a), b), c) thành một dãy số có ba chữ số (Ví dụ: 132, 213,…).",
+      "allHinh": [
+        {
+          "hash": "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a",
+          "where": "VIP27-C3-B8-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "5a1bbfc8f51607d824f2f298faa6d70cd7c3cb9d18751d341ff4074c3924b46a"
+        }
+      ],
+      "missingHashes": [
+        "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a"
+      ]
+    }
+  ],
+  "fullClosure": "Only1qid1hinhmissingthishash=>1full/noPartial.",
+  "review": "NativeFULL+3x/all1publicrefs/allq.hinhread;source-only chưaSVG/chưaĐạt,noalias.",
+  "geometry": {
+    "headers": [
+      {
+        "text": "Cột (A)",
+        "bbox": [
+          135,
+          5,
+          234,
+          35
+        ],
+        "bold": true
+      },
+      {
+        "text": "Cột (B)",
+        "bbox": [
+          589,
+          5,
+          689,
+          35
+        ],
+        "bold": true
+      }
+    ],
+    "rowNumbers": [
+      {
+        "text": "(1)",
+        "bbox": [
+          4,
+          73,
+          43,
+          104
+        ]
+      },
+      {
+        "text": "(2)",
+        "bbox": [
+          4,
+          164,
+          43,
+          195
+        ]
+      },
+      {
+        "text": "(3)",
+        "bbox": [
+          4,
+          250,
+          43,
+          282
+        ]
+      }
+    ],
+    "molecules": [
+      {
+        "Nlabel": {
+          "text": "H₂N",
+          "bbox": [
+            113,
+            66,
+            173,
+            96
+          ],
+          "anchor": "Nright"
+        },
+        "NPhbond": [
+          [
+            175,
+            82
+          ],
+          [
+            201,
+            82
+          ]
+        ],
+        "phenylVertices": [
+          [
+            201,
+            82
+          ],
+          [
+            219,
+            50
+          ],
+          [
+            255,
+            50
+          ],
+          [
+            275,
+            82
+          ],
+          [
+            255,
+            114
+          ],
+          [
+            219,
+            114
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              209,
+              81
+            ],
+            [
+              224,
+              57
+            ]
+          ],
+          [
+            [
+              251,
+              57
+            ],
+            [
+              267,
+              81
+            ]
+          ],
+          [
+            [
+              223,
+              107
+            ],
+            [
+              251,
+              107
+            ]
+          ]
+        ],
+        "counts": "6C1N"
+      },
+      {
+        "Nlabel": {
+          "text": "H₂N",
+          "bbox": [
+            99,
+            154,
+            158,
+            185
+          ]
+        },
+        "NchainBond": [
+          [
+            159,
+            161
+          ],
+          [
+            179,
+            149
+          ]
+        ],
+        "chainVertices": [
+          [
+            179,
+            149
+          ],
+          [
+            210,
+            167
+          ],
+          [
+            241,
+            149
+          ],
+          [
+            272,
+            167
+          ]
+        ],
+        "counts": "4C1N"
+      },
+      {
+        "Nlabel": {
+          "text": "N",
+          "bbox": [
+            142,
+            235,
+            168,
+            262
+          ]
+        },
+        "Hlabel": {
+          "text": "H",
+          "bbox": [
+            142,
+            278,
+            167,
+            305
+          ]
+        },
+        "NHbond": [
+          [
+            155,
+            264
+          ],
+          [
+            155,
+            277
+          ]
+        ],
+        "NleftMethylBond": [
+          [
+            113,
+            226
+          ],
+          [
+            141,
+            242
+          ]
+        ],
+        "NrightBranchBond": [
+          [
+            170,
+            242
+          ],
+          [
+            198,
+            226
+          ]
+        ],
+        "branchVertices": [
+          [
+            198,
+            226
+          ],
+          [
+            231,
+            245
+          ],
+          [
+            263,
+            227
+          ]
+        ],
+        "topMethylBond": [
+          [
+            198,
+            226
+          ],
+          [
+            198,
+            192
+          ]
+        ],
+        "counts": "5C1N;3pathsfromNleftmethyl/rightbutan2C/downH. NoextraN-H2/charge."
+      }
+    ],
+    "columnBTexts": [
+      {
+        "text": "a) N-methylbutan-2-amine; amine bậc hai",
+        "bbox": [
+          383,
+          75,
+          906,
+          105
+        ]
+      },
+      {
+        "text": "b) butan-1-amine; amine bậc một",
+        "bbox": [
+          383,
+          168,
+          800,
+          197
+        ]
+      },
+      {
+        "text": "c) benzenamine; amine bậc một",
+        "bbox": [
+          383,
+          254,
+          780,
+          283
+        ]
+      }
+    ],
+    "textStyle": "ColumnBregularupright;headersBOLDupright;NOgrid/outerframe/rowlines. Keepsemicolon+hyphens+accents. Exactmethylcorrect(UNLIKEold267mehtyl),rowa bậchai notbậcba.",
+    "counts": "15C3Ntotal/1Ph3double/3explicitNlabels1explicitseparateH/2H2Ncondensed/2headers3rownums3columnBtexts. Noanswers/connectionmatchinglines/stereo/charges/titleadded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px;do notmatchanswers/source267or401withoutfreshdatareview.",
+  "actualSvgReviewed": false
+}

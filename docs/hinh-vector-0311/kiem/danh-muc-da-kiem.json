@@ -1189,6 +1189,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a": {
+      "tep": "amine-hai-cot-ddh-cb9bb8359a75122d6dd3c3bbb0155bda95b46383d6bae9b643c15bb5e4f58fec.svg",
+      "hashSvg": "cb9bb8359a75122d6dd3c3bbb0155bda95b46383d6bae9b643c15bb5e4f58fec",
+      "byteSvg": 72972,
+      "byteGzip": 8239,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e": {
       "tep": "o-nguyen-to-ddh-84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4.svg",
       "hashSvg": "84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4",
@@ -2580,6 +2589,15 @@
       "hashSvg": "7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e",
       "byteSvg": 2537,
       "byteGzip": 1008,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441": {
+      "tep": "hai-vong-duong-xy-ddh-d2cf12d1a3685b87d8b82fd04afbf700d88aa2d469adc5aab757716140d35df6.svg",
+      "hashSvg": "d2cf12d1a3685b87d8b82fd04afbf700d88aa2d469adc5aab757716140d35df6",
+      "byteSvg": 10238,
+      "byteGzip": 1693,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -13761,6 +13779,20 @@
       ]
     },
     {
+      "qid": "12-KT-C2-D4-I-8",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441",
+          "where": "12-KT-C2-D4-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "845d133527016ad9eba1d3a64c2f701fd64332b294d10a24651f884b12c1299f",
+          "vector": "hai-vong-duong-xy-ddh-d2cf12d1a3685b87d8b82fd04afbf700d88aa2d469adc5aab757716140d35df6.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D4-II-1",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -19635,6 +19667,20 @@
           "where": "DB-12-B5-D2-I-217.hinh.0.du_lieu",
           "hashDataUrl": "d03e318151bd030f8478ed5a0ef6d7602bc0557cbfb7e4c7f93099f347d3a717",
           "vector": "glucose-c6-ddh-8282151d59121234380c7055ee9898332ce1248fc795d32e72be5273b580afba.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-218",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441",
+          "where": "DB-12-B5-D2-I-218.hinh.0.du_lieu",
+          "hashDataUrl": "845d133527016ad9eba1d3a64c2f701fd64332b294d10a24651f884b12c1299f",
+          "vector": "hai-vong-duong-xy-ddh-d2cf12d1a3685b87d8b82fd04afbf700d88aa2d469adc5aab757716140d35df6.svg"
         }
       ]
     },
@@ -27769,6 +27815,20 @@
       ]
     },
     {
+      "qid": "VIP27-C3-B8-III-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a",
+          "where": "VIP27-C3-B8-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "5a1bbfc8f51607d824f2f298faa6d70cd7c3cb9d18751d341ff4074c3924b46a",
+          "vector": "amine-hai-cot-ddh-cb9bb8359a75122d6dd3c3bbb0155bda95b46383d6bae9b643c15bb5e4f58fec.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-C3-B10-II-2",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -28588,6 +28648,7 @@
     "12-KT-C1234-D2-I-5",
     "12-KT-C2-D4-I-3",
     "12-KT-C2-D4-I-5",
+    "12-KT-C2-D4-I-8",
     "12-KT-C2-D4-II-1",
     "12-KT-C2-D4-II-2",
     "12-KT-C2-D4-II-4",
@@ -28951,6 +29012,7 @@
     "DB-12-B5-D2-III-165",
     "DB-12-B5-D2-I-188",
     "DB-12-B5-D2-I-217",
+    "DB-12-B5-D2-I-218",
     "DB-12-B5-D2-II-222",
     "DB-12-B5-D2-I-224",
     "DB-12-B5-D2-I-227",
@@ -29465,6 +29527,7 @@
     "VIP27-C2-B7-D1-I-11",
     "VIP27-C2-B7-D2-I-16",
     "VIP27-C3-B8-II-2",
+    "VIP27-C3-B8-III-3",
     "VIP27-C3-B10-II-2",
     "VIP27-C3-B10-II-4",
     "VIP27-C3-B10-III-6",

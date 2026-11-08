@@ -1,0 +1,358 @@
+{
+  "i": 987,
+  "hash": "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441.png",
+  "size": [
+    565,
+    284
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C2-D4-I-8",
+      "de": "Phân tử maltose có cấu tạo như hình dưới đây.\nNhóm nguyên tử ở vị trí X, Y trong công thức trên lần lượt là",
+      "allHinh": [
+        {
+          "hash": "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441",
+          "where": "12-KT-C2-D4-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "845d133527016ad9eba1d3a64c2f701fd64332b294d10a24651f884b12c1299f"
+        }
+      ],
+      "missingHashes": [
+        "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441"
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-218",
+      "de": "Phân tử maltose có cấu tạo như hình dưới đây.\nNhóm nguyên tử ở vị trí X, Y trong công thức trên lần lượt là",
+      "allHinh": [
+        {
+          "hash": "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441",
+          "where": "DB-12-B5-D2-I-218.hinh.0.du_lieu",
+          "hashDataUrl": "845d133527016ad9eba1d3a64c2f701fd64332b294d10a24651f884b12c1299f"
+        }
+      ],
+      "missingHashes": [
+        "b162a9cd81d6f2696084260fa6626362671d7d1eac5d4bd877cd8003e076b441"
+      ]
+    }
+  ],
+  "fullClosure": "2qidsEACH1hinh/onlymissingthishash=>2full/noPartial.",
+  "review": "NativeFULL+4x/all2publicrefs/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "leftRing": {
+      "vertices": {
+        "leftBack": [
+          61,
+          149
+        ],
+        "leftFront": [
+          113,
+          188
+        ],
+        "rightFront": [
+          196,
+          188
+        ],
+        "rightBack": [
+          249,
+          148
+        ],
+        "upperLeft": [
+          113,
+          108
+        ],
+        "O": [
+          201,
+          103
+        ]
+      },
+      "backBonds": [
+        [
+          [
+            61,
+            149
+          ],
+          [
+            113,
+            108
+          ]
+        ],
+        [
+          [
+            113,
+            108
+          ],
+          [
+            185,
+            108
+          ]
+        ],
+        [
+          [
+            209,
+            116
+          ],
+          [
+            249,
+            148
+          ]
+        ]
+      ],
+      "subs": [
+        {
+          "text": "CH₂OH",
+          "bbox": [
+            102,
+            45,
+            196,
+            76
+          ],
+          "bond": [
+            [
+              113,
+              108
+            ],
+            [
+              113,
+              75
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            49,
+            189,
+            94,
+            216
+          ],
+          "bond": [
+            [
+              61,
+              149
+            ],
+            [
+              61,
+              187
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            102,
+            128,
+            145,
+            155
+          ],
+          "bond": [
+            [
+              113,
+              188
+            ],
+            [
+              113,
+              154
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            185,
+            227,
+            229,
+            255
+          ],
+          "bond": [
+            [
+              196,
+              188
+            ],
+            [
+              196,
+              226
+            ]
+          ]
+        }
+      ]
+    },
+    "rightRing": {
+      "vertices": {
+        "leftBack": [
+          325,
+          148
+        ],
+        "leftFront": [
+          374,
+          188
+        ],
+        "rightFront": [
+          456,
+          188
+        ],
+        "rightBack": [
+          511,
+          147
+        ],
+        "upperLeft": [
+          375,
+          107
+        ],
+        "O": [
+          457,
+          102
+        ]
+      },
+      "backBonds": [
+        [
+          [
+            325,
+            148
+          ],
+          [
+            375,
+            107
+          ]
+        ],
+        [
+          [
+            375,
+            107
+          ],
+          [
+            443,
+            107
+          ]
+        ],
+        [
+          [
+            465,
+            116
+          ],
+          [
+            511,
+            147
+          ]
+        ]
+      ],
+      "subs": [
+        {
+          "text": "X",
+          "bbox": [
+            365,
+            45,
+            385,
+            73
+          ],
+          "bond": [
+            [
+              375,
+              107
+            ],
+            [
+              375,
+              75
+            ]
+          ]
+        },
+        {
+          "text": "Y",
+          "bbox": [
+            501,
+            190,
+            521,
+            218
+          ],
+          "bond": [
+            [
+              511,
+              147
+            ],
+            [
+              511,
+              187
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            363,
+            128,
+            407,
+            155
+          ],
+          "bond": [
+            [
+              374,
+              188
+            ],
+            [
+              374,
+              154
+            ]
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            446,
+            227,
+            489,
+            255
+          ],
+          "bond": [
+            [
+              456,
+              188
+            ],
+            [
+              456,
+              226
+            ]
+          ]
+        }
+      ]
+    },
+    "bridge": {
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          276,
+          177,
+          298,
+          200
+        ]
+      },
+      "bonds": [
+        [
+          [
+            249,
+            148
+          ],
+          [
+            277,
+            178
+          ]
+        ],
+        [
+          [
+            298,
+            178
+          ],
+          [
+            325,
+            148
+          ]
+        ]
+      ]
+    },
+    "frontStyle": "Eachring2TAPERfromleftBack/rightBackNARROWtowardleftFront/rightFrontBROAD;frontbottomhorizontalBOLD;otherbondsthinuniform. Total4TAPER2bold.",
+    "counts": "11visibleC=10ringC+1CH2OH_C;9visibleO=2ringO+bridgeO+5freeOH+1CH2OH_O;X/YunknownDO NOTfillorcountasatoms. 1CH2OH/5OH/2unknownliteralXY/0explicitH/0Cnums/0caption/0arrow.",
+    "note": "AllOHliteralOHnotHO;firstCofCH2OHanchorleft;noH/stereonames/XYanswersadded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,unknownXYpreservednotmaltosetheory.",
+  "actualSvgReviewed": false
+}

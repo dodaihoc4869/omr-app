@@ -1,0 +1,29 @@
+[
+  {
+    "i": 983,
+    "hash": "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a",
+    "fileNguon": "anh/afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a.png",
+    "svg": "amine-hai-cot-ddh-cb9bb8359a75122d6dd3c3bbb0155bda95b46383d6bae9b643c15bb5e4f58fec.svg",
+    "hashSvg": "cb9bb8359a75122d6dd3c3bbb0155bda95b46383d6bae9b643c15bb5e4f58fec",
+    "byteSvg": 72972,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C3-B8-III-3",
+        "de": "Cho các thông tin ở cột A và cột B dưới đây (xem hình).\nHãy ghép các công thức cấu tạo của cột A với tên gọi tương ứng của cột B theo thứ tự a), b), c) thành một dãy số có ba chữ số (Ví dụ: 132, 213,…).",
+        "refs": [
+          {
+            "hash": "afd1bb70ac568c5fcc6f6b98e7a95053395f3012c585c156aa66967d8e5e2f6a",
+            "where": "VIP27-C3-B8-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "5a1bbfc8f51607d824f2f298faa6d70cd7c3cb9d18751d341ff4074c3924b46a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3amines15C3N/1phenyl3innerdouble/2H2NNanchors/1N1Hwithverticalbond/2actualdamheaders3rownums3regulartexts/EXACTN-methylbutan-2-amine;aminebậchai/NOgrid/noaddedmatchinglines-answer-charge-stereo.",
+    "hashSvgDaSoat": "cb9bb8359a75122d6dd3c3bbb0155bda95b46383d6bae9b643c15bb5e4f58fec",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
