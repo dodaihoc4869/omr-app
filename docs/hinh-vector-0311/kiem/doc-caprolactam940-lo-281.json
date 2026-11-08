@@ -1,0 +1,325 @@
+{
+  "i": 940,
+  "hash": "a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9.png",
+  "size": [
+    865,
+    304
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C34-D1-II-4",
+      "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học ở hình dưới.",
+      "allHinh": [
+        {
+          "hash": "a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9",
+          "where": "12-KT-C34-D1-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "b81797abf616e2b8e31bc2acbef52dfdcadeb46cca26678e52d50bb711d97da3"
+        }
+      ],
+      "missingHashes": [
+        "a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9"
+      ]
+    }
+  ],
+  "fullClosure": "Allaffectedqids onlymissingthishash,1hinh/1qid;willclosefullnotaddpartial ifactuallyadmitted.",
+  "review": "NativeFULL+3x/allpublicrefs/q.hinh actualread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "reactant": {
+      "HNlabel": {
+        "text": "HN",
+        "bbox": [
+          107,
+          109,
+          149,
+          136
+        ],
+        "anchor": "Nright/CObondtoNnotH"
+      },
+      "verticesFromCarbonylC": [
+        [
+          176,
+          109
+        ],
+        [
+          214,
+          128
+        ],
+        [
+          224,
+          169
+        ],
+        [
+          199,
+          201
+        ],
+        [
+          156,
+          201
+        ],
+        [
+          129,
+          168
+        ]
+      ],
+      "Ncenter": [
+        138,
+        124
+      ],
+      "closingBonds": [
+        [
+          [
+            129,
+            168
+          ],
+          [
+            136,
+            144
+          ]
+        ],
+        [
+          [
+            154,
+            120
+          ],
+          [
+            176,
+            109
+          ]
+        ]
+      ],
+      "carbonyl": {
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            166,
+            50,
+            190,
+            77
+          ]
+        },
+        "double": [
+          [
+            [
+              172,
+              109
+            ],
+            [
+              172,
+              83
+            ]
+          ],
+          [
+            [
+              180,
+              109
+            ],
+            [
+              180,
+              83
+            ]
+          ]
+        ]
+      },
+      "coefficient": {
+        "text": "n",
+        "bbox": [
+          83,
+          145,
+          99,
+          168
+        ]
+      },
+      "caption": {
+        "text": "caprolactam",
+        "bbox": [
+          74,
+          223,
+          248,
+          253
+        ],
+        "style": "regularuprightlowercase"
+      }
+    },
+    "arrow": {
+      "shaft": [
+        [
+          282,
+          163
+        ],
+        [
+          423,
+          163
+        ]
+      ],
+      "filledhead": [
+        [
+          407,
+          157
+        ],
+        [
+          423,
+          163
+        ],
+        [
+          407,
+          169
+        ]
+      ],
+      "above": {
+        "text": "t°",
+        "bbox": [
+          340,
+          126,
+          359,
+          151
+        ]
+      }
+    },
+    "polymer": {
+      "Nlabel": {
+        "text": "N",
+        "bbox": [
+          522,
+          143,
+          545,
+          170
+        ]
+      },
+      "Hlabel": {
+        "text": "H",
+        "bbox": [
+          521,
+          100,
+          544,
+          125
+        ]
+      },
+      "NHbond": [
+        [
+          533,
+          126
+        ],
+        [
+          533,
+          143
+        ]
+      ],
+      "verticesFromN": [
+        [
+          533,
+          158
+        ],
+        [
+          567,
+          181
+        ],
+        [
+          604,
+          161
+        ],
+        [
+          640,
+          181
+        ],
+        [
+          677,
+          161
+        ],
+        [
+          713,
+          181
+        ],
+        [
+          750,
+          161
+        ]
+      ],
+      "NbondToFirstCH2": [
+        [
+          546,
+          169
+        ],
+        [
+          567,
+          181
+        ]
+      ],
+      "leftFreeStub": [
+        [
+          481,
+          181
+        ],
+        [
+          518,
+          166
+        ]
+      ],
+      "rightFreeStub": [
+        [
+          750,
+          161
+        ],
+        [
+          801,
+          186
+        ]
+      ],
+      "COdouble": [
+        [
+          [
+            746,
+            161
+          ],
+          [
+            746,
+            135
+          ]
+        ],
+        [
+          [
+            754,
+            161
+          ],
+          [
+            754,
+            135
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          739,
+          102,
+          762,
+          129
+        ]
+      },
+      "roundBrackets": "left~x499 y135..198,curvedopenright;right~x780 y135..198,curvedopenleft;wholeN+5CH2+COinside,stubsprotrudebeyond.",
+      "nSub": {
+        "text": "n",
+        "bbox": [
+          779,
+          182,
+          796,
+          202
+        ]
+      },
+      "caption": {
+        "text": "capron",
+        "bbox": [
+          588,
+          223,
+          690,
+          253
+        ],
+        "style": "regularuprightlowercase"
+      }
+    },
+    "counts": "Reactant6C1O1NwithcondensedHN;product6C1O1NwithseparateHaboveN;5CH2barevertices+COeach,7memberlactam.2COdouble,1RIGHThead,1coefficientn,1roundpair+nsub,2lowercasecaptions.NoH2O/xt/R/temperaturevalue/stereo/answeradded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,connectivityfromsource notcapronname.",
+  "actualSvgReviewed": false
+}

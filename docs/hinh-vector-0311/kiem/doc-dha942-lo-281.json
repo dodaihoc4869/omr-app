@@ -1,0 +1,350 @@
+{
+  "i": 942,
+  "hash": "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a.png",
+  "size": [
+    859,
+    166
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C1-B1-D3-III-6",
+      "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau.\nTổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a",
+          "where": "12-C1-B1-D3-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "5b2bbdda08c255bd8df2d26f295b4850cf757f28ff87053431ab0ed04d371343"
+        }
+      ],
+      "missingHashes": [
+        "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a"
+      ]
+    },
+    {
+      "qid": "12-C1-B3-D2-III-1",
+      "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau.\nTổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a",
+          "where": "12-C1-B3-D2-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "5b2bbdda08c255bd8df2d26f295b4850cf757f28ff87053431ab0ed04d371343"
+        }
+      ],
+      "missingHashes": [
+        "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a"
+      ]
+    }
+  ],
+  "fullClosure": "Bothaffectedqids1hinhEACH,onlymissingthishash;actualadmitcloses2fullquestions/noadditionalpartial.",
+  "review": "NativeFULL+3x/all2publicrefs+allq.hinhactualread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "carbonVerticesZeroIndexFromCOOH": [
+      [
+        104,
+        78
+      ],
+      [
+        141,
+        42
+      ],
+      [
+        170,
+        79
+      ],
+      [
+        206,
+        43
+      ],
+      [
+        243,
+        43
+      ],
+      [
+        272,
+        80
+      ],
+      [
+        307,
+        44
+      ],
+      [
+        344,
+        44
+      ],
+      [
+        374,
+        80
+      ],
+      [
+        410,
+        45
+      ],
+      [
+        446,
+        45
+      ],
+      [
+        475,
+        81
+      ],
+      [
+        511,
+        46
+      ],
+      [
+        548,
+        46
+      ],
+      [
+        577,
+        82
+      ],
+      [
+        614,
+        47
+      ],
+      [
+        650,
+        47
+      ],
+      [
+        679,
+        83
+      ],
+      [
+        716,
+        48
+      ],
+      [
+        752,
+        48
+      ],
+      [
+        782,
+        84
+      ],
+      [
+        819,
+        48
+      ]
+    ],
+    "CCdoubles": [
+      {
+        "indices": [
+          3,
+          4
+        ],
+        "main": [
+          [
+            206,
+            43
+          ],
+          [
+            243,
+            43
+          ]
+        ],
+        "inner": [
+          [
+            208,
+            50
+          ],
+          [
+            241,
+            50
+          ]
+        ]
+      },
+      {
+        "indices": [
+          6,
+          7
+        ],
+        "main": [
+          [
+            307,
+            44
+          ],
+          [
+            344,
+            44
+          ]
+        ],
+        "inner": [
+          [
+            309,
+            51
+          ],
+          [
+            342,
+            51
+          ]
+        ]
+      },
+      {
+        "indices": [
+          9,
+          10
+        ],
+        "main": [
+          [
+            410,
+            45
+          ],
+          [
+            446,
+            45
+          ]
+        ],
+        "inner": [
+          [
+            412,
+            52
+          ],
+          [
+            444,
+            52
+          ]
+        ]
+      },
+      {
+        "indices": [
+          12,
+          13
+        ],
+        "main": [
+          [
+            511,
+            46
+          ],
+          [
+            548,
+            46
+          ]
+        ],
+        "inner": [
+          [
+            513,
+            53
+          ],
+          [
+            546,
+            53
+          ]
+        ]
+      },
+      {
+        "indices": [
+          15,
+          16
+        ],
+        "main": [
+          [
+            614,
+            47
+          ],
+          [
+            650,
+            47
+          ]
+        ],
+        "inner": [
+          [
+            616,
+            54
+          ],
+          [
+            648,
+            54
+          ]
+        ]
+      },
+      {
+        "indices": [
+          18,
+          19
+        ],
+        "main": [
+          [
+            716,
+            48
+          ],
+          [
+            752,
+            48
+          ]
+        ],
+        "inner": [
+          [
+            718,
+            55
+          ],
+          [
+            750,
+            55
+          ]
+        ]
+      }
+    ],
+    "carboxyl": {
+      "HOlabel": {
+        "text": "HO",
+        "bbox": [
+          34,
+          28,
+          75,
+          55
+        ],
+        "anchor": "OatRIGHTnotH"
+      },
+      "HObond": [
+        [
+          76,
+          42
+        ],
+        [
+          104,
+          78
+        ]
+      ],
+      "COdouble": [
+        [
+          [
+            101,
+            82
+          ],
+          [
+            101,
+            112
+          ]
+        ],
+        [
+          [
+            108,
+            82
+          ],
+          [
+            108,
+            112
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          93,
+          114,
+          117,
+          137
+        ]
+      },
+      "note": "COdoubletopsnearCjunctiontinygapscan y78..82;preservenoextraH. HOlabelleft/Odown."
+    },
+    "counts": "22C2O/6CCdouble+1COdouble/1freeRIGHTendpoint/HOleft. NoCH3orCH2labels/noCnumbers/namecaption/arrow/omegaanswer/chargeadded.",
+    "style": "Thinuniformblackzigzag,all6CCdoubleflatTOPwithinnerBELOW. Sourcechainverymildslopedrowy42→48 preservecoordinatesnotidealizedmirror."
+  },
+  "coordinateMeaning": "Nativepixelsapprox1–2px,vertexcountreadsource;noanswerderivedfromstem.",
+  "actualSvgReviewed": false
+}

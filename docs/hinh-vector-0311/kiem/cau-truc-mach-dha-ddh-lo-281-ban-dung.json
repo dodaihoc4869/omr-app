@@ -1,0 +1,40 @@
+[
+  {
+    "i": 942,
+    "hash": "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a",
+    "fileNguon": "anh/aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a.png",
+    "svg": "mach-dha-ddh-8ca70464a4f430b4d8af400bfc3302121adf62bfb5768274bea2c34be6d378c9.svg",
+    "hashSvg": "8ca70464a4f430b4d8af400bfc3302121adf62bfb5768274bea2c34be6d378c9",
+    "byteSvg": 2489,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-III-6",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau.\nTổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a",
+            "where": "12-C1-B1-D3-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "5b2bbdda08c255bd8df2d26f295b4850cf757f28ff87053431ab0ed04d371343"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B3-D2-III-1",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo omega-3 như docosahexaenoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch.\nCông thức cấu tạo của DHA như sau.\nTổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "aa2037842ff1ca13d23b55b8c5a6240122112dae14f783af066524f91729384a",
+            "where": "12-C1-B3-D2-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "5b2bbdda08c255bd8df2d26f295b4850cf757f28ff87053431ab0ed04d371343"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22bareC2O/6flatTOPCCdoubleinnerBELOW/COdoubleDOWN/HOleftOanchor/freeRIGHTend/allthinuniform/noaddedH-nums-omega-caption-answer.",
+    "hashSvgDaSoat": "8ca70464a4f430b4d8af400bfc3302121adf62bfb5768274bea2c34be6d378c9",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

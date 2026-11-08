@@ -1,0 +1,29 @@
+[
+  {
+    "i": 940,
+    "hash": "a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9",
+    "fileNguon": "anh/a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9.png",
+    "svg": "caprolactam-capron-ddh-8d133a393a0ca45b633aa31cc940ba62002a38ceca85828b619f93f567e9a8cb.svg",
+    "hashSvg": "8d133a393a0ca45b633aa31cc940ba62002a38ceca85828b619f93f567e9a8cb",
+    "byteSvg": 18714,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C34-D1-II-4",
+        "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hoá học ở hình dưới.",
+        "refs": [
+          {
+            "hash": "a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9",
+            "where": "12-KT-C34-D1-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "b81797abf616e2b8e31bc2acbef52dfdcadeb46cca26678e52d50bb711d97da3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7member6C1Nring/2COdouble/5bareCH2inpolymer/NwithHverticalbond/1filledRIGHT/t°above/ncoefficient+roundpair+nsub/exactlowercasecaprolactam-capron/noaddedH2O-condition-answer.",
+    "hashSvgDaSoat": "8d133a393a0ca45b633aa31cc940ba62002a38ceca85828b619f93f567e9a8cb",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
