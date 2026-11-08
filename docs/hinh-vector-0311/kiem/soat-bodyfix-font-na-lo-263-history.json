@@ -1,0 +1,741 @@
+{
+  "independentPerSubset": {
+    "ddh-rounded-de-latin.woff2": {
+      "shaMatches": true,
+      "errors": {
+        "nonTarget": [],
+        "metrics": [],
+        "accentContours": [],
+        "holdChanged": []
+      },
+      "changedCount": 11,
+      "independentBBoxDiffCP": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "shaMatches": true,
+      "errors": {
+        "nonTarget": [],
+        "metrics": [],
+        "accentContours": [],
+        "holdChanged": []
+      },
+      "changedCount": 21,
+      "independentBBoxDiffCP": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "shaMatches": true,
+      "errors": {
+        "nonTarget": [],
+        "metrics": [],
+        "accentContours": [],
+        "holdChanged": []
+      },
+      "changedCount": 21,
+      "independentBBoxDiffCP": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "shaMatches": true,
+      "errors": {
+        "nonTarget": [],
+        "metrics": [],
+        "accentContours": [],
+        "holdChanged": []
+      },
+      "changedCount": 11,
+      "independentBBoxDiffCP": []
+    }
+  },
+  "preoffsetUniqueTopologyAudit": {
+    "de": [
+      {
+        "cp": 65,
+        "char": "A",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 78,
+        "char": "N",
+        "valid": true,
+        "indices": [
+          0
+        ]
+      },
+      {
+        "cp": 97,
+        "char": "a",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 192,
+        "char": "À",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 193,
+        "char": "Á",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 194,
+        "char": "Â",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 195,
+        "char": "Ã",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 224,
+        "char": "à",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 225,
+        "char": "á",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 226,
+        "char": "â",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 227,
+        "char": "ã",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 258,
+        "char": "Ă",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 259,
+        "char": "ă",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7840,
+        "char": "Ạ",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7841,
+        "char": "ạ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7842,
+        "char": "Ả",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7843,
+        "char": "ả",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7844,
+        "char": "Ấ",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7845,
+        "char": "ấ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7846,
+        "char": "Ầ",
+        "valid": true,
+        "indices": [
+          2,
+          3
+        ]
+      },
+      {
+        "cp": 7847,
+        "char": "ầ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7848,
+        "char": "Ẩ",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7849,
+        "char": "ẩ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7850,
+        "char": "Ẫ",
+        "valid": false,
+        "indices": [
+          2
+        ]
+      },
+      {
+        "cp": 7851,
+        "char": "ẫ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7852,
+        "char": "Ậ",
+        "valid": false,
+        "indices": []
+      },
+      {
+        "cp": 7853,
+        "char": "ậ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7854,
+        "char": "Ắ",
+        "valid": true,
+        "indices": [
+          2,
+          3
+        ]
+      },
+      {
+        "cp": 7855,
+        "char": "ắ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7856,
+        "char": "Ằ",
+        "valid": true,
+        "indices": [
+          2,
+          3
+        ]
+      },
+      {
+        "cp": 7857,
+        "char": "ằ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7858,
+        "char": "Ẳ",
+        "valid": false,
+        "indices": [
+          1
+        ]
+      },
+      {
+        "cp": 7859,
+        "char": "ẳ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7860,
+        "char": "Ẵ",
+        "valid": false,
+        "indices": [
+          1
+        ]
+      },
+      {
+        "cp": 7861,
+        "char": "ẵ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7862,
+        "char": "Ặ",
+        "valid": false,
+        "indices": [
+          2
+        ]
+      },
+      {
+        "cp": 7863,
+        "char": "ặ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      }
+    ],
+    "dam": [
+      {
+        "cp": 65,
+        "char": "A",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 78,
+        "char": "N",
+        "valid": true,
+        "indices": [
+          0
+        ]
+      },
+      {
+        "cp": 97,
+        "char": "a",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 192,
+        "char": "À",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 193,
+        "char": "Á",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 194,
+        "char": "Â",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 195,
+        "char": "Ã",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 224,
+        "char": "à",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 225,
+        "char": "á",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 226,
+        "char": "â",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 227,
+        "char": "ã",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 258,
+        "char": "Ă",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 259,
+        "char": "ă",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7840,
+        "char": "Ạ",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7841,
+        "char": "ạ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7842,
+        "char": "Ả",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7843,
+        "char": "ả",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7844,
+        "char": "Ấ",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7845,
+        "char": "ấ",
+        "valid": true,
+        "indices": [
+          0,
+          2
+        ]
+      },
+      {
+        "cp": 7846,
+        "char": "Ầ",
+        "valid": true,
+        "indices": [
+          2,
+          3
+        ]
+      },
+      {
+        "cp": 7847,
+        "char": "ầ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7848,
+        "char": "Ẩ",
+        "valid": true,
+        "indices": [
+          1,
+          2
+        ]
+      },
+      {
+        "cp": 7849,
+        "char": "ẩ",
+        "valid": true,
+        "indices": [
+          0,
+          2
+        ]
+      },
+      {
+        "cp": 7850,
+        "char": "Ẫ",
+        "valid": false,
+        "indices": [
+          2
+        ]
+      },
+      {
+        "cp": 7851,
+        "char": "ẫ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7852,
+        "char": "Ậ",
+        "valid": false,
+        "indices": [
+          2
+        ]
+      },
+      {
+        "cp": 7853,
+        "char": "ậ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7854,
+        "char": "Ắ",
+        "valid": true,
+        "indices": [
+          2,
+          3
+        ]
+      },
+      {
+        "cp": 7855,
+        "char": "ắ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7856,
+        "char": "Ằ",
+        "valid": true,
+        "indices": [
+          2,
+          3
+        ]
+      },
+      {
+        "cp": 7857,
+        "char": "ằ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7858,
+        "char": "Ẳ",
+        "valid": false,
+        "indices": [
+          1
+        ]
+      },
+      {
+        "cp": 7859,
+        "char": "ẳ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7860,
+        "char": "Ẵ",
+        "valid": false,
+        "indices": [
+          1
+        ]
+      },
+      {
+        "cp": 7861,
+        "char": "ẵ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "cp": 7862,
+        "char": "Ặ",
+        "valid": false,
+        "indices": [
+          2
+        ]
+      },
+      {
+        "cp": 7863,
+        "char": "ặ",
+        "valid": true,
+        "indices": [
+          0,
+          1
+        ]
+      }
+    ]
+  },
+  "scope": "scratch only, no productionfont mutation",
+  "conclusion": "Limitedrepair candidate checkpoint only; hold five uppercaseaccentedA perstyle. Not globalfontadmission.",
+  "nguoiSoat": "soat_nguon_3",
+  "verdictLimitedRepair": "Có thể stage/adopt checkpoint giới hạn causal-repair NAa và family có unique preoffset topology; chưa deploy. Không phải admit toàn font.",
+  "verdictGlobalFont": "KHÔNG admit toànfont;5variant uppercaseẪẬẲẴẶ mỗi style giữ nguyên/HOLD, các accent defects cũ không được tuyên bố đã sửa.",
+  "fontBytesTotal": 35124,
+  "browserFreshProof": [
+    {
+      "w": 400,
+      "loadedFaces": 2,
+      "check": true
+    },
+    {
+      "w": 700,
+      "loadedFaces": 2,
+      "check": true
+    }
+  ],
+  "imagesFreshOpened": [
+    "/workspace/scratch/bodyfix-independent-dom-400.png",
+    "/workspace/scratch/bodyfix-independent-dom-700.png",
+    "/workspace/scratch/bodyfix-independent-svg-de.png",
+    "/workspace/scratch/bodyfix-independent-svg-dam.png"
+  ],
+  "existingKnownImagesOpened": [
+    "/workspace/scratch/glyph263/bodyfix-known-dam.jpg",
+    "/workspace/scratch/glyph263/bodyfix-known-de.jpg"
+  ],
+  "visualAssessment": "Tự fresh Chromium activeweight-specific fontloadcheck, DOM200/18/24/32px vàSVGpath200/18/24/32px cảĐề/Đậm; đã mở riêng4actualFULL. Không thấy pinholeN/A hoặc seam a mới trênNAa/Na/Aa. Knownsceneimages đã mở thêm; không thấyspike mới. Giữ thiết kế body, gaps/raster phù hợp phạmvi repair.",
+  "auditAssessment": "Độc lập tái dựng source preoffset pipeline trong memory tới them_duoi_a, tự tính NFD/point-count+cycliconcurveflags uniqueness: đúng5holds/style. FinalnonTargetcontours/metric/bbox exact; changedglyphs giữ sốcontoursmark exact multiset ngoài2bodycontours. Không copyhmtx, khôngthresholdarea trongbodyfixgenerator.",
+  "limits": [
+    "Checkpoint chỉ đánh giá limitedrepair; khôngtuyênbốtoànfontđẹphếtlỗi.",
+    "Chưa deployment,khôngsrcchange; root cầnkiểm speed/bundle/SW vàrerenderSVGphụthuộcfont trước release.",
+    "Uniquetopology khôngphảiproofhìnhhọctoànfont,nhưng ởNFDfamilyNAa hiện source audit matchedduynhất và nonTargetgiữexact; khôngforce5holdvariants."
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "i": 746,
+  "hashNguon": "f7e4c85d46d1becd0c9ce16449e543dd7c3793911e8c4db4b03bdeb6ccfd1fcc",
+  "nativeFullOpened": true,
+  "zoomOpened": "/workspace/scratch/source746-zoom.png",
+  "inCatalog": false,
+  "questions": [
+    {
+      "qid": "12-KT-C5-D1-II-1",
+      "maDe": "12-KT-C5-D1",
+      "de": "Một pin điện hoá Zn − H₂ được thiết lập ở các điều kiện như hình dưới (vôn kế có điện trở rất lớn). Nếu thay vôn kế bằng bóng đèn, quan sát thấy bóng đèn sáng và điện cực Zn tan dần.",
+      "hinh": [
+        {
+          "hash": "f7e4c85d46d1becd0c9ce16449e543dd7c3793911e8c4db4b03bdeb6ccfd1fcc",
+          "where": "12-KT-C5-D1-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a2008c0f73ff2319db878364a9a879797c7965de6ee5715d3a9ce8da5e8be7e5"
+        }
+      ]
+    }
+  ],
+  "sourceOnly": true,
+  "status": "Keep source-only; not enough certainty for literal reconstruction of texture/bubbles.",
+  "canvas": [
+    556,
+    490
+  ],
+  "labels": [
+    "0.762V",
+    "−",
+    "+",
+    "e⁻",
+    "e⁻",
+    "Zn",
+    "Zn²⁺",
+    "(1.00 M)",
+    "Cầu\nmuối",
+    "H⁺",
+    "(1.00 M)",
+    "Pt",
+    "H₂",
+    "(1 atm)"
+  ],
+  "geometry": [
+    "Two beakers side by side, right-facing pouring spouts. Left Zn rectangular electrode, right Pt dark electrode inside transparent gas sleeve.",
+    "Short horizontal saltbridge connects beakers near bottom at y380..403, not U overhead.",
+    "Meter upper-middle, leftjack−/rightjack+, two leads to each electrode. Two e− circles and two RIGHT arrows above horizontal wire sections.",
+    "H2 inlet arrow points LEFT toward side inlet of transparent right sleeve. Numerous small circular bubble/texture marks around right Pt, exact count obscured; do not invent count or convert to generic solid particles."
+  ],
+  "repoModified": false
+}

@@ -1,0 +1,27 @@
+{
+  "lo": 263,
+  "chromium": "614/614",
+  "hashXmlSelfcontainedSourcePngAst": true,
+  "build": true,
+  "speed": "21/21",
+  "precache": "170/2613.23KiB",
+  "serviceWorker": "14/14",
+  "serverTsc": true,
+  "mainFetched": "51139084606deee3ec1e9ee2946de3e2c7c39a66",
+  "fontVersion": "v5-bodyfix-NAamr-0811",
+  "fontScope": "1224 câu đủ mọi hình theo bộ trộn snapshot/7 một phần;871 nguồn→614SVG;11479969byte/localgzip2113433;557 nguồn chưa đạt. FontNAamr:31SVG/32nguồn/53câu đủ;chờ583SVG/839nguồn.",
+  "knownAsciiFontRegression": "10/10",
+  "rawMainNegativeControl": "10/10 expectedred",
+  "globalFontPassed": false,
+  "fontHoldActualBad": "5variants×2weights;soat-5ahold-lo-263.json",
+  "fullVitestThisBatch": true,
+  "fullProof": "full-vitest-lo-263.json",
+  "allFullCasesExecuted": false,
+  "commonBrowserSetupFailures": [
+    "tests/bang-tin-san-chong-chu-trinh-duyet-2109.test.ts",
+    "tests/phieu-tuong-phan-trinh-duyet.test.ts"
+  ],
+  "sizeBaselineRed": true,
+  "colorBaselineRed": true,
+  "gioiHan": "Chưa tích hợp/chưa actual reload offline app/chưa phát hành. Main51139084chưa gộp. BuildNAamr/speed21/21/Chromium614/614/hashXMLpathselfcontained/sourcePNGhash/AST/SW14/14/serverTSCđạt;assetdecodeofflineKHÔNGappoffline. KnownASCIItopology10/10xanh,RAWMAINđốichứng10/10đỏ(chỉcontours,khôngfontglobal).5AẪẬẲẴẶ×2weightsBADthật(bodypinhole,Ẫwrongmarks)đãactualDOM/SVG/macromởriêng;epsilon728vẫnthiếu. SizeNỀNđỏ297644Bnguyênbyte/khôngnângmốc. MàusoMain497viPhạm/88checkerfiles(87appsrcdiff+5fontREADME=92srcdiff);lôchỉfont4WOFF2README/generator+builders/assets/docs/diagnosticCLI,khôngsửaappCSS-TSX-harness-tests-mốc. Full cuối nhánh16581/16đỏ-main16732/5đỏ;11tênsoRIÊNGLẦNLƯỢTbranch3pass8fail/main11pass/head3pass8fail:0introducedcòntáihiệndoriêng263,NHƯNG8baselinevẫnđỏtrướcmerge/deploy. Giữfullđỏ+mainDenied56/20suiteslịchsử+NAinterrupted;mainpropernpmciownworktreefixDeniedfont/12casepreflightxanh. Còn2suitebrowserchung26casespendingvìthiếuheadlessshell1234,CDNdownload403 Domain forbidden;khôngsửatest/harnessné/khôngclaimđủmọicasehayhếtflaky. Latestmain/fullTHEOTÊN/cathi/khôngdeploychồngbắtbuộctrướcmerge/release."
+}

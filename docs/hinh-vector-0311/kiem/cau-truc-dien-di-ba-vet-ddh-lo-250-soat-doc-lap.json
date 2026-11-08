@@ -1,15 +1,13 @@
 [
   {
     "i": 657,
-    "hashSvg": "753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064",
-    "nguoiSoat": "soat_nguon_3",
-    "ketQua": "Đạt: Soát mới font-a; mở riêng native FULL và đọc toàn bộ public questions.de/refs. Tự fresh Chromium exact SVG bytes, kiểm SHA256 và mở actual FULL. Đúng khung kín,3đĩaXYZchữtrắng,thứtựtrái→phảiXYZ;terminal+trái/−phải và2shortwires. Cực dương x20 cógap trước terminaltrái,Cực âm phải đúngcase;khôngchạm/cắt. Khôngthêm startline/dash/arrows/pH/tênchất/đápán. DDH path-only không fallback.",
-    "render": "/workspace/scratch/fonta261extra-657-753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064.png",
-    "publicQids": [
-      "12-C3-B9-D3-I-19",
-      "DB-12-B9-P1-D2-I-45"
-    ],
+    "hashSvg": "0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: FINAL NAamr soát MỚI từng nativeFULL/allpublicrefs; tự freshChromium exactSVG rồi mởactualFULL riêng. 3solidXYZwhite/rect/+LEFT−RIGHT/2wires/literal2labels đúng; Cực dương có gap rõ khỏi terminal, mtrongâm sạch. Không thêm đápán/cắt/tràn/chạm. Không dùng oldpositive hay geometryflag đểduyệt.",
+    "actualSvgReviewed": true,
+    "byteSvg": 11542,
+    "render": "/workspace/scratch/review263a-657.jpg",
     "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
-    "hashSvgDaSoat": "753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064"
+    "hashSvgDaSoat": "0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8"
   }
 ]

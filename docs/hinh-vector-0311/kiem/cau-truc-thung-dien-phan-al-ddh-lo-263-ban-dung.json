@@ -1,0 +1,30 @@
+[
+  {
+    "i": 751,
+    "hash": "6a45ad684c147f12c04aac16950a7c34a8f1c58437598c331f0fefda4bf102d4",
+    "fileNguon": "anh/6a45ad684c147f12c04aac16950a7c34a8f1c58437598c331f0fefda4bf102d4.png",
+    "svg": "thung-dien-phan-al-ddh-11e6801c9044c93fcf7b62f48beb026bb36726ae32db2ba846da391ddce9e979.svg",
+    "hashSvg": "11e6801c9044c93fcf7b62f48beb026bb36726ae32db2ba846da391ddce9e979",
+    "byteSvg": 84156,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D4-II-3",
+        "de": "Trong công nghiệp, để sản xuất nhôm người ta điện phân hỗn hợp nóng chảy aluminium oxide (Al₂O₃) và cryolite với điện cực bằng than chì. Sơ đồ thùng điện phân Al₂O₃ nóng chảy được mô tả như hình dưới đây:",
+        "refs": [
+          {
+            "hash": "6a45ad684c147f12c04aac16950a7c34a8f1c58437598c331f0fefda4bf102d4",
+            "where": "12-KT-C5-D4-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "547a7af74c5f2c4b0f53af99aef2cd3c2d91dfae3205044e8da4faf4ce291332"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5anodes/5neckfeet/blackcathodewedgeDOWNRIGHT/2unequalwalls/2outletarms+gap+shaftprotrusion/3knoblobes+archbase/5plainleaders/6literalblocks12lines/noextraarrow-polarity-Hallname-answer.",
+    "hashSvgDaSoat": "11e6801c9044c93fcf7b62f48beb026bb36726ae32db2ba846da391ddce9e979",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

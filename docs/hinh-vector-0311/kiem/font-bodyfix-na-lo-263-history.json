@@ -1,0 +1,925 @@
+{
+  "admissible": false,
+  "scope": "Limited causal N/A/a body repair only. Five uppercase accented A glyphs per style unmatched, held unchanged; NOT global cleanfont claim.",
+  "subsets": {
+    "ddh-rounded-de-latin.woff2": {
+      "sha256": "4537de1ddb741d691996ca7645b5c2ab7a7b5f164fa09ca70ac563f558213d13",
+      "bytes": 11612,
+      "changedCP": [
+        65,
+        78,
+        97,
+        192,
+        193,
+        194,
+        195,
+        224,
+        225,
+        226,
+        227
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "sha256": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "bytes": 5888,
+      "changedCP": [
+        258,
+        259,
+        7840,
+        7841,
+        7842,
+        7843,
+        7844,
+        7845,
+        7846,
+        7847,
+        7848,
+        7849,
+        7851,
+        7853,
+        7854,
+        7855,
+        7856,
+        7857,
+        7859,
+        7861,
+        7863
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "sha256": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "bytes": 5948,
+      "changedCP": [
+        258,
+        259,
+        7840,
+        7841,
+        7842,
+        7843,
+        7844,
+        7845,
+        7846,
+        7847,
+        7848,
+        7849,
+        7851,
+        7853,
+        7854,
+        7855,
+        7856,
+        7857,
+        7859,
+        7861,
+        7863
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "sha256": "1fe9b9fe2abec3d94c5f38a9c2e896180b0b2b34b631952a7b8ea482716ff523",
+      "bytes": 11676,
+      "changedCP": [
+        65,
+        78,
+        97,
+        192,
+        193,
+        194,
+        195,
+        224,
+        225,
+        226,
+        227
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    }
+  },
+  "audit": [
+    {
+      "cp": 65,
+      "glyph": "A",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 78,
+      "glyph": "N",
+      "base": "N",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0
+      ]
+    },
+    {
+      "cp": 97,
+      "glyph": "a",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 192,
+      "glyph": "Agrave",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 193,
+      "glyph": "Aacute",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 194,
+      "glyph": "Acircumflex",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 195,
+      "glyph": "Atilde",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 224,
+      "glyph": "agrave",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 225,
+      "glyph": "aacute",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 226,
+      "glyph": "acircumflex",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 227,
+      "glyph": "atilde",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 258,
+      "glyph": "Abreve",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 259,
+      "glyph": "abreve",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7840,
+      "glyph": "uni1EA0",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7841,
+      "glyph": "uni1EA1",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7842,
+      "glyph": "uni1EA2",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7843,
+      "glyph": "uni1EA3",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7844,
+      "glyph": "uni1EA4",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7845,
+      "glyph": "uni1EA5",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7846,
+      "glyph": "uni1EA6",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        2,
+        3
+      ]
+    },
+    {
+      "cp": 7847,
+      "glyph": "uni1EA7",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7848,
+      "glyph": "uni1EA8",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7849,
+      "glyph": "uni1EA9",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7850,
+      "glyph": "uni1EAA",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        2
+      ]
+    },
+    {
+      "cp": 7851,
+      "glyph": "uni1EAB",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7852,
+      "glyph": "uni1EAC",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": []
+    },
+    {
+      "cp": 7853,
+      "glyph": "uni1EAD",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7854,
+      "glyph": "uni1EAE",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        2,
+        3
+      ]
+    },
+    {
+      "cp": 7855,
+      "glyph": "uni1EAF",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7856,
+      "glyph": "uni1EB0",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        2,
+        3
+      ]
+    },
+    {
+      "cp": 7857,
+      "glyph": "uni1EB1",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7858,
+      "glyph": "uni1EB2",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        1
+      ]
+    },
+    {
+      "cp": 7859,
+      "glyph": "uni1EB3",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7860,
+      "glyph": "uni1EB4",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        1
+      ]
+    },
+    {
+      "cp": 7861,
+      "glyph": "uni1EB5",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7862,
+      "glyph": "uni1EB6",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        2
+      ]
+    },
+    {
+      "cp": 7863,
+      "glyph": "uni1EB7",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 65,
+      "glyph": "A",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 78,
+      "glyph": "N",
+      "base": "N",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0
+      ]
+    },
+    {
+      "cp": 97,
+      "glyph": "a",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 192,
+      "glyph": "Agrave",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 193,
+      "glyph": "Aacute",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 194,
+      "glyph": "Acircumflex",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 195,
+      "glyph": "Atilde",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 224,
+      "glyph": "agrave",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 225,
+      "glyph": "aacute",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 226,
+      "glyph": "acircumflex",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 227,
+      "glyph": "atilde",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 258,
+      "glyph": "Abreve",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 259,
+      "glyph": "abreve",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7840,
+      "glyph": "uni1EA0",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7841,
+      "glyph": "uni1EA1",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7842,
+      "glyph": "uni1EA2",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7843,
+      "glyph": "uni1EA3",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7844,
+      "glyph": "uni1EA4",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7845,
+      "glyph": "uni1EA5",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        2
+      ]
+    },
+    {
+      "cp": 7846,
+      "glyph": "uni1EA6",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        2,
+        3
+      ]
+    },
+    {
+      "cp": 7847,
+      "glyph": "uni1EA7",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7848,
+      "glyph": "uni1EA8",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        1,
+        2
+      ]
+    },
+    {
+      "cp": 7849,
+      "glyph": "uni1EA9",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        2
+      ]
+    },
+    {
+      "cp": 7850,
+      "glyph": "uni1EAA",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        2
+      ]
+    },
+    {
+      "cp": 7851,
+      "glyph": "uni1EAB",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7852,
+      "glyph": "uni1EAC",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        2
+      ]
+    },
+    {
+      "cp": 7853,
+      "glyph": "uni1EAD",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7854,
+      "glyph": "uni1EAE",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        2,
+        3
+      ]
+    },
+    {
+      "cp": 7855,
+      "glyph": "uni1EAF",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7856,
+      "glyph": "uni1EB0",
+      "base": "A",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        2,
+        3
+      ]
+    },
+    {
+      "cp": 7857,
+      "glyph": "uni1EB1",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7858,
+      "glyph": "uni1EB2",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        1
+      ]
+    },
+    {
+      "cp": 7859,
+      "glyph": "uni1EB3",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7860,
+      "glyph": "uni1EB4",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        1
+      ]
+    },
+    {
+      "cp": 7861,
+      "glyph": "uni1EB5",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    },
+    {
+      "cp": 7862,
+      "glyph": "uni1EB6",
+      "base": "A",
+      "uniqueTopology": false,
+      "bodyIndices": [
+        2
+      ]
+    },
+    {
+      "cp": 7863,
+      "glyph": "uni1EB7",
+      "base": "a",
+      "uniqueTopology": true,
+      "bodyIndices": [
+        0,
+        1
+      ]
+    }
+  ],
+  "heldCP": [
+    7850,
+    7852,
+    7858,
+    7860,
+    7862
+  ],
+  "heldCharacters": "Ẫ Ậ Ẳ Ẵ Ặ",
+  "heldReason": "Source TTF already has different body geometry/topology: Ẫ/Ậ/Ặ outerA33points vs plainA29 andxmax638vs620; Ẳ/Ẵ outercontour51points/ymax867or868 includesbreve joined to body. This is not translation/finalrounding. Exacttopologyuniqueness fails and oldglyphs intentionally unchanged, not approximate-matched.",
+  "knownDOMSVG": [
+    {
+      "typ": "de",
+      "loaded": true,
+      "file": "/workspace/scratch/glyph263/bodyfix-known-de.jpg",
+      "bytes": 72628
+    },
+    {
+      "typ": "dam",
+      "loaded": true,
+      "file": "/workspace/scratch/glyph263/bodyfix-known-dam.jpg",
+      "bytes": 72513
+    }
+  ],
+  "DOM": [
+    {
+      "case": "large-dam",
+      "file": "/workspace/scratch/glyph263/bodyfix-large-dam.jpg",
+      "bytes": 59373,
+      "loaded": true
+    },
+    {
+      "case": "large-de",
+      "file": "/workspace/scratch/glyph263/bodyfix-large-de.jpg",
+      "bytes": 60740,
+      "loaded": true
+    },
+    {
+      "case": "viet-dam",
+      "file": "/workspace/scratch/glyph263/bodyfix-viet-dam.jpg",
+      "bytes": 143461,
+      "loaded": true
+    },
+    {
+      "case": "viet-de",
+      "file": "/workspace/scratch/glyph263/bodyfix-viet-de.jpg",
+      "bytes": 133547,
+      "loaded": true
+    },
+    {
+      "case": "app-sizes",
+      "file": "/workspace/scratch/glyph263/bodyfix-app-sizes.jpg",
+      "bytes": 128309,
+      "loaded": true
+    }
+  ],
+  "viewedActual": [
+    "bodyfix-known-de.jpg",
+    "bodyfix-known-dam.jpg",
+    "bodyfix-viet-de.jpg",
+    "bodyfix-viet-dam.jpg"
+  ],
+  "knownVerdict": "KnownN/A/a: freshDOM+SVG32/72/200 bothweights clean, tailjoinnohole; structuralcounter retained. This is limited candidate proof, NOT globalfontpass. Five held uppercaseAvariants remain existing blocker pending separate sourcedecomposition.",
+  "generatorInputSHA": "2b6b776eb7eac1b8af8719edf1ff2fa1b029918b8f6f00a284c1dc82077e24a4",
+  "scripts": {
+    "bodyfix.py": {
+      "path": "/workspace/scratch/glyph263/bodyfix.py",
+      "sha256": "c3a4a128d78f575e2b2da804820314ccf141de2fb8b058db73006381dbf06fee"
+    },
+    "bodyfix-generator.py": {
+      "path": "/workspace/scratch/glyph263/bodyfix-generator.py",
+      "sha256": "f07fdf0560f9c57adf62cd331f2301cbd284419938b9d06ab890b5ad04510fcd"
+    },
+    "known-svg.py": {
+      "path": "/workspace/scratch/glyph263/known-svg.py",
+      "sha256": "9facbe97061446d1fe5389db6b5804314d99eb827f42c98d437333c7a5c9a494"
+    },
+    "known-render.js": {
+      "path": "/workspace/scratch/glyph263/known-render.js",
+      "sha256": "de42a9b1f5c2a34875359d875af3a01bcf8d0a26d65dcaae22d0c13aa007d1e5"
+    },
+    "render-bodyfix.js": {
+      "path": "/workspace/scratch/glyph263/render-bodyfix.js",
+      "sha256": "818613210115bdc534f435f51cf13c27b7ee5e09e0f53c70781169be1adab7b7"
+    }
+  },
+  "candidateFiles": [
+    "/workspace/scratch/glyph263/bodyfix/ddh-rounded-de-latin.woff2",
+    "/workspace/scratch/glyph263/bodyfix/ddh-rounded-de-vietnamese.woff2",
+    "/workspace/scratch/glyph263/bodyfix/ddh-rounded-dam-vietnamese.woff2",
+    "/workspace/scratch/glyph263/bodyfix/ddh-rounded-dam-latin.woff2"
+  ]
+}

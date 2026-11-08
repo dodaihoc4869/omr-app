@@ -1,0 +1,85 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "fontModified": false,
+  "independentPerSubset": {
+    "ddh-rounded-de-latin.woff2": {
+      "candidateSHA": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "byteExactCurrent": false,
+      "changedCP": [
+        109,
+        114
+      ],
+      "metricMismatch": [],
+      "bboxMismatch": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "candidateSHA": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "byteExactCurrent": true,
+      "changedCP": [],
+      "metricMismatch": [],
+      "bboxMismatch": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "candidateSHA": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "byteExactCurrent": true,
+      "changedCP": [],
+      "metricMismatch": [],
+      "bboxMismatch": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "candidateSHA": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "byteExactCurrent": false,
+      "changedCP": [
+        109,
+        114
+      ],
+      "metricMismatch": [],
+      "bboxMismatch": []
+    }
+  },
+  "currentDamMrStage3Exact": {
+    "m": true,
+    "r": true
+  },
+  "openedImages": [
+    "/workspace/scratch/glyph264/known-de.jpg",
+    "/workspace/scratch/glyph264/known-dam.jpg",
+    "/workspace/scratch/glyph264/labels-de.jpg",
+    "/workspace/scratch/glyph264/labels-dam.jpg",
+    "/workspace/scratch/glyph264/mr-stages/dom/0-source.jpg",
+    "/workspace/scratch/glyph264/mr-stages/dom/2-after-offset.jpg",
+    "/workspace/scratch/glyph264/mr-stages/dom/3-after-transform.jpg",
+    "/workspace/scratch/glyph264/mr-stages/dom/4-no-offset.jpg"
+  ],
+  "visual": "Đã mởRIÊNGnativeDOM/SVG32/72/200px m/r/mr cảĐề/Đậm và4labelsPhosphorus/Nonmetal/Sodium/Alkali metal32/72px. Candidate không thấy2lỗm/1lỗr hoặcspike mới;DOM/SVG tươngứng. Source/nooffset sạch,offset xuất hiện lỗ trướctransform.",
+  "verdictLimited": "Có thể stage/adopt checkpoint limitedNAamr repair, chưa deploy; chỉ2Latin109/114 đổi so vớiBODYFIXNAa đãđạt. ToànbộVietnameseBYTEexactcurrent;giữ5uppercaseAhold mỗi style.",
+  "verdictGlobal": "KHÔNGadmittoànfont/khôngclaimmọiglyphhếtlỗi. Causaltrialm/rhiện có chỉDam đượcsource-stageexactrepro; kiểmĐềởcandidate làvisual+exactdiff.",
+  "reportCaveat": "report.json trongglyph264 lưuSHA Viet trước khi rootcopytrảcurrent; independentcurrentcandidatebytes xácnhậnViet đãBYTEexact, filebáocáocũ khôngdùnglàSHA hiện hành.",
+  "limits": [
+    "Khôngthresholdarea vàkhôngthaycase/caption.",
+    "Dùngcheckpointhashmới kiểmrelease gates vàrerenderfiguresphụthuộcm/r trướcchốt."
+  ],
+  "freshIndependentActual": {
+    "fontSource": "Read actual candidate LatinWOFF2 bytes directly during fresh Chromium launch, not oldCSS",
+    "reports": [
+      {
+        "typ": "de",
+        "loaded": true,
+        "file": "/workspace/scratch/glyph264/independent-fresh-known-de.jpg",
+        "bytes": 52544
+      },
+      {
+        "typ": "dam",
+        "loaded": true,
+        "file": "/workspace/scratch/glyph264/independent-fresh-known-dam.jpg",
+        "bytes": 55577
+      }
+    ],
+    "imagesOpenedFull": [
+      "/workspace/scratch/glyph264/independent-fresh-known-de.jpg",
+      "/workspace/scratch/glyph264/independent-fresh-known-dam.jpg"
+    ],
+    "result": "DOM+SVG32/72/200m/r/mr clean bothstyles; activefontchecks true."
+  }
+}

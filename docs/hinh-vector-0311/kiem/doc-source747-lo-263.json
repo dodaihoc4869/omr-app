@@ -1,0 +1,207 @@
+{
+  "i": 747,
+  "hashNguon": "730a1edd159858fce92a0a3ad570c8c6089e7ab1c68503003d775b5d90f94306",
+  "canvas": [
+    901,
+    337
+  ],
+  "nativeFullOpened": true,
+  "zoomOpened": [
+    "/workspace/scratch/source747-zoom.png",
+    "/workspace/scratch/source747-vessel6.png"
+  ],
+  "questions": [
+    {
+      "qid": "12-KT-C5-D1-III-6",
+      "maDe": "12-KT-C5-D1",
+      "de": "Sơ đồ thể hiện thiết bị mạ một chiếc thìa bằng bạc ở hình dưới.\nCho các phát biểu sau:\n(1) Bạc sẽ bám lên chiếc thìa bởi vì bạc là kim loại rất hoạt động.\n(2) Dung dịch điện phân là một muối bạc tan tốt trong nước.\n(3) Điện cực kim loại được làm bằng kim loại bạc.\n(4) Chiếc thìa được nối với cực âm của nguồn điện.\nLiệt kê các phát biểu đúng theo dãy số tăng dần số thứ tự (ví dụ: 1234,24,…).",
+      "hinh": [
+        {
+          "hash": "730a1edd159858fce92a0a3ad570c8c6089e7ab1c68503003d775b5d90f94306",
+          "where": "12-KT-C5-D1-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "f2cf07315b6db60586b2d4336e2c191569d161d8cfd44a59b678a59fb6bdff4d"
+        }
+      ]
+    }
+  ],
+  "inCatalog": false,
+  "sourceOnly": true,
+  "labels": [
+    {
+      "text": "chiếc thìa",
+      "at": [
+        240,
+        175
+      ],
+      "leader": [
+        [
+          303,
+          191
+        ],
+        [
+          375,
+          210
+        ]
+      ]
+    },
+    {
+      "text": "điện cực kim loại",
+      "at": [
+        601,
+        184
+      ],
+      "leader": [
+        [
+          514,
+          191
+        ],
+        [
+          440,
+          212
+        ]
+      ]
+    },
+    {
+      "text": "dung dịch điện phân",
+      "at": [
+        616,
+        255
+      ],
+      "leader": [
+        [
+          514,
+          267
+        ],
+        [
+          440,
+          248
+        ]
+      ]
+    }
+  ],
+  "geometry": {
+    "vessel": "open top, narrow tall U outline x345..477,y103..267, rounded bottom",
+    "liquidSurface": "horizontal x345..477 at129 behind spoon; no ellipse",
+    "spoon": "filled gray,handle x370..385,y115..190,taper then bowl x365..390,y190..231",
+    "electrode": "gray rectangle x432..449,y139..230",
+    "wires": [
+      [
+        [
+          326,
+          40
+        ],
+        [
+          326,
+          94
+        ],
+        [
+          378,
+          94
+        ],
+        [
+          378,
+          115
+        ]
+      ],
+      [
+        [
+          490,
+          40
+        ],
+        [
+          490,
+          94
+        ],
+        [
+          441,
+          94
+        ],
+        [
+          441,
+          139
+        ]
+      ]
+    ]
+  },
+  "dashPattern": {
+    "kind": "short HORIZONTAL strokes, not particles/circles",
+    "rowY": [
+      140,
+      152,
+      164,
+      176,
+      188,
+      200,
+      212,
+      224,
+      236,
+      247,
+      259
+    ],
+    "oddRowsNominalXIntervals": [
+      [
+        346,
+        356
+      ],
+      [
+        366,
+        375
+      ],
+      [
+        386,
+        398
+      ],
+      [
+        408,
+        418
+      ],
+      [
+        428,
+        437
+      ],
+      [
+        448,
+        457
+      ],
+      [
+        467,
+        477
+      ]
+    ],
+    "evenRowsNominalXIntervals": [
+      [
+        356,
+        366
+      ],
+      [
+        376,
+        385
+      ],
+      [
+        399,
+        408
+      ],
+      [
+        418,
+        428
+      ],
+      [
+        438,
+        447
+      ],
+      [
+        457,
+        466
+      ]
+    ],
+    "nominalCountWarning": "11 rows clearly visible;7/6 staggered slots readable from unobscured lower rows. Do not claim72 fully visible strokes: spoon/electrode cover slots and vessel curves clip bottom/side ends.",
+    "occlusion": "Pattern BEHIND filledspoon andrectelectrode, clipped insidebeaker. Odd rows1/3/5 have partial strokes atspoon edges andelectrode edges;row7 bowl covers more, evenrows2/4tinyedge remnants possible. Do not synthesize invisible fragments as if source evidence.",
+    "bottomRows": "y236 row7slots fullyreadable except sideedge; y247 sixslots; y2597slots with left/right shortened by roundedvesselwall."
+  },
+  "notes": [
+    "No +/− polarity/voltage source box, noAg labels/formula/answer added.",
+    "Underline under last word phân is thin text artifact visible; avoid interpreting it as data line.",
+    "Read source-only; exact tiny partial dash remnants still require comparing actual rendered figure before approval."
+  ],
+  "repoModified": false
+}

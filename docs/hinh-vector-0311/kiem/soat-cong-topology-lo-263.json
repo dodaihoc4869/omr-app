@@ -1,0 +1,36 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "fontModified": false,
+  "reviewedScript": "/workspace/omr-vector/scripts/kiem-lo-phong-ddh-0311.py",
+  "independentRuns": [
+    {
+      "case": "current",
+      "exitCode": 0,
+      "stdout": "{\"knownRegressionGatePass\": true, \"cases\": 10, \"failures\": []}",
+      "report": "/workspace/scratch/topology-independent-current-263.json"
+    },
+    {
+      "case": "rawmain",
+      "exitCode": 1,
+      "stdout": "{\"knownRegressionGatePass\": false, \"cases\": 10, \"failures\": [{\"weight\": \"de\", \"char\": \"N\", \"contours\": 3}, {\"weight\": \"de\", \"char\": \"A\", \"contours\": 4}, {\"weight\": \"de\", \"char\": \"a\", \"contours\": 3}, {\"weight\": \"de\", \"char\": \"m\", \"contours\": 5}, {\"weight\": \"de\", \"char\": \"r\", \"contours\": 2}, {\"weight\": \"dam\", \"char\": \"N\", \"contours\": 3}, {\"weight\": \"dam\", \"char\": \"A\", \"contours\": 6}, {\"weight\": \"dam\", \"char\": \"a\", \"contours\": 4}, {\"weight\": \"dam\", \"char\": \"m\", \"contours\": 3}, {\"weight\": \"dam\", \"char\": \"r\", \"contours\": 2}]}",
+      "report": "/workspace/scratch/topology-independent-rawmain-263.json"
+    }
+  ],
+  "verdict": "Hợp lệ làm cổng hồi quy GIỚI HẠN NAamr hiện có; không phải font-global admission.",
+  "whyValid": [
+    "Đọc trực tiếp2WOFF2Latin productionactual,khônggọi/chép thuậttoánlam_dam vàkhôngmirrorimplementation.",
+    "Chuẩn hóa outline quaPathOps simplify với winding trước đếm moveTo nên selfintersection cóthểbộc lộ contourlỗ màrawglyfcontourcount bỏsót.",
+    "Không lọcarea/size:khôngxóa lỗnhỏđể làmtestpass;thiếupathopsraise khôngskip.",
+    "Independent rerun current10/10green/exit0 vàrawmain10/10red/exit1,đúngSHAghiởreport. Negativecontrol táihiện knownfailures hữuích,khôngchỉtestfontfix tựclaim."
+  ],
+  "limits": [
+    "Contourcount làinvariant thô:đúng1/2contours khôngđảmbảohìnhdạng,bềdày,khoảngtrắng,connectivity/holeorientation đúng. Mộtglyphvẽsai/cụt vẫn cócountmongđợi;không thayexactoutline/metrics+DOM/SVGvisualreview.",
+    "simplify cónumerictolerance/internalSkia behavior;khôngareathresholdtrongscript khôngcó nghĩa bảođảm bắt mọi seam nhỏ ởmọiraster/cỡ/fontversion. Nênpin dependency đểreproducible.",
+    "ChỉASCII NAamr/2weightsLatin,khôngkiểmVietnameseaccents/5HOLD/kerning/GPOS/GSUB/lineheight/bbox/metrics,cmap haytoàncorpus.",
+    "Khôngxácnhậnsinglelettertests gồmwordshapingNa/rm hoặcappflow.",
+    "Font đổi thiết kế hợp lệ cóthểđổicontourcount;gatecốýđặc thùthiếtkếDDHhiện tại. Khôngđượcauto-normalize hayrepairproductionfont trongtest."
+  ],
+  "negativeControlObservation": "RAWMAIN mDe5,AĐậm6contours nhiều hơnholesnhìnthấy;đếmcontourskhôngnênđượcdiễnđạtlàsốlỗthực tếchínhxác. Cổngchỉkhẳngđịnhtopologydiffknownregression.",
+  "recommendation": "Giữcổng này nhưtestknownregression cùngvisualactualproof,exactnonTarget/metrics/bbox gates,5AcapsHOLD vàSW/speed trướcrelease;không cầnmởrộngscopechotasknày."
+}

@@ -1,0 +1,193 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "admissible": false,
+  "independentChecks": {
+    "ddh-rounded-de-latin.woff2": {
+      "shaMatchesReport": true,
+      "baselineVsCurrentMismatchCP": [],
+      "metricDiffCP": [],
+      "unaffectedContourDiffCP": [],
+      "accentRetentionFailures": [],
+      "unmatched": [
+        {
+          "cp": 192,
+          "char": "À",
+          "exactBaseline": true
+        },
+        {
+          "cp": 193,
+          "char": "Á",
+          "exactBaseline": true
+        },
+        {
+          "cp": 194,
+          "char": "Â",
+          "exactBaseline": true
+        },
+        {
+          "cp": 195,
+          "char": "Ã",
+          "exactBaseline": true
+        }
+      ],
+      "changedCount": 7
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "shaMatchesReport": true,
+      "baselineVsCurrentMismatchCP": [],
+      "metricDiffCP": [],
+      "unaffectedContourDiffCP": [],
+      "accentRetentionFailures": [],
+      "unmatched": [
+        {
+          "cp": 7850,
+          "char": "Ẫ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7852,
+          "char": "Ậ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7858,
+          "char": "Ẳ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7860,
+          "char": "Ẵ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7862,
+          "char": "Ặ",
+          "exactBaseline": true
+        }
+      ],
+      "changedCount": 21
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "shaMatchesReport": true,
+      "baselineVsCurrentMismatchCP": [],
+      "metricDiffCP": [],
+      "unaffectedContourDiffCP": [],
+      "accentRetentionFailures": [],
+      "unmatched": [
+        {
+          "cp": 259,
+          "char": "ă",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7843,
+          "char": "ả",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7845,
+          "char": "ấ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7847,
+          "char": "ầ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7850,
+          "char": "Ẫ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7851,
+          "char": "ẫ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7852,
+          "char": "Ậ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7853,
+          "char": "ậ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7855,
+          "char": "ắ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7858,
+          "char": "Ẳ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7859,
+          "char": "ẳ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7860,
+          "char": "Ẵ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7861,
+          "char": "ẵ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7862,
+          "char": "Ặ",
+          "exactBaseline": true
+        },
+        {
+          "cp": 7863,
+          "char": "ặ",
+          "exactBaseline": true
+        }
+      ],
+      "changedCount": 11
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "shaMatchesReport": true,
+      "baselineVsCurrentMismatchCP": [],
+      "metricDiffCP": [],
+      "unaffectedContourDiffCP": [],
+      "accentRetentionFailures": [],
+      "unmatched": [
+        {
+          "cp": 227,
+          "char": "ã",
+          "exactBaseline": true
+        }
+      ],
+      "changedCount": 10
+    }
+  },
+  "imagesOpened": [
+    "selective-large-dam.jpg",
+    "selective-large-de.jpg",
+    "selective-viet-dam.jpg",
+    "selective-viet-de.jpg",
+    "selective-app-sizes.jpg",
+    "viet-de.jpg",
+    "viet-dam.jpg",
+    "large-dam.jpg"
+  ],
+  "fullCandidate": "Reject as productioncandidate: changes arbitrary glyph outlines and accent geometry beyond knownNAa. De ẩ/ể/ổ xMax grows158/159/161fontunits; reportedunaffectedmetrics preserved only because hmtx restored. Trace7849 shows postoffset contour countchange3vs4 and later accent pipeline interaction; do not conclude wholefont fixed from cleanNAa.",
+  "selectiveAssessment": "Contourmatching criterion sound and conservative: semantic NFDbaseNAa, EXACT cyclicpoints+oncurveflags matching, no area/y/size heuristic. Independent scan confirms all other Unicode outlines exact and all metrics exact; unmatchedglyphs exactbaseline; all remaining accent contours retained as multisets. This preserves design outside replaced bodies but also preserves existing defects in unmatched or accents.",
+  "unresolved": "De ÀÁÂÃ plus ẪẬẲẴẶ;Dam ã andăảấầẫậắẳẵặ etc remain baseline. Some accentedA bodies were redrawn/specialized, so exactmatchabsence is not evidence safe to force replacement.",
+  "visual": "Selective NAa large looks cleaner, no new spike seen in openedfigures. Existing complicated accents remain crowded/distorted as baseline; do not call wholefont clean. Fullcurveaware accent regression visible in vietde/dam grids.",
+  "domLoadedFlagCaveat": "Four selectivecase loaded:false flags test BOTH700and400 regardlesscase; render-selective.js only requests one weight perlarge/vietcase. Therefore false does not itself prove activeface failed. Activeweight-specific check is still required before treatingthese as complete browserloadproof. Appcase requestsboth and reports true.",
+  "remainingLimits": [
+    "Noadmit orrepo/fontmutation.",
+    "Perweight face-load checks + missingUnicode + all compoundglyphs/GSUB/GPOS/kerning/anchors still need review.",
+    "Exact unaffectedcontours is not same as entireWOFF2byteidentity; names/ordering/timestamps may differ.",
+    "Metricpreservation andbboxequality do not prove visual-designidentity of replacedbodies; app-sizeandSVG independent review still required."
+  ]
+}

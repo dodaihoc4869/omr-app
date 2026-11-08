@@ -1,0 +1,35 @@
+{
+  "lo": 263,
+  "fontVersion": "v5-bodyfix-NAamr-0811",
+  "mainFetched": "51139084606deee3ec1e9ee2946de3e2c7c39a66",
+  "sourceFontMain": "e316e6b5",
+  "normalHash": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+  "boldHash": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+  "fontBytes": 35100,
+  "fontFiles": [
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "bytes": 11648
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2",
+      "sha": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "bytes": 5888
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2",
+      "sha": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "bytes": 5948
+    },
+    {
+      "file": "src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "bytes": 11616
+    }
+  ],
+  "generatorSha": "a988a8998429eb87f6d79449cefed36d13a8597a950cc3399c95c8b503e0b027",
+  "scope": "Sửa có giới hạn thân NAamr và biến thể họ NAa khớp topology duy nhất. Cả5AHOLDẪẬẲẴẶ mỗi kiểu giữ nguyên;không sạch toànfont/khôngtriểnkhai.",
+  "newSrcFontDiffIntentional": true,
+  "mainFontsUnmerged": true
+}

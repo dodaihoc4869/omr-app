@@ -1,0 +1,111 @@
+{
+  "status": "interrupted-not-final-proof",
+  "reason": "Bản NA-only trung gian phát hiện thêm m/r lỗi khi soát4elements; chốt thêm sửa m/r rồi chạy full lại trên fonts ổn định.",
+  "fontStage": "NA-only",
+  "fontFiles": {
+    "ddh-rounded-de-latin.woff2": {
+      "sha256": "4537de1ddb741d691996ca7645b5c2ab7a7b5f164fa09ca70ac563f558213d13",
+      "bytes": 11612,
+      "changedCP": [
+        65,
+        78,
+        97,
+        192,
+        193,
+        194,
+        195,
+        224,
+        225,
+        226,
+        227
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-de-vietnamese.woff2": {
+      "sha256": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "bytes": 5888,
+      "changedCP": [
+        258,
+        259,
+        7840,
+        7841,
+        7842,
+        7843,
+        7844,
+        7845,
+        7846,
+        7847,
+        7848,
+        7849,
+        7851,
+        7853,
+        7854,
+        7855,
+        7856,
+        7857,
+        7859,
+        7861,
+        7863
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-dam-vietnamese.woff2": {
+      "sha256": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "bytes": 5948,
+      "changedCP": [
+        258,
+        259,
+        7840,
+        7841,
+        7842,
+        7843,
+        7844,
+        7845,
+        7846,
+        7847,
+        7848,
+        7849,
+        7851,
+        7853,
+        7854,
+        7855,
+        7856,
+        7857,
+        7859,
+        7861,
+        7863
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    },
+    "ddh-rounded-dam-latin.woff2": {
+      "sha256": "1fe9b9fe2abec3d94c5f38a9c2e896180b0b2b34b631952a7b8ea482716ff523",
+      "bytes": 11676,
+      "changedCP": [
+        65,
+        78,
+        97,
+        192,
+        193,
+        194,
+        195,
+        224,
+        225,
+        226,
+        227
+      ],
+      "nonTargetOutlineChanged": [],
+      "metricMismatchCP": [],
+      "bboxDiff": []
+    }
+  },
+  "log": "/workspace/scratch/full263-branch.log",
+  "logSHA": "77b06f81b860d8f9bf67750af85afcb5deeefbb9e6a290cbb8cd074ff34bc03a",
+  "gioiHan": "Không coi lượt dừng giữa chừng là full đạt;giữ log/không thay full261đỏ17/6 và final263.",
+  "exitCode": 130
+}

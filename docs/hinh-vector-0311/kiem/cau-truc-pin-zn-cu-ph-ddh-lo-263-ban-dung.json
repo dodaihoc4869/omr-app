@@ -1,0 +1,29 @@
+[
+  {
+    "i": 750,
+    "hash": "466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325",
+    "fileNguon": "anh/466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325.png",
+    "svg": "pin-zn-cu-ph-ddh-d9f1b904f9acdbdf8a0d149fab1496e7179508e5231971411f4708bbd7949a79.svg",
+    "hashSvg": "d9f1b904f9acdbdf8a0d149fab1496e7179508e5231971411f4708bbd7949a79",
+    "byteSvg": 24901,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D4-II-1",
+        "de": "Một nhóm học sinh nghiên cứu ảnh hưởng của pH dung dịch đến sức điện động của pin Galvani Zn − Cu. Giả thuyết được đưa ra là: \"Khi thay đổi pH của dung dịch muối sẽ thay đổi sức điện động của pin điện\". Nhóm học sinh đó tiến hành thí nghiệm như sau ở 25 °C:\nThí nghiệm 1: Lấy thanh Zn nhúng vào cốc 1 đựng 400 mL dung dịch ZnSO₄ 1,25M và thanh Cu nhúng vào cốc 2 đựng 400 mL dung dịch CuSO₄ 1,25M, thêm nước cất vào cả hai cốc để thành 500 mL dung dịch. Nối hai dung dịch với nhau bằng cầu muối KCl nhão và hai thanh kim loại với một vôn kế như hình dưới.\nĐể hệ thống ổn định khoảng 2 phút và ghi lại số chỉ vôn kế, được giá trị là 1,10 V. Lặp lại các bước như thí nghiệm 1 nhưng thay nước cất ở một trong hai cốc bằng dung dịch H₂SO₄ 2M. Cụ thể:\nThí nghiệm 2: thay nước cất ở cốc 1 bằng 100 mL dung dịch H₂SO₄ 2M, thì số chỉ vôn kế là 1,07 V.\nThí nghiệm 3: thay nước cất ở cốc 2 bằng 100 mL dung dịch H₂SO₄ 2M, thì số chỉ vôn kế là 1,12 V.",
+        "refs": [
+          {
+            "hash": "466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325",
+            "where": "12-KT-C5-D4-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "f5a7f4d138b3c42c2bc314965af5f9d61a3e5dcbf939dd82339abf6145fd6250"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2beakers2unequalliquidlevels2coloredrods/oneopenUbridge/ovalvoltmeter1pointer2wires/5leaders/8literalblocks/noaddedvoltage-polarity-electrons-KCl-answer.",
+    "hashSvgDaSoat": "d9f1b904f9acdbdf8a0d149fab1496e7179508e5231971411f4708bbd7949a79",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

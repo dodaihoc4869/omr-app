@@ -34,14 +34,14 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4.svg",
-    "hashSvg": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4",
-    "byteSvg": 5540,
+    "svg": "bang-o-ddh-ce70959db18dfe97099ba286bfd8ed3c12d1a8a6eb84942dbe37d84c63cc621c.svg",
+    "hashSvg": "ce70959db18dfe97099ba286bfd8ed3c12d1a8a6eb84942dbe37d84c63cc621c",
+    "byteSvg": 5500,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
-    "hashSvgDaSoat": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4",
-    "nguoiSoat": "soat_nguon_3"
+    "hashSvgDaSoat": "ce70959db18dfe97099ba286bfd8ed3c12d1a8a6eb84942dbe37d84c63cc621c",
+    "nguoiSoat": "soat_nguon_2"
   },
   {
     "i": 229,
@@ -78,14 +78,14 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-b3e3017274ab7c41343fbc4cde6b024f0933829031e0097d7cdf9fc9fff3ab00.svg",
-    "hashSvg": "b3e3017274ab7c41343fbc4cde6b024f0933829031e0097d7cdf9fc9fff3ab00",
-    "byteSvg": 6865,
+    "svg": "bang-o-ddh-aa29f6e5a0853e56835926d2c5e7030b000b585df3b1087ce0f9a06ef243e4a9.svg",
+    "hashSvg": "aa29f6e5a0853e56835926d2c5e7030b000b585df3b1087ce0f9a06ef243e4a9",
+    "byteSvg": 7570,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
-    "hashSvgDaSoat": "b3e3017274ab7c41343fbc4cde6b024f0933829031e0097d7cdf9fc9fff3ab00",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "hashSvgDaSoat": "aa29f6e5a0853e56835926d2c5e7030b000b585df3b1087ce0f9a06ef243e4a9",
     "nguoiSoat": "soat_nguon_3"
   },
   {
@@ -149,14 +149,14 @@
         ]
       }
     ],
-    "svg": "bang-o-ddh-47cb792ba669eab3fd3bf818f39fd8e454cad679c19a05ec210a3e56c0a073ae.svg",
-    "hashSvg": "47cb792ba669eab3fd3bf818f39fd8e454cad679c19a05ec210a3e56c0a073ae",
-    "byteSvg": 96456,
+    "svg": "bang-o-ddh-d21a425356d4869ac38df28880a0180eef68887a54b2262664ca7f5e5dabb6a9.svg",
+    "hashSvg": "d21a425356d4869ac38df28880a0180eef68887a54b2262664ca7f5e5dabb6a9",
+    "byteSvg": 105350,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
-    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
-    "hashSvgDaSoat": "47cb792ba669eab3fd3bf818f39fd8e454cad679c19a05ec210a3e56c0a073ae",
-    "nguoiSoat": "soat_nguon_3"
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "hashSvgDaSoat": "d21a425356d4869ac38df28880a0180eef68887a54b2262664ca7f5e5dabb6a9",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

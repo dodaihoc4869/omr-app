@@ -1,0 +1,10 @@
+{
+  "file": "server/src/index.ts",
+  "bytes": 297644,
+  "sha": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf",
+  "baseline": 295021,
+  "allowance": 2048,
+  "changedThisBatch": false,
+  "log": "\n> omr-app@0.0.0 kiem:co-tep\n> node scripts/kiem-co-tep.mjs\n\n✗ server/src/index.ts: 297644 B > mốc 295021 B + 2048 B — tách bớt sang tệp khác rồi mới đẩy\nkiem-co-tep: 1 tệp vượt (ngưỡng 60 KB, dư 2 KB trên mốc).\n",
+  "gioiHan": "NỀNđỏphảixửlýtrướcmerge/deploy,khôngnângmốc."
+}

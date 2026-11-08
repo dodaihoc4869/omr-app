@@ -1,0 +1,28 @@
+[
+  {
+    "i": 1095,
+    "hashSvg": "70964f08a4d852645c21375220a1200b373ad28d9c8327a72a593e2d83dddbaf",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt sau sửa: Mở lạiRIÊNGnativeFULL vàđọcđủ4publicstem/refs; tựfreshChromiumexactSVG70964…dbafFULL2× vàmởactualFULL+curvezoom. Curve500°C hiện tăng rồi tiệm cận ngang, khôngvõng giảmnhưold5585. Đếm5curves/5opencircles/5legends350/400/450/500/550°C;2axisarrows,xticks0/100/200/300/400,yticks0..70,bothlabels/griddotted đúngsource. GlyphNAamr/gaps sạch,khôngchạm/cắt/tràn;khôngthêm450tick/data/answer.",
+    "svgElementDiffVsRejectedOld": {
+      "oldElementCount": 146,
+      "newElementCount": 146,
+      "differentElementIndices": [
+        104
+      ],
+      "note": "Independent XML diff: exactly ONE element (500°C curve path) changes; allother geometry/glyphpaths/transforms/labels exact."
+    },
+    "curve500DownwardSegments": [],
+    "nativeSource": "anh/c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd.png",
+    "render": "/workspace/scratch/haber1095-fixed70964-full.png",
+    "curveZoom": "/workspace/scratch/haber1095-fixed70964-curvezoom.png",
+    "publicQids": [
+      "DB-11-B5-D1-II-22",
+      "DB-11-B5-D1-II-29",
+      "DH-11-C2-B5-II-18",
+      "DH-11-C2-B9-D1-II-1"
+    ],
+    "repoModified": false,
+    "rejectsOldHash": "5585e34f6ae4a9dfa915e3a0a5fe7548acb3844cefc23982b1f8148b2a9d5ab2"
+  }
+]

@@ -39,18 +39,16 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "o-nguyen-to-ddh-49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911.svg",
-    "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
-    "byteSvg": 7358,
+    "svg": "o-nguyen-to-ddh-84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4.svg",
+    "hashSvg": "84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4",
+    "byteSvg": 7235,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "trangThai": "bi-loai-sau-soat-lai",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
-    "hashSvgDaSoat": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
-    "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d",
-    "lyDoLoai": "Lỗ glyph N/A/a actualold vàfont-a;proof o-nguyen-to-old-positive-lo-261-thu-hoi.json"
+    "hashSvgDaSoat": "84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4",
+    "nguoiSoat": "soat_hinh_vector"
   },
   {
     "i": 764,
@@ -94,17 +92,16 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "o-nguyen-to-ddh-205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff.svg",
-    "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
-    "byteSvg": 18061,
+    "svg": "o-nguyen-to-ddh-b2491fb0732d82347aefd8c687589c3d462b7f9baad6720406e3bf26fa05cc42.svg",
+    "hashSvg": "b2491fb0732d82347aefd8c687589c3d462b7f9baad6720406e3bf26fa05cc42",
+    "byteSvg": 18956,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
     "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
-    "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
-    "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d"
+    "hashSvgDaSoat": "b2491fb0732d82347aefd8c687589c3d462b7f9baad6720406e3bf26fa05cc42",
+    "nguoiSoat": "soat_hinh_vector"
   },
   {
     "i": 468,
@@ -148,18 +145,16 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "o-nguyen-to-ddh-0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df.svg",
-    "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
-    "byteSvg": 16112,
+    "svg": "o-nguyen-to-ddh-5c56503483314fe7b415fdf4b3cc07ab1c727b8d9d0cddbbf43627549ea9ec36.svg",
+    "hashSvg": "5c56503483314fe7b415fdf4b3cc07ab1c727b8d9d0cddbbf43627549ea9ec36",
+    "byteSvg": 18713,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "trangThai": "bi-loai-sau-soat-lai",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
-    "hashSvgDaSoat": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
-    "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d",
-    "lyDoLoai": "Lỗ glyph N/A/a actualold vàfont-a;proof o-nguyen-to-old-positive-lo-261-thu-hoi.json"
+    "hashSvgDaSoat": "5c56503483314fe7b415fdf4b3cc07ab1c727b8d9d0cddbbf43627549ea9ec36",
+    "nguoiSoat": "soat_hinh_vector"
   },
   {
     "i": 658,
@@ -201,17 +196,15 @@
       }
     ],
     "daTrongManifestSauDotDau": false,
-    "svg": "o-nguyen-to-ddh-9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3.svg",
-    "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
-    "byteSvg": 6758,
+    "svg": "o-nguyen-to-ddh-e85bc80d0f88cf4e75ef075bc7ae30c4974a04eb80d94513b752a1922da0f087.svg",
+    "hashSvg": "e85bc80d0f88cf4e75ef075bc7ae30c4974a04eb80d94513b752a1922da0f087",
+    "byteSvg": 6630,
     "font": "DDH Rounded",
-    "hashPhong": "88d88b3e2aae20fcc12d3f86a20e687448dabea032d3d2a04c03f352b5b5909c",
-    "hashPhongDam": "698148238feb9782ade8ef93ed8003bbe3e8af157bab533e97f8a43755111745",
-    "trangThai": "bi-loai-sau-soat-lai",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "trangThai": "da-soat-doc-lap",
     "ghiChuDung": "Giữ14,007/196,97dấuphẩy,30.974/22.990dấuchấm,cấuhình[Ne]3s²3p³/[Ne]3s¹;chữđậmWOFF2thật,khôngfauxbold.",
-    "hashSvgDaSoat": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
-    "nguoiSoat": "soat_nguon_2",
-    "dongBoPhongMain": "7b932d03da846841a3165a8bea1aa043ea1edb0d",
-    "lyDoLoai": "Lỗ glyph N/A/a actualold vàfont-a;proof o-nguyen-to-old-positive-lo-261-thu-hoi.json"
+    "hashSvgDaSoat": "e85bc80d0f88cf4e75ef075bc7ae30c4974a04eb80d94513b752a1922da0f087",
+    "nguoiSoat": "soat_hinh_vector"
   }
 ]

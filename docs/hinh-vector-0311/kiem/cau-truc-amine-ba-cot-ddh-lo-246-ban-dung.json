@@ -3,11 +3,11 @@
     "i": 582,
     "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
     "fileNguon": "anh/6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253.png",
-    "svg": "amine-ba-cot-ddh-08cfb68219098f0876f6be0d03d66392a283781b8d7b01228ea4affc3bf3b4ec.svg",
-    "hashSvg": "08cfb68219098f0876f6be0d03d66392a283781b8d7b01228ea4affc3bf3b4ec",
-    "byteSvg": 21171,
+    "svg": "amine-ba-cot-ddh-8fcbc1ff07f9b0ed30e6bc48bae436e8cedae494bf8c2a8483abc1be1bc8e19b.svg",
+    "hashSvg": "8fcbc1ff07f9b0ed30e6bc48bae436e8cedae494bf8c2a8483abc1be1bc8e19b",
+    "byteSvg": 22193,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,7 @@
       }
     ],
     "ghiChuDung": "3graybars/3dashedguides/2axisheads/literal9,40-3,37-3,23/Aniline-Dimethylamine-Ethylamine/noaddedzero-ticks-units-title-answer/DDHpath.",
-    "hashSvgDaSoat": "08cfb68219098f0876f6be0d03d66392a283781b8d7b01228ea4affc3bf3b4ec",
-    "nguoiSoat": "soat_nguon_2"
+    "hashSvgDaSoat": "8fcbc1ff07f9b0ed30e6bc48bae436e8cedae494bf8c2a8483abc1be1bc8e19b",
+    "nguoiSoat": "soat_nguon_3"
   }
 ]

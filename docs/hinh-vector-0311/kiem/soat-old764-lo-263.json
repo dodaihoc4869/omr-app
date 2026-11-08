@@ -1,0 +1,8 @@
+[
+  {
+    "i": 764,
+    "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: So RIÊNG old snapshot hash205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff lấy từ gitshowHEAD metadata; mở nativeFULL và tựfresh actual ChromiumFULL3x chính xác oldSVG, mở macro m/Nonmetal và r/Phosphorus. Old m/r nét kín sạch, không có hai lỗ kim/khía vai như newbodyfix. Giữ đúng15/30.974/P/Phosphorus/[Ne]3s²3p³/Nonmetal/màu/layout/viền, không crop/overlap. Hai publicrefs DB-10-B5-D1-I-14 vàDH-10-C2-B5-I-5 hinh.0/sau_de/publictrue đã đọc riêng và đối nguồn. Giữ old snapshot cho hai câu; KHÔNG gán verdict này cho hashnew9c7d47... và không thu hồi old khi không thấy lỗi. Đây kiểm hình thực không dựa fingerprint/fontmetadata."
+  }
+]

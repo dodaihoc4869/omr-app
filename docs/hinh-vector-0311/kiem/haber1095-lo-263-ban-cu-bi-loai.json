@@ -1,0 +1,1096 @@
+{
+  "source": "c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd",
+  "newFontNegative": {
+    "i": 1095,
+    "hash": "c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd",
+    "fileNguon": "anh/c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd.png",
+    "canvas": [
+      429,
+      305
+    ],
+    "daMoNative": true,
+    "kind": "graph-haber-yield",
+    "xLabel": "Áp suất (atm)",
+    "yLabel": "Hiệu suất (%)",
+    "xTicks": [
+      0,
+      100,
+      200,
+      300,
+      400
+    ],
+    "yTicks": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "curvesTopToBottom": [
+      "350 °C",
+      "400 °C",
+      "450 °C",
+      "500 °C",
+      "550 °C"
+    ],
+    "notes": "5curveđềuđi từorigin,tăngconglõmxuống,plateauphảikhácnhau.Top350°Ccao~64%,400°C~53%,450°C~43%,500°C~32%,550°C~22% chỉlàđọchìnhKHÔNGnhãnsốthêm. Mỗiđườngphảicóchấmrỗng ởx~450atm (native329) rồinốingangđếnhộpxámlabelnhiệtđộ trắng. Gridchấmx/ytheobước50atm/10%,tickxchỉ0..400. Khôngtựthêm450xtick. Phảibảođảm5labelđúngthứtự/curvenốirõ.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-II-22",
+        "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D1-II-29",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-II-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-II-18",
+        "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-II-1",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        45,
+        275
+      ],
+      "xArrowHead": [
+        366,
+        275
+      ],
+      "yArrowHead": [
+        45,
+        4
+      ],
+      "xTicks": [
+        [
+          0,
+          45
+        ],
+        [
+          100,
+          108
+        ],
+        [
+          200,
+          171
+        ],
+        [
+          300,
+          234
+        ],
+        [
+          400,
+          297
+        ]
+      ],
+      "yTicks": [
+        [
+          0,
+          275
+        ],
+        [
+          10,
+          239
+        ],
+        [
+          20,
+          204
+        ],
+        [
+          30,
+          169
+        ],
+        [
+          40,
+          134
+        ],
+        [
+          50,
+          100
+        ],
+        [
+          60,
+          65
+        ],
+        [
+          70,
+          30
+        ]
+      ],
+      "xLabelAnchor": [
+        372,
+        291
+      ],
+      "yLabelAnchor": [
+        8,
+        155
+      ]
+    },
+    "grid": {
+      "style": "dotted grey",
+      "verticalXs": [
+        45,
+        77,
+        108,
+        140,
+        171,
+        203,
+        234,
+        266,
+        297,
+        329,
+        360
+      ],
+      "horizontalYs": [
+        30,
+        65,
+        100,
+        134,
+        169,
+        204,
+        239,
+        275
+      ]
+    },
+    "curves": [
+      {
+        "label": "350 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            204
+          ],
+          [
+            80,
+            168
+          ],
+          [
+            100,
+            143
+          ],
+          [
+            140,
+            108
+          ],
+          [
+            180,
+            85
+          ],
+          [
+            220,
+            69
+          ],
+          [
+            260,
+            59
+          ],
+          [
+            300,
+            53
+          ],
+          [
+            329,
+            53
+          ],
+          [
+            359,
+            53
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          53
+        ],
+        "legendBox": [
+          365,
+          39,
+          420,
+          66
+        ],
+        "legendNotch": [
+          358,
+          53
+        ],
+        "legendTextAnchor": [
+          392,
+          53
+        ]
+      },
+      {
+        "label": "400 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            216
+          ],
+          [
+            80,
+            185
+          ],
+          [
+            100,
+            165
+          ],
+          [
+            140,
+            136
+          ],
+          [
+            180,
+            116
+          ],
+          [
+            220,
+            103
+          ],
+          [
+            260,
+            95
+          ],
+          [
+            300,
+            90
+          ],
+          [
+            329,
+            89
+          ],
+          [
+            359,
+            89
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          89
+        ],
+        "legendBox": [
+          365,
+          75,
+          420,
+          102
+        ],
+        "legendNotch": [
+          358,
+          89
+        ],
+        "legendTextAnchor": [
+          392,
+          89
+        ]
+      },
+      {
+        "label": "450 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            227
+          ],
+          [
+            80,
+            202
+          ],
+          [
+            100,
+            185
+          ],
+          [
+            140,
+            162
+          ],
+          [
+            180,
+            146
+          ],
+          [
+            220,
+            136
+          ],
+          [
+            260,
+            129
+          ],
+          [
+            300,
+            125
+          ],
+          [
+            329,
+            125
+          ],
+          [
+            359,
+            125
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          125
+        ],
+        "legendBox": [
+          365,
+          111,
+          420,
+          138
+        ],
+        "legendNotch": [
+          358,
+          125
+        ],
+        "legendTextAnchor": [
+          392,
+          125
+        ]
+      },
+      {
+        "label": "500 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            238
+          ],
+          [
+            80,
+            220
+          ],
+          [
+            100,
+            207
+          ],
+          [
+            140,
+            189
+          ],
+          [
+            180,
+            177
+          ],
+          [
+            220,
+            168
+          ],
+          [
+            260,
+            163
+          ],
+          [
+            300,
+            160
+          ],
+          [
+            329,
+            161
+          ],
+          [
+            359,
+            161
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          161
+        ],
+        "legendBox": [
+          365,
+          147,
+          420,
+          174
+        ],
+        "legendNotch": [
+          358,
+          161
+        ],
+        "legendTextAnchor": [
+          392,
+          161
+        ]
+      },
+      {
+        "label": "550 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            250
+          ],
+          [
+            80,
+            237
+          ],
+          [
+            100,
+            228
+          ],
+          [
+            140,
+            216
+          ],
+          [
+            180,
+            207
+          ],
+          [
+            220,
+            202
+          ],
+          [
+            260,
+            198
+          ],
+          [
+            300,
+            196
+          ],
+          [
+            329,
+            196
+          ],
+          [
+            359,
+            196
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          196
+        ],
+        "legendBox": [
+          365,
+          182,
+          420,
+          209
+        ],
+        "legendNotch": [
+          358,
+          196
+        ],
+        "legendTextAnchor": [
+          392,
+          196
+        ]
+      }
+    ],
+    "curveCount": 5,
+    "evidence": "Mởnative1095riêng;đen/xámcurveđượcso16cộtpixelvớigridphânbiệt. Cácsamplelàgeometrypixel,khôngtựin%sốtrêncurve. x329làcirclechấmrỗngcógridđứngcắt,khôngnhầmgridvớipeak.",
+    "svg": "haber-nox-ddh-5585e34f6ae4a9dfa915e3a0a5fe7548acb3844cefc23982b1f8148b2a9d5ab2.svg",
+    "hashSvg": "5585e34f6ae4a9dfa915e3a0a5fe7548acb3844cefc23982b1f8148b2a9d5ab2",
+    "byteSvg": 64848,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
+    "trangThai": "cho-soat-doc-lap",
+    "ghiChuDung": "PCHIPquaanchorsnative,nochuẩnhoáhóahọc.1095đủ5curve/5circlemở/5legend350..550°C/grid/ticks.1330đủ3curve/4guideY+guideverticalt1/từnglabel/color."
+  },
+  "oldPositivePendingRetraction": {
+    "i": 1095,
+    "hash": "c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd",
+    "fileNguon": "anh/c57d05735018f4fcb959f5616e1615e832548702fe760b54db0c78a76cf464dd.png",
+    "canvas": [
+      429,
+      305
+    ],
+    "daMoNative": true,
+    "kind": "graph-haber-yield",
+    "xLabel": "Áp suất (atm)",
+    "yLabel": "Hiệu suất (%)",
+    "xTicks": [
+      0,
+      100,
+      200,
+      300,
+      400
+    ],
+    "yTicks": [
+      0,
+      10,
+      20,
+      30,
+      40,
+      50,
+      60,
+      70
+    ],
+    "curvesTopToBottom": [
+      "350 °C",
+      "400 °C",
+      "450 °C",
+      "500 °C",
+      "550 °C"
+    ],
+    "notes": "5curveđềuđi từorigin,tăngconglõmxuống,plateauphảikhácnhau.Top350°Ccao~64%,400°C~53%,450°C~43%,500°C~32%,550°C~22% chỉlàđọchìnhKHÔNGnhãnsốthêm. Mỗiđườngphảicóchấmrỗng ởx~450atm (native329) rồinốingangđếnhộpxámlabelnhiệtđộ trắng. Gridchấmx/ytheobước50atm/10%,tickxchỉ0..400. Khôngtựthêm450xtick. Phảibảođảm5labelđúngthứtự/curvenốirõ.",
+    "questions": [
+      {
+        "qid": "DB-11-B5-D1-II-22",
+        "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-II-22.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D1-II-29",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "where": "DB-11-B5-D1-II-29.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B5-II-18",
+        "de": "Trong công nghiệp, Ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch. Phản ứng tổng hợp ammonia: N₂ (g) + 3H₂ (g) ⇋ 2NH₃ (g) ΔrH°₂₉₈ = – 91,8kJ Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây:",
+        "refs": [
+          {
+            "where": "DH-11-C2-B5-II-18.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B9-D1-II-1",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber-Bosch:\nN₂(g) + 3H₂(g) ⇌ 2NH₃(g), ΔrH°₂₉₈ = −91,8 kJ\nKết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "where": "DH-11-C2-B9-D1-II-1.hinh.0.du_lieu",
+            "viTri": "sau_de"
+          }
+        ]
+      }
+    ],
+    "axes": {
+      "origin": [
+        45,
+        275
+      ],
+      "xArrowHead": [
+        366,
+        275
+      ],
+      "yArrowHead": [
+        45,
+        4
+      ],
+      "xTicks": [
+        [
+          0,
+          45
+        ],
+        [
+          100,
+          108
+        ],
+        [
+          200,
+          171
+        ],
+        [
+          300,
+          234
+        ],
+        [
+          400,
+          297
+        ]
+      ],
+      "yTicks": [
+        [
+          0,
+          275
+        ],
+        [
+          10,
+          239
+        ],
+        [
+          20,
+          204
+        ],
+        [
+          30,
+          169
+        ],
+        [
+          40,
+          134
+        ],
+        [
+          50,
+          100
+        ],
+        [
+          60,
+          65
+        ],
+        [
+          70,
+          30
+        ]
+      ],
+      "xLabelAnchor": [
+        372,
+        291
+      ],
+      "yLabelAnchor": [
+        8,
+        155
+      ]
+    },
+    "grid": {
+      "style": "dotted grey",
+      "verticalXs": [
+        45,
+        77,
+        108,
+        140,
+        171,
+        203,
+        234,
+        266,
+        297,
+        329,
+        360
+      ],
+      "horizontalYs": [
+        30,
+        65,
+        100,
+        134,
+        169,
+        204,
+        239,
+        275
+      ]
+    },
+    "curves": [
+      {
+        "label": "350 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            204
+          ],
+          [
+            80,
+            168
+          ],
+          [
+            100,
+            143
+          ],
+          [
+            140,
+            108
+          ],
+          [
+            180,
+            85
+          ],
+          [
+            220,
+            69
+          ],
+          [
+            260,
+            59
+          ],
+          [
+            300,
+            53
+          ],
+          [
+            329,
+            53
+          ],
+          [
+            359,
+            53
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          53
+        ],
+        "legendBox": [
+          365,
+          39,
+          420,
+          66
+        ],
+        "legendNotch": [
+          358,
+          53
+        ],
+        "legendTextAnchor": [
+          392,
+          53
+        ]
+      },
+      {
+        "label": "400 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            216
+          ],
+          [
+            80,
+            185
+          ],
+          [
+            100,
+            165
+          ],
+          [
+            140,
+            136
+          ],
+          [
+            180,
+            116
+          ],
+          [
+            220,
+            103
+          ],
+          [
+            260,
+            95
+          ],
+          [
+            300,
+            90
+          ],
+          [
+            329,
+            89
+          ],
+          [
+            359,
+            89
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          89
+        ],
+        "legendBox": [
+          365,
+          75,
+          420,
+          102
+        ],
+        "legendNotch": [
+          358,
+          89
+        ],
+        "legendTextAnchor": [
+          392,
+          89
+        ]
+      },
+      {
+        "label": "450 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            227
+          ],
+          [
+            80,
+            202
+          ],
+          [
+            100,
+            185
+          ],
+          [
+            140,
+            162
+          ],
+          [
+            180,
+            146
+          ],
+          [
+            220,
+            136
+          ],
+          [
+            260,
+            129
+          ],
+          [
+            300,
+            125
+          ],
+          [
+            329,
+            125
+          ],
+          [
+            359,
+            125
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          125
+        ],
+        "legendBox": [
+          365,
+          111,
+          420,
+          138
+        ],
+        "legendNotch": [
+          358,
+          125
+        ],
+        "legendTextAnchor": [
+          392,
+          125
+        ]
+      },
+      {
+        "label": "500 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            238
+          ],
+          [
+            80,
+            220
+          ],
+          [
+            100,
+            207
+          ],
+          [
+            140,
+            189
+          ],
+          [
+            180,
+            177
+          ],
+          [
+            220,
+            168
+          ],
+          [
+            260,
+            163
+          ],
+          [
+            300,
+            160
+          ],
+          [
+            329,
+            161
+          ],
+          [
+            359,
+            161
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          161
+        ],
+        "legendBox": [
+          365,
+          147,
+          420,
+          174
+        ],
+        "legendNotch": [
+          358,
+          161
+        ],
+        "legendTextAnchor": [
+          392,
+          161
+        ]
+      },
+      {
+        "label": "550 °C",
+        "samples": [
+          [
+            45,
+            275
+          ],
+          [
+            60,
+            250
+          ],
+          [
+            80,
+            237
+          ],
+          [
+            100,
+            228
+          ],
+          [
+            140,
+            216
+          ],
+          [
+            180,
+            207
+          ],
+          [
+            220,
+            202
+          ],
+          [
+            260,
+            198
+          ],
+          [
+            300,
+            196
+          ],
+          [
+            329,
+            196
+          ],
+          [
+            359,
+            196
+          ]
+        ],
+        "endOpenCircle": [
+          329,
+          196
+        ],
+        "legendBox": [
+          365,
+          182,
+          420,
+          209
+        ],
+        "legendNotch": [
+          358,
+          196
+        ],
+        "legendTextAnchor": [
+          392,
+          196
+        ]
+      }
+    ],
+    "curveCount": 5,
+    "evidence": "Mởnative1095riêng;đen/xámcurveđượcso16cộtpixelvớigridphânbiệt. Cácsamplelàgeometrypixel,khôngtựin%sốtrêncurve. x329làcirclechấmrỗngcógridđứngcắt,khôngnhầmgridvớipeak.",
+    "svg": "haber-nox-ddh-917a10be7630dd6a0aa084900607a4ea9458120fd1d466219deafdb40c5cac57.svg",
+    "hashSvg": "917a10be7630dd6a0aa084900607a4ea9458120fd1d466219deafdb40c5cac57",
+    "byteSvg": 62853,
+    "font": "DDH Rounded",
+    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
+    "trangThai": "da-soat-doc-lap",
+    "ghiChuDung": "PCHIPquaanchorsnative,nochuẩnhoáhóahọc.1095đủ5curve/5circlemở/5legend350..550°C/grid/ticks.1330đủ3curve/4guideY+guideverticalt1/từnglabel/color.",
+    "hashSvgDaSoat": "917a10be7630dd6a0aa084900607a4ea9458120fd1d466219deafdb40c5cac57",
+    "nguoiSoat": "soat_nguon_2"
+  },
+  "reason": "Readonlyfresh current thấy500°C giảmnhẹ doanchor[300,160] rồi[329,161]. NativeFULL+zoom có tăng dần;darkestpixelx300=y161,khôngphảiy160. Khôngsửa theo lýthuyết/khôngnormalize5curves.",
+  "pixelEvidence": {
+    "260": {
+      "162": 142,
+      "163": 97,
+      "164": 68
+    },
+    "300": {
+      "159": 159,
+      "160": 85,
+      "161": 68,
+      "162": 199
+    },
+    "310": {
+      "159": 127,
+      "160": 97,
+      "161": 68
+    },
+    "320": {
+      "159": 68,
+      "160": 85,
+      "161": 127
+    }
+  },
+  "sua": "Chỉ500°Canchor[300,160]→[300,161],giữ329161/openpoint vàmọicurve/ticks/labels khác.",
+  "oldPositiveVerdict": "THU HỒI: oldhash917a10be…cac57cóvõng đãfreshsoátriêng/all4refs",
+  "oldPositiveProof": "soat-old-haber1095-lo-263-thu-hoi.json",
+  "replacementHash": "70964f08a4d852645c21375220a1200b373ad28d9c8327a72a593e2d83dddbaf",
+  "replacementProof": "soat-haber1095-fix-lo-263.json"
+}

@@ -3,11 +3,11 @@
     "i": 720,
     "hash": "1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04",
     "fileNguon": "anh/1407a116ec16210715dc272ed2f7bed1ba9436dfde6e6beb9e642445efaeed04.png",
-    "svg": "polymer-ba-doan-ddh-15692b4708a4118107d560066e58444aa2aaca8bee7514f437e5a7216a196be2.svg",
-    "hashSvg": "15692b4708a4118107d560066e58444aa2aaca8bee7514f437e5a7216a196be2",
-    "byteSvg": 13524,
+    "svg": "polymer-ba-doan-ddh-0be18a518ff55e3e75646c77cc4faa3e13b7c42aaac9ab314b9c8c9a169dc2c4.svg",
+    "hashSvg": "0be18a518ff55e3e75646c77cc4faa3e13b7c42aaac9ab314b9c8c9a169dc2c4",
+    "byteSvg": 14189,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -23,7 +23,7 @@
       }
     ],
     "ghiChuDung": "8backboneC/4CH2+4CH/1CCdouble/middleCH=CH/branchCNdown+phenyl6C3doubleDown/3roundpairs+abcsub/noextra n-answer-caption.",
-    "hashSvgDaSoat": "15692b4708a4118107d560066e58444aa2aaca8bee7514f437e5a7216a196be2",
-    "nguoiSoat": "soat_hinh_vector"
+    "hashSvgDaSoat": "0be18a518ff55e3e75646c77cc4faa3e13b7c42aaac9ab314b9c8c9a169dc2c4",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

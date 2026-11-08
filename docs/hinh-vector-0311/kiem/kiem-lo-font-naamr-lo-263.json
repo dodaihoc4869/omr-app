@@ -1,0 +1,108 @@
+{
+  "dependencyVersions": {
+    "python": "3.12.14",
+    "fonttools": "4.61.1",
+    "skia_pathops": "0.9.2"
+  },
+  "knownRegressionGatePass": true,
+  "cases": [
+    {
+      "weight": "de",
+      "char": "N",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "expectedContours": 1,
+      "actualContours": 1,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "de",
+      "char": "A",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "expectedContours": 2,
+      "actualContours": 2,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "de",
+      "char": "a",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "expectedContours": 2,
+      "actualContours": 2,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "de",
+      "char": "m",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "expectedContours": 1,
+      "actualContours": 1,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "de",
+      "char": "r",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "expectedContours": 1,
+      "actualContours": 1,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "dam",
+      "char": "N",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "expectedContours": 1,
+      "actualContours": 1,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "dam",
+      "char": "A",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "expectedContours": 2,
+      "actualContours": 2,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "dam",
+      "char": "a",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "expectedContours": 2,
+      "actualContours": 2,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "dam",
+      "char": "m",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "expectedContours": 1,
+      "actualContours": 1,
+      "passKnownRegression": true
+    },
+    {
+      "weight": "dam",
+      "char": "r",
+      "file": "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "expectedContours": 1,
+      "actualContours": 1,
+      "passKnownRegression": true
+    }
+  ],
+  "unresolvedFontGlyphsEachWeight": [
+    "Ẫ",
+    "Ậ",
+    "Ẳ",
+    "Ẵ",
+    "Ặ"
+  ],
+  "gioiHan": "Chỉ 10 ca NAamr từ WOFF2 thật; không tự duyệt toàn font/corpus hay thay soát DOM/SVG độc lập. Không dùng ngưỡng diện tích."
+}

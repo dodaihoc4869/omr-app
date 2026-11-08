@@ -3,11 +3,11 @@
     "i": 743,
     "hash": "1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9",
     "fileNguon": "anh/1907b3ca18d038df6af92575879dd5d9989ff81027648aaf78b78934c0b18ce9.png",
-    "svg": "pvac-pva-ddh-3a96a11d28f2c40c54675aea6ca7f71a06e99e17edfdc557f8fa57e05ce7f24f.svg",
-    "hashSvg": "3a96a11d28f2c40c54675aea6ca7f71a06e99e17edfdc557f8fa57e05ce7f24f",
-    "byteSvg": 20367,
+    "svg": "pvac-pva-ddh-911b2671bb1da2a9473d8b65c32dd51434c86778cbd990dc1f8d73dbf89d27e3.svg",
+    "hashSvg": "911b2671bb1da2a9473d8b65c32dd51434c86778cbd990dc1f8d73dbf89d27e3",
+    "byteSvg": 20768,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -23,7 +23,7 @@
       }
     ],
     "ghiChuDung": "HC≡CH→X→PVAc→PVA/3RIGHTheads/3numberlabels/conditions+CH3COOH;xt,t°,p;+NaOH,t°/casePVAc/noaddedformulaX-answer.",
-    "hashSvgDaSoat": "3a96a11d28f2c40c54675aea6ca7f71a06e99e17edfdc557f8fa57e05ce7f24f",
+    "hashSvgDaSoat": "911b2671bb1da2a9473d8b65c32dd51434c86778cbd990dc1f8d73dbf89d27e3",
     "nguoiSoat": "soat_nguon_2"
   }
 ]

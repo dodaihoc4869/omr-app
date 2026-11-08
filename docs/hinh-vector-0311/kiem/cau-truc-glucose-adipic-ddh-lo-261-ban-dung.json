@@ -3,11 +3,11 @@
     "i": 745,
     "hash": "95710609f02476234ea139f061362ce564de1aedba50b0f54c088a079c0d497d",
     "fileNguon": "anh/95710609f02476234ea139f061362ce564de1aedba50b0f54c088a079c0d497d.png",
-    "svg": "glucose-adipic-ddh-3e3d4577722ccfc16bc4bc8d271bdfe1933164df655fe86694b647d485a17550.svg",
-    "hashSvg": "3e3d4577722ccfc16bc4bc8d271bdfe1933164df655fe86694b647d485a17550",
-    "byteSvg": 26936,
+    "svg": "glucose-adipic-ddh-8e12b4fa546da4abb4761e0b9dd1964a31ee8e58be43c078afb9b46f1b49f773.svg",
+    "hashSvg": "8e12b4fa546da4abb4761e0b9dd1964a31ee8e58be43c078afb9b46f1b49f773",
+    "byteSvg": 27437,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -23,7 +23,7 @@
       }
     ],
     "ghiChuDung": "Glucose→HOOC-CH=CH-CH=CH-COOH→Adipic acid/2RIGHTarrows/enzymeH=80%/+H2H=75%/literalcase-noaddedanswer-catalyst-formula.",
-    "hashSvgDaSoat": "3e3d4577722ccfc16bc4bc8d271bdfe1933164df655fe86694b647d485a17550",
+    "hashSvgDaSoat": "8e12b4fa546da4abb4761e0b9dd1964a31ee8e58be43c078afb9b46f1b49f773",
     "nguoiSoat": "soat_nguon_3"
   }
 ]

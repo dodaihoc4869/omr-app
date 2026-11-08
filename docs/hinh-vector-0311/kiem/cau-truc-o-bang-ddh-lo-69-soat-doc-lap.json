@@ -1,46 +1,38 @@
 [
   {
     "i": 170,
-    "hashSvg": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4",
-    "nguoiSoat": "soat_nguon_3",
-    "ketQua": "Đạt: Soát mới bộ font chữ a, đã mở riêng native FULL và đọc đủ public questions.de/refs; tự fresh Chromium từ chính bytes SVG SHA256 đã kiểm, mở actual FULL. Ô9/F/Fluorine/19 đúng chữ và vị trí; nền xanh nhạt, khung kín, không sửa19; chữ mới rõ, không chạm/cắt. SVG path-only, không text/image fallback.",
-    "render": "/workspace/scratch/fonta261-170-d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4.png",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
-    "hashPhongDam": null,
-    "publicQids": [
-      "DB-10-B5-D1-III-79",
-      "DH-10-C2-B5-III-5"
-    ],
+    "hashSvg": "ce70959db18dfe97099ba286bfd8ed3c12d1a8a6eb84942dbe37d84c63cc621c",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: FINAL NAamr soát MỚI từng nativeFULL/allpublicrefs; tự freshChromium exactSVG rồi mởactualFULL riêng. 9/F/Fluorine/19, màu vàkhung đúng. Không thêm đápán/cắt/tràn/chạm. Không dùng oldpositive hay geometryflag đểduyệt.",
+    "actualSvgReviewed": true,
+    "byteSvg": 5500,
+    "render": "/workspace/scratch/review263a-170.jpg",
     "hash": "1cff56dd7ec1d21ea72530e629574c2957da373bffd2ce4ebad2c59627d49451",
-    "hashSvgDaSoat": "d9f01533e2bffddd26dc894fbb225d7e254ef375576c2340208a7963102628e4"
+    "hashSvgDaSoat": "ce70959db18dfe97099ba286bfd8ed3c12d1a8a6eb84942dbe37d84c63cc621c"
+  },
+  {
+    "i": 83,
+    "hashSvg": "d21a425356d4869ac38df28880a0180eef68887a54b2262664ca7f5e5dabb6a9",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: FINAL NAamr soát MỚI từng nativeFULL/allpublicrefs; tự freshChromium exactSVG rồi mởactualFULL riêng. 6cột/5hàng, 4tên đồuống/6headers-units/20numericentries và commas đúng từngô; glyphm/r/a vàgaps sạch. Không thêm đápán/cắt/tràn/chạm. Không dùng oldpositive hay geometryflag đểduyệt.",
+    "actualSvgReviewed": true,
+    "byteSvg": 105350,
+    "render": "/workspace/scratch/review263a-83.jpg",
+    "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
+    "hashSvgDaSoat": "d21a425356d4869ac38df28880a0180eef68887a54b2262664ca7f5e5dabb6a9"
   },
   {
     "i": 229,
-    "hashSvg": "b3e3017274ab7c41343fbc4cde6b024f0933829031e0097d7cdf9fc9fff3ab00",
+    "hashSvg": "aa29f6e5a0853e56835926d2c5e7030b000b585df3b1087ce0f9a06ef243e4a9",
     "nguoiSoat": "soat_nguon_3",
-    "ketQua": "Đạt: Soát mới bộ font chữ a, đã mở riêng native FULL và đọc đủ public questions.de/refs; tự fresh Chromium từ chính bytes SVG SHA256 đã kiểm, mở actual FULL. Ô6 góc trái/C/Carbon/12.011 giữ dấu chấm và3chữ số sau chấm; DDHĐậm choC, chữ mới không chạm/cắt. SVG path-only, không text/image fallback.",
-    "render": "/workspace/scratch/fonta261-229-b3e3017274ab7c41343fbc4cde6b024f0933829031e0097d7cdf9fc9fff3ab00.png",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
-    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
+    "ketQua": "Đạt: 6/C/Carbon/12.011 đúngcase/dấuchấm;glyphC/r/a/b/o/n vàgaps sạch. Khôngspike/pinhole/seam mới hoặcchạm/cắt/tràn.",
+    "phuongPhap": "Soát độc lậpFINALNAamr: mởRIÊNGnativeFULL vàmọipublicquestions.de/refs;tựfreshChromiumactualFULL2× từexactSVGbytesSHA256 vàmởriêngrender. Khôngtái dùngoldpositive;hashunchangedchỉlàbyteidentity,khôngsuynguyênnhân.",
+    "render": "/workspace/scratch/reviewb263-229-aa29f6e5a0853e56835926d2c5e7030b000b585df3b1087ce0f9a06ef243e4a9.png",
     "publicQids": [
       "DB-10-B5-D1-II-63",
       "DH-10-C2-B5-II-4"
     ],
     "hash": "27891bdb1ce1035be7697f290092ee578a51f4cafb090f3a3eb6818994171b36",
-    "hashSvgDaSoat": "b3e3017274ab7c41343fbc4cde6b024f0933829031e0097d7cdf9fc9fff3ab00"
-  },
-  {
-    "i": 83,
-    "hashSvg": "47cb792ba669eab3fd3bf818f39fd8e454cad679c19a05ec210a3e56c0a073ae",
-    "nguoiSoat": "soat_nguon_3",
-    "ketQua": "Đạt: Soát mới bộ font chữ a, đã mở riêng native FULL và đọc đủ public questions.de/refs; tự fresh Chromium từ chính bytes SVG SHA256 đã kiểm, mở actual FULL. 6cột5hàng, đủ4loại sữa; mọi số273/201/150/105, dấu phẩy4,6/4,7/4,8/3,1;3,7/1,8/0,3/0,1;3,5/3,6/3,6/0,5 và124/124/130/124 khớp; header/unit/case nguyên nguồn. Không chữ chạm đường bảng. SVG path-only, không text/image fallback.",
-    "render": "/workspace/scratch/fonta261-83-47cb792ba669eab3fd3bf818f39fd8e454cad679c19a05ec210a3e56c0a073ae.png",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
-    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
-    "publicQids": [
-      "VIP27-C3-B10-II-4"
-    ],
-    "hash": "10dae9aa17bea001c47c85eef417166ebc38e0a915f31138d9b56b6457611dac",
-    "hashSvgDaSoat": "47cb792ba669eab3fd3bf818f39fd8e454cad679c19a05ec210a3e56c0a073ae"
+    "hashSvgDaSoat": "aa29f6e5a0853e56835926d2c5e7030b000b585df3b1087ce0f9a06ef243e4a9"
   }
 ]

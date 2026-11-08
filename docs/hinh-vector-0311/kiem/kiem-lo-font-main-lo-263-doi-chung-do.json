@@ -1,0 +1,103 @@
+{
+  "knownRegressionGatePass": false,
+  "cases": [
+    {
+      "weight": "de",
+      "char": "N",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+      "expectedContours": 1,
+      "actualContours": 3,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "de",
+      "char": "A",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+      "expectedContours": 2,
+      "actualContours": 4,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "de",
+      "char": "a",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+      "expectedContours": 2,
+      "actualContours": 3,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "de",
+      "char": "m",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+      "expectedContours": 1,
+      "actualContours": 5,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "de",
+      "char": "r",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-latin.woff2",
+      "sha256": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+      "expectedContours": 1,
+      "actualContours": 2,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "dam",
+      "char": "N",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+      "expectedContours": 1,
+      "actualContours": 3,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "dam",
+      "char": "A",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+      "expectedContours": 2,
+      "actualContours": 6,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "dam",
+      "char": "a",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+      "expectedContours": 2,
+      "actualContours": 4,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "dam",
+      "char": "m",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+      "expectedContours": 1,
+      "actualContours": 3,
+      "passKnownRegression": false
+    },
+    {
+      "weight": "dam",
+      "char": "r",
+      "file": "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2",
+      "sha256": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+      "expectedContours": 1,
+      "actualContours": 2,
+      "passKnownRegression": false
+    }
+  ],
+  "unresolvedFontGlyphsEachWeight": [
+    "Ẫ",
+    "Ậ",
+    "Ẳ",
+    "Ẵ",
+    "Ặ"
+  ],
+  "gioiHan": "Chỉ 10 ca NAamr từ WOFF2 thật; không tự duyệt toàn font/corpus hay thay soát DOM/SVG độc lập. Không dùng ngưỡng diện tích."
+}

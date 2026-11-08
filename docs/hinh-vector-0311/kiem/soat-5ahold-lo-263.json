@@ -1,0 +1,494 @@
+{
+  "nguoiSoat": "soat_nguon_3",
+  "repoModified": false,
+  "fontModified": false,
+  "fontInputHashes": {
+    "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-latin.woff2": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+    "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+    "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-latin.woff2": "edee43b8d6d43c6d9e7724470180da1eaacdc83ec53364dd3dd6b039b9bf8daf",
+    "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2": "26b34c70e2830e992830e8dd54bf957e3f1aa331880edbcea9721b4548f90f29",
+    "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+    "/workspace/omr-vector/src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+    "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-latin.woff2": "8e7744ad7295abcd347a6a011e005df8b06159804ba52d8f8ee73a47d1c401de",
+    "/workspace/scratch/main263/src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2": "080aca217c83352f2743274f154b983e9a0c7e155152a9239ebaa8b69f03790a"
+  },
+  "freshEvidenceMethod": "Tựdựng10case,Chromiumheadlessfresh. NativeDOM dùng2WOFF2actualcurrent qua@fontfacebase64/unicode-range;SVGpath từTTFmerge đúng2WOFF2current,khônglivefont. Cả10case cósourceMPLUSRegular/Medium vàRAWMAINfont cạnhnhau,plusASCIIA. Mở riêng10FULL32/72/200 và10macro800. FontloadCurrent/Raw/Sourcecheckstrue từngcase.",
+  "results": [
+    {
+      "char": "Ẫ",
+      "cp": 7850,
+      "style": "de",
+      "weight": 400,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Đề:tilde vàcircumflex bịchồng/giao thànhX thayvìhai dấu tách nhưMPLUSsource."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/de-7850.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-de-7850.png"
+    },
+    {
+      "char": "Ậ",
+      "cp": 7852,
+      "style": "de",
+      "weight": 400,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Mũvàdotdưới vẫn đúngloại/vịtrí tổngquát;khôngphát hiện misplacedmark riêng,nhưng2bodypinhole làlỗi thật."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/de-7852.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-de-7852.png"
+    },
+    {
+      "char": "Ẳ",
+      "cp": 7858,
+      "style": "de",
+      "weight": 400,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Breve nối thânA đã xuất hiện ởMPLUSsource topology;khôngkếtluậnbad chỉvìnối. Tuy nhiên thânAcó2pinhole;Đậm còncóseam trắng ởjointbreve/body trongmacro."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/de-7858.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-de-7858.png"
+    },
+    {
+      "char": "Ẵ",
+      "cp": 7860,
+      "style": "de",
+      "weight": 400,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Breve nối thânA đã xuất hiện ởMPLUSsource topology;khôngkếtluậnbad chỉvìnối. Tuy nhiên thânAcó2pinhole;Đậm còncóseam trắng ởjointbreve/body trongmacro."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/de-7860.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-de-7860.png"
+    },
+    {
+      "char": "Ặ",
+      "cp": 7862,
+      "style": "de",
+      "weight": 400,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Mũvàdotdưới vẫn đúngloại/vịtrí tổngquát;khôngphát hiện misplacedmark riêng,nhưng2bodypinhole làlỗi thật."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/de-7862.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-de-7862.png"
+    },
+    {
+      "char": "Ẫ",
+      "cp": 7850,
+      "style": "dam",
+      "weight": 700,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Đậm:mark dựng thànhhai mái/hats xếpdọc cùnghooklệchphải ởtrên,khác tilde+circumflex củaMPLUSsource;misplaced/extra-lookingmark thật."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/dam-7850.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-dam-7850.png"
+    },
+    {
+      "char": "Ậ",
+      "cp": 7852,
+      "style": "dam",
+      "weight": 700,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Mũvàdotdưới vẫn đúngloại/vịtrí tổngquát;khôngphát hiện misplacedmark riêng,nhưng2bodypinhole làlỗi thật."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/dam-7852.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-dam-7852.png"
+    },
+    {
+      "char": "Ẳ",
+      "cp": 7858,
+      "style": "dam",
+      "weight": 700,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Breve nối thânA đã xuất hiện ởMPLUSsource topology;khôngkếtluậnbad chỉvìnối. Tuy nhiên thânAcó2pinhole;Đậm còncóseam trắng ởjointbreve/body trongmacro."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/dam-7858.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-dam-7858.png"
+    },
+    {
+      "char": "Ẵ",
+      "cp": 7860,
+      "style": "dam",
+      "weight": 700,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Breve nối thânA đã xuất hiện ởMPLUSsource topology;khôngkếtluậnbad chỉvìnối. Tuy nhiên thânAcó2pinhole;Đậm còncóseam trắng ởjointbreve/body trongmacro."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/dam-7860.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-dam-7860.png"
+    },
+    {
+      "char": "Ặ",
+      "cp": 7862,
+      "style": "dam",
+      "weight": 700,
+      "verdict": "BAD—giữHOLD/cầnfixtrướcduyệtglyph",
+      "observations": [
+        "Có2pinhole nhỏ trong nét đỉnh thânA, phía trên lòngtamgiác. MacroSVG800px quan sát được; ASCIIA đãBODYFIX bêncạnh sạch. 32px khóthấy hơn không phải bằngchứng glyphsạch.",
+        "Mũvàdotdưới vẫn đúngloại/vịtrí tổngquát;khôngphát hiện misplacedmark riêng,nhưng2bodypinhole làlỗi thật."
+      ],
+      "freshFontLoadChecks": {
+        "Current": {
+          "loaded": 2,
+          "check": true
+        },
+        "Raw": {
+          "loaded": 2,
+          "check": true
+        },
+        "Source": {
+          "loaded": 1,
+          "check": true
+        }
+      },
+      "exactCurrentVsRawMainOutline": true,
+      "comparison": "Current/RAWMAIN/sourceStyle/ASCIIA so trực tiếp;byteidentity chỉ hỗ trợtruyvết,khôngdùngđểmiễn lỗi.",
+      "domSvg32_72_200Actual": "/workspace/scratch/hold5-263/dam-7862.png",
+      "macroSvg800Actual": "/workspace/scratch/hold5-263/macro-dam-7862.png"
+    }
+  ],
+  "summary": "10/10 cóbad thật ởmacro:haiA-bodypinholes. Ẫ còn lỗi mark rõởcảĐề/Đậm. Ẳ/Ẵjointbreve bảnthânkhôngtựcoilàbad vìsourcecũngnối;damjointcóseam nhỏ. Không cócase chỉunmatchednhưngđượckếtluậnsạch saukiểmthực.",
+  "scope": "Đây là phân loại lỗi hiện hữu của5HOLD×2weights, khôngadmit/rejecttoànfont. GiữlimitedNAamr checkpointnhưng5glyph nàychưađượcduyệt.",
+  "macroFraming": "Macro800 dànhxemthân/joint:ẪĐậmtopmarkvàdotdướiởẬ/Ặ cóthểbịframecắt;khôngcoilàfontclipping. Full200comparisonframes thấytoànglyph/marks/dots.",
+  "nextWork": "Fixbody/joint cho5glyph mỗiweight dựatrênsourcevàthựcproof;Ẫmark cầnđiềutra riêngpipelinevịtrídấu. KhôngforceASCIIA contourmatch hoặc sửa theoareathreshold.",
+  "repoEvidence": [
+    {
+      "char": "Ẫ",
+      "style": "de",
+      "view": "full",
+      "file": "font-5ahold-lo-263-de-7850-full.jpg",
+      "sha256": "e31d6829f54e034a4f6398c5a566de5ffff56bd135732a62fc33ff2e98e1946b",
+      "bytes": 70720,
+      "originalPngSHA": "2a2827bdbe69cf62519df01d4806a8dca4a92ef0d414a1acf8fbc5ddb382bd57"
+    },
+    {
+      "char": "Ẫ",
+      "style": "de",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-de-7850-macro.jpg",
+      "sha256": "b5a31dcf61be6befb0f0e53a4dd3386e6efaaf34d9efbf04cd3ae7917f923667",
+      "bytes": 33311,
+      "originalPngSHA": "e66913ef25695108a7fdea1964241330d1df21b39c8277aedb24ab976fcfe95a"
+    },
+    {
+      "char": "Ậ",
+      "style": "de",
+      "view": "full",
+      "file": "font-5ahold-lo-263-de-7852-full.jpg",
+      "sha256": "fafa9f15e3b96923c09056f7c49d26ba8ae17005f255fa556984641eb5d2b334",
+      "bytes": 68381,
+      "originalPngSHA": "e298c9f2771102c49c6fc80976f7609063590c317d86eb8286bf291a1d136738"
+    },
+    {
+      "char": "Ậ",
+      "style": "de",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-de-7852-macro.jpg",
+      "sha256": "bd4fdfd9853286a414d4c93100fddcf70a74fcb47aae6660065ee40864f8b6ca",
+      "bytes": 30955,
+      "originalPngSHA": "6cfff9482861eaef7b74efa2f1e71caa7edb9328d5c0e3510c6090e7aa3ea868"
+    },
+    {
+      "char": "Ẳ",
+      "style": "de",
+      "view": "full",
+      "file": "font-5ahold-lo-263-de-7858-full.jpg",
+      "sha256": "16d8a72794246bc16fe512d16525b0e0db97f94c8838f12ed126a805a64db402",
+      "bytes": 69882,
+      "originalPngSHA": "ae35fe84c5406e23749163cc05a6f0e32d539bdddea51a9cc6f74d5dbf870468"
+    },
+    {
+      "char": "Ẳ",
+      "style": "de",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-de-7858-macro.jpg",
+      "sha256": "c05f3adb94660398e92d800ec7d97801f7230307172bc5f050339f1ae7ef9359",
+      "bytes": 33172,
+      "originalPngSHA": "cbc2ece69d47823f772f4f12c74d30a808968463e05e3de06cbfbf48a7d4c44e"
+    },
+    {
+      "char": "Ẵ",
+      "style": "de",
+      "view": "full",
+      "file": "font-5ahold-lo-263-de-7860-full.jpg",
+      "sha256": "38d4aa6af260907df0e82e7693636e78f35305a6452d41d14ef03b5ea16d798d",
+      "bytes": 70391,
+      "originalPngSHA": "1e6a099135191076e9e9871e532cc4995fedd5f8395b360dc306a88b795b1fe2"
+    },
+    {
+      "char": "Ẵ",
+      "style": "de",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-de-7860-macro.jpg",
+      "sha256": "523256674e24cf63a5ce031fb386d23a759dbed4bdecc81df8cb2db9f9545692",
+      "bytes": 33298,
+      "originalPngSHA": "db64099c852f9d41c5881051dc8b2bdbc094bd75c31d4d7ecc80d7008cd8ddc8"
+    },
+    {
+      "char": "Ặ",
+      "style": "de",
+      "view": "full",
+      "file": "font-5ahold-lo-263-de-7862-full.jpg",
+      "sha256": "940ea9a22202b4dc95075494b03bfd30e712084dc61a66cf10df536cabd524a1",
+      "bytes": 67969,
+      "originalPngSHA": "e894a36996eb51988929c326d4d129f7b5a7fe62edbee85ca2c332826a4e7f5f"
+    },
+    {
+      "char": "Ặ",
+      "style": "de",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-de-7862-macro.jpg",
+      "sha256": "938b8543beab5755da51f6acde3c1563b059f8c966da6b220974d315dea673be",
+      "bytes": 30770,
+      "originalPngSHA": "52f16f666300f29fa768a363f91858692ce3e2f0355fb29a1873c5a13b6d1232"
+    },
+    {
+      "char": "Ẫ",
+      "style": "dam",
+      "view": "full",
+      "file": "font-5ahold-lo-263-dam-7850-full.jpg",
+      "sha256": "15e1ecc4194afa18de44f681ffbe04baa8985018ba9c92d5b997fce69e74a126",
+      "bytes": 75782,
+      "originalPngSHA": "283714b5090458573c1d76bd8f6e107ea1a0a75d5c954d84d6a5ee025baa7a6c"
+    },
+    {
+      "char": "Ẫ",
+      "style": "dam",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-dam-7850-macro.jpg",
+      "sha256": "6d6d5a3690c54850c5e1b52e8f2c6a15db05076efe9bed656110a80bd19bf309",
+      "bytes": 35673,
+      "originalPngSHA": "17e669fa54e5e3621ea855297f69f5561995b51d99adb09a43acf00794cd3991"
+    },
+    {
+      "char": "Ậ",
+      "style": "dam",
+      "view": "full",
+      "file": "font-5ahold-lo-263-dam-7852-full.jpg",
+      "sha256": "beef895512711138e08d649ecda204a4f45775baa4b5a6e9c071217dc779571e",
+      "bytes": 68736,
+      "originalPngSHA": "b3cbaefbf4590de46fabd1c5eb929106088f570a79c5a13ed2e7b9f8e1b035e3"
+    },
+    {
+      "char": "Ậ",
+      "style": "dam",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-dam-7852-macro.jpg",
+      "sha256": "053719a1511c1cb39486ca49ead991e7c4628effbe7393f4f01d9ae5d91cc7c5",
+      "bytes": 30428,
+      "originalPngSHA": "7cce4e8667ccea0867af3330f6e446995150cee3fa5272edbdcfd0782519fd29"
+    },
+    {
+      "char": "Ẳ",
+      "style": "dam",
+      "view": "full",
+      "file": "font-5ahold-lo-263-dam-7858-full.jpg",
+      "sha256": "1fd7f5e44b19a87b6c4552292ff6ada3cffd99c44bc2e962bc51f7d1d6c19ee1",
+      "bytes": 69365,
+      "originalPngSHA": "558b3a0633fdbebe5b819b20cbb3cba6dc2447c267287d9b390b74e1cec8d5fb"
+    },
+    {
+      "char": "Ẳ",
+      "style": "dam",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-dam-7858-macro.jpg",
+      "sha256": "e2c9477e3cfbc9df2d353104a61b0fda7443e83d7e1fec4595fc6c8ea20603b7",
+      "bytes": 32224,
+      "originalPngSHA": "10073831a8b834040e0529ce3075cd7c5d62bdf11fc24a5b599689e69ac8029e"
+    },
+    {
+      "char": "Ẵ",
+      "style": "dam",
+      "view": "full",
+      "file": "font-5ahold-lo-263-dam-7860-full.jpg",
+      "sha256": "e31011e5866b3aaffc7e9f663768d2e6896d93f35c2aecd1a200df9904355c90",
+      "bytes": 70139,
+      "originalPngSHA": "2663a15281a74717f6c15be680970a32908357be0fa3768f0217cde6f137fd2b"
+    },
+    {
+      "char": "Ẵ",
+      "style": "dam",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-dam-7860-macro.jpg",
+      "sha256": "09e8f15fe6f7fcb0b61a99a25f1107a09eafccf6dc2f81724d885a2bc1aad47a",
+      "bytes": 32380,
+      "originalPngSHA": "a4a282d74647a16aa92b6e74c74aa6fdf93f0d6dd72a2387c28be5a3f065fecd"
+    },
+    {
+      "char": "Ặ",
+      "style": "dam",
+      "view": "full",
+      "file": "font-5ahold-lo-263-dam-7862-full.jpg",
+      "sha256": "5bb01c5e2e77552cd4eee1a1fe9eca46c2778e362fc2440dfa5735907f969364",
+      "bytes": 68838,
+      "originalPngSHA": "6a3d2e2b7492a112ed593f4263fd21faf5c3d83f3faabdca633ad5b0c3aea4fa"
+    },
+    {
+      "char": "Ặ",
+      "style": "dam",
+      "view": "macro",
+      "file": "font-5ahold-lo-263-dam-7862-macro.jpg",
+      "sha256": "4ee23138b5f5cb73921712ed81675399dacf5eb177e1c89944fc8179aeb84da1",
+      "bytes": 30457,
+      "originalPngSHA": "f0c2f185a04c713ccb87c841ac80b776a744a3a02f0d680a6a23e4b4f319503b"
+    }
+  ]
+}

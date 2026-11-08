@@ -3,12 +3,12 @@
     "i": 657,
     "hash": "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785",
     "fileNguon": "anh/7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785.png",
-    "svg": "dien-di-ba-vet-ddh-753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064.svg",
-    "hashSvg": "753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064",
-    "byteSvg": 11076,
+    "svg": "dien-di-ba-vet-ddh-0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8.svg",
+    "hashSvg": "0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8",
+    "byteSvg": 11542,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
-    "hashPhongDam": "458ad9c09c9396e8a203632be852f34b4bc5d81e23d99f83ff9b25a8e52e8f93",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "hashPhongDam": "1b7f41ef153cc164f309f49f8abdcf5c14997563775f5a169f1306788b71bbd6",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -35,7 +35,7 @@
       }
     ],
     "ghiChuDung": "3solidblackcirclesXYZwhitebold/outerrect/2terminalcirclesPLUSLEFTMINUSRIGHT/2shortwires/Cực dương-Cực âm/noextra dash-startline-arrow-pH-answer/DDHpath.",
-    "hashSvgDaSoat": "753ee154f31f22c03225880ea1f86396833d12bcf6bab7f737e854523c15a064",
-    "nguoiSoat": "soat_nguon_3"
+    "hashSvgDaSoat": "0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

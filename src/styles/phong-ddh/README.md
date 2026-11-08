@@ -34,3 +34,10 @@ Hai tệp phông vẫn TĨNH: mọi `font-weight` 550–1000 hiện cùng một 
 - Số mặc định nằm sẵn trong `scripts/tao-phong-ddh-rounded.py` (biến môi trường `DDH_*` chỉ để thử). Tổng 4 tệp 34 076 B.
 - Khoảng trắng giữa từ (Đề) −105 đơn vị: khe từ trung bình 7,8 = Duolingo 7,8 px (đoạn «Hoàn thành thêm 3 bài học…», cùng chiều cao chữ x). Tổng 4 tệp 34 172 B.
 - 08/11: «a» dựng lại (thầy «kiểm tra chữ a»): bụng gốc hình lá + làm đậm ⇒ khối dày, lỗ nhỏ, đuôi như chấm rời. Nay: bỏ bụng cũ, thay vòng bụng bầu dục nét đều bằng nét đứng (vai trên chạy ngang vào nét đứng), đuôi liền chân; 14 khe tiêu đề vẫn bằng Duolingo. Tổng 34 396 B.
+
+
+### 08/11 — sửa có giới hạn thân N/A/a/m/r (lô263, chưa phát hành)
+
+Offset điểm điều khiển cũ tạo lỗ kim N/A và làm nặng khe nối chân a; m/r có lỗ ở vai nối. Bộ tạo font nay giãn nét theo đường cong chỉ ở thân họ N/A/a/m/r có đối chiếu topology duy nhất từ nguồn; dấu và các glyph khác giữ nguyên nét cũ. Không dùng faux bold, fallback hay lọc diện tích lỗ.
+
+Cả4subset tự giữ nguyên advance/LSB và bbox, không chép hmtx. Đã soát độc lập DOM/SVG cỡ18/24/32/72/200 cho phạm vi sửa. Năm biến thể `Ẫ Ậ Ẳ Ẵ Ặ` mỗi kiểu chưa khớp cấu trúc nguồn nên giữ nguyên và còn chờ xử lý; đây chưa phải xác nhận sạch toàn font. Không triển khai cho đến khi các cổng toàn kho đạt. Bằng chứng: `docs/hinh-vector-0311/kiem/soat-naamr-font-lo-263.json`.

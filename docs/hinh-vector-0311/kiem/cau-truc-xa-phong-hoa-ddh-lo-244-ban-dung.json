@@ -3,11 +3,11 @@
     "i": 556,
     "hash": "6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971",
     "fileNguon": "anh/6812fb0de36ad1e3eac463fda1b9e0b516b9ced44916a242d7e0c8948b772971.png",
-    "svg": "xa-phong-hoa-ddh-597bcdbc85406faee156f637c2cafec87b4fb08b89fe4bdc9bf8a81bec17fba7.svg",
-    "hashSvg": "597bcdbc85406faee156f637c2cafec87b4fb08b89fe4bdc9bf8a81bec17fba7",
-    "byteSvg": 32906,
+    "svg": "xa-phong-hoa-ddh-99a664d3b6daae80789a7f54b5555a3b6aacb4097b5985aec8faf08543ee2719.svg",
+    "hashSvg": "99a664d3b6daae80789a7f54b5555a3b6aacb4097b5985aec8faf08543ee2719",
+    "byteSvg": 34236,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,7 @@
       }
     ],
     "ghiChuDung": "Ba C15H31COOCH2/CH/CH2;hai verticalbonds+glycerolCH2OH-CHOH-CH2OH;3NaOH/3C15H31COONa/1RIGHThead/t°literal/noextra phases-caption-answer/DDHpath.",
-    "hashSvgDaSoat": "597bcdbc85406faee156f637c2cafec87b4fb08b89fe4bdc9bf8a81bec17fba7",
+    "hashSvgDaSoat": "99a664d3b6daae80789a7f54b5555a3b6aacb4097b5985aec8faf08543ee2719",
     "nguoiSoat": "soat_nguon_2"
   }
 ]

@@ -1,13 +1,16 @@
 [
   {
     "i": 582,
-    "hashSvg": "08cfb68219098f0876f6be0d03d66392a283781b8d7b01228ea4affc3bf3b4ec",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt: Soát MỚI font-a, mở RIÊNG native FULL từng nguồn, đọc đủ toàn bộ public refs; tự fresh Chromium exactcurrenthash rồi mở actual FULL3x từngSVG. 3graybars top96/323/299 và3 guidesOVERbarfill bắtđầu92 đến215/379/536 đúng, 9,40/3,37/3,23/3names và2heads đúng; không normalizeheights/extra0/unit/title/ticks. Font-a glyph/spacing không chạm/cắt/tràn, không dùng oldproofV5.",
-    "actualSvgReviewed": true,
-    "byteSvg": 21171,
-    "render": "/workspace/scratch/fonta261-582-actual.png",
+    "hashSvg": "8fcbc1ff07f9b0ed30e6bc48bae436e8cedae494bf8c2a8483abc1be1bc8e19b",
+    "nguoiSoat": "soat_nguon_3",
+    "ketQua": "Đạt: 3bars đúngAniline9,40/Dimethylamine3,23/Ethylamine3,37;3dashedlevels/2axisarrows,case/commasđúng;không thêmtick/data,pinhole m/r/Akhôngthấy. Khôngspike/pinhole/seam mới hoặcchạm/cắt/tràn.",
+    "phuongPhap": "Soát độc lậpFINALNAamr: mởRIÊNGnativeFULL vàmọipublicquestions.de/refs;tựfreshChromiumactualFULL2× từexactSVGbytesSHA256 vàmởriêngrender. Khôngtái dùngoldpositive;hashunchangedchỉlàbyteidentity,khôngsuynguyênnhân.",
+    "render": "/workspace/scratch/reviewb263-582-8fcbc1ff07f9b0ed30e6bc48bae436e8cedae494bf8c2a8483abc1be1bc8e19b.png",
+    "publicQids": [
+      "12-KT-C123-D2-I-14",
+      "DB-12-B8-D1-I-241"
+    ],
     "hash": "6cb4208a5afea03cc96dab09c2eaa47e681fc44caff7baa5f9378b97ae032253",
-    "hashSvgDaSoat": "08cfb68219098f0876f6be0d03d66392a283781b8d7b01228ea4affc3bf3b4ec"
+    "hashSvgDaSoat": "8fcbc1ff07f9b0ed30e6bc48bae436e8cedae494bf8c2a8483abc1be1bc8e19b"
   }
 ]

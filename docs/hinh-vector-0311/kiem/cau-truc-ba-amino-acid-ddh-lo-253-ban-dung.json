@@ -3,11 +3,11 @@
     "i": 711,
     "hash": "845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509",
     "fileNguon": "anh/845ce482bdb03ab479d04c87612b9546b920ad8b6f7f00b938e51470a6e0c509.png",
-    "svg": "ba-amino-acid-ddh-f5b0c83c638c971aefc7ebe8428e3ce21fedd21253baa7188a1908d699da9cf7.svg",
-    "hashSvg": "f5b0c83c638c971aefc7ebe8428e3ce21fedd21253baa7188a1908d699da9cf7",
-    "byteSvg": 37661,
+    "svg": "ba-amino-acid-ddh-fea18b4dae4b0c90f5a932ee93eb8e5afe264d3509156a760a3f3581a4f9d972.svg",
+    "hashSvg": "fea18b4dae4b0c90f5a932ee93eb8e5afe264d3509156a760a3f3581a4f9d972",
+    "byteSvg": 38215,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -34,7 +34,7 @@
       }
     ],
     "ghiChuDung": "3moleculesArg-Glu-Gly/13C8O6N/4COdouble+1CNdouble/H2N-NH-N-H-NH2literal/4numbers(1)(2)/3captionscase/noextra charges-stereo-arrows-answer/DDHpath.",
-    "hashSvgDaSoat": "f5b0c83c638c971aefc7ebe8428e3ce21fedd21253baa7188a1908d699da9cf7",
+    "hashSvgDaSoat": "fea18b4dae4b0c90f5a932ee93eb8e5afe264d3509156a760a3f3581a4f9d972",
     "nguoiSoat": "soat_nguon_3"
   }
 ]

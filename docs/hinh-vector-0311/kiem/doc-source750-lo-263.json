@@ -1,0 +1,354 @@
+{
+  "i": 750,
+  "hashNguon": "466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325",
+  "sourceShaVerified": "466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325",
+  "fileNguon": "anh/466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325.png",
+  "canvas": [
+    945,
+    448
+  ],
+  "nativeFullOpened": true,
+  "zoomOpened": "/workspace/scratch/source750-zoom.png",
+  "allPublicQuestions": [
+    {
+      "qid": "12-KT-C5-D4-II-1",
+      "maDe": "12-KT-C5-D4",
+      "de": "Một nhóm học sinh nghiên cứu ảnh hưởng của pH dung dịch đến sức điện động của pin Galvani Zn − Cu. Giả thuyết được đưa ra là: \"Khi thay đổi pH của dung dịch muối sẽ thay đổi sức điện động của pin điện\". Nhóm học sinh đó tiến hành thí nghiệm như sau ở 25 °C:\nThí nghiệm 1: Lấy thanh Zn nhúng vào cốc 1 đựng 400 mL dung dịch ZnSO₄ 1,25M và thanh Cu nhúng vào cốc 2 đựng 400 mL dung dịch CuSO₄ 1,25M, thêm nước cất vào cả hai cốc để thành 500 mL dung dịch. Nối hai dung dịch với nhau bằng cầu muối KCl nhão và hai thanh kim loại với một vôn kế như hình dưới.\nĐể hệ thống ổn định khoảng 2 phút và ghi lại số chỉ vôn kế, được giá trị là 1,10 V. Lặp lại các bước như thí nghiệm 1 nhưng thay nước cất ở một trong hai cốc bằng dung dịch H₂SO₄ 2M. Cụ thể:\nThí nghiệm 2: thay nước cất ở cốc 1 bằng 100 mL dung dịch H₂SO₄ 2M, thì số chỉ vôn kế là 1,07 V.\nThí nghiệm 3: thay nước cất ở cốc 2 bằng 100 mL dung dịch H₂SO₄ 2M, thì số chỉ vôn kế là 1,12 V.",
+      "hinh": [
+        {
+          "hash": "466863dfc0ef748e44dbc85d86ea4fa5cd5a9354d121a7bd1ed269aa77b9c325",
+          "where": "12-KT-C5-D4-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "f5a7f4d138b3c42c2bc314965af5f9d61a3e5dcbf939dd82339abf6145fd6250"
+        }
+      ]
+    }
+  ],
+  "inCatalogByExactHash": false,
+  "sourceOnly": true,
+  "noAliasTo": [
+    483,
+    1216
+  ],
+  "coordinateSystem": "approximate native pixel x/y, origin top-left",
+  "counts": {
+    "vessels": 2,
+    "electrodeBars": 2,
+    "saltBridgeInvertedU": 1,
+    "voltmeter": 1,
+    "meterNeedle": 1,
+    "externalLeads": 2,
+    "textBlocks": 6,
+    "arrowheads": 0,
+    "bubbles": 0,
+    "polaritySigns": 0,
+    "numericDisplay": 0
+  },
+  "labels": [
+    {
+      "text": "Zn",
+      "at": [
+        220,
+        119
+      ],
+      "leader": [
+        [
+          237,
+          121
+        ],
+        [
+          315,
+          148
+        ]
+      ]
+    },
+    {
+      "text": "Cu",
+      "at": [
+        731,
+        119
+      ],
+      "leader": [
+        [
+          714,
+          123
+        ],
+        [
+          644,
+          167
+        ]
+      ]
+    },
+    {
+      "text": "vôn kế",
+      "at": [
+        474,
+        128
+      ]
+    },
+    {
+      "text": "dung dịch\nZnSO₄",
+      "at": [
+        130,
+        256
+      ],
+      "leader": [
+        [
+          194,
+          242
+        ],
+        [
+          279,
+          257
+        ]
+      ]
+    },
+    {
+      "text": "dung dịch\nCuSO₄",
+      "at": [
+        824,
+        257
+      ],
+      "leader": [
+        [
+          754,
+          243
+        ],
+        [
+          685,
+          267
+        ]
+      ]
+    },
+    {
+      "text": "cầu muối",
+      "at": [
+        520,
+        383
+      ],
+      "leader": [
+        [
+          479,
+          361
+        ],
+        [
+          450,
+          198
+        ]
+      ]
+    }
+  ],
+  "electrodes": [
+    {
+      "label": "Zn",
+      "bounds": [
+        314,
+        116,
+        33,
+        185
+      ],
+      "fill": "lightgray",
+      "wireEndpoint": [
+        329,
+        116
+      ]
+    },
+    {
+      "label": "Cu",
+      "bounds": [
+        615,
+        116,
+        29,
+        179
+      ],
+      "fill": "brightred",
+      "wireEndpoint": [
+        626,
+        116
+      ]
+    }
+  ],
+  "vessels": [
+    {
+      "side": "left",
+      "outline": [
+        [
+          256,
+          179
+        ],
+        [
+          256,
+          329
+        ],
+        [
+          415,
+          329
+        ],
+        [
+          415,
+          197
+        ]
+      ],
+      "liquidTopY": 209,
+      "fill": "verylightgray",
+      "note": "surface is gray horizontal x257..390 interrupted byopaqueZnbar; nooval/spout/ticks"
+    },
+    {
+      "side": "right",
+      "outline": [
+        [
+          527,
+          197
+        ],
+        [
+          527,
+          329
+        ],
+        [
+          697,
+          329
+        ],
+        [
+          697,
+          179
+        ]
+      ],
+      "liquidTopY": 201,
+      "fill": "blue",
+      "note": "surface flat x550..695 interruptedbyopaqueCubar. Rightliquid8pxhigherthanleft; do not equalize."
+    }
+  ],
+  "saltBridge": {
+    "fill": "palelavender",
+    "outerTop": [
+      400,
+      165,
+      133,
+      0
+    ],
+    "outerOutline": [
+      [
+        390,
+        279
+      ],
+      [
+        390,
+        170
+      ],
+      [
+        401,
+        165
+      ],
+      [
+        533,
+        165
+      ],
+      [
+        550,
+        170
+      ],
+      [
+        550,
+        275
+      ]
+    ],
+    "innerOutline": [
+      [
+        415,
+        280
+      ],
+      [
+        415,
+        197
+      ],
+      [
+        527,
+        197
+      ],
+      [
+        527,
+        275
+      ]
+    ],
+    "note": "Thick black inverted-U bounds, ends are flat purple atapproximatelyy279left/y275right, immersed inliquid; do not addKCltext even thoughstemnamesKCl."
+  },
+  "meter": {
+    "ellipseBounds": [
+      428,
+      58,
+      83,
+      55
+    ],
+    "needle": [
+      [
+        471,
+        84
+      ],
+      [
+        494,
+        63
+      ]
+    ],
+    "note": "Ovaloutline withoneascending diagonalneedle, noVglyph/numerals/+−."
+  },
+  "wires": [
+    {
+      "from": [
+        329,
+        116
+      ],
+      "via": [
+        [
+          331,
+          95
+        ],
+        [
+          338,
+          83
+        ],
+        [
+          354,
+          79
+        ]
+      ],
+      "to": [
+        428,
+        79
+      ]
+    },
+    {
+      "from": [
+        511,
+        79
+      ],
+      "via": [
+        [
+          581,
+          79
+        ],
+        [
+          603,
+          82
+        ],
+        [
+          614,
+          90
+        ]
+      ],
+      "to": [
+        626,
+        116
+      ]
+    }
+  ],
+  "occlusion": [
+    "Zn/Cu bars draw opaque over liquid andsurface; no outline oncoloredrectangles.",
+    "Meter oval boundary masks/terminatesleft-rightwire endpoints; needle insideonly.",
+    "Bridge lavender opaque over liquid, upper invertedU centered betweentwo vessel interiors.",
+    "Six label leaders are thin lines WITHOUT arrowheads; bridgeleader touchesunderside innerUbar/centralgap at450,198, not extra tube."
+  ],
+  "literalLimits": [
+    "No source concentrations/voltages/pH/+/−/earrows/arrows onwires; do not import stem1,10V/1,07V/1,12V or1,25M intofigure.",
+    "Preserve lower-case vôn kế, dung dịch, cầu muối; Zn/CuSO₄ correctcase.",
+    "Source-only not SVGapproval. Noanswer/solution read; repo/font unchanged."
+  ]
+}

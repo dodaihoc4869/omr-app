@@ -1,43 +1,34 @@
 [
   {
     "i": 807,
-    "hashSvg": "49a26fca12f4de576175d20928478e27eca9788c58f7938ff5a8db1a09c68911",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền nhỏ trong nét N lớn. Có sẵn ở oldSVG, nhỏ hơn font-a nhưng không biến mất. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
-    "actualSvgReviewed": true,
-    "byteSvg": 7358,
-    "render": "/workspace/scratch/oldglyph261-807-actual.png",
-    "detail": "/workspace/scratch/oldglyph261-807-macro.png"
-  },
-  {
-    "i": 468,
-    "hashSvg": "0c4210b870718a48b33590ed80e994b5301e6d9b78b1a4f681bd07edb38a01df",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền trong N và một lỗ kim nhỏ ở chân a. Olda không có vết khuyết lớn như newfont-a nhưng vẫn có lỗ riêng thực thấy. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
-    "actualSvgReviewed": true,
-    "byteSvg": 16112,
-    "render": "/workspace/scratch/oldglyph261-468-actual.png",
-    "detail": "/workspace/scratch/oldglyph261-468-macro.png"
-  },
-  {
-    "i": 658,
-    "hashSvg": "9fda45b27432aeaafc43a1f4ac1182386bd78e220172696ec9c0e3f83b0a02c3",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Cần sửa / THU HỒI oldpositive: Fresh actual OLD hash và macro cho thấy 2 lỗ kim nền nhỏ ở đỉnh A lớn. Có sẵn ở oldSVG. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
-    "actualSvgReviewed": true,
-    "byteSvg": 6758,
-    "render": "/workspace/scratch/oldglyph261-658-actual.png",
-    "detail": "/workspace/scratch/oldglyph261-658-macro.png"
+    "hashSvg": "84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG nativeFULL/allpublicrefs8where sau_de/publictrue và tựfresh actualChromium FULL3x exact FINALNAamr hash, đối nguồn độc lập không dùng oldverdict. Đủ labels 7/14,007/N/Nitrogen; comma14,007/196,97/DOT30.974/22.990 và electron superscripts giữ nguồn; cấu trúc khung/màu/layout đúng. Mở macro N/Na/Au và m/r tại Phosphorus/Nonmetal/Sodium/Alkali metal: nét kín sạch không còn pinholes/khuyết vai đã báo, không dùng holethreshold. DDH de/dam FINAL path tự chứa không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp currentmetadata; chỉ verdict hình FINAL này.",
+    "hash": "95dd65166507c6a1e9e28b991b9868a2174d6d8be56fde930cf54b3196729a5e",
+    "hashSvgDaSoat": "84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4"
   },
   {
     "i": 764,
-    "hashSvg": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff",
-    "nguoiSoat": "soat_nguon_2",
-    "ketQua": "Đạt / GIỮ oldpositive: Đã tự fresh actual OLD hash và mở FULL; không thấy lỗi glyph riêng rõ ở764, dữ liệu/case/configsup30.974/15/P/Phosphorus/Nonmetal/màu-frame đúng. Không suy fail764 từ glyph của3nguồn khác. Chỉ đọc repo; mọi kết luận từ oldactual thực xem, không suy từ font-a/newSVG.",
-    "actualSvgReviewed": true,
-    "byteSvg": 18061,
-    "render": "/workspace/scratch/oldglyph261-764-actual.png",
+    "hashSvg": "b2491fb0732d82347aefd8c687589c3d462b7f9baad6720406e3bf26fa05cc42",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG nativeFULL/allpublicrefs8where sau_de/publictrue và tựfresh actualChromium FULL3x exact FINALNAamr hash, đối nguồn độc lập không dùng oldverdict. Đủ labels 15/30.974/P/Phosphorus/[Ne]3s²3p³/Nonmetal; comma14,007/196,97/DOT30.974/22.990 và electron superscripts giữ nguồn; cấu trúc khung/màu/layout đúng. Mở macro N/Na/Au và m/r tại Phosphorus/Nonmetal/Sodium/Alkali metal: nét kín sạch không còn pinholes/khuyết vai đã báo, không dùng holethreshold. DDH de/dam FINAL path tự chứa không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp currentmetadata; chỉ verdict hình FINAL này.",
     "hash": "8de870720812cbf37124255f9bec57296bd7debef1b6bca6b6fa72c5e1c422f6",
-    "hashSvgDaSoat": "205784d38d278308212ee1b17b0be6f81b805058f52279d6cbdb806e378ae9ff"
+    "hashSvgDaSoat": "b2491fb0732d82347aefd8c687589c3d462b7f9baad6720406e3bf26fa05cc42"
+  },
+  {
+    "i": 468,
+    "hashSvg": "5c56503483314fe7b415fdf4b3cc07ab1c727b8d9d0cddbbf43627549ea9ec36",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG nativeFULL/allpublicrefs8where sau_de/publictrue và tựfresh actualChromium FULL3x exact FINALNAamr hash, đối nguồn độc lập không dùng oldverdict. Đủ labels 11/22.990/Na/Sodium/[Ne]3s¹/Alkali metal; comma14,007/196,97/DOT30.974/22.990 và electron superscripts giữ nguồn; cấu trúc khung/màu/layout đúng. Mở macro N/Na/Au và m/r tại Phosphorus/Nonmetal/Sodium/Alkali metal: nét kín sạch không còn pinholes/khuyết vai đã báo, không dùng holethreshold. DDH de/dam FINAL path tự chứa không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp currentmetadata; chỉ verdict hình FINAL này.",
+    "hash": "55550e68386f718d6c82a079829ae3b8df4e6257da0103b77ac37a38102a9bb9",
+    "hashSvgDaSoat": "5c56503483314fe7b415fdf4b3cc07ab1c727b8d9d0cddbbf43627549ea9ec36"
+  },
+  {
+    "i": 658,
+    "hashSvg": "e85bc80d0f88cf4e75ef075bc7ae30c4974a04eb80d94513b752a1922da0f087",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã mở RIÊNG nativeFULL/allpublicrefs8where sau_de/publictrue và tựfresh actualChromium FULL3x exact FINALNAamr hash, đối nguồn độc lập không dùng oldverdict. Đủ labels 79/196,97/Au/Gold; comma14,007/196,97/DOT30.974/22.990 và electron superscripts giữ nguồn; cấu trúc khung/màu/layout đúng. Mở macro N/Na/Au và m/r tại Phosphorus/Nonmetal/Sodium/Alkali metal: nét kín sạch không còn pinholes/khuyết vai đã báo, không dùng holethreshold. DDH de/dam FINAL path tự chứa không text/image/fallback; không cắt/chạm/tràn. Hash byte thực khớp currentmetadata; chỉ verdict hình FINAL này.",
+    "hash": "7a4f13374d6061568eb232412792216b708e86de1a3a497073031ed7954aa016",
+    "hashSvgDaSoat": "e85bc80d0f88cf4e75ef075bc7ae30c4974a04eb80d94513b752a1922da0f087"
   }
 ]

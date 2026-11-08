@@ -2,8 +2,11 @@
   {
     "i": 739,
     "hashSvg": "8a9f85716b9b3862504660b51262c7bee8f3c6e88ad4ce0c94096ba42b0702d6",
-    "nguoiSoat": "soat_hinh_vector",
-    "ketQua": "Đạt: Mở RIÊNG nativeFULL/all public refs sau_de/publictrue và fresh actual Chromium FULL từ exact SVG bytes hiện tại sau rerunfonta. 6C explicit+6CH2+3CH3=15C;3CCdouble/3H explicit; CH3 vàH hướng lên-xuống-lên đúng nguồn/2freeends. DDH snapshot9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1 theo main e316e6b5, path tự chứa không text/image/fallback; dữ kiện/layout giữ đúng không thêmcaption/answer/charge. Không chạm/cắt/tràn. So lịch sử hash 8a9f85716b9b3862504660b51262c7bee8f3c6e88ad4ce0c94096ba42b0702d6; actual current hash khớp metadata.",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đọc riêng native FULL và mọi public refs; tự fresh Chromium exactSVG rồi mở actual FULL. Sáu C tường minh, sáu CH2, ba CH3/ba H và ba C=C đúng vị trí, hai đầu mở. Glyph FINAL NAamr rõ, không thấy chữ chạm/cắt/tràn; không thêm đáp án. Không dùng oldpositive để duyệt.",
+    "actualSvgReviewed": true,
+    "byteSvg": 17863,
+    "render": "/workspace/scratch/review263a-739.jpg",
     "hash": "0222514952c491c9343f2175ce749276ec03c0f4b5758e38bd3da9b6e24cdf01",
     "hashSvgDaSoat": "8a9f85716b9b3862504660b51262c7bee8f3c6e88ad4ce0c94096ba42b0702d6"
   }

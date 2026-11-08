@@ -1,17 +1,13 @@
 [
   {
     "i": 413,
-    "hashSvg": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a",
-    "nguoiSoat": "soat_nguon_3",
-    "ketQua": "Đạt: Soát mới bộ font chữ a, đã mở riêng native FULL và đọc đủ public questions.de/refs; tự fresh Chromium từ chính bytes SVG SHA256 đã kiểm, mở actual FULL. Đủ14ô màu/1..14 và28tick14trên14dưới; chỉ10⁻¹/10⁻⁷/10⁻¹⁴ ởtrên;[H⁺](mol/L),pH đúngcase. Vị trí số/ticks/3mốc cùng palette, ô7hai màu/8dải chéo/11bóng đứng giữ; chữ không chạm/cắt. SVG path-only, không text/image fallback.",
-    "render": "/workspace/scratch/fonta261-413-4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a.png",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
-    "hashPhongDam": null,
-    "publicQids": [
-      "DB-11-B2-D3-II-146",
-      "DH-11-C1-B2-II-16"
-    ],
+    "hashSvg": "8d9a83e9c9a881b0199dbc5533d014c10f9f06bc6d0c1fb6efd888ad4ccc76d3",
+    "nguoiSoat": "soat_nguon_2",
+    "ketQua": "Đạt: Đã đọc riêng native FULL và mọi public refs; tự fresh Chromium exactSVG rồi mở actual FULL. 14 ô/14 số, 28 tick; ba lũy thừa −1/−7/−14, [H+] (mol/L), pH và màu đặc thù 7/8/11 giữ đúng. Glyph FINAL NAamr rõ, không thấy chữ chạm/cắt/tràn; không thêm đáp án. Không dùng oldpositive để duyệt.",
+    "actualSvgReviewed": true,
+    "byteSvg": 23397,
+    "render": "/workspace/scratch/review263a-413.jpg",
     "hash": "493c6487030d4f14419ffa767db9564125219d3e8d52834c571020682393443f",
-    "hashSvgDaSoat": "4086baa8eed8f347b656a2d9f04f9c6392df6ab8400e57b62cc3f1f5691fb12a"
+    "hashSvgDaSoat": "8d9a83e9c9a881b0199dbc5533d014c10f9f06bc6d0c1fb6efd888ad4ccc76d3"
   }
 ]

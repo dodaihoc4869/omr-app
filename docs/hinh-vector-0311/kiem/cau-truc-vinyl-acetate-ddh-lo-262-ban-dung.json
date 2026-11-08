@@ -3,11 +3,11 @@
     "i": 744,
     "hash": "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa",
     "fileNguon": "anh/c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa.png",
-    "svg": "vinyl-acetate-ddh-7d0bf70890fd68aa5e2b24c2fc19b9e2a9e9575e5490b22f9e86fb641f6942f7.svg",
-    "hashSvg": "7d0bf70890fd68aa5e2b24c2fc19b9e2a9e9575e5490b22f9e86fb641f6942f7",
-    "byteSvg": 37820,
+    "svg": "vinyl-acetate-ddh-5287ab387f1884ec4aeb5a8d485b50565f321284fa28e5702349f7199b291d52.svg",
+    "hashSvg": "5287ab387f1884ec4aeb5a8d485b50565f321284fa28e5702349f7199b291d52",
+    "byteSvg": 39310,
     "font": "DDH Rounded",
-    "hashPhong": "9bb9810da879cdbd9dbe25d9324691f42135a12366b44a6aa365fd16410dfac1",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
     "trangThai": "da-soat-doc-lap",
     "questions": [
       {
@@ -23,7 +23,7 @@
       }
     ],
     "ghiChuDung": "CH2=CH2→CH3COOH→CH3COOCH=CH2→Poly(vinyl acetate)); giữ hai ngoặc đóng nguyên bản/3RIGHTheads/3nums/conditionsliteral/noanswer.",
-    "hashSvgDaSoat": "7d0bf70890fd68aa5e2b24c2fc19b9e2a9e9575e5490b22f9e86fb641f6942f7",
-    "nguoiSoat": "soat_hinh_vector"
+    "hashSvgDaSoat": "5287ab387f1884ec4aeb5a8d485b50565f321284fa28e5702349f7199b291d52",
+    "nguoiSoat": "soat_nguon_2"
   }
 ]

@@ -679,7 +679,7 @@
           ],
           [
             300,
-            160
+            161
           ],
           [
             329,
@@ -778,7 +778,8 @@
       }
     ],
     "curveCount": 5,
-    "evidence": "Mởnative1095riêng;đen/xámcurveđượcso16cộtpixelvớigridphânbiệt. Cácsamplelàgeometrypixel,khôngtựin%sốtrêncurve. x329làcirclechấmrỗngcógridđứngcắt,khôngnhầmgridvớipeak."
+    "evidence": "Mởnative1095riêng;đen/xámcurveđượcso16cộtpixelvớigridphânbiệt. Cácsamplelàgeometrypixel,khôngtựin%sốtrêncurve. x329làcirclechấmrỗngcógridđứngcắt,khôngnhầmgridvớipeak.",
+    "corrigendum263": "Root+readonly mở nativeFULL vàzoom500°C:darkestpixelx300=y161;chỉnhduyanchor[300,160]→[300,161]khửvõngngượcnguồn;giữendpoint/openpoint329161vàallothercurves/data/ticks/labels."
   },
   {
     "i": 1330,

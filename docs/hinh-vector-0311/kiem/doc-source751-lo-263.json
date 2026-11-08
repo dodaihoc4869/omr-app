@@ -1,0 +1,192 @@
+{
+  "i": 751,
+  "hash": "6a45ad684c147f12c04aac16950a7c34a8f1c58437598c331f0fefda4bf102d4",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/6a45ad684c147f12c04aac16950a7c34a8f1c58437598c331f0fefda4bf102d4.png",
+  "size": [
+    932,
+    404
+  ],
+  "manifestPresent": false,
+  "review": "Đã mở nativeFULL, cell3x và valve8x; source-only, chưa có actualSVG, không phải proofĐạt.",
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C5-D4-II-3",
+      "de": "Trong công nghiệp, để sản xuất nhôm người ta điện phân hỗn hợp nóng chảy aluminium oxide (Al₂O₃) và cryolite với điện cực bằng than chì. Sơ đồ thùng điện phân Al₂O₃ nóng chảy được mô tả như hình dưới đây:",
+      "refs": [
+        {
+          "hash": "6a45ad684c147f12c04aac16950a7c34a8f1c58437598c331f0fefda4bf102d4",
+          "where": "12-KT-C5-D4-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "547a7af74c5f2c4b0f53af99aef2cd3c2d91dfae3205044e8da4faf4ce291332"
+        }
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "text": "Anode bằng\nthan chì",
+      "bbox": [
+        59,
+        49,
+        200,
+        103
+      ],
+      "leader": [
+        [
+          177,
+          91
+        ],
+        [
+          306,
+          148
+        ]
+      ]
+    },
+    {
+      "text": "Aluminium oxide\nvà cryolite\nnóng chảy",
+      "bbox": [
+        612,
+        51,
+        815,
+        139
+      ],
+      "leader": [
+        [
+          630,
+          93
+        ],
+        [
+          592,
+          166
+        ]
+      ]
+    },
+    {
+      "text": "Nhôm\nnóng chảy",
+      "bbox": [
+        85,
+        195,
+        202,
+        248
+      ],
+      "leader": [
+        [
+          204,
+          246
+        ],
+        [
+          287,
+          254
+        ]
+      ]
+    },
+    {
+      "text": "Cathode\nbằng than chì",
+      "bbox": [
+        48,
+        268,
+        208,
+        321
+      ],
+      "leader": [
+        [
+          207,
+          289
+        ],
+        [
+          282,
+          290
+        ]
+      ]
+    },
+    {
+      "text": "Cửa tháo nhôm\nnóng chảy",
+      "bbox": [
+        704,
+        245,
+        885,
+        301
+      ],
+      "leader": [
+        [
+          693,
+          279
+        ],
+        [
+          730,
+          279
+        ]
+      ]
+    },
+    {
+      "text": "Sơ đồ thùng điện phân Al₂O₃ nóng chảy",
+      "bbox": [
+        194,
+        328,
+        646,
+        354
+      ],
+      "bold": true
+    }
+  ],
+  "style": "Flat gray/black technical illustration, no photo/metallic. Native bold serif chữ; vector đổi DDH thật nhưng giữ nguyên literal/case/diacritics/subscripts. Không Hall/Héroult caption nguồn.",
+  "coordinateMeaning": "Pixel native, centerline/bounds scan gần đúng~1–2px; không chemical-theory-derived.",
+  "geometry": {
+    "topBus": "Gray rectangle x206..601,y74..90; FIVE necks centered306/372/438/504/569, width~16,x298..314 etc,y90..119. FIVE crossbar feet x283..328,349..394,415..460,481..526,547..592,y119..136. Bus nối liền cả5.",
+    "anodes": [
+      {
+        "bounds": [
+          293,
+          129,
+          320,
+          227
+        ]
+      },
+      {
+        "bounds": [
+          359,
+          129,
+          385,
+          227
+        ]
+      },
+      {
+        "bounds": [
+          425,
+          129,
+          451,
+          227
+        ]
+      },
+      {
+        "bounds": [
+          491,
+          129,
+          517,
+          227
+        ]
+      },
+      {
+        "bounds": [
+          556,
+          129,
+          583,
+          227
+        ]
+      }
+    ],
+    "anodeNote": "5rectđen không textures/hạt; tops che phần giữa chân đỡ xám. Đáy bằng nhau y227. Không cộng hai vách cathode vào anodecount.",
+    "shell": "Vỏ gray outerleft x225..235 từ y120, xuống y309; outerbottom y301..310 x225..630; outerright x635..645 từ y117 đến y263. Không đối xứng độ cao.",
+    "cathode": "Black lining: left x235..256,y133..292; bottom black wedge từ(256,263) dốc xuống(620,286), bottom y301; right x616..635,y128..273. Giữ black wedge dốc, không làm ngang bằng vì lý thuyết.",
+    "bath": "Topbath x256..616,y158..241 gray #c5c5c5 approx, 5anodes occlude. Horizontal boundary y241; belowlightgray moltenAl polygon top y242, loweredge dốc (256,263)→(616,284). Không particles/bubbles.",
+    "upperThinRail": "Nét/rect lightgray x207..616,y144..156; đoạnx207..225 lòi ngoài vách trái. Bị blackelectrodes/anodes/vách che; không nối xuyên nét foreground.",
+    "outletUpper": "Gray upperarm tiếp nối vỏphải: từx645,y263 ngang tới690,y263..273. Mép đen.",
+    "outletLower": "Lowerarm gray từ vùng đáy x630,y284 ngang tới690,y284..294; khetrắng hẹp giữa upper/lower y274..283. Đầu phải haiarm đều vertical x690, không arrow.",
+    "valve": "Tayvặn gray3thùy nối ngang trên y245..257: leftsmallcircle center656,250 radius~5; middlecirclecenter667,250 radius~7; rightovalcenter684,250 rx9,ry6. Đế vòm từ(654,263) lên(658,257),(676,257) xuống(681,263). Trục x662..673 xuống từ upperarm y273 tới lowerarm y284, rồi đoạnnhô dưới lowerarm y294..302. Khe/shaftvisible8x. Không invent wheelspokes/arrow/knobđơntròn.",
+    "counts": "5anodes/5neckfoot; 4labelleaders+1outletleader ngang; không charge/arrowheads/tick/particledata."
+  },
+  "uncertainties": [
+    "Pixelcenters/bounds chỉ scanapprox; valve topology nhìn đủ rõ, grain không được chuyển thành phụ kiện/hạt.",
+    "Leader cửa tháo nằm ở y279 trong vùng trắng ngoài bên phải, không thay thành đường ống."
+  ],
+  "actualSvgReviewed": false
+}
