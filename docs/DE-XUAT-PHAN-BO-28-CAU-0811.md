@@ -11,6 +11,7 @@
 | # | Câu hỏi | Em đề xuất (mặc định) | Phương án khác |
 |---|---|---|---|
 | 1 | Kho bài không đủ câu đúng ô ma trận (vd. bài thiếu câu Phần I mức Biết). Ưu tiên «28 câu đều của bài mới» hay «đúng ma trận»? | **Ma trận thắng tuyệt đối.** Ô thiếu lấp theo thứ tự: câu song sinh/biến thể của chính bài cùng ô → câu cùng ô của bài cũ cùng chương → câu cùng ô bài cũ khác. Số ngày = ⌈số câu ÷ 28⌉. | «Phủ hết từng câu»: số ngày = ô chật nhất quyết định ⇒ dài gấp ~2 (bảng mục 5). |
+| 1b | Câu bài mới «dư ô» (ô ấy đã đủ suất trong các ngày MỚI, vd. Ester bài 1 còn 68 câu chưa xếp được). Nếu cho ra ở ngày ÔN thì em gặp câu chưa từng làm trong ngày ôn — trái luật «ngày ôn không làm câu mới». | **Chờ bước 0**: gắn lại mức xong, câu dư ô sẽ ít đi nhiều; phần còn lại cho ra ở ngày ÔN **gắn nhãn «câu bài cũ chưa gặp»** (cùng chương, cùng ô, không phải bài đang học). | (b) Bỏ hẳn câu dư ô khỏi lịch (chỉ dùng làm song sinh cho ngày SỬA). (c) «Phủ hết từng câu» = thêm ngày MỚI. |
 | 2 | Nhãn mức (Biết/Hiểu/Vận dụng) trong app đang lệch thước ma trận (mục 5.2). | **Bước 0: gắn lại mức theo thước 0326** (máy gắn, lưu trường mới, KHÔNG ghi đè nhãn cũ), rồi mới bật lịch 28 câu. | Dùng nhãn hiện có ⇒ mỗi ngày bài mới ~16–22 câu bài mới, còn lại lấp. |
 | 3 | Số ngày ÔN mỗi bài. | ÔN = ⌈max(7 × số bài cũ, số dạng cũ chưa vững + đến hạn) ÷ 28⌉, ít nhất 1 (từ bài thứ 2), tối đa = số ngày MỚI. | Thầy đặt tỉ lệ cố định (vd. 1 ngày ôn / 2 ngày mới). |
 | 4 | Số ngày SỬA mỗi bài. | SỬA = ⌈tỉ lệ sai trung vị của lớp × (MỚI + ÔN)⌉, mặc định tỉ lệ 30 %; ngày cuối chu kỳ luôn là SỬA. | Cố định 1 ngày SỬA sau mỗi 3 ngày. |
@@ -104,10 +105,13 @@ TỔNG = MỚI + ÔN + SỬA        (KIỂM TRA nếu đến hẹn thì thay 1 n
 
 | Bài thứ | Bài | N | MỚI | ÔN | SỬA | Tổng ngày | Lịch |
 |---|---|---|---|---|---|---|---|
-| 1 | 12-C1-B1 Ester – Lipid (3 tờ) | 404 | 15 | 0 | 5 | **20** | M M M S M M M S M M M S M M M S M M M S |
+| 1 | 12-C1-B1 Ester – Lipid (cả 3 tờ) | 404 | 15 | 0 | 5 | **20** | M M M S M M M S M M M S M M M S M M M S |
 | 5 | 12-C2-B6 Tinh bột – cellulose | 263 | 10 | 1 | 4 | **15** | M M M S M M Ô M S M M S M M S |
 | 10 | 12-C4-B13 Vật liệu polymer | 125 | 5 | 3 | 3 | **11** | M Ô M S M Ô M S M Ô S |
 | — | 12-C6-B18 (bài nhỏ, N < 28, không phải bài đầu) | 20 | 1 | 1 | 1 | 3 | M Ô S |
+
+- Bài 1: chưa có bài cũ để lấp ô thiếu ⇒ với nhãn hiện tại mỗi ngày MỚI chỉ được ~22 câu (chỉ lấp được nếu bài có đủ câu song sinh đã duyệt cùng ô); sau bước 0 sẽ đo lại.
+- **Đòn bẩy của thầy:** N chỉ đếm các tờ thầy tick. Ester bài 1 tick 1 tờ (~135 câu) ⇒ 5 ngày MỚI thay vì 15. Tick mọi tờ của mọi bài lớp 12 ⇒ tổng ~115 ngày MỚI, chưa kể ÔN/SỬA — thầy cân với thời gian còn lại tới kỳ thi tháng 6.
 
 Chu kỳ ngắn dần khi bài nhỏ, phần ôn lớn dần khi số bài cũ tăng (bài 10: 3 ngày ôn = 84 câu cho 9 bài cũ).
 
@@ -124,6 +128,15 @@ Chu kỳ ngắn dần khi bài nhỏ, phần ôn lớn dần khi số bài cũ t
 | Câu chưa gắn mức / chương | Máy gắn ngay khi thầy chọn bài (đã có việc gắn vi kỹ năng lúc tick). Câu chưa gắn xong thì chờ, **không đoán**, không xếp vào ô. |
 | Kho thiếu một ô ngay cả ở bài cũ (ca thi, đề rút) | Không bao giờ đổi mức hoặc phần để đủ số. Báo thầy ô thiếu bao nhiêu câu; thầy bổ sung hoặc chấp nhận đề ít câu hơn. |
 | Đang có ca thi mở | Không phát hành lịch mới cho tới khi ca đóng (luật hiện hành). |
+| KIỂM TRA đến hẹn khi chu kỳ không có ngày ÔN (bài 1) | Thay một ngày SỬA không phải ngày cuối; nếu không có thì chen thêm 1 ngày (lịch lớp lùi 1 ngày cho riêng em ấy). Hẹn kiểm tra cá nhân vẫn theo từng em: ngày KIỂM TRA của em thay ngày ÔN/SỬA gần nhất trên hàng ngày học riêng của em. |
+
+### 4.1. Chuyển đổi và ảnh hưởng phụ (cần chốt khi build)
+
+| Thứ đang chạy | Đề xuất |
+|---|---|
+| Các gói 7 ngày đang chạy (hạn, «Đủ x/y») | Gói đang chạy giữ nguyên tới hạn; bài thầy chọn SAU ngày bật mới dùng lịch 28 câu. Không tính lại điểm, không xoá sổ. |
+| Bậc ngày 24/30/36 (lên tầng khi vững 80 %) | Bỏ bậc số câu (mọi em 28); tầng chỉ còn dùng để chọn độ khó trong ô ÔN/SỬA. |
+| Chuỗi ngày (streak), bậc chăm chỉ, EXP theo số câu/ngày | Mốc «đủ ngày» = xong 28 câu của ngày học. EXP vẫn chỉ theo máy chủ chấm; không đổi luật EXP, chỉ đổi mẫu số. |
 
 ---
 
@@ -161,7 +174,7 @@ Chu kỳ ngắn dần khi bài nhỏ, phần ôn lớn dần khi số bài cũ t
 
 ### 5.2. Vì sao phải gắn lại mức trước (mục 0 điều 2)
 
-- 15 bộ đề chuẩn 28 câu (12-BD7-07…21) theo nhãn app: Phần I trung bình **6,9 Biết / 8,4 Hiểu / 2,7 Vận dụng** mỗi đề, trong khi ma trận 0326 là **12 / 4 / 2**. Đề thật cùng khuôn mà nhãn app lệch ⇒ thước gắn mức của app chấm «Hiểu» rộng hơn thước Bộ.
+- 15 bộ đề chuẩn 28 câu (12-BD7-07…21) theo nhãn app: Phần I trung bình **6,9 Biết / 8,4 Hiểu / 2,7 Vận dụng** mỗi đề, trong khi ma trận 0326 là **12 / 4 / 2**. Các bộ đề này «lấy theo chuẩn», không phải chính đề 0326/0339, nên chưa phải bằng chứng tuyệt đối — nhưng **khả năng cao** thước gắn mức của app chấm «Hiểu» rộng hơn thước Bộ.
 - 40 đề kiểm tra chương (12-KT-*): cùng xu hướng (Phần I: 246 Biết / 382 Hiểu / 89 Vận dụng).
 - Hai tờ «Đề ôn tập chương chuẩn cấu trúc» (12-C2-B7, 12-C3-B11) đang gắn **toàn bộ 56 câu là Biết** — nhãn hỏng.
 - Ô thiếu ở bảng 5.1 phần lớn là Phần I Biết. Gắn lại theo thước 0326 (máy học từ 28 câu mẫu của tài liệu + cột «Cấp độ» mục 3) sẽ làm ô thiếu nhỏ đi; em chạy lại bảng 5.1 sau bước 0 để thầy thấy số ngày cuối.
