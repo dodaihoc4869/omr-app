@@ -1,0 +1,623 @@
+[
+  {
+    "i": 499,
+    "hash": "5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76.png",
+    "size": [
+      652,
+      153
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DH-12-C4-B14-D2-III-6",
+        "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn sau (hình):\n- Giai đoạn 1: Khơi mào\n- Giai đoạn 2: Phát triển mạch\n- Giai đoạn 3: Tắt mạch\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)",
+        "refs": [
+          {
+            "hash": "5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76",
+            "where": "DH-12-C4-B14-D2-III-6.hinh.1.du_lieu",
+            "hashDataUrl": "e720e8da8c9abccd85b3c0c82e752ccdb72382b9c01e355958810d832676862c"
+          }
+        ]
+      }
+    ],
+    "review": "NativeFULL+3x/allpublicrefs actualopened;source-only chưaSVG/chưaĐạt.",
+    "coordinateMeaning": "Nativepixelapprox1–2px;carboncentersprovided;ALLHtopbottomvertical,notcondensedlabels.",
+    "actualSvgReviewed": false,
+    "geometry": {
+      "leftRadical": {
+        "Rbbox": [
+          8,
+          62,
+          26,
+          86
+        ],
+        "Ccenters": [
+          [
+            71,
+            75
+          ],
+          [
+            121,
+            75
+          ]
+        ],
+        "Cheight": [
+          62,
+          86
+        ],
+        "HtopBboxY": [
+          12,
+          35
+        ],
+        "HbottomBboxY": [
+          113,
+          139
+        ],
+        "HbondY": [
+          [
+            38,
+            60
+          ],
+          [
+            88,
+            111
+          ]
+        ],
+        "backboneSegments": [
+          [
+            [
+              29,
+              74
+            ],
+            [
+              56,
+              74
+            ]
+          ],
+          [
+            [
+              83,
+              74
+            ],
+            [
+              107,
+              74
+            ]
+          ]
+        ],
+        "dot": {
+          "center": [
+            143,
+            74
+          ],
+          "radius": 5
+        }
+      },
+      "ethylene": {
+        "Ccenters": [
+          [
+            197,
+            75
+          ],
+          [
+            246,
+            75
+          ]
+        ],
+        "HtopBboxY": [
+          12,
+          35
+        ],
+        "HbottomBboxY": [
+          113,
+          139
+        ],
+        "HbondY": [
+          [
+            38,
+            60
+          ],
+          [
+            88,
+            111
+          ]
+        ],
+        "double": [
+          [
+            [
+              211,
+              70
+            ],
+            [
+              232,
+              70
+            ]
+          ],
+          [
+            [
+              211,
+              77
+            ],
+            [
+              232,
+              77
+            ]
+          ]
+        ]
+      },
+      "operators": [
+        {
+          "text": "+",
+          "center": [
+            164,
+            75
+          ]
+        },
+        {
+          "text": "+",
+          "center": [
+            274,
+            75
+          ]
+        },
+        {
+          "text": "...",
+          "bbox": [
+            294,
+            72,
+            318,
+            87
+          ],
+          "note": "THREEbaselineperiodsnotradicalcharge"
+        }
+      ],
+      "arrow": {
+        "shaft": [
+          [
+            343,
+            75
+          ],
+          [
+            379,
+            75
+          ]
+        ],
+        "openVhead": [
+          [
+            371,
+            68
+          ],
+          [
+            379,
+            75
+          ],
+          [
+            371,
+            82
+          ]
+        ]
+      },
+      "product": {
+        "Rbbox": [
+          393,
+          61,
+          412,
+          86
+        ],
+        "Ccenters": [
+          [
+            455,
+            72
+          ],
+          [
+            505,
+            72
+          ],
+          [
+            560,
+            72
+          ],
+          [
+            622,
+            72
+          ]
+        ],
+        "Cheight": [
+          59,
+          85
+        ],
+        "HtopBboxY": [
+          8,
+          31
+        ],
+        "HbottomBboxY": [
+          110,
+          136
+        ],
+        "HbondY": [
+          [
+            34,
+            57
+          ],
+          [
+            86,
+            108
+          ]
+        ],
+        "backboneSegments": [
+          [
+            [
+              414,
+              72
+            ],
+            [
+              441,
+              72
+            ]
+          ],
+          [
+            [
+              469,
+              72
+            ],
+            [
+              491,
+              72
+            ]
+          ],
+          [
+            [
+              523,
+              72
+            ],
+            [
+              547,
+              72
+            ]
+          ],
+          [
+            [
+              573,
+              72
+            ],
+            [
+              608,
+              72
+            ]
+          ]
+        ],
+        "brackets": [
+          "M4907H480V137H490",
+          "M5777H588V137H577"
+        ],
+        "repeatSub": {
+          "text": "n",
+          "bbox": [
+            591,
+            129,
+            607,
+            148
+          ]
+        },
+        "dot": {
+          "center": [
+            639,
+            71
+          ],
+          "radius": 5
+        },
+        "note": "squarebracketONLYmiddleC505/560with4H;terminalC455/622outside;HpositionscenteredrespectiveC."
+      },
+      "counts": "8C16H/2Rtokens/2radicaldots/2plus/3ellipsisperiods/1CCdouble/1RIGHTopenVhead/1squarepair+nsub. Noheading/stage2caption/condition/Rexpansion/answeradded."
+    }
+  },
+  {
+    "i": 327,
+    "hash": "38b3dacf803d65628186d81d3a7357bb9f19d510c67edcfc8505918c9b168f4e",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/38b3dacf803d65628186d81d3a7357bb9f19d510c67edcfc8505918c9b168f4e.png",
+    "size": [
+      706,
+      158
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "DH-12-C4-B14-D2-III-6",
+        "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn sau (hình):\n- Giai đoạn 1: Khơi mào\n- Giai đoạn 2: Phát triển mạch\n- Giai đoạn 3: Tắt mạch\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)",
+        "refs": [
+          {
+            "hash": "38b3dacf803d65628186d81d3a7357bb9f19d510c67edcfc8505918c9b168f4e",
+            "where": "DH-12-C4-B14-D2-III-6.hinh.2.du_lieu",
+            "hashDataUrl": "ba99575ec35a9d5221b0a6c44c6b095be44ae5d0be736852b6867e89250bc419"
+          }
+        ]
+      }
+    ],
+    "review": "NativeFULL+3x/allpublicrefs actualopened;source-only chưaSVG/chưaĐạt.",
+    "coordinateMeaning": "Nativepixelapprox1–2px;carboncentersprovided;ALLHtopbottomvertical,notcondensedlabels.",
+    "actualSvgReviewed": false,
+    "geometry": {
+      "leftPolymer": {
+        "Rbbox": [
+          8,
+          67,
+          27,
+          91
+        ],
+        "Ccenters": [
+          [
+            70,
+            79
+          ],
+          [
+            119,
+            79
+          ],
+          [
+            174,
+            79
+          ],
+          [
+            234,
+            79
+          ]
+        ],
+        "Cheight": [
+          66,
+          92
+        ],
+        "HtopBboxY": [
+          17,
+          40
+        ],
+        "HbottomBboxY": [
+          115,
+          139
+        ],
+        "HbondY": [
+          [
+            43,
+            64
+          ],
+          [
+            94,
+            112
+          ]
+        ],
+        "backboneSegments": [
+          [
+            [
+              29,
+              79
+            ],
+            [
+              56,
+              79
+            ]
+          ],
+          [
+            [
+              84,
+              79
+            ],
+            [
+              105,
+              79
+            ]
+          ],
+          [
+            [
+              136,
+              79
+            ],
+            [
+              160,
+              79
+            ]
+          ],
+          [
+            [
+              189,
+              79
+            ],
+            [
+              220,
+              79
+            ]
+          ]
+        ],
+        "brackets": [
+          "M10415H94V142H104",
+          "M19015H201V142H190"
+        ],
+        "repeatSub": {
+          "text": "n",
+          "bbox": [
+            204,
+            135,
+            220,
+            154
+          ]
+        },
+        "dot": {
+          "center": [
+            251,
+            76
+          ],
+          "radius": 5
+        }
+      },
+      "plus": {
+        "text": "+",
+        "center": [
+          280,
+          78
+        ]
+      },
+      "incomingR": {
+        "text": "R",
+        "bbox": [
+          300,
+          65,
+          320,
+          90
+        ]
+      },
+      "incomingDot": {
+        "center": [
+          327,
+          76
+        ],
+        "radius": 5
+      },
+      "arrow": {
+        "shaft": [
+          [
+            349,
+            78
+          ],
+          [
+            388,
+            78
+          ]
+        ],
+        "openVhead": [
+          [
+            380,
+            71
+          ],
+          [
+            388,
+            78
+          ],
+          [
+            380,
+            85
+          ]
+        ]
+      },
+      "product": {
+        "RleftBBox": [
+          415,
+          63,
+          435,
+          88
+        ],
+        "Ccenters": [
+          [
+            477,
+            75
+          ],
+          [
+            526,
+            75
+          ],
+          [
+            581,
+            75
+          ],
+          [
+            641,
+            75
+          ]
+        ],
+        "Cheight": [
+          62,
+          88
+        ],
+        "HtopBboxY": [
+          13,
+          36
+        ],
+        "HbottomBboxY": [
+          111,
+          135
+        ],
+        "HbondY": [
+          [
+            39,
+            60
+          ],
+          [
+            90,
+            108
+          ]
+        ],
+        "backboneSegments": [
+          [
+            [
+              437,
+              75
+            ],
+            [
+              464,
+              75
+            ]
+          ],
+          [
+            [
+              491,
+              75
+            ],
+            [
+              512,
+              75
+            ]
+          ],
+          [
+            [
+              543,
+              75
+            ],
+            [
+              567,
+              75
+            ]
+          ],
+          [
+            [
+              596,
+              75
+            ],
+            [
+              627,
+              75
+            ]
+          ],
+          [
+            [
+              655,
+              75
+            ],
+            [
+              679,
+              75
+            ]
+          ]
+        ],
+        "RrightBBox": [
+          681,
+          62,
+          701,
+          88
+        ],
+        "brackets": [
+          "M51111H501V138H511",
+          "M59711H608V138H597"
+        ],
+        "repeatSub": {
+          "text": "n",
+          "bbox": [
+            611,
+            131,
+            626,
+            150
+          ]
+        },
+        "note": "squarebracketONLYmiddleC526/581with4H;terminalC477/641outside;NOproductradicaldot."
+      },
+      "counts": "8C16H/4Rtokens/2radicaldotsONLYreactants/1plus/0CCdouble/1RIGHTopenVhead/2squarepairs+2nsub. Noaddedheading/condition/answer/Rexpansion."
+    }
+  }
+]

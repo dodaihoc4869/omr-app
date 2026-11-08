@@ -1,0 +1,333 @@
+{
+  "i": 924,
+  "hash": "a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370.png",
+  "size": [
+    1009,
+    136
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B2-D1-I-176",
+      "de": "Xác định chất X trong sơ đồ điều chế chất giặt rửa tổng hợp alkylbenzene sulfonate dưới đây:",
+      "refs": [
+        {
+          "hash": "a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370",
+          "where": "DB-12-B2-D1-I-176.hinh.0.du_lieu",
+          "hashDataUrl": "2f1475509fbbbe5b37f353528b91e93e7a7149f0e67cfaee58aaf12d3125871d"
+        }
+      ]
+    },
+    {
+      "qid": "DH-12-C1-B2-I-46",
+      "de": "Xác định chất X trong sơ đồ điều chế chất giặt rửa tổng hợp alkylbenzene sulfonate dưới đây:",
+      "refs": [
+        {
+          "hash": "a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370",
+          "where": "DH-12-C1-B2-I-46.hinh.0.du_lieu",
+          "hashDataUrl": "2f1475509fbbbe5b37f353528b91e93e7a7149f0e67cfaee58aaf12d3125871d"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x/all2publicrefs actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "rings": [
+      {
+        "vertices": [
+          [
+            74,
+            64
+          ],
+          [
+            103,
+            15
+          ],
+          [
+            154,
+            16
+          ],
+          [
+            183,
+            67
+          ],
+          [
+            153,
+            116
+          ],
+          [
+            102,
+            115
+          ]
+        ],
+        "circle": {
+          "center": [
+            128,
+            65
+          ],
+          "radii": [
+            39,
+            39
+          ]
+        },
+        "Rlabel": {
+          "text": "R",
+          "bbox": [
+            11,
+            55,
+            29,
+            77
+          ]
+        },
+        "Rbond": [
+          [
+            34,
+            64
+          ],
+          [
+            74,
+            64
+          ]
+        ]
+      },
+      {
+        "vertices": [
+          [
+            399,
+            68
+          ],
+          [
+            428,
+            19
+          ],
+          [
+            480,
+            20
+          ],
+          [
+            508,
+            71
+          ],
+          [
+            479,
+            121
+          ],
+          [
+            427,
+            119
+          ]
+        ],
+        "circle": {
+          "center": [
+            454,
+            69
+          ],
+          "radii": [
+            39,
+            39
+          ]
+        },
+        "Rlabel": {
+          "text": "R",
+          "bbox": [
+            330,
+            57,
+            348,
+            79
+          ]
+        },
+        "Rbond": [
+          [
+            353,
+            68
+          ],
+          [
+            399,
+            68
+          ]
+        ],
+        "rightBond": [
+          [
+            508,
+            71
+          ],
+          [
+            554,
+            71
+          ]
+        ],
+        "rightLabel": {
+          "text": "SO₃H",
+          "bbox": [
+            558,
+            56,
+            613,
+            85
+          ]
+        }
+      },
+      {
+        "vertices": [
+          [
+            777,
+            70
+          ],
+          [
+            804,
+            22
+          ],
+          [
+            861,
+            23
+          ],
+          [
+            888,
+            74
+          ],
+          [
+            859,
+            124
+          ],
+          [
+            805,
+            122
+          ]
+        ],
+        "circle": {
+          "center": [
+            833,
+            73
+          ],
+          "radii": [
+            39,
+            39
+          ]
+        },
+        "Rlabel": {
+          "text": "R",
+          "bbox": [
+            713,
+            58,
+            732,
+            81
+          ]
+        },
+        "Rbond": [
+          [
+            736,
+            70
+          ],
+          [
+            777,
+            70
+          ]
+        ],
+        "rightBond": [
+          [
+            888,
+            74
+          ],
+          [
+            924,
+            74
+          ]
+        ],
+        "rightLabel": {
+          "text": "SO₃Na",
+          "bbox": [
+            929,
+            56,
+            998,
+            85
+          ]
+        }
+      }
+    ],
+    "arrows": [
+      {
+        "shaft": [
+          [
+            197,
+            65
+          ],
+          [
+            315,
+            65
+          ]
+        ],
+        "filledhead": [
+          [
+            299,
+            60
+          ],
+          [
+            315,
+            65
+          ],
+          [
+            299,
+            70
+          ]
+        ],
+        "above": {
+          "text": "H₂SO₄ đặc",
+          "bbox": [
+            202,
+            35,
+            305,
+            57
+          ]
+        },
+        "below": {
+          "text": "t°",
+          "bbox": [
+            245,
+            74,
+            262,
+            94
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            628,
+            69
+          ],
+          [
+            702,
+            69
+          ]
+        ],
+        "filledhead": [
+          [
+            686,
+            64
+          ],
+          [
+            702,
+            69
+          ],
+          [
+            686,
+            74
+          ]
+        ],
+        "above": {
+          "text": "X",
+          "bbox": [
+            650,
+            37,
+            664,
+            58
+          ]
+        }
+      }
+    ],
+    "counts": "3hexagon3INNERcircles(NO3doubles)/3Rlabels/2RIGHTfilledheads/H2SO4đặcabove+t°below/Xabove2/2SO3condensedsub3. Nocharges/ONaionrewrite/Rvalue/answerX/name/captionadded.",
+    "style": "Uniformthinblackbonds,allregularuprightletters;sourcehandscanjitterinringsnotinventstereo."
+  },
+  "coordinateMeaning": "Nativepixelsapprox1–2px,actualparaR-SO3layout preservednotdeducedfromname.",
+  "actualSvgReviewed": false
+}

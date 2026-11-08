@@ -1,0 +1,56 @@
+[
+  {
+    "i": 499,
+    "hash": "5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76",
+    "fileNguon": "anh/5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76.png",
+    "svg": "pe-giai-doan-499-ddh-71e964e9c5a84cab640bf63403da65c2e6030b4b42a936b2d1686144e7b316b6.svg",
+    "hashSvg": "71e964e9c5a84cab640bf63403da65c2e6030b4b42a936b2d1686144e7b316b6",
+    "byteSvg": 16603,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C4-B14-D2-III-6",
+        "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn sau (hình):\n- Giai đoạn 1: Khơi mào\n- Giai đoạn 2: Phát triển mạch\n- Giai đoạn 3: Tắt mạch\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)",
+        "refs": [
+          {
+            "hash": "5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76",
+            "where": "DH-12-C4-B14-D2-III-6.hinh.1.du_lieu",
+            "hashDataUrl": "e720e8da8c9abccd85b3c0c82e752ccdb72382b9c01e355958810d832676862c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8C16explicitH/2R2radicaldots/2plus3ellipsisperiods/1CCdouble/1RIGHTopenV/1squarepairONLYmiddle2C+nsub/noaddedheading-condition-answer",
+    "hashSvgDaSoat": "71e964e9c5a84cab640bf63403da65c2e6030b4b42a936b2d1686144e7b316b6",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 327,
+    "hash": "38b3dacf803d65628186d81d3a7357bb9f19d510c67edcfc8505918c9b168f4e",
+    "fileNguon": "anh/38b3dacf803d65628186d81d3a7357bb9f19d510c67edcfc8505918c9b168f4e.png",
+    "svg": "pe-giai-doan-327-ddh-b3db564ed7cf37f2d6acab4c5b3629d20af70998b57e7febf39d21d6026a2e15.svg",
+    "hashSvg": "b3db564ed7cf37f2d6acab4c5b3629d20af70998b57e7febf39d21d6026a2e15",
+    "byteSvg": 17808,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C4-B14-D2-III-6",
+        "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn sau (hình):\n- Giai đoạn 1: Khơi mào\n- Giai đoạn 2: Phát triển mạch\n- Giai đoạn 3: Tắt mạch\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)",
+        "refs": [
+          {
+            "hash": "38b3dacf803d65628186d81d3a7357bb9f19d510c67edcfc8505918c9b168f4e",
+            "where": "DH-12-C4-B14-D2-III-6.hinh.2.du_lieu",
+            "hashDataUrl": "ba99575ec35a9d5221b0a6c44c6b095be44ae5d0be736852b6867e89250bc419"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8C16explicitH/4R2radicaldotsONLYreactants/1plus0CCdouble/1RIGHTopenV/2squarepairsONLYmiddle2C+2nsub/NOproductdot/noaddedheading-condition-answer",
+    "hashSvgDaSoat": "b3db564ed7cf37f2d6acab4c5b3629d20af70998b57e7febf39d21d6026a2e15",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,438 @@
+{
+  "i": 930,
+  "hash": "a848b594db62f95204060e1f44837465fc1ecc269367f8434909c55b97def89b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a848b594db62f95204060e1f44837465fc1ecc269367f8434909c55b97def89b.png",
+  "size": [
+    683,
+    141
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C4-B14-D2-III-6",
+      "de": "Polyethylene (PE) là loại nhựa nhiệt dẻo phổ biến được cấu tạo từ các chuỗi ethylene. Một trong các phương pháp để tổng hợp PE là thực hiện phản ứng ở áp suất cao và có mặt các hợp chất peroxide hữu cơ. Phản ứng xảy ra theo các giai đoạn sau (hình):\n- Giai đoạn 1: Khơi mào\n- Giai đoạn 2: Phát triển mạch\n- Giai đoạn 3: Tắt mạch\nVới R là $\\ce{C6H5COO}$ và một phân tử PE có chứa 0,11% oxygen về khối lượng, tính giá trị của n. (Kết quả các phép tính trung gian không được làm tròn, chỉ làm tròn kết quả cuối cùng đến hàng đơn vị)",
+      "refs": [
+        {
+          "hash": "a848b594db62f95204060e1f44837465fc1ecc269367f8434909c55b97def89b",
+          "where": "DH-12-C4-B14-D2-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "0cde88c0c6a3ef112236e0f6ec804306e669f70d80b718d038191e1aa8b3d239"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+3x/all1publicref actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "firstEquation": {
+      "labels": [
+        {
+          "text": "R",
+          "bbox": [
+            7,
+            59,
+            26,
+            83
+          ]
+        },
+        {
+          "text": "R",
+          "bbox": [
+            60,
+            59,
+            78,
+            83
+          ]
+        },
+        {
+          "text": "2R",
+          "bbox": [
+            132,
+            59,
+            164,
+            83
+          ]
+        }
+      ],
+      "RRbond": [
+        [
+          31,
+          72
+        ],
+        [
+          53,
+          72
+        ]
+      ],
+      "arrow": {
+        "shaft": [
+          [
+            87,
+            72
+          ],
+          [
+            124,
+            72
+          ]
+        ],
+        "openVhead": [
+          [
+            116,
+            65
+          ],
+          [
+            124,
+            72
+          ],
+          [
+            116,
+            79
+          ]
+        ]
+      },
+      "radicalDot": {
+        "center": [
+          175,
+          71
+        ],
+        "radius": 5
+      }
+    },
+    "connector": {
+      "text": "và",
+      "bbox": [
+        237,
+        59,
+        263,
+        83
+      ]
+    },
+    "ethylene": {
+      "Ccenters": [
+        [
+          332,
+          71
+        ],
+        [
+          383,
+          71
+        ]
+      ],
+      "Cbbox": [
+        [
+          321,
+          59,
+          343,
+          83
+        ],
+        [
+          372,
+          59,
+          394,
+          83
+        ]
+      ],
+      "double": [
+        [
+          [
+            346,
+            67
+          ],
+          [
+            367,
+            67
+          ]
+        ],
+        [
+          [
+            346,
+            74
+          ],
+          [
+            367,
+            74
+          ]
+        ]
+      ],
+      "Hlabels": [
+        {
+          "text": "H",
+          "bbox": [
+            321,
+            6,
+            343,
+            29
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            372,
+            6,
+            394,
+            29
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            321,
+            112,
+            343,
+            136
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            372,
+            112,
+            394,
+            136
+          ]
+        }
+      ],
+      "CbondsH": [
+        [
+          [
+            332,
+            32
+          ],
+          [
+            332,
+            57
+          ]
+        ],
+        [
+          [
+            383,
+            32
+          ],
+          [
+            383,
+            57
+          ]
+        ],
+        [
+          [
+            332,
+            86
+          ],
+          [
+            332,
+            110
+          ]
+        ],
+        [
+          [
+            383,
+            86
+          ],
+          [
+            383,
+            110
+          ]
+        ]
+      ]
+    },
+    "addition": {
+      "plus": {
+        "text": "+",
+        "bbox": [
+          405,
+          62,
+          418,
+          82
+        ]
+      },
+      "R": {
+        "text": "R",
+        "bbox": [
+          430,
+          59,
+          450,
+          83
+        ]
+      },
+      "radicalDot": {
+        "center": [
+          457,
+          70
+        ],
+        "radius": 5
+      },
+      "arrow": {
+        "shaft": [
+          [
+            477,
+            71
+          ],
+          [
+            515,
+            71
+          ]
+        ],
+        "openVhead": [
+          [
+            507,
+            64
+          ],
+          [
+            515,
+            71
+          ],
+          [
+            507,
+            78
+          ]
+        ]
+      }
+    },
+    "product": {
+      "R": {
+        "text": "R",
+        "bbox": [
+          532,
+          59,
+          552,
+          83
+        ]
+      },
+      "Ccenters": [
+        [
+          597,
+          71
+        ],
+        [
+          648,
+          71
+        ]
+      ],
+      "Cbbox": [
+        [
+          586,
+          59,
+          608,
+          83
+        ],
+        [
+          637,
+          59,
+          659,
+          83
+        ]
+      ],
+      "singleBackbone": [
+        [
+          [
+            554,
+            70
+          ],
+          [
+            583,
+            70
+          ]
+        ],
+        [
+          [
+            610,
+            70
+          ],
+          [
+            635,
+            70
+          ]
+        ]
+      ],
+      "Hlabels": [
+        {
+          "text": "H",
+          "bbox": [
+            586,
+            6,
+            608,
+            29
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            637,
+            6,
+            659,
+            29
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            586,
+            112,
+            608,
+            136
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            637,
+            112,
+            659,
+            136
+          ]
+        }
+      ],
+      "CbondsH": [
+        [
+          [
+            597,
+            32
+          ],
+          [
+            597,
+            57
+          ]
+        ],
+        [
+          [
+            648,
+            32
+          ],
+          [
+            648,
+            57
+          ]
+        ],
+        [
+          [
+            597,
+            86
+          ],
+          [
+            597,
+            110
+          ]
+        ],
+        [
+          [
+            648,
+            86
+          ],
+          [
+            648,
+            110
+          ]
+        ]
+      ],
+      "radicalDot": {
+        "center": [
+          671,
+          70
+        ],
+        "radius": 5
+      }
+    },
+    "counts": "4explicitC8explicitH/3solidradicaldotglyphs (after2R,afterreactantR,afterproductterminalC)/5Rtokensincl2Rcoefficient/1plus/2openVRIGHTarrows/onevà. ProductCCsinglevsreactantCCdouble. NoRexpansion/peroxideformula/phase/condition/stageheading/otherpolymerstages/answeradded.",
+    "style": "Allregularuprightblack;allradicaldotsBASELINE-centerednotcharge/superscript;sourcefirst2Rnot2radicaldots."
+  },
+  "coordinateMeaning": "Nativepixelsapprox1–2px;preserveshownstageonlydespitestemmentions3stages.",
+  "actualSvgReviewed": false
+}

@@ -1,0 +1,40 @@
+[
+  {
+    "i": 924,
+    "hash": "a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370",
+    "fileNguon": "anh/a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370.png",
+    "svg": "alkylbenzene-sulfonate-ddh-a62f1c715f4496261a2be5b899b1eb4af0d07d3bfafbdc7a71bc4de114eb84b9.svg",
+    "hashSvg": "a62f1c715f4496261a2be5b899b1eb4af0d07d3bfafbdc7a71bc4de114eb84b9",
+    "byteSvg": 16022,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B2-D1-I-176",
+        "de": "Xác định chất X trong sơ đồ điều chế chất giặt rửa tổng hợp alkylbenzene sulfonate dưới đây:",
+        "refs": [
+          {
+            "hash": "a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370",
+            "where": "DB-12-B2-D1-I-176.hinh.0.du_lieu",
+            "hashDataUrl": "2f1475509fbbbe5b37f353528b91e93e7a7149f0e67cfaee58aaf12d3125871d"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C1-B2-I-46",
+        "de": "Xác định chất X trong sơ đồ điều chế chất giặt rửa tổng hợp alkylbenzene sulfonate dưới đây:",
+        "refs": [
+          {
+            "hash": "a7ad4e09cc3eaff56f4245043026d96170dab645e7c65c050232f7786af5e370",
+            "where": "DH-12-C1-B2-I-46.hinh.0.du_lieu",
+            "hashDataUrl": "2f1475509fbbbe5b37f353528b91e93e7a7149f0e67cfaee58aaf12d3125871d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3hexagons3INNERcirclesnot3doubles/3Rlabels/2RIGHTfilledheads/H2SO4đặcabove-t°below/Xabove2/SO3H→SO3Naallsub3/noaddedionrewrite-Rvalue-caption-answerX.",
+    "hashSvgDaSoat": "a62f1c715f4496261a2be5b899b1eb4af0d07d3bfafbdc7a71bc4de114eb84b9",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
