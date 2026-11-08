@@ -1,0 +1,194 @@
+{
+  "i": 877,
+  "hash": "9f6ab7dfaa21abe06d429353ddae5e264d25d5ec8fdb1b44cbb2741ab9c48f44",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9f6ab7dfaa21abe06d429353ddae5e264d25d5ec8fdb1b44cbb2741ab9c48f44.png",
+  "size": [
+    766,
+    147
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-KTTX-601-III-6",
+      "de": "Trong công nghiệp, acetylene được sản xuất từ methane và oxygen theo sơ đồ (hình): $\\ce{CH4}$ và $\\ce{O2}$ vào tháp oxi hoá (I), khí ra đi qua tháp ngưng tụ (II) tách $\\ce{H2O}$.\nSau khi đi ra khỏi tháp ngưng tụ, thành phần của hỗn hợp khí còn lại là: 8,5% $\\ce{C2H2}$; 25,5% $\\ce{H2}$; 58,3% CO; 3,7% $\\ce{CO2}$ và 4,0% $\\ce{CH4}$ (theo số mol). Hãy cho biết hỗn hợp khí đưa vào tháp (I) thì $\\ce{CH4}$ chiếm bao nhiêu % theo số mol? (Không làm tròn các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần mười).",
+      "refs": [
+        {
+          "hash": "9f6ab7dfaa21abe06d429353ddae5e264d25d5ec8fdb1b44cbb2741ab9c48f44",
+          "where": "VIP27-BDT-KTTX-601-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "124aa4d28295c435ba900906df896ddf7e23230d9b4eb6dc8eeb8760e06a99cc"
+        }
+      ]
+    }
+  ],
+  "review": "NativeFULL+4x/all1publicref actualopened;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "reactorI": {
+      "roundedRect": [
+        110,
+        8,
+        312,
+        110
+      ],
+      "cornerRadius": 15,
+      "stroke": "blackbold~4px",
+      "label": {
+        "text": "(I)",
+        "bbox": [
+          196,
+          42,
+          227,
+          65
+        ],
+        "bold": true
+      }
+    },
+    "condenserII": {
+      "circleCenter": [
+        389,
+        57
+      ],
+      "radius": 33,
+      "stroke": "thinblack~2px",
+      "label": {
+        "text": "(II)",
+        "bbox": [
+          368,
+          44,
+          411,
+          71
+        ],
+        "bold": true
+      }
+    },
+    "inlets": [
+      {
+        "label": "CH₄",
+        "bbox": [
+          5,
+          23,
+          49,
+          43
+        ],
+        "shaft": [
+          [
+            57,
+            32
+          ],
+          [
+            110,
+            32
+          ]
+        ],
+        "openVhead": [
+          [
+            98,
+            25
+          ],
+          [
+            110,
+            32
+          ],
+          [
+            98,
+            38
+          ]
+        ]
+      },
+      {
+        "label": "O₂",
+        "bbox": [
+          29,
+          76,
+          59,
+          98
+        ],
+        "shaft": [
+          [
+            63,
+            85
+          ],
+          [
+            110,
+            85
+          ]
+        ],
+        "openVhead": [
+          [
+            98,
+            78
+          ],
+          [
+            110,
+            85
+          ],
+          [
+            98,
+            91
+          ]
+        ]
+      }
+    ],
+    "connectingPipe": "Twohorizontalparallelblacklines fromreactorrightx312,y48/62 tocircleleftx357,y48/62. Theyterminateonactualcircleboundary (nearx357),notdrawthroughcircle;NOarrowhere.",
+    "outletPipe": "Twohorizontalparallelblacklines circleRIGHTx421,y48/62 torightfreeendx452,y48/62. NOverticalclose/noarrowhead/outletlabel. Circleedge continuous native (pipejoinsnoopenportcut).",
+    "waterArrow": {
+      "shaft": [
+        [
+          389,
+          90
+        ],
+        [
+          389,
+          113
+        ]
+      ],
+      "openVhead": [
+        [
+          382,
+          103
+        ],
+        [
+          389,
+          113
+        ],
+        [
+          396,
+          103
+        ]
+      ],
+      "label": {
+        "text": "H₂O",
+        "bbox": [
+          368,
+          119,
+          413,
+          142
+        ]
+      }
+    },
+    "legends": [
+      {
+        "text": "(I) : tháp oxi hoá",
+        "bbox": [
+          545,
+          18,
+          745,
+          46
+        ],
+        "style": "Roman(I)bold;followingcolon/descriptiveregular"
+      },
+      {
+        "text": "(II) : tháp ngưng tụ",
+        "bbox": [
+          545,
+          82,
+          760,
+          112
+        ],
+        "style": "Roman(II)bold;followingcolon/descriptiveregular"
+      }
+    ],
+    "counts": "1roundrect1circle/2inputopenRIGHTheads1DOWNopenhead/2parallelconnectionlines2paralleloutletlines/CH4O2H2Oactualsubs/(I)(II)inside+2legendRoman. NoarrowI→II added/nooutletformula/noequation/temperature/yield/compositionpercent/answeradded."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px;ports/heads/readliteralfromnative,notprocessinference.",
+  "actualSvgReviewed": false
+}

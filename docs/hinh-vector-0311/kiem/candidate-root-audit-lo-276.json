@@ -1,0 +1,74 @@
+{
+  "negativeDiagnosticOnly": true,
+  "oldActualProofNotTransferred": true,
+  "fonts": {
+    "de": {
+      "base269SHA": "0fa021440f18da5b3021a074dfa65e5a404d42a72ec7f06fc9cdf96893f68c61",
+      "newSHA": "7345f7fb7b690437806b8872936627c2eb04cf0bdb2ffc80e6222dbaa935b353",
+      "bytes": 22448,
+      "hmtxExact": true,
+      "hheaOS2Exact": true,
+      "changedGlyphs": [
+        "uni1ED6"
+      ],
+      "allCmapTablesExact": true,
+      "layoutTablesExact": true,
+      "shaping": [
+        {
+          "char": "Ẫ",
+          "NFCNFDsame": true,
+          "gid": 494,
+          "glyph": "uni1EAA"
+        },
+        {
+          "char": "Ễ",
+          "NFCNFDsame": true,
+          "gid": 520,
+          "glyph": "uni1EC4"
+        },
+        {
+          "char": "Ỗ",
+          "NFCNFDsame": true,
+          "gid": 538,
+          "glyph": "uni1ED6"
+        }
+      ],
+      "DeOAffectedCmapAliases": [
+        7894
+      ]
+    },
+    "dam": {
+      "base269SHA": "0bd7fe68acbaccb2c7ef82894608562f18d27887c32b5a07c427da179893eef8",
+      "newSHA": "0bd7fe68acbaccb2c7ef82894608562f18d27887c32b5a07c427da179893eef8",
+      "bytes": 22588,
+      "hmtxExact": true,
+      "hheaOS2Exact": true,
+      "changedGlyphs": [],
+      "allCmapTablesExact": true,
+      "layoutTablesExact": true,
+      "shaping": [
+        {
+          "char": "Ẫ",
+          "NFCNFDsame": true,
+          "gid": 494,
+          "glyph": "uni1EAA"
+        },
+        {
+          "char": "Ễ",
+          "NFCNFDsame": true,
+          "gid": 520,
+          "glyph": "uni1EC4"
+        },
+        {
+          "char": "Ỗ",
+          "NFCNFDsame": true,
+          "gid": 538,
+          "glyph": "uni1ED6"
+        }
+      ],
+      "DeOAffectedCmapAliases": [
+        7894
+      ]
+    }
+  }
+}

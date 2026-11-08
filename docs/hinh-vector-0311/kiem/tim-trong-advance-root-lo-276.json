@@ -1,0 +1,334 @@
+[
+  {
+    "style": "de",
+    "glyph": "Ễ",
+    "headroomTop": 1000,
+    "xGrid": [
+      "allinkwithinadvance-step8"
+    ],
+    "advance": 629,
+    "xDomainPerMark": [
+      [
+        -123.92857360839844,
+        108.9285888671875
+      ],
+      [
+        -137.0,
+        123.0
+      ]
+    ],
+    "yStep": 5,
+    "yMinMarkBottom": 550,
+    "curveGap": 12,
+    "bodyMarkTests": 3708,
+    "bodyClearPools": [
+      638,
+      528
+    ],
+    "markPairTests": 336864,
+    "uniqueRelativeIntersectionTests": 2257,
+    "best": null,
+    "interMarkCollisionWitness": {
+      "translations": [
+        [
+          -123,
+          -266.0
+        ],
+        [
+          -137,
+          -55.0
+        ]
+      ],
+      "intersectionBounds": [
+        -5.07407808303833,
+        749.0264282226562,
+        375.00006103515625,
+        898.21630859375
+      ]
+    },
+    "firstCollisionWitness": [
+      {
+        "type": "body-mark",
+        "mark": 0,
+        "dx": -123,
+        "dy": -471.0,
+        "rawBounds": [
+          0.9285717010498047,
+          550.0,
+          397.0714416503906,
+          689.0
+        ]
+      }
+    ],
+    "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+    "strokeConicConversionTolerance": 0.01
+  },
+  {
+    "style": "de",
+    "glyph": "Ỗ",
+    "headroomTop": 1000,
+    "xGrid": [
+      "allinkwithinadvance-step8"
+    ],
+    "advance": 757,
+    "xDomainPerMark": [
+      [
+        -181.92857360839844,
+        178.9310302734375
+      ],
+      [
+        -195.0,
+        193.0
+      ]
+    ],
+    "yStep": 5,
+    "yMinMarkBottom": 550,
+    "curveGap": 12,
+    "bodyMarkTests": 5628,
+    "bodyClearPools": [
+      927,
+      733
+    ],
+    "markPairTests": 679491,
+    "uniqueRelativeIntersectionTests": 3480,
+    "best": {
+      "cost": 504.0,
+      "translations": [
+        [
+          -181,
+          -161.0
+        ],
+        [
+          117,
+          -45.0
+        ]
+      ]
+    },
+    "interMarkCollisionWitness": {
+      "translations": [
+        [
+          -181,
+          -261.0
+        ],
+        [
+          -195,
+          -45.0
+        ]
+      ],
+      "intersectionBounds": [
+        -5.074077606201172,
+        758.999755859375,
+        375.0000305175781,
+        904.1033325195312
+      ]
+    },
+    "firstCollisionWitness": [
+      {
+        "type": "body-mark",
+        "mark": 0,
+        "dx": -181,
+        "dy": -471.0,
+        "rawBounds": [
+          0.9285717010498047,
+          550.0,
+          397.0689697265625,
+          689.0
+        ]
+      }
+    ],
+    "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+    "strokeConicConversionTolerance": 0.01
+  },
+  {
+    "style": "dam",
+    "glyph": "Ẫ",
+    "headroomTop": 1000,
+    "xGrid": [
+      "allinkwithinadvance-step8"
+    ],
+    "advance": 681,
+    "xDomainPerMark": [
+      [
+        -124.81818389892578,
+        125.61700439453125
+      ],
+      [
+        -140.0,
+        141.0
+      ]
+    ],
+    "yStep": 5,
+    "yMinMarkBottom": 550,
+    "curveGap": 26,
+    "bodyMarkTests": 3668,
+    "bodyClearPools": [
+      321,
+      332
+    ],
+    "markPairTests": 106572,
+    "uniqueRelativeIntersectionTests": 1541,
+    "best": null,
+    "interMarkCollisionWitness": {
+      "translations": [
+        [
+          -124,
+          -199.0
+        ],
+        [
+          -140,
+          51.0
+        ]
+      ],
+      "intersectionBounds": [
+        -12.19025993347168,
+        772.2328491210938,
+        413.000244140625,
+        970.5305786132812
+      ]
+    },
+    "firstCollisionWitness": [
+      {
+        "type": "body-mark",
+        "mark": 0,
+        "dx": -124,
+        "dy": -434.0,
+        "rawBounds": [
+          0.8181819915771484,
+          550.0,
+          431.3829650878906,
+          726.0
+        ]
+      }
+    ],
+    "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+    "strokeConicConversionTolerance": 0.01
+  },
+  {
+    "style": "dam",
+    "glyph": "Ễ",
+    "headroomTop": 1000,
+    "xGrid": [
+      "allinkwithinadvance-step8"
+    ],
+    "advance": 615,
+    "xDomainPerMark": [
+      [
+        -96.81394958496094,
+        88.60870361328125
+      ],
+      [
+        -112.0,
+        103.0
+      ]
+    ],
+    "yStep": 5,
+    "yMinMarkBottom": 550,
+    "curveGap": 26,
+    "bodyMarkTests": 2751,
+    "bodyClearPools": [
+      192,
+      162
+    ],
+    "markPairTests": 31104,
+    "uniqueRelativeIntersectionTests": 650,
+    "best": null,
+    "interMarkCollisionWitness": {
+      "translations": [
+        [
+          -96,
+          -251.0
+        ],
+        [
+          -112,
+          -1.0
+        ]
+      ],
+      "intersectionBounds": [
+        -12.194252014160156,
+        772.2008056640625,
+        413.000244140625,
+        970.4619140625
+      ]
+    },
+    "firstCollisionWitness": [
+      {
+        "type": "body-mark",
+        "mark": 0,
+        "dx": -96,
+        "dy": -486.0,
+        "rawBounds": [
+          0.8139533996582031,
+          550.0,
+          430.39129638671875,
+          726.0
+        ]
+      }
+    ],
+    "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+    "strokeConicConversionTolerance": 0.01
+  },
+  {
+    "style": "dam",
+    "glyph": "Ỗ",
+    "headroomTop": 1000,
+    "xGrid": [
+      "allinkwithinadvance-step8"
+    ],
+    "advance": 742,
+    "xDomainPerMark": [
+      [
+        -155.81394958496094,
+        156.60870361328125
+      ],
+      [
+        -171.0,
+        171.0
+      ]
+    ],
+    "yStep": 5,
+    "yMinMarkBottom": 550,
+    "curveGap": 26,
+    "bodyMarkTests": 4424,
+    "bodyClearPools": [
+      267,
+      220
+    ],
+    "markPairTests": 58740,
+    "uniqueRelativeIntersectionTests": 1100,
+    "best": null,
+    "interMarkCollisionWitness": {
+      "translations": [
+        [
+          -155,
+          -256.0
+        ],
+        [
+          -171,
+          -1.0
+        ]
+      ],
+      "intersectionBounds": [
+        -12.192804336547852,
+        781.999755859375,
+        413.000244140625,
+        976.7120361328125
+      ]
+    },
+    "firstCollisionWitness": [
+      {
+        "type": "body-mark",
+        "mark": 0,
+        "dx": -155,
+        "dy": -496.0,
+        "rawBounds": [
+          0.8139533996582031,
+          550.0,
+          430.39129638671875,
+          726.0
+        ]
+      }
+    ],
+    "collisionPredicate": "INTERSECTION of halfgap ROUND-stroked+filled exact curves nonempty verbs; no area threshold",
+    "strokeConicConversionTolerance": 0.01
+  }
+]

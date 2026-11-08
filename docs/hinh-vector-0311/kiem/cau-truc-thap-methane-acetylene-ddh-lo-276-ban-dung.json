@@ -1,0 +1,29 @@
+[
+  {
+    "i": 877,
+    "hash": "9f6ab7dfaa21abe06d429353ddae5e264d25d5ec8fdb1b44cbb2741ab9c48f44",
+    "fileNguon": "anh/9f6ab7dfaa21abe06d429353ddae5e264d25d5ec8fdb1b44cbb2741ab9c48f44.png",
+    "svg": "thap-methane-acetylene-ddh-1942d0234dcd718bc8dbfcb199055578f43fa891a1e57cda8853dda8cae1aa6e.svg",
+    "hashSvg": "1942d0234dcd718bc8dbfcb199055578f43fa891a1e57cda8853dda8cae1aa6e",
+    "byteSvg": 24950,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-III-6",
+        "de": "Trong công nghiệp, acetylene được sản xuất từ methane và oxygen theo sơ đồ (hình): $\\ce{CH4}$ và $\\ce{O2}$ vào tháp oxi hoá (I), khí ra đi qua tháp ngưng tụ (II) tách $\\ce{H2O}$.\nSau khi đi ra khỏi tháp ngưng tụ, thành phần của hỗn hợp khí còn lại là: 8,5% $\\ce{C2H2}$; 25,5% $\\ce{H2}$; 58,3% CO; 3,7% $\\ce{CO2}$ và 4,0% $\\ce{CH4}$ (theo số mol). Hãy cho biết hỗn hợp khí đưa vào tháp (I) thì $\\ce{CH4}$ chiếm bao nhiêu % theo số mol? (Không làm tròn các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "9f6ab7dfaa21abe06d429353ddae5e264d25d5ec8fdb1b44cbb2741ab9c48f44",
+            "where": "VIP27-BDT-KTTX-601-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "124aa4d28295c435ba900906df896ddf7e23230d9b4eb6dc8eeb8760e06a99cc"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1roundrectI1circleII/2connectorlines2outletlinesNOheads/3openVheadsCH4O2RIGHT-H2ODOWN/4Romanlabelsactualdam/legendexacttháp oxi hoá-tháp ngưng tụ/noaddedproducts-percent-temp-answer.",
+    "hashSvgDaSoat": "1942d0234dcd718bc8dbfcb199055578f43fa891a1e57cda8853dda8cae1aa6e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
