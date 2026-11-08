@@ -909,7 +909,7 @@ function docDongPhan(x) {
   if (!laObj(x)) return hong("dongPhan không phải đối tượng");
   const ctpt = s(x.ctpt, 30);
   const nt = laObj(x.nguyenTu) ? x.nguyenTu : {};
-  const C = nguyen(nt.C, 1, 40), H = nguyen(nt.H, 0, 90);
+  const C = nguyen(nt.C, 1, 120), H = nguyen(nt.H, 0, 250);
   const N = nt.N === void 0 ? 0 : nguyen(nt.N, 0, 6), X = nt.X === void 0 ? 0 : nguyen(nt.X, 0, 6), O = nt.O === void 0 ? 0 : nguyen(nt.O, 0, 12);
   if (!ctpt || C === null || H === null || N === null || X === null || O === null) return hong("thiếu công thức phân tử / số nguyên tử");
   const nguyenTu = { C, H, ...N ? { N } : {}, ...X ? { X } : {}, ...O ? { O } : {} };
