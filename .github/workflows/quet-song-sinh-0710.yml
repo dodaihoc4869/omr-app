@@ -1,0 +1,96 @@
+name: Quet song sinh toan kho (chi doc)
+on:
+  pull_request:
+    paths: ['.github/workflows/quet-song-sinh-0710.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lam sach khoa Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Quet toan kho chi SELECT
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          mkdir -p ket-qua-song-sinh
+          node --input-type=module <<'JS'
+          import { writeFileSync } from 'node:fs'
+          import { songSinhDungDuoc } from './scripts/do-phu-lam-lai.mjs'
+          const token = process.env.CLOUDFLARE_API_TOKEN
+          const account = process.env.CLOUDFLARE_ACCOUNT_ID
+          if (!token || !account) throw new Error('Thieu cau hinh Cloudflare')
+          async function query(sql, params = []) {
+            if (!/^SELECT\b/i.test(sql.trim())) throw new Error('Chi cho phep SELECT')
+            const r = await fetch('https://api.cloudflare.com/client/v4/accounts/' + account + '/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query', {
+              method: 'POST', signal: AbortSignal.timeout(60000),
+              headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ sql, params })
+            })
+            const j = await r.json()
+            if (!r.ok || !j.success) throw new Error('D1 HTTP ' + r.status + ' codes ' + (j.errors ?? []).map(x => x.code).join(','))
+            return j.result.flatMap(x => x.results ?? [])
+          }
+          const parsed = v => { try { return JSON.parse(v ?? 'null') } catch { return null } }
+          const cau = new Map()
+          let soDongKho = 0
+          for (let offset = 0; ; offset += 500) {
+            const rows = await query("SELECT q.qid,q.ma_de,d.chuyen_de,json_valid(q.json) AS valid,CASE WHEN json_valid(q.json) THEN json_extract(q.json,'$.phan') END AS phan,CASE WHEN json_valid(q.json) THEN json_extract(q.json,'$.tuLuan') END AS tu_luan FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de WHERE COALESCE(d.da_xoa,0)=0 ORDER BY q.qid,q.ma_de LIMIT 500 OFFSET ?", [offset])
+            soDongKho += rows.length
+            for (const r of rows) {
+              const old = cau.get(r.qid)
+              if (old && (old.phan !== r.phan || old.valid !== r.valid || old.tu_luan !== r.tu_luan)) throw new Error('Ban trung mau thuan: ' + r.qid)
+              if (!old) cau.set(r.qid, r)
+            }
+            if (rows.length < 500) break
+          }
+          const ss = new Map()
+          for (let offset = 0; ; offset += 500) {
+            const rows = await query('SELECT lc.qid,b.song_sinh_json FROM loi_giai_cau lc JOIN cau_bo_tro b ON b.bam=lc.bam ORDER BY lc.qid LIMIT 500 OFFSET ?', [offset])
+            for (const r of rows) {
+              const ds = parsed(r.song_sinh_json)
+              ss.set(r.qid, { ds: Array.isArray(ds) ? ds : [], jsonLoi: r.song_sinh_json != null && !Array.isArray(ds) })
+            }
+            if (rows.length < 500) break
+          }
+          const tao = () => ({ tong: 0, coSongSinhLuu: 0, coSongSinhDungDuoc: 0, chuaCoSongSinhLuu: 0, coNhungKhongDungDuoc: 0, thieuSongSinhDungDuoc: 0, tongBanLuu: 0, tongBanDungDuoc: 0 })
+          const tong = tao(), theoPhan = {}, theoChuong = {}, thieu = []
+          let tuLuan = 0, jsonGocLoi = 0, jsonSongSinhLoi = 0
+          for (const c of cau.values()) {
+            const s = ss.get(c.qid) ?? { ds: [], jsonLoi: false }
+            const usable = c.valid && !c.tu_luan ? s.ds.slice(0, 8).filter(x => songSinhDungDuoc(c.phan, x)).length : 0
+            if (c.tu_luan) tuLuan++
+            if (!c.valid) jsonGocLoi++
+            if (s.jsonLoi) jsonSongSinhLoi++
+            const phan = c.tu_luan ? 'Tu luan' : c.phan ?? 'Khong ro phan'
+            const chuong = c.chuyen_de || 'Khong ghi chuyen de'
+            theoPhan[phan] ??= tao()
+            theoChuong[chuong] ??= tao()
+            for (const o of [tong, theoPhan[phan], theoChuong[chuong]]) {
+              o.tong++; o.tongBanLuu += s.ds.length; o.tongBanDungDuoc += usable
+              if (s.ds.length) o.coSongSinhLuu++; else o.chuaCoSongSinhLuu++
+              if (usable) o.coSongSinhDungDuoc++; else { o.thieuSongSinhDungDuoc++; if (s.ds.length) o.coNhungKhongDungDuoc++ }
+            }
+            if (!usable) thieu.push({ qid: c.qid, maDe: c.ma_de, phan, chuong, soBanLuu: s.ds.length, lyDo: !c.valid ? 'JSON goc loi' : c.tu_luan ? 'Tu luan khong phuc vu trong game' : !s.ds.length ? 'Chua co song sinh luu' : 'Khong co ban dung duoc theo luat hien tai' })
+          }
+          const result = { luc: new Date().toISOString(), chiDoc: true, phamVi: 'game_v2_question cua to chua xoa; khu trung theo qid', soDongKho, soCauDuyNhat: cau.size, tuLuan, jsonGocLoi, jsonSongSinhLoi, tong, theoPhan, theoChuong }
+          writeFileSync('ket-qua-song-sinh/tong-hop.json', JSON.stringify(result, null, 2))
+          writeFileSync('ket-qua-song-sinh/cau-thieu-song-sinh.json', JSON.stringify(thieu, null, 2))
+          console.log(JSON.stringify(result, null, 2))
+          JS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ket-qua-song-sinh-toan-kho
+          path: ket-qua-song-sinh/
+          retention-days: 7
