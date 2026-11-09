@@ -606,6 +606,7 @@ export default defineConfig({
           '**/logo-gv-*',
           // 28/10 biểu tượng app học sinh mới (đầu Cú Ngọc, bộ -cn): favicon / icon cài máy đọc qua mạng như bộ 512 — không thêm mục precache (trần 170).
           '**/logo-hs-*-cn.{png,svg}',
+          '**/logo-hs-*-mol-tron.{png,svg}', // 10/11 Mol bo góc (thầy «bo tròn góc giống doligo») — như bộ -mol: đọc qua mạng lúc cài, không vào precache
           '**/logo-hs-*-mol.{png,svg}', // 09/11 biểu tượng Mol tràn ô (thầy «ảnh mol full giống doligo») — như bộ -cn: đọc qua mạng lúc cài, không vào precache
           // Phiếu HTML: chỉ mở khi em bấm làm phiếu (đang có mạng), tải một lần rồi cất.
           '**/html-phieu-*.js',
