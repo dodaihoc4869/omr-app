@@ -72,7 +72,9 @@ describe('làm chặng kiểu Duolingo («Trong»)', () => {
     expect(tam.getAttribute('data-tt')).toBe('sai')
     expect(tam.textContent).toContain('Đáp án đúng: D. 4')
     expect(tam.textContent).toContain('8 là tổng số đồng phân amine.')
-    expect(tam.textContent).toContain('lịch ôn 1 · 3 · 7 ngày')
+    expect(tam.textContent).toContain('Vì sao em sai?') // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục» — dòng «lịch ôn 1 · 3 · 7 ngày» thay bằng nhóm sửa
+    expect(tam.textContent).toContain('vào nhóm sửa')
+    expect(tam.textContent).not.toContain('1 · 3 · 7')
     expect(tam.textContent).not.toContain('Sửa câu này') // thầy 26/10 «Bỏ câu sai từng bước»: chỉ Lời giải từng bước + Hỏi thầy
     expect(document.querySelector('.ht2-lam-loi-giai')).toBeNull() // lời giải không chen giữa màn
     // thầy 03/11 «Làm chặng đang bị mất nút lời giải» ⇒ nút «Lời giải» của màn làm chặng giữ nguyên (mở khung lời giải)
@@ -128,6 +130,7 @@ describe('hiệu ứng đúng / sai kiểu Duolingo (thầy 26/10)', () => {
     expect(goc.querySelector('.duo-kq-bi')).toBeNull() // 27/10: dải như Duolingo — dấu tròn ×, không Bi
     expect(goc.querySelector('.duo-ket .duo-tick[data-sai]')).not.toBeNull()
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'B', solution: {} })
+    fireEvent.click(screen.getByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
     await screen.findByText(C2.text)
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1') // sang câu sau mới nhích

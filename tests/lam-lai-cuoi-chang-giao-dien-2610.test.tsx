@@ -85,6 +85,7 @@ describe('màn Duo («Trong»)', () => {
     giaLap(false)
     moMan()
     await tra(c1.text, 0)
+    fireEvent.click(await screen.findByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
     fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))
     await tra(c2.text, 0)
     const tiep = await screen.findByRole('button', { name: 'Tiếp tục' })
@@ -106,6 +107,7 @@ describe('màn Duo («Trong»)', () => {
     giaLap(false, false)
     moMan()
     await tra(c1.text, 0)
+    fireEvent.click(await screen.findByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
     fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))
     await tra(c2.text, 0)
     fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))
