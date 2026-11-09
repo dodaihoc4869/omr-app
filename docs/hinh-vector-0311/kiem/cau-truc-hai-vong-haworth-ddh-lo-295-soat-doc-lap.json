@@ -1,0 +1,12 @@
+[
+  {
+    "i": 1217,
+    "hashSvg": "7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, đọc cả hai public questions.de và refs 12-C2-B5-I-38/DB-12-B5-D2-I-31 sau_de; tự fresh Chromium FULL 3x đúng SHA, mở FULL và macro. Hai vòng Haworth sáu cạnh, mỗi vòng 5 C ẩn và một O; hai CH2OH hướng lên, tổng 6 OH tự do (mỗi vòng OH ở đỉnh trước trái hướng lên, trước phải hướng xuống, đầu ngoài hướng xuống), O cầu nối từ đầu phải vòng trái tới đầu trái vòng phải. Đúng bốn cạnh TAPER và hai cạnh trước đậm, không tự thêm H tường minh/số C/tên/đáp án. Hai chỉ số 2 của CH2OH rõ, gắn nhánh qua C đúng; glyph DDH regular và O/H/C không chạm liên kết, không thấy thủng lỗi hay cắt/tràn. SVG path tự chứa không text/image.",
+    "render": "/workspace/scratch/soat263-1217.png",
+    "macro": "/workspace/scratch/haworth1217-macro.png",
+    "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+    "hashSvgDaSoat": "7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc"
+  }
+]

@@ -2233,6 +2233,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d": {
+      "tep": "hai-vong-haworth-ddh-7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc.svg",
+      "hashSvg": "7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc",
+      "byteSvg": 12643,
+      "byteGzip": 1382,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6": {
       "tep": "nong-do-hai-chat-ddh-4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925.svg",
       "hashSvg": "4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925",
@@ -11151,6 +11160,20 @@
       ]
     },
     {
+      "qid": "12-C2-B5-I-38",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+          "where": "12-C2-B5-I-38.hinh.0.du_lieu",
+          "hashDataUrl": "44352cd731d75a70a9ed23d90b63335571524f2aebed2be793421b4928bee665",
+          "vector": "hai-vong-haworth-ddh-7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B5-II-15",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -19929,6 +19952,20 @@
           "where": "DB-12-B5-D2-I-1.hinh.0.du_lieu",
           "hashDataUrl": "52bfcfc5ee443f7b968e1ece012d3fcc650d35113ec5b8b000a0088bda5c8cb7",
           "vector": "glucose-so-carbon-ddh-832455e6183ee456c93ae36a46c4e6fb3fc676de4845c80f97c13cd4803bf732.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-31",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+          "where": "DB-12-B5-D2-I-31.hinh.0.du_lieu",
+          "hashDataUrl": "44352cd731d75a70a9ed23d90b63335571524f2aebed2be793421b4928bee665",
+          "vector": "hai-vong-haworth-ddh-7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc.svg"
         }
       ]
     },
@@ -28853,6 +28890,7 @@
     "12-C2-B4-D2-II-13",
     "12-C2-B4-D2-II-15",
     "12-C2-B4-D2-III-38",
+    "12-C2-B5-I-38",
     "12-C2-B5-II-15",
     "12-C2-B5-II-16",
     "12-C2-B5-III-4",
@@ -29408,6 +29446,7 @@
     "DB-12-B6-D1-I-84",
     "DB-12-B6-D2-II-41",
     "DB-12-B5-D2-I-1",
+    "DB-12-B5-D2-I-31",
     "DB-12-B5-D2-II-52",
     "DB-12-B5-D2-III-55",
     "DB-12-B5-D2-III-165",

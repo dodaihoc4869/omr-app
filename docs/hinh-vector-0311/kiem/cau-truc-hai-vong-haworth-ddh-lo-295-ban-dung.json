@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1217,
+    "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+    "fileNguon": "anh/dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d.png",
+    "svg": "hai-vong-haworth-ddh-7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc.svg",
+    "hashSvg": "7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc",
+    "byteSvg": 12643,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B5-I-38",
+        "de": "Carbohydrate Y có công thức cấu tạo dưới đây:\nTên gọi của Y là",
+        "refs": [
+          {
+            "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+            "where": "12-C2-B5-I-38.hinh.0.du_lieu",
+            "hashDataUrl": "44352cd731d75a70a9ed23d90b63335571524f2aebed2be793421b4928bee665"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-I-31",
+        "de": "Carbohydrate Y có công thức cấu tạo dưới đây:\nTên gọi của Y là",
+        "refs": [
+          {
+            "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+            "where": "DB-12-B5-D2-I-31.hinh.0.du_lieu",
+            "hashDataUrl": "44352cd731d75a70a9ed23d90b63335571524f2aebed2be793421b4928bee665"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2Haworth/2ringO1bridgeO/2CH2OH6freeOH/4TAPER2frontbold/0explicitH0Cnums/regularDDH/noaddedcaption-name-answer.",
+    "hashSvgDaSoat": "7c913a45d5350289673d4ba724916c8b5bd25b889531f1ad47aa0b8d54ef48bc",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

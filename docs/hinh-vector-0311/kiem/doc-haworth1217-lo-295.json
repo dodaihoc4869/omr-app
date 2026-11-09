@@ -1,0 +1,470 @@
+{
+  "i": 1217,
+  "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d.png",
+  "size": [
+    471,
+    286
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C2-B5-I-38",
+      "de": "Carbohydrate Y có công thức cấu tạo dưới đây:\nTên gọi của Y là",
+      "allHinh": [
+        {
+          "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+          "where": "12-C2-B5-I-38.hinh.0.du_lieu",
+          "hashDataUrl": "44352cd731d75a70a9ed23d90b63335571524f2aebed2be793421b4928bee665"
+        }
+      ],
+      "missingHashes": [
+        "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d"
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-31",
+      "de": "Carbohydrate Y có công thức cấu tạo dưới đây:\nTên gọi của Y là",
+      "allHinh": [
+        {
+          "hash": "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d",
+          "where": "DB-12-B5-D2-I-31.hinh.0.du_lieu",
+          "hashDataUrl": "44352cd731d75a70a9ed23d90b63335571524f2aebed2be793421b4928bee665"
+        }
+      ],
+      "missingHashes": [
+        "dcf530b67f2a5183ad13283acca2125d81e95775027b988353bc541ff5a7866d"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/1217-native4x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native pixel geometry and literal visible atoms; semantic C1..C5 below only internal trace keys, NOT labels to draw.",
+  "geometry": {
+    "classification": "Two Haworth six-member rings with downward bridging oxygen. No stereochemical H printed.",
+    "counts": {
+      "C": 12,
+      "O": 11,
+      "ringO": 2,
+      "bridgeO": 1,
+      "freeOH": 6,
+      "CH2OH": 2,
+      "explicitStandaloneH": 0,
+      "taperFrontDiagonals": 4,
+      "boldFrontHorizontal": 2,
+      "Cnums": 0,
+      "caption": 0
+    },
+    "leftRing": {
+      "vertices": {
+        "C1": [
+          193,
+          138
+        ],
+        "C2": [
+          148,
+          182
+        ],
+        "C3": [
+          85,
+          182
+        ],
+        "C4": [
+          40,
+          138
+        ],
+        "C5": [
+          85,
+          92
+        ]
+      },
+      "ringO": {
+        "label": "O",
+        "bbox": [
+          137,
+          82,
+          161,
+          106
+        ]
+      },
+      "backThinLines": [
+        [
+          [
+            40,
+            138
+          ],
+          [
+            85,
+            92
+          ]
+        ],
+        [
+          [
+            85,
+            92
+          ],
+          [
+            135,
+            92
+          ]
+        ],
+        [
+          [
+            160,
+            104
+          ],
+          [
+            193,
+            138
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            40,
+            138
+          ],
+          [
+            81,
+            186
+          ],
+          [
+            87,
+            178
+          ]
+        ],
+        [
+          [
+            193,
+            138
+          ],
+          [
+            146,
+            186
+          ],
+          [
+            148,
+            178
+          ]
+        ]
+      ],
+      "frontBold": [
+        [
+          85,
+          182
+        ],
+        [
+          148,
+          182
+        ]
+      ],
+      "branches": [
+        {
+          "from": [
+            85,
+            92
+          ],
+          "to": [
+            85,
+            59
+          ],
+          "text": "CH₂OH",
+          "bbox": [
+            73,
+            31,
+            174,
+            58
+          ],
+          "anchor": "firstC"
+        },
+        {
+          "from": [
+            40,
+            138
+          ],
+          "to": [
+            40,
+            174
+          ],
+          "text": "OH",
+          "bbox": [
+            28,
+            175,
+            72,
+            200
+          ],
+          "anchor": "O"
+        },
+        {
+          "from": [
+            85,
+            182
+          ],
+          "to": [
+            85,
+            148
+          ],
+          "text": "OH",
+          "bbox": [
+            73,
+            122,
+            117,
+            147
+          ],
+          "anchor": "O"
+        },
+        {
+          "from": [
+            148,
+            182
+          ],
+          "to": [
+            148,
+            219
+          ],
+          "text": "OH",
+          "bbox": [
+            136,
+            220,
+            180,
+            245
+          ],
+          "anchor": "O"
+        }
+      ]
+    },
+    "rightRing": {
+      "vertices": {
+        "C1": [
+          395,
+          138
+        ],
+        "C2": [
+          350,
+          182
+        ],
+        "C3": [
+          286,
+          182
+        ],
+        "C4": [
+          242,
+          138
+        ],
+        "C5": [
+          286,
+          92
+        ]
+      },
+      "ringO": {
+        "label": "O",
+        "bbox": [
+          338,
+          82,
+          363,
+          106
+        ]
+      },
+      "backThinLines": [
+        [
+          [
+            242,
+            138
+          ],
+          [
+            286,
+            92
+          ]
+        ],
+        [
+          [
+            286,
+            92
+          ],
+          [
+            336,
+            92
+          ]
+        ],
+        [
+          [
+            362,
+            104
+          ],
+          [
+            395,
+            138
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            242,
+            138
+          ],
+          [
+            282,
+            186
+          ],
+          [
+            288,
+            178
+          ]
+        ],
+        [
+          [
+            395,
+            138
+          ],
+          [
+            348,
+            186
+          ],
+          [
+            350,
+            178
+          ]
+        ]
+      ],
+      "frontBold": [
+        [
+          286,
+          182
+        ],
+        [
+          350,
+          182
+        ]
+      ],
+      "branches": [
+        {
+          "from": [
+            286,
+            92
+          ],
+          "to": [
+            286,
+            59
+          ],
+          "text": "CH₂OH",
+          "bbox": [
+            275,
+            31,
+            376,
+            58
+          ],
+          "anchor": "firstC"
+        },
+        {
+          "from": [
+            286,
+            182
+          ],
+          "to": [
+            286,
+            148
+          ],
+          "text": "OH",
+          "bbox": [
+            275,
+            122,
+            319,
+            147
+          ],
+          "anchor": "O"
+        },
+        {
+          "from": [
+            350,
+            182
+          ],
+          "to": [
+            350,
+            219
+          ],
+          "text": "OH",
+          "bbox": [
+            338,
+            220,
+            382,
+            245
+          ],
+          "anchor": "O"
+        },
+        {
+          "from": [
+            395,
+            138
+          ],
+          "to": [
+            395,
+            174
+          ],
+          "text": "OH",
+          "bbox": [
+            383,
+            175,
+            427,
+            200
+          ],
+          "anchor": "O"
+        }
+      ]
+    },
+    "bridge": {
+      "label": "O",
+      "bbox": [
+        205,
+        169,
+        231,
+        194
+      ],
+      "thinBonds": [
+        [
+          [
+            193,
+            138
+          ],
+          [
+            211,
+            168
+          ]
+        ],
+        [
+          [
+            224,
+            168
+          ],
+          [
+            242,
+            138
+          ]
+        ]
+      ],
+      "connectivity": "leftC1 DOWNright to bridgeO; bridgeO UPrightrightC4. No extraOH on either bridgeendpoint."
+    },
+    "font": "Regular upright uniform black sans chemical glyphs; CH₂OH2subscript. No bold atomlabels; bold/taper applies onlyfrontbonds.",
+    "noAdded": [
+      "standaloneH",
+      "Cnumbers",
+      "compoundname",
+      "caption",
+      "charges",
+      "wavybond",
+      "extraOH atbridge",
+      "replacingbridgingOwithline"
+    ]
+  },
+  "actualSvgReviewed": false
+}
