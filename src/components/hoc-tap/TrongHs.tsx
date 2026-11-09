@@ -1106,7 +1106,8 @@ export function MotTrangHs(p: PropsMotTrang) {
   // ôn tập của hôm nay (chưa quá hạn; đã nộp ⇒ tính đủ). Chỉ để HIỆN số + đổi màu dung dịch — thứ tự / khoá việc vẫn theo `du` (đủ mức câu học) như cũ.
   const ktNgay = !!kiem && kiem.homNay && (kiem.trangThai === 'can_lam' || kiem.trangThai === 'da_nop')
   const daSuaNgay = typeof daSuaNay === 'number' ? daSuaNay : 0
-  const tongSuaNay = coSua && !p.ngayKiem ? suaNay + daSuaNgay : 0 // cùng số «còn N câu cần sửa» của nút chính
+  // ngày Sửa: 28 câu đã là câu sửa ⇒ không cộng Tự sửa lỗi (10/11)
+  const tongSuaNay = coSua && !p.ngayKiem && p.loaiNgay !== 'sua' ? suaNay + daSuaNgay : 0
   const tongNgay = (so && !p.ngayKiem ? so.muc : 0) + tongSuaNay + (ktNgay ? kiem!.tong : 0)
   const daNgay = (so && !p.ngayKiem ? Math.min(so.daLam, so.muc) : 0) + (tongSuaNay ? daSuaNgay : 0) + (ktNgay ? (kiem!.nopLuc !== null ? kiem!.tong : kiem!.daTra) : 0)
   const coTong = tongNgay > 0 && (!!so || !!p.ngayKiem)

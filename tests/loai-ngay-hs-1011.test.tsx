@@ -80,3 +80,14 @@ describe('nút chính ngày Sửa: «Sửa nhóm N» (khối B lát 5, bản v�
     expect(container.querySelector('.kb-cta')?.textContent ?? '').not.toContain('Sửa nhóm')
   })
 })
+
+describe('tổng câu hôm nay ngày Sửa không đếm trùng Tự sửa lỗi (thầy 10/11 «Đếm của Mol và tổng số câu có sai ko» — ảnh 1/56 vs «còn 27»)', () => {
+  it('ngày Sửa: thẻ mức = 28 (khớp lời Mol); ngày thường vẫn cộng hàng Tự sửa lỗi như cũ', () => {
+    const so = { daLam: 1, muc: 28, chang: 1, soChang: 5 } as PropsMotTrang['so']
+    const { container, rerender } = render(<MotTrangHs {...goc({ so, loaiNgay: 'sua', soSua: 28 })} />)
+    expect(container.querySelector('.kb-so')!.textContent).toBe('1/28 câu')
+    expect(container.textContent).toContain('Còn 27 câu nữa')
+    rerender(<MotTrangHs {...goc({ so, soSua: 28 })} />)
+    expect(Number(/^1\/(\d+) câu$/.exec(container.querySelector('.kb-so')!.textContent ?? '')?.[1])).toBeGreaterThan(28) // ngày thường: mức + hàng Tự sửa lỗi hôm nay (như cũ)
+  })
+})
