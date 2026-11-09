@@ -24,6 +24,8 @@ const lopMayDo = (): LopMayDo | null => (typeof window !== 'undefined' && (windo
 let quyen: TrangThaiQuyen = null
 let dangXin: Promise<unknown> | null = null
 let daDoc = false
+/** Đã xin một lần trong lần nạp trang này (em gạt hộp đi không chọn ⇒ 'prompt' — không hỏi lại ở mỗi lần chạm đáp án). */
+let daXin = false
 
 /** Đọc trạng thái quyền sẵn có (không hiện hộp hỏi) — gọi khi màn BPU gắn. */
 export function docQuyenTatMan(): void {
@@ -43,7 +45,8 @@ export function docQuyenTatMan(): void {
  *  cửa sổ nổi KHÔNG báo nhầm. */
 export function xinQuyenTatMan(): void {
   const L = lopMayDo()
-  if (!L?.requestPermission || dangXin || quyen === 'granted' || quyen === 'denied') return
+  if (!L?.requestPermission || daXin || dangXin || quyen === 'granted' || quyen === 'denied') return
+  daXin = true
   try {
     const p = L.requestPermission()
     dangXin = p
@@ -86,4 +89,4 @@ export function dangChiaDoi(): boolean {
 }
 
 /** Chỉ cho test: xoá trạng thái quyền giữa các ca. */
-export function _datLaiTatMan(): void { quyen = null; dangXin = null; daDoc = false }
+export function _datLaiTatMan(): void { quyen = null; dangXin = null; daDoc = false; daXin = false }

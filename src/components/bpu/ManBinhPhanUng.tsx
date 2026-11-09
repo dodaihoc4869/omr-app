@@ -25,8 +25,11 @@ type LoiGiaiCauKieu = ComponentType<{ q: Question; solution: unknown; dapAn: str
 
 const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
 const LUI_MS = [1500, 3000, 6000, 12000, 20000]
-/** Ẩn app lâu hơn ngần này mới tính là rời màn (bàn phím, kéo thanh thông báo không tính). */
-export const ROI_MAN_MS = 0 // 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app là báo NGAY
+/** Ẩn app lâu hơn ngần này mới tính là rời màn. 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app là báo NGAY (10/11: đồng bộ, không hẹn giờ). */
+export const ROI_MAN_MS = 0
+/** Đang tắt màn (Android có quyền): trang vẫn ẩn mà màn đã MỞ KHOÁ hai lần hỏi liền nhau cách nhau ngần này ⇒ em mở khoá thẳng vào app khác (bấm thông báo /
+ *  lối tắt trên màn khoá) ⇒ báo rời. Mở khoá bình thường: Chrome hiện lại sau vài trăm ms ⇒ kịp trước lần hỏi thứ hai. Trang ẩn, Chrome gom hẹn giờ ~1 s. */
+export const KIEM_KHOA_MS = 1000
 /** Mất tiêu điểm (cửa sổ nổi / bong bóng / chia đôi màn hình — app vẫn hiện nhưng em đang chạm ứng dụng khác) / cửa sổ co lại lâu hơn ngần này ⇒ báo rời.
  *  10/11 thầy «chia đôi, cửa sổ nổi phải bắt tức thì»: rút 350 → 200 ms. 200 ms ≈ 12 khung hình — đủ nuốt nháy tiêu điểm của giao diện hệ thống chớp qua
  *  (vào/thoát toàn màn hình, đổi bàn phím, xoay máy: đều xong trong 1–2 khung hình ≤ ~100 ms ở máy yếu), nhưng ngắn hơn mọi cử chỉ thật (kéo thanh thông báo
@@ -334,15 +337,28 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     let huy = false, lan = 0
     /** Lần ẩn hiện tại là TẮT MÀN (IdleDetector báo 'locked') ⇒ pagehide cũng không báo. */
     let tatMan = false
+    let henKhoa: ReturnType<typeof setTimeout> | undefined
+    /** Trong lúc tắt màn: hỏi lại mỗi KIEM_KHOA_MS — mở khoá mà trang vẫn ẩn (2 lần liền) ⇒ em đã vào thẳng app khác. */
+    const canhKhoa = (lanNay: number, soMo: number) => {
+      clearTimeout(henKhoa)
+      henKhoa = setTimeout(() => {
+        void kiemKhoaMan().then((khoa) => {
+          if (huy || lanNay !== lan || !document.hidden) return
+          const mo = khoa === true ? 0 : soMo + 1
+          if (mo >= 2) { tatMan = false; baoRoi(false); return }
+          canhKhoa(lanNay, mo)
+        })
+      }, KIEM_KHOA_MS)
+    }
     const doi = () => {
       lan += 1
-      if (!document.hidden) { tatMan = false; return }
+      if (!document.hidden) { tatMan = false; clearTimeout(henKhoa); return }
       if (daBaoRoi.current) return
       if (!coQuyenTatMan()) { baoRoi(false); return }
       const lanNay = lan
       void kiemKhoaMan().then((khoa) => {
         if (huy) return
-        if (khoa === true) { if (lanNay === lan) tatMan = true; return }
+        if (khoa === true) { if (lanNay === lan) { tatMan = true; canhKhoa(lanNay, 0) } return }
         baoRoi(false)
         veLai() // em đã quay lại trong lúc hỏi (chuyển app chớp nhoáng) ⇒ vẫn báo, rồi gỡ ngay để bảng không đỏ mãi
       })
@@ -370,7 +386,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
     window.addEventListener('popstate', giuLai)
     return () => {
-      huy = true; clearTimeout(henNoi)
+      huy = true; clearTimeout(henNoi); clearTimeout(henKhoa)
       document.removeEventListener('visibilitychange', doi); window.removeEventListener('blur', kiemNoi); window.removeEventListener('focus', kiemNoi)
       window.removeEventListener('resize', kiemNoi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai)
     }

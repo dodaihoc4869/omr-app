@@ -5,7 +5,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ketThuc, moLuot, roiMan, taoPhong, viewEm } from '../src/lib/bpu/phong'
 import { _datLaiTatMan } from '../src/components/bpu/tat-man'
-import { NOI_MS } from '../src/components/bpu/ManBinhPhanUng'
+import { KIEM_KHOA_MS, NOI_MS } from '../src/components/bpu/ManBinhPhanUng'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 
@@ -37,7 +37,7 @@ const datIdle = (quyen: 'granted' | 'denied' | 'prompt') => {
 const an_ = (v: boolean) => { an = v; co = !v; act(() => { document.dispatchEvent(new Event('visibilitychange')) }) }
 
 beforeEach(() => {
-  WsGia.ds = []; an = false; co = true; khoa = 'unlocked'; soLanHoi = 0; xinQuyen = null; _datLaiTatMan()
+  WsGia.ds = []; an = false; co = true; khoa = 'unlocked'; soLanHoi = 0; xinQuyen = null; _datLaiTatMan(); IdleGia.requestPermission.mockClear()
   vi.stubGlobal('WebSocket', WsGia)
   vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ ok: true, ve: 've-em', buoiId: 'b1' }))))
   Object.defineProperty(document, 'hidden', { configurable: true, get: () => an })
@@ -111,6 +111,27 @@ describe('ẩn trang (thoát app / chuyển app / khoá màn)', () => {
     expect(coTin(ws, 've')).toBe(0)
     expect(screen.queryByText('Em vừa rời màn hình')).toBeNull()
   })
+  it('Android CÓ quyền: khoá màn rồi MỞ KHOÁ THẲNG vào app khác (trang vẫn ẩn, 2 lần hỏi liền) ⇒ báo', async () => {
+    datIdle('granted')
+    const { ws } = await vao()
+    khoa = 'locked'; an_(true); await cho(5)
+    expect(coTin(ws, 'roi')).toBe(0)
+    khoa = 'unlocked' // bấm thông báo trên màn khoá ⇒ vào app khác, Chrome vẫn ẩn
+    await cho(KIEM_KHOA_MS + 50)
+    expect(coTin(ws, 'roi')).toBe(0) // một lần chưa đủ
+    await cho(KIEM_KHOA_MS + 50)
+    expect(coTin(ws, 'roi')).toBe(1)
+  }, 8000)
+  it('Android CÓ quyền: khoá màn rồi mở khoá BÌNH THƯỜNG (Chrome hiện lại ngay) ⇒ không báo', async () => {
+    datIdle('granted')
+    const { ws } = await vao()
+    khoa = 'locked'; an_(true); await cho(KIEM_KHOA_MS + 50)
+    khoa = 'unlocked'; await cho(KIEM_KHOA_MS + 50) // lần hỏi thứ nhất thấy mở khoá
+    an_(false) // Chrome hiện lại trước lần hỏi thứ hai
+    await cho(KIEM_KHOA_MS + 50)
+    expect(coTin(ws, 'roi')).toBe(0)
+    expect(coTin(ws, 've')).toBe(0)
+  }, 8000)
   it('Android CÓ quyền + chuyển app (màn mở khoá) ⇒ báo sau MỘT vòng hỏi (không hẹn giờ)', async () => {
     datIdle('granted')
     const { ws } = await vao()
@@ -173,6 +194,14 @@ describe('trang vẫn hiện (chia đôi / cửa sổ nổi / bàn phím / hộp
     await cho(NOI_MS + 30)
     expect(coTin(ws, 'roi')).toBe(0)
   })
+  it('em GẠT hộp hỏi quyền (không chọn) ⇒ chạm đáp án sau KHÔNG hỏi lại trong lần nạp trang này', async () => {
+    datIdle('prompt')
+    await vao()
+    fireEvent.click(screen.getByRole('dialog', { name: 'Bình Phản Ứng' }))
+    await act(async () => { xinQuyen!.resolve('default') })
+    fireEvent.click(screen.getByRole('dialog', { name: 'Bình Phản Ứng' }))
+    expect(IdleGia.requestPermission).toHaveBeenCalledTimes(1)
+  })
   it('CỬA SỔ NỔI / bong bóng (mất tiêu điểm, cỡ không đổi) ⇒ `roi` sau NOI_MS; nháy tiêu điểm < NOI_MS ⇒ không', async () => {
     const { ws } = await vao()
     co = false; act(() => { window.dispatchEvent(new Event('blur')) })
@@ -203,6 +232,8 @@ describe('trang vẫn hiện (chia đôi / cửa sổ nổi / bàn phím / hộp
     datIdle('prompt')
     const { ws } = await vao()
     fireEvent.click(screen.getByRole('dialog', { name: 'Bình Phản Ứng' }))
+    expect(IdleGia.requestPermission).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('dialog', { name: 'Bình Phản Ứng' })) // chạm tiếp khi hộp còn mở ⇒ không hỏi chồng
     expect(IdleGia.requestPermission).toHaveBeenCalledTimes(1)
     co = false; act(() => { window.dispatchEvent(new Event('blur')) })
     await cho(NOI_MS + 80)
