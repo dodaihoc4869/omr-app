@@ -29,3 +29,23 @@ export function vuaChuTrong(goc: ParentNode | null | undefined, chon: string, mi
   const khoa = ds.map((el) => `${el.textContent}|${el.parentElement?.className ?? ''}|${el.parentElement?.clientWidth ?? 0}|${el.parentElement?.clientHeight ?? 0}|${coGoc}`)
   ds.forEach((el, i) => { if (el.dataset[KHOA] === khoa[i]) return; vuaChu(el, min, haiDong); el.dataset[KHOA] = khoa[i] })
 }
+
+/** MỘT CỠ CHỮ CHUNG cho cả nhóm ô (10/11: dải tên theo đội — mỗi ô một cỡ trông lộn xộn): cỡ = cỡ lớn nhất mà tên DÀI NHẤT vẫn nằm trọn một dòng
+ *  (không dưới `min`). Đọc hết một lượt (đo ở cỡ gốc), rồi ghi một lượt. Nhóm không đổi chữ / bề ngang / cỡ gốc ⇒ bỏ qua. */
+export function vuaChuDeu(goc: ParentNode | null | undefined, chon: string, min: number, coGoc = ''): void {
+  if (!goc) return
+  const ds = [...goc.querySelectorAll<HTMLElement>(chon)]
+  if (!ds.length) return
+  const khoa = ds.map((el) => `${el.textContent}|${el.parentElement?.className ?? ''}|${el.clientWidth}`).join('¦') + `|${coGoc}`
+  const dau = ds[0]!
+  if (dau.dataset[KHOA] === khoa) return
+  for (const el of ds) { el.style.fontSize = ''; el.style.whiteSpace = ''; el.style.lineHeight = '' }
+  let co = Infinity
+  for (const el of ds) {
+    const g = parseFloat(getComputedStyle(el).fontSize) || 24
+    co = Math.min(co, el.scrollWidth > el.clientWidth + 1 ? Math.floor(g * (el.clientWidth / el.scrollWidth)) : g)
+  }
+  const c = `${Math.max(min, co)}px`
+  for (const el of ds) el.style.fontSize = c
+  dau.dataset[KHOA] = khoa
+}

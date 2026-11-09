@@ -129,7 +129,7 @@
 .bpu-bang .bb-tl-nhom .dau i{ flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--doi); }
 .bpu-bang .bb-tl-nhom .dau span{ margin-left: auto; color: var(--tr-chu-3); font-weight: 700; }
 .bpu-bang .bb-tl-nhom .luoi{ display: grid; gap: 8px 10px; align-content: start; }
-.bpu-bang .bb-tl-o{ position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0 30px 0 14px; border-radius: 14px; color: var(--tr-chu-3);
+.bpu-bang .bb-tl-o{ position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0 12px 0 14px; border-radius: 14px; color: var(--tr-chu-3);
   box-shadow: inset 0 0 0 2px var(--tr-vien); }
 .bpu-bang .bb-tl-o .ten{ min-width: 0; overflow: hidden; white-space: nowrap; font-size: var(--co, 27px); font-weight: 600; text-align: center; overflow-wrap: normal; word-break: keep-all; }
 .bpu-bang .bb-tl-o::before{ content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 5px; border-radius: 0 4px 4px 0; background: var(--doi); opacity: 0.35; }
@@ -139,12 +139,12 @@
 .bpu-bang .bb-tl-o.gui{ color: var(--tr-chu); background: color-mix(in srgb, var(--doi) 20%, var(--tr-mat)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--doi) 55%, transparent); }
 .bpu-bang .bb-tl-o.gui .ten{ font-weight: 800; }
 .bpu-bang .bb-tl-o.gui::before{ opacity: 1; }
-.bpu-bang .bb-tl-o .dau{ position: absolute; right: 5px; top: 5px; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--giay); }
+.bpu-bang .bb-tl-o .dau{ position: absolute; right: -7px; top: -7px; z-index: 1; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--giay); }
 .bpu-bang .bb-tl-o .dau svg{ width: 14px; height: 14px; stroke: var(--p-muc); stroke-width: 3.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .bpu-bang .bb-tl-o .bb-tl-hc{ position: absolute; right: 4px; top: 4px; width: 26px; height: 26px; font-size: 16px; }
 /* Lớp đông (3 hàng, ô thấp): dấu ✓ / huy hiệu nhỏ lại ở góc, chừa chỗ cho tên. */
-.bpu-bang .bb-tl-nhom .luoi.thap .bb-tl-o{ padding: 0 24px 0 12px; }
-.bpu-bang .bb-tl-nhom .luoi.thap .bb-tl-o .dau{ right: 3px; top: 3px; width: 17px; height: 17px; }
+.bpu-bang .bb-tl-nhom .luoi.thap .bb-tl-o{ padding: 0 10px 0 12px; }
+.bpu-bang .bb-tl-nhom .luoi.thap .bb-tl-o .dau{ right: -6px; top: -6px; width: 17px; height: 17px; }
 .bpu-bang .bb-tl-nhom .luoi.thap .bb-tl-o .dau svg{ width: 11px; height: 11px; }
 .bpu-bang .bb-tl-nhom .luoi.thap .bb-tl-o .bb-tl-hc{ right: 2px; top: 2px; width: 20px; height: 20px; font-size: 13px; }
 .bpu-bang .bb-tl-o.roi{ color: var(--tr-chu); box-shadow: inset 0 0 0 3px var(--tr-sai); background: color-mix(in srgb, var(--tr-sai) 10%, transparent); }

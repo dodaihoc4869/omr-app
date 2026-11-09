@@ -400,8 +400,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   // CHẠM ĐẦU (10/11): bắt ở `click` chứ không ở `pointerdown` — theo chuẩn HTML, `pointerdown` của ngón tay KHÔNG tính là thao tác người dùng (chỉ
   // `pointerup` / `touchend` / `click`) ⇒ trên điện thoại xin toàn màn hình / xin quyền ở `pointerdown` bị từ chối âm thầm. Xin quyền IdleDetector TRƯỚC:
   // `requestFullscreen` tiêu mất lượt thao tác.
-  const chamDau = () => { xinQuyenTatMan(); xinToanMan() }
   const xinToanMan = () => { try { const d = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> }; if (!document.fullscreenElement && d.requestFullscreen) void d.requestFullscreen().catch(() => {}) } catch { /* bỏ qua */ } }
+  const chamDau = () => { xinQuyenTatMan(); xinToanMan() }
 
   const l = v?.luot ?? null
   const e = v?.em ?? null
