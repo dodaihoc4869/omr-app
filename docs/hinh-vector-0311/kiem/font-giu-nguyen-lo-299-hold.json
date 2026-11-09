@@ -1,0 +1,34 @@
+{
+  "lo": 299,
+  "productionFontBytes": 35100,
+  "productionFontChanged": false,
+  "newFontCandidate": false,
+  "newPlacementSearch": false,
+  "newActualFontAdmission": false,
+  "remainingUppercaseCasesHold": 5,
+  "files": {
+    "src/styles/phong-ddh/ddh-rounded-de-latin.woff2": {
+      "sha256": "858f5ce6d2cab5156ad51a3d8bdf1efcfbe0a3c66442df5f4eefe76f7265edbc",
+      "bytes": 11648
+    },
+    "src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2": {
+      "sha256": "a96c0975208d5428b258daa539be277f0ec38b2bccce6da2211308184aafbd97",
+      "bytes": 5888
+    },
+    "src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2": {
+      "sha256": "4dffdd3446d63977c9f600ca6e417bf455fbd0a38cb0ebc41fa6c4d0bca0490a",
+      "bytes": 5948
+    },
+    "src/styles/phong-ddh/ddh-rounded-dam-latin.woff2": {
+      "sha256": "082a101a4a9fc93ecacc0e9de65793390e5da718ef2fd147e463ef8423a41eda",
+      "bytes": 11616
+    }
+  },
+  "priorEvidence": [
+    "soat-can-tam-dau-lo-277-hold.json",
+    "soat-trong-advance-lo-276-bi-loai.json",
+    "soat-doc-lap-de-aa-lo-269-partial.json"
+  ],
+  "ketLuan": "Lô299 không tạo candidate WOFF/không lặp quét đã negative. Chưa có hướng repair mới đủ cơ sở thiết kế/readability sau277;giữ5uppercaseHOLD,DeẪ269scopedpositiveexactSHA và276DeỖdesignnegative/14pxclip riêng. Bằng chứng pairalignment277 là mô tảthiếtkế,khôngnewnumericgate/globalimpossible/repairpositive. Prod4WOFF2NAamr35100Bnguyênbyte,cốýkhácrawmainfontlỗi;khôngcopyrawmain/adoptpartialfont. Trướcadoptvẫncầnfullatlas/allVN/NFCNFD/CDP/appsizes/lineheight/epsilon/latestmainbuild-speed vàfreshreadonlytừngnative-allrefs-exactSVGnewhash. Giữ phát hiện286δU+03B4thiếu cả4WOFF2 tại1025,F.labeltừchối;giữsource-onlyHOLD/khôngfallback/khôngcount/khôngnewcandidate.",
+  "source1025MissingDeltaHoldProof": "nguon1025-thieu-delta-lo-286-hold.json"
+}

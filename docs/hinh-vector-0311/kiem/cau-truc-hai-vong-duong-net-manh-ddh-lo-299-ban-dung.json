@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1256,
+    "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+    "fileNguon": "anh/e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee.png",
+    "svg": "hai-vong-duong-net-manh-ddh-9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023.svg",
+    "hashSvg": "9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023",
+    "byteSvg": 18438,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B5-D2-I-277",
+        "de": "Carbohydrate X có công thức cấu tạo dưới đây: Tên gọi của X là",
+        "refs": [
+          {
+            "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+            "where": "DB-12-B5-D2-I-277.hinh.0.du_lieu",
+            "hashDataUrl": "9619e9235d1c5ff05296e49ef18d5b4b9cf9980a76c40d611030758b9f8478e9"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B5-I-26",
+        "de": "Carbohydrate X có công thức cấu tạo dưới đây: Tên gọi của X là",
+        "refs": [
+          {
+            "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+            "where": "DH-12-C2-B5-I-26.hinh.0.du_lieu",
+            "hashDataUrl": "9619e9235d1c5ff05296e49ef18d5b4b9cf9980a76c40d611030758b9f8478e9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1sixring1fivering/12C11O/3CH2OH8standaloneH5freeOH2ringO1bridgeO/ALLbondsTHINuniform0TAPER0bold/leftHO-rightHOliteral/regularDDH/noaddednums-stereo-caption-name-answer.",
+    "hashSvgDaSoat": "9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

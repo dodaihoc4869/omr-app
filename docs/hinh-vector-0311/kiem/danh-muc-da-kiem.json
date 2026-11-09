@@ -604,6 +604,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee": {
+      "tep": "hai-vong-duong-net-manh-ddh-9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023.svg",
+      "hashSvg": "9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023",
+      "byteSvg": 18438,
+      "byteGzip": 1590,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1a41ae0efa1b03ed9ecc609035de117daa6b7e3d1cbc3350073a4d56881db9d5": {
       "tep": "maltose-hai-dang-ddh-a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab.svg",
       "hashSvg": "a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab",
@@ -20179,6 +20188,20 @@
       ]
     },
     {
+      "qid": "DB-12-B5-D2-I-277",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+          "where": "DB-12-B5-D2-I-277.hinh.0.du_lieu",
+          "hashDataUrl": "9619e9235d1c5ff05296e49ef18d5b4b9cf9980a76c40d611030758b9f8478e9",
+          "vector": "hai-vong-duong-net-manh-ddh-9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B5-D2-II-293",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -25755,6 +25778,20 @@
       ]
     },
     {
+      "qid": "DH-12-C2-B5-I-26",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+          "where": "DH-12-C2-B5-I-26.hinh.0.du_lieu",
+          "hashDataUrl": "9619e9235d1c5ff05296e49ef18d5b4b9cf9980a76c40d611030758b9f8478e9",
+          "vector": "hai-vong-duong-net-manh-ddh-9d4558ec4db020510bf91dcdaa27bf0fe73c6c4d57c5d364f3b0c573f2a48023.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C2-B5-II-10",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -29529,6 +29566,7 @@
     "DB-12-B5-D2-I-227",
     "DB-12-B5-D2-II-233",
     "DB-12-B5-D2-II-253",
+    "DB-12-B5-D2-I-277",
     "DB-12-B5-D2-II-293",
     "DB-12-B5-D2-II-297",
     "DB-12-B5-D2-II-300",
@@ -29883,6 +29921,7 @@
     "DH-12-C2-B4-III-44",
     "DH-12-C2-B4-III-46",
     "DH-12-C2-B5-VD-II-3",
+    "DH-12-C2-B5-I-26",
     "DH-12-C2-B5-II-10",
     "DH-12-C2-B5-II-17",
     "DH-12-C2-B5-II-19",

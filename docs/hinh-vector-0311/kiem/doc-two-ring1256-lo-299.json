@@ -1,0 +1,597 @@
+{
+  "i": 1256,
+  "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee.png",
+  "size": [
+    1457,
+    672
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B5-D2-I-277",
+      "de": "Carbohydrate X có công thức cấu tạo dưới đây: Tên gọi của X là",
+      "allHinh": [
+        {
+          "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+          "where": "DB-12-B5-D2-I-277.hinh.0.du_lieu",
+          "hashDataUrl": "9619e9235d1c5ff05296e49ef18d5b4b9cf9980a76c40d611030758b9f8478e9"
+        }
+      ],
+      "missingHashes": [
+        "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee"
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B5-I-26",
+      "de": "Carbohydrate X có công thức cấu tạo dưới đây: Tên gọi của X là",
+      "allHinh": [
+        {
+          "hash": "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee",
+          "where": "DH-12-C2-B5-I-26.hinh.0.du_lieu",
+          "hashDataUrl": "9619e9235d1c5ff05296e49ef18d5b4b9cf9980a76c40d611030758b9f8478e9"
+        }
+      ],
+      "missingHashes": [
+        "e3f6591b5b8013543ad6f0bcd565f8892c109bd7d381fbca09e0b7563bd4e4ee"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "publicDeOnly": true,
+    "answersRead": false,
+    "countMethod": "Eachvisiblebranchindependentlytraced, no compoundnameinference"
+  },
+  "coordinateMeaning": "Nativepixelcenterlines, atomlabelanchors approximate; Ckeys traceonly NOTnumbers toadd.",
+  "corrections": [
+    {
+      "finding": "Initial early chatcandidate count7H/6freeOH WRONG. Recountfromeachvisiblebranch gives8H/5freeOH. Parent independently found5OH; finalsourceproof below is authoritative.",
+      "reason": "Do not use mental formula/name toreplace actualsourcecount."
+    }
+  ],
+  "geometry": {
+    "classification": "One six-member andonefive-memberHaworthstructure joinedbyO, no arrow/caption.",
+    "bondStyle": "ALLuniformthinblacklines includingfrontdiagonals andfronthorizontals. ZEROtaper/wedge/hash/boldfront.",
+    "counts": {
+      "C": 12,
+      "O": 11,
+      "CH2OH": 3,
+      "freeOH": 5,
+      "ringO": 2,
+      "bridgeO": 1,
+      "standaloneH": 8,
+      "Cnums": 0
+    },
+    "leftSixRing": {
+      "vertices": {
+        "C1": [
+          538,
+          332
+        ],
+        "C2": [
+          445,
+          492
+        ],
+        "C3": [
+          214,
+          492
+        ],
+        "C4": [
+          119,
+          330
+        ],
+        "C5": [
+          214,
+          173
+        ]
+      },
+      "ringO": {
+        "label": "O",
+        "bbox": [
+          418,
+          147,
+          475,
+          201
+        ]
+      },
+      "backOgapLines": [
+        [
+          [
+            214,
+            173
+          ],
+          [
+            406,
+            173
+          ]
+        ],
+        [
+          [
+            465,
+            208
+          ],
+          [
+            538,
+            332
+          ]
+        ]
+      ],
+      "CCringLines": [
+        [
+          [
+            538,
+            332
+          ],
+          [
+            445,
+            492
+          ]
+        ],
+        [
+          [
+            445,
+            492
+          ],
+          [
+            214,
+            492
+          ]
+        ],
+        [
+          [
+            214,
+            492
+          ],
+          [
+            119,
+            330
+          ]
+        ],
+        [
+          [
+            119,
+            330
+          ],
+          [
+            214,
+            173
+          ]
+        ]
+      ],
+      "branches": [
+        {
+          "atom": "CH₂OH",
+          "from": [
+            214,
+            173
+          ],
+          "to": [
+            214,
+            84
+          ],
+          "bbox": [
+            193,
+            18,
+            429,
+            81
+          ],
+          "anchor": "firstC",
+          "direction": "UP"
+        },
+        {
+          "atom": "H",
+          "from": [
+            214,
+            173
+          ],
+          "to": [
+            214,
+            242
+          ],
+          "bbox": [
+            192,
+            251,
+            247,
+            303
+          ],
+          "direction": "DOWN"
+        },
+        {
+          "atom": "H",
+          "from": [
+            119,
+            330
+          ],
+          "to": [
+            119,
+            241
+          ],
+          "bbox": [
+            90,
+            173,
+            147,
+            226
+          ],
+          "direction": "UP"
+        },
+        {
+          "atom": "HO",
+          "from": [
+            119,
+            330
+          ],
+          "to": [
+            119,
+            425
+          ],
+          "bbox": [
+            29,
+            433,
+            139,
+            486
+          ],
+          "anchor": "O(rightglyph)",
+          "direction": "DOWN"
+        },
+        {
+          "atom": "OH",
+          "from": [
+            214,
+            492
+          ],
+          "to": [
+            214,
+            416
+          ],
+          "bbox": [
+            193,
+            352,
+            302,
+            405
+          ],
+          "anchor": "O",
+          "direction": "UP"
+        },
+        {
+          "atom": "H",
+          "from": [
+            214,
+            492
+          ],
+          "to": [
+            214,
+            580
+          ],
+          "bbox": [
+            190,
+            585,
+            247,
+            639
+          ],
+          "direction": "DOWN"
+        },
+        {
+          "atom": "H",
+          "from": [
+            445,
+            492
+          ],
+          "to": [
+            445,
+            417
+          ],
+          "bbox": [
+            416,
+            352,
+            473,
+            405
+          ],
+          "direction": "UP"
+        },
+        {
+          "atom": "OH",
+          "from": [
+            445,
+            492
+          ],
+          "to": [
+            445,
+            581
+          ],
+          "bbox": [
+            422,
+            590,
+            531,
+            642
+          ],
+          "anchor": "O",
+          "direction": "DOWN"
+        },
+        {
+          "atom": "H",
+          "from": [
+            538,
+            332
+          ],
+          "to": [
+            538,
+            241
+          ],
+          "bbox": [
+            510,
+            175,
+            568,
+            228
+          ],
+          "direction": "UP"
+        }
+      ]
+    },
+    "bridge": {
+      "atom": "O",
+      "bbox": [
+        651,
+        386,
+        703,
+        440
+      ],
+      "bonds": [
+        [
+          [
+            538,
+            332
+          ],
+          [
+            636,
+            389
+          ]
+        ],
+        [
+          [
+            716,
+            389
+          ],
+          [
+            816,
+            332
+          ]
+        ]
+      ],
+      "finding": "V-shaped down bridge, LEFTC1 toRIGHTC2, gapbeforeOink"
+    },
+    "rightFiveRing": {
+      "vertices": {
+        "C2": [
+          816,
+          332
+        ],
+        "C3": [
+          909,
+          492
+        ],
+        "C4": [
+          1139,
+          492
+        ],
+        "C5": [
+          1239,
+          328
+        ]
+      },
+      "ringO": {
+        "atom": "O",
+        "bbox": [
+          1001,
+          181,
+          1057,
+          234
+        ]
+      },
+      "backOgapLines": [
+        [
+          [
+            816,
+            332
+          ],
+          [
+            988,
+            231
+          ]
+        ],
+        [
+          [
+            1070,
+            227
+          ],
+          [
+            1239,
+            328
+          ]
+        ]
+      ],
+      "CCringLines": [
+        [
+          [
+            816,
+            332
+          ],
+          [
+            909,
+            492
+          ]
+        ],
+        [
+          [
+            909,
+            492
+          ],
+          [
+            1139,
+            492
+          ]
+        ],
+        [
+          [
+            1139,
+            492
+          ],
+          [
+            1239,
+            328
+          ]
+        ]
+      ],
+      "branches": [
+        {
+          "atom": "CH₂OH",
+          "from": [
+            816,
+            332
+          ],
+          "to": [
+            816,
+            165
+          ],
+          "bbox": [
+            786,
+            92,
+            1023,
+            156
+          ],
+          "anchor": "firstC",
+          "direction": "UP"
+        },
+        {
+          "atom": "H",
+          "from": [
+            909,
+            492
+          ],
+          "to": [
+            909,
+            421
+          ],
+          "bbox": [
+            887,
+            361,
+            944,
+            413
+          ],
+          "direction": "UP"
+        },
+        {
+          "atom": "OH",
+          "from": [
+            909,
+            492
+          ],
+          "to": [
+            909,
+            576
+          ],
+          "bbox": [
+            886,
+            594,
+            997,
+            647
+          ],
+          "anchor": "O",
+          "direction": "DOWN"
+        },
+        {
+          "atom": "HO",
+          "from": [
+            1139,
+            492
+          ],
+          "to": [
+            1139,
+            421
+          ],
+          "bbox": [
+            1052,
+            357,
+            1162,
+            410
+          ],
+          "anchor": "O(rightglyph)",
+          "direction": "UP"
+        },
+        {
+          "atom": "H",
+          "from": [
+            1139,
+            492
+          ],
+          "to": [
+            1139,
+            577
+          ],
+          "bbox": [
+            1117,
+            586,
+            1174,
+            639
+          ],
+          "direction": "DOWN"
+        },
+        {
+          "atom": "H",
+          "from": [
+            1239,
+            328
+          ],
+          "to": [
+            1239,
+            250
+          ],
+          "bbox": [
+            1209,
+            183,
+            1267,
+            234
+          ],
+          "direction": "UP"
+        },
+        {
+          "atom": "CH₂OH",
+          "from": [
+            1239,
+            328
+          ],
+          "to": [
+            1239,
+            422
+          ],
+          "bbox": [
+            1211,
+            434,
+            1447,
+            498
+          ],
+          "anchor": "firstC",
+          "direction": "DOWN"
+        }
+      ]
+    },
+    "font": "Regularuprightserifallatomlabels, no bold/italic. Only2inCH2OHsubscript, allHstandalonebaseline. Preserve2literalHOorientations (leftC4andrightC4), do notflip toOH.",
+    "noAdded": [
+      "compoundname",
+      "H-atrightC2",
+      "OHatsixringC1",
+      "extraOH/standaloneH",
+      "Cnumbers",
+      "caption",
+      "boldfronts",
+      "tapers",
+      "stereowedges"
+    ]
+  },
+  "actualSvgReviewed": false
+}

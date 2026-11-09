@@ -1,0 +1,145 @@
+{
+  "lo": 299,
+  "main": "6dc0df3338a23e49ff9f278e128226aa0dfceeee",
+  "priorMain": "c0beaa5ca9b3e2da145bf18ad66a0be67b41f92f",
+  "merged": false,
+  "fontFilesChangedInMainSincePrior": false,
+  "branchProductionChanged": false,
+  "colorBaseline": {
+    "violations": 717,
+    "checkerFiles": 132
+  },
+  "sizeBaseline": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainScope": "Main thay app/máy chủ/lý do sai/BPU; không đổi font/mốc so298; chưa gộp.",
+  "speedBaselineLatestMain": {
+    "sha256": "df34ce749d3bd14432f27e18f042cf99ae6374d0a9647df2a6ea6be2ff97d334",
+    "mayChu": {
+      "sanh-lan-dau": {
+        "dot": 12,
+        "lenh": 21
+      },
+      "sanh-lan-sau": {
+        "dot": 1,
+        "lenh": 2
+      },
+      "mo-chang": {
+        "dot": 2,
+        "lenh": 4
+      },
+      "nop-cau": {
+        "dot": 7,
+        "lenh": 9
+      },
+      "dem-hom-nay": {
+        "dot": 1,
+        "lenh": 1
+      }
+    },
+    "taiApp": {
+      "giao-vien": {
+        "tep": 11,
+        "gzip": 180652
+      },
+      "hoc-sinh": {
+        "tep": 35,
+        "gzip": 231877
+      },
+      "phu-huynh": {
+        "tep": 20,
+        "gzip": 167025
+      }
+    },
+    "taiDuong": {
+      "thay /gv": {
+        "gzip": 182744
+      },
+      "phieu /p": {
+        "gzip": 235396
+      },
+      "phu-huynh /ph": {
+        "gzip": 168734
+      },
+      "thi /t": {
+        "gzip": 260602
+      },
+      "dang-nhap-hs /hs": {
+        "gzip": 129730
+      },
+      "cong-hs /hs (đã đăng nhập)": {
+        "gzip": 243803
+      }
+    },
+    "requiredBeforeMergeRelease": true,
+    "branchStillUnmerged": true
+  },
+  "diffFiles": [
+    "DIEU-PHOI.md",
+    "docs/ban-ve-bpu-dua-top-0911/A-dang-lam-1366.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/A-dang-lam-1920.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/A-mo-dap-an-1366.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/A-mo-dap-an-1920.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/B-dang-lam-1366.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/B-dang-lam-1920.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/B-mo-dap-an-1366.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/B-mo-dap-an-1920.jpg",
+    "docs/ban-ve-bpu-dua-top-0911/DAC-TA.md",
+    "docs/ban-ve-bpu-dua-top-0911/ban-ve.html",
+    "docs/ban-ve-bpu-dua-top-0911/chup.cjs",
+    "index.html",
+    "public/cai-app.html",
+    "public/cai-app/index.html",
+    "public/cai-dat.html",
+    "public/hs.mobileconfig",
+    "public/logo-hs-180-mol.png",
+    "public/logo-hs-192-mol.png",
+    "public/logo-hs-512-maskable-mol.png",
+    "public/logo-hs-512-mol.png",
+    "public/logo-hs-64-mol.png",
+    "public/logo-hs-nho-mol.svg",
+    "public/manifest-hs.json",
+    "scripts/do-logo-maskable.mjs",
+    "scripts/kiem-phat-hanh-chua.mjs",
+    "scripts/sinh-logo-png.mjs",
+    "server/src/game-v2.ts",
+    "server/src/goi-bai-7-schema.ts",
+    "server/src/ly-do-sai.ts",
+    "server/src/reset-hoa2.ts",
+    "server/src/reset-toan-app.ts",
+    "src/components/bpu/BangBinhPhanUng.tsx",
+    "src/components/bpu/ManBinhPhanUng.tsx",
+    "src/components/bpu/gan-gv.tsx",
+    "src/components/chien-dich/co-hoa2.ts",
+    "src/components/hoc-tap/KetSaiDuo.tsx",
+    "src/components/hoc-tap/ManLamBaiTap.tsx",
+    "src/components/hoc-tap/TrongHs.tsx",
+    "src/components/hoc-tap/vi-sao-sai.css",
+    "src/components/hoc-tap/vi-sao-sai.ts",
+    "src/components/linh-vat/icon-tab-mol.ts",
+    "src/components/linh-vat/mol-dong.ts",
+    "src/lib/bo-cuc-to-chieu.ts",
+    "src/lib/bpu/nghe-to-chieu.ts",
+    "src/lib/len-bang-bpu-to-chieu.ts",
+    "src/styles/trong-lam-bai.css",
+    "tests/bpu-giao-dien-0611.test.tsx",
+    "tests/chien-dich-thanh-ben.test.tsx",
+    "tests/em-toan-canh-2109.test.tsx",
+    "tests/giu-chan-2710.test.tsx",
+    "tests/hieu-ung-an-mung-0211.test.tsx",
+    "tests/icon-tab-mol-0911.test.ts",
+    "tests/lam-duo-2610.test.tsx",
+    "tests/lam-lai-cuoi-chang-giao-dien-2610.test.tsx",
+    "tests/logo-bo-moi-1909.test.tsx",
+    "tests/lua-cap-ve-3110.test.ts",
+    "tests/ly-do-sai-0911.test.ts",
+    "tests/man-lam-bai-1210d.test.tsx",
+    "tests/thanh-day-hoa2-2809.test.tsx",
+    "tests/vi-sao-sai-0911.test.tsx",
+    "tests/vo-thay-m3-2109.test.tsx",
+    "tests/xem-diem-gv-lich-su-ca-2109.test.tsx",
+    "tests/xoa-vinh-vien-ca.test.tsx",
+    "vite.config.ts"
+  ]
+}
