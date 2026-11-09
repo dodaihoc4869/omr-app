@@ -1,0 +1,42 @@
+{
+  "i": 1319,
+  "hash": "eeedb07068bdd588dbdb7690652e8aa53b958e344c41deb6c6951a4b9ba11de3",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/eeedb07068bdd588dbdb7690652e8aa53b958e344c41deb6c6951a4b9ba11de3.png",
+  "size": [
+    1069,
+    203
+  ],
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C1-B1-P1-III-40",
+      "de": "Diethyl phthalate (còn gọi là DEP) được sử dụng làm thuốc trị ghẻ ngứa, côn trùng đốt. DEP được tổng hợp từ phthalic anhydride và ethanol. Để sản xuất x nghìn lọ thuốc DEP cần tối thiểu 7,03 tấn phthalic anhydride.\nBiết mỗi lọ 10 gam chứa 9,5 gam diethyl phthalate và hiệu suất phản ứng tính theo phthalic anhydride là 60%.\nGiá trị của x là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "ad3d9f20845783750a2ecbebb415c403705e87ee19d988600289ebb1f1bb1323",
+          "where": "DH-12-C1-B1-P1-III-40.hinh.0.du_lieu",
+          "hashDataUrl": "cc7f3d18c26070e1282d871bcf6dcf01622202ff50e923e2751b8764f32b54bd"
+        },
+        {
+          "hash": "eeedb07068bdd588dbdb7690652e8aa53b958e344c41deb6c6951a4b9ba11de3",
+          "where": "DH-12-C1-B1-P1-III-40.hinh.1.du_lieu",
+          "hashDataUrl": "19a71a6187bcdf31d9cb36a95b94efaf42baf387024be01c176bc79361908b1d"
+        }
+      ],
+      "missingHashes": [
+        "ad3d9f20845783750a2ecbebb415c403705e87ee19d988600289ebb1f1bb1323",
+        "eeedb07068bdd588dbdb7690652e8aa53b958e344c41deb6c6951a4b9ba11de3"
+      ]
+    }
+  ],
+  "nativeFullOpened": true,
+  "native2xOpened": "/workspace/scratch/1319-native2x.png",
+  "literal": "phthalicanhydride+2.CH3CH2OH→diethylphthalate+2H2O;conditionH2SO4đặc,tSUP0",
+  "status": "SOURCE_ONLY_HOLD_NO_SVG_NO_COUNT",
+  "closure": {
+    "newFullIfThisAdmitted": 0,
+    "blockingPhotoHash": "ad3d9f20845783750a2ecbebb415c403705e87ee19d988600289ebb1f1bb1323",
+    "photoIndex": 964,
+    "photoNativeFullOpened": true,
+    "reason": "ActualDEPmedicinejarproductphoto/packaging; keepraster, do notdrawfakevector"
+  }
+}

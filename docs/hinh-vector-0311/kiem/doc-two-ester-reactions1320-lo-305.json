@@ -1,0 +1,579 @@
+{
+  "i": 1320,
+  "hash": "ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07.png",
+  "size": [
+    1215,
+    196
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C1-B1-D3-I-60",
+      "de": "Cho 2 phản ứng sau đây (thu cùng một sản phẩm giống nhau) như hình dưới.\nPhát biểu nào sau đây là sai?",
+      "allHinh": [
+        {
+          "hash": "ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07",
+          "where": "12-C1-B1-D3-I-60.hinh.0.du_lieu",
+          "hashDataUrl": "ce20b862c29245db46f92febffe777f155f7aa1f92c2227b539e90a65d4de98d"
+        }
+      ],
+      "missingHashes": [
+        "ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1320-native2x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelvertices/glyphbboxes; reactions literalincludingmissingH2O, no mechanismanswerinferred.",
+  "geometry": {
+    "classification": "Twoindependentskeletalreactionpanels sidebyside, eachcirclednumber/onearrow; no photo.",
+    "font": "RegularuprightserifallO/OH/HO/H; pluschargeSUPafterH. Circlednumbersarecircleoutline+literal1/2, notfilleddisk.",
+    "panels": [
+      {
+        "number": {
+          "text": "1",
+          "circleCenter": [
+            53,
+            113
+          ],
+          "rx": 14,
+          "ry": 14
+        },
+        "acid": {
+          "carbonVertices": [
+            [
+              83,
+              113
+            ],
+            [
+              123,
+              113
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                123,
+                110
+              ],
+              [
+                142,
+                132
+              ]
+            ],
+            [
+              [
+                119,
+                115
+              ],
+              [
+                137,
+                137
+              ]
+            ]
+          ],
+          "carbonylO": {
+            "text": "O",
+            "bbox": [
+              135,
+              135,
+              157,
+              160
+            ]
+          },
+          "OH": {
+            "text": "OH",
+            "bbox": [
+              137,
+              70,
+              181,
+              96
+            ],
+            "bond": [
+              [
+                123,
+                113
+              ],
+              [
+                139,
+                94
+              ]
+            ],
+            "anchor": "O"
+          }
+        },
+        "plus": {
+          "text": "+",
+          "bbox": [
+            184,
+            107,
+            202,
+            127
+          ]
+        },
+        "alcohol": {
+          "text": "HO",
+          "bbox": [
+            213,
+            109,
+            257,
+            135
+          ],
+          "anchor": "O(rightglyph)",
+          "bond": [
+            [
+              257,
+              110
+            ],
+            [
+              279,
+              98
+            ]
+          ],
+          "carbonJunction": [
+            279,
+            98
+          ],
+          "branches": [
+            [
+              [
+                279,
+                98
+              ],
+              [
+                279,
+                56
+              ]
+            ],
+            [
+              [
+                279,
+                98
+              ],
+              [
+                313,
+                117
+              ]
+            ]
+          ]
+        },
+        "condition": {
+          "text": "H⁺",
+          "bbox": [
+            348,
+            78,
+            384,
+            105
+          ]
+        },
+        "arrow": {
+          "shaft": [
+            [
+              331,
+              113
+            ],
+            [
+              401,
+              113
+            ]
+          ],
+          "head": "FILLED RIGHT",
+          "headVertices": [
+            [
+              387,
+              107
+            ],
+            [
+              401,
+              113
+            ],
+            [
+              387,
+              120
+            ]
+          ]
+        },
+        "product": {
+          "acylVertices": [
+            [
+              414,
+              113
+            ],
+            [
+              456,
+              113
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                455,
+                110
+              ],
+              [
+                476,
+                133
+              ]
+            ],
+            [
+              [
+                451,
+                115
+              ],
+              [
+                471,
+                138
+              ]
+            ]
+          ],
+          "carbonylO": {
+            "text": "O",
+            "bbox": [
+              473,
+              135,
+              493,
+              160
+            ]
+          },
+          "esterO": {
+            "text": "O",
+            "bbox": [
+              471,
+              68,
+              494,
+              93
+            ],
+            "bonds": [
+              [
+                [
+                  456,
+                  113
+                ],
+                [
+                  472,
+                  93
+                ]
+              ],
+              [
+                [
+                  496,
+                  79
+                ],
+                [
+                  524,
+                  79
+                ]
+              ]
+            ]
+          },
+          "alkoxyJunction": [
+            524,
+            79
+          ],
+          "branches": [
+            [
+              [
+                524,
+                79
+              ],
+              [
+                540,
+                52
+              ]
+            ],
+            [
+              [
+                524,
+                79
+              ],
+              [
+                544,
+                104
+              ]
+            ]
+          ]
+        }
+      },
+      {
+        "number": {
+          "text": "2",
+          "circleCenter": [
+            661,
+            113
+          ],
+          "rx": 14,
+          "ry": 14
+        },
+        "acid": {
+          "carbonVertices": [
+            [
+              700,
+              113
+            ],
+            [
+              741,
+              113
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                741,
+                110
+              ],
+              [
+                760,
+                132
+              ]
+            ],
+            [
+              [
+                737,
+                115
+              ],
+              [
+                755,
+                137
+              ]
+            ]
+          ],
+          "carbonylO": {
+            "text": "O",
+            "bbox": [
+              753,
+              135,
+              775,
+              160
+            ]
+          },
+          "OH": {
+            "text": "OH",
+            "bbox": [
+              754,
+              70,
+              798,
+              96
+            ],
+            "bond": [
+              [
+                741,
+                113
+              ],
+              [
+                757,
+                94
+              ]
+            ],
+            "anchor": "O"
+          }
+        },
+        "plus": {
+          "text": "+",
+          "bbox": [
+            800,
+            107,
+            819,
+            127
+          ]
+        },
+        "alkene": {
+          "vertices": [
+            [
+              833,
+              117
+            ],
+            [
+              872,
+              94
+            ],
+            [
+              910,
+              117
+            ]
+          ],
+          "doubleEdge": [
+            0,
+            1
+          ],
+          "innerRay": [
+            [
+              839,
+              123
+            ],
+            [
+              872,
+              103
+            ]
+          ]
+        },
+        "condition": {
+          "text": "H⁺",
+          "bbox": [
+            954,
+            78,
+            990,
+            105
+          ]
+        },
+        "arrow": {
+          "shaft": [
+            [
+              935,
+              113
+            ],
+            [
+              1005,
+              113
+            ]
+          ],
+          "head": "FILLED RIGHT",
+          "headVertices": [
+            [
+              991,
+              107
+            ],
+            [
+              1005,
+              113
+            ],
+            [
+              991,
+              120
+            ]
+          ]
+        },
+        "product": {
+          "acylVertices": [
+            [
+              1018,
+              113
+            ],
+            [
+              1060,
+              113
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                1059,
+                110
+              ],
+              [
+                1080,
+                133
+              ]
+            ],
+            [
+              [
+                1055,
+                115
+              ],
+              [
+                1075,
+                138
+              ]
+            ]
+          ],
+          "carbonylO": {
+            "text": "O",
+            "bbox": [
+              1077,
+              135,
+              1097,
+              160
+            ]
+          },
+          "esterO": {
+            "text": "O",
+            "bbox": [
+              1075,
+              68,
+              1098,
+              93
+            ],
+            "bonds": [
+              [
+                [
+                  1060,
+                  113
+                ],
+                [
+                  1076,
+                  93
+                ]
+              ],
+              [
+                [
+                  1100,
+                  79
+                ],
+                [
+                  1128,
+                  79
+                ]
+              ]
+            ]
+          },
+          "alkoxyJunction": [
+            1128,
+            79
+          ],
+          "branches": [
+            [
+              [
+                1128,
+                79
+              ],
+              [
+                1144,
+                52
+              ]
+            ],
+            [
+              [
+                1128,
+                79
+              ],
+              [
+                1148,
+                104
+              ]
+            ]
+          ]
+        }
+      }
+    ],
+    "counts": {
+      "panels": 2,
+      "numberCircles": 2,
+      "filledRightHeads": 2,
+      "conditionHplus": 2,
+      "baselinePlus": 2,
+      "COdouble": 4,
+      "CCdouble": 1,
+      "CtotalAcrossAllPanels": 20,
+      "OtotalAcrossAllPanels": 9
+    },
+    "noAdded": [
+      "waterproduct",
+      "reversiblearrow",
+      "temperature",
+      "captionnames",
+      "stereowedges",
+      "expandedCH3labels",
+      "mechanismanswer"
+    ]
+  },
+  "actualSvgReviewed": false
+}

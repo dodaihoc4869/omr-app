@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1320,
+    "hash": "ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07",
+    "fileNguon": "anh/ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07.png",
+    "svg": "hai-cach-tao-ester-ddh-dfd188772ad8c4ed51be3147c83e9e6996caae94f504aff8df586e96ec9d2420.svg",
+    "hashSvg": "dfd188772ad8c4ed51be3147c83e9e6996caae94f504aff8df586e96ec9d2420",
+    "byteSvg": 11518,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-I-60",
+        "de": "Cho 2 phản ứng sau đây (thu cùng một sản phẩm giống nhau) như hình dưới.\nPhát biểu nào sau đây là sai?",
+        "refs": [
+          {
+            "hash": "ef28b1d6ec68ca36a0b3f931b8f727d688f0e743e3e54db2abb0193e8bb60a07",
+            "where": "12-C1-B1-D3-I-60.hinh.0.du_lieu",
+            "hashDataUrl": "ce20b862c29245db46f92febffe777f155f7aa1f92c2227b539e90a65d4de98d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2panels2circlednums/acid+isopropanol→ester;acid+propene→sameester/2filledRIGHTheads2Hsupplus/4COdouble1CCdouble/20C9Ototal/regularDDH/allthin/noaddedH2O-coeff-caption-answer",
+    "hashSvgDaSoat": "dfd188772ad8c4ed51be3147c83e9e6996caae94f504aff8df586e96ec9d2420",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
