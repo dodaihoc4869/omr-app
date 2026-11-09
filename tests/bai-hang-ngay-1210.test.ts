@@ -150,10 +150,10 @@ describe('mức / đã làm / thiếu — đúng như kế hoạch đang chấm'
     expect(b.ngay.map(o)).toEqual([
       ['2026-10-12', 24, 24, 0, true, 'uoc-goi7', 'goi7'],
       ['2026-10-13', 24, 3, 21, false, 'uoc-goi7', 'goi7'], // G1 (hai lượt + một hướng dẫn) · G6 (ca đã công bố) · G7 (hướng dẫn)
-      ['2026-10-14', 24, 0, 24, false, 'uoc-goi7', 'goi7'],
+      ['2026-10-14', 28, 0, 28, false, 'uoc-goi7', 'goi7'], // 09/11: HÔM NAY ước tính 28 = số lần mở sẽ chốt; ngày cũ trước mốc 09/11 giữ 24
     ])
     expect(b.ngay.every((n) => n.mucUocTinh && n.tang === 1)).toBe(true)
-    expect(b).toMatchObject({ soNgayThieu: 1, tongCauThieu: 21, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 21 }, thieuHomNay: 24 })
+    expect(b).toMatchObject({ soNgayThieu: 1, tongCauThieu: 21, ngayThieuNhieuNhat: { ngay: '2026-10-13', thieu: 21 }, thieuHomNay: 28 }) // 09/11: hôm nay 28
   })
 
   // SỬA CÓ CHỦ ĐÍCH — thầy 12/10: một con số. Ngày Gói 7 KHÔNG còn lấy tầng Hành trình gần nhất (lỗi 0/36 trong khi em được giao 24): có dòng chốt
@@ -191,7 +191,7 @@ describe('xếp em + lọc', () => {
     expect(r.em.map((e) => [e.hoTen, e.soNgayThieu, e.tongCauThieu, e.thieuHomNay])).toEqual([
       ['Trần An', 2, 63, 36],
       ['Vũ Phương', 2, 48, 24], // khối 11: chưa ghi tầng, không kế hoạch ⇒ 24 mỗi ngày
-      ['Lê Bình', 1, 21, 24],
+      ['Lê Bình', 1, 21, 28], // Gói 7 hôm nay ước tính 28 (09/11)
       ['Bùi Em', 1, 5, 5],
       ['Đỗ Dũng', 1, 5, 5],
       ['Phạm Chi', 0, 0, 1],

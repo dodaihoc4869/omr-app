@@ -26,10 +26,10 @@ export const quotaGoi7 = (chuaGap: number, ngay: string, han: string): number =>
 export const MUC_NGAY_CO_DINH = 28
 export const mucNgayGoi7 = (_toiThieuTang: number, _tongQuota: number): number => MUC_NGAY_CO_DINH
 /** Ngày mức 28 bắt đầu có hiệu lực (ngày lên bản sống). Ước tính mức cho NGÀY CŨ chưa có dòng chốt (`mucCuaNgay`) giữ luật cũ
- *  max(mức tầng, Σ quota) — không áp ngược 28 làm ngày đã đủ thành «thiếu». */
+ *  max(mức tầng, Σ quota) — không áp ngược 28 làm ngày đã đủ thành «thiếu». Hôm nay (`homNay`) và ngày tới luôn 28 = đúng số lần mở sẽ chốt. */
 export const NGAY_MUC_CO_DINH = '2026-11-09'
-export const mucUocGoi7 = (ngay: string, toiThieuTang: number, tongQuota: number): number =>
-  ngay >= NGAY_MUC_CO_DINH ? MUC_NGAY_CO_DINH : Math.max(Math.max(0, Math.floor(Number(toiThieuTang) || 0)), Math.max(0, Math.floor(Number(tongQuota) || 0)))
+export const mucUocGoi7 = (ngay: string, toiThieuTang: number, tongQuota: number, homNay = ''): number =>
+  ngay >= NGAY_MUC_CO_DINH || (homNay !== '' && ngay >= homNay) ? MUC_NGAY_CO_DINH : Math.max(Math.max(0, Math.floor(Number(toiThieuTang) || 0)), Math.max(0, Math.floor(Number(tongQuota) || 0)))
 
 const DEM_CAU7 = new WeakMap<CauGoi7, { ngay: string; bm: number; o: string }>()
 /** Quota phủ bài không bị tỷ lệ ôn/sửa ăn mất. Câu chưa sẵn sàng chỉ mở học có hỗ trợ. */

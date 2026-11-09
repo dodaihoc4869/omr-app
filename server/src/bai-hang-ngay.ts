@@ -119,11 +119,11 @@ export interface Goi7Ngay { chot?: { tang: Tang; muc: number } | null; quota?: n
  *     05/10 được giao 10 câu, làm đủ 10 vẫn bị tính thiếu theo 36 câu ước tính từ tầng 3 của 09/10.
  * `chot` đã sắp theo ngày tăng dần.
  */
-export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNgay[], goi7?: Goi7Ngay, soCauKeHoach = 0): { muc: number; tang: Tang; nguon: NguonMuc; uoc: boolean } {
+export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNgay[], goi7?: Goi7Ngay, soCauKeHoach = 0, homNay = ''): { muc: number; tang: Tang; nguon: NguonMuc; uoc: boolean } {
   if (cheDo === 'goi7') {
     const c = goi7?.chot
     if (c && c.muc > 0) return { muc: c.muc, tang: c.tang, nguon: 'da-chot', uoc: false }
-    return { muc: mucUocGoi7(ngay, CAU_TOI_THIEU[1], goi7?.quota ?? 0), tang: 1, nguon: 'uoc-goi7', uoc: true }
+    return { muc: mucUocGoi7(ngay, CAU_TOI_THIEU[1], goi7?.quota ?? 0, homNay), tang: 1, nguon: 'uoc-goi7', uoc: true }
   }
   const dung = chot.find((c) => c.ngay === ngay)
   if (dung && dung.toiThieu > 0) return { muc: dung.toiThieu, tang: dung.tang, nguon: 'da-chot', uoc: false }
@@ -285,7 +285,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
         if(test&&!test.baiNgayToiThieu)return {ngay:d,mucToiThieu:test.tong,daLam:test.daTra,thieu:Math.max(0,test.tong-test.daTra),datMuc:test.nopLuc!==null&&test.daTra>=test.tong,mucUocTinh:false,nguonMuc:'da-chot' as const,tang:1 as const,cheDo:'kiem-tra' as const,homNay:d===homNay}
         const cheDo: CheDoNgay = e.goi7Tu !== null && e.goi7Tu <= d ? 'goi7' : 'hanh-trinh'
         const kh = cheDo === 'hanh-trinh' ? keHoach.get(k(e.sbd, d)) : undefined
-        const m = test?.baiNgayToiThieu?{muc:12,tang:1 as const,nguon:'da-chot' as const,uoc:false}:mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined, kh ? new Set([...kh.dao, ...kh.doan].map(gocKeHoach)).size : 0)
+        const m = test?.baiNgayToiThieu?{muc:12,tang:1 as const,nguon:'da-chot' as const,uoc:false}:mucCuaNgay(d, cheDo, c, cheDo === 'goi7' ? { chot: muc7.get(k(e.sbd, d)) ?? null, quota: quota7.get(k(e.sbd, d)) ?? 0 } : undefined, kh ? new Set([...kh.dao, ...kh.doan].map(gocKeHoach)).size : 0, homNay)
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])
         return { ...(test?.baiNgayToiThieu?{kiemTra:test}:{}),ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))

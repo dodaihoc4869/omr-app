@@ -156,7 +156,7 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
         const t1 = ticks[0]!.tick!, tt = trangThaiBai(t1, false)
         const soEm = nhieu ? null : (t1.goi7?.soEm ?? t1.soEm ?? t1.chungChi?.tong ?? null)
         dong = { khoaBai: b.khoaBai, so: soBaiCuaTen(b.tenBai) === null ? null : String(soBaiCuaTen(b.tenBai)), ten: b.tenBai, soCau: tuGiao || b.soCau, chiaPhan: '', trangThai: ticks.some((x) => x.tick?.trangThai === 'dang_luyen') ? 'dang' : 'da',
-          chuThai: `${tt.chu.split(' · chứng chỉ')[0]}${soEm ? ` · ${soEm} em` : ''}${nhieu ? ` · ${lopChon.length} lớp` : ''}` }
+          chuThai: `${tt.chu.split(' · chứng chỉ')[0]}${soEm ? ` · ${soEm} em` : ''}${nhieu ? ` · ${lopChon.length} lớp` : ''}`, coSuaEm: ticks.some((x) => !!x.tick?.goi7?.goiId) }
       } else {
         const coLop = ticks.filter((x) => x.tick).map((x) => x.lop)
         const cu = b.viTri < xaNhat
@@ -189,7 +189,7 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
     thieuDS: x1.doChuan?.thieuDS ?? 0,
     hanNgay: x1.hanChung?.T ?? null,
     hanChu: x1.hanChung ? `hết ${hienHanNop(x1.hanChung.han, false) || x1.hanChung.han}` : `hết 23:59 · ${hienHanNop(x1.hanNop, false) || x1.hanNop}`,
-    duKienXong: x1.hanChung?.duKienXong ?? 0,
+    duKienXong: gn.lopGiao.reduce((n, x) => n + (gn.xemTheoLop[x.lop]?.hanChung?.duKienXong ?? 0), 0),
     soEm: tongEm,
   } : null
 

@@ -115,10 +115,9 @@ describe('hộp Giao bài 09/11 — máy tự tính, thầy chỉ chọn bài', 
     const hop = await moHop()
     // Bài 2 tick sẵn (gợi ý) ⇒ xem trước tự chạy.
     await waitFor(() => expect(within(hop).getByRole('button', { name: 'Giao 1 bài cho lớp 12A1 · 53 em' })).toBeTruthy(), { timeout: 4000 })
-    console.log('DBGA', JSON.stringify(baO(hop)))
     expect(baO(hop)).toEqual({
       'Câu mới': ['4', '2 ngày · 28 câu/ngày'],
-      'Đề chuẩn': ['24/28', 'đúng mức đề thi; ô thiếu máy tự lấy câu gần nhất'],
+      'Đề chuẩn': ['24/28', 'đúng mức đề thi; ô thiếu máy bù bằng câu ô khác'],
       'Hạn chung cả lớp': ['10 ngày', `hết ${hienHanNop('2026-11-19', false)} · 48/53 em dự kiến xong hết`],
     })
     expect(hop.textContent).toContain('Cả lớp chung hạn. Máy tự xếp 28 câu mỗi ngày cho từng em')

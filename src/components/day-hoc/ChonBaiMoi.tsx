@@ -26,6 +26,8 @@ export interface DongBaiMoi {
   cu?: boolean
   /** Bài kế tiếp nên giao (09/11, hộp Giao bài) ⇒ nhãn «Gợi ý». */
   goiY?: boolean
+  /** Bài đang giao có gói luyện (Gói 7) ⇒ có nút «Sửa em». */
+  coSuaEm?: boolean
 }
 export interface ChuongMoi { ten: string; bai: DongBaiMoi[] }
 /** Tóm tắt hộp Giao bài (09/11, bản vẽ docs/ban-ve-giao-bai-0911): ba ô Câu mới · Đề chuẩn · Hạn chung cả lớp — số do máy chủ tính (`xem-truoc`). */
@@ -109,7 +111,7 @@ export function ChonBaiMoi(p: {
                         <li key={b.khoaBai} className="cbm-bai cbm-bai--da" data-trang-thai={b.trangThai}>
                           <span className="cbm-so" aria-hidden="true">{b.so ?? '•'}</span>
                           <span className="cbm-ten"><b>{b.ten}</b><small>{b.chuThai}</small></span>
-                          {p.onSuaEm && <button type="button" className="cbm-bo" onClick={() => p.onSuaEm!(b.khoaBai)}>Sửa em</button>}
+                          {p.onSuaEm && b.coSuaEm && <button type="button" className="cbm-bo" onClick={() => p.onSuaEm!(b.khoaBai)}>Sửa em</button>}
                           {p.onBoGiao && <button type="button" className="cbm-bo" onClick={() => p.onBoGiao!(b.khoaBai)}>Gỡ bài</button>}
                         </li>
                       )
@@ -138,7 +140,9 @@ export function ChonBaiMoi(p: {
       </div>
 
       <div className="cbm-day" data-khoi="tom-tat-giao" aria-live="polite">
-        {p.xong ? (
+        {/* Giao được MỘT PHẦN (có `canhBao`): vẫn hiện lời lỗi + nút Giao để thầy giao lại phần còn lại (lỗi từ 01/11: nhánh `xong` giấu cả hai). */}
+        {p.xong && (p.canhBao || soChon > 0) && <p className="cbm-xong" role="status"><Check size={18} strokeWidth={3} aria-hidden="true" />{p.xong}</p>}
+        {p.xong && !p.canhBao && !soChon ? (
           <p className="cbm-xong" role="status"><Check size={18} strokeWidth={3} aria-hidden="true" />{p.xong}</p>
         ) : !soChon ? (
           <p className="cbm-cho">Tick bài vừa dạy ở trên. Máy đặt hạn chung cho lớp và tự xếp 28 câu mỗi ngày cho từng em; không giao Ví dụ minh hoạ và Các dạng toán.</p>
