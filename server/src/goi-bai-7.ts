@@ -822,7 +822,9 @@ async function startGoi7Thuc(env: Env, sbd: string, now: number, gsSom?: Promise
   const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
   const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
-  const soCauChang = 6 - (lap.daLamNgay % 6)
+  // Chặng theo ranh 6 câu; chặng cuối của mức chỉ phần còn lại (mức 28 = 4 × 6 + 4). Đã đủ mức ⇒ «Học thêm câu mới» luôn đủ MỘT chặng 6 câu (luật 29/10;
+  // 09/11 mức cố định 28: 28 % 6 = 4 từng làm chặng học thêm chỉ còn 2 câu).
+  const soCauChang = lap.daLamNgay >= lap.toiThieu ? 6 : Math.min(6 - (lap.daLamNgay % 6), lap.toiThieu - lap.daLamNgay)
   for (const lay of lanThu) { if (refs.length) break
     const ds = lay()
     const ung = ds.map(v => { const oldRef = saved?.questions.find(r=>r.qid===v.qid); return { v, oldRef, meta: oldRef ?? lap.hs.meta.get(v.qid) ?? cauGoi.get(v.qid) } })
