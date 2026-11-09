@@ -137,11 +137,12 @@ function chay(san: HTMLElement, loai: 'ten' | 'kj'): void {
   setTimeout(() => chay(san, loai), 120) // thẻ sau cách 120 ms (trong giới hạn bay cùng lúc)
 }
 
-/** Xếp một việc bay. Hàng chờ dài (> 6) ⇒ tên em chỉ bừng sáng ở dải đáy, không bay; nhãn kJ thì hiện tĩnh dưới ống. */
+/** Xếp một việc bay. Tên em: hàng chờ dài (> 6) ⇒ chỉ bừng sáng ở dải đáy, không bay. Nhãn kJ: XẾP HÀNG hết (mở đáp án ⇒ mỗi em một mục,
+ *  tối đa 4 nhãn bay cùng lúc); hàng quá dài (> 40, nối lại sau mất mạng) ⇒ hiện tĩnh dưới ống. */
 function xep(san: HTMLElement, vc: Viec, yeu: boolean): void {
   if (yeu || !coAnimate(san)) { if (vc.loai === 'kj') hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
   const h = hang[vc.loai]
-  if (h.cho.length > 6) { if (vc.loai === 'kj') hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
+  if (h.cho.length > (vc.loai === 'ten' ? 6 : 40)) { if (vc.loai === 'kj') hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
   h.cho.push(vc)
   chay(san, vc.loai)
 }
@@ -160,7 +161,10 @@ export function bayKj(san: HTMLElement, b: BienDong, mau: string, yeu: boolean):
   const tong = Math.round((b.kjEm ?? 0) + (b.kjDoi ?? 0))
   if (!tong) return
   const tru = tong < 0
-  const tu = b.sbd ? san.querySelector(`.bb-tl-o[data-sbd="${thoat(b.sbd)}"]`) : null
+  // TẾ NHỊ TRƯỚC LỚP: chỉ bay TỪ Ô TÊN em khi là lời khen (đúng / giải đúng / đoán đúng / vào lớp). Mục khác («chưa biết làm», chỉ có năng lượng hoạt hoá
+  // — tức em chưa đúng, bị trừ…) bay từ giữa bảng vào ống đội: đội vẫn thấy kJ, cả lớp không suy ra được em nào.
+  const tonVinh = tong > 0 && /^(đúng|giải đúng|đoán đúng|vào lớp)/i.test(String(b.lyDo ?? '').trim())
+  const tu = b.sbd && tonVinh ? san.querySelector(`.bb-tl-o[data-sbd="${thoat(b.sbd)}"]`) : null
   xep(san, { loai: 'kj', tu, doi: b.doi, chu: `${tru ? '−' : '+'}${soKj(Math.abs(tong))} kJ`, tru, lyDo: b.lyDo, mau }, yeu)
 }
 
