@@ -4,7 +4,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { act, cleanup, fireEvent, render } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
-import { CHU_CHO_LY_DO, choLyDoSai, chonLyDoSai, daGuiLyDoSai, thanLyDoSai } from '../src/components/hoc-tap/vi-sao-sai'
+import { CHU_CHO_LY_DO, bacBoTu, choLyDoSai, chonLyDoSai, daGuiLyDoSai, thanLyDoSai } from '../src/components/hoc-tap/vi-sao-sai'
 import { KetSai } from '../src/components/hoc-tap/KetSaiDuo'
 
 afterEach(() => { cleanup(); const g = thanLyDoSai(); daGuiLyDoSai(g); localStorage.clear() })
@@ -59,5 +59,25 @@ describe('màn làm bài nối đúng chỗ', () => {
     expect(src).toContain('daGuiLyDoSai(ly)')
     expect(src).not.toContain('1 · 3 · 7')
     expect(CHU_CHO_LY_DO).toBe('Chọn một lý do để tiếp tục')
+  })
+})
+
+describe('lời giải bác bỏ (khối B lát 7, bản vẽ dt-sang-2)', () => {
+  const pa = ['Aniline', 'Methylamine', 'Glycine', 'Phenol']
+  const lg = { tungPa: { A: { viSao: 'Vòng benzene hút cặp electron của N, tính base của aniline rất yếu, không đổi màu quỳ.' }, B: { viSao: 'Methylamine có tính base mạnh hơn ammonia ⇒ quỳ hoá xanh.' } }, chot: 'Amine béo làm quỳ hoá xanh.' }
+  it('bacBoTu: dựng từ chính lời giải của câu; thiếu lý do phương án em chọn / không phải trắc nghiệm ⇒ null', () => {
+    expect(bacBoTu('A', 'B', pa, lg)).toEqual({ chon: 'A. Aniline', sai: lg.tungPa.A.viSao, dung: lg.tungPa.B.viSao })
+    expect(bacBoTu('C', 'B', pa, lg)).toBeNull()
+    expect(bacBoTu('DSDD', 'DDDD', pa, lg)).toBeNull()
+    expect(bacBoTu('A', 'B', pa, { tungPa: { A: { viSao: 'x' } }, chot: 'chốt' })).toEqual({ chon: 'A. Aniline', sai: 'x', dung: 'chốt' })
+  })
+  it('KetSai: có lý do ⇒ khung Em chọn · Chỗ chưa đúng · Đúng là (thay dòng lời giải ngắn); không có ⇒ dòng cũ', () => {
+    const { container, rerender } = render(<KetSai qid="b1" dap="Đáp án đúng: B. Methylamine" giai="dòng cũ" laLamLai={false} pa={pa} lg={lg} em="A" da="B" />)
+    expect([...container.querySelectorAll('.bac-bo p')].map(p => p.textContent)).toEqual([
+      'Em chọn: A. Aniline', `Chỗ chưa đúng: ${lg.tungPa.A.viSao}`, `Đúng là: ${lg.tungPa.B.viSao}`])
+    expect(container.textContent).not.toContain('dòng cũ')
+    rerender(<KetSai qid="b1" dap="Đáp án đúng: B. Methylamine" giai="dòng cũ" laLamLai={false} pa={pa} lg={lg} em="C" da="B" />)
+    expect(container.querySelector('.bac-bo')).toBeNull()
+    expect(container.textContent).toContain('dòng cũ')
   })
 })

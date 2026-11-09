@@ -3,10 +3,12 @@
 // precache, không thêm byte đường mở app).
 import { useEffect, useLayoutEffect, useRef, type ReactNode } from 'react'
 import { ChemText } from '../../lib/chem-format'
-import { LY_DO_SAI, chonLyDoSai, choCauSai, useLyDoSai } from './vi-sao-sai'
+import { LY_DO_SAI, bacBoTu, chonLyDoSai, choCauSai, useLyDoSai } from './vi-sao-sai'
 
-/** Phần thân dải «Chưa đúng»: đáp án đúng, lời giải ngắn, «Vì sao em sai?» (trừ câu làm lại), dòng nhóm sửa. */
-export function KetSai({ qid, dap, giai, laLamLai, tenDang }: { qid: string; dap: ReactNode; giai: string; laLamLai: boolean; tenDang?: string }) {
+/** Phần thân dải «Chưa đúng»: đáp án đúng, lời giải bác bỏ / lời giải ngắn, «Vì sao em sai?» (trừ câu làm lại), dòng nhóm sửa. */
+export function KetSai({ qid, dap, giai, laLamLai, tenDang, pa, lg, em = '', da = '' }: { qid: string; dap: ReactNode; giai: string; laLamLai: boolean; tenDang?: string
+  pa?: readonly string[]; lg?: Parameters<typeof bacBoTu>[3]; em?: string; da?: string }) {
+  const bb = bacBoTu(em, da, pa, lg)
   const ly = useLyDoSai(qid)
   const o = useRef<HTMLDivElement>(null), thoi = useRef(() => {})
   useLayoutEffect(() => { if (laLamLai) return; const het = choCauSai(qid); thoi.current = het; return het }, [qid, laLamLai])
@@ -21,7 +23,11 @@ export function KetSai({ qid, dap, giai, laLamLai, tenDang }: { qid: string; dap
   }, [qid, laLamLai])
   return <>
     <p><b>{dap}</b></p>
-    {giai && <p className="duo-mo"><ChemText text={giai} /></p>}
+    {bb ? <div className="bac-bo">
+      <p><b>Em chọn:</b> <ChemText text={bb.chon} /></p>
+      <p><b>Chỗ chưa đúng:</b> <ChemText text={bb.sai} /></p>
+      {bb.dung && <p><b>Đúng là:</b> <ChemText text={bb.dung} /></p>}
+    </div> : giai && <p className="duo-mo"><ChemText text={giai} /></p>}
     {!laLamLai && <div ref={o} className="ly-do" role="group" aria-labelledby={`ly-${qid}`}>
       <h3 id={`ly-${qid}`}>Vì sao em sai?</h3>
       <p className="ly-goi-y">Chạm một ô để A.I Đỗ Đại Học xếp cách sửa hợp với em.</p>
