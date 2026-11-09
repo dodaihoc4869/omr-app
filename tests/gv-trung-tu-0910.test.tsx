@@ -86,8 +86,10 @@ describe('một bảng lam · thang chung (nguồn CSS)', () => {
     expect(css).not.toContain('max-width: 1400px')
   })
 
-  it('"Cần thầy chữa": cùng màu hổ phách ở số cạnh Hành trình (thanh bên) và dòng việc Hôm nay', () => {
-    expect(soDemMuc('chiendich', { caMo: null, canThayChua: 4 })).toEqual({ chu: '4', nhan: 'Cần thầy chữa: 4 chỗ', tone: 'vang' })
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «bỏ hẳn thẻ hành trình»): số Cần thầy chữa nay đứng cạnh mục Hôm nay.
+  it('"Cần thầy chữa": cùng màu hổ phách ở số cạnh Hôm nay (thanh bên) và dòng việc Hôm nay', () => {
+    expect(soDemMuc('chiendich', { caMo: null, canThayChua: 4 })).toBeNull()
+    expect(soDemMuc('tongquan', { caMo: null, canThayChua: 4 })).toEqual({ chu: '4', nhan: 'Cần thầy chữa: 4 chỗ', tone: 'vang' })
     expect(doc('src/styles/gv-mau.css')).toMatch(/\.ben-trai-dem\[data-tone='vang'\] \{\s*background: var\(--gvm-hp-nen\);/)
     expect(doc('src/screens/GvHomNayScreen.tsx')).toMatch(/key: 'can-chua', mau: 'hp'/)
   })
