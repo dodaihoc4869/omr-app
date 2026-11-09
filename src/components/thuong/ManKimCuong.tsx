@@ -15,6 +15,9 @@ import { capNhatTongQuan, useTai, useTongQuan } from './dung-thuong'
 import { Cho, Loi, ManToan, NutDay, gioVn, oTinhThe, thuNgayVn, useHieuUng } from './chung'
 import { DauVe } from './ManChuoi'
 import OSoTraLoi from '../OSoTraLoi'
+import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
+import { laChuGiuCho } from '../../lib/anh-phuong-an'
+import type { HinhAnh } from '../../data/examContent'
 
 type Buoc = 'moi' | 'lam' | 'truot' | 'dat'
 export interface PropsKimCuong {
@@ -98,19 +101,32 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
   if (buoc === 'lam' && phien && q) {
     const n = phien.cau.length
     const chon = (v: string) => { if (!kq) setTra(v) }
+    const hinhKc = (q.hinhAnh ?? []) as HinhAnh[]
+    const coAnhPa = !!q.choiceImgs?.some(Boolean) || hinhKc.some((h) => h.viTri.startsWith('sau_pa_'))
     return <ManToan nhan={`Thử thách Kim cương · ${tenChuyenDe}`} onDong={onDong}
       tren={<><OngNghiem phanTram={(100 * (viTri + (kq ? 1 : 0))) / n} kimCuong nhan={`Đã xong ${viTri + (kq ? 1 : 0)}/${n} câu`} /><MangBa con={ongCon} tong={phien.ong} /></>}
       day={kq ? <NutDay chu="Tiếp tục" onClick={tiep} /> : <NutDay chu={gui ? 'Đang kiểm tra…' : 'Kiểm tra'} tat={!du || gui} onClick={() => void kiemTra()} />}>
       <main className="tp-kc-lam">
         <p className="tp-kc-nhan">Thử thách Kim cương · {tenChuyenDe} <span className="tp-chip">Câu {viTri + 1}/{n}</span></p>
-        <p className="tp-kc-de"><ChemText text={q.text} /></p>
-        {q.phan === 'I' && <div className="tp-pa" data-luoi={q.choices.every((c) => c.length < 12) || undefined} role="group" aria-label="Chọn đáp án">
-          {q.choices.map((c, i) => { const k = 'ABCD'[i]!; return <button key={k} type="button" aria-pressed={tra === k} disabled={!!kq} onClick={() => chon(k)}><b>{k}</b><span><ChemText text={c} /></span></button> })}
+        {/* 09/11 (thầy: «nhiều câu Kim cương mất hình»): đề / phương án / ý vẽ ĐỦ hình như màn luyện (LamCau · TheCau): ảnh cả đề, bảng, hình sau đề,
+            ảnh riêng từng phương án / ý, hình sau phương án / ý, hình cuối câu. */}
+        {q.thanCauImg ? <CauHinh src={q.thanCauImg} alt={`Đề câu ${viTri + 1}`} vt="sau_de" /> : <p className="tp-kc-de"><ChemText text={q.text} /></p>}
+        <BangSoLieu table={q.table} />
+        {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt={`Hình câu ${viTri + 1}`} />}
+        <HinhTaiViTri hinhAnh={hinhKc} viTri="sau_de" nhan={`câu ${viTri + 1}`} />
+        {q.phan === 'I' && <div className="tp-pa" data-luoi={(!coAnhPa && q.choices.every((c) => c.length < 12)) || undefined} role="group" aria-label="Chọn đáp án">
+          {q.choices.map((c, i) => { const k = 'ABCD'[i]!, anh = q.choiceImgs?.[i], sau = hinhKc.filter((h) => h.viTri === `sau_pa_${k}`)
+            return <button key={k} type="button" aria-pressed={tra === k} disabled={!!kq} onClick={() => chon(k)}><b>{k}</b><span>
+              {anh ? <img src={anh} alt={`Phương án ${k}`} loading="lazy" decoding="async" className="tp-kc-anh" /> : (sau.length && laChuGiuCho(c)) ? null : <ChemText text={c} />}
+              {sau.map((h, j) => <img key={j} src={h.src} alt={h.alt ?? `Phương án ${k}`} loading="lazy" decoding="async" className="tp-kc-anh" />)}
+            </span></button> })}
         </div>}
-        {q.phan === 'II' && <div className="tp-ds">{q.ideas.map((y, i) => <div key={i}><span><b>{'abcd'[i]})</b> <ChemText text={y} /></span>
+        {q.phan === 'II' && <div className="tp-ds">{q.ideas.map((y, i) => <div key={i}><span><b>{'abcd'[i]})</b> {q.ideaImgs?.[i] ? <img src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} loading="lazy" decoding="async" className="tp-kc-anh" /> : <ChemText text={y} />}
+          <HinhTaiViTri hinhAnh={hinhKc} viTri={`sau_y_${'abcd'[i]}` as HinhAnh['viTri']} nhan={`ý ${'abcd'[i]}`} /></span>
           <span className="tp-hai-nut" role="group" aria-label={`Chọn cho ý ${'abcd'[i]}`}>{(['D', 'S'] as const).map((v) => <button key={v} type="button" className="tp-nut" aria-pressed={tra[i] === v} data-sac={tra[i] === v ? 'chinh' : undefined} disabled={!!kq}
             onClick={() => { const a = tra.padEnd(4, '-').split(''); a[i] = v; chon(a.join('')) }}>{v === 'D' ? 'Đúng' : 'Sai'}</button>)}</span></div>)}</div>}
         {/* 02/11: ô đáp số dùng chung OSoTraLoi (bàn phím số iPhone không có dấu «−» ⇒ cần nút «±» trong ô; luật 30/09). */}
+        <HinhTaiViTri hinhAnh={hinhKc} viTri="cuoi_cau" nhan={`câu ${viTri + 1}`} />
         {q.phan === 'III' && <div className="tp-ds"><span className="tp-mo">Đáp số</span><OSoTraLoi inputClassName="tp-o-so" ariaLabel="Đáp số" maxLength={8} value={tra} disabled={!!kq} onChange={(v) => chon(v.replace(/[^\d,.-]/g, '').slice(0, 8))} /></div>}
         {kq && <div className="tp-kq-kc" data-kq={kq.dung ? 'dung' : 'sai'} role="status">{kq.dung ? 'Chính xác!' : `Chưa đúng · vỡ 1 ống nghiệm${ongCon > 0 ? ` · còn ${ongCon} ống` : ''}`}</div>}
         {kq?.thuong && <TamThuong thuong={kq.thuong} />}
