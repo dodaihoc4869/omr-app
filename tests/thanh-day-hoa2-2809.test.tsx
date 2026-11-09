@@ -42,7 +42,8 @@ describe('thanh đáy theo cờ Game Hóa 2.0', () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     render(<BottomNav />)
     expect(nhanThanh()).toEqual(MUC_HOA2_CHINH.map((m) => m.ngan))
-    expect(nhanThanh()).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề'])
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»): không còn mục Hành trình; màn `chiendich` sáng mục Hôm nay.
+    expect(nhanThanh()).toEqual(['Hôm nay', 'Ca kiểm tra', 'Học sinh', 'Kho đề'])
     expect(nhanThanh().length).toBeLessThanOrEqual(5)
     expect(screen.queryByRole('button', { name: 'Thêm' })).toBeNull()
     for (const cu of ['Tổng quan', 'Chiến dịch', 'Chữa bài', 'Bài tập', 'Học sinh hỏi', 'Giao đề theo tuần', 'Giao bài tập về nhà', 'Lên bảng', 'Gỡ nút']) expect(nhanThanh()).not.toContain(cu)

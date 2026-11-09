@@ -44,7 +44,8 @@ describe('thanh bên theo cờ', () => {
     const { container } = render(<ThanhBenTrai />)
     expect(screen.queryByRole('button', { name: 'Mở ca kiểm tra' })).toBeNull()
     // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
-    expect(tenMuc()).toEqual(['Hôm nay', 'Hành trình', 'Ca kiểm tra', 'Học sinh', 'Kho đề', 'Thi đua tuần', 'Cài đặt'])
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»): không còn mục Hành trình; màn `chiendich` sáng mục Hôm nay.
+    expect(tenMuc()).toEqual(['Hôm nay', 'Ca kiểm tra', 'Học sinh', 'Kho đề', 'Thi đua tuần', 'Cài đặt'])
     for (const bo of ['Tổng quan', 'Chiến dịch luyện', 'Chữa trên lớp', 'Gỡ nút thắt']) expect(tenMuc()).not.toContain(bo)
     expect(container.querySelector('.ben-trai-vach[role="separator"]')).toBeTruthy()
     expect(screen.queryByText('Thêm…')).toBeNull()
@@ -52,8 +53,7 @@ describe('thanh bên theo cờ', () => {
     expect(container.textContent).toContain('Đỗ Đại Học')
     expect(container.textContent).toContain('Giáo viên')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('aria-current')).toBe('page')
-    fireEvent.click(screen.getByRole('button', { name: 'Hành trình' }))
-    expect(useAppStore.getState().screen).toBe('chiendich')
+    expect(screen.queryByRole('button', { name: 'Hành trình' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Hôm nay' }))
     expect(useAppStore.getState().screen).toBe('tongquan')
     // SỬA CÓ CHỦ Ý 09/10 (trung tu giao diện thầy duyệt): "Học sinh hỏi" (`cauhoi`) KHÔNG còn ẩn ở 2.0 — em vẫn gửi "Hỏi bài Thầy" sau ca kiểm tra,
@@ -66,8 +66,9 @@ describe('thanh bên theo cờ', () => {
     expect(mucDangSang('examsetup', true)).toBe('lichsuca')
     expect(mucDangSang('toancanh')).toBe('examhub')
     // Mã màn cũ vẫn mở được (setScreen ở nơi khác) và tô sáng Hành trình.
-    expect(mucDangSang('goilenbang', true)).toBe('chiendich')
-    expect(mucDangSang('bangonutthat', true)).toBe('chiendich')
+    expect(mucDangSang('goilenbang', true)).toBe('tongquan')
+    expect(mucDangSang('bangonutthat', true)).toBe('tongquan')
+    expect(mucDangSang('chiendich', true)).toBe('tongquan')
   })
 
   it('máy chủ chưa có lệnh ⇒ cờ về TẮT (app như cũ)', async () => {

@@ -90,3 +90,10 @@
 }
 /* 12/10: lối vào Hành trình › Bài hằng ngày (nút chữ cuối thẻ Đủ mức) */
 .gvhn-du .gvhn-bhn { align-self: flex-start; margin: -8px 0 -8px -12px; }
+/* 09/11 nút Điểm danh ở đầu màn: thầy dạy nhiều lớp ⇒ hộp nhỏ chọn lớp ngay dưới đầu màn. */
+.gvhn-dau { position: relative; }
+.gvhn-chon-lop { position: absolute; right: 0; top: 100%; z-index: 30; margin-top: 8px; display: grid; gap: 12px; min-width: 260px; max-width: min(520px, calc(100vw - 32px)); padding: 16px; border-radius: 20px;
+  background: var(--gvm-mat-2); color: var(--gvm-chu); box-shadow: inset 0 0 0 1px var(--gvm-vien), 0 16px 40px color-mix(in srgb, var(--gvm-chu) 18%, transparent); }
+.gvhn-chon-lop-ds { display: flex; flex-wrap: wrap; gap: 8px; }
+.gvhn-chon-lop-ds button { min-height: 44px; }
+.gvhn-chon-lop-huy { justify-self: end; min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--gvm-chu-2); font: inherit; cursor: pointer; }

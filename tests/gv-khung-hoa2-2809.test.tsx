@@ -107,7 +107,8 @@ describe('thanh bên 2.0 · số đếm cạnh mục', () => {
     expect(dem).toEqual(['7', '1 mở'])
     expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('aria-current')).toBe('page')
     expect(screen.getByRole('button', { name: 'Ca kiểm tra' }).getAttribute('title')).toBe('Ca kiểm tra · 1 ca đang mở')
-    expect(screen.getByRole('button', { name: 'Hành trình' }).getAttribute('title')).toBe('Hành trình · Cần thầy chữa: 7 chỗ')
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»): không còn mục Hành trình; màn `chiendich` sáng mục Hôm nay.
+    expect(screen.getByRole('button', { name: 'Hôm nay' }).getAttribute('title')).toBe('Hôm nay · Cần thầy chữa: 7 chỗ')
   })
 })
 
