@@ -1,5 +1,5 @@
 import { khopPhanIII } from '../../src/lib/cham-so'
-import { lySach, ghiLyDoSai } from './ly-do-sai'
+import { lySach, ghiLyDoSai, ghiChuaChac } from './ly-do-sai'
 import { ngoaiKenhSo } from '../../src/lib/so-o-tra-loi-ngan'
 import { BANG_HO_SO, BANG_MUA, docDongLop, envGhiRieng, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
 import {BANG_NGAY_CAP,EXP_MOI_VANG,MANH_REN_KHIEN,VANG_REN_KHIEN,ngayDatKhien} from '../../src/lib/kinh-te-game'
@@ -584,6 +584,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     const ghiSoHoc=async(attempt:Attempt,chon?:string,so?:SoOmni)=>{
       const env=envSo
       if(lyEm.length)await ghiLyDoSai(env,sbd,lyEm,new Date(attempt.at).toISOString())
+      if((ref as {vai?:string}).vai==='sua'&&attempt.correct&&!attempt.assisted)await ghiChuaChac(env,sbd,qid,b.tuTin==='chua_chac',new Date(attempt.at).toISOString()) // «Chưa chắc» câu sửa (ly-do-sai.ts)
       // CNH-1.0 P03: khi cờ `nang_luc_v1` BẬT, sự kiện ĐƯỢC HỖ TRỢ cũng vào sổ (kèm `assistance:'assisted'`)
       // để phần hỗ trợ có bằng chứng và KHÔNG bị tính là lần tự làm. Cờ TẮT ⇒ giữ nguyên hành vi cũ (bỏ qua),
       // không đổi hồ sơ mạnh yếu đang chạy.

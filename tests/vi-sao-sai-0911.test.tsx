@@ -55,7 +55,7 @@ describe('màn làm bài nối đúng chỗ', () => {
     expect(src).toContain('disabled={choLy}')
     expect(src).toContain('CHU_CHO_LY_DO')
     expect(src).toMatch(/if \(choLyDoSai\(\)\) return/)
-    expect(src).toMatch(/const ly = thanLyDoSai\(\), than = \{[^}]*\.\.\.ly,/)
+    expect(src).toMatch(/const ly = thanLyDoSai\(q\.qid\), than = \{[^}]*\.\.\.ly,/)
     expect(src).toContain('daGuiLyDoSai(ly)')
     expect(src).not.toContain('1 · 3 · 7')
     expect(CHU_CHO_LY_DO).toBe('Chọn một lý do để tiếp tục')

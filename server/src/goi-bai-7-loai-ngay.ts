@@ -8,7 +8,7 @@ import { NGAY_LOAI_NGAY, chonLoaiNgay7, laLoaiNgay7, type LoaiNgay7 } from './go
 import { docCotLyDo, type LyDoSai } from './ly-do-sai'
 
 type Row = Record<string, unknown>
-export interface MucLoai7 { muc: MucNgay7 | null; loai: LoaiNgay7 | null; truoc: LoaiNgay7[]; lyDo?: ReadonlyMap<string, LyDoSai> }
+export interface MucLoai7 { muc: MucNgay7 | null; loai: LoaiNgay7 | null; truoc: LoaiNgay7[]; lyDo?: ReadonlyMap<string, LyDoSai | 'cc'> }
 const tang7 = (v: unknown): TangHanhTrinh => { const t = Math.floor(Number(v)); return (t >= 1 && t <= 4 ? t : 1) as TangHanhTrinh }
 const mucCua = (r: Row | null | undefined): MucNgay7 | null =>
   r && Number(r.muc) > 0 ? { tang: tang7(r.tang), toiThieuTang: Number(r.toi_thieu_tang) || 0, quota: Number(r.quota) || 0, muc: Number(r.muc), daChot: true } : null
@@ -33,5 +33,5 @@ export function loaiNgayEm7(ml: MucLoai7, ngay: string, goi: readonly GoiCuaEm7[
   const conMoi7 = (g: GoiCuaEm7) => g.cau.filter(c => !daGap.has(c.qid) && !chan.has(c.qid) && !chan.has(c.group)).length
   const loaiNgay: LoaiNgay7 | null = ml.loai ?? chonLoaiNgay7({ ngay, truoc: ml.truoc, kiemNhe: goi.some(g => g.kiemNhe),
     soSua: hs.cau.filter(c => ['mo', 'cho_kiem'].includes(hs.loiV2?.get(c.qid)?.trangThai ?? '') && !chan.has(c.qid)).length, soMoiCon: goi.reduce((n, g) => n + conMoi7(g), 0) })
-  return { loaiNgay, loaiGhi: ml.loai ? null : loaiNgay, conMoi7, lyDo: ml.lyDo ?? new Map<string, LyDoSai>() }
+  return { loaiNgay, loaiGhi: ml.loai ? null : loaiNgay, conMoi7, lyDo: ml.lyDo ?? new Map<string, LyDoSai | 'cc'>() }
 }

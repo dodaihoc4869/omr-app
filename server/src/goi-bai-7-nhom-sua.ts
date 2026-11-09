@@ -14,7 +14,7 @@ export const SAI_HOC_LAI = 3
 export const qidGocSua = (q: string): string => q.replace(/~.*$/, '')
 
 type Meta = ReadonlyMap<string, { dang: string | null; tenDang: string | null }>
-type Loi = ReadonlyMap<string, { soLanSai: number; saiCuoi: string }>
+type Loi = ReadonlyMap<string, { soLanSai: number; saiCuoi: string; trangThai?: string; ngayDung?: readonly string[] }>
 const metaCua = (meta: Meta, q: string) => meta.get(q) ?? meta.get(qidGocSua(q))
 const khoaNhom = (meta: Meta, q: string): string => { const g = metaCua(meta, q); return g?.dang || g?.tenDang?.trim() || '' }
 
@@ -26,7 +26,7 @@ export function xepSuaTheoNhom(sua: readonly string[], meta: Meta): string[] {
 }
 
 /** Gom câu sửa của kế hoạch hôm nay (còn lại + câu lỗi cũ đã làm hôm nay) thành nhóm theo dạng; tối đa 8 nhóm (phần dư gộp vào nhóm cuối). */
-export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { meta: Meta; loiV2?: Loi }, lyDo: ReadonlyMap<string, LyDoSai>, daLam: ReadonlySet<string> = new Set(), ngay = ''): NhomSua7[] {
+export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { meta: Meta; loiV2?: Loi }, lyDo: ReadonlyMap<string, LyDoSai | 'cc'>, daLam: ReadonlySet<string> = new Set(), ngay = ''): NhomSua7[] {
   const m = new Map<string, NhomSua7>()
   const loiCua = (q: string) => hs.loiV2?.get(q) ?? hs.loiV2?.get(qidGocSua(q))
   const nap = (q: string, xong: boolean) => {
@@ -35,7 +35,8 @@ export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { me
     if (!n) { n = { ten: metaCua(hs.meta, q)?.tenDang?.trim() || 'Câu sai khác', so: 0, xong: 0 }; m.set(k, n) }
     n.so++
     if (xong) n.xong++
-    const l: LoaiNhom7 | undefined = (loiCua(q)?.soLanSai ?? 0) >= SAI_HOC_LAI ? 'hoc_lai' : lyDo.get(q) ?? lyDo.get(qidGocSua(q))
+    const g = lyDo.get(q) ?? lyDo.get(qidGocSua(q))
+    const l: LoaiNhom7 | undefined = (loiCua(q)?.soLanSai ?? 0) >= SAI_HOC_LAI ? 'hoc_lai' : g === 'cc' ? undefined : g
     if (l && (!n.loai || NANG[l] > NANG[n.loai])) n.loai = l
   }
   const con = viec.flatMap(v => (v.vai === 'sua' ? [v.qid] : []))
@@ -48,4 +49,19 @@ export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { me
   const du = ds.slice(7)
   const loai = du.reduce<LoaiNhom7 | undefined>((a, n) => (n.loai && (!a || NANG[n.loai] > NANG[a]) ? n.loai : a), undefined)
   return [...ds.slice(0, 7), { ten: 'Các dạng khác', so: du.reduce((s, n) => s + n.so, 0), xong: du.reduce((s, n) => s + n.xong, 0), ...(loai ? { loai } : {}) }]
+}
+
+/** LƯỢT ĐÚNG THEO LOẠI LỖI (khối B lát 5, đặc tả mục 2: «Hiểu nhầm ⇒ cần đúng 3 lần ở 3 ngày») + «CHƯA CHẮC»: ngày Sửa THÊM vào cuối hàng sửa
+ *  (a) câu em chạm «Hiểu nhầm» mà luật đóng lỗi chung đã đóng (đúng 2 ngày) nhưng chưa đủ 3 ngày đúng; (b) câu sửa em làm đúng nhưng «Chưa chắc».
+ *  Không đổi luật đóng lỗi chung (srs2) — chỉ phát thêm lượt; câu đã làm hôm nay không thêm. Thuần CPU. */
+export function themSua7(sua: readonly string[], hs: { cau: readonly { qid: string }[]; loiV2?: Loi }, lyDo: ReadonlyMap<string, LyDoSai | 'cc'>, ngay: string): string[] {
+  const co = new Set(sua), them: string[] = []
+  for (const { qid } of hs.cau) {
+    if (co.has(qid)) continue
+    const l = hs.loiV2?.get(qid)
+    if (!l || !l.soLanSai || (l.ngayDung ?? []).includes(ngay)) continue
+    const nham = lyDo.get(qid) === 'nham' && (l.trangThai === 'dong' || l.trangThai === 'duy_tri') && (l.ngayDung?.length ?? 0) < 3
+    if (nham || lyDo.has(`cc:${qid}`)) { them.push(qid); co.add(qid) }
+  }
+  return them.length ? [...sua, ...them] : [...sua]
 }

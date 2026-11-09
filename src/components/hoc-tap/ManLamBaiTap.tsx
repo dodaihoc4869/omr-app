@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info
 import { ChemText } from '../../lib/chem-format'
 import { useChoLyDoSai, choLyDoSai, thanLyDoSai, daGuiLyDoSai, CHU_CHO_LY_DO } from './vi-sao-sai'
 import { KetSai } from './KetSaiDuo'
+import { ChipChuaChac } from './ChipChuaChac'
 // Trình bày phương trình + «không» phủ định (lib/chem-trinh-bay.tsx) — 07/11 nạp cùng gói KaTeX (katex-goi.ts), không import ở đây nữa (một mảnh, không thêm tên mảnh vào bảng nạp trước).
 import type { TheCauProps } from '../TheCau'
 import { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
@@ -716,7 +717,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           lamLaiSom.current = p
         }
       }
-      const ly = thanLyDoSai(), than = { session: ph, qid: q.qid, answer: tra, assisted, msLam, ...ly, ...(typeof skCau === 'string' && skCau ? { sk: skCau, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0, ...hanhVi } : undefined }
+      const ly = thanLyDoSai(q.qid), than = { session: ph, qid: q.qid, answer: tra, assisted, msLam, ...ly, ...(typeof skCau === 'string' && skCau ? { sk: skCau, ...(luotChang.current > 0 ? { lm: luotChang.current } : {}) } : {}), doGiay: dhMs.current >= 1000 ? { g: Math.round(dhMs.current / 1000), v: dhT.current.v, a: dhT.current.a, l: Math.max(dhT.current.l, dhT.current.lang), n: dhT.current.n, w: dhW.current ? 1 : 0, ...hanhVi } : undefined }
       const r = await guiLaiBenVung(() => duo ? nopCauLuong(token, than, 15, khiTam) : goiHoa2('answer', token, than, 15)) // chống trùng theo biên nhận ⇒ kẹt mạng tự gửi lại
       if (typeof r.correct !== 'boolean' || typeof r.answer !== 'string') throw new Error(typeof r.error === 'string' ? r.error : 'Chưa xác nhận được bài nộp. Em thử lại; kết quả không bị tính hai lần.')
       setMsCau(v => ({ ...v, [q.qid]: msLam })); ghiCauXong(sbd, q.qid); daGuiLyDoSai(ly)
@@ -1192,7 +1193,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       : k ? <section className="duo-day duo-ket" data-tt={khongTinh ? 'trung' : tt} data-tp-trung={khongTinh || undefined} role="status" aria-live="polite"><div className="duo-giua">
           <BungDung key={q.qid} loai={khongTinh ? 'trung' : tt === 'dung' || tt === 'sai' ? tt : 'trung'} />{/* thầy 27/10 (video Duolingo): mây bọt — đúng: xanh + hạt vuông · sai: đỏ nhạt + hạt tròn · chưa tính: xám, không hạt */}
           <div className="duo-kq">
-            {/* 27/10 (thầy: «dải … như dolingo»; phối hợp giám thị đứng trái đề): dải đúng / sai chỉ có dấu tròn tick / × ở tiêu đề — không đặt Bi */}
+            {/* 27/10: dải đúng / sai chỉ dấu tròn ở tiêu đề, không Bi */}
             {tt === 'trung' && !khongTinh ? <span className="duo-kq-o" aria-hidden="true"><BookOpen size={26} /></span> : null}
             <div className="duo-kq-chu">
               {/* 27/10 (thầy: «phần màu xám … làm cho tinh tế lại»): tấm CHƯA ĐƯỢC TÍNH gọn kiểu Duolingo — dấu (i) tròn nhỏ cùng dòng tiêu đề ngắn, một dòng
@@ -1211,7 +1212,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
             </div>
           </div>
           {loi && <p className="duo-loi" role="alert">{loi}</p>}
-          {/* thầy 27/10: Hỏi thầy (nút 3D phụ ~1/4, trái) + «Tiếp tục» CÙNG MỘT HÀNG */}
+          {/* 27/10: Hỏi thầy + «Tiếp tục» một hàng */}
           <div className="duo-hang-nut">{linkHoi}<button ref={nutTiepRef} type="button" className="duo-nut" data-sac={tt === 'sai' && !khongTinh ? 'do' : khongTinh ? 'lam' : undefined} disabled={choLy} onClick={() => { phanHoi('chon'); tiep() }}>{choLy ? CHU_CHO_LY_DO : 'Tiếp tục'}</button></div>
         </div></section>
       // CHẤM NHANH (28/10): chạm «Kiểm tra» ⇒ dải kết quả trượt lên NGAY ở trạng thái trung tính «Đang chấm…»; kết quả về ⇒ CÙNG dải đổi màu đúng / sai tại chỗ.
@@ -1289,7 +1290,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
           <div key="d" className="duo-cot-de">{/* khung thấp xoay ngang: cột trái = đề, cột phải = phương án + Kiểm tra / tấm kết quả; dọc / máy tính: display: contents (y bố cục cũ) */}
           {laLamLai ? <p key={`n${q.qid}`} className="duo-nhan" data-lam-lai=""><span>Làm lại · câu {stt}/{lamLai.length}</span><span className="duo-chip">Cùng dạng câu {goc.findIndex(c => c.qid === q.lamLaiCua) + 1 || '?'}</span></p>
             // thầy 27/10: lời nhắc chặng nằm TRONG dòng nhãn (không lớp nổi đè), mờ về nhãn thường sau 1,8 s — CSS «NHÃN CÂU NHẮC CHẶNG»
-            : <p key={`n${q.qid}`} className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}</p>}
+            : <p key={`n${q.qid}`} className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}{q.vaiGoi7 === 'sua' && !k && <ChipChuaChac qid={q.qid} />}</p>}
           {(!laLamLai || nutDen) && <div key={`l${q.qid}`} className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p key={`g${q.qid}`} className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
           {mucGt ? <div ref={sanRef} className="duo-gt-san">

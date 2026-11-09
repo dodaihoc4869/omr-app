@@ -41,10 +41,16 @@ export function chonLyDoSai(qid: string, ly: LyDoSai): void {
 }
 /** Có câu sai đang hiện mà em chưa chạm lý do ⇒ «Tiếp tục» (nút / phím Enter) chưa đi. */
 export const choLyDoSai = (): boolean => cho.size > 0
-/** Phần THÊM của thân lệnh nộp câu: `{ ly: [[qid, lý do], …] }` (vắng hàng ⇒ {}). */
-export function thanLyDoSai(): { ly?: [string, LyDoSai][] } {
+// «CHƯA CHẮC» (khối B lát 5, bản vẽ dt-sang-5): chip trên câu SỬA trước khi «Kiểm tra» (mặc định Chắc). Bật ⇒ lệnh nộp câu ấy mang `tuTin: 'chua_chac'`; máy chủ
+// (ly-do-sai.ts ghiChuaChac) đánh dấu câu sửa làm đúng mà chưa chắc ⇒ ngày Sửa sau xếp lại; làm đúng và chắc ⇒ xoá dấu.
+const chuaChac = new Set<string>()
+export function datChuaChac(qid: string, bat: boolean): void { if (bat) chuaChac.add(qid); else chuaChac.delete(qid); bao() }
+export const useChuaChac = (qid: string): boolean => { useSyncExternalStore(dangKy, () => ban, () => 0); return chuaChac.has(qid) }
+/** Phần THÊM của thân lệnh nộp câu: `{ ly: [[qid, lý do], …] }` (vắng hàng ⇒ {}) + `tuTin: 'chua_chac'` nếu em bật chip cho câu `qid` (đọc là dùng hết). */
+export function thanLyDoSai(qid?: string): { ly?: [string, LyDoSai][]; tuTin?: 'chua_chac' } {
   nap()
-  return daChon.size ? { ly: [...daChon].slice(0, TOI_DA_GUI) } : {}
+  const cc = !!qid && chuaChac.delete(qid)
+  return { ...(daChon.size ? { ly: [...daChon].slice(0, TOI_DA_GUI) } : {}), ...(cc ? { tuTin: 'chua_chac' as const } : {}) }
 }
 /** Lệnh nộp đã được máy chủ nhận ⇒ bỏ những lý do vừa gửi (lý do bị đổi sau lúc gửi thì giữ lại để gửi bản mới). */
 export function daGuiLyDoSai(gui: { ly?: [string, LyDoSai][] }): void {

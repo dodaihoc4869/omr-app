@@ -12,7 +12,7 @@ import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
 import { xoaDemChienDich, xoaDemMetaCau } from '../server/src/srs2-d1'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
 import { gameToken } from '../server/src/game-v2-auth'
-import { docCotLyDo, lySach } from '../server/src/ly-do-sai'
+import { docCotLyDo, ghiChuaChac, lySach } from '../server/src/ly-do-sai'
 
 const NOW = Date.parse('2026-11-10T02:00:00Z')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW) })
@@ -72,5 +72,18 @@ describe('lệnh nộp câu mang lý do', () => {
     vi.setSystemTime(NOW + 180_000)
     await goi(k, 'answer', { session: s.id, qid: c3!.qid, answer: sai(c3!), assisted: false, msLam: 30_000, ly: [[c1!.qid, 'nham'], [c2!.qid, 'tinh']] })
     expect(lyDaGhi(k)).toEqual([{ qid: c1!.qid, ly: 'nham' }, { qid: c2!.qid, ly: 'tinh' }].sort((a, b) => (a.qid < b.qid ? -1 : 1)))
+  })
+})
+
+describe('dấu «Chưa chắc» (khối B lát 5)', () => {
+  it('câu sửa đúng + chưa chắc ⇒ ghi dấu cc:<qid>; đúng + chắc ⇒ xoá; không đụng lý do của câu', async () => {
+    const k = await kho()
+    k.d.sql.prepare('INSERT INTO goi_bai_7_ly_do(sbd,qid,ly,luc) VALUES(?,?,?,?)').run('S1', 'q1', 'nham', 'x')
+    await ghiChuaChac(k.env, 'S1', 'q1', true, '2026-11-10T02:00:00Z')
+    expect(lyDaGhi(k)).toEqual([{ qid: 'cc:q1', ly: 'cc' }, { qid: 'q1', ly: 'nham' }])
+    await ghiChuaChac(k.env, 'S1', 'q1', true, '2026-11-10T03:00:00Z')
+    expect(lyDaGhi(k)).toHaveLength(2)
+    await ghiChuaChac(k.env, 'S1', 'q1', false, '2026-11-11T02:00:00Z')
+    expect(lyDaGhi(k)).toEqual([{ qid: 'q1', ly: 'nham' }])
   })
 })

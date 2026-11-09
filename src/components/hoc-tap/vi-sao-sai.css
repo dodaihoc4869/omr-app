@@ -19,3 +19,10 @@ html[data-trong]:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-nut:disabled { backg
   :root[data-trong] .duo:not([data-xong]) .duo-ket .ly-do .o-ly { margin-top: 0; gap: 6px; }
   :root[data-trong] .duo:not([data-xong]) .duo-ket .ly-do .o-ly button { min-height: 44px; font-size: 13px; }
 }
+/* Chip «Chưa chắc» trên câu sửa (khối B lát 5, bản vẽ dt-sang-5): mặc định Chắc (viền nhạt); bật ⇒ nền vàng chú ý. Đích chạm ≥ 44 px chiều cao qua vùng đệm. */
+[data-trong] .duo-nhan .chip-chua-chac {
+  margin-left: auto; min-height: 32px; padding: 4px 12px; border: 0; border-radius: 999px; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien);
+  font: inherit; font-size: 13px; font-weight: 800; color: var(--tr-chu-2); cursor: pointer; touch-action: manipulation; position: relative;
+}
+[data-trong] .duo-nhan .chip-chua-chac::after { content: ''; position: absolute; inset: -6px -2px; }
+[data-trong] .duo-nhan .chip-chua-chac[aria-pressed='true'] { background: var(--tr-chu-y-nhat); box-shadow: inset 0 0 0 1.5px var(--tr-chu-y); color: var(--tr-chu-y-chu); }

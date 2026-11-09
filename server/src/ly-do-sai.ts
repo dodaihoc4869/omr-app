@@ -24,10 +24,21 @@ export async function ghiLyDoSai(env: Env, sbd: string, ly: readonly [string, Ly
   } catch (e) { console.error('[ly-do-sai] chưa ghi được:', e instanceof Error ? e.message : e) }
 }
 
-/** Đọc cột `ly` (json_group_array của [qid, lý do]) từ câu đọc mức ngày ⇒ Map qid → lý do. */
-export function docCotLyDo(v: unknown): Map<string, LyDoSai> {
-  const m = new Map<string, LyDoSai>()
+/** «CHƯA CHẮC» (khối B lát 5, bản vẽ dt-sang-5): câu SỬA em làm đúng nhưng chạm «Chưa chắc» ⇒ dấu `cc:<qid>` (giá trị 'cc') trong CÙNG bảng — ngày Sửa sau
+ *  xếp lại câu ấy; làm đúng và chắc ⇒ xoá dấu. Một câu lệnh, chỉ cho câu sửa làm đúng, trong việc phụ sau phản hồi. Lỗi ⇒ ghi nhật ký, không ném. */
+export async function ghiChuaChac(env: Env, sbd: string, qid: string, chuaChac: boolean, luc: string): Promise<void> {
+  if (!sbd || !qid || qid.length > 120) return
+  try {
+    await (chuaChac
+      ? env.DB.prepare(`INSERT INTO goi_bai_7_ly_do(sbd,qid,ly,luc) VALUES(?1,?2,'cc',?3) ON CONFLICT(sbd,qid) DO UPDATE SET luc=excluded.luc`).bind(sbd, `cc:${qid}`, luc)
+      : env.DB.prepare('DELETE FROM goi_bai_7_ly_do WHERE sbd=? AND qid=?').bind(sbd, `cc:${qid}`)).run()
+  } catch (e) { console.error('[chua-chac] chưa ghi được:', e instanceof Error ? e.message : e) }
+}
+
+/** Đọc cột `ly` (json_group_array của [qid, lý do]) từ câu đọc mức ngày ⇒ Map qid → lý do; dấu «Chưa chắc» giữ dưới khoá `cc:<qid>` (giá trị 'cc'). */
+export function docCotLyDo(v: unknown): Map<string, LyDoSai | 'cc'> {
+  const m = new Map<string, LyDoSai | 'cc'>()
   if (typeof v !== 'string' || !v) return m
-  try { const a: unknown = JSON.parse(v); if (Array.isArray(a)) for (const c of a) if (Array.isArray(c) && typeof c[0] === 'string' && laLyDoSai(c[1])) m.set(c[0], c[1]) } catch { /* bỏ */ }
+  try { const a: unknown = JSON.parse(v); if (Array.isArray(a)) for (const c of a) if (Array.isArray(c) && typeof c[0] === 'string' && (laLyDoSai(c[1]) || (c[1] === 'cc' && c[0].startsWith('cc:')))) m.set(c[0], c[1]) } catch { /* bỏ */ }
   return m
 }
