@@ -79,6 +79,7 @@ Chuẩn mỗi đề (blueprint thầy): Phần I 12 Biết · 4 Hiểu · 2 VD; 
 | Chưa biết cách | ví dụ mẫu theo tư duy dạy của thầy (`docs/tu-duy-day-hoa-thay-2610.md`: sơ đồ cột dọc, bảo toàn nguyên tố) | 2 |
 | Hiểu nhầm | lời giải bác bỏ đúng cái bẫy em mắc | 3 |
 
+- **Máy sửa lại loại lỗi em tự chọn** (chống chọn «Tính sai» cho ít việc): nhóm sai lại lần nữa ⇒ nâng thành «Chưa biết cách»; chọn đúng phương án nhiễu blueprint mô tả ⇒ «Hiểu nhầm», dù em bấm gì.
 - Lượt 1 ở ngày Sửa (câu song sinh, không xem lời giải trước). Lượt 2, 3 do đề Ôn gọi (mục 2, ưu tiên 1) ⇒ không tốn thêm ngày Sửa.
 - Chu kỳ bài đóng khi mọi nhóm xong lượt 1; nhóm còn lượt sang chu kỳ sau.
 - Sai 3 lần ⇒ **thầy chữa trực tiếp**. Từ 30 % số em của lớp cùng một nhóm lỗi ⇒ app gợi ý thầy **chữa chung trên lớp** (Gọi lên bảng / Bình Phản Ứng) thay vì để từng em tự sửa.
@@ -94,20 +95,20 @@ M ngày Mới (cứ 2 Mới chen 1 Sửa nếu có lỗi) → 1 ngày Ôn → S�
 **Thầy làm đúng một việc:** chọn bài cho lớp (như đánh dấu bài đã dạy hiện nay). Không duyệt, không giao, không đặt hạn.
 
 **Máy tự làm:**
-1. **Lúc thầy chọn bài:** tính M ngày Mới, độ chuẩn đề (x/28), dự báo ngày xong của TỪNG em; đặt **hạn riêng từng em** = ngày em bắt đầu bài (sau khi xong bài trước) + số ngày dự báo + 2 ngày dung sai. Hạn chốt một lần, không trôi theo dự báo.
-2. **Mỗi đêm:** cập nhật độ bền h từ bài làm trong ngày, tính lại dự báo, xếp loại ngày mai (Mới / Ôn / Sửa) và chọn 28 câu cho từng em theo mục 1–3.
-3. **Tự giao:** em mở app thấy ngay «Hôm nay: Ngày Mới · Bài Amine · 28 câu»; đề chốt lần đầu em mở trong ngày (mở lại không đổi câu).
+1. **Lúc thầy chọn bài:** tính M ngày Mới, độ chuẩn đề (x/28), dự kiến lớp xong (khoảng ngày). **Hạn riêng từng em** đặt KHI EM BẮT ĐẦU bài (bài còn xếp hàng sau bài cũ chưa có hạn ⇒ không báo quá hạn dây chuyền) = số ngày dự báo lúc đó + 2 ngày dung sai; chốt một lần, không trôi.
+2. **Đề của ngày dựng khi em mở app lần đầu trong ngày** (như `goi_bai_7_ngay`; mở lại không đổi câu): cập nhật h, xếp loại ngày (Mới / Ôn / Sửa), chọn 28 câu theo mục 1–3. Việc chạy đêm chỉ gom số cho thẻ báo và dự kiến (luật tốc độ; tránh D1 429).
+3. **Tự giao:** em mở app thấy ngay «Hôm nay: Ngày Mới · Bài Amine · 28 câu».
 4. **Tự báo thầy** ở Hôm nay › Việc cần thầy (xếp theo độ gấp, số đếm trên thanh bên; không có việc thì không báo):
 
 | Báo | Khi nào | Nút một chạm |
 |---|---|---|
 | **Quá hạn bài** | em chưa xong chu kỳ bài khi qua hạn riêng | danh sách em + chậm bao nhiêu ngày |
-| **Bỏ đề** | em không làm đề 2 ngày liền | danh sách em |
 | **Cần thầy chữa** | nhóm lỗi sai 3 lần (gộp vào nhóm Cần thầy chữa đang có) | mở chỗ chữa |
 | **Nên chữa chung** | từ 30 % em của lớp cùng một nhóm lỗi | mở Gọi lên bảng với đúng dạng đó |
 | **Bài thiếu câu chuẩn** | độ chuẩn < 26/28 hoặc thiếu câu Đúng/Sai | xem ô thiếu, bổ sung |
-| **Lớp chưa xong bài trước** | thầy chọn bài mới khi quá nửa lớp còn bài cũ (chỉ báo, không chặn) | xem ai chưa xong |
 
+- Em bỏ làm: hiện ở Nhịp học, không thành thẻ (thầy bỏ thẻ «N em chưa làm» 12/10). Lớp chậm so với nhịp chọn bài: hiện ở ô «Lớp dự kiến xong» trong hộp Giao bài, không thành thẻ.
+- Nút và hộp: bản vẽ `docs/ban-ve-giao-bai-0911/` (thầy: một nút «Giao bài» ở Hôm nay, bỏ các màn phân bài bên trong).
 - Máy KHÔNG tự nhắn phụ huynh (việc gửi ra ngoài để thầy quyết); app phụ huynh vẫn thấy loại ngày và điểm đề Ôn như hiện có.
 - Thay hạn cứng 7 ngày của Gói 7 (`scripts/ap-goi7-song.ts` đổi theo).
 
@@ -117,13 +118,14 @@ M ngày Mới (cứ 2 Mới chen 1 Sửa nếu có lỗi) → 1 ngày Ôn → S�
 - Bằng chứng ôn trộn mạnh nhất ở toán lớp 7; học lại nhiều lượt chủ yếu ở đại học; bác bỏ hiểu nhầm có tranh luận (Zengilowski 2021 hoài nghi, Danielson 2024 vẫn thấy lợi). Áp vào Hoá luyện thi là suy luận hợp lý.
 - Thêm nút «Chắc / Chưa chắc» và một chạm «loại lỗi» là đổi giao diện ⇒ cần bản vẽ, thầy duyệt trước build.
 
-## 6. Thầy chốt
-0. Tự động hoàn toàn mục 4b: hạn riêng = dự báo + 2 ngày; 6 loại báo trên Việc cần thầy (ngưỡng «bỏ đề 2 ngày», «30 % lớp»).
-1. Bốn ưu tiên rút câu (đủ 28 > đúng phần > đúng mức > câu của bài) và «độ chuẩn x/28» hiện cho thầy.
-2. Ngưỡng quên 70 %, ngân sách 1 ngày Ôn/bài.
-3. Phân loại lỗi 3 loại với 1 / 2 / 3 lượt; nút «Chắc / Chưa chắc» chỉ ở câu Ôn và Sửa.
-4. Gợi ý chữa chung trên lớp khi từ 30 % em cùng nhóm lỗi.
-5. Giữ từ trước: 6 chương 0 câu trong blueprint (ngày Ôn dành 10 %?); Phần II tạm theo mức cả câu (0/2/2); hai mâu thuẫn blueprint (P2.C2 ý b mã 0339; P1.C8 thuộc chương nào).
+## 6. Giả định em đã chọn (thầy muốn khác thì nói)
+- Bốn ưu tiên rút câu: đủ 28 > đúng phần > đúng mức > câu của bài; hiện «độ chuẩn x/28».
+- Ngưỡng quên 70 %; 1 ngày Ôn/bài (3 tháng cuối trước thi: 2).
+- Sửa theo nhóm dạng; 3 loại lỗi với 1 / 2 / 3 lượt; nút «Chắc / Chưa chắc» chỉ ở câu Ôn, Sửa.
+- Thẻ «Nên chữa chung» khi từ 30 % lớp cùng nhóm lỗi; hạn riêng = dự báo + 2 ngày.
+- 6 chương 0 câu trong blueprint: ngày Ôn dành 10 % nếu đã học; đề kiểm tra mô phỏng thi theo đúng blueprint.
+- Phần II tính mức theo cả câu (0/2/2) đến khi gắn mức từng ý.
+- Mâu thuẫn blueprint: theo bảng đáp án 7.2 (P2.C2 mã 0339 ý b Sai) và bảng 1.2 (P1.C8 thuộc Đại cương kim loại).
 
 ## 7. Nguồn
 Dunlosky 2013 (https://www.sciencedaily.com/releases/2013/01/130110111734.htm) · Rohrer 2020 (https://ies.ed.gov/ncee/wwc/Study/88770) · Cepeda 2008 (https://www.evullab.org/pdf/CepedaVulRohrerWixtedPashler-PS-2008.pdf) · Duolingo HLR (https://www.github.com/duolingo/halflife-regression) · FSRS (https://expertium.github.io/Algorithm.html, https://expertium.github.io/Benchmark.html) · Butler, Karpicke & Roediger 2007 (https://pcllab.github.io/downloads/2007/2007_Butler_Karpicke_Roediger_JEPA.pdf) · Pashler 2005 (https://digitalcommons.usf.edu/psy_facpub/1773) · Metcalfe 2017 (https://www.learningscientists.org/blog/2019/10/17-1) · Schroeder & Kucera 2022 (https://link.springer.com/article/10.1007/s10648-021-09656-z) · Danielson 2024 (https://par.nsf.gov/biblio/10629626) · Ví dụ mẫu (https://en.wikipedia.org/wiki/Worked-example_effect) · Rawson & Dunlosky (https://openscholarship.wustl.edu/circle_book/8) · Hypercorrection (https://en.wikipedia.org/wiki/Hypercorrection_(psychology))
