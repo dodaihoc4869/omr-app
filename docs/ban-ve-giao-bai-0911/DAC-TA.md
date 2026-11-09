@@ -36,9 +36,15 @@ Thầy: «thiết kế 1 nút giao bài ngay ở màn hôm nay, bấm vào popup
 ## 3b. HẠN CHUNG CẢ LỚP (thầy 09/11: «hạn chung cho học sinh vì học sinh đang phải học cùng nhau trên lớp»)
 - **Hạn chung T = số ngày ít nhất mà máy dự kiến ≥ 90 % em của lớp làm xong hết** (hết câu mới + sửa sạch lỗi của bài + ít nhất 1 ngày Ôn). Dự kiến từng em = M + 1 + số ngày Sửa dự báo theo năng lực từng ô của em (+ lỗi đang mang sang); máy hiệu chỉnh bằng kết quả thật mỗi tháng.
 - **Cá nhân hoá nằm TRONG cùng hạn:** mọi em M ngày Mới như nhau (cả lớp xong câu mới cùng ngày) → 1 ngày Ôn → Sửa đến sạch → còn ngày thì Ôn thêm. Em giỏi: nhiều ngày Ôn; em yếu: nhiều ngày Sửa. Chỉ Ôn thêm khi đã sạch lỗi (Ôn khi còn lỗi sinh thêm lỗi).
-- Giả lập lớp 53 em, bài 112 câu (`docs/de-xuat-28-cau-mo-phong/han-chung.py`, giả định): hạn 10 ngày ⇒ 49–53/53 em sửa sạch lỗi của bài trong hạn; em giỏi được ~2 ngày Ôn, em yếu ~5 ngày Sửa; hạn dài hơn chỉ thêm ngày Ôn cho em giỏi.
+- Giả lập lớp 53 em, bài 112 câu (`docs/de-xuat-28-cau-mo-phong/han-chung.py`, giả định):
+  - Luật «≥ 90 % em xong» với công thức dự báo CHƯA hiệu chỉnh cho **12–13 ngày** (52–53/53 em xong) — công thức đang tính dư khoảng 2 ngày, nghiêng về an toàn.
+  - Thực tế giả lập: hạn **10 ngày** đã đủ cho 49–53/53 em (92–100 %) ⇒ khi máy hiệu chỉnh dự báo bằng kết quả thật (`su_kien_hoc`), hạn sẽ rút về khoảng 10 ngày. **Phải hiệu chỉnh trước khi bật**; chưa đủ dữ liệu thì dùng hạn an toàn.
+  - Trong hạn 10 ngày: em giỏi được ~2 ngày Ôn, em yếu ~5 ngày Sửa. Hạn dài hơn chỉ thêm ngày Ôn cho em giỏi.
+  - Lỗi mang sang không tăng dần: trung bình ~11 nhóm/em sau bài 3, 6 và 10 (hạn 10 ngày).
 - Em chưa xong khi hết hạn (≤ 10 %): lỗi còn lại sang khung bài sau, sửa trước; báo thầy thẻ «Hết hạn · chưa xong».
-- **Thầy giao bài kế sớm hơn hạn:** vì M chung, cả lớp xong câu mới cùng ngày ⇒ giao sau ngày đó thì khung mới bắt đầu ngay, lỗi dở mang sang; giao trước ngày đó thì bài mới bắt đầu khi lớp xong câu mới bài trước (hộp ghi rõ «bắt đầu 13/11»). Lớp luôn đi cùng nhau.
+- **Thầy giao bài kế sớm hơn hạn:** khung bài trước **đóng ngay ngày bài mới bắt đầu**; lỗi dở là lỗi mang sang (sửa trước ở khung mới), KHÔNG tính «Hết hạn» — thẻ «Hết hạn · chưa xong» chỉ xét khung đóng đúng hạn. Bài mới bắt đầu ngay nếu lớp đã xong câu mới bài trước; chưa xong thì bắt đầu sau ngày đó (cả lớp có cùng số ngày Mới nên xong cùng ngày). Hộp ghi rõ: «Bài 9 còn 6 ngày Ôn/Sửa — giao bây giờ thì phần đó chuyển sang khung Bài 10 · bắt đầu 13/11».
+- **Em bỏ ngày, còn câu mới chưa làm khi hết hạn:** câu mới còn nợ làm ĐẦU khung kế, trước câu mới của bài mới (không em nào bỏ câu mới); em này có trong thẻ «Hết hạn · chưa xong».
+- **Chọn nhiều lớp một lúc:** mỗi lớp một hạn chung riêng (năng lực khác nhau); ô «Hạn chung» hiện theo từng lớp.
 
 ## 4. Dữ liệu
 - Đã có: cây bài theo khối (`bai-hom-nay.ts`), `/gv/bai-da-day danh-sach | xem-truoc | tick | bo-tick`, danh sách em (`useDsEmGiao`), gói 7 (`goi-bai-7*.ts`).

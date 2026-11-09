@@ -42,7 +42,7 @@ def mot_lop(P,seed,so_bai=10,N=112):
             (on_gioi if e.a>0.75 else on_yeu if e.a<0.25 else []).append(seq.count('O'))
             if e.a<0.25: sua_yeu.append(seq.count('S'))
         mang=[len(e.mang) for e in lop]
-        kq.append((T,sach,sum(on_gioi)/len(on_gioi),sum(on_yeu)/len(on_yeu),sum(sua_yeu)/len(sua_yeu),max(mang)))
+        kq.append((T,sach,sum(on_gioi)/len(on_gioi),sum(on_yeu)/len(on_yeu),sum(sua_yeu)/len(sua_yeu),max(mang),sum(mang)/len(mang)))
     return kq
 for P in (0.5,0.8,0.9,1.0):
     ds=[mot_lop(P,s) for s in range(3)]
@@ -51,3 +51,5 @@ for P in (0.5,0.8,0.9,1.0):
     mm=max(k[5] for d in ds for k in d)
     print(f"Hạn chung theo phân vị {int(P*100):3d}%: T = {min(T)}–{max(T)} ngày/bài · xong sạch lỗi trong hạn {min(sach)}–{max(sach)}/53 em · "
           f"ngày Ôn: em giỏi {og:.1f}, em yếu {oy:.1f} · ngày Sửa em yếu {sy:.1f} · nhóm lỗi mang sang tối đa {mm}")
+    tb=lambda i:sum(d[i][6] for d in ds)/len(ds)
+    print(f"      nhóm lỗi mang sang trung bình mỗi em sau bài 3 / 6 / 10: {tb(2):.1f} / {tb(5):.1f} / {tb(9):.1f}")

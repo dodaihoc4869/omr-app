@@ -181,6 +181,7 @@ function hopChon(thieu){
     ${tom}
     <div class="o-so"><small>Hạn chung cả lớp</small><strong>${xong}</strong><em>${moc}</em></div>
    </div>
+   ${thieu?`<div class="ghi">${I.dongho}<span>Bài 9 còn 6 ngày Ôn/Sửa — giao bây giờ thì phần đó chuyển sang khung Bài 10.</span></div>`:''}
    ${thieu?`<div class="ghi" style="color:var(--bts-vang-chu)">${I.canh}<span>Bài 10 thiếu 6 câu Đúng/Sai: máy lấy câu trắc nghiệm thay vào chỗ thiếu, rải đều 3 ngày.</span></div><button class="nut-phu" style="align-self:flex-start">Bổ sung câu Đúng/Sai ›</button>`:''}
    <div class="ghi">${I.dongho}<span>Cả lớp chung hạn. Em xong sớm được Ôn thêm; em yếu được nhiều ngày Sửa hơn.</span></div>
    <button class="nut-chinh">Giao ${thieu?'Bài 10':'Bài 9'} cho 12 Thường</button>
