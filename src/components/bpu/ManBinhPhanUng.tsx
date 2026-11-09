@@ -141,26 +141,28 @@ export const THE_BD_MS = 2500
 export function TheBienDong({ ds }: { ds: readonly BienDong[] | undefined }) {
   const daThay = useRef<number | null>(null)
   const [the, setThe] = useState<BienDong[]>([])
+  const hen = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
     if (!ds) return
     const max = ds.reduce((m, x) => Math.max(m, x.id), 0)
     if (daThay.current == null) { daThay.current = max; return }
     const moi = ds.filter((x) => x.id > daThay.current!)
     daThay.current = Math.max(daThay.current, max)
-    if (moi.length) setThe((c) => [...c, ...moi].slice(-3))
+    if (!moi.length) return
+    setThe((c) => [...c, ...moi].slice(-3))
+    // Mỗi thẻ tự gỡ đúng ~2,5 s sau khi hiện (không xếp hàng chờ thẻ trước).
+    const ids = new Set(moi.map((x) => x.id))
+    hen.current.push(setTimeout(() => setThe((c) => c.filter((x) => !ids.has(x.id))), THE_BD_MS))
   }, [ds])
-  useEffect(() => {
-    if (!the.length) return
-    const h = setTimeout(() => setThe((c) => c.slice(1)), THE_BD_MS)
-    return () => clearTimeout(h)
-  }, [the])
+  useEffect(() => () => { for (const h of hen.current) clearTimeout(h) }, [])
   if (!the.length) return null
   return (
     <div className="bpu-bd" role="status" aria-live="polite">
       {the.map((x) => {
-        const tong = x.kjEm + x.kjDoi, chinh = x.kjEm || x.kjDoi
+        // Màu theo DẤU của số to trên thẻ (kJ em; em không đổi ⇒ kJ đội).
+        const chinh = x.kjEm || x.kjDoi
         return (
-          <div key={x.id} className="bpu-bd-the" data-kq={tong > 0 ? 'dung' : tong < 0 ? 'sai' : undefined}>
+          <div key={x.id} className="bpu-bd-the" data-kq={chinh > 0 ? 'dung' : chinh < 0 ? 'sai' : undefined}>
             <NgonLua doi={x.doi} />
             <b>{x.kjEm ? '' : 'Đội '}{dauKj(chinh)} kJ</b>
             <span>{x.lyDo}{x.kjEm && x.kjDoi ? ` · đội ${dauKj(x.kjDoi)} kJ` : ''}</span>
