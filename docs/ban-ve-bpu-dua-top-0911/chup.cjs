@@ -1,4 +1,6 @@
-const { chromium } = require('playwright');
+// Playwright: bản cài toàn cục (khớp trình duyệt trong /opt/pw-browsers) nếu có, không thì bản của repo.
+let pw; try { pw = require('/opt/node22/lib/node_modules/playwright'); } catch { pw = require('playwright'); }
+const { chromium } = pw;
 const fs = require('fs');
 const DIR = __dirname; // chạy: node docs/ban-ve-bpu-dua-top-0911/chup.cjs [A-lam|A-mo|B-lam|B-mo]
 (async () => {
@@ -15,7 +17,7 @@ const DIR = __dirname; // chạy: node docs/ban-ve-bpu-dua-top-0911/chup.cjs [A-
       const tran = await p.evaluate(() => [...document.querySelectorAll('.ten-em span,.hang .t,.B-cot .t')].filter((e) => e.scrollWidth > e.clientWidth + 1).map((e) => e.textContent));
       const ten = `${DIR}/${pa}-${tt === 'lam' ? 'dang-lam' : 'mo-dap-an'}-${w}.jpg`;
       let q = 84, buf;
-      do { buf = await p.screenshot({ type: 'jpeg', quality: q }); q -= 4; } while (buf.length > 150 * 1024 && q > 30);
+      do { buf = await p.screenshot({ type: 'jpeg', quality: q }); q -= 4; } while (buf.length > 150_000 && q > 30);
       fs.writeFileSync(ten, buf);
       console.log(ten.split('/').pop(), Math.round(buf.length / 1024) + 'KB', 'q' + (q + 4), 'font', ok, 'tran', JSON.stringify(tran));
     }

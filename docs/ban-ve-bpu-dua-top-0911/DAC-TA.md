@@ -44,13 +44,13 @@ Mở trực tiếp: `ban-ve.html#A-lam`, `#A-mo`, `#B-lam`, `#B-mo`. Chụp lạ
 
 | Lúc | Chuyển động |
 |---|---|
-| Một em vừa gửi | Thẻ tên ở dải đáy bừng sáng: lớp viền sáng đổi opacity, nền đổi sang «đã gửi». Một thẻ tên nổi lên từ chỗ em đó và bay theo đường cong. Bên A, thẻ bay vào miệng ống của đội. Bên B, thẻ bay lên làn đội rồi trượt vào ngọn lửa. Cả quãng bay khoảng 700 ms, dùng `translate` và `scale` từ 1 xuống 0,6, opacity từ 1 về 0. Ngọn lửa đội nhún một nhịp (`scale` 1 → 1,15 → 1). Bộ đếm «x/y» nảy số (`scale`). |
+| Một em vừa gửi | Thẻ tên ở dải đáy bừng sáng: lớp viền sáng đổi opacity, nền đổi sang «đã gửi». Một thẻ tên nổi lên từ chỗ em đó và bay theo đường cong. Bên A, thẻ bay vào miệng ống của đội. Bên B, thẻ bay lên làn đội rồi trượt vào ngọn lửa. Cả quãng bay khoảng 700 ms, dùng `translate` và `scale` từ 1 xuống 0,6, opacity từ 1 về 0. Đây là ngoại lệ có chủ ý cho màn trình diễn, giống chuỗi mở đáp án. Ngọn lửa đội nhún một nhịp (`scale` 1 → 1,15 → 1). Bộ đếm «x/y» nảy số (`scale`). |
 | Nhiều em gửi cùng lúc | Xếp hàng chờ. Tối đa 3 thẻ bay cùng lúc, mỗi thẻ cách nhau 120 ms. Hàng chờ dài hơn thì chỉ bật sáng thẻ tên ở dải đáy, không cho bay. |
 | Ngọn lửa | Ngọn lửa luôn phập phồng nhẹ: hiệu ứng `bb-lua` đang có, chỉ dùng `scaleY`. |
-| Mở đáp án | Đáp án hiện ra trong 0–0,3 s (opacity, `scale`). Từ 0,4 đến 1,4 s, chất lỏng dâng lên (A) hoặc ngọn lửa chạy tới chỗ mới (B). Mức chất lỏng là một khối cao cố định co giãn bằng `scaleY` từ đáy, ngọn lửa đi theo bằng `translateY`/`translateX`. Số kJ đếm lên khoảng 12 bước; số đều cột (`tabular-nums`) nên chữ không xô. Lúc 1,5 s, nhãn «Bứt lên dẫn đầu» nảy ra (`scale` 0,6 → 1), quầng sáng chuyển từ đội cũ sang đội mới (opacity). Sau đó ba em nhanh nhất lần lượt trượt vào, cách nhau 150 ms. Các hàng của Bảng vàng đổi chỗ bằng FLIP (`translateY`). |
+| Mở đáp án | Đáp án hiện ra trong 0–0,3 s (opacity, `scale`). Từ 0,4 đến 1,4 s, chất lỏng dâng lên (A) hoặc ngọn lửa chạy tới chỗ mới (B). Chất lỏng là một khối cao bằng cả ống, nằm trong ống `overflow:hidden` và trượt lên bằng `translateY`. Không dùng `scaleY`, vì nó bóp méo đáy tròn và bọt khí. Ngọn lửa đi theo bằng `translateY`/`translateX`. Số kJ cũ mờ dần và số mới hiện lên (hai lớp chữ đổi opacity), không đếm từng bước. Lúc 1,5 s, nhãn «Bứt lên dẫn đầu» nảy ra (`scale` 0,6 → 1), quầng sáng chuyển từ đội cũ sang đội mới (opacity). Sau đó ba em nhanh nhất lần lượt trượt vào, cách nhau 150 ms. Các hàng của Bảng vàng đổi chỗ bằng FLIP (`translateY`). |
 | Máy yếu / giảm chuyển động | Không bay, không dâng: hiện ngay trạng thái cuối, theo cùng luật `html.may-yeu` và `prefers-reduced-motion` mà bảng đang dùng. |
 
-Màn này là màn trình diễn trên máy chiếu. Chuỗi mở đáp án dài khoảng 1,6 s, giống như bảng hiện tại đang trễ 1,8 s. Mỗi bước nhỏ vẫn giữ ở mức 300 ms trở xuống.
+Màn này là màn trình diễn trên máy chiếu. Có hai ngoại lệ so với luật «≤ 300 ms»: chuỗi mở đáp án dài khoảng 1,6 s (bảng hiện tại cũng đang trễ 1,8 s) và quãng bay tên 700 ms. Các phản hồi còn lại, như bừng sáng, nảy số hay nhún lửa, đều giữ ở mức 300 ms trở xuống.
 
 ## 4. Thẻ tên em ở dải đáy
 
@@ -78,9 +78,9 @@ Trạng thái thể hiện bằng **hình và chữ**, không chỉ bằng màu,
 | Trên màn | Nguồn |
 |---|---|
 | kJ đội | `ds[].kj` của em trong đội cộng `doiThuong[d]`. Hàm `diemDoi` đã có trong BangBinhPhanUng. |
-| «+kJ lượt này», vạch / vòng «trước» | Bảng chụp kJ từng đội khi lượt sang pha `tra-loi`. Trong lúc làm, kJ không đổi; kJ chỉ đổi ở `moDapAn`, kể cả +200 lên bảng Đạt vào `doiThuong`. Mức tăng = sau − trước. |
+| «+kJ lượt này», vạch / vòng «trước» | Bảng chụp lại kJ từng đội ở **mỗi** view có pha khác `mo`, và dùng ảnh chụp cuối cùng trước khi sang `mo`. Phải chụp liên tục vì kJ vẫn đổi trong lúc làm: em đến muộn được `KJ.vaoLop` vào `doiThuong`, đội đủ quân đầu tiên được `KJ.duQuanDau`. Khi mở đáp án, `moDapAn` cộng kJ câu này, và +200 lên bảng Đạt vào `doiThuong`. Mức tăng = sau − trước. Nếu `soDoi` đổi giữa lượt (em thứ 13 vào thì `chiaLaiDoi` chia lại từ 2 thành 4 đội), bỏ vạch «trước» và «+kJ» đội ở lượt đó. |
 | Bảng vàng kJ | `ds` lọc `vao`, xếp theo `kj` giảm dần (như `xepEm`). |
-| «▲ lên hạng» | So với thứ hạng chụp lúc mở đáp án của lượt trước, lưu trong bộ nhớ trang. Tải lại trang thì lượt đó không có mũi tên. |
+| «▲ lên hạng» | So thứ hạng ngay trước lần mở đáp án gần nhất với thứ hạng ngay sau lần đó. Mũi tên giữ nguyên qua pha `tra-loi` của lượt sau; trong lúc làm, thứ hạng chỉ đổi khi có em đến muộn. Dữ liệu lưu trong bộ nhớ trang, nên tải lại trang thì tới lần mở đáp án kế tiếp mới có mũi tên. |
 | Chuỗi đúng dài nhất | Lấy `max ds[].chuoi` trong các em có mặt, chỉ khi ≥ 3. Hai em bằng nhau thì em nhiều kJ hơn đứng trước. |
 | Đã gửi, «x/y em đã gửi», chấm từng đội | `luot.daGui` (đã gửi) trên số em có mặt (`ds` có `vao`). |
 | Vừa gửi (tên bay) | So `daGui` của hai view liền nhau. **Không dựa vào thứ tự trong mảng `daGui`**: JS tự xếp lại khoá dạng số, và view không có giờ gửi. |
