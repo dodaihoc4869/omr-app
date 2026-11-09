@@ -1,0 +1,15 @@
+[
+  {
+    "i": 1312,
+    "hashSvg": "3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự fresh Chromium FULL 3x đúng SHA cuối, mở lại native FULL/cả hai public questions.de và refs 12-KT-C12-D2-II-1/DB-12-B5-D2-II-187, mở FULL và macro riêng hai vòng mới. Khe trắng dưới stem C2 vòng trái đã rõ sau rút V291, không còn nhập vào O. Đối từng đỉnh: vòng trái 5C+O và nhánh C6; vòng phải 4C+O và nhánh C1/C6, tổng 12C11O. Đủ 12 số carbon (1..6 mỗi phía); ba nhánh gấp carbon trần tận cùng OH và năm OH tự do, đúng hướng/vị trí nguồn, không CH2OH text/H tường minh thêm. Đúng bốn TAPER có base đứng nối frontstroke phẳng và hai frontbold; O cầu và ringO/terminalOH neo đúng O. Glyph DDH regular bằng path tự chứa, không thấy nhãn chạm/cắt/tràn hay dữ kiện/đáp án thêm. Bản eacb2d cũ được giữ negative riêng.",
+    "render": "/workspace/scratch/soat263-1312.png",
+    "macro": [
+      "/workspace/scratch/numbered1312-final-left.png",
+      "/workspace/scratch/numbered1312-final-right.png"
+    ],
+    "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+    "hashSvgDaSoat": "3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c"
+  }
+]

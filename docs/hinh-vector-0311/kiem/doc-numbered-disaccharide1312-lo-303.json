@@ -1,0 +1,573 @@
+{
+  "i": 1312,
+  "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32.png",
+  "size": [
+    965,
+    371
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C12-D2-II-1",
+      "de": "Saccharose được cấu tạo từ một đơn vị α-glucose và một đơn vị β-fructose.\nCông thức cấu tạo của saccharose như hình dưới.",
+      "allHinh": [
+        {
+          "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+          "where": "12-KT-C12-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a23a001c333ed4dccecf6aa12ca3cd39df5a493037900568249c3ddbfac3801a"
+        }
+      ],
+      "missingHashes": [
+        "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32"
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-II-187",
+      "de": "Saccharose được cấu tạo từ một đơn vị α-glucose và một đơn vị β-fructose.\nCông thức cấu tạo của saccharose như hình dưới.",
+      "allHinh": [
+        {
+          "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+          "where": "DB-12-B5-D2-II-187.hinh.0.du_lieu",
+          "hashDataUrl": "a23a001c333ed4dccecf6aa12ca3cd39df5a493037900568249c3ddbfac3801a"
+        }
+      ],
+      "missingHashes": [
+        "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1312-native2x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelgeometry; labelledCnumbers copiedliterally, no theoreticalextraH/CH2glyph.",
+  "geometry": {
+    "classification": "Numbered six-member+five-member Haworth joinedbyO, allterminalCH2groupsrepresentedbyBAREbentendpoint+OH, notCH2OHtext.",
+    "counts": {
+      "C": 12,
+      "O": 11,
+      "OHtext": 8,
+      "ringSubstituentOH": 5,
+      "terminalOHonBareC": 3,
+      "ringO": 2,
+      "bridgeO": 1,
+      "explicitH": 0,
+      "CH2OHtext": 0,
+      "carbonNumberLabels": 12,
+      "taperDiagonals": 4,
+      "boldFrontHorizontals": 2
+    },
+    "leftRing": {
+      "vertices": {
+        "1": [
+          360,
+          191
+        ],
+        "2": [
+          283,
+          250
+        ],
+        "3": [
+          169,
+          250
+        ],
+        "4": [
+          95,
+          191
+        ],
+        "5": [
+          169,
+          131
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          273,
+          122,
+          293,
+          144
+        ]
+      },
+      "thinOlines": [
+        [
+          [
+            169,
+            131
+          ],
+          [
+            272,
+            131
+          ]
+        ],
+        [
+          [
+            294,
+            139
+          ],
+          [
+            360,
+            191
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            95,
+            191
+          ],
+          [
+            165,
+            254
+          ],
+          [
+            172,
+            246
+          ]
+        ],
+        [
+          [
+            360,
+            191
+          ],
+          [
+            280,
+            254
+          ],
+          [
+            285,
+            246
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          169,
+          250
+        ],
+        [
+          283,
+          250
+        ]
+      ],
+      "OHbranches": [
+        {
+          "from": [
+            95,
+            191
+          ],
+          "to": [
+            95,
+            239
+          ],
+          "text": "OH",
+          "bbox": [
+            85,
+            239,
+            119,
+            260
+          ]
+        },
+        {
+          "from": [
+            169,
+            250
+          ],
+          "to": [
+            169,
+            212
+          ],
+          "text": "OH",
+          "bbox": [
+            158,
+            189,
+            193,
+            211
+          ]
+        },
+        {
+          "from": [
+            283,
+            250
+          ],
+          "to": [
+            283,
+            292
+          ],
+          "text": "OH",
+          "bbox": [
+            273,
+            294,
+            307,
+            315
+          ]
+        }
+      ],
+      "bareTerminal": {
+        "path": [
+          [
+            169,
+            131
+          ],
+          [
+            169,
+            81
+          ],
+          [
+            202,
+            61
+          ]
+        ],
+        "text": "OH",
+        "bbox": [
+          202,
+          46,
+          237,
+          66
+        ],
+        "note": "bareC6at16981; noCH2glyph"
+      },
+      "numbers": [
+        {
+          "text": "1",
+          "bbox": [
+            355,
+            171,
+            366,
+            186
+          ]
+        },
+        {
+          "text": "2",
+          "bbox": [
+            272,
+            225,
+            285,
+            242
+          ]
+        },
+        {
+          "text": "3",
+          "bbox": [
+            164,
+            261,
+            175,
+            278
+          ]
+        },
+        {
+          "text": "4",
+          "bbox": [
+            81,
+            180,
+            92,
+            196
+          ]
+        },
+        {
+          "text": "5",
+          "bbox": [
+            165,
+            135,
+            178,
+            151
+          ]
+        },
+        {
+          "text": "6",
+          "bbox": [
+            155,
+            69,
+            168,
+            86
+          ]
+        }
+      ]
+    },
+    "rightRing": {
+      "vertices": {
+        "2": [
+          434,
+          191
+        ],
+        "3": [
+          489,
+          250
+        ],
+        "4": [
+          667,
+          250
+        ],
+        "5": [
+          722,
+          193
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          569,
+          146,
+          588,
+          167
+        ]
+      },
+      "thinOlines": [
+        [
+          [
+            434,
+            191
+          ],
+          [
+            568,
+            159
+          ]
+        ],
+        [
+          [
+            589,
+            160
+          ],
+          [
+            722,
+            193
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            434,
+            191
+          ],
+          [
+            485,
+            254
+          ],
+          [
+            492,
+            246
+          ]
+        ],
+        [
+          [
+            722,
+            193
+          ],
+          [
+            664,
+            254
+          ],
+          [
+            670,
+            246
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          489,
+          250
+        ],
+        [
+          667,
+          250
+        ]
+      ],
+      "OHbranches": [
+        {
+          "from": [
+            489,
+            250
+          ],
+          "to": [
+            489,
+            292
+          ],
+          "text": "OH",
+          "bbox": [
+            479,
+            294,
+            513,
+            315
+          ]
+        },
+        {
+          "from": [
+            667,
+            250
+          ],
+          "to": [
+            667,
+            210
+          ],
+          "text": "OH",
+          "bbox": [
+            656,
+            186,
+            690,
+            208
+          ]
+        }
+      ],
+      "bareTerminals": [
+        {
+          "path": [
+            [
+              434,
+              191
+            ],
+            [
+              434,
+              138
+            ],
+            [
+              468,
+              117
+            ]
+          ],
+          "text": "OH",
+          "bbox": [
+            468,
+            100,
+            503,
+            121
+          ],
+          "note": "bareC1at434138; noCH2glyph"
+        },
+        {
+          "path": [
+            [
+              722,
+              193
+            ],
+            [
+              722,
+              247
+            ],
+            [
+              757,
+              268
+            ]
+          ],
+          "text": "OH",
+          "bbox": [
+            757,
+            265,
+            792,
+            287
+          ],
+          "note": "bareC6at722247; noCH2glyph"
+        }
+      ],
+      "numbers": [
+        {
+          "text": "1",
+          "bbox": [
+            421,
+            125,
+            434,
+            142
+          ]
+        },
+        {
+          "text": "2",
+          "bbox": [
+            420,
+            176,
+            432,
+            193
+          ]
+        },
+        {
+          "text": "3",
+          "bbox": [
+            492,
+            227,
+            505,
+            244
+          ]
+        },
+        {
+          "text": "4",
+          "bbox": [
+            662,
+            259,
+            675,
+            277
+          ]
+        },
+        {
+          "text": "5",
+          "bbox": [
+            725,
+            184,
+            737,
+            201
+          ]
+        },
+        {
+          "text": "6",
+          "bbox": [
+            728,
+            233,
+            741,
+            251
+          ]
+        }
+      ]
+    },
+    "bridge": {
+      "text": "O",
+      "bbox": [
+        385,
+        220,
+        406,
+        241
+      ],
+      "bonds": [
+        [
+          [
+            360,
+            191
+          ],
+          [
+            385,
+            220
+          ]
+        ],
+        [
+          [
+            405,
+            222
+          ],
+          [
+            434,
+            191
+          ]
+        ]
+      ]
+    },
+    "font": "AtomO/OHregularupright sans; numberlabels small darkserif with slightlyslantedsourceappearance, notbold. Noothertext/caption.",
+    "noAdded": [
+      "standaloneH",
+      "CH2/CH2OHglyph",
+      "namescaption",
+      "arrow",
+      "extraOHatbridge",
+      "wavybond",
+      "stereoletters",
+      "charges"
+    ]
+  },
+  "actualSvgReviewed": false
+}

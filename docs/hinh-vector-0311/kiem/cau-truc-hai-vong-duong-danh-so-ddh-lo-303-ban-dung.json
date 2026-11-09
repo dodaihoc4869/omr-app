@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1312,
+    "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+    "fileNguon": "anh/ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32.png",
+    "svg": "hai-vong-duong-danh-so-ddh-3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c.svg",
+    "hashSvg": "3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c",
+    "byteSvg": 16384,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C12-D2-II-1",
+        "de": "Saccharose được cấu tạo từ một đơn vị α-glucose và một đơn vị β-fructose.\nCông thức cấu tạo của saccharose như hình dưới.",
+        "refs": [
+          {
+            "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+            "where": "12-KT-C12-D2-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "a23a001c333ed4dccecf6aa12ca3cd39df5a493037900568249c3ddbfac3801a"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-II-187",
+        "de": "Saccharose được cấu tạo từ một đơn vị α-glucose và một đơn vị β-fructose.\nCông thức cấu tạo của saccharose như hình dưới.",
+        "refs": [
+          {
+            "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+            "where": "DB-12-B5-D2-II-187.hinh.0.du_lieu",
+            "hashDataUrl": "a23a001c333ed4dccecf6aa12ca3cd39df5a493037900568249c3ddbfac3801a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1sixring1fivering/12bareC11O/12Cnums/3bentbareC-OHbranches5freeOH/2ringO1bridgeO/4TAPER2frontbold/0explicitH0CH2OH/regularDDH/noaddedcaption-name-answer",
+    "hashSvgDaSoat": "3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

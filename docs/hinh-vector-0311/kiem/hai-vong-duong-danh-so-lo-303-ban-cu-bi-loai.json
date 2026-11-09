@@ -1,0 +1,12 @@
+{
+  "lo": 303,
+  "trangThai": "bi-loai-truoc-soat-doc-lap",
+  "i": 1312,
+  "oldHash": "c9759c2541f0c2933e40510ec6d876b496e783a2aa78c50c1d904db9b54192f1",
+  "finalHash": "3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c",
+  "reason": "Root actual FULL phát hiện chân taper nhô khỏi góc frontbold; chưa admit.",
+  "change": "Chỉ căn 4 base taper về đúng vertexx và y±3.75 mép frontbold, giữ apex/nhãn/font/bonds khác; final phải fresh soát độc lập riêng exactnewSHA.",
+  "intermediateHash": "eacb2d383b3247ba7f9007d29100e225accf13557279acb149f63d49a84e8aae",
+  "intermediateVerdict": "Cần sửa: stemC2leftV294 chạmđỉnhO; nativecókhetrắng.",
+  "finalChange": "Sau bướcbaseTAPER chỉ rútstemC2leftV294→V291; mọi glyph/pathkhácnguyênbyte. Chờ freshindependentnewSHA."
+}

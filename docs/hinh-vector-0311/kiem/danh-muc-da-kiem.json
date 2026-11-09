@@ -2701,6 +2701,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32": {
+      "tep": "hai-vong-duong-danh-so-ddh-3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c.svg",
+      "hashSvg": "3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c",
+      "byteSvg": 16384,
+      "byteGzip": 2370,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a7118b78945b807e8d7273423417bd1390c623a8d5819040f32893a0a5851ca8": {
       "tep": "bohr-aluminium915-ddh-7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e.svg",
       "hashSvg": "7ee4a020769f7da78a51c20eb2334185f3ed1b4acab38f1eee870db9c1cb832e",
@@ -13799,6 +13808,20 @@
       ]
     },
     {
+      "qid": "12-KT-C12-D2-II-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+          "where": "12-KT-C12-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a23a001c333ed4dccecf6aa12ca3cd39df5a493037900568249c3ddbfac3801a",
+          "vector": "hai-vong-duong-danh-so-ddh-3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C12-D2-III-1",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -20145,6 +20168,20 @@
           "where": "DB-12-B5-D2-III-165.hinh.0.du_lieu",
           "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c",
           "vector": "disaccharide-stereo-ddh-fbe6f74d069444f3c3591eb5c1d606118eaee8ad58589d6f5f403af0bc41767c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-II-187",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ed3df6e23bc60160c79a0d2b9fe4fe2d06889cf225c192f6d52adec261715a32",
+          "where": "DB-12-B5-D2-II-187.hinh.0.du_lieu",
+          "hashDataUrl": "a23a001c333ed4dccecf6aa12ca3cd39df5a493037900568249c3ddbfac3801a",
+          "vector": "hai-vong-duong-danh-so-ddh-3c189b4d7e2f4d7ebb8d96b9ad9e4df7a86851c43d640d23977725850c8e4e1c.svg"
         }
       ]
     },
@@ -29278,6 +29315,7 @@
     "12-KT-C1-D5-III-2",
     "12-KT-C12-D2-I-2",
     "12-KT-C12-D2-I-11",
+    "12-KT-C12-D2-II-1",
     "12-KT-C12-D2-III-1",
     "12-KT-C12-D2-III-4",
     "12-KT-C123-D1-I-1",
@@ -29673,6 +29711,7 @@
     "DB-12-B5-D2-II-52",
     "DB-12-B5-D2-III-55",
     "DB-12-B5-D2-III-165",
+    "DB-12-B5-D2-II-187",
     "DB-12-B5-D2-I-188",
     "DB-12-B5-D2-I-217",
     "DB-12-B5-D2-I-218",
