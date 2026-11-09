@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1329,
+    "hash": "f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73",
+    "fileNguon": "anh/f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73.png",
+    "svg": "aspirin-thuy-phan-ddh-f8ada2eb941fee2ae7c6245c9345071092233d3ca156f803fbe54ae3ff5d879a.svg",
+    "hashSvg": "f8ada2eb941fee2ae7c6245c9345071092233d3ca156f803fbe54ae3ff5d879a",
+    "byteSvg": 24911,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-II-3",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi được người bệnh uống, aspirin bị thuỷ phân một phần trong cơ thể tạo thành salicylic acid theo phương trình hoá học như hình dưới.",
+        "refs": [
+          {
+            "hash": "f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73",
+            "where": "VIP27-C1-B1-ESTER-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "eed4d50965747fc8918f8bd56be18f6be289dc26a6370044229893e1bd1cb5ae"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2Ph6innerdouble/18C10Ototal/2COOHtop-OCOCH3left-OHrightliteral/2oppositefilledHALFheads/2plus-H2O-CH3COOH/2regularcaptionsAspirin-Salicylic acid/noaddedconditions-charges-coeff-answer/noalias176",
+    "hashSvgDaSoat": "f8ada2eb941fee2ae7c6245c9345071092233d3ca156f803fbe54ae3ff5d879a",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

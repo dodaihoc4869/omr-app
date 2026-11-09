@@ -1,0 +1,31 @@
+{
+  "i": 1329,
+  "hashSvg": "f8ada2eb941fee2ae7c6245c9345071092233d3ca156f803fbe54ae3ff5d879a",
+  "metadataBeforeAdmission": "Initial18C9O mentalcount sai; corrected18C10O before readonly verdict; actual SVG unchanged",
+  "breakdown": [
+    {
+      "figure": "aspirin",
+      "C": 9,
+      "O": 4
+    },
+    {
+      "figure": "water",
+      "C": 0,
+      "O": 1
+    },
+    {
+      "figure": "salicylic acid",
+      "C": 7,
+      "O": 3
+    },
+    {
+      "figure": "acetic acid",
+      "C": 2,
+      "O": 2
+    }
+  ],
+  "totalC": 18,
+  "totalO": 10,
+  "glyphsGeometryChanged": false,
+  "countedAsNewSourceForMetadataCorrection": false
+}

@@ -1,0 +1,375 @@
+{
+  "i": 1329,
+  "hash": "f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73.png",
+  "size": [
+    834,
+    198
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B1-ESTER-II-3",
+      "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi được người bệnh uống, aspirin bị thuỷ phân một phần trong cơ thể tạo thành salicylic acid theo phương trình hoá học như hình dưới.",
+      "allHinh": [
+        {
+          "hash": "f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73",
+          "where": "VIP27-C1-B1-ESTER-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "eed4d50965747fc8918f8bd56be18f6be289dc26a6370044229893e1bd1cb5ae"
+        }
+      ],
+      "missingHashes": [
+        "f0f650c989ecb1b369e6c1de99ad425b2595ff90b5478f652582434c416d9d73"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1329-native3x.png",
+    "arrow10xOpened": "/workspace/scratch/1329-arrow10x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelverticesandlabels, no mechanism/answerconditionsfromstemadded.",
+  "geometry": {
+    "classification": "Skeletalaspirinhydrolysis equilibrium, twoaromaticstructures andcondensedformulareagents/products.",
+    "font": "ALLlabelsregularuprightserif includingcaptions, noitalic/noactualbold; preservecapitalAinAspirinandcapitalSonlyinSalicylic acid.",
+    "leftRing": {
+      "vertices": [
+        [
+          46,
+          62
+        ],
+        [
+          85,
+          85
+        ],
+        [
+          85,
+          129
+        ],
+        [
+          46,
+          152
+        ],
+        [
+          8,
+          129
+        ],
+        [
+          8,
+          85
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            18,
+            85
+          ],
+          [
+            46,
+            69
+          ]
+        ],
+        [
+          [
+            77,
+            93
+          ],
+          [
+            77,
+            121
+          ]
+        ],
+        [
+          [
+            46,
+            144
+          ],
+          [
+            18,
+            128
+          ]
+        ]
+      ],
+      "substituents": [
+        {
+          "from": [
+            46,
+            62
+          ],
+          "to": [
+            46,
+            30
+          ],
+          "text": "COOH",
+          "bbox": [
+            37,
+            4,
+            117,
+            27
+          ],
+          "anchor": "firstC"
+        },
+        {
+          "from": [
+            85,
+            85
+          ],
+          "to": [
+            111,
+            70
+          ],
+          "text": "OCOCH₃",
+          "bbox": [
+            114,
+            50,
+            220,
+            76
+          ],
+          "anchor": "firstO",
+          "note": "CONDENSEDliteralOCOCH3, do notexpandCOdoubleorswapOanchor"
+        }
+      ],
+      "caption": {
+        "text": "Aspirin",
+        "bbox": [
+          8,
+          162,
+          105,
+          193
+        ],
+        "weight": "regularupright"
+      }
+    },
+    "reactantPlus": {
+      "text": "+",
+      "bbox": [
+        217,
+        96,
+        235,
+        116
+      ]
+    },
+    "water": {
+      "text": "H₂O",
+      "bbox": [
+        282,
+        96,
+        335,
+        123
+      ]
+    },
+    "equilibriumArrows": {
+      "top": {
+        "shaft": [
+          [
+            363,
+            98
+          ],
+          [
+            451,
+            98
+          ]
+        ],
+        "head": "FILLEDHALFHEADaboveRIGHTtip, notfulltriangle/openV",
+        "headVertices": [
+          [
+            434,
+            93
+          ],
+          [
+            451,
+            98
+          ],
+          [
+            435,
+            98
+          ]
+        ]
+      },
+      "bottom": {
+        "shaft": [
+          [
+            451,
+            110
+          ],
+          [
+            363,
+            110
+          ]
+        ],
+        "head": "FILLEDHALFHEADbelowLEFTtip, notfulltriangle/openV",
+        "headVertices": [
+          [
+            363,
+            110
+          ],
+          [
+            379,
+            110
+          ],
+          [
+            380,
+            116
+          ]
+        ]
+      },
+      "headsTotal": 2,
+      "conditions": null
+    },
+    "rightRing": {
+      "vertices": [
+        [
+          530,
+          62
+        ],
+        [
+          570,
+          85
+        ],
+        [
+          570,
+          129
+        ],
+        [
+          530,
+          152
+        ],
+        [
+          491,
+          129
+        ],
+        [
+          491,
+          85
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            501,
+            85
+          ],
+          [
+            530,
+            69
+          ]
+        ],
+        [
+          [
+            562,
+            93
+          ],
+          [
+            562,
+            121
+          ]
+        ],
+        [
+          [
+            530,
+            144
+          ],
+          [
+            501,
+            128
+          ]
+        ]
+      ],
+      "substituents": [
+        {
+          "from": [
+            530,
+            62
+          ],
+          "to": [
+            530,
+            30
+          ],
+          "text": "COOH",
+          "bbox": [
+            521,
+            4,
+            601,
+            27
+          ],
+          "anchor": "firstC"
+        },
+        {
+          "from": [
+            570,
+            85
+          ],
+          "to": [
+            595,
+            70
+          ],
+          "text": "OH",
+          "bbox": [
+            599,
+            50,
+            640,
+            75
+          ],
+          "anchor": "O"
+        }
+      ],
+      "caption": {
+        "text": "Salicylic acid",
+        "bbox": [
+          451,
+          162,
+          631,
+          193
+        ],
+        "weight": "regularupright"
+      }
+    },
+    "productPlus": {
+      "text": "+",
+      "bbox": [
+        653,
+        96,
+        671,
+        116
+      ]
+    },
+    "aceticAcid": {
+      "text": "CH₃COOH",
+      "bbox": [
+        701,
+        96,
+        829,
+        123
+      ],
+      "note": "condensedformula,3subonly"
+    },
+    "counts": {
+      "PhRings": 2,
+      "innerAromaticDoubleRays": 6,
+      "heads": 2,
+      "baselinePlus": 2,
+      "caption": 2,
+      "conditions": 0,
+      "circleAromatic": 0
+    },
+    "noAdded": [
+      "H+/temperatureconditions",
+      "reactioncoefficient",
+      "phases",
+      "expandedcarbonyl",
+      "fulltrianglehead",
+      "extraarrows",
+      "chemicalanswer",
+      "yield"
+    ]
+  },
+  "actualSvgReviewed": false
+}
