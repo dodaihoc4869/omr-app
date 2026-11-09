@@ -52,8 +52,21 @@ Cạnh tên lớp có chip «Mã 842517», tự đổi mỗi phút, để em đ�
 ## 3. Màn Hôm nay và Hành trình
 
 - Đầu màn Hôm nay có nút **Điểm danh**. Đây là nút chính; khi có ca kiểm tra đang mở thì «Theo dõi ca» là nút chính, Điểm danh thành nút viền bên cạnh. «Bổ sung bài hôm nay» là nút viền.
+- Thầy dạy một lớp và chưa có buổi mở: bấm là mở buổi và bật bảng ngay.
+- Đang có buổi mở trong 4 giờ gần nhất, hoặc thầy dạy nhiều lớp: hiện một hộp nhỏ gồm:
+  - **Tiếp buổi 12A1 · mở 14:02** (bấm Enter là chọn);
+  - lớp khác, để mở **buổi mới**. Buổi lớp sáng quên đóng sẽ không nuốt lớp chiều;
+  - **Kết thúc buổi** (có hỏi lại trước khi đóng);
+  - **Trang buổi dạy: đầu giờ, chữa câu, ôn tập**;
+  - Huỷ.
 - Bỏ mục **Hành trình** khỏi thanh bên và thanh đáy. Số «Cần thầy chữa» nay hiện cạnh mục Hôm nay.
-- Không mất chức năng nào. Màn cũ (Kiểm tra đầu giờ, Chữa câu khó, Cần thầy chữa, Kiểm tra ôn tập) vẫn mở được từ các việc trong «Việc cần thầy» của Hôm nay.
+
+**Thầy cần chọn:** trang buổi dạy cũ (Kiểm tra đầu giờ, Chữa câu khó, Kiểm tra ôn tập, thêm / bớt em, vắng có phép, «Đang chiếu» trên điện thoại) nay chỉ vào được qua hai lối:
+
+1. Mục «Trang buổi dạy» trong hộp Điểm danh. Hộp chỉ hiện khi đang có buổi mở hoặc thầy dạy nhiều lớp.
+2. Việc «Cần thầy chữa» ở Hôm nay. Việc này chỉ hiện khi có chỗ cần chữa.
+
+Nếu thầy muốn giữ lối vào cố định ở chỗ khác, thầy báo chỗ.
 
 ## 4. Phông chữ
 
@@ -86,4 +99,5 @@ Giữ **Be Vietnam Pro**, phông thầy chốt ngày 08/11 cho cả ba app. Đâ
 | check:mau, kiem:mau-giu, kiem:co-tep | 0 vi phạm |
 | Precache | giữ trần 170 tệp |
 | Byte tải mở | app thầy 176,4 KB (mốc 176,5); app học sinh và phụ huynh bằng mốc |
-| Test | test Bình Phản Ứng, điểm danh, thanh điều hướng xanh; thêm `tests/diem-danh-hom-nay-0911.test.ts` |
+| Test | toàn bộ vitest so nền đỏ: 2 test đỏ mới, cả hai do bỏ Hành trình và thêm vòng đọc mã; đã sửa có chủ đích và chạy lại xanh. Thêm `tests/diem-danh-hom-nay-0911.test.ts` |
+| Ảnh | chưa có ảnh màn Hôm nay (nút Điểm danh, hộp chọn) và thanh điều hướng mới; ảnh trong thư mục này chỉ là bảng chiếu |

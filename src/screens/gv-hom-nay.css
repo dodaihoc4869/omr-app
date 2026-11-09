@@ -97,3 +97,5 @@
 .gvhn-chon-lop-ds { display: flex; flex-wrap: wrap; gap: 8px; }
 .gvhn-chon-lop-ds button { min-height: 44px; }
 .gvhn-chon-lop-huy { justify-self: end; min-height: 44px; padding: 0 14px; border: 0; background: none; color: var(--gvm-chu-2); font: inherit; cursor: pointer; }
+.gvhn-chon-lop-tiep { min-height: 48px; justify-content: center; }
+.gvhn-chon-lop-cuoi { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; border-top: 1px solid var(--gvm-vien); padding-top: 8px; }
