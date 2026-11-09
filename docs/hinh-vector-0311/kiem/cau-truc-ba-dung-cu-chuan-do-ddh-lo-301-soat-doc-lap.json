@@ -1,0 +1,16 @@
+[
+  {
+    "i": 1288,
+    "hashSvg": "5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL và phóng 4x, đọc hai public questions.de/refs 11-C1-B2-D2-II-20 và DB-11-B2-D5-II-15 sau_de; tự fresh Chromium FULL 3x đúng SHA 3954B, mở FULL và macro riêng B/C/khóa. Đếm nguồn độc lập A 6 vạch, B 5 vạch (3 trên mặt, 2 dưới; đường mặt meniscus không tính thêm thành vạch), C 6 vạch (3 trên, 3 dưới mặt). Ba hình dụng cụ xám/ba vùng chất lỏng và mức mặt giữ nguồn; A dài có khóa xám, tay ngang và tay đứng, hai cạnh ống ra để hở đầu; B/C hở miệng. Đúng nhãn A/B/C đậm thực DDH bằng path tự chứa, không text/image. Không thêm thể tích/số/drop/giá đỡ hay đáp án; không thấy glyph lỗi, nhãn chạm/cắt/tràn.",
+    "render": "/workspace/scratch/soat263-1288.png",
+    "macro": [
+      "/workspace/scratch/apparatus1288-B.png",
+      "/workspace/scratch/apparatus1288-C.png",
+      "/workspace/scratch/apparatus1288-stopcock.png"
+    ],
+    "hash": "ea64fde328eb1e3e1aa236a70008596fd69acaa8ae7a7765c89c9c683efbb23f",
+    "hashSvgDaSoat": "5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2"
+  }
+]

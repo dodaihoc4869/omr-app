@@ -1,0 +1,8 @@
+{
+  "lo": 301,
+  "trangThai": "ban-root-truoc-hieu-chinh-khong-admit",
+  "i": 1288,
+  "oldHash": "20f50d78cfc6c38b086ede01d349a633be92716f04300ef4a22ea78937d1083f",
+  "finalHash": "5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2",
+  "ghiChu": "Bản root ban đầu trước đối chiếu tọa độ vạch nguồn: final chỉ đưa B65/84/121, C243x178/299x191/318x195/337x200 và mặt thoáng C286 theo native; không thay count, không dùng oldpositive để duyệt hash mới. Final chờ verdict độc lập riêng."
+}

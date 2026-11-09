@@ -1117,6 +1117,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ea64fde328eb1e3e1aa236a70008596fd69acaa8ae7a7765c89c9c683efbb23f": {
+      "tep": "ba-dung-cu-chuan-do-ddh-5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2.svg",
+      "hashSvg": "5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2",
+      "byteSvg": 3954,
+      "byteGzip": 1455,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98": {
       "tep": "glucose-ba-dang-1402-ddh-ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d.svg",
       "hashSvg": "ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d",
@@ -9114,6 +9123,20 @@
       ]
     },
     {
+      "qid": "11-C1-B2-D2-II-20",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ea64fde328eb1e3e1aa236a70008596fd69acaa8ae7a7765c89c9c683efbb23f",
+          "where": "11-C1-B2-D2-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "29ce7ce746262b45670fd372b911d4881d7374c05a4cc1f3666ce54cebe12cab",
+          "vector": "ba-dung-cu-chuan-do-ddh-5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2.svg"
+        }
+      ]
+    },
+    {
       "qid": "11-C1-B2-D1-II-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -17032,6 +17055,20 @@
           "where": "DB-11-B5-D1-II-29.hinh.0.du_lieu",
           "hashDataUrl": "d5cf5b006bcb3c220cbd44e7d9e0e97154d96cc0a1f384ff959bbf8280611d7d",
           "vector": "haber-nox-ddh-70964f08a4d852645c21375220a1200b373ad28d9c8327a72a593e2d83dddbaf.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B2-D5-II-15",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ea64fde328eb1e3e1aa236a70008596fd69acaa8ae7a7765c89c9c683efbb23f",
+          "where": "DB-11-B2-D5-II-15.hinh.0.du_lieu",
+          "hashDataUrl": "29ce7ce746262b45670fd372b911d4881d7374c05a4cc1f3666ce54cebe12cab",
+          "vector": "ba-dung-cu-chuan-do-ddh-5fc35c3457612f235aa4e09bd686abe9047312daeac05ebae79d149349155dd2.svg"
         }
       ]
     },
@@ -28908,6 +28945,7 @@
     "11-C1-B1-III-19",
     "11-C1-B2-D2-II-1",
     "11-C1-B2-D2-II-8",
+    "11-C1-B2-D2-II-20",
     "11-C1-B2-D1-II-5",
     "100-I-16",
     "100-II-2",
@@ -29413,6 +29451,7 @@
     "DB-11-B5-D1-II-22",
     "DB-11-B5-D1-II-28",
     "DB-11-B5-D1-II-29",
+    "DB-11-B2-D5-II-15",
     "DB-11-B6-D2-II-5",
     "DB-11-B6-D2-II-54",
     "DB-11-B6-D2-II-59",
