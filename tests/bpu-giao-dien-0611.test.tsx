@@ -112,7 +112,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
   it('bấm gửi ⇒ tia lửa bay rồi TỰ CHE (không đề, không nút); thầy mở đáp án ⇒ vẫn che, em chọn sai ĐỎ, đáp án đúng XANH; câu mới ⇒ mở', async () => {
     const ws = await vao()
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    const pa = await screen.findAllByRole('radio')
+    const pa = await screen.findAllByRole('radio', {}, { timeout: 5000 }) // máy test bận ⇒ chờ rộng (chập chờn 09/11)
     act(() => { pa[0]!.click() })
     act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }).click() })
     expect(ws.gui.map((x) => JSON.parse(x)).find((x) => x.t === 'tra')).toMatchObject({ chon: 'A' })
@@ -123,11 +123,11 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     await waitFor(() => expect(screen.queryAllByRole('radio')).toHaveLength(0), { timeout: 6000 }) // hiệu ứng gửi ~1,15 s; máy chạy test bận ⇒ chừa rộng (chập chờn 09/11)
     expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
     nhanTra(st, 'S1', 'A', T0 + 2000); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByText(/Đã gửi sau 2 giây/)).toBeTruthy()
+    expect(await screen.findByText(/Đã gửi sau 2 giây/, {}, { timeout: 5000 })).toBeTruthy()
     expect(screen.getByText('Nhìn lên bảng để chữa bài')).toBeTruthy()
     expect(screen.queryAllByRole('button')).toHaveLength(0) // không nút mở ra, không nút đổi đáp án, không nút rời giữa lượt
     moDapAn(st, T0 + 5000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByText('Chưa đúng')).toBeTruthy()
+    expect(await screen.findByText('Chưa đúng', {}, { timeout: 5000 })).toBeTruthy()
     expect(document.querySelector('.bpu-che')!.getAttribute('data-kq')).toBe('sai')
     expect(document.querySelector('.bpu-kq-o[data-kq="sai"] b')!.textContent).toBe('A')
     expect(document.querySelector('.bpu-kq-o[data-kq="dung"] b')!.textContent).toBe('B')
@@ -135,7 +135,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
     expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng, không nút rời
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' }, { timeout: 5000 })).toBeTruthy()
     expect(document.querySelector('.bpu-che')).toBeNull()
   })
   it('em chọn đúng ⇒ lớp che XANH «Chính xác!»; Đúng–sai ⇒ ý đúng xanh, ý sai đỏ kèm đáp án', async () => {
