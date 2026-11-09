@@ -247,7 +247,7 @@ export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLu
   // SỐ ĐỘI theo em có mặt (thầy 09/11) do `vaoLop` lo ngay lúc em vào; ở đây chỉ nắn phòng lưu trước 09/11 (4 đội mà có mặt ≤ 12 em ⇒ 2 đội).
   const can = soDoiTheo(st.ds.filter((e) => e.vao).length)
   if (can !== soDoiCua(st) && st.ds.some((e) => e.vao)) chiaLaiDoi(st, can)
-  st.roiNay = []
+  // 09/11 (lần 3) thầy «học sinh thoát ra làm việc khác … báo động như báo cháy»: «đang rời» GIỮ qua lượt mới / mở đáp án — chỉ tắt khi em quay lại (`ve` / nối lại).
   st.soLuot += 1
   st.luot = {
     so: st.soLuot, qid: c.qid, phan: c.phan, tuLuan: c.tuLuan, cau: c.cau, dung: c.dung, batDau: nay,
@@ -280,9 +280,10 @@ export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: numb
  *  lúc chờ giữa các lượt em được rời (không báo). Rớt kết nối WebSocket KHÔNG phải rời màn (chỉ khi máy em tự báo `roi`). */
 export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   const e = em(st, sbd)
-  if (!e || st.ketThuc || !st.luot || st.luot.pha === 'mo') return false
+  // 09/11 (lần 3): rời màn tính MỌI LÚC trong buổi (cả lúc chờ giữa lượt, sau mở đáp án) — em chỉ thoát khi thầy kết thúc buổi.
+  if (!e || st.ketThuc || !e.vao) return false
   e.roi += 1
-  if (!st.luot.roiMe.includes(sbd)) st.luot.roiMe.push(sbd)
+  if (st.luot && st.luot.pha !== 'mo' && !st.luot.roiMe.includes(sbd)) st.luot.roiMe.push(sbd)
   st.roiNay = [...(st.roiNay ?? []).filter((s) => s !== sbd), sbd]
   st.capNhat = nay
   return true
@@ -350,7 +351,6 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
   const l = st.luot
   if (!l || l.pha === 'mo') return false
   l.pha = 'mo'
-  st.roiNay = [] // mở đáp án ⇒ hết báo động rời màn (lúc chờ em được rời)
   // LƯỢT RỖNG (không em nào gửi — thầy lật qua câu): không đụng chuỗi đúng của ai, không ghi vào tổng kết (tỉ lệ đúng, «lượt khó nhất»).
   if (!Object.keys(l.tra).length && !l.goi) { l.ketQua = {}; st.capNhat = nay; return true }
   const kq: Record<string, KetQuaEm> = {}

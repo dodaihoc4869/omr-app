@@ -11,7 +11,6 @@ import { goiCauHoi } from '../lib/hoi-bai'
 import type { CauChon } from '../components/TamTruotHoiBai'
 import { taoBaiGhiDiem, taoChiTietCau } from '../lib/chi-tiet-cau'
 import { chuyenDeXinKho, dungCauSai, dungPhieuMayEm, SO_CAU_BAI_TAP_KEM, type DiemMotCa, type PhieuDayDu } from '../lib/phieu-du-lieu'
-import { buildTeacherSourceFromKhoDe, parseKhoDeJson } from '../lib/exam-kho-de-import'
 import { gioMayChu, gioNgan } from '../lib/gio-may-chu'
 import { dinhDangDongHo, taoKhoGio, useGiayConLai, useMocGio, type KhoGio } from '../lib/dong-ho-thi'
 import { layIdThietBi } from '../lib/thiet-bi'
@@ -96,7 +95,6 @@ import {
 import { useAppStore } from '../store/appStore'
 import { datDangLamBai } from '../lib/cap-nhat-app'
 import { napDong } from '../lib/nap-manh'
-import KhungXemPhieu from '../components/KhungXemPhieu'
 import NutNopBtvn from '../components/NutNopBtvn'
 import OSoTraLoi from '../components/OSoTraLoi'
 import BangNhapSo from '../components/BangNhapSo'
@@ -146,6 +144,8 @@ const BaoCaoCaCuaEm = lazy(() => import('../components/ca-thi/BaoCaoCaCuaEm'))
 // Phiếu của em chỉ mở SAU khi nộp ⇒ nạp lười (22/10): trước đây nhập tĩnh làm đường vào thi /t tải thêm ~18 KB nén mà em đang thi không dùng.
 // Mảnh vẫn nằm trong precache (cổng học sinh / app thầy cũng dùng) ⇒ mở lúc mất mạng vẫn được.
 const PhieuScreen = lazy(() => import('./PhieuScreen'))
+// Khung «Đề của em kèm lời giải» chỉ mở khi em bấm xem đề (09/11, gỡ kẹt mốc /t): nạp lười, mảnh nằm trong precache.
+const KhungXemPhieu = lazy(() => import('../components/KhungXemPhieu'))
 // Tấm "Hỏi bài Thầy" chỉ mở khi em bấm SAU khi nộp ⇒ nạp lười (22/10, cùng lý do Phiếu của em; mảnh trong precache).
 const TamTruotHoiBai = lazy(() => import('../components/TamTruotHoiBai'))
 
@@ -1021,6 +1021,9 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
         // Gói máy chủ trả về đi qua ĐÚNG cửa nạp của kho đề, không nới luật
         // nào: câu thiếu phương án hay thiếu đáp án thì bỏ, không dựng phiếu
         // với ô trống rồi để em ngồi đoán.
+        // Bộ đọc kho đề nạp lười (02/11 gỡ kẹt mốc /t): chỉ chạy ở nhánh chữa câu sai, không cần lúc mở màn thi.
+        const { buildTeacherSourceFromKhoDe, parseKhoDeJson } = await import('../lib/exam-kho-de-import')
+        if (!con) return
         const nguon: TeacherExamSource[] = []
         for (const m of kq.nguon) {
           const doc = parseKhoDeJson(m.json)
@@ -3407,7 +3410,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
           </Suspense>
         )}
 
-        {htmlDe && <KhungXemPhieu html={htmlDe} ten="Đề của em kèm lời giải" dong={() => setHtmlDe('')} />}
+        {htmlDe && <Suspense fallback={null}><KhungXemPhieu html={htmlDe} ten="Đề của em kèm lời giải" dong={() => setHtmlDe('')} /></Suspense>}
 
         {gradedPopup && graded && (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4 py-6" style={{ background: 'var(--phu)' }}>

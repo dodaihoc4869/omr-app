@@ -100,9 +100,11 @@ export interface PropsBang {
   gocPortal?: HTMLElement | null
   /** (09/11) «Hôm nay làm gì?» sau điểm danh: Kiểm tra đầu giờ / Chữa câu khó / Kiểm tra ôn tập ⇒ tấm buổi dạy (gan-gv). */
   onHoatDong?: (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => void
+  /** (09/11) «Kết thúc buổi học» ở «Hôm nay làm gì?» — trả câu báo lỗi (rỗng = xong). */
+  onKetThuc?: (buoiId: string) => Promise<string>
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, diemDanh = false, onHoatDong }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, diemDanh = false, onHoatDong, onKetThuc }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
   const laDiemDanh = useRef(!qid)
@@ -593,14 +595,14 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         <canvas ref={cv} className="bb-ve" aria-hidden="true" />
         {/* CHUYỂN CẢNH (09/11 «mượt mà trơn chu»): đổi màn lớn (điểm danh ⇄ câu ⇄ câu khác ⇄ đua / vinh danh) ⇒ cảnh mới rõ dần + trồi nhẹ; đổi pha trong một câu giữ nguyên đề. */}
         <div key={man === 'diem-danh' || man === 'dua' || man === 'vinh-danh' ? man : `cau-${l?.so ?? 0}`} className="bb-canh">{noi}</div>
-        {/* RỜI MÀN (thầy 09/11 «thoát app là báo động viền đỏ nhấp nháy trên bảng cộng thẻ tên … để thầy và cả lớp thấy»; không trừ kJ): em đang ở ngoài app
-            (phòng giữ `roiNay`, gỡ khi em quay lại) ⇒ viền đỏ nhấp nháy quanh bảng + thẻ tên giữa trên. */}
-        {roiNay.length ? <><div className="bb-bao-dong" aria-hidden="true" /><div className="bb-bao-the" role="alert"><b>Đang rời màn hình</b><span>{roiNay.map((s) => { const e = ds.find((x) => x.sbd === s); return e ? (an ? `Em số ${ds.indexOf(e) + 1}` : e.ten) : s }).join(' · ')}</span></div></> : null}
-        {chon && onChieuCau ? <Suspense fallback={<div className="bb-cho-chon">Đang mở bảng chọn câu…</div>}><ChonCauBpu buoiId={buoiId} lop={v?.lop ?? ''} buocDau={chon} onChieu={onChieuCau} onHoatDong={onHoatDong ? (hd) => { setChon(false); onHoatDong(hd) } : undefined} onDong={() => setChon(false)} /></Suspense> : null}
+        {chon && onChieuCau ? <Suspense fallback={<div className="bb-cho-chon">Đang mở bảng chọn câu…</div>}><ChonCauBpu buoiId={buoiId} lop={v?.lop ?? ''} buocDau={chon} onChieu={onChieuCau} onHoatDong={onHoatDong ? (hd) => { setChon(false); onHoatDong(hd) } : undefined} onKetThuc={onKetThuc ? () => onKetThuc(buoiId) : undefined} onDong={() => setChon(false)} /></Suspense> : null}
         {vietBang && l?.goi && goiEm ? <VungVietBang g={l.goi} em={goiEm} tenHien={(e: Em) => (an ? ten(e) : e.ten)} onBat={() => setBatLai(true)} /> : null}
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />
       </div>
       <button type="button" className="bb-dong" onClick={onDong} aria-label="Đóng bảng Bình Phản Ứng">Đóng</button>
+      {/* RỜI MÀN — BÁO CHÁY (thầy 09/11 «viền đỏ nhấp nháy xung quanh màn chiếu hiện tên ở giữa bảng to như báo cháy để hs không dám tái phạm»): em đang ở
+          ngoài app (phòng giữ `roiNay` tới khi em quay lại) ⇒ lớp phủ NGOÀI khung bảng (nổi cả khi bảng đang thu vào tờ cũ lúc em lên bảng). */}
+      {roiNay.length ? createPortal(<div className="bpu-bao-chay" role="alert" style={MAU_CHIEU}><div className="bpu-bao-chay-the"><span className="coi" aria-hidden="true" /><b>Rời màn hình</b><strong>{roiNay.map((s) => { const e = ds.find((x) => x.sbd === s); return e ? (an ? `Em số ${ds.indexOf(e) + 1}` : e.ten) : s }).join(' · ')}</strong><span>Quay lại Bình Phản Ứng ngay</span></div></div>, document.body) : null}
     </div>,
     gocPortal ?? document.body,
   )

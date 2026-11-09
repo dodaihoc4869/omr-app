@@ -350,3 +350,28 @@ describe('bảng chiếu', () => {
     a.unmount()
   })
 })
+
+// 09/11 (lần 3) thầy «thoát app là báo động … to như báo cháy»; «chèn chữ khi thoát ra» (CSS bảng trùng tên lớp `.bb-*` của Hôm nay).
+describe('bảng · báo cháy rời màn + CSS gói trong bảng', () => {
+  it('phòng báo `roiNay` ⇒ lớp phủ báo cháy NGOÀI khung bảng, tên em to; em quay lại ⇒ tắt', async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    const khung = document.createElement('div'); document.body.appendChild(khung)
+    render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} gocPortal={khung} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const st = phong(); moLuot(st, cau, T0); WsGia.ds[0]!.nhan(viewBang(st))
+    WsGia.ds[0]!.nhan({ ...viewBang(st), roiNay: ['S2'] })
+    const bao = await screen.findByRole('alert')
+    expect(bao.closest('.bpu-bao-chay')!.parentElement).toBe(document.body) // nổi cả khi khung bảng ẩn (em đang lên bảng ở tờ cũ)
+    expect(bao.textContent).toContain('Trần Gia Bảo')
+    WsGia.ds[0]!.nhan({ ...viewBang(st), roiNay: [] })
+    await waitFor(() => expect(document.querySelector('.bpu-bao-chay')).toBeNull())
+  })
+  it('mọi luật CSS của bảng có lớp `.bb-*` đều gói trong `.bpu-bang` (không đè màn Hôm nay)', async () => {
+    const { readFileSync } = await import('node:fs')
+    const css = readFileSync(require('node:path').resolve(__dirname, '../src/components/bpu/bpu-bang.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/@keyframes[^{]+\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
+    const tach = (sel: string) => { const ra: string[] = []; let d = 0, cu = ''; for (const ch of sel) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { ra.push(cu); cu = '' } else cu += ch } return [...ra, cu] }
+    const chon = [...css.matchAll(/([^{}@;]+)\{/g)].flatMap((m) => tach(m[1]!)).map((x) => x.trim()).filter((x) => x.includes('.bb-'))
+    expect(chon.length).toBeGreaterThan(100)
+    expect(chon.filter((x) => !/\.bpu-bang\b|\[data-bpu-bang\]/.test(x))).toEqual([])
+  })
+})

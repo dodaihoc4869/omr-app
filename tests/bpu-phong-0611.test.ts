@@ -103,12 +103,12 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     expect(st.ds.find((e) => e.sbd === 'S1')!.kj).toBe(KJ.doanDung)
     expect(st.ds.find((e) => e.sbd === 'S2')!.kj).toBe(0)
   })
-  it('rời màn KHÔNG tính khi chưa có lượt hoặc lượt đã mở đáp án (lúc chờ em được rời)', () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (lần 3): rời màn tính MỌI LÚC em đã vào lớp (cả khi chưa có lượt / đã mở đáp án) — em chỉ thoát khi thầy kết thúc buổi.
+  it('rời màn tính mọi lúc em đã vào lớp; em chưa vào / buổi kết thúc ⇒ không tính', () => {
     const st = phong()
-    expect(roiMan(st, 'S1', T0)).toBe(false)
+    expect(roiMan(st, 'S1', T0)).toBe(st.ds[0]!.vao)
     moLuot(st, cauTN, T0); moDapAn(st, T0 + 1000, chamSo)
-    expect(roiMan(st, 'S1', T0)).toBe(false)
-    expect(st.ds[0]!.roi).toBe(0)
+    expect(roiMan(st, 'S1', T0)).toBe(st.ds[0]!.vao)
   })
   // SỬA CÓ CHỦ ĐÍCH 09/11: trước đây rời màn −20 kJ cho đội. Thầy 09/11 «Bỏ tắt màn hình trừ KJ … thoát app là báo động viền đỏ nhấp nháy trên bảng»
   // ⇒ KHÔNG trừ kJ (KJ.roiMan = 0), vẫn đếm lần + ghi vào lượt, thêm «đang rời» `roiNay` (test chi tiết: tests/bpu-chia-doi-0911.test.ts).

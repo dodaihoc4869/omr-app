@@ -13,52 +13,41 @@ const tt = (id: string, ma: string) => ({ ok: true, du: { buoi: { id }, ma } })
 beforeEach(() => { vi.clearAllMocks() })
 afterEach(() => { vi.useRealTimers() })
 
-const hai = { ok: true, du: { lop: [{ tenLop: '12A1' }, { tenLop: '12A2' }] } }
-const mot = { ok: true, du: { lop: [{ tenLop: '12A1' }] } }
-const moTruoc = (gio: number, lop = '12A1') => ({ ok: true, du: [{ id: 'b9', lop, ten: lop, moLuc: new Date(Date.now() - gio * 3_600_000).toISOString() }] })
+const moTruoc = (gio: number) => ({ ok: true, du: [{ id: 'b9', lop: '', ten: 'Buổi', moLuc: new Date(Date.now() - gio * 3_600_000).toISOString() }] })
+const cho = () => new Promise((r) => setTimeout(r, 0))
 
+// SỬA CÓ CHỦ ĐÍCH 09/11 (lần 3, thầy «bỏ luôn chọn lớp đi, bấm điểm danh cái vào màn chiếu luôn … tức thì»): không hỏi gì — buổi mở ≤ 3 giờ dùng tiếp,
+// không có thì mở buổi «mọi lớp»; bảng mở ngay (mã của buổi cũ đọc song song rồi cập nhật).
 describe('nút Điểm danh ở màn Hôm nay', () => {
-  it('chưa có buổi, thầy dạy MỘT lớp ⇒ không hỏi, mở buổi lớp ấy + bảng chiếu điểm danh', async () => {
-    api.buoiDangMo.mockResolvedValue({ ok: true, du: [] }); lop.layLopThay.mockResolvedValue(mot); api.moBuoiHoc.mockResolvedValue(tt('moi', '842517'))
+  it('chưa có buổi ⇒ mở buổi «mọi lớp» (không hỏi lớp) + bảng chiếu điểm danh với mã vừa cấp', async () => {
+    api.buoiDangMo.mockResolvedValue({ ok: true, du: [] }); api.moBuoiHoc.mockResolvedValue(tt('moi', '842517'))
     const { batDauDiemDanh } = await import('../src/lib/bpu/diem-danh-nhanh')
-    const hoi = vi.fn()
-    expect(await batDauDiemDanh(hoi)).toEqual({ loai: 'chieu' })
-    expect(hoi).not.toHaveBeenCalled()
-    expect(api.moBuoiHoc).toHaveBeenCalledWith('12A1')
+    expect(await batDauDiemDanh()).toEqual({ loai: 'chieu' })
+    expect(api.moBuoiHoc).toHaveBeenCalledWith('')
+    expect(lop.layLopThay).not.toHaveBeenCalled()
     expect(gan.moBangDiemDanh).toHaveBeenCalledWith(expect.objectContaining({ buoiId: 'moi', ma: '842517', linkQr: expect.stringContaining('diem-danh=842517') }))
   })
-  it('buổi 12A1 còn mở (lớp sáng quên đóng) ⇒ LUÔN hỏi: «Tiếp» dùng buổi cũ; chọn 12A2 ⇒ buổi MỚI, không nuốt vào buổi 12A1', async () => {
-    api.buoiDangMo.mockResolvedValue(moTruoc(2)); lop.layLopThay.mockResolvedValue(hai)
-    api.xemBuoiHoc.mockResolvedValue(tt('b9', '111111')); api.moBuoiHoc.mockResolvedValue(tt('moi', '222222'))
+  it('buổi mở 2 giờ trước ⇒ dùng tiếp: bảng mở NGAY (chưa chờ mã), mã đọc song song rồi cập nhật lên bảng', async () => {
+    api.buoiDangMo.mockResolvedValue(moTruoc(2)); api.xemBuoiHoc.mockResolvedValue(tt('b9', '111111'))
     const { batDauDiemDanh } = await import('../src/lib/bpu/diem-danh-nhanh')
-    expect(await batDauDiemDanh(async (o) => { expect(o.dangMo?.id).toBe('b9'); expect(o.ds).toEqual(['12A1', '12A2']); return { loai: 'tiep' } })).toEqual({ loai: 'chieu' })
+    expect(await batDauDiemDanh()).toEqual({ loai: 'chieu' })
     expect(api.moBuoiHoc).not.toHaveBeenCalled()
-    expect(gan.moBangDiemDanh).toHaveBeenLastCalledWith(expect.objectContaining({ buoiId: 'b9', ma: '111111' }))
-    expect(await batDauDiemDanh(async () => ({ loai: 'moi', lop: '12A2' }))).toEqual({ loai: 'chieu' })
-    expect(api.moBuoiHoc).toHaveBeenCalledWith('12A2')
-    expect(gan.moBangDiemDanh).toHaveBeenLastCalledWith(expect.objectContaining({ buoiId: 'moi' }))
+    expect(gan.moBangDiemDanh).toHaveBeenCalledWith(expect.objectContaining({ buoiId: 'b9', ma: null }))
+    await cho()
+    expect(gan.capNhatMa).toHaveBeenCalledWith('b9', '111111', expect.stringContaining('diem-danh=111111'))
   })
-  it('Kết thúc buổi ⇒ đóng buổi đang mở + đóng bảng; Trang buổi dạy / Huỷ ⇒ không mở gì', async () => {
-    api.buoiDangMo.mockResolvedValue(moTruoc(1)); lop.layLopThay.mockResolvedValue(mot); api.dongBuoiHoc.mockResolvedValue({ ok: true, du: {} })
-    const { batDauDiemDanh } = await import('../src/lib/bpu/diem-danh-nhanh')
-    expect(await batDauDiemDanh(async () => ({ loai: 'ket-thuc' }))).toEqual({ loai: 'ket-thuc', lop: '12A1' })
-    expect(api.dongBuoiHoc).toHaveBeenCalledWith('b9')
-    expect(gan.dongBang).toHaveBeenCalled()
-    expect(await batDauDiemDanh(async () => ({ loai: 'trang' }))).toEqual({ loai: 'trang' })
-    expect(await batDauDiemDanh(async () => null)).toEqual({ loai: 'huy' })
-    expect(api.moBuoiHoc).not.toHaveBeenCalled()
-    expect(gan.moBangDiemDanh).not.toHaveBeenCalled()
-  })
-  it('buổi mở quá 4 giờ không tính là đang mở (một lớp ⇒ mở buổi mới)', async () => {
-    api.buoiDangMo.mockResolvedValue(moTruoc(6)); lop.layLopThay.mockResolvedValue(mot); api.moBuoiHoc.mockResolvedValue(tt('moi', '333333'))
-    const { batDauDiemDanh } = await import('../src/lib/bpu/diem-danh-nhanh')
-    expect(await batDauDiemDanh(vi.fn())).toEqual({ loai: 'chieu' })
-    expect(api.moBuoiHoc).toHaveBeenCalledWith('12A1')
+  it('buổi mở quá 3 giờ ⇒ mở buổi mới; hỏi sớm (rê chuột) dùng lại một lệnh cho lần bấm ngay sau', async () => {
+    api.buoiDangMo.mockResolvedValue(moTruoc(4)); api.moBuoiHoc.mockResolvedValue(tt('moi', '333333'))
+    const { batDauDiemDanh, hoiSom } = await import('../src/lib/bpu/diem-danh-nhanh')
+    void hoiSom()
+    expect(await batDauDiemDanh()).toEqual({ loai: 'chieu' })
+    expect(api.buoiDangMo).toHaveBeenCalledTimes(1)
+    expect(api.moBuoiHoc).toHaveBeenCalledWith('')
   })
   it('máy chủ lỗi ⇒ trả câu báo, không mở bảng', async () => {
-    api.buoiDangMo.mockResolvedValue({ ok: false, chu: 'Chưa kết nối được máy chủ.' }); lop.layLopThay.mockResolvedValue(mot)
+    api.buoiDangMo.mockResolvedValue({ ok: false, chu: 'Chưa kết nối được máy chủ.' })
     const { batDauDiemDanh } = await import('../src/lib/bpu/diem-danh-nhanh')
-    expect(await batDauDiemDanh(vi.fn())).toEqual({ loai: 'loi', chu: 'Chưa kết nối được máy chủ.' })
+    expect(await batDauDiemDanh()).toEqual({ loai: 'loi', chu: 'Chưa kết nối được máy chủ.' })
     expect(gan.moBangDiemDanh).not.toHaveBeenCalled()
   })
 })
