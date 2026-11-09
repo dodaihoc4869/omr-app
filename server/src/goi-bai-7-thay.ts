@@ -101,7 +101,7 @@ async function suaHanHangLoat(env:Env,b:Row,now:number):Promise<Row>{
 }
 
 /** Một giao dịch cho mọi lớp: chỉ giành biên nhận khi toàn bộ hạn cũ/tick còn đúng ở chính thời điểm ghi. */
-async function suaHanCacGoi(env:Env,goi:{goiId:string;hanCu:string}[],han:string,now:number):Promise<Row>{
+export async function suaHanCacGoi(env:Env,goi:{goiId:string;hanCu:string}[],han:string,now:number):Promise<Row>{
   const ngay=ngayVn7(now)
   if(!/^\d{4}-\d{2}-\d{2}$/.test(han)||!Number.isFinite(Date.parse(han))||new Date(han).toISOString().slice(0,10)!==han)throw new Error('Hạn nộp phải là ngày hợp lệ.')
   if(han<ngay)throw new Error('Thầy chọn hạn từ hôm nay trở đi.')

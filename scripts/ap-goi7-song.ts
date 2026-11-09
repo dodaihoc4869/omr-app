@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process'
 import { dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7, sqlTenLopHs } from '../server/src/goi-bai-7'
 import { sqlEmDangNhan7, sqlQuyetDinhNhan7 } from '../server/src/goi-bai-7-quyen'
 import { ngayVn7 } from '../server/src/goi-bai-7-loi'
+import { phanLai0911 } from './phan-lai-0911'
 // Giữ cùng cổng ca thi/lượt đang làm; không in tên/mã/đáp án học sinh.
 import { query } from './kiem-phat-hanh-chua.mjs'
 const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID
@@ -30,6 +31,8 @@ const now=Date.now(),ngay=ngayVn7(now)
 await db.prepare(`INSERT OR IGNORE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) SELECT 'goi_bai_7_v1',?,? WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`).bind(JSON.stringify({bat:true,batDau:ngay,batLuc:new Date(now).toISOString()}),new Date(now).toISOString()).run()
 const env={DB:db,DE:{async get(key:string){const body=execFileSync('npx',['wrangler','r2','object','get',`omr-de/${key}`,'--remote','--pipe','--config','server/wrangler.toml'],{maxBuffer:32*1024*1024,stdio:['ignore','pipe','pipe']});return {body:new Uint8Array(body)}},async put(){throw new Error('Công cụ không ghi kho đề.')},async delete(){throw new Error('Công cụ không xoá kho đề.')}}} as unknown as Env
 for(let i=0;i<20;i++){const r=await dongBoGoi7(env,now,100,'',true);if(r.hoan)throw new Error('Ca vừa mở: dừng áp lịch.');if(!r.soGoi)break}
+// 09/11 thầy «phân luôn lại câu cho toàn bộ học sinh»: áp mức 28 + hạn chung cho gói đang chạy — MỘT lần (scripts/phan-lai-0911.ts).
+console.log(JSON.stringify(await phanLai0911(env as unknown as Env,now)))
 // Chốt quota cho cả những em chưa mở app, dựa trên câu gốc/bản đã thực sự gặp.
 await db.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota)
   SELECT e.goi_id,e.sbd,?,CAST((COUNT(c.qid)+MAX(1,CAST(julianday(e.han)-julianday(?)+1 AS INT))-1)/MAX(1,CAST(julianday(e.han)-julianday(?)+1 AS INT)) AS INT)
