@@ -188,3 +188,8 @@ html.may-yeu .bpu-ng .quy { animation: none; }
 }
 html.may-yeu .bpu-lua g, html.may-yeu .bpu-lua .hao, html.may-yeu .bpu-che-dau, html.may-yeu .bpu-che.bay::before, html.may-yeu .bpu-che.bay .bpu-che-noi, html.may-yeu .bpu-che.bay .bpu-che-noi > .bpu-lua.to, html.may-yeu .bpu-hs.dang-bay .bpu-hs-than { animation: none; }
 html.may-yeu .bpu-lua .tan, html.may-yeu .bpu-tia { display: none; }
+/* 09/11 thầy «nút sai hiện màu đỏ»: ý Đúng–sai — chọn «Sai» tô ĐỎ (màu sai sẵn có của app học sinh), «Đúng» giữ xanh. Chỉ trong Bình Phản Ứng
+   (độ ưu tiên vượt luật «phẳng» chung của màn chặng `phang-hs.css`). */
+html:not(#_):not(#__) .bpu-hs .ht2-lam-y-nut button[aria-pressed='true']:nth-child(2) { background: var(--tr-sai) !important; border-color: var(--tr-sai) !important; box-shadow: 0 4px 0 var(--tr-sai-day, var(--tr-sai)) !important; }
+/* Cảnh báo cửa sổ nổi (09/11): tiêu đề đỏ, nổi rõ. */
+.bpu-hs .bpu-noi h3 { color: var(--tr-sai); }

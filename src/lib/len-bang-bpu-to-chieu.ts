@@ -52,6 +52,7 @@ export const JS_LEN_BANG_BPU = `
     + '.bpu-lua-doi .tia{fill:var(--doi);opacity:0;animation:bpuTia 1.6s ease-out infinite}'
     + '.bpu-lua-doi .tia:nth-of-type(2){animation-delay:.5s}.bpu-lua-doi .tia:nth-of-type(3){animation-delay:1s}'
     + '.bpu-lua-doi b{margin-top:2px;padding:4px 16px;border-radius:999px;background:var(--doi);color:Canvas;font:800 22px/1.3 inherit;letter-spacing:.04em;white-space:nowrap;box-shadow:0 0 18px var(--doi)}'
+    + '.mc-em.bpu-the-ton{display:flex;justify-content:center;text-align:center}.mc-em.bpu-the-ton .mc-em-trai{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;text-align:center}.mc-em.bpu-the-ton .mc-em-hang1,.mc-em.bpu-the-ton .mc-ten-hang{justify-content:center;text-align:center;width:100%}'
     + '.mc-em.bpu-the-ton{border-radius:16px;box-shadow:0 0 0 4px var(--bpu-doi),0 0 40px var(--bpu-doi);animation:bpuTheSang 2.4s ease-in-out infinite alternate}'
     + '@keyframes bpuTheSang{from{box-shadow:0 0 0 4px var(--bpu-doi),0 0 22px var(--bpu-doi)}to{box-shadow:0 0 0 4px var(--bpu-doi),0 0 52px var(--bpu-doi)}}'
     + '@keyframes bpuLuaCay{0%{transform:scale(1,1) skewX(0)}50%{transform:scale(.96,1.07) skewX(2deg)}100%{transform:scale(1.03,.95) skewX(-2deg)}}'

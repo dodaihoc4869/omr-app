@@ -379,11 +379,14 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     const ly = lyDoLenBang(chon, { mucDo: cauMuc, giayGui: null, nowMs: Date.now() })
     const dsUng = [...new Set([...list.slice(0, 6).map((x) => x.sbd), chon.sbd])]
     const xong = () => {
-      setUng(null); setDangGoi(false); gui({ t: 'goi', sbd: chon.sbd, lyDo: ly })
+      setUng(null); setDangGoi(false)
       // 08/11: có tờ chiếu ⇒ màn lên bảng là màn CŨ của tờ (thầy «bỏ màn chiếu mới»); máy em vẫn sang pha làm bảng như cũ.
       const dEm = v.ds.find((e) => e.sbd === chon.sbd)?.doi ?? 0, mauEm = goc.current ? getComputedStyle(goc.current).getPropertyValue(DOI_BPU[dEm]?.mau ?? '--tr-tin').trim() : ''
       // 09/11: ngọn lửa ĐỘI của em cháy to ở góc đề trên tờ cũ (tờ không có biến màu của app ⇒ gửi mã màu đã đọc).
-      if (lenBangTo?.({ sbd: chon.sbd, ten: v.ds.find((e) => e.sbd === chon.sbd)?.ten ?? chon.sbd, goiNgay: false, mau: mauEm, doi: DOI_BPU[dEm]?.ten ?? '' })) setTimeout(() => gui({ t: 'lam-bang' }), 300)
+      if (lenBangTo?.({ sbd: chon.sbd, ten: v.ds.find((e) => e.sbd === chon.sbd)?.ten ?? chon.sbd, goiNgay: false, mau: mauEm, doi: DOI_BPU[dEm]?.ten ?? '' })) {
+        // Tin phòng gửi SAU khi bảng thu xong (~0,6 s): phòng phát lại view ⇒ bảng vẽ lại — không chen vào giữa hoạt cảnh.
+        setTimeout(() => { gui({ t: 'goi', sbd: chon.sbd, lyDo: ly }); setTimeout(() => gui({ t: 'lam-bang' }), 250) }, 650)
+      } else gui({ t: 'goi', sbd: chon.sbd, lyDo: ly })
     }
     if (yeu || dsUng.length < 2) { xong(); return }
     // 09/11 «gọi lên bảng thì lập tức chuyển về màn chiếu chuẩn cũ»: có tờ ⇒ ô em được chọn bừng sáng một nhịp rồi bảng thu vào tờ (không nhảy tên nữa).

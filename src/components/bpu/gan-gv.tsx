@@ -23,6 +23,13 @@ let nhanCham: ((dat: boolean) => void) | null = null
 /** MỘT GỐC BẢNG (09/11): điểm danh → chọn câu → các lượt dùng CHUNG một bảng (một nối phòng, không dựng lại, không chớp «Đang mở…»).
  *  Props hiện tại của bảng; lần vẽ sau GỘP vào (mã điểm danh đổi mỗi phút không đè câu đang chiếu). */
 let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean; diemDanh?: boolean } | null = null
+/** Gốc + khung của tấm buổi dạy (TamHoatDong) và của tờ chiếu dựng từ câu chọn trên bảng. */
+/** Esc ra Hôm nay: phiên đang tạm ẩn (xem `tamAnTatCa`). */
+let tamAn = false
+let hdGoc: Root | null = null
+let hdKhung: HTMLDivElement | null = null
+let toGoc: Root | null = null
+let toKhung: HTMLDivElement | null = null
 /** Bảng đang lui sau tấm buổi dạy (moHoatDong) — tờ của khối báo câu ⇒ bảng hiện lại. */
 let anViHd = false
 /** Bước Điểm danh (app thầy) muốn biết khi bảng đóng. */
@@ -85,7 +92,7 @@ function veBang(): void {
     <BangBinhPhanUng
       key={hien.buoiId}
       {...hien}
-      onDong={dongBang}
+      onDong={tamAnTatCa}
       onToi={nguonTo ? toiQuaTo : undefined}
       onGiai={giaiTrenTo}
       layGiai={layGiai}
@@ -117,11 +124,48 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
 }
 /** CHIẾU ĐIỂM DANH = MỞ MÀN Bình Phản Ứng (bước Điểm danh của app thầy). Bảng đang mở cho đúng buổi ⇒ chỉ cập nhật mã, giữ câu đang chiếu. */
 export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?: string | null; onDong?: () => void }): void {
-  dongNgoai = o.onDong ?? null
-  if (hien?.buoiId === o.buoiId && khung) { capNhatMa(o.buoiId, o.ma, o.linkQr); return } // không phóng lại bảng: em có thể đang trên bảng (mã đổi mỗi phút)
+  dongNgoai = o.onDong ?? dongNgoai
+  if (hien?.buoiId === o.buoiId && khung) {
+    // Đang tạm ẩn (Esc ra Hôm nay) ⇒ hiện lại ĐÚNG chỗ dở (bảng / tờ / tấm như lúc ra). Đang hiện ⇒ chỉ cập nhật mã (em có thể đang trên bảng).
+    if (tamAn) hienLaiTatCa()
+    if (o.ma !== undefined) capNhatMa(o.buoiId, o.ma, o.linkQr)
+    return
+  }
+  if (khung) { dongBang(); dongTo() } // buổi khác ⇒ đóng phiên cũ
   // Mở mới ⇒ LUÔN màn điểm danh (thầy 09/11 «thoát ra hẳn thì không có chỗ vào lại màn điểm danh»), kể cả phòng còn lượt cũ; chọn câu ⇒ hết cờ.
   hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr, diemDanh: true }
   veBang()
+  phatPhien()
+}
+// ESC = RA HÔM NAY, GIỮ NGUYÊN CHỖ DỞ (thầy 09/11 «khi tôi bấm esc thì out hẳn ra màn hôm nay, bấm vào điểm danh thì vào đúng chỗ đang dở»): ẩn bảng + tờ +
+// tấm (không gỡ — nối phòng, câu, em đang lên bảng giữ nguyên), thoát toàn màn hình, trả cuộn cho Hôm nay. Nút Điểm danh ⇒ `moBangDiemDanh` cùng buổi ⇒ hiện lại.
+/** Phiên Bình Phản Ứng đang có trên máy này (hiện hoặc tạm ẩn) — nút Điểm danh / Kết thúc ở Hôm nay đọc. */
+export function phienDangCo(): { buoiId: string; tamAn: boolean } | null { return hien && khung ? { buoiId: hien.buoiId, tamAn } : null }
+function phatPhien(): void { try { window.dispatchEvent(new CustomEvent('bpu-phien', { detail: phienDangCo() })) } catch { /* trình duyệt cũ */ } }
+const caKhung = () => [khung, toKhung, hdKhung].filter((x): x is HTMLDivElement => !!x)
+function tamAnTatCa(): void {
+  if (!khung || tamAn) return
+  tamAn = true
+  for (const el of caKhung()) { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none' }
+  document.documentElement.setAttribute('data-bpu-an', '')
+  document.body.style.overflow = '' // khung tờ khoá cuộn trang khi mở ⇒ trả lại cho Hôm nay
+  window.removeEventListener('keydown', phimKhiAn, true)
+  baoAnHien(true)
+  try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
+  // Esc / nút «Đóng» ⇒ ra HẲN màn Hôm nay (thầy 09/11 «bấm nút đóng cũng thoát hẳn ra màn hình hôm nay»).
+  try { useAppStore.getState().setScreen('tongquan') } catch { /* app học sinh / test */ }
+  phatPhien()
+}
+function hienLaiTatCa(): void {
+  tamAn = false
+  document.documentElement.removeAttribute('data-bpu-an')
+  for (const el of [toKhung, hdKhung]) if (el) { el.style.visibility = ''; el.style.pointerEvents = '' }
+  if (toKhung) document.body.style.overflow = 'hidden'
+  const dangLenBang = !!khung?.hasAttribute('data-an')
+  if (khung && !dangLenBang) { khung.style.visibility = ''; khung.style.pointerEvents = ''; baoAnHien(false); khung.querySelector<HTMLElement>('.bpu-bang')?.focus() }
+  if (dangLenBang) window.addEventListener('keydown', phimKhiAn, true)
+  try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
+  phatPhien()
 }
 /** Mã điểm danh đổi mỗi phút ⇒ chỉ gộp mã + QR (không đụng câu / lượt đang chiếu). */
 export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | null): void {
@@ -132,8 +176,6 @@ export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | 
 
 // TẤM BUỔI DẠY (09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong … bỏ hẳn hành trình cũ»): Kiểm tra đầu giờ · Chữa câu khó
 // & tính toán · Kiểm tra ôn tập mở trên tấm riêng (dưới tờ chiếu, dưới bảng). Mở từ bảng ⇒ bảng lui (ẩn, giữ nối); khối chiếu câu ⇒ bảng hiện lại.
-let hdGoc: Root | null = null
-let hdKhung: HTMLDivElement | null = null
 export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
   const { default: Tam } = await import('./TamHoatDong')
   if (!hdKhung) { hdKhung = document.createElement('div'); hdKhung.setAttribute('data-bpu-hd', ''); document.body.appendChild(hdKhung); hdGoc = createRoot(hdKhung) }
@@ -143,11 +185,11 @@ export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise
 function moHoatDongTuBang(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): void { void moHoatDong(hd) }
 /** KẾT THÚC BUỔI HỌC từ bảng (thầy 09/11 «thiết kế nút đẹp mắt kết thúc buổi học»; nút ở «Hôm nay làm gì?»): đóng buổi trên máy chủ (phòng kết thúc ⇒ máy em
  *  mới thoát được màn Bình Phản Ứng), đóng bảng + tấm buổi dạy. Trả câu báo lỗi (rỗng = đã kết thúc). */
-async function ketThucBuoiHoc(buoiId: string): Promise<string> {
+export async function ketThucBuoiHoc(buoiId: string): Promise<string> {
   const { dongBuoiHoc } = await import('../../lib/buoi-hoc-api')
   const r = await dongBuoiHoc(buoiId)
   if (!r.ok) return r.chu
-  dongBang(); dongHoatDong()
+  dongBang(); dongHoatDong(); dongTo()
   useAppStore.getState().showToast('Đã kết thúc buổi học', 'success')
   return ''
 }
@@ -157,8 +199,6 @@ export function dongHoatDong(): void {
 }
 
 // TỜ CHIẾU CỦA CÂU THẦY CHỌN TRÊN BẢNG: khung xem tờ (KhungXemPhieu, cùng khung bảng Dạy học dùng) nằm DƯỚI bảng. Tờ vào đợt ⇒ tự báo câu ⇒ bảng mở lượt.
-let toGoc: Root | null = null
-let toKhung: HTMLDivElement | null = null
 function dongTo(): void { toGoc?.unmount(); toGoc = null; toKhung?.remove(); toKhung = null; nguonTo = null; if (hien) veBang() }
 /** Dựng tờ từ câu đã chọn (câu bấm đứng đầu) rồi chiếu. Trả lời báo lỗi (rỗng = đã chiếu). */
 export async function chieuCau(ds: CauDayHoc[]): Promise<string> {
@@ -172,7 +212,7 @@ export async function chieuCau(ds: CauDayHoc[]): Promise<string> {
   nghiDen = 0
   tiepNgay = true // thầy vừa chọn câu = ý muốn rõ ⇒ gửi NGAY (cùng khung tờ cũ thì không coi là «tờ mới»)
   if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
-  toGoc!.render(<KhungXemPhieu html={html} ten="Tờ chiếu Bình Phản Ứng" dong={dongTo} />)
+  toGoc!.render(<KhungXemPhieu html={html} ten="Tờ chiếu Bình Phản Ứng" dong={() => (khung ? tamAnTatCa() : dongTo())} />)
   return ''
 }
 /** Phím G trên bảng: đóng bảng, tờ mở lời giải thu gọn của câu đang chiếu (bảng che tờ nên phím không tới được tờ). */
@@ -205,10 +245,10 @@ export function baoHetCau(d: 1 | -1): void {
   useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
 export function dongBang(): void {
-  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null
-  // Thoát toàn màn hình bảng đã xin + vẽ lại trang (ảnh 09/11: sau Esc đầu màn Hôm nay còn bóng chữ chồng lên nhau — trình duyệt giữ lớp vẽ cũ).
+  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null; tamAn = false
+  document.documentElement.removeAttribute('data-bpu-an')
   try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
-  requestAnimationFrame(() => { const y = window.scrollY; window.scrollTo(0, y + 1); window.scrollTo(0, y); document.body.style.transform = 'translateZ(0)'; requestAnimationFrame(() => { document.body.style.transform = '' }) })
+  phatPhien()
   window.removeEventListener('keydown', phimKhiAn, true)
   const f = dongNgoai; dongNgoai = null; f?.()
 }
@@ -220,18 +260,27 @@ const giamChuyenDong = () => (typeof matchMedia !== 'undefined' && matchMedia('(
 const toTrongTrang = () => !!nguonTo && [...document.querySelectorAll('iframe')].some((f) => f.contentWindow === nguonTo)
 function bangAn(): boolean { return !!khung && khung.hasAttribute('data-an') }
 function baoAnHien(an: boolean): void { try { window.dispatchEvent(new CustomEvent('bpu-an-hien', { detail: an })) } catch { /* trình duyệt cũ */ } }
+// 09/11 (lần 4) thầy «hiệu ứng gọi lên bảng chuyển màn vẫn chưa cực mượt»: (1) chỉ transform + opacity (bỏ hoạt cảnh bo góc — vẽ lại mỗi khung);
+// (2) nâng lớp vẽ trước MỘT khung (`bpu-san`) rồi mới chạy, tờ cũ kịp dựng thẻ tên bên dưới; (3) ẩn bằng visibility (không display:none) ⇒ phóng lại
+// không phải dựng lại cả bảng; (4) bảng hoãn gửi tin phòng tới khi thu xong (BangBinhPhanUng) ⇒ không vẽ lại React giữa hoạt cảnh.
+function anHan(el: HTMLDivElement): void { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none' }
+function hienHan(el: HTMLDivElement): void { el.style.visibility = ''; el.style.pointerEvents = ''; el.style.display = '' }
 function anBang(): void {
   const el = khung
   if (!el) return
   el.setAttribute('data-an', '')
-  baoAnHien(true)
   window.addEventListener('keydown', phimKhiAn, true)
-  if (!toTrongTrang() || giamChuyenDong()) { el.style.display = 'none'; return }
+  if (!toTrongTrang() || giamChuyenDong()) { baoAnHien(true); anHan(el); return }
   el.classList.remove('bpu-no')
-  el.classList.add('bpu-thu')
-  const xong = () => { if (el.classList.contains('bpu-thu')) { el.style.display = 'none'; el.classList.remove('bpu-thu') } }
-  el.addEventListener('animationend', xong, { once: true })
-  setTimeout(xong, 800)
+  el.classList.add('bpu-san')
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (!el.hasAttribute('data-an')) return
+    baoAnHien(true) // dừng canvas đúng lúc bắt đầu thu
+    el.classList.add('bpu-thu')
+    const xong = () => { if (el.classList.contains('bpu-thu')) { anHan(el); el.classList.remove('bpu-thu', 'bpu-san') } }
+    el.addEventListener('animationend', xong, { once: true })
+    setTimeout(xong, 700)
+  }))
 }
 function hienBang(): void {
   const el = khung
@@ -239,9 +288,9 @@ function hienBang(): void {
   el.removeAttribute('data-an')
   window.removeEventListener('keydown', phimKhiAn, true)
   el.classList.remove('bpu-thu')
-  el.style.display = ''
   baoAnHien(false)
-  if (!giamChuyenDong()) { el.classList.add('bpu-no'); const bo = () => el.classList.remove('bpu-no'); el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 800) }
+  if (!giamChuyenDong()) { el.classList.add('bpu-san', 'bpu-no'); const bo = () => el.classList.remove('bpu-no', 'bpu-san'); el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 700) }
+  hienHan(el)
   el.querySelector<HTMLElement>('.bpu-bang')?.focus()
 }
 /** Bảng đang ẩn mà tiêu điểm còn ở app (không ở tờ): D = Đạt, K / F = Chưa đạt vẫn chấm được; Esc / P đưa bảng về. */
