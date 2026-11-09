@@ -1,0 +1,117 @@
+{
+  "lo": 297,
+  "main": "35f6baffbc2d73eb85cc56ec9d5555658f7341de",
+  "priorMain": "f51ec9654e38cdce03a8279af43c2d3b16bbd599",
+  "merged": false,
+  "fontFilesChangedInMainSincePrior": false,
+  "branchProductionChanged": false,
+  "colorBaseline": {
+    "violations": 680,
+    "checkerFiles": 123
+  },
+  "sizeBaseline": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainScope": "Main thay Bình Phản Ứng/Điểm danh và nạp lười màn thi; không đổi font; chưa gộp.",
+  "speedBaselineLatestMain": {
+    "sha256": "df34ce749d3bd14432f27e18f042cf99ae6374d0a9647df2a6ea6be2ff97d334",
+    "mayChu": {
+      "sanh-lan-dau": {
+        "dot": 12,
+        "lenh": 21
+      },
+      "sanh-lan-sau": {
+        "dot": 1,
+        "lenh": 2
+      },
+      "mo-chang": {
+        "dot": 2,
+        "lenh": 4
+      },
+      "nop-cau": {
+        "dot": 7,
+        "lenh": 9
+      },
+      "dem-hom-nay": {
+        "dot": 1,
+        "lenh": 1
+      }
+    },
+    "taiApp": {
+      "giao-vien": {
+        "tep": 11,
+        "gzip": 180652
+      },
+      "hoc-sinh": {
+        "tep": 35,
+        "gzip": 231877
+      },
+      "phu-huynh": {
+        "tep": 20,
+        "gzip": 167025
+      }
+    },
+    "taiDuong": {
+      "thay /gv": {
+        "gzip": 182744
+      },
+      "phieu /p": {
+        "gzip": 235396
+      },
+      "phu-huynh /ph": {
+        "gzip": 168734
+      },
+      "thi /t": {
+        "gzip": 260602
+      },
+      "dang-nhap-hs /hs": {
+        "gzip": 129730
+      },
+      "cong-hs /hs (đã đăng nhập)": {
+        "gzip": 243803
+      }
+    },
+    "requiredBeforeMergeRelease": true,
+    "branchStillUnmerged": true
+  },
+  "diffFiles": [
+    "DIEU-PHOI.md",
+    "docs/ban-ve-moi-on-sua-0911/DAC-TA.md",
+    "docs/ban-ve-moi-on-sua-0911/chup.mjs",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-1-ngay-moi.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-2-sai-co-goi-y.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-2b-sai-chua-goi-y.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-3-ngay-sua.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-4-vi-du-mau.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-5-cau-cung-dang.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-6-kiem-tra-dang-lam.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-7-kiem-tra-ket-qua.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-sang-8-trang-thai.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-toi-1-ngay-moi.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-toi-2-sai-co-goi-y.jpg",
+    "docs/ban-ve-moi-on-sua-0911/dt-toi-4-vi-du-mau.jpg",
+    "docs/ban-ve-moi-on-sua-0911/mb-sang-3-ngay-sua.jpg",
+    "docs/ban-ve-moi-on-sua-0911/moi-on-sua.html",
+    "docs/ban-ve-moi-on-sua-0911/mt-sang-1-ngay-moi.jpg",
+    "docs/ban-ve-moi-on-sua-0911/mt-sang-4-vi-du-mau.jpg",
+    "docs/ban-ve-moi-on-sua-0911/mt-toi-1-ngay-moi.jpg",
+    "docs/moc-toc-do.json",
+    "server/src/phong-binh-phan-ung.ts",
+    "src/components/bpu/BangBinhPhanUng.tsx",
+    "src/components/bpu/ChonCauBpu.tsx",
+    "src/components/bpu/ManBinhPhanUng.tsx",
+    "src/components/bpu/bpu-bang.css",
+    "src/components/bpu/chon-cau.css",
+    "src/components/bpu/gan-gv.tsx",
+    "src/components/hom-nay-thay/NutDiemDanh.tsx",
+    "src/lib/bpu/diem-danh-nhanh.ts",
+    "src/lib/bpu/phong.ts",
+    "src/lib/len-bang-bpu-to-chieu.ts",
+    "src/screens/ExamTakeScreen.tsx",
+    "tests/bpu-chia-doi-0911.test.ts",
+    "tests/bpu-giao-dien-0611.test.tsx",
+    "tests/bpu-phong-0611.test.ts",
+    "tests/diem-danh-hom-nay-0911.test.ts"
+  ]
+}

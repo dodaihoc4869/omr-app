@@ -1,0 +1,243 @@
+{
+  "i": 1250,
+  "hash": "e32a8168dd3fc7d1eab4859ce8f0d192ba34915670d9583901381a2005b3a618",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e32a8168dd3fc7d1eab4859ce8f0d192ba34915670d9583901381a2005b3a618.png",
+  "size": [
+    823,
+    239
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C6-D5-III-6",
+      "de": "Một nhà máy luyện kim sản xuất Zn từ 25 tấn quặng blend (chứa 80% ZnS về khối lượng, còn lại là tạp chất không chứa kẽm) theo các sơ đồ ở hình dưới. Toàn bộ lượng kẽm tạo ra được đúc thành x thanh kẽm hình hộp chữ nhật (đặc nguyên khối), chiều dài 120 cm, chiều rộng 20 cm và chiều cao 10 cm.\nBiết khối lượng riêng của kẽm là 7,14 g/cm³.\nGiá trị của x là bao nhiêu? (Làm tròn đến hàng đơn vị).",
+      "allHinh": [
+        {
+          "hash": "e32a8168dd3fc7d1eab4859ce8f0d192ba34915670d9583901381a2005b3a618",
+          "where": "12-KT-C6-D5-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "77e24bb5c7582c18805450f17881fedc5f3453288e90d5a478a73e2bc8313a16"
+        }
+      ],
+      "missingHashes": [
+        "e32a8168dd3fc7d1eab4859ce8f0d192ba34915670d9583901381a2005b3a618"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1250-native3x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native pixellabel/arrow geometry, literal reactions only; no stoichiometric balancing or numerical solution inferred.",
+  "geometry": {
+    "classification": "Three chemical equation rows with separate above-arrow conditions, no rasterphoto.",
+    "font": "All regular upright serif, including species and condition H/dpdd; no bold/italic blocks. Numbers in molecularformula SUB. t followedby elevated small hollow round o-like symbol, not numeral0; preserve as t withsmallSUPcircle/o.",
+    "rows": [
+      {
+        "label": "(1)",
+        "labelBBox": [
+          45,
+          58,
+          83,
+          96
+        ],
+        "left": "ZnS + O₂",
+        "leftBBox": [
+          96,
+          63,
+          237,
+          96
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              244,
+              78
+            ],
+            [
+              400,
+              78
+            ]
+          ],
+          "head": "openV RIGHT",
+          "vertices": [
+            [
+              392,
+              71
+            ],
+            [
+              400,
+              78
+            ],
+            [
+              392,
+              85
+            ]
+          ]
+        },
+        "condition": {
+          "literal": "tᵒ, H=75%",
+          "bbox": [
+            278,
+            57,
+            369,
+            75
+          ],
+          "note": "small raised hollowroundo aftert; comma followedbyspace; noC temperatureunit ornumerictemperature"
+        },
+        "right": "ZnO + SO₂",
+        "rightBBox": [
+          407,
+          63,
+          572,
+          96
+        ]
+      },
+      {
+        "label": "(2)",
+        "labelBBox": [
+          45,
+          107,
+          89,
+          146
+        ],
+        "left": "ZnO + H₂SO₄",
+        "leftBBox": [
+          100,
+          111,
+          303,
+          145
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              312,
+              126
+            ],
+            [
+              449,
+              126
+            ]
+          ],
+          "head": "openV RIGHT",
+          "vertices": [
+            [
+              441,
+              119
+            ],
+            [
+              449,
+              126
+            ],
+            [
+              441,
+              133
+            ]
+          ]
+        },
+        "condition": {
+          "literal": "H=100%",
+          "bbox": [
+            346,
+            106,
+            417,
+            122
+          ]
+        },
+        "right": "ZnSO₄ + H₂O",
+        "rightBBox": [
+          463,
+          111,
+          658,
+          145
+        ]
+      },
+      {
+        "label": "(3)",
+        "labelBBox": [
+          45,
+          155,
+          89,
+          195
+        ],
+        "left": "ZnSO₄ + H₂O",
+        "leftBBox": [
+          100,
+          160,
+          295,
+          194
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              311,
+              175
+            ],
+            [
+              489,
+              175
+            ]
+          ],
+          "head": "openV RIGHT",
+          "vertices": [
+            [
+              481,
+              168
+            ],
+            [
+              489,
+              175
+            ],
+            [
+              481,
+              182
+            ]
+          ]
+        },
+        "condition": {
+          "literal": "dpdd, H=80%",
+          "bbox": [
+            345,
+            154,
+            458,
+            172
+          ],
+          "note": "EXACTASCII dpdd; firstletterd not đ, no addedspaces/diacritics/expansion fromtheory"
+        },
+        "right": "Zn + H₂SO₄ + O₂",
+        "rightBBox": [
+          505,
+          160,
+          761,
+          194
+        ]
+      }
+    ],
+    "counts": {
+      "rows": 3,
+      "numberLabels": 3,
+      "numberParenthesisPairs": 3,
+      "rightOpenVHeads": 3,
+      "baselinePluses": 7,
+      "conditionLabels": 3
+    },
+    "noAdded": [
+      "stoichiometriccoefficients",
+      "phases",
+      "electrodepolarity",
+      "catalystnames",
+      "balancingequations",
+      "extraO2/H2",
+      "solutionx",
+      "caption",
+      "reactionreversibility"
+    ]
+  },
+  "actualSvgReviewed": false
+}
