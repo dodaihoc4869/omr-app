@@ -16,8 +16,10 @@ vi.mock('../src/lib/exam-db', async (goc) => ({
   loadTeacherSecret: async () => 'mat',
 }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
+// Hộp nạp lười nhiều lớp (kho, buổi, cờ OMNI, danh sách bài) — cho mỗi test đủ thời gian khi chạy chung nhiều tệp.
+vi.setConfig({ testTimeout: 20000 })
 
-import DayHocLenBang from '../src/components/day-hoc/DayHocLenBang'
+import { hienHanNop } from '../src/components/chien-dich/ngay'
 import {
   chiaEmTheoLop,
   doiChonKhoi,
@@ -178,22 +180,30 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-async function moBuoc() {
-  render(<DayHocLenBang />)
-  const buoc = (await screen.findByRole('heading', { name: 'Bài hôm nay' })).closest('section') as HTMLElement
-  await waitFor(() => expect(within(buoc).getByText('Bài 8. Amine')).toBeTruthy())
-  return buoc
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy duyệt docs/ban-ve-giao-bai-0911: «bỏ hết màn phân bài bên trong»): bước «Bài hôm nay» rời bảng Dạy học — chọn lớp / cây bài /
+// giao nhiều lớp nay kiểm trên hộp «Giao bài» (HopBoSungBai: ô tick, chọn nhiều bài; bài kế tiếp tick sẵn; bài đã giao ở MỌI lớp đang chọn gọn một dòng;
+// bài mới có ở một phần lớp ghi «<lớp> đã có · còn <lớp>»). Chip gộp «Đã dạy · k/n lớp» + chấm theo lớp là của cây bước cũ (đã bỏ).
+async function moHop() {
+  const { default: HopBoSungBai } = await import('../src/components/day-hoc/HopBoSungBai')
+  render(<HopBoSungBai onDong={() => {}} />)
+  const hop = screen.getByRole('dialog', { name: 'Giao bài' })
+  await within(hop).findByText('Bài 8. Amine', {}, { timeout: 4000 })
+  return hop
 }
-const dong = (buoc: HTMLElement, khoa: string) => buoc.querySelector(`[data-bai="${khoa}"]`) as HTMLElement
-const moTam = (buoc: HTMLElement) => fireEvent.click(within(buoc).getByRole('button', { name: /Chọn lớp/ }))
+const dongHop = (hop: HTMLElement, ten: string) => [...hop.querySelectorAll('.cbm-ten b')].find((b) => b.textContent === ten)?.closest('li') as HTMLElement
+const oTick = (hop: HTMLElement, ten: RegExp) => within(hop).queryByRole('checkbox', { name: ten }) as HTMLInputElement | null
+const nutGiao = (hop: HTMLElement) => within(hop).getByRole('button', { name: /^Giao \d+ bài cho / }) as HTMLButtonElement
+const moTam = (hop: HTMLElement) => fireEvent.click(within(hop).getByRole('button', { name: /Chọn lớp/ }))
 const tichLop = async (ten: RegExp) => fireEvent.click(await screen.findByRole('checkbox', { name: ten }))
-const chipLop = (buoc: HTMLElement) => [...within(buoc).getByRole('group', { name: 'Lớp đã chọn' }).querySelectorAll('[data-lop]')].map((e) => e.getAttribute('data-lop'))
+const chipLop = (hop: HTMLElement) => [...within(hop).getByRole('group', { name: 'Lớp đã chọn' }).querySelectorAll('[data-lop]')].map((e) => e.getAttribute('data-lop'))
+/** Lượt xem trước MỚI NHẤT của từng lớp cho một bài (bài gợi ý tick sẵn ⇒ lớp đầu đã có lượt xem trước sớm hơn). */
+const xemCuoi = (khoaBai: string) => Object.fromEntries(lenh('xem-truoc').filter((x) => x.khoaBai === khoaBai).map((x) => [x.lop, x]))
 
-describe('màn: ô chọn lớp xếp theo khối 10 · 11 · 12', () => {
+describe('màn: ô chọn lớp xếp theo khối 10 · 11 · 12 (hộp Giao bài)', () => {
   it('lớp của buổi đang mở chọn sẵn; tấm xổ xuống hiện đủ khối 10 · 11 · 12 với các lớp trong khối; "Chưa xếp lớp" không có', async () => {
-    const buoc = await moBuoc()
-    expect(chipLop(buoc)).toEqual(['12 - Tinh Hoa'])
-    moTam(buoc)
+    const hop = await moHop()
+    expect(chipLop(hop)).toEqual(['12 - Tinh Hoa'])
+    moTam(hop)
     const tam = await screen.findByRole('dialog', { name: 'Chọn lớp nhận bài' })
     const khoi = [...tam.querySelectorAll('[role="tree"] > [role="treeitem"]')].map((li) => li.querySelector('b')?.textContent)
     expect(khoi).toEqual(['Khối 10', 'Khối 11', 'Khối 12'])
@@ -205,85 +215,75 @@ describe('màn: ô chọn lớp xếp theo khối 10 · 11 · 12', () => {
   })
 
   it('tick thêm lớp cùng khối ⇒ chọn NHIỀU lớp (thẻ + cây bài + danh-sach gọi từng lớp); bỏ lớp bằng ×', async () => {
-    const buoc = await moBuoc()
-    moTam(buoc)
+    const hop = await moHop()
+    moTam(hop)
     await tichLop(/^12 - Lớp Thường/)
     await tichLop(/^12 - Nhóm 10 điểm/)
-    expect(chipLop(buoc)).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa'])
+    expect(chipLop(hop)).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa'])
     await waitFor(() => expect(new Set(lenh('danh-sach').map((x) => x.lop))).toEqual(new Set(['12 - Tinh Hoa', '12 - Lớp Thường', '12 - Nhóm 10 điểm'])))
-    expect(buoc.textContent).toContain('3 lớp đang chọn')
-    fireEvent.click(within(buoc).getByRole('button', { name: 'Bỏ 12 - Nhóm 10 điểm' }))
-    expect(chipLop(buoc)).toEqual(['12 - Lớp Thường', '12 - Tinh Hoa'])
+    // SỬA CÓ CHỦ ĐÍCH 09/11: chữ «3 lớp đang chọn» của bước cũ ⇒ hộp ghi số lớp ở dòng đầu danh sách bài.
+    await waitFor(() => expect(hop.querySelector('.cbm-goi-y')?.textContent).toContain('3 lớp'))
+    fireEvent.click(within(hop).getByRole('button', { name: 'Bỏ 12 - Nhóm 10 điểm' }))
+    expect(chipLop(hop)).toEqual(['12 - Lớp Thường', '12 - Tinh Hoa'])
   })
 
   it('tick cả khối 12 ⇒ mọi lớp khối 12; tick lớp khối 11 ⇒ chọn lại từ đầu chỉ lớp ấy + dòng báo; cây đổi sang bài khối 11', async () => {
-    const buoc = await moBuoc()
-    moTam(buoc)
+    const hop = await moHop()
+    moTam(hop)
     fireEvent.click(await screen.findByRole('checkbox', { name: /^Khối 12 · 1\/3 lớp/ }))
-    expect(chipLop(buoc)).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa'])
+    expect(chipLop(hop)).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa'])
     await tichLop(/^11 · 30 em/)
-    expect(chipLop(buoc)).toEqual(['11'])
+    expect(chipLop(hop)).toEqual(['11'])
     expect(screen.getByText(/Đã chuyển sang Khối 11/)).toBeTruthy()
-    await waitFor(() => expect(dong(buoc, 'DH-11-C2-B3')).toBeTruthy())
-    expect(buoc.textContent).not.toContain('Bài 8. Amine')
+    await within(hop).findByRole('checkbox', { name: /Bài 3\. Ammonia/ }, { timeout: 4000 })
+    expect(hop.textContent).not.toContain('Bài 8. Amine')
   })
 })
 
-describe('màn: cây bài đúng thứ tự', () => {
+describe('màn: cây bài đúng thứ tự (hộp Giao bài)', () => {
   it('kho nhập chương 3 theo 10, 8, 9 và chương 1 sau chương 3 ⇒ cây hiện chương 1 trước, bài 1, 2, 8, 9, 10 tăng dần', async () => {
-    const buoc = await moBuoc()
-    expect([...buoc.querySelectorAll('[data-bai]')].map((e) => e.getAttribute('data-bai'))).toEqual(['DH-12-C1-B1', 'DH-12-C1-B2', 'DH-12-C3-B8', 'DH-12-C3-B9', 'DH-12-C3-B10'])
-    expect([...buoc.querySelectorAll('.bhn-chuong-dau h3')].map((e) => e.textContent)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
-    expect(buoc.querySelector('.bhn-chuong-dem')?.textContent).toBe('2/2 bài đã giao') // lớp Tinh Hoa đã có Bài 1 và Bài 2
+    const hop = await moHop()
+    // Lớp Tinh Hoa đã có Bài 1 và Bài 2 ⇒ chương 1 đã giao hết, gộp một dòng; bấm hiện lại rồi mở chương.
+    fireEvent.click(within(hop).getByRole('button', { name: 'Hiện 1 chương đã giao hết (C1 - Ester lipid)' }))
+    expect([...hop.querySelectorAll('.cbm-chuong-ten')].map((e) => e.textContent)).toEqual(['C1 - Ester lipid', 'C3 - Hợp chất chứa N'])
+    const c1 = within(hop).getByRole('button', { name: /^C1 - Ester lipid/ })
+    expect(c1.textContent).toContain('Đã giao hết')
+    fireEvent.click(c1)
+    expect([...hop.querySelectorAll('.cbm-ten b')].map((e) => e.textContent)).toEqual(['Bài 1. Ester', 'Bài 2. Lipid', 'Bài 8. Amine', 'Bài 9. Amino acid', 'Bài 10. Protein và enzyme'])
+    expect(within(hop).getByRole('button', { name: /^C3 - Hợp chất chứa N/ }).textContent).toContain('0/3 bài đã giao')
   })
 })
 
-describe('màn: giao Bài cho nhiều lớp', () => {
-  it('thầy 06/10: lớp A đã giao Bài 8, lớp B chưa ⇒ Bài 1, 2 hiện "Đã dạy · 1/2 lớp" (chấm: lớp A đã dạy, lớp B chưa dạy); Bài 9, 10 vẫn "Chưa dạy"; bài chưa tick thật không có nút Sửa em / Bỏ tick', async () => {
+describe('màn: giao bài cho nhiều lớp (hộp Giao bài)', () => {
+  it('thầy 06/10: lớp A đã giao Bài 8, lớp B chưa ⇒ dòng Bài 8 ghi rõ lớp nào đã có, lớp nào còn; vẫn chọn được; bài chưa tick thật ở mọi lớp không có «Gỡ bài»', async () => {
     daTick = { '12 - Lớp Thường': ['DH-12-C3-B8'], '12 - Tinh Hoa': [] }
-    const buoc = await moBuoc()
-    moTam(buoc)
+    const hop = await moHop()
+    moTam(hop)
     await tichLop(/^12 - Lớp Thường/)
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy · 1/2 lớp'))
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã dạy · 1/2 lớp')
-    expect(dong(buoc, 'DH-12-C1-B1').getAttribute('data-trang-thai')).toBe('da_day')
-    expect(dong(buoc, 'DH-12-C3-B9').textContent).toContain('Chưa dạy')
-    const cham = [...dong(buoc, 'DH-12-C1-B1').querySelectorAll('.bhn-cham-ds li[data-lop]')].map((li) => [li.getAttribute('data-lop'), li.getAttribute('aria-label')])
-    expect(cham).toEqual([
-      ['12 - Lớp Thường', '12 - Lớp Thường: Đã dạy'],
-      ['12 - Tinh Hoa', '12 - Tinh Hoa: Chưa dạy'],
-    ])
-    expect(within(dong(buoc, 'DH-12-C1-B1')).queryByRole('button', { name: /Bỏ tick theo lớp/ })).toBeNull()
-    expect(within(dong(buoc, 'DH-12-C3-B8')).getByRole('button', { name: /Bỏ tick theo lớp/ })).toBeTruthy() // Bài 8 tick thật ở lớp Thường
+    await waitFor(() => expect(dongHop(hop, 'Bài 8. Amine').textContent).toContain('12 - Lớp Thường đã có · còn 12 - Tinh Hoa'))
+    expect(oTick(hop, /Bài 8\. Amine/)!.disabled).toBe(false)
+    // Bài 1, 2 đứng trước Bài 8 nhưng lớp Tinh Hoa chưa dạy gì ⇒ không phải «bài cũ» của cả hai lớp.
+    expect(dongHop(hop, 'Bài 1. Ester').textContent).not.toContain('bài cũ')
+    expect(dongHop(hop, 'Bài 9. Amino acid').textContent).not.toContain('đã có')
+    for (const ten of ['Bài 1. Ester', 'Bài 8. Amine', 'Bài 9. Amino acid']) expect(within(dongHop(hop, ten)).queryByRole('button', { name: 'Gỡ bài' })).toBeNull()
   })
 
-  it('chip bài gộp qua lớp ("Đã dạy · 2/3 lớp"), chấm từng lớp; chọn bài ⇒ xem-truoc TỪNG LỚP chưa có bài, sbd chia đúng lớp; "Giao Bài 8 cho 3 lớp" ⇒ 3 lệnh tick lần lượt cùng phamVi', async () => {
-    const buoc = await moBuoc()
-    moTam(buoc)
+  it('chọn bài ⇒ xem-truoc TỪNG LỚP chưa có bài, sbd chia đúng lớp; «Giao 1 bài cho 3 lớp» ⇒ 3 lệnh tick lần lượt cùng phamVi, hạn tự tính, không theLucNgay', async () => {
+    const hop = await moHop()
+    moTam(hop)
     await tichLop(/^12 - Lớp Thường/)
     await tichLop(/^12 - Nhóm 10 điểm/)
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy · 2/3 lớp'))
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã dạy · 1/3 lớp')
-    expect(dong(buoc, 'DH-12-C3-B8').textContent).toContain('Chưa dạy')
-    const cham = [...dong(buoc, 'DH-12-C1-B1').querySelectorAll('.bhn-cham-ds li[data-lop]')].map((li) => [li.getAttribute('data-lop'), li.textContent, li.getAttribute('aria-label')])
-    expect(cham).toEqual([
-      ['12 - Lớp Thường', 'Lớp Thường · Đã dạy 22/09', '12 - Lớp Thường: Đã dạy 22/09 · chứng chỉ 3/4'],
-      ['12 - Nhóm 10 điểm', 'Nhóm 10 điểm', '12 - Nhóm 10 điểm: Chưa dạy'], // lớp chưa dạy chỉ ghi tên (chấm xám), chữ đầy đủ ở aria-label
-      ['12 - Tinh Hoa', 'Tinh Hoa · Đã dạy 22/09', '12 - Tinh Hoa: Đã dạy 22/09 · chứng chỉ 3/4'],
-    ])
-    // Bài chưa lớp nào dạy ⇒ không có hàng chấm theo lớp (chip "Chưa dạy" đã đủ), dòng gọn như một lớp.
-    expect(dong(buoc, 'DH-12-C3-B8').querySelector('.bhn-cham-ds')).toBeNull()
+    await waitFor(() => expect(dongHop(hop, 'Bài 1. Ester').textContent).toContain('12 - Lớp Thường, 12 - Tinh Hoa đã có · còn 12 - Nhóm 10 điểm'))
+    expect(dongHop(hop, 'Bài 2. Lipid').textContent).toContain('12 - Tinh Hoa đã có · còn 12 - Lớp Thường, 12 - Nhóm 10 điểm')
+    // Bài 8 = bài gợi ý (sau bài đã giao xa nhất) ⇒ tick sẵn.
+    expect(oTick(hop, /Bài 8\. Amine/)!.checked).toBe(true)
+    expect(dongHop(hop, 'Bài 8. Amine').textContent).not.toContain('đã có')
 
-    fireEvent.click(within(dong(buoc, 'DH-12-C3-B8')).getByRole('radio'))
-    expect(dong(buoc, 'DH-12-C3-B8').textContent).toContain('Bài hôm nay')
-    await waitFor(() => expect(lenh('xem-truoc').length).toBe(3))
-    const xem = Object.fromEntries(lenh('xem-truoc').map((x) => [x.lop, x.sbd]))
-    expect(xem).toEqual({ '12 - Lớp Thường': ['L1', 'L2', 'L3', 'L4'], '12 - Nhóm 10 điểm': ['N1', 'N2'], '12 - Tinh Hoa': ['T1', 'T2', 'T3'] })
-
-    const the = buoc.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    await waitFor(() => expect(the.querySelectorAll('.bhn-xem-lop')).toHaveLength(3))
-    expect([...the.querySelectorAll('[data-khoi="giao-cho"] .bhn-lop-the')].map((e) => e.textContent)).toEqual(['12 - Lớp Thường · 4 em', '12 - Nhóm 10 điểm · 2 em', '12 - Tinh Hoa · 3 em'])
-    fireEvent.click(within(the).getByRole('button', { name: 'Giao Bài 8 cho 3 lớp' }))
+    await waitFor(() => expect(Object.keys(xemCuoi('DH-12-C3-B8')).sort()).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa']))
+    await waitFor(() => expect(Object.fromEntries(Object.entries(xemCuoi('DH-12-C3-B8')).map(([l, x]) => [l, x.sbd]))).toEqual({ '12 - Lớp Thường': ['L1', 'L2', 'L3', 'L4'], '12 - Nhóm 10 điểm': ['N1', 'N2'], '12 - Tinh Hoa': ['T1', 'T2', 'T3'] }))
+    const nut = await within(hop).findByRole('button', { name: 'Giao 1 bài cho 3 lớp · 9 em' }, { timeout: 4000 })
+    await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
+    fireEvent.click(nut)
     await waitFor(() => expect(lenh('tick')).toHaveLength(3))
     expect(lenh('tick').map((x) => x.lop)).toEqual(['12 - Lớp Thường', '12 - Nhóm 10 điểm', '12 - Tinh Hoa'])
     const phamVi = [
@@ -297,109 +297,116 @@ describe('màn: giao Bài cho nhiều lớp', () => {
       tenBai: 'Bài 8. Amine',
       viTri: 3,
       maDe: ['DH-12-C3-B8-TN', 'DH-12-C3-B8-DS'],
+      hanNop: '2026-10-12',
       sbd: ['T1', 'T2', 'T3'],
       phamVi,
     })
     for (const x of lenh('tick')) expect(x.phamVi).toEqual(phamVi)
-    // Giao xong: nạp lại trạng thái MỌI lớp, thẻ xác nhận đóng.
-    await waitFor(() => expect(document.querySelector('[data-khoi="xac-nhan-tick"]')).toBeNull())
+    // Giao xong: dòng xong nêu đủ lớp; bài vừa giao rời danh sách chọn.
+    await waitFor(() => expect(hop.textContent).toContain('Đã giao Bài 8 cho 9 em 3 lớp (12 - Lớp Thường, 12 - Nhóm 10 điểm, 12 - Tinh Hoa)'))
+    expect(oTick(hop, /Bài 8\. Amine/)!.checked).toBe(false)
+  })
+
+  it('nhiều lớp ⇒ mỗi lớp một hạn chung riêng: «Không giao cho vài em…» liệt kê hạn từng lớp; tick mỗi lớp gửi đúng hạn chung của lớp ấy', async () => {
+    const HAN: Record<string, { T: number; han: string }> = { '12 - Lớp Thường': { T: 12, han: '2026-10-17' }, '12 - Tinh Hoa': { T: 9, han: '2026-10-14' } }
+    const goc = goi.getMockImplementation()!
+    goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
+      const r = (await goc(duong, b)) as { ok: boolean; du: Record<string, unknown> }
+      if (duong !== '/gv/bai-da-day' || b.action !== 'xem-truoc') return r
+      const h = HAN[String(b.lop)]!
+      return { ...r, du: { ...r.du, hanChung: { M: 1, T: h.T, han: h.han, duKienXong: 2, tongEm: 3 }, doChuan: { dungO: 28, M: 1, thieuDS: 0 } } }
+    })
+    const hop = await moHop()
+    moTam(hop)
+    await tichLop(/^12 - Lớp Thường/)
+    await waitFor(() => expect(Object.keys(xemCuoi('DH-12-C3-B8')).sort()).toEqual(['12 - Lớp Thường', '12 - Tinh Hoa']))
+    const nut = await within(hop).findByRole('button', { name: 'Giao 1 bài cho 2 lớp · 7 em' }, { timeout: 4000 })
+    await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
+    // Ô «Hạn chung cả lớp» hiện số ngày của lớp đầu; từng lớp liệt kê ở «Không giao cho vài em…».
+    expect(hop.querySelectorAll('.cbm-o-so')[2]!.querySelector('b')!.textContent).toBe('12 ngày')
+    fireEvent.click(within(hop).getByRole('button', { name: /^Không giao cho vài em…/ }))
+    const ct = hop.querySelector('.cbm-ct') as HTMLElement
+    expect([...ct.querySelectorAll('p[data-lop]')].map((p) => p.textContent)).toEqual([
+      `Lớp 12 - Lớp Thường: hạn chung 12 ngày · hết ${hienHanNop('2026-10-17', false)}`,
+      `Lớp 12 - Tinh Hoa: hạn chung 9 ngày · hết ${hienHanNop('2026-10-14', false)}`,
+    ])
+    fireEvent.click(nut)
+    await waitFor(() => expect(lenh('tick')).toHaveLength(2))
+    expect(Object.fromEntries(lenh('tick').map((x) => [x.lop, x.hanNop]))).toEqual({ '12 - Lớp Thường': '2026-10-17', '12 - Tinh Hoa': '2026-10-14' })
+    for (const x of lenh('tick')) expect('theLucNgay' in x).toBe(false)
   })
 
   it('lớp ĐÃ có bài thì bị bỏ qua (không xem-truoc, không tick) và được ghi rõ; bài có ở MỌI lớp đã chọn ⇒ không chọn được', async () => {
-    const buoc = await moBuoc()
-    moTam(buoc)
+    const hop = await moHop()
+    moTam(hop)
     await tichLop(/^12 - Lớp Thường/)
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã dạy · 1/2 lớp'))
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('radio')) // Lớp Thường chưa có Bài 2, Tinh Hoa đã có
-    const the = buoc.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    await waitFor(() => expect(lenh('xem-truoc').map((x) => x.lop)).toEqual(['12 - Lớp Thường']))
-    expect(the.querySelector('[data-khoi="lop-da-co"]')?.textContent).toContain('12 - Tinh Hoa')
-    expect(within(the).getByRole('button', { name: 'Giao Bài 2 cho 12 - Lớp Thường' })).toBeTruthy()
-    // Bài 1 có ở cả hai lớp ⇒ radio khoá.
-    expect((within(dong(buoc, 'DH-12-C1-B1')).getByRole('radio') as HTMLInputElement).disabled).toBe(true)
+    await waitFor(() => expect(dongHop(hop, 'Bài 2. Lipid').textContent).toContain('12 - Tinh Hoa đã có · còn 12 - Lớp Thường'))
+    // Bỏ bài gợi ý (Bài 8) rồi chọn Bài 2: Lớp Thường chưa có, Tinh Hoa đã có.
+    fireEvent.click(oTick(hop, /Bài 8\. Amine/)!)
+    fireEvent.click(oTick(hop, /Bài 2\. Lipid/)!)
+    await waitFor(() => expect(Object.keys(xemCuoi('DH-12-C1-B2'))).toEqual(['12 - Lớp Thường']))
+    await new Promise((r) => setTimeout(r, 400)) // quá nhịp chờ gõ — Tinh Hoa vẫn không được hỏi
+    expect(Object.keys(xemCuoi('DH-12-C1-B2'))).toEqual(['12 - Lớp Thường'])
+    // Nút Giao đếm đúng số em sẽ nhận (chỉ lớp Thường, 4 em).
+    const nut = await within(hop).findByRole('button', { name: /^Giao 1 bài cho .* · 4 em$/ }, { timeout: 4000 })
+    await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
+    fireEvent.click(nut)
+    await waitFor(() => expect(lenh('tick')).toHaveLength(1))
+    expect(lenh('tick')[0]).toMatchObject({ lop: '12 - Lớp Thường', khoaBai: 'DH-12-C1-B2' })
+    // Bài 1 có ở cả hai lớp ⇒ gọn một dòng đã giao, không ô tick.
+    expect(oTick(hop, /Bài 1\. Ester/)).toBeNull()
+    expect(within(dongHop(hop, 'Bài 1. Ester')).getByRole('button', { name: 'Gỡ bài' })).toBeTruthy()
   })
 
-  it('một lớp bị máy chủ từ chối ⇒ các lớp khác VẪN giao; thẻ xác nhận giữ lại, lời lỗi ghi tên lớp; giao lại chỉ còn lớp lỗi', async () => {
+  it('một lớp bị máy chủ từ chối ⇒ các lớp khác VẪN giao; lời lỗi ghi tên lớp; bài còn chọn, giao lại chỉ còn lớp lỗi', async () => {
     tickLoi = new Set(['12 - Nhóm 10 điểm'])
-    const buoc = await moBuoc()
-    moTam(buoc)
+    const hop = await moHop()
+    moTam(hop)
     await tichLop(/^12 - Nhóm 10 điểm/)
-    fireEvent.click(within(dong(buoc, 'DH-12-C3-B8')).getByRole('radio'))
-    const the = buoc.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    await waitFor(() => expect(lenh('xem-truoc')).toHaveLength(2))
+    await waitFor(() => expect(Object.keys(xemCuoi('DH-12-C3-B8')).sort()).toEqual(['12 - Nhóm 10 điểm', '12 - Tinh Hoa']))
     // Mô phỏng máy chủ đã nhận Tinh Hoa: lần nạp lại danh-sach sau giao thấy Bài 8 ở Tinh Hoa (lớp lỗi vẫn chưa có).
     const goc = goi.getMockImplementation()!
     goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/bai-da-day' && b.action === 'tick' && b.lop === '12 - Tinh Hoa') daTick['12 - Tinh Hoa'] = ['DH-12-C1-B1', 'DH-12-C1-B2', 'DH-12-C3-B8']
       return goc(duong, b)
     })
-    fireEvent.click(within(the).getByRole('button', { name: 'Giao Bài 8 cho 2 lớp' }))
+    const nut = await within(hop).findByRole('button', { name: /^Giao 1 bài cho 2 lớp/ }, { timeout: 4000 })
+    await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
+    fireEvent.click(nut)
     await waitFor(() => expect(lenh('tick')).toHaveLength(2))
-    expect(await screen.findByText('12 - Nhóm 10 điểm: Lớp này đang có ca kiểm tra mở.')).toBeTruthy()
-    expect(document.querySelector('[data-khoi="xac-nhan-tick"]')).toBeTruthy()
-    // Lớp đã giao xong (Tinh Hoa) được nạp lại và tự rời danh sách giao; còn đúng lớp lỗi.
-    await waitFor(() => expect([...document.querySelectorAll('[data-khoi="giao-cho"] .bhn-lop-the')].map((e) => e.getAttribute('data-lop'))).toEqual(['12 - Nhóm 10 điểm']))
-    expect(within(document.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement).getByRole('button', { name: 'Giao Bài 8 cho 12 - Nhóm 10 điểm' })).toBeTruthy()
+    await new Promise((r) => setTimeout(r, 500)); console.log('GOLOI', hop.querySelector('[data-khoi="tom-tat-giao"]')?.textContent, '|ALERT|', [...hop.querySelectorAll('[role="alert"]')].map((x) => x.textContent))
+    expect(await within(hop).findByText(/12 - Nhóm 10 điểm: Lớp này đang có ca kiểm tra mở\./, {}, { timeout: 4000 })).toBeTruthy()
+    // Lớp đã giao xong (Tinh Hoa) được nạp lại; bài vẫn đang chọn cho lớp lỗi.
+    await waitFor(() => expect(dongHop(hop, 'Bài 8. Amine').textContent).toContain('12 - Tinh Hoa đã có · còn 12 - Nhóm 10 điểm'))
+    expect(oTick(hop, /Bài 8\. Amine/)!.checked).toBe(true)
+    tickLoi = new Set()
+    await waitFor(() => expect(nutGiao(hop).disabled).toBe(false))
+    fireEvent.click(nutGiao(hop))
+    await waitFor(() => expect(lenh('tick')).toHaveLength(3))
+    expect(lenh('tick')[2]).toMatchObject({ lop: '12 - Nhóm 10 điểm', khoaBai: 'DH-12-C3-B8' })
   })
 
-  it('"Bỏ tick" theo lớp trong "Bỏ tick theo lớp": gọi bo-tick đúng lớp + khoá bài', async () => {
-    const buoc = await moBuoc()
-    moTam(buoc)
+  it('«Gỡ bài» ở bài có ở nhiều lớp: hỏi lại TỪNG lớp; gọi bo-tick đúng lớp + khoá bài, «Giữ bài» ở lớp sau thì lớp ấy giữ', async () => {
+    const hop = await moHop()
+    moTam(hop)
     await tichLop(/^12 - Lớp Thường/)
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy · 2/2 lớp'))
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByText('Bỏ tick theo lớp'))
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B1')).getByRole('button', { name: 'Bỏ tick · 12 - Lớp Thường' }))
-    const hop = await screen.findByRole('alertdialog')
-    expect(hop.textContent).toContain('lớp 12 - Lớp Thường')
-    fireEvent.click(within(hop).getByRole('button', { name: 'Bỏ tick' }))
+    await waitFor(() => expect(oTick(hop, /Bài 1\. Ester/)).toBeNull()) // Bài 1 có ở cả hai lớp ⇒ dòng đã giao
+    fireEvent.click(within(dongHop(hop, 'Bài 1. Ester')).getByRole('button', { name: 'Gỡ bài' }))
+    let hoi = await screen.findByRole('alertdialog')
+    expect(hoi.textContent).toContain('lớp 12 - Lớp Thường')
+    fireEvent.click(within(hoi).getByRole('button', { name: 'Bỏ tick' }))
     await waitFor(() => expect(lenh('bo-tick')).toEqual([{ action: 'bo-tick', lop: '12 - Lớp Thường', khoaBai: 'DH-12-C1-B1' }]))
+    hoi = await screen.findByRole('alertdialog')
+    expect(hoi.textContent).toContain('lớp 12 - Tinh Hoa')
+    fireEvent.click(within(hoi).getByRole('button', { name: 'Giữ bài' }))
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
+    expect(lenh('bo-tick')).toHaveLength(1)
   })
 })
 
 describe('bố cục máy tính / xoay ngang (thầy 06/10: "làm cho màn hình xoay ngang và máy tính nữa")', () => {
-  it('cột phải (aside) chứa ô chờ chọn bài, chọn bài xong thì chứa thẻ xác nhận', async () => {
-    const buoc = await moBuoc()
-    const aside = buoc.querySelector('aside[data-khoi="bai-hom-nay-the"]') as HTMLElement
-    expect(aside.querySelector('[data-khoi="cho-chon-bai"]')).toBeTruthy()
-    expect(aside.querySelector('[data-khoi="xac-nhan-tick"]')).toBeNull()
-    fireEvent.click(within(dong(buoc, 'DH-12-C3-B8')).getByRole('radio'))
-    await waitFor(() => expect(aside.querySelector('[data-khoi="xac-nhan-tick"]')).toBeTruthy())
-    expect(aside.querySelector('[data-khoi="cho-chon-bai"]')).toBeNull()
-  })
-
-  it('xếp dọc: chọn bài ⇒ cuộn MƯỢT tới đầu thẻ xác nhận (nằm dưới cây); thẻ đã thấy sẵn (hai cột, dính) ⇒ không cuộn; giảm chuyển động ⇒ cuộn tức thì; mỗi bài một lần', async () => {
-    const cuon = vi.fn()
-    const gocCuon = (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView
-    const gocMedia = window.matchMedia
-    ;(Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = cuon
-    let top = 2000
-    const rect = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
-      return { top: this.getAttribute('data-khoi') === 'xac-nhan-tick' ? top : 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0, toJSON: () => ({}) } as DOMRect
-    })
-    try {
-      const buoc = await moBuoc()
-      fireEvent.click(within(dong(buoc, 'DH-12-C3-B8')).getByRole('radio'))
-      await waitFor(() => expect(cuon).toHaveBeenCalledTimes(1))
-      expect(cuon).toHaveBeenLastCalledWith({ behavior: 'smooth', block: 'start' })
-      // Thẻ đã nằm trong tầm nhìn (cột phải dính) ⇒ chọn bài khác không cuộn.
-      cuon.mockClear()
-      top = 100
-      fireEvent.click(within(dong(buoc, 'DH-12-C3-B9')).getByRole('radio'))
-      await waitFor(() => expect(buoc.querySelector('[data-khoi="xac-nhan-tick"]')?.textContent).toContain('Bài 9. Amino acid'))
-      expect(cuon).not.toHaveBeenCalled()
-      // Giảm chuyển động ⇒ cuộn tức thì.
-      window.matchMedia = ((q: string) => ({ matches: /reduce/.test(q), media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia
-      top = 2000
-      fireEvent.click(within(dong(buoc, 'DH-12-C3-B10')).getByRole('radio'))
-      await waitFor(() => expect(cuon).toHaveBeenCalledTimes(1))
-      expect(cuon).toHaveBeenLastCalledWith({ behavior: 'auto', block: 'start' })
-    } finally {
-      rect.mockRestore()
-      window.matchMedia = gocMedia
-      if (gocCuon) (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = gocCuon
-      else delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView
-    }
-  })
+  // Bỏ theo thầy 09/11 (docs/ban-ve-giao-bai-0911): test «cột phải (aside) chứa ô chờ chọn bài, chọn bài xong thì chứa thẻ xác nhận» và «xếp dọc: chọn bài ⇒
+  // cuộn MƯỢT tới đầu thẻ xác nhận…» — bố cục hai cột + thẻ xác nhận là của bước «Bài hôm nay» trong bảng Dạy học, đã bỏ (hộp Giao bài có thanh tóm tắt riêng).
 
   it('kiểu dáng: khung chứa của container query là .bhn-ngoai (container query KHÔNG đổi kiểu chính khung chứa ⇒ lưới hai cột đặt ở .bhn-khung con); có ngưỡng hai cột và gọn khi nằm ngang thấp', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/components/day-hoc/bai-hom-nay.css'), 'utf8')

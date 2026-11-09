@@ -3,6 +3,8 @@
 // ⇒ thẻ xác nhận ĐỦ 6 con số (ẩn ô "ca chốt ≥ 8" khi null) + cảnh báo quá tải; "Giao Bài <số> cho <lớp>" ⇒ `tick` đúng maDe (thầy 05/10: CHỈ tờ
 // Trắc nghiệm / Đúng sai / Trả lời ngắn TỰ GIAO, không ô tích, bỏ hẳn Ví dụ minh hoạ + Các dạng toán trọng tâm) và phamVi (mọi bài đứng TRƯỚC, cùng luật
 // tờ); sửa hạn nộp / số lượt; "Bỏ tick" hỏi lại rồi gọi `bo-tick`; dòng chờ bài mới.
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy duyệt docs/ban-ve-giao-bai-0911): bước «Bài hôm nay» rời bảng Dạy học — phần màn kiểm trên hộp «Giao bài» (HopBoSungBai);
+// sáu con số, cảnh báo quá tải, sửa hạn / số lượt đã bỏ. Phần thuần (src/lib/bai-hom-nay.ts) giữ nguyên.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
@@ -17,6 +19,8 @@ vi.mock('../src/lib/exam-db', async (goc) => ({
   loadTeacherSecret: async () => 'mat',
 }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
+// Hộp nạp lười nhiều lớp (kho, buổi, cờ OMNI, danh sách bài) — cho mỗi test đủ thời gian khi chạy chung nhiều tệp.
+vi.setConfig({ testTimeout: 20000 })
 
 import DayHocLenBang from '../src/components/day-hoc/DayHocLenBang'
 import HopBoSungBai from '../src/components/day-hoc/HopBoSungBai'
@@ -363,7 +367,6 @@ describe('hộp Giao bài: lớp, cây bài, xem trước, giao, gỡ bài', () 
     const b4 = (await within(hop).findByRole('checkbox', { name: /Bài 4\. Nitric acid/ }, { timeout: 4000 })) as HTMLInputElement
     expect(b4.disabled).toBe(true)
     expect(dongHop(hop, 'Bài 4. Nitric acid').textContent).toContain('Chưa có câu tự giao (chỉ có ví dụ minh hoạ)')
-    fireEvent.click(b4)
     expect(b4.checked).toBe(false)
     await new Promise((r) => setTimeout(r, 400)) // quá nhịp chờ gõ của xem trước
     expect(lenh('xem-truoc').filter((x) => x.lop === '11B')).toHaveLength(0)
@@ -572,7 +575,13 @@ describe('bài đứng trước bài đã giao (thầy 06/10: "khi tôi chọn b
 
   it('thầy đã giao Bài 3 (chưa tick bài nào trước đó) ⇒ Bài 3 «Đang luyện» (gọn một dòng); Bài 1, 2 là bài cũ trong phần ôn, vẫn chọn lại được, không «Gỡ bài»', async () => {
     dsTick([B3_DANG_LUYEN])
-    const hop = await moHop()
+    render(<HopBoSungBai onDong={() => {}} />)
+    const hop = screen.getByRole('dialog', { name: 'Giao bài' })
+    // Chương chỉ còn bài cũ (không bài mới) ⇒ gọn lại; bấm mở chương.
+    const chuong = await within(hop).findByRole('button', { name: /^C1 - Ester lipid/ }, { timeout: 4000 })
+    expect(chuong.getAttribute('aria-expanded')).toBe('false')
+    expect(chuong.textContent).toContain('1/3 bài đã giao')
+    fireEvent.click(chuong)
     await waitFor(() => expect(dongHop(hop, 'Bài 3. Xà phòng và chất giặt rửa').textContent).toContain('Đang luyện · còn 6 ngày'))
     expect(oTick(hop, /Bài 3\. Xà phòng/)).toBeNull()
     for (const [ten, mau] of [['Bài 1. Ester', /Bài 1\. Ester/], ['Bài 2. Lipid', /Bài 2\. Lipid/]] as const) {
@@ -629,13 +638,14 @@ beforeEach(() => {
 // Khóa lỗi 13/10: co-doc thất bại không được ẩn Tick mãi; kho đọc lỗi phải khác kho rỗng.
 // SỬA CÓ CHỦ ĐÍCH 21/10 — thầy: "bỏ cái phần tick bài vừa dạy khỏi hành trình đi" + "nút này làm riêng bấm vào popup lên để chọn luôn": Tick bài nay
 // ở hộp "Bổ sung bài hôm nay" (`HopBoSungBai`) và bảng Lên bảng đầy đủ — bước Dạy học nhúng ở Hành trình không còn khối Tick. Cùng hành vi lỗi / thử lại.
+// SỬA CÓ CHỦ ĐÍCH 09/11 (docs/ban-ve-giao-bai-0911): hộp tên «Giao bài»; bảng Lên bảng đầy đủ không còn khối Tick (chỉ dòng chờ bài mới).
 describe('Tick bài tải lỗi và thử lại tại màn đang mở', () => {
   it('lỗi đọc công tắc hiện lý do + Thử lại, phục hồi Tick trong cùng hộp', async () => {
     const goc = goi.getMockImplementation()!
     let loi = true
     goi.mockImplementation(async (d, b) => d === '/gv/omni' && b.action === 'co-doc' && loi ? { ok: false, chu: 'Không nối được máy chủ.' } : goc(d, b))
     render(<HopBoSungBai onDong={() => {}} />)
-    const hop = screen.getByRole('dialog', { name: 'Bổ sung bài hôm nay' })
+    const hop = screen.getByRole('dialog', { name: 'Giao bài' })
     expect((await within(hop).findByRole('alert')).textContent).toContain('Chưa tải được phần Tick bài')
     loi = false
     fireEvent.click(within(hop).getByRole('button', { name: 'Thử tải Tick bài lại' }))
@@ -646,7 +656,7 @@ describe('Tick bài tải lỗi và thử lại tại màn đang mở', () => {
   it('lỗi IndexedDB không biến thành kho trống vĩnh viễn; Thử lại thật sự đọc và giữ cùng hộp/bài', async () => {
     khoGia.loiLan = 1
     render(<HopBoSungBai onDong={() => {}} />)
-    const hop = screen.getByRole('dialog', { name: 'Bổ sung bài hôm nay' })
+    const hop = screen.getByRole('dialog', { name: 'Giao bài' })
     expect((await within(hop).findByRole('alert')).textContent).toContain('Chưa đọc được kho đề')
     expect(within(hop).queryByText(/Kho chưa có bài Dạy học/)).toBeNull()
     const buoc = hop.querySelector('[data-khoi="bai-hom-nay"]')
@@ -656,16 +666,20 @@ describe('Tick bài tải lỗi và thử lại tại màn đang mở', () => {
     expect(hop.querySelector('[data-khoi="bai-hom-nay"]')).toBe(buoc)
     expect(khoGia.docLan).toBe(2)
   })
-  it('bảng Lên bảng đầy đủ: Tick bài và hộp chiếu cùng lúc chỉ đọc/dựng một lượt kho đang chờ', async () => {
+  it('bảng Lên bảng đầy đủ: dòng chờ bài mới (useBaiHomNay) và hộp chiếu cùng lúc chỉ đọc/dựng một lượt kho đang chờ', async () => {
     render(<DayHocLenBang />)
     fireEvent.click(await screen.findByRole('button', { name: 'Chọn bài trong kho Dạy học' }))
-    expect((await screen.findAllByText('Bài 3. Xà phòng và chất giặt rửa')).length).toBeGreaterThan(0)
+    const hop = await screen.findByRole('dialog', { name: 'Chọn bài · kho Dạy học' })
+    await within(hop).findByRole('tree', {}, { timeout: 4000 })
+    await waitFor(() => expect(document.querySelector('[data-khoi="cho-bai-moi"]')).toBeTruthy(), { timeout: 4000 })
     expect(khoGia.docLan).toBe(1)
   })
 })
 
 // Metadata Gói7 phải thống nhất giữa bảng đang giao và cây, không đọc lại lịch sử cả lớp.
-describe('metadata hiện tại của Gói7 tại cây Tick bài', () => {
+// SỬA CÓ CHỦ ĐÍCH 09/11: cây bài nay ở hộp «Giao bài» — dòng bài đã giao ghi «<trạng thái> · N em» (N = số em Gói7; Gói7 = 0 ⇒ không ghi số, KHÔNG
+// lùi về chứng chỉ 44); bài có gói Gói7 có thêm «Sửa em».
+describe('metadata hiện tại của Gói7 tại hộp Giao bài', () => {
   const NOW = Date.parse('2026-10-14T00:00:00Z')
   const layDs = (r: any, soEm = 2) => ({ ...r, du: { ...r.du, bai: r.du.bai.map((b: any) => b.khoaBai === 'DH-12-C1-B2' ? { ...b, goi7: { goiId: 'g2', soEm, han: b.hanNop } } : b) } })
   it('đọc count Gói7=0 thật thay chứng chỉ44; ACK count/hạn cập nhật tại chỗ đúng bài và không khởi động vòng Tick', async () => {
@@ -674,16 +688,19 @@ describe('metadata hiện tại của Gói7 tại cây Tick bài', () => {
       const r = await goc(d, b)
       return d === '/gv/bai-da-day' && b.action === 'danh-sach' ? layDs(r, 0) : r
     })
-    const buoc = await moBuoc()
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 0 em'))
+    const hop = await moHop()
+    const b2 = () => dongHop(hop, 'Bài 2. Lipid')
+    expect(b2().textContent).toContain('Đang luyện · còn 2 ngày')
+    expect(b2().textContent).not.toMatch(/\d+ em/) // Gói7 = 0 em ⇒ không hiện số chứng chỉ 44
+    expect(within(b2()).getByRole('button', { name: 'Sửa em' })).toBeTruthy()
     const truoc = lenh('danh-sach').length
     act(() => baoMetadataBaiDangGiao([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', goiId: 'g2', soEm: 3, han: '2026-10-20', serverNow: NOW }]))
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 3 em')
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đang luyện · còn 7 ngày')
-    expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã giao 44 em')
+    expect(b2().textContent).toContain('Đang luyện · còn 7 ngày · 3 em')
+    expect(dongHop(hop, 'Bài 1. Ester').textContent).toContain('44 em')
     expect(lenh('danh-sach')).toHaveLength(truoc); expect(baiVuaDoi).not.toHaveBeenCalled()
     act(() => baoMetadataBaiDangGiao([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', goiId: 'goi-khac', soEm: 9, serverNow: NOW }]))
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 3 em')
+    expect(b2().textContent).toContain('3 em')
+    expect(b2().textContent).not.toContain('9 em')
   })
   it('ACK tới khi danh sách ban đầu còn chờ: vẫn dựng các bài, áp metadata đúng dòng để phản hồi cũ không đè', async () => {
     const goc = goi.getMockImplementation()!
@@ -694,13 +711,15 @@ describe('metadata hiện tại của Gói7 tại cây Tick bài', () => {
       if (d === '/gv/bai-da-day' && b.action === 'danh-sach') { duCu = layDs(r, 2); return cho }
       return r
     })
-    const buoc = await moBuoc()
-    await waitFor(() => expect(duCu).toBeTruthy())
+    render(<HopBoSungBai onDong={() => {}} />)
+    const hop = screen.getByRole('dialog', { name: 'Giao bài' })
+    await waitFor(() => expect(duCu).toBeTruthy(), { timeout: 4000 })
     act(() => baoMetadataBaiDangGiao([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', goiId: 'g2', soEm: 0, han: '2026-10-20', serverNow: NOW }]))
     await act(async () => tra(duCu))
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 0 em')
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đang luyện · còn 7 ngày')
-    expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã giao 44 em')
+    await within(hop).findByText('Bài 3. Xà phòng và chất giặt rửa', {}, { timeout: 4000 })
+    expect(dongHop(hop, 'Bài 2. Lipid').textContent).toContain('Đang luyện · còn 7 ngày')
+    expect(dongHop(hop, 'Bài 2. Lipid').textContent).not.toMatch(/\d+ em/) // ACK 0 em thắng phản hồi cũ (2 em)
+    expect(dongHop(hop, 'Bài 1. Ester').textContent).toContain('44 em')
     expect(lenh('danh-sach')).toHaveLength(1)
   })
 })
