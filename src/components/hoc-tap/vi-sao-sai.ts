@@ -16,6 +16,7 @@ const KHOA = 'ddh.lyDoSai'
 const TOI_DA_GUI = 20 // một lệnh nộp mang tối đa 20 lý do (hàng dài hơn ⇒ các lệnh sau mang tiếp)
 const daChon = new Map<string, LyDoSai>() // lý do em đã chạm, chưa gửi (qid → lý do)
 const cho = new Set<string>() // câu sai đang hiện dải, em chưa chạm lý do
+const chuaChac = new Set<string>() // câu sửa em bật «Chưa chắc» (khối B lát 5), dùng một lần lúc nộp
 const nghe = new Set<() => void>()
 let ban = 0
 let daNap = false
@@ -41,11 +42,6 @@ export function chonLyDoSai(qid: string, ly: LyDoSai): void {
 }
 /** Có câu sai đang hiện mà em chưa chạm lý do ⇒ «Tiếp tục» (nút / phím Enter) chưa đi. */
 export const choLyDoSai = (): boolean => cho.size > 0
-// «CHƯA CHẮC» (khối B lát 5, bản vẽ dt-sang-5): chip trên câu SỬA trước khi «Kiểm tra» (mặc định Chắc). Bật ⇒ lệnh nộp câu ấy mang `tuTin: 'chua_chac'`; máy chủ
-// (ly-do-sai.ts ghiChuaChac) đánh dấu câu sửa làm đúng mà chưa chắc ⇒ ngày Sửa sau xếp lại; làm đúng và chắc ⇒ xoá dấu.
-const chuaChac = new Set<string>()
-export function datChuaChac(qid: string, bat: boolean): void { if (bat) chuaChac.add(qid); else chuaChac.delete(qid); bao() }
-export const useChuaChac = (qid: string): boolean => { useSyncExternalStore(dangKy, () => ban, () => 0); return chuaChac.has(qid) }
 /** Phần THÊM của thân lệnh nộp câu: `{ ly: [[qid, lý do], …] }` (vắng hàng ⇒ {}) + `tuTin: 'chua_chac'` nếu em bật chip cho câu `qid` (đọc là dùng hết). */
 export function thanLyDoSai(qid?: string): { ly?: [string, LyDoSai][]; tuTin?: 'chua_chac' } {
   nap()
@@ -59,6 +55,10 @@ export function daGuiLyDoSai(gui: { ly?: [string, LyDoSai][] }): void {
   luu()
 }
 const dangKy = (f: () => void) => { nghe.add(f); return () => { nghe.delete(f) } }
+// «CHƯA CHẮC» (khối B lát 5, bản vẽ dt-sang-5): chip trên câu SỬA trước khi «Kiểm tra» (mặc định Chắc). Bật ⇒ lệnh nộp câu ấy mang `tuTin: 'chua_chac'`; máy chủ
+// (ly-do-sai.ts ghiChuaChac) đánh dấu câu sửa làm đúng mà chưa chắc ⇒ ngày Sửa sau xếp lại; làm đúng và chắc ⇒ xoá dấu.
+export function datChuaChac(qid: string, bat: boolean): void { if (bat) chuaChac.add(qid); else chuaChac.delete(qid); bao() }
+export const useChuaChac = (qid: string): boolean => { useSyncExternalStore(dangKy, () => ban, () => 0); return chuaChac.has(qid) }
 /** Nút «Tiếp tục» đọc: còn câu chờ lý do không. */
 export const useChoLyDoSai = (): boolean => useSyncExternalStore(dangKy, () => cho.size > 0, () => false)
 /** Lý do em đã chạm cho câu (đọc lại khi kho đổi). */
