@@ -42,6 +42,16 @@ body {
    * thiếu nét thật. Chữ bị bóp giả làm dấu tiếng Việt lệch khỏi thân chữ. */
   font-synthesis: none;
   overflow-x: hidden;
+  /* 10/11 thầy «Tắt bôi đen chữ, copy chữ trên toàn app hs gv và ph cho chuyên nghiệp»: không bôi đen / giữ-chạm hiện menu ở cả 3 app.
+   * Ô nhập vẫn chọn / sửa chữ được (iPhone cần khai lại, nếu không ô nhập không gõ được); nút «Sao chép» dùng clipboard nên vẫn chạy. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+input, textarea, [contenteditable] {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
 }
 
 .khung-noi-dung {
