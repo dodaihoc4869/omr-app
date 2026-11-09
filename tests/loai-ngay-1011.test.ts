@@ -41,8 +41,8 @@ describe('chonLoaiNgay7 (luật thuần)', () => {
   it('hết câu mới: còn lỗi ⇒ Sửa; không còn gì ⇒ không gắn loại; trước mốc / ngày kiểm tra nhẹ ⇒ không gắn loại', () => {
     expect(chonLoaiNgay7({ ...co, soMoiCon: 0, soSua: 1, truoc: [] })).toBe('sua')
     expect(chonLoaiNgay7({ ...co, soMoiCon: 0, soSua: 0 })).toBeNull()
-    expect(chonLoaiNgay7({ ...co, ngay: '2026-11-09' })).toBeNull()
-    expect(NGAY_LOAI_NGAY).toBe('2026-11-10')
+    expect(chonLoaiNgay7({ ...co, ngay: '2026-11-08' })).toBeNull()
+    expect(NGAY_LOAI_NGAY).toBe('2026-11-09') // thầy 09/11 «áp dụng luôn»
     expect(chonLoaiNgay7({ ...co, kiemNhe: true })).toBeNull()
   })
   it('chonGoi7 ngày Sửa: câu sửa không bị giới hạn ⅓ mức; ngày thường giữ giới hạn', () => {
@@ -89,14 +89,24 @@ describe('lapGoi7 theo loại ngày (từ 10/11)', () => {
     expect(lap!.plan.viec).toHaveLength(28)
     expect(loaiDaGhi(k)).toContainEqual({ ngay: '2026-11-10', loai: 'sua' })
   })
+  it('áp dụng giữa ngày (thầy «áp dụng luôn»): em đã chốt mức 28 trước khi có loại ngày ⇒ lần mở kế ghi loại riêng và kế hoạch theo loại ngay', async () => {
+    const k = await kho()
+    k.d.sql.prepare('INSERT INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES(?,?,?,?,?,?,?)').run('S1', '2026-11-10', 1, 24, 12, 28, 'x')
+    const lap = await lapGoi7(k.env, 'S1', NOW)
+    expect(lap!.loaiNgay).toBe('moi')
+    expect(lap!.toiThieu).toBe(28)
+    expect(lap!.plan.viec.every(v => v.vai === 'moi' || v.vai === 'tiep_can')).toBe(true)
+    await new Promise((r) => setTimeout(r, 0))
+    expect(loaiDaGhi(k)).toEqual([{ ngay: '2026-11-10', loai: 'moi' }])
+  })
   it('loại đã chốt trong ngày giữ nguyên dù số lỗi đổi giữa ngày', async () => {
     const k = await kho()
     ghiLoai(k, '2026-11-10', 'sua')
     expect((await lapGoi7(k.env, 'S1', NOW))!.loaiNgay).toBe('sua')
   })
-  it('ngày trước mốc (09/11): không gắn loại, không ghi bảng loại ngày — kế hoạch như cũ', async () => {
+  it('ngày trước mốc (08/11): không gắn loại, không ghi bảng loại ngày — kế hoạch như cũ', async () => {
     const k = await kho()
-    const t = Date.parse('2026-11-09T02:00:00Z')
+    const t = Date.parse('2026-11-08T02:00:00Z')
     vi.setSystemTime(t)
     const lap = await lapGoi7(k.env, 'S1', t)
     expect(lap!.loaiNgay).toBeNull()

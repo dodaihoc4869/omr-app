@@ -34,9 +34,9 @@ export const mucUocGoi7 = (ngay: string, toiThieuTang: number, tongQuota: number
 /** LOẠI NGÀY (khối B đợt 1 — thầy 09/11 duyệt bản vẽ docs/ban-ve-moi-on-sua-0911 «duyệt, build và đẩy lên bản sống luôn»): mỗi em mỗi ngày là NGÀY HỌC MỚI
  *  (28 câu mới của bài đúng ma trận; thiếu câu mới mới lấp bằng sửa / ôn) hoặc NGÀY SỬA LỖI (câu em sai trước, không giới hạn ⅓ như ngày thường; thiếu thì
  *  ôn rồi câu mới cho đủ 28). Chốt MỘT lần ở lần mở đầu ngày (bảng `goi_bai_7_loai_ngay`, cùng lô với dòng mức 28), mọi lần sau đọc lại ⇒ không đổi giữa ngày.
- *  Từ `NGAY_LOAI_NGAY` (10/11) — ngày trước giữ nguyên kế hoạch cũ (không đổi bài các em đang làm tối 09/11). Ngày Kiểm tra ôn tập: app vẫn hiện nhãn riêng. */
+ *  Từ `NGAY_LOAI_NGAY` — thầy 09/11 «áp dụng luôn» ⇒ ngay hôm nay (em đã chốt mức hôm nay: loại ghi riêng ở lần mở kế, chặng đang làm giữ nguyên câu). */
 export type LoaiNgay7 = 'moi' | 'sua'
-export const NGAY_LOAI_NGAY = '2026-11-10'
+export const NGAY_LOAI_NGAY = '2026-11-09'
 /** Ngày sửa lỗi khi em có từ chừng này câu sai đang chờ sửa (≈ nửa ngày) và hai ngày có loại gần nhất đều là học mới — «cứ 2 ngày Mới chen 1 ngày Sửa». */
 export const SO_LOI_NGAY_SUA = 12
 export const laLoaiNgay7 = (v: unknown): v is LoaiNgay7 => v === 'moi' || v === 'sua'
