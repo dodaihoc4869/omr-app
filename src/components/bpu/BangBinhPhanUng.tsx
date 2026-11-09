@@ -163,7 +163,12 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   const xinToanMan = useCallback(() => { try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }, [])
   useEffect(() => {
     xinToanMan()
-    const lai = (e: Event) => { if (e instanceof KeyboardEvent && (e.key === 'Escape' || e.key.toLowerCase() === 'f')) return; if (!document.fullscreenElement) xinToanMan() }
+    // 09/11: bảng đã Đóng (ẩn) / chạm nút Đóng ⇒ không xin toàn màn hình.
+    const lai = (e: Event) => {
+      if (e instanceof KeyboardEvent && (e.key === 'Escape' || e.key.toLowerCase() === 'f')) return
+      if (document.documentElement.hasAttribute('data-bpu-an') || (e.target instanceof Element && e.target.closest('.bb-dong'))) return
+      if (!document.fullscreenElement) xinToanMan()
+    }
     window.addEventListener('pointerdown', lai, true)
     window.addEventListener('keydown', lai, true)
     return () => { window.removeEventListener('pointerdown', lai, true); window.removeEventListener('keydown', lai, true) }
