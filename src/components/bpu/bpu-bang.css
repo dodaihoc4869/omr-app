@@ -132,7 +132,7 @@ html.may-yeu .bpu-bang .bb-o.cung-doi::before{ animation: none; opacity: 0.5; }
 .bpu-bang .bb-vua{ grid-column: 1 / -1; align-self: end; display: grid; gap: 10px; }
 .bpu-bang .bb-vua .nhan{ font-size: 22px; font-weight: 800; color: var(--tr-chu-3); letter-spacing: 0.06em; text-transform: uppercase; }
 .bpu-bang .bb-vua-hang{ display: flex; align-items: center; gap: 16px; height: 62px; padding: 0 20px; border-radius: 18px; background: var(--tr-mat); box-shadow: inset 6px 0 0 var(--doi), inset 0 0 0 2px var(--tr-vien); font-size: 28px; white-space: nowrap; }
-.bpu-bang .bb-vua-hang b{ min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.bpu-bang .bb-vua-hang b{ min-width: 0; overflow: hidden; white-space: nowrap; } /* 10/11: không «…» — vua-chu.ts thu cỡ chữ */
 .bpu-bang .bb-vua-hang .chip{ padding: 2px 12px; border-radius: 10px; background: var(--doi); color: var(--p-muc); font-size: 20px; font-weight: 800; }
 .bpu-bang .bb-vua-hang .gio{ margin-left: auto; color: var(--tr-chu-3); font-size: 22px; font-variant-numeric: tabular-nums; }
 .bpu-bang .bb-vua-hang .cong{ color: var(--tr-dung-chu); font-weight: 800; font-size: 22px; }
@@ -160,7 +160,7 @@ html.may-yeu .bpu-bang .bb-o.cung-doi::before{ animation: none; opacity: 0.5; }
 .bpu-bang .bb-top h3{ margin: 0 0 6px; font-size: 32px; }
 .bpu-bang .bb-top-hang{ display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 14px; height: 66px; padding: 0 22px; border-radius: 18px; background: var(--tr-mat); box-shadow: inset 6px 0 0 var(--doi), inset 0 0 0 2px var(--tr-vien); font-size: 28px; }
 .bpu-bang .bb-top-hang .h{ font-weight: 800; color: var(--tr-chu-3); text-align: center; }
-.bpu-bang .bb-top-hang .t{ font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bpu-bang .bb-top-hang .t{ font-weight: 700; white-space: nowrap; overflow: hidden; }
 .bpu-bang .bb-top-hang .d{ font-weight: 800; font-variant-numeric: tabular-nums; }
 /* Gọi lên bảng */
 .bpu-bang .bb-mo-den{ position: absolute; left: 0; right: 0; top: 0; bottom: 250px; background: color-mix(in srgb, var(--tr-nen) 62%, transparent); z-index: 5; }
@@ -195,7 +195,7 @@ html.may-yeu .bpu-bang .bb-o.cung-doi::before{ animation: none; opacity: 0.5; }
 .bpu-bang .bb-lb .ng{ flex: none; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); font-size: 40px; font-weight: 900; box-shadow: 0 0 30px var(--doi); }
 .bpu-bang .bb-lb .chu{ min-width: 0; }
 .bpu-bang .bb-lb .mat{ font-size: 20px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tr-chu-3); }
-.bpu-bang .bb-lb .chu b{ display: block; font-size: 40px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bpu-bang .bb-lb .chu b{ display: block; font-size: 40px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; }
 .bpu-bang .bb-lb .chu span{ font-size: 22px; color: var(--tr-chu-2); font-weight: 700; }
 .bpu-bang .bb-lb .viet{ border-radius: 24px; border: 3px dashed var(--tr-vien-2); display: grid; place-items: center; color: var(--tr-chu-3); font-size: 26px; text-align: center; padding: 20px; }
 .bpu-bang .bb-lb .dai{ display: flex; align-items: center; gap: 16px; padding: 12px 18px; border-radius: 18px; background: var(--tr-mat-2); font-size: 22px; color: var(--tr-chu-2); white-space: nowrap; }
@@ -292,7 +292,7 @@ html.may-yeu .bpu-bang *{ animation: none !important; transition: none !importan
 .bpu-bang .bb-goc .ng{ flex: none; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); font-size: 28px; font-weight: 900; box-shadow: 0 0 22px var(--doi); }
 .bpu-bang .bb-goc .chu{ flex: 1; min-width: 0; display: grid; gap: 2px; }
 .bpu-bang .bb-goc .mat{ font-size: 15px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: color-mix(in srgb, var(--giay) 60%, transparent); }
-.bpu-bang .bb-goc .chu b{ font-size: 32px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bpu-bang .bb-goc .chu b{ font-size: 32px; font-weight: 900; line-height: 1.1; white-space: nowrap; overflow: hidden; }
 .bpu-bang .bb-goc .doi{ font-size: 17px; font-weight: 700; color: var(--doi); }
 .bpu-bang .bb-goc .ts{ flex: none; display: grid; justify-items: center; min-width: 108px; padding: 6px 12px; border-radius: 18px; background: color-mix(in srgb, var(--doi) 22%, transparent); }
 .bpu-bang .bb-goc .ts b{ font-size: 48px; font-weight: 900; line-height: 1; color: var(--doi); font-variant-numeric: tabular-nums; text-shadow: 0 0 18px var(--doi); }
@@ -374,7 +374,7 @@ html.may-yeu .bpu-bang .bb-canh{ animation: none; }
   background: var(--tr-sai); color: var(--tr-chieu-giay); box-shadow: 0 0 0 0.6vmin color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent), 0 2vmin 8vmin color-mix(in srgb, var(--tr-sai) 60%, transparent);
   animation: bpu-bao-chay-the 0.9s cubic-bezier(.3, 1.4, .5, 1) both, bpu-bao-chay-rung 1.4s ease-in-out 0.9s infinite; font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif; }
 .bpu-bao-chay-the b { font-size: clamp(22px, 2.6vw, 48px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
-.bpu-bao-chay-the strong { font-size: clamp(44px, 6.4vw, 128px); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; word-break: break-word; }
+.bpu-bao-chay-the strong { font-size: clamp(44px, 6.4vw, 128px); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; overflow-wrap: break-word; text-wrap: balance; }
 .bpu-bao-chay-the > span:last-child { font-size: clamp(18px, 1.9vw, 36px); font-weight: 600; opacity: 0.92; }
 .bpu-bao-chay-the .coi { width: clamp(44px, 5vw, 96px); height: clamp(44px, 5vw, 96px); border-radius: 50%; background: var(--tr-chieu-giay); box-shadow: 0 0 0 1vmin color-mix(in srgb, var(--tr-chieu-giay) 35%, transparent);
   -webkit-mask: radial-gradient(circle, transparent 30%, black 31%); mask: radial-gradient(circle, transparent 30%, black 31%); animation: bpu-bao-chay 0.5s steps(2, jump-none) infinite alternate; }
@@ -387,3 +387,7 @@ html.may-yeu .bpu-bao-chay::before, html.may-yeu .bpu-bao-chay-the, html.may-yeu
 .bpu-bang .bb-o.roi .nhan-roi { background: var(--tr-sai); color: var(--giay); }
 /* Esc ra Hôm nay (09/11): phiên tạm ẩn ⇒ không phủ báo cháy lên Hôm nay (bảng hiện lại ⇒ báo lại nếu em còn ở ngoài). */
 html[data-bpu-an] .bpu-bao-chay { display: none; }
+/* 10/11 thầy «chọn câu xong phải hiện ngay màn đua, không hiện tờ chiếu cũ trước» · «bấm Đóng lộ tờ một nhịp»: bảng đang ở trên ⇒ lớp phủ tờ chiếu
+   (KhungXemPhieu, cổng thẳng vào body) ẩn hẳn, vẫn chạy ngầm; chỉ lộ khi bảng thu vào tờ lúc em lên bảng (gan-gv `cheTo`). */
+html[data-bpu-che-to] .lop-xem-phieu { visibility: hidden; }
+.bpu-bang .bb-tren .bb-ve-chon{ color: var(--tr-chu-2); } /* 10/11 «Chọn câu khác» (C) trên màn đua */

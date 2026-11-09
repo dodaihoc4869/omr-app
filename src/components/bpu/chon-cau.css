@@ -8,6 +8,7 @@
 .bcc-dau p { margin: 0; flex: 1; font-size: 24px; color: var(--tr-chu-2); }
 .bcc-dong, .bcc-khoi button, .bcc-cho button { min-height: 56px; padding: 0 22px; border: 0; border-radius: 16px; background: var(--tr-mat-2); color: var(--tr-chu); font: 600 22px var(--sans); cursor: pointer; box-shadow: inset 0 0 0 2px var(--tr-vien); }
 .bcc-dong { display: inline-flex; align-items: center; gap: 12px; }
+.bcc-ve { color: var(--tr-chu-2); } /* 10/11 «Về màn đua» / «Về điểm danh» — «Đóng» bên cạnh ra thẳng Hôm nay */
 .bcc kbd { font: 700 17px var(--sans); padding: 2px 9px; border-radius: 8px; background: var(--tr-mat-3); color: var(--tr-chu-2); }
 .bcc-trai { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 16px; min-height: 0; padding: 22px; border-radius: 30px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); }
 .bcc-loc { display: grid; gap: 14px; }

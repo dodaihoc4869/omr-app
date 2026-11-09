@@ -10,12 +10,13 @@ export function boLuoi(n: number, day = DAY_LUOI): Luoi {
   const so = Math.max(1, n), cot = so <= 12 ? Math.max(8, so) : Math.ceil(so / 2), hang = Math.ceil(so / cot), h = CAO_O
   return { cot, hang, w: (RONG_LUOI - (cot - 1) * KHE) / cot, h, top: day - (hang * h + (hang - 1) * KHE) }
 }
-/** Tên gọi trên ô: chữ cuối của họ tên («Đỗ Đại Học» ⇒ «Học»); trùng trong lớp ⇒ hai chữ cuối («Minh Anh»); vẫn trùng ⇒ thêm số thứ tự. */
+/** TÊN GỌI trên ô (chỗ chật): HAI chữ cuối của họ tên («Đỗ Đại Học» ⇒ «Đại Học») — thầy 10/11 «dải đội hiện mỗi "Học" … không cụt một chữ», nhất quán
+ *  với Bảng vàng (`tenNgan`); trùng trong lớp ⇒ cả họ tên; vẫn trùng ⇒ thêm số thứ tự. Tên một chữ ⇒ giữ nguyên; tên rỗng ⇒ số báo danh. */
 export function tenGoiLop(ds: { sbd: string; ten: string }[]): Map<string, string> {
   const chu = (t: string) => t.trim().split(/\s+/).filter(Boolean)
   const dem = (f: (t: string[]) => string) => { const m = new Map<string, number>(); for (const e of ds) { const k = f(chu(e.ten)).toLowerCase(); m.set(k, (m.get(k) ?? 0) + 1) } return m }
-  const mot = (t: string[]) => t[t.length - 1] ?? '', hai = (t: string[]) => t.slice(-2).join(' ')
-  const d1 = dem(mot), d2 = dem(hai), ra = new Map<string, string>()
-  ds.forEach((e, i) => { const t = chu(e.ten); const a = mot(t); if (!a) { ra.set(e.sbd, e.sbd); return } if ((d1.get(a.toLowerCase()) ?? 0) < 2) { ra.set(e.sbd, a); return } const b = hai(t); ra.set(e.sbd, (d2.get(b.toLowerCase()) ?? 0) < 2 ? b : `${b} ${i + 1}`) })
+  const hai = (t: string[]) => t.slice(-2).join(' '), du = (t: string[]) => t.join(' ')
+  const d2 = dem(hai), dd = dem(du), ra = new Map<string, string>()
+  ds.forEach((e, i) => { const t = chu(e.ten); const a = hai(t); if (!a) { ra.set(e.sbd, e.sbd); return } if ((d2.get(a.toLowerCase()) ?? 0) < 2) { ra.set(e.sbd, a); return } const b = du(t); ra.set(e.sbd, (dd.get(b.toLowerCase()) ?? 0) < 2 ? b : `${b} ${i + 1}`) })
   return ra
 }

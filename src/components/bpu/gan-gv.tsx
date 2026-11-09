@@ -22,7 +22,9 @@ let nghiDen = 0
 let nhanCham: ((dat: boolean) => void) | null = null
 /** MỘT GỐC BẢNG (09/11): điểm danh → chọn câu → các lượt dùng CHUNG một bảng (một nối phòng, không dựng lại, không chớp «Đang mở…»).
  *  Props hiện tại của bảng; lần vẽ sau GỘP vào (mã điểm danh đổi mỗi phút không đè câu đang chiếu). */
-let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean; diemDanh?: boolean } | null = null
+let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean; diemDanh?: boolean; bo?: boolean } | null = null
+/** (10/11) Câu thầy vừa chọn ở bảng chọn câu khi đang có lượt ⇒ lượt mới của ĐÚNG câu ấy bỏ lượt dở cũ (không chấm, không cộng / trừ kJ). */
+let boQid = ''
 /** Gốc + khung của tấm buổi dạy (TamHoatDong) và của tờ chiếu dựng từ câu chọn trên bảng. */
 /** Esc ra Hôm nay: phiên đang tạm ẩn (xem `tamAnTatCa`). */
 let tamAn = false
@@ -103,6 +105,7 @@ function veBang(): void {
   if (!hien) return
   ngheEsc()
   if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
+  cheTo(!tamAn && !bangAn())
   goc!.render(
     <BangBinhPhanUng
       key={hien.buoiId}
@@ -132,7 +135,9 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   // Bảng đang lui sau tấm buổi dạy (Kiểm tra đầu giờ / Chữa câu…) mà tờ của khối ấy vừa báo câu ⇒ bảng hiện lại với câu đó.
   if (anViHd) { anViHd = false; hienBang() }
   const cung = hien?.buoiId === buoiId
-  hien = { ...(cung ? { ma: hien!.ma, linkQr: hien!.linkQr } : {}), buoiId, qid, luot: dem, giay: o.giay, tuDong }
+  const bo = !!boQid && boQid === qid
+  if (bo) boQid = ''
+  hien = { ...(cung ? { ma: hien!.ma, linkQr: hien!.linkQr } : {}), buoiId, qid, luot: dem, giay: o.giay, tuDong, bo }
   veBang()
   // Màn Hành trình (bước «Chọn câu & chiếu») nghe để sang bước «Đang chiếu».
   try { window.dispatchEvent(new CustomEvent('bpu-dang-chieu', { detail: { buoiId } })) } catch { /* trình duyệt cũ */ }
@@ -158,10 +163,22 @@ export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?:
 export function phienDangCo(): { buoiId: string; tamAn: boolean } | null { return hien && khung ? { buoiId: hien.buoiId, tamAn } : null }
 function phatPhien(): void { try { window.dispatchEvent(new CustomEvent('bpu-phien', { detail: phienDangCo() })) } catch { /* trình duyệt cũ */ } }
 const caKhung = () => [khung, toKhung, hdKhung].filter((x): x is HTMLDivElement => !!x)
+const TEN_TO = 'Tờ chiếu Bình Phản Ứng'
+/** Mọi lớp phủ tờ chiếu đang có (KhungXemPhieu cổng thẳng vào body): tờ dựng từ bảng chọn câu + tờ của màn khác đang nối bảng. */
+const lopTo = () => [...document.querySelectorAll<HTMLElement>('.lop-xem-phieu')]
+/** Lớp phủ tờ đã ẩn lúc Esc / Đóng ra Hôm nay ⇒ hiện lại khi vào lại đúng chỗ dở. */
+let anTam: HTMLElement[] = []
+function traAnTam(): void { for (const el of anTam) if (el.isConnected) { el.style.visibility = ''; el.style.pointerEvents = '' } anTam = [] }
+/** CHE TỜ KHI BẢNG Ở TRÊN (thầy 10/11): tờ chiếu cũ nằm dưới bảng chỉ lộ ra lúc em lên bảng (bảng thu) — chọn câu / chuyển câu / Esc không lộ tờ
+ *  một nhịp nào. CSS ở bpu-bang.css (nạp cùng bảng); tờ vẫn chạy ngầm (báo câu, dựng thẻ tên) vì visibility không dừng trang trong khung. */
+function cheTo(che: boolean): void { document.documentElement.toggleAttribute('data-bpu-che-to', che) }
 function tamAnTatCa(): void {
   if (!khung || tamAn) return
   tamAn = true
-  for (const el of caKhung()) { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none' }
+  // 10/11 thầy «bấm Đóng lộ tờ chiếu cũ một nhịp rồi mới tới Hôm nay»: tờ (KhungXemPhieu) cổng THẲNG vào body, không nằm trong `toKhung` ⇒ ẩn cả lớp phủ
+  // tờ ngay trong nhịp này (bảng, tờ, tấm cùng lúc; không hoạt ảnh thu bảng). Nhớ để hiện lại đúng chỗ dở.
+  for (const el of [...caKhung(), ...lopTo()]) if (el.style.visibility !== 'hidden') { el.style.visibility = 'hidden'; el.style.pointerEvents = 'none'; if (!(caKhung() as HTMLElement[]).includes(el)) anTam.push(el) }
+  cheTo(false)
   document.documentElement.setAttribute('data-bpu-an', '')
   document.body.style.overflow = '' // khung tờ khoá cuộn trang khi mở ⇒ trả lại cho Hôm nay
   window.removeEventListener('keydown', phimKhiAn, true)
@@ -174,6 +191,8 @@ function tamAnTatCa(): void {
 function hienLaiTatCa(): void {
   tamAn = false
   document.documentElement.removeAttribute('data-bpu-an')
+  traAnTam()
+  cheTo(!bangAn())
   for (const el of [toKhung, hdKhung]) if (el) { el.style.visibility = ''; el.style.pointerEvents = '' }
   if (toKhung) document.body.style.overflow = 'hidden'
   const dangLenBang = !!khung?.hasAttribute('data-an')
@@ -227,8 +246,12 @@ export async function chieuCau(ds: CauDayHoc[]): Promise<string> {
   const { default: KhungXemPhieu } = await import('../KhungXemPhieu')
   nghiDen = 0
   tiepNgay = true // thầy vừa chọn câu = ý muốn rõ ⇒ gửi NGAY (cùng khung tờ cũ thì không coi là «tờ mới»)
+  // 10/11 thầy «chọn câu khác ⇒ bắt đầu lượt mới và xoá lượt câu cũ»: đang có lượt ⇒ lượt mới của câu này bỏ lượt dở (máy chủ giữ lượt đã mở đáp án).
+  boQid = hien?.qid ? ds[0]!.qid : ''
   if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
-  toGoc!.render(<KhungXemPhieu html={html} ten="Tờ chiếu Bình Phản Ứng" dong={() => (khung ? tamAnTatCa() : dongTo())} />)
+  // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
+  toGoc!.render(<KhungXemPhieu html={html} ten={TEN_TO} dong={() => (khung ? tamAnTatCa() : dongTo())} />)
+  requestAnimationFrame(() => { if (khung && !bangAn()) khung.querySelector<HTMLElement>('.bpu-bang')?.focus() })
   return ''
 }
 /** Phím G trên bảng: đóng bảng, tờ mở lời giải thu gọn của câu đang chiếu (bảng che tờ nên phím không tới được tờ). */
@@ -253,6 +276,7 @@ export function nhanGiai(html: string): void { const f = choGiai; choGiai = null
 /** Bảng ⇒ tờ: sang câu sau (d = 1) / câu trước (d = -1). */
 export function toiCau(d: 1 | -1): void {
   nghiDen = 0
+  boQid = ''
   tiepNgay = true
   try { nguonTo?.postMessage({ nguon: 'bpu-bang', lenh: 'toi', d }, '*') } catch { /* tờ đã đóng */ }
 }
@@ -261,8 +285,9 @@ export function baoHetCau(d: 1 | -1): void {
   useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
 export function dongBang(): void {
-  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null; tamAn = false
+  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null; tamAn = false; boQid = ''
   document.documentElement.removeAttribute('data-bpu-an')
+  traAnTam(); cheTo(false) // bảng đóng (lùi về tờ: G, câu không gửi được…) ⇒ tờ hiện như thường
   try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
   phatPhien()
   window.removeEventListener('keydown', phimKhiAn, true)
@@ -285,6 +310,7 @@ function anBang(): void {
   const el = khung
   if (!el) return
   el.setAttribute('data-an', '')
+  cheTo(false) // tờ lộ ra ngay dưới bảng đang thu
   window.addEventListener('keydown', phimKhiAn, true)
   if (!toTrongTrang() || giamChuyenDong()) { baoAnHien(true); anHan(el); return }
   el.classList.remove('bpu-no')
@@ -305,7 +331,9 @@ function hienBang(): void {
   window.removeEventListener('keydown', phimKhiAn, true)
   el.classList.remove('bpu-thu')
   baoAnHien(false)
-  if (!giamChuyenDong()) { el.classList.add('bpu-san', 'bpu-no'); const bo = () => el.classList.remove('bpu-no', 'bpu-san'); el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 700) }
+  // Tờ còn hiện dưới bảng đang phóng; phóng xong mới che lại (bảng đã kín màn).
+  const che = () => { if (khung === el && !bangAn() && !tamAn) cheTo(true) }
+  if (!giamChuyenDong()) { el.classList.add('bpu-san', 'bpu-no'); const bo = () => { el.classList.remove('bpu-no', 'bpu-san'); che() }; el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 700) } else che()
   hienHan(el)
   el.querySelector<HTMLElement>('.bpu-bang')?.focus()
 }

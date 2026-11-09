@@ -18,6 +18,7 @@ export const JS_LEN_BANG_BPU = `
     var t = the.querySelector('.mc-ten'); if (t) t.textContent = String(em.ten || em.sbd || '');
     var s = the.querySelector('.mc-sbd'); if (s) s.textContent = String(em.sbd || '');
     var cs = the.querySelector('.mc-cau-so'); if (cs) cs.style.display = 'none';
+    theTen(the);
     S.bpuLen = { sbd: String(em.sbd || '') };
     if (window.__mcVaoLai) window.__mcVaoLai();
     luaDoi(d, em); // sau __mcVaoLai (vào lại đợt phát 'mc-vao-dot' ⇒ xoá lửa cũ)
@@ -28,6 +29,7 @@ export const JS_LEN_BANG_BPU = `
       the.hidden = false;
       var mauThe = String(em.mau || '').trim();
       if (mauThe && /^[#a-z0-9(),.%\\s-]+$/i.test(mauThe)) { the.style.setProperty('--bpu-doi', mauThe); the.classList.add('bpu-the-ton'); }
+      vuaThe(the); // trước khi đo chỗ bay: thẻ đã đúng cỡ cuối
       try {
         var r = the.getBoundingClientRect(), dx = window.innerWidth / 2 - (r.left + r.width / 2), dy = window.innerHeight / 2 - (r.top + r.height / 2);
         var lang = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('may-yeu');
@@ -41,6 +43,25 @@ export const JS_LEN_BANG_BPU = `
       return;
     }
     if (window.__mcLenBang) window.__mcLenBang();
+    vuaThe(the);
+    if (window.requestAnimationFrame) requestAnimationFrame(function () { vuaThe(the); });
+  }
+  // 10/11 thầy «thẻ tên co vừa với tên, đẹp, chuyên nghiệp — thẻ chỉ hiện "Đỗ…"» (luật chung của tờ cắt tên một dòng bằng «…» trong ô hẹp):
+  // thẻ của Bình Phản Ứng ÔM SÁT tên (bề ngang theo chữ, giữa cột), chỉ còn tên đầy đủ một dòng; tên dài hơn cột ⇒ thu cỡ chữ tới khi vừa, không «…».
+  var CSS_THE = '.mc-em.bpu-the{display:flex!important;align-items:center;justify-content:center;gap:clamp(10px,1vw,18px);justify-self:center;align-self:start;width:fit-content!important;max-width:100%!important;min-width:0!important;box-sizing:border-box;margin-left:auto!important;margin-right:auto!important;padding:clamp(8px,.8vw,16px) clamp(22px,2.2vw,44px)!important;text-align:center}'
+    + '.mc-em.bpu-the .mc-em-trai,.mc-em.bpu-the .mc-em-hang1,.mc-em.bpu-the .mc-ten-hang{display:flex!important;align-items:center;justify-content:center;gap:.4em;flex:0 1 auto!important;min-width:0!important;max-width:100%;width:auto!important}'
+    + '.mc-em.bpu-the .mc-ten{display:block;flex:none;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal!important;max-width:none!important;font-size:var(--bpu-co,clamp(30px,3vw,60px))!important;font-weight:800!important;line-height:1.15!important;letter-spacing:-.01em}'
+    + '.mc-em.bpu-the .mc-phu,.mc-em.bpu-the .mc-xem-ct,.mc-em.bpu-the .mc-thu,.mc-em.bpu-the .mc-ls{display:none!important}';
+  function theTen(the) {
+    if (!document.getElementById('bpu-the-css')) { var st = document.createElement('style'); st.id = 'bpu-the-css'; st.textContent = CSS_THE; document.head.appendChild(st); }
+    the.classList.add('bpu-the');
+  }
+  /** Thu cỡ chữ tên tới khi thẻ (chạm mép cột) chứa trọn tên; thẻ đang ẩn (chưa đo được) thì thôi — lần hiện sau đo lại. */
+  function vuaThe(the) {
+    var t = the && the.querySelector('.mc-ten'); if (!t || the.hidden || !the.clientWidth) return;
+    the.style.removeProperty('--bpu-co');
+    var co = parseFloat(getComputedStyle(t).fontSize) || 40, i = 0;
+    while (the.scrollWidth > the.clientWidth + 1 && co > 16 && i++ < 80) { co -= 1; the.style.setProperty('--bpu-co', co + 'px'); }
   }
   // 09/11 thầy «học sinh đội nào lên bảng thì có ngọn lửa đội đó cháy ở góc đề siêu đẹp … đủ to để cả lớp phải wow»: ngọn lửa màu đội (mã màu bảng gửi)
   // nằm ở góc phải trên của đề (float — chữ đề chảy quanh, không bị che), lõi sáng, tia lửa bay lên; chấm xong / sang đợt khác thì tắt.
