@@ -74,6 +74,8 @@ export const JS_LEN_BANG_BPU = `
     v.insertBefore(w, v.firstChild);
   }
   document.addEventListener('mc-vao-dot', xoaLua);
+  // 09/11 Esc một lần ⇒ app ra Hôm nay (đang có phiên Bình Phản Ứng); tờ dùng riêng (không phiên) ⇒ app bỏ qua tin.
+  document.addEventListener('keydown', function (e) { if (e.key !== 'Escape') return; try { var app = dichApp(); if (app) app.postMessage({ nguon: 'to-chieu', loai: 'bpu-esc' }, '*'); } catch (x) { /* app đã đóng */ } }, true);
   document.addEventListener('click', function (e) {
     var n = S.bpuLen && CHAM && e.target && e.target.closest ? e.target.closest(CHAM + '-nut') : null;
     if (!n) return;

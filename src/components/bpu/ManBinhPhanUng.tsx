@@ -25,6 +25,8 @@ export const ROI_MAN_MS = 0 // 09/11 (lần 4) thầy «cảnh báo … phải t
 /** Mất tiêu điểm (cửa sổ nổi / bong bóng / chia đôi màn hình — app vẫn hiện nhưng em đang chạm ứng dụng khác) lâu hơn ngần này ⇒ báo rời. Ngắn để tức thì,
  *  đủ nuốt nháy tiêu điểm của hộp hệ thống chớp qua. */
 export const NOI_MS = 350
+/** Ẩn app lâu hơn ngần này (mà trang không bị đóng băng — không phải tắt màn hình) ⇒ báo rời. */
+export const TAT_MAN_MS = 450
 
 type Tin = { t: string; [k: string]: unknown }
 const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
@@ -212,8 +214,15 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   useEffect(() => {
     if (!dangChoi) return
     const bao = (laNoi: boolean) => { setNoi(laNoi); setVuaRoi(true); if (daBaoRoi.current) return; daBaoRoi.current = true; gui({ t: 'roi' }) }
+    // 09/11 (lần 5) thầy «chỉ tắt màn hình mới không báo thôi, còn thoát app, cửa sổ nổi, chia màn hình báo tức thì»: ẩn app ⇒ chờ RẤT ngắn (TAT_MAN_MS) rồi báo.
+    // Tắt màn hình: trình duyệt ĐÓNG BĂNG trang ngay ⇒ hẹn giờ không chạy đúng hạn (chạy trễ khi mở màn — lúc ấy trang đã hiện lại / độ trễ lớn) ⇒ KHÔNG báo.
+    // Chuyển app khác: trang còn chạy ⇒ hẹn giờ chạy đúng hạn ⇒ báo. (Màn tự tắt vì để lâu thì không xảy ra: màn giữ sáng bằng Wake Lock bên dưới.)
+    let henAn: ReturnType<typeof setTimeout> | undefined
     const doi = () => {
-      if (document.hidden) bao(false) // TỨC THÌ (09/11 lần 4)
+      clearTimeout(henAn)
+      if (!document.hidden) return
+      const t0 = performance.now()
+      henAn = setTimeout(() => { if (document.hidden && performance.now() - t0 < TAT_MAN_MS + 900) bao(false) }, TAT_MAN_MS)
     }
     // CỬA SỔ NỔI (thầy 09/11 «phát hiện được cả ứng dụng nổi lên trên»): app vẫn hiện (không có visibilitychange) nhưng tiêu điểm sang app nổi ⇒ blur.
     // Còn mất tiêu điểm sau NOI_MS ⇒ báo rời; lấy lại tiêu điểm ⇒ `ve` (nghe ở hiệu ứng «về lại màn» bên dưới).
@@ -228,8 +237,19 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     try { window.history.pushState({ bpu: 1 }, '') } catch { /* trình duyệt cũ */ }
     const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
     window.addEventListener('popstate', giuLai)
-    return () => { clearTimeout(henNoi); window.removeEventListener('blur', matTieuDiem); window.removeEventListener('focus', coTieuDiem); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
+    return () => { clearTimeout(henAn); clearTimeout(henNoi); window.removeEventListener('blur', matTieuDiem); window.removeEventListener('focus', coTieuDiem); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
   }, [gui, dangChoi])
+  // GIỮ MÀN SÁNG (09/11): trong Bình Phản Ứng màn máy em không tự tắt vì để lâu (tránh báo nhầm); em tự bấm tắt màn ⇒ không báo (xem trên).
+  useEffect(() => {
+    if (!dangChoi) return
+    type KhoaMan = { release: () => Promise<void> }
+    const nav = navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<KhoaMan> } }
+    let khoa: KhoaMan | null = null, dung = false
+    const xin = () => { if (dung || document.hidden || !nav.wakeLock) return; void nav.wakeLock.request('screen').then((k) => { if (dung) void k.release(); else khoa = k }).catch(() => {}) }
+    xin()
+    document.addEventListener('visibilitychange', xin)
+    return () => { dung = true; document.removeEventListener('visibilitychange', xin); void khoa?.release().catch(() => {}) }
+  }, [dangChoi])
 
   // Toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho khi có thao tác của em; không hỗ trợ ⇒ bỏ qua).
   const xinToanMan = () => { try { const d = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> }; if (!document.fullscreenElement && d.requestFullscreen) void d.requestFullscreen().catch(() => {}) } catch { /* bỏ qua */ } }

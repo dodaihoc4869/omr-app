@@ -369,7 +369,11 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     setDangGoi(true)
     // Em báo «chưa biết làm» KHÔNG bị gọi (thầy 07/11: khuyến khích thành thật); cả lớp đều chưa biết ⇒ gọi trong cả lớp như cũ.
     const kbSet = new Set(lc.chuaBiet ?? [])
-    const tatCa = v.ds.filter((e) => e.vao && !lc.roiMe.includes(e.sbd) && !boQua.includes(e.sbd))
+    // 09/11 (ảnh thầy: 1 em đã gửi mà «Chưa có em nào có mặt để gọi lên bảng»): chỉ bỏ qua em ĐANG ở ngoài app (`roiNay`), không bỏ em từng rời rồi quay lại;
+    // bỏ hết mà không còn ai ⇒ vẫn gọi trong mọi em có mặt.
+    const dangRoi = new Set(((v as { roiNay?: string[] }).roiNay ?? []))
+    const coMat0 = v.ds.filter((e) => e.vao && !boQua.includes(e.sbd))
+    const tatCa = coMat0.some((e) => !dangRoi.has(e.sbd)) ? coMat0.filter((e) => !dangRoi.has(e.sbd)) : coMat0
     const ungVien = tatCa.some((e) => !kbSet.has(e.sbd)) ? tatCa.filter((e) => !kbSet.has(e.sbd)) : tatCa
     const m = await layEmChieu([lc.qid], ungVien.map((e) => e.sbd), new Set(ungVien.map((e) => e.sbd)), v.lop, boQua.length ? new Map([[lc.qid, new Set(boQua)]]) : undefined, { kenh: 'bpu' } as never).catch(() => new Map())
     const list = (m.get(lc.qid) ?? []) as { sbd: string; loai: 'da_dung' | 'du_bao' | 'chua_co'; soSai?: number; soLan14?: number; lanCuoiLenBang?: string | null }[]

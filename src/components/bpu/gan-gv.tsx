@@ -85,8 +85,23 @@ const khongMo = (chu: string, caPhong: boolean) => { dongBang(); if (caPhong) ng
 const tatBpu = () => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }
 const dangKyCham = (f: ((dat: boolean) => void) | null) => { nhanCham = f }
 const toiQuaTo = (d: 1 | -1) => toiCau(d)
+// ESC MỘT LẦN Ở BẤT KỲ ĐÂU ⇒ RA HÔM NAY (thầy 09/11 «khi bấm esc thoát hẳn ra màn hôm nay ở bất kì chỗ nào, hiện tại phải bấm rất nhiều lượt»):
+// nghe ở pha BẮT (trước mọi bảng / bảng chọn / tấm) — bỏ qua các lớp con; tờ chiếu trong khung (iframe) báo Esc qua tin `bpu-esc` (nghe-to-chieu.ts).
+let daNgheEsc = false
+function ngheEsc(): void {
+  if (daNgheEsc || typeof window === 'undefined') return
+  daNgheEsc = true
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && escRaHomNay()) { e.preventDefault(); e.stopImmediatePropagation() } }, true)
+}
+/** Esc: có phiên đang hiện ⇒ tạm ẩn cả phiên (giữ chỗ dở) + về Hôm nay; chỉ có tấm buổi dạy mở từ Hôm nay ⇒ đóng tấm. Trả true nếu đã xử lý. */
+export function escRaHomNay(): boolean {
+  if (khung && !tamAn) { tamAnTatCa(); return true }
+  if (!khung && hdKhung) { dongHoatDong(); return true }
+  return false
+}
 function veBang(): void {
   if (!hien) return
+  ngheEsc()
   if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
   goc!.render(
     <BangBinhPhanUng
@@ -179,6 +194,7 @@ export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | 
 export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
   const { default: Tam } = await import('./TamHoatDong')
   if (!hdKhung) { hdKhung = document.createElement('div'); hdKhung.setAttribute('data-bpu-hd', ''); document.body.appendChild(hdKhung); hdGoc = createRoot(hdKhung) }
+  ngheEsc()
   hdGoc!.render(<Tam key={hd} hd={hd} coBang={!!khung} onDong={dongHoatDong} />)
   if (khung && !bangAn()) { anViHd = true; anBang() }
 }

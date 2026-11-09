@@ -184,7 +184,13 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     const tieuDiem = vi.spyOn(document, 'hasFocus').mockImplementation(() => !an)
     try {
       // 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app ⇒ `roi` NGAY (không chờ 2 giây)
+      // 09/11 (lần 5): ẩn app ⇒ báo sau ~0,45 s (trang còn chạy = chuyển app); hiện lại trước hạn (tắt màn rồi mở / chớp) ⇒ KHÔNG báo
       an = true; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+      an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+      await act(async () => { await new Promise((r) => setTimeout(r, 600)) })
+      expect(coTin(ws, 'roi')).toBe(0)
+      an = true; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+      await act(async () => { await new Promise((r) => setTimeout(r, 600)) })
       expect(coTin(ws, 'roi')).toBe(1)
       an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
       expect(coTin(ws, 've')).toBe(1)
