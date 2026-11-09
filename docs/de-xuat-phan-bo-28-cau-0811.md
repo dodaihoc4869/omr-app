@@ -1,5 +1,7 @@
 # ĐỀ XUẤT v4 — Lịch 28 câu/ngày: làm HẾT câu mới, SỬA HẾT, ÔN TOÀN DIỆN, tính riêng từng em (08/11/2026)
 
+> **ĐÃ THAY bởi `docs/de-xuat-28-cau-v5-0911.md` (09/11).** Giữ để tra lịch sử.
+
 Trạng thái: **ĐỀ XUẤT, CHƯA BUILD.** Thay v1–v3. Thầy chốt 08/11: mọi em làm hết câu mới, sửa hết, ôn hết ⇒ bỏ khung bậc A/B/C và kho bù của v3.
 Nguồn ma trận: blueprint thầy gửi 08/11 (mã đề 0326 & 0339). Bằng chứng: `docs/de-xuat-28-cau-mo-phong/` (giả lập từng câu, từng ngày).
 **Cách chọn câu Ôn, số ngày Ôn và quy trình Sửa: theo `docs/de-xuat-on-sua-0811.md` (thay mục 1 Ôn/Sửa, mục 3 R và phương án A/B ở dưới).** Chu kỳ = M ngày Mới + ngân sách Ôn (1 ngày/bài) + S ngày Sửa. Bảng số ngày mục 4 dưới đây tính khi CHƯA có quên (tỉ lệ đúng cố định); kiểm tải có tính quên ở tài liệu Ôn/Sửa cho em khá ~10–11 ngày, em yếu ~18 ngày một bài 112 câu (giả định).

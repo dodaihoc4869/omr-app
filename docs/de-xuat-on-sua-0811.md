@@ -1,5 +1,7 @@
 # ĐỀ XUẤT — ÔN BÀI CŨ & SỬA CÂU SAI theo bằng chứng nghiên cứu (08/11/2026)
 
+> **ĐÃ THAY bởi `docs/de-xuat-28-cau-v5-0911.md` (09/11).** Giữ để tra lịch sử.
+
 Trạng thái: **ĐỀ XUẤT, CHƯA BUILD.** Thay phần Ôn / Sửa trong `docs/de-xuat-phan-bo-28-cau-0811.md` (v4); phần câu mới, 28 câu/ngày, ma trận giữ nguyên.
 
 ## 1. Thế giới làm thế nào (đã đối chiếu nguồn)
