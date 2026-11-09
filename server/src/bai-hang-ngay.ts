@@ -25,7 +25,7 @@ import { CAU_TOI_THIEU } from './hanh-trinh-ngay'
 import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
 import { SQL_KHONG_LAM_LAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
-import { mucNgayGoi7 } from './goi-bai-7-loi'
+import { mucUocGoi7 } from './goi-bai-7-loi'
 import { SQL_TC } from './lam-lai-so'
 import { idDaLam } from './hanh-trinh-nguon-cau'
 import { tachSongSinh } from './loi-hoc-luat'
@@ -123,7 +123,7 @@ export function mucCuaNgay(ngay: string, cheDo: CheDoNgay, chot: readonly ChotNg
   if (cheDo === 'goi7') {
     const c = goi7?.chot
     if (c && c.muc > 0) return { muc: c.muc, tang: c.tang, nguon: 'da-chot', uoc: false }
-    return { muc: mucNgayGoi7(CAU_TOI_THIEU[1], goi7?.quota ?? 0), tang: 1, nguon: 'uoc-goi7', uoc: true }
+    return { muc: mucUocGoi7(ngay, CAU_TOI_THIEU[1], goi7?.quota ?? 0), tang: 1, nguon: 'uoc-goi7', uoc: true }
   }
   const dung = chot.find((c) => c.ngay === ngay)
   if (dung && dung.toiThieu > 0) return { muc: dung.toiThieu, tang: dung.tang, nguon: 'da-chot', uoc: false }

@@ -6,7 +6,7 @@
 //   2. Mức hôm nay khác 28 của em CHƯA đủ mức ⇒ xoá dòng chốt để lần mở kế tiếp chốt lại 28. Em đã đủ mức giữ nguyên.
 // Không xoá sổ trả lời, không đổi điểm. Có ca thi mở ⇒ không làm gì, không đánh dấu (lần phát hành sau chạy lại). Đánh dấu cau_hinh 'phan_lai_0911' ⇒ chỉ một lần.
 import type { Env } from '../server/src/kieu'
-import { hanChungLop } from '../server/src/han-chung'
+import { hanChung, docNangLucLop, type NangLucEm } from '../server/src/han-chung'
 import { suaHanCacGoi } from '../server/src/goi-bai-7-thay'
 import { sqlTenLopHs } from '../server/src/goi-bai-7'
 import { congNgay7, ngayVn7 } from '../server/src/goi-bai-7-loi'
@@ -22,21 +22,33 @@ export async function phanLai0911(env: Env, now: number): Promise<Record<string,
   if (Number(ca?.n) > 0) return { phanLai0911: 'hoan-co-ca-mo' }
   const goi = (await env.DB.prepare(`SELECT g.id,g.lop,g.bat_dau,g.han,(SELECT COUNT(*) FROM goi_bai_7_cau c WHERE c.goi_id=g.id AND COALESCE(json_extract(c.meta_json,'$.hopLe'),1)<>0) so_cau
     FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.han>=?`).bind(ngay).all<Row>()).results
-  const theoLop = new Map<string, string[]>()
+  // Năng lực đọc MỘT lần mỗi lớp (bớt lượt REST, bớt nguy cơ D1 429), rồi `hanChung` thuần cho từng gói.
+  const theoLop = new Map<string, (NangLucEm | null)[]>()
   const doi: { goiId: string; lop: string; hanCu: string; hanMoi: string; T: number }[] = [], loi: string[] = []
   for (const g of goi) {
     const lop = String(g.lop), soCau = Number(g.so_cau) || 0
     if (!soCau) continue
-    if (!theoLop.has(lop)) theoLop.set(lop, (await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa'`).bind(lop).all<{ sbd: string }>()).results.map((x) => x.sbd))
-    const hc = await hanChungLop(env, theoLop.get(lop)!, soCau, now)
+    if (!theoLop.has(lop)) {
+      const sbds = (await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa'`).bind(lop).all<{ sbd: string }>()).results.map((x) => x.sbd)
+      theoLop.set(lop, await docNangLucLop(env, sbds, now))
+    }
+    const hc = hanChung(soCau, theoLop.get(lop)!)
     const hanMoi = [String(g.han), congNgay7(String(g.bat_dau), hc.T - 1)].sort().at(-1)!
     if (hanMoi === String(g.han)) continue
     try { await suaHanCacGoi(env, [{ goiId: String(g.id), hanCu: String(g.han) }], hanMoi, now); doi.push({ goiId: String(g.id), lop, hanCu: String(g.han), hanMoi, T: hc.T }) }
     catch (e) { loi.push(`${String(g.id)}: ${e instanceof Error ? e.message : String(e)}`) }
   }
+  // TỰ LÀNH: ngoài Worker lô lệnh chạy TỪNG câu — hỏng giữa chừng (D1 429) có thể đã đổi goi_bai_7.han mà goi_bai_7_em còn hạn cũ ⇒ đồng bộ lại
+  // hạn từng em theo hạn gói cho mọi gói còn hạn (đúng như đường sửa hạn làm khi trọn lô). Lặp lại an toàn.
+  const lanh = await env.DB.prepare(`UPDATE goi_bai_7_em SET han=(SELECT g.han FROM goi_bai_7 g WHERE g.id=goi_bai_7_em.goi_id)
+    WHERE goi_id IN(SELECT g.id FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE g.han>=?)
+      AND han<>(SELECT g.han FROM goi_bai_7 g WHERE g.id=goi_bai_7_em.goi_id) AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`)
+    .bind(ngay).run().then((r) => Number((r as { meta?: { changes?: number } }).meta?.changes ?? 0), () => -1)
   const xoaMuc = await env.DB.prepare(`DELETE FROM goi_bai_7_muc_ngay WHERE ngay=? AND muc<>? AND NOT ${sqlDaDuMuc('goi_bai_7_muc_ngay')} AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`)
     .bind(ngay, MUC_NGAY_CO_DINH).run().then((r) => Number((r as { meta?: { changes?: number } }).meta?.changes ?? 0), () => -1)
-  await env.DB.prepare("INSERT OR IGNORE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('phan_lai_0911',?,?)")
-    .bind(JSON.stringify({ luc: new Date(now).toISOString(), soGoiDoiHan: doi.length, loi: loi.length }), new Date(now).toISOString()).run()
-  return { phanLai0911: 'xong', soGoiConHan: goi.length, soGoiKeoDaiHan: doi.length, doi, loi, soDongMucHomNayTinhLai: xoaMuc }
+  // Chỉ đánh dấu «đã chạy» khi trọn vẹn — còn lỗi ⇒ lần phát hành sau làm lại (mọi bước lặp lại an toàn; gói đã kéo dài thì bỏ qua).
+  const tron = !loi.length && xoaMuc >= 0 && lanh >= 0
+  if (tron) await env.DB.prepare("INSERT OR IGNORE INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('phan_lai_0911',?,?)")
+    .bind(JSON.stringify({ luc: new Date(now).toISOString(), soGoiDoiHan: doi.length }), new Date(now).toISOString()).run()
+  return { phanLai0911: tron ? 'xong' : 'chua-tron-se-chay-lai', soGoiConHan: goi.length, soGoiKeoDaiHan: doi.length, doi, loi, soDongMucHomNayTinhLai: xoaMuc, soDongHanEmTuLanh: lanh }
 }

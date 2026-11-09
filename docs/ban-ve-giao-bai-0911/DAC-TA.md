@@ -40,6 +40,8 @@ Thầy: «thiết kế 1 nút giao bài ngay ở màn hôm nay, bấm vào popup
 - **Em bỏ ngày, còn câu mới chưa làm khi hết hạn:** câu mới còn nợ làm ĐẦU khung kế, trước câu mới của bài mới (không em nào bỏ câu mới); em này có trong thẻ «Hết hạn · chưa xong».
 - **Chọn nhiều lớp một lúc:** mỗi lớp một hạn chung riêng (năng lực khác nhau); ô «Hạn chung» hiện theo từng lớp.
 
+- Ghi chú khi build: hạn ghi vào gói tính trên CẢ LỚP; hộp xem trước tính trên các em được chọn ⇒ khi dùng «Không giao cho vài em…» hai số có thể lệch 1–2 ngày.
+
 ## 4. Dữ liệu
 - Đã có: cây bài theo khối (`bai-hom-nay.ts`), `/gv/bai-da-day danh-sach | xem-truoc | tick | bo-tick`, danh sách em (`useDsEmGiao`), gói 7 (`goi-bai-7*.ts`).
 - Thay đổi máy chủ (theo v5): `xem-truoc` trả thêm M (⌈N/28⌉), độ chuẩn đề, hạn chung (mục 3b) và số em dự kiến xong hết; `tick` không nhận hạn / lượt nữa — máy tính hạn chung của lớp (mục 3b) và ghi vào gói bài (cột hạn đã có ở `goi_bai_7`).

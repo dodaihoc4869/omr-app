@@ -43,3 +43,13 @@ describe('docNangLucLop', () => {
     expect(r[2]).toBeNull()
   })
 })
+
+describe('mốc chuyển mức 28 (không áp ngược ngày cũ)', () => {
+  it('ngày trước 09/11 chưa chốt ⇒ luật cũ max(mức tầng, Σ quota); từ 09/11 ⇒ 28 cố định', async () => {
+    const { mucCuaNgay } = await import('../server/src/bai-hang-ngay')
+    expect(mucCuaNgay('2026-10-13', 'goi7', [])).toMatchObject({ muc: 24, nguon: 'uoc-goi7' })
+    expect(mucCuaNgay('2026-10-13', 'goi7', [], { chot: null, quota: 32 })).toMatchObject({ muc: 32 })
+    expect(mucCuaNgay('2026-11-09', 'goi7', [], { chot: null, quota: 32 })).toMatchObject({ muc: 28 })
+    expect(mucCuaNgay('2026-11-20', 'goi7', [])).toMatchObject({ muc: 28 })
+  })
+})

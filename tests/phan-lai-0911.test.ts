@@ -64,3 +64,13 @@ it('có ca thi mở ⇒ không đổi gì, không đánh dấu (lần phát hàn
   expect(k.d.sql.prepare("SELECT han FROM goi_bai_7 WHERE id='g7:latest'").get()).toEqual({ han: '2026-10-16' })
   expect(k.d.sql.prepare("SELECT COUNT(*) n FROM cau_hinh WHERE khoa='phan_lai_0911'").get()).toEqual({ n: 0 })
 })
+
+it('tự lành: gói đã đổi hạn mà hạn từng em còn cũ (lô hỏng giữa chừng) ⇒ đồng bộ hạn em theo hạn gói; không đánh dấu khi chưa trọn', async () => {
+  const k = await kho()
+  // giả lập lần trước hỏng sau khi đổi goi_bai_7.han: gói đã ≥ hạn chung nên lần này không kéo dài nữa, nhưng hạn em vẫn 16/10
+  const hanMoi = congNgay7('2026-10-10', hanChung(127, [null, null, null]).T - 1)
+  k.d.sql.prepare("UPDATE goi_bai_7 SET han=? WHERE id='g7:latest'").run(hanMoi)
+  const kq = await phanLai0911(k.env, NOW)
+  expect(kq).toMatchObject({ phanLai0911: 'xong', soGoiKeoDaiHan: 0, soDongHanEmTuLanh: 3 })
+  expect(k.d.sql.prepare("SELECT DISTINCT han FROM goi_bai_7_em WHERE goi_id='g7:latest'").all()).toEqual([{ han: hanMoi }])
+})

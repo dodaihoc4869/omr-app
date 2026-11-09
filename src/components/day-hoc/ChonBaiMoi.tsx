@@ -153,7 +153,7 @@ export function ChonBaiMoi(p: {
                 {/* Thầy 09/11 «không có cái gì cần thầy cả»: chỉ báo thông tin, máy tự bù bằng câu ô gần nhất — không nhắc thầy bổ sung. */}
                 <div className="cbm-o-so">
                   <span>Đề chuẩn</span><b className="so">{p.tom?.dungO != null ? `${p.tom.dungO}/28` : '—'}</b>
-                  <small>{!p.tom ? 'đang tính…' : p.tom.dungO != null && p.tom.dungO < 28 ? 'đúng mức đề thi; ô thiếu máy tự lấy câu gần nhất' : 'đúng mức đề thi'}</small>
+                  <small>{!p.tom ? 'đang tính…' : p.tom.dungO != null && p.tom.dungO < 28 ? 'đúng mức đề thi; ô thiếu máy bù bằng câu ô khác' : 'đúng mức đề thi'}</small>
                 </div>
                 <div className="cbm-o-so"><span>Hạn chung cả lớp</span><b className="so">{p.tom?.hanNgay != null ? `${p.tom.hanNgay} ngày` : '—'}</b>
                   <small>{!p.tom ? 'đang tính…' : p.tom.hanNgay != null ? `${p.tom.hanChu} · ${p.tom.duKienXong}/${p.tom.soEm} em dự kiến xong hết` : p.tom.hanChu}</small></div>

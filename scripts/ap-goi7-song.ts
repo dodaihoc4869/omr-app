@@ -10,7 +10,13 @@ const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCO
 if(!token||!account)throw new Error('Thiếu cấu hình Cloudflare.')
 const db={prepare(sql:string){
   const st={sql,params:[] as unknown[],bind(...params:unknown[]){st.params=params;return st},async all<T>(){
-    const r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query`,{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify({sql,params:st.params}),signal:AbortSignal.timeout(30000)})
+    // 09/11: D1 429 (quá tải) ⇒ thử lại 2–4–8–16 giây; mọi câu ở đây lặp lại an toàn (UPDATE/DELETE/INSERT có id riêng). Lỗi khác ném ngay như cũ.
+    let r!:Response
+    for(let lan=0;;lan++){
+      r=await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query`,{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify({sql,params:st.params}),signal:AbortSignal.timeout(30000)})
+      if(r.status!==429||lan>=4)break
+      await new Promise(x=>setTimeout(x,2000*2**lan))
+    }
     const j=await r.json() as {success?:boolean;result?:{success:boolean;results:T[];meta:{changes:number}}[]}
     if(!r.ok||!j.success||!j.result?.[0]?.success)throw new Error(`Không áp được lịch bài (${r.status}).`)
     return j.result[0]
