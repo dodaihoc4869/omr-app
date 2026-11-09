@@ -367,7 +367,7 @@ html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 /* RỜI MÀN — BÁO CHÁY (09/11): lớp phủ trên CẢ trang (ngoài khung bảng): viền đỏ dày nhấp nháy quanh màn + quầng đỏ, thẻ tên RẤT TO giữa màn. Không chặn chuột.
    Máy yếu / giảm chuyển động ⇒ viền đứng yên (vẫn đỏ, vẫn to). Tên lớp riêng `.bpu-bao-chay*` (không trùng lớp của màn khác). */
 .bpu-bao-chay { position: fixed; inset: 0; z-index: 2147483600; pointer-events: none; display: grid; place-items: center; }
-.bpu-bao-chay::before { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 clamp(10px, 1.4vw, 26px) var(--tr-sai), inset 0 0 18vmin color-mix(in srgb, var(--tr-sai) 55%, transparent); animation: bpu-bao-chay 0.7s steps(2, jump-none) infinite alternate; }
+.bpu-bao-chay::before { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 14px var(--tr-sai), inset 0 0 90px color-mix(in srgb, var(--tr-sai) 55%, transparent); animation: bpu-bao-chay 0.7s steps(2, jump-none) infinite alternate; }
 @keyframes bpu-bao-chay { from { opacity: 1; } to { opacity: 0.2; } }
 .bpu-bao-chay-the { position: relative; display: grid; justify-items: center; gap: 0.6vmin; max-width: 86vw; padding: 3vmin 5vmin 3.4vmin; border-radius: 3vmin; text-align: center;
   background: var(--tr-sai); color: var(--tr-chieu-giay); box-shadow: 0 0 0 0.6vmin color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent), 0 2vmin 8vmin color-mix(in srgb, var(--tr-sai) 60%, transparent);
@@ -383,3 +383,4 @@ html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 html.may-yeu .bpu-bao-chay::before, html.may-yeu .bpu-bao-chay-the, html.may-yeu .bpu-bao-chay-the .coi { animation: none; }
 /* Ô tên em đang rời màn: quầng đỏ (cùng màu báo cháy) — cả lớp thấy ngay trên dải tên. */
 .bpu-bang .bb-o.roi { box-shadow: 0 12px 40px color-mix(in srgb, var(--tr-sai) 45%, transparent); }
+.bpu-bang .bb-o.roi .nhan-roi { background: var(--tr-sai); color: var(--giay); }
