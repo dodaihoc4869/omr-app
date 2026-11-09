@@ -1,0 +1,544 @@
+[
+  {
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-II-4",
+        "de": "Isoamyl acetate ($t_{nc}$ = −78 °C; $t_s$ = 142 °C; D = 0,876 $g/cm^3$; độ tan 0,30 g/100 g nước) là một chất có mùi thơm của chuối chín và được sử dụng làm hương liệu thực phẩm. Một nhóm học sinh tiến hành thí nghiệm nhằm minh họa cho khả năng thủy phân của dầu chuối (isoamyl acetate) trong các điều kiện khác nhau. Các học sinh đã thực hiện các bước thí nghiệm sau:\nBước 1: Lấy 3 ống nghiệm, một ống đựng 10 mL nước (ống số 1); một ống đựng 10 mL dung dịch $\\ce{H2SO4}$ 1M (ống số 2); một ống đựng 10 mL dung dịch NaOH 2M (ống số 3).\nBước 2: Thêm vào mỗi ống 2 mL isoamyl acetate, lắc đều chất lỏng trong các ống nghiệm thấy chất lỏng đều tách thành hai lớp. Thể tích phần chất lỏng phía trên ở 3 ống nghiệm bằng nhau.\nBước 3: Đặt các ống nghiệm vào cốc nước nóng, dùng đũa thủy tinh khuấy đều phần chất lỏng trong các ống nghiệm đó trong khoảng thời gian 20 phút.\nBước 4: Lấy các ống nghiệm đó ra và quan sát được hiện tượng như hình dưới.",
+        "allHinh": [
+          {
+            "hash": "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+            "where": "VIP27-C1-B1-ESTER-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "978bd4334807db146bdeb60ee1aa44e5152fb9fe036801e6f99f285957488caf"
+          },
+          {
+            "hash": "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c",
+            "where": "VIP27-C1-B1-ESTER-II-4.hinh.1.du_lieu",
+            "hashDataUrl": "54ba55c0d38aba09d4bd5a43ec69aa7946464c0e25709f82e8bbc9773990acf9"
+          }
+        ],
+        "missingHashes": [
+          "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+          "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "affectedQids": 1,
+      "allQuestionsOnlyThisSource": false,
+      "requiresBothHashes": [
+        "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+        "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c"
+      ],
+      "newFullIfOnlyThisAdmitted": 0,
+      "newFullIfBothAdmitted": 1
+    },
+    "actualSvgReviewed": false,
+    "coordinateMeaning": "Native raster literalgeometry, no hydrolysisansweroridentity inferred beyond visiblesource.",
+    "i": 1269,
+    "hash": "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853.png",
+    "size": [
+      426,
+      246
+    ],
+    "review": {
+      "nativeFullOpened": true,
+      "native3xOpened": "/workspace/scratch/1269-native3x.png",
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "classification": "Flat colored schematic3open testtubes, not photograph.",
+      "tubeOutlines": [
+        {
+          "path": "M1477V185 Q147201 171202 Q196202 196185 V7",
+          "topFillY": 120,
+          "blueTopY": 141,
+          "yellowBounds": [
+            148,
+            121,
+            195,
+            140
+          ]
+        },
+        {
+          "path": "M2617V185 Q261201 285202 Q309202 309185 V7",
+          "topFillY": 121,
+          "blueTopY": 131,
+          "yellowBounds": [
+            262,
+            122,
+            308,
+            130
+          ]
+        },
+        {
+          "path": "M3687V185 Q368201 392202 Q417202 417185 V7",
+          "topFillY": 120,
+          "blueTopY": 120,
+          "yellowBounds": null
+        }
+      ],
+      "style": "Blacktubeoutline3px, roundedUbottom, topopen noellipsecap; flatyellowoverflatblue, nohighlight/gradient/bubbles.",
+      "fillRGB": {
+        "blue": [
+          63,
+          71,
+          204
+        ],
+        "yellow": [
+          254,
+          240,
+          0
+        ]
+      },
+      "labels": [
+        {
+          "text": "ester",
+          "bbox": [
+            55,
+            89,
+            104,
+            109
+          ],
+          "weight": "regularserif",
+          "leader": [
+            [
+              105,
+              103
+            ],
+            [
+              153,
+              130
+            ]
+          ],
+          "head": "NONE"
+        },
+        {
+          "text": "dung dịch",
+          "bbox": [
+            6,
+            167,
+            107,
+            194
+          ],
+          "weight": "regularserif",
+          "leader": [
+            [
+              108,
+              180
+            ],
+            [
+              152,
+              166
+            ]
+          ],
+          "head": "NONE"
+        },
+        {
+          "text": "(1)",
+          "bbox": [
+            155,
+            214,
+            186,
+            242
+          ],
+          "weight": "BOLDserif"
+        },
+        {
+          "text": "(2)",
+          "bbox": [
+            274,
+            214,
+            305,
+            242
+          ],
+          "weight": "BOLDserif"
+        },
+        {
+          "text": "(3)",
+          "bbox": [
+            379,
+            214,
+            411,
+            242
+          ],
+          "weight": "BOLDserif"
+        }
+      ],
+      "counts": {
+        "testTubes": 3,
+        "yellowLayers": 2,
+        "blueLayers": 3,
+        "leaders": 2,
+        "heads": 0,
+        "numberPairs": 3
+      },
+      "noAdded": [
+        "mL ticks",
+        "solutionnamesfromstem",
+        "reactionarrows",
+        "heatingapparatus",
+        "mixingrods",
+        "extrayellowontube3",
+        "equalizinglayerthickness"
+      ]
+    }
+  },
+  {
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-II-4",
+        "de": "Isoamyl acetate ($t_{nc}$ = −78 °C; $t_s$ = 142 °C; D = 0,876 $g/cm^3$; độ tan 0,30 g/100 g nước) là một chất có mùi thơm của chuối chín và được sử dụng làm hương liệu thực phẩm. Một nhóm học sinh tiến hành thí nghiệm nhằm minh họa cho khả năng thủy phân của dầu chuối (isoamyl acetate) trong các điều kiện khác nhau. Các học sinh đã thực hiện các bước thí nghiệm sau:\nBước 1: Lấy 3 ống nghiệm, một ống đựng 10 mL nước (ống số 1); một ống đựng 10 mL dung dịch $\\ce{H2SO4}$ 1M (ống số 2); một ống đựng 10 mL dung dịch NaOH 2M (ống số 3).\nBước 2: Thêm vào mỗi ống 2 mL isoamyl acetate, lắc đều chất lỏng trong các ống nghiệm thấy chất lỏng đều tách thành hai lớp. Thể tích phần chất lỏng phía trên ở 3 ống nghiệm bằng nhau.\nBước 3: Đặt các ống nghiệm vào cốc nước nóng, dùng đũa thủy tinh khuấy đều phần chất lỏng trong các ống nghiệm đó trong khoảng thời gian 20 phút.\nBước 4: Lấy các ống nghiệm đó ra và quan sát được hiện tượng như hình dưới.",
+        "allHinh": [
+          {
+            "hash": "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+            "where": "VIP27-C1-B1-ESTER-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "978bd4334807db146bdeb60ee1aa44e5152fb9fe036801e6f99f285957488caf"
+          },
+          {
+            "hash": "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c",
+            "where": "VIP27-C1-B1-ESTER-II-4.hinh.1.du_lieu",
+            "hashDataUrl": "54ba55c0d38aba09d4bd5a43ec69aa7946464c0e25709f82e8bbc9773990acf9"
+          }
+        ],
+        "missingHashes": [
+          "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+          "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "affectedQids": 1,
+      "allQuestionsOnlyThisSource": false,
+      "requiresBothHashes": [
+        "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+        "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c"
+      ],
+      "newFullIfOnlyThisAdmitted": 0,
+      "newFullIfBothAdmitted": 1
+    },
+    "actualSvgReviewed": false,
+    "coordinateMeaning": "Native raster literalgeometry, no hydrolysisansweroridentity inferred beyond visiblesource.",
+    "i": 544,
+    "hash": "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c.png",
+    "size": [
+      1004,
+      110
+    ],
+    "review": {
+      "nativeFullOpened": true,
+      "native2xOpened": "/workspace/scratch/partner1269-native2x.png",
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "classification": "Oneclear skeletalesterhydrolysis equation, no photo.",
+      "literal": "skeletal CH3-C(=O)-O-CH2-CH2-CH(CH3)-CH3 + NaOH → skeletalCH3-C(=O)-ONa + skeletalHO-CH2-CH2-CH(CH3)-CH3",
+      "reactant": {
+        "acylVertices": [
+          [
+            7,
+            16
+          ],
+          [
+            46,
+            40
+          ]
+        ],
+        "COdouble": [
+          [
+            [
+              43,
+              41
+            ],
+            [
+              43,
+              72
+            ]
+          ],
+          [
+            [
+              49,
+              41
+            ],
+            [
+              49,
+              72
+            ]
+          ]
+        ],
+        "carbonylO": {
+          "text": "O",
+          "bbox": [
+            36,
+            77,
+            56,
+            100
+          ]
+        },
+        "esterO": {
+          "text": "O",
+          "bbox": [
+            78,
+            3,
+            100,
+            25
+          ]
+        },
+        "Obonds": [
+          [
+            [
+              46,
+              40
+            ],
+            [
+              73,
+              25
+            ]
+          ],
+          [
+            [
+              102,
+              25
+            ],
+            [
+              132,
+              40
+            ]
+          ]
+        ],
+        "alkoxyVertices": [
+          [
+            132,
+            40
+          ],
+          [
+            171,
+            16
+          ],
+          [
+            213,
+            40
+          ],
+          [
+            255,
+            16
+          ]
+        ],
+        "branch": [
+          [
+            213,
+            40
+          ],
+          [
+            213,
+            89
+          ]
+        ]
+      },
+      "labels": [
+        {
+          "text": "+",
+          "bbox": [
+            280,
+            48,
+            297,
+            68
+          ]
+        },
+        {
+          "text": "NaOH",
+          "bbox": [
+            316,
+            43,
+            395,
+            71
+          ]
+        },
+        {
+          "text": "+",
+          "bbox": [
+            733,
+            48,
+            749,
+            68
+          ]
+        },
+        {
+          "text": "tᵒ",
+          "bbox": [
+            470,
+            22,
+            491,
+            46
+          ],
+          "note": "small elevated hollowo, notnumeral0"
+        }
+      ],
+      "arrow": {
+        "shaft": [
+          [
+            408,
+            55
+          ],
+          [
+            539,
+            55
+          ]
+        ],
+        "head": "FILLED RIGHTskinnytriangle",
+        "vertices": [
+          [
+            522,
+            49
+          ],
+          [
+            539,
+            55
+          ],
+          [
+            522,
+            61
+          ]
+        ]
+      },
+      "saltProduct": {
+        "acylVertices": [
+          [
+            565,
+            16
+          ],
+          [
+            605,
+            40
+          ]
+        ],
+        "COdouble": [
+          [
+            [
+              601,
+              41
+            ],
+            [
+              601,
+              72
+            ]
+          ],
+          [
+            [
+              607,
+              41
+            ],
+            [
+              607,
+              72
+            ]
+          ]
+        ],
+        "carbonylO": {
+          "text": "O",
+          "bbox": [
+            596,
+            77,
+            617,
+            100
+          ]
+        },
+        "ONa": {
+          "text": "ONa",
+          "bbox": [
+            638,
+            3,
+            693,
+            26
+          ],
+          "anchor": "Ofirstglyph",
+          "bond": [
+            [
+              605,
+              40
+            ],
+            [
+              632,
+              25
+            ]
+          ]
+        }
+      },
+      "alcoholProduct": {
+        "vertices": [
+          [
+            802,
+            32
+          ],
+          [
+            843,
+            56
+          ],
+          [
+            884,
+            32
+          ],
+          [
+            925,
+            56
+          ]
+        ],
+        "branch": [
+          [
+            843,
+            56
+          ],
+          [
+            843,
+            105
+          ]
+        ],
+        "OH": {
+          "text": "OH",
+          "bbox": [
+            956,
+            21,
+            998,
+            47
+          ],
+          "anchor": "Ofirstglyph",
+          "bond": [
+            [
+              925,
+              56
+            ],
+            [
+              950,
+              42
+            ]
+          ]
+        }
+      },
+      "counts": {
+        "Creactant": 7,
+        "OreactantEster": 2,
+        "Cproducts": 7,
+        "filledRightHeads": 1,
+        "baselinePlus": 2,
+        "COdouble": 2,
+        "charges": 0,
+        "caption": 0
+      },
+      "font": "RegularuprightserifallformulaO/ONa/NaOH/OH andt; no bold/italic captions.",
+      "noAdded": [
+        "expandedCH3labels",
+        "phases",
+        "coefficient",
+        "Na+/Ominuscharge",
+        "OHswap",
+        "caption",
+        "answer"
+      ]
+    }
+  }
+]

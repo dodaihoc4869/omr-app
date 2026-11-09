@@ -1,0 +1,29 @@
+[
+  {
+    "i": 544,
+    "hash": "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c",
+    "fileNguon": "anh/668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c.png",
+    "svg": "thuy-phan-isoamyl-ddh-2032777b108b66cf23bedecd1c79b3c4241aa30f6f4de712ae2cbdd3a87cc7c2.svg",
+    "hashSvg": "2032777b108b66cf23bedecd1c79b3c4241aa30f6f4de712ae2cbdd3a87cc7c2",
+    "byteSvg": 10812,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-II-4",
+        "de": "Isoamyl acetate ($t_{nc}$ = −78 °C; $t_s$ = 142 °C; D = 0,876 $g/cm^3$; độ tan 0,30 g/100 g nước) là một chất có mùi thơm của chuối chín và được sử dụng làm hương liệu thực phẩm. Một nhóm học sinh tiến hành thí nghiệm nhằm minh họa cho khả năng thủy phân của dầu chuối (isoamyl acetate) trong các điều kiện khác nhau. Các học sinh đã thực hiện các bước thí nghiệm sau:\nBước 1: Lấy 3 ống nghiệm, một ống đựng 10 mL nước (ống số 1); một ống đựng 10 mL dung dịch $\\ce{H2SO4}$ 1M (ống số 2); một ống đựng 10 mL dung dịch NaOH 2M (ống số 3).\nBước 2: Thêm vào mỗi ống 2 mL isoamyl acetate, lắc đều chất lỏng trong các ống nghiệm thấy chất lỏng đều tách thành hai lớp. Thể tích phần chất lỏng phía trên ở 3 ống nghiệm bằng nhau.\nBước 3: Đặt các ống nghiệm vào cốc nước nóng, dùng đũa thủy tinh khuấy đều phần chất lỏng trong các ống nghiệm đó trong khoảng thời gian 20 phút.\nBước 4: Lấy các ống nghiệm đó ra và quan sát được hiện tượng như hình dưới.",
+        "refs": [
+          {
+            "hash": "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c",
+            "where": "VIP27-C1-B1-ESTER-II-4.hinh.1.du_lieu",
+            "hashDataUrl": "54ba55c0d38aba09d4bd5a43ec69aa7946464c0e25709f82e8bbc9773990acf9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7C2Oester+NaOH→2C2OONa+5C1Oalcohol/2COdouble/2plus1filledRIGHT/t-small-supo/regularDDH/noaddedH-coeff-caption-answer",
+    "hashSvgDaSoat": "2032777b108b66cf23bedecd1c79b3c4241aa30f6f4de712ae2cbdd3a87cc7c2",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

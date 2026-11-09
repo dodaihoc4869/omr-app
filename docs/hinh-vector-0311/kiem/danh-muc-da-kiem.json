@@ -2755,6 +2755,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c": {
+      "tep": "thuy-phan-isoamyl-ddh-2032777b108b66cf23bedecd1c79b3c4241aa30f6f4de712ae2cbdd3a87cc7c2.svg",
+      "hashSvg": "2032777b108b66cf23bedecd1c79b3c4241aa30f6f4de712ae2cbdd3a87cc7c2",
+      "byteSvg": 10812,
+      "byteGzip": 2420,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "95951e9776e620bdf3632f35034c106df2be44e88d3d783848d0a9cbec46b193": {
       "tep": "cau-truc-ddh-a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d.svg",
       "hashSvg": "a794b6dc35e031ecc12c2374e8378d853332a79d6a713cece08a6240420c7f4d",
@@ -3687,6 +3696,15 @@
       "hashSvg": "e0127c0e7242f0b8f86672ec5b8f24a6bb3c6326bd9d64fc25c1f2111eaf2a19",
       "byteSvg": 30238,
       "byteGzip": 6664,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853": {
+      "tep": "ba-ong-phan-lop-ddh-26ed27429eac63733f960a97f0ddd2f80af4733ec614516eef07afc6b6c2355f.svg",
+      "hashSvg": "26ed27429eac63733f960a97f0ddd2f80af4733ec614516eef07afc6b6c2355f",
+      "byteSvg": 10814,
+      "byteGzip": 3412,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -28018,6 +28036,26 @@
       ]
     },
     {
+      "qid": "VIP27-C1-B1-ESTER-II-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "e61fb5d63768923f8211848cb0fc1421ac953313b1744da871d820db0f227853",
+          "where": "VIP27-C1-B1-ESTER-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "978bd4334807db146bdeb60ee1aa44e5152fb9fe036801e6f99f285957488caf",
+          "vector": "ba-ong-phan-lop-ddh-26ed27429eac63733f960a97f0ddd2f80af4733ec614516eef07afc6b6c2355f.svg"
+        },
+        {
+          "hash": "668d587c2d30bb9da5f5f0db0cab5d1865f303d06695182dd66a670857b4647c",
+          "where": "VIP27-C1-B1-ESTER-II-4.hinh.1.du_lieu",
+          "hashDataUrl": "54ba55c0d38aba09d4bd5a43ec69aa7946464c0e25709f82e8bbc9773990acf9",
+          "vector": "thuy-phan-isoamyl-ddh-2032777b108b66cf23bedecd1c79b3c4241aa30f6f4de712ae2cbdd3a87cc7c2.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-C1-B1-ESTER-III-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -30062,6 +30100,7 @@
     "VIP27-BDT-L4-0401-III-2",
     "VIP27-BDT-L3-0197-I-7",
     "VIP27-BDT-L3-0197-II-4",
+    "VIP27-C1-B1-ESTER-II-4",
     "VIP27-C1-B1-ESTER-III-3",
     "VIP27-C1-B3-D1-II-3",
     "VIP27-C1-B3-D2-I-6",

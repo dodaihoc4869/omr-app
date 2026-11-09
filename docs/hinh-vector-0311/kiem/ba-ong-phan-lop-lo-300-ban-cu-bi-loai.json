@@ -1,0 +1,9 @@
+{
+  "lo": 300,
+  "trangThai": "bi-loai-truoc-soat-doc-lap",
+  "figure": 1269,
+  "initialSvgHash": "fad881b81581417b87fa12f9171a6e75ddf7718cec44cfdce79384796c0dceb8",
+  "reason": "Root actual FULL: nhãn regular có leader bắt đầu trong vùng chữ; số (1)(2)(3) cần đậm thật theo native. Không admit bản này.",
+  "finalSvgHash": "26ed27429eac63733f960a97f0ddd2f80af4733ec614516eef07afc6b6c2355f",
+  "changes": "Chỉ dịch đầu leader ra ngoài chữ và đổi 3 số sang actualdam; hình ống/lớp chất giữ nguyên. Final phải soát độc lập exacthash mới."
+}
