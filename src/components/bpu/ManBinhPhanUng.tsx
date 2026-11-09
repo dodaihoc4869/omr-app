@@ -211,11 +211,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const dangChoi = !an && !!v && !v.ketThuc
   useEffect(() => {
     if (!dangChoi) return
-    let hen: ReturnType<typeof setTimeout> | undefined
     const bao = (laNoi: boolean) => { setNoi(laNoi); setVuaRoi(true); if (daBaoRoi.current) return; daBaoRoi.current = true; gui({ t: 'roi' }) }
     const doi = () => {
-      if (document.hidden) { clearTimeout(hen); bao(false) } // TỨC THÌ (09/11 lần 4)
-      else clearTimeout(hen)
+      if (document.hidden) bao(false) // TỨC THÌ (09/11 lần 4)
     }
     // CỬA SỔ NỔI (thầy 09/11 «phát hiện được cả ứng dụng nổi lên trên»): app vẫn hiện (không có visibilitychange) nhưng tiêu điểm sang app nổi ⇒ blur.
     // Còn mất tiêu điểm sau NOI_MS ⇒ báo rời; lấy lại tiêu điểm ⇒ `ve` (nghe ở hiệu ứng «về lại màn» bên dưới).
@@ -230,7 +228,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     try { window.history.pushState({ bpu: 1 }, '') } catch { /* trình duyệt cũ */ }
     const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
     window.addEventListener('popstate', giuLai)
-    return () => { clearTimeout(hen); clearTimeout(henNoi); window.removeEventListener('blur', matTieuDiem); window.removeEventListener('focus', coTieuDiem); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
+    return () => { clearTimeout(henNoi); window.removeEventListener('blur', matTieuDiem); window.removeEventListener('focus', coTieuDiem); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
   }, [gui, dangChoi])
 
   // Toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho khi có thao tác của em; không hỗ trợ ⇒ bỏ qua).
