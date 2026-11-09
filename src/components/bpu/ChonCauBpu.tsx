@@ -36,6 +36,14 @@ export interface PropsChonCau {
   onKetThuc?: () => Promise<string>
 }
 
+// NÚT «ĐÓNG» = RA THẲNG HÔM NAY (thầy 10/11 «nút nào thầy bấm cũng phải ra thẳng Hôm nay», như Esc); quay về bảng / màn đua là nút riêng.
+// Bảng chọn dùng ngoài gốc bảng chung (gan-gv không có phiên) ⇒ chỉ đóng bảng chọn.
+const raHomNay = (onDong: () => void) => { void import('./gan-gv').then((m) => { if (!m.escRaHomNay()) onDong() }, onDong) }
+/** Nút quay về: có lượt đang chiếu ⇒ «Về màn đua» (phím C — cùng phím mở bảng chọn); mở từ điểm danh ⇒ «Về điểm danh». */
+function NutVe({ ve, onDong }: { ve: 'dua' | 'dd'; onDong: () => void }) {
+  return <button type="button" className="bcc-dong bcc-ve" onClick={onDong}>{ve === 'dua' ? <><kbd>C</kbd>Về màn đua</> : 'Về điểm danh'}</button>
+}
+
 // «HÔM NAY LÀM GÌ?» (thầy 09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong tinh tế đẹp mắt hiệu quả»): bốn thẻ lớn trên bảng.
 const HD: { id: 'day-hoc' | 'dau-gio' | 'chua-cau' | 'on-tap'; ten: string; mo: string; Icon: typeof Flame; phim: string }[] = [
   { id: 'day-hoc', ten: 'Dạy học · chiếu câu', mo: 'Chọn câu trong kho Dạy học, cả lớp cùng làm trên máy, gọi em lên bảng.', Icon: Presentation, phim: '1' },
@@ -61,7 +69,8 @@ function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[n
       <div className="bcc-dau">
         <h2>Hôm nay làm gì?</h2>
         <p>Điểm danh xong. Chọn một hoạt động — xong quay lại chọn hoạt động khác.</p>
-        <button type="button" className="bcc-dong" onClick={onDong}><kbd>Esc</kbd>Đóng</button>
+        <NutVe ve="dd" onDong={onDong} />
+        <button type="button" className="bcc-dong" onClick={() => raHomNay(onDong)}><kbd>Esc</kbd>Đóng</button>
       </div>
       <div className="bcc-hd-luoi">
         {HD.map(({ id, ten, mo, Icon, phim }, i) => (
@@ -89,7 +98,17 @@ export default function ChonCauBpu(p: PropsChonCau) {
   return <ChonCau {...p} />
 }
 
-function ChonCau({ buoiId, lop, onChieu, onDong }: PropsChonCau) {
+function ChonCau({ buoiId, lop, onChieu, onDong, buocDau }: PropsChonCau) {
+  const veDua = buocDau === 'cau'
+  // Phím C: về màn đua (bảng chọn mở từ màn đua). Gõ trong ô tìm thì thôi.
+  useEffect(() => {
+    if (!veDua) return
+    // Bỏ qua chính lần bấm C vừa MỞ bảng chọn (sự kiện ấy có thể đi tiếp tới đây sau khi bảng chọn đã dựng).
+    const moLuc = performance.now()
+    const phim = (e: KeyboardEvent) => { if (e.key.toLowerCase() === 'c' && !e.repeat && e.timeStamp > moLuc && !(e.target as HTMLElement | null)?.closest?.('input,textarea')) { e.preventDefault(); onDong() } }
+    window.addEventListener('keydown', phim)
+    return () => window.removeEventListener('keydown', phim)
+  }, [veDua, onDong])
   const [kho, setKho] = useState<TeacherExamSource[] | null>(null)
   const [loi, setLoi] = useState('')
   const [lan, setLan] = useState(0)
@@ -138,8 +157,8 @@ function ChonCau({ buoiId, lop, onChieu, onDong }: PropsChonCau) {
     if (!c) return
     setDang(c.khoa); setLoiChieu('')
     const chu = await onChieu(cauBai.slice(i))
-    setDang(null)
-    if (chu) setLoiChieu(chu)
+    // 10/11: chiếu được ⇒ giữ «đang chiếu» tới khi lượt mới về (bảng tự đóng bảng chọn — không lộ màn cũ một nhịp); quá lâu thì nhả.
+    if (chu) { setDang(null); setLoiChieu(chu) } else setTimeout(() => setDang(null), 8000)
   }
 
   return (
@@ -147,7 +166,8 @@ function ChonCau({ buoiId, lop, onChieu, onDong }: PropsChonCau) {
       <div className="bcc-dau">
         <h2>Chọn câu chiếu</h2>
         <p>Bấm một câu: câu lên bảng, tự gửi xuống máy các em có mặt.</p>
-        <button type="button" className="bcc-dong" onClick={onDong}><kbd>Esc</kbd>Đóng</button>
+        <NutVe ve={veDua ? 'dua' : 'dd'} onDong={onDong} />
+        <button type="button" className="bcc-dong" onClick={() => raHomNay(onDong)}><kbd>Esc</kbd>Đóng</button>
       </div>
       <div className="bcc-trai">
         <div className="bcc-loc">

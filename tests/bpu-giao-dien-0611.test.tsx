@@ -299,8 +299,9 @@ describe('bảng chiếu', () => {
     expect(toNghe).not.toHaveBeenCalled()
     window.removeEventListener('keydown', toNghe)
     // SỬA CÓ CHỦ ĐÍCH 09/11 (tháp lửa): dải tên mới theo đội — ô `.bb-tl-o`, vẫn tên gọi đủ chữ.
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «dải đội hiện mỗi "Học" cho "Đỗ Đại Học" … dùng tên gọi 2 chữ cuối»): tên gọi = HAI chữ cuối (cũ: chữ cuối).
     const o = document.querySelector('.bb-tl-o .ten')!
-    expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
+    expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').slice(-2).join(' '))
   })
   it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án KHÔNG tự hiện phương án; Đúng–sai ⇒ đáp án gọn Đ · S', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')

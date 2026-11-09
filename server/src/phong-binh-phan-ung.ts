@@ -157,7 +157,7 @@ export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> 
   return { ok: true, buoiId, ve: await kyVeBpu(env.MA_BI_MAT, { b: buoiId, s: '', v: 'gv', h: nay + HAN_VE_BPU_MS }), soEm: ds.size }
 }
 
-/** `POST /gv/bpu/luot { buoiId, qid, hanGiay }`: đọc câu đầy đủ từ chỉ mục kho + kiểm câu bảo vệ (song song), mở lượt mới, báo máy các em có mặt. */
+/** `POST /gv/bpu/luot { buoiId, qid, hanGiay, bo? }` (bo = bỏ lượt dở cũ, 10/11): đọc câu đầy đủ từ chỉ mục kho + kiểm câu bảo vệ (song song), mở lượt mới, báo máy các em có mặt. */
 export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
   if (!bpuBat(env)) return { ok: false, lyDo: 'tat', error: 'Bình Phản Ứng đang tắt.' }
   const buoiId = buoiHop(b.buoiId), qid = str(b.qid).trim().slice(0, 200)
@@ -184,7 +184,7 @@ export async function gvBpuLuot(env: Env, b: Row): Promise<Row> {
   const tuLuan = phucVu.tuLuan.includes(qid)
   // Lời giải + ảnh lời giải gửi vào PHÒNG (giữ trong phòng; phòng chỉ đưa ra máy em sau khi mở đáp án — viewEm).
   const giai = { solution: (q as { solution?: unknown }).solution ?? null, anh: (q.hinhAnh ?? []).filter((h) => h.viTri === 'sau_loi_giai') }
-  const r = await goiPhong(env, buoiId, '/luot', { qid, phan: q.phan, tuLuan, cau: cauCongKhai(q), dung: tuLuan ? '' : str(q.correct), hanGiay: tuLuan ? 0 : hanGiay, giai })
+  const r = await goiPhong(env, buoiId, '/luot', { qid, phan: q.phan, tuLuan, cau: cauCongKhai(q), dung: tuLuan ? '' : str(q.correct), hanGiay: tuLuan ? 0 : hanGiay, giai, bo: b.bo === true })
   if (!r.ok) return r
   const tru = new Set((dangThi.results ?? []).map((x) => str(x.sbd)))
   const coMat = (Array.isArray(r.coMat) ? (r.coMat as unknown[]).map(str) : []).filter((s) => !tru.has(s))
@@ -366,7 +366,9 @@ export class PhongBinhPhanUng {
     }
     if (u.pathname === '/luot') {
       // Thầy chuyển câu khi lượt trước chưa mở đáp án ⇒ chốt lượt trước (chấm, cộng kJ, ghi) rồi mới mở lượt mới — không mất điểm của các em.
-      if (!L.boLuotRong(st)) await this.chotLuot(st, nay)
+      // 10/11 thầy «chọn câu khác ⇒ xoá lượt câu cũ»: bảng chọn câu gửi `bo` ⇒ lượt dở chưa mở đáp án bỏ hẳn (không chấm, không kJ); đã mở ⇒ giữ.
+      if (b.bo === true) L.boLuot(st, nay)
+      else if (!L.boLuotRong(st)) await this.chotLuot(st, nay)
       const l = L.moLuot(st, { qid: str(b.qid), phan: (b.phan === 'II' || b.phan === 'III' ? b.phan : 'I'), tuLuan: b.tuLuan === true, cau: (b.cau ?? {}) as Row, dung: str(b.dung), hanGiay: Number(b.hanGiay) || null, giai: (b.giai ?? null) as L.LuotPhong['giai'] }, nay)
       await this.luu(); this.phat()
       return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })

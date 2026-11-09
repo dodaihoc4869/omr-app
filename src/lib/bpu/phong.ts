@@ -271,6 +271,16 @@ export function boLuotRong(st: TrangThaiPhong): boolean {
   st.soLuot = Math.max(0, st.soLuot - 1)
   return true
 }
+/** BỎ LƯỢT DỞ (thầy 10/11 «chọn câu khác ⇒ bắt đầu lượt mới và xoá lượt câu cũ»): lượt CHƯA mở đáp án ⇒ bỏ hẳn, dù em đã gửi hay thầy đã gọi em —
+ *  không chấm, không cộng / trừ kJ, không chuỗi, không ghi tổng kết, đáp án không ra ngoài (không qua `moDapAn`). Lượt đã mở đáp án ⇒ giữ kết quả (false). */
+export function boLuot(st: TrangThaiPhong, nay: number): boolean {
+  const l = st.luot
+  if (!l || l.pha === 'mo') return false
+  // Số lượt KHÔNG lùi (khác `boLuotRong`): lượt mới mang số mới ⇒ bảng / máy em không nhận nhầm trạng thái của lượt vừa bỏ (gọi em, phương án, đã gửi).
+  st.luot = null
+  st.capNhat = nay
+  return true
+}
 export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLuan: boolean; cau: Record<string, unknown>; dung: string; hanGiay: number | null; giai?: LuotPhong['giai'] }, nay: number): LuotPhong {
   // SỐ ĐỘI theo em có mặt (thầy 09/11) do `vaoLop` lo ngay lúc em vào; ở đây chỉ nắn phòng lưu trước 09/11 (4 đội mà có mặt ≤ 12 em ⇒ 2 đội).
   const can = soDoiTheo(st.ds.filter((e) => e.vao).length)

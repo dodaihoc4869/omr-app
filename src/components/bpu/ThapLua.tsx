@@ -6,6 +6,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import { DOI_BPU, KJ, type ViewBang } from '../../lib/bpu/phong'
 import { mauDoi } from './ong-ket-qua'
+import { vuaChuTrong } from './vua-chu'
 import { boCucThap, chuoiDaiNhat, dapAnDs, dapSo, dauTheo, kjDoi, soKj, thangOng, thuTuDoi, xepVang, type Em } from './dua-top'
 import './bpu-thap.css'
 
@@ -49,13 +50,11 @@ export default function ThapLua({ v, l, truoc, len, tenGoi, tenHien, an, toanMan
   const vang = xepVang(v), chuoi = mo ? null : chuoiDaiNhat(v)
   const soDung = Object.values(kq).filter((x) => x.dung).length
 
-  // Chữ tên tự co cho vừa ô (lớp đông, tên dài): hạ từng px tới khi vừa (tối thiểu 14 px).
+  // TÊN VỪA Ô (thầy 10/11 «tên đầy đủ đọc được, không cắt "…"»): dải đội = tên gọi hai chữ («Đại Học»), thu cỡ chữ cho vừa, ô chật thì xuống hai dòng;
+  // Bảng vàng / nhanh nhất / chuỗi đúng thu cỡ chữ một dòng. Ô chữ không đổi thì bỏ qua (vua-chu.ts).
   useLayoutEffect(() => {
-    goc.current?.querySelectorAll<HTMLElement>('.bb-tl-o .ten').forEach((el) => {
-      el.style.fontSize = ''
-      let co = parseFloat(getComputedStyle(el).fontSize) || B.coChu
-      while (el.scrollWidth > el.clientWidth + 1 && co > 14) { co -= 1; el.style.fontSize = `${co}px` }
-    })
+    vuaChuTrong(goc.current, '.bb-tl-o .ten', 13, true, String(B.coChu))
+    vuaChuTrong(goc.current, '.bb-tl-hang .t, .bb-tl-chuoi .c2', 18)
   })
 
   // ── Cột phải: số dòng Bảng vàng vừa chiều cao còn lại (6 lúc đang làm). ──

@@ -91,13 +91,13 @@
 .bpu-bang .bb-tl-vang, .bpu-bang .bb-tl-nhanh{ padding: 14px 20px 12px; display: grid; gap: 6px; }
 .bpu-bang .bb-tl-vang .dau, .bpu-bang .bb-tl-nhanh .dau{ display: flex; align-items: baseline; justify-content: space-between; padding: 0 6px 2px; }
 .bpu-bang .bb-tl-hang{ display: grid; grid-template-columns: 46px minmax(0, 1fr) auto 90px 56px; align-items: center; gap: 12px; height: 54px; padding: 0 6px; border-radius: 14px; }
-.bpu-bang .bb-tl-hang .t{ font-size: 31px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bpu-bang .bb-tl-hang .t{ font-size: 31px; font-weight: 700; white-space: nowrap; overflow: hidden; } /* 10/11: không «…» — vua-chu.ts thu cỡ chữ */
 .bpu-bang .bb-tl-hang .d{ font-size: 31px; font-weight: 800; text-align: right; }
 .bpu-bang .bb-tl-hang .len{ font-size: 22px; font-weight: 800; color: var(--tr-tin); white-space: nowrap; }
 .bpu-bang .bb-tl-vang .bb-tl-hang:nth-child(2){ background: color-mix(in srgb, var(--tr-sao) 10%, transparent); }
 .bpu-bang .bb-tl-chuoi{ display: flex; align-items: center; gap: 16px; padding: 12px 22px; }
 .bpu-bang .bb-tl-chuoi .so-c{ flex: none; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 16px; background: var(--giay); color: var(--tr-chieu-chu); font-size: 34px; font-weight: 800; }
-.bpu-bang .bb-tl-chuoi .c2{ font-size: 30px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bpu-bang .bb-tl-chuoi .c2{ min-width: 0; font-size: 30px; font-weight: 800; white-space: nowrap; overflow: hidden; }
 .bpu-bang .bb-tl-chuoi .c2 span{ font-weight: 600; color: var(--tr-chu-2); }
 /* Mở đáp án: đáp án gọn theo loại câu (0–0,3 s), băng năng lượng hoạt hoá, nhanh và đúng nhất trượt vào lần lượt. */
 .bpu-bang .bb-tl-da{ display: flex; align-items: center; gap: 22px; padding: 12px 26px; min-height: 104px; animation: bb-tl-da 0.3s ease-out both; }
@@ -131,7 +131,7 @@
 .bpu-bang .bb-tl-nhom .luoi{ display: grid; gap: 8px 10px; align-content: start; }
 .bpu-bang .bb-tl-o{ position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; padding: 0 30px 0 14px; border-radius: 14px; color: var(--tr-chu-3);
   box-shadow: inset 0 0 0 2px var(--tr-vien); }
-.bpu-bang .bb-tl-o .ten{ min-width: 0; overflow: hidden; white-space: nowrap; font-size: var(--co, 27px); font-weight: 600; }
+.bpu-bang .bb-tl-o .ten{ min-width: 0; overflow: hidden; white-space: nowrap; font-size: var(--co, 27px); font-weight: 600; text-align: center; overflow-wrap: normal; word-break: keep-all; }
 .bpu-bang .bb-tl-o::before{ content: ""; position: absolute; left: 0; top: 22%; bottom: 22%; width: 5px; border-radius: 0 4px 4px 0; background: var(--doi); opacity: 0.35; }
 /* Viền sáng «vừa gửi»: lớp riêng đổi opacity (~1 s). */
 .bpu-bang .bb-tl-o::after{ content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 3px var(--giay), 0 0 26px color-mix(in srgb, var(--doi) 60%, transparent); opacity: 0; transition: opacity 0.3s; pointer-events: none; }
@@ -160,3 +160,4 @@
 /* Máy yếu / giảm chuyển động: animation tắt chung (bpu-bang.css) ⇒ ẩn hẳn lớp số cũ để chỉ còn trạng thái cuối. */
 @media (prefers-reduced-motion: reduce) { .bpu-bang .bb-tl-chan .so .cu{ display: none; } }
 html.may-yeu .bpu-bang .bb-tl-chan .so .cu{ display: none; }
+.bpu-bang .bb-tl-chuoi > div{ min-width: 0; }

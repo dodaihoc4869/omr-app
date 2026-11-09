@@ -15,19 +15,25 @@ describe('lưới tên', () => {
       expect(L.cot * L.w + (L.cot - 1) * KHE).toBeLessThanOrEqual(RONG_LUOI + 0.01)
     }
   })
-  it('tên gọi: chữ cuối; trùng thì hai chữ cuối; vẫn trùng thì thêm số', () => {
+  // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «dải đội đang hiện mỗi "Học" cho "Đỗ Đại Học" … dùng tên gọi 2 chữ cuối cho nhất quán, không cụt một chữ»):
+  // tên gọi = HAI chữ cuối (cũ: chữ cuối); trùng ⇒ cả họ tên (cũ: hai chữ cuối); vẫn trùng ⇒ thêm số.
+  it('tên gọi: hai chữ cuối; trùng thì cả họ tên; vẫn trùng thì thêm số', () => {
     const m = tenGoiLop([
       { sbd: 'a', ten: 'Đỗ Đại Học' }, { sbd: 'b', ten: 'Trần Thảo Nguyên' },
       { sbd: 'c', ten: 'Nguyễn Minh Anh' }, { sbd: 'd', ten: 'Lê Ngọc Anh' },
       { sbd: 'e', ten: 'Phạm Bảo Châu' }, { sbd: 'f', ten: 'Võ Bảo Châu' }, { sbd: 'g', ten: '' },
+      { sbd: 'h', ten: 'Lê Văn Nam' }, { sbd: 'i', ten: 'Lê  Văn Nam' }, { sbd: 'k', ten: 'Tùng' },
     ])
-    expect(m.get('a')).toBe('Học')
-    expect(m.get('b')).toBe('Nguyên')
+    expect(m.get('a')).toBe('Đại Học')
+    expect(m.get('b')).toBe('Thảo Nguyên')
     expect(m.get('c')).toBe('Minh Anh')
     expect(m.get('d')).toBe('Ngọc Anh')
-    expect(m.get('e')).toBe('Bảo Châu 5')
-    expect(m.get('f')).toBe('Bảo Châu 6')
+    expect(m.get('e')).toBe('Phạm Bảo Châu')
+    expect(m.get('f')).toBe('Võ Bảo Châu')
     expect(m.get('g')).toBe('g')
+    expect(m.get('h')).toBe('Lê Văn Nam 8')
+    expect(m.get('i')).toBe('Lê Văn Nam 9')
+    expect(m.get('k')).toBe('Tùng')
   })
 })
 
