@@ -210,7 +210,7 @@ const em = (st: TrangThaiPhong, sbd: string): EmPhong | undefined => st.ds.find(
 function ghiBienDong(st: TrangThaiPhong, ds: readonly Omit<BienDong, 'id' | 'luc'>[], nay: number): void {
   if (!ds.length) return
   const cu = st.bienDong ?? []
-  let id = cu.at(-1)?.id ?? 0
+  let id = cu[cu.length - 1]?.id ?? 0
   st.bienDong = [...cu, ...ds.map((x) => ({ ...x, lyDo: x.lyDo.slice(0, 80), id: ++id, luc: nay }))].slice(-BIEN_DONG_GIU)
 }
 /** Cộng/trừ kJ một em, KẸP ≥ 0 — trả số kJ thực đổi. */

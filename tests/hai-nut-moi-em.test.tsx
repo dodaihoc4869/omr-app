@@ -6,6 +6,11 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import type { EmTomTat, HoSoEm } from '../src/lib/exam-api'
+import { useCoHoa2 as __coHoa2 } from '../src/components/chien-dich/co-hoa2'
+import { beforeEach as __truocMoi } from 'vitest'
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «load lại nhiều lần là lại hiện màn [Hôm nay đời cũ], bỏ hẳn đi»): máy chưa nhớ cờ ⇒ mặc định Game Hóa 2.0 BẬT;
+// tệp này viết cho giao diện cờ TẮT ⇒ đặt rõ cờ tắt trước mỗi ca.
+__truocMoi(() => { __coHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) })
 
 const DS: EmTomTat[] = [
   { sbd: '001', hoTen: 'Lê Minh Đức', lop: '12A1', namSinh: '2008', soCa: 3, diemGanNhat: 7.5, trangThai: 'trong_danh_sach' } as EmTomTat,
