@@ -332,3 +332,35 @@ html.may-yeu .bb-goc.nay, html.may-yeu .bb-goc.nay .ts b { animation: none; }
 .bpu-bang .bb-pa > div { font-size: calc(46px * var(--k)); font-weight: 500; }
 .bpu-bang :is(.bb-pill, .bb-lop) { font-size: 30px; }
 .bpu-bang .bb-chip { font-size: 26px; }
+
+/* ═══ 09/11 TRÙNG TU (thầy «mọi thứ mượt mà đẳng cấp, logic, các nút bấm thuận tiện cho việc gọi học sinh lên bảng … chiếu lên mắt phải thật dễ chịu») ═══
+   Phông: Be Vietnam Pro (thầy chốt 08/11) — đề 500, nhãn 600–700, số / tên 800 (tải kèm mảnh bảng). Số luôn đều cột. Chuyển động: transform + opacity. */
+.bpu-bang { font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.bpu-bang .bb-dong-chu { font-variant-numeric: normal; }
+.bb-canh { position: absolute; inset: 0; animation: bb-canh-vao 0.46s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes bb-canh-vao { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/* Nút chính (một nút mỗi màn, cuối thanh): cùng kiểu nút «Câu tiếp» cũ. */
+.bb-chinh { flex: none; display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 26px; border: 0; border-radius: 18px; font: 800 25px var(--sans); cursor: pointer; white-space: nowrap;
+  background: var(--tr-hs); color: var(--p-muc); box-shadow: 0 5px 0 color-mix(in srgb, var(--tr-hs) 60%, var(--p-muc)); transition: transform 0.12s, box-shadow 0.12s, opacity 0.2s; }
+.bb-chinh:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 color-mix(in srgb, var(--tr-hs) 60%, var(--p-muc)); }
+.bb-chinh:disabled { opacity: 0.6; cursor: default; }
+.bb-chinh kbd { font: 700 19px var(--sans); padding: 3px 10px; border-radius: 10px; background: color-mix(in srgb, var(--p-muc) 14%, transparent); }
+.bb-chinh:focus-visible, .bb-hoi:focus-visible { outline: 4px solid var(--tr-tin); outline-offset: 3px; }
+.bb-logo.gon span { display: none; }
+.bb-lop { display: flex; align-items: baseline; gap: 16px; }
+.bb-ma { font-size: 22px; font-weight: 600; color: var(--tr-chu-3); }
+.bb-ma b { font-weight: 800; letter-spacing: 0.06em; color: var(--tr-chu-2); }
+.bb-cho-chon { position: absolute; left: 40px; right: 40px; top: 104px; bottom: 36px; z-index: 10; display: grid; place-content: center; border-radius: 30px; background: var(--tr-mat); font-size: 30px; color: var(--tr-chu-2); }
+.bcc::before { content: ''; position: absolute; left: -40px; right: -40px; top: -12px; bottom: -36px; z-index: -1; background: var(--tr-nen); }
+/* LÊN BẢNG (thầy 09/11 «khi gọi lên bảng hiệu ứng đẳng cấp thu nhỏ luôn vào màn chiếu chuẩn trước đó»): bảng thu nhỏ về giữa + mờ dần, lộ tờ chiếu cũ
+   ngay dưới; chấm Đạt / Chưa đạt ⇒ bảng phóng lại. gan-gv.tsx bật lớp; máy yếu / giảm chuyển động ⇒ ẩn hiện tức thì (không gắn lớp). */
+[data-bpu-bang].bpu-thu > .bpu-bang { animation: bpu-thu 0.5s cubic-bezier(.4, 0, .2, 1) forwards; will-change: transform, opacity; pointer-events: none; }
+[data-bpu-bang].bpu-no > .bpu-bang { animation: bpu-no 0.46s cubic-bezier(.2, .8, .2, 1) both; will-change: transform, opacity; }
+@keyframes bpu-thu { 0% { transform: none; opacity: 1; border-radius: 0; } 60% { opacity: 0.85; } 100% { transform: scale(0.8); opacity: 0; border-radius: 48px; } }
+@keyframes bpu-no { from { transform: scale(0.9); opacity: 0; border-radius: 48px; } to { transform: none; opacity: 1; border-radius: 0; } }
+@media (prefers-reduced-motion: reduce) { .bb-canh { animation: none; } }
+html.may-yeu .bb-canh { animation: none; }
+/* Thanh trên khi đang chiếu câu: đủ chỗ cho nút chính «Gọi lên bảng» (ảnh chụp 09/11: nút chính tràn mép). */
+.bb-tren { gap: 14px; }
+.bb-tren .bb-hoi { padding: 0 13px; gap: 8px; }
+.bb-tren .bb-pill { padding: 8px 18px; }

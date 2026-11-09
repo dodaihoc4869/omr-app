@@ -1,0 +1,137 @@
+// BÌNH PHẢN ỨNG — CHỌN CÂU NGAY TRÊN BẢNG CHIẾU (thầy 09/11: «có nút xong điểm danh rồi chọn câu chiếu ngay trên màn điểm danh đó»).
+// Mảnh nạp lười (chỉ khi thầy bấm «Xong điểm danh» / «Chọn câu»). Kho = nhánh DẠY HỌC (cùng kho bảng Dạy học). Trái: bài (câu đã chọn cho buổi ở
+// bảng Dạy học đứng đầu, lọc khối theo lớp, ô tìm); phải: thẻ câu của bài. Bấm thẻ ⇒ chiếu từ câu ấy (các câu sau của bài nối tiếp cho «Câu tiếp»).
+// Thầy tự chọn ⇒ hiện cả câu tự luận (luật «Gọi lên bảng thầy chọn gì hiện đúng thế»). Nằm trong sân khấu 1920×1080 của bảng ⇒ cỡ theo px sân khấu.
+import { useEffect, useMemo, useRef, useState } from 'react'
+import type { TeacherExamSource } from '../../data/examContent'
+import { cauTuDeChon, tomTatDe, type CauDayHoc } from '../../lib/day-hoc-len-bang'
+import { baiDaChonCuaBuoi, napKhoDayHoc } from '../../lib/bpu/to-chieu-bpu'
+import './chon-cau.css'
+
+const DA_CHON = '__da-chon'
+const LOAI: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng–sai', III: 'Trả lời ngắn' }
+const MUC: Record<string, string> = { biet: 'Nhận biết', hieu: 'Thông hiểu', van_dung: 'Vận dụng' }
+const tenBai = (s: TeacherExamSource) => (s.nguon || s.maDe).split(' — ')[0]!.trim()
+/** «12 · DẠY HỌC/C1 - Ester» ⇒ { khoi: '12', chuong: 'C1 - Ester' }. */
+function nhomCua(s: TeacherExamSource): { khoi: string; chuong: string } {
+  const n = (s.nhom || '').trim(), i = n.indexOf('·'), j = n.lastIndexOf('/')
+  return { khoi: i >= 0 ? n.slice(0, i).trim() : '', chuong: j >= 0 ? n.slice(j + 1).trim() : n }
+}
+/** Loại câu của bài (kho Dạy học tách theo phần ⇒ một bài thường chỉ một loại). */
+const loaiBai = (s: TeacherExamSource) => [s.phanI.length ? 'Trắc nghiệm' : '', s.phanII.length ? 'Đúng–sai' : '', s.phanIII.length ? 'Trả lời ngắn' : ''].filter(Boolean).join(' · ')
+const boDau = (t: string) => t.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase()
+
+export interface PropsChonCau {
+  buoiId: string
+  lop: string
+  /** Dựng tờ + chiếu; trả lời báo lỗi (rỗng = đã chiếu). */
+  onChieu: (ds: CauDayHoc[]) => Promise<string>
+  onDong: () => void
+}
+
+export default function ChonCauBpu({ buoiId, lop, onChieu, onDong }: PropsChonCau) {
+  const [kho, setKho] = useState<TeacherExamSource[] | null>(null)
+  const [loi, setLoi] = useState('')
+  const [lan, setLan] = useState(0)
+  const [tim, setTim] = useState('')
+  const khoiLop = /^(10|11|12)/.exec(lop.trim())?.[1] ?? ''
+  const [khoi, setKhoi] = useState(khoiLop)
+  const daChon = useMemo(() => baiDaChonCuaBuoi(buoiId), [buoiId])
+  const [bai, setBai] = useState<string>(daChon.maChon.length ? DA_CHON : '')
+  const [dang, setDang] = useState<string | null>(null)
+  const [loiChieu, setLoiChieu] = useState('')
+  const cot = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let con = true
+    napKhoDayHoc().then((k) => { if (con) setKho(k) }, () => { if (con) setLoi('Chưa đọc được kho đề trên máy này.') })
+    return () => { con = false }
+  }, [lan])
+
+  const cauDaChon = useMemo(() => {
+    if (!kho || !daChon.maChon.length) return []
+    const bo = new Set(daChon.boCau)
+    return cauTuDeChon(kho, new Set(daChon.maChon)).filter((c) => !bo.has(c.khoa))
+  }, [kho, daChon])
+  // Bài theo chương (giữ thứ tự kho), lọc khối + ô tìm (không dấu).
+  const nhom = useMemo(() => {
+    const m = new Map<string, TeacherExamSource[]>()
+    const t = boDau(tim.trim())
+    for (const s of kho ?? []) {
+      const n = nhomCua(s)
+      if (khoi && n.khoi && n.khoi !== khoi) continue
+      if (t && !boDau(`${tenBai(s)} ${n.chuong}`).includes(t)) continue
+      const k = `${n.khoi ? `Lớp ${n.khoi} · ` : ''}${n.chuong || 'Chưa xếp chương'}`
+      m.set(k, [...(m.get(k) ?? []), s])
+    }
+    return [...m]
+  }, [kho, khoi, tim])
+  // Bài đã chọn của buổi không còn câu nào trong kho máy này ⇒ chưa chọn bài (không hiện «0 câu»).
+  const baiHien = bai === DA_CHON && kho && !cauDaChon.length ? '' : bai
+  const cauBai = useMemo(() => (baiHien === DA_CHON ? cauDaChon : kho && baiHien ? cauTuDeChon(kho, new Set([baiHien])) : []), [baiHien, kho, cauDaChon])
+  const tenDangXem = baiHien === DA_CHON ? 'Câu đã chọn cho buổi này' : (kho?.find((s) => s.maDe === baiHien) ? tenBai(kho.find((s) => s.maDe === baiHien)!) : '')
+  useEffect(() => { cot.current?.scrollTo?.({ top: 0 }) }, [bai])
+
+  const chieu = async (i: number) => {
+    if (dang) return
+    const c = cauBai[i]
+    if (!c) return
+    setDang(c.khoa); setLoiChieu('')
+    const chu = await onChieu(cauBai.slice(i))
+    setDang(null)
+    if (chu) setLoiChieu(chu)
+  }
+
+  return (
+    <div className="bcc" role="dialog" aria-label="Chọn câu chiếu lên bảng">
+      <div className="bcc-dau">
+        <h2>Chọn câu chiếu</h2>
+        <p>Bấm một câu: câu lên bảng, tự gửi xuống máy các em có mặt.</p>
+        <button type="button" className="bcc-dong" onClick={onDong}><kbd>Esc</kbd>Đóng</button>
+      </div>
+      <div className="bcc-trai">
+        <div className="bcc-loc">
+          <input type="search" value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm bài, chương…" aria-label="Tìm bài" />
+          <div className="bcc-khoi" role="group" aria-label="Khối">
+            {['10', '11', '12', ''].map((k) => <button key={k || 'tat'} type="button" aria-pressed={khoi === k} onClick={() => setKhoi(k)}>{k ? `Lớp ${k}` : 'Tất cả'}</button>)}
+          </div>
+        </div>
+        <div className="bcc-ds-bai">
+          {!kho && !loi ? <p className="bcc-cho">Đang mở kho Dạy học…</p> : null}
+          {loi ? <p className="bcc-cho">{loi} <button type="button" onClick={() => { setLoi(''); setLan((n) => n + 1) }}>Thử lại</button></p> : null}
+          {cauDaChon.length ? (
+            <button type="button" className="bcc-bai noi" aria-current={bai === DA_CHON || undefined} onClick={() => setBai(DA_CHON)}>
+              <b>Câu đã chọn cho buổi này</b><span>{cauDaChon.length} câu · từ bảng Dạy học</span>
+            </button>
+          ) : null}
+          {nhom.map(([ten, ds]) => (
+            <section key={ten}>
+              <h3>{ten}</h3>
+              {ds.map((s) => <button key={s.maDe} type="button" className="bcc-bai" aria-current={bai === s.maDe || undefined} onClick={() => setBai(s.maDe)}>
+                <b>{tenBai(s)}</b><span>{s.phanI.length + s.phanII.length + s.phanIII.length} câu · {loaiBai(s)}</span>
+              </button>)}
+            </section>
+          ))}
+          {kho && !nhom.length ? <p className="bcc-cho">Không có bài khớp «{tim}».</p> : null}
+        </div>
+      </div>
+      <div className="bcc-phai" ref={cot}>
+        {!baiHien ? <div className="bcc-trong"><b>Chọn một bài bên trái</b><span>Các câu của bài hiện ở đây.</span></div> : (
+          <>
+            <h3 className="bcc-ten-bai">{tenDangXem}<span>{cauBai.length} câu</span></h3>
+            <div className="bcc-luoi">
+              {cauBai.map((c, i) => (
+                <button key={c.khoa} type="button" className="bcc-cau" data-dang={dang === c.khoa || undefined} disabled={!!dang} onClick={() => void chieu(i)}>
+                  <span className="bcc-cau-dau"><i>Câu {i + 1}</i><em>{c.tuLuan ? 'Tự luận' : LOAI[c.phan]}</em>{c.mucDo ? <small>{MUC[c.mucDo] ?? c.mucDo}</small> : null}</span>
+                  <span className="bcc-cau-chu">{tomTatDe(c, 220)}</span>
+                  <span className="bcc-cau-chieu">{dang === c.khoa ? 'Đang dựng tờ chiếu…' : 'Chiếu câu này →'}</span>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+        {loiChieu ? <p className="bcc-loi" role="alert">{loiChieu}</p> : null}
+      </div>
+    </div>
+  )
+}

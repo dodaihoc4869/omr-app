@@ -2,9 +2,12 @@
 // Tờ vào đợt mới (TỰ ĐỘNG, thầy 07/11) hoặc thầy bấm P ⇒ lấy buổi điểm danh đang mở ⇒ mở bảng đè lên tờ và mở lượt cho câu đang chiếu (giây ước tính của câu).
 // Bảng bấm «Câu tiếp» / ← → ⇒ nhắn ngược tờ đổi đợt ⇒ tờ báo câu mới ⇒ lượt mới trên cùng bảng.
 // Tin tự động mà không có buổi đang mở / phòng không mở được / câu không gửi được ⇒ KHÔNG che tờ: đóng bảng, báo một lần, thầy chữa trên tờ như thường.
+// 09/11 (thầy «trùng tu lại toàn bộ màn này»): MỘT gốc bảng cho cả điểm danh lẫn các lượt (`moBangDiemDanh` → «Xong điểm danh» → chọn câu ngay trên bảng
+// `chieuCau` ⇒ tờ chiếu dựng sẵn nằm dưới bảng); gọi lên bảng ⇒ bảng THU NHỎ vào tờ cũ, chấm Đạt / Chưa đạt ⇒ bảng PHÓNG LẠI.
 import { createRoot, type Root } from 'react-dom/client'
 import { buoiDangMo, type BuoiHoc } from '../../lib/buoi-hoc-api'
 import { useAppStore } from '../../store/appStore'
+import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
 
 let goc: Root | null = null
@@ -17,6 +20,11 @@ let buoiNho: { ds: BuoiHoc[]; luc: number } | null = null
 let nghiDen = 0
 /** Nơi bảng nhận «Đạt / Chưa đạt» thầy bấm trên tờ cũ (bảng tự đăng kí khi dựng). */
 let nhanCham: ((dat: boolean) => void) | null = null
+/** MỘT GỐC BẢNG (09/11): điểm danh → chọn câu → các lượt dùng CHUNG một bảng (một nối phòng, không dựng lại, không chớp «Đang mở…»).
+ *  Props hiện tại của bảng; lần vẽ sau GỘP vào (mã điểm danh đổi mỗi phút không đè câu đang chiếu). */
+let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean } | null = null
+/** Bước Điểm danh (app thầy) muốn biết khi bảng đóng. */
+let dongNgoai: (() => void) | null = null
 const NHO_BUOI_MS = 60_000
 const GAN_DAY_MS = 4 * 3_600_000
 /** Buổi bước Điểm danh của máy này đang xem hôm nay (giờ VN) — cùng khoá `DiemDanhBuoi.tsx`. */
@@ -63,6 +71,31 @@ export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
   tiepNgay = false
   return new Promise((xong) => { henTu = setTimeout(() => { henTu = null; void moThat(qid, o).then(xong, xong) }, nhanh ? 0 : choTuDongMs) })
 }
+// Hàm gắn vào bảng ĐỨNG YÊN (module): bảng có hiệu ứng phụ thuộc chúng (nối phòng) ⇒ hàm mới mỗi lần vẽ sẽ làm rớt nối mỗi lần chuyển câu.
+const khongMo = (chu: string, caPhong: boolean) => { dongBang(); if (caPhong) nghiDen = Date.now() + 5 * 60_000; useAppStore.getState().showToast(chu, 'warn') }
+const tatBpu = () => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }
+const dangKyCham = (f: ((dat: boolean) => void) | null) => { nhanCham = f }
+const toiQuaTo = (d: 1 | -1) => toiCau(d)
+function veBang(): void {
+  if (!hien) return
+  if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
+  goc!.render(
+    <BangBinhPhanUng
+      key={hien.buoiId}
+      {...hien}
+      onDong={dongBang}
+      onToi={nguonTo ? toiQuaTo : undefined}
+      onGiai={giaiTrenTo}
+      layGiai={layGiai}
+      lenBangTo={lenBangTo}
+      dangKyChamTo={dangKyCham}
+      onKhongMo={khongMo}
+      onTat={tatBpu}
+      onChieuCau={chieuCau}
+      gocPortal={khung}
+    />,
+  )
+}
 async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true
   if (tuDong && Date.now() < nghiDen) return
@@ -70,24 +103,44 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   if (!buoiId) return
   if (o.nguon) nguonTo = o.nguon
   dem += 1
-  if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
-  // Phòng không mở được (ca mở, mất mạng) ⇒ tạm nghỉ tự mở 5 phút; chỉ CÂU này không gửi được ⇒ không nghỉ (câu sau vẫn tự gửi).
-  const khongMo = (chu: string, caPhong: boolean) => { dongBang(); if (caPhong) nghiDen = Date.now() + 5 * 60_000; useAppStore.getState().showToast(chu, 'warn') }
-  goc!.render(
-    <BangBinhPhanUng
-      buoiId={buoiId} qid={qid} luot={dem} giay={o.giay} tuDong={tuDong}
-      onDong={dongBang}
-      onToi={toiCau}
-      onGiai={giaiTrenTo}
-      layGiai={layGiai}
-      lenBangTo={lenBangTo}
-      dangKyChamTo={(f) => { nhanCham = f }}
-      onKhongMo={khongMo}
-      onTat={() => { dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }}
-    />,
-  )
+  const cung = hien?.buoiId === buoiId
+  hien = { ...(cung ? { ma: hien!.ma, linkQr: hien!.linkQr } : {}), buoiId, qid, luot: dem, giay: o.giay, tuDong }
+  veBang()
   // Màn Hành trình (bước «Chọn câu & chiếu») nghe để sang bước «Đang chiếu».
   try { window.dispatchEvent(new CustomEvent('bpu-dang-chieu', { detail: { buoiId } })) } catch { /* trình duyệt cũ */ }
+}
+/** CHIẾU ĐIỂM DANH = MỞ MÀN Bình Phản Ứng (bước Điểm danh của app thầy). Bảng đang mở cho đúng buổi ⇒ chỉ cập nhật mã, giữ câu đang chiếu. */
+export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?: string | null; onDong?: () => void }): void {
+  dongNgoai = o.onDong ?? null
+  if (hien?.buoiId === o.buoiId && khung) { capNhatMa(o.buoiId, o.ma, o.linkQr); return } // không phóng lại bảng: em có thể đang trên bảng (mã đổi mỗi phút)
+  hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr }
+  veBang()
+}
+/** Mã điểm danh đổi mỗi phút ⇒ chỉ gộp mã + QR (không đụng câu / lượt đang chiếu). */
+export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | null): void {
+  if (!hien || hien.buoiId !== buoiId || (hien.ma === ma && hien.linkQr === linkQr)) return
+  hien = { ...hien, ma, linkQr }
+  veBang()
+}
+
+// TỜ CHIẾU CỦA CÂU THẦY CHỌN TRÊN BẢNG: khung xem tờ (KhungXemPhieu, cùng khung bảng Dạy học dùng) nằm DƯỚI bảng. Tờ vào đợt ⇒ tự báo câu ⇒ bảng mở lượt.
+let toGoc: Root | null = null
+let toKhung: HTMLDivElement | null = null
+function dongTo(): void { toGoc?.unmount(); toGoc = null; toKhung?.remove(); toKhung = null; nguonTo = null; if (hien) veBang() }
+/** Dựng tờ từ câu đã chọn (câu bấm đứng đầu) rồi chiếu. Trả lời báo lỗi (rỗng = đã chiếu). */
+export async function chieuCau(ds: CauDayHoc[]): Promise<string> {
+  if (!ds.length) return 'Chưa chọn câu nào.'
+  let html = ''
+  try {
+    const { dungToChieuBpu } = await import('../../lib/bpu/to-chieu-bpu')
+    html = await dungToChieuBpu(ds, `Bình Phản Ứng · ${ds[0]!.tenDe}`)
+  } catch (e) { return e instanceof Error ? e.message : 'Chưa dựng được tờ chiếu.' }
+  const { default: KhungXemPhieu } = await import('../KhungXemPhieu')
+  nghiDen = 0
+  tiepNgay = true // thầy vừa chọn câu = ý muốn rõ ⇒ gửi NGAY (cùng khung tờ cũ thì không coi là «tờ mới»)
+  if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
+  toGoc!.render(<KhungXemPhieu html={html} ten="Tờ chiếu Bình Phản Ứng" dong={dongTo} />)
+  return ''
 }
 /** Phím G trên bảng: đóng bảng, tờ mở lời giải thu gọn của câu đang chiếu (bảng che tờ nên phím không tới được tờ). */
 export function giaiTrenTo(): void {
@@ -118,20 +171,62 @@ export function toiCau(d: 1 | -1): void {
 export function baoHetCau(d: 1 | -1): void {
   useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
-export function dongBang(): void { goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null }
+export function dongBang(): void {
+  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null
+  window.removeEventListener('keydown', phimKhiAn, true)
+  const f = dongNgoai; dongNgoai = null; f?.()
+}
+
+// CHUYỂN CẢNH LÊN BẢNG (thầy 09/11 «khi gọi lên bảng hiệu ứng đẳng cấp thu nhỏ luôn vào màn chiếu chuẩn trước đó»): bảng THU NHỎ + mờ dần để lộ tờ
+// chiếu cũ nằm ngay dưới; chấm xong bảng PHÓNG LẠI từ giữa. Chỉ transform + opacity (máy chiếu yếu vẫn mượt); máy yếu / giảm chuyển động ⇒ ẩn hiện tức thì.
+// Tờ ở cửa sổ riêng (không nằm trong trang) ⇒ ẩn tức thì như cũ.
+const giamChuyenDong = () => (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('may-yeu')
+const toTrongTrang = () => !!nguonTo && [...document.querySelectorAll('iframe')].some((f) => f.contentWindow === nguonTo)
+const bangAn = () => !!khung && khung.hasAttribute('data-an')
+function baoAnHien(an: boolean): void { try { window.dispatchEvent(new CustomEvent('bpu-an-hien', { detail: an })) } catch { /* trình duyệt cũ */ } }
+function anBang(): void {
+  const el = khung
+  if (!el) return
+  el.setAttribute('data-an', '')
+  baoAnHien(true)
+  window.addEventListener('keydown', phimKhiAn, true)
+  if (!toTrongTrang() || giamChuyenDong()) { el.style.display = 'none'; return }
+  el.classList.remove('bpu-no')
+  el.classList.add('bpu-thu')
+  const xong = () => { if (el.classList.contains('bpu-thu')) { el.style.display = 'none'; el.classList.remove('bpu-thu') } }
+  el.addEventListener('animationend', xong, { once: true })
+  setTimeout(xong, 800)
+}
+function hienBang(): void {
+  const el = khung
+  if (!el || !el.hasAttribute('data-an')) return
+  el.removeAttribute('data-an')
+  window.removeEventListener('keydown', phimKhiAn, true)
+  el.classList.remove('bpu-thu')
+  el.style.display = ''
+  baoAnHien(false)
+  if (!giamChuyenDong()) { el.classList.add('bpu-no'); const bo = () => el.classList.remove('bpu-no'); el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 800) }
+  el.querySelector<HTMLElement>('.bpu-bang')?.focus()
+}
+/** Bảng đang ẩn mà tiêu điểm còn ở app (không ở tờ): D = Đạt, K / F = Chưa đạt vẫn chấm được; Esc / P đưa bảng về. */
+function phimKhiAn(e: KeyboardEvent): void {
+  if (!bangAn() || (e.target as HTMLElement | null)?.closest?.('input,textarea')) return
+  const k = e.key.toLowerCase()
+  if (k === 'd' || k === 'k' || k === 'f') { e.preventDefault(); e.stopImmediatePropagation(); chamTuTo(k === 'd'); return }
+  if (k === 'escape' || k === 'p') { e.preventDefault(); e.stopImmediatePropagation(); hienBang() }
+}
 /** LÊN BẢNG BẰNG TỜ CŨ (thầy 08/11 «gọi hs lên bảng thì chuyển về màn chiếu cũ … bấm đạt hoặc ko đạt thì tự động chuyển sang bình phản ứng»):
- *  bảng ẨN (giữ nối phòng + trạng thái), tờ chạy màn lên bảng nguyên bản cho em bảng vừa chọn. Không có tờ ⇒ false (bảng tự lo như cũ). */
+ *  bảng thu nhỏ rồi ẨN (giữ nối phòng + trạng thái), tờ chạy màn lên bảng nguyên bản cho em bảng vừa chọn. Không có tờ ⇒ false (bảng tự lo như cũ). */
 export function lenBangTo(em: { sbd: string; ten: string }): boolean {
   if (!nguonTo || !khung) return false
   try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten } }, '*') } catch { return false }
-  khung.style.display = 'none'
+  anBang()
   try { nguonTo.focus() } catch { /* tờ chặn */ }
   return true
 }
-/** Tờ báo thầy đã chấm em lên bảng ⇒ hiện lại bảng, bảng ghi kết quả + mở đáp án. */
+/** Tờ báo thầy đã chấm em lên bảng ⇒ bảng phóng lại, ghi kết quả + mở đáp án. Bảng không ẩn ⇒ bỏ qua (không ghi hai lần). */
 export function chamTuTo(dat: boolean): void {
-  if (!khung) return
-  khung.style.display = ''
+  if (!bangAn()) return
+  hienBang()
   nhanCham?.(dat)
-  khung.querySelector<HTMLElement>('.bpu-bang')?.focus()
 }
