@@ -139,17 +139,18 @@ describe('rời màn: báo động, không trừ kJ (thầy 09/11)', () => {
     expect(st.ds[0]!.roi).toBe(2)
     expect(st.luot!.roiMe).toEqual(['S01', 'S02'])
   })
-  it('mở đáp án ⇒ roiNay rỗng; lúc chờ (đã mở) rời không tính; lượt mới ⇒ rỗng', () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (lần 3, thầy «học sinh thoát ra làm việc khác … báo động như báo cháy»): rời màn tính MỌI LÚC trong buổi; «đang rời» giữ qua
+  // mở đáp án / lượt mới, chỉ tắt khi em quay lại (`ve` / nối lại).
+  it('rời màn mọi lúc (cả khi đã mở đáp án, giữa lượt); báo động giữ qua lượt mới tới khi em quay lại', () => {
     const st = phong(); moLuot(st, cau, T0)
     roiMan(st, 'S01', T0)
     moDapAn(st, T0 + 1000, chamSo)
-    expect(viewBang(st).roiNay).toEqual([])
-    expect(roiMan(st, 'S02', T0)).toBe(false)
+    expect(viewBang(st).roiNay).toEqual(['S01'])
+    expect(roiMan(st, 'S02', T0)).toBe(true)
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 2000)
-    roiMan(st, 'S03', T0 + 2500)
-    expect(st.roiNay).toEqual(['S03'])
-    moLuot(st, { ...cau, qid: 'q3' }, T0 + 3000)
-    expect(viewBang(st).roiNay).toEqual([])
+    expect(viewBang(st).roiNay).toEqual(['S01', 'S02'])
+    veMan(st, 'S01', T0 + 2500)
+    expect(viewBang(st).roiNay).toEqual(['S02'])
   })
 })
 

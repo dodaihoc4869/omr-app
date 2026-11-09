@@ -95,6 +95,7 @@ function veBang(): void {
       onTat={tatBpu}
       onChieuCau={chieuCau}
       onHoatDong={moHoatDongTuBang}
+      onKetThuc={ketThucBuoiHoc}
       gocPortal={khung}
     />,
   )
@@ -140,6 +141,16 @@ export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise
   if (khung && !bangAn()) { anViHd = true; anBang() }
 }
 function moHoatDongTuBang(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): void { void moHoatDong(hd) }
+/** KẾT THÚC BUỔI HỌC từ bảng (thầy 09/11 «thiết kế nút đẹp mắt kết thúc buổi học»; nút ở «Hôm nay làm gì?»): đóng buổi trên máy chủ (phòng kết thúc ⇒ máy em
+ *  mới thoát được màn Bình Phản Ứng), đóng bảng + tấm buổi dạy. Trả câu báo lỗi (rỗng = đã kết thúc). */
+async function ketThucBuoiHoc(buoiId: string): Promise<string> {
+  const { dongBuoiHoc } = await import('../../lib/buoi-hoc-api')
+  const r = await dongBuoiHoc(buoiId)
+  if (!r.ok) return r.chu
+  dongBang(); dongHoatDong()
+  useAppStore.getState().showToast('Đã kết thúc buổi học', 'success')
+  return ''
+}
 export function dongHoatDong(): void {
   hdGoc?.unmount(); hdGoc = null; hdKhung?.remove(); hdKhung = null
   if (anViHd) { anViHd = false; hienBang() }

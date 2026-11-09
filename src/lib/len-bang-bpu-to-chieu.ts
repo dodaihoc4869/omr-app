@@ -22,24 +22,43 @@ export const JS_LEN_BANG_BPU = `
     if (window.__mcVaoLai) window.__mcVaoLai();
     luaDoi(d, em); // sau __mcVaoLai (vào lại đợt phát 'mc-vao-dot' ⇒ xoá lửa cũ)
     // 09/11 thầy «bấm L lên bảng thì đổi mượt mà sang tờ chiếu cũ chứ không tự động gọi lên bảng»: goiNgay=false ⇒ tờ ở «chờ gọi», thẻ tên em đã đặt; thầy bấm L để mời em.
-    if (em.goiNgay === false) { baoNhanh('Bấm L để mời ' + String(em.ten || '') + ' lên bảng', 2600); return; }
+    // 09/11 (lần 3) thầy «bấm L cái là thu về màn cũ hiện thẻ tên luôn … thẻ tên thu nhỏ vào đẹp tinh tế siêu đẹp, tôn vinh»: thẻ tên hiện NGAY — bay từ giữa
+    // màn (to) thu nhỏ về chỗ của nó, viền + quầng màu đội; tờ vẫn «chờ gọi» (L mời em như tờ cũ, D / K chấm thẳng).
+    if (em.goiNgay === false) {
+      the.hidden = false;
+      var mauThe = String(em.mau || '').trim();
+      if (mauThe && /^[#a-z0-9(),.%\\s-]+$/i.test(mauThe)) { the.style.setProperty('--bpu-doi', mauThe); the.classList.add('bpu-the-ton'); }
+      try {
+        var r = the.getBoundingClientRect(), dx = window.innerWidth / 2 - (r.left + r.width / 2), dy = window.innerHeight / 2 - (r.top + r.height / 2);
+        var lang = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('may-yeu');
+        if (!lang && the.animate) the.animate([
+          { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(2.4)', opacity: 0 },
+          { transform: 'translate(' + dx * 0.9 + 'px,' + dy * 0.9 + 'px) scale(2.2)', opacity: 1, offset: 0.3 },
+          { transform: 'translate(0,0) scale(1)', opacity: 1 }
+        ], { duration: 1150, easing: 'cubic-bezier(.22,.8,.2,1)' });
+      } catch (x) { /* trình duyệt cũ */ }
+      baoNhanh('L — mời ' + String(em.ten || '') + ' lên bảng · D Đạt · K Chưa đạt', 3200);
+      return;
+    }
     if (window.__mcLenBang) window.__mcLenBang();
   }
   // 09/11 thầy «học sinh đội nào lên bảng thì có ngọn lửa đội đó cháy ở góc đề siêu đẹp … đủ to để cả lớp phải wow»: ngọn lửa màu đội (mã màu bảng gửi)
   // nằm ở góc phải trên của đề (float — chữ đề chảy quanh, không bị che), lõi sáng, tia lửa bay lên; chấm xong / sang đợt khác thì tắt.
-  var CSS_LUA = '.bpu-lua-doi{float:right;position:relative;width:170px;height:214px;margin:-6px -6px 6px 18px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none;animation:bpuLuaVao .7s cubic-bezier(.2,.8,.2,1) both}'
-    + '.bpu-lua-doi svg{width:150px;height:180px;overflow:visible;filter:drop-shadow(0 0 22px var(--doi)) drop-shadow(0 0 6px var(--doi))}'
+  var CSS_LUA = '.bpu-lua-doi{float:left;position:relative;width:236px;height:296px;margin:-8px 22px 8px -8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none;animation:bpuLuaVao .7s cubic-bezier(.2,.8,.2,1) both}'
+    + '.bpu-lua-doi svg{width:210px;height:252px;overflow:visible;filter:drop-shadow(0 0 22px var(--doi)) drop-shadow(0 0 6px var(--doi))}'
     + '.bpu-lua-doi .l1{fill:var(--doi);transform-origin:50% 100%;animation:bpuLuaCay 1.1s ease-in-out infinite alternate}'
     + '.bpu-lua-doi .l2{fill:Canvas;opacity:.55;transform-origin:50% 100%;animation:bpuLuaCay .8s ease-in-out infinite alternate-reverse}'
     + '.bpu-lua-doi .l3{fill:Canvas;opacity:.92;transform-origin:50% 100%;animation:bpuLuaCay .6s ease-in-out infinite alternate}'
     + '.bpu-lua-doi .tia{fill:var(--doi);opacity:0;animation:bpuTia 1.6s ease-out infinite}'
     + '.bpu-lua-doi .tia:nth-of-type(2){animation-delay:.5s}.bpu-lua-doi .tia:nth-of-type(3){animation-delay:1s}'
-    + '.bpu-lua-doi b{margin-top:2px;padding:3px 14px;border-radius:999px;background:var(--doi);color:Canvas;font:800 18px/1.3 inherit;letter-spacing:.04em;white-space:nowrap;box-shadow:0 0 18px var(--doi)}'
+    + '.bpu-lua-doi b{margin-top:2px;padding:4px 16px;border-radius:999px;background:var(--doi);color:Canvas;font:800 22px/1.3 inherit;letter-spacing:.04em;white-space:nowrap;box-shadow:0 0 18px var(--doi)}'
+    + '.mc-em.bpu-the-ton{border-radius:16px;box-shadow:0 0 0 4px var(--bpu-doi),0 0 40px var(--bpu-doi);animation:bpuTheSang 2.4s ease-in-out infinite alternate}'
+    + '@keyframes bpuTheSang{from{box-shadow:0 0 0 4px var(--bpu-doi),0 0 22px var(--bpu-doi)}to{box-shadow:0 0 0 4px var(--bpu-doi),0 0 52px var(--bpu-doi)}}'
     + '@keyframes bpuLuaCay{0%{transform:scale(1,1) skewX(0)}50%{transform:scale(.96,1.07) skewX(2deg)}100%{transform:scale(1.03,.95) skewX(-2deg)}}'
     + '@keyframes bpuTia{0%{opacity:0;transform:translate(0,0) scale(1)}20%{opacity:.95}100%{opacity:0;transform:translate(var(--tx,8px),-90px) scale(.3)}}'
     + '@keyframes bpuLuaVao{from{opacity:0;transform:scale(.4) translateY(30px)}to{opacity:1;transform:none}}'
     + '@media (prefers-reduced-motion:reduce){.bpu-lua-doi,.bpu-lua-doi *{animation:none!important}.bpu-lua-doi .tia{display:none}}html.may-yeu .bpu-lua-doi *{animation:none!important}';
-  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); }
+  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-the-ton'), function (x) { x.classList.remove('bpu-the-ton'); }); }
   function luaDoi(d, em) {
     xoaLua();
     var mau = String(em.mau || '').trim(); if (!mau || !/^[#a-z0-9(),.%\\s-]+$/i.test(mau)) return;

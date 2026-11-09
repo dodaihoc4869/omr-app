@@ -72,3 +72,14 @@ html.may-yeu :is(.bcc-cau, .bcc-bai) { transition: none; }
 .bcc-hd-the kbd { position: absolute; right: 26px; top: 22px; font: 700 20px var(--sans); padding: 4px 12px; border-radius: 10px; background: var(--tr-mat-3); color: var(--tr-chu-2); }
 @media (prefers-reduced-motion: reduce) { .bcc-hd-the { transition: none; } }
 html.may-yeu .bcc-hd-the { transition: none; }
+/* «Kết thúc buổi học» (09/11): dải dưới bốn thẻ — nút đỏ bo tròn, biểu tượng nguồn; bấm lần 1 đổi chữ xác nhận (viền sáng nhấp nháy nhẹ). */
+.bcc-ket-thuc { grid-column: 1 / -1; align-self: end; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 20px 26px 20px 34px; border-radius: 28px;
+  background: color-mix(in srgb, var(--tr-sai) 14%, var(--tr-mat)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-sai) 35%, transparent); }
+.bcc-ket-thuc span { font-size: 24px; color: var(--tr-chu-2); }
+.bcc-ket-thuc button { display: inline-flex; align-items: center; gap: 14px; min-height: 72px; padding: 0 34px; border: 0; border-radius: 999px; cursor: pointer; font: 800 26px var(--sans);
+  background: var(--tr-sai); color: var(--tr-chieu-giay); box-shadow: 0 8px 26px color-mix(in srgb, var(--tr-sai) 45%, transparent); transition: transform 0.15s, box-shadow 0.15s; }
+.bcc-ket-thuc button:hover { transform: translateY(-2px); box-shadow: 0 12px 40px color-mix(in srgb, var(--tr-sai) 45%, transparent); }
+.bcc-ket-thuc button:active { transform: scale(0.97); }
+.bcc-ket-thuc button[data-xac-nhan] { box-shadow: 0 0 0 5px var(--tr-chieu-giay), 0 0 34px var(--tr-sai); animation: bcc-xn 0.8s ease-in-out infinite alternate; }
+@keyframes bcc-xn { to { box-shadow: 0 0 0 5px var(--tr-chieu-giay), 0 0 60px var(--tr-sai); } }
+@media (prefers-reduced-motion: reduce) { .bcc-ket-thuc button[data-xac-nhan] { animation: none; } }

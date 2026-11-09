@@ -201,7 +201,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
 
   // RỜI MÀN: CHỈ khi đang có lượt chưa mở đáp án (đang làm / bạn lên bảng). Ẩn app ≥ 2 giây ⇒ báo phòng một lần; quay lại ⇒ màn cảnh báo; nút Back bị giữ.
   // Không có nút rời (09/11): em chỉ thoát khi thầy kết thúc buổi học (phòng kết thúc ⇒ màn tự đóng).
-  const dangChoi = !an && !!v?.luot && v.luot.pha !== 'mo' && !v.ketThuc
+  // 09/11 (lần 3) thầy «học sinh thoát ra làm việc khác»: đo rời màn MỌI LÚC màn đang hiện (cả lúc chờ / đã che), tới khi thầy kết thúc buổi.
+  const dangChoi = !an && !!v && !v.ketThuc
   useEffect(() => {
     if (!dangChoi) return
     let hen: ReturnType<typeof setTimeout> | undefined

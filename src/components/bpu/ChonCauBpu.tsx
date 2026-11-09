@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TeacherExamSource } from '../../data/examContent'
 import { cauTuDeChon, tomTatDe, type CauDayHoc } from '../../lib/day-hoc-len-bang'
 import { baiDaChonCuaBuoi, napKhoDayHoc } from '../../lib/bpu/to-chieu-bpu'
-import { CalendarCheck, ClipboardCheck, Flame, Presentation } from 'lucide-react'
+import { CalendarCheck, ClipboardCheck, Flame, Power, Presentation } from 'lucide-react'
 import './chon-cau.css'
 
 const DA_CHON = '__da-chon'
@@ -32,6 +32,8 @@ export interface PropsChonCau {
   buocDau?: 'hd' | 'cau' | false
   /** Kiểm tra đầu giờ / Chữa câu khó / Kiểm tra ôn tập ⇒ tấm buổi dạy. */
   onHoatDong?: (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => void
+  /** Kết thúc buổi học (trả câu báo lỗi, rỗng = xong). */
+  onKetThuc?: () => Promise<string>
 }
 
 // «HÔM NAY LÀM GÌ?» (thầy 09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong tinh tế đẹp mắt hiệu quả»): bốn thẻ lớn trên bảng.
@@ -41,8 +43,13 @@ const HD: { id: 'day-hoc' | 'dau-gio' | 'chua-cau' | 'on-tap'; ten: string; mo: 
   { id: 'chua-cau', ten: 'Chữa câu khó & tính toán', mo: 'Câu nhiều em sai nhất và câu tính toán thầy chọn; mỗi câu gọi một em làm sai lên chữa.', Icon: Flame, phim: '3' },
   { id: 'on-tap', ten: 'Kiểm tra ôn tập', mo: 'Ngoài buổi dạy · lịch và đề dành riêng cho từng em.', Icon: CalendarCheck, phim: '4' },
 ]
-function HomNayLamGi({ onChon, onDong }: { onChon: (id: (typeof HD)[number]['id']) => void; onDong: () => void }) {
+function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[number]['id']) => void; onDong: () => void; onKetThuc?: () => Promise<string> }) {
   const goc = useRef<HTMLDivElement>(null)
+  // Kết thúc buổi: bấm lần 1 ⇒ nút đổi «Bấm lần nữa để kết thúc» (5 giây); lần 2 ⇒ đóng buổi (không cần hộp hỏi — hộp của app nằm dưới bảng).
+  const [xacNhan, setXacNhan] = useState(false)
+  const [dangKt, setDangKt] = useState('')
+  useEffect(() => { if (!xacNhan) return; const h = setTimeout(() => setXacNhan(false), 5000); return () => clearTimeout(h) }, [xacNhan])
+  const ketThuc = async () => { if (!onKetThuc) return; if (!xacNhan) { setXacNhan(true); return } setDangKt('…'); const loi = await onKetThuc(); setDangKt(loi); setXacNhan(false) }
   useEffect(() => { goc.current?.querySelector('button')?.focus() }, [])
   useEffect(() => {
     const phim = (e: KeyboardEvent) => { const m = HD.find((x) => x.phim === e.key); if (m) { e.preventDefault(); onChon(m.id) } }
@@ -64,13 +71,21 @@ function HomNayLamGi({ onChon, onDong }: { onChon: (id: (typeof HD)[number]['id'
           </button>
         ))}
       </div>
+      {onKetThuc ? (
+        <div className="bcc-ket-thuc">
+          <span>{dangKt && dangKt !== '…' ? dangKt : 'Xong cả buổi? Kết thúc để các em thoát Bình Phản Ứng.'}</span>
+          <button type="button" data-xac-nhan={xacNhan || undefined} disabled={dangKt === '…'} onClick={() => void ketThuc()}>
+            <Power size={26} aria-hidden="true" />{dangKt === '…' ? 'Đang kết thúc…' : xacNhan ? 'Bấm lần nữa để kết thúc' : 'Kết thúc buổi học'}
+          </button>
+        </div>
+      ) : null}
     </div>
   )
 }
 
 export default function ChonCauBpu(p: PropsChonCau) {
   const [buoc, setBuoc] = useState<'hd' | 'cau'>(p.buocDau === 'hd' && p.onHoatDong ? 'hd' : 'cau')
-  if (buoc === 'hd') return <HomNayLamGi onDong={p.onDong} onChon={(id) => { if (id === 'day-hoc') setBuoc('cau'); else p.onHoatDong?.(id) }} />
+  if (buoc === 'hd') return <HomNayLamGi onDong={p.onDong} onKetThuc={p.onKetThuc} onChon={(id) => { if (id === 'day-hoc') setBuoc('cau'); else p.onHoatDong?.(id) }} />
   return <ChonCau {...p} />
 }
 
