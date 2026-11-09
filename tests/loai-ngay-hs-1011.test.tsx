@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import { chuNutHoc } from '../src/components/hoc-tap/nhip-hom-nay'
-import { chuNutLoai } from '../src/components/hoc-tap/loai-ngay'
+import { chuNutLoai, nhomDangSua } from '../src/components/hoc-tap/loai-ngay'
 import { docTomTatGoi7 } from '../src/lib/goi-bai-7'
 
 const noop = () => {}
@@ -59,5 +59,24 @@ describe('đọc tóm tắt Gói 7', () => {
     expect(docTomTatGoi7({ ...tt, loaiNgay: 'moi' })?.loaiNgay).toBe('moi')
     expect(docTomTatGoi7({ ...tt, loaiNgay: 'on' })).not.toHaveProperty('loaiNgay')
     expect(docTomTatGoi7(tt)).not.toHaveProperty('loaiNgay')
+  })
+})
+
+describe('nút chính ngày Sửa: «Sửa nhóm N» (khối B lát 5, bản vẽ dt-sang-3)', () => {
+  const ns = [{ ten: 'Khối lượng muối của amine', so: 8, xong: 8 }, { ten: 'Tính base của amine', so: 6, xong: 2 }, { ten: 'Đồng phân amine', so: 4, xong: 0 }]
+  it('nhóm đang sửa = nhóm đầu chưa xong; thô hỏng / hết nhóm ⇒ null', () => {
+    expect(nhomDangSua(ns)).toEqual({ i: 2, ten: 'Tính base của amine' })
+    expect(nhomDangSua([{ ten: 'X', so: 2, xong: 2 }])).toBeNull()
+    expect(nhomDangSua('x')).toBeNull()
+    expect(nhomDangSua([{ ten: '', so: 2 }, { ten: 'Y', so: 3 }])).toEqual({ i: 2, ten: 'Y' })
+  })
+  it('Lộ trình ngày Sửa có nhóm ⇒ nút chính ghi «Sửa nhóm 2» + tên dạng; ngày học mới / Kiểm tra ôn tập ⇒ như cũ', () => {
+    const { container, rerender } = render(<MotTrangHs {...goc({ loaiNgay: 'sua', goi7: { nhomSua: ns, goi: [] } as never })} />)
+    expect(container.querySelector('.kb-cta')!.textContent).toContain('Sửa nhóm 2')
+    expect(container.querySelector('.kb-cta')!.textContent).toContain('Tính base của amine')
+    rerender(<MotTrangHs {...goc({ loaiNgay: 'moi', goi7: { nhomSua: ns, goi: [] } as never })} />)
+    expect(container.querySelector('.kb-cta')!.textContent).not.toContain('Sửa nhóm')
+    rerender(<MotTrangHs {...goc({ loaiNgay: 'sua', ngayKiem: true, goi7: { nhomSua: ns, goi: [] } as never })} />)
+    expect(container.querySelector('.kb-cta')?.textContent ?? '').not.toContain('Sửa nhóm')
   })
 })

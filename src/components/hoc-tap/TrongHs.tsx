@@ -8,7 +8,7 @@ import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical,
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
 import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
-import { NHAN_LOAI_NGAY, bongHoc, chuNutLoai, type LoaiNgay } from './loai-ngay'
+import { NHAN_LOAI_NGAY, bongHoc, chuNutLoai, nhomDangSua, type LoaiNgay } from './loai-ngay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { TomTatGoi7 } from '../../lib/goi-bai-7'
@@ -889,7 +889,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const moTp = (man: TenManThuong) => setTp({ man })
   const con = so ? Math.max(0, so.muc - so.daLam) : null
   const du = con === 0 && !so?.changDangDo
-  const nutHoc = chuNutLoai(chuNutHoc(so, p.hetCau, p.kho), p.loaiNgay)
+  const nutHoc = chuNutLoai(chuNutHoc(so, p.hetCau, p.kho), p.loaiNgay), ns = p.loaiNgay === 'sua' && !p.ngayKiem ? nhomDangSua(p.goi7?.nhomSua) : null
   const kiemXong = !!kiem && (kiem.nopLuc !== null || kiem.trangThai === 'het_han')
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
   const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
@@ -1168,12 +1168,12 @@ export function MotTrangHs(p: PropsMotTrang) {
       {/* thầy 03/11 chốt bản vẽ docs/ban-ve-mol-goc-0311: Mol nói ở GÓC TRÁI THẺ ĐẦU (kb-mol) — bỏ chỗ cũ giữa thẻ đầu và nút chính */}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
-      {/* 28/10 tối (ảnh thầy giờ cao điểm: Lộ trình chỉ có nút Sửa lỗi): Sảnh chưa về ⇒ chưa vẽ đường (nút Sửa lỗi về trước làm em tưởng hết bài), báo đang tải. */}
+      {/* 28/10: Sảnh chưa về ⇒ chưa vẽ đường, báo đang tải. */}
       {/* NÚT CHÍNH (viên thuốc lớn + ô bánh quy 12 múi): đúng việc của nút đang làm trên danh sách (cùng onClick thẻ bật ra cũ) */}
       {(() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d) return null; const Ic = HINH_NUT[d.loai]
         return <button type="button" className="kb-cta" data-sac={d.loai === 'hoc' && p.loaiNgay === 'sua' && !p.ngayKiem ? 'sai' : SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
-          <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? p.tenBai || 'Bài học hôm nay' : undefined} /></span>
+          <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
       </div><div className="kb-cot-phai">
       {p.goi7 && !p.ngayKiem && (p.loaiNgay === 'sua' || p.goi7.goi.some(g => g.quaHan && g.con > 0)) && <Suspense fallback={null}><NhomSuaHomNay g={p.goi7} /></Suspense>}
