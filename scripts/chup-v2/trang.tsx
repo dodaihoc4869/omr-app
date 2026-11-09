@@ -712,6 +712,10 @@ const SANH_MT = MT_ANH
     theLuc: { con: 1, tong: 18 }, ruong: { ...SANH_MOI.ruong, daLam: 17, tong: 12 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
   : { ...SANH_MOI, chienDich: { id: 'cd1', ten: 'Ester – Lipid' }, hanhTrinh: { ...SANH_MOI.hanhTrinh, tang: 2, toiThieu: 30, daLam: mtLam, daXep: 30, soChang: 5, changHienTai: MT_TT === 'du' || MT_XONG ? 5 : 3 },
   theLuc: MT_TT === 'du' || MT_XONG ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
+// 09/11 khối B lát 3: `&ns=1` = NGÀY SỬA có nhóm lỗi (goi7.loaiNgay 'sua' + nhomSua) — chụp thẻ «Nhóm lỗi hôm nay» (bản vẽ ban-ve-moi-on-sua-0911 dt-sang-3).
+if (man === 'hs-mot' && thamSo.get('ns') === '1') Object.assign(SANH_MT, { goi7: { bat: true, ngay: '2026-11-11', toiThieu: 28, daLamHomNay: 0, tuLamCon: 28, tiepCanCon: 0, thieuPhu: 0, thieuNgay: 0, canHoTro: false, loaiNgay: 'sua',
+  nhomSua: [{ ten: 'Khối lượng muối của amine', so: 8, loai: 'cach' }, { ten: 'Tính base của amine', so: 6, loai: 'nham' }, { ten: 'Đồng phân amine', so: 4, loai: 'tinh' }, { ten: 'Danh pháp amine', so: 10 }],
+  kienThucCu: { tong: 10, dat: 7, tyLe: 70 }, goi: [{ id: 'g7:a', ten: 'Bài 8. Amine', batDau: '2026-11-08', han: '2026-11-17', tong: 112, daGap: 56, con: 56, quota: 28, gapHomNay: 0, quaHan: false, canBoSung: 0, to: ['DH-B8'] }], diemDaDo: [] } })
 if (man === 'hs-mot') {
   try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
   // 28/10 `&moc=N`: nút Tự sửa lỗi đứng sau chặng N (mốc trong ngày đã nhớ) — cảnh «em tới nút Sửa lỗi»: chặng hiện tại nằm SAU nút ⇒ khoá tới khi sửa xong
