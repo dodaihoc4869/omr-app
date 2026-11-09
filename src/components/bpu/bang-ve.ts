@@ -15,6 +15,10 @@ export interface MauBang { tin: string; hs: string; dung: string; sao: string; c
 type Hat = { t0: number; d: number; mau: string; vet: [number, number][]; p: number[]; xong?: () => void }
 type Manh = { x: number; y: number; vx: number; vy: number; q: number; vq: number; s: number; tuoi: number; song: number; mau: string; nang: number }
 type Bot = { x: number; y: number; r: number; v: number }
+/** Lấp lánh (09/11 «hiệu ứng nộp câu bay lên bảng lung linh hơn»): sao bốn cánh nhỏ rắc dọc đường bay + toé khi tới bình. */
+type Sao = { x: number; y: number; vx: number; vy: number; tuoi: number; song: number; s: number; mau: string; pha: number }
+/** Gợn sóng sáng ở miệng bình khi một bài gửi tới. */
+type Gon = { x: number; y: number; t0: number; mau: string }
 
 export const BINH = { x: 1528, y: 470, r: 188, co: 46, mieng: 196 }
 const kep = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
@@ -46,6 +50,8 @@ export class VeBang {
   private hat: Hat[] = []
   private manh: Manh[] = []
   private bot: Bot[] = []
+  private sao: Sao[] = []
+  private gon: Gon[] = []
   private mucHien = 0
   private luaHien: number[] = [0, 0, 0, 0]
   private ongHien: number[] = []
@@ -79,7 +85,13 @@ export class VeBang {
   bayHat(tu: { x: number; y: number }, den: { x: number; y: number }, mau: string, d = 900, xong?: () => void): void {
     if (this.yeu) { xong?.(); return }
     const lech = (tu.x - den.x) * 0.35
-    this.hat.push({ t0: performance.now(), d, mau, vet: [], p: [tu.x, tu.y, tu.x - lech, 520, den.x, BINH.mieng - 140, den.x, den.y], xong })
+    // Rời ô tên: một chùm lấp lánh nhỏ; tới bình: toé sao + gợn sóng sáng (rồi mới gọi `xong` của nơi gọi).
+    this.raoSao(tu.x, tu.y, 6, mau, 160)
+    this.hat.push({ t0: performance.now(), d, mau, vet: [], p: [tu.x, tu.y, tu.x - lech, 520, den.x, BINH.mieng - 140, den.x, den.y], xong: () => { this.raoSao(den.x, den.y, 14, mau, 260); this.gon.push({ x: den.x, y: den.y, t0: performance.now(), mau }); xong?.() } })
+  }
+  private raoSao(x: number, y: number, n: number, mau: string, v: number): void {
+    for (let k = 0; k < n; k++) { const g = Math.random() * Math.PI * 2, t = v * (0.35 + Math.random() * 0.65); this.sao.push({ x, y, vx: Math.cos(g) * t, vy: Math.sin(g) * t - 60, tuoi: 0, song: 0.6 + Math.random() * 0.6, s: 5 + Math.random() * 7, mau: Math.random() < 0.35 ? this.mau.giay : mau, pha: Math.random() * 6 }) }
+    if (this.sao.length > 400) this.sao.splice(0, this.sao.length - 400)
   }
   bungManh(x: number, y: number, n: number, mau: string, luc = 1): void {
     if (this.yeu) return
@@ -202,11 +214,38 @@ export class VeBang {
       const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2, u = 1 - e, p = h.p
       const x = u * u * u * p[0]! + 3 * u * u * e * p[2]! + 3 * u * e * e * p[4]! + e * e * e * p[6]!
       const y = u * u * u * p[1]! + 3 * u * u * e * p[3]! + 3 * u * e * e * p[5]! + e * e * e * p[7]!
-      h.vet.push([x, y]); if (h.vet.length > 14) h.vet.shift()
-      h.vet.forEach(([vx, vy], j) => { c.fillStyle = moMau(h.mau, (j / h.vet.length) * 0.45); c.beginPath(); c.arc(vx, vy, 3 + j * 0.55, 0, Math.PI * 2); c.fill() })
-      c.save(); c.shadowColor = h.mau; c.shadowBlur = 24; c.fillStyle = this.mau.giay; c.beginPath(); c.arc(x, y, 9, 0, Math.PI * 2); c.fill()
-      c.fillStyle = h.mau; c.beginPath(); c.arc(x, y, 6, 0, Math.PI * 2); c.fill(); c.restore()
+      h.vet.push([x, y]); if (h.vet.length > 22) h.vet.shift()
+      // SAO CHỔI màu đội: đuôi thuôn cộng sáng (lighter — chồng lên nhau thành dải sáng mịn), đầu là lõi trắng + quầng màu.
+      c.save(); c.globalCompositeOperation = 'lighter'
+      const n = h.vet.length
+      for (let j = 0; j < n; j++) { const [vx, vy] = h.vet[j]!, q = (j + 1) / n; c.fillStyle = moMau(h.mau, q * 0.32); c.beginPath(); c.arc(vx, vy, 2 + q * 11, 0, Math.PI * 2); c.fill() }
+      c.fillStyle = moMau(h.mau, 0.35); c.beginPath(); c.arc(x, y, 22, 0, Math.PI * 2); c.fill()
+      c.fillStyle = moMau(h.mau, 0.6); c.beginPath(); c.arc(x, y, 12, 0, Math.PI * 2); c.fill()
+      c.restore()
+      c.fillStyle = this.mau.giay; c.beginPath(); c.arc(x, y, 6.5, 0, Math.PI * 2); c.fill()
+      if (Math.random() < 0.55) this.sao.push({ x: x + (Math.random() - 0.5) * 14, y: y + (Math.random() - 0.5) * 14, vx: (Math.random() - 0.5) * 50, vy: 20 + Math.random() * 40, tuoi: 0, song: 0.45 + Math.random() * 0.4, s: 3 + Math.random() * 5, mau: Math.random() < 0.5 ? this.mau.giay : h.mau, pha: Math.random() * 6 })
     }
+    this.veSao(c, now)
+  }
+  /** Sao bốn cánh lấp lánh (nhấp nháy theo pha) + gợn sóng sáng ở miệng bình. */
+  private veSao(c: CanvasRenderingContext2D, now: number): void {
+    const dt = 1 / 60
+    c.save(); c.globalCompositeOperation = 'lighter'
+    for (let k = this.sao.length - 1; k >= 0; k--) {
+      const m = this.sao[k]!; m.tuoi += dt
+      if (m.tuoi > m.song) { this.sao.splice(k, 1); continue }
+      m.x += m.vx * dt; m.y += m.vy * dt; m.vx *= 0.96; m.vy = m.vy * 0.96 + 30 * dt
+      const a = (1 - m.tuoi / m.song) * (0.6 + 0.4 * Math.sin(now * 0.025 + m.pha)), r = m.s * (0.7 + 0.3 * Math.sin(now * 0.02 + m.pha))
+      c.fillStyle = moMau(m.mau, a)
+      c.beginPath(); c.moveTo(m.x, m.y - r); c.quadraticCurveTo(m.x, m.y, m.x + r, m.y); c.quadraticCurveTo(m.x, m.y, m.x, m.y + r); c.quadraticCurveTo(m.x, m.y, m.x - r, m.y); c.quadraticCurveTo(m.x, m.y, m.x, m.y - r); c.fill()
+    }
+    for (let k = this.gon.length - 1; k >= 0; k--) {
+      const g = this.gon[k]!, t = (now - g.t0) / 700
+      if (t >= 1) { this.gon.splice(k, 1); continue }
+      c.strokeStyle = moMau(g.mau, (1 - t) * 0.7); c.lineWidth = 6 * (1 - t) + 1
+      c.beginPath(); c.ellipse(g.x, g.y, 30 + t * 120, 10 + t * 34, 0, 0, Math.PI * 2); c.stroke()
+    }
+    c.restore()
   }
   private veManh(c: CanvasRenderingContext2D, dt: number): void {
     for (let k = this.manh.length - 1; k >= 0; k--) {

@@ -3,7 +3,7 @@
 // Đang có buổi mở / thầy dạy nhiều lớp ⇒ hộp nhỏ: «Tiếp buổi …» (Enter) · lớp khác (buổi mới) · Kết thúc buổi · Trang buổi dạy (đầu giờ, chữa câu,
 // ôn tập — trang cũ của Hành trình, không còn ở thanh bên). Không thêm lệnh nào lúc mở màn.
 import { useEffect, useRef, useState } from 'react'
-import { Users } from 'lucide-react'
+import { Power, Users } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import { hoiXacNhan } from '../hop-thoai'
 import type { ChonDiemDanh } from '../../lib/bpu/diem-danh-nhanh'
@@ -66,8 +66,14 @@ export default function NutDiemDanh({ className }: { className: string }) {
               </div>
             </>
           ) : null}
+          {/* 09/11 thầy «thiết kế nút đẹp mắt kết thúc buổi học»: dải riêng — buổi đang mở + nút đỏ nhạt có biểu tượng nguồn (hỏi lại trước khi đóng). */}
+          {hoi.dangMo ? (
+            <div className="gvhn-ket-thuc">
+              <span><b>Buổi {lopMo || hoi.dangMo.ten}</b> đang mở từ {gioMo(hoi.dangMo.moLuc)}</span>
+              <button type="button" className="gvhn-ket-thuc-nut" onClick={() => void ketThuc()}><Power size={18} aria-hidden="true" />Kết thúc buổi học</button>
+            </div>
+          ) : null}
           <div className="gvhn-chon-lop-cuoi">
-            {hoi.dangMo ? <button type="button" className="gvhn-chon-lop-huy" onClick={() => void ketThuc()}>Kết thúc buổi {lopMo}</button> : null}
             <button type="button" className="gvhn-chon-lop-huy" onClick={() => hoi.tra({ loai: 'trang' })}>Trang buổi dạy: đầu giờ, chữa câu, ôn tập</button>
             <button type="button" className="gvhn-chon-lop-huy" onClick={() => hoi.tra(null)}>Huỷ</button>
           </div>

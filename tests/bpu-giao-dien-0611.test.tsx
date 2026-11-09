@@ -161,7 +161,7 @@ describe('bảng chiếu', () => {
     expect(onToi).toHaveBeenLastCalledWith(1)
     // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «thu hết các nút lại, chỉ để nút gọi lên bảng thôi»): lúc cả lớp làm, thanh trên CHỈ có «Gọi lên bảng»; chuyển câu bằng phím.
     const nut = [...document.querySelectorAll('.bb-tren button')].map((b) => b.textContent)
-    expect(nut).toEqual(['Gọi lên bảngSpace'])
+    expect(nut).toEqual(['Lên bảngL']) // 09/11 lần 2: nút chính «Lên bảng» (phím L) — sang tờ chiếu cũ, không tự gọi
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' })) })
     expect(onToi).toHaveBeenCalledTimes(2)
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' })) })

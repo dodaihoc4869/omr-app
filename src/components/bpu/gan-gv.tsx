@@ -22,7 +22,7 @@ let nghiDen = 0
 let nhanCham: ((dat: boolean) => void) | null = null
 /** MỘT GỐC BẢNG (09/11): điểm danh → chọn câu → các lượt dùng CHUNG một bảng (một nối phòng, không dựng lại, không chớp «Đang mở…»).
  *  Props hiện tại của bảng; lần vẽ sau GỘP vào (mã điểm danh đổi mỗi phút không đè câu đang chiếu). */
-let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean } | null = null
+let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean; diemDanh?: boolean } | null = null
 /** Bước Điểm danh (app thầy) muốn biết khi bảng đóng. */
 let dongNgoai: (() => void) | null = null
 const NHO_BUOI_MS = 60_000
@@ -113,7 +113,8 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
 export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?: string | null; onDong?: () => void }): void {
   dongNgoai = o.onDong ?? null
   if (hien?.buoiId === o.buoiId && khung) { capNhatMa(o.buoiId, o.ma, o.linkQr); return } // không phóng lại bảng: em có thể đang trên bảng (mã đổi mỗi phút)
-  hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr }
+  // Mở mới ⇒ LUÔN màn điểm danh (thầy 09/11 «thoát ra hẳn thì không có chỗ vào lại màn điểm danh»), kể cả phòng còn lượt cũ; chọn câu ⇒ hết cờ.
+  hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr, diemDanh: true }
   veBang()
 }
 /** Mã điểm danh đổi mỗi phút ⇒ chỉ gộp mã + QR (không đụng câu / lượt đang chiếu). */
@@ -173,6 +174,9 @@ export function baoHetCau(d: 1 | -1): void {
 }
 export function dongBang(): void {
   goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null
+  // Thoát toàn màn hình bảng đã xin + vẽ lại trang (ảnh 09/11: sau Esc đầu màn Hôm nay còn bóng chữ chồng lên nhau — trình duyệt giữ lớp vẽ cũ).
+  try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
+  requestAnimationFrame(() => { const y = window.scrollY; window.scrollTo(0, y + 1); window.scrollTo(0, y); document.body.style.transform = 'translateZ(0)'; requestAnimationFrame(() => { document.body.style.transform = '' }) })
   window.removeEventListener('keydown', phimKhiAn, true)
   const f = dongNgoai; dongNgoai = null; f?.()
 }
@@ -217,9 +221,9 @@ function phimKhiAn(e: KeyboardEvent): void {
 }
 /** LÊN BẢNG BẰNG TỜ CŨ (thầy 08/11 «gọi hs lên bảng thì chuyển về màn chiếu cũ … bấm đạt hoặc ko đạt thì tự động chuyển sang bình phản ứng»):
  *  bảng thu nhỏ rồi ẨN (giữ nối phòng + trạng thái), tờ chạy màn lên bảng nguyên bản cho em bảng vừa chọn. Không có tờ ⇒ false (bảng tự lo như cũ). */
-export function lenBangTo(em: { sbd: string; ten: string }): boolean {
+export function lenBangTo(em: { sbd: string; ten: string; goiNgay?: boolean; mau?: string; doi?: string }): boolean {
   if (!nguonTo || !khung) return false
-  try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten } }, '*') } catch { return false }
+  try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten, goiNgay: em.goiNgay !== false, mau: em.mau ?? '', doi: em.doi ?? '' } }, '*') } catch { return false }
   anBang()
   try { nguonTo.focus() } catch { /* tờ chặn */ }
   return true
