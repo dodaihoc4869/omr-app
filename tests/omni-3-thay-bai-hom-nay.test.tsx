@@ -251,15 +251,25 @@ describe('phần thuần (src/lib/bai-hom-nay.ts)', () => {
   })
 })
 
-async function moBuoc() {
-  render(<DayHocLenBang />)
-  const buoc = (await screen.findByRole('heading', { name: 'Bài hôm nay' })).closest('section') as HTMLElement
-  await waitFor(() => expect(within(buoc).getByText('Bài 3. Xà phòng và chất giặt rửa')).toBeTruthy())
-  return buoc
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy duyệt docs/ban-ve-giao-bai-0911: «bỏ hết màn phân bài bên trong», «tôi chỉ chọn giao bài, máy tự làm hết»): bước «Bài hôm nay»
+// không còn vẽ trong bảng Dạy học — chọn bài để giao nay ở hộp «Giao bài» (HopBoSungBai: ô tick, chọn NHIỀU bài, bài kế tiếp tick sẵn «Gợi ý», bài đã giao
+// gọn một dòng có «Gỡ bài», «Giao cho» nằm sau nút «Không giao cho vài em…»). Các hành vi còn giữ dưới đây kiểm trên hộp; hành vi đã bỏ ghi rõ tại chỗ.
+async function moHop() {
+  render(<HopBoSungBai onDong={() => {}} />)
+  const hop = screen.getByRole('dialog', { name: 'Giao bài' })
+  await within(hop).findByText('Bài 3. Xà phòng và chất giặt rửa', {}, { timeout: 4000 })
+  return hop
 }
-const dong = (buoc: HTMLElement, khoa: string) => buoc.querySelector(`[data-bai="${khoa}"]`) as HTMLElement
+/** Dòng bài trong hộp theo đúng tên bài. */
+const dongHop = (hop: HTMLElement, ten: string) => [...hop.querySelectorAll('.cbm-ten b')].find((b) => b.textContent === ten)?.closest('li') as HTMLElement
+const oTick = (hop: HTMLElement, ten: RegExp) => within(hop).queryByRole('checkbox', { name: ten }) as HTMLInputElement | null
+const nutGiao = (hop: HTMLElement) => within(hop).getByRole('button', { name: /^Giao \d+ bài cho / }) as HTMLButtonElement
+const PHAM_VI_B3 = [
+  { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, maDe: ['DH-12-C1-B1-TN', 'DH-12-C1-B1-DS'] },
+  { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, maDe: ['DH-12-C1-B2'] },
+]
 
-describe('màn: bước Bài hôm nay', () => {
+describe('bảng Dạy học (bước «Bài hôm nay» đã bỏ 09/11)', () => {
   it('OMNI tắt (hoặc máy chủ chưa có lệnh) ⇒ bảng Dạy học y như cũ: không có bước, không gọi /gv/bai-da-day', async () => {
     co = { bat: false, lop: [], sbd: [] }
     render(<DayHocLenBang />)
@@ -271,72 +281,62 @@ describe('màn: bước Bài hôm nay', () => {
     expect(document.querySelector('[data-khoi="cho-bai-moi"]')).toBeNull()
   })
 
-  it('lớp = lớp của buổi đang mở; cây DẠY HỌC khối 12 có chip trạng thái; dòng chờ bài mới ở đầu bảng', async () => {
-    const buoc = await moBuoc()
-    // Ô chọn lớp (ô tick xổ xuống theo khối, thầy 06/10): lớp của buổi đang mở được chọn sẵn, hiện thành thẻ có sĩ số.
-    expect(within(within(buoc).getByRole('group', { name: 'Lớp đã chọn' })).getByText('12A1 · 44 em')).toBeTruthy()
+  it('(d) OMNI bật ⇒ dòng chờ bài mới vẫn ở đầu bảng; KHÔNG còn tiêu đề / khối «Bài hôm nay», không cây bài, không nút giao', async () => {
+    render(<DayHocLenBang />)
+    await waitFor(() => expect(document.querySelector('[data-khoi="cho-bai-moi"]')?.textContent).toBe('Lớp 12A1: 4 ngày chưa có bài mới'), { timeout: 4000 })
+    expect(screen.getByRole('heading', { name: 'Chiếu lên bảng' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Bài hôm nay' })).toBeNull()
+    expect(screen.queryByRole('region', { name: 'Bài hôm nay' })).toBeNull()
+    expect(document.querySelector('[data-khoi="bai-hom-nay"]')).toBeNull()
+    expect(document.querySelector('[data-bai]')).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Giao (Bài|\d+ bài)/ })).toBeNull()
+  })
+})
+
+describe('hộp Giao bài: lớp, cây bài, xem trước, giao, gỡ bài', () => {
+  it('lớp = lớp của buổi đang mở; cây DẠY HỌC khối 12; bài đã giao gọn một dòng có trạng thái + «Gỡ bài», không ô tick', async () => {
+    const hop = await moHop()
+    expect(within(within(hop).getByRole('group', { name: 'Lớp đã chọn' })).getByText('12A1 · 44 em')).toBeTruthy()
     expect(lenh('danh-sach').at(-1)).toMatchObject({ lop: '12A1' })
-    expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Đã dạy 22/09 · chứng chỉ 38/44')
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đang luyện · còn 2 ngày')
-    expect(dong(buoc, 'DH-12-C1-B3').textContent).toContain('Chưa dạy')
-    expect(buoc.textContent).not.toContain('Ammonia') // khối 11 không lẫn
-    expect(buoc.textContent).not.toContain('Đề kiểm tra chương 1') // TU LUYỆN không vào cây Dạy học
-    expect(document.querySelector('[data-khoi="cho-bai-moi"]')?.textContent).toBe('Lớp 12A1: 4 ngày chưa có bài mới')
-    // Bài đã tick: không chọn lại được, có "Bỏ tick".
-    expect((within(dong(buoc, 'DH-12-C1-B1')).getByRole('radio') as HTMLInputElement).disabled).toBe(true)
-    expect(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' })).toBeTruthy()
+    expect(dongHop(hop, 'Bài 1. Ester').textContent).toContain('Đã dạy 22/09 · 44 em')
+    expect(dongHop(hop, 'Bài 2. Lipid').textContent).toContain('Đang luyện · còn 2 ngày · 44 em')
+    expect(oTick(hop, /Bài 3\. Xà phòng/)).toBeTruthy()
+    expect(hop.textContent).not.toContain('Ammonia') // khối 11 không lẫn
+    expect(hop.textContent).not.toContain('Đề kiểm tra chương 1') // TỰ LUYỆN không vào cây Dạy học
+    // Bài đã giao: không chọn lại được, có «Gỡ bài» (trước là «Bỏ tick»).
+    expect(oTick(hop, /Bài 1\. Ester/)).toBeNull()
+    expect(oTick(hop, /Bài 2\. Lipid/)).toBeNull()
+    expect(within(dongHop(hop, 'Bài 2. Lipid')).getByRole('button', { name: 'Gỡ bài' })).toBeTruthy()
   })
 
-  it('chọn bài ⇒ "Bài hôm nay" + xem-truoc (chỉ Trắc nghiệm / Đúng sai / Trả lời ngắn) ⇒ thẻ xác nhận ĐỦ 6 con số + cảnh báo quá tải; tick gửi đúng maDe + phamVi', async () => {
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    expect(dong(buoc, 'DH-12-C1-B3').textContent).toContain('Bài hôm nay')
-    await waitFor(() => expect(lenh('xem-truoc').length).toBe(1))
-    // SỬA CÓ CHỦ Ý 06/10 (dòng "Ôn bài cũ: tối đa N câu/em · kho X câu · phủ ≈ Y%"): `xem-truoc` nay gửi kèm `phamVi` — bài đứng TRƯỚC, đúng danh sách `tick` gửi (dưới) —
-    // để máy chủ đếm kho ôn bài cũ của các bài ấy. Bài đầu tiên (không bài trước) ⇒ không gửi (xem test "dòng Ôn bài cũ").
-    expect(lenh('xem-truoc')[0]).toEqual({
+  it('bài gợi ý (Bài 3) ⇒ xem-truoc (chỉ Trắc nghiệm / Đúng sai / Trả lời ngắn) + phamVi; Giao ⇒ tick đúng maDe + phamVi + hạn tự tính, không theLucNgay', async () => {
+    const hop = await moHop()
+    await waitFor(() => expect(oTick(hop, /Bài 3\. Xà phòng/)!.checked).toBe(true))
+    await waitFor(() => expect(lenh('xem-truoc').length).toBeGreaterThan(0))
+    expect(lenh('xem-truoc').at(-1)).toEqual({
       action: 'xem-truoc',
       lop: '12A1',
       khoaBai: 'DH-12-C1-B3',
       tenBai: 'Bài 3. Xà phòng và chất giặt rửa',
       viTri: 3,
       maDe: ['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'],
-      phamVi: [
-        { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, maDe: ['DH-12-C1-B1-TN', 'DH-12-C1-B1-DS'] },
-        { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, maDe: ['DH-12-C1-B2'] },
-      ],
+      phamVi: PHAM_VI_B3,
     })
-
-    const the = (await screen.findByText('Câu rút được')).closest('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    const o = (k: string) => (the.querySelector(`[data-so-tick="${k}"]`) as HTMLElement).textContent ?? ''
-    expect(o('cau')).toContain('112')
-    expect(o('cau')).toContain('đã bỏ 6 câu tự luận')
-    expect(o('han')).toContain('Hạn nộp tự tính')
-    expect(o('han')).toContain('7ngày')
-    expect(o('han')).toContain(`hết ${hienHanNop('2026-10-12', false)}`)
-    expect(o('luot')).toContain('Lượt cần / sức chứa')
-    expect(o('luot')).toContain('224/ 280 lượt')
-    expect(o('luot')).toMatch(/80 ?% sức chứa/)
-    expect(o('luot-ngay')).toContain('40lượt/ngày')
-    expect(o('luot-ngay')).toContain('mặc định của lớp')
-    expect(o('du-luot')).toContain('Đủ lượt để luyện hết')
-    expect(o('du-luot')).toContain('41/ 44 em')
-    expect(o('du-diem-8')).toContain('Đủ lượt để ca chốt ≥ 8')
-    expect(o('du-diem-8')).toContain('29/ 44 em')
-    expect(the.querySelectorAll('[data-so-tick]')).toHaveLength(6)
-    expect(the.querySelector('[data-khoi="qua-tai"]')?.textContent).toContain('3 em quá tải ngay từ ngày đầu: Minh, Hà, Phúc')
+    // Thầy 05/10: ba phần TỰ GIAO (phần 0 câu — ở đây Trả lời ngắn — bỏ khỏi dòng); Ví dụ minh hoạ / Các dạng toán không thành dòng chọn.
+    const b3 = dongHop(hop, 'Bài 3. Xà phòng và chất giặt rửa')
+    expect(b3.textContent).toContain('3 câu · TN 2 · ĐS 1')
+    expect(b3.textContent).not.toContain('TLN')
+    expect(hop.textContent).not.toMatch(/VÍ DỤ MINH HOẠ|CÁC DẠNG TOÁN/)
+    expect(within(hop.querySelector('.cbm-ds') as HTMLElement).getAllByRole('checkbox')).toHaveLength(1)
+    // Tóm tắt: số câu máy chủ; máy chủ cũ (không hạn chung) ⇒ hạn tự tính.
+    await waitFor(() => expect(nutGiao(hop).disabled).toBe(false))
+    const tom = hop.querySelector('[data-khoi="tom-tat-giao"]')!.textContent!
+    expect(tom).toContain('112')
+    expect(tom).toContain(`hết 23:59 · ${hienHanNop('2026-10-12', false)}`)
     // Chữ chuẩn A2: app thầy không dùng chữ "thể lực".
-    expect(buoc.textContent).not.toMatch(/thể lực/i)
+    expect(hop.textContent).not.toMatch(/thể lực/i)
 
-    expect(the.querySelector('[data-khoi="qua-tai"]')?.textContent).toContain('Gợi ý: lùi hạn nộp hoặc tăng số lượt mỗi ngày')
-    // Thầy 05/10: ba phần TỰ GIAO là dòng tĩnh (phần 0 câu — ở đây Trả lời ngắn — bỏ khỏi dòng) + ghi chú; KHÔNG còn ô tích tờ nào.
-    const tuGiao = the.querySelector('[data-khoi="tu-giao"]') as HTMLElement
-    expect(tuGiao.textContent).toContain('Tự giao: Trắc nghiệm · 2 câu · Đúng sai · 1 câu')
-    expect(tuGiao.textContent).not.toContain('Trả lời ngắn')
-    expect(tuGiao.textContent).toContain('Không giao Ví dụ minh hoạ và Các dạng toán trọng tâm.')
-    expect(within(the).queryAllByRole('checkbox')).toHaveLength(0)
-
-    fireEvent.click(within(the).getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
+    fireEvent.click(nutGiao(hop))
     await waitFor(() => expect(lenh('tick')).toHaveLength(1))
     expect(lenh('tick')[0]).toEqual({
       action: 'tick',
@@ -345,88 +345,66 @@ describe('màn: bước Bài hôm nay', () => {
       tenBai: 'Bài 3. Xà phòng và chất giặt rửa',
       viTri: 3,
       maDe: ['DH-12-C1-B3-TN', 'DH-12-C1-B3-DS'],
-      phamVi: [
-        { khoaBai: 'DH-12-C1-B1', tenBai: 'Bài 1. Ester', viTri: 1, maDe: ['DH-12-C1-B1-TN', 'DH-12-C1-B1-DS'] },
-        { khoaBai: 'DH-12-C1-B2', tenBai: 'Bài 2. Lipid', viTri: 2, maDe: ['DH-12-C1-B2'] },
-      ],
+      hanNop: '2026-10-12',
+      phamVi: PHAM_VI_B3,
     })
-    // Giao xong: nạp lại trạng thái lớp, thẻ xác nhận đóng.
+    // Giao xong: nạp lại trạng thái lớp, báo bảng đang giao, bỏ chọn bài, dòng xong.
     await waitFor(() => expect(lenh('danh-sach').length).toBeGreaterThanOrEqual(2))
     expect(baiVuaDoi).toHaveBeenCalledExactlyOnceWith([{ lop: '12A1', khoaBai: 'DH-12-C1-B3', loai: 'tick' }])
-    await waitFor(() => expect(document.querySelector('[data-khoi="xac-nhan-tick"]')).toBeNull())
+    await waitFor(() => expect(hop.textContent).toContain('Đã giao Bài 3 cho'))
+    expect(oTick(hop, /Bài 3\. Xà phòng/)!.checked).toBe(false)
   })
 
-  it('bài chỉ có Ví dụ minh hoạ / Các dạng toán trọng tâm ⇒ không có dòng "Tự giao", báo "Bài này chưa có tờ …" một lần, nút giao khoá, không gọi xem-truoc', async () => {
+  it('bài chỉ có Ví dụ minh hoạ / Các dạng toán trọng tâm ⇒ dòng báo chưa có câu tự giao, ô tick khoá, không gọi xem-truoc', async () => {
     co = { bat: true, lop: [], sbd: [] }
-    const buoc = await moBuoc()
-    fireEvent.click(within(buoc).getByRole('button', { name: /Chọn lớp/ }))
+    const hop = await moHop()
+    fireEvent.click(within(hop).getByRole('button', { name: /Chọn lớp/ }))
     fireEvent.click(await screen.findByRole('checkbox', { name: /^11B/ })) // lớp khối 11 ⇒ chọn lại từ đầu chỉ lớp ấy (cây bài mỗi khối một khác)
-    await waitFor(() => expect(dong(buoc, 'DH-11-C2-B4')).toBeTruthy())
-    fireEvent.click(within(dong(buoc, 'DH-11-C2-B4')).getByRole('radio'))
-    const the = buoc.querySelector('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    expect(the.querySelector('[data-khoi="tu-giao"]')!.textContent).toBe('Không giao Ví dụ minh hoạ và Các dạng toán trọng tâm.')
-    expect(within(the).getAllByText('Bài này chưa có tờ Trắc nghiệm / Đúng sai / Trả lời ngắn.')).toHaveLength(1)
-    expect((within(the).getByRole('button', { name: 'Giao Bài 4 cho 11B' }) as HTMLButtonElement).disabled).toBe(true)
+    const b4 = (await within(hop).findByRole('checkbox', { name: /Bài 4\. Nitric acid/ }, { timeout: 4000 })) as HTMLInputElement
+    expect(b4.disabled).toBe(true)
+    expect(dongHop(hop, 'Bài 4. Nitric acid').textContent).toContain('Chưa có câu tự giao (chỉ có ví dụ minh hoạ)')
+    fireEvent.click(b4)
+    expect(b4.checked).toBe(false)
     await new Promise((r) => setTimeout(r, 400)) // quá nhịp chờ gõ của xem trước
-    expect(lenh('xem-truoc')).toHaveLength(0)
+    expect(lenh('xem-truoc').filter((x) => x.lop === '11B')).toHaveLength(0)
+    expect(lenh('xem-truoc').some((x) => x.khoaBai === 'DH-11-C2-B4')).toBe(false)
   })
 
-  it('"Sửa hạn nộp hoặc số lượt/ngày": hai ô như màn Giao chiến dịch ⇒ xem-truoc + tick mang hanNop / theLucNgay', async () => {
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    await screen.findByText('Câu rút được')
-    fireEvent.click(screen.getByRole('button', { name: 'Sửa hạn nộp hoặc số lượt/ngày' }))
-    fireEvent.change(screen.getByLabelText(/Số lượt câu mỗi ngày/), { target: { value: '50' } })
-    // 02/11: test hẹn giờ — màn chặn hạn đã qua (hanSua >= hôm nay theo đồng hồ THẬT) nên mốc cố định 14/10 nay bị bỏ; dùng hạn 10 ngày sau hôm nay (giờ VN)
-    const han = new Date(Date.now() + 10 * 86_400_000 + 7 * 3_600_000).toISOString().slice(0, 10)
-    fireEvent.change(screen.getByLabelText(/Hạn nộp \(hết lúc 23:59\)/), { target: { value: han } })
-    await waitFor(() => expect(lenh('xem-truoc').at(-1)).toMatchObject({ theLucNgay: 50, hanNop: han }))
-    await waitFor(() => expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(false))
-    fireEvent.click(screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
-    await waitFor(() => expect(lenh('tick').at(-1)).toMatchObject({ theLucNgay: 50, hanNop: han }))
-  })
-
-  it('chưa có P (duDiem8 null) ⇒ ẩn ô "Đủ lượt để ca chốt ≥ 8", còn 5 ô; không quá tải ⇒ không cảnh báo', async () => {
-    xem = { ...XEM, duDiem8: null, quaTai: [] }
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    const the = (await screen.findByText('Câu rút được')).closest('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    expect(the.querySelectorAll('[data-so-tick]')).toHaveLength(5)
-    expect(the.querySelector('[data-so-tick="du-diem-8"]')).toBeNull()
-    expect(the.querySelector('[data-khoi="qua-tai"]')).toBeNull()
-  })
+  // Bỏ theo thầy 09/11 (docs/ban-ve-giao-bai-0911): test «"Sửa hạn nộp hoặc số lượt/ngày": hai ô … ⇒ xem-truoc + tick mang hanNop / theLucNgay» — hộp
+  // không còn ô hạn nộp lẫn số lượt mỗi ngày (máy tự đặt hạn chung; tick không gửi theLucNgay — kiểm ở tests/bo-sung-nhieu-bai-0111.test.tsx).
+  // Bỏ theo thầy 09/11 (docs/ban-ve-giao-bai-0911): test «chưa có P (duDiem8 null) ⇒ ẩn ô "Đủ lượt để ca chốt ≥ 8", còn 5 ô; không quá tải ⇒ không cảnh
+  // báo» — lưới 6 số + cảnh báo quá tải không còn (thay bằng ba ô Câu mới · Đề chuẩn · Hạn chung).
 
   it('máy chủ từ chối xem trước ⇒ hiện đúng lời máy chủ, nút giao tắt', async () => {
     goi.mockImplementation(async (duong: string, b: Record<string, unknown>) => {
       if (duong === '/gv/bai-da-day' && b.action === 'xem-truoc') return { ok: false, loai: 'tu_choi', chu: 'OMNI chưa bật cho lớp 12A1.' }
       return (chuanMockGoc as (d: string, b: Record<string, unknown>) => unknown)(duong, b)
     })
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    expect(await screen.findByText('OMNI chưa bật cho lớp 12A1.')).toBeTruthy()
-    expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(true)
+    const hop = await moHop() // Bài 3 tick sẵn ⇒ xem trước tự chạy
+    expect((await within(hop).findByRole('alert', {}, { timeout: 4000 })).textContent).toBe('OMNI chưa bật cho lớp 12A1.')
+    expect(nutGiao(hop).disabled).toBe(true)
   })
 
-  it('"Bỏ tick" hỏi lại nói rõ hậu quả; "Giữ bài" ⇒ không gọi; đồng ý ⇒ bo-tick đúng lớp + khoá bài', async () => {
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' }))
-    let hop = await screen.findByRole('alertdialog')
-    expect(hop.textContent).toContain('Bỏ tick Bài 2?')
-    expect(hop.textContent).toContain('huỷ hẳn')
-    expect(hop.textContent).toContain('kết quả đã làm vẫn giữ')
-    fireEvent.click(within(hop).getByRole('button', { name: 'Giữ bài' }))
+  it('«Gỡ bài» hỏi lại nói rõ hậu quả; "Giữ bài" ⇒ không gọi; đồng ý ⇒ bo-tick đúng lớp + khoá bài', async () => {
+    const hop = await moHop()
+    fireEvent.click(within(dongHop(hop, 'Bài 2. Lipid')).getByRole('button', { name: 'Gỡ bài' }))
+    let hoi = await screen.findByRole('alertdialog')
+    expect(hoi.textContent).toContain('Bỏ tick Bài 2?')
+    expect(hoi.textContent).toContain('huỷ hẳn')
+    expect(hoi.textContent).toContain('kết quả đã làm vẫn giữ')
+    fireEvent.click(within(hoi).getByRole('button', { name: 'Giữ bài' }))
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull())
     expect(lenh('bo-tick')).toHaveLength(0)
     expect(baiVuaDoi).not.toHaveBeenCalled()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' }))
-    hop = await screen.findByRole('alertdialog')
-    fireEvent.click(within(hop).getByRole('button', { name: 'Bỏ tick' }))
+    fireEvent.click(within(dongHop(hop, 'Bài 2. Lipid')).getByRole('button', { name: 'Gỡ bài' }))
+    hoi = await screen.findByRole('alertdialog')
+    fireEvent.click(within(hoi).getByRole('button', { name: 'Bỏ tick' }))
     await waitFor(() => expect(lenh('bo-tick')).toEqual([{ action: 'bo-tick', lop: '12A1', khoaBai: 'DH-12-C1-B2' }]))
     await waitFor(() => expect(baiVuaDoi).toHaveBeenCalledExactlyOnceWith([{ lop: '12A1', khoaBai: 'DH-12-C1-B2', loai: 'bo-tick' }]))
   })
 })
 
-describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của chiến dịch cũ + chọn theo điểm danh)', () => {
+describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của chiến dịch cũ + chọn theo điểm danh) — nay sau nút «Không giao cho vài em…» (09/11)', () => {
   const coDuEm = () => {
     dsEm = EM_MAY_CHU
     coMatBuoi = [
@@ -443,18 +421,20 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
       buoiCu('BH-4', '2026-09-25', ['S3']), // quá 3 buổi gần nhất ⇒ bỏ
     ]
   }
-  const chonBai3 = async () => {
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    const khoi = (await screen.findByRole('heading', { name: 'Giao cho' })).closest('section') as HTMLElement
-    return { buoc, khoi }
+  /** Mở hộp (Bài 3 tick sẵn) rồi mở «Không giao cho vài em…» ⇒ ô «Giao cho». */
+  const moGiaoCho = async () => {
+    const hop = await moHop()
+    await waitFor(() => expect(oTick(hop, /Bài 3\. Xà phòng/)!.checked).toBe(true))
+    fireEvent.click(await within(hop).findByRole('button', { name: /^Không giao cho vài em…/ }, { timeout: 4000 }))
+    const khoi = (await within(hop).findByRole('heading', { name: 'Giao cho' })).closest('section') as HTMLElement
+    return { hop, khoi }
   }
   /** Nút chọn cách giao (Cả lớp · Theo em · Theo điểm danh) trong ô "Giao cho". */
   const cheDo = (khoi: HTMLElement, ten: RegExp) => within(khoi).getByRole('radio', { name: ten })
 
   it('mặc định CẢ LỚP (ô "Giao cho", chip "N / M em"); "Theo em" mở bộ chọn em của màn Giao; xem-truoc gửi đúng sbd', async () => {
     coDuEm()
-    const { khoi } = await chonBai3()
+    const { khoi } = await moGiaoCho()
     expect(khoi.querySelector('.cd-chip-muc')?.textContent).toBe('3 / 5 em')
     expect(cheDo(khoi, /^Cả lớp/).getAttribute('aria-checked')).toBe('true')
     expect(within(khoi).queryByRole('button', { name: 'Chọn em' })).toBeNull() // bộ chọn em chỉ mở khi thầy chọn "Theo em"
@@ -464,13 +444,17 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
     await waitFor(() => expect(lenh('xem-truoc').at(-1)).toMatchObject({ khoaBai: 'DH-12-C1-B3', sbd: ['S1', 'S2', 'S3'] }))
   })
 
-  it('thầy 06/10: ô "Giao cho" nằm NGAY DƯỚI ô chọn lớp, hiện từ lúc đã chọn lớp (chưa cần chọn bài), không nằm trong thẻ xác nhận; ba cách Cả lớp · Theo em · Theo điểm danh; "Cả lớp" tích lại hết', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (docs/ban-ve-giao-bai-0911): ô «Giao cho» (thầy 06/10: ngay dưới ô chọn lớp, hiện từ lúc chọn lớp) nay MẶC ĐỊNH ẨN sau nút
+  // «Không giao cho vài em…» ở phần tóm tắt — đổi chỗ có chủ đích; ba cách chọn và cách chạy giữ nguyên.
+  it('ô "Giao cho" mặc định ẩn, mở bằng «Không giao cho vài em…»; ba cách Cả lớp · Theo em · Theo điểm danh; "Cả lớp" tích lại hết', async () => {
     coDuEm()
-    const buoc = await moBuoc()
-    const khoi = (await within(buoc).findByRole('heading', { name: 'Giao cho' })).closest('section') as HTMLElement
-    expect(khoi.closest('.bhn-lop')).toBeTruthy()
-    expect(khoi.closest('[data-khoi="xac-nhan-tick"]')).toBeNull()
-    expect(screen.queryByRole('button', { name: /^Giao Bài/ })).toBeNull() // chưa chọn bài mà ô đã có
+    const hop = await moHop()
+    await within(hop).findByRole('button', { name: /^Không giao cho vài em…/ }, { timeout: 4000 })
+    expect(within(hop).queryByRole('heading', { name: 'Giao cho' })).toBeNull()
+    fireEvent.click(within(hop).getByRole('button', { name: /^Không giao cho vài em…/ }))
+    const khoi = (await within(hop).findByRole('heading', { name: 'Giao cho' })).closest('section') as HTMLElement
+    expect(khoi.closest('.cbm-ct')).toBeTruthy()
+    expect(khoi.closest('.bhn-lop')).toBeNull()
     expect(within(khoi).getAllByRole('radio').map((r) => r.querySelector('b')!.textContent)).toEqual(['Cả lớp', 'Theo em', 'Theo điểm danh'])
     expect(khoi.querySelector('.cd-chip-muc')?.textContent).toBe('3 / 5 em')
 
@@ -493,27 +477,24 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
   it('chọn "Theo điểm danh" mà chưa có buổi nào có em có mặt ⇒ một dòng nói rõ, không chip', async () => {
     dsEm = EM_MAY_CHU
     ganDay = []
-    const buoc = await moBuoc()
-    const khoi = (await within(buoc).findByRole('heading', { name: 'Giao cho' })).closest('section') as HTMLElement
+    const { khoi } = await moGiaoCho()
     fireEvent.click(cheDo(khoi, /^Theo điểm danh/))
     expect(khoi.querySelector('[data-khoi="chua-co-diem-danh"]')?.textContent).toContain('Chưa có buổi nào có em có mặt')
     expect(within(khoi).queryByRole('group', { name: 'Chọn em theo điểm danh' })).toBeNull()
   })
 
-  it('máy chủ B1 trả soEmChon (em được giao) ⇒ hai ô "Đủ lượt" chia cho số em được giao, ghi kèm số em cả lớp', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11: hai ô "Đủ lượt" (lưới 6 số) đã bỏ — số em được giao máy chủ trả (soEmChon) nay hiện trên nút Giao.
+  it('máy chủ B1 trả soEmChon (em được giao) ⇒ nút Giao ghi đúng số em được giao, không phải sĩ số lớp', async () => {
     coDuEm()
     xem = { ...XEM, soEmChon: 3, duLuot: 2, duDiem8: 1 }
-    await chonBai3()
-    const the = (await screen.findByText('Câu rút được')).closest('[data-khoi="xac-nhan-tick"]') as HTMLElement
-    const o = (k: string) => (the.querySelector(`[data-so-tick="${k}"]`) as HTMLElement).textContent ?? ''
-    expect(o('du-luot')).toContain('2/ 3 em')
-    expect(o('du-luot')).toContain('em được giao · lớp có 44 em')
-    expect(o('du-diem-8')).toContain('1/ 3 em')
+    const hop = await moHop()
+    expect(await within(hop).findByRole('button', { name: 'Giao 1 bài cho lớp 12A1 · 3 em' }, { timeout: 4000 })).toBeTruthy()
+    expect(within(hop).queryByRole('button', { name: /44 em$/ })).toBeNull()
   })
 
   it('"Theo điểm danh": buổi đang mở + tối đa 3 buổi gần nhất (bỏ buổi 0 em, bỏ trùng); bấm ⇒ đúng em có mặt; "Cả lớp" trả về mặc định; tick gửi đúng sbd', async () => {
     coDuEm()
-    const { khoi } = await chonBai3()
+    const { hop, khoi } = await moGiaoCho()
     fireEvent.click(cheDo(khoi, /^Theo điểm danh/))
     const hang = (await within(khoi).findByRole('group', { name: 'Chọn em theo điểm danh' })) as HTMLElement
     expect(within(hang).getAllByRole('button').map((b) => b.textContent)).toEqual([
@@ -537,45 +518,47 @@ describe('chọn em nhận bài (thầy nhắn 05/10: bê bộ chọn em của c
 
     fireEvent.click(within(hang).getByRole('button', { name: 'Buổi 03/10 · 2 em có mặt' }))
     await waitFor(() => expect(lenh('xem-truoc').at(-1)!.sbd).toEqual(['S2', 'S3']))
-    await waitFor(() => expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(false))
-    fireEvent.click(screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
+    await waitFor(() => expect(nutGiao(hop).disabled).toBe(false))
+    fireEvent.click(nutGiao(hop))
     await waitFor(() => expect(lenh('tick')).toHaveLength(1))
     expect(lenh('tick')[0]).toMatchObject({ khoaBai: 'DH-12-C1-B3', sbd: ['S2', 'S3'] })
   })
 
   it('bỏ hết em ⇒ "Chọn ít nhất 1 em", nút giao khoá, không gọi xem-truoc với 0 em', async () => {
     coDuEm()
-    const { khoi } = await chonBai3()
+    const { hop, khoi } = await moGiaoCho()
     await waitFor(() => expect(lenh('xem-truoc').length).toBeGreaterThan(0))
     fireEvent.click(cheDo(khoi, /^Theo em/))
     fireEvent.click(within(khoi).getByRole('button', { name: 'Bỏ 12A1' }))
     expect(khoi.querySelector('.cd-chip-muc')?.textContent).toBe('0 / 5 em')
     expect(within(khoi).getByText('Chọn ít nhất 1 em.')).toBeTruthy()
-    expect(screen.getByText(/Chưa chọn em nào nên chưa giao được/)).toBeTruthy() // thẻ xác nhận nhắc một dòng ngắn, lời báo chính nằm ở ô "Giao cho"
-    expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(true)
+    // tóm tắt nhắc một dòng ngắn, chỉ đúng chỗ chọn em (09/11: «Không giao cho vài em…»)
+    expect(within(hop).getByText('Chưa chọn em nào — chọn em ở «Không giao cho vài em…».')).toBeTruthy()
+    expect(nutGiao(hop).disabled).toBe(true)
     await new Promise((r) => setTimeout(r, 400))
     expect(lenh('xem-truoc').every((b) => (b.sbd as string[] | undefined)?.length !== 0)).toBe(true)
   })
 
   it('chưa có danh sách em ⇒ giữ hành vi cũ: không có khối chọn em, KHÔNG gửi sbd (máy chủ giao cả lớp)', async () => {
-    const buoc = await moBuoc()
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    await waitFor(() => expect(lenh('xem-truoc').length).toBe(1))
-    expect(lenh('xem-truoc')[0]!.sbd).toBeUndefined()
+    const hop = await moHop()
+    await waitFor(() => expect(lenh('xem-truoc').length).toBeGreaterThan(0))
+    expect(lenh('xem-truoc').at(-1)!.sbd).toBeUndefined()
+    await waitFor(() => expect(nutGiao(hop).disabled).toBe(false))
+    expect(within(hop).queryByRole('button', { name: /^Không giao cho vài em…/ })).toBeNull()
     expect(screen.queryByRole('heading', { name: 'Giao cho' })).toBeNull()
   })
 
-  it('bài đã tick giữ số em và Bỏ tick; danh sách nhận bài chỉnh tại bảng Gói7, không mở chiến dịch cũ', async () => {
+  it('bài đã giao giữ số em và «Gỡ bài»; không có gói Gói7 ⇒ không «Sửa em»; không mở chiến dịch cũ', async () => {
     cd1 = null
-    const buoc = await moBuoc()
-    expect(dong(buoc, 'DH-12-C1-B2').textContent).toContain('Đã giao 44 em')
-    expect(within(dong(buoc, 'DH-12-C1-B2')).queryByRole('button', { name: 'Sửa em' })).toBeNull()
-    expect(within(dong(buoc, 'DH-12-C1-B2')).getByRole('button', { name: 'Bỏ tick' })).toBeTruthy()
+    const hop = await moHop()
+    expect(dongHop(hop, 'Bài 2. Lipid').textContent).toContain('44 em')
+    expect(within(dongHop(hop, 'Bài 2. Lipid')).queryByRole('button', { name: 'Sửa em' })).toBeNull()
+    expect(within(dongHop(hop, 'Bài 2. Lipid')).getByRole('button', { name: 'Gỡ bài' })).toBeTruthy()
     expect(goi.mock.calls.some(([duong]) => duong === '/gv/chien-dich/sua')).toBe(false)
   })
 })
 
-describe('bài đứng trước hiện "Đã dạy" (thầy 06/10: "khi tôi chọn bài nào thì những bài trước hiện đã dạy")', () => {
+describe('bài đứng trước bài đã giao (thầy 06/10: "khi tôi chọn bài nào thì những bài trước hiện đã dạy") — trong hộp Giao bài', () => {
   const B3_DANG_LUYEN = { khoaBai: 'DH-12-C1-B3', tenBai: 'Bài 3. Xà phòng và chất giặt rửa', viTri: 3, tickLuc: '2026-10-05T03:00:00Z', chienDichId: 'cd-9', trangThai: 'dang_luyen', hanNop: '2026-10-12', conNgay: 6, chungChi: null }
   /** Máy chủ trả đúng các bài đã tick `bai` cho danh-sach (mọi lệnh khác như bộ chuẩn). `sauTick`: danh sách mới sau khi `tick` thành công. */
   const dsTick = (bai: object[], sauTick?: object[]) => {
@@ -587,51 +570,38 @@ describe('bài đứng trước hiện "Đã dạy" (thầy 06/10: "khi tôi ch�
     })
   }
 
-  it('thầy đã giao Bài 3 (chưa tick bài nào trước đó) ⇒ Bài 1, 2 hiện "Đã dạy" (phạm vi thật, không nét đứt), Bài 3 "Đang luyện"; không còn "Chưa dạy"; Bài 1, 2 vẫn chọn lại được', async () => {
+  it('thầy đã giao Bài 3 (chưa tick bài nào trước đó) ⇒ Bài 3 «Đang luyện» (gọn một dòng); Bài 1, 2 là bài cũ trong phần ôn, vẫn chọn lại được, không «Gỡ bài»', async () => {
     dsTick([B3_DANG_LUYEN])
-    const buoc = await moBuoc()
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B3').getAttribute('data-trang-thai')).toBe('dang_luyen'))
-    for (const k of ['DH-12-C1-B1', 'DH-12-C1-B2']) {
-      expect(dong(buoc, k).getAttribute('data-trang-thai')).toBe('da_day')
-      expect(dong(buoc, k).textContent).toContain('Đã dạy')
-      expect(dong(buoc, k).textContent).not.toContain('Chưa dạy')
-      expect(dong(buoc, k).querySelector('.bhn-chip--du-kien')).toBeNull()
-      expect((within(dong(buoc, k)).getByRole('radio') as HTMLInputElement).disabled).toBe(false) // chưa tick riêng ⇒ vẫn giao riêng được
-      expect(within(dong(buoc, k)).queryByRole('button', { name: 'Bỏ tick' })).toBeNull() // không phải bài đã tick thật
+    const hop = await moHop()
+    await waitFor(() => expect(dongHop(hop, 'Bài 3. Xà phòng và chất giặt rửa').textContent).toContain('Đang luyện · còn 6 ngày'))
+    expect(oTick(hop, /Bài 3\. Xà phòng/)).toBeNull()
+    for (const [ten, mau] of [['Bài 1. Ester', /Bài 1\. Ester/], ['Bài 2. Lipid', /Bài 2\. Lipid/]] as const) {
+      const o = oTick(hop, mau)!
+      expect(o.disabled).toBe(false) // chưa tick riêng ⇒ vẫn giao riêng được
+      expect(o.checked).toBe(false) // không còn bài kế tiếp trong khối ⇒ không tick sẵn bài nào
+      expect(dongHop(hop, ten).textContent).toContain('bài cũ, đang trong phần ôn')
+      expect(within(dongHop(hop, ten)).queryByRole('button', { name: 'Gỡ bài' })).toBeNull() // không phải bài đã tick thật
     }
   })
 
-  it('chưa giao gì: chọn Bài 3 ⇒ Bài 1, 2 hiện "Đã dạy" NÉT ĐỨT (dự kiến) kèm lời giải thích; đổi sang Bài 2 ⇒ chỉ Bài 1; Bài sau bài đang chọn không đổi', async () => {
-    dsTick([])
-    const buoc = await moBuoc()
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Chưa dạy'))
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    for (const k of ['DH-12-C1-B1', 'DH-12-C1-B2']) {
-      expect(dong(buoc, k).getAttribute('data-trang-thai')).toBe('da_day')
-      const chip = dong(buoc, k).querySelector('.bhn-chip--du-kien') as HTMLElement
-      expect(chip.textContent).toBe('Đã dạy')
-      expect(chip.getAttribute('title')).toBe('Sẽ tính là đã dạy khi giao Bài 3')
-    }
-    expect(dong(buoc, 'DH-12-C1-B3').getAttribute('data-trang-thai')).toBe('hom_nay')
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B2')).getByRole('radio'))
-    expect(dong(buoc, 'DH-12-C1-B1').getAttribute('data-trang-thai')).toBe('da_day')
-    expect(dong(buoc, 'DH-12-C1-B1').querySelector('.bhn-chip--du-kien')?.getAttribute('title')).toBe('Sẽ tính là đã dạy khi giao Bài 2')
-    expect(dong(buoc, 'DH-12-C1-B3').getAttribute('data-trang-thai')).toBe('chua_day') // đứng SAU bài đang chọn ⇒ không đổi
-  })
+  // Bỏ theo thầy 09/11 (docs/ban-ve-giao-bai-0911): test «chưa giao gì: chọn Bài 3 ⇒ Bài 1, 2 hiện "Đã dạy" NÉT ĐỨT (dự kiến) kèm lời giải thích; đổi sang
+  // Bài 2 ⇒ chỉ Bài 1…» — chip dự kiến nét đứt là của cây bước «Bài hôm nay» đã bỏ; hộp gửi phạm vi bài trước qua `phamVi` (kiểm ở trên).
 
-  it('giao xong ⇒ chip nét đứt thành "Đã dạy" thật (sau khi tải lại danh sách), Bài 3 thành "Đang luyện"', async () => {
+  it('giao xong ⇒ tải lại danh sách: Bài 3 thành «Đang luyện» (gọn một dòng), Bài 1, 2 thành bài cũ trong phần ôn', async () => {
     dsTick([], [B3_DANG_LUYEN])
-    const buoc = await moBuoc()
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B1').textContent).toContain('Chưa dạy'))
-    fireEvent.click(within(dong(buoc, 'DH-12-C1-B3')).getByRole('radio'))
-    await waitFor(() => expect((screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }) as HTMLButtonElement).disabled).toBe(false))
-    fireEvent.click(screen.getByRole('button', { name: 'Giao Bài 3 cho 12A1' }))
+    const hop = await moHop()
+    // Chưa giao gì ⇒ Bài 1 là bài gợi ý: bỏ, chọn Bài 3.
+    await waitFor(() => expect(oTick(hop, /Bài 1\. Ester/)!.checked).toBe(true))
+    expect(dongHop(hop, 'Bài 1. Ester').textContent).not.toContain('bài cũ')
+    fireEvent.click(oTick(hop, /Bài 1\. Ester/)!)
+    fireEvent.click(oTick(hop, /Bài 3\. Xà phòng/)!)
+    await waitFor(() => expect(nutGiao(hop).disabled).toBe(false))
+    fireEvent.click(nutGiao(hop))
     await waitFor(() => expect(lenh('tick')).toHaveLength(1))
-    await waitFor(() => expect(dong(buoc, 'DH-12-C1-B3').getAttribute('data-trang-thai')).toBe('dang_luyen'))
-    for (const k of ['DH-12-C1-B1', 'DH-12-C1-B2']) {
-      expect(dong(buoc, k).getAttribute('data-trang-thai')).toBe('da_day')
-      expect(dong(buoc, k).querySelector('.bhn-chip--du-kien')).toBeNull()
-    }
+    expect(lenh('tick')[0]).toMatchObject({ khoaBai: 'DH-12-C1-B3', phamVi: [expect.objectContaining({ khoaBai: 'DH-12-C1-B1' }), expect.objectContaining({ khoaBai: 'DH-12-C1-B2' })] })
+    await waitFor(() => expect(dongHop(hop, 'Bài 3. Xà phòng và chất giặt rửa').textContent).toContain('Đang luyện'))
+    expect(oTick(hop, /Bài 3\. Xà phòng/)).toBeNull()
+    for (const ten of ['Bài 1. Ester', 'Bài 2. Lipid']) expect(dongHop(hop, ten).textContent).toContain('bài cũ, đang trong phần ôn')
   })
 })
 
@@ -644,7 +614,9 @@ describe('lối vào Dạy học qua khoá phiên cũ', () => {
     sessionStorage.setItem(KHOA_MO_THE_DAY_HOC, '1')
     render(<GoiLenBangScreen />)
     expect(screen.getByRole('tab', { name: 'Dạy học' }).getAttribute('aria-selected')).toBe('true')
-    expect(await screen.findByRole('heading', { name: 'Bài hôm nay' })).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 09/11: bảng Dạy học không còn bước «Bài hôm nay» ⇒ nhận ra bảng qua nút chọn bài của nó.
+    expect(await screen.findByRole('button', { name: 'Chọn bài trong kho Dạy học' })).toBeTruthy()
+    expect(screen.queryByRole('heading', { name: 'Bài hôm nay' })).toBeNull()
     expect(sessionStorage.getItem(KHOA_MO_THE_DAY_HOC)).toBeNull()
     expect(docMoTheDayHoc()).toBe(false)
   })

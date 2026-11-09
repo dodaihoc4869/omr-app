@@ -8,7 +8,6 @@ vi.mock('../src/lib/goi-lenh-thay', () => ({ goiLenh: (...a: unknown[]) => goi(.
 vi.mock('../src/lib/exam-db', async goc => ({ ...await goc<typeof import('../src/lib/exam-db')>(), loadExamSources: async () => [], loadTeacherSecret: async () => 'mat' }))
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 import BangBaiDangGiao from '../src/components/chien-dich/BangBaiDangGiao'
-import TheBaiDaDay from '../src/components/chien-dich/TheBaiDaDay'
 const GOI = [
   { id: 'g1', ten: 'Bài 8. Amine', lop: '12 - Lớp Thường', han: '2026-10-16', bat_dau: '2026-10-10' },
   { id: 'g2', ten: 'Bài 8. Amine', lop: '12 - Tinh Hoa', han: '2026-10-17', bat_dau: '2026-10-11' },
@@ -57,25 +56,20 @@ it('Cập nhật giữ bảng/thanh; bấm liên tiếp không nhân yêu cầu;
   await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
   expect(container.querySelector('table')).toBe(table)
 })
-it('trong bước Dạy học thật và form cha: lưu/Enter không submit hoặc chuyển màn, giữ editor + bảng và báo tại dòng sau ACK', async () => {
+// SỬA CÓ CHỦ ĐÍCH 09/11: bảng «Bài đang giao» không còn nằm trong khối Dạy học của Hành trình — bỏ theo thầy 09/11 (docs/ban-ve-giao-bai-0911) phần
+// mở Hành trình › Dạy học và khẳng định «không chuyển bước»; phần còn giữ (thành phần bảng trong form cha: Enter/Lưu không submit, không nổi bọt, giữ
+// editor + bảng, báo tại dòng sau ACK) kiểm thẳng trên `BangBaiDangGiao`.
+it('trong form cha: lưu/Enter không submit hoặc nổi bọt, giữ editor + bảng và báo tại dòng sau ACK', async () => {
   const chuyen = vi.fn(), submit = vi.fn(), bamCha = vi.fn(), cho = doi<unknown>()
   goi.mockImplementation(async (d, b) => {
     if (d === '/gv/goi-bai-7') return b.action === 'tong_hop' ? bang(b.caCu === true) : cho.cho
-    if (d === '/gv/lop') return { ok: true, du: { lop: [] } }
-    if (d === '/gv/buoi-hoc') return { ok: true, du: { buoi: [] } }
-    if (d === '/gv/omni') return { ok: true, du: { co: { bat: false, lop: [], sbd: [] } } }
     return { ok: false, chu: 'Chưa có dữ liệu.' }
   })
-  const { container } = render(<div onClick={bamCha}><form onSubmit={e => { e.preventDefault(); submit() }}><TheBaiDaDay /></form></div>)
-  // SỬA CÓ CHỦ ĐÍCH 07/11 (các bước buổi dạy, bản vẽ docs/ban-ve-buoc-day-0711): Bài đang giao nằm cuối khối Dạy học — chưa ai điểm danh thì trang
-  // mở bước 1; thầy sang «Hôm nay làm gì?» rồi chọn thẻ Dạy học.
-  fireEvent.click(await screen.findByRole('button', { name: /^Hôm nay làm gì\?/ }))
-  fireEvent.click(await screen.findByRole('button', { name: /^Dạy học/ }))
+  const { container } = render(<div onClick={bamCha}><form onSubmit={e => { e.preventDefault(); submit() }}><BangBaiDangGiao /></form></div>)
   const o = await sua(), table = container.querySelector('table')
-  const buoc4 = () => (container.querySelector('[data-buoc-ht="3"]')!.getAttribute('data-mo') === 'true' ? 'false' : 'true') // vẫn ở khối Dạy học, không chuyển bước
   bamCha.mockClear()
   fireEvent.keyDown(o, { key: 'Enter' })
-  expect(submit).not.toHaveBeenCalled(); expect(bamCha).not.toHaveBeenCalled(); expect(chuyen).not.toHaveBeenCalled(); expect(buoc4()).toBe('false')
+  expect(submit).not.toHaveBeenCalled(); expect(bamCha).not.toHaveBeenCalled(); expect(chuyen).not.toHaveBeenCalled()
   expect(screen.getByRole('button', { name: 'Đang lưu…' }).hasAttribute('disabled')).toBe(true)
   expect(screen.queryByText(/Đã lưu hạn mới/)).toBeNull()
   await act(async () => { cho.tra(xacNhan({ goiId: 'g2', han: '2026-10-20' })) })

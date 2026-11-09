@@ -4,6 +4,8 @@
 //   · nhớ lớp + bài đang chọn theo buổi ở khoá `ddh.dayHoc.<buổi>` (đọc-gộp-ghi, không xoá phần nhớ câu chiếu): đóng rồi mở lại vẫn còn bài;
 //   · bước "Dạy học" của Hành trình (DayHocLenBang nhúng) ghi phần nhớ của mình KHÔNG xoá lớp + bài hộp đã chọn (lỗi Đợt 16 không quay lại);
 //   · OMNI tắt ⇒ hộp nói rõ cần bật ở đâu, không nút Giao; đọc cờ lỗi ⇒ lý do + Thử lại.
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy duyệt docs/ban-ve-giao-bai-0911): hộp tên «Giao bài»; bài kế tiếp (sau bài đã giao xa nhất) được TICK SẴN ⇒ test bỏ
+// chọn bài gợi ý trước rồi mới chọn bài cần kiểm.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
@@ -53,15 +55,19 @@ afterEach(() => {
   localStorage.clear()
 })
 
-describe('hộp Bổ sung bài hôm nay', () => {
+describe('hộp Giao bài (trước là «Bổ sung bài hôm nay»)', () => {
   it('hộp chuẩn: tiêu đề, không đầu bước "Bài hôm nay"; lớp mặc định của buổi; chọn bài ⇒ nhớ theo buổi (gộp, giữ câu chiếu); mở lại vẫn còn; Esc đóng', async () => {
     localStorage.setItem('ddh.dayHoc.BH-9', JSON.stringify({ maChon: ['DH-12-C1-B1'], boCau: [], giao: {}, lopNhan: null, baiChon: null }))
     const dong = vi.fn()
     const r = render(<HopBoSungBai onDong={dong} />)
-    const hop = screen.getByRole('dialog', { name: 'Bổ sung bài hôm nay' })
+    const hop = screen.getByRole('dialog', { name: 'Giao bài' })
     expect(within(hop).queryByRole('heading', { name: 'Bài hôm nay' })).toBeNull()
     const radio = await within(hop).findByRole('checkbox', { name: /Bài 2\. Lipid/ }, { timeout: 4000 })
     expect(hop.textContent).toContain('12A1')
+    // Lớp chưa có bài nào ⇒ Bài 1 là bài gợi ý, tick sẵn; bỏ nó để phần nhớ chỉ còn bài thầy chọn.
+    const goiY = within(hop).getByRole('checkbox', { name: /Bài 1\. Ester/ }) as HTMLInputElement
+    await waitFor(() => expect(goiY.checked).toBe(true))
+    fireEvent.click(goiY)
     fireEvent.click(radio)
     await waitFor(() => expect(JSON.parse(localStorage.getItem('ddh.dayHoc.BH-9')!)).toMatchObject({ maChon: ['DH-12-C1-B1'], baiChon: { khoaBai: expect.stringContaining('B2'), khoi: '12' }, baiChonDs: { khoi: '12', ds: [expect.stringContaining('B2')] } }))
     // hộp chỉ đọc buổi một lần, không nhịp làm mới

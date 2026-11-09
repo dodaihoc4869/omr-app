@@ -2,7 +2,7 @@
 // Khoá từng đường làm mất lựa chọn của thầy:
 //  · Dạy học (DayHocLenBang): mở lại hộp chọn ⇒ cây tự mở tới bài đang chọn, giữ chữ tìm + chip lớp; "Dùng" lại y bộ cũ không xoá câu thầy đã bỏ;
 //    lựa chọn làm TRƯỚC khi có buổi (bấm Điểm danh / buổi về muộn) không bị xoá; đổi sang buổi khác thật ⇒ nạp phần nhớ của buổi ấy VÀ báo thầy.
-//  · Bài hôm nay (tick bài vừa dạy): bài + lớp thầy chọn còn nguyên khi mở lại màn (dựng lại thành phần); đổi sang lớp khác khối ⇒ bỏ bài VÀ báo.
+//  · Hộp Giao bài (trước là bước Bài hôm nay — đã bỏ 09/11): bài + lớp thầy chọn còn nguyên khi mở lại hộp; đổi sang lớp khác khối ⇒ bỏ bài VÀ báo.
 //  · Gọi lên bảng theo ca (GoiLenBangCu): danh sách BTVN về muộn không ghi đè bài thầy đã tích; đổi qua lại "Chữa BTVN" ↔ "Tôi tự chọn bài" giữ tích + chữ tìm.
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
@@ -111,6 +111,7 @@ afterEach(() => {
 })
 
 const CHO = { timeout: 8000 }
+const lenh = (action: string) => m.goi.mock.calls.filter(([d, b]) => d === '/gv/bai-da-day' && (b as Record<string, unknown>).action === action).map(([, b]) => b as Record<string, unknown>)
 const tongCau = () => document.querySelector('.dh-tong b')?.textContent ?? ''
 const hopChon = () => screen.findByRole('dialog', { name: 'Chọn bài · kho Dạy học' })
 /** Ô tích một dòng của cây (đang hiện) theo tên; không có ⇒ null. */
@@ -207,38 +208,61 @@ describe('Dạy học — hộp chọn bài mở lại vẫn thấy bài đang c
   })
 })
 
-describe('Bài hôm nay — bài đã chọn để tick còn nguyên khi mở lại', () => {
-  const buocBai = () => screen.findByRole('region', { name: /Bài hôm nay/ }).catch(() => document.querySelector('[data-khoi="bai-hom-nay"]') as HTMLElement)
-  const dongBai = (khoa: string) => document.querySelector(`[data-bai="${khoa}"]`) as HTMLElement | null
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy duyệt docs/ban-ve-giao-bai-0911: «bỏ hết màn phân bài bên trong»): bước «Bài hôm nay» không còn trong bảng Dạy học — chọn
+// bài để giao nay ở hộp «Giao bài» (HopBoSungBai, chọn NHIỀU bài, ô tick) ⇒ cùng hai đường làm mất lựa chọn, kiểm trên hộp. Bài kế tiếp được tick sẵn
+// (gợi ý) ⇒ test bỏ chọn bài gợi ý trước.
+describe('Hộp Giao bài — bài đã chọn để giao còn nguyên khi mở lại', () => {
+  const moHop = async () => {
+    const { default: HopBoSungBai } = await import('../src/components/day-hoc/HopBoSungBai')
+    render(<HopBoSungBai onDong={() => {}} />)
+    return screen.getByRole('dialog', { name: 'Giao bài' })
+  }
+  const o = (hop: HTMLElement, ten: RegExp) => within(hop).getByRole('checkbox', { name: ten }) as HTMLInputElement
+  /** Lớp chưa giao bài nào ⇒ Bài 1 là gợi ý (tick sẵn): bỏ nó, rồi chọn Bài 2. */
+  const chonBai2 = async (hop: HTMLElement) => {
+    await within(hop).findByRole('checkbox', { name: /Bài 2\. Lipid/ }, CHO)
+    await waitFor(() => expect(o(hop, /Bài 1\. Ester/).checked).toBe(true), CHO)
+    fireEvent.click(o(hop, /Bài 1\. Ester/))
+    fireEvent.click(o(hop, /Bài 2\. Lipid/))
+    await waitFor(() => expect(hop.querySelector('.cbm-tom-chu')?.textContent).toContain('1 bài · Bài 2'), CHO)
+  }
 
-  it('chọn bài rồi rời màn, mở lại ⇒ bài vẫn đang chọn, thẻ xác nhận hiện lại', async () => {
+  it('chọn bài rồi đóng hộp, mở lại ⇒ bài vẫn đang chọn (thắng cả bài gợi ý), tóm tắt hiện lại', async () => {
     co = { bat: true, lop: [], sbd: [] }
     buoiMo = [BUOI('BH-1')]
-    render(<DayHocLenBang />)
-    await buocBai()
-    await waitFor(() => expect(dongBai('DH-12-C1-B2')).toBeTruthy(), CHO)
-    fireEvent.click(within(dongBai('DH-12-C1-B2')!).getByRole('radio'))
-    await waitFor(() => expect(document.querySelector('[data-khoi="cho-chon-bai"]')).toBeNull())
+    await chonBai2(await moHop())
+    expect(document.querySelector('.cbm-cho')).toBeNull()
 
     cleanup()
-    render(<DayHocLenBang />)
-    await waitFor(() => expect(dongBai('DH-12-C1-B2')).toBeTruthy(), CHO)
-    await waitFor(() => expect((within(dongBai('DH-12-C1-B2')!).getByRole('radio') as HTMLInputElement).checked).toBe(true), CHO)
-    expect(document.querySelector('[data-khoi="cho-chon-bai"]')).toBeNull()
+    const hop = await moHop()
+    await within(hop).findByRole('checkbox', { name: /Bài 2\. Lipid/ }, CHO)
+    await waitFor(() => expect(o(hop, /Bài 2\. Lipid/).checked).toBe(true), CHO)
+    expect(o(hop, /Bài 1\. Ester/).checked).toBe(false)
+    await waitFor(() => expect(hop.querySelector('.cbm-tom-chu')?.textContent).toContain('1 bài · Bài 2'), CHO)
+    expect(hop.querySelector('.cbm-cho')).toBeNull()
   })
 
-  it('đổi sang lớp khác khối ⇒ bỏ bài đang chọn VÀ báo thầy', async () => {
+  it('đổi sang lớp khác khối ⇒ bỏ bài đang chọn VÀ báo thầy (dòng «Đã chuyển sang Khối 11»); về lại lớp khối 12 ⇒ bài đã chọn của khối 12 hiện lại', async () => {
     co = { bat: true, lop: [], sbd: [] }
     buoiMo = [BUOI('BH-1')]
-    render(<DayHocLenBang />)
-    await waitFor(() => expect(dongBai('DH-12-C1-B2')).toBeTruthy(), CHO)
-    fireEvent.click(within(dongBai('DH-12-C1-B2')!).getByRole('radio'))
-    await waitFor(() => expect(document.querySelector('[data-khoi="cho-chon-bai"]')).toBeNull())
-    const chonLop = document.querySelector('[data-khoi="chon-lop-giao"]') as HTMLElement
-    fireEvent.click(within(chonLop).getByRole('button', { name: /Chọn lớp/ }))
+    const hop = await moHop()
+    await chonBai2(hop)
+    const chonLop = () => hop.querySelector('[data-khoi="chon-lop-giao"]') as HTMLElement
+    fireEvent.click(within(chonLop()).getByRole('button', { name: /Chọn lớp/ }))
     fireEvent.click(await screen.findByRole('checkbox', { name: /^11B/ }))
-    await waitFor(() => expect(document.querySelector('[data-khoi="cho-chon-bai"]')).toBeTruthy(), CHO)
-    expect(m.toast).toHaveBeenCalledWith(expect.stringMatching(/Bài 2/), expect.anything())
+    await within(hop).findByRole('checkbox', { name: /Bài 3\. Ammonia/ }, CHO)
+    // Cây khối 11: không còn Bài 2, không bài nào đang chọn ⇒ tóm tắt về dòng chờ.
+    expect(within(hop).queryByRole('checkbox', { name: /Bài 2\. Lipid/ })).toBeNull()
+    expect(within(hop).queryAllByRole('checkbox', { checked: true }).filter((x) => x.closest('.cbm'))).toHaveLength(0)
+    expect(hop.querySelector('.cbm-cho')?.textContent).toContain('Tick bài vừa dạy ở trên')
+    // Báo thầy ngay tại ô chọn lớp (hộp không bắn toast nêu tên bài như bước cũ).
+    expect(hop.textContent).toContain('Đã chuyển sang Khối 11.')
+    expect(lenh('xem-truoc').every((b) => b.lop !== '11B')).toBe(true)
+
+    // Về lại 12A1: phần chọn nhớ theo khối ⇒ Bài 2 hiện lại đang chọn.
+    fireEvent.click(await screen.findByRole('checkbox', { name: /^12A1/ }))
+    await within(hop).findByRole('checkbox', { name: /Bài 2\. Lipid/ }, CHO)
+    await waitFor(() => expect(o(hop, /Bài 2\. Lipid/).checked).toBe(true), CHO)
   })
 })
 

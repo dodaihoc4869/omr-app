@@ -303,14 +303,25 @@ describe('bảng Bài đang giao', () => {
     expect(await screen.findByText(/Chưa lớp nào đang có bài giao\. Bấm “Bổ sung bài hôm nay” ở màn Hôm nay/)).toBeTruthy()
   })
 
-  it('trong Hành trình: lối "Câu nhiều em sai … sang Chữa câu khó" (cuối khối Dạy học) mở hoạt động Chữa câu khó', async () => {
+  // Test «trong Hành trình: lối "Câu nhiều em sai … sang Chữa câu khó" (cuối khối Dạy học)» — bỏ theo thầy 09/11 (docs/ban-ve-giao-bai-0911):
+  // bảng «Bài đang giao» không còn vẽ trong khối Dạy học của Hành trình (sửa em / gỡ bài nay ở hộp «Giao bài» của màn Hôm nay).
+  it('09/11: khối Dạy học của Hành trình KHÔNG còn bước «Bài hôm nay» lẫn bảng «Bài đang giao»; không đọc Gói7', async () => {
     const { container } = render(<HanhTrinhV2 />)
     await waitFor(() => expect(dangMo(container, 2)).toBe(true))
     fireEvent.click(the(container, /^Dạy học/))
-    fireEvent.click(await screen.findByRole('button', { name: 'Câu nhiều em sai của các bài này: sang Chữa câu khó & tính toán ›' }, { timeout: 4000 }))
-    expect(await screen.findByText('Giả: mục Chữa bài')).toBeTruthy()
-    expect(dangMo(container, 3)).toBe(true)
-    expect(container.querySelector('[data-hd="day-hoc"]')!.hasAttribute('hidden')).toBe(true)
+    // Chờ khối Dạy học (nạp lười) vẽ xong thật rồi mới kiểm vắng.
+    const khoi = container.querySelector('[data-hd="day-hoc"]') as HTMLElement
+    expect(await within(khoi).findByRole('button', { name: 'Chọn câu để chiếu' }, { timeout: 4000 })).toBeTruthy()
+    const buocDay = khoi.querySelector('[data-khoi="buoc-day-chieu"]') as HTMLElement
+    expect(within(buocDay).getByRole('heading', { name: 'Dạy học' })).toBeTruthy()
+    // Chờ thêm một nhịp cho các lệnh nạp sau khi vẽ (danh sách bài, cờ…) — bảng cũ tự đọc Gói7 ngay khi gắn.
+    await new Promise((r) => setTimeout(r, 300))
+    expect(screen.queryByRole('heading', { name: 'Bài hôm nay' })).toBeNull()
+    expect(screen.queryByRole('region', { name: 'Bài hôm nay' })).toBeNull()
+    expect(container.querySelector('[data-khoi="bai-hom-nay"]')).toBeNull()
+    expect(screen.queryByRole('region', { name: /^Bài đang giao/ })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Câu nhiều em sai của các bài này: sang Chữa câu khó & tính toán ›' })).toBeNull()
+    expect(lenh('/gv/goi-bai-7')).toHaveLength(0)
   })
 })
 
