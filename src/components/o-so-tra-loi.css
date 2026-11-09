@@ -13,7 +13,7 @@
 .osl-nut{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;width:var(--osl-nut-rong);min-width:36px;height:var(--osl-nut-cao);margin:0;padding:0;border:0;
   border-radius:calc(var(--osl-bo) - 4px);background:rgba(128,128,128,.14);background:var(--osl-nut-nen,color-mix(in srgb,var(--osl-chu) 9%,transparent));
   color:var(--osl-nut-chu,var(--osl-chu));font:inherit;font-size:20px;font-weight:700;line-height:1;cursor:pointer;
-  touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;transition:background-color .12s,color .12s}
+  touch-action:manipulation;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;transition:background-color .12s,color .12s}
 .osl-nut-phay{font-size:24px;padding-bottom:6px}
 @media (hover:hover){.osl-nut:not(:disabled):hover{background:rgba(128,128,128,.24);background:color-mix(in srgb,var(--osl-chu) 16%,transparent)}}
 .osl-nut:active:not(:disabled){transform:scale(.94)}
