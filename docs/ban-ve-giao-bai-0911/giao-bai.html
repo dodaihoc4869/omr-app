@@ -155,7 +155,7 @@ function hopChon(thieu){
   ? `<div class="o-so canh"><small>Đề chuẩn</small><strong>24/28</strong><em>thiếu câu Đúng/Sai</em></div>`
   : `<div class="o-so"><small>Đề chuẩn</small><strong>26/28</strong><em>đúng mức đề thi</em></div>`
  const tenBai= thieu?'Bài 10 · Polymer':'Bài 9 · Peptide – protein'
- const cau= thieu?'84':'96', ngay= thieu?'3':'4', xong= thieu?'9–16 ngày':'10–18 ngày', moc= thieu?'18/11 – 25/11':'19/11 – 27/11'
+ const cau= thieu?'84':'96', ngay= thieu?'3':'4', xong= thieu?'16–28 ngày':'13–24 ngày', moc= thieu?'25/11 – 07/12 · gồm cả Bài 7–9 đang làm':'22/11 – 03/12 · gồm cả Bài 7, 8 đang làm'
  return `<div class="man"><section class="hop" role="dialog" aria-label="Giao bài">
  <div class="hop-dau"><div><h2>Giao bài</h2><p><span class="dai">Chọn bài vừa dạy. Máy tự xếp 28 câu mỗi ngày cho từng em, tự đặt hạn; quá hạn báo thầy ở Việc cần thầy.</span><span class="ngan">Chọn bài vừa dạy — máy tự lo phần còn lại.</span></p></div><button class="dong" aria-label="Đóng">${I.x}</button></div>
  <div class="lop"><span class="t">Lớp</span><span class="chip on">${I.tick} 12 Thường · 53 em</span><span class="chip">12 Tinh Hoa · 38 em</span><span class="chip">12 Chuyên · 24 em</span></div>

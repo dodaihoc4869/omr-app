@@ -12,7 +12,7 @@ Thầy: «thiết kế 1 nút giao bài ngay ở màn hôm nay, bấm vào popup
 - **Hộp Giao bài** (`*-1-chon`) — máy tính: hộp giữa màn hai cột; điện thoại: tấm trượt từ đáy, tóm tắt một dòng + nút dính đáy:
   1. **Lớp**: chip từng lớp kèm số em; mặc định lớp của buổi đang mở; chọn nhiều lớp cùng khối.
   2. **Danh sách bài theo chương**: chương đã giao hết gộp thành một dòng «Hiện 2 chương đã giao hết»; mở sẵn chương có bài kế tiếp. Mỗi dòng: ô tick · số bài · tên · «96 câu · 4 ngày Mới». Bài kế tiếp **tick sẵn**, nhãn xanh «Gợi ý». Bài đang giao: mờ, dòng phụ «Đang giao · 41/53 em xong», nút ⋯ → «Gỡ bài» (hỏi lại, nói rõ hậu quả).
-  3. **Tóm tắt** (máy tự tính): Câu mới (số câu · số ngày · 28 câu/ngày) · Đề chuẩn x/28 · Lớp dự kiến xong (khoảng ngày + mốc ngày). Dòng «Hạn riêng từng em máy tự đặt khi em bắt đầu bài». Nút **«Giao Bài 9 cho 12 Thường»**. Liên kết nhỏ «Không giao cho vài em…» (mở danh sách em để bỏ tick — giữ chức năng thầy cần 05/10, mặc định ẩn).
+  3. **Tóm tắt** (máy tự tính): Câu mới (số câu · số ngày · 28 câu/ngày) · Đề chuẩn x/28 · Lớp dự kiến xong (khoảng ngày + mốc ngày, **cộng cả các bài đang xếp trước của từng em**, vd «gồm cả Bài 7, 8 đang làm»). Dòng «Hạn riêng từng em máy tự đặt khi em bắt đầu bài». Nút **«Giao Bài 9 cho 12 Thường»**. Liên kết nhỏ «Không giao cho vài em…» mở danh sách em để bỏ tick, có chip «Cả lớp» và «Theo điểm danh» (buổi đang mở + tối đa 3 buổi gần nhất) đúng như bản cũ — giữ chức năng thầy yêu cầu 05/10, mặc định ẩn.
 - **Thiếu câu chuẩn** (`*-2-thieu`): ô Đề chuẩn chuyển vàng «24/28 · thiếu câu Đúng/Sai», dòng giải thích + «Bổ sung câu Đúng/Sai ›». Vẫn giao được.
 - **Đã giao** (`*-3-xong`): dấu ✓, «Đã giao Bài 9 cho 12 Thường · 53 em», một câu máy sẽ làm gì; [Giao thêm bài] [Xong].
 
@@ -30,12 +30,12 @@ Thầy: «thiết kế 1 nút giao bài ngay ở màn hôm nay, bấm vào popup
 - Đang tải: khung xương đúng hình (danh sách + tóm tắt). Đang tính dự kiến: ba ô hiện «…», nút Giao vẫn bấm được (số chỉ để xem).
 - Chưa tick bài: nút ghi «Chọn bài để giao», bị khoá. Tick nhiều bài: «Giao 2 bài cho 12 Thường», tóm tắt cộng gộp.
 - Đang giao: nút «Đang giao…» khoá; mạng lỗi ⇒ dòng đỏ «Chưa chắc đã giao — xem dòng bài trong danh sách rồi hãy bấm lại» (không tự bấm lại).
-- Có ca thi đang mở: vẫn giao được (máy chủ đã chặn ghi lịch khi ca mở như hiện nay ⇒ báo «Đang có ca thi — bài sẽ giao khi ca đóng»).
+- Có ca thi đang mở: vẫn bấm Giao được; bài được ghi, còn gói của các em chỉ tạo khi không có ca mở (`goi-bai-7.ts`, điều kiện `NOT EXISTS ca mở`) và máy chủ đồng bộ gói MỖI PHÚT (`index.ts`, cron `* * * * *` gọi `dongBoGoi7`) ⇒ báo «Đang có ca thi — các em nhận bài ngay khi ca đóng».
 - Không còn bài chưa giao trong khối: dòng «Đã giao hết bài của khối 12».
 
 ## 4. Dữ liệu
 - Đã có: cây bài theo khối (`bai-hom-nay.ts`), `/gv/bai-da-day danh-sach | xem-truoc | tick | bo-tick`, danh sách em (`useDsEmGiao`), gói 7 (`goi-bai-7*.ts`).
-- Thay đổi máy chủ (theo v5): `xem-truoc` trả thêm M (⌈N/28⌉), độ chuẩn đề, dự kiến xong (min–max theo dự báo từng em); `tick` không nhận hạn / lượt nữa — hạn riêng từng em đặt KHI EM BẮT ĐẦU bài (bài xếp hàng sau bài cũ chưa có hạn ⇒ không báo quá hạn dây chuyền). Bảng chỉ-thêm: hạn riêng từng em × bài.
+- Thay đổi máy chủ (theo v5): `xem-truoc` trả thêm M (⌈N/28⌉), độ chuẩn đề, dự kiến xong (min–max theo dự báo từng em); «Lớp dự kiến xong» = với từng em: ngày còn lại của các bài đang xếp trước + chu kỳ dự báo của bài mới; hiện min–max của lớp. `tick` không nhận hạn / lượt nữa — hạn riêng từng em đặt KHI EM BẮT ĐẦU bài (bài xếp hàng sau bài cũ chưa có hạn ⇒ không báo quá hạn dây chuyền). Bảng chỉ-thêm: hạn riêng từng em × bài.
 - Đề 28 câu mỗi ngày dựng khi em mở app lần đầu trong ngày (như `goi_bai_7_ngay`); việc chạy đêm chỉ gom số cho thẻ cảnh báo và dự kiến.
 
 ## 5. Ngoại lệ
@@ -46,9 +46,10 @@ Thầy: «thiết kế 1 nút giao bài ngay ở màn hôm nay, bấm vào popup
 - Đổi tab giữa chừng: giữ bài đang tick (như `chonNho` hiện có).
 
 ## 6. Bỏ đi (thầy: «bỏ hết màn phân bài bên trong»)
-- Hành trình › bước Dạy học: phần chọn bài «Bài hôm nay» (`BuocBaiHomNay` trong `DayHocLenBang.tsx`) — phần dạy trên bảng giữ nguyên.
+- **Trang Hành trình 4 bước (điểm danh · gọi lên bảng đầu giờ · dạy học · chữa câu khó, `TheBaiDaDay`) GIỮ NGUYÊN.** Chỉ bỏ hai phần giao bài bên trong:
+  - phần chọn bài «Bài hôm nay» trong bước Dạy học (`BuocBaiHomNay` ở `DayHocLenBang.tsx`) — phần dạy trên bảng giữ nguyên;
+  - bảng «Bài đang giao» (`BangBaiDangGiao`, nằm trong `TheBaiDaDay`) — gộp vào hộp (dòng bài đang giao + ⋯ Gỡ bài; Thêm/Bớt em ở «Không giao cho vài em…»).
 - Hộp «Bổ sung bài hôm nay» cũ (`HopBoSungBai` + `BoSungNhieuBai`) — thay bằng hộp Giao bài; lối cũ `boSungBai` mở hộp mới.
-- Bảng «Bài đang giao» (`TheBaiDaDay` / `BangBaiDangGiao`) — gộp vào hộp (dòng bài đang giao + ⋯ Gỡ bài; Thêm/Bớt em ở «Không giao cho vài em…»).
 - «Giao bài tập về nhà», «Giao đề theo tuần» không có trong thanh bên hiện tại (chế độ Game Hoá 2) ⇒ không đụng.
 - Mã cũ gỡ khỏi mọi lối vào ngay; xoá hẳn sau một tuần chạy ổn (dễ lùi).
 
