@@ -49,10 +49,13 @@ ghiSwVersion()
 // Mol, giám thị, «Trong», thưởng phạt, màn làm bài / sửa câu / kiểm tra…) nằm ở kho chạy-lúc (precache giữ 170) ⇒ sau MỖI lần phát hành tên tệp đổi, máy em
 // chỉ tải từng mảnh ĐÚNG LÚC mở màn ⇒ chậm. Plugin này đi đồ thị nạp (tĩnh + động) từ vỏ `AppHocSinh`, ghi danh sách `kho-hs.json` (KHÔNG vào precache:
 // globPatterns không có json); cổng học sinh lúc rảnh đọc danh sách và tải ngầm mảnh nào máy chưa có (src/lib/nap-truoc-kho-hs.ts) ⇒ cần là có ngay.
-// Bỏ thư viện lớn chỉ dùng khi bấm (xuất PDF / ảnh, bản đồ 3D) — tải khi cần như cũ.
-const KHO_HS_BO = /^assets\/(?:ban-do-3d-three|jspdf|html2canvas|purify|index\.es|fflate)/
+// Bỏ bản đồ 3D (chỉ màn Hôm nay của thầy). 10/11: thư viện xuất PDF «Câu đã làm» (jspdf, html2canvas, purify, canvg, fflate ≈ 300 KB nén) VÀO kho — tên tệp thư viện
+// không đổi giữa các lần phát hành ⇒ tải một lần.
+const KHO_HS_BO = /^assets\/ban-do-3d-three/
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
-const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol|DemNguocThi|NhomSuaHomNay|ViDuMau|cau-chuyen|tai-chi-tiet)-[\w-]{8}\.(?:js|css)$/
+// 10/11 thầy «Tải hết mọi thứ xg máy hs để app hs tức thì nhé»: thêm mọi mảnh app học sinh còn sót (khoá đề thi, vào bảng BPU, điểm danh phòng, nhật ký / treo máy khi thi,
+// Hỏi thầy kiểm chứng, làm mới app, phiếu in + PDF «Câu đã làm» kèm thư viện) — kho tải ngầm tải lúc rảnh, một lần mỗi phiên bản.
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol|DemNguocThi|NhomSuaHomNay|ViDuMau|cau-chuyen|tai-chi-tiet|khoa-de-thi|gan-hs|phong|nhan-lich-su|do-treo-may-thi|HoiThayKiemChung|lam-moi-app|hoi-thay-goc|html-phieu|pdf-cau-da-lam|jspdf\.es\.min|index\.es|html2canvas|html2canvas-pro\.esm|purify\.es|fflate)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
   let dsCho: string[] = []
   return {

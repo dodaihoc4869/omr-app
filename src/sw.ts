@@ -143,7 +143,8 @@ registerRoute(
   new CacheFirst({
     cacheName: 'omr-manh-chay-lan',
     // 02/11: 150 → 320 mục — cổng học sinh tải ngầm ~110 mảnh của nó (lib/nap-truoc-kho-hs.ts) + mảnh màn thầy; mảnh cũ vẫn hết hạn sau 30 ngày.
-    plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 320, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
+    // 10/11: 320 → 450 — kho tải ngầm nay 225 mảnh (tải hết app học sinh) ⇒ đủ chỗ cả kho + mảnh mới của một lần phát hành, không đẩy mảnh đang dùng ra.
+    plugins: [KHONG_LUU_HTML, new ExpirationPlugin({ maxEntries: 450, maxAgeSeconds: 30 * 24 * 3600, purgeOnQuotaError: true })],
   }),
 )
 registerRoute(
