@@ -16,7 +16,7 @@ const may = createServer((req, res) => {
 }).listen(0)
 await new Promise(r => may.once('listening', r))
 const URL0 = `http://127.0.0.1:${may.address().port}/docs/ban-ve-giao-bai-0911/giao-bai.html#`
-const trinh = await chromium.launch()
+const trinh = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })
 const KHUNG = [
   ['mt-sang-0-hom-nay', 'man=homnay', 1366, 900], ['mt-sang-1-chon', 'man=chon', 1366, 900], ['mt-toi-1-chon', 'man=chon&toi=1', 1366, 900],
   ['mt-sang-2-thieu', 'man=thieu', 1366, 900], ['mt-sang-3-xong', 'man=xong', 1366, 900],
