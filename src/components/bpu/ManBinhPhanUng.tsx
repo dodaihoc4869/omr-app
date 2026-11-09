@@ -63,7 +63,7 @@ function KetQuaChon({ phan, chon, dung, emDung }: { phan: string; chon: string; 
     <div className="bpu-kq-pa" role="list" aria-label="Phương án">
       {['A', 'B', 'C', 'D'].map((x) => {
         const la = x === d ? 'dung' : x === c ? 'sai' : undefined
-        return <div key={x} role="listitem" className="bpu-kq-o" data-kq={la} aria-label={`${x}${x === c ? ' · em chọn' : ''}${x === d ? ' · đáp án đúng' : ''}`}><b>{x}</b>{la ? <span>{la === 'dung' ? '✓' : '✗'}</span> : null}<small>{x === c ? 'Em chọn' : x === d ? 'Đáp án đúng' : ''}</small></div>
+        return <div key={x} role="listitem" className="bpu-kq-cot" data-kq={la} aria-label={`${x}${x === c ? ' · em chọn' : ''}${x === d ? ' · đáp án đúng' : ''}`}><div className="bpu-kq-o" data-kq={la}><b>{x}</b>{la ? <span>{la === 'dung' ? '✓' : '✗'}</span> : null}</div><small>{x === c ? 'Em chọn' : x === d ? 'Đáp án đúng' : ''}</small></div>
       })}
     </div>
   )
@@ -114,10 +114,10 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const [chon, setChon] = useState('')
   const [baoTra, setBaoTra] = useState('')
   const [vuaRoi, setVuaRoi] = useState(false)
-  /** Số lượt em vừa BẤM GỬI trên máy (che ngay, không chờ phòng báo lại — mất mạng vẫn che); lượt mới ⇒ số khác ⇒ tự mở. */
-  const [cheSo, setCheSo] = useState(0)
-  /** Số lượt đang chạy hiệu ứng gửi (tia lửa bay lên) — xong ~1,15 s thì đề bên dưới mới gỡ khỏi màn. */
-  const [bay, setBay] = useState(0)
+  /** Khoá lượt (số:giờ mở) em vừa BẤM GỬI trên máy (che ngay, không chờ phòng báo lại — mất mạng vẫn che); lượt mới ⇒ số khác ⇒ tự mở. */
+  const [cheSo, setCheSo] = useState('')
+  /** Khoá lượt đang chạy hiệu ứng gửi (tia lửa bay lên) — xong ~1,15 s thì đề bên dưới mới gỡ khỏi màn. */
+  const [bay, setBay] = useState('')
   /** Đã báo phòng «rời» ⇒ app hiện lại thì gửi `ve`. */
   const daBaoRoi = useRef(false)
   const [nay, setNay] = useState(() => Date.now())
@@ -186,7 +186,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const coLuot = !!v?.luot
   useEffect(() => { if (an && coLuot && soLuot > boLuot.current && !v?.ketThuc && !chan?.()) setAn(false) }, [an, coLuot, soLuot, v?.ketThuc, chan])
 
-  useEffect(() => { if (!bay) return; const h = setTimeout(() => setBay(0), BAY_MS); return () => clearTimeout(h) }, [bay])
+  useEffect(() => { if (!bay) return; const h = setTimeout(() => setBay(''), BAY_MS); return () => clearTimeout(h) }, [bay])
   // VỀ LẠI MÀN (thầy 09/11 bỏ trừ kJ): đã báo «rời» mà app hiện lại ⇒ báo phòng `ve` (gỡ tên em khỏi «đang rời» trên bảng). Nghe ở mức màn — kể cả khi
   // trong lúc em rời thầy đã mở đáp án (lúc ấy nhánh nghe rời màn đã gỡ). Mất mạng ⇒ `ve` nằm hàng chờ, nối lại là gửi sau `vao`/`chao`.
   useEffect(() => {
@@ -228,13 +228,15 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const tenDoi = DOI_BPU[doi]?.ten ?? ''
   const q = (l?.cau ?? null) as unknown as Question | null
   const duChon = !!l && (l.tuLuan || (l.phan === 'II' ? /^[DS]{4}$/.test(chon) : chon.trim().length > 0))
-  const che = !!l && (!!l.emTra || cheSo === l.so)
-  const dangBay = !!l && bay === l.so
+  // Khoá lượt = số lượt + giờ mở: phòng bỏ lượt rỗng rồi mở câu khác cùng số ⇒ khoá khác ⇒ không che nhầm câu em chưa thấy.
+  const khoaLuot = l ? `${l.so}:${l.batDau}` : ''
+  const che = !!l && (!!l.emTra || cheSo === khoaLuot)
+  const dangBay = !!l && bay === khoaLuot
   const guiTra = () => {
     if (!l || !duChon || che) return
     gui({ t: 'tra', chon: l.tuLuan ? 'xong' : chon })
-    setCheSo(l.so)
-    if (!tinhLang()) setBay(l.so)
+    setCheSo(khoaLuot)
+    if (!tinhLang()) setBay(khoaLuot)
     try { navigator.vibrate?.([18, 40, 26]) } catch { /* máy không rung */ }
     xinToanMan()
   }

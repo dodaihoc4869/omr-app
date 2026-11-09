@@ -1,7 +1,7 @@
 // Bình Phản Ứng — giao diện máy em + bảng chiếu với phòng giả (WebSocket giả, dữ liệu từ luật phòng thật): đi đủ các màn, không vỡ, chữ đúng chuẩn.
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { DOI_BPU, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
+import { DOI_BPU, boLuotRong, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 const traMo = vi.hoisted(() => ({ v: { ok: true, du: { ok: true, ve: 've-thay' } } as Record<string, unknown> }))
@@ -150,12 +150,26 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(await screen.findByText('Chính xác!')).toBeTruthy()
     expect(document.querySelector('.bpu-che')!.getAttribute('data-kq')).toBe('dung')
     expect(document.querySelector('.bpu-kq-o[data-kq="sai"]')).toBeNull()
-    expect(document.querySelector('.bpu-kq-o[data-kq="dung"]')!.textContent).toContain('Em chọn')
+    expect(document.querySelector('.bpu-kq-cot[data-kq="dung"]')!.textContent).toContain('Em chọn')
     const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
     moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText('Chưa đúng')).toBeTruthy()
     expect([...document.querySelectorAll('.bpu-kq-dong')].map((x) => x.textContent)).toEqual(['a)Em: Đúng ✓', 'b)Em: Sai ✓', 'c)Em: Sai ✓', 'd)Em: Sai ✗Đáp án: Đúng ✓'])
     expect(screen.getByText(/Em đúng 3\/4 ý/)).toBeTruthy()
+  })
+  it('mất mạng lúc gửi mà phòng bỏ lượt rỗng rồi mở câu khác CÙNG SỐ lượt ⇒ không che nhầm câu mới (khoá = số lượt + giờ mở)', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    const pa = await screen.findAllByRole('radio')
+    ws.readyState = 0 // mất mạng: đáp án nằm hàng chờ
+    act(() => { pa[1]!.click() })
+    act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }).click() })
+    expect(document.querySelector('.bpu-che')).toBeTruthy()
+    expect(boLuotRong(st)).toBe(true)
+    moLuot(st, { ...cau, qid: 'q2' }, T0 + 7000); ws.nhan(viewEm(st, 'S1'))
+    expect(viewEm(st, 'S1').luot!.so).toBe(1)
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(document.querySelector('.bpu-che')).toBeNull()
   })
   it('em chưa gửi mà thầy mở đáp án ⇒ không che, đáp án đúng tô XANH', async () => {
     const ws = await vao()
