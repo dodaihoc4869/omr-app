@@ -76,6 +76,20 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     await p.webSocketClose()
     expect(gv.tin.length).toBe(truoc)
   })
+  it('10/11 «cảnh báo tức thì»: `roi` ⇒ bảng nhận NGAY trong cùng lần xử lý tin (không gom 250 ms như tiếp sức), đo ms', async () => {
+    const { p, noi, post } = taoPhong()
+    await post('/khoi', { buoiId: 'b3', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1 }] })
+    const gv = await noi('gv'), em = await noi('hs', 'S1')
+    await post('/luot', { qid: 'q', phan: 'I', tuLuan: false, cau: {}, dung: 'A', hanGiay: 0 })
+    const truoc = gv.tin.length
+    const t0 = performance.now()
+    await p.webSocketMessage(em as never, JSON.stringify({ t: 'roi' }))
+    const ms = performance.now() - t0
+    expect(gv.tin.length).toBe(truoc + 1) // đã phát cho bảng khi lệnh xử lý xong — không hẹn giờ
+    expect(JSON.parse(gv.tin.at(-1)!).roiNay).toEqual(['S1'])
+    expect(ms).toBeLessThan(50)
+    console.info(`[đo] phòng: nhận roi → gửi bảng = ${ms.toFixed(2)} ms (gồm ghi kho giả)`)
+  })
   it('em vào muộn qua /vao kèm năng lực ⇒ phòng nhận số năng lực', async () => {
     const { p, post } = taoPhong()
     await post('/khoi', { buoiId: 'b8', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1, nangLuc: 0.9 }] })

@@ -372,13 +372,14 @@ html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 @keyframes bpu-bao-chay { from { opacity: 1; } to { opacity: 0.2; } }
 .bpu-bao-chay-the { position: relative; display: grid; justify-items: center; gap: 0.6vmin; max-width: 86vw; padding: 3vmin 5vmin 3.4vmin; border-radius: 3vmin; text-align: center;
   background: var(--tr-sai); color: var(--tr-chieu-giay); box-shadow: 0 0 0 0.6vmin color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent), 0 2vmin 8vmin color-mix(in srgb, var(--tr-sai) 60%, transparent);
-  animation: bpu-bao-chay-the 0.9s cubic-bezier(.3, 1.4, .5, 1) both, bpu-bao-chay-rung 1.4s ease-in-out 0.9s infinite; font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif; }
+  animation: bpu-bao-chay-the 0.3s cubic-bezier(.3, 1.4, .5, 1) both, bpu-bao-chay-rung 1.4s ease-in-out 0.3s infinite; font-family: 'Be Vietnam Pro', 'Noto Sans', sans-serif; }
 .bpu-bao-chay-the b { font-size: clamp(22px, 2.6vw, 48px); font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
 .bpu-bao-chay-the strong { font-size: clamp(44px, 6.4vw, 128px); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; word-break: break-word; }
 .bpu-bao-chay-the > span:last-child { font-size: clamp(18px, 1.9vw, 36px); font-weight: 600; opacity: 0.92; }
 .bpu-bao-chay-the .coi { width: clamp(44px, 5vw, 96px); height: clamp(44px, 5vw, 96px); border-radius: 50%; background: var(--tr-chieu-giay); box-shadow: 0 0 0 1vmin color-mix(in srgb, var(--tr-chieu-giay) 35%, transparent);
   -webkit-mask: radial-gradient(circle, transparent 30%, black 31%); mask: radial-gradient(circle, transparent 30%, black 31%); animation: bpu-bao-chay 0.5s steps(2, jump-none) infinite alternate; }
-@keyframes bpu-bao-chay-the { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+/* 10/11 «cảnh báo tức thì»: thẻ đọc được NGAY khung hình đầu (không mờ dần từ 0), chỉ nảy cỡ 0,3 s. */
+@keyframes bpu-bao-chay-the { from { opacity: 1; transform: scale(0.82); } to { opacity: 1; transform: none; } }
 @keyframes bpu-bao-chay-rung { 0%, 100% { transform: none; } 10% { transform: translateX(-0.6vmin) rotate(-1deg); } 20% { transform: translateX(0.6vmin) rotate(1deg); } 30% { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .bpu-bao-chay::before, .bpu-bao-chay-the, .bpu-bao-chay-the .coi { animation: none; } }
 html.may-yeu .bpu-bao-chay::before, html.may-yeu .bpu-bao-chay-the, html.may-yeu .bpu-bao-chay-the .coi { animation: none; }

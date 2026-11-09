@@ -184,14 +184,9 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => an })
     const tieuDiem = vi.spyOn(document, 'hasFocus').mockImplementation(() => !an)
     try {
-      // 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app ⇒ `roi` NGAY (không chờ 2 giây)
-      // 09/11 (lần 5): ẩn app ⇒ báo sau ~0,45 s (trang còn chạy = chuyển app); hiện lại trước hạn (tắt màn rồi mở / chớp) ⇒ KHÔNG báo
+      // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «ok giữ chặt, làm cảnh báo tức thì cho mọi điện thoại»): máy không có IdleDetector ⇒ ẩn app là `roi` ĐỒNG BỘ ngay trong
+      // sự kiện (không hẹn giờ — trước: chờ 0,45 s, hiện lại trước hạn thì không báo). Phân biệt tắt màn: tests/bpu-tat-man-1011.test.tsx.
       an = true; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
-      an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
-      await act(async () => { await new Promise((r) => setTimeout(r, 600)) })
-      expect(coTin(ws, 'roi')).toBe(0)
-      an = true; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
-      await act(async () => { await new Promise((r) => setTimeout(r, 600)) })
       expect(coTin(ws, 'roi')).toBe(1)
       an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
       expect(coTin(ws, 've')).toBe(1)
@@ -390,8 +385,10 @@ describe('bảng · báo cháy rời màn + CSS gói trong bảng', () => {
     render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} gocPortal={khung} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
     const st = phong(); moLuot(st, cau, T0); WsGia.ds[0]!.nhan(viewBang(st))
+    const t0 = performance.now()
     WsGia.ds[0]!.nhan({ ...viewBang(st), roiNay: ['S2'] })
-    const bao = await screen.findByRole('alert')
+    const bao = screen.getByRole('alert') // 10/11 «tức thì»: có NGAY khi nhận tin (đồng bộ, không chờ)
+    console.info(`[đo] bảng: nhận roiNay → có lớp báo động = ${(performance.now() - t0).toFixed(2)} ms`)
     expect(bao.closest('.bpu-bao-chay')!.parentElement).toBe(document.body) // nổi cả khi khung bảng ẩn (em đang lên bảng ở tờ cũ)
     expect(bao.textContent).toContain('Trần Gia Bảo')
     WsGia.ds[0]!.nhan({ ...viewBang(st), roiNay: [] })

@@ -4,6 +4,8 @@
 // kênh đẩy, không nạp mảnh, không xin vé lại). «Rời» chỉ ẩn màn, kết nối giữ tới hết buổi.
 import { createRoot, type Root } from 'react-dom/client'
 import ManBinhPhanUng from './ManBinhPhanUng'
+/** Xin quyền phân biệt tắt màn (IdleDetector) — nút «Vào Bình Phản Ứng» gọi trong lần bấm của em (10/11). */
+export { xinQuyenTatMan } from './tat-man'
 
 /** Dấu hiệu em đang thi / ở phòng chờ thi / làm kiểm tra cá nhân. */
 export const CHAN_BPU = '.thi-tren, .pc-room, .ktcn-nav'

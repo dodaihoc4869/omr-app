@@ -1,6 +1,7 @@
 // BÌNH PHẢN ỨNG — MÀN MÁY EM (thầy 06/11; bản vẽ docs/ban-ve-binh-phan-ung-0611 ảnh h00–h15). Nạp lười: chỉ mở khi em vừa điểm danh hoặc kênh đẩy báo `bpu`.
-// Câu hiện ĐẦY MÀN HÌNH giống chặng (dùng lại DeCau / ChonTracNghiem / ChonDungSai / OTraLoiNgan). KHÔNG có nút thoát giữa buổi; em ẩn app ≥ 2 giây ⇒ báo phòng
+// Câu hiện ĐẦY MÀN HÌNH giống chặng (dùng lại DeCau / ChonTracNghiem / ChonDungSai / OTraLoiNgan). KHÔNG có nút thoát giữa buổi; em ẩn app ⇒ báo phòng NGAY
 // «rời màn» (bảng hiện tên em; luật chặt 09/11: em −50 kJ, đội −50 kJ), app hiện lại sau lần báo rời ⇒ gửi `{ t: 've' }` (phòng gỡ em khỏi «đang rời»).
+// 10/11: chỉ TẮT MÀN HÌNH (máy phân biệt được — Android có quyền IdleDetector) là không báo; mọi máy khác giữ chặt (xem `tat-man.ts`).
 // kJ (thầy 09/11 «app hs cũng được cộng trừ kJ hiệu ứng siêu đẹp mắt và hiển thị tinh tế ở mọi chỗ»): mọi số kJ ĐẾM MƯỢT tới số mới (`SoKj`),
 // mỗi biến động của em (`bienDongEm`) ⇒ thẻ nhỏ «+100 kJ · Đúng · nhanh thứ 2» bay lên rồi mờ (`TheBienDong`).
 // Mất mạng KHÔNG tính là rời màn: đáp án đã chọn giữ trên máy, nối lại thì gửi.
@@ -12,6 +13,8 @@ import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useSta
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type ViewEm } from '../../lib/bpu/phong'
+import { coQuyenTatMan, dangChiaDoi, dangXinQuyen, docQuyenTatMan, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
+import { giuSang } from './giu-sang'
 import type { Question } from '../../game/than-thu-v2/core'
 // Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
 type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
@@ -24,11 +27,12 @@ const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
 const LUI_MS = [1500, 3000, 6000, 12000, 20000]
 /** Ẩn app lâu hơn ngần này mới tính là rời màn (bàn phím, kéo thanh thông báo không tính). */
 export const ROI_MAN_MS = 0 // 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app là báo NGAY
-/** Mất tiêu điểm (cửa sổ nổi / bong bóng / chia đôi màn hình — app vẫn hiện nhưng em đang chạm ứng dụng khác) lâu hơn ngần này ⇒ báo rời. Ngắn để tức thì,
- *  đủ nuốt nháy tiêu điểm của hộp hệ thống chớp qua. */
-export const NOI_MS = 350
-/** Ẩn app lâu hơn ngần này (mà trang không bị đóng băng — không phải tắt màn hình) ⇒ báo rời. */
-export const TAT_MAN_MS = 450
+/** Mất tiêu điểm (cửa sổ nổi / bong bóng / chia đôi màn hình — app vẫn hiện nhưng em đang chạm ứng dụng khác) / cửa sổ co lại lâu hơn ngần này ⇒ báo rời.
+ *  10/11 thầy «chia đôi, cửa sổ nổi phải bắt tức thì»: rút 350 → 200 ms. 200 ms ≈ 12 khung hình — đủ nuốt nháy tiêu điểm của giao diện hệ thống chớp qua
+ *  (vào/thoát toàn màn hình, đổi bàn phím, xoay máy: đều xong trong 1–2 khung hình ≤ ~100 ms ở máy yếu), nhưng ngắn hơn mọi cử chỉ thật (kéo thanh thông báo
+ *  xuống rồi đọc, mở bong bóng chat: ≥ 300 ms hoạt ảnh). Bàn phím bật KHÔNG làm mất tiêu điểm (không qua nhánh này); hộp hỏi quyền IdleDetector được
+ *  chặn riêng (`dangXinQuyen`). */
+export const NOI_MS = 200
 
 type Tin = { t: string; [k: string]: unknown }
 const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
@@ -219,6 +223,24 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     choGui.current.push(t)
     return false
   }, [])
+  /** Số lần rời phòng đã ghi cho em (`viewEm.em.roi`) — biên nhận cho `roi`. */
+  const emRoi = useRef<number | null>(null)
+  /** `roi` đã đẩy vào kết nối nhưng CHƯA thấy biên nhận (em.roi chưa tăng): giữ số cũ. iPhone treo trang ⇒ kết nối có thể chết cùng tin; nối lại mà phòng
+   *  vẫn chưa ghi ⇒ GỬI BÙ `roi` (rồi `ve` nếu em đã quay lại). Chưa nối (`gui` trả false) ⇒ tin nằm hàng chờ, nối lại tự gửi — không cần bù. */
+  const buRoi = useRef<number | null>(null)
+  const kiemBu = useRef(false)
+  /** BÁO RỜI: gửi `roi` ngay (đồng bộ). Một lần cho tới khi về lại (phòng cũng chặn trùng). */
+  const baoRoi = useCallback((laNoi: boolean) => {
+    setNoi(laNoi); setVuaRoi(true)
+    if (daBaoRoi.current) return
+    daBaoRoi.current = true
+    const truoc = emRoi.current
+    buRoi.current = gui({ t: 'roi' }) && truoc != null ? truoc : null
+  }, [gui])
+  /** VỀ LẠI: chỉ khi trước đó đã báo `roi`, trang hiện, có tiêu điểm, không chia đôi ⇒ `ve`. */
+  const veLai = useCallback(() => {
+    if (daBaoRoi.current && !document.hidden && document.hasFocus() && !dangChiaDoi()) { daBaoRoi.current = false; gui({ t: 've' }) }
+  }, [gui])
 
   // Nối phòng: xin vé (theo buổi em vừa điểm danh, hoặc buổi đang mở hôm nay em có mặt) ⇒ WebSocket; rớt ⇒ nối lại lùi dần; phòng chưa mở ⇒ hỏi lại sau 8 giây.
   useEffect(() => {
@@ -241,6 +263,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         ws.current = w
         w.onopen = () => {
           loi.current = 0
+          kiemBu.current = buRoi.current != null
           w.send(JSON.stringify({ t: 'vao' })); w.send(JSON.stringify({ t: 'chao' }))
           const cho = choGui.current.splice(0); for (const t of cho) { try { w.send(JSON.stringify(t)) } catch { /* rớt */ } }
           clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000)
@@ -249,7 +272,19 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           if (typeof e.data !== 'string') return
           let m: Tin
           try { m = JSON.parse(e.data) as Tin } catch { return }
-          if (m.t === 'em') { chuaMo.current = false; setV(m as unknown as ViewEm); setTt('ok') }
+          if (m.t === 'em') {
+            const so = (m as unknown as ViewEm).em?.roi
+            if (typeof so === 'number') {
+              emRoi.current = so
+              if (buRoi.current != null && so > buRoi.current) buRoi.current = null // phòng đã ghi lần rời
+              else if (kiemBu.current && buRoi.current != null) { // nối lại: phòng chưa ghi ⇒ tin `roi` đã mất cùng kết nối cũ ⇒ gửi bù
+                buRoi.current = null; gui({ t: 'roi' })
+                if (!document.hidden && document.hasFocus() && !dangChiaDoi()) { daBaoRoi.current = false; gui({ t: 've' }) } else daBaoRoi.current = true
+              }
+            }
+            kiemBu.current = false
+            chuaMo.current = false; setV(m as unknown as ViewEm); setTt('ok')
+          }
           else if (m.t === 'chua-mo') { chuaMo.current = true; setTt('chua-mo'); try { w.close() } catch { /* đã đóng */ } }
           else if (m.t === 'tra-kq' && m.ok === false) setBaoTra(m.ly === 'het-gio' ? 'Hết giờ, đáp án gửi muộn không được tính.' : m.ly === 'da-khoa' ? 'Thầy đã khoá lượt này.' : m.ly === 'la' ? 'Em không thuộc lớp của buổi này.' : '')
         }
@@ -272,7 +307,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   // VỀ LẠI MÀN (thầy 09/11 bỏ trừ kJ): đã báo «rời» mà app hiện lại ⇒ báo phòng `ve` (gỡ tên em khỏi «đang rời» trên bảng). Nghe ở mức màn — kể cả khi
   // trong lúc em rời thầy đã mở đáp án (lúc ấy nhánh nghe rời màn đã gỡ). Mất mạng ⇒ `ve` nằm hàng chờ, nối lại là gửi sau `vao`/`chao`.
   useEffect(() => {
-    const hien = () => { if (!document.hidden && document.hasFocus() && daBaoRoi.current) { daBaoRoi.current = false; gui({ t: 've' }) } }
+    const hien = () => veLai()
     document.addEventListener('visibilitychange', hien)
     window.addEventListener('pageshow', hien)
     window.addEventListener('focus', hien) // tắt cửa sổ nổi / chạm lại vào app ⇒ về lại
@@ -283,52 +318,73 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const coHan = !!v?.luot?.han && v.luot.pha === 'tra-loi'
   useEffect(() => { if (!coHan) return; const h = setInterval(() => setNay(Date.now()), 500); return () => clearInterval(h) }, [coHan])
 
-  // RỜI MÀN: CHỈ khi đang có lượt chưa mở đáp án (đang làm / bạn lên bảng). Ẩn app ≥ 2 giây ⇒ báo phòng một lần; quay lại ⇒ màn cảnh báo; nút Back bị giữ.
-  // Không có nút rời (09/11): em chỉ thoát khi thầy kết thúc buổi học (phòng kết thúc ⇒ màn tự đóng).
-  // 09/11 (lần 3) thầy «học sinh thoát ra làm việc khác»: đo rời màn MỌI LÚC màn đang hiện (cả lúc chờ / đã che), tới khi thầy kết thúc buổi.
+  // RỜI MÀN — LUẬT 10/11 (thầy «ok giữ chặt, làm cảnh báo tức thì cho mọi điện thoại»; «chỉ tắt màn hình mới không báo»). Đo MỌI LÚC màn đang hiện
+  // (cả lúc chờ / đã che) tới khi thầy kết thúc buổi. Không có nút rời (09/11); nút Back bị giữ.
+  //  • Trang ẩn (thoát app, về màn hình chính, chuyển app, khoá màn): máy KHÔNG phân biệt được tắt màn (iPhone/iPad, Android chưa/không cho quyền
+  //    IdleDetector) ⇒ gửi `roi` ĐỒNG BỘ ngay trong visibilitychange — không hẹn giờ (Safari treo JS ngay khi ẩn, hẹn giờ sẽ không kịp chạy). Khoá màn
+  //    trên các máy này CŨNG tính là rời (thầy chọn giữ chặt). Android có quyền ⇒ hỏi tươi IdleDetector (một vòng IPC, vài ms — `tat-man.ts`): 'locked' ⇒
+  //    tắt màn, KHÔNG báo; còn lại ⇒ báo.
+  //  • Trang vẫn hiện nhưng mất tiêu điểm (cửa sổ nổi, bong bóng chat, iPad Slide Over) hoặc cửa sổ co lại (chia đôi màn hình, iPad Split View) quá NOI_MS ⇒
+  //    báo «cửa sổ nổi». Hộp hỏi quyền IdleDetector đang hiện ⇒ không báo. Android có quyền + màn đã khoá ⇒ không báo.
+  //  • Đóng trang (pagehide) mà chưa báo ⇒ báo, trừ khi lần ẩn này đã biết là tắt màn.
   const dangChoi = !an && !!v && !v.ketThuc
   useEffect(() => {
     if (!dangChoi) return
-    const bao = (laNoi: boolean) => { setNoi(laNoi); setVuaRoi(true); if (daBaoRoi.current) return; daBaoRoi.current = true; gui({ t: 'roi' }) }
-    // 09/11 (lần 5) thầy «chỉ tắt màn hình mới không báo thôi, còn thoát app, cửa sổ nổi, chia màn hình báo tức thì»: ẩn app ⇒ chờ RẤT ngắn (TAT_MAN_MS) rồi báo.
-    // Tắt màn hình: trình duyệt ĐÓNG BĂNG trang ngay ⇒ hẹn giờ không chạy đúng hạn (chạy trễ khi mở màn — lúc ấy trang đã hiện lại / độ trễ lớn) ⇒ KHÔNG báo.
-    // Chuyển app khác: trang còn chạy ⇒ hẹn giờ chạy đúng hạn ⇒ báo. (Màn tự tắt vì để lâu thì không xảy ra: màn giữ sáng bằng Wake Lock bên dưới.)
-    let henAn: ReturnType<typeof setTimeout> | undefined
+    docQuyenTatMan()
+    let huy = false, lan = 0
+    /** Lần ẩn hiện tại là TẮT MÀN (IdleDetector báo 'locked') ⇒ pagehide cũng không báo. */
+    let tatMan = false
     const doi = () => {
-      clearTimeout(henAn)
-      if (!document.hidden) return
-      const t0 = performance.now()
-      henAn = setTimeout(() => { if (document.hidden && performance.now() - t0 < TAT_MAN_MS + 900) bao(false) }, TAT_MAN_MS)
+      lan += 1
+      if (!document.hidden) { tatMan = false; return }
+      if (daBaoRoi.current) return
+      if (!coQuyenTatMan()) { baoRoi(false); return }
+      const lanNay = lan
+      void kiemKhoaMan().then((khoa) => {
+        if (huy) return
+        if (khoa === true) { if (lanNay === lan) tatMan = true; return }
+        baoRoi(false)
+        veLai() // em đã quay lại trong lúc hỏi (chuyển app chớp nhoáng) ⇒ vẫn báo, rồi gỡ ngay để bảng không đỏ mãi
+      })
     }
-    // CỬA SỔ NỔI (thầy 09/11 «phát hiện được cả ứng dụng nổi lên trên»): app vẫn hiện (không có visibilitychange) nhưng tiêu điểm sang app nổi ⇒ blur.
-    // Còn mất tiêu điểm sau NOI_MS ⇒ báo rời; lấy lại tiêu điểm ⇒ `ve` (nghe ở hiệu ứng «về lại màn» bên dưới).
     let henNoi: ReturnType<typeof setTimeout> | undefined
-    const matTieuDiem = () => { clearTimeout(henNoi); henNoi = setTimeout(() => { if (!document.hidden && !document.hasFocus()) bao(true) }, NOI_MS) }
-    const coTieuDiem = () => clearTimeout(henNoi)
-    window.addEventListener('blur', matTieuDiem)
-    window.addEventListener('focus', coTieuDiem)
-    // Đã báo rời (ẩn app) rồi đóng trang ⇒ KHÔNG báo lần hai (luật 09/11 trừ kJ mỗi lần rời — phòng cũng chặn trùng).
-    const anTrang = () => { if (document.hidden && !daBaoRoi.current) { daBaoRoi.current = true; gui({ t: 'roi' }) } }
+    const kiemNoi = () => {
+      clearTimeout(henNoi)
+      henNoi = setTimeout(() => {
+        if (huy || document.hidden) return
+        const chia = dangChiaDoi()
+        if (!chia && document.hasFocus()) { veLai(); return } // về lại cỡ đủ / lấy lại tiêu điểm
+        if (daBaoRoi.current || dangXinQuyen()) return
+        if (chia || !coQuyenTatMan()) { baoRoi(true); return }
+        void kiemKhoaMan().then((khoa) => { if (!huy && khoa !== true && !document.hidden && !document.hasFocus()) baoRoi(true) })
+      }, NOI_MS)
+    }
+    const anTrang = () => { if (document.hidden && !daBaoRoi.current && !tatMan) baoRoi(false) }
     document.addEventListener('visibilitychange', doi)
+    window.addEventListener('blur', kiemNoi)
+    window.addEventListener('focus', kiemNoi)
+    window.addEventListener('resize', kiemNoi)
     window.addEventListener('pagehide', anTrang)
+    if (dangChiaDoi()) kiemNoi() // vào BPU khi đang chia đôi
     try { window.history.pushState({ bpu: 1 }, '') } catch { /* trình duyệt cũ */ }
     const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
     window.addEventListener('popstate', giuLai)
-    return () => { clearTimeout(henAn); clearTimeout(henNoi); window.removeEventListener('blur', matTieuDiem); window.removeEventListener('focus', coTieuDiem); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
-  }, [gui, dangChoi])
-  // GIỮ MÀN SÁNG (09/11): trong Bình Phản Ứng màn máy em không tự tắt vì để lâu (tránh báo nhầm); em tự bấm tắt màn ⇒ không báo (xem trên).
-  useEffect(() => {
-    if (!dangChoi) return
-    type KhoaMan = { release: () => Promise<void> }
-    const nav = navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<KhoaMan> } }
-    let khoa: KhoaMan | null = null, dung = false
-    const xin = () => { if (dung || document.hidden || !nav.wakeLock) return; void nav.wakeLock.request('screen').then((k) => { if (dung) void k.release(); else khoa = k }).catch(() => {}) }
-    xin()
-    document.addEventListener('visibilitychange', xin)
-    return () => { dung = true; document.removeEventListener('visibilitychange', xin); void khoa?.release().catch(() => {}) }
-  }, [dangChoi])
+    return () => {
+      huy = true; clearTimeout(henNoi)
+      document.removeEventListener('visibilitychange', doi); window.removeEventListener('blur', kiemNoi); window.removeEventListener('focus', kiemNoi)
+      window.removeEventListener('resize', kiemNoi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai)
+    }
+  }, [baoRoi, veLai, dangChoi])
+  // GIỮ MÀN SÁNG (thầy 10/11 «cho mọi điện thoại»): từ lúc phòng nối (có `viewEm`) tới khi thầy kết thúc buổi — kể cả lúc màn BPU đang ẩn chờ lượt.
+  // wakeLock; không có / bị từ chối / app cài trên iOS ⇒ video câm dự phòng (`giu-sang.ts`). Kết thúc buổi / gỡ màn ⇒ nhả hết.
+  const giuSangBat = !!v && !v.ketThuc
+  useEffect(() => (giuSangBat ? giuSang() : undefined), [giuSangBat])
 
   // Toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho khi có thao tác của em; không hỗ trợ ⇒ bỏ qua).
+  // CHẠM ĐẦU (10/11): bắt ở `click` chứ không ở `pointerdown` — theo chuẩn HTML, `pointerdown` của ngón tay KHÔNG tính là thao tác người dùng (chỉ
+  // `pointerup` / `touchend` / `click`) ⇒ trên điện thoại xin toàn màn hình / xin quyền ở `pointerdown` bị từ chối âm thầm. Xin quyền IdleDetector TRƯỚC:
+  // `requestFullscreen` tiêu mất lượt thao tác.
+  const chamDau = () => { xinQuyenTatMan(); xinToanMan() }
   const xinToanMan = () => { try { const d = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> }; if (!document.fullscreenElement && d.requestFullscreen) void d.requestFullscreen().catch(() => {}) } catch { /* bỏ qua */ } }
 
   const l = v?.luot ?? null
@@ -348,7 +404,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     setCheSo(khoaLuot)
     if (!tinhLang()) setBay(khoaLuot)
     try { navigator.vibrate?.([18, 40, 26]) } catch { /* máy không rung */ }
-    xinToanMan()
+    // toàn màn hình + xin quyền: lớp ngoài (`chamDau`) lo — lần bấm này nổi bọt lên đó.
   }
   // HẾT GIỜ mà em chưa gửi (thầy 07/11): khoá, câu để trống — không gửi muộn, không đoán bừa.
   const hetGio = !!l?.han && l.pha === 'tra-loi' && nay >= l.han && !l.emTra
@@ -384,7 +440,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   } else if (vuaRoi) {
     // SỬA CÓ CHỦ ĐÍCH 09/11 (lần 2, luật chặt «thoát màn hình cảnh báo bị trừ cả đội và cá nhân»): nhắc rõ mức trừ (em và đội), giọng tế nhị.
     const tru = <p className="bpu-tru">Rời màn hình: em −{KJ.roiMan} kJ · đội −{KJ.roiMan} kJ</p>
-    than = noi ? <div className="bpu-hs-giua bpu-noi"><div className="bpu-canh" aria-hidden="true">!</div><h3>Không được dùng cửa sổ nổi</h3><p>Em vừa mở ứng dụng nổi / chia đôi màn hình. Bảng đang báo đỏ tên em trước cả lớp.</p>{tru}<p className="nho">Tắt cửa sổ nổi, chạm vào đây và nhìn lên bảng.</p></div> : <div className="bpu-hs-giua"><div className="bpu-canh" aria-hidden="true">!</div><h3>Em vừa rời màn hình</h3><p>Bảng đang báo tên em — quay lại tập trung lên bảng.</p>{tru}<p className="nho">Trong Bình Phản Ứng em ở lại màn này tới khi thầy kết thúc.</p></div>
+    than = noi ? <div className="bpu-hs-giua bpu-noi"><div className="bpu-canh" aria-hidden="true">!</div><h3>Không được dùng cửa sổ nổi</h3><p>Em vừa mở ứng dụng nổi / chia đôi màn hình. Bảng đang báo đỏ tên em trước cả lớp.</p>{tru}<p className="nho">Tắt cửa sổ nổi hoặc chia đôi màn hình, chạm vào đây và nhìn lên bảng.</p></div> : <div className="bpu-hs-giua"><div className="bpu-canh" aria-hidden="true">!</div><h3>Em vừa rời màn hình</h3><p>Bảng đang báo tên em — quay lại tập trung lên bảng.</p>{tru}<p className="nho">{coQuyenTatMan() ? 'Thoát app hay chuyển app đều bị tính là rời. Em ở lại màn này tới khi thầy kết thúc.' : 'Thoát app, chuyển app hay tắt màn hình đều bị tính là rời. Màn hình tự sáng suốt buổi, em ở lại màn này tới khi thầy kết thúc.'}</p></div>
     day = <button type="button" className="bpu-nut" onClick={() => setVuaRoi(false)}>Quay lại lượt đang làm</button>
   } else if (!l) {
     than = (
@@ -488,7 +544,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
 
   if (an) return null
   return createPortal(
-    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onPointerDown={xinToanMan} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
+    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
       {than ? <main className="bpu-hs-than">{than}</main> : null}
