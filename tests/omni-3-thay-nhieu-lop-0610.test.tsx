@@ -358,7 +358,8 @@ describe('màn: giao bài cho nhiều lớp (hộp Giao bài)', () => {
     expect(within(dongHop(hop, 'Bài 1. Ester')).getByRole('button', { name: 'Gỡ bài' })).toBeTruthy()
   })
 
-  it('một lớp bị máy chủ từ chối ⇒ các lớp khác VẪN giao; lời lỗi ghi tên lớp; bài còn chọn, giao lại chỉ còn lớp lỗi', async () => {
+  /** Hai lớp (Nhóm 10 bị máy chủ từ chối, Tinh Hoa nhận) ⇒ bấm Giao, chờ 2 lệnh tick + nạp lại danh sách. */
+  const giaoMotLopLoi = async () => {
     tickLoi = new Set(['12 - Nhóm 10 điểm'])
     const hop = await moHop()
     moTam(hop)
@@ -374,11 +375,26 @@ describe('màn: giao bài cho nhiều lớp (hộp Giao bài)', () => {
     await waitFor(() => expect((nut as HTMLButtonElement).disabled).toBe(false))
     fireEvent.click(nut)
     await waitFor(() => expect(lenh('tick')).toHaveLength(2))
-    await new Promise((r) => setTimeout(r, 500)); console.log('GOLOI', hop.querySelector('[data-khoi="tom-tat-giao"]')?.textContent, '|ALERT|', [...hop.querySelectorAll('[role="alert"]')].map((x) => x.textContent))
-    expect(await within(hop).findByText(/12 - Nhóm 10 điểm: Lớp này đang có ca kiểm tra mở\./, {}, { timeout: 4000 })).toBeTruthy()
-    // Lớp đã giao xong (Tinh Hoa) được nạp lại; bài vẫn đang chọn cho lớp lỗi.
+    // Lớp đã giao xong (Tinh Hoa) được nạp lại; lớp lỗi vẫn chưa có.
     await waitFor(() => expect(dongHop(hop, 'Bài 8. Amine').textContent).toContain('12 - Tinh Hoa đã có · còn 12 - Nhóm 10 điểm'))
+    return hop
+  }
+
+  it('một lớp bị máy chủ từ chối ⇒ các lớp khác VẪN giao; lớp đã nhận được nạp lại; bài vẫn đang chọn cho lớp lỗi', async () => {
+    const hop = await giaoMotLopLoi()
+    expect(lenh('tick').map((x) => x.lop)).toEqual(['12 - Nhóm 10 điểm', '12 - Tinh Hoa'])
     expect(oTick(hop, /Bài 8\. Amine/)!.checked).toBe(true)
+    expect(hop.textContent).toContain('Đã giao Bài 8 cho 3 em lớp 12 - Tinh Hoa')
+  })
+
+  // ĐỎ DO MÃ (09/11, báo lại — không sửa src/ trong lượt test): giao được một phần ⇒ ChonBaiMoi chỉ vẽ dòng «Đã giao…» — nhánh `p.xong ? … : …`
+  // (src/components/day-hoc/ChonBaiMoi.tsx) giấu cả `canhBao` (lời lỗi theo lớp) lẫn nút Giao, nên thầy không thấy lớp nào chưa giao được và không giao lại
+  // được ngay. Có từ 01/11, nhưng nay hộp là lối giao bài duy nhất. Test giữ đúng hành vi cũ (lỗi/thử lại) — không bấm đổi bài để lách.
+  it('một lớp bị máy chủ từ chối ⇒ lời lỗi ghi tên lớp hiện ngay, nút Giao còn; giao lại chỉ còn lớp lỗi', async () => {
+    const hop = await giaoMotLopLoi()
+    const loi = within(hop).queryByRole('alert')
+    expect(loi, 'giao được một phần ⇒ lời lỗi của lớp chưa giao được phải hiện ngay (ChonBaiMoi: nhánh p.xong đang giấu canhBao)').not.toBeNull()
+    expect(loi!.textContent).toContain('12 - Nhóm 10 điểm: Lớp này đang có ca kiểm tra mở.')
     tickLoi = new Set()
     await waitFor(() => expect(nutGiao(hop).disabled).toBe(false))
     fireEvent.click(nutGiao(hop))
