@@ -161,8 +161,9 @@ describe('máy chủ: năng lực từ sổ học (một đợt chờ D1)', () =
   }
   it('công thức co về 0,5: chưa làm = 0,5; làm ít không ra cực', () => {
     expect(nangLucTuSo(0, 0)).toBe(0.5)
-    expect(nangLucTuSo(3, 3)).toBeCloseTo(0.615, 3)
-    expect(nangLucTuSo(0, 40)).toBeCloseTo(0.1, 3)
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «tính toàn bộ thời gian … thông minh»): K = 8, đếm có trọng số (gần đây / câu khó nặng hơn).
+    expect(nangLucTuSo(3, 3)).toBeCloseTo(7 / 11, 3)
+    expect(nangLucTuSo(0, 40)).toBeCloseTo(4 / 48, 3)
   })
   it('gvBpuMo: đọc năng lực SONG SONG với batch danh sách; em giỏi / yếu chia về hai đội; câu che (embargoed) không tính', async () => {
     const d = taoD1That()
@@ -177,6 +178,14 @@ describe('máy chủ: năng lực từ sổ học (một đợt chờ D1)', () =
     expect(nl.has('K')).toBe(false) // em lớp khác, không điểm danh ⇒ không đọc
     expect(nl.get('A')!).toBeGreaterThan(0.85)
     expect(nl.get('D')!).toBeLessThan(0.15) // 30 câu đúng còn che không tính
+    // TOÀN BỘ THỜI GIAN có trọng số (09/11): E đúng hết từ 1 năm trước nhưng gần đây sai hết ⇒ thấp hơn F (ngược lại); câu vận dụng đúng nặng hơn câu nhận biết.
+    const luot = (sbd: string, ngay: string, dung: boolean, mucDo = '') => chen(d, 'su_kien_hoc', { khoa: `k${k++}`, sbd, qid: `q${k}`, ngay_vn: ngay, ket_qua: dung ? 1 : 0, luc: ngay + 'T01:00:00Z', ...(mucDo ? { muc_do: mucDo } : {}) })
+    for (let i = 0; i < 20; i++) { luot('E', '2025-11-01', true); luot('E', hom, false); luot('F', '2025-11-01', false); luot('F', hom, true) }
+    for (let i = 0; i < 10; i++) { luot('G', hom, true, 'van_dung'); luot('G', hom, false, 'biet'); luot('H', hom, true, 'biet'); luot('H', hom, false, 'van_dung') }
+    const nl2 = await docNangLucBpu(d.env as unknown as Env, { sbd: ['E', 'F', 'G', 'H'] }, nay)
+    expect(nl2.get('E')!).toBeLessThan(0.4)
+    expect(nl2.get('F')!).toBeGreaterThan(0.6)
+    expect(nl2.get('G')!).toBeGreaterThan(nl2.get('H')!)
     // Đếm đợt chờ D1 nối tiếp trước khi gọi phòng: phải là MỘT.
     let dangCho = 0, dot = 0, dotLucGoiPhong = -1
     const goc = d.env.DB as unknown as { prepare: (q: string) => Record<string, unknown>; batch: (s: unknown[]) => Promise<unknown> }
