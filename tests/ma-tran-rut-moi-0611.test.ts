@@ -8,8 +8,8 @@ import { MA_TRAN_HOA_2026 } from '../src/lib/ma-tran-hoa-2026'
 import { chonGoi7, congNgay7, quotaGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
 import { lapKeHoachNgay, phatLaiCau, type CauSrs, type HangEm, type TrangThaiCau } from '../server/src/srs2-loi'
 
-const O = ['I|biet', 'I|hieu', 'I|van_dung', 'II|hieu', 'II|van_dung', 'III|biet', 'III|hieu', 'III|van_dung'] as const
-const W: Record<string, number> = { 'I|biet': 11, 'I|hieu': 4, 'I|van_dung': 3, 'II|hieu': 3, 'II|van_dung': 1, 'III|biet': 1, 'III|hieu': 2, 'III|van_dung': 3 }
+const O = ['I|biet', 'I|hieu', 'I|van_dung', 'II|hieu', 'II|van_dung', 'III|hieu', 'III|van_dung'] as const
+const W: Record<string, number> = { 'I|biet': 12, 'I|hieu': 4, 'I|van_dung': 2, 'II|hieu': 2, 'II|van_dung': 2, 'III|hieu': 3, 'III|van_dung': 3 }
 const MUC_GOC: Record<string, string> = { biet: 'NB', hieu: 'TH', van_dung: 'VD' }
 
 /** Kho `lan` lần đủ một đề 28 câu đúng ma trận (mã câu lẫn thứ tự để không trùng thứ tự ô). */
@@ -28,14 +28,14 @@ describe('ma trận và ô của câu', () => {
     for (const p of ['I', 'II', 'III'] as const) expect(MA_TRAN_RUT_MOI[p]).toEqual({ ...MA_TRAN_HOA_2026[p] })
     expect(Object.values(W).reduce((s, v) => s + v, 0)).toBe(28)
   })
-  it('VDC gộp Vận dụng; chưa gắn mức ⇒ Hiểu; Phần II Biết (trọng số 0) ⇒ Hiểu; phần lạ ⇒ Phần I', () => {
+  it('VDC gộp Vận dụng; chưa gắn mức ⇒ Hiểu; Phần II / Phần III Biết (trọng số 0 theo blueprint 09/11) ⇒ Hiểu — ô gần nhất cùng phần; phần lạ ⇒ Phần I', () => {
     expect(oMaTran('I', 'VDC')).toBe('I|van_dung')
     expect(oMaTran('III', 'Vận dụng cao')).toBe('III|van_dung')
     expect(oMaTran('I', null)).toBe('I|hieu')
     expect(oMaTran('I', 'lạ')).toBe('I|hieu')
     expect(oMaTran('II', 'NB')).toBe('II|hieu')
     expect(oMaTran(undefined, 'Nhận biết')).toBe('I|biet')
-    expect(oMaTran('III', 'biet')).toBe('III|biet')
+    expect(oMaTran('III', 'biet')).toBe('III|hieu')
   })
 })
 
@@ -58,9 +58,9 @@ describe('xepTheoMaTran', () => {
     const r = xepTheoMaTran(it2, (c) => (c.qid === 'x' ? 'lạ' : oCua(c)))
     expect(r.at(-1)!.qid).toBe('x')
     const n = demTheoO(r.slice(0, 18), oCua)
-    expect([n.get('I|biet'), n.get('I|hieu'), n.get('I|van_dung')]).toEqual([11, 4, 3])
+    expect([n.get('I|biet'), n.get('I|hieu'), n.get('I|van_dung')]).toEqual([12, 4, 2])
   })
-  it('đếm câu đã rút ⇒ ô ít câu (Phần II Vận dụng, Phần III Biết) có mặt sớm, không dồn về ngày cuối', () => {
+  it('đếm câu đã rút ⇒ ô ít câu (2/28: Phần I VD, Phần II Hiểu, Phần II VD) có mặt sớm, không dồn về ngày cuối', () => {
     // 5 ngày × 6 câu mới/ngày từ kho 5 đề: rút liên tục từng ngày, mỗi ngày tính lại từ phần còn lại.
     let con = [...kho]
     const da: typeof kho = []

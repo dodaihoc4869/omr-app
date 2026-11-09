@@ -10,16 +10,16 @@
 //   về những ngày cuối (lặp lại «khó sau» dưới tên khác); cả bài bám ma trận, từng ngày sát ma trận.
 // - Ô không còn câu ⇒ tỉ lệ chia lại trên các ô còn câu (kho thầy giao không đủ ô nào thì ô khác bù, tổng số câu không hụt).
 //
-// Ma trận: MA_TRAN_HOA_2026 (src/lib/ma-tran-hoa-2026.ts — ứng dụng phân tích từ đề 0305, 0330, 0332, 0344; không phải ma trận Bộ công bố). Chép số
+// Ma trận: MA_TRAN_HOA_2026 (src/lib/ma-tran-hoa-2026.ts — blueprint thầy gửi 09/11 phân tích đề chính thức 2026 mã 0326 & 0339; Phần II theo mức cao nhất của câu). Chép số
 // sang đây để Worker không kéo theo mã máy thầy; tests/ma-tran-rut-moi-0611.test.ts khoá hai bản luôn trùng.
 
 export type PhanMt = 'I' | 'II' | 'III'
 export type MucMt = 'biet' | 'hieu' | 'van_dung'
 
 export const MA_TRAN_RUT_MOI: Readonly<Record<PhanMt, Readonly<Record<MucMt, number>>>> = {
-  I: { biet: 11, hieu: 4, van_dung: 3 },
-  II: { biet: 0, hieu: 3, van_dung: 1 },
-  III: { biet: 1, hieu: 2, van_dung: 3 },
+  I: { biet: 12, hieu: 4, van_dung: 2 },
+  II: { biet: 0, hieu: 2, van_dung: 2 },
+  III: { biet: 0, hieu: 3, van_dung: 3 },
 }
 
 const MUC_CHUAN: Record<string, MucMt> = {

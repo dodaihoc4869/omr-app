@@ -180,11 +180,11 @@ describe('rutDeChuan2026: câu tự luận không lọt vào đề chuẩn', () 
     const kho = khoChuan(2, 3)
     for (let i = 0; i < 25; i++) for (const s of rutDeChuan2026(kho, `ca-${i}`)) expect(ids([s]).some((id) => /-TL\d+$/.test(id))).toBe(false)
   })
-  it('câu tự luận KHÔNG được tính vào số câu của ô: ô chỉ đủ câu nhờ câu tự luận ⇒ báo thiếu (không lấy tự luận cho đủ)', () => {
+  it('câu tự luận KHÔNG được tính vào số câu: kho chỉ đủ 28 nhờ câu tự luận ⇒ báo thiếu (không lấy tự luận cho đủ)', () => {
     expect(() => rutDeChuan2026(khoChuan(0, 2), 'ca-1')).not.toThrow() // đủ câu sạch đúng bằng cần
     const kho = khoChuan(0, 2)
-    kho[0].phanI = kho[0].phanI.filter((q) => q.id !== 'M-I-biet-0') // bớt một câu sạch của ô Phần I · Biết
-    expect(() => rutDeChuan2026(kho, 'ca-1')).toThrow(/Phần I, Biết: cần 11, có 10/)
+    kho[0].phanI = kho[0].phanI.filter((q) => q.id !== 'M-I-biet-0') // bớt một câu sạch của ô Phần I · Biết ⇒ cả kho còn 27 câu sạch
+    expect(() => rutDeChuan2026(kho, 'ca-1')).toThrow(/chưa đủ 28 câu sạch/)
   })
 })
 

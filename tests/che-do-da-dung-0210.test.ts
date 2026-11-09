@@ -40,12 +40,12 @@ describe('phân bổ theo tỷ lệ ma trận 2026 (phần dư lớn nhất)', (
   it('14 câu ⇒ 9·2·3, tổng đúng 14, từng ô theo tỷ lệ', () => {
     const pb = phanBoMaTran2026(14)
     expect(soCauTheoPhan(pb)).toEqual({ I: 9, II: 2, III: 3 })
-    expect(pb).toEqual({ I: { biet: 6, hieu: 2, van_dung: 1 }, II: { biet: 0, hieu: 2, van_dung: 0 }, III: { biet: 0, hieu: 1, van_dung: 2 } })
+    expect(pb).toEqual({ I: { biet: 6, hieu: 2, van_dung: 1 }, II: { biet: 0, hieu: 1, van_dung: 1 }, III: { biet: 0, hieu: 2, van_dung: 1 } }) // blueprint 09/11
   })
   it('10 câu ⇒ tổng đúng 10 (7·1·2), ô theo tỷ lệ', () => {
     const pb = phanBoMaTran2026(10)
     expect(soCauTheoPhan(pb)).toEqual({ I: 7, II: 1, III: 2 })
-    expect(pb).toEqual({ I: { biet: 4, hieu: 2, van_dung: 1 }, II: { biet: 0, hieu: 1, van_dung: 0 }, III: { biet: 0, hieu: 1, van_dung: 1 } })
+    expect(pb).toEqual({ I: { biet: 5, hieu: 1, van_dung: 1 }, II: { biet: 0, hieu: 1, van_dung: 0 }, III: { biet: 0, hieu: 1, van_dung: 1 } }) // blueprint 09/11
   })
   it('mọi n từ 1 tới 40: tổng luôn = n, Phần II không bao giờ có ô Nhận biết', () => {
     for (let n = 1; n <= 40; n++) {
@@ -128,8 +128,8 @@ describe('rút: chỉ câu đã đúng, đúng ô, ngẫu nhiên có hạt giố
     const kq = rutDeDaDung({ nguon: { Y: [] }, dsSbd: ['Y'], tongCau: 28, seed: 'CA2', khoBu })
     expect(kq.theoEm.Y).toHaveLength(28)
     expect(kq.theoEm.Y!.every((c) => c.bu && c.mucDo === c.mucO)).toBe(true)
-    // ma trận 2026: I 11·4·3, II 0·3·1, III 1·2·3
-    expect(demO(kq.theoEm.Y!)).toEqual({ 'I|biet': 11, 'I|hieu': 4, 'I|van_dung': 3, 'II|hieu': 3, 'II|van_dung': 1, 'III|biet': 1, 'III|hieu': 2, 'III|van_dung': 3 })
+    // ma trận 2026 theo blueprint thầy 09/11: I 12·4·2, II 0·2·2, III 0·3·3
+    expect(demO(kq.theoEm.Y!)).toEqual({ 'I|biet': 12, 'I|hieu': 4, 'I|van_dung': 2, 'II|hieu': 2, 'II|van_dung': 2, 'III|hieu': 3, 'III|van_dung': 3 })
     expect(kq.bu.Y).toBe(28)
   })
 

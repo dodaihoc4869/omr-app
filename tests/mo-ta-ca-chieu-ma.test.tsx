@@ -61,7 +61,7 @@ describe('moTaCaChieuMa', () => {
       [MA_TRAN_HOA_2026.II.biet, MA_TRAN_HOA_2026.II.hieu, MA_TRAN_HOA_2026.II.van_dung],
       [MA_TRAN_HOA_2026.III.biet, MA_TRAN_HOA_2026.III.hieu, MA_TRAN_HOA_2026.III.van_dung],
     ])
-    expect(m.chiTiet.hang.map((h) => h.o)).toEqual([[11, 4, 3], [0, 3, 1], [1, 2, 3]])
+    expect(m.chiTiet.hang.map((h) => h.o)).toEqual([[12, 4, 2], [0, 2, 2], [0, 3, 3]])
     expect(m.vong.doan.map((d) => d.so)).toEqual([18, 4, 6])
     expect(m.chiTiet.cot).toEqual(['Nhận biết', 'Thông hiểu', 'Vận dụng'])
     const m14 = moTaCaChieuMa({ phamViHoiLai: 'da_dung', soCau: SC14 })

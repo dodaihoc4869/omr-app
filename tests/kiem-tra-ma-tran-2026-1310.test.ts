@@ -30,9 +30,12 @@ it('hàng trăm kỹ năng không thể phủ trong 2 đề thì báo phần cò
  expect(r.du).toBe(false);expect(r.chuaPhu.length).toBeGreaterThan(0)
  expect(r.de).toHaveLength(2);expect(r.de.every(d=>d.qids.length===28&&d.phut===50)).toBe(true)
 })
-it('thiếu câu ở ô đúng/sai Vận dụng không lấy câu khác mức/phần bù, vẫn giữ mẫu số kiến thức',()=>{
+it('(thầy 09/11 «đủ 28, chuẩn nhất có thể») thiếu câu ở ô đúng/sai Vận dụng ⇒ lấy ô gần nhất cùng phần (ĐS Hiểu), đề vẫn đủ 28, vẫn giữ mẫu số kiến thức',()=>{
  const qs=pool(1).filter(q=>!(q.phan==='II'&&q.mucDo==='van_dung')),r=chonChuKyKt2026([...bai,...kn(1)],qs,new Map(),'S4')
- expect(r.du).toBe(false);expect(r.thieuMaTran).toEqual([{o:'II:van_dung',can:1,co:0}]);expect(r.tongMuc).toBe(7)
+ expect(r.thieuMaTran).toEqual([{o:'II:van_dung',can:2,co:0}]);expect(r.tongMuc).toBe(7)
+ expect(r.de[0]!.qids).toHaveLength(28)
+ const II=r.de[0]!.qids.map(id=>qs.find(q=>q.qid===id)!).filter(q=>q.phan==='II')
+ expect(II).toHaveLength(4);expect(II.every(q=>q.mucDo==='hieu')).toBe(true)
 })
 
 it('phủ kiến thức dùng nhánh cơ chế trong từ vựng thật; nền tính một lần; lá thao tác vẫn có ánh xạ đầy đủ',()=>{

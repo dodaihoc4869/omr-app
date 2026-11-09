@@ -188,7 +188,8 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
       for(const c of bs)nk.cau.push({qid:c.q.qid,group:c.q.group,muc:c.muc,phan:c.q.phan,mucDo:bacQ(c.q)>=3?'van_dung':bacQ(c.q)===2?'hieu':'biet',phut:c.phut,hopLe:true,daGap:lichSu.results.some(l=>l.qid===c.q.qid)})
       mt=chonChuKyKt2026(nk.muc,nk.cau,nk.hs,sbd+hen.ngay)
     }
-    const thieuKy=new Set([...thieu,...mt.chuaPhu,...mt.thieuMaTran.map(o=>`ma_tran_2026:${o.o}`)])
+    // 09/11 «đủ 28, chuẩn nhất có thể»: ô ma trận thiếu đã lấp bằng ô gần nhất ⇒ KHÔNG còn là lý do «chờ nguồn».
+    const thieuKy=new Set([...thieu,...mt.chuaPhu])
     const phuChuKy=new Set(mt.de.flatMap(d=>d.qids).flatMap(id=>nk.cau.find(q=>q.qid===id)?.muc??[]))
     const dong=mt.de.map((d,i)=>dongGoiDe2026({ngay:hen.ngay,qids:d.qids,nguon,muc:nk.muc,viKyNang:[...muc.values()].filter(m=>m.loai!=='bai'),anhXa:nk.anhXa,bai,thieu:[...thieuKy],soDe:mt.de.length,lan:i+1,chuKyPhu:nk.muc.filter(m=>m.loai!=='bai'&&phuChuKy.has(m.id)).length,seed:sbd+hen.ngay,lyDo:hen.lyDo}))
     if(chiDoc)return {id:`ktcn:${sbd}:${hen.ngay}`,ngay:hen.ngay,tong:28,phut:50,thieu:thieuKy.size,soKienThuc:nk.muc.filter(m=>m.loai!=='bai').length,soViKyNang:[...muc.values()].filter(m=>m.loai!=='bai').length,maTran2026:{soDe:mt.de.length,soCau:mt.de.map(d=>d.qids.length),phut:mt.de.map(d=>d.phut),du:mt.du&&thieu.size===0,phu:mt.phu,tong:mt.tongMuc,thieuMaTran:mt.thieuMaTran,chuaPhu:mt.chuaPhu,thieuNguon:mt.thieuNguon.length}}

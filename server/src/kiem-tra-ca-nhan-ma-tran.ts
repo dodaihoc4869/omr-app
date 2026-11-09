@@ -2,9 +2,12 @@
 // Mức độ do app phân tích 4 đề 2026; không gọi là ma trận chính thức của Bộ.
 import { bamKt, type BangChungKt, type MucKt, type UngKt } from './kiem-tra-ca-nhan-loi'
 import { CO_CHE, VIEC } from '../../src/lib/tu-vung-dang'
-export const KHUNG_KT_2026 = { I: { biet: 11, hieu: 4, van_dung: 3 }, II: { biet: 0, hieu: 3, van_dung: 1 }, III: { biet: 1, hieu: 2, van_dung: 3 } } as const
+export const KHUNG_KT_2026 = { I: { biet: 12, hieu: 4, van_dung: 2 }, II: { biet: 0, hieu: 2, van_dung: 2 }, III: { biet: 0, hieu: 3, van_dung: 3 } } as const // blueprint thầy 09/11 (đề 0326 & 0339)
 export interface CauMaTranKt extends UngKt { phan: 'I'|'II'|'III'; mucDo: 'biet'|'hieu'|'van_dung' }
 const oCau = (q: CauMaTranKt) => `${q.phan}:${q.mucDo}`
+const MUC_KT = ['biet','hieu','van_dung']
+/** Giá lệch đặt câu ô `c` vào suất ô `o` (cùng luật src/lib/ma-tran-hoa-2026.ts `giaLech2026`): cùng phần = số bậc mức chênh; khác phần = 10 + số bậc. */
+const giaO = (o: string, c: string) => { const [P,M]=o.split(':'),[p,m]=c.split(':'); const d=Math.abs(MUC_KT.indexOf(M!)-MUC_KT.indexOf(m!)); return P===p?d:10+d }
 const khung = Object.entries(KHUNG_KT_2026).flatMap(([phan, muc]) => Object.entries(muc).filter(([,n])=>n>0).map(([m,n])=>({o:`${phan}:${m}`,n})))
 
 /** Cây thật trong kho: chương → cơ chế kiến thức → thao tác. Sổ vi kỹ năng giữ riêng toàn bộ lá. */
@@ -45,7 +48,18 @@ export function chonChuKyKt2026(muc: readonly MucKt[], cau: readonly CauMaTranKt
         const score=gain+(q.hopSuc??1)*0.01+(daDung.has(q.qid)?0:0.1)+(q.daGap?0:0.001)
         if(score>diem||score===diem&&bamKt(seedRut+q.qid)<bamKt(seedRut+(tot?.qid??''))){tot=q;diem=score}
       }
-      if(!tot)break;them(tot)
+      if(!tot){
+        // «ĐỦ 28, CHUẨN NHẤT CÓ THỂ» (thầy 09/11): ô còn suất mà hết câu đúng ô ⇒ lấy câu ô gần nhất (cùng phần trước, rồi mức gần) — vẫn ưu tiên phủ kiến thức.
+        let dich:string|undefined,best=-Infinity
+        for(const q of nguon){
+          if(dung.has(q.qid))continue
+          for(const [o,n] of con){if(n<=0)continue;const g=giaO(o,oCau(q)),gain=q.muc.reduce((s,id)=>s+(!daPhu.has(id)&&!dem.has(id)?w.get(id)??0:0),0)
+            const score=gain-100*g+(q.hopSuc??1)*0.01;if(score>best||score===best&&bamKt(seedRut+q.qid)<bamKt(seedRut+(tot?.qid??''))){best=score;tot=q;dich=o}}
+        }
+        if(!tot||!dich)break
+        chon.push(tot);dung.add(tot.qid);con.set(dich,con.get(dich)!-1);for(const id of tot.muc)dem.set(id,(dem.get(id)??0)+1);continue
+      }
+      them(tot)
     }
     // Đổi câu trong cùng ô ma trận nếu tăng độ phủ; không đổi mức/loại để bù thiếu.
     for(let pass=0;pass<3;pass++){
@@ -72,5 +86,6 @@ export function chonChuKyKt2026(muc: readonly MucKt[], cau: readonly CauMaTranKt
   }
   const daPhu=phu(best.flat()),chuaPhu=[...can].filter(id=>!daPhu.has(id))
   return {de:best.map(ds=>({qids:ds.map(q=>q.qid),phut:50})),thieuNguon,thieuMaTran,chuaPhu,tongMuc:can.size,phu:daPhu.size,
-    du:!thieuNguon.length&&!thieuMaTran.length&&!chuaPhu.length&&best.every(ds=>ds.length===28)}
+    // thieuMaTran giờ chỉ là THÔNG TIN (ô đã được lấp bằng ô gần nhất), không làm đề «chưa đủ».
+    du:!thieuNguon.length&&!chuaPhu.length&&best.every(ds=>ds.length===28)}
 }
