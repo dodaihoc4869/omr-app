@@ -11,7 +11,11 @@ describe('plugin kho-hs.json', () => {
   it('gốc có hiệu ứng ăn mừng, Mol, giám thị, «Trong», thưởng phạt; bỏ thư viện lớn; json không vào precache', () => {
     const goc = ma.match(/const KHO_HS_GOC = (.+)\n/)![1]!
     for (const t of ['hieu-ung-an-mung', 'mol-dong', 'GiamThi', 'giam-thi', 'TrongHs', 'ManThuong', 'thuong-gon', 'ManLamBaiTap', 'ChuaGonDuo', 'ThiDuo']) expect(goc, t).toContain(t)
-    expect(ma).toMatch(/const KHO_HS_BO = \/\^assets\\\/\(\?:ban-do-3d-three\|jspdf\|html2canvas/)
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «Tải hết mọi thứ xg máy hs để app hs tức thì nhé»): mọi mảnh app học sinh còn sót + thư viện xuất PDF «Câu đã làm» vào kho;
+    // chỉ còn bỏ bản đồ 3D (màn Hôm nay của thầy). Kho chạy-lúc trên máy đủ chỗ cho cả kho + một lần phát hành.
+    for (const t of ['khoa-de-thi', 'gan-hs', 'nhan-lich-su', 'do-treo-may-thi', 'HoiThayKiemChung', 'lam-moi-app', 'hoi-thay-goc', 'html-phieu', 'pdf-cau-da-lam', 'jspdf', 'html2canvas', 'purify', 'fflate']) expect(goc, t).toContain(t)
+    expect(ma).toMatch(/const KHO_HS_BO = \/\^assets\\\/ban-do-3d-three\/\n/)
+    expect(Number(readFileSync('src/sw.ts', 'utf8').match(/cacheName: 'omr-manh-chay-lan',[\s\S]*?maxEntries: (\d+)/)![1])).toBeGreaterThanOrEqual(450)
     expect(ma).toMatch(/globPatterns: \['\*\*\/\*\.\{js,css,html,ico,png,svg,wasm,data,woff2\}'\]/)
     expect(ma).toContain('khoNapTruocHs(),\n    VitePWA(')
   })

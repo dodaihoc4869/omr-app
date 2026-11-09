@@ -45,7 +45,7 @@ export function chonChuKyKt2026(muc: readonly MucKt[], cau: readonly CauMaTranKt
       for(const q of nguon){
         if(dung.has(q.qid)||(con.get(oCau(q))??0)<=0)continue
         const gain=q.muc.reduce((n,id)=>n+(!daPhu.has(id)&&!dem.has(id)?w.get(id)??0:0),0)
-        const score=gain+(q.hopSuc??1)*0.01+(daDung.has(q.qid)?0:0.1)+(q.daGap?0:0.001)
+        const score=gain+(q.uuTien??0)+(q.hopSuc??1)*0.01+(daDung.has(q.qid)?0:0.1)+(q.daGap?0:0.001)
         if(score>diem||score===diem&&bamKt(seedRut+q.qid)<bamKt(seedRut+(tot?.qid??''))){tot=q;diem=score}
       }
       if(!tot){

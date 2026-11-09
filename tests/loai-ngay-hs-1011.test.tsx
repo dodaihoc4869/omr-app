@@ -80,3 +80,18 @@ describe('nút chính ngày Sửa: «Sửa nhóm N» (khối B lát 5, bản v�
     expect(container.querySelector('.kb-cta')?.textContent ?? '').not.toContain('Sửa nhóm')
   })
 })
+
+describe('ngày có loại = 28 câu, không chặng Tự sửa lỗi (thầy 10/11 «Đếm của Mol và tổng số câu có sai ko» — ảnh 1/56 vs «còn 27»; «mỗi ngày hs làm 28 câu hay 56 câu»)', () => {
+  it('ngày Sửa: thẻ mức = 28 (khớp lời Mol); ngày thường vẫn cộng hàng Tự sửa lỗi như cũ', () => {
+    const so = { daLam: 1, muc: 28, chang: 1, soChang: 5 } as PropsMotTrang['so']
+    const { container, rerender } = render(<MotTrangHs {...goc({ so, loaiNgay: 'sua', soSua: 28 })} />)
+    expect(container.querySelector('.kb-so')!.textContent).toBe('1/28 câu')
+    expect(container.textContent).toContain('Còn 27 câu nữa')
+    // ngày học mới (bản vẽ dt-sang-1: 5 chặng 6·6·6·6·4 = 28): cũng đúng 28, không chặng Tự sửa lỗi trên đường
+    rerender(<MotTrangHs {...goc({ so, loaiNgay: 'moi', soSua: 28 })} />)
+    expect(container.querySelector('.kb-so')!.textContent).toBe('1/28 câu')
+    expect(container.querySelector('[aria-label^="Tự sửa lỗi"]')).toBeNull()
+    rerender(<MotTrangHs {...goc({ so, soSua: 28 })} />)
+    expect(Number(/^1\/(\d+) câu$/.exec(container.querySelector('.kb-so')!.textContent ?? '')?.[1])).toBeGreaterThan(28) // ngày thường: mức + hàng Tự sửa lỗi hôm nay (như cũ)
+  })
+})

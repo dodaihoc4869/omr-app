@@ -7,7 +7,18 @@ export const khoangNgayKt = (a: string, b: string) => Math.round((Date.parse(b) 
 export function bamKt(s: string): number { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0 }
 export interface MucKt { id: string; bai: string; tenBai: string; kyNang: string; mucDo: string; loai?:'bai'|'ky_nang'; baiLienQuan?:string[] }
 export interface BangChungKt { p: number; vung: boolean; n: number; ngayCuoi: string | null; hen?: string }
-export interface UngKt { qid: string; group: string; muc: string[]; phut: number; hopLe: boolean; daGap: boolean; hopSuc?:number }
+export interface UngKt { qid: string; group: string; muc: string[]; phut: number; hopLe: boolean; daGap: boolean; hopSuc?:number; /** khối B (10/11): câu em sai đang chờ kiểm lại ⇒ ưu tiên vào đề */ uuTien?: number }
+/** Câu em SAI trong lịch sử (mới → cũ) mà chưa làm đúng lại ở 2 ngày khác nhau sau lần sai cuối ⇒ «chờ kiểm lại» (đặc tả khối B: ưu tiên vào đề Kiểm tra ôn tập). */
+export function cauChoKiemLaiKt(lichSu: readonly Record<string, unknown>[]): Set<string> {
+  const ra = new Set<string>(), dung = new Map<string, Set<string>>(), xong = new Set<string>()
+  for (const l of lichSu) {
+    const q = String(l.qid ?? ''), ngay = String(l.ngay_vn ?? '')
+    if (!q || xong.has(q)) continue
+    if (Number(l.ket_qua) === 1) { (dung.get(q) ?? dung.set(q, new Set()).get(q)!).add(ngay); continue }
+    if (l.ket_qua !== null && l.ket_qua !== undefined && Number(l.ket_qua) === 0) { xong.add(q); if ((dung.get(q)?.size ?? 0) < 2) ra.add(q) }
+  }
+  return ra
+}
 
 /** Greedy phủ cứng trước, kiểm chứng thêm sau. Không lấy số lượt làm làm mẫu số kiến thức. */
 export function chonDeKt(muc: readonly MucKt[], cau: readonly UngKt[], hs: ReadonlyMap<string, BangChungKt>, seed: string) {

@@ -894,7 +894,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
   const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
   const soSua = p.soSua ?? nhoSua?.[0]
-  const coSua = !!soSua && soSua > 0
+  const coSua = !!soSua && soSua > 0 && !p.loaiNgay // ngày có loại: 28 câu, không chặng Tự sửa (10/11)
   const { con: conSua, phan: conSuaPhan, xong: daSuaNay, mod: modSua } = useConSuaHomNay(p.token, coSua, nhoSua)
   useEffect(() => {
     if (p.token && p.soSua != null && conSuaPhan != null) try { localStorage.setItem(KHOA_SUA_NHO, JSON.stringify({ t: p.token.slice(-16), n: ngayVn(Date.now()), s: [p.soSua, conSua, conSuaPhan, daSuaNay] })) } catch { /* máy chặn: như cũ */ }
@@ -1165,7 +1165,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         <div className="da-dai"><b>{p.tenBai || 'Bài học hôm nay'}</b>
           {chang.length > 0 && <span className="da-dai-tien"><i><s style={{ width: `${Math.round((100 * xongChang) / chang.length)}%` }} /></i>{xongChang}/{chang.length} chặng</span>}</div>
       </div>}
-      {/* thầy 03/11 chốt bản vẽ docs/ban-ve-mol-goc-0311: Mol nói ở GÓC TRÁI THẺ ĐẦU (kb-mol) — bỏ chỗ cũ giữa thẻ đầu và nút chính */}
+      {/* 03/11: Mol nói ở góc trái thẻ đầu (kb-mol) */}
       {p.ghi.map((g) => <p key={g} className="da-ghi">{g}</p>)}
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {/* 28/10: Sảnh chưa về ⇒ chưa vẽ đường, báo đang tải. */}
@@ -1176,7 +1176,7 @@ export function MotTrangHs(p: PropsMotTrang) {
           <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
       </div><div className="kb-cot-phai">
-      {p.goi7 && !p.ngayKiem && (p.loaiNgay === 'sua' || p.goi7.goi.some(g => g.quaHan && g.con > 0)) && <Suspense fallback={null}><NhomSuaHomNay g={p.goi7} /></Suspense>}
+      {p.goi7 && !p.ngayKiem && (p.loaiNgay === 'sua' || p.goi7.goi.some(g => g.quaHan && g.con > 0)) && <Suspense fallback={null}><NhomSuaHomNay g={p.goi7} token={p.token} /></Suspense>}
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
         <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {so && !p.dangTai && !nut.length && <ViecTrong />}

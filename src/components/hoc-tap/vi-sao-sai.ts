@@ -72,3 +72,13 @@ export function choCauSai(qid: string): () => void {
   return () => { if (cho.delete(qid)) bao() }
 }
 
+type Pa = 'A' | 'B' | 'C' | 'D'
+/** LỜI GIẢI BÁC BỎ (khối B lát 7, bản vẽ dt-sang-2; thầy 10/11 «Bỏ codex tự làm lại ko chờ gì cả»): câu trắc nghiệm có lời giải từng phương án ⇒ «Em chọn · Chỗ chưa
+ *  đúng · Đúng là» dựng từ CHÍNH lời giải của câu (`tungPa[X].viSao`, `chot`) — không bịa nội dung; thiếu lý do của phương án em chọn ⇒ giữ dòng lời giải ngắn cũ. */
+export function bacBoTu(em: string, da: string, pa: readonly string[] | undefined, lg: { tungPa?: Partial<Record<Pa, { viSao?: string } | undefined>>; chot?: string } | undefined): { chon: string; sai: string; dung: string } | null {
+  if (!/^[ABCD]$/.test(em) || !/^[ABCD]$/.test(da) || em === da) return null
+  const sai = lg?.tungPa?.[em as Pa]?.viSao?.trim()
+  if (!sai) return null
+  const chuPa = (x: string) => `${x}. ${pa?.['ABCD'.indexOf(x)] ?? ''}`.trim()
+  return { chon: chuPa(em), sai, dung: lg?.tungPa?.[da as Pa]?.viSao?.trim() || (typeof lg?.chot === 'string' ? lg.chot.trim() : '') }
+}

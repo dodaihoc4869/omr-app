@@ -1,7 +1,8 @@
 import type { Env } from './kieu'
+import { ngayKtTheoBai } from './kiem-tra-chu-ky-bai'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { damBaoKtCn } from './kiem-tra-ca-nhan-schema'
-import { bamKt, chonDeKt, congNgayKt, dauNgayKt, henKt, ngayKt, phutCauKt, type BangChungKt, type MucKt, type UngKt } from './kiem-tra-ca-nhan-loi'
+import { bamKt, cauChoKiemLaiKt, chonDeKt, congNgayKt, dauNgayKt, henKt, ngayKt, phutCauKt, type BangChungKt, type MucKt, type UngKt } from './kiem-tra-ca-nhan-loi'
 import { phamViLop } from './bai-da-day'
 import { docCauTheoRef, docKhoiEm, protectedQuestions } from './game-v2-bank'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
@@ -120,6 +121,13 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
   if (!lop || !pv?.maDe.size) return null
   const cu=await env.DB.prepare("SELECT * FROM kiem_tra_ca_nhan WHERE sbd=? AND lop=? AND ngay>=? ORDER BY (trang_thai='cho_nguon'),ngay LIMIT 1").bind(sbd,lop,ngayKt(now)).first<Row>()
   if(cu&&s(cu.trang_thai)!=='cho_nguon'&&(!lamMoi||Number(cu.mo_luc)<=now))return {id:s(cu.id),ngay:s(cu.ngay),tong:de(cu).cau.length,thieu:de(cu).thieu.length,phut:de(cu).phut}
+  // KIỂM TRA ÔN TẬP THEO CHU KỲ BÀI (khối B, thầy 10/11 — kiem-tra-chu-ky-bai.ts): em có gói ⇒ mỗi gói một ngày; chưa tới lúc / đã đủ ⇒ thôi ngay (trước lượt đọc nặng).
+  const goiEm=dungKhung2026?await env.DB.prepare(`SELECT e.goi_id id,e.han,(SELECT COUNT(*) FROM goi_bai_7_cau c WHERE c.goi_id=e.goi_id)-(SELECT COUNT(DISTINCT p.qid) FROM goi_bai_7_gap p WHERE p.goi_id=e.goi_id AND p.sbd=e.sbd) con_moi,(SELECT COUNT(*) FROM kiem_tra_ca_nhan k WHERE k.sbd=e.sbd AND k.trang_thai<>'cho_nguon' AND json_extract(k.json,'$.goiId')=e.goi_id) da_kt FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? AND e.han>=? AND ${sqlEmDangNhan7('e','g','h')}`).bind(sbd,ngayKt(now)).all<Row>().then(r=>r.results,()=>null):null
+  const kb=goiEm?ngayKtTheoBai(ngayKt(now),goiEm.map(r=>({id:s(r.id),han:s(r.han),conMoi:Number(r.con_moi)||0,daKt:Number(r.da_kt)||0}))):null
+  const giuCu=!!cu&&Number(cu.mo_luc)>now
+  if(kb&&'cho' in kb&&!giuCu)return null
+  let goiId:string|undefined=kb&&'goiId' in kb?kb.goiId:undefined
+  if(giuCu)try{goiId=(JSON.parse(s(cu!.json)) as {goiId?:string}).goiId??goiId}catch{/* đề cũ không có mã gói */}
   const goc = JSON.stringify([...pv.maDe])
   const [rows, matrices, hs, baoVe, btvn, control, khoi, lichSu, lanCuoi] = await Promise.all([
     env.DB.prepare(`SELECT q.json,q.qid,q.version,q.ma_de FROM game_v2_question q JOIN de_kho d ON d.ma_de=q.ma_de JOIN game_v2_index i ON i.ma_de=d.ma_de AND i.source_version=d.cap_nhat_luc WHERE COALESCE(d.da_xoa,0)=0 AND q.ma_de IN(SELECT value FROM json_each(?))`).bind(goc).all<Row>(),
@@ -168,14 +176,16 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
   }
   const bacQ=(q:PrivateQuestion)=>({biet:1,hieu:2,VD:3,VDC:4}[chuanMucDo(q.mucDo)]??1)
   const hopSuc=(c:CauDe)=>{const b=c.muc.map(id=>bc.get(id)).filter((v):v is BangChungKt=>!!v),p=Math.min(...b.map(v=>v.p),1),mucTieu=b.every(v=>v.vung&&v.n>=3)?(p>=0.9?4:3):p>=0.75?2:1;return 1/(1+Math.abs(bacQ(c.q)-mucTieu))}
-  const ung: UngKt[] = ds.map(c => ({ qid: c.q.qid, group: c.q.group, muc: c.muc, phut: c.phut,hopSuc:hopSuc(c),
+  const choKiem=cauChoKiemLaiKt(lichSu.results) // khối B (10/11): câu sai chờ kiểm lại ưu tiên vào đề
+  const ung: UngKt[] = ds.map(c => ({ qid: c.q.qid, group: c.q.group, muc: c.muc, phut: c.phut,hopSuc:hopSuc(c),...(choKiem.has(c.q.qid)?{uuTien:1.5}:{}),
     daGap: lichSu.results.some(l => l.qid === c.q.qid), hopLe: c.q.reviewed && quaKhoi.has(c.q.qid) && !baoVe.has(c.q.qid) && !baoVe.has(c.q.group) && !btvn.has(c.q.qid) && !control.blocked.includes(c.q.qid) && (!control.types.length || !!c.q.dang && control.types.includes(c.q.dang)) }))
   const nhip = new Map<number, number>()
   for (const d of new Set(lichSu.results.map(l => s(l.ngay_vn)))) { const thu = new Date(d + 'T00:00:00Z').getUTCDay(); nhip.set(thu, (nhip.get(thu) ?? 0) + 1) }
   const maxNhip = Math.max(1, ...nhip.values()); for (const [k, v] of nhip) nhip.set(k, v / maxNhip)
-  const hanBai = await env.DB.prepare(`SELECT e.han FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? AND e.han>=? AND ${sqlEmDangNhan7('e','g','h')}`).bind(sbd, ngayKt(now)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const hanBai = goiEm ? { results: goiEm } : await env.DB.prepare(`SELECT e.han FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE e.sbd=? AND e.han>=? AND ${sqlEmDangNhan7('e','g','h')}`).bind(sbd, ngayKt(now)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const hen = henKt({ sbd, homNay: ngayKt(now), lanTruoc: lanCuoi ? s(dungKhung2026?(lanCuoi.chu_ky_ngay??lanCuoi.ngay):lanCuoi.ngay) : undefined, bangChung: [...bc.values()], nhip: nhip, hanBai: hanBai.results.map(r => s(r.han)) })
-  if(dungKhung2026&&lanCuoi)hen.ngay=[congNgayKt(s(lanCuoi.chu_ky_ngay??lanCuoi.ngay),7),congNgayKt(ngayKt(now),1)].sort().at(-1)!
+  if(kb&&'ngay' in kb)hen.ngay=kb.ngay
+  else if(dungKhung2026&&lanCuoi&&!goiEm?.length)hen.ngay=[congNgayKt(s(lanCuoi.chu_ky_ngay??lanCuoi.ngay),7),congNgayKt(ngayKt(now),1)].sort().at(-1)!
   if(cu&&Number(cu.mo_luc)>now)hen.ngay=s(cu.ngay)
   const bai=[...new Map([...pv.baiTheoMaDe.values()].map(b=>[b.khoaBai,{khoa:b.khoaBai,ten:b.tenBai}])).values()]
   if(dungKhung2026){
@@ -194,7 +204,7 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
     const dong=mt.de.map((d,i)=>dongGoiDe2026({ngay:hen.ngay,qids:d.qids,nguon,muc:nk.muc,viKyNang:[...muc.values()].filter(m=>m.loai!=='bai'),anhXa:nk.anhXa,bai,thieu:[...thieuKy],soDe:mt.de.length,lan:i+1,chuKyPhu:nk.muc.filter(m=>m.loai!=='bai'&&phuChuKy.has(m.id)).length,seed:sbd+hen.ngay,lyDo:hen.lyDo}))
     if(chiDoc)return {id:`ktcn:${sbd}:${hen.ngay}`,ngay:hen.ngay,tong:28,phut:50,thieu:thieuKy.size,soKienThuc:nk.muc.filter(m=>m.loai!=='bai').length,soViKyNang:[...muc.values()].filter(m=>m.loai!=='bai').length,maTran2026:{soDe:mt.de.length,soCau:mt.de.map(d=>d.qids.length),phut:mt.de.map(d=>d.phut),du:mt.du&&thieu.size===0,phu:mt.phu,tong:mt.tongMuc,thieuMaTran:mt.thieuMaTran,chuaPhu:mt.chuaPhu,thieuNguon:mt.thieuNguon.length}}
     const sql=`INSERT INTO kiem_tra_ca_nhan(id,sbd,lop,ngay,mo_luc,han_luc,trang_thai,json,cap_nhat_luc) SELECT ?1,?2,?3,?4,?5,?6,?7,?8,?9 WHERE NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo') AND NOT EXISTS(SELECT 1 FROM json_each('[0,1,2,3,4,5,6]') o WHERE (SELECT COUNT(*) FROM kiem_tra_ca_nhan k WHERE k.sbd=?2 AND k.id<>?1 AND k.trang_thai<>'cho_nguon' AND k.ngay BETWEEN date(?4,'-'||(6-o.value)||' days') AND date(?4,'+'||o.value||' days'))>=3) ON CONFLICT(sbd,ngay) DO UPDATE SET lop=excluded.lop,json=excluded.json,trang_thai=excluded.trang_thai,cap_nhat_luc=excluded.cap_nhat_luc WHERE kiem_tra_ca_nhan.mo_luc>?10 AND kiem_tra_ca_nhan.nop_luc IS NULL AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=kiem_tra_ca_nhan.id)`
-    await env.DB.batch(dong.flatMap(d=>{const id=`ktcn:${sbd}:${d.ngay}`;return [env.DB.prepare(sql).bind(id,sbd,lop,d.ngay,dauNgayKt(d.ngay),dauNgayKt(congNgayKt(d.ngay,1)),thieuKy.size?'cho_nguon':'hen',JSON.stringify(d.de),now,now),env.DB.prepare(SQL_GHI_META_KT).bind(id,JSON.stringify(metaKt(d.de)),now)]}))
+    await env.DB.batch(dong.flatMap(d=>{const id=`ktcn:${sbd}:${d.ngay}`;return [env.DB.prepare(sql).bind(id,sbd,lop,d.ngay,dauNgayKt(d.ngay),dauNgayKt(congNgayKt(d.ngay,1)),thieuKy.size?'cho_nguon':'hen',JSON.stringify(goiId?{...d.de,goiId}:d.de),now,now),env.DB.prepare(SQL_GHI_META_KT).bind(id,JSON.stringify(metaKt(d.de)),now)]}))
     return {id:`ktcn:${sbd}:${hen.ngay}`,ngay:hen.ngay,tong:28,phut:50,thieu:thieuKy.size}
   }
   const chon = chonDeKt([...muc.values()], ung, bc, sbd + ngayKt(now))
