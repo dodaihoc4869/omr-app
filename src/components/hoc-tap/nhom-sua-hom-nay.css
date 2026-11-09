@@ -20,3 +20,13 @@
 /* Dải nợ bài cũ (bài đã qua hạn chung còn câu chưa gặp) */
 .kb-no-bai { margin: 16px 0 0; padding: 12px 14px; border-radius: 16px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 14px; font-weight: 600; line-height: 1.45; }
 .kb-no-bai > b { font-weight: 800; }
+/* Ví dụ mẫu (khối B lát 6, bản vẽ dt-sang-4): nút trong dòng nhóm + tấm xem lời giải câu cùng dạng em đã làm đúng (tấm đáy trên điện thoại, giữa màn trên máy tính) */
+.kb-ns-vidu { justify-self: start; margin-top: 4px; min-height: 36px; padding: 4px 12px; border: 0; border-radius: 999px; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; touch-action: manipulation; }
+.vdm-nen { position: fixed; inset: 0; z-index: 60; display: flex; align-items: flex-end; justify-content: center; background: color-mix(in oklab, var(--tr-chu) 45%, transparent); }
+.vdm-khung { width: min(720px, 100%); max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; padding: 18px 16px calc(16px + env(safe-area-inset-bottom)); border-radius: 24px 24px 0 0; background: var(--tr-nen); box-shadow: 0 -2px 0 var(--tr-vien); }
+@media (min-width: 900px) { .vdm-nen { align-items: center; } .vdm-khung { border-radius: 24px; } }
+.vdm-dau h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--tr-hs-chu); }
+.vdm-dau p { margin: 4px 0 12px; font-size: 14px; line-height: 1.45; color: var(--tr-chu-2); }
+.vdm-cho, .vdm-loi { margin: 0; padding: 24px 4px; font-size: 15px; color: var(--tr-chu-3); }
+.vdm-loi button { margin-left: 6px; border: 0; background: none; font: inherit; font-weight: 800; color: var(--tr-hs-chu); text-decoration: underline; cursor: pointer; }
+.vdm-nut { display: block; width: 100%; min-height: 52px; margin-top: 14px; border: 0; border-radius: 16px; background: var(--tr-hs); color: var(--tr-trang); font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
