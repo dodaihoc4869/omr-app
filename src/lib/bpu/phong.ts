@@ -22,10 +22,18 @@ export const KJ = {
   vaoLop: 10,
   duQuanDau: 50,
   kichHoat: 30,
+  /** Lên bảng ĐẠT: đội +200 (`doiThuong`) và em được gọi +100 (`lenBangDatEm`). */
   lenBangDat: 200,
+  lenBangDatEm: 100,
+  /** Lên bảng CHƯA ĐẠT mà trên máy em ĐÃ ĐÚNG câu này (thầy 09/11 «làm dưới đúng nhưng lên bảng làm sai … bị trừ cả đội và cá nhân»): em −100, đội −100.
+   *  Trên máy sai / không gửi ⇒ lên bảng để chữa, không trừ. */
+  lenBangTru: 100,
   doanDung: 20,
-  /** SỬA 09/11 (thầy «Bỏ tắt màn hình trừ KJ … thoát app là báo động viền đỏ nhấp nháy trên bảng cộng thẻ tên»): rời màn KHÔNG trừ kJ nữa — chỉ báo động trên bảng (`roiNay`). */
-  roiMan: 0,
+  /** LUẬT CHẶT 09/11 (thầy «thoát màn hình cảnh báo bị trừ cả đội và cá nhân»): mỗi lần rời màn (em chưa đang ở «đang rời») ⇒ em −50 VÀ đội −50. kJ em kẹp ≥ 0. */
+  roiMan: 50,
+  /** CHUỖI ĐÚNG (09/11): em đúng và chuỗi sau lượt ≥ 3 ⇒ +20 × (chuỗi − 2), tối đa +60. */
+  chuoi: 20,
+  chuoiToiDa: 60,
   /** «Em chưa biết làm» (thầy 07/11 «để học sinh thành thật»): +20 kJ cho em, không bị gọi lên bảng; đoán bừa sai thì 0 kJ và vẫn có thể được gọi. */
   thanhThat: 20,
 } as const
@@ -33,6 +41,13 @@ export const NGUONG_KICH_HOAT = 0.75
 export const TIEP_SUC_TOI_DA = 10
 /** Gửi trễ hơn hạn bao lâu vẫn nhận (mạng chậm). */
 export const AN_HAN_MS = 2000
+/** Số mục biến động kJ giữ trong phòng (mới nhất). */
+export const BIEN_DONG_GIU = 30
+
+/** MỘT BIẾN ĐỘNG kJ (thầy 09/11 «cộng trừ hiệu ứng bay thẳng vào ống nghiệm của đội»): bảng chiếu thấy `id` mới ⇒ số «+100 kJ / −50 kJ» bay vào ống đội + dòng lý do;
+ *  máy em thấy mục của mình ⇒ thẻ nhỏ bay lên. `kjEm` = kJ em THỰC đổi (sau kẹp ≥ 0), `kjDoi` = thưởng/phạt riêng của đội (`doiThuong`) ⇒ ống đội đổi `kjEm + kjDoi`.
+ *  Mở đáp án gộp MỘT mục mỗi em mỗi lượt. `sbd: null` = việc của cả đội (đội đủ quân). CHỈ để hoạt cảnh — không phải sổ cái (chia lại đội dời `doiThuong` không ghi mục). */
+export interface BienDong { id: number; sbd: string | null; doi: number; kjEm: number; kjDoi: number; lyDo: string; luc: number }
 
 export interface EmPhong {
   sbd: string
@@ -96,6 +111,8 @@ export interface TrangThaiPhong {
   /** Em ĐANG Ở NGOÀI APP (thầy 09/11 «thoát app là báo động viền đỏ nhấp nháy trên bảng cộng thẻ tên»): `roiMan` thêm, `veMan` gỡ; lượt mới / mở đáp án ⇒ rỗng.
    *  Phòng lưu trước 09/11 không có ⇒ coi như rỗng. */
   roiNay?: string[]
+  /** Biến động kJ mới nhất (≤ `BIEN_DONG_GIU`, `id` tăng dần). Phòng lưu trước 09/11 không có ⇒ rỗng. */
+  bienDong?: BienDong[]
   vuaVao: string[]
   lichSu: TomTatLuot[]
   ketThuc: boolean
@@ -189,6 +206,16 @@ export function taoPhong(o: { buoiId: string; lop: string; nay: number; ds: read
   return st
 }
 const em = (st: TrangThaiPhong, sbd: string): EmPhong | undefined => st.ds.find((x) => x.sbd === sbd)
+/** Ghi các biến động kJ (theo thứ tự truyền vào, `id` tăng dần), giữ `BIEN_DONG_GIU` mục mới nhất. */
+function ghiBienDong(st: TrangThaiPhong, ds: readonly Omit<BienDong, 'id' | 'luc'>[], nay: number): void {
+  if (!ds.length) return
+  const cu = st.bienDong ?? []
+  let id = cu[cu.length - 1]?.id ?? 0
+  st.bienDong = [...cu, ...ds.map((x) => ({ ...x, lyDo: x.lyDo.slice(0, 80), id: ++id, luc: nay }))].slice(-BIEN_DONG_GIU)
+}
+/** Cộng/trừ kJ một em, KẸP ≥ 0 — trả số kJ thực đổi. */
+function congEm(e: EmPhong, kj: number): number { const truoc = e.kj; e.kj = Math.max(0, truoc + kj); return e.kj - truoc }
+const vietHoa = (x: string): string => (x ? x[0]!.toUpperCase() + x.slice(1) : x)
 
 /** Thêm em vào danh sách phòng (CHƯA vào lớp) nếu chưa có; có rồi ⇒ chỉ cập nhật năng lực (thầy mở lại bảng, số mới). Đội dự kiến: lấp cho các đội đều số em. */
 export function themEm(st: TrangThaiPhong, sbd: string, ten: string, nangLuc?: number): void {
@@ -222,13 +249,14 @@ export function vaoLop(st: TrangThaiPhong, sbd: string, nay: number, ten?: strin
   st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) + KJ.vaoLop
   if (moi !== k) chiaLaiDoi(st, moi)
   else xepEmChuaVao(st)
+  ghiBienDong(st, [{ sbd, doi: e.doi, kjEm: 0, kjDoi: KJ.vaoLop, lyDo: 'Vào lớp' }], nay)
   st.vuaVao = [...st.vuaVao.filter((s) => s !== sbd), sbd].slice(-6)
   // Đội đủ quân: xét đội của em trước, rồi các đội khác (xếp lại em chưa vào có thể làm một đội khác vừa đủ quân).
   if (st.doiDu == null) {
     const k2 = soDoiCua(st)
     for (const d of [e.doi, ...Array.from({ length: k2 }, (_, i) => i).filter((i) => i !== e!.doi)]) {
       const thanh = st.ds.filter((x) => x.doi === d)
-      if (thanh.length && thanh.every((x) => x.vao)) { st.doiDu = d; st.doiThuong[d] = (st.doiThuong[d] ?? 0) + KJ.duQuanDau; break }
+      if (thanh.length && thanh.every((x) => x.vao)) { st.doiDu = d; st.doiThuong[d] = (st.doiThuong[d] ?? 0) + KJ.duQuanDau; ghiBienDong(st, [{ sbd: null, doi: d, kjEm: 0, kjDoi: KJ.duQuanDau, lyDo: 'Đội đủ quân đầu tiên' }], nay); break }
     }
   }
   st.capNhat = nay
@@ -275,15 +303,20 @@ export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: numb
   return { ok: true }
 }
 
-/** Em rời màn (ẩn app ≥ 2 s — máy em tự đo): đếm lần, ghi vào lượt, ĐANG RỜI (`roiNay`) ⇒ bảng báo động viền đỏ nhấp nháy + thẻ tên.
- *  SỬA 09/11 (thầy «Bỏ tắt màn hình trừ KJ»): KHÔNG trừ kJ nữa. CHỈ tính khi đang có lượt chưa mở đáp án (đang trả lời / lên bảng);
- *  lúc chờ giữa các lượt em được rời (không báo). Rớt kết nối WebSocket KHÔNG phải rời màn (chỉ khi máy em tự báo `roi`). */
+/** Em rời màn (máy em tự đo): đếm lần, ghi vào lượt, ĐANG RỜI (`roiNay`) ⇒ bảng báo động viền đỏ nhấp nháy + thẻ tên.
+ *  LUẬT CHẶT 09/11 (thầy «thoát màn hình cảnh báo bị trừ cả đội và cá nhân»): mỗi LẦN RỜI MỚI (em chưa nằm trong `roiNay`) ⇒ em −50 (kẹp ≥ 0), đội −50;
+ *  máy em báo trùng (`roi` hai lần trước khi `ve`) không trừ lần hai. Rớt kết nối WebSocket KHÔNG phải rời màn (chỉ khi máy em tự báo `roi`). */
 export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   const e = em(st, sbd)
   // 09/11 (lần 3): rời màn tính MỌI LÚC trong buổi (cả lúc chờ giữa lượt, sau mở đáp án) — em chỉ thoát khi thầy kết thúc buổi.
   if (!e || st.ketThuc || !e.vao) return false
   e.roi += 1
   if (st.luot && st.luot.pha !== 'mo' && !st.luot.roiMe.includes(sbd)) st.luot.roiMe.push(sbd)
+  if (!st.roiNay?.includes(sbd)) {
+    const kjEm = congEm(e, -KJ.roiMan)
+    st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) - KJ.roiMan
+    ghiBienDong(st, [{ sbd, doi: e.doi, kjEm, kjDoi: -KJ.roiMan, lyDo: 'Rời màn hình' }], nay)
+  }
   st.roiNay = [...(st.roiNay ?? []).filter((s) => s !== sbd), sbd]
   st.capNhat = nay
   return true
@@ -345,8 +378,12 @@ export function chamTra(l: Pick<LuotPhong, 'phan' | 'dung' | 'tuLuan'>, chon: st
   return { dung: a === d, soY: null }
 }
 
-/** MỞ ĐÁP ÁN: khoá nhận bài trước, chấm, cộng kJ (đúng 100 + nhanh tối đa 50; Đúng–sai 25/ý, đủ 4 ý mới có nhanh), chuỗi, năng lượng hoạt hoá
- *  (≥ 75% em có mặt đúng ⇒ mọi em có mặt +30), lên bảng Đạt ⇒ đội +200, đoán đúng +20. Gọi lại khi đã mở ⇒ không làm gì. */
+/** MỞ ĐÁP ÁN: khoá nhận bài trước, chấm, cộng kJ — LUẬT 09/11 (thầy «làm lại luật cộng trừ kJ cho cuộc chơi thật hấp dẫn»):
+ *  đúng +100 (Đúng–sai 25/ý) + nhanh tối đa 50 (Đúng–sai đủ 4 ý mới có nhanh); CHUỖI đúng ≥ 3 ⇒ +20 × (chuỗi − 2) tối đa +60; sai 0; «chưa biết làm» +20;
+ *  năng lượng hoạt hoá (≥ 75% em có mặt đúng ⇒ mọi em có mặt +30); đoán đúng bạn lên bảng +20;
+ *  lên bảng ĐẠT ⇒ em +100, đội +200; CHƯA ĐẠT mà trên máy đã đúng ⇒ em −100, đội −100 (trên máy sai / không gửi ⇒ không trừ).
+ *  Mọi thay đổi của một em GỘP một lần (kẹp ≥ 0) ⇒ `ketQua[sbd].kj` = kJ thực đổi trong lượt + MỘT mục `bienDong`. Gọi lại khi đã mở ⇒ không làm gì.
+ *  Kết quả lên bảng chỉ tính ở đây (không lúc thầy chấm `dat`) ⇒ cả lớp không biết trước em được gọi đúng/sai trên máy. */
 export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string, dapAn: string) => boolean): boolean {
   const l = st.luot
   if (!l || l.pha === 'mo') return false
@@ -354,33 +391,54 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
   // LƯỢT RỖNG (không em nào gửi — thầy lật qua câu): không đụng chuỗi đúng của ai, không ghi vào tổng kết (tỉ lệ đúng, «lượt khó nhất»).
   if (!Object.keys(l.tra).length && !l.goi) { l.ketQua = {}; st.capNhat = nay; return true }
   const kq: Record<string, KetQuaEm> = {}
+  const cong = new Map<string, { em: number; doi: number; ly: string[] }>()
+  const them = (s: string, kjEm: number, kjDoi: number, ly?: string) => { const c = cong.get(s) ?? { em: 0, doi: 0, ly: [] }; c.em += kjEm; c.doi += kjDoi; if (ly) c.ly.push(ly); cong.set(s, c) }
   const dungTheoGio = Object.entries(l.tra).filter(([, t]) => !t.kb && chamTra(l, t.chon, chamSo).dung).sort((a, b) => a[1].t - b[1].t).map(([s]) => s)
   const thoiLuong = l.han != null ? l.han - l.batDau : 60_000
   for (const e of st.ds) {
     const t = l.tra[e.sbd]
     if (!t) { if (!l.tuLuan) e.chuoi = 0; continue }
     // Chưa biết làm: +20 kJ thành thật (câu tự luận 0), không chấm, không cộng nhanh; chuỗi đúng giữ nguyên (không phạt sự thành thật).
-    if (t.kb) { const kj = l.tuLuan ? 0 : KJ.thanhThat; e.kj += kj; kq[e.sbd] = { dung: false, soY: 0, kj, nhanh: null, kb: true }; continue }
+    if (t.kb) { kq[e.sbd] = { dung: false, soY: 0, kj: 0, nhanh: null, kb: true }; if (!l.tuLuan) them(e.sbd, KJ.thanhThat, 0, 'thành thật: chưa biết làm'); continue }
     const c = chamTra(l, t.chon, chamSo)
     const nhanh = Math.round(KJ.nhanhToiDa * Math.max(0, 1 - t.t / Math.max(1, thoiLuong)))
-    let kj = 0
-    if (l.tuLuan) kj = 0
-    else if (l.phan === 'II') kj = (c.soY ?? 0) * KJ.moiYDung + (c.dung ? nhanh : 0)
-    else kj = c.dung ? KJ.dung + nhanh : 0
-    if (!l.tuLuan) { if (c.dung) { e.dungSo += 1; e.chuoi += 1 } else e.chuoi = 0 }
-    e.kj += kj
     const k = dungTheoGio.indexOf(e.sbd)
-    kq[e.sbd] = { dung: c.dung, soY: c.soY, kj, nhanh: k >= 0 ? k + 1 : null }
+    kq[e.sbd] = { dung: c.dung, soY: c.soY, kj: 0, nhanh: k >= 0 ? k + 1 : null }
+    if (l.tuLuan) continue
+    if (c.dung) { e.dungSo += 1; e.chuoi += 1 } else e.chuoi = 0
+    const thuongChuoi = c.dung && e.chuoi >= 3 ? Math.min(KJ.chuoiToiDa, KJ.chuoi * (e.chuoi - 2)) : 0
+    const kj = (l.phan === 'II' ? (c.soY ?? 0) * KJ.moiYDung : c.dung ? KJ.dung : 0) + (c.dung ? nhanh + thuongChuoi : 0)
+    const ly = c.dung ? ['đúng', ...(k >= 0 && k < 3 ? [`nhanh thứ ${k + 1}`] : []), ...(thuongChuoi ? [`chuỗi ${e.chuoi}`] : [])].join(' · ')
+      : l.phan === 'II' && c.soY ? `đúng ${c.soY}/4 ý` : ''
+    if (kj || ly) them(e.sbd, kj, 0, ly)
   }
   const coMat = st.ds.filter((e) => e.vao).length
   l.kich = !l.tuLuan && coMat > 0 && dungTheoGio.length / coMat >= NGUONG_KICH_HOAT
-  if (l.kich) for (const e of st.ds) if (e.vao) { e.kj += KJ.kichHoat; if (kq[e.sbd]) kq[e.sbd]!.kj += KJ.kichHoat }
-  if (l.goi) {
-    const g = l.goi, duoc = em(st, g.sbd)
-    if (duoc) duoc.daLenBang += 1
-    if (g.dat === true && duoc) st.doiThuong[duoc.doi] = (st.doiThuong[duoc.doi] ?? 0) + KJ.lenBangDat
-    if (g.dat != null) for (const [s, v] of Object.entries(g.duDoan)) if ((v === 1) === g.dat) { const e = em(st, s); if (e) { e.kj += KJ.doanDung; if (kq[s]) kq[s]!.kj += KJ.doanDung } }
+  if (l.kich) for (const e of st.ds) if (e.vao) them(e.sbd, KJ.kichHoat, 0, 'năng lượng hoạt hoá')
+  const g = l.goi, duoc = g ? em(st, g.sbd) : undefined
+  if (g && duoc) {
+    duoc.daLenBang += 1
+    if (g.dat === true) them(duoc.sbd, KJ.lenBangDatEm, KJ.lenBangDat, 'giải đúng trên bảng')
+    else if (g.dat === false) {
+      const t = l.tra[duoc.sbd], dungTrenMay = !!t && !t.kb && !l.tuLuan && chamTra(l, t.chon, chamSo).dung
+      if (dungTrenMay) them(duoc.sbd, -KJ.lenBangTru, -KJ.lenBangTru, 'đúng trên máy, chưa giải được trên bảng')
+      else them(duoc.sbd, 0, 0, 'lên bảng chữa — không trừ')
+    }
   }
+  if (g && g.dat != null) for (const [s, v] of Object.entries(g.duDoan)) if ((v === 1) === g.dat && em(st, s)) them(s, KJ.doanDung, 0, 'đoán đúng bạn lên bảng')
+  // Áp một lần mỗi em (kẹp ≥ 0). Mục ghi theo |biến động| tăng dần, em lên bảng cuối ⇒ lớp đông vượt 30 mục thì mất các mục nhỏ (+30 hoạt hoá) trước.
+  const muc: (Omit<BienDong, 'id' | 'luc'> & { cuoi: boolean })[] = []
+  for (const [s, c] of cong) {
+    const e = em(st, s)
+    if (!e) continue
+    const kjEm = congEm(e, c.em)
+    st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) + c.doi
+    if (kq[s]) kq[s]!.kj = kjEm
+    const cuoi = duoc?.sbd === s && g?.dat != null
+    if (kjEm || c.doi || cuoi) muc.push({ sbd: s, doi: e.doi, kjEm, kjDoi: c.doi, lyDo: vietHoa(c.ly.join(' · ')), cuoi })
+  }
+  muc.sort((a, b) => Number(a.cuoi) - Number(b.cuoi) || Math.abs(a.kjEm + a.kjDoi) - Math.abs(b.kjEm + b.kjDoi))
+  ghiBienDong(st, muc.map(({ cuoi: _c, ...x }) => x), nay)
   l.ketQua = kq
   st.lichSu.push({ so: l.so, qid: l.qid, soDung: dungTheoGio.length, soGui: Object.keys(l.tra).length, tuLuan: l.tuLuan })
   st.capNhat = nay
@@ -403,6 +461,8 @@ export function viewBang(st: TrangThaiPhong) {
     buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, soDoi: soDoiCua(st), vuaVao: st.vuaVao, lichSu: st.lichSu,
     /** Em đang ở ngoài app trong lượt chưa mở đáp án (thầy 09/11) — bảng vẽ viền đỏ nhấp nháy + thẻ tên khi mảng khác rỗng. */
     roiNay: st.roiNay ?? [],
+    /** Biến động kJ mới nhất (thầy 09/11): mỗi `id` mới ⇒ số kJ bay vào ống đội + lý do. */
+    bienDong: st.bienDong ?? [],
     ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, chuoi: e.chuoi, roi: e.roi, daLenBang: e.daLenBang })),
     luot: l ? {
       so: l.so, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, batDau: l.batDau, han: l.han, pha: l.pha, roiMe: l.roiMe, kich: l.kich,
@@ -414,7 +474,7 @@ export function viewBang(st: TrangThaiPhong) {
   }
 }
 /** `roiNay` TUỲ CHỌN ở kiểu (bảng dựng sẵn view rỗng lúc chờ phòng) — `viewBang` luôn gửi mảng. */
-export type ViewBang = Omit<ReturnType<typeof viewBang>, 'roiNay'> & { roiNay?: string[] }
+export type ViewBang = Omit<ReturnType<typeof viewBang>, 'roiNay' | 'bienDong'> & { roiNay?: string[]; bienDong?: BienDong[] }
 
 /** Thông tin cho MÁY EM: chỉ việc của em; KHÔNG đáp án trước khi mở. */
 export function viewEm(st: TrangThaiPhong, sbd: string) {
@@ -427,6 +487,8 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
     ketThuc: st.ketThuc, soLuot: st.soLuot,
     em: e ? { sbd: e.sbd, ten: e.ten, doi: d, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, roi: e.roi, hang, soEm: xep.length } : null,
     doi: { so: st.ds.filter((x) => x.doi === d && x.vao).length, tong: st.ds.filter((x) => x.doi === d).length, kj: diemDoi(st, d) },
+    /** Biến động kJ của CHÍNH em (5 mục mới nhất, `id` tăng dần) — máy em hiện thẻ nhỏ bay lên khi có `id` mới. */
+    bienDongEm: (st.bienDong ?? []).filter((x) => x.sbd === sbd).slice(-5),
     luot: l ? {
       so: l.so, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, batDau: l.batDau, han: l.han, pha: l.pha,
       daGui: Object.keys(l.tra).length, coMat: st.ds.filter((x) => x.vao).length,

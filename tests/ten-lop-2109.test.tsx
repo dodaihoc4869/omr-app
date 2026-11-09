@@ -4,6 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { EmTomTat, HoSoEm } from '../src/lib/exam-api'
 import { banDoTenLop, chuChipLop, docLop, doiLopMotEm, layLopThay, xoaNhoLop } from '../src/lib/ten-lop-thay'
+import { useCoHoa2 as __coHoa2 } from '../src/components/chien-dich/co-hoa2'
+import { beforeEach as __truocMoi } from 'vitest'
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «load lại nhiều lần là lại hiện màn [Hôm nay đời cũ], bỏ hẳn đi»): máy chưa nhớ cờ ⇒ mặc định Game Hóa 2.0 BẬT;
+// tệp này viết cho giao diện cờ TẮT ⇒ đặt rõ cờ tắt trước mỗi ca.
+__truocMoi(() => { __coHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) })
 
 const m = vi.hoisted(() => ({ giao: vi.fn(), theoDoi: vi.fn(), showToast: vi.fn(), sbd: { v: '' }, moHoSoEm: vi.fn(), setScreen: vi.fn() }))
 const goi = vi.fn()

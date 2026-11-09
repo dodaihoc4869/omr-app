@@ -53,6 +53,11 @@ import { useAppStore } from '../src/store/appStore'
 import { khoDayHoc } from '../src/lib/day-hoc-len-bang'
 import { khuTrungNguon } from '../src/lib/khu-trung-cau'
 import { tachNhieuTheoPhan } from '../src/lib/tach-phan-de'
+import { useCoHoa2 as __coHoa2 } from '../src/components/chien-dich/co-hoa2'
+import { beforeEach as __truocMoi } from 'vitest'
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «load lại nhiều lần là lại hiện màn [Hôm nay đời cũ], bỏ hẳn đi»): máy chưa nhớ cờ ⇒ mặc định Game Hóa 2.0 BẬT;
+// tệp này viết cho giao diện cờ TẮT ⇒ đặt rõ cờ tắt trước mỗi ca.
+__truocMoi(() => { __coHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) })
 
 let so = 0
 const cauI = (ma: string, n: number) => Array.from({ length: n }, () => ({ id: `${ma}-I-${++so}`, text: `Câu ${so} của ${ma}`, choices: ['a', 'b', 'c', 'd'], correct: 'A', chuyenDe: 'Ester – lipid' }))

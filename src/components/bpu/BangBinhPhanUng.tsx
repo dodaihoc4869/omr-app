@@ -11,12 +11,14 @@ import { taoQr } from '../../lib/ma-qr'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { DOI_BPU, KJ, kyHieu, tenNgan, type ViewBang } from '../../lib/bpu/phong'
 import { Chu, HinhDe, VungVietBang } from './bang-phu'
-import { HANG_DS, dungOng, mauDoi, nhanOng } from './ong-ket-qua'
+import { mauDoi } from './ong-ket-qua'
+import ThapLua from './ThapLua'
+import { bayKj, bayTen, boCucThap, layBienDong, useDuaTop } from './dua-top'
 import { lyDoLenBang } from '../../lib/bpu/ly-do'
 import { DAY_LUOI, DAY_LUOI_TOAN_MAN, KHE, TRAI_LUOI, boLuoi, tenGoiLop, type Luoi } from '../../lib/bpu/luoi'
 import { layEmChieu } from '../../lib/ung-vien-chieu'
 import type { Question } from '../../game/than-thu-v2/core'
-import { BINH, VeBang, type CanhBang } from './bang-ve'
+import { VeBang, type CanhBang } from './bang-ve'
 import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import './bpu-bang.css'
 // Phông chiếu (09/11): Be Vietnam Pro 500 (đề — nét đủ dày cho máy chiếu, không chói) + 800 (số, tên) — chỉ tải khi bảng mở.
@@ -28,10 +30,10 @@ import '@fontsource/be-vietnam-pro/latin-800.css'
 /** Chọn câu ngay trên bảng (09/11) — mảnh riêng, tải khi thầy bấm «Xong điểm danh» / «Chọn câu». */
 const ChonCauBpu = lazy(() => import('./ChonCauBpu'))
 
-type Man = 'diem-danh' | 'tra-loi' | 'goi' | 'lam-bang' | 'mo' | 'dua' | 'vinh-danh'
+// 09/11 THÁP LỬA (thầy chốt bản ống nghiệm): bỏ màn «Đua ngọn lửa» (phím K) — đua đội + Bảng vàng đã ở ngay màn câu; giữ Vinh danh làm tổng kết.
+type Man = 'diem-danh' | 'tra-loi' | 'goi' | 'lam-bang' | 'mo' | 'vinh-danh'
 type Em = ViewBang['ds'][number]
 const X_LUA_DD4 = [1290, 1430, 1570, 1710], X_LUA_DD2 = [1390, 1610]
-const X_LUA_DUA4 = [210, 465, 720, 975], X_LUA_DUA2 = [400, 785]
 /** Các đội đang chơi (2 khi lớp dưới 12 em, không thì 4). */
 const dsDoi = (v: ViewBang | null) => (v?.soDoi === 2 ? [0, 1] : [0, 1, 2, 3])
 const coMayYeu = () => (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('may-yeu')
@@ -107,6 +109,12 @@ export interface PropsBang {
 export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, diemDanh = false, onHoatDong, onKetThuc }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
+  /** Nhớ kJ đội + thứ hạng em trước khi mở đáp án (vạch «trước», «+kJ lượt này», ▲ lên hạng) — sống qua các lượt. */
+  const dua = useDuaTop(v)
+  /** Lượt đã giao em cho TỜ CHIẾU CŨ (lenBangTo) ⇒ màn gọi / làm bảng của bảng không vẽ đề (bảng đang thu), giữ tháp lửa tới khi mở đáp án. */
+  const [quaTo, setQuaTo] = useState(-1)
+  /** id biến động kJ lớn nhất đã thấy (null = chưa nối phòng: lần đầu chỉ ghi nhớ, không bay). */
+  const bdMax = useRef<number | null>(null)
   const laDiemDanh = useRef(!qid)
   laDiemDanh.current = !qid // một bảng đi suốt điểm danh → các lượt (09/11): theo câu HIỆN TẠI, không theo lúc dựng
   /** Bảng chọn câu đang mở (09/11). Câu mới về (qid đổi) ⇒ tự đóng. */
@@ -138,12 +146,12 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   const batGiai = useCallback(async () => {
     if (giai != null) { setGiai(null); return }
     const html = layGiai ? await layGiai() : ''
-    if (html.trim()) setGiai(html); else onGiai?.()
+    if (html.trim()) { setGiai(html); setHienPa(false) } else onGiai?.()
   }, [giai, layGiai, onGiai])
   const dkRef = useRef({ onToi: sangCau, onGiai: batGiai as () => void })
   dkRef.current = { onToi: sangCau, onGiai: () => void batGiai() }
   const [loi, setLoi] = useState<{ chu: string; chan?: boolean } | null>(null)
-  const [manPhu, setManPhu] = useState<'dua' | 'vinh-danh' | null>(null)
+  const [manPhu, setManPhu] = useState<'vinh-danh' | null>(null)
   const [an, setAn] = useState(false)
   const [moPhim, setMoPhim] = useState(false)
   // TOÀN MÀN HÌNH (thầy 07/11, ảnh máy chiếu: thanh tác vụ Windows che đáy bảng) — nút / phím F; trình duyệt chỉ cho khi thầy bấm.
@@ -155,7 +163,12 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   const xinToanMan = useCallback(() => { try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }, [])
   useEffect(() => {
     xinToanMan()
-    const lai = (e: Event) => { if (e instanceof KeyboardEvent && (e.key === 'Escape' || e.key.toLowerCase() === 'f')) return; if (!document.fullscreenElement) xinToanMan() }
+    // 09/11: bảng đã Đóng (ẩn) / chạm nút Đóng ⇒ không xin toàn màn hình.
+    const lai = (e: Event) => {
+      if (e instanceof KeyboardEvent && (e.key === 'Escape' || e.key.toLowerCase() === 'f')) return
+      if (document.documentElement.hasAttribute('data-bpu-an') || (e.target instanceof Element && e.target.closest('.bb-dong'))) return
+      if (!document.fullscreenElement) xinToanMan()
+    }
     window.addEventListener('pointerdown', lai, true)
     window.addEventListener('keydown', lai, true)
     return () => { window.removeEventListener('pointerdown', lai, true); window.removeEventListener('keydown', lai, true) }
@@ -175,7 +188,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   const daMoLuot = useRef('')
   const yeu = useMemo(coMayYeu, [])
   const hai = v?.soDoi === 2
-  const X_LUA_DD = hai ? X_LUA_DD2 : X_LUA_DD4, X_LUA_DUA = hai ? X_LUA_DUA2 : X_LUA_DUA4
+  const X_LUA_DD = hai ? X_LUA_DD2 : X_LUA_DD4
   const deRef = useRef<HTMLDivElement>(null)
   const khungDe = useRef<HTMLDivElement>(null)
   // CHỮ ĐỀ CHUẨN (thầy 07/11 «hiển thị đề chuẩn xác kí tự»): dùng ĐÚNG hàm chữ của tờ chiếu (`chuDeChieu`: chỉ số dưới, điện tích Fe³⁺ SO₄²⁻, mũi tên
@@ -274,7 +287,6 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   /** Em đang ở ngoài app (hợp đồng phòng 09/11 `roiNay`; phòng cũ chưa có ⇒ rỗng). */
   const roiNay = ((v as { roiNay?: string[] } | null)?.roiNay ?? []).filter((s) => ds.some((e) => e.sbd === s))
   const daGui = new Set(l?.daGui ?? [])
-  const chuaBietS = new Set(l?.chuaBiet ?? [])
 
   // Sân khấu co theo màn + canvas.
   useLayoutEffect(() => {
@@ -300,10 +312,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     vb.phaoRoi = man === 'vinh-danh'
     let c: CanhBang = { loai: 'trong' }
     if (man === 'diem-danh') c = { loai: 'lua', x: X_LUA_DD, day: 520, cao: 250, nen: 30, giaTri: dsDoi(v).map((d) => { const t = ds.filter((e) => e.doi === d).length; return t ? ds.filter((e) => e.doi === d && e.vao).length / t : 0 }) }
-    else if (man === 'tra-loi' && l) c = { loai: 'binh', muc: coMat.length ? (daGui.size / coMat.length) * 0.85 : 0, con: l.han ? Math.max(0, (l.han - nay) / Math.max(1, l.han - l.batDau)) : null }
-    else if (man === 'mo' && l && !l.tuLuan) c = { loai: 'ong', mo0: vb.canh.loai === 'ong' ? (vb.canh as Extract<CanhBang, { loai: 'ong' }>).mo0 : performance.now(), ong: dungOng(l, vb) }
-    else if (man === 'mo' && l?.tuLuan) c = { loai: 'binh', muc: coMat.length ? (daGui.size / coMat.length) * 0.85 : 0, con: null }
-    else if (man === 'dua') c = { loai: 'lua', x: X_LUA_DUA, day: 640, cao: 400, nen: 70, giaTri: dsDoi(v).map((d) => Math.max(0, diemDoi(v, d))) }
+    // 09/11 tháp lửa: màn câu (đang làm / mở đáp án) vẽ bằng DOM (ThapLua) — canvas chỉ còn lớp hạt (pháo năng lượng hoạt hoá, tia tiếp sức).
     vb.canh = c
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [v, man, nay])
@@ -319,9 +328,11 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       if (e.vao && !c?.vao && !v.luot) { const i = idx.get(e.sbd)!; if (i != null) vb.bayHat(viTriO(i, L), { x: X_LUA_DD[e.doi]!, y: 470 }, vb.mau.doi[e.doi]!, 900) }
     }
     const l2 = v.luot, l1 = cu.luot
-    if (l2 && l2.pha === 'tra-loi') {
-      const cuGui = new Set(l1 && l1.so === l2.so ? l1.daGui : [])
-      for (const s of l2.daGui) if (!cuGui.has(s)) { const i = idx.get(s), d = v.ds.find((e) => e.sbd === s)?.doi; if (i != null) vb.bayHat(viTriO(i, L), { x: BINH.x, y: vb.mucBinh() }, d != null ? vb.mau.doi[d] ?? vb.mau.tin : vb.mau.tin, 1100) } // 09/11: sao chổi MÀU ĐỘI của em
+    // 09/11 THÁP LỬA: em vừa gửi ⇒ thẻ tên bừng sáng + thẻ nhỏ bay vào miệng ống đội (so `daGui` hai view liền nhau — không dựa vào thứ tự mảng).
+    const sanEl = san.current, dangAn = anRef.current
+    if (l2 && l2.pha === 'tra-loi' && l1 && l1.so === l2.so && sanEl && !dangAn) {
+      const cuGui = new Set(l1.daGui)
+      for (const s of l2.daGui) if (!cuGui.has(s)) { const e = v.ds.find((x) => x.sbd === s); if (e?.vao) bayTen(sanEl, e, an ? `Em số ${v.ds.indexOf(e) + 1}` : tenNgan(e.ten), mauDoi(e.doi), yeu) }
     }
     if (l2?.goi && l1?.goi && l1.so === l2.so && l2.goi.tiep > l1.goi.tiep) {
       const ban = v.ds.filter((e) => e.doi === v.ds.find((x) => x.sbd === l2.goi!.sbd)?.doi && e.sbd !== l2.goi!.sbd && e.vao)
@@ -329,11 +340,24 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       const den = l2.pha === 'lam-bang' ? (batLaiRef.current ? { x: 1266, y: 222 } : { x: 1612, y: 112 }) : { x: 496, y: 427 }
       for (let n = 0; n < Math.min(6, l2.goi.tiep - l1.goi.tiep); n++) { const b = ban[Math.floor(Math.random() * ban.length)]; if (b) vb.bayHat(viTriO(idx.get(b.sbd)!, L), den, vb.mau.doi[b.doi]!, 800) }
     }
-    if (l2?.pha === 'mo' && l1?.pha !== 'mo' && !l2.tuLuan) {
-      setTimeout(() => { const v2 = truoc.current; if (!v2?.luot?.dung) return; for (const o of dungOng(v2.luot, vb)) if (o.dung) vb.bungManh(o.x, 300, 44, vb.mau.dung); if (v2.luot.kich) for (let q = 0; q < 6; q++) vb.bungManh(200 + q * 300, 820, 18, [vb.mau.sao, vb.mau.dung, vb.mau.tin][q % 3]!, 1.1) }, 1850)
+    if (l2?.pha === 'mo' && l1?.pha !== 'mo' && !l2.tuLuan && l2.kich) {
+      setTimeout(() => { if (truoc.current?.luot?.kich) for (let q = 0; q < 6; q++) vb.bungManh(1320 + (q % 3) * 260, 200 + Math.floor(q / 3) * 120, 18, [vb.mau.sao, vb.mau.dung, vb.mau.tin][q % 3]!, 1.1) }, 1500)
     }
     if (!l2 || l1?.so !== l2.so) { setManPhu(null); setUng(null) }
-  }, [v, L, X_LUA_DD])
+  }, [v, L, X_LUA_DD, an, yeu])
+  // ±kJ BAY THẲNG VÀO ỐNG ĐỘI (thầy 09/11 «cộng trừ kJ hiệu ứng bay thẳng vào ống nghiệm của đội đó»): mỗi id `bienDong` MỚI ⇒ nhãn «+100 kJ» / «−50 kJ»
+  // từ ô tên em (không có em ⇒ giữa bảng) vào miệng ống, lý do nhỏ dưới ống. Tin đầu tiên của phòng chỉ ghi nhớ. Phòng cũ chưa có trường ⇒ không làm gì.
+  useEffect(() => {
+    const raw = (v as { bienDong?: unknown } | null)?.bienDong
+    if (!v || !Array.isArray(raw)) return
+    const ds = layBienDong(v), max = ds.reduce((m, b) => Math.max(m, b.id), 0)
+    if (bdMax.current == null) { bdMax.current = max; return }
+    const tu = bdMax.current, moi = ds.filter((b) => b.id > tu).sort((a, b) => a.id - b.id)
+    bdMax.current = Math.max(tu, max)
+    const sanEl = san.current
+    if (!sanEl || anRef.current) return
+    for (const b of moi) bayKj(sanEl, b, mauDoi(b.doi), yeu)
+  }, [v, yeu])
   useEffect(() => { if (!toast) return; const h = setTimeout(() => setToast(null), 6000); return () => clearTimeout(h) }, [toast])
 
   useEffect(() => { if (!v?.luot || chuDe) return; let con = true; void import('../../lib/html-may-chieu').then((m) => { if (con) setChuDe(() => m.chuDeChieu) }).catch(() => {}); return () => { con = false } }, [v?.luot, chuDe])
@@ -388,6 +412,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       const dEm = v.ds.find((e) => e.sbd === chon.sbd)?.doi ?? 0, mauEm = goc.current ? getComputedStyle(goc.current).getPropertyValue(DOI_BPU[dEm]?.mau ?? '--tr-tin').trim() : ''
       // 09/11: ngọn lửa ĐỘI của em cháy to ở góc đề trên tờ cũ (tờ không có biến màu của app ⇒ gửi mã màu đã đọc).
       if (lenBangTo?.({ sbd: chon.sbd, ten: v.ds.find((e) => e.sbd === chon.sbd)?.ten ?? chon.sbd, goiNgay: false, mau: mauEm, doi: DOI_BPU[dEm]?.ten ?? '' })) {
+        setQuaTo(lc.so)
         // Tin phòng gửi SAU khi bảng thu xong (~0,6 s): phòng phát lại view ⇒ bảng vẽ lại — không chen vào giữa hoạt cảnh.
         setTimeout(() => { gui({ t: 'goi', sbd: chon.sbd, lyDo: ly }); setTimeout(() => gui({ t: 'lam-bang' }), 250) }, 650)
       } else gui({ t: 'goi', sbd: chon.sbd, lyDo: ly })
@@ -435,9 +460,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       if ((kk === 'd' || kk === 'f') && (man === 'goi' || man === 'lam-bang')) { gui({ t: 'dat', v: kk === 'd' }); setTimeout(() => gui({ t: 'mo' }), 150); return }
       if (kk === 'b' && man === 'lam-bang') { setBatLai((x) => !x); return }
       if (kk === 'n' && (man === 'goi' || man === 'lam-bang') && l?.goi) { void goiLen([l.goi.sbd]); return }
-      if (kk === 'm' && l && !l.tuLuan && l.phan !== 'III') { setHienPa((h) => !h); return }
+      if (kk === 'm' && l && !l.tuLuan && l.phan !== 'III') { setHienPa((h) => !h); setGiai(null); return } // 09/11: tấm giấy phương án đè vùng tháp, M lần nữa về màn đua
       if (kk === 'o' && (man === 'tra-loi' || man === 'goi' || man === 'lam-bang')) { gui({ t: 'mo' }); return } // «Mở đáp án ngay» (trước là M — M nay hiện / ẩn phương án)
-      if (kk === 'k' && (man === 'mo' || man === 'dua')) { setManPhu((c) => (c === 'dua' ? null : 'dua')); return }
       if (kk === 'v') { setManPhu((c) => (c === 'vinh-danh' ? null : 'vinh-danh')); return }
       // Không còn phím X «Kết thúc buổi chơi» (thầy 07/11: một chỗ kết thúc duy nhất là «Kết thúc buổi học» ⇒ máy chủ đóng phòng).
       if (kk === 'h') setAn((a) => !a)
@@ -456,7 +480,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     : man === 'diem-danh' ? (onChieuCau ? <button type="button" className="bb-chinh" onClick={() => setChon('hd')}>Xong điểm danh<kbd>Enter</kbd></button> : null)
     : man === 'tra-loi' ? <button type="button" className="bb-chinh" disabled={dangGoi} onClick={() => void goiLen()}>{dangGoi ? 'Đang chọn em…' : 'Lên bảng'}<kbd>L</kbd></button>
     : (man === 'goi' || man === 'lam-bang') ? <button type="button" className="bb-hoi" onClick={() => gui({ t: 'mo' })}><kbd>Space</kbd>Mở đáp án</button>
-    : (man === 'mo' || man === 'dua') && onToi ? <button type="button" className="bb-chinh" onClick={() => sangCau(1)}>Câu tiếp<kbd>→</kbd></button> : null
+    : man === 'mo' && onToi ? <button type="button" className="bb-chinh" onClick={() => sangCau(1)}>Câu tiếp<kbd>→</kbd></button> : null
   // 09/11 thầy «thu hết các nút lại, chỉ để nút gọi lên bảng thôi»: thanh trên chỉ còn MỘT nút chính; các việc khác dùng phím (bấm ? xem bảng phím).
   const tren = (giua: React.ReactNode, phai?: React.ReactNode) => (
     <div className="bb-tren"><div className={`bb-logo${man === 'diem-danh' ? '' : ' gon'}`}><Lua /><span>Bình Phản Ứng</span></div>{giua}<div className="bb-lop">{v?.lop ?? ''}{ma && man !== 'diem-danh' ? <span className="bb-ma" title="Mã vào lớp">Mã <b>{ma}</b></span> : null}</div><div className="bb-gian" />{phai}{chinh}</div>
@@ -479,8 +503,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     if (ung?.ds.includes(e.sbd)) lop.push(ung.soi === e.sbd ? 'soi' : 'ung')
     if ((man === 'goi' || man === 'lam-bang') && l?.goi?.sbd === e.sbd) lop.push('duoc-goi')
     else if (doiLen != null && e.doi === doiLen) lop.push('cung-doi')
-    const kq = man === 'mo' || man === 'dua' ? l?.ketQua?.[e.sbd] : undefined
-    if ((man === 'mo' || man === 'dua') && l && !l.tuLuan) lop.push(kq?.dung ? 'ket' : 'lang')
+    const kq = man === 'mo' ? l?.ketQua?.[e.sbd] : undefined
+    if (man === 'mo' && l && !l.tuLuan) lop.push(kq?.dung ? 'ket' : 'lang')
     return (
       <div key={e.sbd} className={lop.join(' ')} style={{ ['--doi' as string]: mauDoi(e.doi), ['--tre' as string]: kq?.nhanh ? `${1900 + kq.nhanh * 70}ms` : '0ms' }} aria-label={`${e.ten}${e.vao ? '' : ' (chưa vào)'}`}>
         <span className="ten" style={coChu.rieng.has(e.sbd) && !an ? { fontSize: coChu.rieng.get(e.sbd) } : undefined}>{an ? ds.indexOf(e) + 1 : tenGoi.get(e.sbd)}</span>
@@ -512,18 +536,6 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         {phim([['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Đóng bảng']], 'Chiếu đề lên bảng: mỗi lần chuyển câu, câu tự gửi xuống máy các em có mặt, giờ tự tính theo câu (tối đa 3 phút).')}
       </>
     )
-  } else if (man === 'dua') {
-    const thu = xepDoi(v), xep = [...coMat].sort((a, b) => b.kj - a.kj)
-    noi = (
-      <>
-        {tren(<div className="bb-pill">Sau lượt {v.soLuot}</div>)}
-        <div className="bb-dua"><h2>Đua ngọn lửa</h2><p>Thử màu ngọn lửa: mỗi đội một màu, đội càng nhiều kJ lửa càng cao.</p></div>
-        {DOI_BPU.slice(0, dsDoi(v).length).map((d, i) => <div key={d.ten} className="bb-dua-nhan" style={{ left: X_LUA_DUA[i], ['--doi' as string]: mauDoi(i) }}><b>{d.ten}</b><span>{diemDoi(v, i)} kJ</span><small>hạng {thu.findIndex((x) => x.d === i) + 1}</small></div>)}
-        <div className="bb-top"><h3>Nhiều kJ nhất</h3>{xep.slice(0, 6).map((e, i) => <div key={e.sbd} className="bb-top-hang" style={{ ['--doi' as string]: mauDoi(e.doi) }}><span className="h">{i + 1}</span><span className="t">{ten(e)}</span><span className="d">{e.kj}</span></div>)}</div>
-        {luoi(o)}
-        {phim([...TIEP, ['K', 'Về kết quả câu'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']])}
-      </>
-    )
   } else if (man === 'vinh-danh') {
     const thu = xepDoi(v), vo = thu[0]!.d, xep = [...coMat].sort((a, b) => b.kj - a.kj), top = [xep[1], xep[0], xep[2]]
     const tyLe = v.lichSu.length && coMat.length ? Math.round((v.lichSu.reduce((s, x) => s + x.soDung, 0) / (v.lichSu.filter((x) => !x.tuLuan).length * coMat.length || 1)) * 100) : 0
@@ -541,23 +553,45 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         {phim([['V', 'Đóng vinh danh', true], ...TIEP, ['Esc', 'Về tờ chiếu']])}
       </>
     )
-  } else if (l && q) {
-    const daGuiN = daGui.size
+  } else if (l && (man === 'tra-loi' || man === 'mo' || quaTo === l.so)) {
+    // THÁP LỬA (thầy chốt 09/11 «chốt bản ống nghiệm»): màn câu KHÔNG còn đề — đề có trên máy em, lên bảng (L) thì tờ chiếu cũ có đủ đề.
+    // G (lời giải) / M (phương án) ⇒ tấm giấy đè vùng tháp, bấm lại về màn đua. Gọi / làm bảng đã giao tờ cũ ⇒ bảng (đang thu) giữ tháp tới khi mở đáp án.
     const loaiChu = l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'
     const g = l.goi
-    const chip = man === 'mo' && g && goiEm ? <div className="bb-pill" style={{ boxShadow: `inset 0 0 0 3px ${mauDoi(goiEm.doi)}` }}>Lên bảng: {ten(goiEm)}{g.dat === true ? ` · Đạt · ${DOI_BPU[goiEm.doi]?.ten} +${KJ.lenBangDat}` : g.dat === false ? ' · Chưa đạt' : ''}</div> : null
-    const dem = new Map<string, number>()
-    if (l.chon) for (const c of Object.values(l.chon)) dem.set(c, (dem.get(c) ?? 0) + 1)
-    const ongNhan = man === 'mo' && !l.tuLuan && l.dung ? nhanOng(l, ve.current) : []
+    const chip = man === 'mo' && g && goiEm ? <div className="bb-pill" style={{ boxShadow: `inset 0 0 0 3px ${mauDoi(goiEm.doi)}` }}>Lên bảng: {ten(goiEm)}{g.dat === true ? ` · Đạt · em +${KJ.lenBangDatEm} · ${DOI_BPU[goiEm.doi]?.ten} +${KJ.lenBangDat}` : g.dat === false ? ' · Chưa đạt' : ''}</div> : null
+    const giay = { left: 40, top: 112, width: 1210, height: boCucThap(v, toanMan).caoVung }
+    const coPa = !!q && hienPa && giai == null && !l.tuLuan && (l.phan === 'I' || l.phan === 'II')
     noi = (
       <>
         {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}</>)}
+        <ThapLua v={v} l={l} truoc={dua.truoc} len={dua.len} tenGoi={tenGoi} tenHien={ten} an={an} toanMan={toanMan} roiNay={roiNay} che={giai != null || coPa} />
+        {giai != null ? <div className="bb-giai" ref={giaiRef} tabIndex={-1} role="region" aria-label="Lời giải thu gọn" style={{ ...giay, boxSizing: 'border-box' }} dangerouslySetInnerHTML={{ __html: giai }} /> : null}
+        {coPa && q ? (
+          <div className="bb-de bb-de-pa" ref={khungDe} role="region" aria-label="Phương án" style={giay}>
+            {l.phan === 'I' ? <div className="bb-pa">{(q.choices ?? []).slice(0, 4).map((c, i) => { const chu = 'ABCD'[i]!; return <div key={chu} className={man === 'mo' && l.dung ? (l.dung.toUpperCase() === chu ? 'dung' : 'mo') : ''} style={{ ['--mau' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)', 'var(--tr-hs)'][i] }}><i>{chu}</i><span><Chu t={c} f={chuDe} mot /></span></div> })}</div>
+              : <div className="bb-ds">{(q.ideas ?? []).slice(0, 4).map((y, i) => <div key={i}><i>{'abcd'[i]})</i><span><Chu t={y} f={chuDe} mot /></span></div>)}</div>}
+          </div>
+        ) : null}
+        {toast ? <div className="bb-toast" role="status">{toast}</div> : null}
+        {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
+        {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ...TIEP, ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
+          : [['L', 'Lên bảng · sang tờ chiếu cũ', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
+        'Đề có trên máy các em; L đưa em lên bảng ở tờ chiếu cũ (đủ đề). G lời giải · M phương án: tấm giấy đè vùng tháp, bấm lại về màn đua.')}
+      </>
+    )
+  } else if (l && q) {
+    // GỌI / LÀM BẢNG KHI KHÔNG CÓ TỜ CHIẾU (lenBangTo vắng / trả false): bảng tự lo như cũ — đề bên trái (em trên bảng cần đề), thẻ em bên phải.
+    const loaiChu = l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'
+    const g = l.goi
+    noi = (
+      <>
+        {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span></>)}
         {giai != null ? <div className="bb-giai" ref={giaiRef} tabIndex={-1} role="region" aria-label="Lời giải thu gọn" style={{ height: L.top - 20 - 112 }} dangerouslySetInnerHTML={{ __html: giai }} /> : null}
         <div className={`bb-de${dangSang ? ' doi' : ''}`} ref={khungDe} style={{ height: L.top - 20 - 112, visibility: giai != null ? 'hidden' : undefined }}>
           <div className="bb-de-chu" ref={deRef} tabIndex={-1}><Chu t={q.text} f={chuDe} /><HinhDe q={q} so={l.so} f={chuDe} onTai={coVua} /></div>
-          {hienPa && l.phan === 'I' && !l.tuLuan ? <div className="bb-pa">{(q.choices ?? []).slice(0, 4).map((c, i) => { const chu = 'ABCD'[i]!; return <div key={chu} className={man === 'mo' && l.dung ? (l.dung.toUpperCase() === chu ? 'dung' : 'mo') : ''} style={{ ['--mau' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)', 'var(--tr-hs)'][i] }}><i>{chu}</i><span><Chu t={c} f={chuDe} mot /></span></div> })}</div> : null}
+          {hienPa && l.phan === 'I' && !l.tuLuan ? <div className="bb-pa">{(q.choices ?? []).slice(0, 4).map((c, i) => { const chu = 'ABCD'[i]!; return <div key={chu} style={{ ['--mau' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)', 'var(--tr-hs)'][i] }}><i>{chu}</i><span><Chu t={c} f={chuDe} mot /></span></div> })}</div> : null}
           {hienPa && l.phan === 'II' && !l.tuLuan ? <div className="bb-ds">{(q.ideas ?? []).slice(0, 4).map((y, i) => <div key={i}><i>{'abcd'[i]})</i><span><Chu t={y} f={chuDe} mot /></span></div>)}</div> : null}
-          {l.phan === 'III' && !l.tuLuan ? <div className="bb-tln">Em nhập đáp số trên máy{man === 'mo' && l.dung ? <b>{l.dung}</b> : null}</div> : null}
+          {l.phan === 'III' && !l.tuLuan ? <div className="bb-tln">Em nhập đáp số trên máy</div> : null}
           {l.tuLuan ? <div className="bb-tln">Câu tự luận: em làm ra giấy, xong bấm «Em làm xong» trên máy. Máy không chấm câu này.</div> : null}
         </div>
         <div className="bb-phai">
@@ -567,14 +601,9 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
               <div className="viet">Em giải trên bảng lớp<br />Thầy chấm: <b>D</b> Đạt · <b>F</b> Chưa đạt</div>
               <div className="dai"><span><b>{g.doanDung}</b> đoán đúng · <b>{g.doanSai}</b> chưa</span><span className="vach"><i style={{ width: `${(g.doanDung / Math.max(1, g.doanDung + g.doanSai)) * 100}%` }} /></span><span className="ts">Tiếp sức {g.tiep}</span></div>
             </div>
-          ) : man === 'mo' && !l.tuLuan ? <>{l.phan === 'II' ? <><span className="bb-hang-ds" style={{ top: HANG_DS[0].top + 100 - 128 }}>Đúng</span><span className="bb-hang-ds" style={{ top: HANG_DS[1].top + 100 - 128 }}>Sai</span></> : null}{ongNhan.map((x, k) => x.gon
-              ? <div key={k} className={`bb-ong gon${x.dung ? ' dung' : ''}`} style={{ left: x.x - 1200, top: x.y }}><b>{x.nhan}</b> {x.dem} em</div>
-              : <div key={k} className="bb-ong" style={{ left: x.x - 1200, top: x.y }}><div className="nhan">{x.nhan}</div><div className="dem">{x.dem} em</div>{x.dung ? <div className="the">Đáp án</div> : null}</div>)}</>
-            : <div className="bb-dem"><b>{daGuiN}</b>/{coMat.length} em {l.tuLuan ? 'làm xong' : 'đã gửi'}{chuaBietS.size ? <span className="kb">trong đó {chuaBietS.size} em chưa biết làm</span> : null}</div>}
-          {man === 'mo' && !l.tuLuan && chuaBietS.size ? <div className="bb-kb-mo">{chuaBietS.size} em chưa biết làm · thầy chữa kĩ câu này</div> : null}
+          ) : null}
         </div>
         {luoi(o)}
-        {man === 'mo' && l.kich ? <div className="bb-kich">Vượt năng lượng hoạt hoá! {Object.values(l.ketQua ?? {}).filter((x) => x.dung).length}/{coMat.length} em đúng · cả lớp +{KJ.kichHoat} kJ</div> : null}
         {man === 'goi' && g && goiEm && !giaoTo ? (
           <>
             <div className="bb-mo-den" />
@@ -587,11 +616,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         ) : null}
         {toast ? <div className="bb-toast" role="status">{toast}</div> : null}
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
-        {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...TIEP, ['K', 'Đua ngọn lửa'], ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
-          : man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : man === 'lam-bang' ? [['D', `Đạt · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt vùng em viết' : 'Bật lại vùng em viết'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : [['L', 'Lên bảng · sang tờ chiếu cũ', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
-        'Tự động: hết giờ hoặc cả lớp gửi xong ⇒ gọi một em lên bảng. Chuyển câu khi chưa mở đáp án ⇒ máy tự chấm câu cũ.')}
+        {phim(man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
+          : [['D', `Đạt · em +${KJ.lenBangDatEm} · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt vùng em viết' : 'Bật lại vùng em viết'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']])}
       </>
     )
   }
@@ -601,7 +627,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       <div ref={san} className="bb-san" style={{ transform: `translate(-50%, -50%) scale(${k})` }}>
         <canvas ref={cv} className="bb-ve" aria-hidden="true" />
         {/* CHUYỂN CẢNH (09/11 «mượt mà trơn chu»): đổi màn lớn (điểm danh ⇄ câu ⇄ câu khác ⇄ đua / vinh danh) ⇒ cảnh mới rõ dần + trồi nhẹ; đổi pha trong một câu giữ nguyên đề. */}
-        <div key={man === 'diem-danh' || man === 'dua' || man === 'vinh-danh' ? man : `cau-${l?.so ?? 0}`} className="bb-canh">{noi}</div>
+        <div key={man === 'diem-danh' || man === 'vinh-danh' ? man : `cau-${l?.so ?? 0}`} className="bb-canh">{noi}</div>
         {chon && onChieuCau ? <Suspense fallback={<div className="bb-cho-chon">Đang mở bảng chọn câu…</div>}><ChonCauBpu buoiId={buoiId} lop={v?.lop ?? ''} buocDau={chon} onChieu={onChieuCau} onHoatDong={onHoatDong ? (hd) => { setChon(false); onHoatDong(hd) } : undefined} onKetThuc={onKetThuc ? () => onKetThuc(buoiId) : undefined} onDong={() => setChon(false)} /></Suspense> : null}
         {vietBang && l?.goi && goiEm ? <VungVietBang g={l.goi} em={goiEm} tenHien={(e: Em) => (an ? ten(e) : e.ten)} onBat={() => setBatLai(true)} /> : null}
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />

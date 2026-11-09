@@ -6,6 +6,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, waitFor } from '@testing-library/react'
 import type { TeacherExamSource } from '../src/data/examContent'
+import { useCoHoa2 as __coHoa2 } from '../src/components/chien-dich/co-hoa2'
+import { beforeEach as __truocMoi } from 'vitest'
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «load lại nhiều lần là lại hiện màn [Hôm nay đời cũ], bỏ hẳn đi»): máy chưa nhớ cờ ⇒ mặc định Game Hóa 2.0 BẬT;
+// tệp này viết cho giao diện cờ TẮT ⇒ đặt rõ cờ tắt trước mỗi ca.
+__truocMoi(() => { __coHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) })
 
 const de = (maDe: string, nI: number, nII: number): TeacherExamSource =>
   ({
