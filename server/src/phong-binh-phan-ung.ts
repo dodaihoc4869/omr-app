@@ -4,7 +4,7 @@
 // AN TOÀN ĐÁP ÁN: máy em chỉ nhận `viewEm` — không có đáp án tới khi thầy mở (khoá nhận bài TRƯỚC khi phát). Ngoại lệ niêm phong câu luyện tập KHÔNG áp dụng.
 // VAI: quyết định bằng VÉ (HMAC tiền tố riêng `bpu|`): vé thầy chỉ phát ở `/gv/bpu/mo` (sau chốt mã bí mật), vé em ở `/hs/bpu/ve` (token em). Cửa WebSocket
 // `/bpu/phong?ve=` nằm NGOÀI `/hs/` (như `/dau-ion/`), Worker kiểm vé rồi mới chuyển vào phòng ⇒ em không thể nhận vai thầy.
-// D1: mở phòng 1 đợt chờ (batch), mỗi lượt đọc câu + kiểm câu bảo vệ song song, KẾT THÚC buổi 1 batch ghi `bpu_luot` (bảng tạo lười). Công tắc: `TAT_BPU`.
+// D1: mở phòng 1 đợt chờ (batch ∥ năng lực chia đội), mỗi lượt đọc câu + kiểm câu bảo vệ song song, KẾT THÚC buổi 1 batch ghi `bpu_luot` (bảng tạo lười). Công tắc: `TAT_BPU`.
 import type { DurableObjectState, Env, WsMayChu } from './kieu'
 import * as L from '../../src/lib/bpu/phong'
 import { grade, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -84,18 +84,44 @@ export async function ghiTienTrinh(env: Env, buoiId: string, tt: unknown): Promi
   try { const r = await goiPhong(env, buoiHop(buoiId)!, '/tt-ghi', { tt: t }); return chuanTienTrinh(r.tt) } catch { return null }
 }
 
+// ── NĂNG LỰC để chia đội công bằng (thầy 09/11 «chia thật công bằng dựa trên năng lực của học sinh thông tin toàn bộ trên app») ──
+// Nguồn: SỔ HỌC `su_kien_hoc` (mọi lượt làm câu có chấm trên app — luyện tập, bài về nhà, kiểm tra, thi, Bình Phản Ứng đã ghi sổ…), 60 ngày gần nhất
+// (cùng cửa sổ với sức học `/gv/buoi-hoc/suc-hoc`), bỏ kết quả còn CHE (ca chưa công bố). CÔNG THỨC: tỉ lệ đúng CO VỀ 0,5 theo số câu đã làm
+//   nangLuc = (đúng + 0,5·K) / (đã làm + K), K = 10  ⇒ em chưa làm câu nào = 0,5; em làm ít câu không bị đẩy ra cực (3/3 đúng = 0,62, 60/80 = 0,72).
+// MỘT truy vấn GOM (GROUP BY sbd) chỉ cho em của buổi (lớp của buổi ∪ em đã điểm danh) — đi chỉ mục `idx_skh_em_ngay`; chạy SONG SONG với batch mở phòng.
+export const K_NANG_LUC = 10
+export const nangLucTuSo = (dung: number, daLam: number): number => L.nangLucCua((Math.max(0, dung) + 0.5 * K_NANG_LUC) / (Math.max(0, daLam) + K_NANG_LUC))
+/** Tên lớp hiệu lực trong SQL — đúng luật `tenLopCuaEm` (ten-lop.ts): đã gán ⇒ ten_lop; khối 12 ⇒ «12 - Lớp Thường»; rỗng ⇒ «Chưa xếp lớp»; còn lại ⇒ khối. */
+const SQL_TEN_LOP = "CASE WHEN TRIM(COALESCE(h.ten_lop, '')) <> '' THEN TRIM(h.ten_lop) WHEN TRIM(COALESCE(h.lop, '')) = '12' THEN '12 - Lớp Thường' WHEN TRIM(COALESCE(h.lop, '')) = '' THEN 'Chưa xếp lớp' ELSE TRIM(h.lop) END"
+const SQL_EM_CUA_BUOI = `SELECT sbd FROM buoi_hoc_diem_danh WHERE buoi_id = ? UNION SELECT h.sbd FROM hoc_sinh h JOIN buoi_hoc b ON b.id = ? AND TRIM(COALESCE(b.lop, '')) <> ''
+  WHERE COALESCE(h.trang_thai, '') <> 'khoa' AND ${SQL_TEN_LOP} = TRIM(b.lop)`
+const sqlNangLuc = (nguon: string, che: boolean) =>
+  `SELECT sbd, COUNT(*) AS n, SUM(CASE WHEN ket_qua = 1 THEN 1 ELSE 0 END) AS d FROM su_kien_hoc WHERE sbd IN (${nguon}) AND ngay_vn >= ? AND ket_qua IS NOT NULL${che ? " AND COALESCE(visibility, '') <> 'embargoed'" : ''} GROUP BY sbd`
+/** Ngày VN 59 ngày trước hôm nay (cửa sổ 60 ngày, như sức học). */
+const tuNgayNangLuc = (nay: number): string => new Date(Date.parse(new Date(nay + 7 * 3_600_000).toISOString().slice(0, 10) + 'T00:00:00Z') - 59 * 86_400_000).toISOString().slice(0, 10)
+/** sbd → năng lực (em vắng trong map ⇒ phòng tự dùng 0,5). `buoiId` ⇒ em của buổi; `sbd` ⇒ đúng các em đó. Sổ cũ chưa có cột `visibility` ⇒ đọc lại không lọc;
+ *  lỗi nữa ⇒ map rỗng (chia đội vẫn chạy, mọi em 0,5) — KHÔNG làm hỏng việc mở phòng. */
+export async function docNangLucBpu(env: Env, o: { buoiId: string } | { sbd: string[] }, nay = Date.now()): Promise<Map<string, number>> {
+  const [nguon, tham] = 'buoiId' in o ? [SQL_EM_CUA_BUOI, [o.buoiId, o.buoiId]] : ['SELECT value FROM json_each(?)', [JSON.stringify(o.sbd)]]
+  const tu = tuNgayNangLuc(nay)
+  const hoi = (che: boolean) => env.DB.prepare(sqlNangLuc(nguon, che)).bind(...tham, tu).all<Row>().then((r) => r.results ?? [])
+  const dong = await hoi(true).catch(() => hoi(false)).catch(() => [] as Row[])
+  return new Map(dong.map((x) => [str(x.sbd), nangLucTuSo(Number(x.d) || 0, Number(x.n) || 0)]))
+}
+
 // ── Lệnh Worker ──
 /** `POST /gv/bpu/mo { buoiId }` (sau chốt mã bí mật): dựng / cập nhật phòng của buổi từ danh sách lớp + điểm danh (MỘT batch D1), chặn khi lớp có ca kiểm tra mở. */
 export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> {
   if (!bpuBat(env)) return { ok: false, lyDo: 'tat', error: 'Bình Phản Ứng đang tắt.' }
   const buoiId = buoiHop(b.buoiId)
   if (!buoiId) return { ok: false, error: 'Chưa có buổi học. Thầy mở điểm danh trước.' }
-  const [buoiR, hsR, ddR, caR] = await env.DB.batch([
+  // Một đợt chờ: batch danh sách + năng lực (truy vấn riêng, SONG SONG — lỗi của nó không làm hỏng batch mở phòng).
+  const [[buoiR, hsR, ddR, caR], nangLuc] = await Promise.all([env.DB.batch([
     env.DB.prepare('SELECT id, ten, lop, dong_luc, het_han FROM buoi_hoc WHERE id = ?').bind(buoiId),
     env.DB.prepare("SELECT sbd, ho_ten, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'"),
     env.DB.prepare('SELECT d.sbd, d.luc, d.trang_thai, h.ho_ten, h.lop, h.ten_lop FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ?').bind(buoiId),
     env.DB.prepare("SELECT ma_ca, TRIM(COALESCE(lop, '')) AS lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi'"),
-  ]) as unknown as { results?: Row[] }[]
+  ]) as unknown as Promise<{ results?: Row[] }[]>, docNangLucBpu(env, { buoiId }, nay)])
   const buoi = buoiR?.results?.[0]
   if (!buoi) return { ok: false, error: 'Không tìm thấy buổi học này.' }
   if (buoi.dong_luc) return { ok: false, error: 'Buổi học này đã kết thúc.' }
@@ -116,7 +142,7 @@ export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> 
   const lopEm = new Set([...ds.keys()].map((s) => lopTheoSbd.get(s) ?? '').filter(Boolean))
   const caMo = (caR?.results ?? []).find((c) => lopEm.has(str(c.lop)) || (lopBuoi && str(c.lop) === lopBuoi))
   if (caMo) return { ok: false, lyDo: 'ca-mo', error: `Lớp đang có ca kiểm tra mở (${str(caMo.ma_ca)}). Gửi câu xuống máy lúc này sẽ làm gián đoạn bài thi của các em. Ca đóng xong thầy mở lại.` }
-  const r = await goiPhong(env, buoiId, '/khoi', { buoiId, lop: lopBuoi || str(buoi.ten), ds: [...ds.values()] })
+  const r = await goiPhong(env, buoiId, '/khoi', { buoiId, lop: lopBuoi || str(buoi.ten), ds: [...ds.values()].map((x) => ({ ...x, nangLuc: nangLuc.get(x.sbd) ?? 0.5 })) })
   if (!r.ok) return r
   // Em đã điểm danh trước khi thầy mở bảng ⇒ kênh đẩy mở màn chờ trên máy các em.
   await baoMayCacEm(env, [...ds.values()].filter((x) => x.coMat).map((x) => x.sbd), 'bpu').catch(() => 0)
@@ -187,8 +213,12 @@ export async function baoPhongVaoLop(env: Env, buoiId: unknown, sbd: string): Pr
   if (!bpuBat(env) || !id || !sbd) return
   // Kèm HỌ TÊN (thầy 07/11: buổi «Mọi lớp» ⇒ phòng mở không có sẵn danh sách lớp ⇒ em điểm danh không hiện trên bảng): phòng tự thêm em chưa có trong
   // danh sách (tự chia đội). Chạy nền sau câu trả lời điểm danh — một lệnh D1 nhỏ, không thêm vòng chờ cho em.
-  const h = await env.DB.prepare('SELECT ho_ten FROM hoc_sinh WHERE sbd = ? LIMIT 1').bind(sbd).first<Row>().catch(() => null)
-  await goiPhong(env, id, '/vao', { sbd, ten: str(h?.ho_ten) || sbd }).catch(() => null)
+  // Năng lực của em đọc SONG SONG với họ tên (một đợt chờ): em chưa có trong danh sách phòng (buổi «Mọi lớp») vẫn được xếp đội theo năng lực thật.
+  const [h, nl] = await Promise.all([
+    env.DB.prepare('SELECT ho_ten FROM hoc_sinh WHERE sbd = ? LIMIT 1').bind(sbd).first<Row>().catch(() => null),
+    docNangLucBpu(env, { sbd: [sbd] }),
+  ])
+  await goiPhong(env, id, '/vao', { sbd, ten: str(h?.ho_ten) || sbd, nangLuc: nl.get(sbd) ?? 0.5 }).catch(() => null)
 }
 /** Kết thúc phòng của buổi (thầy kết thúc buổi học). Phòng chưa từng mở ⇒ không làm gì. */
 export async function dongPhongBpu(env: Env, buoiId: unknown): Promise<void> {
@@ -308,12 +338,12 @@ export class PhongBinhPhanUng {
       return json({ ok: true, tt: moi })
     }
     if (u.pathname === '/khoi') {
-      const ds = (Array.isArray(b.ds) ? b.ds : []) as { sbd: string; ten: string; coMat: boolean; luc: number | null }[]
+      const ds = (Array.isArray(b.ds) ? b.ds : []) as { sbd: string; ten: string; coMat: boolean; luc: number | null; nangLuc?: number }[]
       let st = await this.doc()
       if (!st || st.ketThuc || st.buoiId !== str(b.buoiId)) {
         if (st?.ketThuc) await this.ghiD1()
         st = L.taoPhong({ buoiId: str(b.buoiId), lop: str(b.lop), nay, ds })
-      } else for (const x of ds) { if (!st.ds.some((e) => e.sbd === x.sbd)) L.themEm(st, x.sbd, x.ten); if (x.coMat) L.vaoLop(st, x.sbd, x.luc ?? nay) } // em mới của lớp: thêm (CHƯA vào) — trước đây thêm là tính luôn có mặt
+      } else for (const x of ds) { L.themEm(st, x.sbd, x.ten, x.nangLuc); if (x.coMat) L.vaoLop(st, x.sbd, x.luc ?? nay) } // em mới của lớp: thêm (CHƯA vào); em cũ: cập nhật năng lực, KHÔNG dời đội
       this.st = st
       await this.luu(); this.phat()
       return json({ ok: true })
@@ -321,7 +351,7 @@ export class PhongBinhPhanUng {
     const st = await this.doc()
     if (!st || st.ketThuc) return json({ ok: false, lyDo: 'chua-mo', error: 'Phòng chưa mở. Thầy bấm mở Bình Phản Ứng trước.' })
     if (u.pathname === '/vao') {
-      const co = L.vaoLop(st, str(b.sbd), nay, str(b.ten) || undefined)
+      const co = L.vaoLop(st, str(b.sbd), nay, str(b.ten) || undefined, typeof b.nangLuc === 'number' ? b.nangLuc : undefined)
       // Em vừa điểm danh ⇒ kênh đẩy mở màn chờ trên máy em (phòng gửi — không phải ngăn của em gọi lại chính nó).
       if (co) { await this.luu(false); this.phat(); this.ctx.waitUntil(baoMayCacEm(this.env, [str(b.sbd)], 'bpu').catch(() => 0)) }
       return json({ ok: co })
@@ -355,6 +385,7 @@ export class PhongBinhPhanUng {
         this.gui(ws, JSON.stringify({ t: 'tra-kq', ...r }))
         doi = r.ok
       } else if (j.t === 'roi') doi = L.roiMan(st, s, nay)
+      else if (j.t === 've') doi = L.veMan(st, s, nay) // em quay lại app sau `roi` (thầy 09/11: bảng tắt báo động của em)
       else if (j.t === 'doan') doi = L.duDoan(st, s, j.v ? 1 : 0, nay)
       else if (j.t === 'tiep') { doi = L.tiepSuc(st, s, nay); gom = true }
       else if (j.t === 'vao') doi = L.vaoLop(st, s, nay)
@@ -372,7 +403,7 @@ export class PhongBinhPhanUng {
     if (gom) this.phatSau(); else this.phat()
   }
 
-  async webSocketClose(): Promise<void> { /* rời màn do máy em tự báo; mất mạng không bị tính */ }
+  async webSocketClose(): Promise<void> { /* rời màn do máy em tự báo (`roi` / `ve`); rớt kết nối KHÔNG tính rời, không vào `roiNay` */ }
   async webSocketError(): Promise<void> { /* như trên */ }
   /** Hẹn giờ: lượt đang làm quá mốc ⇒ tự mở đáp án rồi hẹn mốc 24 giờ; chưa tới mốc ⇒ hẹn lại; không còn lượt mở ⇒ hết 24 giờ không thao tác ⇒ kết thúc. */
   async alarm(): Promise<void> {
