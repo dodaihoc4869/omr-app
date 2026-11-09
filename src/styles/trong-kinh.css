@@ -12,6 +12,9 @@ html[data-trong='hs'] .kb-hero { position: relative; display: grid; grid-templat
   padding: 18px 16px 14px 20px; border-radius: 30px; background: var(--kinh-mat); box-shadow: inset 0 1px 0 var(--kinh-vien), inset 0 0 0 1px var(--kinh-vien-2), var(--kinh-bong); overflow: hidden; }
 html[data-trong='hs'] .kb-hero-chu { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 html[data-trong='hs'] .kb-nhan { font-size: 13.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--tr-chu-3); }
+/* khối B (10/11): nhãn loại ngày mang màu của loại (học mới chàm · sửa lỗi hồng — đúng SAC_POP); đủ mức (dòng dưới) vẫn thắng */
+html[data-trong='hs'] .kb-hero[data-loai='moi'] .kb-nhan { color: var(--tr-hs-chu); }
+html[data-trong='hs'] .kb-hero[data-loai='sua'] .kb-nhan { color: var(--tr-sai-chu); }
 html[data-trong='hs'] .kb-hero[data-du] .kb-nhan { color: var(--tr-tim-chu); }
 html[data-trong='hs'] .kb-so { font-size: clamp(52px, 17vw, 72px); font-weight: 800; line-height: .92; letter-spacing: -.04em; color: var(--tr-chu); white-space: nowrap; font-variant-numeric: tabular-nums; }
 html[data-trong='hs'] .kb-so small { font-size: .36em; font-weight: 750; letter-spacing: -.01em; color: var(--tr-chu-3); margin-left: 3px; }

@@ -47,14 +47,16 @@ export function chiaChang(so: SoHomNay): { co: number; tt: 'xong' | 'dang' | 'ch
 /** Chữ nút học — MỘT nút cho cả màn (Hôm nay và Hành trình dùng chung).
  *  Gói 7 kho thiếu (khẩn 12/10 21h30): hết việc xếp được mà chưa đủ mức ⇒ "Hôm nay còn N câu chờ thầy bổ sung" (nút khoá); còn việc xếp được nhưng ít
  *  hơn phần còn lại của mức ⇒ nút VẪN BẤM ĐƯỢC, nói đúng số câu sẵn sàng ("Học tiếp · 1 câu sẵn sàng") — số "Còn N câu" phía trên vẫn theo M. */
-export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }): string {
+export function chuNutHoc(so: SoHomNay | null, hetCau: boolean, kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }, loaiNgay?: 'moi' | 'sua'): string {
   // (30/10) hết việc vì câu của bài đang khoá cho ca kiểm tra mở ⇒ nói đúng lý do (không phải thầy thiếu câu)
   if (hetCau && kho?.caThi) return 'Đang có ca kiểm tra · câu bài này mở lại khi ca đóng'
   if (hetCau) return kho?.choBoSung ? `Hôm nay còn ${kho.choBoSung} câu chờ thầy bổ sung` : 'Đã làm hết câu được giao'
-  if (!so) return 'Bắt đầu học'
+  // Khối B (10/11): ngày sửa lỗi ⇒ nút nói đúng việc («Bắt đầu sửa lỗi» / «Sửa lỗi tiếp»); ngày học mới và ngày không loại giữ chữ cũ
+  const sua = loaiNgay === 'sua'
+  if (!so) return sua ? 'Bắt đầu sửa lỗi' : 'Bắt đầu học'
   const con = Math.max(0, so.muc - so.daLam)
   if (con === 0) return so.changDangDo ? 'Học tiếp' : 'Học thêm'
-  const dau = so.daLam > 0 ? 'Học tiếp' : 'Bắt đầu học'
+  const dau = so.daLam > 0 ? (sua ? 'Sửa lỗi tiếp' : 'Học tiếp') : (sua ? 'Bắt đầu sửa lỗi' : 'Bắt đầu học')
   const sanSang = kho?.sanSang
   return sanSang !== undefined && sanSang > 0 && sanSang < con ? `${dau} · ${sanSang} câu sẵn sàng` : `${dau} · ${con} câu`
 }

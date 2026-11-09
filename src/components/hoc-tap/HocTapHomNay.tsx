@@ -208,7 +208,7 @@ export default function HocTapHomNay(p: Props) {
         {p.coCa && !mot && <section className="ht2-ca" aria-label="Ca kiểm tra đang mở"><span className="ht2-dong-bt" data-sac="cham" aria-hidden="true"><ClipboardCheck size={20} /></span><span className="ht2-ca-chu"><strong>Ca kiểm tra đang mở</strong><small>Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</small></span><button className="ht-nut-chinh ht2-nut-lon" onClick={p.onThi}>Vào ca kiểm tra<ArrowRight size={20} aria-hidden="true" /></button></section>}
 
         {MotTrang ? <MotTrang muc={muc} hs={p} ten={p.ten} thongBao={p.thongBao} so={so} dangTai={p.dangTai && !sanh} tenBai={tenBai} viec={viec} onHoc={p.onHoc} khoaHoc={khoaHoc} hetCau={con === 0} kho={kho}
-          coCa={p.coCa} onThi={p.onThi} token={p.token} soSua={soSua} onChua={() => p.onChua()} hinhSua={hinhTuSua()} kiem={kiem} ngayKiem={ngayKiem} onKiemTra={p.onKiemTra}
+          coCa={p.coCa} onThi={p.onThi} token={p.token} soSua={soSua} onChua={() => p.onChua()} hinhSua={hinhTuSua()} kiem={kiem} ngayKiem={ngayKiem} loaiNgay={goi7?.loaiNgay} onKiemTra={p.onKiemTra}
           soBaiTap={p.soBaiTap} coBaiTap={p.coBaiTap} onBaiTap={p.onBaiTap} ghi={ghi} />
           : muc === 'hom-nay' && <>
           {eKiem}

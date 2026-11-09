@@ -114,6 +114,8 @@ function useChoSo(bat: boolean): HTMLElement | null {
 }
 
 export interface PropsMotTrang {
+  /** Khối B (10/11): loại ngày máy chủ đã chốt — nhãn thẻ mức hôm nay + chữ / màu nút chính. Vắng ⇒ như cũ. */
+  loaiNgay?: 'moi' | 'sua'
   so: SoHomNay | null; dangTai: boolean; tenBai?: string; viec?: string
   onHoc: () => void; khoaHoc: boolean; hetCau: boolean; kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }
   coCa: boolean; onThi: () => void; token?: string
@@ -328,6 +330,8 @@ const chuCaiTen = (t?: string) => { const w = (t || '').trim().split(/\s+/).filt
 /** «Thứ Hai 02/11» theo giờ VN. */
 const ngayTuan = () => { const d = new Date(Date.now() + VN); return `${THU[d.getUTCDay()]} ${hai(d.getUTCDate())}/${hai(d.getUTCMonth() + 1)}` }
 const SAC_POP: Record<Nut['loai'], string> = { hoc: 'hs', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
+/** Khối B (10/11, thầy duyệt docs/ban-ve-moi-on-sua-0911): nhãn thẻ mức hôm nay theo loại ngày máy chủ chốt. */
+const NHAN_LOAI_NGAY = { moi: 'Ngày học mới', sua: 'Ngày sửa lỗi' } as const
 /** Tên dòng của một nút: chặng ⇒ «Chặng n» (thẻ bật ra cũ để tên bài), còn lại tên việc. Dòng phụ bỏ «Chặng n / m · » đứng đầu (đã ở tên). */
 const tenDong = (n: Nut, so: number) => n.loai === 'hoc' ? `Chặng ${so}` : n.dem && n.tt !== 'xong' ? `${n.pop.tieu} · ${n.dem} câu` : n.pop.tieu
 /** Dòng phụ như bản vẽ: chặng xong ⇒ «6 câu» · chặng đang học ⇒ «Học tiếp · còn 4 câu» · còn lại = lời thẻ bật ra cũ (bỏ «Chặng n / m · » đầu dòng). */
@@ -884,7 +888,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const moTp = (man: TenManThuong) => setTp({ man })
   const con = so ? Math.max(0, so.muc - so.daLam) : null
   const du = con === 0 && !so?.changDangDo
-  const nutHoc = chuNutHoc(so, p.hetCau, p.kho)
+  const nutHoc = chuNutHoc(so, p.hetCau, p.kho, p.loaiNgay)
   const kiemXong = !!kiem && (kiem.nopLuc !== null || kiem.trangThai === 'het_han')
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
   const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
@@ -1091,7 +1095,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }
     nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', cau: c.co, ten: `Chặng ${i + 1}: đã xong`,
       pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
-      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' && !(p.hetCau && !dangDoNay) ? (c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
+      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' && !(p.hetCau && !dangDoNay) ? (p.loaiNgay === 'sua' ? (c.phan > 0 ? 'Sửa lỗi tiếp' : 'Bắt đầu sửa lỗi') : c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
         soDoan, daDoan, khoaVong: `ddh.vong-chang.${ngayVn(Date.now())}.${sbdPhien() ?? ''}.${i}`,
         pop: { tieu: tenBaiThe, phu: (p.khoaHoc || p.hetCau) && !dangDoNay ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: p.hetCau && p.kho?.caThi && !dangDoNay ? 'Chờ ca kiểm tra đóng' : c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc && !dangDoNay } } }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
@@ -1142,10 +1146,10 @@ export function MotTrangHs(p: PropsMotTrang) {
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? <span className="kb-lop">{hs.lop}</span> : null}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
-      <section className="kb-hero" data-du={duNgay || undefined} aria-label={`Tổng câu hôm nay${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>
+      <section className="kb-hero" data-du={duNgay || undefined} data-loai={!p.ngayKiem ? p.loaiNgay : undefined} aria-label={`${!p.ngayKiem && p.loaiNgay ? NHAN_LOAI_NGAY[p.loaiNgay] : 'Tổng câu hôm nay'}${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>
         {loiLuaBi && <LoiBi key={`g${loiLuaBi[2]}`} cam={loiLuaBi[0]} loi={loiLuaBi[1]} cap={capLua} chanNgon={!!cn} goc />}
         <div className="kb-hero-chu">
-          <span className="kb-nhan">{duNgay ? 'Xong hết hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : 'Tổng câu hôm nay'}</span>
+          <span className="kb-nhan">{duNgay ? 'Xong hết hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : p.loaiNgay ? NHAN_LOAI_NGAY[p.loaiNgay] : 'Tổng câu hôm nay'}</span>
           {coTong ? <div className="kb-so">{daNgay}<small>/{tongNgay} câu</small></div> : <span className="mot-xuong" aria-hidden="true" />}
           <p className="kb-dong-hero" role={!coTong && p.dangTai ? 'status' : undefined}>{!coTong ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : duNgay ? 'Xong hết việc hôm nay — tới điểm tương đương, dung dịch đã hồng!' : p.ngayKiem || khoaKt ? `Còn ${tongNgay - daNgay} câu · làm Kiểm tra ôn tập trước, rồi mới học chặng.` : `Còn ${tongNgay - daNgay} câu nữa là dung dịch đổi màu.`}</p>
         </div>
@@ -1177,7 +1181,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {/* 28/10 tối (ảnh thầy giờ cao điểm: Lộ trình chỉ có nút Sửa lỗi): Sảnh chưa về ⇒ chưa vẽ đường (nút Sửa lỗi về trước làm em tưởng hết bài), báo đang tải. */}
       {/* NÚT CHÍNH (viên thuốc lớn + ô bánh quy 12 múi): đúng việc của nút đang làm trên danh sách (cùng onClick thẻ bật ra cũ) */}
       {(() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d) return null; const Ic = HINH_NUT[d.loai]
-        return <button type="button" className="kb-cta" data-sac={SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
+        return <button type="button" className="kb-cta" data-sac={d.loai === 'hoc' && p.loaiNgay === 'sua' && !p.ngayKiem ? 'sai' : SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
           <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? p.tenBai || 'Bài học hôm nay' : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}

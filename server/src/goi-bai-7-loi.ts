@@ -31,6 +31,24 @@ export const NGAY_MUC_CO_DINH = '2026-11-09'
 export const mucUocGoi7 = (ngay: string, toiThieuTang: number, tongQuota: number, homNay = ''): number =>
   ngay >= NGAY_MUC_CO_DINH || (homNay !== '' && ngay >= homNay) ? MUC_NGAY_CO_DINH : Math.max(Math.max(0, Math.floor(Number(toiThieuTang) || 0)), Math.max(0, Math.floor(Number(tongQuota) || 0)))
 
+/** LOẠI NGÀY (khối B đợt 1 — thầy 09/11 duyệt bản vẽ docs/ban-ve-moi-on-sua-0911 «duyệt, build và đẩy lên bản sống luôn»): mỗi em mỗi ngày là NGÀY HỌC MỚI
+ *  (28 câu mới của bài đúng ma trận; thiếu câu mới mới lấp bằng sửa / ôn) hoặc NGÀY SỬA LỖI (câu em sai trước, không giới hạn ⅓ như ngày thường; thiếu thì
+ *  ôn rồi câu mới cho đủ 28). Chốt MỘT lần ở lần mở đầu ngày (bảng `goi_bai_7_loai_ngay`, cùng lô với dòng mức 28), mọi lần sau đọc lại ⇒ không đổi giữa ngày.
+ *  Từ `NGAY_LOAI_NGAY` (10/11) — ngày trước giữ nguyên kế hoạch cũ (không đổi bài các em đang làm tối 09/11). Ngày Kiểm tra ôn tập: app vẫn hiện nhãn riêng. */
+export type LoaiNgay7 = 'moi' | 'sua'
+export const NGAY_LOAI_NGAY = '2026-11-10'
+/** Ngày sửa lỗi khi em có từ chừng này câu sai đang chờ sửa (≈ nửa ngày) và hai ngày có loại gần nhất đều là học mới — «cứ 2 ngày Mới chen 1 ngày Sửa». */
+export const SO_LOI_NGAY_SUA = 12
+export const laLoaiNgay7 = (v: unknown): v is LoaiNgay7 => v === 'moi' || v === 'sua'
+/** Luật chọn loại ngày (thuần). `truoc` = loại của các ngày ĐÃ CÓ LOẠI gần nhất, mới trước. null ⇒ không gắn loại (kế hoạch như cũ). */
+export function chonLoaiNgay7(a: { ngay: string; truoc: readonly string[]; soSua: number; soMoiCon: number; kiemNhe?: boolean }): LoaiNgay7 | null {
+  if (a.ngay < NGAY_LOAI_NGAY || a.kiemNhe) return null
+  // hết câu mới của mọi bài đang luyện: còn lỗi ⇒ sửa; không còn gì ⇒ không gắn loại (ngày ôn như cũ, không nói «học mới» sai sự thật)
+  if (a.soMoiCon <= 0) return a.soSua > 0 ? 'sua' : null
+  if (a.soSua >= SO_LOI_NGAY_SUA && a.truoc[0] === 'moi' && a.truoc[1] === 'moi') return 'sua'
+  return 'moi'
+}
+
 const DEM_CAU7 = new WeakMap<CauGoi7, { ngay: string; bm: number; o: string }>()
 /** Quota phủ bài không bị tỷ lệ ôn/sửa ăn mất. Câu chưa sẵn sàng chỉ mở học có hỗ trợ. */
 export function chonGoi7(a: {
@@ -52,6 +70,8 @@ export function chonGoi7(a: {
   /** Câu em GẶP LẦN ĐẦU HÔM NAY (nằm trong `daGap`): vẫn đứng trong dãy ma trận của ngày rồi mới bỏ ra ⇒ lập lại giữa ngày không đổi phần câu mới còn lại,
    *  em làm câu nào trước cũng vậy. Vắng ⇒ mọi câu `daGap` tính là đã rút trước hôm nay. */
   gapHomNay?: ReadonlySet<string>
+  /** Khối B (10/11): 'sua' ⇒ câu sửa không bị giới hạn ⅓ mức (ngày sửa lỗi). Câu mới theo loại ngày do nơi gọi đặt qua `nhomPhu` quota. Vắng ⇒ như cũ. */
+  loaiNgay?: LoaiNgay7 | null
 }): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
@@ -106,7 +126,7 @@ export function chonGoi7(a: {
   }
   // Giữ chỗ cho cả lỗi và kiến thức cũ; không sinh nhiệm vụ giả để đủ số.
   const con = Math.max(0,muc-viec.length)
-  them(a.sua, 'sua', Math.min(Math.max(0,con-giuOn),Math.max(4,Math.ceil(muc/3))))
+  them(a.sua, 'sua', Math.min(Math.max(0,con-giuOn),a.loaiNgay==='sua'?con:Math.max(4,Math.ceil(muc/3))))
   them(a.on, 'on', Math.max(0,muc-viec.length))
   them(moi.map(q=>q.qid), 'moi', Math.max(0,muc-viec.length))
   for(const q of moi){if(viec.length>=muc)break;if(used.has(q.qid))continue;const huongDan=!a.sanSang.has(q.qid);viec.push({qid:q.qid,vai:huongDan?'tiep_can':'moi',huongDan});used.add(q.qid)}

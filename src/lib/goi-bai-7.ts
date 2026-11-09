@@ -4,6 +4,8 @@ export interface TomTatGoi7 {
   tang?:Tang7
   /** (30/10, CHỈ-THÊM) số câu bài em chưa gặp đang khoá vì ca kiểm tra mở (bảo vệ đề). Vắng ⇒ 0. */
   khoaCaThi?:number
+  /** Khối B (10/11, CHỈ-THÊM): loại ngày đã chốt — 'moi' ngày học mới · 'sua' ngày sửa lỗi. Vắng ⇒ nhãn như cũ («Tổng câu hôm nay»). */
+  loaiNgay?:'moi'|'sua'
   kienThucCu:{tong:number;dat:number;tyLe:number|null}
   /** `tang` (đợt 19, CHỈ-THÊM) = tầng đang luyện của bài; vắng ⇒ thẻ bài không ghi tầng. */
   goi:{id:string;ten:string;batDau:string;han:string;tong:number;daGap:number;con:number;quota:number;gapHomNay:number;quaHan:boolean;canBoSung:number;nguonDayDu?:boolean;to:string[];tang?:Tang7}[]
@@ -52,5 +54,5 @@ export function docTomTatGoi7(x:unknown):TomTatGoi7|undefined {
   if(!goi.length)return
   const tang = docTang(x.tang)
   return { bat:true, ngay:x.ngay, toiThieu:x.toiThieu, daLamHomNay:x.daLamHomNay, tuLamCon:so0(x.tuLamCon), tiepCanCon:so0(x.tiepCanCon), thieuPhu:so0(x.thieuPhu),
-    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), ...(so0(x.khoaCaThi)>0?{khoaCaThi:so0(x.khoaCaThi)}:{}), kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
+    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), ...(so0(x.khoaCaThi)>0?{khoaCaThi:so0(x.khoaCaThi)}:{}), ...(x.loaiNgay==='moi'||x.loaiNgay==='sua'?{loaiNgay:x.loaiNgay}:{}), kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
 }
