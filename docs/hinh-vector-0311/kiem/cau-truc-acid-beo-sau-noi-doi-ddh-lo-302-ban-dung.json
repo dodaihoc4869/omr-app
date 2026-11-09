@@ -1,0 +1,29 @@
+[
+  {
+    "i": 500,
+    "hash": "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+    "fileNguon": "anh/5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda.png",
+    "svg": "acid-beo-sau-noi-doi-ddh-4be871c9cd9ac85d66ba13a1db4b1b2da0a90a8eb555b3cf9e6dbe72ee47d797.svg",
+    "hashSvg": "4be871c9cd9ac85d66ba13a1db4b1b2da0a90a8eb555b3cf9e6dbe72ee47d797",
+    "byteSvg": 1934,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-20",
+        "de": "Dầu cá chứa hai loại acid béo chủ yếu là docosahexaenoic acid (DHA) và eicosapentaenoic acid (EPA) có tác dụng bổ mắt, tăng cường thị lực. Mỗi viên dầu cá 400 mg chứa 18% EPA và 12% DHA về khối lượng. DHA và EPA có công thức như hình (hình trên: DHA; hình dưới: EPA).",
+        "refs": [
+          {
+            "hash": "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+            "where": "VIP27-CDK-ESTER-TN-II-20.hinh.0.du_lieu",
+            "hashDataUrl": "dbcbb21f18d3cad22c42f9ec3e6075f4458e94801569d80e01426d29aaa687f1"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22bareC2O/6CCdouble1COdouble/COOHleftOHdown/freeRIGHTDOWN/allthinuniform/regularDDH/noaddedCnums-H-stereo-caption-name-answer",
+    "hashSvgDaSoat": "4be871c9cd9ac85d66ba13a1db4b1b2da0a90a8eb555b3cf9e6dbe72ee47d797",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

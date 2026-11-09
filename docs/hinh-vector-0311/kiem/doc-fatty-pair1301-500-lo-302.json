@@ -1,0 +1,584 @@
+[
+  {
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-20",
+        "de": "Dầu cá chứa hai loại acid béo chủ yếu là docosahexaenoic acid (DHA) và eicosapentaenoic acid (EPA) có tác dụng bổ mắt, tăng cường thị lực. Mỗi viên dầu cá 400 mg chứa 18% EPA và 12% DHA về khối lượng. DHA và EPA có công thức như hình (hình trên: DHA; hình dưới: EPA).",
+        "allHinh": [
+          {
+            "hash": "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+            "where": "VIP27-CDK-ESTER-TN-II-20.hinh.0.du_lieu",
+            "hashDataUrl": "dbcbb21f18d3cad22c42f9ec3e6075f4458e94801569d80e01426d29aaa687f1"
+          },
+          {
+            "hash": "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657",
+            "where": "VIP27-CDK-ESTER-TN-II-20.hinh.1.du_lieu",
+            "hashDataUrl": "38ecebff4fec8ab081c87de5cee8062f92c41353c68167e55f188a752a3e5465"
+          }
+        ],
+        "missingHashes": [
+          "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+          "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "affectedQids": 1,
+      "requiresBothHashes": [
+        "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+        "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657"
+      ],
+      "newFullIfOnlyThisAdmitted": 0,
+      "newFullIfBothAdmitted": 1
+    },
+    "coordinateMeaning": "Nativepixelvertices andindividualinnerdoubleoffsets tracedfromactualsource; zero-basedvertexindices onlyforbuilder NOT toshowCnumbers. Countfromliteralvertices,notthepublicchemicalnames.",
+    "actualSvgReviewed": false,
+    "i": 1301,
+    "hash": "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657.png",
+    "size": [
+      661,
+      132
+    ],
+    "review": {
+      "nativeFullOpened": true,
+      "nativeMacro": "/workspace/scratch/1301-native3x.png",
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "classification": "Singleacyclicskeletalfattyacid; freeRIGHTendpoint, notring.",
+      "verticesCarbonylToFreeRight": [
+        [
+          65,
+          49
+        ],
+        [
+          110,
+          24
+        ],
+        [
+          155,
+          50
+        ],
+        [
+          155,
+          102
+        ],
+        [
+          200,
+          127
+        ],
+        [
+          246,
+          102
+        ],
+        [
+          246,
+          52
+        ],
+        [
+          290,
+          25
+        ],
+        [
+          336,
+          50
+        ],
+        [
+          336,
+          89
+        ],
+        [
+          381,
+          115
+        ],
+        [
+          426,
+          89
+        ],
+        [
+          426,
+          37
+        ],
+        [
+          471,
+          12
+        ],
+        [
+          517,
+          38
+        ],
+        [
+          517,
+          89
+        ],
+        [
+          561,
+          115
+        ],
+        [
+          607,
+          89
+        ],
+        [
+          607,
+          38
+        ],
+        [
+          652,
+          12
+        ]
+      ],
+      "carbonCount": 20,
+      "CCdoubleEdgesZeroBased": [
+        [
+          4,
+          5
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          16,
+          17
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            201,
+            121
+          ],
+          [
+            240,
+            98
+          ]
+        ],
+        [
+          [
+            290,
+            32
+          ],
+          [
+            330,
+            55
+          ]
+        ],
+        [
+          [
+            382,
+            108
+          ],
+          [
+            419,
+            85
+          ]
+        ],
+        [
+          [
+            472,
+            19
+          ],
+          [
+            511,
+            42
+          ]
+        ],
+        [
+          [
+            562,
+            108
+          ],
+          [
+            600,
+            85
+          ]
+        ]
+      ],
+      "COdoubleRays": [
+        [
+          [
+            65,
+            46
+          ],
+          [
+            27,
+            24
+          ]
+        ],
+        [
+          [
+            63,
+            53
+          ],
+          [
+            24,
+            30
+          ]
+        ]
+      ],
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          13,
+          15,
+          27,
+          30
+        ]
+      },
+      "OH": {
+        "text": "OH",
+        "anchor": "Ofirstglyph",
+        "bbox": [
+          57,
+          93,
+          83,
+          108
+        ],
+        "bond": [
+          [
+            65,
+            49
+          ],
+          [
+            65,
+            92
+          ]
+        ]
+      },
+      "counts": {
+        "O": 2,
+        "COdouble": 1,
+        "CCdouble": 5,
+        "explicitH": 0,
+        "caption": 0,
+        "Cnums": 0,
+        "charges": 0,
+        "wedgeDash": 0
+      },
+      "font": "OnlyO/OHlabels regularupright sans, allCClines thinuniform grayblack. No bold/namecaption.",
+      "noAdded": [
+        "chemicalnamecaption",
+        "carbonnumbers",
+        "H/CH3labels",
+        "E/Zletters",
+        "bondsfromtheory",
+        "cyclicclosingedge",
+        "normalizinglayout"
+      ]
+    }
+  },
+  {
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-20",
+        "de": "Dầu cá chứa hai loại acid béo chủ yếu là docosahexaenoic acid (DHA) và eicosapentaenoic acid (EPA) có tác dụng bổ mắt, tăng cường thị lực. Mỗi viên dầu cá 400 mg chứa 18% EPA và 12% DHA về khối lượng. DHA và EPA có công thức như hình (hình trên: DHA; hình dưới: EPA).",
+        "allHinh": [
+          {
+            "hash": "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+            "where": "VIP27-CDK-ESTER-TN-II-20.hinh.0.du_lieu",
+            "hashDataUrl": "dbcbb21f18d3cad22c42f9ec3e6075f4458e94801569d80e01426d29aaa687f1"
+          },
+          {
+            "hash": "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657",
+            "where": "VIP27-CDK-ESTER-TN-II-20.hinh.1.du_lieu",
+            "hashDataUrl": "38ecebff4fec8ab081c87de5cee8062f92c41353c68167e55f188a752a3e5465"
+          }
+        ],
+        "missingHashes": [
+          "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+          "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "affectedQids": 1,
+      "requiresBothHashes": [
+        "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+        "ebadb072c98aeeb9cf5f5cfb164efcc6df94f5714b87aa7eb4035e8d84cb1657"
+      ],
+      "newFullIfOnlyThisAdmitted": 0,
+      "newFullIfBothAdmitted": 1
+    },
+    "coordinateMeaning": "Nativepixelvertices andindividualinnerdoubleoffsets tracedfromactualsource; zero-basedvertexindices onlyforbuilder NOT toshowCnumbers. Countfromliteralvertices,notthepublicchemicalnames.",
+    "actualSvgReviewed": false,
+    "i": 500,
+    "hash": "5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5c0020a71d7db570450b9e4b774957fec7e1cfb3f18e3fe1dbca71ffa8585bda.png",
+    "size": [
+      700,
+      124
+    ],
+    "review": {
+      "nativeFullOpened": true,
+      "nativeMacro": null,
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "geometry": {
+      "classification": "Singleacyclicskeletalfattyacid; freeRIGHTendpoint, notring.",
+      "verticesCarbonylToFreeRight": [
+        [
+          60,
+          44
+        ],
+        [
+          104,
+          17
+        ],
+        [
+          149,
+          42
+        ],
+        [
+          149,
+          92
+        ],
+        [
+          193,
+          118
+        ],
+        [
+          238,
+          93
+        ],
+        [
+          238,
+          45
+        ],
+        [
+          282,
+          18
+        ],
+        [
+          327,
+          42
+        ],
+        [
+          327,
+          80
+        ],
+        [
+          372,
+          106
+        ],
+        [
+          415,
+          80
+        ],
+        [
+          415,
+          31
+        ],
+        [
+          460,
+          6
+        ],
+        [
+          504,
+          31
+        ],
+        [
+          504,
+          80
+        ],
+        [
+          548,
+          106
+        ],
+        [
+          592,
+          80
+        ],
+        [
+          592,
+          30
+        ],
+        [
+          637,
+          6
+        ],
+        [
+          681,
+          31
+        ],
+        [
+          681,
+          80
+        ]
+      ],
+      "carbonCount": 22,
+      "CCdoubleEdgesZeroBased": [
+        [
+          3,
+          4
+        ],
+        [
+          6,
+          7
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          12,
+          13
+        ],
+        [
+          15,
+          16
+        ],
+        [
+          18,
+          19
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            155,
+            89
+          ],
+          [
+            193,
+            111
+          ]
+        ],
+        [
+          [
+            244,
+            48
+          ],
+          [
+            282,
+            25
+          ]
+        ],
+        [
+          [
+            333,
+            77
+          ],
+          [
+            372,
+            99
+          ]
+        ],
+        [
+          [
+            421,
+            34
+          ],
+          [
+            460,
+            13
+          ]
+        ],
+        [
+          [
+            510,
+            77
+          ],
+          [
+            548,
+            99
+          ]
+        ],
+        [
+          [
+            598,
+            33
+          ],
+          [
+            637,
+            13
+          ]
+        ]
+      ],
+      "COdoubleRays": [
+        [
+          [
+            60,
+            41
+          ],
+          [
+            23,
+            19
+          ]
+        ],
+        [
+          [
+            58,
+            48
+          ],
+          [
+            20,
+            25
+          ]
+        ]
+      ],
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          9,
+          7,
+          23,
+          23
+        ]
+      },
+      "OH": {
+        "text": "OH",
+        "anchor": "Ofirstglyph",
+        "bbox": [
+          53,
+          84,
+          80,
+          99
+        ],
+        "bond": [
+          [
+            60,
+            44
+          ],
+          [
+            60,
+            81
+          ]
+        ]
+      },
+      "counts": {
+        "O": 2,
+        "COdouble": 1,
+        "CCdouble": 6,
+        "explicitH": 0,
+        "caption": 0,
+        "Cnums": 0,
+        "charges": 0,
+        "wedgeDash": 0
+      },
+      "font": "OnlyO/OHlabels regularupright sans, allCClines thinuniform grayblack. No bold/namecaption.",
+      "noAdded": [
+        "chemicalnamecaption",
+        "carbonnumbers",
+        "H/CH3labels",
+        "E/Zletters",
+        "bondsfromtheory",
+        "cyclicclosingedge",
+        "normalizinglayout"
+      ]
+    }
+  }
+]

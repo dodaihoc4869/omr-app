@@ -1,0 +1,14 @@
+{
+  "lo": 302,
+  "trangThai": "bi-loai-truoc-soat-doc-lap",
+  "oldHashes": [
+    "c1fff55dda93f577a36fc40e2a022f61aa40b98be85f977fe268564e730196fb",
+    "449710f7184b8e5ac90930a6c3d3c19876294def0bd1b65c723d51df6823da21"
+  ],
+  "reason": "Root actual FULL: hai tia carbonyl tách khỏi stem carbon ở cả2bản. Native crop6x riêng từng nguồn xác nhận tia trên gặp nhánh chéo lên và tia dưới gặp stem xuống.",
+  "finalHashes": [
+    "de8ea530c201af800b82c13409480431a77a2a674b4960d859fc781a4a325b77",
+    "4be871c9cd9ac85d66ba13a1db4b1b2da0a90a8eb555b3cf9e6dbe72ee47d797"
+  ],
+  "change": "Chỉ neo carbonylC1301y50→49/500y42→44 và2tia chân gặpstem đúngnative, giữ mọiCCdouble/vertices khác/glyph. Khôngoldpositivecarry; final cần soát độc lập exactnewSHA."
+}
