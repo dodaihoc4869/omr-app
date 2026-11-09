@@ -75,6 +75,13 @@ html[data-trong='hs']:not(#_) .duo .ht2-lam-y-nut button[aria-pressed='true']:nt
    biểu tượng + nút mang màu đúng / sai; vòng biểu tượng nền trang */
 html[data-trong='hs']:not(#_) .duo-day.duo-ket:is([data-tt=dung], [data-tt=sai]) { background: var(--tr-mat) !important; box-shadow: none !important; }
 html[data-trong='hs']:not(#_) .duo-day.duo-ket:is([data-tt=dung], [data-tt=sai]) .duo-kq-o { background: var(--tr-nen) !important; }
+/* 09/11 thầy (ảnh dải Duolingo sáng): «chế độ sáng … hiển thị nền như doligo khi bấm kiểm tra xong, hiện tại là màn trắng» ⇒ SÁNG: dải kết quả tô NỀN NHẠT theo
+   kết quả (đúng lục · sai hồng · chưa được tính lam ngọc), vòng biểu tượng giữ nền trang trắng. TỐI giữ nền thẻ trung tính (thầy 07/11, hai luật trên). */
+@media not all and (prefers-color-scheme: dark) {
+  html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=dung] { background: var(--tr-dung-nhat) !important; }
+  html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=sai] { background: var(--tr-sai-nhat) !important; }
+  html[data-trong='hs']:not(#_) .duo-day.duo-ket[data-tt=trung] { background: var(--tr-tin-nhat) !important; }
+}
 
 /* ── THANH TIẾN ĐỘ: phẳng ── */
 html[data-trong='hs']:not(#_) .duo-tren > .duo-thanh:not(:has(> .duo-doan)) { height: 8px !important; border-radius: 4px !important; background: var(--tr-mat-3) !important; box-shadow: none !important; }
