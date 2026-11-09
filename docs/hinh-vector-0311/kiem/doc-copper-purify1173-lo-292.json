@@ -1,0 +1,380 @@
+{
+  "i": 1173,
+  "hash": "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573.png",
+  "size": [
+    604,
+    337
+  ],
+  "manifestPresent": true,
+  "publicQuestions": [
+    {
+      "qid": "12-C5-B16-II-25",
+      "de": "Để tinh chế đồng từ một mẫu đồng không tinh khiết (chứa đồng và phần tạp chất còn lại không tham gia vào quá trình điện phân), một nhóm học sinh đã thực hiện thí nghiệm sau: nối mẫu đồng không tinh khiết với một điện cực và miếng đồng tinh khiết với điện cực còn lại của nguồn điện một chiều, rồi nhúng vào bình điện phân chứa dung dịch copper(II) sulfate; tiến hành điện phân với cường độ dòng điện 24 A; sau t giờ, các điện cực được lấy ra, làm khô và đem cân.\nKhối lượng các điện cực trước và sau điện phân (đơn vị gam): trước điện phân, mẫu đồng 1030 và đồng tinh khiết 155; sau t giờ, mẫu đồng 85,6 và đồng tinh khiết 980,0.\nGiả sử hiệu suất quá trình điện phân là 100%.\nBiết q = n(e)·F = I·t, trong đó q là điện lượng (C), n(e) là số mol electron đi qua dây dẫn, I là cường độ dòng điện (A), t là thời gian (giây), F là hằng số Faraday (96500 C/mol).",
+      "allHinh": [
+        {
+          "hash": "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573",
+          "where": "12-C5-B16-II-25.hinh.0.du_lieu",
+          "hashDataUrl": "8bd71344ad0e95bcf9653617c659da1b5b480785c241695c663b6adce0a4f3f2"
+        }
+      ],
+      "missingHashes": [
+        "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1173-native3x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native raster pixel positions and literal topology; no inferred electrochemical answer or new quantities.",
+  "geometry": {
+    "classification": "Flat gray textbook illustration of copper purification circuit, not apparatus photograph.",
+    "labels": [
+      {
+        "text": "Nguồn điện",
+        "bbox": [
+          250,
+          91,
+          377,
+          119
+        ],
+        "weight": "regular upright"
+      },
+      {
+        "text": "Đồng không\ntinh khiết",
+        "bbox": [
+          30,
+          190,
+          163,
+          240
+        ],
+        "weight": "regular upright"
+      },
+      {
+        "text": "Đồng\ntinh khiết",
+        "bbox": [
+          473,
+          190,
+          574,
+          240
+        ],
+        "weight": "regular upright"
+      },
+      {
+        "text": "Dung dịch CuSO₄",
+        "bbox": [
+          220,
+          269,
+          416,
+          295
+        ],
+        "weight": "regular upright; only4subscript"
+      }
+    ],
+    "beaker": {
+      "outline": "M16999 V270 Q169295 195297 H432 Q459291 459270 V99",
+      "openTop": true,
+      "liquidSurface": [
+        [
+          169,
+          166
+        ],
+        [
+          459,
+          166
+        ]
+      ],
+      "liquidFill": "flat light gray from surface166 to curved beakerbottom297, no texture/particles",
+      "wallStroke": "gray thin"
+    },
+    "sourceBox": {
+      "outline": [
+        [
+          290,
+          41
+        ],
+        [
+          337,
+          41
+        ],
+        [
+          337,
+          88
+        ],
+        [
+          290,
+          88
+        ],
+        [
+          290,
+          41
+        ]
+      ],
+      "fill": "white",
+      "inside": "blank; no polarity or meterletter",
+      "tinyTopMark": {
+        "bbox": [
+          313,
+          39,
+          317,
+          43
+        ],
+        "finding": "Tiny black/gray raster speck on topborder nearcenter visible in full3x, not readable character; retain as tiny border irregularity if tracing literally, do not turn into terminal/polarity/data."
+      }
+    },
+    "wires": [
+      {
+        "path": [
+          [
+            223,
+            191
+          ],
+          [
+            223,
+            64
+          ],
+          [
+            290,
+            64
+          ]
+        ],
+        "finding": "leftwirejoins impuritysolid upperboundary around223191"
+      },
+      {
+        "path": [
+          [
+            337,
+            64
+          ],
+          [
+            407,
+            64
+          ],
+          [
+            407,
+            194
+          ]
+        ],
+        "finding": "rightwirejoins upperedge of pureCu plate around407194"
+      }
+    ],
+    "leftImpureCopper": {
+      "fill": "medium flat gray",
+      "outlineApprox": [
+        [
+          192,
+          205
+        ],
+        [
+          199,
+          197
+        ],
+        [
+          214,
+          191
+        ],
+        [
+          225,
+          191
+        ],
+        [
+          236,
+          185
+        ],
+        [
+          243,
+          188
+        ],
+        [
+          249,
+          199
+        ],
+        [
+          257,
+          205
+        ],
+        [
+          258,
+          210
+        ],
+        [
+          252,
+          216
+        ],
+        [
+          253,
+          222
+        ],
+        [
+          257,
+          229
+        ],
+        [
+          255,
+          236
+        ],
+        [
+          251,
+          239
+        ],
+        [
+          255,
+          246
+        ],
+        [
+          252,
+          252
+        ],
+        [
+          244,
+          257
+        ],
+        [
+          238,
+          260
+        ],
+        [
+          233,
+          255
+        ],
+        [
+          226,
+          258
+        ],
+        [
+          220,
+          258
+        ],
+        [
+          212,
+          251
+        ],
+        [
+          209,
+          249
+        ],
+        [
+          204,
+          253
+        ],
+        [
+          199,
+          250
+        ],
+        [
+          195,
+          243
+        ],
+        [
+          191,
+          239
+        ],
+        [
+          191,
+          231
+        ],
+        [
+          193,
+          224
+        ],
+        [
+          198,
+          215
+        ],
+        [
+          196,
+          210
+        ],
+        [
+          192,
+          205
+        ]
+      ],
+      "style": "irregular lump silhouette, no spherical particles/internaltext"
+    },
+    "rightPureCopper": {
+      "outline": [
+        [
+          395,
+          191
+        ],
+        [
+          419,
+          198
+        ],
+        [
+          419,
+          250
+        ],
+        [
+          395,
+          244
+        ],
+        [
+          395,
+          191
+        ]
+      ],
+      "fill": "same mediumgray, thin darkstroke",
+      "geometry": "one quadrilateral plate in perspective, no inventedthicknesssideface"
+    },
+    "leaders": [
+      {
+        "from": [
+          150,
+          230
+        ],
+        "to": [
+          192,
+          230
+        ],
+        "head": "NONE; horizontal leftlabel leader crosses beakerwall and meetslump"
+      },
+      {
+        "from": [
+          472,
+          216
+        ],
+        "to": [
+          420,
+          216
+        ],
+        "head": "filled small LEFTpointing triangle atpureplate rightedge, approxvertices420216/432211/432221"
+      }
+    ],
+    "counts": {
+      "beakers": 1,
+      "electrodes": 2,
+      "sourceBoxes": 1,
+      "wireBranches": 2,
+      "leaderLines": 2,
+      "arrowheads": 1,
+      "chemicalLabels": 1
+    },
+    "noAdded": [
+      "+/- polarity",
+      "anode/cathode labels",
+      "electrons",
+      "Cu2+ ions",
+      "bubbles",
+      "sludge particles",
+      "flow/current arrows",
+      "meterletters",
+      "quantity/current24A in figure",
+      "title/caption from theory"
+    ]
+  },
+  "actualSvgReviewed": true,
+  "lo": 292,
+  "rootNativeFullOpened": true,
+  "hashSvg": "006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc",
+  "verdict": "Đạt sau root nativeFULL/allrefs/freshactual3x và readonly riêng exacthash; khép1câu."
+}

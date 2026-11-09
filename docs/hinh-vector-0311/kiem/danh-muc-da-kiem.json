@@ -7030,6 +7030,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573": {
+      "tep": "tinh-che-dong-ddh-006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc.svg",
+      "hashSvg": "006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc",
+      "byteSvg": 30865,
+      "byteGzip": 5339,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "c069ff79367e82b158e50e64bbe1cae9a480fa9a2d32dd528f48cb42295f036c": {
       "tep": "bromo-benzene-co-che-ddh-f8462615f665e44a6de2669810453a6b0de4ef33310574d4a00b8ef787d12f43.svg",
       "hashSvg": "f8462615f665e44a6de2669810453a6b0de4ef33310574d4a00b8ef787d12f43",
@@ -12956,6 +12965,20 @@
           "where": "12-C5-B16-I-24.hinh.0.du_lieu",
           "hashDataUrl": "bbb6d92640b3a466fbc01c107fdd21fe9e5ab2baa6584e7c7835f0b2f122fe39",
           "vector": "hoa-ddh-d10f6e532938a44e8fde49e362275075ef26e2e2c851016063c6a5662c49dabb.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C5-B16-II-25",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573",
+          "where": "12-C5-B16-II-25.hinh.0.du_lieu",
+          "hashDataUrl": "8bd71344ad0e95bcf9653617c659da1b5b480785c241695c663b6adce0a4f3f2",
+          "vector": "tinh-che-dong-ddh-006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc.svg"
         }
       ]
     },
@@ -28896,6 +28919,7 @@
     "12-C4-B12-II-7",
     "12-C5-B16-II-6",
     "12-C5-B16-I-24",
+    "12-C5-B16-II-25",
     "12-C4-B13-I-5",
     "12-C4-B13-I-15",
     "12-C4-B13-II-2",

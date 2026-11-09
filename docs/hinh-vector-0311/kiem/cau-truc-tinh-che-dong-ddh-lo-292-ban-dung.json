@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1173,
+    "hash": "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573",
+    "fileNguon": "anh/d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573.png",
+    "svg": "tinh-che-dong-ddh-006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc.svg",
+    "hashSvg": "006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc",
+    "byteSvg": 30865,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C5-B16-II-25",
+        "de": "Để tinh chế đồng từ một mẫu đồng không tinh khiết (chứa đồng và phần tạp chất còn lại không tham gia vào quá trình điện phân), một nhóm học sinh đã thực hiện thí nghiệm sau: nối mẫu đồng không tinh khiết với một điện cực và miếng đồng tinh khiết với điện cực còn lại của nguồn điện một chiều, rồi nhúng vào bình điện phân chứa dung dịch copper(II) sulfate; tiến hành điện phân với cường độ dòng điện 24 A; sau t giờ, các điện cực được lấy ra, làm khô và đem cân.\nKhối lượng các điện cực trước và sau điện phân (đơn vị gam): trước điện phân, mẫu đồng 1030 và đồng tinh khiết 155; sau t giờ, mẫu đồng 85,6 và đồng tinh khiết 980,0.\nGiả sử hiệu suất quá trình điện phân là 100%.\nBiết q = n(e)·F = I·t, trong đó q là điện lượng (C), n(e) là số mol electron đi qua dây dẫn, I là cường độ dòng điện (A), t là thời gian (giây), F là hằng số Faraday (96500 C/mol).",
+        "refs": [
+          {
+            "hash": "d3defda670f51ca32de49f5ad447d04c0e7f9d1ccc9f6805db1632bcf45c6573",
+            "where": "12-C5-B16-II-25.hinh.0.du_lieu",
+            "hashDataUrl": "8bd71344ad0e95bcf9653617c659da1b5b480785c241695c663b6adce0a4f3f2"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1openbeakergrayliquid/1blankpowersquare2wires/leftirregularcopper-rightslantedquadrilateral/leftleaderNOhead-rightfilledLEFThead/6regulartextlines4labelblocks/sub4/noaddedpolarity-ions-bubbles-current-masses-answer.",
+    "hashSvgDaSoat": "006544d0e27c84ce81499e4c5c7f1b634976638c034541c8fe0e38a9e7b76fbc",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
