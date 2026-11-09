@@ -535,7 +535,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         <div className="bb-dd-dem"><b>{coMat.length}</b>/{ds.length} em có mặt</div>
         {luoi(o)}
         {loi ? <div className="bb-toast loi" role="alert">{loi.chu} · mã điểm danh vẫn dùng được</div> : null}
-        {phim([['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Đóng bảng']], 'Chiếu đề lên bảng: mỗi lần chuyển câu, câu tự gửi xuống máy các em có mặt, giờ tự tính theo câu (tối đa 3 phút).')}
+        {phim([['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Ra Hôm nay']], 'Chiếu đề lên bảng: mỗi lần chuyển câu, câu tự gửi xuống máy các em có mặt, giờ tự tính theo câu (tối đa 3 phút).')}
       </>
     )
   } else if (man === 'vinh-danh') {
@@ -552,7 +552,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
           <div className="bb-vd-buc">{top.map((e, i) => e ? <div key={e.sbd} className="bb-vd-cot" style={{ ['--m' as string]: ['var(--tr-tin)', 'var(--tr-sao)', 'var(--tr-chu-y)'][i] }}><div className="ngoc" style={{ width: [150, 196, 128][i] }}><Ngoc mau="var(--m)" /><Sao x={8} y={18} d={i * 0.4} /><Sao x={80} y={6} d={0.7 + i * 0.4} /><Sao x={92} y={62} d={1.3 + i * 0.4} /></div><div className="ten">{ten(e)}</div><div className="phu">{e.kj} kJ · đúng {e.dungSo}/{v.lichSu.filter((x) => !x.tuLuan).length} lượt</div><div className="bac" style={{ height: [190, 250, 140][i] }}><span>{[2, 1, 3][i]}</span></div></div> : <div key={i} className="bb-vd-cot" />)}</div>
           <div className="bb-vd-ben phai"><h3>Cả lớp hôm nay</h3><div className="bb-vd-so"><b>{tyLe}%</b><span>câu trả lời đúng</span></div>{kho ? <div className="bb-vd-so"><b>Lượt {kho.so}</b><span>khó nhất · {kho.soDung}/{kho.soGui} em đúng</span></div> : null}<div className="bb-vd-so"><b>{v.soLuot}</b><span>lượt đã chơi</span></div></div>
         </div>
-        {phim([['V', 'Đóng vinh danh', true], ...TIEP, ['Esc', 'Về tờ chiếu']])}
+        {phim([['V', 'Đóng vinh danh', true], ...TIEP, ['Esc', 'Ra Hôm nay']])}
       </>
     )
   } else if (l && (man === 'tra-loi' || man === 'mo' || quaTo === l.so)) {
@@ -565,7 +565,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     const coPa = !!q && hienPa && giai == null && !l.tuLuan && (l.phan === 'I' || l.phan === 'II')
     noi = (
       <>
-        {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}{onChieuCau ? <button type="button" className="bb-hoi bb-ve-chon" onClick={() => setChon('cau')}><kbd>C</kbd>Chọn câu khác</button> : null}</>)}
+        {tren(<><div className="bb-pill">Lượt {l.so}</div><span className="bb-chip">{loaiChu}</span>{chip}</>, <>{man === 'tra-loi' && l.han ? <div className="bb-gio">{gio(l.han - nay)}</div> : null}{onChieuCau && !chip ? <button type="button" className="bb-hoi bb-ve-chon" onClick={() => setChon('cau')}><kbd>C</kbd>Chọn câu khác</button> : null}</>)}
         <ThapLua v={v} l={l} truoc={dua.truoc} len={dua.len} tenGoi={tenGoi} tenHien={ten} an={an} toanMan={toanMan} roiNay={roiNay} che={giai != null || coPa} />
         {giai != null ? <div className="bb-giai" ref={giaiRef} tabIndex={-1} role="region" aria-label="Lời giải thu gọn" style={{ ...giay, boxSizing: 'border-box' }} dangerouslySetInnerHTML={{ __html: giai }} /> : null}
         {coPa && q ? (
@@ -576,8 +576,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         ) : null}
         {toast ? <div className="bb-toast" role="status">{toast}</div> : null}
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
-        {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ...TIEP, ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']]
-          : [['L', 'Lên bảng · sang tờ chiếu cũ', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Về tờ chiếu']],
+        {phim(man === 'mo' ? [...(coGiai ? [['G', giai != null ? 'Ẩn lời giải' : 'Lời giải thu gọn', true] as [string, string, boolean]] : []), ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ...TIEP, ['V', 'Vinh danh'], ['H', 'Ẩn tên'], ['Esc', 'Ra Hôm nay']]
+          : [['L', 'Lên bảng · sang tờ chiếu cũ', true], ...(!l.tuLuan && l.phan !== 'III' ? [['M', hienPa ? 'Ẩn phương án' : 'Hiện phương án'] as [string, string]] : []), ['O', l.tuLuan ? 'Xong lượt (thầy chữa)' : 'Mở đáp án ngay'], ...(coGiai ? [['G', 'Lời giải thu gọn'] as [string, string]] : []), ...TIEP, ['H', 'Ẩn tên'], ['Esc', 'Ra Hôm nay']],
         'Đề có trên máy các em; L đưa em lên bảng ở tờ chiếu cũ (đủ đề). G lời giải · M phương án: tấm giấy đè vùng tháp, bấm lại về màn đua.')}
       </>
     )
@@ -618,8 +618,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         ) : null}
         {toast ? <div className="bb-toast" role="status">{toast}</div> : null}
         {loi && v ? <div className="bb-toast loi" role="alert">{loi.chu}</div> : null}
-        {phim(man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']]
-          : [['D', `Đạt · em +${KJ.lenBangDatEm} · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt vùng em viết' : 'Bật lại vùng em viết'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Về tờ chiếu']])}
+        {phim(man === 'goi' ? [['Enter', 'Chiếu đề cho em làm', true], ['N', 'Chọn em khác'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Ra Hôm nay']]
+          : [['D', `Đạt · em +${KJ.lenBangDatEm} · đội +${KJ.lenBangDat}`, true], ['F', 'Chưa đạt'], ['N', 'Chọn em khác'], ['B', batLai ? 'Tắt vùng em viết' : 'Bật lại vùng em viết'], ['Space', 'Mở đáp án'], ...TIEP, ['Esc', 'Ra Hôm nay']])}
       </>
     )
   }

@@ -105,7 +105,7 @@ function veBang(): void {
   if (!hien) return
   ngheEsc()
   if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
-  cheTo(!tamAn && !bangAn())
+  cheTo(!tamAn && !bangAn() && !khung.classList.contains('bpu-no')) // đang phóng lại ⇒ tờ còn lộ dưới bảng tới khi phóng xong
   goc!.render(
     <BangBinhPhanUng
       key={hien.buoiId}

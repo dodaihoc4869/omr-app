@@ -48,10 +48,11 @@ export const JS_LEN_BANG_BPU = `
   }
   // 10/11 thầy «thẻ tên co vừa với tên, đẹp, chuyên nghiệp — thẻ chỉ hiện "Đỗ…"» (luật chung của tờ cắt tên một dòng bằng «…» trong ô hẹp):
   // thẻ của Bình Phản Ứng ÔM SÁT tên (bề ngang theo chữ, giữa cột), chỉ còn tên đầy đủ một dòng; tên dài hơn cột ⇒ thu cỡ chữ tới khi vừa, không «…».
-  var CSS_THE = '.mc-em.bpu-the{display:flex!important;align-items:center;justify-content:center;gap:clamp(10px,1vw,18px);justify-self:center;align-self:start;width:fit-content!important;max-width:100%!important;min-width:0!important;box-sizing:border-box;margin-left:auto!important;margin-right:auto!important;padding:clamp(8px,.8vw,16px) clamp(22px,2.2vw,44px)!important;text-align:center}'
-    + '.mc-em.bpu-the .mc-em-trai,.mc-em.bpu-the .mc-em-hang1,.mc-em.bpu-the .mc-ten-hang{display:flex!important;align-items:center;justify-content:center;gap:.4em;flex:0 1 auto!important;min-width:0!important;max-width:100%;width:auto!important}'
-    + '.mc-em.bpu-the .mc-ten{display:block;flex:none;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal!important;max-width:none!important;font-size:var(--bpu-co,clamp(30px,3vw,60px))!important;font-weight:800!important;line-height:1.15!important;letter-spacing:-.01em}'
-    + '.mc-em.bpu-the .mc-phu,.mc-em.bpu-the .mc-xem-ct,.mc-em.bpu-the .mc-thu,.mc-em.bpu-the .mc-ls{display:none!important}';
+  // Mọi luật kèm :not([hidden]) ⇒ display:flex!important không đè thuộc tính hidden khi tờ giấu thẻ.
+  var CSS_THE = '.mc-em.bpu-the:not([hidden]){display:flex!important;align-items:center;justify-content:center;gap:clamp(10px,1vw,18px);justify-self:center;align-self:start;width:fit-content!important;max-width:100%!important;min-width:0!important;box-sizing:border-box;margin-left:auto!important;margin-right:auto!important;padding:clamp(8px,.8vw,16px) clamp(22px,2.2vw,44px)!important;text-align:center}'
+    + '.mc-em.bpu-the:not([hidden]) .mc-em-trai,.mc-em.bpu-the:not([hidden]) .mc-em-hang1,.mc-em.bpu-the:not([hidden]) .mc-ten-hang{display:flex!important;align-items:center;justify-content:center;gap:.4em;flex:0 1 auto!important;min-width:0!important;max-width:100%;width:auto!important}'
+    + '.mc-em.bpu-the:not([hidden]) .mc-ten{display:block;flex:none;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:normal!important;max-width:none!important;font-size:var(--bpu-co,clamp(30px,3vw,60px))!important;font-weight:800!important;line-height:1.15!important;letter-spacing:-.01em}'
+    + '.mc-em.bpu-the:not([hidden]) .mc-phu,.mc-em.bpu-the:not([hidden]) .mc-xem-ct,.mc-em.bpu-the:not([hidden]) .mc-thu,.mc-em.bpu-the:not([hidden]) .mc-ls{display:none!important}';
   function theTen(the) {
     if (!document.getElementById('bpu-the-css')) { var st = document.createElement('style'); st.id = 'bpu-the-css'; st.textContent = CSS_THE; document.head.appendChild(st); }
     the.classList.add('bpu-the');

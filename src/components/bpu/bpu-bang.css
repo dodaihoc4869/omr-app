@@ -390,4 +390,5 @@ html[data-bpu-an] .bpu-bao-chay { display: none; }
 /* 10/11 thầy «chọn câu xong phải hiện ngay màn đua, không hiện tờ chiếu cũ trước» · «bấm Đóng lộ tờ một nhịp»: bảng đang ở trên ⇒ lớp phủ tờ chiếu
    (KhungXemPhieu, cổng thẳng vào body) ẩn hẳn, vẫn chạy ngầm; chỉ lộ khi bảng thu vào tờ lúc em lên bảng (gan-gv `cheTo`). */
 html[data-bpu-che-to] .lop-xem-phieu { visibility: hidden; }
-.bpu-bang .bb-tren .bb-ve-chon{ color: var(--tr-chu-2); } /* 10/11 «Chọn câu khác» (C) trên màn đua */
+.bpu-bang .bb-tren .bb-ve-chon{ color: var(--tr-chu-2); } /* 10/11 «Chọn câu khác» (C) trên màn đua; mở đáp án có thẻ «Lên bảng: …» ⇒ ẩn nút (phím C vẫn chạy) cho «Câu tiếp» không tràn mép */
+.bpu-bang .bb-tren .bb-pill[style]{ padding: 8px 14px; font-size: 23px; } /* thẻ «Lên bảng: tên · Đạt · …» gọn hơn: tên dài không đẩy «Câu tiếp» ra khỏi màn */

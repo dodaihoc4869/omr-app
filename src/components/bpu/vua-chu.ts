@@ -25,6 +25,7 @@ export function vuaChuTrong(goc: ParentNode | null | undefined, chon: string, mi
   if (!goc) return
   const ds = [...goc.querySelectorAll<HTMLElement>(chon)]
   // Đọc hết trước (một lần bố cục), rồi mới ghi.
-  const khoa = ds.map((el) => `${el.textContent}|${el.parentElement?.clientWidth ?? 0}|${el.parentElement?.clientHeight ?? 0}|${coGoc}`)
+  // Lớp của ô cha vào khoá: em vừa gửi ⇒ ô đổi lớp (chữ đậm hơn, rộng hơn) ⇒ đo lại.
+  const khoa = ds.map((el) => `${el.textContent}|${el.parentElement?.className ?? ''}|${el.parentElement?.clientWidth ?? 0}|${el.parentElement?.clientHeight ?? 0}|${coGoc}`)
   ds.forEach((el, i) => { if (el.dataset[KHOA] === khoa[i]) return; vuaChu(el, min, haiDong); el.dataset[KHOA] = khoa[i] })
 }
