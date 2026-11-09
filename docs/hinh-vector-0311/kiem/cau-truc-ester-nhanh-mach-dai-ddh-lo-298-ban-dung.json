@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1251,
+    "hash": "e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6",
+    "fileNguon": "anh/e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6.png",
+    "svg": "ester-nhanh-mach-dai-ddh-a280f314e95b31149de08f309a36f84c8490196ba9c3d12699f2683c8a9e7f0b.svg",
+    "hashSvg": "a280f314e95b31149de08f309a36f84c8490196ba9c3d12699f2683c8a9e7f0b",
+    "byteSvg": 1416,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-47",
+        "de": "Ethylhexyl palmitate (EHP) là một ester được tổng hợp từ palmitic acid và 2-ethylhexanol. Đây là một chất làm mềm phổ biến trong mỹ phẩm, có vai trò giúp sản phẩm dễ tán, thẩm thấu nhanh và giảm cảm giác nhờn dính trên da. Công thức khung phân tử của EHP như hình.",
+        "refs": [
+          {
+            "hash": "e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6",
+            "where": "VIP27-CDK-ESTER-TN-II-47.hinh.0.du_lieu",
+            "hashDataUrl": "8049d826a9d3f67a57a67b61cd8c8cb3a46722dc842f3a4d512cc54da91cd9ba"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "24bareC2O/acyl16vertices1COdouble2splitrays/esterO-DIRECTbranchC-UP2C-DOWNRIGHT5C/0CCdouble/allthinuniform/regularDDH/noaddedCH2-H-stereo-caption-name-answer/nochangeconnectivityfromstem.",
+    "hashSvgDaSoat": "a280f314e95b31149de08f309a36f84c8490196ba9c3d12699f2683c8a9e7f0b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

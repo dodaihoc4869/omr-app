@@ -1,0 +1,252 @@
+{
+  "i": 1251,
+  "hash": "e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6.png",
+  "size": [
+    278,
+    96
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-47",
+      "de": "Ethylhexyl palmitate (EHP) là một ester được tổng hợp từ palmitic acid và 2-ethylhexanol. Đây là một chất làm mềm phổ biến trong mỹ phẩm, có vai trò giúp sản phẩm dễ tán, thẩm thấu nhanh và giảm cảm giác nhờn dính trên da. Công thức khung phân tử của EHP như hình.",
+      "allHinh": [
+        {
+          "hash": "e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6",
+          "where": "VIP27-CDK-ESTER-TN-II-47.hinh.0.du_lieu",
+          "hashDataUrl": "8049d826a9d3f67a57a67b61cd8c8cb3a46722dc842f3a4d512cc54da91cd9ba"
+        }
+      ],
+      "missingHashes": [
+        "e376ce1113281ce2041784be29b2679c0a3c99bc0b6b841eed5b4310b89caba6"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native6xOpened": "/workspace/scratch/1251-native6x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native pixel centerlines traced fromactualsource; sourceconnectivity retained even if different from named ester in publicstem.",
+  "geometry": {
+    "classification": "One acyclic skeletal ester withbranchedalkoxygroup. No photo/reaction/caption.",
+    "acylChain": {
+      "verticesFreeLeftToCarbonyl": [
+        [
+          5,
+          64
+        ],
+        [
+          19,
+          56
+        ],
+        [
+          33,
+          64
+        ],
+        [
+          47,
+          56
+        ],
+        [
+          61,
+          64
+        ],
+        [
+          75,
+          56
+        ],
+        [
+          89,
+          64
+        ],
+        [
+          103,
+          56
+        ],
+        [
+          117,
+          64
+        ],
+        [
+          131,
+          56
+        ],
+        [
+          145,
+          64
+        ],
+        [
+          159,
+          56
+        ],
+        [
+          173,
+          64
+        ],
+        [
+          187,
+          56
+        ],
+        [
+          201,
+          64
+        ],
+        [
+          215,
+          56
+        ]
+      ],
+      "carbonCountIncludingCarbonyl": 16,
+      "style": "allthinuniformsinglelines; 15C-Csegments, leftfreeendpoint, noCH3glyph"
+    },
+    "esterO": {
+      "label": "O",
+      "bbox": [
+        210,
+        35,
+        222,
+        46
+      ],
+      "centerApprox": [
+        215,
+        40
+      ],
+      "bonds": [
+        [
+          [
+            215,
+            56
+          ],
+          [
+            215,
+            47
+          ]
+        ],
+        [
+          [
+            221,
+            37
+          ],
+          [
+            229,
+            32
+          ]
+        ]
+      ],
+      "note": "O attaches DIRECTLY to branching carbon22932; NOinterveningCH2endpoint. Do not remodel fromstem name."
+    },
+    "carbonylO": {
+      "label": "O",
+      "bbox": [
+        224,
+        59,
+        234,
+        70
+      ],
+      "doubleRays": [
+        [
+          [
+            216,
+            55
+          ],
+          [
+            225,
+            60
+          ]
+        ],
+        [
+          [
+            215,
+            58
+          ],
+          [
+            223,
+            63
+          ]
+        ]
+      ],
+      "note": "2shortdiagonalparallelrays, noaddedverticalconnector; gapsbeforeOinkpreserved"
+    },
+    "alkoxyBranch": {
+      "branchC": [
+        229,
+        32
+      ],
+      "upperArm": [
+        [
+          229,
+          32
+        ],
+        [
+          229,
+          16
+        ],
+        [
+          243,
+          8
+        ]
+      ],
+      "upperAdditionalC": 2,
+      "lowerRightArm": [
+        [
+          229,
+          32
+        ],
+        [
+          243,
+          40
+        ],
+        [
+          243,
+          56
+        ],
+        [
+          257,
+          64
+        ],
+        [
+          257,
+          80
+        ],
+        [
+          271,
+          88
+        ]
+      ],
+      "lowerAdditionalC": 5,
+      "totalCIncludingJunction": 8,
+      "note": "Junctionhasthreeheavyatomconnections O+upperC+lowerC. NoextravertexbetweenOandjunction."
+    },
+    "counts": {
+      "C": 24,
+      "O": 2,
+      "COdouble": 1,
+      "CCdouble": 0,
+      "explicitH": 0,
+      "caption": 0,
+      "Cnums": 0,
+      "charges": 0,
+      "wedgeDash": 0
+    },
+    "font": "Only2Olabels regularupright black chemicalglyphs, nativeverythinlinewidth at278px; no boldlabels.",
+    "noAdded": [
+      "CH2betweenOandbranchjunction",
+      "compoundnamecaption",
+      "carbonnumbers",
+      "Hlabels",
+      "stereo/wedges",
+      "charge",
+      "reactionarrow",
+      "correctingconnectivityfromnamed2-ethylhexylpalmitate"
+    ]
+  },
+  "actualSvgReviewed": false
+}

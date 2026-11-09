@@ -1,0 +1,109 @@
+{
+  "lo": 298,
+  "main": "c0beaa5ca9b3e2da145bf18ad66a0be67b41f92f",
+  "priorMain": "35f6baffbc2d73eb85cc56ec9d5555658f7341de",
+  "merged": false,
+  "fontFilesChangedInMainSincePrior": false,
+  "branchProductionChanged": false,
+  "colorBaseline": {
+    "violations": 704,
+    "checkerFiles": 125
+  },
+  "sizeBaseline": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainScope": "Main thay Bình Phản Ứng/Điểm danh/loại ngày Gói7; không đổi font/mốc so297; chưa gộp.",
+  "speedBaselineLatestMain": {
+    "sha256": "df34ce749d3bd14432f27e18f042cf99ae6374d0a9647df2a6ea6be2ff97d334",
+    "mayChu": {
+      "sanh-lan-dau": {
+        "dot": 12,
+        "lenh": 21
+      },
+      "sanh-lan-sau": {
+        "dot": 1,
+        "lenh": 2
+      },
+      "mo-chang": {
+        "dot": 2,
+        "lenh": 4
+      },
+      "nop-cau": {
+        "dot": 7,
+        "lenh": 9
+      },
+      "dem-hom-nay": {
+        "dot": 1,
+        "lenh": 1
+      }
+    },
+    "taiApp": {
+      "giao-vien": {
+        "tep": 11,
+        "gzip": 180652
+      },
+      "hoc-sinh": {
+        "tep": 35,
+        "gzip": 231877
+      },
+      "phu-huynh": {
+        "tep": 20,
+        "gzip": 167025
+      }
+    },
+    "taiDuong": {
+      "thay /gv": {
+        "gzip": 182744
+      },
+      "phieu /p": {
+        "gzip": 235396
+      },
+      "phu-huynh /ph": {
+        "gzip": 168734
+      },
+      "thi /t": {
+        "gzip": 260602
+      },
+      "dang-nhap-hs /hs": {
+        "gzip": 129730
+      },
+      "cong-hs /hs (đã đăng nhập)": {
+        "gzip": 243803
+      }
+    },
+    "requiredBeforeMergeRelease": true,
+    "branchStillUnmerged": true
+  },
+  "diffFiles": [
+    "DIEU-PHOI.md",
+    "docs/viec-giao-codex.md",
+    "server/src/goi-bai-7-loai-ngay.ts",
+    "server/src/goi-bai-7-loi.ts",
+    "server/src/goi-bai-7-schema.ts",
+    "server/src/goi-bai-7.ts",
+    "server/src/reset-hoa2.ts",
+    "server/src/reset-toan-app.ts",
+    "src/components/bpu/BangBinhPhanUng.tsx",
+    "src/components/bpu/ManBinhPhanUng.tsx",
+    "src/components/bpu/TamHoatDong.tsx",
+    "src/components/bpu/bpu-bang.css",
+    "src/components/bpu/bpu-hs.css",
+    "src/components/bpu/gan-gv.tsx",
+    "src/components/bpu/tam-hoat-dong.css",
+    "src/components/hoc-tap/HocTapHomNay.tsx",
+    "src/components/hoc-tap/TrongHs.tsx",
+    "src/components/hoc-tap/loai-ngay.ts",
+    "src/components/hom-nay-thay/NutDiemDanh.tsx",
+    "src/lib/bpu/diem-danh-nhanh.ts",
+    "src/lib/goi-bai-7.ts",
+    "src/lib/len-bang-bpu-to-chieu.ts",
+    "src/screens/gv-hom-nay.css",
+    "src/styles/phang-hs.css",
+    "src/styles/trong-kinh.css",
+    "tests/bpu-giao-dien-0611.test.tsx",
+    "tests/diem-danh-hom-nay-0911.test.ts",
+    "tests/loai-ngay-1011.test.ts",
+    "tests/loai-ngay-hs-1011.test.tsx"
+  ]
+}
