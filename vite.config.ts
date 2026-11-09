@@ -715,7 +715,9 @@ export default defineConfig({
             // BangNhapSo / NutHoiThay / tờ the-cau.css thành tệp riêng (+1,7 KB ở /t, precache 174 > 170). Gom lại CÙNG mảnh TheCau như trước.
             // 09/11: các mảnh nhỏ cổng HS + màn thi cùng nạp (ô số trả lời, tách dòng, ảnh phương án, số câu, đồng hồ, hình câu, phím số) gom MỘT mảnh ⇒ bớt đầu tệp gzip, nén chung.
             { name: 'lam-bai', test: /src[\\/](?:components[\\/](?:OSoTraLoi|QuestionMedia)\.tsx|components[\\/]hoc-tap[\\/]lam-bai\.ts|lib[\\/](?:tach-dong-cau|anh-phuong-an|so-cau-hien-thi|dong-ho-thi)\.ts)$/, includeDependenciesRecursively: false },
-            { name: 'TheCau', test: /src[\\/]components[\\/](?:TheCau\.tsx|DaiCauThay\.tsx|dai-cau-thay\.css|BangNhapSo\.tsx|bang-nhap-so\.css|loi-giai[\\/]NutHoiThay\.tsx|m3[\\/]the-cau\.css)$/, includeDependenciesRecursively: false },
+            // 09/11: TỜ KIỂU của TheCau gom MỘT tệp CSS riêng (không kèm JS) — cổng HS nạp tĩnh tờ thẻ câu (`.m3 .loi-giai` cho KhoiCauSai / TheCauChiTiet / KhungLoiGiai… không tự nạp; bỏ là đổi màu) mà KHÔNG kéo mã TheCau; /t nén chung ba tờ như cũ.
+            { name: 'the-cau-kieu', test: /src[\\/]components[\\/](?:m3[\\/]the-cau\.css|dai-cau-thay\.css|bang-nhap-so\.css)$/, includeDependenciesRecursively: false },
+            { name: 'TheCau', test: /src[\\/]components[\\/](?:TheCau\.tsx|DaiCauThay\.tsx|BangNhapSo\.tsx|loi-giai[\\/]NutHoiThay\.tsx)$/, includeDependenciesRecursively: false },
             { name: 'KhoiLoiGiaiChuan', test: /src[\\/](?:components[\\/](?:loi-giai[\\/]KhoiLoiGiaiChuan|ExperimentDemo)\.tsx|lib[\\/](?:experiments[\\/]nhe|loi-giai-api|chuan-hoa-loi-giai|chu-la-pdf)\.ts)$/ },
             // 25/10 (gốc riêng cổng phụ huynh `AppPhuHuynh`): đồ thị nhập đổi ⇒ Rolldown xẻ DesignSystem / ChanLoi / exam-grade thành nhiều tệp nhỏ (+1,1 KB nén ở MỌI
             // đường khác, precache 171 > trần 170). Gom lại ĐÚNG ranh mảnh trước đó (danh sách mô-đun đọc từ sourcemap bản 1158a832) ⇒ các đường khác không đổi byte.
