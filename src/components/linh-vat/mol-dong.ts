@@ -805,10 +805,10 @@ let iconGoc: { el: HTMLLinkElement; href: string; type: string }[] | null = null
 let lanIcon = 0
 export async function datIconTabMol(cap: number, anh: (svg: SVGSVGElement) => { src: string } | null): Promise<void> {
   const ma = ++lanIcon
-  if (cap < 4) { if (iconGoc) for (const g of iconGoc) { g.el.type = g.type; g.el.href = g.href } iconGoc = null; return }
+  if (cap >= 0 && cap < 4) { if (iconGoc) for (const g of iconGoc) { g.el.type = g.type; g.el.href = g.href } iconGoc = null; return } // cap < 0 ⇒ mặt Mol đang hiện (icon-tab-mol.ts)
   try {
     // ưu tiên Mol đứng thẳng (vòng Mục tiêu ngày / bong bóng) đã vẽ xong đúng cấp; thiếu thì Mol cạnh đường
-    const duoi = `[data-cap="${cap}"] > svg.mol-svg[data-cap-ve="${cap}"]`
+    const duoi = cap < 0 ? ' > svg.mol-svg' : `[data-cap="${cap}"] > svg.mol-svg[data-cap-ve="${cap}"]`
     const svg = document.querySelector<SVGSVGElement>(`.bi.lua:not([data-goc])${duoi}`) ?? document.querySelector<SVGSVGElement>(`.bi.lua${duoi}`)
     const a = svg && anh(svg)
     if (!a) return
@@ -819,7 +819,7 @@ export async function datIconTabMol(cap: number, anh: (svg: SVGSVGElement) => { 
     c.width = c.height = 64
     const x = c.getContext('2d')
     if (!x || ma !== lanIcon) return
-    x.drawImage(img, 5, 32, 190, 190, 0, 0, 64, 64) // cổ bình + đầu tròn: x 5…195, y 6…196 của khung vẽ
+    x.drawImage(img, 35, 69, 130, 130, 0, 0, 64, 64) // 09/11: cắt sát mặt như biểu tượng app (khung Mol x 35…165, y 43…173)
     const url = c.toDataURL('image/png')
     if (ma !== lanIcon || !url.startsWith('data:image/png')) return
     iconGoc ??= [...document.querySelectorAll<HTMLLinkElement>('link[rel="icon"]')].map((el) => ({ el, href: el.getAttribute('href') ?? '', type: el.type }))

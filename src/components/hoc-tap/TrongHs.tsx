@@ -15,7 +15,7 @@ import type { Props as PropsHomNayCu } from './HocTapHomNay'
 import { ngayGon, useDiemDanhHs } from '../diem-danh/diem-danh-hs'
 import NutVaoBpu from '../bpu/NutVaoBpu'
 import type { BuoiCuaEm } from '../../lib/buoi-hoc-api'
-import { Bi, SU_KIEN_LUA_CAP, type CamBi } from '../linh-vat/Bi'
+import { Bi, type CamBi } from '../linh-vat/Bi'
 // LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): luật + lời (hàm thuần) · sổ câu được tính trên máy · biểu tượng tab + chấm số.
 import { chanNgon, loiLua, mocDoiLua, soLuot, xetLua, type CapLua, type VaoLua } from '../../lib/lua-cam-xuc'
 import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
@@ -85,7 +85,6 @@ function useMq(q: string): boolean {
 const useCoBen = (): boolean => useMq(MQ_BEN)
 /** Điện thoại ngang thấp (cao < 600 px): Lộ trình tự cuộn tới chặng hiện tại ⇒ bong bóng đầu trang khuất ⇒ từ cấp 2 Lửa nói CẠNH mình (đặc tả 31/10 mục 2.2). */
 /** Biểu tượng tab mặt Mol cáu (đầu đỏ): ở mảnh lười mol-dong (đã nạp cùng linh vật; chỉ cần từ cấp 4). */
-const iconTabLua = (cap: number) => { void import('../linh-vat/mol-dong').then((m) => m.datIconTabMol(cap, anhSvg)).catch(() => {}) }
 /** Chấm số trên biểu tượng app đã cài (`navigator.setAppBadge` — iPhone iOS 16.4+ đã cho phép thông báo, Chrome/Edge máy tính): = câu còn thiếu; 0 ⇒ xoá. */
 function chamSoApp(n: number): void {
   const nav = (typeof navigator === 'undefined' ? {} : navigator) as { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> }
@@ -972,18 +971,10 @@ export function MotTrangHs(p: PropsMotTrang) {
     const h = window.setTimeout(() => { if (document.visibilityState !== 'hidden') datNhipLua((n) => n + 1) }, Math.max(1000, mocLua - gioMayChu() + 500))
     return () => window.clearTimeout(h)
   }, [mocLua])
-  // biểu tượng tab: cấp 4–5 ⇒ đầu Lửa đỏ (chụp lại khi một Lửa vẽ xong cấp mới); hạ cấp / rời Lộ trình ⇒ logo
-  const daDoiIcon = useRef(false)
-  useEffect(() => {
-    if (capLua < 4) { if (daDoiIcon.current) iconTabLua(0); daDoiIcon.current = false; return }
-    daDoiIcon.current = true
-    let h = 0
-    const chup = () => { cancelAnimationFrame(h); h = requestAnimationFrame(() => iconTabLua(capLua)) }
-    chup()
-    window.addEventListener(SU_KIEN_LUA_CAP, chup)
-    return () => { cancelAnimationFrame(h); window.removeEventListener(SU_KIEN_LUA_CAP, chup) }
-  }, [capLua])
-  useEffect(() => () => { if (daDoiIcon.current) iconTabLua(0) }, [])
+  // biểu tượng tab = mặt Mol đang hiện, đổi theo cảm xúc (thầy 09/11; icon-tab-mol.ts); rời Lộ trình ⇒ logo
+  useEffect(() => { let don: (() => void) | undefined, het = false
+    void import('../linh-vat/icon-tab-mol').then((m) => { if (!het) don = m.theoDoiIconTabMol(anhSvg) }).catch(() => {})
+    return () => { het = true; don?.() } }, [])
   // chấm số trên biểu tượng app = câu còn thiếu hôm nay (đủ mức / nghỉ / hết câu ⇒ xoá)
   const chamApp = kLua && kLua.lyDo !== 'nghi' && !du && con ? con : 0
   const coSoLua = !!so

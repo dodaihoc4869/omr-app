@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
 const GOC = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const TEP = ['logo-gv-512-maskable-v3.png', 'logo-hs-512-maskable-v3.png', 'logo-ph-512-maskable-v3.png', 'icon-512-maskable.png', 'logo-hs-512-maskable-cn.png']
+const TEP = ['logo-gv-512-maskable-v3.png', 'logo-hs-512-maskable-v3.png', 'logo-ph-512-maskable-v3.png', 'icon-512-maskable.png', 'logo-hs-512-maskable-cn.png', 'logo-hs-512-maskable-mol.png']
 const KHONG_MASKABLE = ['logo-gv-512-v3.png'] // đối chứng: bản tràn nền chưa thu nhỏ PHẢI vượt (chứng minh phép đo có bắt được)
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome'
 const browser = await chromium.launch({ headless: true, executablePath: (await import('node:fs')).existsSync(exe) ? exe : undefined })

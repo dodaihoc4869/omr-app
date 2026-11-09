@@ -52,7 +52,7 @@ ghiSwVersion()
 // Bỏ thư viện lớn chỉ dùng khi bấm (xuất PDF / ảnh, bản đồ 3D) — tải khi cần như cũ.
 const KHO_HS_BO = /^assets\/(?:ban-do-3d-three|jspdf|html2canvas|purify|index\.es|fflate)/
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
-const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs)-[\w-]{8}\.(?:js|css)$/
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
   let dsCho: string[] = []
   return {
@@ -377,6 +377,7 @@ export default defineConfig({
           '**/TamHoatDong-*.{js,css}', // tấm buổi dạy (09/11) — máy thầy, nạp khi mở
           '**/to-chieu-bpu-*.js',
           '**/diem-danh-nhanh-*.js', // nút Điểm danh ở Hôm nay (09/11) — nạp khi bấm
+          '**/icon-tab-mol-*.js', // 09/11 biểu tượng tab theo cảm xúc Mol (Lộ trình nạp sau) ⇒ kho chạy-lúc + kho tải ngầm, precache giữ 170
           '**/TamThongBaoHs-*.js', // 09/11 tấm thông báo học sinh: nạp khi bấm chuông ⇒ kho chạy-lúc + kho tải ngầm (kho-hs.json), precache giữ 170
           '**/DemNguocThi-*.{js,css}', // 09/11 thẻ đếm ngược ngày thi (chỉ lớp 12 nạp): ngoài precache VÀ ngoài kho tải ngầm (em lớp 10/11 không tải một byte); lớp 12 tải lần đầu mở ⇒ kho chạy-lúc
           '**/be-vietnam-pro-*-500-normal-*.woff2',
@@ -600,6 +601,7 @@ export default defineConfig({
           '**/logo-gv-*',
           // 28/10 biểu tượng app học sinh mới (đầu Cú Ngọc, bộ -cn): favicon / icon cài máy đọc qua mạng như bộ 512 — không thêm mục precache (trần 170).
           '**/logo-hs-*-cn.{png,svg}',
+          '**/logo-hs-*-mol.{png,svg}', // 09/11 biểu tượng Mol tràn ô (thầy «ảnh mol full giống doligo») — như bộ -cn: đọc qua mạng lúc cài, không vào precache
           // Phiếu HTML: chỉ mở khi em bấm làm phiếu (đang có mạng), tải một lần rồi cất.
           '**/html-phieu-*.js',
           // Phông Inter (58 KB) chỉ cho app phụ huynh trên máy KHÔNG phải Apple: tải một lần khi phụ huynh mở app rồi cất ở kho chạy-lúc (đường /assets/*.woff2 của src/sw.ts); không ép vào precache vỏ.

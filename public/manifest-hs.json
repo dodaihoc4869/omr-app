@@ -13,19 +13,19 @@
   "theme_color": "#ffffff",
   "icons": [
     {
-      "src": "logo-hs-192-cn.png",
+      "src": "logo-hs-192-mol.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "logo-hs-512-cn.png",
+      "src": "logo-hs-512-mol.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "logo-hs-512-maskable-cn.png",
+      "src": "logo-hs-512-maskable-mol.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

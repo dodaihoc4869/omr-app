@@ -58,9 +58,10 @@ export const BAN_PNG = [
 
 /** Hồ sơ cấu hình iPhone nhúng biểu tượng 180 px (khoá Icon) — sinh lại cho khớp `logo-<vai>-180-v3.png`. */
 export const BAN_MOBILECONFIG = [
-  // 28/10 (thầy «Chốt build thay»): hồ sơ cài iPhone app học sinh mang biểu tượng đầu Cú Ngọc (bộ -cn, PNG có sẵn trong public/, không sinh từ SVG);
+  // 09/11 (thầy «thay ảnh app bằng ảnh mol full giống doligo»): hồ sơ cài iPhone app học sinh mang biểu tượng MOL tràn ô (bộ -mol, PNG có sẵn trong public/,
+  // chụp từ Mol của app — không sinh từ SVG; trước: đầu Cú Ngọc bộ -cn 28/10);
   // PayloadIdentifier / PayloadUUID giữ nguyên ⇒ máy đã cài hồ sơ cũ cài lại là cập nhật đè, không thành app thứ hai.
-  { tep: 'public/hs.mobileconfig', png: 'public/logo-hs-180-cn.png' },
+  { tep: 'public/hs.mobileconfig', png: 'public/logo-hs-180-mol.png' },
   { tep: 'public/ph.mobileconfig', png: 'public/logo-ph-180-v3.png' },
 ]
 
