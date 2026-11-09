@@ -229,8 +229,12 @@ export function cumCauHinhElectron(day: string): { lop: string; soE: string }[] 
 }
 
 /** Ký tự được phép nằm trong một dãy cấu hình electron. `^ { }`: dạng có dấu mũ `1s^22s^2`, `[Ar]3d^{10}4s^2` (thầy chụp 25/10/2026:
- * luật `^` + dãy số là luật THAM nên `1s^22s^22p^6` từng hiện 1s²²s²²p⁶) — bỏ dấu mũ rồi tách như dạng viết liền. */
-const KY_TU_CAU_HINH = /[0-9spdf^{}]/
+ * luật `^` + dãy số là luật THAM nên `1s^22s^22p^6` từng hiện 1s²²s²²p⁶) — bỏ dấu mũ rồi tách như dạng viết liền.
+ * `⁰–⁹`: kho gõ sẵn số mũ Unicode `[Ar]3d⁵4s¹` (thầy chụp 09/11: hiện «[Ar]₃d⁵ 4s¹» — dãy không nhận là cấu hình nên số `3` sau `]`
+ * rơi vào luật chỉ số dưới) — đổi về chữ số thường rồi tách như dạng viết liền. */
+const KY_TU_CAU_HINH = /[0-9spdf^{}⁰¹²³⁴⁵⁶⁷⁸⁹]/
+const SO_MU_CAU_HINH = '⁰¹²³⁴⁵⁶⁷⁸⁹'
+const boMuCauHinh = (s: string): string => s.replace(/[\^{}]/g, '').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (c) => String(SO_MU_CAU_HINH.indexOf(c)))
 
 
 /** Ký tự đứng SÁT trước hoặc sau dãy mà làm dãy đó không còn là cấu hình.
@@ -435,7 +439,9 @@ function parseChemTextDon(text: string): ChemPart[] {
       let cuoi = i
       while (cuoi < text.length && KY_TU_CAU_HINH.test(text[cuoi])) cuoi++
       if (!chanCauHinh(text[cuoi])) {
-        const cum = cumCauHinhElectron(text.slice(i, cuoi).replace(/[\^{}]/g, ''))
+        const cum = cumCauHinhElectron(boMuCauHinh(text.slice(i, cuoi)))
+        // Số mũ đã gõ sẵn bằng Unicode ⇒ giữ nguyên chữ (luật 10/09), chỉ cần NUỐT cả cụm để số đầu không bị hạ thành chỉ số dưới.
+        if (cum && /[⁰¹²³⁴⁵⁶⁷⁸⁹]/.test(text.slice(i, cuoi))) { pushText(text.slice(i, cuoi)); i = cuoi; continue }
         if (cum) {
           for (const c of cum) {
             pushText(c.lop)
