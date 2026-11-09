@@ -364,3 +364,11 @@ html.may-yeu .bb-canh { animation: none; }
 .bb-tren { gap: 14px; }
 .bb-tren .bb-hoi { padding: 0 13px; gap: 8px; }
 .bb-tren .bb-pill { padding: 8px 18px; }
+/* RỜI MÀN (09/11): viền đỏ nhấp nháy quanh cả sân khấu + thẻ tên giữa trên — cả lớp thấy bạn nào đang rời app. Máy yếu / giảm chuyển động ⇒ viền đứng yên. */
+.bb-bao-dong { position: absolute; inset: 0; z-index: 11; pointer-events: none; box-shadow: inset 0 0 0 14px var(--tr-sai), inset 0 0 90px color-mix(in srgb, var(--tr-sai) 55%, transparent); animation: bb-bao-dong 1s ease-in-out infinite alternate; }
+@keyframes bb-bao-dong { from { opacity: 1; } to { opacity: 0.25; } }
+.bb-bao-the { position: absolute; z-index: 12; left: 50%; top: 22px; transform: translateX(-50%); display: flex; align-items: baseline; gap: 18px; max-width: 1500px; padding: 16px 30px; border-radius: 22px;
+  background: var(--tr-sai); color: var(--giay); font-size: 30px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 12px 40px color-mix(in srgb, var(--tr-sai) 45%, transparent); animation: none; }
+.bb-bao-the b { font-weight: 800; letter-spacing: 0.02em; }
+@media (prefers-reduced-motion: reduce) { .bb-bao-dong { animation: none; } }
+html.may-yeu .bb-bao-dong { animation: none; }

@@ -53,7 +53,8 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     expect(cuoi2.luot.ketQua.dung).toBe(false)
     expect(JSON.parse(gv.tin.at(-1)!).luot.chon).toEqual({ S1: 'B', S2: 'A' })
   })
-  it('rời màn: máy em báo ⇒ bảng thấy, đội bị trừ', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11: tên cũ «đội bị trừ» — thầy 09/11 bỏ trừ kJ khi rời màn; nay bảng thấy em ĐANG RỜI (`roiNay`), `ve` gỡ.
+  it('rời màn: máy em báo ⇒ bảng thấy (đang rời, không trừ kJ); em quay lại (ve) ⇒ gỡ', async () => {
     const { p, noi, post } = taoPhong()
     await post('/khoi', { buoiId: 'b2', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1 }] })
     const gv = await noi('gv'), em = await noi('hs', 'S1')
@@ -62,6 +63,23 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     const b = JSON.parse(gv.tin.at(-1)!)
     expect(b.ds[0].roi).toBe(1)
     expect(b.luot.roiMe).toEqual(['S1'])
+    expect(b.roiNay).toEqual(['S1'])
+    expect(b.doiThuong.reduce((x: number, y: number) => x + y, 0)).toBe(10 + 50) // vào lớp + đủ quân — không trừ
+    await p.webSocketMessage(em as never, JSON.stringify({ t: 've' }))
+    expect(JSON.parse(gv.tin.at(-1)!).roiNay).toEqual([])
+    expect(JSON.parse(gv.tin.at(-1)!).luot.roiMe).toEqual(['S1']) // lịch sử lượt vẫn ghi em đã rời
+    // Rớt kết nối WebSocket KHÔNG tính rời màn.
+    const truoc = gv.tin.length
+    await p.webSocketClose()
+    expect(gv.tin.length).toBe(truoc)
+  })
+  it('em vào muộn qua /vao kèm năng lực ⇒ phòng nhận số năng lực', async () => {
+    const { p, post } = taoPhong()
+    await post('/khoi', { buoiId: 'b8', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1, nangLuc: 0.9 }] })
+    await post('/vao', { sbd: 'S2', ten: 'C D', nangLuc: 0.2 })
+    const st = (p as unknown as { st: { ds: { sbd: string; nangLuc: number; doi: number }[] } }).st
+    expect(st.ds.map((e) => [e.sbd, e.nangLuc])).toEqual([['S1', 0.9], ['S2', 0.2]])
+    expect(new Set(st.ds.map((e) => e.doi)).size).toBe(2)
   })
   it('vé: chữ ký đúng mới nhận; vé em không thể là vé thầy', async () => {
     const ve = await kyVeBpu('bi-mat', { b: 'b1', s: 'S1', v: 'hs', h: Date.now() + 60_000 })

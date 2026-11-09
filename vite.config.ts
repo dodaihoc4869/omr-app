@@ -374,6 +374,7 @@ export default defineConfig({
           '**/gan-gv-*.{js,css}',
           // 09/11 trùng tu bảng: bảng chọn câu + tờ dựng từ câu chọn + phông chiếu Be Vietnam Pro 500/800 (chỉ bảng chiếu nạp) — máy thầy, kho chạy-lúc.
           '**/ChonCauBpu-*.{js,css}',
+          '**/TamHoatDong-*.{js,css}', // tấm buổi dạy (09/11) — máy thầy, nạp khi mở
           '**/to-chieu-bpu-*.js',
           '**/diem-danh-nhanh-*.js', // nút Điểm danh ở Hôm nay (09/11) — nạp khi bấm
           '**/TamThongBaoHs-*.js', // 09/11 tấm thông báo học sinh: nạp khi bấm chuông ⇒ kho chạy-lúc + kho tải ngầm (kho-hs.json), precache giữ 170

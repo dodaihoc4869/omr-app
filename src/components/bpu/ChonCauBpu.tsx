@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TeacherExamSource } from '../../data/examContent'
 import { cauTuDeChon, tomTatDe, type CauDayHoc } from '../../lib/day-hoc-len-bang'
 import { baiDaChonCuaBuoi, napKhoDayHoc } from '../../lib/bpu/to-chieu-bpu'
+import { CalendarCheck, ClipboardCheck, Flame, Presentation } from 'lucide-react'
 import './chon-cau.css'
 
 const DA_CHON = '__da-chon'
@@ -27,9 +28,53 @@ export interface PropsChonCau {
   /** Dựng tờ + chiếu; trả lời báo lỗi (rỗng = đã chiếu). */
   onChieu: (ds: CauDayHoc[]) => Promise<string>
   onDong: () => void
+  /** (09/11) Bước mở đầu: 'hd' = «Hôm nay làm gì?» (sau Xong điểm danh) · 'cau' = thẳng bảng chọn câu. */
+  buocDau?: 'hd' | 'cau' | false
+  /** Kiểm tra đầu giờ / Chữa câu khó / Kiểm tra ôn tập ⇒ tấm buổi dạy. */
+  onHoatDong?: (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => void
 }
 
-export default function ChonCauBpu({ buoiId, lop, onChieu, onDong }: PropsChonCau) {
+// «HÔM NAY LÀM GÌ?» (thầy 09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong tinh tế đẹp mắt hiệu quả»): bốn thẻ lớn trên bảng.
+const HD: { id: 'day-hoc' | 'dau-gio' | 'chua-cau' | 'on-tap'; ten: string; mo: string; Icon: typeof Flame; phim: string }[] = [
+  { id: 'day-hoc', ten: 'Dạy học · chiếu câu', mo: 'Chọn câu trong kho Dạy học, cả lớp cùng làm trên máy, gọi em lên bảng.', Icon: Presentation, phim: '1' },
+  { id: 'dau-gio', ten: 'Kiểm tra đầu giờ', mo: 'App chọn tối đa 6 em có mặt, mỗi em một câu em đã làm đúng; thầy chấm Đạt / Chưa đạt.', Icon: ClipboardCheck, phim: '2' },
+  { id: 'chua-cau', ten: 'Chữa câu khó & tính toán', mo: 'Câu nhiều em sai nhất và câu tính toán thầy chọn; mỗi câu gọi một em làm sai lên chữa.', Icon: Flame, phim: '3' },
+  { id: 'on-tap', ten: 'Kiểm tra ôn tập', mo: 'Ngoài buổi dạy · lịch và đề dành riêng cho từng em.', Icon: CalendarCheck, phim: '4' },
+]
+function HomNayLamGi({ onChon, onDong }: { onChon: (id: (typeof HD)[number]['id']) => void; onDong: () => void }) {
+  const goc = useRef<HTMLDivElement>(null)
+  useEffect(() => { goc.current?.querySelector('button')?.focus() }, [])
+  useEffect(() => {
+    const phim = (e: KeyboardEvent) => { const m = HD.find((x) => x.phim === e.key); if (m) { e.preventDefault(); onChon(m.id) } }
+    window.addEventListener('keydown', phim)
+    return () => window.removeEventListener('keydown', phim)
+  }, [onChon])
+  return (
+    <div className="bcc bcc-hd" role="dialog" aria-label="Hôm nay làm gì?" ref={goc}>
+      <div className="bcc-dau">
+        <h2>Hôm nay làm gì?</h2>
+        <p>Điểm danh xong. Chọn một hoạt động — xong quay lại chọn hoạt động khác.</p>
+        <button type="button" className="bcc-dong" onClick={onDong}><kbd>Esc</kbd>Đóng</button>
+      </div>
+      <div className="bcc-hd-luoi">
+        {HD.map(({ id, ten, mo, Icon, phim }, i) => (
+          <button key={id} type="button" className="bcc-hd-the" data-chinh={i === 0 || undefined} onClick={() => onChon(id)}>
+            <span className="bcc-hd-icon" aria-hidden="true"><Icon size={44} strokeWidth={2.2} /></span>
+            <b>{ten}</b><span>{mo}</span><kbd>{phim}</kbd>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function ChonCauBpu(p: PropsChonCau) {
+  const [buoc, setBuoc] = useState<'hd' | 'cau'>(p.buocDau === 'hd' && p.onHoatDong ? 'hd' : 'cau')
+  if (buoc === 'hd') return <HomNayLamGi onDong={p.onDong} onChon={(id) => { if (id === 'day-hoc') setBuoc('cau'); else p.onHoatDong?.(id) }} />
+  return <ChonCau {...p} />
+}
+
+function ChonCau({ buoiId, lop, onChieu, onDong }: PropsChonCau) {
   const [kho, setKho] = useState<TeacherExamSource[] | null>(null)
   const [loi, setLoi] = useState('')
   const [lan, setLan] = useState(0)

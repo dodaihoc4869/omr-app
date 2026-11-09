@@ -1,7 +1,7 @@
 // Bình Phản Ứng — giao diện máy em + bảng chiếu với phòng giả (WebSocket giả, dữ liệu từ luật phòng thật): đi đủ các màn, không vỡ, chữ đúng chuẩn.
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
+import { DOI_BPU, boLuotRong, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 const traMo = vi.hoisted(() => ({ v: { ok: true, du: { ok: true, ve: 've-thay' } } as Record<string, unknown> }))
@@ -32,7 +32,7 @@ describe('máy em', () => {
     ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText(/Em đã vào lớp lúc/)).toBeTruthy()
     // Lúc chờ (chưa có lượt) em rời được — không bị kẹt khi thầy quên kết thúc / có ca kiểm tra.
-    expect(screen.getByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Thoát|Đóng/ })).toBeNull()
@@ -71,21 +71,15 @@ describe('máy em', () => {
     expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «bỏ chữ rời bình phản ứng … khoá cứng tới khi tôi kết thúc buổi học»): không còn nút rời; mở đáp án ⇒ màn vẫn ở lại.
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    act(() => { screen.getByRole('button', { name: 'Rời Bình Phản Ứng' }).click() })
-    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull()
+    expect(screen.getByRole('dialog', { name: 'Bình Phản Ứng' })).toBeTruthy()
     expect(onDong).not.toHaveBeenCalled()
     expect(WsGia.ds).toHaveLength(1) // vẫn một kết nối, không nối lại
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
-    act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }) })
-    // đang thi ⇒ lượt mới KHÔNG tự hiện
-    moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    act(() => { screen.getByRole('button', { name: 'Rời Bình Phản Ứng' }).click() })
-    thi = true
-    moLuot(st, { ...cau, qid: 'q3' }, T0 + 15000); ws.nhan(viewEm(st, 'S1'))
-    await new Promise((r) => setTimeout(r, 30))
-    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
+    void thi
   })
   it('em được gọi lên bảng thấy lý do', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
@@ -95,6 +89,115 @@ describe('máy em', () => {
     WsGia.ds[0]!.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText('Em được mời lên bảng!')).toBeTruthy()
     expect(screen.getByText(/lên giảng lại cho cả lớp/)).toBeTruthy()
+  })
+})
+
+describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi · xanh / đỏ · `ve`)', () => {
+  const vao = async () => {
+    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
+    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    return WsGia.ds[0]!
+  }
+  const coTin = (ws: WsGia, t: string) => ws.gui.filter((x) => JSON.parse(x).t === t).length
+  it('đầu màn: ngọn lửa đội + tên đội + kJ đội', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    await screen.findByRole('button', { name: 'Gửi đáp án' })
+    const ten = DOI_BPU[st.ds[0]!.doi]!.ten
+    expect(document.querySelector('.bpu-hs-tren .bpu-lua')).toBeTruthy()
+    expect(document.querySelector('.bpu-hs-tren .bpu-hs-tieu b')!.textContent).toBe(ten)
+    expect(screen.getByLabelText(new RegExp(`${ten} đang có \\d+ kJ`))).toBeTruthy()
+  })
+  it('bấm gửi ⇒ tia lửa bay rồi TỰ CHE (không đề, không nút); thầy mở đáp án ⇒ vẫn che, em chọn sai ĐỎ, đáp án đúng XANH; câu mới ⇒ mở', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    const pa = await screen.findAllByRole('radio')
+    act(() => { pa[0]!.click() })
+    act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }).click() })
+    expect(ws.gui.map((x) => JSON.parse(x)).find((x) => x.t === 'tra')).toMatchObject({ chon: 'A' })
+    // che NGAY (chưa chờ phòng báo lại): đang bay thì phương án còn nằm dưới nhưng đã khoá
+    expect(document.querySelector('.bpu-che.bay .bpu-tia')).toBeTruthy()
+    expect(screen.getByText('Đang gửi…')).toBeTruthy()
+    expect(screen.getAllByRole('radio').every((b) => (b as HTMLButtonElement).disabled)).toBe(true)
+    await waitFor(() => expect(screen.queryAllByRole('radio')).toHaveLength(0), { timeout: 2500 })
+    expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
+    nhanTra(st, 'S1', 'A', T0 + 2000); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText(/Đã gửi sau 2 giây/)).toBeTruthy()
+    expect(screen.getByText('Nhìn lên bảng để chữa bài')).toBeTruthy()
+    expect(screen.queryAllByRole('button')).toHaveLength(0) // không nút mở ra, không nút đổi đáp án, không nút rời giữa lượt
+    moDapAn(st, T0 + 5000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Chưa đúng')).toBeTruthy()
+    expect(document.querySelector('.bpu-che')!.getAttribute('data-kq')).toBe('sai')
+    expect(document.querySelector('.bpu-kq-o[data-kq="sai"] b')!.textContent).toBe('A')
+    expect(document.querySelector('.bpu-kq-o[data-kq="dung"] b')!.textContent).toBe('B')
+    expect(screen.queryAllByRole('radio')).toHaveLength(0)
+    expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
+    expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng, không nút rời
+    moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(document.querySelector('.bpu-che')).toBeNull()
+  })
+  it('em chọn đúng ⇒ lớp che XANH «Chính xác!»; Đúng–sai ⇒ ý đúng xanh, ý sai đỏ kèm đáp án', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 1000); moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Chính xác!')).toBeTruthy()
+    expect(document.querySelector('.bpu-che')!.getAttribute('data-kq')).toBe('dung')
+    expect(document.querySelector('.bpu-kq-o[data-kq="sai"]')).toBeNull()
+    expect(document.querySelector('.bpu-kq-cot[data-kq="dung"]')!.textContent).toContain('Em chọn')
+    const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
+    moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Chưa đúng')).toBeTruthy()
+    expect([...document.querySelectorAll('.bpu-kq-dong')].map((x) => x.textContent)).toEqual(['a)Em: Đúng ✓', 'b)Em: Sai ✓', 'c)Em: Sai ✓', 'd)Em: Sai ✗Đáp án: Đúng ✓'])
+    expect(screen.getByText(/Em đúng 3\/4 ý/)).toBeTruthy()
+  })
+  it('mất mạng lúc gửi mà phòng bỏ lượt rỗng rồi mở câu khác CÙNG SỐ lượt ⇒ không che nhầm câu mới (khoá = số lượt + giờ mở)', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    const pa = await screen.findAllByRole('radio')
+    ws.readyState = 0 // mất mạng: đáp án nằm hàng chờ
+    act(() => { pa[1]!.click() })
+    act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }).click() })
+    expect(document.querySelector('.bpu-che')).toBeTruthy()
+    expect(boLuotRong(st)).toBe(true)
+    moLuot(st, { ...cau, qid: 'q2' }, T0 + 7000); ws.nhan(viewEm(st, 'S1'))
+    expect(viewEm(st, 'S1').luot!.so).toBe(1)
+    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(document.querySelector('.bpu-che')).toBeNull()
+  })
+  it('em chưa gửi mà thầy mở đáp án ⇒ không che, đáp án đúng tô XANH', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
+    expect(await screen.findByText('Em chưa gửi kịp')).toBeTruthy()
+    expect(document.querySelector('.bpu-che')).toBeNull()
+    expect(document.querySelector('.bpu-kq-o[data-kq="dung"] b')!.textContent).toBe('B')
+    expect(document.querySelector('.bpu-kq-o[data-kq="sai"]')).toBeNull()
+  })
+  it('SỬA CÓ CHỦ ĐÍCH 09/11 — rời màn không nhắc trừ kJ; ẩn app ≥ 2 s ⇒ `roi`, hiện lại ⇒ `ve` (cả khi rời bằng pagehide)', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    await screen.findByRole('button', { name: 'Gửi đáp án' })
+    let an = false
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => an })
+    try {
+      vi.useFakeTimers()
+      an = true; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+      act(() => { vi.advanceTimersByTime(2100) })
+      vi.useRealTimers()
+      expect(coTin(ws, 'roi')).toBe(1)
+      an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+      expect(coTin(ws, 've')).toBe(1)
+      expect(await screen.findByText('Bảng đang báo tên em — quay lại tập trung lên bảng.')).toBeTruthy()
+      expect(document.body.textContent).not.toMatch(/bị trừ/)
+      // hiện lại lần nữa mà không rời ⇒ không gửi thêm `ve`
+      act(() => { document.dispatchEvent(new Event('visibilitychange')) })
+      expect(coTin(ws, 've')).toBe(1)
+      // rời bằng đóng trang (pagehide) ⇒ `roi` ngay; quay lại (pageshow) ⇒ `ve`
+      an = true; act(() => { window.dispatchEvent(new Event('pagehide')) })
+      expect(coTin(ws, 'roi')).toBe(2)
+      an = false; act(() => { window.dispatchEvent(new Event('pageshow')) })
+      expect(coTin(ws, 've')).toBe(2)
+    } finally { vi.useRealTimers(); delete (document as unknown as Record<string, unknown>).hidden }
   })
 })
 
@@ -161,7 +264,7 @@ describe('bảng chiếu', () => {
     expect(onToi).toHaveBeenLastCalledWith(1)
     // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «thu hết các nút lại, chỉ để nút gọi lên bảng thôi»): lúc cả lớp làm, thanh trên CHỈ có «Gọi lên bảng»; chuyển câu bằng phím.
     const nut = [...document.querySelectorAll('.bb-tren button')].map((b) => b.textContent)
-    expect(nut).toEqual(['Gọi lên bảngSpace'])
+    expect(nut).toEqual(['Lên bảngL']) // 09/11 lần 2: nút chính «Lên bảng» (phím L) — sang tờ chiếu cũ, không tự gọi
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' })) })
     expect(onToi).toHaveBeenCalledTimes(2)
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' })) })

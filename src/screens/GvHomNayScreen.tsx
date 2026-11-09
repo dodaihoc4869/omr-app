@@ -416,9 +416,10 @@ export default function GvHomNayScreen() {
     datSo({ caMo: du.ca ? caMo.length : null, ...(du.conCho ? {} : { canThayChua: du.canThayChua ? du.canThayChua.tong : null }) })
   }, [du, caMo.length, datSo])
 
+  // 09/11 thầy «bỏ hẳn hành trình cũ đi»: không mở màn Hành trình nữa — Cần thầy chữa / lối cũ mở TẤM BUỔI DẠY (Kiểm tra đầu giờ · Chữa câu khó · Kiểm tra ôn tập).
   const moHanhTrinh = (m: MoHanhTrinh) => {
-    datMoHanhTrinh(m)
-    setScreen('chiendich')
+    void datMoHanhTrinh
+    void import('../components/bpu/gan-gv').then((g) => g.moHoatDong(m.the === 'dau-gio' ? 'dau-gio' : 'chua-cau')).catch(() => setScreen('chiendich'))
   }
   const [moBoSung, setMoBoSung] = useState(false)
   // «Một trang» (chỉ «Trong»): danh sách Việc cần thầy dài ⇒ 4 việc đầu + «Xem đủ N việc» (mở ra thì cuộn trong thẻ, trang không cuộn)

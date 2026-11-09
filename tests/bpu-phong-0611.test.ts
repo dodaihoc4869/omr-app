@@ -11,10 +11,13 @@ const phong = () => taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds })
 const cauTN = { qid: 'q1', phan: 'I' as const, tuLuan: false, cau: { qid: 'q1', text: 'Chất nào là amine bậc hai?', choices: ['a', 'b', 'c', 'd'] }, dung: 'B', hanGiay: 60 }
 
 describe('chia đội', () => {
-  it('bốn đội lệch nhau tối đa một bạn, cố định theo tháng', () => {
-    const s = Array.from({ length: 31 }, (_, i) => `X${i}`)
-    const a = chiaDoi(s, '2026-11'), b = chiaDoi([...s].reverse(), '2026-11')
+  // SỬA CÓ CHỦ ĐÍCH 09/11: trước đây chia theo BĂM (sbd + tháng), «cố định cả tháng». Thầy 09/11 «chia thật công bằng dựa trên năng lực» ⇒ chia theo
+  // năng lực (rắn + đổi chỗ); vẫn lệch tối đa một bạn và TẤT ĐỊNH (không phụ thuộc thứ tự đầu vào). Test năng lực chi tiết: tests/bpu-chia-doi-0911.test.ts.
+  it('bốn đội lệch nhau tối đa một bạn, tất định theo năng lực (không theo thứ tự đầu vào)', () => {
+    const s = Array.from({ length: 31 }, (_, i) => ({ sbd: `X${i}`, nangLuc: ((i * 37) % 100) / 100 }))
+    const a = chiaDoi(s), b = chiaDoi([...s].reverse())
     const dem = [0, 0, 0, 0]; for (const v of a.values()) dem[v]!++
+    expect(a.size).toBe(31)
     expect(Math.max(...dem) - Math.min(...dem)).toBeLessThanOrEqual(1)
     expect([...a.entries()].every(([k, v]) => b.get(k) === v)).toBe(true)
   })
@@ -107,19 +110,24 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     expect(roiMan(st, 'S1', T0)).toBe(false)
     expect(st.ds[0]!.roi).toBe(0)
   })
-  it('rời màn −20 cho đội, đếm lần, ghi vào lượt', () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11: trước đây rời màn −20 kJ cho đội. Thầy 09/11 «Bỏ tắt màn hình trừ KJ … thoát app là báo động viền đỏ nhấp nháy trên bảng»
+  // ⇒ KHÔNG trừ kJ (KJ.roiMan = 0), vẫn đếm lần + ghi vào lượt, thêm «đang rời» `roiNay` (test chi tiết: tests/bpu-chia-doi-0911.test.ts).
+  it('rời màn KHÔNG trừ kJ (09/11), vẫn đếm lần, ghi vào lượt', () => {
     const st = phong(); moLuot(st, cauTN, T0)
-    const d = st.ds[0]!.doi, truoc = st.doiThuong[d]!
+    const d = st.ds[0]!.doi, truoc = [...st.doiThuong], kjTruoc = diemDoi(st, d)
     roiMan(st, 'S1', T0); roiMan(st, 'S1', T0)
-    expect(st.doiThuong[d]).toBe(truoc + 2 * KJ.roiMan)
+    expect(KJ.roiMan).toBe(0)
+    expect(st.doiThuong).toEqual(truoc)
+    expect(diemDoi(st, d)).toBe(kjTruoc)
     expect(st.ds[0]!.roi).toBe(2)
     expect(st.luot!.roiMe).toEqual(['S1'])
   })
+  // SỬA CÓ CHỦ ĐÍCH 09/11: `phong()` có 10 em có mặt ⇒ nay HAI đội (≤ 12 có mặt ⇒ 2 đội), trước đây bốn.
   it('xếp đội theo tổng kJ (con số hiện trên bảng)', () => {
     const st = phong()
     const x = xepDoi(st)
-    expect(x).toHaveLength(4)
-    expect(x[0]!.tong).toBeGreaterThanOrEqual(x[3]!.tong)
+    expect(x).toHaveLength(2)
+    expect(x[0]!.tong).toBeGreaterThanOrEqual(x[1]!.tong)
   })
 })
 
@@ -133,25 +141,30 @@ describe('hai đội khi lớp ít em (thầy 07/11 «dưới 12 bạn thì ch�
     expect(xepDoi(st)).toHaveLength(2)
     expect(viewBang(st).soDoi).toBe(2)
   })
-  it('sĩ số đông nhưng lượt đầu có mặt dưới 12 ⇒ gộp còn hai đội, giữ đủ kJ điểm danh; từ lượt hai không đổi', () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (hai test dưới): trước đây số đội theo SĨ SỐ lúc mở phòng, gộp còn hai ở lượt đầu, và từ lượt hai «không đổi giữa buổi»;
+  // 12 em có mặt ⇒ bốn đội. Thầy 09/11 «dưới 12 học sinh thì tự động chia 2 đội, từ học sinh thứ 13 trở lên lập tức chia thành 4 đội» ⇒ theo số em
+  // ĐANG CÓ MẶT, ngay lúc em vào (kể cả giữa buổi); 12 có mặt ⇒ hai đội, em thứ 13 ⇒ bốn đội.
+  it('sĩ số đông nhưng có mặt dưới 12 ⇒ hai đội ngay khi mở, giữ đủ kJ điểm danh; em thứ 13 vào giữa buổi ⇒ bốn đội', () => {
     const lon = Array.from({ length: 20 }, (_, i) => ({ sbd: `X${i}`, ten: `Em ${i}`, coMat: i < 8, luc: T0 }))
     const st = taoPhong({ buoiId: 'b', lop: 'L', nay: T0, ds: lon })
-    expect(st.soDoi).toBe(4)
-    const tong = st.doiThuong.reduce((a, b) => a + b, 0)
-    moLuot(st, cauTN, T0)
     expect(st.soDoi).toBe(2)
     expect(st.doiThuong).toHaveLength(2)
-    expect(st.doiThuong.reduce((a, b) => a + b, 0)).toBe(tong)
-    expect(st.ds.every((e) => e.doi < 2)).toBe(true)
-    for (const e of st.ds) vaoLop(st, e.sbd, T0)
+    const tong = st.doiThuong.reduce((a, b) => a + b, 0)
+    expect(st.doiDu).toBeNull()
+    expect(tong).toBe(8 * KJ.vaoLop)
     moLuot(st, cauTN, T0)
     expect(st.soDoi).toBe(2)
+    expect(st.ds.every((e) => e.doi < 2)).toBe(true)
+    for (const e of st.ds) vaoLop(st, e.sbd, T0)
+    expect(st.soDoi).toBe(4)
+    expect(st.doiThuong).toHaveLength(4)
+    expect(st.doiThuong.reduce((a, b) => a + b, 0)).toBe(tong + 12 * KJ.vaoLop + (st.doiDu != null ? KJ.duQuanDau : 0))
   })
-  it('đủ 12 em có mặt ⇒ vẫn bốn đội', () => {
+  it('đủ 12 em có mặt ⇒ hai đội (09/11: ≤ 12 ⇒ hai)', () => {
     const st = phong()
     for (const e of st.ds) vaoLop(st, e.sbd, T0)
     moLuot(st, cauTN, T0)
-    expect(st.soDoi).toBe(4)
+    expect(st.soDoi).toBe(2)
   })
 })
 
