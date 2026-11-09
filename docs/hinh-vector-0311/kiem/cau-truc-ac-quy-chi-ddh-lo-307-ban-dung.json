@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1335,
+    "hash": "f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763",
+    "fileNguon": "anh/f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763.png",
+    "svg": "ac-quy-chi-ddh-088ff778e94b8da90ae302f3ea052d1c9b047a62f33ed6f9b42a5b3ee5c095a2.svg",
+    "hashSvg": "088ff778e94b8da90ae302f3ea052d1c9b047a62f33ed6f9b42a5b3ee5c095a2",
+    "byteSvg": 16007,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C5-D5-I-13",
+        "de": "Acquy chì khi phóng điện được mô tả theo mô hình dưới đây. Tại anode (cực âm):\nPb(s) + HSO₄⁻(aq) → PbSO₄(s) + H⁺(aq) + 2e\nTại cathode (cực dương):\nPbO₂(s) + HSO₄⁻(aq) + 3H⁺(aq) + 2e → PbSO₄(s) + 2H₂O(l)\nTrong quá trình acquy phóng điện, sự thay đổi nào sau đây đúng?",
+        "refs": [
+          {
+            "hash": "f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763",
+            "where": "12-KT-C5-D5-I-13.hinh.0.du_lieu",
+            "hashDataUrl": "f999320c9e6357494f1209c1ffc4e3db540a227092706edcfaffa9bbf3ec9d43"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1openbeakergrayfill/bluePbLEFT-greenPbO2RIGHT/2whitePbSO4bottomcurves/1rectmeter2,1V2wires/eRIGHTopenVshafttotip/(-)LEFT(+)RIGHT/whiteHsupplus-HSO4supminus/regularDDH/noaddedbubbles-reactions-current-legend-answer",
+    "hashSvgDaSoat": "088ff778e94b8da90ae302f3ea052d1c9b047a62f33ed6f9b42a5b3ee5c095a2",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

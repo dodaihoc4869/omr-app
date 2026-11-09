@@ -1,0 +1,327 @@
+{
+  "i": 1335,
+  "hash": "f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763.png",
+  "size": [
+    548,
+    459
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C5-D5-I-13",
+      "de": "Acquy chì khi phóng điện được mô tả theo mô hình dưới đây. Tại anode (cực âm):\nPb(s) + HSO₄⁻(aq) → PbSO₄(s) + H⁺(aq) + 2e\nTại cathode (cực dương):\nPbO₂(s) + HSO₄⁻(aq) + 3H⁺(aq) + 2e → PbSO₄(s) + 2H₂O(l)\nTrong quá trình acquy phóng điện, sự thay đổi nào sau đây đúng?",
+      "allHinh": [
+        {
+          "hash": "f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763",
+          "where": "12-KT-C5-D5-I-13.hinh.0.du_lieu",
+          "hashDataUrl": "f999320c9e6357494f1209c1ffc4e3db540a227092706edcfaffa9bbf3ec9d43"
+        }
+      ],
+      "missingHashes": [
+        "f21a4c96628f5e0bb0476dbd484b636908e6741180cefa7e22919531b76f9763"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1335-native3x.png",
+    "head20xOpened": "/workspace/scratch/1335-head20x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelcellgeometry, labels actualsourceonly; noextraelectrochemicalanswer.",
+  "geometry": {
+    "classification": "Flatcolored leadbattery schematic, notphoto.",
+    "beaker": {
+      "outline": [
+        [
+          99,
+          158
+        ],
+        [
+          99,
+          404
+        ],
+        [
+          466,
+          404
+        ],
+        [
+          466,
+          158
+        ]
+      ],
+      "fillBelowLiquid": "mediumgray",
+      "liquidSurfaceSegments": [
+        [
+          [
+            101,
+            231
+          ],
+          [
+            137,
+            231
+          ]
+        ],
+        [
+          [
+            221,
+            231
+          ],
+          [
+            357,
+            231
+          ]
+        ],
+        [
+          [
+            442,
+            228
+          ],
+          [
+            464,
+            228
+          ]
+        ]
+      ],
+      "surfaceCaution": "Righttinysegment is3pxhigher(228) thanleft/middle231 in source. Retain nativeoffset, do notnormalize.",
+      "noTopCap": true
+    },
+    "leftPlate": {
+      "rect": [
+        137,
+        161,
+        221,
+        367
+      ],
+      "topColorRGB": [
+        112,
+        146,
+        190
+      ],
+      "lowerWhiteRegion": "M137337 C157323 165309 184304 L221293 V367 H137 Z",
+      "boundaryFinding": "Leftinterface slopesUPright from137337 to221293 withmildcurve; whitePbSO4below",
+      "outline": "thin gray"
+    },
+    "rightPlate": {
+      "rect": [
+        357,
+        164,
+        442,
+        369
+      ],
+      "topColorRGB": [
+        181,
+        221,
+        27
+      ],
+      "lowerWhiteRegion": "M357291 C387298 398302 416317 L442342 V369 H357 Z",
+      "boundaryFinding": "Rightinterface slopesDOWNright from357291 to442342 withmildcurve; whitePbSO4below",
+      "outline": "thin gray"
+    },
+    "wires": [
+      [
+        [
+          173,
+          165
+        ],
+        [
+          173,
+          112
+        ],
+        [
+          250,
+          112
+        ]
+      ],
+      [
+        [
+          327,
+          111
+        ],
+        [
+          396,
+          111
+        ],
+        [
+          396,
+          169
+        ]
+      ]
+    ],
+    "meter": {
+      "rect": [
+        250,
+        92,
+        327,
+        127
+      ],
+      "text": "2,1V",
+      "textBBox": [
+        261,
+        100,
+        311,
+        121
+      ],
+      "fill": "white"
+    },
+    "electronArrow": {
+      "shaft": [
+        [
+          191,
+          73
+        ],
+        [
+          372,
+          73
+        ]
+      ],
+      "head": "RIGHT openVstroked legs approx36367→37273→36379; darkshaft/antialiasmergeblacktip, no separateclosedbase",
+      "label": {
+        "text": "e",
+        "bbox": [
+          267,
+          49,
+          281,
+          68
+        ],
+        "note": "baseline e ONLY, NOminuscharge"
+      },
+      "headCount": 1
+    },
+    "labels": [
+      {
+        "text": "(-)",
+        "bbox": [
+          139,
+          131,
+          165,
+          155
+        ],
+        "color": "black",
+        "note": "parenthesizedbaselinehyphen source, no separatecircle"
+      },
+      {
+        "text": "(+)",
+        "bbox": [
+          402,
+          135,
+          435,
+          160
+        ],
+        "color": "black"
+      },
+      {
+        "text": "Pb",
+        "bbox": [
+          164,
+          204,
+          194,
+          225
+        ],
+        "color": "white"
+      },
+      {
+        "text": "PbO₂",
+        "bbox": [
+          376,
+          199,
+          429,
+          223
+        ],
+        "color": "black"
+      },
+      {
+        "text": "PbSO₄",
+        "bbox": [
+          150,
+          330,
+          215,
+          353
+        ],
+        "color": "black"
+      },
+      {
+        "text": "PbSO₄",
+        "bbox": [
+          367,
+          330,
+          432,
+          353
+        ],
+        "color": "black"
+      },
+      {
+        "text": "H⁺",
+        "bbox": [
+          270,
+          253,
+          300,
+          273
+        ],
+        "color": "white",
+        "plus": "SUP"
+      },
+      {
+        "text": "HSO₄⁻",
+        "bbox": [
+          262,
+          316,
+          326,
+          341
+        ],
+        "color": "white",
+        "4": "SUB",
+        "minus": "SUP"
+      }
+    ],
+    "font": "ALLregularuprightserif labels, noactualbold/italicblocks; sourcebluePbwhite andsolutionionswhitecontrast.",
+    "counts": {
+      "beakers": 1,
+      "plates": 2,
+      "whitePbSO4Regions": 2,
+      "wireBranches": 2,
+      "meterBoxes": 1,
+      "arrowheads": 1,
+      "bubbles": 0,
+      "particles": 0
+    },
+    "noAdded": [
+      "e-minus",
+      "watermolecules",
+      "electrolytearrow",
+      "electrodecurrentarrows",
+      "anode/cathodewords",
+      "bubbles",
+      "reactionequationsfromstem",
+      "numbers/unitsbeyond2,1V"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootColorVerification": {
+    "note": "Sourceagentgreen18122127 not used. Root sampled native actualpixel400190 gives18123029; preserve explicit source sample and builderRGB.",
+    "samples": {
+      "150190": [
+        112,
+        146,
+        190
+      ],
+      "400190": [
+        181,
+        230,
+        29
+      ],
+      "250300": [
+        127,
+        127,
+        127
+      ]
+    }
+  }
+}
