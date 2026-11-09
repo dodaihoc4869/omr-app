@@ -32,7 +32,7 @@ describe('máy em', () => {
     ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText(/Em đã vào lớp lúc/)).toBeTruthy()
     // Lúc chờ (chưa có lượt) em rời được — không bị kẹt khi thầy quên kết thúc / có ca kiểm tra.
-    expect(screen.getByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeTruthy()
+    expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Thoát|Đóng/ })).toBeNull()
@@ -71,21 +71,15 @@ describe('máy em', () => {
     expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «bỏ chữ rời bình phản ứng … khoá cứng tới khi tôi kết thúc buổi học»): không còn nút rời; mở đáp án ⇒ màn vẫn ở lại.
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    act(() => { screen.getByRole('button', { name: 'Rời Bình Phản Ứng' }).click() })
-    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull()
+    expect(screen.getByRole('dialog', { name: 'Bình Phản Ứng' })).toBeTruthy()
     expect(onDong).not.toHaveBeenCalled()
     expect(WsGia.ds).toHaveLength(1) // vẫn một kết nối, không nối lại
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
-    act(() => { screen.getByRole('button', { name: 'Gửi đáp án' }) })
-    // đang thi ⇒ lượt mới KHÔNG tự hiện
-    moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    act(() => { screen.getByRole('button', { name: 'Rời Bình Phản Ứng' }).click() })
-    thi = true
-    moLuot(st, { ...cau, qid: 'q3' }, T0 + 15000); ws.nhan(viewEm(st, 'S1'))
-    await new Promise((r) => setTimeout(r, 30))
-    expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
+    void thi
   })
   it('em được gọi lên bảng thấy lý do', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
@@ -139,7 +133,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(document.querySelector('.bpu-kq-o[data-kq="dung"] b')!.textContent).toBe('B')
     expect(screen.queryAllByRole('radio')).toHaveLength(0)
     expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
-    expect(screen.getByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeTruthy() // chờ giữa lượt: rời được (không kẹt)
+    expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng, không nút rời
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
     expect(document.querySelector('.bpu-che')).toBeNull()

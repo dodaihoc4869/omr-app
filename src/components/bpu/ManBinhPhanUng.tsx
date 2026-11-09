@@ -108,8 +108,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   useEffect(() => { if (mo > 0) setAn(false) }, [mo])
 
   const [v, setV] = useState<ViewEm | null>(null)
-  /** Rời: màn giữ nối thì chỉ ẩn (lượt hiện tại coi như đã xem); không thì đóng hẳn. */
-  const roi = () => { if (!giuNoi) { onDong(); return } boLuot.current = v?.luot?.so ?? 0; setAn(true) }
+  // 09/11 thầy «khi tôi kết thúc buổi học thì học sinh mới thoát được màn này, còn lại khoá cứng»: KHÔNG còn nút / lệnh rời Bình Phản Ứng.
   const [tt, setTt] = useState<'noi' | 'mat-mang' | 'chua-mo' | 'khong-buoi' | 'tat' | 'ok'>('noi')
   const [chon, setChon] = useState('')
   const [baoTra, setBaoTra] = useState('')
@@ -201,7 +200,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   useEffect(() => { if (!coHan) return; const h = setInterval(() => setNay(Date.now()), 500); return () => clearInterval(h) }, [coHan])
 
   // RỜI MÀN: CHỈ khi đang có lượt chưa mở đáp án (đang làm / bạn lên bảng). Ẩn app ≥ 2 giây ⇒ báo phòng một lần; quay lại ⇒ màn cảnh báo; nút Back bị giữ.
-  // Lúc chờ giữa các lượt em rời được (nút «Rời Bình Phản Ứng», không phạt) ⇒ thầy quên kết thúc hay mở ca kiểm tra thì em không bị kẹt.
+  // Không có nút rời (09/11): em chỉ thoát khi thầy kết thúc buổi học (phòng kết thúc ⇒ màn tự đóng).
   const dangChoi = !an && !!v?.luot && v.luot.pha !== 'mo' && !v.ketThuc
   useEffect(() => {
     if (!dangChoi) return
@@ -281,7 +280,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         <div className="bpu-doi-the" style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau})` }}><b>{tenDoi} · {v.doi.so}/{v.doi.tong} bạn đã vào</b><div className="vach"><i style={{ width: `${(v.doi.so / Math.max(1, v.doi.tong)) * 100}%` }} /></div><span>Đội đang có {v.doi.kj} kJ.</span></div>
         <p>Thầy chiếu câu nào, câu đó tự hiện ở đây. Đang làm câu mà rời màn là thầy thấy trên bảng.</p></div>
     )
-    day = <button type="button" className="bpu-nut phu" onClick={roi}>Rời Bình Phản Ứng</button>
+    day = null // 09/11 thầy «bỏ chữ rời bình phản ứng … khoá cứng»: không còn nút rời — chỉ «Kết thúc buổi học» của thầy mới cho em thoát.
   } else if ((l.pha === 'goi' || l.pha === 'lam-bang') && l.goi) {
     const g = l.goi, cung = g.doi === doi
     if (g.sbd === e.sbd) {
@@ -312,7 +311,6 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     const chonHien = daGui ? l.emTra!.chon : chon
     const k = l.ketQua
     const chuDung = l.tuLuan ? '' : l.phan === 'II' ? (l.dung ?? '').split('').map((x, i) => `${'abcd'[i]}) ${x === 'D' ? 'Đúng' : 'Sai'}`).join(' · ') : String(l.dung ?? '')
-    const roiNho = <button type="button" className="bpu-roi-nho" onClick={roi}>Rời Bình Phản Ứng</button>
     const baoMang = tt === 'mat-mang' ? <div className="bpu-bao" role="status">Mất kết nối, đang nối lại… Đáp án em chọn vẫn giữ trên máy, nối lại là gửi.</div> : null
     if (che) {
       // LỚP CHE SAU KHI GỬI (thầy 09/11): kín màn, không đề, không nút mở — chỉ câu mới (số lượt đổi) mới mở. Mở đáp án ⇒ kết quả xanh / đỏ ngay trên lớp che.
@@ -336,7 +334,6 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
             <p className="bpu-che-bang">Nhìn lên bảng để chữa bài</p>
             {baoTra ? <div className="bpu-bao" role="status">{baoTra}</div> : null}
             {!daGui ? baoMang : null}
-            {daMo ? roiNho : null}
           </div>
         </div>
       )
@@ -364,8 +361,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     if (che) day = dangBay ? <div className="bpu-hai-nut"><button type="button" className="bpu-nut" disabled>Đã gửi</button></div> : null
     else if (daMo) {
       // Em CHƯA gửi mà thầy mở đáp án: không che (em chưa có gì để giữ); đáp án đúng tô XANH ngay dưới đề + lời giải như cũ.
-      if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p>{roiNho}</div>
-      else day = <div className="bpu-ket sai" role="status"><h4>Em chưa gửi kịp</h4>{l.dung ? <KetQuaChon phan={l.phan} chon="" dung={l.dung} emDung={false} /> : <p>Đáp án đúng: {chuDung}</p>}{roiNho}</div>
+      if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p></div>
+      else day = <div className="bpu-ket sai" role="status"><h4>Em chưa gửi kịp</h4>{l.dung ? <KetQuaChon phan={l.phan} chon="" dung={l.dung} emDung={false} /> : <p>Đáp án đúng: {chuDung}</p>}</div>
     } else {
       day = (
         <div className="bpu-hai-nut">
