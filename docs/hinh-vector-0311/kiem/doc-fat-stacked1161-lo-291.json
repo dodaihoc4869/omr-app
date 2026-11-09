@@ -1,0 +1,387 @@
+{
+  "i": 1161,
+  "hash": "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398.png",
+  "size": [
+    1206,
+    462
+  ],
+  "manifestPresent": true,
+  "publicQuestions": [
+    {
+      "qid": "12-C1-B1-D3-II-17",
+      "de": "Hình dưới đây mô tả hàm lượng % về khối lượng các gốc acid béo trong một số loại dầu thực vật và mỡ động vật.",
+      "allHinh": [
+        {
+          "hash": "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398",
+          "where": "12-C1-B1-D3-II-17.hinh.0.du_lieu",
+          "hashDataUrl": "3ba2c214c398f402697ff1465db62597706a0f4a5fb6ff27e27effc4d3aeeab9"
+        }
+      ],
+      "missingHashes": [
+        "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "allQuestionsOnlyThisSource": true,
+    "affectedQids": 1,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "legendMacroOpened": "/workspace/scratch/1161-legend2x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "Flat stacked horizontal bar chart, typography and vector rectangles; not product/photo.",
+    "rowsTopToBottom": [
+      {
+        "label": "Dầu hướng dương",
+        "literalPercentLabels": [
+          "11%",
+          "20%",
+          "69%"
+        ],
+        "bounds": [
+          225,
+          62,
+          1133,
+          95
+        ],
+        "segmentXBoundaries": [
+          225,
+          319,
+          497,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            253,
+            237,
+            77
+          ],
+          [
+            207,
+            235,
+            26
+          ],
+          [
+            251,
+            185,
+            200
+          ]
+        ]
+      },
+      {
+        "label": "Dầu oliu",
+        "literalPercentLabels": [
+          "14%",
+          "77%",
+          "9%"
+        ],
+        "bounds": [
+          225,
+          107,
+          1133,
+          141
+        ],
+        "segmentXBoundaries": [
+          225,
+          345,
+          1055,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            253,
+            237,
+            77
+          ],
+          [
+            207,
+            235,
+            27
+          ],
+          [
+            250,
+            184,
+            199
+          ]
+        ]
+      },
+      {
+        "label": "Dầu đậu nành",
+        "literalPercentLabels": [
+          "15%",
+          "24%",
+          "61%"
+        ],
+        "bounds": [
+          225,
+          152,
+          1133,
+          185
+        ],
+        "segmentXBoundaries": [
+          225,
+          354,
+          568,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            254,
+            237,
+            77
+          ],
+          [
+            205,
+            235,
+            26
+          ],
+          [
+            251,
+            185,
+            200
+          ]
+        ]
+      },
+      {
+        "label": "Dầu lạc",
+        "literalPercentLabels": [
+          "18%",
+          "48%",
+          "34%"
+        ],
+        "bounds": [
+          225,
+          196,
+          1133,
+          229
+        ],
+        "segmentXBoundaries": [
+          225,
+          381,
+          813,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            254,
+            236,
+            77
+          ],
+          [
+            206,
+            235,
+            26
+          ],
+          [
+            251,
+            183,
+            199
+          ]
+        ]
+      },
+      {
+        "label": "Mỡ lợn",
+        "literalPercentLabels": [
+          "41%",
+          "47%",
+          "12%"
+        ],
+        "bounds": [
+          225,
+          239,
+          1133,
+          272
+        ],
+        "segmentXBoundaries": [
+          225,
+          587,
+          1018,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            254,
+            237,
+            77
+          ],
+          [
+            205,
+            235,
+            26
+          ],
+          [
+            250,
+            185,
+            199
+          ]
+        ]
+      },
+      {
+        "label": "Mỡ bò",
+        "literalPercentLabels": [
+          "52%",
+          "44%",
+          "4%"
+        ],
+        "bounds": [
+          225,
+          283,
+          1133,
+          316
+        ],
+        "segmentXBoundaries": [
+          225,
+          687,
+          1097,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            254,
+            237,
+            77
+          ],
+          [
+            206,
+            235,
+            26
+          ],
+          [
+            37,
+            32,
+            24
+          ]
+        ]
+      },
+      {
+        "label": "Chất béo từ bơ\nđộng vật",
+        "literalPercentLabels": [
+          "66%",
+          "30%",
+          "4%"
+        ],
+        "bounds": [
+          225,
+          327,
+          1133,
+          360
+        ],
+        "segmentXBoundaries": [
+          225,
+          813,
+          1097,
+          1133
+        ],
+        "labelPositions": "each percent near left edge of its own segment, vertically near upper-middle; preserve narrow 4% text inside pink segment",
+        "sampleRGB": [
+          [
+            254,
+            236,
+            77
+          ],
+          [
+            207,
+            235,
+            26
+          ],
+          [
+            137,
+            124,
+            107
+          ]
+        ]
+      }
+    ],
+    "seriesLeftToRight": [
+      {
+        "text": "gốc no",
+        "color": "yellow",
+        "legendSwatch": [
+          222,
+          378,
+          246,
+          401
+        ]
+      },
+      {
+        "text": "gốc không no chứa 1 liên kết đôi",
+        "color": "lime green",
+        "legendSwatch": [
+          355,
+          378,
+          379,
+          401
+        ]
+      },
+      {
+        "text": "gốc không no chứa nhiều liên kết đôi",
+        "color": "pink",
+        "legendSwatch": [
+          742,
+          378,
+          766,
+          401
+        ]
+      }
+    ],
+    "leftAxis": {
+      "line": [
+        [
+          223,
+          54
+        ],
+        [
+          223,
+          367
+        ]
+      ],
+      "color": "black",
+      "arrowhead": false,
+      "ticks": false,
+      "numbers": false
+    },
+    "background": {
+      "panel": [
+        50,
+        53,
+        1148,
+        406
+      ],
+      "sampleRGB": [
+        251,
+        249,
+        238
+      ],
+      "outside": "white; retain chart whitespace, no data outside panel"
+    },
+    "typography": "All labels upright black, visibly condensed thick source lettering, no italic/title. Numerals percent labels similarly dark; preserve literal diacritics. Native condensed appearance cannot be reproduced by assuming Arial bold; use app glyphs with readable spacing.",
+    "noAdded": [
+      "title",
+      "axis scale or 0/100 labels",
+      "arrowheads",
+      "tick stems",
+      "legend percentages",
+      "scientific inferred corrections"
+    ],
+    "dataTrap": "Dầu lạc literal18/48/34, Dầu đậu nành15/24/61, Mỡ bò52/44/4. Do not normalize pixel lengths to exact numeric percentages: retain source segment boundaries/layout. Last label is Chất béo từ bơ / động vật across two lines."
+  },
+  "coordinateMeaning": "Native raster approximate ink/bar boundaries, not newly inferred scientific values; literal percentages separately transcribed.",
+  "actualSvgReviewed": true,
+  "lo": 291,
+  "rootNativeFullOpened": true,
+  "rootLegendMacroOpened": true,
+  "hashSvg": "fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc",
+  "verdict": "Đạt sau root riêng nativeFULL/allrefs/freshactual3x và readonly mới exacthash; khép 1 câu."
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1161,
+    "hash": "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398",
+    "fileNguon": "anh/d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398.png",
+    "svg": "ti-le-acid-beo-ddh-fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc.svg",
+    "hashSvg": "fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc",
+    "byteSvg": 123047,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-II-17",
+        "de": "Hình dưới đây mô tả hàm lượng % về khối lượng các gốc acid béo trong một số loại dầu thực vật và mỡ động vật.",
+        "refs": [
+          {
+            "hash": "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398",
+            "where": "12-C1-B1-D3-II-17.hinh.0.du_lieu",
+            "hashDataUrl": "3ba2c214c398f402697ff1465db62597706a0f4a5fb6ff27e27effc4d3aeeab9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7stackedbars/3colors/21percentlabels11-20-69;14-77-9;15-24-61;18-48-34;41-47-12;52-44-4;66-30-4/7nameslast2lines/3legendlabels/1verticalbaseline/noaddedticks-title-answer/noheightorwidthnormalization.",
+    "hashSvgDaSoat": "fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

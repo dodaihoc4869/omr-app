@@ -2107,6 +2107,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398": {
+      "tep": "ti-le-acid-beo-ddh-fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc.svg",
+      "hashSvg": "fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc",
+      "byteSvg": 123047,
+      "byteGzip": 14418,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1e4c07809750802525d6d91583a40f7ea072e611dec648e2c579f1a799d93021": {
       "tep": "aspirin-phan-ung-ddh-cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08.svg",
       "hashSvg": "cc3aff3924cf151802c04f57f832d64a8c193a4323c8f638670f55c42311dc08",
@@ -10265,6 +10274,20 @@
           "where": "12-C1-B1-D3-II-14.hinh.1.du_lieu",
           "hashDataUrl": "3c48598234a3d6fb36eef5fa70bb511b634fb451a251816d9632c2c8e73d38bc",
           "vector": "cau-truc-ddh-cafdccd4651b1164d6a8e3ec2a6b7d1b63ce53d0d5e3e2eb3723728ec636d8c5.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D3-II-17",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d2afad956e05038c1e248aba1a3f626cb2750b769edaca5941edeb7d201ee398",
+          "where": "12-C1-B1-D3-II-17.hinh.0.du_lieu",
+          "hashDataUrl": "3ba2c214c398f402697ff1465db62597706a0f4a5fb6ff27e27effc4d3aeeab9",
+          "vector": "ti-le-acid-beo-ddh-fa8a137bff4d68600ce06fd5841cdc76b8629f57c4c26d85fc849560f6c053dc.svg"
         }
       ]
     },
@@ -28696,6 +28719,7 @@
     "12-C1-B1-D3-II-8",
     "12-C1-B1-D3-II-9",
     "12-C1-B1-D3-II-14",
+    "12-C1-B1-D3-II-17",
     "12-C1-B1-D3-III-5",
     "12-C1-B1-D3-III-6",
     "12-C1-B1-D3-III-11",
