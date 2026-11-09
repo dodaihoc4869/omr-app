@@ -42,7 +42,7 @@ export const JS_LEN_BANG_BPU = `
   function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); }
   function luaDoi(d, em) {
     xoaLua();
-    var mau = String(em.mau || '').trim(); if (!mau || !/^[#a-z0-9(),.%\s-]+$/i.test(mau)) return;
+    var mau = String(em.mau || '').trim(); if (!mau || !/^[#a-z0-9(),.%\\s-]+$/i.test(mau)) return;
     var v = d.querySelector('.mc-vung-de'); if (!v) return;
     if (!document.getElementById('bpu-lua-css')) { var st = document.createElement('style'); st.id = 'bpu-lua-css'; st.textContent = CSS_LUA; document.head.appendChild(st); }
     var w = document.createElement('div'); w.className = 'bpu-lua-doi'; w.setAttribute('aria-hidden', 'true'); w.style.setProperty('--doi', mau);
