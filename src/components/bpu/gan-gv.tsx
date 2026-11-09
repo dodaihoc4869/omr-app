@@ -23,6 +23,8 @@ let nhanCham: ((dat: boolean) => void) | null = null
 /** MỘT GỐC BẢNG (09/11): điểm danh → chọn câu → các lượt dùng CHUNG một bảng (một nối phòng, không dựng lại, không chớp «Đang mở…»).
  *  Props hiện tại của bảng; lần vẽ sau GỘP vào (mã điểm danh đổi mỗi phút không đè câu đang chiếu). */
 let hien: { buoiId: string; ma?: string | null; linkQr?: string | null; qid?: string | null; luot?: number; giay?: number; tuDong?: boolean; diemDanh?: boolean } | null = null
+/** Bảng đang lui sau tấm buổi dạy (moHoatDong) — tờ của khối báo câu ⇒ bảng hiện lại. */
+let anViHd = false
 /** Bước Điểm danh (app thầy) muốn biết khi bảng đóng. */
 let dongNgoai: (() => void) | null = null
 const NHO_BUOI_MS = 60_000
@@ -131,14 +133,13 @@ export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | 
 // & tính toán · Kiểm tra ôn tập mở trên tấm riêng (dưới tờ chiếu, dưới bảng). Mở từ bảng ⇒ bảng lui (ẩn, giữ nối); khối chiếu câu ⇒ bảng hiện lại.
 let hdGoc: Root | null = null
 let hdKhung: HTMLDivElement | null = null
-let anViHd = false
 export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
   const { default: Tam } = await import('./TamHoatDong')
   if (!hdKhung) { hdKhung = document.createElement('div'); hdKhung.setAttribute('data-bpu-hd', ''); document.body.appendChild(hdKhung); hdGoc = createRoot(hdKhung) }
   hdGoc!.render(<Tam key={hd} hd={hd} coBang={!!khung} onDong={dongHoatDong} />)
   if (khung && !bangAn()) { anViHd = true; anBang() }
 }
-const moHoatDongTuBang = (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => { void moHoatDong(hd) }
+function moHoatDongTuBang(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): void { void moHoatDong(hd) }
 export function dongHoatDong(): void {
   hdGoc?.unmount(); hdGoc = null; hdKhung?.remove(); hdKhung = null
   if (anViHd) { anViHd = false; hienBang() }
@@ -206,7 +207,7 @@ export function dongBang(): void {
 // Tờ ở cửa sổ riêng (không nằm trong trang) ⇒ ẩn tức thì như cũ.
 const giamChuyenDong = () => (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches) || document.documentElement.classList.contains('may-yeu')
 const toTrongTrang = () => !!nguonTo && [...document.querySelectorAll('iframe')].some((f) => f.contentWindow === nguonTo)
-const bangAn = () => !!khung && khung.hasAttribute('data-an')
+function bangAn(): boolean { return !!khung && khung.hasAttribute('data-an') }
 function baoAnHien(an: boolean): void { try { window.dispatchEvent(new CustomEvent('bpu-an-hien', { detail: an })) } catch { /* trình duyệt cũ */ } }
 function anBang(): void {
   const el = khung
