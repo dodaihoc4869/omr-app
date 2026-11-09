@@ -17,7 +17,7 @@ import {MomQuestionStem,MomOption} from '../components/MomQuestionMedia'
 import {momApi, momReviewHtml} from '../lib/mom-api'
 // Gói C 15/10: KhoiKhacPhuc3CheDo nay nạp lười (mảnh khối phụ, dưới) — nhưng thẻ câu GIỮ trong mảnh mở cổng như trước: các màn lười của em
 // (Ôn câu, Làm bài tập, Câu đã làm…) vẫn dựa vào tờ kiểu đi cùng nó (m3/the-cau.css: `.m3 .loi-giai`, `.m3 .the-cau`). Bỏ dòng này là đổi màu.
-import '../components/TheCau'
+// (TheCau nạp lười: tờ kiểu the-cau.css đi cùng mảnh TheCau khi màn cần nó mở)
 import {syncStudentExp} from '../game/than-thu-v2/academic-sync'
 import NutQuayLai from '../components/NutQuayLai'
 import { dungM3, ThanhTren } from '../components/m3'
