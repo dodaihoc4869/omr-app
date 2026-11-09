@@ -354,10 +354,11 @@ html.may-yeu .bpu-bang .bb-goc.nay, html.may-yeu .bpu-bang .bb-goc.nay .ts b{ an
 .bcc::before{ content: ''; position: absolute; left: -40px; right: -40px; top: -12px; bottom: -36px; z-index: -1; background: var(--tr-nen); }
 /* LÊN BẢNG (thầy 09/11 «khi gọi lên bảng hiệu ứng đẳng cấp thu nhỏ luôn vào màn chiếu chuẩn trước đó»): bảng thu nhỏ về giữa + mờ dần, lộ tờ chiếu cũ
    ngay dưới; chấm Đạt / Chưa đạt ⇒ bảng phóng lại. gan-gv.tsx bật lớp; máy yếu / giảm chuyển động ⇒ ẩn hiện tức thì (không gắn lớp). */
-[data-bpu-bang].bpu-thu > .bpu-bang{ animation: bpu-thu 0.5s cubic-bezier(.4, 0, .2, 1) forwards; will-change: transform, opacity; pointer-events: none; }
-[data-bpu-bang].bpu-no > .bpu-bang{ animation: bpu-no 0.46s cubic-bezier(.2, .8, .2, 1) both; will-change: transform, opacity; }
-@keyframes bpu-thu { 0% { transform: none; opacity: 1; border-radius: 0; } 60% { opacity: 0.85; } 100% { transform: scale(0.8); opacity: 0; border-radius: 48px; } }
-@keyframes bpu-no { from { transform: scale(0.9); opacity: 0; border-radius: 48px; } to { transform: none; opacity: 1; border-radius: 0; } }
+[data-bpu-bang].bpu-san > .bpu-bang{ will-change: transform, opacity; }
+[data-bpu-bang].bpu-thu > .bpu-bang{ animation: bpu-thu 0.52s cubic-bezier(.32, .72, 0, 1) forwards; pointer-events: none; }
+[data-bpu-bang].bpu-no > .bpu-bang{ animation: bpu-no 0.48s cubic-bezier(.32, .72, 0, 1) both; }
+@keyframes bpu-thu { 0% { transform: scale(1); opacity: 1; } 55% { opacity: 0.9; } 100% { transform: scale(0.82); opacity: 0; } }
+@keyframes bpu-no { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .bpu-bang .bb-canh{ animation: none; } }
 html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 /* Thanh trên khi đang chiếu câu: đủ chỗ cho nút chính «Gọi lên bảng» (ảnh chụp 09/11: nút chính tràn mép). */
@@ -384,3 +385,5 @@ html.may-yeu .bpu-bao-chay::before, html.may-yeu .bpu-bao-chay-the, html.may-yeu
 /* Ô tên em đang rời màn: quầng đỏ (cùng màu báo cháy) — cả lớp thấy ngay trên dải tên. */
 .bpu-bang .bb-o.roi { box-shadow: 0 12px 40px color-mix(in srgb, var(--tr-sai) 45%, transparent); }
 .bpu-bang .bb-o.roi .nhan-roi { background: var(--tr-sai); color: var(--giay); }
+/* Esc ra Hôm nay (09/11): phiên tạm ẩn ⇒ không phủ báo cháy lên Hôm nay (bảng hiện lại ⇒ báo lại nếu em còn ở ngoài). */
+html[data-bpu-an] .bpu-bao-chay { display: none; }

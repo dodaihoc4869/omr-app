@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const api = vi.hoisted(() => ({ buoiDangMo: vi.fn(), moBuoiHoc: vi.fn(), xemBuoiHoc: vi.fn(), dongBuoiHoc: vi.fn(), linkDiemDanh: (g: string, m: string) => `${g}/hs?diem-danh=${m}` }))
 const lop = vi.hoisted(() => ({ layLopThay: vi.fn() }))
-const gan = vi.hoisted(() => ({ moBangDiemDanh: vi.fn(), capNhatMa: vi.fn(), dongBang: vi.fn() }))
+const gan = vi.hoisted(() => ({ moBangDiemDanh: vi.fn(), capNhatMa: vi.fn(), dongBang: vi.fn(), phienDangCo: vi.fn(() => null as { buoiId: string; tamAn: boolean } | null) }))
 vi.mock('../src/lib/buoi-hoc-api', () => api)
 vi.mock('../src/lib/ten-lop-thay', () => lop)
 vi.mock('../src/components/bpu/gan-gv', () => gan)
@@ -43,6 +43,13 @@ describe('nút Điểm danh ở màn Hôm nay', () => {
     expect(await batDauDiemDanh()).toEqual({ loai: 'chieu' })
     expect(api.buoiDangMo).toHaveBeenCalledTimes(1)
     expect(api.moBuoiHoc).toHaveBeenCalledWith('')
+  })
+  it('09/11 Esc ra Hôm nay rồi bấm Điểm danh ⇒ vào lại ĐÚNG phiên dở, không hỏi máy chủ', async () => {
+    gan.phienDangCo.mockReturnValueOnce({ buoiId: 'dang', tamAn: true })
+    const { batDauDiemDanh } = await import('../src/lib/bpu/diem-danh-nhanh')
+    expect(await batDauDiemDanh()).toEqual({ loai: 'chieu' })
+    expect(api.buoiDangMo).not.toHaveBeenCalled()
+    expect(gan.moBangDiemDanh).toHaveBeenCalledWith({ buoiId: 'dang' })
   })
   it('máy chủ lỗi ⇒ trả câu báo, không mở bảng', async () => {
     api.buoiDangMo.mockResolvedValue({ ok: false, chu: 'Chưa kết nối được máy chủ.' })

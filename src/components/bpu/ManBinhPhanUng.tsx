@@ -21,7 +21,10 @@ type LoiGiaiCauKieu = ComponentType<{ q: Question; solution: unknown; dapAn: str
 const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
 const LUI_MS = [1500, 3000, 6000, 12000, 20000]
 /** Ẩn app lâu hơn ngần này mới tính là rời màn (bàn phím, kéo thanh thông báo không tính). */
-export const ROI_MAN_MS = 2000
+export const ROI_MAN_MS = 0 // 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app là báo NGAY
+/** Mất tiêu điểm (cửa sổ nổi / bong bóng / chia đôi màn hình — app vẫn hiện nhưng em đang chạm ứng dụng khác) lâu hơn ngần này ⇒ báo rời. Ngắn để tức thì,
+ *  đủ nuốt nháy tiêu điểm của hộp hệ thống chớp qua. */
+export const NOI_MS = 350
 
 type Tin = { t: string; [k: string]: unknown }
 const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
@@ -113,6 +116,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const [chon, setChon] = useState('')
   const [baoTra, setBaoTra] = useState('')
   const [vuaRoi, setVuaRoi] = useState(false)
+  /** Lần rời gần nhất là CỬA SỔ NỔI (app vẫn hiện nhưng mất tiêu điểm) ⇒ cảnh báo riêng «không được dùng cửa sổ nổi». */
+  const [noi, setNoi] = useState(false)
   /** Khoá lượt (số:giờ mở) em vừa BẤM GỬI trên máy (che ngay, không chờ phòng báo lại — mất mạng vẫn che); lượt mới ⇒ số khác ⇒ tự mở. */
   const [cheSo, setCheSo] = useState('')
   /** Khoá lượt đang chạy hiệu ứng gửi (tia lửa bay lên) — xong ~1,15 s thì đề bên dưới mới gỡ khỏi màn. */
@@ -189,10 +194,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   // VỀ LẠI MÀN (thầy 09/11 bỏ trừ kJ): đã báo «rời» mà app hiện lại ⇒ báo phòng `ve` (gỡ tên em khỏi «đang rời» trên bảng). Nghe ở mức màn — kể cả khi
   // trong lúc em rời thầy đã mở đáp án (lúc ấy nhánh nghe rời màn đã gỡ). Mất mạng ⇒ `ve` nằm hàng chờ, nối lại là gửi sau `vao`/`chao`.
   useEffect(() => {
-    const hien = () => { if (!document.hidden && daBaoRoi.current) { daBaoRoi.current = false; gui({ t: 've' }) } }
+    const hien = () => { if (!document.hidden && document.hasFocus() && daBaoRoi.current) { daBaoRoi.current = false; gui({ t: 've' }) } }
     document.addEventListener('visibilitychange', hien)
     window.addEventListener('pageshow', hien)
-    return () => { document.removeEventListener('visibilitychange', hien); window.removeEventListener('pageshow', hien) }
+    window.addEventListener('focus', hien) // tắt cửa sổ nổi / chạm lại vào app ⇒ về lại
+    return () => { document.removeEventListener('visibilitychange', hien); window.removeEventListener('pageshow', hien); window.removeEventListener('focus', hien) }
   }, [gui])
 
   // Đồng hồ êm (không đổi màu, không nháy — luật C14).
@@ -206,17 +212,25 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   useEffect(() => {
     if (!dangChoi) return
     let hen: ReturnType<typeof setTimeout> | undefined
+    const bao = (laNoi: boolean) => { setNoi(laNoi); setVuaRoi(true); if (daBaoRoi.current) return; daBaoRoi.current = true; gui({ t: 'roi' }) }
     const doi = () => {
-      if (document.hidden) { hen = setTimeout(() => { daBaoRoi.current = true; gui({ t: 'roi' }); setVuaRoi(true) }, ROI_MAN_MS) }
+      if (document.hidden) { clearTimeout(hen); bao(false) } // TỨC THÌ (09/11 lần 4)
       else clearTimeout(hen)
     }
+    // CỬA SỔ NỔI (thầy 09/11 «phát hiện được cả ứng dụng nổi lên trên»): app vẫn hiện (không có visibilitychange) nhưng tiêu điểm sang app nổi ⇒ blur.
+    // Còn mất tiêu điểm sau NOI_MS ⇒ báo rời; lấy lại tiêu điểm ⇒ `ve` (nghe ở hiệu ứng «về lại màn» bên dưới).
+    let henNoi: ReturnType<typeof setTimeout> | undefined
+    const matTieuDiem = () => { clearTimeout(henNoi); henNoi = setTimeout(() => { if (!document.hidden && !document.hasFocus()) bao(true) }, NOI_MS) }
+    const coTieuDiem = () => clearTimeout(henNoi)
+    window.addEventListener('blur', matTieuDiem)
+    window.addEventListener('focus', coTieuDiem)
     const anTrang = () => { if (document.hidden) { daBaoRoi.current = true; gui({ t: 'roi' }) } }
     document.addEventListener('visibilitychange', doi)
     window.addEventListener('pagehide', anTrang)
     try { window.history.pushState({ bpu: 1 }, '') } catch { /* trình duyệt cũ */ }
     const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
     window.addEventListener('popstate', giuLai)
-    return () => { clearTimeout(hen); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
+    return () => { clearTimeout(hen); clearTimeout(henNoi); window.removeEventListener('blur', matTieuDiem); window.removeEventListener('focus', coTieuDiem); document.removeEventListener('visibilitychange', doi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai) }
   }, [gui, dangChoi])
 
   // Toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho khi có thao tác của em; không hỗ trợ ⇒ bỏ qua).
@@ -274,7 +288,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     day = <button type="button" className="bpu-nut" onClick={onDong}>Về chặng đang làm</button>
   } else if (vuaRoi) {
     // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy bỏ trừ kJ khi rời màn): không nhắc kJ — nhắc em quay lại tập trung lên bảng.
-    than = <div className="bpu-hs-giua"><div className="bpu-canh" aria-hidden="true">!</div><h3>Em vừa rời màn hình</h3><p>Bảng đang báo tên em — quay lại tập trung lên bảng.</p><p className="nho">Trong Bình Phản Ứng em ở lại màn này tới khi thầy kết thúc.</p></div>
+    than = noi ? <div className="bpu-hs-giua bpu-noi"><div className="bpu-canh" aria-hidden="true">!</div><h3>Không được dùng cửa sổ nổi</h3><p>Em vừa mở ứng dụng nổi / chia đôi màn hình. Bảng đang báo đỏ tên em trước cả lớp.</p><p className="nho">Tắt cửa sổ nổi, chạm vào đây và nhìn lên bảng.</p></div> : <div className="bpu-hs-giua"><div className="bpu-canh" aria-hidden="true">!</div><h3>Em vừa rời màn hình</h3><p>Bảng đang báo tên em — quay lại tập trung lên bảng.</p><p className="nho">Trong Bình Phản Ứng em ở lại màn này tới khi thầy kết thúc.</p></div>
     day = <button type="button" className="bpu-nut" onClick={() => setVuaRoi(false)}>Quay lại lượt đang làm</button>
   } else if (!l) {
     than = (

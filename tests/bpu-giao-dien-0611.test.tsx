@@ -120,7 +120,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(document.querySelector('.bpu-che.bay .bpu-tia')).toBeTruthy()
     expect(screen.getByText('Đang gửi…')).toBeTruthy()
     expect(screen.getAllByRole('radio').every((b) => (b as HTMLButtonElement).disabled)).toBe(true)
-    await waitFor(() => expect(screen.queryAllByRole('radio')).toHaveLength(0), { timeout: 2500 })
+    await waitFor(() => expect(screen.queryAllByRole('radio')).toHaveLength(0), { timeout: 6000 }) // hiệu ứng gửi ~1,15 s; máy chạy test bận ⇒ chừa rộng (chập chờn 09/11)
     expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
     nhanTra(st, 'S1', 'A', T0 + 2000); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText(/Đã gửi sau 2 giây/)).toBeTruthy()
@@ -181,11 +181,10 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     await screen.findByRole('button', { name: 'Gửi đáp án' })
     let an = false
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => an })
+    const tieuDiem = vi.spyOn(document, 'hasFocus').mockImplementation(() => !an)
     try {
-      vi.useFakeTimers()
+      // 09/11 (lần 4) thầy «cảnh báo … phải tức thì»: ẩn app ⇒ `roi` NGAY (không chờ 2 giây)
       an = true; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
-      act(() => { vi.advanceTimersByTime(2100) })
-      vi.useRealTimers()
       expect(coTin(ws, 'roi')).toBe(1)
       an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
       expect(coTin(ws, 've')).toBe(1)
@@ -199,7 +198,27 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
       expect(coTin(ws, 'roi')).toBe(2)
       an = false; act(() => { window.dispatchEvent(new Event('pageshow')) })
       expect(coTin(ws, 've')).toBe(2)
-    } finally { vi.useRealTimers(); delete (document as unknown as Record<string, unknown>).hidden }
+    } finally { vi.useRealTimers(); tieuDiem.mockRestore(); delete (document as unknown as Record<string, unknown>).hidden }
+  })
+  it('09/11 CỬA SỔ NỔI: app vẫn hiện nhưng mất tiêu điểm ⇒ `roi` + cảnh báo «Không được dùng cửa sổ nổi»; lấy lại tiêu điểm ⇒ `ve`', async () => {
+    const ws = await vao()
+    const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
+    await screen.findByRole('button', { name: 'Gửi đáp án' })
+    let co = true
+    const tieuDiem = vi.spyOn(document, 'hasFocus').mockImplementation(() => co)
+    try {
+      co = false; act(() => { window.dispatchEvent(new Event('blur')) })
+      await new Promise((r) => setTimeout(r, 450))
+      expect(coTin(ws, 'roi')).toBe(1)
+      expect(await screen.findByText('Không được dùng cửa sổ nổi')).toBeTruthy()
+      co = true; act(() => { window.dispatchEvent(new Event('focus')) })
+      expect(coTin(ws, 've')).toBe(1)
+      // mất tiêu điểm chớp qua (< 350 ms) ⇒ không báo
+      co = false; act(() => { window.dispatchEvent(new Event('blur')) })
+      co = true; act(() => { window.dispatchEvent(new Event('focus')) })
+      await new Promise((r) => setTimeout(r, 450))
+      expect(coTin(ws, 'roi')).toBe(1)
+    } finally { tieuDiem.mockRestore() }
   })
 })
 

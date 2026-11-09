@@ -108,3 +108,6 @@
 .gvhn-ket-thuc-nut:hover { transform: translateY(-1px); box-shadow: 0 10px 22px color-mix(in srgb, var(--gvm-ho) 42%, transparent); }
 .gvhn-ket-thuc-nut:active { transform: scale(0.97); }
 .gvhn-ket-thuc-nut:focus-visible { outline: 3px solid var(--gvm-ho-dam); outline-offset: 2px; }
+/* 09/11 nút «Kết thúc buổi» cạnh Điểm danh: bấm lần 1 ⇒ chờ xác nhận (viền đỏ đậm). */
+.gvhn-dau > .gvhn-ket-thuc-nut { flex: none; align-self: auto; }
+.gvhn-ket-thuc-nut[data-xac-nhan] { box-shadow: 0 0 0 3px var(--gvm-ho-dam), 0 10px 22px color-mix(in srgb, var(--gvm-ho) 42%, transparent); }

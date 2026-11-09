@@ -20,6 +20,11 @@ const napGan = () => import('../../components/bpu/gan-gv')
 
 /** Tải sẵn mảnh bảng (gọi lúc Hôm nay rảnh) ⇒ bấm Điểm danh không phải chờ tải mã. */
 export function napSan(): void { void napGan().catch(() => {}) }
+/** Buổi đang mở gần đây (≤ 3 giờ) — nút «Kết thúc» cạnh Điểm danh ở Hôm nay. */
+export async function buoiMoGanDay(): Promise<string | null> {
+  const r = await hoiSom()
+  return r.ok ? r.du.find((b) => Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id ?? null : null
+}
 /** Hỏi sớm buổi đang mở (chạm / rê vào nút) — lần bấm ngay sau dùng lại kết quả (≤ 20 giây). */
 export function hoiSom(): Promise<KetQuaLenh<BuoiHoc[]>> {
   if (!som || Date.now() - som.luc > HOI_SOM_MS) som = { p: buoiDangMo(), luc: Date.now() }
@@ -29,6 +34,10 @@ export function hoiSom(): Promise<KetQuaLenh<BuoiHoc[]>> {
 export type KetQuaDiemDanh = { loai: 'chieu' } | { loai: 'loi'; chu: string }
 
 export async function batDauDiemDanh(): Promise<KetQuaDiemDanh> {
+  // Đang có phiên (Esc ra Hôm nay) ⇒ vào lại ĐÚNG chỗ dở NGAY, không hỏi máy chủ (thầy 09/11 «bấm vào điểm danh thì vào đúng chỗ đang dở»).
+  const g0 = await napGan()
+  const p = g0.phienDangCo()
+  if (p) { g0.moBangDiemDanh({ buoiId: p.buoiId }); return { loai: 'chieu' } }
   const [dm, g] = await Promise.all([hoiSom(), napGan()])
   som = null
   if (!dm.ok) return { loai: 'loi', chu: dm.chu }
@@ -50,7 +59,7 @@ export async function batDauDiemDanh(): Promise<KetQuaDiemDanh> {
   g.moBangDiemDanh({ buoiId: id, ma, linkQr: lk(ma), onDong: dungDoc })
   dungDoc()
   henDoc = setInterval(() => {
-    if (document.hidden) return
+    if (document.hidden || document.documentElement.hasAttribute('data-bpu-an')) return // tab ẩn / phiên tạm ẩn ⇒ thôi đọc
     void xemBuoiHoc(id).then((x) => { if (x.ok) g.capNhatMa(id, x.du.ma ?? null, lk(x.du.ma ?? null)) })
   }, DOC_LAI_MS)
   return { loai: 'chieu' }
