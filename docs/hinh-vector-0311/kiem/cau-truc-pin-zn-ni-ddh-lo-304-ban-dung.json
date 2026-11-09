@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1313,
+    "hash": "ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d",
+    "fileNguon": "anh/ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d.png",
+    "svg": "pin-zn-ni-ddh-dc5c733ceff59f057e3ea6c950a000e6506b12daeeed50ba33f45a7042f09af0.svg",
+    "hashSvg": "dc5c733ceff59f057e3ea6c950a000e6506b12daeeed50ba33f45a7042f09af0",
+    "byteSvg": 14376,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C5-B16-II-13",
+        "de": "Xét quá trình hoạt động của một pin điện hoá được thiết lập ở điều kiện chuẩn như hình bên.",
+        "refs": [
+          {
+            "hash": "ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d",
+            "where": "12-C5-B16-II-13.hinh.0.du_lieu",
+            "hashDataUrl": "8835052b65583d62022ad328914c689d905c323eb628ad762f0a929c283a969d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2openbeakers2grayfills2grayrods/1rectangularUbridge/1circleV2wires/regularDDH/Zn-Ni-Cầu muối-Zn2+1M-Ni2+1M/noaddedpolarity-arrows-electrons-bubbles-answer",
+    "hashSvgDaSoat": "dc5c733ceff59f057e3ea6c950a000e6506b12daeeed50ba33f45a7042f09af0",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

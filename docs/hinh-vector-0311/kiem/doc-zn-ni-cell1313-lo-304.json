@@ -1,0 +1,264 @@
+{
+  "i": 1313,
+  "hash": "ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d.png",
+  "size": [
+    526,
+    429
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C5-B16-II-13",
+      "de": "Xét quá trình hoạt động của một pin điện hoá được thiết lập ở điều kiện chuẩn như hình bên.",
+      "allHinh": [
+        {
+          "hash": "ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d",
+          "where": "12-C5-B16-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "8835052b65583d62022ad328914c689d905c323eb628ad762f0a929c283a969d"
+        }
+      ],
+      "missingHashes": [
+        "ed89d7d068ebbfd36aad594a335e4f1e4265d510614b17378e3ad2504d12712d"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1313-native3x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixels/literalcelltopology; no electronicdirection/polarityfromtheory.",
+  "geometry": {
+    "classification": "Flatgrayelectrochemicalcellillustration, notphoto.",
+    "labels": [
+      {
+        "text": "V",
+        "bbox": [
+          254,
+          48,
+          276,
+          72
+        ],
+        "weight": "regularserif"
+      },
+      {
+        "text": "Cầu muối",
+        "bbox": [
+          204,
+          126,
+          321,
+          156
+        ],
+        "weight": "regularserif"
+      },
+      {
+        "text": "Zn",
+        "bbox": [
+          81,
+          157,
+          115,
+          182
+        ],
+        "weight": "regularserif"
+      },
+      {
+        "text": "Ni",
+        "bbox": [
+          413,
+          161,
+          442,
+          184
+        ],
+        "weight": "regularserif"
+      },
+      {
+        "text": "Zn²⁺ 1M",
+        "bbox": [
+          73,
+          352,
+          180,
+          381
+        ],
+        "weight": "regularserif;2+SUP afterZn;1Mbaseline"
+      },
+      {
+        "text": "Ni²⁺ 1M",
+        "bbox": [
+          356,
+          353,
+          458,
+          382
+        ],
+        "weight": "regularserif;2+SUP afterNi;1Mbaseline"
+      }
+    ],
+    "meter": {
+      "circleCenter": [
+        265,
+        59
+      ],
+      "r": 26.5,
+      "fill": "white",
+      "noAdded": "no needle/scale/polarity"
+    },
+    "wires": [
+      [
+        [
+          128,
+          116
+        ],
+        [
+          128,
+          59
+        ],
+        [
+          239,
+          59
+        ]
+      ],
+      [
+        [
+          292,
+          59
+        ],
+        [
+          396,
+          59
+        ],
+        [
+          396,
+          116
+        ]
+      ]
+    ],
+    "electrodes": [
+      {
+        "name": "Zn",
+        "rect": [
+          121,
+          116,
+          137,
+          338
+        ],
+        "fill": "mediumgray, sourcehasminorgrain/highlight butnoscientificparticlecount"
+      },
+      {
+        "name": "Ni",
+        "rect": [
+          389,
+          116,
+          405,
+          338
+        ],
+        "fill": "mediumgray"
+      }
+    ],
+    "beakers": [
+      {
+        "outline": "M42176 Q47180 47187 V369 Q49389 70396 H193 Q215390 217369 V187 Q217180 222176",
+        "liquidTopY": 247,
+        "fillBounds": [
+          48,
+          247,
+          216,
+          395
+        ],
+        "fill": "lightgray subtleleft-to-rightshade"
+      },
+      {
+        "outline": "M308176 Q313180 313187 V369 Q315390 337396 H459 Q481390 483369 V187 Q483180 488176",
+        "liquidTopY": 247,
+        "fillBounds": [
+          314,
+          247,
+          482,
+          395
+        ],
+        "fill": "lightgray slightlydarkerthanleft"
+      }
+    ],
+    "saltBridge": {
+      "filledPolygon": [
+        [
+          194,
+          304
+        ],
+        [
+          194,
+          158
+        ],
+        [
+          335,
+          158
+        ],
+        [
+          335,
+          306
+        ],
+        [
+          323,
+          306
+        ],
+        [
+          323,
+          171
+        ],
+        [
+          207,
+          171
+        ],
+        [
+          207,
+          304
+        ],
+        [
+          194,
+          304
+        ]
+      ],
+      "fill": "lightmediumgray",
+      "outline": "thinblack",
+      "type": "invertedU rectangularsquaredcorners; openONLYat2lowerendsasfilledtubeflatends, noflowheads"
+    },
+    "sourceSurfaceDefects": [
+      {
+        "bbox": [
+          466,
+          365,
+          484,
+          386
+        ],
+        "finding": "Smallwhiteirregularpatch nearLOWERRIGHTbeakerwall visibleinfull3x; sourceprint/highlightshape, no readable symbol orparticle. Preserveaslightpatchifliteraltracing, do not turnintoarrow/diamonddata."
+      }
+    ],
+    "counts": {
+      "beakers": 2,
+      "electrodes": 2,
+      "wireBranches": 2,
+      "meterCircles": 1,
+      "saltBridges": 1,
+      "heads": 0,
+      "bubbles": 0,
+      "chargesPrinted": 2
+    },
+    "noAdded": [
+      "+/-electrodepolarity",
+      "e-/currentarrows",
+      "ionmigrationarrows",
+      "bubbles",
+      "cellvoltage",
+      "standardpotentials",
+      "anode/cathodelabels",
+      "newsolutionnames",
+      "caption"
+    ]
+  },
+  "actualSvgReviewed": false
+}
