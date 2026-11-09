@@ -42,6 +42,16 @@ body {
    * thiếu nét thật. Chữ bị bóp giả làm dấu tiếng Việt lệch khỏi thân chữ. */
   font-synthesis: none;
   overflow-x: hidden;
+  /* 10/11 thầy «Tắt bôi đen chữ, copy chữ trên toàn app hs gv và ph cho chuyên nghiệp»: không bôi đen / giữ-chạm hiện menu ở cả 3 app.
+   * Ô nhập vẫn chọn / sửa chữ được (iPhone cần khai lại, nếu không ô nhập không gõ được); nút «Sao chép» dùng clipboard nên vẫn chạy. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+input, textarea, [contenteditable] {
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
 }
 
 .khung-noi-dung {
@@ -189,22 +199,13 @@ body {
   border-radius: var(--bo-1);
 }
 
-/* MÀN LÀM BÀI (MANCUAVAOVANENTOI — ẩn thanh trình duyệt, việc 3): không chọn
- * chữ/không menu giữ-chạm (chống copy đề), không kéo-xuống-làm-mới trang.
- * Ô nhập Phần III vẫn chọn/sửa được chữ. Khoá xoay ngang nằm ở manifest
+/* MÀN LÀM BÀI (MANCUAVAOVANENTOI — ẩn thanh trình duyệt, việc 3): không kéo-xuống-làm-mới trang. Không chọn chữ / không menu
+ * giữ-chạm (chống copy đề) nay nằm ở `body` cho cả 3 app (10/11); ô nhập Phần III vẫn chọn/sửa được chữ. Khoá xoay ngang nằm ở manifest
  * (28/09: đổi sang "any" — xoay ngang tự đổi bố cục làm bài ngang). */
 .man-lam-bai {
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
   overscroll-behavior-y: auto;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
-}
-.man-lam-bai input,
-.man-lam-bai textarea {
-  user-select: text;
-  -webkit-user-select: text;
 }
 .man-thi-phu {
   -webkit-overflow-scrolling: touch;
@@ -478,12 +479,11 @@ html[data-giu-de-an] [data-giu-de-phu] {
   display: flex;
 }
 
-/* CHẶN SAO CHÉP ĐỀ (mục 6D). `user-select` đã có sẵn ở màn thi; ở đây chặn nốt
+/* CHẶN SAO CHÉP ĐỀ (mục 6D). Không chọn chữ đã ở `body` (toàn app, 10/11); ở đây chặn nốt
    đường kéo-thả ảnh. */
 .thi-noi-dung img,
 .thi-noi-dung svg {
   -webkit-user-drag: none;
-  user-select: none;
 }
 
 /* IN RA GIẤY: đề không được in. 27/10: `html[data-co-de]` (khối có `.thi-noi-dung` tự gắn — DanhDauDe trong ExamTakeScreen.tsx) thay `body:has(.thi-noi-dung)` — Chrome gom
@@ -627,7 +627,6 @@ html[data-giu-de-an] [data-giu-de-phu] {
     box-shadow 160ms cubic-bezier(0.2, 0, 0, 1),
     background-color 160ms ease,
     opacity 160ms ease;
-  user-select: none;
 }
 
 /* NỀN TỐI: --gg-xanh thành xanh NHẠT (màu xanh nhạt của nền tối) mà --giay là trắng CỐ ĐỊNH → chữ trắng trên xanh nhạt chỉ 2,11:1 (đo Chromium: nút
@@ -668,7 +667,6 @@ html[data-giu-de-an] [data-giu-de-phu] {
     transform 160ms cubic-bezier(0.2, 0, 0, 1),
     background-color 160ms ease,
     box-shadow 160ms ease;
-  user-select: none;
 }
 
 .btn-google-tonal:hover:not(:disabled) {
@@ -698,7 +696,6 @@ html[data-giu-de-an] [data-giu-de-phu] {
     background-color 160ms ease,
     border-color 160ms ease,
     box-shadow 160ms ease;
-  user-select: none;
 }
 
 .btn-google-outlined:hover:not(:disabled) {
