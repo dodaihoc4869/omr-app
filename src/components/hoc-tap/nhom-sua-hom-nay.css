@@ -14,3 +14,9 @@
 .kb-ns-loai[data-l='tinh'] { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
 .kb-ns-dem { font-size: 15px; font-weight: 800; color: var(--tr-chu-2); white-space: nowrap; }
 .kb-ns-ghi { margin: 8px 4px 0; font-size: 13px; font-weight: 500; line-height: 1.45; color: var(--tr-chu-3); }
+.kb-ns-loai[data-l='hoc_lai'] { background: var(--tr-tin-nhat); color: var(--tr-tin-chu); }
+.kb-nhom-sua li[data-xong] .kb-ns-so { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+.kb-nhom-sua li[data-xong] .kb-ns-dem { color: var(--tr-dung-chu); }
+/* Dải nợ bài cũ (bài đã qua hạn chung còn câu chưa gặp) */
+.kb-no-bai { margin: 16px 0 0; padding: 12px 14px; border-radius: 16px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 14px; font-weight: 600; line-height: 1.45; }
+.kb-no-bai > b { font-weight: 800; }
