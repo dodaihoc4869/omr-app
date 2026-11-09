@@ -111,7 +111,7 @@ describe('manifest 3 app: icon trỏ tới PNG -v3 có thật, đúng cỡ, có 
     it(`${tep}: 192 + 512 (any) và 512 (maskable) của app ${v}; tệp tồn tại, đúng cỡ khai, không còn -v2`, () => {
       const m = JSON.parse(doc(`public/${tep}`))
       const ra = m.icons.map((i: { src: string; sizes: string; purpose: string }) => [i.src, i.sizes, i.purpose])
-      const bo = v === 'hs' ? 'cn' : 'v3' // 28/10: app học sinh dùng đầu linh vật Cú Ngọc (bộ -cn)
+      const bo = v === 'hs' ? 'mol' : 'v3' // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «thay ảnh app bằng ảnh mol full giống doligo»): app học sinh dùng Mol tràn ô (bộ -mol; trước: Cú Ngọc -cn 28/10)
       expect(ra).toEqual([
         [`logo-${v}-192-${bo}.png`, '192x192', 'any'],
         [`logo-${v}-512-${bo}.png`, '512x512', 'any'],
@@ -130,15 +130,15 @@ describe('manifest 3 app: icon trỏ tới PNG -v3 có thật, đúng cỡ, có 
 describe('index.html: favicon SVG nét đậm + PNG 64 + apple-touch-icon 180 theo vai — tệp có thật', () => {
   it('ba thẻ link -v3 theo vai (gv/hs/ph) và mọi tên ghép ra đều tồn tại; không còn -v2', () => {
     const h = doc('index.html')
-    // 28/10: bộ ghép theo vai — học sinh 'cn' (đầu Cú Ngọc), thầy / phụ huynh 'v3'
-    expect(h).toContain(`var bo = logoVai === 'hs' ? 'cn' : 'v3'`)
+    // bộ ghép theo vai — học sinh 'mol' (Mol tràn ô, 09/11; trước 'cn' Cú Ngọc), thầy / phụ huynh 'v3'
+    expect(h).toContain(`var bo = logoVai === 'hs' ? 'mol' : 'v3'`)
     expect(h).toContain(`<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-' + logoVai + '-nho-' + bo + '.svg">`)
     expect(h).toContain(`<link rel="icon" type="image/png" sizes="64x64" href="/logo-' + logoVai + '-64-' + bo + '.png">`)
     expect(h).toContain(`<link rel="apple-touch-icon" href="/logo-' + logoVai + '-180-' + bo + '.png">`)
     expect(h).not.toContain('-v2')
-    for (const v of VAI) { const bo = v === 'hs' ? 'cn' : 'v3'; for (const t of [`logo-${v}-nho-${bo}.svg`, `logo-${v}-64-${bo}.png`, `logo-${v}-180-${bo}.png`]) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true) }
-    for (const t of ['logo-hs-180-cn.png', 'logo-hs-192-cn.png', 'logo-hs-512-cn.png', 'logo-hs-512-maskable-cn.png']) expect(ihdr(docBuf(`public/${t}`)).mau, t).toBe(2) // icon cài máy: RGB đặc
-    expect(doc('public/logo-hs-nho-cn.svg').startsWith('<svg')).toBe(true)
+    for (const v of VAI) { const bo = v === 'hs' ? 'mol' : 'v3'; for (const t of [`logo-${v}-nho-${bo}.svg`, `logo-${v}-64-${bo}.png`, `logo-${v}-180-${bo}.png`]) expect(fs.existsSync(path.join(goc, 'public', t)), t).toBe(true) }
+    for (const t of ['logo-hs-180-mol.png', 'logo-hs-192-mol.png', 'logo-hs-512-mol.png', 'logo-hs-512-maskable-mol.png']) expect(ihdr(docBuf(`public/${t}`)).mau, t).toBe(2) // icon cài máy: RGB đặc
+    expect(doc('public/logo-hs-nho-mol.svg').startsWith('<svg')).toBe(true)
   })
 })
 
@@ -150,9 +150,9 @@ describe('trang cài app (cai-app.html · cai-dat.html · cai-app/index.html): b
     expect(a).toContain('<link rel="icon" type="image/svg+xml" sizes="any" href="/logo-gv-nho-v3.svg">')
     expect(a).toContain('<link rel="apple-touch-icon" href="/logo-gv-180-v3.png">')
     expect(a).toContain('<img src="/logo-gv-180-v3.png" alt="Đỗ Đại Học Logo">')
-    // 28/10: ô xem trước app học sinh = biểu tượng đầu Cú Ngọc (bộ -cn) như icon cài máy thật; phụ huynh giữ -v3
-    expect(a.match(/<img src="\/logo-hs-192-cn\.png" alt="App Icon">/g)).toHaveLength(2)
-    expect(a).toContain("img.src = '/logo-' + (role === 'hs' ? 'hs-192-cn' : 'ph-192-v3') + '.png';")
+    // ô xem trước app học sinh = biểu tượng Mol tràn ô (bộ -mol, 09/11) như icon cài máy thật; phụ huynh giữ -v3
+    expect(a.match(/<img src="\/logo-hs-192-mol\.png" alt="App Icon">/g)).toHaveLength(2)
+    expect(a).toContain("img.src = '/logo-' + (role === 'hs' ? 'hs-192-mol' : 'ph-192-v3') + '.png';")
     expect(a).not.toMatch(/-v2|apple-touch-icon\.png/)
   })
 })

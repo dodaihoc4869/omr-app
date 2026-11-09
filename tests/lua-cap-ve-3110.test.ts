@@ -89,7 +89,9 @@ describe('màu + nạp lười', () => {
   it('01/11 Mol thay hình: Bi.tsx / Lộ trình KHÔNG còn nạp lớp giận Cú Ngọc (Mol tự vẽ cấp 2–5); lua-dong không nhập lua-gian', () => {
     const tsx = readFileSync('src/components/linh-vat/Bi.tsx', 'utf8')
     expect(tsx).not.toMatch(/lua-gian'/)
-    expect(readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')).toMatch(/import\('\.\.\/linh-vat\/mol-dong'\)\.then\(\(m\) => m\.datIconTabMol\(/)
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «biểu tượng thay đổi theo cảm xúc của mol»): Lộ trình nạp lười icon-tab-mol (theo dõi mặt Mol) — vẫn nạp sau, không vào đường mở app
+    expect(readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')).toMatch(/import\('\.\.\/linh-vat\/icon-tab-mol'\)\.then\(\(m\) => \{ if \(!het\) don = m\.theoDoiIconTabMol\(/)
+    expect(readFileSync('src/components/linh-vat/icon-tab-mol.ts', 'utf8')).toMatch(/datIconTabMol\(-1, anh\)/)
     expect(readFileSync('src/components/linh-vat/lua-dong.ts', 'utf8')).not.toMatch(/^import (?!type)[^\n]*lua-gian/m)
     expect(readFileSync('vite.config.ts', 'utf8')).toMatch(/'\*\*\/lua-gian-\*\.\{js,css\}'/)
   })
