@@ -1,0 +1,284 @@
+{
+  "i": 1341,
+  "hash": "f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de.png",
+  "size": [
+    796,
+    116
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B3-D1-III-1",
+      "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexanoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch. Công thức cấu tạo của DHA như hình dưới.\nTổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de",
+          "where": "VIP27-C1-B3-D1-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "76549aa0e34a1cc279364123b088d0ad910ba420a17af23e7042c595812074de"
+        }
+      ],
+      "missingHashes": [
+        "f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1341-native3x.png",
+    "ownCO10xOpened": "/workspace/scratch/1341-co10x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "actualSvgReviewed": false,
+  "geometry": {
+    "verticesCarbonylToFreeRight": [
+      [
+        75,
+        56
+      ],
+      [
+        110,
+        18
+      ],
+      [
+        139,
+        55
+      ],
+      [
+        175,
+        19
+      ],
+      [
+        212,
+        19
+      ],
+      [
+        241,
+        56
+      ],
+      [
+        277,
+        20
+      ],
+      [
+        314,
+        20
+      ],
+      [
+        343,
+        56
+      ],
+      [
+        379,
+        20
+      ],
+      [
+        415,
+        20
+      ],
+      [
+        444,
+        56
+      ],
+      [
+        480,
+        21
+      ],
+      [
+        518,
+        21
+      ],
+      [
+        547,
+        57
+      ],
+      [
+        583,
+        22
+      ],
+      [
+        621,
+        23
+      ],
+      [
+        650,
+        58
+      ],
+      [
+        686,
+        24
+      ],
+      [
+        722,
+        24
+      ],
+      [
+        751,
+        60
+      ],
+      [
+        788,
+        24
+      ]
+    ],
+    "CCdoubleEdgesZeroBased": [
+      [
+        3,
+        4
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        15,
+        16
+      ],
+      [
+        18,
+        19
+      ]
+    ],
+    "innerDoubleRays": [
+      [
+        [
+          175,
+          26
+        ],
+        [
+          212,
+          26
+        ]
+      ],
+      [
+        [
+          277,
+          27
+        ],
+        [
+          314,
+          27
+        ]
+      ],
+      [
+        [
+          379,
+          27
+        ],
+        [
+          415,
+          27
+        ]
+      ],
+      [
+        [
+          480,
+          28
+        ],
+        [
+          518,
+          28
+        ]
+      ],
+      [
+        [
+          583,
+          29
+        ],
+        [
+          621,
+          30
+        ]
+      ],
+      [
+        [
+          686,
+          31
+        ],
+        [
+          722,
+          31
+        ]
+      ]
+    ],
+    "carbonylO": {
+      "text": "O",
+      "bbox": [
+        65,
+        93,
+        85,
+        112
+      ],
+      "doubleRays": [
+        [
+          [
+            72,
+            62
+          ],
+          [
+            72,
+            90
+          ]
+        ],
+        [
+          [
+            79,
+            62
+          ],
+          [
+            79,
+            90
+          ]
+        ]
+      ],
+      "criticalLiteralGap": "BothverticalCOrays start BELOWCvertex7556 withclear4–5pxwhitegap. OwnCO10x confirms gap. PRESERVE, do notjoinrays/bridge orcarrysplitfeetfromotherformula."
+    },
+    "OH": {
+      "text": "HO",
+      "bbox": [
+        5,
+        5,
+        44,
+        28
+      ],
+      "anchor": "O(rightglyph)",
+      "bond": [
+        [
+          75,
+          56
+        ],
+        [
+          47,
+          20
+        ]
+      ],
+      "note": "literalHOleft notOH; noextraC"
+    },
+    "counts": {
+      "Cvertices": 22,
+      "O": 2,
+      "CCdouble": 6,
+      "COdouble": 1,
+      "standaloneH": 0,
+      "caption": 0,
+      "numbers": 0,
+      "charges": 0
+    },
+    "style": "RegularuprightserifHO/O, uniformthinblackskeletallines, no E/Zletters/wedges/namescaption. Source slighttilts retained. Grayprintnoise notparticles."
+  },
+  "coordinateMeaning": "Nativepixelgeometry; zero-basedvertexkeys arebuilderreferences NOT drawnnumbers/answer. No theoreticalnormalization."
+}

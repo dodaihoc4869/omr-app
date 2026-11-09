@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1341,
+    "hash": "f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de",
+    "fileNguon": "anh/f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de.png",
+    "svg": "mach-acid-sau-noi-doi-ddh-7979735fd3599c0a8733ee10bccfc9826c12c4bbca796592aff06f7cd6568fd1.svg",
+    "hashSvg": "7979735fd3599c0a8733ee10bccfc9826c12c4bbca796592aff06f7cd6568fd1",
+    "byteSvg": 2673,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D1-III-1",
+        "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexanoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch. Công thức cấu tạo của DHA như hình dưới.\nTổng số nguyên tử carbon có trong một phân tử DHA là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "f2e809303f3a4b38002d2e6bcc6e56fd86fc3dcb915ddfc2eae64a098ff707de",
+            "where": "VIP27-C1-B3-D1-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "76549aa0e34a1cc279364123b088d0ad910ba420a17af23e7042c595812074de"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22bareC2O/6horizontalCCdoubleinnerBELOW/COdoubleDOWN2verticalrays-withnativeWHITEGAP/HOleftOanchor/freeRIGHTUP/allthinregularDDH/noaddedH-Cnums-caption-name-answer/noalias942",
+    "hashSvgDaSoat": "7979735fd3599c0a8733ee10bccfc9826c12c4bbca796592aff06f7cd6568fd1",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
