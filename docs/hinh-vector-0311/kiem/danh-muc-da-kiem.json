@@ -991,6 +991,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b": {
+      "tep": "dong-hoc-ester-ddh-12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458.svg",
+      "hashSvg": "12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458",
+      "byteSvg": 34578,
+      "byteGzip": 5892,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "18588fd6a9cdbe521f0751544d60d2d6ede9129a3612dd7f7325279f0bb25303": {
       "tep": "ir-hai-panel-ddh-cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615.svg",
       "hashSvg": "cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615",
@@ -28598,6 +28607,20 @@
       ]
     },
     {
+      "qid": "VIP27-CDK-ESTER-TN-II-45",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b",
+          "where": "VIP27-CDK-ESTER-TN-II-45.hinh.0.du_lieu",
+          "hashDataUrl": "d48895a2b117083640714e6b806cdfe9a45bfdadf9121667761de253be244f8d",
+          "vector": "dong-hoc-ester-ddh-12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-CDK-ESTER-TN-III-2",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -29937,6 +29960,7 @@
     "VIP27-CDK-ESTER-TN-II-30",
     "VIP27-CDK-ESTER-TN-II-32",
     "VIP27-CDK-ESTER-TN-II-40",
+    "VIP27-CDK-ESTER-TN-II-45",
     "VIP27-CDK-ESTER-TN-III-2",
     "VIP27-CDK-ACIDBASE-II-7",
     "VIP27-CDK-ACIDBASE-II-19",

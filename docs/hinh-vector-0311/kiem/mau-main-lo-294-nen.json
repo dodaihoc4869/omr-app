@@ -1,0 +1,177 @@
+{
+  "lo": 294,
+  "main": "8af02bce41a9d6ffec866e289e61fa42084150ba",
+  "priorMain": "b7559b9665c320d7c5f061da5652a110ccd4d88f",
+  "merged": false,
+  "fontFilesChangedInMainSincePrior": false,
+  "branchProductionChanged": false,
+  "colorBaseline": {
+    "violations": 667,
+    "checkerFiles": 122
+  },
+  "sizeBaseline": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainScope": "Giao bài/Đếm ngược và hạ mốc tốc độ; chưa gộp.",
+  "speedBaselineLatestMain": {
+    "sha256": "a0bb41478b2de3e755f9f5fccd076012e23473df0f7acf71e149223f09a6a3ca",
+    "mayChu": {
+      "sanh-lan-dau": {
+        "dot": 12,
+        "lenh": 21
+      },
+      "sanh-lan-sau": {
+        "dot": 1,
+        "lenh": 2
+      },
+      "mo-chang": {
+        "dot": 2,
+        "lenh": 4
+      },
+      "nop-cau": {
+        "dot": 7,
+        "lenh": 9
+      },
+      "dem-hom-nay": {
+        "dot": 1,
+        "lenh": 1
+      }
+    },
+    "taiApp": {
+      "giao-vien": {
+        "tep": 11,
+        "gzip": 180652
+      },
+      "hoc-sinh": {
+        "tep": 35,
+        "gzip": 231877
+      },
+      "phu-huynh": {
+        "tep": 20,
+        "gzip": 167025
+      }
+    },
+    "taiDuong": {
+      "thay /gv": {
+        "gzip": 182744
+      },
+      "phieu /p": {
+        "gzip": 235396
+      },
+      "phu-huynh /ph": {
+        "gzip": 168734
+      },
+      "thi /t": {
+        "gzip": 264471
+      },
+      "dang-nhap-hs /hs": {
+        "gzip": 129730
+      },
+      "cong-hs /hs (đã đăng nhập)": {
+        "gzip": 243803
+      }
+    },
+    "branchBaselineUnchanged": true,
+    "latestMainBuildSpeedPendingBeforeMergeRelease": true
+  },
+  "diffFiles": [
+    "DIEU-PHOI.md",
+    "docs/ban-ve-dem-nguoc-0911/DAC-TA.md",
+    "docs/ban-ve-dem-nguoc-0911/chup.mjs",
+    "docs/ban-ve-dem-nguoc-0911/dem-nguoc.html",
+    "docs/ban-ve-dem-nguoc-0911/dt-sang-1-binh.jpg",
+    "docs/ban-ve-dem-nguoc-0911/dt-sang-2-gap.jpg",
+    "docs/ban-ve-dem-nguoc-0911/dt-sang-3-tuan.jpg",
+    "docs/ban-ve-dem-nguoc-0911/dt-sang-4-thi.jpg",
+    "docs/ban-ve-dem-nguoc-0911/dt-toi-1-binh.jpg",
+    "docs/ban-ve-dem-nguoc-0911/mb-sang-1-binh.jpg",
+    "docs/ban-ve-dem-nguoc-0911/mt-sang-1-binh.jpg",
+    "docs/ban-ve-dem-nguoc-0911/mt-toi-1-binh.jpg",
+    "docs/ban-ve-giao-bai-0911/DAC-TA.md",
+    "docs/ban-ve-giao-bai-0911/chup.mjs",
+    "docs/ban-ve-giao-bai-0911/dt-sang-0-hom-nay.jpg",
+    "docs/ban-ve-giao-bai-0911/dt-sang-1-chon.jpg",
+    "docs/ban-ve-giao-bai-0911/dt-sang-2-thieu.jpg",
+    "docs/ban-ve-giao-bai-0911/dt-sang-3-xong.jpg",
+    "docs/ban-ve-giao-bai-0911/dt-toi-1-chon.jpg",
+    "docs/ban-ve-giao-bai-0911/giao-bai.html",
+    "docs/ban-ve-giao-bai-0911/mb-sang-1-chon.jpg",
+    "docs/ban-ve-giao-bai-0911/mb-toi-1-chon.jpg",
+    "docs/ban-ve-giao-bai-0911/mt-sang-0-hom-nay.jpg",
+    "docs/ban-ve-giao-bai-0911/mt-sang-1-chon.jpg",
+    "docs/ban-ve-giao-bai-0911/mt-sang-2-thieu.jpg",
+    "docs/ban-ve-giao-bai-0911/mt-sang-3-xong.jpg",
+    "docs/ban-ve-giao-bai-0911/mt-toi-1-chon.jpg",
+    "docs/de-xuat-28-cau-mo-phong/han-chung.py",
+    "docs/de-xuat-28-cau-mo-phong/kiem-du-bao.py",
+    "docs/de-xuat-28-cau-mo-phong/lich28.py",
+    "docs/de-xuat-28-cau-mo-phong/rut28.py",
+    "docs/de-xuat-28-cau-mo-phong/tai-on.py",
+    "docs/de-xuat-28-cau-v5-0911.md",
+    "docs/de-xuat-on-sua-0811.md",
+    "docs/de-xuat-phan-bo-28-cau-0811.md",
+    "docs/moc-toc-do.json",
+    "scripts/ap-goi7-song.ts",
+    "scripts/phan-lai-0911.ts",
+    "server/src/bai-da-day.ts",
+    "server/src/bai-hang-ngay.ts",
+    "server/src/goi-bai-7-loi.ts",
+    "server/src/goi-bai-7-thay.ts",
+    "server/src/goi-bai-7.ts",
+    "server/src/han-chung.ts",
+    "server/src/kiem-tra-ca-nhan-ma-tran.ts",
+    "server/src/kiem-tra-ca-nhan.ts",
+    "server/src/ma-tran-rut-moi.ts",
+    "server/src/srs2-gv.ts",
+    "src/components/TamThongBaoHs.tsx",
+    "src/components/ThongBaoHocSinh.tsx",
+    "src/components/chien-dich/TheBaiDaDay.tsx",
+    "src/components/chien-dich/api-omni.ts",
+    "src/components/day-hoc/BoSungNhieuBai.tsx",
+    "src/components/day-hoc/ChonBaiMoi.tsx",
+    "src/components/day-hoc/DayHocLenBang.tsx",
+    "src/components/day-hoc/HopBoSungBai.tsx",
+    "src/components/day-hoc/chon-bai-moi.css",
+    "src/components/hoc-tap/DemNguocThi.tsx",
+    "src/components/hoc-tap/HocTapHomNay.tsx",
+    "src/components/hoc-tap/dem-nguoc-thi.css",
+    "src/components/hoc-tap/dem-nguoc.ts",
+    "src/components/hoc-tap/hoc-tap.css",
+    "src/components/hoc-tap/la-lop-12.ts",
+    "src/lib/len-bang-bpu-to-chieu.ts",
+    "src/lib/ma-tran-hoa-2026.ts",
+    "src/screens/GvHomNayScreen.tsx",
+    "tests/bai-hang-ngay-1210.test.ts",
+    "tests/bo-sung-nhieu-bai-0111.test.tsx",
+    "tests/cau-gon-1410.test.ts",
+    "tests/che-do-da-dung-0210.test.ts",
+    "tests/chon-bai-bang-dot16-1210i.test.tsx",
+    "tests/dem-nguoc-thi-0911.test.tsx",
+    "tests/goi-bai-7-1010.test.ts",
+    "tests/goi7-dem-nhe-1210g.test.ts",
+    "tests/goi7-membership-1410.test.ts",
+    "tests/gv-hom-nay-0910.test.tsx",
+    "tests/han-chung-0911.test.ts",
+    "tests/hanh-trinh-2-muc-1210.test.tsx",
+    "tests/hoi-thay-lich-on-goi7-1610.test.ts",
+    "tests/hop-bo-sung-bai-2110.test.tsx",
+    "tests/kiem-tra-ca-nhan-1310.test.ts",
+    "tests/kiem-tra-ma-tran-2026-1310.test.ts",
+    "tests/loc-tu-luan-may-thay-2109.test.ts",
+    "tests/m3-a1-1909.test.tsx",
+    "tests/ma-tran-2026.test.ts",
+    "tests/ma-tran-rut-moi-0611.test.ts",
+    "tests/mo-ta-ca-chieu-ma.test.tsx",
+    "tests/mot-con-so-goi7-1210.test.ts",
+    "tests/muc-tieu-ngay-theo-cau-2710.test.ts",
+    "tests/omni-3-thay-bai-hom-nay.test.tsx",
+    "tests/omni-3-thay-nhieu-lop-0610.test.tsx",
+    "tests/omni-3-thay-on-bai-cu-0610.test.tsx",
+    "tests/omni-3-tick-bai-0510.test.ts",
+    "tests/on-bai-cu-xem-truoc-0610.test.ts",
+    "tests/phan-lai-0911.test.ts",
+    "tests/tick-han-phan-hoi-1310.test.tsx",
+    "vite.config.ts"
+  ]
+}

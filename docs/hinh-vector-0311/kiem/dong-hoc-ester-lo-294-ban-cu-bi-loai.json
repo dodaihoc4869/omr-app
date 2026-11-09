@@ -1,0 +1,10 @@
+{
+  "lo": 294,
+  "i": 1212,
+  "hashSvg": "c6918d1a3f980fcc506d6ef4393c38fe0e9d73a36f9f40c2833b300860de1407",
+  "byteSvg": 34482,
+  "verdict": "Bị loại trước admission: root cần giữ majorliney5 dashedoverlay và khoảng chữ exponent/đơn vị. Không chọn hash này.",
+  "finalHashSvg": "12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458",
+  "nativeMacro": "native-grid5-1212-lo-294.jpg",
+  "finalChanges": "Y5darksolid→lightgrid+dash13gap21, exponentX120→125/molX136→144, t/unit21→20unitX683→682, pointpixels3offsets1px khớp native độc lập."
+}

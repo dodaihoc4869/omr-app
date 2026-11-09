@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1212,
+    "hash": "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b",
+    "fileNguon": "anh/dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b.png",
+    "svg": "dong-hoc-ester-ddh-12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458.svg",
+    "hashSvg": "12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458",
+    "byteSvg": 34578,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-45",
+        "de": "Linalyl acetate ($\\ce{C12H20O2}$) là một ester có mùi thơm của hoa oải hương, được sử dụng rộng rãi trong công nghiệp sản xuất xà phòng và nước hoa. Một phương pháp tổng hợp linalyl acetate là thực hiện phản ứng ester hóa trực tiếp giữa ethanoic acid ($\\ce{CH3COOH}$) và linalool ($\\ce{C10H18O}$). Đây là một phản ứng thuận nghịch và diễn ra chậm. Để nghiên cứu động học của phản ứng này, một nhóm học sinh đã tiến hành thí nghiệm ở nhiệt độ không đổi, lấy mẫu tại các thời điểm khác nhau và chuẩn độ lượng acid dư để suy ra lượng ester sinh ra. Kết quả sự phụ thuộc của số mol ester theo thời gian được biểu diễn như đồ thị.",
+        "refs": [
+          {
+            "hash": "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b",
+            "where": "VIP27-CDK-ESTER-TN-II-45.hinh.0.du_lieu",
+            "hashDataUrl": "d48895a2b117083640714e6b806cdfe9a45bfdadf9121667761de253be244f8d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "10separatedplusdatamarkers/31V36Hgrid-y5dashedOVERlightgrid/7Xlabels0..120step20/8Ylabels0..35step5/minorticks/2openVaxisheads/nitalic-subester(×10supminus4mol)/titalic(phút)/grayDDH/noaddedcurve-lines-title-equilibrium-exactcoordinates-answer.",
+    "hashSvgDaSoat": "12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

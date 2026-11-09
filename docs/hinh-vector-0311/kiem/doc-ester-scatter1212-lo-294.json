@@ -1,0 +1,363 @@
+{
+  "i": 1212,
+  "hash": "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b.png",
+  "size": [
+    749,
+    399
+  ],
+  "manifestPresent": true,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-45",
+      "de": "Linalyl acetate ($\\ce{C12H20O2}$) là một ester có mùi thơm của hoa oải hương, được sử dụng rộng rãi trong công nghiệp sản xuất xà phòng và nước hoa. Một phương pháp tổng hợp linalyl acetate là thực hiện phản ứng ester hóa trực tiếp giữa ethanoic acid ($\\ce{CH3COOH}$) và linalool ($\\ce{C10H18O}$). Đây là một phản ứng thuận nghịch và diễn ra chậm. Để nghiên cứu động học của phản ứng này, một nhóm học sinh đã tiến hành thí nghiệm ở nhiệt độ không đổi, lấy mẫu tại các thời điểm khác nhau và chuẩn độ lượng acid dư để suy ra lượng ester sinh ra. Kết quả sự phụ thuộc của số mol ester theo thời gian được biểu diễn như đồ thị.",
+      "allHinh": [
+        {
+          "hash": "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b",
+          "where": "VIP27-CDK-ESTER-TN-II-45.hinh.0.du_lieu",
+          "hashDataUrl": "d48895a2b117083640714e6b806cdfe9a45bfdadf9121667761de253be244f8d"
+        }
+      ],
+      "missingHashes": [
+        "dc1a5081a2df564f827b31c01940bd348fb3c7802e4c0235f6e66e25b49f259b"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1212-native3x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Grid and marker positions are native pixel coordinates. Scientific-looking values inferred from unlabelled marker coordinates are NOT asserted data; keep points at source positions, do not normalize to theoretical plateau.",
+  "geometry": {
+    "classification": "Gray scatterplot on graph-paper grid, no connecting curves.",
+    "plotBounds": [
+      47,
+      33,
+      623,
+      362
+    ],
+    "axes": {
+      "origin": [
+        47,
+        362
+      ],
+      "xEnd": [
+        658,
+        362
+      ],
+      "yEnd": [
+        47,
+        33
+      ],
+      "heads": "2 open V heads UP andRIGHT",
+      "xHeadApprox": [
+        [
+          645,
+          355
+        ],
+        [
+          658,
+          362
+        ],
+        [
+          645,
+          369
+        ]
+      ],
+      "yHeadApprox": [
+        [
+          40,
+          46
+        ],
+        [
+          47,
+          33
+        ],
+        [
+          54,
+          46
+        ]
+      ]
+    },
+    "grid": {
+      "verticalX": [
+        47.0,
+        66.2,
+        85.4,
+        104.6,
+        123.8,
+        143.0,
+        162.2,
+        181.4,
+        200.6,
+        219.79999999999998,
+        239.0,
+        258.2,
+        277.4,
+        296.6,
+        315.8,
+        335.0,
+        354.2,
+        373.4,
+        392.59999999999997,
+        411.8,
+        431.0,
+        450.2,
+        469.4,
+        488.59999999999997,
+        507.79999999999995,
+        527.0,
+        546.2,
+        565.4,
+        584.6,
+        603.8,
+        623.0
+      ],
+      "horizontalY": [
+        362.0,
+        352.6,
+        343.2,
+        333.8,
+        324.4,
+        315.0,
+        305.6,
+        296.2,
+        286.8,
+        277.4,
+        268.0,
+        258.6,
+        249.2,
+        239.8,
+        230.4,
+        221.0,
+        211.6,
+        202.2,
+        192.8,
+        183.4,
+        174.0,
+        164.6,
+        155.2,
+        145.8,
+        136.4,
+        127.0,
+        117.6,
+        108.19999999999999,
+        98.80000000000001,
+        89.39999999999998,
+        80.0,
+        70.60000000000002,
+        61.19999999999999,
+        51.80000000000001,
+        42.39999999999998,
+        33.0
+      ],
+      "countVerticalIncludingEdges": 31,
+      "countHorizontalIncludingEdges": 36,
+      "majorVerticalAtScientificX": [
+        0,
+        20,
+        40,
+        60,
+        80,
+        100,
+        120
+      ],
+      "majorHorizontalAtScientificY": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35
+      ],
+      "color": "gray, lighter/thinner minor and darker/thicker major",
+      "specialY5": "Major horizontal atnativey315 shows repeated dark short/long segments over lighter basegrid; visible dashed/segmented styling, do not mistakefor a data curve."
+    },
+    "ticks": {
+      "x": "shortstems on axis at all31 verticalgrid intersections, majorstems larger at7labelled positions",
+      "y": "shortstems atall36 horizontalgrid intersections, majorstems larger at8labelled positions"
+    },
+    "labels": {
+      "xTickTexts": [
+        "0",
+        "20",
+        "40",
+        "60",
+        "80",
+        "100",
+        "120"
+      ],
+      "xTickCenters": [
+        [
+          47,
+          383
+        ],
+        [
+          143,
+          383
+        ],
+        [
+          239,
+          383
+        ],
+        [
+          335,
+          383
+        ],
+        [
+          431,
+          383
+        ],
+        [
+          527,
+          383
+        ],
+        [
+          623,
+          383
+        ]
+      ],
+      "yTickTexts": [
+        "0",
+        "5",
+        "10",
+        "15",
+        "20",
+        "25",
+        "30",
+        "35"
+      ],
+      "yTickCenters": [
+        [
+          25,
+          362
+        ],
+        [
+          25,
+          315
+        ],
+        [
+          25,
+          268
+        ],
+        [
+          25,
+          221
+        ],
+        [
+          25,
+          174
+        ],
+        [
+          25,
+          127
+        ],
+        [
+          25,
+          80
+        ],
+        [
+          25,
+          33
+        ]
+      ],
+      "topTitle": {
+        "literal": "n_ester (×10⁻⁴ mol)",
+        "bbox": [
+          42,
+          8,
+          175,
+          26
+        ],
+        "styling": "n italic; ester small subscript upright; exponent−4 SUP; mol upright. Not letterx; literal multiplication×."
+      },
+      "xTitle": {
+        "literal": "t (phút)",
+        "bbox": [
+          669,
+          351,
+          741,
+          376
+        ],
+        "styling": "t italic, parentheticalunit upright"
+      },
+      "allColor": "gray similar to axes, no separate blackboldhierarchy"
+    },
+    "markers": {
+      "count": 10,
+      "shape": "small gray PLUS with horizontal andvertical strokes, not filledcircle; no numerical pointlabels",
+      "centersNative": [
+        [
+          71,
+          231
+        ],
+        [
+          95,
+          184
+        ],
+        [
+          119,
+          165
+        ],
+        [
+          167,
+          137
+        ],
+        [
+          215,
+          118
+        ],
+        [
+          263,
+          95
+        ],
+        [
+          326,
+          85
+        ],
+        [
+          398,
+          76
+        ],
+        [
+          455,
+          76
+        ],
+        [
+          527,
+          76
+        ]
+      ],
+      "approxHalfArm": [
+        4,
+        4
+      ],
+      "connectors": false
+    },
+    "noAdded": [
+      "smoothed curve",
+      "pointvalues",
+      "equilibriumanswer",
+      "legend",
+      "reaction equation",
+      "additionaldata points",
+      "0-at-title",
+      "scientificnormalization"
+    ]
+  },
+  "actualSvgReviewed": true,
+  "lo": 294,
+  "rootNativeFullOpened": true,
+  "rootNativeGrid5MacroOpened": true,
+  "hashSvg": "12b11e1a2bc044dc4fd6ca1680722ea5203f9507593d5cc8db466a3808f2d458",
+  "verdict": "Đạt root nativeFULL/all1ref/freshactual3x và readonly riêng exacthash; khép1câu."
+}
