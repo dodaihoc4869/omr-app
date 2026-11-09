@@ -193,3 +193,21 @@ html.may-yeu .bpu-lua .tan, html.may-yeu .bpu-tia { display: none; }
 html:not(#_):not(#__) .bpu-hs .ht2-lam-y-nut button[aria-pressed='true']:nth-child(2) { background: var(--tr-sai) !important; border-color: var(--tr-sai) !important; box-shadow: 0 4px 0 var(--tr-sai-day, var(--tr-sai)) !important; }
 /* Cảnh báo cửa sổ nổi (09/11): tiêu đề đỏ, nổi rõ. */
 .bpu-hs .bpu-noi h3 { color: var(--tr-sai); }
+/* kJ 09/11 (thầy «app hs cũng được cộng trừ kJ hiệu ứng siêu đẹp mắt và hiển thị tinh tế ở mọi chỗ»): SỐ ĐẾM MƯỢT `.bpu-so` — tăng chữ xanh, giảm chữ đỏ
+   (đổi màu một lần; nảy / rung là transform qua Web Animations); THẺ BIẾN ĐỘNG `.bpu-bd-the` bay lên rồi mờ (transform/opacity). Màu: --tr-dung*, --tr-sai*. */
+.bpu-so { display: inline-block; font-variant-numeric: tabular-nums; font-weight: 900; }
+.bpu-so[data-huong="tang"] { color: var(--tr-dung-chu); }
+.bpu-so[data-huong="giam"] { color: var(--tr-sai-chu); }
+.bpu-tru { margin: 0; padding: 6px 14px; border-radius: 999px; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); font-weight: 800; }
+.bpu-bd { position: absolute; left: 0; right: 0; top: 76px; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-inline: 16px; pointer-events: none; }
+.bpu-bd-the { display: flex; align-items: center; gap: 8px; max-width: min(100%, 440px); padding: 6px 16px 6px 8px; border-radius: 999px; background: var(--tr-mat); color: var(--tr-chu);
+  box-shadow: inset 0 0 0 2px var(--tr-vien), 0 8px 24px color-mix(in srgb, var(--tr-chu) 18%, transparent); animation: bpu-bd-bay 2.5s cubic-bezier(.2, .9, .3, 1) both; }
+.bpu-bd-the[data-kq="dung"] { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); box-shadow: inset 0 0 0 2px var(--tr-dung), 0 8px 24px color-mix(in srgb, var(--tr-dung) 30%, transparent); }
+.bpu-bd-the[data-kq="sai"] { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); box-shadow: inset 0 0 0 2px var(--tr-sai), 0 8px 24px color-mix(in srgb, var(--tr-sai) 30%, transparent); }
+.bpu-bd-the .bpu-lua { width: 22px; height: 27px; }
+.bpu-bd-the .bpu-lua .tan { display: none; }
+.bpu-bd-the b { flex: none; font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bpu-bd-the span { min-width: 0; font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes bpu-bd-bay { 0% { transform: translateY(26px) scale(0.85); opacity: 0; } 12% { transform: translateY(0) scale(1.05); opacity: 1; } 20% { transform: none; } 78% { transform: translateY(-12px); opacity: 1; } 100% { transform: translateY(-44px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bpu-bd-the, .bpu-bd-the .bpu-lua g, .bpu-bd-the .bpu-lua .hao { animation: none; } }
+html.may-yeu .bpu-bd-the, html.may-yeu .bpu-bd-the .bpu-lua g, html.may-yeu .bpu-bd-the .bpu-lua .hao { animation: none; }
