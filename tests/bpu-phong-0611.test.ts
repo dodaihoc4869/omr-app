@@ -88,7 +88,8 @@ describe('một lượt', () => {
 })
 
 describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
-  it('Đạt ⇒ đội +200, đoán đúng +20; tiếp sức tối đa 10; em được gọi không tự đoán', () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (luật mới): Đạt ⇒ em được gọi +100 VÀ đội +200 (trước chỉ đội +200).
+  it('Đạt ⇒ em +100, đội +200, đoán đúng +20; tiếp sức tối đa 10; em được gọi không tự đoán', () => {
     const st = phong(); moLuot(st, cauTN, T0)
     expect(goiLenBang(st, 'S3', ['a', 'b', 'c', 'd'], T0)).toBe(true)
     expect(st.luot!.goi!.lyDo).toHaveLength(3)
@@ -96,10 +97,13 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     duDoan(st, 'S1', 1, T0); duDoan(st, 'S2', 0, T0)
     for (let i = 0; i < 15; i++) tiepSuc(st, 'S1', T0)
     expect(st.luot!.goi!.tiep.S1).toBe(10)
-    const doi = st.ds.find((e) => e.sbd === 'S3')!.doi, truoc = diemDoi(st, doi)
+    const doi = st.ds.find((e) => e.sbd === 'S3')!.doi, truoc = diemDoi(st, doi), thuongTruoc = st.doiThuong[doi]!
     chamLenBang(st, true, T0)
     moDapAn(st, T0 + 1000, chamSo)
-    expect(diemDoi(st, doi) - truoc).toBeGreaterThanOrEqual(KJ.lenBangDat)
+    expect(diemDoi(st, doi) - truoc).toBeGreaterThanOrEqual(KJ.lenBangDat + KJ.lenBangDatEm)
+    expect(st.doiThuong[doi]! - thuongTruoc).toBe(200)
+    expect(st.ds.find((e) => e.sbd === 'S3')!.kj).toBe(100)
+    expect(st.bienDong!.at(-1)).toMatchObject({ sbd: 'S3', kjEm: 100, kjDoi: 200, lyDo: 'Giải đúng trên bảng' })
     expect(st.ds.find((e) => e.sbd === 'S1')!.kj).toBe(KJ.doanDung)
     expect(st.ds.find((e) => e.sbd === 'S2')!.kj).toBe(0)
   })
@@ -110,16 +114,19 @@ describe('gọi lên bảng, đoán, tiếp sức, rời màn', () => {
     moLuot(st, cauTN, T0); moDapAn(st, T0 + 1000, chamSo)
     expect(roiMan(st, 'S1', T0)).toBe(st.ds[0]!.vao)
   })
-  // SỬA CÓ CHỦ ĐÍCH 09/11: trước đây rời màn −20 kJ cho đội. Thầy 09/11 «Bỏ tắt màn hình trừ KJ … thoát app là báo động viền đỏ nhấp nháy trên bảng»
-  // ⇒ KHÔNG trừ kJ (KJ.roiMan = 0), vẫn đếm lần + ghi vào lượt, thêm «đang rời» `roiNay` (test chi tiết: tests/bpu-chia-doi-0911.test.ts).
-  it('rời màn KHÔNG trừ kJ (09/11), vẫn đếm lần, ghi vào lượt', () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (luật chặt, thầy «thoát màn hình cảnh báo bị trừ cả đội và cá nhân»): trước đó rời màn KHÔNG trừ (KJ.roiMan = 0).
+  // Nay mỗi LẦN RỜI MỚI ⇒ em −50 (kẹp ≥ 0) + đội −50; máy báo `roi` trùng (chưa `ve`) không trừ lần hai; vẫn đếm lần + ghi vào lượt.
+  it('rời màn trừ em −50 (kẹp 0) và đội −50; báo trùng không trừ lần hai, vẫn đếm lần', () => {
     const st = phong(); moLuot(st, cauTN, T0)
-    const d = st.ds[0]!.doi, truoc = [...st.doiThuong], kjTruoc = diemDoi(st, d)
+    const e = st.ds[0]!, d = e.doi, truoc = st.doiThuong[d]!
+    e.kj = 30
     roiMan(st, 'S1', T0); roiMan(st, 'S1', T0)
-    expect(KJ.roiMan).toBe(0)
-    expect(st.doiThuong).toEqual(truoc)
-    expect(diemDoi(st, d)).toBe(kjTruoc)
-    expect(st.ds[0]!.roi).toBe(2)
+    expect(KJ.roiMan).toBe(50)
+    expect(st.doiThuong[d]).toBe(truoc - 50)
+    expect(e.kj).toBe(0)
+    expect(st.bienDong!.at(-1)).toMatchObject({ sbd: 'S1', doi: d, kjEm: -30, kjDoi: -50, lyDo: 'Rời màn hình' })
+    expect(st.bienDong!.filter((x) => x.lyDo === 'Rời màn hình')).toHaveLength(1)
+    expect(e.roi).toBe(2)
     expect(st.luot!.roiMe).toEqual(['S1'])
   })
   // SỬA CÓ CHỦ ĐÍCH 09/11: `phong()` có 10 em có mặt ⇒ nay HAI đội (≤ 12 có mặt ⇒ 2 đội), trước đây bốn.

@@ -175,7 +175,8 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(document.querySelector('.bpu-kq-o[data-kq="dung"] b')!.textContent).toBe('B')
     expect(document.querySelector('.bpu-kq-o[data-kq="sai"]')).toBeNull()
   })
-  it('SỬA CÓ CHỦ ĐÍCH 09/11 — rời màn không nhắc trừ kJ; ẩn app ≥ 2 s ⇒ `roi`, hiện lại ⇒ `ve` (cả khi rời bằng pagehide)', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (lần 2, luật chặt): rời màn nay TRỪ em −50 + đội −50 ⇒ màn cảnh báo nhắc rõ mức trừ (trước: không nhắc kJ).
+  it('SỬA CÓ CHỦ ĐÍCH 09/11 — rời màn nhắc «em −50 kJ · đội −50 kJ»; ẩn app ≥ 2 s ⇒ `roi`, hiện lại ⇒ `ve` (cả khi rời bằng pagehide)', async () => {
     const ws = await vao()
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
     await screen.findByRole('button', { name: 'Gửi đáp án' })
@@ -195,7 +196,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
       an = false; act(() => { document.dispatchEvent(new Event('visibilitychange')) })
       expect(coTin(ws, 've')).toBe(1)
       expect(await screen.findByText('Bảng đang báo tên em — quay lại tập trung lên bảng.')).toBeTruthy()
-      expect(document.body.textContent).not.toMatch(/bị trừ/)
+      expect(document.querySelector('.bpu-tru')!.textContent).toBe('Rời màn hình: em −50 kJ · đội −50 kJ')
       // hiện lại lần nữa mà không rời ⇒ không gửi thêm `ve`
       act(() => { document.dispatchEvent(new Event('visibilitychange')) })
       expect(coTin(ws, 've')).toBe(1)

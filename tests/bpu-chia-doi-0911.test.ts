@@ -123,14 +123,15 @@ describe('chia đội theo số em có mặt (thầy 09/11)', () => {
   })
 })
 
-describe('rời màn: báo động, không trừ kJ (thầy 09/11)', () => {
+// SỬA CÓ CHỦ ĐÍCH 09/11 (luật chặt): rời màn nay TRỪ em −50 (kẹp 0) + đội −50 mỗi lần rời mới — trước đó «kJ không đổi».
+describe('rời màn: báo động + trừ kJ (thầy 09/11)', () => {
   const phong = () => taoPhong({ buoiId: 'b', lop: 'L', nay: T0, ds: lop(6, 6) })
-  it('roi ⇒ roiNay có em, kJ không đổi; ve ⇒ gỡ; roi lại ⇒ có lại, roi đếm 2', () => {
+  it('roi ⇒ roiNay có em, đội của em −50; ve ⇒ gỡ; roi lại ⇒ có lại (trừ lần nữa), roi đếm 2', () => {
     const st = phong(); moLuot(st, cau, T0)
-    const truoc = [0, 1].map((d) => diemDoi(st, d))
+    const truoc = [0, 1].map((d) => diemDoi(st, d)), d1 = st.ds[0]!.doi
     expect(roiMan(st, 'S01', T0)).toBe(true)
     expect(viewBang(st).roiNay).toEqual(['S01'])
-    expect([0, 1].map((d) => diemDoi(st, d))).toEqual(truoc)
+    expect([0, 1].map((d) => diemDoi(st, d))).toEqual(truoc.map((x, d) => (d === d1 ? x - KJ.roiMan : x)))
     expect(veMan(st, 'S01', T0)).toBe(true)
     expect(viewBang(st).roiNay).toEqual([])
     expect(veMan(st, 'S01', T0)).toBe(false)

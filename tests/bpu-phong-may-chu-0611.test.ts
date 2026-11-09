@@ -53,8 +53,8 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     expect(cuoi2.luot.ketQua.dung).toBe(false)
     expect(JSON.parse(gv.tin.at(-1)!).luot.chon).toEqual({ S1: 'B', S2: 'A' })
   })
-  // SỬA CÓ CHỦ ĐÍCH 09/11: tên cũ «đội bị trừ» — thầy 09/11 bỏ trừ kJ khi rời màn; nay bảng thấy em ĐANG RỜI (`roiNay`), `ve` gỡ.
-  it('rời màn: máy em báo ⇒ bảng thấy (đang rời, không trừ kJ); em quay lại (ve) ⇒ gỡ', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (lần 2, luật chặt): rời màn TRỪ đội −50 và em −50 (kẹp 0) — bảng thấy em ĐANG RỜI (`roiNay`) + mục biến động; `ve` gỡ.
+  it('rời màn: máy em báo ⇒ bảng thấy (đang rời, trừ kJ, biến động); em quay lại (ve) ⇒ gỡ', async () => {
     const { p, noi, post } = taoPhong()
     await post('/khoi', { buoiId: 'b2', lop: 'L', ds: [{ sbd: 'S1', ten: 'A B', coMat: true, luc: 1 }] })
     const gv = await noi('gv'), em = await noi('hs', 'S1')
@@ -64,7 +64,10 @@ describe('phòng Bình Phản Ứng (Durable Object)', () => {
     expect(b.ds[0].roi).toBe(1)
     expect(b.luot.roiMe).toEqual(['S1'])
     expect(b.roiNay).toEqual(['S1'])
-    expect(b.doiThuong.reduce((x: number, y: number) => x + y, 0)).toBe(10 + 50) // vào lớp + đủ quân — không trừ
+    expect(b.doiThuong.reduce((x: number, y: number) => x + y, 0)).toBe(10 + 50 - 50) // vào lớp + đủ quân − rời màn
+    expect(b.ds[0].kj).toBe(0) // em đang 0 kJ ⇒ kẹp 0
+    expect(b.bienDong.at(-1)).toMatchObject({ sbd: 'S1', kjEm: 0, kjDoi: -50, lyDo: 'Rời màn hình' })
+    expect(JSON.parse(em.tin.at(-1)!).bienDongEm.at(-1)).toMatchObject({ sbd: 'S1', kjDoi: -50 })
     await p.webSocketMessage(em as never, JSON.stringify({ t: 've' }))
     expect(JSON.parse(gv.tin.at(-1)!).roiNay).toEqual([])
     expect(JSON.parse(gv.tin.at(-1)!).luot.roiMe).toEqual(['S1']) // lịch sử lượt vẫn ghi em đã rời

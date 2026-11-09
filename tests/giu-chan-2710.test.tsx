@@ -76,6 +76,7 @@ const lamCau = async (dung: boolean) => {
   fireEvent.click(screen.getByRole('radio', { name: dung ? /^D/ : /^B/ }))
   fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
   await screen.findByRole('heading', { name: dung ? 'Chính xác!' : 'Chưa đúng' })
+  if (!dung) fireEvent.click(screen.getByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
 }
 const X = () => screen.getByRole('button', { name: 'Lưu và về Hôm nay' })
 

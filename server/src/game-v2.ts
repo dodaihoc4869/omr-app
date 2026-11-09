@@ -1,4 +1,5 @@
 import { khopPhanIII } from '../../src/lib/cham-so'
+import { lySach, ghiLyDoSai } from './ly-do-sai'
 import { ngoaiKenhSo } from '../../src/lib/so-o-tra-loi-ngan'
 import { BANG_HO_SO, BANG_MUA, docDongLop, envGhiRieng, gieoNho, gopDocD1, laBanGop, nhoTheoLuot, RAO_GHI, raoGhiD1 } from './doc-d1-theo-luot'
 import {BANG_NGAY_CAP,EXP_MOI_VANG,MANH_REN_KHIEN,VANG_REN_KHIEN,ngayDatKhien} from '../../src/lib/kinh-te-game'
@@ -579,8 +580,10 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
     // xếp hàng chung với đường trả lời — trước: lệnh ghi sổ vào hàng ghi của bản gộp đọc ⇒ lượt đọc EXP còn lại của phản hồi phải chờ nó (một đợt D1). Phần còn lại
     // của phản hồi không đọc bảng sổ. Không có `ctx` (việc phụ chạy tại chỗ, nối tiếp) ⇒ y như cũ.
     const envSo:Env=ctx?envGhiRieng(env):env
+    const lyEm=lySach(b.ly) // «Vì sao em sai?» (ly-do-sai.ts): lý do các câu sai trước, ghi cùng việc phụ ghi sổ
     const ghiSoHoc=async(attempt:Attempt,chon?:string,so?:SoOmni)=>{
       const env=envSo
+      if(lyEm.length)await ghiLyDoSai(env,sbd,lyEm,new Date(attempt.at).toISOString())
       // CNH-1.0 P03: khi cờ `nang_luc_v1` BẬT, sự kiện ĐƯỢC HỖ TRỢ cũng vào sổ (kèm `assistance:'assisted'`)
       // để phần hỗ trợ có bằng chứng và KHÔNG bị tính là lần tự làm. Cờ TẮT ⇒ giữ nguyên hành vi cũ (bỏ qua),
       // không đổi hồ sơ mạnh yếu đang chạy.

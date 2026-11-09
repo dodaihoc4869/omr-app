@@ -88,7 +88,7 @@ describe('màn làm bài', () => {
     expect(nut().textContent).toBe('Nộp câu'); fireEvent.click(nut())
     await screen.findByText('Đúng 3/4 ý · sai ý d')
     expect(goiHoa2).toHaveBeenLastCalledWith('answer', 'tk', expect.objectContaining({ session: 'p1', qid: 'ds1', answer: 'DDDD', assisted: false, msLam: expect.any(Number) }), 15)
-    expect(screen.getByText(/câu này vào lịch ôn 1 · 3 · 7 ngày/)).toBeTruthy()
+    expect(screen.getByText(/câu này vào nhóm sửa/)).toBeTruthy() // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B): «lịch ôn 1 · 3 · 7 ngày» ⇒ nhóm sửa
     expect(within(screen.getByRole('region', { name: 'Ý d, sai' })).getByText('Em chọn Đúng · đáp án Sai')).toBeTruthy()
     expect(within(screen.getByRole('region', { name: 'Ý a, đúng' })).getByText('Em chọn Đúng · đáp án Đúng')).toBeTruthy()
     expect(screen.getByText(/B đứng trước C nên tính acid/)).toBeTruthy() // giải thích ý sai mở sẵn (công thức tách thẻ sub)
@@ -184,7 +184,7 @@ describe('màn làm bài', () => {
     rerender(<ManLamBaiTap token="tk" sbd="s1" onVe={vi.fn()} onCapNhat={onCapNhat} onChua={vi.fn()} homNay={{ daLam: 8, muc: 24, chang: 2, soChang: 4 }} />)
     expect(screen.getByRole('heading', { name: 'Đã lưu chặng 2' })).toBeTruthy()
     expect(screen.getByText(/câu tự làm đúng/).textContent).toBe('1/2 câu tự làm đúng')
-    expect(screen.getByText('Câu 2 đã vào lịch ôn 1 · 3 · 7 ngày.')).toBeTruthy()
+    expect(screen.getByText('Câu 2 đã vào nhóm sửa.')).toBeTruthy() // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B): «lịch ôn 1 · 3 · 7 ngày» ⇒ nhóm sửa
     expect(screen.getByText('Hôm nay 8/24 câu')).toBeTruthy(); expect(screen.getByText('còn 16 câu · 3 chặng')).toBeTruthy()
     expect(screen.getByRole('img', { name: 'Xong 1 trên 4 chặng' })).toBeTruthy()
     expect(screen.getByRole('button', { name: /Học tiếp chặng 3/ })).toBeTruthy(); expect(screen.getByRole('button', { name: 'Nghỉ và về Hôm nay' })).toBeTruthy()

@@ -219,6 +219,7 @@ describe('màn làm chặng không vỡ khi hiệu ứng chạy', () => {
         thuong: dung ? { tinh: true, nguyenTu: 10, dong: [{ nhan: 'Đúng', so: 10 }], chuoiDung: i + 1, cauKho: false } : { tinh: true, nguyenTu: 2, dong: [{ nhan: 'Làm nghiêm túc', so: 2 }], chuoiDung: 0, cauKho: false } })
       fireEvent.click(screen.getByRole('radio', { name: dung ? /^A/ : /^B/ }))
       fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
+      if (!dung) fireEvent.click(await screen.findByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
       await screen.findByRole('button', { name: 'Tiếp tục' })
       const the = document.querySelector<HTMLElement>(`.ht2-lam-pa[data-ket=${dung ? 'dung' : 'sai'}]`)!
       await waitFor(() => expect(the.style.animation).toBe('none'))

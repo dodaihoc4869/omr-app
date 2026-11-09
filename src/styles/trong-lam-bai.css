@@ -5,6 +5,7 @@
 /* Bàn phím số kiểu Duolingo + nút «Trợ giúp» của thanh đáy Duo (27/10): tờ riêng, gộp vào tờ này khi build (không thêm tệp, cùng nạp lười). */
 @import '../components/hoc-tap/ban-phim-duo.css';
 @import '../components/hoc-tap/tro-giup-duo.css';
+@import '../components/hoc-tap/vi-sao-sai.css'; /* 09/11 «Vì sao em sai?» (khối B) */
 @import './trong-lam-ngang.css'; /* ngang + máy tính 27/10: chỉ bố cục, tiền tố :root cho đủ nặng */
 @import './kinh-lanh-hs.css'; /* 07/11 kính lóng lánh: biến --kl-* + thanh tiến độ kính */
 @import './trong-chang-ngang.css'; /* CHẶNG NGANG 01/11: màn làm chặng (gốc data-chang) hai cột cuộn riêng + thanh cuộn luôn thấy — xoay ngang + máy tính */

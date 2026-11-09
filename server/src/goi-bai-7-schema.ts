@@ -28,5 +28,7 @@ export const SQL_GOI7: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS goi_bai_7_revision (goi_id TEXT PRIMARY KEY,revision INTEGER NOT NULL)`,
   // CHỈ THÊM 09/11 (khối B đợt 1): loại ngày đã chốt của em — 'moi' ngày học mới · 'sua' ngày sửa lỗi. Ghi CÙNG lô với dòng mức hôm nay (chotMucNgay7).
   `CREATE TABLE IF NOT EXISTS goi_bai_7_loai_ngay (sbd TEXT NOT NULL,ngay TEXT NOT NULL,loai TEXT NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay))`,
+  // CHỈ THÊM 09/11 (khối B đợt 2, ly-do-sai.ts): «Vì sao em sai?» — lý do em chạm cho câu luyện tập làm sai ('tinh' · 'cach' · 'nham'), lần cuối thắng.
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_ly_do (sbd TEXT NOT NULL,qid TEXT NOT NULL,ly TEXT NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,qid))`,
   `CREATE TABLE IF NOT EXISTS goi_bai_7_sua_em (goi_id TEXT NOT NULL,request_id TEXT NOT NULL,payload TEXT NOT NULL,nonce TEXT NOT NULL,ack_json TEXT NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(goi_id,request_id))`,
 ]
