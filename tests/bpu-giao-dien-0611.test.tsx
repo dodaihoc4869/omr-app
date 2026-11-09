@@ -302,10 +302,11 @@ describe('bảng chiếu', () => {
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })) })
     expect(toNghe).not.toHaveBeenCalled()
     window.removeEventListener('keydown', toNghe)
-    const o = document.querySelector('.bb-o .ten')!
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (tháp lửa): dải tên mới theo đội — ô `.bb-tl-o`, vẫn tên gọi đủ chữ.
+    const o = document.querySelector('.bb-tl-o .ten')!
     expect(o.textContent).toBe(st.ds[0]!.ten.split(' ').at(-1))
   })
-  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án KHÔNG tự hiện phương án bên trái; Đúng–sai ⇒ hai hàng ống Đúng / Sai', async () => {
+  it('phương án ẩn mặc định: M hiện / ẩn (không mở đáp án); O mở đáp án; mở đáp án KHÔNG tự hiện phương án; Đúng–sai ⇒ đáp án gọn Đ · S', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
     render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -322,14 +323,18 @@ describe('bảng chiếu', () => {
     expect(ws.gui.some((t) => t.includes('"mo"'))).toBe(true)
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
     await screen.findByText('Đáp án')
-    expect(document.querySelector('.bb-pa')).toBeNull() // bên trái chỉ đề; kết quả ở cột phải
+    expect(document.querySelector('.bb-pa')).toBeNull() // mở đáp án KHÔNG tự hiện phương án
     const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
     moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); nhanTra(st, 'S2', 'DSSD', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewBang(st))
-    // Đúng–sai: HAI HÀNG ống (thầy 07/11) — hàng Đúng rồi hàng Sai, mỗi ống «ý) N em»; ống của đáp án đúng có lớp `dung`.
-    await screen.findByText('Sai')
-    const o = [...document.querySelectorAll('.bb-ong.gon')]
-    expect(o.map((x) => x.textContent)).toEqual(['a) 2 em', 'b) 0 em', 'c) 0 em', 'd) 1 em', 'a) 0 em', 'b) 2 em', 'c) 2 em', 'd) 1 em'])
-    expect(o.map((x) => x.classList.contains('dung'))).toEqual([true, false, false, true, false, true, true, false])
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy chốt tháp lửa, DAC-TA mục 9.3): Đúng–sai mở đáp án ⇒ «Đáp án: Đ · S · S · Đ» + «x em đúng đủ 4 ý» (thay hai hàng ống).
+    expect(await screen.findByText('Đ · S · S · Đ')).toBeTruthy()
+    expect(document.querySelector('.bb-tl-da')!.textContent).toContain('1 em đúng đủ 4 ý')
+    // M ⇒ tấm giấy 4 ý đè vùng tháp (ống ẩn), M lần nữa về màn đua.
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'm' })) })
+    expect(document.querySelectorAll('.bb-de-pa .bb-ds > div')).toHaveLength(4)
+    expect((document.querySelector('.bb-tl-dai') as HTMLElement).style.visibility).toBe('hidden')
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'm' })) })
+    expect(document.querySelector('.bb-de-pa')).toBeNull()
   })
   it('G ⇒ lời giải thu gọn hiện NGAY TRÊN BẢNG (G lần nữa ẩn); tờ không có lời giải ⇒ lùi về tờ', async () => {
     const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
@@ -393,10 +398,120 @@ describe('bảng · báo cháy rời màn + CSS gói trong bảng', () => {
   })
   it('mọi luật CSS của bảng có lớp `.bb-*` đều gói trong `.bpu-bang` (không đè màn Hôm nay)', async () => {
     const { readFileSync } = await import('node:fs')
-    const css = readFileSync(require('node:path').resolve(__dirname, '../src/components/bpu/bpu-bang.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/@keyframes[^{]+\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
+    // 09/11 tháp lửa: tệp CSS mới bpu-thap.css cũng phải gói trong `.bpu-bang`.
+    const css = ['bpu-bang.css', 'bpu-thap.css'].map((t) => readFileSync(require('node:path').resolve(__dirname, '../src/components/bpu/', t), 'utf8')).join('\n').replace(/\/\*[\s\S]*?\*\//g, '').replace(/@keyframes[^{]+\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g, '')
     const tach = (sel: string) => { const ra: string[] = []; let d = 0, cu = ''; for (const ch of sel) { if (ch === '(') d++; if (ch === ')') d--; if (ch === ',' && !d) { ra.push(cu); cu = '' } else cu += ch } return [...ra, cu] }
     const chon = [...css.matchAll(/([^{}@;]+)\{/g)].flatMap((m) => tach(m[1]!)).map((x) => x.trim()).filter((x) => x.includes('.bb-'))
     expect(chon.length).toBeGreaterThan(100)
     expect(chon.filter((x) => !/\.bpu-bang\b|\[data-bpu-bang\]/.test(x))).toEqual([])
+  })
+})
+
+// 09/11 THÁP LỬA (thầy chốt «chốt bản ống nghiệm nhé»; bản vẽ docs/ban-ve-bpu-dua-top-0911, phương án A): màn câu không còn đề, đội đua bằng kJ trong ống nghiệm.
+describe('bảng · tháp lửa (thầy chốt 09/11)', () => {
+  const TEN = ['Nguyễn Lan Anh', 'Trần Quốc Bảo', 'Lê Thanh Tâm', 'Phạm Hà My', 'Vũ Minh Khôi', 'Đỗ Bảo Ngọc', 'Bùi Gia Huy', 'Hồ Tuấn Kiệt', 'Ngô Phương Thảo', 'Đinh Ngọc Hân', 'Lý Hải Đăng', 'Mai Minh Anh', 'Tạ Khánh Linh', 'Hà Bảo Hân', 'Lưu Đức Duy', 'Cao Mai Phương']
+  const lop = (n: number, vang: number[] = []) => taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds: Array.from({ length: n }, (_, i) => ({ sbd: `E${i}`, ten: TEN[i]!, coMat: !vang.includes(i), luc: T0 + i })) })
+  const moBang = async () => {
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    render(<Bang buoiId="b1" qid="q1" luot={1} onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    return WsGia.ds[0]!
+  }
+  const dichY = (el: Element | null) => Number(/translateY\((-?[\d.]+)px\)/.exec((el as HTMLElement).style.transform)?.[1])
+
+  it('đang làm: KHÔNG chiếu đề; ống đội cao theo kJ, đội dẫn đầu «Dẫn đầu»; em chưa vào không hiện trên dải tên; em vừa gửi bừng sáng', async () => {
+    const { kjDoi } = await import('../src/components/bpu/dua-top')
+    const ws = await moBang()
+    const st = lop(16, [15])
+    st.ds.forEach((e, i) => { e.kj = (i * 37) % 200 })
+    moLuot(st, cau, T0); ws.nhan(viewBang(st))
+    await screen.findByText(/em đã gửi/)
+    expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
+    expect(document.querySelector('.bb-de-chu')).toBeNull()
+    const v = viewBang(st), cot = [...document.querySelectorAll('.bb-tl-cot')]
+    expect(cot).toHaveLength(4)
+    const kj = [0, 1, 2, 3].map((d) => kjDoi(v, d)), dau = kj.indexOf(Math.max(...kj))
+    expect(cot[dau]!.classList.contains('dan')).toBe(true)
+    expect(cot[dau]!.textContent).toContain('Dẫn đầu')
+    const y = cot.map((c) => dichY(c.querySelector('.bb-tl-day')))
+    expect(Math.min(...y)).toBe(y[dau]) // chất lỏng đội nhiều kJ nhất dâng cao nhất
+    for (const d of [0, 1, 2, 3]) expect(cot[d]!.querySelector('.bb-tl-chan .so')!.textContent).toContain(kj[d]!.toLocaleString('vi-VN'))
+    expect(document.querySelectorAll('.bb-tl-o')).toHaveLength(15)
+    expect(document.querySelector('.bb-tl-o[data-sbd="E15"]')).toBeNull()
+    nhanTra(st, 'E0', 'B', T0 + 1000); ws.nhan(viewBang(st))
+    await waitFor(() => expect(document.querySelector('.bb-tl-dem .so')!.textContent).toContain('1/15'))
+    const o = document.querySelector('.bb-tl-o[data-sbd="E0"]')!
+    expect(o.classList.contains('gui')).toBe(true)
+    expect(o.classList.contains('vua')).toBe(true)
+    // Em đang ở ngoài app (`roiNay`) ⇒ ô tên viền đỏ + nhãn chữ «Rời màn» (không chỉ bằng màu).
+    ws.nhan({ ...viewBang(st), roiNay: ['E2'] })
+    await waitFor(() => expect(document.querySelector('.bb-tl-o[data-sbd="E2"]')!.classList.contains('roi')).toBe(true))
+    expect(document.querySelector('.bb-tl-o[data-sbd="E2"] .the-roi')!.textContent).toBe('Rời màn')
+  })
+
+  it('Bảng vàng top 6 theo kJ cả buổi + chuỗi đúng dài nhất (≥ 3)', async () => {
+    const ws = await moBang()
+    const st = lop(10)
+    st.ds.forEach((e, i) => { e.kj = 1000 - ((i * 7) % 10) * 50 })
+    st.ds[4]!.chuoi = 4
+    moLuot(st, cau, T0); ws.nhan(viewBang(st))
+    await screen.findByText(/em đã gửi/)
+    const top = [...st.ds].sort((a, b) => b.kj - a.kj).slice(0, 6).map((e) => e.ten.split(' ').slice(-2).join(' '))
+    expect([...document.querySelectorAll('.bb-tl-vang .bb-tl-hang .t')].map((x) => x.textContent)).toEqual(top)
+    expect(document.querySelector('.bb-tl-chuoi')!.textContent).toContain('Minh Khôi · 4 câu đúng liền')
+  })
+
+  it('mở đáp án: đáp án gọn + số em đúng, vạch «trước», «+kJ lượt này», ▲ lên hạng, nhanh và đúng nhất tối đa 3 em; không nêu tên em sai', async () => {
+    const ws = await moBang()
+    const st = lop(5)
+    st.ds[0]!.kj = 300; st.ds[1]!.kj = 200; st.ds[2]!.kj = 100
+    moLuot(st, cau, T0)
+    nhanTra(st, 'E3', 'B', T0 + 500); nhanTra(st, 'E2', 'B', T0 + 800); nhanTra(st, 'E4', 'B', T0 + 900); nhanTra(st, 'E1', 'A', T0 + 950); nhanTra(st, 'E0', 'B', T0 + 30000)
+    ws.nhan(viewBang(st))
+    await screen.findByText(/em đã gửi/)
+    moDapAn(st, T0 + 40000, chamSo); ws.nhan(viewBang(st))
+    await screen.findByText('Đáp án')
+    expect(document.querySelector('.bb-tl-da')!.textContent).toContain('4/5 em đúng')
+    expect(document.querySelectorAll('.bb-tl-cu').length).toBeGreaterThan(0)
+    expect(document.querySelector('.bb-tl-cu')!.textContent).toMatch(/^trước /)
+    expect(document.querySelectorAll('.bb-tl-chan .bb-tl-cong')).toHaveLength(2)
+    expect(document.querySelector('.bb-tl-chan .bb-tl-cong')!.textContent).toMatch(/^\+[\d.]+ kJ lượt này$/)
+    expect(screen.getByText(/Vượt năng lượng hoạt hoá/)).toBeTruthy()
+    const nhanh = [...document.querySelectorAll('.bb-tl-nhanh .bb-tl-hang .t')].map((x) => x.textContent)
+    expect(nhanh).toEqual(['Hà My', 'Thanh Tâm', 'Minh Khôi'])
+    expect(document.querySelectorAll('.bb-tl-o .bb-tl-hc')).toHaveLength(3) // em đúng thứ 4 (E0) không có huy hiệu
+    expect(document.querySelector('[aria-label^="Lên "]')).toBeTruthy() // Hà My từ hạng 4 lên
+    // Tế nhị: em sai (Quốc Bảo) không có dấu riêng — trông như mọi em đã gửi.
+    const sai = document.querySelector('.bb-tl-o[data-sbd="E1"]')!, dung0 = document.querySelector('.bb-tl-o[data-sbd="E0"]')!
+    expect(sai.className).toBe(dung0.className)
+    expect(document.querySelector('.bb-tl-nhanh')!.textContent).not.toContain('Quốc Bảo')
+  })
+
+  it('Trả lời ngắn ⇒ «Đáp số 2,24»; tự luận ⇒ «x em đã làm xong», không ô đáp án', async () => {
+    const ws = await moBang()
+    const st = lop(4)
+    moLuot(st, { ...cau, qid: 'q3', phan: 'III', cau: { ...cau.cau, qid: 'q3', phan: 'III', choices: [] }, dung: '2.24' }, T0)
+    nhanTra(st, 'E0', '2.24', T0 + 500); moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
+    expect(await screen.findByText('Đáp số')).toBeTruthy()
+    expect(screen.getByText('2,24')).toBeTruthy()
+    moLuot(st, { ...cau, qid: 'q4', phan: 'III', tuLuan: true, cau: { ...cau.cau, qid: 'q4', phan: 'III', choices: [] }, dung: '' }, T0 + 9000)
+    nhanTra(st, 'E1', 'xong', T0 + 9500); nhanTra(st, 'E2', 'xong', T0 + 9600); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewBang(st))
+    await waitFor(() => expect(document.querySelector('.bb-tl-da')!.textContent).toContain('2 em đã làm xong'))
+    expect(screen.queryByText('Đáp án')).toBeNull()
+  })
+
+  it('±kJ (bienDong): tin đầu chỉ ghi nhớ; id mới ⇒ nhãn ±kJ + lý do dưới ống đội (không bay được ⇒ hiện tĩnh)', async () => {
+    const ws = await moBang()
+    const st = lop(4)
+    moLuot(st, cau, T0)
+    const d0 = st.ds[0]!.doi, d1 = st.ds[1]!.doi
+    const b1 = { id: 1, sbd: 'E0', doi: d0, kjEm: 100, kjDoi: 0, lyDo: 'Đúng câu trước', luc: T0 }
+    ws.nhan({ ...viewBang(st), bienDong: [b1] })
+    await screen.findByText(/em đã gửi/)
+    expect(document.querySelector('.bb-tl-ly')).toBeNull()
+    ws.nhan({ ...viewBang(st), bienDong: [b1, { id: 2, sbd: 'E0', doi: d0, kjEm: 100, kjDoi: 30, lyDo: 'Lan Anh đúng nhanh', luc: T0 + 1 }] })
+    await waitFor(() => expect(document.querySelector(`.bb-tl-cot[data-doi="${d0}"] .bb-tl-ly`)!.textContent).toBe('+130 kJ · Lan Anh đúng nhanh'))
+    ws.nhan({ ...viewBang(st), bienDong: [{ id: 3, sbd: null, doi: d1, kjEm: 0, kjDoi: -50, lyDo: 'Rời màn', luc: T0 + 2 }] })
+    await waitFor(() => expect(document.querySelector(`.bb-tl-cot[data-doi="${d1}"] .bb-tl-ly.tru`)!.textContent).toBe('−50 kJ · Rời màn'))
   })
 })
