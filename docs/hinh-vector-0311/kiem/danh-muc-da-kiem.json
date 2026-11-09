@@ -2899,6 +2899,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b": {
+      "tep": "nhan-calcium-carbide-ddh-80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab.svg",
+      "hashSvg": "80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab",
+      "byteSvg": 38892,
+      "byteGzip": 8110,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a9d3a006eeaa99c8720d604caf43e5cd3fb243f54419088e6e5f4dad1c826ac9": {
       "tep": "caprolactam-capron-ddh-8d133a393a0ca45b633aa31cc940ba62002a38ceca85828b619f93f567e9a8cb.svg",
       "hashSvg": "8d133a393a0ca45b633aa31cc940ba62002a38ceca85828b619f93f567e9a8cb",
@@ -9200,6 +9209,20 @@
           "where": "11-C4-B17-II-2.hinh.0.du_lieu",
           "hashDataUrl": "a217b1c9e314387e008cb4ec16161b8c9823a01b47cbf2854b9d4ec96331cb37",
           "vector": "cau-truc-ddh-abf2fc1ad960dd0a2f71c51a4c8b82e92ae18953a14ffed7dd1e8292dc2bbfef.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C4-B16-III-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b",
+          "where": "11-C4-B16-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "82bf0e81c0f48dc83221b1392c12edfa192124a8b87220229e52938ffe6fd2a3",
+          "vector": "nhan-calcium-carbide-ddh-80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab.svg"
         }
       ]
     },
@@ -28610,6 +28633,7 @@
     "11-C4-B17-I-15",
     "11-C4-B17-II-1",
     "11-C4-B17-II-2",
+    "11-C4-B16-III-6",
     "11-C3-B13-III-1",
     "11-C3-B13-III-2",
     "11-C5-B21-I-1",

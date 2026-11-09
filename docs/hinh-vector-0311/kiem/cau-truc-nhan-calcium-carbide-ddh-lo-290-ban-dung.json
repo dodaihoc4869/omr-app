@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1143,
+    "hash": "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b",
+    "fileNguon": "anh/ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b.png",
+    "svg": "nhan-calcium-carbide-ddh-80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab.svg",
+    "hashSvg": "80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab",
+    "byteSvg": 38892,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C4-B16-III-6",
+        "de": "Một học sinh cần điều chế một lượng nhỏ khí acetylene từ calcium carbide để thực hiện thử nghiệm tính chất. Nhãn trên lọ calcium carbide có trong phòng thí nghiệm ghi các thông tin như hình dưới. Học sinh này cần thu 12,4 mL khí acetylene ở điều kiện chuẩn để thực hiện thí nghiệm. Nếu xem hiệu suất phản ứng là 100%, học sinh này cần sử dụng tối thiểu m mg calcium carbide.\nXác định giá trị của m. (Kết quả làm tròn đến hàng phần mười.)",
+        "refs": [
+          {
+            "hash": "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b",
+            "where": "11-C4-B16-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "82bf0e81c0f48dc83221b1392c12edfa192124a8b87220229e52938ffe6fd2a3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "Flat drawn label independently confirmed by root nativeFULL; 2rectangles/grayfill/5regulartextnodes4rows/CaCsub2/64,10 g/mol/Độ tinh khiết: 99%/Chất dễ cháy, nguy hiểm/noaddedhazardicon-bottle-reaction-answer.",
+    "hashSvgDaSoat": "80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,137 @@
+{
+  "i": 1143,
+  "hash": "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b",
+  "file": "anh/ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b.png",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b.png",
+  "nativeSize": [
+    723,
+    337
+  ],
+  "sourceBytes": 7203,
+  "shaVerified": true,
+  "nguoiDoc": "soat_nguon_3",
+  "repoModified": false,
+  "status": "Root và readonly xác nhận nhãn đồ họa phẳng; SVG mới đã soát độc lập exacthash",
+  "manifestPresent": true,
+  "publicQuestions": [
+    {
+      "qid": "11-C4-B16-III-6",
+      "maDe": "11-C4-B16",
+      "de": "Một học sinh cần điều chế một lượng nhỏ khí acetylene từ calcium carbide để thực hiện thử nghiệm tính chất. Nhãn trên lọ calcium carbide có trong phòng thí nghiệm ghi các thông tin như hình dưới. Học sinh này cần thu 12,4 mL khí acetylene ở điều kiện chuẩn để thực hiện thí nghiệm. Nếu xem hiệu suất phản ứng là 100%, học sinh này cần sử dụng tối thiểu m mg calcium carbide.\nXác định giá trị của m. (Kết quả làm tròn đến hàng phần mười.)",
+      "allHinh": [
+        {
+          "hash": "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b",
+          "where": "11-C4-B16-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "82bf0e81c0f48dc83221b1392c12edfa192124a8b87220229e52938ffe6fd2a3"
+        }
+      ],
+      "missingHashes": [
+        "ce5cb5f2f7a9590058db69468bde17dfd8083a5f392f47694d7bc9e33685bd2b"
+      ]
+    }
+  ],
+  "publicEvidenceProvenance": "public questions.de/refs preserved in nguon/kiem-ke.json; this pass read all matching inventorypublicquestionde+allhinh, noanswers. No live publicbank read claimed.",
+  "closure": "Đã khép 1 câu đủ mọi hình sau independent nativeFULL/allrefs/freshactual exactSHA; không cộng câu một phần.",
+  "nativeViewedFull": true,
+  "classification": {
+    "observed": "Flat rectangular textlabel rastergraphic; no bottle/tube/productphotograph visible. Native whitecanvas, uniformlightgrayinside,doubleblackrectborder, crispprintedtext, no perspective/lighting/texture/productcontext.",
+    "tentative": "Looks like drawnlabel containingchemicalproductinformation. Do not automaticallyclassify everyproductlabel asphoto; root must independentlyopen and confirm suitableforvector beforebuild.",
+    "rasterPreservation": "If independentreview identifiesactualpackagingphoto/originalphotographiclabel, retainraster; currentproof source-onlynotadmission.",
+    "rootConfirmed": "Đã mở nativeFULL: nhãn đồ họa phẳng nền xám đồng nhất, hai khung chữ nhật; không ảnh lọ/bao bì chụp. Readonly xác nhận riêng."
+  },
+  "literalText": [
+    {
+      "text": "Calcium carbide",
+      "approxBBox": [
+        50,
+        94,
+        280,
+        119
+      ],
+      "position": "upperleft"
+    },
+    {
+      "text": "CaC₂",
+      "approxBBox": [
+        555,
+        94,
+        620,
+        120
+      ],
+      "position": "upperright",
+      "subscript": "2only"
+    },
+    {
+      "text": "64,10 g/mol",
+      "approxBBox": [
+        477,
+        135,
+        620,
+        159
+      ],
+      "position": "belowformula/rightaligned",
+      "punctuation": "decimalcomma, spacebetween64,10andg/mol; slashg/mol"
+    },
+    {
+      "text": "Độ tinh khiết: 99%",
+      "approxBBox": [
+        50,
+        176,
+        274,
+        200
+      ],
+      "position": "middleleft",
+      "punctuation": "colon+space,percentnointernalspace"
+    },
+    {
+      "text": "Chất dễ cháy, nguy hiểm",
+      "approxBBox": [
+        50,
+        214,
+        342,
+        241
+      ],
+      "position": "lowerleft",
+      "punctuation": "comma+space"
+    }
+  ],
+  "geometry": {
+    "canvas": [
+      0,
+      0,
+      723,
+      337
+    ],
+    "cardApprox": [
+      35,
+      34,
+      686,
+      303
+    ],
+    "innerBorderApprox": [
+      40,
+      40,
+      680,
+      298
+    ],
+    "rectangleBorders": 2,
+    "textRows": 4,
+    "textNodes": 5,
+    "formulaCount": 1,
+    "arrows": 0,
+    "pictograms": 0,
+    "structuralMoleculeDiagrams": 0,
+    "layout": "Two uppercolumns; nameleft/formularight onfirstrow; molarmassbelowformula; twoleftalignedVietnameseinformationrows. Largeemptygrayareaatbottom.",
+    "noAddedContent": "Nohazardicon/experimentapparatus/productbottle/reaction/answer/mcalculation. Preserveliteralcase/commas/percent/subscript2.",
+    "coordinates": "Approxnativerasterboundsforreconstruction aid; rootmustopenfullsourceindependentlybeforefinalgeometry."
+  },
+  "parentInstruction": "Rootreservedforlo290; noSVGbuild/admit/countinlo289.",
+  "loGhiNhan": 290,
+  "admitted": true,
+  "counted": true,
+  "actualSvgReviewed": true,
+  "rootIndependentClassificationPending": false,
+  "rootNativeFullViewed": true,
+  "hashSvg": "80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab",
+  "priorSourceOnlyProof": "doc-calcium-carbide-label1143-lo-289-source-only.json"
+}
