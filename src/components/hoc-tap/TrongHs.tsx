@@ -8,6 +8,7 @@ import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical,
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
 import { chuViecBai } from './chu-viec-bai'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
+import { NHAN_LOAI_NGAY, bongHoc, chuNutLoai, type LoaiNgay } from './loai-ngay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
 import type { TomTatKiemTra } from '../../lib/kiem-tra-ca-nhan'
 import type { Props as PropsHomNayCu } from './HocTapHomNay'
@@ -114,8 +115,7 @@ function useChoSo(bat: boolean): HTMLElement | null {
 }
 
 export interface PropsMotTrang {
-  /** Khối B (10/11): loại ngày máy chủ đã chốt — nhãn thẻ mức hôm nay + chữ / màu nút chính. Vắng ⇒ như cũ. */
-  loaiNgay?: 'moi' | 'sua'
+  loaiNgay?: LoaiNgay
   so: SoHomNay | null; dangTai: boolean; tenBai?: string; viec?: string
   onHoc: () => void; khoaHoc: boolean; hetCau: boolean; kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }
   coCa: boolean; onThi: () => void; token?: string
@@ -330,8 +330,6 @@ const chuCaiTen = (t?: string) => { const w = (t || '').trim().split(/\s+/).filt
 /** «Thứ Hai 02/11» theo giờ VN. */
 const ngayTuan = () => { const d = new Date(Date.now() + VN); return `${THU[d.getUTCDay()]} ${hai(d.getUTCDate())}/${hai(d.getUTCMonth() + 1)}` }
 const SAC_POP: Record<Nut['loai'], string> = { hoc: 'hs', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
-/** Khối B (10/11, thầy duyệt docs/ban-ve-moi-on-sua-0911): nhãn thẻ mức hôm nay theo loại ngày máy chủ chốt. */
-const NHAN_LOAI_NGAY = { moi: 'Ngày học mới', sua: 'Ngày sửa lỗi' } as const
 /** Tên dòng của một nút: chặng ⇒ «Chặng n» (thẻ bật ra cũ để tên bài), còn lại tên việc. Dòng phụ bỏ «Chặng n / m · » đứng đầu (đã ở tên). */
 const tenDong = (n: Nut, so: number) => n.loai === 'hoc' ? `Chặng ${so}` : n.dem && n.tt !== 'xong' ? `${n.pop.tieu} · ${n.dem} câu` : n.pop.tieu
 /** Dòng phụ như bản vẽ: chặng xong ⇒ «6 câu» · chặng đang học ⇒ «Học tiếp · còn 4 câu» · còn lại = lời thẻ bật ra cũ (bỏ «Chặng n / m · » đầu dòng). */
@@ -888,7 +886,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const moTp = (man: TenManThuong) => setTp({ man })
   const con = so ? Math.max(0, so.muc - so.daLam) : null
   const du = con === 0 && !so?.changDangDo
-  const nutHoc = chuNutHoc(so, p.hetCau, p.kho, p.loaiNgay)
+  const nutHoc = chuNutLoai(chuNutHoc(so, p.hetCau, p.kho), p.loaiNgay)
   const kiemXong = !!kiem && (kiem.nopLuc !== null || kiem.trangThai === 'het_han')
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
   const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
@@ -1095,7 +1093,7 @@ export function MotTrangHs(p: PropsMotTrang) {
     if (khoaSua && i >= mocSua && c.tt !== 'xong') { nut.push({ k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: khoá đến khi sửa xong lỗi hôm nay`, pop: { tieu: tenBaiThe, phu: `${thu} · Sửa xong ${conPhan} lỗi hôm nay để mở chặng tiếp` } }); return }
     nut.push(c.tt === 'xong' ? { k: `c${i}`, loai: 'hoc', tt: 'xong', cau: c.co, ten: `Chặng ${i + 1}: đã xong`,
       pop: { tieu: tenBaiThe, phu: `${thu} · đã xong`, nut: hs ? { chu: 'Xem lại', onClick: hs.onXemLai } : undefined } }
-      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' && !(p.hetCau && !dangDoNay) ? (p.loaiNgay === 'sua' ? (c.phan > 0 ? 'Sửa lỗi tiếp' : 'Bắt đầu sửa lỗi') : c.phan > 0 ? 'Học tiếp' : 'Bắt đầu') : undefined, vong: chinh === 'sua' ? undefined : c.phan,
+      : c.tt === 'dang' ? { k: `c${i}`, loai: 'hoc', tt: 'dang', ten: nutHoc, bong: dang && chinh === 'hoc' && !(p.hetCau && !dangDoNay) ? bongHoc(c.phan > 0, p.loaiNgay) : undefined, vong: chinh === 'sua' ? undefined : c.phan,
         soDoan, daDoan, khoaVong: `ddh.vong-chang.${ngayVn(Date.now())}.${sbdPhien() ?? ''}.${i}`,
         pop: { tieu: tenBaiThe, phu: (p.khoaHoc || p.hetCau) && !dangDoNay ? nutHoc : `${thu} · ${conChang} câu`, nut: { chu: p.hetCau && p.kho?.caThi && !dangDoNay ? 'Chờ ca kiểm tra đóng' : c.phan > 0 ? 'Tiếp tục' : 'Bắt đầu', onClick: p.onHoc, tat: p.khoaHoc && !dangDoNay } } }
       : { k: `c${i}`, loai: 'hoc', tt: 'khoa', ten: `Chặng ${i + 1}: chưa mở`, pop: { tieu: tenBaiThe, phu: `${thu} · Hoàn thành các chặng trước để mở khoá` } })
@@ -1163,10 +1161,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       </section>
       {/* hệ Kính: băng ca kiểm tra / đủ mức đứng DƯỚI thẻ mức (đầu trang luôn là lời chào) */}
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
-      {/* 28/10 (thầy «Chúc mừng, em đã hoàn thành bài hôm nay — ghi rõ câu sửa, bài kiểm tra. Thay thẻ hoàn thành nhiệm vụ»): xong HẾT việc hôm nay ⇒ thẻ chúc mừng
-          kèm số câu học · câu sửa · Kiểm tra ôn tập; còn việc ⇒ thẻ «Đủ x/y câu» + việc tiếp như cũ. 02/11 (ảnh thật «Đủ 17/12 câu hôm nay!»): VƯỢT mức ⇒
-          «Đủ mức hôm nay! Đã làm 17 câu (mức 12)» — không viết như phân số (lam-bai.ts vuotMuc). */}
-      {/* đủ mức ⇒ băng «Đủ x/y câu hôm nay! · Tiếp theo: …» (còn việc) / «Hoàn thành bài hôm nay» (xong hết) — giữ như cũ, thẻ mức đổi hồng đi cùng */}
+      {/* 28/10 + 02/11: xong hết ⇒ thẻ chúc mừng (câu học · câu sửa · Kiểm tra ôn tập); còn việc ⇒ «Đủ x/y câu hôm nay! · Tiếp theo: …»; vượt mức ⇒ «Đủ mức hôm nay! Đã làm 17 câu (mức 12)» (lam-bai.ts vuotMuc). */}
       {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label={tiepTheo.length ? 'Đủ mức hôm nay' : 'Hoàn thành bài hôm nay'}><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua">{tiepTheo.length
         ? <><b>{vuotMuc(so) ? `Đủ mức hôm nay! Đã\u00a0làm\u00a0${so.daLam}\u00a0câu\u00a0(mức\u00a0${so.muc})` : `Đủ ${so.daLam}/${so.muc} câu hôm nay!`}</b><span className="mo">Tiếp theo: {tiepTheo.join(', rồi ')}</span></>
         : <><b>Chúc mừng, em đã hoàn thành bài hôm nay!</b><span className="mo">{so.daLam} câu học{daSuaNay ? ` · ${daSuaNay} câu sửa` : ''}{kiem?.homNay && kiem.nopLuc !== null ? ` · Kiểm tra ôn tập ${kiem.diem !== null ? `${diemChu(kiem.diem)}/10` : 'đã nộp'}` : ''}</span></>}</div></section>}

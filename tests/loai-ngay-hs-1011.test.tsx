@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import { chuNutHoc } from '../src/components/hoc-tap/nhip-hom-nay'
+import { chuNutLoai } from '../src/components/hoc-tap/loai-ngay'
 import { docTomTatGoi7 } from '../src/lib/goi-bai-7'
 
 const noop = () => {}
@@ -43,10 +44,10 @@ describe('nhãn loại ngày', () => {
 describe('chữ nút học', () => {
   it('ngày sửa lỗi: Bắt đầu sửa lỗi / Sửa lỗi tiếp; ngày học mới và không loại: như cũ', () => {
     const so = (daLam: number) => ({ daLam, muc: 28, chang: 1, soChang: 5 }) as never
-    expect(chuNutHoc(null, false, undefined, 'sua')).toBe('Bắt đầu sửa lỗi')
-    expect(chuNutHoc(so(0), false, undefined, 'sua')).toBe('Bắt đầu sửa lỗi · 28 câu')
-    expect(chuNutHoc(so(10), false, undefined, 'sua')).toBe('Sửa lỗi tiếp · 18 câu')
-    expect(chuNutHoc(so(10), false, undefined, 'moi')).toBe('Học tiếp · 18 câu')
+    expect(chuNutLoai(chuNutHoc(null, false), 'sua')).toBe('Bắt đầu sửa lỗi')
+    expect(chuNutLoai(chuNutHoc(so(0), false), 'sua')).toBe('Bắt đầu sửa lỗi · 28 câu')
+    expect(chuNutLoai(chuNutHoc(so(10), false), 'sua')).toBe('Sửa lỗi tiếp · 18 câu')
+    expect(chuNutLoai(chuNutHoc(so(10), false), 'moi')).toBe('Học tiếp · 18 câu')
     expect(chuNutHoc(so(0), false)).toBe('Bắt đầu học · 28 câu')
   })
 })
