@@ -13,7 +13,6 @@ import { CalendarCheck, Check, ChevronLeft, ClipboardCheck, Flame, MonitorPlay, 
 import { BuocDiemDanh, emVangBuoi, useDiemDanhBuoi, type DiemDanhBuoi } from '../day-hoc/DiemDanhBuoi'
 import { ghiTienTrinhBuoi, type HoatDongBuoi } from '../../lib/buoi-hoc-api'
 import { useSoDemGv } from '../../lib/so-dem-gv'
-import BangBaiDangGiao from './BangBaiDangGiao'
 import { buocVaoMan, chuBuoi, TEN_BUOC_DAY, TEN_NGAN_BUOC_DAY as TEN_NGAN, type SoBuoc, type TrangThaiBuoc } from './buoi-day-ui'
 import '../../styles/trong-gv-hanh-trinh.css' // «Trong» 26/10 — chỉ áp khi <html data-trong="gv">
 import './buoc-day.css'
@@ -363,7 +362,7 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
           {daGan.has('day-hoc') && (
             <div data-hd="day-hoc" hidden={hd !== 'day-hoc'}>
               <Suspense fallback={<XuongBuoc nhan="Đang mở Dạy học" cao={200} />}>
-                <DayHocLenBang dd={dd} soBuocDau={3} onTrangThai={nhanTtDay} sauBaiHomNay={<BangBaiDangGiao onMoChuaBai={() => dat(3, 'chua-cau')} />} />
+                <DayHocLenBang dd={dd} soBuocDau={3} onTrangThai={nhanTtDay} />{/* bảng «Bài đang giao» đã bỏ (thầy 09/11) — sửa em / gỡ bài nằm trong hộp «Giao bài» ở Hôm nay */}
               </Suspense>
             </div>
           )}

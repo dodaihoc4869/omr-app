@@ -32,7 +32,7 @@ import { khoaToChieu } from '../../lib/to-chieu-cau-noi'
 import { ChemText } from '../../lib/chem-format'
 import TheCauHienThi from './TheCauHienThi'
 import { BuocDiemDanh, useDiemDanhBuoi, type DiemDanhBuoi } from './DiemDanhBuoi'
-import { BuocBaiHomNay, DongChoBaiMoi, useBaiHomNay, type BaiChonNho, type BaiHomNay } from './BaiHomNay'
+import { DongChoBaiMoi, useBaiHomNay, type BaiChonNho, type BaiHomNay } from './BaiHomNay'
 import { KhoiChonEm, ChipTang } from '../goi-len-bang/ChonEm'
 import { docCheDo, phanBoGoi, type CheDoChonEm, type Tang } from '../../lib/chon-em-phan-tang'
 import './day-hoc.css'
@@ -125,7 +125,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, sauBaiHomNay, onTrangThai }: Omi
   // Hộp chọn bài dựng lại mỗi lần mở ⇒ giữ chữ tìm + chip khối ở đây (đợt 16).
   const nhoHop = useRef<NhoHopChonDe | null>(null)
 
-  const [loiKho, setLoiKho] = useState('')
+  const [, setLoiKho] = useState('') // chữ lỗi kho từng hiện ở bước «Bài hôm nay» (đã bỏ 09/11); vẫn đặt để giữ luồng nạp kho cũ
   const dangNapKho = useRef<Promise<TeacherExamSource[]> | null>(null)
   const napKho = useCallback((): Promise<TeacherExamSource[]> => {
     if (kho) return Promise.resolve(kho)
@@ -625,8 +625,7 @@ function DayHocThan({ dd, nhung, soBuocDau = 3, sauBaiHomNay, onTrangThai }: Omi
         {hangChieu}
       </section>
 
-      {/* ───── BƯỚC 4 (OMNI 3) ───── */}
-      <BuocBaiHomNay bhn={bhn} kho={kho} loiKho={loiKho} thuKho={() => void napKho()} />
+      {/* BƯỚC 4 «Bài hôm nay» (chọn bài) ĐÃ BỎ — thầy 09/11 «bỏ hết màn phân bài bên trong»: giao bài qua nút «Giao bài» ở màn Hôm nay. */}
 
       {hopChon}
 

@@ -190,8 +190,8 @@ export default function HopBoSungBai({ onDong }: { onDong: (daGiao: boolean) => 
         <section ref={tam} className="hbs-tam" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={`${id}-tieu`} aria-describedby={`${id}-phu`} data-khoi="hop-bo-sung-bai">
           <header className="hbs-dau">
             <div>
-              <h2 id={`${id}-tieu`}>Bổ sung bài hôm nay</h2>
-              <p id={`${id}-phu`}>Tick các bài vừa dạy (chọn được nhiều bài) — app tự giao luyện theo bài cho lớp thầy chọn. Bài đứng trước bài đã giao là bài cũ để ôn lại.</p>
+              <h2 id={`${id}-tieu`}>Giao bài</h2>
+              <p id={`${id}-phu`}>Chọn bài vừa dạy rồi bấm Giao — máy tự đặt hạn chung cho lớp và tự xếp 28 câu mỗi ngày cho từng em.</p>
             </div>
             <button ref={nutDong} type="button" className="hbs-dong" aria-label="Đóng" disabled={dangGiao} onClick={dong}>
               <X size={22} aria-hidden="true" />

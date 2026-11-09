@@ -75,3 +75,11 @@
   .cbm-o-so { flex-direction: row; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
   .cbm-o-so span { flex-basis: 100%; }
 }
+
+/* 09/11 — hộp «Giao bài» (bản vẽ docs/ban-ve-giao-bai-0911): dòng gộp chương đã giao hết, nhãn Gợi ý, dòng ghi hạn chung. */
+.cbm-het { all: unset; box-sizing: border-box; width: 100%; min-height: 48px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; border: 1px dashed var(--bts-vien); border-radius: 16px; font-size: 14px; color: var(--bts-chu-mo); cursor: pointer; }
+.cbm-het[aria-expanded='true'] .cbm-mui { transform: rotate(180deg); }
+.cbm-het:focus-visible { outline: 3px solid var(--bts-duong); outline-offset: 2px; }
+.cbm-goi-y-chip { flex: none; padding: 3px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 700; background: var(--bts-la-nhat); color: var(--bts-la); }
+.cbm-ghi { margin: 0; font-size: 13px; color: var(--bts-chu-mo); line-height: 1.45; }
+.cbm-ct-nut { min-height: 44px; }

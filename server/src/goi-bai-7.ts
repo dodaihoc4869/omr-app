@@ -1,4 +1,5 @@
 import { LENH_BANG_DIEM_GON, lenhDiemGon } from './diem-gon'
+import { hanChungLop } from './han-chung'
 import type { Env, D1PreparedStatement } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
@@ -93,7 +94,10 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     const cau = await cauTuTick7(env,b)
     // Không bỏ qua bài thiếu chỉ mục: hàng giáo viên vẫn thấy gói rỗng cần bổ sung.
     const batDau = [ngayVn7(Date.parse(str(b.tick_luc))),cfg.batDau].sort().at(-1)!
-    const han = congNgay7(batDau, 6), id = `g7:${str(b.id)}`, luc = new Date(now).toISOString()
+    // HẠN CHUNG cả lớp (thầy 09/11, han-chung.ts — cùng hàm hộp Giao bài xem trước). Bài chưa có câu (chỉ mục chưa sẵn) ⇒ 7 ngày như cũ.
+    const soCauG = cau.filter((c) => c.hopLe !== false).length
+    const sbdLop = soCauG ? (await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa'`).bind(b.lop).all<{ sbd: string }>()).results.map((x) => x.sbd) : []
+    const han = congNgay7(batDau, soCauG ? (await hanChungLop(env, sbdLop, soCauG, now)).T - 1 : 6), id = `g7:${str(b.id)}`, luc = new Date(now).toISOString()
     const rs = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) SELECT ?,?,?,?,?,?,?,? WHERE ${KHONG_CA}`).bind(id,b.id,b.lop,b.khoa_bai,b.ten_bai,batDau,han,luc),
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,JSON.stringify(cau),id),
@@ -584,6 +588,10 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // (`envGhiRieng`: D1 gốc, vẫn qua rào cổng; lệnh ghi tự nuốt lỗi như cũ, đọc lại dòng thắng qua cùng đường; không lượt đọc nào khác của lượt đọc bảng mức hôm nay)
   // — trước: nối tiếp SAU lô ghi của động cơ, hai đợt D1. Cùng đối số y hệt lời gọi cũ bên dưới. Lịch bật / cờ lỗi ⇒ chốt ở chỗ cũ như trước.
   const batKtSom = som(import('./kiem-tra-ca-nhan').then(m=>m.coKtCn(env)))
+  // Câu đã DÀNH cho Kiểm tra ôn tập sắp tới (cho «ôn sớm» khi kế hoạch thiếu mức): đọc SỚM, SONG SONG động cơ — 09/11 mức cố định 28 làm nhánh thiếu mức gặp
+  // thường hơn; đọc muộn (sau khi thấy thiếu) thêm MỘT đợt chờ D1 nối tiếp ở sảnh lần đầu (luật tốc độ). Chỉ dùng khi thiếu mức; lỗi ⇒ null (không ôn sớm).
+  const deKtSom = som(env.DB.prepare(`SELECT DISTINCT json_extract(c.value,'$.q.qid') qid FROM kiem_tra_ca_nhan k, json_each(k.json,'$.cau') c WHERE k.sbd=? AND k.ngay>=? AND k.trang_thai NOT IN ('da_nop','het_han')`)
+    .bind(sbd, ngay).all<{ qid: string }>().then(r => new Set(r.results.map(x => String(x.qid))), () => null))
   const chotSom = batKtSom.then(bat => bat === false ? chotMucNgay7(envGhiRieng(env),sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,0,goi.some(g=>g.kiemNhe),goi.map(g=>g.id)) : null).catch(() => null)
   const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo,{ghiTruoc:ghiTre7,hoan})
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
@@ -623,8 +631,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.
   if (soDaLam + plan.viec.length < toiThieu) {
     const daCo = new Set([...sua, ...on, ...chua])
-    const deKt = await env.DB.prepare(`SELECT DISTINCT json_extract(c.value,'$.q.qid') qid FROM kiem_tra_ca_nhan k, json_each(k.json,'$.cau') c WHERE k.sbd=? AND k.ngay>=? AND k.trang_thai NOT IN ('da_nop','het_han')`)
-      .bind(sbd, ngay).all<{ qid: string }>().then(r => new Set(r.results.map(x => String(x.qid))), () => null)
+    const deKt = await deKtSom
     // Đọc hỏng ⇒ không ôn sớm (không đoán) và cũng KHÔNG hạ mức bên dưới.
     if (deKt) {
       vaoPlan.onSom = hs.cau.filter(c => { const t = hs.tt.get(c.qid); return !!t && !t.laMoi && !t.catTia && !daCo.has(c.qid) && !vuaXem.has(c.qid) && !deKt.has(c.qid) })

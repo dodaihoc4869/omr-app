@@ -16,15 +16,9 @@ Thầy: «thiết kế 1 nút giao bài ngay ở màn hôm nay, bấm vào popup
 - **Thiếu câu chuẩn** (`*-2-thieu`): ô Đề chuẩn chuyển vàng «24/28 · thiếu câu Đúng/Sai», dòng giải thích + «Bổ sung câu Đúng/Sai ›». Vẫn giao được.
 - **Đã giao** (`*-3-xong`): dấu ✓, «Đã giao Bài 9 cho 12 Thường · 53 em», một câu máy sẽ làm gì; [Giao thêm bài] [Xong].
 
-### 2b. Thẻ mới ở Việc cần thầy (không có việc thì không hiện)
-| Thẻ | Khi nào | Nút |
-|---|---|---|
-| Hết hạn · chưa xong (đỏ) | hết hạn chung mà em còn câu mới chưa làm hoặc lỗi của bài chưa sửa | Xem em |
-| Nên chữa chung (vàng) | từ 30 % em của lớp cùng một nhóm lỗi | Gọi lên bảng (mở sẵn dạng đó) |
-| Cần thầy chữa (vàng, đã có) | thêm nguồn: nhóm lỗi sai 3 lần | Mở |
-| Bài thiếu câu chuẩn (xám) | bài đang giao có đề chuẩn < 26/28 | Xem ô thiếu |
-- Em bỏ làm KHÔNG thành thẻ (thầy đã bỏ thẻ «N em chưa làm» 12/10 vì Nhịp học đã nói) ⇒ hiện ở Nhịp học.
-- «Lớp chưa xong bài trước» KHÔNG thành thẻ (với nhịp chọn bài 7 ngày sẽ hiện gần như mọi lần) ⇒ đã có ở ô «Lớp dự kiến xong» trong hộp.
+### 2b. KHÔNG thêm thẻ nào cần thầy (thầy 09/11: «không có cái gì cần thầy cả, mọi thứ tự động tôi chỉ chọn giao bài máy phải làm hết»)
+- Bỏ các thẻ đã vẽ «Hết hạn · chưa xong», «Nên chữa chung», «Bài thiếu câu chuẩn», nguồn mới cho «Cần thầy chữa». «Việc cần thầy» giữ nguyên như trước việc này.
+- Ô thiếu câu chuẩn: máy tự lấy câu ô gần nhất (ô Đề chuẩn chỉ báo thông tin). Em chưa xong khi hết hạn: lỗi mang sang khung sau, máy tự xếp sửa trước.
 
 ## 3. Trạng thái
 - Đang tải: khung xương đúng hình (danh sách + tóm tắt). Đang tính dự kiến: ba ô hiện «…», nút Giao vẫn bấm được (số chỉ để xem).

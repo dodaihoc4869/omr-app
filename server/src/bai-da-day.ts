@@ -13,6 +13,8 @@
 //   · Tick lại bài còn hiệu lực ⇒ trả chiến dịch cũ (`daCo`). Bỏ tick ⇒ ghi `bo_tick_luc`; chiến dịch chưa có lượt làm nào ⇒ huỷ, có ⇒ đóng.
 //   · Phạm vi đã dạy của lớp = bài đang tick ∪ mọi bài đứng TRƯỚC bài tick xa nhất (danh sách `phamVi` app thầy gửi lúc tick).
 //   · Lớp của em: đúng nguồn màn Học sinh (`danh_sach` + `hoc_sinh.ten_lop`, tên lớp mặc định theo khối — ten-lop.ts), em đã khoá không tính.
+import { hanChungLop, doChuanDe } from './han-chung'
+import { MA_TRAN_RUT_MOI, oMaTran } from './ma-tran-rut-moi'
 import type { Env } from './kieu'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { DemTTL } from './dem-chung'
@@ -565,6 +567,8 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
   const homNay = ngayVnCua(nowMs)
   const ctP = cauCuaToChiTiet(env, dv.maDe)
   const khoP = docKhoChoXem(env, dv, ctP, nowMs) // chạy SONG SONG phần cũ (không thêm đợt D1); không bao giờ từ chối
+  // HẠN CHUNG (thầy 09/11) — cùng hàm máy chủ dùng khi tạo gói (han-chung.ts); chạy SONG SONG, không thêm đợt chờ D1 nối tiếp.
+  const hcP = ctP.then((c) => hanChungLop(env, dv.em.map((e) => e.sbd), c.qids.length, nowMs)).catch(() => null)
   const [han, ct, cb] = await Promise.all([tinhHan(env, dv, nowMs), ctP, docCauBai(env, dv.maDe)])
   if ('loi' in han) return { ok: false, error: han.loi }
   // Lượt cần TỪNG em — cùng công thức đồng hồ sức chứa (khoiLuongCan của câu chiến dịch mới + lượt nợ cũ ngoài các câu này).
@@ -576,6 +580,7 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
   // Lần đầu (đệm 5 phút còn lạnh) kho phải đọc mọi câu của các bài trước — nếu quá HAN_KHO_ON_BAI_CU_MS thì bỏ dòng, KHÔNG làm chậm thẻ xác nhận (việc đọc vẫn chạy tiếp để đệm sẵn cho lần sau).
   let hen: ReturnType<typeof setTimeout> | undefined
   const kho = await Promise.race([khoP, new Promise<null>((xong) => { hen = setTimeout(() => xong(null), HAN_KHO_ON_BAI_CU_MS) })]).finally(() => clearTimeout(hen))
+  const hc = await hcP
   const onBaiCu = kho ? xemOnBaiCu({ soNgay: han.D, theLuc: dv.theLuc, khoCau: kho.khoCau, soBai: kho.soBai, tiLe: kho.tiLe }) : null
   return {
     ok: true,
@@ -587,6 +592,9 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
     duDiem8: await demDuDiem8(env, dv, ct.qids, han.D, nowMs),
     quaTai, theLucNgay: dv.theLuc,
     ...(onBaiCu ? { onBaiCu } : {}),
+    ...(hc ? { hanChung: { M: hc.M, T: hc.T, han: congNgay(homNay, hc.T - 1), duKienXong: hc.duKienXong, tongEm: hc.tongEm } } : {}),
+    doChuan: (() => { const o: Record<string, number> = {}; for (const [k, v] of Object.entries(ct.theoO ?? {})) { const [p, m] = k.split('\u0001'); const q = oMaTran(p, m || null); o[q] = (o[q] ?? 0) + v }
+      return doChuanDe(o, ct.qids.length, Object.fromEntries((['I', 'II', 'III'] as const).flatMap((p) => (['biet', 'hieu', 'van_dung'] as const).map((m) => [`${p}|${m}`, MA_TRAN_RUT_MOI[p][m]])).filter(([, w]) => (w as number) > 0))) })(),
   }
 }
 

@@ -24,18 +24,25 @@ export interface DongBaiMoi {
   ghiChu?: string
   /** Bài cũ (đứng trước bài đã giao xa nhất): chọn được nhưng không tính là «bài mới» khi gọn chương. */
   cu?: boolean
+  /** Bài kế tiếp nên giao (09/11, hộp Giao bài) ⇒ nhãn «Gợi ý». */
+  goiY?: boolean
 }
 export interface ChuongMoi { ten: string; bai: DongBaiMoi[] }
+/** Tóm tắt hộp Giao bài (09/11, bản vẽ docs/ban-ve-giao-bai-0911): ba ô Câu mới · Đề chuẩn · Hạn chung cả lớp — số do máy chủ tính (`xem-truoc`). */
 export interface TomTatGiao {
   /** «Bài 10, Bài 11». */
   tenBai: string
   soCau: number
-  chiaPhan: string
+  /** Số ngày câu mới (28 câu/ngày). */
+  soNgayMoi: number
+  /** Đề chuẩn: suất đúng ô / 28 mỗi ngày; null = máy chủ chưa gửi. */
+  dungO: number | null
+  thieuDS: number
+  /** Hạn chung: số ngày + chữ ngày hết hạn; null = máy chủ chưa gửi. */
+  hanNgay: number | null
   hanChu: string
-  soNgay: number
+  duKienXong: number
   soEm: number
-  duLuot: number
-  luotNgay: number
 }
 
 export function ChonBaiMoi(p: {
@@ -53,6 +60,10 @@ export function ChonBaiMoi(p: {
   dangGiao: boolean
   xong?: string
   chiTiet?: ReactNode
+  /** Nhãn nút mở `chiTiet` (09/11: «Không giao cho vài em…»). */
+  chiTietNhan?: string
+  /** Bài đang giao: mở hộp sửa em nhận bài. */
+  onSuaEm?: (khoaBai: string) => void
 }) {
   const id = useId()
   const [moCt, setMoCt] = useState(false)
@@ -60,6 +71,11 @@ export function ChonBaiMoi(p: {
   const [moChuong, setMoChuong] = useState<Set<string>>(() => new Set(p.chuong.filter((c) => c.bai.some((b) => b.trangThai === 'moi' && !b.cu) || c.bai.some((b) => p.chon.includes(b.khoaBai))).map((c) => c.ten)))
   const doiChuong = (t: string) => setMoChuong((s) => { const n = new Set(s); if (n.has(t)) n.delete(t); else n.add(t); return n })
   const soChon = p.chon.length
+  // Chương đã giao hết (không bài mới, không bài đang chọn) gộp MỘT dòng «Hiện N chương đã giao hết» (bản vẽ 09/11).
+  const [hienHet, setHienHet] = useState(false)
+  const laHet = (c: ChuongMoi) => !c.bai.some((b) => b.trangThai === 'moi') && !c.bai.some((b) => p.chon.includes(b.khoaBai))
+  const het = p.chuong.filter(laHet)
+  const ds = hienHet ? p.chuong : p.chuong.filter((c) => !laHet(c))
   return (
     <div className="cbm" data-khoi="chon-bai-moi">
       <div className="cbm-dau">
@@ -67,7 +83,13 @@ export function ChonBaiMoi(p: {
         <span className="cbm-goi-y">Chọn được nhiều bài · {p.lopChu}</span>
       </div>
       <div className="cbm-ds" role="group" aria-labelledby={`${id}-t`}>
-        {p.chuong.map((c) => {
+        {het.length > 0 && (
+          <button type="button" className="cbm-het" aria-expanded={hienHet} onClick={() => setHienHet(!hienHet)}>
+            <ChevronDown className="cbm-mui" size={18} aria-hidden="true" />
+            {hienHet ? `Ẩn ${het.length} chương đã giao hết` : `Hiện ${het.length} chương đã giao hết (${het.map((c) => c.ten).join(', ')})`}
+          </button>
+        )}
+        {ds.map((c) => {
           const moi = c.bai.filter((b) => b.trangThai === 'moi').length, daGiao = c.bai.length - moi
           const mo = moChuong.has(c.ten)
           return (
@@ -87,7 +109,8 @@ export function ChonBaiMoi(p: {
                         <li key={b.khoaBai} className="cbm-bai cbm-bai--da" data-trang-thai={b.trangThai}>
                           <span className="cbm-so" aria-hidden="true">{b.so ?? '•'}</span>
                           <span className="cbm-ten"><b>{b.ten}</b><small>{b.chuThai}</small></span>
-                          {p.onBoGiao && <button type="button" className="cbm-bo" onClick={() => p.onBoGiao!(b.khoaBai)}>Bỏ giao</button>}
+                          {p.onSuaEm && <button type="button" className="cbm-bo" onClick={() => p.onSuaEm!(b.khoaBai)}>Sửa em</button>}
+                          {p.onBoGiao && <button type="button" className="cbm-bo" onClick={() => p.onBoGiao!(b.khoaBai)}>Gỡ bài</button>}
                         </li>
                       )
                     }
@@ -101,6 +124,7 @@ export function ChonBaiMoi(p: {
                             <b>{b.ten}</b>
                             <small>{b.khongGiao ? 'Chưa có câu tự giao (chỉ có ví dụ minh hoạ)' : `${b.soCau} câu${b.chiaPhan ? ` · ${b.chiaPhan}` : ''}${b.ghiChu ? ` · ${b.ghiChu}` : ''}`}</small>
                           </span>
+                          {b.goiY && <span className="cbm-goi-y-chip">Gợi ý</span>}
                           {dc && <span className="cbm-thu-tu" aria-label={`Bài chọn thứ ${thuTu}`}>{thuTu}</span>}
                         </label>
                       </li>
@@ -117,7 +141,7 @@ export function ChonBaiMoi(p: {
         {p.xong ? (
           <p className="cbm-xong" role="status"><Check size={18} strokeWidth={3} aria-hidden="true" />{p.xong}</p>
         ) : !soChon ? (
-          <p className="cbm-cho">Tick bài vừa dạy ở trên. App tự rút câu Trắc nghiệm, Đúng sai, Trả lời ngắn của các bài đã chọn; không giao Ví dụ minh hoạ và Các dạng toán.</p>
+          <p className="cbm-cho">Tick bài vừa dạy ở trên. Máy đặt hạn chung cho lớp và tự xếp 28 câu mỗi ngày cho từng em; không giao Ví dụ minh hoạ và Các dạng toán.</p>
         ) : (
           <>
             <p className="cbm-tom-chu"><b>{soChon} bài</b> · {p.tom?.tenBai ?? '…'} · cho <b>{p.lopChu}</b></p>
@@ -125,15 +149,21 @@ export function ChonBaiMoi(p: {
               <p className="cbm-loi" role="alert">{p.loi}</p>
             ) : (
               <div className="cbm-so-hang" aria-busy={p.dangTinh}>
-                <div className="cbm-o-so"><span>Câu sẽ luyện</span><b className="so">{p.tom ? p.tom.soCau : '—'}</b><small>{p.tom?.chiaPhan ?? 'đang tính…'}</small></div>
-                <div className="cbm-o-so"><span>Hạn nộp</span><b className="so">{p.tom ? `${p.tom.soNgay} ngày` : '—'}</b><small>{p.tom?.hanChu ?? 'đang tính…'}</small></div>
-                <div className="cbm-o-so"><span>Luyện kịp hết</span><b className="so">{p.tom ? `${p.tom.duLuot}/${p.tom.soEm}` : '—'}</b><small>{p.tom ? `em · ${p.tom.luotNgay} lượt/ngày` : 'đang tính…'}</small></div>
+                <div className="cbm-o-so"><span>Câu mới</span><b className="so">{p.tom ? p.tom.soCau : '—'}</b><small>{p.tom ? `${p.tom.soNgayMoi} ngày · 28 câu/ngày` : 'đang tính…'}</small></div>
+                {/* Thầy 09/11 «không có cái gì cần thầy cả»: chỉ báo thông tin, máy tự bù bằng câu ô gần nhất — không nhắc thầy bổ sung. */}
+                <div className="cbm-o-so">
+                  <span>Đề chuẩn</span><b className="so">{p.tom?.dungO != null ? `${p.tom.dungO}/28` : '—'}</b>
+                  <small>{!p.tom ? 'đang tính…' : p.tom.dungO != null && p.tom.dungO < 28 ? 'đúng mức đề thi; ô thiếu máy tự lấy câu gần nhất' : 'đúng mức đề thi'}</small>
+                </div>
+                <div className="cbm-o-so"><span>Hạn chung cả lớp</span><b className="so">{p.tom?.hanNgay != null ? `${p.tom.hanNgay} ngày` : '—'}</b>
+                  <small>{!p.tom ? 'đang tính…' : p.tom.hanNgay != null ? `${p.tom.hanChu} · ${p.tom.duKienXong}/${p.tom.soEm} em dự kiến xong hết` : p.tom.hanChu}</small></div>
               </div>
             )}
+            {p.tom && !p.loi && <p className="cbm-ghi">Cả lớp chung hạn. Máy tự xếp 28 câu mỗi ngày cho từng em: em xong sớm được Ôn thêm, em yếu được nhiều ngày Sửa hơn.</p>}
             {p.chiTiet && (
               <>
                 <button type="button" className="cbm-ct-nut" aria-expanded={moCt} onClick={() => setMoCt(!moCt)}>
-                  {moCt ? 'Ẩn chi tiết' : 'Chi tiết · sửa hạn nộp, số lượt/ngày'}<ChevronDown size={16} aria-hidden="true" />
+                  {moCt ? 'Ẩn' : (p.chiTietNhan ?? 'Chi tiết')}<ChevronDown size={16} aria-hidden="true" />
                 </button>
                 {moCt && <div className="cbm-ct">{p.chiTiet}</div>}
               </>

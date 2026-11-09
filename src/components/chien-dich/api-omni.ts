@@ -114,6 +114,10 @@ export interface XemTruocTick {
   onBaiCu?: OnBaiCuXem
   /** Số câu rút được theo phần I (Trắc nghiệm) · II (Đúng sai) · III (Trả lời ngắn) — 01/11; máy chủ cũ vắng ⇒ không có. */
   theoPhan?: { I: number; II: number; III: number }
+  /** HẠN CHUNG cả lớp (09/11, server/src/han-chung.ts): M ngày câu mới, T ngày hạn, `han` ngày hết hạn, số em dự kiến xong hết. Vắng ⇒ máy chủ cũ. */
+  hanChung?: { M: number; T: number; han: string; duKienXong: number; tongEm: number }
+  /** Độ chuẩn đề (09/11): mỗi ngày Mới trung bình `dungO`/28 suất đúng ô ma trận; `thieuDS` câu Đúng/Sai còn thiếu. */
+  doChuan?: { dungO: number; M: number; thieuDS: number }
 }
 export interface KetQuaTick {
   chienDichId: string
@@ -180,6 +184,9 @@ export async function baiDaDayXemTruoc(dv: DauVaoBai): Promise<KetQuaLenh<XemTru
       duDiem8: so(d.duDiem8) === null ? null : soNguyen(d.duDiem8),
       quaTai: Array.isArray(d.quaTai) ? d.quaTai.filter(laHo).map((e) => ({ sbd: chu(e.sbd), ten: chu(e.ten) || chu(e.sbd) })) : [],
       theLucNgay: soNguyen(d.theLucNgay),
+      ...(laHo(d.hanChung) && so(d.hanChung.T) !== null && so(d.hanChung.M) !== null && /^\d{4}-\d{2}-\d{2}$/.test(chu(d.hanChung.han))
+        ? { hanChung: { M: soNguyen(d.hanChung.M), T: soNguyen(d.hanChung.T), han: chu(d.hanChung.han), duKienXong: soNguyen(d.hanChung.duKienXong), tongEm: soNguyen(d.hanChung.tongEm) } } : {}),
+      ...(laHo(d.doChuan) && so(d.doChuan.dungO) !== null ? { doChuan: { dungO: soNguyen(d.doChuan.dungO), M: soNguyen(d.doChuan.M), thieuDS: soNguyen(d.doChuan.thieuDS) } } : {}),
       ...(onBaiCu ? { onBaiCu } : {}),
       ...(laHo(d.theoPhan) ? { theoPhan: { I: soNguyen(d.theoPhan.I), II: soNguyen(d.theoPhan.II), III: soNguyen(d.theoPhan.III) } } : {}),
     },

@@ -4,6 +4,11 @@ Trạng thái: **ĐỀ XUẤT, CHƯA BUILD.** Bản HIỆN HÀNH, thay `docs/de-
 Thầy chốt 09/11: mỗi ngày đúng 28 câu theo cấu trúc mức độ đề thi; câu không đủ chuẩn thì rút sát chuẩn nhất, miễn đủ 28.
 Kịch bản kiểm (chạy lại được): `docs/de-xuat-28-cau-mo-phong/` — `rut28.py` (rút câu), `tai-on.py` (tải Ôn/Sửa), `lich28.py` + `kiem-du-bao.py` (chu kỳ).
 
+## 0. Cập nhật 09/11 tối — khi build (thầy: «không có cái gì cần thầy cả, mọi thứ tự động tôi chỉ chọn giao bài máy phải làm hết»)
+- KHÔNG thẻ báo mới nào cho thầy (bỏ mục 4b phần bảng thẻ). «Sai 3 lần ⇒ thầy chữa» đổi thành máy tự xử lý (học lại bằng ví dụ mẫu + câu cơ bản hơn cùng dạng) — làm ở khối B.
+- ĐÃ LÊN (khối A): ma trận blueprint ở mọi đường rút + luật «đủ 28, chuẩn nhất có thể»; mức 28 câu/ngày cố định; hạn chung cả lớp cho bài giao mới (`server/src/han-chung.ts`); nút + hộp «Giao bài»; bỏ màn phân bài trong Hành trình.
+- KHỐI B (cần bản vẽ màn học sinh trước khi build): tách ngày Mới / Ôn / Sửa, ôn theo độ bền h, sửa theo nhóm dạng + phân loại lỗi, nút «Chắc / Chưa chắc», hiệu chỉnh hạn bằng dữ liệu thật.
+
 ## 1. RÚT 28 CÂU — một luật cho mọi đường rút (ngày Mới, Ôn, Sửa, mọi kiểu ca kiểm tra)
 
 Chuẩn mỗi đề (blueprint thầy): Phần I 12 Biết · 4 Hiểu · 2 VD; Phần II 2 Hiểu · 2 VD; Phần III 3 Hiểu · 3 VD.

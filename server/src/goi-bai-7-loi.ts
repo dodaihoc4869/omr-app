@@ -20,8 +20,11 @@ export const quotaGoi7 = (chuaGap: number, ngay: string, han: string): number =>
  * Giả định tự chốt (ghi rõ theo yêu cầu thầy): câu mới theo lịch NẰM TRONG M (không cộng thêm) — nên M không nhỏ hơn lịch câu mới; phần lịch câu mới
  * chưa gặp hết trong ngày tự dồn sang ngày sau vì `quotaGoi7` chia lại số câu còn cho số ngày còn.
  */
-export const mucNgayGoi7 = (toiThieuTang: number, tongQuota: number): number =>
-  Math.max(Math.max(0, Math.floor(Number(toiThieuTang) || 0)), Math.max(0, Math.floor(Number(tongQuota) || 0)))
+/** 09/11 thầy «mỗi ngày chỉ 28 câu» ⇒ MỨC CỐ ĐỊNH 28 cho mọi em, mọi tầng (bỏ 24/30/36 và bỏ «lịch vượt mức thì mức tăng»): câu mới theo lịch
+ *  vượt phần còn lại của 28 tự dồn sang ngày sau (`chiTrongMuc`); hạn chung (han-chung.ts) tính để lịch câu mới vừa trong 28/ngày.
+ *  28 = 4 chặng 6 câu + 1 chặng 4 câu (số chặng làm tròn lên ở `hanh-trinh-ngay.ts`). Giữ chữ ký cũ để nơi gọi không đổi. */
+export const MUC_NGAY_CO_DINH = 28
+export const mucNgayGoi7 = (_toiThieuTang: number, _tongQuota: number): number => MUC_NGAY_CO_DINH
 
 const DEM_CAU7 = new WeakMap<CauGoi7, { ngay: string; bm: number; o: string }>()
 /** Quota phủ bài không bị tỷ lệ ôn/sửa ăn mất. Câu chưa sẵn sàng chỉ mở học có hỗ trợ. */

@@ -3,21 +3,20 @@
 // danh sách có ô tick (`ChonBaiMoi`) + thẻ tóm tắt ba số chính lấy THẲNG từ máy chủ (`xem-truoc` gộp mọi tờ tự giao của các bài đã chọn — đúng số câu sẽ rút,
 // đúng hạn tự tính cho cả khối lượng). Giao = `tick` LẦN LƯỢT từng bài (bài số nhỏ trước) cho từng lớp chưa có bài, CÙNG một hạn nộp. Máy chủ: gói mới ⇒ xếp lại phần
 // luyện hôm nay của các em + báo máy các em tải gói mới (goi-bai-7.ts `xepLaiHomNayChoGoiMoi`).
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useAppStore } from '../../store/appStore'
 import { baoBaiDangGiaoThayDoi } from '../../lib/bai-dang-giao-thay-doi'
-import { THAM_SO_OMNI } from '../../../server/src/omni-kieu'
-import { TEN_AI } from '../../lib/omni-chu'
 import { maDeMacDinh, phamViTruoc, phanTuGiao, soBaiCuaTen, tenNganBai, trangThaiBai, viTriTickXaNhat, type BaiCay } from '../../lib/bai-hom-nay'
 import { baiDaDayTick, baiDaDayXemTruoc, type DauVaoBai, type XemTruocTick } from '../chien-dich/api-omni'
-import { hienHanNop, laNgay, ngayVn } from '../chien-dich/ngay'
+import { hienHanNop } from '../chien-dich/ngay'
 import ChonLopGiao from './ChonLopGiao'
-import { CanhBaoQuaTai, GiaoChoAi, LuoiSo, NapDsEm, OnBaiCuTheoLop, type BaiHomNay } from './BaiHomNay'
-import { ChonBaiMoi, type ChuongMoi, type DongBaiMoi } from './ChonBaiMoi'
+import { GiaoChoAi, NapDsEm, type BaiHomNay } from './BaiHomNay'
+import { ChonBaiMoi, type ChuongMoi, type DongBaiMoi, type TomTatGiao } from './ChonBaiMoi'
 import type { TeacherExamSource } from '../../data/examContent'
 
 const CHO_XEM_MS = 350
-const LUOT_TOI_DA = 500
+// Sửa em nhận bài của bài ĐANG giao (thay bảng «Bài đang giao» đã bỏ khỏi Hành trình — thầy 09/11). Tải lười khi bấm.
+const SuaEmNhanBai = lazy(() => import('../chien-dich/SuaEmNhanBai'))
 const TEN_PHAN: Record<string, string> = { I: 'TN', II: 'ĐS', III: 'TLN' }
 const chiaPhanCuaBai = (b: Pick<BaiCay, 'to'>) => phanTuGiao(b).map((x) => `${TEN_PHAN[x.phan] ?? x.ten} ${x.soCau}`).join(' · ')
 const soCauTuGiao = (b: Pick<BaiCay, 'to'>) => phanTuGiao(b).reduce((n, x) => n + x.soCau, 0)
@@ -44,13 +43,18 @@ export function useGiaoNhieuBai(bhn: BaiHomNay, nho?: { khoi: string; ds: string
     setChonNho((c) => { if (!c) return c; const ds = c.ds.filter((k) => !lopChon.every((l) => tickTheoLop.get(l)?.has(k))); return ds.length === c.ds.length ? c : { ...c, ds } })
   }, [lopChon, tickTheoLop])
 
-  const [hanSua, setHanSua] = useState('')
-  const [theLucChu, setTheLucChu] = useState('')
-  const homNay = ngayVn(Date.now())
-  const nTheLuc = Math.floor(Number(theLucChu))
-  const theLucSua = theLucChu.trim() && Number.isFinite(nTheLuc) && nTheLuc >= 1 ? Math.min(LUOT_TOI_DA, nTheLuc) : undefined
-  const loiTheLuc = theLucChu.trim() && !theLucSua ? 'Số lượt phải là số nguyên từ 1' : ''
-  const hanHopLe = !hanSua || (laNgay(hanSua) && hanSua >= homNay)
+  // BÀI GỢI Ý (09/11, hộp Giao bài): bài đầu tiên SAU bài đã giao xa nhất của mọi lớp đang chọn, có tờ tự giao, chưa lớp nào có ⇒ tick sẵn MỘT lần khi mở.
+  const goiY = useMemo(() => {
+    if (!lopChon.length) return null
+    const xa = Math.min(...lopChon.map((l) => viTriTickXaNhat(dsBai, tickTheoLop.get(l)?.keys() ?? [])))
+    return dsBai.find((b) => b.viTri > xa && maDeMacDinh(b).length > 0 && !lopChon.some((l) => tickTheoLop.get(l)?.has(b.khoaBai)))?.khoaBai ?? null
+  }, [lopChon, dsBai, tickTheoLop])
+  const daTuChon = useRef(!!nho?.ds.length)
+  useEffect(() => {
+    if (daTuChon.current || !goiY || !khoi) return
+    daTuChon.current = true
+    setChonNho((c) => (c && c.khoi === khoi && c.ds.length ? c : { khoi, ds: [goiY] }))
+  }, [goiY, khoi])
 
   // Mỗi lớp: các bài đã chọn mà lớp CHƯA có; xem trước GỘP mọi tờ tự giao của các bài ấy (phạm vi = các bài đứng trước bài đầu tiên).
   const lopGiao = useMemo((): LopGiao[] => {
@@ -66,12 +70,12 @@ export function useGiaoNhieuBai(bhn: BaiHomNay, nho?: { khoi: string; ds: string
         lop: l, bai, sbd,
         xemVao: {
           lop: l, khoaBai: cuoi.khoaBai, tenBai: cuoi.tenBai, viTri: cuoi.viTri, maDe: [...new Set(bai.flatMap((b) => maDeMacDinh(b)))],
-          ...(hanSua && hanHopLe ? { hanNop: hanSua } : {}), ...(theLucSua ? { theLucNgay: theLucSua } : {}), ...(sbd ? { sbd } : {}), ...(phamVi.length ? { phamVi } : {}),
+          ...(sbd ? { sbd } : {}), ...(phamVi.length ? { phamVi } : {}),
         },
       })
     }
     return ra
-  }, [baiChon, lopChon, tickTheoLop, coDanhSachEm, emTheoLop, dsBai, hanSua, hanHopLe, theLucSua])
+  }, [baiChon, lopChon, tickTheoLop, coDanhSachEm, emTheoLop, dsBai])
 
   const [xemTheoLop, setXemTheoLop] = useState<Record<string, XemTruocTick>>({})
   const [loiXemTheoLop, setLoiXemTheoLop] = useState<Record<string, string>>({})
@@ -103,12 +107,12 @@ export function useGiaoNhieuBai(bhn: BaiHomNay, nho?: { khoi: string; ds: string
     const ok: { lop: string; khoaBai: string; ten: string }[] = [], loi: string[] = []
     let soEm = 0
     for (const x of lopGiao) {
-      // Cùng MỘT hạn cho mọi bài của lớp: hạn thầy sửa, hoặc hạn máy chủ tự tính cho cả khối lượng các bài đã chọn.
-      const hanNop = hanSua && hanHopLe ? hanSua : xemTheoLop[x.lop]!.hanNop
+      // HẠN CHUNG cả lớp (09/11) — đúng số máy chủ tính ở xem trước (han-chung.ts); máy chủ cũ chưa gửi ⇒ hạn tự tính như trước.
+      const hanNop = xemTheoLop[x.lop]!.hanChung?.han ?? xemTheoLop[x.lop]!.hanNop
       let coBai = false
       for (const b of x.bai) {
         const phamVi = phamViTruoc(dsBai, b.viTri)
-        const r = await baiDaDayTick({ lop: x.lop, khoaBai: b.khoaBai, tenBai: b.tenBai, viTri: b.viTri, maDe: maDeMacDinh(b), hanNop, ...(theLucSua ? { theLucNgay: theLucSua } : {}), ...(x.sbd ? { sbd: x.sbd } : {}), phamVi })
+        const r = await baiDaDayTick({ lop: x.lop, khoaBai: b.khoaBai, tenBai: b.tenBai, viTri: b.viTri, maDe: maDeMacDinh(b), hanNop, ...(x.sbd ? { sbd: x.sbd } : {}), phamVi })
         if (r.ok) { ok.push({ lop: x.lop, khoaBai: b.khoaBai, ten: tenNganBai(b.tenBai) }); coBai = true }
         else loi.push(`${tenNganBai(b.tenBai)} · ${x.lop}: ${r.chu}`)
       }
@@ -119,16 +123,17 @@ export function useGiaoNhieuBai(bhn: BaiHomNay, nho?: { khoi: string; ds: string
       baoBaiDangGiaoThayDoi(ok.map((k) => ({ lop: k.lop, khoaBai: k.khoaBai, loai: 'tick' as const })))
       void bhn.taiDs()
       const ten = [...new Set(ok.map((k) => k.ten))].join(', '), lop = [...new Set(ok.map((k) => k.lop))]
-      setXong(`Đã giao ${ten} cho ${soEm} em ${lop.length > 1 ? `${lop.length} lớp (${lop.join(', ')})` : `lớp ${lop[0]}`}. Phần luyện hôm nay của các em đã xếp lại theo bài mới; máy các em tự tải câu và đáp án (đã khoá) về.`)
+      const han1 = xemTheoLop[lopGiao[0]!.lop]?.hanChung
+      setXong(`Đã giao ${ten} cho ${soEm} em ${lop.length > 1 ? `${lop.length} lớp (${lop.join(', ')})` : `lớp ${lop[0]}`}.${han1 && lop.length === 1 ? ` Hạn chung cả lớp: ${hienHanNop(han1.han, false) || han1.han}.` : ''} Từ hôm nay máy tự xếp 28 câu mỗi ngày cho từng em.`)
       showToast(`Đã giao ${ten}`, 'success')
     }
     if (loi.length) setLoiGiao(loi.join(' · '))
-    else { setChonNho((c) => (c ? { ...c, ds: [] } : c)); setHanSua(''); setTheLucChu('') }
+    else setChonNho((c) => (c ? { ...c, ds: [] } : c))
   }
 
   return {
     chonDs, baiChon, doiChon, xong, lopGiao, xemTheoLop, loiXemTheoLop, dangXem, xemLai: () => setLanXemLai((n) => n + 1),
-    hanSua, setHanSua, theLucChu, setTheLucChu, theLucSua, loiTheLuc, hanHopLe, homNay, giao, dangGiao, loiGiao,
+    goiY, giao, dangGiao, loiGiao,
     nho: chonNho,
   }
 }
@@ -155,7 +160,7 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
       } else {
         const coLop = ticks.filter((x) => x.tick).map((x) => x.lop)
         const cu = b.viTri < xaNhat
-        dong = { khoaBai: b.khoaBai, so: soBaiCuaTen(b.tenBai) === null ? null : String(soBaiCuaTen(b.tenBai)), ten: b.tenBai, soCau: tuGiao, chiaPhan: chiaPhanCuaBai(b), trangThai: 'moi', khongGiao: maDeMacDinh(b).length === 0, cu,
+        dong = { khoaBai: b.khoaBai, so: soBaiCuaTen(b.tenBai) === null ? null : String(soBaiCuaTen(b.tenBai)), ten: b.tenBai, soCau: tuGiao, chiaPhan: chiaPhanCuaBai(b), trangThai: 'moi', khongGiao: maDeMacDinh(b).length === 0, cu, goiY: b.khoaBai === gn.goiY,
           ghiChu: coLop.length ? `${coLop.join(', ')} đã có · còn ${lopChon.filter((l) => !coLop.includes(l)).join(', ')}` : cu ? 'bài cũ, đang trong phần ôn' : undefined }
       }
       const c = ra[ra.length - 1]
@@ -163,7 +168,7 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
       else ra.push({ ten: b.chuong || 'Bài', bai: [dong] })
     }
     return ra
-  }, [dsBai, lopChon, tickTheoLop, nhieu, xaNhat])
+  }, [dsBai, lopChon, tickTheoLop, nhieu, xaNhat, gn.goiY])
 
   // Thẻ tóm tắt: số của lớp đầu tiên (một lớp: đúng lớp ấy); nhiều lớp ⇒ cộng số em, chi tiết từng lớp ở «Chi tiết».
   const lop1 = gn.lopGiao[0]?.lop
@@ -171,47 +176,39 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
   const xongHet = gn.lopGiao.length > 0 && gn.lopGiao.every((x) => gn.xemTheoLop[x.lop])
   const loiXem = gn.lopGiao.map((x) => gn.loiXemTheoLop[x.lop] ? (nhieu ? `${x.lop}: ${gn.loiXemTheoLop[x.lop]}` : gn.loiXemTheoLop[x.lop]) : '').filter(Boolean).join(' · ')
   const tongEm = gn.lopGiao.reduce((n, x) => n + (gn.xemTheoLop[x.lop]?.soEmChon ?? 0), 0)
-  const tongDu = gn.lopGiao.reduce((n, x) => n + (gn.xemTheoLop[x.lop]?.duLuot ?? 0), 0)
   const lopChu = !lopChon.length ? 'lớp' : nhieu ? `${lopChon.length} lớp` : `lớp ${lop}`
   const soEmChu = gn.lopGiao.length ? ` · ${xongHet ? tongEm : '…'} em` : ''
   const chuaChonEm = gn.baiChon.length > 0 && !gn.lopGiao.length
-  const loi = loiXem || (chuaChonEm ? (bhn.coDanhSachEm && !bhn.sbdChon.length ? 'Chưa chọn em nào — chọn em ở mục «Giao cho».' : !gn.hanHopLe ? 'Hạn nộp phải từ hôm nay trở đi.' : 'Các bài đã chọn đều đã giao cho lớp này rồi.') : '') || gn.loiTheLuc
-  const tom = x1 && xongHet && !chuaChonEm ? {
+  const loi = loiXem || (chuaChonEm ? (bhn.coDanhSachEm && !bhn.sbdChon.length ? 'Chưa chọn em nào — chọn em ở «Không giao cho vài em…».' : 'Các bài đã chọn đều đã giao cho lớp này rồi.') : '')
+  // Ba ô (bản vẽ 09/11): số của lớp đầu tiên; nhiều lớp ⇒ mỗi lớp một hạn chung riêng, liệt kê ở «Không giao cho vài em…».
+  const tom: TomTatGiao | null = x1 && xongHet && !chuaChonEm ? {
     tenBai: gn.baiChon.map((b) => tenNganBai(b.tenBai)).join(', '),
     soCau: x1.soCau,
-    chiaPhan: x1.theoPhan ? (['I', 'II', 'III'] as const).filter((k) => x1.theoPhan![k] > 0).map((k) => `${TEN_PHAN[k]} ${x1.theoPhan![k]}`).join(' · ') || 'không có câu tự giao' : (x1.soTuLuan ? `đã bỏ ${x1.soTuLuan} câu tự luận` : 'không có câu tự luận'),
-    hanChu: `hết 23:59 · ${hienHanNop(x1.hanNop, false) || x1.hanNop}`,
-    soNgay: x1.D, soEm: tongEm, duLuot: tongDu, luotNgay: x1.theLucNgay,
+    soNgayMoi: x1.hanChung?.M ?? x1.doChuan?.M ?? Math.max(1, Math.ceil(x1.soCau / 28)),
+    dungO: x1.doChuan?.dungO ?? null,
+    thieuDS: x1.doChuan?.thieuDS ?? 0,
+    hanNgay: x1.hanChung?.T ?? null,
+    hanChu: x1.hanChung ? `hết ${hienHanNop(x1.hanChung.han, false) || x1.hanChung.han}` : `hết 23:59 · ${hienHanNop(x1.hanNop, false) || x1.hanNop}`,
+    duKienXong: x1.hanChung?.duKienXong ?? 0,
+    soEm: tongEm,
   } : null
 
-  const chiTiet = gn.lopGiao.length ? (
+  const chiTiet = lopChon.length > 0 && bhn.coDanhSachEm ? (
     <div className="bhn-ct-nhieu" data-khoi="chi-tiet-giao">
-      {gn.lopGiao.map((x) => {
-        const xem = gn.xemTheoLop[x.lop]
-        if (!xem) return null
-        return (
-          <section key={x.lop} className="bhn-ct-lop" data-lop={x.lop}>
-            {nhieu && <h4 className="bhn-nhan">Lớp {x.lop} · {x.bai.map((b) => tenNganBai(b.tenBai)).join(', ')}</h4>}
-            <LuoiSo xem={xem} hanSua={gn.hanSua} theLucSua={gn.theLucSua} dangXem={gn.dangXem} />
-            <CanhBaoQuaTai xem={xem} lop={x.lop} kemLop={nhieu} />
-            <OnBaiCuTheoLop key={`${x.lop}|${xem.onBaiCu?.tiLe.thuong}|${xem.onBaiCu?.tiLe.cuoi}`} bhn={{ xemLai: gn.xemLai }} lop={x.lop} xem={xem} />
-          </section>
-        )
+      <GiaoChoAi bhn={bhn} />
+      {nhieu && gn.lopGiao.map((x) => {
+        const hc = gn.xemTheoLop[x.lop]?.hanChung
+        return hc ? <p key={x.lop} className="dh-phu" data-lop={x.lop}>Lớp {x.lop}: hạn chung {hc.T} ngày · hết {hienHanNop(hc.han, false) || hc.han}</p> : null
       })}
-      <div className="cd-hai-ngay" data-khoi="sua-han-luot">
-        <label className="cd-truong">
-          Hạn nộp (hết lúc 23:59)
-          <input type="date" value={gn.hanSua} min={gn.homNay} onChange={(e) => gn.setHanSua(e.target.value)} />
-          <small className="cd-so cd-phu">{!gn.hanSua ? `Để trống = ${TEN_AI} tự tính (${THAM_SO_OMNI.HAN_BAI_MIN}–${THAM_SO_OMNI.HAN_BAI_MAX} ngày) cho cả các bài đã chọn` : gn.hanHopLe ? hienHanNop(gn.hanSua) : 'Hạn nộp phải từ hôm nay trở đi'}</small>
-        </label>
-        <label className="cd-truong">
-          Số lượt câu mỗi ngày (một em)
-          <input type="number" inputMode="numeric" min={1} max={LUOT_TOI_DA} value={gn.theLucChu} placeholder={x1 ? String(x1.theLucNgay) : ''} onChange={(e) => gn.setTheLucChu(e.target.value)} />
-          <small className="cd-so cd-phu">{gn.loiTheLuc || 'Để trống = số lượt mặc định của lớp (Cài đặt)'}</small>
-        </label>
-      </div>
     </div>
   ) : undefined
+  const [emSua, setEmSua] = useState<{ goiId: string; lop: string; ten: string } | null>(null)
+  const moSuaEm = (k: string) => {
+    const b = dsBai.find((x) => x.khoaBai === k)
+    const l = lopChon.find((x) => tickTheoLop.get(x)?.get(k)?.goi7?.goiId)
+    const g = l ? tickTheoLop.get(l)?.get(k)?.goi7 : undefined
+    if (b && l && g) setEmSua({ goiId: g.goiId, lop: l, ten: tenNganBai(b.tenBai) })
+  }
 
   const loiDs = lopChon.filter((l) => loiDsTheoLop[l]).map((l) => (nhieu ? `${l}: ${loiDsTheoLop[l]}` : loiDsTheoLop[l]!))
   return (
@@ -220,7 +217,6 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
       <div className="bhn-lop">
         <span className="bhn-nhan">Lớp nhận bài</span>
         <ChonLopGiao dsLop={lopChonDuoc} chon={lopChon} onDoi={bhn.setLopChon} />
-        {lopChon.length > 0 && bhn.coDanhSachEm && <GiaoChoAi bhn={bhn} />}
       </div>
       {!lopChon.length ? (
         <p className="bhn-trong">Chọn lớp để xem các bài Dạy học của khối và trạng thái từng bài.</p>
@@ -250,7 +246,14 @@ export function BoSungNhieuBai({ bhn, gn, kho, loiKho = '', thuKho }: { bhn: Bai
           dangGiao={gn.dangGiao}
           xong={gn.xong || undefined}
           chiTiet={chiTiet}
+          chiTietNhan="Không giao cho vài em…"
+          onSuaEm={lopChon.some((l) => [...(tickTheoLop.get(l)?.values() ?? [])].some((t) => t.goi7?.goiId)) ? moSuaEm : undefined}
         />
+      )}
+      {emSua && (
+        <Suspense fallback={null}>
+          <SuaEmNhanBai goiId={emSua.goiId} lop={emSua.lop} ten={emSua.ten} onDong={() => setEmSua(null)} onDaLuu={() => { void bhn.taiDs() }} />
+        </Suspense>
       )}
     </section>
   )

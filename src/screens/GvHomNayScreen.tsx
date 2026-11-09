@@ -46,6 +46,7 @@ import './gv-hom-nay.css'
 import '../components/hom-nay-thay/hom-nay-thay.css'
 import '../styles/trong-gv-ngang.css' // NGANG GV 26/10: dải biểu tượng điện thoại ngang + khung 1480 (≥ 1600) — mảnh CSS chung của các màn thầy, ngoài đường /gv
 
+// 09/11 (thầy duyệt bản vẽ docs/ban-ve-giao-bai-0911): nút đổi tên «Giao bài» — hộp chọn bài tự tính hạn chung, bỏ hạn/lượt; màn phân bài trong Hành trình đã bỏ.
 // 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn chứ không gắn vào phần hành trình nữa"): "Bổ sung bài hôm nay" / "Bổ sung bài" mở
 // hộp NGAY TẠI CHỖ — mảnh nạp lười, chỉ tải khi bấm (mở màn Hôm nay không thêm byte).
 const HopBoSungBai = lazy(() => import('../components/day-hoc/HopBoSungBai'))
@@ -485,7 +486,7 @@ export default function GvHomNayScreen() {
       ten: ds.length === 1 ? `${ds[0]!.lop}: chưa có bài mới` : 'Lớp chưa có bài mới',
       soNgan: ds.length === 1 ? `${ds[0]!.soNgay} ngày` : `${ds.length} lớp`,
       phu: ds.length === 1 ? 'Hành trình đang ôn bài cũ · tick bài vừa dạy để mở câu mới' : `${ds.map((x) => `${x.lop}: ${x.soNgay} ngày`).join(' · ')} — tick bài vừa dạy để mở câu mới`,
-      nut: 'Bổ sung bài',
+      nut: 'Giao bài',
       lam: () => setMoBoSung(true),
     })
   }
@@ -518,7 +519,7 @@ export default function GvHomNayScreen() {
   }
 
   // Nút chính góc phải = việc gấp nhất: có ca đang mở ⇒ theo dõi ca ấy; không thì bổ sung bài hôm nay.
-  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Bổ sung bài hôm nay', lam: () => setMoBoSung(true) }
+  const nutChinh = caMo.length > 0 ? { chu: 'Theo dõi ca đang mở', lam: () => moChiTietCa(caMo[0]!.maCa) } : { chu: 'Giao bài', lam: () => setMoBoSung(true) }
   const soEm = trong ? tongBon : nhip?.ok ? nhip.kq.em.length : null
 
   // «Trong» · «Một trang» (bản vẽ 26/10 chiều): khối Việc cần thầy là cột đầu của lưới một khung hình (NhipHocThay đặt); không «Trong» ⇒ đúng chỗ cũ.
@@ -608,7 +609,7 @@ export default function GvHomNayScreen() {
         {trong && caMo.length > 0 && (
           <button type="button" className="gvv2-nut-vien gvhn-nut-phu tt-nhan" onClick={() => setMoBoSung(true)}>
             <Plus size={18} aria-hidden="true" />
-            Bổ sung bài hôm nay
+            Giao bài
           </button>
         )}
         <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
