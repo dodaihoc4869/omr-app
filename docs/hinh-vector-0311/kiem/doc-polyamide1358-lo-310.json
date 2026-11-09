@@ -1,0 +1,424 @@
+{
+  "i": 1358,
+  "hash": "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c.png",
+  "size": [
+    953,
+    251
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C4-D4-III-2",
+      "de": "Trùng hợp monomer X thu được polymer Y. Một đoạn mạch của Y được biểu diễn trong hình dưới đây.\nPhân tử khối của X bằng bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c",
+          "where": "12-KT-C4-D4-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "290f9bef2cf14d8adbaf0bcfe676a7f2bb1bd999db2baa2c878791aa3b0f9d33"
+        }
+      ],
+      "missingHashes": [
+        "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1358-native2x.png",
+    "leftMacroOpened": "/workspace/scratch/1358-left10x.png",
+    "rightMacroOpened": "/workspace/scratch/1358-right10x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelvertices/literaldashcount, no impliedrepeatcountor monomeranswer.",
+  "geometry": {
+    "classification": "Openpolyamidefragment, 3NH/3CO groups, nopolygon/brackets.",
+    "NHlabels": [
+      {
+        "text": "NH",
+        "bbox": [
+          67,
+          127,
+          106,
+          152
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          327,
+          101,
+          366,
+          126
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          588,
+          127,
+          627,
+          152
+        ]
+      }
+    ],
+    "carbonSegments": [
+      [
+        [
+          124,
+          115
+        ],
+        [
+          162,
+          140
+        ],
+        [
+          199,
+          115
+        ],
+        [
+          236,
+          140
+        ],
+        [
+          274,
+          115
+        ],
+        [
+          311,
+          140
+        ]
+      ],
+      [
+        [
+          386,
+          140
+        ],
+        [
+          423,
+          115
+        ],
+        [
+          460,
+          140
+        ],
+        [
+          498,
+          115
+        ],
+        [
+          535,
+          140
+        ],
+        [
+          572,
+          115
+        ]
+      ],
+      [
+        [
+          647,
+          115
+        ],
+        [
+          685,
+          140
+        ],
+        [
+          722,
+          115
+        ],
+        [
+          760,
+          140
+        ],
+        [
+          797,
+          115
+        ],
+        [
+          834,
+          140
+        ],
+        [
+          872,
+          115
+        ]
+      ]
+    ],
+    "NHgapBonds": [
+      [
+        [
+          110,
+          125
+        ],
+        [
+          124,
+          115
+        ]
+      ],
+      [
+        [
+          311,
+          140
+        ],
+        [
+          325,
+          130
+        ]
+      ],
+      [
+        [
+          370,
+          130
+        ],
+        [
+          386,
+          140
+        ]
+      ],
+      [
+        [
+          572,
+          115
+        ],
+        [
+          585,
+          123
+        ]
+      ],
+      [
+        [
+          631,
+          125
+        ],
+        [
+          647,
+          115
+        ]
+      ]
+    ],
+    "carbonylO": [
+      {
+        "text": "O",
+        "bbox": [
+          300,
+          179,
+          322,
+          204
+        ],
+        "doubleRays": [
+          [
+            [
+              307,
+              140
+            ],
+            [
+              307,
+              176
+            ]
+          ],
+          [
+            [
+              314,
+              140
+            ],
+            [
+              314,
+              176
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          561,
+          48,
+          583,
+          73
+        ],
+        "doubleRays": [
+          [
+            [
+              568,
+              115
+            ],
+            [
+              568,
+              77
+            ]
+          ],
+          [
+            [
+              575,
+              115
+            ],
+            [
+              575,
+              77
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          821,
+          179,
+          843,
+          204
+        ],
+        "doubleRays": [
+          [
+            [
+              829,
+              140
+            ],
+            [
+              829,
+              176
+            ]
+          ],
+          [
+            [
+              836,
+              140
+            ],
+            [
+              836,
+              176
+            ]
+          ]
+        ]
+      }
+    ],
+    "endExtensions": {
+      "left": {
+        "count": 3,
+        "dashSegments": [
+          [
+            [
+              44,
+              109
+            ],
+            [
+              48,
+              112
+            ]
+          ],
+          [
+            [
+              52,
+              115
+            ],
+            [
+              56,
+              118
+            ]
+          ],
+          [
+            [
+              60,
+              120
+            ],
+            [
+              63,
+              122
+            ]
+          ]
+        ],
+        "note": "3separate shortdiagonaldashes beforeNH, NOT3rounddotsorcharge"
+      },
+      "right": {
+        "count": 4,
+        "dashSegments": [
+          [
+            [
+              879,
+              120
+            ],
+            [
+              884,
+              123
+            ]
+          ],
+          [
+            [
+              889,
+              126
+            ],
+            [
+              894,
+              129
+            ]
+          ],
+          [
+            [
+              899,
+              132
+            ],
+            [
+              904,
+              135
+            ]
+          ],
+          [
+            [
+              908,
+              138
+            ],
+            [
+              911,
+              140
+            ]
+          ]
+        ],
+        "note": "4separate shortdiagonaldashes AFTERbareCvertex872115; keepthatvertex, do notreplacewithNH"
+      }
+    },
+    "counts": {
+      "literalCvertices": 19,
+      "NHtext": 3,
+      "O": 3,
+      "COdouble": 3,
+      "CCdouble": 0,
+      "endDashes": 7,
+      "bracketPairs": 0,
+      "nsub": 0,
+      "caption": 0
+    },
+    "font": "RegularuprightserifNH/O labels; all bonds thinuniform, no bold/italic. NHliteral ordernotHN; preservelabelgroupgaps.",
+    "carbonylFootNote": "EachCOdoublefeetmeetoppositeslopesatcarbonylvertex; noextra bridge/commonnodeconnector, do notnormalize literalparallelrays.",
+    "noAdded": [
+      "repeatbrackets/n",
+      "monomername",
+      "formulaanswer",
+      "CH2/Hlabels",
+      "charges",
+      "terminalNHbeyondrightdashes",
+      "filledroundellipsis",
+      "arrows"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "nativeMacros": [
+      "/workspace/scratch/root310-native-left.png",
+      "/workspace/scratch/root310-native-right.png",
+      "/workspace/scratch/root310-rightend12x.png"
+    ],
+    "actualFull": "/workspace/scratch/root310-1358.png",
+    "actualHash": "3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1",
+    "counts": "6+6+7=19bareC/3NH/3O/3COdouble/3LEFT4RIGHTshortdashes",
+    "note": "Giữ bareC cuối phải trước nét đứt, không suy số C từ tên/repeat. ChânCO trên hai tia xiên, không cầu ngang."
+  }
+}

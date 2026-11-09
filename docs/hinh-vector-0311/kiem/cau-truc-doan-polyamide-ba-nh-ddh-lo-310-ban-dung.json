@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1358,
+    "hash": "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c",
+    "fileNguon": "anh/f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c.png",
+    "svg": "doan-polyamide-ba-nh-ddh-3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1.svg",
+    "hashSvg": "3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1",
+    "byteSvg": 5304,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D4-III-2",
+        "de": "Trùng hợp monomer X thu được polymer Y. Một đoạn mạch của Y được biểu diễn trong hình dưới đây.\nPhân tử khối của X bằng bao nhiêu?",
+        "refs": [
+          {
+            "hash": "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c",
+            "where": "12-KT-C4-D4-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "290f9bef2cf14d8adbaf0bcfe676a7f2bb1bd999db2baa2c878791aa3b0f9d33"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "19bareC3N3O/3literalNH3COdouble/first6-middle6-last7CincludingRIGHTterminal/3LEFT4RIGHTshortdashes/COsplitfeet/allthinregularDDH/noaddedH-CH2-brackets-n-name-caption-answer",
+    "hashSvgDaSoat": "3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

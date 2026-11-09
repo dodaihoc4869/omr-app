@@ -3097,6 +3097,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c": {
+      "tep": "doan-polyamide-ba-nh-ddh-3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1.svg",
+      "hashSvg": "3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1",
+      "byteSvg": 5304,
+      "byteGzip": 1041,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "c5f74e44f554863c549965c3c1f6a745ea6aa132b81d84b3a9a9aab6f788967b": {
       "tep": "cau-truc-339755d62379311b089622acd52dfc0e74f3b48e23873db326d00871d14947e8.svg",
       "hashSvg": "339755d62379311b089622acd52dfc0e74f3b48e23873db326d00871d14947e8",
@@ -15168,6 +15177,20 @@
           "where": "12-KT-C4-D4-II-2.hinh.0.du_lieu",
           "hashDataUrl": "65f0769e64d52c4d247d3fea05081acd635431d23b1875dec5cd21d00a307203",
           "vector": "phenolic-vong-tron-ddh-a33359c682150e76bf60be99f2c5edbaa4732f0fda45483ad49ddb45bd35cb13.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D4-III-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "f5f0d70c65f4c26f90844c4b225b7b7d27d2e481f6b98ec0c0ebb38a380e176c",
+          "where": "12-KT-C4-D4-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "290f9bef2cf14d8adbaf0bcfe676a7f2bb1bd999db2baa2c878791aa3b0f9d33",
+          "vector": "doan-polyamide-ba-nh-ddh-3f5ca95caa13df35480c6cb3584e2bb78a9e3bb402986e4786cc005037d407a1.svg"
         }
       ]
     },
@@ -29552,6 +29575,7 @@
     "12-KT-C4-D2-III-6",
     "12-KT-C4-D4-I-14",
     "12-KT-C4-D4-II-2",
+    "12-KT-C4-D4-III-2",
     "12-KT-C4-D4-III-4",
     "12-KT-C4-D3-II-1",
     "12-KT-C4-D5-I-1",
