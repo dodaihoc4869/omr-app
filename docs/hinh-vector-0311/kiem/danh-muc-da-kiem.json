@@ -163,6 +163,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63": {
+      "tep": "methylphenidate-don-ddh-2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819.svg",
+      "hashSvg": "2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819",
+      "byteSvg": 18927,
+      "byteGzip": 4767,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "9469f3a8d9b2c41305c0b3e58c4363b1097adaedc0aa99ce2411087ab009ca9f": {
       "tep": "hai-acid-khong-no-ddh-83112f6998beb54ba55c9f77edf4eb707eaaeb7332e46e0ac0cbfd71b06aa510.svg",
       "hashSvg": "83112f6998beb54ba55c9f77edf4eb707eaaeb7332e46e0ac0cbfd71b06aa510",
@@ -762,6 +771,15 @@
       "hashSvg": "a18d2295151cd4a3cfc08c8f180506cda5e3647881cf495deff647182231e31a",
       "byteSvg": 23461,
       "byteGzip": 4161,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0": {
+      "tep": "aspirin-hai-buoc-ddh-be6482365d582c4d55dfa38bd90ad4e3c74fd9858acb4bf0fb419eb41e856e77.svg",
+      "hashSvg": "be6482365d582c4d55dfa38bd90ad4e3c74fd9858acb4bf0fb419eb41e856e77",
+      "byteSvg": 26207,
+      "byteGzip": 2150,
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
@@ -14508,6 +14526,20 @@
       ]
     },
     {
+      "qid": "12-KT-C34-D1-III-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+          "where": "12-KT-C34-D1-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "803acee600ca669452698b97f4e1fa2ff9bf4d9dee92a9e4d857db09cb3f42b7",
+          "vector": "methylphenidate-don-ddh-2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C34-D2-I-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -20970,6 +21002,20 @@
           "where": "DB-12-B8-D1-III-285.hinh.0.du_lieu",
           "hashDataUrl": "d9fecc0d750937a6d3e6f279f06b6cb06a7744e0ee0884b0786c1aa79a68dcc4",
           "vector": "bang-amine-ddh-c9fc5660de4138323cb11d4d8ce22ea5b286ed1f4927f3a1612fd157f7b7d099.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-286",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+          "where": "DB-12-B8-D1-III-286.hinh.0.du_lieu",
+          "hashDataUrl": "803acee600ca669452698b97f4e1fa2ff9bf4d9dee92a9e4d857db09cb3f42b7",
+          "vector": "methylphenidate-don-ddh-2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819.svg"
         }
       ]
     },
@@ -28304,6 +28350,20 @@
       ]
     },
     {
+      "qid": "VIP27-CDK-ESTER-TN-II-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0",
+          "where": "VIP27-CDK-ESTER-TN-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "3746a1f93bb7638ed90dacb091fc0c4f2ab3c1302fc6a2cc8eb4a2222a174377",
+          "vector": "aspirin-hai-buoc-ddh-be6482365d582c4d55dfa38bd90ad4e3c74fd9858acb4bf0fb419eb41e856e77.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-CDK-ESTER-TN-II-11",
       "duMoiHinh": true,
       "soHinhNguon": 2,
@@ -28843,6 +28903,7 @@
     "12-KT-C34-D1-II-3",
     "12-KT-C34-D1-II-4",
     "12-KT-C34-D1-III-1",
+    "12-KT-C34-D1-III-4",
     "12-KT-C34-D2-I-5",
     "12-KT-C34-D2-I-8",
     "12-KT-C34-D2-I-11",
@@ -29248,6 +29309,7 @@
     "DB-12-B8-D1-II-276",
     "DB-12-B8-D1-I-278",
     "DB-12-B8-D1-III-285",
+    "DB-12-B8-D1-III-286",
     "DB-12-B8-D1-I-291",
     "DB-12-B8-D1-I-293",
     "DB-12-B8-D1-I-306",
@@ -29710,6 +29772,7 @@
     "VIP27-C4-B14-D2-II-4",
     "VIP27-C5-B17-D2-I-17",
     "VIP27-C5-B17-D2-I-18",
+    "VIP27-CDK-ESTER-TN-II-4",
     "VIP27-CDK-ESTER-TN-II-11",
     "VIP27-CDK-ESTER-TN-II-16",
     "VIP27-CDK-ESTER-TN-II-28",

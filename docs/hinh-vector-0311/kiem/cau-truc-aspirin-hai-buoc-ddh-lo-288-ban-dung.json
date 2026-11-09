@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1073,
+    "hash": "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0",
+    "fileNguon": "anh/c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0.png",
+    "svg": "aspirin-hai-buoc-ddh-be6482365d582c4d55dfa38bd90ad4e3c74fd9858acb4bf0fb419eb41e856e77.svg",
+    "hashSvg": "be6482365d582c4d55dfa38bd90ad4e3c74fd9858acb4bf0fb419eb41e856e77",
+    "byteSvg": 26207,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-4",
+        "de": "Acetylsalicylic acid (aspirin) là hoạt chất phổ biến trong nhiều loại thuốc giảm đau, hạ sốt. Trong một bài thực hành hóa học, để kiểm định chất lượng một mẫu viên nén aspirin có nhãn ghi hàm lượng hoạt chất là 325 mg/viên, một học sinh đã tiến hành phương pháp chuẩn độ ngược kết hợp thiết lập mẫu trắng. Tiến trình thực nghiệm được thực hiện như sau:\n- Bước 1: Cân chính xác một viên thuốc thu được khối lượng 0,400 gam rồi đem nghiền mịn. Cân lấy 0,300 gam bột thuốc này cho vào bình nón làm mẫu thử.\n- Bước 2: Thêm 20,0 mL dung môi ethanol vào bình để hòa tan bột thuốc, nhỏ thêm 3 giọt phenolphthalein.\n- Bước 3: Thêm chính xác 50,00 mL dung dịch NaOH 0,100 M. Đun cách thủy 15 phút để phản ứng xảy ra theo sơ đồ (hình), sau đó để nguội.\n- Bước 4: Chuẩn độ lượng NaOH dư bằng dung dịch chuẩn HCl 0,100 M. Ghi nhận thể tích acid tiêu tốn ngay khi dung dịch vừa mất màu hồng.\n- Bước 5: Thiết lập mẫu trắng (không chứa bột thuốc, chỉ gồm dung môi ethanol và dung dịch NaOH) bằng cách lặp lại quy trình từ Bước 2 đến Bước 4.\nThí nghiệm được lặp lại thêm 2 lần. Kết quả thể tích dung dịch HCl 0,100 M tiêu tốn tại điểm dừng chuẩn độ như bảng.",
+        "refs": [
+          {
+            "hash": "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0",
+            "where": "VIP27-CDK-ESTER-TN-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "3746a1f93bb7638ed90dacb091fc0c4f2ab3c1302fc6a2cc8eb4a2222a174377"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2rows4phenyl12INNERdoubles/3esters3COdouble/COOH→3COOSUPminus/2OHminusreactants/2filledRIGHT/4plus/H2Otop+CH3COOminusbottom/phenOHbottomRIGHTliteral/ALLchemical-labelsactualdam/subs-supcharges/O-Canchors/noaddedNa-temperature-phenoxide-answer.",
+    "hashSvgDaSoat": "be6482365d582c4d55dfa38bd90ad4e3c74fd9858acb4bf0fb419eb41e856e77",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

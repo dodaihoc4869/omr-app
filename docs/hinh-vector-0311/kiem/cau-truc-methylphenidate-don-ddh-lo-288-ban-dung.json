@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1074,
+    "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+    "fileNguon": "anh/c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63.png",
+    "svg": "methylphenidate-don-ddh-2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819.svg",
+    "hashSvg": "2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819",
+    "byteSvg": 18927,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C34-D1-III-4",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride có cấu tạo như hình dưới.\nĐể sản xuất 1000 hộp thuốc loại 30 viên mỗi hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị).",
+        "refs": [
+          {
+            "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+            "where": "12-KT-C34-D1-III-4.hinh.0.du_lieu",
+            "hashDataUrl": "803acee600ca669452698b97f4e1fa2ff9bf4d9dee92a9e4d857db09cb3f42b7"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B8-D1-III-286",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride có cấu tạo như hình dưới.\nĐể sản xuất 1000 hộp thuốc loại 30 viên mỗi hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị).",
+        "refs": [
+          {
+            "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+            "where": "DB-12-B8-D1-III-286.hinh.0.du_lieu",
+            "hashDataUrl": "803acee600ca669452698b97f4e1fa2ff9bf4d9dee92a9e4d857db09cb3f42b7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1phenyl3INNERdoubles+1piperidine5C1N/14C2O1N1Cl/COOCH3FIRSTCanchor/ClH2NliteralNanchorNOcharge/regularchemical-labels/captionactualDAMitalicuppercaseMethylphenidate hydrochloride/noalias118777/noaddedstereo-bond-to-Cl-charge-answer.",
+    "hashSvgDaSoat": "2cdc363c4e82d1147b22bd5f8c597d991591328a4773b6ea8645b8dafb524819",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

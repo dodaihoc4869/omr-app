@@ -1,0 +1,733 @@
+{
+  "i": 1073,
+  "hash": "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0.png",
+  "size": [
+    724,
+    332
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-4",
+      "de": "Acetylsalicylic acid (aspirin) là hoạt chất phổ biến trong nhiều loại thuốc giảm đau, hạ sốt. Trong một bài thực hành hóa học, để kiểm định chất lượng một mẫu viên nén aspirin có nhãn ghi hàm lượng hoạt chất là 325 mg/viên, một học sinh đã tiến hành phương pháp chuẩn độ ngược kết hợp thiết lập mẫu trắng. Tiến trình thực nghiệm được thực hiện như sau:\n- Bước 1: Cân chính xác một viên thuốc thu được khối lượng 0,400 gam rồi đem nghiền mịn. Cân lấy 0,300 gam bột thuốc này cho vào bình nón làm mẫu thử.\n- Bước 2: Thêm 20,0 mL dung môi ethanol vào bình để hòa tan bột thuốc, nhỏ thêm 3 giọt phenolphthalein.\n- Bước 3: Thêm chính xác 50,00 mL dung dịch NaOH 0,100 M. Đun cách thủy 15 phút để phản ứng xảy ra theo sơ đồ (hình), sau đó để nguội.\n- Bước 4: Chuẩn độ lượng NaOH dư bằng dung dịch chuẩn HCl 0,100 M. Ghi nhận thể tích acid tiêu tốn ngay khi dung dịch vừa mất màu hồng.\n- Bước 5: Thiết lập mẫu trắng (không chứa bột thuốc, chỉ gồm dung môi ethanol và dung dịch NaOH) bằng cách lặp lại quy trình từ Bước 2 đến Bước 4.\nThí nghiệm được lặp lại thêm 2 lần. Kết quả thể tích dung dịch HCl 0,100 M tiêu tốn tại điểm dừng chuẩn độ như bảng.",
+      "allHinh": [
+        {
+          "hash": "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0",
+          "where": "VIP27-CDK-ESTER-TN-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "3746a1f93bb7638ed90dacb091fc0c4f2ab3c1302fc6a2cc8eb4a2222a174377"
+        }
+      ],
+      "missingHashes": [
+        "c16ba6422acec34c6de1d4344f9fc1c9359254b75811cb1f2b38185fcec0ffc0"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhonlymissingthishash=>1full/noPartial (publicstemmentionsresulttablebutinventoryhasONLYthissource).",
+  "review": "NativeFULL+3x/allpublicrefs/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "panels": [
+      {
+        "name": "topLeft",
+        "ringVertices": [
+          [
+            28,
+            41
+          ],
+          [
+            65,
+            19
+          ],
+          [
+            103,
+            41
+          ],
+          [
+            103,
+            84
+          ],
+          [
+            65,
+            106
+          ],
+          [
+            28,
+            84
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              34,
+              45
+            ],
+            [
+              34,
+              79
+            ]
+          ],
+          [
+            [
+              65,
+              26
+            ],
+            [
+              97,
+              44
+            ]
+          ],
+          [
+            [
+              65,
+              99
+            ],
+            [
+              97,
+              81
+            ]
+          ]
+        ],
+        "topRightSubstituent": {
+          "label": "COOH",
+          "bbox": [
+            135,
+            9,
+            198,
+            28
+          ],
+          "bond": [
+            [
+              103,
+              41
+            ],
+            [
+              132,
+              22
+            ]
+          ],
+          "anchor": "FIRST C",
+          "minus": "SUPifCOO⁻;notbaselinehyphen"
+        },
+        "bottomRightSubstituent": {
+          "label": "O",
+          "bbox": [
+            127,
+            93,
+            152,
+            113
+          ],
+          "bond": [
+            [
+              103,
+              84
+            ],
+            [
+              126,
+              98
+            ]
+          ]
+        },
+        "esterAcetyl": {
+          "carbonylC": [
+            170,
+            103
+          ],
+          "OtoCOsingle": [
+            [
+              145,
+              103
+            ],
+            [
+              170,
+              103
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                168,
+                101
+              ],
+              [
+                190,
+                78
+              ]
+            ],
+            [
+              [
+                173,
+                104
+              ],
+              [
+                195,
+                81
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              193,
+              64,
+              211,
+              81
+            ]
+          },
+          "CH3label": {
+            "text": "CH₃",
+            "bbox": [
+              184,
+              122,
+              223,
+              142
+            ]
+          },
+          "CCH3bond": [
+            [
+              170,
+              103
+            ],
+            [
+              183,
+              122
+            ]
+          ]
+        }
+      },
+      {
+        "name": "topRight",
+        "ringVertices": [
+          [
+            450,
+            41
+          ],
+          [
+            487,
+            19
+          ],
+          [
+            525,
+            41
+          ],
+          [
+            525,
+            84
+          ],
+          [
+            487,
+            106
+          ],
+          [
+            450,
+            84
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              456,
+              45
+            ],
+            [
+              456,
+              79
+            ]
+          ],
+          [
+            [
+              487,
+              26
+            ],
+            [
+              519,
+              44
+            ]
+          ],
+          [
+            [
+              487,
+              99
+            ],
+            [
+              519,
+              81
+            ]
+          ]
+        ],
+        "topRightSubstituent": {
+          "label": "COO⁻",
+          "bbox": [
+            557,
+            9,
+            620,
+            28
+          ],
+          "bond": [
+            [
+              525,
+              41
+            ],
+            [
+              554,
+              22
+            ]
+          ],
+          "anchor": "FIRST C",
+          "minus": "SUPifCOO⁻;notbaselinehyphen"
+        },
+        "bottomRightSubstituent": {
+          "label": "O",
+          "bbox": [
+            549,
+            93,
+            574,
+            113
+          ],
+          "bond": [
+            [
+              525,
+              84
+            ],
+            [
+              548,
+              98
+            ]
+          ]
+        },
+        "esterAcetyl": {
+          "carbonylC": [
+            592,
+            103
+          ],
+          "OtoCOsingle": [
+            [
+              567,
+              103
+            ],
+            [
+              592,
+              103
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                590,
+                101
+              ],
+              [
+                612,
+                78
+              ]
+            ],
+            [
+              [
+                595,
+                104
+              ],
+              [
+                617,
+                81
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              615,
+              64,
+              633,
+              81
+            ]
+          },
+          "CH3label": {
+            "text": "CH₃",
+            "bbox": [
+              606,
+              122,
+              645,
+              142
+            ]
+          },
+          "CCH3bond": [
+            [
+              592,
+              103
+            ],
+            [
+              605,
+              122
+            ]
+          ]
+        }
+      },
+      {
+        "name": "bottomLeft",
+        "ringVertices": [
+          [
+            26,
+            211
+          ],
+          [
+            63,
+            189
+          ],
+          [
+            101,
+            211
+          ],
+          [
+            101,
+            254
+          ],
+          [
+            63,
+            277
+          ],
+          [
+            26,
+            254
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              32,
+              215
+            ],
+            [
+              32,
+              249
+            ]
+          ],
+          [
+            [
+              63,
+              196
+            ],
+            [
+              95,
+              214
+            ]
+          ],
+          [
+            [
+              63,
+              270
+            ],
+            [
+              95,
+              251
+            ]
+          ]
+        ],
+        "topRightSubstituent": {
+          "label": "COO⁻",
+          "bbox": [
+            133,
+            179,
+            196,
+            198
+          ],
+          "bond": [
+            [
+              101,
+              211
+            ],
+            [
+              130,
+              192
+            ]
+          ],
+          "anchor": "FIRST C",
+          "minus": "SUPifCOO⁻;notbaselinehyphen"
+        },
+        "bottomRightSubstituent": {
+          "label": "O",
+          "bbox": [
+            125,
+            263,
+            150,
+            283
+          ],
+          "bond": [
+            [
+              101,
+              254
+            ],
+            [
+              124,
+              268
+            ]
+          ]
+        },
+        "esterAcetyl": {
+          "carbonylC": [
+            168,
+            273
+          ],
+          "OtoCOsingle": [
+            [
+              143,
+              273
+            ],
+            [
+              168,
+              273
+            ]
+          ],
+          "COdouble": [
+            [
+              [
+                166,
+                271
+              ],
+              [
+                188,
+                248
+              ]
+            ],
+            [
+              [
+                171,
+                274
+              ],
+              [
+                193,
+                251
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              191,
+              234,
+              209,
+              251
+            ]
+          },
+          "CH3label": {
+            "text": "CH₃",
+            "bbox": [
+              182,
+              292,
+              221,
+              312
+            ]
+          },
+          "CCH3bond": [
+            [
+              168,
+              273
+            ],
+            [
+              181,
+              292
+            ]
+          ]
+        }
+      },
+      {
+        "name": "bottomRight",
+        "ringVertices": [
+          [
+            447,
+            211
+          ],
+          [
+            484,
+            189
+          ],
+          [
+            522,
+            211
+          ],
+          [
+            522,
+            254
+          ],
+          [
+            484,
+            277
+          ],
+          [
+            447,
+            254
+          ]
+        ],
+        "innerDoubles": [
+          [
+            [
+              453,
+              215
+            ],
+            [
+              453,
+              249
+            ]
+          ],
+          [
+            [
+              484,
+              196
+            ],
+            [
+              516,
+              214
+            ]
+          ],
+          [
+            [
+              484,
+              270
+            ],
+            [
+              516,
+              251
+            ]
+          ]
+        ],
+        "topRightSubstituent": {
+          "label": "COO⁻",
+          "bbox": [
+            554,
+            179,
+            617,
+            198
+          ],
+          "bond": [
+            [
+              522,
+              211
+            ],
+            [
+              551,
+              192
+            ]
+          ],
+          "anchor": "FIRST C",
+          "minus": "SUPifCOO⁻;notbaselinehyphen"
+        },
+        "bottomRightSubstituent": {
+          "label": "OH",
+          "bbox": [
+            546,
+            263,
+            587,
+            283
+          ],
+          "bond": [
+            [
+              522,
+              254
+            ],
+            [
+              545,
+              268
+            ]
+          ]
+        },
+        "esterAcetyl": null
+      }
+    ],
+    "rows": [
+      {
+        "reactantOH": {
+          "text": "+ OH⁻",
+          "bbox": [
+            247,
+            60,
+            309,
+            81
+          ]
+        },
+        "arrow": {
+          "shaft": [
+            [
+              336,
+              71
+            ],
+            [
+              422,
+              71
+            ]
+          ],
+          "filledHead": [
+            [
+              409,
+              66
+            ],
+            [
+              422,
+              71
+            ],
+            [
+              409,
+              76
+            ]
+          ]
+        },
+        "rightProduct": {
+          "text": "+ H₂O",
+          "bbox": [
+            649,
+            60,
+            711,
+            83
+          ]
+        }
+      },
+      {
+        "reactantOH": {
+          "text": "+ OH⁻",
+          "bbox": [
+            246,
+            229,
+            309,
+            250
+          ]
+        },
+        "arrow": {
+          "shaft": [
+            [
+              335,
+              241
+            ],
+            [
+              421,
+              241
+            ]
+          ],
+          "filledHead": [
+            [
+              408,
+              236
+            ],
+            [
+              421,
+              241
+            ],
+            [
+              408,
+              246
+            ]
+          ]
+        },
+        "rightProduct": {
+          "text": "+ CH₃COO⁻",
+          "bbox": [
+            610,
+            231,
+            717,
+            252
+          ]
+        }
+      }
+    ],
+    "counts": "4Ph12innerdoubles;3expandedesteracetylCOdouble/3CH3labels,1COOH+3COOminus/2OHminus/1CH3COOminus/H2O. TwoRIGHTfilledheads/4baselineplusoperators. NoNa/counterions/phenolicOminus/theoryfix/conditions/stepnumbers/caption/answeradded. BottomrightOHneutralLITERALnotOminus."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px;ALLCHEMICALLABELSBOLDuprightactualsubs/supcharges,confirmednativeFULL+1073-labels5x macro;notautomaticchemicalnormalization.",
+  "actualSvgReviewed": false,
+  "tableContext": "InventorypublicquestionsentryhasEXACTLY1hinh(source1073),nootherhash/tablepartner. StemmentionsresulttablebutNONEotherhinhinpublicinventory;do not inventtableorclaimtableverified."
+}

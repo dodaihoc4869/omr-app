@@ -1,0 +1,216 @@
+{
+  "i": 1074,
+  "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63.png",
+  "size": [
+    448,
+    290
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C34-D1-III-4",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride có cấu tạo như hình dưới.\nĐể sản xuất 1000 hộp thuốc loại 30 viên mỗi hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị).",
+      "allHinh": [
+        {
+          "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+          "where": "12-KT-C34-D1-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "803acee600ca669452698b97f4e1fa2ff9bf4d9dee92a9e4d857db09cb3f42b7"
+        }
+      ],
+      "missingHashes": [
+        "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63"
+      ]
+    },
+    {
+      "qid": "DB-12-B8-D1-III-286",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng ngủ rũ. Mỗi viên thuốc ritalin chứa 10 mg muối methylphenidate hydrochloride có cấu tạo như hình dưới.\nĐể sản xuất 1000 hộp thuốc loại 30 viên mỗi hộp thì cần dùng tối thiểu bao nhiêu gam methylphenidate hydrochloride? (Làm tròn kết quả đến hàng đơn vị).",
+      "allHinh": [
+        {
+          "hash": "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63",
+          "where": "DB-12-B8-D1-III-286.hinh.0.du_lieu",
+          "hashDataUrl": "803acee600ca669452698b97f4e1fa2ff9bf4d9dee92a9e4d857db09cb3f42b7"
+        }
+      ],
+      "missingHashes": [
+        "c182c74e0e86373e93c3478f643f86973961e4ff9ee6f8bceb1b22829b581c63"
+      ]
+    }
+  ],
+  "fullClosure": "2qidsEACH1hinhonlymissingthishash=>2full/noPartial.",
+  "review": "NativeFULL+5x/all2publicrefs/allq.hinhread;source-only chưaSVG/chưaĐạt/noalias.",
+  "geometry": {
+    "phenylVertices": [
+      [
+        124,
+        134
+      ],
+      [
+        159,
+        114
+      ],
+      [
+        194,
+        134
+      ],
+      [
+        194,
+        175
+      ],
+      [
+        159,
+        196
+      ],
+      [
+        124,
+        175
+      ]
+    ],
+    "phenylInnerDoubles": [
+      [
+        [
+          131,
+          138
+        ],
+        [
+          159,
+          122
+        ]
+      ],
+      [
+        [
+          187,
+          140
+        ],
+        [
+          187,
+          169
+        ]
+      ],
+      [
+        [
+          131,
+          171
+        ],
+        [
+          159,
+          188
+        ]
+      ]
+    ],
+    "centralCH": [
+      227,
+      114
+    ],
+    "centralBonds": [
+      [
+        [
+          194,
+          134
+        ],
+        [
+          227,
+          114
+        ]
+      ],
+      [
+        [
+          227,
+          114
+        ],
+        [
+          262,
+          134
+        ]
+      ],
+      [
+        [
+          227,
+          114
+        ],
+        [
+          227,
+          80
+        ]
+      ]
+    ],
+    "carboxylLabel": {
+      "text": "COOCH₃",
+      "bbox": [
+        217,
+        49,
+        316,
+        75
+      ],
+      "anchor": "FIRST Ccenter227,bondendsbelowCanotO/CH3"
+    },
+    "piperidineVerticesFromTopLeft": [
+      [
+        262,
+        134
+      ],
+      [
+        298,
+        114
+      ],
+      [
+        335,
+        135
+      ],
+      [
+        335,
+        175
+      ],
+      [
+        299,
+        196
+      ]
+    ],
+    "Nlabel": {
+      "text": "ClH₂N",
+      "bbox": [
+        202,
+        166,
+        275,
+        195
+      ],
+      "anchor": "Ncenter262,180",
+      "note": "FirstCthenlowercasel,thenHsub2N;NOcharge/counteriondot. MustreadnotCH2N."
+    },
+    "Nbonds": [
+      [
+        [
+          262,
+          134
+        ],
+        [
+          262,
+          154
+        ]
+      ],
+      [
+        [
+          276,
+          184
+        ],
+        [
+          299,
+          196
+        ]
+      ]
+    ],
+    "caption": {
+      "text": "Methylphenidate hydrochloride",
+      "bbox": [
+        55,
+        213,
+        394,
+        241
+      ],
+      "style": "BOLDITALIC,uppercaseMonly/remaininglowercase"
+    },
+    "counts": "14C2O1N1Cl;Ph3innerdouble/piperidine5C+N6member/centralCH/COOCH3condensed. NOexpandedCOdouble/stereo/wedges/charge/extraH/captionnamechange. NHlabelstemH2condensedliteralalreadyshown."
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,literalfromfull5xnotchemicalnamenormalization.",
+  "actualSvgReviewed": false
+}
