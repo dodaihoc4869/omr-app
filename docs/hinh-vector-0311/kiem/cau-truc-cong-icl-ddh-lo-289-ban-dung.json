@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1109,
+    "hash": "c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda",
+    "fileNguon": "anh/c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda.png",
+    "svg": "cong-icl-ddh-781184e7e90fe962d9a8e1870e5a9a094e1a4d31563424483f452cb8d92f0790.svg",
+    "hashSvg": "781184e7e90fe962d9a8e1870e5a9a094e1a4d31563424483f452cb8d92f0790",
+    "byteSvg": 11175,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-III-2",
+        "de": "Mức độ không bão hòa (số liên kết đôi C=C) trong chất béo được biểu thị dưới dạng chỉ số iodine. Để xác định chỉ số iodine thực hiện quy trình phân tích theo phương pháp Wijs như sau:\nBước 1. Hòa tan 0,500 gam mẫu dầu ăn vào dung môi thích hợp. Sau đó, thêm 25,00 mL thuốc thử Wijs (chứa ICl 0,10M), ủ 30 phút trong tối để xảy ra phản ứng (*) như hình.\nBước 2. Thêm 10 mL dung dịch KI 10% để phản ứng với ICl còn dư ở bước 1 và giải phóng $\\ce{I2}$ theo phản ứng:\n$\\ce{KI(aq) + ICl(aq) -> KCl(aq) + I2(aq)}$\nBước 3: Chuẩn độ lượng $\\ce{I2}$ giải phóng ở bước 2 bằng dung dịch $\\ce{Na2S2O3}$ 0,20M với chỉ thị hồ tinh bột cho đến khi dung dịch chuyển sang không màu thì tiêu tốn hết 10,35 mL $\\ce{Na2S2O3}$ theo phản ứng:\n$\\ce{2Na2S2O3(aq) + I2(aq) -> Na2S4O6(aq) + 2NaI(aq)}$\nBiết chỉ số iodine được định nghĩa là số gam iodine ($\\ce{I2}$) tối đa tham gia phản ứng cộng vào liên kết đôi C=C của 100 gam chất béo. Trong phương pháp Wijs, người ta sử dụng ICl thay cho $\\ce{I2}$ để phản ứng cộng xảy ra nhanh và hiệu quả. Tính chỉ số iodine (g/100g chất béo) của mẫu dầu ăn trên (làm tròn kết quả đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda",
+            "where": "VIP27-CDK-ESTER-TN-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "02e0b131157b896a78e0b746b711b70591efe8ae758ae2b73e4f0d4e1d858317"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4explicitC4explicitH2I2Cl/4RtokensSTRAIGHTsingle-doublequotesNOTprime/1CCdouble→CCsingle/1IClbond/4CH4CRproductCIandCCl/1plus1filledRIGHT/allregularDDH/noaddedconditions-caption-phases-charges-Rvalues-answer.",
+    "hashSvgDaSoat": "781184e7e90fe962d9a8e1870e5a9a094e1a4d31563424483f452cb8d92f0790",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "lo": 289,
+  "i": 1109,
+  "hashNguon": "c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda",
+  "rejectedHashSvg": "87e87d7337fc444f2d2b7eb525f84255df94517acd8a3bd16657c8a095217fb1",
+  "rejectedBytes": 11175,
+  "ketQua": "Cần sửa: root actualChromium3x thấy đầu nhánh lên R\" sản phẩm tại (739,36) nhập vào thân R của DDH. Chưa gửi readonly/chưa có positive/candidate không chọn.",
+  "reproduction": "Dựng cùng builder final, chỉ thay M739 45L727 62 thành M739 36L727 62.",
+  "fix": "DUY đầu nhánh y36→45 giữ x739, đầu C(727,62) và mọi glyph/bond khác nguyên; FINAL781184e7e90fe962d9a8e1870e5a9a094e1a4d31563424483f452cb8d92f0790 phải fresh readonly riêng.",
+  "selected": false
+}

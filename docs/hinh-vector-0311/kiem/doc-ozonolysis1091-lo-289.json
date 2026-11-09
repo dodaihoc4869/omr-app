@@ -1,0 +1,364 @@
+{
+  "i": 1091,
+  "hash": "c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294.png",
+  "size": [
+    1037,
+    182
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C6-B23-III-6",
+      "de": "Liên kết đôi C=C bị oxi hóa bằng phản ứng ozone phân khử tạo ra các sản phẩm hữu cơ chứa oxygen. Nếu thực hiện ozone phân và khử ngay bằng chất khử êm dịu như dimethyl sulfide (CH₃)₂S thì thu được sản phẩm theo sơ đồ sau: Cho hydrocarbon X mạch hở có công thức phân tử C₉H₁₆ ozone phân khử theo điều kiện trên thì thu được 3 chất hữu cơ là CH₃COCH₃, CH₂(CHO)₂ và CH₃CH₂CHO.\nCho X tác dụng với Br₂ (CCl₄) thu được chất hữu cơ Y có công thức phân tử C₉H₁₆Br₄.\nKhi đánh số trên mạch chính để đọc tên Y theo danh pháp IUPAC thì tổng chỉ số vị trí nhánh và nhóm thế là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294",
+          "where": "11-C6-B23-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "99fa1cc50429f6f63ffd665b4cc01d7ab44a7eba668cf6d3b93819c63012c123"
+        }
+      ],
+      "missingHashes": [
+        "c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294"
+      ]
+    }
+  ],
+  "fullClosure": "1qid1hinhonlymissingthishash=>1full/noPartial.",
+  "review": "NativeFULL+3x/all1publicref/allq.hinhread;source-only chưaSVG/chưaĐạt.",
+  "geometry": {
+    "alkene": {
+      "Cnodes": [
+        [
+          103,
+          97
+        ],
+        [
+          144,
+          97
+        ]
+      ],
+      "CCdouble": [
+        [
+          [
+            103,
+            97
+          ],
+          [
+            144,
+            97
+          ]
+        ],
+        [
+          [
+            105,
+            90
+          ],
+          [
+            141,
+            90
+          ]
+        ]
+      ],
+      "Rlabels": [
+        {
+          "text": "R¹",
+          "bbox": [
+            39,
+            37,
+            72,
+            70
+          ]
+        },
+        {
+          "text": "R²",
+          "bbox": [
+            30,
+            115,
+            65,
+            150
+          ]
+        },
+        {
+          "text": "R³",
+          "bbox": [
+            179,
+            37,
+            216,
+            70
+          ]
+        },
+        {
+          "text": "R⁴",
+          "bbox": [
+            178,
+            114,
+            216,
+            149
+          ]
+        }
+      ],
+      "Rarms": [
+        [
+          [
+            103,
+            97
+          ],
+          [
+            73,
+            69
+          ]
+        ],
+        [
+          [
+            103,
+            97
+          ],
+          [
+            73,
+            126
+          ]
+        ],
+        [
+          [
+            144,
+            97
+          ],
+          [
+            174,
+            69
+          ]
+        ],
+        [
+          [
+            144,
+            97
+          ],
+          [
+            174,
+            126
+          ]
+        ]
+      ]
+    },
+    "arrow": {
+      "shaft": [
+        [
+          309,
+          95
+        ],
+        [
+          555,
+          95
+        ]
+      ],
+      "filledHead": [
+        [
+          518,
+          90
+        ],
+        [
+          555,
+          95
+        ],
+        [
+          518,
+          100
+        ]
+      ],
+      "above": {
+        "text": "1. O₃",
+        "bbox": [
+          382,
+          60,
+          450,
+          89
+        ]
+      },
+      "below": {
+        "text": "2. (CH₃)₂S",
+        "bbox": [
+          353,
+          112,
+          491,
+          141
+        ]
+      }
+    },
+    "leftProduct": {
+      "Cnode": [
+        694,
+        94
+      ],
+      "COdouble": [
+        [
+          [
+            690,
+            90
+          ],
+          [
+            720,
+            90
+          ]
+        ],
+        [
+          [
+            690,
+            97
+          ],
+          [
+            720,
+            97
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          723,
+          82,
+          744,
+          107
+        ]
+      },
+      "Rlabels": [
+        {
+          "text": "R¹",
+          "bbox": [
+            632,
+            36,
+            668,
+            69
+          ]
+        },
+        {
+          "text": "R²",
+          "bbox": [
+            621,
+            113,
+            658,
+            149
+          ]
+        }
+      ],
+      "Rarms": [
+        [
+          [
+            664,
+            65
+          ],
+          [
+            690,
+            90
+          ]
+        ],
+        [
+          [
+            664,
+            123
+          ],
+          [
+            690,
+            97
+          ]
+        ]
+      ]
+    },
+    "plus": {
+      "text": "+",
+      "bbox": [
+        792,
+        81,
+        807,
+        99
+      ]
+    },
+    "rightProduct": {
+      "Cnode": [
+        918,
+        93
+      ],
+      "COdouble": [
+        [
+          [
+            890,
+            89
+          ],
+          [
+            920,
+            89
+          ]
+        ],
+        [
+          [
+            890,
+            96
+          ],
+          [
+            920,
+            96
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          864,
+          81,
+          886,
+          106
+        ]
+      },
+      "Rlabels": [
+        {
+          "text": "R³",
+          "bbox": [
+            955,
+            34,
+            992,
+            69
+          ]
+        },
+        {
+          "text": "R⁴",
+          "bbox": [
+            954,
+            111,
+            992,
+            148
+          ]
+        }
+      ],
+      "Rarms": [
+        [
+          [
+            920,
+            89
+          ],
+          [
+            947,
+            63
+          ]
+        ],
+        [
+          [
+            920,
+            96
+          ],
+          [
+            947,
+            122
+          ]
+        ]
+      ]
+    },
+    "counts": "2implicitCreactant/2implicitCproducts/1CCdouble2COdouble/8RlabelswithSUP1/2/3/4(notSUB)/1plus/1RIGHTfilledhead/2literalnumberedconditions. NoexpandedR/extraO2/O3coefficient/temp/answer/productsfromstemadded.",
+    "font": "Regularuprightalllabels,actualsub3atO3/CH3and2outer(CH3)2S;RnumbersSUP.",
+    "COfeetMacroNote": "Ownnative10xleft/rightopened. UpperdiagonalmeetsTOPcarbonylray/lowerdiagonalmeetsBOTTOMray separately;rightmirrored. Nativeantialias/kinkgrayinkexistsbetweennearfeetbutNOindependentverticalbridgepath. Preserve2feet/noaddedverticalconnector;bareCnoCglyph.",
+    "macro": [
+      "/workspace/scratch/1091-leftCO10x.png",
+      "/workspace/scratch/1091-rightCO10x.png"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelapprox1–2px,do notinferE/Z orname.",
+  "actualSvgReviewed": false
+}

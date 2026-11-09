@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1091,
+    "hash": "c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294",
+    "fileNguon": "anh/c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294.png",
+    "svg": "ozone-phan-khu-ddh-94ee83a3bcc894a5cd225e0fda7e18897841ec2c6108050265bd8af6eaed62c7.svg",
+    "hashSvg": "94ee83a3bcc894a5cd225e0fda7e18897841ec2c6108050265bd8af6eaed62c7",
+    "byteSvg": 15735,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C6-B23-III-6",
+        "de": "Liên kết đôi C=C bị oxi hóa bằng phản ứng ozone phân khử tạo ra các sản phẩm hữu cơ chứa oxygen. Nếu thực hiện ozone phân và khử ngay bằng chất khử êm dịu như dimethyl sulfide (CH₃)₂S thì thu được sản phẩm theo sơ đồ sau: Cho hydrocarbon X mạch hở có công thức phân tử C₉H₁₆ ozone phân khử theo điều kiện trên thì thu được 3 chất hữu cơ là CH₃COCH₃, CH₂(CHO)₂ và CH₃CH₂CHO.\nCho X tác dụng với Br₂ (CCl₄) thu được chất hữu cơ Y có công thức phân tử C₉H₁₆Br₄.\nKhi đánh số trên mạch chính để đọc tên Y theo danh pháp IUPAC thì tổng chỉ số vị trí nhánh và nhóm thế là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "c4488ecaee3d09e591263df6e81dc57e6aad1698bc5c8e87d372ab29da2c3294",
+            "where": "11-C6-B23-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "99fa1cc50429f6f63ffd665b4cc01d7ab44a7eba668cf6d3b93819c63012c123"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3barestructures4C2O/8RtokensRsup1-2-3-4EACHtwice/1CCdouble2COdouble/2carbonylsplitfeetNOverticalbridge/1filledRIGHT/1plus/1.O3ABOVE-2.(CH3)2SBELOW/regularDDH/noaddedRvalues-X-Y-Br2-answer.",
+    "hashSvgDaSoat": "94ee83a3bcc894a5cd225e0fda7e18897841ec2c6108050265bd8af6eaed62c7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

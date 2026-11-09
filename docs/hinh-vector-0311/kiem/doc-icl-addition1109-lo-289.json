@@ -1,0 +1,400 @@
+{
+  "i": 1109,
+  "hash": "c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda.png",
+  "size": [
+    811,
+    140
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-III-2",
+      "de": "Mức độ không bão hòa (số liên kết đôi C=C) trong chất béo được biểu thị dưới dạng chỉ số iodine. Để xác định chỉ số iodine thực hiện quy trình phân tích theo phương pháp Wijs như sau:\nBước 1. Hòa tan 0,500 gam mẫu dầu ăn vào dung môi thích hợp. Sau đó, thêm 25,00 mL thuốc thử Wijs (chứa ICl 0,10M), ủ 30 phút trong tối để xảy ra phản ứng (*) như hình.\nBước 2. Thêm 10 mL dung dịch KI 10% để phản ứng với ICl còn dư ở bước 1 và giải phóng $\\ce{I2}$ theo phản ứng:\n$\\ce{KI(aq) + ICl(aq) -> KCl(aq) + I2(aq)}$\nBước 3: Chuẩn độ lượng $\\ce{I2}$ giải phóng ở bước 2 bằng dung dịch $\\ce{Na2S2O3}$ 0,20M với chỉ thị hồ tinh bột cho đến khi dung dịch chuyển sang không màu thì tiêu tốn hết 10,35 mL $\\ce{Na2S2O3}$ theo phản ứng:\n$\\ce{2Na2S2O3(aq) + I2(aq) -> Na2S4O6(aq) + 2NaI(aq)}$\nBiết chỉ số iodine được định nghĩa là số gam iodine ($\\ce{I2}$) tối đa tham gia phản ứng cộng vào liên kết đôi C=C của 100 gam chất béo. Trong phương pháp Wijs, người ta sử dụng ICl thay cho $\\ce{I2}$ để phản ứng cộng xảy ra nhanh và hiệu quả. Tính chỉ số iodine (g/100g chất béo) của mẫu dầu ăn trên (làm tròn kết quả đến hàng phần mười).",
+      "allHinh": [
+        {
+          "hash": "c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda",
+          "where": "VIP27-CDK-ESTER-TN-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "02e0b131157b896a78e0b746b711b70591efe8ae758ae2b73e4f0d4e1d858317"
+        }
+      ],
+      "missingHashes": [
+        "c74a71d151580864a175dccd7eee45278caeb00e410b64ea04bf227ca6104eda"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1109-native3x.png",
+    "publicDeOnly": true,
+    "answersRead": false,
+    "labelMacroOpened": "/workspace/scratch/1109-labelmacro5x.png"
+  },
+  "coordinateMeaning": "Native raster pixel coordinates; approximate ink endpoints/label boxes traced from full and 3x native. Not scientific numerical data.",
+  "geometry": {
+    "literal": "R'-C(H)=C(H)-R\" + I-Cl → I-C(H)(R')-C(H)(R\")-Cl",
+    "font": "Regular uniform rounded source glyphs, upright. Macro C/H/Cl has relatively slender rounded strokes; raster thickness alone does not justify bold. Use regular for every label, no weight hierarchy.",
+    "counts": {
+      "explicitC": 4,
+      "explicitH": 4,
+      "I": 2,
+      "Cl": 2,
+      "Rprime": 2,
+      "Rdoubleprime": 2,
+      "plus": 1,
+      "rightArrowheads": 1,
+      "doubleBonds": 1
+    },
+    "labels": [
+      {
+        "text": "R'",
+        "bbox": [
+          6,
+          5,
+          35,
+          31
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          50,
+          54,
+          74,
+          80
+        ]
+      },
+      {
+        "text": "H",
+        "bbox": [
+          20,
+          104,
+          45,
+          131
+        ]
+      },
+      {
+        "text": "R\"",
+        "bbox": [
+          135,
+          5,
+          170,
+          31
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          109,
+          53,
+          132,
+          80
+        ]
+      },
+      {
+        "text": "H",
+        "bbox": [
+          136,
+          104,
+          161,
+          131
+        ]
+      },
+      {
+        "text": "+",
+        "bbox": [
+          209,
+          60,
+          224,
+          76
+        ]
+      },
+      {
+        "text": "I",
+        "bbox": [
+          283,
+          55,
+          293,
+          82
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          334,
+          55,
+          365,
+          83
+        ]
+      },
+      {
+        "text": "R'",
+        "bbox": [
+          606,
+          13,
+          636,
+          39
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          648,
+          63,
+          673,
+          90
+        ]
+      },
+      {
+        "text": "H",
+        "bbox": [
+          619,
+          111,
+          644,
+          138
+        ]
+      },
+      {
+        "text": "I",
+        "bbox": [
+          599,
+          62,
+          608,
+          89
+        ]
+      },
+      {
+        "text": "R\"",
+        "bbox": [
+          735,
+          13,
+          771,
+          39
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          707,
+          63,
+          730,
+          90
+        ]
+      },
+      {
+        "text": "H",
+        "bbox": [
+          737,
+          112,
+          762,
+          138
+        ]
+      },
+      {
+        "text": "Cl",
+        "bbox": [
+          766,
+          63,
+          795,
+          91
+        ]
+      }
+    ],
+    "bonds": [
+      {
+        "type": "single",
+        "from": [
+          34,
+          24
+        ],
+        "to": [
+          53,
+          54
+        ]
+      },
+      {
+        "type": "double",
+        "lines": [
+          [
+            [
+              77,
+              57
+            ],
+            [
+              104,
+              57
+            ]
+          ],
+          [
+            [
+              77,
+              68
+            ],
+            [
+              104,
+              68
+            ]
+          ]
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          140,
+          34
+        ],
+        "to": [
+          130,
+          52
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          53,
+          82
+        ],
+        "to": [
+          41,
+          101
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          130,
+          83
+        ],
+        "to": [
+          140,
+          101
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          296,
+          68
+        ],
+        "to": [
+          330,
+          68
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          631,
+          29
+        ],
+        "to": [
+          652,
+          61
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          608,
+          76
+        ],
+        "to": [
+          645,
+          76
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          674,
+          76
+        ],
+        "to": [
+          702,
+          77
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          734,
+          76
+        ],
+        "to": [
+          761,
+          77
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          739,
+          44
+        ],
+        "to": [
+          729,
+          63
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          651,
+          92
+        ],
+        "to": [
+          638,
+          112
+        ]
+      },
+      {
+        "type": "single",
+        "from": [
+          728,
+          93
+        ],
+        "to": [
+          741,
+          114
+        ]
+      }
+    ],
+    "arrow": {
+      "shaft": [
+        [
+          429,
+          67
+        ],
+        [
+          543,
+          67
+        ]
+      ],
+      "direction": "right",
+      "head": "small filled closed skinny triangle, tip approx54367, base52061..52073; slight raster curved shoulder, no hollow interior seen at 3x",
+      "headCount": 1
+    },
+    "noAdded": [
+      "reaction conditions",
+      "caption",
+      "phases",
+      "charges",
+      "wedge/dash stereo",
+      "numerical coefficients",
+      "theoretical iodine product correction"
+    ],
+    "quoteShape": "Source has straight near-vertical elevated single/double quote strokes after R: R' and R\". Preserve that shape; do not substitute slanted mathematical primes."
+  },
+  "actualSvgReviewed": false,
+  "corrections": [
+    {
+      "finding": "Initial Unicode R′/R″ transcription corrected after 5x native label macro: source shape is elevated straight single/double quote strokes; all labels classified regular rather than inferred bold from raster thickness.",
+      "preserved": "R remains literal generic R; no R-value or chemical answer inferred."
+    }
+  ]
+}
