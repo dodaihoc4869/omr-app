@@ -1144,6 +1144,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990": {
+      "tep": "triester-ba-mach-no-ddh-66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4.svg",
+      "hashSvg": "66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4",
+      "byteSvg": 4155,
+      "byteGzip": 782,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98": {
       "tep": "glucose-ba-dang-1402-ddh-ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d.svg",
       "hashSvg": "ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d",
@@ -10505,6 +10514,20 @@
       ]
     },
     {
+      "qid": "12-C1-B1-D3-II-19",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990",
+          "where": "12-C1-B1-D3-II-19.hinh.0.du_lieu",
+          "hashDataUrl": "6bdc9a98a92349181af035f4842ecae78d32a6b803da90e8277c74d2d68087d3",
+          "vector": "triester-ba-mach-no-ddh-66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C1-B1-D3-III-5",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -17915,6 +17938,20 @@
           "where": "DB-12-B1-P1-D1-II-69.hinh.0.du_lieu",
           "hashDataUrl": "b16110ab5744ee97b33eebf89c33a4ff67ab216c7cb854f0fa6098a118c4f2d1",
           "vector": "ir-hai-panel-ddh-cfc62b796bcd8fe340465ca2c55e803a6eadc268a73dc66358f814146d050615.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B1-P1-D1-II-72",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990",
+          "where": "DB-12-B1-P1-D1-II-72.hinh.0.du_lieu",
+          "hashDataUrl": "6bdc9a98a92349181af035f4842ecae78d32a6b803da90e8277c74d2d68087d3",
+          "vector": "triester-ba-mach-no-ddh-66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4.svg"
         }
       ]
     },
@@ -29214,6 +29251,7 @@
     "12-C1-B1-D3-II-9",
     "12-C1-B1-D3-II-14",
     "12-C1-B1-D3-II-17",
+    "12-C1-B1-D3-II-19",
     "12-C1-B1-D3-III-5",
     "12-C1-B1-D3-III-6",
     "12-C1-B1-D3-III-11",
@@ -29688,6 +29726,7 @@
     "DB-12-B1-P1-D1-II-40",
     "DB-12-B1-P1-D1-III-45",
     "DB-12-B1-P1-D1-II-69",
+    "DB-12-B1-P1-D1-II-72",
     "DB-12-B1-P1-D1-III-75",
     "DB-12-B1-P1-D1-II-92",
     "DB-12-B1-P1-D1-I-101",

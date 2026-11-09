@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1342,
+    "hash": "f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990",
+    "fileNguon": "anh/f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990.png",
+    "svg": "triester-ba-mach-no-ddh-66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4.svg",
+    "hashSvg": "66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4",
+    "byteSvg": 4155,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C1-B1-D3-II-19",
+        "de": "Cho 5 gam hợp chất hữu cơ X có cấu trúc phân tử như hình dưới vào một bát sứ và thêm 15 mL dung dịch KOH 30% (dùng dư), sau đó đun nóng một thời gian để phản ứng xảy ra.",
+        "refs": [
+          {
+            "hash": "f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990",
+            "where": "12-C1-B1-D3-II-19.hinh.0.du_lieu",
+            "hashDataUrl": "6bdc9a98a92349181af035f4842ecae78d32a6b803da90e8277c74d2d68087d3"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B1-P1-D1-II-72",
+        "de": "Cho 5 gam hợp chất hữu cơ X có cấu trúc phân tử như hình dưới vào một bát sứ và thêm 15 mL dung dịch KOH 30% (dùng dư), sau đó đun nóng một thời gian để phản ứng xảy ra.",
+        "refs": [
+          {
+            "hash": "f302843ee940c3a0f766906162edfdbeeece05e56a255b60a1b60f8463cdb990",
+            "where": "DB-12-B1-P1-D1-II-72.hinh.0.du_lieu",
+            "hashDataUrl": "6bdc9a98a92349181af035f4842ecae78d32a6b803da90e8277c74d2d68087d3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3acyl18bareCeach+3bareglycerolC=57C6O/3COdouble2splitfeetEACH/0CCdouble/3freeRIGHTends/bottomfirstCCvertical/allthinregularDDH/noaddedH-CH2-nums-stereo-name-caption-answer",
+    "hashSvgDaSoat": "66450b69e6f27c32b7ea6a7a4db1c635c97ebe017c445c806fca89d6c7e62ae4",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
