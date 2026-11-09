@@ -19,6 +19,8 @@ export function ngheBpuToChieu(): void {
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-het') { void import('../../components/bpu/gan-gv').then((m) => m.baoHetCau(d.d === -1 ? -1 : 1)).catch(() => {}); return }
     // Lời giải thu gọn của đợt đang chiếu (bảng hỏi khi thầy bấm G — hiện ngay trên bảng, không về tờ).
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-giai') { const h = (e.data as { html?: unknown }).html; void import('../../components/bpu/gan-gv').then((m) => m.nhanGiai(typeof h === 'string' ? h : '')).catch(() => {}); return }
+    // 09/11: Esc trong tờ (khung) ⇒ ra Hôm nay một lần (gan-gv chỉ làm khi đang có phiên Bình Phản Ứng).
+    if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-esc') { void import('../../components/bpu/gan-gv').then((m) => m.escRaHomNay()).catch(() => {}); return }
     // 08/11: thầy chấm em lên bảng trên tờ cũ ⇒ bảng hiện lại, ghi kết quả, mở đáp án.
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-cham') { const dat = (e.data as { dat?: unknown }).dat === true; void import('../../components/bpu/gan-gv').then((m) => m.chamTuTo(dat)).catch(() => {}); return }
     if (!laTinBpu(e.data)) return

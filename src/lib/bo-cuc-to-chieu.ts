@@ -120,10 +120,11 @@ body.mc-bc .mc-trai { border-right: 0; }
 body.mc-bc .mc-nua .mc-em { position: static; margin: 0; flex: none; border-radius: 16px; border: 1px solid var(--mc-vien); }
 body.mc-bc .mc-vung-de { position: relative; flex: 0 1 auto; min-height: 0; min-width: 0; overflow: hidden; box-sizing: border-box; padding: 18px 22px; border-radius: 16px; background: var(--mc-nen); border: 1px solid var(--mc-vien); }
 body.mc-bc .mc-vung-de .mc-than { padding-top: 0; }
-body.mc-bc .mc-vung-de .mc-de { font-size: var(--mc-co, 28px); line-height: 1.45; }
-body.mc-bc .mc-vung-de .mc-pa { font-size: calc(var(--mc-co, 28px) * .93); line-height: 1.4; }
+/* 09/11 thầy «cho chữ trên màn chiếu cũ nhỏ hơn một chút»: đề + phương án ×0,9 so cỡ bộ đo tính; «ảnh to phù hợp màn chiếu, có cuộn»: ảnh tới 56vh (đang chữa thì vùng đề cuộn — lớp mc-cuon; lúc chờ gọi lật trang như cũ). */
+body.mc-bc .mc-vung-de .mc-de { font-size: calc(var(--mc-co, 28px) * .9); line-height: 1.45; }
+body.mc-bc .mc-vung-de .mc-pa { font-size: calc(var(--mc-co, 28px) * .84); line-height: 1.4; }
 body.mc-bc .mc-vung-de .mc-ngan { font-size: calc(var(--mc-co, 28px) * .6); }
-body.mc-bc .mc-vung-de img { max-width: 100%; width: auto; height: auto; max-height: calc(30vh * var(--mc-hinh, 1)); object-fit: contain; }
+body.mc-bc .mc-vung-de img { max-width: 100%; width: auto; height: auto; max-height: calc(56vh * var(--mc-hinh, 1)); object-fit: contain; }
 body.mc-bc .mc-vung-de img.mc-anh-pa { max-height: calc(12vh * var(--mc-hinh, 1)); }
 body.mc-bc .mc-vung-de .q-bang-cuon { overflow: visible; }
 body.mc-bc .mc-vung-de .q-bang { width: auto; max-width: 100%; font-size: calc(var(--mc-co, 28px) * .72); }

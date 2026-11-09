@@ -138,6 +138,7 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
   beforeEach(() => {
     vi.useFakeTimers({ toFake: ['Date'] })
     vi.setSystemTime(NAY)
+    useCoHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) // SỬA CÓ CHỦ ĐÍCH 09/11: máy chưa nhớ cờ ⇒ mặc định BẬT; các ca dưới viết cho cờ TẮT
     useAppStore.setState({ screen: 'toancanh', sbdToanCanh: '12121007', sbdGiaoRieng: '', sbdDangXem: '', maCaTheoDoi: '', classList: [{ sbd: '12121007', hoTen: 'Trần Thu Hà', lop: '12A1', sdt: '', namSinh: '2008', raw: {} }] as never } as never)
   })
   const chay = async (h: (b: Record<string, unknown>) => Tra | Promise<Tra> = () => ({ json: day() })) => {
@@ -217,7 +218,7 @@ describe('ToanCanhEmScreen — trang Toàn cảnh một em', () => {
       expect(screen.queryByRole('button', { name: 'Giao bài riêng' })).toBeNull()
       expect(screen.getByRole('button', { name: 'Cho thi lại' }).className).toContain('hn2-nut--chinh')
     } finally {
-      useCoHoa2.getState().dat(null)
+      useCoHoa2.getState().dat({ bat: false, lop: [], sbd: [] })
     }
   })
 
