@@ -90,6 +90,27 @@ M ngày Mới (cứ 2 Mới chen 1 Sửa nếu có lỗi) → 1 ngày Ôn → S�
 - Kiểm tải có tính quên (`tai-on.py`, giả định, bài 112 câu đủ ô, 1 ngày Ôn/bài, luật sửa 2 lượt, chưa tính đoán mò): em khá ~10–11 ngày/bài, em yếu ~18 ngày/bài; không phình theo số bài. Lượt 2–3 nằm trong ngân sách Ôn nên phân loại lỗi không làm dài chu kỳ; sẽ chạy lại khi build.
 - Máy hiện khi thầy chọn bài: số ngày Mới, độ chuẩn đề, dự kiến từng em xong ngày nào, em nào đang chậm.
 
+## 4b. TỰ ĐỘNG HOÀN TOÀN — thầy chỉ chọn bài (thầy chốt 09/11)
+**Thầy làm đúng một việc:** chọn bài cho lớp (như đánh dấu bài đã dạy hiện nay). Không duyệt, không giao, không đặt hạn.
+
+**Máy tự làm:**
+1. **Lúc thầy chọn bài:** tính M ngày Mới, độ chuẩn đề (x/28), dự báo ngày xong của TỪNG em; đặt **hạn riêng từng em** = ngày em bắt đầu bài (sau khi xong bài trước) + số ngày dự báo + 2 ngày dung sai. Hạn chốt một lần, không trôi theo dự báo.
+2. **Mỗi đêm:** cập nhật độ bền h từ bài làm trong ngày, tính lại dự báo, xếp loại ngày mai (Mới / Ôn / Sửa) và chọn 28 câu cho từng em theo mục 1–3.
+3. **Tự giao:** em mở app thấy ngay «Hôm nay: Ngày Mới · Bài Amine · 28 câu»; đề chốt lần đầu em mở trong ngày (mở lại không đổi câu).
+4. **Tự báo thầy** ở Hôm nay › Việc cần thầy (xếp theo độ gấp, số đếm trên thanh bên; không có việc thì không báo):
+
+| Báo | Khi nào | Nút một chạm |
+|---|---|---|
+| **Quá hạn bài** | em chưa xong chu kỳ bài khi qua hạn riêng | danh sách em + chậm bao nhiêu ngày |
+| **Bỏ đề** | em không làm đề 2 ngày liền | danh sách em |
+| **Cần thầy chữa** | nhóm lỗi sai 3 lần (gộp vào nhóm Cần thầy chữa đang có) | mở chỗ chữa |
+| **Nên chữa chung** | từ 30 % em của lớp cùng một nhóm lỗi | mở Gọi lên bảng với đúng dạng đó |
+| **Bài thiếu câu chuẩn** | độ chuẩn < 26/28 hoặc thiếu câu Đúng/Sai | xem ô thiếu, bổ sung |
+| **Lớp chưa xong bài trước** | thầy chọn bài mới khi quá nửa lớp còn bài cũ (chỉ báo, không chặn) | xem ai chưa xong |
+
+- Máy KHÔNG tự nhắn phụ huynh (việc gửi ra ngoài để thầy quyết); app phụ huynh vẫn thấy loại ngày và điểm đề Ôn như hiện có.
+- Thay hạn cứng 7 ngày của Gói 7 (`scripts/ap-goi7-song.ts` đổi theo).
+
 ## 5. Nói thẳng
 - Các con số chu kỳ dùng thông số tạm; máy đo lại bằng dữ liệu trung tâm sau khi chạy.
 - Phần II **chưa có câu song sinh** ⇒ Sửa/Ôn Phần II tạm dùng câu ĐS khác cùng dạng; cần giao Codex soạn.
@@ -97,6 +118,7 @@ M ngày Mới (cứ 2 Mới chen 1 Sửa nếu có lỗi) → 1 ngày Ôn → S�
 - Thêm nút «Chắc / Chưa chắc» và một chạm «loại lỗi» là đổi giao diện ⇒ cần bản vẽ, thầy duyệt trước build.
 
 ## 6. Thầy chốt
+0. Tự động hoàn toàn mục 4b: hạn riêng = dự báo + 2 ngày; 6 loại báo trên Việc cần thầy (ngưỡng «bỏ đề 2 ngày», «30 % lớp»).
 1. Bốn ưu tiên rút câu (đủ 28 > đúng phần > đúng mức > câu của bài) và «độ chuẩn x/28» hiện cho thầy.
 2. Ngưỡng quên 70 %, ngân sách 1 ngày Ôn/bài.
 3. Phân loại lỗi 3 loại với 1 / 2 / 3 lượt; nút «Chắc / Chưa chắc» chỉ ở câu Ôn và Sửa.
