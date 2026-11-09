@@ -92,6 +92,17 @@ describe('chia đội theo số em có mặt (thầy 09/11)', () => {
     // Tổng điểm cả lớp (kJ em + thưởng đội) bảo toàn qua lần chia lại.
     expect([0, 1, 2, 3].reduce((s, d) => s + diemDoi(st, d), 0)).toBe([...kj.values()].reduce((a, b) => a + b, 0) + moi)
   })
+  it('đội đủ quân: hễ có đội đủ mặt (kể cả do xếp lại em chưa vào) là đã thưởng đúng một lần', () => {
+    for (const n of [5, 7, 9, 11, 16]) {
+      const st = taoPhong({ buoiId: 'b', lop: 'L', nay: T0, ds: lop(n, 0) })
+      const thu = [...st.ds].map((e) => e.sbd).sort((a, b) => ((Number(a.slice(1)) * 7) % n) - ((Number(b.slice(1)) * 7) % n))
+      for (const s of thu) {
+        vaoLop(st, s, T0)
+        const du = Array.from({ length: st.soDoi ?? 4 }, (_, d) => st.ds.filter((e) => e.doi === d)).some((t) => t.length > 0 && t.every((e) => e.vao))
+        if (du) expect(st.doiDu).not.toBeNull()
+      }
+    }
+  })
   it('em chưa vào có đội dự kiến: tổng số em các đội đều; viewEm vẫn đủ trường cũ', () => {
     const st = taoPhong({ buoiId: 'b', lop: 'L', nay: T0, ds: lop(11, 4) })
     const dem = [0, 1].map((d) => st.ds.filter((e) => e.doi === d).length)

@@ -223,7 +223,14 @@ export function vaoLop(st: TrangThaiPhong, sbd: string, nay: number, ten?: strin
   if (moi !== k) chiaLaiDoi(st, moi)
   else xepEmChuaVao(st)
   st.vuaVao = [...st.vuaVao.filter((s) => s !== sbd), sbd].slice(-6)
-  if (st.doiDu == null && st.ds.filter((x) => x.doi === e!.doi).every((x) => x.vao)) { st.doiDu = e.doi; st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) + KJ.duQuanDau }
+  // Đội đủ quân: xét đội của em trước, rồi các đội khác (xếp lại em chưa vào có thể làm một đội khác vừa đủ quân).
+  if (st.doiDu == null) {
+    const k2 = soDoiCua(st)
+    for (const d of [e.doi, ...Array.from({ length: k2 }, (_, i) => i).filter((i) => i !== e!.doi)]) {
+      const thanh = st.ds.filter((x) => x.doi === d)
+      if (thanh.length && thanh.every((x) => x.vao)) { st.doiDu = d; st.doiThuong[d] = (st.doiThuong[d] ?? 0) + KJ.duQuanDau; break }
+    }
+  }
   st.capNhat = nay
   return true
 }
