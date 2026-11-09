@@ -2,7 +2,9 @@
 // Khoá: chỉ lớp 12; số ngày theo NGÀY VIỆT NAM (đổi lúc 0 h VN); chặng màu; phần trăm năm học trong ống nghiệm; sau ngày thi không hiện.
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import DemNguocThi, { laLop12, tinhDemNguoc } from '../src/components/hoc-tap/DemNguocThi'
+import DemNguocThi from '../src/components/hoc-tap/DemNguocThi'
+import { tinhDemNguoc } from '../src/components/hoc-tap/dem-nguoc'
+import { laLop12 } from '../src/components/hoc-tap/la-lop-12'
 
 // 0 h giờ Việt Nam của ngày d/m/y = 17 h UTC hôm trước.
 const vn = (y: number, m: number, d: number, gio = 9) => Date.UTC(y, m - 1, d, gio - 7)

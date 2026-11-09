@@ -130,7 +130,7 @@ describe('ThongBaoHocSinh (chuông + tấm thông báo)', () => {
     expect(chuong.getAttribute('aria-expanded')).toBe('false')
     fireEvent.click(chuong)
     expect(chuong.getAttribute('aria-expanded')).toBe('true')
-    const tam = screen.getByRole('dialog', { name: 'Thông báo của em' })
+    const tam = await screen.findByRole('dialog', { name: 'Thông báo của em' }) // 09/11: tấm là mảnh nạp khi bấm chuông
     expect(tam.className).toContain('m3-hop')
     expect(screen.getByText('2 tin chưa đọc')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Đóng thông báo' })).toBeTruthy()
@@ -170,7 +170,7 @@ describe('ThongBaoHocSinh (chuông + tấm thông báo)', () => {
     vi.stubGlobal('fetch', vi.fn(async () => { await cho; return { ok: true, status: 200, json: async () => ({ ok: true, items: [], publicKey: '' }) } }))
     render(<ThongBaoHocSinh token="tok" onOpen={() => {}} />)
     fireEvent.click(screen.getByRole('button', { name: 'Thông báo, 0 chưa đọc' }))
-    expect(screen.getByText('Đang đồng bộ thông báo…')).toBeTruthy()
+    expect(await screen.findByText('Đang đồng bộ thông báo…')).toBeTruthy() // 09/11: tấm nạp sau
     expect(document.querySelector('.m3-xuong')).toBeTruthy()
     expect(document.querySelector('.animate-spin')).toBeNull()
     xong(null)

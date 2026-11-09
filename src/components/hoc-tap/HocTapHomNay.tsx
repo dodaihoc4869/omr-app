@@ -6,7 +6,9 @@ import './hoc-tap.css'
 import TheGoi7 from './TheGoi7'
 const TheKiemTraCaNhan=lazy(()=>import('./TheKiemTraCaNhan'))
 import TheHomNayEm from './TheHomNayEm'
-import DemNguocThi from './DemNguocThi'
+import { laLop12 } from './la-lop-12'
+// 09/11 đếm ngược ngày thi (lớp 12): mảnh nạp sau — đường mở app học sinh không nặng thêm; giữ chỗ cùng cỡ thẻ ⇒ không xô màn.
+const DemNguocThi = lazy(() => import('./DemNguocThi').catch(() => ({ default: () => null }))) // mất mạng chưa có mảnh ⇒ ẩn thẻ, không hỏng màn
 import { chuNutHoc } from './nhip-hom-nay'
 import { soHomNay } from './lam-bai'
 import { useSoCauCanSua } from '../../lib/tu-sua-loi'
@@ -199,7 +201,7 @@ export default function HocTapHomNay(p: Props) {
       {!trong && <nav className="ht-menu" aria-label="Điều hướng học sinh">{MENU.map(({ id, ten, icon: Icon }) => <button key={id} onClick={() => setMuc(id)} aria-current={muc === id ? 'page' : undefined}><Icon size={21} aria-hidden="true" /><span>{ten}</span></button>)}</nav>}
       <main className={daDoiMuc.current ? 'ht-noi-dung ht2-noi-dung tt-vao-muc' : 'ht-noi-dung ht2-noi-dung'} key={muc}>
         <div className="ht2-mo-dau"><p>{homNayChu()}{p.lop ? ` · ${p.lop}` : ''}{muc === 'hanh-trinh' && sanh?.chienDich?.ten ? ` · ${sanh.chienDich.ten}` : ''}</p><h1>{muc === 'hom-nay' ? `Chào ${p.ten || 'em'}` : MENU.find(x => x.id === muc)?.ten}</h1></div>
-        {muc === 'hom-nay' && <DemNguocThi lop={p.lop} />}
+        {muc === 'hom-nay' && laLop12(p.lop) && <Suspense fallback={<div className="dnt-cho" aria-hidden="true" />}><DemNguocThi lop={p.lop} /></Suspense>}
         {p.canhBao}
         {p.dangLamMoi && <p className="ht-thong-bao" data-vung="dang-lam-moi" role="status">App đang làm mới, khoảng 1–5 phút. Em cứ để app mở, app tự vào lại.</p>}
         {p.loi && <div className="ht-thong-bao ht2-loi" role="alert"><span>{p.loi}</span><button className="ht-nut-phu" onClick={p.onTaiLai}>Thử lại</button></div>}

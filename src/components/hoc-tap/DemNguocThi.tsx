@@ -1,29 +1,11 @@
 // ĐẾM NGƯỢC NGÀY THI TỐT NGHIỆP THPT 22/06/2027 — CHỈ học sinh lớp 12, đầu màn Hôm nay (thầy 09/11 duyệt bản vẽ docs/ban-ve-dem-nguoc-0911:
 // «làm thêm một cái gì đó đếm ngược ngày thi đại học (22/6/2027) siêu đẹp tinh tế … lớp 12 thôi» · «chèn vào khung ống thí nghiệm cho tinh tế»).
 // Tính theo NGÀY GIỜ VIỆT NAM bằng giờ máy chủ (`gioMayChu`) ⇒ máy em đặt sai giờ vẫn đúng. 0 lệnh mạng. Sau ngày thi: không hiện.
-// Màu theo chặng (chỉ biến màu app học sinh, CSS trong hoc-tap.css `.dnt`): > 30 ngày chàm · ≤ 30 cam «Chặng nước rút» · ≤ 7 cam «Tuần cuối» · ngày thi lục.
+// Màu theo chặng (chỉ biến màu app học sinh, CSS dem-nguoc-thi.css `.dnt`; mảnh nạp sau, màn giữ chỗ `.dnt-cho`): > 30 ngày chàm · ≤ 30 cam «Chặng nước rút» · ≤ 7 cam «Tuần cuối» · ngày thi lục.
 import { gioMayChu } from '../../lib/gio-may-chu'
-
-export const NGAY_THI_2027 = Date.UTC(2027, 5, 22)
-/** Giả định ngày khai giảng năm học lớp 12 (chỉ dùng cho mực ống nghiệm «đã đi x % năm học»). */
-export const KHAI_GIANG_2026 = Date.UTC(2026, 8, 5)
-const NGAY_MS = 86_400_000
-
-export type ChangDem = 'binh' | 'gap' | 'tuan' | 'thi'
-export interface DemNguoc { con: number; phanTram: number; chang: ChangDem; tuan: number; cau: number }
-
-/** Tên lớp hiệu lực là lớp 12 («12 - Lớp Thường», «12 Tinh Hoa», «12A1»…). */
-export const laLop12 = (lop: string | null | undefined): boolean => /^\s*12(?!\d)/.test(String(lop ?? ''))
-
-/** Số ngày còn (theo ngày Việt Nam), phần trăm năm học, chặng. null = đã qua ngày thi. */
-export function tinhDemNguoc(nowMs: number): DemNguoc | null {
-  const homNay = Math.floor((nowMs + 7 * 3_600_000) / NGAY_MS) * NGAY_MS
-  const con = Math.round((NGAY_THI_2027 - homNay) / NGAY_MS)
-  if (con < 0) return null
-  const phanTram = Math.max(0, Math.min(100, Math.round((100 * (homNay - KHAI_GIANG_2026)) / (NGAY_THI_2027 - KHAI_GIANG_2026))))
-  const chang: ChangDem = con === 0 ? 'thi' : con <= 7 ? 'tuan' : con <= 30 ? 'gap' : 'binh'
-  return { con, phanTram, chang, tuan: Math.floor(con / 7), cau: con * 28 }
-}
+import { laLop12 } from './la-lop-12'
+import { tinhDemNguoc, type ChangDem } from './dem-nguoc'
+import './dem-nguoc-thi.css'
 
 const NHAN: Record<ChangDem, string> = { binh: 'Đếm ngược', gap: 'Chặng nước rút', tuan: 'Tuần cuối', thi: 'Hôm nay' }
 

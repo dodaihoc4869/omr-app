@@ -376,6 +376,8 @@ export default defineConfig({
           '**/ChonCauBpu-*.{js,css}',
           '**/to-chieu-bpu-*.js',
           '**/diem-danh-nhanh-*.js', // nút Điểm danh ở Hôm nay (09/11) — nạp khi bấm
+          '**/TamThongBaoHs-*.js', // 09/11 tấm thông báo học sinh: nạp khi bấm chuông ⇒ kho chạy-lúc + kho tải ngầm (kho-hs.json), precache giữ 170
+          '**/DemNguocThi-*.{js,css}', // 09/11 thẻ đếm ngược ngày thi (lớp 12): mảnh lười học sinh ⇒ kho chạy-lúc + kho tải ngầm (kho-hs.json), precache giữ 170
           '**/be-vietnam-pro-*-500-normal-*.woff2',
           '**/be-vietnam-pro-*-800-normal-*.woff2',
           '**/gan-hs-*.{js,css}',
