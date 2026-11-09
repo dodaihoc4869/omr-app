@@ -150,7 +150,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(await screen.findByText('Chính xác!')).toBeTruthy()
     expect(document.querySelector('.bpu-che')!.getAttribute('data-kq')).toBe('dung')
     expect(document.querySelector('.bpu-kq-o[data-kq="sai"]')).toBeNull()
-    expect(document.querySelector('.bpu-kq-o[data-kq="dung"]')!.textContent).toContain('Em chọn · đúng')
+    expect(document.querySelector('.bpu-kq-o[data-kq="dung"]')!.textContent).toContain('Em chọn')
     const ds = { qid: 'q2', phan: 'II' as const, tuLuan: false, cau: { ...cau.cau, qid: 'q2', phan: 'II', choices: [], ideas: ['Ý một', 'Ý hai', 'Ý ba', 'Ý bốn'] }, dung: 'DSSD', hanGiay: 60 }
     moLuot(st, ds, T0 + 9000); nhanTra(st, 'S1', 'DSSS', T0 + 10000); moDapAn(st, T0 + 12000, chamSo); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText('Chưa đúng')).toBeTruthy()

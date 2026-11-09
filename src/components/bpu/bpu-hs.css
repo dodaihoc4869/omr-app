@@ -172,12 +172,12 @@ html.may-yeu .bpu-ng .quy { animation: none; }
 @keyframes bpu-len { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes bpu-bung { 0% { transform: scale(0.4); opacity: 0; } 45% { transform: scale(1.35); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 .bpu-tia { position: absolute; left: 50%; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); width: 0; height: 0; z-index: 1; pointer-events: none; }
-.bpu-tia i { position: absolute; left: -7px; top: -7px; width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle, var(--giay) 0 22%, var(--doi) 40%, transparent 72%); opacity: 0;
+.bpu-tia i { position: absolute; left: -5px; top: -14px; width: 10px; height: 28px; border-radius: 50% 50% 45% 45% / 30% 30% 70% 70%; background: linear-gradient(to bottom, color-mix(in srgb, var(--doi) 30%, var(--giay)), var(--doi) 35%, transparent); opacity: 0;
   animation: bpu-tia-bay 0.85s var(--d, 0ms) cubic-bezier(.3, .1, .2, 1) both; }
-.bpu-tia i.vang { background: radial-gradient(circle, var(--giay) 0 22%, var(--tr-sao) 40%, transparent 72%); }
-.bpu-tia .song { left: -60px; top: -60px; width: 120px; height: 120px; background: radial-gradient(circle, transparent 52%, color-mix(in srgb, var(--doi) 80%, transparent) 58%, transparent 70%); animation: bpu-song 0.6s ease-out both; }
+.bpu-tia i.vang { background: linear-gradient(to bottom, color-mix(in srgb, var(--tr-sao) 30%, var(--giay)), var(--tr-sao) 35%, transparent); }
+.bpu-tia .song { left: -60px; top: -60px; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, transparent 52%, color-mix(in srgb, var(--doi) 80%, transparent) 58%, transparent 70%); animation: bpu-song 0.6s ease-out both; }
 @keyframes bpu-tia-bay { 0% { transform: translate(0, 0) scale(calc(var(--s, 1) * 0.6)); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--x, 0), -110vh) scale(calc(var(--s, 1) * 1.4)); opacity: 0; } }
-@keyframes bpu-song { from { transform: scale(0.3); opacity: 1; } to { transform: scale(3.2); opacity: 0; } }
+@keyframes bpu-song { from { transform: scale(0.3); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .bpu-lua g, .bpu-lua .hao, .bpu-che-dau, .bpu-che.bay::before, .bpu-che.bay .bpu-che-noi, .bpu-che.bay .bpu-che-noi > .bpu-lua.to, .bpu-hs.dang-bay .bpu-hs-than { animation: none; }

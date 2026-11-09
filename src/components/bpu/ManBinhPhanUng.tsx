@@ -63,7 +63,7 @@ function KetQuaChon({ phan, chon, dung, emDung }: { phan: string; chon: string; 
     <div className="bpu-kq-pa" role="list" aria-label="Phương án">
       {['A', 'B', 'C', 'D'].map((x) => {
         const la = x === d ? 'dung' : x === c ? 'sai' : undefined
-        return <div key={x} role="listitem" className="bpu-kq-o" data-kq={la} aria-label={`${x}${x === c ? ' · em chọn' : ''}${x === d ? ' · đáp án đúng' : ''}`}><b>{x}</b>{la ? <span>{la === 'dung' ? '✓' : '✗'}</span> : null}<small>{x === c && x === d ? 'Em chọn · đúng' : x === c ? 'Em chọn' : x === d ? 'Đáp án đúng' : ''}</small></div>
+        return <div key={x} role="listitem" className="bpu-kq-o" data-kq={la} aria-label={`${x}${x === c ? ' · em chọn' : ''}${x === d ? ' · đáp án đúng' : ''}`}><b>{x}</b>{la ? <span>{la === 'dung' ? '✓' : '✗'}</span> : null}<small>{x === c ? 'Em chọn' : x === d ? 'Đáp án đúng' : ''}</small></div>
       })}
     </div>
   )
