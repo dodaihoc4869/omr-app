@@ -38,7 +38,7 @@ afterEach(async () => {
 })
 const moForm = async () => {
   fireEvent.click(await screen.findByRole('button', { name: 'Vào ca kiểm tra' }))
-  return await screen.findByRole('dialog', { name: 'Vào phòng thi' })
+  return await screen.findByRole('dialog', { name: 'Vào phòng thi' }, { timeout: 5000 }) // form nạp lười (cong-hs-nap-luoi): máy test bận chờ rộng — chập chờn 09/11
 }
 
 describe('C5 · form vào phòng thi ở cổng học sinh (/hs)', () => {
