@@ -110,7 +110,7 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
         <p className="tp-kc-nhan">Thử thách Kim cương · {tenChuyenDe} <span className="tp-chip">Câu {viTri + 1}/{n}</span></p>
         {/* 09/11 (thầy: «nhiều câu Kim cương mất hình»): đề / phương án / ý vẽ ĐỦ hình như màn luyện (LamCau · TheCau): ảnh cả đề, bảng, hình sau đề,
             ảnh riêng từng phương án / ý, hình sau phương án / ý, hình cuối câu. */}
-        {q.thanCauImg ? <CauHinh src={q.thanCauImg} alt={`Đề câu ${viTri + 1}`} vt="sau_de" /> : <p className="tp-kc-de"><ChemText text={q.text} /></p>}
+        {q.thanCauImg ? <CauHinh src={q.thanCauImg} alt={`Đề câu ${viTri + 1}`} /> : <p className="tp-kc-de"><ChemText text={q.text} /></p>}
         <BangSoLieu table={q.table} />
         {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt={`Hình câu ${viTri + 1}`} />}
         <HinhTaiViTri hinhAnh={hinhKc} viTri="sau_de" nhan={`câu ${viTri + 1}`} />
