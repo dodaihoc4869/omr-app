@@ -1,0 +1,281 @@
+{
+  "i": 1365,
+  "hash": "f69d64a883c74f76f3601e081c8d169d71ce896e349de72f1f6f0f8adbc591b1",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f69d64a883c74f76f3601e081c8d169d71ce896e349de72f1f6f0f8adbc591b1.png",
+  "size": [
+    1239,
+    131
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C4-B14-D2-III-4",
+      "de": "Tơ visco được sản xuất phổ biến từ bột gỗ của cây như tre, đậu nành, mía,...theo sơ đồ sau (hình).\nTừ 10 tấn cellulose người ta điều chế được 9,5 tấn tơ visco. Hiệu suất của quá trình điều chế là bao nhiêu %?",
+      "allHinh": [
+        {
+          "hash": "f69d64a883c74f76f3601e081c8d169d71ce896e349de72f1f6f0f8adbc591b1",
+          "where": "DH-12-C4-B14-D2-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "ea66f1bf4db5447fc4949d28338490a94bdbe285e94923a250ce87e9eb17fb75"
+        }
+      ],
+      "missingHashes": [
+        "f69d64a883c74f76f3601e081c8d169d71ce896e349de72f1f6f0f8adbc591b1"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1365-native2x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelgeometry/literalformulasandcaptions; no mechanismorproductanswer expandedfromtheory.",
+  "geometry": {
+    "classification": "Two-step celluloseviscose reactiontextscheme, middleC=Sexpanded vertically.",
+    "leftFormula": {
+      "text": "[C₆H₇O₂(OH)₃]ₙ",
+      "bbox": [
+        6,
+        24,
+        205,
+        54
+      ],
+      "caption": {
+        "text": "Cellulose",
+        "bbox": [
+          46,
+          89,
+          160,
+          115
+        ],
+        "style": "ITALICregularserif"
+      }
+    },
+    "firstArrow": {
+      "shaft": [
+        [
+          217,
+          36
+        ],
+        [
+          388,
+          36
+        ]
+      ],
+      "head": "FILLEDRIGHTskinnytriangle",
+      "headVertices": [
+        [
+          372,
+          30
+        ],
+        [
+          388,
+          36
+        ],
+        [
+          372,
+          42
+        ]
+      ]
+    },
+    "firstConditions": [
+      {
+        "text": "1. NaOH",
+        "bbox": [
+          245,
+          6,
+          358,
+          31
+        ],
+        "placement": "ABOVE",
+        "style": "regularuprightserif; baselineperiodafter1"
+      },
+      {
+        "text": "2. CS₂",
+        "bbox": [
+          245,
+          49,
+          331,
+          76
+        ],
+        "placement": "BELOW",
+        "style": "regularuprightserif;2inCS2SUB"
+      }
+    ],
+    "middleFormula": {
+      "literalLinear": "[C₆H₇O₂(OH)₂-O-C-SNa]ₙ",
+      "bbox": [
+        403,
+        17,
+        758,
+        48
+      ],
+      "expandedC": {
+        "text": "C",
+        "bbox": [
+          635,
+          19,
+          655,
+          43
+        ],
+        "centerApprox": [
+          645,
+          31
+        ],
+        "leftBond": [
+          [
+            616,
+            30
+          ],
+          [
+            631,
+            30
+          ]
+        ],
+        "rightBond": [
+          [
+            659,
+            30
+          ],
+          [
+            683,
+            30
+          ]
+        ],
+        "doubleDownRays": [
+          [
+            [
+              642,
+              47
+            ],
+            [
+              642,
+              66
+            ]
+          ],
+          [
+            [
+              648,
+              47
+            ],
+            [
+              648,
+              66
+            ]
+          ]
+        ],
+        "SDown": {
+          "text": "S",
+          "bbox": [
+            638,
+            69,
+            654,
+            92
+          ]
+        },
+        "note": "S doublebondDOWN fromexplicitC; terminalSNa textonlysinglebondfromC, noSminus/Naplus added"
+      },
+      "bracketCaution": "RightSNa+closingSQUAREbracket+nSUB isbaselineformula, notparen orcharge. Preserve3squarebracketpairs acrossfigure.",
+      "caption": {
+        "text": "Cellulose xangtogenate",
+        "bbox": [
+          458,
+          96,
+          740,
+          123
+        ],
+        "style": "ITALICregularserif",
+        "literalTrap": "EXACTspellingxangtogenate; do notcorrecttoxanthogenate/xantogenate"
+      }
+    },
+    "secondArrow": {
+      "shaft": [
+        [
+          770,
+          35
+        ],
+        [
+          1016,
+          35
+        ]
+      ],
+      "head": "FILLEDRIGHTskinnytriangle",
+      "headVertices": [
+        [
+          1000,
+          29
+        ],
+        [
+          1016,
+          35
+        ],
+        [
+          1000,
+          41
+        ]
+      ]
+    },
+    "secondCondition": {
+      "text": "+ H₂SO₄ (loãng)",
+      "bbox": [
+        793,
+        1,
+        992,
+        31
+      ],
+      "style": "regularuprightserif;literalplusandparenthesizedloãng, noaddedtemperature"
+    },
+    "rightFormula": {
+      "text": "[C₆H₇O₂(OH)₃]ₙ",
+      "bbox": [
+        1033,
+        22,
+        1231,
+        53
+      ],
+      "caption": {
+        "text": "Tơ visco",
+        "bbox": [
+          1077,
+          77,
+          1181,
+          103
+        ],
+        "style": "ITALICregularserif",
+        "literalTrap": "CapitalT,lowercasevisco"
+      }
+    },
+    "font": "Formula/conditionsregularuprightserif;3captionsitalicregular, noactualbold. Chemicaldigitsandall3nrepeatSUB.",
+    "counts": {
+      "rightFilledHeads": 2,
+      "squareBracketPairs": 3,
+      "caption": 3,
+      "CSDoubleExpanded": 1,
+      "literalBaselinePlus": 1
+    },
+    "noAdded": [
+      "reactionphases",
+      "byproductNa2SO4/CS2",
+      "yield",
+      "heat/temperature",
+      "coefficientn",
+      "charges",
+      "expandedcellulosechain",
+      "captionspellingcorrection"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "native2x": "/workspace/scratch/root311-native2x.png",
+    "actualFull": "/workspace/scratch/root311-1365.png",
+    "actualHash": "563f280c31d11d9b4a18f4e73194766db58f74c8a94438c85ab69e2eecce64c8",
+    "note": "Rootinitialc1d42edanmid x746chạmngoặcbịloại; finalDUYnmid752.194=686+advanceSNa]+2, giữmọiformula/glyphpath/geometryothers. Captionxangtogenateliteral, khôngsửatheotênchuẩn."
+  }
+}
