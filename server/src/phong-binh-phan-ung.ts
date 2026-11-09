@@ -375,9 +375,10 @@ export class PhongBinhPhanUng {
     const st = await this.doc()
     if (!st) { this.gui(ws, JSON.stringify({ t: 'chua-mo' })); return }
     const nay = Date.now()
-    if (j.t === 'chao') { this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st) : L.viewEm(st, a.s))); return }
+    // Em NỐI LẠI (tắt hẳn app rồi mở lại sau khi đã báo `roi` — không kịp gửi `ve`) ⇒ coi như đã quay lại: gỡ khỏi «đang rời», bảng tắt báo động.
+    if (j.t === 'chao') { const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay); this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st) : L.viewEm(st, a.s))); if (!veLai) return; j = { t: 'chao-ve' } as Row }
     if (st.ketThuc) return
-    let doi = false, gom = false
+    let doi = j.t === 'chao-ve', gom = false
     if (a.v === 'hs') {
       const s = a.s
       if (j.t === 'tra') {
