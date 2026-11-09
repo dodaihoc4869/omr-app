@@ -95,14 +95,14 @@ M ngày Mới (cứ 2 Mới chen 1 Sửa nếu có lỗi) → 1 ngày Ôn → S�
 **Thầy làm đúng một việc:** chọn bài cho lớp (như đánh dấu bài đã dạy hiện nay). Không duyệt, không giao, không đặt hạn.
 
 **Máy tự làm:**
-1. **Lúc thầy chọn bài:** tính M ngày Mới, độ chuẩn đề (x/28), dự kiến lớp xong (khoảng ngày). **Hạn riêng từng em** đặt KHI EM BẮT ĐẦU bài (bài còn xếp hàng sau bài cũ chưa có hạn ⇒ không báo quá hạn dây chuyền) = số ngày dự báo lúc đó + 2 ngày dung sai; chốt một lần, không trôi.
+1. **Lúc thầy chọn bài:** tính M ngày Mới, độ chuẩn đề (x/28), dự kiến lớp xong (khoảng ngày). **Hạn CHUNG cả lớp** (thầy 09/11: các em học cùng nhau trên lớp) = số ngày ít nhất mà máy dự kiến ≥ 90 % em xong hết (câu mới + sửa sạch lỗi của bài + ≥ 1 ngày Ôn). Cá nhân hoá nằm trong cùng hạn: em giỏi nhiều ngày Ôn, em yếu nhiều ngày Sửa. Chi tiết + giả lập: `docs/ban-ve-giao-bai-0911/DAC-TA.md` mục 3b, `docs/de-xuat-28-cau-mo-phong/han-chung.py`.
 2. **Đề của ngày dựng khi em mở app lần đầu trong ngày** (như `goi_bai_7_ngay`; mở lại không đổi câu): cập nhật h, xếp loại ngày (Mới / Ôn / Sửa), chọn 28 câu theo mục 1–3. Việc chạy đêm chỉ gom số cho thẻ báo và dự kiến (luật tốc độ; tránh D1 429).
 3. **Tự giao:** em mở app thấy ngay «Hôm nay: Ngày Mới · Bài Amine · 28 câu».
 4. **Tự báo thầy** ở Hôm nay › Việc cần thầy (xếp theo độ gấp, số đếm trên thanh bên; không có việc thì không báo):
 
 | Báo | Khi nào | Nút một chạm |
 |---|---|---|
-| **Quá hạn bài** | em chưa xong chu kỳ bài khi qua hạn riêng | danh sách em + chậm bao nhiêu ngày |
+| **Hết hạn · chưa xong** | hết hạn chung mà em còn câu mới chưa làm hoặc lỗi của bài chưa sửa (lỗi sang bài sau, sửa trước) | danh sách em |
 | **Cần thầy chữa** | nhóm lỗi sai 3 lần (gộp vào nhóm Cần thầy chữa đang có) | mở chỗ chữa |
 | **Nên chữa chung** | từ 30 % em của lớp cùng một nhóm lỗi | mở Gọi lên bảng với đúng dạng đó |
 | **Bài thiếu câu chuẩn** | độ chuẩn < 26/28 hoặc thiếu câu Đúng/Sai | xem ô thiếu, bổ sung |
@@ -122,7 +122,7 @@ M ngày Mới (cứ 2 Mới chen 1 Sửa nếu có lỗi) → 1 ngày Ôn → S�
 - Bốn ưu tiên rút câu: đủ 28 > đúng phần > đúng mức > câu của bài; hiện «độ chuẩn x/28».
 - Ngưỡng quên 70 %; 1 ngày Ôn/bài (3 tháng cuối trước thi: 2).
 - Sửa theo nhóm dạng; 3 loại lỗi với 1 / 2 / 3 lượt; nút «Chắc / Chưa chắc» chỉ ở câu Ôn, Sửa.
-- Thẻ «Nên chữa chung» khi từ 30 % lớp cùng nhóm lỗi; hạn riêng = dự báo + 2 ngày.
+- Thẻ «Nên chữa chung» khi từ 30 % lớp cùng nhóm lỗi; hạn chung = đủ cho ≥ 90 % lớp xong hết.
 - 6 chương 0 câu trong blueprint: ngày Ôn dành 10 % nếu đã học; đề kiểm tra mô phỏng thi theo đúng blueprint.
 - Phần II tính mức theo cả câu (0/2/2) đến khi gắn mức từng ý.
 - Mâu thuẫn blueprint: theo bảng đáp án 7.2 (P2.C2 mã 0339 ý b Sai) và bảng 1.2 (P1.C8 thuộc Đại cương kim loại).

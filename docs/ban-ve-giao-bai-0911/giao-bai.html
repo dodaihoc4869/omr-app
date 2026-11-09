@@ -142,7 +142,7 @@ function homNay(){return `<main class="hn">
   <button class="nut-giao">${I.cong} Giao bài</button></div>
  <h2>Việc cần thầy</h2>
  <div class="viec">
-  <div class="the-viec do"><span class="nhan">${I.dongho} Quá hạn bài</span><b>5 em</b><span class="phu">12 Thường · Bài 7 Amine · chậm 1–4 ngày</span><button class="lam">Xem em ${I.phai}</button></div>
+  <div class="the-viec do"><span class="nhan">${I.dongho} Hết hạn · chưa xong</span><b>4 em · Bài 7 Amine</b><span class="phu">12 Thường · hạn chung hết CN 15/11 · còn lỗi chưa sửa</span><button class="lam">Xem em ${I.phai}</button></div>
   <div class="the-viec vang"><span class="nhan">${I.nhom} Nên chữa chung</span><b>14/53 em cùng sai một dạng</b><span class="phu">«Bậc của amine» · Phần I · Biết</span><button class="lam">Gọi lên bảng ${I.phai}</button></div>
   <div class="the-viec vang"><span class="nhan">${I.canh} Cần thầy chữa</span><b>6 chỗ</b><span class="phu">em sai 3 lần cùng một dạng</span><button class="lam">Mở ${I.phai}</button></div>
   <div class="the-viec xam"><span class="nhan">${I.bot} Bài thiếu câu chuẩn</span><b>Bài 10 · Polymer</b><span class="phu">thiếu 6 câu Đúng/Sai · đề chuẩn 24/28</span><button class="lam">Xem ô thiếu ${I.phai}</button></div>
@@ -155,9 +155,9 @@ function hopChon(thieu){
   ? `<div class="o-so canh"><small>Đề chuẩn</small><strong>24/28</strong><em>thiếu câu Đúng/Sai</em></div>`
   : `<div class="o-so"><small>Đề chuẩn</small><strong>26/28</strong><em>đúng mức đề thi</em></div>`
  const tenBai= thieu?'Bài 10 · Polymer':'Bài 9 · Peptide – protein'
- const cau= thieu?'84':'96', ngay= thieu?'3':'4', xong= thieu?'16–28 ngày':'13–24 ngày', moc= thieu?'25/11 – 07/12 · gồm cả Bài 7–9 đang làm':'22/11 – 03/12 · gồm cả Bài 7, 8 đang làm'
+ const cau= thieu?'84':'96', ngay= thieu?'3':'4', xong= thieu?'9 ngày':'10 ngày', moc= thieu?'13/11 → hết Thứ Bảy 21/11 · bắt đầu khi lớp xong câu mới Bài 9':'hôm nay → hết Thứ Tư 18/11 · 49/53 em dự kiến xong hết'
  return `<div class="man"><section class="hop" role="dialog" aria-label="Giao bài">
- <div class="hop-dau"><div><h2>Giao bài</h2><p><span class="dai">Chọn bài vừa dạy. Máy tự xếp 28 câu mỗi ngày cho từng em, tự đặt hạn; quá hạn báo thầy ở Việc cần thầy.</span><span class="ngan">Chọn bài vừa dạy — máy tự lo phần còn lại.</span></p></div><button class="dong" aria-label="Đóng">${I.x}</button></div>
+ <div class="hop-dau"><div><h2>Giao bài</h2><p><span class="dai">Chọn bài vừa dạy. Máy đặt hạn chung cho lớp, tự xếp 28 câu mỗi ngày cho từng em; hết hạn em nào chưa xong, máy báo thầy.</span><span class="ngan">Chọn bài vừa dạy — máy tự lo phần còn lại.</span></p></div><button class="dong" aria-label="Đóng">${I.x}</button></div>
  <div class="lop"><span class="t">Lớp</span><span class="chip on">${I.tick} 12 Thường · 53 em</span><span class="chip">12 Tinh Hoa · 38 em</span><span class="chip">12 Chuyên · 24 em</span></div>
  <div class="than">
   <div class="ds">
@@ -175,14 +175,14 @@ function hopChon(thieu){
   </div>
   <aside class="tom">
    <div class="dau"><b>${tenBai}</b> · cho <b>12 Thường · 53 em</b></div>
-   <div class="gon"><b>${tenBai.split(' · ')[0]}</b> · ${cau} câu · ${ngay} ngày Mới · ${thieu?'<span class="canh-chu">đề chuẩn 24/28 — thiếu câu Đúng/Sai</span>':'đề chuẩn 26/28'} · lớp xong ${xong}</div>
+   <div class="gon"><b>${tenBai.split(' · ')[0]}</b> · ${cau} câu · ${ngay} ngày Mới · ${thieu?'<span class="canh-chu">đề chuẩn 24/28 — thiếu câu Đúng/Sai</span>':'đề chuẩn 26/28'} · hạn chung ${thieu?'21/11':'18/11'}</div>
    <div class="o-ba">
     <div class="o-so"><small>Câu mới</small><strong>${cau}</strong><em>${ngay} ngày · 28 câu/ngày</em></div>
     ${tom}
-    <div class="o-so"><small>Lớp dự kiến xong</small><strong>${xong}</strong><em>${moc}</em></div>
+    <div class="o-so"><small>Hạn chung cả lớp</small><strong>${xong}</strong><em>${moc}</em></div>
    </div>
    ${thieu?`<div class="ghi" style="color:var(--bts-vang-chu)">${I.canh}<span>Bài 10 thiếu 6 câu Đúng/Sai: máy lấy câu trắc nghiệm thay vào chỗ thiếu, rải đều 3 ngày.</span></div><button class="nut-phu" style="align-self:flex-start">Bổ sung câu Đúng/Sai ›</button>`:''}
-   <div class="ghi">${I.dongho}<span>Hạn riêng từng em máy tự đặt khi em bắt đầu bài.</span></div>
+   <div class="ghi">${I.dongho}<span>Cả lớp chung hạn. Em xong sớm được Ôn thêm; em yếu được nhiều ngày Sửa hơn.</span></div>
    <button class="nut-chinh">Giao ${thieu?'Bài 10':'Bài 9'} cho 12 Thường</button>
    <button class="nut-phu tru">Không giao cho vài em…</button>
   </aside>
@@ -190,7 +190,7 @@ function hopChon(thieu){
 function hopXong(){return `<div class="man"><section class="hop" role="dialog" aria-label="Đã giao bài" style="max-width:560px">
  <div class="hop-dau"><div><h2>Giao bài</h2></div><button class="dong" aria-label="Đóng">${I.x}</button></div>
  <div class="xong"><div class="vong">${I.tickTo}</div><h3>Đã giao Bài 9 cho 12 Thường · 53 em</h3>
- <p>Từ hôm nay các em nhận ngày Mới 28 câu. Máy tự xếp ngày Ôn, ngày Sửa và đặt hạn cho từng em. Em nào quá hạn, máy báo thầy ở Việc cần thầy.</p>
+ <p>Hạn chung cả lớp: hết Thứ Tư 18/11. Từ hôm nay các em nhận ngày Mới 28 câu; máy tự chia ngày Ôn, ngày Sửa cho từng em trong cùng hạn. Hết hạn em nào chưa xong, máy báo thầy ở Việc cần thầy.</p>
  <div class="hang"><button class="nut-vien">Giao thêm bài</button><button class="nut-chinh">Xong</button></div></div></section></div>`}
 const g=document.getElementById('goc')
 if(man==='homnay')g.innerHTML=homNay()
