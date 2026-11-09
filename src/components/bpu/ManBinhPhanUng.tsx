@@ -229,7 +229,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const duChon = !!l && (l.tuLuan || (l.phan === 'II' ? /^[DS]{4}$/.test(chon) : chon.trim().length > 0))
   // Khoá lượt = số lượt + giờ mở: phòng bỏ lượt rỗng rồi mở câu khác cùng số ⇒ khoá khác ⇒ không che nhầm câu em chưa thấy.
   const khoaLuot = l ? `${l.so}:${l.batDau}` : ''
-  const che = !!l && (!!l.emTra || cheSo === khoaLuot)
+  // 09/11 thầy «che luôn cả em chưa gửi»: thầy mở đáp án ⇒ MỌI máy che (em chưa gửi cũng chỉ thấy kết quả, không đề, không lời giải) — nhìn lên bảng chữa bài.
+  const che = !!l && (!!l.emTra || cheSo === khoaLuot || l.pha === 'mo')
   const dangBay = !!l && bay === khoaLuot
   const guiTra = () => {
     if (!l || !duChon || che) return
@@ -316,7 +317,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       // LỚP CHE SAU KHI GỬI (thầy 09/11): kín màn, không đề, không nút mở — chỉ câu mới (số lượt đổi) mới mở. Mở đáp án ⇒ kết quả xanh / đỏ ngay trên lớp che.
       const kq = !daMo || kb || l.tuLuan ? undefined : k?.dung ? 'dung' : 'sai'
       const tieuDe = daMo
-        ? kb ? 'Cảm ơn em đã thành thật' : l.tuLuan ? 'Thầy đang chữa trên bảng' : !daGui ? 'Đáp án em gửi chưa được tính' : k?.dung ? (l.phan === 'II' ? 'Đúng cả 4 ý!' : 'Chính xác!') : 'Chưa đúng'
+        ? kb ? 'Cảm ơn em đã thành thật' : l.tuLuan ? 'Thầy đang chữa trên bảng' : !daGui && cheSo !== khoaLuot ? 'Em chưa gửi câu này' : !daGui ? 'Đáp án em gửi chưa được tính' : k?.dung ? (l.phan === 'II' ? 'Đúng cả 4 ý!' : 'Chính xác!') : 'Chưa đúng'
         : !daGui ? 'Đang gửi…' : kb ? 'Em đã báo: chưa biết làm' : l.tuLuan ? 'Đã báo thầy em làm xong' : 'Đã gửi'
       const dongPhu = daMo
         ? kb ? (l.tuLuan ? '' : `+${k?.kj ?? KJ.thanhThat} kJ thành thật · đáp án đúng: ${chuDung}`)

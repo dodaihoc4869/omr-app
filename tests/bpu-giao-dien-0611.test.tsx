@@ -165,11 +165,13 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
     expect(document.querySelector('.bpu-che')).toBeNull()
   })
-  it('em chưa gửi mà thầy mở đáp án ⇒ không che, đáp án đúng tô XANH', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «che luôn cả em chưa gửi»): mở đáp án ⇒ máy em chưa gửi cũng CHE (không đề, không lời giải), chỉ kết quả + đáp án đúng XANH.
+  it('em chưa gửi mà thầy mở đáp án ⇒ CHE, đáp án đúng tô XANH, không đề', async () => {
     const ws = await vao()
     const st = phong(); moLuot(st, cau, T0); moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByText('Em chưa gửi kịp')).toBeTruthy()
-    expect(document.querySelector('.bpu-che')).toBeNull()
+    expect(await screen.findByText('Em chưa gửi câu này')).toBeTruthy()
+    expect(document.querySelector('.bpu-che')).toBeTruthy()
+    expect(screen.queryByText(/Chất nào là amine bậc hai/)).toBeNull()
     expect(document.querySelector('.bpu-kq-o[data-kq="dung"] b')!.textContent).toBe('B')
     expect(document.querySelector('.bpu-kq-o[data-kq="sai"]')).toBeNull()
   })

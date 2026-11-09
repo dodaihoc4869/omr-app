@@ -85,26 +85,34 @@ export async function ghiTienTrinh(env: Env, buoiId: string, tt: unknown): Promi
 }
 
 // ── NĂNG LỰC để chia đội công bằng (thầy 09/11 «chia thật công bằng dựa trên năng lực của học sinh thông tin toàn bộ trên app») ──
-// Nguồn: SỔ HỌC `su_kien_hoc` (mọi lượt làm câu có chấm trên app — luyện tập, bài về nhà, kiểm tra, thi, Bình Phản Ứng đã ghi sổ…), 60 ngày gần nhất
-// (cùng cửa sổ với sức học `/gv/buoi-hoc/suc-hoc`), bỏ kết quả còn CHE (ca chưa công bố). CÔNG THỨC: tỉ lệ đúng CO VỀ 0,5 theo số câu đã làm
-//   nangLuc = (đúng + 0,5·K) / (đã làm + K), K = 10  ⇒ em chưa làm câu nào = 0,5; em làm ít câu không bị đẩy ra cực (3/3 đúng = 0,62, 60/80 = 0,72).
+// Nguồn: SỔ HỌC `su_kien_hoc` (mọi lượt làm câu có chấm trên app — luyện tập, bài về nhà, kiểm tra, thi, Bình Phản Ứng đã ghi sổ…), TOÀN BỘ THỜI GIAN
+// (thầy 09/11 «tính toàn bộ thời gian tự quyết định thông minh đỉnh cao nhất»), bỏ kết quả còn CHE (ca chưa công bố). Mỗi lượt có TRỌNG SỐ:
+//   · gần đây nặng hơn (năng lực hôm nay sát với bài gần nhất): ≤ 30 ngày ×1 · ≤ 90 ×0,7 · ≤ 180 ×0,45 · cũ hơn ×0,25;
+//   · câu khó nặng hơn: vận dụng ×1,3 · vận dụng cao ×1,5 · thông hiểu ×1 · nhận biết ×0,75;
+//   · làm lại (lần 2+, thường sau khi đã xem lời giải) ×0,5.
+//   nangLuc = (Σw·đúng + 0,5·K) / (Σw + K), K = 8 ⇒ em chưa làm câu nào = 0,5; em làm ít câu được kéo về giữa, không bị đẩy ra cực.
 // MỘT truy vấn GOM (GROUP BY sbd) chỉ cho em của buổi (lớp của buổi ∪ em đã điểm danh) — đi chỉ mục `idx_skh_em_ngay`; chạy SONG SONG với batch mở phòng.
-export const K_NANG_LUC = 10
+export const K_NANG_LUC = 8
 export const nangLucTuSo = (dung: number, daLam: number): number => L.nangLucCua((Math.max(0, dung) + 0.5 * K_NANG_LUC) / (Math.max(0, daLam) + K_NANG_LUC))
 /** Tên lớp hiệu lực trong SQL — đúng luật `tenLopCuaEm` (ten-lop.ts): đã gán ⇒ ten_lop; khối 12 ⇒ «12 - Lớp Thường»; rỗng ⇒ «Chưa xếp lớp»; còn lại ⇒ khối. */
 const SQL_TEN_LOP = "CASE WHEN TRIM(COALESCE(h.ten_lop, '')) <> '' THEN TRIM(h.ten_lop) WHEN TRIM(COALESCE(h.lop, '')) = '12' THEN '12 - Lớp Thường' WHEN TRIM(COALESCE(h.lop, '')) = '' THEN 'Chưa xếp lớp' ELSE TRIM(h.lop) END"
 const SQL_EM_CUA_BUOI = `SELECT sbd FROM buoi_hoc_diem_danh WHERE buoi_id = ? UNION SELECT h.sbd FROM hoc_sinh h JOIN buoi_hoc b ON b.id = ? AND TRIM(COALESCE(b.lop, '')) <> ''
   WHERE COALESCE(h.trang_thai, '') <> 'khoa' AND ${SQL_TEN_LOP} = TRIM(b.lop)`
+/** Trọng số một lượt (3 tham số ? = ngày VN cách hôm nay 30 / 90 / 180 ngày; so chuỗi ngày thay julianday ×3 mỗi dòng — cùng kết quả, đo 120 nghìn dòng: 63 → 39 ms). */
+const SQL_TRONG_SO = `(CASE WHEN ngay_vn >= ? THEN 1.0 WHEN ngay_vn >= ? THEN 0.7 WHEN ngay_vn >= ? THEN 0.45 ELSE 0.25 END)
+  * (CASE LOWER(COALESCE(muc_do, '')) WHEN 'van_dung' THEN 1.3 WHEN 'vd' THEN 1.3 WHEN 'vdc' THEN 1.5 WHEN 'van_dung_cao' THEN 1.5 WHEN 'biet' THEN 0.75 WHEN 'nb' THEN 0.75 ELSE 1.0 END)
+  * (CASE WHEN COALESCE(lan, 1) > 1 THEN 0.5 ELSE 1.0 END)`
 const sqlNangLuc = (nguon: string, che: boolean) =>
-  `SELECT sbd, COUNT(*) AS n, SUM(CASE WHEN ket_qua = 1 THEN 1 ELSE 0 END) AS d FROM su_kien_hoc WHERE sbd IN (${nguon}) AND ngay_vn >= ? AND ket_qua IS NOT NULL${che ? " AND COALESCE(visibility, '') <> 'embargoed'" : ''} GROUP BY sbd`
-/** Ngày VN 59 ngày trước hôm nay (cửa sổ 60 ngày, như sức học). */
-const tuNgayNangLuc = (nay: number): string => new Date(Date.parse(new Date(nay + 7 * 3_600_000).toISOString().slice(0, 10) + 'T00:00:00Z') - 59 * 86_400_000).toISOString().slice(0, 10)
+  `SELECT sbd, SUM(w) AS n, SUM(CASE WHEN ket_qua = 1 THEN w ELSE 0 END) AS d FROM (SELECT sbd, ket_qua, ${SQL_TRONG_SO} AS w FROM su_kien_hoc
+  WHERE sbd IN (${nguon}) AND ket_qua IS NOT NULL${che ? " AND COALESCE(visibility, '') <> 'embargoed'" : ''}) GROUP BY sbd`
+/** Ngày VN hôm nay (mốc tính tuổi của từng lượt). */
+const ngayCachNangLuc = (nay: number, soNgay: number): string => new Date(nay + 7 * 3_600_000 - soNgay * 86_400_000).toISOString().slice(0, 10)
 /** sbd → năng lực (em vắng trong map ⇒ phòng tự dùng 0,5). `buoiId` ⇒ em của buổi; `sbd` ⇒ đúng các em đó. Sổ cũ chưa có cột `visibility` ⇒ đọc lại không lọc;
  *  lỗi nữa ⇒ map rỗng (chia đội vẫn chạy, mọi em 0,5) — KHÔNG làm hỏng việc mở phòng. */
 export async function docNangLucBpu(env: Env, o: { buoiId: string } | { sbd: string[] }, nay = Date.now()): Promise<Map<string, number>> {
   const [nguon, tham] = 'buoiId' in o ? [SQL_EM_CUA_BUOI, [o.buoiId, o.buoiId]] : ['SELECT value FROM json_each(?)', [JSON.stringify(o.sbd)]]
-  const tu = tuNgayNangLuc(nay)
-  const hoi = (che: boolean) => env.DB.prepare(sqlNangLuc(nguon, che)).bind(...tham, tu).all<Row>().then((r) => r.results ?? [])
+  const moc = [30, 90, 180].map((n) => ngayCachNangLuc(nay, n))
+  const hoi = (che: boolean) => env.DB.prepare(sqlNangLuc(nguon, che)).bind(...moc, ...tham).all<Row>().then((r) => r.results ?? [])
   const dong = await hoi(true).catch(() => hoi(false)).catch(() => [] as Row[])
   return new Map(dong.map((x) => [str(x.sbd), nangLucTuSo(Number(x.d) || 0, Number(x.n) || 0)]))
 }
