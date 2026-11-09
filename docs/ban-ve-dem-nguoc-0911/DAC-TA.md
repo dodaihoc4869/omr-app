@@ -7,7 +7,7 @@ Thầy: «làm thêm một cái gì đó đếm ngược ngày thi đại học 
 - Nhắc em mỗi ngày còn bao nhiêu ngày, nối với nhịp 28 câu/ngày — động lực, không gây hoảng.
 
 ## 2. Bố cục (ảnh `dt-*` 390 px, `mb-*` 820 px, `mt-*` 1366 px; sáng / tối)
-- Thẻ ngay dưới lời chào, trên Việc hôm nay. Trái: ô số lớn (mặt tô + gờ nổi như nút app) «225 NGÀY». Phải: nhãn trạng thái · «Thi tốt nghiệp THPT» · «Thứ Ba · 22/06/2027» · «≈ 32 tuần · đủ 28 câu mỗi ngày là thêm 6.300 câu» · thanh chặng đường năm học lớp 12 «đã đi 22 %» (máy tính thêm «Khai giảng 05/09»).
+- Thẻ ngay dưới lời chào, trên Việc hôm nay. Trái: ô số lớn (mặt tô + gờ nổi như nút app) «225 NGÀY». Phải: nhãn trạng thái · «Thi tốt nghiệp THPT» · «Thứ Ba · 22/06/2027» · «≈ 32 tuần · đủ 28 câu mỗi ngày là thêm 6.300 câu» · mép phải: **ống nghiệm có vạch chia 25/50/75 %** (thầy 09/11 «chèn vào khung ống thí nghiệm cho tinh tế») — mực chất lỏng = phần năm học lớp 12 đã đi (22 %), mặt khum, bọt khí tĩnh, nhãn «22 % năm học»; máy tính thêm dòng «đã đi 22 % năm học lớp 12 · từ khai giảng 05/09». Chất lỏng đổi màu theo chặng như ô số.
 - Màu theo chặng (đúng bảng màu app học sinh `trong-hs-mau.css`, không thêm màu): còn > 30 ngày chàm «ĐẾM NGƯỢC» (`*-1-binh`) · ≤ 30 ngày cam «CHẶNG NƯỚC RÚT» (`*-2-gap`) · ≤ 7 ngày cam «TUẦN CUỐI» (`*-3-tuan`) · đúng ngày thi xanh lục «HÔM NAY» + mũ tốt nghiệp + lời chúc (`*-4-thi`). Sau ngày thi: thẻ ẩn.
 
 ## 3. Trạng thái

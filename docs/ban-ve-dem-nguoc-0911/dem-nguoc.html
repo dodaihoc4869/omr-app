@@ -27,7 +27,7 @@ body{margin:0;background:var(--tr-nen);color:var(--tr-chu);font-family:'Be Vietn
 .cho{border:2px dashed var(--tr-vien);border-radius:20px;height:180px;display:grid;place-items:center;color:var(--tr-chu-3);font-size:14px;margin-top:16px}
 /* ───── THẺ ĐẾM NGƯỢC ───── */
 .dn{--m:var(--tr-hs-chu);--m-nut:var(--tr-hs-nut);--m-nhat:var(--tr-hs-nhat);--m-go:var(--tr-hs-go);
- position:relative;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:18px;padding:18px 20px 20px;border-radius:22px;
+ position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;padding:18px 20px 20px;border-radius:22px;
  background:var(--tr-mat);border:2px solid var(--tr-vien);box-shadow:0 4px 0 var(--tr-vien);overflow:hidden}
 .dn[data-tt='gap'],.dn[data-tt='tuan']{--m:var(--tr-chu-y-chu);--m-nut:var(--tr-chu-y-nut);--m-nhat:var(--tr-chu-y-nhat);--m-go:var(--tr-chu-y-day)}
 .dn[data-tt='thi']{--m:var(--tr-dung-chu);--m-nut:var(--tr-dung);--m-nhat:var(--tr-dung-nhat);--m-go:var(--tr-dung-day)}
@@ -43,9 +43,22 @@ body{margin:0;background:var(--tr-nen);color:var(--tr-chu);font-family:'Be Vietn
 .phu{font-size:14px;font-weight:500;color:var(--tr-chu-3)}
 .thanh{margin-top:4px;height:10px;border-radius:999px;background:var(--tr-mat-2);overflow:hidden;border:1px solid var(--tr-vien)}
 .thanh i{display:block;height:100%;border-radius:999px;background:var(--m-nut)}
-.duoi{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;font-weight:500;color:var(--tr-chu-3);flex-wrap:wrap}
+.duoi{display:flex;gap:6px;font-size:12.5px;font-weight:500;color:var(--tr-chu-3);flex-wrap:wrap}
 .duoi b{color:var(--m);font-weight:700}
-@media (max-width:480px){.dn{gap:14px;padding:16px}.so{min-width:88px;padding:8px 10px 11px}.so b{font-size:38px}.tieu{font-size:16.5px}.duoi .kg{display:none}.duoi{justify-content:flex-end}}
+/* ỐNG NGHIỆM (thầy 09/11 «chèn vào khung ống thí nghiệm cho tinh tế»): mực chất lỏng = phần năm học lớp 12 đã đi; vạch chia 25/50/75 %; bọt khí tĩnh.
+   Thủy tinh = viền chữ mờ + mặt nhạt; chất lỏng = màu chặng (--m-nut), mặt khum sáng hơn (--m-nhat). Không chuyển động (máy yếu, dễ chịu mắt). */
+.ong{display:flex;flex-direction:column;align-items:center;gap:4px}
+.ong svg{display:block;width:38px;height:128px}
+.ong .thuy-tinh{fill:var(--tr-mat-2);stroke:var(--tr-chu-3);stroke-opacity:.55;stroke-width:2}
+.ong .mieng{fill:var(--tr-mat);stroke:var(--tr-chu-3);stroke-opacity:.55;stroke-width:2}
+.ong .long{fill:var(--m-nut)}
+.ong .khum{fill:var(--m-nhat);opacity:.9}
+.ong .bot{fill:var(--tr-hs-tren);opacity:.55}
+.ong .vach{stroke:var(--tr-chu-3);stroke-opacity:.45;stroke-width:1.5;stroke-linecap:round}
+.ong .ane{fill:#fff;opacity:.35}
+.ong small{display:flex;flex-direction:column;align-items:center;line-height:1.15;font-size:12px;font-weight:700;color:var(--m);font-variant-numeric:tabular-nums}
+.ong small span{font-size:10.5px;font-weight:500;color:var(--tr-chu-3)}
+@media (max-width:480px){.dn{gap:12px;padding:16px}.ong svg{width:30px;height:112px}.so{min-width:88px;padding:8px 10px 11px}.so b{font-size:38px}.tieu{font-size:16.5px}.duoi{display:none}}
 </style>
 </head>
 <body>
@@ -57,6 +70,26 @@ const NGAY_THI=Date.UTC(2027,5,22), KHAI_GIANG=Date.UTC(2026,8,5)
 const HOM_NAY={binh:Date.UTC(2026,10,9),gap:Date.UTC(2027,4,30),tuan:Date.UTC(2027,5,17),thi:Date.UTC(2027,5,22)}[tt]
 const con=Math.round((NGAY_THI-HOM_NAY)/864e5), pt=Math.round(100*(HOM_NAY-KHAI_GIANG)/(NGAY_THI-KHAI_GIANG))
 const nf=n=>n.toLocaleString('vi-VN')
+// Ống nghiệm 38×128 (đơn vị viewBox): miệng loe trên, thân y 12→118, đáy tròn bán kính 11. Mực = pt % chiều cao thân (đo từ đáy).
+function ongNghiem(pt){
+  const top=14, day=117, h=day-top, muc=day-h*Math.max(0,Math.min(100,pt))/100
+  const than='M8 12 H30 V106 A11 11 0 0 1 8 106 Z'
+  return `<div class="ong" role="img" aria-label="Ống nghiệm: đã đi ${pt}% năm học lớp 12">
+  <svg viewBox="0 0 38 128" aria-hidden="true">
+    <defs><clipPath id="cl"><path d="${than}"/></clipPath></defs>
+    <path class="thuy-tinh" d="${than}"/>
+    <g clip-path="url(#cl)">
+      <rect class="long" x="0" y="${muc}" width="38" height="${128-muc}"/>
+      <ellipse class="khum" cx="19" cy="${muc}" rx="11" ry="2.6"/>
+      ${pt>8?`<circle class="bot" cx="15" cy="${Math.min(day-8,muc+14)}" r="2.2"/><circle class="bot" cx="23" cy="${Math.min(day-4,muc+26)}" r="1.6"/><circle class="bot" cx="18" cy="${Math.min(day-2,muc+36)}" r="1.2"/>`:''}
+    </g>
+    ${[25,50,75].map(p=>{const y=day-h*p/100;return `<line class="vach" x1="24" y1="${y}" x2="30" y2="${y}"/>`}).join('')}
+    <rect class="ane" x="11" y="18" width="3" height="70" rx="1.5"/>
+    <rect class="mieng" x="5" y="8" width="28" height="6" rx="3"/>
+  </svg>
+  <small>${pt}%<span>năm học</span></small>
+</div>`
+}
 const loai=con===0?'thi':con<=7?'tuan':con<=30?'gap':'binh'
 const nhan={binh:'Đếm ngược',gap:'Chặng nước rút',tuan:'Tuần cuối',thi:'Hôm nay'}[loai]
 const tieu='Thi tốt nghiệp THPT'
@@ -70,9 +103,9 @@ document.getElementById('goc').innerHTML=`
     <div class="tieu">${tieu}</div>
     <div class="ngay-thi">Thứ Ba · 22/06/2027</div>
     <div class="phu">${phu}</div>
-    ${loai==='thi'?'':`<div class="thanh" role="progressbar" aria-valuenow="${pt}" aria-valuemin="0" aria-valuemax="100" aria-label="Chặng đường năm học lớp 12"><i style="width:${pt}%"></i></div>
-    <div class="duoi"><span class="kg">Khai giảng 05/09</span><span>đã đi <b>${pt}%</b> năm học lớp 12</span></div>`}
+    ${loai==='thi'?'':`<div class="duoi"><span>đã đi <b>${pt}%</b> năm học lớp 12 · từ khai giảng 05/09</span></div>`}
   </div>
+  ${ongNghiem(loai==='thi'?100:pt)}
 </section>
 <div class="cho">Việc hôm nay và phần dưới — giữ nguyên</div>`
 </script>
