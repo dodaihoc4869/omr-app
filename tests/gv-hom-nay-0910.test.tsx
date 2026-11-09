@@ -16,7 +16,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import type { CaTomTat } from '../src/lib/exam-api'
 import type { BangChienDich, ChienDichTom } from '../src/components/chien-dich/api'
 
@@ -283,12 +283,13 @@ describe('màn Hôm nay của thầy — số từ API', () => {
     mayChu()
     render(<GvHomNayScreen />)
     fireEvent.click(await screen.findByRole('button', { name: /^Cần thầy chữa · 8 chỗ.*Chữa bài$/ }))
-    expect(useAppStore.getState().screen).toBe('chiendich')
-    expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'can-chua' })
+    // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «bỏ hẳn hành trình cũ đi»): Cần thầy chữa mở TẤM BUỔI DẠY (Chữa câu khó) ngay trên Hôm nay, không sang màn Hành trình.
+    expect(useAppStore.getState().screen).not.toBe('chiendich')
+    expect(await screen.findByRole('dialog', { name: 'Chữa câu khó & tính toán' })).toBeTruthy()
+    { const { dongHoatDong } = await import('../src/components/bpu/gan-gv'); act(() => dongHoatDong()) } // tấm gắn ngoài cây React của test ⇒ đóng tay, không rò sang test sau
     // SỬA CÓ CHỦ ĐÍCH 21/10 (thầy: "nút này làm riêng bấm vào popup lên để chọn luôn"): "Bổ sung bài" mở hộp tại chỗ, không đặt lối vào Hành trình.
     fireEvent.click(screen.getByRole('button', { name: /^12A2: 3 ngày chưa có bài mới.*Bổ sung bài$/ }))
     expect(await screen.findByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeTruthy()
-    expect(useSoDemGv.getState().moHanhTrinh).toEqual({ the: 'can-chua' })
     fireEvent.click(screen.getByRole('button', { name: 'Giả: đóng hộp' }))
     expect(screen.queryByRole('dialog', { name: 'Bổ sung bài hôm nay' })).toBeNull()
     useSoDemGv.getState().datMoHanhTrinh(null)

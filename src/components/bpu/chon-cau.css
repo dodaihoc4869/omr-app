@@ -57,3 +57,18 @@
 @media (prefers-reduced-motion: reduce) { .bcc { animation: none; } .bcc-cau, .bcc-bai { transition: none; } }
 html.may-yeu .bcc { animation: none; }
 html.may-yeu :is(.bcc-cau, .bcc-bai) { transition: none; }
+/* «Hôm nay làm gì?» (09/11): bốn thẻ lớn, thẻ Dạy học là thẻ chính (viền màu nhấn). */
+.bcc-hd { grid-template-columns: 1fr; }
+.bcc-hd-luoi { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-content: start; }
+.bcc-hd-the { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 26px; row-gap: 8px; align-items: center; min-height: 250px; padding: 34px 40px; border: 0; border-radius: 30px; text-align: left; cursor: pointer; font-family: var(--sans);
+  background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 2px var(--tr-vien); transition: transform 0.2s cubic-bezier(.2, .8, .2, 1), box-shadow 0.2s, background-color 0.2s; }
+.bcc-hd-the[data-chinh] { background: color-mix(in srgb, var(--tr-tin) 14%, var(--tr-mat)); box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--tr-tin) 60%, transparent); }
+.bcc-hd-the:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 3px var(--tr-tin), 0 18px 40px color-mix(in srgb, var(--tr-nen) 60%, transparent); }
+.bcc-hd-the:active { transform: scale(0.985); }
+.bcc-hd-the:focus-visible { outline: 4px solid var(--tr-tin); outline-offset: 4px; }
+.bcc-hd-icon { grid-row: 1 / span 2; display: grid; place-items: center; width: 96px; height: 96px; border-radius: 28px; background: var(--tr-mat-2); color: var(--tr-tin); }
+.bcc-hd-the b { align-self: end; font-size: 38px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; }
+.bcc-hd-the > span:not(.bcc-hd-icon) { align-self: start; font-size: 24px; line-height: 1.4; color: var(--tr-chu-2); }
+.bcc-hd-the kbd { position: absolute; right: 26px; top: 22px; font: 700 20px var(--sans); padding: 4px 12px; border-radius: 10px; background: var(--tr-mat-3); color: var(--tr-chu-2); }
+@media (prefers-reduced-motion: reduce) { .bcc-hd-the { transition: none; } }
+html.may-yeu .bcc-hd-the { transition: none; }

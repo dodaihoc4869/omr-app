@@ -13,7 +13,6 @@ const gioMo = (iso: string) => { const d = new Date(iso); return Number.isNaN(d.
 
 export default function NutDiemDanh({ className }: { className: string }) {
   const showToast = useAppStore((s) => s.showToast)
-  const setScreen = useAppStore((s) => s.setScreen)
   const [dang, setDang] = useState(false)
   const [hoi, setHoi] = useState<{ dangMo: BuoiHoc | null; ds: string[]; tra: (c: ChonDiemDanh) => void } | null>(null)
   const hop = useRef<HTMLDivElement>(null)
@@ -26,7 +25,7 @@ export default function NutDiemDanh({ className }: { className: string }) {
       const kq = await m.batDauDiemDanh((o) => new Promise((tra) => setHoi({ ...o, tra })))
       if (kq.loai === 'loi') showToast(kq.chu, 'warn')
       else if (kq.loai === 'ket-thuc') showToast(`Đã kết thúc buổi ${kq.lop}`, 'success')
-      else if (kq.loai === 'trang') setScreen('chiendich')
+      else if (kq.loai === 'trang') void import('../bpu/gan-gv').then((g) => g.moHoatDong('dau-gio'))
     } catch {
       showToast('Chưa mở được điểm danh. Thầy thử lại.', 'warn')
     } finally {
@@ -74,7 +73,7 @@ export default function NutDiemDanh({ className }: { className: string }) {
             </div>
           ) : null}
           <div className="gvhn-chon-lop-cuoi">
-            <button type="button" className="gvhn-chon-lop-huy" onClick={() => hoi.tra({ loai: 'trang' })}>Trang buổi dạy: đầu giờ, chữa câu, ôn tập</button>
+            <button type="button" className="gvhn-chon-lop-huy" onClick={() => hoi.tra({ loai: 'trang' })}>Buổi dạy: đầu giờ · chữa câu · ôn tập</button>
             <button type="button" className="gvhn-chon-lop-huy" onClick={() => hoi.tra(null)}>Huỷ</button>
           </div>
         </div>

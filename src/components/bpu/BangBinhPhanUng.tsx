@@ -98,15 +98,17 @@ export interface PropsBang {
   diemDanh?: boolean
   /** (09/11) Nơi gắn bảng (khung của gốc chung gan-gv) ⇒ thu nhỏ / ẩn khung là ẩn đúng bảng. Không có ⇒ body. */
   gocPortal?: HTMLElement | null
+  /** (09/11) «Hôm nay làm gì?» sau điểm danh: Kiểm tra đầu giờ / Chữa câu khó / Kiểm tra ôn tập ⇒ tấm buổi dạy (gan-gv). */
+  onHoatDong?: (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => void
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, diemDanh = false }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, diemDanh = false, onHoatDong }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   const [v, setV] = useState<ViewBang | null>(() => (qid ? null : { t: 'bang', buoiId, lop: '', soLuot: 0, ketThuc: false, doiThuong: [0, 0, 0, 0], doiDu: null, soDoi: 4, vuaVao: [], lichSu: [], ds: [], luot: null }))
   const laDiemDanh = useRef(!qid)
   laDiemDanh.current = !qid // một bảng đi suốt điểm danh → các lượt (09/11): theo câu HIỆN TẠI, không theo lúc dựng
   /** Bảng chọn câu đang mở (09/11). Câu mới về (qid đổi) ⇒ tự đóng. */
-  const [chon, setChon] = useState(false)
+  const [chon, setChon] = useState<false | 'hd' | 'cau'>(false)
   useEffect(() => { setChon(false) }, [qid, luot])
   /** Bảng đang thu vào tờ cũ (em lên bảng): phím không xử lý ở bảng, vẽ canvas tạm dừng. */
   const anRef = useRef(false)
@@ -407,7 +409,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       const kk = e.key.toLowerCase()
       // Bảng chọn câu mở: chỉ Esc (đóng bảng chọn); phím khác để bảng chọn dùng (không lỡ tay gọi em / chuyển câu).
       if (chon) { if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); setChon(false) } return }
-      if (onChieuCau && (kk === 'c' || (e.key === 'Enter' && man === 'diem-danh'))) { e.preventDefault(); setChon(true); return }
+      if (onChieuCau && (kk === 'c' || (e.key === 'Enter' && man === 'diem-danh'))) { e.preventDefault(); setChon(man === 'diem-danh' ? 'hd' : 'cau'); return }
       // Esc chỉ đóng BẢNG (thầy 07/11 «bấm esc xong không có chỗ mở lại tờ chiếu»): chặn lan ⇒ khung tờ chiếu bên dưới không đóng theo.
       if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation(); if (moPhim) setMoPhim(false); else if (manPhu) setManPhu(null); else onDong(); return }
       if (e.key === '?') { setMoPhim((m) => !m); return }
@@ -442,7 +444,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   // THANH TRÊN (09/11 «các nút bấm thuận tiện cho việc gọi học sinh lên bảng»): MỘT nút chính theo màn — Xong điểm danh · Gọi lên bảng · Câu tiếp;
   // «Chọn câu» luôn sẵn; mã vào lớp nằm cạnh tên lớp (em đến muộn vẫn vào được). Câu đang chiếu: logo thu còn ngọn lửa cho rộng chỗ.
   const chinh = chon || giaoTo ? null
-    : man === 'diem-danh' ? (onChieuCau ? <button type="button" className="bb-chinh" onClick={() => setChon(true)}>Xong điểm danh · Chọn câu<kbd>Enter</kbd></button> : null)
+    : man === 'diem-danh' ? (onChieuCau ? <button type="button" className="bb-chinh" onClick={() => setChon('hd')}>Xong điểm danh<kbd>Enter</kbd></button> : null)
     : man === 'tra-loi' ? <button type="button" className="bb-chinh" disabled={dangGoi} onClick={() => void goiLen()}>{dangGoi ? 'Đang chọn em…' : 'Lên bảng'}<kbd>L</kbd></button>
     : (man === 'goi' || man === 'lam-bang') ? <button type="button" className="bb-hoi" onClick={() => gui({ t: 'mo' })}><kbd>Space</kbd>Mở đáp án</button>
     : (man === 'mo' || man === 'dua') && onToi ? <button type="button" className="bb-chinh" onClick={() => sangCau(1)}>Câu tiếp<kbd>→</kbd></button> : null
@@ -485,7 +487,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     const vua = v.vuaVao.slice(-2).reverse().map((s) => ds.find((e) => e.sbd === s)).filter(Boolean) as Em[]
     noi = (
       <>
-        {tren(<div className="bb-pill">{chon ? 'Chọn câu' : 'Điểm danh'}</div>)}
+        {tren(<div className="bb-pill">{chon === 'hd' ? 'Hôm nay làm gì?' : chon ? 'Chọn câu' : 'Điểm danh'}</div>)}
         <div className="bb-dd">
           <h2>Vào lớp: mở app, nhập mã</h2>
           <p className="phu">Một mã cho cả điểm danh lẫn Bình Phản Ứng. Mỗi bạn vào lớp: +{KJ.vaoLop} kJ cho đội.</p>
@@ -594,7 +596,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         {/* RỜI MÀN (thầy 09/11 «thoát app là báo động viền đỏ nhấp nháy trên bảng cộng thẻ tên … để thầy và cả lớp thấy»; không trừ kJ): em đang ở ngoài app
             (phòng giữ `roiNay`, gỡ khi em quay lại) ⇒ viền đỏ nhấp nháy quanh bảng + thẻ tên giữa trên. */}
         {roiNay.length ? <><div className="bb-bao-dong" aria-hidden="true" /><div className="bb-bao-the" role="alert"><b>Đang rời màn hình</b><span>{roiNay.map((s) => { const e = ds.find((x) => x.sbd === s); return e ? (an ? `Em số ${ds.indexOf(e) + 1}` : e.ten) : s }).join(' · ')}</span></div></> : null}
-        {chon && onChieuCau ? <Suspense fallback={<div className="bb-cho-chon">Đang mở bảng chọn câu…</div>}><ChonCauBpu buoiId={buoiId} lop={v?.lop ?? ''} onChieu={onChieuCau} onDong={() => setChon(false)} /></Suspense> : null}
+        {chon && onChieuCau ? <Suspense fallback={<div className="bb-cho-chon">Đang mở bảng chọn câu…</div>}><ChonCauBpu buoiId={buoiId} lop={v?.lop ?? ''} buocDau={chon} onChieu={onChieuCau} onHoatDong={onHoatDong ? (hd) => { setChon(false); onHoatDong(hd) } : undefined} onDong={() => setChon(false)} /></Suspense> : null}
         {vietBang && l?.goi && goiEm ? <VungVietBang g={l.goi} em={goiEm} tenHien={(e: Em) => (an ? ten(e) : e.ten)} onBat={() => setBatLai(true)} /> : null}
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />
       </div>

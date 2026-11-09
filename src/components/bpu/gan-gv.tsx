@@ -92,6 +92,7 @@ function veBang(): void {
       onKhongMo={khongMo}
       onTat={tatBpu}
       onChieuCau={chieuCau}
+      onHoatDong={moHoatDongTuBang}
       gocPortal={khung}
     />,
   )
@@ -103,6 +104,8 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   if (!buoiId) return
   if (o.nguon) nguonTo = o.nguon
   dem += 1
+  // Bảng đang lui sau tấm buổi dạy (Kiểm tra đầu giờ / Chữa câu…) mà tờ của khối ấy vừa báo câu ⇒ bảng hiện lại với câu đó.
+  if (anViHd) { anViHd = false; hienBang() }
   const cung = hien?.buoiId === buoiId
   hien = { ...(cung ? { ma: hien!.ma, linkQr: hien!.linkQr } : {}), buoiId, qid, luot: dem, giay: o.giay, tuDong }
   veBang()
@@ -122,6 +125,23 @@ export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | 
   if (!hien || hien.buoiId !== buoiId || (hien.ma === ma && hien.linkQr === linkQr)) return
   hien = { ...hien, ma, linkQr }
   veBang()
+}
+
+// TẤM BUỔI DẠY (09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong … bỏ hẳn hành trình cũ»): Kiểm tra đầu giờ · Chữa câu khó
+// & tính toán · Kiểm tra ôn tập mở trên tấm riêng (dưới tờ chiếu, dưới bảng). Mở từ bảng ⇒ bảng lui (ẩn, giữ nối); khối chiếu câu ⇒ bảng hiện lại.
+let hdGoc: Root | null = null
+let hdKhung: HTMLDivElement | null = null
+let anViHd = false
+export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
+  const { default: Tam } = await import('./TamHoatDong')
+  if (!hdKhung) { hdKhung = document.createElement('div'); hdKhung.setAttribute('data-bpu-hd', ''); document.body.appendChild(hdKhung); hdGoc = createRoot(hdKhung) }
+  hdGoc!.render(<Tam key={hd} hd={hd} coBang={!!khung} onDong={dongHoatDong} />)
+  if (khung && !bangAn()) { anViHd = true; anBang() }
+}
+const moHoatDongTuBang = (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => { void moHoatDong(hd) }
+export function dongHoatDong(): void {
+  hdGoc?.unmount(); hdGoc = null; hdKhung?.remove(); hdKhung = null
+  if (anViHd) { anViHd = false; hienBang() }
 }
 
 // TỜ CHIẾU CỦA CÂU THẦY CHỌN TRÊN BẢNG: khung xem tờ (KhungXemPhieu, cùng khung bảng Dạy học dùng) nằm DƯỚI bảng. Tờ vào đợt ⇒ tự báo câu ⇒ bảng mở lượt.

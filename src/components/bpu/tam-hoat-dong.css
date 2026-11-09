@@ -1,0 +1,17 @@
+/* TẤM BUỔI DẠY (09/11) — thay màn Hành trình. Nền app thầy («Trong», biến --tr-*); nằm dưới tờ chiếu (z 99999) và dưới bảng Bình Phản Ứng. */
+.thd { position: fixed; inset: 0; z-index: 99990; display: flex; flex-direction: column; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; animation: thd-vao 0.32s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes thd-vao { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.thd-dau { flex: none; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 12px max(16px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid var(--tr-vien); background: var(--tr-mat); }
+.thd-ve { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 8px; border: 0; border-radius: 12px; background: none; color: var(--tr-chu-2); font: 600 15px/1 inherit; cursor: pointer; }
+.thd-ve:hover { background: var(--tr-mat-2); color: var(--tr-chu); }
+.thd-tab { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; padding: 4px; border-radius: 14px; background: var(--tr-mat-2); }
+.thd-tab button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: none; color: var(--tr-chu-2); font: 600 14px/1 inherit; cursor: pointer; transition: background-color 0.15s, color 0.15s; }
+.thd-tab button[aria-current='true'] { background: var(--tr-mat); color: var(--tr-chu); box-shadow: 0 1px 3px color-mix(in srgb, var(--tr-chu) 14%, transparent); }
+.thd-than { flex: 1; min-height: 0; overflow-y: auto; padding: 24px max(16px, calc((100vw - 1180px) / 2)) 48px; }
+.thd-tieu-de { margin-bottom: 18px; }
+.thd-tieu-de h1 { margin: 0; font-size: 26px; font-weight: 700; letter-spacing: -0.01em; }
+.thd-tieu-de p { margin: 4px 0 0; font-size: 15px; color: var(--tr-chu-2); }
+.thd-cho { height: 220px; border-radius: 20px; }
+@media (max-width: 720px) { .thd-tab { margin-left: 0; width: 100%; } .thd-tab button { flex: 1; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .thd { animation: none; } }
+html.may-yeu .thd { animation: none; }
