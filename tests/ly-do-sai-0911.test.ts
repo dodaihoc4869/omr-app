@@ -24,6 +24,10 @@ describe('lySach / docCotLyDo', () => {
     expect(lySach('x')).toEqual([])
     expect(lySach([['q1', 'tinh'], ['q2', 'la'], [3, 'cach'], ['q3'], ['q1', 'nham'], ['x'.repeat(121), 'cach']])).toEqual([['q1', 'nham']])
     expect(lySach(Array.from({ length: 30 }, (_, i) => [`q${i}`, 'cach']))).toHaveLength(20)
+    // câu song sinh phát thay ⇒ ghi theo câu GỐC (ngày Sửa xếp theo câu gốc)
+    expect(lySach([['X~ss0', 'nham'], ['X', 'tinh']])).toEqual([['X', 'tinh']])
+    // đọc: dòng cũ ghi theo mã song sinh quy về gốc; dòng mới hơn (đứng sau) thắng; dấu cc quy về gốc
+    expect([...docCotLyDo('[["X~ss0","nham"],["X","tinh"],["cc:Y~ss1","cc"]]')]).toEqual([['X', 'tinh'], ['cc:Y', 'cc']])
     expect([...docCotLyDo('[["a","cach"],["b","la"],["c","nham"]]')]).toEqual([['a', 'cach'], ['c', 'nham']])
     expect(docCotLyDo(null).size).toBe(0)
     expect(docCotLyDo('{')).toEqual(new Map())
@@ -84,6 +88,11 @@ describe('dấu «Chưa chắc» (khối B lát 5)', () => {
     await ghiChuaChac(k.env, 'S1', 'q1', true, '2026-11-10T03:00:00Z')
     expect(lyDaGhi(k)).toHaveLength(2)
     await ghiChuaChac(k.env, 'S1', 'q1', false, '2026-11-11T02:00:00Z')
+    expect(lyDaGhi(k)).toEqual([{ qid: 'q1', ly: 'nham' }])
+    // câu sửa phát dạng song sinh: dấu ghi / xoá theo câu gốc
+    await ghiChuaChac(k.env, 'S1', 'q1~ss0', true, '2026-11-12T02:00:00Z')
+    expect(lyDaGhi(k)).toEqual([{ qid: 'cc:q1', ly: 'cc' }, { qid: 'q1', ly: 'nham' }])
+    await ghiChuaChac(k.env, 'S1', 'q1~ss2', false, '2026-11-13T02:00:00Z')
     expect(lyDaGhi(k)).toEqual([{ qid: 'q1', ly: 'nham' }])
   })
 })

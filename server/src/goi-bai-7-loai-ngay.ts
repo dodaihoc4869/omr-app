@@ -20,7 +20,7 @@ export async function docMucLoai7(env: Env, sbd: string, ngay: string): Promise<
   if (ngay < NGAY_LOAI_NGAY) return { muc: await docMucCu(env, sbd, ngay), loai: null, truoc: [] }
   const q = 'SELECT loai FROM goi_bai_7_loai_ngay WHERE sbd=? AND ngay'
   // 09/11 lát 3: lý do sai («Vì sao em sai?», goi_bai_7_ly_do) đọc CÙNG câu (nhóm lỗi ngày Sửa) — câu có cột ấy lỗi ⇒ đọc lại không cột (chỉ khi lỗi).
-  const doc = (ly: boolean) => env.DB.prepare(`SELECT m.tang,m.toi_thieu_tang,m.quota,m.muc,(${q}=?) loai,(${q}<? ORDER BY ngay DESC LIMIT 1) t1,(${q}<? ORDER BY ngay DESC LIMIT 1 OFFSET 1) t2${ly ? ',(SELECT json_group_array(json_array(qid,ly)) FROM goi_bai_7_ly_do WHERE sbd=?) ly' : ''}
+  const doc = (ly: boolean) => env.DB.prepare(`SELECT m.tang,m.toi_thieu_tang,m.quota,m.muc,(${q}=?) loai,(${q}<? ORDER BY ngay DESC LIMIT 1) t1,(${q}<? ORDER BY ngay DESC LIMIT 1 OFFSET 1) t2${ly ? ',(SELECT json_group_array(json_array(qid,ly)) FROM (SELECT qid,ly,luc FROM (SELECT qid,ly,luc FROM goi_bai_7_ly_do WHERE sbd=? ORDER BY luc DESC LIMIT 400) ORDER BY luc)) ly' : ''}
     FROM (SELECT 1) x LEFT JOIN goi_bai_7_muc_ngay m ON m.sbd=? AND m.ngay=?`).bind(sbd, ngay, sbd, ngay, sbd, ngay, ...(ly ? [sbd] : []), sbd, ngay).first<Row>()
   const r = await doc(true).catch(() => doc(false)).catch(() => undefined)
   if (r === undefined) return { muc: await docMucCu(env, sbd, ngay), loai: null, truoc: [] }

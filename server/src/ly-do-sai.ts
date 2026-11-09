@@ -6,12 +6,14 @@ import type { Env } from './kieu'
 
 export type LyDoSai = 'tinh' | 'cach' | 'nham'
 export const laLyDoSai = (x: unknown): x is LyDoSai => x === 'tinh' || x === 'cach' || x === 'nham'
+/** Câu song sinh / anh em phát thay («<gốc>~ss0») ⇒ câu GỐC: lý do và dấu «Chưa chắc» luôn ghi / đọc theo câu gốc (ngày Sửa xếp theo câu gốc). */
+export const qidGocLy = (q: string): string => q.replace(/~.*$/, '')
 
 /** Làm sạch `ly` của thân lệnh: tối đa 20 cặp [qid ≤ 120 ký tự, lý do hợp lệ]; trùng qid ⇒ giữ cặp sau. Sai kiểu ⇒ []. */
 export function lySach(x: unknown): [string, LyDoSai][] {
   if (!Array.isArray(x)) return []
   const m = new Map<string, LyDoSai>()
-  for (const c of x.slice(0, 20)) if (Array.isArray(c) && typeof c[0] === 'string' && c[0] && c[0].length <= 120 && laLyDoSai(c[1])) { m.delete(c[0]); m.set(c[0], c[1]) }
+  for (const c of x.slice(0, 20)) if (Array.isArray(c) && typeof c[0] === 'string' && c[0] && c[0].length <= 120 && laLyDoSai(c[1])) { const q = qidGocLy(c[0]); m.delete(q); m.set(q, c[1]) }
   return [...m]
 }
 
@@ -28,17 +30,19 @@ export async function ghiLyDoSai(env: Env, sbd: string, ly: readonly [string, Ly
  *  xếp lại câu ấy; làm đúng và chắc ⇒ xoá dấu. Một câu lệnh, chỉ cho câu sửa làm đúng, trong việc phụ sau phản hồi. Lỗi ⇒ ghi nhật ký, không ném. */
 export async function ghiChuaChac(env: Env, sbd: string, qid: string, chuaChac: boolean, luc: string): Promise<void> {
   if (!sbd || !qid || qid.length > 120) return
+  const k = `cc:${qidGocLy(qid)}`
   try {
     await (chuaChac
-      ? env.DB.prepare(`INSERT INTO goi_bai_7_ly_do(sbd,qid,ly,luc) VALUES(?1,?2,'cc',?3) ON CONFLICT(sbd,qid) DO UPDATE SET luc=excluded.luc`).bind(sbd, `cc:${qid}`, luc)
-      : env.DB.prepare('DELETE FROM goi_bai_7_ly_do WHERE sbd=? AND qid=?').bind(sbd, `cc:${qid}`)).run()
+      ? env.DB.prepare(`INSERT INTO goi_bai_7_ly_do(sbd,qid,ly,luc) VALUES(?1,?2,'cc',?3) ON CONFLICT(sbd,qid) DO UPDATE SET luc=excluded.luc`).bind(sbd, k, luc)
+      : env.DB.prepare('DELETE FROM goi_bai_7_ly_do WHERE sbd=? AND qid=?').bind(sbd, k)).run()
   } catch (e) { console.error('[chua-chac] chưa ghi được:', e instanceof Error ? e.message : e) }
 }
 
-/** Đọc cột `ly` (json_group_array của [qid, lý do]) từ câu đọc mức ngày ⇒ Map qid → lý do; dấu «Chưa chắc» giữ dưới khoá `cc:<qid>` (giá trị 'cc'). */
+/** Đọc cột `ly` (json_group_array của [qid, lý do], cũ → mới) từ câu đọc mức ngày ⇒ Map câu GỐC → lý do (dòng mới hơn thắng; dòng cũ ghi theo mã song sinh
+ *  «X~ss0» quy về «X»); dấu «Chưa chắc» giữ dưới khoá `cc:<câu gốc>` (giá trị 'cc'). */
 export function docCotLyDo(v: unknown): Map<string, LyDoSai | 'cc'> {
   const m = new Map<string, LyDoSai | 'cc'>()
   if (typeof v !== 'string' || !v) return m
-  try { const a: unknown = JSON.parse(v); if (Array.isArray(a)) for (const c of a) if (Array.isArray(c) && typeof c[0] === 'string' && (laLyDoSai(c[1]) || (c[1] === 'cc' && c[0].startsWith('cc:')))) m.set(c[0], c[1]) } catch { /* bỏ */ }
+  try { const a: unknown = JSON.parse(v); if (Array.isArray(a)) for (const c of a) if (Array.isArray(c) && typeof c[0] === 'string' && (laLyDoSai(c[1]) || (c[1] === 'cc' && c[0].startsWith('cc:')))) m.set(qidGocLy(c[0]), c[1]) } catch { /* bỏ */ }
   return m
 }
