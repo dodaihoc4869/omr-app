@@ -1,44 +1,47 @@
 // BIỂU TƯỢNG TAB THEO CẢM XÚC MOL (thầy 09/11 «biểu tượng này thay đổi theo cảm xúc của mol trong màn chính nhé») — src/components/linh-vat/icon-tab-mol.ts.
-// Khoá: máy có thanh tab (trình duyệt máy tính) ⇒ SAU khi mở xong mới chụp mặt Mol đang hiện (datIconTabMol(-1)); Mol đổi mặt (data-mat) ⇒ chụp lại; Lửa vẽ lại
-// cấp (sự kiện) ⇒ chụp lại; rời Lộ trình ⇒ về logo (0). SỬA CÓ CHỦ ĐÍCH 09/11 (tác tử toc-do: «tới chạm được» ×6 nghi chậm): điện thoại / app đã cài / máy
-// yếu (không có tab để thấy) ⇒ KHÔNG chụp gì; máy tính chờ `tre` ms rồi mới bắt đầu.
+// SỬA CÓ CHỦ ĐÍCH 09/11 (tác tử toc-do + đo CPU ×6: chụp lúc mở / hoãn 3 s làm chậm «tới chạm được» / «vào chặng»): chỉ chụp mặt Mol đang hiện khi em RỜI
+// trang (tab ẩn) hoặc cửa sổ mất tiêu điểm, và khi Lửa đổi cấp trong lúc ấy — đang học trên trang ⇒ không chụp; rời Lộ trình ⇒ về logo (0) nếu đã chụp.
+// Điện thoại / app đã cài / máy yếu (không có tab để thấy) ⇒ không làm gì.
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 const goi = vi.fn(async (_cap: number) => {})
 vi.mock('../src/components/linh-vat/mol-dong', () => ({ datIconTabMol: (cap: number) => goi(cap) }))
 
 const media = (q: Record<string, boolean>) => vi.stubGlobal('matchMedia', (s: string) => ({ matches: q[s] ?? false }))
-beforeEach(() => { goi.mockClear(); vi.stubGlobal('requestAnimationFrame', (f: FrameRequestCallback) => window.setTimeout(() => f(0), 0)); vi.stubGlobal('cancelAnimationFrame', (h: number) => window.clearTimeout(h)) })
-afterEach(() => { vi.unstubAllGlobals(); document.body.innerHTML = ''; localStorage.clear(); document.documentElement.classList.remove('may-yeu') })
-const cho = (ms: number) => new Promise((r) => setTimeout(r, ms))
+let an = false, focus = true
+beforeEach(() => {
+  goi.mockClear(); an = false; focus = true
+  vi.spyOn(document, 'visibilityState', 'get').mockImplementation(() => (an ? 'hidden' : 'visible'))
+  vi.spyOn(document, 'hasFocus').mockImplementation(() => focus)
+})
+afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); document.documentElement.classList.remove('may-yeu') })
+const roiTab = () => { an = true; focus = false; document.dispatchEvent(new Event('visibilitychange')) }
+const veTab = () => { an = false; focus = true; document.dispatchEvent(new Event('visibilitychange')) }
 
-it('máy tính: chờ `tre` rồi chụp, chụp lại khi Mol đổi mặt / Lửa vẽ lại cấp (nhịp ≥ 250 ms), rời màn ⇒ về logo', async () => {
+it('máy tính: đang học trên trang ⇒ không chụp; rời tab / cửa sổ mất tiêu điểm ⇒ chụp mặt Mol; Lửa đổi cấp lúc ở tab khác ⇒ chụp lại; rời Lộ trình ⇒ về logo', async () => {
   media({ '(pointer: fine)': true })
   const { theoDoiIconTabMol } = await import('../src/components/linh-vat/icon-tab-mol')
-  document.body.innerHTML = '<div class="bi lua"><svg class="mol-svg" data-mat="chao"></svg></div>'
-  const don = theoDoiIconTabMol(() => null, 40)
-  await cho(20)
-  expect(goi).not.toHaveBeenCalled() // chưa tới lúc: không làm gì trong lúc app đang mở
-  await cho(60)
+  const don = theoDoiIconTabMol(() => null)
+  window.dispatchEvent(new Event('ddh-lua-cap')) // đang ở trang ⇒ không làm gì
+  expect(goi).not.toHaveBeenCalled()
+  roiTab()
   expect(goi.mock.calls.map((c) => c[0])).toEqual([-1])
-  await cho(260)
-  document.querySelector('svg')!.setAttribute('data-mat', 'vui')
-  await cho(20)
-  expect(goi.mock.calls.map((c) => c[0])).toEqual([-1, -1])
-  await cho(260)
+  vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 1000)
   window.dispatchEvent(new Event('ddh-lua-cap'))
-  await cho(20)
+  expect(goi).toHaveBeenCalledTimes(2)
+  veTab()
+  vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 2000)
+  focus = false
+  window.dispatchEvent(new Event('blur'))
   expect(goi).toHaveBeenCalledTimes(3)
   don()
   expect(goi.mock.calls.at(-1)![0]).toBe(0)
-  document.querySelector('svg')!.setAttribute('data-mat', 'nghi')
-  await cho(300)
-  expect(goi).toHaveBeenCalledTimes(4)
+  roiTab()
+  expect(goi).toHaveBeenCalledTimes(4) // đã dọn: không chụp nữa
 })
 
-it('điện thoại (cảm ứng) / app đã cài / máy yếu ⇒ không chụp gì; rời màn trước lúc bắt đầu ⇒ không đụng logo', async () => {
+it('điện thoại (cảm ứng) / app đã cài / máy yếu ⇒ không có tab ⇒ không làm gì; chưa từng chụp ⇒ rời màn không đụng logo', async () => {
   const { theoDoiIconTabMol, coThanhTab } = await import('../src/components/linh-vat/icon-tab-mol')
-  document.body.innerHTML = '<div class="bi lua"><svg class="mol-svg" data-mat="chao"></svg></div>'
   media({ '(pointer: coarse)': true })
   expect(coThanhTab()).toBe(false)
   media({ '(pointer: fine)': true, '(display-mode: standalone)': true })
@@ -46,13 +49,12 @@ it('điện thoại (cảm ứng) / app đã cài / máy yếu ⇒ không chụp
   media({ '(pointer: fine)': true })
   document.documentElement.classList.add('may-yeu')
   expect(coThanhTab()).toBe(false)
-  const don = theoDoiIconTabMol(() => null, 0)
-  await cho(50)
+  const don = theoDoiIconTabMol(() => null)
+  roiTab()
   don()
   expect(goi).not.toHaveBeenCalled()
   document.documentElement.classList.remove('may-yeu')
-  const don2 = theoDoiIconTabMol(() => null, 100)
+  const don2 = theoDoiIconTabMol(() => null)
   don2()
-  await cho(150)
   expect(goi).not.toHaveBeenCalled()
 })

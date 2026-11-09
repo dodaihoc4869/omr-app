@@ -1,9 +1,9 @@
 // BIỂU TƯỢNG TAB THEO CẢM XÚC MOL (thầy 09/11 «biểu tượng này thay đổi theo cảm xúc của mol trong màn chính nhé»): khi em ở Lộ trình, biểu tượng tab trình duyệt
-// = MẶT MOL ĐANG HIỆN, đổi khi Mol đổi mặt (data-mat / data-cap-ve trên svg.mol-svg, hoặc Lửa vẽ lại cấp) — mọi cảm xúc. Rời Lộ trình ⇒ về logo.
-// Biểu tượng CÀI MÁY ở màn hình chính điện thoại do hệ điều hành giữ cố định từ lúc cài.
-// TỐC ĐỘ (tác tử toc-do 09/11: «tới chạm được» CPU ×6 nghi chậm lại vì chụp mặt Mol lúc mở app): CHỈ chạy nơi có THANH TAB THẬT — trình duyệt máy tính
-// (con trỏ chuột, không phải app đã cài / chế độ đứng riêng), không bật chế độ máy yếu; và chỉ bắt đầu SAU khi app đã mở xong (chờ 3 s rồi lúc rảnh).
-// Điện thoại / app đã cài (không có tab để thấy) ⇒ không làm gì, 0 công việc lúc mở. Nhịp chụp ≥ 250 ms, một khung hình.
+// = MẶT MOL ĐANG HIỆN. Rời Lộ trình ⇒ về logo. Biểu tượng CÀI MÁY ở màn hình chính điện thoại do hệ điều hành giữ cố định từ lúc cài.
+// TỐC ĐỘ (tác tử toc-do 09/11 + đo scripts/toc-do-sau-gop.mjs CPU ×6): chụp mặt Mol (dựng ảnh SVG + vẽ canvas) lúc mở app làm chậm «tới chạm được»; hoãn 3 s thì
+// rơi đúng lúc em bấm vào chặng («vào chặng» 611 → 752 ms). Nên: CHỈ chụp đúng lúc biểu tượng tab LÀ thứ em nhìn — em rời tab (trang ẩn) hoặc chuyển sang cửa sổ
+// khác (cửa sổ mất tiêu điểm), và khi Lửa vẽ lại cấp trong lúc ấy. Đang học trên trang ⇒ 0 công việc. Chỉ nơi có THANH TAB THẬT: trình duyệt máy tính (con trỏ
+// chuột, không phải app đã cài / đứng riêng), không ở chế độ máy yếu. Điện thoại / app cài ⇒ không làm gì.
 import { datIconTabMol } from './mol-dong'
 import { dangCheDoMayYeu } from '../../lib/may-yeu'
 
@@ -15,36 +15,26 @@ export function coThanhTab(w: Window = window): boolean {
   } catch { return false }
 }
 
-export function theoDoiIconTabMol(anh: Parameters<typeof datIconTabMol>[1], tre = 3000): () => void {
+export function theoDoiIconTabMol(anh: Parameters<typeof datIconTabMol>[1]): () => void {
   if (!coThanhTab()) return () => {}
-  let h = 0, cuoi = 0, het = false, bat = false, ob: MutationObserver | null = null
+  let het = false, daChup = false, cuoi = 0
+  const roi = (): boolean => document.visibilityState === 'hidden' || !document.hasFocus()
   const chup = (): void => {
-    if (het) return
-    cancelAnimationFrame(h)
-    h = requestAnimationFrame(() => {
-      const t = Date.now()
-      if (t - cuoi < 250) { window.setTimeout(chup, 260 - (t - cuoi)); return }
-      cuoi = t
-      void datIconTabMol(-1, anh)
-    })
+    const t = Date.now()
+    if (het || !roi() || t - cuoi < 250) return
+    cuoi = t
+    daChup = true
+    void datIconTabMol(-1, anh)
   }
-  const batDau = (): void => {
-    if (het) return
-    bat = true
-    ob = new MutationObserver(chup)
-    ob.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-mat', 'data-cap-ve'] })
-    window.addEventListener('ddh-lua-cap', chup) // SU_KIEN_LUA_CAP (Bi.tsx)
-    chup()
-  }
-  const ri = (window as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }).requestIdleCallback
-  const hen = window.setTimeout(() => { if (ri) ri(batDau, { timeout: 2000 }); else batDau() }, tre)
+  const khiDoiTrang = (): void => { if (document.visibilityState === 'hidden') chup() }
+  document.addEventListener('visibilitychange', khiDoiTrang)
+  window.addEventListener('blur', chup)
+  window.addEventListener('ddh-lua-cap', chup) // SU_KIEN_LUA_CAP (Bi.tsx): Lửa đổi cấp khi em đang ở tab khác
   return () => {
     het = true
-    window.clearTimeout(hen)
-    cancelAnimationFrame(h)
-    if (!bat) return
-    ob?.disconnect()
+    document.removeEventListener('visibilitychange', khiDoiTrang)
+    window.removeEventListener('blur', chup)
     window.removeEventListener('ddh-lua-cap', chup)
-    void datIconTabMol(0, anh)
+    if (daChup) void datIconTabMol(0, anh)
   }
 }
