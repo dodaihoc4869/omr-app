@@ -16,7 +16,7 @@ const meta = new Map([
   ['s1', { dang: 'D1', tenDang: 'Khối lượng muối của amine' }], ['v1', { dang: 'D1', tenDang: 'Khối lượng muối của amine' }], ['v2', { dang: 'D1', tenDang: 'Khối lượng muối của amine' }],
   ['v3', { dang: 'D1', tenDang: 'Khối lượng muối của amine' }], ['b1', { dang: 'D2', tenDang: 'Tính base của amine' }], ['w1', { dang: 'D2', tenDang: 'Tính base của amine' }],
 ])
-const tt = (o: Partial<{ laMoi: boolean; lanCuoiDung: boolean | null; thanhThao: boolean; catTia: boolean }>) => ({ laMoi: false, lanCuoiDung: true, thanhThao: false, catTia: false, ...o })
+const tt = (o: Partial<{ laMoi: boolean; lanCuoiDung: boolean | null; thanhThao: boolean; catTia: boolean; lichSu: { dung: boolean }[] }>) => ({ laMoi: false, lanCuoiDung: true, thanhThao: false, catTia: false, lichSu: [{ dung: true }], ...o })
 
 describe('chọn ví dụ mẫu (máy chủ)', () => {
   it('nhóm Chưa biết cách ⇒ câu cùng dạng đã làm đúng, ưu tiên thành thạo; không chọn câu mới / lần cuối sai / đang trong kế hoạch; nhóm Tính / đọc đề sai không có', () => {
@@ -26,6 +26,9 @@ describe('chọn ví dụ mẫu (máy chủ)', () => {
     expect(ds[1]).not.toHaveProperty('viDu')
     const sai = { meta, tt: new Map([['v1', tt({ lanCuoiDung: false })]]) }
     expect(nhomSua7([{ qid: 's1', vai: 'sua' }], sai, new Map([['s1', 'cach']]))[0]).not.toHaveProperty('viDu')
+    // từng sai rồi mới đúng (thường đúng qua bản song sinh — sổ không có dòng đúng mã gốc) ⇒ không chọn
+    const tungSai = { meta, tt: new Map([['v1', tt({ lichSu: [{ dung: false }, { dung: true }] })]]) }
+    expect(nhomSua7([{ qid: 's1', vai: 'sua' }], tungSai, new Map([['s1', 'cach']]))[0]).not.toHaveProperty('viDu')
   })
 })
 

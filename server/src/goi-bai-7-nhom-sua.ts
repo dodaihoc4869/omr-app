@@ -15,7 +15,7 @@ export const qidGocSua = (q: string): string => q.replace(/~.*$/, '')
 
 type Meta = ReadonlyMap<string, { dang: string | null; tenDang: string | null }>
 type Loi = ReadonlyMap<string, { soLanSai: number; saiCuoi: string; trangThai?: string; ngayDung?: readonly string[] }>
-type TtCau = ReadonlyMap<string, { laMoi: boolean; lanCuoiDung: boolean | null; thanhThao?: boolean; catTia?: boolean }>
+type TtCau = ReadonlyMap<string, { laMoi: boolean; lanCuoiDung: boolean | null; thanhThao?: boolean; catTia?: boolean; lichSu: readonly { dung: boolean }[] }>
 const metaCua = (meta: Meta, q: string) => meta.get(q) ?? meta.get(qidGocSua(q))
 const khoaNhom = (meta: Meta, q: string): string => { const g = metaCua(meta, q); return g?.dang || g?.tenDang?.trim() || '' }
 
@@ -51,7 +51,8 @@ export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { me
   if (canViDu.length && hs.tt) {
     const tot = new Map<string, { q: string; diem: number }>()
     for (const [q, t] of hs.tt) {
-      if (t.laMoi || t.lanCuoiDung !== true || t.catTia || conSet.has(q) || daLam.has(q) || loiCua(q)?.trangThai === 'mo') continue
+      // chỉ câu em làm ĐÚNG và CHƯA TỪNG SAI: câu ấy được phát ở mã gốc ⇒ sổ có dòng đúng mã (lệnh «Câu đã làm» tra đúng mã; câu sửa qua bản song sinh thì không)
+      if (t.laMoi || t.lanCuoiDung !== true || t.catTia || conSet.has(q) || daLam.has(q) || (loiCua(q)?.soLanSai ?? 0) > 0 || t.lichSu.some((l) => !l.dung)) continue
       const k = khoaNhom(hs.meta, q), diem = t.thanhThao ? 2 : 1
       if (k && (tot.get(k)?.diem ?? 0) < diem) tot.set(k, { q, diem })
     }
