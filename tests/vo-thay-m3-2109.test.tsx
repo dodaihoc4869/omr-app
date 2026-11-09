@@ -11,6 +11,11 @@ import { apDungGiaoDien, datGiaoDien, docGiaoDien, KHOA_GIAO_DIEN, vietLaiMedia 
 vi.mock('../src/components/KhoiMayChuMoi', () => ({ default: () => <div>khối máy chủ</div> }))
 vi.mock('../src/components/KhoiMatKhauApp', () => ({ default: () => <div>khối mật khẩu</div> }))
 import CaiDatScreen from '../src/screens/CaiDatScreen'
+import { useCoHoa2 as __coHoa2 } from '../src/components/chien-dich/co-hoa2'
+import { beforeEach as __truocMoi } from 'vitest'
+// SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «load lại nhiều lần là lại hiện màn [Hôm nay đời cũ], bỏ hẳn đi»): máy chưa nhớ cờ ⇒ mặc định Game Hóa 2.0 BẬT;
+// tệp này viết cho giao diện cờ TẮT ⇒ đặt rõ cờ tắt trước mỗi ca.
+__truocMoi(() => { __coHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) })
 
 const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const CSS = doc('src/styles/vo-thay.css')
