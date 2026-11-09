@@ -25,3 +25,15 @@ describe('ngayKtTheoBai', () => {
     expect(ngayKtTheoBai('2026-11-10', [goi('gx', '2026-11-17', 0, 1)])).toEqual({ cho: true })
   })
 })
+
+import { cauChoKiemLaiKt } from '../server/src/kiem-tra-ca-nhan-loi'
+describe('câu chờ kiểm lại (ưu tiên vào đề Kiểm tra ôn tập)', () => {
+  it('sai mà chưa đúng lại ở 2 ngày khác nhau sau lần sai cuối ⇒ chờ kiểm lại; đúng lại 2 ngày ⇒ thôi; lịch sử mới → cũ', () => {
+    const ls = [
+      { qid: 'a', ngay_vn: '2026-11-09', ket_qua: 1 }, { qid: 'a', ngay_vn: '2026-11-08', ket_qua: 0 },
+      { qid: 'b', ngay_vn: '2026-11-09', ket_qua: 1 }, { qid: 'b', ngay_vn: '2026-11-07', ket_qua: 1 }, { qid: 'b', ngay_vn: '2026-11-06', ket_qua: 0 },
+      { qid: 'c', ngay_vn: '2026-11-09', ket_qua: 0 }, { qid: 'd', ngay_vn: '2026-11-09', ket_qua: 1 }, { qid: 'e', ngay_vn: '2026-11-09', ket_qua: null },
+    ]
+    expect([...cauChoKiemLaiKt(ls)].sort()).toEqual(['a', 'c'])
+  })
+})
