@@ -16,7 +16,7 @@
 //   2.0 theo lệnh thầy 28/09 "bỏ hẳn BTVN" (docs/ban-ve-gv-2809/RA-SOAT.md mục 8) — tắt 2.0 là hiện lại.
 //   (Lịch sử: 28/09 docs/ban-ve-gv-2809/GV-ThanhBen — "Mở ca kiểm tra" + Tổng quan · Ca kiểm tra · Chiến dịch luyện · Chữa trên lớp · Học sinh.)
 // Cùng một phần tử `.ben-trai`: hai dạng đầu chỉ khác nhau ở CSS (vo-thay.css). `KhungXemPhieu` đo mép của `.ben-trai` để chừa lề.
-import { Award, CalendarDays, ChevronRight, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Route, Settings, Users, type LucideIcon } from 'lucide-react'
+import { Award, CalendarDays, ChevronRight, ClipboardCheck, FileText, Home, Library, LifeBuoy, MessageCircleQuestion, Plus, Presentation, Settings, Users, type LucideIcon } from 'lucide-react'
 import { useLayoutEffect, useState } from 'react'
 import { useAppStore, type ScreenId } from '../store/appStore'
 import LogoGiaoVien from './LogoGiaoVien'
@@ -63,8 +63,9 @@ export const MUC_DIEU_HUONG: MucDieuHuong[] = [
 
 /** GAME HÓA 2.0 — năm mục (bản vẽ tối giản thầy chốt 09/10). Thanh đáy điện thoại dùng CHÍNH danh sách này (nhãn `ngan`, ≤ 5 mục — luật C6). */
 export const MUC_HOA2_CHINH: MucDieuHuong[] = [
-  { id: 'tongquan', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home, con: ['cauhoi'] },
-  { id: 'chiendich', ten: 'Hành trình', ngan: 'Hành trình', icon: Route, con: ['goilenbang', 'bangonutthat'] },
+  // 09/11 thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»: không còn mục Hành trình — nút Điểm danh ở đầu màn Hôm nay mở thẳng
+  // bảng Bình Phản Ứng. Màn `chiendich` (Cần thầy chữa, Kiểm tra đầu giờ…) vẫn mở từ các việc của Hôm nay ⇒ sáng mục Hôm nay.
+  { id: 'tongquan', ten: 'Hôm nay', ngan: 'Hôm nay', icon: Home, con: ['cauhoi', 'chiendich', 'goilenbang', 'bangonutthat'] },
   { id: 'lichsuca', ten: 'Ca kiểm tra', ngan: 'Ca kiểm tra', icon: CalendarDays, con: ['exammonitor', 'examsetup'] },
   { id: 'hocsinh', ten: 'Học sinh', ngan: 'Học sinh', icon: Users, con: ['classlist', 'toancanh'] },
   { id: 'nganhangde', ten: 'Kho đề', ngan: 'Kho đề', icon: Library },
@@ -91,7 +92,7 @@ export function mucDangSang(screen: ScreenId, hoa2 = false): ScreenId | null {
  *  Trung tu 09/10: "Cần thầy chữa" MỘT màu ở thanh bên và Hôm nay — hổ phách (`vang` = --gvm-hp-*, đúng màu dòng việc ấy ở Hôm nay). */
 export function soDemMuc(id: ScreenId, so: { caMo: number | null; canThayChua: number | null }): { chu: string; nhan: string; tone: 'la' | 'xam' | 'do' | 'vang' } | null {
   if (id === 'lichsuca' && so.caMo) return { chu: `${so.caMo} mở`, nhan: `${so.caMo} ca đang mở`, tone: 'la' }
-  if (id === 'chiendich' && so.canThayChua) return { chu: String(so.canThayChua), nhan: `Cần thầy chữa: ${so.canThayChua} chỗ`, tone: 'vang' }
+  if (id === 'tongquan' && so.canThayChua) return { chu: String(so.canThayChua), nhan: `Cần thầy chữa: ${so.canThayChua} chỗ`, tone: 'vang' }
   return null
 }
 

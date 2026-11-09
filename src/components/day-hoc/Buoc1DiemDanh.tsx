@@ -30,8 +30,10 @@ import '../../styles/trong-gv-diem-danh.css' // «Trong» 26/10 — chỉ áp kh
 
 const HoSoLamCauEm = lazy(() => import('../chien-dich/HoSoLamCauEm'))
 const BanChieuDiemDanh = lazy(() => import('./BanChieuDiemDanh'))
-// Thầy 06/11 «bỏ kiểu điểm danh hiện tại, thiết kế lại cho phù hợp game lên bảng»: bản chiếu điểm danh = MỞ MÀN Bình Phản Ứng. Máy chủ tắt (`TAT_BPU`) ⇒ lùi về bản chiếu cũ.
-const BangBinhPhanUng = lazy(() => import('../bpu/BangBinhPhanUng'))
+// Thầy 06/11 «bỏ kiểu điểm danh hiện tại, thiết kế lại cho phù hợp game lên bảng»: bản chiếu điểm danh = MỞ MÀN Bình Phản Ứng.
+// 09/11 (thầy «có nút xong điểm danh rồi chọn câu chiếu ngay trên màn điểm danh đó»): bảng dựng qua gốc chung `bpu/gan-gv` (nạp lười) ⇒ CÙNG một bảng
+// đi tiếp sang chọn câu, các lượt, lên bảng — không dựng lại, không rớt nối.
+const napGanGv = () => import('../bpu/gan-gv')
 
 /** Số dòng "Vừa điểm danh" hiện sẵn (bản vẽ: 6); còn lại mở bằng "Xem cả N em có mặt". */
 export const SO_VUA_DIEM_DANH = 6
@@ -311,6 +313,18 @@ export default function Buoc1DiemDanh({
     nutMo.current?.focus?.()
   }, [])
   const dongChieu = useCallback(() => setBanChieu(null), [])
+  // Chiếu điểm danh ⇒ mở bảng Bình Phản Ứng ở gốc chung; mã đổi mỗi phút ⇒ gốc chung chỉ gộp mã (bảng cùng buổi), không đụng câu đang chiếu.
+  const chieuDd = banChieu === 'diem-danh' && !!tt?.buoi.id
+  const idBuoiChieu = tt?.buoi.id ?? ''
+  const maDd = tt?.ma ?? null
+  useEffect(() => {
+    if (!chieuDd) return
+    void napGanGv().then((g) => g.moBangDiemDanh({ buoiId: idBuoiChieu, ma: maDd, linkQr: maDd ? linkDiemDanh(goc, maDd) : null, onDong: dongChieu })).catch(() => setBanChieu(null))
+  }, [chieuDd, idBuoiChieu, maDd, goc, dongChieu])
+  useEffect(() => {
+    if (!idBuoiChieu || chieuDd) return // bảng mở từ tờ chiếu: vẫn nhận mã mới (em đến muộn)
+    void napGanGv().then((g) => g.capNhatMa(idBuoiChieu, maDd, maDd ? linkDiemDanh(goc, maDd) : null)).catch(() => {})
+  }, [idBuoiChieu, chieuDd, maDd, goc])
   const chieuNhip = useCallback(() => {
     void nhip.tai()
     setBanChieu('nhip-lop')
@@ -701,11 +715,7 @@ export default function Buoc1DiemDanh({
         )}
       </section>
 
-      {banChieu === 'diem-danh' && tt && !!tt.buoi.id ? ( // thầy 07/11: chiếu điểm danh LUÔN là bảng Bình Phản Ứng, bỏ hẳn bản chiếu cũ
-        <Suspense fallback={null}>
-          <BangBinhPhanUng buoiId={tt.buoi.id} ma={tt.ma} linkQr={tt.ma ? linkDiemDanh(goc, tt.ma) : null} onDong={dongChieu} />
-        </Suspense>
-      ) : banChieu && tt && (
+      {banChieu === 'diem-danh' && tt && !!tt.buoi.id ? null /* thầy 07/11: chiếu điểm danh LUÔN là bảng Bình Phản Ứng (gốc chung gan-gv, hiệu ứng ở trên) */ : banChieu && tt && (
         <Suspense fallback={null}>
           <BanChieuDiemDanh
             cheDo={banChieu}

@@ -525,3 +525,5 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 - 27/10 · Claude (nhánh hiệu ứng nguyên tử): xếp loại vòng 1 s ở `src/components/thuong/ManChuoi.tsx` (màn Cứu chuỗi, có từ #401, không phải do #464 đổi chữ «bài» → «chặng»): chỉ vẽ lại giờ còn của hạn học bù, không gọi máy chủ, dừng khi cứu xong ⇒ thêm vào bảng KHONG_GOI_MAY_CHU của tests/nhip-bang-2109.test.ts.
 
 - 27/10 · Claude (giám thị hình người v3, nhánh `claude/giam-thi-nguoi-2710`) · `src/components/giam-thi/giam-thi-nguoi.ts` có 1 setInterval: 34 ms gõ dần chữ bong bóng càu nhàu (≤ 42 kí tự rồi tự dừng, cùng cách bản cũ giam-thi-ve.ts); chỉ cục bộ, không gọi máy chủ. Vòng rAF của khung xương lò xo dừng khi tab ẩn / tamDung / giảm chuyển động.
+
+- 09/11 · Claude (session_01Ghxeuws3PppP7uS2JteAn5) · xếp loại vòng mới: `src/lib/bpu/diem-danh-nhanh.ts` 1 vòng — 15 s đọc lại mã buổi (`/gv/buoi-hoc` xem) CHỈ khi bảng điểm danh Bình Phản Ứng mở từ nút Điểm danh ở Hôm nay; tab ẩn bỏ qua, đóng bảng ⇒ dừng.

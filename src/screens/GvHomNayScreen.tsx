@@ -25,6 +25,7 @@ import { loadScriptUrl, loadTeacherSecret } from '../lib/exam-db'
 import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
 import { useSoDemGv, type MoHanhTrinh } from '../lib/so-dem-gv'
+import NutDiemDanh from '../components/hom-nay-thay/NutDiemDanh'
 import { taiGioiHan } from '../lib/tai-gioi-han'
 import { layLopThay } from '../lib/ten-lop-thay'
 import { chuChoBaiMoi } from '../lib/bai-hom-nay'
@@ -605,17 +606,23 @@ export default function GvHomNayScreen() {
             {capNhat !== null && ` · cập nhật ${gioPhut(capNhat)}`}
           </p>
         </div>
-        {/* «Một trang»: có ca đang mở thì «Bổ sung bài hôm nay» thành nút phụ cạnh nút chính (cùng hộp bổ sung bài như nút ở việc «Lớp chưa có bài mới») */}
-        {trong && caMo.length > 0 && (
+        {/* «Một trang»: «Bổ sung bài hôm nay» là nút phụ (cùng hộp bổ sung bài như nút ở việc «Lớp chưa có bài mới»). */}
+        {trong && (
           <button type="button" className="gvv2-nut-vien gvhn-nut-phu tt-nhan" onClick={() => setMoBoSung(true)}>
             <Plus size={18} aria-hidden="true" />
             Giao bài
           </button>
         )}
-        <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
-          {trong && (caMo.length > 0 ? <Eye size={18} aria-hidden="true" /> : <Plus size={18} aria-hidden="true" />)}
-          {nutChinh.chu}
-        </button>
+        {/* 09/11 thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»: Điểm danh = nút chính (ca đang mở ⇒ nút phụ, «Theo dõi ca» chính). */}
+        <NutDiemDanh className={caMo.length > 0 ? 'gvv2-nut-vien gvhn-nut-phu tt-nhan' : 'gvv2-nut-chinh gvhn-nut-chinh tt-nhan'} />
+        {caMo.length > 0 ? (
+          <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>
+            {trong && <Eye size={18} aria-hidden="true" />}
+            {nutChinh.chu}
+          </button>
+        ) : !trong ? (
+          <button type="button" className="gvv2-nut-vien gvhn-nut-phu tt-nhan" onClick={nutChinh.lam}>{nutChinh.chu}</button>
+        ) : null}
       </header>
 
       {!trong && khoiViec}

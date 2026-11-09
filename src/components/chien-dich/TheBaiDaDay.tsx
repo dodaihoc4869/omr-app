@@ -232,9 +232,10 @@ export default function TheBaiDaDay({ buocDau = null }: { buocDau?: SoBuoc | nul
     if (dd.tt && !dd.tt.buoi.dangMo && buoc && buoc > 1) { setBuoc(1); setHd('') }
   }, [dd.tt, buoc])
 
-  // Bảng Bình Phản Ứng vừa mở lượt trên máy này (tờ chiếu chuyển câu) ⇒ bước «Đang chiếu».
+  // Bảng Bình Phản Ứng vừa mở lượt trên máy này (tờ chiếu chuyển câu) ⇒ bước «Đang chiếu». 09/11: thầy chọn câu NGAY TRÊN BẢNG điểm danh ⇒ từ bước 1 / 2
+  // cũng sang bước 4 (máy khác + «Đang chiếu» đồng bộ theo).
   useEffect(() => {
-    const nghe = () => { if (buoc === 3) dat(4) }
+    const nghe = () => { if (buoc !== 4) dat(4) }
     window.addEventListener('bpu-dang-chieu', nghe)
     return () => window.removeEventListener('bpu-dang-chieu', nghe)
   }, [buoc, dat])

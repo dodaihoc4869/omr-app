@@ -372,6 +372,12 @@ export default defineConfig({
           '**/BangBinhPhanUng-*.{js,css}',
           '**/DangChieuBpu-*.{js,css}', // bước «Đang chiếu» của Hành trình (07/11) — mảnh lười máy thầy, ngoài precache
           '**/gan-gv-*.{js,css}',
+          // 09/11 trùng tu bảng: bảng chọn câu + tờ dựng từ câu chọn + phông chiếu Be Vietnam Pro 500/800 (chỉ bảng chiếu nạp) — máy thầy, kho chạy-lúc.
+          '**/ChonCauBpu-*.{js,css}',
+          '**/to-chieu-bpu-*.js',
+          '**/diem-danh-nhanh-*.js', // nút Điểm danh ở Hôm nay (09/11) — nạp khi bấm
+          '**/be-vietnam-pro-*-500-normal-*.woff2',
+          '**/be-vietnam-pro-*-800-normal-*.woff2',
           '**/gan-hs-*.{js,css}',
           // Màn máy em cũng ra kho chạy-lúc: chỉ mở khi lớp đang chơi (cần mạng sẵn) ⇒ không làm phình lượt cài.
           '**/ManBinhPhanUng-*.{js,css}',

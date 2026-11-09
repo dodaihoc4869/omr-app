@@ -1,0 +1,59 @@
+/* BÌNH PHẢN ỨNG — CHỌN CÂU TRÊN BẢNG (09/11). Sân khấu 1920×1080 (px sân khấu). Chỉ biến màu sẵn có của bảng (--tr-*, --tr-chieu-*: bảng màu tờ chiếu cũ).
+   Trái tối (bài), phải tấm giấy ấm (thẻ câu) như tờ cũ. Hiện ra: trồi nhẹ + rõ dần (transform / opacity). */
+.bcc { position: absolute; left: 40px; right: 40px; top: 104px; bottom: 36px; z-index: 10; /* trên lớp hạt lửa (canvas z 9) */ display: grid; grid-template-columns: 540px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 20px 28px;
+  animation: bcc-vao 0.42s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes bcc-vao { from { opacity: 0; transform: translateY(26px) scale(0.985); } to { opacity: 1; transform: none; } }
+.bcc-dau { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 28px; padding: 0 6px; }
+.bcc-dau h2 { margin: 0; font-size: 46px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+.bcc-dau p { margin: 0; flex: 1; font-size: 24px; color: var(--tr-chu-2); }
+.bcc-dong, .bcc-khoi button, .bcc-cho button { min-height: 56px; padding: 0 22px; border: 0; border-radius: 16px; background: var(--tr-mat-2); color: var(--tr-chu); font: 600 22px var(--sans); cursor: pointer; box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.bcc-dong { display: inline-flex; align-items: center; gap: 12px; }
+.bcc kbd { font: 700 17px var(--sans); padding: 2px 9px; border-radius: 8px; background: var(--tr-mat-3); color: var(--tr-chu-2); }
+.bcc-trai { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 16px; min-height: 0; padding: 22px; border-radius: 30px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.bcc-loc { display: grid; gap: 14px; }
+.bcc-loc input { min-height: 64px; padding: 0 22px; border: 0; border-radius: 18px; background: var(--tr-mat-2); color: var(--tr-chu); font: 500 26px var(--sans); box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.bcc-loc input::placeholder { color: var(--tr-chu-3); }
+.bcc-loc input:focus-visible { outline: 3px solid var(--tr-tin); outline-offset: 2px; }
+.bcc-khoi { display: flex; gap: 10px; }
+.bcc-khoi button { flex: 1; padding: 0 10px; }
+.bcc-khoi button[aria-pressed='true'] { background: var(--tr-tin); color: var(--tr-nen); box-shadow: none; }
+.bcc-ds-bai { min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: grid; align-content: start; gap: 8px; padding-right: 8px; scrollbar-width: thin; scrollbar-color: var(--tr-vien-2) transparent; }
+.bcc-ds-bai section { display: grid; gap: 8px; }
+.bcc-ds-bai h3 { margin: 14px 8px 2px; font-size: 19px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tr-chu-3); }
+.bcc-bai { display: grid; gap: 4px; padding: 16px 20px; border: 0; border-radius: 18px; background: transparent; color: var(--tr-chu); text-align: left; cursor: pointer; font-family: var(--sans);
+  transition: background-color 0.18s, box-shadow 0.18s, transform 0.18s cubic-bezier(.2, .8, .2, 1); }
+.bcc-bai b { font-size: 25px; font-weight: 600; line-height: 1.3; }
+.bcc-bai span { font-size: 19px; color: var(--tr-chu-3); }
+.bcc-bai:hover { background: var(--tr-mat-2); }
+.bcc-bai[aria-current='true'] { background: var(--tr-mat-3); box-shadow: inset 5px 0 0 var(--tr-tin); }
+.bcc-bai.noi { background: color-mix(in srgb, var(--tr-tin) 16%, var(--tr-mat-2)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-tin) 45%, transparent); }
+.bcc-bai.noi[aria-current='true'] { box-shadow: inset 0 0 0 3px var(--tr-tin); }
+.bcc-cho { margin: 12px 8px; font-size: 22px; color: var(--tr-chu-2); }
+/* Phải: tấm giấy ấm như tờ cũ. */
+.bcc-phai { --tr-chu: var(--tr-chieu-chu); --tr-chu-3: var(--tr-chieu-phu); --tr-vien: color-mix(in srgb, var(--tr-chieu-chu) 14%, transparent); --tr-tin: var(--tr-chieu-nhan);
+  position: relative; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 28px 30px 34px; border-radius: 30px; background: var(--tr-chieu-giay); color: var(--tr-chieu-chu);
+  scrollbar-width: auto; scrollbar-color: color-mix(in srgb, var(--tr-chieu-chu) 30%, transparent) transparent; }
+.bcc-ten-bai { display: flex; align-items: baseline; gap: 18px; margin: 0 4px 20px; font-size: 34px; font-weight: 700; }
+.bcc-ten-bai span { font-size: 22px; font-weight: 500; color: var(--tr-chu-3); }
+.bcc-luoi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.bcc-cau { display: grid; grid-template-rows: auto 1fr auto; gap: 12px; min-height: 236px; padding: 22px 24px 18px; border: 0; border-radius: 24px; text-align: left; cursor: pointer; font-family: var(--sans);
+  background: var(--tr-chieu-the); color: var(--tr-chieu-chu); box-shadow: inset 0 0 0 2px var(--tr-vien);
+  transition: transform 0.2s cubic-bezier(.2, .8, .2, 1), box-shadow 0.2s, opacity 0.2s; }
+.bcc-cau:hover:not(:disabled) { transform: translateY(-3px); box-shadow: inset 0 0 0 3px var(--tr-tin), 0 14px 30px color-mix(in srgb, var(--tr-chieu-chu) 16%, transparent); }
+.bcc-cau:active:not(:disabled) { transform: scale(0.985); }
+.bcc-cau:focus-visible { outline: 4px solid var(--tr-tin); outline-offset: 3px; }
+.bcc-cau:disabled { cursor: default; opacity: 0.55; }
+.bcc-cau[data-dang] { opacity: 1; box-shadow: inset 0 0 0 4px var(--tr-tin); }
+.bcc-cau-dau { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bcc-cau-dau i { font-style: normal; font-size: 22px; font-weight: 700; padding: 4px 14px; border-radius: 10px; background: var(--tr-tin); color: var(--tr-chieu-giay); }
+.bcc-cau-dau em, .bcc-cau-dau small { font-style: normal; font-size: 19px; font-weight: 600; color: var(--tr-chu-3); }
+.bcc-cau-dau small::before { content: '· '; }
+.bcc-cau-chu { font-size: 25px; line-height: 1.42; font-weight: 500; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; text-wrap: pretty; }
+.bcc-cau-chieu { justify-self: end; font-size: 20px; font-weight: 700; color: var(--tr-tin); }
+.bcc-trong { height: 100%; display: grid; place-content: center; text-align: center; gap: 10px; }
+.bcc-trong b { font-size: 36px; }
+.bcc-trong span { font-size: 24px; color: var(--tr-chu-3); }
+.bcc-loi { position: sticky; bottom: 0; margin: 18px 0 0; padding: 16px 22px; border-radius: 16px; background: var(--tr-sai-nhat); color: var(--tr-sai-chu); font-size: 22px; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .bcc { animation: none; } .bcc-cau, .bcc-bai { transition: none; } }
+html.may-yeu .bcc { animation: none; }
+html.may-yeu :is(.bcc-cau, .bcc-bai) { transition: none; }
