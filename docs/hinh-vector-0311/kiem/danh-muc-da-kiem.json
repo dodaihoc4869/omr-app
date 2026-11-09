@@ -6004,6 +6004,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d": {
+      "tep": "capron-native1376-ddh-c505bfb30178a35b94f9a62768b6952a3d4cb98183b9ab8e7533d76bee4a55de.svg",
+      "hashSvg": "c505bfb30178a35b94f9a62768b6952a3d4cb98183b9ab8e7533d76bee4a55de",
+      "byteSvg": 14667,
+      "byteGzip": 4456,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "1680cc35f202211731150fcc74201d8e974daa186a2b7e7b393b4bcb893b20bb": {
       "tep": "methylphenidate-ddh-0c70e7456f5a851e67d7de97b3a1f227b28f324a62a80bc08c7ee548ebddef1d.svg",
       "hashSvg": "0c70e7456f5a851e67d7de97b3a1f227b28f324a62a80bc08c7ee548ebddef1d",
@@ -13368,6 +13377,20 @@
           "where": "12-C4-B13-II-7.hinh.0.du_lieu",
           "hashDataUrl": "b24a1d28cebc722d441d151d659eb3d59da773f127a9ac88a8fa070fdcedcd81",
           "vector": "tai-che-pair-ddh-610142b2ffb4121d6252796b06de001392c4405a7115b742c61b1c5578b6f995.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B13-II-10",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d",
+          "where": "12-C4-B13-II-10.hinh.0.du_lieu",
+          "hashDataUrl": "4655e49289bc63d7c121178fc2e599d72f9485e374c7fc5ef55ffa8a65a478ce",
+          "vector": "capron-native1376-ddh-c505bfb30178a35b94f9a62768b6952a3d4cb98183b9ab8e7533d76bee4a55de.svg"
         }
       ]
     },
@@ -29484,6 +29507,7 @@
     "12-C4-B13-I-68",
     "12-C4-B13-I-74",
     "12-C4-B13-II-7",
+    "12-C4-B13-II-10",
     "12-C4-B13-II-14",
     "12-C4-B13-II-21",
     "12-C4-B13-III-26",

@@ -1,0 +1,311 @@
+{
+  "i": 1376,
+  "hash": "f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d.png",
+  "size": [
+    865,
+    198
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C4-B13-II-10",
+      "de": "Tơ capron là loại tơ có tính dai, độ đàn hồi và độ bóng cao, ít thấm nước và được sử dụng để dệt vải may mặc. Tơ capron được tổng hợp từ caprolactam theo phương trình hóa học sau:",
+      "allHinh": [
+        {
+          "hash": "f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d",
+          "where": "12-C4-B13-II-10.hinh.0.du_lieu",
+          "hashDataUrl": "4655e49289bc63d7c121178fc2e599d72f9485e374c7fc5ef55ffa8a65a478ce"
+        }
+      ],
+      "missingHashes": [
+        "f8afcc4bd31d12311c39a7e60974838675ce5e8a8d3c8ac1270cb253016c619d"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1376-native2x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixeltrace/literalformula, no inferredreactionconditionsorbyproducts.",
+  "geometry": {
+    "classification": "Singlelactamringopeningpolymerization, nopicturephoto.",
+    "monomer": {
+      "coefficient": {
+        "text": "n",
+        "bbox": [
+          29,
+          111,
+          45,
+          135
+        ],
+        "style": "regularuprightbaseline"
+      },
+      "CverticesCarbonylAroundLeft": [
+        [
+          127,
+          75
+        ],
+        [
+          83,
+          75
+        ],
+        [
+          52,
+          109
+        ],
+        [
+          52,
+          142
+        ],
+        [
+          80,
+          170
+        ],
+        [
+          133,
+          167
+        ]
+      ],
+      "NH": {
+        "text": "NH",
+        "bbox": [
+          141,
+          112,
+          189,
+          139
+        ],
+        "bondUpper": [
+          [
+            127,
+            75
+          ],
+          [
+            147,
+            106
+          ]
+        ],
+        "bondLower": [
+          [
+            148,
+            141
+          ],
+          [
+            133,
+            167
+          ]
+        ],
+        "note": "NHliteralNfirstHright, wholelabelgap; no separateHbondglyph"
+      },
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          133,
+          37,
+          157,
+          63
+        ],
+        "doubleRays": [
+          [
+            [
+              126,
+              73
+            ],
+            [
+              134,
+              60
+            ]
+          ],
+          [
+            [
+              130,
+              77
+            ],
+            [
+              138,
+              63
+            ]
+          ]
+        ]
+      },
+      "ringMembers": 7,
+      "C": 6,
+      "N": 1,
+      "O": 1,
+      "COdouble": 1
+    },
+    "condition": {
+      "text": "xúc tác, tᵒ",
+      "bbox": [
+        230,
+        90,
+        359,
+        118
+      ],
+      "style": "regularuprightserif; smallhollowoSUPaftert, notnumeric0; noCtemperatureunit"
+    },
+    "arrow": {
+      "shaft": [
+        [
+          218,
+          125
+        ],
+        [
+          374,
+          125
+        ]
+      ],
+      "head": "FILLEDRIGHTtriangle",
+      "headVertices": [
+        [
+          362,
+          119
+        ],
+        [
+          374,
+          125
+        ],
+        [
+          362,
+          131
+        ]
+      ]
+    },
+    "polymer": {
+      "literal": "–(HN–[CH₂]₅–CO)ₙ–",
+      "outerRoundPair": {
+        "left": "M42699 Q401125 426154",
+        "right": "M68096 Q707125 680153",
+        "note": "ROUNDnotSQUARE forouterrepeat"
+      },
+      "leftFreeBond": [
+        [
+          398,
+          125
+        ],
+        [
+          430,
+          125
+        ]
+      ],
+      "HN": {
+        "text": "HN",
+        "bbox": [
+          429,
+          109,
+          477,
+          136
+        ],
+        "order": "HfirstNright"
+      },
+      "HNtoBracketBond": [
+        [
+          483,
+          125
+        ],
+        [
+          500,
+          125
+        ]
+      ],
+      "squareGroup": {
+        "text": "[CH₂]₅",
+        "bbox": [
+          508,
+          108,
+          597,
+          140
+        ],
+        "note": "CH2insquarebrackets,2SUBafterH,5SUBafterclosingbracket; not5onH"
+      },
+      "groupToCOBond": [
+        [
+          603,
+          125
+        ],
+        [
+          619,
+          125
+        ]
+      ],
+      "CO": {
+        "text": "CO",
+        "bbox": [
+          626,
+          109,
+          670,
+          136
+        ],
+        "note": "CONDENSEDCOtext, noexpandedcarbonyl"
+      },
+      "rightFreeBond": [
+        [
+          679,
+          125
+        ],
+        [
+          710,
+          125
+        ]
+      ],
+      "n": {
+        "text": "n",
+        "bbox": [
+          696,
+          136,
+          714,
+          156
+        ],
+        "placement": "SUBafterouterclosinground"
+      }
+    },
+    "farRightLabel": {
+      "text": "(1)",
+      "bbox": [
+        787,
+        107,
+        827,
+        140
+      ],
+      "note": "baseline1inroundparentheses, notcirclednumber"
+    },
+    "font": "ALLregularuprightserif labels/coefficient/condition, noitaliccaptions/bold. Skeletallines thinuniform.",
+    "counts": {
+      "rightFilledHeads": 1,
+      "outerRoundRepeatPairs": 1,
+      "innerSquarePairs": 1,
+      "reactionIndexRoundPairs": 1,
+      "coefficientnBaseline": 1,
+      "repeatnSub": 1
+    },
+    "noAdded": [
+      "H2O",
+      "monomer/polymernames",
+      "extracatalyst",
+      "temperaturevalue",
+      "stereowedges",
+      "charges",
+      "ncoefficientforproducts",
+      "openingbracketbeforefreebond"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "nativeMacros": [
+      "/workspace/scratch/root312-native-ring.png",
+      "/workspace/scratch/root312-native-polymer.png"
+    ],
+    "actualFull": "/workspace/scratch/root312-1376.png",
+    "actualHash": "c505bfb30178a35b94f9a62768b6952a3d4cb98183b9ab8e7533d76bee4a55de",
+    "note": "Dựng riêngnative1376, khôngalias685/940. GiữHNtạipolymer/NHtạivòng/coefficientnBASELINE/outerROUNDnSUB-innerSQUARE5SUB/conditiont nhỏSUPo. KhôngthêmH2O/tên/đápán."
+  }
+}
