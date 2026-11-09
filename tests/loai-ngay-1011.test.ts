@@ -80,6 +80,7 @@ describe('lapGoi7 theo loại ngày (từ 10/11)', () => {
     const sai = lap8.plan.viec.filter(v => v.vai === 'moi').map(v => v.qid).filter(q => { const g = lap8.hs.meta.get(q)?.group ?? q; if (nhom.has(g)) return false; nhom.add(g); return true })
     expect(sai.length).toBeGreaterThanOrEqual(SO_LOI_NGAY_SUA)
     for (const [i, qid] of sai.entries()) await lam(k.env, 'S1', qid, t8 + i * 60_000, false, { cauVersion: 'v1' })
+    for (const qid of sai) k.d.sql.prepare('INSERT INTO goi_bai_7_ly_do(sbd,qid,ly,luc) VALUES(?,?,?,?)').run('S1', qid, 'nham', 'x') // lát 3: lý do em chạm ở «Vì sao em sai?»
     const lap = await lapGoi7(k.env, 'S1', NOW)
     expect(lap!.loaiNgay).toBe('sua')
     const vai = lap!.plan.viec.map(v => v.vai)
@@ -88,6 +89,11 @@ describe('lapGoi7 theo loại ngày (từ 10/11)', () => {
     expect(vai.slice(0, soSua).every(v => v === 'sua')).toBe(true)
     expect(lap!.plan.viec).toHaveLength(28)
     expect(loaiDaGhi(k)).toContainEqual({ ngay: '2026-11-10', loai: 'sua' })
+    // lát 3 (09/11): câu sửa gom theo dạng — đủ số câu sửa, nhóm có câu em chạm «Hiểu nhầm» mang loại ấy; tóm tắt gửi nhomSua
+    expect(lap!.nhomSua.reduce((s, n) => s + n.so, 0)).toBe(soSua)
+    expect(lap!.nhomSua.length).toBeGreaterThan(0)
+    expect(lap!.nhomSua.every(n => n.loai === 'nham')).toBe(true)
+    expect(tomTatGoi7(lap!, NOW)).toMatchObject({ nhomSua: lap!.nhomSua })
   })
   it('áp dụng giữa ngày (thầy «áp dụng luôn»): em đã chốt mức 28 trước khi có loại ngày ⇒ lần mở kế ghi loại riêng và kế hoạch theo loại ngay', async () => {
     const k = await kho()

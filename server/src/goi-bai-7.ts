@@ -7,6 +7,7 @@ import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
 import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7, type LoaiNgay7 } from './goi-bai-7-loi'
 import { docMucLoai7, loaiNgayEm7 } from './goi-bai-7-loai-ngay'
+import { nhomSua7 } from './goi-bai-7-nhom-sua'
 import { xepBai6 } from './bai-6-cau'
 import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
@@ -586,7 +587,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   }
   const nhom7 = new Map([...hs.meta].map(([qid,m])=>[qid,m.group]))
   const tang = tangCuaEm(hs.cau,hs.tt,nhom7)
-  const { loaiNgay, loaiGhi, conMoi7 } = loaiNgayEm7(await som7.mucLoaiSom, ngay, goi, hs, chan, daGapCa) // khối B (10/11)
+  const { loaiNgay, loaiGhi, conMoi7, lyDo } = loaiNgayEm7(await som7.mucLoaiSom, ngay, goi, hs, chan, daGapCa) // khối B (10/11)
   // Gói R 15/10: lịch kiểm tra riêng TẮT ⇒ mức hôm nay KHÔNG phụ thuộc động cơ (chỗ giữ ôn/sửa = 0) ⇒ chốt NGAY, SONG SONG với động cơ, qua đường ghi riêng
   // (`envGhiRieng`: D1 gốc, vẫn qua rào cổng; lệnh ghi tự nuốt lỗi như cũ, đọc lại dòng thắng qua cùng đường; không lượt đọc nào khác của lượt đọc bảng mức hôm nay)
   // — trước: nối tiếp SAU lô ghi của động cơ, hai đợt D1. Cùng đối số y hệt lời gọi cũ bên dưới. Lịch bật / cờ lỗi ⇒ chốt ở chỗ cũ như trước.
@@ -674,7 +675,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi, loaiNgay }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi, loaiNgay, nhomSua: loaiNgay === 'sua' ? nhomSua7(plan.viec.flatMap(v => v.vai === 'sua' ? [v.qid] : []), hs.meta, lyDo) : [] }
 }
 
 type LapGoi7 = NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
@@ -719,7 +720,7 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
   }),
     tuLamCon:dem7(lap.plan.tuLam),tiepCanCon:dem7(lap.plan.tiepCan),thieuPhu:dem7(lap.plan.thieuPhu),thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
     canHoTro:lap.plan.tuLam*2+lap.plan.tiepCan*3>60 || lap.plan.thieuPhu>0 || lap.daLamNgay+lap.plan.viec.length<lap.toiThieu,
-    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}),...(lap.loaiNgay ? { loaiNgay: lap.loaiNgay } : {}) }
+    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}),...(lap.loaiNgay ? { loaiNgay: lap.loaiNgay } : {}),...(lap.nhomSua?.length ? { nhomSua: lap.nhomSua } : {}) }
 }
 
 const dangMoChang7 = new WeakMap<object, Map<string, Promise<Record<string, unknown> | null>>>()

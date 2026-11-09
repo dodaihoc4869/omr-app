@@ -60,6 +60,7 @@ const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
+const NhomSuaHomNay = lazy(() => import('./NhomSuaHomNay').catch(() => ({ default: () => null }))) // khối B lát 3: chỉ ngày Sửa, kho tải ngầm
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
 const PhuTamDong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.PhuTamDong })))
@@ -115,6 +116,8 @@ function useChoSo(bat: boolean): HTMLElement | null {
 
 export interface PropsMotTrang {
   loaiNgay?: LoaiNgay
+  /** Khối B lát 3: nhóm lỗi ngày Sửa (thô) ⇒ thẻ «Nhóm lỗi hôm nay» (mảnh lười) trên Việc hôm nay. */
+  nhomSua?: unknown
   so: SoHomNay | null; dangTai: boolean; tenBai?: string; viec?: string
   onHoc: () => void; khoaHoc: boolean; hetCau: boolean; kho?: { choBoSung?: number; sanSang?: number; caThi?: boolean }
   coCa: boolean; onThi: () => void; token?: string
@@ -1172,6 +1175,7 @@ export function MotTrangHs(p: PropsMotTrang) {
           <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? p.tenBai || 'Bài học hôm nay' : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
       </div><div className="kb-cot-phai">
+      {p.loaiNgay === 'sua' && !p.ngayKiem && Array.isArray(p.nhomSua) && p.nhomSua.length ? <Suspense fallback={null}><NhomSuaHomNay tho={p.nhomSua} /></Suspense> : null}
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
         <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {so && !p.dangTai && !nut.length && <ViecTrong />}
