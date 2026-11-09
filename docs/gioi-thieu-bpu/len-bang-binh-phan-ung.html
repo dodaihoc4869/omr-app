@@ -1,0 +1,319 @@
+<title>Lên bảng Bình Phản Ứng</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap">
+<style>
+/* Bố cục: bảng đen lớp học, một cột đọc trên điện thoại; bốn màu ngọn lửa thử Na · K · Cu · Ca làm màu đội; số kJ là nhân vật chính. Một giao diện tối có chủ đích. */
+:root {
+  color-scheme: dark;
+  --bang: #12161b;
+  --bang-2: #1a2027;
+  --bang-3: #232b34;
+  --phan: #eef1ec;
+  --phan-2: #b9c1bb;
+  --phan-3: #87918b;
+  --vien: #2f3943;
+  --na: #f5a524;
+  --k: #b78cff;
+  --cu: #2fc59a;
+  --ca: #ff5d5d;
+  --cong: #46d39a;
+  --tru: #ff6b6b;
+  --nang: #ffd166;
+  --f-tieu: 'Bricolage Grotesque', 'Be Vietnam Pro', system-ui, sans-serif;
+  --f-than: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bang); color: var(--phan); font-family: var(--f-than); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.trang { max-width: 760px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { font-family: var(--f-tieu); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h2 { font-size: clamp(24px, 5vw, 32px); font-weight: 800; line-height: 1.15; }
+h3 { font-size: 19px; font-weight: 700; line-height: 1.3; }
+p { margin: 0; }
+.nhan { font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--phan-3); }
+.so { font-variant-numeric: tabular-nums; }
+section { display: flex; flex-direction: column; gap: 18px; }
+.dau-muc { display: flex; flex-direction: column; gap: 6px; }
+.dau-muc p { color: var(--phan-2); max-width: 60ch; }
+
+/* ─── Mở đầu: bốn ống thử lửa ─── */
+.mo-dau { display: grid; grid-template-columns: 1fr; gap: 26px; padding-top: 8px; }
+.mo-dau h1 { font-size: clamp(40px, 10vw, 72px); font-weight: 800; line-height: 0.98; }
+.mo-dau h1 span { display: block; background: linear-gradient(90deg, var(--na), var(--ca) 40%, var(--k) 70%, var(--cu)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.mo-dau .tom { font-size: 18px; color: var(--phan-2); max-width: 46ch; }
+.mo-dau .tom b { color: var(--phan); font-weight: 600; }
+.ong-hang { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: end; }
+.ong { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.ong-than { position: relative; width: 100%; max-width: 92px; aspect-ratio: 1 / 2.6; border: 3px solid color-mix(in srgb, var(--phan) 55%, transparent); border-top: 0; border-radius: 0 0 46px 46px; overflow: hidden; background: color-mix(in srgb, var(--phan) 4%, transparent); }
+.ong-than::before { content: ""; position: absolute; top: 0; left: -6px; right: -6px; height: 3px; background: color-mix(in srgb, var(--phan) 55%, transparent); }
+.ong-dich { position: absolute; left: 0; right: 0; bottom: 0; height: var(--muc); background: linear-gradient(180deg, color-mix(in srgb, var(--mau) 90%, white 10%), var(--mau)); }
+.ong-dich::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: color-mix(in srgb, white 30%, var(--mau)); }
+.lua { position: absolute; left: 50%; bottom: calc(var(--muc) + 4px); width: 44%; aspect-ratio: 3 / 4; transform: translateX(-50%); transform-origin: 50% 100%; animation: chay 1.6s ease-in-out infinite alternate; filter: drop-shadow(0 0 14px var(--mau)); }
+.lua svg { width: 100%; height: 100%; display: block; }
+@keyframes chay { from { transform: translateX(-50%) scale(1, 1); } to { transform: translateX(-50%) scale(0.92, 1.08); } }
+.ong-ten { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; }
+.ky { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 5px; border-radius: 13px; font-size: 12px; font-weight: 800; background: var(--mau); color: var(--bang); }
+.ong-mau { font-size: 12px; color: var(--phan-3); text-align: center; line-height: 1.35; }
+
+/* ─── Chuẩn bị ─── */
+.chuan-bi { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.o { background: var(--bang-2); border: 1px solid var(--vien); border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.o p { color: var(--phan-2); font-size: 15px; }
+.o .nut { display: inline-block; padding: 1px 10px; border-radius: 999px; background: var(--bang-3); border: 1px solid var(--vien); color: var(--phan); font-weight: 600; font-size: 14px; white-space: nowrap; }
+
+/* ─── Một lượt: dòng thời gian ─── */
+.luot { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.luot li { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; padding-bottom: 22px; }
+.luot li:not(:last-child)::before { content: ""; position: absolute; left: 21px; top: 44px; bottom: 0; width: 2px; background: linear-gradient(var(--vien), var(--vien)); }
+.luot .buoc { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-family: var(--f-tieu); font-weight: 800; font-size: 20px; background: var(--bang-3); border: 2px solid var(--vien); }
+.luot li:nth-child(1) .buoc { border-color: var(--na); color: var(--na); }
+.luot li:nth-child(2) .buoc { border-color: var(--ca); color: var(--ca); }
+.luot li:nth-child(3) .buoc { border-color: var(--k); color: var(--k); }
+.luot li:nth-child(4) .buoc { border-color: var(--cu); color: var(--cu); }
+.luot li:nth-child(5) .buoc { border-color: var(--nang); color: var(--nang); }
+.luot .noi { display: flex; flex-direction: column; gap: 4px; padding-top: 8px; }
+.luot .noi p { color: var(--phan-2); }
+.luot .phim { display: inline-block; min-width: 24px; padding: 0 7px; border-radius: 6px; border: 1px solid var(--vien); background: var(--bang-3); font-weight: 700; font-size: 13px; text-align: center; color: var(--phan); }
+
+/* ─── Đội ─── */
+.doi-khung { background: var(--bang-2); border: 1px solid var(--vien); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+.chia { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.chia > div { border-radius: 16px; padding: 14px 16px; background: var(--bang-3); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.chia .lon { font-family: var(--f-tieu); font-size: 30px; font-weight: 800; line-height: 1; }
+.cham-doi { display: flex; gap: 6px; flex-wrap: wrap; }
+.cham-doi .ky { min-width: 34px; height: 30px; border-radius: 15px; font-size: 13px; }
+.doi-khung > p { color: var(--phan-2); font-size: 15px; }
+
+/* ─── Bảng kJ ─── */
+.bang-kj { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.cot-kj { background: var(--bang-2); border: 1px solid var(--vien); border-radius: 22px; padding: 18px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cot-kj h3 { display: flex; align-items: center; gap: 8px; padding-bottom: 8px; }
+.cot-kj h3 i { width: 10px; height: 10px; border-radius: 50%; background: var(--mau); box-shadow: 0 0 10px var(--mau); }
+.dong { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 10px 0; border-top: 1px solid var(--vien); }
+.dong span { color: var(--phan-2); font-size: 15px; line-height: 1.4; }
+.dong span small { display: block; color: var(--phan-3); font-size: 13px; }
+.dong b { font-family: var(--f-tieu); font-size: 20px; font-weight: 800; white-space: nowrap; text-align: right; font-variant-numeric: tabular-nums; }
+.dong b.c { color: var(--cong); }
+.dong b.t { color: var(--tru); }
+.dong b em { font-style: normal; display: block; font-size: 12px; font-family: var(--f-than); font-weight: 600; color: var(--phan-3); }
+
+/* ─── Ví dụ tính ─── */
+.vi-du { background: linear-gradient(135deg, color-mix(in srgb, var(--na) 14%, var(--bang-2)), var(--bang-2) 60%); border: 1px solid color-mix(in srgb, var(--na) 35%, var(--vien)); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.vi-du .de { color: var(--phan-2); }
+.phep { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; }
+.phep .hang { background: var(--bang-3); border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; min-width: 0; }
+.phep .hang b { font-family: var(--f-tieu); font-size: 26px; font-weight: 800; color: var(--cong); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.phep .hang small { color: var(--phan-3); font-size: 13px; }
+.phep .dau { align-self: center; font-family: var(--f-tieu); font-size: 22px; color: var(--phan-3); }
+.phep .tong { background: var(--nang); color: var(--bang); }
+.phep .tong b { color: var(--bang); font-size: 32px; }
+.phep .tong small { color: color-mix(in srgb, var(--bang) 70%, transparent); font-weight: 600; }
+
+/* ─── Luật cứng ─── */
+.bao-dong { border: 2px solid var(--tru); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: color-mix(in srgb, var(--tru) 8%, var(--bang)); animation: nhay 2.4s ease-in-out infinite; }
+@keyframes nhay { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--tru) 18%, transparent); } }
+.bao-dong h3 { color: var(--tru); font-size: 22px; }
+.luat { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.luat > div { background: var(--bang-2); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.luat .tinh { color: var(--tru); font-weight: 700; font-size: 14px; }
+.luat .khong { color: var(--cong); font-weight: 700; font-size: 14px; }
+.luat p { color: var(--phan-2); font-size: 14px; }
+
+/* ─── Lên bảng ─── */
+.len-bang { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.kq { border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 8px; background: var(--bang-2); border: 1px solid var(--vien); min-width: 0; }
+.kq .lon { font-family: var(--f-tieu); font-size: 22px; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.kq p { color: var(--phan-2); font-size: 14px; }
+.kq.dat { border-color: color-mix(in srgb, var(--cong) 55%, var(--vien)); }
+.kq.dat .lon { color: var(--cong); }
+.kq.truot { border-color: color-mix(in srgb, var(--tru) 55%, var(--vien)); }
+.kq.truot .lon { color: var(--tru); }
+.kq.chua .lon { color: var(--phan-2); }
+.mach { display: flex; flex-direction: column; gap: 10px; }
+.mach li { color: var(--phan-2); }
+.mach ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+
+.ghi { color: var(--phan-3); font-size: 14px; }
+.cuoi { border-top: 1px solid var(--vien); padding-top: 18px; color: var(--phan-3); font-size: 14px; }
+
+@media (max-width: 560px) {
+  .chuan-bi, .bang-kj, .luat, .len-bang { grid-template-columns: 1fr; }
+  .ong-hang { gap: 8px; }
+  .ong-ten { font-size: 13px; }
+  .ong-mau { font-size: 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .lua, .bao-dong { animation: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="ngon-lua" viewBox="0 0 60 80">
+      <path d="M30 2C34 18 52 28 52 50a22 22 0 0 1-44 0c0-12 8-20 12-26 1 8 5 12 9 13-3-10 0-23 1-35z" fill="var(--mau)"/>
+      <path d="M30 34c3 9 12 13 12 24a12 12 0 0 1-24 0c0-6 4-10 6-13 1 4 3 6 5 6-1-6 0-12 1-17z" fill="#fff" fill-opacity=".55"/>
+    </symbol>
+  </defs>
+</svg>
+
+<main class="trang">
+
+  <header class="mo-dau">
+    <p class="nhan">Lớp Hoá Thầy Đỗ Đại Học · đọc trước buổi học</p>
+    <h1>Lên bảng<span>Bình Phản Ứng</span></h1>
+    <p class="tom">Cả lớp làm <b>cùng một câu</b> trên điện thoại. Kết quả bay lên bảng thành <b>kJ</b> đổ vào ống của đội em. Sau mỗi câu, Thầy gọi một bạn lên bảng giải cho cả lớp.</p>
+    <div class="ong-hang" aria-label="Bốn đội theo màu ngọn lửa thử">
+      <div class="ong" style="--mau: var(--na); --muc: 62%">
+        <div class="ong-than"><div class="ong-dich"></div><div class="lua"><svg><use href="#ngon-lua"/></svg></div></div>
+        <div class="ong-ten"><span class="ky">Na</span>Natri</div>
+        <p class="ong-mau">lửa vàng</p>
+      </div>
+      <div class="ong" style="--mau: var(--k); --muc: 48%">
+        <div class="ong-than"><div class="ong-dich"></div><div class="lua"><svg><use href="#ngon-lua"/></svg></div></div>
+        <div class="ong-ten"><span class="ky">K</span>Kali</div>
+        <p class="ong-mau">lửa tím</p>
+      </div>
+      <div class="ong" style="--mau: var(--cu); --muc: 56%">
+        <div class="ong-than"><div class="ong-dich"></div><div class="lua"><svg><use href="#ngon-lua"/></svg></div></div>
+        <div class="ong-ten"><span class="ky">Cu</span>Đồng</div>
+        <p class="ong-mau">lửa xanh lục</p>
+      </div>
+      <div class="ong" style="--mau: var(--ca); --muc: 70%">
+        <div class="ong-than"><div class="ong-dich"></div><div class="lua"><svg><use href="#ngon-lua"/></svg></div></div>
+        <div class="ong-ten"><span class="ky">Ca</span>Canxi</div>
+        <p class="ong-mau">lửa đỏ</p>
+      </div>
+    </div>
+  </header>
+
+  <section aria-labelledby="chuan-bi">
+    <div class="dau-muc">
+      <p class="nhan">Trước giờ vào lớp</p>
+      <h2 id="chuan-bi">Chuẩn bị 4 việc</h2>
+    </div>
+    <div class="chuan-bi">
+      <div class="o"><h3>Sạc đầy pin</h3><p>Cả buổi em làm trên điện thoại. Hết pin giữa buổi là mất lượt.</p></div>
+      <div class="o"><h3>Đăng nhập app sẵn</h3><p>Mở app học sinh của Thầy, đăng nhập trước khi vào lớp.</p></div>
+      <div class="o"><h3>Điểm danh bằng mã trên bảng</h3><p>Nhập mã Thầy chiếu. Mã đổi mỗi phút, em nhập mã đang hiện.</p></div>
+      <div class="o"><h3>Vào phòng</h3><p>Điểm danh xong, bấm <span class="nut">Vào Bình Phản Ứng</span>. Câu Thầy mở sẽ hiện ngay trên máy em.</p></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="mot-luot">
+    <div class="dau-muc">
+      <p class="nhan">Một câu diễn ra thế nào</p>
+      <h2 id="mot-luot">5 bước của một lượt</h2>
+    </div>
+    <ol class="luot">
+      <li><span class="buoc">1</span><div class="noi"><h3>Thầy mở câu</h3><p>Đề hiện trên máy em. Trên bảng là ống lửa các đội và bảng xếp hạng, không có đề.</p></div></li>
+      <li><span class="buoc">2</span><div class="noi"><h3>Em chọn đáp án, bấm «Gửi đáp án»</h3><p>Gửi đúng càng sớm càng được thêm kJ. Đã gửi là không sửa được, nên làm chắc rồi mới gửi.</p></div></li>
+      <li><span class="buoc">3</span><div class="noi"><h3>Máy tự che, em nhìn lên bảng</h3><p>Sau khi gửi, màn hình che lại, không còn đề. Thầy mở đáp án thì máy của mọi em đều che, kể cả em chưa gửi.</p></div></li>
+      <li><span class="buoc">4</span><div class="noi"><h3>Thầy mở đáp án</h3><p>Máy em báo kết quả: đáp án đúng màu xanh, chỗ em chọn sai màu đỏ. Thẻ «+kJ kèm lý do» bay lên, kJ đổ vào ống đội.</p></div></li>
+      <li><span class="buoc">5</span><div class="noi"><h3>Một bạn lên bảng</h3><p>Thầy bấm <span class="phim">L</span>, tên bạn được gọi hiện giữa bảng. Các em ở dưới đoán bạn ấy làm đúng hay chưa, và chạm nút tiếp sức để gửi tia lửa lên bảng.</p></div></li>
+    </ol>
+  </section>
+
+  <section aria-labelledby="doi">
+    <div class="dau-muc">
+      <p class="nhan">Đội</p>
+      <h2 id="doi">Em thi cho đội, không thi một mình</h2>
+      <p>Đội đặt theo màu ngọn lửa khi đốt muối kim loại. Máy chia đội theo năng lực từ toàn bộ bài em đã làm trên app, để các đội cân sức.</p>
+    </div>
+    <div class="doi-khung">
+      <div class="chia">
+        <div>
+          <span class="nhan">Từ 12 em trở xuống</span>
+          <span class="lon so">2 đội</span>
+          <div class="cham-doi"><span class="ky" style="--mau: var(--na)">Na</span><span class="ky" style="--mau: var(--k)">K</span></div>
+        </div>
+        <div>
+          <span class="nhan">Từ em thứ 13</span>
+          <span class="lon so">4 đội</span>
+          <div class="cham-doi"><span class="ky" style="--mau: var(--na)">Na</span><span class="ky" style="--mau: var(--k)">K</span><span class="ky" style="--mau: var(--cu)">Cu</span><span class="ky" style="--mau: var(--ca)">Ca</span></div>
+        </div>
+      </div>
+      <p>Ống của đội là tổng kJ của cả đội. Em làm đúng thì ống đầy lên, em bị trừ thì ống tụt xuống ngay trước mắt cả lớp.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="kj">
+    <div class="dau-muc">
+      <p class="nhan">Luật kJ</p>
+      <h2 id="kj">Được cộng, bị trừ khi nào</h2>
+      <p>kJ của em không xuống dưới 0. Mọi khoản cộng trừ đều hiện lý do trên máy em và trên bảng.</p>
+    </div>
+    <div class="bang-kj">
+      <div class="cot-kj" style="--mau: var(--cong)">
+        <h3><i></i>Mỗi câu làm trên máy</h3>
+        <div class="dong"><span>Trắc nghiệm hoặc trả lời ngắn đúng</span><b class="c so">+100</b></div>
+        <div class="dong"><span>Đúng–sai: mỗi ý đúng<small>đủ 4 ý là 100</small></span><b class="c so">+25</b></div>
+        <div class="dong"><span>Gửi nhanh khi làm đúng<small>gửi ngay được 50, giảm dần, sau 60 giây hết</small></span><b class="c so">tới +50</b></div>
+        <div class="dong"><span>Chuỗi đúng liền<small>câu thứ 3: +20 · câu 4: +40 · từ câu 5: +60</small></span><b class="c so">tới +60</b></div>
+        <div class="dong"><span>Cả lớp từ 3/4 số em trở lên làm đúng<small>năng lượng hoạt hoá, mọi em có mặt</small></span><b class="c so">+30</b></div>
+      </div>
+      <div class="cot-kj" style="--mau: var(--nang)">
+        <h3><i></i>Lên bảng và cả buổi</h3>
+        <div class="dong"><span>Lên bảng giải đúng</span><b class="c so">+100<em>đội +200</em></b></div>
+        <div class="dong"><span>Máy làm đúng, lên bảng chưa giải được</span><b class="t so">−100<em>đội −100</em></b></div>
+        <div class="dong"><span>Đoán đúng bạn trên bảng đạt hay chưa</span><b class="c so">+20</b></div>
+        <div class="dong"><span>Rời màn hình, mỗi lần</span><b class="t so">−50<em>đội −50</em></b></div>
+        <div class="dong"><span>Mỗi em điểm danh vào lớp<small>đội đủ quân trước tiên được thêm 50</small></span><b class="c so">đội +10</b></div>
+      </div>
+    </div>
+    <p class="ghi">Đúng–sai: thưởng nhanh và thưởng chuỗi chỉ tính khi em đúng cả 4 ý. Sai một câu hoặc không gửi thì chuỗi về 0.</p>
+  </section>
+
+  <section aria-labelledby="vi-du">
+    <div class="vi-du">
+      <p class="nhan">Ví dụ</p>
+      <h2 id="vi-du">Một câu được 190 kJ</h2>
+      <p class="de">Câu trắc nghiệm. Em gửi đúng sau 12 giây. Đây là câu thứ 3 em đúng liền. 25/30 em có mặt làm đúng.</p>
+      <div class="phep">
+        <div class="hang"><b>100</b><small>đúng</small></div>
+        <span class="dau">+</span>
+        <div class="hang"><b>40</b><small>nhanh: 50 × (1 − 12/60)</small></div>
+        <span class="dau">+</span>
+        <div class="hang"><b>20</b><small>chuỗi 3 câu</small></div>
+        <span class="dau">+</span>
+        <div class="hang"><b>30</b><small>25/30 ≥ 3/4 lớp</small></div>
+        <span class="dau">=</span>
+        <div class="hang tong"><b>190 kJ</b><small>vào ống đội em</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="roi-man">
+    <div class="bao-dong">
+      <p class="nhan" style="color:var(--tru)">Luật cứng</p>
+      <h3 id="roi-man">Không rời màn hình Bình Phản Ứng</h3>
+      <p style="color:var(--phan-2)">Em thoát app là bảng hiện viền đỏ nhấp nháy và tên em ở giữa bảng, cả lớp cùng thấy. Mỗi lần rời: em −50 kJ, đội −50 kJ. Em chỉ ra khỏi màn này khi Thầy kết thúc buổi học.</p>
+      <div class="luat">
+        <div><span class="tinh">Bị tính là rời</span><p>Chuyển sang app khác, về màn hình chính, mở cửa sổ nổi, chia đôi màn hình.</p></div>
+        <div><span class="khong">Không bị tính</span><p>Tắt màn hình, mất mạng. Đáp án đã chọn vẫn giữ trên máy, có mạng lại là gửi.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="len-bang">
+    <div class="dau-muc">
+      <p class="nhan">Được gọi lên bảng</p>
+      <h2 id="len-bang">Lên bảng có 3 kết quả</h2>
+      <p>Bạn được gọi thấy lý do Thầy chọn ngay trên máy. Đề đầy đủ hiện trên màn chiếu để bạn ấy giải.</p>
+    </div>
+    <div class="len-bang">
+      <div class="kq dat"><span class="nhan">Đạt</span><span class="lon">em +100<br>đội +200</span><p>Giải đúng, trình bày được cho cả lớp.</p></div>
+      <div class="kq truot"><span class="nhan">Chưa đạt, máy đã đúng</span><span class="lon">em −100<br>đội −100</span><p>Trên máy chọn đúng mà lên bảng không giải ra được.</p></div>
+      <div class="kq chua"><span class="nhan">Chưa đạt, máy cũng sai</span><span class="lon">0 kJ</span><p>Em lên để được chữa. Không bị trừ.</p></div>
+    </div>
+    <div class="mach">
+      <h3>Để không bị trừ khi lên bảng</h3>
+      <ul>
+        <li>Làm ra giấy trước khi bấm gửi, giữ tờ nháp đến hết câu.</li>
+        <li>Ghi đủ sơ đồ chất và phép bảo toàn, để lên bảng chép lại được ngay.</li>
+        <li>Không chắc thì đừng đoán bừa cho có đáp án: đúng nhờ đoán mà lên bảng không giải được là −100.</li>
+      </ul>
+    </div>
+  </section>
+
+  <p class="cuoi">Cập nhật 10/11/2026, khớp với app đang chạy. Thầy đổi luật sẽ sửa trang này.</p>
+
+</main>
