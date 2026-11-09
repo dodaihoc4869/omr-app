@@ -7075,6 +7075,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266": {
+      "tep": "bon-phan-ung-carbohydrate-ddh-40e69133d801a8eee8fca497828764346527214e74fdb95f739e210417e48407.svg",
+      "hashSvg": "40e69133d801a8eee8fca497828764346527214e74fdb95f739e210417e48407",
+      "byteSvg": 44798,
+      "byteGzip": 3853,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "8ee1083bffb46588288c1d0e64fd6e9265db847d86bfb098ac3df1f16ca6969a": {
       "tep": "nang-luong-ddh-17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8.svg",
       "hashSvg": "17cabe1b05a63626c6463d716586ef167434e7b4afd36d8782656b68d72fcbb8",
@@ -11670,6 +11679,20 @@
           "where": "12-C3-B10-D2-II-35.hinh.0.du_lieu",
           "hashDataUrl": "d8fc2efb170f1e6dd5843ba6835dadd27c6e1f3e427ff4735c7b7ce3834bca6e",
           "vector": "do-thi-ddh-a4df679ec69e0c5feb14543ae9d1c20439d7441e5cbde7d0de3ad8a21d654db1.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C3-B10-D2-III-29",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266",
+          "where": "12-C3-B10-D2-III-29.hinh.0.du_lieu",
+          "hashDataUrl": "fc5ae9b685734fed73ed99f33503f3d1049ae320dd3c2dfeb26c595e44bf43bf",
+          "vector": "bon-phan-ung-carbohydrate-ddh-40e69133d801a8eee8fca497828764346527214e74fdb95f739e210417e48407.svg"
         }
       ]
     },
@@ -28925,6 +28948,7 @@
     "12-C3-B10-D2-II-31",
     "12-C3-B10-D2-II-32",
     "12-C3-B10-D2-II-35",
+    "12-C3-B10-D2-III-29",
     "12-C3-B10-D1-I-51",
     "12-C3-B10-D1-I-65",
     "12-C3-B10-D1-II-4",

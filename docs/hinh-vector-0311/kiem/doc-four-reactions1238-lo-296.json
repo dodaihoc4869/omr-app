@@ -1,0 +1,264 @@
+{
+  "i": 1238,
+  "hash": "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266.png",
+  "size": [
+    687,
+    301
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C3-B10-D2-III-29",
+      "de": "Cho các phản ứng hóa học sau: Có bao nhiêu phản ứng có thể dùng xúc tác enzyme?",
+      "allHinh": [
+        {
+          "hash": "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266",
+          "where": "12-C3-B10-D2-III-29.hinh.0.du_lieu",
+          "hashDataUrl": "fc5ae9b685734fed73ed99f33503f3d1049ae320dd3c2dfeb26c595e44bf43bf"
+        }
+      ],
+      "missingHashes": [
+        "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1238-native3x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native raster label/bondarrow positions; formula literal transcribed independently from full/3x, no enzyme answer inferred.",
+  "geometry": {
+    "classification": "Four plain chemical reaction equations in separate numbered rows, no apparatus/photo.",
+    "font": "All regular upright serif in native, no italic/bold hierarchy. Chemicaldigits subscript, n afterparentheses subscript; coefficientn baseline, noitalic inference. Number labels regular1)..4), no surroundingopeningparentheses.",
+    "rows": [
+      {
+        "index": "1)",
+        "indexBBox": [
+          39,
+          41,
+          67,
+          72
+        ],
+        "left": "(C₆H₁₀O₅)ₙ + nH₂O",
+        "leftBBox": [
+          81,
+          41,
+          328,
+          73
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              342,
+              57
+            ],
+            [
+              481,
+              57
+            ]
+          ],
+          "head": "open V RIGHT",
+          "headVertices": [
+            [
+              472,
+              50
+            ],
+            [
+              481,
+              57
+            ],
+            [
+              472,
+              64
+            ]
+          ]
+        },
+        "right": "nC₆H₁₂O₆",
+        "rightBBox": [
+          494,
+          41,
+          626,
+          73
+        ]
+      },
+      {
+        "index": "2)",
+        "indexBBox": [
+          39,
+          103,
+          67,
+          134
+        ],
+        "left": "C₁₂H₂₂O₁₁ + H₂O",
+        "leftBBox": [
+          81,
+          102,
+          304,
+          135
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              315,
+              118
+            ],
+            [
+              451,
+              118
+            ]
+          ],
+          "head": "open V RIGHT",
+          "headVertices": [
+            [
+              442,
+              111
+            ],
+            [
+              451,
+              118
+            ],
+            [
+              442,
+              125
+            ]
+          ]
+        },
+        "right": "2C₆H₁₂O₆",
+        "rightBBox": [
+          463,
+          102,
+          592,
+          134
+        ]
+      },
+      {
+        "index": "3)",
+        "indexBBox": [
+          39,
+          163,
+          67,
+          196
+        ],
+        "left": "C₆H₁₂O₆",
+        "leftBBox": [
+          81,
+          163,
+          193,
+          195
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              206,
+              178
+            ],
+            [
+              340,
+              178
+            ]
+          ],
+          "head": "open V RIGHT",
+          "headVertices": [
+            [
+              331,
+              171
+            ],
+            [
+              340,
+              178
+            ],
+            [
+              331,
+              185
+            ]
+          ]
+        },
+        "right": "2C₂H₅OH + 2CO₂",
+        "rightBBox": [
+          353,
+          163,
+          586,
+          195
+        ]
+      },
+      {
+        "index": "4)",
+        "indexBBox": [
+          39,
+          225,
+          67,
+          256
+        ],
+        "left": "C₂H₅OH + O₂",
+        "leftBBox": [
+          81,
+          225,
+          260,
+          257
+        ],
+        "arrow": {
+          "shaft": [
+            [
+              271,
+              238
+            ],
+            [
+              404,
+              238
+            ]
+          ],
+          "head": "open V RIGHT",
+          "headVertices": [
+            [
+              395,
+              231
+            ],
+            [
+              404,
+              238
+            ],
+            [
+              395,
+              245
+            ]
+          ]
+        },
+        "right": "CH₃COOH + H₂O",
+        "rightBBox": [
+          417,
+          225,
+          649,
+          257
+        ]
+      }
+    ],
+    "counts": {
+      "rows": 4,
+      "numberLabels": 4,
+      "rightArrowheads": 4,
+      "baselinePlus": 5,
+      "roundParenthesisPairs": 1
+    },
+    "noAdded": [
+      "enzyme conditions",
+      "temperature",
+      "catalysts",
+      "yield",
+      "speciesanswers",
+      "caption",
+      "phases",
+      "extraO2",
+      "balancedcoefficientsfromtheory"
+    ],
+    "literalTrap": "Row1 n beforeH2O and beforeC6H12O6 baseline; n after(C6H10O5) subscript. Row2 coefficient2; row3 coefficient2 onBOTHproducts; row4 no coefficient2 anywhere. Native source contains no arrowconditions atall."
+  },
+  "actualSvgReviewed": false
+}

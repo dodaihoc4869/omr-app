@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1238,
+    "hash": "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266",
+    "fileNguon": "anh/e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266.png",
+    "svg": "bon-phan-ung-carbohydrate-ddh-40e69133d801a8eee8fca497828764346527214e74fdb95f739e210417e48407.svg",
+    "hashSvg": "40e69133d801a8eee8fca497828764346527214e74fdb95f739e210417e48407",
+    "byteSvg": 44798,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B10-D2-III-29",
+        "de": "Cho các phản ứng hóa học sau: Có bao nhiêu phản ứng có thể dùng xúc tác enzyme?",
+        "refs": [
+          {
+            "hash": "e089fb1c595e8b851e3ff72fa35052cdc2dac1607bda960306b1f201702be266",
+            "where": "12-C3-B10-D2-III-29.hinh.0.du_lieu",
+            "hashDataUrl": "fc5ae9b685734fed73ed99f33503f3d1049ae320dd3c2dfeb26c595e44bf43bf"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4numberedreactionrows1)..4)/4openVRIGHT/regularDDH/subscripts2-3-5-6-10-11-12-22-n/(C6H10O5)n+nH2O→nC6H12O6;C12H22O11+H2O→2C6H12O6;C6H12O6→2C2H5OH+2CO2;C2H5OH+O2→CH3COOH+H2O/noaddedconditions-enzyme-caption-answer.",
+    "hashSvgDaSoat": "40e69133d801a8eee8fca497828764346527214e74fdb95f739e210417e48407",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
