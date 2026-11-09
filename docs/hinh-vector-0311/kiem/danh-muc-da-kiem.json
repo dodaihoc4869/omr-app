@@ -2224,6 +2224,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6": {
+      "tep": "nong-do-hai-chat-ddh-4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925.svg",
+      "hashSvg": "4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925",
+      "byteSvg": 20467,
+      "byteGzip": 5733,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "b03f83efa970cd709a3b8e93576bcf818d7c0b6fa1b96c6e3da971f9b314572c": {
       "tep": "aniline-ddh-2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70.svg",
       "hashSvg": "2fbb6fb3f4c5fc94b30159189b66e5dffbc6e65bc58183cd01d76b138526eb70",
@@ -8931,6 +8940,20 @@
           "where": "11-C1-B1-I-52.hinh.0.du_lieu",
           "hashDataUrl": "9ebd9223af7c5923f1c3cb191b03b8fedb96cf4fbc3d78fbadeda9c2e26cf568",
           "vector": "ong-nuoc-da-ddh-997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C1-B1-I-54",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+          "where": "11-C1-B1-I-54.hinh.0.du_lieu",
+          "hashDataUrl": "961aa6b691f87b1125be2629a7313186b714aafdca8faa686c84da930e2e9ba3",
+          "vector": "nong-do-hai-chat-ddh-4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925.svg"
         }
       ]
     },
@@ -16567,6 +16590,20 @@
           "where": "DB-11-B1-D1-I-50.hinh.0.du_lieu",
           "hashDataUrl": "9ebd9223af7c5923f1c3cb191b03b8fedb96cf4fbc3d78fbadeda9c2e26cf568",
           "vector": "ong-nuoc-da-ddh-997288ed2f4cc69d4e57fc6858933c13f231f3cb9f6ea85cdf2319aa5cad672c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-I-52",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+          "where": "DB-11-B1-D1-I-52.hinh.0.du_lieu",
+          "hashDataUrl": "961aa6b691f87b1125be2629a7313186b714aafdca8faa686c84da930e2e9ba3",
+          "vector": "nong-do-hai-chat-ddh-4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925.svg"
         }
       ]
     },
@@ -28660,6 +28697,7 @@
     "11-C1-B1-I-8",
     "11-C1-B1-I-36",
     "11-C1-B1-I-52",
+    "11-C1-B1-I-54",
     "11-C1-B1-II-10",
     "11-C1-B1-II-11",
     "11-C1-B1-II-18",
@@ -29145,6 +29183,7 @@
     "DB-11-B1-D1-I-8",
     "DB-11-B1-D1-I-36",
     "DB-11-B1-D1-I-50",
+    "DB-11-B1-D1-I-52",
     "DB-11-B1-D1-II-73",
     "DB-11-B1-D1-II-74",
     "DB-11-B1-D1-II-81",

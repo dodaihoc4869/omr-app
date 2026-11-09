@@ -1,0 +1,320 @@
+{
+  "i": 1180,
+  "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6.png",
+  "size": [
+    671,
+    413
+  ],
+  "manifestPresent": true,
+  "publicQuestions": [
+    {
+      "qid": "11-C1-B1-I-54",
+      "de": "Đồ thị dưới đây biểu diễn sự biến đổi nồng độ chất X và chất Y trong phản ứng theo thời gian.\nBiết rằng ban đầu, hệ phản ứng chỉ có chất X, không có chất Y. Dựa vào đồ thị trên, hãy cho biết phương trình hoá học nào sau đây phù hợp với phản ứng chuyển hoá X thành Y.",
+      "allHinh": [
+        {
+          "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+          "where": "11-C1-B1-I-54.hinh.0.du_lieu",
+          "hashDataUrl": "961aa6b691f87b1125be2629a7313186b714aafdca8faa686c84da930e2e9ba3"
+        }
+      ],
+      "missingHashes": [
+        "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6"
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-I-52",
+      "de": "Đồ thị dưới đây biểu diễn sự biến đổi nồng độ chất X và chất Y trong phản ứng theo thời gian.\nBiết rằng ban đầu, hệ phản ứng chỉ có chất X, không có chất Y. Dựa vào đồ thị trên, hãy cho biết phương trình hoá học nào sau đây phù hợp với phản ứng chuyển hoá X thành Y.",
+      "allHinh": [
+        {
+          "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+          "where": "DB-11-B1-D1-I-52.hinh.0.du_lieu",
+          "hashDataUrl": "961aa6b691f87b1125be2629a7313186b714aafdca8faa686c84da930e2e9ba3"
+        }
+      ],
+      "missingHashes": [
+        "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1180-native3x.png",
+    "publicDeOnly": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Approximate native pixel centerlines, not scientific time/concentration samples beyond the TWO explicitly printed yvalues. No inferred reaction answer.",
+  "geometry": {
+    "classification": "Two-curve concentration/time chart; no photos.",
+    "axes": {
+      "origin": [
+        133,
+        340
+      ],
+      "yShaft": [
+        [
+          133,
+          340
+        ],
+        [
+          133,
+          41
+        ]
+      ],
+      "yHead": "UP small open V with dark centralshaft, endpointsapprox12859 and13959 to13341",
+      "xShaft": [
+        [
+          133,
+          340
+        ],
+        [
+          628,
+          340
+        ]
+      ],
+      "xHead": "RIGHT openV, approx610334→628340→610346",
+      "axisHeadCount": 2
+    },
+    "labels": [
+      {
+        "text": "Nồng độ (mol L⁻¹)",
+        "rotation": -90,
+        "bbox": [
+          47,
+          80,
+          80,
+          314
+        ],
+        "font": "upright serif, visibly medium/thick scan; no italic"
+      },
+      {
+        "text": "Thời gian phản ứng",
+        "bbox": [
+          356,
+          350,
+          608,
+          378
+        ],
+        "font": "upright serif, same sourceweight"
+      },
+      {
+        "text": "1",
+        "bbox": [
+          110,
+          122,
+          125,
+          147
+        ]
+      },
+      {
+        "text": "0,5",
+        "bbox": [
+          85,
+          226,
+          125,
+          252
+        ]
+      }
+    ],
+    "yTicks": [
+      {
+        "at": [
+          133,
+          133
+        ],
+        "from": [
+          124,
+          133
+        ],
+        "to": [
+          142,
+          133
+        ]
+      },
+      {
+        "at": [
+          133,
+          240
+        ],
+        "from": [
+          124,
+          240
+        ],
+        "to": [
+          144,
+          240
+        ]
+      }
+    ],
+    "horizontalGuides": [
+      {
+        "from": [
+          141,
+          133
+        ],
+        "to": [
+          592,
+          133
+        ],
+        "style": "short blackgray dashed"
+      },
+      {
+        "from": [
+          143,
+          240
+        ],
+        "to": [
+          578,
+          240
+        ],
+        "style": "short blackgray dashed; much hidden by decreasingcurve on right, keep undercurve"
+      }
+    ],
+    "curves": [
+      {
+        "description": "Increasing from origin, crosses decliningcurve around235213, approaches1 frombelow, endsnear(612133). Never exceeds1. Native has smoothly changing slope rather than explicit mathematical function.",
+        "pixelSamples": [
+          [
+            133,
+            339
+          ],
+          [
+            156,
+            311
+          ],
+          [
+            181,
+            277
+          ],
+          [
+            207,
+            240
+          ],
+          [
+            235,
+            213
+          ],
+          [
+            264,
+            191
+          ],
+          [
+            300,
+            172
+          ],
+          [
+            341,
+            158
+          ],
+          [
+            393,
+            148
+          ],
+          [
+            450,
+            143
+          ],
+          [
+            508,
+            139
+          ],
+          [
+            562,
+            136
+          ],
+          [
+            612,
+            133
+          ]
+        ]
+      },
+      {
+        "description": "Decreases from(133133), crosses increasingnear235213, becomes nearlyflat around0.5 at y239 throughrightend615239.",
+        "pixelSamples": [
+          [
+            133,
+            133
+          ],
+          [
+            157,
+            156
+          ],
+          [
+            183,
+            180
+          ],
+          [
+            208,
+            198
+          ],
+          [
+            235,
+            213
+          ],
+          [
+            264,
+            224
+          ],
+          [
+            303,
+            231
+          ],
+          [
+            351,
+            236
+          ],
+          [
+            408,
+            239
+          ],
+          [
+            466,
+            239
+          ],
+          [
+            529,
+            239
+          ],
+          [
+            580,
+            240
+          ],
+          [
+            615,
+            239
+          ]
+        ]
+      }
+    ],
+    "curveCount": 2,
+    "intersections": {
+      "curveCurveApproxPixel": [
+        235,
+        213
+      ],
+      "note": "No printed X/Y labels, t1/t2/equilibriumlabel, guideintersectionmarker, or pointlabels; do not add. Crossing above0.5 is literal."
+    },
+    "noAdded": [
+      "0 originlabel",
+      "x ticks/numerals/timeunit",
+      "X/Y species labels",
+      "reaction equation",
+      "equilibriumcaption",
+      "title",
+      "new scientific values",
+      "verticalguides",
+      "pointmarkers"
+    ]
+  },
+  "actualSvgReviewed": true,
+  "lo": 293,
+  "rootNativeFullOpened": true,
+  "rootNativeAxisMacrosOpened": true,
+  "hashSvg": "4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925",
+  "verdict": "Đạt root nativeFULL/all2refs/freshactual3x và readonly riêng exacthash; khép2câu."
+}

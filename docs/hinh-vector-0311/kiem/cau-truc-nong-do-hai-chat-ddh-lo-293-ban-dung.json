@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1180,
+    "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+    "fileNguon": "anh/d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6.png",
+    "svg": "nong-do-hai-chat-ddh-4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925.svg",
+    "hashSvg": "4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925",
+    "byteSvg": 20467,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C1-B1-I-54",
+        "de": "Đồ thị dưới đây biểu diễn sự biến đổi nồng độ chất X và chất Y trong phản ứng theo thời gian.\nBiết rằng ban đầu, hệ phản ứng chỉ có chất X, không có chất Y. Dựa vào đồ thị trên, hãy cho biết phương trình hoá học nào sau đây phù hợp với phản ứng chuyển hoá X thành Y.",
+        "refs": [
+          {
+            "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+            "where": "11-C1-B1-I-54.hinh.0.du_lieu",
+            "hashDataUrl": "961aa6b691f87b1125be2629a7313186b714aafdca8faa686c84da930e2e9ba3"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-I-52",
+        "de": "Đồ thị dưới đây biểu diễn sự biến đổi nồng độ chất X và chất Y trong phản ứng theo thời gian.\nBiết rằng ban đầu, hệ phản ứng chỉ có chất X, không có chất Y. Dựa vào đồ thị trên, hãy cho biết phương trình hoá học nào sau đây phù hợp với phản ứng chuyển hoá X thành Y.",
+        "refs": [
+          {
+            "hash": "d61e0d2e63e6262bab77f0f8d06b9d0073acf224a002ece48e60b84d507fa1c6",
+            "where": "DB-11-B1-D1-I-52.hinh.0.du_lieu",
+            "hashDataUrl": "961aa6b691f87b1125be2629a7313186b714aafdca8faa686c84da930e2e9ba3"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2monotoniccurves1rising0to1-1falling1to0comma5/2dashedhorizontallevels/2openVaxisheads/2Yticks1and0comma5/rotatedNồng độ(mol Lsupminus1)/Thời gian phản ứng/regularDDH/noaddedXY-zero-timevalues-grid-equation-answer.",
+    "hashSvgDaSoat": "4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

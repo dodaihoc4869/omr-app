@@ -1,0 +1,13 @@
+{
+  "lo": 293,
+  "i": 1180,
+  "hashSvg": "8ea8d1fc86d966bec66b5ead29c90532872d6df7c8c74fef270bfefe08a20ace",
+  "byteSvg": 20404,
+  "verdict": "Bị loại trước admission: root dựng đầu trục filled sai; macro native xác nhận openV, đoạn cuối đường giảm cần phẳng. Không chọn/hash không vào manifest.",
+  "sourceHeadMacros": [
+    "native-head-x-1180-lo-293.jpg",
+    "native-head-y-1180-lo-293.jpg"
+  ],
+  "finalHashSvg": "4d2af34e5eb8cd3d52634ad68c6e69e51a0908ccc05df3883421b46516a7b925",
+  "finalChanges": "Đổi duy path2heads filled thành openVstroke2.5; lowercurve cuối C410239526240613239→C410239526239613239. Glyphs/curvesother/labels/levels unchanged."
+}
