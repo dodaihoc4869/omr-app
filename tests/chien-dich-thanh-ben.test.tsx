@@ -28,6 +28,7 @@ const tenMuc = () => [...document.querySelectorAll('.ben-trai-muc')].map((b) => 
 
 describe('thanh bên theo cờ', () => {
   it('cờ TẮT ⇒ đúng danh sách cũ (Hôm nay, Giao bài tập về nhà, Học sinh hỏi… còn nguyên)', () => {
+    useCoHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) // SỬA CÓ CHỦ ĐÍCH 09/11: máy chưa nhớ cờ ⇒ mặc định BẬT; cờ TẮT phải do máy chủ trả rõ
     render(<ThanhBenTrai />)
     // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): thêm "Gỡ nút thắt" ngay sau "Học sinh hỏi".
     // ĐỔI CÓ CHỦ Ý 26/10 (thưởng phạt, thầy chốt bản vẽ tp-15): thêm mục «Thi đua tuần» — bộ cũ ngay dưới Học sinh; bộ 2.0 ở đáy thanh bên, trên Cài đặt.
@@ -71,11 +72,12 @@ describe('thanh bên theo cờ', () => {
     expect(mucDangSang('chiendich', true)).toBe('tongquan')
   })
 
-  it('máy chủ chưa có lệnh ⇒ cờ về TẮT (app như cũ)', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «load lại nhiều lần là lại hiện màn [Hôm nay đời cũ], bỏ hẳn đi»): lỗi đọc cờ (kể cả 404 lúc máy chủ đang phát hành) KHÔNG xoá cờ.
+  it('máy chủ chưa có lệnh / lỗi đọc ⇒ GIỮ cờ đang có (không rơi về app cũ)', async () => {
     useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] })
     goi.mockResolvedValue({ ok: false, loai: 'chua_co_lenh', chu: 'Máy chủ chưa có lệnh' })
     await useCoHoa2.getState().doc()
-    expect(useCoHoa2.getState().co).toBeNull()
+    expect(useCoHoa2.getState().co?.bat).toBe(true)
   })
 })
 

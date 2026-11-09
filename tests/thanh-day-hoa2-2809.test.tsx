@@ -27,6 +27,7 @@ const moThem = () => {
 
 describe('thanh đáy theo cờ Game Hóa 2.0', () => {
   it('cờ TẮT ⇒ như cũ: 4 mục chính + Thêm, tờ Thêm đủ các mục còn lại', () => {
+    useCoHoa2.getState().dat({ bat: false, lop: [], sbd: [] }) // SỬA CÓ CHỦ ĐÍCH 09/11: mặc định BẬT khi máy chưa nhớ cờ
     render(<BottomNav />)
     expect(nhanThanh()).toEqual(['Hôm nay', 'Học sinh', 'Ca kiểm tra', 'Bài tập', 'Thêm'])
     // ĐỔI CÓ CHỦ Ý 02/10 (Vòng học v2): tờ Thêm có thêm "Gỡ nút thắt".

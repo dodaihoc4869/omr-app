@@ -38,8 +38,11 @@ interface TrangThaiCo {
   dat: (co: CoHoa2 | null) => void
 }
 
+// 09/11 thầy «load lại nhiều lần là lại hiện màn này [Hôm nay đời cũ], bỏ hẳn đi»: máy CHƯA nhớ cờ (lần đầu / bộ nhớ bị xoá) ⇒ khởi đầu BẬT (giao diện mới)
+// tới khi máy chủ trả lời; lỗi đọc (chậm, quá tải lúc phát hành, 404) KHÔNG xoá cờ. Chỉ máy chủ trả rõ `bat: false` mới về app cũ.
+const MAC_DINH: CoHoa2 = { bat: true, lop: [], sbd: [] }
 export const useCoHoa2 = create<TrangThaiCo>((set, get) => ({
-  co: docNho(),
+  co: docNho() ?? MAC_DINH,
   dangDoc: false,
   loi: '',
   doc: async () => {
@@ -51,10 +54,8 @@ export const useCoHoa2 = create<TrangThaiCo>((set, get) => ({
       set({ co: r.du, dangDoc: false, loi: '' })
     } else {
       // Máy chủ chưa có lệnh ⇒ chắc chắn chưa bật: bỏ bản nhớ cũ. Mất mạng / chậm ⇒ giữ bản nhớ (không đổi app giữa buổi).
-      if (r.loai === 'chua_co_lenh') {
-        ghiNho(null)
-        set({ co: null, dangDoc: false, loi: r.chu })
-      } else set({ dangDoc: false, loi: r.chu })
+      // 09/11: lỗi đọc KHÔNG xoá bản nhớ (trước đây 404 lúc máy chủ đang phát hành ⇒ xoá ⇒ app rơi về giao diện cũ).
+      set({ dangDoc: false, loi: r.chu })
     }
   },
   luu: async (co) => {
