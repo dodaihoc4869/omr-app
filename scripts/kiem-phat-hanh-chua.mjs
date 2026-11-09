@@ -4,11 +4,21 @@ import { kiemDuongPages } from './doi-pages-song.mjs'
 const token = process.env.CLOUDFLARE_API_TOKEN
 const account = process.env.CLOUDFLARE_ACCOUNT_ID
 if (!token || !account) throw new Error('Thiếu cấu hình Cloudflare.')
+// D1 API giới hạn tần suất: sau ~10 bước áp schema liên tiếp, lệnh KIỂM cuối hay nhận 429 (#1521, #1526 ×2 — 09/11) ⇒ phát hành rớt dù schema đủ.
+// Chỉ thử lại khi 429 (D1 từ chối, lệnh CHƯA chạy ⇒ an toàn cả với lệnh ghi của tệp khác dùng chung hàm này): chờ 3 · 6 · 12 · 24 · 48 s.
 export async function query(sql) {
+  for (let lan = 0; ; lan++) {
+    try { return await query1(sql) } catch (e) {
+      if (lan >= 5 || !/\(429\)/.test(String(e?.message))) throw e
+      await new Promise(ok => setTimeout(ok, 3000 * 2 ** lan))
+    }
+  }
+}
+async function query1(sql) {
   const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database/d2e6d322-374a-45d7-83a3-9fac486b23f1/query`, {
     method: 'POST', headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ sql }), signal: AbortSignal.timeout(30000),
   })
-  const j = await r.json()
+  const j = await r.json().catch(() => ({}))
   if (!r.ok || !j.success || j.result?.some(x => !x.success)) throw new Error(`Không kiểm được D1 (${r.status}).`)
   return j.result.flatMap(x => x.results ?? [])
 }
