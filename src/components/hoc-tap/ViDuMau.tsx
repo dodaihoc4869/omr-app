@@ -15,7 +15,6 @@ export default function ViDuMau({ token, qid, ten, onDong }: { token: string; qi
   const [lan, setLan] = useState(0)
   useEffect(() => {
     let het = false
-    setLoi(false)
     taiChiTiet(token, [qid]).then((ds) => { if (het) return; if (ds[0]) setCt(ds[0]); else setLoi(true) }, () => { if (!het) setLoi(true) })
     return () => { het = true }
   }, [token, qid, lan])
@@ -32,7 +31,7 @@ export default function ViDuMau({ token, qid, ten, onDong }: { token: string; qi
       </header>
       <div className="vdm-than">
         {ct ? <TheCau {...propsTheCau(ct, 1)} />
-          : loi ? <p className="vdm-loi" role="alert">Chưa mở được ví dụ mẫu. <button type="button" onClick={() => setLan((n) => n + 1)}>Thử lại</button></p>
+          : loi ? <p className="vdm-loi" role="alert">Chưa mở được ví dụ mẫu. <button type="button" onClick={() => { setLoi(false); setLan((n) => n + 1) }}>Thử lại</button></p>
           : <p className="vdm-cho" role="status">Đang mở ví dụ mẫu…</p>}
       </div>
       <button type="button" className="vdm-nut" onClick={onDong}>Đã hiểu — làm nhóm này</button>
