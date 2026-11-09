@@ -57,7 +57,8 @@ describe('1 · hoc-tap-dem = đúng số "đã làm / M" của sảnh Gói 7', (
       expect({ daLam: d.daLamHomNay, muc: d.toiThieu }).toEqual({ daLam: s.goi7.daLamHomNay, muc: s.goi7.toiThieu })
       return d
     }
-    expect(await so(NOW)).toMatchObject({ daLamHomNay: 0, toiThieu: 32 })
+    // thầy 09/11: mức ngày Gói 7 cố định 28 (trước: lịch câu mới 32 > mức tầng ⇒ 32).
+    expect(await so(NOW)).toMatchObject({ daLamHomNay: 0, toiThieu: 28 })
     const cu = k.qids('DH-B7')
     await lam(k.env, 'S1', cu[0]!, NOW + PHUT, true)
     await lam(k.env, 'S1', cu[1]!, NOW + 2 * PHUT, false)
@@ -67,7 +68,7 @@ describe('1 · hoc-tap-dem = đúng số "đã làm / M" của sảnh Gói 7', (
     const gap = k.d.sql.prepare('INSERT INTO goi_bai_7_gap(receipt,goi_id,sbd,qid,version,kieu,luc) VALUES(?,?,?,?,?,?,?)')
     gap.run('r-a', 'g7:amine', 'S1', moi[6]!, 'v1', 'co_ho_tro', new Date(NOW + 20 * PHUT).toISOString())
     gap.run('r-b', 'g7:amine', 'S1', moi[0]!, 'v1', 'co_ho_tro', new Date(NOW + 21 * PHUT).toISOString()) // trùng câu đã làm ⇒ không cộng
-    expect(await so(NOW + 22 * PHUT)).toMatchObject({ daLamHomNay: 8, toiThieu: 32 })
+    expect(await so(NOW + 22 * PHUT)).toMatchObject({ daLamHomNay: 8, toiThieu: 28 })
     // Em khác cùng lớp không lẫn số.
     const t2 = await gameToken(k.env, 'S2')
     expect((await dem(k.env, t2, NOW + 23 * PHUT)).daLamHomNay).toBe(0)
@@ -76,7 +77,7 @@ describe('1 · hoc-tap-dem = đúng số "đã làm / M" của sảnh Gói 7', (
     const k = await khoGoi7()
     await sanh(k.env, k.token, NOW)
     const truoc = tongGhi(k)
-    expect(await demHomNay7(k.env, 'S1', NOW + PHUT)).toEqual({ ok: true, ngay: '2026-10-12', daLamHomNay: 0, toiThieu: 32 })
+    expect(await demHomNay7(k.env, 'S1', NOW + PHUT)).toEqual({ ok: true, ngay: '2026-10-12', daLamHomNay: 0, toiThieu: 28 }) // mức cố định 28 (thầy 09/11)
     expect(tongGhi(k)).toBe(truoc)
     const src = readFileSync(new URL('../server/src/game-v2.ts', import.meta.url), 'utf8')
     expect(src).toMatch(/laLenhCongSongSong=\(action:string\):boolean=>\['hoc-tap-gap','hoc-tap-dem',/)

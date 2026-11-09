@@ -5,15 +5,17 @@
 // ĐÃ LÀM, CÒN THIẾU, ĐỦ MỨC giống hệt nhau ở: sảnh học sinh (`hoc-tap-sanh` thật) = thầy (`ngayBaiCuaMotEm`, `/gv/bai-hang-ngay`, `/gv/ho-so-thai-do`,
 // `/gv/nhip-hoc`) = `/hs/nhip-hoc` = `/ph/con-tong-quan`.
 //   Ca 1 · Hành trình (mức đã chốt `hanh_trinh_v3_ngay`).
-//   Ca 2 · Gói 7, lịch câu mới 3 < mức tầng 24 ⇒ M = 24.
-//   Ca 3 · Gói 7, lịch câu mới 32 > mức tầng 24 ⇒ M = 32 (ảnh thầy: "2 trên 24 câu" + "31 câu tự làm" + "lịch tối thiểu 32 câu").
+//   Ca 2 · Gói 7, lịch câu mới nhỏ hơn mức ⇒ M = mức.
+//   Ca 3 · Gói 7, lịch câu mới 32 > mức (ảnh thầy: "2 trên 24 câu" + "31 câu tự làm" + "lịch tối thiểu 32 câu").
+// SỬA CÓ CHỦ ĐÍCH 09/11 — thầy «mỗi ngày chỉ 28 câu»: M Gói 7 CỐ ĐỊNH 28 mọi em mọi tầng (`mucNgayGoi7`); lịch vượt phần còn lại của 28 dồn sang ngày sau
+// (Ca 3 nay: lịch 32 ⇒ M vẫn 28, kế hoạch 28 − đã làm). Hạn gói mới = hạn chung cả lớp (han-chung.ts) ⇒ ca đọc hạn thật từ bảng.
 // Thêm: `chonGoi7` có trần ⇒ đúng M − đã làm câu · hai phép đếm "đã làm" (máy em / máy thầy) cho cùng số · ngày cũ chưa chốt ⇒ `uoc-goi7` ·
-// luật Lười dùng M mới (24/24 thành đủ mức, không còn 24/36 "thiếu 12"). Tên em là tên giả.
+// luật Lười dùng M mới (28/28 thành đủ mức, không còn 28/36 "thiếu 8"). Tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoKhoOmni, themChienDich, lam, lucVn, type KhoOmni } from './omni-3-ke-hoach-chung'
 import { taoD1That } from './_d1-that'
 import { dongBoGoi7, lapGoi7 } from '../server/src/goi-bai-7'
-import { chonGoi7, mucNgayGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
+import { chonGoi7, mucNgayGoi7, quotaGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
 import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
 import { SQL_BANG_HANH_TRINH } from '../server/src/hanh-trinh-hop-nhat'
 import { damBaoBangBaiDaDay, xoaDemPhamVi } from '../server/src/bai-da-day'
@@ -105,29 +107,33 @@ const phiaEm = (s: SanhGoi7): Mot => ({ muc: s.goi7.toiThieu, daLam: s.goi7.daLa
 /** Tổng việc tiêu đề (tự làm + có hỗ trợ + chờ bổ sung) = M − đã làm — không số nào mâu thuẫn vòng tròn. */
 const tongTieuDe = (s: SanhGoi7) => s.goi7.tuLamCon + s.goi7.tiepCanCon + s.goi7.thieuNgay
 const mucChot = (k: KhoOmni, sbd = 'S1', ngay = HOM_NAY) => k.d.sql.prepare('SELECT tang,toi_thieu_tang,quota,muc FROM goi_bai_7_muc_ngay WHERE sbd=? AND ngay=?').get(sbd, ngay)
+/** Hạn thật máy chủ ghi cho gói Bài 8 (09/11: hạn chung cả lớp, không còn bat_dau + 6). */
+const hanAmine = (k: KhoOmni) => String((k.d.sql.prepare("SELECT han FROM goi_bai_7 WHERE id='g7:amine'").get() as { han: string }).han)
 
-describe('Ca 3 · Gói 7, lịch câu mới 32 > mức tầng 24 (ảnh thầy 12/10)', () => {
-  it('M = 32 chốt lần mở đầu; em · thầy · Nhịp học · phụ huynh cùng "đã làm / 32"; kế hoạch đúng 32 − đã làm câu; đủ mức khi làm đủ 32', async () => {
-    const k = await khoGoi7(192) // 192 câu chưa gặp / 6 ngày còn ⇒ lịch 32 câu mới hôm nay
+describe('Ca 3 · Gói 7, lịch câu mới 32 > mức ngày (ảnh thầy 12/10)', () => {
+  it('lịch 32 ⇒ M = 28 cố định chốt lần mở đầu (thầy 09/11); em · thầy · Nhịp học · phụ huynh cùng "đã làm / 28"; kế hoạch đúng 28 − đã làm câu; đủ mức khi làm đủ 28', async () => {
+    const k = await khoGoi7(192)
+    // Gói tạo trước 09/11 giữ hạn cũ 7 ngày (gói đang chạy không bị sửa hạn) ⇒ 192 câu chưa gặp / 6 ngày còn ⇒ lịch 32 câu mới hôm nay > 28.
+    k.d.sql.exec("UPDATE goi_bai_7 SET han='2026-10-17' WHERE id='g7:amine'; UPDATE goi_bai_7_em SET han='2026-10-17' WHERE goi_id='g7:amine'")
     // Trước khi em mở bài: chưa có dòng chốt ⇒ thầy thấy mức ƯỚC TÍNH (có cờ), không bịa tầng Hành trình.
     const truoc = await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-11', HOM_NAY, HOM_NAY)
-    expect(truoc!.find((n) => n.homNay)).toMatchObject({ cheDo: 'goi7', nguonMuc: 'uoc-goi7', mucUocTinh: true, mucToiThieu: 24 })
+    expect(truoc!.find((n) => n.homNay)).toMatchObject({ cheDo: 'goi7', nguonMuc: 'uoc-goi7', mucUocTinh: true, mucToiThieu: 28 })
 
     const s0 = await sanh(k.env, k.token, NOW)
     expect(s0.goi7.goi[0]).toMatchObject({ quota: 32, gapHomNay: 0 })
-    expect(phiaEm(s0)).toEqual({ muc: 32, daLam: 0, con: 32, du: false })
-    expect(mucChot(k)).toEqual({ tang: 1, toi_thieu_tang: CAU_TOI_THIEU[1], quota: 32, muc: 32 })
-    expect(s0.theLuc.con).toBe(32)
-    expect(tongTieuDe(s0)).toBe(32)
+    expect(phiaEm(s0)).toEqual({ muc: 28, daLam: 0, con: 28, du: false })
+    expect(mucChot(k)).toEqual({ tang: 1, toi_thieu_tang: CAU_TOI_THIEU[1], quota: 32, muc: 28 }) // lịch 32 vẫn ghi, mức không tăng theo lịch
+    expect(s0.theLuc.con).toBe(28)
+    expect(tongTieuDe(s0)).toBe(28)
 
-    // Em làm 2 câu ôn bài cũ (ngoài gói) — ảnh thầy: "2 trên …". Trước 12/10 máy xếp ĐỦ 32 câu mới (vượt phần còn lại 30 của mức) ⇒ "31 câu tự làm".
+    // Em làm 2 câu ôn bài cũ (ngoài gói) — ảnh thầy: "2 trên …". Trước 12/10 máy xếp ĐỦ 32 câu mới (vượt phần còn lại của mức) ⇒ "31 câu tự làm".
     const cu = k.qids('DH-B7')
     await lam(k.env, 'S1', cu[0]!, NOW + PHUT, true)
     await lam(k.env, 'S1', cu[1]!, NOW + 2 * PHUT, false)
     const s1 = await sanh(k.env, k.token, NOW + 3 * PHUT)
-    expect(phiaEm(s1)).toEqual({ muc: 32, daLam: 2, con: 30, du: false })
-    expect(s1.theLuc.con).toBe(30) // = M − đã làm (không còn 32)
-    expect(tongTieuDe(s1)).toBe(30)
+    expect(phiaEm(s1)).toEqual({ muc: 28, daLam: 2, con: 26, du: false })
+    expect(s1.theLuc.con).toBe(26) // = M − đã làm (không còn 28, không theo lịch 32)
+    expect(tongTieuDe(s1)).toBe(26)
     cungMotSo(await phiaKhac(k.env, 'S1', k.token, NOW + 3 * PHUT), phiaEm(s1))
 
     // Làm thêm 10 câu mới của gói + 1 câu học có hướng dẫn (chưa có trong sổ) + 1 câu hướng dẫn TRÙNG câu đã làm (không cộng hai lần).
@@ -138,72 +144,75 @@ describe('Ca 3 · Gói 7, lịch câu mới 32 > mức tầng 24 (ảnh thầy 1
     gap.run('r-a', 'g7:amine', 'S1', moi[10]!, 'v1', 'co_ho_tro', new Date(NOW + 20 * PHUT).toISOString())
     gap.run('r-b', 'g7:amine', 'S1', moi[0]!, 'v1', 'co_ho_tro', new Date(NOW + 21 * PHUT).toISOString())
     const s2 = await sanh(k.env, k.token, NOW + 22 * PHUT)
-    expect(phiaEm(s2)).toEqual({ muc: 32, daLam: 13, con: 19, du: false })
-    expect(s2.theLuc.con).toBe(19)
+    expect(phiaEm(s2)).toEqual({ muc: 28, daLam: 13, con: 15, du: false })
+    expect(s2.theLuc.con).toBe(15)
     const p2 = await phiaKhac(k.env, 'S1', k.token, NOW + 22 * PHUT)
     cungMotSo(p2, phiaEm(s2))
     expect(p2._ngay).toMatchObject({ nguonMuc: 'da-chot', mucUocTinh: false, tang: 1, cheDo: 'goi7' })
 
-    // Làm hết phần còn lại ⇒ đủ mức ở MỌI phía; kế hoạch về 0 (không giao thêm vượt mức).
+    // Làm hết phần còn lại ⇒ đủ mức ở MỌI phía; kế hoạch về 0 (không giao thêm vượt mức — phần lịch 32 còn lại dồn sang ngày sau).
     const conLai = (await lapGoi7(k.env, 'S1', NOW + 23 * PHUT))!.plan.viec
-    expect(conLai).toHaveLength(19)
+    expect(conLai).toHaveLength(15)
     for (const [i, v] of conLai.entries()) await lam(k.env, 'S1', qidGoc(v.qid), NOW + (24 + i) * PHUT, true, { cauVersion: 'v1' })
     const s3 = await sanh(k.env, k.token, NOW + 50 * PHUT)
-    expect(phiaEm(s3)).toEqual({ muc: 32, daLam: 32, con: 0, du: true })
+    expect(phiaEm(s3)).toEqual({ muc: 28, daLam: 28, con: 0, du: true })
     expect(s3.theLuc.con).toBe(0)
+    expect((await lapGoi7(k.env, 'S1', NOW + 51 * PHUT))!.plan.viec).toHaveLength(0)
     cungMotSo(await phiaKhac(k.env, 'S1', k.token, NOW + 50 * PHUT), phiaEm(s3))
   })
 })
 
-describe('Ca 2 · Gói 7, lịch câu mới 3 < mức tầng', () => {
-  /** Hôm qua (11/10, 20:00) em mở bài và gặp 22/40 câu ⇒ hôm nay còn 18 câu chưa gặp / 6 ngày ⇒ lịch 3 câu mới; 22 câu đã gặp thành câu ôn / sửa. */
+describe('Ca 2 · Gói 7, lịch câu mới nhỏ hơn mức', () => {
+  /** Hôm qua (11/10, 20:00) em mở bài và gặp 22/40 câu ⇒ hôm nay còn 18 câu chưa gặp chia tới hạn chung (09/11) ⇒ lịch vài câu mới; 22 câu đã gặp thành câu ôn / sửa. */
   async function homQua22() {
     const k = await khoGoi7(40)
     const HQ = Date.parse('2026-10-11T13:00:00Z')
     const s = await sanh(k.env, k.token, HQ)
-    expect(s.goi7.toiThieu).toBe(24)
+    expect(s.goi7.toiThieu).toBe(28) // thầy 09/11: mức cố định 28
     const viec = (await lapGoi7(k.env, 'S1', HQ + PHUT))!.plan.viec
     // 06/11 (rút câu mới theo ma trận 2026): kế hoạch hôm qua dồn nhiều câu Nhận biết hơn thứ tự cũ ⇒ đúng 3/4 thì em vững ≥ 80% nhóm tầng 1 và LÊN tầng 2
     // (mức 30 > 28 câu bài 40 câu còn xếp được). Kịch bản này cần em còn ở tầng 1 ⇒ đúng xen kẽ (1/2).
     for (const [i, v] of viec.slice(0, 22).entries()) await lam(k.env, 'S1', qidGoc(v.qid), HQ + (2 + i) * PHUT, i % 2 === 0, { cauVersion: 'v1' })
     return k
   }
-  it('M = mức tầng (lịch 3 nhỏ hơn); kế hoạch = M − đã làm câu, 3 câu mới theo lịch đứng đầu; mọi phía cùng số — hôm nay và hôm qua (22/24 thiếu 2)', async () => {
+  it('M = 28 (lịch nhỏ hơn); kế hoạch = M − đã làm câu, câu mới theo lịch đứng đầu; mọi phía cùng số — hôm nay và hôm qua (22/28 thiếu 6)', async () => {
     const k = await homQua22()
+    const lich = quotaGoi7(18, HOM_NAY, hanAmine(k)) // 18 câu chưa gặp chia tới hạn chung của gói
+    expect(lich).toBeLessThan(28)
     const s0 = await sanh(k.env, k.token, NOW)
-    expect(s0.goi7.goi[0]).toMatchObject({ quota: 3, gapHomNay: 0 })
+    expect(s0.goi7.goi[0]).toMatchObject({ quota: lich, gapHomNay: 0 })
     const chot = mucChot(k) as { tang: 1 | 2 | 3 | 4; quota: number; muc: number }
-    expect(chot.quota).toBe(3)
-    expect(chot.muc).toBe(CAU_TOI_THIEU[chot.tang]) // lịch 3 < mức tầng ⇒ M là mức tầng
+    expect(chot.quota).toBe(lich)
+    expect(chot.muc).toBe(28) // thầy 09/11: mức cố định 28 mọi tầng (lịch nhỏ hơn không hạ mức)
     const M = chot.muc
     expect(phiaEm(s0)).toEqual({ muc: M, daLam: 0, con: M, du: false })
     expect(s0.theLuc.con).toBe(M)
     expect(tongTieuDe(s0)).toBe(M)
     const lap = await lapGoi7(k.env, 'S1', NOW + PHUT)
     const moiGoi = new Set(k.qids('DH-B8'))
-    expect(lap!.plan.viec.slice(0, 3).every((v) => moiGoi.has(v.qid) && (v.vai === 'moi' || v.vai === 'tiep_can'))).toBe(true)
+    expect(lap!.plan.viec.slice(0, lich).every((v) => moiGoi.has(v.qid) && (v.vai === 'moi' || v.vai === 'tiep_can'))).toBe(true)
     for (const [i, v] of lap!.plan.viec.slice(0, 7).entries()) await lam(k.env, 'S1', qidGoc(v.qid), NOW + (2 + i) * PHUT, true, { cauVersion: 'v1' })
     const s1 = await sanh(k.env, k.token, NOW + 10 * PHUT)
     expect(phiaEm(s1)).toEqual({ muc: M, daLam: 7, con: M - 7, du: false })
     expect(s1.theLuc.con).toBe(M - 7)
     expect(tongTieuDe(s1)).toBe(M - 7)
     cungMotSo(await phiaKhac(k.env, 'S1', k.token, NOW + 10 * PHUT), phiaEm(s1))
-    // hôm qua: dòng chốt 24 (lịch 6 < 24), làm 22 ⇒ thiếu 2 ở mọi bảng thầy
+    // hôm qua: dòng chốt 28 (lịch nhỏ hơn 28), làm 22 ⇒ thiếu 6 ở mọi bảng thầy
     const hq = (await ngayBaiCuaMotEm(k.env, 'S1', '2026-10-11', '2026-10-11', HOM_NAY))![0]!
-    expect([hq.mucToiThieu, hq.daLam, hq.thieu, hq.datMuc, hq.nguonMuc]).toEqual([24, 22, 2, false, 'da-chot'])
+    expect([hq.mucToiThieu, hq.daLam, hq.thieu, hq.datMuc, hq.nguonMuc]).toEqual([28, 22, 6, false, 'da-chot'])
   })
 
   it('mức đã chốt KHÔNG nhảy trong ngày (lịch gói đổi giữa ngày vẫn đọc lại số chốt); ngày mới chốt lại', async () => {
     const k = await khoGoi7(18)
     const s0 = await sanh(k.env, k.token, NOW)
-    expect(s0.goi7.toiThieu).toBe(24)
+    expect(s0.goi7.toiThieu).toBe(28) // thầy 09/11: mức cố định 28
     k.d.sql.prepare("UPDATE goi_bai_7_ngay SET quota=40 WHERE sbd='S1' AND ngay=?").run(HOM_NAY) // lịch đổi giữa ngày
     const s = await sanh(k.env, k.token, NOW + 5 * PHUT)
     expect(s.goi7.goi[0]!.quota).toBe(40)
-    expect(s.goi7.toiThieu).toBe(24) // số đã chốt
-    expect((await ngayBaiCuaMotEm(k.env, 'S1', HOM_NAY, HOM_NAY, HOM_NAY))![0]).toMatchObject({ mucToiThieu: 24, nguonMuc: 'da-chot' })
+    expect(s.goi7.toiThieu).toBe(28) // số đã chốt (lịch 40 > 28 cũng không đổi)
+    expect((await ngayBaiCuaMotEm(k.env, 'S1', HOM_NAY, HOM_NAY, HOM_NAY))![0]).toMatchObject({ mucToiThieu: 28, nguonMuc: 'da-chot' })
     await sanh(k.env, k.token, NOW + 86_400_000)
-    expect(mucChot(k, 'S1', '2026-10-13')).toMatchObject({ quota: 4, muc: 24 }) // 18 câu chưa gặp / 5 ngày
+    expect(mucChot(k, 'S1', '2026-10-13')).toMatchObject({ quota: quotaGoi7(18, '2026-10-13', hanAmine(k)), muc: 28 }) // 18 câu chưa gặp chia tới hạn chung
   })
 })
 
@@ -252,9 +261,9 @@ describe('chonGoi7 có trần (chiTrongMuc) — đúng M − đã làm câu khi 
     expect(p.viec.slice(0, 3).map((v) => v.qid)).toEqual(['q00', 'q01', 'q02'])
     expect(p.viec.filter((v) => v.vai === 'on').map((v) => v.qid)).toEqual(['o1', 'o2'])
   })
-  it('đã đủ mức ⇒ 0 việc; mucNgayGoi7 = max(mức tầng, Σ lịch)', () => {
+  it('đã đủ mức ⇒ 0 việc; mucNgayGoi7 = 28 cố định (thầy 09/11 «mỗi ngày chỉ 28 câu»)', () => {
     expect(chonGoi7({ ...co, mucTieuNgay: 0, chiTrongMuc: true }).viec).toEqual([])
-    expect([mucNgayGoi7(24, 3), mucNgayGoi7(24, 32), mucNgayGoi7(36, 32), mucNgayGoi7(24, -5)]).toEqual([24, 32, 36, 24])
+    expect([mucNgayGoi7(24, 3), mucNgayGoi7(24, 32), mucNgayGoi7(36, 32), mucNgayGoi7(24, -5)]).toEqual([28, 28, 28, 28])
   })
 })
 
@@ -290,7 +299,7 @@ describe('đã làm hôm nay: phép của máy em (lapGoi7.daLamNgay) = phép c�
 
 // ------------------------------------------------------------------ NGÀY CŨ + LUẬT LƯỜI
 const luc = (ngay: string, gioVn = 9, phut = 0) => new Date(Date.parse(`${ngay}T00:00:00+07:00`) + (gioVn * 60 + phut) * 60_000).toISOString()
-/** Em L (12 - Tinh Hoa): Hành trình tới 05/10 (tầng 3 Vận dụng, mức 36), Gói 7 từ 06/10, mỗi ngày 06–11/10 làm 24 câu khác nhau, lịch câu mới 19/ngày. */
+/** Em L (12 - Tinh Hoa): Hành trình tới 05/10 (tầng 3 Vận dụng, mức 36), Gói 7 từ 06/10, mỗi ngày 06–11/10 làm 28 câu khác nhau (09/11: mức 28), lịch câu mới 19/ngày. */
 function khoLuoi() {
   const d = taoD1That()
   for (const q of [...SQL_BANG_HANH_TRINH, ...SQL_GOI7]) d.sql.exec(q)
@@ -306,7 +315,7 @@ function khoLuoi() {
   let n = 0
   for (const ng of ['2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11']) {
     d.sql.prepare('INSERT INTO goi_bai_7_ngay (goi_id, sbd, ngay, quota) VALUES (?,?,?,?)').run('g7:t1', 'L', ng, 19)
-    for (let i = 0; i < 24; i++)
+    for (let i = 0; i < 28; i++)
       d.sql.prepare('INSERT INTO su_kien_hoc (khoa, sbd, qid, nguon, ma_nguon, lan, ket_qua, giay, luc, ngay_vn) VALUES (?,?,?,?,?,?,?,?,?,?)')
         .run(`k${++n}`, 'L', `Q-${ng}-${i}`, 'game', 'P', 1, 1, 40, luc(ng, 9, i), ng)
   }
@@ -314,7 +323,8 @@ function khoLuoi() {
 }
 
 describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lười dùng M mới', () => {
-  it('ảnh thầy "24/36 thiếu 12": ngày Gói 7 cũ nay 24/24 đủ mức (uoc-goi7, tầng 1) — không lấy tầng 3 của Hành trình; 6 ngày đủ ⇒ Chăm (trước: Lười)', async () => {
+  // 09/11 (thầy «mỗi ngày chỉ 28 câu»): ước tính ngày Gói 7 cũ = 28 cố định ⇒ dữ liệu giả mỗi ngày 28 câu (trước 24/24) — ý giữ nguyên: không lấy 36 của tầng 3.
+  it('ảnh thầy "24/36 thiếu 12": ngày Gói 7 cũ nay 28/28 đủ mức (uoc-goi7, tầng 1) — không lấy tầng 3 của Hành trình; 6 ngày đủ ⇒ Chăm (trước: Lười)', async () => {
     const T = Date.parse('2026-10-12T05:00:00Z')
     vi.setSystemTime(T)
     const { env } = khoLuoi()
@@ -323,9 +333,9 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     const o = Object.fromEntries(h.ngay.map((n) => [n.ngay, [n.mucToiThieu, n.daLam, n.thieu, n.datMuc, n.nguonMuc, n.tang, n.cheDo]]))
     expect(o['2026-10-05']).toEqual([36, 0, 36, false, 'da-chot', 3, 'hanh-trinh'])
     for (const ng of ['2026-10-06', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10', '2026-10-11'])
-      expect(o[ng], ng).toEqual([24, 24, 0, true, 'uoc-goi7', 1, 'goi7'])
-    expect(o['2026-10-12']).toEqual([24, 0, 24, false, 'uoc-goi7', 1, 'goi7']) // hôm nay chưa mở bài ⇒ ước tính, có cờ
-    expect(h.nhomNhip).toBe('cham') // 6 ngày Gói 7 đủ, chuỗi 6 — trước 12/10 mỗi ngày 24/36 "thiếu 12" ⇒ 0 ngày đủ ⇒ Lười
+      expect(o[ng], ng).toEqual([28, 28, 0, true, 'uoc-goi7', 1, 'goi7'])
+    expect(o['2026-10-12']).toEqual([28, 0, 28, false, 'uoc-goi7', 1, 'goi7']) // hôm nay chưa mở bài ⇒ ước tính, có cờ
+    expect(h.nhomNhip).toBe('cham') // 6 ngày Gói 7 đủ, chuỗi 6 — trước 12/10 mỗi ngày tính theo 36 của tầng 3 ⇒ 0 ngày đủ ⇒ Lười
     expect(h.ketLuan.nhan).not.toBe('luoi')
     // 26/10: bản EM (`/hs/nhip-hoc`) không còn nhóm / độ tin cậy (thầy: chỉ thầy + phụ huynh xem) ⇒ nhóm kiểm ở LÕI dùng chung với `/ph/nhip-hoc`.
     expect(await hsNhipHoc(env, { token: await gameToken(env, 'L') }, T)).toMatchObject({ ok: true, soNgayDu: 6, soNgayQua: 7 })
@@ -333,8 +343,8 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     expect(em).toMatchObject({ ok: true, nhom: 'cham', soNgayDu: 6, soNgayQua: 7 }) // ngày vào 05/10 (dấu vết Hành trình): 6/7 đủ ⇒ Chăm
     const nhip = (await gvNhipHoc(env, { tu: '2026-10-05' }, T)) as KetQuaNhipHoc
     const eL = nhip.em.find((e) => e.sbd === 'L')!
-    expect(eL.muc).toEqual([36, 24, 24, 24, 24, 24, 24, 24])
-    expect(eL.lam).toEqual([0, 24, 24, 24, 24, 24, 24, 0])
+    expect(eL.muc).toEqual([36, 28, 28, 28, 28, 28, 28, 28])
+    expect(eL.lam).toEqual([0, 28, 28, 28, 28, 28, 28, 0])
     // 13/10: chip cạnh tên nhóm trên hồ sơ = CÙNG độ tin cậy của nhóm ở bảng em và dòng thầy (không mượn số của nhãn thái độ).
     expect(em.doTinCay).toBeGreaterThan(0)
     expect(h.tinCayNhom?.doTinCay).toBe(em.doTinCay)
@@ -346,7 +356,8 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     expect(eL.bacCham).toEqual(em.bacCham)
   })
 
-  it('lịch câu mới ngày cũ lớn hơn 24 ⇒ ước tính theo lịch (32); có dòng chốt ⇒ đúng số chốt (da-chot), không ước tính', async () => {
+  // 09/11 (thầy «mỗi ngày chỉ 28 câu»): ước tính KHÔNG còn theo lịch — lịch 32 vẫn ra 28; dòng chốt cũ (30) vẫn được tôn trọng.
+  it('lịch câu mới ngày cũ lớn hơn 28 ⇒ ước tính vẫn 28 cố định (không theo lịch 32); có dòng chốt ⇒ đúng số chốt (da-chot), không ước tính', async () => {
     const T = Date.parse('2026-10-12T05:00:00Z')
     vi.setSystemTime(T)
     const { d, env } = khoLuoi()
@@ -354,8 +365,8 @@ describe('ngày Gói 7 cũ chưa chốt ⇒ ước tính uoc-goi7; luật Lườ
     d.sql.prepare('INSERT INTO goi_bai_7_muc_ngay (sbd, ngay, tang, toi_thieu_tang, quota, muc, luc) VALUES (?,?,?,?,?,?,?)').run('L', '2026-10-11', 2, 30, 19, 30, 'x')
     const r = await ngayBaiCuaMotEm(env, 'L', '2026-10-10', '2026-10-11', '2026-10-12')
     expect(r!.map((n) => [n.ngay, n.mucToiThieu, n.daLam, n.datMuc, n.nguonMuc, n.mucUocTinh, n.tang])).toEqual([
-      ['2026-10-10', 32, 24, false, 'uoc-goi7', true, 1],
-      ['2026-10-11', 30, 24, false, 'da-chot', false, 2],
+      ['2026-10-10', 28, 28, true, 'uoc-goi7', true, 1],
+      ['2026-10-11', 30, 28, false, 'da-chot', false, 2],
     ])
   })
 })

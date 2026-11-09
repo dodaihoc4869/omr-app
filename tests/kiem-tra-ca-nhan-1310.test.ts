@@ -206,10 +206,12 @@ it('kết quả kiểm tra đã nộp vẫn là mức ngày thật nếu tạm t
 })
 it('ngày học giữ chỗ sửa sai và ôn cũ, nhưng không tăng số đã chốt khi em đang làm',async()=>{
  const k=await kho();await damBaoGoi7(k.env)
+ // thầy 09/11 «mỗi ngày chỉ 28 câu»: mức cố định 28 dù lịch câu mới + giữ chỗ (25 + 10) lớn hơn (trước: 35).
  const first=await chotMucNgay7(k.env,'S1','2026-10-13',1,25,NOW,false,undefined,10)
- expect(first.muc).toBe(35)
+ expect(first.muc).toBe(28)
+ // Lịch đổi giữa ngày (50 câu) ⇒ vẫn đọc lại đúng số đã chốt, không tăng khi em đang làm.
  const second=await chotMucNgay7(k.env,'S1','2026-10-13',1,50,NOW+1000,false,undefined,10)
- expect(second.muc).toBe(35)
+ expect(second.muc).toBe(first.muc);expect(second.quota).toBe(first.quota)
  const all=Array.from({length:35},(_,i)=>`q${i}`),moi=all.slice(0,25),sua=all.slice(25,29),on=all.slice(29)
  const p=chonGoi7({cau:moi.map(qid=>({qid,maDe:'M',version:'v1',phan:'I',kho:false,tinhToan:false})),daGap:new Set(),daLamNgay:new Set(),quotaCon:25,sanSang:new Set(all),chan:new Set(),sua,on,mucTieuNgay:35,giuOn:6,chiTrongMuc:true})
  expect(p.viec.filter(v=>v.vai==='sua')).toHaveLength(4)

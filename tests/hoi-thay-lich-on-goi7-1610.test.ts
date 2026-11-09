@@ -46,7 +46,7 @@ it('Gói7: câu đã hỏi đến hạn ngoài mẫu 96 được ưu tiên ôn, 
   expect(r.plan.viec.some(v => v.qid === qid && ['sua', 'on'].includes(v.vai))).toBe(true)
   const ids = r.plan.viec.map(v => v.qid)
   expect(new Set(ids).size).toBe(ids.length)
-  expect(r.plan.viec.length).toBeLessThanOrEqual(24)
+  expect(r.plan.viec.length).toBeLessThanOrEqual(28) // thầy 09/11: mức ngày Gói 7 cố định 28 (trước 24) — kế hoạch không vượt mức ngày
   expect(r.plan.viec.some(v => k.qids('DH-B8').includes(v.qid) && ['moi', 'tiep_can'].includes(v.vai))).toBe(true)
   k.d.sql.close()
 })

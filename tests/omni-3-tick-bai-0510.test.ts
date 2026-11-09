@@ -88,7 +88,11 @@ describe('xem-truoc — dòng xác nhận, không ghi gì', () => {
     const r = await gvBaiDaDay(env, { action: 'xem-truoc', lop: LOP, khoaBai: 'B6', tenBai: TEN_B6, viTri: 6, maDe: MA_B6 }, T0)
     // 9 câu dùng được: tờ "-DT" bị bỏ NGAY ở đầu vào (lưới an toàn 05/10 — chỉ Trắc nghiệm / Đúng sai / Trả lời ngắn) ⇒ chỉ còn 1 câu Phần III tự luận
     // bị bỏ ⇒ soTuLuan 1; em mới: 18 lượt; thể lực mặc định 40 ⇒ D nhỏ nhất với 18 ≤ 0,8 × D × 40 là 7.
-    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 1, theoPhan: { I: 6, II: 2, III: 1 }, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40 })
+    // THÊM 09/11 (thầy: hạn chung cả lớp — han-chung.ts): 9 câu ⇒ M = ⌈9/28⌉ = 1; 3 em chưa có sổ ⇒ năng lực mặc định ⇒ 2 ngày Sửa dự báo
+    // ⇒ T = M + 1 + 2 = 4 (≥ M + 2) ⇒ hạn = hôm nay 05/10 + 3 = 08/10, cả 3 em dự kiến xong. Độ chuẩn đề (`doChuanDe`): mọi câu mức NB ⇒ 6 câu Phần I
+    // vào ô Biết (≤ 12), 2 Phần II + 1 Phần III về ô Hiểu (≤ 2, ≤ 3) ⇒ dungO 9; Đúng sai 2 < 4 × M ⇒ thiếu 2.
+    expect(r).toEqual({ ok: true, soCau: 9, soTuLuan: 1, theoPhan: { I: 6, II: 2, III: 1 }, hanNop: '2026-10-11', D: 7, luotCan: 18, sucChua: 280, soEmChon: 3, duLuot: 3, tongEm: 3, duDiem8: null, quaTai: [], theLucNgay: 40,
+      hanChung: { M: 1, T: 4, han: '2026-10-08', duKienXong: 3, tongEm: 3 }, doChuan: { dungO: 9, M: 1, thieuDS: 2 } })
     expect([d.dem('chien_dich'), d.dem('bai_da_day'), d.dem('pham_vi_lop')]).toEqual([0, 0, 0])
   })
   it('thể lực lớp đọc từ cau_hinh.the_luc_lop; thể lực quá thấp ⇒ D = 14 và danh sách em quá tải có tên', async () => {

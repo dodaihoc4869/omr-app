@@ -11,6 +11,7 @@ import worker from '../server/src/index'
 import { docChanCauMoiGoi7 } from '../server/src/goi-bai-7-chan-moi'
 import { gameToken } from '../server/src/game-v2-auth'
 import { xoaDemCaBaoVe } from '../server/src/game-v2-bank'
+import { soNgayCon7 } from '../server/src/goi-bai-7-loi'
 import { xoaDemChienDich } from '../server/src/srs2-d1'
 import { emCoGhi, keHoachCoDem, xoaDemKeHoach } from '../server/src/dem-ke-hoach'
 import type { Env, D1PreparedStatement } from '../server/src/kieu'
@@ -32,6 +33,8 @@ async function kho(chon?:string[],n=18) {
   return k
 }
 const docEm=(env:Env)=>gvGoi7(env,{action:'doc_em',goiId:ID})
+// thầy 09/11: hạn gói lúc tạo = HẠN CHUNG cả lớp (han-chung.ts), không còn bat_dau + 6 ⇒ đọc hạn thật máy chủ đã ghi.
+const hanGoi=(k:Awaited<ReturnType<typeof kho>>)=>String(k.d.sql.prepare('SELECT han FROM goi_bai_7 WHERE id=?').get(ID)!.han)
 async function sua(env:Env,them:string[]=[],bot:string[]=[],rid=crypto.randomUUID(),revision?:unknown) {
   return gvGoi7(env,{action:'sua_em',goiId:ID,revision:revision??(await docEm(env)).revision,requestId:rid,them,bot})
 }
@@ -51,7 +54,7 @@ it('đọc một truy vấn nhỏ đúng lớp; nhan chỉ em hợp lệ, em kh�
 })
 
 it('bớt bền vững qua 3 lần đồng bộ; thêm lại có chủ đích giữ đúng gói, nguồn, ngày/hạn và lịch sử',async()=>{
-  const k=await kho(),g=snap(k,"SELECT * FROM goi_bai_7"),cs=snap(k,"SELECT * FROM goi_bai_7_cau"),e=snap(k,"SELECT * FROM goi_bai_7_em WHERE sbd='S2'")
+  const k=await kho(),g=snap(k,"SELECT * FROM goi_bai_7"),cs=snap(k,"SELECT * FROM goi_bai_7_cau"),e=snap(k,"SELECT * FROM goi_bai_7_em WHERE sbd='S2'"),han=hanGoi(k)
   await lam(k.env,'S2',k.qids('DH-B1')[0]!,NOW-5000,true,{cauVersion:'v1'})
   const hist=snap(k,"SELECT * FROM su_kien_hoc WHERE sbd='S2'")
   expect(await sua(k.env,[],['S2'])).toMatchObject({ok:true,bot:['S2'],nhan:['S1','S3','S4','S5']})
@@ -60,7 +63,7 @@ it('bớt bền vững qua 3 lần đồng bộ; thêm lại có chủ đích gi
   expect(snap(k,"SELECT * FROM su_kien_hoc WHERE sbd='S2'")).toBe(hist)
   expect(await sua(k.env,['S2'],[])).toMatchObject({ok:true,them:['S2'],nhan:['S1','S2','S3','S4','S5']})
   const re=await docGoiCuaEm7(k.env,'S2',NOW+240000)
-  expect(re[0]).toMatchObject({id:ID,batDau:'2026-10-14',han:'2026-10-20'})
+  expect(re[0]).toMatchObject({id:ID,batDau:'2026-10-14',han})
   expect(re[0]?.daGap).toContain(k.qids('DH-B1')[0])
   expect(snap(k,"SELECT * FROM goi_bai_7")).toBe(g);expect(snap(k,"SELECT * FROM goi_bai_7_cau")).toBe(cs)
 })
@@ -274,7 +277,7 @@ it('sửa hạn gói đã bớt không làm mất mức chốt của em đang nh
     INSERT INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES('S2','2026-10-14',1,24,29,29,'x');
     INSERT INTO goi_bai_7_muc_ngay(sbd,ngay,tang,toi_thieu_tang,quota,muc,luc) VALUES('S1','2026-10-14',1,24,24,24,'x');`)
   const cu=snap(k,"SELECT * FROM goi_bai_7_muc_ngay WHERE sbd='S2'")
-  expect(await gvGoi7(k.env,{action:'sua_han',goiId:ID,hanCu:'2026-10-20',han:'2026-10-25'})).toMatchObject({ok:true,daDoi:true})
+  expect(await gvGoi7(k.env,{action:'sua_han',goiId:ID,hanCu:hanGoi(k),han:'2026-10-25'})).toMatchObject({ok:true,daDoi:true})
   expect(snap(k,"SELECT * FROM goi_bai_7_muc_ngay WHERE sbd='S2'")).toBe(cu)
   expect(k.d.sql.prepare("SELECT COUNT(*) n FROM goi_bai_7_muc_ngay WHERE sbd='S1'").get()).toMatchObject({n:0})
   expect(k.d.sql.prepare("SELECT han FROM goi_bai_7_em WHERE sbd='S2' AND goi_id=?").get(ID)).toMatchObject({han:'2026-10-25'})
@@ -359,9 +362,10 @@ it('cổng câu mới dùng chỉ mục theo em/QID/bản thay vì quét lại s
 it('cây Tick bài đọc số em/hạn của Gói7 hiện hành, kể cả 0 em; không suy từ chiến dịch cũ',async()=>{
   const k=await kho()
   const tree=async()=>((await gvBaiDaDay(k.env,{action:'danh-sach',lop:'12A1'},NOW)).bai as Row[])[0]!
-  expect(await tree()).toMatchObject({hanNop:'2026-10-20',conNgay:7,trangThai:'dang_luyen',goi7:{goiId:ID,soEm:5,han:'2026-10-20'}})
+  const han=hanGoi(k)
+  expect(await tree()).toMatchObject({hanNop:han,conNgay:soNgayCon7('2026-10-14',han),trangThai:'dang_luyen',goi7:{goiId:ID,soEm:5,han}})
   expect(await sua(k.env,[],['S1','S2','S3','S4','S5'])).toMatchObject({ok:true,nhan:[]})
-  expect(await gvGoi7(k.env,{action:'sua_han',goiId:ID,hanCu:'2026-10-20',han:'2026-10-25'})).toMatchObject({ok:true})
+  expect(await gvGoi7(k.env,{action:'sua_han',goiId:ID,hanCu:han,han:'2026-10-25'})).toMatchObject({ok:true})
   expect(await tree()).toMatchObject({hanNop:'2026-10-25',conNgay:12,goi7:{goiId:ID,soEm:0,han:'2026-10-25'}})
 })
 

@@ -22,13 +22,14 @@ const NOW = Date.parse('2026-10-12T13:30:00Z')
 beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(NOW) })
 afterEach(() => { vi.useRealTimers(); xoaDemPhamVi(); xoaDemChienDich(); xoaDemCaBaoVe(); xoaDemChanKhoi(); xoaDemMetaCau() })
 
+// thầy 09/11: mức ngày Gói 7 cố định 28 ⇒ bài cần ≥ 28 câu để em đủ mức (trước: 24 câu = mức tầng 1).
 async function kho() {
-  const k = taoKhoOmni({ 'DH-B8': 24 }, 3)
+  const k = taoKhoOmni({ 'DH-B8': 30 }, 3)
   for (const q of SQL_BANG_HANH_TRINH) k.d.sql.exec(q)
   await damBaoBangBaiDaDay(k.env)
   const b8 = k.qids('DH-B8')
   k.d.sql.exec(`UPDATE hoc_sinh SET lop='12', ten_lop=NULL, mat_khau='mk';
-    INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DH-B8','Bài 8. Amine',24,0,'v1');
+    INSERT INTO de_kho(ma_de,ten_de,so_cau,da_xoa,cap_nhat_luc) VALUES('DH-B8','Bài 8. Amine',30,0,'v1');
     INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DH-B8','v1','x');
     INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('goi_bai_7_v1','{"bat":true,"batDau":"2026-10-10"}','x')`)
   k.d.sql.prepare('INSERT INTO bai_da_day(id,lop,khoa_bai,ten_bai,vi_tri,ma_to_json,tick_luc) VALUES(?,?,?,?,?,?,?)')
