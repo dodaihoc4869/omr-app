@@ -62,6 +62,7 @@ export class VeBang {
   mau: MauBang
   yeu: boolean
   phaoRoi = false
+  private sach = false
 
   private cv: HTMLCanvasElement
   private cvTren: HTMLCanvasElement
@@ -106,6 +107,10 @@ export class VeBang {
     this.raf = requestAnimationFrame(this.khung)
     if (!this.c || !this.c2) return // trình duyệt không có canvas 2D (môi trường test) ⇒ chỉ phần chữ
     const dt = Math.min(0.05, (now - this.truoc) / 1000); this.truoc = now
+    // Cảnh trống (màn đua tháp lửa vẽ bằng DOM) + không còn hạt ⇒ canvas đã sạch thì KHÔNG xoá lại: xoá hai lớp 1920×1080 mỗi khung bắt trình duyệt đẩy lại cả hai lên màn (10/11).
+    const rong = this.canh.loai === 'trong' && !this.phaoRoi && !this.hat.length && !this.manh.length && !this.sao.length && !this.gon.length
+    if (rong && this.sach) return
+    this.sach = rong
     const c = this.c, c2 = this.c2, tl = this.tiLe
     c.setTransform(tl, 0, 0, tl, 0, 0); c2.setTransform(tl, 0, 0, tl, 0, 0)
     c.clearRect(0, 0, 1920, 1080); c2.clearRect(0, 0, 1920, 1080)
