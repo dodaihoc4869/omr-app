@@ -38,4 +38,12 @@ export function chuDanhSachCau(so: number[]): string {
   if (so.length === 1) return `Câu ${so[0]}`
   return `Câu ${so.slice(0, -1).join(', ')} và ${so[so.length - 1]}`
 }
-
+/** «Làm tiếp» không vượt nút Tự sửa lỗi: đã tới mốc Lộ trình (`ddh.moc-sua`, TrongHs mocSuaHomNay) mà sửa hôm nay chưa xong (`ddh.sua-nho`) ⇒ về Hôm nay. Lỗi đọc ⇒ về. */
+export function toiMocSua(chang: number, tong: number): boolean {
+  try {
+    const n = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10), m = JSON.parse(localStorage.getItem('ddh.moc-sua') || 'null') as { ngay?: string; tong?: number; sau?: number } | null
+    if (m?.ngay !== n) return false
+    const s = JSON.parse(localStorage.getItem('ddh.sua-nho') || 'null') as { n?: string; s?: unknown[] } | null
+    return (m.tong !== tong || chang >= (m.sau ?? 0)) && !(s?.n === n && s.s?.[1] === 0)
+  } catch { return true }
+}

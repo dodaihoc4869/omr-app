@@ -27,7 +27,7 @@ import { soOCuaCau } from '../../lib/so-o-tra-loi-ngan'
 import { BanDoY, BanPhimSo, ChonDungSai, ChonTracNghiem, DeCau, HinhCuoiCau, LoiGiaiCau, OTraLoiNgan, PhanHoiDungSai, PhanHoiTraLoiNgan, PhanHoiTracNghiem, ThanhCuon, traLoiCotPhai, useBoCucLam } from './LamCau' // ThanhCuon: thanh cuộn riêng hai cột (CHẶNG NGANG 01/11)
 import { TroGiupDuo } from './TroGiupDuo'
 import { chuDS, chuThoiGian, kyTuHien, nhanPhim, phimTuBanPhim, soChangXong, soSanhDungSai, type PhimSo, type SoHomNay } from './lam-bai'
-import { chuDanhSachCau, coChuSo, cuonDeThayO, soHomNayGoi7 } from './lam-bai-man'
+import { chuDanhSachCau, coChuSo, cuonDeThayO, soHomNayGoi7, toiMocSua } from './lam-bai-man'
 import NutHoiThay from '../loi-giai/NutHoiThay'
 import { phanHoi } from '../../lib/phan-hoi'
 import { Bi } from '../linh-vat/Bi'
@@ -198,8 +198,8 @@ export const vaDaLamSanh = (d: number, tiep: number, ngay: string, sbd?: string)
 }
 /** Nạp lại Sảnh thêm hai lần sau khi thoát (4 s, 12 s): lần nạp ngay lúc thoát có thể đọc trước khi sổ học kịp ghi. */
 const henNapLai = (f: () => void) => { for (const ms of [4000, 12000]) window.setTimeout(f, ms) }
-export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa, homNay }: {
-  token: string; sbd: string; onVe: () => void; onCapNhat: () => void; onChua: (qid: string) => void
+export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa, homNay, coCa }: {
+  token: string; sbd: string; onVe: () => void; onCapNhat: () => void; onChua: (qid: string) => void; coCa?: boolean
   /** Vá bản Sảnh đang hiện (hoa2.va) — số «đã làm» đúng ngay lúc thoát ra Lộ trình. */
   onVa?: (f: (k: KetQuaSanh) => KetQuaSanh) => void
   /** Số "đã làm/M câu hôm nay" + chặng — cùng nguồn vòng tròn Hôm nay (`soHomNay` trong lam-bai.ts). Thiếu ⇒ ẩn ô số, tiêu đề không ghi chặng. */
@@ -258,7 +258,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // LÀM LẠI CUỐI CHẶNG kiểu Duolingo (hợp đồng docs/hop-dong-duolingo-2610.md mục 3; máy chủ goi-bai-7-lam-lai.ts): `soGoc` = số câu của chặng; câu làm lại
   // (≤ 3, chỉ đề) nối sau, mỗi chặng xin MỘT lần (`hoc-tap-lam-lai`), nộp qua `answer` cùng phiên (máy chủ tự ép có hỗ trợ). Không đếm vào số câu của chặng.
   const soGoc0 = dang0 ? (dang0.soGoc || dang0.ds.length) : (dau0?.ds.length ?? 0)
-  const [soGoc, setSoGoc] = useState(soGoc0), daXinLamLai = useRef(!!dang0?.daXinLamLai), daDaySua = useRef(0), daXongRef = useRef(false)
+  const [soGoc, setSoGoc] = useState(soGoc0), daXinLamLai = useRef(!!dang0?.daXinLamLai), daDaySua = useRef(0), lamTiep = useRef(false), daXongRef = useRef(false)
   // A6 — băng combo «N câu đúng liền!» / «Phản ứng dây chuyền!» (n = số câu đúng liền lúc hiện, id = câu vừa đúng ⇒ hoạt ảnh chạy lại mỗi câu).
   const [combo, setCombo] = useState<{ n: number; id: string } | null>(null)
   // THƯỞNG BAY + MỐC COMBO (thầy 27/10, hieu-ung-duo.ts): `luot` = một lượt hiệu ứng của câu vừa chấm; `ntTre` = số nguyên tử ĐANG HIỆN trên bộ đếm khi
@@ -534,7 +534,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       if ((e as { ma?: unknown })?.ma === 'TU_SUA_TRUOC') {
         xoaChangDangLam(sbd)
         // Lần 1: gửi tiến độ Sửa lỗi trên máy rồi mở lại. Lần 2 (vẫn chặn): Lộ trình đã cho bấm chặng này ⇒ gỡ dòng khoá cũ trên máy chủ rồi mở lại.
-        while (daDaySua.current < 2) {
+        while (daDaySua.current < (lamTiep.current ? 1 : 2)) { // «Làm tiếp» ⇒ không gỡ khoá
           const moKhoa = daDaySua.current++ === 1
           if (await daySuaNgay(token, sbd, moKhoa)) { if (!huy) setLan(n => n + 1); return }
         }
@@ -989,7 +989,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     : duocNop ? `Nộp câu · ${[...tra].map(kyTuHien).join('')}` : 'Nhập đáp án để nộp'
   const nutGoiY = q?.goiY && dangTraLoi ? <button type="button" className="ht2-lam-nut-goi-y" aria-label={goiY ? 'Thu gọn gợi ý' : 'Xem gợi ý'} aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={20} aria-hidden="true" /></button> : null
   const nutNop = <button type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={() => void nopCau()} disabled={nop || !duocNop}>{chuNop}{duocNop && !nop && <ArrowRight size={18} aria-hidden="true" />}</button>
-  const coTiep = !!chang && !!homNayHien && chang < homNayHien.soChang // 10/11 ban-ve-mot-nut-1011: còn chặng ⇒ «Làm tiếp»
+  const coTiep = !!chang && !!homNayHien && chang < homNayHien.soChang && !coCa && !toiMocSua(chang, homNayHien.soChang) // 10/11 ban-ve-mot-nut-1011: còn chặng ⇒ «Làm tiếp»
   const chuHocTiep = coTiep ? `Học tiếp chặng ${chang! + 1}` : 'Học tiếp chặng sau'
 
   const thanhDay = tai ? null
@@ -1245,7 +1245,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       }
       return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong="">
         <Suspense fallback={<main className="duo-than"><section className="duo-xong" aria-label="Kết quả chặng"><div className="duo-xong-bi"><Bi cam="mung" size={135} /></div><h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1></section></main>}>
-          <KetBaiThuong ketBai={ketBaiTp} hang={tqLuu?.giai?.hang} bat={tqLuu?.bat} phu={phu} cauHomNay={homNayHien} {...(coTiep ? { chuNut: `Làm tiếp: Chặng ${chang! + 1}`, onTiep: () => setLan(n => n + 1), nutPhu: { chu: `Về ${tenTrangChinh()}`, onClick: veLoTrinh } } : { onTiep: veLoTrinh })} />
+          <KetBaiThuong ketBai={ketBaiTp} hang={tqLuu?.giai?.hang} bat={tqLuu?.bat} phu={phu} cauHomNay={homNayHien} {...(coTiep ? { chuNut: `Làm tiếp: Chặng ${chang! + 1}`, onTiep: () => { lamTiep.current = true; setLan(n => n + 1) }, nutPhu: { chu: `Về ${tenTrangChinh()}`, onClick: veLoTrinh } } : { onTiep: veLoTrinh })} />
         </Suspense>
       </div>
     }

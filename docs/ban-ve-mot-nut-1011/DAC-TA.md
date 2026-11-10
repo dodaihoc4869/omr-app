@@ -1,4 +1,4 @@
-# Bản vẽ «HÔM NAY CHỈ MỘT NÚT» + tự vào chặng kế (thầy 10/11) — CHỜ THẦY DUYỆT, CHƯA BUILD
+# Bản vẽ «HÔM NAY CHỈ MỘT NÚT» + tự vào chặng kế (thầy 10/11) — THẦY DUYỆT 10/11, ĐÃ BUILD + SỐNG (#1554)
 
 Thầy 10/11 (2 ảnh Hôm nay): «ẩn hết những phần ở dưới, chỉ để lại một nút bấm vào làm luôn cho học sinh đỡ rối, áp dụng xoay ngang dọc, máy tính, fold» · «giữ
 lại nút này nhé, làm xong tự chuyển để học sinh làm tiếp» · «vẽ cho tôi trước khi build nhé».
@@ -45,6 +45,11 @@ tự vào = gọi đúng hành động của nút chính (như em bấm).
   Kiểm tra ôn tập, ca kiểm tra không tự vào.
 - `npm run kiem:toc-do` 0 đỏ, `npm run kiem:mau-giu` 0; ảnh Chromium 0 lỗi trang, 0 tràn ngang.
 
-## Cần thầy chốt
-1. Tự vào sau **3 giây** (đề xuất) — hay chỉ đổi nút thành «Làm tiếp» để em tự bấm?
-2. Ẩn hẳn «Nhóm lỗi hôm nay» và «Lịch bài» khỏi Hôm nay (đề xuất, đúng lời thầy) — hay để chúng trong tấm «Thêm» cho em nào muốn xem?
+## Thầy chốt 10/11 («1. Để hs tự bấm 2. Bỏ hẳn  Build đẩy luôn lên nhé»)
+1. KHÔNG tự vào sau 3 giây: xong chặng còn chặng ⇒ nút «Làm tiếp: Chặng n» (em tự bấm) + «Về Hôm nay». Bỏ test `tu-vao-chang-ke-1011` (không còn đếm giờ).
+   Nhãn dùng «Chặng n» (màn làm bài không biết tên nhóm). «Làm tiếp» KHÔNG hiện khi: hết chặng, ca kiểm tra đang mở, hoặc đã tới nút Tự sửa lỗi
+   hôm nay mà sửa chưa xong (`toiMocSua`, lam-bai-man.ts) ⇒ về Hôm nay để nút chính chỉ đúng việc kế; vào bằng «Làm tiếp» bị máy chủ chặn
+   TU_SUA_TRUOC ⇒ không gỡ khoá.
+2. Bỏ hẳn «Nhóm lỗi hôm nay» và «Lịch bài» khỏi Hôm nay (máy chủ vẫn tính `lichBai`, không mảnh nào nạp).
+3. Kèm «Hs vẫn 57 câu à»: ngày có Kiểm tra ôn tập không còn chặng Tự sửa lỗi riêng ⇒ 28 kiểm tra + 12 học = 40 (12 học theo hợp đồng
+   `docs/hop-dong-kiem-tra-ca-nhan-2026-1310.md` — chờ thầy quyết có bỏ không).
