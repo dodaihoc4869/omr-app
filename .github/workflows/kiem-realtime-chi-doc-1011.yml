@@ -1,0 +1,36 @@
+# KIỂM CLOUDFLARE REALTIME (CHỈ ĐỌC) — 10/11: đặc tả chế độ Live cần biết tài khoản đã có ứng dụng Realtime SFU chưa
+# và khoá API đang dùng để phát hành có quyền Realtime không. CHỈ GỌI GET. Không tạo ứng dụng, không đổi gì trên tài khoản.
+# KHÔNG in khoá, mã tài khoản, tên hay mã ứng dụng: chỉ in mã HTTP, cờ success, SỐ LƯỢNG mục, mã lỗi + câu báo lỗi của Cloudflare.
+name: Kiểm Cloudflare Realtime (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/live-dac-ta-1011]
+    paths: ['.github/workflows/kiem-realtime-chi-doc-1011.yml']
+permissions:
+  contents: read
+jobs:
+  kiem:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Hỏi Cloudflare (chỉ GET)
+        env:
+          T: ${{ env.CF_TOKEN_SACH }}
+          A: ${{ env.CF_ACC_SACH }}
+        run: |
+          hoi() {
+            ma=$(curl -sS -m 30 -o /tmp/tra.json -w '%{http_code}' -H "Authorization: Bearer $T" "https://api.cloudflare.com/client/v4/$2" || echo 000)
+            echo "== $1 · HTTP $ma · $(jq -c '{success, so_muc: (if (.result|type)=="array" then (.result|length) else null end), loi: [.errors[]? | {code, message}]}' /tmp/tra.json 2>/dev/null || echo '(không phải JSON)')"
+          }
+          hoi "khoá còn hiệu lực"            "user/tokens/verify"
+          hoi "ứng dụng Realtime SFU"        "accounts/$A/calls/apps"
+          hoi "khoá TURN"                    "accounts/$A/calls/turn_keys"
+          hoi "ứng dụng RealtimeKit"         "accounts/$A/realtime/kit/apps"
+          echo "Trạng thái khoá: $(curl -sS -m 30 -H "Authorization: Bearer $T" https://api.cloudflare.com/client/v4/user/tokens/verify | jq -r '.result.status // "không rõ"')"
