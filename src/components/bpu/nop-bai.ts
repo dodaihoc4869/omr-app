@@ -52,7 +52,7 @@ export function xepHang(cuoi: number, nay: number, cham: number): number | null 
 type Rgb = readonly [number, number, number]
 type OngDo = Ong & { doi: number; mau: Rgb; nhat: Rgb; giay: Rgb; quang: HTMLCanvasElement | null; long: HTMLCanvasElement | null }
 type Tia = { o: OngDo; t0: number; cham: number; gon: boolean; gop: number; lua: boolean; sc: number; giot: number[][]; bot: number[][] }
-type Hinh = { khoa: string; tl: Element; ong: Map<number, OngDo>; x: number; y: number; w: number; h: number; k: number }
+type Hinh = { khoa: string; tl: Element; dai: HTMLElement | null; ong: Map<number, OngDo>; x: number; y: number; w: number; h: number; k: number }
 type Hang = { tia: Tia[]; cuoi: Map<number, number>; lucLua: Map<number, number>; lucSo: number; doi: Em[]; hen: number; raf: number; khoa: string; luot: string; yeu: boolean
   hinh: Hinh | null; cv: HTMLCanvasElement | null; c: CanvasRenderingContext2D | null; ti: number; ban: Set<OngDo> }
 const hangCua = new WeakMap<HTMLElement, Hang>()
@@ -101,7 +101,7 @@ function doHinh(san: HTMLElement, tl: Element, khoa: string): Hinh {
     x0 = Math.min(x0, o.x - o.r - 60); x1 = Math.max(x1, o.x + o.r + 60); y0 = Math.min(y0, o.tren - 70); y1 = Math.max(y1, o.day + 24)
   })
   x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0))
-  return { khoa, tl, ong, x: x0, y: y0, w: Math.max(1, Math.ceil(Math.min(1920, x1) - x0)), h: Math.max(1, Math.ceil(Math.min(1080, y1) - y0)), k }
+  return { khoa, tl, dai: tl.querySelector<HTMLElement>('.bb-tl-dai'), ong, x: x0, y: y0, w: Math.max(1, Math.ceil(Math.min(1920, x1) - x0)), h: Math.max(1, Math.ceil(Math.min(1080, y1) - y0)), k }
 }
 function datCanvas(san: HTMLElement, h: Hang, hinh: Hinh): void {
   if (!h.cv || !h.cv.isConnected) {
@@ -233,11 +233,12 @@ function bungLua(san: HTMLElement, h: Hang, doi: number, nay: number): void {
   if (coAnimate(lua)) lua.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1, 1.22)', offset: 0.3 }, { transform: 'scale(0.98, 0.96)', offset: 0.65 }, { transform: 'scale(1)' }], { duration: 760, easing: 'cubic-bezier(.3, .8, .4, 1)' })
 }
 
-/** MỘT vòng rAF chung: xoá canvas, vẽ mọi tia, bỏ tia đã xong; hết tia ⇒ dừng + ẩn canvas. Bảng / tháp đã gỡ ⇒ huỷ hết. */
+/** MỘT vòng rAF chung: xoá canvas, vẽ mọi tia, bỏ tia đã xong; hết tia ⇒ dừng + ẩn canvas. */
 function khung(san: HTMLElement, h: Hang, nay: number): void {
   h.raf = 0
   const c = h.c, cv = h.cv, hinh = h.hinh
-  if (!c || !cv || !hinh || !san.isConnected || !hinh.tl.isConnected) {
+  // Bảng / tháp đã gỡ, hoặc tấm giấy G / M vừa đè vùng ống (ThapLua ẩn .bb-tl-dai) ⇒ huỷ hết tia đang bay, không vẽ đè lên giấy.
+  if (!c || !cv || !hinh || !san.isConnected || !hinh.tl.isConnected || hinh.dai?.style.visibility === 'hidden') {
     h.tia = []; h.cuoi.clear(); h.ban.clear()
     if (c && cv) { c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, cv.width, cv.height); cv.style.display = 'none' }
     return
