@@ -11,7 +11,7 @@
 //   2. bán kính = co / 2 × (0,6 … 1,6 theo lực, lực đã làm mượt) × thon đầu nét / thon cuối nét;
 //   3. dựng ĐA GIÁC bao quanh đường tâm (hai mép lệch pháp tuyến, chỗ gập gắt thêm quạt tròn, hai đầu bo tròn);
 //   4. tô đa giác bằng đường cong bậc hai qua trung điểm các đỉnh ⇒ mép mịn, không «hạt cườm».
-// SỰ KIỆN (cho việc live):  net-moi · them-diem · net-xong · xoa · trang   — `apSuKien` dựng lại đúng mảng nét ở máy nhận.
+// SỰ KIỆN (cho việc live):  net-moi · them-diem · net-xong · xoa · trang · tro (con trỏ lơ lửng)   — `apSuKien` dựng lại đúng mảng nét ở máy nhận.
 
 /** Một điểm của nét: [x 0..1, y 0..1, áp lực 0..1, mili-giây từ đầu nét]. */
 export type DiemBut = [number, number, number, number]
@@ -26,6 +26,7 @@ export type SuKienBut =
   | { loai: 'net-xong'; trang: string; id: string }
   | { loai: 'xoa'; trang: string; id: string[] }
   | { loai: 'trang'; trang: string; net: NetBut[]; tiLe: number }
+  | { loai: 'tro'; trang: string; x: number; y: number }
 /** Khung quy chiếu của vùng viết W × H px: k = dvi / 1920; rw × rh = vùng viết tính bằng «px ở màn 1920». */
 export interface KhungBut { W: number; H: number; k: number; rw: number; rh: number }
 /** Trạng thái xử lý dần một nét (đường tâm đã lọc + bán kính + độ dài cộng dồn). */
@@ -39,6 +40,8 @@ export interface SoBut {
   batDau(mo: { cong?: 'but' | 'tay'; mau: string; co: number; diem?: DiemBut }): NetBut
   themDiem(ds: DiemBut[]): void
   ketThuc(huy?: boolean): NetBut | null
+  /** Con trỏ bút lơ lửng (chưa chạm): chỉ phát sự kiện `tro`, không đổi nét. */
+  tro(x: number, y: number): void
   xoa(ids: string[], gop?: boolean): number
   dongGop(): void
   xoaHet(): number
@@ -245,6 +248,7 @@ var LoiBut = (function () {
       batDau: function (mo) { dang = { id: id(), cong: mo.cong === 'tay' ? 'tay' : 'but', mau: mo.mau, co: mo.co, diem: mo.diem ? [mo.diem] : [] }; phat({ loai: 'net-moi', net: { id: dang.id, cong: dang.cong, mau: dang.mau, co: dang.co, diem: dang.diem.slice() } }); return dang; },
       themDiem: function (ds) { var i; if (!dang || !ds.length) return; for (i = 0; i < ds.length; i++) dang.diem.push(ds[i]); phat({ loai: 'them-diem', id: dang.id, diem: ds }); },
       ketThuc: ketThuc,
+      tro: function (x, y) { if (tai.length) phat({ loai: 'tro', x: tron(kep(x, 0, 1), 1e4), y: tron(kep(y, 0, 1), 1e4) }); },
       xoa: xoa,
       dongGop: function () { var b = T.lui[T.lui.length - 1]; if (b) b.mo = false; },
       xoaHet: function () { return xoa(T.net.map(function (n) { return n.id; })); },

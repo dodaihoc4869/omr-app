@@ -6,7 +6,8 @@
 //   · ra: hai lớp canvas — lớp TĨNH (nét đã xong, vẽ lại từ vectơ khi đổi cỡ / hoàn tác / tẩy) và lớp SỐNG (chỉ nét đang viết, desynchronized);
 //     một vòng requestAnimationFrame, handler không vẽ; nét dài thì phần đầu đã ổn định in dần xuống lớp tĩnh ⇒ mỗi khung chỉ dựng đoạn đuôi.
 //   · nét giữ theo ĐỢT (khoá = chỉ số đợt): chuyển câu rồi quay lại vẫn còn, câu mới bảng sạch.
-// API cho việc phát LIVE (chưa gửi đi đâu): window.__mcBut = { xuat, nhap, nghe, hoanTac, lamLai, xoaHet, bat, trang } — sự kiện xem `SuKienBut`.
+// API cho việc phát LIVE (chưa gửi đi đâu): window.__mcBut = { xuat, nhap, nghe, hoanTac, lamLai, xoaHet, bat, trang, loi, mau, co, vung } — sự kiện xem `SuKienBut`
+// (them-diem gom MỘT lần mỗi khung hình; tro = con trỏ lơ lửng, tối đa 20 lần / giây). Hàm nghe chạy ngay trong khung vẽ ⇒ phải nhẹ (xếp hàng rồi gửi sau).
 // Màu phấn là DỮ LIỆU của nét (đi theo nét sang máy khác) nên ghi rgb() thẳng, lấy đúng trị của các biến sẵn có trên tờ:
 //   trắng ngà = --mc-bang-chu · vàng = --mc-vang-noi · xanh ngọc = --mc-ll-dung (tối) · hồng = --mc-ll-sai (tối) · mực xanh = màu bút xanh cũ.
 import { JS_LOI_BUT } from './but-bang-loi'
@@ -40,7 +41,7 @@ ${JS_LOI_BUT}
   var cvT = tao('canvas', 'mc-but', body), cv = tao('canvas', 'mc-but mc-but-song', body), butCu = tao('div', 'mc-but-cu', body);
   var gT = nguCanh(cvT, false), g2 = nguCanh(cv, true), so = LoiBut.taoSo(), KH = null, dpr = 1;
   // N = nét đang viết · XT = lượt kéo tẩy · ban = ô vừa vẽ trên lớp sống (để xoá đúng chỗ) · luotBut = lần cuối thấy bút (chặn chạm tay)
-  var N = null, XT = null, ban = null, hRaf = 0, luotBut = -1e9, oThanh = null, hThanh = 0, nong = 0;
+  var N = null, XT = null, ban = null, hRaf = 0, luotBut = -1e9, luotTro = -1e9, oThanh = null, hThanh = 0, nong = 0;
   butCu.setAttribute('role', 'toolbar'); butCu.setAttribute('aria-label', 'Bút viết bảng');
 
   function coCanvas() {
@@ -144,7 +145,8 @@ ${JS_LOI_BUT}
     var ds, i;
     if (e.pointerType === 'pen') luotBut = e.timeStamp;
     if (XT && e.pointerId === XT.id) { tayQua(XT.x, XT.y, e.clientX, e.clientY); XT.x = e.clientX; XT.y = e.clientY; return; }
-    if (!N || e.pointerId !== N.id) return;
+    if (!N) { if (S.but && KH && !XT && e.timeStamp - luotTro > 50) { luotTro = e.timeStamp; so.tro(e.clientX / KH.W, e.clientY / KH.H); } return; }
+    if (e.pointerId !== N.id) return;
     ds = e.getCoalescedEvents ? e.getCoalescedEvents() : null;
     if (!ds || !ds.length) ds = [e];
     for (i = 0; i < ds.length; i++) mau(ds[i]);
@@ -233,7 +235,14 @@ ${JS_LOI_BUT}
     xuat: function () { return so.xuat(); },
     nhap: function (goi) { if (!KH) coCanvas(); ketNet(false); var n = so.nhap(goi); veLai(); capNut(); return n; },
     nghe: so.nghe, trang: so.trang, hoanTac: hoanTac, lamLai: lamLai, xoaHet: xoaBut,
-    bat: function (b) { if (!!b !== S.but) batBut(); }
+    bat: function (b) { if (!!b !== S.but) batBut(); },
+    // cho việc live: bộ máy dựng nét, bảng màu / cỡ, và ô giấy đề / ô bảng đen của đợt đang chiếu tính theo vùng viết [x0, y0, x1, y1] (0..1)
+    loi: LoiBut, mau: MAU_BUT, co: CO_BUT,
+    vung: function () {
+      var d = dot(), W = window.innerWidth, H = window.innerHeight, ra = {};
+      [['giay', '.mc-vung-de'], ['bang', '.mc-cot-lam-bai']].forEach(function (v) { var e = d && d.querySelector ? d.querySelector(v[1]) : null, r = e ? e.getBoundingClientRect() : null; if (r && r.width > 0) ra[v[0]] = [r.left / W, r.top / H, r.right / W, r.bottom / H]; });
+      return ra;
+    }
   };
   so.doiTrang(String(chiSo()));
   veButCu();

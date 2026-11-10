@@ -1,5 +1,5 @@
 {
-  "luc": "2026-11-10T14:47:57.687Z",
+  "luc": "2026-11-10T15:05:16.926Z",
   "may": "Chromium headless /opt/pw-browsers, 1920×1080, bút 200 Hz qua CDP (pointerType pen); máy đo dùng chung nên lấy trung vị các lượt xen kẽ",
   "soMau": 2000,
   "tomTat": [
@@ -11,13 +11,13 @@
       "khungMoiGiay": 60,
       "khungMoiGiayTotNhat": 60,
       "khungTreHon20Ms": 0,
-      "tongKhung": 845,
+      "tongKhung": 844,
       "xuLyMoiKhungMs": {
-        "trungBinh": 0.056,
+        "trungBinh": 0.053,
         "p95": 0.1,
-        "lonNhat": 0.3
+        "lonNhat": 0.5
       },
-      "scriptGiay": 0.112,
+      "scriptGiay": 0.11,
       "boCucLai": 1
     },
     {
@@ -27,14 +27,14 @@
       "luot": 3,
       "khungMoiGiay": 59.9,
       "khungMoiGiayTotNhat": 60,
-      "khungTreHon20Ms": 2,
+      "khungTreHon20Ms": 1,
       "tongKhung": 843,
       "xuLyMoiKhungMs": {
-        "trungBinh": 0.177,
-        "p95": 0.8,
-        "lonNhat": 3.2
+        "trungBinh": 0.215,
+        "p95": 0.9,
+        "lonNhat": 3.3
       },
-      "scriptGiay": 0.377,
+      "scriptGiay": 0.444,
       "boCucLai": 1
     },
     {
@@ -47,11 +47,11 @@
       "khungTreHon20Ms": 0,
       "tongKhung": 628,
       "xuLyMoiKhungMs": {
-        "trungBinh": 0.065,
+        "trungBinh": 0.068,
         "p95": 0.2,
-        "lonNhat": 0.3
+        "lonNhat": 0.5
       },
-      "scriptGiay": 0.1,
+      "scriptGiay": 0.106,
       "boCucLai": 1
     },
     {
@@ -62,13 +62,13 @@
       "khungMoiGiay": 60,
       "khungMoiGiayTotNhat": 60,
       "khungTreHon20Ms": 0,
-      "tongKhung": 628,
+      "tongKhung": 629,
       "xuLyMoiKhungMs": {
-        "trungBinh": 0.229,
+        "trungBinh": 0.228,
         "p95": 0.9,
-        "lonNhat": 2.7
+        "lonNhat": 2.5
       },
-      "scriptGiay": 0.343,
+      "scriptGiay": 0.371,
       "boCucLai": 1
     },
     {
@@ -85,7 +85,7 @@
         "p95": 0,
         "lonNhat": 0
       },
-      "scriptGiay": 0.106,
+      "scriptGiay": 0.118,
       "boCucLai": 0
     },
     {
@@ -102,7 +102,7 @@
         "p95": 0,
         "lonNhat": 0
       },
-      "scriptGiay": 0.084,
+      "scriptGiay": 0.089,
       "boCucLai": 0
     },
     {
@@ -119,7 +119,7 @@
         "p95": 0,
         "lonNhat": 0
       },
-      "scriptGiay": 0.156,
+      "scriptGiay": 0.186,
       "boCucLai": 0
     },
     {
@@ -136,7 +136,7 @@
         "p95": 0,
         "lonNhat": 0
       },
-      "scriptGiay": 0.135,
+      "scriptGiay": 0.139,
       "boCucLai": 0
     }
   ],
@@ -148,7 +148,7 @@
       "mauGui": 2000,
       "giay": 14.07,
       "khung": {
-        "so": 845,
+        "so": 844,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
         "cachP95Ms": 16.8,
@@ -156,14 +156,14 @@
         "treHon20Ms": 0
       },
       "xuLyMoiKhungMs": {
-        "luot": 635,
-        "trungBinh": 0.057,
-        "trungVi": 0.1,
+        "luot": 637,
+        "trungBinh": 0.052,
+        "trungVi": 0,
         "p95": 0.1,
-        "lonNhat": 0.3
+        "lonNhat": 0.4
       },
       "luongChinhGiay": {
-        "TaskDuration": 0.923,
+        "TaskDuration": 0.899,
         "ScriptDuration": 0.11,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
@@ -171,7 +171,7 @@
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1944,
+        "pointermove": 1941,
         "mauGop": 1944,
         "netLuu": 56,
         "diemLuu": 1970,
@@ -191,32 +191,32 @@
       "bai": "chu",
       "cpu": "×4",
       "mauGui": 2000,
-      "giay": 14.07,
+      "giay": 14.06,
       "khung": {
-        "so": 841,
-        "moiGiay": 59.8,
+        "so": 844,
+        "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
-        "cachLonNhatMs": 33.4,
-        "treHon20Ms": 3
+        "cachP95Ms": 16.7,
+        "cachLonNhatMs": 16.8,
+        "treHon20Ms": 0
       },
       "xuLyMoiKhungMs": {
-        "luot": 638,
-        "trungBinh": 0.188,
+        "luot": 629,
+        "trungBinh": 0.241,
         "trungVi": 0.1,
         "p95": 1,
-        "lonNhat": 3.2
+        "lonNhat": 3.3
       },
       "luongChinhGiay": {
-        "TaskDuration": 3.017,
-        "ScriptDuration": 0.41,
-        "LayoutDuration": 0.001,
+        "TaskDuration": 3.165,
+        "ScriptDuration": 0.46,
+        "LayoutDuration": 0,
         "RecalcStyleDuration": 0.001,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1635,
+        "pointermove": 1633,
         "mauGop": 1944,
         "netLuu": 56,
         "diemLuu": 1970,
@@ -247,21 +247,21 @@
       },
       "xuLyMoiKhungMs": {
         "luot": 601,
-        "trungBinh": 0.065,
+        "trungBinh": 0.068,
         "trungVi": 0.1,
         "p95": 0.2,
-        "lonNhat": 0.3
+        "lonNhat": 0.7
       },
       "luongChinhGiay": {
-        "TaskDuration": 0.814,
-        "ScriptDuration": 0.1,
+        "TaskDuration": 0.812,
+        "ScriptDuration": 0.104,
         "LayoutDuration": 0,
-        "RecalcStyleDuration": 0,
+        "RecalcStyleDuration": 0.001,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1994,
+        "pointermove": 1993,
         "mauGop": 1999,
         "netLuu": 1,
         "diemLuu": 2000,
@@ -283,30 +283,30 @@
       "mauGui": 2000,
       "giay": 10.47,
       "khung": {
-        "so": 628,
+        "so": 629,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.7,
+        "cachP95Ms": 16.8,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
       },
       "xuLyMoiKhungMs": {
         "luot": 601,
-        "trungBinh": 0.23,
+        "trungBinh": 0.235,
         "trungVi": 0.1,
         "p95": 0.9,
-        "lonNhat": 2.7
+        "lonNhat": 2.5
       },
       "luongChinhGiay": {
-        "TaskDuration": 2.536,
-        "ScriptDuration": 0.37,
+        "TaskDuration": 2.592,
+        "ScriptDuration": 0.373,
         "LayoutDuration": 0,
-        "RecalcStyleDuration": 0.003,
+        "RecalcStyleDuration": 0.002,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1705,
+        "pointermove": 1638,
         "mauGop": 1999,
         "netLuu": 1,
         "diemLuu": 2000,
@@ -343,15 +343,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.577,
-        "ScriptDuration": 0.11,
+        "TaskDuration": 1.835,
+        "ScriptDuration": 0.119,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1213,
+        "pointermove": 1212,
         "mauGop": 1944,
         "netLuu": 0,
         "diemLuu": 0,
@@ -382,15 +382,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.299,
-        "ScriptDuration": 0.084,
+        "TaskDuration": 1.412,
+        "ScriptDuration": 0.089,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1253,
+        "pointermove": 1230,
         "mauGop": 1999,
         "netLuu": 0,
         "diemLuu": 0,
@@ -409,7 +409,7 @@
         "so": 845,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
+        "cachP95Ms": 16.7,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
       },
@@ -421,15 +421,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.301,
-        "ScriptDuration": 0.169,
+        "TaskDuration": 1.433,
+        "ScriptDuration": 0.186,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1217,
+        "pointermove": 1228,
         "mauGop": 1944,
         "netLuu": 0,
         "diemLuu": 0,
@@ -460,15 +460,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.036,
-        "ScriptDuration": 0.137,
+        "TaskDuration": 1.074,
+        "ScriptDuration": 0.152,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1238,
+        "pointermove": 1253,
         "mauGop": 1999,
         "netLuu": 0,
         "diemLuu": 0,
@@ -482,32 +482,32 @@
       "bai": "chu",
       "cpu": "×1",
       "mauGui": 2000,
-      "giay": 14.08,
+      "giay": 14.06,
       "khung": {
-        "so": 844,
+        "so": 843,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.7,
+        "cachP95Ms": 16.8,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
       },
       "xuLyMoiKhungMs": {
-        "luot": 642,
-        "trungBinh": 0.056,
-        "trungVi": 0,
+        "luot": 635,
+        "trungBinh": 0.066,
+        "trungVi": 0.1,
         "p95": 0.2,
-        "lonNhat": 0.3
+        "lonNhat": 0.8
       },
       "luongChinhGiay": {
-        "TaskDuration": 0.934,
-        "ScriptDuration": 0.114,
+        "TaskDuration": 1.002,
+        "ScriptDuration": 0.122,
         "LayoutDuration": 0,
-        "RecalcStyleDuration": 0,
+        "RecalcStyleDuration": 0.001,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1941,
+        "pointermove": 1944,
         "mauGop": 1944,
         "netLuu": 56,
         "diemLuu": 1970,
@@ -529,30 +529,30 @@
       "mauGui": 2000,
       "giay": 14.07,
       "khung": {
-        "so": 845,
-        "moiGiay": 60,
+        "so": 839,
+        "moiGiay": 59.6,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.7,
-        "cachLonNhatMs": 16.8,
-        "treHon20Ms": 0
+        "cachP95Ms": 16.8,
+        "cachLonNhatMs": 66.6,
+        "treHon20Ms": 3
       },
       "xuLyMoiKhungMs": {
         "luot": 635,
-        "trungBinh": 0.151,
+        "trungBinh": 0.215,
         "trungVi": 0.1,
-        "p95": 0.8,
-        "lonNhat": 2.3
+        "p95": 0.9,
+        "lonNhat": 1.4
       },
       "luongChinhGiay": {
-        "TaskDuration": 2.845,
-        "ScriptDuration": 0.367,
+        "TaskDuration": 3.071,
+        "ScriptDuration": 0.444,
         "LayoutDuration": 0.001,
-        "RecalcStyleDuration": 0.002,
+        "RecalcStyleDuration": 0.004,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1702,
+        "pointermove": 1588,
         "mauGop": 1944,
         "netLuu": 56,
         "diemLuu": 1970,
@@ -583,21 +583,21 @@
       },
       "xuLyMoiKhungMs": {
         "luot": 601,
-        "trungBinh": 0.059,
+        "trungBinh": 0.08,
         "trungVi": 0.1,
-        "p95": 0.1,
-        "lonNhat": 0.3
+        "p95": 0.2,
+        "lonNhat": 0.5
       },
       "luongChinhGiay": {
-        "TaskDuration": 0.836,
-        "ScriptDuration": 0.098,
+        "TaskDuration": 0.834,
+        "ScriptDuration": 0.109,
         "LayoutDuration": 0,
-        "RecalcStyleDuration": 0,
+        "RecalcStyleDuration": 0.001,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1991,
+        "pointermove": 1997,
         "mauGop": 1999,
         "netLuu": 1,
         "diemLuu": 2000,
@@ -628,21 +628,21 @@
       },
       "xuLyMoiKhungMs": {
         "luot": 601,
-        "trungBinh": 0.213,
+        "trungBinh": 0.228,
         "trungVi": 0.1,
-        "p95": 0.8,
-        "lonNhat": 4.7
+        "p95": 0.9,
+        "lonNhat": 2.2
       },
       "luongChinhGiay": {
-        "TaskDuration": 2.483,
-        "ScriptDuration": 0.339,
+        "TaskDuration": 2.627,
+        "ScriptDuration": 0.353,
         "LayoutDuration": 0.001,
-        "RecalcStyleDuration": 0.002,
+        "RecalcStyleDuration": 0.001,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1708,
+        "pointermove": 1668,
         "mauGop": 1999,
         "netLuu": 1,
         "diemLuu": 2000,
@@ -667,45 +667,6 @@
         "so": 844,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
-        "cachLonNhatMs": 16.8,
-        "treHon20Ms": 0
-      },
-      "xuLyMoiKhungMs": {
-        "luot": 0,
-        "trungBinh": 0,
-        "trungVi": 0,
-        "p95": 0,
-        "lonNhat": 0
-      },
-      "luongChinhGiay": {
-        "TaskDuration": 1.589,
-        "ScriptDuration": 0.106,
-        "LayoutDuration": 0,
-        "RecalcStyleDuration": 0,
-        "LayoutCount": 0,
-        "RecalcStyleCount": 0
-      },
-      "vao": {
-        "pointermove": 1218,
-        "mauGop": 1944,
-        "netLuu": 0,
-        "diemLuu": 0,
-        "lucNetDau": []
-      },
-      "loi": [],
-      "lap": 2
-    },
-    {
-      "ban": "nen",
-      "bai": "mot-net-dai",
-      "cpu": "×4",
-      "mauGui": 2000,
-      "giay": 10.47,
-      "khung": {
-        "so": 628,
-        "moiGiay": 60,
-        "cachTrungViMs": 16.7,
         "cachP95Ms": 16.7,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
@@ -718,47 +679,8 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.274,
-        "ScriptDuration": 0.092,
-        "LayoutDuration": 0,
-        "RecalcStyleDuration": 0,
-        "LayoutCount": 0,
-        "RecalcStyleCount": 0
-      },
-      "vao": {
-        "pointermove": 1254,
-        "mauGop": 1999,
-        "netLuu": 0,
-        "diemLuu": 0,
-        "lucNetDau": []
-      },
-      "loi": [],
-      "lap": 2
-    },
-    {
-      "ban": "cu",
-      "bai": "chu",
-      "cpu": "×4",
-      "mauGui": 2000,
-      "giay": 14.07,
-      "khung": {
-        "so": 845,
-        "moiGiay": 60,
-        "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
-        "cachLonNhatMs": 16.8,
-        "treHon20Ms": 0
-      },
-      "xuLyMoiKhungMs": {
-        "luot": 0,
-        "trungBinh": 0,
-        "trungVi": 0,
-        "p95": 0,
-        "lonNhat": 0
-      },
-      "luongChinhGiay": {
-        "TaskDuration": 1.195,
-        "ScriptDuration": 0.145,
+        "TaskDuration": 1.622,
+        "ScriptDuration": 0.117,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
@@ -775,13 +697,13 @@
       "lap": 2
     },
     {
-      "ban": "cu",
+      "ban": "nen",
       "bai": "mot-net-dai",
       "cpu": "×4",
       "mauGui": 2000,
       "giay": 10.47,
       "khung": {
-        "so": 628,
+        "so": 629,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
         "cachP95Ms": 16.8,
@@ -796,15 +718,93 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.008,
-        "ScriptDuration": 0.135,
+        "TaskDuration": 1.322,
+        "ScriptDuration": 0.092,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1245,
+        "pointermove": 1249,
+        "mauGop": 1999,
+        "netLuu": 0,
+        "diemLuu": 0,
+        "lucNetDau": []
+      },
+      "loi": [],
+      "lap": 2
+    },
+    {
+      "ban": "cu",
+      "bai": "chu",
+      "cpu": "×4",
+      "mauGui": 2000,
+      "giay": 14.06,
+      "khung": {
+        "so": 845,
+        "moiGiay": 60,
+        "cachTrungViMs": 16.7,
+        "cachP95Ms": 16.7,
+        "cachLonNhatMs": 16.8,
+        "treHon20Ms": 0
+      },
+      "xuLyMoiKhungMs": {
+        "luot": 0,
+        "trungBinh": 0,
+        "trungVi": 0,
+        "p95": 0,
+        "lonNhat": 0
+      },
+      "luongChinhGiay": {
+        "TaskDuration": 1.256,
+        "ScriptDuration": 0.177,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "vao": {
+        "pointermove": 1223,
+        "mauGop": 1944,
+        "netLuu": 0,
+        "diemLuu": 0,
+        "lucNetDau": []
+      },
+      "loi": [],
+      "lap": 2
+    },
+    {
+      "ban": "cu",
+      "bai": "mot-net-dai",
+      "cpu": "×4",
+      "mauGui": 2000,
+      "giay": 10.47,
+      "khung": {
+        "so": 627,
+        "moiGiay": 59.9,
+        "cachTrungViMs": 16.7,
+        "cachP95Ms": 16.7,
+        "cachLonNhatMs": 33.3,
+        "treHon20Ms": 1
+      },
+      "xuLyMoiKhungMs": {
+        "luot": 0,
+        "trungBinh": 0,
+        "trungVi": 0,
+        "p95": 0,
+        "lonNhat": 0
+      },
+      "luongChinhGiay": {
+        "TaskDuration": 0.964,
+        "ScriptDuration": 0.13,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "vao": {
+        "pointermove": 1236,
         "mauGop": 1999,
         "netLuu": 0,
         "diemLuu": 0,
@@ -818,32 +818,32 @@
       "bai": "chu",
       "cpu": "×1",
       "mauGui": 2000,
-      "giay": 14.07,
+      "giay": 14.06,
       "khung": {
-        "so": 845,
+        "so": 844,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
+        "cachP95Ms": 16.7,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
       },
       "xuLyMoiKhungMs": {
-        "luot": 641,
-        "trungBinh": 0.052,
+        "luot": 645,
+        "trungBinh": 0.053,
         "trungVi": 0,
         "p95": 0.1,
-        "lonNhat": 0.4
+        "lonNhat": 0.5
       },
       "luongChinhGiay": {
-        "TaskDuration": 0.933,
-        "ScriptDuration": 0.112,
+        "TaskDuration": 0.921,
+        "ScriptDuration": 0.108,
         "LayoutDuration": 0,
-        "RecalcStyleDuration": 0.001,
+        "RecalcStyleDuration": 0,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1942,
+        "pointermove": 1943,
         "mauGop": 1944,
         "netLuu": 56,
         "diemLuu": 1970,
@@ -863,32 +863,32 @@
       "bai": "chu",
       "cpu": "×4",
       "mauGui": 2000,
-      "giay": 14.07,
+      "giay": 14.06,
       "khung": {
         "so": 843,
         "moiGiay": 59.9,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
-        "cachLonNhatMs": 33.4,
-        "treHon20Ms": 2
+        "cachP95Ms": 16.7,
+        "cachLonNhatMs": 33.3,
+        "treHon20Ms": 1
       },
       "xuLyMoiKhungMs": {
-        "luot": 633,
-        "trungBinh": 0.177,
+        "luot": 636,
+        "trungBinh": 0.198,
         "trungVi": 0.1,
-        "p95": 0.8,
-        "lonNhat": 4.6
+        "p95": 0.9,
+        "lonNhat": 5.1
       },
       "luongChinhGiay": {
-        "TaskDuration": 2.903,
-        "ScriptDuration": 0.377,
-        "LayoutDuration": 0.001,
-        "RecalcStyleDuration": 0.001,
+        "TaskDuration": 2.962,
+        "ScriptDuration": 0.403,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0.003,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1690,
+        "pointermove": 1640,
         "mauGop": 1944,
         "netLuu": 56,
         "diemLuu": 1970,
@@ -922,18 +922,18 @@
         "trungBinh": 0.067,
         "trungVi": 0.1,
         "p95": 0.2,
-        "lonNhat": 0.2
+        "lonNhat": 0.4
       },
       "luongChinhGiay": {
-        "TaskDuration": 0.826,
-        "ScriptDuration": 0.104,
+        "TaskDuration": 0.817,
+        "ScriptDuration": 0.106,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1998,
+        "pointermove": 1997,
         "mauGop": 1999,
         "netLuu": 1,
         "diemLuu": 2000,
@@ -955,30 +955,30 @@
       "mauGui": 2000,
       "giay": 10.47,
       "khung": {
-        "so": 628,
-        "moiGiay": 60,
+        "so": 625,
+        "moiGiay": 59.7,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.8,
-        "cachLonNhatMs": 16.8,
-        "treHon20Ms": 0
+        "cachP95Ms": 16.7,
+        "cachLonNhatMs": 50,
+        "treHon20Ms": 2
       },
       "xuLyMoiKhungMs": {
-        "luot": 600,
-        "trungBinh": 0.229,
+        "luot": 599,
+        "trungBinh": 0.22,
         "trungVi": 0.1,
         "p95": 0.9,
-        "lonNhat": 2.2
+        "lonNhat": 3.1
       },
       "luongChinhGiay": {
-        "TaskDuration": 2.525,
-        "ScriptDuration": 0.343,
-        "LayoutDuration": 0.001,
-        "RecalcStyleDuration": 0.002,
+        "TaskDuration": 2.583,
+        "ScriptDuration": 0.371,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0.001,
         "LayoutCount": 1,
         "RecalcStyleCount": 2
       },
       "vao": {
-        "pointermove": 1755,
+        "pointermove": 1684,
         "mauGop": 1999,
         "netLuu": 1,
         "diemLuu": 2000,
@@ -1003,7 +1003,7 @@
         "so": 845,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.7,
+        "cachP95Ms": 16.8,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
       },
@@ -1015,15 +1015,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.599,
-        "ScriptDuration": 0.104,
+        "TaskDuration": 1.725,
+        "ScriptDuration": 0.118,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1222,
+        "pointermove": 1216,
         "mauGop": 1944,
         "netLuu": 0,
         "diemLuu": 0,
@@ -1054,15 +1054,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.271,
-        "ScriptDuration": 0.075,
+        "TaskDuration": 1.53,
+        "ScriptDuration": 0.086,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1235,
+        "pointermove": 1192,
         "mauGop": 1999,
         "netLuu": 0,
         "diemLuu": 0,
@@ -1076,14 +1076,14 @@
       "bai": "chu",
       "cpu": "×4",
       "mauGui": 2000,
-      "giay": 14.07,
+      "giay": 14.09,
       "khung": {
         "so": 844,
-        "moiGiay": 60,
+        "moiGiay": 59.9,
         "cachTrungViMs": 16.7,
         "cachP95Ms": 16.7,
-        "cachLonNhatMs": 16.8,
-        "treHon20Ms": 0
+        "cachLonNhatMs": 33.4,
+        "treHon20Ms": 1
       },
       "xuLyMoiKhungMs": {
         "luot": 0,
@@ -1093,15 +1093,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.219,
-        "ScriptDuration": 0.156,
+        "TaskDuration": 1.658,
+        "ScriptDuration": 0.224,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1232,
+        "pointermove": 1184,
         "mauGop": 1944,
         "netLuu": 0,
         "diemLuu": 0,
@@ -1117,10 +1117,10 @@
       "mauGui": 2000,
       "giay": 10.47,
       "khung": {
-        "so": 628,
+        "so": 629,
         "moiGiay": 60,
         "cachTrungViMs": 16.7,
-        "cachP95Ms": 16.7,
+        "cachP95Ms": 16.8,
         "cachLonNhatMs": 16.8,
         "treHon20Ms": 0
       },
@@ -1132,15 +1132,15 @@
         "lonNhat": 0
       },
       "luongChinhGiay": {
-        "TaskDuration": 1.062,
-        "ScriptDuration": 0.13,
+        "TaskDuration": 1.114,
+        "ScriptDuration": 0.139,
         "LayoutDuration": 0,
         "RecalcStyleDuration": 0,
         "LayoutCount": 0,
         "RecalcStyleCount": 0
       },
       "vao": {
-        "pointermove": 1242,
+        "pointermove": 1214,
         "mauGop": 1999,
         "netLuu": 0,
         "diemLuu": 0,

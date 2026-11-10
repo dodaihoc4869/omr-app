@@ -224,14 +224,15 @@ describe('xuất / nhập + sự kiện cho việc phát live', () => {
     so.batDau({ mau: 'rgb(244,239,228)', co: 2.3, diem: [0.5, 0.5, 0.3, 0] }); so.themDiem([[0.6, 0.5, 0.3, 5]]); so.ketThuc(true); kiem()
     so.doiTrang('7'); expect(sk[sk.length - 1]).toMatchObject({ loai: 'trang', trang: '7', net: [] }); kiem()
     viet(0.5); so.doiTrang(''); kiem()
-    huy(); viet(0.8); expect(sk).toHaveLength(0)
+    so.tro(0.123456, 2); expect(sk.pop()).toEqual({ loai: 'tro', trang: '', x: 0.1235, y: 1 }); kiem()
+    huy(); viet(0.8); so.tro(0.5, 0.5); expect(sk).toHaveLength(0)
   })
 })
 
 // ───────────────────────── gắn vào tờ chiếu (JSDOM) ─────────────────────────
 const cau = (id: string) => ({ phan: 'I', id, maDe: '', chuyenDe: 'x', dang: 'x', sao: 1, mucDo: '', text: 'Đề bài.', luaChon: ['Một', 'Hai', 'Ba', 'Bốn'], dapAn: 'B', chot: 'Cốt lõi.', lyDo: [], buoc: [] }) as unknown as OBang['cau']
 const o = (sbd: string, hoTen: string): OBang => ({ sbd, hoTen, qid: `DE-I-${sbd}`, soCau: 3, sao: 1, cau: cau(`DE-I-${sbd}`), bacUoc: 2, lop: '12A1', lanLenBang: 1 } as OBang)
-type ApiBut = { xuat(): { net: NetBut[] }; nhap(g: unknown): number; nghe(f: (s: SuKienBut) => void): () => void; hoanTac(): void; lamLai(): void; xoaHet(): void; bat(b: boolean): void; trang(): string }
+type ApiBut = { xuat(): { net: NetBut[] }; nhap(g: unknown): number; nghe(f: (s: SuKienBut) => void): () => void; hoanTac(): void; lamLai(): void; xoaHet(): void; bat(b: boolean): void; trang(): string; loi: typeof L; mau: [string, string][]; co: [number, string, string][]; vung(): Record<string, number[]> }
 function moTo() {
   const dom = new JSDOM(taoHtmlMayChieu([o('A', 'An'), o('B', 'Bình')]), {
     runScripts: 'dangerously', virtualConsole: new VirtualConsole(),
@@ -321,6 +322,22 @@ describe('bút trên tờ chiếu', () => {
     expect(t.but.trang()).toBe('0'); expect(t.but.xuat().net).toEqual([netMau])
     t.doc.querySelector<HTMLButtonElement>('[data-xoa]')!.click(); expect(t.but.xuat().net).toHaveLength(0)
     t.doc.querySelector<HTMLButtonElement>('[data-lui]')!.click(); expect(t.but.xuat().net).toHaveLength(1)
+  })
+  it('API cho việc live: bộ máy dựng nét, bảng màu / cỡ, vùng giấy / bảng; bút lơ lửng phát sự kiện tro (≤ 20 lần / giây)', () => {
+    const t = moTo(), sk: SuKienBut[] = []
+    expect(t.but.loi.dungNet(netMau, t.but.loi.khung(1920, 1080)).length).toBeGreaterThan(20)
+    expect(t.but.mau.map((m) => m[0])).toEqual(['rgb(244,239,228)', 'rgb(255,210,122)', 'rgb(110,231,183)', 'rgb(253,164,175)', 'rgb(36,86,201)'])
+    expect(t.but.co.map((c) => c[0])).toEqual([1.7, 2.3, 3.4])
+    expect(typeof t.but.vung()).toBe('object')
+    t.but.nghe((x) => sk.push(x))
+    t.tro('pointermove', 100, 100, { pointerType: 'pen', buttons: 0, timeStamp: 5000 })
+    expect(sk).toHaveLength(0) // bút tắt: không phát
+    t.phim('b')
+    t.tro('pointermove', 512, 384, { pointerType: 'pen', buttons: 0, timeStamp: 6000 })
+    t.tro('pointermove', 520, 390, { pointerType: 'pen', buttons: 0, timeStamp: 6010 })
+    t.tro('pointermove', 530, 400, { pointerType: 'pen', buttons: 0, timeStamp: 6060 })
+    expect(sk.map((x) => x.loai)).toEqual(['tro', 'tro'])
+    expect(sk[0]).toMatchObject({ x: Math.round((512 / t.dom.window.innerWidth) * 1e4) / 1e4, y: Math.round((384 / t.dom.window.innerHeight) * 1e4) / 1e4 })
   })
   it('bút TẮT: không cướp phím nào — Ctrl+Z, E không làm gì; L / G / ← → / Esc vẫn là của tờ; bảng phím có dòng bút', () => {
     const t = moTo()
