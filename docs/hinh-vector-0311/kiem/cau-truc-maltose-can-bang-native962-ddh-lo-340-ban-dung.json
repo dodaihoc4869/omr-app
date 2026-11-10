@@ -1,0 +1,40 @@
+[
+  {
+    "i": 962,
+    "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+    "fileNguon": "anh/ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308.png",
+    "svg": "maltose-can-bang-native962-ddh-b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212.svg",
+    "hashSvg": "b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212",
+    "byteSvg": 24510,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1234-D2-II-2",
+        "de": "Maltose là thành phần chính của đường mạch nha. Trong dung dịch nước, maltose tồn tại chủ yếu ở hai dạng cấu tạo (I) và (II). Các dạng này tồn tại trong cân bằng theo chiều từ (I) sang (II), xem hình dưới. Maltose thuỷ phân trong môi trường acid hoặc nhờ enzyme maltase tạo thành glucose.",
+        "refs": [
+          {
+            "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+            "where": "12-KT-C1234-D2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "d50e57467ed5b2e1c8c165357f9a25df8e2fd9a0930141a293579761eda29996"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D1-II-18",
+        "de": "Maltose là thành phần chính của đường mạch nha. Trong dung dịch nước, maltose tồn tại chủ yếu ở hai dạng cấu tạo (I) và (II). Các dạng này tồn tại trong cân bằng theo chiều từ (I) sang (II), xem hình dưới. Maltose thuỷ phân trong môi trường acid hoặc nhờ enzyme maltase tạo thành glucose.",
+        "refs": [
+          {
+            "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+            "where": "DB-12-B5-D1-II-18.hinh.0.du_lieu",
+            "hashDataUrl": "d50e57467ed5b2e1c8c165357f9a25df8e2fd9a0930141a293579761eda29996"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "24C22O16OH/3Haworth1openaldehyde1explicitH/4bareterminalC-noCH2/8TAPER4boldfront6px-verticalfeet/2HALFfilledharpoons/regularchemical2trueDAMcaptions/OH-leftI-down4-stemshort4-clearbackbond/noaddedH-CH2-nums-answer-noalias1247",
+    "hashSvgDaSoat": "b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

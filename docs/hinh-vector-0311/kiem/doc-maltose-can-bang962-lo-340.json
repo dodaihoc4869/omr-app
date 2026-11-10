@@ -1,0 +1,845 @@
+{
+  "i": 962,
+  "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308.png",
+  "size": [
+    998,
+    290
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C1234-D2-II-2",
+      "de": "Maltose là thành phần chính của đường mạch nha. Trong dung dịch nước, maltose tồn tại chủ yếu ở hai dạng cấu tạo (I) và (II). Các dạng này tồn tại trong cân bằng theo chiều từ (I) sang (II), xem hình dưới. Maltose thuỷ phân trong môi trường acid hoặc nhờ enzyme maltase tạo thành glucose.",
+      "allHinh": [
+        {
+          "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+          "where": "12-KT-C1234-D2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "d50e57467ed5b2e1c8c165357f9a25df8e2fd9a0930141a293579761eda29996"
+        }
+      ],
+      "missingHashes": [
+        "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308"
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D1-II-18",
+      "de": "Maltose là thành phần chính của đường mạch nha. Trong dung dịch nước, maltose tồn tại chủ yếu ở hai dạng cấu tạo (I) và (II). Các dạng này tồn tại trong cân bằng theo chiều từ (I) sang (II), xem hình dưới. Maltose thuỷ phân trong môi trường acid hoặc nhờ enzyme maltase tạo thành glucose.",
+      "allHinh": [
+        {
+          "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+          "where": "DB-12-B5-D1-II-18.hinh.0.du_lieu",
+          "hashDataUrl": "d50e57467ed5b2e1c8c165357f9a25df8e2fd9a0930141a293579761eda29996"
+        }
+      ],
+      "missingHashes": [
+        "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/962-native2x-lo340.png",
+    "ownEquilibrium10xOpened": "/workspace/scratch/962-equilibrium10x.png",
+    "ownOpenFrontCO10xOpened": "/workspace/scratch/962-openfront10x.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownCORayEndpoints15xOpened": "/workspace/scratch/own962-co15x-fix.png"
+  },
+  "geometry": {
+    "classification": "Twocarbohydrateformswithcentered2harpoonequilibrium, 3sixrings+oneopenchain, noalias1247.",
+    "ringTraceKeys": "C1..C5belowonlybuilderkeys, NOTtypesetnumbers.",
+    "rings": [
+      {
+        "panel": "I",
+        "vertices": {
+          "C1": [
+            216,
+            145
+          ],
+          "C2": [
+            176,
+            162
+          ],
+          "C3": [
+            109,
+            162
+          ],
+          "C4": [
+            72,
+            142
+          ],
+          "C5": [
+            113,
+            112
+          ]
+        },
+        "O": {
+          "bbox": [
+            173,
+            102,
+            192,
+            123
+          ]
+        },
+        "OgapBonds": [
+          [
+            [
+              113,
+              112
+            ],
+            [
+              171,
+              112
+            ]
+          ],
+          [
+            [
+              192,
+              122
+            ],
+            [
+              216,
+              145
+            ]
+          ]
+        ],
+        "OHbranches": [
+          {
+            "bbox": [
+              64,
+              166,
+              100,
+              188
+            ],
+            "bond": [
+              [
+                72,
+                142
+              ],
+              [
+                72,
+                165
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              101,
+              115,
+              136,
+              137
+            ],
+            "bond": [
+              [
+                109,
+                162
+              ],
+              [
+                109,
+                137
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              166,
+              190,
+              203,
+              212
+            ],
+            "bond": [
+              [
+                176,
+                162
+              ],
+              [
+                176,
+                188
+              ]
+            ]
+          }
+        ],
+        "bareTerminalOH": {
+          "path": [
+            [
+              113,
+              112
+            ],
+            [
+              113,
+              83
+            ],
+            [
+              132,
+              71
+            ]
+          ],
+          "bbox": [
+            136,
+            53,
+            171,
+            75
+          ]
+        }
+      },
+      {
+        "panel": "I",
+        "vertices": {
+          "C1": [
+            411,
+            152
+          ],
+          "C2": [
+            372,
+            168
+          ],
+          "C3": [
+            305,
+            168
+          ],
+          "C4": [
+            270,
+            146
+          ],
+          "C5": [
+            300,
+            114
+          ]
+        },
+        "O": {
+          "bbox": [
+            366,
+            105,
+            386,
+            127
+          ]
+        },
+        "OgapBonds": [
+          [
+            [
+              300,
+              114
+            ],
+            [
+              364,
+              114
+            ]
+          ],
+          [
+            [
+              386,
+              125
+            ],
+            [
+              411,
+              152
+            ]
+          ]
+        ],
+        "OHbranches": [
+          {
+            "bbox": [
+              296,
+              121,
+              332,
+              143
+            ],
+            "bond": [
+              [
+                305,
+                168
+              ],
+              [
+                305,
+                144
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              362,
+              196,
+              399,
+              218
+            ],
+            "bond": [
+              [
+                372,
+                168
+              ],
+              [
+                372,
+                194
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              400,
+              178,
+              437,
+              200
+            ],
+            "bond": [
+              [
+                411,
+                152
+              ],
+              [
+                411,
+                177
+              ]
+            ]
+          }
+        ],
+        "bareTerminalOH": {
+          "path": [
+            [
+              300,
+              114
+            ],
+            [
+              300,
+              89
+            ],
+            [
+              322,
+              75
+            ]
+          ],
+          "bbox": [
+            326,
+            54,
+            363,
+            77
+          ]
+        }
+      },
+      {
+        "panel": "II",
+        "vertices": {
+          "C1": [
+            708,
+            151
+          ],
+          "C2": [
+            667,
+            168
+          ],
+          "C3": [
+            600,
+            168
+          ],
+          "C4": [
+            563,
+            145
+          ],
+          "C5": [
+            604,
+            119
+          ]
+        },
+        "O": {
+          "bbox": [
+            666,
+            109,
+            686,
+            132
+          ]
+        },
+        "OgapBonds": [
+          [
+            [
+              604,
+              119
+            ],
+            [
+              664,
+              119
+            ]
+          ],
+          [
+            [
+              686,
+              130
+            ],
+            [
+              708,
+              151
+            ]
+          ]
+        ],
+        "OHbranches": [
+          {
+            "bbox": [
+              555,
+              171,
+              591,
+              193
+            ],
+            "bond": [
+              [
+                563,
+                145
+              ],
+              [
+                563,
+                170
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              592,
+              121,
+              628,
+              143
+            ],
+            "bond": [
+              [
+                600,
+                168
+              ],
+              [
+                600,
+                144
+              ]
+            ]
+          },
+          {
+            "bbox": [
+              656,
+              196,
+              693,
+              218
+            ],
+            "bond": [
+              [
+                667,
+                168
+              ],
+              [
+                667,
+                194
+              ]
+            ]
+          }
+        ],
+        "bareTerminalOH": {
+          "path": [
+            [
+              604,
+              119
+            ],
+            [
+              604,
+              89
+            ],
+            [
+              624,
+              75
+            ]
+          ],
+          "bbox": [
+            628,
+            59,
+            663,
+            81
+          ]
+        }
+      }
+    ],
+    "ringFrontStyle": "Each3rings:2TAPER+1BOLDhorizontal approx6pxwidth, frontcentersIleft162/Iright168/IIleft168, broadfeet±3. Ownpixelrows atx140dark159..164,x340165..170,x630165..170confirm.",
+    "bridges": [
+      {
+        "panel": "I",
+        "O": {
+          "bbox": [
+            232,
+            159,
+            252,
+            182
+          ]
+        },
+        "bonds": [
+          [
+            [
+              216,
+              145
+            ],
+            [
+              232,
+              162
+            ]
+          ],
+          [
+            [
+              252,
+              163
+            ],
+            [
+              270,
+              146
+            ]
+          ]
+        ]
+      },
+      {
+        "panel": "II",
+        "O": {
+          "bbox": [
+            724,
+            165,
+            745,
+            187
+          ]
+        },
+        "bonds": [
+          [
+            [
+              708,
+              151
+            ],
+            [
+              724,
+              167
+            ]
+          ],
+          [
+            [
+              745,
+              167
+            ],
+            [
+              760,
+              154
+            ]
+          ]
+        ]
+      }
+    ],
+    "openChainII": {
+      "verticesC1ToC6": [
+        [
+          902,
+          158
+        ],
+        [
+          862,
+          173
+        ],
+        [
+          796,
+          173
+        ],
+        [
+          760,
+          154
+        ],
+        [
+          791,
+          119
+        ],
+        [
+          791,
+          93
+        ]
+      ],
+      "bareTerminalOH": {
+        "path": [
+          [
+            791,
+            119
+          ],
+          [
+            791,
+            93
+          ],
+          [
+            815,
+            79
+          ]
+        ],
+        "bbox": [
+          819,
+          59,
+          854,
+          81
+        ]
+      },
+      "OHbranches": [
+        {
+          "bbox": [
+            782,
+            125,
+            818,
+            147
+          ],
+          "bond": [
+            [
+              796,
+              173
+            ],
+            [
+              796,
+              148
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            852,
+            199,
+            889,
+            221
+          ],
+          "bond": [
+            [
+              862,
+              173
+            ],
+            [
+              862,
+              197
+            ]
+          ]
+        },
+        {
+          "bbox": [
+            817,
+            109,
+            854,
+            132
+          ],
+          "bond": [
+            [
+              791,
+              119
+            ],
+            [
+              815,
+              119
+            ]
+          ]
+        }
+      ],
+      "frontStyle": "C4→C3TAPER,C3→C2BOLD6pxhorizontalcenter173 (ownx830dark170..175),C2→C1TAPERnarrowformylend. Widefeet±3.",
+      "aldehyde": {
+        "O": {
+          "bbox": [
+            904,
+            111,
+            924,
+            134
+          ]
+        },
+        "doubleRays": [
+          [
+            [
+              899.5,
+              156
+            ],
+            [
+              905.5,
+              131
+            ]
+          ],
+          [
+            [
+              905.5,
+              158
+            ],
+            [
+              911.5,
+              133.5
+            ]
+          ]
+        ],
+        "H": {
+          "bbox": [
+            927,
+            165,
+            947,
+            187
+          ]
+        },
+        "Hbond": [
+          [
+            906,
+            159
+          ],
+          [
+            924,
+            169
+          ]
+        ],
+        "literalJunction": "Own15xandgray<150nativepixelrowsconfirm upperend905.5,131 /911.5,133.5;feet899.5,156 and905.5,158,apex902,156.5. Actualshortblackjunctionx899..906aty156continuous. Previousupperends910132/916135wereapproxwrong, nowcorrectedfromnative."
+      }
+    },
+    "captions": [
+      {
+        "text": "(I)",
+        "bbox": [
+          243,
+          211,
+          271,
+          238
+        ]
+      },
+      {
+        "text": "(II)",
+        "bbox": [
+          737,
+          215,
+          773,
+          243
+        ]
+      }
+    ],
+    "equilibrium": {
+      "topShaft": [
+        [
+          457,
+          146
+        ],
+        [
+          520,
+          146
+        ]
+      ],
+      "topHead": "FILLEDHALFHEADABOVE RIGHTtip520146, base507142..507146",
+      "bottomShaft": [
+        [
+          520,
+          155
+        ],
+        [
+          457,
+          155
+        ]
+      ],
+      "bottomHead": "FILLEDHALFHEADBELOW LEFTtip457155, base468155..468160",
+      "heads": 2,
+      "conditions": null
+    },
+    "font": "AtomO/OH/Hregularuprightserif;captionRoman(I)/(II)BOLDuprightserif. Noitalicothertext; noCH2/CH2OHglyphon4bareterminalCs.",
+    "counts": {
+      "C": 24,
+      "O": 22,
+      "OHlabels": 16,
+      "bareTerminalC": 4,
+      "standaloneH": 1,
+      "TAPER": 8,
+      "BOLDfrontHorizontals": 4,
+      "captions": 2,
+      "halfHeads": 2,
+      "Cnums": 0
+    },
+    "noAdded": [
+      "CH2/Honbareterminals",
+      "sugarnames",
+      "correctanswer",
+      "carbonnumbers",
+      "reactionconditions",
+      "replacingharpoonswithfullarrows",
+      "ringHlabels"
+    ]
+  },
+  "coordinateMeaning": "Nativepixeltrace/captionliteral, notchemicalnamederivednormalization.",
+  "corrections": [
+    "Ownnativepixelstripeinspectioncorrectedfrontcentersfromearlyapprox163/170/170/174to162/168/168/173 andwidth6pxfeet±3; COleftfoot898157/right906159/apex902156 refined. Noatomcountchange.",
+    {
+      "finding": "UpperCOendpointsold910132/916135wrongby~5-6px. Ownnative15xandpixelrowsconfirm exactgrayinkrays; correctedwithoutSVGchange.",
+      "oldRays": [
+        [
+          [
+            898,
+            157
+          ],
+          [
+            910,
+            132
+          ]
+        ],
+        [
+          [
+            906,
+            159
+          ],
+          [
+            916,
+            135
+          ]
+        ]
+      ],
+      "newRays": [
+        [
+          [
+            899.5,
+            156
+          ],
+          [
+            905.5,
+            131
+          ]
+        ],
+        [
+          [
+            905.5,
+            158
+          ],
+          [
+            911.5,
+            133.5
+          ]
+        ]
+      ],
+      "nativeGrayRows": {
+        "131": [
+          905,
+          906
+        ],
+        "133": [
+          905,
+          906,
+          911,
+          912
+        ],
+        "140": [
+          903,
+          904,
+          910
+        ],
+        "150": [
+          900,
+          901,
+          907,
+          908
+        ],
+        "156": [
+          899,
+          900,
+          901,
+          902,
+          903,
+          904,
+          905,
+          906
+        ]
+      }
+    }
+  ],
+  "redrawReadabilityAdjustment": {
+    "OH": "Panel I vòng trái, OH hướng lên ở C3; native O chạm rearbond chéo, final hạ nhãn4px+rútstem4px để tách chữ, giữ hướng nhánh và toàn bộ nguyên tử.",
+    "oldHash": "f8f4a0564d5cce5e0993e5aaac9335819acbebc9e3e25b6d9773692f489e9d77",
+    "newHash": "b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212",
+    "rootFreshFullAndOHMacroOpened": true
+  }
+}

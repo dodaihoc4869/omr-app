@@ -6463,6 +6463,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308": {
+      "tep": "maltose-can-bang-native962-ddh-b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212.svg",
+      "hashSvg": "b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212",
+      "byteSvg": 24510,
+      "byteGzip": 1882,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0": {
       "tep": "monolaurate-native1404-ddh-7c3c8a4789d127d7fbf5d1e20c82eb528acf641291090afb20fef2f1d4c6472c.svg",
       "hashSvg": "7c3c8a4789d127d7fbf5d1e20c82eb528acf641291090afb20fef2f1d4c6472c",
@@ -14767,6 +14776,20 @@
       ]
     },
     {
+      "qid": "12-KT-C1234-D2-II-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+          "where": "12-KT-C1234-D2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "d50e57467ed5b2e1c8c165357f9a25df8e2fd9a0930141a293579761eda29996",
+          "vector": "maltose-can-bang-native962-ddh-b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-KT-C2-D4-I-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -19467,6 +19490,20 @@
           "where": "DB-12-B2-D1-III-207.hinh.0.du_lieu",
           "hashDataUrl": "80dc98a195cbe55d3410280c399ab8402918300f7676a55781b3f01372433490",
           "vector": "cau-truc-ddh-5ad6831be500aaebf1ff253fe74714939c37715f4a6170caf67f61bb2a62a393.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D1-II-18",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ad31b9948a5a3eb1be18dc10f69ecf5a62c114f9fa9e6d59ef94baea26c00308",
+          "where": "DB-12-B5-D1-II-18.hinh.0.du_lieu",
+          "hashDataUrl": "d50e57467ed5b2e1c8c165357f9a25df8e2fd9a0930141a293579761eda29996",
+          "vector": "maltose-can-bang-native962-ddh-b98b26afa4476371508c0ac0d299aa5fcd550fa9a5e2a6f4b95f458de080d212.svg"
         }
       ]
     },
@@ -30369,6 +30406,7 @@
     "12-KT-C2-D1-III-1",
     "12-KT-C1234-D2-I-2",
     "12-KT-C1234-D2-I-5",
+    "12-KT-C1234-D2-II-2",
     "12-KT-C2-D4-I-3",
     "12-KT-C2-D4-I-5",
     "12-KT-C2-D4-I-8",
@@ -30664,6 +30702,7 @@
     "DB-12-B2-D1-II-200",
     "DB-12-B2-D1-III-204",
     "DB-12-B2-D1-III-207",
+    "DB-12-B5-D1-II-18",
     "DB-12-B4-D1-II-51",
     "DB-12-B4-D1-III-157",
     "DB-12-B4-D3-I-10",
