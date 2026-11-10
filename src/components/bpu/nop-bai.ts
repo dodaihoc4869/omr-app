@@ -25,7 +25,7 @@ export function emVuaGui(cu: ViewBang | null, moi: ViewBang | null): Em[] {
 
 // ── Nhịp (ms) và hình (px sân 1920×1080) ──
 export const XOAN_MS = 1250, DUNG_MS = 170, CACH_MS = 320, TRE_MS = 4000
-const VONG = 2.25, NGHIENG = 0.14, G = 2800, PHAN_UNG_MS = 1500, GON_PU_MS = 650, NHIP_MS = 260, LUA_MS = 450, DUOI = 14, BUOC_DUOI = 0.026
+const VONG = 2.25, NGHIENG = 0.14, G = 2800, PHAN_UNG_MS = 1800, GON_PU_MS = 650, NHIP_MS = 260, LUA_MS = 450, DUOI = 12, NUA_VONG = 0.5 / VONG, MIENG_MS = 420
 const kep = (x: number, a = 0, b = 1) => Math.max(a, Math.min(b, x))
 const de = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * kep(u)) // vào êm, ra êm
 const coAnimate = (el: Element | null | undefined): el is HTMLElement => !!el && typeof (el as HTMLElement).animate === 'function'
@@ -96,9 +96,9 @@ function doHinh(san: HTMLElement, tl: Element, khoa: string): Hinh {
     o.mat = kep((rd.top - r0.top) / k + 6, o.tren + 40, o.day - 18)
     const mau = docMau(cot, '--doi', c1), giay = docMau(cot, '--giay', c1), nhat = tron(mau, giay, 0.45)
     ong.set(Number(cot.dataset.doi), { ...o, doi: Number(cot.dataset.doi), mau, nhat, giay,
-      quang: anhQuang([[0, rgba(giay, 1)], [0.16, rgba(nhat, 0.9)], [0.42, rgba(mau, 0.32)], [1, rgba(mau, 0)]]),
+      quang: anhQuang([[0, rgba(giay, 1)], [0.12, rgba(giay, 0.95)], [0.24, rgba(nhat, 0.9)], [0.5, rgba(mau, 0.45)], [1, rgba(mau, 0)]]),
       long: anhQuang([[0, rgba(nhat, 0.85)], [0.5, rgba(mau, 0.3)], [1, rgba(mau, 0)]]) })
-    x0 = Math.min(x0, o.x - o.r - 60); x1 = Math.max(x1, o.x + o.r + 60); y0 = Math.min(y0, o.tren - 70); y1 = Math.max(y1, o.day + 24)
+    x0 = Math.min(x0, o.x - o.r - 60); x1 = Math.max(x1, o.x + o.r + 60); y0 = Math.min(y0, o.tren - 110); y1 = Math.max(y1, o.day + 24)
   })
   x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0))
   return { khoa, tl, dai: tl.querySelector<HTMLElement>('.bb-tl-dai'), ong, x: x0, y: y0, w: Math.max(1, Math.ceil(Math.min(1920, x1) - x0)), h: Math.max(1, Math.ceil(Math.min(1080, y1) - y0)), k }
@@ -118,8 +118,9 @@ function datCanvas(san: HTMLElement, h: Hang, hinh: Hinh): void {
 
 function taoTia(o: OngDo, t0: number, gon: boolean): Tia {
   const sc = kep(o.r / 90, 1, 1.35), sau = o.day - o.mat, ng = Math.random
-  const giot = Array.from({ length: 12 }, () => { const g = (ng() - 0.5) * 1.6, v = 170 + ng() * 170; return [Math.sin(g) * v, Math.cos(g) * v, (2.4 + ng() * 2.2) * sc] })
-  const bot = sau < 20 ? [] : Array.from({ length: 9 }, (_, i) => [120 + Math.floor(i / 3) * 260 + ng() * 80, (ng() - 0.5) * 1.1, 12 + ng() * Math.min(110, sau - 14), 70 + ng() * 60, (2.6 + ng() * 3.2) * sc, ng() * 6])
+  // Giọt bắn: cỡ 4–8 px, vọt cao 40–70 px (g = 1500 px/s²). Bọt khí: 12 bọt cỡ 4–10 px, sủi rải trong ~0,85 s, lên tới mặt nước rồi tan.
+  const giot = Array.from({ length: 10 }, () => { const g = (ng() - 0.5) * 1.1, v = 390 + ng() * 110; return [Math.sin(g) * v, Math.cos(g) * v, (2 + ng() * 2) * sc] })
+  const bot = sau < 20 ? [] : Array.from({ length: 12 }, (_, i) => [60 + i * 70 + ng() * 50, (ng() - 0.5) * 1.2, 14 + ng() * Math.min(130, sau - 16), 140 + ng() * 80, (2.5 + ng() * 2.5) * sc, ng() * 6])
   return { o, t0, cham: gon ? 140 + roiMs(o) : XOAN_MS + DUNG_MS + roiMs(o), gon, gop: 0, lua: false, sc, giot, bot }
 }
 
@@ -127,30 +128,40 @@ function taoTia(o: OngDo, t0: number, gon: boolean): Tia {
 function dau(c: CanvasRenderingContext2D, o: OngDo, x: number, y: number, s: number, a: number): void {
   if (a <= 0.01) return
   c.globalAlpha = kep(a)
-  const g = 60 * s
+  const g = 72 * s // quầng màu đội ~36 px thấy rõ, lõi giấy ~12 px (sân 1920; canvas co theo khổ chiếu)
   if (o.quang) c.drawImage(o.quang, x - g / 2, y - g / 2, g, g)
-  c.fillStyle = rgba(o.giay, 1); c.beginPath(); c.arc(x, y, 3.6 * s, 0, 2 * Math.PI); c.fill()
+  c.fillStyle = rgba(o.giay, 1); c.beginPath(); c.arc(x, y, 6 * s, 0, 2 * Math.PI); c.fill()
 }
-/** Độ sáng theo chiều sâu: phía trước 1, phía sau ~0,18; khuất hẳn khi ở phía sau, trong bóng ống và dưới mặt chất lỏng (chuyển mượt, không nhảy). */
+/** Độ sáng theo chiều sâu: phía trước 1, phía sau ~0,3 (mờ nhưng vẫn thấy); chìm mờ khi ở phía sau, trong bóng ống và dưới mặt chất lỏng (chuyển mượt, không nhảy). */
 function sangSau(o: Ong, p: { x: number; y: number; z: number }): number {
   const d = (p.z + 1) / 2, kin = kep((nuaRong(o, p.y) - Math.abs(p.x - o.x)) / 10) * kep((p.y - o.mat) / 8) * kep(-p.z / 0.35)
-  return (0.18 + 0.82 * d * d) * (1 - 0.96 * kin)
+  return (0.3 + 0.7 * d * d) * (1 - 0.6 * kin)
 }
-/** Đuôi xoắn: lấy mẫu ngược trên chính đường xoắn; vẽ đoạn phía sau trước, đoạn phía trước sau (đè lên). */
+/** Đuôi xoắn dài nửa vòng: lấy mẫu ngược trên chính đường xoắn; vẽ đoạn phía sau trước, đoạn phía trước sau (đè lên). */
 function veDuoi(c: CanvasRenderingContext2D, t: Tia, u: number, mo: number): void {
-  const o = t.o, ds = Array.from({ length: DUOI + 1 }, (_, k) => diemXoan(o, de(u - k * BUOC_DUOI)))
-  c.lineCap = 'round'; c.globalAlpha = 1
+  const o = t.o, p0 = de(u) + Math.max(0, u - 1) * 0.6, ds = Array.from({ length: DUOI + 1 }, (_, k) => diemXoan(o, kep(p0 - (k * NUA_VONG) / DUOI)))
+  c.lineCap = 'round'; c.lineJoin = 'round'; c.globalAlpha = 1
+  // Gom đoạn theo nhóm 4 (12 đoạn ⇒ 3 nét mỗi lớp thay vì 12): ít lệnh vẽ hơn, chỗ nối không chồng màu.
   for (const truoc of [false, true]) {
-    for (let k = 0; k < DUOI; k++) {
-      const a = ds[k]!, b = ds[k + 1]!, z = (a.z + b.z) / 2
-      if (z >= 0 !== truoc || (a.x === b.x && a.y === b.y)) continue
-      const d = (z + 1) / 2, f = 1 - k / DUOI, al = sangSau(o, a) * f ** 1.4 * mo * kep(u / 0.08)
+    for (let g = 0; g < DUOI; g += 4) {
+      let n = 0, al = 0, dd = 0, noi = false
+      c.beginPath()
+      for (let k = g; k < g + 4; k++) {
+        const a = ds[k]!, b = ds[k + 1]!, z = (a.z + b.z) / 2
+        if (z >= 0 !== truoc || (a.x === b.x && a.y === b.y)) { noi = false; continue }
+        const x = sangSau(o, a) * (1 - k / DUOI) ** 1.4
+        if (x < 0.01) { noi = false; continue }
+        if (!noi) c.moveTo(a.x, a.y)
+        c.lineTo(b.x, b.y); noi = true; al += x; dd += (z + 1) / 2; n++
+      }
+      if (!n) continue
+      al = (al / n) * mo * kep(u / 0.08)
       if (al < 0.01) continue
-      // Hai lớp: viền màu đội rộng, mờ (nổi trên nền tối) + lõi sáng mảnh (nổi trên chất lỏng cùng màu đội).
-      const w = (0.7 + 3.6 * f) * t.sc * (0.55 + 0.45 * d)
-      c.beginPath(); c.moveTo(a.x, a.y); c.lineTo(b.x, b.y)
-      if (truoc) { c.strokeStyle = rgba(o.mau, al * 0.45); c.lineWidth = w * 2.6; c.stroke() }
-      c.strokeStyle = rgba(tron(o.nhat, o.giay, 0.3 + 0.5 * d), al); c.lineWidth = w; c.stroke()
+      // Ba lớp (phía trước): quầng màu đội rộng · thân 4–6 px thon dần · vệt sáng phụ màu giấy ở nửa đầu đuôi. Phía sau: chỉ thân, mờ.
+      const d = dd / n, f = 1 - (g + 2) / DUOI, w = (1.2 + 4.6 * f) * t.sc * (0.55 + 0.45 * d)
+      if (truoc) { c.strokeStyle = rgba(o.mau, al * 0.4); c.lineWidth = w * 2.4; c.stroke() }
+      c.strokeStyle = rgba(tron(o.nhat, o.giay, 0.25 + 0.35 * d), al); c.lineWidth = w; c.stroke()
+      if (truoc && g < DUOI / 2) { c.strokeStyle = rgba(o.giay, al); c.lineWidth = w * 0.35; c.stroke() }
     }
   }
 }
@@ -161,9 +172,9 @@ function longOng(c: CanvasRenderingContext2D, o: Ong): void {
 }
 function gon(c: CanvasRenderingContext2D, o: OngDo, q: number, nua: number, manh: number): void {
   if (q < 0 || q >= 1) return
-  const rx = nua * (0.12 + 0.86 * (1 - (1 - q) ** 3))
-  c.globalAlpha = manh * (1 - q) ** 1.4; c.strokeStyle = rgba(o.nhat, 1); c.lineWidth = 1.2 + 3 * (1 - q)
-  c.beginPath(); c.ellipse(o.x, o.mat, rx, Math.max(2.5, rx * 0.2), 0, 0, 2 * Math.PI); c.stroke()
+  const rx = nua * (0.1 + 0.86 * (1 - (1 - q) ** 3)) // rộng tới sát thành ống
+  c.globalAlpha = manh * (1 - q) ** 1.3; c.strokeStyle = rgba(tron(o.nhat, o.giay, 0.35), 1); c.lineWidth = 2 + 3.5 * (1 - q)
+  c.beginPath(); c.ellipse(o.x, o.mat, rx, Math.max(3, rx * 0.22), 0, 0, 2 * Math.PI); c.stroke()
 }
 /** Chạm mặt chất lỏng (e = ms sau khi chạm): loé trong lòng chất lỏng · gợn sóng · bọt khí · giọt bắn — tất cả cắt trong lòng ống. */
 function phanUng(c: CanvasRenderingContext2D, t: Tia, e: number): void {
@@ -171,32 +182,42 @@ function phanUng(c: CanvasRenderingContext2D, t: Tia, e: number): void {
   c.save(); longOng(c, o); c.clip()
   if (t.gon) { gon(c, o, e / GON_PU_MS, nua, 0.7); c.restore(); return }
   // Loé màu đội trong lòng chất lỏng: quầng nhỏ ngay dưới điểm chạm (vùng lớn đã có lớp .bb-tl-sang của ống — bungLua, chạy trên luồng hợp thành).
-  const qg = e / 600
+  const qg = e / 700
   if (qg < 1 && o.long) {
-    const s = Math.min(nua * 1.5, 150) * (0.7 + 0.3 * qg)
+    const s = Math.min(nua * 1.7, 160) * (0.7 + 0.3 * qg)
     c.globalAlpha = (e < 80 ? e / 80 : (1 - qg) ** 2) * Math.min(0.95, 0.75 + 0.07 * t.gop)
     c.drawImage(o.long, o.x - s / 2, o.mat + Math.min(24, sau * 0.4) - s / 2, s, s)
   }
-  if (e < 280 && o.quang) { const q = e / 280, s = 64 * t.sc * (1 + 0.8 * q); c.globalAlpha = (1 - q) ** 1.5; c.drawImage(o.quang, o.x - s / 2, o.mat - s / 2, s, s) } // loé ngay điểm chạm
-  for (let j = 0; j < (t.gop ? 3 : 2); j++) gon(c, o, (e - j * 170) / 820, nua, 0.95)
-  c.lineWidth = 1.8; c.strokeStyle = rgba(o.giay, 1)
+  if (e < 300 && o.quang) { const q = e / 300, s = 80 * t.sc * (1 + 0.9 * q); c.globalAlpha = (1 - q) ** 1.5; c.drawImage(o.quang, o.x - s / 2, o.mat - s / 2, s, s) } // loé ngay điểm chạm
+  for (let j = 0; j < 3; j++) gon(c, o, (e - j * 150) / 850, nua, j ? 0.75 : 0.95)
+  // Bọt khí: viền giấy; lên tới mặt nước thì tan trong 120 ms.
+  c.lineWidth = 2.2; c.strokeStyle = rgba(o.giay, 1)
   for (const [tre, dx, sauB, v, r, pha] of t.bot) {
-    const tb = (e - tre!) / 1000, y = o.mat + sauB! - v! * tb
-    if (tb < 0 || y < o.mat + r!) continue
-    c.globalAlpha = kep(tb / 0.15) * 0.85
-    c.beginPath(); c.arc(o.x + dx! * nuaRong(o, o.mat + sauB!) + Math.sin(tb * 8 + pha!) * 2.5, y, r!, 0, 2 * Math.PI); c.stroke()
+    const tb = (e - tre!) / 1000, y = o.mat + sauB! - v! * tb, tan = (o.mat + r! - y) / (0.12 * v!)
+    if (tb < 0 || tan >= 1) continue
+    const a = kep(tb / 0.12) * 0.9 * (1 - kep(tan))
+    c.beginPath(); c.arc(o.x + dx! * nuaRong(o, o.mat + sauB!) + Math.sin(tb * 8 + pha!) * 3, Math.max(y, o.mat + r!), r!, 0, 2 * Math.PI)
+    c.globalAlpha = a; c.stroke()
   }
   const tg = e / 1000
-  if (tg < 0.75) {
-    c.fillStyle = rgba(o.nhat, 1)
-    t.giot.slice(0, 6 + 2 * Math.min(3, t.gop)).forEach(([vx, vy, s], i) => {
-      const g2 = i < 6 ? 1 : 1.25, y = o.mat - (vy! * g2 * tg - 750 * tg * tg)
+  if (tg < 0.7) {
+    c.fillStyle = rgba(tron(o.nhat, o.giay, 0.65), 1) // sáng hơn ngọn lửa cùng màu ⇒ giọt bay qua lửa vẫn rõ
+    t.giot.slice(0, 7 + Math.min(3, t.gop)).forEach(([vx, vy, s]) => {
+      const y = o.mat - (vy! * tg - 750 * tg * tg)
       if (tg > 0.05 && y > o.mat + 1) return
-      c.globalAlpha = (1 - tg / 0.75) * 0.9
-      c.beginPath(); c.arc(o.x + vx! * g2 * tg, y, s!, 0, 2 * Math.PI); c.fill()
+      c.globalAlpha = (1 - tg / 0.7) * 0.95
+      c.beginPath(); c.arc(o.x + vx! * tg, y, s!, 0, 2 * Math.PI); c.fill()
     })
   }
   c.restore()
+}
+/** Loé ở miệng ống: vòng sáng nở ra từ miệng rồi tan (MIENG_MS, kéo sang lúc bắt đầu rơi). */
+function vongMieng(c: CanvasRenderingContext2D, o: OngDo, e: number): void {
+  const q = e / MIENG_MS
+  if (q < 0 || q >= 1) return
+  const rx = o.r * (0.6 + 0.75 * (1 - (1 - q) ** 3))
+  c.globalAlpha = 0.9 * (1 - q) ** 1.3; c.strokeStyle = rgba(tron(o.nhat, o.giay, 0.4), 1); c.lineWidth = 1.5 + 5 * (1 - q)
+  c.beginPath(); c.ellipse(o.x, o.tren + 3, rx, Math.max(4, rx * 0.16), 0, 0, 2 * Math.PI); c.stroke()
 }
 /** Tia đang bay (e = ms từ lúc phóng, trước khi chạm). */
 function veBay(c: CanvasRenderingContext2D, t: Tia, e: number): void {
@@ -210,15 +231,15 @@ function veBay(c: CanvasRenderingContext2D, t: Tia, e: number): void {
     // Miệng ống: đuôi thu vào đầu, đầu nhích lên giữa miệng + loé; ánh viền miệng ống.
     const q = (e - XOAN_MS) / DUNG_MS, p1 = diemXoan(o, 1), nh = Math.sin(Math.PI * q), y = p1.y + (o.tren - 12 - p1.y) * (1 - (1 - q) ** 3)
     veDuoi(c, t, 1 + (e - XOAN_MS) / XOAN_MS, kep(1 - q * 1.25))
-    c.globalAlpha = 0.65 * nh; c.strokeStyle = rgba(o.nhat, 1); c.lineWidth = 3
-    c.beginPath(); c.ellipse(o.x, o.tren + 3, o.r * 0.92, Math.max(3, o.r * 0.1), 0, 0, 2 * Math.PI); c.stroke()
-    dau(c, o, o.x, y, t.sc * (1 + 1.1 * nh), 1)
+    vongMieng(c, o, e - XOAN_MS)
+    dau(c, o, o.x, y, t.sc * (1 + 1.4 * nh), 1)
   } else {
     // Rơi tự do: vệt dọc dài theo vận tốc, đầu lõi sáng.
-    const tf = (e - XOAN_MS - DUNG_MS) / 1000, y = Math.min(o.mat, o.tren - 12 + 0.5 * G * tf * tf), L = Math.min(110, 14 + G * tf * 0.07)
+    const tf = (e - XOAN_MS - DUNG_MS) / 1000, y = Math.min(o.mat, o.tren - 12 + 0.5 * G * tf * tf), L = Math.min(120, 16 + G * tf * 0.075)
+    vongMieng(c, o, e - XOAN_MS)
     c.lineCap = 'round'
     for (let k = 0; k < 5; k++) {
-      c.globalAlpha = 0.9 * (1 - k / 5); c.strokeStyle = rgba(o.nhat, 1); c.lineWidth = 5 * t.sc * (1 - k / 6)
+      c.globalAlpha = 0.95 * (1 - k / 5); c.strokeStyle = rgba(k ? o.nhat : o.giay, 1); c.lineWidth = 7 * t.sc * (1 - k / 6)
       c.beginPath(); c.moveTo(o.x, y - (L * k) / 5); c.lineTo(o.x, y - (L * (k + 1)) / 5); c.stroke()
     }
     dau(c, o, o.x, y, t.sc, 1)
@@ -229,8 +250,8 @@ function bungLua(san: HTMLElement, h: Hang, doi: number, nay: number): void {
   if (nay - (h.lucLua.get(doi) ?? -1e9) < LUA_MS) return
   h.lucLua.set(doi, nay)
   const cot = san.querySelector(`.bb-tl-cot[data-doi="${doi}"]`), sang = cot?.querySelector('.bb-tl-sang'), lua = cot?.querySelector('.bb-tl-nhun')
-  if (coAnimate(sang)) sang.animate([{ opacity: 0 }, { opacity: 0.55, offset: 0.2 }, { opacity: 0 }], { duration: 950, easing: 'ease-out' })
-  if (coAnimate(lua)) lua.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.1, 1.22)', offset: 0.3 }, { transform: 'scale(0.98, 0.96)', offset: 0.65 }, { transform: 'scale(1)' }], { duration: 760, easing: 'cubic-bezier(.3, .8, .4, 1)' })
+  if (coAnimate(sang)) sang.animate([{ opacity: 0 }, { opacity: 0.8, offset: 0.12 }, { opacity: 0 }], { duration: 850, easing: 'ease-out' })
+  if (coAnimate(lua)) lua.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18, 1.3)', offset: 0.28 }, { transform: 'scale(0.97, 0.95)', offset: 0.62 }, { transform: 'scale(1)' }], { duration: 820, easing: 'cubic-bezier(.3, .8, .4, 1)' })
 }
 
 /** MỘT vòng rAF chung: xoá canvas, vẽ mọi tia, bỏ tia đã xong; hết tia ⇒ dừng + ẩn canvas. */
@@ -245,7 +266,7 @@ function khung(san: HTMLElement, h: Hang, nay: number): void {
   }
   // Chỉ xoá vùng các ống vừa vẽ ở khung trước (trình duyệt chỉ vẽ lại phần bẩn của canvas, không cả vùng tháp).
   c.setTransform(h.ti, 0, 0, h.ti, -hinh.x * h.ti, -hinh.y * h.ti)
-  h.ban.forEach((o) => c.clearRect(o.x - o.r - 60, o.tren - 70, 2 * o.r + 120, o.day - o.tren + 94))
+  h.ban.forEach((o) => c.clearRect(o.x - o.r - 60, o.tren - 110, 2 * o.r + 120, o.day - o.tren + 134))
   h.ban.clear()
   h.tia = h.tia.filter((t) => {
     const e = nay - t.t0
@@ -260,7 +281,7 @@ function khung(san: HTMLElement, h: Hang, nay: number): void {
   })
   c.globalAlpha = 1
   if (h.tia.length) h.raf = requestAnimationFrame((n) => khung(san, h, n))
-  else { h.ban.forEach((o) => c.clearRect(o.x - o.r - 60, o.tren - 70, 2 * o.r + 120, o.day - o.tren + 94)); h.ban.clear(); h.cuoi.clear(); cv.style.display = 'none' }
+  else { h.ban.forEach((o) => c.clearRect(o.x - o.r - 60, o.tren - 110, 2 * o.r + 120, o.day - o.tren + 134)); h.ban.clear(); h.cuoi.clear(); cv.style.display = 'none' }
 }
 
 /** Các em vừa gửi ⇒ ô sáng + tích nảy NGAY (chỉ ghi lớp, trước khi vẽ); số nảy + ô tiến độ loé + tia lửa gom vào MỘT khung kế (rAF): bao nhiêu tin phòng về
