@@ -1,0 +1,16 @@
+[
+  {
+    "i": 1382,
+    "hashSvg": "9789eeb9c489ca20d2714e5f015255bb35b424cc79f4fc8227e1e56f5658f64a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, đọc public questions.de/ref 12-C4-B13-II-20.hinh.0.du_lieu sau_de; tự fresh Chromium FULL3x đúng SHA/31123B, mở FULL và macro reactant/product/conditions. Hai Ph đủ sáu innerdouble; HO trên trái chất đầu và trên trái sản phẩm gắn DOUBLE đúng literal nguồn, HO dưới chất đầu SINGLE và O dưới sản phẩm SINGLE, không tự sửa theo hóa trị. Các chân carbonyl tách đúng vị trí, 2O phía phải mỗi ring giữ doubleUP/singleDOWN. n và nHO-[CH2]2-OH, điều kiện2,7 - 5,5 bar/220 - 260°C, một filledRIGHT, +(2n - 1)H2O đúng. Sản phẩm giữ [CH2]2]n extra closing square/inner n dưới, outer BIGSQUARE với n dưới riêng và hai crossboundary freebonds; không bỏ ngoặc thừa theo lý thuyết. Mọi text đậm thực đứng DDH, chỉ số/sub n/glyph anchors có khe rõ, path tự chứa không text/image; không thấy chạm/cắt/tràn hay dữ kiện/đáp án thêm.",
+    "render": "/workspace/scratch/soat263-1382.png",
+    "macro": [
+      "/workspace/scratch/pet1382-left.png",
+      "/workspace/scratch/pet1382-product.png",
+      "/workspace/scratch/pet1382-condition.png"
+    ],
+    "hash": "f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05",
+    "hashSvgDaSoat": "9789eeb9c489ca20d2714e5f015255bb35b424cc79f4fc8227e1e56f5658f64a"
+  }
+]

@@ -5887,6 +5887,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05": {
+      "tep": "pet-native1382-ddh-9789eeb9c489ca20d2714e5f015255bb35b424cc79f4fc8227e1e56f5658f64a.svg",
+      "hashSvg": "9789eeb9c489ca20d2714e5f015255bb35b424cc79f4fc8227e1e56f5658f64a",
+      "byteSvg": 31123,
+      "byteGzip": 5269,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "0c76fb96a3ea6ed26b904baa727b6a9780ce40554edee5c88dc43f4f05dc37db": {
       "tep": "maltose-hai-dang-ddh-a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab.svg",
       "hashSvg": "a5bd356f2709191abf415dcbaf087e0bde840884545589263334dc29130270ab",
@@ -13414,6 +13423,20 @@
           "where": "12-C4-B13-II-14.hinh.0.du_lieu",
           "hashDataUrl": "621241ca3124278190d0ca8aae83a2a03a4a7dc82b2e4f560623f0f4435517ea",
           "vector": "tai-che-ddh-cd287e863235681ee8f306de272bdb2bd4e5553bf1f2af1aca8c5bf09133855f.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B13-II-20",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05",
+          "where": "12-C4-B13-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "06400c8594b3416f9ba43e84d96172b02e777cc5ef3376bfe051efc17ccdc759",
+          "vector": "pet-native1382-ddh-9789eeb9c489ca20d2714e5f015255bb35b424cc79f4fc8227e1e56f5658f64a.svg"
         }
       ]
     },
@@ -29532,6 +29555,7 @@
     "12-C4-B13-II-7",
     "12-C4-B13-II-10",
     "12-C4-B13-II-14",
+    "12-C4-B13-II-20",
     "12-C4-B13-II-21",
     "12-C4-B13-III-26",
     "12-C4-B13-III-27",

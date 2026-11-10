@@ -1,0 +1,610 @@
+{
+  "i": 1382,
+  "hash": "f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05.png",
+  "size": [
+    1390,
+    220
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C4-B13-II-20",
+      "de": "Poly(ethylene terephthalate) (viết tắt là PET) được điều chế theo sơ đồ phản ứng sau: PET có mã số kí hiệu trên sản phẩm là số 1 và thuộc loại polymer nhiệt dẻo phổ biến nhất, có thể tái chế và được sử dụng để dệt sợi may quần áo, thảm, đồ hộp đựng chất lỏng và thực phẩm, ...",
+      "allHinh": [
+        {
+          "hash": "f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05",
+          "where": "12-C4-B13-II-20.hinh.0.du_lieu",
+          "hashDataUrl": "06400c8594b3416f9ba43e84d96172b02e777cc5ef3376bfe051efc17ccdc759"
+        }
+      ],
+      "missingHashes": [
+        "f9634f3aaca7fdb70fe02da4d604396393b69eb82e2618166ee1453024c82b05"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1382-native2x.png",
+    "midLeft5xOpened": "/workspace/scratch/1382-midleft5x.png",
+    "brackets5xOpened": "/workspace/scratch/1382-brackets5x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "corrections": [
+    "EarlychatMIDbondorderreversedWRONG. Ownmacroconfirms HOupperLEFTDOUBLE/OdownLEFTSINGLE. Preserve actualsource below."
+  ],
+  "geometry": {
+    "font": "ALLtext BOLDuprightsans: atomlabels, coefficients, linearchain, conditions, byproduct. Noitalic/caption. ordinaryn drawnsmallSUB forinner/outerrepeat, noUnicode-subscriptglyphassumption.",
+    "coefficient": {
+      "text": "n",
+      "bbox": [
+        35,
+        98,
+        55,
+        125
+      ]
+    },
+    "leftRingVertices": [
+      [
+        198,
+        64
+      ],
+      [
+        242,
+        64
+      ],
+      [
+        266,
+        108
+      ],
+      [
+        242,
+        152
+      ],
+      [
+        198,
+        152
+      ],
+      [
+        174,
+        108
+      ]
+    ],
+    "leftRingInnerDoubles": [
+      [
+        [
+          201,
+          72
+        ],
+        [
+          239,
+          72
+        ]
+      ],
+      [
+        [
+          259,
+          111
+        ],
+        [
+          240,
+          144
+        ]
+      ],
+      [
+        [
+          181,
+          111
+        ],
+        [
+          200,
+          144
+        ]
+      ]
+    ],
+    "leftAcylGroups": [
+      {
+        "C": [
+          128,
+          108
+        ],
+        "ringBond": [
+          [
+            128,
+            108
+          ],
+          [
+            174,
+            108
+          ]
+        ],
+        "upper": {
+          "text": "HO",
+          "bbox": [
+            65,
+            44,
+            114,
+            75
+          ],
+          "rays": [
+            [
+              [
+                127,
+                105
+              ],
+              [
+                110,
+                75
+              ]
+            ],
+            [
+              [
+                133,
+                108
+              ],
+              [
+                116,
+                77
+              ]
+            ]
+          ],
+          "bondOrder": 2
+        },
+        "lower": {
+          "text": "HO",
+          "bbox": [
+            65,
+            140,
+            114,
+            171
+          ],
+          "rays": [
+            [
+              [
+                128,
+                108
+              ],
+              [
+                112,
+                139
+              ]
+            ]
+          ],
+          "bondOrder": 1
+        }
+      },
+      {
+        "C": [
+          310,
+          108
+        ],
+        "ringBond": [
+          [
+            266,
+            108
+          ],
+          [
+            310,
+            108
+          ]
+        ],
+        "upper": {
+          "text": "O",
+          "bbox": [
+            326,
+            44,
+            354,
+            75
+          ],
+          "rays": [
+            [
+              [
+                307,
+                106
+              ],
+              [
+                324,
+                76
+              ]
+            ],
+            [
+              [
+                313,
+                109
+              ],
+              [
+                330,
+                78
+              ]
+            ]
+          ],
+          "bondOrder": 2
+        },
+        "lower": {
+          "text": "OH",
+          "bbox": [
+            326,
+            140,
+            375,
+            171
+          ],
+          "rays": [
+            [
+              [
+                310,
+                108
+              ],
+              [
+                329,
+                139
+              ]
+            ]
+          ],
+          "bondOrder": 1
+        }
+      }
+    ],
+    "plusReagent": {
+      "text": "+ nHO-[CH₂]₂-OH",
+      "bbox": [
+        369,
+        101,
+        575,
+        131
+      ],
+      "note": "baseline n beforeHO;oneSQUAREpair;2afterH and2aftercloseSUB"
+    },
+    "arrow": {
+      "shaft": [
+        [
+          592,
+          113
+        ],
+        [
+          746,
+          113
+        ]
+      ],
+      "head": "FILLEDRIGHTtriangle",
+      "vertices": [
+        [
+          728,
+          107
+        ],
+        [
+          746,
+          113
+        ],
+        [
+          728,
+          119
+        ]
+      ]
+    },
+    "conditions": [
+      {
+        "text": "2,7 - 5,5 bar",
+        "bbox": [
+          597,
+          80,
+          732,
+          107
+        ],
+        "place": "ABOVE"
+      },
+      {
+        "text": "220 - 260°C",
+        "bbox": [
+          602,
+          126,
+          732,
+          153
+        ],
+        "place": "BELOW"
+      }
+    ],
+    "productRingVertices": [
+      [
+        888,
+        61
+      ],
+      [
+        927,
+        61
+      ],
+      [
+        947,
+        98
+      ],
+      [
+        927,
+        136
+      ],
+      [
+        888,
+        136
+      ],
+      [
+        868,
+        98
+      ]
+    ],
+    "productRingInnerDoubles": [
+      [
+        [
+          892,
+          68
+        ],
+        [
+          924,
+          68
+        ]
+      ],
+      [
+        [
+          941,
+          101
+        ],
+        [
+          925,
+          129
+        ]
+      ],
+      [
+        [
+          875,
+          101
+        ],
+        [
+          891,
+          129
+        ]
+      ]
+    ],
+    "productAcylGroups": [
+      {
+        "C": [
+          828,
+          98
+        ],
+        "ringBond": [
+          [
+            828,
+            98
+          ],
+          [
+            868,
+            98
+          ]
+        ],
+        "upper": {
+          "text": "HO",
+          "bbox": [
+            776,
+            45,
+            820,
+            75
+          ],
+          "rays": [
+            [
+              [
+                826,
+                95
+              ],
+              [
+                813,
+                72
+              ]
+            ],
+            [
+              [
+                832,
+                98
+              ],
+              [
+                819,
+                74
+              ]
+            ]
+          ],
+          "bondOrder": 2
+        },
+        "lower": {
+          "text": "O",
+          "bbox": [
+            795,
+            122,
+            820,
+            151
+          ],
+          "rays": [
+            [
+              [
+                828,
+                98
+              ],
+              [
+                814,
+                123
+              ]
+            ]
+          ],
+          "bondOrder": 1
+        }
+      },
+      {
+        "C": [
+          985,
+          98
+        ],
+        "ringBond": [
+          [
+            947,
+            98
+          ],
+          [
+            985,
+            98
+          ]
+        ],
+        "upper": {
+          "text": "O",
+          "bbox": [
+            996,
+            45,
+            1022,
+            75
+          ],
+          "rays": [
+            [
+              [
+                982,
+                96
+              ],
+              [
+                996,
+                74
+              ]
+            ],
+            [
+              [
+                988,
+                99
+              ],
+              [
+                1002,
+                76
+              ]
+            ]
+          ],
+          "bondOrder": 2
+        },
+        "lower": {
+          "text": "O",
+          "bbox": [
+            997,
+            121,
+            1024,
+            152
+          ],
+          "rays": [
+            [
+              [
+                985,
+                98
+              ],
+              [
+                1000,
+                124
+              ]
+            ]
+          ],
+          "bondOrder": 1
+        }
+      }
+    ],
+    "productRepeat": {
+      "outerBigSquare": {
+        "left": [
+          [
+            772,
+            36
+          ],
+          [
+            762,
+            36
+          ],
+          [
+            762,
+            175
+          ],
+          [
+            772,
+            175
+          ]
+        ],
+        "right": [
+          [
+            1154,
+            36
+          ],
+          [
+            1164,
+            36
+          ],
+          [
+            1164,
+            175
+          ],
+          [
+            1154,
+            175
+          ]
+        ],
+        "leftFreeStub": [
+          [
+            752,
+            98
+          ],
+          [
+            780,
+            98
+          ]
+        ],
+        "rightFreeStub": [
+          [
+            1151,
+            136
+          ],
+          [
+            1179,
+            136
+          ]
+        ],
+        "nOuterBBox": [
+          1170,
+          164,
+          1186,
+          185
+        ]
+      },
+      "textAfterLowerO": {
+        "literal": "—[CH₂]₂]n",
+        "bbox": [
+          1024,
+          121,
+          1151,
+          157
+        ],
+        "note": "ONEopening[ beforeCH2, closing] afterCH2, SUB2 afterclose, EXTRAclosing] afterSUB2, theninnernSUB. Then separateouterBIGclosing]+outernSUB. Do notremoveextra]orinnern/donotaddopeningbracket tobalance."
+      }
+    },
+    "byproduct": {
+      "text": "+ (2n - 1)H₂O",
+      "bbox": [
+        1180,
+        90,
+        1349,
+        123
+      ],
+      "note": "nBASELINEinsidecoefficient;H2SUB"
+    },
+    "noAdded": [
+      "fixHOtoO",
+      "fixOtoOH",
+      "bracketcleanup",
+      "newcaption",
+      "repeatnnormalization",
+      "stoichiometryfix",
+      "phases"
+    ]
+  },
+  "coordinateMeaning": "Literalnativepixels including chemicallyoddHO andextra repeatclosingbracket, nottheorycorrectedPET."
+}

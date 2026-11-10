@@ -1,0 +1,7 @@
+{
+  "lo": 314,
+  "hashSvg": "dd87f3118ee588a43c78feac166e244683745933e4876e7b521a56365af900a3",
+  "ketQua": "Cần sửa: root actualFULL thấy chainOH chạm thân arrow; chữregular không đúng sourcebold. Không chọn. Final đổi ALLglyph trueDAM và cỡ chain22/product25 để giữ khoảng.",
+  "rootRenderBeforeFinalOverwritten": true,
+  "ghiChu": "Không dùng oldhash làm proof final; final phải fresh root+readonly exactSHA."
+}
