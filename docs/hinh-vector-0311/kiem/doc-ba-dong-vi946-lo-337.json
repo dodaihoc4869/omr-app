@@ -1,0 +1,260 @@
+{
+  "i": 946,
+  "hash": "ab154dba3582c8406dc8d14bab0387d2208ae442e70bd26a7a2d3b06e26f1ab1",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ab154dba3582c8406dc8d14bab0387d2208ae442e70bd26a7a2d3b06e26f1ab1.png",
+  "size": [
+    749,
+    307
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-10-B2-D2-II-96",
+      "de": "Mô hình dưới đây mô tả cấu tạo nguyên tử các đồng vị của nguyên tố hydrogen:",
+      "allHinh": [
+        {
+          "hash": "ab154dba3582c8406dc8d14bab0387d2208ae442e70bd26a7a2d3b06e26f1ab1",
+          "where": "DB-10-B2-D2-II-96.hinh.0.du_lieu",
+          "hashDataUrl": "4c1000a7033fc4786da50f7d90ad8044b2c6d4bb715bc8d5d5fec36e18dd0274"
+        }
+      ],
+      "missingHashes": [
+        "ab154dba3582c8406dc8d14bab0387d2208ae442e70bd26a7a2d3b06e26f1ab1"
+      ]
+    },
+    {
+      "qid": "DH-10-C1-B2-II-6",
+      "de": "Mô hình dưới đây mô tả cấu tạo nguyên tử các đồng vị của nguyên tố hydrogen:",
+      "allHinh": [
+        {
+          "hash": "ab154dba3582c8406dc8d14bab0387d2208ae442e70bd26a7a2d3b06e26f1ab1",
+          "where": "DH-10-C1-B2-II-6.hinh.0.du_lieu",
+          "hashDataUrl": "4c1000a7033fc4786da50f7d90ad8044b2c6d4bb715bc8d5d5fec36e18dd0274"
+        }
+      ],
+      "missingHashes": [
+        "ab154dba3582c8406dc8d14bab0387d2208ae442e70bd26a7a2d3b06e26f1ab1"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/946-native3x-lo337.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "Threecoloredillustrations ofhydrogenisotopes; noorbitlines, NOphotograph.",
+    "clouds": [
+      {
+        "center": [
+          122,
+          123
+        ],
+        "r": 109,
+        "outline": "orange",
+        "gradient": "radialpalecreamyellowcenter→brightyellowedge"
+      },
+      {
+        "center": [
+          373,
+          123
+        ],
+        "r": 109,
+        "outline": "orange",
+        "gradient": "same"
+      },
+      {
+        "center": [
+          627,
+          123
+        ],
+        "r": 109,
+        "outline": "orange",
+        "gradient": "same"
+      }
+    ],
+    "electronBubbles": [
+      {
+        "center": [
+          137,
+          22
+        ],
+        "r": 17,
+        "text": "e-",
+        "labelBBox": [
+          127,
+          10,
+          151,
+          32
+        ]
+      },
+      {
+        "center": [
+          420,
+          30
+        ],
+        "r": 17,
+        "text": "e-",
+        "labelBBox": [
+          410,
+          18,
+          434,
+          40
+        ]
+      },
+      {
+        "center": [
+          685,
+          30
+        ],
+        "r": 17,
+        "text": "e-",
+        "labelBBox": [
+          675,
+          18,
+          699,
+          40
+        ]
+      }
+    ],
+    "electronStyle": "LIMEgreenfilledcircle+mediumgreenoutline, overlapsyellowcloudedgeinFRONT. eandhyphenBASELINE/midheight (notSUPminus), regularsansdarkgray.",
+    "protons": [
+      {
+        "center": [
+          122,
+          123
+        ],
+        "r": 24,
+        "text": "p⁺",
+        "labelBBox": [
+          110,
+          108,
+          139,
+          141
+        ]
+      },
+      {
+        "center": [
+          347,
+          123
+        ],
+        "r": 24,
+        "text": "p⁺",
+        "labelBBox": [
+          335,
+          108,
+          364,
+          141
+        ]
+      },
+      {
+        "center": [
+          595,
+          123
+        ],
+        "r": 24,
+        "text": "p⁺",
+        "labelBBox": [
+          583,
+          108,
+          612,
+          141
+        ]
+      }
+    ],
+    "protonStyle": "Blueconcentric/radialgradientlightcenter,darkerblueedge, greenblueoutline. LowercasepREGULARsansdarkgray, PLUSSUPupperright; do notbaselineplus.",
+    "neutrons": [
+      {
+        "center": [
+          395,
+          123
+        ],
+        "r": 24,
+        "text": "n",
+        "panel": 2
+      },
+      {
+        "center": [
+          638,
+          100
+        ],
+        "r": 24,
+        "text": "n",
+        "panel": 3
+      },
+      {
+        "center": [
+          635,
+          147
+        ],
+        "r": 24,
+        "text": "n",
+        "panel": 3
+      }
+    ],
+    "neutronStyle": "Brightpinkgradientcenterpale→deepmagentaedge, outlinepink, nregularsanslight/whitewithdarkgraythinoutlining/shadowasnative. NOcharge/superscript.",
+    "contacts": "Panel2bluep347123/pinkn395123touchatx371. Panel3upperpink638100/lowerpink635147touch/slightlyoverlaparoundy123..124; bluep595123 close/toucheslowerpinknearx618135. Preserveallnativecenters/radii ratherthanforcingseparatedschematics.",
+    "captions": [
+      {
+        "text": "Protium",
+        "bbox": [
+          69,
+          272,
+          160,
+          293
+        ]
+      },
+      {
+        "text": "Deuterium",
+        "bbox": [
+          312,
+          274,
+          430,
+          296
+        ]
+      },
+      {
+        "text": "Tritium",
+        "bbox": [
+          585,
+          276,
+          669,
+          298
+        ]
+      }
+    ],
+    "font": "CaptionstrueBOLDuprightsansblack, capitalP/D/Trestlowercase; particleglyphsregularsans (p+SU​P,e-BASELINE,nplain). Noitalic/namesbeyond3captions.",
+    "counts": {
+      "clouds": 3,
+      "eBubbles": 3,
+      "protons": 3,
+      "neutrons": 3,
+      "neutronsPerPanel": [
+        0,
+        1,
+        2
+      ],
+      "orbitLines": 0,
+      "captions": 3,
+      "arrowheads": 0
+    },
+    "noAdded": [
+      "orbitcircles",
+      "nuclearcountlabels",
+      "massnumbers",
+      "isotopeformulas",
+      "+/minusonn",
+      "extraelectrons",
+      "connectors",
+      "chemicalanswer"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelparticlepositions/labels countedindependently, notinferredfromisotopenames. Gradientbandsareillustrationnotadditionalparticles."
+}
