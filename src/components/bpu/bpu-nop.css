@@ -1,0 +1,19 @@
+/* BÌNH PHẢN ỨNG — HIỆU ỨNG EM NỘP BÀI (nop-bai.ts, thầy 10/11). Chỉ transform / opacity; màu là biến sẵn có (--doi màu đội, --giay). Toạ độ sân 1920×1080 do WAAPI đặt. */
+/* Tia lửa: vệt mảnh nhạt dần về đuôi, đầu là đốm sáng lõi giấy viền màu đội; gốc toạ độ = đầu vệt (quay theo hướng bay). */
+.bpu-bang .bb-tl-tia{ position: absolute; left: -74px; top: -5px; width: 84px; height: 10px; transform-origin: 74px 5px; border-radius: 999px; opacity: 0; pointer-events: none; will-change: transform, opacity;
+  background: linear-gradient(to right, transparent, color-mix(in srgb, var(--doi) 45%, transparent) 45%, var(--doi) 80%, color-mix(in srgb, var(--doi) 40%, var(--giay))); }
+.bpu-bang .bb-tl-tia::after{ content: ""; position: absolute; left: 61px; top: -8px; width: 26px; height: 26px; border-radius: 50%;
+  background: radial-gradient(circle, var(--giay) 0 22%, color-mix(in srgb, var(--doi) 50%, var(--giay)) 34%, color-mix(in srgb, var(--doi) 70%, transparent) 50%, transparent 72%); }
+/* Đốm than theo sau vệt. */
+.bpu-bang .bb-tl-than{ position: absolute; left: -5px; top: -5px; width: 10px; height: 10px; border-radius: 50%; opacity: 0; pointer-events: none; will-change: transform, opacity;
+  background: radial-gradient(circle, color-mix(in srgb, var(--doi) 35%, var(--giay)) 0 30%, var(--doi) 55%, transparent 75%); }
+/* Chạm mặt chất lỏng: vòng gợn (bề ngang theo lòng ống tại mặt chất lỏng — nop-bai.ts đặt) + quầng sáng ở chân ngọn lửa. */
+.bpu-bang .bb-tl-gon-tia{ position: absolute; left: 0; top: -10px; height: 20px; border-radius: 50%; opacity: 0; pointer-events: none; will-change: transform, opacity;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--doi) 35%, var(--giay)), 0 0 22px 3px color-mix(in srgb, var(--doi) 65%, transparent); }
+.bpu-bang .bb-tl-bung{ position: absolute; left: -80px; top: -34px; width: 160px; height: 68px; border-radius: 50%; opacity: 0; pointer-events: none; will-change: transform, opacity;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--doi) 30%, var(--giay)), color-mix(in srgb, var(--doi) 55%, transparent) 50%, transparent); }
+/* Dấu tích bật nảy (chỉ ô VỪA gửi — lớp `nay` do nop-bai.ts gắn; dựng lại bảng / vào lại không nảy cả loạt). */
+.bpu-bang .bb-tl-o.nay .dau{ animation: bb-tl-tich 0.46s cubic-bezier(.3, 1.7, .5, 1) both; }
+@keyframes bb-tl-tich { from { transform: scale(0); opacity: 0; } 40% { opacity: 1; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bpu-bang .bb-tl-o.nay .dau{ animation: none; } }
+html.may-yeu .bpu-bang .bb-tl-o.nay .dau{ animation: none; }

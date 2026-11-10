@@ -283,11 +283,13 @@ describe('bảng chiếu', () => {
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
     const st = phong(); moLuot(st, cau, T0); WsGia.ds[0]!.nhan(viewBang(st))
     expect(await screen.findByText(/em đã gửi/)).toBeTruthy()
-    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' })) })
-    expect(onToi).toHaveBeenLastCalledWith(1)
     // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «thu hết các nút lại, chỉ để nút gọi lên bảng thôi»): lúc cả lớp làm, thanh trên CHỈ có «Gọi lên bảng»; chuyển câu bằng phím.
+    // SỬA CÓ CHỦ ĐÍCH 10/11 lần 3: xem nút TRƯỚC khi bấm → (bấm → ⇒ màn đua của câu kế chờ lượt mới, nút «Lên bảng» ẩn tới khi lượt về — không gọi em của lượt cũ).
     const nut = [...document.querySelectorAll('.bb-tren button')].map((b) => b.textContent)
     expect(nut).toEqual(['Lên bảngL']) // 09/11 lần 2: nút chính «Lên bảng» (phím L) — sang tờ chiếu cũ, không tự gọi
+    act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' })) })
+    expect(onToi).toHaveBeenLastCalledWith(1)
+    expect(document.querySelector('.bb-tren .bb-chinh')).toBeNull()
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'PageDown' })) })
     expect(onToi).toHaveBeenCalledTimes(2)
     act(() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' })) })
@@ -487,7 +489,11 @@ describe('bảng · tháp lửa (thầy chốt 09/11)', () => {
   })
 
   it('Trả lời ngắn ⇒ «Đáp số 2,24»; tự luận ⇒ «x em đã làm xong», không ô đáp án', async () => {
-    const ws = await moBang()
+    // SỬA CÓ CHỦ ĐÍCH 10/11 lần 3: bảng mở cho câu q1 mà phòng đang ở lượt câu KHÁC ⇒ màn đua chờ lượt q1 (không vẽ lượt cũ của phòng) ⇒ ở đây bảng mở đúng câu q3 (tin tự động nối lại).
+    const { default: Bang } = await import('../src/components/bpu/BangBinhPhanUng')
+    render(<Bang buoiId="b1" qid="q3" luot={1} tuDong onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!
     const st = lop(4)
     moLuot(st, { ...cau, qid: 'q3', phan: 'III', cau: { ...cau.cau, qid: 'q3', phan: 'III', choices: [] }, dung: '2.24' }, T0)
     nhanTra(st, 'E0', '2.24', T0 + 500); moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewBang(st))
