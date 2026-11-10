@@ -117,6 +117,15 @@ describe('chonGoi7 theo suất — bài thật lệch ô', () => {
     expect(phanId(du.viec.map((v) => v.qid))).toEqual([18, 4, 6])
     expect(du.viec.slice(0, 18).every((v) => v.vai === 'sua')).toBe(true)
   })
+  it('nhóm phụ = cả kho dùng lại thứ tự `moi` (không sắp lần hai) và quota 0 bỏ qua nhóm: kết quả y như đường sắp đủ', () => {
+    const base = { cau, daGap: new Set(cau.slice(0, 20).map((c) => c.qid)), daLamNgay: new Set<string>(), quotaCon: 0, sanSang: new Set(cau.map((c) => c.qid)), chan: new Set<string>(), sua: [], on: [], mucTieuNgay: 28, chiTrongMuc: true, ngay: '2026-11-12' }
+    const ids = cau.map((c) => c.qid)
+    for (const quota of [0, 9, 28, 200]) {
+      const nhanh = chonGoi7({ ...base, nhomPhu: [{ qids: ids, quota }] })
+      const cham = chonGoi7({ ...base, nhomPhu: [{ qids: [...ids, 'khong-co-trong-kho'], quota }] }) // ids.size ≠ kho ⇒ đường sắp đủ
+      expect(nhanh).toEqual(cham)
+    }
+  })
   it('không truyền `suat` ⇒ hành vi cũ nguyên vẹn (ngày Sửa lấy câu sai theo thứ tự, không theo ô)', () => {
     const sua = Array.from({ length: 30 }, (_, k) => `sua-I|hieu-${k}`)
     const ra = chonGoi7({ cau, daGap: new Set(), daLamNgay: new Set(), quotaCon: 0, sanSang: new Set(sua), chan: new Set(), sua, on: [], mucTieuNgay: 28, chiTrongMuc: true, nhomPhu: [{ qids: cau.map((c) => c.qid), quota: 0 }], loaiNgay: 'sua' }).viec

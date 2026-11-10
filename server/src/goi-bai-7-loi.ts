@@ -111,8 +111,11 @@ export function chonGoi7(a: {
   if(a.nhomPhu?.length){
     const theoQid=new Map(a.cau.map(q=>[q.qid,q] as const))
     for(const g of a.nhomPhu){const ids=new Set(g.qids),con=Math.max(0,g.quota-[...daChon].filter(id=>ids.has(id)).length)
-      const cuaNhom=[...ids].flatMap(id=>theoQid.get(id)??[]).sort((x,y)=>hangI[viTriQ.get(x)!]!-hangI[viTriQ.get(y)!]!)
-      const chon=xepMoi(cuaNhom).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
+      if(con<=0)continue // hết suất của nhóm (ngày Sửa quota 0): không sắp lại cả nhóm (xepMoi thuần, kết quả rỗng như cũ)
+      // nhóm = cả kho (một gói đang chạy, mã câu không trùng): thứ tự hạng chính là `thuTu` ⇒ dùng lại `moi`, không sắp lần hai
+      const caKho=ids.size===N&&theoQid.size===N&&[...ids].every(id=>theoQid.has(id))
+      const cuaNhom=caKho?null:[...ids].flatMap(id=>theoQid.get(id)??[]).sort((x,y)=>hangI[viTriQ.get(x)!]!-hangI[viTriQ.get(y)!]!)
+      const chon=(cuaNhom?xepMoi(cuaNhom):moi).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
   }else {phu.push(...moi.slice(0,a.quotaCon));thieuPhu=Math.max(0,a.quotaCon-moi.length)}
   if (a.suat) {
     const oId = a.suat.oCua, vaiCua = new Map<string, ViecGoi7>(), ung: UngVien28[] = [], laSua = a.loaiNgay === 'sua'

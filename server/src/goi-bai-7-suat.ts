@@ -22,7 +22,7 @@ export function apSuat7(vao: Vao, hs: { meta: Meta; tt: ReadonlyMap<string, { li
   // nợ ôn chỉ tính khi thật sự có hàng ôn để xếp (một lượt duyệt lịch sử của em)
   let nho: Map<string, number> | undefined
   const no = () => (nho ??= noOnDang(hs.tt, dang, ngay))
-  if (vao.on.length > 1) vao.on = [...vao.on.filter((q) => giuDau.has(q)), ...xepOnTheoNo(vao.on.filter((q) => !giuDau.has(q)), dang, no())]
+  if (vao.on.length > 1) { const dau: string[] = [], con: string[] = []; for (const q of vao.on) (giuDau.has(q) ? dau : con).push(q); vao.on = [...dau, ...xepOnTheoNo(con, dang, no())] }
   vao.suat = { oCua, daLamO: [...daLam].map(oCua) }
   return (onSom) => xepOnTheoNo(onSom, dang, no())
 }
