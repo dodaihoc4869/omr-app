@@ -53,11 +53,9 @@ const HD: { id: 'day-hoc' | 'dau-gio' | 'chua-cau' | 'on-tap'; ten: string; mo: 
 ]
 function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[number]['id']) => void; onDong: () => void; onKetThuc?: () => Promise<string> }) {
   const goc = useRef<HTMLDivElement>(null)
-  // Kết thúc buổi: bấm lần 1 ⇒ nút đổi «Bấm lần nữa để kết thúc» (5 giây); lần 2 ⇒ đóng buổi (không cần hộp hỏi — hộp của app nằm dưới bảng).
-  const [xacNhan, setXacNhan] = useState(false)
+  // Kết thúc buổi — SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «nút bấm kết thúc bấm 1 lần là kết thúc luôn nhé»): bấm MỘT lần ⇒ đóng buổi, bảng đóng, về Hôm nay.
   const [dangKt, setDangKt] = useState('')
-  useEffect(() => { if (!xacNhan) return; const h = setTimeout(() => setXacNhan(false), 5000); return () => clearTimeout(h) }, [xacNhan])
-  const ketThuc = async () => { if (!onKetThuc) return; if (!xacNhan) { setXacNhan(true); return } setDangKt('…'); const loi = await onKetThuc(); setDangKt(loi); setXacNhan(false) }
+  const ketThuc = async () => { if (!onKetThuc || dangKt === '…') return; setDangKt('…'); setDangKt(await onKetThuc()) }
   useEffect(() => { goc.current?.querySelector('button')?.focus() }, [])
   useEffect(() => {
     const phim = (e: KeyboardEvent) => { const m = HD.find((x) => x.phim === e.key); if (m) { e.preventDefault(); onChon(m.id) } }
@@ -83,8 +81,8 @@ function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[n
       {onKetThuc ? (
         <div className="bcc-ket-thuc">
           <span>{dangKt && dangKt !== '…' ? dangKt : 'Xong cả buổi? Kết thúc để các em thoát Bình Phản Ứng.'}</span>
-          <button type="button" data-xac-nhan={xacNhan || undefined} disabled={dangKt === '…'} onClick={() => void ketThuc()}>
-            <Power size={26} aria-hidden="true" />{dangKt === '…' ? 'Đang kết thúc…' : xacNhan ? 'Bấm lần nữa để kết thúc' : 'Kết thúc buổi học'}
+          <button type="button" disabled={dangKt === '…'} onClick={() => void ketThuc()}>
+            <Power size={26} aria-hidden="true" />{dangKt === '…' ? 'Đang kết thúc…' : 'Kết thúc buổi học'}
           </button>
         </div>
       ) : null}

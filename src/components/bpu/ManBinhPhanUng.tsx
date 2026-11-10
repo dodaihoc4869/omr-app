@@ -15,6 +15,7 @@ import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type ViewEm } from '../../lib/bpu/phong'
 import { coQuyenTatMan, dangChiaDoi, dangXinQuyen, docQuyenTatMan, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
+import KetQuaLenBangEm from './KetQuaLenBangEm'
 import type { Question } from '../../game/than-thu-v2/core'
 // Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
 type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
@@ -566,6 +567,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       {than ? <main className="bpu-hs-than">{than}</main> : null}
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
       {lopChe}
+      {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả (trên lớp che, không gỡ che). */}
+      {e && l?.goi && !v?.ketThuc ? <KetQuaLenBangEm g={l.goi} laEm={l.goi.sbd === e.sbd} /> : null}
       {e ? <TheBienDong ds={v?.bienDongEm} /> : null}
     </div>,
     document.body,

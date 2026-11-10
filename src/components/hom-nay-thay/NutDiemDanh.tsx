@@ -13,25 +13,23 @@ export default function NutDiemDanh({ className }: { className: string }) {
   const showToast = useAppStore((s) => s.showToast)
   const [dang, setDang] = useState(false)
   // NÚT KẾT THÚC CẠNH ĐIỂM DANH (thầy 09/11 «khi out ra ngoài có nút kết thúc cạnh chữ điểm danh»): hiện khi có buổi đang mở (phiên trên máy này / buổi
-  // mở ≤ 3 giờ — hỏi lúc Hôm nay rảnh). Bấm lần 1 ⇒ «Bấm lần nữa để kết thúc» (5 giây); lần 2 ⇒ đóng buổi, các em thoát Bình Phản Ứng.
+  // mở ≤ 3 giờ — hỏi lúc Hôm nay rảnh). SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «nút bấm kết thúc bấm 1 lần là kết thúc luôn nhé»): bấm MỘT lần ⇒ đóng buổi,
+  // các em thoát Bình Phản Ứng, bảng đóng, báo «Đã kết thúc buổi học».
   const [buoiMo, setBuoiMo] = useState<string | null>(null)
-  const [xacNhan, setXacNhan] = useState(false)
   const [dangKt, setDangKt] = useState(false)
   useEffect(() => {
     const nghe = (e: Event) => { const d = (e as CustomEvent<{ buoiId: string } | null>).detail; setBuoiMo(d?.buoiId ?? null) }
     window.addEventListener('bpu-phien', nghe)
     return () => window.removeEventListener('bpu-phien', nghe)
   }, [])
-  useEffect(() => { if (!xacNhan) return; const h = setTimeout(() => setXacNhan(false), 5000); return () => clearTimeout(h) }, [xacNhan])
   const ketThuc = async () => {
     if (!buoiMo || dangKt) return
-    if (!xacNhan) { setXacNhan(true); return }
     setDangKt(true)
     try {
       const g = await import('../bpu/gan-gv')
       const loi = await g.ketThucBuoiHoc(buoiMo)
       if (loi) showToast(loi, 'warn'); else setBuoiMo(null)
-    } finally { setDangKt(false); setXacNhan(false) }
+    } finally { setDangKt(false) }
   }
   useEffect(() => {
     const nap = () => { void napNhanh().then((m) => { m.napSan(); void m.buoiMoGanDay().then((id) => setBuoiMo((cu) => cu ?? id)).catch(() => {}) }).catch(() => {}) }
@@ -55,8 +53,8 @@ export default function NutDiemDanh({ className }: { className: string }) {
   return (
     <>
     {buoiMo ? (
-      <button type="button" className="gvhn-ket-thuc-nut" data-xac-nhan={xacNhan || undefined} disabled={dangKt} onClick={() => void ketThuc()}>
-        <Power size={18} aria-hidden="true" />{dangKt ? 'Đang kết thúc…' : xacNhan ? 'Bấm lần nữa để kết thúc' : 'Kết thúc buổi'}
+      <button type="button" className="gvhn-ket-thuc-nut" disabled={dangKt} onClick={() => void ketThuc()}>
+        <Power size={18} aria-hidden="true" />{dangKt ? 'Đang kết thúc…' : 'Kết thúc buổi'}
       </button>
     ) : null}
     <button type="button" className={className} onPointerEnter={hoiSom} onPointerDown={hoiSom} onFocus={hoiSom} onClick={() => void bam()} disabled={dang}>
