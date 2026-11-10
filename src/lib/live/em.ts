@@ -82,6 +82,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let micLuong: MediaStream | null = null, micTx: RTCRtpTransceiver | null = null, dangXinMic = false, hetXinMic = -1e9
   let amCtx: AudioContext | null = null, doAm: AnalyserNode | null = null, mauAm: Float32Array<ArrayBuffer> | null = null
   let amBan: HTMLAudioElement | null = null, thuBan: RTCRtpReceiver | null = null, banDangKeo = '', henBan: unknown = null
+  let midThay: string | null = null, banSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
   let okPhien = -1, okDc: boolean | null = null
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null
@@ -179,6 +180,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (!con()) { p.close(); return }
       if (!r.ok || !r.phien || !r.sdp) throw new Error(r.lyDo ?? 'sfu')
       const phien = r.phien
+      midThay = r.tracks?.[0]?.mid ?? null
       trackSapToi = 'thay'
       let d = await goiCua(mt, tuy.goc, 'dap', { ve: tuy.ve, phien, sdp: await traLoiMoi(p, mt, r.sdp), kenh: ss.kenh != null })
       if (!con()) { p.close(); return }
@@ -317,7 +319,11 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     })
   }
   /** Mức âm tiếng của BẠN đang phát mic 0..1 (cho dải «Bạn … đang nói»; cần em đang bật nghe). */
-  function mucAmBan(): number { try { const n = thuBan?.getSynchronizationSources?.()[0]?.audioLevel; return typeof n === 'number' ? n : 0 } catch { return 0 } }
+  function mucAmBan(): number {
+    if (!tt.banNoi) return 0
+    try { const n = thuBan?.getSynchronizationSources?.()[0]?.audioLevel; if (typeof n === 'number') return n } catch { /* không hỗ trợ */ }
+    return banSo.mucAm // dự phòng: số đo mỗi giây
+  }
   /** Soát lại mic + tiếng bạn theo view mới nhất của phòng. */
   function soatMic(): void {
     const l = live
@@ -424,8 +430,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     }
     if (!pc) { xong(); return }
     void pc.getStats().then((bc) => {
-      const s = docSoWebRtc(bc)
+      const s = docSoWebRtc(bc, midThay)
       rtt = s.rtt
+      banSo = { goi: s.khac.reduce((a, k) => a + (k.goiNhan ?? 0), 0), mucAm: Math.max(0, ...s.khac.map((k) => k.mucAm ?? 0)) }
       soDo.ghi('rtt', s.rtt); soDo.ghi('jt', s.jitter)
       if (s.mucAm != null) mucAmThay = s.mucAm
       if (s.demTong != null && s.demSo != null) {
@@ -525,7 +532,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     bang: (): BangNet => bang,
     khung, mucAm,
     /** Số đo đã thu (trung vị / p95 / lớn nhất): d, j, m, rtt, jt, tt, tn — xem so-do.ts. */
-    soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet }),
+    soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null }),
     huy,
   }
 }

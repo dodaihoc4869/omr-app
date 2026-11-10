@@ -166,11 +166,13 @@ try {
       await cacEm[0].evaluate((view) => window.le.nhanView(view), liveViewEm({ ss, emDuocMoi: true, emNoi: true, noi }))
       for (const em of cacEm.slice(1)) await em.evaluate((view) => { window.__amBan = 0; window.le.nhanView(view); const do1 = () => { window.__amBan = Math.max(window.__amBan, window.le.mucAmBan()); setTimeout(do1, 50) }; do1() }, liveViewEm({ ss, noi }))
       await thay.evaluate((view) => { window.__amEm = 0; window.lt.nhanTinPhong({ t: 'bang', live: view }); const do1 = () => { window.__amEm = Math.max(window.__amEm, window.lt.mucAmEm()); setTimeout(do1, 50) }; do1() }, liveView({ san: true, bat: true, tu: Date.now(), phien: 1, ss, xem: SO_EM, noi }))
+      // «Nghe được» = đã nhận gói RTP của track em (số đo getStats mỗi giây của thư viện); mức âm ghi thêm để tham khảo (mic giả chỉ «bíp» ngắt quãng).
       const t0Nghe = Date.now()
-      await thay.waitForFunction(() => window.__amEm > 0, null, { timeout: 12_000 }).then(() => { mic.thayNgheSauMs = Date.now() - t0Nghe }, () => { mic.thayNgheSauMs = null })
-      if (cacEm[1]) await cacEm[1].waitForFunction(() => window.__amBan > 0, null, { timeout: 12_000 }).then(() => { mic.banNgheSauMs = Date.now() - t0Nghe }, () => { mic.banNgheSauMs = null })
-      mic.thay = await thay.evaluate(() => ({ emNoi: window.lt.trangThai().emNoi?.sbd ?? null, ngheEm: window.lt.trangThai().ngheEm, mucAm: Math.round(window.__amEm * 1000) / 1000 }))
-      if (cacEm[1]) mic.ban = await cacEm[1].evaluate(() => ({ banNoi: window.le.trangThai().banNoi?.sbd ?? null, mucAm: Math.round(window.__amBan * 1000) / 1000 }))
+      await thay.waitForFunction(() => (window.lt.soDo().emNoi?.goi ?? 0) > 0, null, { timeout: 15_000 }).then(() => { mic.thayNgheSauMs = Date.now() - t0Nghe }, () => { mic.thayNgheSauMs = null })
+      if (cacEm[1]) await cacEm[1].waitForFunction(() => (window.le.soDo().ban?.goi ?? 0) > 0, null, { timeout: 15_000 }).then(() => { mic.banNgheSauMs = Date.now() - t0Nghe }, () => { mic.banNgheSauMs = null })
+      await new Promise((x) => setTimeout(x, 3000))
+      mic.thay = await thay.evaluate(() => ({ emNoi: window.lt.trangThai().emNoi?.sbd ?? null, ngheEm: window.lt.trangThai().ngheEm, goi: window.lt.soDo().emNoi?.goi ?? 0, mucAm: Math.round(Math.max(window.__amEm, window.lt.soDo().emNoi?.mucAm ?? 0) * 1000) / 1000 }))
+      if (cacEm[1]) mic.ban = await cacEm[1].evaluate(() => ({ banNoi: window.le.trangThai().banNoi?.sbd ?? null, goi: window.le.soDo().ban?.goi ?? 0, mucAm: Math.round(Math.max(window.__amBan, window.le.soDo().ban?.mucAm ?? 0) * 1000) / 1000 }))
       mic.em1 = await cacEm[0].evaluate(() => ({ mic: window.le.trangThai().mic, mucAmMic: Math.round(window.le.mucAmMic() * 1000) / 1000, choQuyen: window.le.dangChoQuyenMic() }))
     }
     // Em 2 KHÔNG được gọi: gọi thẳng cửa bằng vé của em 2 ⇒ phải bị từ chối, không chạm SFU.
@@ -217,8 +219,8 @@ try {
     kiem('điểm đi DataChannel, không đi WebSocket', ketQua.thay.goiDc > 0 && ketQua.thay.goiWs === 0)
     const m = ketQua.mic
     kiem('1C · em được gọi bật mic: SFU nhận track, máy chủ báo phòng ghi', !!m?.bat?.ok && m.bat.mic === 'dang-phat' && m.phongGhi)
-    kiem('1C · máy thầy nghe được em (mức âm > 0)', (m?.thay?.mucAm ?? 0) > 0)
-    if (SO_EM > 1) kiem('1C · máy em khác nghe được bạn (mức âm > 0)', (m?.ban?.mucAm ?? 0) > 0)
+    kiem('1C · máy thầy nhận được tiếng của em (có gói RTP)', (m?.thay?.goi ?? 0) > 0)
+    if (SO_EM > 1) kiem('1C · máy em khác nhận được tiếng của bạn (có gói RTP)', (m?.ban?.goi ?? 0) > 0)
     if (SO_EM > 1) kiem('1C · em KHÔNG được gọi bị cửa từ chối', m?.emKhac === 'chua-duoc-moi')
     kiem('1C · em tắt mic ⇒ trạng thái mic về «tat»', m?.sauTat === 'tat')
   }
@@ -233,7 +235,7 @@ try {
     s('RTT máy em ↔ SFU', e0.rttSfuMs); s('jitter tiếng', e0.jitterTiengMs); s('trễ tiếng phía máy em (đệm jitter + ~65 ms thu / mã hoá / loa)', e0.treTiengPhiaEmMs)
     console.log(`  RTT máy thầy ↔ SFU: ${ketQua.thay.rttMs ?? 'không đo được'} ms · gói điểm thầy gửi: DataChannel ${ketQua.thay.goiDc}, WebSocket ${ketQua.thay.goiWs}${ketQua.noiEmMs != null ? ` · máy em nối xong sau ${ketQua.noiEmMs} ms` : ''}`)
   }
-  if (ketQua.mic) console.log(`1C mic em lên bảng — bật mic → đang phát: ${ketQua.mic.batMs} ms · thầy nghe thấy sau ${ketQua.mic.thayNgheSauMs ?? 'không'} ms · bạn nghe thấy sau ${ketQua.mic.banNgheSauMs ?? 'không'} ms (tính từ lúc máy nhận view có \`noi\`)`)
+  if (ketQua.mic) console.log(`1C mic em lên bảng — bật mic → đang phát: ${ketQua.mic.batMs} ms · thầy nhận gói đầu sau ≤ ${ketQua.mic.thayNgheSauMs ?? 'không'} ms · bạn ≤ ${ketQua.mic.banNgheSauMs ?? 'không'} ms (từ lúc máy nhận view có \`noi\`, số đo đọc 1 giây một lần) · gói: thầy ${ketQua.mic.thay?.goi ?? 0}, bạn ${ketQua.mic.ban?.goi ?? 0} · mức âm: thầy ${ketQua.mic.thay?.mucAm ?? 0}, bạn ${ketQua.mic.ban?.mucAm ?? 0}`)
   console.log(`Lệnh qua cửa /bpu/live/*: ${JSON.stringify(demCua)}`)
   if (loiTrang.length) console.log(`Lỗi trang: ${loiTrang.join(' | ').slice(0, 800)}`)
   console.log(`JSON: ${JSON.stringify(ketQua)}`)
