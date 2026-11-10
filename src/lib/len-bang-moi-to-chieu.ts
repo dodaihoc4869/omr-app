@@ -126,9 +126,9 @@ body.mc-bc .mc-vung-de.mc-cuon>*{transform:none!important}
 body.mc-bc[data-pha="chua"] .mc-dot,body.mc-bc[data-pha="goi"] .mc-dot{background:var(--mc-den)}
 body.mc-bc[data-pha="chua"] .mc-cot-lam-bai,body.mc-bc[data-pha="goi"] .mc-cot-lam-bai,body.mc-bc[data-pha="chua"] .mc-trang,body.mc-bc[data-pha="goi"] .mc-trang{background:var(--mc-den)!important;box-shadow:none!important;border:0!important}
 body.mc-bc[data-pha="chua"] .mc-cot-lam-bai::before,body.mc-bc[data-pha="chua"] .mc-cot-lam-bai::after,body.mc-bc[data-pha="chua"] .mc-trang::before,body.mc-bc[data-pha="chua"] .mc-trang::after{content:none!important;display:none!important}
-/* 4 · CHỜ GỌI: cột 1/3 chỉ có lời mời, KHÔNG tên em nào */
+/* 4 · CHỜ GỌI: cột 1/3 để TRỐNG, không tên em nào (10/11 thầy «bỏ luôn chữ mờ này»: bỏ lời mời «Chờ thầy gọi…») */
 body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai{display:grid;place-items:center;text-align:center}
-body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai::before{content:"Chờ thầy gọi\\A Bấm L hoặc nút “Lên bảng”\\A \\A Tên em chỉ hiện khi thầy bấm Lên bảng";white-space:pre-line;font:600 calc(var(--u)*1.25)/1.5 var(--mc-sans);color:var(--mc-bang-phu);padding:calc(var(--u)*1.5)}
+body.mc-bc[data-pha="cho"] .mc-dot-don .mc-cot-lam-bai::before{content:"";white-space:pre-line;font:600 calc(var(--u)*1.25)/1.5 var(--mc-sans);color:var(--mc-bang-phu);padding:calc(var(--u)*1.5)}
 body.mc-bc .mc-dot-don[data-thay-chua] .mc-cot-lam-bai::before,body.mc-bc[data-pha] .mc-dot-don[data-thay-chua] .mc-cot-lam-bai::before{content:"Thầy chữa\\A Câu này không gọi em lên bảng";white-space:pre-line;font:800 calc(var(--u)*1.6)/1.5 var(--mc-sans);color:var(--mc-bang-chu);padding:calc(var(--u)*1.5)}
 body[data-dot-thay-chua] .mc-thanh #mc-len-bang{display:none}
 body[data-dot-thay-chua] .mc-thanh #mc-pha{font-size:0}
