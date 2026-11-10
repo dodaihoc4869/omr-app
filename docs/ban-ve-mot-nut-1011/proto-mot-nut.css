@@ -1,0 +1,13 @@
+/* BẢN VẼ «HÔM NAY CHỈ MỘT NÚT» (thầy 10/11) — lớp CSS MẪU chỉ dùng khi chụp bản vẽ, CHƯA vào app. */
+html[data-trong='hs'] :is(.kb-no-bai, .kb-nhom-sua, .kb-viec, .kb-lich, .da-ban, .da-ghi) { display: none !important; }
+html[data-trong='hs'] .kb-the-ruong:not([data-mo]) { display: none !important; }
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] { --hn-rong: 640px !important; }
+  html[data-trong='hs'] .dm-khung:not([data-muc]) > .da-vo { display: flex !important; flex-direction: column !important; max-width: 640px !important; }
+  html[data-trong='hs'] .ht2-noi-dung > :is(.dnt, .dnt-cho) { display: grid !important; }
+  html[data-trong='hs'] .kb-cot-phai > .dnt { display: none !important; }
+  html[data-trong='hs'] .da-vo > :is(.kb-cot-trai, .kb-cot-phai) { width: 100% !important; max-width: none !important; }
+}
+/* màn kết chặng: dòng tự vào + nút về */
+.bv-tu-vao { margin: 10px 0 0; text-align: center; font-size: 14px; font-weight: 600; color: var(--tr-chu-3); }
+.bv-tu-vao b { color: var(--tr-chu); font-variant-numeric: tabular-nums; }
