@@ -43,9 +43,11 @@ function suatGan(con: readonly number[], c: number, cungPhan: boolean): number {
  * Chọn `can` câu từ `ung` (ĐÃ xếp theo tầng rồi ưu tiên) theo 28 suất. `daLamO` = ô của các câu em đã làm hôm nay (chiếm suất trước).
  * Trả mã câu theo đúng thứ tự `ung` (nguồn chính trước) — nơi gọi chia chặng theo thứ tự ấy.
  */
-export function rut28(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[] }): string[] {
+export function rut28(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[] }): string[] { return rut28Lech(a).qids }
+/** Như `rut28`, kèm `lech` = số câu phải lấy LỆCH Ô ở bước 3–4 (nguồn chính lệch mức ở bước 1 không tính) — nơi gọi biết có cần nạp thêm nguồn (ôn sớm) không. */
+export function rut28Lech(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[] }): { qids: string[]; lech: number } {
   const can = Math.max(0, Math.floor(a.can) || 0), n = a.ung.length
-  if (!can || !n) return []
+  if (!can || !n) return { qids: [], lech: 0 }
   const con = [...SUAT_28]
   for (const o of a.daLamO ?? []) { const s = suatGan(con, CHI_SO.get(o) ?? 1, false); if (s >= 0) con[s] = con[s]! - 1 }
   const oU = a.ung.map((u) => CHI_SO.get(u.o) ?? 1), lay = new Uint8Array(n)
@@ -56,6 +58,7 @@ export function rut28(a: { ung: readonly UngVien28[]; can: number; daLamO?: read
   for (let i = 0; i < n && so < can; i++) if (a.ung[i]!.tang === 0 && !lay[i]) { const s = suatGan(con, oU[i]!, true); if (s >= 0) chon(i, s) }
   // 2. mọi nguồn, đúng ô
   for (let i = 0; i < n && so < can; i++) if (!lay[i] && con[oU[i]!]! > 0) chon(i, oU[i]!)
+  const dungO = so
   // 3. suất còn trống: ô gần nhất, tầng trên trước
   for (let s = 0; s < con.length; s++) while (con[s]! > 0 && so < can) {
     let tot = -1
@@ -67,13 +70,14 @@ export function rut28(a: { ung: readonly UngVien28[]; can: number; daLamO?: read
   for (let i = 0; i < n && so < can; i++) if (!lay[i]) { lay[i] = 1; so++ }
   const ra: string[] = []
   for (let i = 0; i < n; i++) if (lay[i]) ra.push(a.ung[i]!.qid)
-  return ra
+  return { qids: ra, lech: so - dungO }
 }
 
 // ───────────── NỢ ÔN THEO DẠNG — ôn cá nhân hoá, phủ rộng ─────────────
-// Mỗi em × mỗi dạng: ngày chạm gần nhất + độ bền h (ngày). h = 2^k, k = số NGÀY gần nhất liên tiếp em làm đúng hết các câu của dạng (sai ⇒ k về 0);
-// trần `tranH` ngày ⇒ dạng vững nhất cũng tới hạn sau ngần ấy ngày. NỢ ÔN = số ngày chưa chạm ÷ h: dạng em yếu và dạng lâu chưa làm lên đầu.
-// Trong một đề mỗi dạng một câu trước (vòng 1), hết dạng mới tới câu thứ hai ⇒ một đề chạm nhiều dạng nhất có thể.
+// Mỗi em × mỗi dạng: ngày chạm gần nhất + độ bền h (ngày). h = 1 + QUÃNG EM ĐÃ GIỮ ĐÚNG dạng ấy (từ lần sai gần nhất — chưa sai thì từ lần chạm đầu —
+// tới lần chạm gần nhất): giữ đúng qua 10 ngày ⇒ lần ôn kế chờ được ~10 ngày (khoảng cách tự nhân đôi như ôn giãn cách); vừa sai ⇒ h = 1, mai ôn lại.
+// Trần `tranH` ngày ⇒ dạng vững nhất cũng tới hạn sau ngần ấy ngày. NỢ ÔN = số ngày chưa chạm ÷ h: dạng em yếu và dạng lâu chưa làm lên đầu.
+// Trong một đề mỗi dạng một câu trước (vòng 1), hết dạng mới tới câu thứ hai ⇒ một đề chạm nhiều dạng nhất có thể. Một lượt duyệt lịch sử, không sắp xếp.
 export const TRAN_H = 30
 export const TRAN_H_CUOI = 14
 /** Ba tháng cuối trước kỳ thi (cùng mốc `MOC_HAI_KT_MOI_BAI`): trần quay lại 14 ngày. */
@@ -82,22 +86,18 @@ const soNgay = (a: string, b: string): number => Math.round((Date.parse(b) - Dat
 
 /** Nợ ôn của từng dạng em đã chạm. `dangCua(qid)` trả khoá dạng ('' = không có dạng ⇒ bỏ qua). */
 export function noOnDang(tt: ReadonlyMap<string, { lichSu: readonly { ngay: string; dung: boolean }[] }>, dangCua: (qid: string) => string, ngay: string): Map<string, number> {
-  const theo = new Map<string, Map<string, boolean>>()
+  const so = new Map<string, { dau: string; cuoi: string; sai: string }>()
   for (const [qid, t] of tt) {
-    if (!t.lichSu.length) continue
+    const ls = t.lichSu
+    if (!ls.length) continue
     const d = dangCua(qid)
     if (!d) continue
-    let m = theo.get(d)
-    if (!m) { m = new Map(); theo.set(d, m) }
-    for (const l of t.lichSu) m.set(l.ngay, (m.get(l.ngay) ?? true) && l.dung)
+    let x = so.get(d)
+    if (!x) { x = { dau: '9', cuoi: '', sai: '' }; so.set(d, x) }
+    for (const l of ls) { if (l.ngay < x.dau) x.dau = l.ngay; if (l.ngay > x.cuoi) x.cuoi = l.ngay; if (!l.dung && l.ngay > x.sai) x.sai = l.ngay }
   }
   const tran = ngay >= MOC_H_CUOI ? TRAN_H_CUOI : TRAN_H, ra = new Map<string, number>()
-  for (const [d, m] of theo) {
-    const ng = [...m.keys()].sort().reverse()
-    let k = 0
-    while (k < ng.length && m.get(ng[k]!)) k++
-    ra.set(d, Math.max(0, soNgay(ng[0]!, ngay)) / Math.min(tran, 2 ** Math.min(k, 5)))
-  }
+  for (const [d, x] of so) ra.set(d, Math.max(0, soNgay(x.cuoi, ngay)) / Math.min(tran, 1 + Math.max(0, soNgay(x.sai || x.dau, x.cuoi))))
   return ra
 }
 

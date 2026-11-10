@@ -632,19 +632,22 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // làm (không câu mới, không câu chờ thầy dạy lại), câu sai lần cuối trước, sai nhiều trước, chưa thành thạo trước, gần lịch ôn trước. Chỉ CPU, không đọc D1.
   const vaoPlan: Parameters<typeof chonGoi7>[0] = { cau,daGap:vuaLam.size||luotNgay.size?new Set([...daGap,...vuaLam,...luotNgay]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua:loaiNgay==='sua'?xepSuaTheoNhom(themSua7(sua,hs,lyDo,ngay),hs.meta):sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn,
     ngay,gapHomNay:new Set([...goi.flatMap(g=>[...g.gapNgay]),...[...vuaLam,...luotNgay].filter(id=>!daGap.has(id))]),loaiNgay }
-  const tinhOnSom = (deKt: ReadonlySet<string>) => { const daCo = new Set([...sua, ...on, ...chua]); return hs.cau.filter(c => { const t = hs.tt.get(c.qid); return !!t && !t.laMoi && !t.catTia && !daCo.has(c.qid) && !vuaXem.has(c.qid) && !deKt.has(c.qid) })
-    .sort((x, y) => { const a = hs.tt.get(x.qid)!, b = hs.tt.get(y.qid)!
-      return Number(a.lanCuoiDung !== false) - Number(b.lanCuoiDung !== false) || b.lanSai - a.lanSai || Number(a.thanhThao) - Number(b.thanhThao) ||
-        (a.henOn ?? '9999').localeCompare(b.henOn ?? '9999') || x.qid.localeCompare(y.qid) }).map(c => c.qid) }
-  // Đề 28 theo suất (goi-bai-7-suat.ts)
-  if (ngay >= NGAY_DE_28 && !kiemNhe) { const deKt = await deKtSom; apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, deKt ? tinhOnSom(deKt) : undefined) }
+  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan) : null // đề 28 theo suất (goi-bai-7-suat.ts)
   let plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
   // Chỉ khi kế hoạch thường còn thiếu mức (hiếm) mới đọc thêm câu đã DÀNH cho Kiểm tra ôn tập sắp tới của em (một lệnh, chỉ mã câu) — ôn sớm không lấy
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.
-  if (soDaLam + plan.viec.length < toiThieu && !vaoPlan.onSom) {
+  if (soDaLam + plan.viec.length < toiThieu || plan.lech) {
+    const daCo = new Set([...sua, ...on, ...chua])
     const deKt = await deKtSom
     // Đọc hỏng ⇒ không ôn sớm (không đoán) và cũng KHÔNG hạ mức bên dưới.
-    if (deKt) { vaoPlan.onSom = tinhOnSom(deKt); plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) }) }
+    if (deKt) {
+      vaoPlan.onSom = hs.cau.filter(c => { const t = hs.tt.get(c.qid); return !!t && !t.laMoi && !t.catTia && !daCo.has(c.qid) && !vuaXem.has(c.qid) && !deKt.has(c.qid) })
+        .sort((x, y) => { const a = hs.tt.get(x.qid)!, b = hs.tt.get(y.qid)!
+          return Number(a.lanCuoiDung !== false) - Number(b.lanCuoiDung !== false) || b.lanSai - a.lanSai || Number(a.thanhThao) - Number(b.thanhThao) ||
+            (a.henOn ?? '9999').localeCompare(b.henOn ?? '9999') || x.qid.localeCompare(y.qid) }).map(c => c.qid)
+      if (xepSom) vaoPlan.onSom = xepSom(vaoPlan.onSom)
+      plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
+    }
   }
   // HẾT CẢ ÔN SỚM (thầy 23/10 "cả hai"): còn thiếu mức mà không còn câu nào xếp được ⇒ mức hôm nay hạ đúng bằng số câu em làm được (đã làm + còn xếp được)
   // để ngày ấy tính ĐỦ MỨC — em không mất chuỗi Chăm vì kho thiếu. Chỉ khi không có câu nào trong cửa sổ "vừa làm" (câu ấy quay lại sau ≤ 15 phút) và mức

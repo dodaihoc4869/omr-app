@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { taoKhoOmni, themChienDich, lam } from './omni-3-ke-hoach-chung'
 import { dongBoGoi7, lapGoi7 } from '../server/src/goi-bai-7'
 import { chonGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
-import { rut28, noOnDang, xepOnTheoNo, NGAY_DE_28, O_28, SUAT_28, TRAN_H, type UngVien28 } from '../server/src/rut-28'
+import { rut28, rut28Lech, noOnDang, xepOnTheoNo, NGAY_DE_28, O_28, SUAT_28, TRAN_H, TRAN_H_CUOI, type UngVien28 } from '../server/src/rut-28'
 import { oMaTran, MA_TRAN_RUT_MOI } from '../server/src/ma-tran-rut-moi'
 import { KHUNG_KT_2026 } from '../server/src/kiem-tra-ca-nhan-ma-tran'
 import { dongGoiDe2026 } from '../server/src/kiem-tra-ca-nhan-chu-ky'
@@ -58,6 +58,11 @@ describe('rut28 — lõi thuần', () => {
     const ra = rut28({ ung: tao('moi', [30, 30, 30, 30, 30, 30, 30], 0), can: 10, daLamO })
     expect(demO(ra)).toEqual([0, 0, 0, 2, 2, 3, 3])
   })
+  it('`lech` đếm câu phải lấy lệch ô ở nguồn phụ (nguồn chính lệch mức không tính) — nơi gọi dựa vào đó để nạp ôn sớm', () => {
+    expect(rut28Lech({ ung: tao('moi', [0, 40, 0, 9, 9, 9, 9], 0), can: 28 }).lech).toBe(0)
+    expect(rut28Lech({ ung: tao('on', [40, 9, 9, 9, 9, 9, 9], 1), can: 28 }).lech).toBe(0)
+    expect(rut28Lech({ ung: tao('on', [40, 0, 0, 9, 9, 9, 9], 1), can: 28 }).lech).toBe(6) // 4 suất I-Hiểu + 2 suất I-VD lấy câu I-Biết
+  })
   it('3000 kho ngẫu nhiên: không lặp, đủ số, đúng 18/4/6 khi mỗi phần đủ câu', () => {
     let s = 12345
     const rnd = (n: number) => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return s % n }
@@ -100,6 +105,18 @@ describe('chonGoi7 theo suất — bài thật lệch ô', () => {
     expect(cau.filter((c) => !daGap.has(c.qid))).toHaveLength(0)
     expect(ngayMoi).toBe(7)
   })
+  it('thiếu câu đúng ô ⇒ `lech` > 0; nạp ôn sớm thì hết lệch (ôn sớm lấp đúng ô, đứng cuối đề)', () => {
+    const sua = Array.from({ length: 40 }, (_, k) => `sua-I|hieu-${k}`), som = cu('som', 8)
+    const vao = { cau, daGap: new Set(cau.map((c) => c.qid)), daLamNgay: new Set<string>(), quotaCon: 0, sanSang: new Set([...sua, ...som]), chan: new Set<string>(), sua, on: [], mucTieuNgay: 28, chiTrongMuc: true,
+      nhomPhu: [{ qids: cau.map((c) => c.qid), quota: 0 }], ngay: '2026-11-11', loaiNgay: 'sua' as const, suat: { oCua, daLamO: [] } }
+    const thieu = chonGoi7(vao)
+    expect(thieu.viec).toHaveLength(28)
+    expect(thieu.lech).toBe(10) // 18 suất Phần I do câu sai lấp (nguồn chính); 10 suất Phần II, III không có câu ⇒ lệch phần
+    const du = chonGoi7({ ...vao, onSom: som })
+    expect(du.lech).toBe(0)
+    expect(phanId(du.viec.map((v) => v.qid))).toEqual([18, 4, 6])
+    expect(du.viec.slice(0, 18).every((v) => v.vai === 'sua')).toBe(true)
+  })
   it('không truyền `suat` ⇒ hành vi cũ nguyên vẹn (ngày Sửa lấy câu sai theo thứ tự, không theo ô)', () => {
     const sua = Array.from({ length: 30 }, (_, k) => `sua-I|hieu-${k}`)
     const ra = chonGoi7({ cau, daGap: new Set(), daLamNgay: new Set(), quotaCon: 0, sanSang: new Set(sua), chan: new Set(), sua, on: [], mucTieuNgay: 28, chiTrongMuc: true, nhomPhu: [{ qids: cau.map((c) => c.qid), quota: 0 }], loaiNgay: 'sua' }).viec
@@ -110,21 +127,23 @@ describe('chonGoi7 theo suất — bài thật lệch ô', () => {
 describe('nợ ôn theo dạng', () => {
   const ls = (...x: [string, boolean][]) => ({ lichSu: x.map(([ngay, dung]) => ({ ngay, dung })) })
   const tt = new Map([
-    ['a1', ls(['2026-11-01', true], ['2026-11-05', true])], // dạng A: đúng 2 ngày liền ⇒ h = 4, chạm cuối 05/11
-    ['b1', ls(['2026-11-05', true], ['2026-11-09', false])], // dạng B: sai lần gần nhất ⇒ h = 1, chạm cuối 09/11
-    ['c1', ls(['2026-09-01', true], ['2026-09-02', true], ['2026-09-03', true], ['2026-09-04', true], ['2026-09-05', true], ['2026-09-06', true], ['2026-09-07', true])],
+    ['a1', ls(['2026-11-01', true], ['2026-11-05', true])], // dạng A: giữ đúng 01 → 05/11 ⇒ h = 1 + 4 = 5, chạm cuối 05/11
+    ['b1', ls(['2026-11-05', true], ['2026-11-09', false])], // dạng B: vừa sai ở lần chạm cuối ⇒ h = 1
+    ['c1', ls(['2026-09-01', true])], ['c2', ls(['2026-09-07', true])], // dạng C (hai câu): giữ đúng 01 → 07/09 ⇒ h = 7, chạm cuối 07/09
+    ['e1', ls(['2026-08-01', false], ['2026-08-02', true], ['2026-10-12', true])], // dạng E: sai 01/08, giữ đúng tới 12/10 (72 ngày) ⇒ h chạm trần
   ])
   const dang = (q: string) => q[0]!.toUpperCase()
-  it('nợ = số ngày chưa chạm ÷ h; h = 2^(số ngày đúng liền gần nhất), trần 30 ngày (3 tháng cuối: 14)', () => {
+  it('nợ = số ngày chưa chạm ÷ h; h = 1 + quãng em đã giữ đúng dạng ấy, trần 30 ngày (3 tháng cuối: 14)', () => {
     const no = noOnDang(tt, dang, '2026-11-11')
-    expect(no.get('A')).toBe(6 / 4)
+    expect(no.get('A')).toBe(6 / 5)
     expect(no.get('B')).toBe(2)
-    expect(no.get('C')).toBeCloseTo(65 / TRAN_H, 10) // 7 ngày đúng liền ⇒ h chạm trần 30
-    expect(noOnDang(tt, dang, '2027-03-22').get('C')).toBeCloseTo(196 / 14, 10)
+    expect(no.get('C')).toBeCloseTo(65 / 7, 10)
+    expect(no.get('E')).toBeCloseTo(30 / TRAN_H, 10)
+    expect(noOnDang(tt, dang, '2027-03-22').get('E')).toBeCloseTo(161 / TRAN_H_CUOI, 10)
   })
   it('xếp: dạng nợ lớn trước, mỗi dạng một câu rồi mới tới câu thứ hai; dạng chưa chạm = nợ 1', () => {
-    const no = noOnDang(tt, dang, '2026-11-11') // C 2,17 · B 2 · A 1,5 · D (chưa chạm) 1
-    expect(xepOnTheoNo(['a1', 'a2', 'b1', 'c1', 'c2', 'd1'], dang, no)).toEqual(['c1', 'b1', 'a1', 'd1', 'c2', 'a2'])
+    const no = noOnDang(tt, dang, '2026-11-11') // C 9,29 · B 2 · A 1,2 · D (chưa chạm) 1 · E 1 (đứng sau D vì cùng nợ, vào hàng sau)
+    expect(xepOnTheoNo(['a1', 'a2', 'b1', 'c1', 'c2', 'd1', 'e1'], dang, no)).toEqual(['c1', 'b1', 'a1', 'd1', 'e1', 'c2', 'a2'])
   })
 })
 

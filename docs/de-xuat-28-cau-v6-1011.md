@@ -40,7 +40,7 @@ Chưa tham vấn được cố vấn (phiên này không có công cụ cố v�
 - Đơn vị ôn = **dạng** (mọi câu đã có `dang`; nhóm sửa đang dùng đúng khoá này).
 - Mỗi em × dạng giữ 2 số: ngày chạm gần nhất, độ bền h (ngày). Tính bằng CPU từ lịch sử hồ sơ đang đọc sẵn; không thêm bảng. (Kiểm lại khi build: hồ sơ có đủ lịch sử theo câu để gộp theo dạng không.)
 - **Nợ ôn = số ngày từ lần chạm cuối ÷ h.** Dạng em yếu (h ngắn) và dạng lâu chưa chạm lên đầu ⇒ hai em cùng lớp nhận hai đề Ôn khác nhau.
-- Cập nhật h: đúng ⇒ h × 2; đúng nhưng «Chưa chắc» ⇒ h × 1,2; sai ⇒ h = 1 và thành lỗi chờ sửa. Câu làm ở ngày Học mới, Sửa cũng tính là một lần chạm dạng.
+- Độ bền h (bản đã build): h = 1 + quãng em đã giữ đúng dạng ấy (từ lần sai gần nhất, chưa sai thì từ lần chạm đầu, tới lần chạm gần nhất); vừa sai ⇒ h = 1. Giữ đúng qua 10 ngày ⇒ lần ôn kế chờ được ~10 ngày (khoảng cách tự nhân đôi). Câu làm ở ngày Học mới, Sửa cũng tính là một lần chạm dạng. Nút «Chưa chắc» chưa đưa vào h.
 - **Trọn vẹn:** trong một đề Ôn mỗi dạng tối đa 1 câu ⇒ 28 dạng khác nhau/đề; h có trần 30 ngày (từ 22/03/2027: 14 ngày) ⇒ dạng vững nhất cũng quay lại trong trần đó.
 - Câu phát: song sinh của câu em đã làm; chưa có song sinh ⇒ câu khác cùng dạng em chưa làm; hết ⇒ câu cũ làm lâu nhất.
 - Điều kiện để «trọn vẹn» đúng thật: số dạng em đã học ÷ trần ngày ≤ số suất ôn mỗi ngày. Ví dụ 300 dạng, trần 30 ngày ⇒ cần 10 lần chạm/ngày. Số dạng thật chưa đo (mục 6).
