@@ -280,7 +280,7 @@ export class PhongBinhPhanUng {
   private phat(): void {
     const st = this.st
     if (!st) return
-    const bang = JSON.stringify(L.viewBang(st))
+    const bang = JSON.stringify(L.viewBang(st, chamSo))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
     for (const ws of this.ctx.getWebSockets('hs')) { const a = ws.deserializeAttachment() as KemBpu | null; if (a?.s) this.gui(ws, JSON.stringify(L.viewEm(st, a.s))) }
   }
@@ -309,6 +309,8 @@ export class PhongBinhPhanUng {
     try {
       await this.env.DB.prepare(`CREATE TABLE IF NOT EXISTS bpu_luot (buoi_id TEXT NOT NULL, sbd TEXT NOT NULL, qid TEXT NOT NULL, luot INTEGER NOT NULL, chon TEXT, dung INTEGER NOT NULL DEFAULT 0,
         giay REAL, kj INTEGER NOT NULL DEFAULT 0, doi INTEGER, roi INTEGER NOT NULL DEFAULT 0, len_bang INTEGER NOT NULL DEFAULT 0, luc TEXT NOT NULL, PRIMARY KEY (buoi_id, sbd, luot))`).run()
+      // 10/11: bộ chọn em lên bảng đọc bpu_luot theo em (`/gv/ung-vien-chieu` kênh bpu) ⇒ chỉ mục theo sbd (chỉ-thêm; chạy lúc kết thúc buổi, không ở đường nóng).
+      await this.env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_bpu_luot_em ON bpu_luot(sbd, luc)').run()
       const cau = this.env.DB.prepare('INSERT OR REPLACE INTO bpu_luot (buoi_id, sbd, qid, luot, chon, dung, giay, kj, doi, roi, len_bang, luc) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)')
       for (let i = 0; i < ds.length; i += 50) await this.env.DB.batch(ds.slice(i, i + 50).map((d) => cau.bind(d.buoi_id, d.sbd, d.qid, d.luot, d.chon, d.dung, d.giay, d.kj, d.doi, d.roi, d.len_bang, d.luc)))
       await this.ctx.storage.delete('ghi')
@@ -386,7 +388,7 @@ export class PhongBinhPhanUng {
     if (!st) { this.gui(ws, JSON.stringify({ t: 'chua-mo' })); return }
     const nay = Date.now()
     // Em NỐI LẠI (tắt hẳn app rồi mở lại sau khi đã báo `roi` — không kịp gửi `ve`) ⇒ coi như đã quay lại: gỡ khỏi «đang rời», bảng tắt báo động.
-    if (j.t === 'chao') { const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay); this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st) : L.viewEm(st, a.s))); if (!veLai) return; j = { t: 'chao-ve' } as Row }
+    if (j.t === 'chao') { const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay); this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st, chamSo) : L.viewEm(st, a.s))); if (!veLai) return; j = { t: 'chao-ve' } as Row }
     if (st.ketThuc) return
     let doi = j.t === 'chao-ve', gom = false
     if (a.v === 'hs') {
