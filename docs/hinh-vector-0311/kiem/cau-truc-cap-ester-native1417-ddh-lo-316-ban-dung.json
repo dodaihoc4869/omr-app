@@ -1,0 +1,56 @@
+[
+  {
+    "i": 1417,
+    "hash": "fe97a5b7345378de73db5022c23ad45c8ea53f27f6d86e0c807bbfd52d867f30",
+    "fileNguon": "anh/fe97a5b7345378de73db5022c23ad45c8ea53f27f6d86e0c807bbfd52d867f30.png",
+    "svg": "ong-ester-native1417-ddh-1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c.svg",
+    "hashSvg": "1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c",
+    "byteSvg": 11489,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-7",
+        "de": "Isoamyl acetate ($t_{nc}$ = −78 °C; $t_s$ = 142 °C; D = 0,876 g/cm³; độ tan 0,30 g/100 g nước) là một chất có mùi thơm của chuối chín và được sử dụng làm hương liệu thực phẩm. Một nhóm học sinh tiến hành thí nghiệm nhằm minh họa cho khả năng thủy phân của dầu chuối (isoamyl acetate) trong các điều kiện khác nhau. Các học sinh đã thực hiện các bước thí nghiệm sau:\nBước 1: Lấy 3 ống nghiệm, một ống đựng 10 mL nước (ống số 1); một ống đựng 10 mL dung dịch $\\ce{H2SO4}$ 1M (ống số 2); một ống đựng 10 mL dung dịch NaOH 2M (ống số 3);\nBước 2: Thêm vào mỗi ống 2 mL isoamyl acetate, lắc đều chất lỏng trong các ống nghiệm thấy chất lỏng đều tách thành hai lớp. Thể tích phần chất lỏng phía trên ở 3 ống nghiệm bằng nhau.\nBước 3: Đặt các ống nghiệm vào cốc nước nóng, dùng đũa thủy tinh khuấy đều phần chất lỏng trong các ống nghiệm đó trong khoảng thời gian 20 phút.\nBước 4: Lấy các ống nghiệm đó ra và quan sát được hiện tượng như hình bên.",
+        "refs": [
+          {
+            "hash": "fe97a5b7345378de73db5022c23ad45c8ea53f27f6d86e0c807bbfd52d867f30",
+            "where": "VIP27-CDK-ESTER-TN-II-7.hinh.0.du_lieu",
+            "hashDataUrl": "0b05e6b1da8394285534075d1b48c2ebb013e4a079bf4fadbe8433c1c3b6b369"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3openU3blueflat/yellow1thick2thin3none/2leadersNOheads/ester-dungdịchREGULAR/3numsactualDAM/noaddedlevels-chemicals-answer/noalias1269",
+    "hashSvgDaSoat": "1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 287,
+    "hash": "30c291741fa7266cf32f1654732c92fa1732b0b210051887d36a814a16b278c4",
+    "fileNguon": "anh/30c291741fa7266cf32f1654732c92fa1732b0b210051887d36a814a16b278c4.png",
+    "svg": "phan-ung-ester-native-ddh-202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c.svg",
+    "hashSvg": "202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c",
+    "byteSvg": 11048,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-7",
+        "de": "Isoamyl acetate ($t_{nc}$ = −78 °C; $t_s$ = 142 °C; D = 0,876 g/cm³; độ tan 0,30 g/100 g nước) là một chất có mùi thơm của chuối chín và được sử dụng làm hương liệu thực phẩm. Một nhóm học sinh tiến hành thí nghiệm nhằm minh họa cho khả năng thủy phân của dầu chuối (isoamyl acetate) trong các điều kiện khác nhau. Các học sinh đã thực hiện các bước thí nghiệm sau:\nBước 1: Lấy 3 ống nghiệm, một ống đựng 10 mL nước (ống số 1); một ống đựng 10 mL dung dịch $\\ce{H2SO4}$ 1M (ống số 2); một ống đựng 10 mL dung dịch NaOH 2M (ống số 3);\nBước 2: Thêm vào mỗi ống 2 mL isoamyl acetate, lắc đều chất lỏng trong các ống nghiệm thấy chất lỏng đều tách thành hai lớp. Thể tích phần chất lỏng phía trên ở 3 ống nghiệm bằng nhau.\nBước 3: Đặt các ống nghiệm vào cốc nước nóng, dùng đũa thủy tinh khuấy đều phần chất lỏng trong các ống nghiệm đó trong khoảng thời gian 20 phút.\nBước 4: Lấy các ống nghiệm đó ra và quan sát được hiện tượng như hình bên.",
+        "refs": [
+          {
+            "hash": "30c291741fa7266cf32f1654732c92fa1732b0b210051887d36a814a16b278c4",
+            "where": "VIP27-CDK-ESTER-TN-II-7.hinh.1.du_lieu",
+            "hashDataUrl": "e6484860cfb0495dea54db7f816f8f92c98d38d7aebb6c159319538d501f1468"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7C2Oester+NaOH→2C2OONa+5C1Oalcohol/2COdouble2splitfeet/2plus1filledRIGHT/t smallSUPo/allthinregularDDH/noaddedconditions-name-answer",
+    "hashSvgDaSoat": "202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

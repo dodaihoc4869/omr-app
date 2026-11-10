@@ -1,0 +1,21 @@
+[
+  {
+    "i": 1417,
+    "hashSvg": "1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã tự mở RIÊNG native FULL, đọc toàn bộ public questions.de/refs cùng qid VIP27-CDK-ESTER-TN-II-7 (hinh0 sau_de,hinh1 sau_y_b), tự fresh Chromium FULL3x đúng SHA rồi mở FULL/macro. Ba ống hở U/ba vùng xanh, lớp vàng1dày2mỏng3không; mặt phẳng và chiều cao/lớp giữ nguồn riêng1417, không alias1269. Hai leader không head, nhãn ester/dung dịch regular đã có khe rõ trước đầu leader, ba số (1)(2)(3) đậm thực. DDH path tự chứa không text/image, không thấy chạm/cắt/tràn, không thêm dữ kiện.",
+    "render": "/workspace/scratch/soat263-1417.png",
+    "macro": "/workspace/scratch/tubes1417-labels.png"
+  },
+  {
+    "i": 287,
+    "hashSvg": "a6834f167a6d6388522a525ded4f21251a99bdca349ee287dec3c3de2d03904c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Cần sửa: Đã tự mở RIÊNG native FULL, đọc toàn bộ public questions.de/refs cùng qid VIP27-CDK-ESTER-TN-II-7 (hinh0 sau_de,hinh1 sau_y_b), tự fresh Chromium FULL3x đúng SHA rồi mở FULL/macro. Ester7C2O +NaOH → salt2C2O+alcohol5C1O tổng14C6O, 2COsplitfeet/2plus/filledRIGHT đúng. Tuy nhiên o nhỏ trên t chạm crossbar t trong actual macro; native crop16x có khe trắng giữa t và o. Cần dịch riêng o sang phải hoặc lên nhẹ rồi render soát SHA mới. Chưa duyệt bản này; không alias544.",
+    "render": "/workspace/scratch/reaction287-CO.png",
+    "macro": [
+      "/workspace/scratch/reaction287-CO.png",
+      "/workspace/scratch/reaction287-nativeT.png"
+    ]
+  }
+]

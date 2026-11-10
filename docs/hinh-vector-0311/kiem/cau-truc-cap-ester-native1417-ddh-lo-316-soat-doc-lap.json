@@ -1,0 +1,25 @@
+[
+  {
+    "i": 1417,
+    "hashSvg": "1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: Đã tự mở RIÊNG native FULL, đọc toàn bộ public questions.de/refs cùng qid VIP27-CDK-ESTER-TN-II-7 (hinh0 sau_de,hinh1 sau_y_b), tự fresh Chromium FULL3x đúng SHA rồi mở FULL/macro. Ba ống hở U/ba vùng xanh, lớp vàng1dày2mỏng3không; mặt phẳng và chiều cao/lớp giữ nguồn riêng1417, không alias1269. Hai leader không head, nhãn ester/dung dịch regular đã có khe rõ trước đầu leader, ba số (1)(2)(3) đậm thực. DDH path tự chứa không text/image, không thấy chạm/cắt/tràn, không thêm dữ kiện.",
+    "render": "/workspace/scratch/soat263-1417.png",
+    "macro": "/workspace/scratch/tubes1417-labels.png",
+    "hash": "fe97a5b7345378de73db5022c23ad45c8ea53f27f6d86e0c807bbfd52d867f30",
+    "hashSvgDaSoat": "1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c"
+  },
+  {
+    "i": 287,
+    "hashSvg": "202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự fresh Chromium FULL3x đúng SHA mới/11048B và mở FULL/macro mới sau sửa riêng o; đối native FULL và nativeT16x đã mở riêng, public questions.de/refs VIP27-CDK-ESTER-TN-II-7.hinh.0/1 đã đọc. o mũ nhỏ nay có khe trắng rõ với t, đúng nguồn. Đếm ester7C2O+NaOH→salt2C2O+alcohol5C1O tổng14C6O; hai COsplitfeet, hai plus, một filledRIGHT, N-a-O-H/ONa/OH literals và vị trí methyl đúng. DDH regular/nét mảnh/anchors và gaps sạch, không thêm điều kiện/tên/đáp án, không alias544. Negative a6834f cũ giữ riêng.",
+    "render": "/workspace/scratch/soat263-287.png",
+    "macro": [
+      "/workspace/scratch/reaction287-final-CO.png",
+      "/workspace/scratch/reaction287-nativeT.png"
+    ],
+    "hash": "30c291741fa7266cf32f1654732c92fa1732b0b210051887d36a814a16b278c4",
+    "hashSvgDaSoat": "202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c"
+  }
+]

@@ -1153,6 +1153,24 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "fe97a5b7345378de73db5022c23ad45c8ea53f27f6d86e0c807bbfd52d867f30": {
+      "tep": "ong-ester-native1417-ddh-1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c.svg",
+      "hashSvg": "1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c",
+      "byteSvg": 11489,
+      "byteGzip": 3486,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "30c291741fa7266cf32f1654732c92fa1732b0b210051887d36a814a16b278c4": {
+      "tep": "phan-ung-ester-native-ddh-202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c.svg",
+      "hashSvg": "202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c",
+      "byteSvg": 11048,
+      "byteGzip": 2413,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "fc5001e1b004158336c360edfbc6b82319d4ab9b1df302469a0ada0e26e5df98": {
       "tep": "glucose-ba-dang-1402-ddh-ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d.svg",
       "hashSvg": "ad0d2fa10f3128484f33cef01221ad2bb0977225bba0373198558cfcc56af13d",
@@ -29060,6 +29078,26 @@
       ]
     },
     {
+      "qid": "VIP27-CDK-ESTER-TN-II-7",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "fe97a5b7345378de73db5022c23ad45c8ea53f27f6d86e0c807bbfd52d867f30",
+          "where": "VIP27-CDK-ESTER-TN-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "0b05e6b1da8394285534075d1b48c2ebb013e4a079bf4fadbe8433c1c3b6b369",
+          "vector": "ong-ester-native1417-ddh-1585e148631e47528c255eea503469826b431c22357fd6ba79f3b3b17f1d9e2c.svg"
+        },
+        {
+          "hash": "30c291741fa7266cf32f1654732c92fa1732b0b210051887d36a814a16b278c4",
+          "where": "VIP27-CDK-ESTER-TN-II-7.hinh.1.du_lieu",
+          "hashDataUrl": "e6484860cfb0495dea54db7f816f8f92c98d38d7aebb6c159319538d501f1468",
+          "vector": "phan-ung-ester-native-ddh-202fcd0c878579acc638fdec58c402b56a2ebbf8dd1cdb154823f606972dae1c.svg"
+        }
+      ]
+    },
+    {
       "qid": "VIP27-CDK-ESTER-TN-II-11",
       "duMoiHinh": true,
       "soHinhNguon": 2,
@@ -30561,6 +30599,7 @@
     "VIP27-C5-B17-D2-I-17",
     "VIP27-C5-B17-D2-I-18",
     "VIP27-CDK-ESTER-TN-II-4",
+    "VIP27-CDK-ESTER-TN-II-7",
     "VIP27-CDK-ESTER-TN-II-11",
     "VIP27-CDK-ESTER-TN-II-16",
     "VIP27-CDK-ESTER-TN-II-20",
