@@ -1,0 +1,40 @@
+[
+  {
+    "i": 917,
+    "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+    "fileNguon": "anh/a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e.png",
+    "svg": "bon-ao-native917-ddh-a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5.svg",
+    "hashSvg": "a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5",
+    "byteSvg": 12036,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "10-C1-B3-D1-I-6",
+        "de": "Trong các AO sau, AO nào là AOpz?",
+        "refs": [
+          {
+            "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+            "where": "10-C1-B3-D1-I-6.hinh.0.du_lieu",
+            "hashDataUrl": "734d18ced388d6a7b1c6aaa02dc557ee8459c530058828ed9eff5e5f946cd3b6"
+          }
+        ]
+      },
+      {
+        "qid": "DB-10-B3-D1-I-6",
+        "de": "Trong các AO sau, AO nào là AOpz?",
+        "refs": [
+          {
+            "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+            "where": "DB-10-B3-D1-I-6.hinh.0.du_lieu",
+            "hashDataUrl": "734d18ced388d6a7b1c6aaa02dc557ee8459c530058828ed9eff5e5f946cd3b6"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4panels1sphere6graylobes/12axes12OPENVheads12xyz4captions/axisOVERshapes/xRIGHT-zUP-yDOWNLEFT/0phaseSigns0nucleus/noaddedAOname-answer/theoryfix/tinyLEFTspeckintentUNKNOWNretained",
+    "hashSvgDaSoat": "a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

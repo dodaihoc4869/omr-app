@@ -1,0 +1,371 @@
+{
+  "i": 917,
+  "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e.png",
+  "size": [
+    1019,
+    322
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "10-C1-B3-D1-I-6",
+      "de": "Trong các AO sau, AO nào là AOpz?",
+      "allHinh": [
+        {
+          "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+          "where": "10-C1-B3-D1-I-6.hinh.0.du_lieu",
+          "hashDataUrl": "734d18ced388d6a7b1c6aaa02dc557ee8459c530058828ed9eff5e5f946cd3b6"
+        }
+      ],
+      "missingHashes": [
+        "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e"
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-6",
+      "de": "Trong các AO sau, AO nào là AOpz?",
+      "allHinh": [
+        {
+          "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+          "where": "DB-10-B3-D1-I-6.hinh.0.du_lieu",
+          "hashDataUrl": "734d18ced388d6a7b1c6aaa02dc557ee8459c530058828ed9eff5e5f946cd3b6"
+        }
+      ],
+      "missingHashes": [
+        "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/917-native2x-lo335.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "FourAOillustrationpanels withallgraydensityshapes, nooppositephase+/minus/whitephaseannotations.",
+    "panels": [
+      {
+        "caption": "(1)",
+        "captionBBox": [
+          125,
+          257,
+          165,
+          288
+        ],
+        "center": [
+          133,
+          141
+        ],
+        "shape": "spherecircle",
+        "sphereBounds": [
+          83,
+          88,
+          184,
+          189
+        ],
+        "axes": {
+          "x": [
+            [
+              63,
+              141
+            ],
+            [
+              204,
+              141
+            ]
+          ],
+          "z": [
+            [
+              133,
+              212
+            ],
+            [
+              133,
+              72
+            ]
+          ],
+          "y": [
+            [
+              184,
+              91
+            ],
+            [
+              83,
+              191
+            ]
+          ]
+        },
+        "labels": {
+          "x": [
+            188,
+            150,
+            202,
+            165
+          ],
+          "y": [
+            91,
+            188,
+            106,
+            210
+          ],
+          "z": [
+            143,
+            69,
+            158,
+            87
+          ]
+        }
+      },
+      {
+        "caption": "(2)",
+        "captionBBox": [
+          363,
+          257,
+          403,
+          288
+        ],
+        "center": [
+          380,
+          137
+        ],
+        "shape": "twohorizontalteardroplobes",
+        "lobes": {
+          "leftPath": "M380137 C352131 305101 296126 C288144 301169 326158 Z",
+          "rightPath": "M380137 C407127 458102 465128 C473146 460168 431157 Z"
+        },
+        "axes": {
+          "x": [
+            [
+              283,
+              137
+            ],
+            [
+              492,
+              137
+            ]
+          ],
+          "z": [
+            [
+              380,
+              212
+            ],
+            [
+              380,
+              72
+            ]
+          ],
+          "y": [
+            [
+              428,
+              91
+            ],
+            [
+              328,
+              191
+            ]
+          ]
+        },
+        "labels": {
+          "x": [
+            473,
+            150,
+            487,
+            165
+          ],
+          "y": [
+            337,
+            189,
+            353,
+            212
+          ],
+          "z": [
+            389,
+            68,
+            404,
+            87
+          ]
+        }
+      },
+      {
+        "caption": "(3)",
+        "captionBBox": [
+          623,
+          257,
+          667,
+          288
+        ],
+        "center": [
+          642,
+          142
+        ],
+        "shape": "twodiagonalteardroplobes UPright/DOWNleft, notxhorizontal/zvertical",
+        "lobes": {
+          "upperRightPath": "M642142 C651111 66866 69479 C72490 704117 642142 Z",
+          "lowerLeftPath": "M642142 C615150 564171 576195 C590231 625199 642142 Z"
+        },
+        "axes": {
+          "x": [
+            [
+              570,
+              142
+            ],
+            [
+              712,
+              142
+            ]
+          ],
+          "z": [
+            [
+              642,
+              212
+            ],
+            [
+              642,
+              72
+            ]
+          ],
+          "y": [
+            [
+              713,
+              72
+            ],
+            [
+              566,
+              219
+            ]
+          ]
+        },
+        "labels": {
+          "x": [
+            693,
+            150,
+            707,
+            165
+          ],
+          "y": [
+            573,
+            218,
+            590,
+            239
+          ],
+          "z": [
+            650,
+            68,
+            665,
+            87
+          ]
+        }
+      },
+      {
+        "caption": "(4)",
+        "captionBBox": [
+          859,
+          257,
+          901,
+          288
+        ],
+        "center": [
+          879,
+          138
+        ],
+        "shape": "twoverticalteardroplobes",
+        "lobes": {
+          "upperPath": "M879138 C870113 84773 86161 C87344 89852 90271 C90588 889118 879138 Z",
+          "lowerPath": "M879138 C867165 849195 860212 C873232 898222 902207 C906190 890160 879138 Z"
+        },
+        "axes": {
+          "x": [
+            [
+              808,
+              138
+            ],
+            [
+              949,
+              138
+            ]
+          ],
+          "z": [
+            [
+              879,
+              227
+            ],
+            [
+              879,
+              38
+            ]
+          ],
+          "y": [
+            [
+              929,
+              88
+            ],
+            [
+              830,
+              187
+            ]
+          ]
+        },
+        "labels": {
+          "x": [
+            931,
+            149,
+            946,
+            165
+          ],
+          "y": [
+            833,
+            190,
+            849,
+            213
+          ],
+          "z": [
+            887,
+            34,
+            901,
+            52
+          ]
+        }
+      }
+    ],
+    "axesStyle": "AllTHREEaxisheads eachpanel: xRIGHTopenV,zUPopenV,yDOWNLEFTopenV. OppositeendsplainNOheads. DiagonalylineextendsUPRIGHTpastorigin withNOheadatthatend. ALLaxislinesvisibleOVERgraylobes/sphere, noocclusionmask.",
+    "phaseAndShade": "Sourceall7densitycomponentsmediumgray (1sphere+6lobes), gentlelighterleft/upperpatchesanddarkerbottom/right. Do notturnoneoppositelobewhite oraddphase+/minus. Pixelprinttexturewithinshapesnotparticlecount.",
+    "font": "x/y/zlowercaseuprightsansregulargray, numbercaptions(1)..(4)regularuprightserifgray, notbold. No AO names/answerlabel.",
+    "tinySpeck": {
+      "bbox": [
+        31,
+        61,
+        38,
+        65
+      ],
+      "finding": "Isolatedtinygraydashaboveleftpanel, noleader/meaning; preserveasverytinyinkmarkifliteral, noletterreconstruction."
+    },
+    "counts": {
+      "panels": 4,
+      "sphere": 1,
+      "lobes": 6,
+      "axisLines": 12,
+      "axisOpenVHeads": 12,
+      "xyzLabels": 12,
+      "captions": 4,
+      "phaseSigns": 0
+    },
+    "noAdded": [
+      "AOname",
+      "pzspecificanswer",
+      "+/minusphase",
+      "electroncount",
+      "whitelobephase",
+      "extraaxisheads",
+      "nucleusdot"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelshape/axiscoordinates; Bezierpaths approxvisualtraces notnewscientificorbitalmodels. No orientationcorrectionfromtheory."
+}

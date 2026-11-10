@@ -1,0 +1,18 @@
+{
+  "lo": 335,
+  "main": "31b202641e14f2944b0cad929759cca7eee0da4b",
+  "newMainChanges": "Luồng Live/BPU và cấu hình Vite; server/font/mốc nguyênbyte so main334.",
+  "productionChangedThisBatch": false,
+  "colorViolations": 951,
+  "colorCheckerFiles": 185,
+  "sizeBaselineRed": {
+    "file": "server/src/index.ts",
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainMocSha": "2c8c45be8ab06dfb7ee3d825eecc0a6eca1f642068971483bf6e3c2f52d058c1",
+  "branchMocSha": "f762cef714985c2b200e382d62736fdbf06c5c6262f026da94b2d477dbd46fde",
+  "latestMainBuildSpeedRequiredBeforeMergeRelease": true,
+  "scope": "Cổng lô335 chỉ nhánh hiện tại, productionoldfonts/assets; chưa phải latestmain build-speed/full.",
+  "comparedToMain334": "4d93f40f7d625646326a403030334a279e04df0f"
+}

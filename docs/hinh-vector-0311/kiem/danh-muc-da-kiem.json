@@ -3457,6 +3457,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e": {
+      "tep": "bon-ao-native917-ddh-a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5.svg",
+      "hashSvg": "a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5",
+      "byteSvg": 12036,
+      "byteGzip": 2580,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "7cb2e8034c07ec64317e0f9f9ea732f2daa7dc4870420c5551231f0994562d8a": {
       "tep": "chair-polymer-ddh-5308efb9f40c37e2ea219bfaa0368f74c481ffe5c6a8d4df5ac334db807d9c3a.svg",
       "hashSvg": "5308efb9f40c37e2ea219bfaa0368f74c481ffe5c6a8d4df5ac334db807d9c3a",
@@ -8988,6 +8997,20 @@
           "where": "10-C1-B2-III-26.hinh.0.du_lieu",
           "hashDataUrl": "49a41de825bda3bbbd40b76d5ca534007f6b87621d17fc10d27811148e88a8a1",
           "vector": "ms-ddh-fdfc619e1fa023fc60aed9551b1d9669caaffb2ac06b12e7cf9a8639bfa4f19e.svg"
+        }
+      ]
+    },
+    {
+      "qid": "10-C1-B3-D1-I-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+          "where": "10-C1-B3-D1-I-6.hinh.0.du_lieu",
+          "hashDataUrl": "734d18ced388d6a7b1c6aaa02dc557ee8459c530058828ed9eff5e5f946cd3b6",
+          "vector": "bon-ao-native917-ddh-a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5.svg"
         }
       ]
     },
@@ -16814,6 +16837,20 @@
           "where": "DB-10-B5-D1-I-194.hinh.0.du_lieu",
           "hashDataUrl": "46c8135d5c55315e42ec3c261c261567c31e708a02e955b3e26750f198288e4f",
           "vector": "o-nguyen-to-ddh-84e31a71d9fedc07b69a8c2f71ab330a32108e015629daeb0b84c6403a23d8a4.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-10-B3-D1-I-6",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a7512bfa2bfd20cac1afd9a8e20e16d71f2c2a210d2b7704c95c5de341090b8e",
+          "where": "DB-10-B3-D1-I-6.hinh.0.du_lieu",
+          "hashDataUrl": "734d18ced388d6a7b1c6aaa02dc557ee8459c530058828ed9eff5e5f946cd3b6",
+          "vector": "bon-ao-native917-ddh-a182f9630f027374c26f21517ee51653d4bb705767ac6691bd1b3639530df4d5.svg"
         }
       ]
     },
@@ -29832,6 +29869,7 @@
     "10-C1-B2-III-16",
     "10-C1-B2-III-24",
     "10-C1-B2-III-26",
+    "10-C1-B3-D1-I-6",
     "10-C1-B3-D1-I-32",
     "10-C1-B3-D1-I-33",
     "10-C1-B3-D1-I-62",
@@ -30337,6 +30375,7 @@
     "DB-10-B5-D1-II-187",
     "DB-10-B5-D1-III-189",
     "DB-10-B5-D1-I-194",
+    "DB-10-B3-D1-I-6",
     "DB-10-B3-D1-I-29",
     "DB-10-B3-D1-I-53",
     "DB-10-B3-D1-I-78",
