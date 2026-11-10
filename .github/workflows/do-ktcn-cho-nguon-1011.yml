@@ -1,0 +1,38 @@
+# SOI VÌ SAO BÀI KIỂM TRA ÔN TẬP KẸT «CHỜ NGUỒN» (CHỈ ĐỌC, 10/11 — thầy: «Sửa luôn 54 bài kiểm tra ôn tập kẹt chờ nguồn»).
+# CHỈ SELECT đếm gộp trên lịch ngày mai: lý do thiếu (mã tờ / mã câu / mã kiến thức — không phải dữ liệu học sinh), số em, số câu của đề. Không in mã em, tên em. KHÔNG `d1 export`.
+name: Soi Kiểm tra ôn tập chờ nguồn (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/do-ktcn-cho-nguon-1011.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-ktcn-cho-nguon
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Soi (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
+          MAI="date('now','+7 hours','+1 day')"
+          LY="CASE WHEN t.value LIKE 'nguon:%' THEN 'nguon (tờ chưa vào kho)' WHEN t.value LIKE 'ma_tran:%' THEN 'ma_tran (câu chưa gắn kỹ năng)' ELSE 'chua_phu (kiến thức không câu nào phủ)' END"
+          q "A lịch chờ nguồn ngày mai: theo lớp — số em, số câu của đề, số mục thiếu" "SELECT k.lop, COUNT(*) em, MIN(json_array_length(k.json,'\$.cau')) cau_it_nhat, MAX(json_array_length(k.json,'\$.cau')) cau_nhieu_nhat, MIN(json_array_length(k.json,'\$.thieu')) thieu_it_nhat, MAX(json_array_length(k.json,'\$.thieu')) thieu_nhieu_nhat, MIN(json_array_length(k.json,'\$.muc')) muc_it, MAX(json_array_length(k.json,'\$.muc')) muc_nhieu, MIN(datetime(k.cap_nhat_luc/1000,'unixepoch','+7 hours')) cap_nhat_som, MAX(datetime(k.cap_nhat_luc/1000,'unixepoch','+7 hours')) cap_nhat_muon FROM kiem_tra_ca_nhan k WHERE k.trang_thai='cho_nguon' AND k.ngay=$MAI GROUP BY 1 ORDER BY em DESC"
+          q "B lý do thiếu: theo lớp × loại" "SELECT k.lop, $LY ly_do, COUNT(DISTINCT k.sbd) em, COUNT(DISTINCT t.value) muc_khac_nhau FROM kiem_tra_ca_nhan k, json_each(k.json,'\$.thieu') t WHERE k.trang_thai='cho_nguon' AND k.ngay=$MAI GROUP BY 1,2 ORDER BY 1,2"
+          q "C các mục thiếu cụ thể (mã tờ / mã câu / mã kiến thức), nhiều em nhất trước" "SELECT t.value muc_thieu, COUNT(DISTINCT k.sbd) em, COUNT(DISTINCT k.lop) lop FROM kiem_tra_ca_nhan k, json_each(k.json,'\$.thieu') t WHERE k.trang_thai='cho_nguon' AND k.ngay=$MAI GROUP BY 1 ORDER BY em DESC, 1 LIMIT 60"
+          q "D lịch chờ nguồn theo ngày lập đầu tiên (kẹt từ bao giờ)" "SELECT k.ngay, COUNT(*) bai, COUNT(DISTINCT k.lop) lop FROM kiem_tra_ca_nhan k WHERE k.trang_thai='cho_nguon' GROUP BY 1 ORDER BY 1 DESC LIMIT 20"
+          q "E các lớp ấy: bài đã giao gần đây (tên bài, ngày giao)" "SELECT b.lop, b.ten_bai, substr(b.tick_luc,1,10) ngay_giao, b.ma_to_json FROM bai_da_day b WHERE b.bo_tick_luc IS NULL AND b.lop IN (SELECT DISTINCT lop FROM kiem_tra_ca_nhan WHERE trang_thai='cho_nguon' AND ngay=$MAI) ORDER BY b.lop, b.tick_luc DESC LIMIT 40"
