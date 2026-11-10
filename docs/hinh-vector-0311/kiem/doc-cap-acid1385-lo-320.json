@@ -1,0 +1,418 @@
+{
+  "i": 1385,
+  "hash": "f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f.png",
+  "size": [
+    1086,
+    189
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-L4-0401-II-2",
+      "de": "DHA (Docosahexaenoic acid) và oleic acid là các acid béo có vai trò quan trọng đối với cơ thể người. Cho cấu trúc DHA (nhiệt độ nóng chảy −44 °C) và oleic acid (nhiệt độ nóng chảy 14 °C) như hình.",
+      "allHinh": [
+        {
+          "hash": "f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f",
+          "where": "VIP27-BDT-L4-0401-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "69b0219bdd30965a33b3c00ff59df04f2d968b6fe6f1d1b26e075d260868e3e2"
+        }
+      ],
+      "missingHashes": [
+        "f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1385-native2x-lo320.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelvertices independentlycounted; sourcenamedOleicacid has16visibleC, do notadd2Ctofitchemicalname. No numericanswerinferred.",
+  "geometry": {
+    "classification": "Twoindependentskeletalacidstructures sidebyside, eachowncaption, notaliaspreviousDHA/oleic.",
+    "left": {
+      "bareVerticesFreeLeftToCOOHLabel": [
+        [
+          8,
+          141
+        ],
+        [
+          26,
+          108
+        ],
+        [
+          8,
+          74
+        ],
+        [
+          27,
+          41
+        ],
+        [
+          61,
+          41
+        ],
+        [
+          80,
+          7
+        ],
+        [
+          114,
+          7
+        ],
+        [
+          133,
+          41
+        ],
+        [
+          166,
+          41
+        ],
+        [
+          185,
+          75
+        ],
+        [
+          163,
+          108
+        ],
+        [
+          179,
+          142
+        ],
+        [
+          215,
+          142
+        ],
+        [
+          234,
+          108
+        ],
+        [
+          217,
+          75
+        ],
+        [
+          236,
+          41
+        ],
+        [
+          271,
+          41
+        ],
+        [
+          289,
+          7
+        ],
+        [
+          326,
+          7
+        ],
+        [
+          343,
+          41
+        ],
+        [
+          377,
+          41
+        ]
+      ],
+      "COOH": {
+        "text": "COOH",
+        "bbox": [
+          382,
+          60,
+          455,
+          83
+        ],
+        "bond": [
+          [
+            377,
+            41
+          ],
+          [
+            386,
+            59
+          ]
+        ],
+        "anchor": "firstC",
+        "note": "COOHcarbonisINSIDEtext, count1Cseparatefrom21barevertices; noextraendpointC at38659"
+      },
+      "CCdoubleEdgesZeroBased": [
+        [
+          2,
+          3
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          17,
+          18
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            17,
+            74
+          ],
+          [
+            33,
+            47
+          ]
+        ],
+        [
+          [
+            85,
+            15
+          ],
+          [
+            109,
+            15
+          ]
+        ],
+        [
+          [
+            163,
+            48
+          ],
+          [
+            176,
+            75
+          ]
+        ],
+        [
+          [
+            185,
+            134
+          ],
+          [
+            210,
+            134
+          ]
+        ],
+        [
+          [
+            226,
+            75
+          ],
+          [
+            240,
+            48
+          ]
+        ],
+        [
+          [
+            295,
+            15
+          ],
+          [
+            320,
+            15
+          ]
+        ]
+      ],
+      "literalC": 22,
+      "caption": {
+        "text": "DHA (nhiệt độ nóng chảy - 44°C)",
+        "bbox": [
+          30,
+          159,
+          394,
+          187
+        ],
+        "font": "BOLDuprightserif; literalhyphenspace44, noextra minusnormalization"
+      }
+    },
+    "right": {
+      "verticesFreeLeftToCarbonyl": [
+        [
+          561,
+          131
+        ],
+        [
+          594,
+          111
+        ],
+        [
+          628,
+          131
+        ],
+        [
+          662,
+          111
+        ],
+        [
+          696,
+          131
+        ],
+        [
+          729,
+          111
+        ],
+        [
+          729,
+          74
+        ],
+        [
+          762,
+          54
+        ],
+        [
+          794,
+          73
+        ],
+        [
+          827,
+          54
+        ],
+        [
+          859,
+          73
+        ],
+        [
+          891,
+          54
+        ],
+        [
+          924,
+          73
+        ],
+        [
+          956,
+          54
+        ],
+        [
+          989,
+          73
+        ],
+        [
+          1016,
+          54
+        ]
+      ],
+      "CCdoubleEdgesZeroBased": [
+        [
+          6,
+          7
+        ]
+      ],
+      "innerDoubleRay": [
+        [
+          736,
+          78
+        ],
+        [
+          763,
+          62
+        ]
+      ],
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          1006,
+          6,
+          1027,
+          28
+        ],
+        "rays": [
+          [
+            [
+              1012,
+              56
+            ],
+            [
+              1012,
+              30
+            ]
+          ],
+          [
+            [
+              1019,
+              55
+            ],
+            [
+              1019,
+              30
+            ]
+          ]
+        ],
+        "footTopology": "2verticalraysmeet2adjacentslopes independently,noaddedhorizontalbridge"
+      },
+      "OH": {
+        "text": "OH",
+        "bbox": [
+          1046,
+          60,
+          1083,
+          84
+        ],
+        "bond": [
+          [
+            1016,
+            54
+          ],
+          [
+            1044,
+            67
+          ]
+        ],
+        "anchor": "O"
+      },
+      "literalC": 16,
+      "caption": {
+        "text": "Oleic acid (nhiệt độ nóng chảy 14°C)",
+        "bbox": [
+          629,
+          159,
+          1032,
+          187
+        ],
+        "font": "BOLDuprightserif"
+      }
+    },
+    "font": "ChemicalCOOH/O/OHregularuprightsans; BOTHcaptionsBOLDuprightserif. Noitalic/arrow.",
+    "counts": {
+      "leftC": 22,
+      "rightC": 16,
+      "Ototal": 4,
+      "leftCCdouble": 6,
+      "rightCCdouble": 1,
+      "caption": 2,
+      "Cnums": 0,
+      "Htext": 0
+    },
+    "noAdded": [
+      "2CtoOleicchain",
+      "expandedCOOHleft",
+      "carbonnumbers",
+      "H/CH3labels",
+      "stereoletters",
+      "temperatureunitspacesnotinsource",
+      "reactionarrow",
+      "ringclosure"
+    ]
+  }
+}

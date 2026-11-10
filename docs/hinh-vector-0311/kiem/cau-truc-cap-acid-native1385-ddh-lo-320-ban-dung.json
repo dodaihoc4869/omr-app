@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1385,
+    "hash": "f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f",
+    "fileNguon": "anh/f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f.png",
+    "svg": "cap-acid-native1385-ddh-b419097e1e5993c13992122b9c0ca4fefb2059204eca064b951e7434cd2a3b55.svg",
+    "hashSvg": "b419097e1e5993c13992122b9c0ca4fefb2059204eca064b951e7434cd2a3b55",
+    "byteSvg": 35353,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L4-0401-II-2",
+        "de": "DHA (Docosahexaenoic acid) và oleic acid là các acid béo có vai trò quan trọng đối với cơ thể người. Cho cấu trúc DHA (nhiệt độ nóng chảy −44 °C) và oleic acid (nhiệt độ nóng chảy 14 °C) như hình.",
+        "refs": [
+          {
+            "hash": "f9ea7bc1d087a80238f4fc802cf994e0192647705c4c750278d373051c3fad6f",
+            "where": "VIP27-BDT-L4-0401-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "69b0219bdd30965a33b3c00ff59df04f2d968b6fe6f1d1b26e075d260868e3e2"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "LEFT21bareC+COOHfirstC=22C6CCdouble/RIGHT16bareC1CCdouble1COdouble2splitfeet/4Ototal/regularchemical2trueDAMuprightcaptions/DHA (nhiệt độ nóng chảy - 44°C)/Oleic acid (nhiệt độ nóng chảy 14°C)/literalASCIIhyphenspace/no18Cnormalization/noaddedH-CH3-nums-answer/noalias1145",
+    "hashSvgDaSoat": "b419097e1e5993c13992122b9c0ca4fefb2059204eca064b951e7434cd2a3b55",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
