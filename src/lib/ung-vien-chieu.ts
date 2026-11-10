@@ -30,7 +30,33 @@ const ngayVN=()=>new Date(Date.now()+7*3600_000).toISOString().slice(0,10)
 export function phanBoEmChieu(m:ReadonlyMap<string,readonly EmChieu[]>,qids:readonly string[]):PhanBoGoi{return phanBoGoi(qids.flatMap(q=>{const e=m.get(q)?.[0];return e?.tang?[{sbd:e.sbd,tang:e.tang}]:[]}))}
 type EmBang=Record<string,{ten?:unknown;soLan14?:unknown;lanCuoiLenBang?:unknown}>
 /** Tải ứng viên từng câu. Lỗi ⇒ null (nơi gọi báo). Em không có số đo: máy chủ gửi một lần trong `em`, máy thầy tự thêm vào mỗi câu với loai 'chua_co'. */
+/** ĐỆM KÊNH BPU (10/11, tác tử tốc độ): bấm «Lên bảng» (L) / «Em khác» (N) từng chờ cả chuyến máy chủ (11 câu D1 theo lịch sử cả lớp, giờ cao điểm hàng trăm ms) mới
+ *  hiện em được chọn. Nay bảng nạp TRƯỚC ngay khi có em nộp đầu tiên (`napTruocBpu`), L / N dùng lại (cùng câu + lớp, trong 3 phút, cùng hoặc rộng hơn danh sách em)
+ *  ⇒ không chờ mạng, và N không gọi máy chủ lần nữa. Số liệu lịch sử không đổi trong lượt; phần theo lượt (đúng/sai, đã lên bảng) lấy từ view, không từ đệm. */
+const NHO_BPU_MS = 180_000
+const nhoBpu = new Map<string, {luc:number;sbd:Set<string>;p:Promise<NapEmChieu|null>}>()
+const khoaBpu=(qids:readonly string[],lop?:string)=>`${[...new Set(qids)].join(',')}|${lop??''}`
+/** Cắt kết quả đệm theo danh sách em đang gọi (em ngoài danh sách không được chọn). */
+function locEm(n:NapEmChieu,em:ReadonlySet<string>):NapEmChieu{
+ const ds=new Map<string,readonly EmChieu[]>();for(const [q,l] of n.ds)ds.set(q,l.filter(e=>em.has(e.sbd)))
+ return {...n,ds}
+}
+/** Nạp trước ứng viên BPU cho lượt đang chạy (gọi một lần khi có em nộp đầu tiên; gọi lại trong 3 phút cùng câu + lớp thì bỏ qua). Không báo lỗi — lỗi thì L tự gọi như cũ. */
+export function napTruocBpu(qids:readonly string[],sbd:readonly string[],lop?:string):void{
+ const k=khoaBpu(qids,lop),cu=nhoBpu.get(k),em=[...new Set(sbd)]
+ if(!em.length||(cu&&Date.now()-cu.luc<NHO_BPU_MS&&em.every(s=>cu.sbd.has(s))))return
+ const p=napEmChieuMang(qids,em,null,lop,'bpu');nhoBpu.set(k,{luc:Date.now(),sbd:new Set(em),p})
+ void p.then(r=>{if(!r&&nhoBpu.get(k)?.p===p)nhoBpu.delete(k)},()=>{nhoBpu.delete(k)})
+ if(nhoBpu.size>8)for(const [x,v] of nhoBpu)if(Date.now()-v.luc>=NHO_BPU_MS)nhoBpu.delete(x)
+}
 export async function napEmChieu(qids:readonly string[],sbd:readonly string[],coMat?:ReadonlySet<string>|null,lop?:string,kenh?:string):Promise<NapEmChieu|null>{
+ if(kenh==='bpu'){
+  const cu=nhoBpu.get(khoaBpu(qids,lop)),em=new Set(sbd.filter(s=>!coMat||coMat.has(s)))
+  if(em.size&&cu&&Date.now()-cu.luc<NHO_BPU_MS&&[...em].every(s=>cu.sbd.has(s))){const r=await cu.p;if(r)return locEm(r,em)}
+ }
+ return napEmChieuMang(qids,sbd,coMat,lop,kenh)
+}
+async function napEmChieuMang(qids:readonly string[],sbd:readonly string[],coMat?:ReadonlySet<string>|null,lop?:string,kenh?:string):Promise<NapEmChieu|null>{
  const em=[...new Set(sbd)].filter(s=>!coMat||coMat.has(s)),ds=new Map<string,EmChieu[]>(),mucDo=new Map<string,string>();let bpu:NapBpu|undefined
  if(!em.length&&(!lop||coMat))return {ds,mucDo}
  const ids=[...new Set(qids)]
