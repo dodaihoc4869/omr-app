@@ -12,6 +12,10 @@ import { gameIdentity } from './game-v2-auth'
 import { tenLopCuaEm } from './ten-lop'
 import { TU_CHI_MUC_GAME, cauCongKhai, qidPhucVuDuoc } from './cau-theo-qid'
 import { baoMayCacEm } from './ngan-hoc-sinh'
+import { docCauHinhDem } from './cau-hinh-dem'
+import { sfuDaCauHinh } from './live-sfu'
+import { LiveMay, type KemBpu } from './phong-live'
+import { datCoLive } from '../../src/lib/bpu/phong-live'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
@@ -30,6 +34,13 @@ export const kepGiay = (v: unknown): number => { const n = Math.round(Number(v))
 const mocTuMo = (l: { han: number | null; batDau: number }): number => (l.han ?? l.batDau + 180_000) + TU_MO_MS
 export const HAN_VE_BPU_MS = 6 * 3_600_000
 export const bpuBat = (env: Env): boolean => !!env.PHONG_BPU && !env.TAT_BPU && !!env.MA_BI_MAT
+/** LIVE BẢNG (10/11): công tắc `cau_hinh.live_bang` — vắng dòng / JSON hỏng ⇒ BẬT (thầy 10/11 «đẩy luôn lên bản sống để tôi test»); `{"bat":false}` ⇒ tắt.
+ *  Chỉ đọc lúc THẦY mở phòng (`/gv/bpu/mo`, song song với batch mở phòng, qua đệm cờ isolate) rồi nạp vào phòng ⇒ đường của em và cửa live 0 lệnh D1. */
+export const KHOA_CH_LIVE_BANG = 'live_bang'
+export function liveBangBat(giaTri: string | null): boolean {
+  if (!giaTri) return true
+  try { const o = JSON.parse(giaTri) as { bat?: unknown } | null; return !(o && typeof o === 'object' && o.bat === false) } catch { return true }
+}
 
 // ── Vé ──
 export interface VeBpu { b: string; s: string; v: 'gv' | 'hs'; h: number }
@@ -124,12 +135,12 @@ export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> 
   const buoiId = buoiHop(b.buoiId)
   if (!buoiId) return { ok: false, error: 'Chưa có buổi học. Thầy mở điểm danh trước.' }
   // Một đợt chờ: batch danh sách + năng lực (truy vấn riêng, SONG SONG — lỗi của nó không làm hỏng batch mở phòng).
-  const [[buoiR, hsR, ddR, caR], nangLuc] = await Promise.all([env.DB.batch([
+  const [[buoiR, hsR, ddR, caR], nangLuc, coLive] = await Promise.all([env.DB.batch([
     env.DB.prepare('SELECT id, ten, lop, dong_luc, het_han FROM buoi_hoc WHERE id = ?').bind(buoiId),
     env.DB.prepare("SELECT sbd, ho_ten, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'"),
     env.DB.prepare('SELECT d.sbd, d.luc, d.trang_thai, h.ho_ten, h.lop, h.ten_lop FROM buoi_hoc_diem_danh d LEFT JOIN hoc_sinh h ON h.sbd = d.sbd WHERE d.buoi_id = ?').bind(buoiId),
     env.DB.prepare("SELECT ma_ca, TRIM(COALESCE(lop, '')) AS lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi'"),
-  ]) as unknown as Promise<{ results?: Row[] }[]>, docNangLucBpu(env, { buoiId }, nay)])
+  ]) as unknown as Promise<{ results?: Row[] }[]>, docNangLucBpu(env, { buoiId }, nay), docCauHinhDem(env, KHOA_CH_LIVE_BANG, nay).then(liveBangBat, () => true)])
   const buoi = buoiR?.results?.[0]
   if (!buoi) return { ok: false, error: 'Không tìm thấy buổi học này.' }
   if (buoi.dong_luc) return { ok: false, error: 'Buổi học này đã kết thúc.' }
@@ -150,7 +161,7 @@ export async function gvBpuMo(env: Env, b: Row, nay = Date.now()): Promise<Row> 
   const lopEm = new Set([...ds.keys()].map((s) => lopTheoSbd.get(s) ?? '').filter(Boolean))
   const caMo = (caR?.results ?? []).find((c) => lopEm.has(str(c.lop)) || (lopBuoi && str(c.lop) === lopBuoi))
   if (caMo) return { ok: false, lyDo: 'ca-mo', error: `Lớp đang có ca kiểm tra mở (${str(caMo.ma_ca)}). Gửi câu xuống máy lúc này sẽ làm gián đoạn bài thi của các em. Ca đóng xong thầy mở lại.` }
-  const r = await goiPhong(env, buoiId, '/khoi', { buoiId, lop: lopBuoi || str(buoi.ten), ds: [...ds.values()].map((x) => ({ ...x, nangLuc: nangLuc.get(x.sbd) ?? 0.5 })) })
+  const r = await goiPhong(env, buoiId, '/khoi', { buoiId, lop: lopBuoi || str(buoi.ten), ds: [...ds.values()].map((x) => ({ ...x, nangLuc: nangLuc.get(x.sbd) ?? 0.5 })), live: { cho: coLive, sfu: sfuDaCauHinh(env) } })
   if (!r.ok) return r
   // Em đã điểm danh trước khi thầy mở bảng ⇒ kênh đẩy mở màn chờ trên máy các em.
   await baoMayCacEm(env, [...ds.values()].filter((x) => x.coMat).map((x) => x.sbd), 'bpu').catch(() => 0)
@@ -248,15 +259,17 @@ export async function vaoPhongBpu(req: Request, env: Env): Promise<Response> {
 // ── Durable Object ──
 const NHIP_TRA_MS = 120
 const chamSo = (traLoi: string, dapAn: string): boolean => grade({ phan: 'III', correct: dapAn }, traLoi)
-interface KemBpu { v: 'gv' | 'hs'; s: string }
 interface DongGhi { buoi_id: string; sbd: string; qid: string; luot: number; chon: string; dung: number; giay: number; kj: number; doi: number; roi: number; len_bang: number; luc: string }
 
 export class PhongBinhPhanUng {
   private st: L.TrangThaiPhong | null | undefined = undefined
   private henGui: ReturnType<typeof setTimeout> | null = null
   private lucPhat = 0
+  /** LIVE BẢNG (10/11, phong-live.ts): sổ nét, lô điểm đang viết, số em đang xem. */
+  private live: LiveMay
 
   constructor(private ctx: DurableObjectState, private env: Env) {
+    this.live = new LiveMay({ ctx, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat() })
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
   }
 
@@ -278,15 +291,17 @@ export class PhongBinhPhanUng {
     if (doi) await this.xepGhi(st)
     return doi
   }
-  private gui(ws: WsMayChu, d: string): void { try { ws.send(d) } catch { /* kết nối vừa đóng */ } }
+  private gui(ws: WsMayChu, d: string | Uint8Array): void { try { ws.send(d) } catch { /* kết nối vừa đóng */ } }
   private phat(): void {
     const st = this.st
     if (!st) return
     this.lucPhat = Date.now()
     if (this.henGui) { clearTimeout(this.henGui); this.henGui = null } // lần phát này đã mang trạng thái mới nhất ⇒ hẹn giờ gom cũ không cần nữa
-    const bang = JSON.stringify(L.viewBang(st, chamSo))
+    // Đọc dữ liệu gắn của các máy em MỘT lần: vừa để đếm «em đang xem live», vừa để phát view của từng em.
+    const hs = this.ctx.getWebSockets('hs'), kem = hs.map((ws) => ws.deserializeAttachment() as KemBpu | null)
+    const bang = JSON.stringify(L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st, kem) : undefined))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
-    for (const ws of this.ctx.getWebSockets('hs')) { const a = ws.deserializeAttachment() as KemBpu | null; if (a?.s) this.gui(ws, JSON.stringify(L.viewEm(st, a.s))) }
+    for (let i = 0; i < hs.length; i++) { const a = kem[i]; if (a?.s) this.gui(hs[i]!, JSON.stringify(L.viewEm(st, a.s))) }
   }
   /** Nhiều em NỘP DỒN (10/11, tác tử tốc độ): mỗi bài nộp từng phát view tới thầy + MỌI máy em (N em nộp = N×N tin, mỗi tin mang cả đề) ⇒ bảng vẽ lại mỗi tin.
    *  Nhịp: tin đầu đi NGAY (em nộp lẻ không trễ), các tin kế trong 120 ms gom thành MỘT lần phát (đúng trạng thái mới nhất). Em nộp vẫn nhận `tra-kq` ngay. */
@@ -334,6 +349,7 @@ export class PhongBinhPhanUng {
     L.ketThuc(st, Date.now())
     await this.ctx.storage.put('st', st)
     this.phat()
+    await this.live.ketThuc()
     await this.ghiD1()
   }
 
@@ -366,6 +382,9 @@ export class PhongBinhPhanUng {
         if (st?.ketThuc) await this.ghiD1()
         st = L.taoPhong({ buoiId: str(b.buoiId), lop: str(b.lop), nay, ds })
       } else for (const x of ds) { L.themEm(st, x.sbd, x.ten, x.nangLuc); if (x.coMat) L.vaoLop(st, x.sbd, x.luc ?? nay) } // em mới của lớp: thêm (CHƯA vào); em cũ: cập nhật năng lực, KHÔNG dời đội
+      // LIVE (10/11): công tắc `cau_hinh.live_bang` + «Worker đã có khoá SFU» nạp mỗi lần thầy mở phòng. Worker bản cũ không gửi ⇒ giữ nguyên.
+      const lv = b.live as { cho?: unknown; sfu?: unknown } | undefined
+      if (lv && typeof lv === 'object') datCoLive(st, { cho: lv.cho === true, sfu: lv.sfu === true }, nay)
       this.st = st
       await this.luu(); this.phat()
       return json({ ok: true })
@@ -392,7 +411,9 @@ export class PhongBinhPhanUng {
   }
 
   async webSocketMessage(ws: WsMayChu, goi: string | ArrayBuffer): Promise<void> {
-    if (typeof goi !== 'string' || goi.length > 2000) return
+    // LIVE (10/11): tin NHỊ PHÂN = mục sổ nét / lô điểm đang viết của máy thầy — đường riêng, không đụng luật lượt.
+    if (typeof goi !== 'string') { await this.live.nhiPhan(ws, goi); return }
+    if (goi.length > 2000) return
     let j: Row
     try { j = JSON.parse(goi) as Row } catch { return }
     const a = (ws.deserializeAttachment() ?? {}) as KemBpu
@@ -400,8 +421,17 @@ export class PhongBinhPhanUng {
     if (!st) { this.gui(ws, JSON.stringify({ t: 'chua-mo' })); return }
     const nay = Date.now()
     // Em NỐI LẠI (tắt hẳn app rồi mở lại sau khi đã báo `roi` — không kịp gửi `ve`) ⇒ coi như đã quay lại: gỡ khỏi «đang rời», bảng tắt báo động.
-    if (j.t === 'chao') { const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay); this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st, chamSo) : L.viewEm(st, a.s))); if (!veLai) return; j = { t: 'chao-ve' } as Row }
+    if (j.t === 'chao') {
+      // LIVE: thầy bỏ quên live quá 15 phút ⇒ tắt trước khi trả view; em kèm `net` (số thứ tự nét cuối đã có) ⇒ gửi bù phần sổ nét còn thiếu sau view.
+      if (st.live?.bat && !st.ketThuc) await this.live.tuTat(st, nay)
+      const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay)
+      this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st) : undefined) : L.viewEm(st, a.s)))
+      if (a.v === 'hs' && a.s && typeof j.net === 'number' && !st.ketThuc) await this.live.guiBu(st, ws, j.net)
+      if (!veLai) return
+      j = { t: 'chao-ve' } as Row
+    }
     if (st.ketThuc) return
+    if (await this.live.tinChu(ws, a, j, st, nay)) return
     let doi = j.t === 'chao-ve', gom = false
     if (a.v === 'hs') {
       const s = a.s
@@ -428,8 +458,9 @@ export class PhongBinhPhanUng {
     if (gom) this.phatSau(); else if (j.t === 'tra') this.phatNhip(); else this.phat()
   }
 
-  async webSocketClose(): Promise<void> { /* rời màn do máy em tự báo (`roi` / `ve`); rớt kết nối KHÔNG tính rời, không vào `roiNay` */ }
-  async webSocketError(): Promise<void> { /* như trên */ }
+  // Rời màn do máy em tự báo (`roi` / `ve`); rớt kết nối KHÔNG tính rời, không vào `roiNay`. LIVE: kết nối đóng ⇒ bỏ khỏi danh sách nhận điểm, báo lại số em xem.
+  async webSocketClose(ws?: WsMayChu): Promise<void> { this.live.dong(ws) }
+  async webSocketError(ws?: WsMayChu): Promise<void> { this.live.dong(ws) }
   /** Hẹn giờ: lượt đang làm quá mốc ⇒ tự mở đáp án rồi hẹn mốc 24 giờ; chưa tới mốc ⇒ hẹn lại; không còn lượt mở ⇒ hết 24 giờ không thao tác ⇒ kết thúc. */
   async alarm(): Promise<void> {
     const st = await this.doc()
