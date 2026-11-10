@@ -1,0 +1,940 @@
+{
+  "i": 955,
+  "hash": "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5.png",
+  "size": [
+    687,
+    504
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C2-B5-II-1",
+      "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber – Bosch. Phản ứng tổng hợp ammonia:\nN₂ (g) + 3H₂ (g) ⇌ 2NH₃ (g), ΔrH°₂₉₈ = -91,8 kJ. Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây.",
+      "allHinh": [
+        {
+          "hash": "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5",
+          "where": "11-C2-B5-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "6aa94458f3a198bcbac4f17fc52b1fc88855387708e9c30f6412c8db78077295"
+        }
+      ],
+      "missingHashes": [
+        "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5"
+      ]
+    },
+    {
+      "qid": "DB-11-B5-D1-II-2",
+      "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber – Bosch. Phản ứng tổng hợp ammonia:\nN₂ (g) + 3H₂ (g) ⇌ 2NH₃ (g), ΔrH°₂₉₈ = -91,8 kJ. Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây.",
+      "allHinh": [
+        {
+          "hash": "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5",
+          "where": "DB-11-B5-D1-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "6aa94458f3a198bcbac4f17fc52b1fc88855387708e9c30f6412c8db78077295"
+        }
+      ],
+      "missingHashes": [
+        "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/955-native2x-lo339.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownOrigin10xOpened": "/workspace/scratch/955-origin10x-lo339.png",
+    "ownYLabel3xOpened": "/workspace/scratch/955-ylabel3x-own.png"
+  },
+  "geometry": {
+    "classification": "Fivepressure-yieldcurveswithtemperaturetags, nolegend/chemicalanswer.",
+    "axes": {
+      "origin": [
+        95,
+        430
+      ],
+      "xEnd": [
+        566,
+        430
+      ],
+      "yEnd": [
+        95,
+        32
+      ],
+      "heads": "2smallfilledgraytriangles UPandRIGHT",
+      "widthApprox": 3
+    },
+    "xTicks": [
+      {
+        "text": "0",
+        "x": 95,
+        "fromY": 430,
+        "toY": 438,
+        "labelCenterY": 456
+      },
+      {
+        "text": "100",
+        "x": 188,
+        "fromY": 430,
+        "toY": 438,
+        "labelCenterY": 456
+      },
+      {
+        "text": "200",
+        "x": 280,
+        "fromY": 430,
+        "toY": 438,
+        "labelCenterY": 456
+      },
+      {
+        "text": "300",
+        "x": 372,
+        "fromY": 430,
+        "toY": 438,
+        "labelCenterY": 456
+      },
+      {
+        "text": "400",
+        "x": 465,
+        "fromY": 430,
+        "toY": 438,
+        "labelCenterY": 456
+      }
+    ],
+    "yTicks": [
+      {
+        "text": "0",
+        "y": 430,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "10",
+        "y": 379,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "20",
+        "y": 327,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "30",
+        "y": 276,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "40",
+        "y": 225,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "50",
+        "y": 174,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "60",
+        "y": 123,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      },
+      {
+        "text": "70",
+        "y": 71,
+        "fromX": 95,
+        "toX": 87,
+        "labelRightX": 83
+      }
+    ],
+    "grid": {
+      "verticalX": [
+        143,
+        188,
+        233,
+        280,
+        326,
+        372,
+        419,
+        465,
+        512
+      ],
+      "verticalYBounds": [
+        39,
+        430
+      ],
+      "horizontalY": [
+        71,
+        123,
+        174,
+        225,
+        276,
+        327,
+        379
+      ],
+      "horizontalXBounds": [
+        95,
+        561
+      ],
+      "countVertical": 9,
+      "countHorizontal": 7,
+      "style": "verylightgraytinyDOTTEDlines, notsolid/dashguides. extendsABOVE70line71toy39; preserve."
+    },
+    "axisLabels": [
+      {
+        "text": "Hiệu suất (%)",
+        "bbox": [
+          29,
+          153,
+          54,
+          304
+        ],
+        "rotation": -90,
+        "font": "BOLDuprightserif"
+      },
+      {
+        "text": "Áp suất (atm)",
+        "bbox": [
+          507,
+          440,
+          649,
+          467
+        ],
+        "font": "BOLDuprightserif",
+        "note": "No450ticklabel/stem;titlebeginsnearendpoint450gridbutnotadataannotation"
+      }
+    ],
+    "curves": [
+      {
+        "temperatureLiteral": "350 °C",
+        "pixelSamples": [
+          [
+            95,
+            430
+          ],
+          [
+            105,
+            359
+          ],
+          [
+            110,
+            343
+          ],
+          [
+            115,
+            333
+          ],
+          [
+            120,
+            320
+          ],
+          [
+            143,
+            278.5
+          ],
+          [
+            188,
+            224.5
+          ],
+          [
+            233,
+            188
+          ],
+          [
+            280,
+            159
+          ],
+          [
+            326,
+            138
+          ],
+          [
+            372,
+            122
+          ],
+          [
+            419,
+            111.5
+          ],
+          [
+            465,
+            105.5
+          ],
+          [
+            505,
+            104
+          ],
+          [
+            512,
+            104
+          ]
+        ],
+        "endpointCircle": {
+          "center": [
+            512,
+            104
+          ],
+          "r": 4.5,
+          "fill": "white",
+          "outline": "gray"
+        },
+        "connector": [
+          [
+            516,
+            104
+          ],
+          [
+            555,
+            104
+          ]
+        ],
+        "tag": {
+          "rect": [
+            565,
+            85,
+            645,
+            124
+          ],
+          "leftTriangularNotchTip": [
+            555,
+            104
+          ],
+          "leftNotchBase": [
+            [
+              565,
+              97
+            ],
+            [
+              565,
+              111
+            ]
+          ],
+          "fill": "darkgray",
+          "textColor": "white",
+          "font": "BOLDuprightsans",
+          "labelBBox": [
+            574,
+            91,
+            634,
+            116
+          ]
+        },
+        "shape": "Sourcecurveincreasesoverallthennearlyflat, DO NOTforceglobalmonotonicifnativeendpointtinyfall/inkvariation. Finiteextensionafterhollowmarkerseparate."
+      },
+      {
+        "temperatureLiteral": "400 °C",
+        "pixelSamples": [
+          [
+            95,
+            430
+          ],
+          [
+            110,
+            357
+          ],
+          [
+            115,
+            347.5
+          ],
+          [
+            120,
+            338
+          ],
+          [
+            143,
+            303.5
+          ],
+          [
+            188,
+            259
+          ],
+          [
+            233,
+            228
+          ],
+          [
+            280,
+            203.5
+          ],
+          [
+            326,
+            186.5
+          ],
+          [
+            372,
+            173.5
+          ],
+          [
+            419,
+            164.5
+          ],
+          [
+            465,
+            159.5
+          ],
+          [
+            505,
+            158.5
+          ],
+          [
+            512,
+            158
+          ]
+        ],
+        "endpointCircle": {
+          "center": [
+            512,
+            158
+          ],
+          "r": 4.5,
+          "fill": "white",
+          "outline": "gray"
+        },
+        "connector": [
+          [
+            516,
+            158
+          ],
+          [
+            555,
+            158
+          ]
+        ],
+        "tag": {
+          "rect": [
+            565,
+            139,
+            645,
+            178
+          ],
+          "leftTriangularNotchTip": [
+            555,
+            158
+          ],
+          "leftNotchBase": [
+            [
+              565,
+              151
+            ],
+            [
+              565,
+              165
+            ]
+          ],
+          "fill": "darkgray",
+          "textColor": "white",
+          "font": "BOLDuprightsans",
+          "labelBBox": [
+            574,
+            145,
+            634,
+            170
+          ]
+        },
+        "shape": "Sourcecurveincreasesoverallthennearlyflat, DO NOTforceglobalmonotonicifnativeendpointtinyfall/inkvariation. Finiteextensionafterhollowmarkerseparate."
+      },
+      {
+        "temperatureLiteral": "450 °C",
+        "pixelSamples": [
+          [
+            95,
+            430
+          ],
+          [
+            105,
+            383
+          ],
+          [
+            110,
+            372
+          ],
+          [
+            115,
+            363.5
+          ],
+          [
+            120,
+            356
+          ],
+          [
+            143,
+            327.5
+          ],
+          [
+            188,
+            291.5
+          ],
+          [
+            233,
+            266
+          ],
+          [
+            280,
+            247
+          ],
+          [
+            326,
+            233
+          ],
+          [
+            372,
+            223
+          ],
+          [
+            419,
+            215.5
+          ],
+          [
+            465,
+            211.5
+          ],
+          [
+            505,
+            210
+          ],
+          [
+            512,
+            210
+          ]
+        ],
+        "endpointCircle": {
+          "center": [
+            512,
+            210
+          ],
+          "r": 4.5,
+          "fill": "white",
+          "outline": "gray"
+        },
+        "connector": [
+          [
+            516,
+            210
+          ],
+          [
+            555,
+            210
+          ]
+        ],
+        "tag": {
+          "rect": [
+            565,
+            191,
+            645,
+            230
+          ],
+          "leftTriangularNotchTip": [
+            555,
+            210
+          ],
+          "leftNotchBase": [
+            [
+              565,
+              203
+            ],
+            [
+              565,
+              217
+            ]
+          ],
+          "fill": "darkgray",
+          "textColor": "white",
+          "font": "BOLDuprightsans",
+          "labelBBox": [
+            574,
+            197,
+            634,
+            222
+          ]
+        },
+        "shape": "Sourcecurveincreasesoverallthennearlyflat, DO NOTforceglobalmonotonicifnativeendpointtinyfall/inkvariation. Finiteextensionafterhollowmarkerseparate."
+      },
+      {
+        "temperatureLiteral": "500 °C",
+        "pixelSamples": [
+          [
+            95,
+            430
+          ],
+          [
+            105,
+            394
+          ],
+          [
+            110,
+            386.5
+          ],
+          [
+            115,
+            379.5
+          ],
+          [
+            120,
+            373.5
+          ],
+          [
+            143,
+            352.5
+          ],
+          [
+            188,
+            324.5
+          ],
+          [
+            233,
+            306
+          ],
+          [
+            280,
+            290.5
+          ],
+          [
+            326,
+            279.5
+          ],
+          [
+            372,
+            272.5
+          ],
+          [
+            419,
+            266.5
+          ],
+          [
+            465,
+            263.5
+          ],
+          [
+            505,
+            262.5
+          ],
+          [
+            512,
+            263
+          ]
+        ],
+        "endpointCircle": {
+          "center": [
+            512,
+            263
+          ],
+          "r": 4.5,
+          "fill": "white",
+          "outline": "gray"
+        },
+        "connector": [
+          [
+            516,
+            263
+          ],
+          [
+            555,
+            263
+          ]
+        ],
+        "tag": {
+          "rect": [
+            565,
+            244,
+            645,
+            283
+          ],
+          "leftTriangularNotchTip": [
+            555,
+            263
+          ],
+          "leftNotchBase": [
+            [
+              565,
+              256
+            ],
+            [
+              565,
+              270
+            ]
+          ],
+          "fill": "darkgray",
+          "textColor": "white",
+          "font": "BOLDuprightsans",
+          "labelBBox": [
+            574,
+            250,
+            634,
+            275
+          ]
+        },
+        "shape": "Sourcecurveincreasesoverallthennearlyflat, DO NOTforceglobalmonotonicifnativeendpointtinyfall/inkvariation. Finiteextensionafterhollowmarkerseparate.",
+        "endpointFallNote": "500°Csample505,262.5→512,263 isSLIGHTFALLinphysicalheight, literal0.5pixel ydown; do notforcepositiveorzero derivative."
+      },
+      {
+        "temperatureLiteral": "550 °C",
+        "pixelSamples": [
+          [
+            95,
+            430
+          ],
+          [
+            105,
+            406.5
+          ],
+          [
+            110,
+            400
+          ],
+          [
+            115,
+            396
+          ],
+          [
+            120,
+            391.5
+          ],
+          [
+            143,
+            377
+          ],
+          [
+            188,
+            358
+          ],
+          [
+            233,
+            344.5
+          ],
+          [
+            280,
+            334.5
+          ],
+          [
+            326,
+            327.5
+          ],
+          [
+            372,
+            321.5
+          ],
+          [
+            419,
+            318
+          ],
+          [
+            465,
+            316
+          ],
+          [
+            505,
+            315.5
+          ],
+          [
+            512,
+            315
+          ]
+        ],
+        "endpointCircle": {
+          "center": [
+            512,
+            315
+          ],
+          "r": 4.5,
+          "fill": "white",
+          "outline": "gray"
+        },
+        "connector": [
+          [
+            516,
+            315
+          ],
+          [
+            555,
+            315
+          ]
+        ],
+        "tag": {
+          "rect": [
+            565,
+            296,
+            645,
+            335
+          ],
+          "leftTriangularNotchTip": [
+            555,
+            315
+          ],
+          "leftNotchBase": [
+            [
+              565,
+              308
+            ],
+            [
+              565,
+              322
+            ]
+          ],
+          "fill": "darkgray",
+          "textColor": "white",
+          "font": "BOLDuprightsans",
+          "labelBBox": [
+            574,
+            302,
+            634,
+            327
+          ]
+        },
+        "shape": "Sourcecurveincreasesoverallthennearlyflat, DO NOTforceglobalmonotonicifnativeendpointtinyfall/inkvariation. Finiteextensionafterhollowmarkerseparate."
+      }
+    ],
+    "font": "TicknumbersBOLDuprightsansgray;axislabelsBOLDuprightserif;temperaturetaglabelsBOLDuprightsansWHITE, preserve°Ccircle/capitalC. Noitalic.",
+    "counts": {
+      "curves": 5,
+      "hollowCircles": 5,
+      "temperatureBoxes": 5,
+      "axisHeads": 2,
+      "tagNotchTips": 5,
+      "xNumLabels": 5,
+      "yNumLabels": 8,
+      "gridV": 9,
+      "gridH": 7
+    },
+    "noAdded": [
+      "450xvalue",
+      "newcurvelegend",
+      "NH3formula",
+      "yieldexactabundance",
+      "equilibriumconstant",
+      "verticalmarkerlabels",
+      "frameborder",
+      "scientificnormalization"
+    ]
+  },
+  "coordinateMeaning": "Pixelcurvecenterlines sampledfromnative, notnewscientificdataset. Printedtemperaturetags/axesliteralonly.",
+  "originSupplement": {
+    "method": "Ownnative10xvisualmacro plusnativegrayrowprofiles, thresholdonlyassistedlocatinginknotautomaticcurvecount. Wherecurvesoverlapcannotseparatesafely, valuesNULLnotinterpolatedguess.",
+    "x100": {
+      "eachCurveY": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "combinedInkY": [
+        372,
+        417
+      ],
+      "reason": "All5bandsmergewithoneanother/nearaxis; noindependentcenterlineforall5proven."
+    },
+    "x105": {
+      "eachCurveY": [
+        359,
+        null,
+        383,
+        394,
+        406.5
+      ],
+      "uncertainSecondBandY": [
+        365,
+        379
+      ],
+      "reason": "Firstdarktraceandlast3bandsseparable;400°Cgraycurveoverlapsfanbetweenfirst/third, noexactcenterguessed."
+    },
+    "x110": {
+      "eachCurveY": [
+        343,
+        357,
+        372,
+        386.5,
+        400
+      ],
+      "nativeBandRanges": [
+        [
+          339,
+          347
+        ],
+        [
+          350,
+          363
+        ],
+        [
+          368,
+          376
+        ],
+        [
+          384,
+          389
+        ],
+        [
+          398,
+          402
+        ]
+      ],
+      "precision": "Approxvisualcenterlines, first2graybandscontactsbutdifferentvisibletones, keepnativebandthickness."
+    },
+    "x115": {
+      "eachCurveY": [
+        333,
+        347.5,
+        363.5,
+        379.5,
+        396
+      ],
+      "nativeBandRanges": [
+        [
+          330,
+          336
+        ],
+        [
+          344,
+          351
+        ],
+        [
+          360,
+          367
+        ],
+        [
+          377,
+          382
+        ],
+        [
+          394,
+          398
+        ]
+      ],
+      "precision": "All5inkbandsvisuallydistinctwithlightgaps, mostreliableadditionalpoints."
+    },
+    "doNotForce": "DoNOTassertanalytictangent/derivativeor5separatepointsatx100; preserveobservedmergedfanink."
+  },
+  "corrections": [
+    {
+      "finding": "Ylabelbbox bottom384 wastranscriptionerror. Ownnativecrop20,140..60,400 viewedconfirmsliteralinkbottom304, revisedbbox29,153..54,304; labelcenterapprox42,228.5.",
+      "old": [
+        29,
+        152,
+        54,
+        384
+      ],
+      "new": [
+        29,
+        153,
+        54,
+        304
+      ]
+    }
+  ]
+}

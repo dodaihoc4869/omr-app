@@ -1,0 +1,40 @@
+[
+  {
+    "i": 955,
+    "hash": "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5",
+    "fileNguon": "anh/ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5.png",
+    "svg": "do-thi-hieu-suat-native955-ddh-b1d6ebb16407b5c6bccc6c3532f41a232b8ce219453728754c5fd3642647d557.svg",
+    "hashSvg": "b1d6ebb16407b5c6bccc6c3532f41a232b8ce219453728754c5fd3642647d557",
+    "byteSvg": 50769,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C2-B5-II-1",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber – Bosch. Phản ứng tổng hợp ammonia:\nN₂ (g) + 3H₂ (g) ⇌ 2NH₃ (g), ΔrH°₂₉₈ = -91,8 kJ. Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "hash": "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5",
+            "where": "11-C2-B5-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "6aa94458f3a198bcbac4f17fc52b1fc88855387708e9c30f6412c8db78077295"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B5-D1-II-2",
+        "de": "Trong công nghiệp, ammonia được tổng hợp từ nitrogen và hydrogen theo phương pháp Haber – Bosch. Phản ứng tổng hợp ammonia:\nN₂ (g) + 3H₂ (g) ⇌ 2NH₃ (g), ΔrH°₂₉₈ = -91,8 kJ. Kết quả nghiên cứu sự phụ thuộc của hiệu suất tổng hợp ammonia vào áp suất và nhiệt độ của phản ứng được thể hiện ở giản đồ trong hình dưới đây.",
+        "refs": [
+          {
+            "hash": "ac8a47ca4fc7847140bf64a62b9ba38695f672a47559f1d98b64f5b3c60900a5",
+            "where": "DB-11-B5-D1-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "6aa94458f3a198bcbac4f17fc52b1fc88855387708e9c30f6412c8db78077295"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5graycurves5HOLLOWcircles5temperaturetags350-400-450-500-550°C/9V7Hdottedgrid/2filledaxisheads/5X8Ynumbers2originzeros/no450Xtick/ALLtrueDAMupright/Hiệu suất (%)-Áp suất (atm)/pixelSamplesPCHIP-noaddedNH3-answer-noalias1095",
+    "hashSvgDaSoat": "b1d6ebb16407b5c6bccc6c3532f41a232b8ce219453728754c5fd3642647d557",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

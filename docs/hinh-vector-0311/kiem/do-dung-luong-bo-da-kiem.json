@@ -1,9 +1,9 @@
 {
-  "nguonDaDoiChieu": 968,
-  "anhGocRiengByte": 12721077,
-  "svgRieng": 711,
-  "svgRawByte": 13531421,
-  "svgGzipFileByte": 2469316,
+  "nguonDaDoiChieu": 969,
+  "anhGocRiengByte": 12750597,
+  "svgRieng": 712,
+  "svgRawByte": 13582190,
+  "svgGzipFileByte": 2477632,
   "ghiChu": "Chỉ bộ đã kiểm. gzip đo từng tệp tại máy, chưa phải byte tải sản phẩm.Chưa đo quota/cache/reload offline app, không ngoại suy toàn kho.",
-  "scopeFont": "1346 câu đủ mọi hình theo bộ trộn snapshot/7 partial;968 nguồn→711SVG;13531421 byte/localgzip 2469316;460 nguồn chưa đạt. FontNAamr128SVG/129sources/175câu đủ;còn583SVG/839sources(415explicitDDH+168nonexplicit chưa phânloại). Localgzip không phải byte mạng sản phẩm."
+  "scopeFont": "1348 câu đủ mọi hình theo bộ trộn snapshot/7 partial;969 nguồn→712SVG;13582190 byte/localgzip 2477632;459 nguồn chưa đạt. FontNAamr129SVG/130sources/177câu đủ;còn583SVG/839sources(415explicitDDH+168nonexplicit chưa phânloại). Localgzip không phải byte mạng sản phẩm."
 }
