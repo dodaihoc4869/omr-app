@@ -7,7 +7,8 @@ vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'htt
 const phanHoi = vi.hoisted(() => vi.fn())
 vi.mock('../src/lib/phan-hoi', () => ({ phanHoi }))
 const moBpuHs = vi.hoisted(() => vi.fn(() => true))
-vi.mock('../src/components/bpu/gan-hs', () => ({ moBpuHs }))
+// 10/11: nút «Vào Bình Phản Ứng» gọi thêm xinQuyenTatMan (947b2cac5) và nối sẵn nenBpuHs — bản giả phải có đủ, không thì nút rơi vào «Chưa mở được»
+vi.mock('../src/components/bpu/gan-hs', () => ({ moBpuHs, xinQuyenTatMan: () => {}, nenBpuHs: () => {} }))
 import { MenuDocTrong, MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import type { TomTatKiemTra } from '../src/lib/kiem-tra-ca-nhan'
 

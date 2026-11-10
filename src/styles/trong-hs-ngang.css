@@ -39,11 +39,8 @@
  * Máy gập mở / máy tính bảng nhỏ (hai cột theo bo-cuc-lam.ts, rộng < 1000, cao > 520): cùng bố cục đường chặng | cột tóm tắt ghim như máy tính (trước: một
  * cột kiểu điện thoại dọc, cột tóm tắt ẩn). */
 @media (max-height: 520px) and (min-width: 600px) {
-  :root[data-trong='hs'] .ht2[data-mot] .dm-ben { position: sticky; top: 12px; align-self: start; }
   :root[data-trong='hs'] .ht2[data-mot] .da-nut[data-tt='dang'] { scroll-margin-top: 104px; }
 }
 @media (orientation: landscape) and (min-width: 640px) and (max-width: 999px) and (min-height: 521px), (min-width: 700px) and (max-width: 999px) and (min-aspect-ratio: 10/13) and (min-height: 521px) {
-  :root[data-trong='hs'] .ht2[data-mot] .dm-khung:not([data-muc]) { grid-template-columns: minmax(0, 1fr) 290px; column-gap: 20px; }
-  :root[data-trong='hs'] .ht2[data-mot] .dm-khung:not([data-muc]) .dm-ben { display: flex; flex-direction: column; gap: 14px; position: sticky; top: 72px; align-self: start; padding-top: 16px; }
   :root[data-trong='hs'] .ht2[data-mot] .da-nut[data-tt='dang'] { scroll-margin-top: 104px; }
 }

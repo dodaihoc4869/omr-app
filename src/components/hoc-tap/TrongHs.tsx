@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
 import { chuViecBai } from './chu-viec-bai'
+import { laLop12 } from './la-lop-12'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { NHAN_LOAI_NGAY, bongHoc, chuNutLoai, nhomDangSua, type LoaiNgay } from './loai-ngay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
@@ -61,6 +62,7 @@ const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
+const DemNguocThi = lazy(() => import('./DemNguocThi').catch(() => ({ default: () => null }))) // 10/11: đầu cột phải khổ ≥ 1100
 const NhomSuaHomNay = lazy(() => import('./NhomSuaHomNay').catch(() => ({ default: () => null }))) // khối B lát 3: chỉ ngày Sửa, kho tải ngầm
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
@@ -96,7 +98,7 @@ function chamSoApp(n: number): void {
 // ── SỐ CỦA EM TRONG HÀNG ĐẦU MENU (thầy 27/10 xem bản sống: «Ko làm hai ẩn, chuyển hết 4 biểu tượng bên trái vào menu ẩn bên phải… thiết kế tinh tế dễ nhìn
 // siêu đẹp» · «Chuyển hết vào menu này» · «Cho nó xếp dọc tinh tế bỏ nền thẳng hàng với cái chuông để ko phải thêm hàng vào menu»): bỏ viên mép trái (PR 501);
 // · «Ý tôi là để dọc xuống thẳng hàng cách đều dưới cái chuông»: 4 mục — vòng mục tiêu · lửa · nguyên tử · tinh thể — biểu tượng trên, số dưới, không nền,
-// thành CỘT DỌC bên phải 6 mục của MENU ĐANG CÓ, ngay dưới chuông, cùng trục (ô #tr-menu-dem của MenuDocTrong); không thêm hàng, menu rộng thêm đúng bề cột. Điện thoại / xoay ngang: menu ẩn mép phải; máy tính ≥ 1024 × 600: thanh menu trái.
+// thành CỘT DỌC bên phải 6 mục của menu, ngay dưới chuông, cùng trục (ô #tr-menu-dem của MenuDocTrong).
 // Vẽ bằng portal vào ô ấy (menu là cây React khác); chạm ô ⇒ mở màn như cũ + menu thu (MenuDocTrong nghe click DOM của ô). Nội dung lấy lại TOÀN bộ bề ngang.
 /** Ô #tr-menu-dem trong menu (chưa vẽ xong ⇒ thử lại vài khung hình). Không có menu ⇒ không vẽ số (không chỗ nổi nào khác). */
 function useChoSo(bat: boolean): HTMLElement | null {
@@ -676,7 +678,7 @@ function LoiBi({ cam, loi, coBi = true, khoa, cap = 0, ben, chanNgon: laChanNgon
   const bongGoc = useBongVuaChu(!!goc, loi) // thầy 03/11 «khung bong bóng vừa với chữ» (src/lib/bong-vua-chu.ts)
   // màu bong bóng theo cảm xúc (trong-hs.css .bi-loi-bong[data-cx]): cấp ≥ 2 ⇒ dỗi · bực · cáu · rất cáu; còn lại theo mặt Mol
   const cx = cap >= 2 ? (['doi', 'buc', 'cau', 'ratCau'] as const)[Math.min(cap, 5) - 2] : cam === 'mung' || cam === 'lua' ? 'khen' : cam === 'sai' ? 'buon' : cam
-  // MOL Ở GÓC TRÁI THẺ ĐẦU (thầy 03/11 «cho mol hiển thị lên bảng đầu tiên góc trái … hiển thị cả bong bóng cảm xúc», chốt bản vẽ docs/ban-ve-mol-goc-0311): Mol nhỏ ở góc trái thẻ «Tổng câu hôm nay», bong bóng cảm xúc cạnh Mol
+  // MOL Ở GÓC TRÁI THẺ ĐẦU (thầy 03/11, bản vẽ docs/ban-ve-mol-goc-0311): Mol nhỏ ở góc trái thẻ «Tổng câu hôm nay», bong bóng cảm xúc cạnh Mol
   if (goc) return <div className="kb-mol"><Bi cam={cam} cap={cap} size={MOL_GOC} noi={loi} /><p ref={bongGoc} className="bi-loi-bong kb-mol-bong" data-cap={cap >= 4 ? cap : undefined} data-cx={cx} data-chan-ngon={laChanNgon || undefined}><span className="ht2-an">{loi}</span><span aria-hidden="true">{loi.slice(0, n)}<span className="bi-loi-con">{loi.slice(n)}</span></span></p></div>
   if (pha === 'an') return null
   // cấp 4–5: viền bong bóng màu «sai» (token có sẵn). `ben` (điện thoại ngang thấp): bong bóng nói CẠNH Lửa trên đường, đuôi chỉ xuống Lửa.
@@ -1156,7 +1158,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       </section>
       {/* hệ Kính: băng ca kiểm tra / đủ mức đứng DƯỚI thẻ mức (đầu trang luôn là lời chào) */}
       {chinh === 'ca' && <section className="da-bang" data-sac="tin" aria-label="Ca kiểm tra đang mở"><span className="h"><ClipboardCheck size={26} aria-hidden="true" /></span><div className="giua"><b>Ca kiểm tra đang mở</b><span className="mo">Nhập mã ca và mật khẩu thầy cung cấp để vào phòng kiểm tra.</span></div><button type="button" className="nut-to" onClick={p.onThi}>Vào ca kiểm tra</button></section>}
-      {/* 28/10 + 02/11: xong hết ⇒ thẻ chúc mừng (câu học · câu sửa · Kiểm tra ôn tập); còn việc ⇒ «Đủ x/y câu hôm nay! · Tiếp theo: …»; vượt mức ⇒ «Đủ mức hôm nay! Đã làm 17 câu (mức 12)» (lam-bai.ts vuotMuc). */}
+      {/* 28/10 + 02/11: xong hết ⇒ thẻ chúc mừng; còn việc ⇒ «Đủ x/y câu hôm nay! · Tiếp theo: …»; vượt mức ⇒ «Đủ mức hôm nay! …» (lam-bai.ts vuotMuc). */}
       {du && chinh !== 'ca' && so && <section className="da-bang" data-sac="dung" aria-label={tiepTheo.length ? 'Đủ mức hôm nay' : 'Hoàn thành bài hôm nay'}><span className="h"><Check size={26} strokeWidth={3} aria-hidden="true" /></span><div className="giua">{tiepTheo.length
         ? <><b>{vuotMuc(so) ? `Đủ mức hôm nay! Đã\u00a0làm\u00a0${so.daLam}\u00a0câu\u00a0(mức\u00a0${so.muc})` : `Đủ ${so.daLam}/${so.muc} câu hôm nay!`}</b><span className="mo">Tiếp theo: {tiepTheo.join(', rồi ')}</span></>
         : <><b>Chúc mừng, em đã hoàn thành bài hôm nay!</b><span className="mo">{so.daLam} câu học{daSuaNay ? ` · ${daSuaNay} câu sửa` : ''}{kiem?.homNay && kiem.nopLuc !== null ? ` · Kiểm tra ôn tập ${kiem.diem !== null ? `${diemChu(kiem.diem)}/10` : 'đã nộp'}` : ''}</span></>}</div></section>}
@@ -1175,11 +1177,12 @@ export function MotTrangHs(p: PropsMotTrang) {
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
           <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
-      </div><div className="kb-cot-phai">
       {p.goi7 && !p.ngayKiem && (p.loaiNgay === 'sua' || p.goi7.goi.some(g => g.quaHan && g.con > 0)) && <Suspense fallback={null}><NhomSuaHomNay g={p.goi7} token={p.token} /></Suspense>}
       {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
         <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {so && !p.dangTai && !nut.length && <ViecTrong />}
+      </div><div className="kb-cot-phai">
+      {hs?.lop && laLop12(hs.lop) && <Suspense fallback={null}><DemNguocThi lop={hs.lop} /></Suspense>}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {!(!so && p.dangTai) && <TheRuong ds={nut} token={p.token} tq={tq} onNhiemVu={() => moTp('nhiem-vu')} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
