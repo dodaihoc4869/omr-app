@@ -1,0 +1,89 @@
+# CÀI CLOUDFLARE REALTIME SFU CHO LIVE BẢNG (10/11, đặc tả docs/dac-ta-live-bang-1011.md điểm quyết 1). CHỈ chạy khi bấm tay (workflow_dispatch).
+# Việc: đưa App ID + App Secret của ứng dụng SFU `omr-live` vào Worker `omr` dưới dạng Worker secrets `REALTIME_APP_ID` / `REALTIME_APP_SECRET`
+# (server/src/live-sfu.ts đọc; KHÔNG ghi vào git / wrangler.toml).
+#   NHÁNH CHÍNH: có GitHub secrets `CF_REALTIME_APP_ID` + `CF_REALTIME_APP_SECRET` (thầy tạo ứng dụng trong dashboard: Realtime → Serverless SFU)
+#     ⇒ KIỂM SỐNG (tạo thử một phiên SFU rồi bỏ — phiên chưa nối tự hết hạn) ⇒ đạt mới `wrangler secret put` hai giá trị ⇒ soát lại tên secret trên Worker.
+#   NHÁNH PHỤ: thiếu secrets nhưng khoá `CLOUDFLARE_API_TOKEN` có quyền Realtime ⇒ tìm ứng dụng tên `omr-live`; CHƯA có thì tạo MỘT cái rồi đặt Worker secrets
+#     từ kết quả; ĐÃ có thì KHÔNG tạo trùng (API không trả lại App Secret của ứng dụng cũ ⇒ báo thầy dán hai secrets).
+# KHÔNG in App ID, App Secret, mã phiên, khoá API: mọi giá trị đều `::add-mask::`. Chỉ in: mã HTTP, «đạt / không đạt», và một trong
+#   «ĐÃ CẤU HÌNH» · «THIẾU SECRET <tên>» · «THIẾU QUYỀN».
+# `wrangler secret put` tạo một bản Worker mới CHỈ khác biến bí mật (không đẩy mã của nhánh đang chạy).
+name: Cài Cloudflare Realtime SFU cho Live (10/11)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cai-realtime-1011
+  cancel-in-progress: false
+jobs:
+  cai:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đặt Worker secrets REALTIME_APP_ID + REALTIME_APP_SECRET
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          ID_THO: ${{ secrets.CF_REALTIME_APP_ID }}
+          BM_THO: ${{ secrets.CF_REALTIME_APP_SECRET }}
+        run: |
+          set -euo pipefail
+          # Bỏ xuống dòng, khoảng trắng, ngoặc kép, tiền tố «TEN_BIEN=» dán thừa (như lam-sach-khoa-cf.sh). Giá trị đã sạch cũng phải che.
+          sach() { printf '%s' "${1:-}" | tr -d '\r\n' | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//; s/^[A-Z][A-Z0-9]*_[A-Z0-9_]*[[:space:]]*[=:][[:space:]]*//; s/^["'\'']//; s/["'\'']$//'; }
+          che() { if [ -n "$1" ]; then echo "::add-mask::$1"; fi; }
+          ID=$(sach "${ID_THO:-}"); BM=$(sach "${BM_THO:-}")
+          che "$ID"; che "$BM"
+
+          # KIỂM SỐNG: tạo thử một phiên SFU bằng App ID + App Secret. Chỉ in mã HTTP + đạt / không đạt.
+          kiem_song() {
+            local ma
+            ma=$(curl -sS -m 30 -o /tmp/phien.json -w '%{http_code}' -X POST -H "Authorization: Bearer $2" "https://rtc.live.cloudflare.com/v1/apps/$1/sessions/new" || echo 000)
+            if { [ "$ma" = 200 ] || [ "$ma" = 201 ]; } && jq -e '(.sessionId // "") | length > 0' /tmp/phien.json >/dev/null 2>&1; then
+              rm -f /tmp/phien.json; echo "Kiểm sống Realtime SFU (tạo thử một phiên): HTTP $ma · đạt"; return 0
+            fi
+            echo "Kiểm sống Realtime SFU (tạo thử một phiên): HTTP $ma · không đạt · mã lỗi: $(jq -r '.errorCode // "không rõ"' /tmp/phien.json 2>/dev/null || echo 'không phải JSON')"
+            rm -f /tmp/phien.json; return 1
+          }
+          dat() {
+            if printf '%s' "$2" | npx -y wrangler@4 secret put "$1" >/tmp/dat.log 2>&1; then echo "Đã đặt Worker secret $1."; else echo "::error::Không đặt được Worker secret $1 (xem dòng cuối, giá trị đã che):"; tail -n 5 /tmp/dat.log; return 1; fi
+          }
+          # Tên các secret Worker đang có (wrangler chỉ trả TÊN, không trả giá trị).
+          co_tren_worker() { npx -y wrangler@4 secret list 2>/dev/null | grep -o -E 'REALTIME_APP_(ID|SECRET)' | sort -u | wc -l | tr -d ' ' || true; }
+          chot() {
+            kiem_song "$1" "$2" || { echo "::error::KHÔNG ĐẠT: App ID / App Secret không tạo được phiên SFU — chưa đặt gì vào Worker. Thầy kiểm lại hai giá trị trong dashboard Realtime → Serverless SFU."; exit 1; }
+            dat REALTIME_APP_ID "$1"; dat REALTIME_APP_SECRET "$2"
+            if [ "$(co_tren_worker)" = 2 ]; then echo "ĐÃ CẤU HÌNH: Worker omr có đủ REALTIME_APP_ID + REALTIME_APP_SECRET."; else echo "::error::Đặt xong nhưng Worker chưa liệt kê đủ hai secret."; exit 1; fi
+          }
+
+          # ── NHÁNH CHÍNH: hai GitHub secrets ──
+          if [ -n "$ID" ] && [ -n "$BM" ]; then chot "$ID" "$BM"; exit 0; fi
+          THIEU=""
+          [ -n "$ID" ] || THIEU="$THIEU CF_REALTIME_APP_ID"
+          [ -n "$BM" ] || THIEU="$THIEU CF_REALTIME_APP_SECRET"
+          echo "THIẾU SECRET (vắng hoặc rỗng):$THIEU"
+          if [ -n "$ID" ] || [ -n "$BM" ]; then echo "::error::Chỉ có một trong hai secret — không tự tạo ứng dụng khác để khỏi lệch cặp. Thầy thêm secret còn thiếu:$THIEU"; exit 1; fi
+
+          # ── NHÁNH PHỤ: khoá API có quyền Realtime ⇒ dùng lại / tạo MỘT ứng dụng `omr-live` ──
+          API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/calls/apps"
+          ma=$(curl -sS -m 30 -o /tmp/apps.json -w '%{http_code}' -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$API" || echo 000)
+          if [ "$ma" != 200 ]; then rm -f /tmp/apps.json; echo "::error::THIẾU QUYỀN: khoá API không đọc được ứng dụng Realtime (HTTP $ma). Thầy thêm hai secret:$THIEU — hoặc thêm quyền «Realtime: Edit» cho khoá phát hành."; exit 1; fi
+          SO=$(jq '[.result[]? | select(.name == "omr-live")] | length' /tmp/apps.json); rm -f /tmp/apps.json
+          if [ "$SO" != 0 ]; then
+            if [ "$(co_tren_worker)" = 2 ]; then echo "ĐÃ CẤU HÌNH: ứng dụng omr-live đã có và Worker omr đã có đủ hai secret (không tạo trùng, không đổi gì)."; exit 0; fi
+            echo "::error::THIẾU SECRET: ứng dụng omr-live ĐÃ CÓ ($SO cái) nhưng Cloudflare không trả lại App Secret của ứng dụng cũ — không tạo trùng. Thầy dán App ID + App Secret vào GitHub secrets:$THIEU"; exit 1
+          fi
+          ma=$(curl -sS -m 30 -o /tmp/moi.json -w '%{http_code}' -X POST -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'content-type: application/json' --data '{"name":"omr-live"}' "$API" || echo 000)
+          ID=$(jq -r '.result.uid // empty' /tmp/moi.json 2>/dev/null || true); BM=$(jq -r '.result.secret // empty' /tmp/moi.json 2>/dev/null || true)
+          rm -f /tmp/moi.json
+          che "$ID"; che "$BM"
+          if [ "$ma" != 200 ] && [ "$ma" != 201 ] || [ -z "$ID" ] || [ -z "$BM" ]; then echo "::error::THIẾU QUYỀN: không tạo được ứng dụng omr-live (HTTP $ma)."; exit 1; fi
+          echo "Đã tạo MỘT ứng dụng Realtime SFU tên omr-live (HTTP $ma)."
+          chot "$ID" "$BM"
