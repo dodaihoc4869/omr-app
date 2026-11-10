@@ -92,7 +92,7 @@ describe('Bình Phản Ứng bấm L ⇒ tờ cũ cuộn ngay, không lật tran
   })
 
   it('đề dài có lửa: chừa lề trái, lửa dính góc trên khi cuộn; chấm xong bỏ lề', () => {
-    expect(JS_LEN_BANG_BPU).toContain("body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:280px}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0")
+    expect(JS_LEN_BANG_BPU).toContain("body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:calc(var(--lua,236px) + 44px)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0")
     expect(JS_LEN_BANG_BPU).toMatch(/function xoaLua\(\)[^\n]*bpu-ranh-lua/)
     expect(JS_LEN_BANG_BPU).toContain('S.bpuCuon = true;')
   })

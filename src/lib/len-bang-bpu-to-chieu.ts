@@ -84,14 +84,20 @@ export const JS_LEN_BANG_BPU = `
     + '@keyframes bpuLuaCay{0%{transform:scale(1,1) skewX(0)}50%{transform:scale(.96,1.07) skewX(2deg)}100%{transform:scale(1.03,.95) skewX(-2deg)}}'
     + '@keyframes bpuTia{0%{opacity:0;transform:translate(0,0) scale(1)}20%{opacity:.95}100%{opacity:0;transform:translate(var(--tx,8px),-90px) scale(.3)}}'
     + '@keyframes bpuLuaVao{from{opacity:0;transform:scale(.4) translateY(30px)}to{opacity:1;transform:none}}'
-    + 'body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:280px}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0;z-index:2;margin:-8px 0 0 -266px}'
+    + 'body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:calc(var(--lua,236px) + 44px)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0;z-index:2;width:var(--lua,236px);height:calc(var(--lua,236px) * 1.25);margin:-8px 0 0 calc(-30px - var(--lua,236px))}'
+    + '.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi svg{width:calc(var(--lua,236px) * .89);height:calc(var(--lua,236px) * 1.07)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi b{font-size:max(14px,calc(var(--lua,236px) * .093))}'
     + '@media (prefers-reduced-motion:reduce){.bpu-lua-doi,.bpu-lua-doi *{animation:none!important}.bpu-lua-doi .tia{display:none}}html.may-yeu .bpu-lua-doi *{animation:none!important}';
   function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-the-ton'), function (x) { x.classList.remove('bpu-the-ton'); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-ranh-lua'), function (x) { x.classList.remove('bpu-ranh-lua'); }); }
   // 10/11 vùng đề cuộn mà có ngọn lửa đội: đề dài (tràn khung) ⇒ chừa lề trái cho lửa, lửa DÍNH ở góc trên (position sticky) — cuộn tới đâu lửa vẫn cháy,
   // chữ đề không chui dưới lửa. Đề ngắn (không tràn) ⇒ y như cũ (lửa float, chữ chảy quanh). Đo ở trạng thái KHÔNG lề để khỏi bật tắt qua lại.
+  // Ảnh / bảng giữ cỡ cũ: lửa trong lề thu nhỏ (tới 110px) cho vừa chỗ trống bên trái ảnh rộng nhất — đề chỉ có chữ thì lửa giữ cỡ to 236px.
   function ranhLua(v) {
     v.classList.remove('bpu-ranh-lua');
-    if (v.classList.contains('mc-cuon') && v.querySelector(':scope > .bpu-lua-doi') && v.scrollHeight > v.clientHeight + 2) v.classList.add('bpu-ranh-lua');
+    if (!(v.classList.contains('mc-cuon') && v.querySelector(':scope > .bpu-lua-doi') && v.scrollHeight > v.clientHeight + 2)) return;
+    var rong = 0;
+    Array.prototype.forEach.call(v.querySelectorAll('img,.q-bang'), function (x) { rong = Math.max(rong, x.getBoundingClientRect().width); });
+    v.style.setProperty('--lua', Math.round(Math.max(110, Math.min(236, v.clientWidth - 66 - rong))) + 'px');
+    v.classList.add('bpu-ranh-lua');
   }
   function cuonBpu(d) {
     if (!d || !S.bpuCuon) return;
