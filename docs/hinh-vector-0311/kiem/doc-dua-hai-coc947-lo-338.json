@@ -1,0 +1,355 @@
+{
+  "i": 947,
+  "hash": "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697.png",
+  "size": [
+    455,
+    163
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-11-B8-D1-II-90",
+      "de": "Học sinh T tiến hành thí nghiệm pha loãng 10 mL dung dịch H₂SO₄ 98,0% (d = 1,84 g/mL) bằng 60 mL H₂O (d = 1 g/mL) với các dụng cụ và hóa chất sau:",
+      "allHinh": [
+        {
+          "hash": "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697",
+          "where": "DB-11-B8-D1-II-90.hinh.0.du_lieu",
+          "hashDataUrl": "4033d67c65c03159b149bc6197301068df763fcee14b2d27f81de90f8a4628e1"
+        }
+      ],
+      "missingHashes": [
+        "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697"
+      ]
+    },
+    {
+      "qid": "DH-11-C2-B8-II-14",
+      "de": "Học sinh T tiến hành thí nghiệm pha loãng 10 mL dung dịch H₂SO₄ 98,0% (d = 1,84 g/mL) bằng 60 mL H₂O (d = 1 g/mL) với các dụng cụ và hóa chất sau:",
+      "allHinh": [
+        {
+          "hash": "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697",
+          "where": "DH-11-C2-B8-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "4033d67c65c03159b149bc6197301068df763fcee14b2d27f81de90f8a4628e1"
+        }
+      ],
+      "missingHashes": [
+        "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/947-native4x-lo338.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "Glassrodand2separateflatbeakerswithunlabelledgraduations, noexperimentactionarrow/photo.",
+    "rod": {
+      "outlineApprox": [
+        [
+          56,
+          124
+        ],
+        [
+          145,
+          4
+        ],
+        [
+          148,
+          3
+        ],
+        [
+          150,
+          5
+        ],
+        [
+          149,
+          8
+        ],
+        [
+          61,
+          127
+        ],
+        [
+          58,
+          128
+        ],
+        [
+          56,
+          127
+        ],
+        [
+          56,
+          124
+        ]
+      ],
+      "fill": "mediumlightgraythinblackedge",
+      "twoTransverseMarks": [
+        [
+          [
+            93,
+            70
+          ],
+          [
+            102,
+            70
+          ]
+        ],
+        [
+          [
+            85,
+            82
+          ],
+          [
+            97,
+            82
+          ]
+        ]
+      ],
+      "markCaution": "Bothshortcrossstrokesvisibleonnativerod, couldillustration/printartefact, intentunknown; retainliteralshortstrokesnotnewdirectionalarrows/graduationvalues."
+    },
+    "beakers": [
+      {
+        "outline": "M20132V117Q202125 211125H254Q262124 262117V35Q26232 26632",
+        "liquidTop": 77,
+        "fill": "paleflatgraybelow77tobottom125",
+        "rulerX": 223,
+        "ticks": [
+          {
+            "y": 45,
+            "xEnd": 241
+          },
+          {
+            "y": 53,
+            "xEnd": 233
+          },
+          {
+            "y": 61,
+            "xEnd": 233
+          },
+          {
+            "y": 69,
+            "xEnd": 233
+          },
+          {
+            "y": 77,
+            "xEnd": 233
+          },
+          {
+            "y": 85,
+            "xEnd": 241
+          },
+          {
+            "y": 93,
+            "xEnd": 233
+          },
+          {
+            "y": 100,
+            "xEnd": 233
+          },
+          {
+            "y": 108,
+            "xEnd": 233
+          },
+          {
+            "y": 116,
+            "xEnd": 233
+          }
+        ],
+        "rulerVertical": [
+          [
+            223,
+            45
+          ],
+          [
+            223,
+            116
+          ]
+        ],
+        "wallMarks": [
+          [
+            [
+              200,
+              69
+            ],
+            [
+              203,
+              69
+            ]
+          ],
+          [
+            [
+              200,
+              82
+            ],
+            [
+              203,
+              82
+            ]
+          ],
+          [
+            [
+              260,
+              69
+            ],
+            [
+              263,
+              69
+            ]
+          ],
+          [
+            [
+              260,
+              82
+            ],
+            [
+              263,
+              82
+            ]
+          ]
+        ]
+      },
+      {
+        "outline": "M33732V117Q338125 347125H390Q398124 398117V35Q39832 40232",
+        "liquidTop": 116,
+        "fill": "paleflatgrayveryshallowbelow116tobottom125",
+        "rulerX": 359,
+        "ticks": [
+          {
+            "y": 45,
+            "xEnd": 377
+          },
+          {
+            "y": 53,
+            "xEnd": 369
+          },
+          {
+            "y": 61,
+            "xEnd": 369
+          },
+          {
+            "y": 69,
+            "xEnd": 369
+          },
+          {
+            "y": 77,
+            "xEnd": 369
+          },
+          {
+            "y": 85,
+            "xEnd": 377
+          },
+          {
+            "y": 93,
+            "xEnd": 369
+          },
+          {
+            "y": 100,
+            "xEnd": 369
+          },
+          {
+            "y": 108,
+            "xEnd": 369
+          },
+          {
+            "y": 116,
+            "xEnd": 369
+          }
+        ],
+        "rulerVertical": [
+          [
+            359,
+            45
+          ],
+          [
+            359,
+            116
+          ]
+        ],
+        "wallMarks": [
+          [
+            [
+              336,
+              69
+            ],
+            [
+              339,
+              69
+            ]
+          ],
+          [
+            [
+              336,
+              82
+            ],
+            [
+              339,
+              82
+            ]
+          ]
+        ]
+      }
+    ],
+    "rulerCaution": "10horizontalgraduationmarks eachbeaker, longat45/85shortothers; minorbrokenpixelsnear69/77fromsourceprinting, retainrepresentativeinknotadditionalvalues. No numbersvisible, do notinfer60/10mLscale.",
+    "labels": [
+      {
+        "text": "Đũa thủy tinh",
+        "bbox": [
+          16,
+          132,
+          111,
+          151
+        ],
+        "font": "BOLDuprightserif"
+      },
+      {
+        "text": "60ml H₂O",
+        "bbox": [
+          199,
+          132,
+          267,
+          151
+        ],
+        "font": "BOLDuprightserif",
+        "literalTrap": "lowercaseml notmL;spacebeforeH2O"
+      },
+      {
+        "text": "10ml dd H₂SO₄ 98%",
+        "bbox": [
+          313,
+          132,
+          449,
+          151
+        ],
+        "font": "BOLDuprightserif",
+        "literalTrap": "lowercaseml/dd; figure98%not98,0%fromstem;2/4SUB"
+      }
+    ],
+    "font": "All3captionsBOLDuprightserif, nolabelsonbeakerticks/noitalic. Keepnativeunitscase/percentspacesnotnormalizefrompublicde.",
+    "counts": {
+      "rod": 1,
+      "beakers": 2,
+      "rulerTicksEach": 10,
+      "labels": 3,
+      "heads": 0,
+      "drops": 0
+    },
+    "noAdded": [
+      "pouringarrows",
+      "heatingequipment",
+      "newmLnumbersonticks",
+      "98,0%fromstem",
+      "mLcasecorrection",
+      "solutionnames",
+      "acid-to-wateranswer"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelapparatusgeometryandvisibletext, notmeasuredvolumefromruler. Printedcaptionsonlydata."
+}

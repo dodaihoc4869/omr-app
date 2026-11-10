@@ -1,0 +1,40 @@
+[
+  {
+    "i": 947,
+    "hash": "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697",
+    "fileNguon": "anh/ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697.png",
+    "svg": "dua-hai-coc-native947-ddh-0bfc8e0eb32da56ff6a4ad5d0ec850cd28093002b56b217035f20abafda576e8.svg",
+    "hashSvg": "0bfc8e0eb32da56ff6a4ad5d0ec850cd28093002b56b217035f20abafda576e8",
+    "byteSvg": 21979,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B8-D1-II-90",
+        "de": "Học sinh T tiến hành thí nghiệm pha loãng 10 mL dung dịch H₂SO₄ 98,0% (d = 1,84 g/mL) bằng 60 mL H₂O (d = 1 g/mL) với các dụng cụ và hóa chất sau:",
+        "refs": [
+          {
+            "hash": "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697",
+            "where": "DB-11-B8-D1-II-90.hinh.0.du_lieu",
+            "hashDataUrl": "4033d67c65c03159b149bc6197301068df763fcee14b2d27f81de90f8a4628e1"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C2-B8-II-14",
+        "de": "Học sinh T tiến hành thí nghiệm pha loãng 10 mL dung dịch H₂SO₄ 98,0% (d = 1,84 g/mL) bằng 60 mL H₂O (d = 1 g/mL) với các dụng cụ và hóa chất sau:",
+        "refs": [
+          {
+            "hash": "ab6c0db08f290786d2b2306110ef59cd3140de6706bda0f930911abeab52b697",
+            "where": "DH-11-C2-B8-II-14.hinh.0.du_lieu",
+            "hashDataUrl": "4033d67c65c03159b149bc6197301068df763fcee14b2d27f81de90f8a4628e1"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1rod2beakers/10ticksEACH-long45-85/liquid77-116/2rodtransversemarks-intentUNKNOWN/3trueDAMliteralcaptions-Đũa thủy tinh-60ml H2O-10ml dd H2SO4 98%/mlLOWER-2-4SUB/noaddedheads-drops-mL-normalize-answer/noalias74",
+    "hashSvgDaSoat": "0bfc8e0eb32da56ff6a4ad5d0ec850cd28093002b56b217035f20abafda576e8",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
