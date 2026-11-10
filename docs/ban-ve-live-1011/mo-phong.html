@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,">
+<title>Bản vẽ chế độ Live — mô phỏng (10/11)</title>
+<!-- TRANG MÔ PHỎNG để chụp bản vẽ (bước 2 quy trình 4 bước). KHÔNG phải mã chạy thật.
+     Mở: mo-phong.html#k=<khung>&doi=<0..3>&giay=<sang|toi>
+     Màu: chép đúng bảng màu tờ chiếu (--mc-*, src/lib/giao-dien-to-chieu.ts) và màu đội (--p-cam / --p-tim-2 / --p-xanh / --p-do, src/styles/tokens.css). -->
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url('/phong/be-vietnam-pro-vietnamese-500-normal.woff2') format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url('/phong/be-vietnam-pro-latin-500-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2070-208F,U+2190-2193,U+2212}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url('/phong/be-vietnam-pro-vietnamese-600-normal.woff2') format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:600;src:url('/phong/be-vietnam-pro-latin-600-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2070-208F,U+2190-2193,U+2212}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url('/phong/be-vietnam-pro-vietnamese-700-normal.woff2') format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url('/phong/be-vietnam-pro-latin-700-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2070-208F,U+2190-2193,U+2212}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url('/phong/be-vietnam-pro-vietnamese-800-normal.woff2') format('woff2');unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url('/phong/be-vietnam-pro-latin-800-normal.woff2') format('woff2');unicode-range:U+0000-00FF,U+2000-206F,U+2070-208F,U+2190-2193,U+2212}
+
+:root{
+  /* Bảng màu tờ chiếu — giấy sáng (matte-light) */
+  --mc-bang:#15181c;--mc-bang-chu:#f4efe4;--mc-bang-phu:rgba(244,239,228,.55);--mc-bang-vien:rgba(244,239,228,.22);--mc-bang-nut:rgba(244,239,228,.14);
+  --mc-giay:#f4efe4;--mc-chu:#22262b;--mc-phu:#5b6168;--mc-nhan:#0b57d0;--mc-chip:#d3e3fd;--mc-chip-chu:#041e49;--mc-the:#e7e1d3;
+  --mc-thanh-nen:#22262b;--mc-lam-nen:#c4eed0;--mc-lam-chu:#072100;--mc-chua-nen:#c2e7ff;--mc-chua-chu:#001d35;--mc-qua-nen:#fdd663;--mc-qua-chu:#3b2f00;
+  --mc-do:rgb(197,34,31);--mc-do-nen:rgb(252,232,230);
+  /* Màu đội + mực trên nền màu đội */
+  --p-cam:#f59e0b;--p-tim-2:#8b5cf6;--p-xanh:#10b981;--p-do:#ef4444;--p-muc:#1a2332;
+  --doi:var(--p-cam);
+  --sans:'Be Vietnam Pro','Noto Sans',-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  /* Mô phỏng vùng an toàn (tai thỏ) — bản thật dùng env(safe-area-inset-*) */
+  --at-trai:0px;--at-phai:0px;--at-duoi:0px;
+}
+:root[data-giay="toi"]{--mc-giay:#23282d;--mc-chu:#f4efe4;--mc-phu:#bfc5cb;--mc-nhan:#a8c7fa;--mc-chip:#1b3556;--mc-chip-chu:#d3e3fd;--mc-the:#2f353b}
+:root[data-doi="1"]{--doi:var(--p-tim-2)}
+:root[data-doi="2"]{--doi:var(--p-xanh)}
+:root[data-doi="3"]{--doi:var(--p-do)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--mc-bang);color:var(--mc-bang-chu);font-family:var(--sans);font-weight:500;overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;touch-action:manipulation}
+svg{display:block}
+.tn{font-variant-numeric:tabular-nums}
+
+/* ═══ VÙNG CHIẾU (giấy đề + bảng đen) — hệ toạ độ lôgic 1600 × 820, co theo màn ═══ */
+.chieu{position:absolute;left:0;top:0;width:1600px;height:820px;transform-origin:0 0}
+.giay{position:absolute;left:12px;top:12px;width:1042px;height:796px;border-radius:28px;background:var(--mc-giay);color:var(--mc-chu);overflow:hidden}
+.lua{position:absolute;left:54px;top:14px;width:186px}
+.lua b{display:block;margin:6px auto 0;width:max-content;padding:5px 18px;border-radius:999px;background:var(--doi-len);color:#fff;font-weight:800;font-size:25px;letter-spacing:.01em}
+.chip{position:absolute;top:30px;height:40px;padding:0 18px;border-radius:999px;display:inline-flex;align-items:center;font-size:20px;font-weight:700}
+.chip.cau{left:322px;background:var(--mc-chip);color:var(--mc-chip-chu)}
+.chip.phan{left:430px;background:var(--mc-the);color:var(--mc-phu);font-weight:600}
+.de{position:absolute;left:258px;top:92px;right:40px;font-size:37px;line-height:1.3;letter-spacing:-.005em}
+.pa{position:absolute;left:322px;top:162px;font-size:37px;line-height:1.86}
+.pa i{font-style:normal;font-weight:800;color:var(--mc-nhan);display:inline-block;width:66px}
+.pa sub{font-size:.62em}
+.bang{position:absolute;left:1066px;top:12px;width:522px;height:796px}
+.ten{position:absolute;left:50%;top:0;transform:translateX(-50%);padding:9px 34px;border-radius:22px;background:var(--mc-giay);color:var(--mc-chu);font-size:44px;font-weight:700;white-space:nowrap;box-shadow:0 0 0 4px var(--doi-len),0 0 26px color-mix(in srgb,var(--doi-len) 55%,transparent)}
+.net{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.net .trang{fill:#f4efe4}.net .vang{fill:#fdd663}.net .lam{fill:#c2e7ff}
+.net path{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.net .s-trang{stroke:#f4efe4}.net .s-vang{stroke:#fdd663}.net .s-lam{stroke:#c2e7ff}.net .s-do{stroke:var(--mc-do)}
+:root[data-giay="toi"] .net .s-do{stroke:#ff8a80}
+.net text{font-family:Inter,'Be Vietnam Pro',sans-serif;font-style:italic;font-weight:500}
+/* Con trỏ bút của thầy (hiện cả khi chưa chạm bảng) */
+.tro{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:2.5px solid #fdd663;box-shadow:0 0 0 6px rgba(253,214,99,.16),0 0 18px rgba(253,214,99,.5)}
+.tro::after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#fdd663}
+.cho-goi{position:absolute;left:0;right:0;top:330px;text-align:center;color:var(--mc-bang-phu);font-size:20px;font-weight:600;line-height:1.5}
+
+/* ═══ MÀN CHIẾU CỦA THẦY — khung lôgic 1600 × 900 ═══ */
+.gv{position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:0 0}
+.thanh{position:absolute;left:12px;right:12px;bottom:10px;height:58px;border-radius:20px;background:var(--mc-thanh-nen);display:flex;align-items:center;gap:8px;padding:0 12px;font-size:18px;font-weight:700;white-space:nowrap}
+.thanh .mui{color:var(--mc-bang-phu);font-size:14px;padding:0 8px}
+.thanh .dot{color:#fdd663;font-weight:800;font-size:20px}
+.thanh .tt{letter-spacing:.02em;padding:0 12px 0 8px}
+.nut{height:44px;padding:0 16px;border-radius:999px;display:inline-flex;align-items:center;gap:9px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu)}
+.nut kbd{font:800 13px var(--sans);min-width:22px;height:22px;padding:0 5px;border-radius:6px;display:inline-grid;place-items:center;background:var(--mc-bang-chu);color:var(--mc-bang)}
+.nut.len{background:var(--mc-lam-nen);color:var(--mc-lam-chu);box-shadow:none}
+.nut.giai{box-shadow:inset 0 0 0 1.5px #fdd663;color:#fdd663}.nut.giai kbd{background:#fdd663;color:#3b2f00}
+.nut.bpu{background:var(--mc-bang-chu);color:var(--mc-bang)}.nut.bpu kbd{background:var(--mc-bang);color:var(--mc-bang-chu)}
+.day{flex:1}
+/* Nút Live — chưa live: viền + chấm đỏ; đang live: viên đỏ đặc gồm đồng hồ, số em, mức mic */
+.nut.live{gap:10px;padding:0 18px 0 14px;font-weight:800}
+.nut.live .cham{width:12px;height:12px;border-radius:50%;background:var(--p-do);box-shadow:0 0 0 4px color-mix(in srgb,var(--p-do) 30%,transparent)}
+.cum-live{height:46px;border-radius:999px;display:inline-flex;align-items:stretch;background:var(--mc-do);color:#fff;font-weight:800;overflow:hidden;box-shadow:0 0 0 4px color-mix(in srgb,var(--mc-do) 28%,transparent)}
+.cum-live>span{display:inline-flex;align-items:center;gap:8px;padding:0 13px}
+.cum-live small{margin-left:-4px}
+.noi-goc{position:absolute;right:12px;bottom:80px;display:flex;gap:10px}
+.noi-goc .nut{height:52px;padding:0 10px 0 16px;font-size:18px;font-weight:800;box-shadow:0 12px 34px rgba(0,0,0,.5)}
+.chong{display:inline-flex;margin-left:4px}.chong .ky{width:34px;height:34px;font-size:13px;margin-left:-8px;box-shadow:0 0 0 2px #fff}.chong .ky:first-child{margin-left:0}
+.cum-live>span+span{box-shadow:inset 1px 0 0 rgba(255,255,255,.28)}
+.cum-live .cham{width:11px;height:11px;border-radius:50%;background:#fff}
+.cum-live small{font-size:14px;font-weight:600;opacity:.9}
+.muc{display:inline-flex;align-items:flex-end;gap:3px;height:22px}
+.muc i{display:block;width:5px;border-radius:2px;background:rgba(255,255,255,.35)}
+.muc i.b{background:#fff}
+.nut.tat{background:transparent;box-shadow:inset 0 0 0 1.5px var(--mc-bang-vien);font-weight:700}
+.nut.tay{background:var(--mc-qua-nen);color:var(--mc-qua-chu);box-shadow:none}
+.nut.roi{background:var(--mc-do-nen);color:var(--mc-do);box-shadow:none}
+.nut.gon{padding:0 11px}
+/* Thẻ nổi neo trên thanh (mic, giơ tay, rời màn) */
+.the{position:absolute;bottom:80px;border-radius:24px;background:#2a2f35;color:var(--mc-bang-chu);box-shadow:0 22px 60px rgba(0,0,0,.55),inset 0 0 0 1px var(--mc-bang-vien);padding:18px}
+.the h3{margin:0 0 4px;font-size:21px;font-weight:800}
+.the p{margin:0;color:var(--mc-bang-phu);font-size:15.5px;line-height:1.45;font-weight:500}
+.the .hang{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 0}
+.the .hang+.hang{box-shadow:inset 0 1px 0 var(--mc-bang-vien)}
+.ky{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:15px;color:var(--p-muc)}
+.the .ho{flex:1;min-width:0;font-size:18px;font-weight:700;line-height:1.2}
+.the .ho small{display:block;color:var(--mc-bang-phu);font-size:13.5px;font-weight:500;margin-top:2px}
+.nho{height:44px;padding:0 16px;border-radius:999px;font-size:16px;font-weight:800;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.nho.chinh{background:var(--mc-bang-chu);color:var(--mc-bang)}
+.nho.phu{box-shadow:inset 0 0 0 1.5px var(--mc-bang-vien)}
+.nho.do{background:var(--mc-do);color:#fff}
+.chon{height:52px;border-radius:14px;padding:0 14px;display:flex;align-items:center;gap:10px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);font-size:16.5px;font-weight:600;margin-top:12px}
+.thuoc{height:12px;border-radius:6px;background:var(--mc-bang-nut);overflow:hidden;margin-top:8px}
+.thuoc i{display:block;height:100%;width:62%;border-radius:6px;background:linear-gradient(90deg,#c4eed0 0 78%,#fdd663 78% 100%)}
+.song{display:inline-flex;align-items:center;gap:3px;height:22px}
+.song i{display:block;width:4px;border-radius:2px;background:currentColor}
+/* Viền báo có em rời màn: mảnh, đứng yên (chỉ nháy 2 nhịp khi có em mới rời) */
+.vien-roi{position:absolute;inset:0;border:5px solid var(--p-do);border-radius:6px;pointer-events:none;box-shadow:inset 0 0 40px color-mix(in srgb,var(--p-do) 35%,transparent)}
+
+/* ═══ MÁY EM ═══ */
+.em{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;background:var(--mc-bang)}
+.em.xoay{transform:rotate(90deg) translateY(-100%)}
+/* Tay nắm: viên thuốc mảnh màu đội ở mép phải — vùng chạm 48 × 76 */
+.nam{position:absolute;right:calc(var(--at-phai) + 2px);top:50%;width:48px;height:76px;margin-top:-38px;display:grid;place-items:center}
+.nam i{display:block;width:7px;height:46px;border-radius:4px;background:var(--doi);opacity:.78;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 0 14px color-mix(in srgb,var(--doi) 55%,transparent)}
+.nam.noi i{opacity:1;box-shadow:0 0 0 5px color-mix(in srgb,var(--doi) 26%,transparent),0 0 18px var(--doi)}
+.nam .dau{position:absolute;right:30px;top:50%;margin-top:-13px;width:26px;height:26px;border-radius:50%;background:var(--doi);color:var(--p-muc);display:grid;place-items:center;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+/* Khay điều khiển: kính mờ tối, trượt ra từ mép phải */
+.khay{position:absolute;right:calc(var(--at-phai) + 10px);top:50%;transform:translateY(-50%);width:212px;border-radius:26px;padding:12px;
+  background:rgba(28,32,37,.72);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);
+  box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(244,239,228,.12);color:var(--mc-bang-chu)}
+.khay .dau-khay{display:flex;align-items:center;gap:8px;height:30px;padding:0 4px;font-size:13.5px;font-weight:700;color:rgba(244,239,228,.86)}
+.khay .dau-khay .song{color:var(--doi);height:16px}
+.khay .dau-khay .vach{margin-left:auto}
+.vach{display:inline-flex;align-items:flex-end;gap:2.5px;height:14px}
+.vach i{display:block;width:4px;border-radius:1.5px;background:rgba(244,239,228,.3)}
+.vach i.b{background:#c4eed0}
+.vach.yeu i.b{background:#fdd663}
+.to{width:100%;min-height:58px;border-radius:18px;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:18px;font-weight:800;
+  background:var(--doi);color:var(--p-muc);box-shadow:0 4px 0 color-mix(in srgb,var(--doi) 60%,var(--p-muc)),inset 0 1px 0 rgba(255,255,255,.4)}
+.to.cho{background:color-mix(in srgb,var(--doi) 22%,transparent);color:var(--mc-bang-chu);box-shadow:inset 0 0 0 2px var(--doi)}
+.to small{display:block;font-size:12.5px;font-weight:600;opacity:.85;line-height:1.15}
+.vua{width:100%;min-height:50px;border-radius:16px;margin-top:8px;padding:0 14px;display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:700;background:rgba(244,239,228,.1);box-shadow:inset 0 0 0 1px rgba(244,239,228,.14)}
+.vua b{margin-left:auto;font-weight:800;color:var(--mc-bang-chu)}
+.vua.tat b{color:rgba(244,239,228,.6)}
+.doi-kj{display:flex;align-items:center;gap:8px;margin-top:10px;padding:2px 6px 0;font-size:13.5px;font-weight:700;color:rgba(244,239,228,.8)}
+.doi-kj .ky{width:26px;height:26px;font-size:11.5px;background:var(--doi)}
+.doi-kj b{margin-left:auto;color:var(--mc-bang-chu);font-weight:800}
+/* Viên «đang nói» (luôn hiện khi mic em đang mở) */
+.dang-noi{position:absolute;right:calc(var(--at-phai) + 12px);top:50%;transform:translateY(-50%);width:168px;border-radius:26px;padding:14px 12px 12px;text-align:center;
+  background:var(--doi);color:var(--p-muc);box-shadow:0 0 0 6px color-mix(in srgb,var(--doi) 28%,transparent),0 18px 50px rgba(0,0,0,.55)}
+.dang-noi .song{height:34px;gap:4px;justify-content:center}.dang-noi .song i{width:5px}
+.dang-noi b{display:block;font-size:18px;font-weight:800;margin-top:6px}
+.dang-noi small{display:block;font-size:12.5px;font-weight:600;opacity:.8;margin-top:1px}
+.dang-noi button{width:100%;min-height:50px;margin-top:10px;border-radius:16px;background:var(--p-muc);color:#fff;font-size:15.5px;font-weight:800}
+/* Tấm mời nói */
+.moi{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:392px;border-radius:28px;padding:20px;text-align:center;
+  background:rgba(28,32,37,.82);-webkit-backdrop-filter:blur(26px) saturate(160%);backdrop-filter:blur(26px) saturate(160%);
+  box-shadow:0 24px 70px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(244,239,228,.12)}
+.moi h3{margin:0;font-size:22px;font-weight:800}
+.moi p{margin:6px 0 0;font-size:14.5px;line-height:1.45;color:rgba(244,239,228,.78)}
+.moi .hai{display:flex;gap:10px;margin-top:16px}
+.moi .hai .to{margin:0;flex:1.5}
+.moi .hai .vua{margin:0;flex:1;justify-content:center;min-height:58px;border-radius:18px}
+.mo{position:absolute;inset:0;background:rgba(10,12,14,.45)}
+/* Dải báo (mất mạng / bật tiếng / bạn đang nói / vào live) */
+.bao{position:absolute;left:50%;transform:translateX(-50%);top:14px;min-height:48px;padding:6px 18px 6px 12px;border-radius:999px;display:flex;align-items:center;gap:10px;font-size:15.5px;font-weight:700;white-space:nowrap;
+  background:rgba(28,32,37,.8);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);box-shadow:0 10px 30px rgba(0,0,0,.5),inset 0 0 0 1px rgba(244,239,228,.14)}
+.bao .quay{width:22px;height:22px;border-radius:50%;border:3px solid rgba(244,239,228,.25);border-top-color:#fdd663}
+.bao.duoi{top:auto;bottom:calc(14px + var(--at-duoi))}
+.bao .ky{width:30px;height:30px;font-size:12.5px}
+.bao.nut-bao{background:var(--doi);color:var(--p-muc);box-shadow:0 0 0 6px color-mix(in srgb,var(--doi) 26%,transparent),0 10px 30px rgba(0,0,0,.5);font-weight:800;min-height:56px;padding:6px 24px 6px 16px;font-size:17px}
+.nhan-live{position:absolute;left:calc(var(--at-trai) + 14px);top:12px;height:30px;padding:0 12px 0 10px;border-radius:999px;display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;letter-spacing:.04em;background:var(--mc-do);color:#fff}
+.nhan-live i{width:8px;height:8px;border-radius:50%;background:#fff}
+.dong-bang{filter:saturate(.55) brightness(.72)}
+/* Mô phỏng tai thỏ / thanh home của iPhone (chỉ để vẽ) */
+.tai{position:absolute;background:#000;border-radius:20px;z-index:9}
+.home{position:absolute;background:rgba(255,255,255,.55);border-radius:3px;z-index:9}
+</style>
+</head>
+<body>
+<div id="goc"></div>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="phan" x="-6%" y="-12%" width="112%" height="124%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="2" seed="4" result="a"/>
+      <feDisplacementMap in="SourceGraphic" in2="a" scale="7" xChannelSelector="R" yChannelSelector="G" result="b"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" seed="9" result="c"/>
+      <feDisplacementMap in="b" in2="c" scale="2.4" xChannelSelector="G" yChannelSelector="R"/>
+    </filter>
+  </defs>
+</svg>
+<script>
+const q = new URLSearchParams(location.hash.slice(1))
+const K = q.get('k') || 'gv-dang-live', DOI = +(q.get('doi') || 0), GIAY = q.get('giay') || 'sang'
+const R = document.documentElement
+R.dataset.doi = String(DOI); R.dataset.giay = GIAY
+const DOI_BPU = [['Đội Natri', 'Na', '--p-cam'], ['Đội Kali', 'K', '--p-tim-2'], ['Đội Đồng', 'Cu', '--p-xanh'], ['Đội Canxi', 'Ca', '--p-do']]
+const W = innerWidth, H = innerHeight
+
+// Biểu tượng nét (không emoji)
+const bt = (d, c = 22, w = 2.2) => `<svg width="${c}" height="${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`
+const BT = {
+  tay: bt('<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-1V4.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V14c0 4-2.5 7-6.5 7-3 0-4.6-1.4-6-4l-2-3.8a1.5 1.5 0 0 1 2.6-1.5L8 13.5"/>'),
+  mic: bt('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>'),
+  loa: bt('<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/>'),
+  loaTat: bt('<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M16 9.5l5 5m0-5l-5 5"/>'),
+  mat: bt('<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/>', 20),
+  roi: bt('<path d="M12 8v5m0 3.2v.3"/><path d="M10.3 3.9 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>', 20),
+}
+const song = (ds) => `<span class="song">${ds.map((h) => `<i style="height:${h}%"></i>`).join('')}</span>`
+const vach = (n, yeu) => `<span class="vach${yeu ? ' yeu' : ''}" aria-label="Chất lượng mạng ${n}/3 vạch">${[5, 9, 14].map((h, i) => `<i class="${i < n ? 'b' : ''}" style="height:${h}px"></i>`).join('')}</span>`
+const ky = (i, ten) => `<span class="ky" style="background:var(${DOI_BPU[i][2]})">${ten}</span>`
+
+// Ngọn lửa đội (dáng như bảng Bình Phản Ứng)
+const lua = (mau) => `<svg viewBox="0 0 120 150" width="186" aria-hidden="true"><defs><filter id="mo"><feGaussianBlur stdDeviation="5"/></filter></defs>
+  <path d="M60 4c8 26 44 46 44 86a44 44 0 0 1-88 0c0-18 8-28 16-38 4 10 8 14 12 16C42 44 52 28 60 4z" fill="${mau}" opacity=".35" filter="url(#mo)"/>
+  <path d="M60 4c8 26 44 46 44 86a44 44 0 0 1-88 0c0-18 8-28 16-38 4 10 8 14 12 16C42 44 52 28 60 4z" fill="${mau}"/>
+  <path d="M60 62c5 14 22 22 22 40a22 22 0 0 1-44 0c0-10 5-15 9-20 2 5 4 7 6 8-1-10 3-18 7-28z" fill="#fff" opacity=".55"/>
+  <path d="M60 96c3 8 11 12 11 21a11 11 0 0 1-22 0c0-9 8-13 11-21z" fill="#fff"/></svg>`
+
+// ── Vùng chiếu: giấy đề + bảng đen. o: {net: có nét phấn, tro: có con trỏ bút, goi: tên em lên bảng, doiLen: chỉ số đội của em lên bảng}
+function chieu(o = {}) {
+  const dl = DOI_BPU[o.doiLen ?? 3]
+  const netGiay = o.net ? `<svg class="net" viewBox="0 0 1042 796" style="filter:url(#phan)">
+      <path class="s-do" stroke-width="4.5" d="M736 142c40-5 86-3 126 1"/>
+      <path class="s-do" stroke-width="4.5" d="M318 232c-22 4-34 22-30 40 5 22 40 30 190 28 130-2 190-8 192-34 2-24-60-36-200-38-70-1-118 0-152 4"/>
+    </svg>` : ''
+  const netBang = o.net ? `<svg class="net" viewBox="0 0 522 796" style="filter:url(#phan)">
+      <text class="vang" x="26" y="150" font-size="33" transform="rotate(-1.5 26 150)">Bậc alcohol = bậc của C</text>
+      <text class="vang" x="46" y="196" font-size="33" transform="rotate(-1 46 196)">mang nhóm –OH</text>
+      <path class="s-vang" stroke-width="3.5" d="M44 212c60-5 150-6 232-2"/>
+      <text class="trang" x="52" y="330" font-size="50">CH<tspan font-size="30" dy="12">3</tspan><tspan dy="-12"> – CH – CH</tspan><tspan font-size="30" dy="12">3</tspan></text>
+      <path class="s-trang" stroke-width="4" d="M262 346c1 16-1 30 0 44"/>
+      <text class="trang" x="232" y="438" font-size="50">OH</text>
+      <path class="s-lam" stroke-width="4" d="M262 262c-34 2-52 18-50 42 2 26 30 38 56 36 28-2 46-18 44-42-2-22-22-36-50-36z"/>
+      <path class="s-lam" stroke-width="3.5" d="M120 262c20-22 60-30 96-16"/><path class="s-lam" stroke-width="3.5" d="M202 236l16 10-16 8"/>
+      <path class="s-lam" stroke-width="3.5" d="M408 262c-20-22-60-30-96-16"/><path class="s-lam" stroke-width="3.5" d="M326 236l-16 10 16 8"/>
+      <text class="lam" x="98" y="250" font-size="34">1</text><text class="lam" x="412" y="250" font-size="34">2</text>
+      <text class="trang" x="34" y="530" font-size="33" transform="rotate(-1 34 530)">C này nối với 2 C khác</text>
+      <text class="vang" x="34" y="610" font-size="42" transform="rotate(-1.5 34 610)">⇒ alcohol bậc II</text>
+      <path class="s-vang" stroke-width="4" d="M92 628c70-6 150-6 236-1"/><path class="s-vang" stroke-width="4" d="M98 640c70-5 140-5 224 0"/>
+      ${o.dangViet ? `<text class="trang" x="60" y="716" font-size="42" transform="rotate(-1 60 716)">Chọn</text><path class="s-trang" stroke-width="4.5" d="M196 680c2 12 1 26 2 38"/>` : `<text class="trang" x="60" y="716" font-size="42" transform="rotate(-1 60 716)">Chọn B</text><path class="s-trang" stroke-width="3.5" d="M46 668c70-6 140-6 196 0 6 22 6 44 0 62-60 5-130 5-196 0-5-20-5-42 0-62z"/>`}
+    </svg>` : ''
+  return `<div class="chieu" id="chieu" style="--doi-len:var(${dl[2]})">
+    <div class="giay">
+      <div class="lua">${lua(`var(${dl[2]})`)}<b>${dl[0]}</b></div>
+      <span class="chip cau">Câu 1</span><span class="chip phan">Phần I · Trắc nghiệm</span>
+      <div class="de">Alcohol nào sau đây là alcohol bậc II?</div>
+      <div class="pa"><div><i>A.</i>CH<sub>3</sub>–CH<sub>2</sub>–OH</div><div><i>B.</i>CH<sub>3</sub>–CH(OH)–CH<sub>3</sub></div><div><i>C.</i>(CH<sub>3</sub>)<sub>3</sub>C–OH</div><div><i>D.</i>CH<sub>3</sub>–OH</div></div>
+      ${netGiay}
+    </div>
+    <div class="bang">
+      ${o.goi ? `<div class="ten">${o.goi}</div>` : ''}
+      ${o.net ? '' : `<div class="cho-goi">Bảng đen · viết bằng bút<br>Bấm «Live» để cả lớp cùng xem trên máy</div>`}
+      ${netBang}
+      ${o.tro ? `<div class="tro" style="left:${o.dangViet ? 206 : 262}px;top:${o.dangViet ? 722 : 700}px"></div>` : ''}
+    </div>
+  </div>`
+}
+
+// ── MÀN CHIẾU CỦA THẦY ──
+function gv(k) {
+  const live = k !== 'gv-chua-live' && k !== 'gv-mo-live'
+
+  const phim = (kb, chu, lop = '') => `<button class="nut ${lop}">${kb ? `<kbd>${kb}</kbd>` : ''}${chu}</button>`
+  const trai = `<span class="mui">◀</span><span class="dot tn">Đợt 1/1</span><span class="mui">▶</span><span class="tt">${live ? 'ĐANG CHỮA' : 'CHỜ THẦY GỌI'}</span>
+    ${phim('', 'Lên bảng', 'len')}${phim('G', 'Giải', 'giai')}${live ? phim('T', '', 'gon') : phim('T', 'Thống kê')}${phim('B', '', 'gon')}${phim('P', 'Bình Phản Ứng', 'bpu')}${live ? phim('Tab', '', 'gon') : phim('Tab', 'Tổng quan') + phim('?', 'Phím')}`
+  let noi = ''
+  let phai = '', the = '', vien = ''
+  if (!live) phai = `<button class="nut live" aria-label="Bật live"><span class="cham"></span>Live</button>`
+  else {
+    if (k === 'gv-roi-gon') noi = `<div class="noi-goc"><button class="nut roi">${BT.roi}<span class="tn">3 em rời màn</span><span class="chong">${ky(0, 'Hu')}${ky(2, 'Vy')}${ky(1, 'Na')}</span></button></div>`
+    if (k === 'gv-tay-gon') noi = `<div class="noi-goc"><button class="nut tay">${BT.tay}<span class="tn">2 em giơ tay</span><span class="chong">${ky(3, 'An')}${ky(1, 'Ba')}</span></button></div>`
+    phai = `<span class="cum-live" role="status" aria-label="Đang live 12 phút 34 giây, 142 trên 150 em đang xem">
+        <span><i class="cham"></i>LIVE <span class="tn">12:34</span></span>
+        <span>${BT.mat}<span class="tn">142</span><small>/150 em xem</small></span>
+        <span aria-label="Mức mic">${BT.mic}<span class="muc">${[8, 13, 18, 22, 16, 10, 6].map((h, i) => `<i class="${i < 5 ? 'b' : ''}" style="height:${h}px"></i>`).join('')}</span></span>
+      </span><button class="nut tat">Tắt live</button>`
+  }
+  if (k === 'gv-mo-live') the = `<div class="the" style="right:12px;width:430px">
+      <h3>Bật live cho lớp 12A1</h3>
+      <p>150 em đã vào phòng sẽ thấy màn chiếu này và nghe tiếng thầy ngay.</p>
+      <div class="chon">${BT.mic}<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis">Mic: Micro không dây (USB)</span><span class="mui">▼</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;color:var(--mc-bang-phu);margin-top:12px"><span>Mức âm khi thầy nói thử</span><span>Vừa đủ</span></div>
+      <div class="thuoc"><i></i></div>
+      <div class="hang" style="margin-top:8px;min-height:44px;padding:0"><span class="ho" style="font-size:15.5px;font-weight:600">Lọc tiếng ồn + khử vọng<small>Đang bật — hợp với loa lớp</small></span><span class="nho phu" style="height:36px;font-size:14.5px">Đang bật</span></div>
+      <div style="display:flex;gap:10px;margin-top:14px"><button class="nho do" style="flex:1;justify-content:center;height:52px;font-size:18px"><i style="width:11px;height:11px;border-radius:50%;background:#fff;display:block"></i>Bắt đầu live</button><button class="nho phu" style="height:52px">Để sau</button></div>
+    </div>`
+  if (k === 'gv-roi-gon') vien = '<div class="vien-roi"></div>'
+  if (k === 'gv-roi-man') {
+    vien = '<div class="vien-roi"></div>'
+    the = `<div class="the" style="right:12px;width:330px;box-shadow:0 22px 60px rgba(0,0,0,.55),inset 0 0 0 2px var(--p-do)">
+      <h3 style="color:#ff8a80;display:flex;align-items:center;gap:8px">${BT.roi}3 em rời màn</h3>
+      <div class="hang">${ky(0, 'Hu')}<span class="ho">Lê Gia Huy<small>Đội Natri · thoát app · 0:08</small></span></div>
+      <div class="hang">${ky(2, 'Vy')}<span class="ho">Phạm Khánh Vy<small>Đội Đồng · chia đôi màn hình · 0:21</small></span></div>
+      <div class="hang">${ky(1, 'Na')}<span class="ho">Đỗ Hoàng Nam<small>Đội Kali · cửa sổ nổi · 0:03</small></span></div>
+      <p style="margin-top:6px">Em quay lại thì tên tự mất. Thẻ tự thu gọn sau 4 giây.</p>
+    </div>`
+  }
+  if (k === 'gv-gio-tay') the = `<div class="the" style="right:12px;width:440px">
+      <h3>Giơ tay · 2 em</h3>
+      <div class="hang">${ky(3, 'An')}<span class="ho">Trần Minh Anh<small>Đội Canxi · giơ tay 0:12 trước</small></span><button class="nho chinh">${BT.mic}Mời nói</button></div>
+      <div class="hang">${ky(1, 'Ba')}<span class="ho">Ngô Gia Bảo<small>Đội Kali · giơ tay 0:05 trước</small></span><button class="nho phu">Mời nói</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><p>Mỗi lúc 1 em nói. Cả lớp cùng nghe.</p><button class="nho phu" style="height:40px;font-size:14.5px">Hạ hết tay</button></div>
+    </div>`
+  if (k === 'gv-em-noi') the = `<div class="the" style="right:12px;width:440px">
+      <h3>Đang nói</h3>
+      <div class="hang">${ky(3, 'An')}<span class="ho">Trần Minh Anh<small>Đội Canxi · đang nói 0:18</small></span><span style="color:#c4eed0">${song([40, 85, 60, 100, 50, 75, 35])}</span><button class="nho do">Thu mic</button></div>
+      <div class="hang">${ky(1, 'Ba')}<span class="ho">Ngô Gia Bảo<small>Đội Kali · đang giơ tay</small></span><button class="nho phu">Mời nói</button></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><p>Em nói xong tự tắt mic, hoặc thầy bấm «Thu mic».</p><button class="nho phu" style="height:40px;font-size:14.5px">Tắt mic tất cả</button></div>
+    </div>`
+  const s = Math.min(W / 1600, H / 900)
+  return `<div class="gv" style="transform:scale(${s})">
+    ${chieu({ net: live, tro: live, dangViet: k === 'gv-dang-live' || k === 'gv-roi-gon' || k === 'gv-tay-gon', goi: 'Nguyễn Thị Hà' })}
+    <div class="thanh">${trai}<span class="day"></span>${phai}<button class="nut">Cài đặt</button></div>
+    ${the}${noi}${vien}
+  </div>`
+}
+
+// ── MÁY EM ──
+function em(k) {
+  const xoay = q.get('xoay') === '1', tai = q.get('tai') === '1'
+  const w = xoay ? H : W, h = xoay ? W : H // khổ của HÌNH (luôn ngang)
+  // Vùng an toàn: máy dọc xoay bằng CSS ⇒ tai thỏ (trên máy) thành mép TRÁI hình, thanh home (dưới máy) thành mép PHẢI hình.
+  const at = xoay ? [54, 30, 0] : tai ? [54, 54, 21] : [0, 0, 0]
+  R.style.setProperty('--at-trai', at[0] + 'px'); R.style.setProperty('--at-phai', at[1] + 'px'); R.style.setProperty('--at-duoi', at[2] + 'px')
+  const coNam = 52 // dải dành cho tay nắm ở mép phải (khi còn chỗ)
+  const s = Math.min((w - at[0] - at[1] - coNam) / 1600, (h - at[2]) / 820) < Math.min((w - at[0] - at[1]) / 1600, (h - at[2]) / 820) * 0.94
+    ? Math.min((w - at[0] - at[1]) / 1600, (h - at[2]) / 820) : Math.min((w - at[0] - at[1] - coNam) / 1600, (h - at[2]) / 820)
+  const cw = 1600 * s, ch = 820 * s
+  const du = w - at[0] - at[1] - cw
+  const x = at[0] + (du > coNam ? Math.max(0, (du - coNam) / 2) : du / 2), y = (h - at[2] - ch) / 2
+  const d = DOI_BPU[DOI]
+  const matMang = k === 'em-mat-mang'
+  const net = k !== 'em-vao-live'
+  let lop = ''
+  const nam = (them = '', noi = true) => `<button class="nam${noi ? ' noi' : ''}" aria-label="Mở khay điều khiển"><i></i>${them}</button>`
+  const dauKhay = (thayNoi = true, n = 3) => `<div class="dau-khay">${thayNoi ? `${song([45, 90, 60, 100, 55])}<span>Thầy đang nói</span>` : '<span>Thầy đang im</span>'}<span class="vach">${vach(n, n < 3)}</span></div>`
+  const doiKj = `<div class="doi-kj">${ky(DOI, d[1])}<span>${d[0]}</span><b class="tn">245 kJ</b></div>`
+  if (k === 'em-an' || k === 'em-vao-live') lop = nam()
+  if (k === 'em-khay-mo') lop = `<div class="khay">${dauKhay()}
+      <button class="to">${BT.tay}Giơ tay</button>
+      <button class="vua">${BT.loa}Tiếng<b>Đang bật</b></button>${doiKj}</div>`
+  if (k === 'em-gio-tay') lop = `<div class="khay">${dauKhay()}
+      <button class="to cho">${BT.tay}<span>Đang giơ tay<small>Em thứ 2 trong hàng · chạm để hạ tay</small></span></button>
+      <button class="vua">${BT.loa}Tiếng<b>Đang bật</b></button>${doiKj}</div>`
+  if (k === 'em-gio-tay-an') lop = nam(`<span class="dau">${bt('<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-1V4.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V14c0 4-2.5 7-6.5 7-3 0-4.6-1.4-6-4l-2-3.8a1.5 1.5 0 0 1 2.6-1.5L8 13.5"/>', 16, 2.4)}</span>`)
+  if (k === 'em-tat-tieng') lop = `<div class="khay">${dauKhay()}
+      <button class="to">${BT.tay}Giơ tay</button>
+      <button class="vua tat">${BT.loaTat}Tiếng<b>Đang tắt</b></button>${doiKj}</div>`
+  if (k === 'em-duoc-moi') lop = `<div class="mo"></div><div class="moi" role="dialog" aria-label="Thầy mời em nói">
+      <h3>Thầy mời em nói</h3><p>Bật mic thì thầy và cả lớp nghe thấy em. Nói xong em bấm «Xong, tắt mic».</p>
+      <div class="hai"><button class="to">${BT.mic}Bật mic và nói</button><button class="vua">Để sau</button></div></div>`
+  if (k === 'em-dang-noi') lop = `<div class="dang-noi" role="status">${song([35, 70, 100, 60, 90, 45, 75, 30])}<b>Em đang nói</b><small>Thầy và cả lớp đang nghe</small><button>Xong, tắt mic</button></div>`
+  if (k === 'em-ban-noi') lop = `${nam()}<div class="bao duoi">${ky(3, 'An')}<span>Bạn Minh Anh đang nói</span><span style="color:var(--p-do)">${song([40, 90, 55, 100, 60])}</span></div>`
+  if (matMang) lop = `${nam('', false)}<div class="bao" style="min-height:58px"><i class="quay"></i><span style="line-height:1.25">Mất kết nối · đang nối lại…<small style="display:block;font-size:12.5px;font-weight:600;color:rgba(244,239,228,.72)">Bảng dừng ở lúc 20:14:07 · nối lại sẽ tự bắt kịp</small></span>${vach(0)}</div>`
+  if (k === 'em-bat-tieng') lop = `${nam('', false)}<button class="bao nut-bao" style="top:auto;bottom:calc(20px + var(--at-duoi))">${BT.loa}Chạm để bật tiếng thầy</button>`
+  if (k === 'em-vao-live') lop += `<div class="mo" style="background:rgba(10,12,14,.3)"></div><div class="bao nut-bao" style="top:50%;transform:translate(-50%,-50%);background:var(--mc-do);color:#fff;box-shadow:0 0 0 8px color-mix(in srgb,var(--mc-do) 26%,transparent),0 20px 60px rgba(0,0,0,.6);font-size:20px;min-height:64px;padding:0 30px 0 22px"><i style="width:13px;height:13px;border-radius:50%;background:#fff;display:block"></i>Thầy đang live</div>`
+  if (k === 'em-phong-bang') lop = `${nam()}<div class="bao duoi" style="font-weight:600;min-height:40px;color:rgba(244,239,228,.8)">Chạm hai lần để về toàn cảnh</div>`
+  const nhan = k === 'em-an' || k === 'em-khay-mo' || k === 'em-mat-mang' ? '' : ''
+  // Phóng bảng: bảng đen phủ kín chiều cao + rộng (nét vectơ nên vẫn sắc)
+  let khung
+  if (k === 'em-phong-bang') {
+    const s2 = Math.min((w - at[0] - at[1] - coNam) / 522, (h - at[2]) / 796) * 1.0, bw = 522 * s2
+    khung = `<div style="position:absolute;left:${at[0] + (w - at[0] - at[1] - coNam - bw) / 2}px;top:0;transform:scale(${s2});transform-origin:0 0"><div style="position:absolute;left:-1066px;top:-12px">${chieu({ net: true, tro: true, goi: 'Nguyễn Thị Hà' })}</div></div>`
+  } else {
+    khung = `<div class="${matMang ? 'dong-bang' : ''}" style="position:absolute;left:${x}px;top:${y}px;transform:scale(${s});transform-origin:0 0;width:1600px;height:820px">${chieu({ net, tro: !matMang && net, dangViet: k === 'em-an' || k === 'em-khay-mo', goi: 'Nguyễn Thị Hà' })}</div>`
+  }
+  const iphone = xoay
+    ? `<div class="tai" style="left:${w / 2 - 63}px;top:11px;width:126px;height:36px;transform-origin:0 0"></div>`
+    : tai ? `<div class="tai" style="left:11px;top:${h / 2 - 63}px;width:36px;height:126px"></div><div class="home" style="left:${w / 2 - 110}px;bottom:8px;width:220px;height:5px"></div>` : ''
+  // Khi xoay CSS: tai thỏ + thanh home vẽ theo MÁY (dọc) nên đặt ngoài khối xoay
+  const ngoai = xoay ? `<div class="tai" style="left:${W / 2 - 63}px;top:11px;width:126px;height:36px"></div><div class="home" style="left:${W / 2 - 70}px;bottom:8px;width:140px;height:5px"></div>` : ''
+  return `<div class="em${xoay ? ' xoay' : ''}" style="width:${w}px;height:${h}px">${khung}${nhan}${lop}${xoay ? '' : iphone}</div>${ngoai}`
+}
+
+document.getElementById('goc').innerHTML = K.startsWith('gv') ? gv(K) : em(K)
+document.fonts.ready.then(() => document.body.setAttribute('data-xong', '1'))
+</script>
+</body>
+</html>
