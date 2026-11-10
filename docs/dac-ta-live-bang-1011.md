@@ -266,6 +266,18 @@ n × { x, y: toạ độ lôgic ×8, điểm đầu tuyệt đối i16, sau đó
 - `POST /bpu/live/phat { ve, sdp }`: máy thầy phát track; máy em CHỈ phát được khi phòng xác nhận em nằm trong `live.noi`.
 - Bí mật Worker mới: `REALTIME_APP_ID`, `REALTIME_APP_SECRET` (và khoá TURN nếu bật dự phòng TCP 443).
 
+### 4.3b Hợp đồng THỰC TẾ sau Đợt 1A (nhánh `claude/live-1a-1011`) — chỗ khác với 4.3 ở trên thì theo mục này
+
+Mã: luật `src/lib/bpu/phong-live.ts` · phòng `server/src/phong-live.ts` · cửa SFU `server/src/live-sfu.ts` · máy khách `src/lib/live/` (cửa vào `index.ts`, có ví dụ nối).
+
+- **Nét = nét của bộ máy bút** (`src/lib/but-bang-loi.ts`): `{ id, cong, mau, co, diem: [x, y, apLuc, t][] }`, mã hoá nhị phân KHÔNG MẤT (x, y × 100000; áp lực × 100; t ms). Máy thầy đưa mọi `SuKienBut` vào `taoLiveThay().nhanSuKienBut(sk)`; máy em nhận lại đúng `SuKienBut` qua `khiBut` ⇒ `taoLoiBut().apSuKien(ds, sk)`. Không còn `vung`, không còn `postMessage` riêng.
+- **`live.ss`** = `{ id, tieng, kenh }`: `id` mã phiên SFU của thầy, `tieng` tên track (`'thay'`), `kenh` TÊN DataChannel (`'net'`) hoặc null. (4.3 ghi `kenh: number`; theo tài liệu SFU mỗi máy nhận tự được cấp mã kênh riêng nên chỉ cần tên.)
+- **`viewBang.live`**: `{ san, bat, tu, phien, ss, xem, ws, tay, noi, xa, tiengLop, soNet, tieng: 'bat' | 'chua-cau-hinh' }` hoặc `null` (công tắc `cau_hinh.live_bang` tắt / phòng mở bằng bản cũ). `ws` = số em đang xem cần điểm qua WebSocket.
+- **`viewEm.live`**: `{ duocXem, san, bat, tu, phien, ss, tieng: 'bat' | 'tat' | 'chua-cau-hinh', soNet, emTay, hangTay, emDuocMoi, emNoi, noi }` hoặc `null`. `tieng: 'tat'` = em trong lớp mặc định tắt tiếng (điểm quyết 3); `'chua-cau-hinh'` = Worker chưa có khoá SFU, live chỉ có hình.
+- **Tin chữ đã có ở 1A:** thầy `live-san {ss, san?}` · `live-bat` · `live-tat` · `live-dat {xa?, tiengLop?}` · `live-nhip` (thầy còn đang nói / viết; im 15 phút phòng tự tắt). Em `live-ok {dc}` · `live-bu {net}` (xin bù sổ nét; `chao {net}` cũng được) · `live-do {d, j, m, rtt, tt, dc}`. Phòng trả: `live-so {lamLai, soNet, muc}` (trước các khung bù) · tới máy thầy `live-xem {xem, ws}` (gom 300 ms) · `live-do {…}` (gộp, 10 giây) · `live-can-anh` (sổ quá dài, xin ảnh trạng thái) · `live-kq {lenh:'bat', ok:false, lyDo}`. `live-moi` / `live-thu` / `live-ha-tay` / `live-tay` / `live-noi`: Đợt 2.
+- **Khung nhị phân** (chỉ máy thầy gửi, ≤ 16 KB): sổ nét `0x11` nét xong (có `vt`, nét rất dài chia nhiều khung) · `0x12` xoá nét (nhiều mã) · `0x13` xoá hết · `0x14` bảng mới (khoá trang + tỉ lệ vùng viết) · `0x15` hoàn tác; byte 1..4 = số thứ tự do PHÒNG ghi. Điểm đang viết `0x21` điểm · `0x22` con trỏ · `0x23` nhấc bút: cùng một khung cho DataChannel «net» và đường dự phòng WebSocket (phòng chuyển nguyên văn tới máy em đã báo `live-ok {dc:false}`, ≤ 30 lô/giây, không lưu).
+- **Cửa HTTP** `POST /bpu/live/{noi,dap,kenh,phat,dong}` (thân luôn kèm `ve`): xem đầu tệp `server/src/live-sfu.ts`. Chưa có khoá ⇒ `{ ok:false, lyDo:'chua-cau-hinh' }`.
+
 ### 4.4 Nét trên máy em chạy mượt như đang viết
 
 - Hai lớp canvas: «đã chốt» (vẽ một lần, chỉ vẽ lại khi đổi cỡ / phóng) và «đang viết» (xoá + vẽ lại mỗi khung, chỉ chứa nét dở). Con trỏ bút là một phần tử DOM dời bằng `transform`.
