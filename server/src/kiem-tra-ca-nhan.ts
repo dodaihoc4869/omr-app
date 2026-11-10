@@ -152,7 +152,12 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
     const bai = pv.baiTheoMaDe.get(q.maDe)
     if (!bai) continue
     const ms = byQ.get(q.qid) ?? [], ids = new Set<string>(), y: Record<string, string[]> = {}
+    // 10/11 (thầy «Sửa luôn 54 bài kiểm tra ôn tập kẹt chờ nguồn» — số thật: cả 54 em lớp 10, Bài 10 + Bài 11 giao 01/11, câu CHƯA CÓ MÃ DẠNG): vi kỹ năng MẶC ĐỊNH
+    // `cau:<mã câu>` (omni-q.ts `vknMacDinh`) chỉ nói «câu này chưa gắn kỹ năng» — KHÔNG phải một kiến thức để phủ. Trước: mỗi câu thành một «kiến thức một câu»,
+    // hơn trăm mục không thể phủ trong 3 đề × 28 câu ⇒ đề luôn «chưa phủ» ⇒ cả lớp kẹt chờ nguồn. Nay câu ấy vẫn vào đề, phủ mục BÀI của nó.
+    let macDinh = false
     for (const m of ms) for (const kn of mang(m.vkn_json)) {
+      if (kn.startsWith('cau:')) { macDinh = true; continue }
       // Năng lực vkn là toàn cục: nền tính mol không trở thành kiến thức mới mỗi khi đổi bài/độ khó câu.
       const id=`kn:${kn}`,cu=muc.get(id),bais=cu?.baiLienQuan??[]
       if(!bais.includes(bai.khoaBai))bais.push(bai.khoaBai)
@@ -160,7 +165,7 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
       ;(y[s(m.y)] ??= []).push(id)
     }
     // Không dùng qid/dang dự phòng để tuyên bố đã phủ đủ kiến thức.
-    if (!ids.size) { thieu.add(`ma_tran:${q.qid}`); continue }
+    if (!ids.size && !macDinh) { thieu.add(`ma_tran:${q.qid}`); continue } // chưa có dòng ma trận nào (làn gắn kỹ năng chưa chạy tới) ⇒ vẫn chờ như cũ
     const mau = lichSu.results.filter(l => phanQ.get(s(l.qid)) === q.phan && Number(l.ket_qua) === 1).map(l => { try { return Number(JSON.parse(s(l.raw_json)).ms) } catch { return NaN } })
     ds.push({ q, muc: [...ids,`bai:${bai.khoaBai}`], y, phut: phutCauKt(q.phan, mau) })
   }
@@ -201,7 +206,9 @@ export async function lapKtCn(env: Env, sbd: string, now: number, lamMoi=false,c
       mt=chonChuKyKt2026(nk.muc,nk.cau,nk.hs,sbd+hen.ngay)
     }
     // 09/11 «đủ 28, chuẩn nhất có thể»: ô ma trận thiếu đã lấp bằng ô gần nhất ⇒ KHÔNG còn là lý do «chờ nguồn».
-    const thieuKy=new Set([...thieu,...mt.chuaPhu])
+    // 10/11: «chờ nguồn» chỉ khi THIẾU NGUỒN CÂU thật (tờ chưa vào kho, câu chưa có dòng ma trận, kiến thức không có câu hợp lệ nào — `mt.thieuNguon`).
+    // Kiến thức có câu nhưng không vừa 3 đề × 28 câu (`mt.chuaPhu` phần còn lại) KHÔNG giữ bài của em: chu kỳ sau ôn tiếp (máy ưu tiên mục chưa phủ / còn yếu).
+    const thieuKy=new Set([...thieu,...mt.thieuNguon])
     const phuChuKy=new Set(mt.de.flatMap(d=>d.qids).flatMap(id=>nk.cau.find(q=>q.qid===id)?.muc??[]))
     const dong=mt.de.map((d,i)=>dongGoiDe2026({ngay:hen.ngay,qids:d.qids,nguon,muc:nk.muc,viKyNang:[...muc.values()].filter(m=>m.loai!=='bai'),anhXa:nk.anhXa,bai,thieu:[...thieuKy],soDe:mt.de.length,lan:i+1,chuKyPhu:nk.muc.filter(m=>m.loai!=='bai'&&phuChuKy.has(m.id)).length,seed:sbd+hen.ngay,lyDo:hen.lyDo}))
     if(chiDoc)return {id:`ktcn:${sbd}:${hen.ngay}`,ngay:hen.ngay,tong:28,phut:50,thieu:thieuKy.size,soKienThuc:nk.muc.filter(m=>m.loai!=='bai').length,soViKyNang:[...muc.values()].filter(m=>m.loai!=='bai').length,maTran2026:{soDe:mt.de.length,soCau:mt.de.map(d=>d.qids.length),phut:mt.de.map(d=>d.phut),du:mt.du&&thieu.size===0,phu:mt.phu,tong:mt.tongMuc,thieuMaTran:mt.thieuMaTran,chuaPhu:mt.chuaPhu,thieuNguon:mt.thieuNguon.length}}
