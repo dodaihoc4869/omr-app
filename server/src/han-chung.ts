@@ -10,6 +10,14 @@
 //        nhóm lỗi dự kiến của ô = số dạng × (1 − p^(câu/dạng)) + suất ô × (1 − (p − 0,05)) (một ngày Ôn); tỉ lệ sửa được q = p + (1 − p)/2.
 //   Tₑ = M + 1 (ngày Ôn) + Sₑ.   HẠN CHUNG T = phân vị 90 % của Tₑ trong lớp (≥ 90 % em dự kiến xong hết), kẹp [M + 2, 28].
 // CHƯA HIỆU CHỈNH: giả lập cho thấy công thức tính dư ~2 ngày (an toàn). Hiệu chỉnh bằng kết quả thật để rút hạn ⇒ việc khối B.
+//
+// 10/11 — HẠN THEO HÀNG CHỜ + ĐỀ 28 SUẤT (thầy: «Tôi chỉ giao bài. Máy tự động tính toán một hạn tối ưu cho tất cả học sinh, có đầy đủ kế hoạch cho hết hạn chưa
+// giao hoặc giao sớm hơn đảm bảo học sinh luôn được làm hết câu mới, ôn tập sửa lỗi … mỗi ngày luôn là 28 câu»). Khi nơi gọi đưa SỐ CÂU THEO PHẦN:
+//   · ngày Học mới của một lượng câu = max(⌈Phần I / 18⌉, ⌈Phần II / 4⌉, ⌈Phần III / 6⌉) — đề 28 suất giữ đúng 18 · 4 · 6 nên phần dồn câu nhất quyết định;
+//   · HÀNG CHỜ của từng em = câu mới em CHƯA gặp của các bài đã giao trước (giao sớm khi bài cũ chưa xong ⇒ bài mới xếp sau, hạn tự dài ra);
+//   · Tₑ = ngày Học mới(hàng chờ + bài này) + 1 ngày Kiểm tra ôn tập cho mỗi bài còn dở và bài này + ngày Sửa dự báo; hạn chung = phân vị 90 %, kẹp [M + 2, 42],
+//     và không sớm hơn hạn của bài đang dở (máy phát câu mới theo hạn gần trước ⇒ thứ tự bài giữ đúng).
+// Hết hạn mà thầy chưa giao bài mới: không cần hạn — kế hoạch ngày vẫn 28 câu (câu mới còn dở → câu sai → ôn theo nợ ôn dạng, rut-28.ts).
 import type { Env } from './kieu'
 
 const O7 = [['biet', 12], ['hieu', 4], ['van_dung', 2], ['hieu', 2], ['van_dung', 2], ['hieu', 3], ['van_dung', 3]] as const
@@ -33,14 +41,36 @@ export function ngaySuaDuBao(M: number, nl: NangLucEm): number {
 }
 
 export interface HanChung { M: number; T: number; duKienXong: number; tongEm: number }
-/** Hạn chung (số ngày, tính cả ngày bắt đầu) của bài `soCau` câu cho lớp có năng lực `lop` (mỗi phần tử một em; null = em chưa có dữ liệu). */
-export function hanChung(soCau: number, lop: readonly (NangLucEm | null)[]): HanChung {
-  const M = soNgayMoiHc(soCau)
+/** Số câu theo phần (câu rút được: đã bỏ tự luận, câu chưa hợp lệ). */
+export interface TheoPhan { I: number; II: number; III: number }
+/** Hàng chờ của một em: câu mới chưa gặp của các bài đã giao trước, số bài còn dở, hạn muộn nhất của các bài ấy. */
+export interface HangCho extends TheoPhan { goi: number; han: string }
+const SUAT_PHAN: TheoPhan = { I: 18, II: 4, III: 6 }
+export const TRAN_HAN_HANG_CHO = 42
+const so0 = (v: unknown): number => Math.max(0, Math.floor(Number(v)) || 0)
+/** Số ngày Học mới để làm hết lượng câu mới theo đề 28 suất (18 · 4 · 6): phần dồn câu nhất quyết định. */
+export const ngayMoiTheoPhan = (n: TheoPhan): number => Math.max(1, Math.ceil(so0(n.I) / SUAT_PHAN.I), Math.ceil(so0(n.II) / SUAT_PHAN.II), Math.ceil(so0(n.III) / SUAT_PHAN.III))
+/** Đếm câu theo phần (bỏ câu `hopLe === false`; phần lạ ⇒ Phần I như `oMaTran`). */
+export function demTheoPhan(cau: readonly { phan?: string | null; hopLe?: boolean }[]): TheoPhan {
+  const n: TheoPhan = { I: 0, II: 0, III: 0 }
+  for (const c of cau) if (c.hopLe !== false) n[c.phan === 'II' || c.phan === 'III' ? c.phan : 'I']++
+  return n
+}
+/** Hạn chung (số ngày, tính cả ngày bắt đầu) của bài cho lớp có năng lực `lop` (mỗi phần tử một em; null = em chưa có dữ liệu).
+ *  `bai` là SỐ ⇒ luật 09/11 (M = ⌈N / 28⌉, không hàng chờ). `bai` là số câu THEO PHẦN ⇒ luật 10/11: đề 28 suất + hàng chờ `cho[i]` của từng em;
+ *  `tuHan` = số ngày từ hôm nay tới hạn muộn nhất của bài đang dở của lớp (0 = không có) — hạn bài mới không sớm hơn. */
+export function hanChung(bai: number | TheoPhan, lop: readonly (NangLucEm | null)[], cho: readonly (HangCho | null | undefined)[] = [], tuHan = 0): HanChung {
+  const theoPhan = typeof bai !== 'number'
+  const M = theoPhan ? ngayMoiTheoPhan(bai) : soNgayMoiHc(bai)
   const co = lop.filter((x): x is NangLucEm => !!x)
   const trungVi = (k: keyof NangLucEm): number => { const v = co.map((x) => x[k]).sort((a, b) => a - b); return v.length ? v[Math.floor((v.length - 1) / 2)]! : NANG_LUC_MAC_DINH[k] }
   const tv: NangLucEm = { biet: trungVi('biet'), hieu: trungVi('hieu'), van_dung: trungVi('van_dung') }
-  const T_em = (lop.length ? lop : [null]).map((x) => M + 1 + ngaySuaDuBao(M, x ?? tv)).sort((a, b) => a - b)
-  const T = Math.min(28, Math.max(M + 2, T_em[Math.ceil(0.9 * T_em.length) - 1]!))
+  const T_em = (lop.length ? lop : [null]).map((x, i) => {
+    const c = theoPhan ? cho[i] : null
+    const Me = theoPhan && c ? ngayMoiTheoPhan({ I: bai.I + so0(c.I), II: bai.II + so0(c.II), III: bai.III + so0(c.III) }) : M
+    return Me + 1 + (c ? so0(c.goi) : 0) + ngaySuaDuBao(Me, x ?? tv)
+  }).sort((a, b) => a - b)
+  const T = Math.min(theoPhan ? TRAN_HAN_HANG_CHO : 28, Math.max(M + 2, so0(tuHan), T_em[Math.ceil(0.9 * T_em.length) - 1]!))
   return { M, T, duKienXong: T_em.filter((t) => t <= T).length, tongEm: lop.length }
 }
 
@@ -73,9 +103,36 @@ export async function docNangLucLop(env: Env, sbds: readonly string[], now: numb
   })
 }
 
-/** Hạn chung cho lớp `lop` (tên lớp hiệu lực) — đọc danh sách em đang học + năng lực, tính `hanChung`. */
-export async function hanChungLop(env: Env, sbds: readonly string[], soCau: number, now: number): Promise<HanChung> {
-  return hanChung(soCau, await docNangLucLop(env, sbds, now).catch(() => sbds.map(() => null)))
+/** Hàng chờ từng em (MỘT truy vấn gộp, chỉ chạy lúc giao bài / xem trước): câu mới CHƯA gặp theo phần của các bài đã giao còn hạn trong 30 ngày gần đây.
+ *  «Đã gặp» = có dòng sổ có kết quả hoặc dòng gặp có hướng dẫn (gần đúng với `docGoiCuaEm7`: không so phiên bản câu ⇒ có thể đếm thiếu vài câu thầy vừa sửa). */
+export async function docHangCho(env: Env, sbds: readonly string[], now: number): Promise<(HangCho | null)[]> {
+  if (!sbds.length) return []
+  const tu = new Date(now + 7 * 3600000 - 30 * 86400000).toISOString().slice(0, 10)
+  const r = await env.DB.prepare(`SELECT e.sbd, json_extract(c.meta_json,'$.phan') p, COUNT(*) n, COUNT(DISTINCT e.goi_id) g, MAX(e.han) han
+    FROM goi_bai_7_em e JOIN goi_bai_7 gg ON gg.id = e.goi_id JOIN bai_da_day b ON b.id = gg.tick_id AND b.bo_tick_luc IS NULL
+    JOIN goi_bai_7_cau c ON c.goi_id = e.goi_id AND COALESCE(json_extract(c.meta_json,'$.hopLe'),1) <> 0
+    WHERE e.sbd IN (SELECT value FROM json_each(?)) AND e.han >= ?
+      AND NOT EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd = e.sbd AND s.qid = c.qid AND s.ket_qua IS NOT NULL)
+      AND NOT EXISTS(SELECT 1 FROM goi_bai_7_gap x WHERE x.goi_id = e.goi_id AND x.sbd = e.sbd AND x.qid = c.qid)
+    GROUP BY e.sbd, p`).bind(JSON.stringify(sbds), tu).all<{ sbd: string; p: string | null; n: number; g: number; han: string }>()
+  const gom = new Map<string, HangCho>()
+  for (const x of r.results ?? []) {
+    const h = gom.get(x.sbd) ?? { I: 0, II: 0, III: 0, goi: 0, han: '' }
+    h[x.p === 'II' || x.p === 'III' ? x.p : 'I'] += so0(x.n); h.goi = Math.max(h.goi, so0(x.g)); if (String(x.han) > h.han) h.han = String(x.han)
+    gom.set(x.sbd, h)
+  }
+  return sbds.map((s) => gom.get(s) ?? null)
+}
+
+/** Hạn chung cho lớp — đọc năng lực (và hàng chờ khi có số câu theo phần) rồi tính `hanChung`. `bai`: số câu (luật 09/11), số câu theo phần, hoặc
+ *  danh sách câu của bài (đếm theo phần ở đây). Đọc hàng chờ hỏng ⇒ coi như không có hàng chờ (không chặn việc giao bài). */
+export async function hanChungLop(env: Env, sbds: readonly string[], bai: number | TheoPhan | readonly { phan?: string | null; hopLe?: boolean }[], now: number): Promise<HanChung> {
+  const nlP = docNangLucLop(env, sbds, now).catch(() => sbds.map(() => null))
+  if (typeof bai === 'number') return hanChung(bai, await nlP)
+  const [nl, cho] = await Promise.all([nlP, docHangCho(env, sbds, now).catch(() => [] as (HangCho | null)[])])
+  const homNay = new Date(now + 7 * 3600000).toISOString().slice(0, 10), hanXa = cho.reduce((m, c) => (c && c.han > m ? c.han : m), '')
+  const tuHan = hanXa >= homNay ? Math.round((Date.parse(hanXa) - Date.parse(homNay)) / 86400000) + 1 : 0
+  return hanChung('I' in bai ? (bai as TheoPhan) : demTheoPhan(bai as readonly { phan?: string | null; hopLe?: boolean }[]), nl, cho, tuHan)
 }
 
 /** ĐỘ CHUẨN ĐỀ của bài (hộp Giao bài, thẻ «Bài thiếu câu chuẩn»): mỗi ngày Mới trung bình bao nhiêu suất có câu ĐÚNG ô ma trận.

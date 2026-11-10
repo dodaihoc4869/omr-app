@@ -20,8 +20,12 @@ export const JS_LEN_BANG_BPU = `
     var cs = the.querySelector('.mc-cau-so'); if (cs) cs.style.display = 'none';
     theTen(the);
     S.bpuLen = { sbd: String(em.sbd || '') };
+    // 10/11 thầy «bấm L lên bảng màn chiếu cũ hiện cuộn nếu đề dài luôn, ko bấm space nữa»: từ đây tờ này CUỘN NGAY (cả lúc chờ gọi, mọi đợt) —
+    // đề dài cuộn bằng bánh xe / bàn di / kéo chạm / ↑ ↓ PageUp PageDown, mép mờ «còn nữa ↓»; không còn lật trang «Trang i/n · Space».
+    S.bpuCuon = true;
     if (window.__mcVaoLai) window.__mcVaoLai();
     luaDoi(d, em); // sau __mcVaoLai (vào lại đợt phát 'mc-vao-dot' ⇒ xoá lửa cũ)
+    cuonBpu(d);
     // 09/11 thầy «bấm L lên bảng thì đổi mượt mà sang tờ chiếu cũ chứ không tự động gọi lên bảng»: goiNgay=false ⇒ tờ ở «chờ gọi», thẻ tên em đã đặt; thầy bấm L để mời em.
     // 09/11 (lần 3) thầy «bấm L cái là thu về màn cũ hiện thẻ tên luôn … thẻ tên thu nhỏ vào đẹp tinh tế siêu đẹp, tôn vinh»: thẻ tên hiện NGAY — bay từ giữa
     // màn (to) thu nhỏ về chỗ của nó, viền + quầng màu đội; tờ vẫn «chờ gọi» (L mời em như tờ cũ, D / K chấm thẳng).
@@ -80,8 +84,30 @@ export const JS_LEN_BANG_BPU = `
     + '@keyframes bpuLuaCay{0%{transform:scale(1,1) skewX(0)}50%{transform:scale(.96,1.07) skewX(2deg)}100%{transform:scale(1.03,.95) skewX(-2deg)}}'
     + '@keyframes bpuTia{0%{opacity:0;transform:translate(0,0) scale(1)}20%{opacity:.95}100%{opacity:0;transform:translate(var(--tx,8px),-90px) scale(.3)}}'
     + '@keyframes bpuLuaVao{from{opacity:0;transform:scale(.4) translateY(30px)}to{opacity:1;transform:none}}'
+    + 'body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:calc(var(--lua,236px) + 44px)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0;z-index:2;width:var(--lua,236px);height:calc(var(--lua,236px) * 1.25);margin:-8px 0 0 calc(-30px - var(--lua,236px))}'
+    + '.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi svg{width:calc(var(--lua,236px) * .89);height:calc(var(--lua,236px) * 1.07)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi b{font-size:max(14px,calc(var(--lua,236px) * .093))}'
     + '@media (prefers-reduced-motion:reduce){.bpu-lua-doi,.bpu-lua-doi *{animation:none!important}.bpu-lua-doi .tia{display:none}}html.may-yeu .bpu-lua-doi *{animation:none!important}';
-  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-the-ton'), function (x) { x.classList.remove('bpu-the-ton'); }); }
+  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-the-ton'), function (x) { x.classList.remove('bpu-the-ton'); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-ranh-lua'), function (x) { x.classList.remove('bpu-ranh-lua'); }); }
+  // 10/11 vùng đề cuộn mà có ngọn lửa đội: đề dài (tràn khung) ⇒ chừa lề trái cho lửa, lửa DÍNH ở góc trên (position sticky) — cuộn tới đâu lửa vẫn cháy,
+  // chữ đề không chui dưới lửa. Đề ngắn (không tràn) ⇒ y như cũ (lửa float, chữ chảy quanh). Đo ở trạng thái KHÔNG lề để khỏi bật tắt qua lại.
+  // Ảnh / bảng giữ cỡ cũ: lửa trong lề thu nhỏ (tới 110px) cho vừa chỗ trống bên trái ảnh rộng nhất — đề chỉ có chữ thì lửa giữ cỡ to 236px.
+  function ranhLua(v) {
+    v.classList.remove('bpu-ranh-lua');
+    if (!(v.classList.contains('mc-cuon') && v.querySelector(':scope > .bpu-lua-doi') && v.scrollHeight > v.clientHeight + 2)) return;
+    var rong = 0;
+    Array.prototype.forEach.call(v.querySelectorAll('img,.q-bang'), function (x) { rong = Math.max(rong, x.getBoundingClientRect().width); });
+    v.style.setProperty('--lua', Math.round(Math.max(110, Math.min(236, v.clientWidth - 66 - rong))) + 'px');
+    v.classList.add('bpu-ranh-lua');
+  }
+  function cuonBpu(d) {
+    if (!d || !S.bpuCuon) return;
+    Array.prototype.forEach.call(d.querySelectorAll('.mc-vung-de'), function (v) {
+      ranhLua(v); conNua(v);
+      // ảnh nạp sau làm đề cao thêm ⇒ đo lại mép mờ «còn nữa ↓» và lề lửa
+      Array.prototype.forEach.call(v.querySelectorAll('img'), function (im) { if (!im.complete && !im.__bpuNghe) { im.__bpuNghe = true; im.addEventListener('load', function () { ranhLua(v); conNua(v); }); } });
+    });
+  }
+  document.addEventListener('mc-bo-cuc-xong', function () { if (S.bpuCuon) cuonBpu(dot()); });
   function luaDoi(d, em) {
     xoaLua();
     var mau = String(em.mau || '').trim(); if (!mau || !/^[#a-z0-9(),.%\\s-]+$/i.test(mau)) return;

@@ -568,7 +568,8 @@ async function xemTruoc(env: Env, b: Row, nowMs: number): Promise<Record<string,
   const ctP = cauCuaToChiTiet(env, dv.maDe)
   const khoP = docKhoChoXem(env, dv, ctP, nowMs) // chạy SONG SONG phần cũ (không thêm đợt D1); không bao giờ từ chối
   // HẠN CHUNG (thầy 09/11) — cùng hàm máy chủ dùng khi tạo gói (han-chung.ts); chạy SONG SONG, không thêm đợt chờ D1 nối tiếp.
-  const hcP = ctP.then((c) => hanChungLop(env, dv.em.map((e) => e.sbd), c.qids.length, nowMs)).catch(() => null)
+  const hcP = ctP.then((c) => { const n = { I: 0, II: 0, III: 0 }; for (const [k, v] of Object.entries(c.theoO ?? {})) { const p = k.split('\u0001')[0]; n[p === 'II' || p === 'III' ? p : 'I'] += v }
+    return hanChungLop(env, dv.em.map((e) => e.sbd), c.theoO ? n : c.qids.length, nowMs) }).catch(() => null)
   const [han, ct, cb] = await Promise.all([tinhHan(env, dv, nowMs), ctP, docCauBai(env, dv.maDe)])
   if ('loi' in han) return { ok: false, error: han.loi }
   // Lượt cần TỪNG em — cùng công thức đồng hồ sức chứa (khoiLuongCan của câu chiến dịch mới + lượt nợ cũ ngoài các câu này).

@@ -1,5 +1,6 @@
 // Gói bài 7 ngày: phủ câu gốc, tự làm và hiểu kiến thức là ba bằng chứng khác nhau.
 import { bamMt, oMaTran, xepTheoMaTran } from './ma-tran-rut-moi'
+import { rut28Lech, type UngVien28 } from './rut-28'
 export type VaiGoi7 = 'moi' | 'sua' | 'on' | 'tiep_can' | 'chua'
 export interface CauGoi7 {
   qid: string; maDe: string; maTo?: string; soCau?:number; version: string; group: string; phan: 'I' | 'II' | 'III'
@@ -72,7 +73,10 @@ export function chonGoi7(a: {
   gapHomNay?: ReadonlySet<string>
   /** Khối B (10/11): 'sua' ⇒ câu sửa không bị giới hạn ⅓ mức (ngày sửa lỗi). Câu mới theo loại ngày do nơi gọi đặt qua `nhomPhu` quota. Vắng ⇒ như cũ. */
   loaiNgay?: LoaiNgay7 | null
-}): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number } {
+  /** ĐỀ 28 THEO SUẤT (rut-28.ts, thầy 10/11): có ⇒ mọi nguồn lấp 28 suất theo ô thay cho bốn tầng lấp cũ. `oCua` = ô của MỌI câu (gói, sửa, ôn);
+   *  `daLamO` = ô của các câu em đã làm hôm nay. Nguồn chính (tầng 0): ngày Sửa = câu sai, ngày khác = câu mới theo lịch. Vắng ⇒ hành vi cũ. */
+  suat?: { oCua: (qid: string) => string; daLamO: readonly string[] }
+}): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number; /** đề theo suất: số câu phải lấy lệch ô (0 = mọi suất đúng ô) */ lech?: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
   // CÂU MỚI THEO MA TRẬN ĐỀ 2026 (thầy 06/11, bỏ «dễ trước khó sau»): trong một ô (phần × mức) — sẵn sàng trước, trọng số OMNI, hoà xoay theo ngày;
@@ -107,9 +111,30 @@ export function chonGoi7(a: {
   if(a.nhomPhu?.length){
     const theoQid=new Map(a.cau.map(q=>[q.qid,q] as const))
     for(const g of a.nhomPhu){const ids=new Set(g.qids),con=Math.max(0,g.quota-[...daChon].filter(id=>ids.has(id)).length)
-      const cuaNhom=[...ids].flatMap(id=>theoQid.get(id)??[]).sort((x,y)=>hangI[viTriQ.get(x)!]!-hangI[viTriQ.get(y)!]!)
-      const chon=xepMoi(cuaNhom).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
+      if(con<=0)continue // hết suất của nhóm (ngày Sửa quota 0): không sắp lại cả nhóm (xepMoi thuần, kết quả rỗng như cũ)
+      // nhóm = cả kho (một gói đang chạy, mã câu không trùng): thứ tự hạng chính là `thuTu` ⇒ dùng lại `moi`, không sắp lần hai
+      const caKho=ids.size===N&&theoQid.size===N&&[...ids].every(id=>theoQid.has(id))
+      const cuaNhom=caKho?null:[...ids].flatMap(id=>theoQid.get(id)??[]).sort((x,y)=>hangI[viTriQ.get(x)!]!-hangI[viTriQ.get(y)!]!)
+      const chon=(cuaNhom?xepMoi(cuaNhom):moi).filter(q=>!daChon.has(q.qid)).slice(0,con);for(const q of chon){phu.push(q);daChon.add(q.qid)}thieuPhu+=Math.max(0,con-chon.length)}
   }else {phu.push(...moi.slice(0,a.quotaCon));thieuPhu=Math.max(0,a.quotaCon-moi.length)}
+  if (a.suat) {
+    const oId = a.suat.oCua, vaiCua = new Map<string, ViecGoi7>(), ung: UngVien28[] = [], laSua = a.loaiNgay === 'sua'
+    const day = (qid: string, vai: VaiGoi7, huongDan: boolean, tang: number, o: string) => { if (vaiCua.has(qid)) return; vaiCua.set(qid, { qid, vai, huongDan }); ung.push({ qid, o, tang }) }
+    const dayMoi = (q: CauGoi7, tang: number) => { const hd = !a.sanSang.has(q.qid); day(q.qid, hd ? 'tiep_can' : 'moi', hd, tang, oCua(q)) }
+    const hop = (id: string) => !a.daLamNgay.has(id) && !a.chan.has(id)
+    const daySua = () => { for (const id of a.sua) if (hop(id) && a.sanSang.has(id)) day(id, 'sua', false, laSua ? 0 : 1, oId(id)) }
+    for (const q of phu) dayMoi(q, 0)
+    if (laSua) daySua()
+    for (const id of a.chua ?? []) if (hop(id)) day(id, 'chua', true, 1, oId(id))
+    if (!laSua) daySua()
+    for (const id of a.on) if (hop(id) && a.sanSang.has(id)) day(id, 'on', false, 1, oId(id))
+    for (const q of moi) dayMoi(q, 1)
+    // ôn sớm (tầng cuối, kho vài nghìn câu): mỗi ô chỉ cần tối đa `muc` ứng viên ⇒ không đưa cả kho vào vòng chọn (luật tốc độ)
+    const demSom = new Map<string, number>()
+    for (const id of a.onSom ?? []) { if (!hop(id) || !a.sanSang.has(id)) continue; const o = oId(id), n = demSom.get(o) ?? 0; if (n < muc) { demSom.set(o, n + 1); day(id, 'on', false, 1, o) } }
+    const r = rut28Lech({ ung, can: muc, daLamO: a.suat.daLamO }), viec2 = r.qids.map((id) => vaiCua.get(id)!)
+    return { viec: viec2, thieuPhu, tuLam: viec2.filter(x => !x.huongDan).length, tiepCan: viec2.filter(x => x.huongDan).length, lech: r.lech }
+  }
   for (const q of a.chiTrongMuc ? phu.slice(0, muc) : phu) {
     const huongDan = !a.sanSang.has(q.qid)
     viec.push({ qid: q.qid, vai: huongDan ? 'tiep_can' : 'moi', huongDan }); used.add(q.qid)

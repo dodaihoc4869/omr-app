@@ -22,6 +22,7 @@ import { henHalfLife, type MoHinhHalfLife } from './half-life'
 import { dongGoiDe2026 } from './kiem-tra-ca-nhan-chu-ky'
 import { nguonTuongDuongKt } from './kiem-tra-ca-nhan-nguon'
 import { chonChuKyKt2026,nhomKienThucKt } from './kiem-tra-ca-nhan-ma-tran'
+import { NGAY_DE_28 } from './rut-28'
 import { chuanMucDo } from './lich-su-lam-cau'
 import { laNgayBaoTri, sqlKhongBaoTriBo, SQL_DS_BAO_TRI } from './ngay-bao-tri'
 import { dongGoiKt, ketGonKt } from './kiem-tra-ca-nhan-khoa'
@@ -96,7 +97,8 @@ export { sqlKhongBaoTriBo }
 export const CHU_BAO_TRI_KT = 'Ngày 27/10 app bảo trì: bài kiểm tra này không tính, em không phải làm. Em làm bài mới theo lịch nhé.'
 export const MA_KHOA_KT = 'KIEM_TRA_ON_TAP_TRUOC'
 export const CHU_KHOA_KT = 'Em làm xong Kiểm tra ôn tập hôm nay trước rồi mới mở chặng học mới nhé.'
-export function coHocNgayKt(r:Row|null):boolean {if(!r)return false;const m=r.meta_json?JSON.parse(s(r.meta_json)):de(r);return Number(m.baiNgayToiThieu)>0}
+/** 10/11 (thầy: «kiểm tra ôn tập để đúng 28 câu bỏ 12 câu»): bài kiểm tra từ NGAY_DE_28 KHÔNG kèm 12 câu bài tập ngày — đọc theo NGÀY của lịch, không sửa lịch đã lập. */
+export function coHocNgayKt(r:Row|null):boolean {if(!r||s(r.ngay)>=NGAY_DE_28)return false;const m=r.meta_json?JSON.parse(s(r.meta_json)):de(r);return Number(m.baiNgayToiThieu)>0}
 export function tomTatKt(r: Row, now: number) {
   const d=r.meta_json?null:de(r),t=d?tra(r):null
   const meta=r.meta_json?JSON.parse(s(r.meta_json)) as Record<string,number|string>:null

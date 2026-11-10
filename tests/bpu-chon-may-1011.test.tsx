@@ -93,7 +93,9 @@ describe('máy em — dải kết quả lên bảng nằm dưới thanh đội (
   beforeEach(() => { vi.resetModules(); vi.doMock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' })); WsGia.ds = []; vi.stubGlobal('WebSocket', WsGia); vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ ok: true, ve: 've-em', buoiId: 'b1' })))) })
   afterEach(() => { vi.unstubAllGlobals(); vi.doUnmock('../src/lib/dia-chi-may-chu') })
   for (const dat of [true, false]) {
-    it(`${dat ? 'Đạt' : 'Chưa đạt'}: trong lớp che, dải đứng NGAY SAU «Đội … kJ đội», rồi mốc thẻ ±kJ — không phải lớp nổi`, async () => {
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «bỏ em đạt, chỉ ghi đạt / không đạt nổi bật», gộp vào thanh đội): nhãn kết quả nằm TRONG thanh đội (bên phải), không
+    // còn chữ «Em ·»; em được gọi thấy kJ thật của mình (mục biến động của phòng); mốc thẻ ±kJ vẫn ngay sau thanh đội.
+    it(`${dat ? 'Đạt' : 'Chưa đạt'}: nhãn kết quả nằm trong thanh đội «Đội … kJ đội», rồi mốc thẻ ±kJ — không phải lớp nổi`, async () => {
       const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
       render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
       await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -103,10 +105,16 @@ describe('máy em — dải kết quả lên bảng nằm dưới thanh đội (
       chamLenBang(st, dat, T0 + 1); moDapAn(st, T0 + 2, (a, b) => a === b)
       ws.nhan(viewEm(st, 'S1'))
       const klb = document.querySelector('.bpu-klb')!
-      expect(klb.textContent).toMatch(dat ? /Em · Đạt/ : /Em · Chưa đạt/)
-      expect(klb.parentElement?.classList.contains('bpu-che-noi')).toBe(true)
-      expect(klb.previousElementSibling?.classList.contains('bpu-che-doi')).toBe(true)
-      expect(klb.nextElementSibling?.classList.contains('bpu-bd-neo')).toBe(true)
+      expect(klb.querySelector('b')?.textContent).toBe(dat ? 'Đạt' : 'Chưa đạt')
+      expect(klb.textContent).not.toMatch(/Em ·/)
+      expect(klb.classList.contains('em')).toBe(true)
+      const bd = viewEm(st, 'S1').bienDongEm!.slice(-1)[0]!
+      if (bd.kjEm) expect(klb.querySelector('small')?.textContent).toBe(`${bd.kjEm > 0 ? '+' : '−'}${Math.abs(bd.kjEm)} kJ`)
+      const thanh = klb.parentElement!
+      expect(thanh.classList.contains('bpu-che-doi')).toBe(true)
+      expect(thanh.textContent).toMatch(/Đội Natri.*kJ đội/)
+      expect(thanh.parentElement?.classList.contains('bpu-che-noi')).toBe(true)
+      expect(thanh.nextElementSibling?.classList.contains('bpu-bd-neo')).toBe(true)
       expect(document.querySelectorAll('.bpu-klb')).toHaveLength(1)
     })
   }
@@ -119,7 +127,7 @@ describe('máy em — dải kết quả lên bảng nằm dưới thanh đội (
     expect(quy('.bpu-bd-neo')).toMatch(/height:\s*0/)
     // trong lớp che chỉ thẻ mới nhất hiện (2–3 thẻ chồng xuống tới «Chưa đúng» — đo bằng Chromium 360–430 px, chữ ×1,3)
     expect(css).toMatch(/\.bpu-che-noi \.bpu-bd-the:not\(:last-child\) \{ display: none; \}/)
-    expect(css).toMatch(/@keyframes bpu-klb-vao \{ from \{ opacity: 0; transform: translateY/)
+    expect(css).toMatch(/@keyframes bpu-klb-vao \{ from \{ opacity: 0; transform: translateX/) // SỬA CÓ CHỦ ĐÍCH 10/11: nhãn bên phải ⇒ trượt ngang
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.bpu-klb \{ animation: none; \} \}/)
     expect(css).toMatch(/html\.may-yeu \.bpu-klb \{ animation: none; \}/)
   })

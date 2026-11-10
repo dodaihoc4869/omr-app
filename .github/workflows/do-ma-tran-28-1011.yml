@@ -1,0 +1,54 @@
+# ĐO MA TRẬN 28 CÂU / NGÀY TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 10/11 — thầy: «quét thuật toán hiện tại … đề xuất đơn giản, siêu tối ưu»).
+# CHỈ SELECT gộp: số câu theo ô (phần × mức) của bài đang giao và cả kho, số câu mỗi em-ngày theo phần (không in mã em, tên em), lỗi tồn, song sinh,
+# Kiểm tra ôn tập. KHÔNG `d1 export`, không ghi. Mỗi câu cách nhau 4 giây (D1 từng 429 khi dồn lệnh).
+name: Đo ma trận 28 câu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/do-ma-tran-28-1011.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-ma-tran-28
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
+          GOC="CASE WHEN instr(qid,'~')>0 THEN substr(qid,1,instr(qid,'~')-1) ELSE qid END"
+          LAM="ket_qua IS NOT NULL AND COALESCE(purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')"
+          PHAN="(SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=x.goc LIMIT 1)"
+          N="CASE WHEN song_sinh_json IS NULL OR song_sinh_json = '' THEN 0 WHEN json_valid(song_sinh_json) AND json_type(song_sinh_json) = 'array' THEN json_array_length(song_sinh_json) ELSE 0 END"
+
+          q "A bài đang giao (hạn từ 7 ngày trước): số câu hợp lệ theo ô" "SELECT g.ten, MIN(g.bat_dau) bat_dau, MAX(g.han) han, COUNT(DISTINCT g.lop) so_lop, json_extract(c.meta_json,'\$.phan') phan, COALESCE(json_extract(c.meta_json,'\$.mucDo'),'(trống)') muc, COUNT(DISTINCT c.qid) n FROM goi_bai_7 g JOIN goi_bai_7_cau c ON c.goi_id=g.id WHERE g.han >= date('now','+7 hours','-7 days') AND COALESCE(json_extract(c.meta_json,'\$.hopLe'),1)<>0 GROUP BY g.khoa_bai, g.ten, phan, muc ORDER BY han, g.ten, phan, muc LIMIT 400"
+
+          q "B nguồn câu làm từ 09/11 (để hiểu bộ lọc)" "SELECT nguon, COALESCE(purpose,'') purpose, COUNT(*) n, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE ngay_vn>='2026-11-09' GROUP BY 1,2 ORDER BY n DESC LIMIT 40"
+
+          q "C mỗi em-ngày từ 05/11: số câu theo phần (quy về 28), theo loại ngày" "WITH s AS (SELECT sbd, ngay_vn, $GOC goc FROM su_kien_hoc WHERE ngay_vn>='2026-11-05' AND $LAM AND ma_nguon NOT LIKE 'ktcn:%' AND nguon NOT IN ('thi','chua_loi','tu_luyen') GROUP BY sbd, ngay_vn, goc), m AS (SELECT x.goc, $PHAN phan FROM (SELECT DISTINCT goc FROM s) x), e AS (SELECT s.sbd, s.ngay_vn, COUNT(*) n, SUM(m.phan='I') i, SUM(m.phan='II') ii, SUM(m.phan='III') iii FROM s JOIN m ON m.goc=s.goc GROUP BY s.sbd, s.ngay_vn) SELECT e.ngay_vn ngay, COALESCE(l.loai,'-') loai, COUNT(*) em, SUM(n>=28) em_du_28, ROUND(AVG(n),1) tb_cau, ROUND(AVG(CASE WHEN n>=28 THEN i*28.0/n END),1) tb_I, ROUND(AVG(CASE WHEN n>=28 THEN ii*28.0/n END),1) tb_II, ROUND(AVG(CASE WHEN n>=28 THEN iii*28.0/n END),1) tb_III, SUM(n>=28 AND ii=0) khong_co_DS, SUM(n>=28 AND iii=0) khong_co_TLN, SUM(n>=28 AND ABS(i*28.0/n-18)<=1 AND ABS(ii*28.0/n-4)<=1 AND ABS(iii*28.0/n-6)<=1) sat_18_4_6, SUM(n=28 AND i=18 AND ii=4 AND iii=6) dung_18_4_6 FROM e LEFT JOIN goi_bai_7_loai_ngay l ON l.sbd=e.sbd AND l.ngay=e.ngay_vn GROUP BY 1,2 ORDER BY 1,2"
+
+          q "D cả kho câu luyện theo ô" "SELECT json_extract(json,'\$.phan') phan, COALESCE(json_extract(json,'\$.mucDo'),'(trống)') muc, COUNT(*) n, SUM(CASE WHEN json_extract(json,'\$.reviewed')=1 THEN 1 ELSE 0 END) da_duyet, SUM(CASE WHEN COALESCE(json_extract(json,'\$.tuLuan'),0)=1 THEN 1 ELSE 0 END) tu_luan, COUNT(DISTINCT dang) so_dang FROM game_v2_question GROUP BY 1,2 ORDER BY 1,2"
+
+          q "E lỗi tồn (lần làm gần nhất của câu là sai) theo em — gộp theo cỡ" "WITH s AS (SELECT sbd, $GOC goc, ket_qua, ROW_NUMBER() OVER (PARTITION BY sbd, $GOC ORDER BY luc DESC) r FROM su_kien_hoc WHERE $LAM), x AS (SELECT sbd, goc FROM s WHERE r=1 AND ket_qua=0), m AS (SELECT x.goc, $PHAN phan FROM (SELECT DISTINCT goc FROM x) x), e AS (SELECT x.sbd, COUNT(*) n, SUM(m.phan='I') i, SUM(m.phan='II') ii, SUM(m.phan='III') iii FROM x JOIN m ON m.goc=x.goc GROUP BY x.sbd) SELECT CASE WHEN n<12 THEN 'a 1-11' WHEN n<28 THEN 'b 12-27' WHEN n<56 THEN 'c 28-55' WHEN n<112 THEN 'd 56-111' ELSE 'e 112+' END co, COUNT(*) em, SUM(n) cau_sai, SUM(i) I, SUM(ii) II, SUM(iii) III FROM e GROUP BY 1 ORDER BY 1"
+
+          q "F độ phủ ôn theo dạng: cặp (em, dạng) đã học và lần chạm gần nhất" "WITH d AS (SELECT sbd, ma_dang, MAX(ngay_vn) cuoi, COUNT(*) lan FROM su_kien_hoc WHERE COALESCE(ma_dang,'')<>'' AND $LAM GROUP BY sbd, ma_dang) SELECT (SELECT MIN(ngay_vn) FROM su_kien_hoc) so_tu_ngay, (SELECT COUNT(*) FROM su_kien_hoc) so_dong, COUNT(DISTINCT sbd) em, COUNT(*) cap_em_dang, ROUND(COUNT(*)*1.0/COUNT(DISTINCT sbd),1) dang_moi_em, SUM(cuoi>=date('now','+7 hours','-7 days')) cham_7_ngay, SUM(cuoi<date('now','+7 hours','-14 days')) chua_cham_14, SUM(cuoi<date('now','+7 hours','-30 days')) chua_cham_30, SUM(lan=1) chi_lam_1_lan FROM d"
+
+          q "G song sinh theo phần" "SELECT COALESCE((SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=b.qid_mau LIMIT 1),'?') phan, COUNT(*) cau_goc, SUM(CASE WHEN ($N)>0 THEN 1 ELSE 0 END) co_song_sinh, SUM($N) ban_song_sinh FROM cau_bo_tro b GROUP BY 1 ORDER BY 1"
+
+          q "H Kiểm tra ôn tập từ 03/11" "SELECT ngay, trang_thai, COUNT(*) bai, SUM(CASE WHEN json_extract(json,'\$.goiId') IS NOT NULL THEN 1 ELSE 0 END) theo_bai, ROUND(AVG(json_array_length(json,'\$.cau')),1) tb_cau, ROUND(AVG(diem),2) tb_diem FROM kiem_tra_ca_nhan WHERE ngay>='2026-11-03' GROUP BY 1,2 ORDER BY 1,2"
+
+          q "I loại ngày đã chốt từ 09/11" "SELECT ngay, loai, COUNT(*) em FROM goi_bai_7_loai_ngay GROUP BY 1,2 ORDER BY 1,2"

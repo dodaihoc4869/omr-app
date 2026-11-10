@@ -132,7 +132,9 @@ describe('thẻ kết quả lên bảng trên bảng chiếu', () => {
 })
 
 describe('máy em: kết quả lên bảng cho cả lớp', () => {
-  it('bạn được gọi Đạt ⇒ «Đỗ Đại Học · Đạt» + đội +200 kJ (sau khi mở đáp án); em được gọi thấy «Em · Đạt»; vẫn giữ lớp che', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «gọn hơn, bỏ em đạt, chỉ ghi đạt / không đạt nổi bật»): bạn cùng lớp thấy «Tên gọi · Đạt» (không còn dòng kJ đội);
+  // em được gọi thấy nhãn «Đạt» (không «Em ·»).
+  it('bạn được gọi Đạt ⇒ «Đại Học · Đạt» (sau khi mở đáp án); em được gọi thấy nhãn «Đạt»; vẫn giữ lớp che', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
     render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -145,10 +147,12 @@ describe('máy em: kết quả lên bảng cho cả lớp', () => {
     expect(q('.bpu-klb')).toBeNull() // chưa mở đáp án ⇒ máy em chưa hiện (hiện cùng lúc với số kJ đội)
     expect(duDoan(st, 'S2', 1, T0 + 1)).toBe(false) // đã chấm ⇒ hết đoán (bảng đang hiện kết quả)
     moDapAn(st, T0 + 2, chamSo); ws.nhan(viewEm(st, 'S2'))
-    expect(q('.bpu-klb')?.textContent).toMatch(/Đỗ Đại Học · Đạt/)
-    expect(q('.bpu-klb')?.textContent).toMatch(/\+200 kJ/)
+    expect(q('.bpu-klb > span')?.textContent).toBe('Đại Học · Đạt') // SỬA CÓ CHỦ ĐÍCH 10/11: tên gọi hai chữ
+    expect(q('.bpu-klb')?.getAttribute('aria-label')).toMatch(/Đỗ Đại Học \(Đội Natri\) lên bảng: Đạt/)
     expect(q('.bpu-che')).toBeTruthy()
     ws.nhan(viewEm(st, 'S1'))
+    expect(q('.bpu-klb b')?.textContent).toBe('Đạt')
+    expect(q('.bpu-klb')?.textContent).not.toMatch(/Em ·/)
   })
   it('viewEm: kJ đội lên bảng chỉ có sau khi mở đáp án; Chưa đạt ⇒ dải tế nhị, không nêu số trừ', () => {
     const st = phong()
@@ -160,11 +164,10 @@ describe('máy em: kết quả lên bảng cho cả lớp', () => {
     moDapAn(st, T0 + 1, chamSo)
     expect((viewEm(st, 'S2').luot!.goi as { kjDoi?: number }).kjDoi).toBe(-100)
   })
-  it('máy em hiện dải «Chưa đạt · cảm ơn bạn đã lên bảng»', async () => {
+  it('máy em hiện nhãn «Học · Chưa đạt» — không nêu số trừ (SỬA CÓ CHỦ ĐÍCH 10/11: bỏ dòng «Cảm ơn bạn đã lên bảng»)', async () => {
     const { default: K } = await import('../src/components/bpu/KetQuaLenBangEm')
     render(<K g={{ sbd: 'S1', ten: 'Đỗ Đại Học', doi: 0, lyDo: [], emDoan: null, emTiep: 0, tiep: 0, dat: false, kjDoi: -100 }} laEm={false} />)
-    expect(document.body.textContent).toMatch(/Đỗ Đại Học · Chưa đạt/)
-    expect(document.body.textContent).toMatch(/Cảm ơn bạn đã lên bảng/)
+    expect(document.body.textContent).toMatch(/Học · Chưa đạt/)
     expect(document.body.textContent).not.toMatch(/−100/)
   })
 })
