@@ -1,0 +1,40 @@
+[
+  {
+    "i": 847,
+    "hash": "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4",
+    "fileNguon": "anh/9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4.png",
+    "svg": "do-thi-hi-native847-ddh-a13c4e9c05266e557027acc234f033c9dfb71b385051d7b375cbd6981b8beb3f.svg",
+    "hashSvg": "a13c4e9c05266e557027acc234f033c9dfb71b385051d7b375cbd6981b8beb3f",
+    "byteSvg": 20623,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B1-D1-II-178",
+        "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g)\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+        "refs": [
+          {
+            "hash": "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4",
+            "where": "DB-11-B1-D1-II-178.hinh.0.du_lieu",
+            "hashDataUrl": "89c995833e431ed6bbe33cd2a1d9f2d0a83714dcb0827c41c3f1ea67a1e245f0"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B1-II-16",
+        "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g)\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+        "refs": [
+          {
+            "hash": "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4",
+            "where": "DH-11-C1-B1-II-16.hinh.0.du_lieu",
+            "hashDataUrl": "89c995833e431ed6bbe33cd2a1d9f2d0a83714dcb0827c41c3f1ea67a1e245f0"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1redincreasingcurve-horizontalplateau/green20x20grid/blue2axes2filledheads/5Ycomma4Xlabels/Lượng HI (mol)trueDAM-Thời gianregular/noaddedplateauvalue-unit-legend-answer",
+    "hashSvgDaSoat": "a13c4e9c05266e557027acc234f033c9dfb71b385051d7b375cbd6981b8beb3f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

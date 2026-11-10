@@ -1,0 +1,335 @@
+{
+  "i": 847,
+  "hash": "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4.png",
+  "size": [
+    606,
+    535
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-11-B1-D1-II-178",
+      "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g)\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+      "allHinh": [
+        {
+          "hash": "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4",
+          "where": "DB-11-B1-D1-II-178.hinh.0.du_lieu",
+          "hashDataUrl": "89c995833e431ed6bbe33cd2a1d9f2d0a83714dcb0827c41c3f1ea67a1e245f0"
+        }
+      ],
+      "missingHashes": [
+        "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4"
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B1-II-16",
+      "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g)\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+      "allHinh": [
+        {
+          "hash": "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4",
+          "where": "DH-11-C1-B1-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "89c995833e431ed6bbe33cd2a1d9f2d0a83714dcb0827c41c3f1ea67a1e245f0"
+        }
+      ],
+      "missingHashes": [
+        "9b9c1d9c9b66914c88b2649e351985f68dc12b22dcc203ecd4eb1c6e027f27d4"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/847-native2x-lo327.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "SinglemonotonicREDcurveonGREENsquaregridwithBLUEaxes. No chemicalmolecule/answer.",
+    "axes": {
+      "origin": [
+        113,
+        445
+      ],
+      "yEnd": [
+        113,
+        0
+      ],
+      "xEnd": [
+        601,
+        445
+      ],
+      "color": "darkblue",
+      "heads": "2FILLEDtriangles, UPwithtip1130/base10811..11911;RIGHTtip601445/base590440..590451",
+      "linewidthApprox": 2
+    },
+    "grid": {
+      "bounds": [
+        113,
+        69,
+        491,
+        445
+      ],
+      "verticalXApprox": [
+        113,
+        129,
+        148,
+        167,
+        186,
+        205,
+        224,
+        243,
+        262,
+        281,
+        300,
+        319,
+        338,
+        357,
+        376,
+        395,
+        414,
+        433,
+        452,
+        471,
+        491
+      ],
+      "horizontalYApprox": [
+        69,
+        88,
+        107,
+        126,
+        145,
+        164,
+        183,
+        202,
+        221,
+        240,
+        259,
+        278,
+        297,
+        316,
+        335,
+        354,
+        373,
+        392,
+        411,
+        430,
+        445
+      ],
+      "countVIncludingEdges": 21,
+      "countHIncludingEdges": 21,
+      "style": "thinGREENuniformgridwithsomeblackoverlap/majorlines; no dashedguides",
+      "note": "First/lastspacingnativeirregularnearaxis, do notassumeperfect19pxgridwithoutchecking."
+    },
+    "ticks": {
+      "x": {
+        "positions": [
+          [
+            206,
+            445
+          ],
+          [
+            302,
+            445
+          ],
+          [
+            397,
+            445
+          ],
+          [
+            493,
+            445
+          ]
+        ],
+        "stemsToY": 457,
+        "texts": [
+          "1",
+          "2",
+          "3",
+          "4"
+        ],
+        "labelCenterY": 477
+      },
+      "y": {
+        "positions": [
+          [
+            113,
+            353
+          ],
+          [
+            113,
+            259
+          ],
+          [
+            113,
+            164
+          ],
+          [
+            113,
+            69
+          ]
+        ],
+        "stemsToX": 99,
+        "texts": [
+          "0,5",
+          "1,0",
+          "1,5",
+          "2,0"
+        ],
+        "labelRightX": 91
+      },
+      "origin": {
+        "text": "0",
+        "bbox": [
+          82,
+          440,
+          98,
+          465
+        ],
+        "note": "OnlyONE0lowerleft, noextra0onx/yaxis"
+      }
+    },
+    "labels": [
+      {
+        "text": "Lượng HI (mol)",
+        "bbox": [
+          14,
+          153,
+          43,
+          350
+        ],
+        "rotation": -90,
+        "font": "BOLDuprightserif"
+      },
+      {
+        "text": "Thời gian",
+        "bbox": [
+          271,
+          504,
+          382,
+          530
+        ],
+        "font": "regularuprightserif"
+      }
+    ],
+    "tickFont": "Numerallabelsregularserifwithslantedmath/italicappearance, notbold; decimalCOMMASallYlabels, noDOT.",
+    "curve": {
+      "color": "red",
+      "linewidthApprox": 2,
+      "pixelSamples": [
+        [
+          114,
+          444
+        ],
+        [
+          132,
+          391
+        ],
+        [
+          151,
+          340
+        ],
+        [
+          170,
+          297
+        ],
+        [
+          189,
+          262.5
+        ],
+        [
+          208,
+          234.5
+        ],
+        [
+          227,
+          211.5
+        ],
+        [
+          246,
+          193
+        ],
+        [
+          265,
+          177.5
+        ],
+        [
+          284,
+          165.5
+        ],
+        [
+          303,
+          155.5
+        ],
+        [
+          322,
+          148.5
+        ],
+        [
+          341,
+          143.5
+        ],
+        [
+          360,
+          138.5
+        ],
+        [
+          379,
+          134.5
+        ],
+        [
+          398,
+          130.5
+        ],
+        [
+          417,
+          127
+        ],
+        [
+          436,
+          125.5
+        ],
+        [
+          455,
+          125.5
+        ],
+        [
+          474,
+          125.5
+        ],
+        [
+          482,
+          125.5
+        ]
+      ],
+      "plateau": "Finitehorizontalnativeportion approxx430..482 at125.5, withsmoothjoinafterincreasingcurve; NEVERovershoot/oscillate.",
+      "markers": 0
+    },
+    "counts": {
+      "curves": 1,
+      "gridV": 21,
+      "gridH": 21,
+      "heads": 2,
+      "xNumLabels": 4,
+      "yNumLabels": 4,
+      "originLabels": 1,
+      "pointMarkers": 0
+    },
+    "noAdded": [
+      "Kc/equilibriumanswer",
+      "curveasymptotevalue1.7label",
+      "timeunit",
+      "t1/t2",
+      "verticaldashedguide",
+      "curvepoints",
+      "newtitle",
+      "H2orI2curves"
+    ]
+  },
+  "coordinateMeaning": "Curvepixelvalues aretracecoordinates, notnewscientificdatasetorprecisionclaim. Onlysourceprintedlabelsaredata. Noformulaanswerinferred."
+}
