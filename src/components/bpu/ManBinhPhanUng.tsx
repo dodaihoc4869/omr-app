@@ -649,7 +649,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
 
   // LIVE BẢNG (10/11). Thầy chốt tối 10/11: live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu; máy em vẫn là màn câu hỏi như thường (thêm dấu nhỏ
   // «Thầy đang live» + nút tiếng). Chỉ khi cờ phòng `live.bang` bật (thầy gọi em lên bảng / bật tay) mới sang BẢNG LIVE toàn màn xoay ngang; lượt mới ⇒ cờ tắt
-  // ⇒ về màn câu hỏi dọc. Phòng chưa có cờ (bản trước đợt 1C) ⇒ suy ra đúng luật ấy từ lượt: đang có em được gọi. Em được gọi ⇒ mic tự bật.
+  // ⇒ về màn câu hỏi dọc. Phòng chưa có cờ (bản trước đợt 1C) ⇒ suy ra đúng luật ấy từ lượt: đang có em được gọi. Em được gọi ⇒ mic tự bật (lớp live lo).
   const lv = v?.live ?? null
   const liveBat = !!lv?.bat && !v?.ketThuc
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
@@ -662,13 +662,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
     <Suspense fallback={null}>
       <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} cau={cauLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
-        mic={liveBat && laEmGoi && (l?.pha === 'goi' || l?.pha === 'lam-bang')} doi={e ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi} />
+        doi={e ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi} />
     </Suspense>
   ) : null
 
   if (an) return null
   return createPortal(
-    <div ref={gocRef} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
+    <div ref={gocRef} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}${cheLive === 'bang' ? ' live-bang' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
       {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}

@@ -53,7 +53,11 @@ export function xinQuyenTatMan(): void {
     void p.then((s) => { quyen = s === 'granted' ? 'granted' : s === 'denied' ? 'denied' : 'prompt' }, () => {}).finally(() => { if (dangXin === p) dangXin = null })
   } catch { dangXin = null }
 }
-export const dangXinQuyen = (): boolean => dangXin !== null || choHop > 0
+export const dangXinQuyen = (): boolean => dangXin !== null || choHop > 0 || !!kiemNgoai?.()
+/** LIVE: thư viện live của máy em tự xin quyền mic (em được gọi lên bảng) và biết lúc hộp hỏi đang hiện (`dangChoQuyenMic`) ⇒ lớp live gắn hàm hỏi vào đây
+ *  (gỡ bằng null) để nhánh «cửa sổ nổi» không báo nhầm. */
+let kiemNgoai: (() => boolean) | null = null
+export function datKiemQuyenNgoai(f: (() => boolean) | null): void { kiemNgoai = f }
 /** LIVE (10/11, đặc tả mục 4.7): hộp hỏi quyền KHÁC của trình duyệt (mic khi em được mời nói…) cũng làm trang mất tiêu điểm ⇒ bọc lời hứa xin quyền
  *  bằng hàm này để nhánh «cửa sổ nổi» không báo nhầm trong lúc hộp đang hiện. Trả lại chính lời hứa đó. */
 let choHop = 0
@@ -108,4 +112,4 @@ export function dangChiaDoi(): boolean {
 }
 
 /** Chỉ cho test: xoá trạng thái quyền giữa các ca. */
-export function _datLaiTatMan(): void { quyen = null; dangXin = null; daDoc = false; daXin = false; choHop = 0; khoaXoayDen = 0 }
+export function _datLaiTatMan(): void { quyen = null; dangXin = null; daDoc = false; daXin = false; choHop = 0; khoaXoayDen = 0; kiemNgoai = null }

@@ -180,16 +180,30 @@ await em2.ctx.close() // phần đo bên dưới chỉ còn MỘT máy em (máy 
 const tk = (ds) => { const s = [...ds].sort((a, b) => a - b), lay = (p) => (s.length ? +s[Math.min(s.length - 1, Math.floor(s.length * p))].toFixed(2) : 0); return { n: s.length, trungVi: lay(0.5), p95: lay(0.95), lonNhat: lay(1) } }
 const cdpEm = await em.ctx.newCDPSession(em.t)
 const soDo = []
+await cdpEm.send('Performance.enable')
+const docCdp = async () => Object.fromEntries((await cdpEm.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]))
+// mức nền: bảng live đứng yên (thầy không viết) 2 giây ở CPU ×4 — luồng chính bận bao nhiêu khi không có nét nào
+await cdpEm.send('Emulation.setCPUThrottlingRate', { rate: 4 })
+await ngu(300)
+const nen0 = await docCdp(), tNen = performance.now()
+await ngu(2000)
+const nen1 = await docCdp()
+const nenNghi = +((nen1.TaskDuration - nen0.TaskDuration) / ((performance.now() - tNen) / 1000) * 100).toFixed(1)
+console.log(`  mức nền ×4 (không nét): luồng chính bận ${nenNghi} %`)
 for (const cpu of [1, 4, 6]) {
   await cdpEm.send('Emulation.setCPUThrottlingRate', { rate: cpu })
   await ngu(300)
+  const truocCdp = await docCdp(), t0Do = performance.now()
   await em.t.evaluate(() => { window.__do.khung = []; window.__do.xl = []; window.__do.bat = true })
   const r2 = taoNgauNhien(40 + cpu), y0 = 430 + (cpu === 1 ? 0 : cpu === 4 ? 150 : 300)
   await viet([...vietDong('n = 0,1 mol', 1312, y0, 40, { rnd: r2, vMax: 900 }), ...vietDong('CH_3COOH + NaOH', 1312, y0 + 70, 38, { rnd: r2, vMax: 900 })], { nghi: 60 })
   await ngu(500)
   const D = await em.t.evaluate(() => { window.__do.bat = false; return window.__do })
+  const sauCdp = await docCdp(), giayDo = (performance.now() - t0Do) / 1000
+  // phần trăm thời gian luồng chính bận (đã nhân hệ số hãm CPU): tổng việc · mã · bố cục · tính kiểu
+  const luong = Object.fromEntries(['TaskDuration', 'ScriptDuration', 'LayoutDuration', 'RecalcStyleDuration'].map((k) => [k.replace('Duration', ''), +((sauCdp[k] - truocCdp[k]) / giayDo * 100).toFixed(1)]))
   const kh = tk(D.khung), xl = tk(D.xl), tong = D.khung.reduce((s, v) => s + v, 0)
-  const dong = { cpu: '×' + cpu, khungMoiGiay: +(kh.n / (tong / 1000)).toFixed(1), cachKhungTrungViMs: kh.trungVi, cachKhungP95Ms: kh.p95, khungTreHon20Ms: D.khung.filter((v) => v > 20).length, soKhung: kh.n, xuLyMoiKhungMs: { trungVi: xl.trungVi, p95: xl.p95, lonNhat: xl.lonNhat } }
+  const dong = { cpu: '×' + cpu, khungMoiGiay: +(kh.n / (tong / 1000)).toFixed(1), cachKhungTrungViMs: kh.trungVi, cachKhungP95Ms: kh.p95, khungTreHon20Ms: D.khung.filter((v) => v > 20).length, soKhung: kh.n, xuLyMoiKhungMs: { trungVi: xl.trungVi, p95: xl.p95, lonNhat: xl.lonNhat }, luongChinhBanPhanTram: luong }
   soDo.push(dong)
   console.log('  đo', JSON.stringify(dong))
 }
@@ -231,7 +245,7 @@ await ngu(800)
 kiem('Tắt live ⇒ tờ về nút «Live», máy em bỏ lớp live + dấu', await em.t.locator('.lv, .lv-dau').count() === 0)
 
 kiem('Không lỗi trang nào', loiTrang.length === 0, loiTrang.slice(0, 4).join(' | '))
-writeFileSync(SO_DO, JSON.stringify({ ngay: new Date().toISOString(), ghiChu: 'Bộ thử scripts/thu-live-1011/thu.mjs — Chromium không đầu, phòng thật trong Node, nét đi đường WebSocket (không SFU). Máy em 844 × 390 @2x.', khungHinhMayEm: soDo, kiem: ket }, null, 2) + '\n')
+writeFileSync(SO_DO, JSON.stringify({ ngay: new Date().toISOString(), ghiChu: 'Bộ thử scripts/thu-live-1011/thu.mjs — Chromium không đầu, phòng thật trong Node, nét đi đường WebSocket (không SFU). Máy em 844 × 390 @2x.', khungHinhMayEm: soDo, luongChinhBanKhiDungYenX4PhanTram: nenNghi, kiem: ket }, null, 2) + '\n')
 await trinh.close()
 await may.dong()
 const hong = ket.filter((k) => !k.dat)

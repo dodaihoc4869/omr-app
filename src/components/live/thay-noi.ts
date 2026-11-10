@@ -25,7 +25,7 @@ export interface TtLiveTo {
   micIm: boolean
   noiLai: boolean
   mayKhac: boolean
-  /** Bảng có đang xuống máy em không (cờ phòng `live.bang`; phòng chưa có cờ ⇒ suy theo luật: đang có em được gọi lên bảng). */
+  /** Bảng có đang xuống máy em không (cờ phòng `live.bang`: tự bật khi gọi em lên bảng, tự tắt khi mở lượt mới; thầy bật / tắt tay bằng công tắc). */
   bang: boolean
   /** Em lên bảng đang mở mic (`live.noi`) — thẻ «Đang nói» + «Thu mic». */
   noi: { sbd: string; ten: string; ky: string; doi: string; mau: string }[]
@@ -72,13 +72,13 @@ function trangThai(): TtLiveTo {
   })
   const lu = view?.luot ?? null
   const live = !!l?.bat
-  const noi = (live ? (l?.noi ?? []) : []).map((sbd) => { const e = ds.find((x) => x.sbd === sbd); return { sbd, ten: e?.ten ?? sbd, ky: kyHieu(e?.ten ?? sbd), doi: e ? (DOI_BPU[e.doi]?.ten ?? '') : '', mau: e ? mauDoi(e.doi) : '' } })
+  const noi = (live ? (l?.noi ?? []) : []).map((n) => ({ sbd: n.sbd, ten: n.ten, ky: kyHieu(n.ten), doi: n.xa ? 'Em ở xa' : (DOI_BPU[n.doi]?.ten ?? ''), mau: n.xa ? '' : mauDoi(n.doi) }))
   return {
     co: !!l && (!!p || live), pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
     xem: ttLt?.xem ?? l?.xem ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
     coTieng: l?.tieng !== 'chua-cau-hinh', khongTieng: ttLt?.tieng === 'khong' || ttLt?.tieng === 'loi', micIm: !!ttLt?.micIm,
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
-    bang: live && ((l as { bang?: boolean } | null)?.bang ?? !!lu?.goi), noi,
+    bang: live && !!l?.bang, noi,
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
     the, roi,
   }
@@ -179,7 +179,7 @@ function bam(): void {
   else void moThe()
 }
 
-type TinTo = { viec?: unknown; id?: unknown; v?: unknown; sbd?: unknown; sk?: unknown; trang?: unknown; tiLe?: unknown; net?: unknown; vung?: unknown; giayToi?: unknown }
+type TinTo = { viec?: unknown; id?: unknown; v?: unknown; sk?: unknown; trang?: unknown; tiLe?: unknown; net?: unknown; vung?: unknown; giayToi?: unknown }
 const vungCua = (v: unknown) => (v && typeof v === 'object' ? (v as { giay?: number[]; bang?: number[] }) : null)
 
 /** Tin `{ nguon: 'to-chieu', loai: 'live', viec, … }` từ tờ chiếu (nghe-to-chieu.ts chuyển vào). */
@@ -198,8 +198,8 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'tieng-lop': if (the) { the = { ...the, tiengLop: m.v === true }; lt?.dat({ tiengLop: m.v === true }); bao() } break
     case 'tat': lt?.tat(); the = null; bao(); break
     // công tắc «Bảng → máy em» (bật / tắt tay cờ `live.bang`) · «Thu mic» em đang nói — phòng xử (đợt 1C)
-    case 'bang': layPhong()?.gui({ t: 'live-dat', bang: m.v === true }); break
-    case 'thu-mic': if (typeof m.sbd === 'string') layPhong()?.gui({ t: 'live-thu', sbd: m.sbd }); break
+    case 'bang': lt?.dat({ bang: m.v === true }); break
+    case 'thu-mic': lt?.thuMic(); break
     case 'anh': {
       guong.khoa = String(m.trang ?? ''); guong.tiLe = Number(m.tiLe) || 16 / 9; guong.net = Array.isArray(m.net) ? (m.net as NetBut[]) : []
       maCua.set(guong.khoa, maTrang(guong.khoa, vungCua(m.vung), m.giayToi === true))

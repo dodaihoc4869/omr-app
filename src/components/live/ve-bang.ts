@@ -1,5 +1,7 @@
 // LIVE BẢNG — VẼ NÉT TRÊN MÁY EM (đặc tả mục 4.4). Cùng bộ dựng nét với máy thầy (`taoLoiBut()` chạy chính chuỗi JS của tờ chiếu) ⇒ cùng dữ liệu, cùng hình.
 // Hai lớp canvas: «đã chốt» (vẽ một lần; chỉ vẽ lại khi đổi cỡ / xoá / bảng mới) và «đang viết» (mỗi khung xoá đúng ô vừa vẽ rồi vẽ lại đoạn đuôi nét dở).
+// Lớp «đang viết» là một canvas NHỎ ĐI THEO ĐẦU BÚT (không phủ cả màn): mỗi khung trình duyệt phải chép lại cả mặt canvas vừa đổi ⇒ canvas nhỏ thì việc mỗi
+// khung nhỏ theo (đo máy em CPU ×4: luồng chính bận 73 % với canvas phủ màn). Đuôi nét dở dài quá khổ canvas ⇒ in sớm phần đã ổn định xuống lớp chốt.
 // Nét dở dài thì phần đầu đã ổn định in dần xuống lớp đã chốt (`mocDong`) ⇒ mỗi khung chỉ dựng đoạn đuôi, như máy thầy.
 // Khung quy chiếu = «cửa sổ thầy ảo» (bo-cuc.ts): canvas chỉ phủ vùng chiếu nên mọi nét dời (−ox, −oy).
 import type { KhungBut, LoiBut, NetBut, SuKienBut, XuLyBut } from '../../lib/but-bang-loi'
@@ -31,6 +33,13 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   const doDang = new Map<string, NetDo>()
   /** Ô vừa vẽ trên lớp sống (px thiết bị) — khung sau xoá đúng chỗ này. */
   let ban: [number, number, number, number] | null = null
+  /** Lớp sống: cạnh (px CSS) + góc trên-trái trong hình (px CSS, đã làm tròn theo điểm ảnh thiết bị). */
+  let canh = 320, sx = 0, sy = 0
+  function dichSong(x: number, y: number): void {
+    const d = kv!.dpr
+    sx = Math.round(x * d) / d; sy = Math.round(y * d) / d
+    cvSong.style.transform = `translate3d(${sx}px,${sy}px,0)`
+  }
 
   function dat(g: G2): number {
     const s = kv!.dpr * KH!.k
@@ -39,7 +48,9 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   }
   function to(g: G2, p: number[], mau: string, tay = false): void {
     if (!p.length) return
-    dat(g); g.globalCompositeOperation = tay ? 'destination-out' : 'source-over'; g.fillStyle = mau
+    const s = dat(g)
+    if (g === gS) g.setTransform(s, 0, 0, s, -(kv!.ox + sx) * kv!.dpr, -(kv!.oy + sy) * kv!.dpr)
+    g.globalCompositeOperation = tay ? 'destination-out' : 'source-over'; g.fillStyle = mau
     g.beginPath(); loi.veDaGiac(g, p); g.fill()
     g.globalCompositeOperation = 'source-over'
   }
@@ -71,7 +82,12 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   function datKhung(k: KhungVe): void {
     kv = k
     KH = loi.khung(k.Wv, k.Hv)
-    for (const c of [cvChot, cvSong]) { c.width = Math.max(1, Math.round(k.w * k.dpr)); c.height = Math.max(1, Math.round(k.h * k.dpr)) }
+    cvChot.width = Math.max(1, Math.round(k.w * k.dpr)); cvChot.height = Math.max(1, Math.round(k.h * k.dpr))
+    // lớp sống: vuông, cạnh theo cỡ nét trên máy này (đuôi nét dở thường ≤ ~540 px ở màn 1920), không lớn hơn hình
+    canh = Math.round(Math.max(200, Math.min(520, 700 * KH.k, k.w, k.h)))
+    cvSong.width = cvSong.height = Math.max(1, Math.round(canh * k.dpr))
+    cvSong.style.width = cvSong.style.height = `${canh}px`
+    dichSong(0, 0)
     ban = null
     for (const d of doDang.values()) { d.st = loi.moXuLy(d.net, KH); loi.xuLyThem(d.st, d.net.diem, d.net.diem.length); d.dong = 0 }
     veLai()
@@ -133,26 +149,48 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     for (const h of dau) { const d = doDang.get(h.id); if (d) d.dau = [h.x, h.y] }
   }
   /** MỘT khung vẽ của lớp «đang viết». Trả số nét dở đã vẽ. */
+  /** Đuôi nét dở dài quá khổ lớp sống ⇒ in sớm phần đã ổn định (chừa đoạn cuối dài hơn đoạn thon cuối nét, như `mocDong`) xuống lớp chốt. */
+  function inSom(d: NetDo): boolean {
+    const st = d.st, m = st.X.length, giu = st.ban * 2 * 6 * 3
+    let den = m - 4
+    while (den > d.dong + 4 && st.L[m - 1]! - st.L[den]! < giu) den -= 2
+    if (den <= d.dong + 4 || !gC) return false
+    to(gC, loi.vien(st, d.dong, den, null, false), d.net.mau, d.net.cong === 'tay')
+    d.dong = den - 2
+    return true
+  }
+  function hop(p: number[], h: [number, number, number, number]): void {
+    for (let i = 0; i < p.length; i += 2) { const x = p[i]!, y = p[i + 1]!; if (x < h[0]) h[0] = x; if (x > h[2]) h[2] = x; if (y < h[1]) h[1] = y; if (y > h[3]) h[3] = y }
+  }
+  /** MỘT khung vẽ của lớp «đang viết». Trả số nét dở đã vẽ. */
   function veSong(): number {
     if (!gS || !gC || !KH || !kv) return 0
     xoaSong()
     if (!doDang.size) return 0
-    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, dem = 0
+    const k = KH.k, h: [number, number, number, number] = [1e9, 1e9, -1e9, -1e9], ve: [number[], string][] = []
+    const duoi = (d: NetDo): number[] => loi.vien(d.st, d.dong, -1, d.dau ? [[d.dau[0] * KH!.rw, d.dau[1] * KH!.rh]] : null, false)
     for (const d of doDang.values()) {
       loi.xuLyThem(d.st, d.net.diem, d.net.diem.length)
       const den = loi.mocDong(d.st, d.dong)
       if (den > 0) { to(gC, loi.vien(d.st, d.dong, den, null, false), d.net.mau, d.net.cong === 'tay'); d.dong = den - 2 }
-      const p = loi.vien(d.st, d.dong, -1, d.dau ? [[d.dau[0] * KH.rw, d.dau[1] * KH.rh]] : null, false)
+      let p = duoi(d)
       if (!p.length) continue
-      to(gS, p, d.net.mau)
-      dem += 1
-      for (let i = 0; i < p.length; i += 2) { const x = p[i]!, y = p[i + 1]!; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
+      const h1: [number, number, number, number] = [1e9, 1e9, -1e9, -1e9]
+      hop(p, h1)
+      if (((h1[2] - h1[0]) * k > canh - 12 || (h1[3] - h1[1]) * k > canh - 12) && inSom(d)) { p = duoi(d); h1[0] = h1[1] = 1e9; h1[2] = h1[3] = -1e9; hop(p, h1) }
+      ve.push([p, d.net.mau])
+      if (h1[0] < h[0]) h[0] = h1[0]; if (h1[1] < h[1]) h[1] = h1[1]; if (h1[2] > h[2]) h[2] = h1[2]; if (h1[3] > h[3]) h[3] = h1[3]
     }
-    if (dem) {
-      const s = kv.dpr * KH.k, dx = kv.ox * kv.dpr, dy = kv.oy * kv.dpr
-      ban = [Math.floor(x0 * s - dx) - 3, Math.floor(y0 * s - dy) - 3, Math.ceil((x1 - x0) * s) + 6, Math.ceil((y1 - y0) * s) + 6]
+    if (!ve.length) return 0
+    // hộp bao (px CSS trong hình) không còn nằm trọn trong lớp sống ⇒ dời lớp cho hộp vào giữa (kẹp trong hình)
+    const x0 = h[0] * k - kv.ox, y0 = h[1] * k - kv.oy, x1 = h[2] * k - kv.ox, y1 = h[3] * k - kv.oy
+    if (x0 < sx + 4 || y0 < sy + 4 || x1 > sx + canh - 4 || y1 > sy + canh - 4) {
+      dichSong(Math.max(0, Math.min(kv.w - canh, (x0 + x1 - canh) / 2)), Math.max(0, Math.min(kv.h - canh, (y0 + y1 - canh) / 2)))
     }
-    return dem
+    for (const [p, mau] of ve) to(gS, p, mau)
+    const d = kv.dpr
+    ban = [Math.floor((x0 - sx) * d) - 3, Math.floor((y0 - sy) * d) - 3, Math.ceil((x1 - x0) * d) + 6, Math.ceil((y1 - y0) * d) + 6]
+    return ve.length
   }
   /** Toạ độ 0..1 (cửa sổ thầy) ⇒ px CSS trong vùng chiếu của máy em. */
   function toiPx(x: number, y: number): [number, number] {

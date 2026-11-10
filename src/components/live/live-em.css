@@ -3,6 +3,8 @@
    Chuyển động: chỉ transform / opacity. Máy yếu (`html.may-yeu`) / giảm chuyển động ⇒ hiện / ẩn tức thì, bỏ kính mờ + quầng. */
 .lv { position: fixed; left: 0; top: 0; width: 100vw; height: 100vh; height: 100dvh; z-index: 6; overflow: hidden; background: var(--tr-chieu-bang); color: var(--tr-chieu-giay);
   font-weight: 500; user-select: none; -webkit-user-select: none; touch-action: none; overscroll-behavior: contain; contain: layout paint; }
+/* Bảng live đang phủ kín ⇒ màn Bình Phản Ứng bên dưới thôi vẽ (ngọn lửa, giám thị… còn chạy hoạt cảnh dưới lớp phủ là tốn khung hình vô ích) */
+.bpu-hs.live-bang > :not(.lv) { content-visibility: hidden; visibility: hidden; }
 /* iPhone / máy không khoá ngang được, đang cầm dọc: xoay HÌNH 90° (đỉnh máy thành mép trái hình) */
 .lv[data-xoay] { transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
 /* thước đo vùng an toàn của MÁY (tai thỏ, thanh home) — đọc bằng getComputedStyle */
@@ -18,6 +20,8 @@
 .lv-bang { position: absolute; border-radius: 28px; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); }
 .lv-bang p { position: absolute; left: 0; right: 0; top: 40%; margin: 0; text-align: center; font-size: 22px; line-height: 1.5; font-weight: 600; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); }
 .lv-cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+/* lớp «đang viết»: canvas nhỏ đi theo đầu bút (cỡ + chỗ do ve-bang.ts đặt) */
+.lv-cv.song { width: auto; height: auto; will-change: transform; }
 /* Con trỏ bút của thầy (hiện cả khi chưa chạm bảng): phần tử DOM dời bằng transform */
 .lv-tro { position: absolute; left: 0; top: 0; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; opacity: 0; pointer-events: none; will-change: transform;
   border: 2px solid var(--p-cam); box-shadow: 0 0 0 5px color-mix(in srgb, var(--p-cam) 16%, transparent), 0 0 14px color-mix(in srgb, var(--p-cam) 50%, transparent); }

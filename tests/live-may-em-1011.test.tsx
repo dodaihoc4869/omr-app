@@ -1,14 +1,16 @@
-// LIVE BẢNG trên MÁY EM (đợt 1B, đặc tả docs/dac-ta-live-bang-1011.md mục 2.2, 4.7, 5 + điểm quyết 5): màn Bình Phản Ứng thật + lớp live nạp lười, phòng giả
-// chạy đúng luật phòng (src/lib/bpu/phong.ts + phong-live.ts). Khoá:
+// LIVE BẢNG trên MÁY EM (đợt 1B, đặc tả docs/dac-ta-live-bang-1011.md mục 2.2, 4.3c, 4.7): màn Bình Phản Ứng thật + lớp live nạp lười, phòng giả chạy đúng
+// luật phòng (src/lib/bpu/phong.ts + phong-live.ts). LUẬT THẦY CHỐT TỐI 10/11 («khi chuyển câu thì vẫn giữ live tiếng với hs, màn hình hs hiện câu hỏi như
+// bình thường, khi bấm gọi lên bảng … lập tức màn hình hs chuyển sang chế độ live»). Khoá:
 //   · phòng không có khối `live` (công tắc tắt / phòng đời cũ) ⇒ không có gì của live trên máy em;
-//   · thầy live mà lượt đang mở, em CHƯA gửi ⇒ giữ màn làm bài + dải «Thầy đang live»; gửi xong ⇒ tự sang bảng live; thầy tắt ⇒ lớp tự thu;
-//   · bảng live: không nút thoát, có tay nắm ≥ 48 px, khay có Tiếng / đội + kJ, KHÔNG mang đáp án;
+//   · thầy live ⇒ máy em GIỮ màn câu hỏi (chưa gửi lẫn đã gửi) + dấu nhỏ «Thầy đang live» (có nút tiếng khi máy chủ có tiếng), KHÔNG vào bảng;
+//   · thầy gọi em lên bảng (cờ `live.bang`) ⇒ bảng live; lượt mới ⇒ về màn câu hỏi, live còn nguyên; thầy tắt ⇒ lớp tự thu;
+//   · bảng live: không nút thoát, có tay nắm, khay có Tiếng / đội + kJ, KHÔNG mang đáp án;
 //   · xoay máy / vào toàn màn hình giữa lúc live KHÔNG gửi `roi` (khoá xoay 600 ms), chia đôi thật sau đó VẪN bị bắt;
 //   · khung nét nhị phân của phòng tới được thư viện live (kết nối đặt `binaryType = 'arraybuffer'`).
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { moDapAn, moLuot, nhanTra, taoPhong, viewEm, type TrangThaiPhong } from '../src/lib/bpu/phong'
-import { datCoLive, liveBat, liveSan, liveTat } from '../src/lib/bpu/phong-live'
+import { goiLenBang, moLuot, nhanTra, taoPhong, viewEm, type TrangThaiPhong } from '../src/lib/bpu/phong'
+import { datCoLive, liveBat, liveDat, liveSan, liveTat } from '../src/lib/bpu/phong-live'
 import { KHOA_XOAY_MS, _datLaiTatMan } from '../src/components/bpu/tat-man'
 import { NOI_MS } from '../src/components/bpu/ManBinhPhanUng'
 import { maBangMoi, maNetXong } from '../src/lib/live/ma-net'
@@ -66,21 +68,28 @@ describe('máy em khi thầy live', () => {
     expect(lop('.lv') + lop('.lv-dai')).toBe(0)
   })
 
-  it('điểm quyết 5: lượt đang mở, em CHƯA gửi ⇒ giữ màn làm bài + dải «Thầy đang live»; gửi xong ⇒ bảng live; thầy tắt ⇒ lớp tự thu', async () => {
+  it('thầy live ⇒ giữ màn câu hỏi + dấu «Thầy đang live»; gọi em lên bảng ⇒ bảng live; lượt mới ⇒ về màn câu hỏi (live còn); thầy tắt ⇒ lớp tự thu', async () => {
     const st = phong(); moLuot(st, cau, T0)
     const { ws, bao } = await vao(st)
     expect(ws.binaryType).toBe('arraybuffer')
     liveSan(st, { san: true, ss: null }, T0); liveBat(st, T0 + 1); bao()
-    await waitFor(() => expect(lop('.lv-dai')).toBe(1))
+    await waitFor(() => expect(lop('.lv-dau')).toBe(1))
     expect(screen.getByText('Thầy đang live')).toBeTruthy()
     expect(lop('.lv')).toBe(0)
     expect(screen.getByLabelText('Gửi đáp án')).toBeTruthy() // màn làm bài còn nguyên
-    // em gửi ⇒ phòng ghi ⇒ lớp bảng live
+    expect(lop('.lv-dau button')).toBe(0) // máy chủ chưa có tiếng ⇒ dấu không có nút tiếng
+    // em gửi ⇒ VẪN màn Bình Phản Ứng (đã gửi) + dấu, chưa vào bảng
     nhanTra(st, 'S1', 'B', T0 + 2000); bao()
+    await cho(60)
+    expect(lop('.lv')).toBe(0); expect(lop('.lv-dau')).toBe(1)
+    // thầy gọi BẠN lên bảng ⇒ phòng bật cờ `bang` ⇒ máy em sang bảng live
+    nhanTra(st, 'S2', 'A', T0 + 2500); goiLenBang(st, 'S2', ['Chưa lên bảng buổi này'], T0 + 3000)
+    expect(viewEm(st, 'S1').live?.bang).toBe(true)
+    bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
-    expect(lop('.lv-dai')).toBe(0)
+    expect(lop('.lv-dau')).toBe(0)
     await waitFor(() => expect(tinChu(ws, 'live-ok')).toBeGreaterThanOrEqual(1)) // báo phòng để đếm «em xem»
-    // KHÔNG có nút thoát; có tay nắm; khay có Tiếng? (SFU chưa cấu hình ⇒ ẩn nút tiếng, ghi chú nhẹ) + đội + kJ
+    // KHÔNG có nút thoát; có tay nắm; SFU chưa cấu hình ⇒ ẩn nút tiếng, ghi chú nhẹ; có đội + kJ
     const goc = document.querySelector('.lv')!
     expect([...goc.querySelectorAll('button')].map((b) => (b.textContent ?? '') + (b.getAttribute('aria-label') ?? '')).join('|')).not.toMatch(/Thoát|Đóng|Rời/i)
     expect(goc.querySelector('.lv-nam')!.getAttribute('aria-label')).toBe('Mở khay điều khiển')
@@ -88,37 +97,41 @@ describe('máy em khi thầy live', () => {
     expect(goc.querySelector('.lv-khay')!.textContent).toContain('chưa có tiếng')
     expect(goc.querySelector('.lv-khay .lv-vua')).toBeNull()
     // đề trên giấy là khối đề dùng chung, chỉ xem — không lộ đáp án
-    expect(goc.querySelector('.lv-giay')!.textContent).toContain('amine bậc hai')
+    await waitFor(() => expect(goc.querySelector('.lv-giay')!.textContent).toContain('amine bậc hai'))
     expect(JSON.stringify(viewEm(st, 'S1').live)).not.toMatch(/"dung"|"giai"/)
-    // thầy tắt live
-    liveTat(st, T0 + 5000); bao()
-    await waitFor(() => expect(lop('.lv')).toBe(0))
-  })
-
-  it('đã mở đáp án (không còn gì để làm) mà thầy live ⇒ vào thẳng bảng live; lượt MỚI mở ⇒ về màn làm bài + dải', async () => {
-    const st = phong(); moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 500); moDapAn(st, T0 + 900, (a, b) => a === b)
-    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
-    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
-    await waitFor(() => expect(WsGia.ds.length).toBe(1))
-    const ws = WsGia.ds[0]!
-    liveBat(st, T0 + 1000); ws.nhan(viewEm(st, 'S1'))
-    await waitFor(() => expect(lop('.lv')).toBe(1))
-    moLuot(st, { ...cau, qid: 'q2', cau: { ...cau.cau, qid: 'q2' } }, T0 + 3000); ws.nhan(viewEm(st, 'S1'))
-    await waitFor(() => expect(lop('.lv-dai')).toBe(1))
+    // lượt MỚI ⇒ cờ `bang` tự tắt ⇒ máy em về màn câu hỏi, live (tiếng) còn nguyên
+    moLuot(st, { ...cau, qid: 'q2', cau: { ...cau.cau, qid: 'q2' } }, T0 + 9000)
+    expect(viewEm(st, 'S1').live).toMatchObject({ bat: true, bang: false })
+    bao()
+    await waitFor(() => expect(lop('.lv-dau')).toBe(1))
     expect(lop('.lv')).toBe(0)
+    expect(screen.getByLabelText('Gửi đáp án')).toBeTruthy()
+    // thầy bật TAY «Bảng → máy em» (giảng trên bảng mà không gọi ai) ⇒ bảng live; tắt tay ⇒ về màn câu hỏi
+    liveDat(st, { bang: true }, T0 + 9500); bao()
+    await waitFor(() => expect(lop('.lv')).toBe(1))
+    liveDat(st, { bang: false }, T0 + 9600); bao()
+    await waitFor(() => expect(lop('.lv')).toBe(0))
+    // thầy tắt live ⇒ hết dấu
+    liveTat(st, T0 + 10_000); bao()
+    await waitFor(() => expect(lop('.lv-dau')).toBe(0))
   })
 
-  it('tiếng theo phòng: SFU có, em trong lớp ⇒ nút «Tiếng: Đang tắt» (mặc định tắt, bấm bật được)', async () => {
-    const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0); moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 500)
-    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
-    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
-    await waitFor(() => expect(WsGia.ds.length).toBe(1))
-    liveBat(st, T0 + 1000); WsGia.ds[0]!.nhan(viewEm(st, 'S1'))
+  it('tiếng theo phòng: máy chủ có tiếng, em trong lớp ⇒ mặc định TẮT; nút tiếng trên dấu và trong khay bật / tắt được', async () => {
+    const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0); moLuot(st, cau, T0)
+    const { bao } = await vao(st)
+    liveBat(st, T0 + 1000); bao()
+    await waitFor(() => expect(lop('.lv-dau button')).toBe(1))
+    const nutDau = document.querySelector('.lv-dau button')!
+    expect(nutDau.getAttribute('aria-pressed')).toBe('false')
+    expect(nutDau.getAttribute('aria-label')).toContain('đang tắt')
+    fireEvent.click(nutDau)
+    await waitFor(() => expect(document.querySelector('.lv-dau button')!.getAttribute('aria-pressed')).toBe('true'))
+    // sang bảng live: khay giữ đúng lựa chọn của em
+    liveDat(st, { bang: true }, T0 + 2000); bao()
     await waitFor(() => expect(lop('.lv .lv-vua')).toBe(1))
-    const nut = document.querySelector('.lv .lv-vua')!
-    expect(nut.textContent).toContain('Đang tắt')
-    fireEvent.click(nut)
-    await waitFor(() => expect(document.querySelector('.lv .lv-vua')!.textContent).toContain('Đang bật'))
+    expect(document.querySelector('.lv .lv-vua')!.textContent).toContain('Đang bật')
+    fireEvent.click(document.querySelector('.lv .lv-vua')!)
+    await waitFor(() => expect(document.querySelector('.lv .lv-vua')!.textContent).toContain('Đang tắt'))
   })
 
   it('khung nét nhị phân của phòng tới thư viện live ⇒ bảng có nét (ghi chú «Bảng đen» biến mất)', async () => {
@@ -126,7 +139,7 @@ describe('máy em khi thầy live', () => {
     const { ws, bao } = await vao(st).catch(async () => { // đã gửi ⇒ không còn nút Gửi: dựng tay
       const w = WsGia.ds[0]!; return { ws: w, bao: () => w.nhan(viewEm(st, 'S1')) }
     })
-    liveBat(st, T0 + 1000); bao()
+    liveBat(st, T0 + 1000); liveDat(st, { bang: true }, T0 + 1001); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
     expect(document.querySelector('.lv-bang')!.textContent).toContain('Bảng đen')
     const ghi = (k: Uint8Array, stt: number) => { k[1] = stt & 255; k[2] = (stt >> 8) & 255; return k }
@@ -148,7 +161,7 @@ describe('rời màn khi live (đặc tả 4.7)', () => {
     may([390, 844], [390, 844], 'portrait-primary')
     const st = phong(); moLuot(st, cau, T0)
     const { ws, bao } = await vao(st)
-    liveBat(st, T0 + 1); nhanTra(st, 'S1', 'B', T0 + 500); bao()
+    liveBat(st, T0 + 1); liveDat(st, { bang: true }, T0 + 2); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
     // hướng màn đã ngang, khung trang CHƯA đổi (lệch vài chục ms) ⇒ nếu xét ngay sẽ ra «chia đôi» giả
     may([390, 844], [844, 390], 'landscape-primary')
@@ -170,7 +183,7 @@ describe('rời màn khi live (đặc tả 4.7)', () => {
     may([390, 844], [390, 844], 'portrait-primary')
     const st = phong(); moLuot(st, cau, T0)
     const { ws, bao } = await vao(st)
-    liveBat(st, T0 + 1); nhanTra(st, 'S1', 'B', T0 + 500); bao()
+    liveBat(st, T0 + 1); liveDat(st, { bang: true }, T0 + 2); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
     may([844, 390], [390, 844], 'portrait-primary') // trang đã ngang, hướng màn báo còn dọc
     act(() => { document.dispatchEvent(new Event('fullscreenchange')); window.dispatchEvent(new Event('resize')) })
@@ -183,7 +196,7 @@ describe('rời màn khi live (đặc tả 4.7)', () => {
   it('thoát app khi đang ở bảng live ⇒ `roi` ngay (bộ bắt cũ vẫn chạy), lớp live nhường màn cảnh báo', async () => {
     const st = phong(); moLuot(st, cau, T0)
     const { ws, bao } = await vao(st)
-    liveBat(st, T0 + 1); nhanTra(st, 'S1', 'B', T0 + 500); bao()
+    liveBat(st, T0 + 1); liveDat(st, { bang: true }, T0 + 2); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
     an = true
     act(() => { document.dispatchEvent(new Event('visibilitychange')) })

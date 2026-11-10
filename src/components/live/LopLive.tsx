@@ -6,7 +6,8 @@
 //   · `che = 'dau'`  : thầy đang live (TIẾNG) nhưng chưa đưa bảng xuống máy em ⇒ màn Bình Phản Ứng như thường + một dấu nhỏ «Thầy đang live» kèm nút tiếng.
 //   · `che = 'bang'` : cờ phòng `live.bang` (thầy gọi em lên bảng / bật tay) ⇒ lớp bảng live phủ kín, xoay ngang (Android khoá hướng sau khi toàn màn hình;
 //                      iPhone / không khoá được ⇒ xoay hình bằng CSS). Cờ tắt (lượt mới) ⇒ lớp gỡ, nhả khoá ngang, về màn câu hỏi dọc.
-// Em ĐƯỢC GỌI LÊN BẢNG (`mic`): mic tự bật qua `taoLiveEm().batMicLenBang()` (đợt 1C); thẻ «Mic của em đang bật» + nút tắt; máy khác thấy «Bạn … đang nói».
+// Em ĐƯỢC GỌI LÊN BẢNG: phòng báo `emDuocMoi` ⇒ mic tự bật (`taoLiveEm().batMicLenBang()`, đợt 1C); thẻ «Mic của em đang bật» + nút tắt; máy khác thấy
+// «Bạn … đang nói». Thầy chấm / lượt mới / tắt live / «Thu mic» ⇒ phòng thu, thư viện tự thả mic.
 // Điều khiển TỰ ẨN: chỉ còn tay nắm màu đội ở mép phải; chạm / vuốt ⇒ khay (tiếng, mạng, đội + kJ). KHÔNG có nút thoát — thầy tắt live thì lớp tự thu.
 // AN TOÀN: lớp này không nhận gì về đáp án; đề do màn Bình Phản Ứng dựng từ `viewEm.luot.cau` (đã lọc) rồi truyền vào.
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MutableRefObject, type ReactNode } from 'react'
@@ -14,7 +15,7 @@ import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { DOI_BPU, kyHieu, tenNgan } from '../../lib/bpu/phong'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
-import { choHopQuyen, khoaXoay } from '../bpu/tat-man'
+import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, boCucEm, boCucPhong, canXoayCss, giaiTrang, khungChieu, type KhungChieu } from './bo-cuc'
 import { taoVeBang, type VeBang } from './ve-bang'
 import './live-em.css'
@@ -31,8 +32,6 @@ export interface PropsLopLive {
   che: 'an' | 'dau' | 'bang'
   /** Màn bên dưới đang có nút đáy (footer) ⇒ dấu «Thầy đang live» nhích lên, không đè nút. */
   nang?: boolean
-  /** Em này đang được gọi lên bảng (pha gọi / làm bảng) khi thầy live ⇒ mic tự bật. */
-  mic?: boolean
   /** Đề của câu đang chiếu (khối đề dùng chung của chặng); null ⇒ giấy ghi «Thầy đang giảng trên bảng». */
   de: ReactNode | null
   khoaDe: string
@@ -43,17 +42,12 @@ export interface PropsLopLive {
   roi: boolean
 }
 
-/** Phần mic của em lên bảng (đợt 1C thêm vào thư viện). Nhánh chưa có ⇒ các hàm vắng, giao diện coi như «không có mic». */
-type MicLenBang = { batMicLenBang?: () => unknown; tatMic?: () => void; mucMic?: () => number }
-export type TtMic = 'tat' | 'dang-xin' | 'bat' | 'tu-choi' | 'em-tat'
-
 const mayYeu = (): boolean => typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
 const giamDong = (): boolean => mayYeu() || (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
 type HuongMan = { lock?: (h: string) => Promise<void>; unlock?: () => void; type?: string }
 const huongMan = (): HuongMan | null => (typeof screen !== 'undefined' ? ((screen as Screen & { orientation?: HuongMan }).orientation ?? null) : null)
 
-export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, mic, de, khoaDe, doi, matMang, roi }: PropsLopLive) {
-  const [ttMic, setTtMic] = useState<TtMic>('tat')
+export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, de, khoaDe, doi, matMang, roi }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -70,11 +64,12 @@ export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, mic, de
     })
     le.current = l
     cau.current = { tin: l.nhanTinPhong, noiLai: l.khiNoiLai }
+    datKiemQuyenNgoai(l.dangChoQuyenMic) // hộp hỏi quyền mic đang hiện ⇒ bộ bắt rời màn không báo «cửa sổ nổi»
     l.nhanView(viewDau.current)
     // Lần chạm đầu của em trong buổi mở khoá phát tiếng (đặc tả 4.5 bước 3) — bắt ở `click` (pointerdown của ngón tay không tính là thao tác).
     const cham = () => { void l.moKhoaTieng() }
     window.addEventListener('click', cham, { capture: true, once: true })
-    return () => { window.removeEventListener('click', cham, true); cau.current = { tin: null, noiLai: null }; le.current = null; l.huy() }
+    return () => { window.removeEventListener('click', cham, true); cau.current = { tin: null, noiLai: null }; datKiemQuyenNgoai(null); le.current = null; l.huy() }
   }, [ve, goc, cau])
   // Rời màn ⇒ tiếng ngừng; về ⇒ nghe tiếp từ hiện tại.
   useEffect(() => {
@@ -84,21 +79,20 @@ export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, mic, de
     return () => document.removeEventListener('visibilitychange', dat)
   }, [roi])
 
-  // EM LÊN BẢNG: mic tự bật (hộp hỏi quyền của trình duyệt được bọc `choHopQuyen` ⇒ bộ bắt rời màn không báo nhầm «cửa sổ nổi»); hết lượt gọi / thầy chấm /
-  // lượt mới / tắt live ⇒ `mic` thành false ⇒ tự tắt. Em tự bấm tắt thì thôi không tự bật lại trong lượt gọi này.
-  const batMic = useCallback(() => {
-    const l = le.current as (LiveEm & MicLenBang) | null
-    if (!l?.batMicLenBang) { setTtMic('tat'); return }
-    setTtMic('dang-xin')
-    void choHopQuyen(Promise.resolve(l.batMicLenBang())).then((r) => { setTtMic((r as { ok?: boolean } | undefined)?.ok === false || r === false ? 'tu-choi' : 'bat') }, () => setTtMic('tu-choi'))
-  }, [])
-  const tatMic = useCallback(() => { (le.current as (LiveEm & MicLenBang) | null)?.tatMic?.(); setTtMic('em-tat') }, [])
-  const coLe = !!tt
+  // EM LÊN BẢNG: phòng cho phép (`duocMoMic`) ⇒ mic tự bật; chưa nối xong SFU thì thử lại mỗi 1,5 giây. Em tự bấm tắt ⇒ thôi không tự bật lại trong lượt gọi
+  // này (còn nút «Bật mic lại»). Hết được phép (thầy chấm, lượt mới, thu mic, tắt live) ⇒ thư viện tự thả mic.
+  const [emTat, setEmTat] = useState(false)
+  const duocMic = !!tt?.duocMoMic, micTat = tt?.mic === 'tat'
   useEffect(() => {
-    if (!mic || !coLe) return
-    batMic()
-    return () => { (le.current as (LiveEm & MicLenBang) | null)?.tatMic?.(); setTtMic('tat') }
-  }, [mic, coLe, batMic])
+    if (!duocMic) { setEmTat(false); return }
+    if (!micTat || emTat) return
+    const thu = () => { void le.current?.batMicLenBang() }
+    thu()
+    const h = setInterval(thu, 1500)
+    return () => clearInterval(h)
+  }, [duocMic, micTat, emTat])
+  const tatMic = useCallback(() => { setEmTat(true); le.current?.tatMic() }, [])
+  const batMic = useCallback(() => setEmTat(false), []) // hiệu ứng ở trên thấy `emTat` hết ⇒ tự gọi bật
 
   if (!tt || che === 'an') return null
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
@@ -109,15 +103,15 @@ export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, mic, de
       {tt.tieng !== 'chua-cau-hinh' ? <button type="button" aria-pressed={nghe} aria-label={nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe ? <BtLoa /> : <BtLoaTat />}</button> : null}
     </div>
   )
-  return <BangLive le={le} nhanBut={nhanBut} tt={tt} de={de} khoaDe={khoaDe} doi={doi} matMang={matMang} ttMic={ttMic} batMic={batMic} tatMic={tatMic} noi={view.noi ?? []} />
+  return <BangLive le={le} nhanBut={nhanBut} tt={tt} de={de} khoaDe={khoaDe} doi={doi} matMang={matMang} emTat={emTat && duocMic} batMic={batMic} tatMic={tatMic} />
 }
 
-interface PropsBang { le: MutableRefObject<LiveEm | null>; nhanBut: MutableRefObject<((sk: SuKienBut) => void) | null>; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; doi: PropsLopLive['doi']; matMang: boolean; ttMic: TtMic; batMic: () => void; tatMic: () => void; noi: readonly { sbd: string; ten: string; doi: number }[] }
+interface PropsBang { le: MutableRefObject<LiveEm | null>; nhanBut: MutableRefObject<((sk: SuKienBut) => void) | null>; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; doi: PropsLopLive['doi']; matMang: boolean; emTat: boolean; batMic: () => void; tatMic: () => void }
 interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; namDe: boolean; kc: KhungChieu; giayToi: boolean }
 
-function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, ttMic, batMic, tatMic, noi }: PropsBang) {
+function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, tatMic }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
-  const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null)
+  const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
   const khoaNgang = useRef(false)
@@ -194,6 +188,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, ttMic, batMic, ta
       if (nay - lucAm > 110) {
         lucAm = nay
         const am = Math.min(1, lv.mucAm() * 3)
+        theMic.current?.style.setProperty('--lv-am', Math.min(1, lv.mucAmMic() * 2.2).toFixed(2)) // sóng của thẻ «Mic của em đang bật» theo mic thật
         khay.current?.style.setProperty('--lv-am', am.toFixed(2)) // đặt ngay trên khay (không ở gốc): biến kế thừa đổi ở gốc ⇒ tính lại kiểu cả cây đề
         if (am > 0.08) noiDen = nay + 1200
         if ((nay < noiDen) !== dangNoi) { dangNoi = nay < noiDen; setThayNoi(dangNoi) }
@@ -279,8 +274,9 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, ttMic, batMic, ta
 
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
   const coTieng = tt.tieng !== 'chua-cau-hinh'
-  /** Bạn đang nói (em lên bảng mở mic) — không tính chính em. */
-  const banNoi = ttMic === 'tat' ? (noi[0] ?? null) : null
+  /** Mic của em đang mở (em được gọi lên bảng). Bạn đang nói = em khác đang mở mic (thư viện đã loại chính em). */
+  const micMo = tt.mic === 'dang-phat' || tt.mic === 'dang-noi'
+  const banNoi = tt.banNoi
   // «Mạng này chặn tiếng»: báo 6 giây rồi tự ẩn (không che bảng mãi).
   const [baoLoi, setBaoLoi] = useState(true)
   useEffect(() => { if (tt.tieng !== 'loi') { setBaoLoi(true); return } const h = setTimeout(() => setBaoLoi(false), 6000); return () => clearTimeout(h) }, [tt.tieng])
@@ -298,7 +294,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, ttMic, batMic, ta
           </div>
         ) : null}
         <canvas ref={cvChot} className="lv-cv" aria-hidden="true" />
-        <canvas ref={cvSong} className="lv-cv" aria-hidden="true" />
+        <canvas ref={cvSong} className="lv-cv song" aria-hidden="true" />
         <div ref={tro} className="lv-tro" aria-hidden="true" />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
@@ -307,14 +303,11 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, ttMic, batMic, ta
       ) : tt.tieng === 'loi' && baoLoi ? <div className="lv-bao nho" role="status">Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</div>
         : phong.current ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
       {/* Em lên bảng: mic đang mở thì thẻ LUÔN HIỆN (không tự ẩn). Máy khác: dải «Bạn … đang nói». */}
-      {ttMic === 'bat' || ttMic === 'dang-xin' ? (
-        <div className="lv-noi" role="status"><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><b>{ttMic === 'bat' ? 'Mic của em đang bật' : 'Đang bật mic…'}</b><small>Thầy và cả lớp đang nghe</small><button type="button" onClick={tatMic}>Tắt mic</button></div>
-      ) : ttMic === 'em-tat' ? <button type="button" className="lv-bat-tieng mic" onClick={batMic}><BtMic />Bật mic lại</button>
-        : ttMic === 'tu-choi' ? <div className="lv-bao nho duoi" role="status">Máy em chưa cho dùng mic · em nói to cho thầy nghe, hoặc mở Cài đặt trình duyệt để cho phép</div>
+      {micMo || tt.mic === 'xin-quyen' ? (
+        <div ref={theMic} className="lv-noi" role="status"><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><b>{micMo ? 'Mic của em đang bật' : 'Đang bật mic…'}</b><small>Thầy và cả lớp đang nghe</small><button type="button" onClick={tatMic}>Tắt mic</button></div>
+      ) : emTat ? <button type="button" className="lv-bat-tieng mic" onClick={batMic}><BtMic />Bật mic lại</button>
+        : tt.mic === 'tu-choi' || tt.mic === 'loi' ? <div className="lv-bao nho duoi" role="status">{tt.mic === 'tu-choi' ? 'Máy em chưa cho dùng mic · em nói to cho thầy nghe, hoặc mở Cài đặt trình duyệt để cho phép' : 'Chưa bật được mic · em nói to cho thầy nghe'}</div>
         : banNoi && !phong.current ? <div className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}
-      {nghe && tt.tieng === 'bi-chan' && !matMang ? (
-        <button type="button" className="lv-bat-tieng" onClick={() => { void le.current?.moKhoaTieng() }}><BtLoa />Chạm để bật tiếng thầy</button>
-      ) : null}
       <button ref={nam} type="button" className={`lv-nam${bc?.namDe ? ' de' : ''}${thayNoi && nghe ? ' noi' : ''}`} style={{ top: `${namY.current * 100}%` }} aria-label={mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'} aria-expanded={mo}
         onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}><i /></button>
       <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={hoanThu}>
