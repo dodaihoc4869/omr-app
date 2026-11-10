@@ -14,9 +14,6 @@ on:
       em:
         description: Số máy em (1–8)
         default: '2'
-  push:
-    branches: [claude/live-1a-1011]
-    paths: ['scripts/thu-live-dot0-1011.mjs', 'scripts/thu-live-dot0-1011/**', '.github/workflows/thu-live-dot0-1011.yml']
 permissions:
   contents: read
 concurrency:
