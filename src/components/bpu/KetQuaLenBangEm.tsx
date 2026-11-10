@@ -1,22 +1,36 @@
-// BÌNH PHẢN ỨNG — KẾT QUẢ LÊN BẢNG TRÊN MÁY EM (thầy 10/11: em được gọi và cả lớp đều thấy «Đỗ Đại Học · Đạt · đội +200 kJ»).
-// Phòng (`viewEm`) gửi mọi máy `goi` = tên, đội, `dat` (thầy vừa chấm) và `kjDoi` (kJ đội do lên bảng — CHỈ sau khi mở đáp án, số thật của phòng).
-// Dải nhỏ màu đội NẰM TRONG DÒNG CHẢY ngay dưới thanh đội (10/11: bản nổi tuyệt đối đè chữ «Đội … kJ đội») — trong lớp che nếu đang che, tế nhị: Đạt ⇒ «Đạt · đội +200 kJ»; Chưa đạt ⇒ «Chưa đạt · cảm ơn bạn đã
-// lên bảng» (không nêu số trừ trước cả lớp; em được gọi thấy thẻ ±kJ của mình qua TheBienDong). Chỉ transform + opacity.
+// BÌNH PHẢN ỨNG — KẾT QUẢ LÊN BẢNG TRÊN MÁY EM (thầy 10/11: em được gọi và cả lớp đều thấy kết quả lên bảng).
+// Phòng (`viewEm`) gửi mọi máy `goi` = tên, đội, `dat` (thầy vừa chấm). Chỉ hiện sau khi thầy mở đáp án.
+// LÀM LẠI 10/11 (thầy «làm lại đẹp hơn gọn hơn tinh tế hơn — bỏ em đạt, chỉ ghi đạt / không đạt nổi bật»): bỏ thẻ to «Em · Chưa đạt / Cảm ơn…»;
+// giờ là MỘT NHÃN nằm bên phải thanh đội:
+//  • em được gọi: nhãn to «Đạt» (xanh --tr-dung) / «Chưa đạt» (đỏ dịu --tr-sai*), dòng phụ nhỏ = kJ THẬT của em lượt này (mục `bienDongEm` của phòng —
+//    người gọi truyền vào, không tính lại); không có biến động ⇒ không dòng phụ;
+//  • bạn cùng lớp: «Tên gọi · Đạt» nhỏ hơn, chấm ký hiệu màu đội của bạn ấy (không nêu số trừ trước cả lớp).
+// Vào: trượt nhẹ + hiện (transform / opacity); máy yếu / giảm chuyển động ⇒ tĩnh.
 import { DOI_BPU, type ViewEm } from '../../lib/bpu/phong'
 
-type Goi = NonNullable<NonNullable<ViewEm['luot']>['goi']> & { kjDoi?: number }
-const dau = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0')
+type Goi = NonNullable<NonNullable<ViewEm['luot']>['goi']>
+const dau = (n: number) => (n > 0 ? `+${n.toLocaleString('vi-VN')}` : `−${Math.abs(n).toLocaleString('vi-VN')}`)
+/** Tên gọi = chữ cuối của họ tên («Đỗ Đại Học» ⇒ «Học»). */
+export const tenGoiEm = (ten: string): string => ten.trim().split(/\s+/).pop() || ten
 
-export default function KetQuaLenBangEm({ g, laEm }: { g: Goi; laEm: boolean }) {
+export default function KetQuaLenBangEm({ g, laEm, kjEm }: { g: Goi; laEm: boolean; kjEm?: number | null }) {
   if (g.dat == null) return null
+  const kq = g.dat ? 'Đạt' : 'Chưa đạt'
   const doi = DOI_BPU[g.doi]
-  const phu = g.dat
-    ? `${laEm ? 'Em giải đúng trên bảng' : 'Giải đúng trên bảng'}${g.kjDoi != null ? ` · ${doi?.ten ?? 'đội'} ${dau(g.kjDoi)}\u00a0kJ` : ''}`
-    : laEm ? 'Cảm ơn em đã lên bảng chữa bài' : 'Cảm ơn bạn đã lên bảng'
+  if (laEm) {
+    const coKj = typeof kjEm === 'number' && kjEm !== 0
+    return (
+      <div className="bpu-klb em" data-dat={g.dat ? '1' : '0'} role="status" aria-live="polite" aria-label={`Kết quả lên bảng: ${kq}${coKj ? `, ${dau(kjEm!)} kJ` : ''}`}>
+        <b>{kq}</b>
+        {coKj ? <small>{dau(kjEm!)} kJ</small> : null}
+      </div>
+    )
+  }
   return (
-    <div className="bpu-klb" data-dat={g.dat ? '1' : '0'} role="status" aria-live="polite" style={{ ['--doi' as string]: `var(${doi?.mau ?? '--tr-tin'})` }}>
-      <span className="ky" aria-hidden="true">{doi?.ky ?? ''}</span>
-      <div><b>{laEm ? 'Em' : g.ten} · {g.dat ? 'Đạt' : 'Chưa đạt'}</b><span>{phu}</span></div>
+    <div className="bpu-klb" data-dat={g.dat ? '1' : '0'} role="status" aria-live="polite" aria-label={`${g.ten} (${doi?.ten ?? 'đội'}) lên bảng: ${kq}`}
+      style={{ ['--doi' as string]: `var(${doi?.mau ?? '--tr-tin'})` }}>
+      <i aria-hidden="true">{doi?.ky ?? ''}</i>
+      <span>{tenGoiEm(g.ten)} · <b>{kq}</b></span>
     </div>
   )
 }
