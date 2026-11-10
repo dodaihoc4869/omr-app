@@ -1,0 +1,29 @@
+[
+  {
+    "i": 851,
+    "hash": "9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67",
+    "fileNguon": "anh/9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67.png",
+    "svg": "pho-khoi-native851-ddh-fbbaae3e76fda4085681c14299d0e12487627a682261a5582d58dee781e3163f.svg",
+    "hashSvg": "fbbaae3e76fda4085681c14299d0e12487627a682261a5582d58dee781e3163f",
+    "byteSvg": 31080,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B12-III-22",
+        "de": "Formaldehyde trong dung dịch (khoảng 40% theo thể tích hoặc 37% theo khối lượng) được gọi là fomon hay formalin, được sử dụng nhiều trong y khoa với tác dụng diệt khuẩn; là dung môi giúp bảo vệ các mẫu thí nghiệm hay các cơ quan trong cơ thể con người,… Kết quả phân tích nguyên tố của hợp chất này có 40%C về khối lượng và $\\dfrac{\\%H}{\\%O} = 0,125$. Khối lượng mol phân tử của formaldehyde được xác định trên phổ khối lượng tương ứng với peak có giá trị m/z lớn nhất.\nTổng số nguyên tử có trong phân tử formaldehyde là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67",
+            "where": "DH-11-C3-B12-III-22.hinh.0.du_lieu",
+            "hashDataUrl": "455788bf89f0d872ca995f70c90b51170d62fc42a31543bae14c4c2dc724d028"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3main28-29-30+3tinyUP13-14-15/1tinygraymark765intentUNKNOWNretained1-2px-NO31label/7X6Ynums/0heads0grid/nativebaseline104506→794502-yaxis10233→104506/regularlabels-mzREGULARITALIC/noaddedformula-abundance-answer",
+    "hashSvgDaSoat": "fbbaae3e76fda4085681c14299d0e12487627a682261a5582d58dee781e3163f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

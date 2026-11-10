@@ -1,0 +1,285 @@
+{
+  "i": 851,
+  "hash": "9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67.png",
+  "size": [
+    817,
+    580
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-11-C3-B12-III-22",
+      "de": "Formaldehyde trong dung dịch (khoảng 40% theo thể tích hoặc 37% theo khối lượng) được gọi là fomon hay formalin, được sử dụng nhiều trong y khoa với tác dụng diệt khuẩn; là dung môi giúp bảo vệ các mẫu thí nghiệm hay các cơ quan trong cơ thể con người,… Kết quả phân tích nguyên tố của hợp chất này có 40%C về khối lượng và $\\dfrac{\\%H}{\\%O} = 0,125$. Khối lượng mol phân tử của formaldehyde được xác định trên phổ khối lượng tương ứng với peak có giá trị m/z lớn nhất.\nTổng số nguyên tử có trong phân tử formaldehyde là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67",
+          "where": "DH-11-C3-B12-III-22.hinh.0.du_lieu",
+          "hashDataUrl": "455788bf89f0d872ca995f70c90b51170d62fc42a31543bae14c4c2dc724d028"
+        }
+      ],
+      "missingHashes": [
+        "9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/851-native2x-lo329.png",
+    "ownBaseline8xOpened": "/workspace/scratch/851-baseline8x-lo329.png",
+    "ownTiny31-20xOpened": "/workspace/scratch/851-tiny31-20x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "MassspectrumLaxes3majorlabelledpeaks+3cleartinyunlabelledstems+1verytinymark. No frame/grid.",
+    "axes": {
+      "y": [
+        [
+          102,
+          33
+        ],
+        [
+          104,
+          506
+        ]
+      ],
+      "x": [
+        [
+          104,
+          506
+        ],
+        [
+          794,
+          502
+        ]
+      ],
+      "heads": 0,
+      "nativeDrift": "XbaselineleansUPtowardright4-5px, yaxisleansRIGHT2px; preserve notnormalizecartesian."
+    },
+    "xTicks": [
+      {
+        "text": "8",
+        "x": 104,
+        "baseY": 506,
+        "endY": 516,
+        "labelCenterY": 529
+      },
+      {
+        "text": "12",
+        "x": 219,
+        "baseY": 505,
+        "endY": 515,
+        "labelCenterY": 529
+      },
+      {
+        "text": "16",
+        "x": 334,
+        "baseY": 505,
+        "endY": 515,
+        "labelCenterY": 529
+      },
+      {
+        "text": "20",
+        "x": 449,
+        "baseY": 504,
+        "endY": 514,
+        "labelCenterY": 529
+      },
+      {
+        "text": "24",
+        "x": 565,
+        "baseY": 503,
+        "endY": 513,
+        "labelCenterY": 529
+      },
+      {
+        "text": "28",
+        "x": 679,
+        "baseY": 503,
+        "endY": 513,
+        "labelCenterY": 529
+      },
+      {
+        "text": "32",
+        "x": 794,
+        "baseY": 502,
+        "endY": 512,
+        "labelCenterY": 529
+      }
+    ],
+    "yTicks": [
+      {
+        "text": "0",
+        "at": [
+          103,
+          506
+        ],
+        "fromX": 93,
+        "labelRightX": 89
+      },
+      {
+        "text": "20",
+        "at": [
+          103,
+          411
+        ],
+        "fromX": 93,
+        "labelRightX": 89
+      },
+      {
+        "text": "40",
+        "at": [
+          103,
+          316
+        ],
+        "fromX": 93,
+        "labelRightX": 89
+      },
+      {
+        "text": "60",
+        "at": [
+          103,
+          222
+        ],
+        "fromX": 93,
+        "labelRightX": 89
+      },
+      {
+        "text": "80",
+        "at": [
+          103,
+          127
+        ],
+        "fromX": 93,
+        "labelRightX": 89
+      },
+      {
+        "text": "100",
+        "at": [
+          103,
+          33
+        ],
+        "fromX": 93,
+        "labelRightX": 89
+      }
+    ],
+    "majorPeaks": [
+      {
+        "printedLabel": "28",
+        "x": 679,
+        "top": 389,
+        "base": 503,
+        "labelBBox": [
+          667,
+          368,
+          691,
+          386
+        ]
+      },
+      {
+        "printedLabel": "29",
+        "x": 707,
+        "top": 31,
+        "base": 502,
+        "labelBBox": [
+          694,
+          7,
+          717,
+          25
+        ]
+      },
+      {
+        "printedLabel": "30",
+        "x": 736,
+        "top": 228,
+        "base": 502,
+        "labelBBox": [
+          723,
+          204,
+          748,
+          223
+        ]
+      }
+    ],
+    "tinyClearPeaks": [
+      {
+        "x": 248,
+        "top": 501,
+        "base": 505,
+        "printedLabel": null
+      },
+      {
+        "x": 277,
+        "top": 500,
+        "base": 505,
+        "printedLabel": null
+      },
+      {
+        "x": 305,
+        "top": 496,
+        "base": 505,
+        "printedLabel": null
+      }
+    ],
+    "tiny31mark": {
+      "x": 765,
+      "topApprox": 500,
+      "baseApprox": 502,
+      "finding": "Own20xshowsnarrowgrayUPprotrusion~1-2nativepxabovebaseline centeredaroundm/z31position. Couldbetinypeak/printvariation; chemicalintentnotprovable. RETAINverytinystem/markatnativepositionandheight, NOTeraseasnoise orinflateintomainpeak. Do notaddlabel31 orclaimabundance."
+    },
+    "baselineTickDistinction": "12x219 and16x334stems extendBELOWbaselineandareticks;13/14/15tinyUPstemsbetweenthemareseparatefeatures. No newXlabels13/14/15.",
+    "labels": [
+      {
+        "text": "Cường độ tương đối (%)",
+        "bbox": [
+          18,
+          134,
+          46,
+          396
+        ],
+        "rotation": -90,
+        "font": "regularuprightsans"
+      },
+      {
+        "text": "m/z",
+        "bbox": [
+          764,
+          545,
+          809,
+          573
+        ],
+        "font": "ITALICregularserif"
+      }
+    ],
+    "font": "Allaxisnumerals/mainpeak28/29/30regularuprightsans, noactualbold; xunitm/zitalicregularserif.",
+    "counts": {
+      "mainPeaks": 3,
+      "clearTinyStems": 3,
+      "extraUncertainTiny31mark": 1,
+      "xNumLabels": 7,
+      "yNumLabels": 6,
+      "mainPeakLabels": 3,
+      "heads": 0,
+      "grid": 0
+    },
+    "noAdded": [
+      "molecularionanswer",
+      "formula",
+      "fragmentions",
+      "tinypeaklabels",
+      "abundancevalues",
+      "H2O/COetcannotations",
+      "frameborder",
+      "straightenedbaseline",
+      "zeroextraheads"
+    ]
+  },
+  "coordinateMeaning": "PeakheightsandcoordinatesareNATIVEPIXELS, notnewmeasuredscientificabundances; onlyprintedlabelsasserteddata."
+}

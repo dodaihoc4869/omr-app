@@ -1,0 +1,17 @@
+[
+  {
+    "i": 851,
+    "hashSvg": "fbbaae3e76fda4085681c14299d0e12487627a682261a5582d58dee781e3163f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL và baseline3x/tinygraymark16x, đọc public questions.de/ref DH-11-C3-B12-III-22.hinh.0.du_lieu sau_de; tự fresh Chromium FULL3x đúng SHA/31080B, mở FULL/toànbaseline/graymarkmacro. Ba peak chính28/29/30 đúng vịtrí và chiều cao nguồn, ba tinyUP13/14/15 giữ riêng, tinygrayUPmark765 cao1–2nativepx giữ nhỏ, không gọi31/không thêm nhãn hay suy ý nghĩa mark. Baseline nghiêng104506→794502 và yaxis10233→104506 giữ native; axes không đầu/grid. Bảy X8/12/16/20/24/28/32, sáu Y0..100 bước20, labelspeak28/29/30 và Cường độ tương đối (%) regular; m/z regularitalic, đủ dấu/kýhiệu. DDH path tự chứa, không thấy chạm/cắt/tràn; không thêm côngthức/abundance/đápán hay biến mark mờ thành peakmới.",
+    "render": "/workspace/scratch/soat263-851.png",
+    "macro": [
+      "/workspace/scratch/ms851-baseline.png",
+      "/workspace/scratch/ms851-mark.png",
+      "/workspace/scratch/ms851-nativebaseline.png",
+      "/workspace/scratch/ms851-nativeMark.png"
+    ],
+    "hash": "9be9532f9efaafb8f44010eec6408bedd0e9b4a69ccf6109cf799b3312255b67",
+    "hashSvgDaSoat": "fbbaae3e76fda4085681c14299d0e12487627a682261a5582d58dee781e3163f"
+  }
+]
