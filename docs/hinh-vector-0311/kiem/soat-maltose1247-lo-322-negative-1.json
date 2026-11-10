@@ -1,0 +1,15 @@
+[
+  {
+    "i": 1247,
+    "hashSvg": "dd8b8d240af6faa532e30de630f319646e380306d137b47bfb56ce86d89619c7",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Cần sửa: fresh Chromium FULL3x đúng SHA, mở FULL/CO/taper macros và native FULL/cropC3. CO hai chân mới đã tiếp xúc đúng. Nhưng base các TAPER có mũi tam giác nhô xuống dưới mép frontstroke, thấy rõ tại góc C3 trái và các góc khác; native C3 crop16x góc nối phẳng không spike. Cần chỉnh base đứng và khớp hai mép frontstroke, giữ taper/stereo/atoms. Đã đọc cả hai de/publicrefs; chưa duyệt candidate này.",
+    "render": "/workspace/scratch/maltose1247-dd8FULL.png",
+    "macro": [
+      "/workspace/scratch/maltose1247-finalI.png",
+      "/workspace/scratch/maltose1247-finalII.png",
+      "/workspace/scratch/maltose1247-nativeTaper.png",
+      "/workspace/scratch/maltose1247-finalCO.png"
+    ]
+  }
+]

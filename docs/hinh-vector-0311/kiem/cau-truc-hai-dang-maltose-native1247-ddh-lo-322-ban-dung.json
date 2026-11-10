@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1247,
+    "hash": "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76",
+    "fileNguon": "anh/e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76.png",
+    "svg": "hai-dang-maltose-native1247-ddh-e3c033b22f348a2e14538fbf68453574c7292fc37146b3b09a6f9b049b7deea0.svg",
+    "hashSvg": "e3c033b22f348a2e14538fbf68453574c7292fc37146b3b09a6f9b049b7deea0",
+    "byteSvg": 24277,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B6-D1-II-61",
+        "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp thuỷ phân tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+        "refs": [
+          {
+            "hash": "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76",
+            "where": "DB-12-B6-D1-II-61.hinh.0.du_lieu",
+            "hashDataUrl": "054bc9e64cdf5934dcc218a0e15e2ca5cfaa19d757e8350ddcca8e7c33f21530"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B5-II-11",
+        "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp thuỷ phân tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+        "refs": [
+          {
+            "hash": "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76",
+            "where": "DH-12-C2-B5-II-11.hinh.0.du_lieu",
+            "hashDataUrl": "054bc9e64cdf5934dcc218a0e15e2ca5cfaa19d757e8350ddcca8e7c33f21530"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2panels24C22O16OH/4bareterminalC-NOCH2/1explicitH/8TAPER4boldfront/chemicalregular2trueDAMuprightRomancaptions/noaddedH-CH2-nums-arrows-answer",
+    "hashSvgDaSoat": "e3c033b22f348a2e14538fbf68453574c7292fc37146b3b09a6f9b049b7deea0",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

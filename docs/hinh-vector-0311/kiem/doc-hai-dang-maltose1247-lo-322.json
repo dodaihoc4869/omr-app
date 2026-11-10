@@ -1,0 +1,749 @@
+{
+  "i": 1247,
+  "hash": "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76.png",
+  "size": [
+    1260,
+    383
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B6-D1-II-61",
+      "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp thuỷ phân tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+      "allHinh": [
+        {
+          "hash": "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76",
+          "where": "DB-12-B6-D1-II-61.hinh.0.du_lieu",
+          "hashDataUrl": "054bc9e64cdf5934dcc218a0e15e2ca5cfaa19d757e8350ddcca8e7c33f21530"
+        }
+      ],
+      "missingHashes": [
+        "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76"
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B5-II-11",
+      "de": "Mạch nha là nguyên liệu quan trọng trong công nghiệp chế biến bánh, kẹo và được sản xuất bằng phương pháp thuỷ phân tinh bột, mầm ngũ cốc,...Thành phần chính của mạch nha là maltose. Maltose được cấu tạo từ hai đơn vị glucose và tồn tại ở hai dạng cấu tạo sau:",
+      "allHinh": [
+        {
+          "hash": "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76",
+          "where": "DH-12-C2-B5-II-11.hinh.0.du_lieu",
+          "hashDataUrl": "054bc9e64cdf5934dcc218a0e15e2ca5cfaa19d757e8350ddcca8e7c33f21530"
+        }
+      ],
+      "missingHashes": [
+        "e24490e9444f5578cbedb302d200c9f2972434ed5a5626dcc228b069d161be76"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "ownOpenFront4xOpened": "/workspace/scratch/1247-openfront4x.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownPanelIITip10xOpened": "/workspace/scratch/1247-panelII-tip10x.png"
+  },
+  "geometry": {
+    "classification": "Twopanelclosed/openchaincarbohydratedrawings, no reactionarrow. SemanticCkeysbelowNOTnumberstotypeset.",
+    "panelI": {
+      "leftRing": {
+        "C1": [
+          242,
+          169
+        ],
+        "C2": [
+          185,
+          210
+        ],
+        "C3": [
+          90,
+          210
+        ],
+        "C4": [
+          35,
+          169
+        ],
+        "C5": [
+          90,
+          116
+        ]
+      },
+      "rightRing": {
+        "C1": [
+          516,
+          169
+        ],
+        "C2": [
+          459,
+          210
+        ],
+        "C3": [
+          366,
+          210
+        ],
+        "C4": [
+          315,
+          169
+        ],
+        "C5": [
+          359,
+          116
+        ]
+      },
+      "ringO": [
+        {
+          "text": "O",
+          "bbox": [
+            184,
+            101,
+            211,
+            131
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            453,
+            101,
+            480,
+            131
+          ]
+        }
+      ],
+      "OgapBonds": [
+        [
+          [
+            90,
+            116
+          ],
+          [
+            182,
+            116
+          ]
+        ],
+        [
+          [
+            211,
+            131
+          ],
+          [
+            242,
+            169
+          ]
+        ],
+        [
+          [
+            359,
+            116
+          ],
+          [
+            451,
+            116
+          ]
+        ],
+        [
+          [
+            480,
+            131
+          ],
+          [
+            516,
+            169
+          ]
+        ]
+      ],
+      "frontStyles": "4TAPERdiagonals fromrearC1/C4pointstofrontC2/C3wide;2BOLDhorizontalC3-C2. Otherthinuniform.",
+      "bareTerminals": [
+        {
+          "path": [
+            [
+              90,
+              116
+            ],
+            [
+              90,
+              64
+            ],
+            [
+              123,
+              42
+            ]
+          ],
+          "text": "OH",
+          "bbox": [
+            127,
+            17,
+            179,
+            47
+          ]
+        },
+        {
+          "path": [
+            [
+              359,
+              116
+            ],
+            [
+              359,
+              64
+            ],
+            [
+              392,
+              42
+            ]
+          ],
+          "text": "OH",
+          "bbox": [
+            396,
+            17,
+            448,
+            47
+          ]
+        }
+      ],
+      "OHbranches": [
+        {
+          "from": [
+            35,
+            169
+          ],
+          "to": [
+            35,
+            218
+          ],
+          "bbox": [
+            23,
+            221,
+            76,
+            251
+          ]
+        },
+        {
+          "from": [
+            90,
+            210
+          ],
+          "to": [
+            90,
+            162
+          ],
+          "bbox": [
+            77,
+            128,
+            130,
+            159
+          ]
+        },
+        {
+          "from": [
+            185,
+            210
+          ],
+          "to": [
+            185,
+            257
+          ],
+          "bbox": [
+            170,
+            259,
+            223,
+            289
+          ]
+        },
+        {
+          "from": [
+            366,
+            210
+          ],
+          "to": [
+            366,
+            162
+          ],
+          "bbox": [
+            353,
+            128,
+            406,
+            159
+          ]
+        },
+        {
+          "from": [
+            459,
+            210
+          ],
+          "to": [
+            459,
+            257
+          ],
+          "bbox": [
+            445,
+            259,
+            498,
+            289
+          ]
+        },
+        {
+          "from": [
+            516,
+            169
+          ],
+          "to": [
+            516,
+            218
+          ],
+          "bbox": [
+            502,
+            221,
+            555,
+            251
+          ]
+        }
+      ],
+      "bridge": {
+        "text": "O",
+        "bbox": [
+          265,
+          195,
+          292,
+          225
+        ],
+        "bonds": [
+          [
+            [
+              242,
+              169
+            ],
+            [
+              265,
+              197
+            ]
+          ],
+          [
+            [
+              291,
+              197
+            ],
+            [
+              315,
+              169
+            ]
+          ]
+        ]
+      },
+      "caption": {
+        "text": "(I)",
+        "bbox": [
+          258,
+          326,
+          314,
+          365
+        ]
+      },
+      "counts": {
+        "C": 12,
+        "O": 11,
+        "OHtext": 8,
+        "ringO": 2,
+        "bridgeO": 1,
+        "explicitStandaloneH": 0
+      }
+    },
+    "panelII": {
+      "leftRing": {
+        "C1": [
+          866,
+          170
+        ],
+        "C2": [
+          813,
+          210
+        ],
+        "C3": [
+          708,
+          210
+        ],
+        "C4": [
+          653,
+          169
+        ],
+        "C5": [
+          708,
+          116
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          803,
+          101,
+          830,
+          131
+        ]
+      },
+      "OgapBonds": [
+        [
+          [
+            708,
+            116
+          ],
+          [
+            801,
+            116
+          ]
+        ],
+        [
+          [
+            830,
+            131
+          ],
+          [
+            866,
+            170
+          ]
+        ]
+      ],
+      "ringFrontStyles": "2TAPER+1BOLDhorizontal",
+      "openChainVerticesC1ToC6": [
+        [
+          1178,
+          181
+        ],
+        [
+          1118,
+          210
+        ],
+        [
+          1010,
+          210
+        ],
+        [
+          954,
+          169
+        ],
+        [
+          1010,
+          116
+        ],
+        [
+          1010,
+          64
+        ]
+      ],
+      "openChainStyle": "C4(954169)→C3(1010210) TAPERwideatC3;C3→C2(1118210)BOLDhorizontal;C2→aldehydeC1(1178181)TAPERnarrowatC1, own4xconfirmsnotuniformthick. C4→C5→C6thin.",
+      "bareTerminals": [
+        {
+          "path": [
+            [
+              708,
+              116
+            ],
+            [
+              708,
+              64
+            ],
+            [
+              741,
+              42
+            ]
+          ],
+          "text": "OH",
+          "bbox": [
+            745,
+            17,
+            797,
+            47
+          ]
+        },
+        {
+          "path": [
+            [
+              1010,
+              116
+            ],
+            [
+              1010,
+              64
+            ],
+            [
+              1047,
+              42
+            ]
+          ],
+          "text": "OH",
+          "bbox": [
+            1051,
+            17,
+            1103,
+            47
+          ]
+        }
+      ],
+      "OHbranches": [
+        {
+          "from": [
+            653,
+            169
+          ],
+          "to": [
+            653,
+            218
+          ],
+          "bbox": [
+            641,
+            221,
+            694,
+            251
+          ]
+        },
+        {
+          "from": [
+            708,
+            210
+          ],
+          "to": [
+            708,
+            162
+          ],
+          "bbox": [
+            695,
+            128,
+            748,
+            159
+          ]
+        },
+        {
+          "from": [
+            813,
+            210
+          ],
+          "to": [
+            813,
+            257
+          ],
+          "bbox": [
+            798,
+            259,
+            851,
+            289
+          ]
+        },
+        {
+          "from": [
+            1010,
+            210
+          ],
+          "to": [
+            1010,
+            162
+          ],
+          "bbox": [
+            997,
+            128,
+            1050,
+            159
+          ]
+        },
+        {
+          "from": [
+            1010,
+            116
+          ],
+          "to": [
+            1053,
+            116
+          ],
+          "bbox": [
+            1056,
+            101,
+            1109,
+            132
+          ],
+          "note": "OHrightOanchor, no extraCendpoint"
+        },
+        {
+          "from": [
+            1118,
+            210
+          ],
+          "to": [
+            1118,
+            257
+          ],
+          "bbox": [
+            1105,
+            259,
+            1158,
+            289
+          ]
+        }
+      ],
+      "bridge": {
+        "text": "O",
+        "bbox": [
+          894,
+          195,
+          921,
+          225
+        ],
+        "bonds": [
+          [
+            [
+              866,
+              170
+            ],
+            [
+              894,
+              198
+            ]
+          ],
+          [
+            [
+              921,
+              198
+            ],
+            [
+              954,
+              169
+            ]
+          ]
+        ]
+      },
+      "aldehyde": {
+        "C": [
+          1178,
+          181
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            1187,
+            101,
+            1214,
+            132
+          ]
+        },
+        "doubleRays": [
+          [
+            [
+              1175,
+              179
+            ],
+            [
+              1186,
+              133
+            ]
+          ],
+          [
+            [
+              1183,
+              182
+            ],
+            [
+              1199,
+              137
+            ]
+          ]
+        ],
+        "H": {
+          "text": "H",
+          "bbox": [
+            1219,
+            201,
+            1246,
+            231
+          ]
+        },
+        "CHbond": [
+          [
+            1178,
+            181
+          ],
+          [
+            1214,
+            202
+          ]
+        ],
+        "footNote": "2COdiagonalraysfeet meet2slopes separately, noaddedbridge"
+      },
+      "caption": {
+        "text": "(II)",
+        "bbox": [
+          928,
+          326,
+          1003,
+          365
+        ]
+      },
+      "counts": {
+        "C": 12,
+        "O": 11,
+        "OHtext": 8,
+        "ringO": 1,
+        "bridgeO": 1,
+        "carbonylO": 1,
+        "explicitStandaloneH": 1
+      }
+    },
+    "font": "AllO/OH/Hregularuprightserif, Roman(I)/(II)captionsBOLDuprightserif. Noothertext/numbers. NoCH2OHtext:4terminalbareCtotal withOHlabels, do notaddCH2glyph.",
+    "countsTotal": {
+      "C": 24,
+      "O": 22,
+      "OHlabels": 16,
+      "bareTerminalC": 4,
+      "standaloneH": 1,
+      "TAPER": 8,
+      "boldFrontHorizontal": 4,
+      "CNums": 0,
+      "reactionArrows": 0
+    },
+    "noAdded": [
+      "compoundnames",
+      "CH2/Hglyphonbareterminals",
+      "carbonnumbers",
+      "equilibriumarrow",
+      "extraOHatbridge",
+      "correctanswerhighlight"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelgeometry/visibleatoms, no sugarnameusedtonormalizebranches.",
+  "corrections": [
+    {
+      "finding": "PanelIIleftRingC1initialapprox860169 was6pxleft. Independentownnative10x tipcrop confirmsactualjunctionapprox866170; ringObond endpoint/bridgebond start correctedtoo.",
+      "old": [
+        860,
+        169
+      ],
+      "new": [
+        866,
+        170
+      ]
+    }
+  ],
+  "rootGeometryCorrection": {
+    "initialLeftCOFoot": [
+      1175,
+      179
+    ],
+    "finalLeftCOFoot": [
+      1178,
+      181
+    ],
+    "rightCOFoot": [
+      1183,
+      184
+    ],
+    "reason": "Root actual3x + macro thấy chân trái initial hở. Final hai chân chạm riêng nêm trái và slopeC-H, không thêm bridge. Native glyph/nhánh/count giữ nguyên."
+  },
+  "rootTaperCorrection": {
+    "rejectedHash": "dd8b8d240af6faa532e30de630f319646e380306d137b47bfb56ce86d89619c7",
+    "reason": "Readonly macro phát hiện base perpendicular tạo mũi nhô. Root đã mở riêng native/actual macro và đồng ý.",
+    "final": "8taper widefeet vertical xfront/y210±4 khớp mép horizontal8px, không đổi CO/glyph/nhánh."
+  }
+}
