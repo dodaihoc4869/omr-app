@@ -29,7 +29,7 @@ function gia(tra: (g: Goi) => { status?: number; j: unknown } | Error) {
 const sfuTot = (g: Goi) => {
   if (g.url.endsWith('/sessions/new')) return { status: 201, j: { sessionId: PHIEN } }
   if (g.url.endsWith('/tracks/new')) {
-    const local = (g.than?.tracks as { location: string }[])[0]!.location === 'local'
+    const local = ((g.than ?? {}).tracks as { location: string }[])[0]!.location === 'local'
     return local ? { j: { sessionDescription: { type: 'answer', sdp: SDP + 'a=tra-loi\r\n' }, tracks: [{ mid: '0', trackName: 'thay' }] } }
       : { j: { requiresImmediateRenegotiation: true, sessionDescription: { type: 'offer', sdp: SDP + 'a=loi-moi\r\n' }, tracks: [{ mid: '0', trackName: 'thay', sessionId: NGUON }] } }
   }

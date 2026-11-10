@@ -70,7 +70,7 @@ async function trang(ten) {
   return t
 }
 const liveView = (o) => ({ san: false, bat: false, tu: null, phien: 0, ss: null, xem: 0, ws: 0, tay: [], noi: [], xa: false, tiengLop: true, soNet: 0, tieng: CO_SFU ? 'bat' : 'chua-cau-hinh', ...o })
-const ketQua = { coSfu: CO_SFU, giay: GIAY, soEm: SO_EM }
+const ketQua = { coSfu: CO_SFU, giay: GIAY, soEm: SO_EM, chromium: trinh.version() }
 let ma = 0
 try {
   const thay = await trang('thầy')

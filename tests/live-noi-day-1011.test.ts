@@ -28,8 +28,8 @@ async function dung(soEm = 2) {
   async function em(sbd: string) {
     const ds: NetBut[] = [], sk: SuKienBut[] = [], tt: TrangThaiLiveEm[] = []
     let ws: WsGia = await ph.noi('hs', sbd)
-    const k = { gui: (tin: Record<string, unknown>) => kn.kenh.gui(tin), guiNhiPhan: (x: Uint8Array) => kn.kenh.guiNhiPhan(x) }
     let kn = taoKenhGia(ph, ws)
+    const k = { gui: (tin: Record<string, unknown>) => kn.kenh.gui(tin), guiNhiPhan: (x: Uint8Array) => kn.kenh.guiNhiPhan(x) }
     kenh.push({ kenh: k, xong: () => kn.xong() })
     const le = taoLiveEm({ ve: 've-hs', goc: 'https://may-chu.example', kenh: k, khiBut: (s) => { sk.push(s); loi.apSuKien(ds, s) }, khiTrangThai: (t) => tt.push(t), moiTruong: dh.mt })
     ws.nhan = (d) => le.nhanTinPhong(d)
