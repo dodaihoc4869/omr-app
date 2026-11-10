@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1200,
+    "hash": "d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc",
+    "fileNguon": "anh/d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc.png",
+    "svg": "dien-phan-nacl-native1200-ddh-e18716678af7d1a41e67347bcea11c1736b8e1cb7b0dfff110aa9253f2e03bd1.svg",
+    "hashSvg": "e18716678af7d1a41e67347bcea11c1736b8e1cb7b0dfff110aa9253f2e03bd1",
+    "byteSvg": 8923,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C5-B16-II-19",
+        "de": "Trong phòng thí nghiệm, một học sinh tiến hành điện phân dung dịch NaCl bão hoà với điện cực than chì để điều chế nước Javel theo sơ đồ bên.",
+        "refs": [
+          {
+            "hash": "d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc",
+            "where": "12-C5-B16-II-19.hinh.0.du_lieu",
+            "hashDataUrl": "92a81724eba6d1a6144fc70da70f8cf50ed9e162f752f282a33b0caff3292d57"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1openbeakerstraightRIM139-liquid209/2grayrodsbluegraybelowliquid/4batterybarsLONGshortLONGshort/+LEFT−RIGHT/17bubblesLEFT9RIGHT8FRONTrodsoverlap/whiteinternalhighlightsNOTextrabubbles/NaClregularDDH/noaddedgas-currentnames-arrows-voltage-molarity-answer",
+    "hashSvgDaSoat": "e18716678af7d1a41e67347bcea11c1736b8e1cb7b0dfff110aa9253f2e03bd1",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

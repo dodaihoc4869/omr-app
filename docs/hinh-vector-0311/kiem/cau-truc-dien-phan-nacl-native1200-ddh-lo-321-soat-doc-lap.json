@@ -1,0 +1,16 @@
+[
+  {
+    "i": 1200,
+    "hashSvg": "e18716678af7d1a41e67347bcea11c1736b8e1cb7b0dfff110aa9253f2e03bd1",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL và bubble native6x, đọc public questions.de/ref 12-C5-B16-II-19.hinh.0.du_lieu sau_de; tự fresh Chromium FULL3x đúng SHA/8923B, mở FULL/macros bubbles/battery. Một cốc hở mép trên thẳng139, hai môi thành cong, hai đường thành/đáy và các mảng tint nguồn; mặt dung dịch209, hai thanh xám đổi xanhxám dưới mặt giữ lớp chồng đúng. Đếm độc lập17bọt: trái9 (4phía trái thanh+5phía phải), phải8 (4mỗi phía); các bọt giao thanh nằm trước thanh, highlight trắng trong bọt không tính thànhbọt mới. Bốn vạch nguồn dài-ngắn-dài-ngắn, dấu+trái/−phải và hai dây đúng; literal NaCl regular đúng hoa/thường. DDH path tự chứa, không text/image, không thấy chữ chạm/cắt/tràn hay thêm tênkhí/current/mũitên/điệnáp/nồngđộ/đápán.",
+    "render": "/workspace/scratch/soat263-1200.png",
+    "macro": [
+      "/workspace/scratch/nacl1200-bubbles.png",
+      "/workspace/scratch/nacl1200-battery.png",
+      "/workspace/scratch/nacl1200-nativeBubbles6.png"
+    ],
+    "hash": "d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc",
+    "hashSvgDaSoat": "e18716678af7d1a41e67347bcea11c1736b8e1cb7b0dfff110aa9253f2e03bd1"
+  }
+]

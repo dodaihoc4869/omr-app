@@ -1,0 +1,332 @@
+{
+  "i": 1200,
+  "hash": "d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc.png",
+  "size": [
+    323,
+    390
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C5-B16-II-19",
+      "de": "Trong phòng thí nghiệm, một học sinh tiến hành điện phân dung dịch NaCl bão hoà với điện cực than chì để điều chế nước Javel theo sơ đồ bên.",
+      "allHinh": [
+        {
+          "hash": "d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc",
+          "where": "12-C5-B16-II-19.hinh.0.du_lieu",
+          "hashDataUrl": "92a81724eba6d1a6144fc70da70f8cf50ed9e162f752f282a33b0caff3292d57"
+        }
+      ],
+      "missingHashes": [
+        "d92e12da589ef96a4e8561fedda164d72de84dfb45dee8dd618421710bb5b9cc"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/1200-native4x-lo321.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelbubbles individuallytraced, no gasidentity/amounttheory. Sourcebubblescountliteral, notstoichiometry.",
+  "geometry": {
+    "classification": "Flatblue transparentbeaker electrolyticcell, notphoto.",
+    "beaker": {
+      "outlineVerbal": "Topstraightrimfrom41139to280139 withsmallflaredlipatbothends; leftouterwall46158→46312, curvedbottomto88354H239, rightcurve275312→275158. Innerwall51158→51312 curvedto88348H239curve270312→270158. Do notdrawtopellipse.",
+      "bottomOuterY": 354,
+      "bottomInnerY": 348,
+      "liquidTopY": 209,
+      "fill": "lightblue solutionbelow209, verypaleblueglassinteriorabove209; transparentwhiteverticalhighlightstripsandpalerodoverlay asnative, noaddedmeniscusellipse"
+    },
+    "electrodes": [
+      {
+        "rect": [
+          98,
+          114,
+          113,
+          325
+        ],
+        "fill": "darkgrayabove209, subduedbluegraybelow209 toshowliquidtransparency"
+      },
+      {
+        "rect": [
+          210,
+          114,
+          225,
+          325
+        ],
+        "fill": "samegray"
+      }
+    ],
+    "wires": [
+      [
+        [
+          105,
+          114
+        ],
+        [
+          105,
+          56
+        ],
+        [
+          149,
+          56
+        ]
+      ],
+      [
+        [
+          171,
+          56
+        ],
+        [
+          217,
+          56
+        ],
+        [
+          217,
+          114
+        ]
+      ]
+    ],
+    "battery": {
+      "bars": [
+        [
+          [
+            149,
+            35
+          ],
+          [
+            149,
+            78
+          ]
+        ],
+        [
+          [
+            156,
+            47
+          ],
+          [
+            156,
+            66
+          ]
+        ],
+        [
+          [
+            164,
+            35
+          ],
+          [
+            164,
+            78
+          ]
+        ],
+        [
+          [
+            171,
+            47
+          ],
+          [
+            171,
+            66
+          ]
+        ]
+      ],
+      "polarity": {
+        "leftPlus": {
+          "h": [
+            [
+              129,
+              40
+            ],
+            [
+              142,
+              40
+            ]
+          ],
+          "v": [
+            [
+              135,
+              34
+            ],
+            [
+              135,
+              47
+            ]
+          ]
+        },
+        "rightMinus": [
+          [
+            175,
+            40
+          ],
+          [
+            188,
+            40
+          ]
+        ]
+      },
+      "note": "4barslongSHORTlongSHORT,noaddedterminaldots/arrowheads"
+    },
+    "bubblesLeft": [
+      {
+        "c": [
+          86,
+          229
+        ],
+        "r": 5
+      },
+      {
+        "c": [
+          130,
+          224
+        ],
+        "r": 6.5
+      },
+      {
+        "c": [
+          119,
+          242
+        ],
+        "r": 4
+      },
+      {
+        "c": [
+          93,
+          254
+        ],
+        "r": 6.5
+      },
+      {
+        "c": [
+          123,
+          264
+        ],
+        "r": 5.5
+      },
+      {
+        "c": [
+          84,
+          271
+        ],
+        "r": 5
+      },
+      {
+        "c": [
+          93,
+          289
+        ],
+        "r": 6.5
+      },
+      {
+        "c": [
+          123,
+          289
+        ],
+        "r": 5.5
+      },
+      {
+        "c": [
+          118,
+          312
+        ],
+        "r": 6.5
+      }
+    ],
+    "bubblesRight": [
+      {
+        "c": [
+          200,
+          222
+        ],
+        "r": 4
+      },
+      {
+        "c": [
+          237,
+          225
+        ],
+        "r": 5
+      },
+      {
+        "c": [
+          191,
+          244
+        ],
+        "r": 5
+      },
+      {
+        "c": [
+          229,
+          249
+        ],
+        "r": 6.5
+      },
+      {
+        "c": [
+          205,
+          272
+        ],
+        "r": 6.5
+      },
+      {
+        "c": [
+          235,
+          274
+        ],
+        "r": 5
+      },
+      {
+        "c": [
+          205,
+          294
+        ],
+        "r": 6.5
+      },
+      {
+        "c": [
+          229,
+          308
+        ],
+        "r": 6.5
+      }
+    ],
+    "bubbleStyle": "Palealmostwhite/lightbluefilledcircleswiththingrayblueoutline/smallwhiteupperleftshine, drawninFRONTOFrodsoverlap (left93254/93289/118312;right229249/205272/205294/229308). No signsinsidebubbles.",
+    "label": {
+      "text": "NaCl",
+      "bbox": [
+        134,
+        317,
+        191,
+        342
+      ],
+      "font": "regularuprightsans, capitallowercaseNaCl exactNOTNACI"
+    },
+    "counts": {
+      "beakers": 1,
+      "rods": 2,
+      "batteryBars": 4,
+      "bubblesLeft": 9,
+      "bubblesRight": 8,
+      "bubblesTotal": 17,
+      "heads": 0
+    },
+    "noAdded": [
+      "gasnames",
+      "electron/currentarrows",
+      "electrodenames",
+      "voltagenumber",
+      "molarity",
+      "bubblesfromtheory",
+      "equalbubblecounts",
+      "saltbridge",
+      "flaskstand"
+    ]
+  },
+  "actualSvgReviewed": false
+}
