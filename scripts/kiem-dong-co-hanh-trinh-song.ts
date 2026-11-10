@@ -33,4 +33,5 @@ async function main(){
   const d=await dongCoHanhTrinh(env,em.sbd,now,hs,new Set(),false)
   console.log(JSON.stringify({kiemDongCoSong:true,lichSuLonNhat:em.n,soUngVien:hs.cau.length,soQuanSatDocLap:d.soQuanSat,soCauChanTienQuyet:d.chan.size,soCauHalfLife:d.soHalfLife,soCanhHoc:d.soCanhHoc,soL4SanSang:d.v5?.soL4??0,phienBanDongCo:'ht6-0910-v1',soCauChanDoanCoGioiHan:d.v5?.chanDoan.size??0,soUngVienBoSungToanKho:d.v5?.ungNgoai.length??0,soKyNangL3MucTieu:d.v5?.tienDo.tong??0,baoPhuL3:d.v5?.tienDo.baoPhu??null,soLenhDoc:soDoc}))
 }
-main().catch(()=>{console.error('Không hoàn tất kiểm động cơ chỉ đọc.');process.exitCode=1})
+// 10/11: lỗi lặp ở #1566/#1567 mà không biết vì sao ⇒ in TÊN + CÂU BÁO lỗi (cắt 300 ký tự; không in dữ liệu em / ngăn xếp) để tìm gốc.
+main().catch((e)=>{const m=e instanceof Error?`${e.name}: ${e.message}`:String(e);console.error('Không hoàn tất kiểm động cơ chỉ đọc. Lỗi: '+m.replace(/\s+/g,' ').slice(0,300));process.exitCode=1})
