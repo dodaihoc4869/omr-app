@@ -32,16 +32,16 @@ describe('chọn ví dụ mẫu (máy chủ)', () => {
   })
 })
 
-describe('luật Tính / đọc đề sai ⇒ đúng 1 lần là đủ (hàng sửa ngày Sửa)', () => {
-  it('bỏ câu tinh đã đúng ≥ 1 ngày sau lần sai cuối; giữ câu tinh chưa đúng lần nào / còn dấu Chưa chắc; câu loại khác giữ', () => {
+// SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «Làm nốt mấy việc còn lại»): luật «Tính / đọc đề sai ⇒ đúng 1 lần» chuyển từ hàng sửa Gói 7 vào LUẬT ĐÓNG LỖI CHUNG
+// (tests/luot-dung-theo-loai-1011.test.ts) ⇒ themSua7 không còn tự bỏ câu «Tính»; hàng sửa (câu lỗi mở / chờ kiểm) đã đúng theo loại.
+describe('hàng sửa ngày Sửa không tự bỏ câu «Tính» nữa (luật chung lo)', () => {
+  it('giữ nguyên hàng sửa; chỉ thêm câu có dấu Chưa chắc', () => {
     const loiV2 = new Map([
       ['t1', { soLanSai: 1, saiCuoi: '2026-11-05', trangThai: 'cho_kiem', ngayDung: ['2026-11-07'] }],
-      ['t2', { soLanSai: 1, saiCuoi: '2026-11-05', trangThai: 'mo', ngayDung: [] }],
-      ['t3', { soLanSai: 1, saiCuoi: '2026-11-05', trangThai: 'cho_kiem', ngayDung: ['2026-11-07'] }],
       ['c1', { soLanSai: 1, saiCuoi: '2026-11-05', trangThai: 'cho_kiem', ngayDung: ['2026-11-07'] }],
     ])
-    const lyDo = new Map<string, 'tinh' | 'cach' | 'cc'>([['t1', 'tinh'], ['t2', 'tinh'], ['t3', 'tinh'], ['cc:t3', 'cc'], ['c1', 'cach']])
-    expect(themSua7(['t1', 't2', 't3', 'c1'], { cau: [], loiV2 }, lyDo, '2026-11-10')).toEqual(['t2', 't3', 'c1'])
+    const lyDo = new Map<string, 'tinh' | 'cach' | 'cc'>([['t1', 'tinh'], ['c1', 'cach']])
+    expect(themSua7(['t1', 'c1'], { cau: [], loiV2 }, lyDo, '2026-11-10')).toEqual(['t1', 'c1'])
   })
 })
 

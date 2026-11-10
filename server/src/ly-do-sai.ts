@@ -46,3 +46,18 @@ export function docCotLyDo(v: unknown): Map<string, LyDoSai | 'cc'> {
   try { const a: unknown = JSON.parse(v); if (Array.isArray(a)) for (const c of a) if (Array.isArray(c) && typeof c[0] === 'string' && (laLyDoSai(c[1]) || (c[1] === 'cc' && c[0].startsWith('cc:')))) m.set(qidGocLy(c[0]), c[1]) } catch { /* bỏ */ }
   return m
 }
+
+/** MÁY NÂNG LOẠI LỖI (đề xuất v5 mục 3: «chống chọn Tính sai cho ít việc — sai lại lần nữa ⇒ nâng thành Chưa biết cách»): câu đã sai tự làm từ 2 lần mà lý do
+ *  là «Tính / đọc đề sai» ⇒ coi là «Chưa biết cách». Dùng chung cho nhóm lỗi ngày Sửa và luật đóng lỗi (srs2-d1, chua-cau-sai-adapter). */
+export const lyDoHieuLuc = (ly: LyDoSai | 'cc' | undefined, soLanSai: number): LyDoSai | undefined =>
+  ly === 'cc' || !ly ? undefined : ly === 'tinh' && soLanSai >= 2 ? 'cach' : ly
+
+/** Lý do sai của một em (câu GỐC → lý do) cho luật đóng lỗi — đọc SONG SONG trong đợt đọc sẵn có của nơi gọi (không thêm đợt chờ). Bảng chưa có / lỗi ⇒ rỗng. */
+export async function docLyDoLoi(env: Env, sbd: string): Promise<Map<string, LyDoSai>> {
+  const m = new Map<string, LyDoSai>()
+  try {
+    const r = await env.DB.prepare("SELECT qid,ly FROM goi_bai_7_ly_do WHERE sbd=? AND ly IN ('tinh','cach','nham')").bind(sbd).all<{ qid: string; ly: string }>()
+    for (const x of r.results ?? []) if (laLyDoSai(x.ly)) m.set(qidGocLy(String(x.qid)), x.ly)
+  } catch { /* bảng chưa có */ }
+  return m
+}

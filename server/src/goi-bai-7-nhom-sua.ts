@@ -3,7 +3,7 @@
 // (Hiểu nhầm > Chưa biết cách > Tính / đọc đề sai; chưa chạm ⇒ không gắn); nhóm có câu em đã sai từ 3 lần ⇒ «Học lại» (thắng mọi loại). Thứ tự nhóm = thứ tự
 // câu đầu tiên của nhóm trong hàng sửa; câu sửa trong kế hoạch xếp liền theo nhóm (`xepSuaTheoNhom`) ⇒ chặng đầu là nhóm 1. Tiến độ: `xong` = câu lỗi cũ
 // (sai trước hôm nay) em đã làm hôm nay. Thuần CPU trên dữ liệu đã đọc (0 lệnh D1).
-import type { LyDoSai } from './ly-do-sai'
+import { lyDoHieuLuc, type LyDoSai } from './ly-do-sai'
 
 export type LoaiNhom7 = LyDoSai | 'hoc_lai'
 export interface NhomSua7 { ten: string; loai?: LoaiNhom7; so: number; xong: number; viDu?: string }
@@ -37,7 +37,7 @@ export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { me
     n.so++
     if (xong) n.xong++
     const g = lyDo.get(q) ?? lyDo.get(qidGocSua(q))
-    const l: LoaiNhom7 | undefined = (loiCua(q)?.soLanSai ?? 0) >= SAI_HOC_LAI ? 'hoc_lai' : g === 'cc' ? undefined : g
+    const n0 = loiCua(q)?.soLanSai ?? 0, l: LoaiNhom7 | undefined = n0 >= SAI_HOC_LAI ? 'hoc_lai' : lyDoHieuLuc(g, n0) // Tính mà sai từ 2 lần ⇒ Chưa biết cách
     if (l && (!n.loai || NANG[l] > NANG[n.loai])) n.loai = l
   }
   const con = viec.flatMap(v => (v.vai === 'sua' ? [v.qid] : []))
@@ -65,20 +65,16 @@ export function nhomSua7(viec: readonly { qid: string; vai: string }[], hs: { me
   return [...ds.slice(0, 7), { ten: 'Các dạng khác', so: du.reduce((s, n) => s + n.so, 0), xong: du.reduce((s, n) => s + n.xong, 0), ...(loai ? { loai } : {}) }]
 }
 
-/** LƯỢT ĐÚNG THEO LOẠI LỖI (khối B lát 5–6, đặc tả mục 2: «Tính / đọc đề sai ⇒ cần đúng 1 lần · Chưa biết cách ⇒ 2 lần · Hiểu nhầm ⇒ 3 lần») + «CHƯA CHẮC»,
- *  áp khi xếp hàng sửa ngày Sửa: THÊM vào cuối (a) câu «Hiểu nhầm» luật đóng lỗi chung đã đóng (đúng 2 ngày) nhưng chưa đủ 3 ngày đúng; (b) câu sửa em làm
- *  đúng nhưng «Chưa chắc»; BỎ (c) câu «Tính / đọc đề sai» đã đúng ≥ 1 ngày sau lần sai cuối (không dấu Chưa chắc) — đủ lượt theo loại.
- *  Không đổi luật đóng lỗi chung (srs2) — chỉ quyết hàng sửa của Lộ trình; câu đã làm hôm nay không thêm. Thuần CPU. */
+/** «CHƯA CHẮC» (khối B lát 5): câu sửa em làm đúng nhưng chạm «Chưa chắc» ⇒ THÊM vào cuối hàng sửa ngày Sửa (câu đã làm hôm nay không thêm).
+ *  10/11: lượt đúng theo loại lỗi (Tính 1 · Chưa biết cách 2 · Hiểu nhầm 3 ngày) nay nằm trong LUẬT ĐÓNG LỖI CHUNG (loi-hoc-luat.ts `thamSoTheoLyDo`, áp ở
+ *  srs2-d1 + chua-cau-sai-adapter) ⇒ hàng sửa (câu lỗi mở / chờ kiểm) đã đúng theo loại; ở đây không còn bỏ câu «Tính» / thêm câu «Hiểu nhầm» riêng. Thuần CPU. */
 export function themSua7(sua: readonly string[], hs: { cau: readonly { qid: string }[]; loiV2?: Loi }, lyDo: ReadonlyMap<string, LyDoSai | 'cc'>, ngay: string): string[] {
   const co = new Set(sua), them: string[] = []
   for (const { qid } of hs.cau) {
-    if (co.has(qid)) continue
+    if (co.has(qid) || !lyDo.has(`cc:${qid}`)) continue
     const l = hs.loiV2?.get(qid)
     if (!l || !l.soLanSai || (l.ngayDung ?? []).includes(ngay)) continue
-    const nham = lyDo.get(qid) === 'nham' && (l.trangThai === 'dong' || l.trangThai === 'duy_tri') && (l.ngayDung?.length ?? 0) < 3
-    if (nham || lyDo.has(`cc:${qid}`)) { them.push(qid); co.add(qid) }
+    them.push(qid); co.add(qid)
   }
-  const loi = hs.loiV2
-  const giu = sua.filter((q) => !(lyDo.get(q) === 'tinh' && !lyDo.has(`cc:${q}`) && (loi?.get(q)?.ngayDung?.length ?? 0) >= 1))
-  return [...giu, ...them]
+  return [...sua, ...them]
 }
