@@ -534,7 +534,7 @@ export function jsLenBangMoi(tuy: { cauNoi?: boolean } = {}): string {
   function xep() {
     var d = dot(); if (!d) return;
     $$(d, '.mc-vung-de').forEach(function (v) {
-      if (daGoi() || lgMo()) {
+      if (daGoi() || lgMo() || S.bpuCuon) {
         if (!v.classList.contains('mc-cuon')) {
           var giu = v.__moc ? (v.__moc[v.__trang || 0] || 0) : 0;
           v.classList.add('mc-cuon'); dat(v, 0);
