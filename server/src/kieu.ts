@@ -116,6 +116,10 @@ export interface Env {
   PHONG_BPU?: DurableObjectNamespace
   /** Công tắc tắt Bình Phản Ứng: có giá trị ⇒ không mở phòng, không phát vé, cửa trả 410 (điểm danh chiếu lại màn cũ). */
   TAT_BPU?: string
+  /** LIVE BẢNG (10/11, server/src/live-sfu.ts): ứng dụng Cloudflare Realtime SFU cho tiếng thầy + DataChannel điểm đang viết — Worker secrets
+   *  (`wrangler secret put`, workflow cai-realtime-1011.yml), KHÔNG vào git / wrangler.toml. Vắng một trong hai ⇒ cửa `/bpu/live/*` trả `chua-cau-hinh`, live chỉ có hình. */
+  REALTIME_APP_ID?: string
+  REALTIME_APP_SECRET?: string
   /** Chỉ có khi lệnh chạy TRONG ngăn của em (ngan-hoc-sinh.ts): kho riêng của đúng em đó. */
   KHO_EM?: KhoEm
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */
