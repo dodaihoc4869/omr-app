@@ -12,7 +12,8 @@
 //     chỉ sống một khung: bút dừng lại là xoá — bản 10/11 để đoạn đoán nằm lại tới khi có sự kiện mới).
 //     Phần vừa in xuống lớp tĩnh còn giữ trên lớp sống thêm 2 khung ⇒ không nháy.
 //     VẼ NGAY khi mẫu tới (pointerrawupdate + lớp sống desynchronized, không chờ khung) ĐÃ CÓ nhưng MẶC ĐỊNH TẮT, chỉ bật bằng __mcBut.veNgay(true): đo ở CPU × 4 thấy
-//     mỗi lượt vẽ ngoài khung làm trình duyệt đẩy canvas lên màn một lần ⇒ nghẽn luồng chính, có khung đứng 200–800 ms (docs/ban-ve-but-1011/so-do-trung-thuc.json).
+//     mỗi lượt vẽ ngoài khung làm trình duyệt đẩy canvas lên màn một lần ⇒ nghẽn luồng chính: chữ nhỏ còn 57–58 khung / giây (docs/ban-ve-but-1011/so-do-trung-thuc.json),
+//     một nét dài viết nhanh có khung đứng 0,3–1,5 giây trước khi bộ máy kịp tự tắt (VE_NGAY=1 CHI=moi:mot-net-dai:4 node scripts/but-bang-1011/do-khung.mjs).
 //     Ô đo bút cho biết máy thầy có làm được không; bật mà rớt khung thì bộ máy tự tắt.
 //   · Alt + B: ô ĐO BÚT (thiết bị, số mẫu mỗi giây, lực, mẫu gộp, thời gian xử lý) để thầy chụp gửi lại.
 //   · nét giữ theo ĐỢT (khoá = chỉ số đợt): chuyển câu rồi quay lại vẫn còn, câu mới bảng sạch.
