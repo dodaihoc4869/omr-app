@@ -1,0 +1,568 @@
+{
+  "i": 1390,
+  "hash": "fa9f6113c522a8fbcf219b371c95c718150d85185bc4e0327171ee3c07c4137c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/fa9f6113c522a8fbcf219b371c95c718150d85185bc4e0327171ee3c07c4137c.png",
+  "size": [
+    655,
+    149
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B13-I-5",
+      "de": "Trùng ngưng hợp chất hữu cơ X mạch hở (phân tử chỉ chứa đồng thời nhóm $\\ce{-COOH}$ và nhóm $\\ce{-OH}$), thu được polymer Y. Một đoạn mạch của Y có cấu tạo như hình.\nCông thức cấu tạo của X là",
+      "allHinh": [
+        {
+          "hash": "fa9f6113c522a8fbcf219b371c95c718150d85185bc4e0327171ee3c07c4137c",
+          "where": "VIP27-C4-B13-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "428dbfa631dc79cdfec5067c2df540a45c521f30d29f9a9104e4284744197f8d"
+        }
+      ],
+      "missingHashes": [
+        "fa9f6113c522a8fbcf219b371c95c718150d85185bc4e0327171ee3c07c4137c"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1390-native3x.png",
+    "left10xOpened": "/workspace/scratch/1390-left10x.png",
+    "right10xOpened": "/workspace/scratch/1390-right10x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelgeometryandvisiblemarks; no monomeranswer or normalizedrepeatunits.",
+  "geometry": {
+    "classification": "Openpolyesterfragment,5alphaC/5CO/5methylbranches, no bracket/caption.",
+    "alphaVertices": [
+      [
+        50,
+        85
+      ],
+      [
+        169,
+        63
+      ],
+      [
+        288,
+        85
+      ],
+      [
+        407,
+        63
+      ],
+      [
+        526,
+        85
+      ]
+    ],
+    "methylBranches": [
+      [
+        [
+          50,
+          85
+        ],
+        [
+          50,
+          132
+        ]
+      ],
+      [
+        [
+          169,
+          63
+        ],
+        [
+          169,
+          17
+        ]
+      ],
+      [
+        [
+          288,
+          85
+        ],
+        [
+          288,
+          132
+        ]
+      ],
+      [
+        [
+          407,
+          63
+        ],
+        [
+          407,
+          17
+        ]
+      ],
+      [
+        [
+          526,
+          85
+        ],
+        [
+          526,
+          132
+        ]
+      ]
+    ],
+    "carbonylVertices": [
+      [
+        90,
+        63
+      ],
+      [
+        209,
+        85
+      ],
+      [
+        328,
+        63
+      ],
+      [
+        447,
+        85
+      ],
+      [
+        565,
+        63
+      ]
+    ],
+    "carbonylO": [
+      {
+        "text": "O",
+        "bbox": [
+          81,
+          4,
+          102,
+          27
+        ],
+        "rays": [
+          [
+            [
+              86,
+              65
+            ],
+            [
+              86,
+              30
+            ]
+          ],
+          [
+            [
+              94,
+              65
+            ],
+            [
+              94,
+              30
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          199,
+          121,
+          221,
+          145
+        ],
+        "rays": [
+          [
+            [
+              205,
+              83
+            ],
+            [
+              205,
+              116
+            ]
+          ],
+          [
+            [
+              213,
+              83
+            ],
+            [
+              213,
+              116
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          318,
+          4,
+          340,
+          27
+        ],
+        "rays": [
+          [
+            [
+              324,
+              65
+            ],
+            [
+              324,
+              30
+            ]
+          ],
+          [
+            [
+              332,
+              65
+            ],
+            [
+              332,
+              30
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          436,
+          121,
+          458,
+          145
+        ],
+        "rays": [
+          [
+            [
+              443,
+              83
+            ],
+            [
+              443,
+              116
+            ]
+          ],
+          [
+            [
+              451,
+              83
+            ],
+            [
+              451,
+              116
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          555,
+          4,
+          577,
+          27
+        ],
+        "rays": [
+          [
+            [
+              561,
+              65
+            ],
+            [
+              561,
+              30
+            ]
+          ],
+          [
+            [
+              569,
+              65
+            ],
+            [
+              569,
+              30
+            ]
+          ]
+        ]
+      }
+    ],
+    "COFootTopology": "UPandDOWNCOdouble2verticalfeet touchDIFFERENTadjacentcarbonylslopes, NOhorizontalbridgejoiningfeet and noforcedsinglecommonnode.",
+    "esterO": [
+      {
+        "text": "O",
+        "bbox": [
+          118,
+          75,
+          140,
+          99
+        ],
+        "bonds": [
+          [
+            [
+              90,
+              63
+            ],
+            [
+              116,
+              77
+            ]
+          ],
+          [
+            [
+              143,
+              77
+            ],
+            [
+              169,
+              63
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          237,
+          51,
+          259,
+          75
+        ],
+        "bonds": [
+          [
+            [
+              209,
+              85
+            ],
+            [
+              235,
+              71
+            ]
+          ],
+          [
+            [
+              262,
+              71
+            ],
+            [
+              288,
+              85
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          356,
+          75,
+          378,
+          99
+        ],
+        "bonds": [
+          [
+            [
+              328,
+              63
+            ],
+            [
+              354,
+              77
+            ]
+          ],
+          [
+            [
+              381,
+              77
+            ],
+            [
+              407,
+              63
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          475,
+          51,
+          497,
+          75
+        ],
+        "bonds": [
+          [
+            [
+              447,
+              85
+            ],
+            [
+              473,
+              71
+            ]
+          ],
+          [
+            [
+              500,
+              71
+            ],
+            [
+              526,
+              85
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          594,
+          75,
+          616,
+          99
+        ],
+        "bonds": [
+          [
+            [
+              565,
+              63
+            ],
+            [
+              592,
+              77
+            ]
+          ]
+        ]
+      }
+    ],
+    "leftEnd": {
+      "disconnectedDashes": [
+        [
+          [
+            12,
+            63
+          ],
+          [
+            16,
+            65
+          ]
+        ],
+        [
+          [
+            21,
+            68
+          ],
+          [
+            25,
+            70
+          ]
+        ],
+        [
+          [
+            30,
+            73
+          ],
+          [
+            34,
+            75
+          ]
+        ],
+        [
+          [
+            39,
+            78
+          ],
+          [
+            43,
+            80
+          ]
+        ]
+      ],
+      "joinedSolidStub": [
+        [
+          47,
+          83
+        ],
+        [
+          50,
+          85
+        ]
+      ],
+      "finding": "4detachedshortdiagonaldashes +lasttinyjoinedstub; not5detacheddashes"
+    },
+    "rightEnd": {
+      "disconnectedDashes": [
+        [
+          [
+            619,
+            76
+          ],
+          [
+            624,
+            74
+          ]
+        ],
+        [
+          [
+            628,
+            71
+          ],
+          [
+            633,
+            69
+          ]
+        ],
+        [
+          [
+            637,
+            66
+          ],
+          [
+            642,
+            64
+          ]
+        ]
+      ],
+      "tinyTerminalMark": {
+        "center": [
+          646,
+          62
+        ],
+        "approxSize": [
+          1,
+          1
+        ],
+        "finding": "Isolatedtinyblackmark followsdashdirection beyond3largerdashes. Single-sourcecannotprove intentionalfourthdash vsprintparticle. RETAINsmallmarkatnativeposition, do notenlargeintofourthequaldash orremoveasnoise."
+      }
+    },
+    "counts": {
+      "C": 15,
+      "alphaC": 5,
+      "carbonylC": 5,
+      "methylC": 5,
+      "O": 10,
+      "COdouble": 5,
+      "CCdouble": 0,
+      "Htext": 0,
+      "caption": 0,
+      "brackets": 0,
+      "nsub": 0
+    },
+    "font": "10Olabelsregularuprightserif, notbold; skeletallines thinuniformblack.",
+    "noAdded": [
+      "repeatbracketsn",
+      "monomerformula/name",
+      "H/CH3labels",
+      "charges",
+      "reactionarrow",
+      "equalizingterminalmarks",
+      "newringclosures"
+    ]
+  },
+  "actualSvgReviewed": false
+}
