@@ -9,6 +9,7 @@ import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7,
 import { docMucLoai7, loaiNgayEm7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
 import { lichBaiEm7 } from './goi-bai-7-lich-bai'
+import { apSuat7, NGAY_DE_28 } from './goi-bai-7-suat'
 import { xepBai6 } from './bai-6-cau'
 import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
@@ -225,7 +226,7 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
   const nguonSom = gs.results.map(g => som(duNguonGoi7(env,mang7(g.ma_to_json))))
   const gids = JSON.stringify(gs.results.map(g => g.id))
   // Lịch kiểm tra chỉ đọc metadata nhỏ, cùng đợt câu/sổ/quota; không bóc đề riêng.
-  const kiemSom=som(import('./kiem-tra-ca-nhan').then(async kt=>await kt.coKtCn(env)?new Map((await env.DB.prepare(`SELECT k.ngay,MAX(COALESCE(json_extract(km.meta_json,'$.baiNgayToiThieu'),0)) hoc,COUNT(*) n FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.sbd=? AND k.trang_thai<>'cho_nguon' AND k.ngay>=? GROUP BY k.ngay`).bind(sbd,ngay).all<{ngay:string;hoc:number;n:number}>()).results.map(r=>[r.ngay,r.hoc?Number(r.n):2])):new Map<string,number>()))
+  const kiemSom=som(import('./kiem-tra-ca-nhan').then(async kt=>await kt.coKtCn(env)?new Map((await env.DB.prepare(`SELECT k.ngay,MAX(COALESCE(json_extract(km.meta_json,'$.baiNgayToiThieu'),0)) hoc,COUNT(*) n FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.sbd=? AND k.trang_thai<>'cho_nguon' AND k.ngay>=? GROUP BY k.ngay`).bind(sbd,ngay).all<{ngay:string;hoc:number;n:number}>()).results.map(r=>[r.ngay,r.hoc&&r.ngay<NGAY_DE_28?Number(r.n):2])):new Map<string,number>()))
   const [cs, gaps, events, quotas, ngayKiem] = await Promise.all([
     env.DB.prepare('SELECT * FROM goi_bai_7_cau WHERE goi_id IN (SELECT value FROM json_each(?))').bind(gids).all<Row>(),
     env.DB.prepare('SELECT goi_id,qid,version,kieu,luc FROM goi_bai_7_gap WHERE sbd=? AND goi_id IN (SELECT value FROM json_each(?)) ORDER BY luc,receipt').bind(sbd,gids).all<Row>(),
@@ -631,20 +632,19 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // làm (không câu mới, không câu chờ thầy dạy lại), câu sai lần cuối trước, sai nhiều trước, chưa thành thạo trước, gần lịch ôn trước. Chỉ CPU, không đọc D1.
   const vaoPlan: Parameters<typeof chonGoi7>[0] = { cau,daGap:vuaLam.size||luotNgay.size?new Set([...daGap,...vuaLam,...luotNgay]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua:loaiNgay==='sua'?xepSuaTheoNhom(themSua7(sua,hs,lyDo,ngay),hs.meta):sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn,
     ngay,gapHomNay:new Set([...goi.flatMap(g=>[...g.gapNgay]),...[...vuaLam,...luotNgay].filter(id=>!daGap.has(id))]),loaiNgay }
+  const tinhOnSom = (deKt: ReadonlySet<string>) => { const daCo = new Set([...sua, ...on, ...chua]); return hs.cau.filter(c => { const t = hs.tt.get(c.qid); return !!t && !t.laMoi && !t.catTia && !daCo.has(c.qid) && !vuaXem.has(c.qid) && !deKt.has(c.qid) })
+    .sort((x, y) => { const a = hs.tt.get(x.qid)!, b = hs.tt.get(y.qid)!
+      return Number(a.lanCuoiDung !== false) - Number(b.lanCuoiDung !== false) || b.lanSai - a.lanSai || Number(a.thanhThao) - Number(b.thanhThao) ||
+        (a.henOn ?? '9999').localeCompare(b.henOn ?? '9999') || x.qid.localeCompare(y.qid) }).map(c => c.qid) }
+  // Đề 28 theo suất (goi-bai-7-suat.ts)
+  if (ngay >= NGAY_DE_28 && !kiemNhe) { const deKt = await deKtSom; apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, deKt ? tinhOnSom(deKt) : undefined) }
   let plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
   // Chỉ khi kế hoạch thường còn thiếu mức (hiếm) mới đọc thêm câu đã DÀNH cho Kiểm tra ôn tập sắp tới của em (một lệnh, chỉ mã câu) — ôn sớm không lấy
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.
-  if (soDaLam + plan.viec.length < toiThieu) {
-    const daCo = new Set([...sua, ...on, ...chua])
+  if (soDaLam + plan.viec.length < toiThieu && !vaoPlan.onSom) {
     const deKt = await deKtSom
     // Đọc hỏng ⇒ không ôn sớm (không đoán) và cũng KHÔNG hạ mức bên dưới.
-    if (deKt) {
-      vaoPlan.onSom = hs.cau.filter(c => { const t = hs.tt.get(c.qid); return !!t && !t.laMoi && !t.catTia && !daCo.has(c.qid) && !vuaXem.has(c.qid) && !deKt.has(c.qid) })
-        .sort((x, y) => { const a = hs.tt.get(x.qid)!, b = hs.tt.get(y.qid)!
-          return Number(a.lanCuoiDung !== false) - Number(b.lanCuoiDung !== false) || b.lanSai - a.lanSai || Number(a.thanhThao) - Number(b.thanhThao) ||
-            (a.henOn ?? '9999').localeCompare(b.henOn ?? '9999') || x.qid.localeCompare(y.qid) }).map(c => c.qid)
-      plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
-    }
+    if (deKt) { vaoPlan.onSom = tinhOnSom(deKt); plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) }) }
   }
   // HẾT CẢ ÔN SỚM (thầy 23/10 "cả hai"): còn thiếu mức mà không còn câu nào xếp được ⇒ mức hôm nay hạ đúng bằng số câu em làm được (đã làm + còn xếp được)
   // để ngày ấy tính ĐỦ MỨC — em không mất chuỗi Chăm vì kho thiếu. Chỉ khi không có câu nào trong cửa sổ "vừa làm" (câu ấy quay lại sau ≤ 15 phút) và mức

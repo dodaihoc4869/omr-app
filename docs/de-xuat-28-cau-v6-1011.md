@@ -62,9 +62,20 @@ Chạy lại: `npx -y tsx docs/de-xuat-28-cau-mo-phong/rut28-suat.ts`.
 
 Cái giá của «kịp hạn»: bài này thêm 1 ngày Học mới (5 thay vì 4) vì Phần I chỉ có 18 suất/ngày mà bài có 82 câu Phần I. Ngày thêm đó không bỏ phí: các suất còn lại là câu sửa và câu ôn đúng ô.
 
-## 6. Chưa có số thật — cần thầy cho phép đo
-Bốn số quyết định chỉnh luật: câu theo ô của từng bài đang giao; số dạng mỗi em đã học; lỗi tồn theo phần; song sinh Phần II.
-Lệnh đo (workflow chỉ đọc, chỉ SELECT đếm gộp, không in tên / mã em) đã soạn nhưng bị lớp quyền của phiên chặn khi đẩy ⇒ chưa chạy. Kết nối Cloudflare trực tiếp của phiên báo «Invalid format for Authorization header».
+## 6. Số thật (workflow chỉ đọc `do-ma-tran-28-1011`, chạy 10/11 11:53 VN; chỉ đếm gộp)
+- **Ngày 09/11 (bản 28 câu đầu tiên):** 53 em ngày Học mới đủ 28 câu — trung bình quy về 28 là 20,7 / 4,5 / 2,8 (chuẩn 18 / 4 / 6), 12 em không có câu trả lời ngắn nào, 7 em không có câu đúng/sai nào. 116 em ngày Sửa — 19,1 / 6,4 / 2,4, 23 em không có câu trả lời ngắn. **Đúng hoặc sát 18/4/6 (lệch ≤ 1): 0 / 169 em.**
+- **Bài thật dồn mức Hiểu:** Bài 9 Amino acid (P1) Phần I 18 Biết · 51 Hiểu · 17 VD; Bài 8 Sulfuric acid 25 · 56 · 20; Bài 10 Protein Phần II 25 câu (4 suất/ngày). ⇒ «kịp hạn» phải LUÔN bật cho nguồn chính (đúng ô trước, dư thì lệch mức trong cùng phần); đúng mức tuyệt đối sẽ kéo một bài tới 13 ngày.
+- **Cả kho:** 17 042 câu; Phần I 3 790 Biết · 4 526 Hiểu · 1 484 VD; Phần II 745 · 1 082 · 1 026; Phần III 692 · 1 614 · 2 083.
+- **Lỗi tồn** (câu mà lần làm gần nhất là sai, số gần đúng): 279 em có lỗi, 149 em từ 112 câu trở lên; tổng 35 613 câu (Phần I 15 950 · II 11 346 · III 8 232) ⇒ ngày Sửa luôn đủ câu sai cho cả ba phần.
+- **Song sinh:** Phần I 438 câu gốc, Phần III 807 câu gốc, **Phần II 0**.
+- **Kiểm tra ôn tập:** 105 bài hẹn ngày 11/11; mỗi bài 28 câu. 54 bài mỗi ngày đang ở trạng thái chờ nguồn (việc riêng, chưa xử lý ở đây).
+- Chưa đo được: số dạng mỗi em đã học (câu đo trả 0 dòng).
+
+## 6b. Đã build 10/11 (thầy: «Duyệt bản kịp hạn, build và đẩy lên bản sống luôn, kiểm tra ôn tập để đúng 28 câu bỏ 12 câu»)
+- `server/src/rut-28.ts` (lõi `rut28` + nợ ôn theo dạng), `server/src/goi-bai-7-suat.ts` (nối vào kế hoạch ngày), `chonGoi7` nhận `suat`. Áp dụng từ đề ngày **11/11** (`NGAY_DE_28`).
+- Nguồn chính của ngày (câu mới ở ngày Học mới, câu sai ở ngày Sửa): đúng ô trước, dư thì lệch mức trong cùng phần. Nguồn phụ chỉ lấp suất trống, đúng ô.
+- Ngày Kiểm tra ôn tập từ 11/11: chỉ bài kiểm tra 28 câu (đọc theo ngày của lịch, không sửa lịch đã lập).
+- CHƯA làm: máy chọn câu của Kiểm tra ôn tập và `rutDeChuan2026` vẫn dùng thuật toán riêng (đã đúng ô, chỉ dùng chung bảng ma trận); công thức hạn chung chưa tính «Phần II 4 suất/ngày».
 
 ## 7. Build (sau khi thầy duyệt) — không đổi giao diện
 1. `server/src/rut-28.ts`: hàm thuần `rut28(ứng viên, {kịpHạn})` + một bảng ma trận dùng chung (bỏ ba bản chép). Test khoá: 10 000 đề giả, đề nào cũng đủ 28 và đúng phần khi kho còn câu.
