@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1378,
+    "hash": "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7",
+    "fileNguon": "anh/f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7.png",
+    "svg": "glycerol-ba-buoc-ddh-4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748.svg",
+    "hashSvg": "4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748",
+    "byteSvg": 21281,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D1-III-3",
+        "de": "Thực hiện các phản ứng với xúc tác H₂SO₄ đặc, đun nóng theo sơ đồ ở hình dưới.\nPhân tử khối của chất Y là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7",
+            "where": "12-KT-C123-D1-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "78482ec921d7f911486dc055c27a4c7265da3c6684c2a0f8f033a6fe976a0cc7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "GlycerolregularUPRIGHT→X→Y→ZtrueDAM-UPRIGHT/3OPENV2legs-shafttoTIP/3above+CH3COOH-3belowminusH2O-ALLchemregularITALIC/noaddedH2SO4-temp-names-structures-answer",
+    "hashSvgDaSoat": "4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

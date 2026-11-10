@@ -8469,6 +8469,15 @@
       "trangThai": "cau-truc-da-soat-doc-lap",
       "canNenSang": true,
       "font": "DDH Rounded"
+    },
+    "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7": {
+      "tep": "glycerol-ba-buoc-ddh-4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748.svg",
+      "hashSvg": "4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748",
+      "byteSvg": 21281,
+      "byteGzip": 3380,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
     }
   },
   "theoCau": [
@@ -14039,6 +14048,20 @@
           "where": "12-KT-C123-D1-II-3.hinh.0.du_lieu",
           "hashDataUrl": "3c9e633773295d32bde9e833a534731835ee462207cb9b71e156404789e024b8",
           "vector": "do-thi-ddh-651fa08a6013179859407b22035afd377be0cf0dbf4d5a05d11e2b9be432643b.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C123-D1-III-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7",
+          "where": "12-KT-C123-D1-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "78482ec921d7f911486dc055c27a4c7265da3c6684c2a0f8f033a6fe976a0cc7",
+          "vector": "glycerol-ba-buoc-ddh-4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748.svg"
         }
       ]
     },
@@ -29547,6 +29570,7 @@
     "12-KT-C123-D1-I-5",
     "12-KT-C123-D1-II-2",
     "12-KT-C123-D1-II-3",
+    "12-KT-C123-D1-III-3",
     "12-KT-C123-D1-III-5",
     "12-KT-C123-D2-I-2",
     "12-KT-C123-D2-I-8",

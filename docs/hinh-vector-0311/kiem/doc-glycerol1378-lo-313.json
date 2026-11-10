@@ -1,0 +1,247 @@
+{
+  "i": 1378,
+  "hash": "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7.png",
+  "size": [
+    1026,
+    162
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C123-D1-III-3",
+      "de": "Thực hiện các phản ứng với xúc tác H₂SO₄ đặc, đun nóng theo sơ đồ ở hình dưới.\nPhân tử khối của chất Y là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7",
+          "where": "12-KT-C123-D1-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "78482ec921d7f911486dc055c27a4c7265da3c6684c2a0f8f033a6fe976a0cc7"
+        }
+      ],
+      "missingHashes": [
+        "f8c631133d9ac5bad4b5881cc057131fa12166253bb872de2691056f21bf2bd7"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1378-native2x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixellabel/arrowgeometry, unknownX/Y/Zkeptliteralnotchemicalanswers.",
+  "geometry": {
+    "classification": "Singlehorizontal3stepreactiontextscheme, no molecularskeleton.",
+    "labels": [
+      {
+        "text": "Glycerol",
+        "bbox": [
+          57,
+          61,
+          180,
+          96
+        ],
+        "style": "regularuprightserif"
+      },
+      {
+        "text": "X",
+        "bbox": [
+          416,
+          61,
+          443,
+          90
+        ],
+        "style": "BOLDuprightserif"
+      },
+      {
+        "text": "Y",
+        "bbox": [
+          687,
+          61,
+          716,
+          90
+        ],
+        "style": "BOLDuprightserif"
+      },
+      {
+        "text": "Z",
+        "bbox": [
+          949,
+          61,
+          977,
+          90
+        ],
+        "style": "BOLDuprightserif"
+      }
+    ],
+    "steps": [
+      {
+        "shaft": [
+          [
+            194,
+            77
+          ],
+          [
+            408,
+            77
+          ]
+        ],
+        "headVertices": [
+          [
+            397,
+            67
+          ],
+          [
+            408,
+            77
+          ],
+          [
+            397,
+            87
+          ]
+        ],
+        "above": {
+          "text": "+ CH₃COOH",
+          "bbox": [
+            235,
+            49,
+            369,
+            77
+          ]
+        },
+        "below": {
+          "text": "−H₂O",
+          "bbox": [
+            269,
+            84,
+            335,
+            111
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            466,
+            77
+          ],
+          [
+            680,
+            77
+          ]
+        ],
+        "headVertices": [
+          [
+            669,
+            67
+          ],
+          [
+            680,
+            77
+          ],
+          [
+            669,
+            87
+          ]
+        ],
+        "above": {
+          "text": "+ CH₃COOH",
+          "bbox": [
+            507,
+            49,
+            641,
+            77
+          ]
+        },
+        "below": {
+          "text": "−H₂O",
+          "bbox": [
+            541,
+            84,
+            607,
+            111
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            728,
+            77
+          ],
+          [
+            942,
+            77
+          ]
+        ],
+        "headVertices": [
+          [
+            931,
+            67
+          ],
+          [
+            942,
+            77
+          ],
+          [
+            931,
+            87
+          ]
+        ],
+        "above": {
+          "text": "+ CH₃COOH",
+          "bbox": [
+            769,
+            49,
+            903,
+            77
+          ]
+        },
+        "below": {
+          "text": "−H₂O",
+          "bbox": [
+            803,
+            84,
+            869,
+            111
+          ]
+        }
+      }
+    ],
+    "arrowStyle": "3RIGHTopenVheadswithshafttotip, nofilledclosedtrianglebase",
+    "conditionStyle": "AllsixconditionlabelsITALICREGULARserif, notbold. Numeral3/2SUB. Glycerolregularupright;XYZBOLDUPRIGHTromanserif (Zangledserifterminals donotimplyitalic). IndependentlyreadnativeFULL2x.",
+    "counts": {
+      "openVRightHeads": 3,
+      "abovePlus": 3,
+      "belowMinus": 3,
+      "unknownSpeciesLetters": 3,
+      "conditions": 6
+    },
+    "noAdded": [
+      "H2SO4/heatfromstem",
+      "expandedX/Y/Z",
+      "reactionindices",
+      "phase",
+      "yield",
+      "molecularweightanswer",
+      "caption"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "nativeMacros": [
+      "/workspace/scratch/root313-native-first.png",
+      "/workspace/scratch/root313-native-letters.png"
+    ],
+    "actualFull": "/workspace/scratch/root313-1378.png",
+    "actualHash": "4d3d548d390c7cf672a36860de7bdaa2cf37e5cc34c0fa447578b49640be3748",
+    "note": "Glycerolregularupright/XYZtrueDAMupright/6chemblocksregularitalic/3OPENVheads-no closedbase. KhôngthêmH2SO4đặc/nhiệtđộ từpublicstem vào hình; khônggiảicấu trúcXY."
+  }
+}
