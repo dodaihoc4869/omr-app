@@ -53,7 +53,25 @@ export function xinQuyenTatMan(): void {
     void p.then((s) => { quyen = s === 'granted' ? 'granted' : s === 'denied' ? 'denied' : 'prompt' }, () => {}).finally(() => { if (dangXin === p) dangXin = null })
   } catch { dangXin = null }
 }
-export const dangXinQuyen = (): boolean => dangXin !== null
+export const dangXinQuyen = (): boolean => dangXin !== null || choHop > 0
+/** LIVE (10/11, đặc tả mục 4.7): hộp hỏi quyền KHÁC của trình duyệt (mic khi em được mời nói…) cũng làm trang mất tiêu điểm ⇒ bọc lời hứa xin quyền
+ *  bằng hàm này để nhánh «cửa sổ nổi» không báo nhầm trong lúc hộp đang hiện. Trả lại chính lời hứa đó. */
+let choHop = 0
+export function choHopQuyen<T>(p: Promise<T>): Promise<T> {
+  choHop += 1
+  const xong = () => { choHop = Math.max(0, choHop - 1) }
+  p.then(xong, xong)
+  return p
+}
+
+/** KHOÁ XOAY (live 10/11, đặc tả mục 4.7): lúc máy đang xoay / vào-ra toàn màn hình, sự kiện đổi cỡ cửa sổ và hướng màn tới LỆCH nhau vài chục ms
+ *  (khung trang còn dọc mà hướng máy đã ngang, hoặc ngược lại) ⇒ so cỡ sẽ ra «chia đôi» giả. Trong 600 ms sau `lock()` / `unlock()` / `orientationchange`
+ *  / đổi toàn màn hình thì CHƯA xét chia đôi; hết khoá xét lại (màn Bình Phản Ứng hẹn kiểm lại sau `conKhoaXoay()`). */
+export const KHOA_XOAY_MS = 600
+let khoaXoayDen = 0
+export function khoaXoay(ms: number = KHOA_XOAY_MS): void { khoaXoayDen = Math.max(khoaXoayDen, Date.now() + ms) }
+/** Mili-giây còn lại của khoá xoay (0 = không khoá). */
+export const conKhoaXoay = (): number => Math.max(0, khoaXoayDen - Date.now())
 /** Máy phân biệt được tắt màn (có IdleDetector + đã có quyền). Sai ⇒ nhánh GIỮ CHẶT. */
 export const coQuyenTatMan = (): boolean => quyen === 'granted' && !!lopMayDo()
 
@@ -75,6 +93,7 @@ export async function kiemKhoaMan(): Promise<boolean | null> {
  *  chia đôi ⇒ ≤ 50 %). Đang gõ trong ô nhập (máy cũ bàn phím co trang) ⇒ bỏ qua chiều cao. */
 export function dangChiaDoi(): boolean {
   if (typeof window === 'undefined' || !window.matchMedia?.('(pointer: coarse)').matches) return false
+  if (conKhoaXoay() > 0) return false // đang xoay / đổi toàn màn hình: cỡ và hướng chưa khớp nhau ⇒ chưa xét (hết khoá xét lại)
   const s = window.screen, de = document.documentElement
   const w = de.clientWidth, h = de.clientHeight
   if (!s?.width || !s?.height || !w || !h) return false
@@ -89,4 +108,4 @@ export function dangChiaDoi(): boolean {
 }
 
 /** Chỉ cho test: xoá trạng thái quyền giữa các ca. */
-export function _datLaiTatMan(): void { quyen = null; dangXin = null; daDoc = false; daXin = false }
+export function _datLaiTatMan(): void { quyen = null; dangXin = null; daDoc = false; daXin = false; choHop = 0; khoaXoayDen = 0 }
