@@ -123,7 +123,8 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
       expect(e.le.khung(b.dh.gio()).dau).toEqual([])
     }
     // Nét dở đã phát đủ điểm ⇒ bản chốt chỉ báo `net-xong`, không vẽ lại.
-    expect(e1.sk.filter((s) => s.loai === 'net-xong').length + e1.sk.filter((s) => s.loai === 'net-moi' && s.xong).length).toBe(1)
+    expect(e1.sk.filter((s) => s.loai === 'net-xong').length).toBe(1)
+    expect(e1.sk.filter((s) => s.loai === 'xoa' || (s.loai === 'net-moi' && s.xong)).length).toBe(0)
     expect(b.lt.soDo()).toMatchObject({ goiDc: 0, kenhNet: 'ws' })
     expect(e1.le.soDo().kenhNet).toBe('ws')
   })
