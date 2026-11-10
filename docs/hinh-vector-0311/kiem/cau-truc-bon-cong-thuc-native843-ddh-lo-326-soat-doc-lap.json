@@ -1,0 +1,16 @@
+[
+  {
+    "i": 843,
+    "hashSvg": "79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, đọc public questions.de/ref 11-C3-B13-I-3.hinh.0.du_lieu sau_de; tự fresh Chromium FULL3x đúng SHA/23362B, mở FULL và macro Cl/N/O. Đối từng nguyên tử và H: panel1 2C2O4H; panel2 3C1O1N với3Hriêng+CH3; panel3 2C2O4H; panel4 2C1Cl6H =9C5O1N1Cl,17standaloneH+3HtrongCH3. Giữ Cl uppercaseC+lowercasel literal có2H bêntrái và doubleC bênphải, N hai singlebonds không H/charge, không sửa hóa trị phương án. Ba C=O và một Cl=C, mọi bond rời glyph có khe trắng như công thức khai triển nguồn, không kiểu skeletal splitfeet; ba O carbonyl không chạm bond. Bốn captions(1)..(4) đậm thực như native, atomsregular DDH path tự chứa, CH3sub và chữl rõ, không thấy va chạm/cắt/tràn hay dữ kiện/tên/đápán thêm.",
+    "render": "/workspace/scratch/soat263-843.png",
+    "macro": [
+      "/workspace/scratch/four843-Cl.png",
+      "/workspace/scratch/four843-N.png",
+      "/workspace/scratch/four843-O.png"
+    ],
+    "hash": "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767",
+    "hashSvgDaSoat": "79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f"
+  }
+]

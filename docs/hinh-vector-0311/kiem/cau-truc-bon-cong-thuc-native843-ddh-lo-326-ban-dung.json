@@ -1,0 +1,29 @@
+[
+  {
+    "i": 843,
+    "hash": "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767",
+    "fileNguon": "anh/9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767.png",
+    "svg": "bon-cong-thuc-native843-ddh-79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f.svg",
+    "hashSvg": "79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f",
+    "byteSvg": 23362,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C3-B13-I-3",
+        "de": "Công thức hoá học nào dưới đây biểu diễn đúng cấu tạo hoá học của chất?",
+        "refs": [
+          {
+            "hash": "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767",
+            "where": "11-C3-B13-I-3.hinh.0.du_lieu",
+            "hashDataUrl": "cac08d07804d523de2fc2ef4609422599dcd9a524898a2aa5953d484618bb791"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "9C5O1N1Cl/17standaloneH+CH3H3/3COdouble1ClCdouble/regularatoms4trueDAMuprightcaptions/Clliteral2H-doubleC-Nliteral2bonds-noH-charge/noanswer-theoryfix",
+    "hashSvgDaSoat": "79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,718 @@
+{
+  "i": 843,
+  "hash": "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767.png",
+  "size": [
+    1140,
+    240
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C3-B13-I-3",
+      "de": "Công thức hoá học nào dưới đây biểu diễn đúng cấu tạo hoá học của chất?",
+      "allHinh": [
+        {
+          "hash": "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767",
+          "where": "11-C3-B13-I-3.hinh.0.du_lieu",
+          "hashDataUrl": "cac08d07804d523de2fc2ef4609422599dcd9a524898a2aa5953d484618bb791"
+        }
+      ],
+      "missingHashes": [
+        "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/843-native2x-lo326.png",
+    "ownPanel4Macro4xOpened": "/workspace/scratch/843-panel4-4x-lo326.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "LiteralexplicitatomdrawingsincludeWRONGoptions, do notnormalizevalence/addH/replaceClfromchemistry. Centersapproxnativepixels, bondsegments separatelylistednotatomcenter-to-center.",
+  "geometry": {
+    "classification": "Fourexpandedchemicalformulaoptionsinonerow; no reaction.",
+    "panels": [
+      {
+        "caption": "(1)",
+        "captionBBox": [
+          122,
+          178,
+          163,
+          207
+        ],
+        "atomCenters": [
+          {
+            "text": "H",
+            "at": [
+              84,
+              100
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              124,
+              100
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              164,
+              100
+            ]
+          },
+          {
+            "text": "O",
+            "at": [
+              205,
+              100
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              249,
+              100
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              124,
+              52
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              124,
+              149
+            ]
+          },
+          {
+            "text": "O",
+            "at": [
+              164,
+              149
+            ]
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              96,
+              100
+            ],
+            [
+              111,
+              100
+            ]
+          ],
+          [
+            [
+              137,
+              100
+            ],
+            [
+              152,
+              100
+            ]
+          ],
+          [
+            [
+              177,
+              100
+            ],
+            [
+              192,
+              100
+            ]
+          ],
+          [
+            [
+              218,
+              100
+            ],
+            [
+              236,
+              100
+            ]
+          ],
+          [
+            [
+              124,
+              65
+            ],
+            [
+              124,
+              82
+            ]
+          ],
+          [
+            [
+              124,
+              115
+            ],
+            [
+              124,
+              132
+            ]
+          ]
+        ],
+        "COdoubleRays": [
+          [
+            [
+              160,
+              116
+            ],
+            [
+              160,
+              135
+            ]
+          ],
+          [
+            [
+              168,
+              116
+            ],
+            [
+              168,
+              135
+            ]
+          ]
+        ],
+        "counts": {
+          "C": 2,
+          "O": 2,
+          "H": 4
+        }
+      },
+      {
+        "caption": "(2)",
+        "captionBBox": [
+          411,
+          178,
+          451,
+          207
+        ],
+        "atomCenters": [
+          {
+            "text": "H",
+            "at": [
+              348,
+              100
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              388,
+              100
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              428,
+              100
+            ]
+          },
+          {
+            "text": "N",
+            "at": [
+              468,
+              100
+            ]
+          },
+          {
+            "text": "CH₃",
+            "bbox": [
+              499,
+              84,
+              557,
+              119
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              388,
+              52
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              388,
+              149
+            ]
+          },
+          {
+            "text": "O",
+            "at": [
+              428,
+              149
+            ]
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              361,
+              100
+            ],
+            [
+              375,
+              100
+            ]
+          ],
+          [
+            [
+              401,
+              100
+            ],
+            [
+              415,
+              100
+            ]
+          ],
+          [
+            [
+              441,
+              100
+            ],
+            [
+              455,
+              100
+            ]
+          ],
+          [
+            [
+              482,
+              100
+            ],
+            [
+              496,
+              100
+            ]
+          ],
+          [
+            [
+              388,
+              65
+            ],
+            [
+              388,
+              82
+            ]
+          ],
+          [
+            [
+              388,
+              115
+            ],
+            [
+              388,
+              132
+            ]
+          ]
+        ],
+        "COdoubleRays": [
+          [
+            [
+              424,
+              116
+            ],
+            [
+              424,
+              135
+            ]
+          ],
+          [
+            [
+              432,
+              116
+            ],
+            [
+              432,
+              135
+            ]
+          ]
+        ],
+        "trap": "NliteralONLY2singlebonds,noH/chargeonN. Do notcorrectvalence.",
+        "counts": {
+          "C": 3,
+          "O": 1,
+          "N": 1,
+          "HincludingCH3": 6,
+          "standaloneHlabels": 3
+        }
+      },
+      {
+        "caption": "(3)",
+        "captionBBox": [
+          702,
+          176,
+          745,
+          205
+        ],
+        "atomCenters": [
+          {
+            "text": "H",
+            "at": [
+              633,
+              93
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              674,
+              93
+            ]
+          },
+          {
+            "text": "O",
+            "at": [
+              714,
+              93
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              755,
+              93
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              797,
+              93
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              755,
+              44
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              755,
+              143
+            ]
+          },
+          {
+            "text": "O",
+            "at": [
+              674,
+              143
+            ]
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              646,
+              93
+            ],
+            [
+              661,
+              93
+            ]
+          ],
+          [
+            [
+              687,
+              93
+            ],
+            [
+              701,
+              93
+            ]
+          ],
+          [
+            [
+              727,
+              93
+            ],
+            [
+              742,
+              93
+            ]
+          ],
+          [
+            [
+              768,
+              93
+            ],
+            [
+              784,
+              93
+            ]
+          ],
+          [
+            [
+              755,
+              58
+            ],
+            [
+              755,
+              77
+            ]
+          ],
+          [
+            [
+              755,
+              108
+            ],
+            [
+              755,
+              128
+            ]
+          ]
+        ],
+        "COdoubleRays": [
+          [
+            [
+              670,
+              110
+            ],
+            [
+              670,
+              130
+            ]
+          ],
+          [
+            [
+              678,
+              110
+            ],
+            [
+              678,
+              130
+            ]
+          ]
+        ],
+        "counts": {
+          "C": 2,
+          "O": 2,
+          "H": 4
+        }
+      },
+      {
+        "caption": "(4)",
+        "captionBBox": [
+          1000,
+          176,
+          1045,
+          205
+        ],
+        "atomCenters": [
+          {
+            "text": "Cl",
+            "bbox": [
+              909,
+              77,
+              941,
+              109
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              972,
+              93
+            ]
+          },
+          {
+            "text": "C",
+            "at": [
+              1013,
+              93
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              1054,
+              93
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              884,
+              64
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              884,
+              123
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              972,
+              143
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              1013,
+              44
+            ]
+          },
+          {
+            "text": "H",
+            "at": [
+              1013,
+              143
+            ]
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              900,
+              69
+            ],
+            [
+              912,
+              79
+            ]
+          ],
+          [
+            [
+              900,
+              115
+            ],
+            [
+              912,
+              106
+            ]
+          ],
+          [
+            [
+              985,
+              93
+            ],
+            [
+              1000,
+              93
+            ]
+          ],
+          [
+            [
+              1026,
+              93
+            ],
+            [
+              1041,
+              93
+            ]
+          ],
+          [
+            [
+              972,
+              108
+            ],
+            [
+              972,
+              128
+            ]
+          ],
+          [
+            [
+              1013,
+              58
+            ],
+            [
+              1013,
+              77
+            ]
+          ],
+          [
+            [
+              1013,
+              108
+            ],
+            [
+              1013,
+              128
+            ]
+          ]
+        ],
+        "ClCDoubleRays": [
+          [
+            [
+              943,
+              88
+            ],
+            [
+              958,
+              88
+            ]
+          ],
+          [
+            [
+              943,
+              96
+            ],
+            [
+              958,
+              96
+            ]
+          ]
+        ],
+        "trap": "ActualClCAPITALC+lowerl; Cl has2Hsinglebonds+DOUBLEtoC. Thisisdeliberatelyinvalidoption, keepliteralClnotC/CH2.",
+        "counts": {
+          "C": 2,
+          "Cl": 1,
+          "H": 6
+        }
+      }
+    ],
+    "font": "Atomlabelsregularuprightserif; condensedCH3 only3SUB. Numbercaptions(1)..(4)heavierBOLDuprightserif; noitalic oranswerhighlight.",
+    "bondTopology": "Allbondsegments stopbeforeprintedglyphinkwithclearwhitegaps; COdouble3pairsverticalBELOWexplicitCglyph. Do notextendbondsintoC/O/Hink orapplyskeletalsplitfeetlogic.",
+    "countsTotal": {
+      "C": 9,
+      "O": 5,
+      "N": 1,
+      "Cl": 1,
+      "standaloneHlabels": 17,
+      "HincludingcondensedCH3": 20,
+      "COdoublePairs": 3,
+      "ClCDoublePairs": 1,
+      "captions": 4,
+      "arrows": 0
+    },
+    "noAdded": [
+      "N-H",
+      "charges",
+      "Clcorrection",
+      "bondvalencefix",
+      "answercolor",
+      "namescaption",
+      "reactionarrows",
+      "coefficients"
+    ]
+  }
+}

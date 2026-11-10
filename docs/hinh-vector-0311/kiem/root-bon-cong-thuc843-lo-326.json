@@ -1,0 +1,12 @@
+{
+  "hashSvg": "79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f",
+  "nativeFull": true,
+  "allPublicRefs": 1,
+  "freshChromiumScale": 3,
+  "ketQua": "Root đã mở riêng native FULL và final actual FULL3x + macro Cl/CO. Giữ Cl gồm C+l, 2H và doubleC; N2bonds không H/charge; 3CO trắng trước O; 4captions trueDAM; không suy đáp án. Initial a934 chạm O bị loại, final chỉ hạ 3O5px.",
+  "render": "/workspace/scratch/root326-843.png",
+  "macro": [
+    "/workspace/scratch/root326-Cl.png",
+    "/workspace/scratch/root326-CO.png"
+  ]
+}

@@ -829,6 +829,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767": {
+      "tep": "bon-cong-thuc-native843-ddh-79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f.svg",
+      "hashSvg": "79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f",
+      "byteSvg": 23362,
+      "byteGzip": 2885,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "7a348047068e0dfdf03e6175616c860a866ce3c11c28b5e9a5ca06c1567c5785": {
       "tep": "dien-di-ba-vet-ddh-0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8.svg",
       "hashSvg": "0b3f04577363a1e794d94a5cbf29d732967ccad72557459985f4228d5bacd2c8",
@@ -9607,6 +9616,20 @@
           "where": "11-C4-B16-III-6.hinh.0.du_lieu",
           "hashDataUrl": "82bf0e81c0f48dc83221b1392c12edfa192124a8b87220229e52938ffe6fd2a3",
           "vector": "nhan-calcium-carbide-ddh-80ab05e52d86510b250497949c5d527c69ff852967ed6cc9e674f12b97e4a6ab.svg"
+        }
+      ]
+    },
+    {
+      "qid": "11-C3-B13-I-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9b0fa741ea6bd94cca619900460c06f50fd2330edb5c401c28b0320275d62767",
+          "where": "11-C3-B13-I-3.hinh.0.du_lieu",
+          "hashDataUrl": "cac08d07804d523de2fc2ef4609422599dcd9a524898a2aa5953d484618bb791",
+          "vector": "bon-cong-thuc-native843-ddh-79037343339efba85c3e198efabd29fa2e98105db7fdca1a96bf2cfd2bde360f.svg"
         }
       ]
     },
@@ -29613,6 +29636,7 @@
     "11-C4-B17-II-1",
     "11-C4-B17-II-2",
     "11-C4-B16-III-6",
+    "11-C3-B13-I-3",
     "11-C3-B13-III-1",
     "11-C3-B13-III-2",
     "11-C5-B21-I-1",
