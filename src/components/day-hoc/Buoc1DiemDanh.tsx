@@ -1,6 +1,6 @@
 // BƯỚC 1 ĐIỂM DANH theo bản vẽ thầy duyệt 12/10 (GV-DiemDanh): "mỗi buổi lên lớp học sinh sẽ làm điểm danh đầu tiên, khi học sinh điểm danh xong sẽ hiện
 // luôn thống kê lười và chăm chỉ rõ ràng đầy đủ trong bản chiếu" + "cho tôi bấm vào từng học sinh hiện hồ sơ làm bài như trong app luôn nhé".
-//   · ô mã + QR (mở lúc · mã đổi mỗi phút · tự làm mới 5 giây) — ô "x/y em có mặt" + thanh nhóm + đếm Chăm / Chưa đều / Lười / Mới trong em có mặt —
+//   · ô mã + QR (mở lúc · mã dùng cả buổi · tự làm mới 5 giây) — ô "x/y em có mặt" + thanh nhóm + đếm Chăm / Chưa đều / Lười / Mới trong em có mặt —
 //     ô đỏ "Vắng N em — k em đang Lười" kèm tên (em Lười trước);
 //   · "Vừa điểm danh" (giờ · tên · nhóm · ngày đủ x/y), bấm em ⇒ CHÍNH tấm Hồ sơ làm bài (`HoSoLamCauEm`, nạp lười, như Hôm nay › Nhịp học);
 //   · nút chính "Xong điểm danh · chiếu Nhịp học của lớp" + nút "Chiếu điểm danh" ⇒ hai bản chiếu React toàn màn (`BanChieuDiemDanh`, nạp lười).

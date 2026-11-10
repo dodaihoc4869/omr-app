@@ -23,13 +23,15 @@ const biMat = (d: ReturnType<typeof taoD1That>, id: string) => String((d.sql.pre
 
 beforeEach(() => _xoaDemSai())
 
-describe('mở buổi + mã đổi mỗi phút', () => {
-  it('mở ⇒ mã 6 số + mốc đổi mã; xem lại cùng phút ⇒ cùng mã; sang phút sau ⇒ mã khác', async () => {
+// SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «Mã điểm danh ko tự đổi nữa. Mỗi buổi cố định mã điểm danh luôn»): mã CỐ ĐỊNH cả buổi, không còn mốc đổi mã.
+describe('mở buổi + mã cố định cả buổi', () => {
+  it('mở ⇒ mã 6 số, không mốc đổi mã; xem lại sau 5 giây, 10 phút, 3 giờ ⇒ VẪN mã đó; buổi khác ⇒ mã khác', async () => {
     const { d, env } = fixture()
     const r = (await gvBuoiHoc(env, { action: 'mo', lop: '12 - Lớp Thường', kemLop: true }, T0)) as any
     expect(r.ok).toBe(true)
     expect(r.ma).toMatch(/^\d{6}$/)
-    expect(r.doiMaLuc).toBe((cuaSoCua(T0) + 1) * CHU_KY_MA_MS)
+    expect(r.doiMaLuc).toBe(0)
+    expect(CHU_KY_MA_MS).toBe(60_000)
     expect(r.buoi).toMatchObject({ lop: '12 - Lớp Thường', dangMo: true })
     expect(r.siSo).toBe(2)
     // lopEm = cả trường (để thêm tay em học ghép lớp khác); sĩ số vẫn theo lớp của buổi
@@ -37,10 +39,12 @@ describe('mở buổi + mã đổi mỗi phút', () => {
     expect(r.lopEm.find((e: any) => e.sbd === 'S3').tenLop).toBe('11')
     const r2 = (await gvBuoiHoc(env, { action: 'xem', id: r.buoi.id }, T0 + 5_000)) as any
     expect(r2.ma).toBe(r.ma)
-    // mã = HMAC(bí mật buổi, phút): phút sau ra mã khác (xác suất trùng 1/900 000 — dùng hai phút để chắc)
+    for (const sau of [10 * 60_000, 3 * 3_600_000]) expect(((await gvBuoiHoc(env, { action: 'xem', id: r.buoi.id }, T0 + sau)) as any).ma).toBe(r.ma)
+    // mã = HMAC(bí mật buổi) — không theo giờ; mỗi buổi một bí mật ⇒ buổi khác ra mã khác (xác suất trùng 1/900 000)
     const bm = biMat(d, r.buoi.id)
-    expect(r.ma).toBe(await maCuaBuoi(bm, cuaSoCua(T0)))
-    expect([await maCuaBuoi(bm, cuaSoCua(T0) + 1), await maCuaBuoi(bm, cuaSoCua(T0) + 2)]).not.toEqual([r.ma, r.ma])
+    expect(cuaSoCua(T0)).toBe(0)
+    expect(cuaSoCua(T0 + 3 * 3_600_000)).toBe(0)
+    expect(r.ma).toBe(await maCuaBuoi(bm, 0))
   })
 })
 
@@ -69,15 +73,12 @@ describe('/hs/diem-danh', () => {
     const mo = (await gvBuoiHoc(env, { action: 'mo' }, T0)) as any
     const bm = biMat(d, mo.buoi.id)
     const token = await gameToken(env, 'S1')
-    // 70 giây sau: đã sang phút mới — mã cũ vẫn nhận (phút trước)
+    // 70 giây sau: mã vẫn nhận (mã cố định cả buổi)
     expect((await hsDiemDanh(env, { token, ma: mo.ma }, T0 + 70_000)).ok).toBe(true)
     const token2 = await gameToken(env, 'S2')
-    // 3 phút sau: mã ban đầu đã quá hai cửa sổ ⇒ từ chối (trừ khi trùng ngẫu nhiên với mã mới)
-    const maMoi = [await maCuaBuoi(bm, cuaSoCua(T0 + 180_000)), await maCuaBuoi(bm, cuaSoCua(T0 + 180_000) - 1)]
-    if (!maMoi.includes(mo.ma)) {
-      const r = (await hsDiemDanh(env, { token: token2, ma: mo.ma }, T0 + 180_000)) as any
-      expect(r).toMatchObject({ ok: false, lyDo: 'ma_sai' })
-    }
+    // SỬA CÓ CHỦ ĐÍCH 10/11: 3 giờ sau mã ban đầu VẪN nhận (trước đây quá hai phút là từ chối)
+    expect(await maCuaBuoi(bm, 0)).toBe(mo.ma)
+    expect((await hsDiemDanh(env, { token: token2, ma: mo.ma }, T0 + 3 * 3_600_000)).ok).toBe(true)
     const sai = mo.ma === '123456' ? '654321' : '123456'
     expect(((await hsDiemDanh(env, { token: token2, ma: sai }, T0)) as any).lyDo).toBe('ma_sai')
     expect(((await hsDiemDanh(env, { token: token2, ma: '12' }, T0)) as any).lyDo).toBe('ma_sai')

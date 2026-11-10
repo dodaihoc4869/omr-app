@@ -481,7 +481,7 @@ export function BuocDiemDanh({
           onDong={() => setChieuMa(false)}
           hoiPhongCho={hoiPhongCho}
           chu={CHU_DIEM_DANH}
-          chuPhuMa="Mã đổi mỗi phút · em chỉ điểm danh được cho chính mình"
+          chuPhuMa="Mã dùng cả buổi · em chỉ điểm danh được cho chính mình"
         />
       )}
     </>
