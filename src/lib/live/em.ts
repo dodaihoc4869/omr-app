@@ -53,6 +53,8 @@ const NHIP_SO_MS = 1000
 const NHIP_DO_MS = 10_000
 const RAI_NOI_MS = 20_000
 const RAI_BU_MS = 3000
+/** Bản chốt của nét đang phát dở chờ tối đa ngần này (đệm phát D ≤ 150 ms + dư) rồi chốt luôn. */
+const CHO_CHOT_MS = 400
 
 export function taoLiveEm(tuy: TuyChonLiveEm) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
@@ -201,25 +203,41 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     lucXinBu = mt.dongHo(); choSo = true
     tuy.kenh.gui({ t: 'live-bu', net: bang.cuoi })
   }
-  /** Bản chốt của một nét đã tới: nét dở cùng id đã phát đủ điểm ⇒ chỉ báo `net-xong`; thiếu / đang phát dở ⇒ thay bằng bản chốt. */
+  /** Hàng chờ sự kiện từ sổ nét (giữ đúng thứ tự): mục `cho` = bản chốt của một nét ĐANG được phát dở ⇒ đợi nét dở phát hết (hoặc quá hạn) rồi mới chốt,
+   *  để đuôi nét không nhảy vọt và lớp vẽ không phải vẽ lại; các sự kiện tới sau xếp sau nó. */
+  const hangSo: ({ cho: NetBut; sk: SuKienBut; han: number } | { ds: SuKienBut[]; don: () => void })[] = []
+  /** Chốt một nét: nét dở cùng id đã phát ĐỦ điểm ⇒ chỉ báo `net-xong` (không vẽ lại); thiếu ⇒ thay bằng bản chốt. */
+  function chotNet(net: NetBut, sk: SuKienBut): void {
+    const daPhat = dangVe.get(net.id)
+    dem.boNet(net.id); dangVe.delete(net.id)
+    if (daPhat === net.diem.length) { but({ loai: 'net-xong', trang: bang.trang, id: net.id }); return }
+    if (daPhat != null) but({ loai: 'xoa', trang: bang.trang, id: [net.id] })
+    but(sk)
+  }
+  function xaHangSo(nay: number): void {
+    while (hangSo.length) {
+      const dau = hangSo[0]!
+      if ('cho' in dau) { if (dem.dangPhat(dau.cho.id) && nay < dau.han) return; chotNet(dau.cho, dau.sk) }
+      else { dau.don(); for (const sk of dau.ds) but(sk) }
+      hangSo.shift()
+    }
+  }
   function apSo(khung: ArrayBuffer | Uint8Array): void {
     const m = giaiSo(khung)
     if (!m) return
     // Nét nhiều khung chưa đủ thì `apMuc` chưa trả sự kiện — nét dở trên lớp vẽ giữ nguyên tới lúc đó.
-    const ds = apMuc(bang, m)
+    const ds = apMuc(bang, m), nay = mt.dongHo()
     if (!ds.length) return
-    if (m.k === 'net' && ds.length === 1 && ds[0]!.loai === 'net-moi') {
-      const net: NetBut = ds[0]!.net, daPhat = dangVe.get(net.id)
-      dem.boNet(net.id); dangVe.delete(net.id)
-      if (daPhat === net.diem.length) { but({ loai: 'net-xong', trang: bang.trang, id: net.id }); return }
-      if (daPhat != null) but({ loai: 'xoa', trang: bang.trang, id: [net.id] })
-      but(ds[0]!)
-      return
+    if (m.k === 'net' && ds.length === 1 && ds[0]!.loai === 'net-moi') hangSo.push({ cho: ds[0]!.net, sk: ds[0]!, han: nay + CHO_CHOT_MS })
+    else {
+      const don = (): void => {
+        if (m.k === 'net') { dem.boNet(m.net.id); dangVe.delete(m.net.id) }
+        if (m.k === 'xoa') for (const id of m.id) { dem.boNet(id); dangVe.delete(id) }
+        if (m.k === 'xoa-het' || m.k === 'bang') { dem.xoa(); dangVe.clear() }
+      }
+      hangSo.push({ ds, don })
     }
-    if (m.k === 'net') { dem.boNet(m.net.id); dangVe.delete(m.net.id) }
-    if (m.k === 'xoa') for (const id of m.id) { dem.boNet(id); dangVe.delete(id) }
-    if (m.k === 'xoa-het' || m.k === 'bang') { dem.xoa(); dangVe.clear() }
-    for (const sk of ds) but(sk)
+    xaHangSo(nay)
   }
   function nhanDiem(goi: ArrayBuffer | Uint8Array): void {
     if (!live?.bat || roiMan) return
@@ -231,7 +249,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   }
   /** GỌI MỖI KHUNG HÌNH khi đang live: phát các điểm tới hạn ra `khiBut` (net-moi / them-diem) và trả đầu nét nội suy + con trỏ để vẽ lớp «đang viết». */
   function khung(nay: number = mt.dongHo()): KhungLiveEm {
-    const k = dem.khung(nay), dau: KhungLiveEm['dau'] = []
+    const k = dem.khung(nay), dau: KhungLiveEm['dau'] = [], coCho = hangSo.length > 0
     for (const n of k.net) {
       if (n.moi.length) {
         if (!dangVe.has(n.dau.id)) but({ loai: 'net-moi', trang: bang.trang, net: { ...n.dau, diem: n.moi.slice() } })
@@ -240,6 +258,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       }
       if (n.head && !n.xong) dau.push({ id: n.dau.id, ...n.head })
     }
+    if (coCho) xaHangSo(nay)
     return { dau, tro: k.tro }
   }
 
@@ -248,6 +267,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     henSo = null
     if (huyRoi || !live?.bat) return
     const nay = mt.dongHo()
+    xaHangSo(nay)
     const xong = (): void => {
       const s = dem.soDo(nay)
       soDo.ghi('d', s.d); soDo.ghi('j', s.jitter); if (s.muon) soDo.ghi('m', s.muonToiDa)
@@ -303,7 +323,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       else henNoi = mt.hen(() => { henNoi = null; const s = live?.ss; if (s && !pc && !nguonNoi) void noiSfu(s) }, mt.ngauNhien() * RAI_NOI_MS)
     } else if (live.bat && henNoi != null) { mt.huyHen(henNoi); henNoi = null; void noiSfu(ss) }
     if (live.bat && (!truoc?.bat || truoc.phien !== live.phien)) { dem.xoa(); dangVe.clear(); demTruoc = null; lucDo = mt.dongHo() }
-    if (!live.bat && truoc?.bat) { dem.xoa(); for (const id of dangVe.keys()) but({ loai: 'xoa', trang: bang.trang, id: [id] }); dangVe.clear(); okPhien = -1 }
+    if (!live.bat && truoc?.bat) { xaHangSo(Infinity); dem.xoa(); for (const id of dangVe.keys()) but({ loai: 'xoa', trang: bang.trang, id: [id] }); dangVe.clear(); okPhien = -1 }
     dat({ duocXem: true, san: live.san, bat: live.bat, tu: live.tu, nghe, duBang, ...(live.tieng === 'chua-cau-hinh' ? { tieng: 'chua-cau-hinh' as const } : tt.tieng === 'chua-cau-hinh' ? { tieng: 'cho' as const } : {}) })
     capNhatTieng()
     if (live.bat) { baoOk(); if (henSo == null) henSo = mt.hen(nhipSo, NHIP_SO_MS); if (daCham) phatTieng() }
@@ -326,7 +346,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     else if (m.t === 'live-so') {
       // Phòng sắp gửi `muc` mục bù ngay sau tin này. `lamLai` ⇒ bảng trắng, nhận lại từ đầu sổ.
       choSo = false
-      if (m.lamLai === true) { dem.xoa(); dangVe.clear(); but(datLai(bang)) }
+      if (m.lamLai === true) { hangSo.length = 0; dem.xoa(); dangVe.clear(); but(datLai(bang)) }
       dat({ duBang: true })
     }
   }

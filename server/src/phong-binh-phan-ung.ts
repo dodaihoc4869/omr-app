@@ -362,6 +362,7 @@ export class PhongBinhPhanUng {
       const cap = new WebSocketPair()
       this.ctx.acceptWebSocket(cap[1], [v])
       cap[1].serializeAttachment({ v, s } satisfies KemBpu)
+      this.live.noiMoi() // kết nối mới ⇒ dựng lại danh sách máy em giữ sẵn (nhận khung sổ nét ngay)
       return new Response(null, { status: 101, webSocket: cap[0] } as ResponseInit)
     }
     if (req.method !== 'POST') return json({ ok: false }, 405)

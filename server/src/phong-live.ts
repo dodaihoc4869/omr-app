@@ -263,6 +263,8 @@ export class LiveMay {
     else this.boDs()
     if (this.chu.nho()?.live?.bat) this.henBaoXem()
   }
+  /** Có kết nối mới vào phòng ⇒ bỏ danh sách giữ sẵn (lần gửi kế dựng lại, có máy mới). */
+  noiMoi(): void { this.boDs() }
   /** Buổi kết thúc: ghi nốt sổ nét. */
   async ketThuc(): Promise<void> { this.boDs(); await this.luuSo() }
 }

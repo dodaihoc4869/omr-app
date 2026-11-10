@@ -77,8 +77,8 @@ export function choIce(pc: RTCPeerConnection, mt: MoiTruongLive, toiDaMs = 1500)
   if (pc.iceGatheringState === 'complete') return Promise.resolve()
   return new Promise((xong) => {
     let h: unknown = null
-    const ra = () => { mt.huyHen(h); pc.removeEventListener('icegatheringstatechange', nghe); xong() }
-    const nghe = () => { if (pc.iceGatheringState === 'complete') ra() }
+    function nghe(): void { if (pc.iceGatheringState === 'complete') ra() }
+    function ra(): void { mt.huyHen(h); pc.removeEventListener('icegatheringstatechange', nghe); xong() }
     pc.addEventListener('icegatheringstatechange', nghe)
     h = mt.hen(ra, toiDaMs)
   })
@@ -88,8 +88,8 @@ export function choNoi(pc: RTCPeerConnection, mt: MoiTruongLive, toiDaMs = 8000)
   if (pc.connectionState === 'connected') return Promise.resolve(true)
   return new Promise((xong) => {
     let h: unknown = null
-    const ra = (ok: boolean) => { mt.huyHen(h); pc.removeEventListener('connectionstatechange', nghe); xong(ok) }
-    const nghe = () => { const s = pc.connectionState; if (s === 'connected') ra(true); else if (s === 'failed' || s === 'closed') ra(false) }
+    function nghe(): void { const s = pc.connectionState; if (s === 'connected') ra(true); else if (s === 'failed' || s === 'closed') ra(false) }
+    function ra(ok: boolean): void { mt.huyHen(h); pc.removeEventListener('connectionstatechange', nghe); xong(ok) }
     pc.addEventListener('connectionstatechange', nghe)
     h = mt.hen(() => ra(pc.connectionState === 'connected'), toiDaMs)
   })
@@ -99,8 +99,8 @@ export function choKenhMo(dc: RTCDataChannel, mt: MoiTruongLive, toiDaMs = 5000)
   if (dc.readyState === 'open') return Promise.resolve(true)
   return new Promise((xong) => {
     let h: unknown = null
-    const ra = (ok: boolean) => { mt.huyHen(h); dc.removeEventListener('open', mo); xong(ok) }
-    const mo = () => ra(true)
+    function mo(): void { ra(true) }
+    function ra(ok: boolean): void { mt.huyHen(h); dc.removeEventListener('open', mo); xong(ok) }
     dc.addEventListener('open', mo)
     h = mt.hen(() => ra(dc.readyState === 'open'), toiDaMs)
   })

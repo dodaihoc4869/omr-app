@@ -1,0 +1,40 @@
+# THỬ KHẢ THI LIVE BẢNG — «Đợt 0» của đặc tả docs/dac-ta-live-bang-1011.md (10/11). Chromium thật (Playwright, mic giả), hai trang THẦY + EM,
+# đúng thư viện src/lib/live + đúng cửa /bpu/live/* (chạy trong Node của lượt này), nối Cloudflare Realtime SFU THẬT bằng hai GitHub secrets
+# CF_REALTIME_APP_ID + CF_REALTIME_APP_SECRET. Chỉ TẠO phiên SFU tạm (tự hết hạn); KHÔNG đụng Worker đang sống, D1, dữ liệu học sinh.
+# Chỉ in SỐ ĐO và đạt / không đạt — không in mã ứng dụng, khoá, mã phiên.
+# NƠI ĐO: máy CI của GitHub (thầy + em cùng một máy, trung tâm dữ liệu nước ngoài) ⇒ kiểm được đường đi chạy thật (SDP, track tiếng, DataChannel),
+# KHÔNG đại diện mạng Việt Nam / 4G / máy em yếu / 300 người nghe — các số đó đo tại lớp (đặc tả mục 7).
+name: Thử khả thi Live — Đợt 0 (10/11)
+on:
+  workflow_dispatch:
+    inputs:
+      giay:
+        description: Số giây thầy viết
+        default: '12'
+      em:
+        description: Số máy em (1–8)
+        default: '2'
+permissions:
+  contents: read
+concurrency:
+  group: thu-live-dot0-1011
+  cancel-in-progress: true
+jobs:
+  thu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Thầy phát tiếng + nét, em nhận — đo trễ, RTT, jitter
+        env:
+          REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
+          REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          GIAY: ${{ inputs.giay || '12' }}
+          EM: ${{ inputs.em || '2' }}
+        run: node scripts/thu-live-dot0-1011.mjs --giay="$GIAY" --em="$EM"
