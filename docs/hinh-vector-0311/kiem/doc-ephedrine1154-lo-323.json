@@ -1,0 +1,233 @@
+{
+  "i": 1154,
+  "hash": "d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73.png",
+  "size": [
+    326,
+    272
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-L7-0701-II-3",
+      "de": "Ephedrine (cấu tạo được cho như hình bên) được dùng với hàm lượng nhất định trong các loại thuốc điều trị cảm và dị ứng. Chất này có mùi tanh và dễ bị oxi hoá trong không khí, do đó người ta thường hạn chế sử dụng trực tiếp.",
+      "allHinh": [
+        {
+          "hash": "d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73",
+          "where": "VIP27-BDT-L7-0701-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "4dd8c84b458ce4e24a9317cc29126f5e4e7a47196820c8e232ddfb25131bc4e8"
+        }
+      ],
+      "missingHashes": [
+        "d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/1154-native4x-lo323.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Literalnativeatom/bondgeometry; no stereochemistryinferredfromEphedrinename.",
+  "geometry": {
+    "classification": "Simpleacyclicsidechainsubstitutedphenylmolecule withcaption, noapparatus/photo.",
+    "phenylVertices": [
+      [
+        68,
+        93
+      ],
+      [
+        123,
+        124
+      ],
+      [
+        123,
+        188
+      ],
+      [
+        68,
+        220
+      ],
+      [
+        14,
+        188
+      ],
+      [
+        14,
+        124
+      ]
+    ],
+    "innerDoubleRays": [
+      [
+        [
+          69,
+          102
+        ],
+        [
+          115,
+          129
+        ]
+      ],
+      [
+        [
+          115,
+          182
+        ],
+        [
+          69,
+          211
+        ]
+      ],
+      [
+        [
+          22,
+          130
+        ],
+        [
+          22,
+          182
+        ]
+      ]
+    ],
+    "sidechainVertices": [
+      [
+        123,
+        124
+      ],
+      [
+        177,
+        93
+      ],
+      [
+        232,
+        124
+      ]
+    ],
+    "OH": {
+      "text": "OH",
+      "bbox": [
+        164,
+        18,
+        217,
+        46
+      ],
+      "bond": [
+        [
+          177,
+          93
+        ],
+        [
+          177,
+          47
+        ]
+      ],
+      "anchor": "O"
+    },
+    "amine": {
+      "text": "NH",
+      "bbox": [
+        274,
+        81,
+        322,
+        109
+      ],
+      "bondFromAlpha": [
+        [
+          232,
+          124
+        ],
+        [
+          273,
+          101
+        ]
+      ],
+      "methylBond": [
+        [
+          287,
+          80
+        ],
+        [
+          287,
+          29
+        ]
+      ],
+      "note": "VerticalNmethylbondx287alignsNfirstglyph, noHanchor; NHliteralorderNthenH"
+    },
+    "alphaMethylBond": [
+      [
+        232,
+        124
+      ],
+      [
+        232,
+        188
+      ]
+    ],
+    "caption": {
+      "text": "Ephedrine",
+      "bbox": [
+        97,
+        234,
+        241,
+        264
+      ],
+      "style": "ITALICregularserif capitalErestlowercase"
+    },
+    "font": "OH/NHregularuprightserif, nocaptionbold; ALLbondsuniformthin1px, noTAPER/wedge/hash/stereolabels.",
+    "counts": {
+      "C": 10,
+      "N": 1,
+      "O": 1,
+      "phenylRings": 1,
+      "innerAromaticDoubles": 3,
+      "NHtextH": 1,
+      "OHtextH": 1,
+      "charges": 0,
+      "stereobonds": 0,
+      "caption": 1
+    }
+  },
+  "outsideFigurePrintFragments": {
+    "topFragment": {
+      "bbox": [
+        0,
+        0,
+        111,
+        9
+      ],
+      "status": "croppedserifproselineatTOPframeboundary, fullwordnotrestored",
+      "literalReadPolicy": "Do notreconstructcutword. VisiblewordendingdifferentfromEphedrinecaption, nobond/leaderlink."
+    },
+    "bottomLeft": {
+      "bbox": [
+        0,
+        263,
+        9,
+        269
+      ],
+      "status": "croppedpunctuationdotsatleftboundary, nofigurelabelorchemicalbond"
+    },
+    "omissionEvidence": [
+      "ALLpublicrefs exactly1qidVIP27-BDT-L7-0701-II-3, only1hinh. FullpublicdeprovidedexplicitlyasksEphedrine(cấutạođượcchonhưhìnhbên), nofragmentword/figureindex/lettercallout referenced.",
+      "Completechemicalfigure isboundedx13..322,y18..220 andexactcaptionEphedrineatx97..241,y234..264. TopprosefragmentisolatedaboveOHwithwhitegap, touchesimageuppercutedge; bottompunctuationleftofcaption faroutsidechemicalfigure.",
+      "Noarrows/leaders/legend connecttheseedgefragments tomolecule; differentproseposition/outsidefigure, not an atom/bond/caption. Removing onlyedgeprintfragments preservesallchemicaldataandcaption."
+    ],
+    "decision": "OmitcroppedNONFIGUREprintedprose/punctuationonly; doNOTrestorecuttextanddoNOTcropcaption/atoms. Ifpubliccontextadditionalrefappears, re-evaluate."
+  },
+  "actualSvgReviewed": false,
+  "rootSourceReview": {
+    "nativeFull": true,
+    "ownNative4x": "/workspace/scratch/native323-1154-4x.png",
+    "publicDeAllRead": true,
+    "actualSvgFull3x": "/workspace/scratch/root323-1154.png",
+    "ownLabelsMacro": "/workspace/scratch/root323-labels.png",
+    "count": "10bareC1N1O/3innerdouble/0stereo/2HliteralOH-NH",
+    "edgeFragmentDecision": "Root mở nativeFULL/4x, đồng ý topcroppedprose và bottomleftpunctuation ngoài figure/caption; ONLY1publicrefnotafter_pa/dechỉgọiEphedrine. Không phục hồi chữ cắt. Chờ soát độc lập trước admit."
+  }
+}

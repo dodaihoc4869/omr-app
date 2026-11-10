@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1154,
+    "hash": "d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73",
+    "fileNguon": "anh/d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73.png",
+    "svg": "ephedrine-native1154-ddh-be761f8bc75439331a776a8901292197574b06f19f42ebca13ae5d36d7d1f421.svg",
+    "hashSvg": "be761f8bc75439331a776a8901292197574b06f19f42ebca13ae5d36d7d1f421",
+    "byteSvg": 6432,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-II-3",
+        "de": "Ephedrine (cấu tạo được cho như hình bên) được dùng với hàm lượng nhất định trong các loại thuốc điều trị cảm và dị ứng. Chất này có mùi tanh và dễ bị oxi hoá trong không khí, do đó người ta thường hạn chế sử dụng trực tiếp.",
+        "refs": [
+          {
+            "hash": "d12bfc880ca5fc2afe7c50c2ccd81a85651ccf6689a5d01eef21e05fba352c73",
+            "where": "VIP27-BDT-L7-0701-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "4dd8c84b458ce4e24a9317cc29126f5e4e7a47196820c8e232ddfb25131bc4e8"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "10C1N1O/Ph3innerdouble/OHUP-Oanchor/NHliteralNanchor-NmethylUP/alphaMethylDOWN/allthinuniform0stereo/chemicalregular-EphedrineREGULARITALIC/noaddedH-CH3-charge-answer;nonfigureedgeprintfragmentsomitONLYafterallrefsproof",
+    "hashSvgDaSoat": "be761f8bc75439331a776a8901292197574b06f19f42ebca13ae5d36d7d1f421",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
