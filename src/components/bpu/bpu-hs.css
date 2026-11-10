@@ -279,3 +279,16 @@ html.may-yeu .bpu-gui-noi, html.may-yeu .bpu-gui-noi[data-hien="true"] { transit
 html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
 /* 10/11: cơ chế nâng thanh dưới 4 s đã BỎ (nút Gửi nổi mép phải). Giữ khai báo màu cũ cho cổng kiem:mau-giu (không xoá màu); lớp `.bo-nang-1011` không gắn ở đâu. */
 .bpu-hs.bo-nang-1011 .bpu-hs-day { box-shadow: 0 -8px 24px color-mix(in srgb, var(--tr-chu) 14%, transparent); }
+/* ĐỀ GIỐNG CHẶNG + GIÁM THỊ (thầy 10/11 «Đề hiển thị ko đúng, cho hiển thị đề giống với phần chặng luôn, có giám thị»): khối đề của màn làm chặng
+   (`KhoiDeChang`) đứng trong đúng chuỗi lớp của chặng `.ht-app.ht2-lam.duo` ⇒ nhận NGUYÊN tờ kiểu của chặng (giam-thi.css, trong-lam-bai.css, phang-hs.css):
+   giám thị + bong bóng đề chữ L, cỡ chữ đề, ảnh công thức nền trắng trên nền tối. Ở đây CHỈ gỡ phần khung «cả màn» của lớp gốc chặng (cao 100dvh, nền,
+   lưới hai cột khi xoay ngang, lề cột gợi ý) — khối nằm gọn trong thân màn Bình Phản Ứng, thân vẫn chừa lề phải cho nút «Gửi» nổi. Không màu mới. */
+.bpu-hs.m3 .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex: none; flex-direction: column; gap: 12px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
+.bpu-tra { display: flex; flex: none; flex-direction: column; gap: 12px; min-width: 0; }
+/* Xoay ngang: đề (giám thị) cột trái · phần trả lời cột phải; nhãn loại câu nằm trên, trọn bề ngang. */
+@media (orientation: landscape) and (min-width: 700px) {
+  .bpu-hs-than > .bpu-chip { grid-column: 1 / -1; justify-self: start; }
+  .bpu-hs-than > .bpu-de-chang { grid-column: 1; }
+  .bpu-hs-than > .bpu-tra { grid-column: 2; }
+  .bpu-hs-than > .bpu-de-chang ~ :not(.bpu-tra) { grid-column: 1 / -1; }
+}
