@@ -63,6 +63,7 @@ const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ def
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
 const DemNguocThi = lazy(() => import('./DemNguocThi').catch(() => ({ default: () => null }))) // 10/11: đầu cột phải khổ ≥ 1100
+const LichBaiHs = lazy(() => import('./LichBaiHs').catch(() => ({ default: () => null })))
 const NhomSuaHomNay = lazy(() => import('./NhomSuaHomNay').catch(() => ({ default: () => null }))) // khối B lát 3: chỉ ngày Sửa, kho tải ngầm
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
@@ -175,11 +176,11 @@ function useConSuaHomNay(token: string | undefined, bat: boolean, nho: number[] 
     setKq(docNhoTuSua(token))
     return ngheTuSua((t, moi) => { if (t === token) setKq(moi) })
   }, [token])
-  // 29/10 (thầy «làm xong thoát ra Lộ trình phải đồng bộ chính xác ngay lập tức»): em vừa sửa xong một câu ⇒ dựng lại việc hôm nay NGAY từ nhật ký trên máy (bản sao danh sách ⇒ vẽ lại)
+  // 29/10: em vừa sửa xong một câu ⇒ dựng lại việc hôm nay NGAY từ nhật ký trên máy (bản sao danh sách ⇒ vẽ lại)
   useEffect(() => mod?.ngheXongSua?.(() => setKq((k) => k && { ...k } as KetQuaDanhSachChua)), [mod])
   const r = useMemo(() => { const sbd = mod?.docSbdHs(); return mod && bat && sbd ? mod.dungViecHomNay(kq, Date.now(), sbd) : null }, [kq, mod, bat])
   useEffect(() => { if (r && mod) mod.luuViecHomNay(r.luu, r.day ?? null) }, [r, mod])
-  // 29/10 (thầy «Mở câu quá lâu»): câu chưa xong đầu tiên của Việc hôm nay ⇒ mở sẵn ở máy chủ khi Lộ trình đã yên; bấm «Sửa ngay» rồi chọn câu là vào ngay (nap-truoc-sua.ts).
+  // 29/10: câu chưa xong đầu tiên của Việc hôm nay ⇒ mở sẵn ở máy chủ khi Lộ trình đã yên (nap-truoc-sua.ts).
   const tiepNap = r?.viec?.tiep?.m.qid
   useEffect(() => {
     if (!mod || !token || !tiepNap) return
@@ -1183,6 +1184,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {so && !p.dangTai && !nut.length && <ViecTrong />}
       </div><div className="kb-cot-phai">
       {hs?.lop && laLop12(hs.lop) && <Suspense fallback={null}><DemNguocThi lop={hs.lop} /></Suspense>}
+      {p.goi7?.lichBai ? <Suspense fallback={null}><LichBaiHs g={p.goi7} /></Suspense> : null}
       {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
       {!(!so && p.dangTai) && <TheRuong ds={nut} token={p.token} tq={tq} onNhiemVu={() => moTp('nhiem-vu')} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}

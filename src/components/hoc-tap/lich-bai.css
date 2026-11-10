@@ -1,0 +1,18 @@
+/* LỊCH BÀI (khối B, bản vẽ docs/ban-ve-moi-on-sua-0911 dt-sang-1) — mảnh lười LichBaiHs. Chỉ biến màu app học sinh có sẵn (--tr-*). */
+.kb-lich { padding: 14px 14px 12px; border-radius: 20px; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien); }
+.kb-lich h3 { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 10px; margin: 0 2px; font-size: 16px; font-weight: 800; color: var(--tr-chu); }
+.kb-lich-han { font-size: 12.5px; font-weight: 600; color: var(--tr-chu-3); }
+.kb-lich-o { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px 4px; margin: 12px 0 0; padding: 0; list-style: none; } /* tuần 7 ô, ngày thứ 8 trở đi xuống hàng */
+.kb-lich-o li { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: var(--tr-chu-3); font-variant-numeric: tabular-nums; }
+.kb-lich-o i { display: grid; place-items: center; width: 100%; height: 30px; border-radius: 9px; background: var(--c-nhat); color: var(--c); font-style: normal; font-weight: 800; }
+.kb-lich [data-l='moi'] { --c: var(--tr-hs-chu); --c-nhat: var(--tr-hs-nhat); }
+.kb-lich [data-l='sua'] { --c: var(--tr-sai-chu); --c-nhat: var(--tr-sai-nhat); }
+.kb-lich [data-l='kiem'] { --c: var(--tr-tin-chu); --c-nhat: var(--tr-tin-nhat); }
+.kb-lich [data-l='du'] { --c: var(--tr-chu-3); --c-nhat: var(--tr-mat-2); }
+.kb-lich-o li[data-nay] { color: var(--tr-chu); }
+.kb-lich-o li[data-nay] i { background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--c); }
+.kb-lich-o li[data-xa] i { opacity: .62; }
+.kb-lich-chu { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 10px 2px 0; font-size: 12.5px; font-weight: 500; color: var(--tr-chu-3); }
+.kb-lich-chu span { display: inline-flex; align-items: center; gap: 5px; }
+.kb-lich-chu span::before { content: ''; width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.kb-lich-ghi { margin: 8px 2px 0; font-size: 12.5px; font-weight: 500; line-height: 1.45; color: var(--tr-chu-3); }

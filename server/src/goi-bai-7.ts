@@ -8,6 +8,7 @@ import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7, type LoaiNgay7 } from './goi-bai-7-loi'
 import { docMucLoai7, loaiNgayEm7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
+import { lichBaiEm7 } from './goi-bai-7-lich-bai'
 import { xepBai6 } from './bai-6-cau'
 import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
@@ -322,11 +323,11 @@ const VUA_LAM_MS = 15 * 60_000
 export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now?: number): Promise<{ daLam: Set<string>; vuaLam: Set<string>; soVua: number; soDaLam: number; luot: Set<string> }> {
   const tu = now === undefined ? '' : new Date(Math.max(now - VUA_LAM_MS, Date.parse(`${ngay}T00:00:00+07:00`))).toISOString()
   const [done, guidedToday, vua] = await Promise.all([
-    // (29/10) + lượt LƯỚT của chặng (câu đã phát + đã trả lời) và cờ `ll` (câu làm lại cuối chặng): `daLam` GIỮ cả hai (không phát lại câu em vừa làm), `soDaLam` chỉ đếm câu của chặng.
-    // (30/10) câu TỰ LUYỆN (`tl` = mọi dòng của câu đều từ Tự luyện): GIỮ trong `daLam` (chặng không phát lại câu em vừa luyện) nhưng KHÔNG đếm vào `soDaLam` (chặng tính số câu riêng).
+    // (29/10) + lượt LƯỚT của chặng và cờ `ll` (làm lại cuối chặng): `daLam` GIỮ cả hai (không phát lại), `soDaLam` chỉ đếm câu của chặng.
+    // (30/10) câu TỰ LUYỆN (`tl`): GIỮ trong `daLam` nhưng KHÔNG đếm vào `soDaLam`.
     env.DB.prepare(`SELECT qid, MIN(CASE WHEN COALESCE(json_extract(raw_json,'$.ll'),0)=1 THEN 1 ELSE 0 END) AS ll, MIN(CASE WHEN purpose='luot' THEN 1 ELSE 0 END) AS chi_luot, MIN(CASE WHEN nguon='tu_luyen' THEN 1 ELSE 0 END) AS tl FROM su_kien_hoc WHERE sbd=? AND ngay_vn=? AND ma_nguon NOT LIKE 'ktcn:%' AND COALESCE(nguon,'')<>'chua_loi' AND ((ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}) OR ${SQL_LA_LUOT_CHANG}) GROUP BY qid`).bind(sbd,ngay).all<{qid:string;ll:number;chi_luot:number;tl:number}>(),
     env.DB.prepare("SELECT DISTINCT qid FROM goi_bai_7_gap WHERE sbd=? AND date(luc,'+7 hours')=?").bind(sbd,ngay).all<{qid:string}>(),
-    // `co_so`: lượt đã có dòng sổ (chỉ mục su_kien_hoc(sbd, qid, ngay_vn)) ⇒ sổ quyết định (lướt / chẩn đoán không tính); chưa có ⇒ đang chờ ghi, tính ngay (kể cả câu tiếp cận có gợi ý/hỗ trợ; chỉ trừ câu lướt hoặc câu làm lại cuối chặng).
+    // `co_so`: lượt đã có dòng sổ ⇒ sổ quyết định; chưa có ⇒ đang chờ ghi, tính ngay (trừ câu lướt / câu làm lại cuối chặng).
     tu ? env.DB.prepare("SELECT a.qid,EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=a.sbd AND s.qid=a.qid AND s.ngay_vn=? AND s.attempt_id=a.id) co_so,(CASE WHEN COALESCE(json_extract(a.json,'$.omni.luot'),0)=1 OR EXISTS(SELECT 1 FROM game_v2_session gs,json_each(gs.json,'$.questions') gq WHERE gs.id=a.session AND gs.sbd=a.sbd AND json_extract(gq.value,'$.qid')=a.qid AND COALESCE(json_extract(gq.value,'$.lamLaiCuoi'),0)=1) THEN 1 ELSE 0 END) khong_tinh FROM game_v2_attempt a WHERE a.sbd=? AND a.created_at>=?").bind(ngay,sbd,tu).all<{qid:string;co_so:number;khong_tinh:number}>().catch(() => ({ results: [] as {qid:string;co_so:number;khong_tinh:number}[] })) : Promise.resolve({ results: [] as {qid:string;co_so:number;khong_tinh:number}[] }),
   ])
   const daLamNgay = new Set<string>(), tinh = new Set<string>()
@@ -568,7 +569,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   const dongCo = som7.dongCo ?? docTruocDongCo(env, sbd, now)
   docTruocDongCoTheoHoSo(env, dongCo, hs)
   const chan = new Set([...baoVe,...btvn,...control.blocked,...goi.flatMap(g=>g.cau.filter(c=>c.hopLe===false).map(c=>c.qid))])
-  // (30/10, thầy: «Làm luôn thông báo rõ khi đang có ca thi») câu gói em CHƯA gặp đang khoá vì ca kiểm tra mở (bảo vệ đề) ⇒ Lộ trình nói rõ lý do thay vì «chờ thầy bổ sung».
+  // (30/10) câu gói em CHƯA gặp đang khoá vì ca kiểm tra mở (bảo vệ đề) ⇒ Lộ trình nói rõ lý do thay vì «chờ thầy bổ sung».
   const daGapCa = new Set(goi.flatMap(g => [...g.daGap]))
   const khoaCaThi = [...new Map(goi.flatMap(g => g.cau).map(c => [c.qid, c])).values()].filter(c => !daGapCa.has(c.qid) && (baoVe.has(c.qid) || baoVe.has(c.group))).length
   if (control.types.length) for (const c of hs.cau) if (!c.dang || !control.types.includes(c.dang)) chan.add(c.qid)
@@ -587,7 +588,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   }
   const nhom7 = new Map([...hs.meta].map(([qid,m])=>[qid,m.group]))
   const tang = tangCuaEm(hs.cau,hs.tt,nhom7)
-  const { loaiNgay, loaiGhi, conMoi7, lyDo } = loaiNgayEm7(await som7.mucLoaiSom, ngay, goi, hs, chan, daGapCa) // khối B (10/11)
+  const ml7 = await som7.mucLoaiSom, { loaiNgay, loaiGhi, conMoi7, lyDo, soSua, soMoiCon } = loaiNgayEm7(ml7, ngay, goi, hs, chan, daGapCa) // khối B (10/11)
   // Gói R 15/10: lịch kiểm tra riêng TẮT ⇒ mức hôm nay KHÔNG phụ thuộc động cơ (chỗ giữ ôn/sửa = 0) ⇒ chốt NGAY, SONG SONG với động cơ, qua đường ghi riêng
   // (`envGhiRieng`: D1 gốc, vẫn qua rào cổng; lệnh ghi tự nuốt lỗi như cũ, đọc lại dòng thắng qua cùng đường; không lượt đọc nào khác của lượt đọc bảng mức hôm nay)
   // — trước: nối tiếp SAU lô ghi của động cơ, hai đợt D1. Cùng đối số y hệt lời gọi cũ bên dưới. Lịch bật / cờ lỗi ⇒ chốt ở chỗ cũ như trước.
@@ -660,8 +661,8 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // được (thầy vừa sửa / rút câu, đọc lại câu lỗi, cổng khối …) là đủ để chặng rỗng. `startGoi7` khi đó đi tiếp TOÀN BỘ hàng chờ theo CÙNG luật xếp (mới theo lịch
   // → chữa → sửa → ôn → mới → tiếp cận), bỏ câu đã có trong kế hoạch. Chỉ tính khi cần — CPU, không đọc D1.
   const duPhong = (): ViecGoi7[] => { const co = new Set(plan.viec.map(v => v.qid)); return chonGoi7({ ...vaoPlan, mucTieuNgay: cau.length + hs.cau.length }).viec.filter(v => !co.has(v.qid)) }
-  // HỌC THÊM CÂU MỚI (thầy 29/10 17:36, ảnh «Em đã hoàn thành phần được xếp hôm nay…»: nút «Học thêm câu mới» của Lộ trình mở chặng RỖNG ⇒ em kẹt): em ĐÃ đủ mức hôm nay muốn học thêm ⇒ một
-  // chặng (6 câu) toàn câu MỚI của các gói (theo lịch trước, rồi câu chưa gặp), không câu sửa / ôn. Không đổi mức đã chốt, chuỗi, số «đã làm» — câu học thêm chỉ cộng vào số đã làm. CPU thuần, chỉ tính khi gọi.
+  // HỌC THÊM CÂU MỚI (thầy 29/10 17:36): em ĐÃ đủ mức hôm nay muốn học thêm ⇒ một
+  // chặng (6 câu) toàn câu MỚI của các gói, không câu sửa / ôn. Không đổi mức đã chốt, chuỗi, số «đã làm». CPU thuần, chỉ tính khi gọi.
   const hocThem = (): ViecGoi7[] => chonGoi7({ ...vaoPlan, sua: [], on: [], chua: [], onSom: undefined, giuOn: 0, mucTieuNgay: CAU_MOT_BAI }).viec
   const kiem=await kiemSom
   const diemDaDo=kiem.results.filter(r=>diemConDungNguon7(json<Row>(r.json).cau,goi.find(g=>g.id===r.goi_id)?.cau.filter(c=>(c.maTo??c.maDe)===r.ma_de)??[])).map(r=>({goiId:str(r.goi_id),maDe:str(r.ma_de),diem:Number(r.diem),luc:str(r.nop_luc),cauMoi:Number(json<Row>(r.json).cauMoi??0),tong:Number(json<Row>(r.json).tong??0)}))
@@ -675,7 +676,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi, loaiNgay, nhomSua: loaiNgay === 'sua' ? nhomSua7(plan.viec, hs, lyDo, daLamNgay, ngay) : [] }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi, loaiNgay, nhomSua: loaiNgay === 'sua' ? nhomSua7(plan.viec, hs, lyDo, daLamNgay, ngay) : [], lichBai: lichBaiEm7(ngay, goi, ml7, loaiNgay, conMoi7, soSua, soMoiCon, plan.viec) }
 }
 
 type LapGoi7 = NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
@@ -720,7 +721,7 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
   }),
     tuLamCon:dem7(lap.plan.tuLam),tiepCanCon:dem7(lap.plan.tiepCan),thieuPhu:dem7(lap.plan.thieuPhu),thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
     canHoTro:lap.plan.tuLam*2+lap.plan.tiepCan*3>60 || lap.plan.thieuPhu>0 || lap.daLamNgay+lap.plan.viec.length<lap.toiThieu,
-    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}),...(lap.loaiNgay ? { loaiNgay: lap.loaiNgay } : {}),...(lap.nhomSua?.length ? { nhomSua: lap.nhomSua } : {}) }
+    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}),...(lap.loaiNgay ? { loaiNgay: lap.loaiNgay } : {}),...(lap.nhomSua?.length ? { nhomSua: lap.nhomSua } : {}),...(lap.lichBai ? { lichBai: lap.lichBai } : {}) }
 }
 
 const dangMoChang7 = new WeakMap<object, Map<string, Promise<Record<string, unknown> | null>>>()

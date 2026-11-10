@@ -73,6 +73,14 @@ export function choCauSai(qid: string): () => void {
 }
 
 type Pa = 'A' | 'B' | 'C' | 'D'
+/** A.I ĐOÁN «HIỂU NHẦM» (bản vẽ dt-sang-2: «A.I Đỗ Đại Học đoán em mắc đúng bẫy của phương án A. Không phải thì chạm ô khác.»). Chưa có trường bẫy riêng
+ *  (`bayPA` — cột «Logic thiết kế phương án nhiễu» của blueprint chưa vào kho) ⇒ đoán từ CHÍNH lời giải từng phương án (`tungPa[X].viSao`) của phương án em chọn:
+ *  câu giải nói em đã lẫn hai khái niệm («… là X, không phải Y», «nhầm …», «tưởng …») ⇒ Hiểu nhầm; câu giải nói lỗi tính / đọc đề / đếm nhận định ⇒ KHÔNG đoán
+ *  (để em tự chọn — máy không bao giờ chọn sẵn «Tính / đọc đề sai»). Đo 10/11 trên 1 500 câu giải phương án sai thật: đoán ở 170 câu; 82 câu gán nhãn tay đúng 79. */
+const LAN = /không phải|nhầm (?!lẫn số)|nhầm lẫn|tưởng|hiểu (sai|nhầm)|lầm|đánh đồng|lẫn (với|lộn)|ngộ nhận|cho rằng|chứ không/iu
+const LOI_TINH = /quên|chưa (đổi|nhân|chia|cộng|trừ|tính|cân bằng|lấy)|bỏ (qua|sót|số|hệ)|viết ngược|đảo|ghép nhầm|số mũ|làm tròn|tính(?! (base|acid|chất|khử|oxi|lưỡng|tan|dẻo|cứng|dẫn))|nhân|chia|đơn vị|đổi sai|lấy nhầm|nhầm lấy|thay vì|hệ số|cộng|đọc nhầm|sai số|nhầm (phần trăm|số|tỉ lệ|dấu)|gấp|một nửa|1\/2|×|\bkhi\b|nhận định|mệnh đề|phát biểu|đáp án|phương án cần chọn|đếm|chỉ có \d|có tới|\bcả (hai|ba|bốn|năm)\b/iu
+export const doanHieuNham = (viSao: string): boolean => LAN.test(viSao) && !LOI_TINH.test(viSao)
+
 /** LỜI GIẢI BÁC BỎ (khối B lát 7, bản vẽ dt-sang-2; thầy 10/11 «Bỏ codex tự làm lại ko chờ gì cả»): câu trắc nghiệm có lời giải từng phương án ⇒ «Em chọn · Chỗ chưa
  *  đúng · Đúng là» dựng từ CHÍNH lời giải của câu (`tungPa[X].viSao`, `chot`) — không bịa nội dung; thiếu lý do của phương án em chọn ⇒ giữ dòng lời giải ngắn cũ. */
 export function bacBoTu(em: string, da: string, pa: readonly string[] | undefined, lg: { tungPa?: Partial<Record<Pa, { viSao?: string } | undefined>>; chot?: string } | undefined): { chon: string; sai: string; dung: string } | null {

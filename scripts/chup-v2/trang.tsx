@@ -714,6 +714,8 @@ const SANH_MT = MT_ANH
   theLuc: MT_TT === 'du' || MT_XONG ? { con: 6, tong: 36 } : { con: 18, tong: 30 }, ruong: { ...SANH_MOI.ruong, daLam: mtLam, tong: 30 }, tamGiuCa: 0, kiemTraCaNhan: MT_KIEM }
 // 09/11 khối B lát 3: `&ns=1` = NGÀY SỬA có nhóm lỗi (goi7.loaiNgay 'sua' + nhomSua) — chụp thẻ «Nhóm lỗi hôm nay» (bản vẽ ban-ve-moi-on-sua-0911 dt-sang-3).
 if (man === 'hs-mot' && thamSo.get('ns') === '1') Object.assign(SANH_MT, { goi7: { bat: true, ngay: '2026-11-11', toiThieu: 28, daLamHomNay: 0, tuLamCon: 28, tiepCanCon: 0, thieuPhu: 0, thieuNgay: 0, canHoTro: false, loaiNgay: 'sua',
+  // 10/11 Lịch bài (bản vẽ dt-sang-1): 08–10 Mới · hôm nay 11 Sửa · dự kiến 12–13 Mới · 14 Sửa · 15 Kiểm tra ôn tập · 16–17 Sửa
+  lichBai: { goiId: 'g7:a', ten: 'Bài 8. Amine', han: '2026-11-17', ngay: (['moi', 'moi', 'moi', 'sua', 'moi', 'moi', 'sua', 'kiem', 'sua', 'sua'] as const).map((loai, i) => ({ ngay: `2026-11-${String(8 + i).padStart(2, '0')}`, loai })) },
   nhomSua: [{ ten: 'Khối lượng muối của amine', so: 8, xong: 3, loai: 'cach' }, { ten: 'Tính base của amine', so: 6, xong: 0, loai: 'nham' }, { ten: 'Đồng phân amine', so: 4, xong: 0, loai: 'tinh' }, { ten: 'Danh pháp amine', so: 10, xong: 0, loai: 'hoc_lai' }],
   kienThucCu: { tong: 10, dat: 7, tyLe: 70 }, goi: [{ id: 'g7:cu', ten: 'Bài 7. Ester', batDau: '2026-11-01', han: '2026-11-08', tong: 84, daGap: 78, con: 6, quota: 28, gapHomNay: 0, quaHan: true, canBoSung: 0, to: ['DH-B7'] }, { id: 'g7:a', ten: 'Bài 8. Amine', batDau: '2026-11-08', han: '2026-11-17', tong: 112, daGap: 56, con: 56, quota: 28, gapHomNay: 0, quaHan: false, canBoSung: 0, to: ['DH-B8'] }], diemDaDo: [] } })
 if (man === 'hs-mot') {

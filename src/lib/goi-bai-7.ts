@@ -8,6 +8,8 @@ export interface TomTatGoi7 {
   loaiNgay?:'moi'|'sua'
   /** Khối B lát 3 (09/11, CHỈ-THÊM): ngày Sửa — nhóm lỗi theo dạng, THÔ (mảnh lười NhomSuaHomNay đọc chặt: nhom-sua-doc.ts — 0 byte đường mở). */
   nhomSua?:unknown
+  /** Lịch bài (10/11, CHỈ-THÊM) — THÔ (mảnh lười LichBaiHs đọc chặt: lich-bai-doc.ts). */
+  lichBai?:unknown
   kienThucCu:{tong:number;dat:number;tyLe:number|null}
   /** `tang` (đợt 19, CHỈ-THÊM) = tầng đang luyện của bài; vắng ⇒ thẻ bài không ghi tầng. */
   goi:{id:string;ten:string;batDau:string;han:string;tong:number;daGap:number;con:number;quota:number;gapHomNay:number;quaHan:boolean;canBoSung:number;nguonDayDu?:boolean;to:string[];tang?:Tang7}[]
@@ -56,5 +58,5 @@ export function docTomTatGoi7(x:unknown):TomTatGoi7|undefined {
   if(!goi.length)return
   const tang = docTang(x.tang)
   return { bat:true, ngay:x.ngay, toiThieu:x.toiThieu, daLamHomNay:x.daLamHomNay, tuLamCon:so0(x.tuLamCon), tiepCanCon:so0(x.tiepCanCon), thieuPhu:so0(x.thieuPhu),
-    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), ...(so0(x.khoaCaThi)>0?{khoaCaThi:so0(x.khoaCaThi)}:{}), ...(x.loaiNgay==='moi'||x.loaiNgay==='sua'?{loaiNgay:x.loaiNgay}:{}),nhomSua:x.nhomSua, kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
+    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), ...(so0(x.khoaCaThi)>0?{khoaCaThi:so0(x.khoaCaThi)}:{}), ...(x.loaiNgay==='moi'||x.loaiNgay==='sua'?{loaiNgay:x.loaiNgay}:{}),nhomSua:x.nhomSua,lichBai:x.lichBai, kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
 }
