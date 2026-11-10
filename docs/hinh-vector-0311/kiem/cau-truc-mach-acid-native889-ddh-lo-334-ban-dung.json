@@ -1,0 +1,29 @@
+[
+  {
+    "i": 889,
+    "hash": "a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195",
+    "fileNguon": "anh/a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195.png",
+    "svg": "mach-acid-native889-ddh-207d03e18546e7d53b5a4c28d54b412ba39afdcf0ed8f193fc6806341a5d8d71.svg",
+    "hashSvg": "207d03e18546e7d53b5a4c28d54b412ba39afdcf0ed8f193fc6806341a5d8d71",
+    "byteSvg": 2265,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D5-II-3",
+        "de": "DHA(Docosahexaenoic acid) là một acid béo rất cần thiết cho sự phát triển trí não, thị giác của con người, giúp tăng khả năng miễn dịch và giảm nguy cơ phát triển dị ứng của trẻ. Cho cấu trúc của DHA như hình bên dưới:",
+        "refs": [
+          {
+            "hash": "a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195",
+            "where": "12-KT-C1-D5-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "dc3c4ac469aa05e8a15d942e48e9296c5a6242ab81ff94c6f5825cb095af30d9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "21bareC+COOHfirstC=22C/6CCdouble/2OcondensedCOOH/1freeLEFTDOWNend/rightCOOHfirstCanchor/regularupright-allthin0stereo/noaddedH-CH3-COdouble-caption-answer/noalias1385-1145",
+    "hashSvgDaSoat": "207d03e18546e7d53b5a4c28d54b412ba39afdcf0ed8f193fc6806341a5d8d71",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

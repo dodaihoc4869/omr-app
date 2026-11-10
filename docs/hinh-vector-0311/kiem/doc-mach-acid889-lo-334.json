@@ -1,0 +1,259 @@
+{
+  "i": 889,
+  "hash": "a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195.png",
+  "size": [
+    665,
+    262
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C1-D5-II-3",
+      "de": "DHA(Docosahexaenoic acid) là một acid béo rất cần thiết cho sự phát triển trí não, thị giác của con người, giúp tăng khả năng miễn dịch và giảm nguy cơ phát triển dị ứng của trẻ. Cho cấu trúc của DHA như hình bên dưới:",
+      "allHinh": [
+        {
+          "hash": "a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195",
+          "where": "12-KT-C1-D5-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "dc3c4ac469aa05e8a15d942e48e9296c5a6242ab81ff94c6f5825cb095af30d9"
+        }
+      ],
+      "missingHashes": [
+        "a2ff4ba94e5fb5796ddfdd39c5651c86c003d3e7d71a6c458b7ed30f7077c195"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/889-native3x-lo334.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixeltrace; countbarevertices+condensedtextCindependently, noDHAnameusedtopredictcount/geometry.",
+  "geometry": {
+    "classification": "Oneacycliccoiledfattyacidchain withcondensedCOOHright, noexpandedcarbonyl.",
+    "bareVerticesFreeLeftToCOOHText": [
+      [
+        44,
+        225
+      ],
+      [
+        67,
+        179
+      ],
+      [
+        44,
+        132
+      ],
+      [
+        67,
+        85
+      ],
+      [
+        114,
+        85
+      ],
+      [
+        138,
+        38
+      ],
+      [
+        185,
+        38
+      ],
+      [
+        209,
+        85
+      ],
+      [
+        256,
+        85
+      ],
+      [
+        279,
+        132
+      ],
+      [
+        256,
+        179
+      ],
+      [
+        279,
+        225
+      ],
+      [
+        326,
+        225
+      ],
+      [
+        350,
+        179
+      ],
+      [
+        327,
+        132
+      ],
+      [
+        350,
+        85
+      ],
+      [
+        397,
+        85
+      ],
+      [
+        421,
+        38
+      ],
+      [
+        468,
+        38
+      ],
+      [
+        491,
+        85
+      ],
+      [
+        538,
+        85
+      ]
+    ],
+    "COOH": {
+      "text": "COOH",
+      "bbox": [
+        549,
+        112,
+        630,
+        141
+      ],
+      "anchor": "FIRSTC",
+      "bond": [
+        [
+          538,
+          85
+        ],
+        [
+          551,
+          112
+        ]
+      ],
+      "noExtraC": "LastlineendatCOOHglyphgapnotnewbarecarbon; condensedCcountedonceinsideCOOH"
+    },
+    "doubleEdgesZeroBasedBare": [
+      [
+        2,
+        3
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        8,
+        9
+      ],
+      [
+        11,
+        12
+      ],
+      [
+        14,
+        15
+      ],
+      [
+        17,
+        18
+      ]
+    ],
+    "innerDoubleRays": [
+      [
+        [
+          56,
+          132
+        ],
+        [
+          74,
+          98
+        ]
+      ],
+      [
+        [
+          144,
+          50
+        ],
+        [
+          179,
+          50
+        ]
+      ],
+      [
+        [
+          249,
+          98
+        ],
+        [
+          268,
+          132
+        ]
+      ],
+      [
+        [
+          286,
+          213
+        ],
+        [
+          319,
+          213
+        ]
+      ],
+      [
+        [
+          339,
+          132
+        ],
+        [
+          357,
+          98
+        ]
+      ],
+      [
+        [
+          428,
+          50
+        ],
+        [
+          461,
+          50
+        ]
+      ]
+    ],
+    "counts": {
+      "bareCVertices": 21,
+      "textCOOHC": 1,
+      "C": 22,
+      "O": 2,
+      "CCdouble": 6,
+      "expandedCOdouble": 0,
+      "caption": 0,
+      "Cnums": 0,
+      "standaloneH": 0
+    },
+    "font": "COOHregularuprightsans, thinsourceglyphs, noactualbold/italic; ALLskeletallinesuniformthingrayblack.",
+    "noAdded": [
+      "compoundnamecaption",
+      "carbonnumbers",
+      "H/CH3labels",
+      "expandedCOOH",
+      "charges",
+      "ringclosure",
+      "E/Zletters",
+      "reactionarrow"
+    ]
+  },
+  "actualSvgReviewed": false
+}
