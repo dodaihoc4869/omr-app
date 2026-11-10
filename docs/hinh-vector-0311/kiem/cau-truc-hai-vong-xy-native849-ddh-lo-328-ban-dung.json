@@ -1,0 +1,40 @@
+[
+  {
+    "i": 849,
+    "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+    "fileNguon": "anh/9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60.png",
+    "svg": "hai-vong-xy-native849-ddh-a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526.svg",
+    "hashSvg": "a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526",
+    "byteSvg": 10337,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B5-I-64",
+        "de": "Phân tử maltose có cấu tạo như sau: Nhóm nguyên tử ở vị trí X, Y trong công thức trên lần lượt là",
+        "refs": [
+          {
+            "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+            "where": "12-C2-B5-I-64.hinh.0.du_lieu",
+            "hashDataUrl": "d273deeca87fef5cdd87ea817bd162f1ab6e43f8e808bdca6772bbc19f0d9bae"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B5-D2-I-72",
+        "de": "Phân tử maltose có cấu tạo như sau: Nhóm nguyên tử ở vị trí X, Y trong công thức trên lần lượt là",
+        "refs": [
+          {
+            "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+            "where": "DB-12-B5-D2-I-72.hinh.0.du_lieu",
+            "hashDataUrl": "d273deeca87fef5cdd87ea817bd162f1ab6e43f8e808bdca6772bbc19f0d9bae"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2sixrings10bareC+CH2OH-C/9O/5freeOH+CH2OH-O/4TAPER2boldfront-verticalfeet/CH2OHleftUP-XrightUP-YrightDOWN/0standaloneH/regularupright/noaddedH-CH2OH-X-Yanswer-nums-caption/noalias987",
+    "hashSvgDaSoat": "a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

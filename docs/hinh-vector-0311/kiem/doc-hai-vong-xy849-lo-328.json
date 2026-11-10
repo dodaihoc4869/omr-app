@@ -1,0 +1,468 @@
+{
+  "i": 849,
+  "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60.png",
+  "size": [
+    492,
+    250
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C2-B5-I-64",
+      "de": "Phân tử maltose có cấu tạo như sau: Nhóm nguyên tử ở vị trí X, Y trong công thức trên lần lượt là",
+      "allHinh": [
+        {
+          "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+          "where": "12-C2-B5-I-64.hinh.0.du_lieu",
+          "hashDataUrl": "d273deeca87fef5cdd87ea817bd162f1ab6e43f8e808bdca6772bbc19f0d9bae"
+        }
+      ],
+      "missingHashes": [
+        "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60"
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-72",
+      "de": "Phân tử maltose có cấu tạo như sau: Nhóm nguyên tử ở vị trí X, Y trong công thức trên lần lượt là",
+      "allHinh": [
+        {
+          "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+          "where": "DB-12-B5-D2-I-72.hinh.0.du_lieu",
+          "hashDataUrl": "d273deeca87fef5cdd87ea817bd162f1ab6e43f8e808bdca6772bbc19f0d9bae"
+        }
+      ],
+      "missingHashes": [
+        "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/849-native3x-lo328.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixeltrace; internalC1..C5onlygeometrykeysNOTdrawnlabels, X/Yunknownliteral notresolved.",
+  "geometry": {
+    "classification": "Twosix-memberHaworthwithunknownX/Ygroups, no reaction/caption.",
+    "left": {
+      "vertices": {
+        "C1": [
+          213,
+          124
+        ],
+        "C2": [
+          167,
+          161
+        ],
+        "C3": [
+          96,
+          161
+        ],
+        "C4": [
+          49,
+          124
+        ],
+        "C5": [
+          96,
+          85
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          155,
+          73,
+          178,
+          99
+        ]
+      },
+      "thinOlines": [
+        [
+          [
+            96,
+            85
+          ],
+          [
+            153,
+            85
+          ]
+        ],
+        [
+          [
+            178,
+            96
+          ],
+          [
+            213,
+            124
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            49,
+            124
+          ],
+          [
+            93,
+            165
+          ],
+          [
+            98,
+            157
+          ]
+        ],
+        [
+          [
+            213,
+            124
+          ],
+          [
+            165,
+            165
+          ],
+          [
+            169,
+            157
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          96,
+          161
+        ],
+        [
+          167,
+          161
+        ]
+      ],
+      "CH2OH": {
+        "text": "CH₂OH",
+        "bbox": [
+          85,
+          27,
+          182,
+          54
+        ],
+        "bond": [
+          [
+            96,
+            85
+          ],
+          [
+            96,
+            55
+          ]
+        ],
+        "anchor": "FIRSTCcenter96notH2/OH"
+      },
+      "OHbranches": [
+        {
+          "text": "OH",
+          "bbox": [
+            37,
+            160,
+            80,
+            187
+          ],
+          "bond": [
+            [
+              49,
+              124
+            ],
+            [
+              49,
+              157
+            ]
+          ],
+          "anchor": "O"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            84,
+            106,
+            127,
+            132
+          ],
+          "bond": [
+            [
+              96,
+              161
+            ],
+            [
+              96,
+              134
+            ]
+          ],
+          "anchor": "O"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            155,
+            196,
+            199,
+            223
+          ],
+          "bond": [
+            [
+              167,
+              161
+            ],
+            [
+              167,
+              193
+            ]
+          ],
+          "anchor": "O"
+        }
+      ]
+    },
+    "right": {
+      "vertices": {
+        "C1": [
+          452,
+          124
+        ],
+        "C2": [
+          404,
+          161
+        ],
+        "C3": [
+          333,
+          161
+        ],
+        "C4": [
+          286,
+          124
+        ],
+        "C5": [
+          333,
+          85
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          392,
+          73,
+          416,
+          99
+        ]
+      },
+      "thinOlines": [
+        [
+          [
+            333,
+            85
+          ],
+          [
+            390,
+            85
+          ]
+        ],
+        [
+          [
+            416,
+            96
+          ],
+          [
+            452,
+            124
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            286,
+            124
+          ],
+          [
+            330,
+            165
+          ],
+          [
+            335,
+            157
+          ]
+        ],
+        [
+          [
+            452,
+            124
+          ],
+          [
+            402,
+            165
+          ],
+          [
+            406,
+            157
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          333,
+          161
+        ],
+        [
+          404,
+          161
+        ]
+      ],
+      "X": {
+        "text": "X",
+        "bbox": [
+          322,
+          27,
+          346,
+          54
+        ],
+        "bond": [
+          [
+            333,
+            85
+          ],
+          [
+            333,
+            55
+          ]
+        ],
+        "direction": "UP",
+        "noExpansion": true
+      },
+      "Y": {
+        "text": "Y",
+        "bbox": [
+          440,
+          159,
+          464,
+          186
+        ],
+        "bond": [
+          [
+            452,
+            124
+          ],
+          [
+            452,
+            157
+          ]
+        ],
+        "direction": "DOWN",
+        "noExpansion": true
+      },
+      "OHbranches": [
+        {
+          "text": "OH",
+          "bbox": [
+            321,
+            106,
+            364,
+            132
+          ],
+          "bond": [
+            [
+              333,
+              161
+            ],
+            [
+              333,
+              134
+            ]
+          ],
+          "anchor": "O"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            392,
+            196,
+            436,
+            223
+          ],
+          "bond": [
+            [
+              404,
+              161
+            ],
+            [
+              404,
+              193
+            ]
+          ],
+          "anchor": "O"
+        }
+      ]
+    },
+    "bridge": {
+      "text": "O",
+      "bbox": [
+        239,
+        142,
+        263,
+        168
+      ],
+      "bonds": [
+        [
+          [
+            213,
+            124
+          ],
+          [
+            238,
+            144
+          ]
+        ],
+        [
+          [
+            263,
+            144
+          ],
+          [
+            286,
+            124
+          ]
+        ]
+      ]
+    },
+    "countsKnownExcludingUnknownXY": {
+      "bareRingC": 10,
+      "CtextCH2OH": 1,
+      "knownC": 11,
+      "OHfree": 5,
+      "CH2OHO": 1,
+      "ringO": 2,
+      "bridgeO": 1,
+      "knownO": 9,
+      "standaloneH": 0,
+      "Xlabels": 1,
+      "Ylabels": 1,
+      "taper": 4,
+      "boldFrontHorizontal": 2
+    },
+    "font": "ALLregularuprightsans atomlabels andX/Y, only2SUBinCH2OH; noactualbold/italictext, boldonlyfrontbonds.",
+    "noAdded": [
+      "X/Yanswers",
+      "Cnumbers",
+      "standaloneH",
+      "namecaption",
+      "OHatunknownY",
+      "CH2OHatunknownX",
+      "reactionarrows"
+    ]
+  },
+  "actualSvgReviewed": false
+}

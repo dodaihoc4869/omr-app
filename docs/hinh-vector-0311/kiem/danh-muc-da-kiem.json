@@ -6472,6 +6472,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60": {
+      "tep": "hai-vong-xy-native849-ddh-a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526.svg",
+      "hashSvg": "a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526",
+      "byteSvg": 10337,
+      "byteGzip": 1637,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "5bf187daeae23673aae96b1952c0f3067d7047bda3eac5901de84def65020e76": {
       "tep": "pe-giai-doan-499-ddh-71e964e9c5a84cab640bf63403da65c2e6030b4b42a936b2d1686144e7b316b6.svg",
       "hashSvg": "71e964e9c5a84cab640bf63403da65c2e6030b4b42a936b2d1686144e7b316b6",
@@ -11625,6 +11634,20 @@
           "where": "12-C2-B5-III-4.hinh.0.du_lieu",
           "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c",
           "vector": "disaccharide-stereo-ddh-fbe6f74d069444f3c3591eb5c1d606118eaee8ad58589d6f5f403af0bc41767c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C2-B5-I-64",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+          "where": "12-C2-B5-I-64.hinh.0.du_lieu",
+          "hashDataUrl": "d273deeca87fef5cdd87ea817bd162f1ab6e43f8e808bdca6772bbc19f0d9bae",
+          "vector": "hai-vong-xy-native849-ddh-a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526.svg"
         }
       ]
     },
@@ -20631,6 +20654,20 @@
           "where": "DB-12-B5-D2-III-55.hinh.0.du_lieu",
           "hashDataUrl": "24ae4c7e35fe7582a04dbc83a044aa31990eea59216322d3c69c2a1e111f1b1c",
           "vector": "disaccharide-stereo-ddh-fbe6f74d069444f3c3591eb5c1d606118eaee8ad58589d6f5f403af0bc41767c.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B5-D2-I-72",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9bd690ef987009dd9a9d47dca42ca87459e3077bf4a3e924cd121795da822d60",
+          "where": "DB-12-B5-D2-I-72.hinh.0.du_lieu",
+          "hashDataUrl": "d273deeca87fef5cdd87ea817bd162f1ab6e43f8e808bdca6772bbc19f0d9bae",
+          "vector": "hai-vong-xy-native849-ddh-a88b9660ffef59eb02fcac134ef461010bb1de2ecdfbb8b7f5e61eca3965f526.svg"
         }
       ]
     },
@@ -29794,6 +29831,7 @@
     "12-C2-B5-II-15",
     "12-C2-B5-II-16",
     "12-C2-B5-III-4",
+    "12-C2-B5-I-64",
     "12-C2-B6-D1-II-3",
     "12-C2-B6-D1-I-100",
     "12-C2-B6-D1-I-112",
@@ -30365,6 +30403,7 @@
     "DB-12-B5-D2-I-31",
     "DB-12-B5-D2-II-52",
     "DB-12-B5-D2-III-55",
+    "DB-12-B5-D2-I-72",
     "DB-12-B5-D2-III-165",
     "DB-12-B5-D2-II-187",
     "DB-12-B5-D2-I-188",
