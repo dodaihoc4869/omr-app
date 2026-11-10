@@ -371,6 +371,15 @@ try {
     if (arg('theo-css', '')) console.error('CSS mở lại:', JSON.stringify(await p.evaluate(() => window.__css)))
     kq.moLai = { fcp: d.fcp, noiDung: Math.round(tLt), chamDuoc: tti(d.dai, tLt), taskMax: daiNhat(d.dai), quaMang: await taiTheoLoai(p), dai: d.dai.filter(([t]) => t >= tLt - 500).map(([t, du]) => `${t}+${du}`) }
   }
+  // --bam-kt=<ms> (10/11, thầy «app bấm kiểm tra không hiện tức thì»): <ms> sau lúc Lộ trình hiện ở lần MỞ LẠI, bấm «Kiểm tra» ở thanh dưới (màn vào ca) ⇒ in
+  // thời gian tới ô nhập mã ca + có lộ màn chờ «Đang mở…» không; xong thì thoát.
+  if (arg('bam-kt', '')) {
+    await p.goto(goc + '/hs', { waitUntil: 'commit' }); await choThay(p, LO_TRINH); await p.waitForTimeout(Number(arg('bam-kt', '0')))
+    await p.evaluate(() => { const w = (window.__kt = { cho: 0, form: 0 }); const t0 = performance.now(); const f = () => { if (!w.cho && document.querySelector('[aria-label="Đang mở…"]')) w.cho = performance.now() - t0; const o = document.querySelector('input[inputmode="numeric"], input[autocomplete="one-time-code"], form input'); if (o && o.getBoundingClientRect().height > 0) { w.form = performance.now() - t0; return } requestAnimationFrame(f) }; w.t0 = t0; document.querySelector('button.kb-thanh-muc[aria-label="Kiểm tra"]').click(); requestAnimationFrame(f) })
+    await p.waitForTimeout(4000)
+    console.log('BAM-KT', JSON.stringify(await p.evaluate(() => ({ toiForm: Math.round(window.__kt.form), lomanCho: Math.round(window.__kt.cho) }))))
+    await trinh.close(); process.exit(0)
+  }
   // --quay=<thư mục> (03/11, thầy «load lại app hiện hình chớp, đo khung hình rồi loại bỏ đi triệt để»): bấm TẢI LẠI (F5) trên tab đã đăng nhập, quay TỪNG KHUNG
   // (CDP screencast) 4 giây ⇒ k000.jpg… + khung.json [{i, t (ms từ lúc bấm)}]; xong thì thoát (không đo phần sau).
   const QUAY = arg('quay', '')

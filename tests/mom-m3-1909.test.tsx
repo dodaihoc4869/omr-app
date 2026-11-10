@@ -80,7 +80,8 @@ describe('C4 · DANH SÁCH ở cổng học sinh (/hs)', () => {
     ]
     render(<StudentPortalScreen />)
     await moTab()
-    await waitFor(() => expect(document.querySelectorAll('.mom-the').length).toBe(3))
+    // 10/11: danh sách nằm trong mảnh khối phụ nạp lười (~135 KB) — máy bận (chạy cả bộ test) nạp quá 1 s mặc định của waitFor ⇒ đỏ chập chờn 3/5 lượt
+    await waitFor(() => expect(document.querySelectorAll('.mom-the').length).toBe(3), { timeout: 10_000 })
     const theo = (t: string) => Array.from(document.querySelectorAll<HTMLElement>('.mom-the')).find((e) => e.textContent!.includes(t))!
     expect(within(theo('Bài chưa làm')).getByText('Chưa làm')).toBeTruthy()
     expect(within(theo('Bài chưa làm')).getByRole('button', { name: 'Bắt đầu làm bài (2 tiếng)' }).className).toContain('m3-nut-chinh')

@@ -852,7 +852,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
   useEffect(() => {
     if (typeof window === 'undefined' || !auth?.token || dangMoManCon || !nenNapTruoc()) return
     let huy = false
-    const cb = () => { if (!huy) void Promise.all([napManLamBaiTap(), napManTuChua(), napManKiemTra(), napManCauDaLam(), napManTuLuyen()]).then(() => boNapExam()).then(() => { if (!huy) return napKhoiPhu() }).catch(() => {}) }
+    const cb = () => { if (!huy) void Promise.all([napKhoiPhu(), napManLamBaiTap(), napManTuChua(), napManKiemTra(), napManCauDaLam(), napManTuLuyen()]).then(() => boNapExam()).catch(() => {}) } // 10/11 thầy «bấm kiểm tra không hiện tức thì»: mảnh khối phụ (màn «Kiểm tra» = vào ca) nạp ĐẦU, không chờ màn thi nặng
     const hen = ('requestIdleCallback' in window
       ? (window as Window & { requestIdleCallback: (fn: () => void) => number }).requestIdleCallback
       : (fn: () => void) => setTimeout(fn, 1200))(cb)
@@ -1021,7 +1021,7 @@ function CongHocSinh({ auth, setAuth }: { auth: ThongTinHs | null; setAuth: (v: 
           canhBao={<TheCanhBaoThay vaiTro="hocsinh" now={nowHocTap} canhBao={duLieuBang.canhBaoThay ?? []} onDaXem={cb => void baoDaXemHocSinh(auth.token!, cb.id)} />}
           tienDoCu={duLieuBang.nguon === 'ke_hoach_ngay' ? duLieuBang.tienDo : undefined} ten={auth.hoTen} lop={auth.lop} ketQua={hoa2.ketQua} dangTai={hoa2.dangTai} loi={hoa2.loi}
           coCa={caDangMo} soBaiTap={dsBtvn.filter((bt) => !bt?.daNop).length} coBaiTap={dsBtvn.length > 0} token={auth.token} onHoc={() => setTab('hoctap')} onXemLai={() => setTab('caudalam')}
-          onChua={(q) => { setQidChua(typeof q === 'string' ? q : undefined); setTab('tuchua') }} onThi={() => { void boNapExam().catch(() => {}); setTab('vaothi') }}
+          onChua={(q) => { setQidChua(typeof q === 'string' ? q : undefined); setTab('tuchua') }} onThi={() => { void boNapExam().catch(() => {}); const f = () => setTab('vaothi'); void napKhoiPhu().then(f, f) /* đợi mảnh «vào ca» (đã tải sẵn ⇒ vài ms) rồi mới mở: vẽ thẳng, không màn chờ + 300 ms React giữ màn chờ */ }}
           onTuLuyen={() => setTab('tuluyen')} onLichSu={() => setTab('lichsuca')}
           onKetQua={() => moManCu('diem')} onLuyenLai={() => moManCu('khacphuc')} onBangTin={() => moManCu('bantin')} onBaiTap={() => moManCu('btvn')} onGiaDinh={() => moManCu('mom')} onTaiLai={hoa2.taiLai} onDangXuat={hoiDangXuat} onLamMoiApp={hoiLamMoiApp}
           onMoHoSo={() => setMoHoSoEm(true)} onKiemTra={() => setTab('kiemtra')} moDiemDanh={tab === null}
