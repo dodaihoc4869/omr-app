@@ -1,0 +1,645 @@
+{
+  "i": 966,
+  "hash": "ad8b00fb9ad10dfa9165393bffff77e2a86b07b5f083f0857b18baa899f12ec8",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ad8b00fb9ad10dfa9165393bffff77e2a86b07b5f083f0857b18baa899f12ec8.png",
+  "size": [
+    667,
+    156
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C4-B14-D2-II-4",
+      "de": "Keo dán poly (urea-fomaldehyde) được dùng làm chất kết dính trong gỗ ván ép, chất dẻo,....và được điều chế từ urea và formaldehyde (cấu tạo như hình).\nKhi kết hợp với các chất đóng rắn như $\\ce{NH4Cl}$, HOOC-COOH, $\\ce{HOCH(CH3)COOH}$ để kết nối các mạch polymer với nhau tạo thành mạng không gian, đồng thời các nhóm C=O, -NH- tạo các liên kết với các nhóm chức có trong gỗ ván ép, chất dẻo,..",
+      "allHinh": [
+        {
+          "hash": "ad8b00fb9ad10dfa9165393bffff77e2a86b07b5f083f0857b18baa899f12ec8",
+          "where": "DH-12-C4-B14-D2-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "f0380acd2e98e1096636702c8a297ecd7e5b667e4d1ed9b39b0a84559d32ba4b"
+        }
+      ],
+      "missingHashes": [
+        "ad8b00fb9ad10dfa9165393bffff77e2a86b07b5f083f0857b18baa899f12ec8"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/966-native3x-lo341.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownTopCO10xOpened": "/workspace/scratch/966-topCO10x-lo341.png",
+    "ownBranchCO10xOpened": "/workspace/scratch/966-branchCO10x-lo341.png"
+  },
+  "geometry": {
+    "classification": "Oneopenbranchedureapolymerfragment, no caption/arrow/brackets.",
+    "mainNHlabels": [
+      {
+        "text": "NH",
+        "bbox": [
+          25,
+          67,
+          64,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          97,
+          67,
+          136,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          169,
+          67,
+          208,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          241,
+          67,
+          280,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          313,
+          67,
+          352,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          385,
+          67,
+          424,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          529,
+          67,
+          568,
+          89
+        ]
+      },
+      {
+        "text": "NH",
+        "bbox": [
+          601,
+          67,
+          640,
+          89
+        ]
+      }
+    ],
+    "branchingN": {
+      "text": "N",
+      "bbox": [
+        467,
+        67,
+        489,
+        89
+      ],
+      "centerApprox": [
+        477,
+        78
+      ],
+      "downBond": [
+        [
+          477,
+          91
+        ],
+        [
+          477,
+          118
+        ]
+      ],
+      "note": "SingleNnoHhere, do notchangeintoNH. Adjacent8mainNHgroups literalNthenH."
+    },
+    "mainCO": [
+      {
+        "C": [
+          81,
+          58
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            72,
+            4,
+            90,
+            25
+          ]
+        },
+        "rays": [
+          [
+            [
+              76.5,
+              57
+            ],
+            [
+              76.5,
+              29
+            ]
+          ],
+          [
+            [
+              83.5,
+              58
+            ],
+            [
+              83.5,
+              29
+            ]
+          ]
+        ],
+        "footTopology": "LEFTverticalrayENDSFREE~1nativepxWHITEGAPbeforeleftslope/apex (row57gapx78 or222), RIGHTverticalrayCONTACTSrightslopingarm. Preservegap."
+      },
+      {
+        "C": [
+          225,
+          58
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            216,
+            4,
+            234,
+            25
+          ]
+        },
+        "rays": [
+          [
+            [
+              220.5,
+              57
+            ],
+            [
+              220.5,
+              29
+            ]
+          ],
+          [
+            [
+              227.5,
+              58
+            ],
+            [
+              227.5,
+              29
+            ]
+          ]
+        ],
+        "footTopology": "LEFTverticalrayENDSFREE~1nativepxWHITEGAPbeforeleftslope/apex (row57gapx78 or222), RIGHTverticalrayCONTACTSrightslopingarm. Preservegap."
+      },
+      {
+        "C": [
+          369,
+          58
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            360,
+            4,
+            378,
+            25
+          ]
+        },
+        "rays": [
+          [
+            [
+              365.5,
+              57
+            ],
+            [
+              365.5,
+              29
+            ]
+          ],
+          [
+            [
+              371.5,
+              58
+            ],
+            [
+              371.5,
+              29
+            ]
+          ]
+        ],
+        "footTopology": "LEFTandRIGHTverticalfeetCONTACTactualapex/slopes: row57continuousink365..372 (CO3) /581..588(CO4); noextraextension/bridge."
+      },
+      {
+        "C": [
+          586,
+          58
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            577,
+            4,
+            595,
+            25
+          ]
+        },
+        "rays": [
+          [
+            [
+              581.5,
+              57
+            ],
+            [
+              581.5,
+              29
+            ]
+          ],
+          [
+            [
+              587.5,
+              58
+            ],
+            [
+              587.5,
+              29
+            ]
+          ]
+        ],
+        "footTopology": "LEFTandRIGHTverticalfeetCONTACTactualapex/slopes: row57continuousink365..372 (CO3) /581..588(CO4); noextraextension/bridge."
+      }
+    ],
+    "bareMethyleneMain": [
+      [
+        153,
+        58
+      ],
+      [
+        297,
+        58
+      ],
+      [
+        441,
+        58
+      ],
+      [
+        513,
+        58
+      ]
+    ],
+    "mainSingleBondSegments": [
+      [
+        [
+          66,
+          67
+        ],
+        [
+          81,
+          58
+        ]
+      ],
+      [
+        [
+          81,
+          58
+        ],
+        [
+          93,
+          66
+        ]
+      ],
+      [
+        [
+          138,
+          67
+        ],
+        [
+          153,
+          58
+        ]
+      ],
+      [
+        [
+          153,
+          58
+        ],
+        [
+          164,
+          65
+        ]
+      ],
+      [
+        [
+          210,
+          67
+        ],
+        [
+          225,
+          58
+        ]
+      ],
+      [
+        [
+          225,
+          58
+        ],
+        [
+          237,
+          65
+        ]
+      ],
+      [
+        [
+          282,
+          67
+        ],
+        [
+          297,
+          58
+        ]
+      ],
+      [
+        [
+          297,
+          58
+        ],
+        [
+          309,
+          65
+        ]
+      ],
+      [
+        [
+          354,
+          67
+        ],
+        [
+          369,
+          58
+        ]
+      ],
+      [
+        [
+          369,
+          58
+        ],
+        [
+          381,
+          65
+        ]
+      ],
+      [
+        [
+          426,
+          67
+        ],
+        [
+          441,
+          58
+        ]
+      ],
+      [
+        [
+          441,
+          58
+        ],
+        [
+          463,
+          69
+        ]
+      ],
+      [
+        [
+          491,
+          70
+        ],
+        [
+          513,
+          58
+        ]
+      ],
+      [
+        [
+          513,
+          58
+        ],
+        [
+          525,
+          65
+        ]
+      ],
+      [
+        [
+          570,
+          67
+        ],
+        [
+          586,
+          58
+        ]
+      ],
+      [
+        [
+          586,
+          58
+        ],
+        [
+          598,
+          65
+        ]
+      ]
+    ],
+    "sideBranch": {
+      "carbonylC": [
+        477,
+        118
+      ],
+      "O": {
+        "text": "O",
+        "bbox": [
+          432,
+          130,
+          452,
+          152
+        ]
+      },
+      "COdoubleRays": [
+        [
+          [
+            475.5,
+            117.5
+          ],
+          [
+            449,
+            132.5
+          ]
+        ],
+        [
+          [
+            478.5,
+            123.5
+          ],
+          [
+            453,
+            138.5
+          ]
+        ]
+      ],
+      "NH": {
+        "text": "NH",
+        "bbox": [
+          493,
+          130,
+          532,
+          152
+        ]
+      },
+      "CtoNH": [
+        [
+          477,
+          118
+        ],
+        [
+          488,
+          127
+        ]
+      ],
+      "bareCH2": [
+        549,
+        120
+      ],
+      "NHtoCH2": [
+        [
+          534,
+          129
+        ],
+        [
+          549,
+          120
+        ]
+      ],
+      "OH": {
+        "text": "OH",
+        "bbox": [
+          577,
+          130,
+          615,
+          153
+        ]
+      },
+      "CH2toOH": [
+        [
+          549,
+          120
+        ],
+        [
+          572,
+          133
+        ]
+      ],
+      "Oanchor": "Ofirstglyph",
+      "COFootTopology": "UPPERrayCONTACTSbranchC/Nverticaljunction around475.5,117.5; LOWERparallelrayFREEEND~478.5,123.5 leavingtinyWHITEGAPbeforeNHslopingarm (row123x480gap betweenray477..479 andarm481..484). Preservegap,noextendtoarm."
+    },
+    "ends": {
+      "leftShortDashes": [
+        [
+          [
+            9,
+            58
+          ],
+          [
+            13,
+            60
+          ]
+        ],
+        [
+          [
+            18,
+            63
+          ],
+          [
+            22,
+            65
+          ]
+        ]
+      ],
+      "rightShortDashes": [
+        [
+          [
+            644,
+            68
+          ],
+          [
+            649,
+            65
+          ]
+        ],
+        [
+          [
+            653,
+            62
+          ],
+          [
+            659,
+            58
+          ]
+        ]
+      ],
+      "note": "2detachedshortdashes eachend inown3x; notroundellipsis/fullbonds."
+    },
+    "COFootTopology": "INDIVIDUALnativeinspectionoverridesearliergenericcontact: mainCO1/2LEFTfeetgap, mainCO3/4LEFTcontact,allmainRIGHTcontact; sidebranchLOWERfootgap/UPPERcontact. Noforcedchemicalnode.",
+    "font": "ALLchemicalNH/N/O/OHregularuprightserif, noactualbold/italic/caption. Thinuniformskeletallines, noTAPER/wedge/hash.",
+    "counts": {
+      "C": 10,
+      "mainCarbonylC": 4,
+      "mainBareMethyleneC": 4,
+      "sideC": 2,
+      "N": 10,
+      "NHlabels": 9,
+      "NsingleLabel": 1,
+      "O": 6,
+      "COdouble": 5,
+      "OHlabels": 1,
+      "charges": 0,
+      "caption": 0,
+      "brackets": 0,
+      "nsub": 0
+    },
+    "noAdded": [
+      "crosslinkfromname",
+      "HontobranchingN",
+      "CH2/Hlabels",
+      "formulanamecaption",
+      "repeatbracketsn",
+      "charges",
+      "arrow",
+      "newbonds"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelgeometry, allatoms/branchescountedfromvisiblelabelsnotpolymername/stoichiometry.",
+  "corrections": [
+    "InitialgenericallCOfeetcontactWRONG. Own2macros+nativegrayrows separatelycheckedall4mainCO; correctedmain1/2leftwhitegap,main3/4leftcontact,branchlowerwhitegap. Do notuseinitialgenericstatement."
+  ]
+}

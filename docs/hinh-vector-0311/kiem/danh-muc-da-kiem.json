@@ -2818,6 +2818,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ad8b00fb9ad10dfa9165393bffff77e2a86b07b5f083f0857b18baa899f12ec8": {
+      "tep": "polymer-nhanh-native966-ddh-b7152608bd9f16e6bcc6485698a297b2eaf37cb8a8768c9d5107cd6ac424550b.svg",
+      "hashSvg": "b7152608bd9f16e6bcc6485698a297b2eaf37cb8a8768c9d5107cd6ac424550b",
+      "byteSvg": 13238,
+      "byteGzip": 1236,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "896d86f2ece3f5f1f916370fe2cb67a08f1b9acd56bc66f7e19e4f9881a9bdb3": {
       "tep": "surfactant-bon-panel-ddh-d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b.svg",
       "hashSvg": "d232d0c7a9a0de70ff96056ca29e2f60ee6c500c8246cfd51fac929bc1eef09b",
@@ -28676,6 +28685,20 @@
       ]
     },
     {
+      "qid": "DH-12-C4-B14-D2-II-4",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ad8b00fb9ad10dfa9165393bffff77e2a86b07b5f083f0857b18baa899f12ec8",
+          "where": "DH-12-C4-B14-D2-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "f0380acd2e98e1096636702c8a297ecd7e5b667e4d1ed9b39b0a84559d32ba4b",
+          "vector": "polymer-nhanh-native966-ddh-b7152608bd9f16e6bcc6485698a297b2eaf37cb8a8768c9d5107cd6ac424550b.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C4-B14-D2-III-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -31284,6 +31307,7 @@
     "DH-12-C3-B9-P1-III-35",
     "DH-12-C4-B14-D2-I-6",
     "DH-12-C4-B14-D2-II-3",
+    "DH-12-C4-B14-D2-II-4",
     "DH-12-C4-B14-D2-III-4",
     "DH-12-C4-B14-D2-III-6",
     "DH-12-C3-B9-P2-VD-I-4",
