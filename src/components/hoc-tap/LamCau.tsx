@@ -9,7 +9,7 @@ import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
 import KhoiLoiGiaiChuan, { loiGiaiChuanTuKho } from '../loi-giai/KhoiLoiGiaiChuan'
 import { ChemText } from '../../lib/chem-format'
 import { tachDongTheoY } from '../../lib/tach-dong-cau'
-import { ngatYSoSau } from '../../lib/ngat-y-so-sau'
+import { ngatYSoSau, tachNhanTran } from '../../lib/ngat-y-so-sau'
 import { giuLienPhuongTrinh, tachDoanDe } from '../../lib/gian-y-de'
 import { laChuGiuCho } from '../../lib/anh-phuong-an'
 import type { HinhAnh } from '../../data/examContent'
@@ -68,6 +68,8 @@ const CHU_PA = ['A', 'B', 'C', 'D'] as const
 // công thức hoá). Đề là hàm thuần của `q` + `stt`.
 export const DeCau = memo(function DeCau({ q, stt }: { q: Question; stt: number }) {
   const de = ngatYSoSau(tachDongTheoY(q.text)) // thầy 02/11 khuya: ý có số đứng sau «… (1); … (2);» ⇒ mỗi ý một dòng
+  // thầy 10/11: dãy số trần «(1) (2) (3)» giữ chỗ cho các công thức nằm trong ảnh sau đề ⇒ lời dẫn + dòng số · ảnh · phần chữ còn lại (ngat-y-so-sau.ts)
+  const nt = !q.thanCauImg && q.hinhAnh.some((h) => h.viTri === 'sau_de') ? tachNhanTran(q.text, tachDongTheoY) : null
   return (
     <section className="ht2-lam-de" aria-label={`Đề câu ${stt}`}>
       {q.thanCauImg ? (
@@ -76,14 +78,16 @@ export const DeCau = memo(function DeCau({ q, stt }: { q: Question; stt: number 
           <CauHinh src={q.thanCauImg} alt={`Đề câu ${stt}`} />
         </>
       ) : (
-        <ChuDe de={de} stt={stt} />
+        <ChuDe de={nt ? nt.truoc : de} stt={stt} />
       )}
+      {nt ? <p className="ht2-lam-de-chu">{nt.nhan}</p> : null}
       <ExperimentDemo text={de} />
       <BangDe table={q.table} />
       <ExperimentOriginal text={q.text} hasImages={Boolean(q.imageDataUrl || q.hinhAnh.some((h) => h.viTri === 'sau_de'))}>
         {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt={`Hình câu ${stt}`} />}
         <HinhTaiViTri hinhAnh={hinh(q)} viTri="sau_de" nhan={`câu ${stt}`} />
       </ExperimentOriginal>
+      {nt?.sau ? <p className="ht2-lam-de-chu"><ChemText text={nt.sau} /></p> : null}
     </section>
   )
 })

@@ -228,6 +228,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const chuaMo = useRef(false)
   const soLuot = v?.luot?.so ?? 0
   const [LC, setLC] = useState<MangChang | null>(null)
+  /** Gốc màn — giám thị nghe chạm / rê trong phần trả lời (`.duo-tra`) để mắt dõi theo ô em chọn. */
+  const gocRef = useRef<HTMLDivElement>(null)
   const theBd = useTheBienDong(v?.em ? v.bienDongEm : undefined)
   useEffect(() => { let huy = false; void import('../hoc-tap/ManLamBaiTap').then((m) => { if (!huy) setLC(m.PHAN_CAU_CHANG) }).catch(() => {}); return () => { huy = true } }, [])
 
@@ -458,6 +460,18 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     </header>
   )
   const nhanDoi = `Bình Phản Ứng${l ? ` · Lượt ${l.so}` : ''}`
+  // ĐỀ GIỐNG CHẶNG (thầy 10/11 «Đề hiển thị ko đúng, cho hiển thị đề giống với phần chặng luôn, có giám thị»): dùng lại NGUYÊN khối đề của màn làm chặng
+  // (`KhoiDeChang`: giám thị theo mức câu + bong bóng đề chữ L + tranh minh hoạ + thẻ «hình của đề vẽ lại») trong ĐÚNG chuỗi lớp của chặng
+  // (`.ht-app.ht2-lam.duo`) ⇒ cùng tờ kiểu, cùng cỡ chữ, cùng cách xử lí ảnh nền trắng trên nền tối. Trước đây `DeCau` đứng ngoài chuỗi lớp ấy nên ra thẻ trơn
+  // khác chặng, thiếu hình vẽ lại và ảnh cuối câu. Không bọc «chạm để hiểu đề» (gợi ý) — lượt thi đua không có trợ giúp. Giám thị: em gửi ⇒ `nop`; thầy mở
+  // đáp án ⇒ `ket` (đúng / sai / chưa tính). Mảnh giám thị nạp lười (đã nằm trong kho tải ngầm của app học sinh); máy yếu / giảm chuyển động ⇒ tự đứng yên.
+  // Giao diện cũ (máy lùi `ddh.trong` = 'tat', <html> không có data-trong): màn chặng cũng không dùng khối này ⇒ giữ `DeCau` trơn như trước.
+  const kieuChang = !!document.documentElement.dataset.trong
+  const boChang = (con: React.ReactNode) => (kieuChang ? <div className="ht-app ht2-lam duo bpu-de-chang" data-duo="">{con}</div> : con)
+  const deChang = (cau: Question, stt: number, muc: ReturnType<MangChang['mucGiamThi']>, nop: boolean, ket: 'dung' | 'sai' | 'trung' | null) => !LC
+    ? <p className="bpu-de-tho">{cau.text}</p>
+    : !kieuChang ? <LC.DeCau q={cau} stt={stt} />
+    : boChang(<LC.KhoiDeChang q={cau} muc={muc} phien={`bpu:${buoiId ?? ''}`} nop={nop} ket={ket} vung={() => gocRef.current}><LC.DeCau q={cau} stt={stt} /></LC.KhoiDeChang>)
   // 10/11 (thầy báo dải kết quả đè thanh đội): dải KẾT QUẢ LÊN BẢNG và mốc THẺ ±kJ nằm TRONG DÒNG CHẢY, ngay dưới thanh đội đang hiện — trong lớp che:
   // dưới «Đội … kJ đội»; ngoài lớp che: dưới đầu màn. Không còn lớp nổi tuyệt đối đè chữ.
   // 10/11 (thầy «bỏ em đạt, chỉ ghi đạt / không đạt nổi bật»): kết quả lên bảng là MỘT NHÃN bên phải thanh đội (trong lớp che) — em được gọi kèm kJ thật
@@ -516,7 +530,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
             <button type="button" aria-pressed={g.emDoan === 0} disabled={g.emDoan !== null || g.dat != null} onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
           </div>
           <p className="nho">Đoán đúng +{KJ.doanDung} kJ cho em. Mỗi lần chạm nút dưới, một tia lửa bay lên bảng tới bạn ấy.</p>
-          {q && !che ? <div className="bpu-de-xem"><span className="m3-chip">Đề trên bảng · chỉ xem</span>{LC ? <LC.DeCau q={q} stt={l.so} /> : <p className="bpu-de-tho">{q.text}</p>}</div> : null}
+          {q && !che ? <div className="bpu-de-xem"><span className="m3-chip">Đề trên bảng · chỉ xem</span>{deChang(q, l.so, null, false, null)}</div> : null}
         </>
       )
       day = <button type="button" className="bpu-nut tiep" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{cung ? `Tiếp sức ${DOI_BPU[g.doi]?.ten}` : 'Cổ vũ bạn ấy'} · {g.emTiep}/10</button>
@@ -561,11 +575,12 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       than = (
         <>
           <span className="m3-chip bpu-chip">{l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'}</span>
-          {LC ? <LC.DeCau q={q} stt={l.so} /> : <p className="bpu-de-tho">{q.text}</p>}
-          {l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
+          {deChang(q, l.so, LC ? LC.mucGiamThi(q) : null, che, !daMo || l.tuLuan ? null : !daGui || kb ? 'trung' : k?.dung ? 'dung' : 'sai')}
+          <div className="duo-tra bpu-tra">{l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
             : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={che || daMo || hetGio} />
             : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={che || daMo || hetGio} />
-            : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!che && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}
+            : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!che && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}</div>
+          {LC && q.hinhAnh?.some((h) => h.viTri === 'cuoi_cau') ? boChang(<LC.HinhCuoiCau q={q} stt={l.so} />) : null}{/* ảnh cuối câu: trước 10/11 không hiện ở Bình Phản Ứng */}
           {daMo && !che && !l.tuLuan && l.dung && LC ? (
             <div className="bpu-loi-giai"><Suspense fallback={<div aria-busy="true" style={{ minHeight: 120 }} />}>
               <LoiGiaiKinhHs qid={String(l.qid ?? q.qid)} phan={l.phan} choices={q.choices} ideas={q.ideas} dapAn={l.dung} duPhong={<LoiGiaiDuPhong LG={LC.LoiGiaiCau as unknown as LoiGiaiCauKieu} q={q} solution={l.giai?.solution ?? null} dapAn={l.dung} hinhLoiGiai={(l.giai?.anh ?? []) as Question['hinhAnh']} />} />
@@ -590,7 +605,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
 
   if (an) return null
   return createPortal(
-    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
+    <div ref={gocRef} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
       {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}

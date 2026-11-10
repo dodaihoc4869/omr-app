@@ -39,16 +39,12 @@ import { VungChamDe } from '../goi-y-cham/VungChamDe'
 const LoiGiaiCauCoSoDo = lazy(() => import('../goi-y-cham/LoiGiaiCauCoSoDo'))
 // LỜI GIẢI KÍNH (thầy chốt 02/11): mảnh nạp lười; câu chưa có bản Kính ⇒ lời giải đang có (sơ đồ / chữ).
 const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
-const HinhVeLaiCuaCau = lazy(() => import('../hinh-ve/HinhVeLaiCuaCau'))
 // NÂNG CẤP 27/10 (bản vẽ ve-moi/nang-cap): tranh Hoá học (cảnh phản ứng dưới đề · phân tử trong ô phương án). Nằm CHUNG mảnh màn làm bài (mảnh này đã
 // nạp lười, ngoài lượt mở app) — không tách mảnh riêng để precache không thêm tệp; chỉ vẽ khi chữ đề / phương án có dáng chất (lọc rẻ ngay đây).
-import { coHinhDe } from '../../lib/hinh-ve/co-hinh'
-import { IcLapLanh, IcMayTinh, MinhHoaDe, TranhPa } from './minh-hoa-hoa'
+import { IcLapLanh, IcMayTinh, TranhPa } from './minh-hoa-hoa'
 import { chayThuong, chuMoc, mocCombo } from './hieu-ung-duo'
 import { SoLan } from './SoLan'
 import { BungDung } from './BungDung'
-/** Đề có «<số> gam|mol <tên chất>» ⇒ đáng thử vẽ cảnh. */
-const coDangCanh = (text: string) => /\d\s*(?:gam|g|mol)\s+[A-Za-z(]/.test(text)
 /** Bốn phương án đều là tên / công thức chất ngắn (không phải số, không phải câu) ⇒ đáng thử vẽ phân tử. */
 const coDangChat = (pa: readonly string[]) => pa.length === 4 && pa.every((c) => /^[A-Za-z(][A-Za-z0-9() ]{1,24}\.?$/.test((c ?? '').trim()) && /[a-z]{4}|[A-Z][a-z]?\d/.test(c ?? ''))
 /** Câu khen xoay vòng ở dải ĐÚNG (thầy 27/10, như Duolingo) — theo thứ tự câu, câu đầu luôn «Chính xác!». */
@@ -74,9 +70,9 @@ import { canGiuChan, chuoiHomNay, loiBangNhac, loiDongVien, loiGiuChan, type Cau
 const KetBaiThuong = lazy(() => import('../thuong/KetBaiThuong'))
 // Chạm ô nguyên tử trên thanh trên ⇒ tấm hướng dẫn (thầy 30/10) — đi trong mảnh nạp lười ManThuong, chỉ «Đã hiểu» (không rời bài).
 const TamHuongDan = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TamHuongDan })))
-// Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng; ở đây chỉ phần chọn mức (nhỏ).
-const GiamThiCau = lazy(() => import('../giam-thi/GiamThi'))
+// Giám thị theo mức câu (thầy chốt 27/10): mảnh lười + tờ riêng (KhoiDeChang.tsx); ở đây chỉ phần chọn mức (nhỏ).
 import { mucGiamThi } from '../giam-thi/muc-giam-thi'
+import { KhoiDeChang } from './KhoiDeChang'
 /** Trùng tên với TrongHs.SU_KIEN_MO_CHUOI (không nhập TrongHs vào mảnh màn làm bài). */
 const SU_KIEN_MO_CHUOI = 'ddh-thuong-mo-chuoi'
 // «Trong» 26/10 (nhóm 2): tờ trình bày styles/trong-lam-bai.css nạp RIÊNG, chỉ khi <html data-trong> (main.tsx gắn trước khi nạp màn) — không cộng byte lượt mở app.
@@ -1294,15 +1290,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
             : <p key={`n${q.qid}`} className="duo-nhan" data-nc="" data-nhac={bangNhac ? '' : undefined}>{bangNhac && <span className="duo-nhan-nhac" role="status">{bangNhac}</span>}<span className="duo-nhan-o" aria-hidden="true">{q.phan === 'III' || soPa ? <IcMayTinh /> : <IcLapLanh />}</span><span>{q.vaiGoi7 === 'moi' ? 'Câu mới' : loai}</span>{tenBai || q.tenDang ? <span className="duo-chip" data-cong-thuc={/[A-Z][a-z]?(\d|[A-Z(])/.test(tenBai || q.tenDang || '') || undefined}><ChemText text={chuDeNgan(tenBai || q.tenDang || '')} /></span> : null}{chang ? <span className="ht2-an">Chặng {chang}</span> : null}{q.vaiGoi7 === 'sua' && !k && <ChipChuaChac qid={q.qid} />}</p>}
           {(!laLamLai || nutDen) && <div key={`l${q.qid}`} className="duo-lenh">{!laLamLai && <h2>{lenh}</h2>}{nutDen}</div>}
           {laLamLai && !k && viTri === soGoc && <p key={`g${q.qid}`} className="duo-mo-ghi">Câu cùng dạng với câu em vừa sai. Lượt này tính là có hỗ trợ.</p>}
-          {mucGt ? <div ref={sanRef} className="duo-gt-san">
-              <div className="duo-gt-loi-o" />{/* hàng riêng của bong bóng càu nhàu: không đè nhãn, đề, phương án */}
-              <div className="duo-gt-nv"><Suspense fallback={null}><GiamThiCau muc={mucGt} qid={q.qid} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current} /></Suspense></div>
-              {/* chữ L (bong bóng gần trọn bề ngang, khuyết góc trái trên ôm giám thị) CHỈ khi chữ thật sự tràn xuống dưới chân giám thị — mảnh GiamThi đo rồi bật `data-l` */}
-              <div key={`b${q.qid}`} className="duo-gt-bong"><svg className="duo-gt-vien" aria-hidden="true"><path /></svg><span className="duo-gt-cho" aria-hidden="true" /><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></div>
-            </div>
-            : <VungChamDe key={`v${q.qid}`} q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe>}
-          {coDangCanh(q.text) && <MinhHoaDe key={`m${q.qid}`} text={q.text} />}
-          {coHinhDe(q.hinhAnh) && <Suspense fallback={null}><HinhVeLaiCuaCau qid={q.qid} hinh={q.hinhAnh} /></Suspense>}{/* thầy 03/11: hình của đề vẽ lại = thẻ riêng ở dưới */}
+          {/* 10/11: khối đề (giám thị + bong bóng chữ L + tranh minh hoạ + hình vẽ lại) tách ra KhoiDeChang.tsx — Bình Phản Ứng dùng chung, DOM y như cũ */}
+          <KhoiDeChang san={sanRef} muc={mucGt} q={q} phien={phien} nop={nop} ket={ketGt} vung={() => gocRef.current}><VungChamDe q={q} token={token} phien={phien} onHoTro={danhDauHoTro} nutBatDau={nutBatDau}><DeCau q={q} stt={stt} /></VungChamDe></KhoiDeChang>
           {q.goiY && goiY && dangTraLoi && <section key={`y${q.qid}`} id="ht2-lam-goi-y" className="ht2-lam-goi-y" aria-label="Gợi ý"><b><Lightbulb size={18} aria-hidden="true" />Gợi ý</b><p>{q.goiY.cotLoi || (q.goiY.gach?.length ? `Có thể loại phương án ${q.goiY.gach.join(', ')}.` : 'Đọc lại kiến thức cốt lõi của bài.')}</p></section>}
           </div>
           <ThanhCuon key="cd" cot="de" />
@@ -1401,4 +1390,4 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
 // Bình Phản Ứng (06/11) dùng lại phần hiện câu của chặng QUA mảnh này, nạp động (một hằng của chính mảnh — KHÔNG `export … from`, vì tái xuất làm bộ đóng
 // gói chia lại mảnh dùng chung ⇒ thêm tệp precache + byte mở).
 // oxlint-disable-next-line react/only-export-components
-export const PHAN_CAU_CHANG = { DeCau, ChonTracNghiem, ChonDungSai, OTraLoiNgan, ChemText, LoiGiaiCau }
+export const PHAN_CAU_CHANG = { DeCau, ChonTracNghiem, ChonDungSai, OTraLoiNgan, ChemText, LoiGiaiCau, KhoiDeChang, HinhCuoiCau, mucGiamThi }
