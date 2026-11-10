@@ -9,6 +9,8 @@ export function laTinBpu(d: unknown): d is TinBpu {
   return !!x && x.nguon === 'to-chieu' && x.loai === 'bpu' && typeof x.qid === 'string' && x.qid.length > 0 && x.qid.length <= 200
 }
 let daNghe = false
+let liveThay: ((d: unknown, nguon: Window | null) => void) | null = null
+const choLive: [unknown, Window | null][] = []
 export function ngheBpuToChieu(): void {
   if (daNghe || typeof window === 'undefined') return
   daNghe = true
@@ -16,6 +18,13 @@ export function ngheBpuToChieu(): void {
     const tuKhung = [...document.querySelectorAll('iframe')].some((f) => f.contentWindow === e.source)
     if (!tuKhung && e.origin !== window.location.origin && e.origin !== 'null') return
     const d = e.data as { nguon?: unknown; loai?: unknown; d?: unknown } | null
+    // 10/11 LIVE BẢNG: nút «Live» + bút của tờ ⇒ phần live của máy thầy (nạp lười; nạp xong thì gọi thẳng — sự kiện bút tới theo từng khung hình).
+    if (d && d.nguon === 'to-chieu' && d.loai === 'live') {
+      const nguon = e.source as Window | null
+      if (liveThay) liveThay(e.data, nguon)
+      else { choLive.push([e.data, nguon]); if (choLive.length === 1) void import('../../components/live/thay-noi').then((m) => { liveThay = m.nhanTinTo; for (const [x, n] of choLive.splice(0)) m.nhanTinTo(x, n) }).catch(() => { choLive.length = 0 }) }
+      return
+    }
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-het') { void import('../../components/bpu/gan-gv').then((m) => m.baoHetCau(d.d === -1 ? -1 : 1)).catch(() => {}); return }
     // Lời giải thu gọn của đợt đang chiếu (bảng hỏi khi thầy bấm G — hiện ngay trên bảng, không về tờ).
     if (d && d.nguon === 'to-chieu' && d.loai === 'bpu-giai') { const h = (e.data as { html?: unknown }).html; void import('../../components/bpu/gan-gv').then((m) => m.nhanGiai(typeof h === 'string' ? h : '')).catch(() => {}); return }

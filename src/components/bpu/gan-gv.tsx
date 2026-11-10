@@ -10,6 +10,7 @@ import { useAppStore } from '../../store/appStore'
 import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
 import { hienKetQua, tatTheKq } from './TheKetQuaLenBang'
+import { layPhong } from './cau-live'
 
 let goc: Root | null = null
 let khung: HTMLDivElement | null = null
@@ -103,6 +104,27 @@ export function escRaHomNay(): boolean {
   if (!khung && hdKhung) { dongHoatDong(); return true }
   return false
 }
+// LIVE BẢNG (10/11, docs/dac-ta-live-bang-1011.md mục 2.1): phần live của máy thầy (src/components/live/thay-noi.ts, nạp lười) báo có / đang live ⇒ nút «Live»
+// trên thanh trên của bảng. Bấm ⇒ bảng LUI về tờ chiếu (máy em soi đúng tờ: giấy đề + bảng đen) rồi bật live như bấm trên tờ; Esc / P đưa bảng về, live vẫn chạy.
+// Đang live mà bảng đang lui (thầy giảng trên tờ) ⇒ ẩn viền đỏ toàn màn «Rời màn hình» (bpu-bang.css) — tờ có thẻ gọn «N em rời màn» không che bảng.
+let liveTt = { co: false, bat: false }
+/** Bảng đang lui vì live (không phải vì em lên bảng) ⇒ D / K / F ở app không chấm ai. */
+let anViLive = false
+export function datLive(tt: { co: boolean; bat: boolean }): void {
+  if (tt.co === liveTt.co && tt.bat === liveTt.bat) return
+  liveTt = tt
+  capLiveGon()
+  if (hien && khung) veBang()
+}
+function capLiveGon(): void { document.documentElement.toggleAttribute('data-bpu-live-gon', liveTt.bat && (bangAn() || tamAn)) }
+function bamLive(): void {
+  if (!nguonTo || !khung) { useAppStore.getState().showToast('Thầy chọn câu để có tờ chiếu rồi bật Live.', 'warn'); return }
+  const dangLive = liveTt.bat
+  anViLive = true
+  anBang()
+  try { nguonTo.focus() } catch { /* tờ chặn */ }
+  if (!dangLive) void import('../live/thay-noi').then((m) => m.bamTuBang()).catch(() => {})
+}
 function veBang(): void {
   if (!hien) return
   ngheEsc()
@@ -124,6 +146,7 @@ function veBang(): void {
       onHoatDong={moHoatDongTuBang}
       onKetThuc={ketThucBuoiHoc}
       gocPortal={khung}
+      them={liveTt.co ? <button type="button" className={`bb-hoi bb-live${liveTt.bat ? ' bat' : ''}`} onClick={bamLive} title="Live: cả lớp xem bảng thầy viết và nghe thầy trên máy"><i aria-hidden="true" />{liveTt.bat ? 'Đang live' : 'Live'}</button> : undefined}
     />,
   )
 }
@@ -295,9 +318,11 @@ export function baoHetCau(d: 1 | -1): void {
   useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
 export function dongBang(): void {
+  if (liveTt.bat) layPhong()?.gui({ t: 'live-tat' }) // bảng đóng hẳn (nối phòng sắp rớt) ⇒ tắt live trước, máy em không kẹt ở bảng live
+  anViLive = false
   goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null; tamAn = false; boQid = ''
   document.documentElement.removeAttribute('data-bpu-an')
-  traAnTam(); cheTo(false) // bảng đóng (lùi về tờ: G, câu không gửi được…) ⇒ tờ hiện như thường
+  traAnTam(); cheTo(false); capLiveGon() // bảng đóng (lùi về tờ: G, câu không gửi được…) ⇒ tờ hiện như thường
   try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
   phatPhien()
   window.removeEventListener('keydown', phimKhiAn, true)
@@ -320,6 +345,7 @@ function anBang(): void {
   const el = khung
   if (!el) return
   el.setAttribute('data-an', '')
+  capLiveGon()
   cheTo(false) // tờ lộ ra ngay dưới bảng đang thu
   window.addEventListener('keydown', phimKhiAn, true)
   if (!toTrongTrang() || giamChuyenDong()) { baoAnHien(true); anHan(el); return }
@@ -338,6 +364,8 @@ function hienBang(): void {
   const el = khung
   if (!el || !el.hasAttribute('data-an')) return
   el.removeAttribute('data-an')
+  anViLive = false
+  capLiveGon()
   window.removeEventListener('keydown', phimKhiAn, true)
   el.classList.remove('bpu-thu')
   baoAnHien(false)
@@ -352,13 +380,14 @@ function hienBang(): void {
 function phimKhiAn(e: KeyboardEvent): void {
   if (!bangAn() || (e.target as HTMLElement | null)?.closest?.('input,textarea')) return
   const k = e.key.toLowerCase()
-  if (k === 'd' || k === 'k' || k === 'f') { e.preventDefault(); e.stopImmediatePropagation(); chamTuTo(k === 'd'); return }
+  if (!anViLive && (k === 'd' || k === 'k' || k === 'f')) { e.preventDefault(); e.stopImmediatePropagation(); chamTuTo(k === 'd'); return }
   if (k === 'escape' || k === 'p') { e.preventDefault(); e.stopImmediatePropagation(); hienBang() }
 }
 /** LÊN BẢNG BẰNG TỜ CŨ (thầy 08/11 «gọi hs lên bảng thì chuyển về màn chiếu cũ … bấm đạt hoặc ko đạt thì tự động chuyển sang bình phản ứng»):
  *  bảng thu nhỏ rồi ẨN (giữ nối phòng + trạng thái), tờ chạy màn lên bảng nguyên bản cho em bảng vừa chọn. Không có tờ ⇒ false (bảng tự lo như cũ). */
 export function lenBangTo(em: { sbd: string; ten: string; goiNgay?: boolean; mau?: string; doi?: string }): boolean {
   if (!nguonTo || !khung) return false
+  anViLive = false
   try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten, goiNgay: em.goiNgay !== false, mau: em.mau ?? '', doi: em.doi ?? '' } }, '*') } catch { return false }
   anBang()
   try { nguonTo.focus() } catch { /* tờ chặn */ }
@@ -367,7 +396,7 @@ export function lenBangTo(em: { sbd: string; ten: string; goiNgay?: boolean; mau
 /** Tờ báo thầy đã chấm em lên bảng ⇒ bảng phóng lại, ghi kết quả + mở đáp án. Bảng không ẩn ⇒ bỏ qua (không ghi hai lần).
  *  10/11 (thầy «hiện KẾT QUẢ khoảng 3 giây rồi mới chuyển mượt về màn đua top»): thẻ kết quả nổi trên bảng đang phóng (TheKetQuaLenBang). */
 export function chamTuTo(dat: boolean): void {
-  if (!bangAn()) return
+  if (!bangAn() || anViLive) return
   hienKetQua(dat)
   hienBang()
   nhanCham?.(dat)

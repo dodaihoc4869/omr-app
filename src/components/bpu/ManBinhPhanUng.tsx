@@ -13,7 +13,7 @@ import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useSta
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type ViewEm } from '../../lib/bpu/phong'
-import { coQuyenTatMan, dangChiaDoi, dangXinQuyen, docQuyenTatMan, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
+import { coQuyenTatMan, conKhoaXoay, dangChiaDoi, dangXinQuyen, docQuyenTatMan, khoaXoay, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
 import KetQuaLenBangEm from './KetQuaLenBangEm'
 import type { Question } from '../../game/than-thu-v2/core'
@@ -22,6 +22,8 @@ type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
 import './bpu-hs.css'
 // LỜI GIẢI SAU KHI MỞ ĐÁP ÁN (thầy 07/11): đúng khối lời giải của màn làm bài — có bản Kính ⇒ Kính + nút «Lời giải thu gọn»; chưa có ⇒ lời giải thu gọn đầy đủ.
 const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
+/** LIVE BẢNG (10/11, docs/dac-ta-live-bang-1011.md): lớp bảng live của máy em + thư viện nối — nạp lười khi phòng báo `live.san` / `live.bat`. */
+const LopLive = lazy(() => import('../live/LopLive'))
 type LoiGiaiCauKieu = ComponentType<{ q: Question; solution: unknown; dapAn: string; hinhLoiGiai?: Question['hinhAnh'] }>
 
 const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
@@ -221,6 +223,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const daBaoRoi = useRef(false)
   const [nay, setNay] = useState(() => Date.now())
   const ws = useRef<WebSocket | null>(null)
+  /** LIVE: lớp live (nạp lười) nhận mọi tin của phòng qua `tin`, được báo khi nối lại qua `noiLai`; `veLive` = vé + gốc máy chủ của kết nối hiện tại. */
+  const cauLive = useRef<{ tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }>({ tin: null, noiLai: null })
+  const [veLive, setVeLive] = useState<{ ve: string; goc: string } | null>(null)
   const dung = useRef(false)
   const loi = useRef(0)
   const choGui = useRef<Tin[]>([])
@@ -299,14 +304,18 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         if (!j?.ok || !j.ve) { setTt('mat-mang'); henLai(); return }
         const w = new WebSocket(`${goc.replace(/^http/, 'ws')}/bpu/phong?ve=${encodeURIComponent(j.ve)}`)
         ws.current = w
+        w.binaryType = 'arraybuffer' // live: khung nét nhị phân
+        setVeLive((c) => (c && c.ve === j.ve && c.goc === goc ? c : { ve: String(j.ve), goc }))
         w.onopen = () => {
           loi.current = 0
+          cauLive.current.noiLai?.()
           kiemBu.current = buRoi.current != null
           w.send(JSON.stringify({ t: 'vao' })); w.send(JSON.stringify({ t: 'chao' }))
           const cho = choGui.current.splice(0); for (const t of cho) { try { w.send(JSON.stringify(t)) } catch { /* rớt */ } }
           clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000)
         }
         w.onmessage = (e) => {
+          cauLive.current.tin?.(e.data)
           if (typeof e.data !== 'string') return
           let m: Tin
           try { m = JSON.parse(e.data) as Tin } catch { return }
@@ -413,13 +422,17 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         if (daBaoRoi.current || dangXinQuyen()) return
         if (chia || !coQuyenTatMan()) { baoRoi(true); return }
         void kiemKhoaMan().then((khoa) => { if (!huy && khoa !== true && !document.hidden && !document.hasFocus()) baoRoi(true) })
-      }, NOI_MS)
+      }, Math.max(NOI_MS, conKhoaXoay() + 30)) // live: đang «khoá xoay» ⇒ xét sau khi hết khoá (tat-man.ts)
     }
+    // LIVE (đặc tả 4.7): máy xoay / vào-ra toàn màn hình ⇒ cỡ cửa sổ và hướng màn lệch nhau vài chục ms ⇒ khoá 600 ms rồi xét lại.
+    const xoay = () => { khoaXoay(); kiemNoi() }
     const anTrang = () => { if (document.hidden && !daBaoRoi.current && !tatMan) baoRoi(false) }
     document.addEventListener('visibilitychange', doi)
     window.addEventListener('blur', kiemNoi)
     window.addEventListener('focus', kiemNoi)
     window.addEventListener('resize', kiemNoi)
+    window.addEventListener('orientationchange', xoay)
+    document.addEventListener('fullscreenchange', xoay)
     window.addEventListener('pagehide', anTrang)
     const cham = () => thuVe(true) // em chạm vào màn Bình Phản Ứng ⇒ chắc chắn đã về (cửa sổ nổi nhận chạm thì trang này không nhận)
     window.addEventListener('pointerdown', cham, true)
@@ -431,6 +444,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       huy = true; clearTimeout(henNoi); clearTimeout(henKhoa)
       document.removeEventListener('visibilitychange', doi); window.removeEventListener('blur', kiemNoi); window.removeEventListener('focus', kiemNoi)
       window.removeEventListener('resize', kiemNoi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai)
+      window.removeEventListener('orientationchange', xoay); document.removeEventListener('fullscreenchange', xoay)
       window.removeEventListener('pointerdown', cham, true)
     }
   }, [baoRoi, veLai, thuVe, dangChoi])
@@ -633,6 +647,24 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     else nutGui = <NutGuiNoi key={khoaLuot} hien={duChon} tuLuan={!!l.tuLuan} onGui={guiTra} />
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
+  // LIVE BẢNG (10/11): phòng báo thầy sẵn sàng / đang live ⇒ nạp lười lớp live. Điểm quyết 5: lượt đang mở mà em CHƯA gửi ⇒ giữ màn làm bài + dải nhỏ
+  // «Thầy đang live» (vẫn nghe tiếng), gửi xong tự sang bảng live. Đang hiện cảnh báo rời màn ⇒ không che. Đề trên giấy = khối đề dùng chung, chỉ xem.
+  const lv = v?.live ?? null
+  const liveBat = !!lv?.bat && !v?.ketThuc
+  const dangLam = !!l && !!q && l.pha === 'tra-loi' && !che && !hetGio
+  const cheLive = !liveBat ? 'an' : vuaRoi ? 'an' : dangLam ? 'dai' : 'bang'
+  const khong = () => {}
+  const deLive = cheLive === 'bang' && q && l && LC ? boChang(<>
+    <LC.DeCau q={q} stt={l.so} />
+    {l.tuLuan ? null : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value="" onChon={khong} khoa /> : l.phan === 'II' ? <LC.ChonDungSai q={q} value="" onChon={khong} khoa /> : null}
+  </>) : null
+  const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
+    <Suspense fallback={null}>
+      <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} cau={cauLive} view={lv} che={cheLive} de={deLive} khoaDe={q?.qid ?? ''}
+        doi={e ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi} />
+    </Suspense>
+  ) : null
+
   if (an) return null
   return createPortal(
     <div ref={gocRef} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
@@ -645,6 +677,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
       {nutGui}
       {lopChe}
+      {lopLive}
     </div>,
     document.body,
   )

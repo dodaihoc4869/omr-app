@@ -393,3 +393,10 @@ html[data-bpu-an] .bpu-bao-chay { display: none; }
 html[data-bpu-che-to] .lop-xem-phieu { visibility: hidden; }
 .bpu-bang .bb-tren .bb-ve-chon{ color: var(--tr-chu-2); } /* 10/11 «Chọn câu khác» (C) trên màn đua; mở đáp án có thẻ «Lên bảng: …» ⇒ ẩn nút (phím C vẫn chạy) cho «Câu tiếp» không tràn mép */
 .bpu-bang .bb-tren .bb-pill[style]{ padding: 8px 14px; font-size: 23px; } /* thẻ «Lên bảng: tên · Đạt · …» gọn hơn: tên dài không đẩy «Câu tiếp» ra khỏi màn */
+
+/* LIVE BẢNG (10/11, docs/dac-ta-live-bang-1011.md mục 2.1): nút «Live» trên thanh trên; đang live mà bảng đang lui về tờ chiếu ⇒ ẩn viền đỏ toàn màn
+   (tờ có thẻ gọn «N em rời màn» không che bảng thầy đang viết). */
+.bpu-bang .bb-live i { display: block; flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--tr-sai); }
+.bpu-bang .bb-live.bat { background: var(--tr-sai); color: var(--tr-chieu-giay); box-shadow: none; }
+.bpu-bang .bb-live.bat i { background: currentColor; }
+html[data-bpu-live-gon] .bpu-bao-chay { display: none; }

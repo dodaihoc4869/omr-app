@@ -2,7 +2,7 @@
 // Hai lớp canvas: «đã chốt» (vẽ một lần; chỉ vẽ lại khi đổi cỡ / xoá / bảng mới) và «đang viết» (mỗi khung xoá đúng ô vừa vẽ rồi vẽ lại đoạn đuôi nét dở).
 // Nét dở dài thì phần đầu đã ổn định in dần xuống lớp đã chốt (`mocDong`) ⇒ mỗi khung chỉ dựng đoạn đuôi, như máy thầy.
 // Khung quy chiếu = «cửa sổ thầy ảo» (bo-cuc.ts): canvas chỉ phủ vùng chiếu nên mọi nét dời (−ox, −oy).
-import type { DiemBut, KhungBut, LoiBut, NetBut, XuLyBut } from '../../lib/but-bang-loi'
+import type { KhungBut, LoiBut, NetBut, SuKienBut, XuLyBut } from '../../lib/but-bang-loi'
 
 type G2 = CanvasRenderingContext2D
 interface NetCoNho extends NetBut { _k?: string; _d?: Path2D | number[] }
@@ -76,41 +76,62 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     for (const d of doDang.values()) { d.st = loi.moXuLy(d.net, KH); loi.xuLyThem(d.st, d.net.diem, d.net.diem.length); d.dong = 0 }
     veLai()
   }
-  /** Đặt cả bảng (vào live, nối lại, bảng mới, xoá). Nét dở giữ nguyên trừ khi `boDo`. */
-  function datNet(net: readonly NetBut[], boDo = false): void {
+  /** Đặt cả bảng (vào live, nối lại, bảng mới). Nét dở bỏ hết. */
+  function datNet(net: readonly NetBut[]): void {
     ds = net.map((n) => n as NetCoNho)
-    if (boDo) { doDang.clear(); xoaSong() }
+    doDang.clear(); xoaSong()
     veLai()
   }
-  /** Một nét đã chốt tới từ sổ nét. Nét này đang viết dở trên máy em và đã đủ điểm ⇒ chỉ in nốt đoạn đuôi (không vẽ lại cả lớp). */
+  /** Một nét đã chốt tới từ sổ nét (chèn ở `vt`; bỏ trống = cuối). */
   function themNet(net: NetBut, vt?: number | null): void {
     const n = net as NetCoNho, cu = ds.findIndex((x) => x.id === n.id)
-    const d = doDang.get(n.id)
-    doDang.delete(n.id)
-    if (cu >= 0) { ds[cu] = n; xoaSong(); veLai(); return }
+    if (doDang.delete(n.id)) xoaSong()
+    if (cu >= 0) { ds[cu] = n; veLai(); return }
     const cuoi = vt == null || vt >= ds.length
     if (cuoi) ds.push(n); else ds.splice(Math.max(0, vt), 0, n)
     if (!KH) return
-    if (d) xoaSong()
-    if (!cuoi || (d && d.dong > 0 && d.st.n !== n.diem.length)) { veLai(); return }
-    if (d && d.dong > 0) to(gC!, loi.vien(d.st, d.dong, -1, null, true), n.mau, n.cong === 'tay')
-    else veNetChot(n)
+    if (cuoi) veNetChot(n); else veLai()
   }
-  /** Thêm điểm cho nét đang viết (tạo mới nếu chưa có). `tu` = số điểm đã có trước lô này (lô lệch ⇒ bỏ phần trùng). */
-  function themDiem(dau: Pick<NetBut, 'id' | 'cong' | 'mau' | 'co'>, diem: readonly DiemBut[], tu: number): void {
-    if (!KH || !diem.length) return
-    let d = doDang.get(dau.id)
-    if (!d) { const net: NetBut = { id: dau.id, cong: dau.cong, mau: dau.mau, co: dau.co, diem: [] }; d = { net, st: loi.moXuLy(net, KH), dong: 0, dau: null }; doDang.set(dau.id, d) }
-    const bo = d.net.diem.length - tu
-    if (bo < 0) return // thủng (mất lô giữa chừng): chờ bản chốt từ sổ nét
-    for (let i = Math.max(0, bo); i < diem.length; i++) d.net.diem.push(diem[i]!)
-  }
-  /** Đầu nét nội suy của khung này (toạ độ 0..1) — vẽ làm đuôi của nét dở. */
-  function datDau(id: string, dau: { x: number; y: number } | null): void {
+  /** Nét dở đã phát đủ điểm ⇒ chốt tại chỗ: in nốt đoạn đuôi (thon cuối nét) xuống lớp đã chốt, không vẽ lại cả lớp. */
+  function chotNet(id: string): void {
     const d = doDang.get(id)
-    if (d) d.dau = dau ? [dau.x, dau.y] : null
+    if (!d) return
+    doDang.delete(id); xoaSong()
+    ds.push(d.net as NetCoNho)
+    if (!KH || !gC) return
+    loi.xuLyThem(d.st, d.net.diem, d.net.diem.length)
+    if (d.dong > 0) to(gC, loi.vien(d.st, d.dong, -1, null, true), d.net.mau, d.net.cong === 'tay')
+    else veNetChot(d.net as NetCoNho)
   }
-  function boDo(id: string): void { if (doDang.delete(id)) xoaSong() }
+  function xoaNet(ids: readonly string[]): void {
+    let chot = false, doi = false
+    for (const id of ids) {
+      const d = doDang.get(id)
+      if (d) { doDang.delete(id); doi = true; if (d.dong > 0) chot = true }
+      const k = ds.findIndex((x) => x.id === id)
+      if (k >= 0) { ds.splice(k, 1); chot = true }
+    }
+    if (doi) xoaSong()
+    if (chot) veLai()
+  }
+  /** Áp MỘT sự kiện của bộ máy bút (thư viện live phát theo đúng thứ tự). `trang` ⇒ nơi gọi đặt lại bố cục trước rồi mới gọi hàm này. */
+  function ap(sk: SuKienBut): void {
+    if (sk.loai === 'trang') datNet(sk.net)
+    else if (sk.loai === 'net-moi') {
+      if (sk.xong) { themNet({ ...sk.net, diem: sk.net.diem.slice() }, sk.vt); return }
+      if (!KH) return
+      const net: NetBut = { id: sk.net.id, cong: sk.net.cong, mau: sk.net.mau, co: sk.net.co, diem: sk.net.diem.slice() }
+      doDang.set(net.id, { net, st: loi.moXuLy(net, KH), dong: 0, dau: null })
+    }
+    else if (sk.loai === 'them-diem') { const d = doDang.get(sk.id); if (d) for (const p of sk.diem) d.net.diem.push(p) }
+    else if (sk.loai === 'net-xong') chotNet(sk.id)
+    else if (sk.loai === 'xoa') xoaNet(sk.id)
+  }
+  /** Đầu nét nội suy của khung này (toạ độ 0..1) — vẽ làm đuôi của nét dở. Nét không có trong `dau` ⇒ bỏ đuôi. */
+  function datDau(dau: readonly { id: string; x: number; y: number }[]): void {
+    for (const d of doDang.values()) d.dau = null
+    for (const h of dau) { const d = doDang.get(h.id); if (d) d.dau = [h.x, h.y] }
+  }
   /** MỘT khung vẽ của lớp «đang viết». Trả số nét dở đã vẽ. */
   function veSong(): number {
     if (!gS || !gC || !KH || !kv) return 0
@@ -137,6 +158,6 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   function toiPx(x: number, y: number): [number, number] {
     return kv ? [x * kv.Wv - kv.ox, y * kv.Hv - kv.oy] : [0, 0]
   }
-  return { datKhung, datNet, themNet, themDiem, datDau, boDo, veSong, veLai, toiPx, soNet: (): number => ds.length, soDo: (): number => doDang.size }
+  return { datKhung, ap, datDau, veSong, veLai, toiPx, soNet: (): number => ds.length, soDo: (): number => doDang.size }
 }
 export type VeBang = ReturnType<typeof taoVeBang>

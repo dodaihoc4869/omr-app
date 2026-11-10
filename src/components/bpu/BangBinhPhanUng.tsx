@@ -9,6 +9,7 @@ import { goiLenh } from '../../lib/goi-lenh-thay'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { DOI_BPU, KJ, kyHieu, tenNgan, type ViewBang } from '../../lib/bpu/phong'
+import { noiLive } from './cau-live'
 import { Chu, HinhDe, VungVietBang } from './bang-phu'
 import { Lua, MaQr, Ngoc, Sao } from './bang-hinh'
 import TheKetQuaLenBang from './TheKetQuaLenBang'
@@ -82,13 +83,14 @@ export interface PropsBang {
   bo?: boolean
   /** (09/11) Nơi gắn bảng (khung của gốc chung gan-gv) ⇒ thu nhỏ / ẩn khung là ẩn đúng bảng. Không có ⇒ body. */
   gocPortal?: HTMLElement | null
+  them?: React.ReactNode
   /** (09/11) «Hôm nay làm gì?» sau điểm danh: Kiểm tra đầu giờ / Chữa câu khó / Kiểm tra ôn tập ⇒ tấm buổi dạy (gan-gv). */
   onHoatDong?: (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => void
   /** (09/11) «Kết thúc buổi học» ở «Hôm nay làm gì?» — trả câu báo lỗi (rỗng = xong). */
   onKetThuc?: (buoiId: string) => Promise<string>
 }
 
-export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, diemDanh = false, onHoatDong, onKetThuc, bo }: PropsBang) {
+export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuDong = false, onDong, onTat, onToi, onGiai, layGiai, onKhongMo, lenBangTo, dangKyChamTo, onChieuCau, gocPortal, them, diemDanh = false, onHoatDong, onKetThuc, bo }: PropsBang) {
   // Điểm danh (không có câu): mã + QR hiện NGAY từ props, không chờ phòng; phòng lỗi ⇒ lùi bản chiếu cũ (onTat).
   // 10/11: có câu mà phòng chưa nối ⇒ view rỗng + lượt chờ ⇒ màn đua ngay (không «Đang mở…» rồi lượt cũ).
   const [v, setV] = useState<ViewBang>(() => viewRong(buoiId))
@@ -201,6 +203,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
       const goc0 = (await layDiaChiMayChu('')) || 'https://omr.ttadodaihoc.workers.dev'
       const w = new WebSocket(`${goc0.replace(/^http/, 'ws')}/bpu/phong?ve=${encodeURIComponent(String(r.du.ve))}`)
       ws.current = w
+      noiLive(w, String(r.du.ve), goc0)
       w.onopen = () => { lan = 0; w.send('{"t":"chao"}'); clearInterval(ping); ping = setInterval(() => { try { w.send('{"t":"ping"}') } catch { /* rớt */ } }, 45_000) }
       w.onmessage = (e) => { if (typeof e.data !== 'string') return; try { const m = JSON.parse(e.data) as { t?: string }; if (m.t === 'bang') { daCoTin = true; setV(m as unknown as ViewBang) } else if (m.t === 'dk') { const l = (m as { lenh?: string }).lenh, d = dkRef.current; if (l === 'toi') d.onToi?.(1); else if (l === 'lui') d.onToi?.(-1); else if (l === 'giai') d.onGiai?.() } } catch { /* bỏ qua */ } }
       w.onclose = () => { if (ws.current !== w) return; ws.current = null; clearInterval(ping); if (dung) return; hen = setTimeout(() => void noi(), [1500, 3000, 6000, 12000][Math.min(lan++, 3)]) }
@@ -478,7 +481,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     : man === 'mo' && onToi ? <button type="button" className="bb-chinh" onClick={() => sangCau(1)}>Câu tiếp<kbd>→</kbd></button> : null
   // 09/11 thầy «thu hết các nút lại, chỉ để nút gọi lên bảng thôi»: thanh trên chỉ còn MỘT nút chính; các việc khác dùng phím (bấm ? xem bảng phím).
   const tren = (giua: React.ReactNode, phai?: React.ReactNode) => (
-    <div className="bb-tren"><div className={`bb-logo${man === 'diem-danh' ? '' : ' gon'}`}><Lua /><span>Bình Phản Ứng</span></div>{giua}<div className="bb-lop">{v?.lop ?? ''}{ma && man !== 'diem-danh' ? <span className="bb-ma" title="Mã vào lớp">Mã <b>{ma}</b></span> : null}</div><div className="bb-gian" />{phai}{chinh}</div>
+    <div className="bb-tren"><div className={`bb-logo${man === 'diem-danh' ? '' : ' gon'}`}><Lua /><span>Bình Phản Ứng</span></div>{giua}<div className="bb-lop">{v?.lop ?? ''}{ma && man !== 'diem-danh' ? <span className="bb-ma" title="Mã vào lớp">Mã <b>{ma}</b></span> : null}</div><div className="bb-gian" />{them}{phai}{chinh}</div>
   )
   // Nút đã thu (09/11) ⇒ bảng phím luôn kèm: Enter / C chọn câu, F toàn màn hình (trừ lúc chấm em: F = Chưa đạt).
   const phimThem = (): [string, string, boolean?][] => [...(onChieuCau ? [man === 'diem-danh' ? ['Enter', 'Xong điểm danh · chọn câu', true] as [string, string, boolean] : ['C', 'Chọn câu khác'] as [string, string]] : []), ...(man === 'goi' || man === 'lam-bang' ? [] : [['F', 'Toàn màn hình'] as [string, string]])]

@@ -381,6 +381,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   return {
     trangThai: (): TrangThaiLiveThay => ({ ...tt }),
     noiSan, dsMic, moMic, mucAm, bat, tat, datTiengMic,
+    /** (Đợt 1B thêm) Thầy đóng thẻ chọn mic mà KHÔNG bật live ⇒ thả mic đã mở thử (đèn mic tắt). Đang live thì không đụng. */
+    thaMic: (): void => { if (!tuBat) ngatMic() },
     nhanSuKienBut, guiAnh,
     /** Công tắc buổi: `xa` = cho em ở xa vào xem (điểm quyết 4), `tiengLop` = máy em trong lớp cũng phát tiếng (điểm quyết 3). */
     dat: (o: { xa?: boolean; tiengLop?: boolean }): void => { tuy.kenh.gui({ t: 'live-dat', ...o }) },
