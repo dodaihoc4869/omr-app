@@ -93,6 +93,19 @@ Cái giá của «kịp hạn»: bài này thêm 1 ngày Học mới (5 thay vì
 - Hộp Giao bài (xem trước) dùng cùng hàm ⇒ số thầy thấy = số máy chủ ghi.
 - Chưa tính: lỗi tồn sẵn có của từng em (số thật: 149 em từ 112 câu sai trở lên) — ngày Sửa dự báo mới chỉ tính lỗi phát sinh từ lượng câu mới.
 
+## 6d. Bảng theo dõi bốn chỉ số — MỐC TRƯỚC 11/11 (workflow chỉ đọc `theo-doi-de-28.yml`, tự chạy 00:20 VN mỗi ngày; lượt đầu 10/11 18:50)
+Mỗi lượt in 14 ngày gần nhất. Mốc dưới đây là 14 ngày 27/10 – 09/11 (trước luật đề 28 theo suất); 275 em đang có bài.
+
+| Chỉ số | Mốc trước 11/11 | Kỳ vọng sau 11/11 |
+|---|---|---|
+| 1. Em-ngày đúng 18 · 4 · 6 trong 28 câu đầu | 4 / 1 730 em-ngày đủ 28 câu (0,2 %); sát (lệch ≤ 1 mỗi phần) 43 / 1 730 (2,5 %) | gần 100 % số em-ngày đủ 28 câu |
+| 2. Em làm đủ 28 câu mỗi ngày | trung bình 121 em/ngày (44 % của 275); tuần 03 – 09/11: 150 em/ngày (55 %) | không giảm |
+| 3. Lỗi tồn (lần làm gần nhất của câu là sai) | 35 767 câu ở 279 em; 151 em từ 112 câu trở lên. Mỗi ngày ~2 800 – 5 000 lượt sai, ~1 400 lượt sửa đúng | tổng giảm dần |
+| 4. Điểm Kiểm tra ôn tập | trung bình 8,22 trên 1 201 bài đã nộp | không giảm |
+| Ngày kiểm tra còn làm thêm bài tập | gần như mọi em (09/11: 81 / 81 em nộp bài) | 0 em |
+
+Ghi chú: mức 28 câu/ngày mới có từ 09/11, nên chỉ số 2 của các ngày trước chỉ để tham khảo. Từ 07/11 mỗi ngày có 40 – 54 bài Kiểm tra ôn tập ở trạng thái chờ nguồn.
+
 ## 7. Build (sau khi thầy duyệt) — không đổi giao diện
 1. `server/src/rut-28.ts`: hàm thuần `rut28(ứng viên, {kịpHạn})` + một bảng ma trận dùng chung (bỏ ba bản chép). Test khoá: 10 000 đề giả, đề nào cũng đủ 28 và đúng phần khi kho còn câu.
 2. `chonGoi7`: thay phần xếp câu mới + bốn tầng lấp bằng một lời gọi `rut28`; bỏ `giuOn`, `onSom`, nhánh hạ mức.

@@ -1,0 +1,49 @@
+# THEO DÕI «ĐỀ 28 THEO SUẤT» (CHỈ ĐỌC — thầy 10/11 «ok» với bảng theo dõi bốn chỉ số trước khi nói tới thương mại hoá):
+#   1. tỉ lệ em-ngày ĐÚNG 18 · 4 · 6 trong 28 câu đầu của ngày;   2. tỉ lệ em làm ĐỦ 28 câu;
+#   3. lỗi tồn (câu mà lần làm gần nhất là sai);                   4. điểm Kiểm tra ôn tập.
+# Mỗi lượt in đủ 14 ngày gần nhất ⇒ một lượt bất kỳ đã thấy xu hướng, không cần lưu trạng thái. CHỈ SELECT đếm gộp — không in mã em, tên em. KHÔNG `d1 export`.
+# Tự chạy 00:20 giờ VN mỗi ngày (ngoài giờ học); mỗi câu cách nhau 4 giây (D1 từng 429 khi dồn lệnh). Đặc tả: docs/de-xuat-28-cau-v6-1011.md.
+name: Theo dõi đề 28 câu (chỉ đọc)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '20 17 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: theo-doi-de-28
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
+          GOC="CASE WHEN instr(qid,'~')>0 THEN substr(qid,1,instr(qid,'~')-1) ELSE qid END"
+          LAM="ket_qua IS NOT NULL AND COALESCE(purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')"
+          PHAN="(SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=x.goc LIMIT 1)"
+          TU="date('now','+7 hours','-14 days')"
+
+          q "1+2 cấu trúc 28 câu đầu của ngày và số em đủ 28 câu — theo ngày, loại ngày" "WITH s AS (SELECT sbd, ngay_vn, $GOC goc, MIN(luc) luc FROM su_kien_hoc WHERE ngay_vn >= $TU AND $LAM AND ma_nguon NOT LIKE 'ktcn:%' AND nguon NOT IN ('thi','chua_loi','tu_luyen') GROUP BY sbd, ngay_vn, goc), r AS (SELECT sbd, ngay_vn, goc, ROW_NUMBER() OVER (PARTITION BY sbd, ngay_vn ORDER BY luc, goc) k, COUNT(*) OVER (PARTITION BY sbd, ngay_vn) n FROM s), m AS (SELECT x.goc, $PHAN phan FROM (SELECT DISTINCT goc FROM s) x), e AS (SELECT r.sbd, r.ngay_vn, MAX(r.n) n, SUM(r.k<=28 AND m.phan='I') i, SUM(r.k<=28 AND m.phan='II') ii, SUM(r.k<=28 AND m.phan='III') iii FROM r JOIN m ON m.goc=r.goc GROUP BY r.sbd, r.ngay_vn) SELECT e.ngay_vn ngay, COALESCE(l.loai,'-') loai, COUNT(*) em_co_lam, SUM(n>=28) em_du_28, SUM(n>=28 AND i=18 AND ii=4 AND iii=6) dung_18_4_6, SUM(n>=28 AND ABS(i-18)<=1 AND ABS(ii-4)<=1 AND ABS(iii-6)<=1) sat_18_4_6, ROUND(AVG(CASE WHEN n>=28 THEN i END),1) tb_I, ROUND(AVG(CASE WHEN n>=28 THEN ii END),1) tb_II, ROUND(AVG(CASE WHEN n>=28 THEN iii END),1) tb_III, SUM(n>=28 AND ii=0) khong_co_DS, SUM(n>=28 AND iii=0) khong_co_TLN FROM e LEFT JOIN goi_bai_7_loai_ngay l ON l.sbd=e.sbd AND l.ngay=e.ngay_vn GROUP BY 1,2 ORDER BY 1,2"
+
+          q "2b số em đang có bài (mẫu số)" "SELECT COUNT(DISTINCT e.sbd) em_co_bai FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE COALESCE(h.trang_thai,'') NOT IN ('khoa','da_nghi')"
+
+          q "3 lỗi tồn hôm nay (lần làm gần nhất của câu là sai) — gộp theo cỡ" "WITH s AS (SELECT sbd, $GOC goc, ket_qua, ROW_NUMBER() OVER (PARTITION BY sbd, $GOC ORDER BY luc DESC) r FROM su_kien_hoc WHERE $LAM), e AS (SELECT sbd, COUNT(*) n FROM s WHERE r=1 AND ket_qua=0 GROUP BY sbd) SELECT CASE WHEN n<12 THEN 'a 1-11' WHEN n<28 THEN 'b 12-27' WHEN n<56 THEN 'c 28-55' WHEN n<112 THEN 'd 56-111' ELSE 'e 112+' END co, COUNT(*) em, SUM(n) cau_sai FROM e GROUP BY 1 ORDER BY 1"
+
+          q "3b câu sai mới và câu sửa đúng — theo ngày" "SELECT ngay_vn ngay, SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) luot_sai, SUM(CASE WHEN ket_qua=1 AND nguon='chua_loi' THEN 1 ELSE 0 END) luot_sua_dung, SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) luot_dung, COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE ngay_vn >= $TU AND $LAM GROUP BY 1 ORDER BY 1"
+
+          q "4 Kiểm tra ôn tập — theo ngày" "SELECT k.ngay, SUM(k.trang_thai='da_nop') da_nop, SUM(k.trang_thai='het_han') het_han, SUM(k.trang_thai IN ('hen','can_lam')) chua_lam, SUM(k.trang_thai='cho_nguon') cho_nguon, ROUND(AVG(CASE WHEN k.trang_thai='da_nop' THEN k.diem END),2) diem_tb, SUM(CASE WHEN k.trang_thai='da_nop' AND k.diem>=8 THEN 1 ELSE 0 END) tu_8_diem FROM kiem_tra_ca_nhan k WHERE k.ngay >= $TU AND k.ngay <= date('now','+7 hours') GROUP BY 1 ORDER BY 1"
+
+          q "4b ngày Kiểm tra ôn tập: em đã nộp bài còn làm thêm bao nhiêu câu bài tập (từ 11/11 phải là 0)" "SELECT k.ngay, COUNT(*) em_nop, SUM(CASE WHEN EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=k.sbd AND s.ngay_vn=k.ngay AND s.ket_qua IS NOT NULL AND s.ma_nguon NOT LIKE 'ktcn:%' AND s.nguon NOT IN ('thi','chua_loi','tu_luyen') AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')) THEN 1 ELSE 0 END) em_lam_them_bai FROM kiem_tra_ca_nhan k WHERE k.ngay >= $TU AND k.trang_thai='da_nop' GROUP BY 1 ORDER BY 1"
