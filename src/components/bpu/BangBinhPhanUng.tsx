@@ -20,7 +20,7 @@ import ThapLua from './ThapLua'
 import { bayKj, boCucThap, layBienDong, useDuaTop } from './dua-top'
 import { lyDoLenBang } from '../../lib/bpu/ly-do'
 import { DAY_LUOI, DAY_LUOI_TOAN_MAN, KHE, TRAI_LUOI, boLuoi, tenGoiLop, type Luoi } from '../../lib/bpu/luoi'
-import { layEmChieu } from '../../lib/ung-vien-chieu'
+import { layEmChieu, napTruocBpu } from '../../lib/ung-vien-chieu'
 import type { Question } from '../../game/than-thu-v2/core'
 import { VeBang, type CanhBang } from './bang-ve'
 import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
@@ -241,7 +241,13 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   // Dải tên: CHỈ các em có mặt (thầy 07/11), tối đa hai hàng; thứ tự giữ theo danh sách lớp.
   const hien = useMemo(() => (v?.ds ?? []).filter((e) => e.vao), [v?.ds])
   const L = useMemo(() => boLuoi(hien.length, toanMan ? DAY_LUOI_TOAN_MAN : DAY_LUOI), [hien.length, toanMan])
-  const tenGoi = useMemo(() => tenGoiLop(v?.ds ?? []), [v?.ds])
+  // 10/11 (tác tử tốc độ): mỗi tin phòng (một em gửi = một tin) tạo mảng `ds` MỚI ⇒ tên gọi + cỡ chữ (đo canvas từng chữ của cả lớp) bị tính lại cho mỗi em gửi dồn.
+  // Chỉ phụ thuộc mã + tên + có mặt ⇒ khoá bằng chuỗi, tính lại khi ĐÚNG những thứ ấy đổi.
+  const khoaTen = (v?.ds ?? []).map((e) => `${e.sbd}\u0001${e.ten}\u0001${e.vao ? 1 : 0}`).join('\u0002')
+  const dsTen = useRef<{ khoa: string; ds: NonNullable<typeof v>['ds'] }>({ khoa: '', ds: [] })
+  if (dsTen.current.khoa !== khoaTen) dsTen.current = { khoa: khoaTen, ds: v?.ds ?? [] }
+  const tenGoi = useMemo(() => tenGoiLop(dsTen.current.ds), [khoaTen])
+  const hienTen = useMemo(() => dsTen.current.ds.filter((e) => e.vao), [khoaTen])
   // CỠ CHỮ: một cỡ chung theo tên thường gặp (85% số tên nằm trọn một dòng — đo bằng canvas theo phông thật; không đo được ⇒ ước 0,62 em/kí tự);
   // tên dài hơn (Nguyên, Trường…) thì riêng ô đó thu chữ cho vừa. Ô hai chữ («Minh Anh») xuống hai dòng, không bẻ giữa chữ.
   const coChu = useMemo(() => {
@@ -249,13 +255,13 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     try { ctx = document.createElement('canvas').getContext('2d') } catch { /* jsdom */ }
     if (ctx) ctx.font = `800 100px 'Be Vietnam Pro', ${getComputedStyle(document.body).fontFamily || 'sans-serif'}`
     const rong = new Map<string, number>()
-    for (const e of hien) { const t = tenGoi.get(e.sbd) ?? ''; rong.set(e.sbd, Math.max(1.4, ...t.split(' ').map((w) => (ctx ? ctx.measureText(w).width / 100 : w.length * 0.62) * 0.97))) }
+    for (const e of hienTen) { const t = tenGoi.get(e.sbd) ?? ''; rong.set(e.sbd, Math.max(1.4, ...t.split(' ').map((w) => (ctx ? ctx.measureText(w).width / 100 : w.length * 0.62) * 0.97))) }
     const xep = [...rong.values()].sort((a, b) => a - b), p85 = xep[Math.min(xep.length - 1, Math.floor(xep.length * 0.85))] ?? 2
     const cho = L.w - 14, chung = Math.floor(Math.max(13, Math.min(36, L.h * 0.47, cho / p85))) // 08/11 «chữ quá nhỏ»: tới 36 px (cũ 30)
     const rieng = new Map<string, number>()
     for (const [sbd, r] of rong) if (r * chung > cho) rieng.set(sbd, Math.max(11, Math.floor(cho / r)))
     return { chung, rieng }
-  }, [tenGoi, hien, L])
+  }, [tenGoi, hienTen, L])
   // ĐO THẬT TỪNG Ô (07/11 «tên vẫn bị cắt»): ô nào chữ còn tràn thì hạ cỡ chữ RIÊNG ô đó tới khi vừa (≥ 10 px). 10/11: tên ở thẻ / hàng khác cũng thu, không «…».
   const vuaTen = useCallback(() => {
     const ds = goc.current?.querySelectorAll<HTMLElement>('.bb-bth .bb-o .ten')
@@ -273,6 +279,14 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
   /** Em đang ở ngoài app (hợp đồng phòng 09/11 `roiNay`; phòng cũ chưa có ⇒ rỗng). */
   const roiNay = ((v as { roiNay?: string[] } | null)?.roiNay ?? []).filter((s) => ds.some((e) => e.sbd === s))
   const daGui = new Set(l?.daGui ?? [])
+  // 10/11 (tác tử tốc độ): em nộp ĐẦU TIÊN ⇒ nạp trước ứng viên «Lên bảng» (lịch sử cả lớp, 11 câu D1) — thầy bấm L / N lúc nào cũng có em ngay, không chờ chuyến máy chủ.
+  const coEmNop = (l?.daGui?.length ?? 0) > 0, qidNap = l?.qid, phaNap = l?.pha, lopNap = v?.lop
+  useEffect(() => {
+    if (!coEmNop || phaNap !== 'tra-loi' || !qidNap || !lopNap) return
+    const h = setTimeout(() => napTruocBpu([qidNap], (v?.ds ?? []).map((e) => e.sbd), lopNap), 400)
+    return () => clearTimeout(h)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [coEmNop, qidNap, l?.so, phaNap, lopNap])
 
   // Sân khấu co theo màn + canvas.
   useLayoutEffect(() => {

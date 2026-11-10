@@ -246,6 +246,7 @@ export async function vaoPhongBpu(req: Request, env: Env): Promise<Response> {
 }
 
 // ── Durable Object ──
+const NHIP_TRA_MS = 120
 const chamSo = (traLoi: string, dapAn: string): boolean => grade({ phan: 'III', correct: dapAn }, traLoi)
 interface KemBpu { v: 'gv' | 'hs'; s: string }
 interface DongGhi { buoi_id: string; sbd: string; qid: string; luot: number; chon: string; dung: number; giay: number; kj: number; doi: number; roi: number; len_bang: number; luc: string }
@@ -253,6 +254,7 @@ interface DongGhi { buoi_id: string; sbd: string; qid: string; luot: number; cho
 export class PhongBinhPhanUng {
   private st: L.TrangThaiPhong | null | undefined = undefined
   private henGui: ReturnType<typeof setTimeout> | null = null
+  private lucPhat = 0
 
   constructor(private ctx: DurableObjectState, private env: Env) {
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
@@ -280,9 +282,19 @@ export class PhongBinhPhanUng {
   private phat(): void {
     const st = this.st
     if (!st) return
+    this.lucPhat = Date.now()
+    if (this.henGui) { clearTimeout(this.henGui); this.henGui = null } // lần phát này đã mang trạng thái mới nhất ⇒ hẹn giờ gom cũ không cần nữa
     const bang = JSON.stringify(L.viewBang(st, chamSo))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
     for (const ws of this.ctx.getWebSockets('hs')) { const a = ws.deserializeAttachment() as KemBpu | null; if (a?.s) this.gui(ws, JSON.stringify(L.viewEm(st, a.s))) }
+  }
+  /** Nhiều em NỘP DỒN (10/11, tác tử tốc độ): mỗi bài nộp từng phát view tới thầy + MỌI máy em (N em nộp = N×N tin, mỗi tin mang cả đề) ⇒ bảng vẽ lại mỗi tin.
+   *  Nhịp: tin đầu đi NGAY (em nộp lẻ không trễ), các tin kế trong 120 ms gom thành MỘT lần phát (đúng trạng thái mới nhất). Em nộp vẫn nhận `tra-kq` ngay. */
+  private phatNhip(): void {
+    const cho = NHIP_TRA_MS - (Date.now() - this.lucPhat)
+    if (cho <= 0) { this.phat(); return }
+    if (this.henGui) return
+    this.henGui = setTimeout(() => { this.henGui = null; this.phat() }, cho)
   }
   /** Gom tin (tiếp sức, đoán): tối đa ~4 lần/giây tới mọi máy. */
   private phatSau(): void {
@@ -413,7 +425,7 @@ export class PhongBinhPhanUng {
     }
     if (!doi) return
     await this.luu(a.v === 'gv')
-    if (gom) this.phatSau(); else this.phat()
+    if (gom) this.phatSau(); else if (j.t === 'tra') this.phatNhip(); else this.phat()
   }
 
   async webSocketClose(): Promise<void> { /* rời màn do máy em tự báo (`roi` / `ve`); rớt kết nối KHÔNG tính rời, không vào `roiNay` */ }
