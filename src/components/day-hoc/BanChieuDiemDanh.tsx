@@ -424,7 +424,7 @@ function MaDoiSau({ luc, xong }: { luc: number | null; xong: boolean }) {
             </b>
           </>
         ) : (
-          'Mã đổi mỗi phút'
+          'Mã dùng cả buổi'
         )}{' '}
         · mỗi em chỉ điểm danh cho chính mình
       </p>

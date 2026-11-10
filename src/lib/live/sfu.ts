@@ -113,29 +113,37 @@ export async function traLoiMoi(pc: RTCPeerConnection, mt: MoiTruongLive, sdpMoi
   return pc.localDescription?.sdp ?? ''
 }
 
-/** Số đo trích từ `getStats()` (mọi trường có thể vắng tuỳ trình duyệt). */
-export interface SoWebRtc {
-  /** RTT tới SFU (ms). */
-  rtt: number | null
-  /** Jitter tiếng nhận (ms). */
+/** Số đo của MỘT luồng tiếng nhận về. */
+export interface SoTiengNhan {
+  /** `mid` của luồng trong kết nối (trình duyệt cũ không báo ⇒ null). */
+  mid: string | null
+  /** Jitter (ms). */
   jitter: number | null
-  /** Tổng trễ đệm tiếng (giây) + số mẫu đã phát — lấy hiệu hai lần đọc ra trễ đệm trung bình. */
+  /** Tổng trễ đệm (giây) + số mẫu đã phát — lấy hiệu hai lần đọc ra trễ đệm trung bình. */
   demTong: number | null
   demSo: number | null
   goiNhan: number | null
   goiMat: number | null
   mucAm: number | null
 }
-export function docSoWebRtc(bc: RTCStatsReport): SoWebRtc {
-  const r: SoWebRtc = { rtt: null, jitter: null, demTong: null, demSo: null, goiNhan: null, goiMat: null, mucAm: null }
+/** Số đo trích từ `getStats()` (mọi trường có thể vắng tuỳ trình duyệt). Các trường tiếng là của luồng CHÍNH (tiếng thầy trên máy em; tiếng em trên máy thầy);
+ *  `khac` = các luồng tiếng nhận khác trên cùng kết nối (tiếng bạn đang phát mic) — tách riêng để không lẫn vào số đo đồng bộ tiếng–nét. */
+export interface SoWebRtc extends Omit<SoTiengNhan, 'mid'> {
+  /** RTT tới SFU (ms). */
+  rtt: number | null
+  khac: SoTiengNhan[]
+}
+/** `midChinh` = mid của luồng chính (biết thì chọn đúng; không biết / trình duyệt không báo mid ⇒ luồng tiếng nhận đầu tiên). */
+export function docSoWebRtc(bc: RTCStatsReport, midChinh?: string | null): SoWebRtc {
+  let rtt: number | null = null, rttXa: number | null = null
+  const vao: SoTiengNhan[] = []
   bc.forEach((x: Record<string, unknown>) => {
     const so = (k: string): number | null => (typeof x[k] === 'number' ? (x[k] as number) : null)
-    if (x.type === 'candidate-pair' && (x.nominated === true || x.selected === true) && so('currentRoundTripTime') != null) r.rtt = so('currentRoundTripTime')! * 1000
+    if (x.type === 'candidate-pair' && (x.nominated === true || x.selected === true) && so('currentRoundTripTime') != null) rtt = so('currentRoundTripTime')! * 1000
     else if (x.type === 'inbound-rtp' && (x.kind === 'audio' || x.mediaType === 'audio')) {
-      if (so('jitter') != null) r.jitter = so('jitter')! * 1000
-      r.demTong = so('jitterBufferDelay'); r.demSo = so('jitterBufferEmittedCount'); r.goiNhan = so('packetsReceived'); r.goiMat = so('packetsLost')
-      if (so('audioLevel') != null) r.mucAm = so('audioLevel')
-    } else if (x.type === 'remote-inbound-rtp' && r.rtt == null && so('roundTripTime') != null) r.rtt = so('roundTripTime')! * 1000
+      vao.push({ mid: typeof x.mid === 'string' ? x.mid : null, jitter: so('jitter') == null ? null : so('jitter')! * 1000, demTong: so('jitterBufferDelay'), demSo: so('jitterBufferEmittedCount'), goiNhan: so('packetsReceived'), goiMat: so('packetsLost'), mucAm: so('audioLevel') })
+    } else if (x.type === 'remote-inbound-rtp' && so('roundTripTime') != null) rttXa = so('roundTripTime')! * 1000
   })
-  return r
+  const chinh = (midChinh ? vao.find((v) => v.mid === midChinh) : undefined) ?? vao[0] ?? null
+  return { rtt: rtt ?? rttXa, jitter: chinh?.jitter ?? null, demTong: chinh?.demTong ?? null, demSo: chinh?.demSo ?? null, goiNhan: chinh?.goiNhan ?? null, goiMat: chinh?.goiMat ?? null, mucAm: chinh?.mucAm ?? null, khac: vao.filter((v) => v !== chinh) }
 }

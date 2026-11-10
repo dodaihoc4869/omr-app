@@ -81,7 +81,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let phienCuaEm = '', hangSfu: Promise<unknown> = Promise.resolve(), trackSapToi: 'thay' | 'ban' = 'thay'
   let micLuong: MediaStream | null = null, micTx: RTCRtpTransceiver | null = null, dangXinMic = false, hetXinMic = -1e9
   let amCtx: AudioContext | null = null, doAm: AnalyserNode | null = null, mauAm: Float32Array<ArrayBuffer> | null = null
-  let amBan: HTMLAudioElement | null = null, banDangKeo = '', henBan: unknown = null
+  let amBan: HTMLAudioElement | null = null, thuBan: RTCRtpReceiver | null = null, banDangKeo = '', henBan: unknown = null
+  let midThay: string | null = null, banSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
   let okPhien = -1, okDc: boolean | null = null
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null
@@ -155,6 +156,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         if (!con() || e.track.kind !== 'audio') return
         if (trackSapToi === 'ban') {
           // Tiếng của bạn đang phát mic trên bảng.
+          thuBan = e.receiver
+          try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
           amBan = amBan ?? document.createElement('audio')
           amBan.autoplay = true; amBan.setAttribute('playsinline', '')
           amBan.srcObject = new MediaStream([e.track])
@@ -177,6 +180,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (!con()) { p.close(); return }
       if (!r.ok || !r.phien || !r.sdp) throw new Error(r.lyDo ?? 'sfu')
       const phien = r.phien
+      midThay = r.tracks?.[0]?.mid ?? null
       trackSapToi = 'thay'
       let d = await goiCua(mt, tuy.goc, 'dap', { ve: tuy.ve, phien, sdp: await traLoiMoi(p, mt, r.sdp), kenh: ss.kenh != null })
       if (!con()) { p.close(); return }
@@ -314,6 +318,12 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       } catch { trackSapToi = 'thay'; if (banDangKeo === nguon) banDangKeo = '' }
     })
   }
+  /** Mức âm tiếng của BẠN đang phát mic 0..1 (cho dải «Bạn … đang nói»; cần em đang bật nghe). */
+  function mucAmBan(): number {
+    if (!tt.banNoi) return 0
+    try { const n = thuBan?.getSynchronizationSources?.()[0]?.audioLevel; if (typeof n === 'number') return n } catch { /* không hỗ trợ */ }
+    return banSo.mucAm // dự phòng: số đo mỗi giây
+  }
   /** Soát lại mic + tiếng bạn theo view mới nhất của phòng. */
   function soatMic(): void {
     const l = live
@@ -323,7 +333,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     const n = l?.bat ? l.noi[0] : undefined
     const ban = n && !l?.emNoi ? { sbd: n.sbd, ten: n.ten, doi: n.doi } : null
     if ((tt.banNoi?.sbd ?? '') !== (ban?.sbd ?? '')) dat({ banNoi: ban })
-    if (!n || l?.emNoi) { banDangKeo = ''; if (amBan) amBan.srcObject = null; mt.huyHen(henBan); henBan = null }
+    if (!n || l?.emNoi) { banDangKeo = ''; thuBan = null; if (amBan) amBan.srcObject = null; mt.huyHen(henBan); henBan = null }
     else if (banDangKeo !== n.ss.id && henBan == null) henBan = mt.hen(keoBan, mt.ngauNhien() * 800)
     if (tuy.tuBatMic && l?.bat && l.emDuocMoi && tt.mic === 'tat' && pc && !roiMan) void batMicLenBang()
   }
@@ -420,8 +430,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     }
     if (!pc) { xong(); return }
     void pc.getStats().then((bc) => {
-      const s = docSoWebRtc(bc)
+      const s = docSoWebRtc(bc, midThay)
       rtt = s.rtt
+      banSo = { goi: s.khac.reduce((a, k) => a + (k.goiNhan ?? 0), 0), mucAm: Math.max(0, ...s.khac.map((k) => k.mucAm ?? 0)) }
       soDo.ghi('rtt', s.rtt); soDo.ghi('jt', s.jitter)
       if (s.mucAm != null) mucAmThay = s.mucAm
       if (s.demTong != null && s.demSo != null) {
@@ -516,12 +527,12 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     trangThai: (): TrangThaiLiveEm => ({ ...tt }),
     nhanView, nhanTinPhong, khiNoiLai,
     moKhoaTieng, datTieng, datRoiMan,
-    batMicLenBang, tatMic, mucAmMic, dangChoQuyenMic,
+    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic,
     /** Bảng đã chốt (khoá trang, tỉ lệ vùng viết, mọi nét) — dùng khi lớp vẽ cần dựng lại từ đầu (đổi cỡ, phóng bảng). */
     bang: (): BangNet => bang,
     khung, mucAm,
     /** Số đo đã thu (trung vị / p95 / lớn nhất): d, j, m, rtt, jt, tt, tn — xem so-do.ts. */
-    soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet }),
+    soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null }),
     huy,
   }
 }

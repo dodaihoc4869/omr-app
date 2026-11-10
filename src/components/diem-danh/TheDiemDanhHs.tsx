@@ -100,7 +100,7 @@ export default function TheDiemDanhHs({ token }: { token: string }) {
               {loi}
             </p>
           )}
-          <p className="dd-hs-phu">Mã đổi mỗi phút. Em chỉ điểm danh được cho chính mình.</p>
+          <p className="dd-hs-phu">Mã dùng cả buổi. Em chỉ điểm danh được cho chính mình.</p>
         </form>
       )}
     </section>

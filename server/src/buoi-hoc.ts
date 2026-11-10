@@ -26,7 +26,7 @@ type Row = Record<string, unknown>
 const str = (x: unknown): string => (x === null || x === undefined ? '' : String(x)).trim()
 const num = (x: unknown): number => (Number.isFinite(Number(x)) ? Number(x) : 0)
 
-/** Mã đổi mỗi ngần này (mili-giây). */
+/** Chu kỳ mã cũ (mã từng đổi mỗi 60 giây). 10/11 thầy: «Mã điểm danh ko tự đổi nữa. Mỗi buổi cố định mã điểm danh luôn» ⇒ không còn dùng để đổi mã; giữ hằng cho mã cũ / test nhập. */
 export const CHU_KY_MA_MS = 60_000
 /** Buổi tự hết hạn sau ngần này kể từ lúc mở (nếu thầy quên bấm Kết thúc). */
 export const HAN_BUOI_MS = 24 * 3_600_000
@@ -53,7 +53,7 @@ async function hoi(env: Env, sql: string, ...bind: unknown[]): Promise<Row[] | n
   }
 }
 
-// ───────────────────────── MÃ ĐỔI MỖI 60 GIÂY ─────────────────────────
+// ───────────────────────── MÃ CỐ ĐỊNH CẢ BUỔI (10/11; trước đó đổi mỗi 60 giây) ─────────────────────────
 
 const enc = new TextEncoder()
 /** Mã 6 số của một buổi ở phút `cuaSo` (= floor(ms / 60 000)). Thuần theo (bí mật, phút): máy chủ nào tính cũng ra một mã. */
@@ -63,11 +63,11 @@ export async function maCuaBuoi(biMat: string, cuaSo: number): Promise<string> {
   const n = ((s[0]! << 24) | (s[1]! << 16) | (s[2]! << 8) | s[3]!) >>> 0
   return String(100000 + (n % 900000))
 }
-export const cuaSoCua = (ms: number): number => Math.floor(ms / CHU_KY_MA_MS)
+/** 10/11: mã CỐ ĐỊNH cả buổi ⇒ «cửa sổ» luôn là 0 (mỗi buổi một bí mật riêng ⇒ mỗi buổi một mã, không đổi theo giờ). */
+export const cuaSoCua = (_ms: number): number => 0
 /** Mã còn nhận: mã của phút này + phút trước (em đang gõ thì mã trên máy chiếu vừa đổi vẫn không hỏng). */
 export async function maConNhan(biMat: string, nowMs: number): Promise<string[]> {
-  const w = cuaSoCua(nowMs)
-  return [await maCuaBuoi(biMat, w), await maCuaBuoi(biMat, w - 1)]
+  return [await maCuaBuoi(biMat, cuaSoCua(nowMs))]
 }
 
 function taoBiMat(): string {
@@ -232,7 +232,7 @@ async function xemBuoi(env: Env, id: string, nowMs: number, kemLop: boolean): Pr
   return {
     ok: true,
     buoi,
-    ...(buoi.dangMo ? { ma: await maCuaBuoi(str(r.bi_mat), w), doiMaLuc: (w + 1) * CHU_KY_MA_MS } : {}),
+    ...(buoi.dangMo ? { ma: await maCuaBuoi(str(r.bi_mat), w), doiMaLuc: 0 } : {}),
     coMat: rCo.map((x) => ({ sbd: str(x.sbd), hoTen: str(x.ho_ten), luc: str(x.luc), cach: str(x.cach) === 'thay' ? 'thay' : 'ma' })),
     coPhep: rDd.filter((x) => str(x.trang_thai) === 'co_phep').map((x) => str(x.sbd)),
     siSo: buoi.lop ? lop.length : null,
@@ -340,7 +340,7 @@ export async function hsDiemDanh(env: Env, b: Row, nowMs: number = Date.now()): 
   for (const x of r) if ((await maConNhan(str(x.bi_mat), nowMs)).includes(ma)) khop.push(x)
   if (!khop.length) {
     ghiSai(sbd, nowMs)
-    return { ok: false, lyDo: 'ma_sai', error: 'Mã không đúng hoặc đã đổi. Em nhìn mã MỚI trên máy chiếu (mã đổi mỗi phút).' }
+    return { ok: false, lyDo: 'ma_sai', error: 'Mã không đúng. Em nhìn lại mã trên máy chiếu rồi nhập lại.' }
   }
   const lopEm = await tenLopCuaMotEm(env, sbd)
   const buoi = khop.find((x) => !str(x.lop) || str(x.lop) === lopEm)

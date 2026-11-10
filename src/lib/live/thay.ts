@@ -75,6 +75,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   let doEm: Record<string, unknown> | null = null, rtt: number | null = null
   // Tiếng của em đang phát mic trên bảng.
   let hangSfu: Promise<unknown> = Promise.resolve(), ngheEmDat: boolean | null = null, emDangKeo = '', amEm: HTMLAudioElement | null = null, thuEm: RTCRtpReceiver | null = null
+  let emSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
   const xepSfu = <T,>(f: () => Promise<T>): Promise<T> => { const p = hangSfu.then(f, f); hangSfu = p.catch(() => undefined); return p }
   const dem = { goiDc: 0, goiWs: 0, khungSo: 0 }
 
@@ -227,7 +228,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     dat({ micIm: tt.tieng === 'mic' && nay - lucTieng > MIC_IM_MS })
     // Có tiếng hoặc có nét trong 30 giây qua ⇒ báo phòng thầy còn đang live (im + không nét 15 phút thì phòng tự tắt).
     if (nay - lucNhip >= NHIP_MS) { if (nay - lucTieng < NHIP_MS || nay - lucNet < NHIP_MS) tuy.kenh.gui({ t: 'live-nhip' }); lucNhip = nay }
-    if (pc) void pc.getStats().then((bc) => { const s = docSoWebRtc(bc); if (s.rtt != null) rtt = s.rtt }).catch(() => undefined)
+    // Trên phiên của thầy, luồng tiếng NHẬN duy nhất là tiếng của em đang phát mic.
+    if (pc) void pc.getStats().then((bc) => { const s = docSoWebRtc(bc); if (s.rtt != null) rtt = s.rtt; emSo = { goi: (s.goiNhan ?? 0) + s.khac.reduce((a, k) => a + (k.goiNhan ?? 0), 0), mucAm: Math.max(s.mucAm ?? 0, ...s.khac.map((k) => k.mucAm ?? 0)) } }).catch(() => undefined)
     henNhip = mt.hen(nhip, 1000)
   }
   /** Bấm Live. `mic`: mã thiết bị (bỏ trống = mic mặc định / mic đã mở bằng `moMic`); `khongTieng` = «Live không tiếng» (chỉ phát bảng). */
@@ -390,7 +392,11 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   /** Bật / tắt phát tiếng của em ra loa máy thầy (ghi đè mặc định «chỉ em ở xa»). */
   function datNgheEm(nghe: boolean): void { ngheEmDat = nghe; soatEmNoi() }
   /** Mức âm tiếng em đang nói 0..1 (cần đang nghe em). */
-  function mucAmEm(): number { try { const n = thuEm?.getSynchronizationSources?.()[0]?.audioLevel; return typeof n === 'number' ? n : 0 } catch { return 0 } }
+  function mucAmEm(): number {
+    if (!tt.emNoi) return 0
+    try { const n = thuEm?.getSynchronizationSources?.()[0]?.audioLevel; if (typeof n === 'number') return n } catch { /* không hỗ trợ */ }
+    return emSo.mucAm // dự phòng: số đo mỗi giây
+  }
 
   // ── TIN TỪ PHÒNG ──
   function nhanLive(l: ViewLiveBang | undefined): void {
@@ -445,7 +451,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     thuMic, datNgheEm, mucAmEm,
     nhanTinPhong, khiNoiLai,
     /** Số đo: gói đã gửi theo đường, RTT máy thầy ↔ SFU, số đo gộp của các máy em (phòng báo 10 giây một lần). */
-    soDo: () => ({ ...dem, rtt, em: doEm, kenhNet: tt.kenhNet }),
+    soDo: () => ({ ...dem, rtt, em: doEm, kenhNet: tt.kenhNet, emNoi: tt.emNoi ? { ...emSo } : null }),
     huy,
   }
 }

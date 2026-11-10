@@ -3,6 +3,7 @@
 // dùng đúng thư viện `src/lib/live` và đúng cửa `/bpu/live/*` (server/src/live-sfu.ts, chạy trong tiến trình Node này) nối tới Cloudflare Realtime SFU THẬT.
 //   thầy: phát tiếng (mic GIẢ của Chromium: tiếng «bíp» mỗi giây) + kênh điểm đang viết (DataChannel không tin cậy) + viết nét tổng hợp 200 điểm/giây;
 //   em:   kéo tiếng, nhận điểm qua DataChannel, phát qua đệm phát + nội suy; đo trễ nét đầu-cuối, RTT tới SFU, jitter, đệm tiếng.
+//   em 1 «được gọi lên bảng» (1C): bật mic (mic giả) ⇒ phát track lên SFU qua cửa `/bpu/live/phat`; máy thầy + em 2 kéo về nghe; em 2 (không được gọi) bị cửa từ chối.
 // Cần hai biến môi trường REALTIME_APP_ID + REALTIME_APP_SECRET (workflow thu-live-dot0-1011.yml lấy từ GitHub secrets). KHÔNG in mã ứng dụng, khoá, mã phiên.
 // Thiếu khoá ⇒ chạy KHÔ: chỉ kiểm thư viện nạp được trong trình duyệt thật và đường «chỉ hình» (khung đi vòng qua kịch bản thay cho phòng) — không có số đo mạng.
 //
@@ -33,7 +34,10 @@ await build({ entryPoints: ['scripts/thu-live-dot0-1011/may-chu.ts'], bundle: tr
 await build({ entryPoints: ['src/lib/live/index.ts'], bundle: true, platform: 'browser', format: 'iife', globalName: 'Live', target: 'es2020', outfile: join(tam, 'live.js'), logLevel: 'warning' })
 const { cuaLive, kyVeBpu } = await import(pathToFileURL(join(tam, 'may-chu.mjs')).href)
 const BI_MAT = randomBytes(24).toString('hex')
-const env = { MA_BI_MAT: BI_MAT, PHONG_BPU: {}, ...(CO_SFU ? { REALTIME_APP_ID: APP_ID, REALTIME_APP_SECRET: APP_SECRET } : {}) }
+// Kịch bản đóng vai PHÒNG cho câu hỏi «em nào đang được gọi lên bảng» của cửa `/bpu/live/phat`: chỉ em S1; ghi lại track mic Worker báo về.
+const phongMic = { goi: 'S1', bat: null }
+const PHONG_GIA = { idFromName: () => ({}), get: () => ({ fetch: async (req) => { const b = await req.json(); const ok = b.sbd === phongMic.goi; if (ok && b.buoc === 'bat') phongMic.bat = { id: b.id, tieng: b.tieng }; return new Response(JSON.stringify({ ok })) } }) }
+const env = { MA_BI_MAT: BI_MAT, PHONG_BPU: PHONG_GIA, ...(CO_SFU ? { REALTIME_APP_ID: APP_ID, REALTIME_APP_SECRET: APP_SECRET } : {}) }
 const demCua = {}
 const mayChu = createServer(async (req, res) => {
   try {
@@ -69,7 +73,8 @@ async function trang(ten) {
   await t.waitForFunction(() => typeof window.Live?.taoLiveThay === 'function')
   return t
 }
-const liveView = (o) => ({ san: false, bat: false, tu: null, phien: 0, ss: null, xem: 0, ws: 0, tay: [], noi: [], xa: false, tiengLop: true, soNet: 0, tieng: CO_SFU ? 'bat' : 'chua-cau-hinh', ...o })
+const liveView = (o) => ({ san: false, bat: false, tu: null, phien: 0, ss: null, xem: 0, ws: 0, tay: [], noi: [], bang: true, xa: false, tiengLop: true, soNet: 0, tieng: CO_SFU ? 'bat' : 'chua-cau-hinh', ...o })
+const liveViewEm = (o) => ({ duocXem: true, san: true, bat: true, tu: Date.now(), phien: 1, ss: null, tieng: CO_SFU ? 'bat' : 'chua-cau-hinh', soNet: 0, bang: true, emTay: false, hangTay: null, emDuocMoi: false, emNoi: false, noi: [], ...o })
 const ketQua = { coSfu: CO_SFU, giay: GIAY, soEm: SO_EM, chromium: trinh.version() }
 let ma = 0
 try {
@@ -103,7 +108,7 @@ try {
       window.le.nhanView(view)
       const ve1 = () => { window.__khung += 1; window.le.khung(); window.__am = Math.max(window.__am, window.le.mucAm()); requestAnimationFrame(ve1) }
       requestAnimationFrame(ve1)
-    }, { ve: await ve('hs', `S${i + 1}`), goc: GOC, view: { duocXem: true, san: true, bat: true, tu: Date.now(), phien: 1, ss, tieng: CO_SFU ? 'bat' : 'chua-cau-hinh', soNet: 0, emTay: false, hangTay: null, emDuocMoi: false, emNoi: false, noi: [] } })
+    }, { ve: await ve('hs', `S${i + 1}`), goc: GOC, view: liveViewEm({ ss }) })
     cacEm.push(em)
   }
   const t0Noi = Date.now()
@@ -148,6 +153,36 @@ try {
   await new Promise((x) => setTimeout(x, 1500))
   chuyen = false; await vongChuyen
 
+  // ── 1C: em 1 «được gọi lên bảng» bật mic; thầy + em 2 nghe; em 2 không được gọi bị từ chối ──
+  if (CO_SFU && ss && soDc === SO_EM) {
+    const mic = { }
+    await cacEm[0].evaluate((view) => window.le.nhanView(view), liveViewEm({ ss, emDuocMoi: true }))
+    const t0Mic = Date.now()
+    mic.bat = await cacEm[0].evaluate(async () => { const r = await window.le.batMicLenBang(); return { ...r, mic: window.le.trangThai().mic } })
+    mic.batMs = Date.now() - t0Mic
+    mic.phongGhi = !!phongMic.bat
+    if (phongMic.bat) {
+      const noi = [{ sbd: 'S1', ten: 'Em S1', doi: 0, xa: true, ss: phongMic.bat }]
+      await cacEm[0].evaluate((view) => window.le.nhanView(view), liveViewEm({ ss, emDuocMoi: true, emNoi: true, noi }))
+      for (const em of cacEm.slice(1)) await em.evaluate((view) => { window.__amBan = 0; window.le.nhanView(view); const do1 = () => { window.__amBan = Math.max(window.__amBan, window.le.mucAmBan()); setTimeout(do1, 50) }; do1() }, liveViewEm({ ss, noi }))
+      await thay.evaluate((view) => { window.__amEm = 0; window.lt.nhanTinPhong({ t: 'bang', live: view }); const do1 = () => { window.__amEm = Math.max(window.__amEm, window.lt.mucAmEm()); setTimeout(do1, 50) }; do1() }, liveView({ san: true, bat: true, tu: Date.now(), phien: 1, ss, xem: SO_EM, noi }))
+      // «Nghe được» = đã nhận gói RTP của track em (số đo getStats mỗi giây của thư viện); mức âm ghi thêm để tham khảo (mic giả chỉ «bíp» ngắt quãng).
+      const t0Nghe = Date.now()
+      await thay.waitForFunction(() => (window.lt.soDo().emNoi?.goi ?? 0) > 0, null, { timeout: 15_000 }).then(() => { mic.thayNgheSauMs = Date.now() - t0Nghe }, () => { mic.thayNgheSauMs = null })
+      if (cacEm[1]) await cacEm[1].waitForFunction(() => (window.le.soDo().ban?.goi ?? 0) > 0, null, { timeout: 15_000 }).then(() => { mic.banNgheSauMs = Date.now() - t0Nghe }, () => { mic.banNgheSauMs = null })
+      await new Promise((x) => setTimeout(x, 3000))
+      mic.thay = await thay.evaluate(() => ({ emNoi: window.lt.trangThai().emNoi?.sbd ?? null, ngheEm: window.lt.trangThai().ngheEm, goi: window.lt.soDo().emNoi?.goi ?? 0, mucAm: Math.round(Math.max(window.__amEm, window.lt.soDo().emNoi?.mucAm ?? 0) * 1000) / 1000 }))
+      if (cacEm[1]) mic.ban = await cacEm[1].evaluate(() => ({ banNoi: window.le.trangThai().banNoi?.sbd ?? null, goi: window.le.soDo().ban?.goi ?? 0, mucAm: Math.round(Math.max(window.__amBan, window.le.soDo().ban?.mucAm ?? 0) * 1000) / 1000 }))
+      mic.em1 = await cacEm[0].evaluate(() => ({ mic: window.le.trangThai().mic, mucAmMic: Math.round(window.le.mucAmMic() * 1000) / 1000, choQuyen: window.le.dangChoQuyenMic() }))
+    }
+    // Em 2 KHÔNG được gọi: gọi thẳng cửa bằng vé của em 2 ⇒ phải bị từ chối, không chạm SFU.
+    if (cacEm[1]) mic.emKhac = await cacEm[1].evaluate(async ({ ve, goc }) => (await (await fetch(`${goc}/bpu/live/phat`, { method: 'POST', body: JSON.stringify({ ve, phien: 'a'.repeat(32), sdp: 'v=0\r\no=- 1 2 IN IP4 0.0.0.0\r\ns=-\r\nt=0 0\r\n', tracks: [{ mid: '9' }] }) })).json()).lyDo, { ve: await ve('hs', 'S2'), goc: GOC })
+    // Thu mic: em tắt tại máy; thầy + bạn thôi nghe khi phòng báo `noi` rỗng.
+    mic.sauTat = await cacEm[0].evaluate(() => { window.le.tatMic(); return window.le.trangThai().mic })
+    await thay.evaluate((view) => window.lt.nhanTinPhong({ t: 'bang', live: view }), liveView({ san: true, bat: true, tu: Date.now(), phien: 1, ss, xem: SO_EM, noi: [] }))
+    ketQua.mic = mic
+  }
+
   // ── Thu số đo ──
   const di = await thay.evaluate(() => ({ di: window.__di, soDo: window.lt.soDo(), tt: window.lt.trangThai() }))
   const gioTao = new Map(di.di.map(([id, t, luc]) => [`${id}|${t}`, luc]))
@@ -182,6 +217,12 @@ try {
     kiem('máy em nhận DataChannel «net» qua SFU', ketQua.em.every((e) => e.kenhNet === 'dc'))
     kiem('máy em có tiếng thầy (mức âm > 0)', ketQua.em.every((e) => e.tieng === 'co' && e.mucAmLonNhat > 0))
     kiem('điểm đi DataChannel, không đi WebSocket', ketQua.thay.goiDc > 0 && ketQua.thay.goiWs === 0)
+    const m = ketQua.mic
+    kiem('1C · em được gọi bật mic: SFU nhận track, máy chủ báo phòng ghi', !!m?.bat?.ok && m.bat.mic === 'dang-phat' && m.phongGhi)
+    kiem('1C · máy thầy nhận được tiếng của em (có gói RTP)', (m?.thay?.goi ?? 0) > 0)
+    if (SO_EM > 1) kiem('1C · máy em khác nhận được tiếng của bạn (có gói RTP)', (m?.ban?.goi ?? 0) > 0)
+    if (SO_EM > 1) kiem('1C · em KHÔNG được gọi bị cửa từ chối', m?.emKhac === 'chua-duoc-moi')
+    kiem('1C · em tắt mic ⇒ trạng thái mic về «tat»', m?.sauTat === 'tat')
   }
   console.log(`\n== THỬ KHẢ THI LIVE (Đợt 0) · ${CO_SFU ? 'Cloudflare Realtime SFU THẬT' : 'CHẠY KHÔ — chưa có khoá SFU, chỉ kiểm đường «chỉ hình»'} · ${SO_EM} máy em · viết ${GIAY} giây ==`)
   console.log('Nơi đo: máy chạy kịch bản này (thầy + em cùng một máy' + (process.env.GITHUB_ACTIONS ? ', máy CI của GitHub' : '') + ') — KHÔNG đại diện mạng Việt Nam / 4G / máy em yếu / 300 người nghe.')
@@ -194,6 +235,7 @@ try {
     s('RTT máy em ↔ SFU', e0.rttSfuMs); s('jitter tiếng', e0.jitterTiengMs); s('trễ tiếng phía máy em (đệm jitter + ~65 ms thu / mã hoá / loa)', e0.treTiengPhiaEmMs)
     console.log(`  RTT máy thầy ↔ SFU: ${ketQua.thay.rttMs ?? 'không đo được'} ms · gói điểm thầy gửi: DataChannel ${ketQua.thay.goiDc}, WebSocket ${ketQua.thay.goiWs}${ketQua.noiEmMs != null ? ` · máy em nối xong sau ${ketQua.noiEmMs} ms` : ''}`)
   }
+  if (ketQua.mic) console.log(`1C mic em lên bảng — bật mic → đang phát: ${ketQua.mic.batMs} ms · thầy nhận gói đầu sau ≤ ${ketQua.mic.thayNgheSauMs ?? 'không'} ms · bạn ≤ ${ketQua.mic.banNgheSauMs ?? 'không'} ms (từ lúc máy nhận view có \`noi\`, số đo đọc 1 giây một lần) · gói: thầy ${ketQua.mic.thay?.goi ?? 0}, bạn ${ketQua.mic.ban?.goi ?? 0} · mức âm: thầy ${ketQua.mic.thay?.mucAm ?? 0}, bạn ${ketQua.mic.ban?.mucAm ?? 0}`)
   console.log(`Lệnh qua cửa /bpu/live/*: ${JSON.stringify(demCua)}`)
   if (loiTrang.length) console.log(`Lỗi trang: ${loiTrang.join(' | ').slice(0, 800)}`)
   console.log(`JSON: ${JSON.stringify(ketQua)}`)
