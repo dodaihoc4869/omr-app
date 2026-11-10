@@ -117,6 +117,8 @@ describe('máy em — dải kết quả lên bảng nằm dưới thanh đội (
     expect(quy('.bpu-klb')).not.toMatch(/translateX\(-50%\)/)
     expect(css).not.toMatch(/top:\s*(76|140)px/)
     expect(quy('.bpu-bd-neo')).toMatch(/height:\s*0/)
+    // trong lớp che chỉ thẻ mới nhất hiện (2–3 thẻ chồng xuống tới «Chưa đúng» — đo bằng Chromium 360–430 px, chữ ×1,3)
+    expect(css).toMatch(/\.bpu-che-noi \.bpu-bd-the:not\(:last-child\) \{ display: none; \}/)
     expect(css).toMatch(/@keyframes bpu-klb-vao \{ from \{ opacity: 0; transform: translateY/)
     expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.bpu-klb \{ animation: none; \} \}/)
     expect(css).toMatch(/html\.may-yeu \.bpu-klb \{ animation: none; \}/)
