@@ -139,7 +139,10 @@ describe('câu mới + sửa câu dùng chung bố cục', () => {
 describe('Lộ trình xoay ngang / máy gập mở (trong-hs-ngang.css)', () => {
   const NG = boChu(doc('src/styles/trong-hs-ngang.css'))
   it('điện thoại ngang: cột tóm tắt GHIM khi cuộn, chặng đang học chừa chỗ bong bóng; máy gập mở: hai cột đường chặng | tóm tắt (chỉ trong vùng hai cột, rộng < 1000)', () => {
-    expect(NG).toMatch(/@media \(max-height: 520px\) and \(min-width: 600px\) \{\s*:root\[data-trong='hs'\] \.ht2\[data-mot\] \.dm-ben \{ position: sticky; top: 12px; align-self: start; \}/)
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «bố cục xoay ngang máy tính, fold chưa chuyên nghiệp … như doligo»): cột tóm tắt `.dm-ben` không còn trong bản vẽ — Fold từng
+    // hiện lại nó ở cuối trang (lặp thẻ Hôm nay / Luyện tập) ⇒ bỏ luật hiện / ghim, khung chung ở bo-cuc-hn-rong.css ẩn hẳn ở mọi khổ rộng.
+    expect(NG).not.toMatch(/\.dm-ben \{[^}]*(display: flex|position: sticky)/)
+    expect(readFileSync('src/styles/bo-cuc-hn-rong.css', 'utf8')).toContain(":not(#_) .dm-ben { display: none; }")
     expect(NG).toMatch(/\.da-nut\[data-tt='dang'\] \{ scroll-margin-top: 104px; \}/)
     const m = cacMedia(NG).find((x) => x.includes('max-width: 999px'))!
     for (const [w, h] of LUOI) if (khop(m, w, h)) expect(haiCotLam(w, h) && w < 1000 && h > 520, `${w}×${h}`).toBe(true)

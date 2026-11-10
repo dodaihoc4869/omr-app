@@ -15,5 +15,47 @@
   html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-ai.kb-thanh-ai { position: absolute; left: calc(32px + env(safe-area-inset-left)); bottom: calc(24px + env(safe-area-inset-bottom)); width: 54px; height: 54px; }
   html[data-trong='hs']:not(#_) .tr-menu { left: 264px; }
   html[data-trong='hs']:not(#_) .dm-khung { max-width: none; margin: 0; padding-left: calc(256px + 48px + env(safe-area-inset-left)); padding-right: 48px; }
-  html[data-trong='hs']:not(#_) .dm-khung .da-vo:has(> .kb-cot-trai) { grid-template-columns: minmax(0, 610px) minmax(320px, 380px); justify-content: center; column-gap: 48px; row-gap: 24px; padding-top: 32px; }
+}
+html[data-trong='hs'] .kb-cot-phai > .dnt { display: none; } /* chỉ hiện ở khổ ≥ 1100 (dưới) */
+/* ── HÔM NAY KHỔ RỘNG CHUYÊN NGHIỆP (thầy 10/11 gửi ảnh «bố cục xoay ngang máy tính, fold chưa chuyên nghiệp làm cho đẹp chuyên nghiệp như doligo»: cột giữa
+   trống dưới nút chính, cột phải dài cả trang; thẻ đếm ngược nằm dưới ray, chữ bị che; nhãn Điểm danh dựng đứng; Fold lặp thẻ Hôm nay / Luyện tập).
+   MỘT khung cho thẻ đếm ngược + Hôm nay: lề trái --hn-trai (ray) · nội dung ≤ --hn-rong ở giữa · lề phải --hn-phai. Như Duolingo:
+   dưới 1100 (Fold mở, máy tính bảng, điện thoại ngang) MỘT cột giữa ≤ 640 — không cột phải; từ 1100 cột giữa = việc chính (chào · thẻ mức · nút chính ·
+   nhóm lỗi · Việc hôm nay) + cột phải GHIM = thẻ phụ (Bạn bè · Rương · Học thêm). Điện thoại dọc không đổi (hai cột là `display: contents`). ── */
+@media (orientation: landscape) and (min-width: 640px), (min-width: 700px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] { --hn-trai: calc(112px + env(safe-area-inset-left)); --hn-phai: 32px; --hn-rong: 640px; }
+  html[data-trong='hs']:not(#_) .dm-khung:not([data-muc]) { grid-template-columns: minmax(0, 1fr); max-width: none; margin: 0; padding-left: var(--hn-trai); padding-right: var(--hn-phai); }
+  html[data-trong='hs']:not(#_) .dm-khung:not([data-muc]) > .da-vo { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: var(--hn-rong); margin: 0 auto; padding-top: 24px; }
+  html[data-trong='hs']:not(#_) .da-vo > :is(.kb-cot-trai, .kb-cot-phai) { display: flex; flex-direction: column; gap: 20px; min-width: 0; margin: 0; }
+  html[data-trong='hs']:not(#_) .da-vo > :is(.kb-cot-trai, .kb-cot-phai) > * { margin-block: 0; }
+  html[data-trong='hs']:not(#_) .da-vo .da-bai-moc { display: none; }
+  html[data-trong='hs']:not(#_) .ht2-noi-dung > :is(.dnt, .dnt-cho) { box-sizing: border-box; width: min(var(--hn-rong), 100% - var(--hn-trai) - var(--hn-phai));
+    margin: 24px 0 0 calc(var(--hn-trai) + max(0px, (100% - var(--hn-trai) - var(--hn-phai) - var(--hn-rong)) / 2)); }
+  /* buổi học mở điểm danh: mục «Thêm» của ray thành mục «Điểm danh» (biểu tượng QR + nhãn) — trước: nhãn nổi cạnh ray đè lên nội dung */
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.tr-menu-cham[data-dd] > :is(span, svg) { display: none; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.tr-menu-cham[data-dd] em { position: static; transform: none; display: flex; flex-direction: column; align-items: center; gap: 1px; width: auto;
+    padding: 0; border-radius: 0; background: none; box-shadow: none; color: inherit; font: inherit; writing-mode: horizontal-tb; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.tr-menu-cham[data-dd] em svg { width: 22px; height: 22px; }
+  html[data-trong='hs']:not(#_) .dm-ben { display: none; }
+}
+@media (orientation: landscape) and (max-height: 500px) { html[data-trong='hs'] { --hn-trai: calc(88px + env(safe-area-inset-left)); --hn-phai: 20px; } }
+@media (orientation: landscape) and (min-width: 1100px), (min-width: 1100px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] { --hn-rong: 1002px; }
+  html[data-trong='hs']:not(#_) .dm-khung:not([data-muc]) > .da-vo { display: grid; grid-template-columns: minmax(0, 610px) minmax(300px, 360px); justify-content: center; align-items: start; column-gap: 32px; }
+  html[data-trong='hs']:not(#_) .da-vo > .kb-cot-trai { grid-area: 1 / 1; }
+  html[data-trong='hs']:not(#_) .da-vo > .kb-cot-phai { grid-area: 1 / 2; position: sticky; top: 24px; }
+  /* đếm ngược ngày thi lên đầu cột phải, gọn (như ô chuỗi ngày của Duolingo); bản đầu trang ẩn */
+  html[data-trong='hs']:not(#_) .ht2-noi-dung > :is(.dnt, .dnt-cho) { display: none; }
+  html[data-trong='hs']:not(#_) .kb-cot-phai > .dnt { display: grid; gap: 14px; margin: 0; padding: 16px 18px; }
+  html[data-trong='hs']:not(#_) .kb-cot-phai .dnt-so { min-width: 84px; padding: 8px 10px 11px; }
+  html[data-trong='hs']:not(#_) .kb-cot-phai .dnt-so b { font-size: 36px; }
+  html[data-trong='hs']:not(#_) .kb-cot-phai .dnt-tieu { font-size: 16px; }
+  html[data-trong='hs']:not(#_) .kb-cot-phai .dnt-duoi { display: none; }
+  html[data-trong='hs']:not(#_) .kb-cot-phai .dnt-ong svg { width: 26px; height: 96px; }
+}
+@media (min-width: 1240px) and (min-height: 501px) and (min-aspect-ratio: 10/13) {
+  html[data-trong='hs'] { --hn-trai: calc(304px + env(safe-area-inset-left)); --hn-phai: 48px; --hn-rong: 1038px; }
+  html[data-trong='hs']:not(#_) .dm-khung:not([data-muc]) > .da-vo { grid-template-columns: minmax(0, 610px) minmax(320px, 380px); column-gap: 48px; padding-top: 32px; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.tr-menu-cham[data-dd] em { flex-direction: row; gap: 20px; }
+  html[data-trong='hs']:not(#_) .kb-thanh .kb-thanh-muc.tr-menu-cham[data-dd] em svg { width: 30px; height: 30px; }
 }
