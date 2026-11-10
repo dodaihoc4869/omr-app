@@ -100,7 +100,7 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
   it('ĐANG VIẾT: nét dở trên máy em lớn dần theo tay thầy (không đợi nét xong); xong ⇒ GIỐNG HỆT nét máy thầy; thầy gửi ≤ 30 lô/giây', async () => {
     const b = await dung()
     const e1 = await b.em('S1'), e2 = await b.em('S2')
-    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    await b.lt.bat({ khongTieng: true }); b.lt.dat({ bang: true }); await b.troi(400)
     const t0 = b.dh.gio(), r = await viet(b, [e1, e2], 200, 0.3, false)
     const giay = (b.dh.gio() - t0) / 1000
     // Lớn dần: không bao giờ co lại, đã có điểm từ sớm, gần cuối đã theo kịp ≥ 80 % số điểm thầy viết.
@@ -131,7 +131,7 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
   it('tẩy, hoàn tác (nét về ĐÚNG chỗ cũ), làm lại, sang trang rồi quay lại: mảng nét máy em luôn bằng máy thầy', async () => {
     const b = await dung()
     const e1 = await b.em('S1')
-    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    await b.lt.bat({ khongTieng: true }); b.lt.dat({ bang: true }); await b.troi(400)
     for (const y of [0.2, 0.4, 0.6, 0.8]) await viet(b, [e1], 20, y)
     await veCho(b, [e1], 300)
     const bang = () => b.so.ds().map((n) => ({ id: n.id, cong: n.cong, mau: n.mau, co: n.co, diem: n.diem }))
@@ -163,7 +163,7 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
   it('em RỚT MẠNG rồi nối lại nhận đúng phần thiếu; em VÀO MUỘN lúc đang live nhận cả bảng; rời màn thì bỏ điểm đang viết, về lại vẫn đủ nét', async () => {
     const b = await dung(3)
     const e1 = await b.em('S1')
-    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    await b.lt.bat({ khongTieng: true }); b.lt.dat({ bang: true }); await b.troi(400)
     await viet(b, [e1], 20, 0.2); await veCho(b, [e1], 300)
     await e1.rot()
     await viet(b, [], 20, 0.4); await viet(b, [], 20, 0.6); await b.troi(100)
@@ -185,6 +185,32 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
     expect(e2.sk.filter((s) => s.loai === 'them-diem').length).toBe(0)
     expect(e2.ds).toEqual(b.so.ds())
     expect(e1.ds).toEqual(b.so.ds())
+  })
+  it('1C: bật live ⇒ máy em CHỈ có tiếng (bảng chưa hiện, không nhận điểm đang viết); thầy gọi lên bảng ⇒ bảng live bật, điểm chạy; chuyển câu ⇒ về màn câu hỏi, live vẫn bật', async () => {
+    const b = await dung()
+    const e1 = await b.em('S1')
+    await b.ph.post('/luot', { qid: 'q1', phan: 'I', tuLuan: false, cau: { text: 'Đề 1' }, dung: 'A', hanGiay: 0 })
+    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    expect(e1.le.trangThai()).toMatchObject({ bat: true, bang: false, duocMoMic: false, mic: 'tat', banNoi: null })
+    expect(b.lt.trangThai()).toMatchObject({ pha: 'live', bang: false, emNoi: null })
+    await viet(b, [e1], 40, 0.2); await veCho(b, [e1], 300)
+    expect(demLo(b.ph, e1.ws())).toBe(0) // lớp đang ở màn câu hỏi ⇒ thầy không phát điểm đang viết
+    expect(e1.sk.filter((s) => s.loai === 'them-diem').length).toBe(0)
+    expect(e1.ds).toEqual(b.so.ds()) // nét xong vẫn vào sổ ⇒ bật bảng là thấy đủ
+    await b.ph.gui(b.gv, { t: 'goi', sbd: 'S2', lyDo: [] }); await b.troi(50)
+    expect(e1.le.trangThai()).toMatchObject({ bat: true, bang: true })
+    expect(b.lt.trangThai().bang).toBe(true)
+    await viet(b, [e1], 60, 0.5); await veCho(b, [e1], 300)
+    expect(demLo(b.ph, e1.ws())).toBeGreaterThan(5)
+    expect(e1.sk.filter((s) => s.loai === 'them-diem').length).toBeGreaterThan(5)
+    expect(e1.ds).toEqual(b.so.ds())
+    await b.ph.post('/luot', { qid: 'q2', phan: 'I', tuLuan: false, cau: { text: 'Đề 2' }, dung: 'B', hanGiay: 0 }); await b.troi(50)
+    expect(e1.le.trangThai()).toMatchObject({ bat: true, bang: false })
+    expect(b.lt.trangThai()).toMatchObject({ pha: 'live', bang: false })
+    // Không có SFU ⇒ em được gọi cũng chưa bật được mic: thư viện từ chối gọn.
+    expect(await e1.le.batMicLenBang()).toEqual({ ok: false, lyDo: 'chua-duoc-moi' })
+    expect(e1.le.dangChoQuyenMic()).toBe(false)
+    expect(e1.le.mucAmMic()).toBe(0)
   })
   it('máy thầy thứ hai bấm Live khi buổi đang live ⇒ «đang live ở máy khác»; công tắc tắt ⇒ thư viện không gửi gì', async () => {
     const b = await dung()

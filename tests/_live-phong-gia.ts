@@ -27,8 +27,9 @@ export function datWebSocketPairGia(): void {
 
 export interface KhoGia { du: Map<string, unknown>; ghi: number }
 /** Phòng thật trên kho giả. Truyền `kho` + `dsWs` của phòng trước để giả «phòng ngủ rồi thức lại» (đối tượng mới, storage + kết nối cũ). */
-export function taoPhongGia(cu?: { kho: KhoGia; dsWs: WsGia[] }) {
+export function taoPhongGia(cu?: { kho: KhoGia; dsWs: WsGia[] } | null, envThem: Record<string, unknown> = {}) {
   const kho: KhoGia = cu?.kho ?? { du: new Map(), ghi: 0 }, dsWs: WsGia[] = cu?.dsWs ?? []
+  const nen: Promise<unknown>[] = []
   const ctx = {
     storage: {
       get: async (k: string) => { const v = kho.du.get(k); return v === undefined ? undefined : structuredClone(v) },
@@ -38,9 +39,9 @@ export function taoPhongGia(cu?: { kho: KhoGia; dsWs: WsGia[] }) {
     },
     acceptWebSocket: (ws: WsGia, tags?: string[]) => { ws.tag = tags?.[0] ?? ''; dsWs.push(ws) },
     getWebSockets: (tag?: string) => dsWs.filter((w) => !w.dong && (!tag || w.tag === tag)),
-    waitUntil: () => {},
+    waitUntil: (viec: Promise<unknown>) => { nen.push(viec) },
   }
-  const p = new PhongBinhPhanUng(ctx as never, { MA_BI_MAT: 'x' } as never)
+  const p = new PhongBinhPhanUng(ctx as never, { MA_BI_MAT: 'x', ...envThem } as never)
   const noi = async (vai: 'gv' | 'hs', sbd = ''): Promise<WsGia> => {
     const truoc = dsWs.length
     await p.fetch(new Request('https://bpu/bpu/phong', { headers: { upgrade: 'websocket', 'x-bpu-vai': vai, 'x-bpu-sbd': sbd } })).catch(() => null)
@@ -55,7 +56,9 @@ export function taoPhongGia(cu?: { kho: KhoGia; dsWs: WsGia[] }) {
   /** Mở phòng buổi `b1` với các em (mặc định đã điểm danh) + công tắc live. */
   const khoi = (ds: { sbd: string; ten?: string; coMat?: boolean }[], live: { cho: boolean; sfu: boolean } | null = { cho: true, sfu: false }) =>
     post('/khoi', { buoiId: 'b1', lop: '12A1', ds: ds.map((x, i) => ({ sbd: x.sbd, ten: x.ten ?? `Em ${x.sbd}`, coMat: x.coMat !== false, luc: i + 1 })), ...(live ? { live } : {}) })
-  return { p, ctx, kho, dsWs, noi, post, gui, guiNp, dong, khoi }
+  /** Chờ các việc nền (`waitUntil`) của phòng xong. */
+  const choNen = async (): Promise<void> => { await Promise.all(nen.splice(0)) }
+  return { p, ctx, kho, dsWs, noi, post, gui, guiNp, dong, khoi, choNen }
 }
 export type PhongGia = ReturnType<typeof taoPhongGia>
 

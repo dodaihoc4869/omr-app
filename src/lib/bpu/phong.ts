@@ -3,7 +3,7 @@
 // giữ trạng thái và gọi các hàm này; app thầy / máy em chỉ dùng phần chia đội + chữ. KHÔNG đọc mạng, KHÔNG đọc đồng hồ (nơi gọi truyền `nay`).
 // BẤT BIẾN AN TOÀN: `viewEm` không bao giờ mang đáp án (`dung`) khi lượt chưa mở đáp án — test tests/bpu-phong-0611.test.ts khoá.
 // Điểm trong buổi là «kJ» (năng lượng) — KHÔNG phải «tinh thể» (tinh thể là phần thưởng tích luỹ sẵn có của app học sinh).
-import { laEmXaDangLive, liveTat, viewLiveBang, viewLiveEm, type LivePhong } from './phong-live'
+import { laEmXaDangLive, liveKhiGoi, liveKhiLuotMoi, liveTat, liveThuMic, viewLiveBang, viewLiveEm, type LivePhong } from './phong-live'
 
 export type PhanCau = 'I' | 'II' | 'III'
 export type PhaLuot = 'tra-loi' | 'goi' | 'lam-bang' | 'mo'
@@ -283,6 +283,7 @@ export function boLuot(st: TrangThaiPhong, nay: number): boolean {
   if (!l || l.pha === 'mo') return false
   // Số lượt KHÔNG lùi (khác `boLuotRong`): lượt mới mang số mới ⇒ bảng / máy em không nhận nhầm trạng thái của lượt vừa bỏ (gọi em, phương án, đã gửi).
   st.luot = null
+  liveKhiLuotMoi(st) // LIVE: không còn ai trên bảng ⇒ thu mic, máy em về màn câu hỏi
   st.capNhat = nay
   return true
 }
@@ -296,6 +297,8 @@ export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLu
     so: st.soLuot, qid: c.qid, phan: c.phan, tuLuan: c.tuLuan, cau: c.cau, dung: c.dung, batDau: nay,
     han: c.hanGiay && c.hanGiay > 0 ? nay + c.hanGiay * 1000 : null, pha: 'tra-loi', tra: {}, roiMe: [], goi: null, ketQua: null, kich: false, giai: c.giai ?? null,
   }
+  // LIVE (thầy 10/11 «khi chuyển câu thì vẫn giữ live tiếng với hs, màn hình hs hiện câu hỏi như bình thường»): tắt BẢNG live, thu mic; KHÔNG tắt live.
+  liveKhiLuotMoi(st)
   st.capNhat = nay
   return st.luot
 }
@@ -329,11 +332,13 @@ export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   if (!e.vao) {
     if (!laEmXaDangLive(st, sbd)) return false
     e.roi += 1
+    liveThuMic(st, nay, sbd)
     st.roiNay = [...(st.roiNay ?? []).filter((s) => s !== sbd), sbd]
     st.capNhat = nay
     return true
   }
   e.roi += 1
+  liveThuMic(st, nay, sbd) // LIVE: em đang phát mic mà rời màn ⇒ thu mic
   if (st.luot && st.luot.pha !== 'mo' && !st.luot.roiMe.includes(sbd)) st.luot.roiMe.push(sbd)
   if (!st.roiNay?.includes(sbd)) {
     const kjEm = congEm(e, -KJ.roiMan)
@@ -357,13 +362,14 @@ export function goiLenBang(st: TrangThaiPhong, sbd: string, lyDo: readonly strin
   if (!l || l.pha === 'mo' || !em(st, sbd)) return false
   l.pha = 'goi'
   l.goi = { sbd, lyDo: lyDo.map((x) => String(x).slice(0, 200)).slice(0, 3), duDoan: {}, tiep: {}, dat: null }
+  liveKhiGoi(st) // LIVE (thầy 10/11): gọi lên bảng ⇒ máy em chuyển sang bảng live ngay
   st.capNhat = nay
   return true
 }
 export function lamBang(st: TrangThaiPhong, nay: number): boolean {
   const l = st.luot
   if (!l || !l.goi || l.pha === 'mo') return false
-  l.pha = 'lam-bang'; st.capNhat = nay
+  l.pha = 'lam-bang'; liveKhiGoi(st); st.capNhat = nay
   return true
 }
 export function duDoan(st: TrangThaiPhong, sbd: string, v: 0 | 1, nay: number): boolean {
@@ -385,6 +391,7 @@ export function chamLenBang(st: TrangThaiPhong, dat: boolean, nay: number): bool
   const l = st.luot
   if (!l?.goi || l.pha === 'mo') return false
   l.goi.dat = dat; st.capNhat = nay
+  liveThuMic(st, nay) // LIVE: chấm xong ⇒ thu mic của em lên bảng (bảng live giữ tới lượt mới)
   return true
 }
 export const tongTiep = (g: GoiLenBang | null): number => (g ? Object.values(g.tiep).reduce((a, b) => a + b, 0) : 0)
@@ -412,6 +419,7 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
   const l = st.luot
   if (!l || l.pha === 'mo') return false
   l.pha = 'mo'
+  liveThuMic(st, nay) // LIVE: mở đáp án ⇒ thu mic (bảng live giữ: thầy còn chữa tiếp tới lượt mới)
   // LƯỢT RỖNG (không em nào gửi — thầy lật qua câu): không đụng chuỗi đúng của ai, không ghi vào tổng kết (tỉ lệ đúng, «lượt khó nhất»).
   if (!Object.keys(l.tra).length && !l.goi) { l.ketQua = {}; st.capNhat = nay; return true }
   const kq: Record<string, KetQuaEm> = {}
