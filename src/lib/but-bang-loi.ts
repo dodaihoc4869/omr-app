@@ -6,11 +6,13 @@
 // MÔ HÌNH NÉT        { id, cong: 'but' | 'tay', mau, co, diem: [x, y, apLuc, t][] }
 //   x, y   0..1 theo bề ngang / bề dọc vùng viết (5 số lẻ)      apLuc  0..1 (2 số lẻ)      t  mili-giây kể từ điểm đầu nét
 //   co     bề rộng cơ sở của nét, tính bằng px ở màn 1920 (máy khác nhân dvi / 1920, dvi = min(ngang, dọc × 16 / 9))
-// CÁCH DỰNG NÉT (cùng một dữ liệu ⇒ cùng một hình ở mọi máy):
-//   1. lọc nhiễu 1€ (tần số cắt tăng theo vận tốc: đi chậm lọc run tay, đi nhanh gần như không trễ) + nối thẳng tới điểm thật cuối cùng;
-//   2. bán kính = co / 2 × (0,6 … 1,6 theo lực, lực đã làm mượt) × thon đầu nét / thon cuối nét;
-//   3. dựng ĐA GIÁC bao quanh đường tâm (hai mép lệch pháp tuyến, chỗ gập gắt thêm quạt tròn, hai đầu bo tròn);
-//   4. tô đa giác bằng đường cong bậc hai qua trung điểm các đỉnh ⇒ mép mịn, không «hạt cườm».
+// CÁCH DỰNG NÉT (hàm THUẦN của dữ liệu điểm: cùng một dữ liệu ⇒ cùng một hình ở mọi máy; KHÔNG dùng cột giờ `t` để dựng hình — giờ mẫu sai / dồn cục không làm méo nét):
+//   1. khử rung RẤT NHẸ, không trễ (11/11, thầy: «viết bị nhằng nhằng chưa mượt như goodnote»): chỉ nắn chỗ mẫu ZÍCH-ZẮC sát nhau (bậc thang của toạ độ nguyên px khi đi chậm),
+//      mỗi mẫu dịch tối đa 0,55 px; chỗ cong thật (bướu «m n u») và mẫu thưa (đi nhanh) giữ NGUYÊN. Không còn lọc 1€: lọc 1€ kéo trễ, san phẳng bướu, để lại đuôi thẳng lúc nhấc bút;
+//   2. đường tâm = đường cong Catmull-Rom hướng tâm ĐI QUA đúng từng mẫu, chia theo độ cong (lệch đường cong ≤ 0,06 px; mẫu 60 Hz vẫn tròn dáng chữ, không cắt góc);
+//   3. bán kính = co / 2 × (0,7 … 1,35 theo lực, lực làm trơn đối xứng 3 mẫu) × thon RẤT NGẮN ở đầu / cuối (nét càng ngắn càng ít thon: dấu chấm, dấu phẩy, dấu thanh vẫn rõ);
+//   4. dựng ĐA GIÁC bao quanh đường tâm (hai mép lệch pháp tuyến, chỗ gập gắt thêm quạt tròn, hai đầu bo tròn), tô bằng đường cong bậc hai qua trung điểm các đỉnh.
+//   Đang viết: phần đã CHỐT (không đổi nữa khi có mẫu mới) nằm trong X / Y / R / L; 3 đoạn cuối là ĐUÔI tạm, dựng lại mỗi lần vẽ — đầu nét luôn tới đúng mẫu mới nhất.
 // SỰ KIỆN (cho việc live):  net-moi · them-diem · net-xong · xoa · trang · tro (con trỏ lơ lửng)   — `apSuKien` dựng lại đúng mảng nét ở máy nhận.
 
 /** Một điểm của nét: [x 0..1, y 0..1, áp lực 0..1, mili-giây từ đầu nét]. */
@@ -29,8 +31,10 @@ export type SuKienBut =
   | { loai: 'tro'; trang: string; x: number; y: number }
 /** Khung quy chiếu của vùng viết W × H px: k = dvi / 1920; rw × rh = vùng viết tính bằng «px ở màn 1920». */
 export interface KhungBut { W: number; H: number; k: number; rw: number; rh: number }
-/** Trạng thái xử lý dần một nét (đường tâm đã lọc + bán kính + độ dài cộng dồn). */
+/** Trạng thái xử lý dần một nét: X / Y / R / L = đường tâm ĐÃ CHỐT (chia dày) + bán kính + độ dài cộng dồn; px, py = mẫu thật mới nhất. */
 export interface XuLyBut { kh: KhungBut; n: number; X: number[]; Y: number[]; R: number[]; L: number[]; px: number; py: number; ban: number }
+/** Đuôi tạm của nét đang viết (từ điểm chốt cuối tới mẫu mới nhất), nối tiếp sau X / Y / R / L của `XuLyBut`. */
+export interface DuoiBut { X: number[]; Y: number[]; R: number[]; L: number[] }
 export interface SoBut {
   nghe(f: (sk: SuKienBut) => void): () => void
   trang(): string
@@ -60,9 +64,13 @@ export interface LoiBut {
   moXuLy(net: { co: number }, kh: KhungBut): XuLyBut
   xuLyThem(st: XuLyBut, diem: DiemBut[], den: number): void
   mocDong(st: XuLyBut, dong: number): number
+  /** Đuôi tạm; `them` = điểm nối thêm sau mẫu cuối (đầu bút thật, điểm dự đoán), px ở màn 1920. */
+  duoiTam(st: XuLyBut, them: number[][] | null): DuoiBut
   /** Đa giác bao của nét từ điểm xử lý `tu` tới `den` (−1 = tới hết, kèm đuôi `duoi` và đầu bo); `xong` = thon cuối nét. Mảng phẳng [x0, y0, x1, y1…] (px ở màn 1920). */
   vien(st: XuLyBut, tu: number, den: number, duoi: number[][] | null, xong: boolean): number[]
   dungNet(net: NetBut, kh: KhungBut): number[]
+  /** Đường tâm của cả nét (đã chốt + đuôi), mảng phẳng [x0, y0, x1, y1…] px ở màn 1920 — để đo độ trung thực, hoặc cho máy nhận muốn tự vẽ. */
+  duongTam(net: NetBut, kh: KhungBut): number[]
   veDaGiac(g: { moveTo(x: number, y: number): void; quadraticCurveTo(a: number, b: number, x: number, y: number): void; closePath(): void }, p: number[]): void
   chamNet(net: NetBut, x: number, y: number, r: number, kh: KhungBut): boolean
   timCham(ds: NetBut[], x: number, y: number, r: number, kh: KhungBut): string[]
@@ -73,65 +81,135 @@ export interface LoiBut {
 export const JS_LOI_BUT = `
 var LoiBut = (function () {
   var CHIA = 1e5, PI = Math.PI, MAU0 = 'rgb(244,239,228)';
-  // Lọc 1€: tần số cắt (Hz) = FC0 + BETA × vận tốc (px ở màn 1920 mỗi giây); FCV = tần số cắt của vận tốc.
-  var FC0 = 3.5, BETA = 0.06, FCV = 6;
-  // Thon: dài bằng bao nhiêu lần bề rộng cơ sở · bán kính còn lại ở mút · bán kính nhỏ nhất (px ở màn 1920).
-  var THON_DAU = 4, THON_CUOI = 6, NHO_DAU = 0.42, NHO_CUOI = 0.28, R_NHO = 0.3, SAT = 0.3;
+` + /* Khử rung: bước trung bình giữa các mẫu ≤ RUNG_A px ⇒ nắn đủ, ≥ RUNG_B px ⇒ không đụng; chỗ zích-zắc nắn RUNG_ZIC phần độ gãy, chỗ cong đều chỉ RUNG_DEU; */ `
+` + /* không mẫu nào bị dịch quá RUNG_KEP px (px ở màn 1920). */ `
+  var RUNG_A = 1, RUNG_B = 2.2, RUNG_ZIC = 0.25, RUNG_DEU = 0.04, RUNG_KEP = 0.55;
+` + /* Đường cong: mỗi đoạn giữa hai mẫu chia THEO ĐỘ CONG — vừa đủ để đường gấp khúc lệch đường cong không quá DUNG px (đoạn thẳng đi nhanh: không chia; bướu gắt: chia dày), */ `
+` + /* tối đa CHIA_MAX bước. */ `
+  var DUNG = 0.06, CHIA_MAX = 14;
+` + /* Thon: dài bằng bao nhiêu lần bề rộng cơ sở · bán kính còn lại ở mút · nét dài dưới NGAN_A lần bề rộng thì không thon, từ NGAN_B lần trở lên thon đủ. */ `
+  var THON_DAU = 1.6, THON_CUOI = 2.2, NHO_DAU = 0.72, NHO_CUOI = 0.55, NGAN_A = 1.5, NGAN_B = 5, R_NHO = 0.3, SAT = 0.3;
   function kep(v, a, b) { return v < a ? a : v > b ? b : v; }
   function tron(v, k) { return Math.round(v * k) / k; }
   function xa(ax, ay, bx, by) { ax -= bx; ay -= by; return Math.sqrt(ax * ax + ay * ay); }
+  function muot(a, b, v) { v = kep((v - a) / (b - a), 0, 1); return v * v * (3 - 2 * v); }
   function khung(W, H) { var k = Math.min(W, H * 16 / 9) / 1920 || 1; return { W: W, H: H, k: k, rw: W / k, rh: H / k }; }
   function diem(x, y, ap, t, W, H) { return [tron(kep(x / W, 0, 1), CHIA), tron(kep(y / H, 0, 1), CHIA), tron(kep(ap, 0, 1), 100), Math.max(0, Math.round(t))]; }
-  // Chuột / chạm không có lực: giả theo vận tốc (quang = px ở màn 1920, dt = mili-giây) — đi nhanh thì nhẹ tay (mảnh), đi chậm thì đậm; đổi dần.
+` + /* Chuột / chạm không có lực: giả theo vận tốc (quang = px ở màn 1920, dt = mili-giây) — đi nhanh thì nhẹ tay (mảnh), đi chậm thì đậm; đổi dần. */ `
   function apLucGia(truoc, quang, dt) { var dich = 0.56 - 0.48 * kep(quang / Math.max(1, dt) / 2.4, 0, 1); return truoc + (dich - truoc) * kep(dt / 70, 0, 1); }
-  // Lực 0..1 ⇒ hệ số bề rộng 0,6 … 1,6.
-  function heSo(ap) { return 0.6 + Math.pow(kep(ap, 0, 1), 0.7); }
+` + /* Lực 0..1 ⇒ hệ số bề rộng 0,7 … 1,35 (11/11: hẹp hơn 0,6 … 1,6 cũ — chữ nhỏ ấn mạnh tay không còn bị nét to át chữ). */ `
+  function heSo(ap) { return 0.7 + 0.65 * Math.pow(kep(ap, 0, 1), 0.8); }
 
-  // ── 1 · đường tâm: lọc dần từng điểm (nhân quả ⇒ phần đã xử lý không đổi khi có điểm mới) ──
-  function moXuLy(net, kh) { return { kh: kh, n: 0, X: [], Y: [], R: [], L: [], fx: 0, fy: 0, vx: 0, vy: 0, ap: 0, px: 0, py: 0, t: 0, ban: (net.co || 2.3) / 2 }; }
-  function tiLoc(dt, fc) { return 1 / (1 + 1 / (2 * PI * fc * dt)); }
+` + /* ── 1 + 2 · đường tâm. rx / ry / rp = mẫu thật (bỏ mẫu trùng chỗ) · cx / cy / cr = MỐC đã chốt (mẫu sau khử rung) + bán kính · */ `
+` + /*    X / Y / R / L = đường cong qua các mốc, chia dày, đã chốt. Mẫu k chốt thành mốc khi có mẫu k + 2; đoạn cong k → k + 1 chốt khi có mốc k + 2 (tức mẫu k + 4). ── */ `
+  function moXuLy(net, kh) { return { kh: kh, n: 0, X: [], Y: [], R: [], L: [], rx: [], ry: [], rp: [], cx: [], cy: [], cr: [], ns: 0, px: 0, py: 0, ban: (net.co || 2.3) / 2 }; }
+` + /* Khử rung mẫu i (0 < i < m − 1) ⇒ ra[0], ra[1]. Độ gãy s = a − 2b + c. Gãy NGƯỢC CHIỀU với mẫu kề (zích-zắc) = nhiễu ⇒ nắn; gãy cùng chiều = cong thật ⇒ gần như giữ nguyên. */ `
+  function nan(RX, RY, i, m, ra) {
+    var ax = RX[i - 1], ay = RY[i - 1], bx = RX[i], by = RY[i], cx = RX[i + 1], cy = RY[i + 1], sx = ax - 2 * bx + cx, sy = ay - 2 * by + cy, zic = false, w, q;
+    q = xa(ax, ay, bx, by) + xa(bx, by, cx, cy);
+` + /* quay đầu bút / góc nhọn (dây cung a → c ngắn hơn hẳn đường a → b → c) là NÉT THẬT: không nắn */ `
+    w = xa(ax, ay, cx, cy) < 0.8 * q ? 0 : 1 - muot(RUNG_A, RUNG_B, q / 2);
+    if (w > 0) {
+      if (i > 1 && (RX[i - 2] - 2 * ax + bx) * sx + (RY[i - 2] - 2 * ay + by) * sy < 0) zic = true;
+      if (!zic && i < m - 2 && (bx - 2 * cx + RX[i + 2]) * sx + (by - 2 * cy + RY[i + 2]) * sy < 0) zic = true;
+      w *= zic ? RUNG_ZIC : RUNG_DEU;
+      sx *= w; sy *= w; q = Math.sqrt(sx * sx + sy * sy);
+      if (q > RUNG_KEP) { sx *= RUNG_KEP / q; sy *= RUNG_KEP / q; }
+      bx += sx; by += sy;
+    }
+    ra[0] = bx; ra[1] = by;
+  }
+` + /* Lực làm trơn [1, 2, 1] / 4 quanh mẫu i (hai đầu lấy phần có được). */ `
+  function lucTron(RP, i, m) { return m === 1 ? RP[0] : !i ? (2 * RP[0] + RP[1]) / 3 : i === m - 1 ? (RP[i - 1] + 2 * RP[i]) / 3 : (RP[i - 1] + 2 * RP[i] + RP[i + 1]) / 4; }
+` + /* Một đoạn Catmull-Rom hướng tâm từ p1 tới p2 (p0, p3 = mốc kề hai bên): thêm các điểm chia vào X / Y / R / L (không thêm p1). Đi QUA đúng p1 và p2. */ `
+  function doan(X, Y, R, L, x0, y0, x1, y1, x2, y2, x3, y3, r1, r2) {
+    var d1 = Math.sqrt(xa(x0, y0, x1, y1)), d2 = Math.sqrt(xa(x1, y1, x2, y2)), d3 = Math.sqrt(xa(x2, y2, x3, y3)), n, k, t, t2, t3, a, b, c, d, x, y, m, q, ux, uy, vx, vy;
+    if (d2 < 1e-4) return;
+    if (d1 < 1e-4) d1 = d2; if (d3 < 1e-4) d3 = d2;
+    ux = ((x1 - x0) / d1 - (x2 - x0) / (d1 + d2) + (x2 - x1) / d2) * d2; uy = ((y1 - y0) / d1 - (y2 - y0) / (d1 + d2) + (y2 - y1) / d2) * d2;
+    vx = ((x2 - x1) / d2 - (x3 - x1) / (d2 + d3) + (x3 - x2) / d3) * d2; vy = ((y2 - y1) / d2 - (y3 - y1) / (d2 + d3) + (y3 - y2) / d3) * d2;
+` + /* đường cong Hermite lệch dây cung nhiều nhất 4/27 × (|u − dây| + |v − dây|); chia n bước thì độ lệch giảm n² lần */ `
+    n = kep(Math.ceil(Math.sqrt(0.148 * (xa(ux, uy, x2 - x1, y2 - y1) + xa(vx, vy, x2 - x1, y2 - y1)) / DUNG)), 1, CHIA_MAX);
+    for (k = 1; k <= n; k++) {
+      t = k / n; t2 = t * t; t3 = t2 * t;
+      a = 2 * t3 - 3 * t2 + 1; b = t3 - 2 * t2 + t; c = 3 * t2 - 2 * t3; d = t3 - t2;
+      x = k === n ? x2 : a * x1 + b * ux + c * x2 + d * vx; y = k === n ? y2 : a * y1 + b * uy + c * y2 + d * vy;
+      m = X.length; q = xa(x, y, X[m - 1], Y[m - 1]);
+      if (q < SAT && k < n) continue;
+      X.push(x); Y.push(y); R.push(r1 + (r2 - r1) * t); L.push(L[m - 1] + q);
+    }
+  }
+` + /* Đoạn cong từ mốc j tới mốc j + 1 (m = số mốc đang có). Ngoài hai đầu nét thì lấy mốc đối xứng qua mốc mút ⇒ đầu / cuối nét đi theo hướng đoạn kề. */ `
+  function doanMoc(X, Y, R, L, CX, CY, CR, j, m) {
+    var a = j > 0, b = j + 2 < m;
+    doan(X, Y, R, L, a ? CX[j - 1] : 2 * CX[j] - CX[j + 1], a ? CY[j - 1] : 2 * CY[j] - CY[j + 1], CX[j], CY[j], CX[j + 1], CY[j + 1], b ? CX[j + 2] : 2 * CX[j + 1] - CX[j], b ? CY[j + 2] : 2 * CY[j + 1] - CY[j], CR[j], CR[j + 1]);
+  }
   function xuLyThem(st, ds, den) {
-    var kh = st.kh, i, d, x, y, dt, a, m, q;
+    var kh = st.kh, i, d, x, y, m, k, ra = [0, 0];
     for (i = st.n; i < den; i++) {
-      d = ds[i]; x = d[0] * kh.rw; y = d[1] * kh.rh;
-      if (!i) { st.fx = x; st.fy = y; st.ap = d[2]; }
-      else {
-        dt = Math.max(1, d[3] - st.t) / 1000;
-        a = i === 1 ? 1 : tiLoc(dt, FCV);
-        st.vx += a * ((x - st.px) / dt - st.vx); st.vy += a * ((y - st.py) / dt - st.vy);
-        a = tiLoc(dt, FC0 + BETA * Math.sqrt(st.vx * st.vx + st.vy * st.vy));
-        st.fx += a * (x - st.fx); st.fy += a * (y - st.fy);
-        st.ap += (d[2] - st.ap) * dt / (dt + 0.03);
+      d = ds[i]; x = d[0] * kh.rw; y = d[1] * kh.rh; st.px = x; st.py = y;
+      m = st.rx.length;
+` + /* mẫu trùng chỗ (ấn bút tại chỗ): không thêm điểm, chỉ nhận lực mạnh hơn ⇒ chấm một cái ra chấm tròn đủ đậm */ `
+      if (m && xa(x, y, st.rx[m - 1], st.ry[m - 1]) < SAT) { if (d[2] > st.rp[m - 1]) st.rp[m - 1] = d[2]; continue; }
+      st.rx.push(x); st.ry.push(y); st.rp.push(d[2]); m++;
+      for (k = st.cx.length; k < m - 2; k++) {
+        if (!k) { ra[0] = st.rx[0]; ra[1] = st.ry[0]; } else nan(st.rx, st.ry, k, m, ra);
+        st.cx.push(ra[0]); st.cy.push(ra[1]); st.cr.push(st.ban * heSo(lucTron(st.rp, k, m)));
       }
-      st.px = x; st.py = y; st.t = d[3];
-      m = st.X.length;
-      if (m) { q = xa(st.fx, st.fy, st.X[m - 1], st.Y[m - 1]); if (q < SAT) continue; st.L.push(st.L[m - 1] + q); } else st.L.push(0);
-      st.X.push(st.fx); st.Y.push(st.fy); st.R.push(st.ban * heSo(st.ap));
+      if (st.cx.length && !st.X.length) { st.X.push(st.cx[0]); st.Y.push(st.cy[0]); st.R.push(st.cr[0]); st.L.push(0); }
+      for (; st.ns < st.cx.length - 2; st.ns++) doanMoc(st.X, st.Y, st.R, st.L, st.cx, st.cy, st.cr, st.ns, st.cx.length);
     }
     st.n = den;
   }
-  // Nét đang viết quá dài: phần đầu (tới chỉ số trả về) đã ổn định, đem in xuống lớp tĩnh. −1 = chưa cần. Luôn chừa đuôi dài hơn đoạn thon cuối.
+` + /* ĐUÔI tạm: phần đường tâm từ điểm chốt cuối cùng tới mẫu mới nhất (+ them = điểm nối thêm: đầu bút thật, điểm xem trước, điểm dự đoán). */ `
+` + /* noiDuoi NỐI THẲNG vào X / Y / R / L đang có (phải kết thúc ở điểm chốt cuối, hoặc rỗng nếu nét chưa chốt điểm nào) — chạy ở mỗi lượt vẽ nên dùng mảng nháp chung, không cấp mảng mới. */ `
+  var DX = [], DY = [], DP = [], DCX = [], DCY = [], DCR = [], DRA = [0, 0];
+  function noiDuoi(st, them, X, Y, R, L) {
+` + /* chỉ lấy KHÚC CUỐI của mảng mẫu (từ mốc đứng trước đoạn chưa chốt) ⇒ nét dài mấy nghìn mẫu vẫn chỉ tốn vài phần tử */ `
+    var s0 = Math.max(0, st.ns - 1), m0 = st.rx.length, nc = st.cx.length - s0, m = 0, i, q;
+    for (i = s0; i < m0; i++) { DX[m] = st.rx[i]; DY[m] = st.ry[i]; DP[m] = st.rp[i]; m++; }
+    if (them) for (i = 0; i < them.length; i++) if (!m || xa(them[i][0], them[i][1], DX[m - 1], DY[m - 1]) >= SAT) { DX[m] = them[i][0]; DY[m] = them[i][1]; DP[m] = m ? DP[m - 1] : 0.3; m++; }
+    if (!m) return;
+    for (i = 0; i < m; i++) {
+      if (i < nc) { DCX[i] = st.cx[s0 + i]; DCY[i] = st.cy[s0 + i]; DCR[i] = st.cr[s0 + i]; continue; }
+` + /* mẫu đầu / cuối NÉT giữ nguyên; mẫu giữa khử rung như lúc chốt (i + s0 = chỉ số thật) */ `
+      if (!(i + s0) || i === m - 1) { DCX[i] = DX[i]; DCY[i] = DY[i]; } else { nan(DX, DY, i, m, DRA); DCX[i] = DRA[0]; DCY[i] = DRA[1]; }
+      DCR[i] = st.ban * heSo(lucTron(DP, i, m));
+    }
+    if (!X.length) { X.push(DCX[0]); Y.push(DCY[0]); R.push(DCR[0]); L.push(0); }
+` + /* khúc chép bắt đầu ở mốc đứng TRƯỚC đoạn chưa chốt ⇒ đoạn nào cũng có mốc kề phía trước; riêng nét chưa chốt đoạn nào (s0 = 0) thì đoạn 0 lấy mốc đối xứng như doanMoc */ `
+    for (i = st.ns - s0; i < m - 1; i++) doanMoc(X, Y, R, L, DCX, DCY, DCR, i, m);
+  }
+  function duoiTam(st, them) {
+    var n = st.X.length, X = n ? [st.X[n - 1]] : [], Y = n ? [st.Y[n - 1]] : [], R = n ? [st.R[n - 1]] : [], L = n ? [st.L[n - 1]] : [];
+    noiDuoi(st, them, X, Y, R, L);
+` + /* điểm đầu = điểm chốt cuối (đã có trong X / Y của nét) — chỉ để tính tiếp độ dài, xong thì bỏ */ `
+    if (n) { X.shift(); Y.shift(); R.shift(); L.shift(); }
+    return { X: X, Y: Y, R: R, L: L };
+  }
+` + /* Nét đang viết: phần đã chốt và đã cách đầu bút đủ xa (hơn đoạn thon cuối + ngưỡng «nét ngắn») thì đem in xuống lớp tĩnh. Trả về chỉ số in tới; −1 = chưa cần. */ `
   function mocDong(st, dong) {
-    var m = st.X.length, den = m - 40, giu = st.ban * 2 * THON_CUOI * 3;
-    if (den - dong < 80) return -1;
-    while (den > dong + 40 && st.L[m - 1] - st.L[den] < giu) den -= 8;
-    return den - dong >= 40 ? den : -1;
+    var m = st.X.length, den = m - 1, giu = st.ban * 2 * (NGAN_B + THON_CUOI) + 3;
+    if (den - dong < 64) return -1;
+    while (den > dong && st.L[m - 1] - st.L[den] < giu) den--;
+    return den - dong >= 64 ? den : -1;
   }
 
-  // ── 2 + 3 · bán kính thon hai đầu, rồi đa giác bao ──
+` + /* ── 3 + 4 · bán kính thon hai đầu, rồi đa giác bao ── */ `
   function vien(st, tu, den, duoi, xong) {
     var o = tu > 0 ? tu - 1 : 0, het = den < 0, c = het ? st.X.length : Math.min(st.X.length, den + 2);
-    var X = st.X.slice(o, c), Y = st.Y.slice(o, c), R = st.R.slice(o, c), L = st.L.slice(o, c), n, i, q, s, f, tong, co, tD, tC;
-    function noi(x, y) { n = X.length; q = n ? xa(x, y, X[n - 1], Y[n - 1]) : 0; if (n && q < SAT) return; X.push(x); Y.push(y); R.push(n ? R[n - 1] : st.ban); L.push(n ? L[n - 1] + q : 0); }
-    if (het) { if (st.n) noi(st.px, st.py); if (duoi) for (i = 0; i < duoi.length; i++) noi(duoi[i][0], duoi[i][1]); }
+    var X = st.X.slice(o, c), Y = st.Y.slice(o, c), R = st.R.slice(o, c), L = st.L.slice(o, c), n, i, q, s, f, g, tong, co, tD, tC;
+    if (het) noiDuoi(st, duoi, X, Y, R, L);
     n = X.length; if (!n) return [];
     tong = L[n - 1]; co = st.ban * 2;
-    tD = Math.min(THON_DAU * co, tong * 0.35); tC = xong ? Math.min(THON_CUOI * co, tong * 0.45) : 0;
+` + /* nét ngắn (dấu chấm, dấu phẩy, dấu thanh): g → 0 ⇒ không thon, giữ đủ bề rộng. Khúc in xuống lớp tĩnh giữa chừng (không tới hết) luôn thuộc nét đã dài ⇒ g = 1. */ `
+    g = het ? muot(NGAN_A * co, NGAN_B * co, tong) : 1;
+    tD = THON_DAU * co; tC = xong ? Math.min(THON_CUOI * co, tong * 0.4) : 0;
     for (i = 0; i < n; i++) {
       f = 1; s = L[i];
-      if (s < tD) { q = s / tD; f *= NHO_DAU + (1 - NHO_DAU) * q * (2 - q); }
+      if (s < tD) { q = 1 - s / tD; f *= 1 - (1 - NHO_DAU) * g * q * q; }
       s = tong - s;
-      if (s < tC) { q = s / tC; f *= NHO_CUOI + (1 - NHO_CUOI) * q * (2 - q); }
+      if (s < tC) { q = 1 - s / tC; f *= 1 - (1 - NHO_CUOI) * g * q * q; }
       R[i] = Math.max(R_NHO, R[i] * f);
     }
     return bao(X, Y, R, tu - o, het ? n - 1 : Math.min(n - 1, den - o), tu === 0, het);
@@ -140,14 +218,14 @@ var LoiBut = (function () {
     var N = X.length, T = [], P = [], i, k, m, ax, ay, bx, by, q, r, nx, ny, x, y, c, s, cham;
     if (b <= a) { r = R[a] * 1.3; for (k = 0; k < 14; k++) T.push(X[a] + r * Math.cos(k * PI / 7), Y[a] + r * Math.sin(k * PI / 7)); return T; }
     for (i = a; i <= b; i++) {
-      // (ax, ay) hướng TỚI điểm này · (bx, by) hướng RỜI điểm này
+` + /* (ax, ay) hướng TỚI điểm này · (bx, by) hướng RỜI điểm này */ `
       if (i > 0) { ax = X[i] - X[i - 1]; ay = Y[i] - Y[i - 1]; } else { ax = X[1] - X[0]; ay = Y[1] - Y[0]; }
       if (i < N - 1) { bx = X[i + 1] - X[i]; by = Y[i + 1] - Y[i]; } else { bx = ax; by = ay; }
       q = Math.sqrt(ax * ax + ay * ay) || 1; ax /= q; ay /= q;
       q = Math.sqrt(bx * bx + by * by) || 1; bx /= q; by /= q;
       r = R[i]; cham = ax * bx + ay * by;
       if (cham < -0.25 && i > a && i < b) {
-        // gập gắt (quay đầu bút): hai mép cùng quét nửa vòng qua phía trước ⇒ góc tròn, không hở, không vênh
+` + /* gập gắt (quay đầu bút): hai mép cùng quét nửa vòng qua phía trước ⇒ góc tròn, không hở, không vênh */ `
         nx = -ay; ny = ax;
         for (k = 0; k <= 6; k++) {
           c = Math.cos(k * PI / 6); s = Math.sin(k * PI / 6);
@@ -157,27 +235,29 @@ var LoiBut = (function () {
         continue;
       }
       nx = ax + bx; ny = ay + by; q = Math.sqrt(nx * nx + ny * ny) || 1; x = -ny / q * r; y = nx / q * r;
-      q = r * r * 0.2;
+` + /* đỉnh mép sát đỉnh trước (dưới ~0,45 lần bán kính, và không dưới ~0,55 px) thì bỏ: nét mảnh không sinh thừa đỉnh */ `
+      q = Math.max(r * r * 0.2, 0.3);
       m = T.length; nx = X[i] + x - T[m - 2]; ny = Y[i] + y - T[m - 1];
       if (i === a || i === b || nx * nx + ny * ny > q) T.push(X[i] + x, Y[i] + y);
       m = P.length; nx = X[i] - x - P[m - 2]; ny = Y[i] - y - P[m - 1];
       if (i === a || i === b || nx * nx + ny * ny > q) P.push(X[i] - x, Y[i] - y);
     }
     if (muCuoi) {
-      // đầu bo ở cuối nét: từ mép trái vòng qua phía trước sang mép phải
+` + /* đầu bo ở cuối nét: từ mép trái vòng qua phía trước sang mép phải */ `
       ax = X[b] - X[b - 1]; ay = Y[b] - Y[b - 1]; q = Math.sqrt(ax * ax + ay * ay) || 1; nx = -ay / q; ny = ax / q; r = R[b];
       for (k = 1; k < 6; k++) { c = Math.cos(k * PI / 6); s = Math.sin(k * PI / 6); T.push(X[b] + r * (nx * c + ny * s), Y[b] + r * (ny * c - nx * s)); }
     }
     for (i = P.length - 2; i >= 0; i -= 2) T.push(P[i], P[i + 1]);
     if (muDau) {
-      // đầu bo ở đầu nét: từ mép phải vòng qua phía sau về mép trái
+` + /* đầu bo ở đầu nét: từ mép phải vòng qua phía sau về mép trái */ `
       ax = X[a + 1] - X[a]; ay = Y[a + 1] - Y[a]; q = Math.sqrt(ax * ax + ay * ay) || 1; nx = ay / q; ny = -ax / q; r = R[a];
       for (k = 1; k < 6; k++) { c = Math.cos(k * PI / 6); s = Math.sin(k * PI / 6); T.push(X[a] + r * (nx * c + ny * s), Y[a] + r * (ny * c - nx * s)); }
     }
     return T;
   }
   function dungNet(net, kh) { var st = moXuLy(net, kh); xuLyThem(st, net.diem, net.diem.length); return vien(st, 0, -1, null, true); }
-  // ── 4 · tô: đường cong bậc hai qua trung điểm các đỉnh (g = ngữ cảnh canvas 2D hoặc Path2D) ──
+  function duongTam(net, kh) { var st = moXuLy(net, kh), D, p = [], i; xuLyThem(st, net.diem, net.diem.length); D = duoiTam(st, null); for (i = 0; i < st.X.length; i++) p.push(st.X[i], st.Y[i]); for (i = 0; i < D.X.length; i++) p.push(D.X[i], D.Y[i]); return p; }
+` + /* ── 4 · tô: đường cong bậc hai qua trung điểm các đỉnh (g = ngữ cảnh canvas 2D hoặc Path2D) ── */ `
   function veDaGiac(g, p) {
     var n = p.length >> 1, i, a, b;
     if (n < 3) return;
@@ -186,7 +266,7 @@ var LoiBut = (function () {
     g.closePath();
   }
 
-  // ── tẩy theo nét: (x, y) chuẩn hoá, r = bán kính tẩy (px ở màn 1920) ──
+` + /* ── tẩy theo nét: (x, y) chuẩn hoá, r = bán kính tẩy (px ở màn 1920) ── */ `
   function chamNet(net, x, y, r, kh) {
     var d = net.diem, h = net._h, i, px, py, ax, ay, bx, by, vx, vy, t, rr, mx, my;
     if (!h) { h = [1, 1, 0, 0]; for (i = 0; i < d.length; i++) { h[0] = Math.min(h[0], d[i][0]); h[1] = Math.min(h[1], d[i][1]); h[2] = Math.max(h[2], d[i][0]); h[3] = Math.max(h[3], d[i][1]); } net._h = h; }
@@ -206,7 +286,7 @@ var LoiBut = (function () {
   }
   function timCham(ds, x, y, r, kh) { var ra = [], i; for (i = 0; i < ds.length; i++) if (ds[i].cong !== 'tay' && chamNet(ds[i], x, y, r, kh)) ra.push(ds[i].id); return ra; }
 
-  // ── sổ nét: mỗi trang (đợt / câu) một mảng nét + hoàn tác / làm lại riêng; mọi thay đổi phát sự kiện ──
+` + /* ── sổ nét: mỗi trang (đợt / câu) một mảng nét + hoàn tác / làm lại riêng; mọi thay đổi phát sự kiện ── */ `
   function gon(n) { return { id: n.id, cong: n.cong, mau: n.mau, co: n.co, diem: n.diem }; }
   function sachNet(n, i) {
     var ds = [], j, d;
@@ -222,7 +302,7 @@ var LoiBut = (function () {
     function phat(sk) { var i; sk.trang = khoa; for (i = 0; i < tai.length; i++) { try { tai[i](sk); } catch (e) {} } }
     function vt(i) { var k; for (k = 0; k < T.net.length; k++) if (T.net[k].id === i) return k; return -1; }
     function ghi(b) { T.lui.push(b); if (T.lui.length > GIOI) T.lui.shift(); T.toi = []; }
-    // Một bước = nhóm { net, vt } ghi theo thứ tự GỠ; gắn lại theo thứ tự ngược ⇒ nét về đúng chỗ cũ trong mảng.
+` + /* Một bước = nhóm { net, vt } ghi theo thứ tự GỠ; gắn lại theo thứ tự ngược ⇒ nét về đúng chỗ cũ trong mảng. */ `
     function go(ds) { var ids = [], i, k; for (i = 0; i < ds.length; i++) { k = vt(ds[i].net.id); if (k >= 0) { ds[i].vt = k; T.net.splice(k, 1); ids.push(ds[i].net.id); } } if (ids.length) phat({ loai: 'xoa', id: ids }); }
     function gan(ds) { var i, k; for (i = ds.length - 1; i >= 0; i--) { k = Math.min(ds[i].vt, T.net.length); T.net.splice(k, 0, ds[i].net); phat({ loai: 'net-moi', net: gon(ds[i].net), vt: k, xong: true }); } }
     function ketThuc(huy) {
@@ -267,7 +347,7 @@ var LoiBut = (function () {
       }
     };
   }
-  // Máy NHẬN: áp một sự kiện vào mảng nét của trang đang xem (sửa tại chỗ, trả lại chính mảng đó).
+` + /* Máy NHẬN: áp một sự kiện vào mảng nét của trang đang xem (sửa tại chỗ, trả lại chính mảng đó). */ `
   function apSuKien(ds, sk) {
     var i, n;
     if (sk.loai === 'trang') { ds.length = 0; for (i = 0; i < sk.net.length; i++) { n = gon(sk.net[i]); n.diem = n.diem.slice(); ds.push(n); } }
@@ -276,7 +356,7 @@ var LoiBut = (function () {
     else if (sk.loai === 'xoa') { for (i = ds.length - 1; i >= 0; i--) if (sk.id.indexOf(ds[i].id) >= 0) ds.splice(i, 1); }
     return ds;
   }
-  return { khung: khung, diem: diem, apLucGia: apLucGia, heSo: heSo, moXuLy: moXuLy, xuLyThem: xuLyThem, mocDong: mocDong, vien: vien, dungNet: dungNet, veDaGiac: veDaGiac, chamNet: chamNet, timCham: timCham, taoSo: taoSo, apSuKien: apSuKien };
+  return { khung: khung, diem: diem, apLucGia: apLucGia, heSo: heSo, moXuLy: moXuLy, xuLyThem: xuLyThem, mocDong: mocDong, vien: vien, dungNet: dungNet, duongTam: duongTam, duoiTam: duoiTam, veDaGiac: veDaGiac, chamNet: chamNet, timCham: timCham, taoSo: taoSo, apSuKien: apSuKien };
 })();
 `
 

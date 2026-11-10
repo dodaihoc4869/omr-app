@@ -119,7 +119,7 @@ if (LA_CHINH) {
     }
     const nhan = (chu, y) => { const e = document.createElement('div'); e.textContent = chu; e.style.cssText = 'position:fixed;left:1318px;top:' + y + 'px;z-index:40;color:var(--mc-bang-phu);font:600 15px var(--mc-sans)'; document.body.appendChild(e) }
     nhan('NÉT CŨ · mỗi pointermove một đoạn thẳng, rộng cố định', 196)
-    nhan('NÉT MỚI · 200 Hz + lọc 1€ + lực bút + thon đầu, tô đa giác', 426)
+    nhan('NÉT MỚI · 200 Hz, đường cong qua đúng mẫu + lực bút + thon ngắn, tô đa giác', 426)
   }, { cu: mauSS, moi: xuong(mauSS, 230).map((m, i) => thanhNet(m, 1920, 1080, { id: 's' + i })) })
   await chup(t, '3-net-cu-net-moi.jpg', { clip: { x: 1300, y: 186, width: 560, height: 440 } })
   await chup(t, '3b-net-cu-phong-to.jpg', { clip: { x: 1320, y: 226, width: 150, height: 110 } })

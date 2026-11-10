@@ -55,6 +55,8 @@ async function do1(trinh, tep, ban, ten, bai, cpu) {
   const cdp = await ctx.newCDPSession(t)
   await cdp.send('Emulation.setCPUThrottlingRate', { rate: cpu })
   if (ban !== 'nen') { await t.keyboard.press('b'); await t.waitForTimeout(400) }
+  // VE_NGAY=1 ⇒ bật thử chế độ vẽ ngay khi mẫu tới (bản 11/11, mặc định tắt)
+  if (ban === 'moi' && process.env.VE_NGAY) await t.evaluate((v) => window.__mcBut.veNgay && window.__mcBut.veNgay(v === '1'), process.env.VE_NGAY)
   await cdp.send('Performance.enable')
   const soDo = async () => Object.fromEntries((await cdp.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]))
   await ngu(300)
