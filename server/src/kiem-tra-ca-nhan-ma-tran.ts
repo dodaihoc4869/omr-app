@@ -2,7 +2,8 @@
 // Mức độ do app phân tích 4 đề 2026; không gọi là ma trận chính thức của Bộ.
 import { bamKt, type BangChungKt, type MucKt, type UngKt } from './kiem-tra-ca-nhan-loi'
 import { CO_CHE, VIEC } from '../../src/lib/tu-vung-dang'
-export const KHUNG_KT_2026 = { I: { biet: 12, hieu: 4, van_dung: 2 }, II: { biet: 0, hieu: 2, van_dung: 2 }, III: { biet: 0, hieu: 3, van_dung: 3 } } as const // blueprint thầy 09/11 (đề 0326 & 0339)
+import { MA_TRAN_RUT_MOI } from './ma-tran-rut-moi'
+export const KHUNG_KT_2026 = MA_TRAN_RUT_MOI // MỘT bảng ma trận cho mọi đường rút của máy chủ (blueprint thầy 09/11, đề 0326 & 0339)
 export interface CauMaTranKt extends UngKt { phan: 'I'|'II'|'III'; mucDo: 'biet'|'hieu'|'van_dung' }
 const oCau = (q: CauMaTranKt) => `${q.phan}:${q.mucDo}`
 const MUC_KT = ['biet','hieu','van_dung']

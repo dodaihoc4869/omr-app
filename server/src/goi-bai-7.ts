@@ -9,6 +9,7 @@ import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7,
 import { docMucLoai7, loaiNgayEm7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
 import { lichBaiEm7 } from './goi-bai-7-lich-bai'
+import { apSuat7, NGAY_DE_28 } from './goi-bai-7-suat'
 import { xepBai6 } from './bai-6-cau'
 import { duolingoChoEm } from './duolingo-bai-co'
 import { tachMaTo } from './srs2-gv'
@@ -93,14 +94,14 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     ORDER BY b.tick_luc DESC,b.vi_tri DESC LIMIT ?`).bind(lop,lop,cfg.batLuc??cfg.batDau+'T00:00:00+07:00', Math.max(1, tran)).all<Row>()
   let soGoi = 0, soEm = 0, soCau = 0
   const goiMoi: string[] = []
-  for (const b of ticks.results) {
+  for (const b of ticks.results.reverse()) {
     const cau = await cauTuTick7(env,b)
     // Không bỏ qua bài thiếu chỉ mục: hàng giáo viên vẫn thấy gói rỗng cần bổ sung.
     const batDau = [ngayVn7(Date.parse(str(b.tick_luc))),cfg.batDau].sort().at(-1)!
     // HẠN CHUNG cả lớp (thầy 09/11, han-chung.ts — cùng hàm hộp Giao bài xem trước). Bài chưa có câu (chỉ mục chưa sẵn) ⇒ 7 ngày như cũ.
     const soCauG = cau.filter((c) => c.hopLe !== false).length
     const sbdLop = soCauG ? (await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa'`).bind(b.lop).all<{ sbd: string }>()).results.map((x) => x.sbd) : []
-    const han = congNgay7(batDau, soCauG ? (await hanChungLop(env, sbdLop, soCauG, now)).T - 1 : 6), id = `g7:${str(b.id)}`, luc = new Date(now).toISOString()
+    const han = congNgay7(batDau, soCauG ? (await hanChungLop(env, sbdLop, cau, now)).T - 1 : 6), id = `g7:${str(b.id)}`, luc = new Date(now).toISOString()
     const rs = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) SELECT ?,?,?,?,?,?,?,? WHERE ${KHONG_CA}`).bind(id,b.id,b.lop,b.khoa_bai,b.ten_bai,batDau,han,luc),
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,JSON.stringify(cau),id),
@@ -225,7 +226,7 @@ export async function docGoiCuaEm7(env: Env, sbd: string, now: number, chiDoc=fa
   const nguonSom = gs.results.map(g => som(duNguonGoi7(env,mang7(g.ma_to_json))))
   const gids = JSON.stringify(gs.results.map(g => g.id))
   // Lịch kiểm tra chỉ đọc metadata nhỏ, cùng đợt câu/sổ/quota; không bóc đề riêng.
-  const kiemSom=som(import('./kiem-tra-ca-nhan').then(async kt=>await kt.coKtCn(env)?new Map((await env.DB.prepare(`SELECT k.ngay,MAX(COALESCE(json_extract(km.meta_json,'$.baiNgayToiThieu'),0)) hoc,COUNT(*) n FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.sbd=? AND k.trang_thai<>'cho_nguon' AND k.ngay>=? GROUP BY k.ngay`).bind(sbd,ngay).all<{ngay:string;hoc:number;n:number}>()).results.map(r=>[r.ngay,r.hoc?Number(r.n):2])):new Map<string,number>()))
+  const kiemSom=som(import('./kiem-tra-ca-nhan').then(async kt=>await kt.coKtCn(env)?new Map((await env.DB.prepare(`SELECT k.ngay,MAX(COALESCE(json_extract(km.meta_json,'$.baiNgayToiThieu'),0)) hoc,COUNT(*) n FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} LEFT JOIN kiem_tra_ca_nhan_meta km ON km.id=k.id WHERE k.sbd=? AND k.trang_thai<>'cho_nguon' AND k.ngay>=? GROUP BY k.ngay`).bind(sbd,ngay).all<{ngay:string;hoc:number;n:number}>()).results.map(r=>[r.ngay,r.hoc&&r.ngay<NGAY_DE_28?Number(r.n):2])):new Map<string,number>()))
   const [cs, gaps, events, quotas, ngayKiem] = await Promise.all([
     env.DB.prepare('SELECT * FROM goi_bai_7_cau WHERE goi_id IN (SELECT value FROM json_each(?))').bind(gids).all<Row>(),
     env.DB.prepare('SELECT goi_id,qid,version,kieu,luc FROM goi_bai_7_gap WHERE sbd=? AND goi_id IN (SELECT value FROM json_each(?)) ORDER BY luc,receipt').bind(sbd,gids).all<Row>(),
@@ -631,10 +632,11 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // làm (không câu mới, không câu chờ thầy dạy lại), câu sai lần cuối trước, sai nhiều trước, chưa thành thạo trước, gần lịch ôn trước. Chỉ CPU, không đọc D1.
   const vaoPlan: Parameters<typeof chonGoi7>[0] = { cau,daGap:vuaLam.size||luotNgay.size?new Set([...daGap,...vuaLam,...luotNgay]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua:loaiNgay==='sua'?xepSuaTheoNhom(themSua7(sua,hs,lyDo,ngay),hs.meta):sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn,
     ngay,gapHomNay:new Set([...goi.flatMap(g=>[...g.gapNgay]),...[...vuaLam,...luotNgay].filter(id=>!daGap.has(id))]),loaiNgay }
+  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan) : null // đề 28 theo suất (goi-bai-7-suat.ts)
   let plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
   // Chỉ khi kế hoạch thường còn thiếu mức (hiếm) mới đọc thêm câu đã DÀNH cho Kiểm tra ôn tập sắp tới của em (một lệnh, chỉ mã câu) — ôn sớm không lấy
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.
-  if (soDaLam + plan.viec.length < toiThieu) {
+  if (soDaLam + plan.viec.length < toiThieu || plan.lech) {
     const daCo = new Set([...sua, ...on, ...chua])
     const deKt = await deKtSom
     // Đọc hỏng ⇒ không ôn sớm (không đoán) và cũng KHÔNG hạ mức bên dưới.
@@ -643,6 +645,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
         .sort((x, y) => { const a = hs.tt.get(x.qid)!, b = hs.tt.get(y.qid)!
           return Number(a.lanCuoiDung !== false) - Number(b.lanCuoiDung !== false) || b.lanSai - a.lanSai || Number(a.thanhThao) - Number(b.thanhThao) ||
             (a.henOn ?? '9999').localeCompare(b.henOn ?? '9999') || x.qid.localeCompare(y.qid) }).map(c => c.qid)
+      if (xepSom) vaoPlan.onSom = xepSom(vaoPlan.onSom)
       plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
     }
   }
