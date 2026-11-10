@@ -34,7 +34,9 @@ describe('máy chủ: dấu Chưa chắc + lượt đúng theo loại', () => {
   it('đọc cột lý do giữ dấu cc:<qid>, bỏ dấu sai dạng', () => {
     expect([...docCotLyDo('[["q1","nham"],["cc:q2","cc"],["q3","cc"]]')]).toEqual([['q1', 'nham'], ['cc:q2', 'cc']])
   })
-  it('ngày Sửa thêm vào cuối hàng: câu có dấu Chưa chắc; câu Hiểu nhầm đã đóng lỗi mà chưa đủ 3 ngày đúng; không thêm câu đã làm hôm nay / đủ 3 ngày / chưa từng sai', () => {
+  // SỬA CÓ CHỦ ĐÍCH 10/11: «Hiểu nhầm ⇒ 3 ngày đúng» nay nằm trong luật đóng lỗi chung (loi-hoc-luat.ts thamSoTheoLyDo) — câu ấy chưa đủ 3 ngày thì vẫn «chờ kiểm»,
+  // tự có trong hàng sửa ⇒ themSua7 chỉ còn thêm câu có dấu Chưa chắc.
+  it('ngày Sửa thêm vào cuối hàng: câu có dấu Chưa chắc; không thêm câu đã làm hôm nay / chưa từng sai; không tự thêm câu Hiểu nhầm (luật chung lo)', () => {
     const cau = ['a', 'b', 'c', 'd', 'e', 'f'].map(qid => ({ qid }))
     const loiV2 = new Map([
       ['b', { soLanSai: 1, saiCuoi: '2026-11-01', trangThai: 'dong', ngayDung: ['2026-11-03', '2026-11-05'] }],
@@ -43,7 +45,7 @@ describe('máy chủ: dấu Chưa chắc + lượt đúng theo loại', () => {
       ['e', { soLanSai: 1, saiCuoi: '2026-11-01', trangThai: 'dong', ngayDung: ['2026-11-03', '2026-11-10'] }],
     ])
     const lyDo = new Map<string, 'nham' | 'cc'>([['b', 'nham'], ['c', 'nham'], ['cc:d', 'cc'], ['e', 'nham'], ['cc:f', 'cc']])
-    expect(themSua7(['a'], { cau, loiV2 }, lyDo, '2026-11-10')).toEqual(['a', 'b', 'd'])
+    expect(themSua7(['a'], { cau, loiV2 }, lyDo, '2026-11-10')).toEqual(['a', 'd'])
     expect(themSua7(['a'], { cau, loiV2 }, new Map(), '2026-11-10')).toEqual(['a'])
   })
   it('dấu Chưa chắc không thành loại nhóm', () => {

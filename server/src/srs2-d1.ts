@@ -7,11 +7,12 @@ import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
 //   {"bat":true}                         ⇒ toàn trung tâm
 //   {"bat":true,"lop":["12A1"]}          ⇒ chỉ các lớp này
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
-import { docNhipKenh, docThamSoEm, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
+import { docNhipKenh, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
 import { apLuatChung, chonBanSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
 import { canThanTu, nhanMocDuyTri } from './omni-can-than'
-import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
+import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, thamSoTheoLyDo, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
+import { docThamSoEmVaLyDo, lyDoHieuLuc } from './ly-do-sai'
 import { laCuaSoLoi, lanLamTuDongTc, sqlQidHoacTc, SQL_TC, tiepBanKhacMoi } from './lam-lai-so'
 import { songSinhDuDuLieu, type BoTro } from './cau-bo-tro'
 import { docChuoiNgayHoc } from './chuoi-ngay-hoc'
@@ -877,7 +878,8 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
   const phamViP = omniP.then((bat) => (bat ? lanBaiDaDay().then((m) => m.phamViCuaEm(env, sbd)).catch(() => null) : null))
   // Tối ưu 28/09: câu sai của ca đã công bố (không phụ thuộc chiến dịch) đọc CÙNG ĐỢT với chiến dịch + mốc thêm.
   let hoiThayDenHan: string[] = []
-  const [{ ds, daHuy }, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi] = await Promise.all([docChienDichKemDaHuyCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd, { now: Date.now(), nhan: q => { hoiThayDenHan = q } }), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([docThamSoEm(env, sbd).catch(() => null), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP])
+  const emLySom = docThamSoEmVaLyDo(env, sbd) // 10/11: tham số riêng + lý do sai «Vì sao em sai?» trong MỘT câu (thay câu đọc tham số riêng cũ)
+  const [{ ds, daHuy }, mocThem, qidSaiCa, qidSaiLop, qidSaiMoiKenh, mocDoc, thamSoV2, omni, phamVi, lyDoLoi] = await Promise.all([docChienDichKemDaHuyCuaEm(env, sbd), docMocThemCuaEm(env, sbd), docQidSaiCaDaCongBo(env, sbd), docQidSaiTaiLop(env, sbd, { now: Date.now(), nhan: q => { hoiThayDenHan = q } }), docQidSaiV2(env, sbd), docMocDocLoiGiai(env, sbd), Promise.all([emLySom.then((x) => x.em), docThamSo(env)]).then(([em, chung]) => em ?? chung), omniP, phamViP, emLySom.then((x) => x.ly)])
   // OMNI 3: mọi chiến dịch đang chạy, hạn gần trước; cờ tắt ⇒ một chiến dịch (giao gần nhất) như cũ.
   const ht = ds.find(c => laHanhTrinh(c.id) && c.trangThai === 'dang_chay' && !chuaBatDau(c, homNay))
   if (ht) {
@@ -1000,7 +1002,10 @@ export async function docHoSo2(env: Env, sbd: string, homNay: string, omniSom?: 
       // Chỉ chỗ < CHO_SONG_SINH: qid ảo phát ra phải nằm trong danh sách đọc sổ (`cacQidSongSinh`), không thì lượt làm rơi khỏi lịch sử câu gốc.
       const ssDungDuoc = (boTro.get(qid)?.songSinh ?? []).flatMap((ss, i) => i < CHO_SONG_SINH && songSinhDuDuLieu(m.phan, ss) ? [i] : [])
       const soSS = ssDungDuoc.length
-      const ap = apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoDung)
+      // 10/11 khối B: lượt đúng theo loại lỗi («Vì sao em sai?»: Tính 1 · Chưa biết cách 2 · Hiểu nhầm 3 ngày); Tính mà đã sai từ 2 lần ⇒ như Chưa biết cách
+      const ly = lyDoLoi.get(qid), apL = (l: typeof ly) => apLuatChung(t0, theoQid.get(qid) ?? [], mocDoc.get(qid) ?? [], soSS > 0, homNay, thamSoTheoLyDo(thamSoDung, l))
+      let ap = apL(ly)
+      if (ly === 'tinh' && lyDoHieuLuc(ly, ap.loi.soLanSai) !== 'tinh') ap = apL('cach')
       t = ap.t
       if (ap.loi.trangThai !== 'khong_loi') loiV2.set(qid, ap.loi)
       // 06/10 (2b): bản song sinh của lượt tới = bản LÂU CHƯA PHỤC VỤ NHẤT theo sổ (`chonBanSongSinh`) — trước: số lượt song sinh mod số bản (nhảy cóc / lặp bản khi lượt câu anh em chen giữa).

@@ -20,8 +20,16 @@ export const CACH_SAI_CUOI_TOI_THIEU = 3
 export const MOC_DUY_TRI = [14, 30] as const
 
 /** Tham số luật — Giai đoạn 5 tự hiệu chỉnh hằng tuần theo tỉ lệ sai lại thực tế (tu-hoan-thien.ts, `cau_hinh` khoá 'v2_tham_so'). */
-export interface ThamSoLuat { cachSaiCuoi: number; mocDuyTri: readonly number[]; gioDocLoiGiai: number }
+export interface ThamSoLuat { cachSaiCuoi: number; mocDuyTri: readonly number[]; gioDocLoiGiai: number
+  /** Số NGÀY đúng tự làm (sau lần sai cuối) cần để đóng lỗi — vắng = 2 (luật gốc). Đặt theo «Vì sao em sai?» (`thamSoTheoLyDo`). */
+  soNgayDung?: number }
 export const THAM_SO_GOC: ThamSoLuat = { cachSaiCuoi: CACH_SAI_CUOI_TOI_THIEU, mocDuyTri: MOC_DUY_TRI, gioDocLoiGiai: GIO_DOC_LOI_GIAI_CAM }
+/** LƯỢT ĐÚNG THEO LOẠI LỖI (khối B, đề xuất v5 mục 3 — thầy 09/11 duyệt; 10/11 «Làm nốt mấy việc còn lại»): lý do em chạm ở «Vì sao em sai?» quyết số ngày đúng
+ *  cần để đóng lỗi — «Tính / đọc đề sai» 1 ngày (ngày sau lần sai, không cần cách 3 ngày) · «Chưa biết cách» 2 ngày (luật gốc) · «Hiểu nhầm» 3 ngày. Song sinh
+ *  và mốc duy trì giữ nguyên. Lý do «Tính / đọc đề sai» mà câu đã sai từ 2 lần ⇒ máy nâng thành «Chưa biết cách» (ly-do-sai.ts `lyDoHieuLuc`). */
+export function thamSoTheoLyDo(ts: ThamSoLuat, ly: 'tinh' | 'cach' | 'nham' | undefined): ThamSoLuat {
+  return ly === 'tinh' ? { ...ts, soNgayDung: 1, cachSaiCuoi: 1 } : ly === 'nham' ? { ...ts, soNgayDung: 3 } : ts
+}
 
 /** Một lần em gặp câu (câu gốc hoặc song sinh của nó). `ketQua`: 1 đúng · 0 sai · null bỏ trống. */
 export interface LanLamLoi {
@@ -91,7 +99,7 @@ export function phatLaiLoi(lan: readonly LanLamLoi[], docLoiGiaiLuc: readonly st
       }
       if (!kq.ngayDung.includes(x.ngayVn)) kq.ngayDung.push(x.ngayVn)
       if (x.songSinh) kq.daDungSongSinh = true
-      const duNgay = kq.ngayDung.length >= 2
+      const duNgay = kq.ngayDung.length >= (ts.soNgayDung ?? 2)
       const duSongSinh = kq.daDungSongSinh || !coSongSinh
       const duCach = cachNgay(kq.saiCuoi, x.ngayVn) >= ts.cachSaiCuoi
       if (duNgay && duSongSinh && duCach) {

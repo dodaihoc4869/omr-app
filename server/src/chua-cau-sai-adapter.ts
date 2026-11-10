@@ -3,6 +3,7 @@ import type { Env } from './kieu'
 import {
   phatLaiLoi,
   tachSongSinh,
+  thamSoTheoLyDo,
   TU_NGAY,
   THAM_SO_GOC,
   type KetQuaLoi,
@@ -10,6 +11,7 @@ import {
   type ThamSoLuat,
 } from './loi-hoc-luat'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
+import { docLyDoLoi, docThamSoEmVaLyDo, lyDoHieuLuc } from './ly-do-sai'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { docThamSo } from './tu-hoan-thien'
 import { docThamSoEm } from './ca-nhan-hoa-v2'
@@ -63,7 +65,7 @@ export async function docNhieuTrangThaiLoiDau(
       roots.flatMap((q) => [q, ...[0, 1, 2, 3].map((i) => `${q}~ss${i}`)]),
     ),
     tcList = JSON.stringify(roots)
-  const [r, docs, materials, ts] = await Promise.all([
+  const [r, docs, materials, ts, lyDo] = await Promise.all([
     env.DB.prepare(
       `SELECT s.qid,s.nguon,s.luc,s.ngay_vn,s.ket_qua,s.assistance,json_extract(s.raw_json,'$.tc') AS tc FROM su_kien_hoc s WHERE s.sbd=? AND s.ngay_vn>=? AND ${SQL_LA_LAN_LAM} AND COALESCE(s.visibility,'')<>'embargoed'
    AND (s.qid IN (SELECT value FROM json_each(?)) OR json_extract(s.raw_json,'$.tc') IN (SELECT value FROM json_each(?)))
@@ -82,8 +84,9 @@ export async function docNhieuTrangThaiLoiDau(
     )
       .bind(ds)
       .all<{ qid: string }>(),
-    thamSo ? Promise.resolve(thamSo) : docLuatChua(env, sbd),
-  ])
+    // 10/11 khối B: lượt đúng theo loại lỗi — chưa có tham số ⇒ tham số riêng + lý do trong MỘT câu (không thêm lệnh); nơi gọi đưa sẵn tham số ⇒ đọc lý do cùng đợt
+    thamSo ? Promise.resolve({ ts: thamSo, ly: docLyDoLoi(env, sbd) }) : Promise.all([docThamSoEmVaLyDo(env, sbd), docThamSo(env)]).then(([x, chung]) => ({ ts: x.em ?? chung, ly: Promise.resolve(x.ly) })),
+  ]).then(async ([r0, d0, m0, t0]) => [r0, d0, m0, t0.ts, await t0.ly] as const)
   const lan = new Map<string, LanLamLoi[]>(),
     ss = new Set((materials.results ?? []).map((x) => x.qid))
   for (const x of r.results ?? []) {
@@ -111,13 +114,11 @@ export async function docNhieuTrangThaiLoiDau(
         .filter((x) => alias.get(q)?.has(qidChuan(x.qid)))
         .map((x) => x.luc),
       tham = ts ?? THAM_SO_GOC
-    const loiHoc = phatLaiLoi(
-      ds,
-      doc,
-      ss.has(q) || ds.some((x) => x.songSinh),
-      homNay,
-      tham,
-    )
+    // 10/11 khối B: lượt đúng theo «Vì sao em sai?» (Tính 1 · Chưa biết cách 2 · Hiểu nhầm 3 ngày); Tính mà đã sai từ 2 lần ⇒ như Chưa biết cách
+    const ly = lyDo.get(q),
+      theoLy = (l: typeof ly) => phatLaiLoi(ds, doc, ss.has(q) || ds.some((x) => x.songSinh), homNay, thamSoTheoLyDo(tham, l))
+    let loiHoc = theoLy(ly)
+    if (ly === 'tinh' && lyDoHieuLuc(ly, loiHoc.soLanSai) !== 'tinh') loiHoc = theoLy('cach')
     const sai = ds
       .filter((x) => !x.coHoTro && x.ketQua !== 1)
       .map((x) => Date.parse(x.luc))
