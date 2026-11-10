@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1421,
+    "hash": "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a",
+    "fileNguon": "anh/ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a.png",
+    "svg": "polymer-bon-phenyl-native1421-a37bc84d3cc05d60cba86a010322d4e569f0203dadd0c9c125ec9c525d37926d.svg",
+    "hashSvg": "a37bc84d3cc05d60cba86a010322d4e569f0203dadd0c9c125ec9c525d37926d",
+    "byteSvg": 1654,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C4-D1-III-1",
+        "de": "Cấu tạo của một đoạn mạch polymer như hình dưới đây.\nCó bao nhiêu nguyên tử hydrogen có trong mỗi mắt xích của polymer trên?",
+        "refs": [
+          {
+            "hash": "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a",
+            "where": "12-KT-C4-D1-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "8dbb8c9cc4a0a6dd5ecf14a292d865c4a578428f62596c16c6a7392736b9bdfe"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4Ph24C12innerdouble+9barebackboneC=33visibleC/branches119UP-228DOWN-264UP-372DOWN/2verticalwaves6RIGHTcrestEACH/cutpointsNOTcarbon/allthin/noaddedH-CH2-brackets-n-caption-answer/no4repeat8Cnormalization",
+    "hashSvgDaSoat": "a37bc84d3cc05d60cba86a010322d4e569f0203dadd0c9c125ec9c525d37926d",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,540 @@
+{
+  "i": 1421,
+  "hash": "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a.png",
+  "size": [
+    459,
+    367
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C4-D1-III-1",
+      "de": "Cấu tạo của một đoạn mạch polymer như hình dưới đây.\nCó bao nhiêu nguyên tử hydrogen có trong mỗi mắt xích của polymer trên?",
+      "allHinh": [
+        {
+          "hash": "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a",
+          "where": "12-KT-C4-D1-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "8dbb8c9cc4a0a6dd5ecf14a292d865c4a578428f62596c16c6a7392736b9bdfe"
+        }
+      ],
+      "missingHashes": [
+        "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1421-native3x.png",
+    "leftWave10xOpened": "/workspace/scratch/1421-leftwave10x.png",
+    "rightWave10xOpened": "/workspace/scratch/1421-rightwave10x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "backboneInternalVertices": [
+      [
+        83,
+        195
+      ],
+      [
+        119,
+        175
+      ],
+      [
+        155,
+        195
+      ],
+      [
+        191,
+        175
+      ],
+      [
+        228,
+        195
+      ],
+      [
+        264,
+        175
+      ],
+      [
+        300,
+        195
+      ],
+      [
+        336,
+        175
+      ],
+      [
+        372,
+        195
+      ]
+    ],
+    "cutBondEnds": [
+      [
+        [
+          44,
+          175
+        ],
+        [
+          83,
+          195
+        ]
+      ],
+      [
+        [
+          372,
+          195
+        ],
+        [
+          405,
+          175
+        ]
+      ]
+    ],
+    "cutPointNote": "Wavecrossings44,175 and405,175 areCUTBONDpoints, notextraexplicitcarbonvertices. Do notinferformula/repeatpattern.",
+    "phenylBranches": [
+      {
+        "bond": [
+          [
+            119,
+            175
+          ],
+          [
+            119,
+            133
+          ]
+        ],
+        "vertices": [
+          [
+            119,
+            50
+          ],
+          [
+            155,
+            71
+          ],
+          [
+            155,
+            112
+          ],
+          [
+            119,
+            133
+          ],
+          [
+            83,
+            112
+          ],
+          [
+            83,
+            71
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              94,
+              73
+            ],
+            [
+              118,
+              59
+            ]
+          ],
+          [
+            [
+              148,
+              78
+            ],
+            [
+              148,
+              105
+            ]
+          ],
+          [
+            [
+              118,
+              124
+            ],
+            [
+              94,
+              110
+            ]
+          ]
+        ]
+      },
+      {
+        "bond": [
+          [
+            228,
+            195
+          ],
+          [
+            228,
+            237
+          ]
+        ],
+        "vertices": [
+          [
+            228,
+            237
+          ],
+          [
+            264,
+            258
+          ],
+          [
+            264,
+            299
+          ],
+          [
+            228,
+            320
+          ],
+          [
+            192,
+            299
+          ],
+          [
+            192,
+            258
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              231,
+              247
+            ],
+            [
+              255,
+              261
+            ]
+          ],
+          [
+            [
+              255,
+              297
+            ],
+            [
+              231,
+              311
+            ]
+          ],
+          [
+            [
+              199,
+              265
+            ],
+            [
+              199,
+              291
+            ]
+          ]
+        ]
+      },
+      {
+        "bond": [
+          [
+            264,
+            175
+          ],
+          [
+            264,
+            133
+          ]
+        ],
+        "vertices": [
+          [
+            264,
+            50
+          ],
+          [
+            300,
+            71
+          ],
+          [
+            300,
+            112
+          ],
+          [
+            264,
+            133
+          ],
+          [
+            228,
+            112
+          ],
+          [
+            228,
+            71
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              239,
+              73
+            ],
+            [
+              263,
+              59
+            ]
+          ],
+          [
+            [
+              293,
+              78
+            ],
+            [
+              293,
+              105
+            ]
+          ],
+          [
+            [
+              263,
+              124
+            ],
+            [
+              239,
+              110
+            ]
+          ]
+        ]
+      },
+      {
+        "bond": [
+          [
+            372,
+            195
+          ],
+          [
+            372,
+            237
+          ]
+        ],
+        "vertices": [
+          [
+            372,
+            237
+          ],
+          [
+            408,
+            258
+          ],
+          [
+            408,
+            299
+          ],
+          [
+            372,
+            320
+          ],
+          [
+            336,
+            299
+          ],
+          [
+            336,
+            258
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              375,
+              247
+            ],
+            [
+              399,
+              261
+            ]
+          ],
+          [
+            [
+              399,
+              297
+            ],
+            [
+              375,
+              311
+            ]
+          ],
+          [
+            [
+              343,
+              265
+            ],
+            [
+              343,
+              291
+            ]
+          ]
+        ]
+      }
+    ],
+    "leftWave": {
+      "top": [
+        43,
+        149
+      ],
+      "bottom": [
+        45,
+        190
+      ],
+      "rightCrestsApprox": [
+        [
+          46,
+          154
+        ],
+        [
+          45,
+          161
+        ],
+        [
+          45,
+          168
+        ],
+        [
+          46,
+          175
+        ],
+        [
+          46,
+          182
+        ],
+        [
+          45,
+          189
+        ]
+      ],
+      "leftTroughsApprox": [
+        [
+          42,
+          150
+        ],
+        [
+          42,
+          157
+        ],
+        [
+          42.5,
+          164
+        ],
+        [
+          42.5,
+          171
+        ],
+        [
+          42,
+          178
+        ],
+        [
+          42.5,
+          185
+        ]
+      ],
+      "finding": "SIXrightbulges along6roughly7pxperiods, not5. Nativeantialiasing shifts extremumrow1px; turnstakenfromownmacroandrowcenters jointly. Junctionnear175 mergeswaveandbackboneline.",
+      "inkStyle": "thinuniformwavyverticalcutline,nofilledhead"
+    },
+    "rightWave": {
+      "top": [
+        403.5,
+        158
+      ],
+      "bottom": [
+        406,
+        199
+      ],
+      "rightCrestsApprox": [
+        [
+          406.5,
+          163
+        ],
+        [
+          406.5,
+          170
+        ],
+        [
+          407,
+          177
+        ],
+        [
+          406,
+          184
+        ],
+        [
+          406,
+          191
+        ],
+        [
+          406,
+          198
+        ]
+      ],
+      "leftTroughsApprox": [
+        [
+          403,
+          159
+        ],
+        [
+          402,
+          167
+        ],
+        [
+          403,
+          173
+        ],
+        [
+          403,
+          180
+        ],
+        [
+          402.5,
+          187
+        ],
+        [
+          403,
+          194
+        ]
+      ],
+      "finding": "SIXrightbulges, junctioncrest177 partlymergedwithdiagonalbackbone. Do notmanufacturenewcyclesfrompixelnoise.",
+      "inkStyle": "thinuniformwavyverticalcutline,nofilledhead"
+    },
+    "counts": {
+      "bareBackboneC": 9,
+      "PhC": 24,
+      "literalCVertices": 33,
+      "PhRings": 4,
+      "innerDoubleRays": 12,
+      "waveLines": 2,
+      "rightBulgesEachWave": 6,
+      "Htext": 0,
+      "caption": 0,
+      "brackets": 0,
+      "nsub": 0
+    },
+    "style": "NoTEXTanywhere, uniformthinblackbonds, noTAPER/bold/wedges/circlearomatic. Polymerbranchpositions literal119UP/228DOWN/264UP/372DOWN, nottheoreticalregularalternation.",
+    "noAdded": [
+      "H/CH2/CHlabels",
+      "monomername",
+      "carboncountanswer",
+      "repeatbracketsn",
+      "extraPhat191",
+      "normalizingbackboneto8C",
+      "wavearrowheads"
+    ]
+  },
+  "corrections": [
+    "Earlychatapprox5cycles waswrong. Own10xmacro pluspixelrowcentertrace identifies6rightcrests eachwave; retainaudit, no5cyclebuilder."
+  ],
+  "coordinateMeaning": "Nativepixelgeometry, internalindices NOTfigurelabels. Barecarboncountliteral, notanswerinference."
+}

@@ -2521,6 +2521,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a": {
+      "tep": "polymer-bon-phenyl-native1421-a37bc84d3cc05d60cba86a010322d4e569f0203dadd0c9c125ec9c525d37926d.svg",
+      "hashSvg": "a37bc84d3cc05d60cba86a010322d4e569f0203dadd0c9c125ec9c525d37926d",
+      "byteSvg": 1654,
+      "byteGzip": 564,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "c6a70f48a7fbe7978f2dd31ac46bd998ea13255e5bf205858bd68cc9538833aa": {
       "tep": "vinyl-acetate-ddh-5287ab387f1884ec4aeb5a8d485b50565f321284fa28e5702349f7199b291d52.svg",
       "hashSvg": "5287ab387f1884ec4aeb5a8d485b50565f321284fa28e5702349f7199b291d52",
@@ -15156,6 +15165,20 @@
           "where": "12-KT-C4-D1-II-3.hinh.0.du_lieu",
           "hashDataUrl": "170d1e6d320e900120184b36d1183187921b251fcf04d5cb330ccb4ec43c9694",
           "vector": "capron-pan-ddh-19fd43d6eb58e4477fd47924521bc7a681ea9e9b1b7ee10feb54a82d1abefd4a.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C4-D1-III-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ff00ffacd27fccf862b13b12d118d3110e51224235b780473cf6ab2d2052393a",
+          "where": "12-KT-C4-D1-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "8dbb8c9cc4a0a6dd5ecf14a292d865c4a578428f62596c16c6a7392736b9bdfe",
+          "vector": "polymer-bon-phenyl-native1421-a37bc84d3cc05d60cba86a010322d4e569f0203dadd0c9c125ec9c525d37926d.svg"
         }
       ]
     },
@@ -29722,6 +29745,7 @@
     "12-KT-C4-D1-I-10",
     "12-KT-C4-D1-II-2",
     "12-KT-C4-D1-II-3",
+    "12-KT-C4-D1-III-1",
     "12-KT-C3-D5-I-2",
     "12-KT-C3-D5-I-8",
     "12-KT-C3-D5-II-4",
