@@ -157,7 +157,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang }: PropsBang) {
       if (nay - lucAm > 110) {
         lucAm = nay
         const am = Math.min(1, lv.mucAm() * 3)
-        goc.current?.style.setProperty('--lv-am', am.toFixed(2))
+        khay.current?.style.setProperty('--lv-am', am.toFixed(2)) // đặt ngay trên khay (không ở gốc): biến kế thừa đổi ở gốc ⇒ tính lại kiểu cả cây đề
         if (am > 0.08) noiDen = nay + 1200
         if ((nay < noiDen) !== dangNoi) { dangNoi = nay < noiDen; setThayNoi(dangNoi) }
       }
@@ -216,7 +216,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang }: PropsBang) {
       const ra = Math.max(0, -dx), vuot = Math.max(0, ra - RONG_KHAY)
       khay.current.style.transition = 'none'
       khay.current.style.transform = `translate3d(${(RONG_KHAY - Math.min(ra, RONG_KHAY) - vuot * 0.25).toFixed(1)}px,-50%,0)`
-      khay.current.style.opacity = '1'
+      khay.current.style.opacity = '1'; khay.current.style.visibility = 'visible'
     }
     k.x = p.x; k.t = e.timeStamp
   }
@@ -225,7 +225,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang }: PropsBang) {
     keo.current = null
     if (!k || k.id !== e.pointerId) return
     const p = toaDo(e)
-    if (khay.current) { khay.current.style.transition = ''; khay.current.style.transform = ''; khay.current.style.opacity = '' }
+    if (khay.current) { khay.current.style.transition = ''; khay.current.style.transform = ''; khay.current.style.opacity = ''; khay.current.style.visibility = '' }
     if (k.kieu === 'ngang') setMo(k.x0 - p.x > RONG_KHAY * 0.3)
     else if (!k.kieu) setMo((m) => !m)
   }

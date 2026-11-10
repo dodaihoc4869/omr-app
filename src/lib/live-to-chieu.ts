@@ -26,7 +26,9 @@ body.mc .mc-thanh .mc-lv-cum{flex:none;display:inline-flex;align-items:stretch;m
 .mc-lv-cum.vang{background:var(--mc-qua-nen);color:var(--mc-qua-chu);box-shadow:none}
 .mc-lv-cum .im{animation:mcLvNhay 1s steps(2,jump-none) infinite}
 @keyframes mcLvNhay{from{background:transparent;color:inherit}to{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}}
-body.mc-live .mc-thanh [data-k="T"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="Tab"] .mc-nut-chu{display:none}
+body.mc-live .mc-thanh [data-k="T"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="Tab"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="P"] .mc-nut-chu{display:none}
+body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
+.mc-lv-nhac{display:inline-flex;align-items:center;height:calc(var(--u)*2.3);padding:0 1em;border-radius:999px;background:var(--mc-thanh-nen);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-phu);font:600 calc(var(--u)*.9) var(--mc-sans);white-space:nowrap;font-variant-numeric:tabular-nums}
 body.mc-live .mc-thanh [data-k="?"]{display:none}
 /* thẻ nổi neo trên thanh */
 .mc-lv-the,.mc-lv-roi{position:fixed;right:calc(var(--u)*.75);bottom:calc(var(--u)*5);z-index:45;font-family:var(--mc-sans);color:var(--mc-bang-chu)}
@@ -108,12 +110,14 @@ export const JS_LIVE_TO_CHIEU = `
   }, true);
   lvThe.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-lv]'); if (b) lvGui(b.getAttribute('data-lv'), b.hasAttribute('data-v') ? { v: b.getAttribute('data-v') === '1' } : null); });
   lvThe.addEventListener('change', function (e) { if (e.target && e.target.tagName === 'SELECT') lvGui('chon-mic', { id: e.target.value }); });
-  lvRoi.addEventListener('click', function () { LV.moRoi = !LV.moRoi; lvVeRoi(); lvHenThu(); });
+  lvRoi.addEventListener('click', function () { if (lvVien.hidden) return; LV.moRoi = !LV.moRoi; lvVeRoi(); lvHenThu(); });
   function lvHenThu() { clearTimeout(LV.hRoi); if (LV.moRoi) LV.hRoi = setTimeout(function () { LV.moRoi = false; lvVeRoi(); }, 4000); }
   function lvVeRoi() {
     var ds = (LV.tt && LV.tt.pha === 'live' && LV.tt.roi) || [], n = ds.length, h, i, e;
-    lvRoi.hidden = lvVien.hidden = !n;
-    if (!n) { LV.moRoi = false; return; }
+    lvVien.hidden = !n;
+    // không em nào rời: chỗ này nhắc «Lượt đang mở · N em chưa gửi» (thầy viết lời giải khi lượt chưa mở đáp án — đặc tả mục 5)
+    lvRoi.hidden = !n && !(LV.tt && LV.tt.pha === 'live' && LV.tt.chuaGui);
+    if (!n) { LV.moRoi = false; lvRoi.innerHTML = lvRoi.hidden ? '' : '<span class="mc-lv-nhac" role="status">Lượt đang mở · ' + LV.tt.chuaGui + ' em chưa gửi</span>'; return; }
     function ky(e) { var m = lvMau(e.mau); return '<b class="mc-lv-ky"' + (m ? ' style="--doi:' + m + '"' : '') + '>' + lvSach(e.ky) + '</b>'; }
     if (!LV.moRoi) {
       h = '<button type="button" class="mc-lv-roi-gon" aria-label="' + n + ' em rời màn, bấm để xem tên">' + LV_BT.roi + '<span>' + n + ' em rời màn</span>';
@@ -173,8 +177,7 @@ export const JS_LIVE_TO_CHIEU = `
         for (i = 0; i < 7; i++) h += '<i style="height:' + [36, 59, 82, 100, 73, 45, 27][i] + '%"></i>';
         lvCum.innerHTML = '<span><i class="cham"></i>LIVE <b id="mc-lv-dh">' + lvDongHo(t.tu || Date.now()) + '</b></span>'
           + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + ' em xem</small></span>'
-          + (t.coTieng && !t.khongTieng ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>Không tiếng</span>')
-          + (t.chuaGui ? '<span><small style="margin:0">Lượt đang mở · ' + t.chuaGui + ' em chưa gửi</small></span>' : '');
+          + (t.coTieng && !t.khongTieng ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>Không tiếng</span>');
         LV.hDh = setInterval(function () { var d = document.getElementById('mc-lv-dh'); if (d && LV.tt && LV.tt.tu) d.textContent = lvDongHo(LV.tt.tu); if (LV.moRoi) lvVeRoi(); }, 1000);
       }
     }
