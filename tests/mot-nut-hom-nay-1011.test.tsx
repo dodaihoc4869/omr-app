@@ -33,7 +33,8 @@ describe('Hôm nay chỉ một nút', () => {
   })
   it('ngày có Kiểm tra ôn tập: không chặng Tự sửa lỗi riêng (thầy «Hs vẫn 57 câu à») — mã', () => {
     const src = readFileSync('src/components/hoc-tap/TrongHs.tsx', 'utf8')
-    expect(src).toMatch(/const coSua = !!soSua && soSua > 0 && !p\.loaiNgay && !kiem\?\.homNay/)
+    expect(src).toMatch(/const coSuaChang = coSua && !kiem\?\.homNay/)
+    expect(src).toMatch(/const tongSuaNay = coSuaChang && !p\.ngayKiem/) // tổng thẻ mức không cộng câu Tự sửa ngày kiểm tra (ô Luyện tập vẫn đếm: coSua)
   })
 })
 

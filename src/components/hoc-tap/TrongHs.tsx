@@ -789,7 +789,8 @@ export function MotTrangHs(p: PropsMotTrang) {
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
   const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
   const soSua = p.soSua ?? nhoSua?.[0]
-  const coSua = !!soSua && soSua > 0 && !p.loaiNgay && !kiem?.homNay // ngày có loại / có Kiểm tra ôn tập: không chặng Tự sửa riêng (10/11)
+  const coSua = !!soSua && soSua > 0 && !p.loaiNgay // ngày có loại: 28 câu, không chặng Tự sửa (10/11)
+  const coSuaChang = coSua && !kiem?.homNay // 10/11 «Hs vẫn 57 câu à»: ngày có Kiểm tra ôn tập không chặng Tự sửa trên Hôm nay (ô Luyện tập vẫn đếm)
   const { con: conSua, phan: conSuaPhan, xong: daSuaNay, mod: modSua } = useConSuaHomNay(p.token, coSua, nhoSua)
   useEffect(() => {
     if (p.token && p.soSua != null && conSuaPhan != null) try { localStorage.setItem(KHOA_SUA_NHO, JSON.stringify({ t: p.token.slice(-16), n: ngayVn(Date.now()), s: [p.soSua, conSua, conSuaPhan, daSuaNay] })) } catch { /* máy chặn: như cũ */ }
@@ -809,26 +810,26 @@ export function MotTrangHs(p: PropsMotTrang) {
   const xongChang = so ? soChangXong(so) : 0
   // TỰ SỬA LỖI CHÈN GIỮA HÀNH TRÌNH (thầy 27/10 «Ưu tiên bài kiểm tra lên đầu hành trình sau đó sửa lỗi chèn vào giữa hành trình mới»): nút Tự sửa lỗi đứng SAU
   // `mocSua` chặng (xem mocSuaHomNay). Đường đi theo thứ tự: các chặng trước mốc xong rồi ⇒ Tự sửa lỗi là việc hiện tại (dù chưa đủ mức).
-  const mocSua = coSua && !p.ngayKiem && chang.length ? mocSuaHomNay(chang.length, xongChang) : chang.length
+  const mocSua = coSuaChang && !p.ngayKiem && chang.length ? mocSuaHomNay(chang.length, xongChang) : chang.length
   // Xong phần sửa HÔM NAY ⇒ Tự sửa lỗi thôi là việc chính (nút ✓, vẫn bấm vào sửa thêm được).
   // SỬA XONG MỚI MỞ CHẶNG SAU (thầy 28/10 «Tôi muốn sửa phải xong mới hiện chặng sau»): phần ngày (12 câu đầu) còn câu chưa xong ⇒ mọi chặng chưa xong
   // NẰM SAU nút Sửa lỗi khoá xám (thẻ «Sửa xong N lỗi hôm nay để mở chặng tiếp»); xong ⇒ vỡ khoá (một lần). Máy chủ cũng chặn (TU_SUA_TRUOC). Kiểm tra ôn tập
   // đang khoá thì khoá kiểm tra đứng trên. CHỈ khoá khi có số thật của việc hôm nay: mảnh chưa nạp / không dựng được việc hôm nay (vòng chữa tắt, bảo trì,
   // chưa có danh sách) ⇒ KHÔNG khoá — không phạt em vì thiếu số (máy chủ cũng chỉ chặn khi có dữ liệu).
   const conPhan = conSuaPhan ?? 0
-  const khoaSua = coSua && !p.ngayKiem && !khoaKt && conPhan > 0
-  const toiSua = coSua && !p.ngayKiem && (khoaSua || !xongSuaNay) && xongChang >= mocSua
+  const khoaSua = coSuaChang && !p.ngayKiem && !khoaKt && conPhan > 0
+  const toiSua = coSuaChang && !p.ngayKiem && (khoaSua || !xongSuaNay) && xongChang >= mocSua
   // Tới nút Sửa lỗi mà phần ngày chưa xong ⇒ báo máy chủ (nền, một lần / ngày) để chặn mở chặng bằng lối khác; nhớ trên máy để lúc xong chạy vỡ khoá MỘT lần.
   const khoaSuaToi = khoaSua && toiSua
   useEffect(() => {
     const ngay = ngayVn(Date.now())
     try {
       if (khoaSuaToi) { modSua?.baoKhoaSua(); localStorage.setItem(KHOA_SUA_MO, ngay); return }
-      if (khoaSua || !coSua || conSuaPhan !== 0 || localStorage.getItem(KHOA_SUA_MO) !== ngay) return
+      if (khoaSua || !coSuaChang || conSuaPhan !== 0 || localStorage.getItem(KHOA_SUA_MO) !== ngay) return
       localStorage.removeItem(KHOA_SUA_MO)
     } catch { /* bỏ qua */ }
   }, [khoaSuaToi, khoaSua, conSuaPhan, modSua]) // eslint-disable-line react-hooks/exhaustive-deps
-  const chinh = p.coCa ? 'ca' : p.ngayKiem || khoaKt ? 'kiem' : toiSua ? 'sua' : du && kiemLam ? 'kiem' : du && coSua && !xongSuaNay ? 'sua' : du && coBt && p.soBaiTap ? 'bt' : 'hoc'
+  const chinh = p.coCa ? 'ca' : p.ngayKiem || khoaKt ? 'kiem' : toiSua ? 'sua' : du && kiemLam ? 'kiem' : du && coSuaChang && !xongSuaNay ? 'sua' : du && coBt && p.soBaiTap ? 'bt' : 'hoc'
   const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
 
   // ── LỬA ĐỔI CẢM XÚC (thầy «Chốt duyệt tất» 31/10, docs/DE-XUAT-BI-CAM-XUC-3110.md): cấp 0–5 tính TRÊN MÁY từ số đã có (Sảnh, /hs/thuong, sổ `ddh.lua-that`)
@@ -960,10 +961,10 @@ export function MotTrangHs(p: PropsMotTrang) {
       nut: (kiemLam || kiemXong) && p.onKiemTra ? { chu: kiemXong ? 'Xem kết quả' : kiem.daTra > 0 ? 'Làm tiếp' : 'Bắt đầu', onClick: p.onKiemTra, tat: p.coCa } : undefined } }
   if (nutKiem) nut.push(nutKiem) // Kiểm tra ôn tập LUÔN đứng đầu hành trình (thầy 27/10)
   let nutSua: Nut | null = null
-  if (coSua && !p.ngayKiem && khoaKt) nutSua = { k: 'sua', loai: 'sua', tt: 'khoa', ten: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập', pop: { tieu: 'Tự sửa lỗi', phu: CHU_KHOA_KT } }
-  else if (coSua && !p.ngayKiem && xongSuaNay) nutSua = { k: 'sua', loai: 'sua', tt: 'xong', ten: 'Tự sửa lỗi: hôm nay đã sửa xong',
+  if (coSuaChang && !p.ngayKiem && khoaKt) nutSua = { k: 'sua', loai: 'sua', tt: 'khoa', ten: 'Tự sửa lỗi: khoá đến khi làm xong Kiểm tra ôn tập', pop: { tieu: 'Tự sửa lỗi', phu: CHU_KHOA_KT } }
+  else if (coSuaChang && !p.ngayKiem && xongSuaNay) nutSua = { k: 'sua', loai: 'sua', tt: 'xong', ten: 'Tự sửa lỗi: hôm nay đã sửa xong',
     pop: { tieu: 'Tự sửa lỗi', phu: 'Hôm nay em đã sửa đủ phần của mình. Những câu còn lại để ngày mai nhé.' } } // thầy 29/10: xong phần hôm nay ⇒ không cho sửa thêm
-  else if (coSua && !p.ngayKiem) nutSua = { k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', dem: choSoSua ? undefined : suaNay || undefined, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: hôm nay còn ${suaNay} câu`,
+  else if (coSuaChang && !p.ngayKiem) nutSua = { k: 'sua', loai: 'sua', tt: chinh === 'sua' ? 'dang' : 'mo', dem: choSoSua ? undefined : suaNay || undefined, bong: chinh === 'sua' ? 'Sửa lỗi' : undefined, ten: `Tự sửa lỗi: hôm nay còn ${suaNay} câu`,
     pop: { tieu: 'Tự sửa lỗi', phu: `Hôm nay còn ${suaNay} câu cần sửa`, nut: { chu: 'Sửa ngay', onClick: p.onChua } } }
   if (!p.ngayKiem) chang.forEach((c, i) => {
     if (nutSua && i === mocSua) nut.push(nutSua)
@@ -996,13 +997,13 @@ export function MotTrangHs(p: PropsMotTrang) {
   // ôn tập của hôm nay (chưa quá hạn; đã nộp ⇒ tính đủ). Chỉ để HIỆN số + đổi màu dung dịch — thứ tự / khoá việc vẫn theo `du` (đủ mức câu học) như cũ.
   const ktNgay = !!kiem && kiem.homNay && (kiem.trangThai === 'can_lam' || kiem.trangThai === 'da_nop')
   const daSuaNgay = typeof daSuaNay === 'number' ? daSuaNay : 0
-  const tongSuaNay = coSua && !p.ngayKiem ? suaNay + daSuaNgay : 0 // cùng số «còn N câu cần sửa» của nút chính
+  const tongSuaNay = coSuaChang && !p.ngayKiem ? suaNay + daSuaNgay : 0 // cùng số «còn N câu cần sửa» của nút chính
   const coViecDang = nut.some((n) => n.tt === 'dang' && !!n.pop.nut?.onClick && !n.pop.nut.tat)
   const tongNgay = (so && !p.ngayKiem ? so.muc : 0) + tongSuaNay + (ktNgay ? kiem!.tong : 0)
   const daNgay = (so && !p.ngayKiem ? Math.min(so.daLam, so.muc) : 0) + (tongSuaNay ? daSuaNgay : 0) + (ktNgay ? (kiem!.nopLuc !== null ? kiem!.tong : kiem!.daTra) : 0)
   const coTong = tongNgay > 0 && (!!so || !!p.ngayKiem)
   const duNgay = coTong && daNgay >= tongNgay
-  const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSua && !xongSuaNay && 'Tự sửa lỗi', coBt && !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
+  const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSuaChang && !xongSuaNay && 'Tự sửa lỗi', coBt && !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = ((chinh === 'sua' && du) || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc && !khoaKt
   // Bi nói việc chính của hôm nay (cùng thứ tự `chinh`); xong hết ⇒ Bi mừng. Chưa có số (đang tải) ⇒ chưa hiện, không đoán.
   // [cảm xúc, lời, loại]: loại làm khoá «nhắc một lần» (số câu còn lại đổi theo từng câu KHÔNG tính là nội dung mới); 'ca' = lời quan trọng, luôn hiện.
@@ -1061,7 +1062,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {/* 28/10: Sảnh chưa về ⇒ chưa vẽ đường, báo đang tải. */}
       {/* NÚT CHÍNH (viên thuốc lớn + ô bánh quy 12 múi): đúng việc của nút đang làm trên danh sách (cùng onClick thẻ bật ra cũ) */}
-      {(() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d) return null; const Ic = HINH_NUT[d.loai]
+      {(() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d || chinh === 'ca' || (!so && p.dangTai && !p.ngayKiem)) return null; /* ca mở ⇒ chỉ nút «Vào ca»; đang tải chưa có số ⇒ chưa vẽ */ const Ic = HINH_NUT[d.loai]
         return <button type="button" className="kb-cta" data-sac={d.loai === 'hoc' && p.loaiNgay === 'sua' && !p.ngayKiem ? 'sai' : SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
           <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} /></span>
