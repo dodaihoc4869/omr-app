@@ -69,8 +69,10 @@ export const JS_LEN_BANG_BPU = `
     while (the.scrollWidth > the.clientWidth + 1 && co > 16 && i++ < 80) { co -= 1; the.style.setProperty('--bpu-co', co + 'px'); }
   }
   // 09/11 thầy «học sinh đội nào lên bảng thì có ngọn lửa đội đó cháy ở góc đề siêu đẹp … đủ to để cả lớp phải wow»: ngọn lửa màu đội (mã màu bảng gửi)
-  // nằm ở góc phải trên của đề (float — chữ đề chảy quanh, không bị che), lõi sáng, tia lửa bay lên; chấm xong / sang đợt khác thì tắt.
-  var CSS_LUA = '.bpu-lua-doi{float:left;position:relative;width:236px;height:296px;margin:-8px 22px 8px -8px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none;animation:bpuLuaVao .7s cubic-bezier(.2,.8,.2,1) both}'
+  // nằm ở góc trên TRÁI của đề, lõi sáng, tia lửa bay lên; chấm xong / sang đợt khác thì tắt.
+  // 10/11 thầy «phần đề bao quanh ngọn lửa để tối ưu diện tích hiển thị đề»: lửa float trong dòng chảy (cuộn cùng đề), shape-outside theo dáng
+  // ngọn lửa (đỉnh nhọn hẹp, thân + nhãn đội rộng) ⇒ chữ đề ôm sát mép lửa, hết chiều cao lửa thì tràn sang trái hết bề ngang — không còn cột trái riêng.
+  var CSS_LUA = '.bpu-lua-doi{float:left;position:relative;width:236px;height:296px;margin:-8px 22px 8px -8px;shape-outside:polygon(0 0,56% 0,72% 24%,84% 46%,84% 100%,0 100%) border-box;shape-margin:14px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;pointer-events:none;animation:bpuLuaVao .7s cubic-bezier(.2,.8,.2,1) both}'
     + '.bpu-lua-doi svg{width:210px;height:252px;overflow:visible;filter:drop-shadow(0 0 22px var(--doi)) drop-shadow(0 0 6px var(--doi))}'
     + '.bpu-lua-doi .l1{fill:var(--doi);transform-origin:50% 100%;animation:bpuLuaCay 1.1s ease-in-out infinite alternate}'
     + '.bpu-lua-doi .l2{fill:Canvas;opacity:.55;transform-origin:50% 100%;animation:bpuLuaCay .8s ease-in-out infinite alternate-reverse}'
@@ -78,33 +80,57 @@ export const JS_LEN_BANG_BPU = `
     + '.bpu-lua-doi .tia{fill:var(--doi);opacity:0;animation:bpuTia 1.6s ease-out infinite}'
     + '.bpu-lua-doi .tia:nth-of-type(2){animation-delay:.5s}.bpu-lua-doi .tia:nth-of-type(3){animation-delay:1s}'
     + '.bpu-lua-doi b{margin-top:2px;padding:4px 16px;border-radius:999px;background:var(--doi);color:Canvas;font:800 22px/1.3 inherit;letter-spacing:.04em;white-space:nowrap;box-shadow:0 0 18px var(--doi)}'
+    + '.bpu-lua-doi b{font-size:22px;font-weight:800;line-height:1.3}'
     + '.mc-em.bpu-the-ton{display:flex;justify-content:center;text-align:center}.mc-em.bpu-the-ton .mc-em-trai{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;text-align:center}.mc-em.bpu-the-ton .mc-em-hang1,.mc-em.bpu-the-ton .mc-ten-hang{justify-content:center;text-align:center;width:100%}'
     + '.mc-em.bpu-the-ton{border-radius:16px;box-shadow:0 0 0 4px var(--bpu-doi),0 0 40px var(--bpu-doi);animation:bpuTheSang 2.4s ease-in-out infinite alternate}'
     + '@keyframes bpuTheSang{from{box-shadow:0 0 0 4px var(--bpu-doi),0 0 22px var(--bpu-doi)}to{box-shadow:0 0 0 4px var(--bpu-doi),0 0 52px var(--bpu-doi)}}'
     + '@keyframes bpuLuaCay{0%{transform:scale(1,1) skewX(0)}50%{transform:scale(.96,1.07) skewX(2deg)}100%{transform:scale(1.03,.95) skewX(-2deg)}}'
     + '@keyframes bpuTia{0%{opacity:0;transform:translate(0,0) scale(1)}20%{opacity:.95}100%{opacity:0;transform:translate(var(--tx,8px),-90px) scale(.3)}}'
     + '@keyframes bpuLuaVao{from{opacity:0;transform:scale(.4) translateY(30px)}to{opacity:1;transform:none}}'
-    + 'body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:calc(var(--lua,236px) + 44px)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0;z-index:2;width:var(--lua,236px);height:calc(var(--lua,236px) * 1.25);margin:-8px 0 0 calc(-30px - var(--lua,236px))}'
-    + '.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi svg{width:calc(var(--lua,236px) * .89);height:calc(var(--lua,236px) * 1.07)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi b{font-size:max(14px,calc(var(--lua,236px) * .093))}'
+    // danh sách ý / phương án MỘT cột: khung thôi là lưới / flex (khối lưới né cả khung lửa suốt chiều cao) ⇒ từng dòng ý tự né lửa, xuống dưới lửa dùng hết bề ngang.
+    // ảnh / bảng rộng bắt đầu cạnh lửa (bị bóp) ⇒ xuống hẳn dưới lửa (clear).
+    + 'body.mc-bc .mc-vung-de .mc-ds-pa.bpu-pa-chay{display:block}body.mc-bc .mc-vung-de .mc-ds-pa.bpu-pa-chay>*+*{margin-top:6px}.mc-vung-de .bpu-duoi-lua{clear:left}'
     + '@media (prefers-reduced-motion:reduce){.bpu-lua-doi,.bpu-lua-doi *{animation:none!important}.bpu-lua-doi .tia{display:none}}html.may-yeu .bpu-lua-doi *{animation:none!important}';
-  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-the-ton'), function (x) { x.classList.remove('bpu-the-ton'); }); Array.prototype.forEach.call(document.querySelectorAll('.bpu-ranh-lua'), function (x) { x.classList.remove('bpu-ranh-lua'); }); }
-  // 10/11 vùng đề cuộn mà có ngọn lửa đội: đề dài (tràn khung) ⇒ chừa lề trái cho lửa, lửa DÍNH ở góc trên (position sticky) — cuộn tới đâu lửa vẫn cháy,
-  // chữ đề không chui dưới lửa. Đề ngắn (không tràn) ⇒ y như cũ (lửa float, chữ chảy quanh). Đo ở trạng thái KHÔNG lề để khỏi bật tắt qua lại.
-  // Ảnh / bảng giữ cỡ cũ: lửa trong lề thu nhỏ (tới 110px) cho vừa chỗ trống bên trái ảnh rộng nhất — đề chỉ có chữ thì lửa giữ cỡ to 236px.
-  function ranhLua(v) {
-    v.classList.remove('bpu-ranh-lua');
-    if (!(v.classList.contains('mc-cuon') && v.querySelector(':scope > .bpu-lua-doi') && v.scrollHeight > v.clientHeight + 2)) return;
-    var rong = 0;
-    Array.prototype.forEach.call(v.querySelectorAll('img,.q-bang'), function (x) { rong = Math.max(rong, x.getBoundingClientRect().width); });
-    v.style.setProperty('--lua', Math.round(Math.max(110, Math.min(236, v.clientWidth - 66 - rong))) + 'px');
-    v.classList.add('bpu-ranh-lua');
+  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); ['bpu-the-ton', 'bpu-pa-chay', 'bpu-duoi-lua'].forEach(function (k) { Array.prototype.forEach.call(document.querySelectorAll('.' + k), function (x) { x.classList.remove(k); }); });
+    // trả số cột phương án tờ đã chia lúc chưa có lửa (baoLua chia lại theo bề ngang cạnh lửa)
+    Array.prototype.forEach.call(document.querySelectorAll('.mc-auto-options'), function (g) { if (g.__bpuCot === undefined) return; if (g.__bpuCot) g.style.setProperty('--mc-option-cols', g.__bpuCot); else g.style.removeProperty('--mc-option-cols'); g.__bpuCot = undefined; }); }
+  // 10/11 chữ đề bao quanh lửa: (1) danh sách ý / phương án MỘT cột ⇒ bpu-pa-chay (khung thường, từng ý né lửa riêng, dưới lửa hết bề ngang); 2 / 4 cột giữ lưới.
+  // (2) ảnh / bảng bắt đầu cạnh lửa mà bị bóp hẹp hơn cỡ đủ, lưới 2 / 4 cột chỉ chạm mép dưới lửa ⇒ bpu-duoi-lua (clear) — xét theo thứ tự, gặp khối đầu tiên đã dưới lửa thì thôi.
+  // Đo lại khi bố cục xong / ảnh nạp xong (số cột do tờ chia lại được).
+  function baoLua(v) {
+    ['bpu-pa-chay', 'bpu-duoi-lua'].forEach(function (k) { Array.prototype.forEach.call(v.querySelectorAll('.' + k), function (x) { x.classList.remove(k); }); });
+    var l = v.querySelector(':scope > .bpu-lua-doi'); if (!l) return;
+    // chia lại số cột theo bề ngang CÒN LẠI cạnh lửa (tờ chia lúc chưa có lửa ⇒ 2 cột bị bóp, phương án dài tràn mép); còn 1 cột ⇒ chảy quanh lửa
+    Array.prototype.forEach.call(v.querySelectorAll('.mc-auto-options'), function (g) { if (g.__bpuCot === undefined) g.__bpuCot = g.style.getPropertyValue('--mc-option-cols'); });
+    if (window.__mcFitOptions) window.__mcFitOptions(v);
+    Array.prototype.forEach.call(v.querySelectorAll('.mc-ds-pa'), function (x) {
+      var cs = getComputedStyle(x), cot = x.classList.contains('mc-auto-options') ? parseInt(cs.getPropertyValue('--mc-option-cols'), 10) || 1
+        : cs.display === 'grid' ? String(cs.gridTemplateColumns || '').trim().split(' ').length : cs.display === 'flex' && cs.flexDirection === 'row' ? 2 : 1;
+      if (cot <= 1) x.classList.add('bpu-pa-chay');
+    });
+    var day = l.getBoundingClientRect().bottom + (parseFloat(getComputedStyle(l).marginBottom) || 0), csv = getComputedStyle(v);
+    var trong = v.clientWidth - (parseFloat(csv.paddingLeft) || 0) - (parseFloat(csv.paddingRight) || 0);
+    var ds = v.querySelectorAll('.mc-ds-pa,img.q-hinh:not(.mc-anh-pa),.q-bang-cuon');
+    for (var i = 0; i < ds.length; i++) {
+      var x = ds[i], r = x.getBoundingClientRect(), hep = false;
+      if (x.classList.contains('bpu-pa-chay') || (x.parentElement && x.parentElement.closest('.mc-ds-pa'))) continue;
+      if (r.top >= day - 1) break;
+      if (x.classList.contains('mc-ds-pa')) hep = day - r.top < r.height / 2; // lưới 2 / 4 cột chỉ chạm mép dưới lửa ⇒ xuống hẳn, khỏi bóp cả lưới
+      else {
+        var muon = 0, b = x.tagName === 'IMG' ? null : x.querySelector('table');
+        if (!b) muon = Math.min(trong, x.naturalWidth || 0, x.naturalHeight ? (parseFloat(getComputedStyle(x).maxHeight) || 1e9) * x.naturalWidth / x.naturalHeight : 1e9);
+        else { r = b.getBoundingClientRect(); b.style.width = 'max-content'; muon = Math.min(trong, b.getBoundingClientRect().width); b.style.width = ''; }
+        hep = muon > r.width + 2;
+      }
+      if (hep) { x.classList.add('bpu-duoi-lua'); break; }
+    }
   }
   function cuonBpu(d) {
     if (!d || !S.bpuCuon) return;
     Array.prototype.forEach.call(d.querySelectorAll('.mc-vung-de'), function (v) {
-      ranhLua(v); conNua(v);
-      // ảnh nạp sau làm đề cao thêm ⇒ đo lại mép mờ «còn nữa ↓» và lề lửa
-      Array.prototype.forEach.call(v.querySelectorAll('img'), function (im) { if (!im.complete && !im.__bpuNghe) { im.__bpuNghe = true; im.addEventListener('load', function () { ranhLua(v); conNua(v); }); } });
+      baoLua(v); conNua(v);
+      // ảnh nạp sau làm đề cao thêm ⇒ đo lại mép mờ «còn nữa ↓» và chỗ ảnh / bảng cạnh lửa
+      Array.prototype.forEach.call(v.querySelectorAll('img'), function (im) { if (!im.complete && !im.__bpuNghe) { im.__bpuNghe = true; im.addEventListener('load', function () { baoLua(v); conNua(v); }); } });
     });
   }
   document.addEventListener('mc-bo-cuc-xong', function () { if (S.bpuCuon) cuonBpu(dot()); });
