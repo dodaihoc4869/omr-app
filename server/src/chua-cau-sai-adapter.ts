@@ -11,7 +11,7 @@ import {
   type ThamSoLuat,
 } from './loi-hoc-luat'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
-import { docLyDoLoi, lyDoHieuLuc } from './ly-do-sai'
+import { docLyDoLoi, docThamSoEmVaLyDo, lyDoHieuLuc } from './ly-do-sai'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { docThamSo } from './tu-hoan-thien'
 import { docThamSoEm } from './ca-nhan-hoa-v2'
@@ -84,9 +84,9 @@ export async function docNhieuTrangThaiLoiDau(
     )
       .bind(ds)
       .all<{ qid: string }>(),
-    thamSo ? Promise.resolve(thamSo) : docLuatChua(env, sbd),
-    docLyDoLoi(env, sbd), // 10/11 khối B: lượt đúng theo loại lỗi — cùng đợt đọc
-  ])
+    // 10/11 khối B: lượt đúng theo loại lỗi — chưa có tham số ⇒ tham số riêng + lý do trong MỘT câu (không thêm lệnh); nơi gọi đưa sẵn tham số ⇒ đọc lý do cùng đợt
+    thamSo ? Promise.resolve({ ts: thamSo, ly: docLyDoLoi(env, sbd) }) : Promise.all([docThamSoEmVaLyDo(env, sbd), docThamSo(env)]).then(([x, chung]) => ({ ts: x.em ?? chung, ly: Promise.resolve(x.ly) })),
+  ]).then(async ([r0, d0, m0, t0]) => [r0, d0, m0, t0.ts, await t0.ly] as const)
   const lan = new Map<string, LanLamLoi[]>(),
     ss = new Set((materials.results ?? []).map((x) => x.qid))
   for (const x of r.results ?? []) {
