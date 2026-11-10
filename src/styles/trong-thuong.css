@@ -352,6 +352,8 @@
 [data-trong='hs'] .tp-chip { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; background: var(--tr-mat-2); color: var(--tr-chu-2); font-size: 12px; letter-spacing: 0; text-transform: none; }
 [data-trong='hs'] .tp-kc-de { margin: 0; font-size: 17px; line-height: 1.55; font-weight: 600; }
 [data-trong='hs'] .tp-pa { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+/* 10/11: ảnh của phương án / của ý (phương án là hình — phổ khối, đồ thị …) nằm TRONG ô, không còn chữ giữ chỗ «(xem hình)» */
+[data-trong='hs'] .tp-kc-anh { display: block; max-width: 100%; max-height: 200px; width: auto; height: auto; margin: 2px 0; border-radius: 8px; }
 [data-trong='hs'] .tp-pa[data-luoi] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 [data-trong='hs'] .tp-pa button { display: flex; align-items: center; gap: 12px; min-height: 54px; padding: 8px 14px; border: 2px solid var(--tr-vien-2); border-bottom-width: 4px; border-radius: 14px; background: var(--tr-mat); color: var(--tr-chu); font: 600 16px/1.4 var(--tp-f); text-align: left; cursor: pointer; touch-action: manipulation; }
 [data-trong='hs'] .tp-pa button > b { display: grid; place-items: center; width: 28px; height: 28px; flex: none; border: 2px solid var(--tr-vien-2); border-radius: 8px; font-size: 13px; color: var(--tr-chu-2); }

@@ -147,6 +147,9 @@ html[data-trong='hs'] .kb-thanh .kb-thanh-ai:focus-visible { outline: 3px solid 
 html[data-trong='hs'][data-menu-cham] .aid-bong { display: none; }
 /* đang làm bài / tấm toàn khung ⇒ thanh ẩn như vạch cũ */
 html[data-trong='hs'][data-aid-tam] .kb-thanh, html[data-trong='hs'][data-tp-toan] .kb-thanh { visibility: hidden; }
+/* 10/11 (ảnh thầy gửi: bốn nút tab đè lên nút «Kiểm tra» của Thử thách Kim cương): nút tab tự khai `visibility: visible` (luật trên) nên KHÔNG thừa hưởng
+   lệnh ẩn của khối cha — phải ẩn thẳng từng nút khi tấm A.I / màn thưởng toàn khung đang mở. */
+html[data-trong='hs']:is([data-aid-tam], [data-tp-toan]) .kb-thanh :is(.kb-thanh-muc.kb-thanh-muc, .kb-thanh-ai.kb-thanh-ai) { visibility: hidden; }
 
 /* ── TẤM «THÊM» (menu cũ giữ nguyên nội dung) = tấm kính trượt từ đáy (điện thoại), ngăn trái nổi (rộng) ── */
 html[data-trong='hs'] .tr-menu { left: 8px; right: 8px; top: auto; bottom: 8px; inset-block: auto 8px; width: auto; max-width: 560px; margin: 0 auto; max-height: min(86dvh, 760px); border: 0; border-radius: 32px;

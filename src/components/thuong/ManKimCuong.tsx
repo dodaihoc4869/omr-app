@@ -5,6 +5,9 @@
 import { useRef, useState } from 'react'
 import { Check, Clock, RefreshCw, Target, Trophy } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
+import { BangSoLieu, CauHinh, HinhTaiViTri } from '../QuestionMedia'
+import { chuPhuongAn } from '../../lib/anh-phuong-an'
+import type { HinhAnh } from '../../data/examContent'
 import { Bi } from '../linh-vat/Bi'
 import { goiHoa2, guiLaiKhiKetMang } from '../hoa2/api'
 import { bayToi, bungHat, hoaGiay, hoatAnh, phanHoiThuong } from '../../lib/hieu-ung-thuong'
@@ -98,20 +101,30 @@ export function ManKimCuong({ token, chuyenDe, tenChuyenDe, onDong, onOnLai, bat
   if (buoc === 'lam' && phien && q) {
     const n = phien.cau.length
     const chon = (v: string) => { if (!kq) setTra(v) }
+    // HÌNH CỦA CÂU (10/11, thầy gửi ảnh «Ko có hình bị lỗi hình»): đề là ảnh, hình sau đề, bảng số liệu, ảnh từng phương án / từng ý — như màn làm bài (LamCau).
+    // Phương án chỉ là ảnh ⇒ bỏ chữ giữ chỗ «(xem hình)», ảnh nằm TRONG ô (luật 01/10, anh-phuong-an.ts); có ảnh phương án ⇒ một cột cho ảnh đủ rộng.
+    const hinh = (q.hinhAnh ?? []) as HinhAnh[], stt = viTri + 1
+    const anhO = (vt: string, nhan: string) => hinh.filter((x) => x.viTri === vt).map((x, i) => <img key={i} className="tp-kc-anh" src={x.src} alt={x.alt ?? nhan} loading="lazy" decoding="async" />)
+    const coAnhPa = !!q.choiceImgs?.some(Boolean) || hinh.some((x) => x.viTri.startsWith('sau_pa_'))
     return <ManToan nhan={`Thử thách Kim cương · ${tenChuyenDe}`} onDong={onDong}
       tren={<><OngNghiem phanTram={(100 * (viTri + (kq ? 1 : 0))) / n} kimCuong nhan={`Đã xong ${viTri + (kq ? 1 : 0)}/${n} câu`} /><MangBa con={ongCon} tong={phien.ong} /></>}
       day={kq ? <NutDay chu="Tiếp tục" onClick={tiep} /> : <NutDay chu={gui ? 'Đang kiểm tra…' : 'Kiểm tra'} tat={!du || gui} onClick={() => void kiemTra()} />}>
       <main className="tp-kc-lam">
         <p className="tp-kc-nhan">Thử thách Kim cương · {tenChuyenDe} <span className="tp-chip">Câu {viTri + 1}/{n}</span></p>
-        <p className="tp-kc-de"><ChemText text={q.text} /></p>
-        {q.phan === 'I' && <div className="tp-pa" data-luoi={q.choices.every((c) => c.length < 12) || undefined} role="group" aria-label="Chọn đáp án">
-          {q.choices.map((c, i) => { const k = 'ABCD'[i]!; return <button key={k} type="button" aria-pressed={tra === k} disabled={!!kq} onClick={() => chon(k)}><b>{k}</b><span><ChemText text={c} /></span></button> })}
+        {q.thanCauImg ? <CauHinh src={q.thanCauImg} alt={`Đề câu ${stt}`} /> : <p className="tp-kc-de"><ChemText text={q.text} /></p>}
+        <BangSoLieu table={q.table} />
+        {q.imageDataUrl && <CauHinh src={q.imageDataUrl} alt={`Hình câu ${stt}`} />}
+        <HinhTaiViTri hinhAnh={hinh} viTri="sau_de" nhan={`câu ${stt}`} />
+        {q.phan === 'I' && <div className="tp-pa" data-luoi={(!coAnhPa && q.choices.every((c) => c.length < 12)) || undefined} role="group" aria-label="Chọn đáp án">
+          {q.choices.map((c, i) => { const k = 'ABCD'[i]!, anh = q.choiceImgs?.[i], sau = anhO(`sau_pa_${k}`, `Phương án ${k}`)
+            return <button key={k} type="button" aria-pressed={tra === k} disabled={!!kq} onClick={() => chon(k)}><b>{k}</b><span>{anh ? <img className="tp-kc-anh" src={anh} alt={`Phương án ${k}`} loading="lazy" decoding="async" /> : <ChemText text={chuPhuongAn(c, sau.length > 0)} />}{!anh && sau}</span></button> })}
         </div>}
-        {q.phan === 'II' && <div className="tp-ds">{q.ideas.map((y, i) => <div key={i}><span><b>{'abcd'[i]})</b> <ChemText text={y} /></span>
+        {q.phan === 'II' && <div className="tp-ds">{q.ideas.map((y, i) => <div key={i}><span><b>{'abcd'[i]})</b> {q.ideaImgs?.[i] ? <img className="tp-kc-anh" src={q.ideaImgs[i]} alt={`Ý ${'abcd'[i]}`} loading="lazy" decoding="async" /> : <ChemText text={y} />}{anhO(`sau_y_${'abcd'[i]}`, `Ý ${'abcd'[i]}`)}</span>
           <span className="tp-hai-nut" role="group" aria-label={`Chọn cho ý ${'abcd'[i]}`}>{(['D', 'S'] as const).map((v) => <button key={v} type="button" className="tp-nut" aria-pressed={tra[i] === v} data-sac={tra[i] === v ? 'chinh' : undefined} disabled={!!kq}
             onClick={() => { const a = tra.padEnd(4, '-').split(''); a[i] = v; chon(a.join('')) }}>{v === 'D' ? 'Đúng' : 'Sai'}</button>)}</span></div>)}</div>}
         {/* 02/11: ô đáp số dùng chung OSoTraLoi (bàn phím số iPhone không có dấu «−» ⇒ cần nút «±» trong ô; luật 30/09). */}
         {q.phan === 'III' && <div className="tp-ds"><span className="tp-mo">Đáp số</span><OSoTraLoi inputClassName="tp-o-so" ariaLabel="Đáp số" maxLength={8} value={tra} disabled={!!kq} onChange={(v) => chon(v.replace(/[^\d,.-]/g, '').slice(0, 8))} /></div>}
+        <HinhTaiViTri hinhAnh={hinh} viTri="cuoi_cau" nhan={`câu ${stt}`} />
         {kq && <div className="tp-kq-kc" data-kq={kq.dung ? 'dung' : 'sai'} role="status">{kq.dung ? 'Chính xác!' : `Chưa đúng · vỡ 1 ống nghiệm${ongCon > 0 ? ` · còn ${ongCon} ống` : ''}`}</div>}
         {kq?.thuong && <TamThuong thuong={kq.thuong} />}
         {loi && <Loi chu={loi} />}

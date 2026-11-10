@@ -72,7 +72,11 @@ export interface KetBai {
   mucTieu?: MucTieuNgay
   giai?: { thuHang: number; doi: number }
 }
-export interface CauKimCuong { qid: string; phan: 'I' | 'II' | 'III'; text: string; choices: string[]; ideas: string[]; tenDang?: string }
+/** Hình của câu (máy chủ gửi qua `publicQuestion`): `viTri` = sau_de · sau_pa_A…D · sau_y_a…d · cuoi_cau. */
+export interface HinhKimCuong { src: string; viTri: string; alt?: string }
+export interface CauKimCuong { qid: string; phan: 'I' | 'II' | 'III'; text: string; choices: string[]; ideas: string[]; tenDang?: string
+  /** 10/11 (thầy gửi ảnh «Ko có hình bị lỗi hình»): trước đây bộ đọc bỏ hết hình ⇒ phương án là ảnh chỉ còn chữ giữ chỗ «(xem hình)». */
+  table?: string[][]; thanCauImg?: string; imageDataUrl?: string; choiceImgs?: string[]; ideaImgs?: string[]; hinhAnh?: HinhKimCuong[] }
 export interface PhienKimCuong { phien: string; cau: CauKimCuong[]; ong: number }
 export interface KimCuongCau { ongCon: number; xong?: boolean; dat?: boolean }
 /** Một chuyên đề trên danh sách Thử thách Kim cương (/hs/kim-cuong/ds): mo = vào được · dang = lượt đang dở · khoa = chờ 24 giờ (moLaiLuc) · chua_vung = đã đạt, nay chưa vững lại. */
@@ -232,7 +236,14 @@ function docCauKc(x: unknown): CauKimCuong | undefined {
   const o = dt(x); const qid = chu(o?.qid), text = typeof o?.text === 'string' ? o.text : undefined
   if (!qid || text === undefined || !(o!.phan === 'I' || o!.phan === 'II' || o!.phan === 'III')) return undefined
   const s = (a: unknown) => (Array.isArray(a) ? a.map((v) => (typeof v === 'string' ? v : '')) : [])
-  return { qid, phan: o!.phan as CauKimCuong['phan'], text, choices: s(o!.choices), ideas: s(o!.ideas), ...(chu(o!.tenDang) ? { tenDang: chu(o!.tenDang) } : {}) }
+  // Hình: chỉ nhận chuỗi; thiếu / sai kiểu ⇒ bỏ trường (câu không hình giữ nguyên hình dạng cũ).
+  const anh = (v: unknown): string | undefined => (typeof v === 'string' && v ? v : undefined)
+  const dsAnh = (a: unknown): string[] | undefined => (Array.isArray(a) && a.some((v) => anh(v)) ? a.map((v) => anh(v) ?? '') : undefined)
+  const hinh: HinhKimCuong[] = Array.isArray(o!.hinhAnh) ? o!.hinhAnh.flatMap((x1): HinhKimCuong[] => { const d = dt(x1), src = anh(d?.src), viTri = anh(d?.viTri); return src && viTri ? [{ src, viTri, ...(anh(d?.alt) ? { alt: anh(d?.alt) } : {}) }] : [] }) : []
+  const bang = Array.isArray(o!.table) && o!.table.length && o!.table.every((r) => Array.isArray(r)) ? (o!.table as unknown[][]).map((r) => r.map((c) => String(c ?? ''))) : undefined
+  return { qid, phan: o!.phan as CauKimCuong['phan'], text, choices: s(o!.choices), ideas: s(o!.ideas), ...(chu(o!.tenDang) ? { tenDang: chu(o!.tenDang) } : {}),
+    ...(bang ? { table: bang } : {}), ...(anh(o!.thanCauImg) ? { thanCauImg: anh(o!.thanCauImg) } : {}), ...(anh(o!.imageDataUrl) ? { imageDataUrl: anh(o!.imageDataUrl) } : {}),
+    ...(dsAnh(o!.choiceImgs) ? { choiceImgs: dsAnh(o!.choiceImgs) } : {}), ...(dsAnh(o!.ideaImgs) ? { ideaImgs: dsAnh(o!.ideaImgs) } : {}), ...(hinh.length ? { hinhAnh: hinh } : {}) }
 }
 export function docPhienKimCuong(x: unknown): PhienKimCuong | null {
   const o = dt(x); const phien = chu(o?.phien), cau = mang(o?.cau, docCauKc)
