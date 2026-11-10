@@ -1,0 +1,4 @@
+/* BẢN VẼ B (10/11) — như A, nhưng ô chính «Tự làm câu này» nền tím nhạt (--tr-hs-nhat) + viền tím: nhấn rõ hơn lựa chọn được khuyến khích. */
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='chinh'] { background: var(--tr-hs-nhat); border-color: var(--tr-hs-day); color: var(--tr-hs-chu); }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='chinh'] .duo-chon-ic { background: var(--tr-hs-day); color: var(--tr-hs-tren); }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='chinh'] small { color: var(--tr-hs-chu); opacity: .85; }

@@ -1,0 +1,19 @@
+/* BẢN VẼ A (10/11) — thẻ «Em muốn làm câu này thế nào?» gọn, tinh tế: hai ô theo đúng kiểu Ô PHƯƠNG ÁN của màn làm câu (.duo .ht2-lam-pa: viền 2 px
+   --tr-vien-2, gờ đáy 4 px, nền --tr-mat, bo 16 px) thay hai khối màu đậm; màu chỉ còn ở ô biểu tượng nhỏ; ô chính «Tự làm» viền tím nhạt. */
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon { gap: 10px; padding: 20px 18px 18px; border-radius: 24px; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-nhan { font-size: 12px; letter-spacing: .06em; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-tieu { margin: -4px 0 6px; font-size: 19px; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o,
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac] {
+  min-height: 64px; gap: 12px; padding: 10px 14px 10px 10px; border: 2px solid var(--tr-vien-2); border-bottom-width: 4px; border-radius: 16px;
+  background: var(--tr-mat); color: var(--tr-chu); box-shadow: none; transition: border-color .12s ease, transform .12s ease;
+}
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='chinh'] { border-color: color-mix(in oklab, var(--tr-hs-day) 45%, var(--tr-vien-2)); }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-ic { width: 40px; height: 40px; border-radius: 12px; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-ic svg { width: 20px; height: 20px; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='vang'] .duo-chon-ic { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-o[data-sac='chinh'] .duo-chon-ic { background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-chu { gap: 2px; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-chu b { font-size: 17px; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-chu small { font-size: 13px; color: var(--tr-chu-2); opacity: 1; }
+:root[data-trong='hs'] .ht-app.ht2-lam.duo[data-chang][data-duo]:not([data-xong]) .duo-chon-di { width: 18px; height: 18px; color: var(--tr-chu-3); opacity: 1; }
