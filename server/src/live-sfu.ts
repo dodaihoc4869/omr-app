@@ -9,11 +9,14 @@
 //   noi   {}                               chỉ tạo phiên ⇒ { phien }
 //   dap   { phien, sdp, kenh? }            nộp câu trả lời SDP (renegotiate); `kenh: true` ⇒ dựng luôn đường DataChannel (establish) ⇒ { sdp: lời mời mới }
 //   kenh  { phien, ten, nguon? }           cấp DataChannel: thầy (không `nguon`) = phát; có `nguon` = nhận từ phiên ấy ⇒ { id } (kênh negotiated)
-//   phat  { phien, sdp, tracks }           THẦY phát thêm track trên phiên đã có. EM: Đợt 2 (mời nói) mới mở ⇒ đợt này luôn `chua-duoc-moi`.
+//   phat  { phien, sdp, tracks }           THẦY phát thêm track trên phiên đã có.
+//                                          EM (10/11, «tự động bật mic cho bạn lên bảng»): CHỈ em đang được gọi lên bảng — Worker hỏi PHÒNG trước khi gọi SFU,
+//                                          tên track do máy chủ đặt (`mic`), SFU nhận xong mới báo phòng ghi `live.mic`; phòng không nhận ⇒ đóng track ngay.
+//   nhan  { phien, nguon, ten:[…] }        kéo THÊM track của phiên `nguon` về phiên đã có (nghe em đang phát mic) ⇒ { sdp: lời mời của SFU } rồi `dap`.
 //   dong  { phien, mids?, kenh? }          đóng track (force, không cần SDP) + DataChannel.
-// Mã phiên SFU là chuỗi ngẫu nhiên dài, chỉ máy tạo ra nó (và phòng, với phiên của thầy) biết ⇒ dùng như khoá năng lực; em KHÔNG phát được gì ở đợt này.
+// Mã phiên SFU là chuỗi ngẫu nhiên dài, chỉ máy tạo ra nó (và phòng, với phiên của thầy / của em đang phát mic) biết ⇒ dùng như khoá năng lực.
 import type { Env } from './kieu'
-import { bpuBat, kiemVeBpu, type VeBpu } from './phong-binh-phan-ung'
+import { bpuBat, hoiPhongMic, kiemVeBpu, type VeBpu } from './phong-binh-phan-ung'
 
 type Row = Record<string, unknown>
 export const DUONG_LIVE = '/bpu/live/'
@@ -73,6 +76,27 @@ async function nhanTrack(env: Env, phien: string, nguon: string, ten: string[]):
   return { ok: true, phien, sdp: d.sdp, loai: d.loai || 'offer', tracks, canDap: r.j.requiresImmediateRenegotiation !== false }
 }
 
+/** Tên track mic của em được gọi lên bảng — do MÁY CHỦ đặt (máy em không tự chọn tên). */
+export const TEN_TRACK_MIC_EM = 'mic'
+/** Đóng track ở SFU không cần máy khách (force) — phòng gọi khi THU mic của em. Chưa cấu hình / lỗi ⇒ bỏ qua, không ném. */
+export async function dongTrackSfu(env: Env, phien: string, mids: readonly string[]): Promise<boolean> {
+  if (!sfuDaCauHinh(env) || !MA_PHIEN.test(phien)) return false
+  const ds = mids.filter((m) => MID.test(m))
+  if (!ds.length) return false
+  const r = await goiSfu(env, 'PUT', `/sessions/${phien}/tracks/close`, { tracks: ds.map((mid) => ({ mid })), force: true })
+  return r.ok || r.ma === 'close_track_error'
+}
+/** EM phát mic: (1) hỏi phòng em có đang được gọi lên bảng không; (2) SFU nhận track; (3) báo phòng ghi — phòng từ chối (thầy vừa chấm / chuyển câu) ⇒ đóng track. */
+async function phatMicEm(env: Env, ve: VeBpu, phien: string, sdp: string, mid: string): Promise<Row> {
+  const kiem = await hoiPhongMic(env, ve.b, { buoc: 'kiem', sbd: ve.s }).catch(() => null)
+  if (!kiem?.ok) return { ok: false, lyDo: 'chua-duoc-moi' }
+  const r = await phatTrack(env, phien, sdp, [{ mid, ten: TEN_TRACK_MIC_EM }])
+  if (!r.ok) return r
+  const ghi = await hoiPhongMic(env, ve.b, { buoc: 'bat', sbd: ve.s, id: phien, tieng: TEN_TRACK_MIC_EM, mid }).catch(() => null)
+  if (!ghi?.ok) { await dongTrackSfu(env, phien, [mid]); return { ok: false, lyDo: 'chua-duoc-moi', sdp: r.sdp, loai: r.loai } }
+  return { ...r, ten: TEN_TRACK_MIC_EM }
+}
+
 /** Một lệnh `/bpu/live/<lenh>` đã có vé hợp lệ. */
 async function lenhLive(env: Env, lenh: string, ve: VeBpu, b: Row): Promise<Row> {
   const laThay = ve.v === 'gv'
@@ -111,11 +135,16 @@ async function lenhLive(env: Env, lenh: string, ve: VeBpu, b: Row): Promise<Row>
     return { ok: true, id, ...CHINH_SACH_KENH }
   }
   if (lenh === 'phat') {
-    // AN TOÀN: em chỉ được phát tiếng khi phòng đã ghi tên em trong `live.noi` (Đợt 2 — giơ tay, mời nói). Đợt 1 chưa có mời nói ⇒ từ chối mọi em.
-    if (!laThay) return { ok: false, lyDo: 'chua-duoc-moi' }
     const sdp = sdpHop(b.sdp), tracks = tracksGui(b.tracks)
+    // AN TOÀN: em chỉ phát được MỘT track mic, và chỉ khi PHÒNG xác nhận em đang được gọi lên bảng lúc đang live (không tin lời máy em).
+    if (!laThay) { const mid = str(((Array.isArray(b.tracks) ? b.tracks : [])[0] as Row | undefined)?.mid); return sdp && MID.test(mid) ? phatMicEm(env, ve, phien, sdp, mid) : { ok: false, lyDo: 'sai-than' } }
     if (!sdp || !tracks.length) return { ok: false, lyDo: 'sai-than' }
     return phatTrack(env, phien, sdp, tracks)
+  }
+  if (lenh === 'nhan') {
+    const nguon = phienHop(b.nguon), ten = tenNhan(b.ten)
+    if (!nguon || !ten.length) return { ok: false, lyDo: 'sai-than' }
+    return nhanTrack(env, phien, nguon, ten)
   }
   if (lenh === 'dong') {
     const mids = (Array.isArray(b.mids) ? b.mids : []).map(str).filter((m) => MID.test(m)).slice(0, 8)

@@ -100,7 +100,7 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
   it('ĐANG VIẾT: nét dở trên máy em lớn dần theo tay thầy (không đợi nét xong); xong ⇒ GIỐNG HỆT nét máy thầy; thầy gửi ≤ 30 lô/giây', async () => {
     const b = await dung()
     const e1 = await b.em('S1'), e2 = await b.em('S2')
-    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    await b.lt.bat({ khongTieng: true }); b.lt.dat({ bang: true }); await b.troi(400)
     const t0 = b.dh.gio(), r = await viet(b, [e1, e2], 200, 0.3, false)
     const giay = (b.dh.gio() - t0) / 1000
     // Lớn dần: không bao giờ co lại, đã có điểm từ sớm, gần cuối đã theo kịp ≥ 80 % số điểm thầy viết.
@@ -131,7 +131,7 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
   it('tẩy, hoàn tác (nét về ĐÚNG chỗ cũ), làm lại, sang trang rồi quay lại: mảng nét máy em luôn bằng máy thầy', async () => {
     const b = await dung()
     const e1 = await b.em('S1')
-    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    await b.lt.bat({ khongTieng: true }); b.lt.dat({ bang: true }); await b.troi(400)
     for (const y of [0.2, 0.4, 0.6, 0.8]) await viet(b, [e1], 20, y)
     await veCho(b, [e1], 300)
     const bang = () => b.so.ds().map((n) => ({ id: n.id, cong: n.cong, mau: n.mau, co: n.co, diem: n.diem }))
@@ -163,7 +163,7 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
   it('em RỚT MẠNG rồi nối lại nhận đúng phần thiếu; em VÀO MUỘN lúc đang live nhận cả bảng; rời màn thì bỏ điểm đang viết, về lại vẫn đủ nét', async () => {
     const b = await dung(3)
     const e1 = await b.em('S1')
-    await b.lt.bat({ khongTieng: true }); await b.troi(400)
+    await b.lt.bat({ khongTieng: true }); b.lt.dat({ bang: true }); await b.troi(400)
     await viet(b, [e1], 20, 0.2); await veCho(b, [e1], 300)
     await e1.rot()
     await viet(b, [], 20, 0.4); await viet(b, [], 20, 0.6); await b.troi(100)

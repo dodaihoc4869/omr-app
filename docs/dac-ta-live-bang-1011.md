@@ -278,6 +278,25 @@ Mã: luật `src/lib/bpu/phong-live.ts` · phòng `server/src/phong-live.ts` · 
 - **Khung nhị phân** (chỉ máy thầy gửi, ≤ 16 KB): sổ nét `0x11` nét xong (có `vt`, nét rất dài chia nhiều khung) · `0x12` xoá nét (nhiều mã) · `0x13` xoá hết · `0x14` bảng mới (khoá trang + tỉ lệ vùng viết) · `0x15` hoàn tác; byte 1..4 = số thứ tự do PHÒNG ghi. Điểm đang viết `0x21` điểm · `0x22` con trỏ · `0x23` nhấc bút: cùng một khung cho DataChannel «net» và đường dự phòng WebSocket (phòng chuyển nguyên văn tới máy em đã báo `live-ok {dc:false}`, ≤ 30 lô/giây, không lưu).
 - **Cửa HTTP** `POST /bpu/live/{noi,dap,kenh,phat,dong}` (thân luôn kèm `ve`): xem đầu tệp `server/src/live-sfu.ts`. Chưa có khoá ⇒ `{ ok:false, lyDo:'chua-cau-hinh' }`.
 
+### 4.3c Thêm ở nhánh `claude/live-1c-1011` — bảng live theo lượt + mic của em lên bảng (thầy 10/11)
+
+Thầy: «Khi bấm nút live, khi chuyển câu thì vẫn giữ live tiếng với hs, màn hình hs hiện câu hỏi như bình thường, khi bấm gọi lên bảng thu về màn chiếu thì lập tức màn hình hs chuyển sang chế độ live để xem thầy và bạn được gọi lên bảng chữa bài, tự động bật mic cho bạn lên bảng».
+
+- **`live.bang`** (thêm vào `viewBang.live` và `viewEm.live`): máy em có HIỆN BẢNG LIVE không. Tiếng giữ suốt khi `bat`.
+  - Tự BẬT: thầy gọi em lên bảng (tin `goi` / `lam-bang` đang có) lúc đang live; bật live khi đang có em được gọi.
+  - Tự TẮT: mở lượt mới / bỏ lượt (`/luot`) — máy em về màn câu hỏi, live KHÔNG tắt, `phien` và phiên SFU KHÔNG đổi (không rớt tiếng); tắt live.
+  - GIỮ: chấm Đạt / Chưa đạt, mở đáp án (thầy còn chữa tiếp trên bảng tới lượt mới).
+  - Tay: thầy `live-dat { bang: true | false }` (chỉ khi đang live).
+  - `bang` false ⇒ máy thầy không phát điểm đang viết, máy em bỏ điểm đang viết; nét xong vẫn vào sổ nên bật bảng là đủ nét.
+- **Mic của em được gọi lên bảng** (một em mỗi lúc):
+  - `viewEm.live.emDuocMoi` = em được phép bật mic lúc này (đang live + SFU có khoá + đúng em trong `luot.goi` + thầy chưa chấm + lượt chưa mở đáp án + em không đang rời màn). `emNoi` = phòng đã ghi nhận track mic của em.
+  - Máy em gọi `POST /bpu/live/phat { ve, phien, sdp, tracks:[{mid}] }` trên phiên SFU của chính nó. Worker HỎI PHÒNG (`/live-mic` nội bộ, 0 D1) trước khi gọi SFU; tên track do máy chủ đặt (`mic`); SFU nhận xong Worker báo phòng ghi `live.mic` rồi phòng phát view. Em khác ⇒ `chua-duoc-moi`.
+  - `live.noi` (cả hai view) = mảng TỐI ĐA MỘT phần tử `{ sbd, ten, doi, xa, ss: { id, tieng } }` — `ss` để các máy kéo track về nghe bằng lệnh mới `POST /bpu/live/nhan { ve, phien, nguon, ten:[…] }` (+ `dap`).
+  - Tự THU mic: chấm Đạt / Chưa đạt, mở đáp án, lượt mới / bỏ lượt, gọi em khác, tắt live, hết buổi, em rời màn, em mất kết nối, thầy `live-thu-mic`, em tự tắt `live-mic-tat`. Phòng đóng track ở SFU (`tracks/close` force) nên thu mic có hiệu lực cả khi máy em không nghe lệnh.
+  - Ai nghe: máy em nào đang BẬT tiếng thì tự kéo track của bạn (rải 0–0,8 giây); em trong lớp mặc định tắt tiếng nên không kéo (điểm quyết 3). Máy thầy mặc định CHỈ phát ra loa khi em ở xa (`noi[0].xa`), vì em đứng trong lớp mà loa lớp phát lại giọng em qua mic máy em thì hú; thầy đổi bằng `datNgheEm`.
+  - Chống vọng: máy em không bao giờ kéo track của chính mình; khi mic em mở, tiếng thầy trên máy em hạ còn 25 % (loa máy kề mic; khử vọng của trình duyệt lọc phần lớn, hạ âm lượng bớt phần lọt và bớt hú; iPhone không cho trang đổi âm lượng nên ở đó chỉ còn khử vọng).
+- **Thư viện:** `taoLiveEm` thêm `batMicLenBang()`, `tatMic()`, `mucAmMic()`, `dangChoQuyenMic()` (hộp hỏi quyền mic đang hiện ⇒ bộ rời màn đừng báo), tuỳ chọn `tuBatMic`; trạng thái thêm `bang`, `duocMoMic`, `mic` (`tat` · `xin-quyen` · `dang-noi` · `dang-phat` · `tu-choi` · `loi`), `banNoi`. `taoLiveThay` thêm `dat({ bang })`, `thuMic()`, `datNgheEm()`, `mucAmEm()`; trạng thái thêm `bang`, `emNoi`, `ngheEm`.
+
 ### 4.4 Nét trên máy em chạy mượt như đang viết
 
 - Hai lớp canvas: «đã chốt» (vẽ một lần, chỉ vẽ lại khi đổi cỡ / phóng) và «đang viết» (xoá + vẽ lại mỗi khung, chỉ chứa nét dở). Con trỏ bút là một phần tử DOM dời bằng `transform`.

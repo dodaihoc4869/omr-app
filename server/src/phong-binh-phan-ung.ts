@@ -13,9 +13,9 @@ import { tenLopCuaEm } from './ten-lop'
 import { TU_CHI_MUC_GAME, cauCongKhai, qidPhucVuDuoc } from './cau-theo-qid'
 import { baoMayCacEm } from './ngan-hoc-sinh'
 import { docCauHinhDem } from './cau-hinh-dem'
-import { sfuDaCauHinh } from './live-sfu'
+import { dongTrackSfu, sfuDaCauHinh } from './live-sfu'
 import { LiveMay, type KemBpu } from './phong-live'
-import { datCoLive } from '../../src/lib/bpu/phong-live'
+import { datCoLive, duocPhatMic, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
@@ -72,6 +72,10 @@ async function goiPhong(env: Env, buoiId: string, duong: string, than: unknown):
   const r = await phongCua(env, buoiId).fetch(new Request(`https://bpu${duong}`, { method: 'POST', body: JSON.stringify(than), headers: { 'content-type': 'application/json' } }))
   return (await r.json().catch(() => ({ ok: false, error: 'Phòng không trả lời.' }))) as Row
 }
+
+/** LIVE (10/11): cửa `/bpu/live/phat` hỏi PHÒNG «em này có đang được gọi lên bảng không» (`buoc: 'kiem'`) và báo phòng ghi track mic (`buoc: 'bat'`). 0 lệnh D1. */
+export const hoiPhongMic = (env: Env, buoiId: string, than: { buoc: 'kiem' | 'bat'; sbd: string; id?: string; tieng?: string; mid?: string }): Promise<Row> =>
+  (buoiHop(buoiId) ? goiPhong(env, buoiId, '/live-mic', than) : Promise.resolve({ ok: false }))
 
 // ── TIẾN TRÌNH BUỔI DẠY (thầy 07/11 «load lại phải giữ nguyên, đồng bộ mọi thiết bị cho đến khi tôi bấm kết thúc buổi học») ──
 // Bước đang mở + hoạt động thầy chọn của buổi, lưu trong storage của CHÍNH phòng buổi (không bảng D1 mới, không vòng chờ D1). Mỗi máy thầy đọc kèm
@@ -298,6 +302,8 @@ export class PhongBinhPhanUng {
     this.lucPhat = Date.now()
     if (this.henGui) { clearTimeout(this.henGui); this.henGui = null } // lần phát này đã mang trạng thái mới nhất ⇒ hẹn giờ gom cũ không cần nữa
     // Đọc dữ liệu gắn của các máy em MỘT lần: vừa để đếm «em đang xem live», vừa để phát view của từng em.
+    // LIVE: track mic vừa bị thu (chấm xong, lượt mới, tắt live, em rời màn…) ⇒ đóng ở SFU, không chờ máy em.
+    for (const m of rutMicDong(st)) this.ctx.waitUntil(dongTrackSfu(this.env, m.id, [m.mid]).catch(() => false))
     const hs = this.ctx.getWebSockets('hs'), kem = hs.map((ws) => ws.deserializeAttachment() as KemBpu | null)
     const bang = JSON.stringify(L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st, kem) : undefined))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
@@ -408,6 +414,14 @@ export class PhongBinhPhanUng {
       return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })
     }
     if (u.pathname === '/dong') { await this.ketThucBuoi(); return json({ ok: true }) }
+    if (u.pathname === '/live-mic') {
+      // Cửa `/bpu/live/phat` của Worker: hỏi quyền phát mic của em / báo track mic SFU đã nhận.
+      const sbd = str(b.sbd)
+      if (b.buoc === 'kiem') return json({ ok: duocPhatMic(st, sbd) })
+      const co = b.buoc === 'bat' && liveMicBat(st, { sbd, id: b.id, tieng: b.tieng, mid: b.mid }, nay)
+      if (co) { await this.luu(false); this.phat() }
+      return json({ ok: co })
+    }
     return json({ ok: false }, 404)
   }
 
@@ -460,8 +474,8 @@ export class PhongBinhPhanUng {
   }
 
   // Rời màn do máy em tự báo (`roi` / `ve`); rớt kết nối KHÔNG tính rời, không vào `roiNay`. LIVE: kết nối đóng ⇒ bỏ khỏi danh sách nhận điểm, báo lại số em xem.
-  async webSocketClose(ws?: WsMayChu): Promise<void> { this.live.dong(ws) }
-  async webSocketError(ws?: WsMayChu): Promise<void> { this.live.dong(ws) }
+  async webSocketClose(ws?: WsMayChu): Promise<void> { await this.live.dong(ws) }
+  async webSocketError(ws?: WsMayChu): Promise<void> { await this.live.dong(ws) }
   /** Hẹn giờ: lượt đang làm quá mốc ⇒ tự mở đáp án rồi hẹn mốc 24 giờ; chưa tới mốc ⇒ hẹn lại; không còn lượt mở ⇒ hết 24 giờ không thao tác ⇒ kết thúc. */
   async alarm(): Promise<void> {
     const st = await this.doc()
