@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1422,
+    "hash": "ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64",
+    "fileNguon": "anh/ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64.png",
+    "svg": "bon-nhom-chuc-native1422-ddh-4792742ba48189554d548e28d2ffabc2a3c85c60a98c1ea1ff91ef98ded6cf8d.svg",
+    "hashSvg": "4792742ba48189554d548e28d2ffabc2a3c85c60a98c1ea1ff91ef98ded6cf8d",
+    "byteSvg": 9347,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C6-B24-I-3",
+        "de": "Cho các nhóm chức (I), (II), (III), (IV) như hình dưới. Nhóm nào là nhóm chức carboxyl?",
+        "refs": [
+          {
+            "hash": "ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64",
+            "where": "11-C6-B24-I-3.hinh.0.du_lieu",
+            "hashDataUrl": "b30e85a835be93d6f810a78b0a3e1e26baf6ffb97aa4ad7be869b1c93623450d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4COdouble2splitfeetEACH/6Oregular2HactualDAM/4RomancaptionsactualDAMupright/IexplicitO-H/IIrightMIDHEIGHTfreebondNOTcharge/IIIexplicitH/IV2barearms/allthin/noaddedcharges-H-CH3-names-answer",
+    "hashSvgDaSoat": "4792742ba48189554d548e28d2ffabc2a3c85c60a98c1ea1ff91ef98ded6cf8d",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

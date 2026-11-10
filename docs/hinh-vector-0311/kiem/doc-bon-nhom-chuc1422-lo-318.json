@@ -1,0 +1,390 @@
+{
+  "i": 1422,
+  "hash": "ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64.png",
+  "size": [
+    870,
+    231
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C6-B24-I-3",
+      "de": "Cho các nhóm chức (I), (II), (III), (IV) như hình dưới. Nhóm nào là nhóm chức carboxyl?",
+      "allHinh": [
+        {
+          "hash": "ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64",
+          "where": "11-C6-B24-I-3.hinh.0.du_lieu",
+          "hashDataUrl": "b30e85a835be93d6f810a78b0a3e1e26baf6ffb97aa4ad7be869b1c93623450d"
+        }
+      ],
+      "missingHashes": [
+        "ff28eaaa483a7c1950a589db0221bf59f2b8615a63bcfe075476dc2f4032ed64"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/1422-native2x.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelgroupstubs, no particularRgroups/methylassignmentoranswerinferred.",
+  "geometry": {
+    "classification": "Fourindependentfunctionalgroupdrawingsinonerow, captionsRomanI..IV. No reaction.",
+    "panels": [
+      {
+        "caption": {
+          "text": "(I)",
+          "bbox": [
+            82,
+            164,
+            117,
+            193
+          ]
+        },
+        "carbonylVertex": [
+          84,
+          83
+        ],
+        "leftStub": [
+          [
+            43,
+            83
+          ],
+          [
+            84,
+            83
+          ]
+        ],
+        "COdouble": [
+          [
+            [
+              82,
+              80
+            ],
+            [
+              107,
+              54
+            ]
+          ],
+          [
+            [
+              88,
+              86
+            ],
+            [
+              113,
+              60
+            ]
+          ]
+        ],
+        "upperO": {
+          "text": "O",
+          "bbox": [
+            102,
+            30,
+            131,
+            60
+          ]
+        },
+        "lowerO": {
+          "text": "O",
+          "bbox": [
+            94,
+            104,
+            123,
+            134
+          ],
+          "bond": [
+            [
+              84,
+              83
+            ],
+            [
+              99,
+              109
+            ]
+          ]
+        },
+        "H": {
+          "text": "H",
+          "bbox": [
+            143,
+            104,
+            173,
+            134
+          ]
+        },
+        "OHbond": [
+          [
+            124,
+            119
+          ],
+          [
+            142,
+            119
+          ]
+        ]
+      },
+      {
+        "caption": {
+          "text": "(II)",
+          "bbox": [
+            333,
+            164,
+            377,
+            193
+          ]
+        },
+        "carbonylVertex": [
+          335,
+          85
+        ],
+        "leftStub": [
+          [
+            292,
+            85
+          ],
+          [
+            335,
+            85
+          ]
+        ],
+        "COdouble": [
+          [
+            [
+              333,
+              82
+            ],
+            [
+              358,
+              56
+            ]
+          ],
+          [
+            [
+              339,
+              88
+            ],
+            [
+              364,
+              62
+            ]
+          ]
+        ],
+        "upperO": {
+          "text": "O",
+          "bbox": [
+            353,
+            32,
+            382,
+            62
+          ]
+        },
+        "lowerO": {
+          "text": "O",
+          "bbox": [
+            345,
+            106,
+            374,
+            136
+          ],
+          "bond": [
+            [
+              335,
+              85
+            ],
+            [
+              350,
+              111
+            ]
+          ]
+        },
+        "rightStub": [
+          [
+            375,
+            120
+          ],
+          [
+            394,
+            120
+          ]
+        ],
+        "rightStubNote": "HorizontalstrokeatOmidheight/baselinebond, NOTSUPnegativecharge. Do notwriteOminus."
+      },
+      {
+        "caption": {
+          "text": "(III)",
+          "bbox": [
+            541,
+            164,
+            597,
+            193
+          ]
+        },
+        "carbonylVertex": [
+          544,
+          89
+        ],
+        "leftStub": [
+          [
+            501,
+            89
+          ],
+          [
+            544,
+            89
+          ]
+        ],
+        "COdouble": [
+          [
+            [
+              542,
+              86
+            ],
+            [
+              567,
+              60
+            ]
+          ],
+          [
+            [
+              548,
+              92
+            ],
+            [
+              573,
+              66
+            ]
+          ]
+        ],
+        "upperO": {
+          "text": "O",
+          "bbox": [
+            561,
+            37,
+            590,
+            67
+          ]
+        },
+        "H": {
+          "text": "H",
+          "bbox": [
+            558,
+            107,
+            588,
+            137
+          ]
+        },
+        "CHbond": [
+          [
+            544,
+            89
+          ],
+          [
+            558,
+            114
+          ]
+        ]
+      },
+      {
+        "caption": {
+          "text": "(IV)",
+          "bbox": [
+            750,
+            164,
+            807,
+            193
+          ]
+        },
+        "carbonylVertex": [
+          793,
+          96
+        ],
+        "leftStub": [
+          [
+            752,
+            96
+          ],
+          [
+            793,
+            96
+          ]
+        ],
+        "lowerRightStub": [
+          [
+            793,
+            96
+          ],
+          [
+            815,
+            131
+          ]
+        ],
+        "COdouble": [
+          [
+            [
+              791,
+              93
+            ],
+            [
+              816,
+              67
+            ]
+          ],
+          [
+            [
+              797,
+              99
+            ],
+            [
+              822,
+              73
+            ]
+          ]
+        ],
+        "upperO": {
+          "text": "O",
+          "bbox": [
+            811,
+            44,
+            840,
+            74
+          ]
+        }
+      }
+    ],
+    "fontStyle": {
+      "Olabels": "regularuprightsans, noactualbold",
+      "Hlabels": "BOLDuprightserif",
+      "RomanCaptions": "BOLDuprightserif, parenthesesregular/boldmatchedglyphstyle; do notitalic",
+      "bonds": "uniformthinblack"
+    },
+    "COFootTopology": "FourdiagonalCOdoublepairs splitfeetonto2adjacentslopes, noaddedconnector/forcedcommonnode.",
+    "counts": {
+      "panels": 4,
+      "COdouble": 4,
+      "Olabels": 6,
+      "Hlabels": 2,
+      "RomanCaptions": 4,
+      "arrows": 0,
+      "charges": 0
+    },
+    "noAdded": [
+      "groupnames",
+      "correctanswerhighlight",
+      "R/methyl labels",
+      "expandedmolecule",
+      "chargeonII",
+      "reactionarrow",
+      "bracketsn"
+    ]
+  },
+  "actualSvgReviewed": false
+}
