@@ -68,7 +68,7 @@ describe('máy em — vừa vào toàn màn hình thì nâng nút «Gửi đáp 
     expect(css).toMatch(/\.bpu-hs-day \{ padding: 12px 16px calc\(16px \+ env\(safe-area-inset-bottom, 0px\)\)/)
   })
 
-  it('bạn cùng lớp Chưa đạt: nhãn nhỏ «Học · Chưa đạt» trong thanh đội, không có «Em ·», không số trừ', async () => {
+  it('bạn cùng lớp Chưa đạt: nhãn nhỏ «Đại Học · Chưa đạt» trong thanh đội, không có «Em ·», không số trừ', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
     render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -77,7 +77,7 @@ describe('máy em — vừa vào toàn màn hình thì nâng nút «Gửi đáp 
     chamLenBang(st, false, T0 + 1); moDapAn(st, T0 + 2, (a, b) => a === b)
     WsGia.ds[0]!.nhan(viewEm(st, 'S2'))
     const klb = document.querySelector('.bpu-che-doi .bpu-klb')!
-    expect(klb.querySelector('span')?.textContent).toBe('Học · Chưa đạt')
+    expect(klb.querySelector('span')?.textContent).toBe('Đại Học · Chưa đạt') // SỬA CÓ CHỦ ĐÍCH 10/11: tên gọi hai chữ
     expect(klb.classList.contains('em')).toBe(false)
     expect(klb.textContent).not.toMatch(/Em ·|−|kJ/)
   })

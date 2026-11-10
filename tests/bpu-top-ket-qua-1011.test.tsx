@@ -134,7 +134,7 @@ describe('thẻ kết quả lên bảng trên bảng chiếu', () => {
 describe('máy em: kết quả lên bảng cho cả lớp', () => {
   // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «gọn hơn, bỏ em đạt, chỉ ghi đạt / không đạt nổi bật»): bạn cùng lớp thấy «Tên gọi · Đạt» (không còn dòng kJ đội);
   // em được gọi thấy nhãn «Đạt» (không «Em ·»).
-  it('bạn được gọi Đạt ⇒ «Học · Đạt» (sau khi mở đáp án); em được gọi thấy nhãn «Đạt»; vẫn giữ lớp che', async () => {
+  it('bạn được gọi Đạt ⇒ «Đại Học · Đạt» (sau khi mở đáp án); em được gọi thấy nhãn «Đạt»; vẫn giữ lớp che', async () => {
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
     render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
@@ -147,7 +147,7 @@ describe('máy em: kết quả lên bảng cho cả lớp', () => {
     expect(q('.bpu-klb')).toBeNull() // chưa mở đáp án ⇒ máy em chưa hiện (hiện cùng lúc với số kJ đội)
     expect(duDoan(st, 'S2', 1, T0 + 1)).toBe(false) // đã chấm ⇒ hết đoán (bảng đang hiện kết quả)
     moDapAn(st, T0 + 2, chamSo); ws.nhan(viewEm(st, 'S2'))
-    expect(q('.bpu-klb > span')?.textContent).toBe('Học · Đạt')
+    expect(q('.bpu-klb > span')?.textContent).toBe('Đại Học · Đạt') // SỬA CÓ CHỦ ĐÍCH 10/11: tên gọi hai chữ
     expect(q('.bpu-klb')?.getAttribute('aria-label')).toMatch(/Đỗ Đại Học \(Đội Natri\) lên bảng: Đạt/)
     expect(q('.bpu-che')).toBeTruthy()
     ws.nhan(viewEm(st, 'S1'))
