@@ -1,0 +1,27 @@
+/* BÌNH PHẢN ỨNG — thẻ kết quả lên bảng trên bảng chiếu (TheKetQuaLenBang.tsx, thầy 10/11). Toạ độ sân 1920×1080; chỉ transform + opacity động.
+   Màu: biến của bảng (--tr-*) + màu đội (--doi = biến màu đội của app). */
+.bpu-bang .bkq{ position: absolute; inset: 0; z-index: 12; display: grid; place-items: center; background: color-mix(in srgb, var(--tr-nen) 70%, transparent);
+  animation: bkq-nen 0.32s ease-out both; transition: opacity 0.38s ease-in; cursor: pointer; }
+.bpu-bang .bkq.tat{ opacity: 0; }
+.bpu-bang .bkq-the{ position: relative; display: grid; justify-items: center; gap: 14px; min-width: 860px; max-width: 1240px; padding: 54px 84px 58px; border-radius: 40px; text-align: center;
+  background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 4px var(--doi), 0 0 90px color-mix(in srgb, var(--doi) 34%, transparent), 0 30px 80px color-mix(in srgb, var(--tr-nen) 80%, transparent);
+  animation: bkq-vao 0.5s cubic-bezier(.2, .9, .25, 1.15) both; transition: transform 0.38s cubic-bezier(.4, 0, .6, 1); }
+.bpu-bang .bkq.tat .bkq-the{ transform: translateY(18px) scale(0.94); }
+.bpu-bang .bkq-mat{ font-size: 26px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--doi); }
+.bpu-bang .bkq-ten{ font-size: 76px; font-weight: 800; line-height: 1.08; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.bpu-bang .bkq-kq{ margin-top: 4px; padding: 10px 40px; border-radius: 999px; font-size: 54px; font-weight: 800; color: var(--tr-dung-chu); background: color-mix(in srgb, var(--tr-dung) 18%, var(--tr-mat)); box-shadow: inset 0 0 0 3px var(--tr-dung);
+  animation: bkq-dau 0.55s 0.18s cubic-bezier(.2, .9, .25, 1.3) both; }
+.bpu-bang .bkq[data-dat="0"] .bkq-kq{ color: var(--tr-chu-y-chu); background: color-mix(in srgb, var(--tr-chu-y) 16%, var(--tr-mat)); box-shadow: inset 0 0 0 3px var(--tr-chu-y); }
+.bpu-bang .bkq-so{ display: flex; gap: 22px; margin-top: 18px; }
+.bpu-bang .bkq-so > span{ display: grid; gap: 2px; min-width: 260px; padding: 16px 30px; border-radius: 24px; background: var(--tr-mat-2); box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.bpu-bang .bkq-so > span + span{ box-shadow: inset 0 0 0 3px var(--doi); }
+.bpu-bang .bkq-so small{ font-size: 22px; font-weight: 600; color: var(--tr-chu-2); }
+.bpu-bang .bkq-so b{ font-size: 50px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bpu-bang .bkq-so[aria-busy="false"] b{ animation: bkq-so 0.4s ease-out both; }
+.bpu-bang .bkq-phu{ font-size: 26px; color: var(--tr-chu-2); }
+@keyframes bkq-nen{ from { opacity: 0; } to { opacity: 1; } }
+@keyframes bkq-vao{ from { opacity: 0; transform: translateY(26px) scale(0.9); } to { opacity: 1; transform: none; } }
+@keyframes bkq-dau{ from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes bkq-so{ from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce){ .bpu-bang .bkq, .bpu-bang .bkq-the, .bpu-bang .bkq-kq, .bpu-bang .bkq-so b{ animation: none; transition: none; } }
+html.may-yeu .bpu-bang .bkq, html.may-yeu .bpu-bang .bkq-the, html.may-yeu .bpu-bang .bkq-kq, html.may-yeu .bpu-bang .bkq-so b{ animation: none; transition: none; }

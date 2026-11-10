@@ -9,6 +9,7 @@ import { buoiDangMo, type BuoiHoc } from '../../lib/buoi-hoc-api'
 import { useAppStore } from '../../store/appStore'
 import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
+import { hienKetQua, tatTheKq } from './TheKetQuaLenBang'
 
 let goc: Root | null = null
 let khung: HTMLDivElement | null = null
@@ -93,7 +94,8 @@ let daNgheEsc = false
 function ngheEsc(): void {
   if (daNgheEsc || typeof window === 'undefined') return
   daNgheEsc = true
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && escRaHomNay()) { e.preventDefault(); e.stopImmediatePropagation() } }, true)
+  // 10/11: thẻ kết quả lên bảng đang hiện ⇒ phím bất kì (cả Esc) chỉ chuyển ngay về màn đua, không lọt xuống bảng / không ra Hôm nay.
+  window.addEventListener('keydown', (e) => { if (tatTheKq() || (e.key === 'Escape' && escRaHomNay())) { e.preventDefault(); e.stopImmediatePropagation() } }, true)
 }
 /** Esc: có phiên đang hiện ⇒ tạm ẩn cả phiên (giữ chỗ dở) + về Hôm nay; chỉ có tấm buổi dạy mở từ Hôm nay ⇒ đóng tấm. Trả true nếu đã xử lý. */
 export function escRaHomNay(): boolean {
@@ -225,6 +227,7 @@ export async function ketThucBuoiHoc(buoiId: string): Promise<string> {
   const r = await dongBuoiHoc(buoiId)
   if (!r.ok) return r.chu
   dongBang(); dongHoatDong(); dongTo()
+  try { useAppStore.getState().setScreen('tongquan') } catch { /* app học sinh / test */ } // 10/11: một lần bấm ⇒ bảng đóng, về Hôm nay
   useAppStore.getState().showToast('Đã kết thúc buổi học', 'success')
   return ''
 }
@@ -353,9 +356,11 @@ export function lenBangTo(em: { sbd: string; ten: string; goiNgay?: boolean; mau
   try { nguonTo.focus() } catch { /* tờ chặn */ }
   return true
 }
-/** Tờ báo thầy đã chấm em lên bảng ⇒ bảng phóng lại, ghi kết quả + mở đáp án. Bảng không ẩn ⇒ bỏ qua (không ghi hai lần). */
+/** Tờ báo thầy đã chấm em lên bảng ⇒ bảng phóng lại, ghi kết quả + mở đáp án. Bảng không ẩn ⇒ bỏ qua (không ghi hai lần).
+ *  10/11 (thầy «hiện KẾT QUẢ khoảng 3 giây rồi mới chuyển mượt về màn đua top»): thẻ kết quả nổi trên bảng đang phóng (TheKetQuaLenBang). */
 export function chamTuTo(dat: boolean): void {
   if (!bangAn()) return
+  hienKetQua(dat)
   hienBang()
   nhanCham?.(dat)
 }

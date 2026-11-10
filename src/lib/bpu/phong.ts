@@ -72,6 +72,8 @@ export interface GoiLenBang {
   duDoan: Record<string, 0 | 1>
   tiep: Record<string, number>
   dat: boolean | null
+  /** (10/11) kJ ĐỘI do lên bảng — ghi lúc mở đáp án (+200 / −100 / 0); trước đó không có. Máy các em hiện «đội +200 kJ» khi bạn lên bảng xong. */
+  kjDoi?: number
 }
 export interface KetQuaEm { dung: boolean; soY: number | null; kj: number; nhanh: number | null; kb?: boolean }
 export interface LuotPhong {
@@ -355,7 +357,8 @@ export function lamBang(st: TrangThaiPhong, nay: number): boolean {
 }
 export function duDoan(st: TrangThaiPhong, sbd: string, v: 0 | 1, nay: number): boolean {
   const l = st.luot
-  if (!l?.goi || l.pha === 'mo' || l.goi.sbd === sbd || !em(st, sbd) || l.goi.duDoan[sbd] != null) return false
+  // 10/11: thầy đã chấm (bảng hiện kết quả trước khi mở đáp án) ⇒ hết đoán — không ai đoán sau khi đã thấy kết quả.
+  if (!l?.goi || l.pha === 'mo' || l.goi.dat != null || l.goi.sbd === sbd || !em(st, sbd) || l.goi.duDoan[sbd] != null) return false
   l.goi.duDoan[sbd] = v ? 1 : 0; st.capNhat = nay
   return true
 }
@@ -445,6 +448,7 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
     st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) + c.doi
     if (kq[s]) kq[s]!.kj = kjEm
     const cuoi = duoc?.sbd === s && g?.dat != null
+    if (cuoi) g!.kjDoi = c.doi
     if (kjEm || c.doi || cuoi) muc.push({ sbd: s, doi: e.doi, kjEm, kjDoi: c.doi, lyDo: vietHoa(c.ly.join(' · ')), cuoi })
   }
   muc.sort((a, b) => Number(a.cuoi) - Number(b.cuoi) || Math.abs(a.kjEm + a.kjDoi) - Math.abs(b.kjEm + b.kjDoi))
@@ -491,7 +495,7 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
   const e = em(st, sbd), l = st.luot
   const xep = xepEm(st), hang = e ? xep.findIndex((x) => x.sbd === sbd) + 1 : 0
   const d = e ? e.doi : 0
-  const goi = l?.goi ? (() => { const g = l.goi!, h = em(st, g.sbd); return { sbd: g.sbd, ten: h?.ten ?? g.sbd, doi: h?.doi ?? 0, lyDo: g.lyDo, emDoan: g.duDoan[sbd] ?? null, emTiep: g.tiep[sbd] ?? 0, tiep: tongTiep(g), dat: g.dat } })() : null
+  const goi = l?.goi ? (() => { const g = l.goi!, h = em(st, g.sbd); return { sbd: g.sbd, ten: h?.ten ?? g.sbd, doi: h?.doi ?? 0, lyDo: g.lyDo, emDoan: g.duDoan[sbd] ?? null, emTiep: g.tiep[sbd] ?? 0, tiep: tongTiep(g), dat: g.dat, ...(l.pha === 'mo' && g.kjDoi != null ? { kjDoi: g.kjDoi } : {}) } })() : null
   return {
     t: 'em' as const,
     ketThuc: st.ketThuc, soLuot: st.soLuot,

@@ -15,6 +15,7 @@ import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type ViewEm } from '../../lib/bpu/phong'
 import { coQuyenTatMan, dangChiaDoi, dangXinQuyen, docQuyenTatMan, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
+import KetQuaLenBangEm from './KetQuaLenBangEm'
 import type { Question } from '../../game/than-thu-v2/core'
 // Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
 type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
@@ -480,8 +481,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           <div className="bpu-ban" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }}><b className="ky">{kyHieu(g.ten)}</b><div><b>{g.ten}</b><span>{DOI_BPU[g.doi]?.ten} · đang lên bảng</span></div></div>
           <p className="bpu-hoi">Em đoán bạn ấy làm đúng không?</p>
           <div className="bpu-hai">
-            <button type="button" aria-pressed={g.emDoan === 1} disabled={g.emDoan !== null} onClick={() => gui({ t: 'doan', v: 1 })}>Làm đúng</button>
-            <button type="button" aria-pressed={g.emDoan === 0} disabled={g.emDoan !== null} onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
+            <button type="button" aria-pressed={g.emDoan === 1} disabled={g.emDoan !== null || g.dat != null} onClick={() => gui({ t: 'doan', v: 1 })}>Làm đúng</button>
+            <button type="button" aria-pressed={g.emDoan === 0} disabled={g.emDoan !== null || g.dat != null} onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
           </div>
           <p className="nho">Đoán đúng +{KJ.doanDung} kJ cho em. Mỗi lần chạm nút dưới, một tia lửa bay lên bảng tới bạn ấy.</p>
           {q && !che ? <div className="bpu-de-xem"><span className="m3-chip">Đề trên bảng · chỉ xem</span>{LC ? <LC.DeCau q={q} stt={l.so} /> : <p className="bpu-de-tho">{q.text}</p>}</div> : null}
@@ -566,6 +567,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       {than ? <main className="bpu-hs-than">{than}</main> : null}
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
       {lopChe}
+      {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả (trên lớp che, không gỡ che). */}
+      {e && l?.goi && l.pha === 'mo' && !v?.ketThuc ? <KetQuaLenBangEm g={l.goi} laEm={l.goi.sbd === e.sbd} /> : null}
       {e ? <TheBienDong ds={v?.bienDongEm} /> : null}
     </div>,
     document.body,
