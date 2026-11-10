@@ -37,6 +37,8 @@ export const KIEM_KHOA_MS = 1000
  *  xuống rồi đọc, mở bong bóng chat: ≥ 300 ms hoạt ảnh). Bàn phím bật KHÔNG làm mất tiêu điểm (không qua nhánh này); hộp hỏi quyền IdleDetector được
  *  chặn riêng (`dangXinQuyen`). */
 export const NOI_MS = 200
+/** Dòng hướng dẫn thoát toàn màn hình của Chrome Android nằm ở đáy ~3–4 s ⇒ thanh dưới nâng lên ngần này rồi hạ. */
+export const NANG_DAY_MS = 4200
 
 type Tin = { t: string; [k: string]: unknown }
 const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
@@ -405,13 +407,38 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   // GIỮ MÀN SÁNG (thầy 10/11 «cho mọi điện thoại»): từ lúc phòng nối (có `viewEm`) tới khi thầy kết thúc buổi — kể cả lúc màn BPU đang ẩn chờ lượt.
   // wakeLock; không có / bị từ chối / app cài trên iOS ⇒ video câm dự phòng (`giu-sang.ts`). Kết thúc buổi / gỡ màn ⇒ nhả hết.
   const giuSangBat = !!v && !v.ketThuc
+  // NÂNG THANH DƯỚI KHI VỪA VÀO TOÀN MÀN HÌNH (thầy 10/11 «dòng hướng dẫn ở cuối màn hình che nút gửi bài»): mỗi lần vào toàn màn hình, Chrome Android hiện
+  // một dòng «Kéo từ trên xuống… để thoát khỏi chế độ toàn màn hình» ở đáy ~3–4 s (trang không tắt được). Trong lúc ấy thanh dưới (nút «Gửi đáp án»)
+  // nâng lên khỏi vùng đáy (`.nang-day`, chỉ transform) rồi hạ về sau NANG_DAY_MS. Chỉ khi VỪA VÀO (fullscreenElement có), không khi thoát.
+  const [nangDay, setNangDay] = useState(false)
+  useEffect(() => {
+    let hen: ReturnType<typeof setTimeout> | undefined
+    const doi = () => {
+      clearTimeout(hen)
+      if (!document.fullscreenElement) { setNangDay(false); return }
+      setNangDay(true)
+      hen = setTimeout(() => setNangDay(false), NANG_DAY_MS)
+    }
+    document.addEventListener('fullscreenchange', doi)
+    return () => { clearTimeout(hen); document.removeEventListener('fullscreenchange', doi) }
+  }, [])
   useEffect(() => (giuSangBat ? giuSang() : undefined), [giuSangBat])
+  const dangXinTm = useRef(false)
 
   // Toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho khi có thao tác của em; không hỗ trợ ⇒ bỏ qua).
   // CHẠM ĐẦU (10/11): bắt ở `click` chứ không ở `pointerdown` — theo chuẩn HTML, `pointerdown` của ngón tay KHÔNG tính là thao tác người dùng (chỉ
   // `pointerup` / `touchend` / `click`) ⇒ trên điện thoại xin toàn màn hình / xin quyền ở `pointerdown` bị từ chối âm thầm. Xin quyền IdleDetector TRƯỚC:
   // `requestFullscreen` tiêu mất lượt thao tác.
-  const xinToanMan = () => { try { const d = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> }; if (!document.fullscreenElement && d.requestFullscreen) void d.requestFullscreen().catch(() => {}) } catch { /* bỏ qua */ } }
+  // Đã toàn màn hình ⇒ KHÔNG xin lại (mỗi lần xin Chrome lại hiện dòng hướng dẫn thoát); đang chờ trình duyệt trả lời lần xin trước ⇒ không xin chồng.
+  const xinToanMan = () => {
+    if (dangXinTm.current) return
+    try {
+      const d = document.documentElement as HTMLElement & { requestFullscreen?: () => Promise<void> }
+      if (document.fullscreenElement || !d.requestFullscreen) return
+      dangXinTm.current = true
+      void d.requestFullscreen().catch(() => {}).finally(() => { dangXinTm.current = false })
+    } catch { dangXinTm.current = false }
+  }
   const chamDau = () => { xinQuyenTatMan(); xinToanMan() }
 
   const l = v?.luot ?? null
@@ -449,7 +476,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const nhanDoi = `Bình Phản Ứng${l ? ` · Lượt ${l.so}` : ''}`
   // 10/11 (thầy báo dải kết quả đè thanh đội): dải KẾT QUẢ LÊN BẢNG và mốc THẺ ±kJ nằm TRONG DÒNG CHẢY, ngay dưới thanh đội đang hiện — trong lớp che:
   // dưới «Đội … kJ đội»; ngoài lớp che: dưới đầu màn. Không còn lớp nổi tuyệt đối đè chữ.
-  const ketQuaBang = e && l?.goi && l.pha === 'mo' && !v?.ketThuc ? <KetQuaLenBangEm g={l.goi} laEm={l.goi.sbd === e.sbd} /> : null
+  // 10/11 (thầy «bỏ em đạt, chỉ ghi đạt / không đạt nổi bật»): kết quả lên bảng là MỘT NHÃN bên phải thanh đội (trong lớp che) — em được gọi kèm kJ thật
+  // của em lượt này: mục biến động mới nhất của em từ lúc mở lượt có lý do «… bảng» (phòng ghi; không tính lại trên máy).
+  const laEmGoi = !!e && !!l?.goi && l.goi.sbd === e.sbd
+  const bdBang = laEmGoi && l ? (v?.bienDongEm ?? []).filter((x) => x.luc >= l.batDau && /bảng/i.test(x.lyDo)).slice(-1)[0] : undefined
+  const ketQuaBang = e && l?.goi && l.pha === 'mo' && !v?.ketThuc ? <KetQuaLenBangEm g={l.goi} laEm={laEmGoi} kjEm={bdBang?.kjEm ?? null} /> : null
   const neoBd = e ? <div className="bpu-bd-neo"><DsTheBienDong the={theBd} /></div> : null
   let lopChe: React.ReactNode = null
 
@@ -526,8 +557,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         <div className={`bpu-che${dangBay ? ' bay' : ''}`} data-kq={kq} role="status" aria-live="polite" aria-label="Màn đã che sau khi gửi">
           {dangBay ? <TiaBay /> : null}
           <div className="bpu-che-noi">
-            <div className="bpu-che-doi"><NgonLua doi={doi} /><b>{tenDoi}</b><span><SoKj v={kjDoiSo} /> kJ đội</span></div>
-            {ketQuaBang}
+            <div className={`bpu-che-doi${ketQuaBang ? ' co-kq' : ''}`}><NgonLua doi={doi} /><div className="ten"><b>{tenDoi}</b><span><SoKj v={kjDoiSo} /> kJ đội</span></div>{ketQuaBang}</div>
             {neoBd}
             {kq ? <div className="bpu-che-dau" aria-hidden="true">{kq === 'dung' ? '✓' : '✗'}</div> : <NgonLua doi={doi} ky={DOI_BPU[doi]?.ky} to />}
             <h3>{tieuDe}</h3>
@@ -577,11 +607,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
 
   if (an) return null
   return createPortal(
-    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
+    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nangDay ? ' nang-day' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
       {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}
-      {lopChe ? null : ketQuaBang}
+      {lopChe || !ketQuaBang ? null : <div className="bpu-klb-hang">{ketQuaBang}</div>}
       {lopChe ? null : neoBd}
       {than ? <main className="bpu-hs-than">{than}</main> : null}
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
