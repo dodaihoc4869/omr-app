@@ -27,7 +27,8 @@ describe('nhãn loại ngày', () => {
     expect(hero().getAttribute('data-loai')).toBe('sua')
     expect(container.querySelector('.kb-cta')!.getAttribute('data-sac')).toBe('sai')
     expect(container.querySelector('.kb-cta')!.textContent).toContain('Bắt đầu sửa lỗi')
-    expect(container.querySelector('button[aria-label="Sửa lỗi tiếp · 22 câu"], .kb-dong[aria-label="Sửa lỗi tiếp · 22 câu"]')).toBeTruthy()
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (bản vẽ docs/ban-ve-mot-nut-1011 «chỉ để lại một nút»): danh sách Việc hôm nay đã bỏ — chỉ còn nút chính
+    expect(container.querySelector('.kb-viec-ds, .kb-dong')).toBeNull()
     rerender(<MotTrangHs {...goc()} />)
     expect(container.querySelector('.kb-cta')!.textContent).toContain('Bắt đầu')
     expect(container.querySelector('.kb-cta')!.textContent).not.toContain('sửa lỗi')
