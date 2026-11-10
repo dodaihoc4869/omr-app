@@ -19,6 +19,7 @@
 // TỆP NÀY KHÔNG CÓ MÃ MÀU "#rrggbb" (luật `check:mau`) — chỉ rgb()/rgba().
 import { thoat } from './html-phieu'
 import { JS_LEN_BANG_BPU } from './len-bang-bpu-to-chieu'
+import { CSS_BUT_BANG, JS_BUT_BANG } from './but-bang-to-chieu'
 import type { ThongKeLopCau } from './thong-ke-lop-cau'
 export { thongKeLopCau, type ThongKeLopCau } from './thong-ke-lop-cau'
 
@@ -204,7 +205,7 @@ body.mc-co-but .mc-but-cu{display:flex}
 .mc-but-cu .mc-m.mc-chon{border-color:rgb(255,255,255)}
 .mc-but-cu .mc-n{padding:.3em .8em;border-radius:2em;background:rgba(255,255,255,.1)}
 .mc-but-cu .mc-n.mc-chon{background:rgb(255,255,255);color:var(--mc-thanh2)}
-/* Lớp phủ: phóng hình · lưới tổng quan · phím tắt · báo nhanh */
+${CSS_BUT_BANG}/* Lớp phủ: phóng hình · lưới tổng quan · phím tắt · báo nhanh */
 .mc-phu-lop{position:fixed;inset:0;z-index:60;display:none;font-family:var(--mc-sans)}
 .mc-phu-lop.mc-mo{display:block}
 .mc-phong{background:rgba(20,18,14,.9);cursor:zoom-out}
@@ -727,36 +728,7 @@ ${JS_LEN_BANG_BPU}
     if (S.tk && d && !d.querySelector('.mc-tk')) baoNhanh('Chưa có số liệu lớp cho câu này', 1800);
   }
 
-  // ── B · bút ──
-  var cv = tao('canvas', 'mc-but', body), g2 = cv.getContext ? cv.getContext('2d') : null, butCu = tao('div', 'mc-but-cu', body);
-  function coCanvas() { if (!g2) return; var dpr = window.devicePixelRatio || 1; cv.width = Math.round(window.innerWidth * dpr); cv.height = Math.round(window.innerHeight * dpr); g2.setTransform(dpr, 0, 0, dpr, 0, 0); }
-  function xoaBut() { if (g2) { g2.save(); g2.setTransform(1, 0, 0, 1, 0, 0); g2.clearRect(0, 0, cv.width, cv.height); g2.restore(); } }
-  function veButCu() {
-    var MAU = [['rgb(229,72,77)', 'Đỏ'], ['rgb(36,86,201)', 'Xanh dương'], ['rgb(31,157,85)', 'Xanh lá']];
-    butCu.innerHTML = 'Bút' + MAU.map(function (m) { return '<button type="button" class="mc-m' + (!S.tay && S.mau === m[0] ? ' mc-chon' : '') + '" style="background:' + m[0] + '" data-m="' + m[0] + '" aria-label="' + m[1] + '"></button>'; }).join('') +
-      '<button type="button" class="mc-n' + (S.tay ? ' mc-chon' : '') + '" data-tay="1">Tẩy</button><button type="button" class="mc-n" data-xoa="1">Xoá hết</button><button type="button" class="mc-n" data-tat="1">Tắt (B)</button>';
-  }
-  butCu.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('button'); if (!b) return;
-    if (b.getAttribute('data-m')) { S.mau = b.getAttribute('data-m'); S.tay = false; }
-    if (b.getAttribute('data-tay')) S.tay = true;
-    if (b.getAttribute('data-xoa')) xoaBut();
-    if (b.getAttribute('data-tat')) { batBut(); return; }
-    veButCu();
-  });
-  var dangVe = false, truoc = null;
-  cv.addEventListener('pointerdown', function (e) { if (!S.but) return; dangVe = true; try { cv.setPointerCapture(e.pointerId); } catch (x) {} truoc = { x: e.clientX, y: e.clientY }; });
-  cv.addEventListener('pointermove', function (e) {
-    if (!dangVe || !g2) return;
-    g2.globalCompositeOperation = S.tay ? 'destination-out' : 'source-over';
-    g2.strokeStyle = S.mau; g2.lineCap = 'round'; g2.lineJoin = 'round'; g2.lineWidth = u() * (S.tay ? 2.2 : 0.35);
-    g2.beginPath(); g2.moveTo(truoc.x, truoc.y); g2.lineTo(e.clientX, e.clientY); g2.stroke(); truoc = { x: e.clientX, y: e.clientY };
-  });
-  ['pointerup', 'pointercancel'].forEach(function (t) { cv.addEventListener(t, function () { dangVe = false; }); });
-  function batBut() { S.but = !S.but; if (S.but && !cv.width) coCanvas(); body.classList.toggle('mc-co-but', S.but); veButCu(); veThanh(); }
-  window.addEventListener('resize', function () { if (cv.width) { coCanvas(); } });
-  veButCu();
-
+${JS_BUT_BANG}
   // ── lớp phủ: phóng hình / tổng quan / phím ──
   var phong = tao('div', 'mc-phu-lop mc-phong', body), luoi = tao('div', 'mc-phu-lop mc-luoi', body), phim = tao('div', 'mc-phu-lop mc-phim', body);
   phong.addEventListener('click', function () { phong.classList.remove('mc-mo'); });
@@ -782,7 +754,7 @@ ${JS_LEN_BANG_BPU}
   function moPhim() {
     var ds = [['L', 'Gọi em lên bảng (hiệu ứng gọi tên)'], ['G', 'Mở / đóng lời giải (ngay dưới đề, trong 2/3)'], ['Space', 'Lời giải đang mở: hiện mục tiếp — hết mục thì lật trang / cuộn'],
       ['↓ PageDown', 'Chờ gọi: lật trang của câu · Đang chữa: cuộn một khung'], ['↑ PageUp', 'Trang trước / cuộn lên'], ['← →', 'Đổi đợt'],
-      ['C', 'Thầy chữa câu này (không gọi em)'], ['X', 'Học sinh làm sai câu này (giờ, ca, thời gian làm)'], ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], ['B', 'Bút vẽ (3 màu, tẩy)'], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
+      ['C', 'Thầy chữa câu này (không gọi em)'], ['X', 'Học sinh làm sai câu này (giờ, ca, thời gian làm)'], ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], PHIM_BUT[0], PHIM_BUT[1], PHIM_BUT[2], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
     phim.innerHTML = '<div class="mc-h"><h2>Phím tắt</h2><dl>' + ds.map(function (x) { return '<dt>' + x[0].split(' ').map(function (k) { return k === '/' || k === '+' || k === 'số' ? k : '<kbd>' + k + '</kbd>'; }).join(' ') + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>';
     phim.classList.add('mc-mo');
   }
@@ -1151,7 +1123,7 @@ ${JS_LEN_BANG_BPU}
 
   // ── móc vào script chính ──
   document.addEventListener('mc-vao-dot', function () {
-    xoaBut(); dongCt(); phong.classList.remove('mc-mo');
+    butTrang(); dongCt(); phong.classList.remove('mc-mo');
     tuGui();
     var d = dot();
     if (d) $$(d, '.mc-vung-de').forEach(function (v) { v.__trang = 0; v.classList.remove('mc-cuon'); v.scrollTop = 0; });
