@@ -1,0 +1,359 @@
+{
+  "i": 1145,
+  "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349.png",
+  "size": [
+    601,
+    182
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "100-III-2",
+      "de": "Docosahexaenoic acid (DHA) thuộc loại acid béo omega-n, là thành phần quan trọng của não người, vỏ não, da và võng mạc.\nDocosahexaenoic acid có công thức cấu tạo như hình.\nGiá trị của n là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+          "where": "100-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "cef8468b8f5bbfb83325404fc740f3e99c1f534e418578746f35ad7e2efd4c8a"
+        }
+      ],
+      "missingHashes": [
+        "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349"
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D1-III-1",
+      "de": "Docosahexaenoic acid (DHA) thuộc loại acid béo omega-n, là thành phần quan trọng của não người, vỏ não, da và võng mạc.\nDocosahexaenoic acid có công thức cấu tạo như hình.\nGiá trị của n là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+          "where": "12-C1-B1-D1-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "cef8468b8f5bbfb83325404fc740f3e99c1f534e418578746f35ad7e2efd4c8a"
+        }
+      ],
+      "missingHashes": [
+        "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/1145-native3x-lo319.png",
+    "ownCO5xOpened": "/workspace/scratch/1145-co5x-lo319.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelvertices/bonds literal, noDHAnameusedforcounts oromegananswer. InternalindicesNOTfigurelabels.",
+  "geometry": {
+    "classification": "Oneopenfattyacidcoiledchain, no ringclosure.",
+    "verticesCarbonylToFreeRight": [
+      [
+        101,
+        90
+      ],
+      [
+        123,
+        53
+      ],
+      [
+        167,
+        53
+      ],
+      [
+        189,
+        16
+      ],
+      [
+        233,
+        16
+      ],
+      [
+        255,
+        53
+      ],
+      [
+        299,
+        53
+      ],
+      [
+        321,
+        90
+      ],
+      [
+        299,
+        127
+      ],
+      [
+        321,
+        164
+      ],
+      [
+        365,
+        164
+      ],
+      [
+        387,
+        127
+      ],
+      [
+        365,
+        90
+      ],
+      [
+        387,
+        53
+      ],
+      [
+        431,
+        53
+      ],
+      [
+        453,
+        16
+      ],
+      [
+        497,
+        16
+      ],
+      [
+        519,
+        53
+      ],
+      [
+        563,
+        53
+      ],
+      [
+        585,
+        90
+      ],
+      [
+        563,
+        127
+      ],
+      [
+        585,
+        164
+      ]
+    ],
+    "CCdoubleEdgesZeroBased": [
+      [
+        3,
+        4
+      ],
+      [
+        6,
+        7
+      ],
+      [
+        9,
+        10
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        15,
+        16
+      ],
+      [
+        18,
+        19
+      ]
+    ],
+    "innerDoubleRays": [
+      [
+        [
+          195,
+          25
+        ],
+        [
+          227,
+          25
+        ]
+      ],
+      [
+        [
+          293,
+          63
+        ],
+        [
+          310,
+          90
+        ]
+      ],
+      [
+        [
+          328,
+          154
+        ],
+        [
+          359,
+          154
+        ]
+      ],
+      [
+        [
+          376,
+          90
+        ],
+        [
+          393,
+          63
+        ]
+      ],
+      [
+        [
+          459,
+          25
+        ],
+        [
+          491,
+          25
+        ]
+      ],
+      [
+        [
+          557,
+          63
+        ],
+        [
+          574,
+          90
+        ]
+      ]
+    ],
+    "carbonylO": {
+      "text": "O",
+      "bbox": [
+        118,
+        127,
+        145,
+        152
+      ],
+      "doubleRays": [
+        [
+          [
+            99,
+            93
+          ],
+          [
+            120,
+            127
+          ]
+        ],
+        [
+          [
+            105,
+            89
+          ],
+          [
+            126,
+            124
+          ]
+        ]
+      ],
+      "footTopology": "TwoDIAGONALparallelrays attachDIFFERENTslopes aroundcarbonyl10190: lowerleftfoot9993 nearHOarm, upperrightfoot10589 onCCslope. NoWHITEsplitfromvertexlike1341; own5xshowscontinuouscontact. Noaddedbridge/forcedcommonnode."
+    },
+    "OH": {
+      "text": "HO",
+      "bbox": [
+        6,
+        77,
+        54,
+        104
+      ],
+      "bond": [
+        [
+          101,
+          90
+        ],
+        [
+          57,
+          90
+        ]
+      ],
+      "anchor": "O(rightglyph)"
+    },
+    "counts": {
+      "Cvertices": 22,
+      "O": 2,
+      "CCdouble": 6,
+      "COdouble": 1,
+      "Htext": 0,
+      "Cnums": 0,
+      "caption": 0,
+      "charges": 0
+    },
+    "font": "HO/Oregularuprightsans, noactualbold; skeletallines thinuniformgrayblack.",
+    "tinyColoredFlecks": {
+      "blueApprox": [
+        [
+          188,
+          10
+        ],
+        [
+          304,
+          45
+        ],
+        [
+          312,
+          30
+        ],
+        [
+          94,
+          114
+        ],
+        [
+          305,
+          171
+        ],
+        [
+          321,
+          171
+        ],
+        [
+          570,
+          46
+        ]
+      ],
+      "orangeApprox": [
+        [
+          591,
+          87
+        ],
+        [
+          592,
+          94
+        ],
+        [
+          584,
+          171
+        ]
+      ],
+      "finding": "Tinyisolatedblue/orange squares/flecks outsidechemicalbonds, noreadableglyph orleader/circle/legend, publicdeonlyasksomega classificationanddoesnotrefercolors. Likelyselection/exportartefacts; intentcannotbeprovenfromsinglePNG. Theyarenotatomlabels/bondtypes/chemicaldata; do notturnintovertices/charges orparticlecounts. Keepnonsemanticmarkevidenceinproof, parentmayrendercleanchemicallinewithoutinventedcoloredannotation."
+    },
+    "noAdded": [
+      "DHAcaption",
+      "omegaanswer",
+      "Cnumbers",
+      "H/CH3labels",
+      "ringclosure",
+      "stereowedges",
+      "carrying1341COgap"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootCorrectionBeforeAdmission": {
+    "finding": "SourceagentblueApprox[94,114] là tọa độ nhầm; root nativeCO8x xác nhận vết xanh gầnHOarm tại x94,y81. Giữ dòng sourceagent như lịch sử, không dùng làm dữ liệu hóa học hay dựng annotation.",
+    "nativeMacro": "/workspace/scratch/native319-CO.png",
+    "svgGeometryChanged": false
+  }
+}

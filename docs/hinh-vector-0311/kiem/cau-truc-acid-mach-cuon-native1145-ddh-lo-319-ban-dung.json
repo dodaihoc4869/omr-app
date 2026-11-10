@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1145,
+    "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+    "fileNguon": "anh/ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349.png",
+    "svg": "acid-mach-cuon-native1145-ddh-0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070.svg",
+    "hashSvg": "0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070",
+    "byteSvg": 2122,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "100-III-2",
+        "de": "Docosahexaenoic acid (DHA) thuộc loại acid béo omega-n, là thành phần quan trọng của não người, vỏ não, da và võng mạc.\nDocosahexaenoic acid có công thức cấu tạo như hình.\nGiá trị của n là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+            "where": "100-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "cef8468b8f5bbfb83325404fc740f3e99c1f534e418578746f35ad7e2efd4c8a"
+          }
+        ]
+      },
+      {
+        "qid": "12-C1-B1-D1-III-1",
+        "de": "Docosahexaenoic acid (DHA) thuộc loại acid béo omega-n, là thành phần quan trọng của não người, vỏ não, da và võng mạc.\nDocosahexaenoic acid có công thức cấu tạo như hình.\nGiá trị của n là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+            "where": "12-C1-B1-D1-III-1.hinh.0.du_lieu",
+            "hashDataUrl": "cef8468b8f5bbfb83325404fc740f3e99c1f534e418578746f35ad7e2efd4c8a"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22bareC2O/6CCdouble/COdoubleDOWNRIGHT2splitfeetCONTINUOUS/HOleftOanchor/freeRIGHTDOWN/allthinregular/noaddedH-CH3-nums-caption-answer/noalias1341-noCOwhitegap",
+    "hashSvgDaSoat": "0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

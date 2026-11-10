@@ -3394,6 +3394,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349": {
+      "tep": "acid-mach-cuon-native1145-ddh-0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070.svg",
+      "hashSvg": "0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070",
+      "byteSvg": 2122,
+      "byteGzip": 784,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "e4bb3007b9f23540990cf8b900e34248990c371e790ed671f9f07ba9f93e0aee": {
       "tep": "ph-icons-ddh-d605de992e5c8ef28ece5848fe0564faa43bef17096915f14df4021129daa27a.svg",
       "hashSvg": "d605de992e5c8ef28ece5848fe0564faa43bef17096915f14df4021129daa27a",
@@ -9356,6 +9365,20 @@
       ]
     },
     {
+      "qid": "100-III-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+          "where": "100-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "cef8468b8f5bbfb83325404fc740f3e99c1f534e418578746f35ad7e2efd4c8a",
+          "vector": "acid-mach-cuon-native1145-ddh-0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070.svg"
+        }
+      ]
+    },
+    {
       "qid": "100-III-3",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -10144,6 +10167,20 @@
           "where": "12-C1-B1-D1-II-20.hinh.0.du_lieu",
           "hashDataUrl": "e72fe73d71c7f35262966e6753fff12582be12573cf8a5588aa1d590f65809f2",
           "vector": "aspirin-ddh-7990e7bb805cd86bd4e1bd85d0ccfc13d5be3a554c64bd936b0444cf0e7fa259.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C1-B1-D1-III-1",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "ced42548a5bd44a35229b977f61073a3b767c656388de3691c3570813a430349",
+          "where": "12-C1-B1-D1-III-1.hinh.0.du_lieu",
+          "hashDataUrl": "cef8468b8f5bbfb83325404fc740f3e99c1f534e418578746f35ad7e2efd4c8a",
+          "vector": "acid-mach-cuon-native1145-ddh-0133a44e5fa4cd7e1c5b145576eed4954a6ffacb6074a2c6de5110b73381e070.svg"
         }
       ]
     },
@@ -29398,6 +29435,7 @@
     "11-C1-B2-D1-II-5",
     "100-I-16",
     "100-II-2",
+    "100-III-2",
     "100-III-3",
     "11-C2-B6-II-2",
     "11-C2-B5-I-4",
@@ -29446,6 +29484,7 @@
     "12-C1-B1-D1-II-17",
     "12-C1-B1-D1-II-19",
     "12-C1-B1-D1-II-20",
+    "12-C1-B1-D1-III-1",
     "12-BD7-21-II-1",
     "12-BD7-20-II-2",
     "12-BD7-20-III-3",
