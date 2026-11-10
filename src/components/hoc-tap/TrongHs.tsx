@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
 import { chuViecBai } from './chu-viec-bai'
-import { laLop12 } from './la-lop-12'
 import { chiaChang, chuNutHoc, useNhipHocEm } from './nhip-hom-nay'
 import { NHAN_LOAI_NGAY, bongHoc, chuNutLoai, nhomDangSua, type LoaiNgay } from './loai-ngay'
 import { chuViecTiepHs, nhipTheoSanh } from '../../lib/nhip-hoc-em'
@@ -24,7 +23,7 @@ import { chonChoBong, rongOmChu, type Hop } from '../../lib/bong-bong-mol'
 import { useBongVuaChu } from '../../lib/bong-vua-chu'
 import { docLuaThat } from '../../lib/lua-that'
 import { gioMayChu } from '../../lib/gio-may-chu'
-import { anMung, banHat, KHOA_AM_AN_MUNG, kichRuong, napAnMung, napTruocAnMung, yenLang } from '../../lib/hieu-ung'
+import { anMung, KHOA_AM_AN_MUNG, kichRuong, napAnMung, napTruocAnMung } from '../../lib/hieu-ung'
 import { napTruocKhoHs } from '../../lib/nap-truoc-kho-hs'
 import { docNhoTuSua, ngheTuSua } from '../../lib/tu-sua-loi'
 // Việc hôm nay NẠP ĐỘNG qua mảnh ManTuChua (đã là điểm nạp lười, có trong precache, Lộ trình nạp sẵn lúc rảnh): nhập tĩnh / nạp thẳng tu-sua-viec-hom-nay làm
@@ -50,7 +49,6 @@ import '../../styles/khong-xuong-hs.css' // thầy 03/11 «màn nào load hiện
 // thưởng phạt + thẻ bên là MỘT mảnh nạp lười (ManThuong). Học sinh không thấy nhãn nhịp học / bậc.
 import { ThanhThuong } from '../thuong/ThanhThuong'
 import { IcNguyenTu, IcTinhThe } from '../thuong/hinh' // biểu tượng nguyên tử / tinh thể ĐÚNG như bộ đếm thưởng (không thêm biểu tượng thư viện)
-import { TheBanLoTrinh } from '../thuong/TheBanLoTrinh' // lối vào Học cùng bạn trên Lộ trình (27/10)
 import { capNhatTongQuan, useTongQuan } from '../thuong/dung-thuong'
 import { moRuong, napSanThanhTich, type TongQuanThuong } from '../../lib/thuong-api'
 import { laSamsungInternet } from '../../lib/nhac-samsung'
@@ -62,9 +60,6 @@ const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
-const DemNguocThi = lazy(() => import('./DemNguocThi').catch(() => ({ default: () => null }))) // 10/11: đầu cột phải khổ ≥ 1100
-const LichBaiHs = lazy(() => import('./LichBaiHs').catch(() => ({ default: () => null })))
-const NhomSuaHomNay = lazy(() => import('./NhomSuaHomNay').catch(() => ({ default: () => null }))) // khối B lát 3: chỉ ngày Sửa, kho tải ngầm
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
 const PhuTamDong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.PhuTamDong })))
@@ -225,9 +220,6 @@ type Nut = { k: string; loai: 'hoc' | 'kiem' | 'sua' | 'bt'; tt: 'xong' | 'dang'
 type Pop = { tieu: string; phu: string; nut?: { chu: string; onClick?: () => void; tat?: boolean } }
 const HINH_NUT: Record<Nut['loai'], LucideIcon> = { hoc: Play, kiem: FlaskConical, sua: Wrench, bt: PenLine }
 
-/** F2/F3 — nhớ trên máy số chặng đã xong hôm nay (giờ VN): lần mở Lộ trình kế tiếp thấy THÊM đúng một chặng ⇒ chặng đó «vừa xong». Không bao giờ ghi lùi
- *  (bản Sảnh đệm cũ vẽ trước bản mới không làm chạy lại hiệu ứng). Trả chỉ số chặng vừa xong hoặc null. */
-const KHOA_LO_TRINH = 'ddh.lo-trinh'
 /** MỐC CHÈN Tự sửa lỗi = số chặng đứng TRƯỚC nút (thầy 27/10 «sửa lỗi chèn vào giữa hành trình mới»). Giả định: một nút Tự sửa lỗi / ngày; tính MỘT lần mỗi
  *  ngày từ chỗ em đang học (d = số chặng đã xong) rồi nhớ trên máy để nút không trôi theo em: còn ≥ 3 chặng mới ⇒ sau chặng mới thứ 2 (d + 2); còn 1–2 ⇒ sau
  *  chặng mới đầu tiên (d + 1); hết chặng ⇒ cuối đường. Số chặng hôm nay đổi ⇒ tính lại. Không đọc / ghi được bộ nhớ máy ⇒ tính theo chỗ hiện tại. */
@@ -245,16 +237,6 @@ export function mocSuaHomNay(tong: number, xong: number): number {
 const KHOA_KT_MO = 'ddh.kt-khoa'
 /** Ngày VN Lộ trình đang khoá chặng sau nút Tự sửa lỗi (28/10) — lúc phần ngày xong thì chạy vỡ khoá một lần. */
 const KHOA_SUA_MO = 'ddh.sua-khoa'
-function changVuaXong(xong: number, tong: number): number | null {
-  if (!tong) return null
-  const ngay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
-  let cu: { ngay?: string; tong?: number; xong?: number } | null = null
-  try { cu = JSON.parse(localStorage.getItem(KHOA_LO_TRINH) || 'null') } catch { /* bộ nhớ máy không đọc được: bỏ hiệu ứng */ }
-  const cung = !!cu && cu.ngay === ngay && cu.tong === tong
-  if (cung && typeof cu!.xong === 'number' && xong < cu!.xong) return null
-  try { localStorage.setItem(KHOA_LO_TRINH, JSON.stringify({ ngay, tong, xong })) } catch { /* không lưu được: lần sau không có hiệu ứng */ }
-  return cung && xong === (cu!.xong ?? -1) + 1 ? xong - 1 : null
-}
 
 /** CON ĐƯỜNG CHẶNG (bản vẽ dm-1/2/3, thầy chốt 26/10): nút lục giác nổi khối, nối bằng đường chấm mềm (vẽ theo vị trí thật của nút).
  *  Hiệu ứng (HIEU-UNG.md F): F1 nút hiện tại phồng thở + bong bóng nhún (CSS) · F2 chặng vừa xong: vòng lan + sao bay · F3 chặng mới mở: khoá tinh thể vỡ
@@ -288,47 +270,6 @@ function Ruong({ mo }: { mo?: boolean }) {
     </g>
   </svg>
 }
-/** Vòng tiến độ quanh nút HIỆN TẠI (thầy 27/10, ảnh Duolingo; «làm sát lại, tinh tế hơn»): bốn đoạn đầu tròn, khe nhỏ, ôm sát nút, nền xám
- *  rất nhạt; phần đã làm cùng màu nút, tô dần 0 → tỉ lệ thật lúc mở (mặt nạ stroke-dashoffset, 500 ms ease-out). Không có số ⇒ vòng xám nguyên.
- *  31/10 (thầy «vòng bị lệch, muốn khít cân đối»): cỡ / tâm / nét ở trong-hs.css (vòng đặt đúng tâm khối mặt + đáy, khe đều ~5 px mọi phía). */
-// khe giữa hai đoạn theo đơn vị khung 116 — CHUNG cho vòng 4 đoạn và vòng đoạn theo câu (nét 5,7 đầu tròn ⇒ khe nhìn thấy ~3 px ở vòng 102 px)
-const CV = 2 * Math.PI * 54, KHE = 9
-/** `so` = số đoạn (mặc định 4). Nút Kiểm tra ôn tập (28/10): MỖI CHẶNG MỘT ĐOẠN, `pt` = chặng đã chốt / tổng ⇒ tô trọn đúng số đoạn (mặt nạ dừng giữa khe).
- *  `da` (thầy 30/10 «chặng đó bao nhiêu câu thì chia thành bấy nhiêu đoạn, xong câu nào thì đoạn câu đó đồng bộ tức thì tô màu, làm khít lại, hiệu ứng tinh
- *  tế hơn») ⇒ vòng ĐOẠN: `so` đoạn = số câu, `da` đoạn đầu tô trọn; đoạn VỪA xong kể từ lần vẽ trước (nhớ theo `khoa` trong phiên trình duyệt) vẽ dần + sáng
- *  nhẹ, đoạn cũ hiện ngay. */
-function VongChang({ pt, so = 4, da, khoa }: { pt?: number; so?: number; da?: number; khoa?: string }) {
-  // useId TRƯỚC lệnh return sớm (dọn mã 02/11, luật rules-of-hooks): `da` đổi từ vắng → có trên cùng một vòng thì số hook giữa hai lần vẽ lệch ⇒ React sập màn.
-  const maId = useId()
-  if (da !== undefined) return <VongDoan so={so} da={da} khoa={khoa} />
-  const L = Math.max(0, Math.min(100, pt ?? 0)) / 100 * CV, DOAN = CV / Math.max(2, Math.min(8, so))
-  const id = `da-vm${maId.replace(/[^a-zA-Z0-9]/g, '')}`
-  const doan = { cx: 58, cy: 58, r: 54, strokeDasharray: `${DOAN - KHE} ${KHE}`, strokeDashoffset: DOAN - KHE / 2 }
-  return <svg className="da-vong" viewBox="0 0 116 116" aria-hidden="true">
-    {L > 0 && <mask id={id}><circle className="mo" cx="58" cy="58" r="54" strokeDasharray={`${L} ${CV}`} style={{ '--L': `${L}` } as CSSProperties} /></mask>}
-    <circle className="nen" {...doan} />
-    {L > 0 && <circle className="chay" {...doan} mask={`url(#${id})`} />}</svg>
-}
-
-function VongDoan({ so, da, khoa }: { so: number; da: number; khoa?: string }) {
-  const n = Math.max(1, Math.min(12, Math.round(so))), d = Math.max(0, Math.min(n, Math.round(da)))
-  const doan = CV / n, cung = Math.max(4, doan - (n > 1 ? KHE : 0))
-  // đoạn tô MỚI kể từ lần vẽ trước: lần đầu trong phiên ⇒ không hiệu ứng (hiện ngay); quay về Lộ trình sau khi làm câu ⇒ chỉ các đoạn mới chạy
-  // mốc giữ nguyên qua các lần vẽ lại cùng số câu (màn còn vẽ lại sau khi hiện — mất mốc là mất hiệu ứng), đổi khi số câu đổi
-  const moc = useRef<{ d: number; tu: number } | null>(null)
-  if (moc.current === null) { let v = d; try { const x = khoa ? sessionStorage.getItem(khoa) : null; if (x !== null && Number(x) >= 0 && Number(x) < d) v = Number(x) } catch { /* bỏ qua */ } moc.current = { d, tu: v } }
-  else if (moc.current.d !== d) moc.current = { d, tu: Math.min(moc.current.d, d) }
-  const tu = moc.current.tu
-  useEffect(() => { try { if (khoa) sessionStorage.setItem(khoa, String(d)) } catch { /* bỏ qua */ } }, [khoa, d])
-  return <svg className="da-vong" data-doan="" viewBox="0 0 116 116" aria-hidden="true">
-    {Array.from({ length: n }, (_, i) => {
-      const moi = i < d && i >= tu
-      return <circle key={i} className={i < d ? 'chay' : 'nen'} data-moi={moi || undefined} cx="58" cy="58" r="54" strokeDasharray={`${cung} ${CV}`}
-        strokeDashoffset={-(i * doan + (n > 1 ? KHE / 2 : 0))} style={moi ? { '--tre': `${(i - tu) * 160}ms` } as CSSProperties : undefined} />
-    })}
-  </svg>
-}
-
 /** Viền bánh quy 12 múi (hình logo app học sinh, M3 Expressive) — chuỗi path tính sẵn một lần. */
 const BANH_12 = Array.from({ length: 121 }, (_, i) => { const t = (i / 120) * 2 * Math.PI, r = 50 * (1 + 0.075 * Math.cos(12 * t)) / 1.075; return `${i ? 'L' : 'M'}${(50 + r * Math.cos(t)).toFixed(1)} ${(50 + r * Math.sin(t)).toFixed(1)}` }).join('') + 'Z'
 /** Chữ cái đầu tên (ảnh đại diện) — «Nguyễn Minh Anh» ⇒ «MA»; trống ⇒ «Em». */
@@ -514,50 +455,6 @@ export function TheRuong({ ds, token, tq, onNhiemVu }: { ds: Nut[]; token?: stri
   {mo && !sang && <TheNut id="da-pop-ruong" sac="sao" mo={mo} onDong={dong} pop={{ tieu: 'Rương hôm nay', phu, nut: thuong && onNhiemVu ? { chu: 'Xem nhiệm vụ', onClick: onNhiemVu } : undefined }} />}</>
 }
 
-/** màu THẺ BẬT RA giữ đúng như con đường cũ (thầy 05/10 «giữ nguyên mọi màu sắc»): chặng xanh · kiểm tra lam · sửa đỏ · bài tập vàng */
-const SAC_THE: Record<Nut['loai'], string> = { hoc: 'dung', kiem: 'tin', sua: 'sai', bt: 'chu-y' }
-function DanhSachViec({ ds, moKhoa, moDi }: { ds: Nut[]; moKhoa?: 'kt' | 'sua'; moDi?: boolean }) {
-  const goc = useRef<HTMLOListElement>(null)
-  const [vua, setVua] = useState<number | null>(null)
-  // chỉ MỘT thẻ mở một lúc: k của dòng đang mở + phần tử dòng (đặt thẻ, trả focus khi Esc)
-  const [moThe, setMoThe] = useState<{ k: string; el: HTMLElement } | null>(null)
-  const dongThe = useRef((traFocus: boolean) => setMoThe((m) => { if (traFocus) m?.el.focus(); return null })).current
-  const chang = ds.filter((n) => n.k.startsWith('c')), soChang = chang.length, soXong = chang.filter((n) => n.tt === 'xong').length
-  useEffect(() => {
-    const v = changVuaXong(soXong, soChang)
-    if (v === null || yenLang()) return
-    const iDong = ds.findIndex((n) => n.k === `c${v}`)
-    const mo = window.setTimeout(() => setVua(iDong), 450)
-    const t = window.setTimeout(() => banHat(goc.current?.querySelectorAll('.kb-dong')[iDong]?.querySelector('.kb-tich'), { hinh: 'sao', so: 10, xa: 80, ms: 700, mau: ['--tr-sao', '--tr-dung', '--tr-tin'] }), 570)
-    const het = window.setTimeout(() => setVua(null), 2100)
-    return () => { window.clearTimeout(mo); window.clearTimeout(t); window.clearTimeout(het) }
-  }, [soXong, soChang]) // eslint-disable-line react-hooks/exhaustive-deps
-  const viSua = ds.findIndex((m) => m.k === 'sua')
-  const vuaMo = (m: Nut, j: number) => m.tt !== 'khoa' && m.tt !== 'xong' && (moKhoa === 'kt' ? m.k.startsWith('c') || m.k === 'sua' : m.k.startsWith('c') && viSua >= 0 && j > viSua)
-  let thuChang = 0
-  // ca kiểm tra đang mở ⇒ danh sách mờ đi (như đường chặng cũ `data-mo-di`): mắt dồn vào băng ca phía trên
-  return <ol ref={goc} className="kb-viec-ds" data-mo-di={moDi || undefined} aria-label="Việc hôm nay">
-    {ds.map((n, i) => {
-      if (n.loai === 'hoc') thuChang++
-      const thuMo = moKhoa && vuaMo(n, i) ? ds.slice(0, i).filter(vuaMo).length : -1
-      const hu = moKhoa ? (n.tt === 'xong' && n.k === (moKhoa === 'kt' ? 'kiem' : 'sua') ? 'xong' : thuMo >= 0 ? 'mo' : undefined) : i === vua ? 'xong' : vua !== null && i === vua + 1 && n.tt === 'dang' ? 'mo' : undefined
-      const viec = n.pop.nut, mo = moThe?.k === n.k
-      const Icon = n.tt === 'xong' ? Check : Lock
-      return <li key={n.k} className="kb-o" data-hu={hu} style={thuMo >= 0 ? { '--tre': `${300 + thuMo * 160}ms` } as CSSProperties : undefined}>
-        {/* chạm dòng KHÔNG vào thẳng (thầy 27/10): thẻ bật ra dưới dòng — việc chính nằm trong thẻ; dòng khoá ⇒ thẻ nói lý do */}
-        <button type="button" className="kb-dong" data-loai={n.loai} data-tt={n.tt} data-sac={SAC_POP[n.loai]} aria-label={n.ten} aria-haspopup="dialog" aria-expanded={mo}
-          aria-controls={mo ? `da-pop-${n.k}` : undefined} onClick={(e) => { const el = e.currentTarget; cham(); setMoThe((m) => (m?.k === n.k ? null : { k: n.k, el })) }}>
-          <span className="kb-tich">{n.vong !== undefined && n.tt === 'dang' ? <VongChang pt={n.vong} so={n.soDoan} da={n.daDoan} khoa={n.khoaVong} /> : null}{n.tt === 'xong' || n.tt === 'khoa' ? <Icon size={n.tt === 'khoa' ? 15 : 18} strokeWidth={n.tt === 'xong' ? 3 : 2.4} aria-hidden="true" /> : null}</span>
-          <span className="kb-giua"><b>{tenDong(n, thuChang)}</b><span className="kb-phu">{phuDong(n)}</span></span>
-          {n.tt === 'dang' ? <span className="kb-viec" aria-hidden="true">{n.daDoan !== undefined && n.soDoan ? `${n.daDoan}/${n.soDoan}` : n.bong ?? viec?.chu ?? ''}</span> : <i className="kb-loai" aria-hidden="true" />}
-          {/* huy hiệu số như chấm thông báo (thầy 27/10 — số câu Tự sửa lỗi còn hôm nay…); tên đầy đủ ở aria-label + thẻ bật ra */}
-          {n.dem ? <b className="da-dem kb-dem" aria-hidden="true">{n.dem > 99 ? '99+' : n.dem}</b> : null}
-        </button>
-        {mo && <TheNut id={`da-pop-${n.k}`} sac={n.tt === 'khoa' ? 'khoa' : SAC_THE[n.loai]} pop={n.pop} mo={moThe!.el} onDong={dongThe} />}
-      </li>
-    })}
-  </ol>
-}
 
 /** G — Bi NÓI: bong bóng lời hiện chữ gõ dần (~28 ms/chữ); giảm chuyển động / máy yếu ⇒ hiện đủ ngay. Trình đọc màn hình đọc cả câu một lần. */
 /** Lời Bi NHẮC MỘT LẦN (thầy 27/10: «Chỗ học tiếp nhé nhắc 1 lần xong ẩn đi»): khoá = ngày VN + loại lời + bài. Đã hiện khoá ấy ⇒ không hiện nữa
@@ -864,7 +761,6 @@ export function MotTrangHs(p: PropsMotTrang) {
   const choSo = useChoSo(coThuong)
   useEffect(() => { setTp(null) }, [p.muc])
   // Vừa nộp Kiểm tra ôn tập (lần mở trước còn khoá) ⇒ hiệu ứng vỡ khoá các chặng MỘT lần: nhớ id bài đang khoá trên máy, thấy đã nộp ⇒ chạy rồi xoá.
-  const [moKt, setMoKt] = useState(false)
   const ktKhoaNay = !!kiem && kiem.homNay && !p.ngayKiem && kiem.nopLuc === null && kiem.trangThai === 'can_lam'
   useEffect(() => {
     if (!kiem || !kiem.homNay || p.ngayKiem) return
@@ -872,11 +768,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       if (ktKhoaNay) { localStorage.setItem(KHOA_KT_MO, kiem.id); return }
       if (kiem.nopLuc === null || localStorage.getItem(KHOA_KT_MO) !== kiem.id) return
       localStorage.removeItem(KHOA_KT_MO)
-    } catch { return }
-    if (yenLang()) return
-    setMoKt(true)
-    const t = window.setTimeout(() => setMoKt(false), 3200)
-    return () => window.clearTimeout(t)
+    } catch { /* bỏ qua */ }
   }, [kiem?.id, kiem?.nopLuc, ktKhoaNay]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const mo = () => setTp({ man: 'chuoi', hieuUng: 'chuoi' })
@@ -897,7 +789,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const kiemLam = !!kiem && kiem.homNay && !kiemXong && kiem.trangThai === 'can_lam'
   const nhoSua = useMemo(() => docSuaNho(p.token), [p.token])
   const soSua = p.soSua ?? nhoSua?.[0]
-  const coSua = !!soSua && soSua > 0 && !p.loaiNgay // ngày có loại: 28 câu, không chặng Tự sửa (10/11)
+  const coSua = !!soSua && soSua > 0 && !p.loaiNgay && !kiem?.homNay // ngày có loại / có Kiểm tra ôn tập: không chặng Tự sửa riêng (10/11)
   const { con: conSua, phan: conSuaPhan, xong: daSuaNay, mod: modSua } = useConSuaHomNay(p.token, coSua, nhoSua)
   useEffect(() => {
     if (p.token && p.soSua != null && conSuaPhan != null) try { localStorage.setItem(KHOA_SUA_NHO, JSON.stringify({ t: p.token.slice(-16), n: ngayVn(Date.now()), s: [p.soSua, conSua, conSuaPhan, daSuaNay] })) } catch { /* máy chặn: như cũ */ }
@@ -927,7 +819,6 @@ export function MotTrangHs(p: PropsMotTrang) {
   const khoaSua = coSua && !p.ngayKiem && !khoaKt && conPhan > 0
   const toiSua = coSua && !p.ngayKiem && (khoaSua || !xongSuaNay) && xongChang >= mocSua
   // Tới nút Sửa lỗi mà phần ngày chưa xong ⇒ báo máy chủ (nền, một lần / ngày) để chặn mở chặng bằng lối khác; nhớ trên máy để lúc xong chạy vỡ khoá MỘT lần.
-  const [moSua, setMoSua] = useState(false)
   const khoaSuaToi = khoaSua && toiSua
   useEffect(() => {
     const ngay = ngayVn(Date.now())
@@ -935,11 +826,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       if (khoaSuaToi) { modSua?.baoKhoaSua(); localStorage.setItem(KHOA_SUA_MO, ngay); return }
       if (khoaSua || !coSua || conSuaPhan !== 0 || localStorage.getItem(KHOA_SUA_MO) !== ngay) return
       localStorage.removeItem(KHOA_SUA_MO)
-    } catch { return }
-    if (yenLang()) return
-    setMoSua(true)
-    const t = window.setTimeout(() => setMoSua(false), 3200)
-    return () => window.clearTimeout(t)
+    } catch { /* bỏ qua */ }
   }, [khoaSuaToi, khoaSua, conSuaPhan, modSua]) // eslint-disable-line react-hooks/exhaustive-deps
   const chinh = p.coCa ? 'ca' : p.ngayKiem || khoaKt ? 'kiem' : toiSua ? 'sua' : du && kiemLam ? 'kiem' : du && coSua && !xongSuaNay ? 'sua' : du && coBt && p.soBaiTap ? 'bt' : 'hoc'
   const pct = so && so.muc > 0 ? Math.min(100, Math.round((100 * so.daLam) / so.muc)) : 0
@@ -1110,6 +997,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const ktNgay = !!kiem && kiem.homNay && (kiem.trangThai === 'can_lam' || kiem.trangThai === 'da_nop')
   const daSuaNgay = typeof daSuaNay === 'number' ? daSuaNay : 0
   const tongSuaNay = coSua && !p.ngayKiem ? suaNay + daSuaNgay : 0 // cùng số «còn N câu cần sửa» của nút chính
+  const coViecDang = nut.some((n) => n.tt === 'dang' && !!n.pop.nut?.onClick && !n.pop.nut.tat)
   const tongNgay = (so && !p.ngayKiem ? so.muc : 0) + tongSuaNay + (ktNgay ? kiem!.tong : 0)
   const daNgay = (so && !p.ngayKiem ? Math.min(so.daLam, so.muc) : 0) + (tongSuaNay ? daSuaNgay : 0) + (ktNgay ? (kiem!.nopLuc !== null ? kiem!.tong : kiem!.daTra) : 0)
   const coTong = tongNgay > 0 && (!!so || !!p.ngayKiem)
@@ -1178,15 +1066,11 @@ export function MotTrangHs(p: PropsMotTrang) {
           <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
           <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} /></span>
           <ChevronRight size={22} aria-hidden="true" /></button> })()}
-      {p.goi7 && !p.ngayKiem && (p.loaiNgay === 'sua' || p.goi7.goi.some(g => g.quaHan && g.con > 0)) && <Suspense fallback={null}><NhomSuaHomNay g={p.goi7} token={p.token} /></Suspense>}
-      {!so && p.dangTai && !p.ngayKiem ? null : nut.length > 0 && <section className="kb-viec" aria-label="Việc hôm nay"><h2>Việc hôm nay<span>{nut.filter((n) => n.tt === 'xong').length}/{nut.length} xong</span></h2>
-        <DanhSachViec ds={nut} moDi={chinh === 'ca'} moKhoa={moKt ? 'kt' : moSua ? 'sua' : undefined} /></section>}
       {so && !p.dangTai && !nut.length && <ViecTrong />}
       </div><div className="kb-cot-phai">
-      {hs?.lop && laLop12(hs.lop) && <Suspense fallback={null}><DemNguocThi lop={hs.lop} /></Suspense>}
-      {p.goi7?.lichBai ? <Suspense fallback={null}><LichBaiHs g={p.goi7} /></Suspense> : null}
-      {coThuong && <TheBanLoTrinh token={p.token} bat={tq?.bat.banBe} onMo={() => moTp('ban')} />}
-      {!(!so && p.dangTai) && <TheRuong ds={nut} token={p.token} tq={tq} onNhiemVu={() => moTp('nhiem-vu')} />}
+      {/* 10/11 thầy duyệt bản vẽ docs/ban-ve-mot-nut-1011 «ẩn hết những phần ở dưới, chỉ để lại một nút»: bỏ nợ bài · Nhóm lỗi · Việc hôm nay · Lịch bài · Bạn bè;
+          Rương chỉ khi không còn việc (thay chỗ nút chính) */}
+      {!(!so && p.dangTai) && !coViecDang && <TheRuong ds={nut} token={p.token} tq={tq} onNhiemVu={() => moTp('nhiem-vu')} />}
       {hocThem && <button type="button" className="mot-lien-ket" onClick={p.onHoc}>Học thêm câu mới<ChevronRight size={18} aria-hidden="true" /></button>}
     </div>
     </main>

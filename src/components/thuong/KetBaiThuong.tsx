@@ -25,11 +25,13 @@ export interface PropsKetBai {
   bat?: CongTac
   onTiep: () => void
   chuNut?: string
+  /** Nút phụ dưới nút chính (10/11 bản vẽ docs/ban-ve-mot-nut-1011: «Làm tiếp: Chặng N» + «Về Hôm nay»). */
+  nutPhu?: { chu: string; onClick: () => void }
   /** Số câu hôm nay mới nhất của màn làm bài (`hoc-tap-dem`) ⇒ vòng mục tiêu tính bằng CÂU, cùng thước đo thẻ «Đủ x/y câu hôm nay!». */
   cauHomNay?: { daLam: number; muc: number } | null
 }
 
-export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut = 'Tiếp tục', cauHomNay }: PropsKetBai) {
+export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut = 'Tiếp tục', nutPhu, cauHomNay }: PropsKetBai) {
   const hh = k.hoanHao
   // Màn làm bài có số `hoc-tap-dem` mới nhất ⇒ đè số của máy chủ (mục tiêu đo bằng câu, cùng thẻ «Đủ x/y câu»).
   const mt = vongMucTieu(cauHomNay && cauHomNay.muc > 0 ? { daXong: 0, can: 1, cau: cauHomNay.muc, cauDaLam: cauHomNay.daLam } : k.mucTieu), dat = !!mt && mt.dat
@@ -121,6 +123,7 @@ export default function KetBaiThuong({ ketBai: k, phu, hang, bat, onTiep, chuNut
         </div>}
       </div>
     </main>
-    <div className="tp-day"><div className="tp-day-giua"><button type="button" className="tp-nut-lon" onClick={() => { xongHieuUng(); onTiep() }}>{chuNut}</button></div></div>
+    <div className="tp-day"><div className="tp-day-giua"><button type="button" className="tp-nut-lon" onClick={() => { xongHieuUng(); onTiep() }}>{chuNut}</button>
+      {nutPhu && <button type="button" className="tp-nut-chu" onClick={() => { xongHieuUng(); nutPhu.onClick() }}>{nutPhu.chu}</button>}</div></div>
   </div>
 }

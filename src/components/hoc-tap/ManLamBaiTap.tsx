@@ -316,7 +316,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // CHẤM NHANH (thầy 28/10 «bấm kiểm tra … chưa tức thì ngay»): `cham` = đang chờ máy chủ chấm (dải «Đang chấm…» trượt lên ngay khi chạm); `tiepCho` = em bấm
   // «Tiếp tục» khi kết quả còn TẠM ⇒ sang câu ngay khi bản đầy đủ (đã ghi) về — câu kế không bao giờ nộp chồng lên lượt ghi của câu trước.
   const [cham, setCham] = useState(false), tiepCho = useRef(false), tiepMoi = useRef<() => void>(() => {})
-  // GHI NỀN (29/10, thầy «tải sẵn gì tải luôn, tức thì cả giờ cao điểm»): kết quả đã hiện (dòng tạm) mà bản đầy đủ (đã ghi) chưa về ⇒ «Tiếp tục» sang câu kế NGAY (trừ câu cuối), lượt ghi chạy tiếp nền.
+  // GHI NỀN (29/10): kết quả đã hiện (dòng tạm) mà bản đầy đủ chưa về ⇒ «Tiếp tục» sang câu kế NGAY (trừ câu cuối).
   // `ghiTruoc` = lượt nộp trước còn chạy: câu kế chỉ GỬI sau khi nó xong (hồ sơ game ghi bằng CAS — không chồng hai lượt ghi của một em); `tachRoi` = câu đã rời màn khi bản đầy đủ chưa về.
   const ghiTruoc = useRef<Promise<void> | null>(null), tachRoi = useRef<Set<string>>(new Set())
   // «Kiểm tra» tức thì cả câu sai nhanh (29/10): số lượt LƯỚT máy chủ đã báo từ lúc mở chặng (tem mang số lướt lúc niêm phong) — gửi kèm `lm` để dòng 1 từ tem quyết lướt đúng.
@@ -653,7 +653,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // Rung phản hồi kiểu Duolingo (thầy 26/10) — chỉ app học sinh «Trong» (phan-hoi.ts tự kiểm): tấm kết quả đúng / sai, hết chặng.
   useEffect(() => { if (k && !k.choThay && !k.hocCoHoTro && !k.omni?.luot) phanHoi(k.correct ? 'dung' : 'sai') }, [!!k]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (xong) phanHoi('xong') }, [xong])
-  // NỘP TỨC THÌ (thầy 27/10): em đang đọc kết quả câu này ⇒ tải sẵn + giải mã sẵn ảnh đề / phương án của câu KẾ (không gồm ảnh lời giải) — bấm «Tiếp tục» là câu hiện đủ ngay, không nghẽn luồng chính trên máy yếu.
+  // NỘP TỨC THÌ (thầy 27/10): tải sẵn + giải mã sẵn ảnh đề / phương án của câu KẾ (không gồm ảnh lời giải).
   useEffect(() => {
     const sau = k ? cau[viTri + 1] : undefined
     if (!sau) return
@@ -707,7 +707,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
         ph = m.id
         if (typeof m.sk[q.qid] === 'string') skCau = m.sk[q.qid] as string
       }
-      // CHẤM NHANH: dòng TẠM (đúng / sai từ bộ nhớ máy chủ) ⇒ đổi màu đúng / sai NGAY tại dải + đồng bộ tiến độ chặng ngay (0 ms) nếu em bấm thoát ngay sau đó; thưởng / EXP đến cùng phản hồi đầy đủ ngay sau. Bản nháp giữ tới bản đầy đủ.
+      // CHẤM NHANH: dòng TẠM ⇒ đổi màu đúng / sai NGAY tại dải + đồng bộ tiến độ chặng (0 ms); thưởng / EXP đến cùng phản hồi đầy đủ.
       const khiTam = (o: Record<string, unknown>) => {
         if (!apKetTam(o)) return
         // TỨC THÌ: nếu là câu cuối và có câu sai (hoặc câu này sai), kích hoạt xin làm lại sớm ngay từ lúc có kết quả tạm!
@@ -989,7 +989,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     : duocNop ? `Nộp câu · ${[...tra].map(kyTuHien).join('')}` : 'Nhập đáp án để nộp'
   const nutGoiY = q?.goiY && dangTraLoi ? <button type="button" className="ht2-lam-nut-goi-y" aria-label={goiY ? 'Thu gọn gợi ý' : 'Xem gợi ý'} aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={20} aria-hidden="true" /></button> : null
   const nutNop = <button type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={() => void nopCau()} disabled={nop || !duocNop}>{chuNop}{duocNop && !nop && <ArrowRight size={18} aria-hidden="true" />}</button>
-  const chuHocTiep = chang && homNayHien && chang < homNayHien.soChang ? `Học tiếp chặng ${chang + 1}` : 'Học tiếp chặng sau'
+  const coTiep = !!chang && !!homNayHien && chang < homNayHien.soChang // 10/11 ban-ve-mot-nut-1011: còn chặng ⇒ «Làm tiếp»
+  const chuHocTiep = coTiep ? `Học tiếp chặng ${chang! + 1}` : 'Học tiếp chặng sau'
 
   const thanhDay = tai ? null
     : xong ? <div className="ht2-lam-cot-nut">
@@ -1244,7 +1245,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       }
       return <div ref={gocRef} className="ht-app ht2-lam duo" data-duo="" data-xong="">
         <Suspense fallback={<main className="duo-than"><section className="duo-xong" aria-label="Kết quả chặng"><div className="duo-xong-bi"><Bi cam="mung" size={135} /></div><h1>{chang ? `Xong chặng ${chang}!` : 'Xong chặng học!'}</h1></section></main>}>
-          <KetBaiThuong ketBai={ketBaiTp} hang={tqLuu?.giai?.hang} bat={tqLuu?.bat} phu={phu} onTiep={veLoTrinh} cauHomNay={homNayHien} />
+          <KetBaiThuong ketBai={ketBaiTp} hang={tqLuu?.giai?.hang} bat={tqLuu?.bat} phu={phu} cauHomNay={homNayHien} {...(coTiep ? { chuNut: `Làm tiếp: Chặng ${chang! + 1}`, onTiep: () => setLan(n => n + 1), nutPhu: { chu: `Về ${tenTrangChinh()}`, onClick: veLoTrinh } } : { onTiep: veLoTrinh })} />
         </Suspense>
       </div>
     }
