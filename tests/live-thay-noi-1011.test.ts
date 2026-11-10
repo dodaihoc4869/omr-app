@@ -20,7 +20,7 @@ vi.mock('../src/lib/live', () => ({
       noiSan: async () => { goi.push(['noiSan', []]) }, dsMic: async () => [{ id: 'm1', ten: 'Micro không dây (USB)' }, { id: 'm2', ten: 'Mic máy tính' }],
       moMic: async (id: unknown) => { goi.push(['moMic', [id]]); return micOk ? { ok: true } : { ok: false, lyDo: 'mic-tu-choi' } },
       bat: async (o: unknown) => { goi.push(['bat', [o]]); return { ok: true } },
-      tat: ghi('tat'), thaMic: ghi('thaMic'), mucAm: () => 0.3, dat: ghi('dat'), thuMic: ghi('thuMic'), nhanSuKienBut: ghi('nhanSuKienBut'), guiAnh: ghi('guiAnh'),
+      tat: ghi('tat'), thaMic: ghi('thaMic'), mucAm: () => 0.3, dat: ghi('dat'), thuMic: ghi('thuMic'), datNgheEm: ghi('datNgheEm'), nhanSuKienBut: ghi('nhanSuKienBut'), guiAnh: ghi('guiAnh'),
       nhanTinPhong: ghi('nhanTinPhong'), khiNoiLai: ghi('khiNoiLai'), huy: ghi('huy'), layAnh: () => tuy.layAnh?.(),
     }
   },
@@ -160,6 +160,8 @@ describe('phần nối live của máy thầy', () => {
     expect(goi.filter(([t]) => t === 'dat').at(-1)![1][0]).toEqual({ bang: false })
     M.nhanTinTo({ viec: 'thu-mic' }, to)
     expect(goi.some(([t]) => t === 'thuMic')).toBe(true)
+    M.nhanTinTo({ viec: 'nghe-em', v: true }, to) // công tắc «Phát tiếng em ra loa lớp» trên thẻ «Đang nói»
+    expect(goi.filter(([t]) => t === 'datNgheEm').at(-1)![1][0]).toBe(true)
     // nút Live trên bảng đua + ẩn viền đỏ toàn màn: gan-gv được báo «đang live»
     await cho()
     expect(goi.filter(([t]) => t === 'datLive').at(-1)![1][0]).toEqual({ co: true, bat: true })

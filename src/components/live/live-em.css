@@ -39,7 +39,7 @@
 /* Dấu «Thầy đang live» trên màn Bình Phản Ứng thường (thầy live TIẾNG, chưa đưa bảng xuống): viên nhỏ góc trái dưới, viền màu đội, kèm nút tiếng.
    Không đè nút «Gửi» nổi (mép phải, giữa màn); màn có nút đáy ⇒ lớp `nang` nhích lên. */
 .lv-dau { position: fixed; z-index: 4; left: max(10px, env(safe-area-inset-left, 0px)); bottom: max(10px, env(safe-area-inset-bottom, 0px)); height: 44px; padding: 0 4px 0 12px; border-radius: 999px;
-  display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; white-space: nowrap; color: var(--tr-chu); background: var(--tr-mat);
+  display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; white-space: nowrap; color: var(--tr-chu); background: var(--tr-mat);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--doi) 60%, transparent), 0 6px 18px color-mix(in srgb, var(--tr-chu) 16%, transparent); animation: lv-dau-vao 0.32s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
 .lv-dau.nang { bottom: calc(max(10px, env(safe-area-inset-bottom, 0px)) + 72px); }
 .lv-dau > i { display: block; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--p-do); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p-do) 22%, transparent); }

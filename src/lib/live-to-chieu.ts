@@ -5,7 +5,7 @@
 // (2) khung `srcdoc` / tờ mở cửa sổ riêng không chắc có quyền mic; (3) WebSocket của phòng vốn ở app.
 // LUẬT (thầy chốt tối 10/11): bật live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu / dựng lại tờ; BẢNG chỉ xuống máy em khi cờ phòng `live.bang` bật
 // (tự bật lúc gọi em lên bảng, tự tắt lúc mở lượt mới) — công tắc «Bảng → máy em» trong cụm Live để thầy bật / tắt tay. Em lên bảng mở mic ⇒ thẻ «Đang nói» + «Thu mic».
-// Tờ → app:  { nguon:'to-chieu', loai:'live', viec, … }   viec = chao · bam · the-dong · chon-mic · bat-dau · khong-tieng · thu-lai · tieng-lop · tat · bang · thu-mic · but · anh · vung
+// Tờ → app:  { nguon:'to-chieu', loai:'live', viec, … }   viec = chao · bam · the-dong · chon-mic · bat-dau · khong-tieng · thu-lai · tieng-lop · tat · bang · thu-mic · nghe-em · but · anh · vung
 // App → tờ:  { nguon:'bpu-bang', lenh:'live-tt', tt }  (toàn bộ trạng thái để vẽ)   ·   { nguon:'bpu-bang', lenh:'live-muc', v }  (mức âm mic 0..1, ~11 lần / giây)
 // Bút: mọi sự kiện của `window.__mcBut.nghe` chuyển nguyên văn sang app (`viec:'but'`); sự kiện `trang` kèm ô giấy / ô bảng (`__mcBut.vung()`) + kiểu giấy
 // ⇒ máy em dựng đúng bố cục (src/components/live/bo-cuc.ts). Bấm Live ⇒ bút bật sẵn.
@@ -128,6 +128,8 @@ export const JS_LIVE_TO_CHIEU = `
   lvRoi.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('[data-thu]');
     if (b) { lvGui('thu-mic', { sbd: b.getAttribute('data-thu') }); return; }
+    b = e.target.closest && e.target.closest('[data-nghe]');
+    if (b) { lvGui('nghe-em', { v: b.getAttribute('data-nghe') === '1' }); return; }
     if (lvVien.hidden || (e.target.closest && e.target.closest('.mc-lv-noi'))) return;
     LV.moRoi = !LV.moRoi; lvVeRoi(); lvHenThu();
   });
@@ -141,6 +143,8 @@ export const JS_LIVE_TO_CHIEU = `
     if (noi.length) {
       h += '<div class="mc-lv-noi" role="status"><h3>Đang nói</h3>';
       for (i = 0; i < noi.length; i++) { e = noi[i]; h += '<div class="mc-lv-em">' + ky(e) + '<span>' + lvSach(e.ten) + '<small>' + (e.doi ? lvSach(e.doi) + ' · ' : '') + 'mic đang bật</small></span><button type="button" class="mc-lv-n do" style="flex:none" data-thu="' + lvSach(e.sbd) + '">Thu mic</button></div>'; }
+      // em đứng trong lớp: loa lớp phát lại giọng em qua mic máy em dễ hú ⇒ mặc định tắt; em ở xa ⇒ mặc định bật. Thầy đổi tại đây.
+      h += '<div class="mc-lv-dong" style="margin-top:0"><span><b>Phát tiếng em ra loa lớp</b><br>Em đứng cạnh loa thì nên tắt (dễ hú)</span><button type="button" class="mc-lv-n nho" data-nghe="' + (LV.tt.ngheEm ? '0' : '1') + '" aria-pressed="' + (!!LV.tt.ngheEm) + '">' + (LV.tt.ngheEm ? 'Đang bật' : 'Đang tắt') + '</button></div>';
       h += '</div>';
     }
     if (n && !LV.moRoi) {

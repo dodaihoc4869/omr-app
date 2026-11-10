@@ -392,6 +392,15 @@ export default defineConfig({
           // Màn máy em cũng ra kho chạy-lúc: chỉ mở khi lớp đang chơi (cần mạng sẵn) ⇒ không làm phình lượt cài.
           '**/ManBinhPhanUng-*.{js,css}',
           '**/phong-*.js',
+          // LIVE BẢNG (10/11, đợt 1B): lớp bảng live của máy em, phần nối của máy thầy, thư viện WebRTC / mã hoá nét, bộ dựng nét — chỉ nạp khi phòng báo thầy
+          // sẵn sàng live (lúc đó chắc chắn đang có mạng) ⇒ kho chạy-lúc, precache giữ trần 170. Tên có đúng 8 ký tự băm để không bắt nhầm `bo-cuc-to-chieu-*`.
+          '**/LopLive-*.{js,css}',
+          '**/thay-noi-*.js',
+          '**/cau-live-*.js',
+          '**/live-????????.js',
+          '**/bo-cuc-????????.js',
+          '**/but-bang-loi-*.js',
+          '**/mau-chieu-*.js',
           // Lời giải Kính (thầy chốt 02/11): khung + bộ tải sẵn chỉ app học sinh dùng ⇒ kho chạy-lúc + kho tải ngầm học sinh (KHO_HS_GOC), precache giữ 170.
           '**/LoiGiaiKinhHs-*.{js,css}',
           '**/tai-san-*.js',

@@ -26,8 +26,8 @@ export interface PropsLopLive {
   goc: string
   /** Gửi thẳng qua WebSocket của phòng (chuỗi JSON hoặc khung nhị phân); kết nối chưa mở ⇒ bỏ (thư viện tự gửi lại khi nối lại). */
   guiTho: (d: string | Uint8Array) => void
-  /** Màn Bình Phản Ứng chuyển MỌI tin của phòng (chữ lẫn nhị phân) vào `tin`, gọi `noiLai` khi WebSocket nối lại. */
-  cau: MutableRefObject<CauNoiPhongEm>
+  /** Lớp live đăng ký với màn Bình Phản Ứng: màn chuyển MỌI tin của phòng (chữ lẫn nhị phân) vào `tin`, gọi `noiLai` khi WebSocket nối lại. Gỡ = hai null. */
+  dangKy: (c: CauNoiPhongEm) => void
   view: NonNullable<ViewLiveEm>
   che: 'an' | 'dau' | 'bang'
   /** Màn bên dưới đang có nút đáy (footer) ⇒ dấu «Thầy đang live» nhích lên, không đè nút. */
@@ -42,17 +42,58 @@ export interface PropsLopLive {
   roi: boolean
 }
 
+/** Tấm giấy đề: khối đề dùng chung dựng ở bề ngang gốc rồi phóng lên cho vừa chiều cao giấy (đề dài ⇒ cỡ nhỏ nhất + cuộn dọc). */
+const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
+  const trong = useRef<HTMLDivElement>(null)
+  const [k, setK] = useState(2)
+  const coDe = de != null
+  useLayoutEffect(() => {
+    const el = trong.current
+    if (!el) return
+    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(1.3, Math.min(2.1, (cao - 28) / h))) }
+    do1()
+    if (typeof ResizeObserver !== 'function') return
+    const ro = new ResizeObserver(do1)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [khoa, rong, cao, coDe])
+  if (!de) return <p className="lv-giay-trong">Thầy đang giảng trên bảng</p>
+  return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
+})
+
+function Vach({ n }: { n: number }) {
+  return <span className={`lv-vach${n > 0 && n < 3 ? ' yeu' : ''}`} role="img" aria-label={`Chất lượng mạng ${n}/3 vạch`}>{[5, 9, 14].map((h, i) => <i key={h} className={i < n ? 'b' : ''} style={{ height: h }} />)}</span>
+}
+const bt = (d: ReactNode) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>
+const BtLoa = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></>)
+const BtMic = () => bt(<><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></>)
+const BtLoaTat = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M16 9.5l5 5m0-5l-5 5" /></>)
+
+/** Dải báo tự ẩn sau `ms` (không che bảng mãi). */
+function BaoTam({ ms, children }: { ms: number; children: ReactNode }) {
+  const [hien, setHien] = useState(true)
+  useEffect(() => { const h = setTimeout(() => setHien(false), ms); return () => clearTimeout(h) }, [ms])
+  return hien ? <div className="lv-bao nho" role="status">{children}</div> : null
+}
+/** Dải «Mất kết nối»: giờ bảng dừng chốt MỘT lần lúc dải hiện (giờ của sự kiện bút cuối cùng nhận được). */
+function BaoMatMang({ layLuc }: { layLuc: () => number }) {
+  const [dung] = useState(() => { const t = layLuc(); return t ? new Date(t).toLocaleTimeString('vi-VN', { hour12: false }) : '' })
+  return <div className="lv-bao" role="status"><i className="quay" aria-hidden="true" /><span>Mất kết nối · đang nối lại…<small>{dung ? `Bảng dừng ở lúc ${dung} · ` : ''}nối lại sẽ tự bắt kịp</small></span><Vach n={0} /></div>
+}
+
 const mayYeu = (): boolean => typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
 const giamDong = (): boolean => mayYeu() || (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
 type HuongMan = { lock?: (h: string) => Promise<void>; unlock?: () => void; type?: string }
 const huongMan = (): HuongMan | null => (typeof screen !== 'undefined' ? ((screen as Screen & { orientation?: HuongMan }).orientation ?? null) : null)
 
-export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, de, khoaDe, doi, matMang, roi }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, nang, de, khoaDe, doi, matMang, roi }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
   const nhanBut = useRef<((sk: SuKienBut) => void) | null>(null)
-  const guiRef = useRef(guiTho); guiRef.current = guiTho
+  const datNhanBut = useCallback((f: ((sk: SuKienBut) => void) | null) => { nhanBut.current = f }, [])
+  const guiRef = useRef(guiTho)
+  useEffect(() => { guiRef.current = guiTho }, [guiTho])
   const viewDau = useRef(view)
 
   useEffect(() => {
@@ -63,14 +104,14 @@ export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, de, kho
       khiTrangThai: setTt,
     })
     le.current = l
-    cau.current = { tin: l.nhanTinPhong, noiLai: l.khiNoiLai }
+    dangKy({ tin: l.nhanTinPhong, noiLai: l.khiNoiLai })
     datKiemQuyenNgoai(l.dangChoQuyenMic) // hộp hỏi quyền mic đang hiện ⇒ bộ bắt rời màn không báo «cửa sổ nổi»
     l.nhanView(viewDau.current)
     // Lần chạm đầu của em trong buổi mở khoá phát tiếng (đặc tả 4.5 bước 3) — bắt ở `click` (pointerdown của ngón tay không tính là thao tác).
     const cham = () => { void l.moKhoaTieng() }
     window.addEventListener('click', cham, { capture: true, once: true })
-    return () => { window.removeEventListener('click', cham, true); cau.current = { tin: null, noiLai: null }; datKiemQuyenNgoai(null); le.current = null; l.huy() }
-  }, [ve, goc, cau])
+    return () => { window.removeEventListener('click', cham, true); dangKy({ tin: null, noiLai: null }); datKiemQuyenNgoai(null); le.current = null; l.huy() }
+  }, [ve, goc, dangKy])
   // Rời màn ⇒ tiếng ngừng; về ⇒ nghe tiếp từ hiện tại.
   useEffect(() => {
     const dat = () => le.current?.datRoiMan(roi || document.hidden)
@@ -83,9 +124,10 @@ export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, de, kho
   // này (còn nút «Bật mic lại»). Hết được phép (thầy chấm, lượt mới, thu mic, tắt live) ⇒ thư viện tự thả mic.
   const [emTat, setEmTat] = useState(false)
   const duocMic = !!tt?.duocMoMic, micTat = tt?.mic === 'tat'
+  const [duocTruoc, setDuocTruoc] = useState(false)
+  if (duocMic !== duocTruoc) { setDuocTruoc(duocMic); if (!duocMic && emTat) setEmTat(false) } // lượt gọi mới ⇒ lại tự bật
   useEffect(() => {
-    if (!duocMic) { setEmTat(false); return }
-    if (!micTat || emTat) return
+    if (!duocMic || !micTat || emTat) return
     const thu = () => { void le.current?.batMicLenBang() }
     thu()
     const h = setInterval(thu, 1500)
@@ -103,19 +145,20 @@ export default function LopLive({ ve, goc, guiTho, cau, view, che, nang, de, kho
       {tt.tieng !== 'chua-cau-hinh' ? <button type="button" aria-pressed={nghe} aria-label={nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe ? <BtLoa /> : <BtLoaTat />}</button> : null}
     </div>
   )
-  return <BangLive le={le} nhanBut={nhanBut} tt={tt} de={de} khoaDe={khoaDe} doi={doi} matMang={matMang} emTat={emTat && duocMic} batMic={batMic} tatMic={tatMic} />
+  return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} doi={doi} matMang={matMang} emTat={emTat && duocMic} batMic={batMic} tatMic={tatMic} />
 }
 
-interface PropsBang { le: MutableRefObject<LiveEm | null>; nhanBut: MutableRefObject<((sk: SuKienBut) => void) | null>; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; doi: PropsLopLive['doi']; matMang: boolean; emTat: boolean; batMic: () => void; tatMic: () => void }
+interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; doi: PropsLopLive['doi']; matMang: boolean; emTat: boolean; batMic: () => void; tatMic: () => void }
 interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; namDe: boolean; kc: KhungChieu; giayToi: boolean }
 
-function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, tatMic }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, tatMic }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
-  const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null)
+  const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
   const khoaNgang = useRef(false)
   const phong = useRef(false)
+  const [phongTo, setPhongTo] = useState(false)
   const [bc, setBc] = useState<BoCuc | null>(null)
   const bcRef = useRef<BoCuc | null>(null)
   const [coNet, setCoNet] = useState(false)
@@ -123,8 +166,8 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
   const [mo, setMo] = useState(false)
   const [thayNoi, setThayNoi] = useState(false)
   const [mang, setMang] = useState(3)
-  const [dung, setDung] = useState('')
-  const lucCuoi = useRef(Date.now())
+  const lucCuoi = useRef(0)
+  const layLuc = useCallback(() => lucCuoi.current, [])
   const namY = useRef(0.5)
 
   /** Tính lại bố cục theo màn + trang đang chiếu, đặt cỡ hai canvas. */
@@ -164,7 +207,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
     if (b) trang.current = { trang: b.trang, tiLe: b.tiLe }
     xep()
     if (b) ap({ loai: 'trang', trang: b.trang, tiLe: b.tiLe, net: b.net.slice() })
-    nhanBut.current = ap
+    datNhanBut(ap)
     let raf = 0, le2 = false, lucAm = 0, noiDen = 0, dangNoi = false, lucMang = 0
     const yeu = mayYeu()
     const khung = (nay: number) => {
@@ -189,6 +232,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
         lucAm = nay
         const am = Math.min(1, lv.mucAm() * 3)
         theMic.current?.style.setProperty('--lv-am', Math.min(1, lv.mucAmMic() * 2.2).toFixed(2)) // sóng của thẻ «Mic của em đang bật» theo mic thật
+        daiBan.current?.style.setProperty('--lv-am', Math.min(1, lv.mucAmBan() * 3).toFixed(2))
         khay.current?.style.setProperty('--lv-am', am.toFixed(2)) // đặt ngay trên khay (không ở gốc): biến kế thừa đổi ở gốc ⇒ tính lại kiểu cả cây đề
         if (am > 0.08) noiDen = nay + 1200
         if ((nay < noiDen) !== dangNoi) { dangNoi = nay < noiDen; setThayNoi(dangNoi) }
@@ -196,8 +240,8 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
       if (nay - lucMang > 2000) { lucMang = nay; const d = lv.soDo().d?.tv; setMang(d == null ? 3 : d <= 70 ? 3 : d <= 115 ? 2 : 1) }
     }
     raf = requestAnimationFrame(khung)
-    return () => { cancelAnimationFrame(raf); if (nhanBut.current === ap) nhanBut.current = null; veB.current = null }
-  }, [le, nhanBut, xep])
+    return () => { cancelAnimationFrame(raf); datNhanBut(null); veB.current = null }
+  }, [le, datNhanBut, xep])
 
   // Xoay ngang: Android khoá hướng sau khi đã toàn màn hình; không khoá được ⇒ `canXoayCss`. Mọi lần khoá / nhả / đổi hướng ⇒ «khoá xoay» 600 ms
   // để bộ bắt rời màn không báo nhầm chia đôi (tat-man.ts).
@@ -222,7 +266,6 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
   }, [xep])
 
   useEffect(() => { if (!vao) return; const h = setTimeout(() => setVao(false), 620); return () => clearTimeout(h) }, [vao])
-  useEffect(() => { setDung(matMang ? new Date(lucCuoi.current).toLocaleTimeString('vi-VN', { hour12: false }) : '') }, [matMang])
 
   // ── KHAY: chạm tay nắm ⇒ mở; vuốt từ tay nắm ⇒ khay bám ngón tay; chạm ngoài / 3 giây không chạm ⇒ thu. Kéo dọc ⇒ dời tay nắm. ──
   const henThu = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -269,7 +312,7 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
     if (!b) return
     const p = toaDo(e), x = (p.x - b.x) / b.s, y = (p.y - b.y) / b.s, o = b.kc.bang
     const trongBang = x >= o.x && x <= o.x + o.w && y >= o.y && y <= o.y + o.h
-    if (trongBang && e.timeStamp - chamCuoi.current < 320) { phong.current = !phong.current; chamCuoi.current = 0; xep(); veB.current?.veLai() } else chamCuoi.current = e.timeStamp
+    if (trongBang && e.timeStamp - chamCuoi.current < 320) { phong.current = !phong.current; setPhongTo(phong.current); chamCuoi.current = 0; xep(); veB.current?.veLai() } else chamCuoi.current = e.timeStamp
   }
 
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
@@ -277,9 +320,6 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
   /** Mic của em đang mở (em được gọi lên bảng). Bạn đang nói = em khác đang mở mic (thư viện đã loại chính em). */
   const micMo = tt.mic === 'dang-phat' || tt.mic === 'dang-noi'
   const banNoi = tt.banNoi
-  // «Mạng này chặn tiếng»: báo 6 giây rồi tự ẩn (không che bảng mãi).
-  const [baoLoi, setBaoLoi] = useState(true)
-  useEffect(() => { if (tt.tieng !== 'loi') { setBaoLoi(true); return } const h = setTimeout(() => setBaoLoi(false), 6000); return () => clearTimeout(h) }, [tt.tieng])
   const kieu: CSSProperties = { ...(MAU_CHIEU as CSSProperties), ...(bc ? { width: bc.w, height: bc.h } : {}), ...(doi ? {} : { ['--doi' as string]: 'var(--tr-chieu-giay)' }) }
   const kc = bc?.kc
   const o = (v: { x: number; y: number; w: number; h: number }): CSSProperties => ({ left: v.x, top: v.y, width: v.w, height: v.h })
@@ -298,17 +338,16 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
         <div ref={tro} className="lv-tro" aria-hidden="true" />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
-      {matMang ? (
-        <div className="lv-bao" role="status"><i className="quay" aria-hidden="true" /><span>Mất kết nối · đang nối lại…<small>{dung ? `Bảng dừng ở lúc ${dung} · ` : ''}nối lại sẽ tự bắt kịp</small></span><Vach n={0} /></div>
-      ) : tt.tieng === 'loi' && baoLoi ? <div className="lv-bao nho" role="status">Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</div>
-        : phong.current ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
+      {matMang ? <BaoMatMang layLuc={layLuc} />
+        : tt.tieng === 'loi' ? <BaoTam ms={6000}>Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</BaoTam>
+        : phongTo ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
       {/* Em lên bảng: mic đang mở thì thẻ LUÔN HIỆN (không tự ẩn). Máy khác: dải «Bạn … đang nói». */}
       {micMo || tt.mic === 'xin-quyen' ? (
         <div ref={theMic} className="lv-noi" role="status"><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><b>{micMo ? 'Mic của em đang bật' : 'Đang bật mic…'}</b><small>Thầy và cả lớp đang nghe</small><button type="button" onClick={tatMic}>Tắt mic</button></div>
       ) : emTat ? <button type="button" className="lv-bat-tieng mic" onClick={batMic}><BtMic />Bật mic lại</button>
         : tt.mic === 'tu-choi' || tt.mic === 'loi' ? <div className="lv-bao nho duoi" role="status">{tt.mic === 'tu-choi' ? 'Máy em chưa cho dùng mic · em nói to cho thầy nghe, hoặc mở Cài đặt trình duyệt để cho phép' : 'Chưa bật được mic · em nói to cho thầy nghe'}</div>
-        : banNoi && !phong.current ? <div className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}
-      <button ref={nam} type="button" className={`lv-nam${bc?.namDe ? ' de' : ''}${thayNoi && nghe ? ' noi' : ''}`} style={{ top: `${namY.current * 100}%` }} aria-label={mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'} aria-expanded={mo}
+        : banNoi && !phongTo ? <div ref={daiBan} className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}
+      <button ref={nam} type="button" className={`lv-nam${bc?.namDe ? ' de' : ''}${thayNoi && nghe ? ' noi' : ''}`} aria-label={mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'} aria-expanded={mo}
         onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}><i /></button>
       <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={hoanThu}>
         <div className="lv-khay-dau">
@@ -324,29 +363,3 @@ function BangLive({ le, nhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, ta
     </div>
   )
 }
-
-/** Tấm giấy đề: khối đề dùng chung dựng ở bề ngang gốc rồi phóng lên cho vừa chiều cao giấy (đề dài ⇒ cỡ nhỏ nhất + cuộn dọc). */
-const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
-  const trong = useRef<HTMLDivElement>(null)
-  const [k, setK] = useState(2)
-  useLayoutEffect(() => {
-    const el = trong.current
-    if (!el) return
-    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(1.3, Math.min(2.1, (cao - 28) / h))) }
-    do1()
-    if (typeof ResizeObserver !== 'function') return
-    const ro = new ResizeObserver(do1)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [khoa, rong, cao, de == null])
-  if (!de) return <p className="lv-giay-trong">Thầy đang giảng trên bảng</p>
-  return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
-})
-
-function Vach({ n }: { n: number }) {
-  return <span className={`lv-vach${n > 0 && n < 3 ? ' yeu' : ''}`} role="img" aria-label={`Chất lượng mạng ${n}/3 vạch`}>{[5, 9, 14].map((h, i) => <i key={h} className={i < n ? 'b' : ''} style={{ height: h }} />)}</span>
-}
-const bt = (d: ReactNode) => <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>
-const BtLoa = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></>)
-const BtMic = () => bt(<><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></>)
-const BtLoaTat = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M16 9.5l5 5m0-5l-5 5" /></>)

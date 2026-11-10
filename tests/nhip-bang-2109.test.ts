@@ -35,6 +35,9 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/tu-luyen/ManTuLuyen.tsx': 2, // 30/09 thầy duyệt "Bàn Bi-a mới": bỏ hai nút ◀ ▶ (vòng 45 ms khi GIỮ nút) — thay bằng bánh xe kéo, không hẹn giờ
   'src/hooks/useGioHocTap.ts': 1,
   'src/lib/html-may-chieu.ts': 0,
+  'src/components/live/LopLive.tsx': 1, // 10/11 Live (máy em): 1,5 s thử lại bật mic CHỈ trong lúc em đang được gọi lên bảng mà mic chưa mở (chờ nối xong SFU); cục bộ + cửa /bpu/live của Worker (0 D1); mở được / hết lượt gọi ⇒ dừng
+  'src/components/live/thay-noi.ts': 1, // 10/11 Live (máy thầy): 90 ms đọc mức âm mic gửi sang tờ chiếu (vạch mic) CHỈ khi thẻ mic mở hoặc đang live có tiếng; cục bộ, không gọi máy chủ
+  'src/lib/live-to-chieu.ts': 1, // 10/11 Live (tờ chiếu, trong iframe): 1 s vẽ đồng hồ «LIVE 12:34» CHỈ khi đang live; cục bộ, không gọi máy chủ
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
   'src/lib/html-phieu.ts': 2, // 20/10 đo giây: +1 vòng 1 s TRONG trang phiếu (iframe), chỉ cục bộ, không gọi máy chủ; dừng khi tab ẩn / 180 giây không chạm
   'src/lib/thu-tin-hieu.ts': 1,

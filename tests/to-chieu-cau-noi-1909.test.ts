@@ -229,7 +229,8 @@ describe('tờ chiếu chạy thật — bắt tay với màn giáo viên', () =
   it('gửi SAN_SANG kèm mã phiên ngay khi mở, tới đúng gốc của cha; nút VẪN ẨN cho tới khi có KET_NOI', () => {
     const t = moTo()
     // 07/11: tờ còn báo câu đang chiếu cho Bình Phản Ứng (`loai: 'bpu'`) — không thuộc cầu nối, bỏ ra khi đếm tin bắt tay.
-    const cauNoi = t.gui.filter((x) => (x.m as { loai?: string }).loai !== 'bpu')
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (Live bảng): tờ còn chào phần live của app (`loai: 'live'`, viec «chao») — cũng không thuộc cầu nối.
+    const cauNoi = t.gui.filter((x) => !['bpu', 'live'].includes((x.m as { loai?: string }).loai ?? ''))
     expect(cauNoi).toHaveLength(1)
     expect(cauNoi[0]).toEqual({ m: { type: TIN_TO_CHIEU.SAN_SANG, maPhien: MA }, o: GOC })
     expect(t.doc.body.classList.contains('mc-noi')).toBe(false)

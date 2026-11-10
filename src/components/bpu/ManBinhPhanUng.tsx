@@ -225,6 +225,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const ws = useRef<WebSocket | null>(null)
   /** LIVE: lớp live (nạp lười) nhận mọi tin của phòng qua `tin`, được báo khi nối lại qua `noiLai`; `veLive` = vé + gốc máy chủ của kết nối hiện tại. */
   const cauLive = useRef<{ tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }>({ tin: null, noiLai: null })
+  const dangKyLive = useCallback((c: typeof cauLive.current) => { cauLive.current = c }, [])
   const [veLive, setVeLive] = useState<{ ve: string; goc: string } | null>(null)
   const dung = useRef(false)
   const loi = useRef(0)
@@ -661,7 +662,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   </>) : null
   const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
     <Suspense fallback={null}>
-      <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} cau={cauLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
+      <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} dangKy={dangKyLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
         doi={e ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi} />
     </Suspense>
   ) : null

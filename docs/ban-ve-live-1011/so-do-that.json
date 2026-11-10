@@ -1,0 +1,201 @@
+{
+  "ngay": "2026-11-10T16:34:05.687Z",
+  "ghiChu": "Bộ thử scripts/thu-live-1011/thu.mjs — Chromium không đầu, phòng thật trong Node, nét đi đường WebSocket (không SFU). Máy em 844 × 390 @2x.",
+  "khungHinhMayEm": [
+    {
+      "cpu": "×1",
+      "khungMoiGiay": 60,
+      "cachKhungTrungViMs": 16.7,
+      "cachKhungP95Ms": 16.7,
+      "khungTreHon20Ms": 0,
+      "soKhung": 436,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 0.3,
+        "lonNhat": 1
+      },
+      "luongChinhBanPhanTram": {
+        "Task": 12.7,
+        "Script": 1.3,
+        "Layout": 0,
+        "RecalcStyle": 0.5
+      }
+    },
+    {
+      "cpu": "×4",
+      "khungMoiGiay": 60,
+      "cachKhungTrungViMs": 16.7,
+      "cachKhungP95Ms": 16.7,
+      "khungTreHon20Ms": 0,
+      "soKhung": 435,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 1.3,
+        "lonNhat": 7.2
+      },
+      "luongChinhBanPhanTram": {
+        "Task": 37,
+        "Script": 3.7,
+        "Layout": 0,
+        "RecalcStyle": 1.8
+      }
+    },
+    {
+      "cpu": "×6",
+      "khungMoiGiay": 59.2,
+      "cachKhungTrungViMs": 16.7,
+      "cachKhungP95Ms": 16.8,
+      "khungTreHon20Ms": 5,
+      "soKhung": 432,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 1.6,
+        "lonNhat": 9.2
+      },
+      "luongChinhBanPhanTram": {
+        "Task": 48.8,
+        "Script": 4.3,
+        "Layout": 0,
+        "RecalcStyle": 2.2
+      }
+    }
+  ],
+  "luongChinhBanKhiDungYenX4PhanTram": 3.7,
+  "kiem": [
+    {
+      "ten": "Tờ chiếu có nút «Live» khi phòng bật công tắc live",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Bấm Live lần đầu ⇒ thẻ bật live + chọn mic",
+      "dat": true,
+      "them": "3 mic"
+    },
+    {
+      "ten": "«Bắt đầu live» ⇒ viên đỏ LIVE + đồng hồ + «Tắt live»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Bấm Live ⇒ bút bật sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Thanh dưới 1366 không tràn khi live (Tắt live + Cài đặt còn trong màn)",
+      "dat": true,
+      "them": "mép phải nút Cài đặt 1344 px"
+    },
+    {
+      "ten": "Thầy bật live: máy em giữ màn câu hỏi + dấu «Thầy đang live» có nút tiếng, KHÔNG vào bảng",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Dấu «Thầy đang live» không đè nút «Gửi» nổi",
+      "dat": true,
+      "them": "[10,790,210,834]"
+    },
+    {
+      "ten": "Chạm nút tiếng trên dấu ⇒ «đang bật»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Em gửi xong khi thầy live: vẫn màn Bình Phản Ứng (đã gửi) + dấu, chưa vào bảng",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Công tắc «Bảng → máy em» có trên cụm Live, đang tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Thầy gọi em lên bảng ⇒ máy em tự sang bảng live",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Máy dọc không khoá ngang được ⇒ hình xoay 90° bằng CSS",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Gọi lên bảng ⇒ công tắc «Bảng → máy em» tự bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Thầy viết ⇒ nét hiện trên máy em",
+      "dat": true,
+      "them": "thầy 28 nét · lớp «đã chốt» máy em có 26 mẫu điểm ảnh có mực"
+    },
+    {
+      "ten": "Khay mở: Tiếng · mạng · đội + kJ; mọi nút ≥ 48 px; không có nút thoát",
+      "dat": true,
+      "them": "nút nhỏ nhất 48 px"
+    },
+    {
+      "ten": "Khay tự thu sau 3 giây không chạm",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Em rời màn khi live ⇒ tờ hiện thẻ tên (không viền đỏ toàn màn) + viền mảnh",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Thẻ tự thu gọn sau 4 giây",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Em quay lại ⇒ tên tự mất, viền tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Máy em nhận nét ở CPU ×4: ≥ 55 khung / giây",
+      "dat": true,
+      "them": "60 khung/giây · p95 khoảng khung 16.7 ms · xử lý mỗi khung p95 1.3 ms"
+    },
+    {
+      "ten": "Mất mạng ⇒ bảng đứng, dải «Mất kết nối · đang nối lại…»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Nối lại ⇒ tự bắt kịp nét thầy viết lúc mất mạng (từ sổ nét)",
+      "dat": true,
+      "them": "mẫu mực 132 → 144"
+    },
+    {
+      "ten": "Lượt mới khi đang live ⇒ máy em về màn câu hỏi (bỏ bảng live) + dấu «Thầy đang live»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Chuyển câu: viên LIVE trên tờ còn nguyên (live không rớt), bảng → máy em tự tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Câu mới: bảng live của máy em là bảng mới (sạch nét câu cũ)",
+      "dat": true,
+      "them": "mẫu mực còn 0"
+    },
+    {
+      "ten": "Tắt live ⇒ tờ về nút «Live», máy em bỏ lớp live + dấu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Không lỗi trang nào",
+      "dat": true,
+      "them": ""
+    }
+  ]
+}

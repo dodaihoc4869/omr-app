@@ -29,6 +29,8 @@ export interface TtLiveTo {
   bang: boolean
   /** Em lên bảng đang mở mic (`live.noi`) — thẻ «Đang nói» + «Thu mic». */
   noi: { sbd: string; ten: string; ky: string; doi: string; mau: string }[]
+  /** Máy thầy có đang phát tiếng em ra loa lớp không (mặc định chỉ khi em ở xa — chống hú). */
+  ngheEm: boolean
   /** Lượt đang mở mà còn em chưa gửi — viên live nhắc (đặc tả mục 5). */
   chuaGui: number
   the: { ds: { id: string; ten: string }[]; chon: string; loi: string; tiengLop: boolean } | null
@@ -78,7 +80,7 @@ function trangThai(): TtLiveTo {
     xem: ttLt?.xem ?? l?.xem ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
     coTieng: l?.tieng !== 'chua-cau-hinh', khongTieng: ttLt?.tieng === 'khong' || ttLt?.tieng === 'loi', micIm: !!ttLt?.micIm,
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
-    bang: live && !!l?.bang, noi,
+    bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm,
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
     the, roi,
   }
@@ -200,6 +202,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     // công tắc «Bảng → máy em» (bật / tắt tay cờ `live.bang`) · «Thu mic» em đang nói — phòng xử (đợt 1C)
     case 'bang': lt?.dat({ bang: m.v === true }); break
     case 'thu-mic': lt?.thuMic(); break
+    case 'nghe-em': lt?.datNgheEm(m.v === true); break
     case 'anh': {
       guong.khoa = String(m.trang ?? ''); guong.tiLe = Number(m.tiLe) || 16 / 9; guong.net = Array.isArray(m.net) ? (m.net as NetBut[]) : []
       maCua.set(guong.khoa, maTrang(guong.khoa, vungCua(m.vung), m.giayToi === true))

@@ -24,6 +24,7 @@ const phat = (): void => { for (const f of taiPhong) { try { f() } catch { /* n�
 
 /** Bảng gọi ngay sau khi tạo WebSocket của phòng. */
 export function noiLive(w: WebSocket, ve: string, goc: string): void {
+  if (typeof w.addEventListener !== 'function') return // WebSocket giả tối giản (test cũ): bảng chạy như trước, không có live
   w.binaryType = 'arraybuffer'
   const p: PhongThay = {
     ve, goc,

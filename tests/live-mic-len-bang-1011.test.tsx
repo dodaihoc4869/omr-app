@@ -3,7 +3,6 @@
 // khi mic mở, có «Tắt mic»; em tự tắt ⇒ không tự bật lại, còn «Bật mic lại»; bị từ chối quyền ⇒ báo nhẹ kèm cách bật; máy khác ⇒ «Bạn … đang nói»;
 // hộp hỏi quyền mic đang hiện ⇒ bộ bắt rời màn coi như đang xin quyền (không báo «cửa sổ nổi»).
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { createRef } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { _datLaiTatMan, dangXinQuyen } from '../src/components/bpu/tat-man'
 
@@ -19,7 +18,7 @@ vi.mock('../src/lib/live', () => ({
     setTimeout(() => dat({}), 0)
     return {
       trangThai: () => ({ ...tt }), nhanView() {}, nhanTinPhong() {}, khiNoiLai() {}, moKhoaTieng: async () => true, datTieng() {}, datRoiMan() {},
-      bang: () => ({ trang: '', tiLe: 16 / 9, net: [], cuoi: 0, lichSu: [], ghep: null }), khung: () => ({ dau: [], tro: null }), mucAm: () => 0, mucAmMic: () => 0.4, soDo: () => ({ kenhNet: 'ws' }), huy() {},
+      bang: () => ({ trang: '', tiLe: 16 / 9, net: [], cuoi: 0, lichSu: [], ghep: null }), khung: () => ({ dau: [], tro: null }), mucAm: () => 0, mucAmMic: () => 0.4, mucAmBan: () => 0.2, soDo: () => ({ kenhNet: 'ws' }), huy() {},
       batMicLenBang: async () => { goi.push('bat'); return { ok: true } }, tatMic: () => { goi.push('tat'); dat({ mic: 'tat' }) }, dangChoQuyenMic: () => choQuyen,
     }
   },
@@ -27,11 +26,10 @@ vi.mock('../src/lib/live', () => ({
 
 const view = { duocXem: true, san: true, bat: true, tu: 1, phien: 1, ss: null, tieng: 'tat', soNet: 0, bang: true, emTay: false, hangTay: null, emDuocMoi: false, emNoi: false, noi: [] } as never
 
+const dangKy = () => {}
 async function dung() {
   const { default: LopLive } = await import('../src/components/live/LopLive')
-  const cau = createRef<{ tin: null; noiLai: null }>() as never
-  ;(cau as { current: unknown }).current = { tin: null, noiLai: null }
-  render(<LopLive ve="ve" goc="https://may-chu" guiTho={() => {}} cau={cau} view={view} che="bang" de={null} khoaDe="q1" doi={{ ten: 'Đội Kali', ky: 'K', kj: 120 }} matMang={false} roi={false} />)
+  render(<LopLive ve="ve" goc="https://may-chu" guiTho={() => {}} dangKy={dangKy} view={view} che="bang" de={null} khoaDe="q1" doi={{ ten: 'Đội Kali', ky: 'K', kj: 120 }} matMang={false} roi={false} />)
   await waitFor(() => expect(document.querySelector('.lv')).toBeTruthy())
 }
 beforeEach(() => { goi.length = 0; choQuyen = false; _datLaiTatMan() })

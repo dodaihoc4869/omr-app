@@ -97,4 +97,3 @@ document.documentElement.dataset.trong = vai === 'em' ? 'hs' : 'gv'
 if (vai === 'em') document.documentElement.setAttribute('data-ht2', '')
 if (ts.get('yeu') === '1') document.documentElement.classList.add('may-yeu')
 try { localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: 'tk-gia' })) } catch { /* chặn lưu */ }
-export {}
