@@ -1,0 +1,569 @@
+{
+  "i": 811,
+  "hash": "964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c.png",
+  "size": [
+    1507,
+    276
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C12-D1-II-1",
+      "de": "Acid béo omega-3 và omega-6 là những acid béo không no, trong phân tử chứa nhóm C=C đầu tiên ở vị trí carbon số 3 và 6 (tính từ nhóm −CH₃).\nCông thức của hai acid béo được cho ở hình dưới.",
+      "allHinh": [
+        {
+          "hash": "964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c",
+          "where": "12-KT-C12-D1-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "50e93df7d565747b9724d0435222590bcc764d59510756ba88cb20dbfc88ebce"
+        }
+      ],
+      "missingHashes": [
+        "964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/811-native2x-lo325.png",
+    "ownCaption4xOpened": "/workspace/scratch/811-caption4x-lo325.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownLeftCO12xOpened": "/workspace/scratch/own325-leftCO12x.png",
+    "ownRightCO12xOpened": "/workspace/scratch/own325-rightCO12x.png"
+  },
+  "corrections": [
+    "EarlychatcaptionArachidonic wronglynormalized. Own4xcaptionconfirmsliteralArachidomic(mtwohumps), preservedbelow.",
+    "InitialgenericbothCOsplitfeetcontactdescriptionWRONGforRIGHTupperray. Own12xactualrasterconfirmsRIGHTupperraytinyWHITEGAP; LEFTupperfoot corrected64596. Allcorrectionliteralnotchemistry."
+  ],
+  "geometry": {
+    "classification": "Twoindependentfattyacidstructures, bothopen, no reaction orstereoannotation.",
+    "left": {
+      "methyl": {
+        "text": "H₃C",
+        "bbox": [
+          59,
+          60,
+          112,
+          86
+        ],
+        "anchor": "C(rightglyph)",
+        "bond": [
+          [
+            117,
+            82
+          ],
+          [
+            145,
+            98
+          ]
+        ]
+      },
+      "bareVerticesToCarbonyl": [
+        [
+          145,
+          98
+        ],
+        [
+          145,
+          147
+        ],
+        [
+          187,
+          170
+        ],
+        [
+          229,
+          146
+        ],
+        [
+          229,
+          99
+        ],
+        [
+          271,
+          75
+        ],
+        [
+          312,
+          99
+        ],
+        [
+          312,
+          146
+        ],
+        [
+          354,
+          170
+        ],
+        [
+          396,
+          146
+        ],
+        [
+          396,
+          99
+        ],
+        [
+          438,
+          75
+        ],
+        [
+          480,
+          99
+        ],
+        [
+          480,
+          146
+        ],
+        [
+          522,
+          170
+        ],
+        [
+          564,
+          146
+        ],
+        [
+          564,
+          99
+        ],
+        [
+          606,
+          75
+        ],
+        [
+          649,
+          99
+        ]
+      ],
+      "CCdoubleEdgesZeroBasedBare": [
+        [
+          4,
+          5
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          13,
+          14
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            229,
+            94
+          ],
+          [
+            269,
+            71
+          ]
+        ],
+        [
+          [
+            314,
+            141
+          ],
+          [
+            355,
+            165
+          ]
+        ],
+        [
+          [
+            397,
+            94
+          ],
+          [
+            436,
+            71
+          ]
+        ],
+        [
+          [
+            482,
+            141
+          ],
+          [
+            523,
+            165
+          ]
+        ]
+      ],
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          677,
+          61,
+          701,
+          87
+        ],
+        "rays": [
+          [
+            [
+              645,
+              96
+            ],
+            [
+              673,
+              81
+            ]
+          ],
+          [
+            [
+              649,
+              102
+            ],
+            [
+              677,
+              87
+            ]
+          ]
+        ],
+        "note": "Own12x confirmsUPPERraytouchesleftCCslope around64596,LOWERraytouchesverticalCOHstemaround649102; noaddedbridge."
+      },
+      "OH": {
+        "text": "OH",
+        "bbox": [
+          637,
+          135,
+          680,
+          162
+        ],
+        "bond": [
+          [
+            649,
+            99
+          ],
+          [
+            649,
+            131
+          ]
+        ],
+        "anchor": "Ofirstglyph"
+      },
+      "literalC": 20,
+      "caption": {
+        "text": "Arachidomic acid (ARA)",
+        "bbox": [
+          280,
+          200,
+          592,
+          231
+        ],
+        "style": "regularuprightserif",
+        "trap": "EXACTm, notn inArachidomic; do notcorrectchemicalname"
+      }
+    },
+    "right": {
+      "methyl": {
+        "text": "H₃C",
+        "bbox": [
+          758,
+          56,
+          811,
+          82
+        ],
+        "anchor": "C(rightglyph)",
+        "bond": [
+          [
+            815,
+            79
+          ],
+          [
+            843,
+            95
+          ]
+        ]
+      },
+      "bareVerticesToCarbonyl": [
+        [
+          843,
+          95
+        ],
+        [
+          843,
+          142
+        ],
+        [
+          885,
+          166
+        ],
+        [
+          927,
+          142
+        ],
+        [
+          927,
+          94
+        ],
+        [
+          969,
+          70
+        ],
+        [
+          1010,
+          94
+        ],
+        [
+          1010,
+          142
+        ],
+        [
+          1052,
+          166
+        ],
+        [
+          1094,
+          142
+        ],
+        [
+          1094,
+          94
+        ],
+        [
+          1136,
+          70
+        ],
+        [
+          1178,
+          94
+        ],
+        [
+          1178,
+          142
+        ],
+        [
+          1220,
+          166
+        ],
+        [
+          1262,
+          142
+        ],
+        [
+          1262,
+          94
+        ],
+        [
+          1304,
+          70
+        ],
+        [
+          1346,
+          94
+        ],
+        [
+          1346,
+          142
+        ],
+        [
+          1392,
+          153
+        ]
+      ],
+      "CCdoubleEdgesZeroBasedBare": [
+        [
+          1,
+          2
+        ],
+        [
+          4,
+          5
+        ],
+        [
+          7,
+          8
+        ],
+        [
+          10,
+          11
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          16,
+          17
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            845,
+            137
+          ],
+          [
+            886,
+            160
+          ]
+        ],
+        [
+          [
+            928,
+            89
+          ],
+          [
+            967,
+            66
+          ]
+        ],
+        [
+          [
+            1012,
+            137
+          ],
+          [
+            1053,
+            160
+          ]
+        ],
+        [
+          [
+            1095,
+            89
+          ],
+          [
+            1134,
+            66
+          ]
+        ],
+        [
+          [
+            1180,
+            137
+          ],
+          [
+            1221,
+            160
+          ]
+        ],
+        [
+          [
+            1263,
+            89
+          ],
+          [
+            1302,
+            66
+          ]
+        ]
+      ],
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          1421,
+          117,
+          1447,
+          145
+        ],
+        "rays": [
+          [
+            [
+              1391,
+              151
+            ],
+            [
+              1418,
+              134
+            ]
+          ],
+          [
+            [
+              1392,
+              159
+            ],
+            [
+              1422,
+              140
+            ]
+          ]
+        ],
+        "note": "Own12x confirmsUPPERraystartsFREEwith~1-2nativepxWHITEGAPaboveleftCCslope, NOTtouchingcarbonyljunction. LOWERraytouchesverticalOHstemaround1392159. Preservegap/noforcednodeorbridge."
+      },
+      "OH": {
+        "text": "OH",
+        "bbox": [
+          1380,
+          190,
+          1423,
+          218
+        ],
+        "bond": [
+          [
+            1392,
+            153
+          ],
+          [
+            1392,
+            187
+          ]
+        ],
+        "anchor": "Ofirstglyph"
+      },
+      "literalC": 22,
+      "caption": {
+        "text": "Docosahexaenoic acid (DHA)",
+        "bbox": [
+          953,
+          196,
+          1327,
+          228
+        ],
+        "style": "regularuprightserif"
+      }
+    },
+    "font": "H3C/O/OH andbothcaptionsregularuprightserif;3SUBinH3C, noactualbold/italic. Skeletalbondsthinuniform.",
+    "counts": {
+      "leftC": 20,
+      "rightC": 22,
+      "Ototal": 4,
+      "CCdoubleLeft": 4,
+      "CCdoubleRight": 6,
+      "COdouble": 2,
+      "caption": 2,
+      "Cnums": 0
+    },
+    "noAdded": [
+      "correctingcaptionmton",
+      "carbonnumbers",
+      "E/Zletters",
+      "omegaanswer",
+      "additionalH/CH3labels",
+      "ringclosure",
+      "reactionarrow"
+    ]
+  },
+  "coordinateMeaning": "Nativepixeltrace; countedbarevertices+explicitmethyltextC separately, notsourcechemicalnameinference.",
+  "rootReview": {
+    "nativeFull": true,
+    "allPublicDeRead": true,
+    "ownCaption5x": "/workspace/scratch/native325-leftcaption5x.png",
+    "ownNativeCO15x": [
+      "/workspace/scratch/native325-leftCO15x.png",
+      "/workspace/scratch/native325-rightCO15x.png"
+    ],
+    "actualFinalFull3x": "/workspace/scratch/root325-811.png",
+    "actualFinalCOmacro": [
+      "/workspace/scratch/root325-leftCO-final.png",
+      "/workspace/scratch/root325-rightCO-final.png"
+    ],
+    "count": "LEFT19bareC+H3C=20C4CCdouble/RIGHT21bareC+H3C=22C6CCdouble/4O",
+    "captionCorrection": "Arachidomic literal m confirmed root5x+readonlysourceagentown4x BEFOREadmit; earlyagentchatArachidonicwrong retainedaudit",
+    "COCorrection": "NativeRIGHTtopFREEFOOTwhitegap1–2px/lowerstemcontact;LEFTbothcontact. InitialagentgenericbothcontactWRONGcorrected. ActualSVG3d7start1391151 roundcapmadeinkcontact/rootrejected; finalONLYrightupperstarty151→150 restorednativewhitegap, lower/rings/glyphs unchanged. Noaddedbridge/no COtheorynormalization."
+  }
+}

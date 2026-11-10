@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "i": 811,
+    "hash": "964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c",
+    "fileNguon": "anh/964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c.png",
+    "svg": "hai-acid-native811-ddh-3d7acb7d9073653355c6bda1816fae543742a3c0f7ca682e0d302cab149b5038.svg",
+    "hashSvg": "3d7acb7d9073653355c6bda1816fae543742a3c0f7ca682e0d302cab149b5038",
+    "byteSvg": 32681,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "cho-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C12-D1-II-1",
+        "de": "Acid béo omega-3 và omega-6 là những acid béo không no, trong phân tử chứa nhóm C=C đầu tiên ở vị trí carbon số 3 và 6 (tính từ nhóm −CH₃).\nCông thức của hai acid béo được cho ở hình dưới.",
+        "refs": [
+          {
+            "hash": "964586ad421f1691832a4a0602c12297000636c9d475b5e0d30b58edd927223c",
+            "where": "12-KT-C12-D1-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "50e93df7d565747b9724d0435222590bcc764d59510756ba88cb20dbfc88ebce"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "LEFT20C4CCdouble-RIGHT22C6CCdouble/4O/2H3C3sub/2OH-Oanchors/2COdouble-LEFTcontact-RIGHTuppernativeWHITEGAP1-2px-lowercontact/ALLthinregularupright/EXACTArachidomic acid (ARA)-Docosahexaenoic acid (DHA)/noaddedH-CH3-nums-EZ-omegaanswer/noalias"
+  },
+  "verdict": "Root actual macro+ROI: RIGHTupperray roundcap tạo inkcontact với slope dù endpointapprox1391151; native có 2 inkcomponents và whitegap1–2px. Không chọn hash này. Caption27 đã sạch giữ nguyên."
+}
