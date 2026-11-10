@@ -1,0 +1,412 @@
+{
+  "i": 878,
+  "hash": "9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3.png",
+  "size": [
+    531,
+    447
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ACIDBASE-II-11",
+      "de": "Đồ thị dưới đây biểu diễn sự biến thiên pH của dung dịch thu được khi cho từ từ dung dịch X nồng độ 0,20 M vào 50,0 mL dung dịch chất Y (chưa biết nồng độ). Biết rằng X, Y là hai chất không theo thứ tự gồm HCl và NaOH.",
+      "allHinh": [
+        {
+          "hash": "9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3",
+          "where": "VIP27-CDK-ACIDBASE-II-11.hinh.0.du_lieu",
+          "hashDataUrl": "36b9c392a3e0b713ff38c9ded1ea54383a1b7111a888ba1a1bef95507765b374"
+        }
+      ],
+      "missingHashes": [
+        "9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native3xOpened": "/workspace/scratch/878-native3x-lo333.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "corrections": [
+    "Earlycandidatechat16? wasunconfirmedestimate; actualownFULL3xcountFIFTEENsolidmarkers, centersbelow."
+  ],
+  "geometry": {
+    "classification": "Singlebluetitrationcurvewith15solidcircularmarkersinsideclosedframe, notphoto.",
+    "frame": {
+      "rect": [
+        57,
+        10,
+        516,
+        401
+      ],
+      "color": "darkblue",
+      "widthApprox": 3,
+      "heads": 0,
+      "grid": 0
+    },
+    "xTicks": [
+      {
+        "text": "0",
+        "x": 75,
+        "fromY": 401,
+        "toY": 412,
+        "labelCenterY": 429
+      },
+      {
+        "text": "10",
+        "x": 157,
+        "fromY": 401,
+        "toY": 412,
+        "labelCenterY": 429
+      },
+      {
+        "text": "20",
+        "x": 240,
+        "fromY": 401,
+        "toY": 412,
+        "labelCenterY": 429
+      },
+      {
+        "text": "30",
+        "x": 322,
+        "fromY": 401,
+        "toY": 412,
+        "labelCenterY": 429
+      },
+      {
+        "text": "40",
+        "x": 405,
+        "fromY": 401,
+        "toY": 412,
+        "labelCenterY": 429
+      },
+      {
+        "text": "50",
+        "x": 487,
+        "fromY": 401,
+        "toY": 412,
+        "labelCenterY": 429
+      }
+    ],
+    "yTicks": [
+      {
+        "text": "0",
+        "y": 383,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "2",
+        "y": 331,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "4",
+        "y": 280,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "6",
+        "y": 229,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "8",
+        "y": 178,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "10",
+        "y": 126,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "12",
+        "y": 75,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      },
+      {
+        "text": "14",
+        "y": 24,
+        "fromX": 57,
+        "toX": 46,
+        "labelRightX": 33
+      }
+    ],
+    "nativeOffsets": "Frameleftx57 is18pxLEFT ofx0tick75; framebottom401 is18pxBELOWy0tick383;frametop10 is14pxABOVEy14tick24. Preservealloffsets, do notnormalizeorigin/pH14totop.",
+    "labels": [
+      {
+        "text": "pH",
+        "bbox": [
+          71,
+          22,
+          96,
+          42
+        ],
+        "font": "regularuprightserif"
+      },
+      {
+        "text": "Thể tích dung dịch X (mL)",
+        "bbox": [
+          286,
+          373,
+          486,
+          393
+        ],
+        "font": "regularuprightserif, insideframe nearbottom"
+      }
+    ],
+    "markers": {
+      "count": 15,
+      "centersNative": [
+        [
+          75,
+          359
+        ],
+        [
+          116,
+          359
+        ],
+        [
+          157,
+          356
+        ],
+        [
+          199,
+          351
+        ],
+        [
+          241,
+          343
+        ],
+        [
+          257,
+          336
+        ],
+        [
+          273,
+          325
+        ],
+        [
+          281,
+          206
+        ],
+        [
+          287,
+          94
+        ],
+        [
+          304,
+          81
+        ],
+        [
+          322,
+          75
+        ],
+        [
+          363,
+          66
+        ],
+        [
+          406,
+          62
+        ],
+        [
+          447,
+          60
+        ],
+        [
+          492,
+          62
+        ]
+      ],
+      "radiusApprox": 8,
+      "fill": "sameblueascurve",
+      "note": "Marker49262 isRIGHTofprinted50tick487 by5px. Do notmoverto50orlabeldata. Somecentersmarkeroverlaycurve, preserve."
+    },
+    "curve": {
+      "color": "sameblue",
+      "widthApprox": 2.5,
+      "pixelTrace": [
+        [
+          75,
+          359
+        ],
+        [
+          116,
+          359
+        ],
+        [
+          157,
+          356
+        ],
+        [
+          199,
+          351
+        ],
+        [
+          221,
+          347
+        ],
+        [
+          241,
+          343
+        ],
+        [
+          257,
+          336
+        ],
+        [
+          273,
+          325
+        ],
+        [
+          278,
+          313
+        ],
+        [
+          282,
+          300
+        ],
+        [
+          282,
+          270
+        ],
+        [
+          281.5,
+          240
+        ],
+        [
+          281,
+          206
+        ],
+        [
+          282,
+          176
+        ],
+        [
+          282,
+          146
+        ],
+        [
+          282,
+          117
+        ],
+        [
+          280,
+          110
+        ],
+        [
+          281,
+          102
+        ],
+        [
+          287,
+          94
+        ],
+        [
+          295,
+          87
+        ],
+        [
+          304,
+          81
+        ],
+        [
+          322,
+          75
+        ],
+        [
+          341,
+          70
+        ],
+        [
+          363,
+          66
+        ],
+        [
+          385,
+          64
+        ],
+        [
+          406,
+          62
+        ],
+        [
+          427,
+          61
+        ],
+        [
+          447,
+          60
+        ],
+        [
+          470,
+          61
+        ],
+        [
+          492,
+          62
+        ],
+        [
+          516,
+          63
+        ]
+      ],
+      "topBehavior": "Risesuntilaround44760 thenSLIGHTFALLto51663, NOTexactflatplateau/monotonicglobal. Preserveliteralnative.",
+      "nearVertical": "Aroundx281..282 fromy300toy117 withsmallleftnotchnear280110, noidealizedperfectanalyticverticaljump; noaddedpointthere."
+    },
+    "tinyLeftEdgeMark": {
+      "bounds": [
+        0,
+        196,
+        4,
+        198
+      ],
+      "color": "sameblue",
+      "finding": "PartialhorizontalblueinkclippedatLEFTedge, intentUNKNOWN. RETAINtinylineatnativeposition, do notreconstructmissingaxislabel/omitnoise."
+    },
+    "font": "Alllabels/ticknumbersregularuprightserifblue, noactualbold/italic. Xcapital/mLcaseexact, noaddedtitle.",
+    "counts": {
+      "curves": 1,
+      "markers": 15,
+      "xLabels": 6,
+      "yLabels": 8,
+      "heads": 0,
+      "frame": 1,
+      "grid": 0
+    },
+    "noAdded": [
+      "X/Ychemicalanswer",
+      "equivalencepointlabel",
+      "dashedguides",
+      "unitM",
+      "normalizingaxisoffsets",
+      "14.5label",
+      "marker50at487",
+      "legend"
+    ]
+  },
+  "coordinateMeaning": "Nativepixeltrace/markerpositions only, notnewscientificnumericaldata; explicitaxislabels aretheonlyassertedvalues."
+}

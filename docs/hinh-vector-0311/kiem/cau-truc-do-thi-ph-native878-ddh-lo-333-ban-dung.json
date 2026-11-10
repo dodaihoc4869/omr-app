@@ -1,0 +1,29 @@
+[
+  {
+    "i": 878,
+    "hash": "9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3",
+    "fileNguon": "anh/9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3.png",
+    "svg": "do-thi-ph-native878-ddh-35e493c60b4ddd78ab826a814b780df1652eabd396de067ec3f8f3386e9f60c9.svg",
+    "hashSvg": "35e493c60b4ddd78ab826a814b780df1652eabd396de067ec3f8f3386e9f60c9",
+    "byteSvg": 24582,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ACIDBASE-II-11",
+        "de": "Đồ thị dưới đây biểu diễn sự biến thiên pH của dung dịch thu được khi cho từ từ dung dịch X nồng độ 0,20 M vào 50,0 mL dung dịch chất Y (chưa biết nồng độ). Biết rằng X, Y là hai chất không theo thứ tự gồm HCl và NaOH.",
+        "refs": [
+          {
+            "hash": "9f90c5790adef287e08a1907a70ddc58734511fc8bf9fbbaf0b3bd310df5e6c3",
+            "where": "VIP27-CDK-ACIDBASE-II-11.hinh.0.du_lieu",
+            "hashDataUrl": "36b9c392a3e0b713ff38c9ded1ea54383a1b7111a888ba1a1bef95507765b374"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1bluecurve15solidcirclemarkers/closedframe0heads0grid/8Y6Xnumbers/native0Y383-vsframe401/lastmarker492-vstick50487/regularupright-pH-Thể tích dung dịch X (mL)/tinycroppedLEFTmark0..4y197intentUNKNOWNretained/noaddedXYanswer-equivalence-guide",
+    "hashSvgDaSoat": "35e493c60b4ddd78ab826a814b780df1652eabd396de067ec3f8f3386e9f60c9",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
