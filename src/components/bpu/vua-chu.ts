@@ -3,6 +3,9 @@
 // ô đã vừa với đúng chữ + đúng bề ngang lần trước thì BỎ QUA (đọc một lượt rồi mới ghi ⇒ không đo đi đo lại cả bảng mỗi lần phòng cập nhật).
 
 const KHOA = 'vuaChu'
+/** Lớp tạm của hiệu ứng nộp bài (`nop-bai.ts` thêm rồi gỡ sau ~1,2 s): chỉ đổi hình vẽ, không đổi bề ngang chữ ⇒ KHÔNG vào khoá đo (trước đây mỗi em gửi đo lại cả
+ *  dải HAI lần: lúc thêm và lúc gỡ lớp). Lớp thật đổi chữ (`gui` đậm hơn, `roi`…) vẫn vào khoá. */
+const lopThat = (el: Element | null): string => (el?.className ?? '').toString().replace(/(^|\s)(vua|nay)(?=\s|$)/g, '').trim()
 
 /** Hạ cỡ chữ `el` từng px tới khi chữ nằm trọn bề ngang (tối thiểu `min` px). `haiDong`: thu một dòng mà nhỏ hơn 85% cỡ gốc ⇒ thử xuống hai dòng
  *  (ngắt ở dấu cách, không bẻ giữa chữ) nếu ô cha đủ cao — lấy cách nào chữ to hơn. */
@@ -26,8 +29,18 @@ export function vuaChuTrong(goc: ParentNode | null | undefined, chon: string, mi
   const ds = [...goc.querySelectorAll<HTMLElement>(chon)]
   // Đọc hết trước (một lần bố cục), rồi mới ghi.
   // Lớp của ô cha vào khoá: em vừa gửi ⇒ ô đổi lớp (chữ đậm hơn, rộng hơn) ⇒ đo lại.
-  const khoa = ds.map((el) => `${el.textContent}|${el.parentElement?.className ?? ''}|${el.parentElement?.clientWidth ?? 0}|${el.parentElement?.clientHeight ?? 0}|${coGoc}`)
+  const khoa = ds.map((el) => `${el.textContent}|${lopThat(el.parentElement)}|${el.parentElement?.clientWidth ?? 0}|${el.parentElement?.clientHeight ?? 0}|${coGoc}`)
   ds.forEach((el, i) => { if (el.dataset[KHOA] === khoa[i]) return; vuaChu(el, min, haiDong); el.dataset[KHOA] = khoa[i] })
+}
+
+/** Lần đo trước của dải (theo ô đầu): chữ + lớp thật + bề ngang từng ô. */
+const nhoDeu = new WeakMap<Element, { phan: string[]; coGoc: string }>()
+/** `moi` = `cu` cộng thêm lớp (cùng chữ, cùng bề ngang). Khoá dạng «chữ|lớp|rộng» (tên em không chứa '|'). */
+function chiThemLop(cu: string, moi: string): boolean {
+  const a = cu.split('|'), b = moi.split('|')
+  if (a.length !== 3 || b.length !== 3 || a[0] !== b[0] || a[2] !== b[2]) return false
+  const cb = new Set(b[1]!.split(/\s+/).filter(Boolean))
+  return a[1]!.split(/\s+/).filter(Boolean).every((x) => cb.has(x))
 }
 
 /** MỘT CỠ CHỮ CHUNG cho cả nhóm ô (10/11: dải tên theo đội — mỗi ô một cỡ trông lộn xộn): cỡ = cỡ lớn nhất mà tên DÀI NHẤT vẫn nằm trọn một dòng
@@ -36,9 +49,16 @@ export function vuaChuDeu(goc: ParentNode | null | undefined, chon: string, min:
   if (!goc) return
   const ds = [...goc.querySelectorAll<HTMLElement>(chon)]
   if (!ds.length) return
-  const khoa = ds.map((el) => `${el.textContent}|${el.parentElement?.className ?? ''}|${el.clientWidth}`).join('¦') + `|${coGoc}`
+  const phan = ds.map((el) => `${el.textContent}|${lopThat(el.parentElement)}|${el.clientWidth}`)
+  const khoa = phan.join('¦') + `|${coGoc}`
   const dau = ds[0]!
   if (dau.dataset[KHOA] === khoa) return
+  // 10/11 (tác tử tốc độ): em gửi bài = ô chỉ THÊM lớp (`gui`: chữ đậm hơn), chữ + bề ngang giữ nguyên, và MỌI ô vẫn nằm trọn ở cỡ chung hiện tại ⇒ giữ cỡ, không
+  // xoá-đo-ghi lại cả dải (xoá cỡ rồi đọc = hai lần dựng bố cục cho mỗi em gửi). Ô nào tràn (hoặc đổi chữ / bề ngang / bỏ lớp) ⇒ đo lại đầy đủ như cũ.
+  const cu = nhoDeu.get(dau)
+  if (cu && cu.coGoc === coGoc && cu.phan.length === phan.length && phan.every((x, i) => x === cu.phan[i] || chiThemLop(cu.phan[i]!, x)) && ds.every((el) => el.scrollWidth <= el.clientWidth + 1)) {
+    dau.dataset[KHOA] = khoa; nhoDeu.set(dau, { phan, coGoc }); return
+  }
   for (const el of ds) { el.style.fontSize = ''; el.style.whiteSpace = ''; el.style.lineHeight = '' }
   let co = Infinity
   for (const el of ds) {
@@ -47,5 +67,5 @@ export function vuaChuDeu(goc: ParentNode | null | undefined, chon: string, min:
   }
   const c = `${Math.max(min, co)}px`
   for (const el of ds) el.style.fontSize = c
-  dau.dataset[KHOA] = khoa
+  dau.dataset[KHOA] = khoa; nhoDeu.set(dau, { phan, coGoc })
 }

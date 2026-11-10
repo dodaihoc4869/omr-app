@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs'
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import KetBaiThuong from '../src/components/thuong/KetBaiThuong'
 import { docKetBai } from '../src/lib/thuong-api'
+import { toiMocSua } from '../src/components/hoc-tap/lam-bai-man'
 
 const noop = () => {}
 const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
@@ -52,7 +53,24 @@ describe('xong chặng: «Làm tiếp» (em tự bấm) + «Về Hôm nay»', ()
   })
   it('màn làm bài: còn chặng ⇒ «Làm tiếp: Chặng n» mở thẳng chặng sau (setLan), «Về …» về Hôm nay; hết chặng ⇒ «Tiếp tục» về Hôm nay', () => {
     const src = readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')
-    expect(src).toMatch(/const coTiep = !!chang && !!homNayHien && chang < homNayHien\.soChang/)
-    expect(src).toMatch(/coTiep \? \{ chuNut: `Làm tiếp: Chặng \$\{chang! \+ 1\}`, onTiep: \(\) => setLan\(n => n \+ 1\), nutPhu: \{ chu: `Về \$\{tenTrangChinh\(\)\}`, onClick: veLoTrinh \} \} : \{ onTiep: veLoTrinh \}/)
+    expect(src).toMatch(/const coTiep = !!chang && !!homNayHien && chang < homNayHien\.soChang && !coCa && !toiMocSua\(chang, homNayHien\.soChang\)/)
+    expect(src).toMatch(/coTiep \? \{ chuNut: `Làm tiếp: Chặng \$\{chang! \+ 1\}`, onTiep: \(\) => \{ lamTiep\.current = true; setLan\(n => n \+ 1\) \}, nutPhu: \{ chu: `Về \$\{tenTrangChinh\(\)\}`, onClick: veLoTrinh \} \} : \{ onTiep: veLoTrinh \}/)
+    // vào bằng «Làm tiếp» (không qua Lộ trình) ⇒ chặn TU_SUA_TRUOC không được gỡ khoá; ca kiểm tra đang mở ⇒ không «Làm tiếp» (về Hôm nay: «Vào ca»)
+    expect(src).toMatch(/while \(daDaySua\.current < \(lamTiep\.current \? 1 : 2\)\)/)
+    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toMatch(/<ManLamBaiTap token=\{auth\.token\} sbd=\{auth\.sbd\} coCa=\{!!caDangMo\}/)
+  })
+  it('«Làm tiếp» không vượt nút Tự sửa lỗi: tới mốc Lộ trình mà sửa hôm nay chưa xong ⇒ về Hôm nay', () => {
+    const nay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)
+    expect(toiMocSua(2, 5)).toBe(false) // hôm nay không có nút Tự sửa lỗi
+    localStorage.setItem('ddh.moc-sua', JSON.stringify({ ngay: nay, tong: 5, sau: 2 }))
+    expect(toiMocSua(1, 5)).toBe(false) // chặng 2 còn trước nút Sửa
+    expect(toiMocSua(2, 5)).toBe(true) // xong chặng 2 = tới nút Sửa
+    expect(toiMocSua(1, 6)).toBe(true) // số chặng đổi (mốc cũ) ⇒ về Hôm nay tính lại
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'x', n: nay, s: [17, 3, 0, 9] }))
+    expect(toiMocSua(3, 5)).toBe(true) // còn 3 câu sửa
+    localStorage.setItem('ddh.sua-nho', JSON.stringify({ t: 'x', n: nay, s: [17, 0, 0, 12] }))
+    expect(toiMocSua(3, 5)).toBe(false) // sửa xong ⇒ đi tiếp
+    localStorage.setItem('ddh.moc-sua', JSON.stringify({ ngay: '2026-01-01', tong: 5, sau: 2 }))
+    expect(toiMocSua(3, 5)).toBe(false) // mốc ngày cũ
   })
 })
