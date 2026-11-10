@@ -147,6 +147,10 @@ export const THE_BD_MS = 2500
 /** THẺ BIẾN ĐỘNG kJ của em (thầy 09/11): mục `bienDongEm` có `id` mới ⇒ thẻ nhỏ màu đúng (xanh) / sai (đỏ) + ngọn lửa đội + lý do, bay lên rồi mờ (~2,5 s).
  *  Lần đầu nhận view (mở màn / nối lại) chỉ ghi nhớ `id`, không phát lại chuyện cũ. Tối đa 3 thẻ cùng lúc. */
 export function TheBienDong({ ds }: { ds: readonly BienDong[] | undefined }) {
+  return <DsTheBienDong the={useTheBienDong(ds)} />
+}
+/** Trạng thái thẻ biến động (tách khỏi chỗ vẽ — 10/11: màn em vẽ thẻ ngay DƯỚI thanh đội đang hiện, trong hay ngoài lớp che, không mất thẻ khi đổi chỗ). */
+function useTheBienDong(ds: readonly BienDong[] | undefined): BienDong[] {
   const daThay = useRef<number | null>(null)
   const [the, setThe] = useState<BienDong[]>([])
   const hen = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -163,6 +167,11 @@ export function TheBienDong({ ds }: { ds: readonly BienDong[] | undefined }) {
     hen.current.push(setTimeout(() => setThe((c) => c.filter((x) => !ids.has(x.id))), THE_BD_MS))
   }, [ds])
   useEffect(() => () => { for (const h of hen.current) clearTimeout(h) }, [])
+  return the
+}
+/** Chồng thẻ biến động: nằm trong `.bpu-bd-neo` (mốc cao 0 đặt ngay dưới thanh đội / dải kết quả) ⇒ thẻ nổi XUỐNG phía dưới, không bao giờ đè thanh đội;
+ *  các thẻ xếp cột có khe, không đè nhau. */
+function DsTheBienDong({ the }: { the: readonly BienDong[] }) {
   if (!the.length) return null
   return (
     <div className="bpu-bd" role="status" aria-live="polite">
@@ -219,6 +228,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const chuaMo = useRef(false)
   const soLuot = v?.luot?.so ?? 0
   const [LC, setLC] = useState<MangChang | null>(null)
+  const theBd = useTheBienDong(v?.em ? v.bienDongEm : undefined)
   useEffect(() => { let huy = false; void import('../hoc-tap/ManLamBaiTap').then((m) => { if (!huy) setLC(m.PHAN_CAU_CHANG) }).catch(() => {}); return () => { huy = true } }, [])
 
   const gui = useCallback((t: Tin) => {
@@ -437,6 +447,10 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     </header>
   )
   const nhanDoi = `Bình Phản Ứng${l ? ` · Lượt ${l.so}` : ''}`
+  // 10/11 (thầy báo dải kết quả đè thanh đội): dải KẾT QUẢ LÊN BẢNG và mốc THẺ ±kJ nằm TRONG DÒNG CHẢY, ngay dưới thanh đội đang hiện — trong lớp che:
+  // dưới «Đội … kJ đội»; ngoài lớp che: dưới đầu màn. Không còn lớp nổi tuyệt đối đè chữ.
+  const ketQuaBang = e && l?.goi && l.pha === 'mo' && !v?.ketThuc ? <KetQuaLenBangEm g={l.goi} laEm={l.goi.sbd === e.sbd} /> : null
+  const neoBd = e ? <div className="bpu-bd-neo"><DsTheBienDong the={theBd} /></div> : null
   let lopChe: React.ReactNode = null
 
   let than: React.ReactNode
@@ -513,6 +527,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           {dangBay ? <TiaBay /> : null}
           <div className="bpu-che-noi">
             <div className="bpu-che-doi"><NgonLua doi={doi} /><b>{tenDoi}</b><span><SoKj v={kjDoiSo} /> kJ đội</span></div>
+            {ketQuaBang}
+            {neoBd}
             {kq ? <div className="bpu-che-dau" aria-hidden="true">{kq === 'dung' ? '✓' : '✗'}</div> : <NgonLua doi={doi} ky={DOI_BPU[doi]?.ky} to />}
             <h3>{tieuDe}</h3>
             {dongPhu ? <p className="phu">{dongPhu}</p> : null}
@@ -564,12 +580,12 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
+      {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}
+      {lopChe ? null : ketQuaBang}
+      {lopChe ? null : neoBd}
       {than ? <main className="bpu-hs-than">{than}</main> : null}
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
       {lopChe}
-      {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả (trên lớp che, không gỡ che). */}
-      {e && l?.goi && l.pha === 'mo' && !v?.ketThuc ? <KetQuaLenBangEm g={l.goi} laEm={l.goi.sbd === e.sbd} /> : null}
-      {e ? <TheBienDong ds={v?.bienDongEm} /> : null}
     </div>,
     document.body,
   )

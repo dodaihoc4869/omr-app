@@ -1,6 +1,6 @@
 // BÌNH PHẢN ỨNG — KẾT QUẢ LÊN BẢNG TRÊN MÁY EM (thầy 10/11: em được gọi và cả lớp đều thấy «Đỗ Đại Học · Đạt · đội +200 kJ»).
 // Phòng (`viewEm`) gửi mọi máy `goi` = tên, đội, `dat` (thầy vừa chấm) và `kjDoi` (kJ đội do lên bảng — CHỈ sau khi mở đáp án, số thật của phòng).
-// Dải nhỏ nổi trên cùng (trên lớp che nếu đang che — không gỡ che), màu đội, tế nhị: Đạt ⇒ «Đạt · đội +200 kJ»; Chưa đạt ⇒ «Chưa đạt · cảm ơn bạn đã
+// Dải nhỏ màu đội NẰM TRONG DÒNG CHẢY ngay dưới thanh đội (10/11: bản nổi tuyệt đối đè chữ «Đội … kJ đội») — trong lớp che nếu đang che, tế nhị: Đạt ⇒ «Đạt · đội +200 kJ»; Chưa đạt ⇒ «Chưa đạt · cảm ơn bạn đã
 // lên bảng» (không nêu số trừ trước cả lớp; em được gọi thấy thẻ ±kJ của mình qua TheBienDong). Chỉ transform + opacity.
 import { DOI_BPU, type ViewEm } from '../../lib/bpu/phong'
 

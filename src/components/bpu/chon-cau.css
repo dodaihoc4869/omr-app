@@ -30,6 +30,14 @@
 .bcc-bai.noi { background: color-mix(in srgb, var(--tr-tin) 16%, var(--tr-mat-2)); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-tin) 45%, transparent); }
 .bcc-bai.noi[aria-current='true'] { box-shadow: inset 0 0 0 3px var(--tr-tin); }
 .bcc-cho { margin: 12px 8px; font-size: 22px; color: var(--tr-chu-2); }
+/* 10/11 «đúng thứ tự cây thư mục»: các tờ của MỘT bài gom dưới tên bài (như cây kho) — tên bài là tiêu đề, tờ là dòng chọn thụt vào, vạch dọc nối. */
+.bcc-nhom-bai { display: grid; gap: 2px; padding: 6px 0 8px; }
+.bcc-ten-nhom { display: flex; align-items: baseline; gap: 12px; margin: 0; padding: 8px 20px 4px; font-size: 25px; font-weight: 700; line-height: 1.3; color: var(--tr-chu); }
+.bcc-ten-nhom span { flex: none; margin-left: auto; font-size: 18px; font-weight: 500; color: var(--tr-chu-3); }
+.bcc-bai.bcc-to { display: flex; align-items: baseline; gap: 12px; margin-left: 22px; padding: 11px 18px; border-radius: 14px; box-shadow: inset 2px 0 0 var(--tr-vien); }
+.bcc-bai.bcc-to b { font-size: 22px; font-weight: 600; }
+.bcc-bai.bcc-to span { flex: none; margin-left: auto; font-size: 18px; }
+.bcc-bai.bcc-to[aria-current='true'] { box-shadow: inset 5px 0 0 var(--tr-tin); }
 /* Phải: tấm giấy ấm như tờ cũ. */
 .bcc-phai { --tr-chu: var(--tr-chieu-chu); --tr-chu-3: var(--tr-chieu-phu); --tr-vien: color-mix(in srgb, var(--tr-chieu-chu) 14%, transparent); --tr-tin: var(--tr-chieu-nhan);
   position: relative; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 28px 30px 34px; border-radius: 30px; background: var(--tr-chieu-giay); color: var(--tr-chieu-chu);
