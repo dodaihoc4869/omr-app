@@ -28,14 +28,25 @@
 .lv-vao { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); min-height: 64px; padding: 0 30px 0 22px; border-radius: 999px; display: flex; align-items: center; gap: 12px;
   font-size: 20px; font-weight: 800; white-space: nowrap; background: var(--p-do); color: var(--p-trang); pointer-events: none;
   box-shadow: 0 0 0 8px color-mix(in srgb, var(--p-do) 26%, transparent), 0 20px 60px color-mix(in srgb, var(--tr-chieu-bang) 60%, transparent); animation: lv-vien 0.62s ease-out both; }
-.lv-vao i, .lv-dai i { display: block; width: 13px; height: 13px; border-radius: 50%; background: var(--p-trang); flex: none; }
+.lv-vao i { display: block; width: 13px; height: 13px; border-radius: 50%; background: var(--p-trang); flex: none; }
 @keyframes lv-no { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: none; } }
 @keyframes lv-vien { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.86); } 18%, 78% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.04); } }
 
-/* Dải «Thầy đang live» trên màn làm bài (điểm quyết 5: lượt đang mở, em chưa gửi) — không chặn chạm */
-.lv-dai { position: fixed; z-index: 3; left: 50%; top: max(6px, env(safe-area-inset-top, 0px)); transform: translateX(-50%); height: 30px; padding: 0 12px 0 10px; border-radius: 999px;
-  display: flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em; white-space: nowrap; pointer-events: none; background: var(--p-do); color: var(--p-trang); }
-.lv-dai i { width: 8px; height: 8px; }
+/* Dấu «Thầy đang live» trên màn Bình Phản Ứng thường (thầy live TIẾNG, chưa đưa bảng xuống): viên nhỏ góc trái dưới, viền màu đội, kèm nút tiếng.
+   Không đè nút «Gửi» nổi (mép phải, giữa màn); màn có nút đáy ⇒ lớp `nang` nhích lên. */
+.lv-dau { position: fixed; z-index: 4; left: max(10px, env(safe-area-inset-left, 0px)); bottom: max(10px, env(safe-area-inset-bottom, 0px)); height: 44px; padding: 0 4px 0 12px; border-radius: 999px;
+  display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; white-space: nowrap; color: var(--tr-chu); background: var(--tr-mat);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--doi) 60%, transparent), 0 6px 18px color-mix(in srgb, var(--tr-chu) 16%, transparent); animation: lv-dau-vao 0.32s cubic-bezier(0.22, 0.8, 0.2, 1) both; }
+.lv-dau.nang { bottom: calc(max(10px, env(safe-area-inset-bottom, 0px)) + 72px); }
+.lv-dau > i { display: block; flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--p-do); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p-do) 22%, transparent); }
+.lv-dau > span { padding-right: 8px; }
+.bpu-hs .lv-dau button { flex: none; width: 36px; height: 36px; min-height: 36px; padding: 0; border: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer; position: relative;
+  background: color-mix(in srgb, var(--doi) 22%, transparent); color: var(--tr-chu); transition: transform 0.1s; }
+.lv-dau button::before { content: ""; position: absolute; inset: -6px; } /* vùng chạm 48 px */
+.lv-dau button[aria-pressed="true"] { background: var(--doi); color: var(--p-muc); }
+.lv-dau button:active { transform: scale(0.94); }
+.lv-dau svg { width: 20px; height: 20px; }
+@keyframes lv-dau-vao { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 /* Tay nắm: viên thuốc mảnh màu đội ở mép phải — vùng chạm 48 × 76 */
 .lv .lv-nam { position: absolute; right: calc(var(--lv-at-phai, 0px) + 2px); top: 50%; width: 48px; height: 76px; min-height: 76px; margin: -38px 0 0; padding: 0; border: 0; background: none; display: grid; place-items: center;
@@ -93,16 +104,30 @@
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--doi) 26%, transparent), 0 10px 30px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent); }
 .lv-bat-tieng:active { transform: translateX(-50%) scale(0.97); }
 
+/* Em lên bảng — mic đang mở (ảnh 31): viên màu đội LUÔN HIỆN ở mép phải; bạn đang nói (ảnh 32): dải nhỏ đáy màn */
+.lv-noi { position: absolute; right: calc(var(--lv-at-phai, 0px) + 56px); top: 50%; transform: translateY(-50%); width: 172px; border-radius: 26px; padding: 14px 12px 12px; text-align: center; background: var(--doi); color: var(--p-muc);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--doi) 28%, transparent), 0 18px 50px color-mix(in srgb, var(--tr-chieu-bang) 55%, transparent); }
+.lv-noi .lv-song { height: 30px; gap: 4px; justify-content: center; color: var(--p-muc); }
+.lv-noi .lv-song i { width: 5px; }
+.lv-noi b { display: block; font-size: 16.5px; font-weight: 800; margin-top: 6px; }
+.lv-noi small { display: block; font-size: 12.5px; font-weight: 600; opacity: 0.8; margin-top: 1px; }
+.lv .lv-noi button { width: 100%; min-height: 50px; margin-top: 10px; border: 0; border-radius: 16px; background: var(--p-muc); color: var(--p-trang); font: inherit; font-size: 15.5px; font-weight: 800; cursor: pointer; }
+.lv-noi button:active { transform: scale(0.97); }
+.lv .lv-bat-tieng.mic { left: auto; right: calc(var(--lv-at-phai, 0px) + 60px); transform: none; }
+.lv-bao.ban { min-height: 44px; padding: 4px 16px 4px 8px; font-weight: 700; color: var(--tr-chieu-giay); }
+.lv-bao.ban .ky { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 12.5px; font-weight: 800; background: var(--doi); color: var(--p-muc); }
+.lv-bao.ban .lv-song { color: var(--doi); }
+
 @media (prefers-reduced-transparency: reduce) {
   .lv-khay, .lv-bao { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
 }
 @media (prefers-reduced-motion: reduce) {
   .lv-khay { transition: none; }
-  .lv[data-vao] .lv-nen, .lv-vao, .lv-bao .quay { animation: none; }
+  .lv[data-vao] .lv-nen, .lv-vao, .lv-bao .quay, .lv-dau { animation: none; }
   .lv-song i { transition: none; }
 }
 html.may-yeu .lv-khay { transition: none; -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
 html.may-yeu .lv-bao { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
-html.may-yeu .lv[data-vao] .lv-nen, html.may-yeu .lv-vao, html.may-yeu .lv-bao .quay { animation: none; }
+html.may-yeu .lv[data-vao] .lv-nen, html.may-yeu .lv-vao, html.may-yeu .lv-bao .quay, html.may-yeu .lv-dau { animation: none; }
 html.may-yeu .lv-tro, html.may-yeu .lv-nam i, html.may-yeu .lv-nam.noi i { box-shadow: none; }
 html.may-yeu .lv-song i { transition: none; }

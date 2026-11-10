@@ -2,8 +2,8 @@
 // BỘ THỬ LIVE BẢNG (10/11, đợt 1B) — Chromium THẬT, HAI TRANG (thầy + em) qua phòng THẬT chạy trong Node (may-chu.mjs). Dữ liệu giả.
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu.mjs <thư mục tạm> [thư mục ảnh = docs/ban-ve-live-1011] [tệp số đo = docs/ban-ve-live-1011/so-do-that.json]
-// Kịch bản: thầy bấm Live (thẻ chọn mic → Bắt đầu live) ⇒ em chưa gửi thấy dải «Thầy đang live», gửi xong vào bảng live ⇒ thầy viết bằng bút (sự kiện
-// con trỏ thật, 200 Hz) ⇒ nét hiện bên em ⇒ khay ⇒ em rời màn ⇒ thẻ gọn trên tờ ⇒ mất mạng / nối lại bắt kịp ⇒ chuyển câu ⇒ tắt live.
+// Kịch bản: thầy bấm Live (thẻ chọn mic → Bắt đầu live) ⇒ máy em giữ màn câu hỏi + dấu «Thầy đang live» ⇒ thầy gọi em lên bảng ⇒ máy em sang bảng live ⇒ thầy viết bằng bút (sự kiện
+// con trỏ thật, 200 Hz) ⇒ nét hiện bên em ⇒ khay ⇒ em rời màn ⇒ thẻ gọn trên tờ ⇒ mất mạng / nối lại bắt kịp ⇒ lượt mới (về màn câu hỏi) ⇒ tắt live.
 // Ảnh thật `that-*.jpg` (≤ 150 KB) để đối chiếu bản vẽ; đo khung hình máy em lúc nhận nét ở CPU ×1 / ×4 / ×6.
 // KHÔNG kiểm được ở đây: tiếng (cần Cloudflare Realtime SFU thật + mic thật), khoá xoay của Android, vùng an toàn iPhone — kiểm trên máy thật.
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
@@ -89,20 +89,34 @@ kiem('Bấm Live lần đầu ⇒ thẻ bật live + chọn mic', await to.locat
 await chup(thay, '04-thay-bat-live-chon-mic-1366')
 await to.locator('.mc-lv-the [data-lv="bat-dau"]').click()
 await to.locator('.mc-lv-cum b#mc-lv-dh').waitFor({ timeout: 10000 })
-kiem('«Bắt đầu live» ⇒ viên đỏ LIVE + đồng hồ + «Tắt live»', await to.locator('.mc-lv-tat').isVisible())
+kiem('«Bắt đầu live» ⇒ viên đỏ LIVE + đồng hồ + «Tắt live»', await to.locator('.mc-lv-tat:not(.mc-lv-bg)').isVisible())
 kiem('Bấm Live ⇒ bút bật sẵn', await to.locator('body.mc-co-but').count() === 1)
+const mepPhai = await to.locator('#mc-cai-btn').evaluate((e) => Math.round(e.getBoundingClientRect().right))
+kiem('Thanh dưới 1366 không tràn khi live (Tắt live + Cài đặt còn trong màn)', mepPhai <= 1366 && mepPhai > 0, `mép phải nút Cài đặt ${mepPhai} px`)
 
-// Em chưa gửi ⇒ giữ màn làm bài + dải «Thầy đang live» (điểm quyết 5)
-await em.t.locator('.lv-dai').waitFor({ timeout: 8000 })
-kiem('Em chưa gửi: giữ màn làm bài + dải «Thầy đang live»', await em.t.locator('.lv').count() === 0)
-await chup(em.t, '25b-em-chua-gui-dai-thay-dang-live-844')
+// LUẬT THẦY CHỐT TỐI 10/11: live = TIẾNG; máy em vẫn là màn câu hỏi như thường + dấu nhỏ «Thầy đang live» (kèm nút tiếng); CHƯA vào bảng.
+await em2.t.locator('.lv-dau').waitFor({ timeout: 8000 })
+kiem('Thầy bật live: máy em giữ màn câu hỏi + dấu «Thầy đang live» có nút tiếng, KHÔNG vào bảng', await em2.t.locator('.lv').count() === 0 && await em2.t.locator('.lv-dau button').count() === 1 && await em.t.locator('.lv').count() === 0)
+const hDau = await em2.t.evaluate(() => { const d = document.querySelector('.lv-dau').getBoundingClientRect(), g = document.querySelector('.bpu-gui-noi')?.getBoundingClientRect(); return { dau: [d.left, d.top, d.right, d.bottom], gui: g ? [g.left, g.top, g.right, g.bottom] : null } })
+kiem('Dấu «Thầy đang live» không đè nút «Gửi» nổi', !hDau.gui || hDau.dau[2] < hDau.gui[0] || hDau.dau[1] > hDau.gui[3] || hDau.dau[3] < hDau.gui[1], JSON.stringify(hDau.dau.map(Math.round)))
+await chup(em2.t, '41-em-dau-thay-dang-live-man-cau-hoi-390')
+await em2.t.locator('.lv-dau button').tap()
+kiem('Chạm nút tiếng trên dấu ⇒ «đang bật»', await em2.t.locator('.lv-dau button[aria-pressed="true"]').count() === 1)
 await emGui(em.t)
+await emGui(em2.t)
+await ngu(1700)
+kiem('Em gửi xong khi thầy live: vẫn màn Bình Phản Ứng (đã gửi) + dấu, chưa vào bảng', await em.t.locator('.lv').count() === 0 && await em.t.locator('.lv-dau').count() === 1)
+await chup(em2.t, '42-em-dau-thay-dang-live-da-gui-390')
+// Chuyển câu khi đang live: tờ dựng lại / sang đợt — live (tiếng) không rớt, máy em vẫn màn câu hỏi
+kiem('Công tắc «Bảng → máy em» có trên cụm Live, đang tắt', await to.locator('.mc-lv-bg[aria-pressed="false"]').isVisible())
+// THẦY GỌI EM LÊN BẢNG (phòng: pha «gọi») ⇒ máy cả lớp LẬP TỨC sang bảng live, xoay ngang
+await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S2', lyDo: ['Chưa lên bảng buổi này'] })))
 await em.t.locator('.lv').waitFor({ timeout: 8000 })
 await chup(em.t, '25-em-vao-live-844')
-kiem('Em gửi xong ⇒ tự sang bảng live', true)
-await emGui(em2.t)
+kiem('Thầy gọi em lên bảng ⇒ máy em tự sang bảng live', true)
 await em2.t.locator('.lv[data-xoay]').waitFor({ timeout: 8000 })
 kiem('Máy dọc không khoá ngang được ⇒ hình xoay 90° bằng CSS', true)
+await to.locator('.mc-lv-bg[aria-pressed="true"]').waitFor({ timeout: 5000 }).then(() => kiem('Gọi lên bảng ⇒ công tắc «Bảng → máy em» tự bật', true), () => kiem('Gọi lên bảng ⇒ công tắc «Bảng → máy em» tự bật', false))
 await ngu(1200)
 
 // ───────────── THẦY VIẾT (sự kiện con trỏ thật, 200 Hz) ─────────────
@@ -159,7 +173,7 @@ kiem('Thẻ tự thu gọn sau 4 giây', await to.locator('.mc-lv-roi-gon').isVi
 await chup(thay, '08-thay-em-roi-man-the-gon-1366')
 await roi(em2.t, false)
 await em2.t.locator('.bpu-hs').tap({ position: { x: 30, y: 400 } }).catch(() => {})
-await to.locator('.mc-lv-roi').waitFor({ state: 'hidden', timeout: 8000 }).then(() => kiem('Em quay lại ⇒ tên tự mất, viền tắt', true), () => kiem('Em quay lại ⇒ tên tự mất, viền tắt', false))
+await to.locator('.mc-lv-vien').waitFor({ state: 'hidden', timeout: 8000 }).then(() => kiem('Em quay lại ⇒ tên tự mất, viền tắt', true), () => kiem('Em quay lại ⇒ tên tự mất, viền tắt', false))
 await em2.ctx.close() // phần đo bên dưới chỉ còn MỘT máy em (máy đo không phải vẽ thêm trang thứ ba)
 
 // ───────────── ĐO KHUNG HÌNH MÁY EM KHI NHẬN NÉT ─────────────
@@ -196,20 +210,25 @@ await ngu(2500)
 const sauNoi = await soNetEm()
 kiem('Nối lại ⇒ tự bắt kịp nét thầy viết lúc mất mạng (từ sổ nét)', sauNoi > truocNoi, `mẫu mực ${truocNoi} → ${sauNoi}`)
 
-// ───────────── CHUYỂN CÂU ⇒ BẢNG MỚI ─────────────
+// ───────────── CHUYỂN CÂU ⇒ LƯỢT MỚI: MÁY EM VỀ MÀN CÂU HỎI DỌC, LIVE (TIẾNG) VẪN CHẠY ─────────────
 await thay.keyboard.press('Escape').catch(() => {})
 await to.locator('#mc-sau').click()
-await ngu(1500)
-const sauChuyen = await soNetEm()
-kiem('Thầy chuyển câu ⇒ máy em bảng mới (sạch nét)', sauChuyen < 5, `mẫu mực còn ${sauChuyen}`)
+await ngu(600)
 await may.moLuot(CAU[1], 'B')
-await em.t.locator('.lv-dai').waitFor({ timeout: 8000 }).then(() => kiem('Lượt mới mở khi đang live ⇒ em về màn làm bài + dải', true), () => kiem('Lượt mới mở khi đang live ⇒ em về màn làm bài + dải', false))
+await em.t.locator('.lv-dau').waitFor({ timeout: 8000 }).then(() => kiem('Lượt mới khi đang live ⇒ máy em về màn câu hỏi (bỏ bảng live) + dấu «Thầy đang live»', true), () => kiem('Lượt mới khi đang live ⇒ máy em về màn câu hỏi (bỏ bảng live) + dấu «Thầy đang live»', false))
+kiem('Chuyển câu: viên LIVE trên tờ còn nguyên (live không rớt), bảng → máy em tự tắt', await to.locator('.mc-lv-cum b#mc-lv-dh').count() === 1 && await to.locator('.mc-lv-bg[aria-pressed="false"]').count() === 1 && await em.t.locator('.lv').count() === 0)
+// gọi lần nữa ở câu mới ⇒ bảng mới (sạch nét của câu cũ)
+await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S3', lyDo: ['Chưa lên bảng buổi này'] })))
+await em.t.locator('.lv').waitFor({ timeout: 8000 })
+await ngu(900)
+const sauChuyen = await soNetEm()
+kiem('Câu mới: bảng live của máy em là bảng mới (sạch nét câu cũ)', sauChuyen < 5, `mẫu mực còn ${sauChuyen}`)
 
 // ───────────── TẮT LIVE ─────────────
-await to.locator('.mc-lv-tat').click()
+await to.locator('.mc-lv-tat:not(.mc-lv-bg)').click()
 await to.locator('.mc-lv-nut').waitFor({ state: 'visible', timeout: 8000 })
 await ngu(800)
-kiem('Tắt live ⇒ tờ về nút «Live», máy em bỏ lớp live', await em.t.locator('.lv, .lv-dai').count() === 0)
+kiem('Tắt live ⇒ tờ về nút «Live», máy em bỏ lớp live + dấu', await em.t.locator('.lv, .lv-dau').count() === 0)
 
 kiem('Không lỗi trang nào', loiTrang.length === 0, loiTrang.slice(0, 4).join(' | '))
 writeFileSync(SO_DO, JSON.stringify({ ngay: new Date().toISOString(), ghiChu: 'Bộ thử scripts/thu-live-1011/thu.mjs — Chromium không đầu, phòng thật trong Node, nét đi đường WebSocket (không SFU). Máy em 844 × 390 @2x.', khungHinhMayEm: soDo, kiem: ket }, null, 2) + '\n')

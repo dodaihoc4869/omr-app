@@ -647,12 +647,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     else nutGui = <NutGuiNoi key={khoaLuot} hien={duChon} tuLuan={!!l.tuLuan} onGui={guiTra} />
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
-  // LIVE BẢNG (10/11): phòng báo thầy sẵn sàng / đang live ⇒ nạp lười lớp live. Điểm quyết 5: lượt đang mở mà em CHƯA gửi ⇒ giữ màn làm bài + dải nhỏ
-  // «Thầy đang live» (vẫn nghe tiếng), gửi xong tự sang bảng live. Đang hiện cảnh báo rời màn ⇒ không che. Đề trên giấy = khối đề dùng chung, chỉ xem.
+  // LIVE BẢNG (10/11). Thầy chốt tối 10/11: live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu; máy em vẫn là màn câu hỏi như thường (thêm dấu nhỏ
+  // «Thầy đang live» + nút tiếng). Chỉ khi cờ phòng `live.bang` bật (thầy gọi em lên bảng / bật tay) mới sang BẢNG LIVE toàn màn xoay ngang; lượt mới ⇒ cờ tắt
+  // ⇒ về màn câu hỏi dọc. Phòng chưa có cờ (bản trước đợt 1C) ⇒ suy ra đúng luật ấy từ lượt: đang có em được gọi. Em được gọi ⇒ mic tự bật.
   const lv = v?.live ?? null
   const liveBat = !!lv?.bat && !v?.ketThuc
-  const dangLam = !!l && !!q && l.pha === 'tra-loi' && !che && !hetGio
-  const cheLive = !liveBat ? 'an' : vuaRoi ? 'an' : dangLam ? 'dai' : 'bang'
+  const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
+  const cheLive = !liveBat || vuaRoi ? 'an' : coBang ? 'bang' : 'dau'
   const khong = () => {}
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<>
     <LC.DeCau q={q} stt={l.so} />
@@ -660,8 +661,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   </>) : null
   const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
     <Suspense fallback={null}>
-      <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} cau={cauLive} view={lv} che={cheLive} de={deLive} khoaDe={q?.qid ?? ''}
-        doi={e ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi} />
+      <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} cau={cauLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
+        mic={liveBat && laEmGoi && (l?.pha === 'goi' || l?.pha === 'lam-bang')} doi={e ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi} />
     </Suspense>
   ) : null
 

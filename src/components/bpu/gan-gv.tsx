@@ -105,7 +105,9 @@ export function escRaHomNay(): boolean {
   return false
 }
 // LIVE BẢNG (10/11, docs/dac-ta-live-bang-1011.md mục 2.1): phần live của máy thầy (src/components/live/thay-noi.ts, nạp lười) báo có / đang live ⇒ nút «Live»
-// trên thanh trên của bảng. Bấm ⇒ bảng LUI về tờ chiếu (máy em soi đúng tờ: giấy đề + bảng đen) rồi bật live như bấm trên tờ; Esc / P đưa bảng về, live vẫn chạy.
+// trên thanh trên của bảng — giữ trạng thái «Đang live» qua mọi màn (tờ chiếu, bảng đua, chọn câu) vì live nằm ở cửa sổ app, không ở tờ.
+// Thầy chốt tối 10/11: live = TIẾNG chạy suốt buổi ⇒ bấm Live trên bảng thì live NGAY TẠI CHỖ (mic đã nhớ), bảng không lui. Chỉ lui về tờ khi cần thẻ chọn mic
+// (lần đầu) hoặc khi đang live mà thầy bấm «Đang live» (cụm điều khiển — mic, «Bảng → máy em», «Tắt live» — nằm trên tờ). Esc / P đưa bảng về, live vẫn chạy.
 // Đang live mà bảng đang lui (thầy giảng trên tờ) ⇒ ẩn viền đỏ toàn màn «Rời màn hình» (bpu-bang.css) — tờ có thẻ gọn «N em rời màn» không che bảng.
 let liveTt = { co: false, bat: false }
 /** Bảng đang lui vì live (không phải vì em lên bảng) ⇒ D / K / F ở app không chấm ai. */
@@ -119,11 +121,12 @@ export function datLive(tt: { co: boolean; bat: boolean }): void {
 function capLiveGon(): void { document.documentElement.toggleAttribute('data-bpu-live-gon', liveTt.bat && (bangAn() || tamAn)) }
 function bamLive(): void {
   if (!nguonTo || !khung) { useAppStore.getState().showToast('Thầy chọn câu để có tờ chiếu rồi bật Live.', 'warn'); return }
-  const dangLive = liveTt.bat
-  anViLive = true
-  anBang()
-  try { nguonTo.focus() } catch { /* tờ chặn */ }
-  if (!dangLive) void import('../live/thay-noi').then((m) => m.bamTuBang()).catch(() => {})
+  void import('../live/thay-noi').then((m) => {
+    if (!m.bamTuBang() || !nguonTo || !khung || bangAn()) return
+    anViLive = true
+    anBang()
+    try { nguonTo.focus() } catch { /* tờ chặn */ }
+  }).catch(() => {})
 }
 function veBang(): void {
   if (!hien) return

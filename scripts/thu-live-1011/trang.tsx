@@ -89,6 +89,7 @@ if (vai === 'em') {
     noiLive(w, 'gv', location.origin)
     w.onopen = () => w.send('{"t":"chao"}')
     w.onclose = () => setTimeout(noi, 800)
+    ;(window as unknown as { __ws: WebSocket }).__ws = w // bộ thử đóng vai bảng Bình Phản Ứng: gửi lệnh «gọi em lên bảng»
   }
   noi()
 }

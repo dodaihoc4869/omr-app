@@ -3,7 +3,9 @@
 // Tờ CHỈ LÀ MẶT: nút «Live», thẻ bật live + chọn mic, viên đỏ ba ngăn, «Tắt live», thẻ gọn «N em rời màn» + viền đỏ mảnh. MÁY CHẠY ở cửa sổ app
 // (src/components/live/thay-noi.ts): mic + WebRTC + phòng nằm ở đó vì (1) tờ là khung dựng lại mỗi lần thầy chọn câu — nối ở tờ thì rớt live;
 // (2) khung `srcdoc` / tờ mở cửa sổ riêng không chắc có quyền mic; (3) WebSocket của phòng vốn ở app.
-// Tờ → app:  { nguon:'to-chieu', loai:'live', viec, … }   viec = chao · bam · the-dong · chon-mic · bat-dau · khong-tieng · thu-lai · tieng-lop · tat · but · anh · vung
+// LUẬT (thầy chốt tối 10/11): bật live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu / dựng lại tờ; BẢNG chỉ xuống máy em khi cờ phòng `live.bang` bật
+// (tự bật lúc gọi em lên bảng, tự tắt lúc mở lượt mới) — công tắc «Bảng → máy em» trong cụm Live để thầy bật / tắt tay. Em lên bảng mở mic ⇒ thẻ «Đang nói» + «Thu mic».
+// Tờ → app:  { nguon:'to-chieu', loai:'live', viec, … }   viec = chao · bam · the-dong · chon-mic · bat-dau · khong-tieng · thu-lai · tieng-lop · tat · bang · thu-mic · but · anh · vung
 // App → tờ:  { nguon:'bpu-bang', lenh:'live-tt', tt }  (toàn bộ trạng thái để vẽ)   ·   { nguon:'bpu-bang', lenh:'live-muc', v }  (mức âm mic 0..1, ~11 lần / giây)
 // Bút: mọi sự kiện của `window.__mcBut.nghe` chuyển nguyên văn sang app (`viec:'but'`); sự kiện `trang` kèm ô giấy / ô bảng (`__mcBut.vung()`) + kiểu giấy
 // ⇒ máy em dựng đúng bố cục (src/components/live/bo-cuc.ts). Bấm Live ⇒ bút bật sẵn.
@@ -26,12 +28,23 @@ body.mc .mc-thanh .mc-lv-cum{flex:none;display:inline-flex;align-items:stretch;m
 .mc-lv-cum.vang{background:var(--mc-qua-nen);color:var(--mc-qua-chu);box-shadow:none}
 .mc-lv-cum .im{animation:mcLvNhay 1s steps(2,jump-none) infinite}
 @keyframes mcLvNhay{from{background:transparent;color:inherit}to{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}}
-body.mc-live .mc-thanh [data-k="T"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="Tab"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="P"] .mc-nut-chu{display:none}
+body.mc-live .mc-thanh [data-k="T"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="Tab"] .mc-nut-chu{display:none}
+body.mc.mc-live .mc-phim-nhom [data-k="P"] .mc-nut-chu{display:none!important}
+body.mc .mc-thanh .mc-lv-bg{gap:.45em;padding:0 .8em}
+.mc-lv-bg i{display:block;width:.62em;height:.62em;border-radius:50%;box-shadow:inset 0 0 0 1.5px currentColor}
+.mc-lv-bg[aria-pressed="true"]{background:var(--mc-bang-chu)!important;color:var(--mc-bang)!important;box-shadow:none!important}
+.mc-lv-bg[aria-pressed="true"] i{background:var(--mc-do);box-shadow:none}
+/* màn chiếu hẹp (1366): cụm Live gọn lại để «Tắt live» + «Cài đặt» không bị đẩy khỏi thanh */
+@media (max-width:1500px){.mc-lv-cum small,.mc-lv-bg span{display:none}body.mc-live .mc-thanh{gap:calc(var(--u)*.3)}.mc-lv-cum>span{padding:0 .6em}}
 body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
 .mc-lv-nhac{display:inline-flex;align-items:center;height:calc(var(--u)*2.3);padding:0 1em;border-radius:999px;background:var(--mc-thanh-nen);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-phu);font:600 calc(var(--u)*.9) var(--mc-sans);white-space:nowrap;font-variant-numeric:tabular-nums}
 body.mc-live .mc-thanh [data-k="?"]{display:none}
 /* thẻ nổi neo trên thanh */
 .mc-lv-the,.mc-lv-roi{position:fixed;right:calc(var(--u)*.75);bottom:calc(var(--u)*5);z-index:45;font-family:var(--mc-sans);color:var(--mc-bang-chu)}
+.mc-lv-roi{display:flex;flex-direction:column;align-items:flex-end;gap:calc(var(--u)*.6)}
+.mc-lv-noi{width:calc(var(--u)*23);padding:calc(var(--u)*.9) calc(var(--u)*1.1);border-radius:calc(var(--u)*1.5);background:var(--mc-thanh-nen);box-shadow:0 calc(var(--u)*1.4) calc(var(--u)*3.75) color-mix(in srgb,var(--mc-bang) 55%,transparent),inset 0 0 0 1px var(--mc-bang-vien)}
+.mc-lv-noi h3{margin:0;font:800 calc(var(--u)*1.15) var(--mc-sans)}
+.mc-lv-noi .mc-lv-n{height:calc(var(--u)*2.6);font-size:calc(var(--u)*.95)}
 .mc-lv-the{width:calc(var(--u)*27);max-width:calc(100vw - var(--u)*1.5);padding:calc(var(--u)*1.1);border-radius:calc(var(--u)*1.5);background:var(--mc-thanh-nen);box-shadow:0 calc(var(--u)*1.4) calc(var(--u)*3.75) color-mix(in srgb,var(--mc-bang) 55%,transparent),inset 0 0 0 1px var(--mc-bang-vien)}
 .mc-lv-the[hidden],.mc-lv-roi[hidden],.mc-lv-vien[hidden]{display:none}
 .mc-lv-the h3{margin:0 0 .2em;font:800 calc(var(--u)*1.3) var(--mc-sans)}
@@ -74,7 +87,7 @@ html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
 export const JS_LIVE_TO_CHIEU = `
   // ── V · live bảng (thầy 10/11) — mặt của tờ; máy chạy ở app: src/components/live/thay-noi.ts ──
   var LV = { tt: null, moRoi: false, hRoi: 0, roiCu: '', hDh: 0, anhXong: false, vungCu: '' };
-  var lvNut = document.createElement('button'), lvCum = document.createElement('button'), lvTat = document.createElement('button');
+  var lvNut = document.createElement('button'), lvCum = document.createElement('button'), lvTat = document.createElement('button'), lvBg = document.createElement('button');
   var lvThe = tao('div', 'mc-lv-the', body), lvRoi = tao('div', 'mc-lv-roi', body), lvVien = tao('div', 'mc-lv-vien', body);
   var LV_BT = {
     mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
@@ -93,16 +106,18 @@ export const JS_LIVE_TO_CHIEU = `
   function lvVung() { return window.__mcBut && window.__mcBut.vung ? window.__mcBut.vung() : {}; }
   function lvDongHo(tu) { var s = Math.max(0, Math.floor((Date.now() - tu) / 1000)), p = Math.floor(s / 60); s = s % 60; return (p < 10 ? '0' : '') + p + ':' + (s < 10 ? '0' : '') + s; }
   function lvLau(luc) { var s = Math.max(0, Math.floor((Date.now() - luc) / 1000)); return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
-  lvNut.type = lvCum.type = lvTat.type = 'button';
+  lvNut.type = lvCum.type = lvTat.type = lvBg.type = 'button';
+  lvBg.className = 'mc-lv-tat mc-lv-bg'; lvBg.hidden = true; lvBg.title = 'Bảng → máy em: máy cả lớp xem bảng thầy viết (tự bật khi gọi em lên bảng, tự tắt khi sang lượt mới)';
   lvNut.className = 'mc-lv-nut'; lvNut.hidden = true; lvNut.setAttribute('aria-label', 'Bật live'); lvNut.title = 'Live: cả lớp xem bảng + nghe thầy trên máy (phím V)'; lvNut.innerHTML = '<i></i>Live';
   lvCum.className = 'mc-lv-cum'; lvCum.hidden = true;
   lvTat.className = 'mc-lv-tat'; lvTat.hidden = true; lvTat.textContent = 'Tắt live';
   lvThe.hidden = lvRoi.hidden = lvVien.hidden = true;
   lvThe.setAttribute('role', 'dialog'); lvThe.setAttribute('aria-label', 'Bật live');
-  (function () { var c = document.getElementById('mc-cai-btn'); if (thanh && c) { thanh.insertBefore(lvNut, c); thanh.insertBefore(lvCum, c); thanh.insertBefore(lvTat, c); } })();
+  (function () { var c = document.getElementById('mc-cai-btn'); if (thanh && c) { thanh.insertBefore(lvNut, c); thanh.insertBefore(lvCum, c); thanh.insertBefore(lvBg, c); thanh.insertBefore(lvTat, c); } })();
   function lvBam() { if (!LV.tt || !LV.tt.co) { baoNhanh('Mở Điểm danh (Bình Phản Ứng) trước rồi bật Live', 2200); return; } lvGui('bam'); }
   lvNut.addEventListener('click', lvBam); lvCum.addEventListener('click', lvBam);
   lvTat.addEventListener('click', function () { lvGui('tat'); });
+  lvBg.addEventListener('click', function () { lvGui('bang', { v: !(LV.tt && LV.tt.bang) }); });
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey || (e.target && e.target.closest && e.target.closest('input,textarea,select'))) return;
     if (e.key === 'v' || e.key === 'V') { e.preventDefault(); lvBam(); }
@@ -110,24 +125,39 @@ export const JS_LIVE_TO_CHIEU = `
   }, true);
   lvThe.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-lv]'); if (b) lvGui(b.getAttribute('data-lv'), b.hasAttribute('data-v') ? { v: b.getAttribute('data-v') === '1' } : null); });
   lvThe.addEventListener('change', function (e) { if (e.target && e.target.tagName === 'SELECT') lvGui('chon-mic', { id: e.target.value }); });
-  lvRoi.addEventListener('click', function () { if (lvVien.hidden) return; LV.moRoi = !LV.moRoi; lvVeRoi(); lvHenThu(); });
+  lvRoi.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-thu]');
+    if (b) { lvGui('thu-mic', { sbd: b.getAttribute('data-thu') }); return; }
+    if (lvVien.hidden || (e.target.closest && e.target.closest('.mc-lv-noi'))) return;
+    LV.moRoi = !LV.moRoi; lvVeRoi(); lvHenThu();
+  });
   function lvHenThu() { clearTimeout(LV.hRoi); if (LV.moRoi) LV.hRoi = setTimeout(function () { LV.moRoi = false; lvVeRoi(); }, 4000); }
   function lvVeRoi() {
-    var ds = (LV.tt && LV.tt.pha === 'live' && LV.tt.roi) || [], n = ds.length, h, i, e;
-    lvVien.hidden = !n;
-    // không em nào rời: chỗ này nhắc «Lượt đang mở · N em chưa gửi» (thầy viết lời giải khi lượt chưa mở đáp án — đặc tả mục 5)
-    lvRoi.hidden = !n && !(LV.tt && LV.tt.pha === 'live' && LV.tt.chuaGui);
-    if (!n) { LV.moRoi = false; lvRoi.innerHTML = lvRoi.hidden ? '' : '<span class="mc-lv-nhac" role="status">Lượt đang mở · ' + LV.tt.chuaGui + ' em chưa gửi</span>'; return; }
+    var live = !!LV.tt && LV.tt.pha === 'live', ds = (live && LV.tt.roi) || [], noi = (live && LV.tt.noi) || [], n = ds.length, h = '', i, e;
     function ky(e) { var m = lvMau(e.mau); return '<b class="mc-lv-ky"' + (m ? ' style="--doi:' + m + '"' : '') + '>' + lvSach(e.ky) + '</b>'; }
-    if (!LV.moRoi) {
-      h = '<button type="button" class="mc-lv-roi-gon" aria-label="' + n + ' em rời màn, bấm để xem tên">' + LV_BT.roi + '<span>' + n + ' em rời màn</span>';
-      for (i = 0; i < Math.min(3, n); i++) h += ky(ds[i]);
-      lvRoi.innerHTML = h + '</button>'; return;
+    lvVien.hidden = !n;
+    if (!n) LV.moRoi = false;
+    // em lên bảng đang mở mic: thẻ «Đang nói» + «Thu mic»
+    if (noi.length) {
+      h += '<div class="mc-lv-noi" role="status"><h3>Đang nói</h3>';
+      for (i = 0; i < noi.length; i++) { e = noi[i]; h += '<div class="mc-lv-em">' + ky(e) + '<span>' + lvSach(e.ten) + '<small>' + (e.doi ? lvSach(e.doi) + ' · ' : '') + 'mic đang bật</small></span><button type="button" class="mc-lv-n do" style="flex:none" data-thu="' + lvSach(e.sbd) + '">Thu mic</button></div>'; }
+      h += '</div>';
     }
-    h = '<div class="mc-lv-roi-mo" role="status"><h3>' + LV_BT.roi + n + ' em rời màn</h3>';
-    for (i = 0; i < Math.min(3, n); i++) { e = ds[i]; h += '<div class="mc-lv-em">' + ky(e) + '<span>' + lvSach(e.ten) + '<small>' + (e.doi ? lvSach(e.doi) + ' · ' : '') + 'rời màn · ' + lvLau(e.luc) + '</small></span></div>'; }
-    if (n > 3) h += '<p>+' + (n - 3) + ' em nữa</p>';
-    lvRoi.innerHTML = h + '<p>Em quay lại thì tên tự mất.</p></div>';
+    if (n && !LV.moRoi) {
+      h += '<button type="button" class="mc-lv-roi-gon" aria-label="' + n + ' em rời màn, bấm để xem tên">' + LV_BT.roi + '<span>' + n + ' em rời màn</span>';
+      for (i = 0; i < Math.min(3, n); i++) h += ky(ds[i]);
+      h += '</button>';
+    } else if (n) {
+      h += '<div class="mc-lv-roi-mo" role="status"><h3>' + LV_BT.roi + n + ' em rời màn</h3>';
+      for (i = 0; i < Math.min(3, n); i++) { e = ds[i]; h += '<div class="mc-lv-em">' + ky(e) + '<span>' + lvSach(e.ten) + '<small>' + (e.doi ? lvSach(e.doi) + ' · ' : '') + 'rời màn · ' + lvLau(e.luc) + '</small></span></div>'; }
+      if (n > 3) h += '<p>+' + (n - 3) + ' em nữa</p>';
+      h += '<p>Em quay lại thì tên tự mất.</p></div>';
+    } else if (live && LV.tt.chuaGui && !noi.length) {
+      // không em nào rời: chỗ này nhắc «Lượt đang mở · N em chưa gửi» (thầy viết lời giải khi lượt chưa mở đáp án — đặc tả mục 5)
+      h += '<span class="mc-lv-nhac" role="status">Lượt đang mở · ' + LV.tt.chuaGui + ' em chưa gửi</span>';
+    }
+    lvRoi.hidden = !h;
+    if (lvRoi.__h !== h) { lvRoi.__h = h; lvRoi.innerHTML = h; }
   }
   function lvVeThe() {
     var t = LV.tt && LV.tt.the, h, i, m, loi;
@@ -163,7 +193,8 @@ export const JS_LIVE_TO_CHIEU = `
   function lvVe() {
     var t = LV.tt, live = !!t && t.pha === 'live', dang = !!t && t.pha === 'dang-bat', h, i, khoa;
     lvNut.hidden = !t || !t.co || live || dang;
-    lvCum.hidden = !(live || dang); lvTat.hidden = !live;
+    lvCum.hidden = !(live || dang); lvTat.hidden = lvBg.hidden = !live;
+    if (live) { lvBg.setAttribute('aria-pressed', t.bang ? 'true' : 'false'); lvBg.innerHTML = '<i></i>Bảng<span>&nbsp;→ máy em</span>'; lvBg.setAttribute('aria-label', 'Bảng xuống máy em: ' + (t.bang ? 'đang bật' : 'đang tắt')); }
     body.classList.toggle('mc-live', live);
     clearInterval(LV.hDh);
     if (dang) { lvCum.className = 'mc-lv-cum'; lvCum.innerHTML = '<span><i class="cham"></i>Đang bật live…</span>'; }
