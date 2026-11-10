@@ -357,7 +357,8 @@ export function lamBang(st: TrangThaiPhong, nay: number): boolean {
 }
 export function duDoan(st: TrangThaiPhong, sbd: string, v: 0 | 1, nay: number): boolean {
   const l = st.luot
-  if (!l?.goi || l.pha === 'mo' || l.goi.sbd === sbd || !em(st, sbd) || l.goi.duDoan[sbd] != null) return false
+  // 10/11: thầy đã chấm (bảng hiện kết quả trước khi mở đáp án) ⇒ hết đoán — không ai đoán sau khi đã thấy kết quả.
+  if (!l?.goi || l.pha === 'mo' || l.goi.dat != null || l.goi.sbd === sbd || !em(st, sbd) || l.goi.duDoan[sbd] != null) return false
   l.goi.duDoan[sbd] = v ? 1 : 0; st.capNhat = nay
   return true
 }

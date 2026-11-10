@@ -4,7 +4,7 @@
 // (3) máy em: cả lớp thấy kết quả lên bảng (kJ đội chỉ sau khi mở đáp án).
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { chamLenBang, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm } from '../src/lib/bpu/phong'
+import { chamLenBang, duDoan, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm } from '../src/lib/bpu/phong'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 const goiLenhGhi = vi.hoisted(() => vi.fn())
@@ -142,9 +142,10 @@ describe('máy em: kết quả lên bảng cho cả lớp', () => {
     ws.nhan(viewEm(st, 'S2'))
     expect(q('.bpu-klb')).toBeNull()
     chamLenBang(st, true, T0 + 1); ws.nhan(viewEm(st, 'S2'))
-    expect(q('.bpu-klb')?.textContent).toMatch(/Đỗ Đại Học · Đạt/)
-    expect(q('.bpu-klb')?.textContent).not.toMatch(/kJ/) // chưa mở đáp án ⇒ chưa có số
+    expect(q('.bpu-klb')).toBeNull() // chưa mở đáp án ⇒ máy em chưa hiện (hiện cùng lúc với số kJ đội)
+    expect(duDoan(st, 'S2', 1, T0 + 1)).toBe(false) // đã chấm ⇒ hết đoán (bảng đang hiện kết quả)
     moDapAn(st, T0 + 2, chamSo); ws.nhan(viewEm(st, 'S2'))
+    expect(q('.bpu-klb')?.textContent).toMatch(/Đỗ Đại Học · Đạt/)
     expect(q('.bpu-klb')?.textContent).toMatch(/\+200 kJ/)
     expect(q('.bpu-che')).toBeTruthy()
     ws.nhan(viewEm(st, 'S1'))
