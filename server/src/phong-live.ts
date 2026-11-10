@@ -206,7 +206,8 @@ export class LiveMay {
         doi = LL.liveBat(st, nay)
         if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
       } else if (t === 'live-tat') { doi = this.tat(st, nay) }
-      else if (t === 'live-dat') doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop }, nay)
+      else if (t === 'live-dat') doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang }, nay)
+      else if (t === 'live-thu-mic') doi = LL.liveThuMic(st, nay) // thầy bấm «Thu mic»: phòng gỡ + đóng track ở SFU khi phát view
       else if (t === 'live-nhip') {
         LL.liveNhip(st, nay)
         // Nhịp chỉ ghi storage thưa (1 phút / lần) ⇒ phòng ngủ rồi thức lại không tự tắt nhầm live đang chạy.
@@ -217,6 +218,8 @@ export class LiveMay {
     }
     if (!a.s) return true
     if (t === 'live-bu') { await this.guiBu(st, ws, j.net); return true }
+    // Em tự tắt mic (bấm «Xong», mất quyền mic): chỉ gỡ được mic của CHÍNH mình.
+    if (t === 'live-mic-tat') { if (LL.liveThuMic(st, nay, a.s)) { await this.chu.luu(false); this.chu.phat() } return true }
     if (await this.tuTat(st, nay)) return true
     if (t === 'live-ok') {
       if (!l.bat || !LL.duocXemLive(st, a.s)) return true
@@ -258,10 +261,15 @@ export class LiveMay {
     return true
   }
   /** Em đã về lại app / rời màn ⇒ số em xem đổi (view đầy đủ đã do phòng phát). Kết nối đóng ⇒ bỏ khỏi danh sách giữ sẵn + báo lại số em xem. */
-  dong(ws?: WsMayChu): void {
+  async dong(ws?: WsMayChu): Promise<void> {
+    const a = ws ? this.kem(ws) : null
     if (ws) { this.vai.delete(ws); for (const ds of [this.dsHs, this.dsDiem]) { const i = ds ? ds.indexOf(ws) : -1; if (i >= 0) ds!.splice(i, 1) } }
     else this.boDs()
-    if (this.chu.nho()?.live?.bat) this.henBaoXem()
+    const st = this.chu.nho() ?? (a?.v === 'hs' ? await this.chu.doc() : null)
+    if (!st?.live?.bat) return
+    // Em đang phát mic mất kết nối (không còn kết nối nào khác của em) ⇒ thu mic.
+    if (a?.v === 'hs' && a.s && st.live.mic?.sbd === a.s && !this.chu.ctx.getWebSockets('hs').some((w) => w !== ws && this.kem(w).s === a.s) && LL.liveThuMic(st, Date.now(), a.s)) { await this.chu.luu(false); this.chu.phat(); return }
+    this.henBaoXem()
   }
   /** Có kết nối mới vào phòng ⇒ bỏ danh sách giữ sẵn (lần gửi kế dựng lại, có máy mới). */
   noiMoi(): void { this.boDs() }

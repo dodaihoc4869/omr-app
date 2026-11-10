@@ -15,9 +15,13 @@
 //   ws.onmessage = (e) => le.nhanTinPhong(e.data)          // MỌI tin của phòng (viewEm, live-so, khung nhị phân)
 //   ws.onopen (nối lại) ⇒ le.khiNoiLai()
 //   lần chạm đầu ⇒ le.moKhoaTieng()  ·  rời màn / về ⇒ le.datRoiMan(true / false)  ·  nút Tiếng ⇒ le.datTieng(true / false)
-//   mỗi khung hình khi `trangThai().bat`: const k = le.khung()  ⇒ vẽ đầu nét nội suy `k.dau` + con trỏ `k.tro`
+//   mỗi khung hình khi `trangThai().bang`: const k = le.khung()  ⇒ vẽ đầu nét nội suy `k.dau` + con trỏ `k.tro`
+//   `trangThai().bat` mà `bang` false ⇒ giữ màn câu hỏi bình thường, chỉ có tiếng thầy; `bang` true (thầy gọi bạn lên bảng / bật tay) ⇒ hiện bảng live.
+//   em được gọi lên bảng (`trangThai().duocMoMic`) ⇒ le.batMicLenBang() (hoặc tuỳ chọn `tuBatMic: true`) · le.tatMic() · le.mucAmMic()
+//   bộ bắt rời màn: bỏ qua mất tiêu điểm khi `le.dangChoQuyenMic()` (hộp hỏi quyền mic đang hiện).
+// MÁY THẦY thêm: lt.dat({ bang: true|false }) bật / tắt tay bảng live · lt.thuMic() · lt.datNgheEm(b) · lt.mucAmEm() · trangThai().emNoi / .bang
 export { taoLiveThay, type AnhBang, type KetQuaBat, type LiveThay, type TrangThaiLiveThay, type TuyChonLiveThay } from './thay'
-export { taoLiveEm, type KhungLiveEm, type LiveEm, type TrangThaiLiveEm, type TuyChonLiveEm } from './em'
+export { taoLiveEm, type KetQuaMicEm, type KhungLiveEm, type LiveEm, type TrangThaiLiveEm, type TuyChonLiveEm } from './em'
 export type { KenhPhong, MoiTruongLive, TuyChonOpus } from './sfu'
 export type { BangNet } from './so-net'
 export type { TenSoDo, TomTatSo } from './so-do'
