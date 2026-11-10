@@ -502,7 +502,8 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
   return {
     t: 'em' as const,
     ketThuc: st.ketThuc, soLuot: st.soLuot,
-    em: e ? { sbd: e.sbd, ten: e.ten, doi: d, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, roi: e.roi, hang, soEm: xep.length } : null,
+    // `dangRoi` (10/11): phòng CÒN ghi em «đang rời» ⇒ máy em đã về mà cờ này còn bật thì gửi lại `ve` (tin `ve` trước có thể mất trong kết nối chết).
+    em: e ? { sbd: e.sbd, ten: e.ten, doi: d, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, roi: e.roi, dangRoi: !!st.roiNay?.includes(e.sbd), hang, soEm: xep.length } : null,
     doi: { so: st.ds.filter((x) => x.doi === d && x.vao).length, tong: st.ds.filter((x) => x.doi === d).length, kj: diemDoi(st, d) },
     /** Biến động kJ của CHÍNH em (5 mục mới nhất, `id` tăng dần) — máy em hiện thẻ nhỏ bay lên khi có `id` mới. */
     bienDongEm: (st.bienDong ?? []).filter((x) => x.sbd === sbd).slice(-5),

@@ -251,10 +251,32 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     const truoc = emRoi.current
     buRoi.current = gui({ t: 'roi' }) && truoc != null ? truoc : null
   }, [gui])
-  /** VỀ LẠI: chỉ khi trước đó đã báo `roi`, trang hiện, có tiêu điểm, không chia đôi ⇒ `ve`. */
-  const veLai = useCallback(() => {
-    if (daBaoRoi.current && !document.hidden && document.hasFocus() && !dangChiaDoi()) { daBaoRoi.current = false; gui({ t: 've' }) }
+  /** VỀ LẠI CÓ XÁC NHẬN (10/11 thầy «quay lại Bình Phản Ứng vẫn chưa ẩn cảnh báo»): trước đây `ve` chỉ gửi MỘT lần đúng lúc trang hiện lại — lúc ấy chưa có
+   *  tiêu điểm, hoặc tin đi vào kết nối đã chết (máy treo trang khi ra ngoài) ⇒ bảng đỏ mãi. Nay: còn nợ `ve` (đã báo rời / phòng còn ghi `dangRoi` / `ve` chưa
+   *  được phòng xác nhận) ⇒ tự thử lại mỗi 0,5 s tới khi phòng xác nhận; em chạm vào màn = chắc chắn đã về (không cần chờ tiêu điểm); gửi `ve` quá 2,5 s
+   *  mà phòng im ⇒ kết nối chết ⇒ nối lại ngay (phòng tự gỡ «đang rời» khi em nối lại). Trang ẩn / đang chia đôi / cửa sổ nổi giữ tiêu điểm ⇒ KHÔNG gửi. */
+  const phongRoi = useRef(false)
+  const choVe = useRef(0)
+  const lucVe = useRef(0)
+  const henVe = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const noiLai = useRef<(() => void) | null>(null)
+  const thuVeRef = useRef<(tuongTac?: boolean) => void>(() => {})
+  const thuVe = useCallback((tuongTac = false) => {
+    clearTimeout(henVe.current)
+    if (dung.current || !(daBaoRoi.current || phongRoi.current || choVe.current)) return
+    if (document.hidden) return // trang ẩn: không hẹn giờ nền; trang hiện lại (visibilitychange / pageshow / focus) sẽ gọi lại
+    henVe.current = setTimeout(() => thuVeRef.current(), 500)
+    if (dangChiaDoi() || !(tuongTac || document.hasFocus())) return
+    const nay = Date.now()
+    if (daBaoRoi.current || (phongRoi.current && nay - lucVe.current > 1000)) {
+      daBaoRoi.current = false; lucVe.current = nay
+      if (!choVe.current) choVe.current = nay
+      gui({ t: 've' })
+    }
+    if (choVe.current && nay - choVe.current > 2500) { choVe.current = nay; noiLai.current?.() }
   }, [gui])
+  thuVeRef.current = thuVe
+  const veLai = useCallback(() => thuVe(), [thuVe])
 
   // Nối phòng: xin vé (theo buổi em vừa điểm danh, hoặc buổi đang mở hôm nay em có mặt) ⇒ WebSocket; rớt ⇒ nối lại lùi dần; phòng chưa mở ⇒ hỏi lại sau 8 giây.
   useEffect(() => {
@@ -287,6 +309,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
           let m: Tin
           try { m = JSON.parse(e.data) as Tin } catch { return }
           if (m.t === 'em') {
+            phongRoi.current = (m as unknown as ViewEm).em?.dangRoi === true
+            if (!phongRoi.current) choVe.current = 0 // phòng xác nhận em không còn «đang rời» (phòng đời cũ không có cờ ⇒ tin nào về cũng là kết nối còn sống)
             const so = (m as unknown as ViewEm).em?.roi
             if (typeof so === 'number') {
               emRoi.current = so
@@ -298,6 +322,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
             }
             kiemBu.current = false
             chuaMo.current = false; setV(m as unknown as ViewEm); setTt('ok')
+            if (phongRoi.current) thuVeRef.current() // phòng còn ghi «đang rời» mà em đang ở đây ⇒ gỡ
           }
           else if (m.t === 'chua-mo') { chuaMo.current = true; setTt('chua-mo'); try { w.close() } catch { /* đã đóng */ } }
           else if (m.t === 'tra-kq' && m.ok === false) setBaoTra(m.ly === 'het-gio' ? 'Hết giờ, đáp án gửi muộn không được tính.' : m.ly === 'da-khoa' ? 'Thầy đã khoá lượt này.' : m.ly === 'la' ? 'Em không thuộc lớp của buổi này.' : '')
@@ -306,8 +331,10 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
       } catch { setTt('mat-mang'); henLai() }
     }
+    // Kết nối «mở» nhưng đã chết (phòng im sau `ve`): bỏ hẳn, nối mới ngay. Đang nối dở (ws rỗng) ⇒ để luồng nối lại sẵn có lo, không mở hai kết nối.
+    noiLai.current = () => { const w = ws.current; if (!w || w.readyState !== 1) return; ws.current = null; clearInterval(ping); try { w.close() } catch { /* đã đóng */ } loi.current = 0; henLai(0) }
     void noi()
-    return () => { dung.current = true; clearTimeout(hen); clearInterval(ping); try { ws.current?.close() } catch { /* đã đóng */ } ws.current = null }
+    return () => { dung.current = true; noiLai.current = null; clearTimeout(henVe.current); clearTimeout(hen); clearInterval(ping); try { ws.current?.close() } catch { /* đã đóng */ } ws.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, buoiId])
 
@@ -392,6 +419,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     window.addEventListener('focus', kiemNoi)
     window.addEventListener('resize', kiemNoi)
     window.addEventListener('pagehide', anTrang)
+    const cham = () => thuVe(true) // em chạm vào màn Bình Phản Ứng ⇒ chắc chắn đã về (cửa sổ nổi nhận chạm thì trang này không nhận)
+    window.addEventListener('pointerdown', cham, true)
     if (dangChiaDoi()) kiemNoi() // vào BPU khi đang chia đôi
     try { window.history.pushState({ bpu: 1 }, '') } catch { /* trình duyệt cũ */ }
     const giuLai = () => { try { window.history.pushState({ bpu: 1 }, '') } catch { /* bỏ qua */ } }
@@ -400,8 +429,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       huy = true; clearTimeout(henNoi); clearTimeout(henKhoa)
       document.removeEventListener('visibilitychange', doi); window.removeEventListener('blur', kiemNoi); window.removeEventListener('focus', kiemNoi)
       window.removeEventListener('resize', kiemNoi); window.removeEventListener('pagehide', anTrang); window.removeEventListener('popstate', giuLai)
+      window.removeEventListener('pointerdown', cham, true)
     }
-  }, [baoRoi, veLai, dangChoi])
+  }, [baoRoi, veLai, thuVe, dangChoi])
   // GIỮ MÀN SÁNG (thầy 10/11 «cho mọi điện thoại»): từ lúc phòng nối (có `viewEm`) tới khi thầy kết thúc buổi — kể cả lúc màn BPU đang ẩn chờ lượt.
   // wakeLock; không có / bị từ chối / app cài trên iOS ⇒ video câm dự phòng (`giu-sang.ts`). Kết thúc buổi / gỡ màn ⇒ nhả hết.
   const giuSangBat = !!v && !v.ketThuc
