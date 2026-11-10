@@ -204,6 +204,10 @@ html:not(#_):not(#__) .bpu-hs .ht2-lam-y-nut button[aria-pressed='true']:nth-chi
 .bpu-che-noi > .bpu-bd-neo { margin-top: -12px; } /* mốc cao 0 không ăn khe lưới của lớp che */
 .bpu-bd { position: absolute; left: 0; right: 0; top: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; padding-inline: 16px; pointer-events: none; }
 .bpu-che-noi > .bpu-bd-neo .bpu-bd { padding-inline: 0; }
+/* 10/11 (thầy «chèn chữ»): trong lớp che thẻ kJ nằm TRONG dòng chảy (đẩy vòng ✓/✗ xuống), không treo đè lên vòng kết quả. */
+.bpu-che-noi > .bpu-bd-neo { height: auto; }
+.bpu-che-noi > .bpu-bd-neo:not(:empty) { margin-top: 0; } /* :empty chứ không :has (iPhone iOS 14–15) */
+.bpu-che-noi > .bpu-bd-neo .bpu-bd { position: static; }
 /* Trong lớp che thẻ nổi trên vòng ✓/✗: CHỈ thẻ mới nhất (2–3 thẻ cùng lúc chồng xuống tới dòng «Chưa đúng» / số kJ — đè chữ). Số kJ đủ ở dòng phụ. */
 .bpu-che-noi .bpu-bd-the:not(:last-child) { display: none; }
 .bpu-bd-the { display: flex; align-items: center; gap: 8px; max-width: min(100%, 440px); padding: 6px 16px 6px 8px; border-radius: 22px; background: var(--tr-mat); color: var(--tr-chu);

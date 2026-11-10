@@ -91,13 +91,13 @@ describe('luật kJ 09/11 — lên bảng', () => {
     expect(diemDoi(st, d) - tong).toBe(NHANH_1S - 100)
     expect(st.bienDong!.at(-1)).toMatchObject({ sbd: 'S1', kjDoi: -100, lyDo: 'Đúng · nhanh thứ 1 · đúng trên máy, chưa giải được trên bảng' })
   })
-  it('Chưa đạt mà trên máy sai / không gửi ⇒ 0 / 0, vẫn có mục «Lên bảng chữa — không trừ»', () => {
+  it('Chưa đạt mà trên máy sai / không gửi ⇒ 0 / 0, vẫn có mục «Lên bảng chữa, không trừ»', () => {
     for (const tra of [[['S1', 'A']], []] as [string, string][][]) {
       const st = phong(), d = e(st, 'S1').doi, dt = st.doiThuong[d]!
       luot(st, 1, tra, { sbd: 'S1', dat: false })
       expect(st.doiThuong[d]).toBe(dt)
       expect(e(st, 'S1').kj).toBe(0)
-      expect(st.bienDong!.at(-1)).toMatchObject({ sbd: 'S1', kjEm: 0, kjDoi: 0, lyDo: 'Lên bảng chữa — không trừ' })
+      expect(st.bienDong!.at(-1)).toMatchObject({ sbd: 'S1', kjEm: 0, kjDoi: 0, lyDo: 'Lên bảng chữa, không trừ' })
     }
   })
   it('kJ em KẸP 0 (đội vẫn trừ đủ); mục ghi số THỰC đổi', () => {

@@ -435,7 +435,7 @@ export function moDapAn(st: TrangThaiPhong, nay: number, chamSo: (traLoi: string
     else if (g.dat === false) {
       const t = l.tra[duoc.sbd], dungTrenMay = !!t && !t.kb && !l.tuLuan && chamTra(l, t.chon, chamSo).dung
       if (dungTrenMay) them(duoc.sbd, -KJ.lenBangTru, -KJ.lenBangTru, 'đúng trên máy, chưa giải được trên bảng')
-      else them(duoc.sbd, 0, 0, 'lên bảng chữa — không trừ')
+      else them(duoc.sbd, 0, 0, 'lên bảng chữa, không trừ')
     }
   }
   if (g && g.dat != null) for (const [s, v] of Object.entries(g.duDoan)) if ((v === 1) === g.dat && em(st, s)) them(s, KJ.doanDung, 0, 'đoán đúng bạn lên bảng')
