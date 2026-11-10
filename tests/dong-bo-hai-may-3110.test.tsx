@@ -3,7 +3,7 @@
 // đè lên số máy chủ. Máy chủ biết em đã làm NHIỀU HƠN chặng dở ấy (máy khác làm tiếp) ⇒ bản lưu cũ bị bỏ, Lộ trình hiện đúng số máy chủ. Máy chủ chưa theo kịp
 // (câu máy này vừa nộp chưa về) ⇒ vẫn hiện tiến độ của máy này như cũ.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { cleanup, render } from '@testing-library/react'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 vi.mock('../src/lib/phan-hoi', () => ({ phanHoi: vi.fn() }))
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
