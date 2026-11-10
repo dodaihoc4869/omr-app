@@ -8,6 +8,8 @@ export interface EmLyDo {
   soSai?: number
   soLan14?: number
   lanCuoiLenBang?: string | null
+  /** (10/11) Lý do bộ chọn theo toàn bộ lịch sử trả về (src/lib/bpu/chon-em-bpu.ts) — đủ 2 dòng thì dùng thẳng, thiếu ⇒ ba dòng chung dưới. */
+  lyDoBpu?: readonly string[]
 }
 const NGAY_MS = 86_400_000
 
@@ -20,6 +22,7 @@ export function chuMucDo(mucDo: string | null | undefined): string {
 }
 
 export function lyDoLenBang(e: EmLyDo, o: { mucDo?: string | null; giayGui?: number | null; nowMs: number }): string[] {
+  if ((e.lyDoBpu?.length ?? 0) >= 2) return e.lyDoBpu!.slice(0, 3)
   const muc = chuMucDo(o.mucDo)
   const ra: string[] = []
   if (e.loai === 'da_dung') ra.push('Em đã tự làm đúng câu này trên app: lên giảng lại cho cả lớp.')

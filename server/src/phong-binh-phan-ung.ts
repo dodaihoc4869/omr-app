@@ -280,7 +280,7 @@ export class PhongBinhPhanUng {
   private phat(): void {
     const st = this.st
     if (!st) return
-    const bang = JSON.stringify(L.viewBang(st))
+    const bang = JSON.stringify(L.viewBang(st, chamSo))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
     for (const ws of this.ctx.getWebSockets('hs')) { const a = ws.deserializeAttachment() as KemBpu | null; if (a?.s) this.gui(ws, JSON.stringify(L.viewEm(st, a.s))) }
   }
@@ -386,7 +386,7 @@ export class PhongBinhPhanUng {
     if (!st) { this.gui(ws, JSON.stringify({ t: 'chua-mo' })); return }
     const nay = Date.now()
     // Em NỐI LẠI (tắt hẳn app rồi mở lại sau khi đã báo `roi` — không kịp gửi `ve`) ⇒ coi như đã quay lại: gỡ khỏi «đang rời», bảng tắt báo động.
-    if (j.t === 'chao') { const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay); this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st) : L.viewEm(st, a.s))); if (!veLai) return; j = { t: 'chao-ve' } as Row }
+    if (j.t === 'chao') { const veLai = a.v === 'hs' && !st.ketThuc && L.veMan(st, a.s, nay); this.gui(ws, JSON.stringify(a.v === 'gv' ? L.viewBang(st, chamSo) : L.viewEm(st, a.s))); if (!veLai) return; j = { t: 'chao-ve' } as Row }
     if (st.ketThuc) return
     let doi = j.t === 'chao-ve', gom = false
     if (a.v === 'hs') {

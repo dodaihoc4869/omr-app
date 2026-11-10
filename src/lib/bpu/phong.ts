@@ -467,8 +467,10 @@ export function xepDoi(st: TrangThaiPhong): { doi: number; tong: number; coMat: 
 }
 export const xepEm = (st: TrangThaiPhong): EmPhong[] => [...st.ds].filter((e) => e.vao).sort((a, b) => b.kj - a.kj || a.ten.localeCompare(b.ten))
 
-/** Thông tin cho BẢNG CHIẾU (máy thầy): đủ mọi thứ; đáp án chỉ khi đã mở. */
-export function viewBang(st: TrangThaiPhong) {
+/** Thông tin cho BẢNG CHIẾU (máy thầy): đủ mọi thứ; đáp án chỉ khi đã mở.
+ *  `chamSo` (máy chủ truyền, 10/11): lượt trắc nghiệm đang «tra-loi» ⇒ thêm `kiem` {sbd: [đúng 1/0, giây gửi]} CHỈ cho bộ chọn em lên bảng (ưu tiên em đúng
+ *  trên máy để kiểm thật, có lượt chọn em sai để chữa). KHÔNG vẽ, KHÔNG vào lý do (lộ đúng/sai làm hỏng trò đoán của lớp), không bao giờ ra `viewEm`. */
+export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: string) => boolean) {
   const l = st.luot
   return {
     t: 'bang' as const,
@@ -482,6 +484,7 @@ export function viewBang(st: TrangThaiPhong) {
       so: l.so, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, batDau: l.batDau, han: l.han, pha: l.pha, roiMe: l.roiMe, kich: l.kich,
       daGui: Object.keys(l.tra),
       chuaBiet: Object.entries(l.tra).filter(([, t]) => t.kb).map(([s]) => s),
+      ...(chamSo && l.pha === 'tra-loi' && !l.tuLuan ? { kiem: Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, [chamTra(l, t.chon, chamSo).dung ? 1 : 0, Math.max(1, Math.round(t.t / 1000))] as [0 | 1, number]])) } : {}),
       goi: l.goi ? { sbd: l.goi.sbd, lyDo: l.goi.lyDo, dat: l.goi.dat, doanDung: Object.values(l.goi.duDoan).filter((v) => v === 1).length, doanSai: Object.values(l.goi.duDoan).filter((v) => v === 0).length, tiep: tongTiep(l.goi) } : null,
       ...(l.pha === 'mo' ? { dung: l.dung, chon: Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, t.chon])), ketQua: l.ketQua } : {}),
     } : null,

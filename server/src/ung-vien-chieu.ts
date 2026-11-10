@@ -2,19 +2,26 @@
 // {ten, soLan14, lanCuoiLenBang} (máy thầy tự thêm em chưa có số đo vào từng câu) + `mucDo` từng câu + `soSai` {qid:{sbd:n}} — để chia tầng
 // (src/lib/chon-em-phan-tang.ts). Trường theo em để ở bảng `em`, không lặp theo câu × em (gói nhỏ hơn).
 // Ba truy vấn thêm đi chung một đợt Promise.all — không thêm vòng chờ nối tiếp.
+// KÊNH `bpu` (Bình Phản Ứng, thầy 09/11 «chọn học sinh lên bảng theo toàn bộ lịch sử làm bài … có lý do»): thêm `bpu` = {tenDang, chuyenDe, em:{sbd:{dang,cd,ngay14,lb,lbCuoi,datCuoi}}}
+// — đúng/tổng lượt làm câu CÙNG DẠNG (và cùng chuyên đề) trên app, số ngày học trong 14 ngày, mọi lần lên bảng (len_bang ∪ bpu_luot) kèm Đạt. Bốn câu đọc đi CHUNG batch,
+// `bpu_luot` (bảng tạo lười) đọc SONG SONG với batch (Promise.all, lỗi ⇒ rỗng) — không thêm đợt chờ nối tiếp. Kênh khác không đổi.
 import type { Env } from './kieu'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { sqlTenLopHs } from './goi-bai-7'
 type Row=Record<string,unknown>
 const ds=(v:unknown,n:number)=>Array.isArray(v)?[...new Set(v.filter((x):x is string=>typeof x==='string'&&!!x&&x.length<=180))].slice(0,n):[]
+/** Lần lên bảng ở Bình Phản Ứng (bảng phòng ghi lúc kết thúc buổi; 1 = Chưa đạt, 2 = Đạt). Cột trần `len_bang` cạnh MAX(luc) = kết quả của lần mới nhất (SQLite). */
+const SQL_BPU_LUOT='SELECT sbd,COUNT(*) n,SUM(len_bang=2) d,MAX(luc) cuoi,len_bang kq FROM bpu_luot WHERE sbd IN(SELECT value FROM json_each(?)) AND len_bang>0 GROUP BY sbd'
+const ngayVnLui=(n:number)=>new Date(Date.now()+7*3600_000-n*864e5).toISOString().slice(0,10)
 export async function ungVienChieu(env:Env,b:Row){
  let sbds=ds(b.sbd,200);const qids=ds(b.qids,120)
  if(!sbds.length&&typeof b.lop==='string'&&b.lop){const r=await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa' LIMIT 200`).bind(b.lop).all<{sbd:string}>();sbds=r.results.map(e=>e.sbd)}
  if(!sbds.length||!qids.length)return {ok:true,cau:{}}
 const J=(v:unknown)=>JSON.stringify(v)
- // MỘT lượt khứ hồi D1 cho cả 7 câu đọc (batch) — trước 21/10 là 5 lượt song song; không thêm đợt chờ nối tiếp.
- const [em,cau,kn,p,luot,lb,md]=await env.DB.batch<Row>([
+ const bpu=b.kenh==='bpu'
+ // MỘT lượt khứ hồi D1 cho cả 7 câu đọc (batch) — trước 21/10 là 5 lượt song song; không thêm đợt chờ nối tiếp. Kênh bpu: +4 câu cùng batch, `bpu_luot` song song.
+ const [[em,cau,kn,p,luot,lb,md,...them],bl]=await Promise.all([env.DB.batch<Row>([
   env.DB.prepare(`SELECT sbd,ho_ten FROM hoc_sinh h WHERE sbd IN(SELECT value FROM json_each(?)) AND COALESCE(trang_thai,'')<>'khoa' AND (?='' OR ${sqlTenLopHs('h')}=?)`).bind(JSON.stringify(sbds),typeof b.lop==='string'?b.lop:'',typeof b.lop==='string'?b.lop:''),
   env.DB.prepare('SELECT qid,version FROM game_v2_question WHERE qid IN(SELECT value FROM json_each(?))').bind(JSON.stringify(qids)),
   env.DB.prepare('SELECT qid,vkn_json FROM omni_q WHERE qid IN(SELECT value FROM json_each(?))').bind(JSON.stringify(qids)),
@@ -22,7 +29,8 @@ const J=(v:unknown)=>JSON.stringify(v)
   env.DB.prepare(`SELECT s.sbd,s.qid,s.ket_qua,s.luc,json_extract(CASE WHEN json_valid(s.raw_json) THEN s.raw_json ELSE '{}' END,'$.ht_cau_version') version FROM su_kien_hoc s WHERE s.sbd IN(SELECT value FROM json_each(?)) AND s.qid IN(SELECT value FROM json_each(?)) AND ${SQL_LA_LAN_LAM} AND COALESCE(s.assistance,'none')='none' AND COALESCE(s.visibility,'')<>'embargoed' AND (s.nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=s.ma_nguon AND ${SQL_DA_CONG_BO('c')})) AND NOT EXISTS(SELECT 1 FROM loi_giai_hoi h WHERE h.sbd=s.sbd AND h.qid=s.qid AND julianday(h.luc)<=julianday(s.luc) AND julianday(h.luc)>julianday(s.luc)-0.5) ORDER BY s.luc DESC LIMIT 20000`).bind(JSON.stringify(sbds),JSON.stringify(qids)),
   env.DB.prepare(`SELECT sbd,SUM(luc>=?) n,MAX(luc) cuoi FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) AND luc>=? GROUP BY sbd`).bind(new Date(Date.now()-14*864e5).toISOString(),J(sbds),new Date(Date.now()-60*864e5).toISOString()),
   env.DB.prepare('SELECT qid,MAX(muc_do) md FROM cau_meta WHERE qid IN(SELECT value FROM json_each(?)) GROUP BY qid').bind(J(qids)),
- ])
+  ...(bpu?lenhBpu(env,sbds,qids[0]!):[]),
+ ]),bpu?env.DB.prepare(SQL_BPU_LUOT).bind(J(sbds)).all<Row>().then(r=>r.results,()=>null):Promise.resolve(null)])
  const versions=new Map(cau.results.map(q=>[String(q.qid),String(q.version)])),skills=new Map<string,Set<string>>()
  for(const r of kn.results){const a=skills.get(String(r.qid))??new Set<string>();const values=JSON.parse(String(r.vkn_json)) as unknown;if(!Array.isArray(values))throw new Error('Ma trận kỹ năng của câu chưa hợp lệ.');for(const k of values)if(typeof k==='string'&&k)a.add(k);skills.set(String(r.qid),a)}
  const pv=new Map(p.results.filter(r=>Number.isFinite(Number(r.p))&&Number(r.p)>=0&&Number(r.p)<=1).map(r=>[`${r.sbd}|${r.vkn_id}`,Number(r.p)])),last=new Map<string,Row>()
@@ -40,5 +48,32 @@ const J=(v:unknown)=>JSON.stringify(v)
  for(const e of em.results){const s=String(e.sbd);emRa[s]={ten:String(e.ho_ten??s),...(lenBang.get(s)??{soLan14:0,lanCuoiLenBang:null})}}
  const mucDo:Record<string,string>={}
  for(const r of md.results)if(r.md!=null)mucDo[String(r.qid)]=String(r.md)
- return {ok:true,cau:result,mucDo,em:emRa,soSai}
+ return {ok:true,cau:result,mucDo,em:emRa,soSai,...(bpu?{bpu:gopBpu(them,bl)}:{})}
+}
+/** Bốn câu đọc thêm của kênh bpu (đi chung batch): dạng/chuyên đề câu, đúng/tổng lượt cùng dạng + cùng chuyên đề, số ngày học 14 ngày, mọi lần lên bảng (len_bang). */
+function lenhBpu(env:Env,sbds:string[],qid:string){
+ const S=JSON.stringify(sbds)
+ return [
+  env.DB.prepare("SELECT MAX(dang) dang,MAX(ten_dang) td,MAX(chuyen_de) cd FROM cau_meta WHERE qid=?").bind(qid),
+  env.DB.prepare(`WITH m AS (SELECT MAX(dang) d,NULLIF(NULLIF(NULLIF(MAX(chuyen_de),''),'Hoá học'),'Hóa học') c FROM cau_meta WHERE qid=?)
+   SELECT s.sbd,SUM(s.ma_dang=m.d) nd,SUM(s.ma_dang=m.d AND s.ket_qua=1) dd,SUM(s.chuyen_de=m.c) nc,SUM(s.chuyen_de=m.c AND s.ket_qua=1) dc FROM su_kien_hoc s,m
+   WHERE s.sbd IN(SELECT value FROM json_each(?)) AND (s.ma_dang=m.d OR s.chuyen_de=m.c) AND s.ket_qua IS NOT NULL AND ${SQL_LA_LAN_LAM} AND COALESCE(s.assistance,'none')='none' AND COALESCE(s.visibility,'')<>'embargoed'
+    AND (s.nguon<>'thi' OR EXISTS(SELECT 1 FROM ca c WHERE c.ma_ca=s.ma_nguon AND ${SQL_DA_CONG_BO('c')})) GROUP BY s.sbd`).bind(qid,S),
+  env.DB.prepare('SELECT sbd,COUNT(DISTINCT ngay_vn) n FROM su_kien_hoc WHERE sbd IN(SELECT value FROM json_each(?)) AND ngay_vn>=? GROUP BY sbd').bind(S,ngayVnLui(13)),
+  env.DB.prepare('SELECT sbd,COUNT(*) n,SUM(dat=1) d,MAX(luc) cuoi,dat kq FROM len_bang WHERE sbd IN(SELECT value FROM json_each(?)) GROUP BY sbd').bind(S),
+ ]
+}
+type EmBpu={dang?:[number,number];cd?:[number,number];ngay14?:number;lb?:[number,number];lbCuoi?:string|null;datCuoi?:boolean|null}
+/** Gộp bốn kết quả + `bpu_luot`. `lbDu` = đọc đủ HAI sổ lên bảng (bpu_luot đọc lỗi ⇒ false ⇒ máy thầy không nói «chưa lên bảng lần nào»). */
+function gopBpu(them:{results:Row[]}[],bl:Row[]|null){
+ const [mt,dg,ch,lb]=them,m=mt?.results[0]??{},em:Record<string,EmBpu>={},o=(s:unknown)=>(em[String(s)]??={})
+ for(const r of dg?.results??[]){const e=o(r.sbd);if(Number(r.nd)>0)e.dang=[Number(r.dd)||0,Number(r.nd)];if(Number(r.nc)>0)e.cd=[Number(r.dc)||0,Number(r.nc)]}
+ for(const r of ch?.results??[])o(r.sbd).ngay14=Number(r.n)||0
+ for(const r of [...(lb?.results??[]).map((r):Row=>({...r,kq:Number(r.kq)===1?2:1})),...(bl??[])]){
+  const e=o(r.sbd),n=Number(r.n)||0,cuoi=r.cuoi==null?null:String(r.cuoi);if(!n)continue
+  const [d0,n0]=e.lb??[0,0];e.lb=[d0+(Number(r.d)||0),n0+n]
+  if(cuoi&&(!e.lbCuoi||cuoi>e.lbCuoi)){e.lbCuoi=cuoi;e.datCuoi=Number(r.kq)===2}
+ }
+ const str=(v:unknown)=>typeof v==='string'&&v.trim()?v.trim():''
+ return {tenDang:str(m.td),chuyenDe:str(m.cd),lbDu:bl!==null,em}
 }

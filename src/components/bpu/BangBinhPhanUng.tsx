@@ -382,7 +382,7 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     const coMat0 = v.ds.filter((e) => e.vao && !boQua.includes(e.sbd))
     const tatCa = coMat0.some((e) => !dangRoi.has(e.sbd)) ? coMat0.filter((e) => !dangRoi.has(e.sbd)) : coMat0
     const ungVien = tatCa.some((e) => !kbSet.has(e.sbd)) ? tatCa.filter((e) => !kbSet.has(e.sbd)) : tatCa
-    const m = await layEmChieu([lc.qid], ungVien.map((e) => e.sbd), new Set(ungVien.map((e) => e.sbd)), v.lop, boQua.length ? new Map([[lc.qid, new Set(boQua)]]) : undefined, { kenh: 'bpu' } as never).catch(() => new Map())
+    const m = await layEmChieu([lc.qid], ungVien.map((e) => e.sbd), new Set(ungVien.map((e) => e.sbd)), v.lop, boQua.length ? new Map([[lc.qid, new Set(boQua)]]) : undefined, { kenh: 'bpu', bpu: v } as never).catch(() => new Map())
     const list = (m.get(lc.qid) ?? []) as { sbd: string; loai: 'da_dung' | 'du_bao' | 'chua_co'; soSai?: number; soLan14?: number; lanCuoiLenBang?: string | null }[]
     const chon = list[0] ?? (ungVien.length ? { sbd: ungVien[Math.floor(Math.random() * ungVien.length)]!.sbd, loai: 'chua_co' as const } : null)
     if (!chon) { setDangGoi(false); setLoi({ chu: 'Chưa có em nào có mặt để gọi lên bảng.' }); return }
