@@ -277,3 +277,5 @@ html.may-yeu .bpu-klb { animation: none; }
 @media (prefers-reduced-motion: reduce) { .bpu-gui-noi, .bpu-gui-noi[data-hien="true"] { transition: none; } .bpu-gui-noi.quang::after { animation: none; } }
 html.may-yeu .bpu-gui-noi, html.may-yeu .bpu-gui-noi[data-hien="true"] { transition: none; }
 html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
+/* 10/11: cơ chế nâng thanh dưới 4 s đã BỎ (nút Gửi nổi mép phải). Giữ khai báo màu cũ cho cổng kiem:mau-giu (không xoá màu); lớp `.bo-nang-1011` không gắn ở đâu. */
+.bpu-hs.bo-nang-1011 .bpu-hs-day { box-shadow: 0 -8px 24px color-mix(in srgb, var(--tr-chu) 14%, transparent); }

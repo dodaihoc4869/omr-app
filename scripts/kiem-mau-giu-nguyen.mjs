@@ -273,9 +273,6 @@ for (const x of JSON.parse(readFileSync(new URL('../docs/ban-ve-nut-net-0711/mau
 const BANG_HS_DOI_DUOC = new Set(['src/styles/trong-hs-mau.css', 'src/components/loi-giai-kinh/loi-giai-kinh.css'])
 for (const k of ['--tr-nen: #121129', '--tr-mat: #1c1b3a', '--tr-mat-2: #24234a', '--tr-mat-3: #312f5e', '--tr-vien: #2f2d59', '--tr-vien-2: #403e72', '--tr-chu: #f1f0ff']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1 // 28/10 tối đo theo Duolingo
 for (const k of ['--tr-nen: #131f24', '--tr-mat: #202f36', '--tr-mat-2: #2a3a42', '--tr-mat-3: #37464f', '--tr-vien: #37464f', '--tr-vien-2: #4a5b64', '--tr-chu: #f2f1ea']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1
-// 10/11 thầy: «bỏ nút gửi đáp án hiện lên trên 4 giây đi, chuyển nút gửi đáp án sang mép phải giữa màn hình» ⇒ gỡ cơ chế nâng thanh dưới Bình Phản Ứng
-// (`.bpu-hs.nang-day .bpu-hs-day`): bóng của trạng thái nâng biến mất cùng nó — đúng 1 khai báo, đúng tệp.
-MAU_CU_THAY_RA_LENH['src/components/bpu/bpu-hs.css · box-shadow: 0 -8px 24px color-mix(in srgb, var(--tr-chu) 14%, transparent)'] = (MAU_CU_THAY_RA_LENH['src/components/bpu/bpu-hs.css · box-shadow: 0 -8px 24px color-mix(in srgb, var(--tr-chu) 14%, transparent)'] ?? 0) + 1
 const MAU_THAY_RA_LENH = new Set([
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
