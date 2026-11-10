@@ -4,7 +4,7 @@
 //   a/h · Hôm nay → Điểm danh → Xong → Dạy học → chọn câu (lượt đầu, tờ dựng lần đầu); thầy còn buổi KHÁC mở ⇒ không dựng lại bảng cho buổi kia
 //   b/f · «Câu tiếp» sau thẻ kết quả / sau mở đáp án      c · C → chọn câu khác      d · Esc ra Hôm nay → Điểm danh
 //   e   · tải lại trang (phòng còn lượt cùng câu: làm bảng / đã mở đáp án)         g · L → tờ cũ → Đạt → về (tờ không lẫn dưới bảng)
-// + hiệu ứng em nộp bài (nop-bai.ts): chỉ em VỪA gửi, theo view thật, máy yếu ⇒ bản gọn.
+// + hiệu ứng em nộp bài (nop-bai.ts, xoắn ốc 10/11): chỉ em VỪA gửi, theo view thật, máy yếu ⇒ bản gọn; hình xoắn + hàng đợi theo ống.
 import type { ComponentType } from 'react'
 import { createPortal } from 'react-dom'
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
@@ -255,14 +255,37 @@ describe('hiệu ứng em nộp bài (nop-bai.ts)', () => {
     moLuot(st, cau('q2'), T0 + 2); nhanTra(st, 'S1', 'B', T0 + 3)
     expect(emVuaGui(v1, viewBang(st))).toEqual([])
   })
-  it('đường cong: bắt đầu ở ô tên, kết thúc ở mặt chất lỏng, mờ vào / mờ ra; vệt quay theo hướng bay', async () => {
-    const { khungCong } = await import('../src/components/bpu/nop-bai')
-    const k = khungCong({ x: 100, y: 900 }, { x: 200, y: 100 }, { x: 200, y: 600 }, 1, 1, true)
-    expect(k[0]!.transform).toMatch(/^translate\(100\.0px, 900\.0px\) rotate/)
-    expect(k[k.length - 1]!.transform).toMatch(/^translate\(200\.0px, 600\.0px\) rotate\(9\d\.\ddeg\)/) // rơi thẳng xuống
-    expect(Number(k[0]!.opacity)).toBe(0)
-    expect(Number(k[k.length - 1]!.opacity)).toBe(0)
-    expect(Math.max(...k.map((x) => Number(x.opacity)))).toBe(1)
+  it('đường xoắn ốc (thầy 10/11): bắt đầu ở chóp đáy ống, ôm theo đáy tròn, kết thúc giữa PHÍA TRƯỚC ngay dưới miệng; có vòng trước / vòng sau', async () => {
+    const { diemXoan, nuaRong } = await import('../src/components/bpu/nop-bai')
+    const o = { x: 500, tren: 170, day: 700, r: 90, mat: 600 }
+    const dau = diemXoan(o, 0), cuoi = diemXoan(o, 1)
+    expect(dau.x).toBeCloseTo(500, 5); expect(dau.y).toBeCloseTo(700, 5) // chóp đáy
+    expect(cuoi.x).toBeCloseTo(500, 5); expect(cuoi.z).toBeCloseTo(1, 5) // giữa, phía trước
+    expect(cuoi.y).toBeGreaterThan(o.tren); expect(cuoi.y).toBeLessThan(o.tren + 40)
+    expect(nuaRong(o, 300)).toBe(90); expect(nuaRong(o, 700)).toBeCloseTo(0, 5); expect(nuaRong(o, 655)).toBeCloseTo(Math.sqrt(90 * 90 - 45 * 45), 5)
+    const ds = Array.from({ length: 201 }, (_, i) => diemXoan(o, i / 200))
+    for (const p of ds) expect(p.y).toBeLessThanOrEqual(o.day + 3) // không tụt dưới đáy ống
+    // ôm sát thân ống: cách tâm không quá lòng ống + 10 (+ nghiêng); có cả điểm phía sau (z < 0) và phía trước; khoảng 2,25 vòng ⇒ đổi phía ≥ 4 lần
+    for (const p of ds) expect(Math.abs(p.x - o.x)).toBeLessThanOrEqual(o.r + 10 + 1e-6)
+    expect(ds.some((p) => p.z < -0.9)).toBe(true); expect(ds.some((p) => p.z > 0.9)).toBe(true)
+    let doi = 0; for (let i = 1; i < ds.length; i++) if (Math.sign(ds[i]!.z) !== Math.sign(ds[i - 1]!.z)) doi++
+    expect(doi).toBeGreaterThanOrEqual(4)
+    // vòng trước thấp hơn vòng sau ở cùng độ cao (nhìn từ trên xuống)
+    const p1 = diemXoan(o, 0.5)
+    expect(p1.y - (o.day - 0.5 * (o.day - o.tren - 14))).toBeCloseTo(p1.z * (o.r + 10) * 0.14, 3)
+  })
+  it('hàng đợi theo ống: hai tia cách nhau ≥ 320 ms; chạm nước trễ quá 4 s ⇒ gộp (null)', async () => {
+    const { xepHang, roiMs, XOAN_MS, DUNG_MS, CACH_MS, TRE_MS } = await import('../src/components/bpu/nop-bai')
+    const o = { x: 500, tren: 170, day: 700, r: 90, mat: 682 }
+    const cham = XOAN_MS + DUNG_MS + roiMs(o)
+    expect(roiMs(o)).toBeGreaterThan(300); expect(cham).toBeLessThan(2400)
+    expect(xepHang(-1e9, 1000, cham)).toBe(1000)
+    let cuoi = -1e9, n = 0
+    for (;;) { const bd = xepHang(cuoi, 1000, cham); if (bd === null) break; if (n) expect(bd - cuoi).toBe(CACH_MS); cuoi = bd; n++ }
+    expect(n).toBeGreaterThanOrEqual(5) // vài em cùng ống vẫn có tia riêng
+    expect(cuoi + cham - 1000).toBeLessThanOrEqual(TRE_MS)
+    expect(xepHang(cuoi, 1000, cham)).toBeNull()
+    expect(xepHang(cuoi, 1000 + 2000, cham)).not.toBeNull() // hàng vơi dần ⇒ lại có tia riêng
   })
   it('bảng: em gửi ⇒ ô tên sáng + tích nảy (lớp «vua nay»); không bay khi không có hoạt cảnh (máy yếu / jsdom)', async () => {
     bangGia.that = true
@@ -276,6 +299,6 @@ describe('hiệu ứng em nộp bài (nop-bai.ts)', () => {
     expect(q('.bb-tl-o[data-sbd="S2"]')?.classList.contains('nay')).toBe(true)
     expect(q('.bb-tl-o[data-sbd="S2"]')?.classList.contains('vua')).toBe(true)
     expect(q('.bb-tl-o[data-sbd="S1"]')?.classList.contains('nay')).toBe(false)
-    expect(document.querySelectorAll('.bb-tl-tia').length).toBe(0)
+    expect(document.querySelectorAll('.bb-tl-tia, .bb-tl-xoan').length).toBe(0)
   })
 })

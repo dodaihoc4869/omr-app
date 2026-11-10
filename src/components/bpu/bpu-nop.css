@@ -1,4 +1,7 @@
 /* BÌNH PHẢN ỨNG — HIỆU ỨNG EM NỘP BÀI (nop-bai.ts, thầy 10/11). Chỉ transform / opacity; màu là biến sẵn có (--doi màu đội, --giay). Toạ độ sân 1920×1080 do WAAPI đặt. */
+/* Tia lửa XOẮN ỐC (thầy 10/11 lần 2): vẽ trên MỘT canvas phủ vùng ống (nop-bai.ts đặt toạ độ + cỡ; ẩn khi không còn tia). */
+.bpu-bang .bb-tl-xoan{ position: absolute; left: 0; top: 0; pointer-events: none; }
+/* Các lớp dưới (tia bay cong cũ) không còn dùng; giữ khai báo màu theo cổng kiem:mau-giu. */
 /* Tia lửa: vệt mảnh nhạt dần về đuôi, đầu là đốm sáng lõi giấy viền màu đội; gốc toạ độ = đầu vệt (quay theo hướng bay). */
 .bpu-bang .bb-tl-tia{ position: absolute; left: -74px; top: -5px; width: 84px; height: 10px; transform-origin: 74px 5px; border-radius: 999px; opacity: 0; pointer-events: none; will-change: transform, opacity;
   background: linear-gradient(to right, transparent, color-mix(in srgb, var(--doi) 45%, transparent) 45%, var(--doi) 80%, color-mix(in srgb, var(--doi) 40%, var(--giay))); }
