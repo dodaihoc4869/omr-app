@@ -94,14 +94,14 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     ORDER BY b.tick_luc DESC,b.vi_tri DESC LIMIT ?`).bind(lop,lop,cfg.batLuc??cfg.batDau+'T00:00:00+07:00', Math.max(1, tran)).all<Row>()
   let soGoi = 0, soEm = 0, soCau = 0
   const goiMoi: string[] = []
-  for (const b of ticks.results) {
+  for (const b of ticks.results.reverse()) {
     const cau = await cauTuTick7(env,b)
     // Không bỏ qua bài thiếu chỉ mục: hàng giáo viên vẫn thấy gói rỗng cần bổ sung.
     const batDau = [ngayVn7(Date.parse(str(b.tick_luc))),cfg.batDau].sort().at(-1)!
     // HẠN CHUNG cả lớp (thầy 09/11, han-chung.ts — cùng hàm hộp Giao bài xem trước). Bài chưa có câu (chỉ mục chưa sẵn) ⇒ 7 ngày như cũ.
     const soCauG = cau.filter((c) => c.hopLe !== false).length
     const sbdLop = soCauG ? (await env.DB.prepare(`SELECT h.sbd FROM hoc_sinh h WHERE ${sqlTenLopHs('h')}=? AND COALESCE(h.trang_thai,'')<>'khoa'`).bind(b.lop).all<{ sbd: string }>()).results.map((x) => x.sbd) : []
-    const han = congNgay7(batDau, soCauG ? (await hanChungLop(env, sbdLop, soCauG, now)).T - 1 : 6), id = `g7:${str(b.id)}`, luc = new Date(now).toISOString()
+    const han = congNgay7(batDau, soCauG ? (await hanChungLop(env, sbdLop, cau, now)).T - 1 : 6), id = `g7:${str(b.id)}`, luc = new Date(now).toISOString()
     const rs = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) SELECT ?,?,?,?,?,?,?,? WHERE ${KHONG_CA}`).bind(id,b.id,b.lop,b.khoa_bai,b.ten_bai,batDau,han,luc),
       env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_cau(goi_id,qid,version,ma_de,meta_json) SELECT ?,json_extract(value,'$.qid'),json_extract(value,'$.version'),json_extract(value,'$.maDe'),value FROM json_each(?) WHERE EXISTS(SELECT 1 FROM goi_bai_7 WHERE id=?) AND ${KHONG_CA}`).bind(id,JSON.stringify(cau),id),

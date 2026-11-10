@@ -13,7 +13,7 @@ import { gvGoi7 } from '../server/src/goi-bai-7-thay'
 import { type PrivateQuestion } from '../src/game/than-thu-v2/core'
 import { khopPhanIII } from '../src/lib/cham-so'
 import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
-import { hanChung } from '../server/src/han-chung'
+import { hanChung, demTheoPhan } from '../server/src/han-chung'
 import { BANG_GIU } from '../server/src/reset-toan-app'
 import { BANG_GIU_HOA2 } from '../server/src/reset-hoa2'
 
@@ -52,8 +52,10 @@ it('chỉ bài gần nhất mỗi lớp chuyển chu kỳ, đủ 3 dạng; giữ
   const k=await kho()
   const gs=await docGoiCuaEm7(k.env,'S1',NOW)
   // thầy 09/11: hạn gói mới = HẠN CHUNG cả lớp (han-chung.ts; 3 em chưa có sổ ⇒ năng lực mặc định), không còn bat_dau + 6; quota chia tới hạn ấy.
-  const han=congNgay7('2026-10-10',hanChung(127,[null,null,null]).T-1)
-  expect(han>'2026-10-16').toBe(true) // 127 câu ⇒ 5 ngày câu mới (28/ngày) + Ôn + Sửa ⇒ dài hơn 7 ngày cũ
+  // thầy 10/11 («máy tự động tính toán một hạn tối ưu … mỗi ngày luôn là 28 câu»): hạn tính theo SỐ CÂU TỪNG PHẦN của bài (đề 28 suất 18 · 4 · 6) + hàng chờ
+  // (ở đây chưa có bài nào trước ⇒ hàng chờ rỗng) — trước 10/11 dòng này khoá công thức ⌈127 / 28⌉ của 09/11.
+  const han=congNgay7('2026-10-10',hanChung(demTheoPhan(gs[0]!.cau),[null,null,null]).T-1)
+  expect(han>congNgay7('2026-10-10',hanChung(127,[null,null,null]).T-1)).toBe(true) // kho giả chia đều ba phần ⇒ Phần II dồn câu ⇒ dài hơn công thức theo tổng số câu
   expect(gs).toHaveLength(1);expect(gs[0]).toMatchObject({id:'g7:latest',batDau:'2026-10-10',han,quota:quotaGoi7(127,'2026-10-10',han)})
   expect(gs[0]!.cau).toHaveLength(127);expect(new Set(gs[0]!.cau.map(q=>q.phan))).toEqual(new Set(['I','II','III']))
   k.d.sql.prepare("UPDATE hoc_sinh SET lop='11A1' WHERE sbd='S3'").run()

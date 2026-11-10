@@ -77,6 +77,22 @@ Cái giá của «kịp hạn»: bài này thêm 1 ngày Học mới (5 thay vì
 - Ngày Kiểm tra ôn tập từ 11/11: chỉ bài kiểm tra 28 câu (đọc theo ngày của lịch, không sửa lịch đã lập).
 - CHƯA làm: máy chọn câu của Kiểm tra ôn tập và `rutDeChuan2026` vẫn dùng thuật toán riêng (đã đúng ô, chỉ dùng chung bảng ma trận); công thức hạn chung chưa tính «Phần II 4 suất/ngày».
 
+## 6c. Hạn chung theo hàng chờ (build 10/11 chiều — thầy: «Tôi chỉ giao bài. Máy tự động tính toán một hạn tối ưu cho tất cả học sinh, có đầy đủ kế hoạch cho hết hạn chưa giao hoặc giao sớm hơn … mỗi ngày luôn là 28 câu»)
+`server/src/han-chung.ts`, áp cho bài giao MỚI (bài đang chạy giữ hạn cũ — không sửa dữ liệu thật hàng loạt):
+- **Ngày Học mới của một lượng câu** = max(⌈Phần I ÷ 18⌉, ⌈Phần II ÷ 4⌉, ⌈Phần III ÷ 6⌉). Ví dụ số thật: Bài 10 Protein (65 · 25 · 20) = 7 ngày, công thức cũ ⌈110 ÷ 28⌉ = 4.
+- **Hàng chờ của từng em** = câu mới em chưa gặp của các bài đã giao trước (một truy vấn gộp lúc giao bài). Giao sớm khi bài cũ chưa xong ⇒ bài mới xếp sau, hạn tự dài ra.
+- **Tₑ** = ngày Học mới(hàng chờ + bài này) + 1 ngày Kiểm tra ôn tập cho mỗi bài còn dở và bài này + ngày Sửa dự báo (công thức 09/11). **Hạn chung** = phân vị 90 % của Tₑ, kẹp [M + 2, 42 ngày], không sớm hơn hạn bài đang dở của lớp (máy phát câu mới theo hạn gần trước ⇒ thứ tự bài giữ đúng). Giao nhiều bài một lượt: tạo theo thứ tự bài cũ → mới để hạn nối tiếp.
+- **Ba tình huống, mỗi ngày vẫn 28 câu đúng 18/4/6** (test `tests/han-chung-hang-cho-1011.test.ts`):
+
+| Tình huống | Máy làm gì |
+|---|---|
+| Giao đúng nhịp | Ngày Học mới / Sửa / Kiểm tra ôn tập như mục 2–4 |
+| Giao sớm (bài cũ chưa xong) | Bài cũ làm trước, bài mới nối sau; hạn bài mới tính cả hàng chờ |
+| Hết hạn, chưa giao bài mới | Em còn câu mới: tiếp tục ngày Học mới. Em hết câu mới: ngày Sửa nếu còn câu sai, không thì 28 câu ôn theo nợ ôn dạng |
+
+- Hộp Giao bài (xem trước) dùng cùng hàm ⇒ số thầy thấy = số máy chủ ghi.
+- Chưa tính: lỗi tồn sẵn có của từng em (số thật: 149 em từ 112 câu sai trở lên) — ngày Sửa dự báo mới chỉ tính lỗi phát sinh từ lượng câu mới.
+
 ## 7. Build (sau khi thầy duyệt) — không đổi giao diện
 1. `server/src/rut-28.ts`: hàm thuần `rut28(ứng viên, {kịpHạn})` + một bảng ma trận dùng chung (bỏ ba bản chép). Test khoá: 10 000 đề giả, đề nào cũng đủ 28 và đúng phần khi kho còn câu.
 2. `chonGoi7`: thay phần xếp câu mới + bốn tầng lấp bằng một lời gọi `rut28`; bỏ `giuOn`, `onSom`, nhánh hạ mức.
