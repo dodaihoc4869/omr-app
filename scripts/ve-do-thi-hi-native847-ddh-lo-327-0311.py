@@ -24,5 +24,5 @@ for y,t in [(77,'2,0'),(173,'1,5'),(267,'1,0'),(362,'0,5'),(461,'0')]:b+='<g tra
 b+='<g transform="translate(34 254)rotate(-90)">'+F.label(0,0,'Lượng HI (mol)',29,weight='dam',fill='#001a17')+'</g>'
 b+=F.label(324,526,'Thời gian',29,fill='#001a17')
 raw=('<svg xmlns="http://www.w3.org/2000/svg" width="606" height="535" viewBox="0 0 606 535"><title>Đồ thị HI theo nguồn847</title>'+b+'</svg>').encode();hh=hashlib.sha256(raw).hexdigest();fn='do-thi-hi-native847-ddh-'+hh+'.svg';(K/fn).write_bytes(raw)
-r=dict(i=847,hash=h,fileNguon='anh/'+h+'.png',svg=fn,hashSvg=hh,byteSvg=len(raw),font='DDH Rounded',hashPhong=F.HASH,trangThai='cho-soat-doc-lap',questions=qs,ghiChuDung='1redincreasingcurve-horizontalplateau/green20x20grid/blue2axes2filledheads/5Ycomma4Xlabels/Lượng HI (mol)trueDAM-Thời gianregular/noaddedplateauvalue-unit-legend-answer')
+r=dict(i=847,hash=h,fileNguon='anh/'+h+'.png',svg=fn,hashSvg=hh,byteSvg=len(raw),font='DDH Rounded',hashPhong=F.HASH,trangThai='cho-soat-doc-lap',questions=qs,ghiChuDung='1redincreasingcurve-horizontalplateau/green20x20grid/blue2axes2filledheads/4Ycomma+one0-4Xlabels/Lượng HI (mol)trueDAM-Thời gianregular/noaddedplateauvalue-unit-legend-answer')
 (K/'cau-truc-do-thi-hi-native847-ddh-lo-327-ban-dung.json').write_text(json.dumps([r],ensure_ascii=False,indent=2)+'\n');print(hh,len(raw))
