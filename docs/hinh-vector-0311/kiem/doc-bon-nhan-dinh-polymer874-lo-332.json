@@ -1,0 +1,418 @@
+{
+  "i": 874,
+  "hash": "9f06a92bb0d0b88b5aec52227d84e7a679e1698e5de6dc0a3fb8c9634d89e997",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9f06a92bb0d0b88b5aec52227d84e7a679e1698e5de6dc0a3fb8c9634d89e997.png",
+  "size": [
+    953,
+    526
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C4-B12-III-5",
+      "de": "Cho các nhận định sau: Có bao nhiêu nhận định sai trong các nhận định trên?",
+      "allHinh": [
+        {
+          "hash": "9f06a92bb0d0b88b5aec52227d84e7a679e1698e5de6dc0a3fb8c9634d89e997",
+          "where": "12-C4-B12-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "3d6be649665e78afdfad35401bfefa27cef145b3dd55fca33f5a8705e448d6fd"
+        }
+      ],
+      "missingHashes": [
+        "9f06a92bb0d0b88b5aec52227d84e7a679e1698e5de6dc0a3fb8c9634d89e997"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/874-native2x-lo332.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "Fourprintedstatementsa-d withpolymerformula, allstatementtextMUSTremain asquestiondata. No correct/incorrectanswerinferred.",
+    "rowA": {
+      "label": "a.",
+      "labelBBox": [
+        41,
+        40,
+        67,
+        69
+      ],
+      "formula": "...–CH₂–CH₂–CH₂–CH₂–...",
+      "formulaBBox": [
+        77,
+        39,
+        439,
+        75
+      ],
+      "CH2tokens": 4,
+      "leftDots": {
+        "count": 3,
+        "bbox": [
+          77,
+          49,
+          98,
+          59
+        ]
+      },
+      "rightDots": {
+        "count": 3,
+        "bbox": [
+          416,
+          49,
+          439,
+          59
+        ]
+      },
+      "text": "có tên là polymethylene.",
+      "textBBox": [
+        448,
+        39,
+        778,
+        74
+      ],
+      "noBracket": true,
+      "C": 4
+    },
+    "rowB": {
+      "label": "b.",
+      "labelBBox": [
+        41,
+        118,
+        67,
+        147
+      ],
+      "backbone": "–(CH₂–CH=C–CH₂)ₙ–",
+      "formulaBBox": [
+        77,
+        112,
+        377,
+        187
+      ],
+      "Ccenter": [
+        257,
+        130
+      ],
+      "branch": {
+        "text": "CH₃",
+        "bbox": [
+          243,
+          165,
+          306,
+          198
+        ],
+        "bond": [
+          [
+            257,
+            145
+          ],
+          [
+            257,
+            163
+          ]
+        ],
+        "direction": "DOWN",
+        "anchor": "C"
+      },
+      "outerRoundPair": {
+        "left": "M103113Q81148 103183",
+        "right": "M346113Q367148 346183"
+      },
+      "nSUB": {
+        "text": "n",
+        "bbox": [
+          355,
+          151,
+          369,
+          174
+        ]
+      },
+      "text": "có tên là polyisoprene.",
+      "textBBox": [
+        389,
+        118,
+        689,
+        152
+      ],
+      "C": 5,
+      "CCdouble": 1
+    },
+    "rowC": {
+      "label": "c.",
+      "labelBBox": [
+        41,
+        272,
+        67,
+        303
+      ],
+      "backbone": "–(CH₂–C–CH₂)ₙ–",
+      "formulaBBox": [
+        80,
+        255,
+        346,
+        330
+      ],
+      "centralC": [
+        213,
+        286
+      ],
+      "upperBranch": {
+        "text": "COOCH₃",
+        "bbox": [
+          200,
+          223,
+          327,
+          257
+        ],
+        "bond": [
+          [
+            213,
+            270
+          ],
+          [
+            213,
+            250
+          ]
+        ],
+        "anchor": "FIRSTC",
+        "direction": "UP"
+      },
+      "lowerBranch": {
+        "text": "CH₃",
+        "bbox": [
+          200,
+          321,
+          263,
+          354
+        ],
+        "bond": [
+          [
+            213,
+            302
+          ],
+          [
+            213,
+            320
+          ]
+        ],
+        "anchor": "C",
+        "direction": "DOWN"
+      },
+      "outerRoundPair": {
+        "left": "M123257Q103292 123327",
+        "right": "M325257Q345292 325327"
+      },
+      "nSUB": {
+        "text": "n",
+        "bbox": [
+          334,
+          296,
+          348,
+          319
+        ]
+      },
+      "text": "có tên là poly(methyl methacrylate).",
+      "textBBox": [
+        361,
+        272,
+        841,
+        307
+      ],
+      "C": 6,
+      "O": 2,
+      "trap": "THREEbackbonetokensCH2-C-CH2shown; do NOTremoveextraCH2tofitnamedPMMA. COOCH3condensedtextnoexpandedCO."
+    },
+    "rowD": {
+      "label": "d.",
+      "labelBBox": [
+        41,
+        416,
+        67,
+        447
+      ],
+      "backboneLiteral": "...–CH₂CHCHCH₂CH₂CHCH₂CH–...",
+      "backboneTokenOrder": [
+        "CH₂",
+        "CH",
+        "CH",
+        "CH₂",
+        "CH₂",
+        "CH",
+        "CH₂",
+        "CH"
+      ],
+      "formulaBBox": [
+        77,
+        415,
+        573,
+        453
+      ],
+      "noInternalBonds": "ThereareNOexplicitHORIZONTALbondstrokesbetween8adjacentcondensedtokens; do notinsert. Onlyleft/rightfreebondstubs beside3dotellipses.",
+      "branches": [
+        {
+          "tokenIndexOneBased": 2,
+          "text": "CH₃",
+          "bbox": [
+            174,
+            463,
+            237,
+            496
+          ],
+          "bond": [
+            [
+              187,
+              443
+            ],
+            [
+              187,
+              462
+            ]
+          ],
+          "direction": "DOWN",
+          "anchor": "CofCHnotH"
+        },
+        {
+          "tokenIndexOneBased": 3,
+          "text": "CH₃",
+          "bbox": [
+            221,
+            370,
+            284,
+            402
+          ],
+          "bond": [
+            [
+              233,
+              418
+            ],
+            [
+              233,
+              397
+            ]
+          ],
+          "direction": "UP",
+          "anchor": "CofCHnotH"
+        },
+        {
+          "tokenIndexOneBased": 6,
+          "text": "CH₃",
+          "bbox": [
+            377,
+            463,
+            440,
+            496
+          ],
+          "bond": [
+            [
+              389,
+              443
+            ],
+            [
+              389,
+              462
+            ]
+          ],
+          "direction": "DOWN",
+          "anchor": "CofCHnotH"
+        },
+        {
+          "tokenIndexOneBased": 8,
+          "text": "CH₃",
+          "bbox": [
+            482,
+            370,
+            545,
+            402
+          ],
+          "bond": [
+            [
+              495,
+              418
+            ],
+            [
+              495,
+              397
+            ]
+          ],
+          "direction": "UP",
+          "anchor": "CofCHnotH"
+        }
+      ],
+      "leftEllipsis": {
+        "count": 3,
+        "bbox": [
+          77,
+          427,
+          99,
+          436
+        ],
+        "shaft": [
+          [
+            100,
+            432
+          ],
+          [
+            120,
+            432
+          ]
+        ]
+      },
+      "rightEllipsis": {
+        "count": 3,
+        "bbox": [
+          548,
+          427,
+          573,
+          436
+        ],
+        "shaft": [
+          [
+            526,
+            432
+          ],
+          [
+            547,
+            432
+          ]
+        ]
+      },
+      "text": "có tên là polypropylene.",
+      "textBBox": [
+        588,
+        415,
+        921,
+        451
+      ],
+      "C": 12
+    },
+    "font": "a./b./c./d.BOLDuprightserif; chemicalformulasandstatementprose regularuprightserif, noitaliccaption. Sourcechemical/proseblackscanheavybutlabelslettersheavier. Formula2/3/nSUB, nordinarysmalllowercaseplacedbelowbaseline.",
+    "countsTotal": {
+      "statementRows": 4,
+      "roundRepeatPairs": 2,
+      "repeatnSUB": 2,
+      "baselineEllipsisGroups": 4,
+      "dotsEachEllipsis": 3,
+      "arrowheads": 0,
+      "C": 27,
+      "O": 2,
+      "branchLabelsIncludingCOOCH3": 7
+    },
+    "noAdded": [
+      "correctionofwrongnames/formulas",
+      "internalrowDbonds",
+      "bracketrowA/D",
+      "rowCCH2removal",
+      "repeatcountanswer",
+      "truefalsemarks",
+      "colorhighlight"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelanchorsandliteralstatementtext; do notinfercorrectmonomer/polymerstructurefromgivenname."
+}

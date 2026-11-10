@@ -6481,6 +6481,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "9f06a92bb0d0b88b5aec52227d84e7a679e1698e5de6dc0a3fb8c9634d89e997": {
+      "tep": "bon-nhan-dinh-polymer-native874-ddh-df2e17e61d129910ab674f01ef1d145c687b322181ab3b7e3fff0077cc8327cc.svg",
+      "hashSvg": "df2e17e61d129910ab674f01ef1d145c687b322181ab3b7e3fff0077cc8327cc",
+      "byteSvg": 93413,
+      "byteGzip": 9837,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "2ec39076bcc2849239103f7293e75e683e330bbbf2b9eb812b4915e34d438828": {
       "tep": "hinh-ddh-9e1a7d367e857daf212bfd5d86f1ba993a8322f0ca0108f15394a9310a285530.svg",
       "hashSvg": "9e1a7d367e857daf212bfd5d86f1ba993a8322f0ca0108f15394a9310a285530",
@@ -13483,6 +13492,20 @@
           "where": "12-C4-B12-II-7.hinh.0.du_lieu",
           "hashDataUrl": "9d20be33a491dadcd2a01a17566c021529c6b47c36bc544e7b400b88f47c2f6a",
           "vector": "benzene-ethyl-styrene-ddh-d0cb32144c00cdd3a6b61ce09d86592e9a69e21303cc09b552bc592b774910f6.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-C4-B12-III-5",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9f06a92bb0d0b88b5aec52227d84e7a679e1698e5de6dc0a3fb8c9634d89e997",
+          "where": "12-C4-B12-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "3d6be649665e78afdfad35401bfefa27cef145b3dd55fca33f5a8705e448d6fd",
+          "vector": "bon-nhan-dinh-polymer-native874-ddh-df2e17e61d129910ab674f01ef1d145c687b322181ab3b7e3fff0077cc8327cc.svg"
         }
       ]
     },
@@ -30053,6 +30076,7 @@
     "12-C4-B12-I-22",
     "12-C4-B12-II-4",
     "12-C4-B12-II-7",
+    "12-C4-B12-III-5",
     "12-C5-B16-II-6",
     "12-C5-B16-I-24",
     "12-C5-B16-II-13",
