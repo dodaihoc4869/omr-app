@@ -8,7 +8,9 @@ import { readFileSync } from 'node:fs'
 import { MotTrangHs, type PropsMotTrang } from '../src/components/hoc-tap/TrongHs'
 import KetBaiThuong from '../src/components/thuong/KetBaiThuong'
 import { docKetBai } from '../src/lib/thuong-api'
-import { toiMocSua } from '../src/components/hoc-tap/lam-bai-man'
+import { soHomNayGoi7, toiMocSua } from '../src/components/hoc-tap/lam-bai-man'
+import { soHomNay } from '../src/components/hoc-tap/lam-bai'
+import { chiaChang } from '../src/components/hoc-tap/nhip-hom-nay'
 
 const noop = () => {}
 const goc = (them: Partial<PropsMotTrang> = {}): PropsMotTrang => ({
@@ -53,11 +55,17 @@ describe('xong chặng: «Làm tiếp» (em tự bấm) + «Về Hôm nay»', ()
   })
   it('màn làm bài: còn chặng ⇒ «Làm tiếp: Chặng n» mở thẳng chặng sau (setLan), «Về …» về Hôm nay; hết chặng ⇒ «Tiếp tục» về Hôm nay', () => {
     const src = readFileSync('src/components/hoc-tap/ManLamBaiTap.tsx', 'utf8')
-    expect(src).toMatch(/const coTiep = !!chang && !!homNayHien && chang < homNayHien\.soChang && !coCa && !toiMocSua\(chang, homNayHien\.soChang\)/)
+    expect(src).toMatch(/const coTiep = xong && !!chang && !!homNayHien && chang < homNayHien\.soChang && !coCa && !toiMocSua\(chang, homNayHien\.soChang\)/)
     expect(src).toMatch(/coTiep \? \{ chuNut: `Làm tiếp: Chặng \$\{chang! \+ 1\}`, onTiep: \(\) => \{ lamTiep\.current = true; setLan\(n => n \+ 1\) \}, nutPhu: \{ chu: `Về \$\{tenTrangChinh\(\)\}`, onClick: veLoTrinh \} \} : \{ onTiep: veLoTrinh \}/)
     // vào bằng «Làm tiếp» (không qua Lộ trình) ⇒ chặn TU_SUA_TRUOC không được gỡ khoá; ca kiểm tra đang mở ⇒ không «Làm tiếp» (về Hôm nay: «Vào ca»)
     expect(src).toMatch(/while \(daDaySua\.current < \(lamTiep\.current \? 1 : 2\)\)/)
-    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toMatch(/<ManLamBaiTap token=\{auth\.token\} sbd=\{auth\.sbd\} coCa=\{!!caDangMo\}/)
+    expect(readFileSync('src/screens/StudentPortalScreen.tsx', 'utf8')).toMatch(/<ManLamBaiTap token=\{auth\.token\} sbd=\{auth\.sbd\} coCa=\{caDangMo\}/)
+  })
+  it('số chặng hai màn trùng nhau (mốc Lộ trình lưu chiaChang(so).length; màn làm bài so bằng soHomNayGoi7) — khác thì «Làm tiếp» tắt nhầm', () => {
+    for (const [daLam, muc] of [[0, 28], [13, 28], [27, 28], [5, 30], [40, 28]] as const) {
+      const lo = soHomNay({ cheDo2: true, sanh: { goi7: { daLamHomNay: daLam, toiThieu: muc }, theLuc: { tong: 99, con: 1 } } } as unknown as Parameters<typeof soHomNay>[0])!
+      expect(chiaChang(lo).length, `${daLam}/${muc}`).toBe(soHomNayGoi7(daLam, muc)!.soChang)
+    }
   })
   it('«Làm tiếp» không vượt nút Tự sửa lỗi: tới mốc Lộ trình mà sửa hôm nay chưa xong ⇒ về Hôm nay', () => {
     const nay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10)

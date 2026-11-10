@@ -113,6 +113,8 @@ export function canhThuong(): ReactNode {
     case 'khong-tinh': return khungCau('khong-tinh')
     case 'ket': case 'ket-hh': return h('div', { className: 'ht-app duo', style: { minHeight: '100dvh', background: 'var(--tr-mat)' } },
       h(KetBaiThuong, { ketBai: docKetBai(V === 'ket' ? M.KET_BAI : M.KET_BAI_HH)!, hang: 'bac', bat: t.bat, phu: V === 'ket' ? 'Amine · tầng Hiểu · chặng 3 · 6 câu' : 'Amine · chặng 3', onTiep: noop }))
+    case 'ket-tiep': return h('div', { className: 'ht-app duo', style: { minHeight: '100dvh', background: 'var(--tr-mat)' } }, // 10/11 «Làm tiếp» (ban-ve-mot-nut-1011)
+      h(KetBaiThuong, { ketBai: docKetBai(M.KET_BAI)!, hang: 'bac', bat: t.bat, phu: 'Amine · chặng 3 · 6 câu', onTiep: noop, chuNut: 'Làm tiếp: Chặng 4', nutPhu: { chu: 'Về Hôm nay', onClick: noop } }))
     case 'chuoi': return khungMenu(h(ManThuong, { man: 'chuoi', token: TK, onHoc: noop, hieuUng: 'chuoi' }))
     case 'cuu': case 'cuu-xong': return h(ManCuuChuoi, { chuoi: t.chuoiNgay!, onHoc: noop, onDong: noop })
     case 'giai': return khungMenu(h(ManThuong, { man: 'giai', token: TK }))

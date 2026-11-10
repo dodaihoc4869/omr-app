@@ -989,7 +989,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     : duocNop ? `Nộp câu · ${[...tra].map(kyTuHien).join('')}` : 'Nhập đáp án để nộp'
   const nutGoiY = q?.goiY && dangTraLoi ? <button type="button" className="ht2-lam-nut-goi-y" aria-label={goiY ? 'Thu gọn gợi ý' : 'Xem gợi ý'} aria-expanded={goiY} aria-controls="ht2-lam-goi-y" onClick={() => setGoiY(v => !v)}><Lightbulb size={20} aria-hidden="true" /></button> : null
   const nutNop = <button type="button" className="ht2-lam-nut ht2-lam-nut-chinh" onClick={() => void nopCau()} disabled={nop || !duocNop}>{chuNop}{duocNop && !nop && <ArrowRight size={18} aria-hidden="true" />}</button>
-  const coTiep = !!chang && !!homNayHien && chang < homNayHien.soChang && !coCa && !toiMocSua(chang, homNayHien.soChang) // 10/11 ban-ve-mot-nut-1011: còn chặng ⇒ «Làm tiếp»
+  const coTiep = xong && !!chang && !!homNayHien && chang < homNayHien.soChang && !coCa && !toiMocSua(chang, homNayHien.soChang) // 10/11 ban-ve-mot-nut-1011: còn chặng ⇒ «Làm tiếp»
   const chuHocTiep = coTiep ? `Học tiếp chặng ${chang! + 1}` : 'Học tiếp chặng sau'
 
   const thanhDay = tai ? null
