@@ -1,7 +1,8 @@
 // Bình Phản Ứng — máy em, thầy báo 10/11 (bản 1011d):
 // (1) «dòng hướng dẫn ở cuối màn hình che nút gửi bài» = dòng «Kéo từ trên xuống… để thoát khỏi chế độ toàn màn hình» Chrome Android hiện mỗi lần trang VÀO
-//     toàn màn hình. Thầy chốt GIỮ tự bật toàn màn hình ⇒ vừa vào toàn màn hình thì thanh dưới (nút «Gửi đáp án») nâng lên khỏi vùng đáy ~4 s rồi hạ về
-//     (chỉ transform); đã toàn màn hình thì chạm / gửi KHÔNG xin lại (mỗi lần xin là dòng ấy hiện lại).
+//     toàn màn hình. Thầy chốt GIỮ tự bật toàn màn hình; đã toàn màn hình thì chạm / gửi KHÔNG xin lại (mỗi lần xin là dòng ấy hiện lại).
+//     SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «bỏ nút gửi đáp án hiện lên trên 4 giây đi, chuyển nút gửi đáp án sang mép phải giữa màn hình»): BỎ hẳn cơ chế nâng
+//     thanh dưới (`.nang-day`, NANG_DAY_MS) — nút gửi nay nổi ở mép phải giữa màn (tests/bpu-nut-gui-1011.test.tsx), không còn ở đáy để bị che.
 // (2) thanh đội + nhãn Đạt / Chưa đạt: một khối gọn — xem tests/bpu-chon-may-1011 & bpu-top-ket-qua-1011.
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
@@ -18,7 +19,7 @@ const cau = (qid: string) => ({ qid, phan: 'I' as const, tuLuan: false, cau: { q
 let toanMan: Element | null = null
 const xin = vi.fn(async () => { toanMan = document.documentElement; document.dispatchEvent(new Event('fullscreenchange')) })
 
-describe('máy em — vừa vào toàn màn hình thì nâng nút «Gửi đáp án» khỏi dòng hướng dẫn của Chrome', () => {
+describe('máy em — toàn màn hình chỉ xin khi chưa toàn màn hình (không bật lại dòng hướng dẫn của Chrome)', () => {
   beforeEach(() => {
     vi.resetModules(); vi.useRealTimers(); toanMan = null; xin.mockClear()
     vi.doMock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
@@ -33,38 +34,30 @@ describe('máy em — vừa vào toàn màn hình thì nâng nút «Gửi đáp 
     delete (document.documentElement as unknown as Record<string, unknown>).requestFullscreen
   })
 
-  it('chạm đầu ⇒ xin toàn màn hình MỘT lần; vào toàn màn hình ⇒ .nang-day ~4 s rồi hạ; chạm / gửi tiếp không xin lại', async () => {
-    const { default: Man, NANG_DAY_MS } = await import('../src/components/bpu/ManBinhPhanUng')
+  it('chạm đầu ⇒ xin toàn màn hình MỘT lần; chạm / gửi tiếp không xin lại; thoát rồi chạm ⇒ xin lại; không còn nâng thanh dưới', async () => {
+    const mod = await import('../src/components/bpu/ManBinhPhanUng')
+    const Man = mod.default
+    expect((mod as Record<string, unknown>).NANG_DAY_MS).toBeUndefined() // SỬA CÓ CHỦ ĐÍCH 10/11: bỏ cơ chế nâng
     render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
     const st = phong(); moLuot(st, cau('q1'), T0)
     WsGia.ds[0]!.nhan(viewEm(st, 'S1'))
     const goc = screen.getByRole('dialog', { name: 'Bình Phản Ứng' })
-    expect(goc.classList.contains('nang-day')).toBe(false)
-    vi.useFakeTimers()
     await act(async () => { fireEvent.click(goc) })
     expect(xin).toHaveBeenCalledTimes(1)
-    expect(goc.classList.contains('nang-day')).toBe(true)
+    expect(goc.classList.contains('nang-day')).toBe(false)
     fireEvent.click(goc); fireEvent.click(goc)
     expect(xin).toHaveBeenCalledTimes(1) // đã toàn màn hình ⇒ không xin lại (không bật lại dòng hướng dẫn)
-    act(() => { vi.advanceTimersByTime(NANG_DAY_MS - 100) })
-    expect(goc.classList.contains('nang-day')).toBe(true)
-    act(() => { vi.advanceTimersByTime(200) })
-    expect(goc.classList.contains('nang-day')).toBe(false)
-    // em vuốt thoát toàn màn hình ⇒ không nâng; chạm lại ⇒ xin lại (thầy giữ tự bật) và nâng lại
+    // em vuốt thoát toàn màn hình; chạm lại ⇒ xin lại (thầy giữ tự bật)
     act(() => { toanMan = null; document.dispatchEvent(new Event('fullscreenchange')) })
-    expect(goc.classList.contains('nang-day')).toBe(false)
     await act(async () => { fireEvent.click(goc) })
     expect(xin).toHaveBeenCalledTimes(2)
-    expect(goc.classList.contains('nang-day')).toBe(true)
+    expect(goc.classList.contains('nang-day')).toBe(false)
   })
 
-  it('CSS: thanh dưới nâng bằng transform (không đổi bố cục), máy yếu / giảm chuyển động không trượt; đáy chừa safe-area', () => {
+  it('CSS: không còn luật nâng thanh dưới (SỬA CÓ CHỦ ĐÍCH 10/11)', () => {
     const css = readFileSync('src/components/bpu/bpu-hs.css', 'utf8')
-    expect(css).toMatch(/\.bpu-hs\.nang-day \.bpu-hs-day \{ transform: translateY\(-1[1-4]\dpx\)/)
-    expect(css).toMatch(/\.bpu-hs-day \{[^}]*transition: transform/)
-    expect(css).toMatch(/prefers-reduced-motion: reduce\) \{ \.bpu-hs-day \{ transition: none; \} \}/)
-    expect(css).toMatch(/html\.may-yeu \.bpu-hs-day \{ transition: none; \}/)
+    expect(css).not.toMatch(/nang-day/)
     expect(css).toMatch(/\.bpu-hs-day \{ padding: 12px 16px calc\(16px \+ env\(safe-area-inset-bottom, 0px\)\)/)
   })
 

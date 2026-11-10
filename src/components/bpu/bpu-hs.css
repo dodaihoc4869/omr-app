@@ -58,7 +58,7 @@
 .bpu-hai button[aria-pressed="true"] { border-color: var(--tr-hs); background: var(--tr-hs-nhat); box-shadow: 0 4px 0 var(--tr-hs); }
 .bpu-hai button:disabled:not([aria-pressed="true"]) { opacity: 0.55; }
 .bpu-de-xem { display: grid; gap: 8px; padding-top: 6px; border-top: 1px solid var(--tr-vien); }
-.bpu-tln { display: grid; gap: 10px; }
+.bpu-tln { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; } /* 10/11: cột co theo thân (thân chừa lề cho nút gửi nổi) — bàn phím số không tràn sang phải */
 .bpu-phim { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .bpu-phim button { height: 52px; border: 0; border-radius: 14px; background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 2px var(--tr-vien), 0 3px 0 var(--tr-vien); font-size: 22px; font-weight: 800; cursor: pointer; }
 .bpu-phim .xoa { grid-column: 1 / -1; font-size: 17px; }
@@ -125,7 +125,7 @@ html.may-yeu .bpu-ng .quy { animation: none; }
 @keyframes bpu-tan-to { 0% { transform: translate(0, 0) scale(1); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(8px, -90px) scale(0.3); opacity: 0; } }
 
 /* LỚP CHE: kín màn (đè cả đầu màn), không đề, không nút mở. */
-.bpu-che { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; overflow: auto; overscroll-behavior: contain; isolation: isolate;
+.bpu-che { position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; isolation: isolate;
   padding: calc(16px + env(safe-area-inset-top, 0px)) 16px calc(20px + env(safe-area-inset-bottom, 0px)); }
 .bpu-che::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(120% 60% at 50% 30%, color-mix(in srgb, var(--doi) 26%, var(--tr-nen)), var(--tr-nen) 70%); }
 .bpu-che[data-kq="dung"]::before { background: radial-gradient(120% 60% at 50% 30%, var(--tr-dung-nhat), var(--tr-nen) 75%); }
@@ -181,12 +181,12 @@ html.may-yeu .bpu-ng .quy { animation: none; }
 @keyframes bpu-hien { from { opacity: 0; } to { opacity: 1; } }
 @keyframes bpu-len { from { transform: translateY(28px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes bpu-bung { 0% { transform: scale(0.4); opacity: 0; } 45% { transform: scale(1.35); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
-.bpu-tia { position: absolute; left: 50%; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); width: 0; height: 0; z-index: 1; pointer-events: none; }
+.bpu-tia { position: absolute; right: calc(max(12px, env(safe-area-inset-right, 0px)) + 28px); top: 50%; width: 0; height: 0; z-index: 1; pointer-events: none; } /* 10/11: bật từ nút gửi nổi (mép phải, giữa màn) */
 .bpu-tia i { position: absolute; left: -5px; top: -14px; width: 10px; height: 28px; border-radius: 50% 50% 45% 45% / 30% 30% 70% 70%; background: linear-gradient(to bottom, color-mix(in srgb, var(--doi) 30%, var(--giay)), var(--doi) 35%, transparent); opacity: 0;
   animation: bpu-tia-bay 0.85s var(--d, 0ms) cubic-bezier(.3, .1, .2, 1) both; }
 .bpu-tia i.vang { background: linear-gradient(to bottom, color-mix(in srgb, var(--tr-sao) 30%, var(--giay)), var(--tr-sao) 35%, transparent); }
 .bpu-tia .song { left: -60px; top: -60px; width: 120px; height: 120px; border-radius: 50%; background: radial-gradient(circle, transparent 52%, color-mix(in srgb, var(--doi) 80%, transparent) 58%, transparent 70%); animation: bpu-song 0.6s ease-out both; }
-@keyframes bpu-tia-bay { 0% { transform: translate(0, 0) scale(calc(var(--s, 1) * 0.6)); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(var(--x, 0), -110vh) scale(calc(var(--s, 1) * 1.4)); opacity: 0; } }
+@keyframes bpu-tia-bay { 0% { transform: translate(0, 0) scale(calc(var(--s, 1) * 0.6)); opacity: 0; } 12% { opacity: 1; } 100% { transform: translate(calc(var(--x, 0px) - 84px), -80vh) scale(calc(var(--s, 1) * 1.4)); opacity: 0; } } /* lệch sang trái: gốc ở mép phải */
 @keyframes bpu-song { from { transform: scale(0.3); opacity: 1; } to { transform: scale(2.4); opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
@@ -254,10 +254,26 @@ html.may-yeu .bpu-bd-the, html.may-yeu .bpu-bd-the .bpu-lua g, html.may-yeu .bpu
 @keyframes bpu-klb-vao { from { opacity: 0; transform: translateX(8px) scale(0.92); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .bpu-klb { animation: none; } }
 html.may-yeu .bpu-klb { animation: none; }
-/* 10/11 (thầy «dòng hướng dẫn ở cuối màn hình che nút gửi bài»): vừa vào toàn màn hình, Chrome Android hiện dòng hướng dẫn thoát ở đáy ~3–4 s, cao ~80–130 px
-   ⇒ thanh dưới nâng lên khỏi vùng ấy (`.nang-day`, ManBinhPhanUng NANG_DAY_MS) rồi hạ về. Chỉ transform; máy yếu / giảm chuyển động ⇒ nhảy thẳng, không trượt. */
-.bpu-hs-day { position: relative; z-index: 2; transition: transform 0.28s cubic-bezier(.2, .9, .3, 1); }
-.bpu-hs.nang-day .bpu-hs-day { transform: translateY(-140px); box-shadow: 0 -8px 24px color-mix(in srgb, var(--tr-chu) 14%, transparent); }
-@media (prefers-reduced-motion: reduce) { .bpu-hs-day { transition: none; } }
-html.may-yeu .bpu-hs-day { transition: none; }
-.bpu-hs.nang-day .bpu-tia { transform: translateY(-140px); } /* gửi trong lúc thanh dưới đang nâng ⇒ tia lửa bật lên từ chỗ nút */
+/* NÚT GỬI NỔI (thầy 10/11 «chuyển nút gửi đáp án sang mép phải giữa màn hình, chọn hết thì tự bật ra, chưa chọn hết thì ẩn đi. thiết kế đẹp tinh tế»):
+   viên thuốc dọc màu đội (--doi, chữ --p-muc như nút «Tiếp sức»), mép phải, giữa chiều cao; 56 × 84 px (vùng chạm ≥ 56). Ẩn = thu ra ngoài mép + mờ
+   (vẫn trong cây để trượt); bật = trượt vào + rõ + nảy nhẹ; lần đầu trong lượt có quầng sáng nhịp 2 lần. Chỉ transform / opacity.
+   Thân màn chừa lề phải = khoảng từ mép thân tới mép nút + bề ngang nút + 8 px ⇒ nút không đè phương án / ý đúng–sai / bàn phím số. */
+.bpu-hs.co-gui .bpu-hs-than { padding-right: calc(max(12px, env(safe-area-inset-right, 0px)) - env(safe-area-inset-right, 0px) + 64px); }
+.bpu-gui-noi { position: fixed; z-index: 2; top: 50%; right: max(12px, env(safe-area-inset-right, 0px)); width: 56px; padding: 12px 0 10px; border: 0; border-radius: 28px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer;
+  background: var(--doi); color: var(--p-muc); font-size: 14px; font-weight: 900; letter-spacing: 0.01em; line-height: 1;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--giay) 40%, transparent), 0 3px 0 color-mix(in srgb, var(--doi) 60%, var(--p-muc)), 0 10px 24px color-mix(in srgb, var(--doi) 34%, transparent);
+  transform: translate(calc(100% + 32px), -50%); opacity: 0; pointer-events: none;
+  transition: transform 0.22s cubic-bezier(.4, 0, 1, 1), opacity 0.18s ease-in; }
+.bpu-hs .bpu-gui-noi { min-height: 84px; } /* thắng `.m3 button` (min-height 48) */
+.bpu-gui-noi[data-hien="true"] { transform: translate(0, -50%); opacity: 1; pointer-events: auto;
+  transition: transform 0.46s cubic-bezier(.3, 1.4, .5, 1), opacity 0.2s ease-out; }
+.bpu-gui-noi[data-hien="true"]:active { transform: translate(0, -50%) scale(0.94); transition-duration: 0.08s; }
+.bpu-gui-noi:focus-visible { outline: 3px solid var(--tr-chu); outline-offset: 3px; }
+.bpu-gui-noi svg { width: 24px; height: 24px; flex: none; }
+.bpu-gui-noi::after { content: ""; position: absolute; inset: -5px; border-radius: 33px; border: 3px solid color-mix(in srgb, var(--doi) 70%, transparent); opacity: 0; pointer-events: none; }
+.bpu-gui-noi.quang::after { animation: bpu-gui-noi-quang 1s 0.3s ease-out 2; }
+@keyframes bpu-gui-noi-quang { from { transform: scale(0.94); opacity: 0.9; } to { transform: scale(1.32); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .bpu-gui-noi, .bpu-gui-noi[data-hien="true"] { transition: none; } .bpu-gui-noi.quang::after { animation: none; } }
+html.may-yeu .bpu-gui-noi, html.may-yeu .bpu-gui-noi[data-hien="true"] { transition: none; }
+html.may-yeu .bpu-gui-noi.quang::after { animation: none; }

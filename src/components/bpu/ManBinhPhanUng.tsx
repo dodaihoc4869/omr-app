@@ -37,8 +37,6 @@ export const KIEM_KHOA_MS = 1000
  *  xuống rồi đọc, mở bong bóng chat: ≥ 300 ms hoạt ảnh). Bàn phím bật KHÔNG làm mất tiêu điểm (không qua nhánh này); hộp hỏi quyền IdleDetector được
  *  chặn riêng (`dangXinQuyen`). */
 export const NOI_MS = 200
-/** Dòng hướng dẫn thoát toàn màn hình của Chrome Android nằm ở đáy ~3–4 s ⇒ thanh dưới nâng lên ngần này rồi hạ. */
-export const NANG_DAY_MS = 4200
 
 type Tin = { t: string; [k: string]: unknown }
 const gio = (ms: number) => { const s = Math.max(0, Math.ceil(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` }
@@ -407,21 +405,6 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   // GIỮ MÀN SÁNG (thầy 10/11 «cho mọi điện thoại»): từ lúc phòng nối (có `viewEm`) tới khi thầy kết thúc buổi — kể cả lúc màn BPU đang ẩn chờ lượt.
   // wakeLock; không có / bị từ chối / app cài trên iOS ⇒ video câm dự phòng (`giu-sang.ts`). Kết thúc buổi / gỡ màn ⇒ nhả hết.
   const giuSangBat = !!v && !v.ketThuc
-  // NÂNG THANH DƯỚI KHI VỪA VÀO TOÀN MÀN HÌNH (thầy 10/11 «dòng hướng dẫn ở cuối màn hình che nút gửi bài»): mỗi lần vào toàn màn hình, Chrome Android hiện
-  // một dòng «Kéo từ trên xuống… để thoát khỏi chế độ toàn màn hình» ở đáy ~3–4 s (trang không tắt được). Trong lúc ấy thanh dưới (nút «Gửi đáp án»)
-  // nâng lên khỏi vùng đáy (`.nang-day`, chỉ transform) rồi hạ về sau NANG_DAY_MS. Chỉ khi VỪA VÀO (fullscreenElement có), không khi thoát.
-  const [nangDay, setNangDay] = useState(false)
-  useEffect(() => {
-    let hen: ReturnType<typeof setTimeout> | undefined
-    const doi = () => {
-      clearTimeout(hen)
-      if (!document.fullscreenElement) { setNangDay(false); return }
-      setNangDay(true)
-      hen = setTimeout(() => setNangDay(false), NANG_DAY_MS)
-    }
-    document.addEventListener('fullscreenchange', doi)
-    return () => { clearTimeout(hen); document.removeEventListener('fullscreenchange', doi) }
-  }, [])
   useEffect(() => (giuSangBat ? giuSang() : undefined), [giuSangBat])
   const dangXinTm = useRef(false)
 
@@ -446,7 +429,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const doi = e ? e.doi : 0
   const tenDoi = DOI_BPU[doi]?.ten ?? ''
   const q = (l?.cau ?? null) as unknown as Question | null
-  const duChon = !!l && (l.tuLuan || (l.phan === 'II' ? /^[DS]{4}$/.test(chon) : chon.trim().length > 0))
+  // Trả lời ngắn: phải có ít nhất một chữ số (chỉ «−» / «,» vẫn là ô trống ⇒ nút gửi chưa bật ra).
+  const duChon = !!l && (l.tuLuan || (l.phan === 'II' ? /^[DS]{4}$/.test(chon) : l.phan === 'I' ? chon.trim().length > 0 : /\d/.test(chon)))
   // Khoá lượt = số lượt + giờ mở: phòng bỏ lượt rỗng rồi mở câu khác cùng số ⇒ khoá khác ⇒ không che nhầm câu em chưa thấy.
   const khoaLuot = l ? `${l.so}:${l.batDau}` : ''
   // 09/11 thầy «che luôn cả em chưa gửi»: thầy mở đáp án ⇒ MỌI máy che (em chưa gửi cũng chỉ thấy kết quả, không đề, không lời giải) — nhìn lên bảng chữa bài.
@@ -486,6 +470,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
 
   let than: React.ReactNode
   let day: React.ReactNode = null
+  /** Nút gửi NỔI ở mép phải (10/11) — chỉ có khi em đang làm câu (chưa che, chưa mở đáp án, chưa hết giờ) hoặc đang chạy hiệu ứng gửi (thu vào mép). */
+  let nutGui: React.ReactNode = null
   if (tt === 'tat' || tt === 'khong-buoi') {
     than = <div className="bpu-hs-giua"><h3>{tt === 'tat' ? 'Bình Phản Ứng đang tạm tắt' : 'Lớp chưa mở Bình Phản Ứng'}</h3><p>{tt === 'tat' ? 'Thầy sẽ chiếu câu như thường trên bảng.' : 'Khi thầy mở, câu sẽ tự hiện ở đây.'}</p></div>
     day = <button type="button" className="bpu-nut" onClick={onDong}>Đóng</button>
@@ -590,24 +576,21 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         </>
       )
     }
-    if (che) day = dangBay ? <div className="bpu-hai-nut"><button type="button" className="bpu-nut" disabled>Đã gửi</button></div> : null
+    // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «chuyển nút gửi đáp án sang mép phải giữa màn hình, chọn hết thì tự bật ra, chưa chọn hết thì ẩn»): bỏ thanh dưới
+    // chứa nút gửi (và nút «Đã gửi» lúc bay) — nút nổi `NutGuiNoi` (lớp `.bpu-gui-noi`). Tự luận («Em làm xong») cũng dùng nút nổi, luôn bật (không có gì để chọn): một chỗ
+    // gửi duy nhất cho mọi loại câu, em không phải tìm nút ở hai nơi. Thanh dưới chỉ còn khi hết giờ (dòng báo) / thầy mở đáp án mà em chưa gửi.
+    if (che) { if (dangBay) nutGui = <NutGuiNoi key={khoaLuot} hien={false} tuLuan={!!l.tuLuan} onGui={guiTra} /> }
     else if (daMo) {
       // Em CHƯA gửi mà thầy mở đáp án: không che (em chưa có gì để giữ); đáp án đúng tô XANH ngay dưới đề + lời giải như cũ.
       if (l.tuLuan) day = <div className="bpu-ket"><h4>Thầy đang chữa trên bảng</h4><p>Em nhìn lên bảng và đối chiếu bài làm của mình.</p></div>
       else day = <div className="bpu-ket sai" role="status"><h4>Em chưa gửi kịp</h4>{l.dung ? <KetQuaChon phan={l.phan} chon="" dung={l.dung} emDung={false} /> : <p>Đáp án đúng: {chuDung}</p>}</div>
-    } else {
-      day = (
-        <div className="bpu-hai-nut">
-          {hetGio ? <p className="bpu-bao" role="status">Hết giờ — câu này để trống. Nhìn lên bảng nhé.</p>
-            : <button type="button" className="bpu-nut" disabled={!duChon} onClick={guiTra}>{l.tuLuan ? 'Em làm xong' : 'Gửi đáp án'}</button>}
-        </div>
-      )
-    }
+    } else if (hetGio) day = <div className="bpu-hai-nut"><p className="bpu-bao" role="status">Hết giờ — câu này để trống. Nhìn lên bảng nhé.</p></div>
+    else nutGui = <NutGuiNoi key={khoaLuot} hien={duChon} tuLuan={!!l.tuLuan} onGui={guiTra} />
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
   if (an) return null
   return createPortal(
-    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nangDay ? ' nang-day' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
+    <div className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }}>
       {tren(e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
       {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}
@@ -615,9 +598,35 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       {lopChe ? null : neoBd}
       {than ? <main className="bpu-hs-than">{than}</main> : null}
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
+      {nutGui}
       {lopChe}
     </div>,
     document.body,
+  )
+}
+
+/** NÚT GỬI NỔI (thầy 10/11 «chuyển nút gửi đáp án sang mép phải giữa màn hình, khi học sinh chọn hết thì tự bật ra, còn chưa chọn hết thì ẩn đi»):
+ *  viên thuốc dọc màu đội dính mép phải, giữa chiều cao màn (`position: fixed`). Chọn đủ (trắc nghiệm: một phương án; đúng–sai: đủ 4 ý; trả lời ngắn: có số)
+ *  ⇒ trượt từ mép vào + rõ dần + nảy nhẹ; bỏ chọn bớt ⇒ thu lại vào mép. Lần ĐẦU bật ra trong lượt ⇒ quầng sáng nhịp 2 lần (lớp `quang` giữ suốt lượt nên
+ *  bật lại không nhấp nháy nữa; lượt mới ⇒ `key` mới ⇒ trạng thái mới). Lúc ẩn: vẫn nằm trong cây (để trượt ra / vào) nhưng `inert` + `aria-hidden` +
+ *  `disabled` ⇒ không chạm, không Tab, máy đọc màn hình bỏ qua.
+ *  KHÔNG CHE phương án / ý đúng–sai / bàn phím số: thân màn chừa lề phải đủ rộng cho nút (`.bpu-hs.co-gui .bpu-hs-than`, chừa suốt lúc có nút — kể cả lúc
+ *  nút ẩn — để bật / ẩn không làm chữ chạy dòng dưới tay em). Nhờ lề ấy bàn phím số cũng nằm gọn bên trái nút ⇒ không cần đặt nút riêng trên bàn phím. */
+function NutGuiNoi({ hien, tuLuan, onGui }: { hien: boolean; tuLuan: boolean; onGui: () => void }) {
+  // Gắn vào màn ở trạng thái ẨN rồi mới bật (một nhịp sau) ⇒ câu tự luận / câu vừa tới đã đủ chọn vẫn thấy nút trượt vào, không hiện bụp.
+  const [vao, setVao] = useState(false)
+  useEffect(() => { setVao(true) }, [])
+  const mo = hien && vao
+  const [quang, setQuang] = useState(false)
+  useEffect(() => { if (mo) setQuang(true) }, [mo])
+  return (
+    <button type="button" className={`bpu-gui-noi${quang ? ' quang' : ''}`} data-hien={mo} aria-label={tuLuan ? 'Em làm xong' : 'Gửi đáp án'}
+      aria-hidden={mo ? undefined : true} inert={!mo} tabIndex={mo ? undefined : -1} disabled={!mo} onClick={onGui}>
+      {tuLuan
+        ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.6 4.6L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3L10.2 13.8M21 3l-6.6 18-4.2-7.2L3 9.6 21 3z" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+      <span>{tuLuan ? 'Xong' : 'Gửi'}</span>
+    </button>
   )
 }
 

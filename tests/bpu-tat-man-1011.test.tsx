@@ -58,7 +58,7 @@ async function vao() {
   await waitFor(() => expect(WsGia.ds.length).toBe(1))
   const ws = WsGia.ds[0]!
   const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-  await screen.findByRole('button', { name: 'Gửi đáp án' })
+  await screen.findByLabelText('Gửi đáp án')  // SỬA CÓ CHỦ ĐÍCH 10/11: nút gửi nổi, chưa chọn thì ẩn
   await cho(0) // đọc quyền xong
   return { ws, st }
 }

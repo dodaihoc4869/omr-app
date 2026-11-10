@@ -1,4 +1,6 @@
 // Bình Phản Ứng — giao diện máy em + bảng chiếu với phòng giả (WebSocket giả, dữ liệu từ luật phòng thật): đi đủ các màn, không vỡ, chữ đúng chuẩn.
+// SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «nút gửi đáp án sang mép phải giữa màn hình, chọn hết thì tự bật ra, chưa chọn hết thì ẩn»): nút gửi nay NỔI, chưa chọn
+// thì ẩn (aria-hidden) ⇒ chỗ chờ «câu đã hiện» chờ nút theo nhãn (`findByLabelText`); kiểm ẩn / bật / gửi: tests/bpu-nut-gui-1011.test.tsx.
 import { act, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DOI_BPU, boLuotRong, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm, ketThuc } from '../src/lib/bpu/phong'
@@ -34,7 +36,7 @@ describe('máy em', () => {
     // Lúc chờ (chưa có lượt) em rời được — không bị kẹt khi thầy quên kết thúc / có ca kiểm tra.
     expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(await screen.findByLabelText('Gửi đáp án')).toBeTruthy()
     expect(screen.queryByRole('button', { name: /Thoát|Đóng/ })).toBeNull()
     nhanTra(st, 'S1', 'B', T0 + 3000); ws.nhan(viewEm(st, 'S1'))
     expect(await screen.findByText(/Đã gửi sau 3 giây/)).toBeTruthy()
@@ -53,7 +55,7 @@ describe('máy em', () => {
     await waitFor(() => expect(WsGia.ds.length).toBe(1))
     const ws = WsGia.ds[0]!
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(await screen.findByLabelText('Gửi đáp án')).toBeTruthy()
     expect(screen.queryByRole('button', { name: /chưa biết làm/ })).toBeNull()
     expect(document.body.textContent).not.toMatch(/Thành thật|\+20 kJ/)
     moLuot(st, cau, Date.now() - 120_000); ws.nhan(viewEm(st, 'S1'))
@@ -70,7 +72,7 @@ describe('máy em', () => {
     const st = phong(); ws.nhan(viewEm(st, 'S1'))
     expect(screen.queryByRole('dialog', { name: 'Bình Phản Ứng' })).toBeNull()
     moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(await screen.findByLabelText('Gửi đáp án')).toBeTruthy()
     // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «bỏ chữ rời bình phản ứng … khoá cứng tới khi tôi kết thúc buổi học»): không còn nút rời; mở đáp án ⇒ màn vẫn ở lại.
     moDapAn(st, T0 + 3000, chamSo); ws.nhan(viewEm(st, 'S1'))
     expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull()
@@ -78,7 +80,7 @@ describe('máy em', () => {
     expect(onDong).not.toHaveBeenCalled()
     expect(WsGia.ds).toHaveLength(1) // vẫn một kết nối, không nối lại
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(await screen.findByLabelText('Gửi đáp án')).toBeTruthy()
     void thi
   })
   it('em được gọi lên bảng thấy lý do', async () => {
@@ -103,7 +105,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
   it('đầu màn: ngọn lửa đội + tên đội + kJ đội', async () => {
     const ws = await vao()
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    await screen.findByRole('button', { name: 'Gửi đáp án' })
+    await screen.findByLabelText('Gửi đáp án')
     const ten = DOI_BPU[st.ds[0]!.doi]!.ten
     expect(document.querySelector('.bpu-hs-tren .bpu-lua')).toBeTruthy()
     expect(document.querySelector('.bpu-hs-tren .bpu-hs-tieu b')!.textContent).toBe(ten)
@@ -135,7 +137,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(document.body.textContent).not.toContain('Chất nào là amine bậc hai?')
     expect(screen.queryByRole('button', { name: 'Rời Bình Phản Ứng' })).toBeNull() // SỬA CÓ CHỦ ĐÍCH 09/11: khoá cứng, không nút rời
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 9000); ws.nhan(viewEm(st, 'S1'))
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' }, { timeout: 5000 })).toBeTruthy()
+    expect(await screen.findByLabelText('Gửi đáp án', {}, { timeout: 5000 })).toBeTruthy()
     expect(document.querySelector('.bpu-che')).toBeNull()
   })
   it('em chọn đúng ⇒ lớp che XANH «Chính xác!»; Đúng–sai ⇒ ý đúng xanh, ý sai đỏ kèm đáp án', async () => {
@@ -162,7 +164,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
     expect(boLuotRong(st)).toBe(true)
     moLuot(st, { ...cau, qid: 'q2' }, T0 + 7000); ws.nhan(viewEm(st, 'S1'))
     expect(viewEm(st, 'S1').luot!.so).toBe(1)
-    expect(await screen.findByRole('button', { name: 'Gửi đáp án' })).toBeTruthy()
+    expect(await screen.findByLabelText('Gửi đáp án')).toBeTruthy()
     expect(document.querySelector('.bpu-che')).toBeNull()
   })
   // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «che luôn cả em chưa gửi»): mở đáp án ⇒ máy em chưa gửi cũng CHE (không đề, không lời giải), chỉ kết quả + đáp án đúng XANH.
@@ -179,7 +181,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
   it('SỬA CÓ CHỦ ĐÍCH 09/11 — rời màn nhắc «em −50 kJ · đội −50 kJ»; ẩn app ≥ 2 s ⇒ `roi`, hiện lại ⇒ `ve` (cả khi rời bằng pagehide)', async () => {
     const ws = await vao()
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    await screen.findByRole('button', { name: 'Gửi đáp án' })
+    await screen.findByLabelText('Gửi đáp án')
     let an = false
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => an })
     const tieuDiem = vi.spyOn(document, 'hasFocus').mockImplementation(() => !an)
@@ -205,7 +207,7 @@ describe('máy em · thầy 09/11 (ngọn lửa đội · tự che sau khi gửi
   it('09/11 CỬA SỔ NỔI: app vẫn hiện nhưng mất tiêu điểm ⇒ `roi` + cảnh báo «Không được dùng cửa sổ nổi»; lấy lại tiêu điểm ⇒ `ve`', async () => {
     const ws = await vao()
     const st = phong(); moLuot(st, cau, T0); ws.nhan(viewEm(st, 'S1'))
-    await screen.findByRole('button', { name: 'Gửi đáp án' })
+    await screen.findByLabelText('Gửi đáp án')
     let co = true
     const tieuDiem = vi.spyOn(document, 'hasFocus').mockImplementation(() => co)
     try {
