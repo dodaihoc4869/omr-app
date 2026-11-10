@@ -91,9 +91,23 @@ describe('Bình Phản Ứng bấm L ⇒ tờ cũ cuộn ngay, không lật tran
     expect(t.vung().classList.contains('mc-cuon')).toBe(true)
   })
 
-  it('đề dài có lửa: chừa lề trái, lửa dính góc trên khi cuộn; chấm xong bỏ lề', () => {
-    expect(JS_LEN_BANG_BPU).toContain("body.mc-bc .mc-vung-de.bpu-ranh-lua{padding-left:calc(var(--lua,236px) + 44px)}.mc-vung-de.bpu-ranh-lua>.bpu-lua-doi{position:sticky;top:0")
-    expect(JS_LEN_BANG_BPU).toMatch(/function xoaLua\(\)[^\n]*bpu-ranh-lua/)
+  // SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «phần đề bao quanh ngọn lửa để tối ưu diện tích hiển thị đề»): bỏ lề trái + lửa dính (sticky) — lửa float góc trên trái,
+  // shape-outside theo dáng lửa ⇒ chữ đề ôm mép lửa rồi tràn hết bề ngang dưới lửa; ý / phương án một cột thôi là lưới (từng ý né lửa riêng).
+  it('đề có lửa: lửa float + shape-outside, chữ chảy quanh (không còn lề trái / sticky); chấm xong gỡ hết', () => {
+    expect(JS_LEN_BANG_BPU).toMatch(/\.bpu-lua-doi\{float:left;[^']*shape-outside:polygon\([^)]*\) border-box;shape-margin:\d+px/)
+    expect(JS_LEN_BANG_BPU).not.toMatch(/bpu-ranh-lua|position:sticky|--lua\b/)
+    expect(JS_LEN_BANG_BPU).toContain('.mc-ds-pa.bpu-pa-chay{display:block}')
+    expect(JS_LEN_BANG_BPU).toContain('.bpu-duoi-lua{clear:left}')
     expect(JS_LEN_BANG_BPU).toContain('S.bpuCuon = true;')
+    const t = moTo([o('A', 'An'), o('B', 'Bình')])
+    t.datBoCuc()
+    expect(t.doc.getElementById('bpu-lua-css')).toBeNull() // tờ Gọi lên bảng thường: không lửa, không luật lửa
+    t.giaoEm()
+    const v = t.vung()
+    expect(t.doc.getElementById('bpu-lua-css')).toBeTruthy()
+    expect(v.firstElementChild!.classList.contains('bpu-lua-doi')).toBe(true) // góc trên trái vùng đề, trong dòng chảy (cuộn cùng đề)
+    expect(v.querySelector('.mc-ds-pa.bpu-pa-chay')).toBeTruthy() // phương án một cột chảy quanh lửa
+    t.phim('d')
+    expect(t.doc.querySelector('.bpu-lua-doi, .bpu-pa-chay, .bpu-duoi-lua, .bpu-ranh-lua')).toBeNull()
   })
 })
