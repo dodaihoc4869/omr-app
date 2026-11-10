@@ -1567,6 +1567,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3": {
+      "tep": "vong-nam-native855-ddh-f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e.svg",
+      "hashSvg": "f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e",
+      "byteSvg": 8773,
+      "byteGzip": 1277,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "06c60a8e7f0f0ad38ec85e732f715a1d24e92d7d6754a71c49bc37d8cee6816e": {
       "tep": "hinh-ddh-402f9be6a48b74e30ee8230bf510b1d8d18f8df7afaf43f215453279c0103ee7.svg",
       "hashSvg": "402f9be6a48b74e30ee8230bf510b1d8d18f8df7afaf43f215453279c0103ee7",
@@ -11512,6 +11521,20 @@
       ]
     },
     {
+      "qid": "12-C2-B4-D2-I-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+          "where": "12-C2-B4-D2-I-3.hinh.0.du_lieu",
+          "hashDataUrl": "1cc5a1aadf2719c087f4f02d235ff2543bf3a6530df0affd75b2fa5ccb30dafa",
+          "vector": "vong-nam-native855-ddh-f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C2-B4-D2-I-5",
       "duMoiHinh": true,
       "soHinhNguon": 4,
@@ -19454,6 +19477,20 @@
           "where": "DB-12-B4-D3-I-66.hinh.0.du_lieu",
           "hashDataUrl": "bc00335cf17dfd367af8e64d798ecc001474471a1ce948dea99dcbc075204f8c",
           "vector": "fructose-bon-mui-ten-ddh-da7f12408148d0c8a7bd91eff261c03cbbcdd86a4569a6cdde3955ace0e106be.svg"
+        }
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-67",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+          "where": "DB-12-B4-D3-I-67.hinh.0.du_lieu",
+          "hashDataUrl": "1cc5a1aadf2719c087f4f02d235ff2543bf3a6530df0affd75b2fa5ccb30dafa",
+          "vector": "vong-nam-native855-ddh-f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e.svg"
         }
       ]
     },
@@ -29882,6 +29919,7 @@
     "12-C2-B4-D2-II-10",
     "12-C2-B4-D2-III-16",
     "12-C2-B4-D2-I-2",
+    "12-C2-B4-D2-I-3",
     "12-C2-B4-D2-I-5",
     "12-C2-B4-D2-I-7",
     "12-C2-B4-D2-II-13",
@@ -30388,6 +30426,7 @@
     "DB-12-B4-D3-I-39",
     "DB-12-B4-D3-II-44",
     "DB-12-B4-D3-I-66",
+    "DB-12-B4-D3-I-67",
     "DB-12-B4-D3-I-69",
     "DB-12-B4-D3-II-78",
     "DB-12-B4-D3-I-96",

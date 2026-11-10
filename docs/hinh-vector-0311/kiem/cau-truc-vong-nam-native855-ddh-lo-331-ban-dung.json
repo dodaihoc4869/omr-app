@@ -1,0 +1,40 @@
+[
+  {
+    "i": 855,
+    "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+    "fileNguon": "anh/9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3.png",
+    "svg": "vong-nam-native855-ddh-f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e.svg",
+    "hashSvg": "f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e",
+    "byteSvg": 8773,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C2-B4-D2-I-3",
+        "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+        "refs": [
+          {
+            "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+            "where": "12-C2-B4-D2-I-3.hinh.0.du_lieu",
+            "hashDataUrl": "1cc5a1aadf2719c087f4f02d235ff2543bf3a6530df0affd75b2fa5ccb30dafa"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B4-D3-I-67",
+        "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+        "refs": [
+          {
+            "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+            "where": "DB-12-B4-D3-I-67.hinh.0.du_lieu",
+            "hashDataUrl": "1cc5a1aadf2719c087f4f02d235ff2543bf3a6530df0affd75b2fa5ccb30dafa"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1five-ring4bareC+2CH2OH-C=6C/6O/3freeOH/2TAPER1boldfront6px-verticalfeet/CH2OHleftUP-rightDOWN-firstCanchors/upperOHUP-backbondWHITEGAPS/0standaloneH/regularupright/noaddedname-answer-nums-caption",
+    "hashSvgDaSoat": "f3b2b1bf850e1585fd9b38c0fb6cd0ab5a781f64c8ebda33fd07ad2c7628953e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,297 @@
+{
+  "i": 855,
+  "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3.png",
+  "size": [
+    382,
+    248
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C2-B4-D2-I-3",
+      "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+      "allHinh": [
+        {
+          "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+          "where": "12-C2-B4-D2-I-3.hinh.0.du_lieu",
+          "hashDataUrl": "1cc5a1aadf2719c087f4f02d235ff2543bf3a6530df0affd75b2fa5ccb30dafa"
+        }
+      ],
+      "missingHashes": [
+        "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3"
+      ]
+    },
+    {
+      "qid": "DB-12-B4-D3-I-67",
+      "de": "Monosaccharide X có công thức cấu tạo như sau: Tên gọi của X là",
+      "allHinh": [
+        {
+          "hash": "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3",
+          "where": "DB-12-B4-D3-I-67.hinh.0.du_lieu",
+          "hashDataUrl": "1cc5a1aadf2719c087f4f02d235ff2543bf3a6530df0affd75b2fa5ccb30dafa"
+        }
+      ],
+      "missingHashes": [
+        "9c1fb7249a11d76b198b08585e24dedf695b923ddc933050f34865108e3308b3"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/855-native4x-lo331.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "Singlefive-memberHaworthmonosaccharide, no caption/numberlabels.",
+    "ringVertices": {
+      "leftC2": [
+        53,
+        104
+      ],
+      "frontLeftC3": [
+        93,
+        143
+      ],
+      "frontRightC4": [
+        224,
+        143
+      ],
+      "rightC5": [
+        263,
+        104
+      ]
+    },
+    "ringO": {
+      "text": "O",
+      "bbox": [
+        145,
+        57,
+        170,
+        85
+      ],
+      "leftBond": [
+        [
+          53,
+          104
+        ],
+        [
+          144,
+          75
+        ]
+      ],
+      "rightBondSPLIT": [
+        [
+          [
+            172,
+            75
+          ],
+          [
+            219,
+            91
+          ]
+        ],
+        [
+          [
+            228,
+            94
+          ],
+          [
+            263,
+            104
+          ]
+        ]
+      ],
+      "gapFinding": "Own4xconfirmsbackO-rightCthinbondBREAKSarounduprightfrontOHstemx224. Preservewhitegapapprox219..228 and DO NOTnodejoinatcrossing; verticalOHstemcontinuousfrom143up75."
+    },
+    "frontTapers": [
+      [
+        [
+          53,
+          104
+        ],
+        [
+          90,
+          147
+        ],
+        [
+          96,
+          139
+        ]
+      ],
+      [
+        [
+          263,
+          104
+        ],
+        [
+          221,
+          147
+        ],
+        [
+          227,
+          139
+        ]
+      ]
+    ],
+    "frontBold": {
+      "line": [
+        [
+          93,
+          143
+        ],
+        [
+          224,
+          143
+        ]
+      ],
+      "widthApprox": 6,
+      "wideVertexFeetY": [
+        139,
+        147
+      ],
+      "note": "TAPERwidenstowardfrontvertices, uniformboldhorizontal; noextrawedgebranches."
+    },
+    "branches": [
+      {
+        "text": "CH₂OH",
+        "bbox": [
+          41,
+          28,
+          145,
+          58
+        ],
+        "bond": [
+          [
+            53,
+            104
+          ],
+          [
+            53,
+            58
+          ]
+        ],
+        "anchor": "FIRSTCcenter53",
+        "direction": "UP"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          41,
+          150,
+          88,
+          180
+        ],
+        "bond": [
+          [
+            53,
+            104
+          ],
+          [
+            53,
+            149
+          ]
+        ],
+        "anchor": "Ofirstglyph",
+        "direction": "DOWN"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          81,
+          192,
+          129,
+          222
+        ],
+        "bond": [
+          [
+            93,
+            143
+          ],
+          [
+            93,
+            190
+          ]
+        ],
+        "anchor": "Ofirstglyph",
+        "direction": "DOWN"
+      },
+      {
+        "text": "OH",
+        "bbox": [
+          211,
+          47,
+          260,
+          78
+        ],
+        "bond": [
+          [
+            224,
+            143
+          ],
+          [
+            224,
+            75
+          ]
+        ],
+        "anchor": "Ofirstglyph",
+        "direction": "UP",
+        "crossingNote": "CrossesbackbondviaWHITEGAP, noCjunctionatcrossing"
+      },
+      {
+        "text": "CH₂OH",
+        "bbox": [
+          250,
+          159,
+          355,
+          192
+        ],
+        "bond": [
+          [
+            263,
+            104
+          ],
+          [
+            263,
+            157
+          ]
+        ],
+        "anchor": "FIRSTCcenter263",
+        "direction": "DOWN"
+      }
+    ],
+    "font": "ALLregularuprightsanschemicalglyphs;2SUBinbothCH2OH, noactualbold/italictext.",
+    "counts": {
+      "C": 6,
+      "ringC": 4,
+      "CH2OHtextC": 2,
+      "O": 6,
+      "ringO": 1,
+      "OHfree": 3,
+      "CH2OHO": 2,
+      "standaloneH": 0,
+      "TAPER": 2,
+      "boldFrontHorizontal": 1,
+      "caption": 0,
+      "numbers": 0
+    },
+    "noAdded": [
+      "compoundnameanswer",
+      "Hlabels",
+      "Cnumbers",
+      "fillednodeatbackbondcrossing",
+      "closingwhitegap",
+      "stereowedges",
+      "reactionarrow",
+      "extraOH"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelgeometryincludingliteralocclusiongap, no sugarname/stereochemicalinference."
+}
