@@ -46,8 +46,9 @@ export interface SoDoDem {
   goi: number
 }
 
-/** `diem[i]` = điểm bút; `gio[i]` = giờ live của thầy (ms) của điểm đó. */
-interface NetDem { dau: DauNet; diem: DiemBut[]; gio: number[]; ke: number; daVe: number; nhac: boolean; tong: number | null }
+/** `diem[i]` = điểm thứ i của nét (lỗ = gói chưa tới / đã mất); `gio[i]` = giờ live của thầy (ms) của điểm đó; `cao` = chỉ số cao nhất đã nhận + 1;
+ *  `daVe` = chỉ số kế tiếp sẽ phát; `cuoi` = chỉ số điểm vừa phát gần nhất (−1 = chưa phát điểm nào); `soPhat` = số điểm đã phát ra lớp vẽ. */
+interface NetDem { dau: DauNet; diem: (DiemBut | undefined)[]; gio: number[]; cao: number; daVe: number; cuoi: number; soPhat: number; nhac: boolean; nhacLuc: number; tong: number | null }
 const kep = (v: number, a: number, b: number): number => (v < a ? a : v > b ? b : v)
 const XO = 5000
 
@@ -81,20 +82,19 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     if (tGuiTruoc >= 0 && g.tGui > tGuiTruoc) lo = lo * 0.8 + kep(g.tGui - tGuiTruoc, 8, 50) * 0.2
     tGuiTruoc = Math.max(tGuiTruoc, g.tGui)
     if (g.k === 'tro') { troHang.push({ t: g.tGui, x: g.x, y: g.y }); if (troHang.length > 60) troHang = troHang.slice(-40); return }
-    if (g.k === 'nhac') { const n = net.get(g.id); if (n) { n.nhac = true; n.tong = g.tong } return }
+    if (g.k === 'nhac') { const n = net.get(g.id); if (n && !n.nhac) { n.nhac = true; n.nhacLuc = g.tGui; n.tong = g.tong } return }
     let n = net.get(g.dau.id)
-    if (!n) { n = { dau: g.dau, diem: [], gio: [], ke: 0, daVe: 0, nhac: false, tong: null }; net.set(g.dau.id, n) }
-    if (g.tu > n.ke) { mat += g.tu - n.ke; n.ke = g.tu } // thủng (mất ≥ 2 gói liền): nối thẳng qua chỗ thủng
+    if (!n) { n = { dau: g.dau, diem: [], gio: [], cao: 0, daVe: 0, cuoi: -1, soPhat: 0, nhac: false, nhacLuc: 0, tong: null }; net.set(g.dau.id, n) }
     const mocNay = nhan - lech() - d
-    for (let i = n.ke - g.tu; i < g.diem.length; i++) {
-      const p = g.diem[i]!
-      // Giờ điểm không được lùi trong một nét — giữ thứ tự để nội suy đúng.
-      const gio = Math.max(g.tGoc + p[3], n.gio.length ? n.gio[n.gio.length - 1]! : -Infinity)
-      n.diem.push(p); n.gio.push(gio)
-      const tre = mocNay - gio
-      if (tre > 0 && n.daVe > 0) { muon += 1; if (tre > muonToiDa) muonToiDa = tre }
+    // Ghi theo CHỈ SỐ trong nét: gói tới lệch thứ tự / gói lặp lấp đúng chỗ; điểm mà mốc phát đã đi qua (tới quá muộn) thì bỏ.
+    for (let i = 0; i < g.diem.length; i++) {
+      const k = g.tu + i
+      if (k < n.daVe || n.diem[k]) continue
+      n.diem[k] = g.diem[i]!; n.gio[k] = g.tGoc + g.diem[i]![3]
+      const tre = mocNay - n.gio[k]!
+      if (tre > 0 && n.soPhat > 0) { muon += 1; if (tre > muonToiDa) muonToiDa = tre }
     }
-    n.ke = Math.max(n.ke, g.tu + g.diem.length)
+    n.cao = Math.max(n.cao, g.tu + g.diem.length)
   }
 
   function p95(nay: number): number {
@@ -115,15 +115,25 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     mocTruoc = moc
     const ra: NetDangViet[] = []
     for (const [id, n] of net) {
-      const moi: DiemBut[] = [], daCo = n.daVe
-      while (n.daVe < n.diem.length && n.gio[n.daVe]! <= moc) moi.push(n.diem[n.daVe++]!)
+      const moi: DiemBut[] = [], daCo = n.soPhat
+      let ke = -1
+      for (;;) {
+        // Điểm kế tiếp ĐÃ CÓ (bỏ qua lỗ). Tới hạn ⇒ phát; lỗ nằm trước nó coi như mất (bản chốt từ sổ nét sẽ thay).
+        ke = n.daVe
+        while (ke < n.cao && !n.diem[ke]) ke++
+        if (ke >= n.cao) { ke = -1; break }
+        if (n.gio[ke]! > moc) break
+        mat += ke - n.daVe
+        moi.push(n.diem[ke]!); n.cuoi = ke; n.daVe = ke + 1; n.soPhat += 1
+      }
       let head: NetDangViet['head'] = null
-      if (n.daVe > 0) {
-        const i = n.daVe - 1, a = n.diem[i]!, b = n.diem[i + 1], ta = n.gio[i]!, tb = n.gio[i + 1]
-        if (b && tb != null && tb > ta) { const k = kep((moc - ta) / (tb - ta), 0, 1); head = { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, apLuc: a[2] + (b[2] - a[2]) * k } }
+      if (n.cuoi >= 0) {
+        const a = n.diem[n.cuoi]!, ta = n.gio[n.cuoi]!, b = ke >= 0 ? n.diem[ke] : undefined, tb = ke >= 0 ? n.gio[ke]! : 0
+        if (b && tb > ta) { const k = kep((moc - ta) / (tb - ta), 0, 1); head = { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k, apLuc: a[2] + (b[2] - a[2]) * k } }
         else head = { x: a[0], y: a[1], apLuc: a[2] } // hết điểm: giữ đầu nét
       }
-      const xong = n.nhac && n.daVe >= n.diem.length && (n.tong == null || n.ke >= n.tong)
+      // Đã nhấc + phát hết ⇒ xong. Gói cuối mất hẳn ⇒ sau 0,5 giây cũng coi là xong (bản chốt từ sổ nét mang đủ điểm).
+      const xong = n.nhac && (n.daVe >= Math.max(n.cao, n.tong ?? 0) || moc - n.nhacLuc > 500)
       if (xong) net.delete(id)
       if (moi.length || head || xong) ra.push({ dau: n.dau, moi, daCo, head, xong })
     }
@@ -147,7 +157,7 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     /** Nét dở có đang phát không (để lớp trên hoãn bản chốt tới khi phát xong). */
     dangPhat(id: string): boolean { return net.has(id) },
     /** Số điểm của nét dở đã PHÁT ra lớp vẽ (−1 = không có nét này). */
-    daPhat(id: string): number { return net.get(id)?.daVe ?? -1 },
+    daPhat(id: string): number { return net.get(id)?.soPhat ?? -1 },
     /** Bỏ hết nét dở (tắt live, sang phiên mới, bảng mới). */
     xoa(): void { net.clear(); troHang = [] },
     /** Đọc số đo và đặt lại các bộ đếm. */
