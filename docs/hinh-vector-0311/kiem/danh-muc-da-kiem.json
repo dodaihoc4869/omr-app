@@ -4042,6 +4042,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a": {
+      "tep": "triglyceride-native939-ddh-3c393645f29cbce11df4c9ba52cc41ff5947f88026632b1c324f15286f076fa9.svg",
+      "hashSvg": "3c393645f29cbce11df4c9ba52cc41ff5947f88026632b1c324f15286f076fa9",
+      "byteSvg": 12614,
+      "byteGzip": 2080,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "25b4bf0cdf73e8d22fb8d532fc3296f61acaf77ddc397c0d36748e1030e18ee5": {
       "tep": "hall-heroult-ddh-e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c.svg",
       "hashSvg": "e2702ee62adbfc7912c300f8a89d13c56bc66411aa69455afd14e380e99f7c1c",
@@ -14031,6 +14040,20 @@
           "where": "12-KT-C1-D3-I-17.hinh.4.du_lieu",
           "hashDataUrl": "691c05e83a2b6955cb46a793a1184eb6cb10a4e5c3abb12a5e6df34b4959f3c0",
           "vector": "khep-be-mat-ddh-be34054e99aff3b1b425c8e179242db609e23b1211e0b5c52a983f3c197f5da0.svg"
+        }
+      ]
+    },
+    {
+      "qid": "12-KT-C1-D3-II-3",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a",
+          "where": "12-KT-C1-D3-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "424ca0312d13b617f9f2e77326f80de8aacc5b84c85212c9529f019fc6f4678b",
+          "vector": "triglyceride-native939-ddh-3c393645f29cbce11df4c9ba52cc41ff5947f88026632b1c324f15286f076fa9.svg"
         }
       ]
     },
@@ -30190,6 +30213,7 @@
     "12-KT-C1-D2-I-14",
     "12-KT-C1-D2-III-1",
     "12-KT-C1-D3-I-17",
+    "12-KT-C1-D3-II-3",
     "12-KT-C1-D3-III-3",
     "12-KT-C1-D4-I-16",
     "12-KT-C1-D4-I-17",

@@ -1,0 +1,623 @@
+{
+  "i": 939,
+  "hash": "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a.png",
+  "size": [
+    915,
+    376
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C1-D3-II-3",
+      "de": "Triglyceride đóng vai trò là nguồn cung cấp năng lượng và chuyên chở các chất béo trong quá trình trao đổi chất. Cho triglyceride X có công thức cấu tạo như hình sau: Các kí hiệu (1), (2), (3) lần lượt là các gốc hydrocarbon trong cấu tạo của triglyceride X",
+      "allHinh": [
+        {
+          "hash": "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a",
+          "where": "12-KT-C1-D3-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "424ca0312d13b617f9f2e77326f80de8aacc5b84c85212c9529f019fc6f4678b"
+        }
+      ],
+      "missingHashes": [
+        "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/939-native2x-lo336.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownCO10xOpened": "/workspace/scratch/939-co10x-lo336.png"
+  },
+  "geometry": {
+    "classification": "One3acylchainglyceroltriesterwith3branchindices, no reaction.",
+    "glycerol": {
+      "labels": [
+        {
+          "text": "H₂C",
+          "bbox": [
+            39,
+            106,
+            90,
+            134
+          ]
+        },
+        {
+          "text": "HC",
+          "bbox": [
+            49,
+            201,
+            90,
+            229
+          ]
+        },
+        {
+          "text": "H₂C",
+          "bbox": [
+            39,
+            298,
+            90,
+            326
+          ]
+        }
+      ],
+      "CanchorX": 79,
+      "verticalBonds": [
+        [
+          [
+            79,
+            142
+          ],
+          [
+            79,
+            199
+          ]
+        ],
+        [
+          [
+            79,
+            233
+          ],
+          [
+            79,
+            289
+          ]
+        ]
+      ],
+      "note": "ALL3verticalanchorsCrightglyph, notH/2; noCH2reordering."
+    },
+    "esterO": [
+      {
+        "text": "O",
+        "bbox": [
+          122,
+          106,
+          146,
+          134
+        ],
+        "glycerolBond": [
+          [
+            94,
+            119
+          ],
+          [
+            119,
+            119
+          ]
+        ],
+        "acylBond": [
+          [
+            147,
+            108
+          ],
+          [
+            170,
+            85
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          122,
+          201,
+          146,
+          229
+        ],
+        "glycerolBond": [
+          [
+            94,
+            214
+          ],
+          [
+            119,
+            214
+          ]
+        ],
+        "acylBond": [
+          [
+            147,
+            203
+          ],
+          [
+            170,
+            180
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          122,
+          298,
+          146,
+          326
+        ],
+        "glycerolBond": [
+          [
+            94,
+            311
+          ],
+          [
+            119,
+            311
+          ]
+        ],
+        "acylBond": [
+          [
+            147,
+            300
+          ],
+          [
+            170,
+            277
+          ]
+        ]
+      }
+    ],
+    "chains": [
+      {
+        "index": "(1)",
+        "indexBBox": [
+          831,
+          82,
+          873,
+          113
+        ],
+        "verticesCarbonylToFreeRight": [
+          [
+            170,
+            85
+          ],
+          [
+            203,
+            120
+          ],
+          [
+            237,
+            85
+          ],
+          [
+            272,
+            120
+          ],
+          [
+            306,
+            85
+          ],
+          [
+            340,
+            120
+          ],
+          [
+            375,
+            85
+          ],
+          [
+            409,
+            120
+          ],
+          [
+            444,
+            85
+          ],
+          [
+            478,
+            120
+          ],
+          [
+            512,
+            85
+          ],
+          [
+            547,
+            120
+          ],
+          [
+            581,
+            85
+          ],
+          [
+            615,
+            120
+          ],
+          [
+            650,
+            85
+          ],
+          [
+            684,
+            120
+          ]
+        ],
+        "C": 16,
+        "CCdoubleEdges": []
+      },
+      {
+        "index": "(2)",
+        "indexBBox": [
+          835,
+          178,
+          877,
+          210
+        ],
+        "verticesCarbonylToFreeRight": [
+          [
+            170,
+            180
+          ],
+          [
+            203,
+            215
+          ],
+          [
+            237,
+            180
+          ],
+          [
+            272,
+            215
+          ],
+          [
+            306,
+            180
+          ],
+          [
+            340,
+            215
+          ],
+          [
+            375,
+            180
+          ],
+          [
+            409,
+            215
+          ],
+          [
+            444,
+            180
+          ],
+          [
+            492,
+            180
+          ],
+          [
+            527,
+            215
+          ],
+          [
+            561,
+            180
+          ],
+          [
+            596,
+            215
+          ],
+          [
+            630,
+            180
+          ],
+          [
+            665,
+            215
+          ],
+          [
+            699,
+            180
+          ],
+          [
+            733,
+            215
+          ],
+          [
+            768,
+            180
+          ]
+        ],
+        "C": 18,
+        "CCdoubleEdges": [
+          [
+            8,
+            9
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              446,
+              191
+            ],
+            [
+              490,
+              191
+            ]
+          ]
+        ]
+      },
+      {
+        "index": "(3)",
+        "indexBBox": [
+          837,
+          276,
+          879,
+          309
+        ],
+        "verticesCarbonylToFreeRight": [
+          [
+            170,
+            277
+          ],
+          [
+            203,
+            312
+          ],
+          [
+            237,
+            277
+          ],
+          [
+            272,
+            312
+          ],
+          [
+            306,
+            277
+          ],
+          [
+            340,
+            312
+          ],
+          [
+            375,
+            277
+          ],
+          [
+            409,
+            312
+          ],
+          [
+            444,
+            277
+          ],
+          [
+            492,
+            277
+          ],
+          [
+            527,
+            312
+          ],
+          [
+            561,
+            277
+          ],
+          [
+            608,
+            277
+          ],
+          [
+            643,
+            312
+          ],
+          [
+            678,
+            277
+          ],
+          [
+            726,
+            277
+          ],
+          [
+            761,
+            312
+          ],
+          [
+            796,
+            277
+          ]
+        ],
+        "C": 18,
+        "CCdoubleEdges": [
+          [
+            8,
+            9
+          ],
+          [
+            11,
+            12
+          ],
+          [
+            14,
+            15
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              446,
+              288
+            ],
+            [
+              490,
+              288
+            ]
+          ],
+          [
+            [
+              563,
+              288
+            ],
+            [
+              606,
+              288
+            ]
+          ],
+          [
+            [
+              680,
+              288
+            ],
+            [
+              724,
+              288
+            ]
+          ]
+        ]
+      }
+    ],
+    "carbonylO": [
+      {
+        "text": "O",
+        "bbox": [
+          155,
+          34,
+          181,
+          62
+        ],
+        "rays": [
+          [
+            [
+              165,
+              89
+            ],
+            [
+              165,
+              64
+            ]
+          ],
+          [
+            [
+              174,
+              89
+            ],
+            [
+              174,
+              64
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          155,
+          129,
+          181,
+          157
+        ],
+        "rays": [
+          [
+            [
+              165,
+              184
+            ],
+            [
+              165,
+              159
+            ]
+          ],
+          [
+            [
+              174,
+              184
+            ],
+            [
+              174,
+              159
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          155,
+          226,
+          181,
+          254
+        ],
+        "rays": [
+          [
+            [
+              165,
+              281
+            ],
+            [
+              165,
+              256
+            ]
+          ],
+          [
+            [
+              174,
+              281
+            ],
+            [
+              174,
+              256
+            ]
+          ]
+        ]
+      }
+    ],
+    "COFootTopology": "Own10x confirmsleftfootx165/rightfootx174 eachmeetoppositeslopesBELOWnativeapexx170,y85(top); preserveactualroundedapexink, noadditionalhorizontalbridge. Mid/bottomsameindividualnative2xvisiblefootpattern.",
+    "font": "ChemicalH2C/HC/OlabelsBOLDuprightsans source;branch(1)/(2)/(3)BOLDuprightserif. Noitalic/namescaption. ALLskeletallinesuniformthickishblack, noTAPER/wedges.",
+    "counts": {
+      "C": 55,
+      "glycerolC": 3,
+      "acylC": [
+        16,
+        18,
+        18
+      ],
+      "O": 6,
+      "COdouble": 3,
+      "CCdouble": 4,
+      "branchIndex": 3,
+      "caption": 0,
+      "charges": 0
+    },
+    "noAdded": [
+      "Xcaption",
+      "namesofacylchains",
+      "reactionarrow",
+      "H/CH3onfreeends",
+      "repeatbrackets",
+      "newstereolabels",
+      "CCdoubleontopchain",
+      "Cnumbers"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelverticescountedseparatelyeachchain, nothydrogenationtheory/name; zero-basededgeindices arebuilderreferencesnotfigurelabels.",
+  "corrections": [
+    "InitialCOcarbonylx168/feet172 approximate was2pxleft; own10xcorrectednode170 andrightfoot174. Vertexcountsunchanged."
+  ]
+}

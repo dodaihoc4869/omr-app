@@ -1,0 +1,29 @@
+[
+  {
+    "i": 939,
+    "hash": "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a",
+    "fileNguon": "anh/a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a.png",
+    "svg": "triglyceride-native939-ddh-3c393645f29cbce11df4c9ba52cc41ff5947f88026632b1c324f15286f076fa9.svg",
+    "hashSvg": "3c393645f29cbce11df4c9ba52cc41ff5947f88026632b1c324f15286f076fa9",
+    "byteSvg": 12614,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C1-D3-II-3",
+        "de": "Triglyceride đóng vai trò là nguồn cung cấp năng lượng và chuyên chở các chất béo trong quá trình trao đổi chất. Cho triglyceride X có công thức cấu tạo như hình sau: Các kí hiệu (1), (2), (3) lần lượt là các gốc hydrocarbon trong cấu tạo của triglyceride X",
+        "refs": [
+          {
+            "hash": "a9c2db29d2d6fefd1b709ac048312be0fe9217b8e88c0b4518d7fb80eabab54a",
+            "where": "12-KT-C1-D3-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "424ca0312d13b617f9f2e77326f80de8aacc5b84c85212c9529f019fc6f4678b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3acyl16-18-18C+3glycerolC=55C6O/0-1-3CCdouble/3COsplitfeet/explicitH2C-HC-H2C-Canchors/3trueDAMcaptions1-2-3/ALLtrueDAMchemical/noaddedH-CH3-stereo-answer/noalias490-801",
+    "hashSvgDaSoat": "3c393645f29cbce11df4c9ba52cc41ff5947f88026632b1c324f15286f076fa9",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
