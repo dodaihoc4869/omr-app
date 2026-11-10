@@ -1,0 +1,601 @@
+{
+  "i": 996,
+  "hash": "b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa.png",
+  "size": [
+    767,
+    323
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-KT-C123-D2-I-7",
+      "de": "Trong thành phần của dầu oliu có bao gồm một số chất béo, trong đó chủ yếu là một triglyceride X có cấu trúc như hình dưới.\nTriglyceride X là triester của glycerol với các acid béo có tên gọi là",
+      "allHinh": [
+        {
+          "hash": "b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa",
+          "where": "12-KT-C123-D2-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "c8a2aeb34024e9b7c6d6d8e2d3153fd8537f69b068827672a04388c102a33225"
+        }
+      ],
+      "missingHashes": [
+        "b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": [
+      "12-KT-C123-D2-I-7"
+    ],
+    "newFullIfSourceAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownCOMacro4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native pixel centerline traces approximate to nearest1px; internal C numbering for builder only, never add labels. Counts independently from listed vertices, not fatty-acid names.",
+  "geometry": {
+    "classification": "Open skeletal triglyceride with3acylchains, no printed caption/explicitH/C tokens.",
+    "glycerolBareC": [
+      [
+        55,
+        130
+      ],
+      [
+        55,
+        172
+      ],
+      [
+        55,
+        213
+      ]
+    ],
+    "glycerolBonds": [
+      [
+        [
+          55,
+          130
+        ],
+        [
+          55,
+          213
+        ]
+      ]
+    ],
+    "esterSingleO": [
+      {
+        "text": "O",
+        "bbox": [
+          74,
+          91,
+          93,
+          111
+        ],
+        "bonds": [
+          [
+            [
+              55,
+              130
+            ],
+            [
+              74,
+              110
+            ]
+          ],
+          [
+            [
+              94,
+              101
+            ],
+            [
+              119,
+              101
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          85,
+          161,
+          104,
+          182
+        ],
+        "bonds": [
+          [
+            [
+              55,
+              172
+            ],
+            [
+              82,
+              172
+            ]
+          ],
+          [
+            [
+              106,
+              172
+            ],
+            [
+              130,
+              172
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          74,
+          233,
+          93,
+          253
+        ],
+        "bonds": [
+          [
+            [
+              55,
+              213
+            ],
+            [
+              74,
+              233
+            ]
+          ],
+          [
+            [
+              94,
+              243
+            ],
+            [
+              119,
+              243
+            ]
+          ]
+        ]
+      }
+    ],
+    "chains": [
+      {
+        "vertices": [
+          [
+            119,
+            101
+          ],
+          [
+            162,
+            101
+          ],
+          [
+            195,
+            121
+          ],
+          [
+            229,
+            101
+          ],
+          [
+            263,
+            121
+          ],
+          [
+            297,
+            101
+          ],
+          [
+            330,
+            121
+          ],
+          [
+            364,
+            101
+          ],
+          [
+            398,
+            121
+          ],
+          [
+            437,
+            121
+          ],
+          [
+            471,
+            101
+          ],
+          [
+            505,
+            121
+          ],
+          [
+            539,
+            101
+          ],
+          [
+            572,
+            121
+          ],
+          [
+            606,
+            101
+          ],
+          [
+            640,
+            121
+          ],
+          [
+            674,
+            101
+          ],
+          [
+            708,
+            121
+          ]
+        ],
+        "doubleCC": [
+          {
+            "carbonIndices": [
+              9,
+              10
+            ],
+            "innerParallel": [
+              [
+                401,
+                116
+              ],
+              [
+                434,
+                116
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "vertices": [
+          [
+            130,
+            172
+          ],
+          [
+            162,
+            172
+          ],
+          [
+            195,
+            192
+          ],
+          [
+            229,
+            172
+          ],
+          [
+            263,
+            192
+          ],
+          [
+            297,
+            172
+          ],
+          [
+            330,
+            192
+          ],
+          [
+            364,
+            172
+          ],
+          [
+            398,
+            192
+          ],
+          [
+            437,
+            192
+          ],
+          [
+            471,
+            172
+          ],
+          [
+            505,
+            192
+          ],
+          [
+            539,
+            172
+          ],
+          [
+            572,
+            192
+          ],
+          [
+            606,
+            172
+          ],
+          [
+            640,
+            192
+          ],
+          [
+            674,
+            172
+          ],
+          [
+            708,
+            192
+          ]
+        ],
+        "doubleCC": [
+          {
+            "carbonIndices": [
+              9,
+              10
+            ],
+            "innerParallel": [
+              [
+                401,
+                187
+              ],
+              [
+                434,
+                187
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "vertices": [
+          [
+            119,
+            243
+          ],
+          [
+            156,
+            263
+          ],
+          [
+            195,
+            263
+          ],
+          [
+            229,
+            243
+          ],
+          [
+            263,
+            263
+          ],
+          [
+            297,
+            243
+          ],
+          [
+            330,
+            263
+          ],
+          [
+            364,
+            243
+          ],
+          [
+            398,
+            263
+          ],
+          [
+            437,
+            263
+          ],
+          [
+            471,
+            243
+          ],
+          [
+            505,
+            263
+          ],
+          [
+            543,
+            263
+          ],
+          [
+            577,
+            243
+          ],
+          [
+            611,
+            263
+          ],
+          [
+            645,
+            243
+          ],
+          [
+            679,
+            263
+          ],
+          [
+            713,
+            243
+          ]
+        ],
+        "doubleCC": [
+          {
+            "carbonIndices": [
+              9,
+              10
+            ],
+            "innerParallel": [
+              [
+                401,
+                258
+              ],
+              [
+                434,
+                258
+              ]
+            ]
+          },
+          {
+            "carbonIndices": [
+              12,
+              13
+            ],
+            "innerParallel": [
+              [
+                509,
+                258
+              ],
+              [
+                540,
+                258
+              ]
+            ]
+          }
+        ]
+      }
+    ],
+    "carbonyls": [
+      {
+        "O": "O",
+        "bbox": [
+          110,
+          49,
+          129,
+          70
+        ],
+        "rays": [
+          [
+            [
+              116.5,
+              71
+            ],
+            [
+              116.5,
+              101
+            ]
+          ],
+          [
+            [
+              122,
+              71
+            ],
+            [
+              122,
+              101
+            ]
+          ]
+        ],
+        "feet": "Both contact native horizontalester/chainline."
+      },
+      {
+        "O": "O",
+        "bbox": [
+          121,
+          120,
+          140,
+          140
+        ],
+        "rays": [
+          [
+            [
+              127.5,
+              142
+            ],
+            [
+              127.5,
+              172
+            ]
+          ],
+          [
+            [
+              133,
+              142
+            ],
+            [
+              133,
+              172
+            ]
+          ]
+        ],
+        "feet": "Both contact native horizontalester/chainline."
+      },
+      {
+        "O": "O",
+        "bbox": [
+          110,
+          191,
+          129,
+          211
+        ],
+        "rays": [
+          [
+            [
+              116.5,
+              213
+            ],
+            [
+              116.5,
+              243
+            ]
+          ],
+          [
+            [
+              122,
+              213
+            ],
+            [
+              122,
+              245
+            ]
+          ]
+        ],
+        "feet": "Left contacts horizontalesterline; right contacts descendingchain slope at122245, preserving separatefeet. No inventedverticalbridge."
+      }
+    ],
+    "font": "All6O regular upright serif; not truebold. Bond thinuniform black. No italic/caption/numbers.",
+    "counts": {
+      "C": 57,
+      "glycerolC": 3,
+      "acylC": [
+        18,
+        18,
+        18
+      ],
+      "O": 6,
+      "COdouble": 3,
+      "CCdouble": 4,
+      "CCdoubleByChain": [
+        1,
+        1,
+        2
+      ],
+      "explicitH": 0,
+      "caption": 0
+    },
+    "noAdded": [
+      "fattyacidnames",
+      "H/CH2labels",
+      "caption",
+      "stereo",
+      "repeatbrackets",
+      "reactionarrow",
+      "closedchainend"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootAudit": {
+    "nativeFullAllPublicDeOpened": true,
+    "actualChromium3xFullOpened": true,
+    "carbonylBottomMacroOpened": true,
+    "finalSvg": "c4a7500b1b1dab6da21618d4f85654c685ddee4735a615ffec1ad4f42b2d656c",
+    "correction": "Nâng riêng O carbonyl trên baseline70→68 để giữ khe trắng native; giữ tất cả ray/feet/5O còn lại.",
+    "counts": "57C6O/3COdouble/CC1-1-2/0H/0caption"
+  }
+}

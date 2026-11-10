@@ -1,0 +1,29 @@
+[
+  {
+    "i": 996,
+    "hash": "b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa",
+    "fileNguon": "anh/b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa.png",
+    "svg": "triglyceride-native996-ddh-c4a7500b1b1dab6da21618d4f85654c685ddee4735a615ffec1ad4f42b2d656c.svg",
+    "hashSvg": "c4a7500b1b1dab6da21618d4f85654c685ddee4735a615ffec1ad4f42b2d656c",
+    "byteSvg": 5868,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-KT-C123-D2-I-7",
+        "de": "Trong thành phần của dầu oliu có bao gồm một số chất béo, trong đó chủ yếu là một triglyceride X có cấu trúc như hình dưới.\nTriglyceride X là triester của glycerol với các acid béo có tên gọi là",
+        "refs": [
+          {
+            "hash": "b350c2455c66cfed55efa7add39d24cb2eccdfbc28a20818b17a63e778ae4efa",
+            "where": "12-KT-C123-D2-I-7.hinh.0.du_lieu",
+            "hashDataUrl": "c8a2aeb34024e9b7c6d6d8e2d3153fd8537f69b068827672a04388c102a33225"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "57C6O/3acyl18C+3glycerolC/1-1-2CCdouble/3COsplitfeet/bottomrightfootonslope/6regularuprightO/ALLthin/noH-CH2-caption-answer-noalias490801939",
+    "hashSvgDaSoat": "c4a7500b1b1dab6da21618d4f85654c685ddee4735a615ffec1ad4f42b2d656c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
