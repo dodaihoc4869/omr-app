@@ -107,7 +107,7 @@ function veBang(): void {
   if (!hien) return
   ngheEsc()
   if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
-  cheTo(!tamAn && !bangAn() && !khung.classList.contains('bpu-no')) // đang phóng lại ⇒ tờ còn lộ dưới bảng tới khi phóng xong
+  cheTo(!tamAn && !bangAn()) // bảng ở trên (kể cả đang phóng lại — kín màn từ khung đầu) ⇒ tờ ẩn
   goc!.render(
     <BangBinhPhanUng
       key={hien.buoiId}
@@ -130,7 +130,10 @@ function veBang(): void {
 async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   const tuDong = o.tuDong === true
   if (tuDong && Date.now() < nghiDen) return
-  const buoiId = await layBuoi(tuDong)
+  // 10/11 (lần 3) «vẫn chưa load hẳn vào đua top»: bảng đang mở ⇒ lượt thuộc ĐÚNG buổi của bảng, không hỏi lại máy chủ. Trước đây tin tự động lấy buổi ĐẦU danh
+  // sách «đang mở trong 4 giờ» ⇒ thầy còn buổi khác mở thì bảng dựng lại cho buổi kia («Đang mở…» → lượt cũ của phòng kia → mới tới màn đua), lại chờ một
+  // lượt hỏi máy chủ (300–1500 ms) mỗi khi hết 60 giây nhớ.
+  const buoiId = khung && hien ? hien.buoiId : await layBuoi(tuDong)
   if (!buoiId) return
   if (o.nguon) nguonTo = o.nguon
   dem += 1
@@ -239,7 +242,7 @@ export function dongHoatDong(): void {
 // TỜ CHIẾU CỦA CÂU THẦY CHỌN TRÊN BẢNG: khung xem tờ (KhungXemPhieu, cùng khung bảng Dạy học dùng) nằm DƯỚI bảng. Tờ vào đợt ⇒ tự báo câu ⇒ bảng mở lượt.
 function dongTo(): void { toGoc?.unmount(); toGoc = null; toKhung?.remove(); toKhung = null; nguonTo = null; if (hien) veBang() }
 /** Dựng tờ từ câu đã chọn (câu bấm đứng đầu) rồi chiếu. Trả lời báo lỗi (rỗng = đã chiếu). */
-export async function chieuCau(ds: CauDayHoc[]): Promise<string> {
+export async function chieuCau(ds: CauDayHoc[], moi = false): Promise<string> {
   if (!ds.length) return 'Chưa chọn câu nào.'
   let html = ''
   try {
@@ -250,9 +253,12 @@ export async function chieuCau(ds: CauDayHoc[]): Promise<string> {
   nghiDen = 0
   tiepNgay = true // thầy vừa chọn câu = ý muốn rõ ⇒ gửi NGAY (cùng khung tờ cũ thì không coi là «tờ mới»)
   // 10/11 thầy «chọn câu khác ⇒ bắt đầu lượt mới và xoá lượt câu cũ»: đang có lượt ⇒ lượt mới của câu này bỏ lượt dở (máy chủ giữ lượt đã mở đáp án).
-  boQid = hien?.qid ? ds[0]!.qid : ''
+  // `moi` (bảng báo): phòng có lượt câu này đã mở đáp án ⇒ hỏi lại cả lớp (lượt mới), không nối lại màn mở đáp án cũ.
+  boQid = hien?.qid || moi ? ds[0]!.qid : ''
   if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
   // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
+  // Che TRƯỚC khi khung tờ gắn vào trang ⇒ khung đầu tiên của tờ (cả dải xám 48 px trên cùng) đã ẩn.
+  if (khung && !bangAn() && !tamAn) cheTo(true)
   toGoc!.render(<KhungXemPhieu html={html} ten={TEN_TO} dong={() => (khung ? tamAnTatCa() : dongTo())} />)
   requestAnimationFrame(() => { if (khung && !bangAn()) khung.querySelector<HTMLElement>('.bpu-bang')?.focus() })
   return ''
@@ -285,6 +291,7 @@ export function toiCau(d: 1 | -1): void {
 }
 /** Tờ báo đã hết câu theo hướng d. */
 export function baoHetCau(d: 1 | -1): void {
+  try { window.dispatchEvent(new CustomEvent('bpu-het-cau')) } catch { /* trình duyệt cũ */ } // bảng thôi chờ câu kế (cho-luot.ts)
   useAppStore.getState().showToast(d > 0 ? 'Đã tới câu cuối của tờ chiếu.' : 'Đang ở câu đầu.', 'warn')
 }
 export function dongBang(): void {
@@ -334,9 +341,10 @@ function hienBang(): void {
   window.removeEventListener('keydown', phimKhiAn, true)
   el.classList.remove('bpu-thu')
   baoAnHien(false)
-  // Tờ còn hiện dưới bảng đang phóng; phóng xong mới che lại (bảng đã kín màn).
-  const che = () => { if (khung === el && !bangAn() && !tamAn) cheTo(true) }
-  if (!giamChuyenDong()) { el.classList.add('bpu-san', 'bpu-no'); const bo = () => { el.classList.remove('bpu-no', 'bpu-san'); che() }; el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 700) } else che()
+  // 10/11 (lần 3): che tờ NGAY và bảng kín màn từ khung đầu (trước đây bảng mờ dần 0 → 1 trên tờ ~0,5 s ⇒ tờ cũ lẫn dưới thẻ kết quả); chỉ còn nhịp
+  // «đáp xuống» nhẹ bằng transform (bpu-no), thẻ kết quả nảy lên trên.
+  if (!tamAn) cheTo(true)
+  if (!giamChuyenDong()) { el.classList.add('bpu-san', 'bpu-no'); const bo = () => el.classList.remove('bpu-no', 'bpu-san'); el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 700) }
   hienHan(el)
   el.querySelector<HTMLElement>('.bpu-bang')?.focus()
 }

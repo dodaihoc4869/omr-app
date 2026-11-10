@@ -358,7 +358,7 @@ html.may-yeu .bpu-bang .bb-goc.nay, html.may-yeu .bpu-bang .bb-goc.nay .ts b{ an
 [data-bpu-bang].bpu-thu > .bpu-bang{ animation: bpu-thu 0.52s cubic-bezier(.32, .72, 0, 1) forwards; pointer-events: none; }
 [data-bpu-bang].bpu-no > .bpu-bang{ animation: bpu-no 0.48s cubic-bezier(.32, .72, 0, 1) both; }
 @keyframes bpu-thu { 0% { transform: scale(1); opacity: 1; } 55% { opacity: 0.9; } 100% { transform: scale(0.82); opacity: 0; } }
-@keyframes bpu-no { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes bpu-no { from { transform: scale(1.04); } to { transform: none; } } /* 10/11: kín màn từ khung đầu (không mờ dần trên tờ) */
 @media (prefers-reduced-motion: reduce) { .bpu-bang .bb-canh{ animation: none; } }
 html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 /* Thanh trên khi đang chiếu câu: đủ chỗ cho nút chính «Gọi lên bảng» (ảnh chụp 09/11: nút chính tràn mép). */

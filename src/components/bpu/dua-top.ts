@@ -1,5 +1,5 @@
 // BÌNH PHẢN ỨNG — ĐUA TOP «THÁP LỬA» (thầy chốt 09/11 «chốt bản ống nghiệm», bản vẽ docs/ban-ve-bpu-dua-top-0911, phương án A).
-// Phần THUẦN (xếp hạng đội / em, bảng vàng, lên hạng, chuỗi đúng dài nhất, thang ống) + hook nhớ «trước khi mở đáp án» + bộ BAY (tên em vừa gửi,
+// Phần THUẦN (xếp hạng đội / em, bảng vàng, lên hạng, chuỗi đúng dài nhất, thang ống) + hook nhớ «trước khi mở đáp án» + bộ BAY (
 // nhãn ±kJ «bienDong») vào miệng ống nghiệm đội. Bay chỉ transform / opacity (WAAPI); máy yếu / giảm chuyển động / jsdom ⇒ không bay, hiện tĩnh.
 import { useState } from 'react'
 import type { ViewBang } from '../../lib/bpu/phong'
@@ -64,9 +64,10 @@ export function useDuaTop(v: ViewBang | null): { truoc: number[] | null; len: Ma
 }
 
 // ── BAY VÀO ỐNG ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-type Viec = { loai: 'ten' | 'kj'; tu: Element | null; doi: number; chu: string; tru?: boolean; lyDo?: string; mau: string }
-const hang: Record<'ten' | 'kj', { cho: Viec[]; dang: number }> = { ten: { cho: [], dang: 0 }, kj: { cho: [], dang: 0 } }
-const TOI_DA = { ten: 3, kj: 4 } as const
+// Em vừa gửi: nop-bai.ts (tia lửa — thầy 10/11 chê thẻ tên bay «chưa đẹp»). Ở đây chỉ còn nhãn ±kJ.
+type Viec = { loai: 'kj'; tu: Element | null; doi: number; chu: string; tru?: boolean; lyDo?: string; mau: string }
+const hang: Record<'kj', { cho: Viec[]; dang: number }> = { kj: { cho: [], dang: 0 } }
+const TOI_DA = { kj: 4 } as const
 const thoat = (s: string): string => (typeof CSS !== 'undefined' && typeof CSS.escape === 'function' ? CSS.escape(s) : s.replace(/["\\]/g, '\\$&'))
 const coAnimate = (el: Element | null | undefined): el is HTMLElement => !!el && typeof (el as HTMLElement).animate === 'function'
 
@@ -106,7 +107,7 @@ function chamOng(san: HTMLElement, d: number, tru: boolean): void {
   if (coAnimate(lua)) lua.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.15)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' })
 }
 
-function chay(san: HTMLElement, loai: 'ten' | 'kj'): void {
+function chay(san: HTMLElement, loai: 'kj'): void {
   const h = hang[loai]
   if (h.dang >= TOI_DA[loai] || !h.cho.length) return
   const vc = h.cho.shift()!
@@ -130,30 +131,20 @@ function chay(san: HTMLElement, loai: 'ten' | 'kj'): void {
     { transform: t(a.x, a.y - 16, 1.05), opacity: 1, offset: 0.12 },
     { transform: t(mx, my, 0.9), opacity: 1, offset: 0.55 },
     { transform: t(b.x, b.y, 0.6), opacity: 0 },
-  ], { duration: vc.loai === 'kj' ? 900 : 700, easing: 'cubic-bezier(.45, 0, .3, 1)', fill: 'forwards' })
+  ], { duration: 900, easing: 'cubic-bezier(.45, 0, .3, 1)', fill: 'forwards' })
   const den = () => { el.remove(); chamOng(san, vc.doi, !!vc.tru); if (vc.lyDo) hienLyDo(san, vc.doi, vc.lyDo, !!vc.tru); xong() }
   an.onfinish = den
   an.oncancel = () => { el.remove(); xong() }
   setTimeout(() => chay(san, loai), 120) // thẻ sau cách 120 ms (trong giới hạn bay cùng lúc)
 }
 
-/** Xếp một việc bay. Tên em: hàng chờ dài (> 6) ⇒ chỉ bừng sáng ở dải đáy, không bay. Nhãn kJ: XẾP HÀNG hết (mở đáp án ⇒ mỗi em một mục,
- *  tối đa 4 nhãn bay cùng lúc); hàng quá dài (> 40, nối lại sau mất mạng) ⇒ hiện tĩnh dưới ống. */
+/** Xếp một nhãn kJ bay: XẾP HÀNG hết (mở đáp án ⇒ mỗi em một mục, tối đa 4 nhãn bay cùng lúc); hàng quá dài (> 40, nối lại sau mất mạng) ⇒ hiện tĩnh dưới ống. */
 function xep(san: HTMLElement, vc: Viec, yeu: boolean): void {
-  if (yeu || !coAnimate(san)) { if (vc.loai === 'kj') hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
+  if (yeu || !coAnimate(san)) { hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
   const h = hang[vc.loai]
-  if (h.cho.length > (vc.loai === 'ten' ? 6 : 40)) { if (vc.loai === 'kj') hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
+  if (h.cho.length > 40) { hienLyDo(san, vc.doi, vc.lyDo ? `${vc.chu} · ${vc.lyDo}` : vc.chu, !!vc.tru); return }
   h.cho.push(vc)
   chay(san, vc.loai)
-}
-
-/** Em vừa gửi ⇒ thẻ tên bừng sáng ở dải đáy (~1 s) + thẻ nhỏ bay vào miệng ống đội + bộ đếm nảy số. */
-export function bayTen(san: HTMLElement, e: Em, chu: string, mau: string, yeu: boolean): void {
-  const o = san.querySelector(`.bb-tl-o[data-sbd="${thoat(e.sbd)}"]`)
-  if (o) { o.classList.add('vua'); setTimeout(() => o.classList.remove('vua'), 1100) }
-  const dem = san.querySelector('.bb-tl-dem .so b')
-  if (!yeu && coAnimate(dem)) dem.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 280, easing: 'ease-out' })
-  xep(san, { loai: 'ten', tu: o, doi: e.doi, chu, mau }, yeu)
 }
 
 /** Biến động kJ mới ⇒ nhãn «+100 kJ» / «−50 kJ» bay từ ô tên em (không có em ⇒ giữa bảng) vào miệng ống đội, lý do hiện dưới ống. */

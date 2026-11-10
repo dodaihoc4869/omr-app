@@ -2,7 +2,7 @@
 // Thay chiếu ĐỀ ở màn «cả lớp đang làm» và «đã mở đáp án»: đề có trên máy em; lên bảng (L) thì tờ chiếu cũ có đủ đề. Một điểm nhìn chính: các đội đua
 // bằng kJ trong ống nghiệm (chất lỏng màu đội, ngọn lửa thử màu). Cột phải: số em đã gửi · Bảng vàng kJ · chuỗi đúng; mở đáp án: đáp án gọn, năng lượng
 // hoạt hoá, nhanh và đúng nhất. Dải tên đáy theo đội. TẾ NHỊ: không nêu tên em sai / chưa biết làm; chỉ mũi tên LÊN hạng; «+kJ» riêng chỉ cho 3 em nhanh nhất.
-// Chuyển động chỉ transform / opacity; máy yếu / giảm chuyển động ⇒ trạng thái cuối (luật chung html.may-yeu của bpu-bang.css). Bay tên / ±kJ: dua-top.ts.
+// Chuyển động chỉ transform / opacity; máy yếu / giảm chuyển động ⇒ trạng thái cuối (luật chung html.may-yeu của bpu-bang.css). Em vừa gửi: nop-bai.ts · ±kJ: dua-top.ts.
 import { useLayoutEffect, useRef } from 'react'
 import { DOI_BPU, KJ, type ViewBang } from '../../lib/bpu/phong'
 import { mauDoi } from './ong-ket-qua'
