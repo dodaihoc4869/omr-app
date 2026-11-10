@@ -1,0 +1,550 @@
+{
+  "i": 1404,
+  "hash": "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0.png",
+  "size": [
+    471,
+    213
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B5-D2-II-296",
+      "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+      "allHinh": [
+        {
+          "hash": "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0",
+          "where": "DB-12-B5-D2-II-296.hinh.0.du_lieu",
+          "hashDataUrl": "d4af197fe20b443bf74a3a658a4225772c29ff192545c1bf400cdc44b433239d"
+        }
+      ],
+      "missingHashes": [
+        "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0"
+      ]
+    },
+    {
+      "qid": "DH-12-C2-B5-II-16",
+      "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+      "allHinh": [
+        {
+          "hash": "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0",
+          "where": "DH-12-C2-B5-II-16.hinh.0.du_lieu",
+          "hashDataUrl": "d4af197fe20b443bf74a3a658a4225772c29ff192545c1bf400cdc44b433239d"
+        }
+      ],
+      "missingHashes": [
+        "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/1404-native4x-lo324.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "Onecondensedacylester+6memberand5memberHaworth, cleanframe, noalias253.",
+    "acyl": {
+      "text": "H₃C(H₂C)₉H₂C",
+      "bbox": [
+        4,
+        53,
+        145,
+        78
+      ],
+      "anchor": "LASTterminalC(rightglyph) connectsCOC16249; noexpanded11Czigzag",
+      "carbonylC": [
+        162,
+        49
+      ],
+      "leftBond": [
+        [
+          145,
+          58
+        ],
+        [
+          162,
+          49
+        ]
+      ],
+      "esterO": {
+        "text": "O",
+        "bbox": [
+          179,
+          54,
+          198,
+          75
+        ],
+        "leftBond": [
+          [
+            162,
+            49
+          ],
+          [
+            178,
+            58
+          ]
+        ],
+        "rightBond": [
+          [
+            199,
+            65
+          ],
+          [
+            220,
+            70
+          ]
+        ]
+      },
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          153,
+          8,
+          173,
+          29
+        ],
+        "rays": [
+          [
+            [
+              159,
+              50
+            ],
+            [
+              159,
+              30
+            ]
+          ],
+          [
+            [
+              165,
+              50
+            ],
+            [
+              165,
+              30
+            ]
+          ]
+        ],
+        "COFootTopology": "Verticalraysfoot15950/16550meet2adjacentslopes, nohorizontalbridge."
+      }
+    },
+    "leftRing": {
+      "vertices": {
+        "C1": [
+          283,
+          122
+        ],
+        "C2": [
+          261,
+          149
+        ],
+        "C3": [
+          220,
+          149
+        ],
+        "C4": [
+          199,
+          123
+        ],
+        "C5": [
+          220,
+          96
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          252,
+          86,
+          271,
+          107
+        ]
+      },
+      "thinOlines": [
+        [
+          [
+            220,
+            96
+          ],
+          [
+            251,
+            96
+          ]
+        ],
+        [
+          [
+            270,
+            105
+          ],
+          [
+            283,
+            122
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            199,
+            123
+          ],
+          [
+            218,
+            152
+          ],
+          [
+            222,
+            146
+          ]
+        ],
+        [
+          [
+            283,
+            122
+          ],
+          [
+            259,
+            152
+          ],
+          [
+            263,
+            146
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          220,
+          149
+        ],
+        [
+          261,
+          149
+        ]
+      ],
+      "esterifiedBareC6Path": [
+        [
+          220,
+          96
+        ],
+        [
+          220,
+          70
+        ]
+      ],
+      "OHbranches": [
+        {
+          "text": "HO",
+          "bbox": [
+            175,
+            156,
+            208,
+            177
+          ],
+          "from": [
+            199,
+            123
+          ],
+          "to": [
+            199,
+            155
+          ],
+          "anchor": "O(rightglyph)"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            210,
+            110,
+            244,
+            131
+          ],
+          "from": [
+            220,
+            149
+          ],
+          "to": [
+            220,
+            132
+          ],
+          "anchor": "O"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            252,
+            176,
+            285,
+            197
+          ],
+          "from": [
+            261,
+            149
+          ],
+          "to": [
+            261,
+            174
+          ],
+          "anchor": "O"
+        }
+      ]
+    },
+    "rightRing": {
+      "vertices": {
+        "C2": [
+          333,
+          123
+        ],
+        "C3": [
+          349,
+          154
+        ],
+        "C4": [
+          400,
+          154
+        ],
+        "C5": [
+          414,
+          123
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          364,
+          91,
+          383,
+          112
+        ]
+      },
+      "thinOlines": [
+        [
+          [
+            333,
+            123
+          ],
+          [
+            363,
+            106
+          ]
+        ],
+        [
+          [
+            384,
+            106
+          ],
+          [
+            414,
+            123
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            333,
+            123
+          ],
+          [
+            347,
+            157
+          ],
+          [
+            352,
+            151
+          ]
+        ],
+        [
+          [
+            414,
+            123
+          ],
+          [
+            398,
+            157
+          ],
+          [
+            403,
+            151
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          349,
+          154
+        ],
+        [
+          400,
+          154
+        ]
+      ],
+      "bareTerminalOH": [
+        {
+          "text": "HO",
+          "bbox": [
+            287,
+            75,
+            320,
+            96
+          ],
+          "path": [
+            [
+              333,
+              123
+            ],
+            [
+              333,
+              96
+            ],
+            [
+              320,
+              88
+            ]
+          ],
+          "anchor": "O(rightglyph)",
+          "note": "bareC1at33396, NOCH2text"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            430,
+            165,
+            464,
+            186
+          ],
+          "path": [
+            [
+              414,
+              123
+            ],
+            [
+              414,
+              158
+            ],
+            [
+              429,
+              169
+            ]
+          ],
+          "anchor": "O(firstglyph)",
+          "note": "bareC6at414158, NOCH2text"
+        }
+      ],
+      "OHbranches": [
+        {
+          "text": "OH",
+          "bbox": [
+            338,
+            182,
+            371,
+            203
+          ],
+          "from": [
+            349,
+            154
+          ],
+          "to": [
+            349,
+            180
+          ],
+          "anchor": "O"
+        },
+        {
+          "text": "HO",
+          "bbox": [
+            374,
+            119,
+            408,
+            140
+          ],
+          "from": [
+            400,
+            154
+          ],
+          "to": [
+            400,
+            141
+          ],
+          "anchor": "O(rightglyph)"
+        }
+      ]
+    },
+    "bridge": {
+      "text": "O",
+      "bbox": [
+        299,
+        148,
+        318,
+        169
+      ],
+      "bonds": [
+        [
+          [
+            283,
+            122
+          ],
+          [
+            302,
+            149
+          ]
+        ],
+        [
+          [
+            315,
+            149
+          ],
+          [
+            333,
+            123
+          ]
+        ]
+      ]
+    },
+    "font": "ALLregularuprightsanschemicaltext; 3/2/9SUBincondensedalkyltext. Noactualboldlabels/caption. Skeletalthinbackbonds/4TAPER+2BOLDfronts.",
+    "counts": {
+      "C": 24,
+      "O": 12,
+      "freeOHHOlabels": 7,
+      "ringO": 2,
+      "bridgeO": 1,
+      "esterO": 1,
+      "carbonylO": 1,
+      "standaloneH": 0,
+      "CH2OHtext": 0,
+      "Cnums": 0,
+      "taper": 4,
+      "boldFrontHorizontal": 2,
+      "caption": 0
+    },
+    "noAdded": [
+      "H-atHaworthcorners",
+      "CH2/CH2OHtextonbareterminals",
+      "namecaption",
+      "carbonnumbers",
+      "stereowedges",
+      "charge",
+      "expandedacylchain",
+      "reactionarrow"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelstructureandliteralcondensedtext; no stereochemistryinferredfromcompoundname.",
+  "rootReview": {
+    "nativeFull": true,
+    "ownNative4x": "/workspace/scratch/native324-1404-4x.png",
+    "publicDeAllRead": true,
+    "actualFinalFull3x": "/workspace/scratch/root324-1404.png",
+    "actualFinalCOmacro": "/workspace/scratch/root324-CO-final.png",
+    "count": "24C12O7OHHO/3bareCoutsideRings/4TAPER2bold0standaloneH",
+    "initialRejected": "72d2eac66c06c2d7c2b0c2f6c71900ff21a88cb58c92e549ce65eafa2c050c27:chainadvance153/CObondstart155 changedleftslopesoCOfootgap,roundfrontcaps protrusion",
+    "finalCorrection": "chainfontmain22→20.5/sub15.4→14.35;end143.0228/startbond145.0228;2boldcapsround→butt;OTHERglyphgeometry unchanged;leftCO15950.6,right16550.7 meet2slopes, noaddedbridge"
+  }
+}

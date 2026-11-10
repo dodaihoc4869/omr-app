@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1404,
+    "hash": "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0",
+    "fileNguon": "anh/fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0.png",
+    "svg": "monolaurate-native1404-ddh-7c3c8a4789d127d7fbf5d1e20c82eb528acf641291090afb20fef2f1d4c6472c.svg",
+    "hashSvg": "7c3c8a4789d127d7fbf5d1e20c82eb528acf641291090afb20fef2f1d4c6472c",
+    "byteSvg": 15785,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B5-D2-II-296",
+        "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+        "refs": [
+          {
+            "hash": "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0",
+            "where": "DB-12-B5-D2-II-296.hinh.0.du_lieu",
+            "hashDataUrl": "d4af197fe20b443bf74a3a658a4225772c29ff192545c1bf400cdc44b433239d"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C2-B5-II-16",
+        "de": "Saccharose monolaurate được tổng hợp bằng phản ứng ester hoá giữa saccharose (đường mía hoặc đường củ cải) với lauric acid, một acid béo no có nhiều trong dầu dừa. Saccharose monolaurate được sử dụng như một chất nhũ hoá và chất hoạt động bề mặt trong thực phẩm và mĩ phẩm. Saccharose monolaurate được đánh giá an toàn và thân thiện với môi trường.\nCông thức cấu tạo của saccharose monolaurate như sau:",
+        "refs": [
+          {
+            "hash": "fc85392ea0ab06e99f9b2d7e7795be5755a675560a4d88dfa7751d4bb27dc6a0",
+            "where": "DH-12-C2-B5-II-16.hinh.0.du_lieu",
+            "hashDataUrl": "d4af197fe20b443bf74a3a658a4225772c29ff192545c1bf400cdc44b433239d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "24C12O/7OH-HO/6member5member/4TAPER2boldfront-verticalfeet/3bareterminalC-NOCH2text/0standaloneH/EXACTH3C(H2C)9H2Csubscripts-lastCanchor/COdouble2splitfeet-noaddedbridge/regularupright/noaddedH-CH3-nums-caption-answer/noalias253",
+    "hashSvgDaSoat": "7c3c8a4789d127d7fbf5d1e20c82eb528acf641291090afb20fef2f1d4c6472c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
