@@ -1,0 +1,263 @@
+{
+  "i": 852,
+  "hash": "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521.png",
+  "size": [
+    235,
+    379
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-11-B2-D5-II-43",
+      "de": "Trong phòng thí nghiệm, học sinh tiến hành chuẩn độ dung dịch NaOH chưa biết chính xác nồng độ (xM) bằng dung dịch chuẩn HCl 0,10M với chất chỉ thị phenolphthalein.\nBước 1: Burette (loại 25 mL) đã được đổ đầy đến vạch 0 bằng dung dịch NaOH và chắc chắn không còn bọt khí trong burette. Cho 10 mL dung dịch chuẩn HCl vào bình tam giác (loại 100 mL), thêm 2 giọt chỉ thị phenolphthalein (loại 1% pha trong cồn).\nBước 2: Mở khóa burette để dung dịch NaOH trong burette chảy từ từ vào bình tam giác, đồng thời lắc đều bình. Đến khi dung dịch ở bình tam giác chuyển từ không màu sang màu hồng nhạt bền trong ít nhất 20 giây thì kết thúc chuẩn độ (khóa burette).\nGhi lại thể tích dung dịch NaOH đã dùng, lặp lại thí nghiệm ít nhất 3 lần. Kết quả như bảng sau.",
+      "allHinh": [
+        {
+          "hash": "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521",
+          "where": "DB-11-B2-D5-II-43.hinh.0.du_lieu",
+          "hashDataUrl": "ef79714ba62e52fc7be5fca3e4e4351447ef5dc6ed74e9547da71468337128c9"
+        }
+      ],
+      "missingHashes": [
+        "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521"
+      ]
+    },
+    {
+      "qid": "DH-11-C1-B2-II-28",
+      "de": "Trong phòng thí nghiệm, học sinh tiến hành chuẩn độ dung dịch NaOH chưa biết chính xác nồng độ (xM) bằng dung dịch chuẩn HCl 0,10M với chất chỉ thị phenolphthalein.\nBước 1: Burette (loại 25 mL) đã được đổ đầy đến vạch 0 bằng dung dịch NaOH và chắc chắn không còn bọt khí trong burette. Cho 10 mL dung dịch chuẩn HCl vào bình tam giác (loại 100 mL), thêm 2 giọt chỉ thị phenolphthalein (loại 1% pha trong cồn).\nBước 2: Mở khóa burette để dung dịch NaOH trong burette chảy từ từ vào bình tam giác, đồng thời lắc đều bình. Đến khi dung dịch ở bình tam giác chuyển từ không màu sang màu hồng nhạt bền trong ít nhất 20 giây thì kết thúc chuẩn độ (khóa burette).\nGhi lại thể tích dung dịch NaOH đã dùng, lặp lại thí nghiệm ít nhất 3 lần. Kết quả như bảng sau.",
+      "allHinh": [
+        {
+          "hash": "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521",
+          "where": "DH-11-C1-B2-II-28.hinh.0.du_lieu",
+          "hashDataUrl": "ef79714ba62e52fc7be5fca3e4e4351447ef5dc6ed74e9547da71468337128c9"
+        }
+      ],
+      "missingHashes": [
+        "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 2,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 2,
+    "tableMentionCaution": "Publicde saysresultsastablebutinventoryhasONLYthis1hinhforeachqid; do notinventtablepartnerorclaimtablechecked."
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native4xOpened": "/workspace/scratch/852-native4x-lo330.png",
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "classification": "3separateflatgrayapparatusA/B/C,noassemblyconnections, notphoto.",
+    "A": {
+      "outline": "M107Q1410 1417V276Q14290 30296Q48291 48276V17Q4810 527",
+      "liquidSurface": [
+        [
+          16,
+          211
+        ],
+        [
+          45,
+          211
+        ]
+      ],
+      "fill": "verylightgraybelow211toroundedbottom296",
+      "ticks": [
+        [
+          31,
+          49,
+          42,
+          49
+        ],
+        [
+          31,
+          90,
+          42,
+          90
+        ],
+        [
+          31,
+          132,
+          42,
+          132
+        ],
+        [
+          31,
+          173,
+          42,
+          173
+        ],
+        [
+          31,
+          215,
+          42,
+          215
+        ],
+        [
+          31,
+          256,
+          42,
+          256
+        ]
+      ],
+      "tickCount": 6,
+      "stopcock": {
+        "body": "M18296H44V323L40337H22L17323Z",
+        "fill": "mediumgraylighterleftstrip",
+        "sideKnob": "M44306H62Q67306 67313V319Q67323 62323H44Z",
+        "verticalHandle": "roundedrectx51..59 y285..345 behindhorizontalrightknob",
+        "outlet": "2parallelblacklinesx26and35from337to373, openbottom"
+      },
+      "label": {
+        "text": "A",
+        "bbox": [
+          65,
+          165,
+          85,
+          184
+        ]
+      }
+    },
+    "B": {
+      "outline": "M1077Q11110 11117V130Q112144 127146H207Q221143 222130V17Q22210 2277",
+      "liquidSurface": "M11282Q11586 12286H211Q21885 22182",
+      "fill": "verylightgraybelowmeniscus tobottom146",
+      "ticks": [
+        [
+          203,
+          23,
+          214,
+          23
+        ],
+        [
+          203,
+          43,
+          214,
+          43
+        ],
+        [
+          203,
+          64,
+          214,
+          64
+        ],
+        [
+          203,
+          85,
+          214,
+          85
+        ],
+        [
+          203,
+          105,
+          214,
+          105
+        ],
+        [
+          203,
+          126,
+          214,
+          126
+        ]
+      ],
+      "tickCount": 6,
+      "tickAt85": "Agraytickat85overlapsmeniscusrightbutvisiblydarker/shortseparatehorizontalmark inown4x; keepliteralink, noextra7thtick.",
+      "label": {
+        "text": "B",
+        "bbox": [
+          157,
+          47,
+          177,
+          67
+        ]
+      }
+    },
+    "C": {
+      "outline": "M141189Q145192 145199V223Q145227 142233L112337Q110343 114349Q121364 137365H211Q225361 229347Q231342 228336L197233Q195227 195223V199Q195192 199189",
+      "liquidSurface": [
+        [
+          128,
+          288
+        ],
+        [
+          211,
+          288
+        ]
+      ],
+      "fill": "verylightgraybelow288toroundedbottom365",
+      "ticks": [
+        [
+          179,
+          240,
+          190,
+          240
+        ],
+        [
+          184,
+          261,
+          195,
+          261
+        ],
+        [
+          190,
+          282,
+          201,
+          282
+        ],
+        [
+          195,
+          303,
+          206,
+          303
+        ],
+        [
+          200,
+          323,
+          211,
+          323
+        ],
+        [
+          206,
+          344,
+          217,
+          344
+        ]
+      ],
+      "tickCount": 6,
+      "label": {
+        "text": "C",
+        "bbox": [
+          151,
+          254,
+          171,
+          274
+        ]
+      }
+    },
+    "font": "ONLYA/B/C labelsBOLDuprightsans, black. Noothertext/scalevalues/units. Wallsblack, ticks/surfaceslightgray, liquidflatpalegraywithsubtleedgehighlight.",
+    "counts": {
+      "apparatus": 3,
+      "ticksA": 6,
+      "ticksB": 6,
+      "ticksC": 6,
+      "labels": 3,
+      "arrows": 0,
+      "bubbles": 0
+    },
+    "noAdded": [
+      "25mL/100mLfromstem",
+      "chemicalsolutionnames",
+      "numbersonticks",
+      "drops",
+      "connectingapparatusassembly",
+      "stand",
+      "pinkindicatorcolor",
+      "tablefrompublicde",
+      "matching1288geometrybyalias"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelapparatusgeometry, ticksunlabellednoquantitativevaluesinferred."
+}

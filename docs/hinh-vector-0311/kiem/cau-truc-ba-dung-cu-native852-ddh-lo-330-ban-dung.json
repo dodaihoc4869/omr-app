@@ -1,0 +1,40 @@
+[
+  {
+    "i": 852,
+    "hash": "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521",
+    "fileNguon": "anh/9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521.png",
+    "svg": "ba-dung-cu-native852-ddh-b7ae7c5cd025844083b4782176328be9e3b29dac7c2763d98ca7b143dc065b7b.svg",
+    "hashSvg": "b7ae7c5cd025844083b4782176328be9e3b29dac7c2763d98ca7b143dc065b7b",
+    "byteSvg": 4100,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-11-B2-D5-II-43",
+        "de": "Trong phòng thí nghiệm, học sinh tiến hành chuẩn độ dung dịch NaOH chưa biết chính xác nồng độ (xM) bằng dung dịch chuẩn HCl 0,10M với chất chỉ thị phenolphthalein.\nBước 1: Burette (loại 25 mL) đã được đổ đầy đến vạch 0 bằng dung dịch NaOH và chắc chắn không còn bọt khí trong burette. Cho 10 mL dung dịch chuẩn HCl vào bình tam giác (loại 100 mL), thêm 2 giọt chỉ thị phenolphthalein (loại 1% pha trong cồn).\nBước 2: Mở khóa burette để dung dịch NaOH trong burette chảy từ từ vào bình tam giác, đồng thời lắc đều bình. Đến khi dung dịch ở bình tam giác chuyển từ không màu sang màu hồng nhạt bền trong ít nhất 20 giây thì kết thúc chuẩn độ (khóa burette).\nGhi lại thể tích dung dịch NaOH đã dùng, lặp lại thí nghiệm ít nhất 3 lần. Kết quả như bảng sau.",
+        "refs": [
+          {
+            "hash": "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521",
+            "where": "DB-11-B2-D5-II-43.hinh.0.du_lieu",
+            "hashDataUrl": "ef79714ba62e52fc7be5fca3e4e4351447ef5dc6ed74e9547da71468337128c9"
+          }
+        ]
+      },
+      {
+        "qid": "DH-11-C1-B2-II-28",
+        "de": "Trong phòng thí nghiệm, học sinh tiến hành chuẩn độ dung dịch NaOH chưa biết chính xác nồng độ (xM) bằng dung dịch chuẩn HCl 0,10M với chất chỉ thị phenolphthalein.\nBước 1: Burette (loại 25 mL) đã được đổ đầy đến vạch 0 bằng dung dịch NaOH và chắc chắn không còn bọt khí trong burette. Cho 10 mL dung dịch chuẩn HCl vào bình tam giác (loại 100 mL), thêm 2 giọt chỉ thị phenolphthalein (loại 1% pha trong cồn).\nBước 2: Mở khóa burette để dung dịch NaOH trong burette chảy từ từ vào bình tam giác, đồng thời lắc đều bình. Đến khi dung dịch ở bình tam giác chuyển từ không màu sang màu hồng nhạt bền trong ít nhất 20 giây thì kết thúc chuẩn độ (khóa burette).\nGhi lại thể tích dung dịch NaOH đã dùng, lặp lại thí nghiệm ít nhất 3 lần. Kết quả như bảng sau.",
+        "refs": [
+          {
+            "hash": "9bee2d632b156e4129f9152fb7e4960366d8d79a46b67b3933fc588045c76521",
+            "where": "DH-11-C1-B2-II-28.hinh.0.du_lieu",
+            "hashDataUrl": "ef79714ba62e52fc7be5fca3e4e4351447ef5dc6ed74e9547da71468337128c9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3grayapparatusABC/6Aticks6Bticks6Cticks-B85coincidentmeniscus/3liquidfills/stopcock2edgesOPENoutlet/3trueDAMlabels/noaddednums-mL-drop-stand-answer/noalias1288",
+    "hashSvgDaSoat": "b7ae7c5cd025844083b4782176328be9e3b29dac7c2763d98ca7b143dc065b7b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
