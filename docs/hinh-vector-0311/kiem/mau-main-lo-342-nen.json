@@ -1,0 +1,18 @@
+{
+  "lo": 342,
+  "main": "4a0edc22146d5a6beaff7d711974493ae3adf0fa",
+  "newMainChanges": "Không đổi so main341; app/server/font/mốc nguyênbyte.",
+  "productionChangedThisBatch": false,
+  "colorViolations": 955,
+  "colorCheckerFiles": 185,
+  "sizeBaselineRed": {
+    "file": "server/src/index.ts",
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainMocSha": "2c8c45be8ab06dfb7ee3d825eecc0a6eca1f642068971483bf6e3c2f52d058c1",
+  "branchMocSha": "f762cef714985c2b200e382d62736fdbf06c5c6262f026da94b2d477dbd46fde",
+  "latestMainBuildSpeedRequiredBeforeMergeRelease": true,
+  "scope": "Cổng lô342 chỉ nhánh hiện tại, productionoldfonts/assets; chưa phải latestmain build-speed/full.",
+  "comparedToMain341": "4a0edc22146d5a6beaff7d711974493ae3adf0fa"
+}

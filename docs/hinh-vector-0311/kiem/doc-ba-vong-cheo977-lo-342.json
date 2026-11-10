@@ -1,0 +1,1294 @@
+{
+  "i": 977,
+  "hash": "aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7.png",
+  "size": [
+    691,
+    309
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C2-B6-I-12",
+      "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nCho các phát biểu sau về carbohydrate X:\n(a) X là một polysaccharide có cấu trúc mạch phân nhánh.\n(b) X có phản ứng đổi màu với dung dịch iodine tạo thành màu xanh tím.\n(c) Công thức viết gọn của X là $\\ce{[C6H7O2(OH)3]_n}$.\n(d) Phân tử khối trung bình của một phân tử carbohydrate X là 1 134 000.\nSố phát biểu đúng là",
+      "allHinh": [
+        {
+          "hash": "aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7",
+          "where": "VIP27-C2-B6-I-12.hinh.0.du_lieu",
+          "hashDataUrl": "6facca8b8c4cabdfc5b8c10c14051e7481fce3981ac5118e3b96f2462e791a9f"
+        }
+      ],
+      "missingHashes": [
+        "aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": 1,
+    "allQuestionsOnlyThisSource": true,
+    "newFullIfAdmitted": 1
+  },
+  "actualSvgReviewed": false,
+  "review": {
+    "nativeFullOpened": true,
+    "native2xOpened": "/workspace/scratch/977-native2x-lo342.png",
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownFrontFeet10xOpened": true
+  },
+  "geometry": {
+    "classification": "3diagonalHaworthringswithallH/OH/CH2OH, middlebracket7 000, noaliasolderpolymer.",
+    "rings": [
+      {
+        "vertices": {
+          "C1": [
+            161,
+            221
+          ],
+          "C2": [
+            121,
+            261
+          ],
+          "C3": [
+            64,
+            261
+          ],
+          "C4": [
+            24,
+            221
+          ],
+          "C5": [
+            64,
+            181
+          ]
+        },
+        "ringO": {
+          "text": "O",
+          "bbox": [
+            112,
+            170,
+            133,
+            193
+          ]
+        },
+        "thinOlines": [
+          [
+            [
+              64,
+              181
+            ],
+            [
+              110,
+              181
+            ]
+          ],
+          [
+            [
+              134,
+              192
+            ],
+            [
+              161,
+              221
+            ]
+          ]
+        ],
+        "frontTapers": [
+          [
+            [
+              24,
+              221
+            ],
+            [
+              64,
+              264
+            ],
+            [
+              64,
+              258
+            ]
+          ],
+          [
+            [
+              161,
+              221
+            ],
+            [
+              121,
+              264
+            ],
+            [
+              121,
+              258
+            ]
+          ]
+        ],
+        "boldFront": [
+          [
+            64,
+            261
+          ],
+          [
+            121,
+            261
+          ]
+        ],
+        "frontWidth": 6,
+        "CH2OH": {
+          "text": "CH₂OH",
+          "bbox": [
+            54,
+            137,
+            135,
+            163
+          ],
+          "bond": [
+            [
+              64,
+              181
+            ],
+            [
+              64,
+              160
+            ]
+          ],
+          "anchor": "FIRSTC"
+        },
+        "commonH": [
+          {
+            "atC": "C5",
+            "text": "H",
+            "labelCenter": [
+              64,
+              210
+            ],
+            "bond": [
+              [
+                64,
+                181
+              ],
+              [
+                64,
+                198
+              ]
+            ]
+          },
+          {
+            "atC": "C4",
+            "text": "H",
+            "labelCenter": [
+              24,
+              184
+            ],
+            "bond": [
+              [
+                24,
+                221
+              ],
+              [
+                24,
+                195
+              ]
+            ]
+          },
+          {
+            "atC": "C3",
+            "text": "H",
+            "labelCenter": [
+              64,
+              297
+            ],
+            "bond": [
+              [
+                64,
+                261
+              ],
+              [
+                64,
+                283
+              ]
+            ]
+          },
+          {
+            "atC": "C2",
+            "text": "H",
+            "labelCenter": [
+              121,
+              229
+            ],
+            "bond": [
+              [
+                121,
+                261
+              ],
+              [
+                121,
+                242
+              ]
+            ]
+          },
+          {
+            "atC": "C1",
+            "text": "H",
+            "labelCenter": [
+              161,
+              264
+            ],
+            "bond": [
+              [
+                161,
+                221
+              ],
+              [
+                161,
+                249
+              ]
+            ]
+          }
+        ],
+        "commonOH": [
+          {
+            "atC": "C3",
+            "text": "OH",
+            "Ocenter": [
+              64,
+              229
+            ],
+            "bbox": [
+              54,
+              217,
+              88,
+              243
+            ],
+            "bond": [
+              [
+                64,
+                261
+              ],
+              [
+                64,
+                243
+              ]
+            ]
+          },
+          {
+            "atC": "C2",
+            "text": "OH",
+            "Ocenter": [
+              121,
+              298
+            ],
+            "bbox": [
+              111,
+              285,
+              146,
+              309
+            ],
+            "bond": [
+              [
+                121,
+                261
+              ],
+              [
+                121,
+                283
+              ]
+            ]
+          }
+        ],
+        "leftTerminalOH": {
+          "text": "OH",
+          "bbox": [
+            14,
+            253,
+            49,
+            279
+          ],
+          "bond": [
+            [
+              24,
+              221
+            ],
+            [
+              24,
+              249
+            ]
+          ],
+          "anchor": "O"
+        }
+      },
+      {
+        "vertices": {
+          "C1": [
+            396,
+            156
+          ],
+          "C2": [
+            356,
+            196
+          ],
+          "C3": [
+            299,
+            196
+          ],
+          "C4": [
+            259,
+            156
+          ],
+          "C5": [
+            299,
+            116
+          ]
+        },
+        "ringO": {
+          "text": "O",
+          "bbox": [
+            347,
+            105,
+            368,
+            128
+          ]
+        },
+        "thinOlines": [
+          [
+            [
+              299,
+              116
+            ],
+            [
+              345,
+              116
+            ]
+          ],
+          [
+            [
+              369,
+              127
+            ],
+            [
+              396,
+              156
+            ]
+          ]
+        ],
+        "frontTapers": [
+          [
+            [
+              259,
+              156
+            ],
+            [
+              299,
+              199
+            ],
+            [
+              299,
+              193
+            ]
+          ],
+          [
+            [
+              396,
+              156
+            ],
+            [
+              356,
+              199
+            ],
+            [
+              356,
+              193
+            ]
+          ]
+        ],
+        "boldFront": [
+          [
+            299,
+            196
+          ],
+          [
+            356,
+            196
+          ]
+        ],
+        "frontWidth": 6,
+        "CH2OH": {
+          "text": "CH₂OH",
+          "bbox": [
+            289,
+            72,
+            370,
+            98
+          ],
+          "bond": [
+            [
+              299,
+              116
+            ],
+            [
+              299,
+              95
+            ]
+          ],
+          "anchor": "FIRSTC"
+        },
+        "commonH": [
+          {
+            "atC": "C5",
+            "text": "H",
+            "labelCenter": [
+              299,
+              145
+            ],
+            "bond": [
+              [
+                299,
+                116
+              ],
+              [
+                299,
+                133
+              ]
+            ]
+          },
+          {
+            "atC": "C4",
+            "text": "H",
+            "labelCenter": [
+              259,
+              119
+            ],
+            "bond": [
+              [
+                259,
+                156
+              ],
+              [
+                259,
+                130
+              ]
+            ]
+          },
+          {
+            "atC": "C3",
+            "text": "H",
+            "labelCenter": [
+              299,
+              232
+            ],
+            "bond": [
+              [
+                299,
+                196
+              ],
+              [
+                299,
+                218
+              ]
+            ]
+          },
+          {
+            "atC": "C2",
+            "text": "H",
+            "labelCenter": [
+              356,
+              164
+            ],
+            "bond": [
+              [
+                356,
+                196
+              ],
+              [
+                356,
+                177
+              ]
+            ]
+          },
+          {
+            "atC": "C1",
+            "text": "H",
+            "labelCenter": [
+              396,
+              199
+            ],
+            "bond": [
+              [
+                396,
+                156
+              ],
+              [
+                396,
+                184
+              ]
+            ]
+          }
+        ],
+        "commonOH": [
+          {
+            "atC": "C3",
+            "text": "OH",
+            "Ocenter": [
+              299,
+              164
+            ],
+            "bbox": [
+              289,
+              152,
+              323,
+              178
+            ],
+            "bond": [
+              [
+                299,
+                196
+              ],
+              [
+                299,
+                178
+              ]
+            ]
+          },
+          {
+            "atC": "C2",
+            "text": "OH",
+            "Ocenter": [
+              356,
+              233
+            ],
+            "bbox": [
+              346,
+              220,
+              381,
+              244
+            ],
+            "bond": [
+              [
+                356,
+                196
+              ],
+              [
+                356,
+                218
+              ]
+            ]
+          }
+        ]
+      },
+      {
+        "vertices": {
+          "C1": [
+            630,
+            91
+          ],
+          "C2": [
+            590,
+            131
+          ],
+          "C3": [
+            533,
+            131
+          ],
+          "C4": [
+            493,
+            91
+          ],
+          "C5": [
+            533,
+            51
+          ]
+        },
+        "ringO": {
+          "text": "O",
+          "bbox": [
+            581,
+            40,
+            602,
+            63
+          ]
+        },
+        "thinOlines": [
+          [
+            [
+              533,
+              51
+            ],
+            [
+              579,
+              51
+            ]
+          ],
+          [
+            [
+              603,
+              62
+            ],
+            [
+              630,
+              91
+            ]
+          ]
+        ],
+        "frontTapers": [
+          [
+            [
+              493,
+              91
+            ],
+            [
+              533,
+              134
+            ],
+            [
+              533,
+              128
+            ]
+          ],
+          [
+            [
+              630,
+              91
+            ],
+            [
+              590,
+              134
+            ],
+            [
+              590,
+              128
+            ]
+          ]
+        ],
+        "boldFront": [
+          [
+            533,
+            131
+          ],
+          [
+            590,
+            131
+          ]
+        ],
+        "frontWidth": 6,
+        "CH2OH": {
+          "text": "CH₂OH",
+          "bbox": [
+            523,
+            7,
+            604,
+            33
+          ],
+          "bond": [
+            [
+              533,
+              51
+            ],
+            [
+              533,
+              30
+            ]
+          ],
+          "anchor": "FIRSTC"
+        },
+        "commonH": [
+          {
+            "atC": "C5",
+            "text": "H",
+            "labelCenter": [
+              533,
+              80
+            ],
+            "bond": [
+              [
+                533,
+                51
+              ],
+              [
+                533,
+                68
+              ]
+            ]
+          },
+          {
+            "atC": "C4",
+            "text": "H",
+            "labelCenter": [
+              493,
+              54
+            ],
+            "bond": [
+              [
+                493,
+                91
+              ],
+              [
+                493,
+                65
+              ]
+            ]
+          },
+          {
+            "atC": "C3",
+            "text": "H",
+            "labelCenter": [
+              533,
+              167
+            ],
+            "bond": [
+              [
+                533,
+                131
+              ],
+              [
+                533,
+                153
+              ]
+            ]
+          },
+          {
+            "atC": "C2",
+            "text": "H",
+            "labelCenter": [
+              590,
+              99
+            ],
+            "bond": [
+              [
+                590,
+                131
+              ],
+              [
+                590,
+                112
+              ]
+            ]
+          },
+          {
+            "atC": "C1",
+            "text": "H",
+            "labelCenter": [
+              630,
+              134
+            ],
+            "bond": [
+              [
+                630,
+                91
+              ],
+              [
+                630,
+                119
+              ]
+            ]
+          }
+        ],
+        "commonOH": [
+          {
+            "atC": "C3",
+            "text": "OH",
+            "Ocenter": [
+              533,
+              99
+            ],
+            "bbox": [
+              523,
+              87,
+              557,
+              113
+            ],
+            "bond": [
+              [
+                533,
+                131
+              ],
+              [
+                533,
+                113
+              ]
+            ]
+          },
+          {
+            "atC": "C2",
+            "text": "OH",
+            "Ocenter": [
+              590,
+              168
+            ],
+            "bbox": [
+              580,
+              155,
+              615,
+              179
+            ],
+            "bond": [
+              [
+                590,
+                131
+              ],
+              [
+                590,
+                153
+              ]
+            ]
+          }
+        ],
+        "rightTerminalOH": {
+          "text": "OH",
+          "bbox": [
+            622,
+            42,
+            658,
+            68
+          ],
+          "bond": [
+            [
+              630,
+              91
+            ],
+            [
+              630,
+              68
+            ]
+          ],
+          "anchor": "O"
+        }
+      }
+    ],
+    "bridges": [
+      {
+        "text": "O",
+        "bbox": [
+          199,
+          178,
+          220,
+          201
+        ],
+        "bonds": [
+          [
+            [
+              161,
+              221
+            ],
+            [
+              198,
+              197
+            ]
+          ],
+          [
+            [
+              220,
+              179
+            ],
+            [
+              259,
+              156
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          434,
+          112,
+          455,
+          135
+        ],
+        "bonds": [
+          [
+            [
+              396,
+              156
+            ],
+            [
+              433,
+              132
+            ]
+          ],
+          [
+            [
+              455,
+              115
+            ],
+            [
+              493,
+              91
+            ]
+          ]
+        ]
+      }
+    ],
+    "bracket": {
+      "left": [
+        [
+          246,
+          62
+        ],
+        [
+          235,
+          62
+        ],
+        [
+          235,
+          245
+        ],
+        [
+          246,
+          245
+        ]
+      ],
+      "right": [
+        [
+          464,
+          62
+        ],
+        [
+          474,
+          62
+        ],
+        [
+          474,
+          245
+        ],
+        [
+          464,
+          245
+        ]
+      ],
+      "repeatLiteral": {
+        "text": "7 000",
+        "bbox": [
+          481,
+          238,
+          524,
+          253
+        ],
+        "font": "regularuprightsans",
+        "note": "literalSPACEbetween7and000, no n orcomma"
+      },
+      "scope": "IncludesMIDDLEring+RIGHTbridgeOat444124. ExcludesLEFTbridgeO209189andoutsideendrings. Leftbracketcrossesincomingbridgebondaround235171, rightbracketcrossesoutgoingbridgebondaround474102; do notmovebrackettoexcluderightO."
+    },
+    "font": "AllregularuprightsanslabelsH/OH/CH2OH/7 000, only2SUBinCH2OH; noactualbold/italictext. BoldONLY3frontbonds/6tapers.",
+    "counts": {
+      "C": 18,
+      "bareRingC": 15,
+      "CH2OHtextC": 3,
+      "O": 16,
+      "OHfree": 8,
+      "CH2OHO": 3,
+      "ringO": 3,
+      "bridgeO": 2,
+      "standaloneH": 15,
+      "TAPER": 6,
+      "BOLDfront": 3,
+      "squareBracketPairs": 1,
+      "caption": 0
+    },
+    "noAdded": [
+      "polymernamecaption",
+      "nsub",
+      "Cnumbers",
+      "extraH/OH",
+      "differentbracketscope",
+      "stereocorrectionfromname",
+      "reactionarrow"
+    ]
+  },
+  "coordinateMeaning": "Nativepixelgeometry; repeatedringrelativepositions individuallyverifiedvisible, no molecularnameinference. HpositionsliteralUP/DOWN.",
+  "corrections": [
+    {
+      "field": "geometry.rings[*].frontTapers",
+      "reason": "Own native crop opened at 10x confirms broad taper feet vertical at C3/C2 x, yfront +/-3. Prior normal-offset x +/-3 coordinates were incorrect. Source-only correction; no repo/SVG changes.",
+      "evidence": "/workspace/scratch/own977-frontfeet10x.png",
+      "oldNew": [
+        {
+          "ring": 1,
+          "old": [
+            [
+              [
+                24,
+                221
+              ],
+              [
+                61,
+                264
+              ],
+              [
+                67,
+                258
+              ]
+            ],
+            [
+              [
+                161,
+                221
+              ],
+              [
+                118,
+                264
+              ],
+              [
+                124,
+                258
+              ]
+            ]
+          ],
+          "new": [
+            [
+              [
+                24,
+                221
+              ],
+              [
+                64,
+                264
+              ],
+              [
+                64,
+                258
+              ]
+            ],
+            [
+              [
+                161,
+                221
+              ],
+              [
+                121,
+                264
+              ],
+              [
+                121,
+                258
+              ]
+            ]
+          ]
+        },
+        {
+          "ring": 2,
+          "old": [
+            [
+              [
+                259,
+                156
+              ],
+              [
+                296,
+                199
+              ],
+              [
+                302,
+                193
+              ]
+            ],
+            [
+              [
+                396,
+                156
+              ],
+              [
+                353,
+                199
+              ],
+              [
+                359,
+                193
+              ]
+            ]
+          ],
+          "new": [
+            [
+              [
+                259,
+                156
+              ],
+              [
+                299,
+                199
+              ],
+              [
+                299,
+                193
+              ]
+            ],
+            [
+              [
+                396,
+                156
+              ],
+              [
+                356,
+                199
+              ],
+              [
+                356,
+                193
+              ]
+            ]
+          ]
+        },
+        {
+          "ring": 3,
+          "old": [
+            [
+              [
+                493,
+                91
+              ],
+              [
+                530,
+                134
+              ],
+              [
+                536,
+                128
+              ]
+            ],
+            [
+              [
+                630,
+                91
+              ],
+              [
+                587,
+                134
+              ],
+              [
+                593,
+                128
+              ]
+            ]
+          ],
+          "new": [
+            [
+              [
+                493,
+                91
+              ],
+              [
+                533,
+                134
+              ],
+              [
+                533,
+                128
+              ]
+            ],
+            [
+              [
+                630,
+                91
+              ],
+              [
+                590,
+                134
+              ],
+              [
+                590,
+                128
+              ]
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "rootTaperCoordinateCorrection": {
+    "oldNormalOffsetCoordinatesWrong": [
+      [
+        [
+          [
+            24,
+            221
+          ],
+          [
+            61,
+            264
+          ],
+          [
+            67,
+            258
+          ]
+        ],
+        [
+          [
+            161,
+            221
+          ],
+          [
+            118,
+            264
+          ],
+          [
+            124,
+            258
+          ]
+        ]
+      ],
+      [
+        [
+          [
+            259,
+            156
+          ],
+          [
+            296,
+            199
+          ],
+          [
+            302,
+            193
+          ]
+        ],
+        [
+          [
+            396,
+            156
+          ],
+          [
+            353,
+            199
+          ],
+          [
+            359,
+            193
+          ]
+        ]
+      ],
+      [
+        [
+          [
+            493,
+            91
+          ],
+          [
+            530,
+            134
+          ],
+          [
+            536,
+            128
+          ]
+        ],
+        [
+          [
+            630,
+            91
+          ],
+          [
+            587,
+            134
+          ],
+          [
+            593,
+            128
+          ]
+        ]
+      ]
+    ],
+    "new": "BroadfeetVERTICAL atC3/C2 xfixed,yfront±3; no perpendicular xoffset.",
+    "evidence": "Root native977-feet342.png FULL10x and readonly independent nativeFULL/freshSVG3x confirm 6TAPER3front6pxvertical. Builder already vertical from initialdff203, no SVGchange.",
+    "rootOwnNativeMacroOpened": true,
+    "readonlyExactSvgHash": "dff203efbb0b0eccce3980b09b97e5c81d791de6f848179bdc00f47b61067956"
+  }
+}

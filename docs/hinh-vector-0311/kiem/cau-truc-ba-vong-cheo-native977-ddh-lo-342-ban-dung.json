@@ -1,0 +1,29 @@
+[
+  {
+    "i": 977,
+    "hash": "aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7",
+    "fileNguon": "anh/aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7.png",
+    "svg": "ba-vong-cheo-native977-ddh-dff203efbb0b0eccce3980b09b97e5c81d791de6f848179bdc00f47b61067956.svg",
+    "hashSvg": "dff203efbb0b0eccce3980b09b97e5c81d791de6f848179bdc00f47b61067956",
+    "byteSvg": 28899,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B6-I-12",
+        "de": "Quan sát cấu trúc phân tử carbohydrate X được cho dưới đây:\nCho các phát biểu sau về carbohydrate X:\n(a) X là một polysaccharide có cấu trúc mạch phân nhánh.\n(b) X có phản ứng đổi màu với dung dịch iodine tạo thành màu xanh tím.\n(c) Công thức viết gọn của X là $\\ce{[C6H7O2(OH)3]_n}$.\n(d) Phân tử khối trung bình của một phân tử carbohydrate X là 1 134 000.\nSố phát biểu đúng là",
+        "refs": [
+          {
+            "hash": "aede1db1caa28087c17bc5e0155f008635da32df9a284d253b59c8b6ed6797d7",
+            "where": "VIP27-C2-B6-I-12.hinh.0.du_lieu",
+            "hashDataUrl": "6facca8b8c4cabdfc5b8c10c14051e7481fce3981ac5118e3b96f2462e791a9f"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18C16O15H8freeOH3CH2OH/3ringO2bridgeO/6TAPER3boldfront6px-verticalfeet/ALLregularupright/leftOHdown-rightOHup/1SQUAREpairincludesMIDDLEplusRIGHTbridgeO-excludesLEFTbridgeO/literal7 000SPACE/noaddedname-n-carbonnums-answer-noalias265-506",
+    "hashSvgDaSoat": "dff203efbb0b0eccce3980b09b97e5c81d791de6f848179bdc00f47b61067956",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
