@@ -91,7 +91,9 @@ export const JS_LEN_BANG_BPU = `
     // ảnh / bảng rộng bắt đầu cạnh lửa (bị bóp) ⇒ xuống hẳn dưới lửa (clear).
     + 'body.mc-bc .mc-vung-de .mc-ds-pa.bpu-pa-chay{display:block}body.mc-bc .mc-vung-de .mc-ds-pa.bpu-pa-chay>*+*{margin-top:6px}.mc-vung-de .bpu-duoi-lua{clear:left}'
     + '@media (prefers-reduced-motion:reduce){.bpu-lua-doi,.bpu-lua-doi *{animation:none!important}.bpu-lua-doi .tia{display:none}}html.may-yeu .bpu-lua-doi *{animation:none!important}';
-  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); ['bpu-the-ton', 'bpu-pa-chay', 'bpu-duoi-lua'].forEach(function (k) { Array.prototype.forEach.call(document.querySelectorAll('.' + k), function (x) { x.classList.remove(k); }); }); }
+  function xoaLua() { Array.prototype.forEach.call(document.querySelectorAll('.bpu-lua-doi'), function (x) { x.remove(); }); ['bpu-the-ton', 'bpu-pa-chay', 'bpu-duoi-lua'].forEach(function (k) { Array.prototype.forEach.call(document.querySelectorAll('.' + k), function (x) { x.classList.remove(k); }); });
+    // trả số cột phương án tờ đã chia lúc chưa có lửa (baoLua chia lại theo bề ngang cạnh lửa)
+    Array.prototype.forEach.call(document.querySelectorAll('.mc-auto-options'), function (g) { if (g.__bpuCot === undefined) return; if (g.__bpuCot) g.style.setProperty('--mc-option-cols', g.__bpuCot); else g.style.removeProperty('--mc-option-cols'); g.__bpuCot = undefined; }); }
   // 10/11 chữ đề bao quanh lửa: (1) danh sách ý / phương án MỘT cột ⇒ bpu-pa-chay (khung thường, từng ý né lửa riêng, dưới lửa hết bề ngang); 2 / 4 cột giữ lưới.
   // (2) ảnh / bảng bắt đầu cạnh lửa mà bị bóp hẹp hơn cỡ đủ, lưới 2 / 4 cột chỉ chạm mép dưới lửa ⇒ bpu-duoi-lua (clear) — xét theo thứ tự, gặp khối đầu tiên đã dưới lửa thì thôi.
   // Đo lại khi bố cục xong / ảnh nạp xong (số cột do tờ chia lại được).
@@ -99,6 +101,7 @@ export const JS_LEN_BANG_BPU = `
     ['bpu-pa-chay', 'bpu-duoi-lua'].forEach(function (k) { Array.prototype.forEach.call(v.querySelectorAll('.' + k), function (x) { x.classList.remove(k); }); });
     var l = v.querySelector(':scope > .bpu-lua-doi'); if (!l) return;
     // chia lại số cột theo bề ngang CÒN LẠI cạnh lửa (tờ chia lúc chưa có lửa ⇒ 2 cột bị bóp, phương án dài tràn mép); còn 1 cột ⇒ chảy quanh lửa
+    Array.prototype.forEach.call(v.querySelectorAll('.mc-auto-options'), function (g) { if (g.__bpuCot === undefined) g.__bpuCot = g.style.getPropertyValue('--mc-option-cols'); });
     if (window.__mcFitOptions) window.__mcFitOptions(v);
     Array.prototype.forEach.call(v.querySelectorAll('.mc-ds-pa'), function (x) {
       var cs = getComputedStyle(x), cot = x.classList.contains('mc-auto-options') ? parseInt(cs.getPropertyValue('--mc-option-cols'), 10) || 1
