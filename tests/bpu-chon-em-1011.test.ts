@@ -4,7 +4,7 @@
 // lượt này, không số kém; thiếu dữ liệu ⇒ lý do chung; (3) `kiem` chỉ ở view bảng (có chamSo, đang trả lời), không bao giờ ra máy em;
 // (4) máy chủ kênh 'bpu' đọc dạng / chuyên đề / độ chăm / mọi lần lên bảng (len_bang ∪ bpu_luot), bpu_luot chưa có ⇒ vẫn chạy.
 import { describe, expect, it } from 'vitest'
-import { xepTheoBpu, type LuotBpu, type NapBpu } from '../src/lib/bpu/chon-em-bpu'
+import { tenDoc, xepTheoBpu, type LuotBpu, type NapBpu } from '../src/lib/bpu/chon-em-bpu'
 import { lyDoLenBang } from '../src/lib/bpu/ly-do'
 import type { EmChieu } from '../src/lib/ung-vien-chieu'
 import { moDapAn, moLuot, nhanTra, taoPhong, viewBang, viewEm } from '../src/lib/bpu/phong'
@@ -60,6 +60,15 @@ describe('bộ chọn thuần', () => {
     // Lớp chỉ toàn em đúng ⇒ không có lượt «chữa».
     const v = (so: number): LuotBpu => ({ buoiId: 'b1', ds, luot: { so, qid: 'q1', kiem: { A: [1, 5], B: [1, 9] } } })
     expect(new Set(Array.from({ length: 30 }, (_, i) => xep([em('A'), em('B')], nap, v(i + 1))[0]!.sbd))).toEqual(new Set(['A']))
+  })
+  it('tên dạng đọc được: bỏ «Dạng» đầu, không gạch dài, mã nội bộ ⇒ «cùng dạng»', () => {
+    expect(tenDoc('Dạng 3: Thuỷ phân ester')).toBe('Thuỷ phân ester')
+    expect(tenDoc('Hằng số cân bằng — tính số mol')).toBe('Hằng số cân bằng, tính số mol')
+    expect(tenDoc('DH-B0.D0')).toBe('')
+    expect(tenDoc('Dạng DH-B0.D0')).toBe('')
+    const r = xep([em('A')], { ...nap, tenDang: 'Dạng DH-B0.D0' }, view([{ sbd: 'A', doi: 0 }]))
+    expect(r[0]!.lyDoBpu![0]).toBe('Đúng 4/5 lượt làm câu cùng dạng trên app.')
+    for (const d of r[0]!.lyDoBpu!) expect(d).not.toMatch(/—|DH-B0/)
   })
   it('thiếu dữ liệu (máy chủ cũ) ⇒ không bịa số, dùng lý do chung', () => {
     const r = xep([em('C', { soLan14: 0 })], undefined, view([{ sbd: 'C', doi: 0 }]))

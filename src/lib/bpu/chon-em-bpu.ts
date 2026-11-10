@@ -28,7 +28,12 @@ const bam = (s: string): number => { let h = 2166136261; for (let i = 0; i < s.l
 const tiLe = (x?: readonly [number, number]): number => { if (!x || x[1] <= 0) return 0.5; const tin = Math.min(x[1], 8) / 8; return tin * ((x[0] + 1) / (x[1] + 2)) + (1 - tin) * 0.5 }
 const ngaySau = (iso: string | null | undefined, nowMs: number): number | null => { const t = iso ? Date.parse(iso) : NaN; return Number.isFinite(t) ? Math.max(0, Math.floor((nowMs - t) / NGAY_MS)) : null }
 const moiHon = (a?: string | null, b?: string | null): string | null => (a && b ? (a > b ? a : b) : a || b || null)
-const gon = (s: string | undefined, n = 60): string => { const t = (s ?? '').trim(); return t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t }
+const gon = (s: string, n = 60): string => (s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s)
+/** Tên dạng / chuyên đề đọc được cho học sinh: bỏ chữ «Dạng» / «Chuyên đề» đứng đầu (kèm số thứ tự), gạch dài ⇒ dấu phẩy; trông như MÃ NỘI BỘ ⇒ '' (dùng «cùng dạng»). */
+export function tenDoc(s: string | undefined): string {
+  const t = (s ?? '').trim().replace(/^(dạng|chuyên đề)\s*\d*\s*[:.-]?\s*/i, '').replace(/\s*[—–]\s*/g, ', ').trim()
+  return !t || /^[A-Z0-9._\-\s]+$/.test(t) || !/[a-zà-ỹ]/i.test(t) ? '' : gon(t)
+}
 
 interface BoiCanh { nap?: NapBpu; kiem: Record<string, readonly [number, number]>; doiCua: Map<string, number>; lenTrongBuoi: Map<string, number>; goiDoi: Map<number, number>; nowMs: number }
 
@@ -51,7 +56,8 @@ export function diemLichSu(e: EmChieu, c: BoiCanh): number {
 export function lyDoBpu(e: EmChieu, c: BoiCanh): string[] {
   const h = c.nap?.em[e.sbd], dau: string[] = [], them: string[] = []
   // 1) Dạng / chuyên đề — chỉ khi đúng từ một nửa trở lên (không nêu số kém trước lớp).
-  const nguon = h?.dang && h.dang[1] >= 2 ? { x: h.dang, ten: c.nap?.tenDang ? `dạng ${gon(c.nap.tenDang)}` : 'cùng dạng' } : h?.cd && h.cd[1] >= 2 ? { x: h.cd, ten: c.nap?.chuyenDe ? `chuyên đề ${gon(c.nap.chuyenDe)}` : 'cùng chuyên đề' } : null
+  const td = tenDoc(c.nap?.tenDang), cd = tenDoc(c.nap?.chuyenDe)
+  const nguon = h?.dang && h.dang[1] >= 2 ? { x: h.dang, ten: td ? `dạng ${td}` : 'cùng dạng' } : h?.cd && h.cd[1] >= 2 ? { x: h.cd, ten: cd ? `chuyên đề ${cd}` : 'cùng chuyên đề' } : null
   if (nguon && nguon.x[0] * 2 >= nguon.x[1]) dau.push(`Đúng ${nguon.x[0]}/${nguon.x[1]} lượt làm câu ${nguon.ten} trên app.`)
   else if (e.loai === 'da_dung') dau.push('Em đã tự làm đúng câu này trên app.')
   // 2) Lên bảng.
