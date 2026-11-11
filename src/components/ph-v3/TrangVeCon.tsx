@@ -41,7 +41,7 @@ export function cuonToiPhan(id: IdPhan, muot = true): void {
 // ---------------------------------------------------------------- khối nạp khi cần ----------------------------------------------------------------
 const napPhanDuoi = () => import('./TrangVeConDuoi')
 const PhanDuoi = lazy(napPhanDuoi)
-const KhoiNoCauPh = lazy(() => import('./KhoiNoCauPh')) // nợ câu của con (11/11): chỉ tải khi con đang nợ
+const KhoiNoCauPh = lazy(() => import('./KhoiNoCauPh').catch(() => ({ default: (() => null) as unknown as typeof import('./KhoiNoCauPh').default }))) // nợ câu của con (11/11): chỉ tải khi con đang nợ
 type KhoiBac = typeof import('./BacCon')
 let huaBac: Promise<KhoiBac | null> | null = null
 /** Nạp sẵn khối bậc (huy hiệu + thang 12 bậc, làn M) — một lần mỗi phiên; lỗi ⇒ lần sau thử lại, phần bậc ẩn. */

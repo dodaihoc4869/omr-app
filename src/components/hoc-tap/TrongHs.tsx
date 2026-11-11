@@ -60,7 +60,8 @@ import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
-const TheNoCau = lazy(() => import('./TheNoCau'))
+// mảnh ngoài precache: mất mạng lúc nạp ⇒ không vẽ thẻ (không làm hỏng Hôm nay)
+const TheNoCau = lazy(() => import('./TheNoCau').catch(() => ({ default: (() => null) as unknown as typeof import('./TheNoCau').default })))
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
