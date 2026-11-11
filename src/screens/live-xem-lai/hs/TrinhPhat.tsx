@@ -12,6 +12,7 @@ import { createPortal } from 'react-dom'
 import { anToanHinh, canXoayCss, giaiTrang, khungChieu, type KhungChieu } from '../../../components/live/bo-cuc'
 import { taoVeBang, type VeBang } from '../../../components/live/ve-bang'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
+import { chonHeSoGiay } from '../../../components/live/vua-giay'
 import { taoLoiBut, type SuKienBut } from '../../../lib/but-bang-loi'
 import { TEP_LIVE, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
@@ -56,18 +57,27 @@ interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: 
 /** Tấm giấy đề: khối đề dựng ở bề ngang gốc rồi phóng lên cho vừa chiều cao giấy (cùng phép tính lớp bảng live của máy em). */
 const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
   const trong = useRef<HTMLDivElement>(null)
+  const K_MIN = 1.3, K_MAX = 2.1
   const [k, setK] = useState(2)
   const coDe = de != null
+  const da = useRef(0)
   useLayoutEffect(() => {
     const el = trong.current
     if (!el) return
-    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(1.3, Math.min(2.1, (cao - 28) / h))) }
+    // Chọn hệ số phóng MỘT lần cho mỗi (câu, khổ ô giấy) bằng cách dò (vua-giay.ts) — bản trước tính lại theo chính chiều cao vừa đổi ⇒ không có điểm dừng,
+    // khối đề đổi cỡ mỗi khung hình («đề nhấp nháy lên xuống», thầy 11/11). Chỉ dò lại khi khối đề đổi cao vì lý do KHÁC (ảnh / phông tải xong).
+    const do1 = () => {
+      const r = chonHeSoGiay((thu) => { el.style.width = `${(rong - 36) / thu}px`; return el.scrollHeight }, cao, K_MIN, K_MAX)
+      el.style.width = `${(rong - 36) / r.k}px`
+      da.current = r.h
+      setK(r.k)
+    }
     do1()
     if (typeof ResizeObserver !== 'function') return
-    const ro = new ResizeObserver(do1)
+    const ro = new ResizeObserver(() => { if (Math.abs((el.scrollHeight || 1) - da.current) > 1) do1() })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [khoa, rong, cao, coDe])
+  }, [khoa, rong, cao, coDe, K_MIN, K_MAX])
   if (!de) return <p className="xp-giay-trong">Thầy chữa trên bảng</p>
   return <div className="xp-de"><div ref={trong} className="xp-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
 })
