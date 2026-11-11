@@ -122,7 +122,9 @@ await em2.locator('.lv').waitFor({ timeout: 6000 })
 kq['E1 · 3 giây đầu bị ép vào bảng live (Đúng / Sai)'] = await do1(em2, '.lv-giay', 3); in1('E1 · 3 giây đầu bị ép vào bảng live (Đúng / Sai)')
 kq['E · bị ép vào bảng live, đứng yên'] = await do1(em2, '.lv-giay', GIAY); in1('E · bị ép vào bảng live, đứng yên')
 kq['E2 · bị ép vào bảng live, thầy đang viết'] = await do1(em2, '.lv-giay', GIAY, () => vietBang(GIAY, 0.5), 0.6); in1('E2 · bị ép vào bảng live, thầy đang viết')
-const giayE = await em2.evaluate(() => ({ soi: document.querySelector('.lv')?.hasAttribute('data-soi') ?? null, nutTraLoi: document.querySelectorAll('.lv-giay button, .lv-giay [role="radio"], .lv-giay input').length }))
+const giayE = await em2.evaluate(() => ({ soi: document.querySelector('.lv')?.hasAttribute('data-soi') ?? null, nutTraLoi: [...document.querySelectorAll('.lv-giay button, .lv-giay [role="radio"], .lv-giay input, .lv-giay [aria-pressed]')].filter((e) => !e.classList.contains('lv-mui')).length, giay: (() => { const r = document.querySelector('.lv-giay').getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] })(), man: [innerWidth, innerHeight], chu: (document.querySelector('.lv-giay')?.innerText ?? '').replace(/\s+/g, ' ').slice(0, 120) }))
+// NN_ANH=<tệp .jpg>: chụp máy em thứ hai đúng tình huống thầy gửi ảnh (em chưa gửi, thầy gọi bạn lên bảng, câu Đúng / Sai)
+if (process.env.NN_ANH) { let q = 86, buf; do { buf = await em2.screenshot({ type: 'jpeg', quality: q, scale: e2w > 1200 ? 'css' : 'device' }); q -= 6 } while (buf.length > 150 * 1000 && q > 30); writeFileSync(resolve(process.env.NN_ANH), buf); console.log('ảnh', process.env.NN_ANH, Math.round(buf.length / 1024), 'KB') }
 
 writeFileSync(SO_DO, JSON.stringify({ luc: new Date().toISOString(), ghiChu: 'Chromium thật, phòng thật trong Node, dữ liệu giả. Mỗi trạng thái: MutationObserver trên vùng đề + chụp liên tiếp vùng đề (so từng cặp khung liền nhau).', dist: DIST, giayMoiTrangThai: GIAY, giayE, kq, loiTrang }, null, 1) + '\n')
 console.log('ô giấy lúc bị ép vào bảng (Đúng / Sai):', JSON.stringify(giayE))

@@ -406,6 +406,7 @@ export default defineConfig({
           '**/TrinhPhat-*.{js,css}',
           '**/MoTuThay-*.js', // cửa app thầy bấm «Mở» ở Lịch sử Live (nhập lười) — bọc mỏng quanh mảnh xem-lai-live
           '**/ve-bang-*.js',
+          '**/GiayDung-*.js', // giấy đề kiểu tờ chiếu dùng chung bảng live + trình phát (11/11) — chỉ nạp khi live / xem lại
           '**/so-do-????????.js', // 11/11 bộ đo trễ Live (chỉ lớp Live của thầy / em dùng): tách ra thành mảnh riêng sau Xem lại Live ⇒ kho chạy-lúc, precache giữ ≤ 170
           '**/so-net-*.js',
           '**/ma-net-*.js',

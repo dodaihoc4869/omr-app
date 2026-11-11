@@ -46,6 +46,7 @@ import type { Vung } from './bo-cuc-doc-lap'
 import ChonLoa from './ChonLoa'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
 import { chonHeSoGiay } from './vua-giay'
+import { DauGiay, PhuongAnTinh } from './GiayDung'
 import GiayThay, { soiDuoc, type BoChu, type CauGiay } from './GiayThay'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from './KhungDocLap'
 import './live-em.css'
@@ -79,11 +80,13 @@ export interface PropsLopLive {
   luot?: DuLieuLuot | null
   /** Em ở xa (thuộc lớp, chưa điểm danh, thầy bật «Cho em ở xa vào xem»). */
   xa?: boolean
+  /** Số thứ tự câu của lượt («Câu 3» ở đầu giấy đề dựng tại máy em). */
+  so?: number | null
 }
 
 /** Tấm giấy đề DỰNG THƯỜNG (câu có ảnh / bảng / sơ đồ, giấy lệch giấy thầy): khối đề dùng chung dựng theo bề ngang khung giấy của EM rồi phóng cho vừa
  *  chiều cao khung — chữ to tự nhiên theo khổ máy (hệ số phóng kẹp theo bề ngang khung), đề dài ⇒ cỡ nhỏ nhất + cuộn dọc. */
-const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
+const GiayDe = memo(function GiayDe({ de, khoa, rong, cao, q, Chu, tuLuan, so }: { de: ReactNode | null; khoa: string; rong: number; cao: number; q?: CauGiay | null; Chu?: BoChu; tuLuan?: boolean; so?: number | null }) {
   const trong = useRef<HTMLDivElement>(null)
   const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 340))
   const [k, setK] = useState(kMin)
@@ -107,7 +110,8 @@ const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | n
     return () => ro.disconnect()
   }, [khoa, rong, cao, coDe, kMin, kMax])
   if (!de) return <p className="lv-giay-trong" style={{ fontSize: Math.max(18, Math.min(34, rong / 18)) }}>Thầy đang giảng trên bảng</p>
-  return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
+  // GIẤY ĐỀ kiểu tờ chiếu (GiayDung.tsx): đầu giấy · thân đề (chữ + ảnh + bảng của câu) · phương án / ý là CHỮ — không có nút trả lời nào
+  return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}><div className="lv-gd">{q ? <DauGiay q={q} so={so} tuLuan={!!tuLuan} /> : null}{de}{q && Chu ? <PhuongAnTinh q={q} Chu={Chu} tuLuan={!!tuLuan} /> : null}</div></div></div>
 })
 
 function Vach({ n }: { n: number }) {
@@ -265,7 +269,7 @@ function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
   return ms == null ? null : <small className="lv-tre" title="Ước tính, chưa gồm loa / tai nghe">Trễ ~{Math.round(ms / 5) * 5} ms</small>
 }
 
-export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -363,6 +367,8 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     return ds
   }
   /** Các dòng của khay — dùng chung cho bảng live và màn câu hỏi. `dau` = dòng đầu (bảng live: sóng «Thầy đang nói» + vạch mạng). */
+  /** Em CHƯA gửi mà thầy đã gọi bạn lên bảng (cả lớp bị đưa vào bảng live): lượt đã khoá — nói rõ cho em trong khay. */
+  const khoaChuaGui = che === 'bang' && !!luot && (luot.l.pha === 'goi' || luot.l.pha === 'lam-bang') && !luot.l.emTra && !luot.daGuiMay && !!luot.l.goi && luot.l.goi.sbd !== luot.sbd
   const dongKhay = (dau: ReactNode, them?: ReactNode) => (
     <>
       <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}{nghe && !tt.nghi ? <TreTieng le={le} /> : null}</div>
@@ -382,6 +388,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
           <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : 'Đang tắt'}</b></button>
       ) : null}
       {micBang && micMo ? <p className="lv-ghi">Thầy và cả lớp đang nghe em.{view.ghi ? ' Đang ghi để lớp xem lại.' : ''}</p> : null}
+      {khoaChuaGui ? <p className="lv-ghi">Thầy đã gọi bạn lên bảng — câu này đã khoá, em chưa gửi nên để trống.</p> : null}
       {them}
       {doi ? <div className="lv-doi"><span className="ky" aria-hidden="true">{doi.ky}</span><span>{doi.ten}</span><b>{doi.kj.toLocaleString('vi-VN')} kJ</b></div> : null}
     </>
@@ -396,18 +403,18 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     </div>
   )
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} />
+    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} />
 }
 
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
-  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; luot: ReactNode; coDoi: boolean; dauNam: (mangYeu: boolean) => DauNam[]; gioiThieu: boolean; khiGioiThieu: () => void
+  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; so: number | null; luot: ReactNode; coDoi: boolean; dauNam: (mangYeu: boolean) => DauNam[]; gioiThieu: boolean; khiGioiThieu: () => void
   dongKhay: (dau: ReactNode, them?: ReactNode) => ReactNode; ghi?: boolean }
 /** Khổ HÌNH (đã xoay nếu có) + kiểu giấy của thầy. */
 interface KhoHinh { xoay: boolean; w: number; h: number; giayToi: boolean }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), kdl = useRef<TayKhungDL>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
@@ -529,8 +536,8 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
   const khiCham = useCallback((): boolean => { if (!moRef.current) return false; setMo(false); return true }, [])
   const khiNet = useCallback((v: { soNet: () => number; soDo: () => number }) => setCoNet(v.soNet() + v.soDo() > 0), [])
   const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number }) => (soi && giay && q && Chu
-    ? <GiayThay giay={giay} q={q} Chu={Chu} tuLuan={tuLuan} rong={rong} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />} />
-    : <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />), [soi, giay, q, Chu, tuLuan, datKhop, de, khoaDe])
+    ? <GiayThay giay={giay} q={q} Chu={Chu} tuLuan={tuLuan} rong={rong} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} q={q} Chu={Chu} tuLuan={tuLuan} so={so} />} />
+    : <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} q={q} Chu={Chu} tuLuan={tuLuan} so={so} />), [soi, giay, q, Chu, tuLuan, so, datKhop, de, khoaDe])
   const yeu = mayYeu()
 
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'

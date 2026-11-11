@@ -672,16 +672,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
   // Luật màn lúc live (11/11: em gửi xong tự về bảng live; thầy gọi lên bảng ép cả lớp vào bảng) — `cheLiveCua` ở luat-man-live.tsx.
   const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !!l && l.pha === 'tra-loi' && !che && !hetGio })
-  const khong = () => {}
-  const deLive = cheLive === 'bang' && q && l && LC ? boChang(<>
-    <LC.DeCau q={q} stt={l.so} />
-    {l.tuLuan ? null : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value="" onChon={khong} khoa /> : l.phan === 'II' ? <LC.ChonDungSai q={q} value="" onChon={khong} khoa /> : null}
-  </>) : null
+  // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
+  const deLive = cheLive === 'bang' && q && l && LC ? boChang(<LC.DeCau q={q} stt={l.so} />) : null
   const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
     <Suspense fallback={null}>
       <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} dangKy={dangKyLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
         doi={e && !xaEm ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi}
-        q={q && l ? q : null} Chu={LC?.ChemText} tuLuan={!!l?.tuLuan} xa={xaEm}
+        q={q && l ? q : null} Chu={LC?.ChemText} tuLuan={!!l?.tuLuan} xa={xaEm} so={l?.so ?? null}
         luot={cheLive === 'bang' && e && !xaEm && l ? { l, sbd: e.sbd, doi, daGuiMay: cheSo === khoaLuot, ketQuaBang, gui } : null} />
     </Suspense>
   ) : null

@@ -197,6 +197,35 @@
 .lv .lv-ve { bottom: calc(12px + var(--lv-at-duoi, 0px)); background: var(--doi); color: var(--p-muc); box-shadow: 0 8px 24px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent); }
 .lv-mui:active, .lv-ve:active { transform: translateX(-50%) scale(0.97); }
 
+/* ── GIẤY ĐỀ DỰNG TẠI MÁY EM, KIỂU TỜ CHIẾU (11/11, GiayDung.tsx): ô giấy LUÔN theo màu giấy của THẦY (sáng / tối), thân đề không khung thẻ, phương án / ý
+   là chữ đề — không có điều khiển trả lời. Trong giấy đè `--tr-*` bằng bảng màu màn chiếu (như trình phát Xem lại Live) để khối đề của chặng lên đúng màu. ── */
+.lv .lv-giay { background: var(--tr-chieu-giay); color: var(--tr-chieu-chu);
+  --tr-nen: var(--tr-chieu-giay); --tr-mat: var(--tr-chieu-giay); --tr-mat-2: var(--tr-chieu-the); --tr-mat-3: var(--tr-chieu-the); --tr-vien: var(--tr-chieu-the); --tr-vien-2: var(--tr-chieu-phu);
+  --tr-chu: var(--tr-chieu-chu); --tr-chu-2: var(--tr-chieu-chu); --tr-chu-3: var(--tr-chieu-phu); }
+.lv[data-giay="toi"] .lv-giay { background: var(--tr-chieu-mat); color: var(--tr-chieu-giay);
+  --tr-nen: var(--tr-chieu-mat); --tr-mat: var(--tr-chieu-mat); --tr-mat-2: var(--tr-chieu-mat-2); --tr-mat-3: var(--tr-chieu-mat-3); --tr-vien: var(--tr-chieu-mat-3); --tr-vien-2: var(--tr-chieu-mat-3);
+  --tr-chu: var(--tr-chieu-giay); --tr-chu-2: var(--tr-chieu-giay); --tr-chu-3: var(--tr-chieu-the); }
+.lv-gd { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.lv-gd-dau { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; line-height: 1.2; }
+.lv-gd-so { padding: 4px 11px; border-radius: 999px; font-weight: 700; background: color-mix(in srgb, var(--tr-chieu-nhan) 16%, transparent); }
+.lv-gd-phan { padding: 4px 11px; border-radius: 999px; font-weight: 600; background: var(--tr-chieu-the); color: var(--tr-chieu-phu); }
+/* thân đề của chặng nằm trên giấy: bỏ khung thẻ (luật của màn làm bài nặng hơn nên phải ép) */
+/* (giao diện «Trong» ép khung thẻ bằng luật rất nặng `html[data-trong]:not(#_)… !important` ⇒ ở đây phải nặng hơn) */
+html:not(#_):not(#_):not(#_) .lv .lv-gd section.ht2-lam-de, html:not(#_):not(#_):not(#_) .lv .lv-gd .duo-gt-bong { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
+.lv .lv-gd section.ht2-lam-de, .lv .lv-gd .ht2-lam-de-chu { outline: 0 !important; }
+.lv .lv-gd section.ht2-lam-de::before, .lv .lv-gd section.ht2-lam-de::after { display: none !important; }
+/* «Câu N.» đã có ở đầu giấy ⇒ ẩn chữ «Câu N.» đậm mở đầu thân đề (khỏi lặp) */
+.lv-gd .ht2-lam-de > .ht2-lam-de-chu:first-child > b:first-child { display: none; }
+.lv-gd-pa { display: grid; grid-template-columns: 1fr; gap: 8px 28px; font-size: 17px; line-height: 1.55; }
+.lv-gd-pa[data-cot="2"] { grid-template-columns: 1fr 1fr; }
+.lv-gd-pa > div { display: flex; gap: 10px; min-width: 0; }
+.lv-gd-pa > div > span { min-width: 0; overflow-wrap: break-word; }
+.lv-gd-ky { flex: none; font-weight: 700; color: var(--tr-chieu-nhan); }
+.lv-gd-ngan { margin: 0; font-size: 15px; line-height: 1.5; opacity: 0.72; }
+.lv[data-giay="toi"] .lv-gd-ky { color: var(--tr-chieu-nhan-toi); }
+.lv[data-giay="toi"] .lv-gd-so { background: color-mix(in srgb, var(--tr-chieu-nhan-toi) 20%, transparent); }
+.lv[data-giay="toi"] .lv-gd-phan { background: var(--tr-chieu-mat-3); color: var(--tr-chieu-giay); }
+
 /* Nút chính màu đội trong khay: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» */
 .lv .lv-tay { width: 100%; min-height: 54px; margin-top: 8px; padding: 6px 14px; border: 0; border-radius: 16px; display: flex; align-items: center; gap: 10px; font: inherit; font-size: 16.5px; font-weight: 800; text-align: left; cursor: pointer;
   background: var(--doi); color: var(--p-muc); transition: transform 0.1s; }

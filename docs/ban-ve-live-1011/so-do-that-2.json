@@ -1,8 +1,8 @@
 {
-  "luc": "2026-11-11T08:47:56.415Z",
+  "luc": "2026-11-11T09:26:12.144Z",
   "ghiChu": "Chromium thật, phòng thật trong Node, dữ liệu giả; KHÔNG có tiếng (SFU chưa cấu hình ở máy chủ thử).",
   "soDo": {
-    "k1_gui_toi_bang_ms": 44,
+    "k1_gui_toi_bang_ms": 50.6,
     "b1_so_khoi_chu": 5,
     "b1_lech_lon_nhat_phan_nghin_be_rong_giay": 1,
     "dl_net_khop_chu": {
@@ -28,15 +28,15 @@
         "chu": 15.01
       }
     },
-    "k2_tin_phong_toi_bang_ms": 69.4,
+    "k2_tin_phong_toi_bang_ms": 62.1,
     "dai_luot_px": {
       "chua_doan": 552,
       "da_doan": 306,
       "cao": 34
     },
-    "k3_tam_dung_toi_may_em_ms": 126,
-    "k3_tiep_tuc_toi_may_em_ms": 114,
-    "k1_gui_toi_bang_lan_2_ms": 41.6
+    "k3_tam_dung_toi_may_em_ms": 133,
+    "k3_tiep_tuc_toi_may_em_ms": 128,
+    "k1_gui_toi_bang_lan_2_ms": 43.5
   },
   "kiem": [
     {
@@ -82,7 +82,7 @@
     {
       "ten": "P · chạm tay nắm ⇒ khay trượt ra từ phải, dừng BÊN TRÁI cột nút «Gửi» (không che nút), nằm gọn trong màn, có «Thầy đang live»",
       "dat": true,
-      "them": "{\"khay\":[96,317,312,527],\"gui\":[322,380,378,464]}"
+      "them": "{\"khay\":[96,321,312,523],\"gui\":[322,380,378,464]}"
     },
     {
       "ten": "P · khay còn mở ở giây thứ 3 (tự thu sau 4 giây không chạm)",
@@ -102,7 +102,7 @@
     {
       "ten": "K1 · em bấm Gửi ⇒ máy em TỰ về bảng live (≤ 200 ms từ cú bấm)",
       "dat": true,
-      "them": "44 ms"
+      "them": "50.6 ms"
     },
     {
       "ten": "K6 · vào bảng sau khi gửi: không có viên «Thầy đang live» chớp giữa màn",
@@ -127,7 +127,7 @@
     {
       "ten": "B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)",
       "dat": true,
-      "them": "967 điểm ảnh có mực trên lớp nét của giấy"
+      "them": "965 điểm ảnh có mực trên lớp nét của giấy"
     },
     {
       "ten": "ĐL · nét gạch chân KHỚP chữ trên giấy đã phóng (hai đầu nét lệch ≤ 2 % bề ngang khối đề; nét nằm ngay dưới dòng chữ, cách ≤ 0,4 cỡ chữ)",
@@ -162,7 +162,7 @@
     {
       "ten": "P · khay trượt ra từ mép phải, nằm gọn trong màn, đè lên mép bảng (không đẩy bố cục): mạng · tiếng · đội + kJ",
       "dat": true,
-      "them": "620–836 × 61–329 px · Thầy đang im Tiếng Đang tắt Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai"
+      "them": "620–836 × 65–325 px · Thầy đang im Tiếng Đang bật Loa Mặc định của máy — Fake Default Audio Output Fak"
     },
     {
       "ten": "P · chạm ra ngoài ⇒ khay thu",
@@ -232,7 +232,7 @@
     {
       "ten": "K2 · thầy gọi lên bảng ⇒ máy em chưa gửi vào bảng live NGAY (≤ 200 ms từ tin phòng)",
       "dat": true,
-      "them": "69.4 ms"
+      "them": "62.1 ms"
     },
     {
       "ten": "K2 · không ai gửi hộ đáp án em chọn dở (phòng không có bài của S2)",
@@ -262,7 +262,7 @@
     {
       "ten": "P · iPhone xoay: khay ra từ mép phải của hình (đáy máy), trên thanh home, gọn trong màn",
       "dat": true,
-      "them": "[61,586,329,802]"
+      "them": "[35,586,355,802]"
     },
     {
       "ten": "P · iPhone xoay: chạm hai lần vào bảng đen vẫn phóng bảng (ô bảng của thầy to ra), có dòng «Chạm hai lần để về toàn cảnh»",
@@ -292,12 +292,12 @@
     {
       "ten": "M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)",
       "dat": true,
-      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng tắt · lọc ồn tắt · tự chỉnh bật · cách mở 1/4 · mức tại mic 0 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khu"
+      "them": "Fake Default Audio Input · luồng đang chạy · 44100 Hz · 2 kênh · khử vọng tắt · lọc ồn tắt · tự chỉnh tắt · cách mở 3/4 · mức tại mic 0 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khu"
     },
     {
       "ten": "M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)",
       "dat": true,
-      "them": "nút «Tự động» đang ấn: 1 · put Mic: Fake Audio Input 1 Mic: Fake Audio Input 2 Mức âm đang gửi cho lớp Chưa nghe thấy Lọc ồn Vừa — bớt ồn nền, giữ giọng tự nhiên Mạnh Vừa Tắt Khử vọng Đang tắt — giọng trong "
+      "them": "nút «Tự động» đang ấn: 1 · put Mic: Fake Audio Input 1 Mic: Fake Audio Input 2 Mức âm đang gửi cho lớp Chưa nghe thấy Lọc ồn Vừa — bớt ồn nền, giữ giọng tự nhiên Bộ lọc sâu đã sẵn sàng — sẽ chuyển sang ở quã"
     },
     {
       "ten": "M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung",
@@ -312,12 +312,12 @@
     {
       "ten": "M2 · thầy ép «Bật» ⇒ mic mở lại với khử vọng + lọc ồn bật (dòng chẩn đoán đổi theo)",
       "dat": true,
-      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng bật · lọc ồn bật · tự chỉnh bật · cách mở 1/4 · mức tại mic 1 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khung) · lọc ồn vua (chay) · bộ đo running | bấm=bat"
+      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng bật · lọc ồn bật · tự chỉnh bật · cách mở 1/4 · mức tại mic 5 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khung) · lọc ồn vua (chay, bộ nhẹ) · bộ đo running | bấm=bat"
     },
     {
       "ten": "K3 · «Tạm dừng» ⇒ máy em hiện «Thầy tạm dừng live» (≤ 500 ms kể từ lúc bấm)",
       "dat": true,
-      "them": "126 ms"
+      "them": "133 ms"
     },
     {
       "ten": "K3 · viên Live ghi «TẠM DỪNG», cửa sổ đổi thành «Tiếp tục»; phiên live giữ nguyên",
@@ -342,7 +342,7 @@
     {
       "ten": "K3 · «Tiếp tục» ⇒ máy em hết dải dừng (≤ 500 ms), nét viết lúc dừng tới máy em một lượt",
       "dat": true,
-      "them": "114 ms · mực trong ô bảng 25 → 182"
+      "them": "128 ms · mực trong ô bảng 25 → 183"
     },
     {
       "ten": "B2 · thẻ «em rời màn» ghi KIỂU rời (Chromium máy tính không phân biệt được khoá màn ⇒ «thoát app hoặc khoá màn»)",
@@ -362,7 +362,7 @@
     {
       "ten": "K1 · câu thứ hai: gửi xong lại tự về bảng live",
       "dat": true,
-      "them": "41.6 ms"
+      "them": "43.5 ms"
     },
     {
       "ten": "K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», nút «thêm» vẫn ở cuối thanh",

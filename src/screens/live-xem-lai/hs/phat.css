@@ -28,6 +28,25 @@
 .xp-bang { position: absolute; border-radius: 28px; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px var(--tr-chieu-mat-3); }
 /* ── HAI KHUNG ĐỘC LẬP (11/11 chiều, components/live/KhungDocLap.tsx): vị trí / khổ đặt bằng `style`; ở đây màu + dáng của vạch chia, mũi tên trên giấy, nút về chỗ thầy ── */
 .xp .xp-giay, .xp .xp-bang { border-radius: 12px; }
+/* giấy đề kiểu tờ chiếu trong trình phát (components/live/GiayDung.tsx): phương án / ý là chữ đề, thân đề không khung thẻ */
+.xp .lv-gd { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.xp .lv-gd-dau { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; line-height: 1.2; }
+.xp .lv-gd-so { padding: 4px 11px; border-radius: 999px; font-weight: 700; background: color-mix(in srgb, var(--tr-chieu-nhan) 16%, transparent); }
+.xp .lv-gd-phan { padding: 4px 11px; border-radius: 999px; font-weight: 600; background: var(--tr-chieu-the); color: var(--tr-chieu-phu); }
+/* thân đề của chặng nằm trên giấy: bỏ khung thẻ (luật của màn làm bài nặng hơn nên phải ép) */
+/* (giao diện «Trong» ép khung thẻ bằng luật rất nặng `html[data-trong]:not(#_)… !important` ⇒ ở đây phải nặng hơn) */
+html:not(#_):not(#_):not(#_) .xp .lv-gd section.ht2-lam-de, html:not(#_):not(#_):not(#_) .xp .lv-gd .duo-gt-bong { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
+.xp .lv-gd section.ht2-lam-de, .xp .lv-gd .ht2-lam-de-chu { outline: 0 !important; }
+.xp .lv-gd section.ht2-lam-de::before, .xp .lv-gd section.ht2-lam-de::after { display: none !important; }
+/* «Câu N.» đã có ở đầu giấy ⇒ ẩn chữ «Câu N.» đậm mở đầu thân đề (khỏi lặp) */
+.xp .lv-gd .ht2-lam-de > .ht2-lam-de-chu:first-child > b:first-child { display: none; }
+.xp .lv-gd-pa { display: grid; grid-template-columns: 1fr; gap: 8px 28px; font-size: 17px; line-height: 1.55; }
+.xp .lv-gd-pa[data-cot="2"] { grid-template-columns: 1fr 1fr; }
+.xp .lv-gd-pa > div { display: flex; gap: 10px; min-width: 0; }
+.xp .lv-gd-ky { flex: none; font-weight: 700; color: var(--tr-chieu-nhan); }
+.xp .lv-gd-ngan { margin: 0; font-size: 15px; line-height: 1.5; opacity: 0.72; }
+.xp[data-giay='toi'] .lv-gd-ky { color: var(--tr-chieu-nhan-toi); }
+.xp[data-giay='toi'] .lv-gd-phan { background: var(--tr-chieu-mat-3); color: var(--tr-chieu-giay); }
 .xp-kg-cuon { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--tr-chieu-chu) 30%, transparent) transparent; }
 .xp-vach-chia { z-index: 2; display: grid; place-items: center; cursor: col-resize; -webkit-tap-highlight-color: transparent; }
 .xp-vach-chia i { display: block; width: 5px; height: 40px; border-radius: 3px; background: var(--tr-chieu-giay); opacity: 0.5; box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-chieu-bang) 45%, transparent); transition: opacity 0.15s, height 0.15s; }

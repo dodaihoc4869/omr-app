@@ -13,6 +13,7 @@ import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type C
 import { createPortal } from 'react-dom'
 import { anToanHinh, canXoayCss, giaiTrang, khungChieu } from '../../../components/live/bo-cuc'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from '../../../components/live/KhungDocLap'
+import { DauGiay, PhuongAnTinh } from '../../../components/live/GiayDung'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
 import { chonHeSoGiay } from '../../../components/live/vua-giay'
 import type { SuKienBut } from '../../../lib/but-bang-loi'
@@ -85,7 +86,6 @@ const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | n
   if (!de) return <p className="xp-giay-trong" style={{ fontSize: Math.max(18, Math.min(34, rong / 18)) }}>Thầy chữa trên bảng</p>
   return <div className="xp-de"><div ref={trong} className="xp-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
 })
-const khong = () => {}
 
 export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, lenh, LC, tenDoi, dong, khiDoan, khiXem, khiGo }: PropsTrinhPhat) {
   const gocRef = useRef<HTMLDivElement>(null), nen = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null)
@@ -382,8 +382,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const q = cau ? thanhCau(cau) : null
   const kieuChang = typeof document !== 'undefined' && !!document.documentElement.dataset.trong
   const de = cau && q && LC ? <div className={kieuChang ? 'ht-app ht2-lam duo bpu-de-chang' : undefined} data-duo={kieuChang ? '' : undefined}>
-    <LC.DeCau q={q} stt={cau.so} />
-    {cau.tuLuan ? null : cau.phan === 'I' && q.choices.length ? <LC.ChonTracNghiem q={q} value="" onChon={khong} khoa /> : cau.phan === 'II' && q.ideas.length ? <LC.ChonDungSai q={q} value="" onChon={khong} khoa /> : null}
+    {/* giấy đề kiểu tờ chiếu (như bảng live, GiayDung.tsx): phương án / ý là CHỮ ĐỀ, không có nút trả lời */}
+    <div className="lv-gd"><DauGiay q={q} so={cau.so} tuLuan={!!cau.tuLuan} /><LC.DeCau q={q} stt={cau.so} /><PhuongAnTinh q={q} Chu={LC.ChemText} tuLuan={!!cau.tuLuan} /></div>
     {cau.dung ? <p className="xp-dap">Đáp án đúng<b>{chuDapAn(cau)}</b></p> : null}
   </div> : cau && q ? <p style={{ fontSize: 20, margin: 0 }}>{q.text}</p> : null
   const tong = tongHang(hang)
