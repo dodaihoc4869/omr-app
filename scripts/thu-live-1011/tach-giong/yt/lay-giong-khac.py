@@ -20,17 +20,26 @@ KHO, RA, CAMP = sys.argv[1:4]
 D = os.path.join(RA, KHO); os.makedirs(D, exist_ok=True)
 NB_ = {'noiBo': True, 'ghiChuNoiBo': 'kho phi thương mại — thầy duyệt dùng nội bộ 11/11'}
 
-class _XoaKhiDong(io.FileIO):
-    def close(self):
-        super().close()
-        if os.path.exists(self.name): os.remove(self.name)
-def luong(url):
-    """Tải về tệp tạm (curl, thử lại + NỐI TIẾP khi đứt — đọc thẳng theo dòng từng bị cắt giữa chừng «unexpected end of data»), trả tệp mở; đóng là xoá."""
-    p = os.path.join(RA, f'_tai-{zlib.crc32(url.encode()):08x}')
-    for _ in range(8):
-        if subprocess.run(['curl', '-sSL', '--fail', '--retry', '5', '--retry-delay', '5', '-C', '-', '-A', 'omr-app-tach-giong/1.0', '-o', p, url]).returncode == 0: break
-    else: raise RuntimeError('tải hỏng ' + url)
-    return _XoaKhiDong(p, 'r')
+class luong(io.RawIOBase):
+    """Đọc THEO DÒNG từ URL, KHÔNG ghi ra đĩa (kho 11–15 GB như MUSAN / AISHELL không vừa đĩa). Đứt giữa chừng (từng gặp «unexpected end of data»)
+    ⇒ mở lại bằng Range: bytes=<đã đọc>- rồi đọc tiếp, tối đa 20 lần."""
+    def __init__(self, url):
+        self.url, self.pos, self.r, self.lan = url, 0, None, 0; self._mo()
+    def _mo(self):
+        h = {'User-Agent': 'omr-app-tach-giong/1.0', **({'Range': f'bytes={self.pos}-'} if self.pos else {})}
+        self.r = urllib.request.urlopen(urllib.request.Request(self.url, headers=h), timeout=120)
+        if self.pos and self.r.status != 206: raise RuntimeError('máy chủ không cho đọc tiếp (Range) ' + self.url)
+    def readable(self): return True
+    def readinto(self, b):
+        while True:
+            try:
+                n = self.r.readinto(b)
+                if n == 0 and self.r.length not in (None, 0): raise IOError('đứt sớm')
+                self.pos += n; return n
+            except Exception:
+                self.lan += 1
+                if self.lan > 20: raise
+                import time; time.sleep(5); self._mo()
 def doc(b, dang=None):
     """Giải mã GIỮ tần số gốc (≤ 48 kHz) ⇒ (x float32 mono, sr) hoặc (None, 0)."""
     f = ['-f', dang] if dang else []
