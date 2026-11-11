@@ -95,6 +95,7 @@ Chuyển động (theo skill apple-design):
 | Thầy lấy lại quyền nói | **Thu mic** · «Tắt mic tất cả» | mute, kick |
 | Âm thanh trên máy em | **Tiếng** («Tiếng: Đang bật / Đang tắt», «Chạm để bật tiếng thầy») | âm lượng, audio, loa |
 | Rời màn (đã có) | **rời màn** («3 em rời màn») — giữ nguyên chữ của Bình Phản Ứng | thoát, vi phạm |
+| Hai phần của bảng live trên máy em (11/11, mục 4.3h) | **Giấy đề** · **Bảng đen**; hàng trong khay «Tự phóng theo thầy: Đang bật / Đang tắt»; «Thầy đang viết ở dưới ↓» / «ở trên ↑»; «Về chỗ thầy đang viết»; «Chạm hai lần để về toàn cảnh» | zoom, auto focus, split, panel |
 
 ## 3. Trạng thái
 
@@ -437,6 +438,39 @@ Thầy (11/11, kèm ảnh máy em): «Chuyển mic, tắt tiếng, thanh ẩn sa
 - **iPhone máy dọc xoay CSS**: «mép phải» là mép phải của hình = đáy máy; tay nắm, khay và ô bảng chừa thanh home, ô giấy chừa tai thỏ.
 - **Bộ thử**: `thu-2.mjs` 64 phép kiểm (30 phép «P»), ảnh `that-2-em-*.jpg`; vitest `tests/live-may-em-mep-phai-1111.test.tsx` + phép «GIẤY + BẢNG PHỦ KÍN» ở `tests/live-xoay-chia-doi-1011.test.ts`.
 
+### 4.3h Máy em: GIẤY ĐỀ và BẢNG ĐEN co giãn ĐỘC LẬP (11/11, lần 4; nhánh `claude/may-em-doc-lap-1111`) — chỗ khác với các mục trên thì theo mục này
+
+Thầy (11/11), sau khi biết bản phủ kín 4.3g chưa làm chữ to hơn: «Làm chuẩn cái này luôn nhé. Tối ưu cho hs nhất có thể». Thay phép co chung của 4.3g; tay nắm + khay + dải lượt của 4.3g giữ nguyên. Màn chiếu của thầy và giao thức KHÔNG đổi (không thêm khung, không thêm tin; máy em bản cũ vẫn chạy).
+
+- **Hai khung, mỗi khung một phép biến đổi** (`bo-cuc-doc-lap.ts` thuần + `KhungDocLap.tsx` dùng chung cho bảng live và trình phát «Xem lại Live»): khung GIẤY (trái) và khung BẢNG (phải) phủ kín bề ngang (lề 4 px + vùng an toàn, khe 5 px), mỗi khung co theo BỀ NGANG của chính nó; nội dung cao hơn khung thì cuộn dọc trong khung. Phép co có trần `S_TRAN` 1,15 (nét to bằng nét thật của thầy trên màn 1920) trừ khi màn cao tới mức «vừa chiều cao» còn lớn hơn.
+- **Giới hạn hình học, nói thẳng**: giấy giữ ĐÚNG cách xuống dòng của giấy thầy (để nét gạch chân khớp chữ) nên cỡ chữ đề tỉ lệ thuận với bề ngang khung giấy; nét bảng tỉ lệ thuận với bề ngang khung bảng. Hai khung chia nhau MỘT bề ngang màn, nên chữ đề và nét bảng KHÔNG THỂ cùng lúc to hết cỡ. Bản một-phép-co chỉ còn dư bề ngang trên điện thoại dài (844 × 390: 97 px bảng trống); ở 667 × 375, máy bảng và máy tính thì bề ngang đã là cạnh giới hạn. Vì vậy máy chia bề ngang theo việc thầy đang làm.
+- **Ba mốc chia** (`mocChia`, tính theo cỡ chữ THẬT của đề trên giấy thầy — khối đề của `live.giay`): ƯU TIÊN GIẤY (giấy tối đa 80 % bề ngang, không quá mức chữ 34 px) · GIỮA (60 %, dùng khi máy không tự ưu tiên) · ƯU TIÊN BẢNG (bảng nở tới khi chữ đề còn 15 px — `SAN_CHU`; không hẹp hơn 42 % giấy; không rộng hơn mức nét = nét thật của thầy). Giấy dựng thường (câu có ảnh / bảng / sơ đồ, giấy lệch): 60 · 50 · 42 %.
+- **Tự ưu tiên theo thầy** (`taoUuTien`, mặc định bật; hàng «Tự phóng theo thầy» trong khay): vừa vào mà bảng trống ⇒ ưu tiên giấy (em đọc đề, chữ to); bảng đã có nét ⇒ ưu tiên bảng. Thầy đặt bút viết ở khung KHÁC khung đang ưu tiên ⇒ ghi mốc, sau 2 giây thì đổi; trong 2 giây ấy thầy quay lại khung cũ thì huỷ mốc (thầy nhấp qua lại không làm khung giật). Bút lơ lửng không tính. Khung nở / thu 450 ms chỉ bằng `transform` (đặt bố cục mới ngay, phép ngược đưa về không); `prefers-reduced-motion` ⇒ đổi tức thì. **Máy yếu** (`ddh.mayYeu`): không tự ưu tiên, chia cố định ở mốc GIỮA, không có hàng trong khay.
+- **Em điều khiển**: kéo vạch chia giữa hai khung (vùng chạm 30 px; thả tay mới xếp lại) ⇒ theo em, nhớ trên máy (`localStorage` `ddh.live.chia`, bọc try/catch), hàng «Tự phóng theo thầy» thành «Đang tắt»; bật lại thì quên. Chạm hai lần vào khung nào ⇒ khung đó phủ kín, khung kia trượt ra ngoài màn, có dòng «Chạm hai lần để về toàn cảnh» (thay «phóng bảng» của 4.3e).
+- **Giấy** (`.lv-giay` > `.lv-kg-cuon` > `.lv-kg-tam`): tấm giấy = đúng ô giấy của thầy đã co; lớp nét đã chốt của giấy là canvas nằm NGAY TRÊN tấm giấy, trong khung cuộn của trình duyệt ⇒ chữ và nét cuộn cùng nhau, không lệch một khung hình nào. Em tự cuộn đọc đề được. Thầy viết / trỏ ở phần đang khuất ⇒ khung tự trôi êm cho bút về 45 % chiều cao (`troiGiay`, hằng số thời gian 160 ms); em vừa chạm / cuộn giấy trong 4 giây ⇒ KHÔNG giật khung, chỉ hiện «Thầy đang viết ở dưới ↓» / «ở trên ↑» (chạm vào là tới).
+- **Bảng** (`.lv-bang` > khung cuộn `.lv-cuon` của lớp vẽ): bảng phóng to thì tầm nhìn của máy em THẤP hơn tầm nhìn của thầy ⇒ máy em trôi theo bút (đầu nét / con trỏ) nhưng không ra ngoài tầm nhìn của thầy (độ cuộn thầy báo qua gói con trỏ như cũ); tầm nhìn không thấp hơn ⇒ soi đúng độ cuộn của thầy như 4.4b. Em vuốt dọc xem lại phần trên (`vuotBang`): bảng đứng yên, hiện nút «Về chỗ thầy đang viết»; em thôi chạm 4 giây mà thầy đang viết trên bảng ⇒ tự về.
+- **Lớp vẽ nét** (`ve-bang.ts`, thêm `KhungVe.dl`; vắng thì y như cũ): nét giấy theo phép của giấy vào canvas của tấm giấy; nét bảng «b_…» theo phép của bảng vào canvas trong khung cuộn. Nét mã thường nhưng BẮT ĐẦU trong ô bảng (bản ghi / máy thầy trước khi có mã «b_») cũng tính là nét bảng. Lớp «đang viết» vẫn là MỘT canvas nhỏ chạy trong cả hình: đuôi nét của vùng nào trừ độ cuộn của vùng ấy và cắt theo ô nhìn của vùng ấy (nét vắt sang khung kia bị cắt ở mép, như trước). Bộ dựng nét, đệm phát, cây bút: không đổi.
+- **Câu có ảnh / bảng / sơ đồ** (giấy thầy «lạ») và giấy lệch: giấy dựng theo bề ngang khung của EM (khối đề của chặng, hệ số phóng kẹp theo bề ngang khung: chữ to tự nhiên, ảnh co vừa khung), nét trên giấy vẫn ẩn; bảng vẫn co giãn độc lập.
+- **Trình phát «Xem lại Live»** (`TrinhPhat.tsx`): cùng `KhungDocLap` (lớp CSS `xp-…`); tua lại ⇒ bảng tới thẳng chỗ nét đang phát, khung thầy đang viết tự nở, giấy tự trôi theo bút.
+- **Số đo** (Chromium thật, KHÔNG phải máy thật; tờ thầy 1366 × 768, cùng câu, cùng nét mẫu thầy kẻ ngang 80 % bề ngang bảng; `scripts/thu-live-1011/do-doc-lap-1111.mjs`, `docs/ban-ve-live-1011/so-do-doc-lap-1111.json`): xem bảng dưới. «Trước» = bản 4.3g.
+
+| Khổ máy em | Chữ đề TRƯỚC | Ưu tiên GIẤY (vừa vào, bảng trống / thầy gạch trên giấy) | Ưu tiên BẢNG (thầy viết bảng quá 2 giây) | Nét mẫu dài TRƯỚC | Ưu tiên giấy | Ưu tiên bảng | Nét mẫu dày: trước → ưu tiên bảng |
+|---|---|---|---|---|---|---|---|
+| 844 × 390 | 17.67 px | 23.88 px (+35 %) | 15.01 px (−15 %) | 197.5 px | 133.5 px (−32 %) | 331 px (+68 %) | 0.75 → 1.18 px (+57 %) |
+| 667 × 375 | 15.65 px | 18.78 px (+20 %) | 15.01 px (−4 %) | 174.5 px | 105 px (−40 %) | 189.5 px (+9 %) | 0.75 → 0.68 px (−9 %) |
+| 1180 × 820 | 27.83 px | 33.54 px (+21 %) | 20.69 px (−26 %) | 310.5 px | 186.5 px (−40 %) | 474 px (+53 %) | 1.18 → 1.68 px (+42 %) |
+| 1971 × 1247 | 46.62 px | 42.2 px (−9 %) | 41.23 px (−12 %) | 521 px | 628 px (+21 %) | 650 px (+25 %) | 2.34 → 2.49 px (+6 %) |
+| iPhone dọc, hình xoay CSS (390 × 844) | 17.67 px | 23.88 px (+35 %) | 15.01 px (−15 %) | 197.3 px | 133 px (−33 %) | 331.3 px (+68 %) | 0.74 → 1.21 px (+64 %) |
+
+Đọc bảng: ở 844 × 390 chữ đề to hơn 35 % lúc giấy được ưu tiên và nét bảng dài hơn 68 % lúc bảng được ưu tiên — KHÔNG cùng lúc (lúc bảng được ưu tiên chữ đề còn 15 px, nhỏ hơn trước 15 %). Ở 667 × 375 bề ngang quá hẹp: +20 % chữ hoặc +9 % nét. Máy bảng: +21 % chữ hoặc +53 % nét. Máy tính 1971 × 1247: chữ nhỏ đi 9–12 % (vẫn trên 41 px), nét to thêm 21–25 %.
+
+Chạm hai lần phóng kín (đo Chromium): 844 × 390 giấy phủ kín ⇒ chữ đề 30.02 px, bảng phủ kín ⇒ nét mẫu dài 474 px; 667 × 375 ⇒ chữ đề 23.67 px, nét mẫu dài 474 px.
+
+Khung hình máy em 844 × 390 lúc thầy viết trên bảng 7 giây, trong đó có MỘT lần khung bảng nở (Chromium dựng hình bằng phần mềm, trung vị các lượt chạy xen kẽ; trong ngoặc là từng lượt): CPU ×1 trước 60 (59,1 · 60 · 60) → sau 56,7 (56,9 · 56,4) khung / giây; CPU ×4 trước 57,5 (59,6 · 57,1 · 55,2 · 57,5 · 59,7) → sau 51,8 (51,8 · 53,5 · 51,6). Lúc bố cục đứng yên (đã ưu tiên bảng, thầy viết tiếp): 59,1 khung / giây ở CPU ×1, 59,5 ở CPU ×4. Số khung rớt nằm trọn ở lần khung nở: MỘT việc dài ở luồng chính (cấp lại canvas của hai khung + vẽ lại nét đã chốt + trình duyệt bố cục lại; đo được tới 59 ms ở CPU ×1, 60–139 ms ở CPU ×4) rồi 450 ms hai lớp phủ màn co giãn (ở đây bằng phần mềm). **CPU ×4 có lần nở trong quãng đo: 51,8 khung / giây — DƯỚI mốc 55; lúc đứng yên thì đạt (59,5).** Máy yếu không tự ưu tiên nên không có lần nở nào. Hướng giảm tiếp (chưa làm): giữ canvas của mỗi khung ở độ phân giải lớn nhất rồi co bằng CSS ⇒ lần nở không phải cấp lại canvas. Trễ nét: bộ dựng nét, đệm phát và đường mạng không đổi.
+
+- **Chưa đo / chưa thử**: máy thật (iPhone, Android), cuộn chạm trong hình xoay 90° trên iPhone thật, GPU thật (Chromium ở đây dựng hình bằng phần mềm).
+- **Bộ thử**: `thu-2.mjs` 68 phép kiểm (5 phép «ĐL»: giấy được ưu tiên lúc bảng trống, nét gạch chân khớp chữ đo bằng điểm ảnh, bảng nở sau 2 giây, hàng trong khay); ảnh `that-4-em-*.jpg`; vitest `tests/live-doc-lap-bo-cuc-1111.test.ts` (thuần), `tests/live-doc-lap-ve-1111.test.ts` (lớp vẽ hai phép biến đổi), `tests/live-doc-lap-khung-1111.test.tsx` (hai khung, tự ưu tiên, tự trôi, vạch chia, trình phát).
+
 ## 5. Ngoại lệ
 
 | Tình huống | Xử lý |
@@ -578,6 +612,7 @@ Làn: phòng + máy em + tờ chiếu thuộc làn Bình Phản Ứng (Claude). 
 | 35 | Phóng bảng đen kín màn |
 | 36, 37, 38 | iPhone máy dọc, hình xoay bằng CSS: ẩn hết, khay mở, đang nói |
 | 39, 40 | iPhone ngang có tai thỏ: ẩn hết, khay mở |
+| that-4-em-* | (11/11 chiều, ảnh Chromium THẬT, mục 4.3h) Giấy đề và bảng đen co giãn độc lập: 844 vừa vào (giấy được ưu tiên) · bảng đang nở · bảng được ưu tiên · giấy được ưu tiên, nét khớp chữ · giấy cuộn + mũi tên «Thầy đang viết ở dưới» · giấy tự trôi · chạm hai lần phủ kín giấy / bảng · câu có ảnh (giấy dựng thường) · 667 · 1180 · 1971 · iPhone dọc xoay · trình phát «Xem lại Live» 844 / 1180 / iPhone dọc xoay |
 
 Bản vẽ dùng dữ liệu giả sát thực tế (lớp 12A1, 150 em). Nét phấn trong ảnh là hình minh hoạ, không phải bộ máy bút thật.
 

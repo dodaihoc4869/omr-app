@@ -90,6 +90,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   let cuonG = 0
   /** Em đang tự vuốt bảng: tầm nhìn đứng ở `tayY` (không trôi theo bút) · trần vuốt xuống. */
   let tuTay = false, tayY = 0, tayTran = 0
+  let daDocMau = false
   let ds: NetCoNho[] = []
   const doDang = new Map<string, NetDo>()
   /** Ô vừa vẽ trên lớp sống (px thiết bị) — khung sau xoá đúng chỗ này. */
@@ -309,15 +310,21 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     // cỡ HIỆN = đúng cỡ nền / mật độ (không để 100 %): cỡ điểm ảnh lẻ thì 100 % lệch cỡ nền chưa tới một điểm ảnh, đủ để cả lớp bị co giãn, mờ từng quãng
     cvChot.style.width = `${cvChot.width / k.dpr}px`; cvChot.style.height = `${cvChot.height / k.dpr}px`
     // lớp sống: vuông, cạnh theo cỡ nét trên máy này (đuôi nét dở thường ≤ ~540 px ở màn 1920), không lớn hơn hình
-    canh = Math.round(Math.max(200, Math.min(520, 700 * Math.max(KH.k, KHB.k), hW, hH)))
-    cvSong.width = cvSong.height = Math.max(1, Math.round(canh * k.dpr))
-    cvSong.style.width = cvSong.style.height = `${cvSong.width / k.dpr}px`
-    dichSong(0, 0)
+    // (bố cục độc lập: khung nở / thu đổi phép co liên tục ⇒ cạnh lớp sống lấy theo mức lớn nhất, không theo phép co đang áp — khỏi cấp lại canvas mỗi lần nở)
+    canh = Math.round(Math.max(200, Math.min(520, dl ? 520 : 700 * KH.k, hW, hH)))
+    const canhDa = Math.max(1, Math.round(canh * k.dpr))
+    if (!dl || cvSong.width !== canhDa) {
+      cvSong.width = cvSong.height = canhDa
+      cvSong.style.width = cvSong.style.height = `${cvSong.width / k.dpr}px`
+      dichSong(0, 0)
+    } else xoaSong()
     ban = null
-    // màu cây bút: biến màu sẵn có của bảng live (gắn tại gốc `.lv`), đọc một lần mỗi lần xếp lại
-    try {
+    // màu cây bút: biến màu sẵn có của bảng live (gắn tại gốc `.lv`), đọc một lần mỗi lần xếp lại (bố cục độc lập: MỘT lần — đọc kiểu buộc trình duyệt tính lại
+    // kiểu cả cây ngay giữa lúc khung đang đổi chỗ)
+    if (!dl || !daDocMau) try {
       const cs = getComputedStyle(cvSong), lay = (ten: string, thay: string): string => cs.getPropertyValue(ten).trim() || thay
       mauBut.than = lay('--tr-chieu-giay', 'white'); mauBut.bong = lay('--tr-chieu-bang', 'black'); mauBut.dai = lay('--p-cam', 'orange')
+      daDocMau = true
     } catch { /* không có kiểu (test) ⇒ màu dự phòng */ }
     datBang()
     // cỡ bàn tay theo bề cao bảng đen (≈ 5,5 %)

@@ -379,7 +379,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   </div> : cau && q ? <p style={{ fontSize: 20, margin: 0 }}>{q.text}</p> : null
   const tong = tongHang(hang)
   const khoaDe = `${cau?.qid ?? ''}|${LC ? 1 : 0}`
-  const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number; khung: number }) => <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />, [de, khoaDe]) // eslint-disable-line react-hooks/exhaustive-deps -- `de` dựng lại mỗi lượt vẽ; khoá theo câu
+  const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number }) => <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />, [de, khoaDe]) // eslint-disable-line react-hooks/exhaustive-deps -- `de` dựng lại mỗi lượt vẽ; khoá theo câu
   const kieu: CSSProperties = { ...(MAU_CHIEU as CSSProperties), ['--doi' as string]: mauDoi(d?.lenBang?.doi), ...(bc && !nhung ? { width: bc.w, height: bc.h } : null) }
   const an = !nhung && !hien && dangPhat && !matMang
   const hinh = (

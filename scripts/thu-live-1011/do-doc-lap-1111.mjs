@@ -129,7 +129,7 @@ await ke(bang.x + bang.w * 0.1, bang.y + bang.h * 0.3, bang.x + bang.w * 0.9, ba
 await ngu(700)
 await doHet('net_dau_tren_bang_chua_qua_2_giay', kq)
 // chụp đúng LÚC khung bảng đang nở (phép transform đang chạy): chờ khung bảng nhận chuyển động rồi chụp sau 150 ms
-const dangNo = ANH ? E.t.waitForFunction(() => /transform/.test(document.querySelector('.lv-bang')?.style.transition ?? ''), null, { polling: 'raf', timeout: 6000 }).then(async () => { await ngu(150); await chup(E.t, '844-bang-dang-no') }, () => console.log('  (không bắt được lúc khung bảng đang nở)')) : null
+const dangNo = ANH ? E.t.waitForFunction(() => (document.querySelector('.lv-bang')?.getAnimations?.().length ?? 0) > 0, null, { polling: 'raf', timeout: 6000 }).then(async () => { await ngu(150); await chup(E.t, '844-bang-dang-no') }, () => console.log('  (không bắt được lúc khung bảng đang nở)')) : null
 for (let i = 0; i < 5; i++) { await ke(bang.x + bang.w * 0.1, bang.y + bang.h * (0.4 + i * 0.05), bang.x + bang.w * 0.4, bang.y + bang.h * (0.42 + i * 0.05), 22, 12); await ngu(120) }
 await dangNo
 await ngu(900)
@@ -142,7 +142,7 @@ await chup(em['iPhone dọc xoay 390x844'].t, 'iphone-doc-xoay-bang-uu-tien')
 const khung = await E.t.evaluate(() => { const K = window.__kh; K.chay = false; const t = K.t.slice(5).sort((a, b) => a - b); const tb = t.reduce((a, b) => a + b, 0) / Math.max(1, t.length); const dai = K.t.map((d, i) => [Math.round(K.luc[i] - K.luc[0]), Math.round(d)]).filter((x) => x[1] > 34); return { viecDai: K.viec.map((v) => [v[0] - Math.round(K.luc[0]), v[1]]), khungDai: dai, xepLuc: K.xep.map((x) => Math.round(x - K.luc[0])).filter((x, i, a) => !i || x - a[i - 1] > 30), so: t.length, kh_giay: Math.round(1000 / tb * 10) / 10, p95_ms: Math.round(t[Math.floor(t.length * 0.95)] * 10) / 10, dai_nhat_ms: Math.round(t[t.length - 1] * 10) / 10, tren_34ms: t.filter((x) => x > 34).length } })
 // khung hình lúc bố cục ĐỨNG YÊN (đã ưu tiên bảng — không có lần nở nào trong quãng đo): thầy viết tiếp 5 nét
 await E.t.evaluate(() => { const K = (window.__kh2 = { t: [], chay: true }); let truoc = performance.now(); const f = (n) => { K.t.push(n - truoc); truoc = n; if (K.chay) requestAnimationFrame(f) }; requestAnimationFrame(f) })
-for (let i = 0; i < 5; i++) { await ke(bang.x + bang.w * 0.5, bang.y + bang.h * (0.4 + i * 0.05), bang.x + bang.w * 0.85, bang.y + bang.h * (0.42 + i * 0.05), 22, 12); await ngu(120) }
+for (let i = 0; i < 5; i++) { await ke(bang.x + bang.w * 0.1, bang.y + bang.h * (0.66 + i * 0.05), bang.x + bang.w * 0.4, bang.y + bang.h * (0.68 + i * 0.05), 22, 12); await ngu(120) } // (tránh cột lấy mẫu của nét mẫu)
 const khungYen = await E.t.evaluate(() => { const K = window.__kh2; K.chay = false; const t = K.t.slice(5).sort((a, b) => a - b); const tb = t.reduce((a, b) => a + b, 0) / Math.max(1, t.length); return { so: t.length, kh_giay: Math.round(1000 / tb * 10) / 10, p95_ms: Math.round(t[Math.floor(t.length * 0.95)] * 10) / 10, dai_nhat_ms: Math.round(t[t.length - 1] * 10) / 10, tren_34ms: t.filter((x) => x > 34).length } })
 if (cpu > 1) await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
 
@@ -194,7 +194,7 @@ for (const ten of ['844x390', '667x375']) {
   if (ten === '844x390') await chup(t, '844-cham-hai-lan-bang-phu-kin')
   await hai(b.bang[0] + b.bang[2] / 2, b.bang[1] + 250)
   phong[ten] = { giayPhuKin: { chuDe: g.chuDe, giay: g.giay }, bangPhuKin: { netDai: b.netDai, net: b.net, bang: b.bang }, veLai: (await do1(t)).giay }
-  console.log(`${ten}: chạm hai lần — giấy phủ kín: chữ đề ${g.chuDe} px · bảng phủ kín: nét mẫu dài ${b.netDai} px, dày ${b.net} px`)
+  console.log(`${ten}: chạm hai lần — giấy phủ kín: chữ đề ${g.chuDe} px · bảng phủ kín: nét mẫu dài ${b.netDai} px`)
 }
 
 const ra = { phong, khungHinh844DungYen: khungYen, luc: new Date().toISOString(), ghiChu: 'Chromium thật (không phải máy thật), phòng thật trong Node, dữ liệu giả; màn chiếu của thầy 1366 × 768. Cỡ chữ + bề dày nét: px CSS thật trên màn máy em.', dist: DIST, cpu, khungHinh844: khung, muiTen, troi, kq, loiTrang }

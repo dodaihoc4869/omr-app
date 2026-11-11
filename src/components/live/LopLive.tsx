@@ -517,7 +517,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
   /** Em chạm nền lúc khay đang mở ⇒ thu khay trước (không tính vào chạm hai lần). */
   const khiCham = useCallback((): boolean => { if (!moRef.current) return false; setMo(false); return true }, [])
   const khiNet = useCallback((v: { soNet: () => number; soDo: () => number }) => setCoNet(v.soNet() + v.soDo() > 0), [])
-  const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number; khung: number }) => (soi && giay && q && Chu
+  const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number }) => (soi && giay && q && Chu
     ? <GiayThay giay={giay} q={q} Chu={Chu} tuLuan={tuLuan} rong={rong} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />} />
     : <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />), [soi, giay, q, Chu, tuLuan, datKhop, de, khoaDe])
   const yeu = mayYeu()
@@ -537,7 +537,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div ref={thuoc} className="lv-thuoc" aria-hidden="true" />
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
-        <KhungDocLap ref={kdl} lop="lv" layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay}
+        <KhungDocLap ref={kdl} lop="lv" layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
           bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet} />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
