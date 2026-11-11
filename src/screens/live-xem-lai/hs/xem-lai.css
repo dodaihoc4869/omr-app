@@ -106,7 +106,7 @@
 .xl-tg { position: relative; display: flex; gap: 3px; height: 44px; margin-top: 14px; }
 .xl .xl-tg > button { display: block; height: 100%; min-height: 0; min-width: 3px; padding: 0; border-radius: 0; background: var(--tr-mat-3); position: relative; }
 .xl .xl-tg > button:disabled { cursor: default; opacity: 1; }
-.xl .xl-tg > button.chua { background: var(--doi); min-width: 22px; }
+.xl .xl-tg > button.chua { background: var(--doi); min-width: 32px; }
 .xl-tg > button.chua b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13.5px; font-weight: 800; color: var(--p-muc); }
 .xl .xl-tg > button:first-child { border-radius: 14px 0 0 14px; }
 .xl .xl-tg > button:last-child { border-radius: 0 14px 14px 0; }

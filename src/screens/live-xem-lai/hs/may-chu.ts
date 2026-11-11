@@ -36,12 +36,15 @@ async function goiJson<T>(duong: string, ts: Record<string, string>, hopLe: (j: 
 
 // ── danh sách (nhớ 10 phút trong phiên; lần tải được gần nhất cất trên máy cho lúc mất mạng) ──
 let nhoDs: { khoa: string; luc: number; d: TraLiveDsHs } | null = null
+/** Token của lượt gọi danh sách gần nhất (dòng «Live» ở «Thêm» gọi trước khi màn mở) — màn không phải nhận token qua tham số. */
+let tokenNho = ''
 let dangTaiDs: { khoa: string; hua: Promise<KetQua<TraLiveDsHs>> } | null = null
 /** Chỉ dùng cho phép kiểm. */
-export function _quenDs(): void { nhoDs = null; dangTaiDs = null }
+export function _quenDs(): void { nhoDs = null; dangTaiDs = null; tokenNho = '' }
 /** `moi` = bỏ bản nhớ 10 phút (nút «Thử lại», buổi đang dựng tự hỏi lại). Hai nơi cùng hỏi một lúc ⇒ chung một lượt gọi. */
 export function taiDs(token: string, moi = false): Promise<KetQua<TraLiveDsHs>> {
   const khoa = khoaEm(token)
+  tokenNho = token
   if (!moi && nhoDs && nhoDs.khoa === khoa && Date.now() - nhoDs.luc < NHO_DS_MS) return Promise.resolve({ ok: true, d: nhoDs.d })
   if (dangTaiDs && dangTaiDs.khoa === khoa) return dangTaiDs.hua
   const hua = goiJson<TraLiveDsHs>('/hs/live-ds', { token }, (j) => Array.isArray(j.buoi)).then((k) => {
@@ -88,7 +91,8 @@ export async function taiKhucNet(goc: string, id: string, ve: string, tu: number
   if (!k.r.ok) return { ok: false, loai: 'loi' }
   try { return { ok: true, d: { status: k.r.status, b: new Uint8Array(await k.r.arrayBuffer()) } } } catch { return { ok: false, loai: 'mang' } }
 }
-/** Token phiên của em đang đăng nhập trên máy (điểm vào dùng chung không nhận token qua tham số). */
+/** Token phiên của em: lượt gọi danh sách gần nhất, không có thì phiên đăng nhập cất trên máy (điểm vào dùng chung không nhận token qua tham số). */
 export function tokenEm(): string {
+  if (tokenNho) return tokenNho
   try { const v = JSON.parse(localStorage.getItem('omr_student_portal_auth') || 'null') as { token?: unknown } | null; return typeof v?.token === 'string' ? v.token : '' } catch { return '' }
 }

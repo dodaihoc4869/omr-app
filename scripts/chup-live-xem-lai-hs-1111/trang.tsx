@@ -41,7 +41,7 @@ import './../../src/styles/trong-kinh.css'
 import './../../src/styles/bong-mol.css'
 import './../../src/styles/bo-cuc-hn.css'
 import './../../src/styles/khong-xuong-hs.css'
-import { createElement as h, useRef } from 'react'
+import { createElement as h, createRef } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MenuDocTrong } from '../../src/components/hoc-tap/TrongHs'
 import { layDiaChiMayChu } from '../../src/lib/dia-chi-may-chu'
@@ -52,25 +52,23 @@ const man = ts.get('man') ?? 'ds'
 const noop = () => {}
 
 /** Nền «Hôm nay» giản lược phía sau tấm «Thêm» (chỉ để ảnh có ngữ cảnh — không phải màn thật). */
-function NenHomNay() {
-  return h('main', { style: { maxWidth: 560, margin: '0 auto', padding: '20px 16px 140px' } },
+const nenHomNay = () =>
+  h('main', { style: { maxWidth: 560, margin: '0 auto', padding: '20px 16px 140px' } },
     h('p', { style: { fontSize: 13.5, fontWeight: 600, color: 'var(--tr-chu-3)', margin: 0 } }, 'Thứ Tư 11/11 · 12A1'),
     h('h1', { style: { fontSize: 26, fontWeight: 800, margin: '0 0 14px' } }, 'Chào Minh Anh'),
     h('div', { style: { borderRadius: 26, padding: 18, background: 'var(--tr-mat)', boxShadow: 'inset 0 0 0 1px var(--tr-vien)' } },
       h('small', { style: { fontSize: 12.5, fontWeight: 800, letterSpacing: '.06em', color: 'var(--tr-chu-3)' } }, 'TỔNG CÂU HÔM NAY'),
       h('b', { style: { display: 'block', fontSize: 40, fontWeight: 800, lineHeight: 1.1 } }, '12/35 câu')))
-}
-function Them() {
-  const nut = useRef<HTMLButtonElement>(null)
-  return h('div', { className: 'ht-app ht2', 'data-mot': '', 'data-nguon': 'hs' },
+const nut = createRef<HTMLButtonElement>()
+const them = () =>
+  h('div', { className: 'ht-app ht2', 'data-mot': '', 'data-nguon': 'hs' },
     h(MenuDocTrong, { muc: 'hom-nay', ds: [], onMuc: noop, coCa: false, onThi: noop, dangTai: false, onTaiLai: noop, chuDau: 'MA', moCuaEm: false, onCuaEm: noop, nutCuaEm: nut, token: 'tk-gia', moDiemDanh: false }),
-    h(NenHomNay))
-}
+    nenHomNay())
 
 // Nhớ địa chỉ máy chủ GIẢ trước khi dựng màn (chup.mjs chặn mọi yêu cầu tới địa chỉ này và trả dữ liệu giả).
 void layDiaChiMayChu('https://may-chu-gia.test').then(() => {
   const goc = createRoot(document.getElementById('root')!)
-  if (man === 'them') goc.render(h(Them))
+  if (man === 'them') goc.render(them())
   else if (man === 'buoi' || man === 'gv') goc.render(h(XemBuoiLive, { id: ts.get('id') ?? 'buoi-gia-1011', ve: 've-gia', nguon: man === 'gv' ? 'gv' : 'hs', dong: noop }))
   else goc.render(h(ManLiveHs, { token: 'tk-gia', dong: noop }))
 })

@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { ChuNutChinh, ViecTrong } from './nut-chinh-chu'
-import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
@@ -1172,7 +1172,9 @@ export function MenuDocTrong(p: {
   const [cai, setCai] = useState(false) // tấm con «Cài đặt» đang mở (thay chỗ 6 mục)
   const [live, setLive] = useState(false) // màn «Xem lại Live» đang mở
   const [liveMoi, setLiveMoi] = useState(0) // số buổi live em chưa mở (chip «N buổi mới»); mảnh lười tự nhớ 10 phút
-  useEffect(() => { const tk = p.token; if (mo && !live && tk) void napLive().then((m) => m.demBuoiMoi(tk)).then(setLiveMoi, () => {}) }, [mo, live, p.token])
+  const tkLive = p.token
+  const dongLive = useCallback(() => setLive(false), [])
+  useEffect(() => { if (mo && !live && tkLive) void napLive().then((m) => m.demBuoiMoi(tkLive)).then(setLiveMoi, () => {}) }, [mo, live, tkLive])
   // Kết quả ca thi «Về Lộ trình» (Boss 27/10): đóng phòng thi ⇒ về đúng mục Lộ trình dù em vào thi từ mục khác (sự kiện do cổng phát khi đóng phòng thi)
   const onMuc = useRef(p.onMuc)
   onMuc.current = p.onMuc
@@ -1184,6 +1186,8 @@ export function MenuDocTrong(p: {
   const caiRef = useRef(false)
   caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)
+  const coLive = useRef(false)
+  useEffect(() => { if (coLive.current && !live) nut.current?.focus(); coLive.current = live }, [live]) // đóng màn Live ⇒ tiêu điểm về nút «Thêm»
   // 28/10 MƯỢT: `<html data-menu-cham>` thay `body:has(.tr-menu-cham)` (trong-hs.css) — :has() trên body khiến MỖI lần thêm / gỡ nút ở bất kì đâu
   // (vd đổi câu) Chrome lên lịch kiểm lại cả trang theo tập luật :has() chung (tính lại kiểu mọi <span>…). Đếm tham chiếu: nhiều menu cùng lúc vẫn đúng.
   useLayoutEffect(() => {
@@ -1258,7 +1262,7 @@ export function MenuDocTrong(p: {
       <div ref={oSo} id="tr-menu-dem" className="tr-menu-dem" />
       <div className="tr-menu-ds" hidden={cai}>
         {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" data-k={id} data-hien={id === 'on-lai' || undefined} onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
-        {p.token && <button type="button" className="tr-menu-muc" onClick={chon(() => { dong(false); setLive(true) })}><span className="tr-menu-o" data-sac="chinh" aria-hidden="true"><IconNet d={['M21.2 12a9.2 9.2 0 1 1-18.4 0 9.2 9.2 0 0 1 18.4 0z', 'M10 8.6v6.8l5.6-3.4z']} /></span>Live{liveMoi > 0 && <span className="xl-chip-moi">{liveMoi} buổi mới</span>}<ChevronRight size={20} aria-hidden="true" className="tr-menu-mui" /></button>}
+        {p.token && <button type="button" className="tr-menu-muc" onClick={chon(() => { setMo(false); setLive(true) })}><span className="tr-menu-o" data-sac="chinh" aria-hidden="true"><IconNet d={['M21.2 12a9.2 9.2 0 1 1-18.4 0 9.2 9.2 0 0 1 18.4 0z', 'M10 8.6v6.8l5.6-3.4z']} /></span>Live{liveMoi > 0 && <span className="xl-chip-moi">{liveMoi} buổi mới</span>}<ChevronRight size={20} aria-hidden="true" className="tr-menu-mui" /></button>}
         {/* thầy 02/11 khuya: Kiểm tra lên thanh nổi ⇒ tấm Thêm hiện Luyện tập (MENU_DUO «on-lai», data-hien), bỏ Ca kiểm tra; bỏ
             «Hỏi A.I Đỗ Đại Học» (đã có nút A.I riêng ngoài thanh) */}
         {p.token && !coDd && <button type="button" className="tr-menu-muc" data-hien onClick={chon(() => { setTt({ loai: 'cho', buoi: null }); setTimeout(() => oNhap.current?.focus()) })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><QrCode size={20} /></span>Điểm danh</button>}
@@ -1274,6 +1278,6 @@ export function MenuDocTrong(p: {
         <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={chon(() => { dong(false); p.onCuaEm() })} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-o tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
       </div>
     </nav>
-    {live && p.token && <Suspense fallback={null}><ManLiveHs token={p.token} dong={() => { setLive(false); nut.current?.focus() }} /></Suspense>}
+    {live && <Suspense fallback={null}><ManLiveHs dong={dongLive} /></Suspense>}
   </>
 }

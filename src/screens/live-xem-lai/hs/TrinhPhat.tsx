@@ -8,11 +8,13 @@
 // · Mất mạng: dừng tại chỗ, có mạng phát tiếp. Tệp trả 404 ⇒ thầy đã gỡ buổi (`khiGo`). Máy yếu: 30 khung/giây, bỏ quầng con trỏ.
 // AN TOÀN: chỉ đọc ba tệp của buổi qua vé; đề trên giấy là câu trong `buoi.json`.
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { anToanHinh, canXoayCss, giaiTrang, khungChieu, type KhungChieu } from '../../../components/live/bo-cuc'
 import { taoVeBang, type VeBang } from '../../../components/live/ve-bang'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
 import { taoLoiBut, type SuKienBut } from '../../../lib/but-bang-loi'
 import { TEP_LIVE, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
+import { batVongTrucTiep } from '../../../lib/nhip-ben-vung'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
 import { nhayLang, taoDongHoRieng, taoLamMuot, tongHang, tuViTriHang, viTriHang } from './dong-ho'
 import { taoKhoNet, type KhoNet } from './kho-net'
@@ -46,6 +48,8 @@ export interface PropsTrinhPhat {
   khiGo: () => void
 }
 const TOC_DO = [1, 1.5, 2] as const
+/** Đang báo «Mất mạng · đang nối lại…» ⇒ thử lại sau chừng này. */
+const THU_LAI_MS = 4000
 const mayYeu = (): boolean => typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
 class LoiTai extends Error { loai: 'mang' | 'loi' | 'go'; constructor(loai: 'mang' | 'loi' | 'go') { super(loai); this.loai = loai } }
 interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; kc: KhungChieu }
@@ -87,15 +91,15 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const [hien, setHien] = useState(true)
   const [luoc, setLuoc] = useState(0)
   /** Trạng thái chạy (không gây vẽ lại): mọi thứ vòng khung hình đọc. */
-  const st = useRef({
+  const S = useRef({
     vt: Math.max(0, Math.min(batDau, hang.length - 1)), phat: false, tocDo: 1, boLang: true, luot: 0, daNap: -1, dangNapKe: false, dangDung: false, matMang: false,
-    luoc: 0, daBaoXem: -1, gioCuoi: 0, gioMuon: -1, trang: { trang: '', tiLe: 16 / 9 }, giayCu: -1, het: false,
-  }).current
-  const rieng = useRef(taoDongHoRieng()).current, muot = useRef(taoLamMuot()).current
+    luoc: 0, daBaoXem: -1, gioCuoi: 0, gioMuon: -1, trang: { trang: '', tiLe: 16 / 9 }, giayCu: -1, het: false, lucHien: 0,
+  })
+  const [rieng] = useState(taoDongHoRieng), [muot] = useState(taoLamMuot)
   const hangRef = useRef(hang)
-  hangRef.current = hang
   const cb = useRef({ khiDoan, khiXem, khiGo })
-  cb.current = { khiDoan, khiXem, khiGo }
+  // (đặt trước mọi hiệu ứng khác: vòng khung hình và các lệnh tua luôn thấy hàng phát + hàm báo mới nhất)
+  useLayoutEffect(() => { hangRef.current = hang; cb.current = { khiDoan, khiXem, khiGo } })
   const coTieng = buoi.coTieng
 
   // ── đồng hồ ──
@@ -103,40 +107,40 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const docGio = useCallback((nay: number): number => {
     if (!coTieng) return rieng.doc(nay)
     const a = am.current
-    if (!a) return st.gioCuoi
+    if (!a) return S.current.gioCuoi
     // chưa có siêu dữ liệu: `currentTime` chưa nhận lệnh tua ⇒ dùng mốc đang muốn tới
-    if (st.gioMuon >= 0 && a.readyState < 1) return st.gioMuon
-    return muot.doc(a.currentTime * 1000, nay, !a.paused && a.readyState > 2, st.tocDo)
-  }, [coTieng, rieng, muot, st])
+    if (S.current.gioMuon >= 0 && a.readyState < 1) return S.current.gioMuon
+    return muot.doc(a.currentTime * 1000, nay, !a.paused && a.readyState > 2, S.current.tocDo)
+  }, [coTieng, rieng, muot])
   const datGio = useCallback((ms: number): void => {
-    st.gioCuoi = ms
+    S.current.gioCuoi = ms
     if (!coTieng) { rieng.dat(ms, performance.now()); return }
     const a = am.current
-    st.gioMuon = ms
+    S.current.gioMuon = ms
     if (a) { try { a.currentTime = ms / 1000 } catch { /* chưa có siêu dữ liệu: đặt lại ở `loadedmetadata` */ } }
     muot.doc(ms, performance.now(), false, 1)
-  }, [coTieng, rieng, muot, st])
+  }, [coTieng, rieng, muot])
   const dungPhat = useCallback((): void => {
     if (coTieng) { try { am.current?.pause() } catch { /* jsdom */ } } else rieng.dung(performance.now())
   }, [coTieng, rieng])
   const chayPhat = useCallback((): void => {
-    if (!coTieng) { rieng.datTocDo(st.tocDo, performance.now()); rieng.phat(performance.now()); return }
+    if (!coTieng) { rieng.datTocDo(S.current.tocDo, performance.now()); rieng.phat(performance.now()); return }
     const a = am.current
     if (!a) return
     try {
-      a.playbackRate = st.tocDo
+      a.playbackRate = S.current.tocDo
       const h = a.play() as Promise<void> | undefined
       // trình duyệt chặn tự phát (chưa có thao tác của em) ⇒ về tạm dừng, em bấm nút phát to giữa bảng
-      if (h && typeof h.catch === 'function') h.catch(() => { if (a.paused) { st.phat = false; setDangPhat(false) } })
-    } catch { st.phat = false; setDangPhat(false) }
-  }, [coTieng, rieng, st])
+      if (h && typeof h.catch === 'function') h.catch(() => { if (a.paused) { S.current.phat = false; setDangPhat(false) } })
+    } catch { S.current.phat = false; setDangPhat(false) }
+  }, [coTieng, rieng])
 
   // ── bố cục ──
   const xep = useCallback(() => {
     const el = gocRef.current
     if (!el) return
     const W = nhung ? el.clientWidth || 800 : window.innerWidth, H0 = window.innerHeight
-    const { vung } = giaiTrang(st.trang.trang), kc = khungChieu(vung, st.trang.tiLe)
+    const { vung } = giaiTrang(S.current.trang.trang), kc = khungChieu(vung, S.current.trang.tiLe)
     const xoay = !nhung && canXoayCss(W, H0, false)
     const w = xoay ? H0 : W
     const cs = thuoc.current && !nhung ? getComputedStyle(thuoc.current) : null
@@ -151,53 +155,55 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
     el.style.setProperty('--xp-at-trai', `${at.trai}px`); el.style.setProperty('--xp-at-phai', `${at.phai}px`); el.style.setProperty('--xp-at-duoi', `${at.duoi}px`)
     const dpr = Math.min(window.devicePixelRatio || 1, mayYeu() ? 1.5 : 2.5)
     veB.current?.datKhung({ Wv: kc.Wv * s, Hv: kc.Hv * s, ox: kc.ox * s - moi.x, oy: kc.oy * s - moi.y, w, h, dpr })
-  }, [nhung, st])
+  }, [nhung])
 
   // ── tua / phát ──
   const baoLoi = useCallback((e: unknown) => {
     const loai = e instanceof LoiTai ? e.loai : 'mang'
     if (loai === 'go') { dungPhat(); cb.current.khiGo(); return }
     // mất mạng / máy chủ chưa trả: dừng tại chỗ, tự thử lại
-    st.matMang = true; setMatMang(true); dungPhat(); setCho(false)
-  }, [dungPhat, st])
+    S.current.matMang = true; setMatMang(true); dungPhat(); setCho(false)
+  }, [dungPhat])
   const tuaToi = useCallback(async (vtMoi: number, t: number, phat?: boolean): Promise<void> => {
     const ds = hangRef.current, d = ds[vtMoi], m = may.current, k = kho.current
     if (!d || !m || !k) return
-    const luot = ++st.luot
-    if (phat != null) st.phat = phat
-    if (vtMoi !== st.vt || st.het) { st.luoc = 0; setLuoc(0) }
-    st.vt = vtMoi; st.het = false; st.daBaoXem = st.daBaoXem === d.stt ? d.stt : -1
+    const luot = ++S.current.luot
+    S.current.dangDung = false // lệnh mới thay lệnh cũ còn đang tải dở (lệnh cũ thấy số lượt đã đổi thì tự bỏ)
+    if (phat != null) S.current.phat = phat
+    if (vtMoi !== S.current.vt || S.current.het) { S.current.luoc = 0; setLuoc(0) }
+    S.current.vt = vtMoi; S.current.het = false; S.current.daBaoXem = S.current.daBaoXem === d.stt ? d.stt : -1
     setVt(vtMoi); setHet(false); cb.current.khiDoan?.(vtMoi)
     const tt = Math.max(d.t0, Math.min(t, d.t1))
-    const canDung = m.gio() < 0 || tt < m.gio() || k.chiSo(tt) > st.daNap
+    const canDung = m.gio() < 0 || tt < m.gio() || k.chiSo(tt) > S.current.daNap
     if (canDung || Math.abs(docGio(performance.now()) - tt) > 300) datGio(tt)
     if (canDung) {
-      st.dangDung = true; setCho(true)
+      S.current.dangDung = true; setCho(true)
       try {
         const r = await k.napTu(tt)
-        if (luot !== st.luot) return
-        st.daNap = r.den
+        if (luot !== S.current.luot) return
+        S.current.daNap = r.den
         m.dungLai(r.muc, tt)
-      } catch (e) { if (luot === st.luot) { st.dangDung = false; baoLoi(e) } return }
-      st.dangDung = false; setCho(false)
+      } catch (e) { if (luot === S.current.luot) { S.current.dangDung = false; baoLoi(e) } return }
+      S.current.dangDung = false
     }
-    if (st.matMang) { st.matMang = false; setMatMang(false) }
-    setDangPhat(st.phat)
-    if (st.phat) chayPhat(); else dungPhat()
-  }, [st, docGio, datGio, baoLoi, chayPhat, dungPhat])
+    setCho(false)
+    if (S.current.matMang) { S.current.matMang = false; setMatMang(false) }
+    setDangPhat(S.current.phat)
+    if (S.current.phat) chayPhat(); else dungPhat()
+  }, [docGio, datGio, baoLoi, chayPhat, dungPhat])
   const tuaRef = useRef(tuaToi)
-  tuaRef.current = tuaToi
+  useLayoutEffect(() => { tuaRef.current = tuaToi }, [tuaToi])
   const bamPhat = useCallback(() => {
     const ds = hangRef.current
-    if (st.het) { void tuaRef.current(0, ds[0]?.t0 ?? 0, true); return }
-    const moi = !st.phat
-    void tuaRef.current(st.vt, docGio(performance.now()), moi)
-  }, [st, docGio])
+    if (S.current.het) { void tuaRef.current(0, ds[0]?.t0 ?? 0, true); return }
+    const moi = !S.current.phat
+    void tuaRef.current(S.current.vt, docGio(performance.now()), moi)
+  }, [docGio])
   const nhay = useCallback((ms: number) => {
     const ds = hangRef.current
-    const den = tuViTriHang(ds, Math.max(0, viTriHang(ds, st.vt, docGio(performance.now())) + ms))
+    const den = tuViTriHang(ds, Math.max(0, viTriHang(ds, S.current.vt, docGio(performance.now())) + ms))
     void tuaRef.current(den.vt, den.t)
-  }, [st, docGio])
+  }, [docGio])
 
   // ── lớp vẽ + máy phát + kho nét + vòng khung hình ──
   const daMo = useRef(false)
@@ -206,43 +212,43 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
     const v = taoVeBang(taoLoiBut(), cvChot.current, cvSong.current)
     veB.current = v
     const ap = (sk: SuKienBut) => {
-      if (sk.loai === 'trang') { const doi = sk.trang !== st.trang.trang || sk.tiLe !== st.trang.tiLe; st.trang = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep() }
+      if (sk.loai === 'trang') { const doi = sk.trang !== S.current.trang.trang || sk.tiLe !== S.current.trang.tiLe; S.current.trang = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep() }
       v.ap(sk)
     }
     may.current = taoMayPhat(ap)
     kho.current = taoKhoNet({ byteNet: buoi.byteNet, moc: buoi.mocBang, tai: async (tu, den) => { const k = await taiKhucNet(goc, buoi.id, ve, tu, den); if (!k.ok) throw new LoiTai(k.loai); return k.d } })
-    st.daNap = -1; st.luot += 1
+    S.current.daNap = -1; S.current.luot += 1
     xep()
     // mở đầu: dựng bảng tại đầu đoạn (phát ngay nếu em vừa bấm một đoạn). Hiệu ứng chạy lại (chế độ kiểm của React) ⇒ dựng lại tại chỗ đang đứng.
-    { const d0 = hangRef.current[st.vt]; if (d0) void tuaRef.current(st.vt, st.gioCuoi > d0.t0 ? st.gioCuoi : d0.t0, daMo.current ? st.phat : tuPhat); daMo.current = true }
+    { const d0 = hangRef.current[S.current.vt]; if (d0) void tuaRef.current(S.current.vt, S.current.gioCuoi > d0.t0 ? S.current.gioCuoi : d0.t0, daMo.current ? S.current.phat : tuPhat); daMo.current = true }
     const yeu = mayYeu()
     let raf = 0, le = false
     const khung = () => {
       raf = requestAnimationFrame(khung)
       if (yeu && (le = !le)) return // máy yếu: 30 khung / giây
-      const ds = hangRef.current, d = ds[st.vt], m = may.current, k = kho.current
+      const ds = hangRef.current, d = ds[S.current.vt], m = may.current, k = kho.current
       if (!d || !m || !k) return
       const nay = performance.now()
       let t = docGio(nay)
-      if (dangChay() && !st.dangDung) {
-        st.gioCuoi = t
-        if (st.boLang) { const den = nhayLang(t, buoi.lang, d); if (den != null) { st.luoc += den - t; setLuoc(st.luoc); datGio(den); t = den } }
-        if (st.daBaoXem !== d.stt && t - d.t0 >= (d.t1 - d.t0) * 0.9) { st.daBaoXem = d.stt; cb.current.khiXem(d.stt) }
+      if (dangChay() && !S.current.dangDung) {
+        S.current.gioCuoi = t
+        if (S.current.boLang) { const den = nhayLang(t, buoi.lang, d); if (den != null) { S.current.luoc += den - t; setLuoc(S.current.luoc); datGio(den); t = den } }
+        if (S.current.daBaoXem !== d.stt && t - d.t0 >= (d.t1 - d.t0) * 0.9) { S.current.daBaoXem = d.stt; cb.current.khiXem(d.stt) }
         if (t >= d.t1 - 20) {
           // hết đoạn: sang đoạn kế của hàng, hoặc dừng ở cuối hàng
-          if (st.vt + 1 < ds.length) void tuaRef.current(st.vt + 1, ds[st.vt + 1]!.t0)
-          else { st.phat = false; st.het = true; dungPhat(); setDangPhat(false); setHet(true); setHien(true) }
+          if (S.current.vt + 1 < ds.length) void tuaRef.current(S.current.vt + 1, ds[S.current.vt + 1]!.t0)
+          else { S.current.phat = false; S.current.het = true; dungPhat(); setDangPhat(false); setHet(true); setHien(true) }
           return
         }
         // sắp sang khúc nét kế ⇒ tải trước
-        const ke = st.daNap + 1
-        if (ke < k.soKhuc && !st.dangNapKe && t > k.gioMoc(ke) - 6000) {
-          st.dangNapKe = true
-          const luot = st.luot
-          k.khuc(ke).then((muc) => { if (luot === st.luot && st.daNap === ke - 1) { m.nap(muc); st.daNap = ke } }, (e) => { if (luot === st.luot) baoLoi(e) }).then(() => { st.dangNapKe = false })
+        const ke = S.current.daNap + 1
+        if (ke < k.soKhuc && !S.current.dangNapKe && t > k.gioMoc(ke) - 6000) {
+          S.current.dangNapKe = true
+          const luot = S.current.luot
+          k.khuc(ke).then((muc) => { if (luot === S.current.luot && S.current.daNap === ke - 1) { m.nap(muc); S.current.daNap = ke } }, (e) => { if (luot === S.current.luot) baoLoi(e) }).then(() => { S.current.dangNapKe = false })
         }
       }
-      if (m.gio() >= 0 && !st.dangDung) {
+      if (m.gio() >= 0 && !S.current.dangDung) {
         const f = m.buoc(t)
         v.datDau(f.dau)
         v.veSong()
@@ -253,14 +259,14 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
         }
       }
       // thanh tua + giờ: đổi thẳng DOM (không vẽ lại React mỗi khung)
-      const ray = tua.current?.children[st.vt]?.querySelector<HTMLElement>('.xp-ray')
+      const ray = tua.current?.children[S.current.vt]?.querySelector<HTMLElement>('.xp-ray')
       if (ray) ray.style.setProperty('--xp-f', Math.min(1, Math.max(0, (t - d.t0) / Math.max(1, d.t1 - d.t0))).toFixed(4))
-      const giay = Math.floor(viTriHang(ds, st.vt, t) / 1000)
-      if (giay !== st.giayCu && gioChu.current) { st.giayCu = giay; gioChu.current.textContent = gioPhat(giay * 1000) }
+      const giay = Math.floor(viTriHang(ds, S.current.vt, t) / 1000)
+      if (giay !== S.current.giayCu && gioChu.current) { S.current.giayCu = giay; gioChu.current.textContent = gioPhat(giay * 1000) }
     }
     raf = requestAnimationFrame(khung)
     return () => { cancelAnimationFrame(raf); veB.current = null; may.current = null; kho.current = null }
-  }, [buoi, goc, ve, st, xep, docGio, datGio, dangChay, dungPhat, baoLoi]) // eslint-disable-line react-hooks/exhaustive-deps -- `tuPhat` chỉ đọc lúc mở
+  }, [buoi, goc, ve, xep, docGio, datGio, dangChay, dungPhat, baoLoi]) // eslint-disable-line react-hooks/exhaustive-deps -- `tuPhat` chỉ đọc lúc mở
   // lệnh từ trang (máy tính): bấm một đoạn trong danh sách / ảnh bìa
   const lenhSo = lenh?.so ?? 0
   useEffect(() => {
@@ -278,38 +284,44 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   }, [xep, nhung])
   // rời màn (đổi tab, khoá máy) ⇒ tạm dừng; mất mạng ⇒ dừng tại chỗ; có mạng ⇒ phát tiếp từ chỗ dừng
   useEffect(() => {
-    const an = () => { if (document.hidden && st.phat) { st.phat = false; dungPhat(); setDangPhat(false) } }
-    const mat = () => { if (!st.matMang) { st.matMang = true; setMatMang(true); dungPhat() } }
+    const an = () => { if (document.hidden && S.current.phat) { S.current.phat = false; dungPhat(); setDangPhat(false) } }
+    const mat = () => { if (!S.current.matMang) { S.current.matMang = true; setMatMang(true); dungPhat() } }
     const noi = () => {
-      if (!st.matMang) return
+      if (!S.current.matMang) return
       const a = am.current
       if (a && a.error) { try { a.load() } catch { /* jsdom */ } }
-      void tuaRef.current(st.vt, st.gioCuoi)
+      void tuaRef.current(S.current.vt, S.current.gioCuoi)
     }
     document.addEventListener('visibilitychange', an); window.addEventListener('offline', mat); window.addEventListener('online', noi)
-    const h = setInterval(() => { if (st.matMang && (typeof navigator === 'undefined' || navigator.onLine !== false)) noi() }, 4000)
-    return () => { document.removeEventListener('visibilitychange', an); window.removeEventListener('offline', mat); window.removeEventListener('online', noi); clearInterval(h) }
-  }, [st, dungPhat])
+    // đang báo mất mạng ⇒ tự thử lại, lượt sau chỉ hẹn khi lượt trước xong, thưa dần khi còn hỏng (cùng luật vòng hỏi trực tiếp của app)
+    const v = batVongTrucTiep(() => { if (S.current.matMang && (typeof navigator === 'undefined' || navigator.onLine !== false)) noi() }, THU_LAI_MS)
+    return () => { document.removeEventListener('visibilitychange', an); window.removeEventListener('offline', mat); window.removeEventListener('online', noi); v.dung() }
+  }, [dungPhat])
   // tiếng: tua trước khi có siêu dữ liệu, đang đệm, lỗi tệp (404 = thầy đã gỡ)
   useEffect(() => {
     const a = am.current
     if (!a) return
-    const meta = () => { if (st.gioMuon >= 0 && Math.abs(a.currentTime * 1000 - st.gioMuon) > 300) { try { a.currentTime = st.gioMuon / 1000 } catch { /* bỏ */ } } a.playbackRate = st.tocDo }
-    const doi = () => setCho(true), xong = () => { if (!st.dangDung) setCho(false) }
+    const meta = () => { if (S.current.gioMuon >= 0 && Math.abs(a.currentTime * 1000 - S.current.gioMuon) > 300) { try { a.currentTime = S.current.gioMuon / 1000 } catch { /* bỏ */ } } a.playbackRate = S.current.tocDo }
+    const doi = () => setCho(true), xong = () => { if (!S.current.dangDung) setCho(false) }
     const loi = () => {
       void taiKhucNet(goc, buoi.id, ve, 0, 1).then((k) => { if (!k.ok && k.loai === 'go') cb.current.khiGo(); else baoLoi(new LoiTai('mang')) })
     }
     a.addEventListener('loadedmetadata', meta); a.addEventListener('waiting', doi); a.addEventListener('playing', xong); a.addEventListener('canplay', xong); a.addEventListener('error', loi)
     return () => { a.removeEventListener('loadedmetadata', meta); a.removeEventListener('waiting', doi); a.removeEventListener('playing', xong); a.removeEventListener('canplay', xong); a.removeEventListener('error', loi); try { a.pause() } catch { /* jsdom */ } }
-  }, [goc, buoi.id, ve, st, baoLoi])
+  }, [goc, buoi.id, ve, baoLoi])
   // dải điều khiển tự ẩn sau 3 giây khi đang phát (chỉ bản phủ kín)
-  const hen = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const [nhip, setNhip] = useState(0)
+  /** Em vừa chạm / rê chuột ⇒ hiện dải + đếm lại 3 giây (rê chuột liên tục: nửa giây mới đếm lại một lần). */
   const giuHien = useCallback(() => {
     setHien(true)
-    clearTimeout(hen.current)
-    if (!nhung) hen.current = setTimeout(() => { if (st.phat && !st.matMang) setHien(false) }, AN_SAU_MS)
-  }, [nhung, st])
-  useEffect(() => { giuHien(); return () => clearTimeout(hen.current) }, [dangPhat, giuHien])
+    const nay = Date.now()
+    if (nay - S.current.lucHien > 500) { S.current.lucHien = nay; setNhip((n) => n + 1) }
+  }, [])
+  useEffect(() => {
+    if (nhung || !dangPhat || !hien || matMang) return
+    const h = setTimeout(() => setHien(false), AN_SAU_MS)
+    return () => clearTimeout(h)
+  }, [nhung, dangPhat, hien, matMang, nhip])
   // phím: cách = phát / tạm dừng, ← → = lùi / tới 10 giây, Esc = đóng
   useEffect(() => {
     const phim = (e: KeyboardEvent) => {
@@ -326,8 +338,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
     return () => window.removeEventListener('keydown', phim)
   }, [nhung, bamPhat, nhay, dong, giuHien])
 
-  const doiTocDo = (v: number) => { st.tocDo = v; setTocDo(v); if (coTieng) { if (am.current) am.current.playbackRate = v } else rieng.datTocDo(v, performance.now()) }
-  const doiLang = () => { st.boLang = !st.boLang; setBoLang(st.boLang) }
+  const doiTocDo = useCallback((v: number) => { S.current.tocDo = v; setTocDo(v); if (coTieng) { if (am.current) am.current.playbackRate = v } else rieng.datTocDo(v, performance.now()) }, [coTieng, rieng])
+  const doiLang = () => { S.current.boLang = !S.current.boLang; setBoLang(S.current.boLang) }
   /** Chạm / kéo trên thanh tua: khúc nào + tới đâu trong khúc (hình xoay 90° ⇒ trục dọc của màn là trục ngang của hình). */
   const keo = useRef<{ id: number; luc: number } | null>(null)
   const tuaTheo = (e: React.PointerEvent<HTMLDivElement>, chot: boolean) => {
@@ -349,7 +361,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const tuaXuong = (e: React.PointerEvent<HTMLDivElement>) => { keo.current = { id: e.pointerId, luc: 0 }; try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* trình duyệt cũ */ } tuaTheo(e, true); giuHien() }
   const tuaDi = (e: React.PointerEvent<HTMLDivElement>) => { if (keo.current?.id === e.pointerId) { tuaTheo(e, false); giuHien() } }
   const tuaNha = (e: React.PointerEvent<HTMLDivElement>) => { if (keo.current?.id === e.pointerId) { keo.current = null; tuaTheo(e, true) } }
-  const chamNen = () => { if (nhung) { bamPhat(); return } if (hien && st.phat) { clearTimeout(hen.current); setHien(false) } else giuHien() }
+  const chamNen = () => { if (nhung) { bamPhat(); return } if (hien && S.current.phat) setHien(false); else giuHien() }
 
   const d = hang[vt], cau = d ? buoi.cau.find((c) => c.so === d.cau) ?? null : null
   const q = cau ? thanhCau(cau) : null
@@ -364,11 +376,11 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const o = (v: { x: number; y: number; w: number; h: number }): CSSProperties => ({ left: v.x, top: v.y, width: v.w, height: v.h })
   const kieu: CSSProperties = { ...(MAU_CHIEU as CSSProperties), ['--doi' as string]: mauDoi(d?.lenBang?.doi), ...(bc && !nhung ? { width: bc.w, height: bc.h } : null) }
   const an = !nhung && !hien && dangPhat && !matMang
-  return (
+  const hinh = (
     <div ref={gocRef} className="xp" data-nhung={nhung || undefined} data-xoay={bc?.xoay || undefined} data-an={an || undefined} data-giay={buoi.giayToi ? 'toi' : 'sang'} style={kieu}
       role={nhung ? 'region' : 'dialog'} aria-modal={nhung ? undefined : true} aria-label={`Xem lại đoạn chữa bài${d ? `: ${d.ten}` : ''}`} tabIndex={nhung ? 0 : undefined} onPointerMove={nhung ? undefined : giuHien}>
       <div ref={thuoc} className="xp-thuoc" aria-hidden="true" />
-      {coTieng ? <audio ref={am} src={duongTep(goc, buoi.id, TEP_LIVE.tieng, ve)} preload="metadata" playsInline /> : null}
+      {coTieng ? <audio ref={am} src={duongTep(goc, buoi.id, TEP_LIVE.tieng, ve)} preload="metadata" /> : null}
       <div ref={nen} className="xp-nen" style={nhung && bc ? { height: bc.h } : undefined} onClick={chamNen}>
         {bc && kc ? (
           <div className="xp-chieu" style={{ width: kc.LW, height: kc.LH, transform: `translate3d(${bc.x}px,${bc.y}px,0) scale(${bc.s})` }}>
@@ -380,7 +392,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
         <canvas ref={cvSong} className="xp-cv song" aria-hidden="true" />
         <div ref={tro} className="xp-tro" aria-hidden="true" />
         {!dangPhat && !cho && !matMang ? <button type="button" className="xp-giua" onClick={(e) => { e.stopPropagation(); bamPhat() }} aria-label={het ? 'Phát lại từ đầu' : 'Phát'}><BtPhat s={38} /></button> : null}
-        {luoc >= 1000 && boLang ? <div className="xp-luoc so" role="status">Đã lược {gioPhat(luoc)} khoảng lặng</div> : null}
+        {luoc >= 1000 && boLang ? <div className="xp-luoc so" role="status">Đã lược {gioPhat(Math.round(luoc / 1000) * 1000)} khoảng lặng</div> : null}
         {matMang ? <div className="xp-mat" role="status"><i aria-hidden="true" />Mất mạng · đang nối lại…</div> : null}
       </div>
       {nhung ? null : <div className="xp-tren">
@@ -413,4 +425,6 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       </div>
     </div>
   )
+  // bản phủ kín gắn thẳng vào <body>: không nằm trong khung cuộn của trang buổi (iPhone đời cũ xử lí `position: fixed` trong khung cuộn không ổn)
+  return nhung ? hinh : createPortal(hinh, document.body)
 }

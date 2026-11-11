@@ -317,7 +317,7 @@ describe('trình phát (mở từ thẻ câu)', () => {
     expect(within(phat).queryByText('Buổi này không có tiếng')).toBeNull()
     // nét: chỉ tải khúc của mốc bảng câu 3 (không tải từ đầu tệp)
     await waitFor(() => expect(goi.some((p) => p.endsWith('/net.bin'))).toBe(true))
-    const lanGoi = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.filter((c) => String(c[0]).includes('net.bin')).map((c) => String((c[1]?.headers as Record<string, string>).Range))
+    const lanGoi = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.filter((c) => String(c[0]).includes('net.bin')).map((c) => String(((c[1]?.headers ?? {}) as Record<string, string>).Range))
     const mocC3 = buoi.mocBang.filter((m) => m.t <= buoi.doan[2]!.t0).pop()!
     expect(lanGoi[0]).toMatch(new RegExp(`^bytes=${mocC3.byte}-`))
     expect(mocC3.byte).toBeGreaterThan(0)

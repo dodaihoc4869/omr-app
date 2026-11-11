@@ -10,7 +10,7 @@ import { gocMayChu, taiBuoiJson, taiBuoiRieng } from './may-chu'
 import { chuDaXem, danhDauMo, danhDauXem, docDaXem, khoaEm } from './nho-may'
 import { CHU_NHAN, cauTheoSo, dangXemNhat, doanHopLe, dongThoiGian, ketQuaEm, sapDoan } from './sap-doan'
 import TheCau from './TheCau'
-import { dongNgay, gioPhat, gioVn, mauDoi, soLieuBuoi, soPhut, tenBai, tenDayDu } from './ten-hien'
+import { dongNgay, gioPhat, gioVn, mauDoi, soLieuBuoi, soPhut, tenBai, tenDayDu, tenGoi } from './ten-hien'
 import './xem-lai.css'
 
 const TrinhPhat = lazy(() => import('./TrinhPhat'))
@@ -44,10 +44,10 @@ function useKhoRong(q: string): boolean {
 export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui = 'Về danh sách buổi live' }: PropsTrangBuoi) {
   const [tt, setTt] = useState<TrangThai>({ loai: 'tai' })
   const [lan, setLan] = useState(0)
+  const [daXem, setDaXem] = useState<number[]>([])
   const khoa = useMemo(() => (nguon === 'hs' && token ? khoaEm(token) : ''), [nguon, token])
   useEffect(() => {
     let huy = false
-    setTt({ loai: 'tai' })
     void (async () => {
       const hRieng = nguon === 'hs' && token ? taiBuoiRieng(token, id) : null
       const [goc, kb0, kr] = await Promise.all([gocMayChu(), veDau ? taiBuoiJson(id, veDau) : null, hRieng])
@@ -60,6 +60,7 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
       if (!kb || !ve) { setTt({ loai: 'loi' }); return }
       if (!kb.ok) { setTt({ loai: kb.loai === 'go' ? 'go' : 'loi' }); return }
       if (khoa) danhDauMo(khoa, id)
+      setDaXem(khoa ? docDaXem(khoa, kb.d.id, kb.d.ban) : [])
       setTt({ loai: 'ok', buoi: kb.d, ve, rieng, goc })
     })()
     return () => { huy = true }
@@ -69,7 +70,8 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
   const [LC, setLC] = useState<MangChang | null>(null)
   useEffect(() => { let huy = false; void import('../../../components/hoc-tap/ManLamBaiTap').then((m) => { if (!huy) setLC(m.PHAN_CAU_CHANG) }).catch(() => {}); return () => { huy = true } }, [])
 
-  const mayTinh = useKhoRong('(min-width: 900px)')
+  // hai cột + trình phát nhúng CHỈ cho máy tính (màn rộng, dùng chuột); máy bảng xem như điện thoại: trình phát phủ kín (bản vẽ ảnh 24)
+  const mayTinh = useKhoRong('(min-width: 900px) and (hover: hover) and (pointer: fine)')
   /** Điện thoại / máy bảng: trình phát phủ kín. */
   const [phat, setPhat] = useState<{ vt: number } | null>(null)
   /** Máy tính: trình phát nhúng — lệnh nhảy tới đoạn + đoạn đang đứng. */
@@ -77,8 +79,6 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
   const [vtNhung, setVtNhung] = useState(0)
   const oPhat = useRef<HTMLDivElement>(null)
   const buoi = tt.loai === 'ok' ? tt.buoi : null
-  const [daXem, setDaXem] = useState<number[]>([])
-  useEffect(() => { if (buoi) setDaXem(khoa ? docDaXem(khoa, buoi.id, buoi.ban) : []) }, [buoi, khoa])
   const khiXem = useCallback((stt: number) => {
     if (!buoi) return
     setDaXem((c) => (c.includes(stt) ? c : khoa ? danhDauXem(khoa, buoi.id, buoi.ban, stt) : c.concat(stt)))
@@ -98,7 +98,7 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
     <section className="xl-kinh xl-trong" role="alert"><b>Thầy đã gỡ buổi này.</b><p>Buổi live này không còn để xem lại.</p><button type="button" className="xl-nut chinh" onClick={dong}>Về danh sách</button></section>
   </main>
   if (tt.loai === 'loi' || !buoi) return <main className="xl-trang">{dau()}
-    <section className="xl-kinh xl-trong" role="alert"><div className="hinh" aria-hidden="true"><BtMatMang s={40} /></div><b>Chưa tải được. Em thử lại.</b><p>Buổi live này chưa về tới máy em.</p><button type="button" className="xl-nut chinh" onClick={() => setLan((n) => n + 1)}>Thử lại</button></section>
+    <section className="xl-kinh xl-trong" role="alert"><div className="hinh" aria-hidden="true"><BtMatMang s={40} /></div><b>Chưa tải được. Em thử lại.</b><p>Buổi live này chưa về tới máy em.</p><button type="button" className="xl-nut chinh" onClick={() => { setTt({ loai: 'tai' }); setLan((n) => n + 1) }}>Thử lại</button></section>
   </main>
 
   const { rieng, ve, goc } = tt
@@ -136,7 +136,7 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
     {bv.doiThang != null && bv.doi[bv.doiThang] ? <div className="xl-thang-doi" style={doiCss(bv.doiThang)}><span className="cup" aria-hidden="true"><BtCup /></span><div><b>{bv.doi[bv.doiThang]!.ten} thắng</b>
       <span className="so">{soVn(bv.doi[bv.doiThang]!.kj)} kJ{doiXep[1] && doiXep[0]!.kj > doiXep[1].kj ? ` · hơn đội nhì ${soVn(doiXep[0]!.kj - doiXep[1].kj)} kJ` : ''}</span></div></div> : null}
     <div className="xl-doi so">{doiXep.map((d) => [<span key={`t${d.i}`} className="ten" style={doiCss(d.i)}><i className="xl-cham" aria-hidden="true" />{d.ten}</span>, <span key={`b${d.i}`} className="thanh" style={doiCss(d.i)} aria-hidden="true"><i style={{ width: `${Math.round((d.kj / kjLon) * 100)}%` }} /></span>, <span key={`k${d.i}`} className="kj">{soVn(d.kj)} kJ</span>])}</div>
-    {bv.top.length ? <div className="xl-top">{bv.top.slice(0, 3).map((e, i) => <div key={i}><i aria-hidden="true">{i + 1}</i><b>{e.ten}</b><span className="so">{soVn(e.kj)} kJ</span></div>)}</div> : null}
+    {bv.top.length ? <div className="xl-top">{bv.top.slice(0, 3).map((e, i) => <div key={i} title={e.ten}><i aria-hidden="true">{i + 1}</i><b>{tenGoi(e.ten)}</b><span className="so">{soVn(e.kj)} kJ</span></div>)}</div> : null}
     {bv.chuoi ? <div className="xl-chuoi"><BtLua /><span>Chuỗi đúng dài nhất: {bv.chuoi.ten} · {bv.chuoi.so} câu liền</span></div> : null}
   </section> : null
   const sttDangPhat = mayTinh ? hang[vtNhung]?.stt : undefined

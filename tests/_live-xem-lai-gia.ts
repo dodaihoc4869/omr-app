@@ -86,6 +86,7 @@ const CAU: { de: string; phan: 'I' | 'II' | 'III'; pa?: string[]; dung: string; 
   { de: 'Tên thay thế của CH3–CH2–NH2 là', phan: 'I', pa: ['methanamine', 'ethanamine', 'propan-1-amine', 'N-methylmethanamine'], dung: 'B', lop: 88, len: 'Vũ Hà My', sbd: 'G058', doi: 1, dat: true, giay: 303, dang: 'Danh pháp amine', net: 19 },
 ]
 export const SO_EM_GIA = 150
+const tenHaiChu = (ten: string): string => ten.trim().split(/\s+/).slice(-2).join(' ')
 export const ID_BUOI_GIA = 'buoi-gia-1011'
 
 export interface BuoiGia { buoi: BuoiLiveJson; net: Uint8Array<ArrayBuffer>; /** Khoảng CÓ tiếng (ms) — bộ sinh tệp tiếng giả phát tiếng ở các khoảng này, im ở khoảng lặng. */ coTieng: KhoangMs[] }
@@ -157,7 +158,6 @@ export function taoBuoiGia(tuy: { giayToi?: boolean; coTieng?: boolean; id?: str
   }
   return { buoi, net, coTieng }
 }
-const tenHaiChu = (ten: string): string => ten.trim().split(/\s+/).slice(-2).join(' ')
 
 /** Kết quả riêng của em «Trần Minh Anh» (giả): sai câu 3, lên bảng câu 3. Khoá theo SỐ LƯỢT của phòng. */
 export function taoRiengGia(buoi: BuoiLiveJson, ve = 've-gia'): TraLiveBuoiHs {

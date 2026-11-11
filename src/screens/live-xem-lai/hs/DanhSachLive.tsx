@@ -3,9 +3,10 @@
 // tới khi xong) · mất mạng (hiện danh sách đã lưu trên máy) · lỗi máy chủ («Thử lại»). Chỉ gọi `GET /hs/live-ds` (nhớ 10 phút).
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { TraLiveDsHs } from '../../../lib/live/xem-lai-kieu'
+import { batVongTrucTiep } from '../../../lib/nhip-ben-vung'
 import { BtLive, BtLui, BtMatMang, BtMui, BtPhat } from './bieu-tuong'
 import { HOI_LAI_DANG_DUNG_MS } from './kieu'
-import { dsDaLuu, taiDs } from './may-chu'
+import { dsDaLuu, taiDs, type KetQua } from './may-chu'
 import { chuDaXem, docDaMo, docDaXem, khoaEm } from './nho-may'
 import { dongNgay, nhanThang, soPhut, tachNgay, tenBai, tenDayDu } from './ten-hien'
 
@@ -26,16 +27,21 @@ export function BiaBang({ dai, nhan }: { dai?: string; nhan?: string }) {
 export default function DanhSachLive({ token, dong, onMo }: { token: string; dong: () => void; onMo: (b: { id: string; ve: string | null }) => void }) {
   const khoa = useMemo(() => khoaEm(token), [token])
   const [tt, setTt] = useState<TrangThai>({ loai: 'tai' })
-  const tai = useCallback(async (moi: boolean) => {
-    const k = await taiDs(token, moi)
+  const nhan = useCallback((k: KetQua<TraLiveDsHs>) => {
     if (k.ok) { setTt({ loai: 'ok', d: k.d, matMang: false }); return }
     // Mất mạng ⇒ danh sách đã lưu trên máy (nếu có). Lỗi máy chủ khi đang có danh sách ⇒ giữ danh sách đang hiện.
     const luu = k.loai === 'mang' ? dsDaLuu(token) : null
     setTt((c) => (luu ? { loai: 'ok', d: luu, matMang: true } : c.loai === 'ok' ? c : { loai: 'loi' }))
   }, [token])
-  useEffect(() => { void tai(false) }, [tai])
+  const tai = useCallback((moi: boolean) => taiDs(token, moi).then(nhan), [token, nhan])
+  useEffect(() => { let huy = false; void taiDs(token, false).then((k) => { if (!huy) nhan(k) }); return () => { huy = true } }, [token, nhan])
   const dangDung = tt.loai === 'ok' && !tt.matMang && tt.d.buoi.some((b) => b.trangThai === 'dang_xu_ly')
-  useEffect(() => { if (!dangDung) return; const h = setInterval(() => void tai(true), HOI_LAI_DANG_DUNG_MS); return () => clearInterval(h) }, [dangDung, tai])
+  // buổi đang dựng ⇒ tự hỏi lại: lượt sau chỉ hẹn khi lượt trước xong, lỗi thì thưa dần, tab ẩn thì bỏ lượt (vòng hỏi trực tiếp của app, không `setInterval`)
+  useEffect(() => {
+    if (!dangDung) return
+    const v = batVongTrucTiep(async () => { if (document.hidden) return true; const k = await taiDs(token, true); nhan(k); return k.ok }, HOI_LAI_DANG_DUNG_MS)
+    return () => v.dung()
+  }, [dangDung, token, nhan])
   const matMang = tt.loai === 'ok' && tt.matMang
   useEffect(() => { if (!matMang) return; const f = () => void tai(true); window.addEventListener('online', f); return () => window.removeEventListener('online', f) }, [matMang, tai])
 
@@ -43,7 +49,7 @@ export default function DanhSachLive({ token, dong, onMo }: { token: string; don
   const xong = tt.loai === 'ok' ? tt.d.buoi.filter((b) => b.trangThai === 'xong') : []
   const dung = tt.loai === 'ok' ? tt.d.buoi.filter((b) => b.trangThai === 'dang_xu_ly') : []
   const lop = tt.loai === 'ok' ? tt.d.buoi.find((b) => b.lop)?.lop ?? '' : ''
-  const namNay = new Date().getFullYear(), homNay = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10) // ngày theo giờ Việt Nam
+  const [{ namNay, homNay }] = useState(() => { const d = new Date(Date.now() + 7 * 3600_000); return { namNay: d.getUTCFullYear(), homNay: d.toISOString().slice(0, 10) } }) // ngày theo giờ Việt Nam
   const chuXem = (b: Buoi): string => chuDaXem(docDaXem(khoa, b.id, b.ban).length, b.soDoan)
   const mo = (b: Buoi) => () => onMo({ id: b.id, ve: b.ve })
 

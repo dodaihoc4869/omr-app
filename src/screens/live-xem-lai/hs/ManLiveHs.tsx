@@ -12,7 +12,7 @@ import './xem-lai.css'
 function Khung({ nhan, khoa, lui, children }: { nhan: string; khoa: string; lui: () => void; children: ReactNode }) {
   const goc = useRef<HTMLDivElement>(null)
   const luiRef = useRef(lui)
-  luiRef.current = lui
+  useEffect(() => { luiRef.current = lui })
   useEffect(() => {
     const phim = (e: KeyboardEvent) => { if (e.key === 'Escape' && !document.querySelector('.xp:not([data-nhung])')) luiRef.current() }
     window.addEventListener('keydown', phim)
@@ -22,8 +22,9 @@ function Khung({ nhan, khoa, lui, children }: { nhan: string; khoa: string; lui:
   return createPortal(<div ref={goc} className="xl" tabIndex={-1} role="dialog" aria-modal="true" aria-label={nhan} style={MAU_CHIEU as CSSProperties}>{children}</div>, document.body)
 }
 
-export default function ManLiveHs({ token, dong }: { token: string; dong: () => void }) {
+export default function ManLiveHs({ token: tokenVao, dong }: { token?: string; dong: () => void }) {
   const [mo, setMo] = useState<{ id: string; ve: string | null } | null>(null)
+  const [token] = useState(() => tokenVao || tokenEm()) // tấm «Thêm» không truyền token: dùng token của lượt đếm «N buổi mới» vừa gọi
   return <Khung nhan="Xem lại Live" khoa={mo?.id ?? ''} lui={() => (mo ? setMo(null) : dong())}>
     {mo ? <TrangBuoi id={mo.id} ve={mo.ve} nguon="hs" token={token} dong={() => setMo(null)} /> : <DanhSachLive token={token} dong={dong} onMo={setMo} />}
   </Khung>
