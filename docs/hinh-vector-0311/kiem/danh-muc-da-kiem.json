@@ -8371,6 +8371,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7": {
+      "tep": "bang-hydrogen76-native-ddh-a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f.svg",
+      "hashSvg": "a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f",
+      "byteSvg": 34359,
+      "byteGzip": 3724,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "a927e0455dfa0774a9d1ba69302e83596571805d4a80ade6bdb7497a425a8ee3": {
       "tep": "fructofuranose-ddh-93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776.svg",
       "hashSvg": "93fefa471605af279dbb701e10d65f422b0e7b5982ceed03829bba2997f66776",
@@ -25125,6 +25134,20 @@
       ]
     },
     {
+      "qid": "DH-10-C3-B14-D1-III-2",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7",
+          "where": "DH-10-C3-B14-D1-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "951681c9e8e2f0af1718f580558dea363625adcc9ed7f0b1f79b4bd323d5388d",
+          "vector": "bang-hydrogen76-native-ddh-a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-11-C1-B2-II-4",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -31403,6 +31426,7 @@
     "DH-10-C3-B11-III-14",
     "DH-10-C3-B14-D1-I-5",
     "DH-10-C3-B14-D1-I-11",
+    "DH-10-C3-B14-D1-III-2",
     "DH-11-C1-B2-II-4",
     "DH-11-C1-B2-II-9",
     "DH-11-C1-B2-II-16",

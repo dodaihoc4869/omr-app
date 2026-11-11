@@ -1,0 +1,959 @@
+{
+  "i": 76,
+  "assetIndexProvided": 1100,
+  "hash": "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7.png",
+  "size": [
+    1400,
+    153
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-10-C3-B14-D1-III-2",
+      "de": "Trong dung dịch ethanol ($\\ce{C2H5OH}$) có những kiểu liên kết hydrogen như hình (Kiểu 1, 2, 3, 4).\nKiểu liên kết kém bền nhất là x và bền nhất là y. Bộ số xy đó là (Ví dụ: 13, 24,…).",
+      "allHinh": [
+        {
+          "hash": "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7",
+          "where": "DH-10-C3-B14-D1-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "951681c9e8e2f0af1718f580558dea363625adcc9ed7f0b1f79b4bd323d5388d"
+        }
+      ],
+      "missingHashes": [
+        "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownPanel1Macro3xOpened": true,
+    "ownPanels34Macro2xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativecenterline/bboxnearest1pxapprox; reddotcentroidsmeasuredfrompixelsafterindependentvisualcount. NoHbondstrengthinference.",
+  "geometry": {
+    "table": {
+      "outer": [
+        6,
+        4,
+        1397,
+        151
+      ],
+      "verticalDividersX": [
+        355,
+        701,
+        1048
+      ],
+      "headerDividerY": 47,
+      "stroke": "black1pxthinrules;top+headerbottomabout1.5pxnative"
+    },
+    "panels": [
+      {
+        "header": {
+          "text": "Kiểu 1",
+          "bbox": [
+            134,
+            9,
+            228,
+            39
+          ],
+          "font": "truebold uprightblackserif"
+        },
+        "atoms": [
+          {
+            "text": "O",
+            "bbox": [
+              76,
+              64,
+              102,
+              91
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              136,
+              64,
+              162,
+              91
+            ]
+          },
+          {
+            "text": "O",
+            "bbox": [
+              234,
+              64,
+              260,
+              91
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              295,
+              64,
+              321,
+              91
+            ]
+          }
+        ],
+        "horizontalBonds": [
+          [
+            [
+              109,
+              81
+            ],
+            [
+              127,
+              81
+            ]
+          ],
+          [
+            [
+              267,
+              81
+            ],
+            [
+              285,
+              81
+            ]
+          ]
+        ],
+        "pendants": [
+          {
+            "text": "C₂H₅",
+            "bbox": [
+              20,
+              105,
+              96,
+              135
+            ],
+            "bond": [
+              [
+                65,
+                100
+              ],
+              [
+                75,
+                91
+              ]
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              193,
+              104,
+              219,
+              132
+            ],
+            "bond": [
+              [
+                223,
+                100
+              ],
+              [
+                233,
+                91
+              ]
+            ]
+          }
+        ],
+        "redDots": [
+          [
+            181.78,
+            78.91
+          ],
+          [
+            193.09,
+            78.91
+          ],
+          [
+            204.28,
+            78.89
+          ]
+        ],
+        "redDotCount": 3,
+        "note": "RightO-Hrowis4pxlowerthanLEFTinpanels2/3/4; keepnativeoffsetnotnormalize.",
+        "headerCenter": 181.0,
+        "headerText": "Kiểu 1",
+        "topAtoms": [
+          {
+            "x": 89.0,
+            "baseline": 90,
+            "text": "O"
+          },
+          {
+            "x": 149.0,
+            "baseline": 90,
+            "text": "H"
+          },
+          {
+            "x": 247.0,
+            "baseline": 90,
+            "text": "O"
+          },
+          {
+            "x": 308.0,
+            "baseline": 90,
+            "text": "H"
+          }
+        ],
+        "lowerLabels": [
+          {
+            "x": 58.0,
+            "baseline": 131,
+            "text": "C2H5"
+          },
+          {
+            "x": 206.0,
+            "baseline": 131,
+            "text": "H"
+          }
+        ],
+        "bonds": [
+          [
+            109,
+            81,
+            127,
+            81
+          ],
+          [
+            267,
+            81,
+            285,
+            81
+          ],
+          [
+            65,
+            100,
+            75,
+            91
+          ],
+          [
+            223,
+            100,
+            233,
+            91
+          ]
+        ],
+        "dots": [
+          [
+            181.78,
+            78.91
+          ],
+          [
+            193.09,
+            78.91
+          ],
+          [
+            204.28,
+            78.89
+          ]
+        ]
+      },
+      {
+        "header": {
+          "text": "Kiểu 2",
+          "bbox": [
+            481,
+            9,
+            575,
+            39
+          ],
+          "font": "truebold uprightblackserif"
+        },
+        "atoms": [
+          {
+            "text": "O",
+            "bbox": [
+              410,
+              64,
+              436,
+              91
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              471,
+              64,
+              497,
+              91
+            ]
+          },
+          {
+            "text": "O",
+            "bbox": [
+              581,
+              68,
+              607,
+              95
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              641,
+              68,
+              667,
+              95
+            ]
+          }
+        ],
+        "horizontalBonds": [
+          [
+            [
+              443,
+              81
+            ],
+            [
+              462,
+              81
+            ]
+          ],
+          [
+            [
+              614,
+              84
+            ],
+            [
+              632,
+              84
+            ]
+          ]
+        ],
+        "pendants": [
+          {
+            "text": "H",
+            "bbox": [
+              369,
+              104,
+              396,
+              132
+            ],
+            "bond": [
+              [
+                400,
+                100
+              ],
+              [
+                410,
+                91
+              ]
+            ]
+          },
+          {
+            "text": "C₂H₅",
+            "bbox": [
+              526,
+              109,
+              601,
+              139
+            ],
+            "bond": [
+              [
+                569,
+                104
+              ],
+              [
+                580,
+                94
+              ]
+            ]
+          }
+        ],
+        "redDots": [
+          [
+            524.11,
+            78.94
+          ],
+          [
+            535.55,
+            78.9
+          ],
+          [
+            546.68,
+            78.86
+          ]
+        ],
+        "redDotCount": 3,
+        "note": "RightO-Hrowis4pxlowerthanLEFTinpanels2/3/4; keepnativeoffsetnotnormalize.",
+        "headerCenter": 528.0,
+        "headerText": "Kiểu 2",
+        "topAtoms": [
+          {
+            "x": 423.0,
+            "baseline": 90,
+            "text": "O"
+          },
+          {
+            "x": 484.0,
+            "baseline": 90,
+            "text": "H"
+          },
+          {
+            "x": 594.0,
+            "baseline": 94,
+            "text": "O"
+          },
+          {
+            "x": 654.0,
+            "baseline": 94,
+            "text": "H"
+          }
+        ],
+        "lowerLabels": [
+          {
+            "x": 382.5,
+            "baseline": 131,
+            "text": "H"
+          },
+          {
+            "x": 563.5,
+            "baseline": 135,
+            "text": "C2H5"
+          }
+        ],
+        "bonds": [
+          [
+            443,
+            81,
+            462,
+            81
+          ],
+          [
+            614,
+            84,
+            632,
+            84
+          ],
+          [
+            400,
+            100,
+            410,
+            91
+          ],
+          [
+            569,
+            104,
+            580,
+            94
+          ]
+        ],
+        "dots": [
+          [
+            524.11,
+            78.94
+          ],
+          [
+            535.55,
+            78.9
+          ],
+          [
+            546.68,
+            78.86
+          ]
+        ]
+      },
+      {
+        "header": {
+          "text": "Kiểu 3",
+          "bbox": [
+            828,
+            9,
+            922,
+            39
+          ],
+          "font": "truebold uprightblackserif"
+        },
+        "atoms": [
+          {
+            "text": "O",
+            "bbox": [
+              757,
+              64,
+              783,
+              91
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              818,
+              64,
+              844,
+              91
+            ]
+          },
+          {
+            "text": "O",
+            "bbox": [
+              927,
+              68,
+              953,
+              95
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              987,
+              68,
+              1013,
+              95
+            ]
+          }
+        ],
+        "horizontalBonds": [
+          [
+            [
+              790,
+              81
+            ],
+            [
+              809,
+              81
+            ]
+          ],
+          [
+            [
+              960,
+              84
+            ],
+            [
+              978,
+              84
+            ]
+          ]
+        ],
+        "pendants": [
+          {
+            "text": "H",
+            "bbox": [
+              717,
+              104,
+              743,
+              132
+            ],
+            "bond": [
+              [
+                746,
+                100
+              ],
+              [
+                756,
+                91
+              ]
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              886,
+              109,
+              913,
+              137
+            ],
+            "bond": [
+              [
+                916,
+                104
+              ],
+              [
+                926,
+                95
+              ]
+            ]
+          }
+        ],
+        "redDots": [
+          [
+            870.68,
+            78.86
+          ],
+          [
+            882.09,
+            78.91
+          ],
+          [
+            893.37,
+            78.79
+          ]
+        ],
+        "redDotCount": 3,
+        "note": "RightO-Hrowis4pxlowerthanLEFTinpanels2/3/4; keepnativeoffsetnotnormalize.",
+        "headerCenter": 875.0,
+        "headerText": "Kiểu 3",
+        "topAtoms": [
+          {
+            "x": 770.0,
+            "baseline": 90,
+            "text": "O"
+          },
+          {
+            "x": 831.0,
+            "baseline": 90,
+            "text": "H"
+          },
+          {
+            "x": 940.0,
+            "baseline": 94,
+            "text": "O"
+          },
+          {
+            "x": 1000.0,
+            "baseline": 94,
+            "text": "H"
+          }
+        ],
+        "lowerLabels": [
+          {
+            "x": 730.0,
+            "baseline": 131,
+            "text": "H"
+          },
+          {
+            "x": 899.5,
+            "baseline": 136,
+            "text": "H"
+          }
+        ],
+        "bonds": [
+          [
+            790,
+            81,
+            809,
+            81
+          ],
+          [
+            960,
+            84,
+            978,
+            84
+          ],
+          [
+            746,
+            100,
+            756,
+            91
+          ],
+          [
+            916,
+            104,
+            926,
+            95
+          ]
+        ],
+        "dots": [
+          [
+            870.68,
+            78.86
+          ],
+          [
+            882.09,
+            78.91
+          ],
+          [
+            893.37,
+            78.79
+          ]
+        ]
+      },
+      {
+        "header": {
+          "text": "Kiểu 4",
+          "bbox": [
+            1175,
+            9,
+            1270,
+            39
+          ],
+          "font": "truebold uprightblackserif"
+        },
+        "atoms": [
+          {
+            "text": "O",
+            "bbox": [
+              1105,
+              64,
+              1131,
+              91
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              1166,
+              64,
+              1192,
+              91
+            ]
+          },
+          {
+            "text": "O",
+            "bbox": [
+              1275,
+              68,
+              1301,
+              95
+            ]
+          },
+          {
+            "text": "H",
+            "bbox": [
+              1336,
+              68,
+              1362,
+              95
+            ]
+          }
+        ],
+        "horizontalBonds": [
+          [
+            [
+              1138,
+              81
+            ],
+            [
+              1157,
+              81
+            ]
+          ],
+          [
+            [
+              1308,
+              84
+            ],
+            [
+              1326,
+              84
+            ]
+          ]
+        ],
+        "pendants": [
+          {
+            "text": "C₂H₅",
+            "bbox": [
+              1062,
+              109,
+              1138,
+              139
+            ],
+            "bond": [
+              [
+                1095,
+                101
+              ],
+              [
+                1105,
+                92
+              ]
+            ]
+          },
+          {
+            "text": "C₂H₅",
+            "bbox": [
+              1220,
+              109,
+              1296,
+              139
+            ],
+            "bond": [
+              [
+                1264,
+                104
+              ],
+              [
+                1274,
+                95
+              ]
+            ]
+          }
+        ],
+        "redDots": [
+          [
+            1218.67,
+            78.73
+          ],
+          [
+            1230,
+            78.67
+          ],
+          [
+            1241.41,
+            78.65
+          ]
+        ],
+        "redDotCount": 3,
+        "note": "RightO-Hrowis4pxlowerthanLEFTinpanels2/3/4; keepnativeoffsetnotnormalize.",
+        "headerCenter": 1222.5,
+        "headerText": "Kiểu 4",
+        "topAtoms": [
+          {
+            "x": 1118.0,
+            "baseline": 90,
+            "text": "O"
+          },
+          {
+            "x": 1179.0,
+            "baseline": 90,
+            "text": "H"
+          },
+          {
+            "x": 1288.0,
+            "baseline": 94,
+            "text": "O"
+          },
+          {
+            "x": 1349.0,
+            "baseline": 94,
+            "text": "H"
+          }
+        ],
+        "lowerLabels": [
+          {
+            "x": 1100.0,
+            "baseline": 135,
+            "text": "C2H5"
+          },
+          {
+            "x": 1258.0,
+            "baseline": 135,
+            "text": "C2H5"
+          }
+        ],
+        "bonds": [
+          [
+            1138,
+            81,
+            1157,
+            81
+          ],
+          [
+            1308,
+            84,
+            1326,
+            84
+          ],
+          [
+            1095,
+            101,
+            1105,
+            92
+          ],
+          [
+            1264,
+            104,
+            1274,
+            95
+          ]
+        ],
+        "dots": [
+          [
+            1218.67,
+            78.73
+          ],
+          [
+            1230,
+            78.67
+          ],
+          [
+            1241.41,
+            78.65
+          ]
+        ]
+      }
+    ],
+    "formulaStyle": "truebold uprightblue serif, noitalic; 2/5SUBinC2H5. Bluebonds thinuniform notfilledwedges.",
+    "redDotStyle": "3separatefilledreddots perpanel, radiusabout2.3px. NOTcontinuousdashorUnicodeellipsisglyph; preserve3centers.",
+    "counts": {
+      "panels": 4,
+      "headers": 4,
+      "redDots": 12,
+      "O": 8,
+      "horizontalOHBonds": 8,
+      "pendantDiagonalBonds": 8,
+      "C2H5labels": 4,
+      "pendantHlabels": 4,
+      "O-HhorizontalHlabels": 8
+    },
+    "noAdded": [
+      "correctanswerhighlight",
+      "x-ystrengthlabels",
+      "charges",
+      "lonepairs",
+      "extraHbondlines",
+      "reorderpanels",
+      "normalizeRightRowY"
+    ],
+    "tableLines": [
+      [
+        6,
+        4,
+        1397,
+        4
+      ],
+      [
+        1397,
+        4,
+        1397,
+        151
+      ],
+      [
+        1397,
+        151,
+        6,
+        151
+      ],
+      [
+        6,
+        151,
+        6,
+        4
+      ],
+      [
+        6,
+        47,
+        1397,
+        47
+      ],
+      [
+        355,
+        4,
+        355,
+        151
+      ],
+      [
+        701,
+        4,
+        701,
+        151
+      ],
+      [
+        1048,
+        4,
+        1048,
+        151
+      ]
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "nativeFull2xOpened": true,
+    "allPublicDeRead": true,
+    "geometryAgrees": true,
+    "actualSvgReviewed": true,
+    "actualSvgHash": "a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f",
+    "freshChromiumScale": 3,
+    "actualFullOpened": true,
+    "verdict": "Đạt riêng nguồn76; giữ 4rowliteral/12dots/16bonds/currentfontglobalHOLD"
+  }
+}

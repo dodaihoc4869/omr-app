@@ -1,0 +1,29 @@
+[
+  {
+    "i": 76,
+    "hash": "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7",
+    "fileNguon": "anh/0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7.png",
+    "svg": "bang-hydrogen76-native-ddh-a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f.svg",
+    "hashSvg": "a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f",
+    "byteSvg": 34359,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B14-D1-III-2",
+        "de": "Trong dung dịch ethanol ($\\ce{C2H5OH}$) có những kiểu liên kết hydrogen như hình (Kiểu 1, 2, 3, 4).\nKiểu liên kết kém bền nhất là x và bền nhất là y. Bộ số xy đó là (Ví dụ: 13, 24,…).",
+        "refs": [
+          {
+            "hash": "0f2c477f870a1345581b2bdab442aea0d876a7faef7a6f0c3f978dabcd7963a7",
+            "where": "DH-10-C3-B14-D1-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "951681c9e8e2f0af1718f580558dea363625adcc9ed7f0b1f79b4bd323d5388d"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4tablepanelsKiểu1-4TRUEdamUPRIGHT/ALLbluechemicalTRUEdamUPRIGHT/4C2H5with2-5SUB4pendantH/8O8topH/8horizontal8diagonalbonds/12REDdots3EACH/0charges0arrows/noaddedanswer-ranking-theoryfix",
+    "hashSvgDaSoat": "a2993bec2db9480015377f0f931cb568e62439d00a8d38a13b14022481d2be1f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
