@@ -154,7 +154,7 @@ function trangThai(): TtLiveTo {
     doTieng: live ? dongTieng(em) : [],
     the: the ? { ...the, xa: !!l?.xa } : null, roi, tay, moi, micLoi, nghi: live && !!l?.nghi, dot2: GIAO_DIEN_DOT_2,
     mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong', khac: ttLt.micKhac ?? '' } : null,
-    lyDoKT: !live || l?.tieng === 'chua-cau-hinh' ? '' : ttLt?.tieng === 'loi' ? 'Chưa nối máy chủ tiếng'
+    lyDoKT: !live || l?.tieng === 'chua-cau-hinh' ? '' : ttLt?.tieng === 'loi' ? (ttLt.loi === 'khong-noi' ? 'Mạng chặn đường tiếng' : 'Chưa nối máy chủ tiếng')
       : ttLt?.tieng === 'khong' ? (loiMic === 'mic-tu-choi' ? 'Chưa có quyền mic' : loiMic === 'khong-mic' ? 'Không thấy mic' : loiMic === 'mic-ban' ? 'Mic đang bị ứng dụng khác giữ' : loiMic ? 'Mic chưa mở được' : 'Live không tiếng')
       : ttLt?.micTinh === 'im' ? 'Mic chưa có tín hiệu' : ttLt?.micTinh === 'bi-tat' ? 'Mic bị tắt tiếng' : ttLt?.micTinh === 'mat' ? 'Mic bị rút' : '',
     ...(live && l?.ghi !== undefined ? { ghi: l.ghi } : {}),
@@ -166,7 +166,7 @@ function trangThai(): TtLiveTo {
 function dongTieng(em: (sbd: string) => { ten: string }): string[] {
   const tm = lt?.tiengMay?.()
   if (!tm) return []
-  const g = tm.thay?.g, ds: string[] = [`Máy thầy gửi: ${g ? `${g.kb} kb/s · mức nguồn ${Math.round(g.muc * 100)}` : 'chưa đo'}${tm.thay ? ` · ICE ${tm.thay.ice}${tm.thay.uv ? ` (${tm.thay.uv})` : ''}` : ''}`]
+  const g = tm.thay?.g, ds: string[] = ttLt?.tieng === 'loi' ? [`Máy thầy: ⚠ ${ttLt.loi === 'khong-noi' ? 'ICE hỏng — mạng chặn đường tiếng (UDP); bảng vẫn chạy' : `chưa nối máy chủ tiếng${ttLt.loi ? ` (${ttLt.loi})` : ''}`}`] : [`Máy thầy gửi: ${g ? `${g.kb} kb/s · mức nguồn ${Math.round(g.muc * 100)}` : 'chưa đo'}${tm.thay ? ` · ICE ${tm.thay.ice}${tm.thay.uv ? ` (${tm.thay.uv})` : ''}` : ''}`]
   if (ttLt?.emNoi && ttLt.ngheEm) ds.push(dongMay(`Máy thầy nghe ${ttLt.emNoi.ten}`, tm.thay, 'tiếng em'))
   const may = tm.em.map((x) => ({ d: dongMay(em(x.s).ten, x.ti), xau: viSaoCam(x.ti) !== '' }))
   may.sort((a, b) => Number(b.xau) - Number(a.xau))
