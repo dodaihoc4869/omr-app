@@ -12,7 +12,9 @@ DL, CK = sys.argv[1], sys.argv[2]
 SO_BUOC = int(sys.argv[3]) if len(sys.argv) > 3 else 30000
 os.makedirs(CK, exist_ok=True)
 HZ, N, H, NB, D = 24000, 480, 240, 221, 192
-GIAY, BATCH = 3.0, 16
+GIAY, BATCH = float(os.environ.get('TG_GIAY', '2.0')), 16
+LAM_LOT = float(os.environ.get('TG_LOT', '0.5'))
+LAM_L2 = float(os.environ.get('TG_L2', '1.0'))     # trọng số phạt THÊM khi mất tiếng thầy (cao ⇒ mặt nạ rụt rè)   # trọng số phạt phần lọt (lượt 2b: 0,05 chỉ ở ô không có thầy ⇒ chỉ hạ 2–6 dB)
 L = int(GIAY * HZ)
 WIN = np.sqrt(0.5 - 0.5 * np.cos(2 * np.pi * np.arange(N) / N)).astype(np.float32)
 GIU = ['75f8acfc']                      # buổi giữ riêng để chấm (không luyện)
@@ -83,7 +85,7 @@ def mau(thay, khac, am, rr=None):
         if rng.random() < 0.6:  # chỉ nói một khúc ⇒ có lúc một mình, lúc chồng, có điểm bắt đầu / dứt
             a = rng.integers(0, L // 2); b = rng.integers(a + L // 4, L + 1); s[:a] = 0; s[b:] = 0
         r = rmsHd(s)
-        if r > 0: i += s / r * 10 ** (-rng.uniform(-6, 12) / 20)
+        if r > 0: i += s / r * 10 ** (-rng.uniform(-8, 8) / 20)   # đo thật: giọng khác thấp hơn thầy ≈ 2 dB (−4,4…+7,4)
     rt = rmsHd(t)
     if rt > 0: t = t / rt; i = i  # giọng khác đã tính theo mức thầy = 1
     else: i = i * 10 ** (rng.uniform(-12, 0) / 20)
@@ -132,8 +134,8 @@ def matMat(p, f, Ya, Sa, Ia):
     Sh = (M * Ya) ** c; St = Sa ** c
     l1 = jnp.mean(TS * (Sh - St) ** 2)
     l2 = jnp.mean(TS * jax.nn.relu(St - Sh) ** 2)          # mất tiếng thầy ⇒ phạt thêm
-    l3 = jnp.mean((M * Ia) ** c * (St < 1e-3 * jnp.max(St)))  # giọng khác lọt ở ô không có thầy
-    return l1 + 1.0 * l2 + 0.05 * l3
+    l3 = jnp.mean(TS * (M * Ia) ** (2 * c))                    # phần giọng khác / ồn còn lọt (mọi ô) ⇒ đẩy mức hạ tới ≥ 20 dB
+    return l1 + LAM_L2 * l2 + LAM_LOT * l3
 lich = optax.warmup_cosine_decay_schedule(1e-4, 1.5e-3, min(500, SO_BUOC // 4), max(SO_BUOC, 1000), 5e-5)
 toiUu = optax.chain(optax.clip_by_global_norm(1.0), optax.adam(lich))
 @jax.jit
@@ -153,28 +155,30 @@ def siSdr(o, g):
     a = (o * g).sum() / max((g * g).sum(), 1e-12); s = a * g; n = o - s
     return 10 * np.log10((s ** 2).sum() / max((n ** 2).sum(), 1e-12))
 rv = np.random.default_rng(1)
+LC = int(3.0 * HZ)  # tập chấm cố định 3 s / mẫu (không theo độ dài mẫu luyện)
 def tapCham():
     o = []
     for k in range(24):
-        t = THAY_V[(k * 2 * HZ) % (len(THAY_V) - L):][:L]
-        s = KHAC_V[(k * HZ) % (len(KHAC_V) - L):][:L] if k % 2 == 0 else cat(AM_V[k % len(AM_V)], L)
+        t = THAY_V[(k * 2 * HZ) % (len(THAY_V) - LC):][:LC]
+        s = KHAC_V[(k * HZ) % (len(KHAC_V) - LC):][:LC] if k % 2 == 0 else cat(AM_V[k % len(AM_V)], LC)
         sir = [2, -5, 10][k % 3]
         o.append((t / max(rmsHd(t), 1e-9) * 0.1, s / max(rmsHd(s), 1e-9) * 0.1 * 10 ** (-sir / 20), sir))
     return o
 CHAM = tapCham()
 def cham(p):
-    kq = {'thayGiu': [], 'khacGiam': [], 'chong': {2: [], -5: [], 10: []}}
+    kq = {'thayGiu': [], 'khacGiam': [], 'chong': {2: [], -5: [], 10: []}, 'khacTheoSir': {2: [], -5: [], 10: []}}
     for t, s, sir in CHAM:
         for loai, x, goc in (('thay', t, t), ('khac', s, None), ('chong', t + s, t)):
             X = stft(x[None])[0]; M = np.asarray(matNaJ(P, dacTrung(X)[None]))[0]
             g = np.ones(N // 2 + 1, np.float32)[None].repeat(M.shape[0], 0); g[:, :NB] = M; g[:, NB:] = M[:, 120:NB].mean(1, keepdims=True)
-            y = istft(X * g, L)
+            y = istft(X * g, LC)
             dl = N  # trễ thuật toán: istft(stft) nhân quả không lùi mẫu ⇒ so trực tiếp
             if loai == 'thay': kq['thayGiu'].append(siSdr(y[N:-N], x[N:-N]))
-            elif loai == 'khac': kq['khacGiam'].append(10 * np.log10((x[N:-N] ** 2).sum() / max((y[N:-N] ** 2).sum(), 1e-12)))
+            elif loai == 'khac': v = 10 * np.log10((x[N:-N] ** 2).sum() / max((y[N:-N] ** 2).sum(), 1e-12)); kq['khacGiam'].append(v); kq['khacTheoSir'][sir].append(v)
             else: kq['chong'][sir].append(siSdr(y[N:-N], goc[N:-N]) - siSdr(x[N:-N], goc[N:-N]))
     return {'thayGiuSiSdr': round(float(np.median(kq['thayGiu'])), 1), 'khacGiamDb': round(float(np.median(kq['khacGiam'])), 1),
-            **{f'chongTang{k}dB': round(float(np.median(v)), 1) for k, v in kq['chong'].items()}}
+            **{f'chongTang{k}dB': round(float(np.median(v)), 1) for k, v in kq['chong'].items()},
+            **{f'khacGiam{k}dB': round(float(np.median(v)), 1) for k, v in kq['khacTheoSir'].items()}}
 
 def docTgt(duong):  # nạp trọng số từ tệp .tgt (định dạng của lõi JS src/lib/live/tach-giong-thay.ts) — để tinh chỉnh tiếp từ bản của nhánh khác
     import struct
