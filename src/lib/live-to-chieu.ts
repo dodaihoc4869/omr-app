@@ -226,7 +226,7 @@ export const JS_LIVE_TO_CHIEU = `
     cd = cd ? cd.textContent : '';
     lvThe.hidden = !t;
     if (!t) return;
-    loi = t.loi === 'mic-tu-choi' ? 'trình duyệt chưa cho dùng mic' : t.loi === 'khong-mic' ? 'máy này không thấy mic nào' : t.loi ? 'mic chưa mở được' : '';
+    loi = t.loi === 'mic-tu-choi' ? 'trình duyệt chưa cho dùng mic' : t.loi === 'khong-mic' ? 'máy này không thấy mic nào' : t.loi === 'mic-ban' ? 'mic đang bị ứng dụng khác giữ (Zoom, OBS…) hoặc bộ thu lỗi — tắt ứng dụng ấy / cắm lại bộ thu' : t.loi ? 'mic chưa mở được' : '';
     h = '<h3>' + (LV.tt.pha === 'live' ? (LV.tt.nghi ? 'Đang tạm dừng live' : 'Đang live') : 'Bật live cho ' + (LV.tt.lop ? 'lớp ' + lvSach(LV.tt.lop) : 'cả lớp')) + '</h3>'
       + '<p>' + (LV.tt.tong || 0) + ' em đã vào phòng sẽ thấy màn chiếu này' + (LV.tt.coTieng ? ' và nghe tiếng thầy ngay.' : '. Buổi này live chưa có tiếng trên máy em.') + '</p>';
     if (LV.tt.coTieng) {
@@ -239,6 +239,8 @@ export const JS_LIVE_TO_CHIEU = `
         mi = LV.tt.mic || { tinh: 'chua', ten: '', loc: false, cheDo: 'tu', locOn: 'vua', locOnChay: 'tat' };
         h += '</select></label><div class="mc-lv-dong"><span>' + (LV.tt.pha !== 'live' ? 'Mức âm khi thầy nói thử' : LV.tt.nghi ? 'Đang tạm dừng — lớp không nghe' : 'Mức âm đang gửi cho lớp') + '</span><span id="mc-lv-nx"></span></div><div class="mc-lv-thuoc"><i id="mc-lv-th"></i></div>';
         if (LV_MIC[mi.tinh]) h += '<p class="loi" role="alert">' + LV_MIC[mi.tinh] + '</p>';
+        // 11/11 tối: mic đã chọn không có trên máy ⇒ app dùng mic mặc định — NÓI RÕ, không âm thầm đổi mic
+        if (mi.khac) h += '<p class="loi" role="alert">Không mở được «' + lvSach(mi.khac) + '» — lớp đang nghe ' + lvSach(mi.ten || 'mic mặc định của máy') + '. Cắm lại bộ thu là app tự về mic ấy.</p>';
         // khử vọng + lọc ồn làm đục giọng ⇒ «Tự động» chỉ bật khi có đường vọng (loa máy thầy đang phát tiếng em nói); thầy ép tay được
         // LỌC ỒN RIÊNG (11/11): ba mức, tách khỏi khử vọng. Máy không chạy được bộ lọc riêng ⇒ nói rõ, nút vẫn ghi nhớ lựa chọn.
         h += '<div class="mc-lv-dong"><span><b>Lọc ồn</b><br>' + (mi.locOnChay === 'khong' ? 'Máy này chưa chạy được bộ lọc riêng' : mi.locOnChay === 'loi' ? 'Chưa tải được bộ lọc — đang không lọc' : mi.locOnChay === 'tai' ? 'Đang tải bộ lọc…' : mi.locOn === 'manh' ? 'Mạnh — phòng ồn; lúc im lọc sâu hơn' : mi.locOn === 'tat' ? 'Tắt — giữ nguyên tiếng mic' : 'Vừa — bớt ồn nền, giữ giọng tự nhiên') + '</span><span style="display:inline-flex;gap:.3em">'
@@ -266,7 +268,7 @@ export const JS_LIVE_TO_CHIEU = `
   }
   var LV_MIC = {
     'bi-tat': 'Trình duyệt báo mic đang bị tắt tiếng (nút tắt tiếng trên mic / bộ thu, hoặc Windows đang tắt tiếng mic này).',
-    im: 'Mic này chưa có tín hiệu qua trình duyệt dù app đã tự thử mọi cách mở. Thầy chọn mục mic đích danh (không phải «Mặc định») hoặc chụp dòng chữ nhỏ bên dưới gửi lại.',
+    im: 'Mic này chưa có tín hiệu qua trình duyệt dù app đã tự thử mọi cách mở. Mic không dây: bật bộ phát, kiểm tra đã ghép với bộ thu. Hoặc thầy chọn mục mic đích danh (không phải «Mặc định») hoặc chụp dòng chữ nhỏ bên dưới gửi lại.',
     mat: 'Mic vừa bị rút. Đang chờ cắm lại — hoặc thầy chọn mic khác.'
   };
   /** Xem lại Live: ngăn ghi của viên Live. ghi vắng = công tắc tắt ⇒ không vẽ. Máy ghi chưa báo trong 15 giây đầu ⇒ chưa vẽ gì (đang khởi động). */
