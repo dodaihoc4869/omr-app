@@ -230,7 +230,9 @@ describe('phòng thật + cửa `/bpu/live/phat` cho em', () => {
     await ph.gui(gv, { t: 'live-thu-mic' }); await ph.choNen()
     expect(viewCuoi(gv).live.noi).toEqual([])
     expect(dong().length).toBe(2)
-    // Em vẫn đang được gọi ⇒ bật lại được; rồi tự tắt.
+    // Đợt 2 (11/11): thầy đã «Thu mic» ⇒ em lên bảng KHÔNG tự bật lại được trong lượt gọi này; thầy cho làm bảng (`lam-bang`) ⇒ bật lại được; rồi tự tắt.
+    expect(await phat('S1', '7')).toEqual({ ok: false, lyDo: 'chua-duoc-moi' })
+    await ph.gui(gv, { t: 'lam-bang' })
     expect((await phat('S1', '7')).ok).toBe(true)
     await ph.gui(e1, { t: 'live-mic-tat' }); await ph.choNen()
     expect(viewCuoi(gv).live.noi).toEqual([])

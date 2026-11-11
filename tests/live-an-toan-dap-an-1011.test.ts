@@ -12,7 +12,8 @@ import { maNetXong } from '../src/lib/live/ma-net'
 import { datWebSocketPairGia, taoPhongGia, viewCuoi, type WsGia } from './_live-phong-gia'
 
 const DAP_AN = 'ĐÁP-ÁN-BÍ-MẬT-XYZ', LOI_GIAI = 'LỜI-GIẢI-BÍ-MẬT-QWE', QID = 'qid-bi-mat-123'
-const KHOA_LIVE = ['bang', 'duocXem', 'san', 'bat', 'tu', 'phien', 'ss', 'tieng', 'soNet', 'emTay', 'hangTay', 'emDuocMoi', 'emNoi', 'noi'].sort()
+// 11/11 thêm `nghi` (thầy tạm dừng live). Đợt 2 thêm: `xa` (em ở xa), `emMoi` (thầy mời em nói), `giay` (bố cục giấy đề của thầy — chỉ số đo).
+const KHOA_LIVE = ['bang', 'duocXem', 'san', 'bat', 'tu', 'phien', 'ss', 'tieng', 'soNet', 'emTay', 'hangTay', 'emDuocMoi', 'emNoi', 'noi', 'xa', 'emMoi', 'giay', 'nghi'].sort()
 /** Mọi byte một máy em đã nhận, đọc như chữ (khung nhị phân giải UTF-8 lỏng) ⇒ soát chuỗi cấm. */
 const moiChu = (ws: WsGia): string => ws.tin.map((t) => (typeof t === 'string' ? t : new TextDecoder('utf-8', { fatal: false }).decode(t))).join('\n')
 const khongLo = (ws: WsGia) => { const s = moiChu(ws); expect(s).not.toContain(DAP_AN); expect(s).not.toContain(LOI_GIAI); expect(s).not.toContain(QID); expect(s).not.toContain('"dung"'); expect(s).not.toContain('"giai"') }
