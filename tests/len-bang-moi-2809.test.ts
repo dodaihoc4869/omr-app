@@ -156,7 +156,10 @@ describe('LUẬT 7 — thanh dưới, T, B, ?', () => {
     const k = [...t.doc.querySelectorAll('#mc-phim-nhom [data-k]')].map((b) => b.getAttribute('data-k'))
     // thầy 05/10: thêm "C · Thầy chữa" và "X · Ai sai" đầu nhóm (chỉ hiện khi đã nối app)
     // 06/11 Bình Phản Ứng: «P · Cả lớp làm» sau B (L vẫn là Lên bảng)
-    expect(k).toEqual(['C', 'X', 'D', 'K', 'G', 'T', 'B', 'P', 'Tab', '?'])
+    // SỬA CÓ CHỦ ĐÍCH 11/11 (thầy: «Phần nút ở dưới chưa gọn, làm cho gọn lại tinh tế đẹp»): nút theo ngữ cảnh C / D / K ở lại trên thanh; nút phụ chuyển vào
+    // khay của nút «thêm» (vẫn TRONG #mc-phim-nhom), xếp theo nhóm Câu này · Lớp và bảng · Màn chiếu — tests/thanh-day-1111.test.ts.
+    expect(k).toEqual(['C', 'D', 'K', 'G', 'X', 'T', 'P', 'B', 'Tab', '?'])
+    expect([...t.doc.querySelectorAll('#mc-phim-nhom > [data-k]')].map((b) => b.getAttribute('data-k'))).toEqual(['C', 'D', 'K'])
     expect(t.doc.querySelector<HTMLElement>('[data-k="C"]')!.hidden).toBe(true)
     expect(CSS_LEN_BANG_MOI).toMatch(/body\.mc \.mc-thanh\{[^}]*font-size:max\(14px,calc\(var\(--u\)\*1\.15\)\);font-weight:700/)
     expect(t.doc.querySelector<HTMLElement>('[data-k="D"]')!.hidden).toBe(true)
