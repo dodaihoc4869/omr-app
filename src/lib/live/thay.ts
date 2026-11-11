@@ -56,7 +56,10 @@ export type KetQuaBat = { ok: true } | { ok: false; lyDo: 'mic-tu-choi' | 'khong
 
 interface NetGui { dau: DauNet; diem: DiemBut[]; tGoc: number | null; daDc: number; truocDc: number; daWs: number }
 const WS_CACH_MS = 34
-const XA_MS = 16
+/** Điểm đang viết đi DataChannel NGAY sau khung vẽ của thầy (11/11: bản trước chờ thêm 16 ms rồi mới gửi ⇒ máy em trễ thêm đúng một khung);
+ *  hai gói liền nhau cách tối thiểu 12 ms (màn 120–240 Hz không bắn quá ~80 gói / giây). */
+const XA_MS = 0
+const DC_CACH_MS = 12
 const NHIP_MS = 30_000
 const MIC_IM_MS = 20_000
 const NGUONG_TIENG = 0.04
@@ -72,7 +75,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   let dangNoi: Promise<void> | null = null, huyRoi = false
   let t0Live = 0, tuBat = false, daThayBat = false
   const net = new Map<string, NetGui>()
-  let henXa: unknown = null, lucWs = -1e9, troCho: { x: number; y: number } | null = null
+  let henXa: unknown = null, lucWs = -1e9, lucDc = -1e9, troCho: { x: number; y: number; dc?: boolean } | null = null, cuonCho: { x: number; y: number; dc?: boolean } | null = null
   let henNhip: unknown = null, lucTieng = 0, lucNet = 0, lucNhip = 0
   let doEm: Record<string, unknown> | null = null, rtt: number | null = null
   // Tiếng của em đang phát mic trên bảng.
@@ -280,25 +283,28 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     for (const x of k instanceof Uint8Array ? [k] : k) { dem.khungSo += 1; tuy.kenh.guiNhiPhan(x) }
   }
   const henXaSau = (ms: number): void => { if (henXa == null) henXa = mt.hen(xa, ms) }
-  /** Xả lô điểm: DataChannel mỗi ~16 ms (kèm lặp lô trước); WebSocket ≥ 34 ms một lô (≤ 30 lô/giây) và chỉ khi có máy em cần. */
+  /** Xả lô điểm: DataChannel ngay sau mỗi khung vẽ của thầy, cách nhau ≥ 12 ms (kèm lặp lô trước); WebSocket ≥ 34 ms một lô (≤ 30 lô/giây) và chỉ khi có máy em cần. */
   function xa(): void {
     henXa = null
     // 11/11 (thầy «bấm nộp thì tự về màn live»): em gửi xong là ở bảng live dù cờ phòng `bang` tắt ⇒ điểm đang viết phát SUỐT lúc live (máy em đang ở màn câu
     // hỏi tự bỏ). Đang TẠM DỪNG ⇒ không phát.
-    if (!dangLive() || live!.nghi) { for (const n of net.values()) { n.daDc = n.truocDc = n.daWs = n.diem.length } troCho = null; return }
+    if (!dangLive() || live!.nghi) { for (const n of net.values()) { n.daDc = n.truocDc = n.daWs = n.diem.length } troCho = null; cuonCho = null; return }
     const nay = mt.dongHo(), phien = live!.phien, tGui = tLive(), coDc = dcMo()
     const canWs = !coDc || tt.xemWs > 0
-    let conWs = false, wsDuoc = canWs && nay - lucWs >= WS_CACH_MS
+    const dcDuoc = coDc && nay - lucDc >= DC_CACH_MS
+    let conWs = false, conDc = false, daDc = false, wsDuoc = canWs && nay - lucWs >= WS_CACH_MS
     for (const n of net.values()) {
       const tong = n.diem.length
       if (!tong) continue
       // Mốc đầu nét trên đồng hồ live: neo điểm mới nhất vào «bây giờ» ở lần gửi đầu (số nguyên ms ⇒ máy em khôi phục đúng t của bộ máy bút).
       if (n.tGoc == null) n.tGoc = Math.round(tGui - n.diem[tong - 1]![3])
       if (coDc && n.daDc < tong) {
-        // Gói = lô liền trước + lô mới ⇒ mất MỘT gói không thủng nét.
-        const tu = Math.max(n.truocDc, tong - DIEM_TOI_DA_MOT_GOI)
-        try { dc!.send(maGoiDiem({ phien, tGui, dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu) })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ }
-        n.truocDc = n.daDc; n.daDc = tong
+        if (dcDuoc) {
+          // Gói = lô liền trước + lô mới ⇒ mất MỘT gói không thủng nét.
+          const tu = Math.max(n.truocDc, tong - DIEM_TOI_DA_MOT_GOI)
+          try { dc!.send(maGoiDiem({ phien, tGui, dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu) })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ }
+          n.truocDc = n.daDc; n.daDc = tong; daDc = true
+        } else conDc = true
       }
       if (canWs && n.daWs < tong) {
         if (wsDuoc) {
@@ -307,13 +313,19 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
         } else conWs = true
       } else if (!canWs) n.daWs = tong
     }
-    if (troCho) {
-      const k = maTro({ phien, tGui, ...troCho })
-      if (coDc) { try { dc!.send(k); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } }
-      if (canWs && !wsDuoc) conWs = true
-      else { if (canWs) { tuy.kenh.guiNhiPhan(k); dem.goiWs += 1; lucWs = nay } troCho = null }
+    // Con trỏ lơ lửng + (11/11) độ cuộn của bảng đen (`tro` có x > 1,5): hai ô chờ riêng để cái này không đè cái kia.
+    // Đường DataChannel gửi ngay, mỗi vị trí một lần (kể cả khi đường WebSocket còn phải chờ lượt). Trả true = đã gửi xong mọi đường cần gửi.
+    const guiTro = (o: { x: number; y: number; dc?: boolean }): boolean => {
+      const k = maTro({ phien, tGui, x: o.x, y: o.y })
+      if (coDc && !o.dc) { if (dcDuoc) { try { dc!.send(k); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } o.dc = true; daDc = true } else conDc = true }
+      if (canWs) { if (!wsDuoc) { conWs = true; return false } tuy.kenh.guiNhiPhan(k); dem.goiWs += 1; lucWs = nay; wsDuoc = false }
+      return !coDc || !!o.dc
     }
-    if (conWs) henXaSau(Math.max(1, WS_CACH_MS - (nay - lucWs)))
+    if (troCho && guiTro(troCho)) troCho = null
+    if (cuonCho && guiTro(cuonCho)) cuonCho = null
+    if (daDc) lucDc = nay
+    if (conDc) henXaSau(Math.max(1, DC_CACH_MS - (nay - lucDc)))
+    else if (conWs) henXaSau(Math.max(1, WS_CACH_MS - (nay - lucWs)))
   }
   /** Bút nhấc khỏi bảng: xả nốt điểm, báo nhấc (DataChannel gửi hai lần vì không tin cậy). */
   function nhacBut(id: string): void {
@@ -321,8 +333,11 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     if (!n) return
     if (dangLive()) {
       if (henXa != null) { mt.huyHen(henXa); henXa = null }
-      lucWs = -1e9 // lô cuối của nét luôn được đi ngay
+      lucWs = lucDc = -1e9 // lô cuối của nét luôn được đi ngay
+      const tuLap = n.daDc // đầu lô áp chót (sau `xa` nó thành «lô liền trước» của gói cuối)
       xa()
+      // Gói CUỐI của nét không có gói nào sau nó lặp lại ⇒ gửi DataChannel thêm một lần (11/11: mất gói cuối là đuôi nét hiện muộn thành một cục).
+      if (!live!.nghi && dcMo() && n.tGoc != null && n.diem.length) { const tu = Math.max(0, Math.min(tuLap, n.truocDc), n.diem.length - DIEM_TOI_DA_MOT_GOI); try { dc!.send(maGoiDiem({ phien: live!.phien, tGui: tLive(), dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu) })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } }
       const k = maNhac({ phien: live!.phien, tGui: tLive(), id, tong: n.diem.length })
       if (dcMo()) { try { dc!.send(k); dc!.send(k); dem.goiDc += 2 } catch { /* kênh vừa đóng */ } }
       if (!dcMo() || tt.xemWs > 0) { tuy.kenh.guiNhiPhan(k); dem.goiWs += 1 }
@@ -362,7 +377,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       guiAnh({ trang: sk.trang, tiLe: sk.tiLe, net: sk.net })
     } else if (sk.loai === 'tro') {
       if (!dangLive()) return
-      troCho = { x: sk.x, y: sk.y }
+      if (sk.x > 1.5) cuonCho = { x: sk.x, y: sk.y }
+      else troCho = { x: sk.x, y: sk.y }
       henXaSau(XA_MS)
     }
   }

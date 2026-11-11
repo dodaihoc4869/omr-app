@@ -250,12 +250,11 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       if (m.gio() >= 0 && !S.current.dangDung) {
         const f = m.buoc(t)
         v.datDau(f.dau)
+        // Con trỏ = CÂY BÚT của bảng live (11/11, tro-but.ts): lớp vẽ tự vẽ nó trên lớp «đang viết», ngòi ở đúng đầu nét, bảng đã cuộn thì trôi theo.
+        // Phần tử `.xp-tro` (chấm tròn cũ) để nguyên, không hiện nữa.
+        const dn = f.dau.length ? f.dau[f.dau.length - 1]! : null
+        v.datBut(f.tro ? { x: f.tro.x, y: f.tro.y, cham: !!dn, net: dn?.id } : null)
         v.veSong()
-        const tr = tro.current
-        if (tr) {
-          if (f.tro) { const [x, y] = v.toiPx(f.tro.x, f.tro.y); tr.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`; tr.style.opacity = '1' }
-          else tr.style.opacity = '0'
-        }
       }
       // thanh tua + giờ: đổi thẳng DOM (không vẽ lại React mỗi khung)
       const ray = tua.current?.children[S.current.vt]?.querySelector<HTMLElement>('.xp-ray')

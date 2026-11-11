@@ -1,0 +1,97 @@
+{
+  "ten": "truoc",
+  "ngay": "2026-11-11T02:04:45.377Z",
+  "may": "Chromium không đầu /opt/pw-browsers, thầy 1366 × 768, máy em 844 × 390 @2x; phòng thật trong Node; nét đi WebSocket của phòng (không SFU, không mạng thật)",
+  "nhipMuc": {
+    "soNet": 65,
+    "cachKhungCoMucMs": {
+      "n": 750,
+      "trungVi": 16.7,
+      "p95": 17.2,
+      "lonNhat": 33.4
+    },
+    "quangDungDaiNhatMoiNetMs": {
+      "n": 65,
+      "trungVi": 17.1,
+      "p95": 19.3,
+      "lonNhat": 33.4
+    },
+    "quangDungTu50Ms": 0,
+    "treChamButToiMucMs": {
+      "n": 65,
+      "trungVi": 69.3,
+      "p95": 79.6,
+      "lonNhat": 85.7
+    },
+    "conTro": {
+      "khungMucChay": 748,
+      "trongDoConTroDungIm": 732,
+      "dungRoiNhay6px": 46
+    }
+  },
+  "uotSoKhoMayEm": {
+    "soNet": 5,
+    "netCoKhac": 5,
+    "diemAnhKhac": 70,
+    "khac16": 28,
+    "mucLon": 54,
+    "ghiChu": "ô bảng đen của máy em ở đúng điểm ảnh thiết bị (@2x)"
+  },
+  "khungHinhMayEm": [
+    {
+      "cpu": "×1",
+      "khungMoiGiay": 60,
+      "cachKhungP95Ms": 16.7,
+      "khungTreHon20Ms": 0,
+      "soKhung": 315,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 0.2,
+        "lonNhat": 0.3
+      },
+      "luongChinhBanPhanTram": 8.5,
+      "maPhanTram": 0.9,
+      "boCucPhanTram": 0,
+      "tinhKieuPhanTram": 0.1,
+      "soLanBoCuc": 0,
+      "soLanTinhKieu": 68
+    },
+    {
+      "cpu": "×4",
+      "khungMoiGiay": 60,
+      "cachKhungP95Ms": 16.8,
+      "khungTreHon20Ms": 0,
+      "soKhung": 311,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 0.9,
+        "lonNhat": 2.1
+      },
+      "luongChinhBanPhanTram": 28.5,
+      "maPhanTram": 3,
+      "boCucPhanTram": 0,
+      "tinhKieuPhanTram": 0.5,
+      "soLanBoCuc": 0,
+      "soLanTinhKieu": 57
+    },
+    {
+      "cpu": "×6",
+      "khungMoiGiay": 60,
+      "cachKhungP95Ms": 16.8,
+      "khungTreHon20Ms": 0,
+      "soKhung": 318,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 1.5,
+        "lonNhat": 5.5
+      },
+      "luongChinhBanPhanTram": 42.2,
+      "maPhanTram": 3.7,
+      "boCucPhanTram": 0,
+      "tinhKieuPhanTram": 0.6,
+      "soLanBoCuc": 0,
+      "soLanTinhKieu": 60
+    }
+  ],
+  "loiTrang": []
+}
