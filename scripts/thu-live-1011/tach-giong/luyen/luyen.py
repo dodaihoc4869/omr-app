@@ -95,6 +95,7 @@ def napMo():
     except Exception: dai = {}
     MO = [(rf(f), float(dai.get(os.path.basename(f)[:-4], 8000))) for f in sorted(glob.glob(os.path.join(goc, '*.f32')))]
 napMo()
+LUOT = float(os.environ.get('TG_LUOT', '0'))   # tỉ lệ mẫu LUÂN LƯỢT (xem mau()); nên kèm TG_GIAY ≥ 4 để quãng một mình đủ dài
 GIA = min(0.2, float(os.environ.get('TG_GIA', '0.15')))   # tỉ lệ giọng khác là «NGƯỜI GIẢ» — ≤ 20 % (dao hai lưỡi: mạng có thể học hạ cả thầy lúc nói cao giọng)
 def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant CÙNG LÚC (nội suy lại) với độ lệch LỚN: ×1,25–1,6 (nữ / trẻ) hoặc ×0,68–0,75 (nam trầm hơn)
     r = rng.uniform(1.25, 1.6) if rng.random() < 0.7 else rng.uniform(0.68, 0.75); m = int(np.ceil(n * r)); x = cat(thay, m)
@@ -109,8 +110,14 @@ def loa(x):  # mô phỏng «loa phòng → mic»: dải thông của loa nhỏ 
 def mau(thay, khac, am, rr=None):
     """Một mẫu 3 s: (Y phức, S phức) — Y = thầy + giọng khác + ồn, S = chỉ thầy (cùng EQ, cùng vang, cùng mức)."""
     t = (tocDo(thay, L) if rng.random() < 0.5 else cat(thay, L)) if rng.random() > 0.12 else np.zeros(L, np.float32)
+    # LUÂN LƯỢT (lượt 3, TG_LUOT = tỉ lệ mẫu, mặc định 0 = như cũ): thầy nói rồi DỪNG một quãng dài [a, b) (35–80 % mẫu) cho người khác nói MỘT MÌNH, có khi thầy
+    # nói lại. Mẫu cũ: thầy nói gần suốt mẫu (chỉ hở ≤ 0,6 s giữa các đoạn) ⇒ mạng chưa từng gặp «thầy vừa nói xong, người khác nói một mình vài giây» —
+    # bản đo 18 s cho thấy đúng chỗ này lọt: giọng khác giảm 7–10 dB ở 0,25–0,5 s đầu rồi tụt còn 3–4,5 dB ở 2–4 s (mục 11.7).
+    luot = LUOT > 0 and t.any() and rng.random() < LUOT
+    if luot: a_l = int(rng.uniform(0.15, 0.5) * L); b_l = min(L, a_l + int(rng.uniform(0.35, 0.8) * L)); t = t.copy(); t[a_l:b_l] = 0
     if rng.random() < 0.4 and t.any(): t = vang(t, rng.uniform(0.1, 0.35), rng.uniform(6, 20))
     n_k = 0 if rng.random() < 0.15 else (2 if rng.random() < 0.2 else 1); i = np.zeros(L, np.float32)
+    if luot: n_k = max(n_k, 1)
     dai = 12000.0   # dải gốc hẹp nhất trong mẫu (Hz): giọng thầy / AudioMNIST / giọng thật trong lớp ≥ 11 kHz; kho mở 16 kHz chỉ tới 8 kHz
     for _ in range(n_k):
         u = rng.random()
@@ -122,7 +129,9 @@ def mau(thay, khac, am, rr=None):
             s = (tocDo(nguon, L) if rng.random() < 0.3 else cat(nguon, L)).copy()
         if rng.random() < 0.25: s = loa(s)   # tiếng em PHÁT RA LOA LỚP rồi vào mic thầy (máy thầy luôn phát tiếng em ra loa — chốt 11/11)
         if rng.random() < 0.6: s = vang(s, rng.uniform(0.2, 0.7), rng.uniform(-3, 10))
-        if rng.random() < 0.6:  # chỉ nói một khúc ⇒ có lúc một mình, lúc chồng, có điểm bắt đầu / dứt
+        if luot:   # người khác vào sau khi thầy dừng 0–0,4 s, dứt quanh lúc thầy nói lại (± 0,3 s ⇒ có chồng ngắn hoặc hở)
+            c0 = min(L, a_l + int(rng.uniform(0, 0.4) * HZ)); c1 = max(c0, min(L, b_l + int(rng.uniform(-0.3, 0.3) * HZ))); s[:c0] = 0; s[c1:] = 0
+        elif rng.random() < 0.6:  # chỉ nói một khúc ⇒ có lúc một mình, lúc chồng, có điểm bắt đầu / dứt
             a = rng.integers(0, L // 2); b = rng.integers(a + L // 4, L + 1); s[:a] = 0; s[b:] = 0
         r = rmsHd(s)
         if r > 0: i += s / r * 10 ** (-rng.uniform(-8, 8) / 20)   # đo thật: giọng khác thấp hơn thầy ≈ 2 dB (−4,4…+7,4)

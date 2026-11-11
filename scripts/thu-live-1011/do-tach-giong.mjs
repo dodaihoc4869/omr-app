@@ -64,10 +64,13 @@ function canh(khac, snr) {
   const s = (g) => Math.round(g * HZ), dai = s(18.2)
   const tT = new Float32Array(dai), tO = new Float32Array(dai), nhan = new Uint8Array(Math.ceil(dai / K)) // 1 thầy · 2 khác · 3 chồng · 4 thầy sau khác
   const dat = (dich, nguon, tu, tuNguon, dai2) => { for (let i = 0; i < dai2 && tu + i < dich.length && tuNguon + i < nguon.length; i++) dich[tu + i] = nguon[tuNguon + i] }
-  const nT = T.length, a = Math.floor(nT / 2)
+  // SỬA LƯỢT 3: mỗi khúc thầy / chồng dài ĐÚNG 2,8 s. Trước đây dài nT / 2 — đúng với giong-nam.wav (10,6 s ⇒ 2,8 s) nhưng với LV_THAY dài (giọng thầy thật
+  // 32 s ⇒ 13,5 s) thầy nói LIỀN từ 0,3 tới 18,2 s và giọng khác kéo tới 18,2 s ⇒ hai đoạn «khác một mình» và đoạn «thầy sau khác» thật ra là NÓI CHỒNG
+  // ⇒ «giọng khác giảm» và «mở sau» của mô hình ở mục 11.2 / 11.4 (LV_THAY) đo SAI (thấp); «thầy một mình», «nói chồng», giữ dải không bị ảnh hưởng.
+  const nT = T.length, a = Math.min(Math.floor(nT / 2), s(2.8)), b2 = Math.min(nT - a, s(2.8))
   dat(tT, T, s(0.3), 0, a)                       // [0,3; 3,1) thầy một mình
   dat(tO, O, s(3.6), 0, s(3))                    // [3,6; 6,6) khác một mình
-  dat(tT, T, s(7.1), a, nT - a); dat(tO, O, s(7.1), s(3) % O.length, nT - a) // [7,1; 9,9) chồng
+  dat(tT, T, s(7.1), a, b2); dat(tO, O, s(7.1), s(3) % O.length, b2) // [7,1; 9,9) chồng
   dat(tO, O, s(10.4), s(0.5), s(3.5))            // [10,4; 13,9) khác một mình
   dat(tT, T, s(14.05), 0, a)                     // [14,05; …) thầy NGAY sau khác (hở 150 ms)
   for (let k = 0; k < nhan.length; k++) { const t = (k * K) / HZ; nhan[k] = t >= 0.3 && t < 3.1 ? 1 : t >= 3.6 && t < 6.6 ? 2 : t >= 7.1 && t < 9.9 ? 3 : t >= 10.4 && t < 13.9 ? 2 : t >= 14.05 && t < 16.8 ? 4 : 0 }
@@ -182,7 +185,10 @@ for (const snr of (process.env.LV_SNR ?? '0,2,10').split(',').map(Number)) {
       if (r.rO) { const MOC = [[0, 250], [250, 500], [500, 1000], [1000, 2000], [2000, 4000]], eV = MOC.map(() => 0), eR = MOC.map(() => 0); let k0 = -1
         for (let k = 0; k < c.nhan.length; k++) { if (c.nhan[k] !== 2) { k0 = -1; continue } if (k0 < 0) k0 = k; const ms = ((k - k0) * K * 1000) / HZ, j0 = MOC.findIndex(([a, b]) => ms >= a && ms < b); if (j0 < 0) continue
           for (let j = 0; j < K; j++) { eV[j0] += (c.tO[k * K + j] ?? 0) ** 2; eR[j0] += (r.rO[k * K + j + tre] ?? 0) ** 2 } }
-        MOC.forEach(([a, b], j) => { theoTg[`${a}-${b}ms`] = +db(eV[j] / Math.max(eR[j], 1e-20)).toFixed(1) }) }
+        MOC.forEach(([a, b], j) => { theoTg[`${a}-${b}ms`] = +db(eV[j] / Math.max(eR[j], 1e-20)).toFixed(1) })
+        // từng đoạn «khác một mình»: [3,6; 6,6) ngay sau THẦY · [10,4; 13,9) ngay sau NÓI CHỒNG
+        const dv = [0, 0], dr = [0, 0]; for (let k = 0; k < c.nhan.length; k++) { if (c.nhan[k] !== 2) continue; const i2 = (k * K) / HZ < 8 ? 0 : 1; for (let j = 0; j < K; j++) { dv[i2] += (c.tO[k * K + j] ?? 0) ** 2; dr[i2] += (r.rO[k * K + j + tre] ?? 0) ** 2 } }
+        theoTg.sauThay = +db(dv[0] / Math.max(dr[0], 1e-20)).toFixed(1); theoTg.sauChong = +db(dv[1] / Math.max(dr[1], 1e-20)).toFixed(1) }
       const tGiu = siSdr(doan(r.ra, c.nhan, 1, tre), doan(c.vao, c.nhan, 1))
       const chong = siSdr(doan(r.ra, c.nhan, 3, tre), doan(c.tT, c.nhan, 3)), chong0 = siSdr(doan(c.vao, c.nhan, 3), doan(c.tT, c.nhan, 3))
       let ha = 0, ha1 = 0, tong = 0; if (r.g) for (let k = 0; k < c.nhan.length; k++) if (c.nhan[k] === 1 || c.nhan[k] === 4) { let e = 0; for (let j = 0; j < K; j++) e += (c.tT[k * K + j] ?? 0) ** 2; if (e / K > 1e-6) { tong++; if (r.g[k] < 0.708) { ha++; if (c.nhan[k] === 1) ha1++ } } }
