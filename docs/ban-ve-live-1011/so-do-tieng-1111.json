@@ -1661,12 +1661,12 @@
    "mic": "Fake Audio Input 1",
    "boGuiCamMic": true,
    "emNangLuongTangSauMs": 101,
-   "nhanRmsDb": -13.2,
+   "nhanRmsDb": -13.3,
    "boGuiBao": 1,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 59
+   "kbpsNhan": 59.7
   },
   {
    "buoc": "đổi sang «Fake Audio Input 2» TRONG lúc live",
@@ -1678,7 +1678,7 @@
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 53.9
+   "kbpsNhan": 54.4
   },
   {
    "buoc": "tạm dừng (phía em phải đứng yên)",
@@ -1696,80 +1696,80 @@
    "buoc": "tiếp tục",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
-   "emNangLuongTangSauMs": 202,
-   "nhanRmsDb": -27.9,
-   "boGuiBao": 0.16,
-   "vach": 0.85,
+   "emNangLuongTangSauMs": 207,
+   "nhanRmsDb": -27.4,
+   "boGuiBao": 0.14,
+   "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 43.4
+   "kbpsNhan": 44.9
   },
   {
    "buoc": "3 giây sau khi tiếp tục",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
-   "emNangLuongTangSauMs": 402,
-   "nhanRmsDb": -21.4,
+   "emNangLuongTangSauMs": 404,
+   "nhanRmsDb": -21.3,
    "boGuiBao": 1,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 56.3
+   "kbpsNhan": 53.9
   },
   {
    "buoc": "thầy ép lọc «Bật» (mở lại cùng mic)",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
    "emNangLuongTangSauMs": 101,
-   "nhanRmsDb": -16.9,
+   "nhanRmsDb": -17,
    "boGuiBao": 1,
    "vach": 1,
    "vong": true,
    "bac": 0,
-   "kbpsNhan": 59.1
+   "kbpsNhan": 59.4
   },
   {
    "buoc": "về «Tự động»",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
-   "emNangLuongTangSauMs": 102,
-   "nhanRmsDb": -17.4,
+   "emNangLuongTangSauMs": 101,
+   "nhanRmsDb": -17.3,
    "boGuiBao": 1,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 60.6
+   "kbpsNhan": 60.7
   },
   {
    "buoc": "gọi em lên bảng (em chưa bật mic)",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
    "emNangLuongTangSauMs": 101,
-   "nhanRmsDb": -22.3,
+   "nhanRmsDb": -22,
    "boGuiBao": 1,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 57.5
+   "kbpsNhan": 58.3
   },
   {
    "buoc": "em bật mic ⇒ máy thầy kéo tiếng em về (phòng nhận mic em: true; đàm phán lại: 1 lời mời, 1 câu trả lời)",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
    "emNangLuongTangSauMs": 101,
-   "nhanRmsDb": -24.6,
+   "nhanRmsDb": -25.2,
    "boGuiBao": 1,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 41.5
+   "kbpsNhan": 40.1
   },
   {
    "buoc": "em tắt mic / thầy thu mic",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
    "emNangLuongTangSauMs": 101,
-   "nhanRmsDb": -15.2,
+   "nhanRmsDb": -15.1,
    "boGuiBao": 1,
    "vach": 1,
    "vong": true,
@@ -1781,12 +1781,12 @@
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
    "emNangLuongTangSauMs": 101,
-   "nhanRmsDb": -14.1,
+   "nhanRmsDb": -13.9,
    "boGuiBao": 1,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 51.8
+   "kbpsNhan": 55.7
   },
   {
    "buoc": "kết thúc live (phía em phải đứng yên)",
@@ -1804,15 +1804,15 @@
    "buoc": "bật live lại",
    "mic": "Fake Audio Input 2",
    "boGuiCamMic": true,
-   "emNangLuongTangSauMs": 404,
-   "nhanRmsDb": -15.6,
-   "boGuiBao": 1,
+   "emNangLuongTangSauMs": 304,
+   "nhanRmsDb": -15.2,
+   "boGuiBao": 0.58,
    "vach": 1,
    "vong": false,
    "bac": 0,
-   "kbpsNhan": 57.6
+   "kbpsNhan": 57.4
   }
  ],
  "doiMicDat": true,
- "lucDoiMic": "2026-11-11T05:53:46.299Z"
+ "lucDoiMic": "2026-11-11T06:07:23.752Z"
 }

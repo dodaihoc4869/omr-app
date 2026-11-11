@@ -7,13 +7,14 @@
 // «tiếng nước» = độ lệch chuẩn theo thời gian của ồn dư từng băng (dB) · trễ thêm (ms) · thời gian xử lý mỗi khung 10 ms.
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 const GOC = resolve(import.meta.dirname, '../..')
 const WASM = resolve(process.argv[2] ?? join(GOC, 'src/lib/live/loc-on/rnnoise.wasm'))
 const RA = resolve(process.argv[3] ?? join(GOC, 'docs/ban-ve-live-1011/so-do-loc-on-1111.json'))
 const HZ = 48000, K = 480, GIAY = 14
 
-// ── RNNoise (wasm thô, không lớp keo) ──
+// ── RNNoise (wasm thô, không lớp keo): trả hàm (khung 480) ⇒ { y: khung đã lọc (trễ 10 ms), vad: xác suất có giọng } ──
 function taoRnnoise() {
   let bo
   const kq = new WebAssembly.Instance(new WebAssembly.Module(readFileSync(WASM)), { env: { emscripten_memcpy_big: (d, s, n) => { new Uint8Array(bo.buffer).copyWithin(d, s, s + n) } /* KHÔNG trả mảng về wasm: đổi cả mảng 16 MB ra số mất ≈ 1 giây mỗi lần gọi */, emscripten_resize_heap: () => 0, __assert_fail: () => { throw new Error('rnnoise') } } })
@@ -21,15 +22,51 @@ function taoRnnoise() {
   bo = x.memory
   x.emscripten_stack_init?.(); x.__wasm_call_ctors?.()
   const st = x.rnnoise_create(0), pv = x.malloc(K * 4), pr = x.malloc(K * 4)
-  return (khung) => { const f = new Float32Array(bo.buffer, pv, K); for (let i = 0; i < K; i++) f[i] = khung[i] * 32768 + (Math.random() - 0.5) * 0.1 /* rung ≈ −116 dBFS: số 0 tuyệt đối làm bộ lọc chạy số siêu nhỏ, chậm đi */; x.rnnoise_process_frame(st, pr, pv); const r = new Float32Array(bo.buffer, pr, K), y = new Float32Array(K); for (let i = 0; i < K; i++) y[i] = r[i] / 32768; return y }
+  return (khung) => { const f = new Float32Array(bo.buffer, pv, K); for (let i = 0; i < K; i++) f[i] = khung[i] * 32768 + (Math.random() - 0.5) * 0.1; const vad = x.rnnoise_process_frame(st, pr, pv); const r = new Float32Array(bo.buffer, pr, K), y = new Float32Array(K); for (let i = 0; i < K; i++) y[i] = r[i] / 32768; return { y, vad } }
 }
-/** Chạy cả tín hiệu qua bộ lọc; `kho` = phần giọng gốc trộn lại (0 = lọc hết cỡ). Trả đầu ra + thời gian mỗi khung (ms). */
-function loc(x, kho) {
-  const f = taoRnnoise(), y = new Float32Array(x.length)
+/** TRỘN của app (chép đúng thuật toán trong Worker — src/lib/live/chuoi-tieng.ts, hàm locOn). `th` null = lọc hết cỡ; `th.kho` = trộn cố định (bản 1);
+ *  bản 2 (theo xác suất có giọng + tách băng 3,5 kHz): băng thấp = lọc × (1 − k) + gốc × k với k = khoNoi lúc có giọng / khoIm lúc im; băng cao = gốc × cao
+ *  lúc có giọng; cả tín hiệu nhân cổng (1 lúc có giọng → `san` lúc im, mở trong một khung — sớm hơn tiếng 10 ms nhờ trễ của bộ lọc, đóng êm ≈ 100 ms,
+ *  giữ 120 ms sau tiếng cuối). */
+function tron(x, th) {
+  const f = taoRnnoise(), y = new Float32Array(x.length), cu = new Float32Array(K)
+  let k = th?.khoIm ?? 0, cong = th?.san ?? 1, giu = 0, mucNoi = 0, lw = [0, 0, 0, 0], ld = [0, 0, 0, 0]
+  // Butterworth bậc 2 thông thấp 3,5 kHz
+  const w0 = (2 * Math.PI * 3500) / HZ, al = Math.sin(w0) / (2 * Math.SQRT1_2), a0 = 1 + al, b0 = (1 - Math.cos(w0)) / 2 / a0, b1 = (1 - Math.cos(w0)) / a0, a1 = (-2 * Math.cos(w0)) / a0, a2 = (1 - al) / a0
+  const thap = (v, z) => { const o = b0 * v + b1 * z[0] + b0 * z[1] - a1 * z[2] - a2 * z[3]; z[1] = z[0]; z[0] = v; z[3] = z[2]; z[2] = o; return o }
   const t0 = process.hrtime.bigint()
-  for (let d = 0; d + K <= x.length; d += K) y.set(f(x.subarray(d, d + K)), d)
-  const ms = Number(process.hrtime.bigint() - t0) / 1e6 / Math.floor(x.length / K)
-  return { y, ms, kho }
+  for (let d = 0; d + K <= x.length; d += K) {
+    const kh = x.subarray(d, d + K), r = f(kh)
+    if (!th) y.set(r.y, d)
+    else if (th.kho != null) for (let i = 0; i < K; i++) y[d + i] = r.y[i] * (1 - th.kho) + cu[i] * th.kho
+    else {
+      // CÓ GIỌNG = bộ lọc báo có giọng VÀ khung đã lọc to hơn −15 dB so với mức giọng gần đây (xôn xao nhỏ hơn giọng thầy không mở được cổng); giữ 120 ms
+      let e = 0; for (let i = 0; i < K; i++) e += r.y[i] * r.y[i]
+      const rw = Math.sqrt(e / K); mucNoi = Math.max(mucNoi * 0.9995, rw)
+      if (r.vad > 0.6 && rw > 0.18 * mucNoi) giu = 12; else if (giu > 0) giu -= 1
+      const noi = giu > 0, k1 = noi ? th.khoNoi : Math.max(th.khoIm, k - 0.1), c1 = noi ? 1 : th.san + (cong - th.san) * Math.exp(-10 / 100), cao1 = noi ? th.cao : 0, k0 = k, c0 = cong
+      for (let i = 0; i < K; i++) {
+        const t = (i + 1) / K, kk = k0 + (k1 - k0) * t, cc = c0 + (c1 - c0) * t, goc = cu[i], tg = thap(goc, ld)
+        y[d + i] = (thap(r.y[i] * (1 - kk) + goc * kk, lw) + (goc - tg) * Math.max(cao1, kk)) * cc
+      }
+      k = k1; cong = c1
+    }
+    cu.set(kh)
+  }
+  return { y, ms: Number(process.hrtime.bigint() - t0) / 1e6 / Math.floor(x.length / K) }
+}
+/** Bộ lọc của gói @sapphi-red/web-noise-suppressor chạy bằng CHÍNH lớp AudioWorklet của gói, trong một phạm vi worklet giả (khối 128 mẫu). */
+async function taoWorklet(tepJs, tepWasm) {
+  let Lop = null
+  globalThis.AudioWorkletProcessor = class { constructor() { this.port = { postMessage() {}, onmessage: null, addEventListener() {}, start() {} } } }
+  globalThis.registerProcessor = (_, L) => { Lop = L }
+  globalThis.sampleRate = HZ; globalThis.currentFrame = 0; globalThis.currentTime = 0
+  await import(pathToFileURL(tepJs).href)
+  if (!Lop) throw new Error('gói không đăng ký bộ xử lý')
+  const b = readFileSync(tepWasm)
+  const tao = () => new Lop({ numberOfInputs: 1, numberOfOutputs: 1, processorOptions: { maxChannels: 1, wasmBinary: b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength) } })
+  tao()
+  return (x) => { const p = tao(), y = new Float32Array(x.length), t0 = process.hrtime.bigint(); for (let d = 0; d + 128 <= x.length; d += 128) { const ra = [[new Float32Array(128)]]; p.process([[x.subarray(d, d + 128)]], ra, {}); y.set(ra[0][0], d) } return { y, ms: (Number(process.hrtime.bigint() - t0) / 1e6 / Math.floor(x.length / 128)) * 3.75 } }
 }
 
 // ── Tín hiệu ──
@@ -74,38 +111,45 @@ function onIm(y, noi, tre) { const xa = new Uint8Array(noi.length); for (let i =
 function daiTan(y, s, tre) { let tren = 0; for (let b = 0; b < 40; b++) { const f = 200 * Math.pow(100, b / 39), w = (2 * Math.PI * f) / HZ; const nl = (m, lech) => { let t = 0; for (let d = HZ; d + 2048 + lech < m.length; d += 9600) { let re = 0, im = 0; for (let i = 0; i < 2048; i++) { re += m[d + lech + i] * Math.cos(w * i); im -= m[d + lech + i] * Math.sin(w * i) } t += re * re + im * im } return t }; if (db(nl(y, tre) / nl(s, 0)) > -3) tren = f } return Math.round(tren) }
 
 const r1 = (v) => (v == null ? null : Math.round(v * 10) / 10)
+const tb = (a) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : null)
 const GIONG = { 'giọng nam': giong(105, 150, 1), 'giọng nữ / trẻ': giong(220, 320, 1.17) }
 const ON = { 'quạt / điều hoà': onQuat(), 'xôn xao lớp học': onXonXao(), 'gõ bút / bàn phím': onGo() }
-const MUC = { 'không lọc': null, 'Vừa (giữ 25 % nền)': 0.25, 'Mạnh (giữ 6 % nền)': 0.06, 'lọc hết cỡ (0 % nền)': 0 }
-const ra = { luc: new Date().toISOString(), wasm: WASM.replace(GOC + '/', ''), ghiChu: 'Ngoại tuyến trong Node, tín hiệu tổng hợp 48 kHz; RNNoise khung 480 mẫu. Trộn: đầu ra = lọc × (1 − kho) + gốc (đã lùi cho khớp trễ) × kho.', sach: {}, on: [] }
-
-// (1) giọng SẠCH đi qua bộ lọc: bộ lọc làm hỏng giọng bao nhiêu
-let TRE = 0, msKhung = 0
-for (const [ten, g] of Object.entries(GIONG)) {
-  const s = nhan(g.m, 0.1 / rms(g.m, g.noi)), k = loc(s, 0)
-  TRE = timTre(k.y, s); msKhung = k.ms
-  const hang = { giong: ten, treMau: TRE, treMs: r1(TRE / 48) }
-  for (const [tm, kho] of Object.entries(MUC)) { if (kho == null) continue; const y = new Float32Array(s.length); for (let i = TRE; i < s.length; i++) y[i] = k.y[i] * (1 - kho) + s[i - TRE] * kho; hang[tm] = { siSdr: r1(siSdr(y, s, TRE)), den3dBHz: daiTan(y, s, TRE) } }
-  ra.sach[ten] = hang
-  console.log(`Giọng sạch · ${ten}: trễ ${hang.treMs} ms · ` + Object.entries(MUC).filter(([, v]) => v != null).map(([tm]) => `${tm}: SI-SDR ${hang[tm].siSdr} dB, còn tới ${hang[tm].den3dBHz} Hz`).join(' · '))
+const VUA2 = { khoNoi: 0.5, khoIm: 0.2, cao: 1, san: 0.4 }, MANH2 = { khoNoi: 0.25, khoIm: 0.05, cao: 0.9, san: 0.25 }
+const BO = [
+  { ten: 'không lọc', chay: (x) => ({ y: x, ms: 0 }), kb: 0 },
+  { ten: 'RNNoise lọc hết cỡ', chay: (x) => tron(x, null), kb: 157 },
+  { ten: 'RNNoise «Vừa» bản 1 (trộn cố định 25 %)', chay: (x) => tron(x, { kho: 0.25 }), kb: 157 },
+  { ten: 'RNNoise «Mạnh» bản 1 (trộn cố định 6 %)', chay: (x) => tron(x, { kho: 0.06 }), kb: 157 },
+  { ten: 'RNNoise «Vừa» bản 2 (theo giọng + tách băng)', chay: (x) => tron(x, VUA2), kb: 157 },
+  { ten: 'RNNoise «Mạnh» bản 2 (theo giọng + tách băng)', chay: (x) => tron(x, MANH2), kb: 157 },
+]
+const GOI = process.env.LV_GOI // thư mục gói @sapphi-red/web-noise-suppressor đã giải nén (không cài vào dự án) ⇒ đo thêm Speex + GTCRN
+const khongChay = []
+if (GOI) for (const [ten, thuMuc, wasm, kb] of [['Speex (gói sapphi)', 'speex', 'speex.wasm', 56], ['GTCRN (gói sapphi)', 'gtcrn', 'gtcrn.wasm', 197]]) {
+  try { const f = await taoWorklet(join(GOI, 'dist', thuMuc, 'workletProcessor.js'), join(GOI, 'dist', wasm)); const thu = new Float32Array(48000); for (let i = 0; i < thu.length; i++) thu[i] = 0.1 * Math.sin(i * 0.05); if (rms(f(thu).y) < 1e-6) throw new Error('đầu ra toàn số 0 trong phạm vi AudioWorklet giả của Node (bộ xử lý của gói chưa khởi tạo xong bộ wasm)'); BO.push({ ten, chay: f, kb }) } catch (e) { khongChay.push({ ten, viSao: String(e?.message ?? e).slice(0, 160) }); console.log(`KHÔNG chạy được ${ten}: ${String(e?.message ?? e).slice(0, 160)}`) }
 }
-ra.msMoiKhung = Math.round(msKhung * 1000) / 1000
-ra.cpuPhanTram = r1((msKhung / 10) * 100)
-console.log(`Xử lý: ${ra.msMoiKhung} ms mỗi khung 10 ms = ${ra.cpuPhanTram} % một lõi (máy này); CPU ×4: ${r1(ra.cpuPhanTram * 4)} %`)
-
-// (2) giọng + ồn
-for (const [tg, g] of Object.entries(GIONG)) for (const [to, o] of Object.entries(ON)) for (const snr of [0, 10, 20]) {
-  const s = nhan(g.m, 0.1 / rms(g.m, g.noi)), n = nhan(o, (0.1 / Math.pow(10, snr / 20)) / rms(o)), x = new Float32Array(s.length)
-  for (let i = 0; i < x.length; i++) x[i] = s[i] + n[i]
-  const k = loc(x, 0), hang = { giong: tg, on: to, snr }
-  const on0 = onIm(x, g.noi, 0), sdr0 = siSdr(x, s, 0), nuoc0 = tiengNuoc(x, g.noi, 0)
-  for (const [tm, kho] of Object.entries(MUC)) {
-    if (kho == null) { hang[tm] = { giamOn: 0, siSdr: r1(sdr0), tiengNuoc: r1(nuoc0) }; continue }
-    const y = new Float32Array(x.length); for (let i = TRE; i < x.length; i++) y[i] = k.y[i] * (1 - kho) + x[i - TRE] * kho
-    hang[tm] = { giamOn: r1(db(on0 / onIm(y, g.noi, TRE))), siSdr: r1(siSdr(y, s, TRE)), hon: r1(siSdr(y, s, TRE) - sdr0), tiengNuoc: r1(tiengNuoc(y, g.noi, TRE)) }
+const ra = { luc: new Date().toISOString(), wasm: WASM.replace(GOC + '/', ''), ghiChu: 'Ngoại tuyến trong Node, tín hiệu tổng hợp 48 kHz. Mỗi bộ: 2 giọng × 3 loại ồn × tín / ồn 0 / 10 / 20 dB.', khongChay, bo: [] }
+for (const b of BO) {
+  const h = { ten: b.ten, kb: b.kb, sach: {}, on: {} }
+  let tre = 0, ms = 0
+  for (const [tg, g] of Object.entries(GIONG)) {
+    const s = nhan(g.m, 0.1 / rms(g.m, g.noi)), k = b.chay(s)
+    tre = b.kb ? timTre(k.y, s) : 0; ms = k.ms
+    h.sach[tg] = { siSdr: b.kb ? r1(siSdr(k.y, s, tre)) : null, den3dBHz: b.kb ? daiTan(k.y, s, tre) : null }
   }
-  ra.on.push(hang)
-  console.log(`${tg} + ${to} @ ${snr} dB: ` + Object.entries(MUC).map(([tm]) => `${tm.split(' ')[0]} giảm ồn ${hang[tm].giamOn} · SI-SDR ${hang[tm].siSdr} · nước ${hang[tm].tiengNuoc}`).join(' | '))
+  h.treMs = r1(tre / 48); h.msMoiKhung = Math.round(ms * 1000) / 1000
+  for (const [to, o] of Object.entries(ON)) {
+    const giam = [], hon = { 0: [], 10: [], 20: [] }
+    for (const g of Object.values(GIONG)) for (const snr of [0, 10, 20]) {
+      const s = nhan(g.m, 0.1 / rms(g.m, g.noi)), n = nhan(o, (0.1 / Math.pow(10, snr / 20)) / rms(o)), x = new Float32Array(s.length)
+      for (let i = 0; i < x.length; i++) x[i] = s[i] + n[i]
+      const y = b.chay(x).y
+      giam.push(db(onIm(x, g.noi, 0) / onIm(y, g.noi, tre))); hon[snr].push(siSdr(y, s, tre) - siSdr(x, s, 0))
+    }
+    h.on[to] = { giamOn: r1(tb(giam)), siSdrHon0: r1(tb(hon[0])), siSdrHon10: r1(tb(hon[10])), siSdrHon20: r1(tb(hon[20])), siSdrHon20XauNhat: r1(Math.min(...hon[20])) }
+  }
+  ra.bo.push(h)
+  console.log(`${b.ten} · trễ ${h.treMs} ms · ${h.msMoiKhung} ms/khung · sạch: nam ${h.sach['giọng nam'].siSdr} dB tới ${h.sach['giọng nam'].den3dBHz} Hz, nữ ${h.sach['giọng nữ / trẻ'].siSdr} dB tới ${h.sach['giọng nữ / trẻ'].den3dBHz} Hz\n   ` + Object.entries(h.on).map(([to, v]) => `${to}: bớt ${v.giamOn} dB · SI-SDR hơn ${v.siSdrHon0} / ${v.siSdrHon10} / ${v.siSdrHon20} (xấu nhất ở 20 dB: ${v.siSdrHon20XauNhat})`).join('\n   '))
 }
 writeFileSync(RA, JSON.stringify(ra, null, 1) + '\n')
 console.log(`\nĐã ghi ${RA}`)

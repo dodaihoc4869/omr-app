@@ -237,67 +237,52 @@ loa thoại, dải hẹp — chỉ máy thật mới biết). Giọng nói là t
 
 ## 6. Lọc ồn riêng (11/11, thầy: «lọc ồn chưa ngon … để giọng thầy và hs trong sáng nhất»)
 
-Bộ được dùng: **RNNoise** (mạng nơ-ron nhỏ của Xiph.Org, BSD-3) — tệp `rnnoise_simd.wasm` 157 KB của gói `@sapphi-red/web-noise-suppressor` 0.4.1 (MIT),
+Bộ đang dùng: **RNNoise** (mạng nơ-ron nhỏ của Xiph.Org, BSD-3) — tệp `rnnoise_simd.wasm` 157 KB của gói `@sapphi-red/web-noise-suppressor` 0.4.1 (MIT),
 để ở `src/lib/live/loc-on/` kèm giấy phép. Chạy trong Worker của chuỗi từng khung, trước khâu nâng mức. Tín hiệu đo là TỔNG HỢP (không có giọng người thật,
-không có lớp học thật): RNNoise học trên giọng thật nên các số «giữ giọng» dưới đây nhiều khả năng xấu hơn thực tế — cần nghe trên máy thật.
+không có lớp học thật): RNNoise học trên giọng thật nên các số «giữ giọng» nhiều khả năng xấu hơn thực tế — cần nghe trên máy thật.
 
-Ứng viên đã tra (kho npm, 11/11): `@sapphi-red/web-noise-suppressor` 0.4.1 (MIT; RNNoise 153–157 KB, Speex 56 KB, GTCRN 197 KB) · `@jitsi/rnnoise-wasm` 0.2.1
-(Apache-2.0; 112 KB, tên hàm đã rút gọn) · `@shiguredo/rnnoise-wasm` 2025.1.5 (Apache-2.0) · `@lofcz/deepfilternet-web` 0.1.0 (DeepFilterNet 3, MIT / Apache-2.0;
-tệp wasm **34 MB**). CHỈ RNNoise được đo. DeepFilterNet 3 bị loại trước khi đo: tệp 34 MB vượt giới hạn 25 MiB một tệp của Cloudflare Pages và bộ lọc có
-nhìn-trước. Speex và GTCRN chưa đo (tệp wasm đã rút gọn tên hàm, phải dùng lớp keo của gói). Krisp / NVIDIA là sản phẩm đóng, không so được.
+**CHỈ RNNoise được đo.** Các bộ khác: Speex và GTCRN (cùng gói) — đã thử chạy bằng lớp AudioWorklet của gói trong Node nhưng chưa chạy được (Speex (gói sapphi): đầu ra toàn số 0 trong phạm vi AudioWorklet giả của Node (bộ xử lý của gói chưa khởi tạo xong bộ wasm); GTCRN (gói sapphi): đầu ra toàn số 0 trong phạm vi AudioWorklet giả của Node (bộ xử lý của gói chưa khởi tạo xong bộ wasm));
+DeepFilterNet 3 (`@lofcz/deepfilternet-web` 0.1.0, tệp wasm 34 MB), DTLN, NSNet2 — chưa tải, chưa đo; lọc ồn của trình duyệt — chỉ đo được mức bớt ồn
+qua đường thật (6.2), CHƯA đo độ giữ giọng. Giới hạn cỡ tệp của Cloudflare Pages chưa tra lại. Vì vậy chưa thể nói RNNoise thắng bộ nào.
 
-### 6.1 Ngoại tuyến (`scripts/thu-live-1011/do-loc-on.mjs`) — mỗi ô: giảm ồn ở đoạn im (dB) / SI-SDR so với giọng sạch (dB)
+### 6.1 Ngoại tuyến (`scripts/thu-live-1011/do-loc-on.mjs`) — 2 giọng × 3 loại ồn × tín / ồn 0 / 10 / 20 dB
 
-Trễ thêm của bộ lọc: **10 ms** (đúng một khung). Xử lý: 0,105 ms mỗi khung 10 ms = 1,1 % một lõi trên máy đo (×4: 4,4 %).
+Cột ồn: bớt ồn ở đoạn im (dB, trung bình) · SI-SDR hơn «không lọc» ở tín / ồn 0 / 10 / 20 dB (trong ngoặc: ca xấu nhất ở 20 dB). Cột giọng sạch: SI-SDR của
+giọng sạch sau khi đi qua bộ lọc (càng cao càng nguyên vẹn) · tần số cao nhất còn trong −3 dB.
 
-Giọng SẠCH đi qua bộ lọc (bộ lọc làm hỏng giọng bao nhiêu — SI-SDR càng cao càng nguyên vẹn; dải tần còn trong −3 dB):
+| Cách lọc | Trễ (ms) | ms / khung 10 ms | Giọng nam sạch | Giọng nữ / trẻ sạch | Quạt / điều hoà | Xôn xao | Gõ bút / bàn phím |
+|---|---|---|---|---|---|---|---|
+| không lọc | 0 | 0 | — | — | 0 · 0 / 0 / 0 (0) | 0 · 0 / 0 / 0 (0) | 0 · 0 / 0 / 0 (0) |
+| RNNoise lọc hết cỡ | 10 | 0,125 | 11,8 dB · 3403 Hz | 13,1 dB · 8751 Hz | 26,9 · 8,1 / 6,1 / 0,4 (−1,6) | 4,8 · 0,4 / −0,3 / −5 (−7,2) | 4,8 · 3,9 / 1,1 / −4,4 (−5,3) |
+| RNNoise «Vừa» bản 1 (trộn cố định 25 %) | 10 | 0,104 | 14,4 dB · 14034 Hz | 15,8 dB · 8751 Hz | 11,3 · 6,4 / 5,7 / 1,8 (0,2) | 3,8 · 0,6 / 0,4 / −3,1 (−5) | 2,9 · 2,6 / 1,3 / −2,3 (−3,5) |
+| RNNoise «Mạnh» bản 1 (trộn cố định 6 %) | 10 | 0,088 | 12,4 dB · 3403 Hz | 13,7 dB · 8751 Hz | 20,7 · 7,9 / 6,2 / 0,8 (−1,1) | 4,6 · 0,5 / −0,1 / −4,6 (−6,7) | 3,9 · 3,3 / 1,2 / −4 (−4,7) |
+| RNNoise «Vừa» bản 2 (theo giọng + tách băng) | 10 | 0,147 | 21,5 dB · 20000 Hz | 18,2 dB · 20000 Hz | 18,5 · 3,3 / 3,7 / 2,4 (1,6) | 6,1 · 0,6 / 1,2 / −1,3 (−3,1) | 6,9 · 0,5 / 0,8 / −0,4 (−1,2) |
+| RNNoise «Mạnh» bản 2 (theo giọng + tách băng) | 10 | 0,132 | 18,6 dB · 20000 Hz | 16,2 dB · 15793 Hz | 28,2 · 4,4 / 4,6 / 1,7 (0,3) | 7,6 · 0,8 / 1,2 / −2,4 (−4,7) | 7,4 · 1,5 / 1,1 / −1,3 (−2,9) |
 
-| Giọng | Trễ (ms) | Vừa | Mạnh | Lọc hết cỡ |
-|---|---|---|---|---|
-| giọng nam | 10 | 14,5 dB · tới 14034 Hz | 12,4 dB · tới 3403 Hz | 11,8 dB · tới 3403 Hz |
-| giọng nữ / trẻ | 10 | 16,8 dB · tới 11082 Hz | 14,7 dB · tới 11082 Hz | 14,2 dB · tới 8751 Hz |
+**Trộn bản 2** (đang dùng; `THAM_LOC_ON` trong `src/lib/live/chuoi-tieng.ts`): băng thấp (< 3,5 kHz) lọc sâu lúc im, lúc có giọng giữ 50 % (Vừa) / 25 % (Mạnh)
+tiếng gốc; băng cao giữ tiếng gốc lúc có giọng; cả tín hiệu qua cổng theo giọng (lúc im hạ 8 dB với Vừa, 12 dB với Mạnh; mở sớm hơn tiếng 10 ms, đóng êm
+≈ 100 ms). So với bản 1 (trộn cố định): giọng nam ở mức Mạnh không còn bị cắt ở 3,4 kHz (còn đủ dải), giọng sạch nguyên vẹn hơn 4–7 dB SI-SDR, ồn đều ở đoạn
+im bớt nhiều hơn. CHƯA ĐẠT: xôn xao ở đoạn im mới bớt 6–8 dB (mục tiêu 12); khi giọng vốn rõ (20 dB) mà nền là xôn xao / tiếng gõ thì SI-SDR còn kém «không
+lọc» 0,4–2,4 dB (trung bình). Chưa làm khâu chặn xung riêng cho tiếng gõ.
 
-| Giọng | Ồn | Tín / ồn vào (dB) | Không lọc | Vừa | Mạnh | Lọc hết cỡ |
-|---|---|---|---|---|---|---|
-| giọng nam | quạt / điều hoà | 0 | 0 / −3 | 11,1 / 3,1 | 19,4 / 4,4 | 23,6 / 4,6 |
-| giọng nam | quạt / điều hoà | 10 | 0 / 7 | 11,5 / 11,9 | 21,4 / 12 | 28,9 / 11,8 |
-| giọng nam | quạt / điều hoà | 20 | 0 / 17 | 11,2 / 17,2 | 20,3 / 15,8 | 25,8 / 15,4 |
-| giọng nam | xôn xao lớp học | 0 | 0 / −2,9 | 3,5 / −2,4 | 4,2 / −2,7 | 4,3 / −2,8 |
-| giọng nam | xôn xao lớp học | 10 | 0 / 7 | 5,1 / 7,2 | 6,2 / 6,6 | 6,4 / 6,3 |
-| giọng nam | xôn xao lớp học | 20 | 0 / 17 | 5,5 / 12 | 6,8 / 10,3 | 7,1 / 9,8 |
-| giọng nam | gõ bút / bàn phím | 0 | 0 / −3 | 3,9 / −0,5 | 4,8 / 0,1 | 5 / 0,2 |
-| giọng nam | gõ bút / bàn phím | 10 | 0 / 7 | 4 / 8,2 | 5 / 8 | 5,2 / 7,9 |
-| giọng nam | gõ bút / bàn phím | 20 | 0 / 17 | 2,7 / 13,7 | 3,3 / 12,2 | 3,4 / 11,8 |
-| giọng nữ / trẻ | quạt / điều hoà | 0 | 0 / −3,1 | 11,2 / 3,6 | 19,9 / 5,4 | 24,4 / 5,6 |
-| giọng nữ / trẻ | quạt / điều hoà | 10 | 0 / 6,9 | 11,6 / 13,3 | 22,2 / 14,2 | 31,6 / 14,3 |
-| giọng nữ / trẻ | quạt / điều hoà | 20 | 0 / 16,9 | 11,3 / 20,2 | 20,7 / 19,6 | 26,9 / 19,3 |
-| giọng nữ / trẻ | xôn xao lớp học | 0 | 0 / −3,1 | 2,3 / −2,3 | 2,8 / −2,4 | 2,9 / −2,4 |
-| giọng nữ / trẻ | xôn xao lớp học | 10 | 0 / 6,9 | 2,6 / 7,5 | 3,1 / 7,2 | 3,2 / 7,1 |
-| giọng nữ / trẻ | xôn xao lớp học | 20 | 0 / 16,9 | 4 / 15,6 | 4,9 / 14,4 | 5,1 / 14 |
-| giọng nữ / trẻ | gõ bút / bàn phím | 0 | 0 / −3,1 | 5,2 / −0,3 | 6,6 / 0,2 | 7 / 0,3 |
-| giọng nữ / trẻ | gõ bút / bàn phím | 10 | 0 / 6,9 | 2,9 / 8,4 | 3,5 / 8,4 | 3,7 / 8,4 |
-| giọng nữ / trẻ | gõ bút / bàn phím | 20 | 0 / 16,9 | 1,4 / 15,3 | 1,7 / 14,3 | 1,8 / 14 |
+### 6.2 Qua đường thật trên Chromium (`do-tre.mjs … on`) — giọng −25 dBFS trên nền ồn trắng −35 dBFS (tín / ồn tại mic ≈ 10 dB)
 
-Đọc bảng: (1) ồn ĐỀU (quạt, điều hoà): Vừa bớt ≈ 11 dB, Mạnh ≈ 20 dB; SI-SDR tăng rõ khi ồn to (0 / 10 dB), ở 20 dB thì Vừa giữ nguyên còn Mạnh kém đi ≈ 1 dB;
-(2) xôn xao và tiếng gõ: chỉ bớt 2–7 dB, và khi giọng vốn đã rõ (20 dB) thì lọc làm giọng kém đi 3–7 dB SI-SDR; (3) Mạnh / lọc hết cỡ cắt dải cao của giọng
-tổng hợp (giọng nam còn tới ≈ 3,4 kHz) — vì vậy mặc định là **Vừa** (giữ 25 % tiếng gốc: còn tới 11–14 kHz).
-
-### 6.2 Qua đường thật trên Chromium (`do-tre.mjs … loc-on on`) — giọng −25 dBFS trên nền ồn trắng −35 dBFS (tín / ồn tại mic ≈ 10 dB)
-
-| Cấu hình | Mức nói (dBFS) | Đỉnh | Ồn trong quãng nghỉ | Tín / ồn ở đầu nhận (dB) | «Thở» (dB) |
+| Cấu hình | Mức nói (dBFS) | Đỉnh | Ồn trong quãng nghỉ | Tín / ồn ở đầu nhận (dB) | Ồn cuối quãng nghỉ so với đầu (dB) |
 |---|---|---|---|---|---|
-| không lọc | −16,5 | −0,9 | −29,3 | 12,8 | 0,5 |
-| lọc ồn + khử vọng của TRÌNH DUYỆT (lọc riêng tắt) | −17,4 | −3,8 | −47,3 | 30 | −0,9 |
-| lọc riêng «Vừa» | −17 | −3,3 | −40,9 | 23,9 | −0,1 |
-| lọc riêng «Mạnh» | −16,6 | −2,8 | −49,9 | 33,3 | −0,6 |
+| không lọc | −16,7 | −0,9 | −29,3 | 12,6 | 0,5 |
+| lọc ồn + khử vọng của TRÌNH DUYỆT (lọc riêng tắt) | −17,3 | −3,9 | −47,4 | 30,1 | −0,9 |
+| lọc riêng «Vừa» | −15,7 | −1,3 | −44,1 | 28,4 | −8,9 |
+| lọc riêng «Mạnh» | −15,5 | −1,6 | −59 | 43,5 | −8,3 |
+| lọc ồn + khử vọng của TRÌNH DUYỆT (lọc riêng tắt) — bản 1 (trộn cố định) | −17,4 | −3,8 | −47,3 | 30 | −0,9 |
+| lọc riêng «Vừa» — bản 1 (trộn cố định) | −17 | −3,3 | −40,9 | 23,9 | −0,1 |
+| lọc riêng «Mạnh» — bản 1 (trộn cố định) | −16,6 | −2,8 | −49,9 | 33,3 | −0,6 |
 
-Lọc riêng «Mạnh» bớt ồn ngang lọc của trình duyệt; «Vừa» giữ lại một phần nền. Độ giữ giọng của lọc trình duyệt KHÔNG đo được ở đây (không có kênh giọng
-sạch để so) nên chưa nói được bộ nào trong hơn — phải nghe trên máy thật.
+Cột cuối âm = ồn TẮT DẦN trong quãng nghỉ (cổng đóng lại), không phải bơm lên.
 
 ### 6.3 Ngân sách và giới hạn
 
-Trễ: chuỗi 0 → 10 ms khi lọc bật (tổng mic → ra khỏi đệm rung ≈ 46 → ≈ 56 ms, tính từ số đo mục 5 + 10 ms; chuỗi xung không đo được qua bộ lọc vì nó coi
-xung là ồn). Tệp bộ lọc là một mảnh riêng, tải sau khi bật live, không nằm trong kho tải sẵn. Chưa tải xong / lỗi ⇒ chuỗi chạy không lọc; vào / ra chế độ
-lọc bằng một khung trộn dần. Chỉ chạy khi mic 48 kHz khung 480 mẫu và trình duyệt có kiểu «khung» (Chromium trên máy tính). MIC CỦA EM lên bảng (điện thoại)
-KHÔNG đổi: vẫn dùng lọc ồn + khử vọng của trình duyệt (loa máy em phát tiếng thầy nên buộc phải khử vọng; Safari trên iPhone không có cách xử lý từng khung).
+Trễ: chuỗi 0 → 10 ms khi lọc bật (tổng mic → ra khỏi đệm rung ≈ 46 → ≈ 56 ms, cộng từ số đo mục 5; chuỗi xung không đo được qua bộ lọc vì nó coi xung là
+ồn). CPU ≈ 1,5 % một lõi trên máy đo. Tệp bộ lọc là một mảnh riêng, tải sau khi bật live, không nằm trong kho tải sẵn. Chưa tải xong / lỗi ⇒ chuỗi chạy không
+lọc; vào / ra chế độ lọc bằng một khung trộn dần. Chỉ chạy khi mic 48 kHz khung 480 mẫu và trình duyệt có kiểu «khung» (Chromium trên máy tính).
+MIC CỦA EM lên bảng (điện thoại) KHÔNG đổi: vẫn dùng lọc ồn + khử vọng của trình duyệt; chưa đo bản nhẹ trên CPU ×4 / ×6, chưa làm đường AudioWorklet cho iPhone.
 
