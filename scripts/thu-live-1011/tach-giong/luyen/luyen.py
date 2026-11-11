@@ -99,6 +99,13 @@ GIA = min(0.2, float(os.environ.get('TG_GIA', '0.15')))   # tỉ lệ giọng kh
 def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant CÙNG LÚC (nội suy lại) với độ lệch LỚN: ×1,25–1,6 (nữ / trẻ) hoặc ×0,68–0,75 (nam trầm hơn)
     r = rng.uniform(1.25, 1.6) if rng.random() < 0.7 else rng.uniform(0.68, 0.75); m = int(np.ceil(n * r)); x = cat(thay, m)
     return np.interp(np.arange(n) * (m - 1) / max(n - 1, 1), np.arange(m), x).astype(np.float32)
+def loa(x):  # mô phỏng «loa phòng → mic»: dải thông của loa nhỏ (cắt dưới 150–350 Hz, trên 6–11 kHz, cộng hưởng ±4 dB), méo mềm, vang phòng vừa
+    n = len(x); f = np.fft.rfftfreq(n, 1 / HZ); X = np.fft.rfft(x)
+    lo, hi, fc = rng.uniform(150, 350), rng.uniform(6000, 11000), rng.uniform(800, 3000)
+    g = 1 / np.sqrt(1 + (lo / np.maximum(f, 1)) ** 4) / np.sqrt(1 + (f / hi) ** 8) * 10 ** (rng.uniform(-4, 4) * np.exp(-((np.log(np.maximum(f, 1) / fc)) ** 2) / 0.3) / 20)
+    y = np.fft.irfft(X * g, n).astype(np.float32); k = rng.uniform(1, 4) / max(np.abs(y).max(), 1e-9)
+    y = np.tanh(y * k) / k
+    return vang(y, rng.uniform(0.3, 0.8), rng.uniform(-6, 3))
 def mau(thay, khac, am, rr=None):
     """Một mẫu 3 s: (Y phức, S phức) — Y = thầy + giọng khác + ồn, S = chỉ thầy (cùng EQ, cùng vang, cùng mức)."""
     t = (tocDo(thay, L) if rng.random() < 0.5 else cat(thay, L)) if rng.random() > 0.12 else np.zeros(L, np.float32)
@@ -113,6 +120,7 @@ def mau(thay, khac, am, rr=None):
         else:
             nguon = khac if khac is not None and rng.random() < 0.4 else am[rng.integers(len(am))]
             s = (tocDo(nguon, L) if rng.random() < 0.3 else cat(nguon, L)).copy()
+        if rng.random() < 0.25: s = loa(s)   # tiếng em PHÁT RA LOA LỚP rồi vào mic thầy (máy thầy luôn phát tiếng em ra loa — chốt 11/11)
         if rng.random() < 0.6: s = vang(s, rng.uniform(0.2, 0.7), rng.uniform(-3, 10))
         if rng.random() < 0.6:  # chỉ nói một khúc ⇒ có lúc một mình, lúc chồng, có điểm bắt đầu / dứt
             a = rng.integers(0, L // 2); b = rng.integers(a + L // 4, L + 1); s[:a] = 0; s[b:] = 0
