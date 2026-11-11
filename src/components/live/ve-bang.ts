@@ -57,6 +57,8 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   // ── CÂY BÚT CỦA THẦY ──
   const but = taoTroBut()
   let butDich: { x: number; y: number; cham: boolean; net?: string; mau?: string } | null = null
+  /** Cây bút vừa vẽ khi lớp sống chỉ có mỗi nó: [x, y, độ nhấc, độ cuộn px] — khung sau y hệt thì khỏi vẽ lại. */
+  let butVe: [number, number, number, number] | null = null
   const mauBut: MauBut = { than: 'white', dai: 'orange', ngoi: 'gray', bong: 'black', muc: '' }
 
   // ── BẢNG ĐEN CUỘN ──
@@ -306,7 +308,6 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (cuonThay != null) dich = cuonThay
     else if (butDich) theoBut(butDich.x, butDich.y, butDich.net)
     buocCuon(nay)
-    xoaSong()
     const k = KH.k, cy = cuonPx()
     // h = hộp bao mọi thứ sẽ vẽ, px CSS trong hình (nét bảng đã trừ độ cuộn)
     const h: Hop = [1e9, 1e9, -1e9, -1e9], ve: [number[], string, boolean][] = []
@@ -330,6 +331,10 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     // cây bút: chỗ ngòi theo đệm phát (đã trừ độ cuộn của máy em) ⇒ một bước chuyển động
     let hb = null
     if (butDich) { const q = toiPx(butDich.x, butDich.y, butDich.net); hb = but.buoc({ x: q[0], y: q[1], cham: butDich.cham }, nay); if (butDich.mau) mauBut.muc = butDich.mau } else but.buoc(null, nay)
+    // chỉ có cây bút và nó đứng yên y như khung trước ⇒ giữ nguyên lớp sống (không xoá, không vẽ: trình duyệt khỏi phải đẩy canvas lên màn)
+    if (!ve.length && hb && ban && butVe && butVe[0] === hb.x && butVe[1] === hb.y && butVe[2] === hb.nang && butVe[3] === cy) return 0
+    butVe = hb && !ve.length ? [hb.x, hb.y, hb.nang, cy] : null
+    xoaSong()
     if (hb) { h[0] = Math.min(h[0], hb.x + HOP_BUT[0]); h[1] = Math.min(h[1], hb.y + HOP_BUT[1]); h[2] = Math.max(h[2], hb.x + HOP_BUT[2]); h[3] = Math.max(h[3], hb.y + HOP_BUT[3]) }
     if (!ve.length && !hb) return 0
     // hộp bao không còn nằm trọn trong lớp sống ⇒ dời lớp cho hộp vào giữa (kẹp trong hình)

@@ -62,6 +62,9 @@ function chay(taoDemPhat, { cu, duong, rung, mat, mayYeu = false, ban = false, h
   for (let f = 0; f < tHet; f += khungThay) {
     // máy thầy BẬN (tuỳ chọn): 15 % khung vẽ trễ 20–60 ms (luồng chính đang lo việc khác)
     const tf = f + rn() * 1.5 + (ban && rn() < 0.15 ? 20 + rn() * 40 : 0)
+    // hẹn giờ tới hạn TRƯỚC khung này chạy trước (chỉ thấy các mẫu đã gom ở những khung trước)
+    hang.sort((a, b) => a.luc - b.luc)
+    while (hang.length && hang[0].luc <= tf) { const v = hang.shift(); v.lam(v.luc + rn() * 2) }
     let co = false
     for (const s of st) { if (s.xong) continue; let n = s.daMoi; while (n < s.m.length && s.m[n][3] <= tf) n++; if (n > s.daMoi) { co = true; s.daMoi = n } }
     const p = tro(tf)
@@ -82,9 +85,6 @@ function chay(taoDemPhat, { cu, duong, rung, mat, mayYeu = false, ban = false, h
       if (troCho) { if (duong === 'dc' ? dcDuoc : wsDuoc) { (duong === 'dc' ? guiDc : guiWs)({ phien: 1, tGui: t, k: 'tro', x: troCho[0], y: troCho[1] }, t); if (duong === 'dc') tGuiCuoiDc = t; else tGuiCuoiWs = t; troCho = null } else lai = true }
       if (lai) hang.push({ luc: t + (duong === 'dc' ? 12 : Math.max(1, 34 - (t - tGuiCuoiWs))), lam: (t2) => xa(t2, false) })
     }
-    // việc chờ tới hạn trước khung này
-    hang.sort((a, b) => a.luc - b.luc)
-    while (hang.length && hang[0].luc <= tf) { const v = hang.shift(); v.lam(v.luc + rn() * 2) }
     if (co) { if (cu) hang.push({ luc: tf + 16, lam: (t2) => xa(t2, false) }); else xa(tf + 0.5, false) }
     // nhấc bút: nét đã gom đủ mẫu ⇒ xả nốt ngay + báo nhấc (DataChannel hai lần)
     for (const s of st) if (!s.xong && s.daMoi >= s.m.length) {

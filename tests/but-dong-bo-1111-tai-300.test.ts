@@ -52,11 +52,12 @@ describe('300 em cùng lúc: thầy viết thật qua phòng thật', () => {
       that.push({ le, ds, dangViet })
     }
     // 298 máy em chỉ đếm
-    const dem = { nhiPhan: 0, byte: 0, chu: 0 }
+    const dem = { nhiPhan: 0, byte: 0, chu: 0, diem: 0 }
+    const gia = []
     for (let i = 2; i < SO_EM; i++) {
       const w = await ph.noi('hs', `S${i}`)
-      await ph.gui(w, { t: 'vao' }); await ph.gui(w, { t: 'chao' }); await ph.gui(w, { t: 'live-ok', dc: false })
-      w.send = (d) => { if (typeof d === 'string') dem.chu += 1; else { dem.nhiPhan += 1; dem.byte += (d as ArrayBuffer).byteLength } }
+      await ph.gui(w, { t: 'vao' }); await ph.gui(w, { t: 'chao' })
+      gia.push(w)
     }
     const troi = async (ms: number) => {
       for (let con = ms; con > 0; con -= 4) { dh.tien(Math.min(4, con)); for (const k of kenh) await k.xong(); await vi.advanceTimersByTimeAsync(Math.min(4, con)) }
@@ -67,6 +68,12 @@ describe('300 em cùng lúc: thầy viết thật qua phòng thật', () => {
     expect((await lt.bat({ khongTieng: true })).ok).toBe(true)
     lt.dat({ bang: true }) // bảng → máy em
     await troi(600)
+    // 298 máy em giả báo «đang xem, không có DataChannel» SAU khi live bật (phòng mới chuyển lô điểm cho các máy đã báo), rồi chỉ ĐẾM
+    for (const w of gia) {
+      await ph.gui(w, { t: 'live-ok', dc: false })
+      w.send = (d) => { if (typeof d === 'string') dem.chu += 1; else { const b = new Uint8Array(d as ArrayBuffer); dem.nhiPhan += 1; dem.byte += b.byteLength; if (b[0]! >= 0x21) dem.diem += 1 } }
+    }
+    await troi(100)
     // đo thời gian phòng xử lý từng khung nhị phân của thầy (nhận → gửi xong cho mọi máy)
     const msLo: number[] = [], gioLo: number[] = []
     const goc = ph.p.webSocketMessage.bind(ph.p)
@@ -77,7 +84,7 @@ describe('300 em cùng lúc: thầy viết thật qua phòng thật', () => {
       await goc(ws, d)
       if (diem) { msLo.push(performance.now() - a); gioLo.push(dh.gio()) }
     }) as typeof ph.p.webSocketMessage
-    dem.nhiPhan = dem.byte = dem.chu = 0
+    dem.nhiPhan = dem.byte = dem.chu = dem.diem = 0
 
     // ── thầy viết: máy thầy 60 khung / giây gom mẫu; giữa hai nét bút lơ lửng tới đầu nét sau; máy em vẽ 60 khung / giây ──
     const bai = baiViet(), t0 = dh.gio()
@@ -128,6 +135,7 @@ describe('300 em cùng lúc: thầy viết thật qua phòng thật', () => {
       `phòng xử lý mỗi lô: trung bình ${(msLo.reduce((a, b) => a + b, 0) / msLo.length).toFixed(4)} ms · p95 ${pc(msLo, 0.95).toFixed(4)} ms · lớn nhất ${Math.max(...msLo).toFixed(3)} ms ` +
       `(= ${(msLo.reduce((a, b) => a + b, 0) / giay).toFixed(2)} ms CPU cho mỗi giây live) · máy em thật: đầu nét đứng ${khungDung}/${khungViet} khung, quãng đứng dài nhất ${dungDai} ms`)
     expect(loMoiGiayLon).toBeLessThanOrEqual(LO_MOI_GIAY_TRAN)
+    expect(dem.diem).toBe(msLo.length * 298) // MỌI lô điểm tới đủ 298 máy đếm (+ 2 máy thật)
     // lô theo nhịp ≤ 30 / giây + mỗi nét thêm lô cuối (đi ngay, không chờ nhịp) và tin nhấc bút
     expect(moiEm.loMoiGiay).toBeLessThanOrEqual(30.5 + 2 * nguon.length / giay)
     expect(pc(msLo, 0.95)).toBeLessThan(1)
