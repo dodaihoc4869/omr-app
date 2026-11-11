@@ -1,0 +1,29 @@
+[
+  {
+    "i": 188,
+    "hash": "20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c",
+    "fileNguon": "anh/20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c.png",
+    "svg": "nguyen-tu188-native-ddh-bfe670a92d214c82e083f0ef54aa3962f4ed2b293b135c9a22312a525875f4c5.svg",
+    "hashSvg": "bfe670a92d214c82e083f0ef54aa3962f4ed2b293b135c9a22312a525875f4c5",
+    "byteSvg": 2350,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B11-III-8",
+        "de": "Nguyên tử nguyên tố nitrogen (hình dưới đây) chuyển thành ion mang điện tích là bao nhiêu khi nhận electron để thỏa mãn quy tắc octet? (Hình: Mô hình cấu tạo nguyên tử nitrogen.)",
+        "refs": [
+          {
+            "hash": "20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c",
+            "where": "DH-10-C3-B11-III-8.hinh.0.du_lieu",
+            "hashDataUrl": "69fa5dc9864ffd9c5eedc6f46ac615239e80de34e40544e23f665d0040f3b5f1"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2grayvioletcontinuousorbits/7tealdots2inner5outerOVERorbits/1yellowcore+7trueDAMuprightSAMEbaseline/outerBOTTOMcroppednative242/blankRIGHTretained/0arrows0captions/noaddedN-name-shellnums-electronminus-ionanswer",
+    "hashSvgDaSoat": "bfe670a92d214c82e083f0ef54aa3962f4ed2b293b135c9a22312a525875f4c5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

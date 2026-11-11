@@ -1,0 +1,233 @@
+{
+  "i": 188,
+  "assetIndexProvided": 1095,
+  "hash": "20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c.png",
+  "size": [
+    380,
+    242
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-10-C3-B11-III-8",
+      "de": "Nguyên tử nguyên tố nitrogen (hình dưới đây) chuyển thành ion mang điện tích là bao nhiêu khi nhận electron để thỏa mãn quy tắc octet? (Hình: Mô hình cấu tạo nguyên tử nitrogen.)",
+      "allHinh": [
+        {
+          "hash": "20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c",
+          "where": "DH-10-C3-B11-III-8.hinh.0.du_lieu",
+          "hashDataUrl": "69fa5dc9864ffd9c5eedc6f46ac615239e80de34e40544e23f665d0040f3b5f1"
+        }
+      ],
+      "missingHashes": [
+        "20144d171b80f19704aa64327d5bf263a60cf3512f2c5dc2db64655886dca72c"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "ownCore10xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelapproximatecenters/radii/bboxes, countedpositionsdirectlynotatomicnumbertheory. RGBsamplesnative notuniversalcolorpalette.",
+  "geometry": {
+    "orbits": [
+      {
+        "center": [
+          135,
+          134
+        ],
+        "rx": 106.5,
+        "ry": 107.5,
+        "bounds": [
+          28.5,
+          26.5,
+          241.5,
+          241.5
+        ],
+        "style": "continuousgrayviolet thinellipseabout2px, noarrows/dashes"
+      },
+      {
+        "center": [
+          135,
+          134
+        ],
+        "rx": 79.5,
+        "ry": 80,
+        "bounds": [
+          55.5,
+          54,
+          214.5,
+          214
+        ],
+        "style": "continuousgrayviolet thinellipseabout2px"
+      }
+    ],
+    "nucleus": {
+      "center": [
+        134,
+        132
+      ],
+      "radius": 34,
+      "bounds": [
+        100,
+        98,
+        168,
+        166
+      ],
+      "fill": "softyellowcircle, nohardblackoutline",
+      "sampleRGB": [
+        250,
+        217,
+        105
+      ],
+      "label": {
+        "text": "+7",
+        "bbox": [
+          116,
+          122,
+          145,
+          141
+        ],
+        "font": "truebold upright sans",
+        "note": "PLUSand7samebaseline, notsuperscript; doNOTaddtotalchargeoratomicname"
+      }
+    },
+    "innerElectrons": [
+      {
+        "center": [
+          135,
+          54
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          42,
+          147,
+          175
+        ]
+      },
+      {
+        "center": [
+          135,
+          213
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          47,
+          145,
+          180
+        ]
+      }
+    ],
+    "outerElectrons": [
+      {
+        "center": [
+          135,
+          26
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          46,
+          139,
+          184
+        ]
+      },
+      {
+        "center": [
+          34,
+          104
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          48,
+          144,
+          183
+        ]
+      },
+      {
+        "center": [
+          237,
+          104
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          50,
+          148,
+          181
+        ]
+      },
+      {
+        "center": [
+          57,
+          205
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          38,
+          142,
+          181
+        ]
+      },
+      {
+        "center": [
+          213,
+          205
+        ],
+        "rx": 8,
+        "ry": 8,
+        "sampleRGB": [
+          40,
+          148,
+          181
+        ]
+      }
+    ],
+    "electronStyle": "tealblue smallsphereswithsubtlesoftlighterupperleft/darkeredge, notflatblack; drawnoverorbitandretaincontact. Noelectronminusglyph.",
+    "crop": "Outerorbitbottomat241..242touchesnativebottomedge242; noaddedwhitepaddingtocompleteoutlines. Fullnativewhiteblankright~250..379 retained. Allelectronsfullyvisible.",
+    "counts": {
+      "orbits": 2,
+      "innerDots": 2,
+      "outerDots": 5,
+      "totalDots": 7,
+      "nucleusCircles": 1,
+      "labels": 1,
+      "arrows": 0,
+      "captions": 0
+    },
+    "noAdded": [
+      "nitrogenname",
+      "Nsymbol",
+      "electronnegativecharges",
+      "shellnumbers",
+      "ionanswer",
+      "captionfromstem",
+      "thirdorbit",
+      "blacknucleusoutline"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "native4xOpened": true,
+    "allPublicDeRead": true,
+    "geometryAgrees": true,
+    "actualSvgReviewed": true,
+    "actualSvgHash": "bfe670a92d214c82e083f0ef54aa3962f4ed2b293b135c9a22312a525875f4c5",
+    "freshChromiumScale": 3,
+    "actualFullOpened": true,
+    "verdict": "Đạt riêng nguồn188; không suy font global"
+  }
+}
