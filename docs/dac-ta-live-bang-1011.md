@@ -56,6 +56,8 @@ Mục tiêu ĐO ĐƯỢC (kiến trúc chọn theo các số này):
 
 Máy em soi đúng màn chiếu: giấy đề bên trái, bảng đen bên phải, cùng kiểu giấy thầy đang chọn (sáng / tối theo THẦY, không theo máy em). Hệ toạ độ lôgic 1600 × 820, co vừa màn, nét vectơ nên sắc ở mọi cỡ.
 
+> 11/11 lần 3: tay nắm, khay, dấu trạng thái và cách giấy + bảng phủ kín màn theo mục **4.3g** (chỗ nào khác các gạch đầu dòng dưới đây thì theo 4.3g).
+
 - **Mặc định ẩn hết** (ảnh 13–18): bảng phủ kín màn ngang, KHÔNG thanh cố định nào. Chỉ còn một **tay nắm**: viên thuốc mảnh màu đội (7 × 46, vùng chạm 48 × 76), mép phải, giữa chiều cao, đồng điệu nút «Gửi» nổi `.bpu-gui-noi`.
   - Điện thoại dài (19,5:9): vùng chiếu dính trái, dải dư bên phải là chỗ của tay nắm ⇒ không che nét.
   - Điện thoại 16:9 và máy bảng: tay nắm đè mép bảng ⇒ mờ 78 %, em kéo được lên / xuống dọc mép; tự né nếu nét mới chạy tới vùng nó đang đứng.
@@ -338,7 +340,7 @@ Thầy (11/11, 06:33): «khi bấm nộp thì không tự về màn live» · «
 Thầy: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút tức thì mượt mà cực mượt mà» · «thay nút vàng bằng một cái bút nhỏ» · «bảng đen khi live có cuộn vô hạn». Số đo trước / sau: `docs/do-but-dong-bo-1111.md`.
 
 - **Mốc phát là một đồng hồ chạy**, không còn là «bây giờ − D» cứng: mỗi khung tiến `dt × nhịp`, nhịp 0,65–1,6 để bám đích «bây giờ − lệch − D». Nét đang viết hết điểm (lô về muộn, mất gói) ⇒ đồng hồ đứng ở điểm mới nhất; lô tới thì chạy nhanh hơn một chút cho tới khi bắt kịp. Không dồn cả lô vào một khung.
-- **D** = số lớn hơn giữa (p95 dao động + khoảng cách lô p90) và p95 «độ cần» của từng lô (giờ tới − lệch − giờ của điểm mới đầu tiên trong lô), + 3 ms; kẹp 22–450 ms (11/11 lần 2: sàn 30 → 22, dư 4 → 3; 12/11: trần 150 → 450 cho mạng yếu), nới ≤ 2 ms mỗi 16,7 ms, rút ≤ 1 ms — tính theo thời gian thật.
+- **D** = số lớn hơn giữa (p95 dao động + khoảng cách lô p90) và p95 «độ cần» của từng lô (giờ tới − lệch − giờ của điểm mới đầu tiên trong lô), + 3 ms; kẹp 14–450 ms (11/11 lần 2: sàn 30 → 22, dư 4 → 3; 12/11: trần 150 → 450 cho mạng yếu, sàn 22 → 14; rung lẻ một đợt nhẹ thì về sàn trong ~2 giây — `docs/do-but-dong-bo-1111.md` mục 10), nới ≤ 2 ms mỗi 16,7 ms, rút ≤ 1 ms — tính theo thời gian thật.
 - **MẠNG YẾU (12/11, thầy: «thử iphone mạng wifi 1 vạch nét chữ ko mượt»)** — số đo + lí do: `docs/do-but-dong-bo-1111.md` mục 9. D lấy số lớn hơn của cửa sổ 2 giây (p95) và 10 giây (p90). Gói DataChannel kèm 3 lô trước (`src/lib/live/gui-diem.ts`; vẫn gói `0x21`, `tu` lùi lại). Nét thủng / lô tới quá muộn ⇒ máy em gửi `live-ok` với `dc: false` trong 20 giây để nhận THÊM điểm qua WebSocket (vẫn nghe DataChannel, ghép theo chỉ số); máy thầy gửi nét đang viết qua WebSocket từ điểm đầu khi có em vừa xin. Sau khi đứt: phát bù tới ×2,5, tồn quá 1,2 giây thì hiện ngay phần cũ. Tin nhấc bút nhắc lại sau 0,3 và 1,2 giây. Gói của nét đã xong thì bỏ; con trỏ xếp theo giờ gửi. Vạch tín hiệu trong khay theo `soDo().mang`.
 - **Gói cuối của nét** máy thầy gửi DataChannel thêm một lần. Vẫn mất ⇒ bản chốt từ sổ nét VÁ điểm thiếu cho nét dở phát nốt (`DemPhat.va`), không xoá nét dở vẽ lại.
 - **Máy thầy gửi điểm ngay sau khung vẽ** (trước: chờ thêm 16 ms), hai gói cách nhau ≥ 12 ms. Con trỏ lơ lửng báo mỗi khung (trước: 20 lần / giây).
@@ -418,6 +420,22 @@ Thầy: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút t
 - **Số em đang nghe**: máy em báo `nghe` trong `live-ok` khi loa đang phát tiếng thầy thật; viên Live ghi «N em nghe» cạnh «N em xem»; cửa sổ nút Live nói rõ
   «Máy em TRONG LỚP đang tắt tiếng» khi thầy để «Em ở xa». Máy em đang tắt tiếng ⇒ nút «Tiếng đang tắt» cạnh tay nắm, một chạm là bật.
 - Số đo: `docs/do-live-1011.md` mục 4.
+
+### 4.3g Máy em: thanh ẩn MÉP PHẢI + giấy / bảng phủ kín (11/11, lần 3; nhánh `claude/may-em-mep-phai-1111`) — chỗ khác với các mục trên thì theo mục này
+
+Thầy (11/11, kèm ảnh máy em): «Chuyển mic, tắt tiếng, thanh ẩn sang hẳn góc phải ở giữa bảng đen, tối ưu không gian hiển thị đề và bảng đen phải full để hs đọc rõ, thiết kế ẩn hết vào thanh ẩn». Thay «mép trên» của 4.3f và «mép trái» của 4.3e.
+
+- **Một tay nắm, mép phải, giữa chiều cao** (`LopLive.tsx` `Khay`, `live-em.css` `.lv-nam`): viên thuốc dọc 5 × 40 màu đội, vùng chạm 44 × 76, mờ 55 % khi không chạm. Bút của thầy tới gần (cách mép phải < 72 px, lệch dọc < 84 px) ⇒ `data-ne`, mờ 16 %; bút đi khỏi 1,2 giây ⇒ rõ lại. Kéo dọc để dời tay nắm dọc mép phải (bảng live).
+- **Không còn gì nổi riêng**: bỏ viên «Tiếng đang tắt» và huy hiệu mic tròn. Trạng thái là dấu 15 px xếp dọc ngay trên viên thuốc: tiếng đang tắt (hoặc trình duyệt chặn phát) · mic của em đang bật · em đang giơ tay · mạng yếu. Nhãn của tay nắm đọc kèm các trạng thái này.
+- **Khay** trượt ra từ mép phải trong 180 ms (`transform` / `opacity`), canh giữa chiều cao, đè lên mép bảng, không đẩy bố cục; vuốt sang trái từ tay nắm thì bám ngón tay. Tự thu sau 4 giây không chạm hoặc khi chạm ra ngoài. Các hàng giữ nguyên thứ tự (`dongKhay`): dòng đầu «Thầy đang nói / im» + vạch mạng + «Trễ ~N ms» · «Giơ tay» (đợt 2) · «Tiếng» · «Mic của em» · đội + kJ.
+- **Lần đầu vào live mà tiếng đang tắt**: khay tự mở 3 giây cho em thấy nút «Tiếng», một lần mỗi buổi (thay viên nổi cũ). Trình duyệt chặn phát: ô «Tiếng» ghi «Chạm để nghe», chạm là mở khoá.
+- **Giấy + bảng phủ kín** (`bo-cuc.ts` `boCucEm`, `oPhu`): không chừa dải nào cho tay nắm; bỏ lề của tờ chiếu, co hộp bao (ô giấy + ô bảng của thầy) theo cạnh giới hạn bằng MỘT phép co đều (nét khớp chỗ). Khối dính mép trên và dính về phía giấy; ô giấy / ô bảng VẼ nới tới mép khung nhìn (lề 4 px + `env(safe-area-inset-*)`, khe giữa ≤ 5 px). Phần nới chỉ là nền: giấy soi, nét và khung cuộn của bảng vẫn theo đúng ô của thầy.
+  - Diện tích (giấy + bảng) / khung nhìn, tờ 16:9: 844 × 390 77 → 97 % · 667 × 375 89 → 96 % · 1180 × 820 72 → 98 % · 1971 × 1247 79 → 99 %.
+  - Cỡ chữ + nét (phép co): tờ 16:9 gần như giữ (0 … +5 %); tờ có lề rộng (ước tờ 4:3 trong ảnh thầy gửi) to hơn 7–9 %. Màn rộng hơn tờ nhiều thì phần dư là bảng trống bên phải; muốn chữ to hơn nữa phải tách phép co của giấy và của bảng (đụng lớp vẽ nét, chưa làm).
+- **Màn câu hỏi**: tay nắm đứng trên nút «Gửi» nổi (tâm cao hơn giữa màn 104 px), khay dừng bên trái cột nút «Gửi».
+- **Dải lượt** (`DaiLuot.tsx`): dải mỏng cao 34 px sát đáy trái; em đoán xong thì chỉ còn tên bạn + điều em đoán + nút tiếp sức.
+- **iPhone máy dọc xoay CSS**: «mép phải» là mép phải của hình = đáy máy; tay nắm, khay và ô bảng chừa thanh home, ô giấy chừa tai thỏ.
+- **Bộ thử**: `thu-2.mjs` 64 phép kiểm (30 phép «P»), ảnh `that-2-em-*.jpg`; vitest `tests/live-may-em-mep-phai-1111.test.tsx` + phép «GIẤY + BẢNG PHỦ KÍN» ở `tests/live-xoay-chia-doi-1011.test.ts`.
 
 ## 5. Ngoại lệ
 

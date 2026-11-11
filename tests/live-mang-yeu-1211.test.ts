@@ -204,7 +204,17 @@ describe('độ đệm thích nghi', () => {
     expect(Math.abs(dA - dB)).toBeLessThan(25)
     expect(dB).toBeGreaterThan(200)
   })
-  it('mạng tốt: D ở sàn 22 ms, mức mạng 0, không xin đường phụ', () => {
+  it('RUNG LẺ một đợt 150 ms rồi mạng tốt lại: độ đệm về gần sàn trong ~2 giây (trước: ~10 giây); rung LẶP LẠI thì giữ đệm, không rút vội', () => {
+    // một đợt rung 150 ms dài 4 giây (giây 2–6), rồi yên
+    const mot = chay(taoDemPhat(), [...troRung(0, 2000, 0), ...troRung(2000, 6000, 150), ...troRung(6000, 12_000, 0)], LECH, LECH + 12_000)
+    const dMot = (t: number) => mot.ks.find((k) => k.t >= LECH + t)!.d
+    expect(dMot(5800)).toBeGreaterThan(120)
+    expect(dMot(8300)).toBeLessThan(40) // 2,3 giây sau khi hết rung (gói cuối của đợt rung tới muộn tới 150 ms)
+    // hai đợt rung cách nhau 3 giây: sau đợt hai vẫn giữ đệm (cửa sổ chậm 10 giây)
+    const hai = chay(taoDemPhat(), [...troRung(0, 2000, 0), ...troRung(2000, 4000, 150), ...troRung(4000, 7000, 0), ...troRung(7000, 9000, 150), ...troRung(9000, 14_000, 0)], LECH, LECH + 14_000)
+    expect(hai.ks.find((k) => k.t >= LECH + 11_500)!.d).toBeGreaterThan(100)
+  })
+  it('mạng tốt: D ở sàn (một khoảng gói + 3 ms, không quá 22 ms), mức mạng 0, không xin đường phụ', () => {
     const ds = net(200), dem = taoDemPhat(), r = chay(dem, goiCua(ds, 3), LECH, LECH + 1500)
     expect(r.ra).toEqual(ds)
     expect(Math.max(...r.ks.map((k) => k.d))).toBeLessThanOrEqual(22 + 1e-9)

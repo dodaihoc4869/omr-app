@@ -47,8 +47,11 @@ export interface LivePhong {
   micDong?: { id: string; mid: string }[]
   /** Cho em ở xa (thuộc lớp, chưa điểm danh) vào xem — điểm quyết 4, mặc định TẮT. */
   xa: boolean
-  /** Máy em TRONG LỚP có phát tiếng không — điểm quyết 3, mặc định TẮT (chống dàn đồng ca lệch + hú). Em ở xa luôn mặc định bật. */
+  /** Máy em TRONG LỚP có phát tiếng không — điểm quyết 3. Thầy 11/11 lần 4 («Tự động bật tiếng … cho hs khi vào live»): mặc định BẬT («Tất cả»); thầy chọn
+   *  «Em ở xa» ⇒ tắt (chống dàn đồng ca lệch + hú). Em ở xa luôn mặc định bật. */
   tiengLop: boolean
+  /** Thầy ĐÃ TỰ CHỌN «Em ở xa» / «Tất cả» trong buổi này (kể cả trước khi bật live) ⇒ lần bật live đầu không ghi đè lựa chọn ấy. */
+  tiengChon?: boolean
   /** Số thứ tự mục cuối của sổ nét. */
   soNet: number
   /** Lần cuối thầy có dấu hiệu đang live (bật, nhịp có tiếng / có nét, nét xong) — quá `TU_TAT_LIVE_MS` ⇒ phòng tự tắt live. */
@@ -97,7 +100,7 @@ export function nhomKhung(ma: number): 'so' | 'diem' | null {
 /** Mục sổ nét làm sổ bắt đầu lại (xoá sạch / bảng mới) ⇒ phòng dọn phần cũ. */
 export const laMucDonSo = (ma: number): boolean => ma === MA_SO.xoaHet || ma === MA_SO.bangMoi
 
-const liveTrong = (): LivePhong => ({ cho: false, sfu: false, san: false, bat: false, tu: null, phien: 0, ss: null, tay: [], noi: [], bang: false, mic: null, micDong: [], xa: false, tiengLop: false, soNet: 0, nhip: 0, moi: null, micLoi: null, camMic: null, nk: [], giay: null })
+const liveTrong = (): LivePhong => ({ cho: false, sfu: false, san: false, bat: false, tu: null, phien: 0, ss: null, tay: [], noi: [], bang: false, mic: null, micDong: [], xa: false, tiengLop: true, soNet: 0, nhip: 0, moi: null, micLoi: null, camMic: null, nk: [], giay: null })
 /** Khối live của phòng; phòng lưu trước 10/11 (chưa có) ⇒ null = coi như công tắc tắt tới khi thầy mở lại phòng. */
 export const liveCua = (st: Pick<TrangThaiPhong, 'live'>): LivePhong | null => st.live ?? null
 const liveMo = (st: TrangThaiPhong): LivePhong | null => (st.live && st.live.cho && !st.ketThuc ? st.live : null)
@@ -162,6 +165,9 @@ export function liveSan(st: TrangThaiPhong, o: { san?: boolean; ss?: unknown }, 
 export function liveBat(st: TrangThaiPhong, nay: number): boolean {
   const l = liveMo(st)
   if (!l || l.bat) return false
+  // Thầy 11/11 lần 4: «Tự động bật tiếng … cho hs khi vào live» ⇒ lần bật live ĐẦU của buổi, máy em trong lớp cũng phát tiếng (phòng mở trước 11/11 còn giữ `tiengLop: false`).
+  // Các lần bật sau trong buổi giữ lựa chọn của thầy («Em ở xa» / «Tất cả»); thầy đã chọn trong cửa sổ nút Live TRƯỚC khi bật (`tiengChon`) cũng giữ.
+  if (l.phien === 0 && !l.tiengChon) l.tiengLop = true
   l.bat = true; l.san = true; l.tu = nay; l.phien += 1; l.nhip = nay
   thuMic(l, nay, 'tat'); donDamThoai(l)
   // Bật live khi thầy ĐANG gọi một em lên bảng ⇒ máy em vào bảng live ngay; còn lại máy em giữ màn câu hỏi, chỉ có tiếng.
@@ -190,6 +196,7 @@ export function liveDat(st: TrangThaiPhong, o: { xa?: unknown; tiengLop?: unknow
   const doiGiay = JSON.stringify(giay) !== JSON.stringify(l.giay ?? null)
   // `nghi` (11/11): tạm dừng / tiếp tục — chỉ khi đang live. Tạm dừng ⇒ thu mic của em đang nói, thôi lời mời; tiếp tục ⇒ tính lại nhịp «thầy còn live».
   const nghi = typeof o.nghi === 'boolean' && l.bat ? o.nghi : !!l.nghi
+  if (typeof o.tiengLop === 'boolean') l.tiengChon = true // thầy tự chọn ⇒ `liveBat` lần đầu không tự bật lại
   if (xa === l.xa && tiengLop === l.tiengLop && bang === !!l.bang && !doiGiay && nghi === !!l.nghi) return false
   if (nghi !== !!l.nghi) { l.nghi = nghi; l.nhip = nay; if (nghi) { thuMic(l, nay, 'tat'); l.moi = null } }
   // Tắt «cho em ở xa»: em ở xa không còn được xem ⇒ ra khỏi hàng giơ tay, thôi nói, thôi được mời.
@@ -428,7 +435,7 @@ export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
   if (!l || !l.cho) return null
   const e = st.ds.find((x) => x.sbd === sbd), duoc = !st.ketThuc && !!e && (e.vao || l.xa)
   const hang = l.tay.findIndex((x) => x.sbd === sbd)
-  // Điểm quyết 3: em trong lớp mặc định TẮT tiếng (thầy bật «Tất cả» thì bật); em ở xa mặc định bật. Máy em tự bật được khi đeo tai nghe.
+  // Điểm quyết 3 (thầy 11/11 lần 4): em trong lớp mặc định BẬT tiếng; thầy chọn «Em ở xa» (`tiengLop: false`) ⇒ tắt, em đeo tai nghe tự bật lại được. Em ở xa luôn bật.
   const tieng: TiengLive = !l.sfu ? 'chua-cau-hinh' : e?.vao && !l.tiengLop ? 'tat' : 'bat'
   return {
     duocXem: duoc, san: duoc && l.san, bat: duoc && l.bat, tu: duoc ? l.tu : null, phien: l.phien, ss: duoc ? l.ss : null, tieng, soNet: l.soNet,

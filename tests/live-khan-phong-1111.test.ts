@@ -191,7 +191,9 @@ describe('ĐỢT 2 · giơ tay, mời nói, thu mic (thuần — giao diện ch�
     LL.liveDat(st, { xa: true }, 1400)
     expect(LL.laEmXaDangLive(st, 'XA')).toBe(true); expect(LL.laEmXaDangLive(st, 'S1')).toBe(false); expect(LL.laEmXaDangLive(st, 'LA')).toBe(false)
     expect(L.viewEm(st, 'XA').live).toMatchObject({ duocXem: true, bat: true, bang: true, xa: true, tieng: 'bat' })
-    expect(L.viewEm(st, 'S1').live).toMatchObject({ xa: false, bang: false, tieng: 'tat' }) // em trong lớp: mặc định tắt tiếng (điểm quyết 3)
+    expect(L.viewEm(st, 'S1').live).toMatchObject({ xa: false, bang: false, tieng: 'bat' }) // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): em trong lớp mặc định BẬT tiếng
+    LL.liveDat(st, { tiengLop: false }, 1450) // thầy chọn «Em ở xa» ⇒ chỉ em ở xa còn nghe (điểm quyết 3)
+    expect(L.viewEm(st, 'S1').live).toMatchObject({ xa: false, bang: false, tieng: 'tat' }); expect(L.viewEm(st, 'XA').live).toMatchObject({ tieng: 'bat' })
     expect(LL.liveTay(st, 'XA', true, 1500)).toBe(true)
     expect(LL.liveMoi(st, 'XA', 1600)).toBe(true)
     expect(mic(st, 'XA', 1700)).toBe(true)

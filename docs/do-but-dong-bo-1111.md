@@ -350,3 +350,72 @@ Chỉ suy đoán, chưa thử máy thật: iOS có giao đủ gói DataChannel k
 node scripts/thu-live-1011/do-mang-yeu.mjs          # GOC_CU=<thư mục có src/lib bản trước> CHEO=1 để có cột «trước» + dòng đo chéo
 npx vitest run tests/live-mang-yeu-1211.test.ts
 ```
+
+## 10. Tức thì hơn cho cả hai máy (12/11, lần 2)
+
+Thầy thử Wacom thật + máy em: «Nét bút bị chậm hơn, làm cho thật hơn tức thì hơn nữa cho cả 2 app gv và hs».
+
+Mọi số ở mục này đo trên **Chromium không đầu** (canvas vẽ bằng phần mềm) hoặc **máy mô phỏng** — KHÔNG đo được độ trễ ra màn của card đồ hoạ thật; lợi ích của lớp vẽ-thẳng-lên-màn chỉ thầy thử trên máy thật mới biết.
+
+### 10.1 Máy thầy — lớp bảng ĐẶC (P1)
+
+Vì sao chậm đi: bản «hết nháy» bỏ đoạn dự đoán; rồi lớp mực phủ cả tờ phải bỏ `desynchronized` (trong suốt + vẽ thẳng lên màn = đen kín giấy đề trên card thật, sự cố 11/11) ⇒ mực phải chờ trình duyệt ghép khung.
+
+Cách làm (`src/lib/but-bang-to-chieu.ts`):
+- Ô bảng đen có canvas riêng `cvB`: **đặc** (`alpha: false`), nằm **trong** cột bảng làm nền của cột (`z-index: -1`, cột `isolation: isolate`), tự tô màu nền + viền + mọi mực trong ô bảng, xin `desynchronized: true`. Lớp phủ cả tờ `cvT` không xin, và để trống trong ô bảng. Lớp đã chốt `cvC` vẫn giữ mọi nét nên tẩy / hoàn tác / cuộn / đổi cỡ không đổi cách làm.
+- **Chống đen đề:** lớp đặc chỉ rộng đúng ô bảng nên không có điểm ảnh nào của nó nằm trên giấy đề; nó không cần trong suốt nên có bị đưa lên lớp phủ phần cứng thì thứ hiện ra vẫn là bảng đen có mực.
+- **Công tắc lùi:** chỉ bật khi trình duyệt cấp `desynchronized` cho `cvB`; localStorage `ddh.but.nhanh` = `tat` tắt hẳn (hoặc gõ `__mcBut.nhanh(false)` trong bảng điều khiển của tờ), `ep` = ép bật để thử. Nền cột không dựng lại được (ảnh nền, nền bán trong suốt, bóng kiểu khác, cột có viền thật, cột không định vị) ⇒ đợt đó tự dùng đường cũ.
+- Đổi so với trước: mực trên bảng nay nằm DƯỚI thẻ tên / chữ của cột bảng (trước: trên).
+
+Phép thử (`node scripts/but-bang-1011/do-bang-nhanh.mjs`, số: `docs/ban-ve-but-1011/so-do-bang-nhanh.json`) — chạy tờ thật hai lần y hệt nhau, một lần đường cũ, một lần ép lớp bảng đặc, chụp cả cửa sổ ở 6 mốc (viết bảng + giấy + nét vắt qua mép bảng · cuộn · viết tiếp · hoàn tác · tẩy · đổi cỡ cửa sổ):
+
+| | Mật độ 1 | Mật độ 1,5 |
+|---|---|---|
+| Điểm ảnh khác ở vùng GIẤY ĐỀ (cả 6 mốc) | 0 | 0 |
+| Điểm ảnh khác ở vùng bảng, 5 mốc đầu | 0 | 0 |
+| … mốc đổi cỡ cửa sổ | 1 (lệch 4 / 255) | 3160 (cả mực lệch 1 điểm ảnh) |
+| Mực lùi ≥ 16 / 255 lúc viết (đường cũ / lớp đặc, ~378 khung) | 64 / 73 | 140 / 158 |
+| Nét ướt khác nét khô (17 nét) | 0 / 0 | 0 / 0 |
+| Xử lý mỗi khung ×1 (đường cũ / lớp đặc) | 0,26 / 0,27 ms | 0,26 / 0,29 ms |
+| Xử lý mỗi khung ×4 | 1,28 / 1,22 ms | — |
+
+Mật độ 1,25: như mật độ 1 (mốc đổi cỡ: 6 điểm ảnh ở mép viền). «Mực lùi» còn lại là đầu nét thon dần khi nét dài ra — có sẵn ở đường cũ, hai đường cùng cỡ.
+
+Mắc phải khi làm: lớp nằm trong cột bị ghép lệch phần lẻ của điểm ảnh ở mật độ 1,5 (nét nhoè 0,26 điểm ảnh) ⇒ `image-rendering: pixelated` + dời lớp về đúng lưới của `cvT`.
+
+**Không làm / chưa đạt:**
+- «Vẽ ngay khi mẫu tới» (pointerrawupdate) KHÔNG tự bật: đo 380 khung thấy 61 điểm ảnh mực lùi (đoạn vẽ trước dựng từ mẫu thô, lệch với nét đã làm trơn). Vẫn bật tay được: `__mcBut.veNgay(true)`.
+- Dự đoán ngắn: KHÔNG làm, chưa đo — mọi dự đoán sai đều phải rút mực, trái với «không nháy» (lần 1 đo dự đoán dài: 55 % điểm ảnh lùi).
+- Trễ mẫu → mực trước / sau trên card thật: KHÔNG đo được ở đây.
+
+### 10.2 Máy em (P2)
+
+Mô phỏng `do-mang-yeu.mjs`, 9 hạt, so với bản đang sống #1614 (cột `ban1614` trong `so-do-mang-yeu.json`):
+
+| | #1614 | Sau |
+|---|---|---|
+| Mạng tốt, DataChannel: trễ trung vị / độ đệm | 54 ms / 22 | 52 ms / 20 |
+| Mạng tốt, WebSocket | 76 ms / 43 | 76 ms / 43 |
+| Rung 30 ms | 95 ms | 95 ms |
+| Rung 150 ms trong 5 giây rồi tốt lại: thời gian về sàn | 9,5 giây | 1,9 giây |
+| … đường WebSocket | 9,9 giây | 1,5 giây |
+| «Wi-Fi 1 vạch»: đứng > 100 ms × dài nhất · trễ | 4 × 367 ms · 257 ms | 4 × 367 ms · 257 ms |
+| Các dòng mạng xấu khác | — | bằng #1614 (lệch ≤ 3 %) |
+
+- Sàn độ đệm 22 → 14 ms: mạng tốt đệm = một khoảng gói + 3 ms ≈ 20 ms. Thấp hơn nữa phải gửi dày hơn một lô mỗi khung hình của thầy — chưa làm được (mẫu bút chỉ tới theo khung).
+- Về sàn nhanh: rung LẺ một đợt nhẹ (< 250 ms, 30 giây qua không có đợt khác) rồi yên 0,3 giây ⇒ chỉ tính các mẫu sau đợt rung, rút 12 % tốc độ phát. Rung lặp lại hoặc đợt nặng (TCP chặn đầu hàng, vừa đứt): giữ cửa sổ chậm 10 giây như #1614.
+- **Đã thử, không dùng — nhịp gửi dày hơn:** WebSocket 17 ms một lô (kèm nâng trần phòng 45 → 80 lô / giây): mạng tốt 76 → 55 ms, nhưng em mạng xấu đứng 8 → 11 lần (15 hạt) vì trên TCP mỗi gói là một lần có thể bị chặn đầu hàng. Cho lô đầu của nét đi ngay: thêm ~10 % gói, cùng cái hại. Đường chính (DataChannel) vốn đã gửi ngay sau từng khung hình của thầy ⇒ băng thông mỗi em KHÔNG đổi so với #1614.
+- Lớp vẽ: gói tới là nạp ngay, khung hình kế phát luôn — không có khung chờ thêm (đọc `LopLive.tsx`). Mật độ 3 so với 2 trên bộ thử (844 × 390, CPU ×1 / ×4 / ×6): 60 khung / giây cả hai, 0–1 khung trễ ⇒ không kẹp.
+- **Chưa đạt:** đích «≤ 45–50 ms trên bộ thử». Bộ thử đi đường WebSocket (không có SFU) nên vẫn ~75–80 ms; đường DataChannel mô phỏng 52 ms.
+
+### 10.3 «Thật hơn» (P3)
+
+`thu-but-1111.mjs` chụp ô bảng hai máy sau khi viết, khớp theo hộp bao vùng mực: tỉ lệ đều hai chiều 1,046; phần giao / phần hợp của vùng mực 0,55 tại chỗ, 0,79 khi dời 1 điểm ảnh. Hai máy khác cỡ (thầy 1366 @1, em 844 @2) nên **không đo được trùng từng điểm ảnh**; chưa dựng phép thử cùng cỡ cùng mật độ. Có sẵn từ các lần trước: cùng bộ dựng nét `LoiBut`, mã hoá điểm không mất, đuôi nét dở vẽ đúng dáng nét xong (nét ướt = nét khô trên cả hai máy).
+
+### 10.4 Chạy lại
+
+```
+node scripts/but-bang-1011/do-bang-nhanh.mjs        # MAT_DO=1.25 để đo mật độ khác
+GOC_1614=<thư mục có src/lib bản #1614> SO_HAT=9 node scripts/thu-live-1011/do-mang-yeu.mjs
+npx vitest run tests/but-bang-nhanh-1211.test.ts tests/live-mang-yeu-1211.test.ts
+```

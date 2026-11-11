@@ -2,7 +2,8 @@
 //   K1  «Khi chuyển câu, máy hs nhận câu nhưng khi bấm nộp thì không tự về màn live» ⇒ em bấm Gửi là về bảng live NGAY (không chờ phòng báo lại).
 //   K2  «Bấm lên bảng là phải ép hết mọi hs vào live không chờ nộp xong» ⇒ cờ phòng `bang` ép cả em chưa gửi; máy em KHÔNG gửi hộ đáp án đang chọn dở.
 //   K3  «Tạm dừng» ⇒ máy em hiện «Thầy tạm dừng live».
-//   K4  tay nắm + khay ở MÉP TRÊN (thầy 11/11 lần 2; lần 1 là mép trái); ô tiếng nằm trong khay; không còn viên «Thầy đang live» nổi ở đáy màn.
+//   K4  tay nắm + khay ở MÉP PHẢI, giữa chiều cao (thầy 11/11 LẦN 3: «Chuyển mic, tắt tiếng, thanh ẩn sang hẳn góc phải ở giữa bảng đen … thiết kế ẩn hết vào
+//       thanh ẩn»; lần 2 là mép trên, lần 1 là mép trái); ô tiếng nằm trong khay; không còn viên «Thầy đang live» nổi ở đáy màn, không còn viên «Tiếng đang tắt» nổi.
 //   K6  vào bảng sau khi gửi không có viên «Thầy đang live» chớp giữa màn.
 //   B2  tin `roi` mang kiểu rời (`an` trên máy không phân biệt được khoá màn; `chia` khi chia đôi màn hình).
 //   B3  bảng live không nuốt việc của lượt: dải đoán / tiếp sức gửi đúng lệnh `doan` / `tiep`.
@@ -138,8 +139,12 @@ describe('K2 · thầy gọi lên bảng ⇒ ép cả lớp vào bảng live, kh
   })
 })
 
-describe('K3 · K4 · tạm dừng + khay mép trái', () => {
-  it('TIẾNG ĐANG TẮT (thầy 11/11: live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết): khay đóng vẫn có nút «Tiếng đang tắt» cạnh tay nắm, MỘT chạm là bật; thầy tạm dừng / buổi chưa có tiếng ⇒ không hiện', async () => {
+describe('K3 · K4 · tạm dừng + khay mép phải', () => {
+  // 11/11 LẦN 3 — sửa có chủ đích: trước đây (lần 2) khay đóng có nút nổi «Tiếng đang tắt» cạnh tay nắm. Thầy: «thiết kế ẩn hết vào thanh ẩn» ⇒ bỏ nút nổi;
+  // tay nắm mang DẤU loa gạch rất nhỏ, và lần ĐẦU trong buổi khay tự mở 3 giây cho em thấy nút «Tiếng» (một chạm là bật) rồi tự thu.
+  // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): máy em trong lớp nay MẶC ĐỊNH BẬT tiếng ⇒ không dấu, khay không tự mở; trạng thái «tiếng tắt» của test này
+  // dựng bằng đường thật: thầy chọn «Em ở xa» (`live-dat { tiengLop: false }`).
+  it('TIẾNG ĐANG TẮT (thầy 11/11: live «Em ở xa», máy em trong lớp tắt tiếng mà không ai biết): KHÔNG còn nút nổi; tay nắm có dấu «tiếng đang tắt», khay tự mở lần đầu, nút «Tiếng» trong khay MỘT chạm là bật; thầy tạm dừng ⇒ hết dấu', async () => {
     const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0)
     moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 100); moDapAn(st, T0 + 200, (a, b) => a === b)
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
@@ -148,15 +153,26 @@ describe('K3 · K4 · tạm dừng + khay mép trái', () => {
     const ws = WsGia.ds[0]!, bao = () => ws.nhan(viewEm(st, 'S1'))
     liveBat(st, T0 + 1000); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
+    const dau = () => document.querySelector('.lv .lv-nam .lv-nam-dau [data-dau="tieng"]')
+    // mặc định mới: tiếng BẬT ⇒ ô «Tiếng» ghi «Đang bật», tay nắm không có dấu, khay không tự mở
+    expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'bat' })
+    await screen.findByLabelText('Tiếng thầy: đang bật. Chạm để tắt')
+    expect(dau()).toBeNull(); expect(document.querySelector('.lv .lv-khay')!.hasAttribute('data-mo')).toBe(false)
+    liveDat(st, { tiengLop: false }, T0 + 1500); bao() // thầy chọn «Em ở xa»
     expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'tat' }) // em trong lớp, thầy để «Em ở xa»
-    const nut = await screen.findByLabelText('Tiếng thầy đang tắt. Chạm để bật')
-    expect(nut.textContent).toBe('Tiếng đang tắt')
+    await waitFor(() => expect(dau()).toBeTruthy())
+    expect(dau()!.getAttribute('title')).toBe('tiếng đang tắt')
+    expect(document.querySelector('.lv .lv-nam')!.getAttribute('aria-label')).toMatch(/khay điều khiển · tiếng đang tắt$/)
+    expect(lop('.lv-tieng-tat')).toBe(0); expect(screen.queryByText('Tiếng đang tắt')).toBeNull() // viên nổi cũ đã bỏ
+    await waitFor(() => expect(document.querySelector('.lv .lv-khay')!.hasAttribute('data-mo')).toBe(true)) // lần đầu: khay tự mở
     liveDat(st, { nghi: true }, T0 + 2000); bao()
-    await waitFor(() => expect(screen.queryByLabelText('Tiếng thầy đang tắt. Chạm để bật')).toBeNull())
+    await waitFor(() => expect(dau()).toBeNull())
     liveDat(st, { nghi: false }, T0 + 3000); bao()
-    fireEvent.click(await screen.findByLabelText('Tiếng thầy đang tắt. Chạm để bật'))
-    await waitFor(() => expect(screen.queryByLabelText('Tiếng thầy đang tắt. Chạm để bật')).toBeNull()) // đã bật ⇒ nút mất
-    expect(screen.getByLabelText('Tiếng thầy: đang bật. Chạm để tắt')).toBeTruthy() // ô «Tiếng» trong khay cũng đã bật
+    await waitFor(() => expect(dau()).toBeTruthy())
+    fireEvent.click(await screen.findByLabelText('Tiếng thầy: đang tắt. Chạm để bật'))
+    await waitFor(() => expect(dau()).toBeNull()) // đã bật ⇒ hết dấu
+    expect(screen.getByLabelText('Tiếng thầy: đang bật. Chạm để tắt')).toBeTruthy() // ô «Tiếng» trong khay đã bật
+    expect(document.querySelector('.lv .lv-nam')!.getAttribute('aria-label')).not.toContain('tiếng đang tắt')
   })
   it('thầy tạm dừng ⇒ bảng live ghi «Thầy tạm dừng live» (khay cũng ghi); tiếp tục ⇒ hết; lớp bảng KHÔNG dựng lại (không nháy)', async () => {
     const st = phong(); moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 100); moDapAn(st, T0 + 200, (a, b) => a === b)
@@ -175,18 +191,34 @@ describe('K3 · K4 · tạm dừng + khay mép trái', () => {
     await waitFor(() => expect(screen.queryByText('Thầy tạm dừng live')).toBeNull())
     expect(document.querySelector('.lv')).toBe(goc)
   })
-  it('tay nắm + khay neo MÉP TRÊN, xổ từ trên xuống, chừa tai thỏ; ô tiếng trong khay; không còn viên «Thầy đang live» nổi đáy màn, không còn nút nổi «Bật mic lại»', () => {
+  // 11/11 LẦN 3 — sửa có chủ đích (lần 2 khoá «neo MÉP TRÊN, xổ từ trên xuống»): thầy chốt MÉP PHẢI, giữa chiều cao bảng đen.
+  it('tay nắm + khay neo MÉP PHẢI giữa chiều cao, khay trượt từ phải ≤ 180 ms bằng transform / opacity, chừa vùng an toàn; màn câu hỏi: tay nắm đứng TRÊN nút «Gửi», khay dừng bên trái cột nút «Gửi»; ô tiếng trong khay; không còn nút / viên / huy hiệu nổi', () => {
     const css = readFileSync('src/components/live/live-em.css', 'utf8'), tsx = readFileSync('src/components/live/LopLive.tsx', 'utf8')
     const luat = (bo: string) => { const i = css.indexOf(`\n${bo} {`); return i < 0 ? '' : css.slice(i, css.indexOf('}', i)) }
-    expect(luat('.lv .lv-nam, .lv-phu .lv-nam')).toMatch(/left: 50%; top: var\(--lv-at-tren, 0px\)/)
-    expect(luat('.lv .lv-nam, .lv-phu .lv-nam')).not.toMatch(/right:|bottom:/)
-    expect(luat('.lv-nam i')).toMatch(/width: 46px; height: 7px/) // viên thuốc nằm ngang
-    expect(luat('.lv-khay')).toMatch(/left: 50%; top: calc\(var\(--lv-at-tren, 0px\) \+ 10px\)/)
-    expect(luat('.lv-khay')).toMatch(/translate3d\(-50%, calc\(-100% - 24px\), 0\)/)
-    expect(luat('.lv-khay[data-mo]')).toMatch(/translate3d\(-50%, 0, 0\)/)
-    expect(luat('.lv-phu')).toMatch(/--lv-at-tren: env\(safe-area-inset-top, 0px\)/) // màn câu hỏi: không đè tai thỏ
+    const nam = luat('.lv .lv-nam, .lv-phu .lv-nam')
+    expect(nam).toMatch(/right: var\(--lv-at-phai, 0px\); top: 50%; width: 44px; height: 76px/) // vùng chạm 44 × 76, sát mép phải, giữa chiều cao
+    expect(nam).not.toMatch(/left:|bottom:/)
+    expect(luat('.lv-nam i')).toMatch(/width: 5px; height: 40px/) // viên thuốc DỌC mảnh
+    expect(luat('.lv-nam i')).toMatch(/opacity: 0\.55/) // mờ khi không chạm
+    expect(luat('.lv-nam[data-ne]')).toMatch(/opacity: 0\.16/) // bút của thầy tới gần ⇒ mờ hẳn
+    const khay = luat('.lv-khay')
+    expect(khay).toMatch(/right: var\(--lv-kp\); top: 50%/)
+    expect(khay).toMatch(/translate3d\(calc\(100% \+ var\(--lv-kp\) \+ 16px\), -50%, 0\)/)
+    expect(khay).toMatch(/transition: transform 0\.18s cubic-bezier\([^)]*\), opacity 0\.14s, visibility 0s 0\.18s/) // ≤ 180 ms, chỉ transform / opacity
+    expect(khay).not.toMatch(/transition:[^;]*(left|right|top|width|height)/)
+    expect(luat('.lv-khay[data-mo]')).toMatch(/translate3d\(0, -50%, 0\)/)
+    expect(luat('.lv-phu')).toMatch(/--lv-at-phai: env\(safe-area-inset-right, 0px\)/) // màn câu hỏi: không đè vùng an toàn mép phải
+    expect(luat('.lv-phu .lv-nam')).toMatch(/top: calc\(50% - 104px\)/) // tâm tay nắm cao hơn giữa màn 104 px: mép dưới (−66) cách mép trên nút «Gửi» (−42, quầng −47) ≥ 19 px
+    expect(luat('.lv-phu .lv-khay')).toMatch(/--lv-kp: calc\(max\(12px, env\(safe-area-inset-right, 0px\)\) \+ 66px\)/) // nút «Gửi»: right max(12px, an toàn), rộng 56 ⇒ khay cách thêm 10
+    const gui = readFileSync('src/components/bpu/bpu-hs.css', 'utf8')
+    expect(gui).toMatch(/\.bpu-gui-noi \{ position: fixed; z-index: 2; top: 50%; right: max\(12px, env\(safe-area-inset-right, 0px\)\); width: 56px/) // nút «Gửi» giữ nguyên chỗ
+    // máy yếu / giảm chuyển động: không trượt, không kính mờ
+    expect(css).toMatch(/html\.may-yeu \.lv-khay \{ transition: none; -webkit-backdrop-filter: none; backdrop-filter: none;/)
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{\n  \.lv-khay, [^{]*\{ transition: none; \}/)
     expect(tsx).not.toContain('className="lv-dau') // viên nổi cũ
     expect(tsx).not.toContain('lv-bat-tieng') // nút nổi «Bật mic lại» / «Chạm để bật tiếng»
+    expect(tsx).not.toContain('lv-tieng-tat') // viên «Tiếng đang tắt» nổi (lần 2)
+    expect(tsx).not.toContain('lv-nam-hh') // huy hiệu mic / giơ tay tròn nổi (lần 2)
     expect(tsx).toMatch(/className=\{`lv-vua mic/) // mic của em nằm trong khay
   })
 })
