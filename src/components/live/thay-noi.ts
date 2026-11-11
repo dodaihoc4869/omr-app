@@ -37,7 +37,9 @@ export interface TtLiveTo {
   ngheEm: boolean
   /** Lượt đang mở mà còn em chưa gửi — viên live nhắc (đặc tả mục 5). */
   chuaGui: number
-  the: { ds: { id: string; ten: string }[]; chon: string; loi: string; tiengLop: boolean; xa: boolean } | null
+  /** `loa` = ô chọn đầu ra âm thanh (null = trình duyệt không chọn được ⇒ ẩn); `thu` = kết quả lần «Thử loa» gần nhất; `trung` = tên loa mặc định nếu đó là
+   *  CHÍNH thiết bị của mic (bộ thu USB — Windows hay tự đặt làm loa mặc định ⇒ tiếng app ra jack tai nghe của bộ thu, thầy không nghe thấy). */
+  the: { ds: { id: string; ten: string }[]; chon: string; loi: string; tiengLop: boolean; xa: boolean; loa?: { ds: { id: string; ten: string }[]; chon: string; thu?: 'dang' | 'ok' | 'loi'; trung?: string } | null } | null
   /** `kieu` (11/11): em rời bằng cách nào — chữ đã soạn sẵn theo tín hiệu máy em báo; '' = máy em bản cũ không báo. */
   roi: { sbd: string; ten: string; ky: string; doi: string; mau: string; luc: number; kieu: string }[]
   /** ĐỢT 2 (đặc tả 4.8): hàng giơ tay theo thứ tự · em đang được mời mà chưa bật mic · tên em vừa không bật được mic ('' = không). */
@@ -174,6 +176,17 @@ function soatGhi(): void {
     m.soatMayGhi({ layLuong: lt ? lt.luongGhi : null, pha: ttLt?.pha, live: view?.live, phong: layPhong(), buoiId: view?.buoiId, gui: (t) => { layPhong()?.gui(t) } })
   }).catch(() => {})
 }
+/** Đọc lại danh sách loa cho cửa sổ nút Live (mở cửa sổ, cắm / rút thiết bị, đổi mic). Loa đã chọn không còn ⇒ về «Mặc định của máy». */
+async function napLoa(): Promise<void> {
+  if (!the || !lt?.coLoa?.()) return
+  const ds = await lt.dsLoa().catch(() => [])
+  const trung = (await lt.loaTrungMic(ttLt?.micTen || '')) || (await lt.loaTrungMic(nho(KHOA_MIC_TEN)))
+  if (!the || !lt) return
+  let chon = lt.loa()
+  if (chon && !ds.some((d) => d.id === chon)) { chon = ''; void lt.datLoa('') }
+  the = { ...the, loa: ds.length ? { ds, chon, thu: the.loa?.thu, trung } : null }
+  bao()
+}
 function bao(): void {
   const tt = trangThai()
   soatGhi()
@@ -225,9 +238,9 @@ function dam(): Promise<void> {
       kenh: { gui: (t) => { layPhong()?.gui(t) }, guiNhiPhan: (k) => { layPhong()?.guiNhiPhan(k) }, hangCho: () => layPhong()?.hangCho() ?? 0 },
       layAnh: anh, loc: cheDoLoc(), locOn: mucLocOn(), chuoi: nho('ddh.live.chuoi') !== 'tat', // công tắc lùi khẩn của chuỗi làm rõ tiếng: localStorage `ddh.live.chuoi` = `tat`
       // cắm / rút mic ⇒ ô chọn mic đang mở đọc lại danh sách
-      khiThietBi: () => { if (the && lt) void lt.dsMic().then((ds) => { if (the) { the = { ...the, ds }; bao() } }).catch(() => {}) },
+      khiThietBi: () => { if (the && lt) void lt.dsMic().then((ds) => { if (the) { the = { ...the, ds }; bao() } }).catch(() => {}); void napLoa() },
       micTen: nho(KHOA_MIC_TEN), khiMicMoi: (id) => { ghi(KHOA_MIC, id); if (the) the = { ...the, chon: id } }, // mic đã chọn đổi mã (cắm cổng khác) ⇒ nhớ mã mới
-      khiTrangThai: (t) => { ttLt = t; if (t.micTen && !t.micKhac && nho(KHOA_MIC)) ghi(KHOA_MIC_TEN, t.micTen); if (t.pha === 'live' || t.pha === 'san') dangBat = false; bao() },
+      khiTrangThai: (t) => { if (the && t.micTen !== ttLt?.micTen) setTimeout(() => { void napLoa() }, 0); ttLt = t; if (t.micTen && !t.micKhac && nho(KHOA_MIC)) ghi(KHOA_MIC_TEN, t.micTen); if (t.pha === 'live' || t.pha === 'san') dangBat = false; bao() },
     })
     if (view) lt.nhanTinPhong(view)
     void lt.noiSan()
@@ -278,6 +291,7 @@ async function moThe(): Promise<void> {
   loiMic = kq.ok ? '' : kq.lyDo
   if (!kq.ok) the = { ...the, loi: kq.lyDo }
   else the = { ...the, loi: '', ds: await lt.dsMic().catch(() => []) }
+  void napLoa() // ô «Loa» (sau khi có quyền mic thì trình duyệt mới cho tên thiết bị)
   bao()
 }
 async function bat(khongTieng: boolean): Promise<void> {
@@ -314,6 +328,8 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'chao': bao(); break
     case 'bam': bam(); break
     case 'the-dong': if (the) { the = null; lt?.thaMic(); bao() } break
+    case 'chon-loa': if (the?.loa && typeof m.id === 'string') { the = { ...the, loa: { ...the.loa, chon: m.id, thu: undefined } }; bao(); void lt?.datLoa(m.id).then(() => napLoa()) } break
+    case 'thu-loa': if (the?.loa && lt) { the = { ...the, loa: { ...the.loa, thu: 'dang' } }; bao(); void lt.thuLoa().then((ok) => { if (the?.loa) { the = { ...the, loa: { ...the.loa, thu: ok ? 'ok' : 'loi' } }; bao() } }) } break
     // chọn mic ⇒ áp NGAY cho cả vạch đo lẫn luồng đang gửi (thư viện gắn luồng mới vào bộ gửi), nhớ cho lần sau
     case 'chon-mic': if (the && typeof m.id === 'string') { the = { ...the, chon: m.id }; ghi(KHOA_MIC, m.id); bao(); void lt?.moMic(m.id).then((kq) => { loiMic = kq.ok ? '' : kq.lyDo; if (the && !kq.ok) the = { ...the, loi: kq.lyDo }; bao() }) } break
     // «Lọc tiếng ồn + khử vọng»: tự động / luôn bật / luôn tắt

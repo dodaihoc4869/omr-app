@@ -11,6 +11,7 @@ import { giaiGoi, giaiSo } from './ma-net'
 import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
+import { boLoa, theAmLoa } from './loa'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
@@ -77,6 +78,11 @@ const RAI_BU_MS = 3000
 /** Bản chốt của nét đang phát dở chờ tối đa ngần này (đệm phát D ≤ 150 ms + dư) rồi chốt luôn. */
 const CHO_CHOT_MS = 400
 
+/** Âm lượng tiếng thầy trên máy em ĐANG PHÁT MIC: mic có khử vọng của trình duyệt ⇒ 1; không (hoặc chưa biết) ⇒ 0,6. */
+export function amLuongKhiNoi(l: MediaStream | null): number {
+  try { return l?.getAudioTracks()[0]?.getSettings().echoCancellation === true ? 1 : 0.6 } catch { return 0.6 }
+}
+
 export function taoLiveEm(tuy: TuyChonLiveEm) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
   const tt: TrangThaiLiveEm = { duocXem: false, san: false, bat: false, tu: null, tieng: 'cho', nghe: false, kenhNet: 'ws', duBang: false, bang: false, duocMoMic: false, duocMoi: false, tay: false, hangTay: null, mic: 'tat', banNoi: null, nghi: false }
@@ -111,12 +117,13 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   const dcMo = (): boolean => !!dc && dc.readyState === 'open'
 
   // ── TIẾNG ──
-  /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ hạ tiếng thầy còn 25 % (loa máy em kề ngay mic của chính nó: khử vọng của
-   *  trình duyệt lọc gần hết, hạ âm lượng bớt phần còn lọt và bớt hú khi có máy khác mở loa gần đó; iPhone không cho trang đổi âm lượng ⇒ ở đó chỉ còn khử vọng). */
+  /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ âm lượng theo `amLuongKhiNoi` (có khử vọng ⇒ 1, không ⇒ 0,6). */
   /** Loa máy em ĐANG PHÁT tiếng thầy thật: có luồng, em không tắt tiếng, trình duyệt không chặn phát, em không rời màn. */
   const dangNghe = (): boolean => !!am && !!am.srcObject && tt.nghe && tt.tieng === 'co' && !roiMan
   const capNhatTieng = (): void => {
-    if (am) { am.muted = !tt.nghe || roiMan; try { am.volume = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? 0.25 : 1 } catch { /* iPhone */ } }
+    // 11/11 tối (thầy: em lên bảng không nghe thầy): bản cũ hạ còn 0,25 — trên điện thoại (trình duyệt chuyển tiếng sang loa thoại khi mic mở) gần như câm.
+    // Khử vọng của trình duyệt ĐANG chạy trên mic em ⇒ để nguyên 1; không có khử vọng ⇒ 0,6 (vẫn nghe rõ, bớt phần lọt vào mic).
+    if (am) { am.muted = !tt.nghe || roiMan; try { am.volume = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? amLuongKhiNoi(micLuong) : 1 } catch { /* iPhone */ } }
     if (amBan) amBan.muted = !tt.nghe || roiMan
   }
   /** Mọi thay đổi trên phiên SFU của máy em đi NỐI TIẾP (một phiên chỉ có một máy trạng thái lời mời / trả lời — tài liệu «Serialize mutations per session»). */
@@ -130,7 +137,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   async function moKhoaTieng(): Promise<boolean> {
     daCham = true
     try {
-      am = am ?? document.createElement('audio')
+      am = am ?? theAmLoa()
       am.autoplay = true
       am.setAttribute('playsinline', '')
       if (am.srcObject) { capNhatTieng(); await am.play(); dat({ tieng: 'co' }); return true }
@@ -173,7 +180,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
           thuBan = e.receiver
           try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
           try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-          amBan = amBan ?? document.createElement('audio')
+          amBan = amBan ?? theAmLoa()
           amBan.autoplay = true; amBan.setAttribute('playsinline', '')
           amBan.srcObject = new MediaStream([e.track])
           capNhatTieng()
@@ -184,7 +191,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         // Đệm jitter thấp nhất, để trình duyệt tự thích ứng (đặc tả 4.2).
         try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
         try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-        am = am ?? document.createElement('audio')
+        am = am ?? theAmLoa()
         am.autoplay = true
         am.setAttribute('playsinline', '')
         am.removeAttribute('src')
@@ -573,7 +580,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     trangThai: (): TrangThaiLiveEm => ({ ...tt }),
     nhanView, nhanTinPhong, khiNoiLai,
     moKhoaTieng, datTieng, datRoiMan,
-    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic,
+    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic, coLoa: boLoa.co, dsLoa: boLoa.ds, loa: boLoa.id, datLoa: boLoa.dat,
     gioTay, deSau, datGiayLech, datHienBang,
     /** Bảng đã chốt (khoá trang, tỉ lệ vùng viết, mọi nét) — dùng khi lớp vẽ cần dựng lại từ đầu (đổi cỡ, phóng bảng). */
     bang: (): BangNet => bang,
