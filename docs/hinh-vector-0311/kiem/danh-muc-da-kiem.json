@@ -8749,6 +8749,24 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b": {
+      "tep": "model-electron-native1029-ddh-8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd.svg",
+      "hashSvg": "8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd",
+      "byteSvg": 7505,
+      "byteGzip": 1464,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
+    "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674": {
+      "tep": "model-electron-native778-ddh-10fe2b89b1ecbcc9ed4ccb21cf4af7a76806262352657999e698dc88dd5f2609.svg",
+      "hashSvg": "10fe2b89b1ecbcc9ed4ccb21cf4af7a76806262352657999e698dc88dd5f2609",
+      "byteSvg": 8217,
+      "byteGzip": 1356,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "eed4e5a4900792fa1f83a4673ac26f4e84388c5d3afbef26c101b3dcf3000856": {
       "tep": "bang-do-thi-ddh-178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e.svg",
       "hashSvg": "178dbfc6ad6b92d0174330d559c99a9c3a247fc6db29e343130da3329837028e",
@@ -24958,6 +24976,26 @@
       ]
     },
     {
+      "qid": "DH-10-C3-B10-II-9",
+      "duMoiHinh": true,
+      "soHinhNguon": 2,
+      "soHinhDaKiem": 2,
+      "hinh": [
+        {
+          "hash": "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+          "where": "DH-10-C3-B10-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "c2d0995648c2373d0934832dd7e622aa01ef3925fa4667f25fdc53e2f42d51cb",
+          "vector": "model-electron-native778-ddh-10fe2b89b1ecbcc9ed4ccb21cf4af7a76806262352657999e698dc88dd5f2609.svg"
+        },
+        {
+          "hash": "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b",
+          "where": "DH-10-C3-B10-II-9.hinh.1.du_lieu",
+          "hashDataUrl": "699d6e20b1260e25acc2284cdbbbea9cdc756f7f4d9ceb698db8215c4d5fddad",
+          "vector": "model-electron-native1029-ddh-8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-10-C3-B14-D1-I-11",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -31215,6 +31253,7 @@
     "DH-10-C2-B9-D2-I-7",
     "DH-10-C3-B10-I-24",
     "DH-10-C3-B10-I-25",
+    "DH-10-C3-B10-II-9",
     "DH-10-C3-B14-D1-I-11",
     "DH-11-C1-B2-II-4",
     "DH-11-C1-B2-II-9",

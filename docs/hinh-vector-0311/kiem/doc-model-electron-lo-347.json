@@ -1,0 +1,626 @@
+{
+  "sources": [
+    {
+      "i": 1029,
+      "hash": "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b",
+      "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b.png",
+      "size": [
+        872,
+        210
+      ],
+      "left": {
+        "nuclei": [
+          {
+            "center": [
+              75,
+              103
+            ],
+            "radius": 22,
+            "text": "+1",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              75,
+              103
+            ]
+          },
+          {
+            "center": [
+              307,
+              101
+            ],
+            "radius": 22,
+            "text": "+9",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              307,
+              101
+            ]
+          }
+        ],
+        "orbits": [
+          {
+            "center": [
+              75,
+              102
+            ],
+            "rx": 59,
+            "ry": 56
+          },
+          {
+            "center": [
+              307,
+              101
+            ],
+            "rx": 96,
+            "ry": 92
+          },
+          {
+            "center": [
+              305,
+              103
+            ],
+            "rx": 58,
+            "ry": 57
+          }
+        ],
+        "electronCenters": [
+          [
+            129.5,
+            80.5
+          ],
+          [
+            217.5,
+            67.7
+          ],
+          [
+            227.6,
+            148
+          ],
+          [
+            259.6,
+            20.4
+          ],
+          [
+            324,
+            11
+          ],
+          [
+            390.9,
+            57.2
+          ],
+          [
+            395.4,
+            132.6
+          ],
+          [
+            306.8,
+            189.5
+          ],
+          [
+            305.8,
+            46.6
+          ],
+          [
+            307,
+            157.1
+          ]
+        ],
+        "electronCount": 10,
+        "plus": {
+          "text": "+",
+          "center": [
+            172,
+            99
+          ],
+          "font": "regular uprightserif"
+        }
+      },
+      "arrow": {
+        "shaft": [
+          [
+            458,
+            106
+          ],
+          [
+            529,
+            106
+          ]
+        ],
+        "headTriangle": [
+          [
+            529,
+            106
+          ],
+          [
+            521,
+            102
+          ],
+          [
+            521,
+            110
+          ]
+        ],
+        "filled": true,
+        "direction": "RIGHT"
+      },
+      "right": {
+        "nuclei": [
+          {
+            "center": [
+              628,
+              112
+            ],
+            "radius": 22,
+            "text": "+1",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              628,
+              112
+            ]
+          },
+          {
+            "center": [
+              763,
+              110
+            ],
+            "radius": 22,
+            "text": "+9",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              763,
+              110
+            ]
+          }
+        ],
+        "orbits": [
+          {
+            "center": [
+              629,
+              112
+            ],
+            "rx": 59,
+            "ry": 57
+          },
+          {
+            "center": [
+              763,
+              108
+            ],
+            "rx": 97,
+            "ry": 92
+          },
+          {
+            "center": [
+              761,
+              110
+            ],
+            "rx": 58,
+            "ry": 57
+          }
+        ],
+        "electronCenters": [
+          [
+            677.5,
+            102.9
+          ],
+          [
+            677.8,
+            122.2
+          ],
+          [
+            682.8,
+            155.9
+          ],
+          [
+            698.9,
+            41.8
+          ],
+          [
+            762.7,
+            196.9
+          ],
+          [
+            762.8,
+            53.9
+          ],
+          [
+            762.8,
+            164.9
+          ],
+          [
+            780.4,
+            18.9
+          ],
+          [
+            836.1,
+            165.3
+          ],
+          [
+            837.5,
+            52.4
+          ]
+        ],
+        "electronCount": 10,
+        "sharedPair": [
+          [
+            677.5,
+            102.9
+          ],
+          [
+            677.8,
+            122.2
+          ]
+        ],
+        "occlusion": "Continuousorbitscross, noerase atsharedlens oratomoverlap; dotsdrawnoverorbit."
+      }
+    },
+    {
+      "i": 778,
+      "hash": "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+      "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674.png",
+      "size": [
+        950,
+        185
+      ],
+      "left": {
+        "nuclei": [
+          {
+            "center": [
+              103,
+              87
+            ],
+            "radius": 19,
+            "text": "+7",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              103,
+              87
+            ]
+          },
+          {
+            "center": [
+              404,
+              95
+            ],
+            "radius": 20,
+            "text": "+7",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              404,
+              95
+            ]
+          }
+        ],
+        "orbits": [
+          {
+            "center": [
+              103,
+              88
+            ],
+            "rx": 90,
+            "ry": 80
+          },
+          {
+            "center": [
+              102,
+              89
+            ],
+            "rx": 55,
+            "ry": 50
+          },
+          {
+            "center": [
+              405,
+              95
+            ],
+            "rx": 90,
+            "ry": 80
+          },
+          {
+            "center": [
+              404,
+              96
+            ],
+            "rx": 53,
+            "ry": 50
+          }
+        ],
+        "electronsByAtom": [
+          [
+            [
+              16.2,
+              106.5
+            ],
+            [
+              60.5,
+              16.2
+            ],
+            [
+              173.2,
+              37.8
+            ],
+            [
+              171.6,
+              138.9
+            ],
+            [
+              114.1,
+              167.1
+            ],
+            [
+              101.9,
+              39.2
+            ],
+            [
+              103.3,
+              138.9
+            ]
+          ],
+          [
+            [
+              316.6,
+              109.1
+            ],
+            [
+              361,
+              24.3
+            ],
+            [
+              473.4,
+              44.7
+            ],
+            [
+              472.3,
+              145.6
+            ],
+            [
+              415.8,
+              173.8
+            ],
+            [
+              403.9,
+              47.3
+            ],
+            [
+              405,
+              145.7
+            ]
+          ]
+        ],
+        "electronCount": 14,
+        "plus": {
+          "text": "+",
+          "center": [
+            250,
+            90
+          ],
+          "font": "regular uprightserif"
+        }
+      },
+      "arrow": {
+        "shaft": [
+          [
+            528,
+            80.5
+          ],
+          [
+            595,
+            80.5
+          ]
+        ],
+        "headTriangle": [
+          [
+            595,
+            80.5
+          ],
+          [
+            588,
+            77
+          ],
+          [
+            588,
+            84
+          ]
+        ],
+        "filled": true,
+        "direction": "RIGHT"
+      },
+      "right": {
+        "nuclei": [
+          {
+            "center": [
+              714,
+              92
+            ],
+            "radius": 19,
+            "text": "+7",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              714,
+              92
+            ]
+          },
+          {
+            "center": [
+              864,
+              98
+            ],
+            "radius": 20,
+            "text": "+7",
+            "fill": "red withthinblackoutline",
+            "font": "truebold uprightserif black; + anddigit onSAMEbaseline, noSup",
+            "textCenter": [
+              864,
+              98
+            ]
+          }
+        ],
+        "orbits": [
+          {
+            "center": [
+              713,
+              93
+            ],
+            "rx": 89,
+            "ry": 80
+          },
+          {
+            "center": [
+              712,
+              94
+            ],
+            "rx": 55,
+            "ry": 50
+          },
+          {
+            "center": [
+              864,
+              97
+            ],
+            "rx": 88,
+            "ry": 81
+          },
+          {
+            "center": [
+              862,
+              99
+            ],
+            "rx": 55,
+            "ry": 50
+          }
+        ],
+        "innerElectrons": [
+          [
+            712.1,
+            44.7
+          ],
+          [
+            713.7,
+            144.4
+          ],
+          [
+            862.6,
+            49.9
+          ],
+          [
+            863.9,
+            148.2
+          ]
+        ],
+        "externalOuterElectrons": [
+          [
+            669.5,
+            22
+          ],
+          [
+            677.4,
+            164.6
+          ],
+          [
+            877.3,
+            18.9
+          ],
+          [
+            901.5,
+            170.1
+          ]
+        ],
+        "sharedLensElectrons": [
+          [
+            783.3,
+            78.5
+          ],
+          [
+            795.5,
+            78.1
+          ],
+          [
+            781.8,
+            94.5
+          ],
+          [
+            797,
+            94.4
+          ],
+          [
+            783.3,
+            110.8
+          ],
+          [
+            795.9,
+            111
+          ]
+        ],
+        "electronCount": 14,
+        "occlusion": "Allorbitscontinuouscross;sharedsixdotsinsideintersectionlens; rightouterorbitreaches/cropsatnativeRIGHTedge950, doNOTinventfreeend ormissingdot."
+      }
+    }
+  ],
+  "publicQuestions": [
+    {
+      "qid": "DH-10-C3-B10-II-9",
+      "de": "Cho các phát biểu sau về phân tử HF và $\\ce{N2}$:",
+      "allHinh": [
+        {
+          "hash": "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+          "where": "DH-10-C3-B10-II-9.hinh.0.du_lieu",
+          "hashDataUrl": "c2d0995648c2373d0934832dd7e622aa01ef3925fa4667f25fdc53e2f42d51cb"
+        },
+        {
+          "hash": "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b",
+          "where": "DH-10-C3-B10-II-9.hinh.1.du_lieu",
+          "hashDataUrl": "699d6e20b1260e25acc2284cdbbbea9cdc756f7f4d9ceb698db8215c4d5fddad"
+        }
+      ],
+      "missingHashes": [
+        "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+        "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfBOTHAdmitted": 1,
+    "ifOnlyOneAdmitted": "partialONLY",
+    "requiredHashes": [
+      "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+      "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b"
+    ]
+  },
+  "review": {
+    "bothNativeFullOpened": true,
+    "bothOwn2xFullOpened": true,
+    "bothArrow10xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelapproximatecenters/radii. Electronpositionsselectedfromownopenedimage andbluefillcomponents; incidentalorbitpixelcomponents excludedvisually. Countsfrompositionsnotatomicnumbertheory.",
+  "sharedStyle": {
+    "electrons": "smallverticalellipses bluegrayfill thinblackoutline; HF typicalrx3.5ry5 /N2rx3ry4; notsolidblackparticles",
+    "orbit": "darkblueblackthincontinuous outline, whiteinterior; noarrowheads",
+    "nucleus": "redflatcirclethinblackoutline, black+digitliteralinside",
+    "noAdded": [
+      "H/F/Nletterlabels",
+      "moleculenames",
+      "extracharges",
+      "bondstick",
+      "p+/e−names",
+      "captions",
+      "equationanswer"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootAudit": {
+    "nativeFull": true,
+    "allPublicRefs": true,
+    "freshChromiumScale": 3,
+    "actualSvgReviewed": true,
+    "notes": "Root đã mở riêng hai PNG native FULL và hai SVG Chromium FULL 3x; HF 10 electron mỗi phía, 2 chấm chung; N2 14 electron mỗi phía, 6 chấm chung; giữ nhãn +1/+9/+7 baseline, true dam, các ellipse và cắt mép phải native N2. Không thêm tên hay đáp án."
+  }
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "i": 1029,
+    "hash": "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b",
+    "fileNguon": "anh/b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b.png",
+    "svg": "model-electron-native1029-ddh-8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd.svg",
+    "hashSvg": "8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd",
+    "byteSvg": 7505,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-II-9",
+        "de": "Cho các phát biểu sau về phân tử HF và $\\ce{N2}$:",
+        "refs": [
+          {
+            "hash": "b8aeaf2c4715fb42d6c014f1169a7b2f20bc57926389359f771e394b318f640b",
+            "where": "DH-10-C3-B10-II-9.hinh.1.du_lieu",
+            "hashDataUrl": "699d6e20b1260e25acc2284cdbbbea9cdc756f7f4d9ceb698db8215c4d5fddad"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "HF10source10product/2sharedlensdots/+1+9EACHside/6orbits/4rednuclei/grayblueoutlinedelectrons/1FILLEDrighthead1plus/blacktrueDAMnucleusregularplus/ALLuprightPLUSbaseline/noaddedletters-names-charge-caption-answer",
+    "hashSvgDaSoat": "8e28378c471391464999a099f6c6e953a8f6b625a1fe7adcc58eddfd05e7e3cd",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 778,
+    "hash": "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+    "fileNguon": "anh/9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674.png",
+    "svg": "model-electron-native778-ddh-10fe2b89b1ecbcc9ed4ccb21cf4af7a76806262352657999e698dc88dd5f2609.svg",
+    "hashSvg": "10fe2b89b1ecbcc9ed4ccb21cf4af7a76806262352657999e698dc88dd5f2609",
+    "byteSvg": 8217,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B10-II-9",
+        "de": "Cho các phát biểu sau về phân tử HF và $\\ce{N2}$:",
+        "refs": [
+          {
+            "hash": "9195b79405cc98dfa16282e9baab8ea5c71da70f09761a309eef735236ff3674",
+            "where": "DH-10-C3-B10-II-9.hinh.0.du_lieu",
+            "hashDataUrl": "c2d0995648c2373d0934832dd7e622aa01ef3925fa4667f25fdc53e2f42d51cb"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "N2source7+7-product14/6sharedlensdots-4inner4external/+7FOUR/8orbits-rightouterCROPPEDnative/4rednuclei/grayblueoutlinedelectrons/1FILLEDrighthead1plus/blacktrueDAMnucleusregularplus/ALLuprightPLUSbaseline/noaddedletters-names-charge-caption-answer",
+    "hashSvgDaSoat": "10fe2b89b1ecbcc9ed4ccb21cf4af7a76806262352657999e698dc88dd5f2609",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
