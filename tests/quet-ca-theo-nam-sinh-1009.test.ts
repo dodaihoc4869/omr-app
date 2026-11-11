@@ -5,7 +5,7 @@
 //   2. Quét phải lấy CẢ thư mục, không bốc ngẫu nhiên ba ca của cả trung tâm.
 //   3. Chặn "ba ca" phải nằm ở chỗ ĐÃ BIẾT em nào nộp ca nào.
 //   4. Câu em từng sai phải lấy được kể cả khi kho đã đổi id vì nạp lại đề.
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { namSinhDaSo, namSinhTuTenCa } from '../src/lib/nam-sinh-ca'
 import { chonCauLapChoEm, type CaTruocDaCham } from '../src/lib/de-rieng'
 import { cauHinhDeRieng } from '../src/lib/cau-hinh-de-rieng'

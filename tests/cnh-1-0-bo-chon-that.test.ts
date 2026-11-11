@@ -3,11 +3,11 @@
 // trạng thái đợt dạy lại, lấy mức đang luyện từ bản dựng P03, rồi SẮP theo điểm — không phải mọi câu cùng điểm.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  chonCauChoLuot, docHoSoCau, locTheoLuatLap, mucDangLuyen, mucTheoKyNangCuaEm, trangThaiDotTuHoSoCau, xepLuotTheoChinhSach, type CauUngVien,
+  chonCauChoLuot, docHoSoCau, locTheoLuatLap, mucDangLuyen, trangThaiDotTuHoSoCau, xepLuotTheoChinhSach, type CauUngVien,
 } from '../server/src/bo-chon-that'
 import { giuCho, nhaCho } from '../server/src/giu-cho'
 import { taoD1That } from './_d1-that'
-import { dungLaiNangLuc, xoaBietCotChuanNL, xoaDemNangLuc } from '../server/src/nang-luc-d1'
+import { xoaBietCotChuanNL, xoaDemNangLuc } from '../server/src/nang-luc-d1'
 import { ghiSuKien, xoaBietCotChuan } from '../server/src/su-kien-hoc'
 
 const T0 = Date.parse('2026-09-22T12:00:00+07:00')

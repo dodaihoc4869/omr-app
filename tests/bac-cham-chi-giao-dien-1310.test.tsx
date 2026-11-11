@@ -13,7 +13,7 @@
 // aria-hidden, không có chữ) ⇒ các chuỗi khoá chữ bỏ phần emoji, kiểm huy hiệu đúng `data-bac` thay vào; chip ở app phụ huynh nay là NÚT mở tấm 12 bậc
 // (chữ nút thêm phần chỉ trình đọc màn hình nghe ", xem đủ 12 bậc"). Bộ test mới: tests/huy-hieu-bac-1310m.test.tsx.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 
 const ph = vi.hoisted(() => ({ nhip: vi.fn() }))

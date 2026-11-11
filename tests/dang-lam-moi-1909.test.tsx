@@ -2,7 +2,7 @@
 // Đó KHÔNG phải lỗi đăng nhập/mất mạng ⇒ app: GIỮ phiên, GIỮ bản nhớ + nháp, hiện một dải M3 nhẹ (chữ 0.Planer chốt), tự thử lại theo
 // nhịp 60 s, dải biến mất ngay khi máy chủ trả bình thường. Lỗi mạng thường KHÔNG bật dải.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, renderHook, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, render, renderHook, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'

@@ -4,7 +4,7 @@
 //   · máy em: máy chủ trả `cho_bo_cau` ⇒ tự thử lại, không cắt đề theo băm;
 //   · chạy thử lúc mở ca rồi chốt lúc Bắt đầu: dùng lại kết quả, chỉ rút thêm cho em vào sau, nối câu song sinh vào kho ca.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 
 const loiDenHanTheoEm = vi.fn()
 const noiKhoCa = vi.fn(async () => ({ themBank: 1, themKey: 1 }))

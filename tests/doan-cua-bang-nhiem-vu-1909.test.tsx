@@ -1,8 +1,8 @@
 // Cửa vào game "Đoàn Hộ Tống" trên Bảng nhiệm vụ (Boss giao 21/09; hợp đồng docs/hop-dong-mo-game-doan-ho-tong-1909.md).
 // Thẻ "Lên đường cùng Đoàn Hộ Tống" CHỈ hiện khi: học sinh + máy chủ báo `doanMo === true` (gốc /hs/ke-hoach-ngay) + có hàm mở.
 // Bấm ⇒ đặt sessionStorage['game-v2:man-dau']='doan' rồi mở tab game; nút "Về app học sinh" của game về ĐÚNG Bảng nhiệm vụ (không phải sheet điểm).
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'

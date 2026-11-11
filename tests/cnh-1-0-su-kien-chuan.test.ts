@@ -13,7 +13,7 @@ import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'
 import { ghiSuKien, xoaBietCotChuan, type SuKien } from '../server/src/su-kien-hoc'
 import {
-  bamSo, congBoSuKien, docAnhChup, docSuKienNL, dungLaiNangLuc, nangLucBat,
+  congBoSuKien, docSuKienNL, dungLaiNangLuc, nangLucBat,
   xoaBietCotChuanNL, xoaDemNangLuc, KHOA_BAT_NANG_LUC,
 } from '../server/src/nang-luc-d1'
 import { dtoNangLuc } from '../server/src/ho-so-dto'

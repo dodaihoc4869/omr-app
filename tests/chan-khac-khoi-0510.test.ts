@@ -6,7 +6,7 @@
 // làm giàu nguồn khối từ D1, luật A cho em / luật B cho lớp). Từng kênh rút câu & danh sách chữa bài: tests/chan-khac-khoi-kenh-0510.test.ts (+ OMNI: -omni-0510).
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
-import { CAC_KHOI, KHOI_THEO_MA_CHUONG, cauHopKhoi, khoiCuaCau, khoiCuaChuong, khoiCuaEm, khoiCuaMaDe, locCauKemDem, lyDoChanKhoi, phanTichKhoiCau, type Khoi } from '../src/lib/khoi-cau'
+import { CAC_KHOI, KHOI_THEO_MA_CHUONG, cauHopKhoi, khoiCuaCau, khoiCuaChuong, khoiCuaEm, locCauKemDem, lyDoChanKhoi, phanTichKhoiCau, type Khoi } from '../src/lib/khoi-cau'
 import { DS_CHUONG, TEN_CHUONG } from '../src/lib/tu-vung-dang'
 import { BO_CHIA_KHOA } from '../src/lib/loi-giai-bo'
 import { chanKhacKhoiEm, chanKhacKhoiLop, chanKhacKhoiTheoEm, chanMetaKhacKhoi, congKhoi, demChanKhoi, docKhoiChungCacEm, docKhoiLopCong, khoiDichLop, xoaDemChanKhoi } from '../server/src/chan-khac-khoi'

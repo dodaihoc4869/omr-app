@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { chotNgayCu, lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
-import { goiWorker, taoD1That } from './_d1-that'
+import { taoD1That } from './_d1-that'
 
 const NOW = Date.parse('2026-09-23T05:00:00.000Z') // 12:00 giờ VN, 23/09
 const NGAY_HOM_NAY = '2026-09-23'

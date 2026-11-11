@@ -2,8 +2,8 @@
 // ("EXP đã vào ống nghiệm · còn N EXP nữa lên cấp · ống nghiệm có M EXP · hôm nay thú còn ăn được K EXP"), câu báo trần EXP game 120/ngày, và lý do `tienBo.thieuDat` ("cần đúng thêm N câu").
 // Mọi số do máy chủ; thiếu MỘT số ⇒ ẩn hết (Pages đi trước Worker được); phụ huynh không thấy gì về thú.
 // 27/10: thẻ "Cho ăn" (`bang-nhiem-vu/TheChoAn`) đã gỡ khỏi src/ vì không màn nào dùng ⇒ các phép kiểm viewChoAn / TheChoAn bỏ theo.
-import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+import { cleanup, render } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import TheCuoiChang from '../src/components/bang-nhiem-vu/TheCuoiChang'

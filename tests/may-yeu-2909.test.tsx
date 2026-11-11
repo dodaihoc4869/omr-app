@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { render, waitFor } from '@testing-library/react'
-import { laMayYeu, docPhienBanIos, batCheDoMayYeu, docDauHieuMay, giamHieuUng, dangCheDoMayYeu, LOP_MAY_YEU, KHOA_NHO_MAY_YEU } from '../src/lib/may-yeu'
+import { laMayYeu, docPhienBanIos, batCheDoMayYeu, docDauHieuMay, LOP_MAY_YEU, KHOA_NHO_MAY_YEU } from '../src/lib/may-yeu'
 import { nhipKhungCham } from '../src/lib/do-nhip-khung'
 import ExperimentDemo from '../src/components/ExperimentDemo'
 

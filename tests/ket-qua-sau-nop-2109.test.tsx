@@ -2,7 +2,7 @@
 // ba trạng thái theo luật công bố; HAI trạng thái chưa có điểm KHÔNG vẽ điểm/đáp án/lời giải; không xếp hạng, không nhãn năng lực; chỉ so với lần trước CỦA CHÍNH EM;
 // đường "đang gửi" (pendingSubmit) của màn thi giữ nguyên.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import KetQuaSauNop from '../src/components/xem-diem/KetQuaSauNop'

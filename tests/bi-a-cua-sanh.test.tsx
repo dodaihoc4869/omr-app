@@ -1,8 +1,8 @@
 // BI-A PHẢN ỨNG · CỬA THỨ BA TRÊN SẢNH BÁT LINH (đặc tả mục 8.1) + công tắc cờ: `hoa2-sanh` gửi `bia` khi cờ bật cho em;
 // còn câu ⇒ "Bi-a Phản Ứng · còn c/t câu"; hết trần ⇒ mờ; xong kế hoạch ⇒ Bàn giao hữu; có ca ⇒ mờ; cờ tắt ⇒ không có cửa.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, configure, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { docBiaTrenSanh, docSanh, type KetQuaSanh } from '../src/components/hoa2/api'
+import { cleanup, configure, render, screen } from '@testing-library/react'
+import { docBiaTrenSanh } from '../src/components/hoa2/api'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 
 const mocks = vi.hoisted(() => ({ items: [] as any[] }))

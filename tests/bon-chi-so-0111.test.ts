@@ -6,7 +6,7 @@
 //   · dưới 40 lượt đo thật ⇒ Học thật / Đối phó = null; dưới 3 ngày phải làm ⇒ Chăm / Lười = null;
 //   · bấm lặp mà phần lớn đúng (đáp án thật trùng chữ) KHÔNG tính.
 import { describe, expect, it } from 'vitest'
-import { tinhBon, vaoBang, type DauVaoBon } from '../server/src/bon-chi-so'
+import { tinhBon, vaoBang } from '../server/src/bon-chi-so'
 import { danhGiaEm, type DauVaoDanhGia, type LuotDanhGia } from '../server/src/danh-gia-hoc-that'
 
 const NGAY = Array.from({ length: 14 }, (_, i) => `2026-10-${String(18 + i).padStart(2, '0')}`).map((n) => (n > '2026-10-31' ? '2026-11-0' + (Number(n.slice(8)) - 31) : n))

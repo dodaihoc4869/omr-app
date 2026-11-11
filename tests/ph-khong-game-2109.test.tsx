@@ -3,7 +3,7 @@
 // CHỐT CHẶN: dữ liệu ĐẦY game (thú, EXP, mảnh khiên, Đoàn, thử thách, cảnh báo/lời có chữ game, việc `than_thu`) đi vào MÀN PHỤ HUYNH ⇒ chữ HIỂN THỊ (nội dung + aria-label + title + alt)
 // của cả cây không còn "thần thú|EXP|khiên|Đoàn|Đảo|Võ đài". Học sinh giữ nguyên (không quét).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, configure, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, configure, render, screen, waitFor } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import BangTinPhuHuynh from '../src/components/BangTinPhuHuynh'

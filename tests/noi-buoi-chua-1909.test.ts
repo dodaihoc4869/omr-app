@@ -14,7 +14,6 @@ import {
   laBuoiChuaHopLe,
   taoBanGhiBuoi,
   tinhTrangBuoi,
-  type BuoiChuaLuu,
   type DauVaoLuuBuoi,
 } from '../src/lib/noi-buoi-chua'
 import { xepBuoiChua, type CauVaoXep } from '../src/lib/xep-buoi-chua'

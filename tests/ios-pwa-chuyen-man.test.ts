@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest'
-import { docDuongVao, laManThayQuanLy, nhoVaiDaDung, vaiDaDung } from '../src/lib/vai-tro'
+import { docDuongVao, laManThayQuanLy, nhoVaiDaDung } from '../src/lib/vai-tro'
 import manifestHs from '../public/manifest-hs.json'
 import manifestPh from '../public/manifest-ph.json'
 

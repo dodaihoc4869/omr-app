@@ -16,7 +16,7 @@ import worker from '../server/src/index'
 import { gameToken } from '../server/src/game-v2-auth'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import {
-  CAN_RONG, cauGocTuKho, coTuXuNghi, dauSoLieu, ghepHaiLuot, khopMu, kiemBanKhac, kiemBoTro, kiemYMoi, nhanBanKhacNop, nhanYMoiNop,
+  CAN_RONG, cauGocTuKho, coTuXuNghi, dauSoLieu, ghepHaiLuot, khopMu, kiemBanKhac, kiemYMoi, nhanBanKhacNop, nhanYMoiNop,
   qidGocMaySoan, soTrongChu, thieuBanKhac, tinhCan, tuXuCoDapAn, uuTienEmSai, type CauGoc, type TraLoiMu,
 } from '../server/src/may-soan-kiem'
 import { docYDs } from '../server/src/cau-y-ds'

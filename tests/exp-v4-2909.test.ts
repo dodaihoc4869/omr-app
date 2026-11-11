@@ -6,7 +6,7 @@
 //   (8) D1 thật: đúc vàng lười chỉ-thêm, không đúc đôi; rèn khiên trừ đúng 1 400 vàng một lần; vang-doi đã bỏ.
 // SỬA CÓ CHỦ Ý 29/09 v5 (THẦY ĐÃ CHỐT luật EXP v5, docs/DE-XUAT-EXP-V5-2909.md): đường cấp v4 nay là LỊCH SỬ (`*V4`, chỉ để chuyển v4 → v5); mô phỏng v4 thay bằng v5;
 // bỏ mọi trần kiếm theo ngày; hồ sơ sang luật 5; khiên 36 mảnh + 2 600 vàng + ngày đạt ≥ 36 + 18(k − 1). Nghiệm thu v5 đầy đủ: tests/exp-v5-2909.test.ts.
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { BANG_THANH_EXP_V4 as BANG_THANH_EXP, BANG_THANH_EXP_V3, THANH_DAU_V4, thanhExpV4 as thanhExp, thanhExpV3, tongExpToiCapV4 as tongExpToiCap } from '../src/game/than-thu-hoa-hoc/kinh-nghiem'
 import { EXP_MOI_VANG, VANG_REN_KHIEN, vangDangDuc } from '../src/lib/kinh-te-game'
 import { LUAT_CAP_MOI, LUAT_CAP_V3, LUAT_CAP_V4, NGAY_DAT_MO_CAP_10_V4 as NGAY_DAT_MO_CAP_10, chuyenDoiLuatCap, chuyenV3SangV4, dangKhoaMoc, nhanTuDo } from '../src/lib/hap-thu-ngay'

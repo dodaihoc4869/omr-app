@@ -1,7 +1,7 @@
 // MỨC LÀM 1–4 TRONG TẤM "HỒ SƠ LÀM BÀI" (thầy 21/10) — giao diện ba chế độ (thầy · học sinh · phụ huynh), đọc hợp đồng, ba trạng thái (có số đo · chưa có số đo · lớp chưa đủ mẫu).
 // Dữ liệu: scripts/chup-v2/gia/lich-su-muc-lam.ts — mức của từng lượt do CHÍNH hàm máy chủ `mucLamCuaLuot` tính, giao diện chỉ vẽ lại, không tự xếp mức.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import HoSoLamCauEm, { type NguonHoSo } from '../src/components/chien-dich/HoSoLamCauEm'
 import { chuanHoaMucLam, docMucLam, docTongMucLam, mocThuoc, TEN_MUC_EM, TEN_MUC_THAY } from '../src/components/chien-dich/muc-lam-giao-dien'
 import { docLichSuLamCau } from '../src/lib/lich-su-lam-cau-api'

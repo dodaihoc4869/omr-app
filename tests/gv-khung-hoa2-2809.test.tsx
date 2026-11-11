@@ -2,7 +2,7 @@
 // đơn vị + mẫu số, ca đang mở, chiến dịch đang chạy, việc cần làm), Ca kiểm tra dạng bảng + trạng thái trống MỘT dòng chữ,
 // phép tính thuần `tong-quan-gv`. Cờ tắt ⇒ Ca kiểm tra y như cũ (khoá ở tests/lich-su-ca-*).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import type { CaTomTat } from '../src/lib/exam-api'
 
 const m = vi.hoisted(() => ({ danhSachCa: vi.fn(), goi: vi.fn() }))

@@ -3,7 +3,7 @@
 // mở THẲNG câu chưa xong kế tiếp của Việc hôm nay, không vẽ danh sách; rời câu ⇒ về Hôm nay (onVe); xong hết hôm nay ⇒ về Hôm nay ngay.
 import { readFileSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 
 const api = vi.hoisted(() => ({ apiDanhSachTuChua: vi.fn() }))
 vi.mock('../src/lib/chua-cau-sai-api', async (goc) => ({ ...(await goc<typeof import('../src/lib/chua-cau-sai-api')>()), apiDanhSachTuChua: api.apiDanhSachTuChua }))

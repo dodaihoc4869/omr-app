@@ -4,7 +4,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, type D1That } from './_d1-that'
-import { BAY_GIO, DAP_AN_DUNG, HAN, boCuaEm, dung, giao, gio, maBtvn, mo, nopChang } from './_btvn-nang-do-mau'
+import { BAY_GIO, DAP_AN_DUNG, HAN, boCuaEm, dung, giao, gio, mo, nopChang } from './_btvn-nang-do-mau'
 
 afterEach(() => vi.useRealTimers())
 const SAU_HAN_4G30 = new Date(Date.parse(HAN) + 4.5 * 3_600_000) // 4,5 giờ sau hạn ⇒ trễ 5 giờ (làm tròn lên)

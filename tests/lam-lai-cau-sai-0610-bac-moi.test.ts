@@ -19,7 +19,7 @@ import { apBienThe, cacHoDe, sinhBienThe } from '../server/src/bien-the-sinh'
 import { apYDsMoi, bienTheTheoQid, chonBanKhacMoi, deCoHinh, nhomYDs, phuQidAoMoi } from '../server/src/ban-khac-ao'
 import { loaiQidAo, tachSongSinh } from '../server/src/loi-hoc-luat'
 import { tiepBanKhacMoi } from '../server/src/lam-lai-so'
-import { grade, publicQuestion, type PrivateQuestion } from '../src/game/than-thu-v2/core'
+import { publicQuestion, type PrivateQuestion } from '../src/game/than-thu-v2/core'
 import type { Env } from '../server/src/kieu'
 
 type Phan = 'I' | 'II' | 'III'
