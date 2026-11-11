@@ -194,7 +194,9 @@ describe('live đầu-cuối qua phòng (chưa có SFU ⇒ chỉ hình)', () => 
     expect(e1.le.trangThai()).toMatchObject({ bat: true, bang: false, duocMoMic: false, mic: 'tat', banNoi: null })
     expect(b.lt.trangThai()).toMatchObject({ pha: 'live', bang: false, emNoi: null })
     await viet(b, [e1], 40, 0.2); await veCho(b, [e1], 300)
-    expect(demLo(b.ph, e1.ws())).toBe(0) // lớp đang ở màn câu hỏi ⇒ thầy không phát điểm đang viết
+    // 11/11 (thầy «bấm nộp thì tự về màn live»): em gửi xong là ở bảng live dù cờ phòng `bang` tắt ⇒ thầy phát điểm đang viết suốt lúc live;
+    // máy em đang ở màn câu hỏi (lớp giao diện chưa báo `datHienBang(true)`) tự bỏ — dòng dưới khoá điều đó.
+    expect(demLo(b.ph, e1.ws())).toBeGreaterThan(0)
     expect(e1.sk.filter((s) => s.loai === 'them-diem').length).toBe(0)
     expect(e1.ds).toEqual(b.so.ds()) // nét xong vẫn vào sổ ⇒ bật bảng là thấy đủ
     await b.ph.gui(b.gv, { t: 'goi', sbd: 'S2', lyDo: [] }); await b.troi(50)

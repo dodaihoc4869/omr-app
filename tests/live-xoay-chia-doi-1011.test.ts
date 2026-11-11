@@ -108,10 +108,11 @@ describe('bố cục máy em (bo-cuc.ts)', () => {
     expect(VUNG_MAC_DINH.bang[0] * k.Wv - k.ox).toBeCloseTo(k.bang.x, 5)
     expect(VUNG_MAC_DINH.bang[1] * k.Hv - k.oy).toBeCloseTo(k.bang.y, 5)
   })
-  it('điện thoại dài 19,5:9: vùng chiếu dính trái, dải dư bên phải cho tay nắm (không che nét)', () => {
+  it('điện thoại dài 19,5:9: dải dư bên TRÁI cho tay nắm (thầy 11/11: thanh sang mép trái), vùng chiếu dồn sang phải (không che nét)', () => {
     const k = khungChieu(VUNG_MAC_DINH, 16 / 9), b = boCucEm(844, 390, { trai: 0, phai: 0, duoi: 0 }, k.LW)
     expect(b.namDe).toBe(false)
-    expect(b.x + b.cw).toBeLessThanOrEqual(844 - 52 + 0.5)
+    expect(b.x).toBeGreaterThanOrEqual(52 - 0.5)
+    expect(b.x + b.cw).toBeLessThanOrEqual(844 + 0.5)
     expect(b.ch).toBeCloseTo(390, 0)
   })
   it('điện thoại 16:9: chừa dải thì hình nhỏ đi quá 6 % ⇒ hình phủ hết bề ngang, tay nắm đè mép (mờ, kéo dọc được); máy bảng: chừa dải (hình nhỏ đi < 6 %)', () => {
@@ -122,7 +123,8 @@ describe('bố cục máy em (bo-cuc.ts)', () => {
     expect(dt.x).toBeCloseTo(0, 1)
     const bang = boCucEm(1180, 820, { trai: 0, phai: 0, duoi: 0 }, k.LW)
     expect(bang.namDe).toBe(false)
-    expect(bang.x + bang.cw).toBeLessThanOrEqual(1180 - 52 + 0.5)
+    expect(bang.x).toBeGreaterThanOrEqual(52 - 0.5)
+    expect(bang.x + bang.cw).toBeLessThanOrEqual(1180 + 0.5)
     expect(bang.y).toBeGreaterThan(0) // vùng chiếu nằm giữa chiều cao
   })
   it('iPhone: máy dọc không khoá ngang được ⇒ xoay CSS, tai thỏ thành mép trái hình, thanh home thành mép phải hình', () => {
@@ -139,7 +141,7 @@ describe('bố cục máy em (bo-cuc.ts)', () => {
   it('phóng bảng (chạm hai lần): ô bảng đen phủ kín chiều cao, nằm giữa phần còn lại', () => {
     const k = khungChieu(VUNG_MAC_DINH, 16 / 9), p = boCucPhong(844, 390, { trai: 0, phai: 0, duoi: 0 }, k)
     expect(k.bang.h * p.s).toBeCloseTo(390, 0)
-    expect(p.x + k.bang.x * p.s).toBeGreaterThanOrEqual(0)
-    expect(p.x + (k.bang.x + k.bang.w) * p.s).toBeLessThanOrEqual(844 - 52 + 0.5)
+    expect(p.x + k.bang.x * p.s).toBeGreaterThanOrEqual(52 - 0.5)
+    expect(p.x + (k.bang.x + k.bang.w) * p.s).toBeLessThanOrEqual(844 + 0.5)
   })
 })

@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { _datLaiTatMan, dangXinQuyen } from '../src/components/bpu/tat-man'
 
 type Tt = Record<string, unknown>
-const NEN: Tt = { duocXem: true, san: true, bat: true, tu: 1, tieng: 'co', nghe: false, kenhNet: 'ws', duBang: true, bang: true, duocMoMic: false, mic: 'tat', banNoi: null }
+const NEN: Tt = { duocXem: true, san: true, bat: true, tu: 1, tieng: 'co', nghe: false, kenhNet: 'ws', duBang: true, bang: true, duocMoMic: false, duocMoi: false, tay: false, hangTay: null, mic: 'tat', banNoi: null, nghi: false }
 let dat: (o: Tt) => void = () => {}
 let choQuyen = false
 const goi: string[] = []
@@ -20,6 +20,7 @@ vi.mock('../src/lib/live', () => ({
       trangThai: () => ({ ...tt }), nhanView() {}, nhanTinPhong() {}, khiNoiLai() {}, moKhoaTieng: async () => true, datTieng() {}, datRoiMan() {},
       bang: () => ({ trang: '', tiLe: 16 / 9, net: [], cuoi: 0, lichSu: [], ghep: null }), khung: () => ({ dau: [], tro: null }), mucAm: () => 0, mucAmMic: () => 0.4, mucAmBan: () => 0.2, soDo: () => ({ kenhNet: 'ws' }), huy() {},
       batMicLenBang: async () => { goi.push('bat'); return { ok: true } }, tatMic: () => { goi.push('tat'); dat({ mic: 'tat' }) }, dangChoQuyenMic: () => choQuyen,
+      gioTay() {}, deSau() {}, datGiayLech() {}, datHienBang() {},
     }
   },
 }))
@@ -36,28 +37,34 @@ beforeEach(() => { goi.length = 0; choQuyen = false; _datLaiTatMan() })
 afterEach(() => { _datLaiTatMan() })
 
 describe('mic của em lên bảng', () => {
-  it('phòng cho phép ⇒ mic TỰ BẬT; thẻ «Mic của em đang bật» có nút «Tắt mic»; em tắt ⇒ không tự bật lại, có «Bật mic lại»; hết lượt gọi ⇒ sạch', async () => {
+  // 11/11 (thầy «ô tắt mở tiếng ẩn hết vào thanh»): mic của em lên bảng điều khiển TRONG khay (dòng «Mic của em · Đang bật / Đang tắt»), tay nắm mang huy hiệu
+  // mic khi mic đang mở — không còn thẻ / nút nổi riêng trên bảng.
+  it('phòng cho phép ⇒ mic TỰ BẬT; khay có dòng «Mic của em · Đang bật» + huy hiệu mic trên tay nắm; em tắt ⇒ không tự bật lại, bấm dòng ấy để bật lại; hết lượt gọi ⇒ sạch', async () => {
     await dung()
     expect(goi).toEqual([])
     dat({ duocMoMic: true })
     await waitFor(() => expect(goi).toContain('bat'))
+    const nutMic = () => document.querySelector<HTMLButtonElement>('.lv-khay .lv-vua.mic')
     dat({ mic: 'xin-quyen' })
-    expect(screen.getByText('Đang bật mic…')).toBeTruthy()
+    expect(nutMic()!.textContent).toContain('Đang bật…')
     dat({ mic: 'dang-phat' })
-    expect(screen.getByText('Mic của em đang bật')).toBeTruthy()
-    expect(screen.getByText('Thầy và cả lớp đang nghe')).toBeTruthy()
+    expect(nutMic()!.textContent).toContain('Mic của em'); expect(nutMic()!.textContent).toContain('Đang bật')
+    expect(nutMic()!.getAttribute('aria-pressed')).toBe('true')
+    expect(screen.getByText('Thầy và cả lớp đang nghe em.')).toBeTruthy()
+    expect(document.querySelector('.lv-nam .lv-nam-hh.mic')!.getAttribute('aria-label')).toBe('Mic của em đang bật') // khay đóng vẫn biết mic đang mở
+    expect(document.querySelector('.lv > .lv-noi, .lv > .lv-bat-tieng')).toBeNull() // không còn thẻ / nút nổi riêng trên bảng
     const soBat = goi.filter((x) => x === 'bat').length
-    fireEvent.click(screen.getByRole('button', { name: 'Tắt mic' }))
+    fireEvent.click(nutMic()!)
     expect(goi).toContain('tat')
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Bật mic lại' })).toBeTruthy())
+    await waitFor(() => expect(nutMic()!.getAttribute('aria-label')).toContain('bật mic lại'))
+    expect(document.querySelector('.lv-nam .lv-nam-hh')).toBeNull()
     await act(async () => { await new Promise((r) => setTimeout(r, 1700)) }) // quá một nhịp thử lại: KHÔNG tự bật lại
     expect(goi.filter((x) => x === 'bat').length).toBe(soBat)
-    fireEvent.click(screen.getByRole('button', { name: 'Bật mic lại' }))
+    fireEvent.click(nutMic()!)
     await waitFor(() => expect(goi.filter((x) => x === 'bat').length).toBe(soBat + 1))
-    // thầy chấm / lượt mới: phòng thôi cho phép ⇒ không còn thẻ, không còn nút
+    // thầy chấm / lượt mới: phòng thôi cho phép ⇒ không còn dòng mic
     dat({ duocMoMic: false, mic: 'tat' })
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Bật mic lại' })).toBeNull())
-    expect(screen.queryByText('Mic của em đang bật')).toBeNull()
+    await waitFor(() => expect(nutMic()).toBeNull())
   })
 
   it('bị từ chối quyền mic ⇒ báo nhẹ kèm cách bật, không hỏi lại dồn dập', async () => {
