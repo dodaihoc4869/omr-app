@@ -8650,6 +8650,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b": {
+      "tep": "azo-native1082-ddh-76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373.svg",
+      "hashSvg": "76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373",
+      "byteSvg": 25129,
+      "byteGzip": 4932,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "f623d1ca4cdc50f02668a602dfaf136bf2b0f5ffcdb1f8a086a211102cc1c131": {
       "tep": "do-thi-aspirin-ddh-cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700.svg",
       "hashSvg": "cea584f57e1a2ceabaa0931910cbd9d0e3abf154b0baa727ecd7c6e425b2c700",
@@ -22687,6 +22696,20 @@
       ]
     },
     {
+      "qid": "DB-12-B8-D1-III-428",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+          "where": "DB-12-B8-D1-III-428.hinh.0.du_lieu",
+          "hashDataUrl": "e7ba92f89e6f2dbdd8d7976a9359f6a926d822cea0532989fe8cb0f687f609c5",
+          "vector": "azo-native1082-ddh-76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B8-D1-III-432",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -27969,6 +27992,20 @@
       ]
     },
     {
+      "qid": "DH-12-C3-B8-III-32",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+          "where": "DH-12-C3-B8-III-32.hinh.0.du_lieu",
+          "hashDataUrl": "e7ba92f89e6f2dbdd8d7976a9359f6a926d822cea0532989fe8cb0f687f609c5",
+          "vector": "azo-native1082-ddh-76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373.svg"
+        }
+      ]
+    },
+    {
       "qid": "DH-12-C3-B8-III-38",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -31143,6 +31180,7 @@
     "DB-12-B8-D1-III-414",
     "DB-12-B8-D1-III-415",
     "DB-12-B8-D1-III-427",
+    "DB-12-B8-D1-III-428",
     "DB-12-B8-D1-III-432",
     "DB-12-B8-D1-III-438",
     "DB-12-B8-D1-II-439",
@@ -31476,6 +31514,7 @@
     "DH-12-C3-B8-III-12",
     "DH-12-C3-B8-III-28",
     "DH-12-C3-B8-III-30",
+    "DH-12-C3-B8-III-32",
     "DH-12-C3-B8-III-38",
     "DH-12-C3-B9-P2-I-4",
     "DH-12-C3-B9-P2-I-17",

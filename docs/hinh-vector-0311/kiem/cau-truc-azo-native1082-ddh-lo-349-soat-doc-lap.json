@@ -1,0 +1,15 @@
+[
+  {
+    "i": 1082,
+    "hashSvg": "76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: đã đối chiếu riêng PNG nguồn FULL, cả hai câu dẫn công khai và refs; mở bản Chromium 3× mới FULL cùng macro muối diazonium và sản phẩm. Giữ đủ 5 vòng phenyl/15 liên kết đôi trong vòng, 30C5N2O1Cl của các cấu trúc, N₂ trong ngoặc vuông với dấu cộng ngoài trên phải và Cl⁻; hai tia azo nghiêng tách nhau, nhánh phải nối đỉnh dưới trái vòng phenyl. Hai đầu mũi tên đặc, +HNO₂/+HCl, (1), 0 - 5°C, (2), (màu cam) đúng nguồn; chữ DDH nét path đều, chỉ số đúng, không thấy cắt/chồng/chạm nhãn hay dữ kiện thêm.",
+    "render": "/workspace/scratch/soat263-1082.png",
+    "macro": [
+      "/workspace/scratch/azo1082-salt.png",
+      "/workspace/scratch/azo1082-product.png"
+    ],
+    "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+    "hashSvgDaSoat": "76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373"
+  }
+]

@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1082,
+    "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+    "fileNguon": "anh/c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b.png",
+    "svg": "azo-native1082-ddh-76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373.svg",
+    "hashSvg": "76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373",
+    "byteSvg": 25129,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-428",
+        "de": "Một nhà máy sản xuất vải màu cam từ hợp chất azo, sử dụng aniline làm nguyên liệu chính. Cho sơ đồ sau: Nhà máy cần sản xuất đủ lượng vải màu cam để may 30.000 chiếc áo và 15.000 chiếc túi đựng. Biết rằng:\n- Mỗi chiếc áo cần 1,2 m² vải với khối lượng 400 g/m².\n- Mỗi chiếc túi cần 0,6 m² vải với khối lượng 500 g/m².\n- Để nhuộm 150 kg vải cần 230 gam hợp chất azo (màu cam). Hiệu suất quá trình (1) và (2) lần lượt là 80% và 95%.\nKhối lượng aniline cần thiết là m kg.\nGiá trị của m bằng bao nhiêu? (kết quả làm tròn đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+            "where": "DB-12-B8-D1-III-428.hinh.0.du_lieu",
+            "hashDataUrl": "e7ba92f89e6f2dbdd8d7976a9359f6a926d822cea0532989fe8cb0f687f609c5"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B8-III-32",
+        "de": "Một nhà máy sản xuất vải màu cam từ hợp chất azo, sử dụng aniline làm nguyên liệu chính. Cho sơ đồ sau: Nhà máy cần sản xuất đủ lượng vải màu cam để may 30.000 chiếc áo và 15.000 chiếc túi đựng. Biết rằng:\n- Mỗi chiếc áo cần 1,2 m² vải với khối lượng 400 g/m².\n- Mỗi chiếc túi cần 0,6 m² vải với khối lượng 500 g/m².\n- Để nhuộm 150 kg vải cần 230 gam hợp chất azo (màu cam). Hiệu suất quá trình (1) và (2) lần lượt là 80% và 95%.\nKhối lượng aniline cần thiết là m kg.\nGiá trị của m bằng bao nhiêu? (kết quả làm tròn đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+            "where": "DH-12-C3-B8-III-32.hinh.0.du_lieu",
+            "hashDataUrl": "e7ba92f89e6f2dbdd8d7976a9359f6a926d822cea0532989fe8cb0f687f609c5"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "30C5N2O1Cl/5Ph15innerCCdouble1NNdouble2separatedslopingrays/N2insideSQUAREplusSUPoutsideRIGHT-ClminusSUP/NH2-OHfirstanchors/ALLregularUPRIGHT/2FILLEDrightheads/+HNO2+HCl/(1)0 - 5°C/(2)/(màu cam)/productrightarmLOWERLEFTphenyl/noaddedNaNO2-yield-water-NH-answer",
+    "hashSvgDaSoat": "76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

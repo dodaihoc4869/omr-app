@@ -1,0 +1,724 @@
+{
+  "i": 1082,
+  "assetIndexProvided": 1039,
+  "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b.png",
+  "size": [
+    602,
+    115
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B8-D1-III-428",
+      "de": "Một nhà máy sản xuất vải màu cam từ hợp chất azo, sử dụng aniline làm nguyên liệu chính. Cho sơ đồ sau: Nhà máy cần sản xuất đủ lượng vải màu cam để may 30.000 chiếc áo và 15.000 chiếc túi đựng. Biết rằng:\n- Mỗi chiếc áo cần 1,2 m² vải với khối lượng 400 g/m².\n- Mỗi chiếc túi cần 0,6 m² vải với khối lượng 500 g/m².\n- Để nhuộm 150 kg vải cần 230 gam hợp chất azo (màu cam). Hiệu suất quá trình (1) và (2) lần lượt là 80% và 95%.\nKhối lượng aniline cần thiết là m kg.\nGiá trị của m bằng bao nhiêu? (kết quả làm tròn đến hàng phần mười).",
+      "allHinh": [
+        {
+          "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+          "where": "DB-12-B8-D1-III-428.hinh.0.du_lieu",
+          "hashDataUrl": "e7ba92f89e6f2dbdd8d7976a9359f6a926d822cea0532989fe8cb0f687f609c5"
+        }
+      ],
+      "missingHashes": [
+        "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b"
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B8-III-32",
+      "de": "Một nhà máy sản xuất vải màu cam từ hợp chất azo, sử dụng aniline làm nguyên liệu chính. Cho sơ đồ sau: Nhà máy cần sản xuất đủ lượng vải màu cam để may 30.000 chiếc áo và 15.000 chiếc túi đựng. Biết rằng:\n- Mỗi chiếc áo cần 1,2 m² vải với khối lượng 400 g/m².\n- Mỗi chiếc túi cần 0,6 m² vải với khối lượng 500 g/m².\n- Để nhuộm 150 kg vải cần 230 gam hợp chất azo (màu cam). Hiệu suất quá trình (1) và (2) lần lượt là 80% và 95%.\nKhối lượng aniline cần thiết là m kg.\nGiá trị của m bằng bao nhiêu? (kết quả làm tròn đến hàng phần mười).",
+      "allHinh": [
+        {
+          "hash": "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b",
+          "where": "DH-12-C3-B8-III-32.hinh.0.du_lieu",
+          "hashDataUrl": "e7ba92f89e6f2dbdd8d7976a9359f6a926d822cea0532989fe8cb0f687f609c5"
+        }
+      ],
+      "missingHashes": [
+        "c34c19c012c81b18ac8cc5726dfc7d77be2837b4ff09fa61d6172ec9ba9d3d5b"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 2,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownDiazonium8xOpened": true,
+    "ownAzo12xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Approximate nearest1px nativecenterlines/bboxes; exact chemicaltoken/chargepositionfrommacros, notscientificmeasurement.",
+  "geometry": {
+    "aniline": {
+      "ring": {
+        "vertices": [
+          [
+            13,
+            74
+          ],
+          [
+            34,
+            62
+          ],
+          [
+            55,
+            74
+          ],
+          [
+            55,
+            98
+          ],
+          [
+            34,
+            110
+          ],
+          [
+            13,
+            98
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              17,
+              76
+            ],
+            [
+              17,
+              96
+            ]
+          ],
+          [
+            [
+              35,
+              66
+            ],
+            [
+              51,
+              76
+            ]
+          ],
+          [
+            [
+              35,
+              106
+            ],
+            [
+              51,
+              96
+            ]
+          ]
+        ],
+        "circle": false
+      },
+      "branchBond": [
+        [
+          34,
+          62
+        ],
+        [
+          34,
+          44
+        ]
+      ],
+      "label": {
+        "text": "NH₂",
+        "bbox": [
+          28,
+          31,
+          56,
+          46
+        ],
+        "anchor": "FIRSTN"
+      }
+    },
+    "diazonium": {
+      "ring": {
+        "vertices": [
+          [
+            204,
+            72
+          ],
+          [
+            225,
+            60
+          ],
+          [
+            246,
+            72
+          ],
+          [
+            246,
+            96
+          ],
+          [
+            225,
+            108
+          ],
+          [
+            204,
+            96
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              208,
+              74
+            ],
+            [
+              208,
+              94
+            ]
+          ],
+          [
+            [
+              226,
+              64
+            ],
+            [
+              242,
+              74
+            ]
+          ],
+          [
+            [
+              226,
+              104
+            ],
+            [
+              242,
+              94
+            ]
+          ]
+        ],
+        "circle": false
+      },
+      "branchBond": [
+        [
+          225,
+          60
+        ],
+        [
+          225,
+          43
+        ]
+      ],
+      "label": {
+        "text": "N₂",
+        "bbox": [
+          219,
+          29,
+          238,
+          43
+        ],
+        "anchor": "Nfirst"
+      },
+      "leftBracket": [
+        [
+          204,
+          31
+        ],
+        [
+          198,
+          31
+        ],
+        [
+          198,
+          113
+        ],
+        [
+          204,
+          113
+        ]
+      ],
+      "rightBracket": [
+        [
+          245,
+          31
+        ],
+        [
+          251,
+          31
+        ],
+        [
+          251,
+          113
+        ],
+        [
+          245,
+          113
+        ]
+      ],
+      "plus": {
+        "text": "+",
+        "bbox": [
+          254,
+          22,
+          261,
+          30
+        ],
+        "position": "SUPoutsideRIGHTbracketnotbaselineN"
+      },
+      "chloride": {
+        "text": "Cl",
+        "bbox": [
+          262,
+          30,
+          278,
+          43
+        ],
+        "minus": {
+          "text": "−",
+          "bbox": [
+            276,
+            24,
+            285,
+            28
+          ],
+          "position": "SUP"
+        }
+      }
+    },
+    "phenolAboveArrow2": {
+      "ring": {
+        "vertices": [
+          [
+            328,
+            47
+          ],
+          [
+            349,
+            35
+          ],
+          [
+            370,
+            47
+          ],
+          [
+            370,
+            71
+          ],
+          [
+            349,
+            83
+          ],
+          [
+            328,
+            71
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              332,
+              49
+            ],
+            [
+              332,
+              69
+            ]
+          ],
+          [
+            [
+              350,
+              39
+            ],
+            [
+              366,
+              49
+            ]
+          ],
+          [
+            [
+              350,
+              79
+            ],
+            [
+              366,
+              69
+            ]
+          ]
+        ],
+        "circle": false
+      },
+      "branchBond": [
+        [
+          349,
+          35
+        ],
+        [
+          349,
+          17
+        ]
+      ],
+      "label": {
+        "text": "OH",
+        "bbox": [
+          342,
+          3,
+          366,
+          16
+        ],
+        "anchor": "Ofirst"
+      },
+      "plusToLeft": {
+        "text": "+",
+        "bbox": [
+          306,
+          58,
+          315,
+          68
+        ]
+      }
+    },
+    "azoProduct": {
+      "rings": [
+        {
+          "vertices": [
+            [
+              409,
+              72
+            ],
+            [
+              430,
+              60
+            ],
+            [
+              451,
+              72
+            ],
+            [
+              451,
+              96
+            ],
+            [
+              430,
+              108
+            ],
+            [
+              409,
+              96
+            ]
+          ],
+          "innerDoubleRays": [
+            [
+              [
+                413,
+                74
+              ],
+              [
+                413,
+                94
+              ]
+            ],
+            [
+              [
+                431,
+                64
+              ],
+              [
+                447,
+                74
+              ]
+            ],
+            [
+              [
+                431,
+                104
+              ],
+              [
+                447,
+                94
+              ]
+            ]
+          ],
+          "circle": false
+        },
+        {
+          "vertices": [
+            [
+              514,
+              37
+            ],
+            [
+              535,
+              25
+            ],
+            [
+              556,
+              37
+            ],
+            [
+              556,
+              61
+            ],
+            [
+              535,
+              73
+            ],
+            [
+              514,
+              61
+            ]
+          ],
+          "innerDoubleRays": [
+            [
+              [
+                518,
+                39
+              ],
+              [
+                518,
+                59
+              ]
+            ],
+            [
+              [
+                536,
+                29
+              ],
+              [
+                552,
+                39
+              ]
+            ],
+            [
+              [
+                536,
+                69
+              ],
+              [
+                552,
+                59
+              ]
+            ]
+          ],
+          "circle": false
+        }
+      ],
+      "leftArm": [
+        [
+          451,
+          72
+        ],
+        [
+          465,
+          63
+        ]
+      ],
+      "rightArm": [
+        [
+          502,
+          68
+        ],
+        [
+          514,
+          61
+        ]
+      ],
+      "Nleft": {
+        "text": "N",
+        "bbox": [
+          467,
+          51,
+          478,
+          64
+        ]
+      },
+      "Nright": {
+        "text": "N",
+        "bbox": [
+          488,
+          64,
+          500,
+          77
+        ]
+      },
+      "azoDoubleRays": [
+        [
+          [
+            479,
+            59
+          ],
+          [
+            489,
+            65
+          ]
+        ],
+        [
+          [
+            478,
+            63
+          ],
+          [
+            486,
+            68
+          ]
+        ]
+      ],
+      "note": "Two shortslopingseparatedraysbetweenNlabels; noextraN-H orcharge. ProductOHatupperRIGHTphenylC.",
+      "OHbond": [
+        [
+          556,
+          37
+        ],
+        [
+          571,
+          28
+        ]
+      ],
+      "OHlabel": {
+        "text": "OH",
+        "bbox": [
+          572,
+          17,
+          595,
+          30
+        ],
+        "anchor": "Ofirst"
+      },
+      "caption": {
+        "text": "(màu cam)",
+        "bbox": [
+          475,
+          84,
+          541,
+          99
+        ]
+      }
+    },
+    "arrows": [
+      {
+        "shaft": [
+          [
+            73,
+            90
+          ],
+          [
+            195,
+            90
+          ]
+        ],
+        "filledHeadTriangle": [
+          [
+            195,
+            90
+          ],
+          [
+            187,
+            87
+          ],
+          [
+            187,
+            93
+          ]
+        ],
+        "above": {
+          "text": "+ HNO₂ + HCl",
+          "bbox": [
+            81,
+            72,
+            175,
+            85
+          ]
+        },
+        "below": [
+          {
+            "text": "(1)",
+            "bbox": [
+              80,
+              96,
+              98,
+              110
+            ]
+          },
+          {
+            "text": "0 - 5°C",
+            "bbox": [
+              115,
+              94,
+              160,
+              107
+            ],
+            "note": "literalhyphenseparator/degreeSupbeforeC;noaddedtemperatureconditions"
+          }
+        ]
+      },
+      {
+        "shaft": [
+          [
+            276,
+            88
+          ],
+          [
+            392,
+            88
+          ]
+        ],
+        "filledHeadTriangle": [
+          [
+            392,
+            88
+          ],
+          [
+            384,
+            85
+          ],
+          [
+            384,
+            91
+          ]
+        ],
+        "below": {
+          "text": "(2)",
+          "bbox": [
+            327,
+            94,
+            345,
+            108
+          ]
+        },
+        "abovePhenol": "seephenolAboveArrow2"
+      }
+    ],
+    "font": "ALLtext regular upright serif, nottruebold/italic: NH2/N2/Cl/OH/conditions/numberlabels/(màu cam). Numerals2SUB;charge+−SUP;degreeSUP.",
+    "counts": {
+      "phenylRings": 5,
+      "bareC": 30,
+      "innerCCdoubleRays": 15,
+      "azoNNdouble": 1,
+      "structuralN": 5,
+      "structuralO": 2,
+      "chlorideAtoms": 1,
+      "filledArrowheads": 2,
+      "captions": 1,
+      "reactionNumberLabels": 2,
+      "stereo": 0
+    },
+    "noAdded": [
+      "azoanswername",
+      "water/byproducts",
+      "stem80%95%yieldlabels",
+      "NaNO2replacement",
+      "chargeonproductN",
+      "phenylcircles",
+      "boldcaption",
+      "N-Hbonds",
+      "newHClcounterionbond"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only clear,noSVG/noCount",
+  "rootAudit": {
+    "nativeFull": true,
+    "native4x": true,
+    "allPublicDeAndRefs": true,
+    "freshChromium3xFull": true,
+    "exactSvg": "76cc26e17d1d5e268f01337d282b5dee84b7d8a68964b5c9d0449aba1b2ba373",
+    "notes": "Root mở native FULL+4x và SVG actualFULL3x. 5Ph15innerdouble/30C5N2O1Cl; N2insideSQUARE plus SUPoutsideRIGHT/ClminusSUP; product2N2slopingrays/LOWERLEFTphenyl attachment;2filledheads/conditionsnumberscaptionregularUPRIGHT/noextraNaNO2yieldwateranswer."
+  }
+}
