@@ -19,6 +19,7 @@ import type { ViewLiveBang } from '../bpu/phong-live'
 import type { DiemBut, NetBut, SuKienBut } from '../but-bang-loi'
 import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet, type DauNet } from './ma-net'
 import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type KenhPhong, type MoiTruongLive, type TuyChonOpus } from './sfu'
+import { dsMic, timTheMacDinh } from './thiet-bi-mic'
 
 export interface TuyChonLiveThay {
   /** Vé phòng vai thầy (`/gv/bpu/mo` trả về). */
@@ -262,16 +263,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
    *  thầy để «Mặc định của máy» mà luồng câm ⇒ mở THẲNG thiết bị thật đứng sau mục mặc định (cùng `groupId`, không thì trùng nhãn). `daThuThe` = vòng này đã thử. */
   let idThe: string | null = null, daThuThe = false
   const idDung = (): string | null => idThe ?? micId
-  async function timThe(): Promise<string | null> {
-    try {
-      const ds = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audioinput')
-      const md = ds.filter((d) => d.deviceId === 'default')[0]
-      const that = ds.filter((d) => !!d.deviceId && d.deviceId !== 'default' && d.deviceId !== 'communications')
-      const nhan = (md?.label || mic?.getAudioTracks()[0]?.label || '').replace(/^(Default|Mặc định)\s*-\s*/i, '')
-      const k = (md?.groupId ? that.filter((d) => d.groupId === md.groupId)[0] : undefined) ?? (nhan ? that.filter((d) => d.label === nhan)[0] : undefined)
-      return k?.deviceId ?? null
-    } catch { return null }
-  }
+  const timThe = (): Promise<string | null> => timTheMacDinh(mic?.getAudioTracks()[0]?.label ?? '')
   /** Chuỗi làm rõ tiếng (Web Audio) của luồng mic đang mở; `hong` = chuỗi ra câm trong khi mic có tiếng ⇒ bỏ chuỗi, gửi thẳng track mic. */
   let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean } | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
   let guiSo2: { muc: number | null; kbps: number | null; byte: number | null; luc: number } = { muc: null, kbps: null, byte: null, luc: 0 }, lucDocGui = -1e9, gui0 = 0
@@ -289,13 +281,6 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   })
   const bacCuoi = (): number => (idDung() ? SO_BAC - 1 : SO_BAC - 2)
   const ctxChay = (): boolean => !!amCtx && amCtx.state === 'running'
-  async function dsMic(): Promise<{ id: string; ten: string }[]> {
-    try {
-      const ds = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audioinput' && d.deviceId !== 'communications')
-      // Windows liệt kê cùng một mic hai lần: «Default - <tên>» (mã `default`) và đích danh. Giữ cả hai nhưng gọi rõ mục mặc định.
-      return ds.map((d, i) => ({ id: d.deviceId, ten: d.deviceId === 'default' ? `Mặc định của máy${d.label ? ` — ${d.label.replace(/^(Default|Mặc định)\s*-\s*/i, '')}` : ''}` : d.label || `Mic ${i + 1}` }))
-    } catch { return [] }
-  }
   function thaLuong(l: MediaStream | null): void { for (const t of l?.getTracks() ?? []) { t.onmute = t.onunmute = t.onended = null; try { t.stop() } catch { /* đã dừng */ } } }
   function goChuoi(): void {
     for (const n of chuoi?.nut ?? []) { try { n.disconnect() } catch { /* chưa nối */ } }
@@ -721,7 +706,9 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       try {
         const r = await goiCua(mt, tuy.goc, 'nhan', { ve: tuy.ve, phien, nguon, ten: [ten] })
         if (!r.ok || !r.sdp) throw new Error('nhan')
-        await goiCua(mt, tuy.goc, 'dap', { ve: tuy.ve, phien, sdp: await traLoiMoi(p, mt, r.sdp) })
+        // lời mời mới của SFU mô tả lại cả đường gửi tiếng thầy ⇒ sửa Opus như lúc nối (không thì bộ mã của thầy rơi về mặc định của SFU sau khi gọi em lên bảng)
+        await goiCua(mt, tuy.goc, 'dap', { ve: tuy.ve, phien, sdp: await traLoiMoi(p, mt, suaSdpOpus(r.sdp, opus)) })
+        void ganMic() // đàm phán lại xong: bộ gửi vẫn phải cầm tiếng mic
       } catch { if (emDangKeo === nguon) emDangKeo = '' }
     })
   }

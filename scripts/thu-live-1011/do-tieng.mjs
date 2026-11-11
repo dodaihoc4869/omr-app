@@ -138,7 +138,7 @@ console.log('③ Đổi mic / tạm dừng / đổi lọc LÚC ĐANG LIVE — đ
     for (const b of ra.doiMic) {
       const lang = /đứng yên/.test(b.buoc), dat = lang ? b.emNangLuongTangSauMs == null : b.emNangLuongTangSauMs != null && b.emNangLuongTangSauMs <= 2000
       if (!dat) hong += 1
-      console.log(`  ${dat ? '✓' : '✗'} ${b.buoc}: năng lượng phía em ${b.emNangLuongTangSauMs == null ? 'KHÔNG tăng trong 2 giây' : `tăng sau ${b.emNangLuongTangSauMs} ms`} · đầu nhận ${b.nhanRmsDb} dBFS · mic «${b.mic}» · bộ gửi ${b.boGuiCamMic ? 'cầm mic' : 'KHÔNG cầm mic'} · bộ gửi báo ${b.boGuiBao} · vạch ${b.vach} · khử vọng ${b.vong} · bậc ${b.bac}`)
+      console.log(`  ${dat ? '✓' : '✗'} ${b.buoc}: năng lượng phía em ${b.emNangLuongTangSauMs == null ? 'KHÔNG tăng trong 2 giây' : `tăng sau ${b.emNangLuongTangSauMs} ms`} · đầu nhận ${b.nhanRmsDb} dBFS · mic «${b.mic}» · bộ gửi ${b.boGuiCamMic ? 'cầm mic' : 'KHÔNG cầm mic'} · ${b.kbpsNhan} kb/s · vạch ${b.vach} · khử vọng ${b.vong}`)
     }
     ra.doiMicDat = hong === 0
     if (hong) process.exitCode = 1

@@ -96,16 +96,22 @@ Chạy riêng: `node scripts/thu-live-1011/do-tieng.mjs <dist> docs/ban-ve-live-
 
 | Bước | Năng lượng phía em | Mức nhận | Khử vọng |
 |---|---|---|---|
-| Chọn đích danh «Fake Audio Input 1» TRƯỚC khi bật live ⇒ bật live | tăng sau 303 ms | −14,8 dBFS | tắt |
-| Đổi sang «Fake Audio Input 2» TRONG lúc live | tăng sau 101 ms | −14,7 dBFS | tắt |
-| Tạm dừng | đứng yên suốt 2 giây | câm | tắt |
-| Tiếp tục | tăng sau 202 ms | −19,0 dBFS | tắt |
-| Thầy ép lọc «Bật» (mở lại cùng mic) | tăng sau 101 ms | −16,4 dBFS | bật |
-| Về «Tự động» | tăng sau 101 ms | −15,7 dBFS | tắt |
-| Kết thúc live | đứng yên suốt 2 giây | câm | — |
-| Bật live lại | tăng sau 403 ms | −14,6 dBFS | tắt |
+| chọn «Fake Audio Input 1» trước khi bật live ⇒ bật live | tăng sau 101 ms | −13,8 dBFS | tắt |
+| đổi sang «Fake Audio Input 2» TRONG lúc live | tăng sau 105 ms | −14,6 dBFS | tắt |
+| tạm dừng (phía em phải đứng yên) | đứng yên suốt 2 giây | câm | tắt |
+| tiếp tục | tăng sau 202 ms | −18,8 dBFS | tắt |
+| thầy ép lọc «Bật» (mở lại cùng mic) | tăng sau 101 ms | −16,6 dBFS | bật |
+| về «Tự động» | tăng sau 101 ms | −15,9 dBFS | tắt |
+| gọi em lên bảng (em chưa bật mic) | tăng sau 101 ms | −16,7 dBFS | tắt |
+| em bật mic ⇒ máy thầy kéo tiếng em về (phòng nhận mic em: true; đàm phán lại: 1 lời mời, 1 câu trả lời) | tăng sau 101 ms | −21,1 dBFS | tắt |
+| em tắt mic / thầy thu mic | tăng sau 101 ms | −15,7 dBFS | bật |
+| lượt mới | tăng sau 101 ms | −14,5 dBFS | tắt |
+| kết thúc live (phía em phải đứng yên) | đứng yên suốt 2 giây | câm | — |
+| bật live lại | tăng sau 404 ms | −14,3 dBFS | tắt |
 
 Bước đo là 100 ms nên «tăng sau 101 ms» nghĩa là đã tăng ngay ở lần đọc đầu.
+Bước «em bật mic»: «SFU» giả thêm một đường gửi (tiếng dao động thay giọng em) và gửi LỜI MỜI MỚI; máy thầy trả lời bằng đúng mã thật (`soatEmNoi`). Tiếng thầy
+phía em không đứt qua lần đàm phán lại ấy (mức nhận thấp hơn vì cùng lúc mic thầy mở lại với khử vọng — loa máy thầy đang phát tiếng em).
 
 ### 4.2 Chromium trả lại cấu hình của luồng đang mở
 

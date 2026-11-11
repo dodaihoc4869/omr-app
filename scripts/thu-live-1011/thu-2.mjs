@@ -220,7 +220,7 @@ kiem('K3 · bấm viên Live ⇒ cửa sổ có «Tạm dừng», «Kết thúc 
 await ngu(1500)
 const cdMic = await to.locator('#mc-lv-cd').innerText().catch(() => '')
 kiem('M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)', /Hz · \d kênh/.test(cdMic) && /khử vọng (bật|tắt) · lọc ồn (bật|tắt) · tự chỉnh (bật|tắt)/.test(cdMic) && /cách mở \d\/4/.test(cdMic) && /máy chủ tiếng CHƯA nối/.test(cdMic), cdMic.slice(0, 230))
-kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', await to.locator('.mc-lv-the [data-lv="loc"][data-c="tu"][aria-pressed="true"]').count() === 1 && /Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()) && /khử vọng tắt · lọc ồn tắt · tự chỉnh bật/.test(cdMic))
+kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', await to.locator('.mc-lv-the [data-lv="loc"][data-c="tu"][aria-pressed="true"]').count() === 1 && /Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()) && /khử vọng tắt · lọc ồn tắt · tự chỉnh bật/.test(cdMic), cdMic.slice(0, 220) + ' | ' + (await to.locator('.mc-lv-the').innerText()).replace(/\s+/g, ' ').slice(120, 330))
 kiem('M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung', /Chưa nối máy chủ tiếng/.test(await to.locator('.mc-lv-cum').innerText()))
 kiem('M1 · vạch mức âm ghi đúng trạng thái: đang live ⇒ «Mức âm đang gửi cho lớp»', /Mức âm đang gửi cho lớp/.test(await to.locator('.mc-lv-the').innerText()))
 await to.locator('.mc-lv-the [data-lv="loc"][data-c="bat"]').click(); await ngu(1600)
@@ -239,11 +239,14 @@ kiem('K3 · viên Live ghi «TẠM DỪNG», cửa sổ đổi thành «Tiếp t
 await chup(thay, 'thay-dang-tam-dung-1366')
 await chup(em.t, 'em-thay-tam-dung-844')
 // Thầy viết lúc tạm dừng ⇒ máy em KHÔNG nhận; tiếp tục ⇒ nhận đủ
-/** Số mẫu điểm ảnh có mực trong ô BẢNG ĐEN của máy em (lớp «đã chốt»). */
+/** Số mẫu điểm ảnh có mực trên BẢNG ĐEN của máy em: nét đã chốt của bảng nằm ở khung cuộn `.lv-cuon` (bảng đen cuộn, 11/11); cộng cả phần ô bảng của lớp
+ *  «đã chốt» chung (bản trước khi có khung cuộn). */
 const mucBang = (t) => t.evaluate(() => {
+  let n = 0
+  const dem = (c, x, y, w, h) => { if (w < 1 || h < 1) return; const d = c.getContext('2d').getImageData(x, y, w, h).data; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) n++ }
+  for (const c of document.querySelectorAll('.lv-cuon canvas')) dem(c, 0, 0, c.width, c.height)
   const c = document.querySelector('.lv-cv'), g = document.querySelector('.lv-bang').getBoundingClientRect(), k = c.width / c.getBoundingClientRect().width
-  const d = c.getContext('2d').getImageData(Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k)).data
-  let n = 0; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) n++
+  dem(c, Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k))
   return n
 })
 const mucTruoc = await mucBang(em.t)
