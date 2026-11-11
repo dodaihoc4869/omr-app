@@ -16,8 +16,8 @@
 //     (máy em trong lớp phát loa — «Tất cả»; hoặc loa máy thầy đang phát tiếng em) — luật ở `canLoc()`; thầy ép tay được (`datLoc`).
 // SFU chưa cấu hình (`tieng: 'chua-cau-hinh'`) hoặc nối hỏng ⇒ live vẫn chạy phần HÌNH qua WebSocket.
 import type { ViewLiveBang } from '../bpu/phong-live'
-import type { DiemBut, NetBut, SuKienBut } from '../but-bang-loi'
-import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet, type DauNet } from './ma-net'
+import type { NetBut, SuKienBut } from '../but-bang-loi'
+import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet } from './ma-net'
 import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type KenhPhong, type MoiTruongLive, type TuyChonOpus } from './sfu'
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
 import { dungChuoiTieng, type KieuChuoi } from './chuoi-tieng'
@@ -119,12 +119,6 @@ export interface TrangThaiLiveThay {
 }
 export type KetQuaBat = { ok: true } | { ok: false; lyDo: 'mic-tu-choi' | 'khong-mic' | 'mic-loi' | 'dang-live' | 'chua-san' }
 
-interface NetGui { dau: DauNet; diem: DiemBut[]; tGoc: number | null; daDc: number; truocDc: number; daWs: number }
-const WS_CACH_MS = 34
-/** Điểm đang viết đi DataChannel NGAY sau khung vẽ của thầy (11/11: bản trước chờ thêm 16 ms rồi mới gửi ⇒ máy em trễ thêm đúng một khung);
- *  hai gói liền nhau cách tối thiểu 12 ms (màn 120–240 Hz không bắn quá ~80 gói / giây). */
-const XA_MS = 0
-const DC_CACH_MS = 12
 const NHIP_MS = 30_000
 const MIC_IM_MS = 20_000
 const NGUONG_TIENG = 0.04
@@ -133,6 +127,7 @@ const NGUONG_CAM = 2e-5
 /** Mic chưa hề có tín hiệu, đã hết bậc: chờ ngần này rồi chạy lại cả vòng. Mic từng có tín hiệu rồi im hẳn: im liền ngần này mới mở lại đúng bậc đang chạy. */
 const CHO_VONG = 8000, CAM_LAU = 20000
 export { NEN_RO, CHAN_DINH, LAM_RO } from './chuoi-tieng'
+import { DC_CACH_MS, NGHEN_WS, NHAC_LAI_MS, WS_CACH_MS, XA_MS, daGuiDc, netGuiMoi, tuGoiCuoi, tuGoiDc, tuGoiWs, type NetGui } from './gui-diem'
 
 export function taoLiveThay(tuy: TuyChonLiveThay) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
@@ -596,11 +591,12 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     henXa = null
     // 11/11 (thầy «bấm nộp thì tự về màn live»): em gửi xong là ở bảng live dù cờ phòng `bang` tắt ⇒ điểm đang viết phát SUỐT lúc live (máy em đang ở màn câu
     // hỏi tự bỏ). Đang TẠM DỪNG ⇒ không phát.
-    if (!dangLive() || live!.nghi) { for (const n of net.values()) { n.daDc = n.truocDc = n.daWs = n.diem.length } troCho = null; cuonCho = null; return }
+    if (!dangLive() || live!.nghi) { for (const n of net.values()) { n.daDc = n.daWs = n.diem.length; n.lichDc = [] } troCho = null; cuonCho = null; return }
     const nay = mt.dongHo(), phien = live!.phien, tGui = tLive(), coDc = dcMo()
     const canWs = !coDc || tt.xemWs > 0
     const dcDuoc = coDc && nay - lucDc >= DC_CACH_MS
-    let conWs = false, conDc = false, daDc = false, wsDuoc = canWs && nay - lucWs >= WS_CACH_MS
+    const nghen = canWs && (tuy.kenh.hangCho?.() ?? 0) > NGHEN_WS
+    let conWs = false, conDc = false, daDc = false, wsDuoc = canWs && !nghen && nay - lucWs >= WS_CACH_MS
     for (const n of net.values()) {
       const tong = n.diem.length
       if (!tong) continue
@@ -608,25 +604,25 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       if (n.tGoc == null) n.tGoc = Math.round(tGui - n.diem[tong - 1]![3])
       if (coDc && n.daDc < tong) {
         if (dcDuoc) {
-          // Gói = lô liền trước + lô mới ⇒ mất MỘT gói không thủng nét.
-          const tu = Math.max(n.truocDc, tong - DIEM_TOI_DA_MOT_GOI)
+          // Gói = 3 lô liền trước + lô mới (gui-diem.ts) ⇒ mất tới 3 gói liền không thủng nét.
+          const tu = tuGoiDc(n)
           try { dc!.send(maGoiDiem({ phien, tGui, dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu) })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ }
-          n.truocDc = n.daDc; n.daDc = tong; daDc = true
+          daGuiDc(n); daDc = true
         } else conDc = true
       }
       if (canWs && n.daWs < tong) {
         if (wsDuoc) {
-          for (let tu = n.daWs; tu < tong; tu += DIEM_TOI_DA_MOT_GOI) { tuy.kenh.guiNhiPhan(maGoiDiem({ phien, tGui, dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu, tu + DIEM_TOI_DA_MOT_GOI) })); dem.goiWs += 1 }
+          for (let tu = tuGoiWs(n); tu < tong; tu += DIEM_TOI_DA_MOT_GOI) { tuy.kenh.guiNhiPhan(maGoiDiem({ phien, tGui, dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu, tu + DIEM_TOI_DA_MOT_GOI) })); dem.goiWs += 1 }
           n.daWs = tong; lucWs = nay; wsDuoc = false
-        } else conWs = true
-      } else if (!canWs) n.daWs = tong
+        } else { conWs = true; if (nghen) n.nghen = true }
+      }
     }
     // Con trỏ lơ lửng + (11/11) độ cuộn của bảng đen (`tro` có x > 1,5): hai ô chờ riêng để cái này không đè cái kia.
     // Đường DataChannel gửi ngay, mỗi vị trí một lần (kể cả khi đường WebSocket còn phải chờ lượt). Trả true = đã gửi xong mọi đường cần gửi.
     const guiTro = (o: { x: number; y: number; dc?: boolean }): boolean => {
       const k = maTro({ phien, tGui, x: o.x, y: o.y })
       if (coDc && !o.dc) { if (dcDuoc) { try { dc!.send(k); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } o.dc = true; daDc = true } else conDc = true }
-      if (canWs) { if (!wsDuoc) { conWs = true; return false } tuy.kenh.guiNhiPhan(k); dem.goiWs += 1; lucWs = nay; wsDuoc = false }
+      if (canWs) { if (nghen) return !coDc || !!o.dc; if (!wsDuoc) { conWs = true; return false } tuy.kenh.guiNhiPhan(k); dem.goiWs += 1; lucWs = nay; wsDuoc = false }
       return !coDc || !!o.dc
     }
     if (troCho && guiTro(troCho)) troCho = null
@@ -642,12 +638,14 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     if (dangLive()) {
       if (henXa != null) { mt.huyHen(henXa); henXa = null }
       lucWs = lucDc = -1e9 // lô cuối của nét luôn được đi ngay
-      const tuLap = n.daDc // đầu lô áp chót (sau `xa` nó thành «lô liền trước» của gói cuối)
       xa()
       // Gói CUỐI của nét không có gói nào sau nó lặp lại ⇒ gửi DataChannel thêm một lần (11/11: mất gói cuối là đuôi nét hiện muộn thành một cục).
-      if (!live!.nghi && dcMo() && n.tGoc != null && n.diem.length) { const tu = Math.max(0, Math.min(tuLap, n.truocDc), n.diem.length - DIEM_TOI_DA_MOT_GOI); try { dc!.send(maGoiDiem({ phien: live!.phien, tGui: tLive(), dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu) })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } }
+      if (!live!.nghi && dcMo() && n.tGoc != null && n.diem.length) { const tu = tuGoiCuoi(n); try { dc!.send(maGoiDiem({ phien: live!.phien, tGui: tLive(), dau: n.dau, tGoc: n.tGoc, tu, diem: n.diem.slice(tu) })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } }
       const k = maNhac({ phien: live!.phien, tGui: tLive(), id, tong: n.diem.length })
       if (dcMo()) { try { dc!.send(k); dc!.send(k); dem.goiDc += 2 } catch { /* kênh vừa đóng */ } }
+      // tin nhấc nhắc lại sau 0,3 và 1,2 giây (gui-diem.ts: dọn nét «ma» trên máy em bản cũ khi mạng rung)
+      const ph = live!.phien, tong = n.diem.length
+      for (const ms of NHAC_LAI_MS) mt.hen(() => { if (dcMo() && live?.bat && live.phien === ph) { try { dc!.send(maNhac({ phien: ph, tGui: tLive(), id, tong })); dem.goiDc += 1 } catch { /* kênh vừa đóng */ } } }, ms)
       if (!dcMo() || tt.xemWs > 0) { tuy.kenh.guiNhiPhan(k); dem.goiWs += 1 }
     }
     net.delete(id)
@@ -668,7 +666,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       if (dangLive()) henXaSau(XA_MS)
     } else if (sk.loai === 'net-moi') {
       if (sk.xong) { guiSo(maNetXong(sk.net, sk.vt)); return }
-      net.set(sk.net.id, { dau: { id: sk.net.id, cong: sk.net.cong, mau: sk.net.mau, co: sk.net.co }, diem: sk.net.diem.slice(), tGoc: null, daDc: 0, truocDc: 0, daWs: 0 })
+      net.set(sk.net.id, netGuiMoi({ id: sk.net.id, cong: sk.net.cong, mau: sk.net.mau, co: sk.net.co }, sk.net.diem.slice()))
       lucNet = mt.dongHo()
       if (dangLive() && sk.net.diem.length) henXaSau(XA_MS)
     } else if (sk.loai === 'net-xong') {

@@ -118,6 +118,20 @@ describe('bảng đen cuộn trên máy em', () => {
   })
 })
 
+describe('cỡ canvas theo mật độ (iPhone / iPad có trần bộ nhớ canvas)', () => {
+  it('iPhone nằm ngang 932 × 430 ở mật độ 3: giữ đúng điểm ảnh thật (3,6 triệu); màn rất lớn: lớp chốt kẹp dưới 8 triệu điểm ảnh, cỡ hiện vẫn đúng', () => {
+    const nen = document.createElement('div'), cvChot = document.createElement('canvas'), cvSong = document.createElement('canvas')
+    nen.append(cvChot, cvSong); document.body.append(nen)
+    const v = taoVeBang(L, cvChot, cvSong)
+    v.datKhung({ Wv: 932, Hv: 524.25, ox: 0, oy: 47, w: 932, h: 430, dpr: 3 })
+    expect([cvChot.width, cvChot.height]).toEqual([2796, 1290])
+    v.datKhung({ Wv: 3200, Hv: 1800, ox: 0, oy: 0, w: 3200, h: 1800, dpr: 3 })
+    expect(cvChot.width * cvChot.height).toBeLessThanOrEqual(8e6)
+    expect(cvChot.width).toBeGreaterThanOrEqual(3200) // không hạ dưới mật độ 1
+    expect(parseFloat(cvChot.style.width)).toBeCloseTo(3200, 6)
+  })
+})
+
 describe('nét dở trên máy em = đúng nét xong; cây bút vẽ cùng lượt', () => {
   it('đuôi nét dở (đầu nét đã tới điểm cuối) và nét chốt là CÙNG một đa giác ⇒ chốt nét không đổi hình', () => {
     const m = dung(), n = net('b_n1', 0.4, 40)

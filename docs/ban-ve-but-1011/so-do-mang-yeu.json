@@ -1,0 +1,870 @@
+{
+  "luc": "2026-11-11T06:05:46.195Z",
+  "may": "máy mô phỏng (không mạng thật, không trình duyệt): node + src/lib/live/noi-suy.ts + bản chép luật gửi của máy thầy; mỗi ô = trung vị 5 hạt ngẫu nhiên",
+  "ketQua": [
+    {
+      "kichBan": "Mạng tốt (rung 0, mất 0)",
+      "cauHinh": {
+        "duong": "dc"
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.03,
+        "treTrungVi": 54,
+        "treP95": 57,
+        "troNhay": 37,
+        "suaHinh": 0,
+        "dTrungVi": 22,
+        "dLonNhat": 22
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.03,
+        "treTrungVi": 54,
+        "treP95": 57,
+        "troNhay": 37,
+        "suaHinh": 0,
+        "dTrungVi": 22,
+        "dLonNhat": 22
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.03,
+        "treTrungVi": 54,
+        "treP95": 57,
+        "troNhay": 37,
+        "suaHinh": 0,
+        "dTrungVi": 22,
+        "dLonNhat": 22
+      }
+    },
+    {
+      "kichBan": "Mạng tốt, đường WebSocket",
+      "cauHinh": {
+        "duong": "ws",
+        "hol": 0
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.04,
+        "treTrungVi": 76,
+        "treP95": 81,
+        "troNhay": 39,
+        "suaHinh": 0,
+        "dTrungVi": 43,
+        "dLonNhat": 48
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.04,
+        "treTrungVi": 76,
+        "treP95": 81,
+        "troNhay": 39,
+        "suaHinh": 0,
+        "dTrungVi": 43,
+        "dLonNhat": 48
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.04,
+        "treTrungVi": 76,
+        "treP95": 81,
+        "troNhay": 39,
+        "suaHinh": 0,
+        "dTrungVi": 43,
+        "dLonNhat": 48
+      }
+    },
+    {
+      "kichBan": "Mất gói 5 % · rung 30",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 5,
+        "rung": 30
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.07,
+        "treTrungVi": 96.7,
+        "treP95": 100,
+        "troNhay": 35,
+        "suaHinh": 1,
+        "dTrungVi": 64.4,
+        "dLonNhat": 66.4
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.07,
+        "treTrungVi": 96.7,
+        "treP95": 100.1,
+        "troNhay": 35,
+        "suaHinh": 0,
+        "dTrungVi": 64.4,
+        "dLonNhat": 66.2
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.06,
+        "treTrungVi": 96.7,
+        "treP95": 100.1,
+        "troNhay": 35,
+        "suaHinh": 0,
+        "dTrungVi": 64.4,
+        "dLonNhat": 66.2
+      }
+    },
+    {
+      "kichBan": "Mất gói 15 % · rung 30",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 15,
+        "rung": 30
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 33,
+        "hienVut": 0,
+        "doDeu": 0.18,
+        "treTrungVi": 98,
+        "treP95": 114.4,
+        "troNhay": 36,
+        "suaHinh": 14,
+        "dTrungVi": 65.1,
+        "dLonNhat": 82.1
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 17,
+        "hienVut": 0,
+        "doDeu": 0.06,
+        "treTrungVi": 97.7,
+        "treP95": 104,
+        "troNhay": 35,
+        "suaHinh": 0,
+        "dTrungVi": 64.9,
+        "dLonNhat": 81.5
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 17,
+        "hienVut": 0,
+        "doDeu": 0.06,
+        "treTrungVi": 97.9,
+        "treP95": 107.9,
+        "troNhay": 36,
+        "suaHinh": 0,
+        "dTrungVi": 64.9,
+        "dLonNhat": 81.9
+      }
+    },
+    {
+      "kichBan": "Mất gói 30 % · rung 30",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 30,
+        "rung": 30
+      },
+      "truoc": {
+        "dungHon100": 1,
+        "dungDaiNhatMs": 183,
+        "hienVut": 0,
+        "doDeu": 0.37,
+        "treTrungVi": 112.2,
+        "treP95": 143,
+        "troNhay": 40,
+        "suaHinh": 39,
+        "dTrungVi": 79.5,
+        "dLonNhat": 98.7
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 67,
+        "hienVut": 0,
+        "doDeu": 0.25,
+        "treTrungVi": 111.8,
+        "treP95": 130,
+        "troNhay": 43,
+        "suaHinh": 7,
+        "dTrungVi": 77.2,
+        "dLonNhat": 98
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 33,
+        "hienVut": 0,
+        "doDeu": 0.15,
+        "treTrungVi": 107,
+        "treP95": 121.7,
+        "troNhay": 38,
+        "suaHinh": 4,
+        "dTrungVi": 71,
+        "dLonNhat": 98
+      }
+    },
+    {
+      "kichBan": "Mất gói 15 % theo CHÙM · rung 50",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 15,
+        "chum": true,
+        "rung": 50
+      },
+      "truoc": {
+        "dungHon100": 1,
+        "dungDaiNhatMs": 100,
+        "hienVut": 0,
+        "doDeu": 0.41,
+        "treTrungVi": 126,
+        "treP95": 159,
+        "troNhay": 41,
+        "suaHinh": 22,
+        "dTrungVi": 85.8,
+        "dLonNhat": 117.9
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 83,
+        "hienVut": 0,
+        "doDeu": 0.25,
+        "treTrungVi": 126.1,
+        "treP95": 146,
+        "troNhay": 40,
+        "suaHinh": 7,
+        "dTrungVi": 89.6,
+        "dLonNhat": 117.6
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 67,
+        "hienVut": 0,
+        "doDeu": 0.25,
+        "treTrungVi": 125,
+        "treP95": 144,
+        "troNhay": 37,
+        "suaHinh": 7,
+        "dTrungVi": 87,
+        "dLonNhat": 117.9
+      }
+    },
+    {
+      "kichBan": "Rung 50 ms · mất 2 %",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 50
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 17,
+        "hienVut": 0,
+        "doDeu": 0.06,
+        "treTrungVi": 117,
+        "treP95": 129.8,
+        "troNhay": 37,
+        "suaHinh": 0,
+        "dTrungVi": 84.3,
+        "dLonNhat": 101.6
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 17,
+        "hienVut": 0,
+        "doDeu": 0.07,
+        "treTrungVi": 116.9,
+        "treP95": 132.1,
+        "troNhay": 36,
+        "suaHinh": 0,
+        "dTrungVi": 84.3,
+        "dLonNhat": 101.6
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 17,
+        "hienVut": 0,
+        "doDeu": 0.06,
+        "treTrungVi": 116.9,
+        "treP95": 132,
+        "troNhay": 36,
+        "suaHinh": 0,
+        "dTrungVi": 84.3,
+        "dLonNhat": 101.7
+      }
+    },
+    {
+      "kichBan": "Rung 150 ms · mất 2 %",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 150
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 50,
+        "hienVut": 0,
+        "doDeu": 0.12,
+        "treTrungVi": 182.5,
+        "treP95": 185.4,
+        "troNhay": 178,
+        "suaHinh": 3,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 50,
+        "hienVut": 0,
+        "doDeu": 0.11,
+        "treTrungVi": 247.5,
+        "treP95": 265.4,
+        "troNhay": 36,
+        "suaHinh": 1,
+        "dTrungVi": 213.2,
+        "dLonNhat": 245.9
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 50,
+        "hienVut": 0,
+        "doDeu": 0.1,
+        "treTrungVi": 182.5,
+        "treP95": 185.2,
+        "troNhay": 36,
+        "suaHinh": 6,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "Rung 300 ms · mất 2 %",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 300
+      },
+      "truoc": {
+        "dungHon100": 76,
+        "dungDaiNhatMs": 3400,
+        "hienVut": 0,
+        "doDeu": 2.5,
+        "treTrungVi": 7008,
+        "treP95": 28061,
+        "troNhay": 187,
+        "suaHinh": 46,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 83,
+        "hienVut": 0,
+        "doDeu": 0.13,
+        "treTrungVi": 416.7,
+        "treP95": 429.6,
+        "troNhay": 37,
+        "suaHinh": 4,
+        "dTrungVi": 382.4,
+        "dLonNhat": 410.4
+      },
+      "emCuThayMoi": {
+        "dungHon100": 6,
+        "dungDaiNhatMs": 400,
+        "hienVut": 0,
+        "doDeu": 0.57,
+        "treTrungVi": 198.3,
+        "treP95": 724,
+        "troNhay": 92,
+        "suaHinh": 40,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "Đứt 0,5 giây mỗi 5 giây (gói mất)",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 30,
+        "dut": [
+          5000,
+          500
+        ]
+      },
+      "truoc": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 533,
+        "hienVut": 0,
+        "doDeu": 0.42,
+        "treTrungVi": 96.6,
+        "treP95": 440,
+        "troNhay": 34,
+        "suaHinh": 7,
+        "dTrungVi": 64.2,
+        "dLonNhat": 66.3
+      },
+      "sau": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 500,
+        "hienVut": 0,
+        "doDeu": 0.55,
+        "treTrungVi": 96.8,
+        "treP95": 441,
+        "troNhay": 36,
+        "suaHinh": 6,
+        "dTrungVi": 64.3,
+        "dLonNhat": 66.1
+      },
+      "emCuThayMoi": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 517,
+        "hienVut": 0,
+        "doDeu": 0.42,
+        "treTrungVi": 96.7,
+        "treP95": 426,
+        "troNhay": 34,
+        "suaHinh": 6,
+        "dTrungVi": 64.2,
+        "dLonNhat": 66.1
+      }
+    },
+    {
+      "kichBan": "Đứt 1 giây mỗi 6 giây (gói mất)",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 30,
+        "dut": [
+          6000,
+          1000
+        ]
+      },
+      "truoc": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 1000,
+        "hienVut": 0,
+        "doDeu": 0.42,
+        "treTrungVi": 96.5,
+        "treP95": 761,
+        "troNhay": 22,
+        "suaHinh": 16,
+        "dTrungVi": 64,
+        "dLonNhat": 66.2
+      },
+      "sau": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 1000,
+        "hienVut": 0,
+        "doDeu": 0.48,
+        "treTrungVi": 97.3,
+        "treP95": 818,
+        "troNhay": 26,
+        "suaHinh": 6,
+        "dTrungVi": 63.9,
+        "dLonNhat": 77.5
+      },
+      "emCuThayMoi": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 1000,
+        "hienVut": 0,
+        "doDeu": 0.42,
+        "treTrungVi": 96.5,
+        "treP95": 761,
+        "troNhay": 22,
+        "suaHinh": 15,
+        "dTrungVi": 64.1,
+        "dLonNhat": 84.1
+      }
+    },
+    {
+      "kichBan": "Đứt 2 giây mỗi 8 giây (gói mất)",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 30,
+        "dut": [
+          8000,
+          2000
+        ]
+      },
+      "truoc": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 2000,
+        "hienVut": 0,
+        "doDeu": 0.63,
+        "treTrungVi": 97.3,
+        "treP95": 1744,
+        "troNhay": 37,
+        "suaHinh": 24,
+        "dTrungVi": 64.2,
+        "dLonNhat": 66.9
+      },
+      "sau": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 2033,
+        "hienVut": 0,
+        "doDeu": 0.65,
+        "treTrungVi": 97.5,
+        "treP95": 1794,
+        "troNhay": 38,
+        "suaHinh": 16,
+        "dTrungVi": 64,
+        "dLonNhat": 77.5
+      },
+      "emCuThayMoi": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 2033,
+        "hienVut": 0,
+        "doDeu": 0.63,
+        "treTrungVi": 97,
+        "treP95": 1777,
+        "troNhay": 37,
+        "suaHinh": 24,
+        "dTrungVi": 64,
+        "dLonNhat": 81.8
+      }
+    },
+    {
+      "kichBan": "Đứt 1 giây rồi gói về DỒN CỤC",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 30,
+        "dut": [
+          6000,
+          1000
+        ],
+        "don": true
+      },
+      "truoc": {
+        "dungHon100": 3,
+        "dungDaiNhatMs": 933,
+        "hienVut": 0,
+        "doDeu": 0.46,
+        "treTrungVi": 153.1,
+        "treP95": 711,
+        "troNhay": 35,
+        "suaHinh": 15,
+        "dTrungVi": 65.3,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 2,
+        "dungDaiNhatMs": 517,
+        "hienVut": 0,
+        "doDeu": 0.37,
+        "treTrungVi": 479.4,
+        "treP95": 774,
+        "troNhay": 24,
+        "suaHinh": 4,
+        "dTrungVi": 405.1,
+        "dLonNhat": 450
+      },
+      "emCuThayMoi": {
+        "dungHon100": 3,
+        "dungDaiNhatMs": 967,
+        "hienVut": 0,
+        "doDeu": 0.51,
+        "treTrungVi": 154.7,
+        "treP95": 694,
+        "troNhay": 35,
+        "suaHinh": 15,
+        "dTrungVi": 65.1,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "DataChannel RỚT ở giây 6 ⇒ WebSocket",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 2,
+        "rung": 30,
+        "dcRot": 6000
+      },
+      "truoc": {
+        "dungHon100": 5,
+        "dungDaiNhatMs": 550,
+        "hienVut": 0,
+        "doDeu": 0.56,
+        "treTrungVi": 149.6,
+        "treP95": 460,
+        "troNhay": 45,
+        "suaHinh": 0,
+        "dTrungVi": 70.1,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 3,
+        "dungDaiNhatMs": 300,
+        "hienVut": 0,
+        "doDeu": 0.31,
+        "treTrungVi": 340.7,
+        "treP95": 485.2,
+        "troNhay": 35,
+        "suaHinh": 0,
+        "dTrungVi": 283.8,
+        "dLonNhat": 450
+      },
+      "emCuThayMoi": {
+        "dungHon100": 3,
+        "dungDaiNhatMs": 567,
+        "hienVut": 0,
+        "doDeu": 0.34,
+        "treTrungVi": 145.4,
+        "treP95": 311,
+        "troNhay": 39,
+        "suaHinh": 0,
+        "dTrungVi": 72.6,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "WebSocket · 5 % gói bị chặn đầu hàng 200–800 ms",
+      "cauHinh": {
+        "duong": "ws",
+        "rung": 30,
+        "hol": 0.05
+      },
+      "truoc": {
+        "dungHon100": 18,
+        "dungDaiNhatMs": 850,
+        "hienVut": 0,
+        "doDeu": 1.55,
+        "treTrungVi": 242,
+        "treP95": 691,
+        "troNhay": 47,
+        "suaHinh": 0,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 9,
+        "dungDaiNhatMs": 500,
+        "hienVut": 0,
+        "doDeu": 0.66,
+        "treTrungVi": 485.1,
+        "treP95": 725,
+        "troNhay": 44,
+        "suaHinh": 0,
+        "dTrungVi": 450,
+        "dLonNhat": 450
+      },
+      "emCuThayMoi": {
+        "dungHon100": 18,
+        "dungDaiNhatMs": 850,
+        "hienVut": 0,
+        "doDeu": 1.55,
+        "treTrungVi": 242,
+        "treP95": 691,
+        "troNhay": 47,
+        "suaHinh": 0,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "WebSocket · rung 30 · mất 2 % (kịch bản cũ)",
+      "cauHinh": {
+        "duong": "ws",
+        "rung": 30,
+        "mat": 2
+      },
+      "truoc": {
+        "dungHon100": 7,
+        "dungDaiNhatMs": 667,
+        "hienVut": 0,
+        "doDeu": 0.58,
+        "treTrungVi": 181.2,
+        "treP95": 527,
+        "troNhay": 40,
+        "suaHinh": 0,
+        "dTrungVi": 114,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 5,
+        "dungDaiNhatMs": 633,
+        "hienVut": 0,
+        "doDeu": 0.44,
+        "treTrungVi": 402.5,
+        "treP95": 593,
+        "troNhay": 37,
+        "suaHinh": 0,
+        "dTrungVi": 306.6,
+        "dLonNhat": 450
+      },
+      "emCuThayMoi": {
+        "dungHon100": 7,
+        "dungDaiNhatMs": 667,
+        "hienVut": 0,
+        "doDeu": 0.58,
+        "treTrungVi": 181.2,
+        "treP95": 527,
+        "troNhay": 40,
+        "suaHinh": 0,
+        "dTrungVi": 114,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "«Wi-Fi 1 vạch»: mất 15 % chùm · rung 150 · đứt 0,5 giây",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 15,
+        "chum": true,
+        "rung": 150,
+        "dut": [
+          5000,
+          500
+        ]
+      },
+      "truoc": {
+        "dungHon100": 5,
+        "dungDaiNhatMs": 450,
+        "hienVut": 0,
+        "doDeu": 0.73,
+        "treTrungVi": 183.8,
+        "treP95": 440,
+        "troNhay": 39,
+        "suaHinh": 24,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 367,
+        "hienVut": 0,
+        "doDeu": 0.48,
+        "treTrungVi": 260.1,
+        "treP95": 473,
+        "troNhay": 36,
+        "suaHinh": 6,
+        "dTrungVi": 215.5,
+        "dLonNhat": 247.9
+      },
+      "emCuThayMoi": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 450,
+        "hienVut": 1,
+        "doDeu": 0.74,
+        "treTrungVi": 183.7,
+        "treP95": 426,
+        "troNhay": 38,
+        "suaHinh": 19,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      }
+    },
+    {
+      "kichBan": "iPhone 30 khung/giây, đồng hồ 1 ms · mạng tốt",
+      "cauHinh": {
+        "duong": "dc",
+        "fps": 30,
+        "tron": true
+      },
+      "truoc": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.01,
+        "treTrungVi": 54.3,
+        "treP95": 57.3,
+        "troNhay": 20,
+        "suaHinh": 0,
+        "dTrungVi": 22,
+        "dLonNhat": 22
+      },
+      "sau": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.01,
+        "treTrungVi": 54,
+        "treP95": 57,
+        "troNhay": 20,
+        "suaHinh": 0,
+        "dTrungVi": 22,
+        "dLonNhat": 22
+      },
+      "emCuThayMoi": {
+        "dungHon100": 0,
+        "dungDaiNhatMs": 0,
+        "hienVut": 0,
+        "doDeu": 0.01,
+        "treTrungVi": 54,
+        "treP95": 57,
+        "troNhay": 20,
+        "suaHinh": 0,
+        "dTrungVi": 22,
+        "dLonNhat": 22
+      }
+    },
+    {
+      "kichBan": "iPhone 30 khung/giây · «Wi-Fi 1 vạch»",
+      "cauHinh": {
+        "duong": "dc",
+        "mat": 15,
+        "chum": true,
+        "rung": 150,
+        "dut": [
+          5000,
+          500
+        ],
+        "fps": 30,
+        "tron": true
+      },
+      "truoc": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 433,
+        "hienVut": 0,
+        "doDeu": 0.59,
+        "treTrungVi": 183.5,
+        "treP95": 457,
+        "troNhay": 17,
+        "suaHinh": 24,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      },
+      "sau": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 333,
+        "hienVut": 0,
+        "doDeu": 0.46,
+        "treTrungVi": 258.5,
+        "treP95": 474,
+        "troNhay": 16,
+        "suaHinh": 6,
+        "dTrungVi": 216.2,
+        "dLonNhat": 247
+      },
+      "emCuThayMoi": {
+        "dungHon100": 4,
+        "dungDaiNhatMs": 433,
+        "hienVut": 1,
+        "doDeu": 0.58,
+        "treTrungVi": 183.5,
+        "treP95": 457,
+        "troNhay": 18,
+        "suaHinh": 19,
+        "dTrungVi": 150,
+        "dLonNhat": 150
+      }
+    }
+  ]
+}

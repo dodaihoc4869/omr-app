@@ -260,3 +260,93 @@ Tìm ra bằng vết Chromium (`VET=1`): mỗi khung hình trình duyệt nộp 
 - Cỡ: bàn tay ≈ 5,5 % bề cao bảng đen (kẹp 15–44 px); trên điện thoại 844 × 390 hình dán cả lề 26,5 × 29,5 px. Cây bút dài 0,75 bề cao bàn tay.
 - Trên máy em: `10-tay-dang-viet-may-em-844.jpg`, phóng to `10-tay-dang-viet-phong-to.jpg`, lơ lửng `10-tay-lo-lung-phong-to.jpg`. Trong trình phát «Xem lại Live»: `10-tay-trong-trinh-phat-844.jpg`.
 - Màu: `--tr-chieu-giay` (tay), `--tr-chieu-bang` (viền, bóng), `--p-cam` (thân bút), ngòi mang màu mực đang viết.
+
+## 9. Mạng yếu + iPhone (12/11)
+
+Thầy: «Nãy tôi thử iphone mạng wifi 1 vạch nét chữ ko mượt».
+
+Mọi số ở mục này là **máy mô phỏng** (`node scripts/thu-live-1011/do-mang-yeu.mjs`): chạy đúng mã đệm phát của máy em (`src/lib/live/noi-suy.ts`) + bản chép luật gửi của máy thầy + mô hình đường truyền. KHÔNG phải mạng thật, KHÔNG phải iPhone thật (máy đo không có WebKit). Mỗi ô = trung vị 5 hạt ngẫu nhiên; thầy viết ~20 giây. Số đầy đủ: `docs/ban-ve-but-1011/so-do-mang-yeu.json`. «Trước» = bản đang sống #1610 (commit 99267cb80).
+
+### 9.1 Tìm ra gì
+
+1. **Mạng rung lớn làm nét đứng hẳn.** Trần độ đệm 150 ms; rung quá mức đó thì gói của một nét còn tới SAU khi nét đã phát xong ⇒ máy em dựng lại nó thành một nét «ma» chưa nhấc bút, nét ma giữ đồng hồ phát. Rung 300 ms: 76 lần đứng, dài nhất 3,4 giây, trễ trung vị 7 giây.
+2. **Mất gói liền nhau làm thủng nét.** Gói chỉ kèm 1 lô trước ⇒ mất 2 gói liền là thiếu điểm, máy em nối thẳng qua chỗ thiếu rồi lúc bản chốt tới phải vẽ lại cả nét (mất 15 %: 14 nét; mất 30 %: 39 nét).
+3. **Tin nhấc bút mất ⇒ nét kế phải chờ 350 ms** mới được chạy.
+4. **Gói con trỏ tới lệch thứ tự** (DataChannel không thứ tự) xếp theo giờ TỚI ⇒ con trỏ giật lùi (rung 150 ms: 178 khung nhảy > 12 px).
+5. **Đứt rồi gói về dồn cục**: tồn đọng quá 0,4 giây là hiện vụt cả đoạn.
+6. **Độ đệm đổi theo SỐ KHUNG** (2 ms mỗi khung) ⇒ máy 30 khung / giây đổi chậm bằng nửa.
+
+### 9.2 Sửa
+
+- **Đệm phát thích nghi** (`noi-suy.ts`): trần D 150 → 450 ms; D = số lớn hơn của cửa sổ nhanh (2 giây, p95) và cửa sổ chậm (10 giây, p90) ⇒ mạng xấu nới ngay, mạng tốt lại ~10 giây sau mới rút; nới ≤ 12 % tốc độ phát, rút ≤ 6 %, tính theo thời gian thật. Mạng tốt D vẫn ở sàn 22 ms.
+- **Dư thừa trong gói** (`gui-diem.ts`): mỗi gói DataChannel kèm 3 lô liền trước (trước: 1), phần kèm ≤ 24 điểm.
+- **Đường phụ**: nét bị thủng hoặc có lô tới muộn hơn độ đệm quá 100 ms ⇒ máy em báo phòng «cần điểm qua WebSocket» trong 20 giây (tin `live-ok` sẵn có, `dc: false`), vẫn nghe DataChannel; hai đường ghép theo chỉ số điểm. Máy thầy thấy có em xin giữa nét thì gửi nét đang viết qua WebSocket từ điểm đầu. Đường phụ đang chảy thì máy em chờ vá lỗ tối đa 0,4 giây rồi mới nối thẳng.
+- **Sau khi đứt**: tồn đọng ≥ 150 ms thì phát bù nhanh dần, trần ×2,5; quá 1,2 giây thì hiện ngay phần cũ, chỉ phát động 0,5 giây mới nhất. Sắp hết điểm mà lô kế đã quá hẹn thì chậm dần (tới 0,3 lần) trước khi phải đứng. Cả đường truyền cùng im giữa nét ⇒ giữ đồng hồ ở điểm cuối tới 2,5 giây.
+- **Nét ma**: gói của nét đã phát xong / đã có bản chốt thì bỏ (máy em bản mới); máy thầy nhắc lại tin nhấc sau 0,3 và 1,2 giây (dọn nét ma trên máy em bản cũ). **Nhấc bút**: đã thấy con trỏ lơ lửng hoặc một nét mới thì nét trước thôi giữ đồng hồ. **Con trỏ**: xếp theo giờ gửi, gói cũ hơn mốc đã phát thì bỏ; đi cùng đồng hồ phát với nét.
+- **Bản chốt** (`em.ts`): hạn chờ nét dở phát xong = 400 ms + độ đệm đang dùng (trước: 400 ms cứng ⇒ đệm lớn là nét bị cắt ngang, hiện vụt).
+- **WebSocket phía gửi** (`thay.ts`): hàng chờ `bufferedAmount` > 24 KB thì chưa gửi thêm điểm; hết nghẽn chỉ gửi gói mới nhất của nét.
+- **Trạng thái mạng trên máy em**: vạch tín hiệu sẵn có trong khay lấy theo mức mạng lúc này của đệm phát (`soDo().mang`: 3 vạch tốt · 2 vạch đang nới đệm / đang xin đường phụ · 1 vạch kém). Trước lấy trung vị D cả buổi nên mạng vừa xấu không thấy đổi. Không thêm thông báo nào.
+
+### 9.3 Trước / sau theo kiểu mạng
+
+Cột: số lần đứng > 100 ms × quãng đứng dài nhất · trễ trung vị · số nét phải sửa hình lúc bản chốt tới. «Đứng» chỉ tính khi còn ≥ 40 ms đường viết chưa hiện.
+
+| Kiểu mạng | Trước | Sau |
+|---|---|---|
+| Tốt (DataChannel) | 0 · 54 ms · 0 | 0 · 54 ms · 0 |
+| Tốt (WebSocket) | 0 · 76 ms · 0 | 0 · 76 ms · 0 |
+| Mất 5 % | 0 · 97 ms · 1 | 0 · 97 ms · 0 |
+| Mất 15 % | 0 · 98 ms · 14 | 0 · 98 ms · 0 |
+| Mất 30 % | 1 × 183 ms · 112 ms · 39 | 0 (dài nhất 67 ms) · 112 ms · 7 |
+| Mất 15 % theo chùm, rung 50 | 1 × 100 ms · 126 ms · 22 | 0 (83 ms) · 126 ms · 7 |
+| Rung 50 ms | 0 · 117 ms · 0 | 0 · 117 ms · 0 |
+| Rung 150 ms | 0 · 183 ms · 3; con trỏ nhảy 178 | 0 · 248 ms · 1; con trỏ nhảy 36 |
+| Rung 300 ms | 76 × 3400 ms · 7008 ms · 46 | 0 (83 ms) · 417 ms · 4 |
+| Đứt 0,5 giây mỗi 5 giây | 4 × 533 ms · 97 ms · 7 | 4 × 500 ms · 97 ms · 6 |
+| Đứt 1 giây mỗi 6 giây | 2 × 1000 ms · 97 ms · 16 | 2 × 1000 ms · 97 ms · 6 |
+| Đứt 2 giây mỗi 8 giây | 2 × 2000 ms · 97 ms · 24 | 2 × 2033 ms · 98 ms · 16 |
+| Đứt 1 giây, gói về dồn cục | 3 × 933 ms · 153 ms · 15 | 2 × 517 ms · 479 ms · 4 |
+| DataChannel rớt ⇒ WebSocket | 5 × 550 ms · 150 ms · 0 | 3 × 300 ms · 341 ms · 0 |
+| WebSocket, 5 % gói chặn đầu hàng 200–800 ms | 18 × 850 ms · 242 ms · 0 | 9 × 500 ms · 485 ms · 0 |
+| WebSocket rung 30, mất 2 % | 7 × 667 ms · 181 ms · 0 | 5 × 633 ms · 403 ms · 0 |
+| «Wi-Fi 1 vạch» (mất 15 % chùm, rung 150, đứt 0,5 giây) | 5 × 450 ms · 184 ms · 24 | 4 × 367 ms · 260 ms · 6 |
+| iPhone 30 khung / giây, mạng tốt | 0 · 54 ms · 0 | 0 · 54 ms · 0 |
+| iPhone 30 khung / giây, «Wi-Fi 1 vạch» | 4 × 433 ms · 184 ms · 24 | 4 × 333 ms · 259 ms · 6 |
+
+Hiện vụt (một khung hiện hơn 250 ms đường viết): 0 ở mọi dòng của bản sau.
+
+**Không cứu được:** trong lúc mạng đứt hẳn thì không có gì để vẽ — số lần đứng ở các dòng «đứt» chính là quãng đứt; bản sau chỉ làm cho lúc có lại nét chảy tiếp êm và ít phải sửa hình. **Cái giá:** mạng xấu thì chậm hơn thầy nhiều hơn (rung 150: 183 → 248 ms; gói dồn cục và WebSocket bị chặn đầu hàng: ~0,48 giây) — đổi lấy ít đứng hơn. Đường WebSocket thuần (em không có DataChannel) vẫn đứng mỗi khi TCP chặn lâu hơn 450 ms.
+
+Kịch bản cũ ở mục 2 (`do-dem-phat.mjs`, đường WebSocket): rung 30 mất 2 % đứng dài nhất 133 → 17 ms; rung 80 mất 5 % 150 → 50 ms (trễ 181 → 242 ms và 185 → 306 ms).
+
+**Mạng tốt không kém đi.** Chromium thật (`thu-but-1111.mjs`), đo xen kẽ ba lượt với bản đang sống trên cùng máy (máy đang bận việc khác nên số nhiễu): trễ chạm bút → mực 82,9 / 80,9 / 80,3 ms (bản sống) so với 81,0 / 79,3 / 80,1 ms; 60 khung / giây cả hai; luồng chính máy em ở CPU ×4: 35 / 35 / 30 % so với 35 / 27 / 25 %.
+
+### 9.4 Giao thức + tương thích
+
+- KHÔNG thêm loại khung, KHÔNG đổi định dạng. Điểm dư thừa = vẫn gói `0x21`, chỉ `tu` (chỉ số điểm đầu gói) lùi về trước. Máy em bản cũ ghi điểm theo chỉ số và bỏ điểm đã có (đã nhận «lô trước + lô mới» từ 11/11) nên đọc được.
+- Đường phụ dùng tin `live-ok` sẵn có với `dc: false`; phòng và máy thầy bản cũ xử lí như một em không có DataChannel (không cần đẩy máy chủ).
+- Thêm một việc ở phía gửi, vẫn bằng gói sẵn có: TIN NHẤC BÚT (`0x23`) nhắc lại sau 0,3 và 1,2 giây. Lí do: máy em BẢN CŨ (tab chưa tải lại) khi mạng rung hay dựng lại nét đã xong thành nét «ma» không bao giờ nhấc — con trỏ cứ nhảy về chỗ nét ma (mô phỏng 9 hạt, rung 150: 6 / 9 hạt bị với máy thầy cũ); tin nhấc tới sau dọn nó (0 / 9 hạt bị). Không có nét thì tin này bị bỏ qua.
+- Đo chéo «máy em BẢN CŨ + máy thầy bản mới» (dòng `emCuThayMoi` trong tệp số đo): mạng tốt y hệt bản cũ (54 ms, 0 đứng, 0 sửa hình); mạng xấu bằng hoặc tốt hơn bản cũ — mất 30 %: sửa hình 39 → 4; rung 300: đứng 76 lần × 3,4 giây → 6 lần × 0,4 giây, trễ 7 giây → 0,2 giây. Tức là em CHƯA tải lại trang cũng được lợi ngay khi máy thầy có bản mới.
+- Một lần thử đã BỎ vì làm hỏng máy em bản cũ: gửi lặp gói ĐIỂM cuối nét sau 25 / 70 ms ⇒ bản cũ dựng nét ma, mạng tốt trễ 54 → 90 ms.
+
+### 9.5 iPhone (Safari / WebKit)
+
+Máy đo không có WebKit ⇒ chỉ đọc mã + mô phỏng; chưa chạy trên iPhone thật.
+
+Có thật trong mã, đã sửa:
+- Độ đệm đổi theo số khung ⇒ ở 30 khung / giây (tiết kiệm pin) đổi chậm bằng nửa. Nay theo thời gian thật. Đồng hồ phát, cuộn bảng, cây bút vốn đã theo thời gian.
+- Gói con trỏ lệch thứ tự (mục 9.1 số 4) — DataChannel của máy em mở `ordered: false, maxRetransmits: 0`.
+
+Đã kiểm, không phải lỗi:
+- Cỡ canvas ở mật độ 3: iPhone nằm ngang 932 × 430 ⇒ lớp chốt 2796 × 1290 = 3,6 triệu điểm ảnh, canvas bảng cuộn kẹp sẵn 4096 px bề dọc, lớp «đang viết» ~0,7 triệu — đều dưới trần 16,7 triệu của một canvas. Vẫn thêm kẹp theo DIỆN TÍCH cho lớp chốt (8 triệu điểm ảnh, vượt thì hạ mật độ) phòng màn rất lớn.
+- `performance.now()` độ phân giải 1 ms: mô phỏng làm tròn 1 ms cho kết quả như không làm tròn.
+- `drawImage` mỗi khung chỉ dán hình cây bút nhỏ (~27 × 30 px), không chép canvas lớn.
+
+Chỉ suy đoán, chưa thử máy thật: iOS có giao đủ gói DataChannel không thứ tự lúc luồng chính bận không; Safari bóp bộ hẹn giờ khi tab vừa hiện có làm trễ tin `live-ok` xin đường phụ không; tốc độ vẽ canvas mật độ 3 trên iPhone đời cũ.
+
+### 9.6 Chạy lại
+
+```
+node scripts/thu-live-1011/do-mang-yeu.mjs          # GOC_CU=<thư mục có src/lib bản trước> CHEO=1 để có cột «trước» + dòng đo chéo
+npx vitest run tests/live-mang-yeu-1211.test.ts
+```

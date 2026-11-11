@@ -6,6 +6,8 @@ export interface PhongThay {
   goc: string
   gui(tin: Record<string, unknown>): void
   guiNhiPhan(khung: Uint8Array): void
+  /** Số byte còn chờ gửi của WebSocket phòng (đường lên nghẽn thì lớn dần). */
+  hangCho(): number
 }
 let phong: PhongThay | null = null
 let bangCuoi = ''
@@ -30,6 +32,7 @@ export function noiLive(w: WebSocket, ve: string, goc: string): void {
     ve, goc,
     gui: (tin) => { if (w.readyState === 1) { try { w.send(JSON.stringify(tin)) } catch { /* rớt */ } } },
     guiNhiPhan: (khung) => { if (w.readyState === 1) { try { w.send(khung as Uint8Array<ArrayBuffer>) } catch { /* rớt */ } } },
+    hangCho: () => w.bufferedAmount || 0,
   }
   w.addEventListener('open', () => { phong = p; phat() })
   w.addEventListener('close', () => { if (phong === p) { phong = null; bangCuoi = ''; phat() } })

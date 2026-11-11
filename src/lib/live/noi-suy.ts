@@ -2,7 +2,7 @@
 // Vấn đề: gói điểm tới thưa và không đều (16–50 ms, có dao động, có mất) trong khi màn vẽ 60 khung/giây ⇒ vẽ ngay khi gói tới thì nét giật từng khúc.
 // Cách làm (11/11 làm lại sau khi thầy thử máy thật: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút tức thì mượt mà cực mượt mà»):
 //   · mỗi điểm mang giờ theo ĐỒNG HỒ THẦY; độ lệch đồng hồ = giá trị NHỎ NHẤT của (giờ nhận − tGui) trong ~10 giây gần nhất;
-//   · ĐỘ ĐỆM D = số lớn hơn trong hai số, + 3 ms, kẹp 22–150 ms (sàn 30 → 22 từ 11/11 lần 2: đồng hồ phát đã biết đứng chờ khi hết điểm nên sàn thấp
+//   · ĐỘ ĐỆM D = số lớn hơn trong hai số, + 3 ms, kẹp 22–450 ms (trần 150 → 450 từ 12/11, xem cuối; sàn 30 → 22 từ 11/11 lần 2: đồng hồ phát đã biết đứng chờ khi hết điểm nên sàn thấp
 //     không còn gây nhảy cục; mô phỏng đường DataChannel sạch: trễ 63 → 55 ms, 0 khung đứng), mỗi khung đổi tối đa 2 ms:
 //       (a) p95 dao động giờ tới trong 2 giây + KHOẢNG CÁCH LÔ lớn (p90 của ~40 lô gần nhất, không phải trung bình);
 //       (b) p95 của «ĐỘ CẦN» từng lô = (giờ tới − lệch) − giờ của điểm MỚI đầu tiên trong lô: đúng bằng độ đệm ít nhất để điểm đó không tới muộn. Số này gồm
@@ -16,11 +16,19 @@
 //   · CÂY BÚT (`but`): một vị trí duy nhất cho con trỏ — đang có nét thì ở đúng đầu nét, không thì theo con trỏ lơ lửng; không lấy điểm lơ lửng CŨ khi
 //     nét đang chạy (bản trước: con trỏ đứng im ở chỗ lơ lửng cuối suốt nét rồi nhảy);
 //   · đồng bộ tiếng–nét: `datDTheoTieng(trễ tiếng)` ⇒ D = kẹp(trễ tiếng − 60, D theo dao động, 150) — nét đi trước tiếng ≤ 80 ms.
+// MẠNG YẾU (12/11, thầy: «thử iphone mạng wifi 1 vạch nét chữ ko mượt») — thà chậm thêm một chút còn hơn giật cục:
+//   · TRẦN D 150 → 450 ms. D lấy số lớn hơn của cửa sổ NHANH (2 giây, p95) và cửa sổ CHẬM (10 giây, p90): mạng vừa xấu thì nới ngay, mạng tốt lại thì
+//     ~10 giây sau mới rút. Nới tối đa 12 % tốc độ phát, rút 6 % (tính theo THỜI GIAN, không theo số khung: máy 30 khung/giây đổi cùng tốc độ);
+//   · SẮP HẾT ĐIỂM mà lô kế đã quá hẹn ⇒ đồng hồ phát CHẬM DẦN (tới 0,3 lần) trước khi phải đứng, không chạy hết tốc lực rồi khựng;
+//   · TỒN ĐỌNG sau khi đứt (gói về dồn cục): ≥ 150 ms thì phát bù nhanh dần tới ×2,5; quá 1,2 giây thì HIỆN NGAY phần cũ, chỉ phát động 0,5 giây mới nhất
+//     (bản trước: tồn > 0,4 giây là hiện vụt cả đoạn);
+//   · `canTro(nay)`: vừa có điểm bị thủng (mất nhiều gói liền, dư thừa trong gói không vá nổi) hoặc vừa có lô tới muộn hơn độ đệm quá 100 ms ⇒ máy em xin THÊM điểm qua đường
+//     WebSocket của phòng (tin cậy) trong 20 giây; gói của đường phụ đó nạp với `phu = true` (không tính vào dao động của đường chính).
 import type { DiemBut } from '../but-bang-loi'
 import type { DauNet, GoiDiem } from './ma-net'
 
 export interface TuyChonDem {
-  /** Kẹp dưới / trên của D (ms). */
+  /** Kẹp dưới / trên của D (ms). Mặc định 22 … 450. */
   dMin?: number
   dMax?: number
   /** D đổi tối đa mỗi khung (ms). */
@@ -65,20 +73,38 @@ export interface SoDoDem {
   dungToiDa: number
   /** Mốc phát đang chậm hơn đích bao nhiêu (ms): > 0 = đang bắt kịp sau một lần hết điểm. */
   cham: number
+  /** (12/11) Số lần phải HIỆN NGAY một đoạn cũ vì tồn đọng quá 1,2 giây · đang cần đường phụ WebSocket không · MỨC MẠNG cho giao diện:
+   *  0 = tốt · 1 = đang nới đệm (D > 120 ms hoặc đang cần đường phụ) · 2 = kém (D > 280 ms hoặc vừa có lô tới muộn hơn độ đệm > 300 ms). */
+  vut: number
+  tro: boolean
+  muc: 0 | 1 | 2
 }
 
 /** `diem[i]` = điểm thứ i của nét (lỗ = gói chưa tới / đã mất); `gio[i]` = giờ live của thầy (ms) của điểm đó; `cao` = chỉ số cao nhất đã nhận + 1;
  *  `daVe` = chỉ số kế tiếp sẽ phát; `cuoi` = chỉ số điểm vừa phát gần nhất (−1 = chưa phát điểm nào); `soPhat` = số điểm đã phát ra lớp vẽ;
  *  `lucNhan` = đồng hồ máy em lúc nhận gói gần nhất của nét. */
-interface NetDem { dau: DauNet; tGoc: number; diem: (DiemBut | undefined)[]; gio: number[]; cao: number; daVe: number; cuoi: number; soPhat: number; nhac: boolean; nhacLuc: number; tong: number | null; lucNhan: number }
+interface NetDem { dau: DauNet; tGoc: number; diem: (DiemBut | undefined)[]; gio: number[]; cao: number; daVe: number; cuoi: number; soPhat: number; nhac: boolean; roi: boolean; nhacLuc: number; tong: number | null; lucNhan: number; lucLo: number | null }
 const kep = (v: number, a: number, b: number): number => (v < a ? a : v > b ? b : v)
 const XO = 5000
 /** Đồng hồ phát bám đích: hằng số thời gian (ms) + nhịp chậm nhất / nhanh nhất. */
 const BAM_MS = 120, NHIP_MIN = 0.65, NHIP_MAX = 1.6
-/** Lệch đích quá ngần này (máy em vừa quay lại, đồng hồ nhảy) ⇒ đặt thẳng, không bám dần. */
+/** Mốc phát chạy TRƯỚC đích quá ngần này (đồng hồ lệch vừa đổi) ⇒ đứng chờ đích, không bám dần. */
 const NHAY_MS = 400
-/** Nét dở im lặng quá ngần này (gói cuối + tin nhấc đều mất) ⇒ thôi giữ đồng hồ, bản chốt từ sổ nét sẽ thay. */
-const BO_GIU_MS = 350
+/** PHÁT BÙ sau khi đứt: tồn đọng từ 150 ms thì nhịp = 1 + tồn / 400, trần ×2,5; tồn quá 1,2 giây ⇒ hiện ngay phần cũ, chỉ phát động 0,5 giây mới nhất. */
+const BU_TU_MS = 150, BU_NHIP = 2.5, BU_TRAN_MS = 1200, BU_GIU_MS = 500
+/** Sắp hết điểm + lô kế quá hẹn: nhịp = đệm còn lại / 80 ms, không dưới 0,3. */
+const CAN_MS = 80, NHIP_CAN = 0.3
+/** Cửa sổ chậm của dao động (ms) · tính lại các phân vị mỗi ngần này ms (không sắp xếp ở mọi khung hình). */
+const CUA_CHAM = 10_000, TINH_LAI_MS = 100
+/** Trần của phần D theo trễ tiếng (ms) — không đổi khi trần D theo dao động lên 450. */
+const TRAN_TIENG = 150
+/** Xin đường phụ WebSocket trong ngần này ms kể từ lần thủng / lô tới quá muộn gần nhất · lô tới muộn hơn độ đệm quá ngần này ms mới tính là «đứng lâu». */
+const TRO_MS = 20_000, DUNG_LAU_MS = 100
+/** Nét dở im lặng quá ngần này TRONG KHI gói khác vẫn tới (gói cuối + tin nhấc của nó đều mất) ⇒ thôi giữ đồng hồ, bản chốt từ sổ nét sẽ thay.
+ *  Cả đường truyền cùng im (mạng đứt, hoặc thầy dừng tay giữa nét) ⇒ giữ tới `GIU_DUT_MS`: mạng có lại thì phát tiếp từ đúng chỗ dừng. */
+const BO_GIU_MS = 350, GIU_DUT_MS = 2500
+/** Giữa nét có LỖ (mất nhiều gói liền) mà điểm sau lỗ đã tới, đường phụ đang chảy: chờ nó vá tối đa ngần này ms (lỗ càng ngắn chờ càng ít) rồi mới nối thẳng qua lỗ. */
+const CHO_VA_MS = 400
 /** Dư an toàn cộng vào D (ms). */
 const DU_MS = 3
 
@@ -89,8 +115,11 @@ export function dNetTheoTieng(treTieng: number | null, dJitter: number, tran = 1
 }
 
 export function taoDemPhat(tuy: TuyChonDem = {}) {
-  const dMin = tuy.dMin ?? 22, dMax = tuy.dMax ?? 150, buoc = tuy.buoc ?? 2, cuaSo = tuy.cuaSo ?? 2000, them = tuy.mayYeu ? 16 : 0
+  const dMin = tuy.dMin ?? 22, dMax = tuy.dMax ?? 450, buoc = tuy.buoc ?? 2, cuaSo = tuy.cuaSo ?? 2000, them = tuy.mayYeu ? 16 : 0
   const net = new Map<string, NetDem>()
+  // Nét vừa phát XONG / vừa có bản chốt: gói điểm của nó còn tới muộn (gói lặp, mạng rung, đường phụ chậm) thì bỏ — không dựng lại thành một nét «ma».
+  const daXong = new Map<string, number>()
+  const ghiXong = (id: string, luc: number): void => { daXong.set(id, luc); if (daXong.size > 80) for (const [k, t] of daXong) { if (luc - t > 15_000 || daXong.size > 60) daXong.delete(k); else break } }
   let troHang: { t: number; x: number; y: number }[] = []
   // Độ cuộn bảng đen của thầy (gói `tro` có x > 1,5): hàng chờ theo giờ gửi + giá trị đã tới mốc phát.
   let cuonHang: { t: number; v: number }[] = [], cuonNay: number | null = null
@@ -100,20 +129,27 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
   // Khoảng cách giữa hai lần gửi liền nhau của thầy (ms, 8–120; dài hơn = thầy nghỉ tay, không tính): giữ ~40 số gần nhất, lấy p90.
   let cachLo: number[] = [], lo = 16, tGuiTruoc = -1
   let d = dMin + them, tp = -Infinity, nayTruoc = 0, treTieng: number | null = null
-  let muon = 0, muonToiDa = 0, mat = 0, goi = 0, dung = 0, dungToiDa = 0, dungNay = 0
+  let muon = 0, muonToiDa = 0, mat = 0, goi = 0, dung = 0, dungToiDa = 0, dungNay = 0, vut = 0
+  // phân vị đã tính (làm mới mỗi 100 ms) · lúc nhận gói gần nhất của đường chính · lúc thủng / lô tới quá muộn gần nhất · mức muộn lớn nhất 5 giây qua
+  let dJ = 0, lucTinh = -1e9, lucGoi = -1e9, lucXau = -1e9, lucDungLau = -1e9, dungLau = 0, lucPhu = -1e9
+  /** Chờ vá một lỗ dài `rong` ms bao lâu: chỉ chờ khi đường phụ ĐANG chảy (vừa nhận gói của nó trong 3 giây) — không có ai vá thì nối thẳng ngay. */
+  const hanVa = (nay: number, rong: number): number => (nay - lucPhu < 3000 ? Math.min(CHO_VA_MS, Math.max(40, rong)) : 0)
   // Màu nét gần nhất (cho ngòi của cây bút).
   let mauBut = ''
   const lech = (): number => Math.min(xoNay, xoTruoc)
 
-  /** Nạp một gói vừa nhận (`nhan` = đồng hồ máy em lúc nhận, ms). */
-  function nap(g: GoiDiem, nhan: number): void {
+  /** Nạp một gói vừa nhận (`nhan` = đồng hồ máy em lúc nhận, ms). `phu` = gói của ĐƯỜNG PHỤ (WebSocket xin thêm khi DataChannel thủng): chỉ lấy điểm,
+   *  không tính vào lệch đồng hồ / dao động / khoảng cách lô của đường chính. */
+  function nap(g: GoiDiem, nhan: number, phu = false): void {
     goi += 1
+    if (phu) { lucPhu = nhan; napDiem(g, nhan, true); return }
+    lucGoi = nhan
     const xo = Math.floor(nhan / XO)
     if (xo !== xoMoc) { xoTruoc = xo === xoMoc + 1 ? xoNay : Infinity; xoNay = Infinity; xoMoc = xo }
     const lechGoi = nhan - g.tGui
     if (lechGoi < xoNay) xoNay = lechGoi
     mau.push({ luc: nhan, j: Math.max(0, lechGoi - lech()) })
-    if (mau.length > 400) mau = mau.slice(-300)
+    if (mau.length > 1400) mau = mau.slice(-1000)
     if (tGuiTruoc >= 0 && g.tGui > tGuiTruoc && g.tGui - tGuiTruoc <= 120) {
       cachLo.push(Math.max(8, g.tGui - tGuiTruoc))
       if (cachLo.length > 40) cachLo.shift()
@@ -121,12 +157,32 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
       lo = s[Math.min(s.length - 1, Math.floor(s.length * 0.9))]!
     }
     tGuiTruoc = Math.max(tGuiTruoc, g.tGui)
-    if (g.k === 'tro' && g.x > 1.5) { cuonHang.push({ t: g.tGui, v: g.y }); if (cuonHang.length > 60) cuonHang = cuonHang.slice(-40); return }
-    if (g.k === 'tro') { troHang.push({ t: g.tGui, x: g.x, y: g.y }); if (troHang.length > 90) troHang = troHang.slice(-60); return }
+    napDiem(g, nhan, false)
+  }
+  /** Thầy chỉ có MỘT cây bút: đã thấy con trỏ lơ lửng / một nét MỚI ở giờ `t` thì mọi nét dở có điểm mới nhất trước đó đều đã nhấc bút — tin nhấc của
+   *  chúng mất cũng thôi GIỮ đồng hồ phát (trước: giữ thêm 350 ms, nét kế phải đứng chờ). Việc chốt nét vẫn theo tin nhấc / bản chốt. */
+  function butDaRoi(t: number): void { for (const n of net.values()) if (!n.nhac && !n.roi && n.cao > 0 && n.gio[n.cao - 1]! < t) n.roi = true }
+  function napDiem(g: GoiDiem, nhan: number, phu: boolean): void {
+    // Con trỏ / độ cuộn: đường phụ không lấy (đường chính đã có, tới sớm hơn). Gói tới LỆCH THỨ TỰ (DataChannel không thứ tự, mạng rung) ⇒ chèn đúng chỗ theo
+    // giờ gửi; gói cũ hơn mốc đã phát thì bỏ — không để con trỏ giật lùi.
+    if (g.k === 'tro') {
+      if (phu) return
+      if (g.x <= 1.5) butDaRoi(g.tGui - 30)
+      if (g.tGui <= tp) return
+      const h: { t: number }[] = g.x > 1.5 ? cuonHang : troHang, m = g.x > 1.5 ? { t: g.tGui, v: g.y } : { t: g.tGui, x: g.x, y: g.y }
+      let i = h.length
+      while (i > 0 && h[i - 1]!.t > g.tGui) i--
+      h.splice(i, 0, m)
+      if (cuonHang.length > 60) cuonHang = cuonHang.slice(-40)
+      if (troHang.length > 90) troHang = troHang.slice(-60)
+      return
+    }
     if (g.k === 'nhac') { const n = net.get(g.id); if (n && !n.nhac) { n.nhac = true; n.nhacLuc = g.tGui; n.tong = g.tong } return }
     let n = net.get(g.dau.id)
-    if (!n) { n = { dau: g.dau, tGoc: g.tGoc, diem: [], gio: [], cao: 0, daVe: 0, cuoi: -1, soPhat: 0, nhac: false, nhacLuc: 0, tong: null, lucNhan: nhan }; net.set(g.dau.id, n) }
-    n.lucNhan = nhan
+    if (!n && daXong.has(g.dau.id)) return
+    if (!n && !phu) butDaRoi(g.tGoc + (g.diem[0]?.[3] ?? 0) - 30)
+    if (!n) { n = { dau: g.dau, tGoc: g.tGoc, diem: [], gio: [], cao: 0, daVe: 0, cuoi: -1, soPhat: 0, nhac: false, roi: false, nhacLuc: 0, tong: null, lucNhan: nhan, lucLo: null }; net.set(g.dau.id, n) }
+    if (!phu) n.lucNhan = nhan
     // Ghi theo CHỈ SỐ trong nét: gói tới lệch thứ tự / gói lặp lấp đúng chỗ; điểm mà mốc phát đã đi qua (tới quá muộn) thì bỏ.
     let dauMoi = true
     for (let i = 0; i < g.diem.length; i++) {
@@ -134,53 +190,93 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
       if (k < n.daVe || n.diem[k]) continue
       n.diem[k] = g.diem[i]!; n.gio[k] = g.tGoc + g.diem[i]![3]
       // «độ cần» của lô = tuổi của điểm mới đầu tiên lúc lô tới (đo trên đồng hồ thầy đã trừ lệch); bỏ số vô lí (thầy ngừng tay giữa nét)
-      if (dauMoi) { dauMoi = false; const v = nhan - lech() - n.gio[k]!; if (v >= 0 && v < 400) { can.push({ luc: nhan, v }); if (can.length > 400) can = can.slice(-300) } }
+      if (dauMoi && !phu) {
+        dauMoi = false
+        const v = nhan - lech() - n.gio[k]!
+        if (v >= 0 && v < dMax + 150) { can.push({ luc: nhan, v }); if (can.length > 1400) can = can.slice(-1000) }
+        // lô tới MUỘN hơn độ đệm đang dùng quá 100 ms = đầu nét vừa phải đứng vì mạng (khác với thầy dừng tay giữa nét: lúc đó điểm kế tới vẫn «tươi»)
+        const tre = v - d
+        if (tre > DUNG_LAU_MS) { lucXau = nhan; if (tre > dungLau || nhan - lucDungLau > 5000) { dungLau = tre; lucDungLau = nhan } }
+      }
       const tre = tp - n.gio[k]!
       if (tre > 0 && n.soPhat > 0) { muon += 1; if (tre > muonToiDa) muonToiDa = tre }
     }
     n.cao = Math.max(n.cao, g.tu + g.diem.length)
   }
 
-  function p95(nay: number): number {
-    while (mau.length && nay - mau[0]!.luc > cuaSo) mau.shift()
-    if (!mau.length) return 0
-    const s = mau.map((x) => x.j).sort((a, b) => a - b)
-    return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))]!
+  /** Phân vị `p` của các mẫu trong `ms` gần nhất. */
+  const phanVi = (ds: readonly { luc: number }[], lay: (i: number) => number, nay: number, ms: number, p: number): number => {
+    const s: number[] = []
+    for (let i = ds.length - 1; i >= 0 && nay - ds[i]!.luc <= ms; i--) s.push(lay(i))
+    if (!s.length) return 0
+    s.sort((a, b) => a - b)
+    return s[Math.min(s.length - 1, Math.floor(s.length * p))]!
   }
-
-  function canP95(nay: number): number {
-    while (can.length && nay - can[0]!.luc > cuaSo) can.shift()
-    if (!can.length) return 0
-    const s = can.map((x) => x.v).sort((a, b) => a - b)
-    return s[Math.min(s.length - 1, Math.floor(s.length * 0.95))]!
+  function p95(nay: number): number {
+    while (mau.length && nay - mau[0]!.luc > CUA_CHAM) mau.shift()
+    return phanVi(mau, (i) => mau[i]!.j, nay, cuaSo, 0.95)
+  }
+  /** D theo dao động (chưa kẹp theo tiếng): số lớn hơn của cửa sổ nhanh (p95) và cửa sổ chậm 10 giây (p90). Tính lại mỗi 100 ms. */
+  function dDaoDong(nay: number): number {
+    if (nay - lucTinh < TINH_LAI_MS && nay >= lucTinh) return dJ
+    lucTinh = nay
+    while (can.length && nay - can[0]!.luc > CUA_CHAM) can.shift()
+    const j = Math.max(p95(nay), phanVi(mau, (i) => mau[i]!.j, nay, CUA_CHAM, 0.9))
+    const c = Math.max(phanVi(can, (i) => can[i]!.v, nay, cuaSo, 0.95), phanVi(can, (i) => can[i]!.v, nay, CUA_CHAM, 0.9))
+    return (dJ = kep(Math.max(j + lo, c) + DU_MS + them, dMin + them, dMax))
   }
 
   /** Gọi MỖI KHUNG HÌNH (`nay` = đồng hồ máy em, cùng gốc với `nhan`). */
   function khung(nay: number): KhungPhat {
-    const dJitter = kep(Math.max(p95(nay) + lo, canP95(nay)) + DU_MS + them, dMin + them, dMax)
-    const dich = Math.max(dJitter, dNetTheoTieng(treTieng, dJitter, dMax))
-    d += kep(dich - d, -buoc, buoc)
+    const dJitter = dDaoDong(nay)
+    const dich = Math.max(dJitter, dNetTheoTieng(treTieng, dJitter, Math.min(TRAN_TIENG, dMax)))
+    const dt = nay - nayTruoc, dtc = dt > 0 ? Math.min(dt, 100) : 0
+    nayTruoc = nay
+    // nới nhanh (≤ `buoc` ms mỗi 16,7 ms = 12 % tốc độ phát), rút chậm bằng nửa — theo thời gian thật
+    d += kep(dich - d, -buoc * 0.5 * (dtc || 16.7) / 16.7, buoc * (dtc || 16.7) / 16.7)
     if (!Number.isFinite(lech())) return { net: [], tro: null, but: null, d, cuon: cuonNay }
     // ── đồng hồ phát ──
-    const muc = nay - lech() - d, dt = nay - nayTruoc
-    nayTruoc = nay
-    let moc: number
-    if (!Number.isFinite(tp) || Math.abs(muc - tp) > NHAY_MS || !(dt > 0) || dt > 250) moc = Math.max(Number.isFinite(tp) ? tp : -Infinity, muc)
-    else {
-      // bám đích nhưng không vượt qua đích (khung hình thưa, dt lớn, thì phép nhân nhịp có thể vọt quá)
-      const ung = tp + dt * kep(1 + (muc - tp) / BAM_MS, NHIP_MIN, NHIP_MAX)
-      moc = tp <= muc ? Math.min(ung, muc) : Math.max(ung, muc)
-    }
-    // Nét đang viết (chưa nhấc) mà sắp hết điểm ⇒ đồng hồ chỉ chạy tới điểm mới nhất của nét đó (đứng chờ lô sau, không vượt).
+    const muc = nay - lech() - d
+    // điểm mới nhất của các nét đang viết (chưa nhấc): đồng hồ không chạy vượt nó
     let giu = Infinity
     for (const n of net.values()) {
-      if (n.nhac || n.cao <= 0 || nay - n.lucNhan > BO_GIU_MS) continue
+      // LỖ ngay trước điểm kế tiếp (đã phát tới `cuoi`, điểm `daVe` chưa có mà điểm sau nó đã tới): giữ đồng hồ ở điểm vừa phát, chờ vá có hạn
+      if (n.cuoi >= 0 && n.daVe < n.cao && !n.diem[n.daVe]) {
+        let ke = n.daVe
+        while (ke < n.cao && !n.diem[ke]) ke++
+        if (ke < n.cao) {
+          if (n.lucLo == null) { n.lucLo = nay; lucXau = nay }
+          if (nay - n.lucLo < hanVa(nay, n.gio[ke]! - n.gio[n.cuoi]!)) { if (n.gio[n.cuoi]! < giu) giu = n.gio[n.cuoi]!; continue }
+        }
+      } else n.lucLo = null
+      if (n.nhac || n.roi || n.cao <= 0) continue
+      const im = nay - n.lucNhan
+      if (im > BO_GIU_MS && (lucGoi - n.lucNhan > 100 || im > GIU_DUT_MS)) continue
       const t = n.gio[n.cao - 1]
       if (t != null && t < giu) giu = t
     }
+    let moc: number
+    if (!Number.isFinite(tp) || !(dt > 0)) moc = Math.max(Number.isFinite(tp) ? tp : -Infinity, muc)
+    else {
+      let tu = tp
+      const hetDiem = Math.min(muc, giu)
+      // tồn đọng quá nhiều (đứt lâu rồi gói về dồn cục, máy em vừa quay lại): hiện ngay phần cũ, chỉ phát động đoạn mới nhất
+      if (hetDiem - tu > BU_TRAN_MS) { tu = hetDiem - BU_GIU_MS; vut += 1 }
+      const ton = muc - tu
+      let nhip: number
+      if (ton < -NHAY_MS) nhip = 0
+      else if (ton <= 0) nhip = kep(1 + ton / BAM_MS, NHIP_MIN, 1)
+      else nhip = kep(Math.max(Math.min(1 + ton / BAM_MS, NHIP_MAX), ton >= BU_TU_MS ? 1 + ton / 400 : 0), 1, BU_NHIP)
+      // sắp hết điểm mà lô kế đã quá hẹn ⇒ chậm dần chứ không chạy hết rồi đứng
+      if (giu < Infinity && nay - lucGoi > lo + 24) nhip = Math.min(nhip, Math.max(NHIP_CAN, (giu - tu) / CAN_MS))
+      const ung = tu + dtc * nhip
+      // bám đích nhưng không vượt qua đích (khung hình thưa, dt lớn, thì phép nhân nhịp có thể vọt quá)
+      moc = tu <= muc ? Math.min(ung, muc) : Math.max(ung, muc)
+    }
+    // Nét đang viết (chưa nhấc) mà sắp hết điểm ⇒ đồng hồ chỉ chạy tới điểm mới nhất của nét đó (đứng chờ lô sau, không vượt).
     if (moc > giu) {
       moc = Math.max(Number.isFinite(tp) ? tp : giu, giu)
-      dung += 1; dungNay += dt > 0 && dt < 250 ? dt : 0; if (dungNay > dungToiDa) dungToiDa = dungNay
+      dung += 1; dungNay += dtc; if (dungNay > dungToiDa) dungToiDa = dungNay
     } else dungNay = 0
     tp = moc
     const ra: NetDangViet[] = []
@@ -194,7 +290,11 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
         while (ke < n.cao && !n.diem[ke]) ke++
         if (ke >= n.cao) { ke = -1; break }
         if (n.gio[ke]! > moc) break
-        mat += ke - n.daVe
+        // có lỗ trước điểm này: còn trong hạn chờ vá thì chưa đi qua (đầu nét đứng ở điểm vừa phát); hết hạn ⇒ nối thẳng qua lỗ, bản chốt sẽ sửa hình
+        if (ke > n.daVe) {
+          if (n.cuoi >= 0 && n.lucLo != null && nay - n.lucLo < hanVa(nay, n.gio[ke]! - n.gio[n.cuoi]!)) { ke = -1; break }
+          mat += ke - n.daVe; lucXau = nay
+        }
         moi.push(n.diem[ke]!); n.cuoi = ke; n.daVe = ke + 1; n.soPhat += 1
       }
       let head: NetDangViet['head'] = null
@@ -205,7 +305,7 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
       }
       // Đã nhấc + phát hết ⇒ xong. Gói cuối mất hẳn ⇒ sau 0,5 giây cũng coi là xong (bản chốt từ sổ nét mang đủ điểm).
       const xong = n.nhac && (n.daVe >= Math.max(n.cao, n.tong ?? 0) || moc - n.nhacLuc > 500)
-      if (xong) net.delete(id)
+      if (xong) { net.delete(id); ghiXong(id, nay) }
       if (head) { dauCuoi = head; mauBut = n.dau.mau; if (!xong) { dauBut = head; netBut = id } }
       if (moi.length || head || xong) ra.push({ dau: n.dau, moi, daCo, head, xong })
     }
@@ -235,7 +335,7 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     /** Trễ tiếng ước lượng (ms) từ số đo WebRTC; null = chưa có tiếng. */
     datDTheoTieng(ms: number | null): void { treTieng = ms },
     /** Bản chốt từ sổ nét đã tới ⇒ bỏ nét dở cùng id (nếu còn). Trả true nếu nét đang được phát dở. */
-    boNet(id: string): boolean { return net.delete(id) },
+    boNet(id: string): boolean { ghiXong(id, nayTruoc); return net.delete(id) },
     /** Nét dở có đang phát không (để lớp trên hoãn bản chốt tới khi phát xong). */
     dangPhat(id: string): boolean { return net.has(id) },
     /** Số điểm của nét dở đã PHÁT ra lớp vẽ (−1 = không có nét này). */
@@ -252,12 +352,15 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
       n.tong = diem.length
       return so
     },
+    /** (12/11) Vừa có điểm thủng hoặc vừa đứng lâu trong 20 giây qua ⇒ nên xin thêm điểm qua đường phụ WebSocket của phòng. */
+    canTro(nay: number): boolean { return nay - lucXau < TRO_MS },
     /** Bỏ hết nét dở (tắt live, sang phiên mới, bảng mới). */
-    xoa(): void { net.clear(); troHang = []; cuonHang = []; cuonNay = null },
+    xoa(): void { net.clear(); daXong.clear(); troHang = []; cuonHang = []; cuonNay = null },
     /** Đọc số đo và đặt lại các bộ đếm. */
     soDo(nay: number): SoDoDem {
-      const r: SoDoDem = { d, jitter: p95(nay), muon, muonToiDa, mat, goi, dung, dungToiDa, cham: Number.isFinite(tp) && Number.isFinite(lech()) ? Math.max(0, nay - lech() - d - tp) : 0 }
-      muon = 0; muonToiDa = 0; mat = 0; goi = 0; dung = 0; dungToiDa = 0
+      const tro = nay - lucXau < TRO_MS, dungGan = nay - lucDungLau < 5000 ? dungLau : 0
+      const r: SoDoDem = { d, jitter: p95(nay), muon, muonToiDa, mat, goi, dung, dungToiDa, cham: Number.isFinite(tp) && Number.isFinite(lech()) ? Math.max(0, nay - lech() - d - tp) : 0, vut, tro, muc: d > 280 || dungGan > 300 ? 2 : d > 120 || tro ? 1 : 0 }
+      muon = 0; muonToiDa = 0; mat = 0; goi = 0; dung = 0; dungToiDa = 0; vut = 0
       return r
     },
   }

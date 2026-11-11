@@ -94,6 +94,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let amBan: HTMLAudioElement | null = null, thuBan: RTCRtpReceiver | null = null, banDangKeo = '', henBan: unknown = null
   let midThay: string | null = null, banSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
   let okPhien = -1, okDc: boolean | null = null, okNghe: boolean | null = null
+  /** Đang xin điểm qua đường phụ WebSocket (DataChannel thủng) · mức mạng của nét cho giao diện (0 tốt · 1 đang nới đệm · 2 kém). */
+  let troWs = false, mucMang: 0 | 1 | 2 = 0, dNay = 0
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, demRung: number | null = null, giayLech = false
   /** Nét đang viết đã phát ra lớp vẽ: id → số điểm đã phát. */
@@ -217,7 +219,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         if (c.ok && typeof c.id === 'number') {
           const k = p.createDataChannel(ss.kenh, { negotiated: true, id: c.id, ordered: false, maxRetransmits: 0 })
           k.binaryType = 'arraybuffer'
-          k.addEventListener('message', (e) => { if (e.data instanceof ArrayBuffer) nhanDiem(e.data) })
+          k.addEventListener('message', (e) => { if (e.data instanceof ArrayBuffer) nhanDiem(e.data, false) })
           k.addEventListener('close', () => { if (dc === k) { dc = null; dat({ kenhNet: 'ws' }); baoOk() } })
           if (await choKenhMo(k, mt)) { if (!con()) return; dc = k; dat({ kenhNet: 'dc' }) } else { try { k.close() } catch { /* đã đóng */ } }
         }
@@ -376,7 +378,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   /** Báo phòng em đã sẵn sàng xem (để đếm «em xem») + em có DataChannel hay cần điểm qua WebSocket. Gửi lại khi phiên / đường điểm đổi. */
   function baoOk(): void {
     if (!live?.bat || huyRoi) return
-    const coDc = dcMo(), nghe = dangNghe()
+    // (12/11) DataChannel mở nhưng đang THỦNG (mất nhiều gói liền / vừa đứt) ⇒ báo như không có DataChannel: phòng gửi THÊM điểm qua WebSocket (tin cậy);
+    // máy em nhận cả hai đường, ghép theo chỉ số điểm. Hết xấu 20 giây thì thôi xin.
+    const coDc = dcMo() && !troWs, nghe = dangNghe()
     if (okPhien === live.phien && okDc === coDc && okNghe === nghe) return
     okPhien = live.phien; okDc = coDc; okNghe = nghe
     tuy.kenh.gui({ t: 'live-ok', dc: coDc, nghe })
@@ -413,7 +417,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     // Nét nhiều khung chưa đủ thì `apMuc` chưa trả sự kiện — nét dở trên lớp vẽ giữ nguyên tới lúc đó.
     const ds = apMuc(bang, m), nay = mt.dongHo()
     if (!ds.length) return
-    if (m.k === 'net' && ds.length === 1 && ds[0]!.loai === 'net-moi') hangSo.push({ cho: ds[0]!.net, sk: ds[0]!, han: nay + CHO_CHOT_MS })
+    if (m.k === 'net' && ds.length === 1 && ds[0]!.loai === 'net-moi') hangSo.push({ cho: ds[0]!.net, sk: ds[0]!, han: nay + Math.max(CHO_CHOT_MS, dNay + CHO_CHOT_MS) })
     else {
       const don = (): void => {
         if (m.k === 'net') { dem.boNet(m.net.id); dangVe.delete(m.net.id) }
@@ -424,7 +428,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     }
     xaHangSo(nay)
   }
-  function nhanDiem(goi: ArrayBuffer | Uint8Array): void {
+  function nhanDiem(goi: ArrayBuffer | Uint8Array, quaWs: boolean): void {
     // Bảng live chưa hiện (máy em đang ở màn câu hỏi) ⇒ bỏ điểm đang viết; nét xong vẫn vào sổ nên bật bảng là thấy đủ.
     // 11/11 (thầy «bấm nộp thì tự về màn live»): máy em tự vào bảng live cả khi cờ phòng `bang` tắt ⇒ lớp giao diện báo `datHienBang`; chưa báo ⇒ theo cờ phòng.
     if (!live?.bat || !(hienBang ?? live.bang) || roiMan) return
@@ -432,11 +436,14 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     if (!g) return
     // Nét đã có bản chốt trong bảng ⇒ gói điểm tới muộn của nó bỏ.
     if (g.k === 'diem' && !dangVe.has(g.dau.id) && bang.net.some((x) => x.id === g.dau.id)) return
-    dem.nap(g, mt.dongHo())
+    // DataChannel đang mở mà gói này tới qua WebSocket = gói của ĐƯỜNG PHỤ (em xin thêm vì DataChannel thủng): chỉ lấy điểm, không tính dao động
+    dem.nap(g, mt.dongHo(), quaWs && dcMo())
   }
   /** GỌI MỖI KHUNG HÌNH khi đang live: phát các điểm tới hạn ra `khiBut` (net-moi / them-diem) và trả đầu nét nội suy + con trỏ để vẽ lớp «đang viết». */
   function khung(nay: number = mt.dongHo()): KhungLiveEm {
     const k = dem.khung(nay), dau: KhungLiveEm['dau'] = [], coCho = hangSo.length > 0
+    if (dem.canTro(nay) !== troWs) { troWs = !troWs; baoOk() }
+    dNay = k.d
     for (const n of k.net) {
       if (n.moi.length) {
         if (!dangVe.has(n.dau.id)) but({ loai: 'net-moi', trang: bang.trang, net: { ...n.dau, diem: n.moi.slice() } })
@@ -458,6 +465,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     const xong = (): void => {
       const s = dem.soDo(nay)
       soDo.ghi('d', s.d); soDo.ghi('j', s.jitter); if (s.muon) soDo.ghi('m', s.muonToiDa)
+      mucMang = s.muc
       if (s.dung) soDo.ghi('dg', s.dungToiDa)
       soDo.ghi('tn', s.d + (rtt ?? 0) / 2)
       if (nay - lucDo >= NHIP_DO_MS && !roiMan) { lucDo = nay; const tin = soDo.tinKy(dcMo()); if (tin) tuy.kenh.gui(giayLech ? { ...tin, gl: true } : tin) }
@@ -528,7 +536,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (!b.length) return
       const nhom = nhomKhung(b[0]!)
       if (nhom === 'so') apSo(b)
-      else if (nhom === 'diem') nhanDiem(b)
+      else if (nhom === 'diem') nhanDiem(b, true)
       return
     }
     let m: Record<string, unknown> | null = null
@@ -574,7 +582,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     /** Trễ tiếng ƯỚC TÍNH miệng thầy → máy này (ms; null = chưa đo được): đệm rung đo tại máy + quãng mạng (coi máy thầy ↔ SFU bằng máy em ↔ SFU) +
      *  phần máy thầy (≈ 10 ms thu + khung Opus 20 ms). Chưa gồm loa / tai nghe. */
     treUocTinh: (): number | null => (demRung == null || rtt == null ? null : treTiengUocTinh({ thu: 10, chuoi: 0, ma: treKhungOpus(20), mangThay: rtt, mangEm: rtt, demEm: demRung }).ms),
-    soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null }),
+    /** `mang` (12/11) = mức mạng của nét LÚC NÀY: 0 tốt · 1 đang nới đệm / đang xin đường phụ · 2 kém; `troWs` = đang nhận thêm điểm qua WebSocket. */
+    soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null, mang: mucMang, troWs }),
     huy,
   }
 }
