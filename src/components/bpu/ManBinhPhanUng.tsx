@@ -13,7 +13,7 @@ import { Suspense, lazy, startTransition, useCallback, useEffect, useLayoutEffec
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
-import { cheLiveCua, manEmXa } from './luat-man-live'
+import { cheLiveCua, manEmXa, useHuongLive } from './luat-man-live'
 import { coQuyenTatMan, conKhoaXoay, dangChiaDoi, dangXinQuyen, docQuyenTatMan, khoaXoay, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
 import KetQuaLenBangEm from './KetQuaLenBangEm'
@@ -665,13 +665,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     else nutGui = <NutGuiNoi key={khoaLuot} hien={duChon} tuLuan={!!l.tuLuan} onGui={guiTra} />
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
-  // LIVE BẢNG (10/11; luật màn sửa 11/11 sau khi thầy test máy thật): live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu. Em đang làm câu ⇒ màn câu hỏi +
-  // tay nắm «Thầy đang live» mép trái; gửi xong / thầy gọi lên bảng ⇒ BẢNG LIVE toàn màn xoay ngang. Phòng chưa có cờ `bang` (bản trước 1C) ⇒ suy từ lượt.
+  // LIVE BẢNG: live = TIẾNG suốt buổi, qua mọi lần chuyển câu. Luật màn (`cheLiveCua`: làm câu ⇒ màn câu hỏi + tay nắm; gửi xong / gọi lên bảng ⇒ bảng live)
+  // + hướng màn (`useHuongLive`: đã xem bảng ngang ⇒ câu mới vẫn ngang) ở luat-man-live.tsx. Phòng chưa có cờ `bang` (bản trước 1C) ⇒ suy từ lượt.
   const lv = v?.live ?? null
   const liveBat = !!lv?.bat && !v?.ketThuc
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
-  // Luật màn lúc live (11/11: em gửi xong tự về bảng live; thầy gọi lên bảng ép cả lớp vào bảng) — `cheLiveCua` ở luat-man-live.tsx.
   const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !!l && l.pha === 'tra-loi' && !che && !hetGio })
+  const hl = useHuongLive(cheLive, liveBat)
   // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<LC.DeCau q={q} stt={l.so} />) : null
   const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
@@ -679,13 +679,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} dangKy={dangKyLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
         doi={e && !xaEm ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi}
         q={q && l ? q : null} Chu={LC?.ChemText} tuLuan={!!l?.tuLuan} xa={xaEm} so={l?.so ?? null}
-        luot={cheLive === 'bang' && e && !xaEm && l ? { l, sbd: e.sbd, doi, daGuiMay: cheSo === khoaLuot, ketQuaBang, gui } : null} lenBang={l} />
+        luot={cheLive === 'bang' && e && !xaEm && l ? { l, sbd: e.sbd, doi, daGuiMay: cheSo === khoaLuot, ketQuaBang, gui } : null} lenBang={l} giuNgang={hl.giu} xoayDau={hl.xoay} />
     </Suspense>
   ) : null
 
   if (an) return null
   return createPortal(
-    <div ref={gocRef} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}${cheLive === 'bang' ? ' live-bang' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ['--doi' as string]: `var(${(xaEm ? null : DOI_BPU[doi]?.mau) ?? '--tr-tin'})` }}>
+    <div ref={gocRef} {...hl.the} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}${cheLive === 'bang' ? ' live-bang' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ...hl.the.style, ['--doi' as string]: `var(${(xaEm ? null : DOI_BPU[doi]?.mau) ?? '--tr-tin'})` }}>
       {tren(xaEm ? 'Em đang xem từ xa' : e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}
       {coHan && l?.han ? <div className="bpu-hs-vach"><i style={{ width: `${Math.max(0, Math.min(1, (l.han - nay) / Math.max(1, l.han - l.batDau))) * 100}%` }} /></div> : null}
       {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}

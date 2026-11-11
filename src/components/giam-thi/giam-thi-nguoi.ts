@@ -409,7 +409,7 @@ class Nguoi {
   readonly b: Record<string, Element> = {}
   readonly rm: { mieng?: Mieng; ban?: Ban; mat?: Mat } = {}
   readonly cache = new Map<string, string>()
-  hop: DOMRect | null = null
+  hop: { left: number; top: number; width: number; height: number } | null = null
   hien = true
   song = false
   dung = false
@@ -583,7 +583,7 @@ class Nguoi {
   }
   // ── mắt dõi theo tay / nhìn một điểm (khung SVG đo một lần, bỏ đệm khi cuộn / đổi cỡ / khuất / đổi chỗ) ──
   diemMat(): { x: number; y: number; sc: number } {
-    const r = this.hop ?? (this.hop = this.svg.getBoundingClientRect())
+    const r = this.hop ?? (this.hop = hopHinh(this.svg))
     return { x: r.left + ((0 - VB.x) / VB.w) * r.width, y: r.top + ((MAT_Y * TL - VB.y) / VB.h) * r.height, sc: r.width / VB.w }
   }
   huong(px: number, py: number, xa = 170): { gx: number; gy: number } {
@@ -656,7 +656,13 @@ class Nguoi {
   }
 }
 
-const tamCua = (el: Element) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
+/** Hộp của phần tử theo TRỤC CỦA HÌNH (11/11 tối): màn đang xoay hình 90° bằng CSS (`[data-xoay]`, Bình Phản Ứng lúc live — iPhone cầm ngang, màn câu hỏi xoay
+ *  y như bảng) ⇒ đổi trục: x hình = y màn, y hình = bề ngang màn − x màn. Không xoay ⇒ đúng `getBoundingClientRect()`. Mắt / tay giám thị đo theo trục này. */
+export function hopHinh(el: Element): { left: number; top: number; width: number; height: number } {
+  const r = el.getBoundingClientRect()
+  return el.closest('[data-xoay]') ? { left: r.top, top: window.innerWidth - r.right, width: r.height, height: r.width } : r
+}
+const tamCua = (el: Element) => { const r = hopHinh(el); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } }
 const PU_THEO_TT: Partial<Record<TrangThaiGT, PhanUngGT>> = { 'nghi-ngo': 'voi', nop: 'nop', dung: 'dung', combo: 'dungLien', sai: 'sai', xong: 'dungLien' }
 const DT_THEO_TT: Partial<Record<TrangThaiGT, NhanRoi>> = { doc: 'nhinDe', cho: 'ngap', soi: 'nheo', 'dong-ho': 'nheo', 'chua-tinh': 'nghieng' }
 

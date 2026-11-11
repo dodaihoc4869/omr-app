@@ -78,11 +78,16 @@
 .bpu-kb { min-height: 46px; font-size: 16px; }
 .bpu-kb.hoi { box-shadow: inset 0 0 0 2px var(--tr-chu-y); color: var(--tr-chu-y-chu); background: var(--tr-chu-y-nhat); }
 @media (orientation: landscape) and (min-width: 700px) { .bpu-hai-nut { grid-template-columns: 2fr 1fr; align-items: center; } .bpu-hai-nut .nho { grid-column: 1 / -1; } }
+/* `data-ngang` = màn câu hỏi XOAY HÌNH lúc live, hình rộng ≥ 700 px (luat-man-live.tsx): trang vẫn dọc nên @media ngang không khớp ⇒ nhắc lại đúng luật ngang,
+   `:where()` giữ độ ưu tiên bằng luật gốc (lề phải chừa nút «Gửi» vẫn thắng như trên máy ngang thật). */
+:where(.bpu-hs[data-ngang]) .bpu-hai-nut { grid-template-columns: 2fr 1fr; align-items: center; } :where(.bpu-hs[data-ngang]) .bpu-hai-nut .nho { grid-column: 1 / -1; }
 .bpu-roi-nho { justify-self: start; min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--tr-chu-2); font-size: 14px; font-weight: 700; text-decoration: underline; cursor: pointer; }
 @media (orientation: landscape) and (min-width: 700px) {
   .bpu-hs-than { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; column-gap: 28px; padding-inline: 28px; }
   .bpu-hs-day { padding-inline: 28px; }
 }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; column-gap: 28px; padding-inline: 28px; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-day { padding-inline: 28px; }
 @media (min-width: 1100px) {
   .bpu-hs-tren, .bpu-hs-vach, .bpu-hs-than { width: min(calc(100% - 32px), 1100px); margin-inline: auto; }
   .bpu-hs-day { padding-inline: max(28px, calc((100% - 1100px) / 2)); }
@@ -292,3 +297,25 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
   .bpu-hs-than > .bpu-tra { grid-column: 2; }
   .bpu-hs-than > .bpu-de-chang ~ :not(.bpu-tra) { grid-column: 1 / -1; }
 }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-chip { grid-column: 1 / -1; justify-self: start; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-de-chang { grid-column: 1; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-tra { grid-column: 2; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-de-chang ~ :not(.bpu-tra) { grid-column: 1 / -1; }
+/* XOAY HÌNH LÚC LIVE (thầy 11/11 tối «khi chuyển câu thì máy hs đang ở màn hình ngang live thì câu hiện luôn theo kiểu xoay ngang không về dạng dọc nữa»):
+   em đang cầm NGANG xem bảng xoay hình (iPhone / máy chưa khoá ngang được) mà thầy chuyển câu ⇒ màn câu hỏi xoay y như bảng (`.lv[data-xoay]`, live-em.css):
+   đỉnh máy thành mép trái hình. Khổ hình = trang đổi trục (luat-man-live.tsx đặt width / height). Vùng an toàn đổi trục: mép trên hình ⇐ mép phải máy,
+   mép phải hình ⇐ đáy máy (thanh home), đáy hình ⇐ mép trái máy, mép trái hình ⇐ đỉnh máy (tai thỏ). */
+.bpu-hs[data-xoay] { inset: 0 auto auto 0; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%);
+  padding-top: env(safe-area-inset-right, 0px); padding-left: env(safe-area-inset-top, 0px); padding-right: env(safe-area-inset-bottom, 0px); }
+.bpu-hs[data-xoay] .bpu-hs-day { padding-bottom: calc(16px + env(safe-area-inset-left, 0px)); }
+.bpu-hs[data-xoay] .bpu-gui-noi { right: max(12px, env(safe-area-inset-bottom, 0px)); }
+.bpu-hs[data-xoay].co-gui .bpu-hs-than { padding-right: calc(max(12px, env(safe-area-inset-bottom, 0px)) - env(safe-area-inset-bottom, 0px) + 64px); }
+.bpu-hs[data-xoay] .lv-phu { --lv-at-trai: env(safe-area-inset-top, 0px); --lv-at-tren: env(safe-area-inset-right, 0px); --lv-at-phai: env(safe-area-inset-bottom, 0px); --lv-at-duoi: env(safe-area-inset-left, 0px); }
+/* `data-thap` = hình xoay cao ≤ 500 px: nhắc lại luật «khung thấp xoay ngang» của giám thị (giam-thi.css, @media landscape + max-height 500 px) — đo bằng Chromium
+   thật (scripts/thu-live-1011/thu-ngang-chuyen-cau-1111.mjs): đây là luật DUY NHẤT khác giữa màn ngang thật và màn xoay hình. Ưu tiên cao hơn luật gốc một bậc
+   (tệp nạp trước / sau không đổi kết quả) mà vẫn thua luật riêng của chặng. */
+.bpu-hs[data-thap] .duo-gt-san { --gt-nvw: 96px; }
+.bpu-hs[data-thap] .duo-gt-san:not([data-l]) { align-items: start; }
+.bpu-hs[data-thap] .duo-gt-san:not([data-l]) .duo-gt-bong { margin-top: 4px; padding: 10px 12px; }
+.bpu-hs[data-thap] .duo-gt-san:not([data-l]) .duo-gt-bong::before { --duoi: 40px; }
+.bpu-hs[data-thap] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
