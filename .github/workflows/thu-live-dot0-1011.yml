@@ -18,52 +18,44 @@ concurrency:
 jobs:
   thu-yt:
     if: ${{ inputs.kieu == 'thu-yt' }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    name: dò YouTube (nhánh tach-giong-yt)
+    strategy:
+      fail-fast: false
+      matrix:
+        may: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+        pot: ['0', '1']
+        exclude:
+          - may: macos-latest
+            pot: '1'
+          - may: ubuntu-24.04-arm
+            pot: '1'
+    runs-on: ${{ matrix.may }}
+    timeout-minutes: 20
+    name: dò YouTube (${{ matrix.may }}, PO-token ${{ matrix.pot }})
     steps:
-      - uses: actions/checkout@v4
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Cài yt-dlp mới nhất
+      - name: Cài yt-dlp (+ plugin PO-token bgutil nếu pot = 1, không tài khoản)
+        env:
+          POT: ${{ matrix.pot }}
         run: |
-          python3 -m pip install -q -U "yt-dlp[default]" 2>&1 | tail -2
-          yt-dlp --version; deno --version | head -1; node --version; ffmpeg -version | head -1
-      - name: Dò từng player_client (chỉ in trạng thái, tiếng ở RUNNER_TEMP)
+          python3 -m pip install -q -U --break-system-packages "yt-dlp[default]" 2>&1 | tail -1 || python3 -m pip install -q -U "yt-dlp[default]" 2>&1 | tail -1
+          if [ "$POT" = 1 ]; then
+            docker run --name bgutil -d -p 4416:4416 --init brainicism/bgutil-ytdlp-pot-provider > /dev/null && sleep 5
+            python3 -m pip install -q -U bgutil-ytdlp-pot-provider 2>&1 | tail -1
+          fi
+          yt-dlp --version; curl -s -m 5 -o /dev/null -w 'ip-kiem %{http_code}\n' https://www.youtube.com/
+      - name: Mỗi video thử lần lượt vài client, giãn lượt hỏi; tải 10 KiB đầu tiếng (--test)
         run: |
           cd "$RUNNER_TEMP"
-          for id in PfhFCRGNLKM 2zcCycq9EYc kY0NUO7-fCc; do
-            for c in default tv web_safari mweb android_vr web_embedded ios tv_simply; do
+          for id in kY0NUO7-fCc PfhFCRGNLKM 2zcCycq9EYc lMa-IohYrs4; do
+            for c in default mweb web web_music tv; do
               ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
-              if yt-dlp -q --no-warnings $ea -j "https://www.youtube.com/watch?v=$id" > "j-$id-$c.json" 2> "e-$id-$c.txt"; then
-                python3 -c "import json,sys; d=json.load(open(sys.argv[1])); a=[f for f in d['formats'] if f.get('acodec') not in (None,'none') and f.get('vcodec') in (None,'none')]; print('OK', sys.argv[2], sys.argv[3], 'dài', d.get('duration'), 's ·', ' '.join(f\"{f['format_id']}:{f.get('acodec','')[:4]}/{f.get('asr')}/{round(f.get('abr') or 0)}\" for f in a))" "j-$id-$c.json" "$id" "$c"
-              else
-                echo "LỖI $id $c: $(grep -m1 -o 'ERROR.*' "e-$id-$c.txt" | cut -c1-160)"
-              fi
+              if yt-dlp -q --no-warnings --sleep-requests 2 $ea -f bestaudio --test -o "t-$id.%(ext)s" "https://www.youtube.com/watch?v=$id" 2> e.txt; then
+                echo "TẢI ĐƯỢC $id $c $(ls -l t-$id.* | awk '{print $5}') byte"; rm -f t-$id.*; break
+              else echo "LỖI $id $c: $(grep -m1 -o 'ERROR.*' e.txt | cut -c1-120)"; fi
+              sleep 3
             done
-          done
-      - name: Tải thử 40 s (bestaudio) bằng client đầu tiên dò được + đo dải
-        run: |
-          cd "$RUNNER_TEMP"
-          for id in PfhFCRGNLKM 2zcCycq9EYc kY0NUO7-fCc; do
-            c=$(ls j-$id-*.json 2>/dev/null | xargs -r -n1 sh -c '[ -s "$0" ] && echo "$0"' | head -1 | sed "s/j-$id-//; s/.json//")
-            [ -z "$c" ] && { echo "KHÔNG client nào cho $id"; continue; }
-            ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
-            t0=$(date +%s)
-            if yt-dlp -q --no-warnings $ea -f bestaudio --download-sections "*600-640" -o "a-$id.%(ext)s" "https://www.youtube.com/watch?v=$id" 2> "d-$id.txt"; then
-              f=$(ls a-$id.* | head -1); ffmpeg -v error -i "$f" -ac 1 -ar 48000 -f f32le "a-$id.f32"
-              python3 - "a-$id.f32" "$id" "$c" "$(( $(date +%s) - t0 ))" <<'PY'
-          import sys, numpy as np
-          x = np.fromfile(sys.argv[1], np.float32); n = 4096
-          if len(x) < n * 4: print('ngắn quá', sys.argv[2]); sys.exit()
-          f = x[:len(x) // n * n].reshape(-1, n) * np.hanning(n); p = (np.abs(np.fft.rfft(f, axis=1)) ** 2)
-          e = (f ** 2).mean(1); p = p[e > np.percentile(e, 50)].mean(0); hz = np.arange(len(p)) * 48000 / n
-          ref = p[(hz > 500) & (hz < 4000)].mean(); db = lambda a, b: 10 * np.log10(p[(hz >= a) & (hz < b)].mean() / ref + 1e-20)
-          top = max([h for h, v in zip(hz, 10 * np.log10(p / ref + 1e-20)) if v > -60] or [0])
-          print('TẢI', sys.argv[2], sys.argv[3], f'{len(x) / 48000:.0f} s trong {sys.argv[4]} s', '· dB so 0,5–4 kHz: 8–11k', round(db(8000, 11000), 1), '11–16k', round(db(11000, 16000), 1), '16–20k', round(db(16000, 20000), 1), '· tần cao nhất > −60 dB', round(top))
-          PY
-            else echo "LỖI TẢI $id $c: $(grep -m1 -o 'ERROR.*' d-$id.txt | cut -c1-200)"; fi
           done
       - name: Kiểm nguồn tải (HEAD) + tìm kho giọng Việt trên HF (chỉ in tên, giấy phép)
         run: |
