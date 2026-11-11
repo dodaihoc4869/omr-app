@@ -608,8 +608,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   function soatEmNoi(): void {
     const n = live?.bat ? live.noi[0] : undefined
     const emNoi = n ? { sbd: n.sbd, ten: n.ten, doi: n.doi, xa: n.xa } : null
-    // Mặc định chỉ phát ra loa khi em ở xa: em đứng ngay trong lớp mà loa lớp phát lại giọng em qua mic máy em ⇒ vọng / hú.
-    const ngheEm = ngheEmDat ?? !!n?.xa
+    // Thầy chốt 11/11 tối: em bật mic (ở xa hay tại lớp) là máy thầy TỰ phát tiếng em ra loa lớp, bỏ công tắc; chống hú nhờ khử vọng của trình duyệt.
+    const ngheEm = ngheEmDat ?? true
     // 11/11 lần 4: soát lọc NGAY khi hai giá trị này đổi (`soatLoc()` của `nhanLive` chạy trước dòng này ⇒ chậm một view).
     if ((tt.emNoi?.sbd ?? '') !== (emNoi?.sbd ?? '') || tt.ngheEm !== ngheEm) { dat({ emNoi, ngheEm }); soatLoc() }
     if (amEm) amEm.muted = !ngheEm

@@ -174,7 +174,7 @@ function dongTieng(em: (sbd: string) => { ten: string }): string[] {
   // DÒNG MÁY THẦY NHẬN TIẾNG EM (11/11 tối): luôn có khi đang live — có kéo track em không, vì sao không, kb/s, dBFS giải mã, thẻ phát
   const e1 = ttLt?.emNoi, n = tm.thay?.n
   if (!e1) ds.push('Máy thầy nhận tiếng em: chưa có em nào đang nói')
-  else if (!ttLt?.ngheEm) ds.push(`Máy thầy nhận tiếng ${e1.ten}: «Phát tiếng em ra loa lớp» đang TẮT — không kéo tiếng em`)
+  else if (!ttLt?.ngheEm) ds.push(`Máy thầy nhận tiếng ${e1.ten}: ⚠ phát tiếng em ra loa bị tắt bằng lệnh cũ (mặc định 11/11: luôn phát) — không kéo tiếng em`)
   else if (!n) ds.push(`Máy thầy nhận tiếng ${e1.ten}: ⚠ chưa kéo được tiếng em${tm.loiKeo ? ` (lỗi ${tm.loiKeo})` : tm.keo ? ' (đang kéo…)' : ''}`)
   else {
     // chỉ là chữ GỢI Ý: tiếng em đã giải mã đủ to + thẻ đang phát mà thầy vẫn không nghe ⇒ khả năng cao là loa / âm lượng của máy (trình duyệt không đọc được)

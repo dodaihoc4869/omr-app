@@ -7,8 +7,9 @@
 //   · Mọi nút phụ thường trực vào KHAY của nút «thêm»: có NHÃN CHỮ + phím tắt, ba nhóm «Câu này» (Giải, Ai sai, Thống kê) · «Lớp và bảng»
 //     (Bình Phản Ứng, Bút, Thu gọn tên) · «Màn chiếu» (Tổng quan, Phím tắt, Cài đặt). Chạm ra ngoài / Esc / chọn xong / 8 giây không chạm ⇒ khay thu.
 //   · Nút đang bật (lời giải mở, thống kê, bút) ⇒ CHẤM trên nút «thêm» + dòng tô đặc trong khay.
-//   · 11/11 tối · đang live có em nói / giơ tay ⇒ dải «Đang nói» neo trên ba nhóm (mặt live dựng: live-to-chieu.ts lvVeDai) + DẤU ĐỎ ở góc trái nút «thêm»
-//     khi thẻ «Đang nói» đang đóng (__mcKhay.noi). Dải không phải nhóm ⇒ dau() không đụng, không tính vào bề rộng khay.
+//   · 11/11 tối · đang live ⇒ thẻ «Đang nói» ĐẦY ĐỦ là khối đầu khay, trọn một hàng trên ba nhóm (mặt live dựng: live-to-chieu.ts lvVeKhoi); có em nói /
+//     giơ tay ⇒ DẤU ĐỎ ở góc trái nút «thêm» (__mcKhay.noi). Khối không phải nhóm ⇒ dau() không đụng; bấm trong khối KHÔNG làm khay thu, khay không tự thu
+//     sau 8 giây khi có khối (như thẻ cũ: chỉ Esc / chạm ra ngoài).
 // CÁCH LÀM: không dựng nút mới — CHUYỂN chính các nút cũ vào khay nằm TRONG #mc-phim-nhom ⇒ bộ nghe bấm của nhóm, veThanh (ẩn / hiện, «Giải» ⇄ «Ẩn giải»,
 // mc-bat) và mọi phím tắt chạy y như cũ; khay chỉ là lối bấm chuột / chạm. Tờ không có nhóm phím ⇒ đoạn này không làm gì.
 // Bàn phím: Tab của tờ vốn là phím tắt «Tổng quan» ⇒ CHỈ khi khay đang mở, Tab / Shift+Tab mới đi giữa các nút của khay (Enter để chọn, Esc để thu).
@@ -55,7 +56,7 @@ body.mc .mc-phim-nhom .mc-khay .mc-nut-phim.mc-bat kbd,body.mc .mc-phim-nhom .mc
 .mc-td-them::before{content:"";position:absolute;top:4%;left:4%;display:none;width:max(10px,calc(var(--u)*.78));height:max(10px,calc(var(--u)*.78));border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 2px var(--mc-thanh-nen)}
 .mc-td-them[data-noi]::before{display:block}
 .mc-td-them[data-noi="tay"]::before{background:var(--mc-thanh-nen);box-shadow:inset 0 0 0 2.5px var(--mc-do),0 0 0 2px var(--mc-thanh-nen)}
-/* dải «Đang nói» neo NGAY TRÊN khay, rộng ít nhất bằng khay (định vị tuyệt đối ⇒ không làm khay nở); viền đỏ như thẻ báo của live */
+/* dải «Đang nói» bản 11/11 (đã thay bằng khối đầy đủ bên dưới): giữ khai báo màu theo cổng kiem:mau-giu; .mc-khay-noi .mc-lv-n vẫn dùng (nút ≥ 40 px) */
 .mc-khay-noi{position:absolute;right:0;bottom:calc(100% + var(--u)*.6);box-sizing:border-box;display:flex;align-items:center;gap:calc(var(--u)*.6);min-width:100%;max-width:calc(100vw - 20px);padding:calc(var(--u)*.5);border-radius:calc(var(--u)*1.5);background:var(--mc-thanh-nen);box-shadow:0 calc(var(--u)*1.4) calc(var(--u)*3.75) color-mix(in srgb,var(--mc-bang) 55%,transparent),inset 0 0 0 2px var(--mc-do)}
 .mc-khay-noi[hidden]{display:none}
 .mc-khay-noi-mo{flex:1;min-width:0;display:flex;align-items:center;gap:calc(var(--u)*.6);min-height:max(40px,calc(var(--u)*2.9));padding:0 calc(var(--u)*.8);border:0;border-radius:calc(var(--u)*.8);background:transparent;color:var(--mc-bang-chu);font:600 max(13px,calc(var(--u)*1.1)) var(--mc-sans);text-align:left;white-space:nowrap;cursor:pointer;touch-action:manipulation}
@@ -70,6 +71,15 @@ body.mc .mc-phim-nhom .mc-khay .mc-nut-phim.mc-bat kbd,body.mc .mc-phim-nhom .mc
 .mc-khay-noi-mo[aria-expanded="true"] kbd{background:var(--mc-thanh2);box-shadow:none;color:var(--mc-bang-chu)}
 .mc-khay-noi .mc-lv-n{flex:none;height:auto;min-height:max(40px,calc(var(--u)*2.9));padding:0 1.1em;font-size:max(13px,calc(var(--u)*1.05));touch-action:manipulation}
 @media (max-width:900px){.mc-khay-noi{position:static;min-width:0;max-width:none;flex:none;box-shadow:inset 0 0 0 2px var(--mc-do)}}
+/* khối «Đang nói» đầu khay: khay xuống dòng, khối trọn hàng trên ba nhóm và không làm khay rộng ra (contain + lề âm bù một khoảng gap); khay cao quá màn ⇒ cuộn */
+.mc-khay{flex-wrap:wrap;max-height:calc(100vh - 18px - max(44px,calc(var(--u)*3.6)) - var(--u)*.6);overflow-y:auto;overscroll-behavior:contain}
+.mc-khay-noi{position:static;flex:0 0 100%;contain:inline-size;margin-right:calc(var(--u)*-.7);flex-direction:column;align-items:flex-start;min-width:0;max-width:none;padding:0;border-radius:0;background:none;box-shadow:none}
+.mc-khay-noi .mc-lv-noi{box-sizing:border-box;width:100%;box-shadow:inset 0 0 0 1px var(--mc-bang-vien)}
+.mc-khay-noi.co-mic .mc-lv-noi:first-child{box-shadow:inset 0 0 0 2px var(--mc-do)}
+.mc-khay-noi .mc-lv-noi.chua h3{color:var(--mc-bang-phu);font-weight:700}
+.mc-khay-noi .mc-lv-roi-gon{min-height:40px;box-shadow:inset 0 0 0 1.5px var(--mc-vang-noi)}
+.mc-khay-noi svg{width:1.25em;height:1.25em;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:900px){.mc-khay{flex-wrap:nowrap}.mc-khay-noi{flex:none;contain:none;margin-right:0}}
 @media (max-width:900px){.mc-khay{flex-direction:column;align-items:stretch;bottom:62px;max-height:calc(100vh - 76px);overflow-y:auto;overscroll-behavior:contain}.mc-khay-nhom{flex:none}.mc-khay-nhom+.mc-khay-nhom{padding-left:0;border-left:0}}
 @media (prefers-reduced-motion:reduce){.mc-khay{transition:none;transform:none}}
 html.may-yeu .mc-khay{transition:none;transform:none}
@@ -103,7 +113,7 @@ export const JS_THANH_DAY = `
     thanh.appendChild(nut);
     // các nút đang bấm được của khay (bỏ nút ẩn, nhóm ẩn)
     function ds() { return Array.prototype.filter.call(khay.querySelectorAll('button'), function (x) { return !x.hidden && !x.disabled && !x.parentNode.hidden; }); }
-    function hen() { clearTimeout(TD.h); if (TD.mo) TD.h = setTimeout(function () { mo(false); }, 8000); }
+    function hen() { clearTimeout(TD.h); if (TD.mo && !khay.querySelector('.mc-khay-noi:not([hidden])')) TD.h = setTimeout(function () { mo(false); }, 8000); }
     function mo(v, tieu) {
       var d;
       TD.mo = !!v; body.classList.toggle('mc-khay-mo', TD.mo); nut.setAttribute('aria-expanded', TD.mo ? 'true' : 'false'); hen();
@@ -152,7 +162,8 @@ export const JS_THANH_DAY = `
     // chọn xong ⇒ khay thu (bộ nghe của nhóm phím chạy ngay sau, lệnh không đổi); chọn bằng bàn phím ⇒ trả tiêu điểm về nút thêm
     khay.addEventListener('click', function (e) {
       var x = e.target.closest ? e.target.closest('button') : null;
-      if (!x) return;
+      // bấm trong khối «Đang nói» (kể cả nút vừa bị vẽ lại, đã rời khay) ⇒ khay giữ nguyên
+      if (!x || !khay.contains(x) || x.closest('.mc-khay-noi')) return;
       mo(false);
       if (e.detail === 0 && document.activeElement === x) nut.focus();
     });
@@ -171,7 +182,8 @@ export const JS_THANH_DAY = `
         hen();
       }
     }, true);
-    if (window.MutationObserver) new MutationObserver(dau).observe(khay, { attributes: true, attributeFilter: ['class', 'hidden'], subtree: true });
+    // sóng âm trong khối «Đang nói» đổi lớp ~11 lần / giây ⇒ bỏ qua, chỉ soát khi nút của nhóm đổi
+    if (window.MutationObserver) new MutationObserver(function (r) { for (var i = 0; i < r.length; i++) if (!(r[i].target.closest && r[i].target.closest('.mc-khay-noi'))) { dau(); return; } }).observe(khay, { attributes: true, attributeFilter: ['class', 'hidden'], subtree: true });
     dau(); vua();
     window.__mcKhay = { mo: function (v) { mo(v); }, dangMo: function () { return TD.mo; }, vua: vua,
       // mặt live báo: kiểu dấu ('noi' | 'tay' | '' = không dấu) + câu đọc màn hình nối vào nhãn nút «thêm»

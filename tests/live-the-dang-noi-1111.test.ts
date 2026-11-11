@@ -1,11 +1,13 @@
-// THẺ «ĐANG NÓI» VÀO KHAY CỦA NÚT «THÊM» — thầy 11/11 tối, kèm ảnh thẻ «Đang nói» ở góc phải dưới màn chiếu: «bảng này ẩn thì không biết mở ở đâu,
-// cho nó ẩn luôn vào cái biểu tượng các nút để tôi bật chủ động nhé».
-// Mã: src/lib/live-to-chieu.ts (lvVeRoi · lvVeDai · lvMoNoi, phím N) + src/lib/thanh-day-to-chieu.ts (dấu đỏ trên nút «thêm», CSS dải «Đang nói»).
-//   A · đoạn mã mặt live + thanh đáy chạy chung trong DOM giả: có em nói ⇒ thẻ KHÔNG tự hiện, nút «thêm» có dấu, khay có mục «Đang nói · <tên ngắn>» + phím N
-//       + nút «Thu mic» nhanh (mở khay ⇒ «Thu mic»: hai chạm); bấm mục / phím N ⇒ thẻ mở đầy đủ; bấm lại / Esc / chạm ra ngoài ⇒ thu; hết em ⇒ tự thu.
-//   B · tờ chiếu THẬT trong JSDOM: Esc thu thẻ mà KHÔNG tắt bút (live bật bút sẵn); phím N không đụng lệnh nào của tờ; bảng «Phím tắt» có N và V.
-//   C · CSS: dấu khác chấm vàng «đang bật» (góc trái, đỏ; vòng khi chỉ có em giơ tay), dải không làm khay nở, ô chạm ≥ 40 px, chỉ biến màu của tờ.
-// Ảnh Chromium thật: scripts/thu-live-1011/thu-dang-noi-1111.mjs ⇒ docs/ban-ve-live-1011/that-6-dang-noi-*.jpg.
+// THẺ «ĐANG NÓI» TRONG KHAY CỦA NÚT «THÊM» — thầy 11/11 tối:
+//   (1) «bảng này ẩn thì không biết mở ở đâu, cho nó ẩn luôn vào cái biểu tượng các nút để tôi bật chủ động nhé» ⇒ thẻ KHÔNG tự bung, nằm sau nút «thêm»;
+//   (2) kèm ảnh thẻ cũ + ảnh khay chỉ còn dải gọn: «phải hiện đủ bảng kích thước chức năng như mẫu…» ⇒ mở khay là thấy thẻ ĐẦY ĐỦ (khối đầu khay);
+//   (3) ~21:45: «khi học sinh bật mic thì tự động phát tiếng em ra loa lớp luôn nhé, bỏ luôn nút bật tắt đó đi … có thêm tắt mic tất cả nhé»
+//       ⇒ KHÔNG còn hàng «Phát tiếng em ra loa lớp»; máy thầy tự phát (src/lib/live/thay.ts, test ở tests/live-mic-thay-1111.test.ts).
+// Mã: src/lib/live-to-chieu.ts (lvTheNoi · lvVeKhoi · lvBamThe · phím N) + src/lib/thanh-day-to-chieu.ts (khay giữ khi bấm trong khối, dấu đỏ, CSS khối).
+//   A · đoạn mã mặt live + thanh đáy chạy chung trong DOM giả.
+//   B · tờ chiếu THẬT trong JSDOM: N mở khay tại thẻ; Esc thu khay mà KHÔNG tắt bút; phím N không đụng lệnh nào của tờ; bảng «Phím tắt» có N và V.
+//   C · CSS + cú pháp.
+// Ảnh Chromium thật: scripts/thu-live-1011/thu-dang-noi-1111.mjs ⇒ docs/ban-ve-live-1011/that-7-khay-dang-noi-du-*.jpg.
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { JSDOM, VirtualConsole } from 'jsdom'
 import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
@@ -14,7 +16,7 @@ import { CSS_THANH_DAY, JS_THANH_DAY } from '../src/lib/thanh-day-to-chieu'
 import { TIN_TO_CHIEU } from '../src/lib/to-chieu-cau-noi'
 
 type Tin = Record<string, unknown>
-const NEN = { co: true, pha: 'live', tu: Date.now() - 65_000, xem: 28, tong: 30, lop: '12A1', coTieng: true, khongTieng: false, micIm: false, noiLai: false, mayKhac: false, bang: false, noi: [], ngheEm: false, chuaGui: 0, the: null, roi: [], tay: [], moi: null, micLoi: '', nghi: false, dot2: false }
+const NEN = { co: true, pha: 'live', tu: Date.now() - 65_000, xem: 28, tong: 30, lop: '12A1', coTieng: true, khongTieng: false, micIm: false, noiLai: false, mayKhac: false, bang: false, noi: [], ngheEm: true, chuaGui: 0, the: null, roi: [], tay: [], moi: null, micLoi: '', nghi: false, dot2: false }
 const MINH_ANH = { sbd: 'S1', ten: 'Nguyễn Minh Anh', ky: 'MA', doi: 'Đội Natri', mau: '' }
 const GIA_HUY = { sbd: 'S2', ten: 'Lê Gia Huy', ky: 'LH', doi: 'Đội Kali', mau: '' }
 const TAY = [{ ...GIA_HUY, luc: 1 }, { sbd: 'S3', ten: 'Trần Thu Hà', ky: 'TH', doi: 'Đội Natri', mau: '', luc: 2 }]
@@ -37,151 +39,146 @@ function dung(coKhay = true) {
   new Function('body', 'tao', 'thanh', 'nhom', 'dichApp', 'baoNhanh', 'dot', JS_LIVE_TO_CHIEU + (coKhay ? JS_THANH_DAY : ''))(body, tao, thanh, nhom, () => window, (c: string) => { bao.push(c) }, () => null)
   vi.mocked(document.addEventListener).mockRestore(); vi.mocked(window.addEventListener).mockRestore()
   const bom = (tt: Tin | null) => { window.dispatchEvent(new MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'live-tt', tt }, source: window })) }
+  const muc = (v: number, em: number) => { window.dispatchEvent(new MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'live-muc', v, em }, source: window })) }
   const phim = (key: string) => document.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
   const cham = (dich: Element) => dich.dispatchEvent(new Event(window.PointerEvent ? 'pointerdown' : 'mousedown', { bubbles: true }))
-  const the = () => document.querySelector<HTMLElement>('.mc-lv-roi .mc-lv-noi:not(.mc-lv-ghi-nhac)')
-  const dai = () => document.querySelector<HTMLElement>('#mc-khay > .mc-khay-noi')
-  const muc = () => dai()!.querySelector<HTMLElement>('.mc-khay-noi-mo')!
-  return { body, gui, bao, bom, phim, cham, the, dai, muc, viec: (v: string) => gui.filter((m) => m.loai === 'live' && m.viec === v),
-    nut: () => document.getElementById('mc-them')!, khayMo: () => body.classList.contains('mc-khay-mo'), cot: () => document.querySelector<HTMLElement>('.mc-lv-roi')! }
+  const khoi = () => document.querySelector<HTMLElement>('#mc-khay > .mc-khay-noi')
+  const nutChu = (goc: ParentNode, chu: string) => [...goc.querySelectorAll<HTMLElement>('button')].find((b) => (b.textContent ?? '').trim() === chu)
+  return { body, gui, bao, bom, muc, phim, cham, khoi, nutChu, viec: (v: string) => gui.filter((m) => m.loai === 'live' && m.viec === v),
+    nut: () => document.getElementById('mc-them')!, khay: () => document.getElementById('mc-khay')!, khayMo: () => body.classList.contains('mc-khay-mo'),
+    cot: () => document.querySelector<HTMLElement>('.mc-lv-roi')! }
 }
-afterEach(() => { for (const [dich, loai, f, tuy] of daGan.splice(0)) dich.removeEventListener(loai, f, tuy); vi.restoreAllMocks(); document.body.innerHTML = ''; document.body.className = ''; delete (window as unknown as { __mcKhay?: unknown }).__mcKhay })
+afterEach(() => { for (const [dich, loai, f, tuy] of daGan.splice(0)) dich.removeEventListener(loai, f, tuy); vi.useRealTimers(); vi.restoreAllMocks(); document.body.innerHTML = ''; document.body.className = ''; delete (window as unknown as { __mcKhay?: unknown }).__mcKhay })
 
-describe('A · thẻ «Đang nói» nằm sau nút «thêm», thầy chủ động mở', () => {
-  it('có em nói ⇒ thẻ KHÔNG tự hiện; nút «thêm» có dấu «noi» + nhãn đọc tên em; khay có mục «Đang nói · Minh Anh» kèm ô phím N + nút «Thu mic» nhanh', () => {
+describe('A · khay của nút «thêm» có thẻ «Đang nói» ĐẦY ĐỦ', () => {
+  it('có em nói ⇒ góc phải dưới trống; nút «thêm» có dấu đỏ; khối ĐẦU khay là thẻ đầy đủ như mẫu: chữ cái, tên, «Đội Natri · mic đang bật», sóng, «Thu mic», «Tắt mic tất cả»', () => {
     const t = dung()
     t.bom({ ...NEN, noi: [MINH_ANH] })
-    expect(t.the()).toBeNull()
     expect(t.cot().hidden).toBe(true) // không còn gì tự bung ở góc phải dưới
     expect(t.nut().getAttribute('data-noi')).toBe('noi')
     expect(t.nut().getAttribute('aria-label')).toBe('Thêm nút điều khiển, Minh Anh đang nói')
-    expect(t.dai()!.hidden).toBe(false)
-    expect(t.dai()!.classList.contains('mc-khay-nhom')).toBe(false) // dải không phải nhóm: ba nhóm cũ giữ nguyên
-    expect(t.muc().querySelector('b')!.textContent).toBe('Đang nói · Minh Anh')
-    expect(t.muc().querySelector('kbd')!.textContent).toBe('N')
-    expect(t.muc().getAttribute('aria-expanded')).toBe('false')
-    expect(t.muc().hasAttribute('data-k')).toBe(false) // không lọt vào bộ nghe bấm của nhóm phím
-    const thu = t.dai()!.querySelector<HTMLElement>('[data-thu]')!
+    const k = t.khoi()!
+    expect(t.khay().firstElementChild).toBe(k) // nằm ngay trên ba nhóm
+    expect([k.hidden, k.classList.contains('mc-khay-nhom'), t.khay().querySelectorAll('.mc-khay-nhom').length]).toEqual([false, false, 3])
+    const the = k.querySelector('.mc-lv-noi')!
+    expect(the.querySelector('h3')!.textContent).toBe('Đang nói')
+    const em = the.querySelector('.mc-lv-em')!
+    expect(em.querySelector('.mc-lv-ky')!.textContent).toBe('MA')
+    expect(em.querySelector('span')!.firstChild!.textContent).toBe('Nguyễn Minh Anh')
+    expect(em.querySelector('small')!.textContent).toBe('Đội Natri · mic đang bật')
+    expect(em.querySelector('#mc-lv-me')!.children.length).toBe(5)
+    const thu = em.querySelector<HTMLElement>('[data-thu]')!
     expect([thu.textContent, thu.getAttribute('data-thu'), thu.className]).toEqual(['Thu mic', 'S1', 'mc-lv-n do'])
+    expect(t.nutChu(the, 'Tắt mic tất cả')!.getAttribute('data-thu')).toBe('')
+    // thầy bỏ công tắc: không còn hàng «Phát tiếng em ra loa lớp» ở đâu trên màn chiếu
+    expect(document.body.textContent).not.toContain('Phát tiếng em ra loa lớp')
+    expect(document.querySelector('[data-nghe="0"],[data-nghe="1"]')).toBeNull()
+    expect(k.querySelectorAll('[data-k]').length).toBe(0) // không lọt vào bộ nghe bấm của nhóm phím
   })
 
-  it('«Thu mic» khẩn: HAI chạm — mở khay ⇒ «Thu mic»; khay tự thu, thẻ vẫn đóng', () => {
+  it('bấm trong thẻ KHÔNG làm khay thu: «Thu mic», «Tắt mic tất cả» gửi đúng lệnh như thẻ cũ; nút của nhóm vẫn thu khay như cũ', () => {
     const t = dung()
     t.bom({ ...NEN, noi: [MINH_ANH] })
     t.nut().click()
     expect(t.khayMo()).toBe(true)
-    t.dai()!.querySelector<HTMLElement>('[data-thu]')!.click()
-    expect(t.viec('thu-mic')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'thu-mic', sbd: 'S1' }])
-    expect(t.khayMo()).toBe(false)
-    expect(t.the()).toBeNull()
-  })
-
-  it('bấm mục ⇒ thẻ mở ĐẦY ĐỦ như cũ (sóng âm, Thu mic, Phát tiếng em ra loa lớp, Tắt mic tất cả), dấu tắt; bấm lại ⇒ thu, dấu trở lại', () => {
-    const t = dung()
-    t.bom({ ...NEN, noi: [MINH_ANH] })
-    t.nut().click(); t.muc().click()
-    expect(t.khayMo()).toBe(false) // chọn xong ⇒ khay thu
-    const the = t.the()!
-    expect(the.querySelector('h3')!.textContent).toBe('Đang nói')
-    expect(the.querySelector('#mc-lv-me')!.children.length).toBe(5)
-    for (const chu of ['Thu mic', 'Phát tiếng em ra loa lớp', 'Tắt mic tất cả']) expect(the.textContent).toContain(chu)
-    expect(t.nut().hasAttribute('data-noi')).toBe(false)
-    expect(t.nut().getAttribute('aria-label')).toBe('Thêm nút điều khiển')
-    expect(t.muc().getAttribute('aria-expanded')).toBe('true')
-    // nút trong thẻ vẫn gửi đúng lệnh như trước
-    ;[...the.querySelectorAll<HTMLElement>('button')].find((b) => b.textContent === 'Tắt mic tất cả')!.click()
-    expect(t.viec('thu-mic')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'thu-mic' }])
-    t.nut().click(); t.muc().click()
-    expect(t.the()).toBeNull()
-    expect(t.nut().getAttribute('data-noi')).toBe('noi')
-  })
-
-  it('phím N mở / đóng; Esc thu (khay đang mở thì khay thu trước); chạm ra ngoài thu, chạm trong thẻ / nút «thêm» thì giữ', () => {
-    const t = dung()
-    t.bom({ ...NEN, noi: [MINH_ANH] })
-    t.phim('n')
-    expect(t.the()).not.toBeNull()
-    t.phim('N')
-    expect(t.the()).toBeNull()
-    t.phim('n')
-    t.phim('Escape')
-    expect(t.the()).toBeNull()
-    // khay đang mở + thẻ đang mở: Esc thứ nhất thu khay, Esc thứ hai thu thẻ
-    t.phim('n'); t.nut().click()
+    t.khoi()!.querySelector<HTMLElement>('.mc-lv-em [data-thu]')!.click()
+    t.nutChu(t.khoi()!, 'Tắt mic tất cả')!.click()
+    expect(t.viec('thu-mic')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'thu-mic', sbd: 'S1' }, { nguon: 'to-chieu', loai: 'live', viec: 'thu-mic' }])
     expect(t.khayMo()).toBe(true)
-    t.phim('Escape')
-    expect([t.khayMo(), !!t.the()]).toEqual([false, true])
-    t.phim('Escape')
-    expect(t.the()).toBeNull()
-    // chạm
-    t.phim('n')
-    t.cham(t.the()!)
-    expect(t.the()).not.toBeNull()
-    t.cham(t.nut())
-    expect(t.the()).not.toBeNull()
-    t.cham(document.getElementById('ngoai')!)
-    expect(t.the()).toBeNull()
-    // phím N lúc khay đang mở ⇒ khay thu, thẻ mở
-    t.nut().click(); t.phim('n')
-    expect([t.khayMo(), !!t.the()]).toEqual([false, true])
+    t.cham(t.khoi()!.querySelector('h3')!) // chạm trong khối ⇒ khay giữ
+    expect(t.khayMo()).toBe(true)
+    document.querySelector<HTMLElement>('#mc-khay [data-k="G"]')!.click()
+    expect(t.khayMo()).toBe(false)
   })
 
-  it('không có em nào ⇒ N chỉ báo nhanh, không mở; hết em nói ⇒ thẻ tự thu, dải + dấu mất; em mới nói ⇒ thẻ vẫn KHÔNG tự bung', () => {
+  it('đang live mà CHƯA em nào nói / giơ tay ⇒ khối chỉ một dòng «Chưa có em nào nói» (không nút, không hàng loa); không dấu. Không live ⇒ không có khối', () => {
     const t = dung()
+    t.bom({ ...NEN, pha: 'tat', tu: null })
+    expect(t.khoi()).toBeNull() // chưa live: khay y như cũ
     t.bom(NEN)
-    t.phim('n')
-    expect(t.bao).toEqual(['Chưa em nào đang nói hay giơ tay'])
-    expect(t.the()).toBeNull()
-    expect(t.dai()).toBeNull() // chưa từng có em: khay y như cũ
-    t.bom({ ...NEN, noi: [MINH_ANH] }); t.phim('n')
-    expect(t.the()).not.toBeNull()
-    t.bom(NEN)
-    expect(t.the()).toBeNull()
-    expect(t.dai()!.hidden).toBe(true)
-    expect(t.dai()!.querySelectorAll('button').length).toBe(0) // dải rỗng ⇒ không nút nào lọt vào vòng Tab của khay
+    const k = t.khoi()!
+    expect(k.hidden).toBe(false)
+    expect(k.textContent).toBe('Chưa có em nào nói')
+    expect(k.querySelectorAll('button').length).toBe(0) // vòng Tab của khay không thêm gì
     expect(t.nut().hasAttribute('data-noi')).toBe(false)
-    t.bom({ ...NEN, noi: [GIA_HUY] })
-    expect(t.the()).toBeNull()
-    expect(t.muc().querySelector('b')!.textContent).toBe('Đang nói · Gia Huy')
-    t.bom({ ...NEN, pha: 'tat', tu: null, noi: [GIA_HUY] }) // hết live
-    expect(t.dai()!.hidden).toBe(true)
-    expect(t.nut().hasAttribute('data-noi')).toBe(false)
+    t.bom({ ...NEN, noi: [MINH_ANH] }); t.bom(NEN) // em vừa nói xong ⇒ về một dòng
+    expect(k.textContent).toBe('Chưa có em nào nói')
+    t.bom({ ...NEN, pha: 'tat', tu: null, noi: [MINH_ANH] }) // hết live
+    expect([k.hidden, k.querySelectorAll('button').length, t.nut().hasAttribute('data-noi')]).toEqual([true, 0, false])
   })
 
-  it('chỉ có em giơ tay ⇒ dấu VÒNG («tay»), mục «2 em giơ tay» không có «Thu mic»; mở ⇒ hàng chờ hiện thẳng với «Mời nói»', () => {
+  it('giơ tay: dấu VÒNG; khối «Chưa có em nào nói» + thẻ gọn «2 em giơ tay» ⇒ chạm mở hàng chờ mà khay KHÔNG thu; «Mời nói», «Hạ hết tay» gửi đúng lệnh', () => {
     const t = dung()
     t.bom({ ...NEN, tay: TAY })
     expect(t.cot().hidden).toBe(true)
     expect(t.nut().getAttribute('data-noi')).toBe('tay')
     expect(t.nut().getAttribute('aria-label')).toBe('Thêm nút điều khiển, 2 em giơ tay')
-    expect(t.muc().querySelector('b')!.textContent).toBe('2 em giơ tay')
-    expect(t.dai()!.querySelector('[data-thu]')).toBeNull()
-    t.phim('n')
-    const hang = t.cot().querySelector('.mc-lv-tay')!
+    t.nut().click()
+    expect(t.khoi()!.querySelector('h3')!.textContent).toBe('Chưa có em nào nói')
+    t.khoi()!.querySelector<HTMLElement>('[data-tay]')!.click() // nút bị vẽ lại ngay trong lượt bấm
+    expect(t.khayMo()).toBe(true)
+    const hang = t.khoi()!.querySelector('.mc-lv-tay')!
     expect([...hang.querySelectorAll('.mc-lv-em span')].map((e) => e.firstChild!.textContent)).toEqual(['Lê Gia Huy', 'Trần Thu Hà'])
-    ;[...hang.querySelectorAll<HTMLElement>('button')].find((b) => b.textContent === 'Mời nói')!.click()
+    t.nutChu(hang, 'Mời nói')!.click()
     expect(t.viec('moi')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'moi', sbd: 'S2' }])
-    // em được mời: thẻ thầy đã mở thì vẫn mở; mục đổi «Đã mời nói · Gia Huy» + «Thu mic» (không đỏ — em chưa nói)
+    expect(t.khayMo()).toBe(true)
+    // em được mời: «Đã mời nói» + «chờ em bật mic» + «Thu mic» (không đỏ — em chưa nói); dấu đặc
     t.bom({ ...NEN, tay: [TAY[1]], moi: GIA_HUY })
-    expect(t.the()!.textContent).toContain('đã mời · chờ em bật mic')
-    expect(t.muc().querySelector('b')!.textContent).toBe('Đã mời nói · Gia Huy')
-    expect(t.muc().querySelector('small')!.textContent).toBe('1 em giơ tay')
-    const thu = t.dai()!.querySelector<HTMLElement>('[data-thu]')!
-    expect([thu.textContent, thu.getAttribute('data-thu'), thu.className]).toEqual(['Thu mic', 'S2', 'mc-lv-n'])
+    expect(t.khoi()!.querySelector('h3')!.textContent).toBe('Đã mời nói')
+    expect(t.khoi()!.textContent).toContain('đã mời · chờ em bật mic')
+    expect(t.khoi()!.querySelector('[data-thu]')!.className).toBe('mc-lv-n')
+    expect(t.nut().getAttribute('data-noi')).toBe('noi')
+    t.nutChu(t.khoi()!, 'Hạ hết tay')!.click()
+    expect(t.viec('ha-tay')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'ha-tay' }])
+    expect(t.khayMo()).toBe(true)
   })
 
-  it('em nói + em giơ tay ⇒ dấu đặc, dòng phụ «2 em giơ tay»; hai em cùng nói ⇒ nút nhanh là «Tắt mic tất cả»', () => {
+  it('trình duyệt chặn tự phát tiếng em ⇒ dòng «Máy chưa phát được tiếng em» + «Chạm để nghe» (giữ); bấm ⇒ app phát lại, khay giữ', () => {
     const t = dung()
-    t.bom({ ...NEN, noi: [MINH_ANH], tay: TAY })
-    expect(t.nut().getAttribute('data-noi')).toBe('noi')
-    expect(t.nut().getAttribute('aria-label')).toBe('Thêm nút điều khiển, Minh Anh đang nói, 2 em giơ tay')
-    expect(t.muc().querySelector('small')!.textContent).toBe('2 em giơ tay')
-    t.bom({ ...NEN, noi: [MINH_ANH, GIA_HUY] })
-    expect(t.muc().querySelector('b')!.textContent).toBe('Đang nói · Minh Anh +1')
-    const thu = t.dai()!.querySelector<HTMLElement>('[data-thu]')!
-    expect([thu.textContent, thu.getAttribute('data-thu')]).toEqual(['Tắt mic tất cả', ''])
-    thu.click()
-    expect(t.viec('thu-mic')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'thu-mic' }])
+    t.bom({ ...NEN, noi: [MINH_ANH], emKet: true })
+    t.nut().click()
+    expect(t.khoi()!.textContent).toContain('Máy chưa phát được tiếng em')
+    t.nutChu(t.khoi()!, 'Chạm để nghe')!.click()
+    expect(t.viec('nghe-em-lai').length).toBe(1)
+    expect(t.khayMo()).toBe(true)
+  })
+
+  it('phím N: đang live ⇒ mở / đóng khay NGAY tại khối (cuộn về đầu); chưa live ⇒ chỉ báo nhanh. Esc / chạm ra ngoài thu khay', () => {
+    const t = dung()
+    t.phim('n')
+    expect([t.khayMo(), t.bao]).toEqual([false, ['Chưa bật live']])
+    t.bom({ ...NEN, noi: [MINH_ANH] })
+    t.khay().scrollTop = 120
+    t.phim('n')
+    expect([t.khayMo(), t.khay().scrollTop]).toEqual([true, 0])
+    t.phim('N')
+    expect(t.khayMo()).toBe(false)
+    t.phim('n'); t.phim('Escape')
+    expect(t.khayMo()).toBe(false)
+    t.phim('n'); t.cham(document.getElementById('ngoai')!)
+    expect(t.khayMo()).toBe(false)
+  })
+
+  it('có khối «Đang nói» ⇒ khay KHÔNG tự thu sau 8 giây (như thẻ cũ); không live ⇒ 8 giây vẫn thu như cũ', () => {
+    vi.useFakeTimers()
+    const t = dung()
+    t.nut().click()
+    vi.advanceTimersByTime(8100)
+    expect(t.khayMo()).toBe(false)
+    t.bom(NEN)
+    t.nut().click()
+    vi.advanceTimersByTime(20_000)
+    expect(t.khayMo()).toBe(true)
+  })
+
+  it('sóng âm của em chỉ vẽ khi khay mở (khay đóng ⇒ không đổi lớp 11 lần / giây)', () => {
+    const t = dung()
+    t.bom({ ...NEN, noi: [MINH_ANH] })
+    const vach = () => [...document.getElementById('mc-lv-me')!.children].filter((i) => i.className === 'b').length
+    t.muc(0.2, 0.5)
+    expect(vach()).toBe(0)
+    t.nut().click(); t.muc(0.2, 0.5)
+    expect(vach()).toBe(5)
   })
 
   it('chấm vàng «đang bật» và dấu «có em nói» song song: nhãn đọc kể cả hai', async () => {
@@ -194,10 +191,16 @@ describe('A · thẻ «Đang nói» nằm sau nút «thêm», thầy chủ độ
     expect(t.nut().getAttribute('aria-label')).toBe('Thêm nút điều khiển, đang bật: Lời giải, Minh Anh đang nói')
   })
 
-  it('tờ KHÔNG có khay (không nhóm phím) ⇒ thẻ hiện như cũ — không bao giờ mất lối «Thu mic»', () => {
+  it('tờ KHÔNG có khay (không nhóm phím) ⇒ thẻ hiện ở góc như cũ khi có em nói (không hàng loa); chưa ai nói ⇒ góc trống', () => {
     const t = dung(false)
+    t.bom(NEN)
+    expect(t.cot().hidden).toBe(true)
     t.bom({ ...NEN, noi: [MINH_ANH] })
-    expect(t.the()!.querySelector('h3')!.textContent).toBe('Đang nói')
+    const the = t.cot().querySelector('.mc-lv-noi')!
+    expect(the.querySelector('h3')!.textContent).toBe('Đang nói')
+    expect(the.textContent).not.toContain('Phát tiếng em ra loa lớp')
+    t.nutChu(the, 'Tắt mic tất cả')!.click()
+    expect(t.viec('thu-mic')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'thu-mic' }])
     expect(document.querySelector('.mc-khay-noi')).toBeNull()
   })
 })
@@ -225,28 +228,30 @@ function moTo() {
   const doc = dom.window.document
   const phim = (key: string) => doc.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
   const tuCha = (data: Record<string, unknown>) => w.dispatchEvent(new dom.window.MessageEvent('message', { data: { maPhien: MA, ...data }, origin: GOC, source: cha as unknown as MessageEventSource }))
-  return { doc, w, phim, tuCha, the: () => doc.querySelector('.mc-lv-roi .mc-lv-noi'), but: () => doc.body.classList.contains('mc-co-but') }
+  return { doc, w, phim, tuCha, khayMo: () => doc.body.classList.contains('mc-khay-mo'), but: () => doc.body.classList.contains('mc-co-but') }
 }
 
 describe('B · tờ thật', () => {
-  it('đang live (bút bật sẵn), có em nói: thẻ không tự hiện; N mở; Esc thu thẻ mà KHÔNG tắt bút; Esc lần nữa mới tắt bút như cũ', () => {
+  it('đang live (bút bật sẵn), có em nói: góc trống; N mở khay có thẻ đầy đủ; Esc thu khay mà KHÔNG tắt bút; Esc lần nữa mới tắt bút như cũ', () => {
     const t = moTo()
     t.tuCha({ type: TIN_TO_CHIEU.KET_NOI })
     t.tuCha({ nguon: 'bpu-bang', lenh: 'live-tt', tt: { ...NEN, noi: [MINH_ANH] } })
     expect(t.but()).toBe(true)
-    expect(t.the()).toBeNull()
+    expect(t.doc.querySelector<HTMLElement>('.mc-lv-roi')!.hidden).toBe(true)
     expect(t.doc.getElementById('mc-them')!.getAttribute('data-noi')).toBe('noi')
-    expect(t.doc.querySelector('#mc-khay > .mc-khay-noi .mc-khay-noi-mo b')!.textContent).toBe('Đang nói · Minh Anh')
+    const k = t.doc.querySelector('#mc-khay > .mc-khay-noi')!
+    expect(k.querySelector('h3')!.textContent).toBe('Đang nói')
+    for (const chu of ['Nguyễn Minh Anh', 'Thu mic', 'Tắt mic tất cả']) expect(k.textContent).toContain(chu)
+    expect(k.textContent).not.toContain('Phát tiếng em ra loa lớp')
     t.phim('n')
-    expect(t.the()).not.toBeNull()
+    expect(t.khayMo()).toBe(true)
     t.phim('Escape')
-    expect(t.the()).toBeNull()
-    expect(t.but()).toBe(true)
+    expect([t.khayMo(), t.but()]).toEqual([false, true])
     t.phim('Escape')
     expect(t.but()).toBe(false)
   })
 
-  it('phím N không trùng lệnh nào của tờ (chưa live: không mở lời giải / thống kê / bút / lưới / bảng phím); bảng «Phím tắt» có dòng N và V', () => {
+  it('phím N không trùng lệnh nào của tờ (chưa live: không mở lời giải / thống kê / bút / lưới / bảng phím / khay); bảng «Phím tắt» có dòng N và V', () => {
     const t = moTo()
     t.phim('n'); t.phim('N')
     expect(t.w.__mcTrangThai().lgMo).toBe(false)
@@ -260,22 +265,26 @@ describe('B · tờ thật', () => {
   })
 })
 
-describe('C · CSS', () => {
+describe('C · CSS + cú pháp', () => {
   it('dấu «có em nói» ở góc TRÁI, màu đỏ của tờ (chấm vàng «đang bật» ở góc phải giữ nguyên); vòng khi chỉ có em giơ tay', () => {
     expect(CSS_THANH_DAY).toMatch(/\.mc-td-them::before\{[^}]*left:4%[^}]*background:var\(--mc-do\)/)
     expect(CSS_THANH_DAY).toContain('.mc-td-them[data-noi]::before{display:block}')
     expect(CSS_THANH_DAY).toMatch(/\.mc-td-them\[data-noi="tay"\]::before\{[^}]*inset 0 0 0 2\.5px var\(--mc-do\)/)
     expect(CSS_THANH_DAY).toContain('.mc-td-them::after{content:"";position:absolute;top:6%;right:6%') // chấm vàng cũ không đổi
   })
-  it('dải «Đang nói» định vị tuyệt đối trên khay (không làm khay nở ra); màn hẹp thì nằm trong luồng; ô chạm ≥ 40 px; không chuyển động riêng', () => {
-    expect(CSS_THANH_DAY).toMatch(/\.mc-khay-noi\{position:absolute;right:0;bottom:calc\(100% \+ var\(--u\)\*\.6\)[^}]*min-width:100%/)
-    expect(CSS_THANH_DAY).toMatch(/@media \(max-width:900px\)\{\.mc-khay-noi\{position:static/)
-    expect(CSS_THANH_DAY).toMatch(/\.mc-khay-noi-mo\{[^}]*min-height:max\(40px,calc\(var\(--u\)\*2\.9\)\)/)
+  it('khối đầu khay trọn một hàng, không làm khay rộng ra; khay cao quá màn ⇒ cuộn; màn hẹp xếp dọc; nút trong khối ≥ 40 px; không chuyển động riêng', () => {
+    expect(CSS_THANH_DAY).toMatch(/\.mc-khay\{flex-wrap:wrap;max-height:calc\(100vh[^}]*overflow-y:auto/)
+    expect(CSS_THANH_DAY).toMatch(/\.mc-khay-noi\{position:static;flex:0 0 100%;contain:inline-size;margin-right:calc\(var\(--u\)\*-\.7\);flex-direction:column/) // lề âm bù đúng một gap của khay
+    expect(CSS_THANH_DAY).toContain('@media (max-width:900px){.mc-khay{flex-wrap:nowrap}.mc-khay-noi{flex:none;contain:none;margin-right:0}}') // hẹp: một cột cuộn, không dàn cột mới
     expect(CSS_THANH_DAY).toMatch(/\.mc-khay-noi \.mc-lv-n\{[^}]*min-height:max\(40px,calc\(var\(--u\)\*2\.9\)\)/)
+    // luật khối mới đứng SAU dải cũ (đè được vị trí tuyệt đối của dải)
+    expect(CSS_THANH_DAY.indexOf('.mc-khay-noi{position:static;flex:0 0 100%')).toBeGreaterThan(CSS_THANH_DAY.indexOf('.mc-khay-noi{position:absolute'))
     expect(CSS_THANH_DAY.split('\n').filter((d) => d.includes('mc-khay-noi') || d.includes('data-noi')).join('\n')).not.toMatch(/transition|animation/)
   })
-  it('mã chèn vào tờ không dùng cú pháp máy cũ không hiểu; tách tên bằng \\s+ còn nguyên dấu gạch chéo ngược', () => {
+  it('mã chèn vào tờ không dùng cú pháp máy cũ không hiểu; tách tên bằng \\s+ còn nguyên dấu gạch chéo ngược; hết công tắc loa', () => {
     expect(JS_LIVE_TO_CHIEU).not.toMatch(/`|=>|\.at\(|\blet\b|\bconst\b|\?\.|\?\?/)
+    expect(JS_THANH_DAY).not.toMatch(/`|=>|\.at\(|\blet\b|\bconst\b|\?\.|\?\?/)
     expect(JS_LIVE_TO_CHIEU).toContain(".split(/\\s+/).slice(-2)")
+    expect(JS_LIVE_TO_CHIEU).not.toContain('Phát tiếng em ra loa lớp')
   })
 })
