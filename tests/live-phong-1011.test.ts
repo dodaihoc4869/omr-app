@@ -151,7 +151,7 @@ describe('phòng live (Durable Object)', () => {
     await vi.advanceTimersByTimeAsync(400)
     expect(em.map((w) => w.tin.length)).toEqual(truoc) // không view nào tới máy em vì `live-ok`
     expect(chu(gv).filter((m) => m.t === 'bang').length).toBe(truocGv)
-    expect(chu(gv).filter((m) => m.t === 'live-xem')).toEqual([{ t: 'live-xem', xem: 2, ws: 1 }])
+    expect(chu(gv).filter((m) => m.t === 'live-xem')).toEqual([{ t: 'live-xem', xem: 2, ws: 1, nghe: 0 }])
     // Em rời màn không tính là đang xem; kết nối đóng ⇒ báo lại.
     await ph.gui(em[0]!, { t: 'roi' })
     expect(viewCuoi(gv).live).toMatchObject({ xem: 1, ws: 1 })
@@ -159,10 +159,29 @@ describe('phòng live (Durable Object)', () => {
     expect(viewCuoi(gv).live).toMatchObject({ xem: 2, ws: 1 })
     await ph.dong(em[1]!); await ph.dong(e2b)
     await vi.advanceTimersByTimeAsync(400)
-    expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toEqual({ t: 'live-xem', xem: 1, ws: 0 })
+    expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toEqual({ t: 'live-xem', xem: 1, ws: 0, nghe: 0 })
     // Bật lại (phiên mới) ⇒ đếm lại từ đầu.
     await ph.gui(gv, { t: 'live-tat' }); await ph.gui(gv, { t: 'live-bat' })
     expect(viewCuoi(gv).live).toMatchObject({ bat: true, phien: 2, xem: 0 })
+  })
+  it('số em ĐANG NGHE (thầy 11/11: vạch mic chạy mà em không nghe): máy em báo `nghe` trong `live-ok` khi loa phát tiếng thầy thật ⇒ thầy nhận `live-xem` có `nghe`; em tắt tiếng ⇒ số giảm; view bảng mang `live.nghe`', async () => {
+    const ph = taoPhongGia()
+    await ph.khoi([{ sbd: 'S1' }, { sbd: 'S2' }, { sbd: 'S3' }])
+    const gv = await ph.noi('gv'), em = [await ph.noi('hs', 'S1'), await ph.noi('hs', 'S2'), await ph.noi('hs', 'S3')]
+    await ph.gui(gv, { t: 'live-bat' })
+    for (const w of em) await ph.gui(w, { t: 'live-ok', dc: true }) // máy em trong lớp mặc định tắt tiếng
+    await vi.advanceTimersByTimeAsync(400)
+    expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toEqual({ t: 'live-xem', xem: 3, ws: 0, nghe: 0 })
+    const truoc = em.map((w) => w.tin.length)
+    await ph.gui(em[0]!, { t: 'live-ok', dc: true, nghe: true }); await ph.gui(em[1]!, { t: 'live-ok', dc: true, nghe: true })
+    await vi.advanceTimersByTimeAsync(400)
+    expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toEqual({ t: 'live-xem', xem: 3, ws: 0, nghe: 2 })
+    expect(em.map((w) => w.tin.length)).toEqual(truoc) // không view nào tới máy em
+    await ph.gui(em[0]!, { t: 'live-ok', dc: true, nghe: false })
+    await vi.advanceTimersByTimeAsync(400)
+    expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toMatchObject({ xem: 3, nghe: 1 })
+    await ph.gui(gv, { t: 'live-dat', tiengLop: true })
+    expect(viewCuoi(gv).live).toMatchObject({ xem: 3, nghe: 1 })
   })
   it('công tắc tắt / phòng mở bằng Worker bản cũ (không gửi `live`): không khối live, lệnh live và khung nhị phân đều bị bỏ, luật cũ chạy y nguyên', async () => {
     for (const live of [{ cho: false, sfu: true }, null]) {

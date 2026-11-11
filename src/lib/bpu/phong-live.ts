@@ -399,11 +399,11 @@ export type TiengLive = 'bat' | 'tat' | 'chua-cau-hinh'
 
 /** Khối `live` cho BẢNG CHIẾU. `dem` do phòng đếm trên kết nối đang mở: `xem` = em đã báo `live-ok` phiên này, còn nối, không đang rời màn;
  *  `ws` = trong số đó, em cần điểm đang viết qua WebSocket (chưa có DataChannel). Công tắc tắt / phòng đời cũ ⇒ null. */
-export function viewLiveBang(st: TrangThaiPhong, dem?: { xem: number; ws: number }) {
+export function viewLiveBang(st: TrangThaiPhong, dem?: { xem: number; ws: number; nghe?: number }) {
   const l = liveCua(st)
   if (!l || !l.cho) return null
   return {
-    san: l.san, bat: l.bat, tu: l.tu, phien: l.phien, ss: l.ss, xem: dem?.xem ?? 0, ws: dem?.ws ?? 0,
+    san: l.san, bat: l.bat, tu: l.tu, phien: l.phien, ss: l.ss, xem: dem?.xem ?? 0, ws: dem?.ws ?? 0, nghe: dem?.nghe ?? 0,
     tay: l.tay, noi: viewNoi(st, l), bang: !!l.bang, xa: l.xa, tiengLop: l.tiengLop, soNet: l.soNet,
     /** ĐỢT 2: em đang được mời nói (chưa / đang bật mic) · em vừa không bật được mic. */
     moi: l.moi ?? null, micLoi: l.micLoi ?? null,
