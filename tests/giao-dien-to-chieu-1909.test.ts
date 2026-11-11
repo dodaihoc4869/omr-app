@@ -103,6 +103,32 @@ describe('bảng màu, hào quang theo hệ, tế nhị trước lớp', () => {
       expect(css).not.toMatch(/--mc-do|var\(--mc-do|#c5221f|#f28b82|\bred\b|rgb\(\s*(?:19[0-9]|2[0-5][0-9])\s*,\s*[0-5]?\d\s*,\s*[0-5]?\d\s*\)/i)
     }
   })
+
+  it('11/11 tối · D «Đạt» / K «Không đạt» trên thanh đáy: MỘT viên liền khối nhỏ, nền mờ, màu chỉ ở ô phím (xanh mạ / vàng), vùng chạm giữ cao thanh', () => {
+    const luat = (chon: string) => CSS_GIAO_DIEN_NUT_CHAM.split('\n').find((d) => d.startsWith(chon + '{')) ?? ''
+    const D = 'body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="D"]', K = 'body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="K"]'
+    const chung = luat(`${D},${K}`)
+    // viên thụt vào bằng viền TRONG SUỐT + nền cắt ở padding-box ⇒ nhỏ lại mà vùng chạm vẫn cao bằng thanh; không khối đặc, không quầng sáng
+    expect(chung).toMatch(/border:max\(3px,calc\(var\(--u\)\*\.3\)\) solid transparent/)
+    expect(chung).toContain('background:var(--mc-bang-nut) padding-box')
+    expect(chung).toContain('box-shadow:none')
+    expect(chung).not.toMatch(/height|min-height/)
+    // liền khối: D bo trái, K bo phải và lùi đúng khoảng cách của nhóm nút
+    expect(luat(D)).toContain('border-radius:999px 0 0 999px')
+    expect(luat(K)).toContain('border-radius:0 999px 999px 0')
+    const gapNhom = /\.mc-phim-nhom\{[^}]*gap:calc\(var\(--u\)\*([\d.]+)\)/.exec(CSS_LEN_BANG_MOI)?.[1]
+    expect(gapNhom).toBeTruthy()
+    expect(luat(K)).toContain(`margin-left:calc(var(--u)*-${gapNhom})`)
+    // màu: chỉ biến sẵn có của tờ, cùng cặp màu thẻ tên dùng cho đúng / sai (xanh mạ / vàng — không đỏ trước lớp)
+    expect(luat('body.mc .mc-thanh .mc-phim-nhom>[data-k="D"] kbd')).toBe('body.mc .mc-thanh .mc-phim-nhom>[data-k="D"] kbd{background:var(--mc-lam-nen);color:var(--mc-lam-chu)}')
+    expect(luat('body.mc .mc-thanh .mc-phim-nhom>[data-k="K"] kbd')).toBe('body.mc .mc-thanh .mc-phim-nhom>[data-k="K"] kbd{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}')
+    for (const d of CSS_GIAO_DIEN_NUT_CHAM.split('\n').filter((x) => x.includes('[data-k='))) expect(d).not.toMatch(/rgba?\(|#[0-9a-f]{3,8}\b/i)
+    // luật D / K nạp SAU khối đặc cũ của CSS_LEN_BANG_MOI (tờ có cầu nối) và độ ưu tiên cao hơn ⇒ thắng cả lúc rê chuột
+    const h = taoHtmlMayChieu([o('A', 'An')], { cauNoi: { maPhien: MA } })
+    expect(h.indexOf(D)).toBeGreaterThan(h.indexOf('body.mc .mc-phim-nhom [data-k="D"]:hover{'))
+    expect(h).toContain('<button type="button" class="mc-nut-phim" data-k="D" hidden><kbd>D</kbd><span class="mc-nut-chu">Đạt</span></button>')
+    expect(h).toContain('<button type="button" class="mc-nut-phim" data-k="K" hidden><kbd>K</kbd><span class="mc-nut-chu">Không đạt</span></button>')
+  })
 })
 
 describe('thẻ tên: "thú · cấp · lần lên bảng thứ N", nhãn vùng làm bài, dòng đầu thẻ đề', () => {
