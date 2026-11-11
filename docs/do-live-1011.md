@@ -619,7 +619,9 @@ thêm `TG_IM_TU=20000` để `lamIm` không tăng lại từ 0,05) và `canh-ck.
 thật 32 s thì dài 13,5 s ⇒ thầy nói LIỀN từ 0,3 tới 18,2 s và giọng khác kéo tới 18,2 s ⇒ hai đoạn «khác một mình» và đoạn «thầy sau khác» thật ra là NÓI CHỒNG.
 ⇒ **mọi số «giọng khác giảm» (3–7 dB) và «mở sau» của MÔ HÌNH ở 11.2 / 11.4 là SAI, thấp hơn thật nhiều**; «thầy một mình», giữ dải, hệ số thời gian thực không bị ảnh hưởng.
 Nay mỗi khúc đúng 2,8 s (giong-nam không đổi ⇒ số lượt 1 giữ nguyên). Soát chéo bằng `do-trang-thai.mjs` (cùng đoạn giọng khác 3 s chạy riêng): cùng cỡ số với bản đã sửa.
-Mức vào của đoạn chồng thấp hơn mức danh định (SI-SDR vào −5,6…−9,3 dB ở «0 dB») vì khúc giọng thầy đặt vào đó có quãng lặng — số vẫn so vào → ra trên cùng một đoạn.
+Lỗi thứ hai (sửa cùng lượt): khúc giọng thầy thật đặt vào đoạn chồng có quãng lặng ⇒ «0 dB» thực tế −6…−9 dB, «10 dB» thực tế 4,6 dB — dưới trần SI-SDR thầy một mình
+(7–11 dB) nên che mất việc mô hình làm hại thầy; nay mỗi khúc chồng đặt mức RIÊNG (thầy −25, khác −25 − snr dBFS) ⇒ tín / nhiễu tại chỗ đúng nhãn. Hàng «nói chồng»
+của lượt 1 (giong-nam) có thể lệch nhẹ nếu chạy lại. Mọi số dưới đây đo bằng bản đã sửa cả hai lỗi (commit e8ad11914 trở đi).
 
 #### (1) Bốn tiêu chí — bản đo 18 s đã sửa
 Giọng thầy thật giữ riêng (75f8acfc, miền MP3, −25 dBFS); giọng khác: VCTK nam, LJ nữ, người đóng vai em giữ riêng (bac5a835), xôn xao 5 giọng; thấp hơn thầy 0 / 2 / 10 dB.
@@ -627,10 +629,10 @@ Giọng thầy thật giữ riêng (75f8acfc, miền MP3, −25 dBFS); giọng k
 
 | tiêu chí (10.5) | C-28000 | E-28000 | E-34000 | F-31000 (chỉ đổi tham số) | F-33000 (+ giọng thầy mới) | đạt? |
 |---|---|---|---|---|---|---|
-| mở sau ≤ 50 ms | 0–30 | 0–30 | 0–50 | 0–20 | 0 | ĐẠT |
-| nói chồng không giảm SI-SDR thầy (12 ca, vào → ra) | tăng 11 / 12; 10 dB giọng nam 4,6 → 4,2 | tăng 10 / 12 (1 ca bằng); xôn xao 0 dB −8,5 → −8,7 | tăng 11 / 12; xôn xao 0 dB −8,5 → −8,8 | tăng 10 / 12 (1 ca bằng); xôn xao 0 dB −8,5 → −9,0 | tăng 11 / 12; 10 dB nam 4,6 → 4,5 | GẦN (mỗi bản giảm ≤ 0,5 dB ở 1 ca) |
-| giọng khác giảm ≥ 20 dB (một mình): VCTK nam · LJ nữ · em thật · xôn xao | 14–17 · 23–27 · 20–26 · **7** | 14–17 · 20–31 · 22–28 · **5** | 17–24 · 28–30 · 23–27 · **6–7** | 12–16 · 20–26 · 17–19 · **4–5** | 7–8 · 12–16 · 12–16 · **3** | KHÔNG |
-| hệ số thời gian thực ≤ 0,6 (máy phiên, Node 1 luồng) | 0,08–0,09 | 0,08–0,10 | 0,08–0,09 | 0,08–0,10 | 0,08–0,11 | ĐẠT (máy phiên) |
+| mở sau ≤ 50 ms | 0–30 | 0–30 | 0–30, một ca 90 (VCTK nam 10 dB) | 0–30 | 0 | ĐẠT (trừ E-34000 một ca) |
+| nói chồng không giảm SI-SDR thầy: 0 / 2 dB (8 ca) · 10 dB (4 ca), dB vào → ra | 0 / 2 dB tăng 8 / 8 · 10 dB GIẢM 0,5–2,6 (VCTK nam 11 → 8,4) | tăng 8 / 8 · 10 dB giảm 0,4–2,2 | tăng 7 / 8 (1 bằng) · 10 dB giảm 0,9–2,4 | tăng 7 / 8 (1 bằng) · 10 dB giảm 0–2,2 | tăng 8 / 8 · 10 dB −2,0…+0,1 (VCTK nam 11 → 9) | KHÔNG ở 10 dB (ra bị kéo về trần SI-SDR thầy một mình); 0 / 2 dB ĐẠT |
+| giọng khác giảm ≥ 20 dB (một mình): VCTK nam · LJ nữ · em thật · xôn xao | 14–17 · 22–26 · 22–27 · **7** | 16–17 · 21–30 · 26–28 · **5** | 18–22 · 26–28 · 22–26 · **6–7** | 12–15 · 22–25 · 18–19 · **4–5** | 7–8 · 13–16 · 12–17 · **3** | KHÔNG |
+| hệ số thời gian thực ≤ 0,6 (máy phiên, Node 1 luồng) | 0,08–0,09 | 0,08–0,10 | 0,08–0,10 | 0,08–0,11 | 0,08–0,10 | ĐẠT (máy phiên) |
 | thầy bị hạ, đoạn thầy một mình (mong ≤ 0,5 dB) | 1,3–1,5 | 1,2–1,3 | 1,3–1,5 | 1,0–1,1 | **0,8–0,9** | KHÔNG |
 | giữ dải (dB): 0,1–1 / 1–3 / 3–6 / 6–11 / 11–24 kHz | −1,5 / −0,8 / −2,0 / −2,6 / −9,5 | −1,3 / −0,8 / −2,1 / −5,2 / −7,5 | −1,4 / −1,0 / −2,2 / −4,5 / −7,2 | −1,1 / −0,7 / −1,4 / −2,5 / −5,6 | −0,9 / −0,5 / −0,9 / −0,9 / −4,4 | — |
 | SI-SDR thầy một mình (dB) | 7,2–8,1 | 7,6–8,5 | 6,9–7,3 | 8,1–9,0 | 9,2–10,9 | — |
@@ -644,7 +646,7 @@ Giọng thầy thật giữ riêng (75f8acfc, miền MP3, −25 dBFS); giọng k
   sau 2,8 s thầy nói 18 / 22 / 26 / 19 / 13 dB; sau 2,8 s nói chồng 18 / 27 / 23 / 15 / 11 dB (em thật: mới 20–50, sau chồng 14–28) ⇒ mạng «nhớ» đang có thầy và nới tay nhiều giây.
   Mẫu luyện: thầy nói gần suốt mẫu 2 s (chỉ hở ≤ 0,6 s) ⇒ chưa từng gặp «thầy dừng, người khác nói một mình vài giây».
 - **Xôn xao 5 giọng chỉ giảm 3–7 dB** (từng giọng một 12–31 dB): mẫu luyện chỉ có 1–2 người khác.
-- Đo nhanh (`do-nhanh.mjs`) giờ cùng cỡ với bản 18 s đã sửa ở từng giọng (E-28000: VCTK nam 14,6 / 16,4 dB) ⇒ vẫn dùng lọc checkpoint được, nhưng không thấy xôn xao và trạng thái mang sang.
+- Đo nhanh (`do-nhanh.mjs`) giờ cùng cỡ với bản 18 s đã sửa ở từng giọng (E-28000: VCTK nam 14,6 / 16–17 dB) ⇒ vẫn dùng lọc checkpoint được, nhưng không thấy xôn xao và trạng thái mang sang.
 
 #### (2) Thêm giọng thầy — 37,5 s → 55,2 s tiếng thầy luyện (+17,7 s, +47 %; tính cả quãng nghỉ bộ luyện chèn: 46 → 68 s)
 - Worker `/gv/live-ds` có 9 buổi, ĐỀU đã có ở máy (thêm `7847bb30` đã xoá trên Worker, bản ở máy còn) ⇒ không có buổi mới. Hai buổi sau 19:10 (1bb2fcd1 20:04, f2c39a2d 21:16):
@@ -667,11 +669,12 @@ Khởi 05:10 từ E-28000 (chép `ck-giu/e-ck-028000.pkl` ⇒ `ck-f/`), tới 40
 - `l4` (IM) chỉ ở khung KHÔNG có thầy — số hạng duy nhất nhắm đúng đoạn người khác nói một mình ⇒ giữ 0,1 (= E), IM0 = IM1 để không tăng lại từ 0,05.
 - GIA («người giả» = giọng thầy đổi cao độ) dạy mạng hạ cả thầy lúc cao giọng (hàng «thầy nói to» bị hạ nhiều nhất) ⇒ 0,1 → 0,05.
 
-Kết quả: F-33000 giữ thầy tốt nhất từ trước tới nay (thầy bị hạ 0,8–0,9 dB, 6–11 kHz −0,9 dB, mở sau 0, nói chồng không hại) NHƯNG giọng khác chỉ giảm 7–16 dB (E-28000 14–31).
+Kết quả: F-33000 giữ thầy tốt nhất từ trước tới nay (thầy bị hạ 0,8–0,9 dB, 6–11 kHz −0,9 dB, mở sau 0, nói chồng 0 / 2 dB không hại) NHƯNG giọng khác chỉ giảm 7–17 dB
+(E-28000 16–30), và ở 10 dB vẫn hạ SI-SDR thầy tới 2 dB như mọi bản.
 ⇒ **đổi trọng số chỉ trượt dọc MỘT đường đánh đổi** (giống sáu lượt chỉnh cổng ở 10.4) — F KHÔNG «tốt hơn rõ» E; chưa bản nào đạt đủ 4 tiêu chí + giữ thầy.
-F-35000 (bản đo 18 s): thầy bị hạ 1,0–1,1 dB · VCTK nam 7–9 · LJ nữ 16–23 · em thật 15–23 · xôn xao 4 dB · nói chồng không giảm ca nào ⇒ F dao động quanh cùng chỗ.
+F-35000 (bản đo 18 s): thầy bị hạ 1,0–1,1 dB · VCTK nam 7–9 · LJ nữ 17–23 · em thật 16–23 · xôn xao 4 dB · nói chồng 0 / 2 dB tăng 8 / 8, 10 dB giảm 0,4–1,8 ⇒ F dao động quanh cùng chỗ.
 Đo nhanh F (thầy / thầy nói to, dB hạ): 28000 2,1 / 3,3 ⇒ 31000 1,7 / 2,8 ⇒ 33000 1,4 / 2,4 ⇒ 34000 1,8 / 3,1 ⇒ 35000 2,1 / 3,2.
-E chạy tiếp (E-34000): giọng khác một mình 17–30 dB (VCTK nam 17–24) nhưng thầy bị hạ 1,3–1,5 dB, 6–11 kHz −4,5 dB — đi ngược chiều F trên cùng đường đánh đổi.
+E chạy tiếp (E-34000): giọng khác một mình 18–28 dB (VCTK nam 18–22) nhưng thầy bị hạ 1,3–1,5 dB, 6–11 kHz −4,5 dB — đi ngược chiều F trên cùng đường đánh đổi.
 
 #### (4) Việc kế — mã đã có trong `luyen.py`, MẶC ĐỊNH TẮT (E / F chạy lại vẫn y như cũ)
 - `TG_LUOT` = tỉ lệ mẫu LUÂN LƯỢT: thầy dừng một quãng 35–80 % mẫu, người khác vào sau 0–0,4 s và nói một mình tới quanh lúc thầy nói lại (± 0,3 s); nên kèm `TG_GIAY ≥ 4`
