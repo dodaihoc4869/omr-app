@@ -57,7 +57,12 @@ export function mauHaoQuang(he: string | undefined): string {
 }
 
 /** Diện mạo hai nút Đạt / Chưa đạt + nhãn "Đã ghi" — CHỈ chèn khi tờ có cầu nối (không cầu nối thì tờ không có `mc-cham` nào, kể cả trong CSS).
- * Cùng một kiểu cho cả hai nút: nền mờ trên bảng tối, chữ giấy ấm; không xanh/đỏ. */
+ * Cùng một kiểu cho cả hai nút: nền mờ trên bảng tối, chữ giấy ấm; không xanh/đỏ.
+ * 11/11 tối (thầy «nút đạt và không đạt hiện ở live không đẹp, không khớp với khung … nhỏ lại tinh tế»): kèm diện mạo D «Đạt» / K «Không đạt» của THANH ĐÁY —
+ * nút thật thầy bấm, cũng chỉ hiện khi tờ đã nối. Khối đặc xanh / đỏ viền sáng ở len-bang-moi-to-chieu.ts giữ nguyên chữ (cổng giữ màu), bị luật ở đây đè
+ * (độ ưu tiên cao hơn + nạp sau) ⇒ MỘT viên liền khối nhỏ, nền mờ như nút «Live» / «thêm», màu chỉ ở ô phím (xanh mạ = Đạt, vàng = Không đạt; không đỏ trước
+ * lớp). Vùng chạm vẫn cao bằng thanh (≥ 40 px): viên thụt vào nhờ viền trong suốt + nền cắt ở padding-box. Nối liền: K lùi đúng khoảng cách của nhóm
+ * (`.mc-phim-nhom` gap = --u × .5). */
 export const CSS_GIAO_DIEN_NUT_CHAM = `
 body.mc .mc-cham-nut{height:clamp(32px,3.12vw,56px);min-height:0;padding:0 clamp(12px,1.25vw,24px);border:0;border-radius:999px;background:var(--mc-bang-nut);color:var(--mc-bang-chu);font:600 clamp(12px,1.17vw,22px)/1 var(--mc-sans);cursor:pointer}
 body.mc .mc-cham-nut:hover:not([disabled]){background:rgba(244,239,228,.24);color:var(--mc-bang-chu)}
@@ -69,6 +74,13 @@ body.mc .mc-thay-chua-xong{padding:0 clamp(10px,1vw,18px);height:clamp(28px,2.6v
 body.mc-bc .mc-giai-mo .mc-thay-chua-nut{border-color:var(--mc-chu);color:var(--mc-chu)}
 body.mc-bc .mc-giai-mo .mc-cham-nut{background:var(--mc-chu);color:var(--mc-giay)}
 body.mc-bc .mc-giai-mo .mc-cham-xong,body.mc-bc .mc-giai-mo .mc-cham-tin{background:color-mix(in srgb,var(--mc-chu) 12%,transparent);color:var(--mc-phu)}
+body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="D"],body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="K"]{gap:.38em;border:max(3px,calc(var(--u)*.3)) solid transparent;background:var(--mc-bang-nut) padding-box;box-shadow:none;color:var(--mc-bang-chu);font-weight:600;font-size:max(13px,calc(var(--u)*1.05))}
+body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="D"]{border-right:0;border-radius:999px 0 0 999px;padding:0 .65em 0 .5em}
+body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="K"]{border-left:0;border-radius:0 999px 999px 0;margin-left:calc(var(--u)*-.5);padding:0 .75em 0 .65em;box-shadow:inset 1px 0 0 var(--mc-bang-vien)}
+body.mc .mc-thanh .mc-phim-nhom>[data-k="D"] kbd{background:var(--mc-lam-nen);color:var(--mc-lam-chu)}
+body.mc .mc-thanh .mc-phim-nhom>[data-k="K"] kbd{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}
+body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="D"]:hover{background-color:color-mix(in srgb,var(--mc-lam-nen) 24%,transparent)}
+body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="K"]:hover{background-color:color-mix(in srgb,var(--mc-qua-nen) 24%,transparent)}
 `
 
 export const CSS_GIAO_DIEN_TO_CHIEU = `
