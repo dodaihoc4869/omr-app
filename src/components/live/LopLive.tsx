@@ -290,8 +290,8 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     return () => document.removeEventListener('visibilitychange', dat)
   }, [roi])
 
-  // EM LÊN BẢNG: phòng cho phép (`duocMoMic`) ⇒ mic tự bật; chưa nối xong SFU thì thử lại mỗi 1,5 giây. Em tự bấm tắt ⇒ thôi không tự bật lại trong lượt gọi
-  // này (còn nút «Bật mic lại»). Hết được phép (thầy chấm, lượt mới, thu mic, tắt live) ⇒ thư viện tự thả mic.
+  // EM LÊN BẢNG: phòng cho phép (`duocMoMic`) ⇒ em chạm «Mic của em» là bật; chưa nối xong SFU thì thử lại mỗi 1,5 giây. Em tự bấm tắt ⇒ thôi không thử lại
+  // trong lượt gọi này (chạm dòng ấy để bật lại). Hết được phép (thầy chấm, lượt mới, thu mic, tắt live) ⇒ thư viện tự thả mic.
   // EM ĐƯỢC MỜI NÓI (đợt 2): mic KHÔNG tự bật — em chạm «Bật mic và nói» (`muonMic`) rồi mới bật; chưa nối xong SFU thì cũng thử lại mỗi 1,5 giây.
   // Thầy 11/11 lần 4: «tự động tắt mic cho hs khi vào live» ⇒ mic KHÔNG tự bật nữa, kể cả em được gọi lên bảng: `emTat` khởi đầu = true, em chạm dòng
   // «Mic của em» trong khay mới bật (khay tự mở vài giây khi em vừa được phép — xem `duocMic` ở dưới).
@@ -329,8 +329,10 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   if (dangBat !== batTruoc) { setBatTruoc(dangBat); lucBat.current = dangBat ? Date.now() : 0 }
   const [moDau, setMoDau] = useState(false)
   /** Khay đã tự mở giới thiệu nút «Tiếng» trong buổi này chưa (một lần mỗi buổi, dù ở màn câu hỏi hay bảng live). */
-  const daGioiThieu = useRef(false)
-  const khiGioiThieu = useCallback(() => { daGioiThieu.current = true; setGioiMic(false) }, [])
+  // 11/11 lần 4: là STATE (trước là ref) — khay báo «đã cho xem» ⇒ lớp này vẽ lại với `gioiThieu` = false; nếu không, lượt tự mở kế (`gioiMic`) đi từ
+  // true sang true, khay không thấy đổi nên không mở.
+  const [daGioiThieu, setDaGioiThieu] = useState(false)
+  const khiGioiThieu = useCallback(() => { setDaGioiThieu(true); setGioiMic(false) }, [])
 
   if (!tt || che === 'an') return null
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
@@ -341,13 +343,13 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const micMo = tt.mic === 'dang-phat' || tt.mic === 'dang-noi'
   /** Tấm «Thầy mời em nói»: đang được mời, chưa bấm bật (hoặc buổi chưa có tiếng ⇒ em nói trực tiếp). */
   const tamMoi = duocMoi && !micMo && tt.mic !== 'xin-quyen' && !muonMic ? <TamMoi coMic={duocMic} onBat={batMicMoi} onSau={deSau} /> : null
-  /** Mic của em LÊN BẢNG (tự bật): điều khiển nằm trong khay; tay nắm mang huy hiệu mic khi mic đang mở (em luôn biết mic đang bật dù khay đóng). */
+  /** Mic của em LÊN BẢNG (tắt sẵn, em chạm mới bật): điều khiển nằm trong khay; tay nắm mang huy hiệu mic khi mic đang mở (em luôn biết mic đang bật dù khay đóng). */
   const micBang = duocMic && !duocMoi
   const tayDuoc = !micMo && !duocMoi && tt.mic !== 'xin-quyen'
   /** TIẾNG ĐANG TẮT (thầy 11/11: thầy live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết) / trình duyệt chặn phát: khay đóng vẫn có DẤU
    *  loa gạch trên tay nắm; lần đầu trong buổi khay tự mở 3 giây cho em thấy nút «Tiếng» (thầy 11/11 lần 3: không còn viên nổi «Tiếng đang tắt»). */
   const tiengTat = tt.bat && !tt.nghi && tt.tieng !== 'chua-cau-hinh' && (!nghe || tt.tieng === 'bi-chan')
-  const gioiThieu = (tiengTat && !daGioiThieu.current) || gioiMic
+  const gioiThieu = (tiengTat && !daGioiThieu) || gioiMic
   /** Dấu rất nhỏ trên tay nắm (em luôn biết dù khay đóng): tiếng đang tắt · mic của em đang mở · em đang giơ tay · mạng yếu. */
   const dauNam = (mangYeu: boolean): DauNam[] => {
     const ds: DauNam[] = []
@@ -372,7 +374,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       ) : <p className="lv-ghi">Buổi này live chưa có tiếng trên máy. Em nghe thầy giảng trực tiếp.</p>}
       {coTieng && !nghe ? <p className="lv-ghi">{xa ? 'Em đang xem từ xa: bật tiếng để nghe thầy giảng.' : 'Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì bật tiếng.'}</p> : null}
       {micBang ? (
-        <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic lại'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
+        <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
           <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : 'Đang tắt'}</b></button>
       ) : null}
       {micBang && micMo ? <p className="lv-ghi">Thầy và cả lớp đang nghe em.{view.ghi ? ' Đang ghi để lớp xem lại.' : ''}</p> : null}
