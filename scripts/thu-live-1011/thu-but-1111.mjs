@@ -51,7 +51,8 @@ await to.locator('.mc-lv-nut').waitFor({ state: 'visible', timeout: 15000 })
 await may.moLuot(CAU, 'B')
 
 // ───────────── EM ─────────────
-const ctxEm = await trinh.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true })
+// DPR_EM=3 ⇒ đo máy em ở mật độ 3 (điện thoại đời mới)
+const ctxEm = await trinh.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: Number(process.env.DPR_EM) || 2, hasTouch: true, isMobile: true })
 await chanNgoai(ctxEm)
 const em = await ctxEm.newPage()
 em.on('pageerror', (e) => loiTrang.push(`em: ${e.message}`))
@@ -206,6 +207,38 @@ await viet(vietDong('H_2O', 1312, 450, 40, { rnd, vMax: 700 }), { dung: 300, sau
 await em.evaluate(() => { window.__do.bat = false; window.__do.boBut = false })
 { const ds = uotKho.filter(Boolean); kq.uotSoKhoMayEm = { soNet: ds.length, netCoKhac: ds.filter((x) => x[0] > 0).length, diemAnhKhac: ds.reduce((s, x) => s + x[0], 0), khac16: ds.reduce((s, x) => s + x[1], 0), mucLon: ds.reduce((s, x) => Math.max(s, x[2]), 0), ghiChu: 'ô bảng đen của máy em ở đúng điểm ảnh thiết bị (@2x)' } }
 console.log(`[${TEN}] ướt so khô máy em:`, JSON.stringify(kq.uotSoKhoMayEm))
+
+// 2b · «THẬT HƠN» (12/11): hình nét ĐÃ CHỐT trên bảng của máy em so với máy thầy. Chụp ô bảng hai máy (bút đã nghỉ 2,2 giây ⇒ con trỏ đã ẩn), đổi ra «độ đậm
+// mực» (lệch so với màu nền), thu ảnh máy thầy về đúng cỡ ảnh máy em rồi so: phần giao / phần hợp của hai vùng mực (1 = trùng khít) + lệch độ đậm trung bình
+// trên vùng mực. Hai máy khác cỡ (thầy 1366 @1, em 844 @2) nên mép nét không thể trùng từng điểm ảnh; thử dời ±2 điểm ảnh để biết có lệch vị trí không.
+{
+  await ngu(2200)
+  const oThay = await to.locator('.mc-cot-lam-bai').first().boundingBox(), oEm = await em.locator('.lv-bang').boundingBox()
+  if (oThay && oEm) {
+    const le = 6, cat = (o) => ({ x: Math.round(o.x + le), y: Math.round(o.y + le), width: Math.round(o.width - 2 * le), height: Math.round(o.height - 2 * le) })
+    const aT = await thay.screenshot({ type: 'png', clip: cat(oThay) }), aE = await em.screenshot({ type: 'png', clip: cat(oEm) })
+    // ô bảng của hai máy không cùng cỡ / cùng lề (máy em còn có nút đè ở đáy) ⇒ KHỚP theo hộp bao của chính vùng mực (chỉ xét 60 % phía trên, 90 % bên trái ảnh — ngoài đó là nút / vạch cuộn):
+    // cắt mỗi ảnh về hộp mực của nó, thu hộp của máy thầy về đúng cỡ hộp của máy em
+    const hopMuc = async (anh) => {
+      const m = await sharp(anh).raw().toBuffer({ resolveWithObject: true }), c = m.info.channels, w = m.info.width, h = Math.round(m.info.height * 0.6), nen = [m.data[0], m.data[1], m.data[2]]
+      let x0 = 1e9, y0 = 1e9, x1 = -1, y1 = -1
+      for (let y = 0; y < h; y++) for (let x = 0; x < w * 0.9; x++) { const i = (y * w + x) * c; if (Math.max(Math.abs(m.data[i] - nen[0]), Math.abs(m.data[i + 1] - nen[1]), Math.abs(m.data[i + 2] - nen[2])) > 64) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y } }
+      return { left: Math.max(0, x0 - 4), top: Math.max(0, y0 - 4), width: Math.min(w, x1 + 5) - Math.max(0, x0 - 4), height: Math.min(h, y1 + 5) - Math.max(0, y0 - 4), nen }
+    }
+    const hT = await hopMuc(aT), hE = await hopMuc(aE)
+    const mE = await sharp(aE).extract({ left: hE.left, top: hE.top, width: hE.width, height: hE.height }).raw().toBuffer({ resolveWithObject: true })
+    const mT = await sharp(aT).extract({ left: hT.left, top: hT.top, width: hT.width, height: hT.height }).resize(mE.info.width, mE.info.height, { fit: 'fill', kernel: 'lanczos3' }).raw().toBuffer({ resolveWithObject: true })
+    const dam = (m, nen) => { const c = m.info.channels, n = m.info.width * m.info.height, r = new Uint8Array(n); for (let i = 0, k = 0; k < n; i += c, k++) r[k] = Math.max(Math.abs(m.data[i] - nen[0]), Math.abs(m.data[i + 1] - nen[1]), Math.abs(m.data[i + 2] - nen[2])); return r }
+    const dT = dam(mT, hT.nen), dE = dam(mE, hE.nen), w = mE.info.width, h = mE.info.height
+    const so = (dx, dy) => { let giao = 0, hop = 0, lech = 0; for (let y = 3; y < h - 3; y++) for (let x = 3; x < w - 3; x++) { const p = dT[(y + dy) * w + x + dx], q = dE[y * w + x], a = p > 64, b = q > 64; if (a && b) giao++; if (a || b) { hop++; lech += Math.abs(p - q) } } return { giao, hop, lech } }
+    let tot = null
+    for (let dy = -2; dy <= 2; dy++) for (let dx = -2; dx <= 2; dx++) { const r = so(dx, dy); if (!tot || r.giao / r.hop > tot.giao / tot.hop) tot = { ...r, dx, dy } }
+    const tai0 = so(0, 0)
+    kq.hinhThaySoEm = { hopMucMayEm: `${w} × ${h}`, phongAnhThay: [+(w / hT.width).toFixed(3), +(h / hT.height).toFixed(3)], diemAnhMuc: tai0.hop, giaoTrenHop: +(tai0.giao / Math.max(1, tai0.hop)).toFixed(3), lechDoDamTrungBinh: +(tai0.lech / Math.max(1, tai0.hop)).toFixed(1), khopNhatKhiDoi: [tot.dx, tot.dy], giaoTrenHopKhopNhat: +(tot.giao / Math.max(1, tot.hop)).toFixed(3) }
+    console.log(`[${TEN}] hình máy thầy so máy em:`, JSON.stringify(kq.hinhThaySoEm))
+    if (process.env.ANH_HINH) { writeFileSync(join(process.env.ANH_HINH, `hinh-thay-${TEN}.png`), aT); writeFileSync(join(process.env.ANH_HINH, `hinh-em-${TEN}.png`), aE) }
+  }
+}
 
 // 3 · KHUNG HÌNH MÁY EM lúc nhận nét ở CPU ×1 / ×4 / ×6 (không chụp ô bảng mỗi khung — chỉ đo khung)
 const cdpEm = await ctxEm.newCDPSession(em)

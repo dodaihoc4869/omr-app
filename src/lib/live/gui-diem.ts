@@ -17,7 +17,12 @@ import { DIEM_TOI_DA_MOT_GOI, type DauNet } from './ma-net'
 /** Một nét đang viết ở phía gửi. `daDc` / `daWs` = số điểm đã gửi trên từng đường; `lichDc` = chỉ số điểm đầu của các lô DataChannel vừa gửi
  *  (cũ → mới, giữ `LO_KEM` lô); `nghen` = đường WebSocket vừa nghẽn lúc nét này còn điểm chờ. */
 export interface NetGui { dau: DauNet; diem: DiemBut[]; tGoc: number | null; daDc: number; lichDc: number[]; daWs: number; nghen?: boolean }
-export const WS_CACH_MS = 34, XA_MS = 0, DC_CACH_MS = 12
+export const XA_MS = 0, DC_CACH_MS = 12
+/** Khoảng cách hai lô WebSocket (ms). ĐÃ THỬ 17 ms (mỗi khung hình của thầy một lô, 12/11): máy em đường WebSocket mạng tốt nhanh hơn ~20 ms (mô phỏng
+ *  76 → 55 ms) nhưng trên TCP mỗi gói là một lần có thể bị chặn đầu hàng — em mạng xấu / em đang xin đường phụ đứng nhiều hơn (mô phỏng 15 hạt: 8 → 11
+ *  lần đứng) ⇒ giữ 34 ms. Cũng đã thử cho LÔ ĐẦU của mỗi nét đi ngay không chờ nhịp: thêm ~10 % gói, cùng cái hại đó ⇒ không dùng.
+ *  Đường chính (DataChannel) vốn đã gửi ngay sau từng khung hình của thầy (khoảng cách tối thiểu 12 ms < một khung 16,7 ms). */
+export const WS_CACH_MS = 34
 export const LO_KEM = 3, DU_TOI_DA = 24, NGHEN_WS = 24_000
 /** TIN NHẤC BÚT nhắc lại sau ngần này ms (chỉ tin nhấc, 20 byte): máy em BẢN CŨ khi mạng rung hay dựng lại nét đã xong thành nét «ma» không bao giờ nhấc
  *  (con trỏ cứ nhảy về chỗ nét ma) — tin nhấc tới sau sẽ dọn nó. Máy em bản mới và nét đã dọn: tin này vô hại (không có nét thì bỏ qua). */
