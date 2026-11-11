@@ -12,16 +12,17 @@
 //     Máy yếu: giữ bàn tay, bỏ bóng + bỏ ngả + bỏ chuyển êm.
 // Tệp này thuần phần hình + phần chuyển động; việc dựng hình sẵn và dán nằm ở ve-bang.ts. Màu do nơi gọi đọc từ biến màu sẵn có của bảng live.
 
-/** Dáng bàn tay: `nam` = bàn tay mềm đủ ngón trỏ + ngón cái (mặc định) · `gon` = một khối tròn gọn · `vien` = chỉ nét viền, ruột gần trong suốt. */
-export type DangTay = 'nam' | 'gon' | 'vien'
+/** Dáng con trỏ: `but` = CHỈ cây bút ngắn, không bàn tay (MẶC ĐỊNH — thầy 11/11 lần 3: «Bỏ tay chỉ để lại bút») · `nam` = bàn tay mềm đủ ngón trỏ + ngón cái ·
+ *  `gon` = một khối tròn gọn · `vien` = chỉ nét viền, ruột gần trong suốt. Ba dáng có bàn tay giữ lại để thầy đổi ý thì bật một dòng (`datDangTay`). */
+export type DangTay = 'but' | 'nam' | 'gon' | 'vien'
 /** Màu: `than` = bàn tay (tông sáng) · `bong` = tông tối (bóng, viền) · `dai` = thân bút · `muc` = màu nét gần nhất (ngòi bút mang màu này). */
 export interface MauBut { than: string; dai: string; bong: string; muc: string }
 /** Trạng thái hiện của một khung: ngòi tại (x, y) px CSS trong hình · `nang` 0 = chạm … 1 = lơ lửng · `goc` = độ ngả (rad) · `mo` = độ rõ 0..1. */
 export interface HinhBut { x: number; y: number; nang: number; goc: number; mo: number }
 
-/** Hình vẽ theo đơn vị thiết kế: ngòi ở gốc (0, 0), bàn tay cao ≈ 60 đơn vị. Ô bao cả hình (kể cả bóng + viền): x −4 … 72, y −40 … 44. */
+/** Hình vẽ theo đơn vị thiết kế: ngòi ở gốc (0, 0), bàn tay cao ≈ 60 đơn vị. Ô bao cả hình (kể cả bóng + viền): x −4 … 72, y −50 … 44. */
 const DV_TAY = 60
-export const O_TAY = { trai: -4, tren: -40, phai: 72, duoi: 44 } as const
+export const O_TAY = { trai: -4, tren: -50, phai: 72, duoi: 44 } as const
 /** Cỡ bàn tay (px CSS) theo bề cao bảng đen: ≈ 5,5 %, kẹp 15 … 44 (điện thoại ngang bảng cao ~330 px ⇒ ~18 px). */
 export const coTay = (caoBang: number): number => Math.max(15, Math.min(44, caoBang * 0.055))
 
@@ -97,9 +98,9 @@ function muTay(g: G, gon: boolean): void {
   g.closePath()
 }
 /** Cây bút NGẮN: từ ngòi (0, 0) đi lên-phải tới (30, −34); 11 đơn vị đầu là ngòi nhọn mang MÀU MỰC đang viết (phấn sáng trên bảng, mực sẫm trên giấy). */
-function but(g: G, mau: MauBut): void {
+function but(g: G, mau: MauBut, k = 1): void {
   const ux = 30 / 45.3, uy = -34 / 45.3, nx = -uy, ny = ux, r = 3.4
-  const diem = (t: number, s: number): [number, number] => [ux * t + nx * s, uy * t + ny * s]
+  const diem = (t: number, s: number): [number, number] => [(ux * t + nx * s) * k, (uy * t + ny * s) * k]
   // thân
   g.fillStyle = mau.dai
   g.beginPath()
@@ -113,11 +114,16 @@ function but(g: G, mau: MauBut): void {
   g.beginPath(); g.moveTo(0, 0); p = diem(10, -r); g.lineTo(p[0], p[1]); p = diem(10, r); g.lineTo(p[0], p[1]); g.closePath(); g.fill()
 }
 
-/** VẼ bàn tay cầm bút vào `g` (đã đặt phép biến đổi sao cho gốc = ngòi bút, 1 đơn vị = `co / 60` px). Vẽ ĐẶC (nơi gọi dán cả hình với độ rõ cần có).
+/** Cây bút đứng một mình (dáng `but`) phóng bấy nhiêu lần so với cây bút trong bàn tay. */
+export const K_BUT_LE = 1.3
+
+/** VẼ con trỏ (cây bút, hoặc bàn tay cầm bút) vào `g` (đã đặt phép biến đổi sao cho gốc = ngòi bút, 1 đơn vị = `co / 60` px). Vẽ ĐẶC (nơi gọi dán cả hình với độ rõ cần có).
  *  `bong` = có bóng đổ nhẹ. */
 export function veTay(g: G, dang: DangTay, mau: MauBut, bong: boolean): void {
   const vien = dang === 'vien', gon = dang === 'gon'
   g.lineJoin = 'round'; g.lineCap = 'round'
+  // CHỈ cây bút (mặc định): không bàn tay, không bóng. Phóng 1,3 lần so với cây bút nằm trong bàn tay để một mình nó vẫn thấy rõ trên điện thoại (≈ 18 px), vẫn ngắn và nhỏ.
+  if (dang === 'but') { but(g, mau, K_BUT_LE); return }
   // bóng rất nhẹ dưới bàn tay
   if (bong && !vien) { g.save(); g.translate(2, 2.6); g.globalAlpha = 0.26; g.fillStyle = mau.bong; muTay(g, gon); g.fill(); g.restore() }
   /** Một khối của bàn tay: tô tông sáng + viền rất mảnh tông tối. `toi` = phủ thêm một lớp tông tối mờ (khối nằm phía dưới). Dáng viền: hai nét chồng (tối rộng, sáng hẹp) — nền nào cũng thấy. */

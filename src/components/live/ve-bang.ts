@@ -65,7 +65,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   const mauBut: MauBut = { than: 'white', dai: 'orange', bong: 'black', muc: '' }
   let cvTay: HTMLCanvasElement | null = null, gTay: G2 | null = null
   /** Dáng tay · cỡ tay (px CSS) · khoá hình đã dựng · chỗ ngòi trong hình dựng sẵn (px thiết bị) · khoá của khung vừa vẽ khi lớp sống CHỈ có bàn tay. */
-  let dangTay: DangTay = 'nam', coT = 18, hinhTay = '', tayAx = 0, tayAy = 0, tayVe = ''
+  let dangTay: DangTay = 'but', coT = 18, hinhTay = '', tayAx = 0, tayAy = 0, tayVe = ''
   /** Lớp giấy / khung bảng đang có nét không · đang hiện không (lớp rỗng thì ẩn). */
   let coGiay = false, coBang = false, hienGiay = true, hienBang = true
 

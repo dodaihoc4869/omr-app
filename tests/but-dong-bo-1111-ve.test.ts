@@ -251,6 +251,15 @@ describe('bàn tay cầm bút (tro-but.ts)', () => {
       for (let i = 0; i < than.duong.length; i += 2) xa = Math.max(xa, Math.hypot(than.duong[i], than.duong[i + 1]))
       expect(xa).toBeLessThan(50)
     }
+    // 11/11 lần 3 (thầy: «Bỏ tay chỉ để lại bút»): dáng mặc định `but` CHỈ vẽ cây bút — thân + ngòi, không khối nào mang màu bàn tay, không bóng, không viền
+    const g = ctxGia()
+    veTay(g as unknown as CanvasRenderingContext2D, 'but', { than: 'white', dai: 'orange', bong: 'black', muc: 'red' }, true)
+    expect(g.lenh.map((l) => `${l.loai}:${l.mau}`)).toEqual(['fill:orange', 'fill:red'])
+    expect(g.lenh[1]!.duong.slice(0, 2)).toEqual([0, 0]) // ngòi vẫn đúng điểm viết
+    for (const l of g.lenh) for (let i = 0; i < l.duong.length; i += 2) {
+      expect(l.duong[i]).toBeGreaterThanOrEqual(O_TAY.trai); expect(l.duong[i]).toBeLessThanOrEqual(O_TAY.phai - 3)
+      expect(l.duong[i + 1]).toBeGreaterThanOrEqual(O_TAY.tren + 1); expect(l.duong[i + 1]).toBeLessThanOrEqual(O_TAY.duoi - 3)
+    }
     expect([coTay(100), coTay(2000)]).toEqual([15, 44])
     expect(tiLeTay(60)).toBe(1)
   })
