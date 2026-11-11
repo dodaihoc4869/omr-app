@@ -1,0 +1,1014 @@
+{
+  "luc": "2026-11-11T05:52:27.712Z",
+  "ghiChu": "Chromium thật, tờ chiếu thật có cầu nối, phòng thật trong Node, dữ liệu giả. Khổ 1224×875 = khung của ảnh thầy gửi 11/11.",
+  "soDo": {
+    "1024_chưa live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 409,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1024_khay": {
+      "rong": 443,
+      "cao": 161,
+      "dong": [
+        "Giải [G] 40px",
+        "Ai sai [X] 40px",
+        "Thống kê [T] 40px",
+        "Bình Phản Ứng [P] 40px",
+        "Bút [B] 40px",
+        "Tổng quan [Tab] 40px",
+        "Phím tắt [?] 40px",
+        "Cài đặt 40px"
+      ]
+    },
+    "1024_chưa live, bút đang bật": {
+      "soNut": 6,
+      "duPhai_px": 409,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1024_chưa live, đang chữa (Đạt / Không đạt)": {
+      "soNut": 7,
+      "duPhai_px": 340,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1024_đang live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 163,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 00:000/8 em x»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1024_đang live, viên Live đủ ngăn + đang chữa (xấu nhất)": {
+      "soNut": 7,
+      "duPhai_px": 48,
+      "mucGon": "1",
+      "nut": [
+        ".mc-lv-cum «LIVE 62:0538/40 em»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1180_chưa live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 544,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1180_khay": {
+      "rong": 485,
+      "cao": 165,
+      "dong": [
+        "Giải [G] 40px",
+        "Ai sai [X] 40px",
+        "Thống kê [T] 40px",
+        "Bình Phản Ứng [P] 40px",
+        "Bút [B] 40px",
+        "Tổng quan [Tab] 40px",
+        "Phím tắt [?] 40px",
+        "Cài đặt 40px"
+      ]
+    },
+    "1180_chưa live, bút đang bật": {
+      "soNut": 6,
+      "duPhai_px": 544,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1180_chưa live, đang chữa (Đạt / Không đạt)": {
+      "soNut": 7,
+      "duPhai_px": 470,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1180_đang live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 297,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 00:000/8 em x»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1180_đang live, viên Live đủ ngăn + đang chữa (xấu nhất)": {
+      "soNut": 7,
+      "duPhai_px": 175,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 62:0538/40 em»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1224_chưa live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 570,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1224_khay": {
+      "rong": 502,
+      "cao": 166,
+      "dong": [
+        "Giải [G] 40px",
+        "Ai sai [X] 40px",
+        "Thống kê [T] 40px",
+        "Bình Phản Ứng [P] 40px",
+        "Bút [B] 40px",
+        "Tổng quan [Tab] 40px",
+        "Phím tắt [?] 40px",
+        "Cài đặt 40px"
+      ]
+    },
+    "1224_chưa live, bút đang bật": {
+      "soNut": 6,
+      "duPhai_px": 570,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1224_chưa live, đang chữa (Đạt / Không đạt)": {
+      "soNut": 7,
+      "duPhai_px": 493,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1224_đang live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 314,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 00:000/8 em x»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1224_đang live, viên Live đủ ngăn + đang chữa (xấu nhất)": {
+      "soNut": 7,
+      "duPhai_px": 107,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 62:0538/40 em»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1280_chưa live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 603,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1280_khay": {
+      "rong": 525,
+      "cao": 168,
+      "dong": [
+        "Giải [G] 40px",
+        "Ai sai [X] 40px",
+        "Thống kê [T] 40px",
+        "Bình Phản Ứng [P] 40px",
+        "Bút [B] 40px",
+        "Tổng quan [Tab] 40px",
+        "Phím tắt [?] 40px",
+        "Cài đặt 40px"
+      ]
+    },
+    "1280_chưa live, bút đang bật": {
+      "soNut": 6,
+      "duPhai_px": 603,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1280_chưa live, đang chữa (Đạt / Không đạt)": {
+      "soNut": 7,
+      "duPhai_px": 520,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1280_đang live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 335,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 00:000/8 em x»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1280_đang live, viên Live đủ ngăn + đang chữa (xấu nhất)": {
+      "soNut": 7,
+      "duPhai_px": 117,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 62:0538/40 em»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1366_chưa live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 650,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1366_khay": {
+      "rong": 560,
+      "cao": 170,
+      "dong": [
+        "Giải [G] 40px",
+        "Ai sai [X] 40px",
+        "Thống kê [T] 40px",
+        "Bình Phản Ứng [P] 40px",
+        "Bút [B] 40px",
+        "Tổng quan [Tab] 40px",
+        "Phím tắt [?] 40px",
+        "Cài đặt 40px"
+      ]
+    },
+    "1366_chưa live, bút đang bật": {
+      "soNut": 6,
+      "duPhai_px": 650,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1366_chưa live, đang chữa (Đạt / Không đạt)": {
+      "soNut": 7,
+      "duPhai_px": 560,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1366_đang live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 364,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 00:000/8 em x»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1366_đang live, viên Live đủ ngăn + đang chữa (xấu nhất)": {
+      "soNut": 7,
+      "duPhai_px": 130,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 62:0538/40 em»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1920_chưa live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 954,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1920_khay": {
+      "rong": 788,
+      "cao": 237,
+      "dong": [
+        "Giải [G] 56px",
+        "Ai sai [X] 56px",
+        "Thống kê [T] 56px",
+        "Bình Phản Ứng [P] 56px",
+        "Bút [B] 56px",
+        "Tổng quan [Tab] 56px",
+        "Phím tắt [?] 56px",
+        "Cài đặt 56px"
+      ]
+    },
+    "1920_chưa live, bút đang bật": {
+      "soNut": 6,
+      "duPhai_px": 954,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1920_chưa live, đang chữa (Đạt / Không đạt)": {
+      "soNut": 7,
+      "duPhai_px": 815,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-nut «Live»",
+        ".mc-buoc «◂ Đợt 1/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    },
+    "1920_đang live, chờ thầy gọi": {
+      "soNut": 6,
+      "duPhai_px": 437,
+      "mucGon": "0",
+      "nut": [
+        ".mc-lv-cum «LIVE 00:000/8 em x»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «CHỜ THẦY GỌI»",
+        "#mc-len-bang «Lên bảng»",
+        "[C] «CThầy chữa»",
+        "#mc-them «»"
+      ]
+    },
+    "1920_đang live, viên Live đủ ngăn + đang chữa (xấu nhất)": {
+      "soNut": 7,
+      "duPhai_px": 337,
+      "mucGon": "1",
+      "nut": [
+        ".mc-lv-cum «LIVE 62:0538/40 em»",
+        ".mc-buoc «◂ Đợt 2/2 ▸»",
+        "#mc-pha «ĐANG CHỮA»",
+        "[C] «CThầy chữa»",
+        "[D] «DĐạt»",
+        "[K] «KKhông đạt»",
+        "#mc-them «»"
+      ]
+    }
+  },
+  "kiem": [
+    {
+      "ten": "1024×768 · chưa live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 409 px, mức gọn 0"
+    },
+    {
+      "ten": "1024×768 · chưa live: trên thanh chỉ còn Live · đợt · trạng thái · «Lên bảng» · nút theo ngữ cảnh · nút «thêm»",
+      "dat": true,
+      "them": ".mc-lv-nut «Live» · .mc-buoc «◂ Đợt 1/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1024×768 · khay xoè: nằm trọn trong màn, ba nhóm có tên, đủ 8 nút kèm NHÃN CHỮ + phím tắt, mỗi dòng ≥ 40 px",
+      "dat": true,
+      "them": "443×161 px · Giải[G], Ai sai[X], Thống kê[T], Bình Phản Ứng[P], Bút[B], Tổng quan[Tab], Phím tắt[?], Cài đặt"
+    },
+    {
+      "ten": "1024×768 · chuyển động xoè / thu ≤ 160 ms, chỉ opacity / transform (visibility lật tức thì)",
+      "dat": true,
+      "them": "0.14s, 0.14s, 0s · opacity, transform, visibility"
+    },
+    {
+      "ten": "1024×768 · nút «thêm»: aria-expanded = true khi khay xoè, có aria-label",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · Esc ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · chọn «Giải» trong khay ⇒ lời giải mở, khay tự thu, nút «thêm» có chấm «đang bật: Lời giải»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · khay đóng: phím G vẫn đóng lời giải, chấm trên nút «thêm» tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · khay đóng: phím Tab vẫn mở / đóng «Tổng quan»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · phím B bật bút ⇒ nút «thêm» có chấm «đang bật: Bút»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · chưa live, bút đang bật: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 409 px, mức gọn 0"
+    },
+    {
+      "ten": "1024×768 · chưa live, đang chữa (Đạt / Không đạt): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 340 px, mức gọn 0"
+    },
+    {
+      "ten": "1024×768 · đang live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 163 px, mức gọn 0"
+    },
+    {
+      "ten": "1024×768 · đang live: CÙNG một thanh — viên Live · đợt · trạng thái · «Lên bảng» · nút «thêm» ở mép phải (không còn hai kiểu thanh)",
+      "dat": true,
+      "them": ".mc-lv-cum «LIVE 00:000/8 em x» · .mc-buoc «◂ Đợt 2/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1024×768 · đang live: khay xoè y như lúc chưa live (cùng nhóm, cùng nút), dòng «Bút» tô đặc vì live bật bút sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1024×768 · đang live, viên Live đủ ngăn + đang chữa (xấu nhất): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 48 px, mức gọn 1"
+    },
+    {
+      "ten": "1180×820 · chưa live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 544 px, mức gọn 0"
+    },
+    {
+      "ten": "1180×820 · chưa live: trên thanh chỉ còn Live · đợt · trạng thái · «Lên bảng» · nút theo ngữ cảnh · nút «thêm»",
+      "dat": true,
+      "them": ".mc-lv-nut «Live» · .mc-buoc «◂ Đợt 1/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1180×820 · khay xoè: nằm trọn trong màn, ba nhóm có tên, đủ 8 nút kèm NHÃN CHỮ + phím tắt, mỗi dòng ≥ 40 px",
+      "dat": true,
+      "them": "485×165 px · Giải[G], Ai sai[X], Thống kê[T], Bình Phản Ứng[P], Bút[B], Tổng quan[Tab], Phím tắt[?], Cài đặt"
+    },
+    {
+      "ten": "1180×820 · chuyển động xoè / thu ≤ 160 ms, chỉ opacity / transform (visibility lật tức thì)",
+      "dat": true,
+      "them": "0.14s, 0.14s, 0s · opacity, transform, visibility"
+    },
+    {
+      "ten": "1180×820 · nút «thêm»: aria-expanded = true khi khay xoè, có aria-label",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · Esc ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · chọn «Giải» trong khay ⇒ lời giải mở, khay tự thu, nút «thêm» có chấm «đang bật: Lời giải»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · khay đóng: phím G vẫn đóng lời giải, chấm trên nút «thêm» tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · khay đóng: phím Tab vẫn mở / đóng «Tổng quan»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · phím B bật bút ⇒ nút «thêm» có chấm «đang bật: Bút»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · chưa live, bút đang bật: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 544 px, mức gọn 0"
+    },
+    {
+      "ten": "1180×820 · chưa live, đang chữa (Đạt / Không đạt): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 470 px, mức gọn 0"
+    },
+    {
+      "ten": "1180×820 · đang live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 297 px, mức gọn 0"
+    },
+    {
+      "ten": "1180×820 · đang live: CÙNG một thanh — viên Live · đợt · trạng thái · «Lên bảng» · nút «thêm» ở mép phải (không còn hai kiểu thanh)",
+      "dat": true,
+      "them": ".mc-lv-cum «LIVE 00:000/8 em x» · .mc-buoc «◂ Đợt 2/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1180×820 · đang live: khay xoè y như lúc chưa live (cùng nhóm, cùng nút), dòng «Bút» tô đặc vì live bật bút sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · đang live, viên Live đủ ngăn + đang chữa (xấu nhất): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 175 px, mức gọn 0"
+    },
+    {
+      "ten": "1224×875 · chưa live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 570 px, mức gọn 0"
+    },
+    {
+      "ten": "1224×875 · chưa live: trên thanh chỉ còn Live · đợt · trạng thái · «Lên bảng» · nút theo ngữ cảnh · nút «thêm»",
+      "dat": true,
+      "them": ".mc-lv-nut «Live» · .mc-buoc «◂ Đợt 1/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1224×875 · khay xoè: nằm trọn trong màn, ba nhóm có tên, đủ 8 nút kèm NHÃN CHỮ + phím tắt, mỗi dòng ≥ 40 px",
+      "dat": true,
+      "them": "502×166 px · Giải[G], Ai sai[X], Thống kê[T], Bình Phản Ứng[P], Bút[B], Tổng quan[Tab], Phím tắt[?], Cài đặt"
+    },
+    {
+      "ten": "1224×875 · chuyển động xoè / thu ≤ 160 ms, chỉ opacity / transform (visibility lật tức thì)",
+      "dat": true,
+      "them": "0.14s, 0.14s, 0s · opacity, transform, visibility"
+    },
+    {
+      "ten": "1224×875 · nút «thêm»: aria-expanded = true khi khay xoè, có aria-label",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · Esc ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · chọn «Giải» trong khay ⇒ lời giải mở, khay tự thu, nút «thêm» có chấm «đang bật: Lời giải»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · khay đóng: phím G vẫn đóng lời giải, chấm trên nút «thêm» tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · khay đóng: phím Tab vẫn mở / đóng «Tổng quan»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · phím B bật bút ⇒ nút «thêm» có chấm «đang bật: Bút»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · chưa live, bút đang bật: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 570 px, mức gọn 0"
+    },
+    {
+      "ten": "1224×875 · chưa live, đang chữa (Đạt / Không đạt): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 493 px, mức gọn 0"
+    },
+    {
+      "ten": "1224×875 · đang live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 314 px, mức gọn 0"
+    },
+    {
+      "ten": "1224×875 · đang live: CÙNG một thanh — viên Live · đợt · trạng thái · «Lên bảng» · nút «thêm» ở mép phải (không còn hai kiểu thanh)",
+      "dat": true,
+      "them": ".mc-lv-cum «LIVE 00:000/8 em x» · .mc-buoc «◂ Đợt 2/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1224×875 · đang live: khay xoè y như lúc chưa live (cùng nhóm, cùng nút), dòng «Bút» tô đặc vì live bật bút sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1224×875 · đang live, viên Live đủ ngăn + đang chữa (xấu nhất): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 107 px, mức gọn 0"
+    },
+    {
+      "ten": "1280×720 · chưa live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 603 px, mức gọn 0"
+    },
+    {
+      "ten": "1280×720 · chưa live: trên thanh chỉ còn Live · đợt · trạng thái · «Lên bảng» · nút theo ngữ cảnh · nút «thêm»",
+      "dat": true,
+      "them": ".mc-lv-nut «Live» · .mc-buoc «◂ Đợt 1/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1280×720 · khay xoè: nằm trọn trong màn, ba nhóm có tên, đủ 8 nút kèm NHÃN CHỮ + phím tắt, mỗi dòng ≥ 40 px",
+      "dat": true,
+      "them": "525×168 px · Giải[G], Ai sai[X], Thống kê[T], Bình Phản Ứng[P], Bút[B], Tổng quan[Tab], Phím tắt[?], Cài đặt"
+    },
+    {
+      "ten": "1280×720 · chuyển động xoè / thu ≤ 160 ms, chỉ opacity / transform (visibility lật tức thì)",
+      "dat": true,
+      "them": "0.14s, 0.14s, 0s · opacity, transform, visibility"
+    },
+    {
+      "ten": "1280×720 · nút «thêm»: aria-expanded = true khi khay xoè, có aria-label",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · Esc ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · chọn «Giải» trong khay ⇒ lời giải mở, khay tự thu, nút «thêm» có chấm «đang bật: Lời giải»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · khay đóng: phím G vẫn đóng lời giải, chấm trên nút «thêm» tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · khay đóng: phím Tab vẫn mở / đóng «Tổng quan»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · phím B bật bút ⇒ nút «thêm» có chấm «đang bật: Bút»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · chưa live, bút đang bật: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 603 px, mức gọn 0"
+    },
+    {
+      "ten": "1280×720 · chưa live, đang chữa (Đạt / Không đạt): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 520 px, mức gọn 0"
+    },
+    {
+      "ten": "1280×720 · đang live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 335 px, mức gọn 0"
+    },
+    {
+      "ten": "1280×720 · đang live: CÙNG một thanh — viên Live · đợt · trạng thái · «Lên bảng» · nút «thêm» ở mép phải (không còn hai kiểu thanh)",
+      "dat": true,
+      "them": ".mc-lv-cum «LIVE 00:000/8 em x» · .mc-buoc «◂ Đợt 2/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1280×720 · đang live: khay xoè y như lúc chưa live (cùng nhóm, cùng nút), dòng «Bút» tô đặc vì live bật bút sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1280×720 · đang live, viên Live đủ ngăn + đang chữa (xấu nhất): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 117 px, mức gọn 0"
+    },
+    {
+      "ten": "1366×768 · chưa live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 650 px, mức gọn 0"
+    },
+    {
+      "ten": "1366×768 · chưa live: trên thanh chỉ còn Live · đợt · trạng thái · «Lên bảng» · nút theo ngữ cảnh · nút «thêm»",
+      "dat": true,
+      "them": ".mc-lv-nut «Live» · .mc-buoc «◂ Đợt 1/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1366×768 · khay xoè: nằm trọn trong màn, ba nhóm có tên, đủ 8 nút kèm NHÃN CHỮ + phím tắt, mỗi dòng ≥ 40 px",
+      "dat": true,
+      "them": "560×170 px · Giải[G], Ai sai[X], Thống kê[T], Bình Phản Ứng[P], Bút[B], Tổng quan[Tab], Phím tắt[?], Cài đặt"
+    },
+    {
+      "ten": "1366×768 · chuyển động xoè / thu ≤ 160 ms, chỉ opacity / transform (visibility lật tức thì)",
+      "dat": true,
+      "them": "0.14s, 0.14s, 0s · opacity, transform, visibility"
+    },
+    {
+      "ten": "1366×768 · nút «thêm»: aria-expanded = true khi khay xoè, có aria-label",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · Esc ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · chọn «Giải» trong khay ⇒ lời giải mở, khay tự thu, nút «thêm» có chấm «đang bật: Lời giải»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · khay đóng: phím G vẫn đóng lời giải, chấm trên nút «thêm» tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · khay đóng: phím Tab vẫn mở / đóng «Tổng quan»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · phím B bật bút ⇒ nút «thêm» có chấm «đang bật: Bút»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · chưa live, bút đang bật: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 650 px, mức gọn 0"
+    },
+    {
+      "ten": "1366×768 · bút bật: dòng «Bút» trong khay tô đặc",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · chưa live, đang chữa (Đạt / Không đạt): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 560 px, mức gọn 0"
+    },
+    {
+      "ten": "1366×768 · đang live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 364 px, mức gọn 0"
+    },
+    {
+      "ten": "1366×768 · đang live: CÙNG một thanh — viên Live · đợt · trạng thái · «Lên bảng» · nút «thêm» ở mép phải (không còn hai kiểu thanh)",
+      "dat": true,
+      "them": ".mc-lv-cum «LIVE 00:000/8 em x» · .mc-buoc «◂ Đợt 2/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1366×768 · đang live: khay xoè y như lúc chưa live (cùng nhóm, cùng nút), dòng «Bút» tô đặc vì live bật bút sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · đang live, viên Live đủ ngăn + đang chữa (xấu nhất): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 130 px, mức gọn 0"
+    },
+    {
+      "ten": "1920×1080 · chưa live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 954 px, mức gọn 0"
+    },
+    {
+      "ten": "1920×1080 · chưa live: trên thanh chỉ còn Live · đợt · trạng thái · «Lên bảng» · nút theo ngữ cảnh · nút «thêm»",
+      "dat": true,
+      "them": ".mc-lv-nut «Live» · .mc-buoc «◂ Đợt 1/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1920×1080 · khay xoè: nằm trọn trong màn, ba nhóm có tên, đủ 8 nút kèm NHÃN CHỮ + phím tắt, mỗi dòng ≥ 40 px",
+      "dat": true,
+      "them": "788×237 px · Giải[G], Ai sai[X], Thống kê[T], Bình Phản Ứng[P], Bút[B], Tổng quan[Tab], Phím tắt[?], Cài đặt"
+    },
+    {
+      "ten": "1920×1080 · chuyển động xoè / thu ≤ 160 ms, chỉ opacity / transform (visibility lật tức thì)",
+      "dat": true,
+      "them": "0.14s, 0.14s, 0s · opacity, transform, visibility"
+    },
+    {
+      "ten": "1920×1080 · nút «thêm»: aria-expanded = true khi khay xoè, có aria-label",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · Esc ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · chọn «Giải» trong khay ⇒ lời giải mở, khay tự thu, nút «thêm» có chấm «đang bật: Lời giải»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · khay đóng: phím G vẫn đóng lời giải, chấm trên nút «thêm» tắt",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · khay đóng: phím Tab vẫn mở / đóng «Tổng quan»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · phím B bật bút ⇒ nút «thêm» có chấm «đang bật: Bút»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · chưa live, bút đang bật: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 954 px, mức gọn 0"
+    },
+    {
+      "ten": "1920×1080 · chưa live, đang chữa (Đạt / Không đạt): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 815 px, mức gọn 0"
+    },
+    {
+      "ten": "1920×1080 · đang live, chờ thầy gọi: không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "6 thứ trên thanh, còn dư 437 px, mức gọn 0"
+    },
+    {
+      "ten": "1920×1080 · đang live: CÙNG một thanh — viên Live · đợt · trạng thái · «Lên bảng» · nút «thêm» ở mép phải (không còn hai kiểu thanh)",
+      "dat": true,
+      "them": ".mc-lv-cum «LIVE 00:000/8 em x» · .mc-buoc «◂ Đợt 2/2 ▸» · #mc-pha «CHỜ THẦY GỌI» · #mc-len-bang «Lên bảng» · [C] «CThầy chữa» · #mc-them «»"
+    },
+    {
+      "ten": "1920×1080 · đang live: khay xoè y như lúc chưa live (cùng nhóm, cùng nút), dòng «Bút» tô đặc vì live bật bút sẵn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · đang live, viên Live đủ ngăn + đang chữa (xấu nhất): không nút nào tràn mép thanh, không đè nhau, thanh không phải cuộn",
+      "dat": true,
+      "them": "7 thứ trên thanh, còn dư 337 px, mức gọn 1"
+    },
+    {
+      "ten": "Không lỗi JavaScript trên trang nào",
+      "dat": true,
+      "them": ""
+    }
+  ]
+}

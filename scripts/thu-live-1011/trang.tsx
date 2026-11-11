@@ -1,7 +1,7 @@
 // TRANG THỬ LIVE BẢNG (10/11, đợt 1B) — component THẬT (ManBinhPhanUng + LopLive · tờ chiếu thật + phần nối live của app thầy) nói chuyện với phòng THẬT
 // chạy trong Node (scripts/thu-live-1011/may-chu.mjs). Không máy chủ thật, không dữ liệu học sinh thật.
 //   ?vai=em&sbd=S1 [&yeu=1 máy yếu]      — máy em
-//   ?vai=thay [&giay=toi]                 — tờ chiếu trong khung + cửa sổ app (mic, phòng)
+//   ?vai=thay [&giay=toi] [&noi=1]        — tờ chiếu trong khung + cửa sổ app (mic, phòng); noi=1: tờ có cầu nối (mã phiên thu1111)
 // Cách chạy: xem đầu tệp scripts/thu-live-1011/thu.mjs
 import '../chup-bpu-de-chang-1011/bat-trong'
 import '../../src/components/m3/m3-tuong-thich.css'
@@ -76,7 +76,8 @@ if (vai === 'em') {
   const html = taoHtmlMayChieu([
     o('S1', 'Nguyễn Thị Hà', cau('Q1', 'Alcohol nào sau đây là alcohol bậc II?', ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH']), 1),
     o('S2', 'Lê Gia Huy', cau('Q2', 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', ['NaCl', 'NaOH', 'HCl', 'NaHCO₃']), 2),
-  ] as never, { tenBuoi: 'Buổi chữa 10/11', nutAiSai: false } as never)
+  // ?noi=1 (bộ thử thanh đáy 11/11): tờ có cầu nối ⇒ đủ nút «Ai sai», «Thầy chữa», «Đạt», «Không đạt» như tờ thật trong app thầy; bộ thử gửi tin kết nối thay app.
+  ] as never, (ts.get('noi') === '1' ? { tenBuoi: 'Buổi chữa 11/11', cauNoi: { maPhien: 'thu1111' } } : { tenBuoi: 'Buổi chữa 10/11', nutAiSai: false }) as never)
   const khung = document.createElement('iframe')
   khung.setAttribute('title', 'Tờ chiếu')
   khung.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;border:0'
