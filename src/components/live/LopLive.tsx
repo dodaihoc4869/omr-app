@@ -366,7 +366,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const tayDuoc = !micMo && !duocMoi && tt.mic !== 'xin-quyen'
   /** TIẾNG ĐANG TẮT (thầy 11/11: thầy live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết) / trình duyệt chặn phát: khay đóng vẫn có DẤU
    *  loa gạch trên tay nắm; lần đầu trong buổi khay tự mở 3 giây cho em thấy nút «Tiếng» (thầy 11/11 lần 3: không còn viên nổi «Tiếng đang tắt»). */
-  const tiengTat = tt.bat && !tt.nghi && tt.tieng !== 'chua-cau-hinh' && (!nghe || tt.tieng === 'bi-chan')
+  const tiengTat = tt.bat && !tt.nghi && tt.tieng !== 'chua-cau-hinh' && (!nghe || tt.tieng === 'bi-chan' || tt.chamNghe)
   const gioiThieu = tiengTat && !daGioiThieu.current
   /** Dấu rất nhỏ trên tay nắm (em luôn biết dù khay đóng): tiếng đang tắt · mic của em đang mở · em đang giơ tay · mạng yếu. */
   const dauNam = (mangYeu: boolean): DauNam[] => {
@@ -382,6 +382,8 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const khoaChuaGui = che === 'bang' && !!luot && (luot.l.pha === 'goi' || luot.l.pha === 'lam-bang') && !luot.l.emTra && !luot.daGuiMay && !!luot.l.goi && luot.l.goi.sbd !== luot.sbd
   const dongKhay = (dau: ReactNode, them?: ReactNode) => (
     <>
+      {/* tiếng thầy ĐÃ tới máy (giải mã > −50 dBFS) mà em chưa chạm từ lúc vào live: một chạm = play() + AudioContext.resume() */}
+      {tt.chamNghe && !tt.nghi ? <button type="button" className="lv-vua" style={{ minHeight: 64, fontSize: 18, width: '100%' }} onClick={() => { void le.current?.moKhoaTieng() }}><BtLoa />Chạm để nghe<b>Tiếng thầy đã tới máy</b></button> : null}
       <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}{nghe && !tt.nghi ? <TreTieng le={le} /> : null}</div>
       {GIAO_DIEN_DOT_2 ? (
         // Nút chính màu đội: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» (ảnh 28)
@@ -393,6 +395,8 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
         <button type="button" className={`lv-vua${nghe && !biChan ? '' : ' tat'}`} aria-pressed={nghe && !biChan} aria-label={biChan ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe && !biChan ? <BtLoa /> : <BtLoaTat />}Tiếng<b>{biChan ? 'Chạm để nghe' : nghe ? 'Đang bật' : 'Đang tắt'}</b></button>
       ) : <p className="lv-ghi">Buổi này live chưa có tiếng trên máy. Em nghe thầy giảng trực tiếp.</p>}
       {coTieng && nghe ? <ChonLoa le={le} /> : null}
+      {/* 11/11 tối (#1630 «không nghe thấy gì»): phát tiếng qua WebAudio thay thẻ <audio> — gọi trong cú chạm, nhớ ở máy (nghe-wa.ts) */}
+      {coTieng && nghe ? <button type="button" className={`lv-vua lv-wa${tt.quaWa ? '' : ' tat'}`} aria-pressed={tt.quaWa} onClick={() => le.current?.datNgheWa(!tt.quaWa)}><BtLoa />{tt.quaWa ? 'Đang nghe cách khác' : 'Vẫn không nghe?'}<b>{tt.quaWa ? 'Chạm để về cách thường' : 'Thử cách khác'}</b></button> : null}
       {coTieng && !nghe ? <p className="lv-ghi">{xa ? 'Em đang xem từ xa: bật tiếng để nghe thầy giảng.' : 'Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì bật tiếng.'}</p> : null}
       {micBang ? (
         <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic lại'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
