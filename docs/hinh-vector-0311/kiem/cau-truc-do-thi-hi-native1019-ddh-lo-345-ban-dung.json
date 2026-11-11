@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1019,
+    "hash": "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523",
+    "fileNguon": "anh/b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523.png",
+    "svg": "do-thi-hi-native1019-ddh-37a0efd03c0a2b9a881b6fd0b3eb3aaa3ab68c66d0aa79dc0afa8085a6ab8d41.svg",
+    "hashSvg": "37a0efd03c0a2b9a881b6fd0b3eb3aaa3ab68c66d0aa79dc0afa8085a6ab8d41",
+    "byteSvg": 21023,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "11-C1-B1-II-15",
+        "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g).\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+        "refs": [
+          {
+            "hash": "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523",
+            "where": "11-C1-B1-II-15.hinh.0.du_lieu",
+            "hashDataUrl": "d00375ef53e91ebc1817d721ec094eb3a69736691448cc0e14e4cbe25298ce37"
+          }
+        ]
+      },
+      {
+        "qid": "DB-11-B1-D1-II-78",
+        "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g).\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+        "refs": [
+          {
+            "hash": "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523",
+            "where": "DB-11-B1-D1-II-78.hinh.0.du_lieu",
+            "hashDataUrl": "d00375ef53e91ebc1817d721ec094eb3a69736691448cc0e14e4cbe25298ce37"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "1redcurve-finitehorizontalplateau/nativeirregular20V20Hgreen+2blueaxisboundaries/2filledheads/4commaY4X1origin0/numeralsregularITALIC-Lượng HI (mol)trueDAMrotated-Thời gianregular/noaddedplateauvalue-unit-marker-answer-noalias847",
+    "hashSvgDaSoat": "37a0efd03c0a2b9a881b6fd0b3eb3aaa3ab68c66d0aa79dc0afa8085a6ab8d41",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

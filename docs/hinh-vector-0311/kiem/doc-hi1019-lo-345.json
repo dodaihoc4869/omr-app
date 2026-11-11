@@ -1,0 +1,467 @@
+{
+  "i": 1019,
+  "hash": "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523.png",
+  "size": [
+    630,
+    531
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "11-C1-B1-II-15",
+      "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g).\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+      "allHinh": [
+        {
+          "hash": "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523",
+          "where": "11-C1-B1-II-15.hinh.0.du_lieu",
+          "hashDataUrl": "d00375ef53e91ebc1817d721ec094eb3a69736691448cc0e14e4cbe25298ce37"
+        }
+      ],
+      "missingHashes": [
+        "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523"
+      ]
+    },
+    {
+      "qid": "DB-11-B1-D1-II-78",
+      "de": "Trong một bình kín xảy ra cân bằng hoá học sau:\nH₂(g) + I₂(g) ⇌ 2HI(g).\nCho 1 mol H₂ và 1 mol I₂ vào bình kín, dung tích 2 lít. Lượng HI tạo thành theo thời gian được biểu diễn bằng đồ thị sau:",
+      "allHinh": [
+        {
+          "hash": "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523",
+          "where": "DB-11-B1-D1-II-78.hinh.0.du_lieu",
+          "hashDataUrl": "d00375ef53e91ebc1817d721ec094eb3a69736691448cc0e14e4cbe25298ce37"
+        }
+      ],
+      "missingHashes": [
+        "b6c93db56d3ba3eef16373bc027c8db920e92eb94f2880f4d761f97b850df523"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfSourceAdmitted": 2,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownPlateau4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native pixel coordinates only, not inferred equilibrium/yield or new scientific values. Color filtering supplements openedFULL/macros; x129curve maskedbyblueaxis so129441 is sourcegraphicorigin attachment not visible redmeasurement.",
+  "geometry": {
+    "axes": {
+      "origin": [
+        129,
+        441
+      ],
+      "UPtip": [
+        129,
+        5
+      ],
+      "RIGHTtip": [
+        606,
+        441
+      ],
+      "headStyle": "2filledblue triangles",
+      "color": "blue"
+    },
+    "grid": {
+      "verticalX": [
+        129,
+        144,
+        163,
+        180.5,
+        199.5,
+        219.5,
+        238,
+        256,
+        275,
+        293.5,
+        313,
+        330,
+        349.5,
+        368.5,
+        388,
+        405.5,
+        424.5,
+        444.5,
+        463,
+        481,
+        498.5
+      ],
+      "horizontalY": [
+        71.5,
+        90,
+        108,
+        127,
+        146,
+        165.5,
+        183,
+        202,
+        221.5,
+        240.5,
+        258,
+        277,
+        295.5,
+        314,
+        332,
+        350.5,
+        370,
+        389,
+        406.5,
+        426,
+        441
+      ],
+      "bounds": [
+        129,
+        71.5,
+        498.5,
+        441
+      ],
+      "style": "green thincontinuous finegrid;21V21H counting left/bottomblueaxes,20greenV20greenH. Native spacingnotperfectlyuniform."
+    },
+    "curve": {
+      "color": "red",
+      "pixelSamples": [
+        [
+          129,
+          441
+        ],
+        [
+          130,
+          437.5
+        ],
+        [
+          140,
+          409
+        ],
+        [
+          150,
+          379.5
+        ],
+        [
+          160,
+          352.5
+        ],
+        [
+          180,
+          303
+        ],
+        [
+          200,
+          266.5
+        ],
+        [
+          220,
+          236.25
+        ],
+        [
+          240,
+          211.5
+        ],
+        [
+          260,
+          192
+        ],
+        [
+          280,
+          176.5
+        ],
+        [
+          300,
+          163.5
+        ],
+        [
+          320,
+          154
+        ],
+        [
+          340,
+          147
+        ],
+        [
+          360,
+          143
+        ],
+        [
+          380,
+          138
+        ],
+        [
+          400,
+          133
+        ],
+        [
+          420,
+          130
+        ],
+        [
+          430,
+          128
+        ],
+        [
+          440,
+          128
+        ],
+        [
+          460,
+          127.5
+        ],
+        [
+          480,
+          127.5
+        ],
+        [
+          490,
+          127.0
+        ]
+      ],
+      "style": "singlecontinuous thinred curve fromgraphicorigin, rises thenfiniteplateau aboutx430..491,y127.5; NOmarkers/extraheads",
+      "notes": "Do notfitdifferent847shape orinferprecise equilibriumquantityfromname."
+    },
+    "labels": [
+      {
+        "text": "Lượng HI (mol)",
+        "bbox": [
+          33,
+          158,
+          61,
+          346
+        ],
+        "rotation": -90,
+        "font": "truebold uprightserif rotated"
+      },
+      {
+        "text": "Thời gian",
+        "bbox": [
+          282,
+          497,
+          391,
+          521
+        ],
+        "font": "regular uprightserif"
+      },
+      {
+        "text": "0",
+        "bbox": [
+          99,
+          437,
+          115,
+          459
+        ],
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "0,5",
+        "bbox": [
+          73,
+          339,
+          108,
+          362
+        ],
+        "atGridY": 350.5,
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "1,0",
+        "bbox": [
+          74,
+          247,
+          108,
+          270
+        ],
+        "atGridY": 258,
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "1,5",
+        "bbox": [
+          74,
+          154,
+          108,
+          177
+        ],
+        "atGridY": 165.5,
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "2,0",
+        "bbox": [
+          72,
+          60,
+          108,
+          83
+        ],
+        "atGridY": 71.5,
+        "font": "regularserif mathitalic/slanted"
+      }
+    ],
+    "xTickLabels": [
+      {
+        "text": "1",
+        "x": 219.5,
+        "bbox": [
+          210.5,
+          461,
+          228.5,
+          482
+        ],
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "2",
+        "x": 313,
+        "bbox": [
+          304,
+          461,
+          322,
+          482
+        ],
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "3",
+        "x": 405.5,
+        "bbox": [
+          396.5,
+          461,
+          414.5,
+          482
+        ],
+        "font": "regularserif mathitalic/slanted"
+      },
+      {
+        "text": "4",
+        "x": 498.5,
+        "bbox": [
+          489.5,
+          461,
+          507.5,
+          482
+        ],
+        "font": "regularserif mathitalic/slanted"
+      }
+    ],
+    "tickStems": {
+      "x": [
+        [
+          [
+            219.5,
+            441
+          ],
+          [
+            219.5,
+            452
+          ]
+        ],
+        [
+          [
+            313,
+            441
+          ],
+          [
+            313,
+            452
+          ]
+        ],
+        [
+          [
+            405.5,
+            441
+          ],
+          [
+            405.5,
+            452
+          ]
+        ],
+        [
+          [
+            498.5,
+            441
+          ],
+          [
+            498.5,
+            452
+          ]
+        ]
+      ],
+      "y": [
+        [
+          [
+            115,
+            71.5
+          ],
+          [
+            129,
+            71.5
+          ]
+        ],
+        [
+          [
+            115,
+            165.5
+          ],
+          [
+            129,
+            165.5
+          ]
+        ],
+        [
+          [
+            115,
+            258
+          ],
+          [
+            129,
+            258
+          ]
+        ],
+        [
+          [
+            115,
+            350.5
+          ],
+          [
+            129,
+            350.5
+          ]
+        ]
+      ],
+      "note": "shortadditionalhairlineprotrusionsalsoatfinegridleftedgevisible; preserve openednative ratherthanaddingnumbers"
+    },
+    "counts": {
+      "curves": 1,
+      "filledAxisHeads": 2,
+      "VgridIncludingAxis": 21,
+      "HgridIncludingAxis": 21,
+      "xNumericLabels": 4,
+      "yNumericLabels": 4,
+      "originZero": 1,
+      "markers": 0
+    },
+    "noAdded": [
+      "timeunit",
+      "caption",
+      "numericplateauannotation",
+      "secondoriginzero",
+      "markers",
+      "reactionequation",
+      "answer",
+      "alias847"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootAudit": {
+    "nativeFullAll2PublicDeOpened": true,
+    "nativeLeftTickMacroOpened": true,
+    "pointsIndependentlySampled": true,
+    "note": "Finiteplateau endpoint490;16shortfineYstems added fromnative macro/major4Ystems separate. Noalias847 orderivedplateauvalue.",
+    "actualFreshChromium3xFullOpened": true,
+    "hashSvg": "37a0efd03c0a2b9a881b6fd0b3eb3aaa3ab68c66d0aa79dc0afa8085a6ab8d41",
+    "byteSvg": 21023,
+    "independentPixelSamples": "x140409.5,x150379.5,x160352,x180303.5,x200266.5,x220237,x240211.5,x260192,x280176.5,x300163.5,x320154,x340147,x360142.5,x380138,x400133.5,x420130,x440-480127.5; lastred490.",
+    "actualNewHashFullAndOriginMacroOpened": true,
+    "negativeInitial": "94d8270e redOVERblue rejected; finalONLYblueaxesOVERred asnative, coordinates/glyph/othersunchanged."
+  }
+}
