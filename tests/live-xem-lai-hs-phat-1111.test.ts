@@ -10,7 +10,7 @@ import { docNetBin } from '../src/lib/live/xem-lai-kieu'
 import { LUOC_IT_NHAT_MS, nhayLang, taoDongHoRieng, taoLamMuot, tongHang, tongLang, tuViTriHang, viTriHang } from '../src/screens/live-xem-lai/hs/dong-ho'
 import { taoKhoNet } from '../src/screens/live-xem-lai/hs/kho-net'
 import { giaiMuc, taoMayPhat, NAN_TRO_MS } from '../src/screens/live-xem-lai/hs/may-phat'
-import { taoBuoiGia } from './_live-xem-lai-gia'
+import { taoBuoiGia } from './_live-xem-lai-hs-gia'
 
 const loi = taoLoiBut()
 /** Lớp vẽ giả: dựng lại mảng nét bằng CHÍNH `apSuKien` của bộ máy bút (như lớp vẽ thật). */

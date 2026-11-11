@@ -1,5 +1,5 @@
 // TRANG CHỤP «XEM LẠI LIVE — MÁY EM» (đợt X2, thầy chốt build 11/11). Thành phần THẬT; mọi lệnh máy chủ (`/hs/live-ds`, `/hs/live-buoi`, `/live-tep/…`)
-// do chup.mjs trả lời bằng dữ liệu giả đúng hợp đồng (tests/_live-xem-lai-gia.ts). Không yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật.
+// do chup.mjs trả lời bằng dữ liệu giả đúng hợp đồng (tests/_live-xem-lai-hs-gia.ts). Không yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật.
 //   ?man=them  tấm «Thêm» thật (MenuDocTrong) có dòng «Live»      ?man=ds    màn của app học sinh: danh sách → trang buổi → trình phát
 //   ?man=buoi  điểm vào dùng chung mở thẳng một buổi (nguon=hs)    ?man=gv    như trên với nguon=gv (app thầy bấm «Mở»)
 //   [&yeu=1 máy yếu]

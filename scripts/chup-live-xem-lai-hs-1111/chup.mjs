@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// CHỤP + ĐO «Xem lại Live — máy em» (đợt X2, 11/11) — Chromium thật, dữ liệu giả đúng hợp đồng (tests/_live-xem-lai-gia.ts).
+// CHỤP + ĐO «Xem lại Live — máy em» (đợt X2, 11/11) — Chromium thật, dữ liệu giả đúng hợp đồng (tests/_live-xem-lai-hs-gia.ts).
 //   npx vite build --config scripts/chup-live-xem-lai-hs-1111/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/chup-live-xem-lai-hs-1111/chup.mjs <thư mục tạm> <thư mục ảnh> [cảnh,cảnh… | do]
 // Máy chủ GIẢ = chặn mọi yêu cầu tới https://may-chu-gia.test: `/hs/live-ds`, `/hs/live-buoi`, `/live-tep/<id>/<tệp>` (có Range ⇒ 206, kể cả tệp tiếng).
@@ -21,7 +21,7 @@ mkdirSync(ANH, { recursive: true })
 
 // ── dữ liệu giả: đóng gói bộ sinh (TypeScript) rồi nạp ──
 const tam = mkdtempSync(join(tmpdir(), 'xl-gia-'))
-await build({ entryPoints: [join(GOC, 'tests/_live-xem-lai-gia.ts')], bundle: true, platform: 'node', format: 'esm', outfile: join(tam, 'gia.mjs'), logLevel: 'warning' })
+await build({ entryPoints: [join(GOC, 'tests/_live-xem-lai-hs-gia.ts')], bundle: true, platform: 'node', format: 'esm', outfile: join(tam, 'gia.mjs'), logLevel: 'warning' })
 const gia = await import(pathToFileURL(join(tam, 'gia.mjs')).href)
 const kho = new Map()
 /** Bộ tệp của buổi giả theo (giấy tối, có tiếng). Tệp tiếng là WAV 8 kHz (máy chủ thật trả MP3). */

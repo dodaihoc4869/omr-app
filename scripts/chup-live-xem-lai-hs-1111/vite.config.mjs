@@ -1,5 +1,5 @@
 // BẢN BUILD RIÊNG ĐỂ CHỤP + ĐO «Xem lại Live — máy em» (đợt X2, 11/11) — không phải bản phát hành, không service worker.
-// Thành phần THẬT (tấm «Thêm», danh sách, trang buổi, trình phát); máy chủ GIẢ do chup.mjs trả lời (dữ liệu giả tests/_live-xem-lai-gia.ts).
+// Thành phần THẬT (tấm «Thêm», danh sách, trang buổi, trình phát); máy chủ GIẢ do chup.mjs trả lời (dữ liệu giả tests/_live-xem-lai-hs-gia.ts).
 //   npx vite build --config scripts/chup-live-xem-lai-hs-1111/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/chup-live-xem-lai-hs-1111/chup.mjs <thư mục tạm> docs/ban-ve-live-xem-lai-1011
 import { resolve } from 'node:path'

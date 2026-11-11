@@ -16,7 +16,7 @@ import { _quenDs, NHO_DS_MS } from '../src/screens/live-xem-lai/hs/may-chu'
 import { chuDaXem, danhDauXem, docDaXem, khoaEm } from '../src/screens/live-xem-lai/hs/nho-may'
 import { dangXemNhat, doanHopLe, dongThoiGian, sapDoan } from '../src/screens/live-xem-lai/hs/sap-doan'
 import { dongNgay, gioPhat, gioVn, nhanThang, tenBai, tenDayDu } from '../src/screens/live-xem-lai/hs/ten-hien'
-import { ID_BUOI_GIA, taoBuoiGia, taoDsGia, taoRiengGia } from './_live-xem-lai-gia'
+import { ID_BUOI_GIA, taoBuoiGia, taoDsGia, taoRiengGia } from './_live-xem-lai-hs-gia'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 
