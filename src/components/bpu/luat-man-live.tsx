@@ -29,8 +29,10 @@ export function buocHuongLive(truoc: HuongLive, che: 'an' | 'dau' | 'bang', live
 }
 /** Màn câu hỏi (đang live, chưa vào bảng) xoay hình 90° bằng CSS: chỉ khi em đang cầm ngang trên trang dọc. */
 export const xoayManCau = (h: HuongLive, che: 'an' | 'dau' | 'bang', doc: boolean): boolean => che === 'dau' && h === 'xoay' && doc
-/** Bề ngang tối thiểu của HÌNH để màn câu hỏi chia hai cột — đúng ngưỡng `@media (orientation: landscape) and (min-width: 700px)` của bpu-hs.css. */
-export const RONG_HAI_COT = 700
+/** Bề ngang tối thiểu của HÌNH để màn câu hỏi chia hai cột — đúng ngưỡng `@media (orientation: landscape) and (min-width: 640px)` của bpu-hs.css; CÙNG số với
+ *  hai cột của màn chặng (`RONG_NGANG_MIN`, bo-cuc-lam.ts — không nhập để mảnh màn này không kéo theo mảnh chặng; test bpu-ngang-de-dap-an-1111 khoá bằng nhau).
+ *  11/11 (bố cục ngang «một bên đề một bên chọn đáp án»): trước 700 ⇒ máy 640 / 667 px ngang còn một cột. */
+export const RONG_HAI_COT = 640
 /** Bề cao tối đa của HÌNH còn tính là «khung thấp xoay ngang» — đúng ngưỡng `@media (orientation: landscape) and (max-height: 500px)` (giám thị gọn, giam-thi.css). */
 export const CAO_KHUNG_THAP = 500
 

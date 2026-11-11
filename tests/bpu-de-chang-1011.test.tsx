@@ -107,7 +107,7 @@ describe('màn máy em: đề vẽ bằng khối đề của chặng + giám th�
 
   it('câu có mức độ ⇒ khối đề đứng trong chuỗi lớp của chặng, có giám thị đúng mức + bong bóng đề; phần trả lời nằm trong `.duo-tra`', async () => {
     await vao(rieng)
-    const khoi = document.querySelector('.bpu-hs-than > .bpu-de-chang')!
+    const khoi = document.querySelector('.bpu-hs-than > .bpu-cot-de > .bpu-de-chang')! // 11/11: đề nằm trong cột đề (bố cục ngang; dọc: `display: contents`)
     expect([...khoi.classList]).toEqual(expect.arrayContaining(['ht-app', 'ht2-lam', 'duo'])) // cùng tờ kiểu với chặng
     expect(khoi.hasAttribute('data-chang')).toBe(false) // không kéo bố cục «cả màn» hai cột của màn chặng
     const san = khoi.querySelector('.duo-gt-san')!
@@ -157,7 +157,7 @@ describe('giao diện cũ (máy lùi, <html> không có data-trong)', () => {
     const st = phong()
     moLuot(st, { qid: rieng.qid, phan: rieng.phan, tuLuan: false, cau: cauCongKhai(rieng) as unknown as Record<string, unknown>, dung: rieng.correct, hanGiay: 0 }, T0)
     WsGia.ds[0]!.nhan(viewEm(st, 'S1'))
-    await waitFor(() => expect(document.querySelector('.bpu-hs-than > .ht2-lam-de')).toBeTruthy(), { timeout: 8000 })
+    await waitFor(() => expect(document.querySelector('.bpu-hs-than > .bpu-cot-de > .ht2-lam-de')).toBeTruthy(), { timeout: 8000 })
     expect(document.querySelector('.bpu-de-chang')).toBeNull()
     expect(document.querySelector('.duo-gt-san')).toBeNull()
   })

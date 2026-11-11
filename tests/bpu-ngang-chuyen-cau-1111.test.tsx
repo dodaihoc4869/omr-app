@@ -73,7 +73,7 @@ describe('useHuongLive: thuộc tính xoay có NGAY lượt dựng đầu của 
     lan.push(r)
     return <div className="bpu-hs" {...r.the} />
   }
-  it('iPhone 390 × 844: bảng ⇒ câu mới: lượt dựng ĐẦU TIÊN với màn câu hỏi đã có data-xoay + khổ hình 844 × 390, data-ngang (≥ 700), data-thap (≤ 500)', () => {
+  it('iPhone 390 × 844: bảng ⇒ câu mới: lượt dựng ĐẦU TIÊN với màn câu hỏi đã có data-xoay + khổ hình 844 × 390, data-ngang (≥ 640), data-thap (≤ 500)', () => {
     kho(390, 844)
     lan.length = 0
     const { container, rerender } = render(<Thu che="bang" bat />)
@@ -87,7 +87,7 @@ describe('useHuongLive: thuộc tính xoay có NGAY lượt dựng đầu của 
     const g = container.querySelector<HTMLElement>('.bpu-hs')!
     expect(g.hasAttribute('data-xoay') && g.hasAttribute('data-ngang') && g.hasAttribute('data-thap')).toBe(true)
     expect([g.style.width, g.style.height]).toEqual(['844px', '390px'])
-    expect(RONG_HAI_COT).toBe(700); expect(CAO_KHUNG_THAP).toBe(500)
+    expect(RONG_HAI_COT).toBe(640); expect(CAO_KHUNG_THAP).toBe(500) // 11/11 bố cục ngang: hai cột từ 640 (một ngưỡng với màn chặng), trước 700
   })
   it('máy dọc chưa vào bảng / máy ngang thật: không có thuộc tính xoay', () => {
     kho(390, 844)
@@ -100,8 +100,17 @@ describe('useHuongLive: thuộc tính xoay có NGAY lượt dựng đầu của 
     expect(b.container.querySelector('.bpu-hs')!.hasAttribute('data-xoay')).toBe(false)
     expect(lan.at(-1)!.giu).toBe(true) // vẫn giữ khoá ngang (Android) suốt live
   })
-  it('hình xoay hẹp (iPhone SE 375 × 667 ⇒ hình 667 × 375): xoay nhưng KHÔNG hai cột — đúng như máy ngang thật 667 px (@media ≥ 700 px không khớp)', () => {
+  it('hình xoay iPhone SE 375 × 667 ⇒ hình 667 × 375: xoay VÀ hai cột (11/11: ngưỡng 640, đúng như máy ngang thật 667 px — @media ≥ 640 px khớp)', () => {
     kho(375, 667)
+    const { container, rerender } = render(<Thu che="bang" bat />)
+    rerender(<Thu che="dau" bat />)
+    const g = container.querySelector<HTMLElement>('.bpu-hs')!
+    expect(g.hasAttribute('data-xoay')).toBe(true)
+    expect(g.hasAttribute('data-ngang')).toBe(true)
+    expect(g.hasAttribute('data-thap')).toBe(true)
+  })
+  it('hình xoay hẹp (iPhone SE đời đầu 320 × 568 ⇒ hình 568 × 320): xoay nhưng KHÔNG hai cột — như máy ngang thật 568 px (@media ≥ 640 px không khớp)', () => {
+    kho(320, 568)
     const { container, rerender } = render(<Thu che="bang" bat />)
     rerender(<Thu che="dau" bat />)
     const g = container.querySelector<HTMLElement>('.bpu-hs')!

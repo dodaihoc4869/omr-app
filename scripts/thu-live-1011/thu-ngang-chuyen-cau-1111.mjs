@@ -39,6 +39,9 @@ async function chup(t, ten) {
 const CAU = [
   { qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Alcohol nào sau đây là alcohol bậc II?', choices: ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Bậc alcohol', mucDo: 'hieu', sao: 2, kienThuc: [] },
   { qid: 'Q2', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', choices: ['NaCl', 'NaOH', 'HCl', 'NaHCO₃'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Phenol', mucDo: 'hieu', sao: 2, kienThuc: [] },
+  // 11/11 (bố cục ngang «một bên đề một bên chọn đáp án»): đúng–sai + trả lời ngắn để đo phần chọn đáp án trọn khung trên máy xoay hình / Android 740
+  { qid: 'Q3', maDe: 'm', version: '1', group: 'g', phan: 'II', text: 'Cho các phát biểu sau về phenol (C₆H₅OH) và ethanol (C₂H₅OH) ở điều kiện thường.', choices: [], ideas: ['Phenol tác dụng được với dung dịch NaOH, còn ethanol thì không.', 'Cả hai chất đều tác dụng với kim loại Na giải phóng khí H₂.', 'Phenol làm quỳ tím ẩm chuyển sang màu đỏ rõ rệt.', 'Dung dịch phenol tạo kết tủa trắng với nước bromine.'], hinhAnh: [], dang: null, tenDang: 'Phenol', mucDo: 'hieu', sao: 2, kienThuc: [] },
+  { qid: 'Q4', maDe: 'm', version: '1', group: 'g', phan: 'III', soO: 4, text: 'Cho 4,65 gam aniline tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam? (Làm tròn đến hàng phần trăm.)', choices: [], ideas: [], hinhAnh: [], dang: null, tenDang: 'Aniline', mucDo: 'van_dung', sao: 3, kienThuc: [] },
 ]
 
 /** kieu: 'that' (trang thật như khung nhìn) · 'android-khoa' (khoá hướng đổi khung nhìn) · 'iphone' (không toàn màn hình, không khoá hướng). */
@@ -206,6 +209,50 @@ await ngu(1300)
 const c3 = { A: await trang(A.t), B: await trang(B.t), C: await trang(C.t) }
 kiem(`(3) GỬI XONG · A, B, C về bảng live ngang (B không quay, C xoay CSS) — ${ghiChu(c3.B)}`, c3.A.man === 'bang' && c3.B.man === 'bang' && c3.C.man === 'bang' && c3.B.vp === '740×360' && c3.C.lvXoay && !c3.A.lvXoay)
 kiem(`(3) B · suốt ba trường hợp không nhả khoá ngang (nhả ${c3.B.nc.lanNha} lần)`, c3.B.nc.lanNha === 0)
+
+// ───────────── (4) BỐ CỤC NGANG «một bên đề một bên chọn đáp án» (thầy 11/11 tối): ba dạng câu trên A (ngang thật 844), B (Android 740), C (iPhone xoay hình) ─────────────
+/** Phần chọn đáp án theo TRỤC CỦA HÌNH: mọi nút trọn trong hình + chạm được (điểm giữa không bị che / cắt), ≥ 44 px; trang / thân / cột trả lời không cuộn;
+ *  tay nắm «Thầy đang live» không đè đầu màn / nút trả lời. */
+const doTra = (t) => t.evaluate(() => {
+  const g = document.querySelector('.bpu-hs'), W = innerWidth
+  if (!g) return null
+  const gXoay = g.hasAttribute('data-xoay')
+  const gr = g.getBoundingClientRect(), HW = gXoay ? gr.height : gr.width, HH = gXoay ? gr.width : gr.height
+  const hop = (e) => { const r = e.getBoundingClientRect(); return gXoay ? [r.top, W - r.right, r.bottom, W - r.left] : [r.left, r.top, r.right, r.bottom] }
+  const cat = (a, b) => a[0] < b[2] - 1 && b[0] < a[2] - 1 && a[1] < b[3] - 1 && b[1] < a[3] - 1
+  const cuon = (e) => !!e && e.scrollHeight > e.clientHeight + 1 && !/hidden|clip/.test(getComputedStyle(e).overflowY)
+  const tra = document.querySelector('.bpu-tra'), than = document.querySelector('.bpu-hs-than')
+  const nut = tra ? [...tra.querySelectorAll('button, [role=radio], .ht2-lam-o-hang')].filter((e) => e.getBoundingClientRect().width > 0) : []
+  const ngoai = nut.filter((e) => {
+    const b = hop(e)
+    if (b[0] < -0.5 || b[1] < -0.5 || b[2] > HW + 0.5 || b[3] > HH + 0.5) return true
+    const r = e.getBoundingClientRect(), o = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+    return !o || !(o === e || e.contains(o) || o.contains(e))
+  }).length
+  const nho = nut.filter((e) => !e.matches('.ht2-lam-o-hang') && (e.getBoundingClientRect().width < 43.5 || e.getBoundingClientRect().height < 43.5)).length
+  const nam = document.querySelector('.lv-phu .lv-nam'), tren = document.querySelector('.bpu-hs-tren')
+  const namDe = nam ? nut.filter((e) => cat(hop(e), hop(nam))).length + (tren && cat(hop(nam), hop(tren)) ? 1 : 0) : 0
+  return {
+    hinh: [Math.round(HW), Math.round(HH)], gXoay, soNut: nut.length, ngoai, nho, namDe, phieu: !!document.querySelector('.bpu-hs-than[data-gon]'),
+    cuon: document.scrollingElement.scrollHeight > innerHeight + 1 || cuon(g) || cuon(than) || cuon(tra),
+    hop: nut.map((e) => hop(e).map((v) => Math.round(v))), dau: tren ? Math.round(hop(tren)[3] - hop(tren)[1]) : 0,
+  }
+})
+for (const [ten, cau, dung] of [['đúng–sai', CAU[2], 'DSDS'], ['trả lời ngắn', CAU[3], '6,48'], ['trắc nghiệm', CAU[1], 'B']]) {
+  await may.moLuot(cau, dung)
+  for (const m of [A, B, C]) await m.t.locator('.lv').waitFor({ state: 'detached', timeout: 6000 })
+  await ngu(1500) // phông + mảnh chặng + đo kiểu phiếu
+  const d = { A: await doTra(A.t), B: await doTra(B.t), C: await doTra(C.t) }
+  for (const k of ['A', 'B', 'C']) {
+    const x = d[k]
+    kiem(`(4) NGANG · ${ten} · ${k} (hình ${x.hinh.join('×')}${x.gXoay ? ', xoay CSS' : ''}): ${x.soNut} nút trả lời trọn khung, chạm được, ≥ 44 px; không cuộn; tay nắm không đè`,
+      x.soNut > 0 && !x.ngoai && !x.nho && !x.cuon && !x.namDe, `ngoài ${x.ngoai} · nhỏ ${x.nho} · cuộn ${x.cuon} · tay nắm đè ${x.namDe} · phiếu ${x.phieu} · đầu ${x.dau}px`)
+  }
+  // ngang THẬT 844 × 390 (A) và XOAY HÌNH 844 × 390 (C) phải ra cùng một bố cục (luật sinh đôi `data-ngang` / `data-thap`)
+  const lech = d.A.hop.length !== d.C.hop.length ? 99 : Math.max(0, ...d.A.hop.flatMap((h, i) => h.map((v, j) => Math.abs(v - d.C.hop[i][j]))))
+  kiem(`(4) ${ten} · ngang thật (A) ≡ xoay hình (C): nút trả lời lệch tối đa ${lech} px`, lech <= 1)
+  if (ten !== 'trắc nghiệm') { await chup(B.t, `bo-cuc-${ten === 'đúng–sai' ? 'dung-sai' : 'tra-loi-ngan'}-android-740`); await chup(C.t, `bo-cuc-${ten === 'đúng–sai' ? 'dung-sai' : 'tra-loi-ngan'}-iphone-xoay-390`) }
+}
 
 // ───────────── E: đang làm câu ngang thì em XOAY LẠI DỌC (máy tự xoay) ⇒ câu dọc như cũ ─────────────
 await E.t.setViewportSize({ width: 390, height: 844 }); await E.t.evaluate(() => window.dispatchEvent(new Event('orientationchange'))); await ngu(900)

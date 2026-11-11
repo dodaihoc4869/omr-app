@@ -14,6 +14,8 @@ import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
 import { cheLiveCua, manEmXa, useHuongLive } from './luat-man-live'
+import { YDeNgang, useThanNgang } from './bo-cuc-ngang'
+import { NutGuiNoi } from './nut-gui-noi'
 import { coQuyenTatMan, conKhoaXoay, dangChiaDoi, dangXinQuyen, docQuyenTatMan, khoaXoay, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
 import KetQuaLenBangEm from './KetQuaLenBangEm'
@@ -546,6 +548,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   let day: React.ReactNode = null
   /** Nút gửi NỔI ở mép phải (10/11) — chỉ có khi em đang làm câu (chưa che, chưa mở đáp án, chưa hết giờ) hoặc đang chạy hiệu ứng gửi (thu vào mép). */
   let nutGui: React.ReactNode = null
+  let laCau = false // màn câu hỏi ⇒ thân hai cột khi ngang (bo-cuc-ngang.tsx)
   if (tt === 'tat' || tt === 'khong-buoi') {
     than = <div className="bpu-hs-giua"><h3>{tt === 'tat' ? 'Bình Phản Ứng đang tạm tắt' : 'Lớp chưa mở Bình Phản Ứng'}</h3><p>{tt === 'tat' ? 'Thầy sẽ chiếu câu như thường trên bảng.' : 'Khi thầy mở, câu sẽ tự hiện ở đây.'}</p></div>
     day = <button type="button" className="bpu-nut" onClick={onDong}>Đóng</button>
@@ -634,20 +637,22 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     }
     // Đang bay: đề còn nằm dưới lớp che vừa hiện (phương án em chọn bừng sáng màu đội); bay xong ⇒ gỡ đề khỏi màn (em không mở lại được).
     if (!che || dangBay) {
+      laCau = true
       than = (
         <>
-          <span className="m3-chip bpu-chip">{l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'}</span>
+          <div className="bpu-cot-de"><span className="m3-chip bpu-chip">{l.tuLuan ? 'Tự luận · làm ra giấy' : l.phan === 'I' ? 'Trắc nghiệm' : l.phan === 'II' ? 'Đúng–sai' : 'Trả lời ngắn'}</span>
           {deChang(q, l.so, LC ? LC.mucGiamThi(q) : null, che, !daMo || l.tuLuan ? null : !daGui || kb ? 'trung' : k?.dung ? 'dung' : 'sai')}
-          <div className="duo-tra bpu-tra">{l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
-            : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={che || daMo || hetGio} />
-            : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={che || daMo || hetGio} />
-            : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!che && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}</div>
+          <YDeNgang q={q} Chu={LC?.ChemText} tuLuan={!!l.tuLuan} /><div className="bpu-sau-tra">
           {LC && q.hinhAnh?.some((h) => h.viTri === 'cuoi_cau') ? boChang(<LC.HinhCuoiCau q={q} stt={l.so} />) : null}{/* ảnh cuối câu: trước 10/11 không hiện ở Bình Phản Ứng */}
           {daMo && !che && !l.tuLuan && l.dung && LC ? (
             <div className="bpu-loi-giai"><Suspense fallback={<div aria-busy="true" style={{ minHeight: 120 }} />}>
               <LoiGiaiKinhHs qid={String(l.qid ?? q.qid)} phan={l.phan} choices={q.choices} ideas={q.ideas} dapAn={l.dung} duPhong={<LoiGiaiDuPhong LG={LC.LoiGiaiCau as unknown as LoiGiaiCauKieu} q={q} solution={l.giai?.solution ?? null} dapAn={l.dung} hinhLoiGiai={(l.giai?.anh ?? []) as Question['hinhAnh']} />} />
             </Suspense></div>
-          ) : null}
+          ) : null}</div></div>
+          <div className="duo-tra bpu-tra">{l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
+            : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={che || daMo || hetGio} />
+            : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={che || daMo || hetGio} />
+            : <div className="bpu-tln"><LC.OTraLoiNgan value={chonHien} soO={q.soO} />{!che && !daMo && !hetGio ? <div className="bpu-phim">{PHIM_SO.map((p) => <button type="button" key={p} onClick={() => phimSo(p)} aria-label={p === '−' ? 'Đổi dấu' : p}>{p}</button>)}<button type="button" className="xoa" onClick={() => setChon((c) => c.slice(0, -1))}>Xoá</button></div> : null}</div>}</div>
           {!che && baoTra ? <div className="bpu-bao" role="status">{baoTra}</div> : null}
           {!che ? baoMang : null}
         </>
@@ -672,6 +677,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
   const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !!l && l.pha === 'tra-loi' && !che && !hetGio })
   const hl = useHuongLive(cheLive, liveBat)
+  const thanNgang = useThanNgang(gocRef, laCau ? q : null, !!l?.tuLuan, `${khoaLuot}|${LC ? 1 : 0}|${hl.the.style?.width}x${hl.the.style?.height}`)
   // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<LC.DeCau q={q} stt={l.so} />) : null
   const lopLive = lv && (lv.san || lv.bat) && veLive && !v?.ketThuc ? (
@@ -691,38 +697,13 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       {/* 10/11: thầy chấm em lên bảng ⇒ cả lớp thấy kết quả — có lớp che thì dải nằm trong lớp che (dưới thanh đội), không thì ngay dưới đầu màn. */}
       {lopChe || !ketQuaBang ? null : <div className="bpu-klb-hang">{ketQuaBang}</div>}
       {lopChe ? null : neoBd}
-      {than ? <main className="bpu-hs-than">{than}</main> : null}
+      {than ? <main {...thanNgang}>{than}</main> : null}
       {day ? <footer className="bpu-hs-day">{day}</footer> : null}
       {nutGui}
       {lopChe}
       {lopLive}
     </div>,
     document.body,
-  )
-}
-
-/** NÚT GỬI NỔI (thầy 10/11 «chuyển nút gửi đáp án sang mép phải giữa màn hình, khi học sinh chọn hết thì tự bật ra, còn chưa chọn hết thì ẩn đi»):
- *  viên thuốc dọc màu đội dính mép phải, giữa chiều cao màn (`position: fixed`). Chọn đủ (trắc nghiệm: một phương án; đúng–sai: đủ 4 ý; trả lời ngắn: có số)
- *  ⇒ trượt từ mép vào + rõ dần + nảy nhẹ; bỏ chọn bớt ⇒ thu lại vào mép. Lần ĐẦU bật ra trong lượt ⇒ quầng sáng nhịp 2 lần (lớp `quang` giữ suốt lượt nên
- *  bật lại không nhấp nháy nữa; lượt mới ⇒ `key` mới ⇒ trạng thái mới). Lúc ẩn: vẫn nằm trong cây (để trượt ra / vào) nhưng `inert` + `aria-hidden` +
- *  `disabled` ⇒ không chạm, không Tab, máy đọc màn hình bỏ qua.
- *  KHÔNG CHE phương án / ý đúng–sai / bàn phím số: thân màn chừa lề phải đủ rộng cho nút (`.bpu-hs.co-gui .bpu-hs-than`, chừa suốt lúc có nút — kể cả lúc
- *  nút ẩn — để bật / ẩn không làm chữ chạy dòng dưới tay em). Nhờ lề ấy bàn phím số cũng nằm gọn bên trái nút ⇒ không cần đặt nút riêng trên bàn phím. */
-function NutGuiNoi({ hien, tuLuan, onGui }: { hien: boolean; tuLuan: boolean; onGui: () => void }) {
-  // Gắn vào màn ở trạng thái ẨN rồi mới bật (một nhịp sau) ⇒ câu tự luận / câu vừa tới đã đủ chọn vẫn thấy nút trượt vào, không hiện bụp.
-  const [vao, setVao] = useState(false)
-  useEffect(() => { setVao(true) }, [])
-  const mo = hien && vao
-  const [quang, setQuang] = useState(false)
-  useEffect(() => { if (mo) setQuang(true) }, [mo])
-  return (
-    <button type="button" className={`bpu-gui-noi${quang ? ' quang' : ''}`} data-hien={mo} aria-label={tuLuan ? 'Em làm xong' : 'Gửi đáp án'}
-      aria-hidden={mo ? undefined : true} inert={!mo} tabIndex={mo ? undefined : -1} disabled={!mo} onClick={onGui}>
-      {tuLuan
-        ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.6 4.6L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3L10.2 13.8M21 3l-6.6 18-4.2-7.2L3 9.6 21 3z" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-      <span>{tuLuan ? 'Xong' : 'Gửi'}</span>
-    </button>
   )
 }
 
