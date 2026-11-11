@@ -1,0 +1,29 @@
+[
+  {
+    "i": 611,
+    "hash": "7163abfd6cf33d65e146279d6db46edc80deec31ce6aa5982e4949fe4d11f27c",
+    "fileNguon": "anh/7163abfd6cf33d65e146279d6db46edc80deec31ce6aa5982e4949fe4d11f27c.png",
+    "svg": "salicylate611-native-ddh-1fa456b80e479410921101f79eed83972f765097463fe74479b534772a2b8020.svg",
+    "hashSvg": "1fa456b80e479410921101f79eed83972f765097463fe74479b534772a2b8020",
+    "byteSvg": 36473,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-III-5",
+        "de": "Methyl salicylate dùng làm thuốc xoa bóp giảm đau, được điều chế từ salicylic acid và methanol theo phản ứng như hình dưới.\nĐể sản xuất 5,0 triệu tuýp thuốc xoa bóp giảm đau cần tối thiểu m tấn salicylic acid. Biết mỗi tuýp thuốc chứa 3,04 gam methyl salicylate và hiệu suất phản ứng tính theo salicylic acid là 75%. Giá trị của m là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "7163abfd6cf33d65e146279d6db46edc80deec31ce6aa5982e4949fe4d11f27c",
+            "where": "VIP27-C1-B1-ESTER-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "e1f05b39a1b8d958e718f12885a8c58a02609e791bd4963d5c0dd71d2ebaac34"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "16C8Oincludingmethanol-waterEXCLUDINGconditionHplus/2Ph6innerCCdouble/2COdouble2splitfeetCONTACTslopes-nativeV-NOaddedcrossbar/2HALFfilledharpoonsTOPrightABOVE-BOTTOMleftBELOW/ALLregularUPRIGHT3captions-chemicals-condition/EXACTSalicylicacid-Methanol-Methylsalicylate/OHfirstO-CH3firstCanchors/SUB3-2-SUPplus/0stereo-noadded75percent-massanswer-temp-coefficient-condensedCOOH",
+    "hashSvgDaSoat": "1fa456b80e479410921101f79eed83972f765097463fe74479b534772a2b8020",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
