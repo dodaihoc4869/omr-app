@@ -67,6 +67,8 @@ export interface LivePhong {
    *  Tiếp tục ⇒ có lại ngay. Thầy đặt bằng `live-dat { nghi }` (chỉ khi đang live). Chỉ thêm — phòng / máy bản cũ không có ⇒ coi như không dừng.
    *  Tên trường là `nghi` (KHÔNG đặt `dung`: trùng khoá đáp án `dung` mà test an toàn soát trên mọi tin tới máy em). */
   nghi?: boolean
+  /** XEM LẠI LIVE (11/11 — chỉ thêm): trạng thái máy ghi của máy thầy tự báo. VẮNG = công tắc `cau_hinh.live_xem_lai` tắt ⇒ view không có ngăn «Đang ghi». */
+  ghi?: 'dang-ghi' | 'loi' | 'tat'
 }
 /** ĐỢT 2 (giơ tay, mời nói, em ở xa) — luật phòng + máy chủ đã có và có test, nhưng GIAO DIỆN CHƯA MỞ (11/11: phiên chính dời đợt 2 sang lượt sau, chờ thử
  *  tiếng trên máy thật). Bật cờ này ⇒ máy em hiện nút «Giơ tay», màn chiếu hiện công tắc «Cho em ở xa vào xem». */
@@ -408,6 +410,8 @@ export function viewLiveBang(st: TrangThaiPhong, dem?: { xem: number; ws: number
     /** Thầy đang TẠM DỪNG live. */
     nghi: l.bat && !!l.nghi,
     tieng: (l.sfu ? 'bat' : 'chua-cau-hinh') as Exclude<TiengLive, 'tat'>,
+    /** Xem lại Live: 'dang-ghi' | 'loi' | 'tat'; vắng = công tắc tắt (màn chiếu không vẽ ngăn ghi). */
+    ...(l.ghi !== undefined ? { ghi: l.ghi } : {}),
   }
 }
 /** Em đang phát mic (mảng tối đa MỘT phần tử): tên, đội, `xa` = em ở xa (chưa điểm danh tại lớp ⇒ máy thầy mới tự phát tiếng em ra loa),
@@ -442,6 +446,8 @@ export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
     noi: duoc ? viewNoi(st, l) : [],
     /** Bố cục giấy đề thầy đang chiếu (chỉ số đo) — máy em dựng giấy cùng bề rộng, cùng cỡ chữ. */
     giay: duoc && l.bat ? (l.giay ?? null) : null,
+    /** Xem lại Live (điểm quyết 2): buổi live này đang được ghi ⇒ máy em đang bật mic hiện «Đang ghi để lớp xem lại». */
+    ...(duoc && l.bat && l.ghi === 'dang-ghi' ? { ghi: true } : {}),
   }
 }
 export type ViewLiveBang = ReturnType<typeof viewLiveBang>

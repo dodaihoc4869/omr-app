@@ -469,6 +469,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     /** …và `giay` = bố cục giấy đề đang chiếu (chỉ số đo; null = xoá) để máy em dựng giấy giống giấy của thầy. */
     dat: (o: { xa?: boolean; tiengLop?: boolean; bang?: boolean; giay?: unknown }): void => { tuy.kenh.gui({ t: 'live-dat', ...o }) },
     thuMic, datNgheEm, mucAmEm, moiNoi, haTay, tamDung,
+    /** (Xem lại Live 11/11 — chỉ thêm) Luồng tiếng cho MÁY GHI: mic thầy đang phát lên SFU + tiếng em đang kéo về (null = không có). Không đổi gì ở live. */
+    luongGhi: (): { mic: MediaStream | null; em: MediaStream | null } => ({ mic: tuBat && tt.tieng === 'mic' ? mic : null, em: tt.emNoi && amEm?.srcObject instanceof MediaStream ? amEm.srcObject : null }),
     nhanTinPhong, khiNoiLai,
     /** Số đo: gói đã gửi theo đường, RTT máy thầy ↔ SFU, số đo gộp của các máy em (phòng báo 10 giây một lần). */
     soDo: () => ({ ...dem, rtt, em: doEm, kenhNet: tt.kenhNet, emNoi: tt.emNoi ? { ...emSo } : null }),

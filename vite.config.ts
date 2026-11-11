@@ -401,6 +401,13 @@ export default defineConfig({
           '**/bo-cuc-????????.js',
           '**/but-bang-loi-*.js',
           '**/mau-chieu-*.js',
+          // XEM LẠI LIVE (11/11): máy ghi của máy thầy (mảnh lười + luồng thợ + LAME wasm tách rời, nạp lúc đang live) và màn Lịch sử Live của thầy
+          // (nạp khi bấm nút Live ở Hôm nay) ⇒ kho chạy-lúc; tệp wasm KHÔNG BAO GIỜ vào precache.
+          '**/may-ghi-*.js',
+          '**/mp3-*.wasm',
+          '**/LichSuLive-*.{js,css}',
+          '**/lich-su-live-api-*.js',
+          '**/xem-lai-ten-*.js',
           // Lời giải Kính (thầy chốt 02/11): khung + bộ tải sẵn chỉ app học sinh dùng ⇒ kho chạy-lúc + kho tải ngầm học sinh (KHO_HS_GOC), precache giữ 170.
           '**/LoiGiaiKinhHs-*.{js,css}',
           '**/tai-san-*.js',

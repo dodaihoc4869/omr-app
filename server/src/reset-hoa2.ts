@@ -58,6 +58,8 @@ export const BANG_XOA_HOA2: readonly string[] = [
 
 /** GIỮ — không bao giờ vào SQL xoá. `cau_hinh` và `game_v2_settings` chỉ bị GHI đúng vài dòng ở bước chốt (mùa game, `exp_moi`, xoá khoá P08). */
 export const BANG_GIU_HOA2: readonly string[] = [
+  // 11/11 Xem lại Live: chỉ mục buổi live + đoạn (tệp tiếng / nét nằm ở R2) — reset D1 KHÔNG được làm mồ côi tệp R2; chỉ thầy xoá ở «Lịch sử Live» ⇒ GIỮ
+  'live_buoi', 'live_doan',
   // Hỏi thầy: bằng chứng học tập và biên nhận, luôn bảo toàn.
   'hoi_thay_kiem', 'hoi_thay_can_giup', 'hoi_thay_ho_tro_receipt',
   'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',

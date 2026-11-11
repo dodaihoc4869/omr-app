@@ -25,6 +25,8 @@ export interface ChuPhong {
   phat(): void
   /** Báo máy các em qua kênh đẩy (mở màn Bình Phản Ứng) — đợt 2: gọi em ở xa vào xem khi thầy bật «Cho em ở xa vào xem». Không có ⇒ bỏ qua. */
   bao?(sbd: string[]): void
+  /** XEM LẠI LIVE (11/11, live-xem-lai.ts — chỉ thêm): nhật ký nét kèm giờ + tin `live-ghi` của máy ghi. Vắng ⇒ không ghi gì. */
+  xl?: { khung(k: Uint8Array, nay: number): void; bat(so: readonly Uint8Array[], nay: number): void; tinGhi(st: TrangThaiPhong, j: Row, nay: number): boolean }
 }
 
 /** Sổ nét lưu theo MẢNH: mỗi mảnh tối đa ngần này khung (khung ≤ 16 KB ⇒ mảnh ≤ 512 KB, dưới trần 2 MB một giá trị của Durable Object lớp SQLite). */
@@ -158,6 +160,7 @@ export class LiveMay {
     }
     if (!this.daXinAnh && (ds.length > SO_MEM.muc || this.soByte > SO_MEM.byte)) { this.daXinAnh = true; this.gui(ws, '{"t":"live-can-anh"}') }
     LL.liveNhip(st, nay)
+    if (l.bat) this.chu.xl?.khung(k, nay) // Xem lại Live: nhật ký nét chỉ-nối
     this.lamMoiDs(nay, l.phien)
     for (const w of this.dsHs!) this.gui(w, goc)
   }
@@ -213,13 +216,14 @@ export class LiveMay {
       if (t === 'live-san') doi = LL.liveSan(st, { san: j.san !== false, ss: j.ss }, nay)
       else if (t === 'live-bat') {
         doi = LL.liveBat(st, nay)
-        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
+        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay; if (this.chu.xl) this.chu.xl.bat(await this.docSo(st), nay) } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
       } else if (t === 'live-tat') { doi = this.tat(st, nay) }
       else if (t === 'live-dat') {
         const xaTruoc = l.xa
         doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang, giay: j.giay, nghi: j.nghi }, nay)
         if (l.xa && !xaTruoc) this.goiXa(st, nay) // vừa bật «Cho em ở xa vào xem» ⇒ gọi máy các em ở xa
       }
+      else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay) // Xem lại Live: máy ghi báo trạng thái + mẫu đồng hồ
       // ĐỢT 2 (đặc tả 4.8): thầy «Thu mic» (một em) / «Tắt mic tất cả» · «Mời nói» · «Hạ hết tay» / hạ tay một em. Phòng gỡ + đóng track ở SFU khi phát view.
       else if (t === 'live-thu-mic') doi = LL.liveThu(st, nay, typeof j.sbd === 'string' && j.sbd ? j.sbd : undefined)
       else if (t === 'live-moi') doi = LL.liveMoi(st, String(j.sbd ?? ''), nay)
