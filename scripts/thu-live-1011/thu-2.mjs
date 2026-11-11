@@ -3,7 +3,7 @@
 // (may-chu.mjs). Dữ liệu giả, không chạm máy chủ thật. Thay cho kịch bản «em gửi xong vẫn ở màn câu hỏi» của thu.mjs (luật màn đã đổi 11/11).
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu-2.mjs <thư mục tạm> [thư mục ảnh = docs/ban-ve-live-1011] [tệp số đo = docs/ban-ve-live-1011/so-do-that-2.json]
-// Kịch bản: bật live ⇒ thanh màn chiếu gom vào một nút (K5) ⇒ máy em đang làm: tay nắm MÉP TRÊN, trên đầu thẻ đội / tên (K4 + M3 — thầy 11/11 lần 2) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy đề soi đúng
+// Kịch bản: bật live ⇒ thanh màn chiếu gọn, nút phụ trong khay của nút «thêm» (K5) ⇒ máy em đang làm: tay nắm MÉP TRÊN, trên đầu thẻ đội / tên (K4 + M3 — thầy 11/11 lần 2) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy đề soi đúng
 // giấy thầy (B1) ⇒ thầy gạch chân trên giấy ⇒ nét khớp chữ ⇒ thầy gọi lên bảng ⇒ em CHƯA gửi bị ép vào bảng live, có dải đoán / tiếp sức (K2, B3) ⇒
 // tạm dừng / tiếp tục / kết thúc trong cửa sổ nút Live (K3) ⇒ em rời màn ⇒ thẻ ghi kiểu rời (B2) ⇒ chạm hai lần phóng bảng.
 // KHÔNG kiểm được ở đây: TIẾNG (cửa /bpu/live của máy chủ thử trả «chưa cấu hình» — cần Cloudflare Realtime SFU thật + mic thật), khoá xoay Android, iPhone thật.
@@ -108,13 +108,14 @@ await chup(thay, 'thay-cua-so-bat-live-trai-1366')
 await to.locator('.mc-lv-the [data-lv="bat-dau"]').click().catch(() => to.locator('.mc-lv-the [data-lv="khong-tieng"]').click())
 await to.locator('.mc-lv-cum b#mc-lv-dh').waitFor({ timeout: 10000 })
 await ngu(500)
-// K5: thanh gom vào một nút
-const an = async () => to.locator('#mc-phim-nhom, #mc-len-bang, #mc-cai-btn').evaluateAll((ds) => ds.filter((e) => e.getClientRects().length > 0).length)
-kiem('K5 · đang live: thanh dưới gom — nhóm phím / «Lên bảng» / «Cài đặt» ẩn sau MỘT nút lưới', await an() === 0 && await to.locator('.mc-lv-gon').isVisible())
+// K5 (sửa chiều 11/11, thầy: «Phần nút ở dưới chưa gọn»): thanh gọn ở MỌI trạng thái — nút phụ nằm trong khay của nút «thêm» (src/lib/thanh-day-to-chieu.ts),
+// «Lên bảng» ở lại trên thanh. Kiểm kỹ từng khổ + ảnh that-3-thanh-*: scripts/thu-live-1011/thu-thanh-day-1111.mjs.
+const an = async () => to.locator('#mc-khay button').evaluateAll((ds) => ds.filter((e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility === 'visible').length)
+kiem('K5 · đang live: nút phụ nằm trong khay đang đóng; trên thanh còn «Lên bảng» + nút «thêm»', await an() === 0 && await to.locator('#mc-them').isVisible() && await to.locator('#mc-len-bang').isVisible())
 await chup(thay, 'thay-thanh-gom-1366')
-await to.locator('.mc-lv-gon').click()
+await to.locator('#mc-them').click()
 await ngu(350)
-kiem('K5 · bấm nút lưới ⇒ các nút xoè ra, không tràn màn 1366', await an() >= 2 && await to.locator('#mc-cai-btn').evaluate((e) => e.getBoundingClientRect().right <= 1366))
+kiem('K5 · bấm nút «thêm» ⇒ khay xoè, nằm trọn trong màn 1366', await an() >= 2 && await to.locator('#mc-khay').evaluate((e) => e.getBoundingClientRect().right <= 1366 && e.getBoundingClientRect().left >= 0))
 await chup(thay, 'thay-thanh-xoe-1366')
 await thay.mouse.click(600, 300)
 await ngu(250)
@@ -329,7 +330,7 @@ await to.locator('.mc-lv-the [data-lv="tat"]').waitFor({ state: 'visible', timeo
 await to.locator('.mc-lv-the [data-lv="tat"]').click()
 await em.t.locator('.lv').waitFor({ state: 'detached', timeout: 6000 })
 await ngu(400)
-kiem('K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», thanh hết gom', may.trangThai().live.bat === false && await to.locator('.mc-lv-nut').isVisible() && await to.locator('.mc-lv-gon').isHidden() && await em.t.locator('.lv-phu').count() === 0)
+kiem('K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», nút «thêm» vẫn ở cuối thanh', may.trangThai().live.bat === false && await to.locator('.mc-lv-nut').isVisible() && await to.locator('#mc-them').isVisible() && await em.t.locator('.lv-phu').count() === 0)
 await chup(thay, 'thay-sau-ket-thuc-1366')
 
 // AN TOÀN: suốt kịch bản, trước khi thầy mở đáp án, không tin nào tới máy em mang đáp án
