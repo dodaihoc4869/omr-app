@@ -629,5 +629,5 @@ B2 (mô hình có sẵn trên Hugging Face qua runner): KHÔNG làm — điều 
   | VLSP 2020 VinAI (1 mảnh) | CC BY 4.0 | 16 kHz | 4 cụm (2 / 2) · 1,2 | 12 cụm · 0,6 |
   | LibriSpeech dev + test-clean | CC BY 4.0 | 16 kHz | 72 (36 / 36) · ≈ 9,5 | 8 (gồm 1320, 8230) · ≈ 1,0 |
   | AISHELL-1 (60 người đầu) | Apache 2.0 | 16 kHz | 52 (21 / 31) · 2,6 | 8 · 0,4 |
-  | DEMAND OMEETING / PCAFETER / SCAFE (ồn) | CC BY-SA 3.0 | **48 kHz** | 5 tệp · 0,4 | 1 tệp · 0,1 |
-  | MUSAN noise (ồn) | CC0 / CC BY / phạm vi công cộng | 16 kHz | đang tải lúc ghi (đọc theo dòng 11 GB, phần noise nằm sau) | — |
+  | DEMAND (ồn thật: căng-tin, quán cà phê, phòng họp; kênh 1 + 9) | CC BY-SA 3.0 | **48 kHz** | căng-tin + quán cà phê · 0,33 | phòng họp · 0,17 — tách THEO MÔI TRƯỜNG |
+  | MUSAN noise | — | — | KHÔNG lấy: phần noise nằm sau ≈ 10 GB nhạc + tiếng nói của tệp nén (đọc theo dòng ≈ 1,6 MB/s) ⇒ dừng; DEMAND 48 kHz thay cho ồn + xôn xao | — |

@@ -65,7 +65,7 @@ def tamChung():
     t = np.mean(vs, 0); return t / (np.linalg.norm(t) + 1e-9)
 
 for id, nh, tieuDe, p in ung:
-    if id in muc['video'] and muc['video'][id].get('xong'): continue
+    if id in muc['video'] and muc['video'][id].get('xong') is True: continue
     t0 = time.time(); print(f'== {id} [{nh}] {tieuDe[:60]}', flush=True)
     v = {'id': id, 'nhom': nh, 'tieuDe': tieuDe, 'tepGoc': os.path.basename(p), 'xong': True}
     r = subprocess.run(['ffmpeg', '-v', 'error', '-i', p, '-vn', '-ac', '1', '-ar', str(HZ), '-f', 'f32le', '-'], capture_output=True)

@@ -219,11 +219,11 @@ elif KHO == 'musan-noise':
                 x, sr = doc(tf.extractfile(m).read(), 'wav')
                 if x is None: continue
                 dd = os.path.join(D, ph[2]); os.makedirs(dd, exist_ok=True); ghiFlac(x, sr, os.path.join(dd, ph[-1][:-4] + '.flac')); tong += len(x) / sr; srs.add(sr)
-                (tepC if zlib.crc32(ph[-1].encode()) % 10 == 0 else tepL).append(ph[2] + '/' + ph[-1][:-4])
+                pass
             elif daQua and len(ph) >= 2 and ph[1] not in ('noise', ''): break
     ds = {'kho': 'MUSAN — phần noise (OpenSLR 17)', 'loai': 'on', 'giayPhep': 'theo từng thư mục (musan/noise/*/LICENSE): free-sound CC0 / CC BY, sound-bible CC BY / phạm vi công cộng',
           'licenseGoc': lic, 'nguon': G, 'sr_goc': sorted(srs), 'dinhDang': 'FLAC mono 16 bit, giữ tần số gốc; ≤ 3 giờ', 'giay': round(tong),
-          'nguoi': {}, 'tapLuyen': tepL, 'tapCham': tepC, 'ghiChu': 'ồn, không có người: tapLuyen / tapCham là danh sách TỆP (crc32 % 10 == 0 ⇒ chấm)'}
+          'nguoi': {}, 'tapLuyen': ['free-sound'], 'tapCham': ['sound-bible'], 'ghiChu': 'ồn, không có người: tách luyện / chấm THEO THƯ MỤC NGUỒN (free-sound ⇒ luyện, sound-bible ⇒ chấm)'}
 elif KHO == 'aishell':
     G = 'https://www.openslr.org/resources/33/'
     gioi, nguoi, srs = {}, {}, set()
@@ -265,11 +265,11 @@ elif KHO == 'demand':
                 if x is None: continue
                 dd = os.path.join(D, moi); os.makedirs(dd, exist_ok=True); t = os.path.basename(n)[:-4]
                 ghiFlac(x, sr, os.path.join(dd, t + '.flac')); tong += len(x) / sr; srs.add(sr)
-                (tepC if t == 'ch09' and moi == 'OMEETING' else tepL).append(f'{moi}/{t}')
+                pass
         os.remove(zp)
     ds = {'kho': 'DEMAND (Zenodo 1227121) — OMEETING / PCAFETER / SCAFE, kênh 1 + 9', 'loai': 'on', 'giayPhep': 'CC BY-SA 3.0', 'nguon': G, 'sr_goc': sorted(srs),
-          'dinhDang': 'FLAC mono 16 bit 48 kHz gốc', 'giay': round(tong), 'nguoi': {}, 'tapLuyen': tepL, 'tapCham': tepC,
-          'ghiChu': 'ồn thật DẢI RỘNG 48 kHz (phòng họp, căng-tin xôn xao, quán cà phê); tapLuyen / tapCham là danh sách TỆP'}
+          'dinhDang': 'FLAC mono 16 bit 48 kHz gốc', 'giay': round(tong), 'nguoi': {}, 'tapLuyen': ['PCAFETER', 'SCAFE'], 'tapCham': ['OMEETING'],
+          'ghiChu': 'ồn thật DẢI RỘNG 48 kHz (phòng họp, căng-tin xôn xao, quán cà phê); hai kênh là hai mic của CÙNG một bản ghi ⇒ tách luyện / chấm THEO MÔI TRƯỜNG'}
 else: sys.exit('kho lạ')
 assert not set(ds['tapLuyen']) & set(ds['tapCham'])
 json.dump(ds, open(os.path.join(D, 'ds.json'), 'w'), ensure_ascii=False, indent=1)

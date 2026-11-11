@@ -32,9 +32,14 @@
    "gioLuyen": null,
    "gioCham": null,
    "gioOn": 0.5,
-   "tepLuyen": 5,
-   "tepCham": 1,
-   "ghiChu": "ồn thật DẢI RỘNG 48 kHz (phòng họp, căng-tin xôn xao, quán cà phê); tapLuyen / tapCham là danh sách TỆP"
+   "ghiChu": "ồn thật DẢI RỘNG 48 kHz; <kho>/<môi trường>/ch01|ch09.flac (hai mic của CÙNG một bản ghi 5 phút) ⇒ tách luyện / chấm THEO MÔI TRƯỜNG: luyện căng-tin + quán cà phê, chấm phòng họp",
+   "moiTruongLuyen": [
+    "PCAFETER",
+    "SCAFE"
+   ],
+   "moiTruongCham": [
+    "OMEETING"
+   ]
   },
   "fleurs-vi": {
    "ten": "FLEURS vi_vn (google/fleurs, dev + test)",
@@ -122,5 +127,11 @@
    "gioCham": 0.56,
    "ghiChu": "CAM++ (WeSpeaker VoxCeleb) 8 s đầu mỗi tệp; tâm cụm cos ≥ 0,55; gộp tâm ≥ 0,6; cụm < 3 tệp bỏ"
   }
+ },
+ "khongLay": {
+  "musan-noise": "dừng: phần noise nằm sau ≈ 10 GB của tệp nén, DEMAND 48 kHz thay",
+  "common-voice-vi": "đã gỡ khỏi Hugging Face (cần Mozilla Data Collective, đăng nhập)",
+  "bud500": "cần đăng nhập (gated)",
+  "youtube-giong-thay": "0 phút — bị chặn bot-check, hệ thống quyền chặn việc lách"
  }
 }
