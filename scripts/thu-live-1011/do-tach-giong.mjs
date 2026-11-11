@@ -143,7 +143,7 @@ async function chayMoHinh(vao, tT, tO) {
   }
   const giuDai = Object.fromEntries(DAI.map(([a, b], j) => [`${a / 1000}-${b / 1000}kHz`, +(10 * Math.log10(eR[j] / Math.max(eV[j], 1e-20))).toFixed(1)]))
   giuDai['11-24kHz'] = +(20 * Math.log10(Math.max(cao / Math.max(nCao, 1), 1e-6))).toFixed(1)
-  return { ra, tre: K, g, rO, msCuaSo: ms / nK, rtf: ms / nK / 10, usKhung: (ms / nK) * 1000, ban: w.h.ban, giuDai }
+  return { ra, tre: K, g, rO, rT, msCuaSo: ms / nK, rtf: ms / nK / 10, usKhung: (ms / nK) * 1000, ban: w.h.ban, giuDai }
 }
 
 // ── số đo ──
@@ -177,12 +177,18 @@ for (const snr of (process.env.LV_SNR ?? '0,2,10').split(',').map(Number)) {
       const tre = r.tre ?? 0
       const khacGiam = db(nl(doan(c.vao, c.nhan, 2)) / nl(doan(r.ra, c.nhan, 2, tre)))
       const chongKhac = r.rO ? db(nl(doan(c.tO, c.nhan, 3)) / nl(doan(r.rO, c.nhan, 3, tre))) : r.g ? db(nl(doan(c.tO, c.nhan, 3)) / nl(doan(c.tO.map((v, i) => v * r.g[Math.floor(i / K)]), c.nhan, 3))) : null
+      // LƯỢT 3: giọng khác lọt THEO THỜI GIAN từ lúc người khác bắt đầu nói (đoạn «khác một mình») — lọt dồn ở đầu lượt (trạng thái GRU còn «thầy») hay đều
+      const theoTg = {}
+      if (r.rO) { const MOC = [[0, 250], [250, 500], [500, 1000], [1000, 2000], [2000, 4000]], eV = MOC.map(() => 0), eR = MOC.map(() => 0); let k0 = -1
+        for (let k = 0; k < c.nhan.length; k++) { if (c.nhan[k] !== 2) { k0 = -1; continue } if (k0 < 0) k0 = k; const ms = ((k - k0) * K * 1000) / HZ, j0 = MOC.findIndex(([a, b]) => ms >= a && ms < b); if (j0 < 0) continue
+          for (let j = 0; j < K; j++) { eV[j0] += (c.tO[k * K + j] ?? 0) ** 2; eR[j0] += (r.rO[k * K + j + tre] ?? 0) ** 2 } }
+        MOC.forEach(([a, b], j) => { theoTg[`${a}-${b}ms`] = +db(eV[j] / Math.max(eR[j], 1e-20)).toFixed(1) }) }
       const tGiu = siSdr(doan(r.ra, c.nhan, 1, tre), doan(c.vao, c.nhan, 1))
       const chong = siSdr(doan(r.ra, c.nhan, 3, tre), doan(c.tT, c.nhan, 3)), chong0 = siSdr(doan(c.vao, c.nhan, 3), doan(c.tT, c.nhan, 3))
       let ha = 0, ha1 = 0, tong = 0; if (r.g) for (let k = 0; k < c.nhan.length; k++) if (c.nhan[k] === 1 || c.nhan[k] === 4) { let e = 0; for (let j = 0; j < K; j++) e += (c.tT[k * K + j] ?? 0) ** 2; if (e / K > 1e-6) { tong++; if (r.g[k] < 0.708) { ha++; if (c.nhan[k] === 1) ha1++ } } }
       const dong = { snr, khac: ten, cach: ten2, khacGiamDb: +khacGiam.toFixed(1), chongKhacGiamDb: chongKhac == null ? null : +chongKhac.toFixed(1), thayGiuSiSdr: +tGiu.toFixed(1), chongSiSdr: +chong.toFixed(1), chongSiSdr0: +chong0.toFixed(1),
         thayBiHaPt: r.g ? +((100 * ha) / Math.max(1, tong)).toFixed(1) : null, thayMotMinhBiHa: r.g ? ha1 : null, moSauKhacMs: r.g ? moSau(r.g, c.nhan, c.tT) : null, daiTanHz: daiTan(doan(r.ra, c.nhan, 1, tre), doan(c.vao, c.nhan, 1)), treMs: (tre * 1000) / HZ,
-        msCuaSo: r.msCuaSo ? +r.msCuaSo.toFixed(1) : null, rtf: r.rtf ? +r.rtf.toFixed(3) : null, usKhung: r.usKhung ? +r.usKhung.toFixed(1) : null, bv: r.bv || null, ...(r.giuDai ? { giuDai: r.giuDai, ban: r.ban } : {}) }
+        msCuaSo: r.msCuaSo ? +r.msCuaSo.toFixed(1) : null, rtf: r.rtf ? +r.rtf.toFixed(3) : null, usKhung: r.usKhung ? +r.usKhung.toFixed(1) : null, bv: r.bv || null, ...(r.giuDai ? { giuDai: r.giuDai, ban: r.ban } : {}), ...(r.rO ? { khacGiamTheoTg: theoTg } : {}), ...(r.rT ? { thayHaDb: +db(nl(doan(c.tT, c.nhan, 1)) / nl(doan(r.rT, c.nhan, 1, tre))).toFixed(1) } : {}) }
       ketQua.ca.push(dong)
       console.log(JSON.stringify(dong))
       if (process.env.LV_DONG && ten2 === 'chi-thay' && `${snr}-${ten}` === (process.env.LV_CA ?? '0-hs-nam')) { writeFileSync(process.env.LV_DONG, dongTg.join('\n')); process.exit(0) }
