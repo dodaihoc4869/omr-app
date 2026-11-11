@@ -11,7 +11,7 @@ import { giaiGoi, giaiSo } from './ma-net'
 import { taoDemPhat } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo } from './so-do'
-import { choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
+import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
   /** Vé phòng của em (`/hs/bpu/ve` hoặc `/hs/bpu/cua-em`). */
@@ -285,12 +285,14 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       try {
         tx = p.addTransceiver(track, { direction: 'sendonly' })
         micTx = tx
-        await p.setLocalDescription({ type: 'offer', sdp: suaSdpOpus((await p.createOffer()).sdp ?? '') })
+        await p.setLocalDescription({ type: 'offer', sdp: suaSdpOpus((await p.createOffer()).sdp ?? '', OPUS_EM) })
         await choIce(p, mt)
         const r = await goiCua(mt, tuy.goc, 'phat', { ve: tuy.ve, phien, sdp: p.localDescription?.sdp ?? '', tracks: [{ mid: tx.mid ?? '', ten: 'mic' }] })
         // Có câu trả lời của SFU thì luôn áp (kể cả khi phòng từ chối sau đó) để máy trạng thái SDP về ổn định; không có ⇒ lùi lời mời.
-        if (r.sdp) await p.setRemoteDescription({ type: 'answer', sdp: suaSdpOpus(r.sdp) })
-        else await p.setLocalDescription({ type: 'rollback' }).catch(() => undefined)
+        if (r.sdp) {
+          await p.setRemoteDescription({ type: 'answer', sdp: suaSdpOpus(r.sdp, OPUS_EM) })
+          try { const ts = tx.sender.getParameters(); if (ts.encodings?.length) { ts.encodings[0]!.maxBitrate = OPUS_EM.bitrate!; await tx.sender.setParameters(ts) } } catch { /* dùng trần trong SDP */ }
+        } else await p.setLocalDescription({ type: 'rollback' }).catch(() => undefined)
         if (!r.ok) {
           ngatMic(r.lyDo === 'chua-duoc-moi' ? 'tat' : 'loi')
           if (r.lyDo !== 'chua-duoc-moi' && live?.emMoi) tuy.kenh.gui({ t: 'live-mic-loi', ly: 'loi' })
