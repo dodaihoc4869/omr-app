@@ -1,0 +1,646 @@
+{
+  "i": 460,
+  "assetIndexProvided": 1228,
+  "hash": "53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1.png",
+  "size": [
+    810,
+    275
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-L7-0701-I-8",
+      "de": "Trong công nghiệp, hydrogen hóa chất béo không no thành chất béo no để sản xuất các loại bơ nhân tạo. Chất béo X công thức cấu tạo như sau. Hydrogen hóa hoàn toàn 1 mol chất béo X (xúc tác Ni, $t^\\circ$) cần dùng ***a*** mol khí $\\ce{H2}$. Giá trị của ***a*** là",
+      "allHinh": [
+        {
+          "hash": "53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1",
+          "where": "VIP27-BDT-L7-0701-I-8.hinh.0.du_lieu",
+          "hashDataUrl": "c175c7e19543eaecdea1ea942bfca9591b8bb6383b375402c005252a2557e7e8"
+        }
+      ],
+      "missingHashes": [
+        "53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownEachThreeCO12xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativepixelvertex/foot/bboxnearest1pxapprox; chaincountsfromvisibleverticesnotfatnames/theory. Contact-preservingintersectionscalculatedbelowNOTsubpixelrastermeasurement.",
+  "geometry": {
+    "glycerolBareC": [
+      [
+        7,
+        122
+      ],
+      [
+        38,
+        166
+      ],
+      [
+        7,
+        211
+      ]
+    ],
+    "glycerolBonds": [
+      [
+        [
+          7,
+          122
+        ],
+        [
+          38,
+          166
+        ]
+      ],
+      [
+        [
+          38,
+          166
+        ],
+        [
+          7,
+          211
+        ]
+      ]
+    ],
+    "esterO": [
+      {
+        "text": "O",
+        "bbox": [
+          27,
+          71,
+          48,
+          93
+        ],
+        "bonds": [
+          [
+            [
+              7,
+              122
+            ],
+            [
+              29,
+              91
+            ]
+          ],
+          [
+            [
+              48,
+              71
+            ],
+            [
+              77,
+              52
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          70,
+          159,
+          91,
+          182
+        ],
+        "bonds": [
+          [
+            [
+              38,
+              166
+            ],
+            [
+              68,
+              166
+            ]
+          ],
+          [
+            [
+              89,
+              159
+            ],
+            [
+              118,
+              131
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          27,
+          249,
+          48,
+          273
+        ],
+        "bonds": [
+          [
+            [
+              7,
+              211
+            ],
+            [
+              31,
+              246
+            ]
+          ],
+          [
+            [
+              48,
+              250
+            ],
+            [
+              82,
+              230
+            ]
+          ]
+        ]
+      }
+    ],
+    "chains": [
+      {
+        "vertices": [
+          [
+            77,
+            52
+          ],
+          [
+            117,
+            77
+          ],
+          [
+            156,
+            52
+          ],
+          [
+            196,
+            77
+          ],
+          [
+            235,
+            52
+          ],
+          [
+            275,
+            77
+          ],
+          [
+            314,
+            52
+          ],
+          [
+            353,
+            77
+          ],
+          [
+            393,
+            52
+          ],
+          [
+            432,
+            77
+          ],
+          [
+            472,
+            52
+          ],
+          [
+            511,
+            77
+          ],
+          [
+            551,
+            52
+          ],
+          [
+            591,
+            77
+          ],
+          [
+            630,
+            52
+          ],
+          [
+            670,
+            77
+          ]
+        ],
+        "CCDoublePairs1Based": [],
+        "innerParallelRays": []
+      },
+      {
+        "vertices": [
+          [
+            118,
+            131
+          ],
+          [
+            156,
+            167
+          ],
+          [
+            194,
+            130
+          ],
+          [
+            233,
+            167
+          ],
+          [
+            272,
+            130
+          ],
+          [
+            310,
+            167
+          ],
+          [
+            349,
+            130
+          ],
+          [
+            387,
+            167
+          ],
+          [
+            426,
+            130
+          ],
+          [
+            479,
+            130
+          ],
+          [
+            518,
+            167
+          ],
+          [
+            557,
+            130
+          ],
+          [
+            610,
+            130
+          ],
+          [
+            649,
+            167
+          ],
+          [
+            687,
+            130
+          ],
+          [
+            726,
+            167
+          ],
+          [
+            764,
+            130
+          ],
+          [
+            803,
+            167
+          ]
+        ],
+        "CCDoublePairs1Based": [
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              429,
+              137
+            ],
+            [
+              476,
+              137
+            ]
+          ],
+          [
+            [
+              560,
+              137
+            ],
+            [
+              607,
+              137
+            ]
+          ]
+        ]
+      },
+      {
+        "vertices": [
+          [
+            82,
+            230
+          ],
+          [
+            119,
+            255
+          ],
+          [
+            157,
+            230
+          ],
+          [
+            195,
+            255
+          ],
+          [
+            233,
+            230
+          ],
+          [
+            271,
+            255
+          ],
+          [
+            309,
+            230
+          ],
+          [
+            346,
+            255
+          ],
+          [
+            384,
+            230
+          ],
+          [
+            422,
+            255
+          ],
+          [
+            465,
+            255
+          ],
+          [
+            502,
+            230
+          ],
+          [
+            540,
+            255
+          ],
+          [
+            578,
+            230
+          ],
+          [
+            615,
+            255
+          ],
+          [
+            653,
+            230
+          ],
+          [
+            691,
+            255
+          ],
+          [
+            729,
+            230
+          ]
+        ],
+        "CCDoublePairs1Based": [
+          [
+            10,
+            11
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              423,
+              250
+            ],
+            [
+              463,
+              250
+            ]
+          ]
+        ]
+      }
+    ],
+    "carbonyls": [
+      {
+        "apex": [
+          77,
+          52
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            67,
+            4,
+            87,
+            28
+          ]
+        },
+        "rays": [
+          [
+            [
+              75,
+              26
+            ],
+            [
+              75,
+              53.31
+            ]
+          ],
+          [
+            [
+              79,
+              26
+            ],
+            [
+              79,
+              53.25
+            ]
+          ]
+        ],
+        "apexJoin": [
+          [
+            75,
+            53.31
+          ],
+          [
+            77,
+            52
+          ],
+          [
+            79,
+            53.25
+          ]
+        ]
+      },
+      {
+        "apex": [
+          118,
+          131
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            107,
+            89,
+            128,
+            112
+          ]
+        },
+        "rays": [
+          [
+            [
+              116,
+              111
+            ],
+            [
+              116,
+              132.93
+            ]
+          ],
+          [
+            [
+              120,
+              111
+            ],
+            [
+              120,
+              132.89
+            ]
+          ]
+        ],
+        "apexJoin": [
+          [
+            116,
+            132.93
+          ],
+          [
+            118,
+            131
+          ],
+          [
+            120,
+            132.89
+          ]
+        ]
+      },
+      {
+        "apex": [
+          82,
+          230
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            71,
+            190,
+            92,
+            213
+          ]
+        },
+        "rays": [
+          [
+            [
+              80,
+              212
+            ],
+            [
+              80,
+              231.18
+            ]
+          ],
+          [
+            [
+              84,
+              212
+            ],
+            [
+              84,
+              231.35
+            ]
+          ]
+        ],
+        "apexJoin": [
+          [
+            80,
+            231.18
+          ],
+          [
+            82,
+            230
+          ],
+          [
+            84,
+            231.35
+          ]
+        ]
+      }
+    ],
+    "COFeetNote": "Each12xnativebothverticalfeetCONTACT2correspondingslopes, sourceblackshallowapexVbetweenfeet. DoNOTleavefalsegap/deleteV/createflatbridge. RayglyphendsO26/111/212touchornearOlowinknative; noaddedatom.",
+    "font": "ALL6Oregularuprightserifblack; clearcontrastthin/thick, noactualbold/italic. Bondsblackuniform~1.5px.",
+    "counts": {
+      "glycerolC": 3,
+      "acylC": [
+        16,
+        18,
+        18
+      ],
+      "totalC": 55,
+      "O": 6,
+      "COdouble": 3,
+      "CCdoubleByChain": [
+        0,
+        2,
+        1
+      ],
+      "CCdoubleTotal": 3,
+      "captions": 0,
+      "arrows": 0
+    },
+    "noAdded": [
+      "hydrogenationanswer",
+      "H2coefficient",
+      "Ni/tcondition",
+      "H/CH2labels",
+      "captionX",
+      "acidnames",
+      "extraCCdouble",
+      "aliases",
+      "falsegapCOfeet"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFull": true,
+    "allPublicRefs": true,
+    "freshChromium3x": "/workspace/scratch/root365-460.png",
+    "ownThreeCoMacros": true,
+    "verdict": "Đạt:55C6O/CC0-2-1/3COcontactslopes/regularO/geometryliteral",
+    "fractionalFeet": "CALCULATED from approximate slopes, not native subpixel measurement",
+    "finalHashSvg": "3cd973e4827107cc30bfd74ef9ccd1938158f5f8901a706d3e497b6258d43ccb",
+    "negativeInitial": "triester460-lo-365-ban-cu-bi-loai.json",
+    "finalCorrection": "Only native vertex coordinates/inner rays/midCO and same O anchor baseline, glyphshape/count/remaininggeometrykept"
+  }
+}

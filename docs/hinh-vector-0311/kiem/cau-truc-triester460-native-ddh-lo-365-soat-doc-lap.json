@@ -1,0 +1,20 @@
+[
+  {
+    "i": 460,
+    "hashSvg": "3cd973e4827107cc30bfd74ef9ccd1938158f5f8901a706d3e497b6258d43ccb",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt FINAL: tự mở lại fresh Chromium3× FULL/runtime exactSHA final và cả5 macro ba CO/ba CC, đối chiếu native FULL/câu dẫn-ref đã đọc riêng. 55C6O (acyl16/18/18+3glycerol), CC0/2/1, ba CO hai chân contact hai nhánh; sáu O thường thẳng, mạch mảnh, không H/stereo/arrow. NativeCOtop thực tiếp O; giữ contact nguồn. Final geometry drift/rays đã so riêng, không thấy sai connectivity/chạm mới/cắt/tràn. Old110c draft CHƯA ADMIT đã archive riêng, không carry positive.",
+    "render": "/workspace/scratch/soat365-final-460-fresh.png",
+    "macro": [
+      "/workspace/scratch/triester460-final-check0.png",
+      "/workspace/scratch/triester460-final-check1.png",
+      "/workspace/scratch/triester460-final-check2.png",
+      "/workspace/scratch/triester460-final-check3.png",
+      "/workspace/scratch/triester460-final-check4.png",
+      "/workspace/scratch/triester460-nativeO.png",
+      "/workspace/scratch/triester460-nativeCC.png"
+    ],
+    "hash": "53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1",
+    "hashSvgDaSoat": "3cd973e4827107cc30bfd74ef9ccd1938158f5f8901a706d3e497b6258d43ccb"
+  }
+]

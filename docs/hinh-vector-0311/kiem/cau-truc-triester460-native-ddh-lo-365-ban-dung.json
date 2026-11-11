@@ -1,0 +1,29 @@
+[
+  {
+    "i": 460,
+    "hash": "53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1",
+    "fileNguon": "anh/53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1.png",
+    "svg": "triester460-native-ddh-3cd973e4827107cc30bfd74ef9ccd1938158f5f8901a706d3e497b6258d43ccb.svg",
+    "hashSvg": "3cd973e4827107cc30bfd74ef9ccd1938158f5f8901a706d3e497b6258d43ccb",
+    "byteSvg": 7994,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-I-8",
+        "de": "Trong công nghiệp, hydrogen hóa chất béo không no thành chất béo no để sản xuất các loại bơ nhân tạo. Chất béo X công thức cấu tạo như sau. Hydrogen hóa hoàn toàn 1 mol chất béo X (xúc tác Ni, $t^\\circ$) cần dùng ***a*** mol khí $\\ce{H2}$. Giá trị của ***a*** là",
+        "refs": [
+          {
+            "hash": "53d59b6a279713c1d4fd275f240835a80e4f8dc99f2edd59cee18a90fd71cda1",
+            "where": "VIP27-BDT-L7-0701-I-8.hinh.0.du_lieu",
+            "hashDataUrl": "c175c7e19543eaecdea1ea942bfca9591b8bb6383b375402c005252a2557e7e8"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "55C6O/3glycerol+16-18-18acyl/CCdouble0-2-1/3COdouble2raysCONTACTslopingarms/noaddedcrossbar/6OregularUPRIGHT/ALLthinblack/0H0stereo0arrows/noformula-caption-X-answer",
+    "hashSvgDaSoat": "3cd973e4827107cc30bfd74ef9ccd1938158f5f8901a706d3e497b6258d43ccb",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
