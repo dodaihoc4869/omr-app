@@ -42,6 +42,7 @@ import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
+import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
 import { chonHeSoGiay } from './vua-giay'
@@ -390,6 +391,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       {coTieng ? (
         <button type="button" className={`lv-vua${nghe && !biChan ? '' : ' tat'}`} aria-pressed={nghe && !biChan} aria-label={biChan ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe && !biChan ? <BtLoa /> : <BtLoaTat />}Tiếng<b>{biChan ? 'Chạm để nghe' : nghe ? 'Đang bật' : 'Đang tắt'}</b></button>
       ) : <p className="lv-ghi">Buổi này live chưa có tiếng trên máy. Em nghe thầy giảng trực tiếp.</p>}
+      {coTieng && nghe ? <ChonLoa le={le} /> : null}
       {coTieng && !nghe ? <p className="lv-ghi">{xa ? 'Em đang xem từ xa: bật tiếng để nghe thầy giảng.' : 'Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì bật tiếng.'}</p> : null}
       {micBang ? (
         <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic lại'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
