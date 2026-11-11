@@ -35,6 +35,8 @@ export function taoPhongGia(cu?: { kho: KhoGia; dsWs: WsGia[] } | null, envThem:
       get: async (k: string) => { const v = kho.du.get(k); return v === undefined ? undefined : structuredClone(v) },
       put: async (k: string, v: unknown) => { kho.ghi += 1; kho.du.set(k, structuredClone(v)) },
       delete: async (k: string) => kho.du.delete(k),
+      // đợt 2 (11/11): nhật ký đàm thoại đọc theo tiền tố
+      list: async (o?: { prefix?: string; limit?: number }) => new Map([...kho.du].filter(([k]) => k.startsWith(o?.prefix ?? '')).sort(([x], [y]) => (x < y ? -1 : 1)).slice(0, o?.limit ?? 1000).map(([k, v]) => [k, structuredClone(v)])),
       setAlarm: async () => {}, getAlarm: async () => null, deleteAlarm: async () => {},
     },
     acceptWebSocket: (ws: WsGia, tags?: string[]) => { ws.tag = tags?.[0] ?? ''; dsWs.push(ws) },
@@ -42,9 +44,10 @@ export function taoPhongGia(cu?: { kho: KhoGia; dsWs: WsGia[] } | null, envThem:
     waitUntil: (viec: Promise<unknown>) => { nen.push(viec) },
   }
   const p = new PhongBinhPhanUng(ctx as never, { MA_BI_MAT: 'x', ...envThem } as never)
-  const noi = async (vai: 'gv' | 'hs', sbd = ''): Promise<WsGia> => {
+  /** `xa` = nối bằng vé «em ở xa» (đợt 2). */
+  const noi = async (vai: 'gv' | 'hs', sbd = '', xa = false): Promise<WsGia> => {
     const truoc = dsWs.length
-    await p.fetch(new Request('https://bpu/bpu/phong', { headers: { upgrade: 'websocket', 'x-bpu-vai': vai, 'x-bpu-sbd': sbd } })).catch(() => null)
+    await p.fetch(new Request('https://bpu/bpu/phong', { headers: { upgrade: 'websocket', 'x-bpu-vai': vai, 'x-bpu-sbd': sbd, ...(xa ? { 'x-bpu-xa': '1' } : {}) } })).catch(() => null)
     return dsWs[truoc]!
   }
   const post = (duong: string, b: unknown) => p.fetch(new Request(`https://bpu${duong}`, { method: 'POST', body: JSON.stringify(b) })).then((r) => r.json() as Promise<Record<string, unknown>>)

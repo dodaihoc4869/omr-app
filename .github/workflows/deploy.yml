@@ -172,6 +172,8 @@ jobs:
           node /tmp/hoi-thay-schema.mjs
           # Thưởng phạt 26/10: bảng + trigger chỉ-thêm (nộp câu ghi vào các bảng này) — áp TRƯỚC khi đẩy Worker.
           node scripts/ap-migration-thuong-2610.mjs
+          # Xem lại Live 11/11: hai bảng chỉ-thêm (live_buoi, live_doan) qua API từng câu — áp TRƯỚC khi đẩy Worker (chạy được cả giờ cao điểm).
+          node scripts/ap-migration-live-xem-lai-1111.mjs
           node scripts/kiem-phat-hanh-chua.mjs --schema
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}

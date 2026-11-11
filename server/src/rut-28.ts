@@ -43,12 +43,21 @@ function suatGan(con: readonly number[], c: number, cungPhan: boolean): number {
  * Chọn `can` câu từ `ung` (ĐÃ xếp theo tầng rồi ưu tiên) theo 28 suất. `daLamO` = ô của các câu em đã làm hôm nay (chiếm suất trước).
  * Trả mã câu theo đúng thứ tự `ung` (nguồn chính trước) — nơi gọi chia chặng theo thứ tự ấy.
  */
-export function rut28(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[] }): string[] { return rut28Lech(a).qids }
+export function rut28(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[]; tong?: number }): string[] { return rut28Lech(a).qids }
+/** Suất của một ngày `tong` câu (nợ câu 11/11: mức hôm nay = 28 + số câu trả nợ): chia theo ĐÚNG tỉ lệ 28 suất, phần lẻ lớn nhất nhận trước. ≤ 28 ⇒ 28 suất gốc. */
+export function suatTheoTong(tong?: number): number[] {
+  const t = Math.floor(Number(tong) || 0)
+  if (t <= 28) return [...SUAT_28]
+  const ra = SUAT_28.map((x) => Math.floor(x * t / 28))
+  const le = SUAT_28.map((x, i) => ({ i, le: (x * t) % 28 })).sort((a, b) => b.le - a.le || a.i - b.i)
+  for (let k = 0, con = t - ra.reduce((n, x) => n + x, 0); k < con; k++) ra[le[k]!.i]!++
+  return ra
+}
 /** Như `rut28`, kèm `lech` = số câu phải lấy LỆCH Ô ở bước 3–4 (nguồn chính lệch mức ở bước 1 không tính) — nơi gọi biết có cần nạp thêm nguồn (ôn sớm) không. */
-export function rut28Lech(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[] }): { qids: string[]; lech: number } {
+export function rut28Lech(a: { ung: readonly UngVien28[]; can: number; daLamO?: readonly string[]; tong?: number }): { qids: string[]; lech: number } {
   const can = Math.max(0, Math.floor(a.can) || 0), n = a.ung.length
   if (!can || !n) return { qids: [], lech: 0 }
-  const con = [...SUAT_28]
+  const con = suatTheoTong(a.tong)
   for (const o of a.daLamO ?? []) { const s = suatGan(con, CHI_SO.get(o) ?? 1, false); if (s >= 0) con[s] = con[s]! - 1 }
   const oU = a.ung.map((u) => CHI_SO.get(u.o) ?? 1), lay = new Uint8Array(n)
   let so = 0

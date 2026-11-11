@@ -34,13 +34,29 @@ export interface R2Object {
   httpEtag: string
   /** Kho ảnh đề (kho-anh.ts) đọc kiểu nội dung đã cất. */
   httpMetadata?: { contentType?: string; cacheControl?: string }
+  /** XEM LẠI LIVE (11/11, chỉ thêm): cỡ tệp, siêu dữ liệu tự đặt, đọc cả thân, khoảng đã đọc khi gọi `get` có `range`. Bản giả cũ có thể vắng. */
+  size?: number
+  customMetadata?: Record<string, string>
+  arrayBuffer?(): Promise<ArrayBuffer>
+  range?: { offset?: number; length?: number; suffix?: number }
+}
+/** XEM LẠI LIVE (11/11): tải lên nhiều phần (tệp tiếng buổi live dài) — phần không phải cuối đúng 5 MiB. */
+export interface R2NhieuPhan {
+  uploadId: string
+  uploadPart(so: number, than: ArrayBuffer | ArrayBufferView): Promise<{ partNumber: number; etag: string }>
+  complete(phan: { partNumber: number; etag: string }[]): Promise<unknown>
+  abort(): Promise<void>
 }
 export interface R2Bucket {
-  get(key: string): Promise<R2Object | null>
-  put(key: string, value: ArrayBuffer | ArrayBufferView | string | ReadableStream, opts?: { httpMetadata?: { contentType?: string; cacheControl?: string } }): Promise<unknown>
+  get(key: string, opts?: { range?: { offset?: number; length?: number; suffix?: number } }): Promise<R2Object | null>
+  put(key: string, value: ArrayBuffer | ArrayBufferView | string | ReadableStream, opts?: { httpMetadata?: { contentType?: string; cacheControl?: string }; customMetadata?: Record<string, string> }): Promise<unknown>
   /** Chỉ hỏi có/không (kho ảnh đề). R2 thật luôn có; bản giả trong test có thể vắng ⇒ kho-anh.ts lui về `get`. */
   head?(key: string): Promise<unknown | null>
   delete(keys: string | string[]): Promise<void>
+  /** XEM LẠI LIVE (11/11, chỉ thêm): liệt kê theo tiền tố (xoá cả buổi, đọc phần đầu các khúc tiếng). R2 thật luôn có; bản giả cũ có thể vắng. */
+  list?(o: { prefix?: string; cursor?: string; limit?: number; include?: ('customMetadata' | 'httpMetadata')[] }): Promise<{ objects: { key: string; size: number; customMetadata?: Record<string, string> }[]; truncated: boolean; cursor?: string }>
+  createMultipartUpload?(key: string, opts?: { httpMetadata?: { contentType?: string; cacheControl?: string } }): Promise<R2NhieuPhan>
+  resumeMultipartUpload?(key: string, uploadId: string): R2NhieuPhan
 }
 /** Durable Object (Bi-a Phản Ứng GĐ2 — phòng đấu `BanBiA`): chỉ khai đúng phần dùng tới. */
 export interface DurableObjectId { toString(): string }
@@ -66,6 +82,8 @@ export interface DurableObjectStorage {
   get<T = unknown>(khoa: string): Promise<T | undefined>
   put(khoa: string, v: unknown): Promise<void>
   delete(khoa: string): Promise<boolean>
+  /** Đọc các khoá theo tiền tố (nhật ký đàm thoại của phòng live). */
+  list<T = unknown>(o?: { prefix?: string; limit?: number }): Promise<Map<string, T>>
   setAlarm(luc: number): Promise<void>
   getAlarm(): Promise<number | null>
   deleteAlarm(): Promise<void>

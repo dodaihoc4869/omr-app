@@ -68,7 +68,8 @@ describe('máy em khi thầy live', () => {
     expect(lop('.lv') + lop('.lv-dai')).toBe(0)
   })
 
-  it('thầy live ⇒ giữ màn câu hỏi + dấu «Thầy đang live»; gọi em lên bảng ⇒ bảng live; lượt mới ⇒ về màn câu hỏi (live còn); thầy tắt ⇒ lớp tự thu', async () => {
+  // 11/11 (thầy test máy thật): em GỬI xong tự về bảng live; dấu «Thầy đang live» nay là tay nắm nhỏ mép trái (`.lv-phu.lv-dau`), ô tiếng nằm trong khay.
+  it('thầy live ⇒ đang làm thì giữ màn câu hỏi + tay nắm «Thầy đang live»; em gửi ⇒ TỰ về bảng live; gọi bạn lên bảng ⇒ vẫn bảng live; lượt mới ⇒ về màn câu hỏi (live còn); thầy tắt ⇒ lớp tự thu', async () => {
     const st = phong(); moLuot(st, cau, T0)
     const { ws, bao } = await vao(st)
     expect(ws.binaryType).toBe('arraybuffer')
@@ -77,16 +78,20 @@ describe('máy em khi thầy live', () => {
     expect(screen.getByText('Thầy đang live')).toBeTruthy()
     expect(lop('.lv')).toBe(0)
     expect(screen.getByLabelText('Gửi đáp án')).toBeTruthy() // màn làm bài còn nguyên
-    expect(lop('.lv-dau button')).toBe(0) // máy chủ chưa có tiếng ⇒ dấu không có nút tiếng
-    // em gửi ⇒ VẪN màn Bình Phản Ứng (đã gửi) + dấu, chưa vào bảng
+    expect(lop('.lv-dau .lv-vua')).toBe(0) // máy chủ chưa có tiếng ⇒ khay không có ô tiếng
+    expect(document.querySelector('.lv-dau .lv-nam')!.getAttribute('aria-label')).toBe('Mở khay điều khiển')
+    // (K1) em gửi ⇒ TỰ về bảng live ngay (cờ phòng `bang` vẫn tắt)
     nhanTra(st, 'S1', 'B', T0 + 2000); bao()
-    await cho(60)
-    expect(lop('.lv')).toBe(0); expect(lop('.lv-dau')).toBe(1)
-    // thầy gọi BẠN lên bảng ⇒ phòng bật cờ `bang` ⇒ máy em sang bảng live
+    expect(viewEm(st, 'S1').live?.bang).toBe(false)
+    await waitFor(() => expect(lop('.lv')).toBe(1))
+    expect(lop('.lv-dau')).toBe(0)
+    expect(document.querySelector('.lv-luot')!.textContent).toContain('Đã gửi')
+    // thầy gọi BẠN lên bảng ⇒ phòng bật cờ `bang` ⇒ máy em vẫn ở bảng live, dải lượt có đoán + cổ vũ
     nhanTra(st, 'S2', 'A', T0 + 2500); goiLenBang(st, 'S2', ['Chưa lên bảng buổi này'], T0 + 3000)
     expect(viewEm(st, 'S1').live?.bang).toBe(true)
     bao()
-    await waitFor(() => expect(lop('.lv')).toBe(1))
+    await waitFor(() => expect(document.querySelector('.lv-luot')!.textContent).toContain('Làm đúng'))
+    expect(lop('.lv')).toBe(1)
     expect(lop('.lv-dau')).toBe(0)
     await waitFor(() => expect(tinChu(ws, 'live-ok')).toBeGreaterThanOrEqual(1)) // báo phòng để đếm «em xem»
     // KHÔNG có nút thoát; có tay nắm; SFU chưa cấu hình ⇒ ẩn nút tiếng, ghi chú nhẹ; có đội + kJ
@@ -120,12 +125,12 @@ describe('máy em khi thầy live', () => {
     const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0); moLuot(st, cau, T0)
     const { bao } = await vao(st)
     liveBat(st, T0 + 1000); bao()
-    await waitFor(() => expect(lop('.lv-dau button')).toBe(1))
-    const nutDau = document.querySelector('.lv-dau button')!
+    await waitFor(() => expect(lop('.lv-dau .lv-vua')).toBe(1))
+    const nutDau = document.querySelector('.lv-dau .lv-vua')!
     expect(nutDau.getAttribute('aria-pressed')).toBe('false')
     expect(nutDau.getAttribute('aria-label')).toContain('đang tắt')
     fireEvent.click(nutDau)
-    await waitFor(() => expect(document.querySelector('.lv-dau button')!.getAttribute('aria-pressed')).toBe('true'))
+    await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('true'))
     // sang bảng live: khay giữ đúng lựa chọn của em
     liveDat(st, { bang: true }, T0 + 2000); bao()
     await waitFor(() => expect(lop('.lv .lv-vua')).toBe(1))

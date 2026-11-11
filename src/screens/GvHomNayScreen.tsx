@@ -26,6 +26,7 @@ import { gioMayChu } from '../lib/gio-may-chu'
 import { useAppStore } from '../store/appStore'
 import { useSoDemGv, type MoHanhTrinh } from '../lib/so-dem-gv'
 import NutDiemDanh from '../components/hom-nay-thay/NutDiemDanh'
+import NutLive from '../components/hom-nay-thay/NutLive'
 import { taiGioiHan } from '../lib/tai-gioi-han'
 import { layLopThay } from '../lib/ten-lop-thay'
 import { chuChoBaiMoi } from '../lib/bai-hom-nay'
@@ -615,6 +616,8 @@ export default function GvHomNayScreen() {
           </button>
         )}
         {/* 09/11 thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»: Điểm danh = nút chính (ca đang mở ⇒ nút phụ, «Theo dõi ca» chính). */}
+        {/* 11/11 Xem lại Live: nút viền «Live» ngay trước «Điểm danh» ⇒ Lịch sử Live (mảnh nạp lười); không thêm mục thanh bên. */}
+        <NutLive className="gvv2-nut-vien gvhn-nut-phu gvhn-nut-live tt-nhan" />
         <NutDiemDanh className={caMo.length > 0 ? 'gvv2-nut-vien gvhn-nut-phu tt-nhan' : 'gvv2-nut-chinh gvhn-nut-chinh tt-nhan'} />
         {caMo.length > 0 ? (
           <button type="button" className="gvv2-nut-chinh gvhn-nut-chinh tt-nhan" onClick={nutChinh.lam}>

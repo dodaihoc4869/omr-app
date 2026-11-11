@@ -6,11 +6,16 @@ import type { MucNgay7, GoiCuaEm7 } from './goi-bai-7'
 import type { HoSo2 } from './srs2-d1'
 import { NGAY_LOAI_NGAY, chonLoaiNgay7, congNgay7, laLoaiNgay7, type LoaiNgay7 } from './goi-bai-7-loi'
 import { docCotLyDo, type LyDoSai } from './ly-do-sai'
+import { SQL_COT_NO, docCotNo, type DocNo7 } from './no-cau-d1'
+import type { TomTatNo } from './no-cau'
+export { noCau7 } from './no-cau-d1'
 
 type Row = Record<string, unknown>
 export interface MucLoai7 { muc: MucNgay7 | null; loai: LoaiNgay7 | null; truoc: LoaiNgay7[]; lyDo?: ReadonlyMap<string, LyDoSai | 'cc'>
   /** Lịch bài (10/11): loại đã chốt 21 ngày qua + ngày các lịch Kiểm tra ôn tập (kèm mã gói) — cùng câu đọc. */
-  lich?: { daChot: Map<string, LoaiNgay7>; kt: [string, string][] } }
+  lich?: { daChot: Map<string, LoaiNgay7>; kt: [string, string][] }
+  /** Nợ câu (11/11, no-cau-d1.ts): sổ nợ + lựa chọn hôm nay — cùng câu đọc; `noCau` = tóm tắt gửi app, `loaiNay` = loại ngày hôm nay (nhãn phần thiếu của ngày vắng). */
+  no?: DocNo7; noCau?: TomTatNo | null; loaiNay?: LoaiNgay7 | null; /** lúc tạo dòng mức hôm nay */ mucLuc?: string }
 const tang7 = (v: unknown): TangHanhTrinh => { const t = Math.floor(Number(v)); return (t >= 1 && t <= 4 ? t : 1) as TangHanhTrinh }
 const mucCua = (r: Row | null | undefined): MucNgay7 | null =>
   r && Number(r.muc) > 0 ? { tang: tang7(r.tang), toiThieuTang: Number(r.toi_thieu_tang) || 0, quota: Number(r.quota) || 0, muc: Number(r.muc), daChot: true } : null
@@ -30,11 +35,11 @@ export async function docMucLoai7(env: Env, sbd: string, ngay: string): Promise<
   // 09/11 lát 3: lý do sai («Vì sao em sai?», goi_bai_7_ly_do) đọc CÙNG câu (nhóm lỗi ngày Sửa); 10/11 Lịch bài: loại đã chốt 21 ngày qua + ngày lịch Kiểm tra ôn tập
   // (mã gói trong json) cũng CÙNG câu — câu đủ cột lỗi ⇒ bớt cột dần (chỉ khi lỗi), không thêm lệnh D1.
   const tu = congNgay7(ngay, -21)
-  const doc = (muc: number) => env.DB.prepare(`SELECT m.tang,m.toi_thieu_tang,m.quota,m.muc,(${q}=?) loai,(${q}<? ORDER BY ngay DESC LIMIT 1) t1,(${q}<? ORDER BY ngay DESC LIMIT 1 OFFSET 1) t2${muc ? ',(SELECT json_group_array(json_array(qid,ly)) FROM (SELECT qid,ly,luc FROM (SELECT qid,ly,luc FROM goi_bai_7_ly_do WHERE sbd=? ORDER BY luc DESC LIMIT 400) ORDER BY luc)) ly' : ''}${muc > 1 ? `,(SELECT json_group_array(json_array(ngay,loai)) FROM goi_bai_7_loai_ngay WHERE sbd=? AND ngay>=? AND ngay<?) lsu,(SELECT json_group_array(json_array(ngay,json_extract(json,'$.goiId'))) FROM kiem_tra_ca_nhan WHERE sbd=? AND ngay>=?) kt` : ''}
-    FROM (SELECT 1) x LEFT JOIN goi_bai_7_muc_ngay m ON m.sbd=? AND m.ngay=?`).bind(sbd, ngay, sbd, ngay, sbd, ngay, ...(muc ? [sbd] : []), ...(muc > 1 ? [sbd, tu, ngay, sbd, tu] : []), sbd, ngay).first<Row>()
-  const r = await doc(2).catch(() => doc(1)).catch(() => doc(0)).catch(() => undefined)
+  const doc = (muc: number) => env.DB.prepare(`SELECT m.tang,m.toi_thieu_tang,m.quota,m.muc,(${q}=?) loai,(${q}<? ORDER BY ngay DESC LIMIT 1) t1,(${q}<? ORDER BY ngay DESC LIMIT 1 OFFSET 1) t2${muc ? ',(SELECT json_group_array(json_array(qid,ly)) FROM (SELECT qid,ly,luc FROM (SELECT qid,ly,luc FROM goi_bai_7_ly_do WHERE sbd=? ORDER BY luc DESC LIMIT 400) ORDER BY luc)) ly' : ''}${muc > 1 ? `,(SELECT json_group_array(json_array(ngay,loai)) FROM goi_bai_7_loai_ngay WHERE sbd=? AND ngay>=? AND ngay<?) lsu,(SELECT json_group_array(json_array(ngay,json_extract(json,'$.goiId'))) FROM kiem_tra_ca_nhan WHERE sbd=? AND ngay>=?) kt` : ''}${muc > 2 ? `,m.luc mluc,${SQL_COT_NO}` : ''}
+    FROM (SELECT 1) x LEFT JOIN goi_bai_7_muc_ngay m ON m.sbd=? AND m.ngay=?`).bind(sbd, ngay, sbd, ngay, sbd, ngay, ...(muc ? [sbd] : []), ...(muc > 1 ? [sbd, tu, ngay, sbd, tu] : []), ...(muc > 2 ? [sbd, sbd, ngay] : []), sbd, ngay).first<Row>()
+  const r = await doc(3).catch(() => doc(2)).catch(() => doc(1)).catch(() => doc(0)).catch(() => undefined)
   if (r === undefined) return { muc: await docMucCu(env, sbd, ngay), loai: null, truoc: [] }
-  return { muc: mucCua(r), loai: laLoaiNgay7(r?.loai) ? (r!.loai as LoaiNgay7) : null, truoc: [r?.t1, r?.t2].filter(laLoaiNgay7), lyDo: docCotLyDo(r?.ly), ...(r && 'lsu' in r ? { lich: docLich(r.lsu, r.kt) } : {}) }
+  return { muc: mucCua(r), loai: laLoaiNgay7(r?.loai) ? (r!.loai as LoaiNgay7) : null, truoc: [r?.t1, r?.t2].filter(laLoaiNgay7), lyDo: docCotLyDo(r?.ly), ...(r && 'lsu' in r ? { lich: docLich(r.lsu, r.kt) } : {}), ...(r && 'nc' in r ? { no: docCotNo(r.nc, r.ncc), ...(typeof r.mluc === 'string' ? { mucLuc: r.mluc } : {}) } : {}) }
 }
 
 /** Loại ngày của em hôm nay: đã chốt ⇒ giữ; chưa ⇒ luật `chonLoaiNgay7` (CPU, không đọc thêm — câu sai chờ sửa từ hồ sơ, câu mới còn của các gói sau cổng chặn).
@@ -43,5 +48,6 @@ export function loaiNgayEm7(ml: MucLoai7, ngay: string, goi: readonly GoiCuaEm7[
   const conMoi7 = (g: GoiCuaEm7) => g.cau.filter(c => !daGap.has(c.qid) && !chan.has(c.qid) && !chan.has(c.group)).length
   const soSua = hs.cau.filter(c => ['mo', 'cho_kiem'].includes(hs.loiV2?.get(c.qid)?.trangThai ?? '') && !chan.has(c.qid)).length, soMoiCon = goi.reduce((n, g) => n + conMoi7(g), 0)
   const loaiNgay: LoaiNgay7 | null = ml.loai ?? chonLoaiNgay7({ ngay, truoc: ml.truoc, kiemNhe: goi.some(g => g.kiemNhe), soSua, soMoiCon })
+  ml.loaiNay = loaiNgay
   return { loaiNgay, loaiGhi: ml.loai ? null : loaiNgay, conMoi7, lyDo: ml.lyDo ?? new Map<string, LyDoSai | 'cc'>(), soSua, soMoiCon }
 }

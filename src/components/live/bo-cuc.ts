@@ -15,7 +15,7 @@ export interface VungChieu { giay: O4; bang: O4; giayToi: boolean }
 export const VUNG_MAC_DINH: VungChieu = { giay: [0.0052, 0.0093, 0.6615, 0.9194], bang: [0.6667, 0.0185, 0.9948, 0.9194], giayToi: false }
 /** Chiều cao lôgic của vùng chiếu trên máy em (bản vẽ: 1600 × 820). */
 export const CAO_LOGIC = 820
-/** Dải dành cho tay nắm ở mép phải (khi còn chỗ). */
+/** Dải dành cho tay nắm ở MÉP TRÁI (thầy 11/11 «chuyển thanh đó sang mép bên trái») — khi còn chỗ. */
 export const CO_NAM = 52
 
 const hopLe = (o: number[]): o is O4 => o.length === 4 && o.every((v) => Number.isFinite(v) && v >= 0 && v <= 1) && o[2]! - o[0]! > 0.02 && o[3]! - o[1]! > 0.02
@@ -67,21 +67,21 @@ export function khungChieu(vung: VungChieu, tiLe: number): KhungChieu {
 /** Vùng an toàn của HÌNH (đã xoay nếu có): trái, phải, đáy (px). */
 export interface AnToan { trai: number; phai: number; duoi: number }
 export interface BoCucEm { s: number; x: number; y: number; cw: number; ch: number; /** Tay nắm đè lên mép bảng (không còn dải dư) ⇒ mờ 78 %, em kéo dọc được. */ namDe: boolean }
-/** Co vùng chiếu `LW × LH` vừa hình `w × h` (hình luôn NGANG). Còn chỗ thì chừa dải tay nắm ở mép phải; chừa mà hình nhỏ đi quá 6 % ⇒ thôi, để tay nắm đè mép. */
+/** Co vùng chiếu `LW × LH` vừa hình `w × h` (hình luôn NGANG). Còn chỗ thì chừa dải tay nắm ở MÉP TRÁI (vùng chiếu dồn sang phải); chừa mà hình nhỏ đi quá 6 % ⇒ thôi, để tay nắm đè mép. */
 export function boCucEm(w: number, h: number, at: AnToan, LW: number, LH: number = CAO_LOGIC): BoCucEm {
   const ngang = Math.max(1, w - at.trai - at.phai), doc = Math.max(1, h - at.duoi)
   const sDay = Math.min(ngang / LW, doc / LH), sNam = Math.min((ngang - CO_NAM) / LW, doc / LH)
   const s = sNam < sDay * 0.94 ? sDay : sNam
   const cw = LW * s, ch = LH * s, du = ngang - cw
   const namDe = du < CO_NAM - 0.5
-  return { s, x: at.trai + (namDe ? du / 2 : Math.max(0, (du - CO_NAM) / 2)), y: (doc - ch) / 2, cw, ch, namDe }
+  return { s, x: at.trai + (namDe ? du / 2 : CO_NAM + Math.max(0, (du - CO_NAM) / 2)), y: (doc - ch) / 2, cw, ch, namDe }
 }
 
 /** Phóng bảng (chạm hai lần, ảnh 35): ô bảng đen phủ kín chiều cao. Trả phép dời + co áp lên vùng chiếu. */
 export function boCucPhong(w: number, h: number, at: AnToan, k: KhungChieu): { s: number; x: number; y: number } {
   const ngang = Math.max(1, w - at.trai - at.phai - CO_NAM), doc = Math.max(1, h - at.duoi)
   const s = Math.min(ngang / k.bang.w, doc / k.bang.h)
-  return { s, x: at.trai + (ngang - k.bang.w * s) / 2 - k.bang.x * s, y: (doc - k.bang.h * s) / 2 - k.bang.y * s }
+  return { s, x: at.trai + CO_NAM + (ngang - k.bang.w * s) / 2 - k.bang.x * s, y: (doc - k.bang.h * s) / 2 - k.bang.y * s }
 }
 
 /** Máy đang DỌC mà không khoá ngang được (iPhone; Android từ chối `lock`) ⇒ xoay hình 90° bằng CSS. Khổ của HÌNH khi đó = (cao, rộng) của trang. */

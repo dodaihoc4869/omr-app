@@ -1,0 +1,185 @@
+{
+  "luc": "2026-11-11T00:24:34.652Z",
+  "ghiChu": "Chromium thật, phòng thật trong Node, dữ liệu giả; KHÔNG có tiếng (SFU chưa cấu hình ở máy chủ thử).",
+  "soDo": {
+    "k1_gui_toi_bang_ms": 42.9,
+    "b1_so_khoi_chu": 5,
+    "b1_lech_lon_nhat_phan_nghin_be_rong_giay": 1,
+    "k2_tin_phong_toi_bang_ms": 56.1,
+    "k3_tam_dung_toi_may_em_ms": 123,
+    "k3_tiep_tuc_toi_may_em_ms": 127,
+    "k1_gui_toi_bang_lan_2_ms": 13.1
+  },
+  "kiem": [
+    {
+      "ten": "K4 · nút «Live» đứng ĐẦU thanh, sát mép trái màn chiếu",
+      "dat": true,
+      "them": "mép trái nút 18 px"
+    },
+    {
+      "ten": "K4 · cửa sổ của nút Live neo MÉP TRÁI",
+      "dat": true,
+      "them": "mép trái cửa sổ 10 px"
+    },
+    {
+      "ten": "K5 · đang live: thanh dưới gom — nhóm phím / «Lên bảng» / «Cài đặt» ẩn sau MỘT nút lưới",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K5 · bấm nút lưới ⇒ các nút xoè ra, không tràn màn 1366",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K5 · bấm ra ngoài thanh ⇒ thu lại",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K5 · phím tắt vẫn chạy khi thanh gom (G mở lời giải)",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K4 · máy em đang làm bài: chỉ còn tay nắm ở MÉP TRÁI (không viên nổi đáy màn), chưa vào bảng",
+      "dat": true,
+      "them": "tay nắm x 0–30"
+    },
+    {
+      "ten": "K4 · chạm tay nắm ⇒ khay trượt ra từ mép trái, có «Thầy đang live»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K4 · khay tự ẩn sau 3 giây",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K1 · em bấm Gửi ⇒ máy em TỰ về bảng live (≤ 200 ms từ cú bấm)",
+      "dat": true,
+      "them": "42.9 ms"
+    },
+    {
+      "ten": "K6 · vào bảng sau khi gửi: không có viên «Thầy đang live» chớp giữa màn",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "B3 · dải lượt trên bảng live ghi «Đã gửi · n/8 bạn đã gửi»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "B1 · giấy đề máy em dựng theo số đo giấy thầy và TỰ KIỂM khớp (nét trên giấy được giữ)",
+      "dat": true,
+      "them": "{\"soi\":true,\"khop\":true,\"giay\":\"sang\"}"
+    },
+    {
+      "ten": "B1 · mọi khối chữ (đề + phương án) trên máy em nằm đúng chỗ như giấy thầy (lệch ≤ 4 ‰ bề rộng giấy)",
+      "dat": true,
+      "them": "5 khối, lệch lớn nhất 1 ‰"
+    },
+    {
+      "ten": "B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)",
+      "dat": true,
+      "them": "78 mẫu điểm ảnh có mực trong ô giấy"
+    },
+    {
+      "ten": "K4 · bảng live: tay nắm ở MÉP TRÁI; không còn nút nổi nào trên bảng",
+      "dat": true,
+      "them": "tay nắm x 2"
+    },
+    {
+      "ten": "K4 · khay mở từ mép trái: mạng · đội + kJ (ô tiếng nằm trong khay khi buổi có tiếng)",
+      "dat": true,
+      "them": "Thầy đang im Tiếng Đang tắt Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì "
+    },
+    {
+      "ten": "K2 · trước khi gọi: máy em S2 chưa gửi, còn ở màn làm bài",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K2 · thầy gọi lên bảng ⇒ máy em chưa gửi vào bảng live NGAY (≤ 200 ms từ tin phòng)",
+      "dat": true,
+      "them": "56.1 ms"
+    },
+    {
+      "ten": "K2 · không ai gửi hộ đáp án em chọn dở (phòng không có bài của S2)",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "B3 · bảng live không nuốt trò đoán / tiếp sức: dải «Em đoán … làm đúng không?» + «Làm đúng» · «Chưa đúng» · tiếp sức",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "B3 · bấm trên dải ⇒ phòng nhận đoán + tiếp sức của S2",
+      "dat": true,
+      "them": "{\"doan\":1,\"tiep\":1}"
+    },
+    {
+      "ten": "K3 · bấm viên Live ⇒ cửa sổ có «Tạm dừng», «Kết thúc live», công tắc «Bảng → máy em»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K3 · «Tạm dừng» ⇒ máy em hiện «Thầy tạm dừng live» (≤ 500 ms kể từ lúc bấm)",
+      "dat": true,
+      "them": "123 ms"
+    },
+    {
+      "ten": "K3 · viên Live ghi «TẠM DỪNG», cửa sổ đổi thành «Tiếp tục»; phiên live giữ nguyên",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K3 · đang tạm dừng: nét thầy viết lên bảng KHÔNG tới máy em",
+      "dat": true,
+      "them": "mực trong ô bảng máy em 0 → 0"
+    },
+    {
+      "ten": "K3 · «Tiếp tục» ⇒ máy em hết dải dừng (≤ 500 ms), nét viết lúc dừng tới máy em một lượt",
+      "dat": true,
+      "them": "127 ms · mực trong ô bảng 0 → 67"
+    },
+    {
+      "ten": "B2 · thẻ «em rời màn» ghi KIỂU rời (Chromium máy tính không phân biệt được khoá màn ⇒ «thoát app hoặc khoá màn»)",
+      "dat": true,
+      "them": "1 em rời màn Hu Lê Gia Huy Đội Kali · thoát app hoặc khoá màn · 0:00 Em quay lại thì tên tự mất."
+    },
+    {
+      "ten": "Chạm hai lần vào bảng đen ⇒ phóng bảng (ô bảng rộng hơn), có dòng «Chạm hai lần để về toàn cảnh»",
+      "dat": true,
+      "them": "244 → 255 px"
+    },
+    {
+      "ten": "Thầy chuyển câu ⇒ máy em về màn câu hỏi để làm (live còn, tay nắm mép trái)",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "K1 · câu thứ hai: gửi xong lại tự về bảng live",
+      "dat": true,
+      "them": "13.1 ms"
+    },
+    {
+      "ten": "K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», thanh hết gom",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "AN TOÀN · lượt đang mở: view máy em không có khoá đáp án / lời giải",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Không lỗi JavaScript trên ba trang",
+      "dat": true,
+      "them": ""
+    }
+  ]
+}

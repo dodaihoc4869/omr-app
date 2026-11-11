@@ -37,6 +37,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/lib/html-may-chieu.ts': 0,
   'src/components/live/LopLive.tsx': 1, // 10/11 Live (máy em): 1,5 s thử lại bật mic CHỈ trong lúc em đang được gọi lên bảng mà mic chưa mở (chờ nối xong SFU); cục bộ + cửa /bpu/live của Worker (0 D1); mở được / hết lượt gọi ⇒ dừng
   'src/components/live/thay-noi.ts': 1, // 10/11 Live (máy thầy): 90 ms đọc mức âm mic gửi sang tờ chiếu (vạch mic) CHỈ khi thẻ mic mở hoặc đang live có tiếng; cục bộ, không gọi máy chủ
+  'src/lib/live/may-ghi.ts': 2, // 11/11 Xem lại Live (máy ghi trên máy thầy, CHỈ khi đang live): 1 s soát luồng mic (cục bộ) + 10 s gửi tin `live-ghi` (mẫu đồng hồ) qua WebSocket của phòng — 0 D1; live tắt ⇒ dừng
   'src/lib/live-to-chieu.ts': 1, // 10/11 Live (tờ chiếu, trong iframe): 1 s vẽ đồng hồ «LIVE 12:34» CHỈ khi đang live; cục bộ, không gọi máy chủ
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe
   'src/lib/html-phieu.ts': 2, // 20/10 đo giây: +1 vòng 1 s TRONG trang phiếu (iframe), chỉ cục bộ, không gọi máy chủ; dừng khi tab ẩn / 180 giây không chạm
@@ -53,7 +54,8 @@ const NGOAI_LENH: Record<string, string> = {
 }
 /** Làn của app thầy (Code 4) — có thể đổi; chỉ cho phép tồn tại. */
 // + màn Chiếu mã vào thi (28/09): 5 giây/lần hỏi danh sách em đã vào, dừng khi tab ẩn / đóng màn — chỉ chạy khi thầy đang chiếu.
-const LAN_APP_THAY = ['src/components/bang-tin/hooks.ts', 'src/screens/ExamMonitorScreen.tsx', 'src/components/TamPhuChieuMa.tsx', 'src/components/day-hoc/BanChieuDiemDanh.tsx'] // 23/10: đồng hồ 1 s «Mã đổi sau m:ss» trên màn chiếu, chỉ vẽ lại ô mã, không gọi máy chủ
+// + 11/11 Xem lại Live: nút Live ở Hôm nay (15 s) và màn Lịch sử Live (4 s) hỏi lại `/gv/live-ds` CHỈ khi có buổi đang xử lý, tab ẩn bỏ qua, xong ⇒ dừng.
+const LAN_APP_THAY = ['src/components/hom-nay-thay/NutLive.tsx', 'src/screens/live-xem-lai/gv/LichSuLive.tsx', 'src/components/bang-tin/hooks.ts', 'src/screens/ExamMonitorScreen.tsx', 'src/components/TamPhuChieuMa.tsx', 'src/components/day-hoc/BanChieuDiemDanh.tsx'] // 23/10: đồng hồ 1 s «Mã đổi sau m:ss» trên màn chiếu, chỉ vẽ lại ô mã, không gọi máy chủ
 
 const dem = (nguon: string) =>
   nguon

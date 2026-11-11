@@ -13,8 +13,9 @@ import type { TrangThaiPhong } from '../../src/lib/bpu/phong'
 import * as LL from '../../src/lib/bpu/phong-live'
 
 type Row = Record<string, unknown>
-/** Dữ liệu gắn vào kết nối: vai + sbd (đã có) · `x` = phiên live em đã báo `live-ok` · `d` = 1 khi em cần điểm đang viết qua WebSocket. */
-export interface KemBpu { v: 'gv' | 'hs'; s: string; x?: number; d?: 0 | 1 }
+/** Dữ liệu gắn vào kết nối: vai + sbd (đã có) · `x` = phiên live em đã báo `live-ok` · `d` = 1 khi em cần điểm đang viết qua WebSocket ·
+ *  `xa` = 1 khi em vào bằng vé «em ở xa» (đợt 2, điểm quyết 4: chỉ xem live — không điểm danh, không đội, không kJ, không gửi đáp án). */
+export interface KemBpu { v: 'gv' | 'hs'; s: string; x?: number; d?: 0 | 1; xa?: 1 }
 export interface ChuPhong {
   ctx: DurableObjectState
   doc(): Promise<TrangThaiPhong | null>
@@ -22,6 +23,10 @@ export interface ChuPhong {
   nho(): TrangThaiPhong | null | undefined
   luu(henNghi?: boolean): Promise<void>
   phat(): void
+  /** Báo máy các em qua kênh đẩy (mở màn Bình Phản Ứng) — đợt 2: gọi em ở xa vào xem khi thầy bật «Cho em ở xa vào xem». Không có ⇒ bỏ qua. */
+  bao?(sbd: string[]): void
+  /** XEM LẠI LIVE (11/11, live-xem-lai.ts — chỉ thêm): nhật ký nét kèm giờ + tin `live-ghi` của máy ghi. Vắng ⇒ không ghi gì. */
+  xl?: { khung(k: Uint8Array, nay: number): void; bat(so: readonly Uint8Array[], nay: number): void; tinGhi(st: TrangThaiPhong, j: Row, nay: number): boolean }
 }
 
 /** Sổ nét lưu theo MẢNH: mỗi mảnh tối đa ngần này khung (khung ≤ 16 KB ⇒ mảnh ≤ 512 KB, dưới trần 2 MB một giá trị của Durable Object lớp SQLite). */
@@ -34,8 +39,12 @@ const GOM_XEM_MS = 300
 const LAM_MOI_DS_MS = 5000
 const NHIP_LUU_MS = 60_000
 const NHIP_DO_MS = 10_000
+/** Gọi lại em ở xa CHƯA nối phòng (em mở app sau lúc thầy bật) thưa nhất ngần này một lần, theo nhịp của máy thầy. */
+const NHIP_GOI_XA_MS = 120_000
+/** Nhật ký đàm thoại trong kho của phòng: mỗi lần ghi một khoá `nk:<giờ>:<số>` (không đọc–sửa–ghi cả sổ); đọc lại tối đa ngần này khoá. */
+const NK_DOC_TOI_DA = 1000
 
-interface DoEm { luc: number; d: number; j: number; m: number; rtt: number; tt: number; dc: boolean }
+interface DoEm { luc: number; d: number; j: number; m: number; rtt: number; tt: number; dc: boolean; gl: boolean }
 const so = (v: unknown, tran: number): number => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(tran, Math.round(n)) : -1 }
 function tomTat(ds: number[]): { tv: number; p95: number } | null {
   const s = ds.filter((x) => x >= 0).sort((a, b) => a - b)
@@ -60,6 +69,8 @@ export class LiveMay {
   private lucLuuNhip = 0
   private giayLo = 0
   private soLo = 0
+  private lucGoiXa = 0
+  private soNk = 0
   /** Bộ đếm cho bài đo tải: số lô điểm đã chuyển + số lệnh gửi. */
   dem = { lo: 0, gui: 0, boVuot: 0 }
 
@@ -149,6 +160,7 @@ export class LiveMay {
     }
     if (!this.daXinAnh && (ds.length > SO_MEM.muc || this.soByte > SO_MEM.byte)) { this.daXinAnh = true; this.gui(ws, '{"t":"live-can-anh"}') }
     LL.liveNhip(st, nay)
+    if (l.bat) this.chu.xl?.khung(k, nay) // Xem lại Live: nhật ký nét chỉ-nối
     this.lamMoiDs(nay, l.phien)
     for (const w of this.dsHs!) this.gui(w, goc)
   }
@@ -204,22 +216,37 @@ export class LiveMay {
       if (t === 'live-san') doi = LL.liveSan(st, { san: j.san !== false, ss: j.ss }, nay)
       else if (t === 'live-bat') {
         doi = LL.liveBat(st, nay)
-        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
+        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay; if (this.chu.xl) this.chu.xl.bat(await this.docSo(st), nay) } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
       } else if (t === 'live-tat') { doi = this.tat(st, nay) }
-      else if (t === 'live-dat') doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang }, nay)
-      else if (t === 'live-thu-mic') doi = LL.liveThuMic(st, nay) // thầy bấm «Thu mic»: phòng gỡ + đóng track ở SFU khi phát view
+      else if (t === 'live-dat') {
+        const xaTruoc = l.xa
+        doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang, giay: j.giay, nghi: j.nghi }, nay)
+        if (l.xa && !xaTruoc) this.goiXa(st, nay) // vừa bật «Cho em ở xa vào xem» ⇒ gọi máy các em ở xa
+      }
+      else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay) // Xem lại Live: máy ghi báo trạng thái + mẫu đồng hồ
+      // ĐỢT 2 (đặc tả 4.8): thầy «Thu mic» (một em) / «Tắt mic tất cả» · «Mời nói» · «Hạ hết tay» / hạ tay một em. Phòng gỡ + đóng track ở SFU khi phát view.
+      else if (t === 'live-thu-mic') doi = LL.liveThu(st, nay, typeof j.sbd === 'string' && j.sbd ? j.sbd : undefined)
+      else if (t === 'live-moi') doi = LL.liveMoi(st, String(j.sbd ?? ''), nay)
+      else if (t === 'live-ha-tay') doi = LL.liveHaTay(st, nay, typeof j.sbd === 'string' && j.sbd ? j.sbd : undefined)
       else if (t === 'live-nhip') {
         LL.liveNhip(st, nay)
+        if (l.bat && l.xa && nay - this.lucGoiXa > NHIP_GOI_XA_MS) this.goiXa(st, nay)
         // Nhịp chỉ ghi storage thưa (1 phút / lần) ⇒ phòng ngủ rồi thức lại không tự tắt nhầm live đang chạy.
         if (l.bat && nay - this.lucLuuNhip > NHIP_LUU_MS) { this.lucLuuNhip = nay; await this.chu.luu(false) }
       }
-      if (doi) { if (t === 'live-san') this.boDs(); await this.chu.luu(true); this.chu.phat() }
+      if (doi) { if (t === 'live-san') this.boDs(); if (t === 'live-bat' && l.xa) this.goiXa(st, nay); await this.chu.luu(true); this.chu.phat() }
       return true
     }
     if (!a.s) return true
     if (t === 'live-bu') { await this.guiBu(st, ws, j.net); return true }
-    // Em tự tắt mic (bấm «Xong», mất quyền mic): chỉ gỡ được mic của CHÍNH mình.
-    if (t === 'live-mic-tat') { if (LL.liveThuMic(st, nay, a.s)) { await this.chu.luu(false); this.chu.phat() } return true }
+    // Em tự tắt mic (bấm «Xong, tắt mic», mất quyền mic): chỉ gỡ được mic / lời mời của CHÍNH mình.
+    if (t === 'live-mic-tat') { if (LL.liveEmTatMic(st, a.s, nay)) { await this.chu.luu(false); this.chu.phat() } return true }
+    // ĐỢT 2: em giơ / hạ tay · «Để sau» · máy em không bật được mic. Mọi lệnh chỉ đụng tới CHÍNH em (sbd lấy từ vé, không từ tin).
+    if (t === 'live-tay' || t === 'live-de-sau' || t === 'live-mic-loi') {
+      const doi = t === 'live-tay' ? LL.liveTay(st, a.s, j.v !== false, nay) : t === 'live-de-sau' ? LL.liveDeSau(st, a.s, nay) : LL.liveMicLoi(st, a.s, j.ly, nay)
+      if (doi) { await this.chu.luu(false); this.chu.phat() }
+      return true
+    }
     if (await this.tuTat(st, nay)) return true
     if (t === 'live-ok') {
       if (!l.bat || !LL.duocXemLive(st, a.s)) return true
@@ -234,7 +261,7 @@ export class LiveMay {
     }
     if (t === 'live-do') {
       if (!l.bat || a.x !== l.phien) return true
-      this.doEm.set(a.s, { luc: nay, d: so(j.d, 2000), j: so(j.j, 5000), m: so(j.m, 60_000), rtt: so(j.rtt, 10_000), tt: so(j.tt, 10_000), dc: j.dc === true })
+      this.doEm.set(a.s, { luc: nay, d: so(j.d, 2000), j: so(j.j, 5000), m: so(j.m, 60_000), rtt: so(j.rtt, 10_000), tt: so(j.tt, 10_000), dc: j.dc === true, gl: j.gl === true })
       if (nay - this.lucGuiDo >= NHIP_DO_MS) { this.lucGuiDo = nay; this.guiThay(JSON.stringify({ t: 'live-do', ...this.gomDo(nay) })) }
       return true
     }
@@ -243,7 +270,8 @@ export class LiveMay {
   /** Gộp số đo các máy em báo trong 30 giây gần nhất (trung vị + p95 giữa các em). Chỉ trong bộ nhớ. */
   gomDo(nay: number) {
     const ds = [...this.doEm.values()].filter((x) => nay - x.luc <= 30_000)
-    return { so: ds.length, dc: ds.filter((x) => x.dc).length, d: tomTat(ds.map((x) => x.d)), jitter: tomTat(ds.map((x) => x.j)), muon: tomTat(ds.map((x) => x.m)), rtt: tomTat(ds.map((x) => x.rtt)), tieng: tomTat(ds.map((x) => x.tt)) }
+    // `giayLech` = số máy em báo giấy đề xuống dòng KHÁC giấy của thầy (rủi ro R3) ⇒ máy đó đang ẩn nét trên giấy.
+    return { so: ds.length, dc: ds.filter((x) => x.dc).length, giayLech: ds.filter((x) => x.gl).length, d: tomTat(ds.map((x) => x.d)), jitter: tomTat(ds.map((x) => x.j)), muon: tomTat(ds.map((x) => x.m)), rtt: tomTat(ds.map((x) => x.rtt)), tieng: tomTat(ds.map((x) => x.tt)) }
   }
   private tat(st: TrangThaiPhong, nay: number): boolean {
     const tomTatDo = this.gomDo(nay)
@@ -270,6 +298,30 @@ export class LiveMay {
     // Em đang phát mic mất kết nối (không còn kết nối nào khác của em) ⇒ thu mic.
     if (a?.v === 'hs' && a.s && st.live.mic?.sbd === a.s && !this.chu.ctx.getWebSockets('hs').some((w) => w !== ws && this.kem(w).s === a.s) && LL.liveThuMic(st, Date.now(), a.s)) { await this.chu.luu(false); this.chu.phat(); return }
     this.henBaoXem()
+  }
+  // ── ĐỢT 2: EM Ở XA + NHẬT KÝ ĐÀM THOẠI ──
+  /** Gọi máy các em Ở XA (thuộc lớp, chưa điểm danh, chưa nối phòng) qua kênh đẩy ⇒ máy em mở màn và xin vé «em ở xa». 0 lệnh D1. */
+  private goiXa(st: TrangThaiPhong, nay: number): void {
+    this.lucGoiXa = nay
+    if (!this.chu.bao || !st.live?.xa) return
+    const daNoi = new Set(this.chu.ctx.getWebSockets('hs').map((ws) => this.kem(ws).s))
+    const ds = st.ds.filter((e) => !e.vao && !daNoi.has(e.sbd)).map((e) => e.sbd)
+    if (ds.length) this.chu.bao(ds)
+  }
+  /** Phòng gọi mỗi lần phát view: rút nhật ký đàm thoại chờ ghi (ai giơ tay, được mời, nói từ giờ nào tới giờ nào, bị thu mic) vào KHO CỦA PHÒNG —
+   *  mỗi lần một khoá riêng, không đọc lại sổ, không D1. Lỗi ghi ⇒ bỏ qua (không làm hỏng việc phát view). */
+  ghiNhatKy(st: TrangThaiPhong): void {
+    const ds = LL.rutNhatKy(st)
+    if (!ds.length) return
+    const khoa = `nk:${String(ds[0]!.luc).padStart(14, '0')}:${String(this.soNk++ % 1000).padStart(3, '0')}`
+    this.chu.ctx.waitUntil(this.chu.ctx.storage.put(khoa, ds).catch(() => undefined))
+  }
+  /** Đọc nhật ký đàm thoại của buổi (theo thứ tự giờ). */
+  async docNhatKy(): Promise<LL.MucNhatKy[]> {
+    const m = await this.chu.ctx.storage.list<LL.MucNhatKy[]>({ prefix: 'nk:', limit: NK_DOC_TOI_DA })
+    const ra: LL.MucNhatKy[] = []
+    for (const ds of m.values()) if (Array.isArray(ds)) ra.push(...ds)
+    return ra
   }
   /** Có kết nối mới vào phòng ⇒ bỏ danh sách giữ sẵn (lần gửi kế dựng lại, có máy mới). */
   noiMoi(): void { this.boDs() }
