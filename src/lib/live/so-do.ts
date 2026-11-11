@@ -52,6 +52,7 @@ export interface PhanTre { thu: number; chuoi: number; ma: number; mangThay: num
 /** Tổng các phần đã biết (ms, làm tròn); `du` = đã có đủ số của cả máy thầy lẫn máy em. */
 export function treTiengUocTinh(p: PhanTre): { ms: number; du: boolean } {
   const du = p.mangThay != null && p.mangEm != null && p.demEm != null
-  return { ms: Math.round(p.thu + p.chuoi + p.ma + (p.mangThay ?? 0) / 2 + (p.mangEm ?? 0) / 2 + (p.demEm ?? 0)), du }
+  const k = (v: number | null): number => (v != null && Number.isFinite(v) && v > 0 ? v : 0) // số âm / không phải số (thiết bị báo bậy) không được kéo tổng xuống
+  return { ms: Math.round(k(p.thu) + k(p.chuoi) + k(p.ma) + k(p.mangThay) / 2 + k(p.mangEm) / 2 + k(p.demEm)), du }
 }
 

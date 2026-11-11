@@ -209,7 +209,7 @@ function dongTre(c: ChanDoanMic): string {
   const so = (o: unknown, k: string): number | null => { const v = (o as Record<string, { tv?: unknown } | null> | null)?.[k]?.tv; return typeof v === 'number' ? v : null }
   const tt = so(m.em, 'tieng'), rttEm = so(m.em, 'rtt')
   const u = treTiengUocTinh({ thu: c.treThu ?? 10, chuoi: c.chuoi ? TRE_CHUOI[c.kieu] ?? 0 : 0, ma: treKhungOpus(m.ptime), mangThay: m.rtt, mangEm: rttEm, demEm: tt == null ? null : Math.max(0, tt - TRE_CO_DINH_EM) })
-  return `đường nối ${m.duong ?? '?'} · RTT ${m.rtt == null ? '?' : Math.round(m.rtt)} ms · ${u.du ? `trễ tiếng ước tính ~${u.ms} ms (chưa gồm loa máy em)` : `trễ tiếng phần máy thầy ~${u.ms} ms (chưa có số từ máy em)`}`
+  return `đường nối ${m.duong ?? '?'} · RTT ${m.rtt == null ? '?' : Math.round(m.rtt)} ms · ${u.ms <= 0 ? 'trễ tiếng chưa đo được' : u.du ? `trễ tiếng ước tính ~${u.ms} ms (chưa gồm loa máy em)` : `trễ tiếng phần máy thầy ~${u.ms} ms (chưa có số từ máy em)`}`
 }
 /** Có phòng + công tắc bật ⇒ nạp thư viện, nối sẵn (track câm) để bấm Live là live ngay. */
 function dam(): Promise<void> {

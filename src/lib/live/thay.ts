@@ -484,18 +484,18 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   function mucAm(): number {
     let v = 0
     const nay = mt.dongHo(), ra = tuy.chuoi !== false && chuoi && !chuoi.hong && mauRa ? chuoi.doRa : null
-    const doTaiCho = (): number | null => (ctxChay() && (ra || (doAm && mauAm)) ? Math.min(1, (ra ? rms(ra, mauRa!) : rms(doAm!, mauAm!)) * 4) : null)
+    const doTaiCho = (): number | null => (ctxChay() && (ra || (doAm && mauAm)) ? Math.min(1, (ra ? rms(ra, mauRa!) : rms(doAm!, mauAm!)) * 3) : null)
     if (tt.micTat) v = 0 // thầy tắt tiếng / tạm dừng: lớp không nghe ⇒ vạch đứng yên ngay (không chờ số đo của bộ gửi làm mới)
     else if (dangLive() && gui && tt.tieng === 'mic' && !khongTieng) {
       // ĐANG LIVE: vạch = tiếng ĐANG GỬI cho lớp (số đo của bộ gửi), KHÔNG lấy luồng đo tại chỗ — máy thầy có tín hiệu mà bộ gửi không cầm / chưa nối
       // máy chủ tiếng thì vạch phải đứng yên (thầy 11/11: vạch chạy mà em không nghe).
       if (nay - lucDocGui > 120) docGui()
-      if (guiSo2.muc != null && nay - guiSo2.luc < 1500) v = pc && pc.connectionState === 'connected' ? Math.min(1, guiSo2.muc * 4) : 0
+      if (guiSo2.muc != null && nay - guiSo2.luc < 1500) v = pc && pc.connectionState === 'connected' ? Math.min(1, guiSo2.muc * 3) : 0
       else v = nay - gui0 < 1500 || !gui.getStats ? doTaiCho() ?? 0 : 0 // bộ gửi chưa kịp có số đo (vừa gắn) / trình duyệt không có `getStats`
     } else {
       const d = doTaiCho()
       if (d != null) v = d
-      else { void amCtx?.resume().catch(() => undefined); if (nay - lucDocGui > 250) docGui(); v = Math.min(1, (guiSo2.muc ?? 0) * 4) }
+      else { void amCtx?.resume().catch(() => undefined); if (nay - lucDocGui > 250) docGui(); v = Math.min(1, (guiSo2.muc ?? 0) * 3) }
     }
     if (v > NGUONG_TIENG && !tt.micTat) lucTieng = nay
     return v
@@ -519,10 +519,10 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     const d = t && ctxChay() && doAm && mauAm ? Math.min(1, rms(doAm, mauAm) * 4) : null
     return {
       ten: t?.label || '', track: !t ? 'khong' : t.readyState !== 'live' ? 'ended' : t.muted ? 'muted' : !t.enabled ? 'tat' : 'live',
-      muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 4) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
+      muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 3) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
       sfu: !!pc && pc.connectionState === 'connected', loc: tt.loc, bac, ctx: amCtx?.state ?? 'khong',
       hz: cd.sampleRate ?? null, kenh: cd.channelCount ?? null, vong: typeof cd.echoCancellation === 'boolean' ? cd.echoCancellation : cd.echoCancellation == null ? null : true, on: cd.noiseSuppression ?? null, agc: cd.autoGainControl ?? null,
-      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: typeof (cd as { latency?: number }).latency === 'number' ? Math.round((cd as { latency: number }).latency * 1000) : null,
+      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: ((l) => (typeof l === 'number' && l >= 0 && l <= 0.2 ? Math.round(l * 1000) : null))((cd as { latency?: number }).latency), // ngoài 0–200 ms = trình điều khiển báo bậy (mic USB báo số âm ⇒ «trễ −121 ms»)
     }
   }
   const khiThietBi = (): void => { tuy.khiThietBi?.(); if (tt.micTinh === 'mat') henMoLaiMic(300) }
