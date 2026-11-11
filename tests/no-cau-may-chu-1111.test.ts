@@ -60,7 +60,7 @@ it('ngày đầu mở sổ nợ 0; thiếu 8 câu ⇒ hôm sau nợ 8, trả t�
   const c = await lap(k, D12 + 60_000)
   expect(c.l.toiThieu).toBe(34)
   expect(mucNgay(k, '2026-11-12')).toBe(34)
-  expect(soDong(k, 'no_cau_chon')).toBe(1)
+  expect(soDong(k, 'goi_bai_7_no_chon')).toBe(1)
   expect(await docNo7(k.env, 'S1', '2026-11-12')).toMatchObject({ em: { no: 8, lan: 0, den: '2026-11-11' }, chon: { kieu: 'toi_thieu', so: 6, goc: 28 } })
 })
 
@@ -129,7 +129,7 @@ it('em vắng nhiều ngày: nợ cộng dồn có lãi nhưng không quá trầ
   const a = await lap(k, D16)
   expect(a.t.noCau).toMatchObject({ no: 84, toiThieu: 21, kieu: 'toi_thieu', so: 21 })
   expect(a.l.toiThieu).toBe(49)
-  k.d.sql.prepare("UPDATE no_cau_em SET lan=3 WHERE sbd='S1'").run() // dựng trạng thái «đã trả tối thiểu 3 lần»
+  k.d.sql.prepare("UPDATE goi_bai_7_no_em SET lan=3 WHERE sbd='S1'").run() // dựng trạng thái «đã trả tối thiểu 3 lần»
   await expect(chonNoCau7(k.env, 'S1', { kieu: 'toi_thieu' }, D16 + 1000)).rejects.toThrow('trả hết')
   expect(await chonNoCau7(k.env, 'S1', { kieu: 'het' }, D16 + 2000)).toMatchObject({ so: 84, muc: 112 })
 })
@@ -148,7 +148,7 @@ it('không nợ thì không có lệnh chọn; trước ngày bật / lỗi đ�
   const k = await kho()
   await lap(k, D11)
   await expect(chonNoCau7(k.env, 'S1', { kieu: 'het' }, D11)).rejects.toThrow('không có nợ câu')
-  k.d.sql.exec('DROP TABLE no_cau_chon') // bảng hỏng ⇒ câu đọc lùi về bản cũ, em học như chưa có tính năng
+  k.d.sql.exec('DROP TABLE goi_bai_7_no_chon') // bảng hỏng ⇒ câu đọc lùi về bản cũ, em học như chưa có tính năng
   sang(D11 + NGAY)
   const b = await lap(k, D11 + NGAY)
   expect(b.l.toiThieu).toBe(28)

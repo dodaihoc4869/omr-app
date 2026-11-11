@@ -78,7 +78,7 @@ Tổng em trả 47 câu cho khoản nợ 42 câu: 5 câu là lãi. Trả hết n
 - Thầy sửa / rút câu của bài: nợ đếm theo số câu, không gắn mã câu ⇒ không lệch.
 
 ## 6. Dữ liệu và chi phí máy chủ
-- Hai bảng CHỈ-THÊM (goi-bai-7-schema.ts): `no_cau_em(sbd, no, lan, loai_json, den_ngay, luc)` (sổ nợ của em: nợ đầu ngày kế sau `den_ngay`, số lần đã trả tối thiểu, nợ theo loại kể cả lãi) và `no_cau_chon(sbd, ngay, kieu, so, goc, luc)` (lựa chọn mỗi ngày; `goc` = mức gốc của ngày, mức hôm nay = goc + so).
+- Hai bảng CHỈ-THÊM (goi-bai-7-schema.ts): `goi_bai_7_no_em(sbd, no, lan, loai_json, den_ngay, luc)` (sổ nợ của em: nợ đầu ngày kế sau `den_ngay`, số lần đã trả tối thiểu, nợ theo loại kể cả lãi) và `goi_bai_7_no_chon(sbd, ngay, kieu, so, goc, luc)` (lựa chọn mỗi ngày; `goc` = mức gốc của ngày, mức hôm nay = goc + so).
 - Sổ nợ + lựa chọn hôm nay đọc CÙNG câu đọc mức ngày ⇒ ngày thường **0 đợt chờ D1 thêm** trên lệnh nóng. Riêng lần lập ĐẦU TIÊN của ngày (thường là lượt lập sẵn ban đêm, không ai chờ) thêm 1 lô đọc các ngày đã qua + 1 lô ghi (chốt nợ, lựa chọn mặc định «trả tối thiểu», nâng mức hôm nay). Không chốt trong 2 phút đầu ngày (chờ dòng sổ của câu làm lúc 23:59).
 - Tóm tắt trả về trong `goi7.noCau = { no, con, theoLoai: { moi, sua, on, lai }, toiThieu, lan, phaiTraHet, kieu, so, daTra, lai, laiDemNay }`. Một lệnh mới `hoc-tap-no-cau-chon { kieu: 'toi_thieu' | 'het' }`. Mã: `server/src/no-cau.ts` (luật thuần), `server/src/no-cau-d1.ts`, `src/components/hoc-tap/TheNoCau.tsx` (mảnh lười), `src/lib/no-cau-doc.ts`.
 - Kế hoạch ngày: số câu cần = số đã chọn trả + 28, vẫn qua `rut28`. Đáp án không xuống máy trước khi nộp — như mọi chặng hiện nay.
