@@ -83,9 +83,10 @@ export interface PropsLopLive {
   xa?: boolean
   /** Số thứ tự câu của lượt («Câu 3» ở đầu giấy đề dựng tại máy em). */
   so?: number | null
-  /** Lượt đang có em được gọi LÊN BẢNG (`viewEm.luot` + số báo danh của em cầm máy; cả em ở xa) ⇒ thông báo «lên bảng» giữa màn 3 giây + thẻ tên trên
-   *  khung bảng (LenBang.tsx). Không có lời gọi ⇒ null. */
-  lenBang?: { l: Parameters<typeof emLenBang>[0]; sbd: string } | null
+  /** Lượt của phòng (`viewEm.luot`, mọi màn kể cả em ở xa): có `goi` ⇒ thông báo «lên bảng» giữa màn 3 giây + thẻ tên trên khung bảng (LenBang.tsx).
+   *  Máy của CHÍNH em được gọi nhận ra qua `luot.sbd` (có khi đang ở bảng live — đúng lúc cần chữ «Em lên bảng»). Truyền thẳng lượt (không dựng vật mới) để
+   *  mảnh ManBinhPhanUng nằm trên đường tải mở /ph không to thêm. */
+  lenBang?: Parameters<typeof emLenBang>[0] | null
 }
 
 /** Tấm giấy đề DỰNG THƯỜNG (câu có ảnh / bảng / sơ đồ, giấy lệch giấy thầy): khối đề dùng chung dựng theo bề ngang khung giấy của EM rồi phóng cho vừa
@@ -342,7 +343,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   if (dangBat !== batTruoc) { setBatTruoc(dangBat); lucBat.current = dangBat ? Date.now() : 0 }
   // EM LÊN BẢNG: mốc phát tấm giữa màn = lúc lời gọi MỚI tới khi lớp này đang chạy. Lớp vừa dựng mà đã có em đang lên bảng (em vào muộn / nối lại) ⇒
   // mốc 0: không phát lại, chỉ thẻ tên + dấu. Gọi em khác ⇒ mốc mới (tấm mới thay tấm cũ); hết lượt gọi ⇒ mốc 0.
-  const emBang = emLenBang(lenBang?.l, lenBang?.sbd), khoaBang = khoaDang(emBang)
+  const emBang = emLenBang(lenBang ?? undefined, luot?.sbd), khoaBang = khoaDang(emBang)
   const [bangTruoc, setBangTruoc] = useState(khoaBang)
   const [lucBang, setLucBang] = useState(0)
   if (khoaBang !== bangTruoc) { setBangTruoc(khoaBang); setLucBang(khoaBang ? Date.now() : 0) }

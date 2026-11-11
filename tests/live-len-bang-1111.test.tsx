@@ -43,10 +43,13 @@ function phong(): TrangThaiPhong {
 }
 const view = { duocXem: true, san: true, bat: true, tu: 1, phien: 1, ss: null, tieng: 'bat', soNet: 0, bang: true, emTay: false, hangTay: null, emDuocMoi: false, emNoi: false, noi: [] } as never
 const dangKy = () => {}
-/** Dựng LopLive cho máy của em `sbd` theo đúng cách ManBinhPhanUng truyền: `lenBang` = lượt có lời gọi + số báo danh của em. */
+/** Dựng LopLive cho máy của em `sbd` theo đúng cách ManBinhPhanUng truyền: `lenBang` = lượt của phòng (thẳng `viewEm.luot`); `luot` (dải lượt, mang số
+ *  báo danh của em cầm máy) có khi máy đang ở bảng live. */
 async function dung(st: TrangThaiPhong, sbd: string) {
   const { default: LopLive } = await import('../src/components/live/LopLive')
-  const ve = () => { const l = viewEm(st, sbd).luot; return <LopLive ve="ve" goc="https://may-chu" guiTho={() => {}} dangKy={dangKy} view={view} che="bang" de={null} khoaDe="q1" doi={{ ten: 'Đội Natri', ky: 'Na', kj: 0 }} matMang={false} roi={false} lenBang={l?.goi ? { l, sbd } : null} /> }
+  const doi = st.ds.find((e) => e.sbd === sbd)?.doi ?? 0
+  const ve = () => { const l = viewEm(st, sbd).luot; return <LopLive ve="ve" goc="https://may-chu" guiTho={() => {}} dangKy={dangKy} view={view} che="bang" de={null} khoaDe="q1" doi={{ ten: 'Đội Natri', ky: 'Na', kj: 0 }} matMang={false} roi={false}
+    luot={l ? { l, sbd, doi, daGuiMay: false, ketQuaBang: null, gui: () => true } : null} lenBang={l} /> }
   const r = render(ve())
   await waitFor(() => expect(document.querySelector('.lv')).toBeTruthy())
   return { lai: () => act(() => { r.rerender(ve()) }) }
@@ -179,7 +182,9 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
   it('thầy chấm ⇒ dấu mất ngay (kể cả khi tấm còn đang đứng), thẻ tên còn; lượt mới ⇒ thẻ + dải mất, khung bảng cao lại như cũ', async () => {
     const st = phong(), m = await dung(st, 'S1')
     const caoTruoc = parseFloat(document.querySelector<HTMLElement>('.lv-bang')!.style.height)
-    await act(async () => { await new Promise((r) => setTimeout(r, 700)) }) // viên chào «Thầy đang live» lúc thầy vừa bật live tự mất sau 0,6 giây
+    const conLop = () => [...document.querySelector('.lv')!.children].map((e) => e.className.split(' ')[0]).sort()
+    await act(async () => { await new Promise((r) => setTimeout(r, 700)) })
+    const conTruoc = conLop() // viên chào «Thầy đang live» lúc thầy vừa bật live tự mất sau 0,6 giây
     gioGia()
     goiLenBang(st, 'S5', [], 3000); m.lai()
     qua(900)
@@ -190,8 +195,8 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
     moLuot(st, { ...CAU, qid: 'Q2' }, 6000); m.lai()
     expect(the()).toBeNull(); expect(document.querySelector('.lv-dau-bang')).toBeNull()
     expect(parseFloat(document.querySelector<HTMLElement>('.lv-bang')!.style.height)).toBe(caoTruoc)
-    // con trực tiếp của lớp bảng về đúng như lúc chưa ai lên bảng
-    expect([...document.querySelector('.lv')!.children].map((e) => e.className.split(' ')[0]).sort()).toEqual(['lv-khay', 'lv-nam', 'lv-nen', 'lv-thuoc'])
+    // con trực tiếp của lớp bảng về đúng như lúc chưa ai lên bảng (không sót tấm / dải nào)
+    expect(conLop()).toEqual(conTruoc); expect(conTruoc.some((c) => c.startsWith('lv-lb') || c === 'lv-dau-bang')).toBe(false)
   })
 
   it('máy của CHÍNH em được gọi ⇒ chữ riêng «Em lên bảng» + tên em · đội; dấu vẫn gọn «đang lên bảng», nhãn đọc màn «Em đang lên bảng»', async () => {
