@@ -1,0 +1,16 @@
+[
+  {
+    "i": 719,
+    "hashSvg": "9b1901b7ae244c55d4532d7806ffc41a5f85b1e2a53e602d52b4a40b24abad5c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở RIÊNG native719 FULL, câu dẫn/ref DH-11-C3-B14-D1-I-7.hinh.0.du_lieu và fresh Chromium3× FULL với runtime actualreadSHA; đã mở macro hai vòng, nhãnY, peak102/128. Bốn peak đen51/64/102/128 đúng vị trí/độ cao nguồn, bảy nhãnX/năm nhãnY/12ticks, không số0; trụcY cách mép trên. Hai vòng ngưng tụ10C/hai vòng tròn và cạnh chung liên tục nhìn thấy. NhãnY đậm xoay, số thường thẳng, m/z thường nghiêng; không thấy chạm/cắt/tràn hoặc dữ kiện/đáp án thêm; không dựa alias554.",
+    "render": "/workspace/scratch/soat356-719-fresh.png",
+    "macro": [
+      "/workspace/scratch/ms719-y.png",
+      "/workspace/scratch/ms719-rings.png",
+      "/workspace/scratch/ms719-peaks.png"
+    ],
+    "hash": "86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484",
+    "hashSvgDaSoat": "9b1901b7ae244c55d4532d7806ffc41a5f85b1e2a53e602d52b4a40b24abad5c"
+  }
+]

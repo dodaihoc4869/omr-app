@@ -1,0 +1,29 @@
+[
+  {
+    "i": 719,
+    "hash": "86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484",
+    "fileNguon": "anh/86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484.png",
+    "svg": "ms719-native-ddh-9b1901b7ae244c55d4532d7806ffc41a5f85b1e2a53e602d52b4a40b24abad5c.svg",
+    "hashSvg": "9b1901b7ae244c55d4532d7806ffc41a5f85b1e2a53e602d52b4a40b24abad5c",
+    "byteSvg": 33188,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B14-D1-I-7",
+        "de": "Phổ khối lượng của naphtalene được cho trong hình dưới đây:\nPhân tử khối của naphtalene là",
+        "refs": [
+          {
+            "hash": "86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484",
+            "where": "DH-11-C3-B14-D1-I-7.hinh.0.du_lieu",
+            "hashDataUrl": "711ae0d0255613387ed66924daea696c3a2c89694afbd6b430081e783e79dc02"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4BLACKpeaks51-64-102-128/ALLwidth2native/7X5Y12ticks/BLACKaxes-YTOPmargin15NOTcropped-NOorigin0/2fusedhex10bareC2innercirclesONEsharededge/regularUPRIGHTnums-trueDAMrotYlabel-mzREGULARITALIC/0H0heads0grid/noalternatingdouble-names-formula-answer-intensityinference",
+    "hashSvgDaSoat": "9b1901b7ae244c55d4532d7806ffc41a5f85b1e2a53e602d52b4a40b24abad5c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

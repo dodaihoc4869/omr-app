@@ -1,0 +1,519 @@
+{
+  "i": 719,
+  "assetIndexProvided": 1134,
+  "hash": "86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484.png",
+  "size": [
+    770,
+    405
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-11-C3-B14-D1-I-7",
+      "de": "Phổ khối lượng của naphtalene được cho trong hình dưới đây:\nPhân tử khối của naphtalene là",
+      "allHinh": [
+        {
+          "hash": "86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484",
+          "where": "DH-11-C3-B14-D1-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "711ae0d0255613387ed66924daea696c3a2c89694afbd6b430081e783e79dc02"
+        }
+      ],
+      "missingHashes": [
+        "86a9ded525e68f06f8bf3e849f113b77d8aaa5bd634cefc58346e0c5d3a6d484"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownRings6xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownYlabel6xOpened": true
+  },
+  "measurementLimits": "Nearest1pxnativecenterline/bbox estimates, notexactintensityscientificdata. Independentnative719, NOTalias554.",
+  "geometry": {
+    "axes": {
+      "vertical": [
+        [
+          95,
+          15
+        ],
+        [
+          95,
+          360
+        ]
+      ],
+      "horizontal": [
+        [
+          95,
+          360
+        ],
+        [
+          751,
+          360
+        ]
+      ],
+      "stroke": "blackgray about2px, noheads",
+      "crop": "NativewhiteTOPmargin15px axisNOTcropped; NOorigin0printed"
+    },
+    "xTicks": [
+      {
+        "text": "20",
+        "x": 165,
+        "stem": [
+          [
+            165,
+            360
+          ],
+          [
+            165,
+            370
+          ]
+        ],
+        "bbox": [
+          151,
+          373,
+          180,
+          393
+        ]
+      },
+      {
+        "text": "40",
+        "x": 252,
+        "stem": [
+          [
+            252,
+            360
+          ],
+          [
+            252,
+            370
+          ]
+        ],
+        "bbox": [
+          238,
+          373,
+          267,
+          393
+        ]
+      },
+      {
+        "text": "60",
+        "x": 340,
+        "stem": [
+          [
+            340,
+            360
+          ],
+          [
+            340,
+            370
+          ]
+        ],
+        "bbox": [
+          326,
+          373,
+          355,
+          393
+        ]
+      },
+      {
+        "text": "80",
+        "x": 427,
+        "stem": [
+          [
+            427,
+            360
+          ],
+          [
+            427,
+            370
+          ]
+        ],
+        "bbox": [
+          413,
+          373,
+          442,
+          393
+        ]
+      },
+      {
+        "text": "100",
+        "x": 515,
+        "stem": [
+          [
+            515,
+            360
+          ],
+          [
+            515,
+            370
+          ]
+        ],
+        "bbox": [
+          501,
+          373,
+          530,
+          393
+        ]
+      },
+      {
+        "text": "120",
+        "x": 602,
+        "stem": [
+          [
+            602,
+            360
+          ],
+          [
+            602,
+            370
+          ]
+        ],
+        "bbox": [
+          588,
+          373,
+          617,
+          393
+        ]
+      },
+      {
+        "text": "140",
+        "x": 690,
+        "stem": [
+          [
+            690,
+            360
+          ],
+          [
+            690,
+            370
+          ]
+        ],
+        "bbox": [
+          676,
+          373,
+          705,
+          393
+        ]
+      }
+    ],
+    "yTicks": [
+      {
+        "text": "20",
+        "y": 298,
+        "stem": [
+          [
+            87,
+            298
+          ],
+          [
+            95,
+            298
+          ]
+        ],
+        "bbox": [
+          61,
+          288,
+          85,
+          308
+        ]
+      },
+      {
+        "text": "40",
+        "y": 235,
+        "stem": [
+          [
+            87,
+            235
+          ],
+          [
+            95,
+            235
+          ]
+        ],
+        "bbox": [
+          61,
+          225,
+          85,
+          245
+        ]
+      },
+      {
+        "text": "60",
+        "y": 173,
+        "stem": [
+          [
+            87,
+            173
+          ],
+          [
+            95,
+            173
+          ]
+        ],
+        "bbox": [
+          61,
+          163,
+          85,
+          183
+        ]
+      },
+      {
+        "text": "80",
+        "y": 111,
+        "stem": [
+          [
+            87,
+            111
+          ],
+          [
+            95,
+            111
+          ]
+        ],
+        "bbox": [
+          61,
+          101,
+          85,
+          121
+        ]
+      },
+      {
+        "text": "100",
+        "y": 49,
+        "stem": [
+          [
+            87,
+            49
+          ],
+          [
+            95,
+            49
+          ]
+        ],
+        "bbox": [
+          51,
+          39,
+          85,
+          59
+        ]
+      }
+    ],
+    "peaks": [
+      {
+        "label": "51",
+        "x": 299,
+        "topY": 289,
+        "baselineY": 360,
+        "pixelHeight": 71,
+        "width": 2,
+        "labelBBox": [
+          287,
+          267,
+          312,
+          285
+        ]
+      },
+      {
+        "label": "64",
+        "x": 361,
+        "topY": 309,
+        "baselineY": 360,
+        "pixelHeight": 51,
+        "width": 2,
+        "labelBBox": [
+          349,
+          287,
+          374,
+          305
+        ]
+      },
+      {
+        "label": "102",
+        "x": 528,
+        "topY": 330,
+        "baselineY": 360,
+        "pixelHeight": 30,
+        "width": 2,
+        "labelBBox": [
+          510,
+          308,
+          546,
+          326
+        ]
+      },
+      {
+        "label": "128",
+        "x": 646,
+        "topY": 49,
+        "baselineY": 360,
+        "pixelHeight": 311,
+        "width": 2,
+        "labelBBox": [
+          628,
+          27,
+          664,
+          45
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Cường độ tương đối (%)",
+        "bbox": [
+          23,
+          58,
+          48,
+          292
+        ],
+        "rotation": -90,
+        "font": "truebold upright sans rotated-90; visiblyheavierthanregularnumeralsconfirmedown6x"
+      },
+      {
+        "text": "m/z",
+        "bbox": [
+          727,
+          371,
+          760,
+          390
+        ],
+        "font": "italiclowercase sans"
+      }
+    ],
+    "structure": {
+      "leftHex": [
+        [
+          427,
+          104
+        ],
+        [
+          462,
+          84
+        ],
+        [
+          496,
+          104
+        ],
+        [
+          496,
+          143
+        ],
+        [
+          462,
+          162
+        ],
+        [
+          427,
+          143
+        ]
+      ],
+      "rightHex": [
+        [
+          496,
+          104
+        ],
+        [
+          530,
+          84
+        ],
+        [
+          564,
+          104
+        ],
+        [
+          564,
+          143
+        ],
+        [
+          530,
+          162
+        ],
+        [
+          496,
+          143
+        ]
+      ],
+      "sharedEdge": [
+        [
+          496,
+          104
+        ],
+        [
+          496,
+          143
+        ]
+      ],
+      "sharedEdgeDrawCount": 1,
+      "innerCircles": [
+        {
+          "center": [
+            461,
+            123
+          ],
+          "rx": 22,
+          "ry": 21.5
+        },
+        {
+          "center": [
+            530,
+            123
+          ],
+          "rx": 22,
+          "ry": 21.5
+        }
+      ],
+      "stroke": "blackthinuniform2px,noalternatingdouble",
+      "bareC": 10,
+      "explicitH": 0
+    },
+    "font": "Tick/peaknumerals regularuprightsansblackgray; Ytitle TRUEBOLDuprightsansrotated; m/zregularitalic.",
+    "counts": {
+      "peaks": 4,
+      "peakLabels": 4,
+      "xTickLabels": 7,
+      "yTickLabels": 5,
+      "origin0Labels": 0,
+      "axisHeads": 0,
+      "rings": 2,
+      "innerCircles": 2,
+      "bareC": 10
+    },
+    "noAdded": [
+      "zeroatOrigin",
+      "tealaxes",
+      "magentapeaks",
+      "croptopaxis",
+      "H/Cformula",
+      "structurecaption",
+      "alternatingdoubles",
+      "exactpercentoverpeaks",
+      "answer"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "corrections": [
+    {
+      "field": "Ytitlefont",
+      "old": "regularuprightsansrotated",
+      "new": "truebold upright sans rotated",
+      "reason": "Ownylabel6xmacroshowsheavycounter/stems distinctregularnumerals; initialFULL-onlyfontclassificationincorrect.",
+      "evidence": "/workspace/scratch/719-ylabel6x-lo356.png"
+    }
+  ],
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "rings6xOpened": true,
+    "yAxis3xOpened": true,
+    "allPublicDeRead": true,
+    "yTitleTrueDam": true,
+    "noAlias554": true
+  }
+}
