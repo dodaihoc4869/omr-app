@@ -52,6 +52,30 @@ const diToi = async (hash: string) => {
 }
 
 describe('Hôm nay — bỏ "Cần thầy chữa"; khối chính có đúng/sai/giây; gợi ý nhắc con; lịch tuần', () => {
+  // 11/11 — thầy: «Làm tiếp cho thầy và phụ huynh xem nợ câu từng em»
+  it('nợ câu của con: khối ngay dưới số hôm nay, mỗi con số có nhãn; con không nợ thì không có khối', async () => {
+    const NO = { no: 42, con: 37, theoLoai: { moi: 20, sua: 14, on: 6, lai: 2 }, toiThieu: 11, lan: 1, phaiTraHet: false, kieu: 'toi_thieu', so: 11, daTra: 5, lai: 5, laiDemNay: 2, muc: 39, daChon: true }
+    tq = { ...(tq as Record<string, unknown>), noCau: NO } as typeof tq
+    const a = render(<ParentPortalScreen />)
+    await waitFor(() => expect(a.container.querySelector('[data-vung="no-cau"]')).toBeTruthy())
+    expect([...a.container.querySelectorAll('[data-vung="no-cau"] p')].map((p) => p.textContent)).toEqual([
+      'Con đang nợ 37 câu20 câu mới · 14 câu sửa · 6 câu ôn · 2 câu lãi',
+      'Hôm nay con chọn trả tối thiểu 11 câu, đã trả 5 câu.',
+      'Số còn nợ mỗi đêm cộng thêm 5 % lãi (đêm nay 2 câu). Con được trả tối thiểu nhiều nhất 3 lần (đã dùng 1), lần thứ tư phải trả hết.',
+    ])
+    cleanup()
+    tq = { ...(tq as Record<string, unknown>), noCau: { ...NO, con: 20, no: 20, lan: 3, phaiTraHet: true, kieu: 'het', so: 20, daTra: 0, daChon: false } } as typeof tq
+    const b = render(<ParentPortalScreen />)
+    await waitFor(() => expect(b.container.querySelector('[data-vung="no-cau"]')).toBeTruthy())
+    expect(b.container.querySelector('[data-vung="no-cau"]')!.getAttribute('data-het')).toBe('true')
+    expect(b.container.querySelector('[data-vung="no-cau"]')!.textContent).toContain('Hôm nay con chưa mở app.')
+    expect(b.container.querySelector('[data-vung="no-cau"]')!.textContent).toContain('Con đã dùng hết 3 lần trả tối thiểu: hôm nay phải trả hết mới tính là xong bài.')
+  })
+  it('con không nợ câu ⇒ không có khối nợ', async () => {
+    const { container } = render(<ParentPortalScreen />)
+    await waitFor(() => expect(container.querySelector('[data-vung="goi-y-nhac"]')).toBeTruthy())
+    expect(container.querySelector('[data-vung="no-cau"]')).toBeNull()
+  })
   it('không còn "Cần thầy chữa" dù máy chủ gửi số; ba số câu đúng · câu sai · trung bình; số câu đã làm / mức một lần', async () => {
     const { container } = render(<ParentPortalScreen />)
     await waitFor(() => expect(container.querySelector('[data-vung="goi-y-nhac"]')).toBeTruthy())

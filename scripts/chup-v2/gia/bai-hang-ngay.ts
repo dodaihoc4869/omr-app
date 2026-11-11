@@ -55,12 +55,19 @@ const EM = Array.from({ length: 44 }, (_, i) => emGia(i)).sort(
   (a, b) => b.soNgayThieu - a.soNgayThieu || b.tongCauThieu - a.tongCauThieu || b.thieuHomNay - a.thieuHomNay || a.hoTen.localeCompare(b.hoTen, 'vi') || a.sbd.localeCompare(b.sbd),
 )
 
+// 11/11 nợ câu cho thầy xem (`&nc=1`): em 1 đang trả tối thiểu · em 2 hết 3 lần, chưa mở app · em 5 nợ ít — hình dạng server/src/no-cau-xem.ts
+const coNoGia = (): boolean => typeof location !== 'undefined' && new URLSearchParams(location.search).has('nc')
+const NO_GIA: Record<number, NonNullable<EmBaiHangNgay['noCau']>> = {
+  0: { no: 42, con: 37, theoLoai: { moi: 20, sua: 14, on: 6, lai: 2 }, toiThieu: 11, lan: 1, phaiTraHet: false, kieu: 'toi_thieu', so: 11, daTra: 5, lai: 5, laiDemNay: 2, muc: 39, daChon: true },
+  1: { no: 20, con: 20, theoLoai: { moi: 0, sua: 9, on: 8, lai: 3 }, toiThieu: 6, lan: 3, phaiTraHet: true, kieu: 'het', so: 20, daTra: 0, lai: 5, laiDemNay: 1, muc: 48, daChon: false },
+  4: { no: 9, con: 9, theoLoai: { moi: 8, sua: 0, on: 0, lai: 1 }, toiThieu: 6, lan: 0, phaiTraHet: false, kieu: 'toi_thieu', so: 6, daTra: 0, lai: 5, laiDemNay: 1, muc: 34, daChon: true },
+}
 export function baiHangNgayGia(): KetQuaBaiHangNgay {
   const dem = new Map<string, { tenLop: string; khoi: string; soEm: number }>()
   for (const e of EM) dem.set(e.lop, { tenLop: e.lop, khoi: e.khoi, soEm: (dem.get(e.lop)?.soEm ?? 0) + 1 })
   const o = EM.flatMap((e) => e.ngay)
   return {
-    ok: true, tu: NGAY[0]!, den: HOM_NAY, homNay: HOM_NAY, ngay: NGAY, em: EM,
+    ok: true, tu: NGAY[0]!, den: HOM_NAY, homNay: HOM_NAY, ngay: NGAY, em: coNoGia() ? EM.map((e, i) => (NO_GIA[i] ? { ...e, noCau: NO_GIA[i] } : e)) : EM,
     lop: [...dem.values()].sort((a, b) => b.khoi.localeCompare(a.khoi) || a.tenLop.localeCompare(b.tenLop, 'vi')),
     soOUocTinh: o.filter((n) => n.mucUocTinh).length, soO: o.length, canhBao: [],
   }

@@ -24,6 +24,7 @@ import { NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO as NG, TEN_NHAN_THAI_DO, TOI
 import { CAU_TOI_THIEU } from './hanh-trinh-ngay'
 import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
 import { SQL_KHONG_LAM_LAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
+import { SQL_NO_XEM, gomDongNo, xemNoEm, type NoCauXem } from './no-cau-xem'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { mucUocGoi7 } from './goi-bai-7-loi'
 import { SQL_TC } from './lam-lai-so'
@@ -194,6 +195,8 @@ export const SQL_DEM_GAP = `SELECT g.sbd AS sbd, date(g.luc, '+7 hours') AS ngay
   GROUP BY g.sbd, date(g.luc, '+7 hours')`
 /** Mức hôm nay đã chốt của ngày Gói 7 (`chotMucNgay7`) — đúng số em thấy trên app. */
 const SQL_MUC_GOI7 = 'SELECT sbd, ngay, tang, muc FROM goi_bai_7_muc_ngay WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay BETWEEN ?2 AND ?3'
+/** Mức Gói 7 + SỔ NỢ CÂU của các em trong CÙNG một lệnh (no-cau-xem.ts; cổng tốc độ `/ph` đếm cả số lệnh D1). Bảng nợ chưa có ⇒ lệnh lỗi ⇒ đọc lại câu mức cũ. */
+const SQL_MUC_NO_GOI7 = SQL_MUC_GOI7.replace('SELECT sbd, ngay, tang, muc', 'SELECT sbd, ngay, tang, muc, NULL AS k, NULL AS d') + SQL_NO_XEM
 /** Σ lịch câu mới các gói của em mỗi ngày — chỉ dùng ƯỚC TÍNH ngày Gói 7 chưa có dòng chốt. */
 const SQL_QUOTA_GOI7 = `SELECT n.sbd,n.ngay,SUM(n.quota) AS q FROM goi_bai_7_ngay n
   WHERE n.sbd IN(SELECT value FROM json_each(?1)) AND n.ngay BETWEEN ?2 AND ?3 AND (n.ngay<?4 OR EXISTS(
@@ -231,7 +234,8 @@ export function khoangDocTheoCheDo(lo: readonly Pick<EmGoc, 'goi7Tu'>[], tu: str
 }
 
 /** Dãy ngày (mức + đã làm) của các em, đọc theo lô. Ném `LoiDocSo` khi không đọc được sổ chính. */
-export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: string, homNay: string, canhBao: string[]): Promise<Map<string, NgayBaiEm[]>> {
+/** `noRa` (11/11): có ⇒ đọc kèm sổ NỢ CÂU (cùng lệnh đọc mức Gói 7) và điền nợ câu hiện tại của từng em đang nợ. */
+export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, den: string, homNay: string, canhBao: string[], noRa?: Map<string, NoCauXem>): Promise<Map<string, NgayBaiEm[]>> {
   const ngay = cacNgay(tu, den)
   const ra = new Map<string, NgayBaiEm[]>()
   const baoMot = (chu: string) => { if (!canhBao.includes(chu)) canhBao.push(chu) }
@@ -252,7 +256,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
       goi.length ? hoi(env, SQL_DEM_GAP, j(goi), tuGoi, den) : rong,
       ht.length ? hoi(env, SQL_KE_HOACH, j(ht), tu, denHt) : rong,
       ht.length ? hoi(env, SQL_LUOT_KE_HOACH, j(ht), tu, denHt) : rong,
-      goi.length ? hoi(env, SQL_MUC_GOI7, j(goi), tuGoi, den) : rong,
+      goi.length ? (noRa ? hoi(env, SQL_MUC_NO_GOI7, j(goi), tuGoi, den).then((r) => r ?? hoi(env, SQL_MUC_GOI7, j(goi), tuGoi, den)) : hoi(env, SQL_MUC_GOI7, j(goi), tuGoi, den)) : rong,
       goi.length ? hoi(env, SQL_QUOTA_GOI7, j(goi), tuGoi, den, homNay) : rong,
     ])
     if(kRows===null&&batKt)throw new LoiDocSo('Không đọc được lịch kiểm tra riêng của các em.')
@@ -274,7 +278,8 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
     const demGoi = new Map((rGoi ?? []).map((x) => [k(x.sbd, x.ngay), Number(x.n) || 0]))
     const demGap = new Map((rGap ?? []).map((x) => [k(x.sbd, x.ngay), Number(x.n) || 0]))
     const keHoach = new Map((rKh ?? []).map((x) => [k(x.sbd, x.ngay), { dao: mangChuoi(x.dao_json), doan: mangChuoi(x.doan_json) }]))
-    const muc7 = new Map((rMuc7 ?? []).map((x) => [k(x.sbd, x.ngay), { tang: tangHopLe(x.tang), muc: Math.max(0, Math.floor(Number(x.muc) || 0)) }]))
+    const muc7 = new Map((rMuc7 ?? []).filter((x) => x.k == null).map((x) => [k(x.sbd, x.ngay), { tang: tangHopLe(x.tang), muc: Math.max(0, Math.floor(Number(x.muc) || 0)) }]))
+    const dongNo = noRa ? gomDongNo((rMuc7 ?? []).filter((x) => x.k != null)) : null
     const quota7 = new Map((rQuota7 ?? []).map((x) => [k(x.sbd, x.ngay), Math.max(0, Math.floor(Number(x.q) || 0))]))
     const luot = new Map<string, { qid: unknown; tc: unknown }[]>()
     for (const x of rLuot ?? []) (luot.get(k(x.sbd, x.ngay)) ?? luot.set(k(x.sbd, x.ngay), []).get(k(x.sbd, x.ngay))!).push({ qid: x.qid, tc: x.tc })
@@ -289,6 +294,11 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])
         return { ...(test?.baiNgayToiThieu?{kiemTra:test}:{}),ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))
+      const soNo = dongNo?.get(e.sbd)
+      if (soNo && noRa) {
+        const nx = xemNoEm(soNo, ra.get(e.sbd)!.map((n) => ({ ngay: n.ngay, cheDo: n.cheDo === 'hanh-trinh' ? 'khac' as const : n.cheDo, muc: n.cheDo === 'goi7' && (muc7.get(k(e.sbd, n.ngay))?.muc ?? 0) > 0 ? muc7.get(k(e.sbd, n.ngay))!.muc : null, lam: n.daLam, ktNop: ktNgay.get(k(e.sbd, n.ngay))?.nopLuc != null })), homNay)
+        if (nx) noRa.set(e.sbd, nx)
+      }
     }
   }))
   return ra
@@ -298,12 +308,12 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
  * Dãy ngày (mức + đã làm) của MỘT em — ĐÚNG phép tính bảng "Bài hằng ngày" của thầy. App phụ huynh (`/ph/con-tong-quan`) dùng chung hàm này để
  * phụ huynh và thầy luôn thấy cùng một số "đã làm / mức" mỗi ngày. Đọc thiếu bất kỳ bảng nào (có cảnh báo) hoặc lỗi ⇒ null (bên gọi giữ cách tính riêng).
  */
-export async function ngayBaiCuaMotEm(env: Env, sbd: string, tu: string, den: string, homNay: string): Promise<NgayBaiEm[] | null> {
+export async function ngayBaiCuaMotEm(env: Env, sbd: string, tu: string, den: string, homNay: string, noRa?: Map<string, NoCauXem>): Promise<NgayBaiEm[] | null> {
   const goi7 = await docGoi7Em(env, sbd)
   if (!goi7) return null
   const canhBao: string[] = []
   try {
-    const ra = await docNgayCacEm(env, [{ sbd, hoTen: sbd, lop: '', khoi: '', goi7Tu: goi7.get(sbd) ?? null }], tu, den, homNay, canhBao)
+    const ra = await docNgayCacEm(env, [{ sbd, hoTen: sbd, lop: '', khoi: '', goi7Tu: goi7.get(sbd) ?? null }], tu, den, homNay, canhBao, noRa)
     return canhBao.length ? null : (ra.get(sbd) ?? null)
   } catch {
     return null
@@ -389,14 +399,16 @@ export async function gvBaiHangNgay(env: Env, b: Row, nowMs = Date.now()): Promi
   const tenLop = str(b.lop)
   const chon = tatCa.filter((e) => (!khoi || e.khoi === khoi) && (!tenLop || e.lop === tenLop))
   let ngayEm: Map<string, NgayBaiEm[]>
+  const noRa = new Map<string, NoCauXem>()
   try {
-    ngayEm = await docNgayCacEm(env, chon, tu, den, homNay, canhBao)
+    ngayEm = await docNgayCacEm(env, chon, tu, den, homNay, canhBao, noRa)
   } catch (e) {
     return { ok: false, error: e instanceof LoiDocSo ? e.message : 'Không đọc được sổ học của các em.' }
   }
   const em: EmBaiHangNgay[] = chon.map((e) => {
     const ngay = ngayEm.get(e.sbd) ?? []
-    return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, ngay, ...tomTatNgay(ngay) }
+    const no = noRa.get(e.sbd)
+    return { sbd: e.sbd, hoTen: e.hoTen, lop: e.lop, khoi: e.khoi, ngay, ...tomTatNgay(ngay), ...(no ? { noCau: no } : {}) }
   })
   em.sort(xepEmBaiHangNgay)
   const o = em.flatMap((e) => e.ngay)

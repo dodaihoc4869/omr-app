@@ -2,6 +2,7 @@
 // `POST /gv/bai-hang-ngay {tu?, den?, khoi?, lop?}` và `POST /gv/ho-so-thai-do {sbd, tu?, den?}`; hình dạng trả về là hợp đồng dùng chung
 // `server/src/bai-hang-ngay-kieu.ts` (app CHỈ ĐỌC kiểu). Không ném lỗi: trả `KetQuaLenh` với MỘT câu nói thật. Trường thiếu / sai kiểu ⇒ bỏ dòng ấy
 // (không bịa số); thiếu cả khung ⇒ "không đọc được".
+import { docNoCauXem } from './no-cau-xem'
 import type { KetQuaLenh } from './goi-lenh-thay'
 import type {
   CauTomTat, CheDoNgay, EmBaiHangNgay, KetLuanThaiDo, KetQuaBaiHangNgay, KetQuaHoSoThaiDo, LopBaiHangNgay, MaTinHieu, MucTinHieu, NgayBaiEm,
@@ -82,7 +83,7 @@ function docEm(x: unknown): EmBaiHangNgay | null {
   const o = dt(x)
   if (!o || typeof o.sbd !== 'string' || !o.sbd) return null
   const ngay = mang(o.ngay, docNgayBai)
-  const lon = dt(o.ngayThieuNhieuNhat)
+  const lon = dt(o.ngayThieuNhieuNhat), noCau = docNoCauXem(o.noCau)
   return {
     sbd: o.sbd,
     hoTen: chu(o.hoTen) || o.sbd,
@@ -97,6 +98,7 @@ function docEm(x: unknown): EmBaiHangNgay | null {
     tongDaLam: soKhongAm(o.tongDaLam),
     // máy chủ cũ chưa có trường ⇒ tính lại từ ô hôm nay (không bịa)
     thieuHomNay: so(o.thieuHomNay) !== null ? soKhongAm(o.thieuHomNay) : (ngay.find((n) => n.homNay)?.thieu ?? 0),
+    ...(noCau ? { noCau } : {}),
   }
 }
 

@@ -1,5 +1,6 @@
 // LÀN PHỤ HUYNH 12/10 — lớp ĐỌC CHẶT của `POST /ph/con-tong-quan` (hợp đồng server/src/ph-con-tong-quan-kieu.ts, chỉ import KIỂU).
 // Cùng nguyên tắc với du-lieu.ts: khối sai dạng ⇒ VẮNG hoặc bỏ dòng (không bịa 0), không ném lỗi. Chữ gợi ý nhắc do máy chủ sinh theo luật — app chỉ hiện.
+import { docNoCauXem } from '../no-cau-xem'
 import type {
   CauSaiCon, DemCau, GoiYNhac, KetQuaConTongQuan, KhoangGiay, LuotGanDay, MaGoiY, NgayHoc, NguonGiay, ThoiGianLam, TrangThaiNgay,
 } from '../../../server/src/ph-con-tong-quan-kieu'
@@ -109,6 +110,7 @@ export function docConTongQuan(raw: unknown): ConTongQuan | null {
     goiYDaDung: { so: nguyen(gy.so) ?? 0, tong: nguyen(gy.tong) ?? 0 },
     goiY: goiY.slice(0, 5),
     catBot: raw.catBot === true,
+    ...(docNoCauXem(raw.noCau) ? { noCau: docNoCauXem(raw.noCau)! } : {}),
   }
 }
 

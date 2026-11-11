@@ -8,6 +8,7 @@
 // TỚI (IntersectionObserver): khối mã nạp lười + hai lệnh `/ph/ho-so-thai-do` · `/ph/lich-su-lam-cau` chạy SONG SONG (AppPhuHuynh giữ số).
 // Huy hiệu / thang 12 bậc (làn M) ở BacCon.tsx — khối nạp sẵn song song lúc mở trang. Tin xấu nói thẳng, có số, giọng bình tĩnh; số nào cũng có nhãn;
 // không mã nội bộ, không đáp án. MÀU: chỉ biến --ph3-* sẵn có + 12 màu bậc (trang-con.css).
+import { chuLoaiNo, chuNoPhuHuynh } from '../../lib/no-cau-xem'
 import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { PhMoi } from '../../lib/ph-moi/du-lieu'
 import type { Hoc2, NhanXetCa } from '../../lib/ph-v3/du-lieu'
@@ -319,6 +320,12 @@ export function HomNay({ pm, hoc2, tq, k, nowMs }: { pm: PhMoi; hoc2: Hoc2 | nul
             <p className="tvc-hn-con">
               {so.daLam >= so.tong ? <>Con đã <b>{so.du.replace(/ hôm nay$| của ngày$/, '')}</b>{/ hôm nay$/.test(so.du) ? ' hôm nay' : ' của ngày'}.</> : so.daLam === 0 && (nTq ? nTq.soCau === 0 : true) ? <>Con <b>chưa làm câu nào</b> hôm nay.</> : <>Còn <b>{so.xap}{so.tong - so.daLam} câu</b> nữa là {so.du}.</>}
             </p>
+          )}
+          {tq?.noCau && (
+            <div className="tvc-hn-no" data-vung="no-cau" data-het={tq.noCau.phaiTraHet || undefined} role="note">
+              <p className="tvc-hn-no-dau"><b>Con đang nợ {tq.noCau.con} câu</b><span>{chuLoaiNo(tq.noCau)}</span></p>
+              {chuNoPhuHuynh(tq.noCau).map((c) => <p key={c}>{c}</p>)}
+            </div>
           )}
           {(ghi.length > 0 || hanhTrinh) && (
             <div className="tvc-hn-ghi">

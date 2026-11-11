@@ -153,6 +153,30 @@ describe('thẻ Bài hằng ngày', () => {
     expect(m.goi.mock.calls.filter(([d]) => d === '/gv/bai-hang-ngay')).toHaveLength(0)
   })
 
+  // 11/11 — thầy: «Làm tiếp cho thầy và phụ huynh xem nợ câu từng em» (server/src/no-cau-xem.ts, src/lib/no-cau-xem.ts)
+  it('nợ câu: dòng «Nợ … câu» dưới tên em đang nợ, dòng tổng trên bảng; em không nợ không có dòng; số hỏng thì không vẽ', async () => {
+    const NO = { no: 42, con: 37, theoLoai: { moi: 20, sua: 14, on: 6, lai: 2 }, toiThieu: 11, lan: 1, phaiTraHet: false, kieu: 'toi_thieu', so: 11, daTra: 5, lai: 5, laiDemNay: 2, muc: 39, daChon: true }
+    const HET = { ...NO, no: 20, con: 20, theoLoai: { moi: 0, sua: 9, on: 8, lai: 3 }, lan: 3, phaiTraHet: true, kieu: 'het', so: 20, daTra: 0, laiDemNay: 1, muc: 48, daChon: false }
+    mayChu({ bang: { ok: true, du: { ...BANG, em: BANG.em.map((e, i) => (i === 0 ? { ...e, noCau: NO } : i === 1 ? { ...e, noCau: HET } : i === 2 ? { ...e, noCau: { ...NO, con: 'x' } } : e)) } } })
+    const { container } = render(<TheBaiHangNgay />)
+    await waitFor(() => expect(container.querySelectorAll('small[data-vung="no-cau"]')).toHaveLength(2))
+    const [a, b] = [...container.querySelectorAll('small[data-vung="no-cau"]')]
+    expect(a!.textContent).toBe('Nợ 37 câu')
+    expect(a!.getAttribute('title')).toBe('Nợ câu: còn 37 câu (đầu ngày 42 câu: 20 câu mới · 14 câu sửa · 6 câu ôn · 2 câu lãi); đã trả tối thiểu 1/3 lần. Hôm nay em chọn trả tối thiểu 11 câu, đã trả 5. Còn nợ thì đêm nay cộng 2 câu lãi (5 %).')
+    expect(a!.closest('button')!.getAttribute('aria-label')).toContain('Nợ câu: còn 37 câu')
+    expect(b!.textContent).toBe('Nợ 20 câu · phải trả hết')
+    expect(b!.getAttribute('data-het')).toBe('true')
+    expect(b!.getAttribute('title')).toContain('Hôm nay em chưa mở app.')
+    expect(container.querySelector('[data-vung="tong-no-cau"]')!.textContent).toBe('2 em đang nợ câu · tổng 57 câu (số nợ ghi dưới tên em; nợ còn lại mỗi đêm cộng 5 % lãi).')
+  })
+  it('nợ câu: không em nào nợ ⇒ bảng y như cũ (không dòng nợ, không dòng tổng)', async () => {
+    mayChu()
+    const { container } = render(<TheBaiHangNgay />)
+    await waitFor(() => expect(tenHang(container)).toHaveLength(4))
+    expect(container.querySelector('[data-vung="no-cau"]')).toBeNull()
+    expect(container.querySelector('[data-vung="tong-no-cau"]')).toBeNull()
+  })
+
   it('bảng nhiệt: thứ tự máy chủ, ô "đã làm/mức" tô bốn mức, ô hôm nay, cột tổng, ghi chú mức ước tính', async () => {
     mayChu()
     const { container } = render(<TheBaiHangNgay />)

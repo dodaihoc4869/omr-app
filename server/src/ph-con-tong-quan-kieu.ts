@@ -143,6 +143,8 @@ export interface KetQuaConTongQuan {
   goiY: GoiYNhac[]
   /** Sổ của con vượt `TOI_DA_LUOT_DOC_PH` (10 000) lượt trong khoảng đọc ⇒ chỉ tính 10 000 lượt mới nhất. */
   catBot: boolean
+  /** Nợ câu hiện tại của con (11/11); vắng = không nợ. */
+  noCau?: import('./no-cau-xem').NoCauXem
 }
 
 export type TraLoiConTongQuan = KetQuaConTongQuan | { ok: false; error: string }

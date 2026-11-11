@@ -1,3 +1,4 @@
+import TheBaiHangNgayChup from '../../src/components/chien-dich/TheBaiHangNgay'
 import GvHomNayScreen from '../../src/screens/GvHomNayScreen'
 import NganHangDeScreen from '../../src/screens/NganHangDeScreen'
 import CaiDatScreen from '../../src/screens/CaiDatScreen'
@@ -127,6 +128,11 @@ if (man !== 'ph' && !man.startsWith('ph-') && thamSo.get('trong') !== 'tat') doc
 //   · `&lt=0` thầy chưa gửi nhận xét · `&dai=1` dữ liệu dài (tên dài, lời thầy dài, số lớn). Thẻ «Kiểm tra và sửa lỗi»: `&kt=chua|dang|nop|het|cu|sap|khong`
 //   (Kiểm tra ôn tập hôm nay chưa làm · đang làm 10/28 · đã nộp 8 · hết hạn · lần trước 7,5 · bài sắp mở · không có lịch) · `&ss=het|do` (đã sửa hết ·
 //   còn nhiều mà 14 ngày không sửa) · `&bt=du|khong` (Bài tập về nhà đã nộp đủ · không có bài). Đồng hồ trang = mốc của bộ giả.
+// 11/11 nợ câu cho thầy / phụ huynh xem: `&nc=1` (đang trả tối thiểu) · `&nc=het` (hết 3 lần, phải trả hết) — hình dạng server/src/no-cau-xem.ts
+const NO_XEM_GIA = [
+  { no: 42, con: 37, theoLoai: { moi: 20, sua: 14, on: 6, lai: 2 }, toiThieu: 11, lan: 1, phaiTraHet: false, kieu: 'toi_thieu', so: 11, daTra: 5, lai: 5, laiDemNay: 2, muc: 39, daChon: true },
+  { no: 20, con: 20, theoLoai: { moi: 0, sua: 9, on: 8, lai: 3 }, toiThieu: 6, lan: 3, phaiTraHet: true, kieu: 'het', so: 20, daTra: 0, lai: 5, laiDemNay: 1, muc: 48, daChon: false },
+] as const
 const MOT_PH = man === 'ph' && thamSo.get('mot') === '1'
 const traMotPh = (duong: string): unknown => {
   if (duong.endsWith('/ph/nhip-hoc')) return nhipPh19()
@@ -165,6 +171,7 @@ const bienThePh = (duong: string, r: any): unknown => {
       diem: kt === 'nop' ? 8 : kt === 'cu' ? 7.5 : null, nopLuc: kt === 'nop' ? NAY_PH19 - 3_600_000 : kt === 'cu' ? mo + 20 * 3_600_000 : null,
     }
   }
+  if (duong.endsWith('/ph/con-tong-quan') && thamSo.get('nc')) (r as { noCau?: unknown }).noCau = NO_XEM_GIA[thamSo.get('nc') === 'het' ? 1 : 0]
   if (duong.endsWith('/ph/con-tong-quan') && thamSo.get('ss') === 'het') r.cauSai = { ...r.cauSai, daSua: r.cauSai.tong }
   if (duong.endsWith('/ph/tat-ca-ve-con') && thamSo.get('ss') === 'do' && r.lichOn) r.lichOn = { ...r.lichOn, daKhacPhuc14Ngay: 0 }
   if (duong.endsWith('/ph/tat-ca-ve-con') && thamSo.get('bt') && r.baiTapVeNha) {
@@ -309,7 +316,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   // ---- LÀN PHỤ HUYNH 12/10 (khối riêng): `/ph/con-tong-quan` GIẢ — `&tq=loi` ⇒ máy chủ lỗi (khối Gợi ý nhắc con hiện lý do + Thử lại).
   if (u.pathname.endsWith('/ph/con-tong-quan')) return thamSo.get('tq') === 'loi'
     ? new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang bận. Anh/chị thử lại sau ít phút.' }), { status: 500, headers: { 'content-type': 'application/json' } })
-    : tra(conTongQuanGia())
+    : tra(thamSo.get('nc') ? { ...conTongQuanGia(), noCau: NO_XEM_GIA[thamSo.get('nc') === 'het' ? 1 : 0] } : conTongQuanGia())
   // ---- hết khối LÀN PHỤ HUYNH 12/10
   if (u.pathname.endsWith('/ph/tat-ca-ve-con')) return tra(PH_OK)
   if (u.pathname.endsWith('/ph/hoc-2')) return tra({ ok: true, cheDo2: true, ngay: '2026-10-09', homNay: { tong: 30, daLam: 12 } })
@@ -1088,6 +1095,7 @@ const con =
   PH_VAO ? h(BatLinhShell, { vai: 'ph' }, h(ParentPortalScreen)) : // NGANG PH 26/10
   man === 'ph' ? h(AppPhuHuynh, { sbd: '12121212', hoTen: 'Nguyễn Minh Anh', lop: '12A1', onDoiSbd: noop })
   : man === 'gv-nhip' ? (useCoHoa2.getState().dat({ bat: true, lop: [], sbd: [] }), thamSo.get('the') && useSoDemGv.getState().datMoHanhTrinh({ the: thamSo.get('the') as TheHanhTrinh, ...(thamSo.get('khoi') ? { khoi: Number(thamSo.get('khoi')) } : {}) }), h(ChienDichScreen))
+  : man === 'gv-bhn' ? h('div', { style: { padding: 16, maxWidth: 1280, margin: '0 auto' } }, h(TheBaiHangNgayChup)) // 11/11: thẻ Bài hằng ngày đứng riêng (nợ câu `&nc=1`)
   : man === 'gv-ma-tran' ? h('div', { style: { padding: 24, maxWidth: 900 } }, h(BangMaTranDe, { nguon: KHO, rut: false }))
   : man === 'hs-moi' ? h(HocTapHomNay, { ten: 'Minh Anh', lop: '12A1', ketQua: { cheDo2: true, sanh: SANH_MOI } as never, dangTai: false, loi: '', coCa: thamSo.get('ca') === '1',
       onHoc: noop, onXemLai: noop, onChua: noop, onThi: noop, onTuLuyen: noop, onLichSu: noop, onBaiTap: noop, onGiaDinh: noop, onTaiLai: noop, onDangXuat: noop, onKetQua: noop, onBangTin: noop, onLuyenLai: noop })
