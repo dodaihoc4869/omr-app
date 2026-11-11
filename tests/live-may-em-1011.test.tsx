@@ -78,7 +78,7 @@ describe('máy em khi thầy live', () => {
     expect(screen.getByText('Thầy đang live')).toBeTruthy()
     expect(lop('.lv')).toBe(0)
     expect(screen.getByLabelText('Gửi đáp án')).toBeTruthy() // màn làm bài còn nguyên
-    expect(lop('.lv-dau .lv-vua')).toBe(0) // máy chủ chưa có tiếng ⇒ khay không có ô tiếng
+    expect(lop('.lv-dau .lv-vua:not(.lv-wa)')).toBe(0) // máy chủ chưa có tiếng ⇒ khay không có ô tiếng
     expect(document.querySelector('.lv-dau .lv-nam')!.getAttribute('aria-label')).toBe('Mở khay điều khiển')
     // (K1) em gửi ⇒ TỰ về bảng live ngay (cờ phòng `bang` vẫn tắt)
     nhanTra(st, 'S1', 'B', T0 + 2000); bao()
@@ -126,21 +126,21 @@ describe('máy em khi thầy live', () => {
     const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0); moLuot(st, cau, T0)
     const { bao } = await vao(st)
     liveBat(st, T0 + 1000); bao()
-    await waitFor(() => expect(lop('.lv-dau .lv-vua')).toBe(1))
-    expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('true')
-    expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-label')).toContain('đang bật')
+    await waitFor(() => expect(lop('.lv-dau .lv-vua:not(.lv-wa)')).toBe(1))
+    expect(document.querySelector('.lv-dau .lv-vua:not(.lv-wa)')!.getAttribute('aria-pressed')).toBe('true')
+    expect(document.querySelector('.lv-dau .lv-vua:not(.lv-wa)')!.getAttribute('aria-label')).toContain('đang bật')
     liveDat(st, { tiengLop: false }, T0 + 1500); bao()
-    await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('false'))
-    const nutDau = document.querySelector('.lv-dau .lv-vua')!
+    await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua:not(.lv-wa)')!.getAttribute('aria-pressed')).toBe('false'))
+    const nutDau = document.querySelector('.lv-dau .lv-vua:not(.lv-wa)')!
     expect(nutDau.getAttribute('aria-label')).toContain('đang tắt')
     fireEvent.click(nutDau)
-    await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('true'))
+    await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua:not(.lv-wa)')!.getAttribute('aria-pressed')).toBe('true'))
     // sang bảng live: khay giữ đúng lựa chọn của em
     liveDat(st, { bang: true }, T0 + 2000); bao()
-    await waitFor(() => expect(lop('.lv .lv-vua')).toBe(1))
-    expect(document.querySelector('.lv .lv-vua')!.textContent).toContain('Đang bật')
-    fireEvent.click(document.querySelector('.lv .lv-vua')!)
-    await waitFor(() => expect(document.querySelector('.lv .lv-vua')!.textContent).toContain('Đang tắt'))
+    await waitFor(() => expect(lop('.lv .lv-vua:not(.lv-wa)')).toBe(1))
+    expect(document.querySelector('.lv .lv-vua:not(.lv-wa)')!.textContent).toContain('Đang bật')
+    fireEvent.click(document.querySelector('.lv .lv-vua:not(.lv-wa)')!)
+    await waitFor(() => expect(document.querySelector('.lv .lv-vua:not(.lv-wa)')!.textContent).toContain('Đang tắt'))
   })
 
   it('khung nét nhị phân của phòng tới thư viện live ⇒ bảng có nét (ghi chú «Bảng đen» biến mất)', async () => {

@@ -66,6 +66,8 @@ export function tomTatTieng(a: Anh, b: Anh): SoTieng {
 let ctxDo: AudioContext | null = null
 const nutDo = new WeakMap<MediaStreamTrack, { a: AnalyserNode; m: Float32Array<ArrayBuffer> }>()
 function boDo(t: MediaStreamTrack | null | undefined): (() => number | null) | null {
+  // công tắc lùi riêng: `ddh.live.do-db` = `tat` ⇒ không gắn bộ đo WebAudio lên track nhận (chưa thử trên iPhone thật)
+  try { if (typeof localStorage !== 'undefined' && localStorage.getItem('ddh.live.do-db') === 'tat') return null } catch { /* không đọc được: cứ đo */ }
   if (!t || t.readyState !== 'live' || typeof AudioContext === 'undefined') return null
   try {
     ctxDo ??= new AudioContext()

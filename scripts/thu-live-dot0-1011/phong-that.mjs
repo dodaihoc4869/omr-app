@@ -24,8 +24,8 @@ const ts = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, 
 const DIST = resolve(ts.dist ?? 'dist-thu-live'), NHAN = ts.nhan ?? 'dist', WAV = resolve(ts.wav ?? ''), LOC_ON = ts['loc-on'] ?? 'manh'
 const GOC_PHONG = ts['goc-phong'] ? resolve(ts['goc-phong']) : undefined, CHAN_UDP = ts['chan-udp'] === '1', UDP_HE = ts['udp-he'] === '1', GIAY = Math.max(2, Number(ts.giay) || 4)
 const sach = (v) => String(v ?? '').replace(/[\r\n]/g, '').trim().replace(/^["']|["']$/g, '')
-const APP_ID = sach(process.env.REALTIME_APP_ID), APP_SECRET = sach(process.env.REALTIME_APP_SECRET)
-if (process.env.GITHUB_ACTIONS) { for (const v of [APP_ID, APP_SECRET]) if (v) console.log(`::add-mask::${v}`) }
+const APP_ID = sach(process.env.REALTIME_APP_ID), APP_SECRET = sach(process.env.REALTIME_APP_SECRET), TURN_ID = sach(process.env.TURN_KEY_ID), TURN_TOKEN = sach(process.env.TURN_KEY_API_TOKEN), CO_TURN = !!TURN_ID && !!TURN_TOKEN
+if (process.env.GITHUB_ACTIONS) { for (const v of [APP_ID, APP_SECRET, TURN_ID, TURN_TOKEN]) if (v) console.log(`::add-mask::${v}`) }
 if (!APP_ID || !APP_SECRET) { console.log('KHÔNG ĐẠT · thiếu khoá SFU (REALTIME_APP_ID / REALTIME_APP_SECRET)'); process.exit(1) }
 if (!existsSync(WAV)) { console.log(`KHÔNG ĐẠT · thiếu tệp giọng --wav`); process.exit(1) }
 const mau = docWav(readFileSync(WAV)), mauMono = doiHz(mau.kenh[0], mau.hz)
@@ -38,7 +38,7 @@ const veThat = async (ve) => (ve === 'gv' ? kyVeBpu(BI_MAT, { b: 'b1', s: '', v:
 const may = await moMayChu({
   dist: DIST, gocPhong: GOC_PHONG, // phòng của CHÍNH bản cần thử (worktree), không phải của nhánh chạy phép thử
   cuaLive: async (duong, b, phong) => {
-    const env = { MA_BI_MAT: BI_MAT, REALTIME_APP_ID: APP_ID, REALTIME_APP_SECRET: APP_SECRET, PHONG_BPU: { idFromName: () => ({}), get: () => ({ fetch: (r) => phong.fetch(r) }) } }
+    const env = { MA_BI_MAT: BI_MAT, REALTIME_APP_ID: APP_ID, REALTIME_APP_SECRET: APP_SECRET, ...(CO_TURN ? { TURN_KEY_ID: TURN_ID, TURN_KEY_API_TOKEN: TURN_TOKEN } : {}), PHONG_BPU: { idFromName: () => ({}), get: () => ({ fetch: (r) => phong.fetch(r) }) } }
     const r = await cuaLive(new Request(`http://x${duong}`, { method: 'POST', body: JSON.stringify({ ...b, ve: await veThat(String(b.ve ?? '')) }) }), env)
     const j = await r.json()
     const k = `${duong.slice('/bpu/live/'.length)} ${j.ok ? 'ok' : j.lyDo}`
@@ -104,7 +104,8 @@ try {
     ketQua.pha.push({ ten, pc: { thay: a.pc, s1: b.pc, s2: c.pc } })
     return { thay: a, s1: b, s2: c }
   }
-  const udp = (ten) => (UDP_HE ? 'cả máy bị chặn UDP' : CHAN_UDP && /S2/.test(ten) ? 'S2 ở mạng chặn UDP' : '')
+  // có khoá TURN ⇒ chặn UDP vẫn PHẢI có tiếng (qua TURN TCP / TLS 443); chưa có khoá ⇒ câm là mong đợi
+  const udp = (ten) => (UDP_HE ? (CO_TURN ? '' : 'cả máy bị chặn UDP, chưa có khoá TURN') : CHAN_UDP && /S2/.test(ten) ? 'S2 ở mạng chặn UDP' : '')
   const cham = (p, ten, chieu) => { for (const [tc, n, d, v, tk] of chieu) ketLuan(ten, tc, n, d, v, tk ?? '', udp(tc)) }
   const VAI_LIVE = { thay: ['micTho', 'gui'], s1: ['nhanDau'], s2: ['nhanDau'] }, VAI_NOI = { thay: ['micTho', 'gui', 'nhanCuoi'], s1: ['nhanDau', 'micTho', 'gui'], s2: ['nhanDau', 'nhanCuoi'] }
 

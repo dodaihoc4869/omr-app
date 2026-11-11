@@ -28,6 +28,46 @@ const CHINH_SACH_KENH = { ordered: false, maxRetransmits: 0 } as const
 /** Máy khách dùng STUN công khai của Cloudflare; trả kèm `noi` để sau này thêm TURN ở máy chủ mà không phải phát hành lại app. */
 const ICE = [{ urls: 'stun:stun.cloudflare.com:3478' }]
 
+/** TURN (11/11 tối): mạng chặn UDP (Wi-Fi trường, 4G khắt khe) ⇒ máy không nối được SFU ⇒ câm CẢ HAI CHIỀU, bảng vẫn chạy (đo CI: chặn UDP cả máy ⇒ câm trên
+ *  cả bản cũ lẫn bản mới). Thông tin TURN NGẮN HẠN cấp từ khoá TURN (Worker secrets TURN_KEY_ID + TURN_KEY_API_TOKEN) qua
+ *  `POST https://rtc.live.cloudflare.com/v1/turn/keys/<id>/credentials/generate-ice-servers {ttl}` (tài liệu Realtime TURN «Generate Credentials»), hạn 24 giờ,
+ *  ĐỆM trong bộ nhớ isolate 4 giờ (300 em không gọi Cloudflare 300 lần; chung một lần gọi đang chạy). Bỏ URL cổng 53 (trình duyệt chặn — tài liệu dặn bỏ khi không
+ *  trickle ICE). Thiếu secret / lỗi ⇒ `null` ⇒ máy khách chạy như cũ (chỉ STUN), không chặn live. 0 lệnh D1. */
+const TTL_TURN_GIAY = 86_400, DEM_TURN_MS = 4 * 3_600_000, LOI_TURN_MS = 60_000
+export const turnDaCauHinh = (env: Pick<Env, 'TURN_KEY_ID' | 'TURN_KEY_API_TOKEN'>): boolean => !!env.TURN_KEY_ID && !!env.TURN_KEY_API_TOKEN
+/** Giữ đúng dạng `RTCIceServer`: chỉ stun: / turn: / turns:, bỏ cổng 53, thông tin đăng nhập là chuỗi. */
+export function locTurn(v: unknown): Row[] {
+  const ra: Row[] = []
+  for (const x of Array.isArray(v) ? v.slice(0, 8) : []) {
+    const o = x as Row | null
+    if (!o || typeof o !== 'object') continue
+    const urls = (Array.isArray(o.urls) ? o.urls : [o.urls]).map(str).filter((u) => /^(stun|turns?):[^\s]{3,200}$/.test(u) && !/:53(\?|$)/.test(u)).slice(0, 8)
+    if (!urls.length) continue
+    ra.push({ urls, ...(str(o.username) ? { username: str(o.username) } : {}), ...(str(o.credential) ? { credential: str(o.credential) } : {}) })
+  }
+  return ra
+}
+let demTurn: { het: number; ice: Row[] | null } | null = null, dangTurn: Promise<Row[] | null> | null = null
+/** Thông tin TURN (đã đệm). `null` = chưa cấu hình / Cloudflare lỗi. */
+export function layTurn(env: Env, nay = Date.now()): Promise<Row[] | null> {
+  if (!turnDaCauHinh(env)) return Promise.resolve(null)
+  if (demTurn && demTurn.het > nay) return Promise.resolve(demTurn.ice)
+  dangTurn ??= (async () => {
+    try {
+      const r = await fetch(`https://rtc.live.cloudflare.com/v1/turn/keys/${encodeURIComponent(env.TURN_KEY_ID!)}/credentials/generate-ice-servers`, {
+        method: 'POST', headers: { authorization: `Bearer ${env.TURN_KEY_API_TOKEN!}`, 'content-type': 'application/json' }, body: JSON.stringify({ ttl: TTL_TURN_GIAY }), signal: AbortSignal.timeout(HAN_GOI_MS),
+      })
+      const ice = locTurn(((await r.json().catch(() => null)) as Row | null)?.iceServers)
+      const tot = r.ok && ice.some((x) => (x.urls as string[]).some((u) => u.startsWith('turn')))
+      demTurn = { het: Date.now() + (tot ? DEM_TURN_MS : LOI_TURN_MS), ice: tot ? ice : null }
+      return demTurn.ice
+    } catch { demTurn = { het: Date.now() + LOI_TURN_MS, ice: null }; return null } finally { dangTurn = null }
+  })()
+  return dangTurn
+}
+/** Chỉ cho phép thử: xoá đệm TURN của isolate. */
+export const xoaDemTurn = (): void => { demTurn = null; dangTurn = null }
+
 const MA_PHIEN = /^[A-Za-z0-9_-]{8,128}$/
 const TEN = /^[a-z0-9-]{1,32}$/
 const MID = /^[A-Za-z0-9]{1,16}$/
@@ -100,6 +140,8 @@ async function phatMicEm(env: Env, ve: VeBpu, phien: string, sdp: string, mid: s
 /** Một lệnh `/bpu/live/<lenh>` đã có vé hợp lệ. */
 async function lenhLive(env: Env, lenh: string, ve: VeBpu, b: Row): Promise<Row> {
   const laThay = ve.v === 'gv'
+  // `turn`: thông tin TURN ngắn hạn cho RTCPeerConnection tới SFU (gọi TRƯỚC khi tạo PeerConnection; thiếu ⇒ máy khách chỉ dùng STUN như cũ)
+  if (lenh === 'turn') { const ice = await layTurn(env); return ice ? { ok: true, ice } : { ok: false, lyDo: turnDaCauHinh(env) ? 'turn-loi' : 'chua-cau-hinh-turn' } }
   if (lenh === 'noi') {
     const sdp = sdpHop(b.sdp), tracks = tracksGui(b.tracks), nguon = phienHop(b.nguon), ten = tenNhan(b.ten)
     if (sdp && !laThay) return { ok: false, lyDo: 'chua-duoc-moi' }

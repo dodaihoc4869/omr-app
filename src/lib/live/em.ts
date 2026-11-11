@@ -13,9 +13,10 @@ import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
 import { boLoa, theAmLoa } from './loa'
 import { taoLuoiPhat } from './luoi-tieng'
+import { chamNghe, nhoWa, taoNgheWa } from './nghe-wa'
 import { doTieng } from './do-tieng'
 import { ngheThat, type SoTieng } from './so-tieng'
-import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
+import { OPUS_EM, layIce, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
   /** Vé phòng của em (`/hs/bpu/ve` hoặc `/hs/bpu/cua-em`). */
@@ -60,6 +61,10 @@ export interface TrangThaiLiveEm {
   banNoi: { sbd: string; ten: string; doi: number } | null
   /** Thầy đang TẠM DỪNG live (11/11): tiếng và nét ngừng tới, phiên giữ nguyên — hiện «Thầy tạm dừng live». */
   nghi: boolean
+  /** (11/11 tối) Tiếng thầy đã giải mã đủ to mà em CHƯA chạm màn từ lúc vào live ⇒ khay hiện nút to «Chạm để nghe» (nghe-wa.ts). */
+  chamNghe: boolean
+  /** Đang phát tiếng qua WebAudio («Vẫn không nghe? Thử cách khác»). */
+  quaWa: boolean
 }
 export type KetQuaMicEm = { ok: true } | { ok: false; lyDo: 'chua-duoc-moi' | 'chua-noi' | 'mic-tu-choi' | 'khong-mic' | 'mic-loi' | 'sfu-loi' }
 export interface KhungLiveEm {
@@ -88,7 +93,7 @@ export function amLuongKhiNoi(l: MediaStream | null): number {
 
 export function taoLiveEm(tuy: TuyChonLiveEm) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
-  const tt: TrangThaiLiveEm = { duocXem: false, san: false, bat: false, tu: null, tieng: 'cho', nghe: false, kenhNet: 'ws', duBang: false, bang: false, duocMoMic: false, duocMoi: false, tay: false, hangTay: null, mic: 'tat', banNoi: null, nghi: false }
+  const tt: TrangThaiLiveEm = { duocXem: false, san: false, bat: false, tu: null, tieng: 'cho', nghe: false, kenhNet: 'ws', duBang: false, bang: false, duocMoMic: false, duocMoi: false, tay: false, hangTay: null, mic: 'tat', banNoi: null, nghi: false, chamNghe: false, quaWa: nhoWa() }
   const bang: BangNet = taoBang()
   const dem = taoDemPhat({ mayYeu: tuy.mayYeu })
   const soDo = taoSoDo()
@@ -125,11 +130,15 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ âm lượng theo `amLuongKhiNoi` (có khử vọng ⇒ 1, không ⇒ 0,6). */
   /** Loa máy em ĐANG PHÁT tiếng thầy thật: có luồng, em không tắt tiếng, trình duyệt không chặn phát, em không rời màn. */
   const dangNghe = (): boolean => !!am && !!am.srcObject && tt.nghe && tt.tieng === 'co' && !roiMan
+  const ngheWa = taoNgheWa()
   const capNhatTieng = (): void => {
     // 11/11 tối (thầy: em lên bảng không nghe thầy): bản cũ hạ còn 0,25 — trên điện thoại (trình duyệt chuyển tiếng sang loa thoại khi mic mở) gần như câm.
     // Khử vọng của trình duyệt ĐANG chạy trên mic em ⇒ để nguyên 1; không có khử vọng ⇒ 0,6 (vẫn nghe rõ, bớt phần lọt vào mic).
-    if (am) { am.muted = !tt.nghe || roiMan; try { am.volume = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? amLuongKhiNoi(micLuong) : 1 } catch { /* iPhone */ } }
-    if (amBan) amBan.muted = !tt.nghe || roiMan
+    // «Thử cách khác»: tiếng đi qua WebAudio ⇒ thẻ <audio> tắt tiếng (không nghe đôi), mức phát đặt ở nút khuếch đại
+    const vol = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? amLuongKhiNoi(micLuong) : 1, wa = ngheWa.bat()
+    if (am) { am.muted = wa || !tt.nghe || roiMan; try { am.volume = vol } catch { /* iPhone */ } }
+    if (amBan) amBan.muted = wa || !tt.nghe || roiMan
+    ngheWa.capNhat([thu?.track, thuBan?.track], !tt.nghe || roiMan ? 0 : vol)
   }
   /** Mọi thay đổi trên phiên SFU của máy em đi NỐI TIẾP (một phiên chỉ có một máy trạng thái lời mời / trả lời — tài liệu «Serialize mutations per session»). */
   const xepSfu = <T,>(f: () => Promise<T>): Promise<T> => { const p = hangSfu.then(f, f); hangSfu = p.catch(() => undefined); return p }
@@ -140,7 +149,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   }
   /** GỌI TRONG LẦN CHẠM ĐẦU của em trong buổi (vd. cú chạm vào toàn màn hình): mở khoá phát tiếng ⇒ sau này có tiếng thật không cần chạm nữa. */
   async function moKhoaTieng(): Promise<boolean> {
-    daCham = true
+    daCham = true; ngheWa.moKhoa(); dat({ chamNghe: false })
     try {
       am = am ?? theAmLoa()
       am.autoplay = true
@@ -177,7 +186,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     let p: RTCPeerConnection | null = null
     const con = (): boolean => !huyRoi && doiNay === doi
     try {
-      p = mt.taoPc({ iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }], bundlePolicy: 'max-bundle' })
+      const ice = await layIce(mt, tuy.goc, tuy.ve) // STUN + TURN (mạng chặn UDP — 4G / Wi-Fi trường)
+      if (!con()) return
+      p = mt.taoPc({ iceServers: ice, bundlePolicy: 'max-bundle' })
       const pcNay = p
       p.addEventListener('track', (e) => {
         if (!con() || e.track.kind !== 'audio') return
@@ -480,7 +491,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     if (!dangDoTi && nay - lucTi >= 5000) {
       lucTi = nay; dangDoTi = true
       void doTieng(() => ({ pc, n: { thu, the: am }, b: { thu: thuBan, the: amBan }, g: micTx?.sender ?? null }), mt.dongHo, (ms) => new Promise<void>((r) => { mt.hen(r, ms) }))
-        .then((t) => { tiNay = t; const ng = ngheThat(t.n); if (ng !== ngheTi) { ngheTi = ng; baoOk() } }, () => undefined).finally(() => { dangDoTi = false })
+        .then((t) => {
+          if (ngheWa.bat() && t.n?.pt) t.n.pt.m = 0 // đang phát qua WebAudio: thẻ tắt tiếng là chủ ý, không phải câm
+          tiNay = t; dat({ chamNghe: chamNghe({ nghe: tt.nghe && !roiMan, daCham, db: t.n?.db }) }); const ng = ngheThat(t.n); if (ng !== ngheTi) { ngheTi = ng; baoOk() } }, () => undefined).finally(() => { dangDoTi = false })
     }
     const xong = (): void => {
       const s = dem.soDo(nay)
@@ -601,6 +614,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     trangThai: (): TrangThaiLiveEm => ({ ...tt }),
     nhanView, nhanTinPhong, khiNoiLai,
     moKhoaTieng, datTieng, datRoiMan,
+    /** «Vẫn không nghe? Thử cách khác» — gọi TRONG cú chạm: phát tiếng qua WebAudio (true) / về thẻ <audio> (false). Nhớ ở máy. */
+    datNgheWa: (on: boolean): void => { daCham = true; ngheWa.dat(on); dat({ quaWa: ngheWa.bat(), chamNghe: false }); capNhatTieng(); if (am?.srcObject) void am.play().catch(() => undefined) },
     batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic, coLoa: boLoa.co, dsLoa: boLoa.ds, loa: boLoa.id, datLoa: boLoa.dat,
     gioTay, deSau, datGiayLech, datHienBang,
     /** Bảng đã chốt (khoá trang, tỉ lệ vùng viết, mọi nét) — dùng khi lớp vẽ cần dựng lại từ đầu (đổi cỡ, phóng bảng). */

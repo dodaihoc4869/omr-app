@@ -397,3 +397,25 @@ Thầy: «khi chuyển câu bấm L lên bảng thì máy học sinh vào màn h
 **Test khoá**: `tests/live-de-nhap-nhay-1111.test.tsx` — phép tính cũ dao động với khối có số dòng nhảy bậc, phép dò mới cho cùng kết quả mọi lần gọi và đo không quá 9 lần; bảng live nhận 30 view + 30 trạng thái liên tiếp (số nét, số em, tiếng, giơ tay, bạn nói) ⇒ khối đề là cùng một nút, 0 lần đổi trong ô giấy.
 
 **Chưa làm ở bản vá này** (nằm ở nhánh hai khung độc lập `claude/may-em-doc-lap-1111`): ô giấy lúc em chưa gửi vẫn là thẻ làm bài có nút «Đúng | Sai» mờ; giấy soi của câu chữ thuần vẫn đi theo độ cuộn giấy của thầy (số đo `live.giay` lấy theo khung nhìn của tờ chiếu) — CHƯA đo được trường hợp này có gây nhảy hay không.
+
+## 9. «Câm cả hai chiều» (11/11 tối) — phép thử TIẾNG THẬT trên SFU thật (`scripts/thu-live-dot0-1011/tieng-that.mjs`, `phong-that.mjs`)
+
+Cách đo: workflow `thu-live-dot0-1011.yml` (`kieu: tieng-that` / `phong-that`), máy CI GitHub, Cloudflare Realtime SFU THẬT, mic giả = giọng người (DeepFilterNet assets, 1 / 2 kênh — Chrome trộn về 1 kênh).
+Mỗi chiều kiểm bốn tầng: **0** mic vào có giọng · **1** bộ gửi tăng byte + `media-source` có năng lượng + tiếng gửi vẫn là giọng (tương quan đường bao với mẫu ≥ 0,5) ·
+**2** `inbound-rtp` có gói + năng lượng · **3** thẻ `<audio>` chạy, không tắt tiếng, âm lượng > 0, `currentTime` tăng, tiếng nó cầm vẫn là giọng.
+`tieng-that`: BẢN DỰNG THẬT (`vite build`, service worker điều khiển trang, mảnh `live-*.js` thật) + phòng giả. `phong-that`: PHÒNG THẬT (Durable Object chạy trong Node)
++ giao diện đầy đủ (tờ chiếu + ManBinhPhanUng / LopLive) + cửa `/bpu/live` thật; trình tự như thầy (mic nhớ theo tên với mã cũ, lọc ồn Mạnh, Live → Bắt đầu, gọi em, mic em tự bật, bật «Phát tiếng em ra loa lớp»).
+
+| Lượt CI | Bản | Kết quả (mọi chiều: thầy→S1, thầy→S2, S1→thầy khi bật «Phát tiếng em», S1→S2) |
+|---|---|---|
+| 43001793972 | #1622 (HEAD = main), #1603 7c0935aab, #1610 cc7de387b, #1614 e6aa2a569, #1619 ca1214048 | XANH cả 4 tầng, mic 1 / 2 kênh, có / không cờ tự phát; r tiếng nhận 0,88–0,98 |
+| 43006330193 | origin/main vs nhánh | P4 «chuỗi hỏng» (dừng Worker chuỗi + treo AudioContext): origin/main **CÂM** (+0 B gửi, cả lớp không nghe); nhánh: lưới an toàn phía gửi tự về mic thô ⇒ XANH |
+| 43009858106 | nhánh (đo từ xa) | XANH; `ti` mỗi máy hợp lý (ICE ok srflx/udp · nhận 58–64 kb/s · thẻ chạy) |
+| 43012800820 | phòng thật: origin/main + nhánh | mạng thường: XANH mọi chiều, cửa sổ nút Live «2 em đang nghe» + dòng đo đúng. **Chặn UDP cả máy: CÂM CẢ HAI CHIỀU trên cả hai bản** (máy thầy không lên SFU — chỉ STUN, không TURN; bảng vẫn chạy WebSocket); nhánh BÁO RÕ («Chưa nối máy chủ tiếng», mỗi em «⚠ …») |
+| 43014908026 | phòng thật, nhánh (đo từ xa lượt 2) | XANH; «Máy thầy gửi: 43 kb/s · mức nguồn 76», «Máy thầy nhận tiếng Hà: nhận 32 kb/s · nghe −27 dBFS · loa đang phát» |
+
+Kết luận có bằng chứng: trên Chromium chuẩn KHÔNG bản nào câm (kể cả #1619 có bộ lọc sâu) ⇒ gốc nằm ở thứ máy thật có mà CI không có. Đã loại trừ: mã chung của chuỗi «khung» / RNNoise Mạnh,
+mic 2 kênh, cửa `/bpu/live`, phòng thật (live-san / live-mic / ss / noi[].ss), service worker + bản dựng thật. Lộ ra và đã sửa: thang nới mic bậc «ideal» âm thầm đổi sang mic khác
+(ảnh thầy: chọn BOYALINK mà lớp nghe mic Intel); chuỗi hỏng giữa chừng làm cả lớp câm (lưới phía gửi); máy em đang phát mic hạ tiếng thầy còn 0,25 (nay 1 / 0,6); «mức nguồn 0» của đo từ xa.
+Chưa tái hiện được trên CI: chặn tự phát của trình duyệt (Chromium không giao diện cho phát dù đặt chính sách) ⇒ lưới phía nghe chỉ có test vitest. Mạng chặn UDP ⇒ cần TURN (mã ở nhánh cục bộ, chờ khoá).
+Mặc định: DeepFilterNet 3 + lọc mic em CHƯA đưa lại (chưa có lượt CI có bộ lọc bật xanh đủ tầng qua phòng thật) ⇒ TẮT; «Loa» hiện, chỉ gọi `setSinkId` khi chọn loa khác mặc định.
