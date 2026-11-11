@@ -85,14 +85,21 @@ def vang(x, rt60, drr):  # vang phòng tổng hợp: đường thẳng + đuôi 
     h *= 10 ** (-drr / 20) / max(np.sqrt((h ** 2).sum()), 1e-9); h[0] = 1.0
     m = 1 << int(np.ceil(np.log2(len(x) + n)))
     return np.fft.irfft(np.fft.rfft(x, m) * np.fft.rfft(h, m), m)[:len(x)].astype(np.float32)
+GIA = float(os.environ.get('TG_GIA', '0.35'))   # tỉ lệ giọng khác là «NGƯỜI GIẢ»
+def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant cùng lúc (nội suy lại) ra ngoài vùng của thầy ⇒ giọng nữ / trẻ (×1,18–1,6) hoặc nam khác (×0,72–0,86)
+    r = rng.uniform(1.18, 1.6) if rng.random() < 0.7 else rng.uniform(0.72, 0.86); m = int(np.ceil(n * r)); x = cat(thay, m)
+    return np.interp(np.arange(n) * (m - 1) / max(n - 1, 1), np.arange(m), x).astype(np.float32)
 def mau(thay, khac, am, rr=None):
     """Một mẫu 3 s: (Y phức, S phức) — Y = thầy + giọng khác + ồn, S = chỉ thầy (cùng EQ, cùng vang, cùng mức)."""
     t = (tocDo(thay, L) if rng.random() < 0.5 else cat(thay, L)) if rng.random() > 0.12 else np.zeros(L, np.float32)
     if rng.random() < 0.4 and t.any(): t = vang(t, rng.uniform(0.1, 0.35), rng.uniform(6, 20))
     n_k = 0 if rng.random() < 0.15 else (2 if rng.random() < 0.2 else 1); i = np.zeros(L, np.float32)
     for _ in range(n_k):
-        nguon = khac if khac is not None and rng.random() < 0.4 else am[rng.integers(len(am))]
-        s = (tocDo(nguon, L) if rng.random() < 0.3 else cat(nguon, L)).copy()
+        u = rng.random()
+        if u < GIA: s = nguoiGia(thay, L)
+        else:
+            nguon = khac if khac is not None and rng.random() < 0.4 else am[rng.integers(len(am))]
+            s = (tocDo(nguon, L) if rng.random() < 0.3 else cat(nguon, L)).copy()
         if rng.random() < 0.6: s = vang(s, rng.uniform(0.2, 0.7), rng.uniform(-3, 10))
         if rng.random() < 0.6:  # chỉ nói một khúc ⇒ có lúc một mình, lúc chồng, có điểm bắt đầu / dứt
             a = rng.integers(0, L // 2); b = rng.integers(a + L // 4, L + 1); s[:a] = 0; s[b:] = 0

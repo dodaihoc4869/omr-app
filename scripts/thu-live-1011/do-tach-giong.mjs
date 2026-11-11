@@ -170,7 +170,9 @@ for (const snr of (process.env.LV_SNR ?? '0,2,10').split(',').map(Number)) {
   for (const [ten, khac] of [...BO.map(([t, f]) => [t, doc(f)]), ['xon-xao', xon]]) {
     const c = canh(khac, snr)
     NHAN_HT = c.nhan
-    const cach = { 'chuan': { ra: c.vao, tre: 0 }, 'manh': await chayManh(c.vao), 'chi-thay': await chayCong(c.vao), ...(process.env.LV_MH ? { 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) } : {}) }
+    // LV_CHI_MH=1: chỉ đo «chuan» + «mo-hinh» (nhanh — bỏ cổng CAM++ và RNNoise khi so các checkpoint)
+    const cach = process.env.LV_CHI_MH ? { 'chuan': { ra: c.vao, tre: 0 }, 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) }
+      : { 'chuan': { ra: c.vao, tre: 0 }, 'manh': await chayManh(c.vao), 'chi-thay': await chayCong(c.vao), ...(process.env.LV_MH ? { 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) } : {}) }
     for (const [ten2, r] of Object.entries(cach)) {
       const tre = r.tre ?? 0
       const khacGiam = db(nl(doan(c.vao, c.nhan, 2)) / nl(doan(r.ra, c.nhan, 2, tre)))

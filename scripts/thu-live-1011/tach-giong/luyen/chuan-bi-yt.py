@@ -6,7 +6,7 @@ import sys, os, glob, json, subprocess
 YT, DL = sys.argv[1:3]
 for t in ('yt/sach', 'yt/mp3', 'yt-cham'): os.makedirs(os.path.join(DL, t), exist_ok=True)
 tep = sorted(glob.glob(os.path.join(YT, '*.flac')))
-if not tep: print('chưa có tệp'); sys.exit(0)
+if not tep and not glob.glob(os.path.join(YT, 'cham', '*.flac')): print('chưa có tệp'); sys.exit(0)
 giu = os.path.join(DL, 'yt-cham', 'ten.txt')
 if not os.path.exists(giu):
     def rong(f):
@@ -15,7 +15,8 @@ if not os.path.exists(giu):
             d = json.load(open(j)); v = [x for k, x in d.items() if isinstance(x, (int, float)) and ('hz' in k.lower() or 'dai' in k.lower())]
             return max(v) if v else 0
         except Exception: return 0
-    chon = max(tep, key=rong)
+    rieng = sorted(glob.glob(os.path.join(YT, 'cham', '*.flac')))  # tác tử YouTube đã để riêng bản chấm ⇒ dùng đúng bản ấy
+    chon = rieng[0] if rieng else max(tep, key=rong)
     open(giu, 'w').write(os.path.basename(chon))
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', chon, '-ac', '1', '-ar', '48000', '-c:a', 'pcm_s16le', os.path.join(DL, 'yt-cham', 'thay-yt.wav')], check=True)
     print('giữ riêng để chấm:', os.path.basename(chon))
