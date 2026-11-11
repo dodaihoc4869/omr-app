@@ -1,0 +1,17 @@
+[
+  {
+    "i": 1076,
+    "hashSvg": "1016249315be2088b922146f962a4b4ea85a355baf56c022d4bfecce782d0e8b",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở RIÊNG nguồn FULL, câu dẫn/ref DH-11-C3-B14-D2-I-2.hinh.0.du_lieu, fresh Chromium3× FULL với runtime exactSHA; mở macro baseline nguồn/bản mới, OH/vòng và nhãnY. Đúng11 peak hướng lên gồm6 peak mang nhãn27/40/55/66/77/94 và5 peak yếu không nhãn, giữ tương quan vị trí/độ cao nguồn. Sáu nhãnY có0 nhưng chỉ5 tickY, một tickX100; origin0 không thêm nét trái. Trục xám/peak xám đậm, vòng6C với vòng tròn trong/OH nối theo O đầu, chữ/số thường thẳng, nhãnY thường xoay/mz thường nghiêng. Không thấy chạm/cắt/tràn hoặc công thức/đáp án thêm.",
+    "render": "/workspace/scratch/soat357-1076-fresh.png",
+    "macro": [
+      "/workspace/scratch/ms1076-base.png",
+      "/workspace/scratch/ms1076-native-base.png",
+      "/workspace/scratch/ms1076-OH.png",
+      "/workspace/scratch/ms1076-y.png"
+    ],
+    "hash": "c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4",
+    "hashSvgDaSoat": "1016249315be2088b922146f962a4b4ea85a355baf56c022d4bfecce782d0e8b"
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1076,
+    "hash": "c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4",
+    "fileNguon": "anh/c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4.png",
+    "svg": "ms1076-native-ddh-1016249315be2088b922146f962a4b4ea85a355baf56c022d4bfecce782d0e8b.svg",
+    "hashSvg": "1016249315be2088b922146f962a4b4ea85a355baf56c022d4bfecce782d0e8b",
+    "byteSvg": 28675,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B14-D2-I-2",
+        "de": "Phổ khối lượng (MS) của phenol được cho trong hình dưới đây.\nPhân tử khối của phenol là",
+        "refs": [
+          {
+            "hash": "c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4",
+            "where": "DH-11-C3-B14-D2-I-2.hinh.0.du_lieu",
+            "hashDataUrl": "222caf3cd3e79e10875c305794a8615665f067bc7644667565cdcc42451af00c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "11UPpeaks6labels27-40-55-66-77-94/5weakUNLABELLED/1X100-6Yincl0-6tickstems/GRAYaxes-darkgraypeaks/6bareC1innercircle-OHfirstOanchor/regularUPRIGHTnums-Yrotated-mzREGULARITALIC/0heads0grid/noadded3double-formula-answer-intensityinference",
+    "hashSvgDaSoat": "1016249315be2088b922146f962a4b4ea85a355baf56c022d4bfecce782d0e8b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

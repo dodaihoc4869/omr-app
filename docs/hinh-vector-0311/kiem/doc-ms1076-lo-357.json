@@ -1,0 +1,525 @@
+{
+  "i": 1076,
+  "assetIndexProvided": 1140,
+  "hash": "c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4.png",
+  "size": [
+    428,
+    441
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-11-C3-B14-D2-I-2",
+      "de": "Phổ khối lượng (MS) của phenol được cho trong hình dưới đây.\nPhân tử khối của phenol là",
+      "allHinh": [
+        {
+          "hash": "c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4",
+          "where": "DH-11-C3-B14-D2-I-2.hinh.0.du_lieu",
+          "hashDataUrl": "222caf3cd3e79e10875c305794a8615665f067bc7644667565cdcc42451af00c"
+        }
+      ],
+      "missingHashes": [
+        "c1d8dd87b018d9dd38c8850a70100a7563943db20253deec3a7d0be9564f59e4"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownBaseline6xOpened": true,
+    "ownPhenol5xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nearest1pxnativecenterlines/bboxes/heights, notexact%scientificmeasurement. Weakpeaks independentlyvisuallydistinguishedfrombaseline/tick; printedlabelsONLY6. DO NOTassignm/znumberstounlabelledweakpeaksornewintensityvalues.",
+  "geometry": {
+    "axes": {
+      "vertical": [
+        [
+          92,
+          6
+        ],
+        [
+          92,
+          404
+        ]
+      ],
+      "horizontal": [
+        [
+          92,
+          404
+        ],
+        [
+          419,
+          404
+        ]
+      ],
+      "style": "thinlightgray~1.5px/noheads, nottopcropped",
+      "approxColor": "#9a9a9a"
+    },
+    "yTicks": [
+      {
+        "text": "0",
+        "y": 403,
+        "stem": null,
+        "bbox": [
+          73,
+          392,
+          81,
+          414
+        ]
+      },
+      {
+        "text": "20",
+        "y": 331,
+        "stem": [
+          [
+            85,
+            331
+          ],
+          [
+            92,
+            331
+          ]
+        ],
+        "bbox": [
+          52,
+          320,
+          81,
+          342
+        ]
+      },
+      {
+        "text": "40",
+        "y": 259,
+        "stem": [
+          [
+            85,
+            259
+          ],
+          [
+            92,
+            259
+          ]
+        ],
+        "bbox": [
+          52,
+          248,
+          81,
+          270
+        ]
+      },
+      {
+        "text": "60",
+        "y": 187,
+        "stem": [
+          [
+            85,
+            187
+          ],
+          [
+            92,
+            187
+          ]
+        ],
+        "bbox": [
+          52,
+          176,
+          81,
+          198
+        ]
+      },
+      {
+        "text": "80",
+        "y": 115,
+        "stem": [
+          [
+            85,
+            115
+          ],
+          [
+            92,
+            115
+          ]
+        ],
+        "bbox": [
+          52,
+          104,
+          81,
+          126
+        ]
+      },
+      {
+        "text": "100",
+        "y": 43,
+        "stem": [
+          [
+            85,
+            43
+          ],
+          [
+            92,
+            43
+          ]
+        ],
+        "bbox": [
+          41,
+          32,
+          81,
+          54
+        ]
+      }
+    ],
+    "xTicks": [
+      {
+        "text": "100",
+        "x": 289,
+        "stem": [
+          [
+            289,
+            404
+          ],
+          [
+            289,
+            411
+          ]
+        ],
+        "bbox": [
+          272,
+          414,
+          308,
+          435
+        ]
+      }
+    ],
+    "peaks": [
+      {
+        "x": 113,
+        "topY": 398,
+        "baselineY": 404,
+        "pixelHeight": 6,
+        "label": "27",
+        "width": 1.5,
+        "labelBBox": [
+          100,
+          374,
+          127,
+          392
+        ]
+      },
+      {
+        "x": 139,
+        "topY": 373,
+        "baselineY": 404,
+        "pixelHeight": 31,
+        "label": null,
+        "width": 2,
+        "labelBBox": null
+      },
+      {
+        "x": 143,
+        "topY": 341,
+        "baselineY": 404,
+        "pixelHeight": 63,
+        "label": "40",
+        "width": 2,
+        "labelBBox": [
+          130,
+          317,
+          157,
+          335
+        ]
+      },
+      {
+        "x": 158,
+        "topY": 397,
+        "baselineY": 404,
+        "pixelHeight": 7,
+        "label": null,
+        "width": 1.5,
+        "labelBBox": null
+      },
+      {
+        "x": 169,
+        "topY": 398,
+        "baselineY": 404,
+        "pixelHeight": 6,
+        "label": null,
+        "width": 1.5,
+        "labelBBox": null
+      },
+      {
+        "x": 180,
+        "topY": 354,
+        "baselineY": 404,
+        "pixelHeight": 50,
+        "label": "55",
+        "width": 2,
+        "labelBBox": [
+          167,
+          330,
+          194,
+          348
+        ]
+      },
+      {
+        "x": 189,
+        "topY": 389,
+        "baselineY": 404,
+        "pixelHeight": 15,
+        "label": null,
+        "width": 1.5,
+        "labelBBox": null
+      },
+      {
+        "x": 204,
+        "topY": 289,
+        "baselineY": 404,
+        "pixelHeight": 115,
+        "label": null,
+        "width": 2,
+        "labelBBox": null
+      },
+      {
+        "x": 209,
+        "topY": 195,
+        "baselineY": 404,
+        "pixelHeight": 209,
+        "label": "66",
+        "width": 2,
+        "labelBBox": [
+          196,
+          171,
+          223,
+          189
+        ]
+      },
+      {
+        "x": 233,
+        "topY": 398,
+        "baselineY": 404,
+        "pixelHeight": 6,
+        "label": "77",
+        "width": 1.5,
+        "labelBBox": [
+          220,
+          374,
+          247,
+          392
+        ]
+      },
+      {
+        "x": 274,
+        "topY": 44,
+        "baselineY": 404,
+        "pixelHeight": 360,
+        "label": "94",
+        "width": 2,
+        "labelBBox": [
+          261,
+          20,
+          288,
+          38
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Cường độ tương đối (%)",
+        "bbox": [
+          10,
+          59,
+          36,
+          333
+        ],
+        "rotation": -90,
+        "font": "regular upright sans rotated-90, NOTtruebold719/356"
+      },
+      {
+        "text": "m/z",
+        "bbox": [
+          385,
+          417,
+          422,
+          440
+        ],
+        "font": "italiclowercasesans"
+      }
+    ],
+    "phenol": {
+      "hexVertices": [
+        [
+          314,
+          162
+        ],
+        [
+          352,
+          140
+        ],
+        [
+          390,
+          162
+        ],
+        [
+          390,
+          206
+        ],
+        [
+          352,
+          228
+        ],
+        [
+          314,
+          206
+        ]
+      ],
+      "innerCircle": {
+        "center": [
+          352,
+          184
+        ],
+        "rx": 24.5,
+        "ry": 24.5
+      },
+      "OH": {
+        "text": "OH",
+        "bbox": [
+          342,
+          105,
+          378,
+          126
+        ],
+        "font": "regularuprightsans",
+        "anchor": "FIRSTOcenter351",
+        "bond": [
+          [
+            352,
+            140
+          ],
+          [
+            352,
+            128
+          ]
+        ]
+      },
+      "bareC": 6,
+      "O": 1,
+      "explicitH": 1,
+      "circleNotThreeDoubles": true,
+      "caption": 0
+    },
+    "fonts": "Peak/ticknumbers regularuprightsans; m/zitalic. OHregularuprightsans. Noactualboldchemicalcaption.",
+    "counts": {
+      "peaks": 11,
+      "labelledPeaks": 6,
+      "unlabelledPeaks": 5,
+      "xTickLabels": 1,
+      "yTickLabels": 6,
+      "axisHeads": 0,
+      "hexRings": 1,
+      "innerCircles": 1,
+      "yTickStems": 5,
+      "xTickStems": 1,
+      "totalTickStems": 6
+    },
+    "noAdded": [
+      "weakpeakm/zlabels",
+      "intensitypercent",
+      "molecularanswer",
+      "originx0",
+      "grid",
+      "3aromaticdoubles",
+      "phenolcaption",
+      "HanchorforOH",
+      "extraaxishead"
+    ],
+    "peakStyle": "darkgrayroughly#666666, darkerthanlightgrayaxes; no magenta"
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "builderGeometry": {
+    "peaks": [
+      [
+        113,
+        398,
+        1.5
+      ],
+      [
+        139,
+        373,
+        2
+      ],
+      [
+        143,
+        341,
+        2
+      ],
+      [
+        158,
+        397,
+        1.5
+      ],
+      [
+        169,
+        398,
+        1.5
+      ],
+      [
+        180,
+        354,
+        2
+      ],
+      [
+        189,
+        389,
+        1.5
+      ],
+      [
+        204,
+        289,
+        2
+      ],
+      [
+        209,
+        195,
+        2
+      ],
+      [
+        233,
+        398,
+        1.5
+      ],
+      [
+        274,
+        44,
+        2
+      ]
+    ]
+  },
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "publicDeAllRefsRead": true,
+    "baseline4xAndRing4xY3xOpened": true,
+    "origin12xOpened": true,
+    "origin0HasNoLeftTick": true,
+    "noIntensityInference": true
+  },
+  "rootSourceCorrection": {
+    "initialSourceReviewerZeroYStem": "invalid: glyph0 mistaken for stem",
+    "rootOwnOrigin12x": "/workspace/scratch/native357-origin.png",
+    "row403GrayX87to90": [
+      253,
+      253,
+      252,
+      244
+    ],
+    "actualZeroYStem": false,
+    "builderFromFirstSvgNoZeroStem": true,
+    "archivedOriginMacro": "actual-source1076-origin-lo-357.jpg"
+  }
+}
