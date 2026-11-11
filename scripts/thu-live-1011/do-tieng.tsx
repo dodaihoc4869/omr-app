@@ -224,7 +224,7 @@ const SAU_LOC: CauHinh = { ten: 'sau · chống hú («Tất cả»: bật khử
 // ───────────── TRỄ THƯỜNG TRỰC + ĐỘ TRONG (thầy 11/11: «làm cho tức thì», «tiếng phải trong nhất») ─────────────
 // Ba kênh thu CÙNG MỘT đồng hồ mẫu (một AudioContext đo, ScriptProcessor 3 kênh): 0 = mic của thầy (luồng trình duyệt giao) · 1 = đầu ra chuỗi làm rõ tiếng
 // (track đang gửi) · 2 = tiếng nhận được ở «máy em» (sau Opus + đệm rung). Hiệu vị trí mẫu giữa các kênh = trễ từng chặng, chính xác tới mẫu.
-interface CauHinh2 { ten: string; chuoi?: boolean; chuoiKieu?: 'khung' | 'nhanh' | 'nen'; agc?: boolean; loc?: CheDoLoc; opus?: TuyChonOpus; demNhan0?: boolean }
+interface CauHinh2 { ten: string; chuoi?: boolean; chuoiKieu?: 'khung' | 'nhanh' | 'nen'; agc?: boolean; loc?: CheDoLoc; locOn?: 'manh' | 'vua' | 'tat'; opus?: TuyChonOpus; demNhan0?: boolean }
 const trungVi = (a: number[], q = 0.5): number | null => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return Math.round(s[Math.min(s.length - 1, Math.ceil((s.length - 1) * q))]! * 10) / 10 }
 /** FFT cơ số 2 tại chỗ (phần thực / ảo). */
 function fft(re: Float64Array, im: Float64Array): void {
@@ -276,7 +276,9 @@ function doNoi(x: Float32Array, moc: Float32Array, goc: Float32Array | null) {
   const rms = (m: Float32Array, k: number, lech = 0) => { let e = 0; const d = k * K + lech; if (d < 0 || d + K > m.length) return 0; for (let i = 0; i < K; i++) e += m[d + i]! * m[d + i]!; return Math.sqrt(e / K) }
   const rm = Array.from({ length: nk }, (_, k) => rms(moc, k))
   const p95 = [...rm].sort((a, b) => a - b)[Math.floor(nk * 0.95)] || 1e-9
-  const noi = rm.map((v) => v > p95 * 0.1)
+  // ngưỡng «đang nói»: −20 dB dưới mức nói, hoặc giữa mức nói và nền ồn (trung bình nhân) khi nền ồn cao — không thì ồn to bị tính là tiếng nói
+  const p10 = [...rm].sort((a, b) => a - b)[Math.floor(nk * 0.1)] || 0
+  const noi = rm.map((v) => v > Math.max(p95 * 0.1, Math.sqrt(p95 * p10)))
   // khung NGHỈ: chính nó và 5 khung hai bên (100 ms) đều không có tiếng
   const nghi = rm.map((_, k) => { for (let j = k - 5; j <= k + 5; j++) if (j < 0 || j >= nk || noi[j]) return false; return true })
   const LECH = 3 * K // đường truyền trễ ≈ 60 ms so với kênh mốc
@@ -324,7 +326,7 @@ async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi', giay: number, cho
   datCoLive(st, { cho: true, sfu: true }, Date.now())
   let pc2: RTCPeerConnection | null = null, nhan: MediaStreamTrack | null = null, thu: RTCRtpReceiver | null = null
   const lt = taoLiveThay({
-    ve: 've', goc: 'https://sfu-gia', loc: ch.loc ?? 'tu', chuoi: ch.chuoi, chuoiKieu: ch.chuoiKieu, agc: ch.agc, opus: ch.opus,
+    ve: 've', goc: 'https://sfu-gia', loc: ch.loc ?? 'tu', locOn: ch.locOn, chuoi: ch.chuoi, chuoiKieu: ch.chuoiKieu, agc: ch.agc, opus: ch.opus,
     kenh: { gui: (t) => { if (t.t === 'live-bat') liveBat(st, Date.now()); if (t.t === 'live-tat') liveTat(st, Date.now()); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, Date.now()); if (t.t === 'live-dat') liveDat(st, t as never, Date.now()); if (String(t.t).startsWith('live-')) queueMicrotask(() => lt.nhanTinPhong(viewBang(st))) }, guiNhiPhan: () => undefined },
     moiTruong: { fetch: (async (u: RequestInfo | URL, o?: RequestInit) => {
       const b = JSON.parse(String(o?.body ?? '{}')) as { sdp?: string }
@@ -368,7 +370,7 @@ async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi', giay: number, cho
   const ra: Record<string, unknown> = {
     ten: ch.ten, kieu, kbps: Math.round(((b.byte - a.byte) * 8) / (t1 - t0) * 10) / 10, goiMoiGiay: Math.round(((b.goi - a.goi) * 1000) / (t1 - t0)),
     demRungMs: b.phat > a.phat ? Math.round(((b.tre - a.tre) / (b.phat - a.phat)) * 10000) / 10 : null, xuLyNhanMs: b.phat > a.phat ? Math.round(((b.xl - a.xl) / (b.phat - a.phat)) * 10000) / 10 : null,
-    mic: { hz: cd.hz, kenh: cd.kenh, vong: cd.vong, on: cd.on, agc: cd.agc, bac: cd.bac, treThuMs: cd.treThu, chuoi: cd.chuoi, kieu: cd.kieu, hzXuLy: cd.hzXuLy },
+    mic: { hz: cd.hz, kenh: cd.kenh, vong: cd.vong, on: cd.on, agc: cd.agc, bac: cd.bac, treThuMs: cd.treThu, chuoi: cd.chuoi, kieu: cd.kieu, hzXuLy: cd.hzXuLy, locOn: cd.locOn, locOnChay: cd.locOnChay },
   }
   if (kieu === 'xung') {
     const x0 = batXung(k0), x1 = batXung(k1), x2 = batXung(k2), dChuoi: number[] = [], dTong: number[] = []

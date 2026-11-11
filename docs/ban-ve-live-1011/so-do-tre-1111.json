@@ -1588,5 +1588,207 @@
     }
    }
   ]
+ },
+ "loc-on": {
+  "luc": "2026-11-11T05:48:56.530Z",
+  "ghiChu": "Chromium thật + mic giả đọc tệp WAV; thư viện taoLiveThay thật → kết nối WebRTC thứ hai trong trang (không SFU thật, không loa / mic thật). Trễ đo giữa ba điểm trong trang bằng cùng một đồng hồ mẫu: mic trình duyệt giao → đầu ra chuỗi → tiếng nhận sau Opus + đệm rung. CHƯA gồm bộ đệm thu của thiết bị và trễ loa.",
+  "on": [
+   {
+    "ten": "không lọc",
+    "kieu": "noi",
+    "kbps": 61.3,
+    "goiMoiGiay": 51,
+    "demRungMs": 33.2,
+    "xuLyNhanMs": 26.2,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000,
+     "locOn": "tat",
+     "locOnChay": "tat"
+    },
+    "noiMic": {
+     "rmsNoiDb": -25,
+     "dinhDb": -10.5,
+     "onNghiDb": -35,
+     "tinTrenOnDb": 10,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -17.5,
+     "dinhDb": -1.5,
+     "onNghiDb": -27.5,
+     "tinTrenOnDb": 10.1,
+     "thoDb": 0.5,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -16.5,
+     "dinhDb": -0.9,
+     "onNghiDb": -29.3,
+     "tinTrenOnDb": 12.8,
+     "thoDb": 0.5,
+     "soQuangNghi": 7,
+     "segSnrDb": 5.2
+    }
+   },
+   {
+    "ten": "lọc ồn + khử vọng của TRÌNH DUYỆT (lọc riêng tắt)",
+    "kieu": "noi",
+    "kbps": 63.8,
+    "goiMoiGiay": 51,
+    "demRungMs": 42.1,
+    "xuLyNhanMs": 40.1,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": true,
+     "on": true,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000,
+     "locOn": "tat",
+     "locOnChay": "tat"
+    },
+    "noiMic": {
+     "rmsNoiDb": -22.5,
+     "dinhDb": -7.9,
+     "onNghiDb": -50.7,
+     "tinTrenOnDb": 28.2,
+     "thoDb": -0.5,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18,
+     "dinhDb": -3.9,
+     "onNghiDb": -46.6,
+     "tinTrenOnDb": 28.6,
+     "thoDb": -0.5,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.4,
+     "dinhDb": -3.8,
+     "onNghiDb": -47.3,
+     "tinTrenOnDb": 30,
+     "thoDb": -0.9,
+     "soQuangNghi": 7,
+     "segSnrDb": 7.5
+    }
+   },
+   {
+    "ten": "lọc riêng «Vừa»",
+    "kieu": "noi",
+    "kbps": 62.6,
+    "goiMoiGiay": 51,
+    "demRungMs": 39.8,
+    "xuLyNhanMs": 31.4,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000,
+     "locOn": "vua",
+     "locOnChay": "chay"
+    },
+    "noiMic": {
+     "rmsNoiDb": -25,
+     "dinhDb": -10.5,
+     "onNghiDb": -35,
+     "tinTrenOnDb": 9.9,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18,
+     "dinhDb": -2.9,
+     "onNghiDb": -39.5,
+     "tinTrenOnDb": 21.4,
+     "thoDb": -0.1,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17,
+     "dinhDb": -3.3,
+     "onNghiDb": -40.9,
+     "tinTrenOnDb": 23.9,
+     "thoDb": -0.1,
+     "soQuangNghi": 7,
+     "segSnrDb": 8.9
+    }
+   },
+   {
+    "ten": "lọc riêng «Mạnh»",
+    "kieu": "noi",
+    "kbps": 63.3,
+    "goiMoiGiay": 51,
+    "demRungMs": 35.6,
+    "xuLyNhanMs": 30.1,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000,
+     "locOn": "manh",
+     "locOnChay": "chay"
+    },
+    "noiMic": {
+     "rmsNoiDb": -25.1,
+     "dinhDb": -10.5,
+     "onNghiDb": -35,
+     "tinTrenOnDb": 9.9,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -17.7,
+     "dinhDb": -2.8,
+     "onNghiDb": -48.8,
+     "tinTrenOnDb": 31.2,
+     "thoDb": -0.6,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -16.6,
+     "dinhDb": -2.8,
+     "onNghiDb": -49.9,
+     "tinTrenOnDb": 33.3,
+     "thoDb": -0.6,
+     "soQuangNghi": 7,
+     "segSnrDb": 10
+    }
+   }
+  ]
  }
 }

@@ -1,0 +1,549 @@
+{
+ "luc": "2026-11-11T05:41:37.595Z",
+ "wasm": "src/lib/live/loc-on/rnnoise.wasm",
+ "ghiChu": "Ngoại tuyến trong Node, tín hiệu tổng hợp 48 kHz; RNNoise khung 480 mẫu. Trộn: đầu ra = lọc × (1 − kho) + gốc (đã lùi cho khớp trễ) × kho.",
+ "sach": {
+  "giọng nam": {
+   "giong": "giọng nam",
+   "treMau": 480,
+   "treMs": 10,
+   "Vừa (giữ 25 % nền)": {
+    "siSdr": 14.5,
+    "den3dBHz": 14034
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "siSdr": 12.4,
+    "den3dBHz": 3403
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "siSdr": 11.8,
+    "den3dBHz": 3403
+   }
+  },
+  "giọng nữ / trẻ": {
+   "giong": "giọng nữ / trẻ",
+   "treMau": 480,
+   "treMs": 10,
+   "Vừa (giữ 25 % nền)": {
+    "siSdr": 16.8,
+    "den3dBHz": 11082
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "siSdr": 14.7,
+    "den3dBHz": 11082
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "siSdr": 14.2,
+    "den3dBHz": 8751
+   }
+  }
+ },
+ "on": [
+  {
+   "giong": "giọng nam",
+   "on": "quạt / điều hoà",
+   "snr": 0,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": -3,
+    "tiengNuoc": 5.4
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 11.1,
+    "siSdr": 3.1,
+    "hon": 6,
+    "tiengNuoc": 5.5
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 19.4,
+    "siSdr": 4.4,
+    "hon": 7.4,
+    "tiengNuoc": 5.9
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 23.6,
+    "siSdr": 4.6,
+    "hon": 7.5,
+    "tiengNuoc": 7.1
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "quạt / điều hoà",
+   "snr": 10,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 7,
+    "tiengNuoc": 5.4
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 11.5,
+    "siSdr": 11.9,
+    "hon": 4.9,
+    "tiengNuoc": 5.5
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 21.4,
+    "siSdr": 12,
+    "hon": 5,
+    "tiengNuoc": 5.6
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 28.9,
+    "siSdr": 11.8,
+    "hon": 4.8,
+    "tiengNuoc": 6.8
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "quạt / điều hoà",
+   "snr": 20,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 17,
+    "tiengNuoc": 5.4
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 11.2,
+    "siSdr": 17.2,
+    "hon": 0.2,
+    "tiengNuoc": 5.5
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 20.3,
+    "siSdr": 15.8,
+    "hon": -1.1,
+    "tiengNuoc": 5.5
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 25.8,
+    "siSdr": 15.4,
+    "hon": -1.6,
+    "tiengNuoc": 6.3
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "xôn xao lớp học",
+   "snr": 0,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": -2.9,
+    "tiengNuoc": 119.9
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 3.5,
+    "siSdr": -2.4,
+    "hon": 0.5,
+    "tiengNuoc": 38.2
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 4.2,
+    "siSdr": -2.7,
+    "hon": 0.3,
+    "tiengNuoc": 36
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 4.3,
+    "siSdr": -2.8,
+    "hon": 0.1,
+    "tiengNuoc": 35.2
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "xôn xao lớp học",
+   "snr": 10,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 7,
+    "tiengNuoc": 116
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 5.1,
+    "siSdr": 7.2,
+    "hon": 0.2,
+    "tiengNuoc": 34
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 6.2,
+    "siSdr": 6.6,
+    "hon": -0.4,
+    "tiengNuoc": 31.6
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 6.4,
+    "siSdr": 6.3,
+    "hon": -0.7,
+    "tiengNuoc": 30.6
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "xôn xao lớp học",
+   "snr": 20,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 17,
+    "tiengNuoc": 112.1
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 5.5,
+    "siSdr": 12,
+    "hon": -5,
+    "tiengNuoc": 30.8
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 6.8,
+    "siSdr": 10.3,
+    "hon": -6.7,
+    "tiengNuoc": 28.7
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 7.1,
+    "siSdr": 9.8,
+    "hon": -7.2,
+    "tiengNuoc": 27.9
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "gõ bút / bàn phím",
+   "snr": 0,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": -3,
+    "tiengNuoc": 95.9
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 3.9,
+    "siSdr": -0.5,
+    "hon": 2.6,
+    "tiengNuoc": 32.5
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 4.8,
+    "siSdr": 0.1,
+    "hon": 3.1,
+    "tiengNuoc": 31.6
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 5,
+    "siSdr": 0.2,
+    "hon": 3.2,
+    "tiengNuoc": 31.3
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "gõ bút / bàn phím",
+   "snr": 10,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 7,
+    "tiengNuoc": 92.7
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 4,
+    "siSdr": 8.2,
+    "hon": 1.2,
+    "tiengNuoc": 29.1
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 5,
+    "siSdr": 8,
+    "hon": 1,
+    "tiengNuoc": 28
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 5.2,
+    "siSdr": 7.9,
+    "hon": 0.9,
+    "tiengNuoc": 27.7
+   }
+  },
+  {
+   "giong": "giọng nam",
+   "on": "gõ bút / bàn phím",
+   "snr": 20,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 17,
+    "tiengNuoc": 89.4
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 2.7,
+    "siSdr": 13.7,
+    "hon": -3.3,
+    "tiengNuoc": 25.7
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 3.3,
+    "siSdr": 12.2,
+    "hon": -4.7,
+    "tiengNuoc": 24.8
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 3.4,
+    "siSdr": 11.8,
+    "hon": -5.2,
+    "tiengNuoc": 24.5
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "quạt / điều hoà",
+   "snr": 0,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": -3.1,
+    "tiengNuoc": 5.3
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 11.2,
+    "siSdr": 3.6,
+    "hon": 6.7,
+    "tiengNuoc": 5.4
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 19.9,
+    "siSdr": 5.4,
+    "hon": 8.5,
+    "tiengNuoc": 5.8
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 24.4,
+    "siSdr": 5.6,
+    "hon": 8.8,
+    "tiengNuoc": 7
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "quạt / điều hoà",
+   "snr": 10,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 6.9,
+    "tiengNuoc": 5.3
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 11.6,
+    "siSdr": 13.3,
+    "hon": 6.4,
+    "tiengNuoc": 5.4
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 22.2,
+    "siSdr": 14.2,
+    "hon": 7.3,
+    "tiengNuoc": 5.5
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 31.6,
+    "siSdr": 14.3,
+    "hon": 7.4,
+    "tiengNuoc": 6.4
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "quạt / điều hoà",
+   "snr": 20,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 16.9,
+    "tiengNuoc": 5.3
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 11.3,
+    "siSdr": 20.2,
+    "hon": 3.4,
+    "tiengNuoc": 5.4
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 20.7,
+    "siSdr": 19.6,
+    "hon": 2.7,
+    "tiengNuoc": 5.6
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 26.9,
+    "siSdr": 19.3,
+    "hon": 2.4,
+    "tiengNuoc": 6.5
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "xôn xao lớp học",
+   "snr": 0,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": -3.1,
+    "tiengNuoc": 117.3
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 2.3,
+    "siSdr": -2.3,
+    "hon": 0.8,
+    "tiengNuoc": 37.7
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 2.8,
+    "siSdr": -2.4,
+    "hon": 0.7,
+    "tiengNuoc": 35.9
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 2.9,
+    "siSdr": -2.4,
+    "hon": 0.7,
+    "tiengNuoc": 35.2
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "xôn xao lớp học",
+   "snr": 10,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 6.9,
+    "tiengNuoc": 113.5
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 2.6,
+    "siSdr": 7.5,
+    "hon": 0.7,
+    "tiengNuoc": 34.4
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 3.1,
+    "siSdr": 7.2,
+    "hon": 0.3,
+    "tiengNuoc": 32.9
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 3.2,
+    "siSdr": 7.1,
+    "hon": 0.2,
+    "tiengNuoc": 32.4
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "xôn xao lớp học",
+   "snr": 20,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 16.9,
+    "tiengNuoc": 109.6
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 4,
+    "siSdr": 15.6,
+    "hon": -1.3,
+    "tiengNuoc": 30.4
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 4.9,
+    "siSdr": 14.4,
+    "hon": -2.5,
+    "tiengNuoc": 28.7
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 5.1,
+    "siSdr": 14,
+    "hon": -2.9,
+    "tiengNuoc": 28.2
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "gõ bút / bàn phím",
+   "snr": 0,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": -3.1,
+    "tiengNuoc": 83.3
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 5.2,
+    "siSdr": -0.3,
+    "hon": 2.7,
+    "tiengNuoc": 27.8
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 6.6,
+    "siSdr": 0.2,
+    "hon": 3.3,
+    "tiengNuoc": 27
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 7,
+    "siSdr": 0.3,
+    "hon": 3.4,
+    "tiengNuoc": 26.7
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "gõ bút / bàn phím",
+   "snr": 10,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 6.9,
+    "tiengNuoc": 80.4
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 2.9,
+    "siSdr": 8.4,
+    "hon": 1.5,
+    "tiengNuoc": 25
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 3.5,
+    "siSdr": 8.4,
+    "hon": 1.5,
+    "tiengNuoc": 24.3
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 3.7,
+    "siSdr": 8.4,
+    "hon": 1.5,
+    "tiengNuoc": 24
+   }
+  },
+  {
+   "giong": "giọng nữ / trẻ",
+   "on": "gõ bút / bàn phím",
+   "snr": 20,
+   "không lọc": {
+    "giamOn": 0,
+    "siSdr": 16.9,
+    "tiengNuoc": 77.6
+   },
+   "Vừa (giữ 25 % nền)": {
+    "giamOn": 1.4,
+    "siSdr": 15.3,
+    "hon": -1.6,
+    "tiengNuoc": 22.6
+   },
+   "Mạnh (giữ 6 % nền)": {
+    "giamOn": 1.7,
+    "siSdr": 14.3,
+    "hon": -2.6,
+    "tiengNuoc": 22
+   },
+   "lọc hết cỡ (0 % nền)": {
+    "giamOn": 1.8,
+    "siSdr": 14,
+    "hon": -2.9,
+    "tiengNuoc": 21.8
+   }
+  }
+ ],
+ "msMoiKhung": 0.105,
+ "cpuPhanTram": 1.1
+}
