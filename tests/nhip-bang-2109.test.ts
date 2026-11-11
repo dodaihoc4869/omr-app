@@ -37,6 +37,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/lib/html-may-chieu.ts': 0,
   'src/components/live/LopLive.tsx': 1, // 10/11 Live (máy em): 1,5 s thử lại bật mic CHỈ trong lúc em đang được gọi lên bảng mà mic chưa mở (chờ nối xong SFU); cục bộ + cửa /bpu/live của Worker (0 D1); mở được / hết lượt gọi ⇒ dừng
   'src/components/live/thay-noi.ts': 1, // 10/11 Live (máy thầy): 90 ms đọc mức âm mic gửi sang tờ chiếu (vạch mic) CHỈ khi thẻ mic mở hoặc đang live có tiếng; cục bộ, không gọi máy chủ
+  'src/lib/live/thay-them.ts': 1, // 11/11 Đo tiếng từ xa (máy thầy): 5 s đo 2 giây số liệu tiếng của chính máy (getStats cục bộ), CHỈ khi đang live; 10 s gửi một tin `live-do` qua WebSocket của phòng — 0 D1; live tắt ⇒ bỏ qua
   'src/lib/live/may-ghi.ts': 2, // 11/11 Xem lại Live (máy ghi trên máy thầy, CHỈ khi đang live): 1 s soát luồng mic (cục bộ) + 10 s gửi tin `live-ghi` (mẫu đồng hồ) qua WebSocket của phòng — 0 D1; live tắt ⇒ dừng
   'src/lib/live-to-chieu.ts': 1, // 10/11 Live (tờ chiếu, trong iframe): 1 s vẽ đồng hồ «LIVE 12:34» CHỈ khi đang live; cục bộ, không gọi máy chủ
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe

@@ -24,7 +24,7 @@
 //     `ddh.but.nhanh` = `tat` (tắt hẳn) · `ep` (ép bật để thử dù trình duyệt không cấp) · `__mcBut.nhanh(false)`. Mực trên bảng nay nằm DƯỚI thẻ tên /
 //     chữ của cột bảng (trước: trên). «Vẽ ngay khi mẫu tới» vẫn mặc định tắt (xem `datBang`).
 //   · BẢNG ĐEN CUỘN (11/11, thầy: «bảng đen khi live có cuộn vô hạn để viết được nhiều phần»): nét bắt đầu trong cột bảng đen là NÉT BẢNG (mã «b_…»),
-//     y = y màn + độ cuộn ⇒ vẽ trong ô bảng, dời theo độ cuộn; nét trên giấy đề đứng yên như cũ. Cuộn: lăn chuột / hai ngón trên bảng, kéo vạch mép phải bảng,
+//     y = y màn + độ cuộn ⇒ vẽ trong ô bảng, dời theo độ cuộn; nét trên giấy đề dời theo giấy (but-cuon-giay-to-chieu.ts). Cuộn: lăn chuột / hai ngón trên bảng, kéo vạch mép phải bảng,
 //     viết sát đáy rồi ngừng 0,9 giây thì bảng tự trôi lên. Đang viết thì không cuộn. Độ cuộn nhớ theo đợt.
 //   · Alt + B: ô ĐO BÚT (thiết bị, số mẫu mỗi giây, lực, mẫu gộp, thời gian xử lý) để thầy chụp gửi lại.
 //   · nét giữ theo ĐỢT (khoá = chỉ số đợt): chuyển câu rồi quay lại vẫn còn, câu mới bảng sạch.
@@ -33,6 +33,7 @@
 // Màu phấn là DỮ LIỆU của nét (đi theo nét sang máy khác) nên ghi rgb() thẳng, lấy đúng trị của các biến sẵn có trên tờ:
 //   trắng ngà = --mc-bang-chu · vàng = --mc-vang-noi · xanh ngọc = --mc-ll-dung (tối) · hồng = --mc-ll-sai (tối) · mực xanh = màu bút xanh cũ.
 import { JS_LOI_BUT } from './but-bang-loi'
+import { JS_CUON_GIAY } from './but-cuon-giay-to-chieu'
 
 export const CSS_BUT_BANG = `
 /* 7b · bút viết bảng 10/11: lớp sống nằm trên lớp tĩnh; thanh bút gọn */
@@ -108,7 +109,7 @@ ${JS_LOI_BUT}
   var coRaw = 'onpointerrawupdate' in window, veNgay = false, ngheRaw = false, tVe = 0, DO = null, oDo = null, luotDo = 0, duocNgay = false, kyKh = 1e9, khTb = 0, khDem = 0, khSach = 0, khPhat = 0, tuTat = false;
   var khungSau = window.requestAnimationFrame ? function (f) { return window.requestAnimationFrame(f); } : function (f) { return setTimeout(f, 16); };
   butCu.setAttribute('role', 'toolbar'); butCu.setAttribute('aria-label', 'Bút viết bảng');
-
+` + /* giấy đề cuộn (con lăn khi bút bật, nét trên giấy cuộn theo đề): but-cuon-giay-to-chieu.ts */ `${JS_CUON_GIAY}
   function coCanvas() {
     var W = window.innerWidth, H = window.innerHeight;
     dpr = Math.min(window.devicePixelRatio || 1, 3); KH = LoiBut.khung(W, H); ban = UO = null; B = null;
@@ -118,7 +119,7 @@ ${JS_LOI_BUT}
     cvT.style.width = cvT.width / dpr + 'px'; cvT.style.height = cvT.height / dpr + 'px';
     datMatDo();
     cv.width = cv.height = 1; CY = Math.round(cuon * H * dpr);
-    khoaB = '#'; so.datTiLe(W / H); datBang(); veLai();
+    khoaB = '#'; so.datTiLe(W / H); doOGiay(); datBang(); veLai();
     if (!nong) { nong = 1; lamNong(); }
   }
 ` + /* Ô bảng đen của đợt đang chiếu, đo SO VỚI ĐỢT (đợt đang trượt vào vẫn ra đúng số). Trả true nếu ô đổi. */ `
@@ -210,12 +211,13 @@ ${JS_LOI_BUT}
     for (i = 0; i < 40; i++) p = LoiBut.dungNet(n, KH);
     if (g2) { toDaGiac(gC, p, 'transparent'); cvS.width = cvS.height = 640; toDaGiac(gS, p, 'transparent'); }
   }
-` + /* Tô một đa giác lên canvas c có gốc (ox, oy) điểm ảnh thiết bị. bang = nét bảng: dời theo độ cuộn, cắt trong ô bảng đen. */ `
+` + /* Tô một đa giác lên canvas c có gốc (ox, oy) điểm ảnh thiết bị. bang = true: nét bảng — dời theo độ cuộn, cắt trong ô bảng đen; */ `
+` + /* bang = ô [x, y, rộng, cao, độ cuộn] của giấy đề đang cuộn: nét giấy — dời theo độ cuộn của giấy, cắt theo mép trên / dưới ô giấy. */ `
   function toDaGiac(c, p, mau, bang, ox, oy) {
     var s = dpr * KH.k, bu;
     ox = ox || 0; oy = oy || 0;
-    if (bang) { c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.beginPath(); c.rect(BX - ox, BY - oy, BW, BH); c.clip(); }
-    c.setTransform(s, 0, 0, s, -ox, -oy - (bang ? CY : 0)); c.globalCompositeOperation = 'source-over'; c.fillStyle = mau;
+    if (bang) { c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.beginPath(); if (bang === true) c.rect(BX - ox, BY - oy, BW, BH); else c.rect(-ox, bang[1] - oy, cvT.width, bang[3]); c.clip(); }
+    c.setTransform(s, 0, 0, s, -ox, -oy - (bang ? bang === true ? CY : bang[4] : 0)); c.globalCompositeOperation = 'source-over'; c.fillStyle = mau;
     c.beginPath(); LoiBut.veDaGiac(c, p); c.fill();
 ` + /* bù sáng cho nét phấn (xem LoiBut.buSang): tô thêm một lượt mờ ⇒ mép nét đều sáng, nét mảnh không lổn nhổn */ `
     if (bu = LoiBut.buSang(mau)) { c.globalAlpha = bu; c.fill(); c.globalAlpha = 1; }
@@ -227,10 +229,16 @@ ${JS_LOI_BUT}
     c.globalCompositeOperation = 'copy'; c.drawImage(nguon, 0, 0, w, h, x, y, w, h); c.restore();
   }
 ` + /* Lớp ĐÃ CHỐT: vẽ lại MỌI nét của trang từ vectơ (đường bao nhớ theo tỉ lệ vùng viết ⇒ đổi cỡ cùng tỉ lệ / tẩy / hoàn tác / cuộn không dựng lại), rồi chép cả lớp lên màn. */ `
-` + /* Lượt 0 = nét trên giấy (đứng yên) · lượt 1 = nét bảng (cắt trong ô bảng, dời theo độ cuộn; nét ngoài tầm nhìn bỏ qua). */ `
+` + /* Lượt 0 = nét thường + nét trên giấy chưa cuộn · lượt 1 = nét bảng (cắt trong ô bảng, dời theo độ cuộn; nét ngoài tầm nhìn bỏ qua). */ `
   function veLai() {
     if (!g2 || !KH) return;
     var s = dpr * KH.k, khoaD = KH.rw + 'x' + KH.rh, coD = typeof Path2D === 'function', ds = so.ds(), luot, i, n, h, p;
+    function to(n) {
+      if (n._k !== khoaD) { p = LoiBut.dungNet(n, KH); n._k = khoaD; if (coD) { n._d = new Path2D(); LoiBut.veDaGiac(n._d, p); } else n._d = p; }
+      gC.globalCompositeOperation = n.cong === 'tay' ? 'destination-out' : 'source-over'; gC.fillStyle = n.mau;
+      if (coD) gC.fill(n._d); else { gC.beginPath(); LoiBut.veDaGiac(gC, n._d); gC.fill(); }
+      if (n.cong !== 'tay' && (p = LoiBut.buSang(n.mau))) { gC.globalAlpha = p; if (coD) gC.fill(n._d); else gC.fill(); gC.globalAlpha = 1; }
+    }
     gC.setTransform(1, 0, 0, 1, 0, 0); gC.clearRect(0, 0, cvC.width, cvC.height); daiBang = 0;
     for (luot = 0; luot < 2; luot++) {
       if (luot) { if (!B) break; gC.save(); gC.setTransform(1, 0, 0, 1, 0, 0); gC.beginPath(); gC.rect(BX, BY, BW, BH); gC.clip(); }
@@ -239,13 +247,13 @@ ${JS_LOI_BUT}
         n = ds[i];
         if ((B && LoiBut.laBang(n) ? 1 : 0) !== luot) continue;
         if (luot) { h = LoiBut.hop(n); if (h[3] > daiBang) daiBang = h[3]; if (h[3] < cuon + B[1] - 0.02 || h[1] > cuon + B[3] + 0.02) continue; }
-        if (n._k !== khoaD) { p = LoiBut.dungNet(n, KH); n._k = khoaD; if (coD) { n._d = new Path2D(); LoiBut.veDaGiac(n._d, p); } else n._d = p; }
-        gC.globalCompositeOperation = n.cong === 'tay' ? 'destination-out' : 'source-over'; gC.fillStyle = n.mau;
-        if (coD) gC.fill(n._d); else { gC.beginPath(); LoiBut.veDaGiac(gC, n._d); gC.fill(); }
-        if (n.cong !== 'tay' && (p = LoiBut.buSang(n.mau))) { gC.globalAlpha = p; if (coD) gC.fill(n._d); else gC.fill(); gC.globalAlpha = 1; }
+        else if (cuonCuaNet(n)) continue;
+        to(n);
       }
       if (luot) gC.restore();
     }
+` + /* lượt 2 = nét của giấy đề ĐANG CUỘN (dời theo độ cuộn của giấy, cắt theo ô giấy); giấy chưa cuộn thì nét giấy đã vẽ ở lượt 0 như cũ */ `
+    veNetGiay(ds, to, s);
     gC.globalCompositeOperation = 'source-over';
     gT.setTransform(1, 0, 0, 1, 0, 0); gT.globalCompositeOperation = 'copy'; gT.drawImage(cvC, 0, 0); gT.globalCompositeOperation = 'source-over';
 ` + /* lớp bảng đặc đang dùng: mọi thứ trong ô bảng hiện ở đó, lớp hiện chung để trống trong ô bảng */ `
@@ -255,7 +263,7 @@ ${JS_LOI_BUT}
 ` + /* HIỆN ĐUÔI nét đang viết (p = đa giác bao, rỗng = gỡ đuôi): ô cần đổi = ô đuôi khung trước ∪ ô đuôi mới. Dựng ô đó trên NHÁP = [lớp đã chốt + đuôi], */ `
 ` + /* rồi chép MỘT lần lên lớp hiện ⇒ màn không bao giờ thấy trạng thái dở (đã xoá mà chưa vẽ). Mọi nét đều được tô trên canvas ngoài màn cùng loại ⇒ cùng một cách khử răng cưa. */ `
   function hienDuoi(p, mau, bang) {
-    var s = dpr * KH.k, cy = bang ? CY : 0, i, x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, r = null, a = ban, w, h, ix, iy, iw, ih;
+    var s = dpr * KH.k, cy = bang ? bang === true ? CY : bang[4] : 0, i, x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9, r = null, a = ban, w, h, ix, iy, iw, ih;
     for (i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1]; }
     if (p.length) r = [Math.floor(x0 * s) - 3, Math.floor(y0 * s) - 3 - cy, Math.ceil((x1 - x0) * s) + 6, Math.ceil((y1 - y0) * s) + 6];
     ban = r; UO = null;
@@ -283,11 +291,11 @@ ${JS_LOI_BUT}
     n.can = false;
     LoiBut.xuLyThem(st, n.tat, n.tat.length);
     den = LoiBut.mocDong(st, n.dong, 160);
-    if (den > 0) { toDaGiac(gC, LoiBut.vien(st, n.dong, den, null, false), n.net.mau, n.bang); n.dong = den - 2; }
+    if (den > 0) { toDaGiac(gC, LoiBut.vien(st, n.dong, den, null, false), n.net.mau, n.vg); n.dong = den - 2; }
 ` + /* đầu bút thật (chưa đủ xa để thành mẫu): làm tròn như một mẫu thật ⇒ lúc nhấc bút mẫu chốt rơi đúng chỗ này, hình không đổi */ `
     if (n.mx !== n.tx || n.my !== n.ty) { d = LoiBut.diem(n.mx, n.my + n.cy, 0, 0, KH.W, KH.H); them = [[d[0] * KH.rw, d[1] * KH.rh]]; }
     if (n.xem.length) them = (them || []).concat(n.xem);
-    hienDuoi(LoiBut.vien(st, n.dong, -1, them, true), n.net.mau, n.bang);
+    hienDuoi(LoiBut.vien(st, n.dong, -1, them, true), n.net.mau, n.vg);
 ` + /* thời gian một lượt vẽ chỉ cần khi đang vẽ ngay (để tự giãn): đọc đồng hồ ở mỗi lượt vẽ cũng tốn */ `
     if (veNgay) { tVe += ((gio() - t0) - tVe) * 0.2; n.tgVe = n.xem.length ? n.xem[n.xem.length - 1][2] : n.tg; }
   }
@@ -334,12 +342,16 @@ ${JS_LOI_BUT}
   }
 ` + /* Mở nét tại mẫu e. luc = thiết bị này đã từng báo lực thật (nét mở lại sau khi bút lướt). Bắt đầu trong ô bảng đen ⇒ nét bảng. */ `
   function batNet(e, id, loai, luc) {
-    var but = loai === 'pen', coLuc = but && e.pressure > 0 && e.pressure !== 0.5, ap = coLuc ? e.pressure : but ? 0.12 : 0.3, bang = trongBang(e.clientX, e.clientY), cy = bang ? CY / dpr : 0, d = LoiBut.diem(e.clientX, e.clientY + cy, ap, 0, KH.W, KH.H);
+    var but = loai === 'pen', coLuc = but && e.pressure > 0 && e.pressure !== 0.5, ap = coLuc ? e.pressure : but ? 0.12 : 0.3, bang, gv, og, cy, d;
 ` + /* tờ vừa dựng lại ruột cột bảng (lớp bảng đặc bị gỡ khỏi trang) ⇒ gắn lại trước khi viết */ `
-    if (NH && cvB.parentNode !== cotB) { khoaB = '#'; datBang(); veLai(); bang = trongBang(e.clientX, e.clientY); cy = bang ? CY / dpr : 0; }
-    dungCuon(); ban = UO = null;
-    N = { id: id, loai: loai, coLuc: coLuc || !!luc, nghi: 0, t0: e.timeStamp, tg: e.timeStamp, tgVe: e.timeStamp, tt: 0, tx: e.clientX, ty: e.clientY, mx: e.clientX, my: e.clientY, ap: ap, moi: [], tat: [d], xem: [], tsKh: 0, dong: 0, can: true, net: null, st: null, bang: bang, cy: cy, yLon: e.clientY };
+    if (NH && cvB.parentNode !== cotB) { khoaB = '#'; datBang(); veLai(); }
+` + /* nét bắt đầu trong ô giấy đề ⇒ nét GIẤY: y = y màn + độ cuộn của giấy (og[4]); vg = cách vẽ đuôi nét (true: bảng · ô giấy đang cuộn · false: thường) */ `
+    bang = trongBang(e.clientX, e.clientY); gv = bang ? null : giayViet(e.clientX, e.clientY); og = gv ? gv.__go : null;
+    cy = (bang ? CY : og ? og[4] : 0) / dpr; d = LoiBut.diem(e.clientX, e.clientY + cy, ap, 0, KH.W, KH.H);
+    dungCuon(); ban = UO = null; dyPhat = og ? og[4] / dpr / KH.H : 0;
+    N = { id: id, loai: loai, coLuc: coLuc || !!luc, nghi: 0, t0: e.timeStamp, tg: e.timeStamp, tgVe: e.timeStamp, tt: 0, tx: e.clientX, ty: e.clientY, mx: e.clientX, my: e.clientY, ap: ap, moi: [], tat: [d], xem: [], tsKh: 0, dong: 0, can: true, net: null, st: null, bang: bang, vg: bang || (og && og[4] ? og : false), cy: cy, yLon: e.clientY };
     N.net = so.batDau({ cong: 'but', mau: S.mau, co: S.co, diem: d, bang: bang });
+    if (gv) { N.net._g = dsGiay.indexOf(gv) + 1; N.net._c = og[4]; }
     N.st = LoiBut.moXuLy(N.net, KH);
     if (DO) { DO.net++; DO.tb = loai; DO.coLuc = N.coLuc; DO.tc = e.timeStamp; DO.g0 = DO.g1 = gio(); DO.nNet = 1; }
     hen();
@@ -396,14 +408,17 @@ ${JS_LOI_BUT}
     rayTay.style.top = (cuon / dai * 100) + '%'; rayTay.style.height = ((B[3] - B[1]) / dai * 100) + '%';
   }
   cv.addEventListener('wheel', function (e) {
-    if (!S.but || !KH || !trongBang(e.clientX, e.clientY)) return;
+    if (!S.but || !KH) return;
+    if (!trongBang(e.clientX, e.clientY)) { lanGiay(e); return; }
     e.preventDefault(); dungCuon();
     tx0 = e.clientX; ty0 = e.clientY; luotTro = e.timeStamp;
     datCuon(cuon + e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? KH.H * 0.8 : 1) / KH.H);
   }, { passive: false });
 ` + /* Tẩy theo NÉT: kéo qua nét nào thì cả nét đó mất; cả lượt kéo là MỘT bước hoàn tác. */ `
   function tayQua(x0, y0, x1, y1) {
-    var bang = trongBang(x0, y0), cy = bang ? CY / dpr : 0, ds = so.ds().filter(function (n) { return !!(B && LoiBut.laBang(n)) === bang; });
+    var bang = trongBang(x0, y0), gv = bang ? null : oGiayTai(x0, y0), og = gv && gv.__go[4] ? gv.__go : null, cy = (bang ? CY : og ? og[4] : 0) / dpr;
+` + /* tẩy trong ô giấy đang cuộn ⇒ chỉ chạm nét của giấy ấy (y đã cộng độ cuộn); ngoài ra ⇒ nét thường / nét giấy chưa cuộn */ `
+    var ds = so.ds().filter(function (n) { return !!(B && LoiBut.laBang(n)) === bang && (bang || cuonCuaNet(n) === og); });
     var buoc = Math.max(1, Math.ceil(Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0)) / (R_TAY * KH.k * 0.5))), i, ids = [];
     for (i = 0; i <= buoc; i++) LoiBut.timCham(ds, (x0 + (x1 - x0) * i / buoc) / KH.W, (y0 + (y1 - y0) * i / buoc + cy) / KH.H, R_TAY, KH).forEach(function (d) { if (ids.indexOf(d) < 0) ids.push(d); });
     if (ids.length && so.xoa(ids, true)) { veLai(); capNut(); }
@@ -552,7 +567,7 @@ ${JS_LOI_BUT}
 ` + /* Thanh bút nằm trên mép phải tấm giấy đề, sát cột bảng đen (không che thẻ tên em); tờ không có cột bảng ⇒ giữa mép trên như cũ. */ `
 ` + /* Đo chỗ cột SO VỚI ĐỢT (đợt đang trượt vào vẫn ra đúng số), và đo lại một nhịp sau khi tờ xếp xong. */ `
   function datThanh() {
-    var W = window.innerWidth, doi = KH && !N ? datBang() : false, co = S.but && !!B;
+    var W = window.innerWidth, doiG = !!KH && !N && doOGiay(), doi = (KH && !N ? datBang() : false) || doiG, co = S.but && !!B;
     butCu.style.left = co ? 'auto' : ''; butCu.style.transform = co ? 'none' : ''; butCu.style.right = co ? Math.round(W - B[0] * W + u() * 0.9) + 'px' : '';
     oThanh = S.but ? butCu.getBoundingClientRect() : null;
     if (doi) veLai(); else veRay();
@@ -576,7 +591,7 @@ ${JS_LOI_BUT}
   function lamLai() { ketNet(false); if (so.lamLai()) { veLai(); capNut(); } }
   function xoaBut() { ketNet(false); if (so.xoaHet()) { veLai(); capNut(); } }
 ` + /* Vào đợt: nét của đợt cũ cất lại, bảng hiện nét của đợt này (đợt chưa viết ⇒ bảng sạch). */ `
-  function butTrang() { ketNet(false); XT = null; CHO = null; KC = null; dungCuon(); so.doiTrang(String(chiSo())); cuon = CUON[so.trang()] || 0; CY = KH ? Math.round(cuon * KH.H * dpr) : 0; veLai(); capNut(); henThanh(); so.cuon(cuon); }
+  function butTrang() { ketNet(false); XT = null; CHO = null; KC = null; dungCuon(); clearTimeout(hPhatGiay); doOGiay(); so.doiTrang(String(chiSo())); cuon = CUON[so.trang()] || 0; CY = KH ? Math.round(cuon * KH.H * dpr) : 0; veLai(); capNut(); henThanh(); so.cuon(cuon); }
   butCu.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('button'); if (!b || b.disabled) return;
     if (b.getAttribute('data-m')) { S.mau = b.getAttribute('data-m'); S.tay = false; }
@@ -606,9 +621,9 @@ ${JS_LOI_BUT}
   });
   window.addEventListener('resize', function () { if (KH) { ketNet(false); coCanvas(); conTro(); henThanh(); } });
   window.__mcBut = {
-    xuat: function () { return so.xuat(); },
+    xuat: xuatMan,
     nhap: function (goi) { if (!KH) coCanvas(); ketNet(false); var n = so.nhap(goi); veLai(); capNut(); return n; },
-    nghe: so.nghe, trang: so.trang, hoanTac: hoanTac, lamLai: lamLai, xoaHet: xoaBut,
+    nghe: ngheBut, trang: so.trang, hoanTac: hoanTac, lamLai: lamLai, xoaHet: xoaBut,
     bat: function (b) { if (!!b !== S.but) batBut(); },
 ` + /* cho việc live: bộ máy dựng nét, bảng màu / cỡ, và ô giấy đề / ô bảng đen của đợt đang chiếu tính theo vùng viết [x0, y0, x1, y1] (0..1) */ `
     loi: LoiBut, mau: MAU_BUT, co: CO_BUT,

@@ -1,0 +1,32 @@
+# ĐO CHI PHÍ CLOUDFLARE (CHỈ ĐỌC, 11/11 — thầy: «Tôi chỉ đk gói 5 đô tại sao lại trừ [127,61 USD]. Tìm hiểu kĩ nguyên nhân»). Kịch bản: scripts/do-chi-phi-cf-1111.mjs.
+# Chỉ gọi ĐỌC (REST gói / hoá đơn, GraphQL Analytics); không SELECT trên D1, không ghi, không in khoá / mã tài khoản / thông tin cá nhân.
+name: Đo chi phí Cloudflare (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/do-chi-phi-cf-1111.yml', 'scripts/do-chi-phi-cf-1111.mjs']
+permissions:
+  contents: read
+concurrency:
+  group: do-chi-phi-cf
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+      CHI_NS: '2' # lượt 7: mọi D1, Worker thử còn gắn D1 thật / lịch chạy, Durable Object hàng đọc/ghi, kỳ bỏ 11/11
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ đọc)
+        run: node scripts/do-chi-phi-cf-1111.mjs

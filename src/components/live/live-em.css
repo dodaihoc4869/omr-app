@@ -269,6 +269,46 @@ html:not(#_):not(#_):not(#_) .lv .lv-gd section.ht2-lam-de, html:not(#_):not(#_)
 .lv-luot .kq[data-kq="dung"] { color: var(--p-xanh); }
 .lv-luot .kq[data-kq="sai"] { color: var(--p-cam); }
 
+/* ── EM LÊN BẢNG (thầy 11/11: «hiện một thông báo lên bảng ở giữa màn hình máy học sinh trong 3 giây … rồi tự thu nhỏ vào góc thẻ tên của học sinh đó, không
+   chèn thẻ tên»; LenBang.tsx). `--doi` ở đây = màu đội của EM ĐƯỢC GỌI (đặt ngay trên từng phần tử), không phải đội của em cầm máy.
+   · DẢI `.lv-dau-bang` nằm NGOÀI mép trên khung bảng đen (KhungDocLap đặt chỗ; khung bảng nhường 26 px) ⇒ không đè nét của thầy.
+   · THẺ TÊN `.lv-lb-the`: giấy kem + viền màu đội — cùng dáng thẻ tên trên màn chiếu của thầy. DẤU `.lv-lb-dau` đứng CẠNH thẻ (không lồng trong thẻ).
+   · TẤM GIỮA MÀN `.lv-lb-tam`: thẻ tên phóng to, ≤ 40 % bề ngang, không chặn chạm; sau 3 giây thu về chỗ dấu (chỉ transform + opacity, 0,4 giây). ── */
+.lv-dau-bang { box-sizing: border-box; display: flex; align-items: center; gap: 6px; padding: 0 4px 0 6px; white-space: nowrap; }
+.lv-lb-the { flex: 0 1 auto; min-width: 0; height: 22px; padding: 0 9px 0 7px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; line-height: 1; font-weight: 800;
+  background: var(--tr-chieu-giay); color: var(--tr-chieu-chu); box-shadow: inset 0 0 0 1.5px var(--doi); }
+.lv-lb-the i { flex: none; display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--doi); }
+.lv-lb-the b { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 800; }
+.lv-lb-dau { flex: none; height: 22px; padding: 0 9px 0 7px; border-radius: 999px; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; line-height: 1; font-weight: 700;
+  background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--doi) 70%, transparent);
+  transition: opacity 0.14s ease-out 0.26s, transform 0.2s cubic-bezier(0.2, 0.9, 0.25, 1) 0.26s; }
+.lv-lb-dau svg { flex: none; color: var(--doi); }
+.lv-lb-dau em { font-style: normal; }
+/* tấm giữa màn còn đứng ⇒ dấu giữ chỗ nhưng chưa hiện (tấm sẽ bay về đúng chỗ này) */
+.lv-lb-dau[data-cho] { opacity: 0; transform: scale(0.6); transition: none; }
+/* dải hẹp (bảng đang nhường bề ngang cho giấy) ⇒ dấu chỉ còn hình tròn nhỏ; chữ ở nhãn cho trình đọc màn */
+.lv-dau-bang[data-hep] .lv-lb-dau { width: 22px; padding: 0; justify-content: center; }
+.lv-dau-bang[data-hep] .lv-lb-dau em { display: none; }
+.lv-lb-tam { --lb-co: clamp(22px, calc(var(--lb-w, 844) * 0.036px), 52px); position: absolute; left: 50%; top: 50%; z-index: 3; box-sizing: border-box; width: max-content; max-width: min(40%, 460px);
+  padding: calc(var(--lb-co) * 0.42) calc(var(--lb-co) * 0.9) calc(var(--lb-co) * 0.5); border-radius: calc(var(--lb-co) * 0.72); display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; white-space: nowrap;
+  pointer-events: none; background: var(--tr-chieu-giay); color: var(--tr-chieu-chu); transform: translate(-50%, -50%); will-change: transform, opacity;
+  box-shadow: inset 0 0 0 3px var(--doi), 0 0 0 6px color-mix(in srgb, var(--doi) 26%, transparent), 0 18px 50px color-mix(in srgb, var(--tr-chieu-bang) 60%, transparent);
+  animation: lv-lb-vao 0.24s cubic-bezier(0.22, 0.8, 0.2, 1); }
+.lv-lb-tam b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: var(--lb-co); line-height: 1.15; font-weight: 800; }
+.lv-lb-tam span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: max(15px, calc(var(--lb-co) * 0.6)); line-height: 1.25; font-weight: 700; }
+.lv-lb-tam small { display: inline-flex; align-items: center; gap: 6px; font-size: max(12.5px, calc(var(--lb-co) * 0.44)); line-height: 1.3; font-weight: 700; color: var(--tr-chieu-phu); }
+.lv-lb-tam small::before { content: ""; flex: none; width: 0.62em; height: 0.62em; border-radius: 50%; background: var(--doi); }
+.lv-lb-tam[data-em] span { color: var(--tr-chieu-phu); }
+@keyframes lv-lb-vao { from { opacity: 0; transform: translate(-50%, -46%) scale(0.94); } }
+/* hết 3 giây: thu nhỏ bay về chỗ dấu (`--lb-dx` / `--lb-dy` / `--lb-k` do LenBang.tsx đo); máy yếu / giảm chuyển động: `data-tat` ⇒ tắt ngay.
+   Độ mờ 0 KHÔNG đặt ở `data-pha="thu"`: lúc LenBang.tsx đo chỗ bay, trình duyệt tính kiểu trước khi có `data-thu` ⇒ tấm sẽ tắt phụt, không thấy bay. */
+.lv-lb-tam[data-pha="thu"] { animation: none; }
+.lv-lb-tam[data-tat] { opacity: 0; }
+.lv-lb-tam[data-thu] { opacity: 0; transform: translate(-50%, -50%) translate3d(var(--lb-dx, 0px), var(--lb-dy, 0px), 0) scale(var(--lb-k, 0.3)); transition: transform 0.4s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.14s ease-in 0.26s; }
+@media (prefers-reduced-motion: reduce) { .lv-lb-tam { animation: none; } .lv-lb-dau { transition: none; } }
+html.may-yeu .lv-lb-tam { animation: none; box-shadow: inset 0 0 0 3px var(--doi); }
+html.may-yeu .lv-lb-dau { transition: none; }
+
 @media (prefers-reduced-transparency: reduce) {
   .lv-moi, .lv-luot { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
 }

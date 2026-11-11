@@ -392,6 +392,8 @@ export const JS_LIVE_TO_CHIEU = `
   });
   ['mc-doi-pha', 'mc-bo-cuc-xong'].forEach(function (t) { document.addEventListener(t, function () { if (LV.anhXong && window.__mcBut) setTimeout(function () { lvBaoVung(window.__mcBut.trang()); }, 650); }); });
   window.addEventListener('resize', function () { if (LV.anhXong && window.__mcBut) setTimeout(lvAnh, 300); });
+  // Giấy đề vừa cuộn xong (bút: but-cuon-giay-to-chieu.ts): đo lại giấy NGAY, không chờ nhịp 1 giây ⇒ chữ và nét trên máy em dời cùng lúc.
+  document.addEventListener('mc-giay-cuon', function () { lvBaoGiay(); });
   window.addEventListener('message', function (e) {
     var m = e.data, truoc;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
