@@ -59,6 +59,8 @@ export interface ChuoiTieng {
  *  lọc lúc này (ms; 0 = không lọc); `df3` = tình trạng bộ lọc sâu ('khong' / 'tai' / 'san' / 'loi' / 'cham'), byte đã tải / tổng, ms mỗi khung 10 ms,
  *  vì sao bỏ, thời gian tải + dựng. */
 export interface TomTatLocOn { locOnBo: 'df3' | 'rn'; locOnTre: number; df3: { tinh: string; da: number; tong: number; ms: number; vi?: string; msDung?: number } }
+/** Chuỗi kiểu 'khung' dựng gần nhất còn sống (dọn thì thôi). */
+let chuoiSong: ChuoiTieng | null = null
 /** `muc` = mức lọc đang dùng ('tat' khi chuỗi không chạy). Đọc chuỗi kiểu 'khung' đang sống của trang (mỗi lúc chỉ một). */
 export function tomTatLocOn(muc: MucLocOn): TomTatLocOn {
   const d = tinhDf3(), k = chuoiSong, bat = !!k && muc !== 'tat'
@@ -187,8 +189,6 @@ onmessage = function (ev) {
 };
 `
 const daNap = new WeakMap<object, Promise<boolean>>()
-/** Chuỗi kiểu 'khung' dựng gần nhất còn sống (dọn thì thôi). */
-let chuoiSong: ChuoiTieng | null = null
 /** Hệ số nâng gần nhất: mở lại mic / đổi mic thì BẮT ĐẦU từ hệ số ấy (không tụt về 1), rồi 3 giây nói đầu vẫn trôi nhanh về mức đúng của luồng mới. */
 let gNho = 0
 
