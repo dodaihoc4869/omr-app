@@ -33,7 +33,7 @@ export default function TheNoCau({ nc, daTra, con, gon, duMuc, token, onDoi }: {
     <div className="nc-chon" role="group" aria-label="Chọn cách trả" data-mot={motNut || undefined}>{!motNut && nut('toi_thieu', 'Trả tối thiểu', nc.toiThieu)}{nut('het', 'Trả hết', nc.no)}</div>
     <p className="nc-ghi">{het ? `Em đã trả tối thiểu 3 lần. Hôm nay trả hết nợ câu rồi mới làm bài mới. Còn nợ thì mỗi đêm cộng ${nc.lai} % lãi.`
       : kieu === 'het' ? 'Trả hết thì không bị tính lãi, số lần trả tối thiểu tính lại từ đầu.'
-      : `Tối thiểu = 25 % số nợ, ít nhất 6 câu. Phần còn nợ tính lãi ${nc.lai} % mỗi đêm: đêm nay cộng ${laiDem(nc.no - nc.toiThieu, nc.lai)} câu.`}</p>
+      : `Tối thiểu = 25 % số nợ, ít nhất 6 câu. Phần còn nợ tính lãi ${nc.lai} % mỗi đêm: đêm nay cộng ${laiDem(nc.no - nc.toiThieu, nc.lai)} câu.`}{nc.theoLoai.lai > 0 ? ' Câu lãi là câu ôn dạng em hay sai.' : ''}</p>
     {loi && <p className="nc-ghi" role="alert">{loi}</p>}
   </section>
 }

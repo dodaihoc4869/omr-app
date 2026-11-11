@@ -90,6 +90,11 @@ it('đổi sang trả hết rồi đổi lại: mức hôm nay = 28 + số của
   const c = await lap(k, D13) // còn 2 + lãi 1 = 3 ⇒ nợ ≤ 6 thì trả hết luôn; đã dùng 1 lần trả tối thiểu
   expect(c.t.noCau).toMatchObject({ no: 3, toiThieu: 3, lan: 1, kieu: 'toi_thieu', so: 3, theoLoai: { lai: 1 } })
   expect(c.l.toiThieu).toBe(31)
+  // câu lãi (1 câu) = câu ÔN của chính em, đứng đầu đề: một câu em đã làm ở các ngày trước, không phải câu mới
+  expect(c.l.plan.viec).toHaveLength(31)
+  expect(c.l.plan.viec[0]!.vai).toBe('on')
+  expect((k.d.sql.prepare("SELECT COUNT(*) n FROM su_kien_hoc WHERE sbd='S1' AND qid=? AND ngay_vn<'2026-11-13'").get(c.l.plan.viec[0]!.qid) as { n: number }).n).toBeGreaterThan(0)
+  expect(c.l.plan.viec.slice(1).filter((v) => v.vai === 'moi' || v.vai === 'tiep_can').length).toBeGreaterThanOrEqual(28)
   await lamCau(k, c.l, 31, D13)
   const D14 = D13 + NGAY
   sang(D14)
