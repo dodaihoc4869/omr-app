@@ -604,13 +604,22 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
   // (như Gợi ý, Hỏi thầy). Ruột tự vẽ thẻ giải nghĩa / gợi ý (TamGiaiThich); màn chỉ chừa chỗ đặt nút ở hàng nút đáy (`oNutCham`).
   const hoTroCham = useRef(dang0?.hoTroCham ?? '')
   const [oNutCham, setONutCham] = useState<HTMLElement | null>(null)
+  const deDaCuon = useRef(false)
   useEffect(() => {
     if (!q) return
     if (daMo.current && !daVeDau.current) veDau(); daVeDau.current = false; daMo.current = true
     // CHẶNG NGANG 01/11: cột đề (giữ nguyên qua các câu) cuộn riêng ở xoay ngang / máy tính ⇒ câu mới đọc từ đầu đề.
+    // 11/11 MƯỢT: chỉ đọc scrollTop khi cột đề ĐÃ cuộn (cờ từ sự kiện cuộn) — đọc mỗi câu ép tính kiểu + bố cục ngay giữa lượt dựng câu mới (~45 ms ở CPU ×4)
+    if (!deDaCuon.current) return
+    deDaCuon.current = false
     const cotDe = gocRef.current?.querySelector<HTMLElement>('.duo-cot-de')
     if (cotDe?.scrollTop) cotDe.scrollTop = 0
   }, [q?.qid]) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const f = (e: Event) => { if ((e.target as Element | null)?.classList?.contains('duo-cot-de')) deDaCuon.current = true }
+    document.addEventListener('scroll', f, { capture: true, passive: true })
+    return () => document.removeEventListener('scroll', f, { capture: true })
+  }, [])
   // Màn Duo ở khung thấp xoay ngang: tấm kết quả nằm ở cột phải DƯỚI phương án ⇒ đưa tấm (nút «Tiếp tục») vào khung nhìn thay vì cuộn về đầu.
   // MÁY YẾU 30/10 (vết Chrome «Kiểm tra» CPU ×6: `scrollIntoView` + đo phương án ép tính kiểu + bố cục cả màn ~120 ms NGAY trong lượt chạm, trước khi tấm kết
   // quả kịp vẽ): React chạy hiệu ứng của cú chạm ĐỒNG BỘ trước lần sơn ⇒ dời cuộn / đo / tiêu điểm sang SAU khung đầu (rAF → setTimeout). Tấm kết quả hiện
@@ -847,6 +856,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     if (goc && kh) { const lech = goc.getBoundingClientRect().top - kh.getBoundingClientRect().top; if (lech) kh.scrollTop += lech; daVeDau.current = true }
     else if (goc && !kh && goc.getBoundingClientRect().top === 0) daVeDau.current = true // không khung nào cuộn được, màn đã ở đầu ⇒ khỏi cuộn
     khoi.forEach((e, i) => truotRa(e, 180, rs[i], 'svg.gtv'))
+    return khoi
   }
   // Hết câu của chặng mà có câu TỰ LÀM SAI ⇒ xin vòng làm lại MỘT lần. Rỗng / lỗi mạng ⇒ vào màn kết chặng như cũ. Đang xin ⇒ chạm lặp không kết chặng giữa chừng.
   const xinLamLai = async () => {
@@ -907,8 +917,8 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
       else if (duo) sauKhiVe(() => {
         // máy thường: bản sao câu cũ trượt ra phủ trên ⇒ câu thật ẩn bằng opacity (một phần tử, không lan xuống con) và câu kế dựng trong lượt chuyển
         // tiếp (chia nhỏ) — không giữ luồng chính một mạch ~200 ms. Câu kế gắn thì hiện lại (layout effect theo qid).
-        truotCauCu()
-        for (const e of khoiCau()) e.style.setProperty('opacity', '0')
+        // 11/11 MƯỢT: ẩn đúng các khối vừa đo — gọi lại khoiCau() thì getComputedStyle ép tính kiểu bản sao vừa gắn giữa lượt (~50 ms ở CPU ×4)
+        for (const e of truotCauCu()) e.style.setProperty('opacity', '0')
         startTransition(() => setViTri(i => i + 1))
       })
       else { dangSang.current = -1; truotCauCu(); setViTri(i => i + 1) }
