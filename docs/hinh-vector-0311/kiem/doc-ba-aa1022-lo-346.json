@@ -1,0 +1,793 @@
+{
+  "i": 1022,
+  "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8.png",
+  "size": [
+    1156,
+    295
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "12-C3-B9-D3-II-7",
+      "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+      "allHinh": [
+        {
+          "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+          "where": "12-C3-B9-D3-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "39fb8a1224c61907347f7a99bbccb5e1b543a97e952afeedad8606c3e3cf917c"
+        }
+      ],
+      "missingHashes": [
+        "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8"
+      ]
+    },
+    {
+      "qid": "DB-12-B9-P2-D2-II-63",
+      "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+      "allHinh": [
+        {
+          "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+          "where": "DB-12-B9-P2-D2-II-63.hinh.0.du_lieu",
+          "hashDataUrl": "39fb8a1224c61907347f7a99bbccb5e1b543a97e952afeedad8606c3e3cf917c"
+        }
+      ],
+      "missingHashes": [
+        "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfSourceAdmitted": 2,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownArginine3xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownGlyCO12xOpened": true
+  },
+  "coordinateMeaning": "Nativepixel centerlines/bboxes nearest1px approximate; Cindices notprinted and mustnotbeadded. No chemicalanswer inferredfromcaption.",
+  "geometry": {
+    "panels": [
+      {
+        "bareC": [
+          [
+            130,
+            111
+          ],
+          [
+            214,
+            111
+          ],
+          [
+            255,
+            135
+          ],
+          [
+            297,
+            111
+          ],
+          [
+            339,
+            135
+          ],
+          [
+            380,
+            111
+          ]
+        ],
+        "labels": [
+          {
+            "text": "H₂N",
+            "bbox": [
+              40,
+              122,
+              103,
+              155
+            ],
+            "bondAnchor": "Nright"
+          },
+          {
+            "text": "NH",
+            "bbox": [
+              119,
+              49,
+              167,
+              77
+            ],
+            "bondAnchor": "Nleft"
+          },
+          {
+            "text": "N",
+            "bbox": [
+              161,
+              122,
+              185,
+              151
+            ],
+            "bondAnchor": "N"
+          },
+          {
+            "text": "H",
+            "bbox": [
+              161,
+              151,
+              185,
+              178
+            ],
+            "bondAnchor": "separatebelowN/noN-Hline"
+          },
+          {
+            "text": "NH₂",
+            "bbox": [
+              327,
+              173,
+              387,
+              203
+            ],
+            "bondAnchor": "Nleft"
+          },
+          {
+            "text": "O",
+            "bbox": [
+              367,
+              49,
+              393,
+              77
+            ],
+            "bondAnchor": "O"
+          },
+          {
+            "text": "OH",
+            "bbox": [
+              408,
+              122,
+              459,
+              152
+            ],
+            "bondAnchor": "Ofirst"
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              106,
+              125
+            ],
+            [
+              130,
+              111
+            ]
+          ],
+          [
+            [
+              130,
+              111
+            ],
+            [
+              156,
+              126
+            ]
+          ],
+          [
+            [
+              189,
+              125
+            ],
+            [
+              214,
+              111
+            ]
+          ],
+          [
+            [
+              214,
+              111
+            ],
+            [
+              255,
+              135
+            ]
+          ],
+          [
+            [
+              255,
+              135
+            ],
+            [
+              297,
+              111
+            ]
+          ],
+          [
+            [
+              297,
+              111
+            ],
+            [
+              339,
+              135
+            ]
+          ],
+          [
+            [
+              339,
+              135
+            ],
+            [
+              380,
+              111
+            ]
+          ],
+          [
+            [
+              339,
+              135
+            ],
+            [
+              339,
+              168
+            ]
+          ],
+          [
+            [
+              380,
+              111
+            ],
+            [
+              406,
+              126
+            ]
+          ]
+        ],
+        "doubleBonds": [
+          [
+            [
+              [
+                126.5,
+                80
+              ],
+              [
+                126.5,
+                112
+              ]
+            ],
+            [
+              [
+                133,
+                80
+              ],
+              [
+                133,
+                112
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                376.5,
+                80
+              ],
+              [
+                376.5,
+                112
+              ]
+            ],
+            [
+              [
+                383,
+                80
+              ],
+              [
+                383,
+                112
+              ]
+            ]
+          ]
+        ],
+        "numberLabels": [
+          {
+            "text": "(1)",
+            "bbox": [
+              56,
+              165,
+              87,
+              189
+            ],
+            "bondAnchor": null
+          },
+          {
+            "text": "(2)",
+            "bbox": [
+              293,
+              177,
+              325,
+              201
+            ],
+            "bondAnchor": null
+          }
+        ],
+        "caption": {
+          "text": "Arginine (Arg)",
+          "bbox": [
+            169,
+            226,
+            347,
+            256
+          ],
+          "bondAnchor": null
+        }
+      },
+      {
+        "bareC": [
+          [
+            596,
+            111
+          ],
+          [
+            639,
+            135
+          ],
+          [
+            681,
+            111
+          ],
+          [
+            723,
+            135
+          ],
+          [
+            765,
+            111
+          ]
+        ],
+        "labels": [
+          {
+            "text": "HO",
+            "bbox": [
+              517,
+              122,
+              569,
+              152
+            ],
+            "bondAnchor": "Oright"
+          },
+          {
+            "text": "O",
+            "bbox": [
+              583,
+              49,
+              610,
+              77
+            ],
+            "bondAnchor": "O"
+          },
+          {
+            "text": "O",
+            "bbox": [
+              752,
+              49,
+              779,
+              77
+            ],
+            "bondAnchor": "O"
+          },
+          {
+            "text": "OH",
+            "bbox": [
+              794,
+              122,
+              846,
+              152
+            ],
+            "bondAnchor": "Ofirst"
+          },
+          {
+            "text": "NH₂",
+            "bbox": [
+              711,
+              173,
+              774,
+              203
+            ],
+            "bondAnchor": "Nleft"
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              569,
+              126
+            ],
+            [
+              596,
+              111
+            ]
+          ],
+          [
+            [
+              596,
+              111
+            ],
+            [
+              639,
+              135
+            ]
+          ],
+          [
+            [
+              639,
+              135
+            ],
+            [
+              681,
+              111
+            ]
+          ],
+          [
+            [
+              681,
+              111
+            ],
+            [
+              723,
+              135
+            ]
+          ],
+          [
+            [
+              723,
+              135
+            ],
+            [
+              765,
+              111
+            ]
+          ],
+          [
+            [
+              765,
+              111
+            ],
+            [
+              792,
+              126
+            ]
+          ],
+          [
+            [
+              723,
+              135
+            ],
+            [
+              723,
+              168
+            ]
+          ]
+        ],
+        "doubleBonds": [
+          [
+            [
+              [
+                592.5,
+                80
+              ],
+              [
+                592.5,
+                112
+              ]
+            ],
+            [
+              [
+                599,
+                80
+              ],
+              [
+                599,
+                112
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                761.5,
+                80
+              ],
+              [
+                761.5,
+                112
+              ]
+            ],
+            [
+              [
+                768,
+                80
+              ],
+              [
+                768,
+                112
+              ]
+            ]
+          ]
+        ],
+        "numberLabels": [
+          {
+            "text": "(1)",
+            "bbox": [
+              530,
+              160,
+              561,
+              185
+            ],
+            "bondAnchor": null
+          },
+          {
+            "text": "(2)",
+            "bbox": [
+              803,
+              160,
+              834,
+              185
+            ],
+            "bondAnchor": null
+          }
+        ],
+        "caption": {
+          "text": "Glutamic acid (Glu)",
+          "bbox": [
+            559,
+            226,
+            802,
+            256
+          ],
+          "bondAnchor": null
+        }
+      },
+      {
+        "bareC": [
+          [
+            1017,
+            110
+          ],
+          [
+            1059,
+            135
+          ]
+        ],
+        "labels": [
+          {
+            "text": "H₂N",
+            "bbox": [
+              925,
+              122,
+              988,
+              155
+            ],
+            "bondAnchor": "Nright"
+          },
+          {
+            "text": "O",
+            "bbox": [
+              1088,
+              95,
+              1116,
+              124
+            ],
+            "bondAnchor": "O"
+          },
+          {
+            "text": "OH",
+            "bbox": [
+              1046,
+              173,
+              1098,
+              203
+            ],
+            "bondAnchor": "Ofirst"
+          }
+        ],
+        "singleBonds": [
+          [
+            [
+              990,
+              125
+            ],
+            [
+              1017,
+              110
+            ]
+          ],
+          [
+            [
+              1017,
+              110
+            ],
+            [
+              1059,
+              135
+            ]
+          ],
+          [
+            [
+              1059,
+              135
+            ],
+            [
+              1059,
+              168
+            ]
+          ]
+        ],
+        "doubleBonds": [
+          [
+            [
+              [
+                1054.66336634,
+                132.41867044
+              ],
+              [
+                1085,
+                114
+              ]
+            ],
+            [
+              [
+                1059,
+                140.21428571
+              ],
+              [
+                1089,
+                122
+              ]
+            ]
+          ]
+        ],
+        "numberLabels": [],
+        "caption": {
+          "text": "Glycine (Gly)",
+          "bbox": [
+            939,
+            226,
+            1108,
+            256
+          ],
+          "bondAnchor": null
+        }
+      }
+    ],
+    "order": [
+      "Arginine (Arg)",
+      "Glutamic acid (Glu)",
+      "Glycine (Gly)"
+    ],
+    "font": "ALLchemical labels/numbers/captions regular upright sans, nottruebold/italic. H2subscripts. HunderN separateexplicitglyph notNHmergedtoken.",
+    "counts": {
+      "C": 13,
+      "N": 6,
+      "O": 8,
+      "COdouble": 4,
+      "CNdouble": 1,
+      "NH2groups": 4,
+      "standaloneImineNH": 1,
+      "separateNbridgeH": 1,
+      "OHgroups": 4,
+      "numberLabels": 4,
+      "captions": 3,
+      "rings": 0,
+      "charges": 0
+    },
+    "carbonylFeet": "NativebothglyCOfeetCONTACT: upperdiagonaljoinsincomingC-Carm;lowerdiagonaljoinsC-OHstem. Updatedcontactpreservingraystarts1054.66336634/132.41867044 and1059/140.21428571 calculatedintersection, notrasterprecisionclaim. Earlierapproximateinteriorpoints causedfalsevectorgaps andwerecorrectedwithaudit. Other3verticalcarbonyls unchanged.",
+    "noAdded": [
+      "charges",
+      "stereowedges",
+      "HNreversal",
+      "N-Hbridgebond",
+      "peptidearrows",
+      "answer",
+      "alias711",
+      "carbonnumbers"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "corrections": [
+    {
+      "field": "geometry.panels[2].doubleBonds",
+      "oldApproximate": [
+        [
+          [
+            [
+              1057,
+              131
+            ],
+            [
+              1085,
+              114
+            ]
+          ],
+          [
+            [
+              1061,
+              139
+            ],
+            [
+              1089,
+              122
+            ]
+          ]
+        ]
+      ],
+      "newContactPreserving": [
+        [
+          [
+            [
+              1054.66336634,
+              132.41867044
+            ],
+            [
+              1085,
+              114
+            ]
+          ],
+          [
+            [
+              1059,
+              140.21428571
+            ],
+            [
+              1089,
+              122
+            ]
+          ]
+        ]
+      ],
+      "reason": "Own reopened nativeFULL and12x macro confirm CONTACT bothfeet. Earlier approximate1057131/1061139 points were interior raypoints, not truejoined endpoints; literal directusewithskeleton1059135 createsfalsegaps. Newpoints calculated independently by exactintersectionofsame raydirectionswithstoredincomingarm/stem. Not claimed subpixelmeasurement fromraster.",
+      "ownNativePixelEvidence": {
+        "grayBelow120AtY131X": [
+          1052,
+          1053,
+          1054,
+          1055,
+          1056,
+          1057,
+          1058,
+          1059
+        ],
+        "y132": [
+          1054,
+          1055,
+          1056,
+          1057,
+          1058,
+          1059
+        ],
+        "y138": [
+          1059,
+          1060,
+          1061,
+          1062,
+          1063,
+          1064
+        ],
+        "y140": [
+          1059,
+          1060,
+          1061
+        ],
+        "macro": "/workspace/scratch/1022-glyCO12x-lo346.png"
+      }
+    }
+  ],
+  "rootAudit": {
+    "nativeFullAll2PublicDeOpened": true,
+    "nativeCNAndGlyCOMacroOpened": true,
+    "freshActualChromium3xFinalFullAndGlyCOMacroOpened": true,
+    "finalSvg": "8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb",
+    "negativeInitial": "607bdde1 approximate glyCO rayfeet disconnected; rejected/root ownmacro. FinalONLYextended2rayfeet alongsameangles tointersections ofincomingarm/C-OHstem; nativecontacts preserved/noaddedbridge.",
+    "counts": "13C8O6N/4CO1CN/4NH2/imineNH/bridgeN+Hseparate/4OH/4numbers3captionsALLregularUPRIGHT/nocharge/stereo/alias711"
+  }
+}

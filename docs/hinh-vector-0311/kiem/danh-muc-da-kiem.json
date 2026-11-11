@@ -2197,6 +2197,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8": {
+      "tep": "ba-amino-acid-native1022-ddh-8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb.svg",
+      "hashSvg": "8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb",
+      "byteSvg": 38233,
+      "byteGzip": 5730,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "d870a8f44437563c0509c17e0b33d23fb0e4b5d422193822aa75b441e685b955": {
       "tep": "ms-sulfur-ddh-d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b.svg",
       "hashSvg": "d6b740d1083354263ad43e160ff33716e65d83fe288505ae5d1b5231269fe67b",
@@ -13487,6 +13496,20 @@
       ]
     },
     {
+      "qid": "12-C3-B9-D3-II-7",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+          "where": "12-C3-B9-D3-II-7.hinh.0.du_lieu",
+          "hashDataUrl": "39fb8a1224c61907347f7a99bbccb5e1b543a97e952afeedad8606c3e3cf917c",
+          "vector": "ba-amino-acid-native1022-ddh-8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb.svg"
+        }
+      ]
+    },
+    {
       "qid": "12-C3-B9-D3-III-44",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -23383,6 +23406,20 @@
       ]
     },
     {
+      "qid": "DB-12-B9-P2-D2-II-63",
+      "duMoiHinh": true,
+      "soHinhNguon": 1,
+      "soHinhDaKiem": 1,
+      "hinh": [
+        {
+          "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+          "where": "DB-12-B9-P2-D2-II-63.hinh.0.du_lieu",
+          "hashDataUrl": "39fb8a1224c61907347f7a99bbccb5e1b543a97e952afeedad8606c3e3cf917c",
+          "vector": "ba-amino-acid-native1022-ddh-8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb.svg"
+        }
+      ]
+    },
+    {
       "qid": "DB-12-B9-P2-D2-III-65",
       "duMoiHinh": true,
       "soHinhNguon": 1,
@@ -30450,6 +30487,7 @@
     "12-C3-B9-D3-II-3",
     "12-C3-B9-D3-II-4",
     "12-C3-B9-D3-II-6",
+    "12-C3-B9-D3-II-7",
     "12-C3-B9-D3-III-44",
     "12-C3-B9-D3-III-47",
     "12-C3-B9-D3-III-51",
@@ -31082,6 +31120,7 @@
     "DB-12-B9-P2-D2-I-32",
     "DB-12-B9-P2-D2-II-43",
     "DB-12-B9-P2-D2-I-59",
+    "DB-12-B9-P2-D2-II-63",
     "DB-12-B9-P2-D2-III-65",
     "DB-12-B9-P2-D2-III-73",
     "DB-12-B9-P2-D2-II-76",

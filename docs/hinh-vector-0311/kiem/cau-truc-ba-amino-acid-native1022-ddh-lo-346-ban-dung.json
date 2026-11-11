@@ -1,0 +1,40 @@
+[
+  {
+    "i": 1022,
+    "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+    "fileNguon": "anh/b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8.png",
+    "svg": "ba-amino-acid-native1022-ddh-8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb.svg",
+    "hashSvg": "8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb",
+    "byteSvg": 38233,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "12-C3-B9-D3-II-7",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+        "refs": [
+          {
+            "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+            "where": "12-C3-B9-D3-II-7.hinh.0.du_lieu",
+            "hashDataUrl": "39fb8a1224c61907347f7a99bbccb5e1b543a97e952afeedad8606c3e3cf917c"
+          }
+        ]
+      },
+      {
+        "qid": "DB-12-B9-P2-D2-II-63",
+        "de": "Insulin là hormone do tuyến tuỵ tiết ra, giúp điều hoà lượng đường trong máu bằng cách thúc đẩy tế bào sử dụng glucose làm năng lượng. Sự thiếu hụt insulin hoặc giảm đáp ứng với insulin có nguy cơ gây ra bệnh tiểu đường.\nThuỷ phân không hoàn toàn một đoạn phân tử insulin thu được tripeptide X mạch hở Glu-Arg-Gly. Cho công thức cấu tạo và kí hiệu một số nhóm chức của các amino acid:",
+        "refs": [
+          {
+            "hash": "b7a4c92b16d84f90ce71e4bbacf4745772589f6eac6272272670ea39b7d542b8",
+            "where": "DB-12-B9-P2-D2-II-63.hinh.0.du_lieu",
+            "hashDataUrl": "39fb8a1224c61907347f7a99bbccb5e1b543a97e952afeedad8606c3e3cf917c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3AA13C8O6N/4CO1CNdouble/4NH2-1imineNH-1bridgeNplusHseparate/4OH/ALLregularUPRIGHT/4numbers3captionsliteral/GlyCO2diagonalfeet/0charge0stereo/noaddedN-Hline-answer-noalias711",
+    "hashSvgDaSoat": "8cfc378d3ea4682d957d8c0e4f909e1a9e730642ece65311aad037afaf70acfb",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
