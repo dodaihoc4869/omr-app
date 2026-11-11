@@ -2,7 +2,8 @@
 // Component THẬT (ManLamBaiTap · ManBinhPhanUng) + máy chủ GIẢ trong trang (bọc fetch + WebSocket giả chạy đúng lõi phòng `src/lib/bpu/phong.ts`).
 // Không yêu cầu nào tới máy chủ thật, không dữ liệu học sinh thật. Thứ tự CSS theo src/main.tsx + cổng học sinh.
 //   ?man=chang|bpu  &cau=ds|tn|tln|ds-ve  [&yeu=1 máy yếu] [&chu=130 cỡ chữ %] [&ve=1 câu có cảnh «hình vẽ lại»]
-//   Trang BPU: window.__bpu.mo() = thầy mở đáp án · window.__bpu.gui() = gửi lại viewEm.
+//   Trang BPU: window.__bpu.mo() = thầy mở đáp án · window.__bpu.gui() = gửi lại viewEm · window.__bpu.bd() = thẻ «+145 kJ» (11/11).
+//   11/11 thêm câu: &cau=dai (đúng–sai đề dài + bảng + ảnh) · &cau=tn-dai (trắc nghiệm phương án dài). Đo bố cục ngang: ngang-1111.mjs.
 //   npx vite build --config scripts/chup-bpu-de-chang-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/chup-bpu-de-chang-1011/chup.mjs <thư mục tạm> docs/ban-ve-bpu-1011 [truoc|sau]
 import './bat-trong'
@@ -80,6 +81,16 @@ const CAU: Record<string, CauGia> = {
     text: 'Cho 4,65 gam aniline tác dụng vừa đủ với dung dịch HCl. Khối lượng muối thu được là bao nhiêu gam? (Làm tròn đến hàng phần trăm.)' },
   // Đề ngắn, không hình: bong bóng thường bên phải giám thị (không chữ L).
   ngan: { ...nen, qid: 'BPU-TN-2', phan: 'I', dapAn: 'B', mucDo: 'biet', text: 'Chất nào sau đây là amine bậc hai?', choices: ['CH3NH2', 'CH3NHCH3', '(CH3)3N', 'C6H5NH2'] },
+  // 11/11 (bố cục NGANG máy em): đề DÀI có bảng + ảnh sau đề + ảnh sau ý a ⇒ cột đề phải cuộn riêng; ý đúng–sai dài.
+  dai: { ...nen, qid: 'BPU-DS-DAI', phan: 'II', dapAn: 'DSDS', mucDo: 'van_dung',
+    text: 'Tiến hành thí nghiệm theo các bước sau: Bước 1: Cho vào ống nghiệm 1 ml dung dịch CuSO₄ 5% và 2 ml dung dịch NaOH 10%, lắc nhẹ. Bước 2: Gạn bỏ phần dung dịch, giữ lại kết tủa. Bước 3: Thêm 2 ml dung dịch glucose 1% vào ống nghiệm, lắc nhẹ rồi quan sát. Kết quả ba lần làm được ghi ở bảng dưới đây.',
+    table: [['Lần', 'Kết tủa (g)', 'Màu dung dịch'], ['1', '0,98', 'xanh lam'], ['2', '0,97', 'xanh lam'], ['3', '0,99', 'xanh lam']],
+    hinhAnh: [{ src: anhVong, viTri: 'sau_de', alt: 'Sơ đồ ống nghiệm' }, { src: anhVong, viTri: 'sau_y_a', alt: 'Hình ý a' }, { src: anhVong, viTri: 'cuoi_cau', alt: 'Hình cuối câu' }],
+    ideas: ['Sau bước 1, trong ống nghiệm xuất hiện kết tủa màu xanh lam là Cu(OH)₂.', 'Ở bước 3, dung dịch thu được có màu tím đặc trưng của phản ứng biuret.', 'Thí nghiệm chứng tỏ phân tử glucose có nhiều nhóm –OH liền kề nhau.', 'Nếu thay glucose bằng saccharose thì hiện tượng ở bước 3 vẫn giống như trên.'] },
+  // Trắc nghiệm phương án DÀI (60–90 ký tự): thử luật «thiếu chỗ ⇒ cột phải gọn kiểu phiếu» ở khổ 640 × 360.
+  'tn-dai': { ...nen, qid: 'BPU-TN-DAI', phan: 'I', dapAn: 'C', mucDo: 'hieu',
+    text: 'Phát biểu nào sau đây về amine là đúng?',
+    choices: ['Tất cả các amine đều làm quỳ tím ẩm chuyển sang màu xanh, kể cả aniline ở điều kiện thường.', 'Ở điều kiện thường, methylamine và ethylamine là chất lỏng có mùi khai, tan rất ít trong nước.', 'Aniline tác dụng với nước bromine tạo kết tủa trắng 2,4,6-tribromoaniline.', 'Tính base của aniline mạnh hơn tính base của ammonia do ảnh hưởng của vòng benzene.'] },
 }
 const cau = CAU[loaiCau] ?? CAU.ds!
 const congKhai = ({ dapAn, ...q }: CauGia) => (q.phan === 'III' ? { ...q, soO: dapAn.length } : q)
@@ -124,7 +135,9 @@ class WsGia {
 }
 if (man === 'bpu') {
   ;(window as unknown as { WebSocket: unknown }).WebSocket = WsGia
-  ;(window as unknown as { __bpu: unknown }).__bpu = { goi: () => { goiLenBang(st, 'S2', ['Chưa lên bảng buổi này'], Date.now()); for (const w of WsGia.ds) w.bao() }, mo: () => { moDapAn(st, Date.now(), chamSo); for (const w of WsGia.ds) w.bao() }, gui: () => { for (const w of WsGia.ds) w.bao() } }
+  ;(window as unknown as { __bpu: unknown }).__bpu = { goi: () => { goiLenBang(st, 'S2', ['Chưa lên bảng buổi này'], Date.now()); for (const w of WsGia.ds) w.bao() }, mo: () => { moDapAn(st, Date.now(), chamSo); for (const w of WsGia.ds) w.bao() }, gui: () => { for (const w of WsGia.ds) w.bao() },
+    // 11/11: thẻ biến động kJ của em (như lúc câu trước vừa chấm mà thầy chuyển câu ngay) — thử thẻ «+145 kJ» không đè phương án.
+    bd: (kj = 145, lyDo = 'Đúng · nhanh thứ 2') => { const em = st.ds.find((x) => x.sbd === 'S1')!, cu = st.bienDong ?? []; st.bienDong = [...cu, { id: cu.reduce((m, x) => Math.max(m, x.id), 0) + 1, sbd: 'S1', doi: em.doi, kjEm: kj, kjDoi: kj, lyDo, luc: Date.now() }]; for (const w of WsGia.ds) w.bao() } }
 }
 
 // Nhớ địa chỉ máy chủ GIẢ trước khi dựng màn (mọi lệnh đều do `fetch` bọc ở trên trả lời) ⇒ lệnh `/hs/hinh-ve` có chỗ gửi. Không dùng `await` cấp mô-đun

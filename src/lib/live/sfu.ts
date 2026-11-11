@@ -41,6 +41,27 @@ export async function goiCua(mt: MoiTruongLive, goc: string, lenh: string, than:
   } catch { return { ok: false, lyDo: 'mang' } }
 }
 
+/** STUN công khai của Cloudflare — dùng khi chưa có TURN. */
+export const ICE_MAC_DINH: RTCIceServer[] = [{ urls: 'stun:stun.cloudflare.com:3478' }]
+let iceNho: { goc: string; het: number; p: Promise<RTCIceServer[]> } | null = null
+/** ICE cho PeerConnection tới SFU (11/11 tối — mạng chặn UDP ⇒ câm cả hai chiều): STUN + TURN NGẮN HẠN do Worker cấp (`/bpu/live/turn`), lấy TRƯỚC khi tạo
+ *  PeerConnection; đệm trên máy 4 giờ (hạn thông tin 24 giờ), lỗi ⇒ 60 giây. Chờ tối đa 2,5 giây; thiếu / lỗi ⇒ chỉ STUN như cũ (không chặn live). */
+export function layIce(mt: MoiTruongLive, goc: string, ve: string): Promise<RTCIceServer[]> {
+  const nay = Date.now()
+  if (iceNho && iceNho.goc === goc && iceNho.het > nay) return iceNho.p
+  const p = Promise.race([goiCua(mt, goc, 'turn', { ve }).then((r) => (r.ok && Array.isArray(r.ice) ? r.ice : null)), new Promise<null>((xong) => { mt.hen(() => xong(null), 2500) })])
+    .then((ds): RTCIceServer[] => {
+      const turn = (ds ?? []).filter((x) => x && (typeof x.urls === 'string' || Array.isArray(x.urls)))
+      if (!turn.length) { iceNho = { goc, het: Date.now() + 60_000, p: Promise.resolve(ICE_MAC_DINH) }; return ICE_MAC_DINH }
+      const coStun = turn.some((x) => [x.urls].flat().some((u) => String(u).startsWith('stun:')))
+      return coStun ? turn : [...ICE_MAC_DINH, ...turn]
+    })
+  iceNho = { goc, het: nay + 4 * 3_600_000, p }
+  return p
+}
+/** Chỉ cho phép thử: quên ICE đã đệm. */
+export const xoaIceNho = (): void => { iceNho = null }
+
 export interface TuyChonOpus {
   /** Lúc im gần như không gửi gói (đặc tả 4.2). Mặc định bật. */
   dtx?: boolean

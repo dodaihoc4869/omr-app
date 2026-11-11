@@ -135,3 +135,9 @@ export function canXoayCss(rong: number, cao: number, daKhoaNgang: boolean): boo
 export function anToanHinh(may: { tren: number; phai: number; duoi: number; trai: number }, xoay: boolean): AnToan {
   return xoay ? { trai: may.tren, phai: may.duoi, duoi: may.trai, tren: may.phai } : { trai: may.trai, phai: may.phai, duoi: may.duoi, tren: may.tren }
 }
+/** GIỮ KHOÁ NGANG (11/11 tối, thầy «khi chuyển câu thì máy hs đang ở màn hình ngang live thì câu hiện luôn theo kiểu xoay ngang không về dạng dọc nữa»): khoá khi
+ *  bảng live đang hiện, VÀ suốt phần còn lại của lần live sau khi em đã xem bảng (`nho` — màn câu hỏi thay bảng lúc thầy chuyển câu không nhả khoá ⇒ máy khoá
+ *  xoay hệ thống không quay về dọc). Hết live ⇒ `nho` tắt ⇒ nhả. Máy chưa từng vào bảng (cầm dọc làm câu) ⇒ không khoá, như cũ. */
+export function giuKhoaNgang(che: 'an' | 'dau' | 'bang', nho: boolean): boolean {
+  return che === 'bang' || nho
+}

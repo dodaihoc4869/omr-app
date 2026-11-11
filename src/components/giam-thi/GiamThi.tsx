@@ -9,7 +9,7 @@
 // bỏ lời «ngẫu nhiên» / «quá giờ» (thầy chỉ ghép câu cho các tình huống trên).
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
 import { duongL, khuyetL, type MucGT, type TrangThaiGT } from './giam-thi-ve'
-import { taoGiamThi, type GiamThi } from './giam-thi-nguoi' // 4 giám thị HÌNH NGƯỜI v3 (thầy chốt 27/10), cùng API bản cũ
+import { hopHinh, taoGiamThi, type GiamThi } from './giam-thi-nguoi' // 4 giám thị HÌNH NGƯỜI v3 (thầy chốt 27/10), cùng API bản cũ
 import { cauMoi, suLoi, taoNhip, type NguCanhLoi, type NhipLoi } from './loi-giam-thi'
 import './giam-thi.css'
 
@@ -93,6 +93,8 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
     const de = bong?.querySelector<HTMLElement>('.ht2-lam-de') ?? bong?.querySelector<HTMLElement>('.gyc-de')
     if (!san || !bong || !svg || !path || !de || typeof ResizeObserver === 'undefined') return
     const khuyet = () => khuyetL(parseFloat(getComputedStyle(san).getPropertyValue('--gt-nvw')) || 120)
+    /** Từ mép trên bong bóng tới đáy chữ đề, theo trục của HÌNH (màn xoay hình CSS lúc live ⇒ đo thẳng ra bề NGANG ⇒ bật chữ L nhầm — 11/11 tối). */
+    const doDay = () => { const d = hopHinh(de), b = hopHinh(bong); return d.top + d.height - b.top }
     const ve = () => {
       if (!san.hasAttribute('data-l')) return
       const w = bong.offsetWidth, h = bong.offsetHeight, { kw, kh, kd } = khuyet()
@@ -108,9 +110,9 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       // 27/10 MƯỢT: đang là bong bóng thường ⇒ đo NGAY ở dáng này trước (lượt bố cục này lần sơn vốn đã cần, không tốn thêm). Chữ L cho chữ RỘNG hơn
       // ở phần dưới chân giám thị ⇒ khối chữ chỉ thấp đi: dáng thường đã không tràn quá khuyết thì dáng L chắc chắn không cần — khỏi bật thử chữ L
       // (mỗi lần bật thử = thêm một lượt tính kiểu + bố cục cả màn, ~30–60 ms ở CPU ×6). Câu dài thật sự tràn ⇒ bật thử như cũ.
-      if (!san.hasAttribute('data-l') && !(de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top > khuyet().kh + 12)) return
+      if (!san.hasAttribute('data-l') && !(doDay() > khuyet().kh + 12)) return
       san.setAttribute('data-l', ''); danhCon(true)
-      const day = de.getBoundingClientRect().bottom - bong.getBoundingClientRect().top
+      const day = doDay()
       if (!(day > khuyet().kh + 12)) { san.removeAttribute('data-l'); danhCon(false) }
       ve()
     }
@@ -146,7 +148,7 @@ export default function GiamThiCau({ muc, qid, phien, nop, ket, vung }: {
       if (laO || e.type === 'keydown') requestAnimationFrame(() => window.setTimeout(() => {
         if (coKet.current) return
         const c = goc.querySelector(`.duo-tra ${CHON}`)
-        if (laO && c && gt.current) { const r = c.getBoundingClientRect(); gt.current.phanUng('chon', { diem: { x: r.left + r.width / 2, y: r.top + r.height / 2 } }) } // em chọn ⇒ liếc ô em chọn
+        if (laO && c && gt.current) { const r = hopHinh(c); gt.current.phanUng('chon', { diem: { x: r.left + r.width / 2, y: r.top + r.height / 2 } }) } // em chọn ⇒ liếc ô em chọn
         else nhinChon()
         if (goc.querySelector(`.duo-tra ${CHON}`)) datHen('soi', NGUONG.soi, () => { if (!coKet.current && !daNop.current && !document.hidden) datTT('soi') })
       }, 0))

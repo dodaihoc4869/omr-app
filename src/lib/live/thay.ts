@@ -18,7 +18,7 @@
 import type { ViewLiveBang } from '../bpu/phong-live'
 import type { NetBut, SuKienBut } from '../but-bang-loi'
 import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet } from './ma-net'
-import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type MoiTruongLive, type TuyChonOpus } from './sfu'
+import { OPUS_THAY, layIce, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type MoiTruongLive, type TuyChonOpus } from './sfu'
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
 import { BAC_CUOI, coMic, rangBuocMic, timMicTheoTen } from './thang-mic'
 import { theAmLoa } from './loa'
@@ -85,7 +85,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     dat({ pha: 'dang-noi' })
     let p: RTCPeerConnection | null = null
     try {
-      p = mt.taoPc({ iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }], bundlePolicy: 'max-bundle' })
+      p = mt.taoPc({ iceServers: await layIce(mt, tuy.goc, tuy.ve), bundlePolicy: 'max-bundle' }) // STUN + TURN (mạng chặn UDP)
       p.addEventListener('track', (e) => {
         // Track nhận về trên phiên của thầy chỉ có thể là tiếng của em đang phát mic.
         if (e.track.kind !== 'audio') return
@@ -608,8 +608,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   function soatEmNoi(): void {
     const n = live?.bat ? live.noi[0] : undefined
     const emNoi = n ? { sbd: n.sbd, ten: n.ten, doi: n.doi, xa: n.xa } : null
-    // Mặc định chỉ phát ra loa khi em ở xa: em đứng ngay trong lớp mà loa lớp phát lại giọng em qua mic máy em ⇒ vọng / hú.
-    const ngheEm = ngheEmDat ?? !!n?.xa
+    // Thầy chốt 11/11 tối: em bật mic (ở xa hay tại lớp) là máy thầy TỰ phát tiếng em ra loa lớp, bỏ công tắc; chống hú nhờ khử vọng của trình duyệt.
+    const ngheEm = ngheEmDat ?? true
     // 11/11 lần 4: soát lọc NGAY khi hai giá trị này đổi (`soatLoc()` của `nhanLive` chạy trước dòng này ⇒ chậm một view).
     if ((tt.emNoi?.sbd ?? '') !== (emNoi?.sbd ?? '') || tt.ngheEm !== ngheEm) { dat({ emNoi, ngheEm }); soatLoc() }
     if (amEm) amEm.muted = !ngheEm

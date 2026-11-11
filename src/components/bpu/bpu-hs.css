@@ -77,12 +77,17 @@
 .bpu-hai-nut .nho { text-align: center; font-size: 13px; }
 .bpu-kb { min-height: 46px; font-size: 16px; }
 .bpu-kb.hoi { box-shadow: inset 0 0 0 2px var(--tr-chu-y); color: var(--tr-chu-y-chu); background: var(--tr-chu-y-nhat); }
-@media (orientation: landscape) and (min-width: 700px) { .bpu-hai-nut { grid-template-columns: 2fr 1fr; align-items: center; } .bpu-hai-nut .nho { grid-column: 1 / -1; } }
+@media (orientation: landscape) and (min-width: 640px) { .bpu-hai-nut { grid-template-columns: 2fr 1fr; align-items: center; } .bpu-hai-nut .nho { grid-column: 1 / -1; } }
+/* `data-ngang` = màn câu hỏi XOAY HÌNH lúc live, hình rộng ≥ 640 px (luat-man-live.tsx · RONG_NGANG_MIN, 11/11: trước 700): trang vẫn dọc nên @media ngang không khớp ⇒ nhắc lại đúng luật ngang,
+   `:where()` giữ độ ưu tiên bằng luật gốc (lề phải chừa nút «Gửi» vẫn thắng như trên máy ngang thật). */
+:where(.bpu-hs[data-ngang]) .bpu-hai-nut { grid-template-columns: 2fr 1fr; align-items: center; } :where(.bpu-hs[data-ngang]) .bpu-hai-nut .nho { grid-column: 1 / -1; }
 .bpu-roi-nho { justify-self: start; min-height: 44px; padding: 0 4px; border: 0; background: transparent; color: var(--tr-chu-2); font-size: 14px; font-weight: 700; text-decoration: underline; cursor: pointer; }
-@media (orientation: landscape) and (min-width: 700px) {
+@media (orientation: landscape) and (min-width: 640px) {
   .bpu-hs-than { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; column-gap: 28px; padding-inline: 28px; }
   .bpu-hs-day { padding-inline: 28px; }
 }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; column-gap: 28px; padding-inline: 28px; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-day { padding-inline: 28px; }
 @media (min-width: 1100px) {
   .bpu-hs-tren, .bpu-hs-vach, .bpu-hs-than { width: min(calc(100% - 32px), 1100px); margin-inline: auto; }
   .bpu-hs-day { padding-inline: max(28px, calc((100% - 1100px) / 2)); }
@@ -286,9 +291,142 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
 .bpu-hs.m3 .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex: none; flex-direction: column; gap: 12px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
 .bpu-tra { display: flex; flex: none; flex-direction: column; gap: 12px; min-width: 0; }
 /* Xoay ngang: đề (giám thị) cột trái · phần trả lời cột phải; nhãn loại câu nằm trên, trọn bề ngang. */
-@media (orientation: landscape) and (min-width: 700px) {
+@media (orientation: landscape) and (min-width: 640px) {
   .bpu-hs-than > .bpu-chip { grid-column: 1 / -1; justify-self: start; }
   .bpu-hs-than > .bpu-de-chang { grid-column: 1; }
   .bpu-hs-than > .bpu-tra { grid-column: 2; }
   .bpu-hs-than > .bpu-de-chang ~ :not(.bpu-tra) { grid-column: 1 / -1; }
 }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-chip { grid-column: 1 / -1; justify-self: start; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-de-chang { grid-column: 1; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-tra { grid-column: 2; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than > .bpu-de-chang ~ :not(.bpu-tra) { grid-column: 1 / -1; }
+/* XOAY HÌNH LÚC LIVE (thầy 11/11 tối «khi chuyển câu thì máy hs đang ở màn hình ngang live thì câu hiện luôn theo kiểu xoay ngang không về dạng dọc nữa»):
+   em đang cầm NGANG xem bảng xoay hình (iPhone / máy chưa khoá ngang được) mà thầy chuyển câu ⇒ màn câu hỏi xoay y như bảng (`.lv[data-xoay]`, live-em.css):
+   đỉnh máy thành mép trái hình. Khổ hình = trang đổi trục (luat-man-live.tsx đặt width / height). Vùng an toàn đổi trục: mép trên hình ⇐ mép phải máy,
+   mép phải hình ⇐ đáy máy (thanh home), đáy hình ⇐ mép trái máy, mép trái hình ⇐ đỉnh máy (tai thỏ). */
+.bpu-hs[data-xoay] { inset: 0 auto auto 0; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%);
+  padding-top: env(safe-area-inset-right, 0px); padding-left: env(safe-area-inset-top, 0px); padding-right: env(safe-area-inset-bottom, 0px); }
+.bpu-hs[data-xoay] .bpu-hs-day { padding-bottom: calc(16px + env(safe-area-inset-left, 0px)); }
+.bpu-hs[data-xoay] .bpu-gui-noi { right: max(12px, env(safe-area-inset-bottom, 0px)); }
+.bpu-hs[data-xoay].co-gui .bpu-hs-than { padding-right: calc(max(12px, env(safe-area-inset-bottom, 0px)) - env(safe-area-inset-bottom, 0px) + 64px); }
+.bpu-hs[data-xoay] .lv-phu { --lv-at-trai: env(safe-area-inset-top, 0px); --lv-at-tren: env(safe-area-inset-right, 0px); --lv-at-phai: env(safe-area-inset-bottom, 0px); --lv-at-duoi: env(safe-area-inset-left, 0px); }
+/* `data-thap` = hình xoay cao ≤ 500 px: nhắc lại luật «khung thấp xoay ngang» của giám thị (giam-thi.css, @media landscape + max-height 500 px) — đo bằng Chromium
+   thật (scripts/thu-live-1011/thu-ngang-chuyen-cau-1111.mjs): đây là luật DUY NHẤT khác giữa màn ngang thật và màn xoay hình. Ưu tiên cao hơn luật gốc một bậc
+   (tệp nạp trước / sau không đổi kết quả) mà vẫn thua luật riêng của chặng. */
+.bpu-hs[data-thap] .duo-gt-san { --gt-nvw: 96px; }
+.bpu-hs[data-thap] .duo-gt-san:not([data-l]) { align-items: start; }
+.bpu-hs[data-thap] .duo-gt-san:not([data-l]) .duo-gt-bong { margin-top: 4px; padding: 10px 12px; }
+.bpu-hs[data-thap] .duo-gt-san:not([data-l]) .duo-gt-bong::before { --duoi: 40px; }
+.bpu-hs[data-thap] .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 18px; }
+
+/* ── BỐ CỤC NGANG 11/11 (thầy 11/11 tối: «tôi muốn câu hỏi xoay ngang trên máy học sinh thì hiển thị giao diện xoay ngang, một bên đề một bên chọn đáp án»;
+   ảnh trước docs/ban-ve-live-1011/ngang-chuyen-cau-sau-cau-moi-android-740.jpg: thanh đầu cao, giám thị + bong bóng chiếm chỗ, phương án cách xa, D bị cắt).
+   Thân màn CÂU HỎI (`.bpu-hs-than.bpu-cau`, bo-cuc-ngang.tsx) khi NGANG (trang ngang ≥ 640 px — cùng ngưỡng hai cột của màn chặng `RONG_NGANG_MIN` — hoặc
+   hình xoay CSS lúc live `data-ngang`): lưới hai cột KHÔNG cuộn trang —
+     TRÁI `.bpu-cot-de`  nhãn loại câu · giám thị + đề · ảnh / bảng · ảnh cuối câu; cuộn RIÊNG khi dài, mép dưới mờ dần «còn nữa».
+     PHẢI `.bpu-tra`     chọn đáp án, luôn trọn khung. Thiếu chỗ (đo thật — `data-gon`) ⇒ KIỂU PHIẾU: chữ đầy đủ phương án / ý xuống cột trái (`.bpu-y-de`),
+                         cột phải còn chữ cái + nút + chữ rút gọn để nhận ra (trắc nghiệm: một dòng; đúng–sai: hai dòng cạnh hai nút Đúng / Sai).
+   Máy THẤP (cao ≤ 500 px — điện thoại xoay ngang; `data-thap` khi xoay hình): đầu màn thành DẢI MẢNH một hàng (đội · lượt · kJ đội), giám thị 72 px, đề 16 px,
+   phương án / bàn phím số gọn (nút ≥ 44 px; phím «Xoá» thành cột cao bên phải bàn phím). Thẻ ±kJ chỉ nổi trên nửa trái (không đè phương án, nút «Gửi»).
+   DỌC: hai lớp bọc là `display: contents` + `order` ⇒ y như trước. Mỗi luật trong @media có BẢN SINH ĐÔI `:where(.bpu-hs[data-ngang]…)` cùng khai báo
+   (màn xoay hình: trang dọc nên @media không khớp) — tests/bpu-ngang-de-dap-an-1111.test.tsx khoá đủ cặp. Màu: chỉ biến --tr-* sẵn có. ── */
+.bpu-cot-de, .bpu-sau-tra { display: contents; }
+.bpu-cot-de > *, .bpu-sau-tra > * { min-width: 0; }
+.bpu-sau-tra > * { order: 1; } /* dọc: ảnh cuối câu / lời giải SAU phần trả lời như cũ */
+.bpu-cau > .bpu-bao { order: 2; }
+.bpu-y-de { display: none; gap: 8px; margin: 0; padding: 10px 12px; list-style: none; border-radius: 16px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.bpu-y-de li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 4px; align-items: baseline; font-size: 16px; line-height: 1.45; }
+.bpu-y-de li > b { font-weight: 900; color: var(--tr-chu-2); }
+.bpu-y-de li > div { min-width: 0; }
+.bpu-y-de img { display: block; max-width: 100%; height: auto; }
+.bpu-y-de .cau-hinh { margin-top: 6px; }
+@media (orientation: landscape) and (min-width: 640px) {
+  .bpu-hs-than.bpu-cau { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; padding-top: 0; padding-bottom: 0; }
+  .bpu-cau > .bpu-cot-de { grid-column: 1; grid-row: 1 / -1; display: flex; flex-direction: column; gap: 12px; min-height: 0; padding: 14px 6px 32px 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; -webkit-mask-image: linear-gradient(to bottom, var(--tr-chu) calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, var(--tr-chu) calc(100% - 28px), transparent); }
+  .bpu-cau > .bpu-tra { grid-column: 2; grid-row: 1; align-self: stretch; min-height: 0; margin-inline: -6px; padding: 14px 6px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+  .bpu-cau > .bpu-bao { grid-column: 2; grid-row: 2; margin-bottom: 12px; }
+  .bpu-cau[data-gon] .bpu-y-de { display: grid; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-tn { gap: 6px; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-pa { min-height: 46px; padding-block: 4px; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-pa-chu { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--tr-chu-2); }
+  .bpu-cau[data-gon] .bpu-tra :is(.ht2-lam-pa-chu img, .ht2-lam-pa-khoi > .cau-hinh, .ht2-lam-y-chu img, .ht2-lam-y > .cau-hinh) { display: none; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-y { flex-direction: row; align-items: center; gap: 12px; padding-block: 5px; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-ds { padding-inline: 2px; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-dau { flex: 1 1 auto; min-width: 0; align-items: center; gap: 8px; }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-chu { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 14px; line-height: 1.35; color: var(--tr-chu-2); }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut { flex: none; grid-template-columns: repeat(2, minmax(58px, auto)); }
+  .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut button { padding-inline: 8px; }
+  .bpu-hs-tren ~ .bpu-bd-neo .bpu-bd { right: calc(50% + 24px); padding-inline: 16px 0; }
+}
+:where(.bpu-hs[data-ngang]) .bpu-hs-than.bpu-cau { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; padding-top: 0; padding-bottom: 0; }
+:where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-cot-de { grid-column: 1; grid-row: 1 / -1; display: flex; flex-direction: column; gap: 12px; min-height: 0; padding: 14px 6px 32px 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; -webkit-mask-image: linear-gradient(to bottom, var(--tr-chu) calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, var(--tr-chu) calc(100% - 28px), transparent); }
+:where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-tra { grid-column: 2; grid-row: 1; align-self: stretch; min-height: 0; margin-inline: -6px; padding: 14px 6px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; }
+:where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-bao { grid-column: 2; grid-row: 2; margin-bottom: 12px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-y-de { display: grid; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-tn { gap: 6px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-pa { min-height: 46px; padding-block: 4px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-pa-chu { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--tr-chu-2); }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra :is(.ht2-lam-pa-chu img, .ht2-lam-pa-khoi > .cau-hinh, .ht2-lam-y-chu img, .ht2-lam-y > .cau-hinh) { display: none; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y { flex-direction: row; align-items: center; gap: 12px; padding-block: 5px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-ds { padding-inline: 2px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-dau { flex: 1 1 auto; min-width: 0; align-items: center; gap: 8px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-chu { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 14px; line-height: 1.35; color: var(--tr-chu-2); }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut { flex: none; grid-template-columns: repeat(2, minmax(58px, auto)); }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut button { padding-inline: 8px; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-tren ~ .bpu-bd-neo .bpu-bd { right: calc(50% + 24px); padding-inline: 16px 0; }
+@media (orientation: landscape) and (min-width: 640px) and (max-height: 500px) {
+  .bpu-hs-tren, .bpu-hs-tren.co-doi { gap: 8px; padding: 3px 16px; }
+  .bpu-hs-tren .bpu-lua { width: 24px; height: 29px; }
+  .bpu-hs-tren .bpu-lua .tan { display: none; }
+  .bpu-hs-tren .bpu-hs-binh { width: 26px; height: 26px; }
+  .bpu-hs-tieu { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; overflow: hidden; }
+  .bpu-hs-tieu b { display: inline; font-size: 15px; }
+  .bpu-hs-tieu span { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+  .bpu-hs-kj { min-height: 30px; grid-auto-flow: column; align-items: baseline; column-gap: 5px; padding: 2px 12px; border-radius: 12px; }
+  .bpu-hs-kj b { font-size: 16px; }
+  .bpu-hs-gio { height: 30px; min-width: 60px; border-radius: 12px; font-size: 17px; }
+  .bpu-hs-vach { height: 4px; }
+  .bpu-hs-than.bpu-cau { column-gap: 20px; padding-left: 16px; }
+  .bpu-cau > .bpu-cot-de { gap: 8px; padding-top: 8px; }
+  .bpu-cau > .bpu-tra { gap: 8px; padding-block: 8px; }
+  .bpu-cau > .bpu-cot-de > .bpu-chip { min-height: 26px; padding-block: 2px; font-size: 12.5px; }
+  .bpu-hs-than.bpu-cau .duo-gt-san { --gt-nvw: 72px; }
+  .bpu-hs-than.bpu-cau .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 16px; line-height: 1.5; }
+  .bpu-hs-than.bpu-cau .duo-gt-san:not([data-l]) .duo-gt-bong { margin-top: 2px; padding: 8px 12px; }
+  .bpu-cau .bpu-tra .ht2-lam-tn { gap: 6px; }
+  .bpu-cau .bpu-tra .ht2-lam-pa { min-height: 48px; padding: 6px 12px 6px 8px; gap: 12px; line-height: 1.35; }
+  .bpu-cau .bpu-tra .ht2-lam-y { padding-block: 8px; }
+  .bpu-cau .bpu-tra .ht2-lam-y-chu { font-size: 15px; line-height: 1.45; }
+  .bpu-cau .bpu-tra .bpu-tln { gap: 8px; }
+  .bpu-cau .bpu-tra .bpu-phim { grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.15fr); gap: 6px; }
+  .bpu-cau .bpu-tra .bpu-phim button { height: 44px; min-height: 44px; font-size: 20px; }
+  .bpu-cau .bpu-tra .bpu-phim .xoa { grid-column: 4; grid-row: 1 / span 4; height: auto; font-size: 16px; }
+}
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tren, :where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tren.co-doi { gap: 8px; padding: 3px 16px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tren .bpu-lua { width: 24px; height: 29px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tren .bpu-lua .tan { display: none; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tren .bpu-hs-binh { width: 26px; height: 26px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tieu { display: flex; align-items: baseline; gap: 10px; white-space: nowrap; overflow: hidden; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tieu b { display: inline; font-size: 15px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-tieu span { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-kj { min-height: 30px; grid-auto-flow: column; align-items: baseline; column-gap: 5px; padding: 2px 12px; border-radius: 12px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-kj b { font-size: 16px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-gio { height: 30px; min-width: 60px; border-radius: 12px; font-size: 17px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-vach { height: 4px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-than.bpu-cau { column-gap: 20px; padding-left: 16px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau > .bpu-cot-de { gap: 8px; padding-top: 8px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau > .bpu-tra { gap: 8px; padding-block: 8px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau > .bpu-cot-de > .bpu-chip { min-height: 26px; padding-block: 2px; font-size: 12.5px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-than.bpu-cau .duo-gt-san { --gt-nvw: 72px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-than.bpu-cau .duo .duo-gt-bong .ht2-lam-de-chu { font-size: 16px; line-height: 1.5; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-hs-than.bpu-cau .duo-gt-san:not([data-l]) .duo-gt-bong { margin-top: 2px; padding: 8px 12px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .ht2-lam-tn { gap: 6px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .ht2-lam-pa { min-height: 48px; padding: 6px 12px 6px 8px; gap: 12px; line-height: 1.35; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .ht2-lam-y { padding-block: 8px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .ht2-lam-y-chu { font-size: 15px; line-height: 1.45; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .bpu-tln { gap: 8px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .bpu-phim { grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.15fr); gap: 6px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .bpu-phim button { height: 44px; min-height: 44px; font-size: 20px; }
+:where(.bpu-hs[data-ngang][data-thap]) .bpu-cau .bpu-tra .bpu-phim .xoa { grid-column: 4; grid-row: 1 / span 4; height: auto; font-size: 16px; }
+html.may-yeu .bpu-cau > .bpu-cot-de { -webkit-mask-image: none; mask-image: none; } /* máy yếu: không mặt nạ mờ trên khung cuộn */

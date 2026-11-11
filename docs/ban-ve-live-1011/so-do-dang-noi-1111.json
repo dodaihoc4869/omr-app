@@ -1,0 +1,458 @@
+{
+  "luc": "2026-11-11T14:39:53.125Z",
+  "ghiChu": "Chromium thật, tờ chiếu thật có cầu nối, phòng thật trong Node, dữ liệu giả («chưa ai nói» là trạng thái thật của app; «có em nói» bơm từ trang thử).",
+  "soDo": {
+    "1366_chuaAi": {
+      "khay": {
+        "w": 560,
+        "h": 224,
+        "top": 478
+      },
+      "goc": {
+        "w": 560,
+        "h": 170
+      },
+      "khoi": {
+        "t": 489,
+        "b": 534,
+        "w": 538
+      }
+    },
+    "1366_coEm": {
+      "khay": {
+        "w": 560,
+        "h": 373,
+        "top": 330
+      },
+      "khoi": {
+        "t": 340,
+        "b": 534,
+        "w": 538
+      },
+      "nut": [
+        {
+          "chu": "Thu mic",
+          "cao": 40
+        },
+        {
+          "chu": "Tắt mic tất cả",
+          "cao": 40
+        },
+        {
+          "chu": "2 em giơ tay LH TH",
+          "cao": 44
+        }
+      ]
+    },
+    "1366_caoNhat": {
+      "khay": {
+        "w": 560,
+        "h": 559,
+        "top": 143
+      },
+      "cuon": false
+    },
+    "1920_chuaAi": {
+      "khay": {
+        "w": 788,
+        "h": 313,
+        "top": 679
+      },
+      "goc": {
+        "w": 788,
+        "h": 237
+      },
+      "khoi": {
+        "t": 694,
+        "b": 756,
+        "w": 757
+      }
+    },
+    "1920_coEm": {
+      "khay": {
+        "w": 788,
+        "h": 521,
+        "top": 470
+      },
+      "khoi": {
+        "t": 486,
+        "b": 756,
+        "w": 757
+      },
+      "nut": [
+        {
+          "chu": "Thu mic",
+          "cao": 56
+        },
+        {
+          "chu": "Tắt mic tất cả",
+          "cao": 56
+        },
+        {
+          "chu": "2 em giơ tay LH TH",
+          "cao": 62
+        }
+      ]
+    },
+    "1920_caoNhat": {
+      "khay": {
+        "w": 788,
+        "h": 780,
+        "top": 211
+      },
+      "cuon": false
+    },
+    "1180_chuaAi": {
+      "khay": {
+        "w": 485,
+        "h": 213,
+        "top": 548
+      },
+      "goc": {
+        "w": 485,
+        "h": 165
+      },
+      "khoi": {
+        "t": 558,
+        "b": 597,
+        "w": 466
+      }
+    },
+    "1180_coEm": {
+      "khay": {
+        "w": 485,
+        "h": 354,
+        "top": 407
+      },
+      "khoi": {
+        "t": 416,
+        "b": 597,
+        "w": 466
+      },
+      "nut": [
+        {
+          "chu": "Thu mic",
+          "cao": 40
+        },
+        {
+          "chu": "Tắt mic tất cả",
+          "cao": 40
+        },
+        {
+          "chu": "2 em giơ tay LH TH",
+          "cao": 40
+        }
+      ]
+    },
+    "1180_caoNhat": {
+      "khay": {
+        "w": 485,
+        "h": 536,
+        "top": 225
+      },
+      "cuon": false
+    },
+    "860_chuaAi": {
+      "khay": {
+        "w": 150,
+        "h": 448,
+        "top": 90
+      },
+      "goc": {
+        "w": 150,
+        "h": 414
+      },
+      "khoi": {
+        "t": 97,
+        "b": 125,
+        "w": 136
+      }
+    },
+    "860_coEm": {
+      "khay": {
+        "w": 255,
+        "h": 524,
+        "top": 14
+      },
+      "khoi": {
+        "t": 21,
+        "b": 185,
+        "w": 241
+      },
+      "nut": [
+        {
+          "chu": "Thu mic",
+          "cao": 40
+        },
+        {
+          "chu": "Tắt mic tất cả",
+          "cao": 40
+        },
+        {
+          "chu": "2 em giơ tay LH TH",
+          "cao": 40
+        }
+      ]
+    },
+    "860_caoNhat": {
+      "khay": {
+        "w": 308,
+        "h": 524,
+        "top": 14
+      },
+      "cuon": true
+    }
+  },
+  "kiem": [
+    {
+      "ten": "1366×768 · chưa live: khay không có khối «Đang nói»",
+      "dat": true,
+      "them": "{\"w\":560,\"h\":170}"
+    },
+    {
+      "ten": "1366×768 · máy thầy THẬT (thay.ts) báo «phát tiếng em ra loa» BẬT sẵn, không cần bấm",
+      "dat": true,
+      "them": "{\"pha\":\"live\",\"ngheEm\":true}"
+    },
+    {
+      "ten": "1366×768 · chưa ai nói: khối đầu khay chỉ một dòng «Chưa có em nào nói», không nút, không hàng loa, không dấu",
+      "dat": true,
+      "them": "Chưa có em nào nói"
+    },
+    {
+      "ten": "1366×768 · khối không làm khay rộng ra, ba nhóm vẫn một hàng dưới khối; khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "khay 560 ⇒ 560 · row"
+    },
+    {
+      "ten": "1366×768 · có em nói: thẻ KHÔNG tự bung (góc phải dưới trống); nút «thêm» có dấu đỏ góc trái, nhãn đọc tên em",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, Đại Học đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "1366×768 · mở khay ⇒ khối đầu khay là thẻ ĐẦY ĐỦ: chữ cái, tên, «Đội Natri · mic đang bật», sóng 5 vạch, Thu mic, Tắt mic tất cả, «2 em giơ tay»; không hàng loa",
+      "dat": true,
+      "them": "Đang nói ĐH Đỗ Đại Học Đội Natri · mic đang bật Thu mic Tắt mic tất cả 2 em giơ tay LH TH"
+    },
+    {
+      "ten": "1366×768 · khay giữ bề rộng, ba nhóm một hàng dưới thẻ, trọn trong màn, không tràn ngang; mọi nút trong thẻ ≥ 40 px",
+      "dat": true,
+      "them": "560×373 top 330 · Thu mic 40 | Tắt mic tất cả 40 | 2 em giơ tay LH TH 44"
+    },
+    {
+      "ten": "1366×768 · bấm «Thu mic» rồi «Tắt mic tất cả» trong khay ⇒ gửi app đúng lệnh như thẻ cũ, khay KHÔNG thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"},{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\"}]"
+    },
+    {
+      "ten": "1366×768 · chạm «2 em giơ tay» trong khay ⇒ hàng chờ mở («Mời nói», «Hạ hết tay»), khay KHÔNG thu",
+      "dat": true,
+      "them": " · thứ 1 trong hàng Mời nói TH Trần Thu Hà Đội Natri · thứ 2 trong hàng Mời nói Hạ hết tay"
+    },
+    {
+      "ten": "1366×768 · cao nhất (em nói + hàng chờ mở + «Máy chưa phát được tiếng em»): khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "560×559 top 143"
+    },
+    {
+      "ten": "1366×768 · Esc thu khay, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · phím N mở khay tại thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · chưa live: khay không có khối «Đang nói»",
+      "dat": true,
+      "them": "{\"w\":788,\"h\":237}"
+    },
+    {
+      "ten": "1920×1080 · máy thầy THẬT (thay.ts) báo «phát tiếng em ra loa» BẬT sẵn, không cần bấm",
+      "dat": true,
+      "them": "{\"pha\":\"live\",\"ngheEm\":true}"
+    },
+    {
+      "ten": "1920×1080 · chưa ai nói: khối đầu khay chỉ một dòng «Chưa có em nào nói», không nút, không hàng loa, không dấu",
+      "dat": true,
+      "them": "Chưa có em nào nói"
+    },
+    {
+      "ten": "1920×1080 · khối không làm khay rộng ra, ba nhóm vẫn một hàng dưới khối; khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "khay 788 ⇒ 788 · row"
+    },
+    {
+      "ten": "1920×1080 · có em nói: thẻ KHÔNG tự bung (góc phải dưới trống); nút «thêm» có dấu đỏ góc trái, nhãn đọc tên em",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, Đại Học đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "1920×1080 · mở khay ⇒ khối đầu khay là thẻ ĐẦY ĐỦ: chữ cái, tên, «Đội Natri · mic đang bật», sóng 5 vạch, Thu mic, Tắt mic tất cả, «2 em giơ tay»; không hàng loa",
+      "dat": true,
+      "them": "Đang nói ĐH Đỗ Đại Học Đội Natri · mic đang bật Thu mic Tắt mic tất cả 2 em giơ tay LH TH"
+    },
+    {
+      "ten": "1920×1080 · khay giữ bề rộng, ba nhóm một hàng dưới thẻ, trọn trong màn, không tràn ngang; mọi nút trong thẻ ≥ 40 px",
+      "dat": true,
+      "them": "788×521 top 470 · Thu mic 56 | Tắt mic tất cả 56 | 2 em giơ tay LH TH 62"
+    },
+    {
+      "ten": "1920×1080 · bấm «Thu mic» rồi «Tắt mic tất cả» trong khay ⇒ gửi app đúng lệnh như thẻ cũ, khay KHÔNG thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"},{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\"}]"
+    },
+    {
+      "ten": "1920×1080 · chạm «2 em giơ tay» trong khay ⇒ hàng chờ mở («Mời nói», «Hạ hết tay»), khay KHÔNG thu",
+      "dat": true,
+      "them": " · thứ 1 trong hàng Mời nói TH Trần Thu Hà Đội Natri · thứ 2 trong hàng Mời nói Hạ hết tay"
+    },
+    {
+      "ten": "1920×1080 · cao nhất (em nói + hàng chờ mở + «Máy chưa phát được tiếng em»): khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "788×780 top 211"
+    },
+    {
+      "ten": "1920×1080 · Esc thu khay, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · phím N mở khay tại thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · chưa live: khay không có khối «Đang nói»",
+      "dat": true,
+      "them": "{\"w\":485,\"h\":165}"
+    },
+    {
+      "ten": "1180×820 · máy thầy THẬT (thay.ts) báo «phát tiếng em ra loa» BẬT sẵn, không cần bấm",
+      "dat": true,
+      "them": "{\"pha\":\"live\",\"ngheEm\":true}"
+    },
+    {
+      "ten": "1180×820 · chưa ai nói: khối đầu khay chỉ một dòng «Chưa có em nào nói», không nút, không hàng loa, không dấu",
+      "dat": true,
+      "them": "Chưa có em nào nói"
+    },
+    {
+      "ten": "1180×820 · khối không làm khay rộng ra, ba nhóm vẫn một hàng dưới khối; khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "khay 485 ⇒ 485 · row"
+    },
+    {
+      "ten": "1180×820 · có em nói: thẻ KHÔNG tự bung (góc phải dưới trống); nút «thêm» có dấu đỏ góc trái, nhãn đọc tên em",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, Đại Học đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "1180×820 · mở khay ⇒ khối đầu khay là thẻ ĐẦY ĐỦ: chữ cái, tên, «Đội Natri · mic đang bật», sóng 5 vạch, Thu mic, Tắt mic tất cả, «2 em giơ tay»; không hàng loa",
+      "dat": true,
+      "them": "Đang nói ĐH Đỗ Đại Học Đội Natri · mic đang bật Thu mic Tắt mic tất cả 2 em giơ tay LH TH"
+    },
+    {
+      "ten": "1180×820 · khay giữ bề rộng, ba nhóm một hàng dưới thẻ, trọn trong màn, không tràn ngang; mọi nút trong thẻ ≥ 40 px",
+      "dat": true,
+      "them": "485×354 top 407 · Thu mic 40 | Tắt mic tất cả 40 | 2 em giơ tay LH TH 40"
+    },
+    {
+      "ten": "1180×820 · bấm «Thu mic» rồi «Tắt mic tất cả» trong khay ⇒ gửi app đúng lệnh như thẻ cũ, khay KHÔNG thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"},{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\"}]"
+    },
+    {
+      "ten": "1180×820 · chạm «2 em giơ tay» trong khay ⇒ hàng chờ mở («Mời nói», «Hạ hết tay»), khay KHÔNG thu",
+      "dat": true,
+      "them": " · thứ 1 trong hàng Mời nói TH Trần Thu Hà Đội Natri · thứ 2 trong hàng Mời nói Hạ hết tay"
+    },
+    {
+      "ten": "1180×820 · cao nhất (em nói + hàng chờ mở + «Máy chưa phát được tiếng em»): khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "485×536 top 225"
+    },
+    {
+      "ten": "1180×820 · Esc thu khay, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · phím N mở khay tại thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "860×600 · chưa live: khay không có khối «Đang nói»",
+      "dat": true,
+      "them": "{\"w\":150,\"h\":414}"
+    },
+    {
+      "ten": "860×600 · máy thầy THẬT (thay.ts) báo «phát tiếng em ra loa» BẬT sẵn, không cần bấm",
+      "dat": true,
+      "them": "{\"pha\":\"live\",\"ngheEm\":true}"
+    },
+    {
+      "ten": "860×600 · chưa ai nói: khối đầu khay chỉ một dòng «Chưa có em nào nói», không nút, không hàng loa, không dấu",
+      "dat": true,
+      "them": "Chưa có em nào nói"
+    },
+    {
+      "ten": "860×600 · khổ hẹp: khay xếp dọc, khối ở đầu; khay trọn trong màn, không tràn ngang",
+      "dat": true,
+      "them": "khay 150 ⇒ 150 · column"
+    },
+    {
+      "ten": "860×600 · có em nói: thẻ KHÔNG tự bung (góc phải dưới trống); nút «thêm» có dấu đỏ góc trái, nhãn đọc tên em",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, Đại Học đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "860×600 · mở khay ⇒ khối đầu khay là thẻ ĐẦY ĐỦ: chữ cái, tên, «Đội Natri · mic đang bật», sóng 5 vạch, Thu mic, Tắt mic tất cả, «2 em giơ tay»; không hàng loa",
+      "dat": true,
+      "them": "Đang nói ĐH Đỗ Đại Học Đội Natri · mic đang bật Thu mic Tắt mic tất cả 2 em giơ tay LH TH"
+    },
+    {
+      "ten": "860×600 · khổ hẹp: xếp dọc, khay đủ rộng cho thẻ, trọn trong màn, không tràn ngang; mọi nút trong thẻ ≥ 40 px",
+      "dat": true,
+      "them": "255×524 top 14 · Thu mic 40 | Tắt mic tất cả 40 | 2 em giơ tay LH TH 40"
+    },
+    {
+      "ten": "860×600 · bấm «Thu mic» rồi «Tắt mic tất cả» trong khay ⇒ gửi app đúng lệnh như thẻ cũ, khay KHÔNG thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"},{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\"}]"
+    },
+    {
+      "ten": "860×600 · chạm «2 em giơ tay» trong khay ⇒ hàng chờ mở («Mời nói», «Hạ hết tay»), khay KHÔNG thu",
+      "dat": true,
+      "them": " · thứ 1 trong hàng Mời nói TH Trần Thu Hà Đội Natri · thứ 2 trong hàng Mời nói Hạ hết tay"
+    },
+    {
+      "ten": "860×600 · cao nhất (em nói + hàng chờ mở + «Máy chưa phát được tiếng em»): khay trọn trong màn, cuộn trong khay, không tràn ngang",
+      "dat": true,
+      "them": "308×524 top 14"
+    },
+    {
+      "ten": "860×600 · khổ hẹp: khay xếp dọc, cuộn được; phím N mở lại ngay tại khối (cuộn về đầu)",
+      "dat": true,
+      "them": "cuộn true · scrollTop 0"
+    },
+    {
+      "ten": "860×600 · Esc thu khay, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "860×600 · phím N mở khay tại thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Không lỗi JavaScript trên trang nào",
+      "dat": true,
+      "them": ""
+    }
+  ]
+}

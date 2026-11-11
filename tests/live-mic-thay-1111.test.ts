@@ -477,7 +477,9 @@ describe('M2 · tiếng trong: luật lọc theo đường vọng + Opus dải r
     expect(b.lt.trangThai().loc).toBe(false)
   })
   // TEST MỚI 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live) — khoá luật `canLoc` tự động = CHỈ (`ngheEm` && `emNoi`).
-  it('«Tự động» không theo `tiengLop`: «Tất cả» bật sẵn mà không có em nói ⇒ KHÔNG xin khử vọng, đổi «Em ở xa» ⇄ «Tất cả» không mở lại mic; em nói mà loa thầy không phát ⇒ vẫn không; thầy bật phát ra loa ⇒ xin NGAY; em thôi nói ⇒ tắt NGAY trong view ấy', async () => {
+  // SỬA CÓ CHỦ ĐÍCH 11/11 tối (thầy: «khi học sinh bật mic thì tự động phát tiếng em ra loa lớp luôn nhé, bỏ luôn nút bật tắt đó đi»): em nói (cả em tại lớp)
+  // ⇒ máy thầy TỰ phát ra loa ⇒ có đường vọng ngay, không cần bấm; chỉ lệnh cũ `datNgheEm(false)` mới thôi phát.
+  it('«Tự động» không theo `tiengLop`: «Tất cả» bật sẵn mà không có em nói ⇒ KHÔNG xin khử vọng, đổi «Em ở xa» ⇄ «Tất cả» không mở lại mic; em tại lớp nói ⇒ loa thầy TỰ phát ⇒ xin NGAY; em thôi nói ⇒ tắt NGAY trong view ấy', async () => {
     const b = dung()
     await b.lt.bat({})
     expect(b.st.live).toMatchObject({ bat: true, tiengLop: true }) // mặc định mới: máy em trong lớp phát tiếng
@@ -486,15 +488,30 @@ describe('M2 · tiếng trong: luật lọc theo đường vọng + Opus dải r
     b.lt.dat({ tiengLop: false }); await troi(50); b.lt.dat({ tiengLop: true }); await troi(50)
     expect(b.st.live!.tiengLop).toBe(true)
     expect(goiGum.length).toBe(1); expect(b.lt.trangThai().loc).toBe(false)
-    emNoi(b); await troi(50) // em trong lớp nói, loa máy thầy KHÔNG phát (mặc định chỉ phát em ở xa) ⇒ không có đường vọng
-    expect(b.lt.trangThai()).toMatchObject({ emNoi: { sbd: 'S1' }, ngheEm: false, loc: false }); expect(goiGum.length).toBe(1)
-    b.lt.datNgheEm(true); await troi(50) // thầy bấm «Phát tiếng em ra loa lớp» ⇒ xin ngay, không chờ view kế của phòng
+    emNoi(b); await troi(50) // em trong lớp nói ⇒ máy thầy tự phát tiếng em ra loa (không nút bật) ⇒ xin khử vọng ngay trong view ấy
+    expect(b.lt.trangThai()).toMatchObject({ emNoi: { sbd: 'S1' }, ngheEm: true, loc: true })
     expect(goiGum.length).toBe(2); expect(goiGum[1]).toMatchObject({ echoCancellation: true, noiseSuppression: true })
-    expect(b.lt.trangThai().loc).toBe(true)
     liveThuMic(b.st, T0 + 9, 'S1'); b.bao(); await troi(50) // em thôi nói: MỘT view của phòng là đủ để tắt lại
     expect(b.lt.trangThai()).toMatchObject({ emNoi: null, loc: false }); expect(goiGum.length).toBe(3)
-    emNoi(b); await troi(50) // em nói lại (thầy vẫn để phát ra loa): MỘT view là đủ để bật
+    emNoi(b); await troi(50) // em nói lại: MỘT view là đủ để bật
     expect(b.lt.trangThai().loc).toBe(true); expect(goiGum.length).toBe(4)
+    b.lt.datNgheEm(false); await troi(50) // lệnh cũ «nghe-em» tắt phát ⇒ hết đường vọng
+    expect(b.lt.trangThai()).toMatchObject({ ngheEm: false, loc: false })
+  })
+  it('11/11 tối · em TẠI LỚP bật mic ⇒ thẻ phát tiếng em trên máy thầy KHÔNG tắt tiếng (muted = false), không cần bấm gì; view kế của phòng vẫn phát', async () => {
+    vi.stubGlobal('MediaStream', class { constructor(public ds: unknown[]) {} })
+    const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
+    const b = dung()
+    await b.lt.bat({})
+    emNoi(b); await troi(50)
+    expect(b.lt.trangThai()).toMatchObject({ emNoi: { sbd: 'S1' }, ngheEm: true })
+    PcGia.ds[PcGia.ds.length - 1]!.dispatchEvent(Object.assign(new Event('track'), { track: { kind: 'audio' }, receiver: {} }))
+    const the = b.lt.nguonDo().n.the as HTMLAudioElement
+    expect(the).toBeTruthy()
+    expect(the.muted).toBe(false)
+    b.bao(); await troi(50)
+    expect(the.muted).toBe(false)
+    play.mockRestore()
   })
   it('thầy ép tay: «Luôn bật» / «Luôn tắt» thắng luật tự động', async () => {
     const b = dung()
