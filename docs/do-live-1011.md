@@ -519,6 +519,10 @@ Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach
   `docs/ban-ve-live-1011/so-do-tach-giong-mo-hinh-1000-1111.json`): giọng khác giảm **1,9–3,0 dB** (cổng lượt 1: 0,1–2,2; Mạnh: 0–1,6); thầy một mình SI-SDR 19,2 dB;
   nói chồng ở 2 dB không hại thầy (8,4 → 8,3; giọng khác thật 4,1 → 5,7 — cổng lượt 1 làm hỏng 4,1 → −2,9); mở sau 10–60 ms; hệ số thời gian thực 0,10–0,12
   (máy phiên, Node, một luồng). **Còn rất xa tiêu chí «giảm ≥ 20 dB».**
+- **Giới hạn của số đo:** (1) MIỀN MP3 — giọng thầy chấm là MP3 «Xem lại Live» (cùng miền với dữ liệu luyện); lúc chạy thật mô hình nhận tiếng mic 48 kHz sạch ⇒
+  đạt trên bản đo này chưa phải đạt khi dùng (điểm miền sạch: nhánh YouTube giữ riêng giọng sạch). (2) Hàng «khac-that» CHƯA giữ riêng theo NGƯỜI: người đóng vai em
+  trong buổi thử có cả trong dữ liệu luyện; học sinh thật chưa thử. (3) 62 % giọng thầy trích ra (77 / 124 s) nằm trong `emNoi` ± 1 s ⇒ có thể lẫn giọng em vào đích
+  (đã lọc bằng CAM++ nhưng không chắc sạch hết); bỏ hẳn thì chỉ còn ≈ 47 s.
 - Cột «dải tới −3 dB» của bản đo cũ không dùng được cho mô hình: giọng mẫu là MP3 (không có gì trên 11 kHz) và mô hình hạ dải < 150 Hz ⇒ thước đo dừng ở dải đầu.
 
 ### 11.3 Bộ chạy trong app (trên nhánh, ẨN sau cờ — chưa phát hành)
