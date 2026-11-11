@@ -27,55 +27,49 @@ for (const duong of ['/accounts/{acc}/billing/usage', '/accounts/{acc}/billing/u
 console.log('\n## 1d. D1: cỡ, bản sao đọc')
 { const r = await rest(`/accounts/{acc}/d1/database/${DB}`); const x = r.j?.result ?? {}; console.log(`HTTP ${r.st}`, JSON.stringify({ coMB: x.file_size ? Math.round(x.file_size / 1e6) : null, soBang: x.num_tables, banSaoDoc: x.read_replication, vung: x.running_in_region ?? x.version })) }
 
-// ───────── 2. SỐ DÙNG THEO NGÀY (GraphQL Analytics) ─────────
-// Mỗi bộ số liệu một truy vấn riêng (một bộ lỗi không làm hỏng bộ khác). Trường số lấy bằng introspection kiểu `sum` / `max`; nhóm theo ngày thử lần lượt
-// dimensions date → datetimeHour; lọc thử datetime_geq → date_geq.
-const tenKieu = (t) => t?.name ?? t?.ofType?.name ?? t?.ofType?.ofType?.name ?? t?.ofType?.ofType?.ofType?.name
-async function kieuCua(ten) { const j = await gql(`query($n:String!){__type(name:$n){fields{name type{name ofType{name ofType{name ofType{name}}}}}}}`, { n: ten }); return j?.data?.__type?.fields ?? [] }
-const acctF = await kieuCua('account')
+// ───────── 2. SỐ DÙNG THEO NGÀY (GraphQL Analytics) — truy vấn viết thẳng, mỗi bộ thử vài dạng, in lỗi nếu hỏng ─────────
 const tongKy = []
-const BO = [
-  ['d1AnalyticsAdaptiveGroups', `databaseId:"${DB}"`], ['d1StorageAdaptiveGroups', `databaseId:"${DB}"`],
-  ['workersInvocationsAdaptive', ''], ['workersInvocationsScheduled', ''], ['workersSubrequestsAdaptiveGroups', ''],
-  ['durableObjectsInvocationsAdaptiveGroups', ''], ['durableObjectsPeriodicGroups', ''], ['durableObjectsSqlStorageGroups', ''], ['durableObjectsStorageGroups', ''], ['durableObjectsSubrequestsAdaptiveGroups', ''],
-  ['r2OperationsAdaptiveGroups', ''], ['r2StorageAdaptiveGroups', ''], ['r2BandwidthUsageAdaptiveGroups', ''],
-  ['aiInferenceAdaptiveGroups', ''], ['callsUsageAdaptiveGroups', ''], ['callsTurnUsageAdaptiveGroups', ''], ['realtimeKitUsageAdaptiveGroups', ''],
-  ['kvOperationsAdaptiveGroups', ''], ['kvStorageAdaptiveGroups', ''], ['containersUsageAdaptiveGroups', ''], ['browserRenderingBrowserTimeUsageAdaptiveGroups', ''],
-]
-for (const [bo, locThem] of BO) {
-  const kieuBo = tenKieu(acctF.find((f) => f.name === bo)?.type)
-  if (!kieuBo) { console.log(`\n### ${bo}: không có trên tài khoản`); continue }
-  const fs = await kieuCua(kieuBo), co = new Map(fs.map((f) => [f.name, tenKieu(f.type)]))
-  const nhom = []
-  for (const k of ['sum', 'max']) if (co.has(k)) { const so = (await kieuCua(co.get(k))).filter((f) => /int|float/i.test(tenKieu(f.type) ?? '')).map((f) => f.name); if (so.length) nhom.push(`${k}{${so.join(' ')}}`) }
-  const dims = co.has('dimensions') ? new Set((await kieuCua(co.get('dimensions'))).map((f) => f.name)) : new Set()
-  if (!nhom.length) { console.log(`\n### ${bo}: không có trường số`); continue }
-  console.log(`\n### ${bo}  [${nhom.join(' ').slice(0, 260)}]  dims: ${[...dims].slice(0, 30).join(',')}`)
-  const dNgay = dims.has('date') ? 'date' : dims.has('datetimeHour') ? 'datetimeHour' : dims.has('datetimeMinute') ? 'datetimeMinute' : null
-  const ph = [...dims].filter((x) => /^(scriptName|namespaceId|actionType|bucketName|modelId|model|status|storageClass|productName)$/.test(x))
-  let ds = null, loiCuoi = ''
-  for (const loc of [`{datetime_geq:"${TU}T00:00:00Z",datetime_leq:"${DEN}T23:59:59Z"${locThem ? ',' + locThem : ''}}`, `{date_geq:"${TU}",date_leq:"${DEN}"${locThem ? ',' + locThem : ''}}`, `{datetimeHour_geq:"${TU}T00:00:00Z",datetimeHour_leq:"${DEN}T23:00:00Z"${locThem ? ',' + locThem : ''}}`]) {
-    const q = `query($a:String!){viewer{accounts(filter:{accountTag:$a}){${bo}(limit:10000,filter:${loc}){${nhom.join(' ')} ${dNgay || ph.length ? `dimensions{${[dNgay, ...ph].filter(Boolean).join(' ')}}` : ''}}}}}`
-    const j = await gql(q, { a: ACC })
-    if (j.errors?.length) { loiCuoi = loiNgan(j.errors); continue }
-    ds = j?.data?.viewer?.accounts?.[0]?.[bo] ?? []; break
+const L = (x) => `{datetime_geq:"${TU}T00:00:00Z",datetime_leq:"${DEN}T23:59:59Z"${x ? ',' + x : ''}}`
+const LD = (x) => `{date_geq:"${TU}",date_leq:"${DEN}"${x ? ',' + x : ''}}`
+async function bo(ten, bienThe) {
+  console.log(`\n### ${ten}`)
+  let loi = []
+  for (const [loc, than] of bienThe) {
+    const j = await gql(`query($a:String!){viewer{accounts(filter:{accountTag:$a}){${ten}(limit:10000,filter:${loc}){${than}}}}}`, { a: ACC })
+    if (j.errors?.length) { loi.push(loiNgan(j.errors).slice(0, 160)); continue }
+    const ds = j?.data?.viewer?.accounts?.[0]?.[ten] ?? []
+    const theoNgay = new Map(), theoPh = new Map(), tong = {}
+    for (const x of ds) {
+      const d = x.dimensions ?? {}, ngay = String(d.date ?? d.datetimeHour ?? d.datetimeMinute ?? '').slice(0, 10)
+      const ph = Object.entries(d).filter(([k]) => !/^(date|datetime)/.test(k)).map(([k, v]) => `${k}=${v}`).join(' ')
+      for (const k of ['sum', 'max']) for (const [tt, v] of Object.entries(x[k] ?? {})) { if (typeof v !== 'number') continue
+        const t = `${k}.${tt}`, gop = k === 'sum' ? (a, b) => a + b : Math.max
+        const n = theoNgay.get(ngay) ?? {}; n[t] = gop(n[t] ?? 0, v); theoNgay.set(ngay, n)
+        if (ph) { const p = theoPh.get(ph) ?? {}; p[t] = gop(p[t] ?? 0, v); theoPh.set(ph, p) }
+        tong[t] = gop(tong[t] ?? 0, v) }
+    }
+    const tron = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v).map(([k, v]) => [k, Math.round(v)]))
+    for (const [ngay, o] of [...theoNgay].sort()) console.log(ngay, JSON.stringify(tron(o)))
+    for (const [k, o] of [...theoPh].slice(0, 30)) console.log('  ·', an(k), JSON.stringify(tron(o)))
+    console.log('  TỔNG', JSON.stringify(tron(tong)))
+    tongKy.push([ten, tron(tong)])
+    return
   }
-  if (!ds) { console.log('LỖI: ' + loiCuoi); continue }
-  const theoNgay = new Map(), theoPh = new Map(), tong = {}
-  for (const x of ds) {
-    const ngay = String(x.dimensions?.[dNgay] ?? '').slice(0, 10), khoa = ph.map((p) => `${p}=${x.dimensions?.[p]}`).join(' ')
-    for (const k of ['sum', 'max']) for (const [tt, v] of Object.entries(x[k] ?? {})) { if (typeof v !== 'number') continue
-      const ten = `${k}.${tt}`, gop = k === 'sum' ? (a, b) => a + b : Math.max
-      const n = theoNgay.get(ngay) ?? {}; n[ten] = gop(n[ten] ?? 0, v); theoNgay.set(ngay, n)
-      const p = theoPh.get(khoa) ?? {}; p[ten] = gop(p[ten] ?? 0, v); theoPh.set(khoa, p)
-      tong[ten] = gop(tong[ten] ?? 0, v) }
-  }
-  const tron = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v).map(([k, v]) => [k, Math.round(v)]))
-  for (const [ngay, o] of [...theoNgay].sort()) console.log(ngay, JSON.stringify(tron(o)))
-  if (ph.length) for (const [k, o] of [...theoPh].slice(0, 30)) console.log('  ·', an(k), JSON.stringify(tron(o)))
-  console.log('  TỔNG', JSON.stringify(tron(tong)))
-  tongKy.push([bo, tron(tong)])
+  console.log('LỖI: ' + loi.join(' || '))
 }
+const DBL = `databaseId:"${DB}"`
+await bo('d1AnalyticsAdaptiveGroups', [[L(DBL), 'sum{readQueries writeQueries rowsRead rowsWritten} dimensions{date}'], [L(DBL), 'sum{readQueries writeQueries rowsRead rowsWritten} dimensions{datetimeHour}']])
+await bo('d1StorageAdaptiveGroups', [[L(DBL), 'max{databaseSizeBytes} dimensions{date}'], [LD(DBL), 'max{databaseSizeBytes} dimensions{date}']])
+await bo('workersInvocationsAdaptive', [[L(''), 'sum{requests errors subrequests cpuTimeUs wallTime} dimensions{date scriptName}'], [L(''), 'sum{requests errors subrequests} dimensions{date scriptName}']])
+await bo('durableObjectsInvocationsAdaptiveGroups', [[L(''), 'sum{requests wallTime responseBodySize errors} dimensions{date scriptName}'], [L(''), 'sum{requests} dimensions{date}']])
+await bo('durableObjectsPeriodicGroups', [[L(''), 'sum{activeTime cpuTime storageReadUnits storageWriteUnits subrequests inboundWebsocketMsgCount outboundWebsocketMsgCount} dimensions{date namespaceId}'], [L(''), 'sum{activeTime cpuTime} dimensions{date}']])
+await bo('durableObjectsSqlStorageGroups', [[L(''), 'max{storedBytes} dimensions{date}'], [LD(''), 'max{storedBytes} dimensions{date}']])
+await bo('durableObjectsStorageGroups', [[L(''), 'max{storedBytes} dimensions{date}'], [LD(''), 'max{storedBytes} dimensions{date}']])
+await bo('r2OperationsAdaptiveGroups', [[L(''), 'sum{requests} dimensions{date actionType}']])
+await bo('r2StorageAdaptiveGroups', [[L(''), 'max{payloadSize metadataSize objectCount} dimensions{date}']])
+await bo('aiInferenceAdaptiveGroups', [[L(''), 'sum{totalNeurons totalInputTokens totalOutputTokens} dimensions{date}'], [L(''), 'sum{totalNeurons} dimensions{date}'], [L(''), 'count dimensions{date}']])
+await bo('callsUsageAdaptiveGroups', [[L(''), 'sum{egressBytes ingressBytes} dimensions{date}'], [LD(''), 'sum{egressBytes ingressBytes} dimensions{date}']])
+await bo('callsTurnUsageAdaptiveGroups', [[L(''), 'sum{egressBytes ingressBytes} dimensions{date}'], [LD(''), 'sum{egressBytes ingressBytes} dimensions{date}']])
 
 // ───────── 2b. Nhật ký Worker (Workers Logs — tính phí theo số sự kiện): đếm qua API Telemetry nếu khoá có quyền ─────────
 for (const [tu, den] of [['2026-10-11', '2026-11-11'], ['2026-11-10', '2026-11-11']]) {
