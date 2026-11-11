@@ -1,0 +1,726 @@
+{
+  "i": 591,
+  "assetIndexProvided": 1267,
+  "hash": "6e1308fb22d2d3a68e57e0388abb8caa2ba522d6b2cbaef33254c6e91a26b115",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/6e1308fb22d2d3a68e57e0388abb8caa2ba522d6b2cbaef33254c6e91a26b115.png",
+  "size": [
+    869,
+    216
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B1-LIPID-II-4",
+      "de": "Triglyceride là thành phần đóng một vai trò là nguồn cung cấp năng lượng và chuyên chở các chất béo trong quá trình trao đổi chất. Cho một triglyceride X có công thức cấu tạo như hình dưới đây (các gốc acid béo kí hiệu (1), (2), (3)).",
+      "allHinh": [
+        {
+          "hash": "6e1308fb22d2d3a68e57e0388abb8caa2ba522d6b2cbaef33254c6e91a26b115",
+          "where": "VIP27-C1-B1-LIPID-II-4.hinh.0.du_lieu",
+          "hashDataUrl": "fa3f942144e17251273b4e97e7b0f0732c6527bcbc1611d5bfcabc39747d4764"
+        }
+      ],
+      "missingHashes": [
+        "6e1308fb22d2d3a68e57e0388abb8caa2ba522d6b2cbaef33254c6e91a26b115"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownAllCO6xOpened": true,
+    "ownGlycerol5xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativevertex/bboxnearest1pxapprox; listsretainnonperiodicspacing/countsnotbasedtriestername. Footfractionsintersectionstoavoidroundingfalsegapsnotrasterprecisionclaim.",
+  "geometry": {
+    "glycerol": {
+      "labels": [
+        {
+          "text": "H₂C",
+          "bbox": [
+            4,
+            63,
+            43,
+            87
+          ],
+          "CcenterX": 35
+        },
+        {
+          "text": "HC",
+          "bbox": [
+            13,
+            125,
+            43,
+            149
+          ],
+          "CcenterX": 35
+        },
+        {
+          "text": "H₂C",
+          "bbox": [
+            4,
+            188,
+            43,
+            212
+          ],
+          "CcenterX": 35
+        }
+      ],
+      "verticalBonds": [
+        [
+          [
+            35,
+            87
+          ],
+          [
+            35,
+            123
+          ]
+        ],
+        [
+          [
+            35,
+            150
+          ],
+          [
+            35,
+            186
+          ]
+        ]
+      ],
+      "horizontalEsterBonds": [
+        [
+          [
+            46,
+            73
+          ],
+          [
+            68,
+            73
+          ]
+        ],
+        [
+          [
+            46,
+            135
+          ],
+          [
+            68,
+            135
+          ]
+        ],
+        [
+          [
+            46,
+            198
+          ],
+          [
+            68,
+            198
+          ]
+        ]
+      ],
+      "anchor": "LASTCrightofH2C/HC, NOTH/sub2; eachverticalatCcenter35."
+    },
+    "esterO": [
+      {
+        "text": "O",
+        "bbox": [
+          71,
+          62,
+          89,
+          85
+        ],
+        "bond": [
+          [
+            89,
+            67
+          ],
+          [
+            118,
+            51
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          71,
+          125,
+          89,
+          148
+        ],
+        "bond": [
+          [
+            89,
+            129
+          ],
+          [
+            118,
+            113
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          71,
+          188,
+          89,
+          211
+        ],
+        "bond": [
+          [
+            89,
+            192
+          ],
+          [
+            118,
+            176
+          ]
+        ]
+      }
+    ],
+    "chains": [
+      {
+        "vertices": [
+          [
+            118,
+            51
+          ],
+          [
+            157,
+            73
+          ],
+          [
+            196,
+            51
+          ],
+          [
+            235,
+            73
+          ],
+          [
+            273,
+            51
+          ],
+          [
+            312,
+            73
+          ],
+          [
+            351,
+            51
+          ],
+          [
+            390,
+            73
+          ],
+          [
+            428,
+            51
+          ],
+          [
+            467,
+            73
+          ],
+          [
+            506,
+            51
+          ],
+          [
+            545,
+            73
+          ],
+          [
+            583,
+            51
+          ],
+          [
+            622,
+            73
+          ],
+          [
+            661,
+            51
+          ],
+          [
+            700,
+            73
+          ]
+        ],
+        "CCDoublePairs1Based": [],
+        "innerParallelRays": []
+      },
+      {
+        "vertices": [
+          [
+            118,
+            113
+          ],
+          [
+            157,
+            135
+          ],
+          [
+            196,
+            113
+          ],
+          [
+            235,
+            135
+          ],
+          [
+            273,
+            113
+          ],
+          [
+            312,
+            135
+          ],
+          [
+            351,
+            113
+          ],
+          [
+            390,
+            135
+          ],
+          [
+            428,
+            113
+          ],
+          [
+            473,
+            113
+          ],
+          [
+            511,
+            135
+          ],
+          [
+            550,
+            113
+          ],
+          [
+            589,
+            135
+          ],
+          [
+            627,
+            113
+          ],
+          [
+            666,
+            135
+          ],
+          [
+            705,
+            113
+          ],
+          [
+            743,
+            135
+          ],
+          [
+            782,
+            113
+          ]
+        ],
+        "CCDoublePairs1Based": [
+          [
+            9,
+            10
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              434,
+              121
+            ],
+            [
+              467,
+              121
+            ]
+          ]
+        ]
+      },
+      {
+        "vertices": [
+          [
+            118,
+            176
+          ],
+          [
+            157,
+            198
+          ],
+          [
+            196,
+            176
+          ],
+          [
+            235,
+            198
+          ],
+          [
+            273,
+            176
+          ],
+          [
+            312,
+            198
+          ],
+          [
+            351,
+            176
+          ],
+          [
+            390,
+            198
+          ],
+          [
+            428,
+            176
+          ],
+          [
+            474,
+            176
+          ],
+          [
+            512,
+            198
+          ],
+          [
+            551,
+            176
+          ],
+          [
+            597,
+            176
+          ],
+          [
+            635,
+            198
+          ],
+          [
+            673,
+            176
+          ],
+          [
+            719,
+            176
+          ],
+          [
+            757,
+            198
+          ],
+          [
+            795,
+            176
+          ]
+        ],
+        "CCDoublePairs1Based": [
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              434,
+              184
+            ],
+            [
+              468,
+              184
+            ]
+          ],
+          [
+            [
+              557,
+              184
+            ],
+            [
+              590,
+              184
+            ]
+          ],
+          [
+            [
+              680,
+              184
+            ],
+            [
+              712,
+              184
+            ]
+          ]
+        ]
+      }
+    ],
+    "carbonyls": [
+      {
+        "apex": [
+          118,
+          51
+        ],
+        "OlabelBBox": [
+          109,
+          4,
+          128,
+          26
+        ],
+        "rays": [
+          [
+            [
+              114,
+              27
+            ],
+            [
+              114,
+              53.21
+            ]
+          ],
+          [
+            [
+              122,
+              27
+            ],
+            [
+              122,
+              53.26
+            ]
+          ]
+        ],
+        "apexV": [
+          [
+            114,
+            53.21
+          ],
+          [
+            118,
+            51
+          ],
+          [
+            122,
+            53.26
+          ]
+        ]
+      },
+      {
+        "apex": [
+          118,
+          113
+        ],
+        "OlabelBBox": [
+          109,
+          67,
+          128,
+          89
+        ],
+        "rays": [
+          [
+            [
+              114,
+              90
+            ],
+            [
+              114,
+              115.21
+            ]
+          ],
+          [
+            [
+              122,
+              90
+            ],
+            [
+              122,
+              115.26
+            ]
+          ]
+        ],
+        "apexV": [
+          [
+            114,
+            115.21
+          ],
+          [
+            118,
+            113
+          ],
+          [
+            122,
+            115.26
+          ]
+        ]
+      },
+      {
+        "apex": [
+          118,
+          176
+        ],
+        "OlabelBBox": [
+          109,
+          130,
+          128,
+          152
+        ],
+        "rays": [
+          [
+            [
+              114,
+              153
+            ],
+            [
+              114,
+              178.21
+            ]
+          ],
+          [
+            [
+              122,
+              153
+            ],
+            [
+              122,
+              178.26
+            ]
+          ]
+        ],
+        "apexV": [
+          [
+            114,
+            178.21
+          ],
+          [
+            118,
+            176
+          ],
+          [
+            122,
+            178.26
+          ]
+        ]
+      }
+    ],
+    "COFeetNote": "All3pairsverticalrayfeetCONTACTeach2slopes/nativeVjoinbetween, nofootwhitegaps. WhitegaponlybetweenOlabelbottominkandupperraystart. Noartificialflatbridge/deleteV.",
+    "captions": [
+      {
+        "text": "(1)",
+        "bbox": [
+          817,
+          33,
+          866,
+          74
+        ]
+      },
+      {
+        "text": "(2)",
+        "bbox": [
+          813,
+          94,
+          862,
+          136
+        ]
+      },
+      {
+        "text": "(3)",
+        "bbox": [
+          813,
+          143,
+          862,
+          185
+        ]
+      }
+    ],
+    "font": "AllchemicalH2C/HC/Oregularuprightsansblackgray; ONLY(1)(2)(3)TRUEBOLDuprightserif. Sub2literal. Noitalic.",
+    "isolatedGrayMarks": {
+      "centersApprox": [
+        [
+          791,
+          187
+        ],
+        [
+          801,
+          187
+        ]
+      ],
+      "note": "RetainEXACT2tinygraydotsintentUNKNOWNnondata; NOcharge/radical/electron/ellipsiscontinuationinference; NOthird dot. Notcarbonvertices.",
+      "radiusApprox": 1.2,
+      "fillApprox": "#b5b5b5 gray",
+      "drawCount": 2,
+      "preserve": true
+    },
+    "counts": {
+      "acylC": [
+        16,
+        18,
+        18
+      ],
+      "glycerolTextC": 3,
+      "totalC": 55,
+      "O": 6,
+      "CCdoubleByChain": [
+        0,
+        1,
+        3
+      ],
+      "CCdoubleTotal": 4,
+      "COdouble": 3,
+      "captions": 3,
+      "arrows": 0
+    },
+    "noAdded": [
+      "alias490/460/939/996/801",
+      "Hhydrogenationanswer",
+      "fattyacidnames",
+      "labelX",
+      "Ni/tcondition",
+      "C18normalizationtop",
+      "newcharges",
+      "extraCCdouble"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "publicDeAllRefsRead": true,
+    "ownFull2xOpened": true,
+    "ownAllCO3xOpened": true,
+    "ownEsterO10xOpened": true,
+    "ownDots10xOpened": true,
+    "actualChromiumFinalFull3xOpened": true,
+    "actualAllCOMacroOpened": true,
+    "actualDotsMacroOpened": true,
+    "hashSvg": "5e6552e167bbea0cf056c046cfa2396e6af5dc3bc106c1fbea06eba9a8f32dd1",
+    "verdict": "RootPASS+independentreadonlyexactSHAPASS",
+    "measurementLimits": "nativeapproxnearest1px;COfootfractionsCALCULATEDapproxslopesNOTsubpixel",
+    "oldRejectedHash": "a5aea39a0f49409b20e6af73714964273b957e16a3789ee2154df01991541199",
+    "onlyChangedTopLevelChildren": [
+      25,
+      26,
+      27
+    ],
+    "allOtherSvgChildrenExact": true,
+    "rootFullRenderSha256": "09fd1e5b37d753789637ca121d5cf1e1bc15ad5208471e7d985407c53844fad5",
+    "runtimeIndependent": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/triester591-native-ddh-5e6552e167bbea0cf056c046cfa2396e6af5dc3bc106c1fbea06eba9a8f32dd1.svg 5e6552e167bbea0cf056c046cfa2396e6af5dc3bc106c1fbea06eba9a8f32dd1\n591 { x: 0, y: 0, width: 869, height: 216 }\n"
+  }
+}
