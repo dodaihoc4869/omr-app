@@ -12,8 +12,8 @@
 // ĐỢT 2: thẻ gọn «N em giơ tay» (bấm ⇒ hàng chờ, mỗi em «Mời nói», dưới cùng «Hạ hết tay») · thẻ «Đang nói» có sóng âm + «Thu mic» + «Tắt mic tất cả» ·
 // SỬA 11/11 SAU KHI THẦY TEST MÁY THẬT: (1) «nút tạm dừng live và kết thúc live ở trong nút live luôn» ⇒ cửa sổ của nút Live (bấm viên đỏ) có «Tạm dừng» ⇄
 // «Tiếp tục», «Kết thúc live», và công tắc «Bảng → máy em» (trước nằm rời trên thanh); (2) «cửa sổ của nút live cũng [sang mép trái]» ⇒ nút Live + viên đỏ
-// đứng ĐẦU thanh (mép trái), cửa sổ neo mép trái; (3) «các nút bấm ở thanh dưới thu gọn vào một biểu tượng» ⇒ lúc live các nút phím của thanh gom vào MỘT
-// nút lưới; bấm ⇒ xoè ra (8 giây không chạm / bấm ra ngoài ⇒ thu lại). Phím tắt giữ nguyên.
+// đứng ĐẦU thanh (mép trái), cửa sổ neo mép trái; (3) «các nút bấm ở thanh dưới thu gọn vào một biểu tượng» ⇒ nút lưới «thêm» + khay — từ chiều 11/11
+// (thầy: «Phần nút ở dưới chưa gọn») dùng cho MỌI trạng thái, dựng ở thanh-day-to-chieu.ts. Phím tắt giữ nguyên.
 // công tắc «Cho em ở xa vào xem» trong thẻ mic (sau cờ `dot2`) · thẻ «em rời màn» ghi KIỂU rời · tờ ĐO bố cục giấy đề (chỉ số đo, không chữ) gửi app ⇒ phòng ⇒ máy em dựng
 // giấy cùng bề rộng, cùng cỡ chữ (rủi ro R3 của đặc tả).
 // Bút: mọi sự kiện của `window.__mcBut.nghe` chuyển nguyên văn sang app (`viec:'but'`); sự kiện `trang` kèm ô giấy / ô bảng (`__mcBut.vung()`) + kiểu giấy
@@ -43,8 +43,6 @@ body.mc .mc-thanh .mc-lv-cum{flex:none;display:inline-flex;align-items:stretch;m
 @media (max-width:1180px){.mc-lv-cum>span.ghi b{display:none}}
 .mc-lv-cum .im{animation:mcLvNhay 1s steps(2,jump-none) infinite}
 @keyframes mcLvNhay{from{background:transparent;color:inherit}to{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}}
-body.mc-live .mc-thanh [data-k="T"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="Tab"] .mc-nut-chu{display:none}
-body.mc.mc-live .mc-phim-nhom [data-k="P"] .mc-nut-chu{display:none!important}
 body.mc .mc-thanh .mc-lv-bg{gap:.45em;padding:0 .8em}
 .mc-lv-bg i{display:block;width:.62em;height:.62em;border-radius:50%;box-shadow:inset 0 0 0 1.5px currentColor}
 .mc-lv-bg[aria-pressed="true"]{background:var(--mc-bang-chu)!important;color:var(--mc-bang)!important;box-shadow:none!important}
@@ -53,7 +51,6 @@ body.mc .mc-thanh .mc-lv-bg{gap:.45em;padding:0 .8em}
 @media (max-width:1500px){.mc-lv-cum small,.mc-lv-bg span{display:none}body.mc-live .mc-thanh{gap:calc(var(--u)*.3)}.mc-lv-cum>span{padding:0 .6em}}
 body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
 .mc-lv-nhac{display:inline-flex;align-items:center;height:calc(var(--u)*2.3);padding:0 1em;border-radius:999px;background:var(--mc-thanh-nen);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-phu);font:600 calc(var(--u)*.9) var(--mc-sans);white-space:nowrap;font-variant-numeric:tabular-nums}
-body.mc-live .mc-thanh [data-k="?"]{display:none}
 /* thẻ nổi neo trên thanh */
 .mc-lv-the,.mc-lv-roi{position:fixed;right:calc(var(--u)*.75);bottom:calc(var(--u)*5);z-index:45;font-family:var(--mc-sans);color:var(--mc-bang-chu)}
 .mc-lv-roi{display:flex;flex-direction:column;align-items:flex-end;gap:calc(var(--u)*.6)}
@@ -110,15 +107,14 @@ body.mc-live .mc-thanh [data-k="?"]{display:none}
 /* dòng chẩn đoán mic: chữ nhỏ, chọn / chụp được */
 .mc-lv-the .mc-lv-cd{margin-top:calc(var(--u)*.6);font:500 calc(var(--u)*.72)/1.4 var(--mc-sans);color:var(--mc-bang-phu);opacity:.85;user-select:text;overflow-wrap:anywhere}
 .mc-lv-the .mc-lv-cd:empty{display:none}
-/* 11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh); lúc live các nút phím của thanh gom vào một nút lưới, bấm thì xoè */
+/* 11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh). Dáng nút lưới «thêm» (.mc-lv-gon) khai ở đây từ bản K5; nút + khay nay dựng ở thanh-day-to-chieu.ts cho MỌI trạng thái */
 .mc-lv-the{right:auto;left:calc(var(--u)*.75)}
 body.mc .mc-thanh .mc-lv-gon{flex:none;display:inline-grid;place-items:center;width:calc(var(--u)*2.5);height:calc(var(--u)*2.5);padding:0;border:0;border-radius:50%;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);cursor:pointer}
 .mc-lv-gon[hidden]{display:none!important}
-.mc-lv-gon svg{width:55%;height:55%;fill:currentColor;transition:transform .18s}
+.mc-lv-gon svg{width:55%;height:55%;fill:currentColor;transition:transform .14s}
 .mc-lv-gon[aria-expanded="true"]{background:var(--mc-bang-chu);color:var(--mc-bang);box-shadow:none}
 .mc-lv-gon[aria-expanded="true"] svg{transform:rotate(45deg)}
 .mc-lv-gon:focus-visible{outline:3px solid var(--mc-vang-noi);outline-offset:2px}
-body.mc-live:not(.mc-lv-xoe) .mc-thanh>#mc-phim-nhom,body.mc-live:not(.mc-lv-xoe) .mc-thanh>#mc-len-bang,body.mc-live:not(.mc-lv-xoe) .mc-thanh>#mc-cai-btn{display:none!important}
 @media (prefers-reduced-motion:reduce){.mc-lv-gon svg{transition:none}}
 @media (prefers-reduced-motion:reduce){.mc-lv-vien.nhay,.mc-lv-cum .im{animation:none}.mc-lv-thuoc i{transition:none}}
 html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
@@ -126,8 +122,8 @@ html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
 
 export const JS_LIVE_TO_CHIEU = `
   // ── V · live bảng (thầy 10/11) — mặt của tờ; máy chạy ở app: src/components/live/thay-noi.ts ──
-  var LV = { tt: null, moRoi: false, hRoi: 0, roiCu: '', hDh: 0, anhXong: false, vungCu: '', moTay: false, giayCu: '', hGon: 0 };
-  var lvNut = document.createElement('button'), lvCum = document.createElement('button'), lvGon = document.createElement('button');
+  var LV = { tt: null, moRoi: false, hRoi: 0, roiCu: '', hDh: 0, anhXong: false, vungCu: '', moTay: false, giayCu: '' };
+  var lvNut = document.createElement('button'), lvCum = document.createElement('button');
   var lvThe = tao('div', 'mc-lv-the', body), lvRoi = tao('div', 'mc-lv-roi', body), lvVien = tao('div', 'mc-lv-vien', body);
   var LV_BT = {
     mic: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>',
@@ -147,19 +143,13 @@ export const JS_LIVE_TO_CHIEU = `
   function lvVung() { return window.__mcBut && window.__mcBut.vung ? window.__mcBut.vung() : {}; }
   function lvDongHo(tu) { var s = Math.max(0, Math.floor((Date.now() - tu) / 1000)), p = Math.floor(s / 60); s = s % 60; return (p < 10 ? '0' : '') + p + ':' + (s < 10 ? '0' : '') + s; }
   function lvLau(luc) { var s = Math.max(0, Math.floor((Date.now() - luc) / 1000)); return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
-  lvNut.type = lvCum.type = lvGon.type = 'button';
-  lvGon.className = 'mc-lv-gon'; lvGon.hidden = true; lvGon.setAttribute('aria-expanded', 'false'); lvGon.setAttribute('aria-label', 'Các nút điều khiển'); lvGon.title = 'Các nút điều khiển (phím tắt vẫn dùng được)';
-  lvGon.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>';
+  lvNut.type = lvCum.type = 'button';
   lvNut.className = 'mc-lv-nut'; lvNut.hidden = true; lvNut.setAttribute('aria-label', 'Bật live'); lvNut.title = 'Live: cả lớp xem bảng + nghe thầy trên máy (phím V)'; lvNut.innerHTML = '<i></i>Live';
   lvCum.className = 'mc-lv-cum'; lvCum.hidden = true;
   lvThe.hidden = lvRoi.hidden = lvVien.hidden = true;
   lvThe.setAttribute('role', 'dialog'); lvThe.setAttribute('aria-label', 'Bật live');
-  // nút Live + viên đỏ + nút lưới đứng ĐẦU thanh (mép trái) ⇒ cửa sổ của nút Live mở ngay phía trên, sát mép trái
-  (function () { var c = thanh ? thanh.firstChild : null; if (thanh) { thanh.insertBefore(lvNut, c); thanh.insertBefore(lvCum, c); thanh.insertBefore(lvGon, c); } })();
-  function lvXoe(mo) { clearTimeout(LV.hGon); body.classList.toggle('mc-lv-xoe', !!mo); lvGon.setAttribute('aria-expanded', mo ? 'true' : 'false'); if (mo) LV.hGon = setTimeout(function () { lvXoe(false); }, 8000); }
-  lvGon.addEventListener('click', function (e) { e.stopPropagation(); lvXoe(!body.classList.contains('mc-lv-xoe')); });
-  if (thanh) thanh.addEventListener('pointerdown', function () { if (body.classList.contains('mc-lv-xoe')) lvXoe(true); }, true);
-  document.addEventListener('pointerdown', function (e) { if (body.classList.contains('mc-lv-xoe') && thanh && !thanh.contains(e.target)) lvXoe(false); }, true);
+  // nút Live + viên đỏ đứng ĐẦU thanh (mép trái) ⇒ cửa sổ của nút Live mở ngay phía trên, sát mép trái. Nút «thêm» + khay: thanh-day-to-chieu.ts
+  (function () { var c = thanh ? thanh.firstChild : null; if (thanh) { thanh.insertBefore(lvNut, c); thanh.insertBefore(lvCum, c); } })();
   function lvBam() { if (!LV.tt || !LV.tt.co) { baoNhanh('Mở Điểm danh (Bình Phản Ứng) trước rồi bật Live', 2200); return; } lvGui('bam'); }
   lvNut.addEventListener('click', lvBam); lvCum.addEventListener('click', lvBam);
   document.addEventListener('keydown', function (e) {
@@ -249,14 +239,15 @@ export const JS_LIVE_TO_CHIEU = `
         mi = LV.tt.mic || { tinh: 'chua', ten: '', loc: false, cheDo: 'tu', locOn: 'vua', locOnChay: 'tat' };
         h += '</select></label><div class="mc-lv-dong"><span>' + (LV.tt.pha !== 'live' ? 'Mức âm khi thầy nói thử' : LV.tt.nghi ? 'Đang tạm dừng — lớp không nghe' : 'Mức âm đang gửi cho lớp') + '</span><span id="mc-lv-nx"></span></div><div class="mc-lv-thuoc"><i id="mc-lv-th"></i></div>';
         if (LV_MIC[mi.tinh]) h += '<p class="loi" role="alert">' + LV_MIC[mi.tinh] + '</p>';
-        // khử vọng + lọc ồn làm đục giọng ⇒ «Tự động» chỉ bật khi có đường vọng (máy em trong lớp phát loa — «Tất cả»); thầy ép tay được
+        // khử vọng + lọc ồn làm đục giọng ⇒ «Tự động» chỉ bật khi có đường vọng (loa máy thầy đang phát tiếng em nói); thầy ép tay được
         // LỌC ỒN RIÊNG (11/11): ba mức, tách khỏi khử vọng. Máy không chạy được bộ lọc riêng ⇒ nói rõ, nút vẫn ghi nhớ lựa chọn.
         h += '<div class="mc-lv-dong"><span><b>Lọc ồn</b><br>' + (mi.locOnChay === 'khong' ? 'Máy này chưa chạy được bộ lọc riêng' : mi.locOnChay === 'loi' ? 'Chưa tải được bộ lọc — đang không lọc' : mi.locOnChay === 'tai' ? 'Đang tải bộ lọc…' : mi.locOn === 'manh' ? 'Mạnh — phòng ồn; lúc im lọc sâu hơn' : mi.locOn === 'tat' ? 'Tắt — giữ nguyên tiếng mic' : 'Vừa — bớt ồn nền, giữ giọng tự nhiên') + '</span><span style="display:inline-flex;gap:.3em">'
           + '<button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="manh" aria-pressed="' + (mi.locOn === 'manh') + '">Mạnh</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="vua" aria-pressed="' + (mi.locOn !== 'manh' && mi.locOn !== 'tat') + '">Vừa</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="tat" aria-pressed="' + (mi.locOn === 'tat') + '">Tắt</button></span></div>';
         h += '<div class="mc-lv-dong"><span><b>Khử vọng</b><br>' + (mi.loc ? 'Đang bật — chống vọng, chống hú' : 'Đang tắt — giọng trong nhất') + '</span><span style="display:inline-flex;gap:.3em">'
           + '<button type="button" class="mc-lv-n nho" data-lv="loc" data-c="tu" aria-pressed="' + (mi.cheDo === 'tu') + '">Tự động</button><button type="button" class="mc-lv-n nho" data-lv="loc" data-c="bat" aria-pressed="' + (mi.cheDo === 'bat') + '">Bật</button><button type="button" class="mc-lv-n nho" data-lv="loc" data-c="tat" aria-pressed="' + (mi.cheDo === 'tat') + '">Tắt</button></span></div>';
       }
-      h += '<div class="mc-lv-dong"><span><b>Tiếng trên máy em</b><br>' + (t.tiengLop ? 'Mọi máy em đang phát tiếng thầy' : 'Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe') + (LV.tt.pha === 'live' ? '<br><b>' + (LV.tt.nghe || 0) + '</b> em đang nghe qua máy' : '') + '</span><span style="display:inline-flex;gap:.4em">'
+      // 11/11 lần 4: «Tất cả» là mặc định ⇒ chữ đúng cả lúc chưa live + dòng phụ nhắc vọng tiếng
+      h += '<div class="mc-lv-dong"><span><b>Tiếng trên máy em</b><br>' + (t.tiengLop ? (LV.tt.pha === 'live' ? 'Mọi máy em đang phát tiếng thầy' : 'Bật live là mọi máy em phát tiếng thầy') + '<br>Máy em trong lớp đang bật tiếng: dễ vọng tiếng — nên cho em đeo tai nghe' : 'Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe') + (LV.tt.pha === 'live' ? '<br><b>' + (LV.tt.nghe || 0) + '</b> em đang nghe qua máy' : '') + '</span><span style="display:inline-flex;gap:.4em">'
         + '<button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="0" aria-pressed="' + (!t.tiengLop) + '">Em ở xa</button><button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="1" aria-pressed="' + (!!t.tiengLop) + '">Tất cả</button></span></div>';
     }
     // điểm quyết 4: mặc định TẮT, thầy bật từng buổi — chỉ em có tên trong lớp, đã đăng nhập; không điểm danh, không đội, không kJ
@@ -296,8 +287,7 @@ export const JS_LIVE_TO_CHIEU = `
   function lvVe() {
     var t = LV.tt, live = !!t && t.pha === 'live', dang = !!t && t.pha === 'dang-bat', h, i, khoa;
     lvNut.hidden = !t || !t.co || live || dang;
-    lvCum.hidden = !(live || dang); lvGon.hidden = !live;
-    if (!live && body.classList.contains('mc-lv-xoe')) lvXoe(false);
+    lvCum.hidden = !(live || dang);
     body.classList.toggle('mc-live', live);
     clearInterval(LV.hDh);
     if (dang) { lvCum.className = 'mc-lv-cum'; lvCum.innerHTML = '<span><i class="cham"></i>Đang bật live…</span>'; }
@@ -385,6 +375,8 @@ export const JS_LIVE_TO_CHIEU = `
   });
   ['mc-doi-pha', 'mc-bo-cuc-xong'].forEach(function (t) { document.addEventListener(t, function () { if (LV.anhXong && window.__mcBut) setTimeout(function () { lvBaoVung(window.__mcBut.trang()); }, 650); }); });
   window.addEventListener('resize', function () { if (LV.anhXong && window.__mcBut) setTimeout(lvAnh, 300); });
+  // Giấy đề vừa cuộn xong (bút: but-cuon-giay-to-chieu.ts): đo lại giấy NGAY, không chờ nhịp 1 giây ⇒ chữ và nét trên máy em dời cùng lúc.
+  document.addEventListener('mc-giay-cuon', function () { lvBaoGiay(); });
   window.addEventListener('message', function (e) {
     var m = e.data, truoc;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;

@@ -406,6 +406,7 @@ export default defineConfig({
           '**/TrinhPhat-*.{js,css}',
           '**/MoTuThay-*.js', // cửa app thầy bấm «Mở» ở Lịch sử Live (nhập lười) — bọc mỏng quanh mảnh xem-lai-live
           '**/ve-bang-*.js',
+          '**/GiayDung-*.js', // giấy đề kiểu tờ chiếu dùng chung bảng live + trình phát (11/11) — chỉ nạp khi live / xem lại
           '**/so-do-????????.js', // 11/11 bộ đo trễ Live (chỉ lớp Live của thầy / em dùng): tách ra thành mảnh riêng sau Xem lại Live ⇒ kho chạy-lúc, precache giữ ≤ 170
           '**/so-net-*.js',
           '**/ma-net-*.js',
@@ -730,6 +731,9 @@ export default defineConfig({
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
             // XEM LẠI LIVE máy em (11/11): danh sách + trang buổi + lớp gọi máy chủ gom MỘT mảnh tên cố định (cửa `hs/index.ts` — tên tự sinh là `index-*`, quá chung)
             // ⇒ globIgnores + kho tải ngầm học sinh bắt đúng nó. Trình phát (TrinhPhat + máy phát nét, kho nét, đồng hồ) là mảnh lười riêng `TrinhPhat-*`.
+            // BẢNG LIVE hai khung độc lập (11/11): phần dùng chung của bảng live và trình phát (KhungDocLap + bố cục + lớp vẽ + cây bút + dò cỡ giấy) giữ MỘT mảnh
+            // tên `ve-bang-*` như trước khi có KhungDocLap (tên tự sinh đổi thành `KhungDocLap-*` ⇒ lọt khỏi globIgnores `ve-bang-*`, precache 169 → 170).
+            { name: 've-bang', test: /src[\\/]components[\\/]live[\\/](?:KhungDocLap\.tsx|bo-cuc-doc-lap\.ts|ve-bang\.ts|tro-but\.ts|vua-giay\.ts)$/, includeDependenciesRecursively: false },
             { name: 'xem-lai-live', test: /src[\\/]screens[\\/]live-xem-lai[\\/]hs[\\/](?!TrinhPhat\.tsx|may-phat\.ts|kho-net\.ts|dong-ho\.ts|phat\.css)[^\\/]+$/, includeDependenciesRecursively: false },
             // 22/10 (màn thi nạp lười Phiếu của em): các mô-đun nhỏ (+ zustand của appStore) CHỈ đi cùng App (đường /gv /p /ph /t, không đường học sinh) bị Rolldown tách
             // thành nhiều tệp ⇒ gom MỘT mảnh: cùng tập đường nên không đường nào tải thêm byte, bớt tệp precache và phần đầu nén từng tệp.

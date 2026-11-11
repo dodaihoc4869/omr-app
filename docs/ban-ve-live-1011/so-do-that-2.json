@@ -1,14 +1,42 @@
 {
-  "luc": "2026-11-11T06:11:27.348Z",
+  "luc": "2026-11-11T09:26:12.144Z",
   "ghiChu": "Chromium thật, phòng thật trong Node, dữ liệu giả; KHÔNG có tiếng (SFU chưa cấu hình ở máy chủ thử).",
   "soDo": {
-    "k1_gui_toi_bang_ms": 42.7,
+    "k1_gui_toi_bang_ms": 50.6,
     "b1_so_khoi_chu": 5,
     "b1_lech_lon_nhat_phan_nghin_be_rong_giay": 1,
-    "k2_tin_phong_toi_bang_ms": 35.8,
-    "k3_tam_dung_toi_may_em_ms": 122,
-    "k3_tiep_tuc_toi_may_em_ms": 85,
-    "k1_gui_toi_bang_lan_2_ms": 33
+    "dl_net_khop_chu": {
+      "lech_ngang_phan_tram_be_rong_chu": 0,
+      "net_duoi_day_dong_chu_px": 2,
+      "co_chu_de_px": 23.88
+    },
+    "phu_kin_phan_tram": {
+      "844x390": 96.4,
+      "667x375": 96,
+      "1180x820": 97.9,
+      "1971x1247": 98.7,
+      "iPhone dọc xoay 844x390": 96.4
+    },
+    "dl_667_bang_no": {
+      "truoc": {
+        "giay": 523,
+        "bang": 131
+      },
+      "sau": {
+        "giay": 418,
+        "bang": 236,
+        "chu": 15.01
+      }
+    },
+    "k2_tin_phong_toi_bang_ms": 62.1,
+    "dai_luot_px": {
+      "chua_doan": 552,
+      "da_doan": 306,
+      "cao": 34
+    },
+    "k3_tam_dung_toi_may_em_ms": 133,
+    "k3_tiep_tuc_toi_may_em_ms": 128,
+    "k1_gui_toi_bang_lan_2_ms": 43.5
   },
   "kiem": [
     {
@@ -22,12 +50,12 @@
       "them": "mép trái cửa sổ 10 px"
     },
     {
-      "ten": "K5 · đang live: thanh dưới gom — nhóm phím / «Lên bảng» / «Cài đặt» ẩn sau MỘT nút lưới",
+      "ten": "K5 · đang live: nút phụ nằm trong khay đang đóng; trên thanh còn «Lên bảng» + nút «thêm»",
       "dat": true,
       "them": ""
     },
     {
-      "ten": "K5 · bấm nút lưới ⇒ các nút xoè ra, không tràn màn 1366",
+      "ten": "K5 · bấm nút «thêm» ⇒ khay xoè, nằm trọn trong màn 1366",
       "dat": true,
       "them": ""
     },
@@ -42,29 +70,39 @@
       "them": ""
     },
     {
-      "ten": "M3 · máy em đang làm bài: tay nắm nằm giữa MÉP TRÊN (không viên nổi đáy màn, không còn ở mép trái), chưa vào bảng",
+      "ten": "P · máy em đang làm bài: MỘT tay nắm sát MÉP PHẢI (không còn ở mép trên / mép trái, không nút nổi nào khác), chưa vào bảng",
       "dat": true,
-      "them": "viên [172,5,218,12]"
+      "them": "viên [382,298,387,338]"
     },
     {
-      "ten": "M3 · tay nắm ở trên đầu thẻ đội / tên: không đè chữ thẻ, không đè ô kJ, không đè ngọn lửa đội, không đè nút «Gửi»",
+      "ten": "P · tay nắm đứng TRÊN nút «Gửi» nổi: vùng chạm 44 × 76 không chạm nút «Gửi» (cách ≥ 8 px), không đè thẻ đội / ô kJ",
       "dat": true,
-      "them": "{\"tieu\":[66,18,304,58],\"kj\":[314,16,374,60],\"gui\":[410,380,466,464]}"
+      "them": "{\"nam\":[346,280,390,356],\"gui\":[322,380,378,464]}"
     },
     {
-      "ten": "M3 · chạm tay nắm ⇒ khay xổ từ mép trên xuống, có «Thầy đang live»",
+      "ten": "P · chạm tay nắm ⇒ khay trượt ra từ phải, dừng BÊN TRÁI cột nút «Gửi» (không che nút), nằm gọn trong màn, có «Thầy đang live»",
+      "dat": true,
+      "them": "{\"khay\":[96,321,312,523],\"gui\":[322,380,378,464]}"
+    },
+    {
+      "ten": "P · khay còn mở ở giây thứ 3 (tự thu sau 4 giây không chạm)",
       "dat": true,
       "them": ""
     },
     {
-      "ten": "K4 · khay tự ẩn sau 3 giây",
+      "ten": "P · khay tự thu sau 4 giây",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "P · chạm ra ngoài khay ⇒ thu ngay",
       "dat": true,
       "them": ""
     },
     {
       "ten": "K1 · em bấm Gửi ⇒ máy em TỰ về bảng live (≤ 200 ms từ cú bấm)",
       "dat": true,
-      "them": "42.7 ms"
+      "them": "50.6 ms"
     },
     {
       "ten": "K6 · vào bảng sau khi gửi: không có viên «Thầy đang live» chớp giữa màn",
@@ -89,37 +127,112 @@
     {
       "ten": "B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)",
       "dat": true,
-      "them": "74 mẫu điểm ảnh có mực trong ô giấy"
+      "them": "965 điểm ảnh có mực trên lớp nét của giấy"
     },
     {
-      "ten": "M3 · bảng live: tay nắm giữa MÉP TRÊN, không đè giấy đề, không đè bảng đen; không còn nút nổi nào trên bảng",
+      "ten": "ĐL · nét gạch chân KHỚP chữ trên giấy đã phóng (hai đầu nét lệch ≤ 2 % bề ngang khối đề; nét nằm ngay dưới dòng chữ, cách ≤ 0,4 cỡ chữ)",
       "dat": true,
-      "them": "viên [399,5,445,12] · giấy [69,23,536,385]"
+      "them": "{\"lech_ngang_phan_tram_be_rong_chu\":0,\"net_duoi_day_dong_chu_px\":2,\"co_chu_de_px\":23.88}"
     },
     {
-      "ten": "M3 · khay xổ từ mép trên, nằm gọn trong màn: mạng · tiếng · đội + kJ",
+      "ten": "ĐL · 844 × 390, bảng trống ⇒ GIẤY được ưu tiên: chữ đề ≥ 22 px (bản một-phép-co: 17,7 px), tấm giấy rộng bằng khung giấy và cao hơn khung (cuộn được)",
       "dat": true,
-      "them": "10–221 px · Thầy đang im Tiếng Đang tắt Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai"
+      "them": "chữ đề 23.88 px"
     },
     {
-      "ten": "M3 · khổ 667 × 375: tay nắm giữa mép trên, không đè giấy đề / bảng đen",
+      "ten": "P · bảng live 844 × 390: MỘT tay nắm sát mép phải, giữa chiều cao; không còn nút / viên / huy hiệu nổi nào trên bảng",
       "dat": true,
-      "them": "viên [311,5,357,12] · giấy [5,28,440,365]"
+      "them": "viên [836,175,841,215]"
     },
     {
-      "ten": "M3 · khổ 1180 × 820: tay nắm giữa mép trên, không đè giấy đề / bảng đen",
+      "ten": "P · 844 × 390: giấy + bảng PHỦ KÍN ≥ 92 % khung nhìn, lề ngoài ≤ 6 px, khe giữa ≤ 6 px",
       "dat": true,
-      "them": "viên [567,5,613,12] · giấy [8,120,778,718]"
+      "them": "96.4 % · giấy [4,4,669,386] · bảng [674,4,840,386]"
     },
     {
-      "ten": "K2 · trước khi gọi: máy em S2 chưa gửi, còn ở màn làm bài",
+      "ten": "ĐL · 844 × 390: ô bảng của thầy phủ hết bề ngang khung bảng (không còn dải bảng trống bên phải); tay nắm đứng trên mép phải bảng",
+      "dat": true,
+      "them": "ô bảng của thầy [674,4,840,386] · khung bảng [674,4,840,386]"
+    },
+    {
+      "ten": "ĐL · khay có hàng «Tự phóng theo thầy», đang bật (em chưa kéo vạch chia)",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "P · khay trượt ra từ mép phải, nằm gọn trong màn, đè lên mép bảng (không đẩy bố cục): mạng · tiếng · đội + kJ",
+      "dat": true,
+      "them": "620–836 × 65–325 px · Thầy đang im Tiếng Đang bật Loa Mặc định của máy — Fake Default Audio Output Fak"
+    },
+    {
+      "ten": "P · chạm ra ngoài ⇒ khay thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "P · vuốt từ mép phải vào (trên tay nắm) ⇒ khay bám ngón tay rồi mở",
+      "dat": true,
+      "them": "{\"kieu\":\"translate3d(52px, -50%, 0px)\",\"phai\":888}"
+    },
+    {
+      "ten": "P · khay tự thu sau 4 giây không chạm",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "P · bốn dấu trạng thái (dựng tay): mỗi dấu 15 px, xếp dọc ngay trên viên thuốc, sát mép phải, không ra ngoài màn",
+      "dat": true,
+      "them": "[[828,156,15,15],[828,138,15,15],[828,120,15,15],[828,102,15,15]]"
+    },
+    {
+      "ten": "P · khổ 667 × 375: giấy + bảng phủ kín ≥ 92 %, lề ngoài ≤ 6 px bốn phía; tay nắm sát mép phải, giữa chiều cao",
+      "dat": true,
+      "them": "96 % · giấy [4,4,527,371] · bảng [532,4,663,371] · ô bảng của thầy [532,4,663,371]"
+    },
+    {
+      "ten": "GIẤY ĐỀ máy em · khổ 667 × 375: có khổ, trong khung nhìn, có chữ đề, không bị phủ",
+      "dat": true,
+      "them": "{\"co\":true,\"x\":4,\"y\":4,\"w\":523,\"h\":367,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"667x375\"}"
+    },
+    {
+      "ten": "P · thầy viết sát mép phải ngang tầm tay nắm ⇒ tay nắm MỜ HẲN (không chặn nhìn nét); bút đi khỏi ⇒ rõ lại",
+      "dat": true,
+      "them": "{\"truoc\":\"1\",\"luc\":{\"ne\":true,\"mo\":\"0.16\"},\"sau\":{\"ne\":false,\"mo\":\"1\"}}"
+    },
+    {
+      "ten": "ĐL · 667 × 375: thầy viết trên bảng quá 2 giây ⇒ khung bảng nở (rộng hơn lúc giấy được ưu tiên ≥ 60 %), chữ đề KHÔNG dưới 15 px",
+      "dat": true,
+      "them": "{\"truoc\":{\"giay\":523,\"bang\":131},\"sau\":{\"giay\":418,\"bang\":236,\"chu\":15.01}}"
+    },
+    {
+      "ten": "P · khổ 1180 × 820: giấy + bảng phủ kín ≥ 92 %, lề ngoài ≤ 6 px bốn phía; tay nắm sát mép phải, giữa chiều cao",
+      "dat": true,
+      "them": "97.9 % · giấy [4,4,580,816] · bảng [585,4,1176,816] · ô bảng của thầy [585,4,1176,816]"
+    },
+    {
+      "ten": "GIẤY ĐỀ máy em · khổ 1180 × 820: có khổ, trong khung nhìn, có chữ đề, không bị phủ",
+      "dat": true,
+      "them": "{\"co\":true,\"x\":4,\"y\":4,\"w\":576,\"h\":812,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"1180x820\"}"
+    },
+    {
+      "ten": "P · khổ 1971 × 1247: giấy + bảng phủ kín ≥ 92 %, lề ngoài ≤ 6 px bốn phía; tay nắm sát mép phải, giữa chiều cao",
+      "dat": true,
+      "them": "98.7 % · giấy [4,4,1152,1243] · bảng [1157,4,1967,1243] · ô bảng của thầy [1157,4,1967,1243]"
+    },
+    {
+      "ten": "GIẤY ĐỀ máy em · khổ 1971 × 1247: có khổ, trong khung nhìn, có chữ đề, không bị phủ",
+      "dat": true,
+      "them": "{\"co\":true,\"x\":4,\"y\":4,\"w\":1148,\"h\":1239,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"1971x1247\"}"
+    },
+    {
+      "ten": "K2 · trước khi gọi: máy em S2 chưa gửi (đang chọn dở phương án A), còn ở màn làm bài",
       "dat": true,
       "them": ""
     },
     {
       "ten": "K2 · thầy gọi lên bảng ⇒ máy em chưa gửi vào bảng live NGAY (≤ 200 ms từ tin phòng)",
       "dat": true,
-      "them": "35.8 ms"
+      "them": "62.1 ms"
     },
     {
       "ten": "K2 · không ai gửi hộ đáp án em chọn dở (phòng không có bài của S2)",
@@ -132,9 +245,44 @@
       "them": ""
     },
     {
+      "ten": "P · iPhone máy dọc xoay CSS: tay nắm ở mép phải của HÌNH (đáy máy), giữa chiều cao hình; giấy + bảng phủ kín ≥ 92 %",
+      "dat": true,
+      "them": "96.4 % · viên [836,175,841,215]"
+    },
+    {
+      "ten": "P · dải lượt (chưa đoán): DẢI MỎNG sát đáy hình, cao ≤ 36 px, cách đáy ≤ 8 px — che không quá một dòng",
+      "dat": true,
+      "them": "dải [8,350,560,384]"
+    },
+    {
+      "ten": "P · iPhone xoay + vùng an toàn (giả 47 / 34): giấy chừa tai thỏ bên trái hình, bảng + tay nắm chừa thanh home bên phải hình",
+      "dat": true,
+      "them": "giấy [51,4,469,386] · bảng [474,4,806,386] · viên [802,175,807,215]"
+    },
+    {
+      "ten": "P · iPhone xoay: khay ra từ mép phải của hình (đáy máy), trên thanh home, gọn trong màn",
+      "dat": true,
+      "them": "[35,586,355,802]"
+    },
+    {
+      "ten": "P · iPhone xoay: chạm hai lần vào bảng đen vẫn phóng bảng (ô bảng của thầy to ra), có dòng «Chạm hai lần để về toàn cảnh»",
+      "dat": true,
+      "them": "382 → 591 px"
+    },
+    {
+      "ten": "P · iPhone xoay: chạm hai lần nữa ⇒ về toàn cảnh, dải lượt hiện lại",
+      "dat": true,
+      "them": ""
+    },
+    {
       "ten": "B3 · bấm trên dải ⇒ phòng nhận đoán + tiếp sức của S2",
       "dat": true,
       "them": "{\"doan\":1,\"tiep\":1}"
+    },
+    {
+      "ten": "P · em đoán xong ⇒ dải thu về MỘT VIÊN NHỎ: chỉ còn tên bạn + điều em đoán + nút tiếp sức, hẹp hơn hẳn, cao ≤ 36 px",
+      "dat": true,
+      "them": "552 → 306 px · Ha Em đoán Thị Hà làm đúng Cổ vũ · 1/10"
     },
     {
       "ten": "K3 · bấm viên Live ⇒ cửa sổ có «Tạm dừng», «Kết thúc live», công tắc «Bảng → máy em»",
@@ -144,12 +292,12 @@
     {
       "ten": "M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)",
       "dat": true,
-      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng tắt · lọc ồn tắt · tự chỉnh bật · cách mở 1/4 · mức tại mic 0 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khu"
+      "them": "Fake Default Audio Input · luồng đang chạy · 44100 Hz · 2 kênh · khử vọng tắt · lọc ồn tắt · tự chỉnh tắt · cách mở 3/4 · mức tại mic 0 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khu"
     },
     {
       "ten": "M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)",
       "dat": true,
-      "them": "nút «Tự động» đang ấn: 1 · put Mic: Fake Audio Input 1 Mic: Fake Audio Input 2 Mức âm đang gửi cho lớp Chưa nghe thấy Lọc ồn Vừa — bớt ồn nền, giữ giọng tự nhiên Mạnh Vừa Tắt Khử vọng Đang tắt — giọng trong "
+      "them": "nút «Tự động» đang ấn: 1 · put Mic: Fake Audio Input 1 Mic: Fake Audio Input 2 Mức âm đang gửi cho lớp Chưa nghe thấy Lọc ồn Vừa — bớt ồn nền, giữ giọng tự nhiên Bộ lọc sâu đã sẵn sàng — sẽ chuyển sang ở quã"
     },
     {
       "ten": "M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung",
@@ -164,12 +312,12 @@
     {
       "ten": "M2 · thầy ép «Bật» ⇒ mic mở lại với khử vọng + lọc ồn bật (dòng chẩn đoán đổi theo)",
       "dat": true,
-      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng bật · lọc ồn bật · tự chỉnh bật · cách mở 1/4 · mức tại mic 0 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khung) · lọc ồn vua (chay) · bộ đo running | bấm=bat"
+      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng bật · lọc ồn bật · tự chỉnh bật · cách mở 1/4 · mức tại mic 5 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật (khung) · lọc ồn vua (chay, bộ nhẹ) · bộ đo running | bấm=bat"
     },
     {
       "ten": "K3 · «Tạm dừng» ⇒ máy em hiện «Thầy tạm dừng live» (≤ 500 ms kể từ lúc bấm)",
       "dat": true,
-      "them": "122 ms"
+      "them": "133 ms"
     },
     {
       "ten": "K3 · viên Live ghi «TẠM DỪNG», cửa sổ đổi thành «Tiếp tục»; phiên live giữ nguyên",
@@ -179,22 +327,22 @@
     {
       "ten": "GIẤY ĐỀ máy em · đang tạm dừng: có khổ, trong khung nhìn, có chữ đề, không bị phủ",
       "dat": true,
-      "them": "{\"co\":true,\"x\":69,\"y\":23,\"w\":466,\"h\":362,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"844x390\"}"
+      "them": "{\"co\":true,\"x\":4,\"y\":4,\"w\":418,\"h\":382,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"844x390\"}"
     },
     {
       "ten": "K3 · đang tạm dừng: nét thầy viết lên bảng KHÔNG tới máy em",
       "dat": true,
-      "them": "mực trong ô bảng máy em 0 → 0"
+      "them": "mực trong ô bảng máy em 25 → 25"
     },
     {
       "ten": "GIẤY ĐỀ máy em · sau khi tiếp tục: có khổ, trong khung nhìn, có chữ đề, không bị phủ",
       "dat": true,
-      "them": "{\"co\":true,\"x\":69,\"y\":23,\"w\":466,\"h\":362,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"844x390\"}"
+      "them": "{\"co\":true,\"x\":4,\"y\":4,\"w\":418,\"h\":382,\"trong\":true,\"chu\":\"Câu 1 Phần I · Trắc nghiệm Alcohol nào sau đây là alcohol bậ\",\"phu\":false,\"nen\":\"rgb(244, 239, 228)\",\"mau\":\"rgb(34, 38, 43)\",\"man\":\"844x390\"}"
     },
     {
       "ten": "K3 · «Tiếp tục» ⇒ máy em hết dải dừng (≤ 500 ms), nét viết lúc dừng tới máy em một lượt",
       "dat": true,
-      "them": "85 ms · mực trong ô bảng 0 → 55"
+      "them": "128 ms · mực trong ô bảng 25 → 183"
     },
     {
       "ten": "B2 · thẻ «em rời màn» ghi KIỂU rời (Chromium máy tính không phân biệt được khoá màn ⇒ «thoát app hoặc khoá màn»)",
@@ -204,20 +352,20 @@
     {
       "ten": "Chạm hai lần vào bảng đen ⇒ phóng bảng (ô bảng rộng hơn), có dòng «Chạm hai lần để về toàn cảnh»",
       "dat": true,
-      "them": "233 → 243 px"
+      "them": "413 → 836 px"
     },
     {
-      "ten": "Thầy chuyển câu ⇒ máy em về màn câu hỏi để làm (live còn, tay nắm mép trái)",
+      "ten": "Thầy chuyển câu ⇒ máy em về màn câu hỏi để làm (live còn, tay nắm mép phải)",
       "dat": true,
       "them": ""
     },
     {
       "ten": "K1 · câu thứ hai: gửi xong lại tự về bảng live",
       "dat": true,
-      "them": "33 ms"
+      "them": "43.5 ms"
     },
     {
-      "ten": "K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», thanh hết gom",
+      "ten": "K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», nút «thêm» vẫn ở cuối thanh",
       "dat": true,
       "them": ""
     },

@@ -11,10 +11,10 @@
 // TRÊN GIẤY (nét trên bảng đen không bị ảnh hưởng) + số đo `live-do` mang cờ `gl`.
 import { Fragment, memo, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type ReactNode } from 'react'
 import type { GiayThay as BoCucGiay } from '../../lib/bpu/phong-live'
+import { TEN_PHAN } from './GiayDung'
 
 /** Phần câu công khai giấy soi cần (không có đáp án). */
 export interface CauGiay { phan: string; text?: string; choices?: readonly string[]; ideas?: readonly string[] }
-const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
 /** Chỉ số trong một khối của bố cục (xem `GiayThay` ở phong-live.ts). */
 const LOAI = 0, TT = 1, X = 2, Y = 3, W = 4, H = 5, CO = 6, DONG = 7, DAM = 8, HET_X = 9, HET_Y = 10
 /** Bộ dựng chữ có công thức Hoá của màn làm bài (`ChemText`). */

@@ -17,6 +17,11 @@
 //     Khung nào không có đuôi nét mà bàn tay y như khung trước thì KHÔNG vẽ gì. `datBut` mỗi khung trước `veSong`.
 //   · LỚP RỖNG THÌ ẨN (11/11): mỗi khung hình trình duyệt phải nộp lại MỌI canvas đang hiện, vẽ hay không (đo máy em CPU ×4, 5,2 giây viết: 1552 ms cho ba
 //     lớp, còn 741 ms khi ẩn lớp giấy đang rỗng). Lớp giấy chưa có nét ⇒ `visibility: hidden`; khung bảng cuộn chưa có nét ⇒ cũng ẩn.
+//   · GIẤY VÀ BẢNG CO GIÃN ĐỘC LẬP (11/11 chiều, thầy: «Làm chuẩn cái này luôn nhé. Tối ưu cho hs nhất có thể»): `KhungVe.dl` có ⇒ HAI phép biến đổi —
+//     nét giấy theo (Wv, Hv, ox, oy) như cũ nhưng lớp chốt của giấy là ĐÚNG TẤM GIẤY (nằm trong khung cuộn của giấy, trình duyệt cuộn nó cùng chữ đề),
+//     nét bảng «b_…» theo cửa sổ thầy ảo riêng (`dl.bWv…`). Lớp «đang viết» vẫn là MỘT canvas chạy trong cả hình: đuôi nét giấy trừ độ cuộn của giấy
+//     (`datCuonGiay`), đuôi nét bảng trừ độ cuộn của bảng, mỗi đuôi cắt theo ô nhìn của vùng nó. Ô nhìn của bảng thấp hơn tầm nhìn của thầy (bảng phóng
+//     to) ⇒ máy em tự trôi theo bút TRONG tầm nhìn của thầy. Em tự vuốt bảng xem lại: `vuotBang`. `dl` vắng ⇒ y như trước (một phép co).
 import type { KhungBut, LoiBut, NetBut, SuKienBut, XuLyBut } from '../../lib/but-bang-loi'
 import { giaiTrang, VUNG_MAC_DINH, type O4 } from './bo-cuc'
 import { O_TAY, coTay, taoTroBut, tiLeTay, veTay, type DangTay, type MauBut } from './tro-but'
@@ -40,6 +45,29 @@ export interface KhungVe {
   w: number
   h: number
   dpr: number
+  /** Bố cục độc lập (bo-cuc-doc-lap.ts): có ⇒ các số ở trên là của GIẤY (canvas chốt = tấm giấy), bảng đen theo phép riêng. Vắng ⇒ một phép co như cũ. */
+  dl?: KhungDocLap
+}
+/** Mọi số là px CSS trong HÌNH (hình = cả lớp bảng live của máy em). */
+export interface KhungDocLap {
+  /** Khổ hình — lớp «đang viết» chạy trong cả hình. */
+  hw: number
+  hh: number
+  /** Ô NHÌN của giấy: góc = chỗ góc tấm giấy lúc chưa cuộn; đuôi nét trên giấy cắt theo ô này. */
+  gx: number
+  gy: number
+  gw: number
+  gh: number
+  /** Cửa sổ thầy ảo của BẢNG + góc của nó trong hình (như Wv, Hv, ox, oy, cho nét «b_…»). */
+  bWv: number
+  bHv: number
+  box: number
+  boy: number
+  /** Bề cao NHÌN THẤY của bảng đen trên máy em (có thể thấp hơn ô bảng của thầy đã phóng). */
+  bh: number
+  /** Góc của khung chứa khung cuộn bảng (`noiBang` của `taoVeBang`) trong hình. */
+  kx: number
+  ky: number
 }
 
 /** Nét dở dồn đủ ngần này điểm mới in xuống lớp chốt (chữ viết thường không tới ⇒ cả nét là MỘT đa giác, chốt xong không đổi điểm ảnh nào). */
@@ -49,11 +77,20 @@ const CAO_BANG = 2.2
 /** Trôi theo bút: hằng số thời gian (ms). */
 const TROI_MS = 110
 
-export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCanvasElement) {
+/** `noiBang`: phần tử chứa khung cuộn của bảng đen (bố cục độc lập: chính là khung bảng, để khung cuộn đi cùng khi khung bảng trượt / nở). Vắng ⇒ đặt cạnh lớp «đang viết» như cũ. */
+export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCanvasElement, noiBang?: HTMLElement | null) {
   const nguCanh = (c: HTMLCanvasElement): G2 | null => { try { return c.getContext('2d') } catch { return null } }
   const gC = nguCanh(cvChot), gS = nguCanh(cvSong)
   const coPath = typeof Path2D === 'function'
   let kv: KhungVe | null = null, KH: KhungBut | null = null
+  /** BỐ CỤC ĐỘC LẬP: khung của nét BẢNG (một phép co ⇒ trùng `KH`) · cửa sổ thầy ảo của bảng + góc · góc tấm giấy trong hình · khổ hình · góc khung chứa. */
+  let dl: KhungDocLap | null = null, KHB: KhungBut | null = null
+  let bW = 1, bH = 1, bOx = 0, bOy = 0, gX = 0, gY = 0, hW = 1, hH = 1, kX = 0, kY = 0
+  /** Độ cuộn của khung GIẤY (px CSS) — nơi dựng báo qua `datCuonGiay`. */
+  let cuonG = 0
+  /** Em đang tự vuốt bảng: tầm nhìn đứng ở `tayY` (không trôi theo bút) · trần vuốt xuống. */
+  let tuTay = false, tayY = 0, tayTran = 0
+  let daDocMau = false
   let ds: NetCoNho[] = []
   const doDang = new Map<string, NetDo>()
   /** Ô vừa vẽ trên lớp sống (px thiết bị) — khung sau xoá đúng chỗ này. */
@@ -81,7 +118,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   let cuon = 0, dich = 0, lucCuon = 0
   /** Độ cuộn của THẦY (thư viện live báo qua `datBut`); null = chưa biết ⇒ tự trôi theo bút. */
   let cuonThay: number | null = null
-  const doc = cvSong.ownerDocument, cha = cvSong.parentNode
+  const doc = cvSong.ownerDocument, cha = noiBang ?? cvSong.parentNode
   if (doc && cha) {
     // lớp vẽ dựng lại (đổi vé, đổi phòng) ⇒ gỡ khung cuộn của lần trước
     for (const c of Array.from(cha.childNodes)) if ((c as HTMLElement).className === 'lv-cuon') cha.removeChild(c)
@@ -92,14 +129,23 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     cvB.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none'
     trong.appendChild(cvB); khung.appendChild(trong)
     // khung cuộn nằm DƯỚI lớp «đang viết» (đuôi nét dở + cây bút luôn ở trên cùng, không bị ô bảng cắt)
-    cha.insertBefore(khung, cvSong)
+    if (noiBang) noiBang.appendChild(khung); else cha.insertBefore(khung, cvSong)
     gB = nguCanh(cvB)
     cvTay = doc.createElement('canvas')
     gTay = nguCanh(cvTay)
   }
-  const laBang = (n: { id: string }): boolean => !!gB && loi.laBang(n)
+  /** Nét thuộc BẢNG: mã «b_…»; bố cục độc lập còn tính cả nét mã thường BẮT ĐẦU trong ô bảng đen (bản ghi / máy thầy trước khi có mã «b_»: nét ấy vốn nằm
+   *  trên cột bảng, toạ độ theo cửa sổ thầy = toạ độ bảng lúc chưa cuộn) — hai khung co riêng nên nét phải theo phép của khung nó nằm trên. */
+  const laBang = (n: { id: string; diem?: readonly (readonly number[])[] }): boolean => {
+    if (!gB) return false
+    if (loi.laBang(n)) return true
+    const p = dl && n.diem ? n.diem[0] : undefined
+    return !!p && p[0]! >= B[0] && p[0]! <= B[2] && p[1]! >= B[1] && p[1]! <= B[3]
+  }
   const tron = (v: number): number => { const d = kv!.dpr; return Math.round(v * d) / d }
-  const cuonPx = (): number => tron(cuon * kv!.Hv)
+  const cuonPx = (): number => tron(cuon * bH)
+  /** Tầm nhìn của máy em trên bảng (số lần bề dọc cửa sổ thầy) — bố cục độc lập có thể THẤP hơn tầm nhìn của thầy. */
+  const nhinBang = (): number => (dl ? bh / bH : B[3] - B[1])
 
   /** Dựng hình bàn tay cầm bút vào canvas rời — CHỈ khi cỡ / dáng / màu / mật độ đổi. Hình ĐẶC; độ rõ đặt lúc dán. */
   function dungHinhTay(): void {
@@ -122,9 +168,9 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     cvSong.style.transform = `translate3d(${sx}px,${sy}px,0)`
   }
   /** Tô đa giác `p` (px ở màn 1920) lên `g`, gốc canvas nằm ở (gx, gy) px CSS của cửa sổ thầy ảo. */
-  function to(g: G2, p: number[], mau: string, tay: boolean, gx: number, gy: number): void {
+  function to(g: G2, p: number[], mau: string, tay: boolean, gx: number, gy: number, kk: number = KH!.k): void {
     if (!p.length) return
-    const s = kv!.dpr * KH!.k
+    const s = kv!.dpr * kk
     g.setTransform(s, 0, 0, s, -gx * kv!.dpr, -gy * kv!.dpr)
     g.globalCompositeOperation = tay ? 'destination-out' : 'source-over'; g.fillStyle = mau
     g.beginPath(); loi.veDaGiac(g, p); g.fill()
@@ -136,29 +182,29 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   /** Tô xuống lớp ĐÃ CHỐT của đúng vùng (giấy / bảng). */
   function toChot(bang: boolean, p: number[], mau: string, tay: boolean): void {
     if (!p.length) return
-    if (bang) { to(gB!, p, mau, tay, kv!.ox + bx, kv!.oy + by + goc); coBang = true }
+    if (bang) { to(gB!, p, mau, tay, bOx + bx, bOy + by + goc, KHB!.k); coBang = true }
     else { to(gC!, p, mau, tay, kv!.ox, kv!.oy); coGiay = true }
     hienLop()
   }
   /** Nét bảng có nằm trong tầm canvas bảng không (nét ngoài tầm không vẽ — tới khi canvas dời tới đó). */
   function trongTam(n: NetBut): boolean {
-    const h = loi.hop(n), y0 = (kv!.oy + by + goc) / kv!.Hv, le = 8 / kv!.Hv
-    return h[3] >= y0 - le && h[1] <= y0 + HB / kv!.Hv + le
+    const h = loi.hop(n), y0 = (bOy + by + goc) / bH, le = 8 / bH
+    return h[3] >= y0 - le && h[1] <= y0 + HB / bH + le
   }
   function veNetChot(n: NetCoNho): void {
-    if (!gC || !KH) return
-    const bang = laBang(n)
+    if (!gC || !KH || !KHB) return
+    const bang = laBang(n), K = bang ? KHB : KH
     if (bang && !trongTam(n)) return
-    const khoa = `${KH.rw}x${KH.rh}`
+    const khoa = `${K.rw}x${K.rh}`
     if (n._k !== khoa) {
-      const p = loi.dungNet(n, KH)
+      const p = loi.dungNet(n, K)
       n._k = khoa
       if (coPath) { const d = new Path2D(); loi.veDaGiac(d, p); n._d = d } else n._d = p
     }
-    const g = bang ? gB! : gC, s = kv!.dpr * KH.k
+    const g = bang ? gB! : gC, s = kv!.dpr * K.k
     if (bang) coBang = true; else coGiay = true
     hienLop()
-    g.setTransform(s, 0, 0, s, -(kv!.ox + (bang ? bx : 0)) * kv!.dpr, -(kv!.oy + (bang ? by + goc : 0)) * kv!.dpr)
+    g.setTransform(s, 0, 0, s, -(bang ? bOx + bx : kv!.ox) * kv!.dpr, -(bang ? bOy + by + goc : kv!.oy) * kv!.dpr)
     g.globalCompositeOperation = n.cong === 'tay' ? 'destination-out' : 'source-over'; g.fillStyle = n.mau
     if (coPath) g.fill(n._d as Path2D)
     else { g.beginPath(); loi.veDaGiac(g, n._d as number[]); g.fill() }
@@ -205,16 +251,16 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (!trong || !kv) return
     trong.style.transform = `translate3d(0,${-cuonPx()}px,0)`
     // đang trôi: chỉ vẽ lại khi tầm nhìn ra khỏi canvas; đã đứng yên: dời sẵn gốc khi tầm nhìn sát mép (vẽ lại lúc rảnh, không lúc đang trôi)
-    const cy = cuonPx(), sat = cuon === dich && ((goc > 0 && cy - goc < bh * 0.15) || goc + HB - (cy + bh) < bh * 0.3)
+    const cy = cuonPx(), sat = cuon === (tuTay ? tayY : dich) && ((goc > 0 && cy - goc < bh * 0.15) || goc + HB - (cy + bh) < bh * 0.3)
     if (datGoc(sat)) veBang()
   }
   /** Xếp khung cuộn theo ô bảng + khung vẽ hiện tại. */
   function datBang(): void {
     if (!kv || !khung || !cvB || !gB) return
     const d = kv.dpr
-    bx = tron(B[0] * kv.Wv - kv.ox); by = tron(B[1] * kv.Hv - kv.oy); bw = tron((B[2] - B[0]) * kv.Wv); bh = tron((B[3] - B[1]) * kv.Hv)
+    bx = tron(B[0] * bW - bOx); by = tron(B[1] * bH - bOy); bw = tron((B[2] - B[0]) * bW); bh = tron(dl ? dl.bh : (B[3] - B[1]) * bH)
     HB = tron(Math.min(bh * CAO_BANG, 4096 / d))
-    khung.style.width = `${bw}px`; khung.style.height = `${bh}px`; khung.style.transform = `translate3d(${bx}px,${by}px,0)`
+    khung.style.width = `${bw}px`; khung.style.height = `${bh}px`; khung.style.transform = `translate3d(${tron(bx - kX)}px,${tron(by - kY)}px,0)`
     cvB.width = Math.max(1, Math.round(bw * d)); cvB.height = Math.max(1, Math.round(HB * d))
     cvB.style.width = `${bw}px`; cvB.style.height = `${HB}px`
     datGoc(true)
@@ -223,20 +269,24 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   /** Bút của thầy đang ở y (theo bảng): ra ngoài tầm nhìn ⇒ đặt đích trôi sao cho bút về khoảng giữa bảng (xuống: 55 % · lên: 30 %). `ngay` = tới luôn. */
   function theo(y: number, ngay = false): void {
     if (!kv || !gB) return
-    // đã biết độ cuộn của thầy ⇒ soi đúng theo thầy (bút của thầy luôn nằm trong tầm nhìn của thầy), không cần đoán
-    if (cuonThay != null) { dich = cuonThay; if (ngay && cuon !== dich) { cuon = dich; apCuon() } return }
-    const cao = B[3] - B[1], p = (y - B[1] - dich) / cao
+    // đã biết độ cuộn của thầy ⇒ soi đúng theo thầy (bút của thầy luôn nằm trong tầm nhìn của thầy), không cần đoán —
+    // trừ khi tầm nhìn của máy em THẤP hơn của thầy (bảng phóng to, bố cục độc lập): khi đó trôi theo bút, nhưng không ra ngoài tầm nhìn của thầy
+    const caoThay = B[3] - B[1], cao = Math.min(caoThay, nhinBang()), hep = cao < caoThay - 1e-6
+    if (cuonThay != null && !hep) { dich = cuonThay; if (ngay && !tuTay && cuon !== dich) { cuon = dich; apCuon() } return }
+    const p = (y - B[1] - dich) / cao
     if (p > 0.9) dich = Math.max(0, y - B[1] - cao * 0.55)
     else if (p < 0.04) dich = Math.max(0, y - B[1] - cao * 0.3)
-    if (ngay && cuon !== dich) { cuon = dich; apCuon() }
+    if (cuonThay != null) dich = Math.max(cuonThay, Math.min(cuonThay + caoThay - cao, dich))
+    if (ngay && !tuTay && cuon !== dich) { cuon = dich; apCuon() }
   }
   /** Một bước trôi (gọi mỗi khung). */
   function buocCuon(nay: number): void {
     const dt = Math.min(64, Math.max(0, nay - lucCuon))
     lucCuon = nay
-    if (cuon === dich || !kv) return
-    cuon += (dich - cuon) * (1 - Math.exp(-dt / TROI_MS))
-    if (Math.abs(dich - cuon) * kv.Hv < 0.5) cuon = dich
+    const den = tuTay ? tayY : dich
+    if (cuon === den || !kv) return
+    cuon += (den - cuon) * (1 - Math.exp(-dt / TROI_MS))
+    if (Math.abs(den - cuon) * bH < 0.5) cuon = den
     apCuon()
   }
   /** Đổi cỡ / tỉ lệ: đặt lại hai canvas, dựng lại trạng thái nét dở theo khung mới, vẽ lại. */
@@ -251,31 +301,42 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (k.w * k.h * k.dpr * k.dpr > TRAN_DIEM_ANH) k = { ...k, dpr: Math.max(1, Math.floor(Math.sqrt(TRAN_DIEM_ANH / (k.w * k.h)) * 4) / 4) }
     kv = k
     KH = loi.khung(k.Wv, k.Hv)
+    dl = k.dl ?? null
+    KHB = dl ? loi.khung(dl.bWv, dl.bHv) : KH
+    bW = dl ? dl.bWv : k.Wv; bH = dl ? dl.bHv : k.Hv; bOx = dl ? dl.box : k.ox; bOy = dl ? dl.boy : k.oy
+    gX = dl ? dl.gx : 0; gY = dl ? dl.gy : 0; hW = dl ? dl.hw : k.w; hH = dl ? dl.hh : k.h; kX = dl ? dl.kx : 0; kY = dl ? dl.ky : 0
+    if (!dl) cuonG = 0
     cvChot.width = Math.max(1, Math.round(k.w * k.dpr)); cvChot.height = Math.max(1, Math.round(k.h * k.dpr))
     // cỡ HIỆN = đúng cỡ nền / mật độ (không để 100 %): cỡ điểm ảnh lẻ thì 100 % lệch cỡ nền chưa tới một điểm ảnh, đủ để cả lớp bị co giãn, mờ từng quãng
     cvChot.style.width = `${cvChot.width / k.dpr}px`; cvChot.style.height = `${cvChot.height / k.dpr}px`
     // lớp sống: vuông, cạnh theo cỡ nét trên máy này (đuôi nét dở thường ≤ ~540 px ở màn 1920), không lớn hơn hình
-    canh = Math.round(Math.max(200, Math.min(520, 700 * KH.k, k.w, k.h)))
-    cvSong.width = cvSong.height = Math.max(1, Math.round(canh * k.dpr))
-    cvSong.style.width = cvSong.style.height = `${cvSong.width / k.dpr}px`
-    dichSong(0, 0)
+    // (bố cục độc lập: khung nở / thu đổi phép co liên tục ⇒ cạnh lớp sống lấy theo mức lớn nhất, không theo phép co đang áp — khỏi cấp lại canvas mỗi lần nở)
+    canh = Math.round(Math.max(200, Math.min(520, dl ? 520 : 700 * KH.k, hW, hH)))
+    const canhDa = Math.max(1, Math.round(canh * k.dpr))
+    if (!dl || cvSong.width !== canhDa) {
+      cvSong.width = cvSong.height = canhDa
+      cvSong.style.width = cvSong.style.height = `${cvSong.width / k.dpr}px`
+      dichSong(0, 0)
+    } else xoaSong()
     ban = null
-    // màu cây bút: biến màu sẵn có của bảng live (gắn tại gốc `.lv`), đọc một lần mỗi lần xếp lại
-    try {
+    // màu cây bút: biến màu sẵn có của bảng live (gắn tại gốc `.lv`), đọc một lần mỗi lần xếp lại (bố cục độc lập: MỘT lần — đọc kiểu buộc trình duyệt tính lại
+    // kiểu cả cây ngay giữa lúc khung đang đổi chỗ)
+    if (!dl || !daDocMau) try {
       const cs = getComputedStyle(cvSong), lay = (ten: string, thay: string): string => cs.getPropertyValue(ten).trim() || thay
       mauBut.than = lay('--tr-chieu-giay', 'white'); mauBut.bong = lay('--tr-chieu-bang', 'black'); mauBut.dai = lay('--p-cam', 'orange')
+      daDocMau = true
     } catch { /* không có kiểu (test) ⇒ màu dự phòng */ }
     datBang()
     // cỡ bàn tay theo bề cao bảng đen (≈ 5,5 %)
     coT = Math.round(coTay(bh > 0 ? bh : k.h * 0.9) * 2) / 2
-    for (const d of doDang.values()) { d.st = loi.moXuLy(d.net, KH); loi.xuLyThem(d.st, d.net.diem, d.net.diem.length); d.dong = 0 }
+    for (const d of doDang.values()) { d.st = loi.moXuLy(d.net, d.bang ? KHB : KH); loi.xuLyThem(d.st, d.net.diem, d.net.diem.length); d.dong = 0 }
     veLai()
   }
   /** Đặt cả bảng (vào live, nối lại, bảng mới). Nét dở bỏ hết. Bảng cuộn: tới thẳng chỗ nét bảng mới nhất. */
   function datNet(net: readonly NetBut[]): void {
     ds = net.map((n) => n as NetCoNho)
     doDang.clear(); xoaHetSong()
-    cuon = dich = 0; cuonThay = null
+    cuon = dich = 0; cuonThay = null; tuTay = false
     if (kv && gB) {
       for (let i = ds.length - 1; i >= 0; i--) if (laBang(ds[i]!)) { const p = ds[i]!.diem[ds[i]!.diem.length - 1]; if (p) theo(p[1]); break }
       cuon = dich
@@ -329,7 +390,8 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       if (sk.xong) { themNet({ ...sk.net, diem: sk.net.diem.slice() }, sk.vt); return }
       if (!KH) return
       const net: NetBut = { id: sk.net.id, cong: sk.net.cong, mau: sk.net.mau, co: sk.net.co, diem: sk.net.diem.slice() }
-      doDang.set(net.id, { net, st: loi.moXuLy(net, KH), dong: 0, dau: null, bang: laBang(net) })
+      const bang = laBang(net)
+      doDang.set(net.id, { net, st: loi.moXuLy(net, bang && KHB ? KHB : KH), dong: 0, dau: null, bang })
     }
     else if (sk.loai === 'them-diem') { const d = doDang.get(sk.id); if (d) for (const p of sk.diem) d.net.diem.push(p) }
     else if (sk.loai === 'net-xong') chotNet(sk.id)
@@ -355,16 +417,23 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
   }
   /** MỘT khung vẽ của lớp «đang viết»: đuôi các nét dở + cây bút của thầy (+ một bước trôi của bảng cuộn). `nay` = đồng hồ khung hình (ms). Trả số nét dở đã vẽ. */
   function veSong(nay: number = typeof performance !== 'undefined' ? performance.now() : Date.now()): number {
-    if (!gC || !gS || !KH || !kv) return 0
+    if (!gC || !gS || !KH || !KHB || !kv) return 0
     // bút ở trên bảng cuộn ⇒ máy em trôi theo trước, rồi mới tính chỗ vẽ
-    if (cuonThay != null) dich = cuonThay
-    else if (butDich) theoBut(butDich.x, butDich.y, butDich.net)
+    const caoThay = B[3] - B[1], nhin = nhinBang()
+    if (cuonThay != null && nhin >= caoThay - 1e-6) dich = cuonThay
+    else {
+      if (butDich) theoBut(butDich.x, butDich.y, butDich.net)
+      // thầy cuộn bảng mà không viết: tầm nhìn (thấp hơn) của máy em vẫn phải nằm trong tầm nhìn của thầy
+      if (cuonThay != null) dich = Math.max(cuonThay, Math.min(cuonThay + caoThay - nhin, dich))
+    }
     buocCuon(nay)
-    const k = KH.k, cy = cuonPx(), dd = kv.dpr, leTay = 14 + (O_TAY.phai - O_TAY.trai) * tiLeTay(coT)
+    const cy = cuonPx(), dd = kv.dpr, leTay = 14 + (O_TAY.phai - O_TAY.trai) * tiLeTay(coT)
+    /** Góc cửa sổ thầy ảo của vùng (giấy / bảng) tính trong HÌNH, đã cộng độ cuộn của vùng. */
+    const gocX = (bang: boolean): number => (bang ? bOx : kv!.ox - gX), gocY = (bang: boolean): number => (bang ? bOy + cy : kv!.oy - gY + cuonG)
     // h = hộp bao mọi thứ sẽ vẽ, px CSS trong hình (nét bảng đã trừ độ cuộn)
     const h: Hop = [1e9, 1e9, -1e9, -1e9], ve: [number[], string, boolean][] = []
     // đuôi luôn vẽ đúng dáng nét XONG (thon cuối): đầu nét là chỗ thon, đi tiếp thì chỗ cũ dày lên — chốt nét không đổi hình
-    const duoi = (d: NetDo): number[] => loi.vien(d.st, d.dong, -1, d.dau ? [[d.dau[0] * KH!.rw, d.dau[1] * KH!.rh]] : null, true)
+    const duoi = (d: NetDo): number[] => { const K = d.bang ? KHB! : KH!; return loi.vien(d.st, d.dong, -1, d.dau ? [[d.dau[0] * K.rw, d.dau[1] * K.rh]] : null, true) }
     for (const d of doDang.values()) {
       loi.xuLyThem(d.st, d.net.diem, d.net.diem.length)
       const den = loi.mocDong(d.st, d.dong, IT_NET)
@@ -373,11 +442,13 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
       if (d.bang) { const c = d.dau ?? d.net.diem[d.net.diem.length - 1]; if (c) theo(c[1]!) }
       let p = duoi(d)
       if (!p.length) continue
+      const k = d.bang ? KHB.k : KH.k
       const h1: Hop = [1e9, 1e9, -1e9, -1e9]
       hop(p, h1)
       if (((h1[2] - h1[0]) * k > canh - leTay || (h1[3] - h1[1]) * k > canh - leTay) && inSom(d)) { p = duoi(d); h1[0] = h1[1] = 1e9; h1[2] = h1[3] = -1e9; hop(p, h1) }
       ve.push([p, d.net.mau, d.bang])
-      const x0 = h1[0] * k - kv.ox, y0 = h1[1] * k - kv.oy - (d.bang ? cy : 0), x1 = h1[2] * k - kv.ox, y1 = h1[3] * k - kv.oy - (d.bang ? cy : 0)
+      const ox = gocX(d.bang), oy = gocY(d.bang)
+      const x0 = h1[0] * k - ox, y0 = h1[1] * k - oy, x1 = h1[2] * k - ox, y1 = h1[3] * k - oy
       if (x0 < h[0]) h[0] = x0; if (y0 < h[1]) h[1] = y0; if (x1 > h[2]) h[2] = x1; if (y1 > h[3]) h[3] = y1
     }
     // bàn tay cầm bút: chỗ ngòi theo đệm phát (đã trừ độ cuộn của máy em) ⇒ một bước chuyển động ⇒ chỗ dán hình
@@ -400,9 +471,18 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (!ve.length && !hb) return 0
     // hộp bao không còn nằm trọn trong lớp sống ⇒ dời lớp cho hộp vào giữa (kẹp trong hình)
     if (h[0] < sx + 4 || h[1] < sy + 4 || h[2] > sx + canh - 4 || h[3] > sy + canh - 4) {
-      dichSong(Math.max(0, Math.min(kv.w - canh, (h[0] + h[2] - canh) / 2)), Math.max(0, Math.min(kv.h - canh, (h[1] + h[3] - canh) / 2)))
+      dichSong(Math.max(0, Math.min(hW - canh, (h[0] + h[2] - canh) / 2)), Math.max(0, Math.min(hH - canh, (h[1] + h[3] - canh) / 2)))
     }
-    for (const [p, mau, bang] of ve) to(gS, p, mau, false, kv.ox + sx, kv.oy + (bang ? cy : 0) + sy)
+    for (const [p, mau, bang] of ve) {
+      // bố cục độc lập: đuôi nét của vùng nào cắt theo ô nhìn của vùng ấy (nét giấy không tràn sang bảng và ngược lại)
+      if (dl) {
+        gS.save(); gS.setTransform(1, 0, 0, 1, 0, 0); gS.beginPath()
+        if (bang) gS.rect((bx - sx) * dd, (by - sy) * dd, bw * dd, bh * dd); else gS.rect((dl.gx - sx) * dd, (dl.gy - sy) * dd, dl.gw * dd, dl.gh * dd)
+        gS.clip()
+      }
+      to(gS, p, mau, false, gocX(bang) + sx, gocY(bang) + sy, bang ? KHB.k : KH.k)
+      if (dl) gS.restore()
+    }
     if (hb) {
       // dán hình bàn tay: gốc = ngòi bút, ngả quanh đúng ngòi, độ rõ đều cả hình
       const c = Math.cos(hb.goc), s2 = Math.sin(hb.goc)
@@ -416,26 +496,43 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     return ve.length
   }
   /** Điểm (x, y) có tính theo BẢNG CUỘN không: biết mã nét thì theo mã, không thì theo hoành độ (nằm trong cột bảng đen). */
-  const theoBang = (x: number, net?: string): boolean => !!gB && (net ? laBang({ id: net }) : x >= B[0] && x <= B[2])
+  const theoBang = (x: number, net?: string): boolean => { const d = net ? doDang.get(net) : undefined; return !!gB && (d ? d.bang : net && !dl ? laBang({ id: net }) : (!!net && loi.laBang({ id: net })) || (x >= B[0] && x <= B[2])) }
   /** Toạ độ 0..1 (cửa sổ thầy) ⇒ px CSS trong vùng chiếu của máy em. Điểm trên bảng cuộn đã trừ độ cuộn của máy em. `net` = mã nét đang viết (nếu có). */
   function toiPx(x: number, y: number, net?: string): [number, number] {
     if (!kv) return [0, 0]
-    return [x * kv.Wv - kv.ox, y * kv.Hv - kv.oy - (theoBang(x, net) ? cuonPx() : 0)]
+    return theoBang(x, net) ? [x * bW - bOx, y * bH - bOy - cuonPx()] : [x * kv.Wv - kv.ox + gX, y * kv.Hv - kv.oy + gY - cuonG]
   }
   /** Cây bút của thầy đang ở (x, y): nếu ở trên bảng cuộn thì máy em trôi theo (cả khi bút chỉ lơ lửng). */
   function theoBut(x: number, y: number, net?: string): void { if (theoBang(x, net)) theo(y) }
   /** Chỗ cây bút của thầy ở khung này (`KhungLiveEm.but` của thư viện live; toạ độ 0..1) — gọi TRƯỚC `veSong`. null = ẩn bút.
    *  `cuonCuaThay` = `KhungLiveEm.cuon`: độ cuộn bảng đen của thầy (null = chưa biết ⇒ tự trôi theo bút; bỏ trống = giữ như cũ). */
   function datBut(b: { x: number; y: number; cham: boolean; net?: string; mau?: string } | null, cuonCuaThay?: number | null): void { butDich = b; if (cuonCuaThay !== undefined) cuonThay = cuonCuaThay }
+  /** Độ cuộn của khung GIẤY (px CSS; bố cục độc lập) — đuôi nét và cây bút trên giấy dời theo. */
+  function datCuonGiay(px: number): void { if (dl && px !== cuonG) { cuonG = px; tayVe = '' } }
+  /** Em tự vuốt bảng đen xem lại: dời tầm nhìn `dy` px (dương = xem phần dưới). `null` = thôi, về chỗ thầy đang viết. Đang tự vuốt ⇒ bảng không tự trôi theo bút. */
+  function vuotBang(dy: number | null): void {
+    if (!kv || !gB) return
+    if (dy == null) { tuTay = false; return }
+    if (!tuTay) {
+      tuTay = true; tayY = cuon
+      // trần vuốt xuống: tới hết nét bảng thấp nhất (chừa 60 % tầm nhìn), không thấp hơn chỗ thầy đang đứng
+      let day = 0
+      for (const n of ds) if (laBang(n)) { const y = loi.hop(n)[3]!; if (y > day) day = y }
+      for (const d of doDang.values()) if (d.bang) for (const p of d.net.diem) if (p[1] > day) day = p[1]
+      tayTran = Math.max(0, dich, cuon, day - B[1] - nhinBang() * 0.6)
+    }
+    tayY = Math.max(0, Math.min(Math.max(tayTran, dich), tayY + dy / bH))
+    if (cuon !== tayY) { cuon = tayY; apCuon() }
+  }
   return {
-    datKhung, ap, datDau, veSong, veLai, toiPx, theoBut, datBut,
+    datKhung, ap, datDau, veSong, veLai, toiPx, theoBut, datBut, datCuonGiay, vuotBang,
     /** Ngòi cây bút đang hiện ở đâu (px CSS trong hình); null = đang ẩn. */
     viTriBut: (): [number, number] | null => but.viTri(),
     /** Đổi dáng bàn tay (`nam` mặc định · `gon` · `vien`) — để chụp so các phương án. */
     datDangTay: (d: DangTay): void => { dangTay = d },
     soNet: (): number => ds.length, soDo: (): number => doDang.size,
     /** Bảng cuộn: độ cuộn hiện tại / đích (số lần bề dọc cửa sổ thầy) + ô bảng trong hình (px CSS). */
-    cuon: () => ({ y: cuon, dich, bang: { x: bx, y: by, w: bw, h: bh } }),
+    cuon: () => ({ y: cuon, dich, tay: tuTay, bang: { x: bx, y: by, w: bw, h: bh } }),
   }
 }
 export type VeBang = ReturnType<typeof taoVeBang>

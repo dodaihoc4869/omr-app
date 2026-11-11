@@ -1,7 +1,9 @@
 // XEM LẠI LIVE — TRÌNH PHÁT (đợt X2, thầy chốt build 11/11; đặc tả docs/dac-ta-live-xem-lai-1011.md mục 2.1, 3, 4.9; bản vẽ ảnh 19–27).
 // Phát lại VECTƠ + tiếng: đồng hồ chủ là `audio.currentTime` (buổi không tiếng ⇒ đồng hồ riêng); mỗi khung hình máy phát (`may-phat.ts`) đưa các điểm
 // tới hạn vào ĐÚNG lớp vẽ bảng live của máy em (`components/live/ve-bang.ts` + bộ dựng nét `but-bang-loi.ts`) ⇒ hình y như lúc live, sắc ở mọi cỡ.
-// Bố cục = bố cục lúc live (`components/live/bo-cuc.ts`): giấy đề trái, bảng đen phải; giấy sáng / tối theo THẦY (`buoi.giayToi`).
+// Bố cục = bố cục lúc live: giấy đề trái, bảng đen phải; giấy sáng / tối theo THẦY (`buoi.giayToi`). Từ 11/11 chiều: HAI KHUNG CO GIÃN ĐỘC LẬP như bảng live
+// (`components/live/KhungDocLap.tsx` + `bo-cuc-doc-lap.ts`): mỗi khung co theo bề ngang của nó, khung thầy đang viết tự nở, em kéo vạch chia / chạm hai lần
+// phóng kín được; tua lại ⇒ bảng tới thẳng chỗ nét đang phát, giấy tự trôi theo bút.
 // · Phủ kín, luôn NGANG: máy đang cầm dọc ⇒ xoay hình 90° bằng CSS như Live. `nhung` (máy tính): nằm trong trang, điều khiển dưới bảng.
 // · Tua = dựng lại từ mốc «bảng mới» gần nhất phía trước; `net.bin` tải theo Range từng khúc (`kho-net.ts`).
 // · «Bỏ khoảng lặng», tốc độ 1× / 1,5× / 2×, lùi / tới 10 giây, «Đoạn 3/5», thanh tua chia khúc theo câu + vạch em nói, dải tự ẩn sau 3 giây.
@@ -9,10 +11,12 @@
 // AN TOÀN: chỉ đọc ba tệp của buổi qua vé; đề trên giấy là câu trong `buoi.json`.
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { anToanHinh, canXoayCss, giaiTrang, khungChieu, type KhungChieu } from '../../../components/live/bo-cuc'
-import { taoVeBang, type VeBang } from '../../../components/live/ve-bang'
+import { anToanHinh, canXoayCss, giaiTrang, khungChieu } from '../../../components/live/bo-cuc'
+import KhungDocLap, { type HinhDL, type TayKhungDL } from '../../../components/live/KhungDocLap'
+import { DauGiay, PhuongAnTinh } from '../../../components/live/GiayDung'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
-import { taoLoiBut, type SuKienBut } from '../../../lib/but-bang-loi'
+import { chonHeSoGiay } from '../../../components/live/vua-giay'
+import type { SuKienBut } from '../../../lib/but-bang-loi'
 import { TEP_LIVE, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
 import { nhayLang, taoDongHoRieng, taoLamMuot, tongHang, tuViTriHang, viTriHang } from './dong-ho'
@@ -51,34 +55,44 @@ const TOC_DO = [1, 1.5, 2] as const
 const THU_LAI_MS = 4000
 const mayYeu = (): boolean => typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
 class LoiTai extends Error { loai: 'mang' | 'loi' | 'go'; constructor(loai: 'mang' | 'loi' | 'go') { super(loai); this.loai = loai } }
-interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; kc: KhungChieu }
+interface BoCuc { xoay: boolean; w: number; h: number }
+const giamDong = (): boolean => mayYeu() || (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
 
-/** Tấm giấy đề: khối đề dựng ở bề ngang gốc rồi phóng lên cho vừa chiều cao giấy (cùng phép tính lớp bảng live của máy em). */
+/** Tấm giấy đề: khối đề dựng theo bề ngang khung giấy của EM rồi phóng lên cho vừa chiều cao giấy (cùng phép tính lớp bảng live của máy em — hệ số phóng
+ *  kẹp theo bề ngang khung ⇒ chữ to tự nhiên theo khổ máy). */
 const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
   const trong = useRef<HTMLDivElement>(null)
-  const [k, setK] = useState(2)
+  const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 340))
+  const [k, setK] = useState(kMin)
   const coDe = de != null
+  const da = useRef(0)
   useLayoutEffect(() => {
     const el = trong.current
     if (!el) return
-    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(1.3, Math.min(2.1, (cao - 28) / h))) }
+    // Chọn hệ số phóng MỘT lần cho mỗi (câu, khổ ô giấy) bằng cách dò (vua-giay.ts) — bản trước tính lại theo chính chiều cao vừa đổi ⇒ không có điểm dừng,
+    // khối đề đổi cỡ mỗi khung hình («đề nhấp nháy lên xuống», thầy 11/11). Chỉ dò lại khi khối đề đổi cao vì lý do KHÁC (ảnh / phông tải xong).
+    const do1 = () => {
+      const r = chonHeSoGiay((thu) => { el.style.width = `${(rong - 36) / thu}px`; return el.scrollHeight }, cao, kMin, kMax)
+      el.style.width = `${(rong - 36) / r.k}px`
+      da.current = r.h
+      setK(r.k)
+    }
     do1()
     if (typeof ResizeObserver !== 'function') return
-    const ro = new ResizeObserver(do1)
+    const ro = new ResizeObserver(() => { if (Math.abs((el.scrollHeight || 1) - da.current) > 1) do1() })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [khoa, rong, cao, coDe])
-  if (!de) return <p className="xp-giay-trong">Thầy chữa trên bảng</p>
+  }, [khoa, rong, cao, coDe, kMin, kMax])
+  if (!de) return <p className="xp-giay-trong" style={{ fontSize: Math.max(18, Math.min(34, rong / 18)) }}>Thầy chữa trên bảng</p>
   return <div className="xp-de"><div ref={trong} className="xp-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
 })
-const khong = () => {}
 
 export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, lenh, LC, tenDoi, dong, khiDoan, khiXem, khiGo }: PropsTrinhPhat) {
   const gocRef = useRef<HTMLDivElement>(null), nen = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null)
-  const cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
+  const kdl = useRef<TayKhungDL>(null)
   const am = useRef<HTMLAudioElement>(null), tua = useRef<HTMLDivElement>(null), gioChu = useRef<HTMLSpanElement>(null)
-  const veB = useRef<VeBang | null>(null), may = useRef<MayPhat | null>(null), kho = useRef<KhoNet | null>(null)
-  const bcRef = useRef<BoCuc | null>(null)
+  const may = useRef<MayPhat | null>(null), kho = useRef<KhoNet | null>(null)
+  const bcRef = useRef<BoCuc | null>(null), khoHinh = useRef<HinhDL | null>(null)
   const [bc, setBc] = useState<BoCuc | null>(null)
   const [vt, setVt] = useState(() => Math.max(0, Math.min(batDau, hang.length - 1)))
   const [dangPhat, setDangPhat] = useState(false)
@@ -135,26 +149,31 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   }, [coTieng, rieng])
 
   // ── bố cục ──
-  const xep = useCallback(() => {
+  /** Đo khổ hình + vùng an toàn. Nhúng trong trang (máy tính): hình rộng bằng khung, cao theo tỉ lệ vùng chiếu của thầy. */
+  const doHinh = useCallback((): HinhDL => {
     const el = gocRef.current
-    if (!el) return
-    const W = nhung ? el.clientWidth || 800 : window.innerWidth, H0 = window.innerHeight
+    const W = nhung ? el?.clientWidth || 800 : window.innerWidth, H0 = window.innerHeight
     const { vung } = giaiTrang(S.current.trang.trang), kc = khungChieu(vung, S.current.trang.tiLe)
     const xoay = !nhung && canXoayCss(W, H0, false)
     const w = xoay ? H0 : W
     const cs = thuoc.current && !nhung ? getComputedStyle(thuoc.current) : null
     const px = (v: string | undefined) => parseFloat(v || '0') || 0
     const at = anToanHinh({ tren: px(cs?.paddingTop), phai: px(cs?.paddingRight), duoi: px(cs?.paddingBottom), trai: px(cs?.paddingLeft) }, xoay)
-    const h = nhung ? Math.round((w * kc.LH) / kc.LW) : xoay ? W : H0
-    const ngang = Math.max(1, w - at.trai - at.phai), doc = Math.max(1, h - (nhung ? 0 : at.duoi))
-    const s = Math.min(ngang / kc.LW, doc / kc.LH)
-    const moi: BoCuc = { xoay, w, h, s, x: at.trai + (ngang - kc.LW * s) / 2, y: (doc - kc.LH * s) / 2, kc }
+    return { xoay, w, h: nhung ? Math.round((w * kc.LH) / kc.LW) : xoay ? W : H0, at: nhung ? { trai: 0, phai: 0, duoi: 0, tren: 0 } : at }
+  }, [nhung])
+  const layHinh = useCallback((): HinhDL => khoHinh.current ?? (khoHinh.current = doHinh()), [doHinh])
+  const layTrang = useCallback(() => S.current.trang, [])
+  const xep = useCallback(() => {
+    const el = gocRef.current
+    if (!el) return
+    const m = doHinh(), at = m.at
+    khoHinh.current = m
+    const moi: BoCuc = { xoay: m.xoay, w: m.w, h: m.h }
     bcRef.current = moi
     setBc(moi)
     el.style.setProperty('--xp-at-trai', `${at.trai}px`); el.style.setProperty('--xp-at-phai', `${at.phai}px`); el.style.setProperty('--xp-at-duoi', `${at.duoi}px`)
-    const dpr = Math.min(window.devicePixelRatio || 1, mayYeu() ? 1.5 : 2.5)
-    veB.current?.datKhung({ Wv: kc.Wv * s, Hv: kc.Hv * s, ox: kc.ox * s - moi.x, oy: kc.oy * s - moi.y, w, h, dpr })
-  }, [nhung])
+    kdl.current?.xep()
+  }, [doHinh])
 
   // ── tua / phát ──
   const baoLoi = useCallback((e: unknown) => {
@@ -207,9 +226,9 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   // ── lớp vẽ + máy phát + kho nét + vòng khung hình ──
   const daMo = useRef(false)
   useLayoutEffect(() => {
-    if (!cvChot.current || !cvSong.current) return
-    const v = taoVeBang(taoLoiBut(), cvChot.current, cvSong.current)
-    veB.current = v
+    // lớp vẽ nét nằm trong KhungDocLap (hiệu ứng của nó chạy trước hiệu ứng này)
+    const v = kdl.current
+    if (!v) return
     const ap = (sk: SuKienBut) => {
       if (sk.loai === 'trang') { const doi = sk.trang !== S.current.trang.trang || sk.tiLe !== S.current.trang.tiLe; S.current.trang = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep() }
       v.ap(sk)
@@ -249,12 +268,10 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       }
       if (m.gio() >= 0 && !S.current.dangDung) {
         const f = m.buoc(t)
-        v.datDau(f.dau)
-        // Con trỏ = CÂY BÚT của bảng live (11/11, tro-but.ts): lớp vẽ tự vẽ nó trên lớp «đang viết», ngòi ở đúng đầu nét, bảng đã cuộn thì trôi theo.
-        // Phần tử `.xp-tro` (chấm tròn cũ) để nguyên, không hiện nữa.
+        // Con trỏ = CÂY BÚT của bảng live (11/11, tro-but.ts): lớp vẽ tự vẽ nó trên lớp «đang viết», ngòi ở đúng đầu nét, bảng đã cuộn thì trôi theo;
+        // khung thầy đang viết tự nở, giấy tự trôi theo bút (KhungDocLap).
         const dn = f.dau.length ? f.dau[f.dau.length - 1]! : null
-        v.datBut(f.tro ? { x: f.tro.x, y: f.tro.y, cham: !!dn, net: dn?.id } : null)
-        v.veSong()
+        v.khung(nay, f.dau, f.tro ? { x: f.tro.x, y: f.tro.y, cham: !!dn, net: dn?.id } : null)
       }
       // thanh tua + giờ: đổi thẳng DOM (không vẽ lại React mỗi khung)
       const ray = tua.current?.children[S.current.vt]?.querySelector<HTMLElement>('.xp-ray')
@@ -263,7 +280,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       if (giay !== S.current.giayCu && gioChu.current) { S.current.giayCu = giay; gioChu.current.textContent = gioPhat(giay * 1000) }
     }
     raf = requestAnimationFrame(khung)
-    return () => { cancelAnimationFrame(raf); veB.current = null; may.current = null; kho.current = null }
+    return () => { cancelAnimationFrame(raf); may.current = null; kho.current = null }
   }, [buoi, goc, ve, xep, docGio, datGio, dangChay, dungPhat, baoLoi]) // eslint-disable-line react-hooks/exhaustive-deps -- `tuPhat` chỉ đọc lúc mở
   // lệnh từ trang (máy tính): bấm một đoạn trong danh sách / ảnh bìa
   const lenhSo = lenh?.so ?? 0
@@ -365,13 +382,13 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const q = cau ? thanhCau(cau) : null
   const kieuChang = typeof document !== 'undefined' && !!document.documentElement.dataset.trong
   const de = cau && q && LC ? <div className={kieuChang ? 'ht-app ht2-lam duo bpu-de-chang' : undefined} data-duo={kieuChang ? '' : undefined}>
-    <LC.DeCau q={q} stt={cau.so} />
-    {cau.tuLuan ? null : cau.phan === 'I' && q.choices.length ? <LC.ChonTracNghiem q={q} value="" onChon={khong} khoa /> : cau.phan === 'II' && q.ideas.length ? <LC.ChonDungSai q={q} value="" onChon={khong} khoa /> : null}
+    {/* giấy đề kiểu tờ chiếu (như bảng live, GiayDung.tsx): phương án / ý là CHỮ ĐỀ, không có nút trả lời */}
+    <div className="lv-gd"><DauGiay q={q} so={cau.so} tuLuan={!!cau.tuLuan} /><LC.DeCau q={q} stt={cau.so} /><PhuongAnTinh q={q} Chu={LC.ChemText} tuLuan={!!cau.tuLuan} /></div>
     {cau.dung ? <p className="xp-dap">Đáp án đúng<b>{chuDapAn(cau)}</b></p> : null}
   </div> : cau && q ? <p style={{ fontSize: 20, margin: 0 }}>{q.text}</p> : null
   const tong = tongHang(hang)
-  const kc = bc?.kc
-  const o = (v: { x: number; y: number; w: number; h: number }): CSSProperties => ({ left: v.x, top: v.y, width: v.w, height: v.h })
+  const khoaDe = `${cau?.qid ?? ''}|${LC ? 1 : 0}`
+  const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number }) => <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} />, [de, khoaDe]) // eslint-disable-line react-hooks/exhaustive-deps -- `de` dựng lại mỗi lượt vẽ; khoá theo câu
   const kieu: CSSProperties = { ...(MAU_CHIEU as CSSProperties), ['--doi' as string]: mauDoi(d?.lenBang?.doi), ...(bc && !nhung ? { width: bc.w, height: bc.h } : null) }
   const an = !nhung && !hien && dangPhat && !matMang
   const hinh = (
@@ -380,15 +397,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       <div ref={thuoc} className="xp-thuoc" aria-hidden="true" />
       {coTieng ? <audio ref={am} src={duongTep(goc, buoi.id, TEP_LIVE.tieng, ve)} preload="metadata" /> : null}
       <div ref={nen} className="xp-nen" style={nhung && bc ? { height: bc.h } : undefined} onClick={chamNen}>
-        {bc && kc ? (
-          <div className="xp-chieu" style={{ width: kc.LW, height: kc.LH, transform: `translate3d(${bc.x}px,${bc.y}px,0) scale(${bc.s})` }}>
-            <div className="xp-giay" style={o(kc.giay)}><GiayDe de={de} khoa={`${cau?.qid ?? ''}|${LC ? 1 : 0}`} rong={kc.giay.w} cao={kc.giay.h} /></div>
-            <div className="xp-bang" style={o(kc.bang)} />
-          </div>
-        ) : null}
-        <canvas ref={cvChot} className="xp-cv" aria-hidden="true" />
-        <canvas ref={cvSong} className="xp-cv song" aria-hidden="true" />
-        <div ref={tro} className="xp-tro" aria-hidden="true" />
+        {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập như bảng live (giấy ở đây dựng theo khối đề của chặng ⇒ `tiLeChu` null: chữ không phụ thuộc bề ngang khung) */}
+        <KhungDocLap ref={kdl} lop="xp" layHinh={layHinh} layTrang={layTrang} netGiay tiLeChu={null} tuUuTien={!mayYeu()} dong={!giamDong()} giay={dungGiay} />
         {!dangPhat && !cho && !matMang ? <button type="button" className="xp-giua" onClick={(e) => { e.stopPropagation(); bamPhat() }} aria-label={het ? 'Phát lại từ đầu' : 'Phát'}><BtPhat s={38} /></button> : null}
         {luoc >= 1000 && boLang ? <div className="xp-luoc so" role="status">Đã lược {gioPhat(Math.round(luoc / 1000) * 1000)} khoảng lặng</div> : null}
         {matMang ? <div className="xp-mat" role="status"><i aria-hidden="true" />Mất mạng · đang nối lại…</div> : null}

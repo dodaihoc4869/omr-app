@@ -1,0 +1,6 @@
+/* Hàng «Loa» trong khay live của em (ChonLoa.tsx). Màu: chỉ biến có sẵn của khay (--tr-chieu-giay), không thêm màu mới. */
+.lv-loa { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 8px 4px 0; font-size: 14px; font-weight: 600; color: var(--tr-chieu-giay); }
+.lv-loa > span { flex: none; }
+.lv-loa select { flex: 1; min-width: 0; height: 44px; padding: 0 10px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--tr-chieu-giay) 28%, transparent); background: color-mix(in srgb, var(--tr-chieu-giay) 8%, transparent); color: inherit; font: inherit; font-weight: 500; text-overflow: ellipsis; cursor: pointer; }
+.lv-loa select:focus-visible { outline: 2px solid var(--tr-chieu-giay); outline-offset: 2px; }
+.lv-loa select option { color: initial; }

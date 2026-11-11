@@ -121,13 +121,17 @@ describe('máy em khi thầy live', () => {
     await waitFor(() => expect(lop('.lv-dau')).toBe(0))
   })
 
-  it('tiếng theo phòng: máy chủ có tiếng, em trong lớp ⇒ mặc định TẮT; nút tiếng trên dấu và trong khay bật / tắt được', async () => {
+  // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): em trong lớp nay mặc định BẬT; thầy chọn «Em ở xa» (`live-dat { tiengLop: false }`) ⇒ tắt.
+  it('tiếng theo phòng: máy chủ có tiếng, em trong lớp ⇒ mặc định BẬT, thầy chọn «Em ở xa» ⇒ TẮT; nút tiếng trên dấu và trong khay bật / tắt được', async () => {
     const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0); moLuot(st, cau, T0)
     const { bao } = await vao(st)
     liveBat(st, T0 + 1000); bao()
     await waitFor(() => expect(lop('.lv-dau .lv-vua')).toBe(1))
+    expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('true')
+    expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-label')).toContain('đang bật')
+    liveDat(st, { tiengLop: false }, T0 + 1500); bao()
+    await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('false'))
     const nutDau = document.querySelector('.lv-dau .lv-vua')!
-    expect(nutDau.getAttribute('aria-pressed')).toBe('false')
     expect(nutDau.getAttribute('aria-label')).toContain('đang tắt')
     fireEvent.click(nutDau)
     await waitFor(() => expect(document.querySelector('.lv-dau .lv-vua')!.getAttribute('aria-pressed')).toBe('true'))

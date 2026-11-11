@@ -321,7 +321,30 @@ function doNoi(x: Float32Array, moc: Float32Array, goc: Float32Array | null) {
   return { rmsNoiDb: r1(db(Math.sqrt(eN / Math.max(1, nN)))), dinhDb: r1(db(dinh)), onNghiDb: r1(db(Math.sqrt(eG / Math.max(1, nG)))), tinTrenOnDb: r1(db(Math.sqrt(eN / Math.max(1, nN))) - db(Math.sqrt(eG / Math.max(1, nG)))),
     thoDb: dau.length ? r1(10 * Math.log10(tb(cuoi) / Math.max(1e-30, tb(dau)))) : null, soQuangNghi: dau.length, segSnrDb: seg }
 }
-async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi', giay: number, cho: number) {
+/** Trễ bằng TƯƠNG QUAN CHÉO trên giọng thật (bộ lọc sâu coi xung / giọng tổng hợp là ồn nên không đo bằng xung được): chia tín hiệu mic thành cửa sổ 0,5 giây,
+ *  lấy các cửa sổ to nhất, dò độ lệch 0–250 ms cho kênh chuỗi và kênh nhận (lấy mẫu thưa 4 lần ⇒ bước 0,08 ms), trả trung vị. */
+function treTuongQuan(k0: Float32Array, k1: Float32Array, k2: Float32Array) {
+  const B = 4, W = 6000, thua = (m: Float32Array) => { const r = new Float32Array(Math.floor(m.length / B)); for (let i = 0; i < r.length; i++) r[i] = m[i * B]!; return r }
+  const a = thua(k0), b = thua(k1), c = thua(k2), cs: { d: number; e: number }[] = []
+  for (let d = 0; d + W + 3200 < a.length; d += W) { let e = 0; for (let i = 0; i < W; i++) e += a[d + i]! * a[d + i]!; cs.push({ d, e }) }
+  cs.sort((x, y) => y.e - x.e)
+  const tim = (y: Float32Array, d: number) => { let lon = -1, tre = 0; for (let lag = 0; lag <= 3000; lag++) { let s = 0, yy = 0; for (let i = 0; i < W; i += 2) { const v = y[d + i + lag]!; s += a[d + i]! * v; yy += v * v } const r = yy > 1e-12 ? (s * Math.abs(s)) / yy : -1; if (r > lon) { lon = r; tre = lag } } return (tre * B) / 48 }
+  const chon = cs.slice(0, Math.max(4, Math.floor(cs.length * 0.4))), dc = chon.map((x) => tim(b, x.d)), dt = chon.map((x) => tim(c, x.d))
+  return { soCuaSo: chon.length, chuoiMs: trungVi(dc), chuoiP95: trungVi(dc, 0.95), tongMs: trungVi(dt), tongP95: trungVi(dt, 0.95) }
+}
+/** Ồn ở QUÃNG NGHỈ DÀI (≥ 0,6 giây không có tiếng nói tại mic; lấy nửa giữa của quãng): mức tại mic và tại kênh `x` (lùi `lechMs`), dBFS.
+ *  Giọng thật có nhiều quãng nghỉ ngắn còn đuôi tiếng ⇒ `doNoi` (quãng ≥ 100 ms) lẫn tiếng nói nhỏ; số này chỉ lấy chỗ chắc chắn im. */
+function onNghiDai(k0: Float32Array, x: Float32Array, lechMs: number) {
+  const K = 960, nk = Math.floor(k0.length / K), lech = Math.round(lechMs * 48)
+  const rms = (m: Float32Array, d: number, n: number) => { let e = 0; if (d < 0 || d + n > m.length) return 0; for (let i = 0; i < n; i++) e += m[d + i]! * m[d + i]!; return e / n }
+  const rm = Array.from({ length: nk }, (_, k) => Math.sqrt(rms(k0, k * K, K))), xep = [...rm].sort((a, b) => a - b), p95 = xep[Math.floor(nk * 0.95)] || 1e-9, p10 = xep[Math.floor(nk * 0.1)] || 0
+  const noi = rm.map((v) => v > Math.max(p95 * 0.1, Math.sqrt(p95 * p10)))
+  let eM = 0, eX = 0, n = 0, so = 0
+  for (let k = 0; k < nk; k++) if (!noi[k] && (k === 0 || noi[k - 1])) { let c = k; while (c < nk && !noi[c]) c++; if (c - k >= 30) { const d = (k + Math.floor((c - k) / 4)) * K, dai = Math.floor((c - k) / 2) * K; eM += rms(k0, d, dai) * dai; eX += rms(x, d + lech, dai) * dai; n += dai; so++ } k = c }
+  const r1 = (v: number) => Math.round(v * 10) / 10
+  return so ? { soQuang: so, micDb: r1(10 * Math.log10(Math.max(1e-30, eM / n))), raDb: r1(10 * Math.log10(Math.max(1e-30, eX / n))) } : null
+}
+async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi' | 'that', giay: number, cho: number) {
   const st = taoPhong({ buoiId: 'do', lop: 'L', nay: Date.now(), ds: [{ sbd: 'S1', ten: 'Em', coMat: true, luc: 1 }] })
   datCoLive(st, { cho: true, sfu: true }, Date.now())
   let pc2: RTCPeerConnection | null = null, nhan: MediaStreamTrack | null = null, thu: RTCRtpReceiver | null = null
@@ -370,7 +393,7 @@ async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi', giay: number, cho
   const ra: Record<string, unknown> = {
     ten: ch.ten, kieu, kbps: Math.round(((b.byte - a.byte) * 8) / (t1 - t0) * 10) / 10, goiMoiGiay: Math.round(((b.goi - a.goi) * 1000) / (t1 - t0)),
     demRungMs: b.phat > a.phat ? Math.round(((b.tre - a.tre) / (b.phat - a.phat)) * 10000) / 10 : null, xuLyNhanMs: b.phat > a.phat ? Math.round(((b.xl - a.xl) / (b.phat - a.phat)) * 10000) / 10 : null,
-    mic: { hz: cd.hz, kenh: cd.kenh, vong: cd.vong, on: cd.on, agc: cd.agc, bac: cd.bac, treThuMs: cd.treThu, chuoi: cd.chuoi, kieu: cd.kieu, hzXuLy: cd.hzXuLy, locOn: cd.locOn, locOnChay: cd.locOnChay },
+    mic: { hz: cd.hz, kenh: cd.kenh, vong: cd.vong, on: cd.on, agc: cd.agc, bac: cd.bac, treThuMs: cd.treThu, chuoi: cd.chuoi, kieu: cd.kieu, hzXuLy: cd.hzXuLy, locOn: cd.locOn, locOnChay: cd.locOnChay, locOnBo: cd.locOnBo, locOnTre: cd.locOnTre, df3: cd.df3 },
   }
   if (kieu === 'xung') {
     const x0 = batXung(k0), x1 = batXung(k1), x2 = batXung(k2), dChuoi: number[] = [], dTong: number[] = []
@@ -381,11 +404,12 @@ async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi', giay: number, cho
     }
     Object.assign(ra, { soXung: x0.length, soNhan: dTong.length, chuoiMs: trungVi(dChuoi), chuoiP95: trungVi(dChuoi, 0.95), tongMs: trungVi(dTong), tongP95: trungVi(dTong, 0.95), tongNhoNhat: dTong.length ? Math.round(Math.min(...dTong) * 10) / 10 : null, tongLonNhat: dTong.length ? Math.round(Math.max(...dTong) * 10) / 10 : null })
   } else if (kieu === 'sin') Object.assign(ra, { sinMic: doSin(k0), sinChuoi: doSin(k1), sinNhan: doSin(k2) })
+  else if (kieu === 'that') { const tq = treTuongQuan(k0, k1, k2); Object.assign(ra, { that: tq, noiMic: doNoi(k0, k0, null), noiChuoi: doNoi(k1, k0, null), noiNhan: doNoi(k2, k0, null), nghiChuoi: onNghiDai(k0, k1, tq.chuoiMs ?? 0), nghiNhan: onNghiDai(k0, k2, tq.tongMs ?? 60) }) }
   else Object.assign(ra, { noiMic: doNoi(k0, k0, null), noiChuoi: doNoi(k1, k0, null), noiNhan: doNoi(k2, k0, k1) })
   lt.tat(); lt.huy()
   try { (pc2 as RTCPeerConnection).close() } catch { /* đã đóng */ }
   await actx.close()
   return ra
 }
-;(window as unknown as Record<string, unknown>).__do2 = async (ds: CauHinh2[], kieu: 'xung' | 'sin' | 'noi', giay: number, cho: number) => { const ra = []; for (const ch of ds) ra.push(await do2(ch, kieu, giay, cho)); return ra }
+;(window as unknown as Record<string, unknown>).__do2 = async (ds: CauHinh2[], kieu: 'xung' | 'sin' | 'noi' | 'that', giay: number, cho: number) => { const ra = []; for (const ch of ds) ra.push(await do2(ch, kieu, giay, cho)); return ra }
 document.body.textContent = 'Trang đo tiếng Live — chạy bằng scripts/thu-live-1011/do-tieng.mjs'

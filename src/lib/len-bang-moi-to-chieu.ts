@@ -21,6 +21,7 @@ import { thoat } from './html-phieu'
 import { JS_LEN_BANG_BPU } from './len-bang-bpu-to-chieu'
 import { CSS_BUT_BANG, JS_BUT_BANG } from './but-bang-to-chieu'
 import { CSS_LIVE_TO_CHIEU, JS_LIVE_TO_CHIEU } from './live-to-chieu'
+import { CSS_THANH_DAY, JS_THANH_DAY } from './thanh-day-to-chieu'
 import type { ThongKeLopCau } from './thong-ke-lop-cau'
 export { thongKeLopCau, type ThongKeLopCau } from './thong-ke-lop-cau'
 
@@ -206,7 +207,7 @@ body.mc-co-but .mc-but-cu{display:flex}
 .mc-but-cu .mc-m.mc-chon{border-color:rgb(255,255,255)}
 .mc-but-cu .mc-n{padding:.3em .8em;border-radius:2em;background:rgba(255,255,255,.1)}
 .mc-but-cu .mc-n.mc-chon{background:rgb(255,255,255);color:var(--mc-thanh2)}
-${CSS_BUT_BANG}${CSS_LIVE_TO_CHIEU}/* Lớp phủ: phóng hình · lưới tổng quan · phím tắt · báo nhanh */
+${CSS_BUT_BANG}${CSS_LIVE_TO_CHIEU}${CSS_THANH_DAY}/* Lớp phủ: phóng hình · lưới tổng quan · phím tắt · báo nhanh */
 .mc-phu-lop{position:fixed;inset:0;z-index:60;display:none;font-family:var(--mc-sans)}
 .mc-phu-lop.mc-mo{display:block}
 .mc-phong{background:rgba(20,18,14,.9);cursor:zoom-out}
@@ -731,6 +732,7 @@ ${JS_LEN_BANG_BPU}
 
 ${JS_BUT_BANG}
 ${JS_LIVE_TO_CHIEU}
+${JS_THANH_DAY}
   // ── lớp phủ: phóng hình / tổng quan / phím ──
   var phong = tao('div', 'mc-phu-lop mc-phong', body), luoi = tao('div', 'mc-phu-lop mc-luoi', body), phim = tao('div', 'mc-phu-lop mc-phim', body);
   phong.addEventListener('click', function () { phong.classList.remove('mc-mo'); });

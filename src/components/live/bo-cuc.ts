@@ -15,8 +15,10 @@ export interface VungChieu { giay: O4; bang: O4; giayToi: boolean }
 export const VUNG_MAC_DINH: VungChieu = { giay: [0.0052, 0.0093, 0.6615, 0.9194], bang: [0.6667, 0.0185, 0.9948, 0.9194], giayToi: false }
 /** Chiều cao lôgic của vùng chiếu trên máy em (bản vẽ: 1600 × 820). */
 export const CAO_LOGIC = 820
-/** Dải dành cho tay nắm ở MÉP TRÊN (thầy 11/11 lần 2: «thanh ẩn … chuyển lên mép trên») — khi còn chỗ; tay nắm là viên thuốc nằm ngang cao 7 px. */
-export const CO_NAM = 18
+/** Lề ngoài tối thiểu quanh giấy + bảng (px của máy em), cộng thêm vùng an toàn của máy (tai thỏ, thanh home). */
+export const LE_NGOAI = 4
+/** Khe giữa giấy và bảng trên máy em không rộng quá ngần này (px); khe trên tờ của thầy rộng hơn ⇒ hai ô nới về phía nhau. */
+export const KHE_GIUA = 5
 
 const hopLe = (o: number[]): o is O4 => o.length === 4 && o.every((v) => Number.isFinite(v) && v >= 0 && v <= 1) && o[2]! - o[0]! > 0.02 && o[3]! - o[1]! > 0.02
 
@@ -66,25 +68,62 @@ export function khungChieu(vung: VungChieu, tiLe: number): KhungChieu {
 
 /** Vùng an toàn của HÌNH (đã xoay nếu có): trái, phải, đáy, trên (px; `tren` vắng = 0). */
 export interface AnToan { trai: number; phai: number; duoi: number; tren?: number }
-export interface BoCucEm { s: number; x: number; y: number; cw: number; ch: number; /** Tay nắm đè lên mép bảng (không còn dải dư) ⇒ mờ 78 %, em kéo dọc được. */ namDe: boolean }
-/** Co vùng chiếu `LW × LH` vừa hình `w × h` (hình luôn NGANG), canh giữa bề ngang. Còn chỗ thì chừa dải tay nắm ở MÉP TRÊN (vùng chiếu dồn xuống dưới);
- *  chừa mà hình nhỏ đi quá 6 % ⇒ thôi, để tay nắm đè mép trên (mờ, tự né nét). */
-export function boCucEm(w: number, h: number, at: AnToan, LW: number, LH: number = CAO_LOGIC): BoCucEm {
-  const tren = at.tren ?? 0
-  const ngang = Math.max(1, w - at.trai - at.phai), doc = Math.max(1, h - at.duoi - tren)
-  const sDay = Math.min(ngang / LW, doc / LH), sNam = Math.min(ngang / LW, (doc - CO_NAM) / LH)
-  const s = sNam < sDay * 0.94 ? sDay : sNam
-  const cw = LW * s, ch = LH * s, du = doc - ch
-  const namDe = du < CO_NAM - 0.5
-  return { s, x: at.trai + (ngang - cw) / 2, y: tren + (namDe ? du / 2 : CO_NAM + Math.max(0, (du - CO_NAM) / 2)), cw, ch, namDe }
+export interface O { x: number; y: number; w: number; h: number }
+export interface BoCucEm {
+  /** Phép co + dời áp lên vùng chiếu (px lôgic ⇒ px của hình). MỘT phép co đều cho cả giấy lẫn bảng ⇒ nét của thầy khớp đúng chỗ. */
+  s: number; x: number; y: number
+  /** Khối giấy + bảng theo ĐÚNG ô của thầy (px của hình). */
+  cw: number; ch: number
+  /** Ô giấy / ô bảng VẼ trên máy em (px của hình): ô của thầy nới ra tới mép khung nhìn — phần nới là giấy trắng / bảng trống, nét không đổi chỗ. */
+  giay: O; bang: O
+  /** Diện tích (giấy + bảng) / diện tích khung nhìn đã trừ vùng an toàn, 0..1. */
+  phu: number
+}
+interface Hop { x0: number; y0: number; x1: number; y1: number }
+/** Khung nhìn dùng được: hình trừ vùng an toàn trừ lề ngoài. */
+const khungDung = (w: number, h: number, at: AnToan): Hop => {
+  const x0 = at.trai + LE_NGOAI, y0 = (at.tren ?? 0) + LE_NGOAI
+  return { x0, y0, x1: Math.max(x0 + 1, w - at.phai - LE_NGOAI), y1: Math.max(y0 + 1, h - at.duoi - LE_NGOAI) }
+}
+const giayBenTrai = (k: KhungChieu): boolean => k.giay.x <= k.bang.x
+
+/** PHỦ KÍN (thầy 11/11 lần 3: «tối ưu không gian hiển thị đề và bảng đen phải full để hs đọc rõ»): với phép co + dời `p`, nới ô giấy và ô bảng ra tới mép
+ *  khung nhìn — ô bên trái nới sang trái, ô bên phải nới sang phải, cả hai nới lên / xuống; khe giữa thu về `KHE_GIUA`. Chỉ ô NỀN nới; nét, chữ giấy soi và
+ *  khung cuộn của bảng vẫn theo đúng ô của thầy. Giấy và bảng không xếp cạnh nhau (bố cục lạ) ⇒ giữ nguyên ô của thầy. */
+export function oPhu(w: number, h: number, at: AnToan, k: KhungChieu, p: { s: number; x: number; y: number }): { giay: O; bang: O; phu: number } {
+  const A = khungDung(w, h, at)
+  const hop = (o: O): Hop => ({ x0: p.x + o.x * p.s, y0: p.y + o.y * p.s, x1: p.x + (o.x + o.w) * p.s, y1: p.y + (o.y + o.h) * p.s })
+  const g = hop(k.giay), b = hop(k.bang)
+  const T = giayBenTrai(k) ? g : b, P = giayBenTrai(k) ? b : g
+  if (T.x1 <= P.x0 + 0.5) {
+    const bot = Math.max(0, (P.x0 - T.x1 - KHE_GIUA) / 2)
+    T.x1 += bot; P.x0 -= bot
+    T.x0 = Math.min(T.x0, A.x0); P.x1 = Math.max(P.x1, A.x1)
+    for (const o of [T, P]) { o.y0 = Math.min(o.y0, A.y0); o.y1 = Math.max(o.y1, A.y1) }
+  }
+  const o4 = (v: Hop): O => ({ x: v.x0, y: v.y0, w: v.x1 - v.x0, h: v.y1 - v.y0 })
+  const dt = (v: Hop): number => Math.max(0, Math.min(v.x1, A.x1) - Math.max(v.x0, A.x0)) * Math.max(0, Math.min(v.y1, A.y1) - Math.max(v.y0, A.y0))
+  return { giay: o4(g), bang: o4(b), phu: (dt(g) + dt(b)) / (Math.max(1, w - at.trai - at.phai) * Math.max(1, h - at.duoi - (at.tren ?? 0))) }
 }
 
-/** Phóng bảng (chạm hai lần, ảnh 35): ô bảng đen phủ kín chiều cao. Trả phép dời + co áp lên vùng chiếu. */
-export function boCucPhong(w: number, h: number, at: AnToan, k: KhungChieu): { s: number; x: number; y: number } {
-  const tren = (at.tren ?? 0) + CO_NAM
-  const ngang = Math.max(1, w - at.trai - at.phai), doc = Math.max(1, h - at.duoi - tren)
+/** Co khối GIẤY + BẢNG (hộp bao hai ô của thầy — bỏ hẳn lề của tờ chiếu) vừa khung nhìn theo CẠNH GIỚI HẠN, không chừa dải nào cho tay nắm (tay nắm đè mép
+ *  phải bảng đen). Khối dính mép trên và dính về phía giấy (giấy bên trái ⇒ dính trái): phần dư bề ngang thành bảng đen nới rộng — chỗ tay nắm đứng, thầy
+ *  không viết tới; phần dư bề dọc thành giấy / bảng nới xuống dưới. Tỉ lệ nội bộ của vùng chiếu giữ nguyên (một phép co đều). */
+export function boCucEm(w: number, h: number, at: AnToan, k: KhungChieu): BoCucEm {
+  const A = khungDung(w, h, at)
+  const bx0 = Math.min(k.giay.x, k.bang.x), by0 = Math.min(k.giay.y, k.bang.y)
+  const bw = Math.max(k.giay.x + k.giay.w, k.bang.x + k.bang.w) - bx0, bh = Math.max(k.giay.y + k.giay.h, k.bang.y + k.bang.h) - by0
+  const s = Math.min((A.x1 - A.x0) / bw, (A.y1 - A.y0) / bh)
+  const p = { s, x: giayBenTrai(k) ? A.x0 - bx0 * s : A.x1 - (bx0 + bw) * s, y: A.y0 - by0 * s }
+  return { ...p, cw: bw * s, ch: bh * s, ...oPhu(w, h, at, k, p) }
+}
+
+/** Phóng bảng (chạm hai lần, ảnh 35): ô bảng đen của thầy phủ kín chiều cao (hoặc bề ngang), nằm giữa; phần còn lại bên phía giấy vẫn là giấy. */
+export function boCucPhong(w: number, h: number, at: AnToan, k: KhungChieu): BoCucEm {
+  const A = khungDung(w, h, at), ngang = A.x1 - A.x0, doc = A.y1 - A.y0
   const s = Math.min(ngang / k.bang.w, doc / k.bang.h)
-  return { s, x: at.trai + (ngang - k.bang.w * s) / 2 - k.bang.x * s, y: tren + (doc - k.bang.h * s) / 2 - k.bang.y * s }
+  const p = { s, x: A.x0 + (ngang - k.bang.w * s) / 2 - k.bang.x * s, y: A.y0 + (doc - k.bang.h * s) / 2 - k.bang.y * s }
+  return { ...p, cw: k.bang.w * s, ch: k.bang.h * s, ...oPhu(w, h, at, k, p) }
 }
 
 /** Máy đang DỌC mà không khoá ngang được (iPhone; Android từ chối `lock`) ⇒ xoay hình 90° bằng CSS. Khổ của HÌNH khi đó = (cao, rộng) của trang. */
@@ -92,7 +131,7 @@ export function canXoayCss(rong: number, cao: number, daKhoaNgang: boolean): boo
   return !daKhoaNgang && cao > rong
 }
 /** Vùng an toàn của HÌNH từ vùng an toàn của MÁY (env(safe-area-inset-*)): hình xoay 90° thuận kim ⇒ đỉnh máy (tai thỏ) thành mép TRÁI hình, đáy máy
- *  (thanh home) thành mép PHẢI hình, mép trái máy thành đáy hình, mép phải máy thành mép TRÊN hình (chỗ tay nắm). */
+ *  (thanh home) thành mép PHẢI hình, mép trái máy thành đáy hình, mép phải máy thành mép TRÊN hình. Tay nắm + khay ở mép PHẢI của hình = phía thanh home. */
 export function anToanHinh(may: { tren: number; phai: number; duoi: number; trai: number }, xoay: boolean): AnToan {
   return xoay ? { trai: may.tren, phai: may.duoi, duoi: may.trai, tren: may.phai } : { trai: may.trai, phai: may.phai, duoi: may.duoi, tren: may.tren }
 }

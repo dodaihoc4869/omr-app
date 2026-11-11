@@ -3,6 +3,9 @@
 //   K3  cửa sổ của nút Live có «Tạm dừng» ⇄ «Tiếp tục» và «Kết thúc live» (bấm một lần); viên Live ghi «TẠM DỪNG» lúc dừng.
 //   K4  nút Live / viên Live đứng ĐẦU thanh (mép trái); cửa sổ nút Live neo mép trái.
 //   K5  lúc live các nút phím của thanh gom vào MỘT nút lưới; bấm ⇒ xoè, bấm ra ngoài / 8 giây ⇒ thu; chưa live thì thanh như cũ.
+//       SỬA CÓ CHỦ ĐÍCH chiều 11/11 (thầy, kèm ảnh màn chiếu lúc CHƯA live: «Phần nút ở dưới chưa gọn, làm cho gọn lại tinh tế đẹp»): nút lưới thành nút
+//       «thêm» + khay có nhãn, dùng cho MỌI trạng thái, dựng ở src/lib/thanh-day-to-chieu.ts ⇒ phần mặt live không còn nút lưới riêng, không còn ẩn
+//       «Lên bảng» / nhóm phím lúc live. Luật của khay kiểm ở tests/thanh-day-1111.test.ts.
 //   B2  thẻ «em rời màn» ghi KIỂU rời.   Đợt 2: thẻ gọn «N em giơ tay» ⇒ hàng chờ + «Mời nói» + «Hạ hết tay»; công tắc em ở xa chỉ hiện khi cờ `dot2` bật.
 // + phần nối ở app (thay-noi.ts): tin `tam-dung` của tờ ⇒ thư viện `tamDung`; trạng thái gửi tờ có `nghi`, `roi[].kieu`.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -73,38 +76,25 @@ describe('K3 · cửa sổ nút Live: Tạm dừng / Tiếp tục / Kết thúc 
   })
 })
 
-describe('K4 · K5 · nút Live đầu thanh, cửa sổ neo trái, thanh gom vào một nút', () => {
-  it('nút Live, viên Live, nút lưới là ba phần tử ĐẦU của thanh; CSS neo cửa sổ nút Live sang trái', () => {
+describe('K4 · K5 · nút Live đầu thanh, cửa sổ neo trái; nút lưới «thêm» + khay nay ở thanh-day-to-chieu.ts', () => {
+  it('nút Live, viên Live là hai phần tử ĐẦU của thanh; CSS neo cửa sổ nút Live sang trái', () => {
     const t = dungTo()
-    expect([...t.thanh.children].slice(0, 3).map((e) => e.className)).toEqual(['mc-lv-nut', 'mc-lv-cum', 'mc-lv-gon'])
+    expect([...t.thanh.children].slice(0, 3).map((e) => e.className)).toEqual(['mc-lv-nut', 'mc-lv-cum', 'mc-buoc'])
     expect(CSS_LIVE_TO_CHIEU).toMatch(/\.mc-lv-the\{right:auto;left:calc\(var\(--u\)\*\.75\)\}/)
   })
-  it('chưa live: không có nút lưới, thanh như cũ; đang live: thanh gom (CSS ẩn nhóm phím, «Lên bảng», «Cài đặt»), bấm nút lưới ⇒ xoè; bấm ra ngoài / 8 giây ⇒ thu; hết live ⇒ bỏ gom', () => {
-    const t = dungTo(), gon = document.querySelector<HTMLElement>('.mc-lv-gon')!
-    t.bom({ ...NEN, pha: 'tat', tu: null })
-    expect(gon.hidden).toBe(true)
-    expect(document.body.classList.contains('mc-live')).toBe(false)
+  it('mặt live KHÔNG còn tự gom thanh: không dựng nút lưới riêng, không ẩn «Lên bảng» / nhóm phím / «Cài đặt» lúc live, không lớp mc-lv-xoe (một cơ chế chung ở thanh-day-to-chieu.ts)', () => {
+    const t = dungTo()
     t.bom(NEN)
-    expect(gon.hidden).toBe(false)
     expect(document.body.classList.contains('mc-live')).toBe(true)
-    expect(document.body.classList.contains('mc-lv-xoe')).toBe(false)
-    expect(CSS_LIVE_TO_CHIEU).toContain('body.mc-live:not(.mc-lv-xoe) .mc-thanh>#mc-phim-nhom,body.mc-live:not(.mc-lv-xoe) .mc-thanh>#mc-len-bang,body.mc-live:not(.mc-lv-xoe) .mc-thanh>#mc-cai-btn{display:none!important}')
-    gon.click()
-    expect(document.body.classList.contains('mc-lv-xoe')).toBe(true)
-    expect(gon.getAttribute('aria-expanded')).toBe('true')
-    vi.advanceTimersByTime(7000)
-    t.thanh.dispatchEvent(new Event('pointerdown', { bubbles: true })) // thầy còn đang bấm trong thanh ⇒ chưa thu
-    vi.advanceTimersByTime(7000)
-    expect(document.body.classList.contains('mc-lv-xoe')).toBe(true)
-    vi.advanceTimersByTime(1500)
-    expect(document.body.classList.contains('mc-lv-xoe')).toBe(false)
-    gon.click()
-    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true })) // bấm ra ngoài thanh
-    expect(document.body.classList.contains('mc-lv-xoe')).toBe(false)
-    gon.click()
+    expect(t.thanh.querySelector('.mc-lv-gon')).toBeNull() // nút «thêm» do thanh-day-to-chieu.ts dựng, không phải mặt live
+    expect(JS_LIVE_TO_CHIEU).not.toMatch(/lvGon|lvXoe|mc-lv-xoe/)
+    expect(CSS_LIVE_TO_CHIEU).not.toMatch(/mc-lv-xoe|#mc-len-bang|#mc-phim-nhom|#mc-cai-btn/)
+    // nhãn chữ của nút không còn bị ẩn riêng lúc live (trước: «T», «Tab», «P» trơ trọi; «?» biến mất)
+    expect(CSS_LIVE_TO_CHIEU).not.toMatch(/mc-live[^{]*\.mc-nut-chu|mc-live[^{]*\[data-k="\?"\]/)
+    // dáng nút lưới vẫn khai ở đây (cổng giữ màu so theo tệp) — thanh-day-to-chieu.ts dùng lại lớp .mc-lv-gon
+    expect(CSS_LIVE_TO_CHIEU).toContain('body.mc .mc-thanh .mc-lv-gon{')
     t.bom({ ...NEN, pha: 'tat', tu: null })
-    expect(document.body.classList.contains('mc-lv-xoe')).toBe(false)
-    expect(gon.hidden).toBe(true)
+    expect(document.body.classList.contains('mc-live')).toBe(false)
   })
   it('phím tắt V vẫn chạy khi thanh đang gom', () => {
     const t = dungTo()

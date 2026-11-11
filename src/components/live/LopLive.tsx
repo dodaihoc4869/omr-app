@@ -21,18 +21,33 @@
 //   · «Nút tạm dừng live» ⇒ phòng báo `nghi` ⇒ dải «Thầy tạm dừng live» (bảng đứng, tiếng ngừng; thầy tiếp tục là có lại ngay).
 //   · Em gửi đáp án xong tự về bảng live / thầy gọi lên bảng ép cả lớp vào bảng live: luật ở ManBinhPhanUng (`cheLive`); lớp này báo thư viện
 //     `datHienBang` để nhận điểm đang viết đúng lúc bảng hiện. Vào bảng không còn viên «Thầy đang live» chớp giữa màn (chỉ lúc thầy VỪA bật live).
+// 11/11 LẦN 3 (thầy, kèm ảnh máy em: «Chuyển mic, tắt tiếng, thanh ẩn sang hẳn góc phải ở giữa bảng đen, tối ưu không gian hiển thị đề và bảng đen phải full để hs
+//   đọc rõ, thiết kế ẩn hết vào thanh ẩn») — THAY «mép trên» của lần 2:
+//   · MỘT tay nắm ở MÉP PHẢI, giữa chiều cao bảng đen: viên thuốc dọc mảnh màu đội, mờ khi không chạm, bút của thầy tới gần thì mờ hẳn. KHÔNG còn gì nổi
+//     riêng: hết viên «Tiếng đang tắt», hết huy hiệu mic tròn — trạng thái báo bằng DẤU RẤT NHỎ xếp dọc trên tay nắm (tiếng tắt · mic mở · giơ tay · mạng yếu).
+//   · Khay trượt ra từ mép phải (đè lên mép bảng, không đẩy bố cục), tự thu sau 4 giây / chạm ra ngoài. Lần ĐẦU vào live mà tiếng đang tắt: khay tự mở
+//     3 giây cho em thấy nút «Tiếng» (một lần mỗi buổi) — thay cho viên nổi cũ.
+//   · Giấy đề + bảng đen PHỦ KÍN: bo-cuc.ts thôi chừa dải tay nắm, bỏ lề tờ chiếu, nới ô giấy / ô bảng tới mép khung nhìn (`boCucEm`).
+//   · Màn câu hỏi: tay nắm cũng ở mép phải nhưng đứng TRÊN nút «Gửi» nổi; khay mở ra bên trái cột nút «Gửi» (không che nút).
+// 11/11 CHIỀU (thầy: «Làm chuẩn cái này luôn nhé. Tối ưu cho hs nhất có thể» — sau khi biết bản phủ kín chưa làm chữ to hơn vì giấy + bảng trói nhau bằng MỘT
+//   phép co): GIẤY ĐỀ và BẢNG ĐEN co giãn ĐỘC LẬP (KhungDocLap.tsx + bo-cuc-doc-lap.ts, đặc tả 4.3h) — mỗi khung co theo bề ngang của chính nó, cao quá thì
+//   cuộn; máy tự ưu tiên khung thầy đang viết (trễ 2 giây), em kéo vạch chia được, chạm hai lần vào khung nào thì khung đó phủ kín. Lớp này chỉ còn đo khổ
+//   hình + vòng khung hình + các thứ nổi (khay, dải báo, dải lượt).
 // AN TOÀN: lớp này không nhận gì về đáp án; đề do màn Bình Phản Ứng dựng từ `viewEm.luot.cau` (đã lọc) rồi truyền vào.
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MutableRefObject, type ReactNode } from 'react'
-import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
+import type { SuKienBut } from '../../lib/but-bang-loi'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { DOI_BPU, kyHieu, tenNgan } from '../../lib/bpu/phong'
 import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
-import { anToanHinh, boCucEm, boCucPhong, canXoayCss, giaiTrang, khungChieu, type KhungChieu } from './bo-cuc'
+import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
+import type { Vung } from './bo-cuc-doc-lap'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
+import { chonHeSoGiay } from './vua-giay'
+import { DauGiay, PhuongAnTinh } from './GiayDung'
 import GiayThay, { soiDuoc, type BoChu, type CauGiay } from './GiayThay'
-import { taoVeBang, type VeBang } from './ve-bang'
+import KhungDocLap, { type HinhDL, type TayKhungDL } from './KhungDocLap'
 import './live-em.css'
 
 export interface CauNoiPhongEm { tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }
@@ -45,7 +60,7 @@ export interface PropsLopLive {
   dangKy: (c: CauNoiPhongEm) => void
   view: NonNullable<ViewLiveEm>
   che: 'an' | 'dau' | 'bang'
-  /** (Trước 11/11: màn có nút đáy ⇒ dấu «Thầy đang live» nhích lên.) Dấu nay là tay nắm mép trái nên không còn dùng; giữ để chỗ gọi cũ không vỡ. */
+  /** (Trước 11/11: màn có nút đáy ⇒ dấu «Thầy đang live» nhích lên.) Dấu nay là tay nắm mép phải nên không còn dùng; giữ để chỗ gọi cũ không vỡ. */
   nang?: boolean
   /** Đề của câu đang chiếu (khối đề dùng chung của chặng); null ⇒ giấy ghi «Thầy đang giảng trên bảng». */
   de: ReactNode | null
@@ -64,33 +79,38 @@ export interface PropsLopLive {
   luot?: DuLieuLuot | null
   /** Em ở xa (thuộc lớp, chưa điểm danh, thầy bật «Cho em ở xa vào xem»). */
   xa?: boolean
+  /** Số thứ tự câu của lượt («Câu 3» ở đầu giấy đề dựng tại máy em). */
+  so?: number | null
 }
 
-/** Giấy lệch ⇒ cắt lớp nét khỏi ô giấy: giấy bên trái bảng (mọi bố cục hiện có) ⇒ chỉ giữ phần từ mép phải của giấy trở đi; ngược lại giữ phần bên trái. */
-function catGiay(bc: { x: number; s: number; w: number }, kc: KhungChieu): CSSProperties {
-  const trai = kc.giay.x <= kc.bang.x
-  const mep = Math.max(0, Math.round(trai ? bc.x + (kc.giay.x + kc.giay.w) * bc.s : bc.w - (bc.x + kc.giay.x * bc.s)))
-  const cat = trai ? `inset(0 0 0 ${mep}px)` : `inset(0 ${mep}px 0 0)`
-  return { WebkitClipPath: cat, clipPath: cat }
-}
-
-/** Tấm giấy đề: khối đề dùng chung dựng ở bề ngang gốc rồi phóng lên cho vừa chiều cao giấy (đề dài ⇒ cỡ nhỏ nhất + cuộn dọc). */
-const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
+/** Tấm giấy đề DỰNG THƯỜNG (câu có ảnh / bảng / sơ đồ, giấy lệch giấy thầy): khối đề dùng chung dựng theo bề ngang khung giấy của EM rồi phóng cho vừa
+ *  chiều cao khung — chữ to tự nhiên theo khổ máy (hệ số phóng kẹp theo bề ngang khung), đề dài ⇒ cỡ nhỏ nhất + cuộn dọc. */
+const GiayDe = memo(function GiayDe({ de, khoa, rong, cao, q, Chu, tuLuan, so }: { de: ReactNode | null; khoa: string; rong: number; cao: number; q?: CauGiay | null; Chu?: BoChu; tuLuan?: boolean; so?: number | null }) {
   const trong = useRef<HTMLDivElement>(null)
-  const [k, setK] = useState(2)
+  const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 340))
+  const [k, setK] = useState(kMin)
   const coDe = de != null
+  const da = useRef(0)
   useLayoutEffect(() => {
     const el = trong.current
     if (!el) return
-    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(1.3, Math.min(2.1, (cao - 28) / h))) }
+    // Chọn hệ số phóng MỘT lần cho mỗi (câu, khổ ô giấy) bằng cách dò (vua-giay.ts) — bản trước tính lại theo chính chiều cao vừa đổi ⇒ không có điểm dừng,
+    // khối đề đổi cỡ mỗi khung hình («đề nhấp nháy lên xuống», thầy 11/11). Chỉ dò lại khi khối đề đổi cao vì lý do KHÁC (ảnh / phông tải xong).
+    const do1 = () => {
+      const r = chonHeSoGiay((thu) => { el.style.width = `${(rong - 36) / thu}px`; return el.scrollHeight }, cao, kMin, kMax)
+      el.style.width = `${(rong - 36) / r.k}px`
+      da.current = r.h
+      setK(r.k)
+    }
     do1()
     if (typeof ResizeObserver !== 'function') return
-    const ro = new ResizeObserver(do1)
+    const ro = new ResizeObserver(() => { if (Math.abs((el.scrollHeight || 1) - da.current) > 1) do1() })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [khoa, rong, cao, coDe])
-  if (!de) return <p className="lv-giay-trong">Thầy đang giảng trên bảng</p>
-  return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
+  }, [khoa, rong, cao, coDe, kMin, kMax])
+  if (!de) return <p className="lv-giay-trong" style={{ fontSize: Math.max(18, Math.min(34, rong / 18)) }}>Thầy đang giảng trên bảng</p>
+  // GIẤY ĐỀ kiểu tờ chiếu (GiayDung.tsx): đầu giấy · thân đề (chữ + ảnh + bảng của câu) · phương án / ý là CHỮ — không có nút trả lời nào
+  return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}><div className="lv-gd">{q ? <DauGiay q={q} so={so} tuLuan={!!tuLuan} /> : null}{de}{q && Chu ? <PhuongAnTinh q={q} Chu={Chu} tuLuan={!!tuLuan} /> : null}</div></div></div>
 })
 
 function Vach({ n }: { n: number }) {
@@ -100,6 +120,8 @@ const bt = (d: ReactNode) => <svg width="22" height="22" viewBox="0 0 24 24" fil
 const BtLoa = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></>)
 const BtMic = () => bt(<><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></>)
 const BtLoaTat = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M16 9.5l5 5m0-5l-5 5" /></>)
+const BtMang = () => bt(<path d="M5 20v-4M12 20v-9M19 20V5" />)
+const BtChia = () => bt(<path d="M12 4v16M8 9l-3.5 3L8 15M16 9l3.5 3L16 15" />)
 const BtTay = () => bt(<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5V4a1.5 1.5 0 0 1 3 0v7m0-5.5a1.5 1.5 0 0 1 3 0V12m0-3a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1.6a6 6 0 0 1-4.8-2.4L4.5 14.4a1.6 1.6 0 0 1 2.4-2.1L8 13.4" />)
 
 /** Tấm giữa màn «Thầy mời em nói» (ảnh 30). `coMic` false = buổi này máy em chưa phát được mic (live chưa có tiếng) ⇒ em nói trực tiếp. */
@@ -140,35 +162,57 @@ const giamDong = (): boolean => mayYeu() || (typeof matchMedia !== 'undefined' &
 type HuongMan = { lock?: (h: string) => Promise<void>; unlock?: () => void; type?: string }
 const huongMan = (): HuongMan | null => (typeof screen !== 'undefined' ? ((screen as Screen & { orientation?: HuongMan }).orientation ?? null) : null)
 
+/** Dấu trạng thái rất nhỏ trên tay nắm (khay đóng vẫn biết): `nhan` = chữ cho trình đọc màn (nối vào nhãn của tay nắm). */
+export interface DauNam { loai: 'tieng' | 'mic' | 'tay' | 'mang'; nhan: string }
+const BT_DAU: Record<DauNam['loai'], () => ReactNode> = { tieng: BtLoaTat, mic: BtMic, tay: BtTay, mang: BtMang }
+/** Khay tự thu sau ngần này ms không chạm; lần tự mở đầu buổi (tiếng đang tắt) thì ngắn hơn. */
+const THU_MS = 4000, GIOI_THIEU_MS = 3000
+
 interface PropsKhay {
   mo: boolean
   datMo: (m: boolean | ((truoc: boolean) => boolean)) => void
   /** Hình đang xoay 90° bằng CSS ⇒ đổi trục con trỏ. */
   xoay?: () => boolean
-  /** Bề ngang của hình (px) — để kéo tay nắm sang trái / phải dọc mép trên. */
-  rong: () => number
+  /** Bề cao của hình (px) — để kéo tay nắm lên / xuống dọc mép phải. Vắng ⇒ tay nắm đứng yên (màn câu hỏi: không được trôi xuống đè nút «Gửi»). */
+  cao?: () => number
   namRef?: MutableRefObject<HTMLButtonElement | null>
   khayRef?: MutableRefObject<HTMLDivElement | null>
-  /** Vị trí tay nắm dọc mép trên, 0..1 bề ngang hình. */
-  namX: MutableRefObject<number>
+  /** Vị trí tay nắm dọc mép phải, 0..1 bề cao hình. */
+  namY?: MutableRefObject<number>
   lopNam?: string
-  huyHieu?: ReactNode
-  /** Nút nổi cạnh tay nắm khi khay đóng (vd. «Tiếng đang tắt» — một chạm là bật). */
-  kem?: ReactNode
+  /** Dấu trạng thái xếp dọc trên tay nắm khi khay đóng: tiếng đang tắt · mic của em đang mở · em đang giơ tay · mạng yếu. */
+  dau?: DauNam[]
+  /** Lần ĐẦU vào live mà tiếng đang tắt ⇒ khay tự mở 3 giây rồi tự thu; `khiGioiThieu` báo lớp trên «đã cho xem» (một lần mỗi buổi). */
+  gioiThieu?: boolean
+  khiGioiThieu?: () => void
   children: ReactNode
 }
-/** TAY NẮM + KHAY ở MÉP TRÊN (thầy 11/11 lần 2: «thanh ẩn trên app hs chuyển lên mép trên đầu của phần thẻ tên»): viên thuốc nằm ngang giữa mép trên; chạm ⇒
- *  khay xổ từ trên xuống; vuốt xuống từ tay nắm ⇒ khay bám ngón tay; chạm ngoài / 3 giây không chạm ⇒ thu. Kéo ngang ⇒ dời tay nắm dọc mép trên.
- *  Dùng cho cả bảng live lẫn màn câu hỏi. */
-function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, kem, children }: PropsKhay) {
-  const khayTrong = useRef<HTMLDivElement | null>(null)
-  const khay = khayRef ?? khayTrong
+/** TAY NẮM + KHAY ở MÉP PHẢI (thầy 11/11 lần 3: «thanh ẩn sang hẳn góc phải ở giữa bảng đen … thiết kế ẩn hết vào thanh ẩn»): viên thuốc DỌC mảnh giữa mép
+ *  phải; chạm ⇒ khay trượt ra từ phải; vuốt sang trái từ tay nắm ⇒ khay bám ngón tay; chạm ngoài / 4 giây không chạm ⇒ thu. Kéo dọc ⇒ dời tay nắm dọc mép
+ *  phải. Dùng cho cả bảng live lẫn màn câu hỏi. */
+function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiThieu, khiGioiThieu, children }: PropsKhay) {
+  const khayTrong = useRef<HTMLDivElement | null>(null), namTrong = useRef<HTMLButtonElement | null>(null)
+  const khay = khayRef ?? khayTrong, nam = namRef ?? namTrong
   const henThu = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const hoanThu = useCallback(() => { clearTimeout(henThu.current); henThu.current = setTimeout(() => datMo(false), 3000) }, [datMo])
-  useEffect(() => { if (mo) hoanThu(); else clearTimeout(henThu.current); return () => clearTimeout(henThu.current) }, [mo, hoanThu])
+  const hanThu = useRef(THU_MS)
+  const hoanThu = useCallback(() => { clearTimeout(henThu.current); henThu.current = setTimeout(() => datMo(false), hanThu.current) }, [datMo])
+  useEffect(() => { if (mo) hoanThu(); else { clearTimeout(henThu.current); hanThu.current = THU_MS } return () => clearTimeout(henThu.current) }, [mo, hoanThu])
+  // Lần đầu vào live mà tiếng đang tắt: tự mở 3 giây (em thấy nút «Tiếng»), không lặp lại trong buổi.
+  const baoGioiThieu = useRef(khiGioiThieu)
+  baoGioiThieu.current = khiGioiThieu
+  useEffect(() => { if (!gioiThieu) return; baoGioiThieu.current?.(); hanThu.current = GIOI_THIEU_MS; datMo(true) }, [gioiThieu, datMo])
+  // Chạm ra ngoài khay + tay nắm ⇒ thu.
+  useEffect(() => {
+    if (!mo) return
+    const ngoai = (e: Event) => { const t = e.target as Node | null; if (t && (khay.current?.contains(t) || nam.current?.contains(t))) return; datMo(false) }
+    document.addEventListener('pointerdown', ngoai, true)
+    return () => document.removeEventListener('pointerdown', ngoai, true)
+  }, [mo, datMo, khay, nam])
   const keo = useRef<{ id: number; x0: number; y0: number; kieu: '' | 'ngang' | 'doc' } | null>(null)
   /** Toạ độ con trỏ theo trục của HÌNH (hình xoay 90° ⇒ đổi trục). */
   const toaDo = (e: { clientX: number; clientY: number }) => (xoay?.() ? { x: e.clientY, y: window.innerWidth - e.clientX } : { x: e.clientX, y: e.clientY })
+  /** Quãng khay phải trượt để ra hẳn ngoài mép phải (bề rộng khay + khoảng cách tới mép). */
+  const quang = () => { const k = khay.current; return k ? k.offsetWidth + 16 + (parseFloat(getComputedStyle(k).right) || 0) : 240 }
   const namXuong = (e: React.PointerEvent<HTMLButtonElement>) => {
     const p = toaDo(e)
     keo.current = { id: e.pointerId, x0: p.x, y0: p.y, kieu: '' }
@@ -178,16 +222,16 @@ function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, k
     const k = keo.current
     if (!k || k.id !== e.pointerId) return
     const p = toaDo(e), dx = p.x - k.x0, dy = p.y - k.y0
-    if (!k.kieu && Math.hypot(dx, dy) > 8) k.kieu = Math.abs(dy) > Math.abs(dx) ? 'doc' : 'ngang'
-    if (k.kieu === 'ngang') {
-      namX.current = Math.max(0.14, Math.min(0.86, p.x / Math.max(1, rong())))
-      e.currentTarget.style.left = `${namX.current * 100}%`
-      if (khay.current) khay.current.style.left = `${namX.current * 100}%`
-    } else if (k.kieu === 'doc' && khay.current) {
-      // bám ngón tay 1:1 (vuốt từ mép trên xuống); kéo quá ⇒ đàn hồi
-      const cao = khay.current.offsetHeight + 24, ra = Math.max(0, dy), vuot = Math.max(0, ra - cao)
+    if (!k.kieu && Math.hypot(dx, dy) > 8) k.kieu = Math.abs(dx) >= Math.abs(dy) ? 'ngang' : 'doc'
+    if (k.kieu === 'doc') {
+      if (!cao || !namY) return
+      namY.current = Math.max(0.14, Math.min(0.86, p.y / Math.max(1, cao())))
+      e.currentTarget.style.top = `${namY.current * 100}%`
+    } else if (k.kieu === 'ngang' && khay.current) {
+      // bám ngón tay 1:1 (vuốt từ mép phải vào); kéo quá ⇒ đàn hồi
+      const q = quang(), ra = Math.max(0, -dx), vuot = Math.max(0, ra - q)
       khay.current.style.transition = 'none'
-      khay.current.style.transform = `translate3d(-50%,${(-(cao - Math.min(ra, cao)) + vuot * 0.25).toFixed(1)}px,0)`
+      khay.current.style.transform = `translate3d(${(q - Math.min(ra, q) - vuot * 0.25).toFixed(1)}px,-50%,0)`
       khay.current.style.opacity = '1'; khay.current.style.visibility = 'visible'
     }
   }
@@ -197,15 +241,17 @@ function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, k
     if (!k || k.id !== e.pointerId) return
     const p = toaDo(e)
     if (khay.current) { khay.current.style.transition = ''; khay.current.style.transform = ''; khay.current.style.opacity = ''; khay.current.style.visibility = '' }
-    if (k.kieu === 'doc') datMo(p.y - k.y0 > ((khay.current?.offsetHeight ?? 200) + 24) * 0.3)
+    if (k.kieu === 'ngang') datMo(k.x0 - p.x > quang() * 0.3)
     else if (!k.kieu) datMo((m) => !m)
   }
+  const ds = dau ?? []
   return (
     <>
-      <button ref={namRef} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'} aria-expanded={mo}
-        onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}><i />{mo ? null : huyHieu}</button>
-      {mo ? null : kem}
-      <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={hoanThu}>{children}</div>
+      <button ref={nam} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={`${mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'}${ds.length ? ` · ${ds.map((d) => d.nhan).join(' · ')}` : ''}`} aria-expanded={mo}
+        onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}>
+        <i />{!ds.length ? null : <span className="lv-nam-dau" aria-hidden="true">{ds.map((d) => { const Bt = BT_DAU[d.loai]; return <b key={d.loai} data-dau={d.loai} title={d.nhan}><Bt /></b> })}</span>}
+      </button>
+      <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={() => { hanThu.current = THU_MS; hoanThu() }}>{children}</div>
     </>
   )
 }
@@ -222,7 +268,7 @@ function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
   return ms == null ? null : <small className="lv-tre" title="Ước tính, chưa gồm loa / tai nghe">Trễ ~{Math.round(ms / 5) * 5} ms</small>
 }
 
-export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -290,26 +336,39 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const [batTruoc, setBatTruoc] = useState(false)
   if (dangBat !== batTruoc) { setBatTruoc(dangBat); lucBat.current = dangBat ? Date.now() : 0 }
   const [moDau, setMoDau] = useState(false)
-  const namXDau = useRef(0.5)
+  /** Khay đã tự mở giới thiệu nút «Tiếng» trong buổi này chưa (một lần mỗi buổi, dù ở màn câu hỏi hay bảng live). */
+  const daGioiThieu = useRef(false)
+  const khiGioiThieu = useCallback(() => { daGioiThieu.current = true }, [])
 
   if (!tt || che === 'an') return null
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
   const coTieng = tt.tieng !== 'chua-cau-hinh'
-  const doiTieng = () => { le.current?.datTieng(!nghe); if (!nghe) void le.current?.moKhoaTieng() }
+  /** Trình duyệt chặn phát (chưa có thao tác của em) ⇒ ô «Tiếng» ghi «Chạm để nghe»: chạm là mở khoá, không phải tắt. */
+  const biChan = nghe && tt.tieng === 'bi-chan'
+  const doiTieng = () => { if (biChan) { void le.current?.moKhoaTieng(); return } le.current?.datTieng(!nghe); if (!nghe) void le.current?.moKhoaTieng() }
   const micMo = tt.mic === 'dang-phat' || tt.mic === 'dang-noi'
   /** Tấm «Thầy mời em nói»: đang được mời, chưa bấm bật (hoặc buổi chưa có tiếng ⇒ em nói trực tiếp). */
   const tamMoi = duocMoi && !micMo && tt.mic !== 'xin-quyen' && !muonMic ? <TamMoi coMic={duocMic} onBat={batMicMoi} onSau={deSau} /> : null
   /** Mic của em LÊN BẢNG (tự bật): điều khiển nằm trong khay; tay nắm mang huy hiệu mic khi mic đang mở (em luôn biết mic đang bật dù khay đóng). */
   const micBang = duocMic && !duocMoi
   const tayDuoc = !micMo && !duocMoi && tt.mic !== 'xin-quyen'
-  const huyHieu = micMo ? <b className="lv-nam-hh mic" aria-label="Mic của em đang bật"><BtMic /></b>
-    : tt.tay ? <b className="lv-nam-hh" aria-label={`Em đang giơ tay, thứ ${tt.hangTay ?? ''} trong hàng`}><BtTay /></b> : null
-  /** TIẾNG ĐANG TẮT (thầy 11/11: thầy live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết): khay đóng vẫn thấy rõ, MỘT chạm là bật.
-   *  Trình duyệt chặn phát ⇒ cùng nút ấy «Chạm để nghe thầy». */
-  const nutTieng = tt.bat && !tt.nghi && tt.tieng !== 'chua-cau-hinh' && (!nghe || tt.tieng === 'bi-chan')
-    ? <button type="button" className="lv-tieng-tat" aria-label={nghe ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : 'Tiếng thầy đang tắt. Chạm để bật'} onClick={() => { le.current?.datTieng(true); void le.current?.moKhoaTieng() }}><BtLoaTat />{nghe ? 'Chạm để nghe thầy' : 'Tiếng đang tắt'}</button> : null
+  /** TIẾNG ĐANG TẮT (thầy 11/11: thầy live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết) / trình duyệt chặn phát: khay đóng vẫn có DẤU
+   *  loa gạch trên tay nắm; lần đầu trong buổi khay tự mở 3 giây cho em thấy nút «Tiếng» (thầy 11/11 lần 3: không còn viên nổi «Tiếng đang tắt»). */
+  const tiengTat = tt.bat && !tt.nghi && tt.tieng !== 'chua-cau-hinh' && (!nghe || tt.tieng === 'bi-chan')
+  const gioiThieu = tiengTat && !daGioiThieu.current
+  /** Dấu rất nhỏ trên tay nắm (em luôn biết dù khay đóng): tiếng đang tắt · mic của em đang mở · em đang giơ tay · mạng yếu. */
+  const dauNam = (mangYeu: boolean): DauNam[] => {
+    const ds: DauNam[] = []
+    if (tiengTat) ds.push({ loai: 'tieng', nhan: nghe ? 'máy chưa phát được tiếng thầy' : 'tiếng đang tắt' })
+    if (micMo) ds.push({ loai: 'mic', nhan: 'mic của em đang bật' })
+    if (tt.tay) ds.push({ loai: 'tay', nhan: `em đang giơ tay${tt.hangTay ? `, thứ ${tt.hangTay} trong hàng` : ''}` })
+    if (mangYeu) ds.push({ loai: 'mang', nhan: 'mạng yếu' })
+    return ds
+  }
   /** Các dòng của khay — dùng chung cho bảng live và màn câu hỏi. `dau` = dòng đầu (bảng live: sóng «Thầy đang nói» + vạch mạng). */
-  const dongKhay = (dau: ReactNode) => (
+  /** Em CHƯA gửi mà thầy đã gọi bạn lên bảng (cả lớp bị đưa vào bảng live): lượt đã khoá — nói rõ cho em trong khay. */
+  const khoaChuaGui = che === 'bang' && !!luot && (luot.l.pha === 'goi' || luot.l.pha === 'lam-bang') && !luot.l.emTra && !luot.daGuiMay && !!luot.l.goi && luot.l.goi.sbd !== luot.sbd
+  const dongKhay = (dau: ReactNode, them?: ReactNode) => (
     <>
       <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}{nghe && !tt.nghi ? <TreTieng le={le} /> : null}</div>
       {GIAO_DIEN_DOT_2 ? (
@@ -319,7 +378,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
         </button>
       ) : null}
       {coTieng ? (
-        <button type="button" className={`lv-vua${nghe ? '' : ' tat'}`} aria-pressed={nghe} aria-label={nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe ? <BtLoa /> : <BtLoaTat />}Tiếng<b>{nghe ? 'Đang bật' : 'Đang tắt'}</b></button>
+        <button type="button" className={`lv-vua${nghe && !biChan ? '' : ' tat'}`} aria-pressed={nghe && !biChan} aria-label={biChan ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe && !biChan ? <BtLoa /> : <BtLoaTat />}Tiếng<b>{biChan ? 'Chạm để nghe' : nghe ? 'Đang bật' : 'Đang tắt'}</b></button>
       ) : <p className="lv-ghi">Buổi này live chưa có tiếng trên máy. Em nghe thầy giảng trực tiếp.</p>}
       {coTieng && !nghe ? <p className="lv-ghi">{xa ? 'Em đang xem từ xa: bật tiếng để nghe thầy giảng.' : 'Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì bật tiếng.'}</p> : null}
       {micBang ? (
@@ -327,12 +386,14 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
           <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : 'Đang tắt'}</b></button>
       ) : null}
       {micBang && micMo ? <p className="lv-ghi">Thầy và cả lớp đang nghe em.{view.ghi ? ' Đang ghi để lớp xem lại.' : ''}</p> : null}
+      {khoaChuaGui ? <p className="lv-ghi">Thầy đã gọi bạn lên bảng — câu này đã khoá, em chưa gửi nên để trống.</p> : null}
+      {them}
       {doi ? <div className="lv-doi"><span className="ky" aria-hidden="true">{doi.ky}</span><span>{doi.ten}</span><b>{doi.kj.toLocaleString('vi-VN')} kJ</b></div> : null}
     </>
   )
   if (che === 'dau') return (
     <div className="lv-phu lv-dau" role="group" aria-label="Thầy đang live" style={{ ...(MAU_CHIEU as CSSProperties), ...(doi ? {} : { ['--doi' as string]: 'var(--tr-chieu-giay)' }) }}>
-      <Khay mo={moDau} datMo={setMoDau} rong={() => window.innerWidth} namX={namXDau} lopNam={`de song${micMo ? ' noi' : ''}`} huyHieu={huyHieu} kem={nutTieng}>
+      <Khay mo={moDau} datMo={setMoDau} lopNam={`song${micMo ? ' noi' : ''}`} dau={dauNam(matMang)} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu}>
         {dongKhay(<span>{tt.banNoi ? `Bạn ${tenNgan(tt.banNoi.ten)} đang nói` : 'Thầy đang live'}</span>)}
       </Khay>
       {tamMoi ?? (tt.mic === 'tu-choi' ? <BaoTam ms={8000}>Máy em chưa cho dùng mic. Em mở Cài đặt của trình duyệt để cho phép, hoặc phát biểu sau.</BaoTam>
@@ -340,34 +401,37 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     </div>
   )
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} huyHieu={huyHieu} nutTieng={nutTieng} dongKhay={dongKhay} ghi={!!view.ghi} />
+    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} />
 }
 
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
-  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; luot: ReactNode; coDoi: boolean; huyHieu: ReactNode; nutTieng: ReactNode
-  dongKhay: (dau: ReactNode) => ReactNode; ghi?: boolean }
-interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; namDe: boolean; kc: KhungChieu; giayToi: boolean; tren: number }
+  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; so: number | null; luot: ReactNode; coDoi: boolean; dauNam: (mangYeu: boolean) => DauNam[]; gioiThieu: boolean; khiGioiThieu: () => void
+  dongKhay: (dau: ReactNode, them?: ReactNode) => ReactNode; ghi?: boolean }
+/** Khổ HÌNH (đã xoay nếu có) + kiểu giấy của thầy. */
+interface KhoHinh { xoay: boolean; w: number; h: number; giayToi: boolean }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, luot, coDoi, huyHieu, nutTieng, dongKhay, ghi }: PropsBang) {
-  const goc = useRef<HTMLDivElement>(null), cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi }: PropsBang) {
+  const goc = useRef<HTMLDivElement>(null), kdl = useRef<TayKhungDL>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
-  const veB = useRef<VeBang | null>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
   const khoaNgang = useRef(false)
-  const phong = useRef(false)
-  const [phongTo, setPhongTo] = useState(false)
-  const [bc, setBc] = useState<BoCuc | null>(null)
-  const bcRef = useRef<BoCuc | null>(null)
+  /** Khung đang phóng kín (em chạm hai lần) · vạch chia đang do em giữ (em đã kéo / tắt «Tự phóng theo thầy»). */
+  const [phongTo, setPhongTo] = useState<Vung | null>(null)
+  const [tayChia, setTayChia] = useState(false)
+  const [bc, setBc] = useState<KhoHinh | null>(null)
+  const hinh = useRef<HinhDL | null>(null)
   const [coNet, setCoNet] = useState(false)
   const [vao, setVao] = useState(() => vaoMoi && !giamDong())
   const [mo, setMo] = useState(false)
+  const moRef = useRef(mo)
+  moRef.current = mo
   const [thayNoi, setThayNoi] = useState(false)
   const [mang, setMang] = useState(3)
   const lucCuoi = useRef(0)
   const layLuc = useCallback(() => lucCuoi.current, [])
-  const namX = useRef(0.5)
+  const namY = useRef(0.5)
   // GIẤY ĐỀ GIỐNG GIẤY THẦY (rủi ro R3): bố cục của đúng trang đang chiếu + máy em soi được ⇒ dựng giấy soi rồi tự kiểm; lệch / không soi được ⇒ cách dựng
   // thường + ẨN NÉT TRÊN GIẤY (nét trên bảng đen giữ nguyên), số đo `live-do` mang cờ giấy lệch.
   const [khopGiay, setKhopGiay] = useState(false)
@@ -375,59 +439,57 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
   const soi = !!q && !!Chu && soiDuoc(giay, giaiTrang(bc ? trang.current.trang : '').khoa)
   const netGiay = soi && khopGiay
   useEffect(() => { le.current?.datGiayLech(!netGiay) }, [le, netGiay])
+  /** Cỡ chữ đề / bề ngang ô giấy của thầy (khối đề = loại 2, cỡ chữ × 10 ở ô thứ 7) ⇒ máy chia bề ngang sao cho chữ đề không dưới 15 px. Giấy không soi
+   *  được (dựng thường) ⇒ null: chữ xuống dòng theo khung của em, không phụ thuộc bề ngang khung. */
+  const khoiDe = soi && giay ? giay.o.find((b) => b[0] === 2) : undefined
+  const tiLeChu = khoiDe && giay && giay.w > 0 && khoiDe[6]! > 0 ? khoiDe[6]! / 10 / giay.w : null
 
-  /** Tính lại bố cục theo màn + trang đang chiếu, đặt cỡ hai canvas. */
-  const xep = useCallback(() => {
+  /** Đo khổ hình + vùng an toàn của máy (đọc thước `env(safe-area-inset-*)`). */
+  const doHinh = useCallback((): HinhDL => {
     const W = window.innerWidth, H = window.innerHeight
     const xoay = canXoayCss(W, H, khoaNgang.current)
-    const w = xoay ? H : W, h = xoay ? W : H
     const cs = thuoc.current ? getComputedStyle(thuoc.current) : null
     const px = (v: string | undefined) => parseFloat(v || '0') || 0
-    const at = anToanHinh({ tren: px(cs?.paddingTop), phai: px(cs?.paddingRight), duoi: px(cs?.paddingBottom), trai: px(cs?.paddingLeft) }, xoay)
-    const { vung } = giaiTrang(trang.current.trang)
-    const kc = khungChieu(vung, trang.current.tiLe)
-    const b0 = boCucEm(w, h, at, kc.LW, kc.LH)
-    const b = phong.current ? { ...b0, ...boCucPhong(w, h, at, kc) } : b0
-    const moi: BoCuc = { xoay, w, h, s: b.s, x: b.x, y: b.y, namDe: b0.namDe || phong.current, kc, giayToi: vung.giayToi, tren: at.tren ?? 0 }
-    bcRef.current = moi
-    setBc(moi)
-    goc.current?.style.setProperty('--lv-at-phai', `${at.phai}px`); goc.current?.style.setProperty('--lv-at-duoi', `${at.duoi}px`); goc.current?.style.setProperty('--lv-at-trai', `${at.trai}px`); goc.current?.style.setProperty('--lv-at-tren', `${at.tren ?? 0}px`)
-    const dpr = Math.min(window.devicePixelRatio || 1, mayYeu() ? 1.5 : 2.5)
-    // canvas phủ cả hình (không chỉ vùng chiếu) ⇒ phóng bảng / dời vùng chiếu không phải đổi cỡ canvas
-    veB.current?.datKhung({ Wv: kc.Wv * b.s, Hv: kc.Hv * b.s, ox: kc.ox * b.s - b.x, oy: kc.oy * b.s - b.y, w, h, dpr })
+    return { xoay, w: xoay ? H : W, h: xoay ? W : H, at: anToanHinh({ tren: px(cs?.paddingTop), phai: px(cs?.paddingRight), duoi: px(cs?.paddingBottom), trai: px(cs?.paddingLeft) }, xoay) }
   }, [])
+  const layHinh = useCallback((): HinhDL => hinh.current ?? (hinh.current = doHinh()), [doHinh])
+  const layTrang = useCallback(() => trang.current, [])
+  /** Tính lại bố cục theo màn + trang đang chiếu (hai khung + lớp vẽ: KhungDocLap). */
+  const xep = useCallback(() => {
+    const m = doHinh(), at = m.at
+    hinh.current = m
+    setBc({ xoay: m.xoay, w: m.w, h: m.h, giayToi: giaiTrang(trang.current.trang).vung.giayToi })
+    goc.current?.style.setProperty('--lv-at-phai', `${at.phai}px`); goc.current?.style.setProperty('--lv-at-duoi', `${at.duoi}px`); goc.current?.style.setProperty('--lv-at-trai', `${at.trai}px`); goc.current?.style.setProperty('--lv-at-tren', `${at.tren ?? 0}px`)
+    kdl.current?.xep()
+  }, [doHinh])
 
-  // Lớp vẽ + nối sự kiện bút + vòng khung hình.
+  // Nối sự kiện bút + vòng khung hình (lớp vẽ nằm trong KhungDocLap — hiệu ứng của nó chạy trước hiệu ứng này).
   useLayoutEffect(() => {
-    const l = le.current
-    if (!cvChot.current || !cvSong.current) return
-    const v = taoVeBang(taoLoiBut(), cvChot.current, cvSong.current)
-    veB.current = v
+    const l = le.current, t = kdl.current
+    if (!t) return
     const ap = (sk: SuKienBut) => {
       lucCuoi.current = Date.now()
       if (sk.loai === 'trang') { const doi = sk.trang !== trang.current.trang || sk.tiLe !== trang.current.tiLe; trang.current = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep() }
-      v.ap(sk)
-      setCoNet(v.soNet() + v.soDo() > 0)
+      t.ap(sk)
     }
     const b = l?.bang()
     if (b) trang.current = { trang: b.trang, tiLe: b.tiLe }
     xep()
     if (b) ap({ loai: 'trang', trang: b.trang, tiLe: b.tiLe, net: b.net.slice() })
     datNhanBut(ap)
-    let raf = 0, le2 = false, lucAm = 0, noiDen = 0, dangNoi = false, lucMang = 0
+    let raf = 0, le2 = false, lucAm = 0, noiDen = 0, dangNoi = false, lucMang = 0, neDen = 0, dangNe = false
     const yeu = mayYeu()
     const khung = (nay: number) => {
       raf = requestAnimationFrame(khung)
       if (yeu && (le2 = !le2)) return // máy yếu: 30 khung / giây
-      const lv = le.current, b2 = bcRef.current
+      const lv = le.current, b2 = hinh.current
       if (!lv || !b2) return
       const k = lv.khung()
-      v.datDau(k.dau)
-      v.datBut(k.but, k.cuon) // cây bút của thầy (11/11, thay chấm tròn vàng): vẽ ngay trên lớp «đang viết», cùng lượt với đuôi nét
-      v.veSong(nay)
-      const p = v.viTriBut()
-      // tay nắm đè mép trên vùng chiếu: nét chạy tới chỗ nó đang đứng ⇒ tự né sang trái / phải
-      if (p && b2.namDe && nam.current && p[1] < b2.tren + 64 && Math.abs(p[0] - namX.current * b2.w) < 70) { namX.current = p[0] < b2.w / 2 ? 0.8 : 0.2; nam.current.style.left = `${namX.current * 100}%`; if (khay.current) khay.current.style.left = `${namX.current * 100}%` }
+      // cây bút của thầy (11/11, thay chấm tròn vàng) vẽ ngay trên lớp «đang viết», cùng lượt với đuôi nét; kèm tự ưu tiên khung + giấy tự trôi theo bút
+      const p = t.khung(nay, k.dau, k.but, k.cuon)
+      // tay nắm đè mép phải bảng đen: bút của thầy tới gần chỗ nó đứng ⇒ MỜ HẲN (không chặn nhìn nét); bút đi khỏi 1,2 giây ⇒ rõ lại
+      if (p && p[0] > b2.w - b2.at.phai - 72 && Math.abs(p[1] - namY.current * b2.h) < 84) neDen = nay + 1200
+      if ((nay < neDen) !== dangNe) { dangNe = nay < neDen; if (dangNe) nam.current?.setAttribute('data-ne', ''); else nam.current?.removeAttribute('data-ne') }
       if (nay - lucAm > 110) {
         lucAm = nay
         const am = Math.min(1, lv.mucAm() * 3)
@@ -441,7 +503,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       if (nay - lucMang > 1000) { lucMang = nay; const m = lv.soDo().mang; setMang(m === 2 ? 1 : m === 1 ? 2 : 3) }
     }
     raf = requestAnimationFrame(khung)
-    return () => { cancelAnimationFrame(raf); datNhanBut(null); veB.current = null }
+    return () => { cancelAnimationFrame(raf); datNhanBut(null) }
   }, [le, datNhanBut, xep])
 
   // Xoay ngang: Android khoá hướng sau khi đã toàn màn hình; không khoá được ⇒ `canXoayCss`. Mọi lần khoá / nhả / đổi hướng ⇒ «khoá xoay» 600 ms
@@ -468,43 +530,31 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
 
   useEffect(() => { if (!vao) return; const h = setTimeout(() => setVao(false), 620); return () => clearTimeout(h) }, [vao])
 
-  /** Chạm hai lần vào bảng đen ⇒ phóng bảng; hai lần nữa ⇒ toàn cảnh (ảnh 35). */
-  const chamCuoi = useRef(0)
-  const chamNen = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (mo) { setMo(false); return }
-    const b = bcRef.current
-    if (!b) return
-    const p = b.xoay ? { x: e.clientY, y: window.innerWidth - e.clientX } : { x: e.clientX, y: e.clientY }, x = (p.x - b.x) / b.s, y = (p.y - b.y) / b.s, o = b.kc.bang
-    const trongBang = x >= o.x && x <= o.x + o.w && y >= o.y && y <= o.y + o.h
-    if (trongBang && e.timeStamp - chamCuoi.current < 320) { phong.current = !phong.current; setPhongTo(phong.current); chamCuoi.current = 0; xep(); veB.current?.veLai() } else chamCuoi.current = e.timeStamp
-  }
+  /** Em chạm nền lúc khay đang mở ⇒ thu khay trước (không tính vào chạm hai lần). */
+  const khiCham = useCallback((): boolean => { if (!moRef.current) return false; setMo(false); return true }, [])
+  const khiNet = useCallback((v: { soNet: () => number; soDo: () => number }) => setCoNet(v.soNet() + v.soDo() > 0), [])
+  const dungGiay = useCallback(({ rong, cao }: { rong: number; cao: number }) => (soi && giay && q && Chu
+    ? <GiayThay giay={giay} q={q} Chu={Chu} tuLuan={tuLuan} rong={rong} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} q={q} Chu={Chu} tuLuan={tuLuan} so={so} />} />
+    : <GiayDe de={de} khoa={khoaDe} rong={rong} cao={cao} q={q} Chu={Chu} tuLuan={tuLuan} so={so} />), [soi, giay, q, Chu, tuLuan, so, datKhop, de, khoaDe])
+  const yeu = mayYeu()
 
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
   /** Mic của em đang mở (em được gọi lên bảng / được mời nói). Bạn đang nói = em khác đang mở mic (thư viện đã loại chính em). */
   const micMo = tt.mic === 'dang-phat' || tt.mic === 'dang-noi'
   const banNoi = tt.banNoi
   const kieu: CSSProperties = { ...(MAU_CHIEU as CSSProperties), ...(bc ? { width: bc.w, height: bc.h } : {}), ...(coDoi ? {} : { ['--doi' as string]: 'var(--tr-chieu-giay)' }) }
-  const kc = bc?.kc
-  const o = (v: { x: number; y: number; w: number; h: number }): CSSProperties => ({ left: v.x, top: v.y, width: v.w, height: v.h })
+  /** Hàng «Tự phóng theo thầy» trong khay: bật = máy tự cho khung thầy đang viết to ra; em kéo vạch chia thì tự tắt (giữ chỗ em chia). Máy yếu: chia cố định. */
+  const hangChia = yeu ? null : (
+    <button type="button" className={`lv-tu-phong${tayChia ? ' tat' : ''}`} aria-pressed={!tayChia} aria-label={tayChia ? 'Tự phóng theo thầy: đang tắt. Chạm để bật' : 'Tự phóng theo thầy: đang bật. Chạm để tắt'} onClick={() => (tayChia ? kdl.current?.boTay() : kdl.current?.giuTay())}>
+      <BtChia />Tự phóng theo thầy<b>{tayChia ? 'Đang tắt' : 'Đang bật'}</b></button>
+  )
   return (
     <div ref={goc} className="lv" data-xoay={bc?.xoay || undefined} data-vao={vao || undefined} data-mat={matMang || undefined} data-giay={bc?.giayToi ? 'toi' : 'sang'} data-soi={netGiay || undefined} style={kieu} role="region" aria-label="Thầy đang live: bảng chữa bài">
       <div ref={thuoc} className="lv-thuoc" aria-hidden="true" />
-      <div className="lv-nen" onPointerDown={chamNen}>
-        {bc && kc ? (
-          <div className="lv-chieu" style={{ width: kc.LW, height: kc.LH, transform: `translate3d(${bc.x}px,${bc.y}px,0) scale(${bc.s})` }}>
-            <div className="lv-giay" style={o(kc.giay)}>
-              {soi && giay && q && Chu ? <GiayThay giay={giay} q={q} Chu={Chu} tuLuan={tuLuan} rong={kc.giay.w} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={kc.giay.w} cao={kc.giay.h} />} />
-                : <GiayDe de={de} khoa={khoaDe} rong={kc.giay.w} cao={kc.giay.h} />}
-            </div>
-            <div className="lv-bang" style={o(kc.bang)}>{coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>}</div>
-          </div>
-        ) : null}
-        {/* giấy lệch ⇒ cắt lớp nét khỏi ô giấy (chỉ còn phần từ mép bảng đen trở đi) */}
-        <div className="lv-net" style={netGiay || !bc || !kc ? undefined : catGiay(bc, kc)}>
-          <canvas ref={cvChot} className="lv-cv" aria-hidden="true" />
-          <canvas ref={cvSong} className="lv-cv song" aria-hidden="true" />
-          <div ref={tro} className="lv-tro" aria-hidden="true" />
-        </div>
+      <div className="lv-nen">
+        {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
+        <KhungDocLap ref={kdl} lop="lv" layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
+          bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet} />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
       {matMang ? <BaoMatMang layLuc={layLuc} />
@@ -512,14 +562,14 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
         : tt.tieng === 'loi' ? <BaoTam ms={6000}>Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</BaoTam>
         : phongTo ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
       {luot && !phongTo ? <div className="lv-luot" onPointerDown={(e) => e.stopPropagation()}>{luot}</div> : null}
-      {/* Không còn nút nổi trên bảng (thầy 11/11): mic của em lên bảng điều khiển TRONG khay (tay nắm mang huy hiệu mic). Chỉ còn tấm mời / viên «Em đang
+      {/* Không còn nút nổi trên bảng (thầy 11/11): mic của em lên bảng điều khiển TRONG khay (tay nắm mang dấu mic rất nhỏ). Chỉ còn tấm mời / viên «Em đang
           nói» của em ĐƯỢC MỜI (đợt 2), dòng báo lỗi mic và dải «Bạn … đang nói». */}
       {tamMoi ? tamMoi : tt.duocMoi && (micMo || tt.mic === 'xin-quyen') ? <VienNoi goc={theMic} dangMo={micMo} lenBang={false} onTat={tatMic} ghi={ghi} />
         : tt.mic === 'tu-choi' || tt.mic === 'loi' ? <div className="lv-bao nho duoi" role="status">{tt.mic === 'tu-choi' ? 'Máy em chưa cho dùng mic. Em mở Cài đặt của trình duyệt để cho phép, hoặc phát biểu sau.' : 'Chưa bật được mic · em nói to cho thầy nghe'}</div>
         : banNoi && !phongTo && !luot ? <div ref={daiBan} className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}
-      <Khay mo={mo} datMo={setMo} xoay={() => !!bcRef.current?.xoay} rong={() => bcRef.current?.w ?? window.innerWidth} namRef={nam} khayRef={khay} namX={namX}
-        lopNam={`${bc?.namDe ? 'de' : ''}${(thayNoi && nghe) || micMo ? ' noi' : ''}`} huyHieu={huyHieu} kem={nutTieng}>
-        {dongKhay(<>{thayNoi ? <><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><span>Thầy đang nói</span></> : <span>Thầy đang im</span>}<Vach n={matMang ? 0 : mang} /></>)}
+      <Khay mo={mo} datMo={setMo} xoay={() => !!hinh.current?.xoay} cao={() => hinh.current?.h ?? window.innerHeight} namRef={nam} khayRef={khay} namY={namY}
+        lopNam={(thayNoi && nghe) || micMo ? 'noi' : ''} dau={dauNam(matMang || mang < 3)} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu}>
+        {dongKhay(<>{thayNoi ? <><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><span>Thầy đang nói</span></> : <span>Thầy đang im</span>}<Vach n={matMang ? 0 : mang} /></>, hangChia)}
       </Khay>
     </div>
   )

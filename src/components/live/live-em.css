@@ -12,13 +12,13 @@
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
 .lv-nen { position: absolute; inset: 0; }
 .lv-chieu { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
-.lv-giay { position: absolute; border-radius: 28px; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; }
+.lv-giay { position: absolute; border-radius: 12px; background: var(--tr-nen); color: var(--tr-chu); overflow: hidden; }
 .lv-de { position: absolute; inset: 0; padding: 14px 18px; overflow-x: hidden; overflow-y: auto; touch-action: pan-y; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .lv-de-trong { transform-origin: 0 0; pointer-events: none; }
 .lv-de-trong .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex-direction: column; gap: 10px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
 .lv-giay-trong { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; text-align: center; font-size: 34px; font-weight: 700; color: var(--tr-chu-2); }
-.lv-bang { position: absolute; border-radius: 28px; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); }
-.lv-bang p { position: absolute; left: 0; right: 0; top: 40%; margin: 0; text-align: center; font-size: 22px; line-height: 1.5; font-weight: 600; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); }
+.lv-bang { position: absolute; border-radius: 12px; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); }
+.lv-bang p { position: absolute; left: 8px; right: 8px; top: 40%; margin: 0; text-align: center; font-size: clamp(13px, calc(2.4vmin + 6px), 22px); line-height: 1.5; font-weight: 600; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); pointer-events: none; }
 .lv-cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
 /* lớp «đang viết»: canvas nhỏ đi theo đầu bút (cỡ + chỗ do ve-bang.ts đặt) */
 .lv-cv.song { width: auto; height: auto; will-change: transform; }
@@ -53,33 +53,43 @@
 .lv-dau-cu svg { width: 20px; height: 20px; }
 @keyframes lv-dau-vao { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-/* TAY NẮM + KHAY ở MÉP TRÊN (thầy 11/11 lần 2: «thanh ẩn trên app hs chuyển lên mép trên đầu của phần thẻ tên»; lần 1 cùng ngày: «thanh ẩn và ô tắt mở
-   tiếng ẩn hết vào thanh»). Tay nắm: viên thuốc NẰM NGANG màu đội giữa mép trên — vùng chạm 76 × 44. Ô tiếng, nút mic nằm TRONG khay; không còn nút nổi riêng. */
-.lv .lv-nam, .lv-phu .lv-nam { position: absolute; left: 50%; top: var(--lv-at-tren, 0px); width: 76px; height: 44px; min-height: 44px; margin: 0 0 0 -38px; padding: 5px 0 0; border: 0; background: none; display: grid; place-items: start center;
-  cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; z-index: 3; }
-.lv-nam i { display: block; width: 46px; height: 7px; border-radius: 4px; background: var(--doi); opacity: 0.78; transition: transform 0.12s;
+/* TAY NẮM + KHAY ở MÉP PHẢI (thầy 11/11 lần 3, kèm ảnh máy em: «Chuyển mic, tắt tiếng, thanh ẩn sang hẳn góc phải ở giữa bảng đen … thiết kế ẩn hết vào thanh
+   ẩn»; lần 2 cùng ngày là mép trên, lần 1 là mép trái). Tay nắm: viên thuốc DỌC mảnh màu đội (5 × 40) sát mép phải, giữa chiều cao — vùng chạm 44 × 76, mờ
+   khi không chạm; bút của thầy tới gần ⇒ `data-ne` mờ hẳn. KHÔNG còn nút / huy hiệu nổi riêng: trạng thái là các DẤU 15 px xếp dọc ngay trên viên thuốc. */
+.lv .lv-nam, .lv-phu .lv-nam { position: absolute; right: var(--lv-at-phai, 0px); top: 50%; width: 44px; height: 76px; min-height: 76px; margin: -38px 0 0; padding: 0 3px 0 0; border: 0; background: none; display: grid; place-items: center end;
+  cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; z-index: 3; transition: opacity 0.18s; }
+.lv-nam i { display: block; width: 5px; height: 40px; border-radius: 3px; background: var(--doi); opacity: 0.55; transition: transform 0.12s, opacity 0.18s;
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-chieu-bang) 25%, transparent), 0 0 14px color-mix(in srgb, var(--doi) 55%, transparent); }
-.lv-nam:active i { transform: scale(0.97, 0.9); }
+.lv-nam:active i { opacity: 1; transform: scale(0.9, 0.97); }
 .lv-nam.noi i { opacity: 1; box-shadow: 0 0 0 5px color-mix(in srgb, var(--doi) 26%, transparent), 0 0 18px var(--doi); }
+.lv-nam[data-ne] { opacity: 0.16; }
 .lv-nam:focus-visible { outline: 3px solid var(--tr-chieu-giay); outline-offset: -6px; border-radius: 16px; }
-/* Huy hiệu cạnh tay nắm khi khay đóng: mic của em đang bật · em đang giơ tay (ảnh 29) */
+/* Dấu trạng thái trên tay nắm khi khay đóng (xếp từ đầu viên thuốc lên trên): tiếng đang tắt · mic của em đang bật · em đang giơ tay · mạng yếu */
+.lv-nam-dau { position: absolute; right: 1px; bottom: calc(50% + 24px); display: flex; flex-direction: column-reverse; align-items: center; gap: 3px; pointer-events: none; }
+.lv-nam-dau b { display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--tr-chieu-mat); color: var(--tr-chieu-giay);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tr-chieu-giay) 30%, transparent); }
+.lv-nam-dau svg { width: 9px; height: 9px; stroke-width: 3; }
+/* khay đang mở (nằm trên tay nắm) ⇒ ẩn dấu, khỏi ló nửa vời sau mép khay */
+.lv-nam[aria-expanded="true"] .lv-nam-dau { visibility: hidden; }
+.lv-nam-dau b[data-dau="tieng"], .lv-nam-dau b[data-dau="mang"] { color: var(--p-cam); box-shadow: inset 0 0 0 1px var(--p-cam); }
+.lv-nam-dau b[data-dau="mic"], .lv-nam-dau b[data-dau="tay"] { background: var(--doi); color: var(--p-muc); box-shadow: none; }
+/* (GIỮ KHAI BÁO CŨ — luật giữ màu; từ 11/11 lần 3 không còn dựng: huy hiệu tròn cạnh tay nắm `.lv-nam-hh`, viên «Tiếng đang tắt» nổi `.lv-tieng-tat`.) */
 .lv-nam-hh { position: absolute; left: calc(50% + 30px); top: 2px; width: 34px; height: 34px; margin-top: 0; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); pointer-events: none;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--doi) 28%, transparent), 0 6px 18px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent); }
 .lv-nam-hh svg { width: 20px; height: 20px; }
-/* «Tiếng đang tắt» cạnh tay nắm (bên trái, khay đóng): một chạm là bật. Cao 22 px — nằm gọn trong dải mép trên, vùng chạm nới ra 44 px bằng ::after. */
 .lv .lv-tieng-tat, .lv-phu .lv-tieng-tat { position: absolute; right: calc(50% + 42px); top: var(--lv-at-tren, 0px); height: 22px; min-height: 22px; margin: 0; padding: 0 9px 0 6px; border: 1px solid var(--p-cam); border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;
   background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); font-family: inherit; font-size: 12px; font-weight: 700; line-height: 1; white-space: nowrap; z-index: 6; pointer-events: auto; cursor: pointer; }
-.lv-tieng-tat::after { content: ""; position: absolute; left: -6px; right: -6px; top: -6px; bottom: -16px; }
 .lv-tieng-tat svg { width: 14px; height: 14px; color: var(--p-cam); }
 .lv-tieng-tat:focus-visible { outline: 3px solid var(--tr-chieu-giay); outline-offset: 2px; }
 
-/* Khay điều khiển: kính mờ tối, xổ từ mép trên xuống (canh theo tay nắm) */
-.lv-khay { position: absolute; left: 50%; top: calc(var(--lv-at-tren, 0px) + 10px); width: 216px; max-height: calc(100% - var(--lv-at-tren, 0px) - 20px); overflow-y: auto; overscroll-behavior: contain; border-radius: 26px; padding: 12px; color: var(--tr-chieu-giay); z-index: 2;
+/* Khay điều khiển: kính mờ tối, trượt ra từ MÉP PHẢI (đè lên mép bảng đen, không đẩy bố cục), canh giữa chiều cao. `--lv-kp` = khoảng cách tới mép phải.
+   Trượt 180 ms bằng transform / opacity. Khay mở nằm TRÊN tay nắm (vùng chạm của tay nắm không ăn mất mép phải các nút trong khay). */
+.lv-khay { --lv-kp: calc(var(--lv-at-phai, 0px) + 8px); position: absolute; right: var(--lv-kp); top: 50%; width: 216px; max-height: calc(100% - var(--lv-at-tren, 0px) - var(--lv-at-duoi, 0px) - 12px); overflow-y: auto; overscroll-behavior: contain; border-radius: 26px; padding: 12px; color: var(--tr-chieu-giay); z-index: 4;
   background: color-mix(in srgb, var(--tr-chieu-mat) 74%, transparent); -webkit-backdrop-filter: blur(22px) saturate(160%); backdrop-filter: blur(22px) saturate(160%);
   box-shadow: 0 18px 50px color-mix(in srgb, var(--tr-chieu-bang) 55%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--tr-chieu-giay) 12%, transparent);
-  transform: translate3d(-50%, calc(-100% - 24px), 0); opacity: 0; visibility: hidden; transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.25, 1), opacity 0.18s, visibility 0s 0.3s; }
+  transform: translate3d(calc(100% + var(--lv-kp) + 16px), -50%, 0); opacity: 0; visibility: hidden; transition: transform 0.18s cubic-bezier(0.2, 0.9, 0.25, 1), opacity 0.14s, visibility 0s 0.18s; }
 /* khay đóng ⇒ visibility: hidden (kính mờ không phải vẽ lại nền mỗi khung khi thầy đang viết) */
-.lv-khay[data-mo] { transform: translate3d(-50%, 0, 0); opacity: 1; visibility: visible; transition-delay: 0s; }
+.lv-khay[data-mo] { transform: translate3d(0, -50%, 0); opacity: 1; visibility: visible; transition-delay: 0s; }
 .lv-khay-dau { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 4px; font-size: 13.5px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 86%, transparent); }
 .lv-khay-dau .lv-vach { margin-left: auto; }
 .lv-khay-dau .lv-tre { font-size: 11.5px; font-weight: 600; opacity: 0.72; white-space: nowrap; }
@@ -91,27 +101,30 @@
 .lv-vach i { display: block; width: 4px; border-radius: 1.5px; background: color-mix(in srgb, var(--tr-chieu-giay) 30%, transparent); }
 .lv-vach i.b { background: var(--p-xanh); }
 .lv-vach.yeu i.b { background: var(--p-cam); }
-.lv .lv-vua, .lv-phu .lv-vua { width: 100%; min-height: 50px; border: 0; border-radius: 16px; margin-top: 8px; padding: 0 14px; display: flex; align-items: center; gap: 10px; font: inherit; font-size: 15.5px; font-weight: 700; cursor: pointer;
+.lv .lv-vua, .lv-phu .lv-vua, .lv .lv-tu-phong { width: 100%; min-height: 50px; border: 0; border-radius: 16px; margin-top: 8px; padding: 0 14px; display: flex; align-items: center; gap: 10px; font: inherit; font-size: 15.5px; font-weight: 700; cursor: pointer;
   color: var(--tr-chieu-giay); background: color-mix(in srgb, var(--tr-chieu-giay) 10%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tr-chieu-giay) 14%, transparent); transition: transform 0.1s; }
-.lv-vua:active { transform: scale(0.97); }
-.lv-vua b { margin-left: auto; font-weight: 800; }
-.lv-vua.tat b { color: color-mix(in srgb, var(--tr-chieu-giay) 60%, transparent); }
+.lv-vua:active, .lv-tu-phong:active { transform: scale(0.97); }
+.lv-vua b, .lv-tu-phong b { margin-left: auto; font-weight: 800; }
+.lv-vua.tat b, .lv-tu-phong.tat b { color: color-mix(in srgb, var(--tr-chieu-giay) 60%, transparent); }
 .lv-vua.mic[aria-pressed="true"] { background: var(--doi); color: var(--p-muc); box-shadow: none; }
-.lv-vua svg { flex: none; }
+.lv-vua svg, .lv-tu-phong svg { flex: none; }
 .lv-ghi { margin: 8px 4px 0; font-size: 12.5px; line-height: 1.4; font-weight: 500; color: color-mix(in srgb, var(--tr-chieu-giay) 72%, transparent); }
 .lv-doi { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 2px 6px 0; font-size: 13.5px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 80%, transparent); }
 .lv-doi .ky { flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; font-weight: 800; background: var(--doi); color: var(--p-muc); }
 .lv-doi b { margin-left: auto; font-weight: 800; color: var(--tr-chieu-giay); font-variant-numeric: tabular-nums; }
 
-/* MÀN CÂU HỎI lúc thầy đang live (em đang làm bài): chỉ còn tay nắm nhỏ giữa MÉP TRÊN, ngay trên đầu thẻ đội / tên của em (chấm đỏ = thầy đang live) + khay
-   xổ từ trên xuống; tấm mời / viên «Em đang nói» nổi trên màn. Chừa tai thỏ bằng env(safe-area-inset-top). */
-.lv-phu { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 7; pointer-events: none; font-weight: 500; --lv-at-trai: env(safe-area-inset-left, 0px); --lv-at-tren: env(safe-area-inset-top, 0px); }
+/* MÀN CÂU HỎI lúc thầy đang live (em đang làm bài): chỉ còn tay nắm nhỏ ở MÉP PHẢI, đứng TRÊN nút «Gửi» nổi (`.bpu-gui-noi`: mép phải, giữa màn, cao 84) —
+   tâm tay nắm cao hơn giữa màn 104 px nên hai thứ không chạm nhau; chấm đỏ dưới viên thuốc = thầy đang live. Khay trượt ra từ phải nhưng dừng BÊN TRÁI cột
+   nút «Gửi» (không che nút). Tấm mời / viên «Em đang nói» nổi trên màn. Chừa vùng an toàn bằng env(safe-area-inset-*). */
+.lv-phu { position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 7; pointer-events: none; font-weight: 500; --lv-at-trai: env(safe-area-inset-left, 0px); --lv-at-tren: env(safe-area-inset-top, 0px); --lv-at-phai: env(safe-area-inset-right, 0px); --lv-at-duoi: env(safe-area-inset-bottom, 0px); }
 .lv-phu > * { pointer-events: auto; }
-.lv-phu .lv-nam { height: 30px; min-height: 30px; }
-.lv-phu .lv-nam.song::before { content: ""; position: absolute; left: 3px; top: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--p-do); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-do) 24%, transparent); }
+.lv-phu .lv-nam { top: calc(50% - 104px); }
+.lv-phu .lv-nam i { opacity: 0.9; }
+.lv-phu .lv-nam.song::before { content: ""; position: absolute; right: 2px; top: calc(50% + 26px); width: 7px; height: 7px; border-radius: 50%; background: var(--p-do); box-shadow: 0 0 0 3px color-mix(in srgb, var(--p-do) 24%, transparent); }
+.lv-phu .lv-khay { --lv-kp: calc(max(12px, env(safe-area-inset-right, 0px)) + 66px); }
 
 /* Dải báo: mất mạng (ảnh 33–34) · mạng chặn tiếng · phóng bảng */
-.lv-bao { position: absolute; left: 50%; top: calc(var(--lv-at-tren, 0px) + 30px); transform: translateX(-50%); min-height: 58px; padding: 6px 18px 6px 12px; border-radius: 999px; display: flex; align-items: center; gap: 10px;
+.lv-bao { position: absolute; left: 50%; top: calc(var(--lv-at-tren, 0px) + 8px); transform: translateX(-50%); min-height: 58px; padding: 6px 18px 6px 12px; border-radius: 999px; display: flex; align-items: center; gap: 10px;
   font-size: 15.5px; font-weight: 700; line-height: 1.25; white-space: nowrap; pointer-events: none; color: var(--tr-chieu-giay);
   background: color-mix(in srgb, var(--tr-chieu-mat) 82%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
   box-shadow: 0 10px 30px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--tr-chieu-giay) 14%, transparent); }
@@ -146,7 +159,7 @@
 /* Lớp nét (hai canvas + con trỏ): giấy lệch giấy thầy ⇒ LopLive cắt lớp này khỏi ô giấy bằng clip-path */
 .lv-net { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
 /* Giấy soi đúng giấy của thầy (GiayThay.tsx): tấm cùng bề rộng lôgic với giấy thầy, co bằng transform; chưa khớp ⇒ ẩn (vẫn dựng để tự kiểm) */
-.lv-gt { position: absolute; left: 0; top: 0; transform-origin: 0 0; visibility: hidden; pointer-events: none; font-family: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
+.lv-gt { position: absolute; left: var(--gt-x, 0px); top: var(--gt-y, 0px); transform-origin: 0 0; visibility: hidden; pointer-events: none; font-family: 'Be Vietnam Pro', 'Noto Sans', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif; }
 .lv-gt[data-khop] { visibility: visible; }
 .lv-gt-o { position: absolute; margin: 0; padding: 0; letter-spacing: 0; word-spacing: 0; text-align: left; white-space: normal; word-break: normal; overflow-wrap: normal; -webkit-hyphens: none; hyphens: none; }
 .lv-gt-o sub { font-size: 0.72em; vertical-align: -0.25em; line-height: 0; }
@@ -164,6 +177,54 @@
 .lv[data-soi][data-giay="toi"] .lv-gt-ky { color: var(--tr-chieu-nhan-toi); }
 .lv[data-soi][data-giay="toi"] .lv-gt-so { background: color-mix(in srgb, var(--tr-chieu-nhan-toi) 20%, transparent); }
 .lv[data-soi][data-giay="toi"] .lv-gt-phan { background: var(--tr-chieu-mat-3); color: var(--tr-chieu-giay); }
+
+/* ── HAI KHUNG ĐỘC LẬP (11/11 chiều, KhungDocLap.tsx; đặc tả 4.3h): khung giấy `.lv-giay` + khung bảng `.lv-bang` mỗi khung một phép co; vị trí / khổ đặt
+   bằng `style`, ở đây chỉ có màu + dáng. Khung nở / thu chỉ bằng transform (KhungDocLap đặt), máy yếu / giảm chuyển động ⇒ đổi tức thì. ── */
+.lv-kg-cuon { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--tr-chieu-chu) 30%, transparent) transparent; }
+/* vạch chia giữa giấy và bảng: vùng chạm 30 px, viên mảnh ở giữa; đang kéo ⇒ thành một vạch dọc màu đội suốt chiều cao */
+.lv-vach-chia { z-index: 2; display: grid; place-items: center; cursor: col-resize; -webkit-tap-highlight-color: transparent; }
+.lv-vach-chia i { display: block; width: 5px; height: 40px; border-radius: 3px; background: var(--tr-chieu-giay); opacity: 0.5; box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-chieu-bang) 45%, transparent); transition: opacity 0.15s, height 0.15s; }
+.lv-vach-chia:hover i { opacity: 0.85; }
+.lv-vach-chia[data-keo] i { width: 3px; height: 100%; opacity: 1; background: var(--doi); }
+/* đang phóng kín một khung ⇒ không có vạch chia (khung kia đứng ngoài màn) */
+/* mũi tên «Thầy đang viết ở dưới / ở trên» trên giấy (em vừa tự cuộn nên khung không tự trôi) + nút «Về chỗ thầy đang viết» trên bảng (em đang vuốt xem lại) */
+.lv .lv-mui, .lv .lv-ve { position: absolute; left: 50%; transform: translateX(-50%); z-index: 1; display: none; align-items: center; min-height: 36px; padding: 0 14px; border: 0; border-radius: 999px; font: inherit; font-size: 13.5px; font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer;
+  color: var(--tr-chieu-giay); background: color-mix(in srgb, var(--tr-chieu-mat) 92%, transparent); box-shadow: 0 8px 24px color-mix(in srgb, var(--tr-chieu-bang) 40%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--tr-chieu-giay) 16%, transparent); }
+.lv-mui::before, .lv-ve::before { content: ""; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; } /* vùng chạm 44 px */
+.lv .lv-mui[data-huong="duoi"] { bottom: calc(46px + var(--lv-at-duoi, 0px)); }
+.lv .lv-mui[data-huong="tren"] { top: 10px; }
+.lv-giay[data-mui="duoi"] .lv-mui[data-huong="duoi"], .lv-giay[data-mui="tren"] .lv-mui[data-huong="tren"], .lv-bang[data-tay] .lv-ve { display: inline-flex; }
+.lv .lv-ve { bottom: calc(12px + var(--lv-at-duoi, 0px)); background: var(--doi); color: var(--p-muc); box-shadow: 0 8px 24px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent); }
+.lv-mui:active, .lv-ve:active { transform: translateX(-50%) scale(0.97); }
+
+/* ── GIẤY ĐỀ DỰNG TẠI MÁY EM, KIỂU TỜ CHIẾU (11/11, GiayDung.tsx): ô giấy LUÔN theo màu giấy của THẦY (sáng / tối), thân đề không khung thẻ, phương án / ý
+   là chữ đề — không có điều khiển trả lời. Trong giấy đè `--tr-*` bằng bảng màu màn chiếu (như trình phát Xem lại Live) để khối đề của chặng lên đúng màu. ── */
+.lv .lv-giay { background: var(--tr-chieu-giay); color: var(--tr-chieu-chu);
+  --tr-nen: var(--tr-chieu-giay); --tr-mat: var(--tr-chieu-giay); --tr-mat-2: var(--tr-chieu-the); --tr-mat-3: var(--tr-chieu-the); --tr-vien: var(--tr-chieu-the); --tr-vien-2: var(--tr-chieu-phu);
+  --tr-chu: var(--tr-chieu-chu); --tr-chu-2: var(--tr-chieu-chu); --tr-chu-3: var(--tr-chieu-phu); }
+.lv[data-giay="toi"] .lv-giay { background: var(--tr-chieu-mat); color: var(--tr-chieu-giay);
+  --tr-nen: var(--tr-chieu-mat); --tr-mat: var(--tr-chieu-mat); --tr-mat-2: var(--tr-chieu-mat-2); --tr-mat-3: var(--tr-chieu-mat-3); --tr-vien: var(--tr-chieu-mat-3); --tr-vien-2: var(--tr-chieu-mat-3);
+  --tr-chu: var(--tr-chieu-giay); --tr-chu-2: var(--tr-chieu-giay); --tr-chu-3: var(--tr-chieu-the); }
+.lv-gd { display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.lv-gd-dau { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; line-height: 1.2; }
+.lv-gd-so { padding: 4px 11px; border-radius: 999px; font-weight: 700; background: color-mix(in srgb, var(--tr-chieu-nhan) 16%, transparent); }
+.lv-gd-phan { padding: 4px 11px; border-radius: 999px; font-weight: 600; background: var(--tr-chieu-the); color: var(--tr-chieu-phu); }
+/* thân đề của chặng nằm trên giấy: bỏ khung thẻ (luật của màn làm bài nặng hơn nên phải ép) */
+/* (giao diện «Trong» ép khung thẻ bằng luật rất nặng `html[data-trong]:not(#_)… !important` ⇒ ở đây phải nặng hơn) */
+html:not(#_):not(#_):not(#_) .lv .lv-gd section.ht2-lam-de, html:not(#_):not(#_):not(#_) .lv .lv-gd .duo-gt-bong { padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; }
+.lv .lv-gd section.ht2-lam-de, .lv .lv-gd .ht2-lam-de-chu { outline: 0 !important; }
+.lv .lv-gd section.ht2-lam-de::before, .lv .lv-gd section.ht2-lam-de::after { display: none !important; }
+/* «Câu N.» đã có ở đầu giấy ⇒ ẩn chữ «Câu N.» đậm mở đầu thân đề (khỏi lặp) */
+.lv-gd .ht2-lam-de > .ht2-lam-de-chu:first-child > b:first-child { display: none; }
+.lv-gd-pa { display: grid; grid-template-columns: 1fr; gap: 8px 28px; font-size: 17px; line-height: 1.55; }
+.lv-gd-pa[data-cot="2"] { grid-template-columns: 1fr 1fr; }
+.lv-gd-pa > div { display: flex; gap: 10px; min-width: 0; }
+.lv-gd-pa > div > span { min-width: 0; overflow-wrap: break-word; }
+.lv-gd-ky { flex: none; font-weight: 700; color: var(--tr-chieu-nhan); }
+.lv-gd-ngan { margin: 0; font-size: 15px; line-height: 1.5; opacity: 0.72; }
+.lv[data-giay="toi"] .lv-gd-ky { color: var(--tr-chieu-nhan-toi); }
+.lv[data-giay="toi"] .lv-gd-so { background: color-mix(in srgb, var(--tr-chieu-nhan-toi) 20%, transparent); }
+.lv[data-giay="toi"] .lv-gd-phan { background: var(--tr-chieu-mat-3); color: var(--tr-chieu-giay); }
 
 /* Nút chính màu đội trong khay: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» */
 .lv .lv-tay { width: 100%; min-height: 54px; margin-top: 8px; padding: 6px 14px; border: 0; border-radius: 16px; display: flex; align-items: center; gap: 10px; font: inherit; font-size: 16.5px; font-weight: 800; text-align: left; cursor: pointer;
@@ -189,15 +250,16 @@
 .lv-phu .lv-noi { left: 50%; top: auto; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); }
 .lv-phu .lv-noi button { width: 100%; min-height: 50px; margin-top: 10px; border: 0; border-radius: 16px; background: var(--p-muc); color: var(--p-trang); font: inherit; font-size: 15.5px; font-weight: 800; cursor: pointer; }
 .lv-phu .lv-bao { position: fixed; pointer-events: none; }
-/* Dải việc của LƯỢT trên bảng live (đoán bạn lên bảng · tiếp sức · kết quả) — góc trái dưới, kính mờ */
-.lv-luot { position: absolute; left: calc(12px + var(--lv-at-trai, 0px)); bottom: calc(10px + var(--lv-at-duoi, 0px)); max-width: calc(100% - 24px - var(--lv-at-trai, 0px)); min-height: 48px; padding: 4px 6px 4px 12px; border-radius: 999px; display: flex; align-items: center; gap: 8px;
-  font-size: 13.5px; font-weight: 700; white-space: nowrap; color: var(--tr-chieu-giay); background: color-mix(in srgb, var(--tr-chieu-mat) 86%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+/* Dải việc của LƯỢT trên bảng live (đoán bạn lên bảng · tiếp sức · kết quả) — DẢI MỎNG sát đáy, góc trái (thầy 11/11 lần 3: giấy + bảng phủ kín): cao 34 px,
+   che không quá một dòng chữ cuối của đề / nét sát đáy; em đoán xong thì DaiLuot chỉ còn tên bạn + nút tiếp sức (một viên nhỏ). Nút cao 30, vùng chạm 44. */
+.lv-luot { position: absolute; left: calc(8px + var(--lv-at-trai, 0px)); bottom: calc(6px + var(--lv-at-duoi, 0px)); max-width: calc(100% - 16px - var(--lv-at-trai, 0px) - var(--lv-at-phai, 0px)); min-height: 34px; padding: 2px 3px 2px 8px; border-radius: 999px; display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 700; white-space: nowrap; color: var(--tr-chieu-giay); background: color-mix(in srgb, var(--tr-chieu-mat) 86%, transparent); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
   box-shadow: 0 10px 30px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--tr-chieu-giay) 14%, transparent); }
-.lv-luot .ky { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 800; background: var(--doi); color: var(--p-muc); }
+.lv-luot .ky { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 10.5px; font-weight: 800; background: var(--doi); color: var(--p-muc); }
 .lv-luot .ten { overflow: hidden; text-overflow: ellipsis; }
-.lv .lv-luot button { flex: none; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; font: inherit; font-size: 13.5px; font-weight: 800; cursor: pointer; position: relative;
+.lv .lv-luot button { flex: none; min-height: 30px; padding: 0 11px; border: 0; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; position: relative;
   color: var(--tr-chieu-giay); background: color-mix(in srgb, var(--tr-chieu-giay) 14%, transparent); transition: transform 0.1s; }
-.lv-luot button::before { content: ""; position: absolute; left: 0; right: 0; top: -4px; bottom: -4px; } /* vùng chạm 48 px */
+.lv-luot button::before { content: ""; position: absolute; left: 0; right: 0; top: -7px; bottom: -7px; } /* vùng chạm 44 px */
 .lv-luot button[aria-pressed="true"] { background: var(--tr-chieu-giay); color: var(--tr-chieu-bang); }
 .lv-luot button:disabled { opacity: 0.5; cursor: default; }
 .lv-luot button[aria-pressed="true"]:disabled { opacity: 1; }
@@ -218,10 +280,11 @@ html.may-yeu .lv-nam-hh, html.may-yeu .lv-tay.gio { box-shadow: none; }
   .lv-khay, .lv-bao { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .lv-khay { transition: none; }
+  .lv-khay, .lv .lv-nam, .lv-phu .lv-nam, .lv-nam i { transition: none; }
   .lv[data-vao] .lv-nen, .lv-vao, .lv-bao .quay { animation: none; }
   .lv-song i { transition: none; }
 }
+html.may-yeu .lv .lv-nam, html.may-yeu .lv-phu .lv-nam, html.may-yeu .lv-nam i { transition: none; }
 html.may-yeu .lv-khay { transition: none; -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
 html.may-yeu .lv-bao { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
 html.may-yeu .lv[data-vao] .lv-nen, html.may-yeu .lv-vao, html.may-yeu .lv-bao .quay { animation: none; }

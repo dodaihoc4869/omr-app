@@ -13,7 +13,7 @@
 //   · Vạch mức âm có nguồn thứ hai KHÔNG cần AudioContext: `sender.getStats()` (`media-source.audioLevel`) = tiếng ĐANG GỬI cho lớp; AudioContext bị treo
 //     thì vạch, «mic đang im» và nhịp `live-nhip` vẫn đúng.
 //   · Tiếng trong: Opus 64 kb/s dải rộng, không DTX (`OPUS_THAY`); khử vọng + lọc ồn của trình duyệt làm đục giọng mic cài áo ⇒ chỉ bật khi CÓ đường vọng
-//     (máy em trong lớp phát loa — «Tất cả»; hoặc loa máy thầy đang phát tiếng em) — luật ở `canLoc()`; thầy ép tay được (`datLoc`).
+//     (loa máy thầy đang phát tiếng em) — luật ở `canLoc()`; thầy ép tay được (`datLoc`).
 // SFU chưa cấu hình (`tieng: 'chua-cau-hinh'`) hoặc nối hỏng ⇒ live vẫn chạy phần HÌNH qua WebSocket.
 import type { ViewLiveBang } from '../bpu/phong-live'
 import type { NetBut, SuKienBut } from '../but-bang-loi'
@@ -272,9 +272,10 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
   let guiSo2: { muc: number | null; kbps: number | null; byte: number | null; luc: number } = { muc: null, kbps: null, byte: null, luc: 0 }, lucDocGui = -1e9, gui0 = 0
   /** LUẬT XỬ LÝ TIẾNG (thầy 11/11 «tiếng trong và cực rõ»): khử vọng + lọc ồn của trình duyệt làm đục giọng (nhất là mic cài áo) ⇒ chỉ bật khi CÓ ĐƯỜNG VỌNG:
-   *  máy em trong lớp đang phát tiếng thầy ra loa (`tiengLop` — «Tất cả»), hoặc loa máy thầy đang phát tiếng em nói. Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
+   *  loa máy thầy đang phát tiếng em nói (11/11 lần 4: hết tính `tiengLop`). Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
    *  lượng. Thầy ép «Luôn bật» / «Luôn tắt» bằng `datLoc`. */
-  const canLoc = (): boolean => (cheDoLoc === 'bat' ? true : cheDoLoc === 'tat' ? false : !!live?.tiengLop || (tt.ngheEm && !!tt.emNoi))
+  // 11/11 lần 4 (`tiengLop` nay mặc định bật): bỏ `tiengLop` khỏi luật — khử vọng chỉ khử tiếng do CHÍNH MÁY THẦY phát; tiếng loa máy em lọt vào mic thì không khử được.
+  const canLoc = (): boolean => (cheDoLoc === 'bat' ? true : cheDoLoc === 'tat' ? false : tt.ngheEm && !!tt.emNoi)
   /** RÀNG BUỘC NỚI DẦN (mic USB có thể ra luồng CÂM khi trình duyệt bật xử lý tiếng): 0 theo luật lọc · 1 tắt khử vọng + lọc ồn · 2 mic thô · 3 mic thô +
    *  thiết bị chỉ là «ưu tiên». KHÔNG ép `channelCount` (chuỗi làm rõ tiếng tự cộng hai kênh về mono). */
   const SO_BAC = 4
@@ -484,18 +485,18 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   function mucAm(): number {
     let v = 0
     const nay = mt.dongHo(), ra = tuy.chuoi !== false && chuoi && !chuoi.hong && mauRa ? chuoi.doRa : null
-    const doTaiCho = (): number | null => (ctxChay() && (ra || (doAm && mauAm)) ? Math.min(1, (ra ? rms(ra, mauRa!) : rms(doAm!, mauAm!)) * 4) : null)
+    const doTaiCho = (): number | null => (ctxChay() && (ra || (doAm && mauAm)) ? Math.min(1, (ra ? rms(ra, mauRa!) : rms(doAm!, mauAm!)) * 3) : null)
     if (tt.micTat) v = 0 // thầy tắt tiếng / tạm dừng: lớp không nghe ⇒ vạch đứng yên ngay (không chờ số đo của bộ gửi làm mới)
     else if (dangLive() && gui && tt.tieng === 'mic' && !khongTieng) {
       // ĐANG LIVE: vạch = tiếng ĐANG GỬI cho lớp (số đo của bộ gửi), KHÔNG lấy luồng đo tại chỗ — máy thầy có tín hiệu mà bộ gửi không cầm / chưa nối
       // máy chủ tiếng thì vạch phải đứng yên (thầy 11/11: vạch chạy mà em không nghe).
       if (nay - lucDocGui > 120) docGui()
-      if (guiSo2.muc != null && nay - guiSo2.luc < 1500) v = pc && pc.connectionState === 'connected' ? Math.min(1, guiSo2.muc * 4) : 0
+      if (guiSo2.muc != null && nay - guiSo2.luc < 1500) v = pc && pc.connectionState === 'connected' ? Math.min(1, guiSo2.muc * 3) : 0
       else v = nay - gui0 < 1500 || !gui.getStats ? doTaiCho() ?? 0 : 0 // bộ gửi chưa kịp có số đo (vừa gắn) / trình duyệt không có `getStats`
     } else {
       const d = doTaiCho()
       if (d != null) v = d
-      else { void amCtx?.resume().catch(() => undefined); if (nay - lucDocGui > 250) docGui(); v = Math.min(1, (guiSo2.muc ?? 0) * 4) }
+      else { void amCtx?.resume().catch(() => undefined); if (nay - lucDocGui > 250) docGui(); v = Math.min(1, (guiSo2.muc ?? 0) * 3) }
     }
     if (v > NGUONG_TIENG && !tt.micTat) lucTieng = nay
     return v
@@ -519,10 +520,10 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     const d = t && ctxChay() && doAm && mauAm ? Math.min(1, rms(doAm, mauAm) * 4) : null
     return {
       ten: t?.label || '', track: !t ? 'khong' : t.readyState !== 'live' ? 'ended' : t.muted ? 'muted' : !t.enabled ? 'tat' : 'live',
-      muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 4) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
+      muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 3) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
       sfu: !!pc && pc.connectionState === 'connected', loc: tt.loc, bac, ctx: amCtx?.state ?? 'khong',
       hz: cd.sampleRate ?? null, kenh: cd.channelCount ?? null, vong: typeof cd.echoCancellation === 'boolean' ? cd.echoCancellation : cd.echoCancellation == null ? null : true, on: cd.noiseSuppression ?? null, agc: cd.autoGainControl ?? null,
-      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: typeof (cd as { latency?: number }).latency === 'number' ? Math.round((cd as { latency: number }).latency * 1000) : null,
+      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: ((l) => (typeof l === 'number' && l >= 0 && l <= 0.2 ? Math.round(l * 1000) : null))((cd as { latency?: number }).latency), // ngoài 0–200 ms = trình điều khiển báo bậy (mic USB báo số âm ⇒ «trễ −121 ms»)
     }
   }
   const khiThietBi = (): void => { tuy.khiThietBi?.(); if (tt.micTinh === 'mat') henMoLaiMic(300) }
@@ -701,7 +702,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     const emNoi = n ? { sbd: n.sbd, ten: n.ten, doi: n.doi, xa: n.xa } : null
     // Mặc định chỉ phát ra loa khi em ở xa: em đứng ngay trong lớp mà loa lớp phát lại giọng em qua mic máy em ⇒ vọng / hú.
     const ngheEm = ngheEmDat ?? !!n?.xa
-    if ((tt.emNoi?.sbd ?? '') !== (emNoi?.sbd ?? '') || tt.ngheEm !== ngheEm) dat({ emNoi, ngheEm })
+    // 11/11 lần 4: soát lọc NGAY khi hai giá trị này đổi (`soatLoc()` của `nhanLive` chạy trước dòng này ⇒ chậm một view).
+    if ((tt.emNoi?.sbd ?? '') !== (emNoi?.sbd ?? '') || tt.ngheEm !== ngheEm) { dat({ emNoi, ngheEm }); soatLoc() }
     if (amEm) amEm.muted = !ngheEm
     if (!n) { emDangKeo = ''; thuEm = null; if (amEm) amEm.srcObject = null; return }
     if (!ngheEm || !pc || !phienSfu || emDangKeo === n.ss.id) return
@@ -748,7 +750,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       if (!nghiNay && live.bat && tuBat) { net.clear(); const anh = tuy.layAnh?.(); if (anh) guiAnh(anh) }
     }
     if (tt.nghi !== nghiNay) dat({ nghi: nghiNay })
-    soatLoc() // «Tất cả» / em ở xa đang nói ⇒ có đường vọng ⇒ đổi chế độ lọc của mic đang mở
+    soatLoc() // có đường vọng ⇒ đổi chế độ lọc của mic đang mở
     if (live.bat && tuBat) daThayBat = true
     // Phòng tự tắt (hết buổi, quá 15 phút) — chỉ tin khi đã từng thấy phòng xác nhận lần bật này (view cũ còn trên đường không được tắt nhầm).
     else if (!live.bat && tuBat && daThayBat) { tuBat = false; ngatMic(); if (gui) void gui.replaceTrack(trackCam).catch(() => undefined) }

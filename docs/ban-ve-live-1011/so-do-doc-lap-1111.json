@@ -1,0 +1,797 @@
+{
+ "luc": "2026-11-11T08:45:43.449Z",
+ "ghiChu": "Chromium thật dựng hình bằng PHẦN MỀM (không phải máy thật, không GPU), phòng thật trong Node, dữ liệu giả; màn chiếu của thầy 1366 × 768; cùng câu, cùng nét mẫu (thầy kẻ ngang 80 % bề ngang bảng). «truoc» = bản một phép co (origin/main trước nhánh này). Cỡ chữ + nét: px CSS thật trên màn máy em. Khung hình: máy em 844 × 390 suốt 7 giây thầy viết trên bảng (có một lần khung bảng nở), trung vị các lượt chạy xen kẽ trước / sau trên máy dùng chung.",
+ "kq": {
+  "844x390": {
+   "chu_de_px": {
+    "truoc": 17.67,
+    "uu_tien_giay": 23.88,
+    "uu_tien_bang": 15.01
+   },
+   "net_mau_dai_px": {
+    "truoc": 197.5,
+    "uu_tien_giay": 133.5,
+    "uu_tien_bang": 331
+   },
+   "net_mau_day_px": {
+    "truoc": 0.75,
+    "uu_tien_giay": 0.47,
+    "uu_tien_bang": 1.18
+   },
+   "khung_giay_px": {
+    "truoc": 492,
+    "uu_tien_giay": 665,
+    "uu_tien_bang": 418
+   },
+   "khung_bang_px": {
+    "truoc": 338,
+    "uu_tien_giay": 166,
+    "uu_tien_bang": 413
+   }
+  },
+  "667x375": {
+   "chu_de_px": {
+    "truoc": 15.65,
+    "uu_tien_giay": 18.78,
+    "uu_tien_bang": 15.01
+   },
+   "net_mau_dai_px": {
+    "truoc": 174.5,
+    "uu_tien_giay": 105,
+    "uu_tien_bang": 189.5
+   },
+   "net_mau_day_px": {
+    "truoc": 0.75,
+    "uu_tien_giay": 0.43,
+    "uu_tien_bang": 0.68
+   },
+   "khung_giay_px": {
+    "truoc": 436,
+    "uu_tien_giay": 523,
+    "uu_tien_bang": 418
+   },
+   "khung_bang_px": {
+    "truoc": 218,
+    "uu_tien_giay": 131,
+    "uu_tien_bang": 236
+   }
+  },
+  "1180x820": {
+   "chu_de_px": {
+    "truoc": 27.83,
+    "uu_tien_giay": 33.54,
+    "uu_tien_bang": 20.69
+   },
+   "net_mau_dai_px": {
+    "truoc": 310.5,
+    "uu_tien_giay": 186.5,
+    "uu_tien_bang": 474
+   },
+   "net_mau_day_px": {
+    "truoc": 1.18,
+    "uu_tien_giay": 0.75,
+    "uu_tien_bang": 1.68
+   },
+   "khung_giay_px": {
+    "truoc": 777,
+    "uu_tien_giay": 934,
+    "uu_tien_bang": 576
+   },
+   "khung_bang_px": {
+    "truoc": 390,
+    "uu_tien_giay": 233,
+    "uu_tien_bang": 591
+   }
+  },
+  "1971x1247": {
+   "chu_de_px": {
+    "truoc": 46.62,
+    "uu_tien_giay": 42.2,
+    "uu_tien_bang": 41.23
+   },
+   "net_mau_dai_px": {
+    "truoc": 521,
+    "uu_tien_giay": 628,
+    "uu_tien_bang": 650
+   },
+   "net_mau_day_px": {
+    "truoc": 2.34,
+    "uu_tien_giay": 2.49,
+    "uu_tien_bang": 2.49
+   },
+   "khung_giay_px": {
+    "truoc": 1304,
+    "uu_tien_giay": 1175,
+    "uu_tien_bang": 1148
+   },
+   "khung_bang_px": {
+    "truoc": 654,
+    "uu_tien_giay": 783,
+    "uu_tien_bang": 810
+   }
+  },
+  "iPhone dọc xoay 390x844": {
+   "chu_de_px": {
+    "truoc": 17.67,
+    "uu_tien_giay": 23.88,
+    "uu_tien_bang": 15.01
+   },
+   "net_mau_dai_px": {
+    "truoc": 197.3,
+    "uu_tien_giay": 133,
+    "uu_tien_bang": 331.3
+   },
+   "net_mau_day_px": {
+    "truoc": 0.74,
+    "uu_tien_giay": 0.45,
+    "uu_tien_bang": 1.21
+   },
+   "khung_giay_px": {
+    "truoc": 492,
+    "uu_tien_giay": 665,
+    "uu_tien_bang": 418
+   },
+   "khung_bang_px": {
+    "truoc": 338,
+    "uu_tien_giay": 166,
+    "uu_tien_bang": 413
+   }
+  }
+ },
+ "khung_hinh_844": {
+  "truoc_x1": {
+   "luot": 3,
+   "kh_giay_trung_vi": 60.0,
+   "kh_giay_cac_luot": [
+    59.1,
+    60.0,
+    60.0
+   ],
+   "khung_dai_nhat_ms_trung_vi": 16.8,
+   "so_khung_tren_34ms_trung_vi": 0
+  },
+  "truoc_x4": {
+   "luot": 5,
+   "kh_giay_trung_vi": 57.5,
+   "kh_giay_cac_luot": [
+    59.6,
+    57.1,
+    55.2,
+    57.5,
+    59.7
+   ],
+   "khung_dai_nhat_ms_trung_vi": 66.7,
+   "so_khung_tren_34ms_trung_vi": 1
+  },
+  "sau_x4": {
+   "luot": 3,
+   "kh_giay_trung_vi": 51.8,
+   "kh_giay_cac_luot": [
+    51.8,
+    53.5,
+    51.6
+   ],
+   "khung_dai_nhat_ms_trung_vi": 133.4,
+   "so_khung_tren_34ms_trung_vi": 8
+  },
+  "sau_x1": {
+   "luot": 2,
+   "kh_giay_trung_vi": 56.65,
+   "kh_giay_cac_luot": [
+    56.9,
+    56.4
+   ],
+   "khung_dai_nhat_ms_trung_vi": 66.7,
+   "so_khung_tren_34ms_trung_vi": 5.5
+  }
+ },
+ "giay_cuon_844": {
+  "mui_ten_khi_em_vua_cham": "duoi",
+  "cuon_luc_do": [
+   0,
+   517,
+   382
+  ],
+  "sau_4_giay_tu_troi_toi": [
+   134,
+   517,
+   382
+  ]
+ },
+ "cau_co_anh_844": {
+  "soi": false,
+  "coAnh": true,
+  "anhTrongKhung": true,
+  "heSoPhong": 1,
+  "chuDe": 16,
+  "giay": [
+   4,
+   349
+  ],
+  "cvGiayAn": true
+ },
+ "phong_kin": {
+  "844x390": {
+   "giayPhuKin": {
+    "chuDe": 30.02,
+    "giay": [
+     4,
+     4,
+     836,
+     382
+    ]
+   },
+   "bangPhuKin": {
+    "netDai": 474,
+    "net": 1.68,
+    "bang": [
+     4,
+     4,
+     836,
+     382
+    ]
+   },
+   "veLai": [
+    4,
+    4,
+    665,
+    382
+   ]
+  },
+  "667x375": {
+   "giayPhuKin": {
+    "chuDe": 23.67,
+    "giay": [
+     4,
+     4,
+     659,
+     367
+    ]
+   },
+   "bangPhuKin": {
+    "netDai": 474,
+    "net": 1.68,
+    "bang": [
+     4,
+     4,
+     659,
+     367
+    ]
+   },
+   "veLai": [
+    4,
+    4,
+    523,
+    367
+   ]
+  }
+ },
+ "khung_hinh_844_dung_yen": {
+  "x1": {
+   "so": 254,
+   "kh_giay": 59.1,
+   "p95_ms": 16.8,
+   "dai_nhat_ms": 33.3,
+   "tren_34ms": 0
+  },
+  "x4": {
+   "so": 252,
+   "kh_giay": 59.5,
+   "p95_ms": 16.7,
+   "dai_nhat_ms": 49.9,
+   "tren_34ms": 1
+  }
+ },
+ "chi_tiet_sau": {
+  "844x390": {
+   "vua_vao_bang_trong": {
+    "chuDe": 23.88,
+    "chuPhuongAn": 23.88,
+    "giay": [
+     4,
+     4,
+     665,
+     382
+    ],
+    "bang": [
+     674,
+     4,
+     166,
+     382
+    ],
+    "net": null,
+    "netDai": null,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     517,
+     382
+    ],
+    "mui": null
+   },
+   "net_dau_tren_bang_chua_qua_2_giay": {
+    "chuDe": 23.88,
+    "chuPhuongAn": 23.88,
+    "giay": [
+     4,
+     4,
+     665,
+     382
+    ],
+    "bang": [
+     674,
+     4,
+     166,
+     382
+    ],
+    "net": 0.47,
+    "netDai": 133.5,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     517,
+     382
+    ],
+    "mui": null
+   },
+   "thay_viet_bang_qua_2_giay": {
+    "chuDe": 15.01,
+    "chuPhuongAn": 15.01,
+    "giay": [
+     4,
+     4,
+     418,
+     382
+    ],
+    "bang": [
+     427,
+     4,
+     413,
+     382
+    ],
+    "net": 1.18,
+    "netDai": 331,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     382,
+     382
+    ],
+    "mui": null
+   },
+   "thay_gach_giay_qua_2_giay": {
+    "chuDe": 23.88,
+    "chuPhuongAn": 23.88,
+    "giay": [
+     4,
+     4,
+     665,
+     382
+    ],
+    "bang": [
+     674,
+     4,
+     166,
+     382
+    ],
+    "net": 0.47,
+    "netDai": 133.5,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     517,
+     382
+    ],
+    "mui": null
+   }
+  },
+  "667x375": {
+   "vua_vao_bang_trong": {
+    "chuDe": 18.78,
+    "chuPhuongAn": 18.78,
+    "giay": [
+     4,
+     4,
+     523,
+     367
+    ],
+    "bang": [
+     532,
+     4,
+     131,
+     367
+    ],
+    "net": null,
+    "netDai": null,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     406,
+     367
+    ],
+    "mui": null
+   },
+   "net_dau_tren_bang_chua_qua_2_giay": {
+    "chuDe": 18.78,
+    "chuPhuongAn": 18.78,
+    "giay": [
+     4,
+     4,
+     523,
+     367
+    ],
+    "bang": [
+     532,
+     4,
+     131,
+     367
+    ],
+    "net": 0.43,
+    "netDai": 105,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     406,
+     367
+    ],
+    "mui": null
+   },
+   "thay_viet_bang_qua_2_giay": {
+    "chuDe": 15.01,
+    "chuPhuongAn": 15.01,
+    "giay": [
+     4,
+     4,
+     418,
+     367
+    ],
+    "bang": [
+     427,
+     4,
+     236,
+     367
+    ],
+    "net": 0.68,
+    "netDai": 189.5,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     367,
+     367
+    ],
+    "mui": null
+   },
+   "thay_gach_giay_qua_2_giay": {
+    "chuDe": 18.78,
+    "chuPhuongAn": 18.78,
+    "giay": [
+     4,
+     4,
+     523,
+     367
+    ],
+    "bang": [
+     532,
+     4,
+     131,
+     367
+    ],
+    "net": 0.43,
+    "netDai": 105,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     406,
+     367
+    ],
+    "mui": null
+   }
+  },
+  "1180x820": {
+   "vua_vao_bang_trong": {
+    "chuDe": 33.54,
+    "chuPhuongAn": 33.54,
+    "giay": [
+     4,
+     4,
+     934,
+     812
+    ],
+    "bang": [
+     943,
+     4,
+     233,
+     812
+    ],
+    "net": null,
+    "netDai": null,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     812,
+     812
+    ],
+    "mui": null
+   },
+   "net_dau_tren_bang_chua_qua_2_giay": {
+    "chuDe": 33.54,
+    "chuPhuongAn": 33.54,
+    "giay": [
+     4,
+     4,
+     934,
+     812
+    ],
+    "bang": [
+     943,
+     4,
+     233,
+     812
+    ],
+    "net": 0.75,
+    "netDai": 186.5,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     812,
+     812
+    ],
+    "mui": null
+   },
+   "thay_viet_bang_qua_2_giay": {
+    "chuDe": 20.69,
+    "chuPhuongAn": 20.69,
+    "giay": [
+     4,
+     4,
+     576,
+     812
+    ],
+    "bang": [
+     585,
+     4,
+     591,
+     812
+    ],
+    "net": 1.68,
+    "netDai": 474,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     812,
+     812
+    ],
+    "mui": null
+   },
+   "thay_gach_giay_qua_2_giay": {
+    "chuDe": 33.54,
+    "chuPhuongAn": 33.54,
+    "giay": [
+     4,
+     4,
+     934,
+     812
+    ],
+    "bang": [
+     943,
+     4,
+     233,
+     812
+    ],
+    "net": 0.75,
+    "netDai": 186.5,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     812,
+     812
+    ],
+    "mui": null
+   }
+  },
+  "1971x1247": {
+   "vua_vao_bang_trong": {
+    "chuDe": 42.2,
+    "chuPhuongAn": 42.2,
+    "giay": [
+     4,
+     4,
+     1175,
+     1239
+    ],
+    "bang": [
+     1184,
+     4,
+     783,
+     1239
+    ],
+    "net": null,
+    "netDai": null,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     1239,
+     1239
+    ],
+    "mui": null
+   },
+   "net_dau_tren_bang_chua_qua_2_giay": {
+    "chuDe": 42.2,
+    "chuPhuongAn": 42.2,
+    "giay": [
+     4,
+     4,
+     1175,
+     1239
+    ],
+    "bang": [
+     1184,
+     4,
+     783,
+     1239
+    ],
+    "net": 2.49,
+    "netDai": 628,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     1239,
+     1239
+    ],
+    "mui": null
+   },
+   "thay_viet_bang_qua_2_giay": {
+    "chuDe": 41.23,
+    "chuPhuongAn": 41.23,
+    "giay": [
+     4,
+     4,
+     1148,
+     1239
+    ],
+    "bang": [
+     1157,
+     4,
+     810,
+     1239
+    ],
+    "net": 2.49,
+    "netDai": 650,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     1239,
+     1239
+    ],
+    "mui": null
+   },
+   "thay_gach_giay_qua_2_giay": {
+    "chuDe": 42.2,
+    "chuPhuongAn": 42.2,
+    "giay": [
+     4,
+     4,
+     1175,
+     1239
+    ],
+    "bang": [
+     1184,
+     4,
+     783,
+     1239
+    ],
+    "net": 2.49,
+    "netDai": 628,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     1239,
+     1239
+    ],
+    "mui": null
+   }
+  },
+  "iPhone dọc xoay 390x844": {
+   "vua_vao_bang_trong": {
+    "chuDe": 23.88,
+    "chuPhuongAn": 23.88,
+    "giay": [
+     4,
+     4,
+     665,
+     382
+    ],
+    "bang": [
+     674,
+     4,
+     166,
+     382
+    ],
+    "net": null,
+    "netDai": null,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     516,
+     382
+    ],
+    "mui": null
+   },
+   "net_dau_tren_bang_chua_qua_2_giay": {
+    "chuDe": 23.88,
+    "chuPhuongAn": 23.88,
+    "giay": [
+     4,
+     4,
+     665,
+     382
+    ],
+    "bang": [
+     674,
+     4,
+     166,
+     382
+    ],
+    "net": 0.45,
+    "netDai": 133,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     516,
+     382
+    ],
+    "mui": null
+   },
+   "thay_viet_bang_qua_2_giay": {
+    "chuDe": 15.01,
+    "chuPhuongAn": 15.01,
+    "giay": [
+     4,
+     4,
+     418,
+     382
+    ],
+    "bang": [
+     427,
+     4,
+     413,
+     382
+    ],
+    "net": 1.21,
+    "netDai": 331.3,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     382,
+     382
+    ],
+    "mui": null
+   },
+   "thay_gach_giay_qua_2_giay": {
+    "chuDe": 23.88,
+    "chuPhuongAn": 23.88,
+    "giay": [
+     4,
+     4,
+     665,
+     382
+    ],
+    "bang": [
+     674,
+     4,
+     166,
+     382
+    ],
+    "net": 0.45,
+    "netDai": 133,
+    "soi": true,
+    "cuonGiay": [
+     0,
+     516,
+     382
+    ],
+    "mui": null
+   }
+  }
+ }
+}
