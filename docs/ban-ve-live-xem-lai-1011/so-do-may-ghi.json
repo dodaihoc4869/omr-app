@@ -1,0 +1,282 @@
+{
+ "luc": "2026-11-11T00:37:02.635Z",
+ "moiTruong": "Chromium 153.0.8010.12 (Playwright) trên Linux, mic giả --use-fake-device-for-media-stream; MÁY MÔ PHỎNG, chưa có iPhone / Android thật",
+ "loiTrang": [],
+ "khucTaiBu": 0,
+ "giayGhi": 70,
+ "hzVao": 44100,
+ "soKhuc": 8,
+ "khuc": [
+  {
+   "stt": 0,
+   "kh": 414,
+   "khGhi": 414,
+   "byte": 59767,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 4
+  },
+  {
+   "stt": 1,
+   "kh": 416,
+   "khGhi": 416,
+   "byte": 60045,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 3
+  },
+  {
+   "stt": 2,
+   "kh": 417,
+   "khGhi": 417,
+   "byte": 60203,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 4
+  },
+  {
+   "stt": 3,
+   "kh": 417,
+   "khGhi": 417,
+   "byte": 60192,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 3
+  },
+  {
+   "stt": 4,
+   "kh": 416,
+   "khGhi": 416,
+   "byte": 60048,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 3
+  },
+  {
+   "stt": 5,
+   "kh": 417,
+   "khGhi": 417,
+   "byte": 60206,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 4
+  },
+  {
+   "stt": 6,
+   "kh": 417,
+   "khGhi": 417,
+   "byte": 60192,
+   "soMuc": 20,
+   "mucCao": 210,
+   "soNet": 3
+  },
+  {
+   "stt": 7,
+   "kh": 6,
+   "khGhi": 6,
+   "byte": 944,
+   "soMuc": 1,
+   "mucCao": 0,
+   "soNet": 0
+  }
+ ],
+ "byteTieng": 420480,
+ "soKhung": 2920,
+ "msTheoKhung": 70080,
+ "msGiaiMa": 70080,
+ "msDung": 61,
+ "khucBao": [
+  {
+   "stt": 0,
+   "luc": 10021
+  },
+  {
+   "stt": 1,
+   "luc": 20000
+  },
+  {
+   "stt": 2,
+   "luc": 30020
+  },
+  {
+   "stt": 3,
+   "luc": 40001
+  },
+  {
+   "stt": 4,
+   "luc": 50031
+  },
+  {
+   "stt": 5,
+   "luc": 60011
+  },
+  {
+   "stt": 6,
+   "luc": 69991
+  },
+  {
+   "stt": 7,
+   "luc": 70005
+  }
+ ],
+ "khucDaTai": 8,
+ "tinPhong": {
+  "so": 16,
+  "dau": {
+   "t": "live-ghi",
+   "tt": "dang-ghi",
+   "dh": 1794357335761,
+   "p": "mwbe11an"
+  },
+  "cuoi": {
+   "t": "live-ghi",
+   "tt": "tat",
+   "dh": 1794357405824,
+   "p": "mwbe11an",
+   "xong": true,
+   "ket": 0
+  }
+ },
+ "bip": {
+  "trongTep": 138,
+  "luongChinh": 140,
+  "khop": 138,
+  "lechTrungVi": -30,
+  "lechP95": 40,
+  "lechNho": -44,
+  "lechLon": -19
+ },
+ "troiKhuc": {
+  "trungVi": 0,
+  "lon": 8
+ },
+ "mocNet": {
+  "gui": 24,
+  "trongKhuc": 24,
+  "lechLon": 0
+ },
+ "audio": {
+  "thoiLuongBao": 70.08,
+  "thoiLuongTheoKhung": 70.08,
+  "tua": [
+   {
+    "dich": 35.04,
+    "den": 35.04,
+    "lech": 0,
+    "ms": 5
+   },
+   {
+    "dich": 17.52,
+    "den": 17.52,
+    "lech": 0,
+    "ms": 1
+   },
+   {
+    "dich": 52.56,
+    "den": 52.56,
+    "lech": 0,
+    "ms": 1
+   },
+   {
+    "dich": 63.072,
+    "den": 63.072,
+    "lech": 0,
+    "ms": 1
+   },
+   {
+    "dich": 7.008,
+    "den": 7.008,
+    "lech": 0,
+    "ms": 1
+   },
+   {
+    "dich": 42.048,
+    "den": 42.048,
+    "lech": 0,
+    "ms": 1
+   },
+   {
+    "dich": 23.126,
+    "den": 23.126,
+    "lech": 0,
+    "ms": 1
+   }
+  ],
+  "giua": {
+   "dich": 35.04,
+   "den": 35.04,
+   "sau2Giay": 37.000116,
+   "daPhatMs": 2000
+  },
+  "range": [
+   "0-420479"
+  ],
+  "byteGiuaTheoCbr": 210240
+ },
+ "tepDai": {
+  "byte": 3784320,
+  "thoiLuongBao": 630.72,
+  "thoiLuongTheoKhung": 630.72,
+  "tua": [
+   {
+    "dich": 315.36,
+    "den": 315.36,
+    "lech": 0,
+    "ms": 14,
+    "range": "1867776-",
+    "byteCbr": 1892160
+   },
+   {
+    "dich": 504.576,
+    "den": 504.576,
+    "lech": 0,
+    "ms": 10,
+    "range": "3014656-",
+    "byteCbr": 3027456
+   },
+   {
+    "dich": 189.216,
+    "den": 189.216,
+    "lech": 0,
+    "ms": 11,
+    "range": "1114112-",
+    "byteCbr": 1135296
+   },
+   {
+    "dich": 599.184,
+    "den": 599.184,
+    "lech": 0,
+    "ms": 12,
+    "range": "3571712- 1179648-",
+    "byteCbr": 3595104
+   }
+  ],
+  "giua": {
+   "dich": 315.36,
+   "den": 315.36,
+   "sau2Giay": 317.320535,
+   "daPhatMs": 2001
+  },
+  "noiDungSauTua": [
+   {
+    "dich": 315.36,
+    "soBip": 7,
+    "lechTrungVi": 14,
+    "lechLon": 16
+   },
+   {
+    "dich": 126.144,
+    "soBip": 7,
+    "lechTrungVi": 8,
+    "lechLon": 11
+   },
+   {
+    "dich": 536.112,
+    "soBip": 8,
+    "lechTrungVi": 15,
+    "lechLon": 37
+   }
+  ]
+ },
+ "cpuMs": 86777
+}
