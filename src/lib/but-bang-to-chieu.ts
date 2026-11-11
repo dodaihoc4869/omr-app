@@ -24,7 +24,7 @@
 //     `ddh.but.nhanh` = `tat` (tắt hẳn) · `ep` (ép bật để thử dù trình duyệt không cấp) · `__mcBut.nhanh(false)`. Mực trên bảng nay nằm DƯỚI thẻ tên /
 //     chữ của cột bảng (trước: trên). «Vẽ ngay khi mẫu tới» vẫn mặc định tắt (xem `datBang`).
 //   · BẢNG ĐEN CUỘN (11/11, thầy: «bảng đen khi live có cuộn vô hạn để viết được nhiều phần»): nét bắt đầu trong cột bảng đen là NÉT BẢNG (mã «b_…»),
-//     y = y màn + độ cuộn ⇒ vẽ trong ô bảng, dời theo độ cuộn; nét trên giấy đề đứng yên như cũ. Cuộn: lăn chuột / hai ngón trên bảng, kéo vạch mép phải bảng,
+//     y = y màn + độ cuộn ⇒ vẽ trong ô bảng, dời theo độ cuộn; nét trên giấy đề dời theo giấy (but-cuon-giay-to-chieu.ts). Cuộn: lăn chuột / hai ngón trên bảng, kéo vạch mép phải bảng,
 //     viết sát đáy rồi ngừng 0,9 giây thì bảng tự trôi lên. Đang viết thì không cuộn. Độ cuộn nhớ theo đợt.
 //   · Alt + B: ô ĐO BÚT (thiết bị, số mẫu mỗi giây, lực, mẫu gộp, thời gian xử lý) để thầy chụp gửi lại.
 //   · nét giữ theo ĐỢT (khoá = chỉ số đợt): chuyển câu rồi quay lại vẫn còn, câu mới bảng sạch.
@@ -346,7 +346,7 @@ ${JS_LOI_BUT}
 ` + /* tờ vừa dựng lại ruột cột bảng (lớp bảng đặc bị gỡ khỏi trang) ⇒ gắn lại trước khi viết */ `
     if (NH && cvB.parentNode !== cotB) { khoaB = '#'; datBang(); veLai(); }
 ` + /* nét bắt đầu trong ô giấy đề ⇒ nét GIẤY: y = y màn + độ cuộn của giấy (og[4]); vg = cách vẽ đuôi nét (true: bảng · ô giấy đang cuộn · false: thường) */ `
-    bang = trongBang(e.clientX, e.clientY); gv = bang ? null : oGiayTai(e.clientX, e.clientY); og = gv ? gv.__go : null;
+    bang = trongBang(e.clientX, e.clientY); gv = bang ? null : giayViet(e.clientX, e.clientY); og = gv ? gv.__go : null;
     cy = (bang ? CY : og ? og[4] : 0) / dpr; d = LoiBut.diem(e.clientX, e.clientY + cy, ap, 0, KH.W, KH.H);
     dungCuon(); ban = UO = null; dyPhat = og ? og[4] / dpr / KH.H : 0;
     N = { id: id, loai: loai, coLuc: coLuc || !!luc, nghi: 0, t0: e.timeStamp, tg: e.timeStamp, tgVe: e.timeStamp, tt: 0, tx: e.clientX, ty: e.clientY, mx: e.clientX, my: e.clientY, ap: ap, moi: [], tat: [d], xem: [], tsKh: 0, dong: 0, can: true, net: null, st: null, bang: bang, vg: bang || (og && og[4] ? og : false), cy: cy, yLon: e.clientY };

@@ -47,14 +47,11 @@ const dyThay = () => t.evaluate(() => window.__dy)
 await t.goto(pathToFileURL(tep).href)
 await t.waitForFunction(() => document.body.getAttribute('data-bo-cuc') === 'xong')
 await t.evaluate(() => document.fonts.ready)
-await t.keyboard.press('l'); await t.waitForTimeout(2800)
 
 const doc = () => t.evaluate(() => {
   const v = window.__mcDot().querySelector('.mc-vung-de'), c = v.querySelector(':scope > .mc-con-nua'), r = v.getBoundingClientRect()
-  return { cuon: v.classList.contains('mc-cuon'), top: Math.round(v.scrollTop), cao: v.clientHeight, tong: v.scrollHeight, conNua: !!c && c.classList.contains('mc-hien'), o: [r.left, r.top, r.right, r.bottom].map(Math.round), bang: window.__mcBut ? +window.__mcBut.cuon().toFixed(4) : null, vung: window.__mcBut ? window.__mcBut.vung() : null }
+  return { cuon: v.classList.contains('mc-cuon'), top: Math.round(v.scrollTop), cao: v.clientHeight, tong: v.scrollHeight, conNua: !!c && c.classList.contains('mc-hien'), o: [r.left, r.top, r.right, r.bottom].map(Math.round), bang: window.__mcBut ? +window.__mcBut.cuon().toFixed(4) : null, vung: window.__mcBut ? window.__mcBut.vung() : null, trang: v.getAttribute('data-trang') }
 })
-const datTop = (v) => t.evaluate((y) => { window.__mcDot().querySelector('.mc-vung-de').scrollTop = y }, v)
-const lan = async (x, y, dy, tuy) => { await t.mouse.move(x, y); if (tuy?.ctrl) await t.keyboard.down('Control'); await t.mouse.wheel(0, dy); if (tuy?.ctrl) await t.keyboard.up('Control'); await t.waitForTimeout(160) }
 const kiem = (ten, dung, chiTiet) => { console.log((dung ? '✓ ' : '✗ ') + ten + (chiTiet ? ' — ' + chiTiet : '')); if (!dung) sai.push(ten) }
 /** Số điểm ảnh có mực của lớp hiện mực trong ô (px CSS). */
 const muc = (x, y, w, h) => t.evaluate(([x, y, w, h]) => {
@@ -62,6 +59,23 @@ const muc = (x, y, w, h) => t.evaluate(([x, y, w, h]) => {
   let n = 0; for (let i = 3; i < a.length; i += 4) if (a[i] > 40) n++
   return n
 }, [x, y, w, h])
+
+// 0 · CHỜ GỌI, giấy lật TRANG (chữ dời bằng translateY, không cuộn): nét viết ở TRANG 2 không dính vào giấy ⇒ bấm L (giấy chuyển sang cuộn,
+// scrollTop = đầu trang 2) thì nét KHÔNG nhảy lên cả trang — đứng yên như cũ.
+const p0 = await doc()
+await t.keyboard.press('b'); await t.waitForTimeout(250)
+await t.keyboard.press('ArrowDown'); await t.waitForTimeout(250)
+const p1 = await doc(), PX = Math.round((p1.o[0] + p1.o[2]) / 2), PY = Math.round((p1.o[1] + p1.o[3]) / 2)
+await t.mouse.move(PX - 200, PY); await t.mouse.down(); await t.mouse.move(PX, PY + 3, { steps: 8 }); await t.mouse.up(); await t.waitForTimeout(150)
+const oP = [PX - 205, PY - 12, 215, 28], mP0 = await muc(...oP)
+await t.keyboard.press('b'); await t.waitForTimeout(150)
+await t.keyboard.press('l'); await t.waitForTimeout(2800)
+const p2 = await doc(), mP1 = await muc(...oP)
+so.trang2 = { trang: [p0.trang, p1.trang], scrollTopSauL: p2.top, muc: [mP0, mP1] }
+kiem('chờ gọi · nét viết ở trang 2 rồi bấm L ⇒ nét không nhảy theo scrollTop của giấy', !p0.cuon && p1.trang && p1.trang.startsWith('2/') && p2.cuon && p2.top > 100 && mP0 > 100 && Math.abs(mP1 - mP0) <= mP0 * 0.02, `trang ${p0.trang} → ${p1.trang} · scrollTop sau L ${p2.top} · mực ${mP0} → ${mP1}`)
+await t.evaluate(() => { window.__mcBut.nhap({ net: [] }); window.__mcDot().querySelector('.mc-vung-de').scrollTop = 0 }); await t.waitForTimeout(150)
+const datTop = (v) => t.evaluate((y) => { window.__mcDot().querySelector('.mc-vung-de').scrollTop = y }, v)
+const lan = async (x, y, dy, tuy) => { await t.mouse.move(x, y); if (tuy?.ctrl) await t.keyboard.down('Control'); await t.mouse.wheel(0, dy); if (tuy?.ctrl) await t.keyboard.up('Control'); await t.waitForTimeout(160) }
 
 const g0 = await doc()
 kiem('đề dài hơn khung giấy, giấy ở chế độ cuộn', g0.cuon && g0.tong > g0.cao + 200, `khung ${g0.cao} px, nội dung ${g0.tong} px`)
