@@ -22,7 +22,7 @@ import { moMayChu } from '../thu-live-1011/may-chu.mjs'
 
 const ts = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, ...v]) => [k, v.length ? v.join('=') : '1']))
 const DIST = resolve(ts.dist ?? 'dist-thu-live'), NHAN = ts.nhan ?? 'dist', WAV = resolve(ts.wav ?? ''), LOC_ON = ts['loc-on'] ?? 'manh'
-const GOC_PHONG = ts['goc-phong'] ? resolve(ts['goc-phong']) : undefined, CHAN_UDP = ts['chan-udp'] === '1', GIAY = Math.max(2, Number(ts.giay) || 4)
+const GOC_PHONG = ts['goc-phong'] ? resolve(ts['goc-phong']) : undefined, CHAN_UDP = ts['chan-udp'] === '1', UDP_HE = ts['udp-he'] === '1', GIAY = Math.max(2, Number(ts.giay) || 4)
 const sach = (v) => String(v ?? '').replace(/[\r\n]/g, '').trim().replace(/^["']|["']$/g, '')
 const APP_ID = sach(process.env.REALTIME_APP_ID), APP_SECRET = sach(process.env.REALTIME_APP_SECRET)
 if (process.env.GITHUB_ACTIONS) { for (const v of [APP_ID, APP_SECRET]) if (v) console.log(`::add-mask::${v}`) }
@@ -51,7 +51,8 @@ const CAU = { qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: '
 const exe = process.env.PW_CHROMIUM
 const ARGS = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-audio-capture=${WAV}`, '--autoplay-policy=no-user-gesture-required']
 const moTrinh = (them = []) => chromium.launch({ ...(exe && existsSync(exe) ? { executablePath: exe } : { channel: 'chromium' }), args: [...ARGS, ...them] })
-const trinh = await moTrinh(), trinhUdp = CHAN_UDP ? await moTrinh(['--force-webrtc-ip-handling-policy=disable_non_proxied_udp']) : trinh
+// `--udp-he=1`: UDP đã bị chặn cho CẢ máy (iptables ở workflow) ⇒ mọi trang cùng một trình duyệt; không thì chỉ S2 ở trình duyệt có cờ chính sách IP.
+const trinh = await moTrinh(), trinhUdp = CHAN_UDP && !UDP_HE ? await moTrinh(['--force-webrtc-ip-handling-policy=disable_non_proxied_udp']) : trinh
 const loiTrang = []
 const ngu = (ms) => new Promise((r) => setTimeout(r, ms))
 async function nguCanh(tr, o) {
@@ -60,7 +61,7 @@ async function nguCanh(tr, o) {
   await c.addInitScript(moc)
   return c
 }
-const { ketLuan, dong, loi } = taoKetLuan({ nhan: `${NHAN}${CHAN_UDP ? ' · S2 chặn UDP' : ''}`, giay: GIAY, mauMono })
+const { ketLuan, dong, loi } = taoKetLuan({ nhan: `${NHAN}${UDP_HE ? ' · chặn UDP' : CHAN_UDP ? ' · S2 chặn UDP' : ''}`, giay: GIAY, mauMono })
 const ketQua = { nhan: NHAN, chanUdp: CHAN_UDP, locOn: LOC_ON, kenhMic: mau.kenh.length, pha: [] }
 let ma = 0
 try {
@@ -103,7 +104,7 @@ try {
     ketQua.pha.push({ ten, pc: { thay: a.pc, s1: b.pc, s2: c.pc } })
     return { thay: a, s1: b, s2: c }
   }
-  const udp = (ten) => (CHAN_UDP && /S2/.test(ten) ? 'S2 ở mạng chặn UDP' : '')
+  const udp = (ten) => (UDP_HE ? 'cả máy bị chặn UDP' : CHAN_UDP && /S2/.test(ten) ? 'S2 ở mạng chặn UDP' : '')
   const cham = (p, ten, chieu) => { for (const [tc, n, d, v, tk] of chieu) ketLuan(ten, tc, n, d, v, tk ?? '', udp(tc)) }
   const VAI_LIVE = { thay: ['micTho', 'gui'], s1: ['nhanDau'], s2: ['nhanDau'] }, VAI_NOI = { thay: ['micTho', 'gui', 'nhanCuoi'], s1: ['nhanDau', 'micTho', 'gui'], s2: ['nhanDau', 'nhanCuoi'] }
 
@@ -137,7 +138,7 @@ try {
   const s2Dong = dongDo.find((x) => /S2|Lê Gia Huy/.test(x)) ?? ''
   if (CHAN_UDP) {
     const s2Ui = (await s2.locator('body').innerText().catch(() => '')).match(/[^\n]*(chặn tiếng|Mạng)[^\n]*/)?.[0] ?? ''
-    ketQua.udp = { s2Dong, s2Ui, s2Pc: P2.s2.pc }
+    ketQua.udp = { s2Dong, s2Ui, s2Pc: P2.s2.pc, thayPc: P2.thay.pc, vienLive: (await to.locator('.mc-lv-cum').innerText().catch(() => '')).replace(/\s+/g, ' ').slice(0, 120), dongDo }
     const baoThay = /⚠/.test(s2Dong), s2Cam = !!P2.s2.pc && P2.s2.pc.ice !== 'connected' && P2.s2.pc.ice !== 'completed'
     dong.push(`| ${NHAN} · S2 chặn UDP | báo rõ | thầy / S2 | — | — | ICE S2: ${P2.s2.pc?.ice ?? 'không phiên'} | — | ${s2Cam ? (baoThay ? 'S2 câm (mạng chặn) · máy thầy BÁO RÕ' : 'S2 câm · máy thầy KHÔNG báo') : 'S2 có tiếng qua TCP / đường khác'}${s2Ui ? ' · màn S2: «' + s2Ui.slice(0, 60) + '»' : ''} |`)
     if (s2Cam && !baoThay) ma = 1
@@ -155,7 +156,7 @@ try {
   await may.dong().catch(() => {})
 }
 if (loi() > 0) ma = 1
-const tieuDe = `== PHÒNG THẬT + GIAO DIỆN + SFU THẬT · ${NHAN} · mic giả ${mau.kenh.length} kênh · lọc ồn ${LOC_ON}${CHAN_UDP ? ' · S2 CHẶN UDP' : ''} ==`
+const tieuDe = `== PHÒNG THẬT + GIAO DIỆN + SFU THẬT · ${NHAN} · mic giả ${mau.kenh.length} kênh · lọc ồn ${LOC_ON}${UDP_HE ? ' · CẢ MÁY CHẶN UDP' : CHAN_UDP ? ' · S2 CHẶN UDP' : ''} ==`
 const bang = ['| bản | pha | chiều | 0 mic vào | 1 phía gửi | 2 phía nhận | 3 phần tử phát | kết luận |', '|---|---|---|---|---|---|---|---|', ...dong]
 console.log(`\n${tieuDe}`)
 for (const d of bang) console.log(d)

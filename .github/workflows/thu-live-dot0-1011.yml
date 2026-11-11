@@ -140,8 +140,9 @@ jobs:
           REF: ${{ matrix.ref }}
         run: |
           W="$GITHUB_WORKSPACE"
+          # --configLoader native: cấu hình nạp tại chỗ (đóng gói vào node_modules/.vite-temp thì `import.meta.dirname` trỏ về nhánh đang chạy ⇒ dựng nhầm mã của nhánh)
           if [ "$REF" != "HEAD" ]; then git worktree add --detach "$RUNNER_TEMP/wt" "$REF"; ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/wt/node_modules"; W="$RUNNER_TEMP/wt"; fi
-          (cd "$W" && npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir "$RUNNER_TEMP/dist-thu" > "$RUNNER_TEMP/dung.log" 2>&1) || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }
+          (cd "$W" && npx vite build --configLoader native --config scripts/thu-live-1011/vite.config.mjs --outDir "$RUNNER_TEMP/dist-thu" > "$RUNNER_TEMP/dung.log" 2>&1) || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }
           echo "WT=$W" >> "$GITHUB_ENV"
       - name: Thử tiếng qua phòng thật — bình thường, rồi S2 chặn UDP
         env:
@@ -151,7 +152,9 @@ jobs:
           LOC_ON: ${{ inputs.loc_on || 'manh' }}
         run: |
           rc=0
-          for u in 0 1; do
-            node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" --chan-udp="$u" || rc=1
-          done
+          node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" || rc=1
+          # MẠNG CHẶN UDP (Wi-Fi trường / 4G khắt khe): chặn mọi gói UDP ra ngoài trừ DNS cho CẢ máy chạy (cờ chính sách IP của Chromium không có hiệu lực ở đây)
+          sudo iptables -I OUTPUT -p udp ! --dport 53 -j DROP
+          node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" --chan-udp=1 --udp-he=1 || rc=1
+          sudo iptables -D OUTPUT -p udp ! --dport 53 -j DROP
           exit $rc
