@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1037,
+    "hash": "bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b",
+    "fileNguon": "anh/bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b.png",
+    "svg": "ester1037-native-ddh-bc19cac4fb53841b9d8c3bf8cdcc6fdf334b07fe5439c2b8242f5dc219cf55dc.svg",
+    "hashSvg": "bc19cac4fb53841b9d8c3bf8cdcc6fdf334b07fe5439c2b8242f5dc219cf55dc",
+    "byteSvg": 12968,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-I-13",
+        "de": "Sơ đồ đơn giản của phản ứng thuỷ phân ester trong môi trường acid như hình dưới.\nNguyên tử oxygen trong phân tử $\\ce{H2O}$ đã",
+        "refs": [
+          {
+            "hash": "bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b",
+            "where": "VIP27-C1-B1-ESTER-I-13.hinh.0.du_lieu",
+            "hashDataUrl": "18e5dd7ef839163085365f9b878ce879f597172e3b89391fd7e6d5f8916fc69e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2knownBareC6O4HexcludingconditionHplus/2R2RapostropheUNKNOWNtotalC/2COdouble2splitfeetCONTACTslopes-nativeV/noaddedcrossbar/2HALFfilledharpoonsTOPrightABOVE-BOTTOMleftBELOW/1FULLfilledcleavageleaderDOWNRIGHTtip6166ABOVEbondNOTatom/ALLregularUPRIGHT/EXACTH-O-H-andRapostrophe-O-H/shortstraightapostropheNOlongprime/OHfirstOanchor/Hplus,tSUPo/0captions-stereo/noaddedanswer-H2Ocondense-acidnames",
+    "hashSvgDaSoat": "bc19cac4fb53841b9d8c3bf8cdcc6fdf334b07fe5439c2b8242f5dc219cf55dc",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,500 @@
+{
+  "i": 1037,
+  "assetIndexProvided": 1258,
+  "hash": "bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b.png",
+  "size": [
+    822,
+    136
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B1-ESTER-I-13",
+      "de": "Sơ đồ đơn giản của phản ứng thuỷ phân ester trong môi trường acid như hình dưới.\nNguyên tử oxygen trong phân tử $\\ce{H2O}$ đã",
+      "allHinh": [
+        {
+          "hash": "bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b",
+          "where": "VIP27-C1-B1-ESTER-I-13.hinh.0.du_lieu",
+          "hashDataUrl": "18e5dd7ef839163085365f9b878ce879f597172e3b89391fd7e6d5f8916fc69e"
+        }
+      ],
+      "missingHashes": [
+        "bb17854c0bdb8b7c6c0d8a8363fad329d68ada2598ac71f240163477a2b11f0b"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownEquilibrium8xOpened": true,
+    "ownCleavageLeader10xOpened": true,
+    "ownCOMacros12xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativecenters/bboxesapprox1px. Rapostropheshapeexplicitnative, noanswer/theoryinference. Contactpreservingfeetneedintersectionwithactualbuilderslopes.",
+  "geometry": {
+    "esterLeft": {
+      "carbonylC": [
+        51,
+        83
+      ],
+      "labels": [
+        {
+          "text": "R",
+          "bbox": [
+            6,
+            49,
+            30,
+            73
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            74,
+            49,
+            97,
+            73
+          ]
+        },
+        {
+          "text": "R'",
+          "bbox": [
+            117,
+            72,
+            145,
+            97
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            40,
+            107,
+            64,
+            132
+          ]
+        }
+      ],
+      "singleBonds": [
+        [
+          [
+            30,
+            71
+          ],
+          [
+            51,
+            83
+          ]
+        ],
+        [
+          [
+            51,
+            83
+          ],
+          [
+            70,
+            72
+          ]
+        ],
+        [
+          [
+            98,
+            71
+          ],
+          [
+            113,
+            79
+          ]
+        ]
+      ],
+      "CORaysDown": [
+        [
+          [
+            48,
+            81.29
+          ],
+          [
+            48,
+            106
+          ]
+        ],
+        [
+          [
+            55,
+            80.68
+          ],
+          [
+            55,
+            106
+          ]
+        ]
+      ],
+      "COFootJoin": [
+        [
+          48,
+          81.29
+        ],
+        [
+          51,
+          83
+        ],
+        [
+          55,
+          80.68
+        ]
+      ],
+      "note": "UpperfeetCONTACT2slopes/sourceVjoin, lowerendsleavewhitegaptoOinknative. NoextraCOOHlabel."
+    },
+    "water": {
+      "labels": [
+        {
+          "text": "H",
+          "bbox": [
+            224,
+            74,
+            248,
+            99
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            270,
+            74,
+            294,
+            99
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            316,
+            74,
+            340,
+            99
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            250,
+            87
+          ],
+          [
+            267,
+            87
+          ]
+        ],
+        [
+          [
+            297,
+            87
+          ],
+          [
+            313,
+            87
+          ]
+        ]
+      ],
+      "literal": "H–O–H, NOTH2Ocondensed"
+    },
+    "acidRight": {
+      "carbonylC": [
+        538,
+        83
+      ],
+      "labels": [
+        {
+          "text": "R",
+          "bbox": [
+            484,
+            47,
+            508,
+            72
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            561,
+            49,
+            608,
+            74
+          ],
+          "anchor": "FIRSTO"
+        },
+        {
+          "text": "O",
+          "bbox": [
+            526,
+            107,
+            551,
+            132
+          ]
+        }
+      ],
+      "singleBonds": [
+        [
+          [
+            509,
+            70
+          ],
+          [
+            538,
+            83
+          ]
+        ],
+        [
+          [
+            538,
+            83
+          ],
+          [
+            557,
+            72
+          ]
+        ]
+      ],
+      "CORaysDown": [
+        [
+          [
+            535,
+            81.66
+          ],
+          [
+            535,
+            106
+          ]
+        ],
+        [
+          [
+            542,
+            80.68
+          ],
+          [
+            542,
+            106
+          ]
+        ]
+      ],
+      "COFootJoin": [
+        [
+          535,
+          81.66
+        ],
+        [
+          538,
+          83
+        ],
+        [
+          542,
+          80.68
+        ]
+      ],
+      "note": "UpperfeetCONTACT correspondingincomingR/OHslopes, nofalsegap;OlabelFIRSTO."
+    },
+    "alcohol": {
+      "labels": [
+        {
+          "text": "R'",
+          "bbox": [
+            701,
+            74,
+            729,
+            99
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            754,
+            74,
+            778,
+            99
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            793,
+            74,
+            817,
+            99
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            730,
+            87
+          ],
+          [
+            751,
+            87
+          ]
+        ],
+        [
+          [
+            779,
+            87
+          ],
+          [
+            790,
+            87
+          ]
+        ]
+      ],
+      "literal": "R'–O–H"
+    },
+    "plusSigns": [
+      {
+        "text": "+",
+        "bbox": [
+          171,
+          79,
+          190,
+          99
+        ]
+      },
+      {
+        "text": "+",
+        "bbox": [
+          649,
+          79,
+          666,
+          99
+        ]
+      }
+    ],
+    "equilibrium": {
+      "upperShaft": [
+        [
+          361,
+          86
+        ],
+        [
+          464,
+          86
+        ]
+      ],
+      "upperHalfHead": [
+        [
+          464,
+          86
+        ],
+        [
+          450,
+          81
+        ],
+        [
+          450,
+          86
+        ]
+      ],
+      "lowerShaft": [
+        [
+          360,
+          95
+        ],
+        [
+          464,
+          95
+        ]
+      ],
+      "lowerHalfHead": [
+        [
+          360,
+          95
+        ],
+        [
+          374,
+          100
+        ],
+        [
+          374,
+          95
+        ]
+      ],
+      "condition": {
+        "text": "H⁺, tᵒ",
+        "bbox": [
+          378,
+          54,
+          444,
+          78
+        ],
+        "note": "HplusSUP;smallroundosupaftert;notnumerictemperature"
+      }
+    },
+    "cleavageLeader": {
+      "shaft": [
+        [
+          42,
+          7
+        ],
+        [
+          61,
+          66
+        ]
+      ],
+      "filledTriangle": [
+        [
+          61,
+          66
+        ],
+        [
+          51,
+          54
+        ],
+        [
+          61,
+          51
+        ]
+      ],
+      "note": "FULLfilleddown-rightarrow triangle; sourceTIP6166stopsABOVEesterC-Obondaround61678, noforcedcontact/Catomattachment."
+    },
+    "font": "ALLregularuprightserifblackgray, noactualitalic/bold. R/RapostropheUPRIGHT; apostropheisstraightshortupperstroke notcurlyquote/longprime. Noactualcaptions.",
+    "countsExplicit": {
+      "bareCarbonylC": 2,
+      "structuralO": 6,
+      "explicitOH-H": 4,
+      "Rtokens": 2,
+      "COdouble": 2,
+      "equilibriumHalfHeads": 2,
+      "cleavageFullHeads": 1,
+      "captions": 0,
+      "RapostropheTokens": 2,
+      "totalC": "UNKNOWNbecauseR/Rapostrophegroups"
+    },
+    "noAdded": [
+      "cleavageproductanswer",
+      "acidnames",
+      "waterH2Ocondensing",
+      "Rprimetransform",
+      "stericwedge",
+      "leaderattachmenttoatom",
+      "fulltriangleequilibriumheads",
+      "caption"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFull": true,
+    "allPublicRefs": true,
+    "freshChromium3x": "/workspace/scratch/root368-1037.png",
+    "ownCoMacro": "/workspace/scratch/root368-co.png",
+    "hashSvg": "bc19cac4fb53841b9d8c3bf8cdcc6fdf334b07fe5439c2b8242f5dc219cf55dc",
+    "verdict": "Đạt root:known2C6O4H/unknownR/H-O-H/Rapostrophe-O-H/2halfharpoons+1fullcleavage/COcontact/noaddedanswer",
+    "limits": "fractionalCOfeet calculated approximate source slopes not native subpixel measurement"
+  }
+}
