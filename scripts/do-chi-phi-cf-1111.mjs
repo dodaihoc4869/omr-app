@@ -28,53 +28,64 @@ console.log('\n## 1d. D1: cỡ, bản sao đọc')
 { const r = await rest(`/accounts/{acc}/d1/database/${DB}`); const x = r.j?.result ?? {}; console.log(`HTTP ${r.st}`, JSON.stringify({ coMB: x.file_size ? Math.round(x.file_size / 1e6) : null, soBang: x.num_tables, banSaoDoc: x.read_replication, vung: x.running_in_region ?? x.version })) }
 
 // ───────── 2. SỐ DÙNG THEO NGÀY (GraphQL Analytics) ─────────
+// Mỗi bộ số liệu một truy vấn riêng (một bộ lỗi không làm hỏng bộ khác). Trường số lấy bằng introspection kiểu `sum` / `max`; nhóm theo ngày thử lần lượt
+// dimensions date → datetimeHour; lọc thử datetime_geq → date_geq.
 const tenKieu = (t) => t?.name ?? t?.ofType?.name ?? t?.ofType?.ofType?.name ?? t?.ofType?.ofType?.ofType?.name
-const kieu = new Map()
-async function truong(ten) { if (kieu.has(ten)) return kieu.get(ten); const j = await gql(`query($n:String!){__type(name:$n){fields{name type{name kind ofType{name kind ofType{name kind ofType{name}}}}} inputFields{name}}}`, { n: ten }); const t = j?.data?.__type ?? null; kieu.set(ten, t); return t }
-const acct = await truong('account')
-const dsBo = (acct?.fields ?? []).map((f) => ({ ten: f.name, kieu: tenKieu(f.type) }))
-const QUAN_TAM = /^(d1|durableObjects|workersInvocations|workersSubrequests|r2|ai|calls|realtime|workersObservability|workersLogs|observability|kv|queue|pagesFunctions|workersAnalyticsEngine|containers|workflows|hyperdrive|vectorize|browser)/i
-const chon = dsBo.filter((d) => QUAN_TAM.test(d.ten))
-console.log(`\n## 2. Bộ số liệu (dataset) liên quan có trên tài khoản: ${chon.map((d) => d.ten).join(', ')}`)
-const SO = new Set(['Int', 'Float', 'Uint64', 'Int64', 'uint64', 'int64', 'float64', 'float32', 'uint32', 'int32', 'Uint32', 'Float64'])
+async function kieuCua(ten) { const j = await gql(`query($n:String!){__type(name:$n){fields{name type{name ofType{name ofType{name ofType{name}}}}}}}`, { n: ten }); return j?.data?.__type?.fields ?? [] }
+const acctF = await kieuCua('account')
 const tongKy = []
-for (const d of chon) {
-  const t = await truong(d.kieu)
-  const f = new Map((t?.fields ?? []).map((x) => [x.name, tenKieu(x.type)]))
+const BO = [
+  ['d1AnalyticsAdaptiveGroups', `databaseId:"${DB}"`], ['d1StorageAdaptiveGroups', `databaseId:"${DB}"`],
+  ['workersInvocationsAdaptive', ''], ['workersInvocationsScheduled', ''], ['workersSubrequestsAdaptiveGroups', ''],
+  ['durableObjectsInvocationsAdaptiveGroups', ''], ['durableObjectsPeriodicGroups', ''], ['durableObjectsSqlStorageGroups', ''], ['durableObjectsStorageGroups', ''], ['durableObjectsSubrequestsAdaptiveGroups', ''],
+  ['r2OperationsAdaptiveGroups', ''], ['r2StorageAdaptiveGroups', ''], ['r2BandwidthUsageAdaptiveGroups', ''],
+  ['aiInferenceAdaptiveGroups', ''], ['callsUsageAdaptiveGroups', ''], ['callsTurnUsageAdaptiveGroups', ''], ['realtimeKitUsageAdaptiveGroups', ''],
+  ['kvOperationsAdaptiveGroups', ''], ['kvStorageAdaptiveGroups', ''], ['containersUsageAdaptiveGroups', ''], ['browserRenderingBrowserTimeUsageAdaptiveGroups', ''],
+]
+for (const [bo, locThem] of BO) {
+  const kieuBo = tenKieu(acctF.find((f) => f.name === bo)?.type)
+  if (!kieuBo) { console.log(`\n### ${bo}: không có trên tài khoản`); continue }
+  const fs = await kieuCua(kieuBo), co = new Map(fs.map((f) => [f.name, tenKieu(f.type)]))
   const nhom = []
-  for (const k of ['sum', 'max', 'avg']) if (f.has(k)) { const tt = await truong(f.get(k)); const so = (tt?.fields ?? []).filter((x) => SO.has(tenKieu(x.type)) || /^(U?Int|Float)/.test(tenKieu(x.type) ?? '')).map((x) => x.name); if (so.length) nhom.push(`${k}{${so.join(' ')}}`) }
-  if (f.has('count')) nhom.push('count')
-  const dimT = f.has('dimensions') ? await truong(f.get('dimensions')) : null, dims = new Set((dimT?.fields ?? []).map((x) => x.name))
-  const dNgay = dims.has('date') ? 'date' : dims.has('datetimeDay') ? 'datetimeDay' : dims.has('datetimeHour') ? 'datetimeHour' : null
-  // lọc theo ngày: xem kiểu filter
-  const accF = (acct?.fields ?? []).find((x) => x.name === d.ten)
-  const fArg = await (async () => { const j = await gql(`query{__type(name:"account"){fields{name args{name type{name ofType{name}}}}}}`); const a = j?.data?.__type?.fields?.find((x) => x.name === d.ten)?.args?.find((x) => x.name === 'filter'); return tenKieu(a?.type) })()
-  const fT = fArg ? await truong(fArg) : null, fIn = new Set((fT?.inputFields ?? []).map((x) => x.name))
-  const loc = fIn.has('date_geq') ? `{date_geq:"${TU}",date_leq:"${DEN}"}` : fIn.has('datetime_geq') ? `{datetime_geq:"${TU}T00:00:00Z",datetime_leq:"${DEN}T23:59:59Z"}` : fIn.has('datetimeHour_geq') ? `{datetimeHour_geq:"${TU}T00:00:00Z",datetimeHour_leq:"${DEN}T23:00:00Z"}` : null
-  if (!nhom.length || !loc) { console.log(`\n### ${d.ten}: bỏ qua (không có nhóm số hoặc không lọc được theo ngày)`); continue }
-  const ph = [...dims].filter((x) => /^(scriptName|namespaceId|actionType|bucketName|modelId|model|databaseId|status|storageClass)$/.test(x))
-  const dimQ = `dimensions{${[dNgay, ...ph].filter(Boolean).join(' ')}}`
-  const q = `query($a:String!){viewer{accounts(filter:{accountTag:$a}){${d.ten}(limit:9999,filter:${loc}${dNgay ? `,orderBy:[${dNgay}_ASC]` : ''}){${nhom.join(' ')} ${dNgay || ph.length ? dimQ : ''}}}}}`
-  const j = await gql(q, { a: ACC })
-  console.log(`\n### ${d.ten}  [${nhom.join(' ').slice(0, 300)}]`)
-  if (j.errors?.length) { console.log('LỖI: ' + loiNgan(j.errors)); continue }
-  const ds = j?.data?.viewer?.accounts?.[0]?.[d.ten] ?? []
-  // gộp theo ngày (cộng mọi phân nhóm) + tổng cả khoảng theo phân nhóm
+  for (const k of ['sum', 'max']) if (co.has(k)) { const so = (await kieuCua(co.get(k))).filter((f) => /int|float/i.test(tenKieu(f.type) ?? '')).map((f) => f.name); if (so.length) nhom.push(`${k}{${so.join(' ')}}`) }
+  const dims = co.has('dimensions') ? new Set((await kieuCua(co.get('dimensions'))).map((f) => f.name)) : new Set()
+  if (!nhom.length) { console.log(`\n### ${bo}: không có trường số`); continue }
+  console.log(`\n### ${bo}  [${nhom.join(' ').slice(0, 260)}]  dims: ${[...dims].slice(0, 30).join(',')}`)
+  const dNgay = dims.has('date') ? 'date' : dims.has('datetimeHour') ? 'datetimeHour' : dims.has('datetimeMinute') ? 'datetimeMinute' : null
+  const ph = [...dims].filter((x) => /^(scriptName|namespaceId|actionType|bucketName|modelId|model|status|storageClass|productName)$/.test(x))
+  let ds = null, loiCuoi = ''
+  for (const loc of [`{datetime_geq:"${TU}T00:00:00Z",datetime_leq:"${DEN}T23:59:59Z"${locThem ? ',' + locThem : ''}}`, `{date_geq:"${TU}",date_leq:"${DEN}"${locThem ? ',' + locThem : ''}}`, `{datetimeHour_geq:"${TU}T00:00:00Z",datetimeHour_leq:"${DEN}T23:00:00Z"${locThem ? ',' + locThem : ''}}`]) {
+    const q = `query($a:String!){viewer{accounts(filter:{accountTag:$a}){${bo}(limit:10000,filter:${loc}){${nhom.join(' ')} ${dNgay || ph.length ? `dimensions{${[dNgay, ...ph].filter(Boolean).join(' ')}}` : ''}}}}}`
+    const j = await gql(q, { a: ACC })
+    if (j.errors?.length) { loiCuoi = loiNgan(j.errors); continue }
+    ds = j?.data?.viewer?.accounts?.[0]?.[bo] ?? []; break
+  }
+  if (!ds) { console.log('LỖI: ' + loiCuoi); continue }
   const theoNgay = new Map(), theoPh = new Map(), tong = {}
   for (const x of ds) {
     const ngay = String(x.dimensions?.[dNgay] ?? '').slice(0, 10), khoa = ph.map((p) => `${p}=${x.dimensions?.[p]}`).join(' ')
-    for (const k of ['sum', 'max', 'avg']) for (const [tt, v] of Object.entries(x[k] ?? {})) { if (typeof v !== 'number') continue
+    for (const k of ['sum', 'max']) for (const [tt, v] of Object.entries(x[k] ?? {})) { if (typeof v !== 'number') continue
       const ten = `${k}.${tt}`, gop = k === 'sum' ? (a, b) => a + b : Math.max
       const n = theoNgay.get(ngay) ?? {}; n[ten] = gop(n[ten] ?? 0, v); theoNgay.set(ngay, n)
       const p = theoPh.get(khoa) ?? {}; p[ten] = gop(p[ten] ?? 0, v); theoPh.set(khoa, p)
       tong[ten] = gop(tong[ten] ?? 0, v) }
-    if (typeof x.count === 'number') { const n = theoNgay.get(ngay) ?? {}; n.count = (n.count ?? 0) + x.count; theoNgay.set(ngay, n); tong.count = (tong.count ?? 0) + x.count }
   }
   const tron = (o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v).map(([k, v]) => [k, Math.round(v)]))
   for (const [ngay, o] of [...theoNgay].sort()) console.log(ngay, JSON.stringify(tron(o)))
-  if (ph.length) for (const [k, o] of [...theoPh].sort((a, b) => (b[1]['sum.requests'] ?? b[1]['sum.rowsWritten'] ?? 0) - (a[1]['sum.requests'] ?? a[1]['sum.rowsWritten'] ?? 0)).slice(0, 25)) console.log('  ·', an(k), JSON.stringify(tron(o)))
+  if (ph.length) for (const [k, o] of [...theoPh].slice(0, 30)) console.log('  ·', an(k), JSON.stringify(tron(o)))
   console.log('  TỔNG', JSON.stringify(tron(tong)))
-  tongKy.push([d.ten, tron(tong)])
+  tongKy.push([bo, tron(tong)])
+}
+
+// ───────── 2b. Nhật ký Worker (Workers Logs — tính phí theo số sự kiện): đếm qua API Telemetry nếu khoá có quyền ─────────
+for (const [tu, den] of [['2026-10-11', '2026-11-11'], ['2026-11-10', '2026-11-11']]) {
+  try {
+    const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/observability/telemetry/query`, { method: 'POST', headers: H,
+      body: JSON.stringify({ queryId: 'dem-su-kien', timeframe: { from: Date.parse(`${tu}T00:00:00Z`), to: Date.parse(`${den}T00:00:00Z`) }, view: 'calculations', limit: 10,
+        parameters: { datasets: ['cloudflare-workers'], calculations: [{ operator: 'count', alias: 'soSuKien' }], filters: [], groupBys: [] } }) })
+    const j = await r.json().catch(() => null)
+    console.log(`\n## 2b. Workers Logs ${tu} → ${den}: HTTP ${r.status} ${j?.success === false ? loiNgan(j.errors) : ''} ${an(JSON.stringify(j?.result?.calculations ?? j?.result ?? '').slice(0, 600))}`)
+  } catch (e) { console.log('2b lỗi', String(e).slice(0, 120)) }
 }
 
 // ───────── 3. TRUY VẤN D1 GHI / ĐỌC NHIỀU NHẤT (2 ngày mẫu) ─────────
