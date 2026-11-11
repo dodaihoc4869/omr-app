@@ -12,9 +12,6 @@ import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
-import { taiLoc, THAM_LOC_ON } from './chuoi-tieng'
-import { dungLocMicEm, type LocMicEm } from './mic-em'
-import { boLoa, theAmLoa } from './loa'
 
 export interface TuyChonLiveEm {
   /** Vé phòng của em (`/hs/bpu/ve` hoặc `/hs/bpu/cua-em`). */
@@ -93,7 +90,6 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   // Mic của em được gọi lên bảng + tiếng của bạn đang phát mic.
   let phienCuaEm = '', hangSfu: Promise<unknown> = Promise.resolve(), trackSapToi: 'thay' | 'ban' = 'thay'
   let micLuong: MediaStream | null = null, micTx: RTCRtpTransceiver | null = null, dangXinMic = false, hetXinMic = -1e9
-  let micLoc: LocMicEm | null = null, micLocTinh: 'khong' | 'chay' | 'cham' | 'treo' | 'loi' = 'khong'
   let amCtx: AudioContext | null = null, doAm: AnalyserNode | null = null, mauAm: Float32Array<ArrayBuffer> | null = null
   let amBan: HTMLAudioElement | null = null, thuBan: RTCRtpReceiver | null = null, banDangKeo = '', henBan: unknown = null
   let midThay: string | null = null, banSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
@@ -134,7 +130,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   async function moKhoaTieng(): Promise<boolean> {
     daCham = true
     try {
-      am = am ?? theAmLoa()
+      am = am ?? document.createElement('audio')
       am.autoplay = true
       am.setAttribute('playsinline', '')
       if (am.srcObject) { capNhatTieng(); await am.play(); dat({ tieng: 'co' }); return true }
@@ -177,7 +173,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
           thuBan = e.receiver
           try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
           try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-          amBan = amBan ?? theAmLoa()
+          amBan = amBan ?? document.createElement('audio')
           amBan.autoplay = true; amBan.setAttribute('playsinline', '')
           amBan.srcObject = new MediaStream([e.track])
           capNhatTieng()
@@ -188,7 +184,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         // Đệm jitter thấp nhất, để trình duyệt tự thích ứng (đặc tả 4.2).
         try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
         try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-        am = am ?? theAmLoa()
+        am = am ?? document.createElement('audio')
         am.autoplay = true
         am.setAttribute('playsinline', '')
         am.removeAttribute('src')
@@ -252,29 +248,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   function ngatMic(sau: TrangThaiLiveEm['mic']): void {
     for (const t of micLuong?.getTracks() ?? []) t.stop()
     micLuong = null; doAm = null
-    if (micLoc) { micLoc.don(); micLoc = null }
-    if (micLocTinh === 'chay') micLocTinh = 'khong'
     if (micTx) { const tx = micTx; micTx = null; void tx.sender.replaceTrack(null).catch(() => undefined); try { tx.direction = 'inactive' } catch { /* đã đóng */ } }
     if (tt.mic !== sau) dat({ mic: sau })
     capNhatTieng()
-  }
-  /** LỌC ỒN NHẸ cho mic của em (Z4 11/11, mic-em.ts): mic thô đã gửi rồi mới dựng; bộ lọc chạy thật ⇒ đổi bộ gửi sang track đã lọc; chậm / treo / lỗi ⇒
-   *  đổi lại mic thô (còn khử vọng + lọc ồn của trình duyệt như cũ). Máy yếu hoặc `ddh.live.loc-mic-em` = `tat` ⇒ không dựng. */
-  async function batLocMic(luong: MediaStream, track: MediaStreamTrack): Promise<void> {
-    if (tuy.mayYeu || micLocTinh === 'cham') return
-    try { if (typeof localStorage !== 'undefined' && localStorage.getItem('ddh.live.loc-mic-em') === 'tat') return } catch { /* không đọc được: cứ dựng */ }
-    const giu: { l: LocMicEm | null } = { l: null }
-    try {
-      const wasm = await taiLoc()
-      if (!wasm || micLuong !== luong) return
-      giu.l = await dungLocMicEm(luong, wasm.slice(0), THAM_LOC_ON.vua, {
-        khiSan: () => { const l = giu.l; if (l && micLuong === luong && micTx) void micTx.sender.replaceTrack(l.ra).then(() => { if (micLuong === luong && micLoc === l) micLocTinh = 'chay' }, () => undefined) },
-        khiLui: (vi) => { micLocTinh = vi; if (micLuong === luong && micTx) void micTx.sender.replaceTrack(track).catch(() => undefined); if (micLoc === giu.l) micLoc = null; giu.l?.don() },
-      })
-    } catch { giu.l = null }
-    if (!giu.l) return
-    if (micLuong !== luong) { giu.l.don(); return }
-    micLoc = giu.l
   }
   /** Em tắt mic (nút «Xong, tắt mic») — báo phòng gỡ để các máy khác thôi nghe. Thầy thu mic / chấm xong / lượt mới thì thư viện tự tắt. */
   function tatMic(): void {
@@ -333,7 +309,6 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         }
         if (micLuong !== luong) return { ok: false, lyDo: 'chua-duoc-moi' } // đã bị thu trong lúc nối
         dat({ mic: 'dang-phat' }); capNhatTieng()
-        void batLocMic(luong, track)
         return { ok: true }
       } catch { if (micLuong === luong) ngatMic('loi'); if (live?.emMoi) tuy.kenh.gui({ t: 'live-mic-loi', ly: 'loi' }); return { ok: false, lyDo: 'sfu-loi' } }
     })
@@ -598,7 +573,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     trangThai: (): TrangThaiLiveEm => ({ ...tt }),
     nhanView, nhanTinPhong, khiNoiLai,
     moKhoaTieng, datTieng, datRoiMan,
-    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic, locMic: () => micLocTinh, coLoa: boLoa.co, dsLoa: boLoa.ds, loa: boLoa.id, datLoa: boLoa.dat,
+    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic,
     gioTay, deSau, datGiayLech, datHienBang,
     /** Bảng đã chốt (khoá trang, tỉ lệ vùng viết, mọi nét) — dùng khi lớp vẽ cần dựng lại từ đầu (đổi cỡ, phóng bảng). */
     bang: (): BangNet => bang,
