@@ -22,11 +22,21 @@ if (pos >= 0) {
     throw new Error('--persist-to chỉ dùng cho kiểm cục bộ.')
   base.push('--persist-to', args[pos + 1])
 }
-const run = (du) =>
-  execFileSync('npx', [...base, ...du], {
-    encoding: 'utf8',
-    maxBuffer: 8 * 1024 * 1024,
-  })
+// 11/11: D1 trả 7429 «DB is overloaded … within a 10 second window» làm DỪNG hai lượt phát hành (#1608, #1612) ngay câu SELECT đầu, dù không có ca thi mở.
+// Quá tải kiểu này tự hết sau cửa sổ 10 giây ⇒ chờ rồi thử lại 12 · 24 · 36 · 48 giây; lỗi khác thì ném ngay như cũ.
+const ngu = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
+const quaTai = (e) => /7429|overloaded|Too many resources|\b429\b/i.test(`${e?.stdout ?? ''}${e?.stderr ?? ''}${e?.message ?? ''}`)
+const run = (du) => {
+  for (let lan = 0; ; lan++) {
+    try {
+      return execFileSync('npx', [...base, ...du], { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 })
+    } catch (e) {
+      if (lan >= 4 || !quaTai(e)) throw e
+      console.log(`D1 đang quá tải — chờ ${12 * (lan + 1)} giây rồi thử lại (lần ${lan + 1}/4).`)
+      ngu(12_000 * (lan + 1))
+    }
+  }
+}
 const query = (sql) => {
   const text = run(['--command', sql, '--json'])
   const rs = JSON.parse(text)
