@@ -271,11 +271,17 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void, chi
     w = new Worker(u)
     const wk = w
     let muc: MucLocOn = 'tat', daGui = false, daGuiTg = false, batLuc = Date.now()
-    const canh = setInterval(() => { if (muc === 'thay' && xetNgungChay(k, batLuc, Date.now())) { k.tg = 'tu-tat'; k.locOn = 'loi'; k.tgTin = { ...(k.tgTin ?? { ban: '', ngay: '' }), ly: 'ngung' }; try { wk.postMessage({ chiThay: false }) } catch { /* đã dừng */ } khiTuTat?.('ngung') } }, 500)
+    // canh khung ngừng chảy: hẹn giờ MỘT LẦN, đặt lại mỗi khi Worker báo tin (không thêm vòng setInterval)
+    let canh: ReturnType<typeof setTimeout> | null = null
+    const henCanh = (): void => {
+      if (canh) clearTimeout(canh)
+      canh = setTimeout(() => { canh = null; if (muc === 'thay' && xetNgungChay(k, batLuc, Date.now())) { k.tg = 'tu-tat'; k.locOn = 'loi'; k.tgTin = { ...(k.tgTin ?? { ban: '', ngay: '' }), ly: 'ngung' }; try { wk.postMessage({ chiThay: false }) } catch { /* đã dừng */ } khiTuTat?.('ngung') } }, NGUNG_CHAY_MS + 200)
+    }
     wk.onmessage = (e: MessageEvent) => {
       const d = e.data as { g?: number; v?: number; loi?: string; loc?: 'chay' | 'loi'; tg?: 'chay' | 'loi' | 'tu-tat'; h?: TinChiThay; ly?: string; tgRtf?: number }
       if (typeof d?.g === 'number' && d.g > 0) gNho = d.g
       if (typeof d?.v === 'number') { k.vao = d.v; k.vaoLuc = Date.now() }
+      if (muc === 'thay' && k.tg === 'chay') henCanh()
       if (d?.loc && muc !== 'thay') k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc
       if (d?.tg === 'chay') { batLuc = Date.now(); k.tgTin = { ban: String(d.h?.ban ?? ''), ngay: String(d.h?.ngay ?? ''), buoc: Number(d.h?.buoc) || undefined }; k.tg = muc === 'thay' ? 'chay' : 'tat' }
       if (d?.tg === 'loi' || d?.tg === 'tu-tat') { k.tg = d.tg; k.tgTin = { ...(k.tgTin ?? { ban: '', ngay: '' }), ly: d.ly ?? d.tg }; daGuiTg = d.tg === 'tu-tat'; khiTuTat?.(d.ly ?? d.tg) }
@@ -307,7 +313,7 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void, chi
     }
     wk.onerror = () => khiHong?.()
     wk.postMessage({ c: { ...LAM_RO, g0: gNho, chiTach }, vao: xl.readable, ra: sinh.writable }, [xl.readable as unknown as Transferable, sinh.writable as unknown as Transferable])
-    return { ra: sinh, don: () => { clearInterval(canh); try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
+    return { ra: sinh, don: () => { if (canh) clearTimeout(canh); try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
   } catch { try { w?.terminate() } catch { /* chưa chạy */ } return null }
 }
 
