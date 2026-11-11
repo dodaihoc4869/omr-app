@@ -43,17 +43,35 @@ async function trangEm(sbd, w, h, dpr, them = '') {
   t.on('pageerror', (e) => loiTrang.push(`em ${sbd}: ${e.message}`))
   // Mốc giờ của tấm giữa màn: lúc hiện, lúc bắt đầu thu (data-thu / data-pha="thu"), lúc gỡ; số tấm nhiều nhất cùng lúc; tên trên từng tấm đã hiện.
   await t.addInitScript(() => {
-    const M = (window.__lb = { hien: 0, thu: 0, mat: 0, nhieu: 0, ten: [] })
+    const M = (window.__lb = { hien: 0, thu: 0, mat: 0, nhieu: 0, ten: [], thu0: null, giuaThu: null, dap: null })
+    // tâm hộp bao (px màn): khoảng cách hai tâm không đổi khi hình xoay 90° bằng CSS ⇒ so thẳng được, khỏi đổi trục
+    const tamHop = (e) => { const r = e.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2, r.width, r.height] }
     const xem = () => {
       const ds = document.querySelectorAll('.lv-lb-tam'), e = ds[0]
       M.nhieu = Math.max(M.nhieu, ds.length)
-      if (e && !M._co) { M.hien = performance.now(); M.thu = 0; M.mat = 0; M.ten.push(e.textContent) }
-      if (e && M._e && e !== M._e) { M.hien = performance.now(); M.thu = 0; M.mat = 0; M.ten.push(e.textContent) }
+      if ((e && !M._co) || (e && M._e && e !== M._e)) { M.hien = performance.now(); M.thu = 0; M.mat = 0; M.ten.push(e.textContent); M._daThu = false; M.thu0 = null; M.giuaThu = null; M.dap = null }
       if (e && e.getAttribute('data-pha') === 'thu' && !M.thu) M.thu = performance.now()
+      // vừa bắt đầu bay: ghi hộp lúc đầu + hộp sau 140 ms (giữa chừng) — đo ngay trong trang, không phụ thuộc tốc độ chụp ảnh
+      if (e && e.hasAttribute('data-thu') && !M._daThu) {
+        M._daThu = true; M.thu0 = tamHop(e)
+        setTimeout(() => { const t = document.querySelector('.lv-lb-tam[data-thu]'), d = document.querySelector('.lv-lb-dau'); if (t) M.giuaThu = { tam: tamHop(t), dau: d ? tamHop(d) : null, mo: Number(getComputedStyle(t).opacity) } }, 140)
+        // mẫu theo từng khung hình suốt lúc bay (dự phòng khi trình duyệt gỡ tấm trước khi kịp báo transitionend)
+        const bd = performance.now(), d0 = document.querySelector('.lv-lb-dau')
+        M.mau = []
+        const lay = () => { const t = document.querySelector('.lv-lb-tam[data-thu]'); if (!t) return; M.mau.push([Math.round(performance.now() - bd), ...tamHop(t).map((v) => Math.round(v * 10) / 10)]); M.cuoi = { tam: tamHop(t), dau: d0 ? tamHop(d0) : null, ms: performance.now() - bd }; requestAnimationFrame(lay) }
+        lay()
+      }
       if (!e && M._co) M.mat = performance.now()
       M._co = !!e; M._e = e || null
     }
     new MutationObserver(xem).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-pha', 'data-thu'] })
+    // CHỖ HẠ CÁNH: lúc phép dời của tấm chạy xong, tâm tấm phải trùng tâm dấu nhỏ cạnh thẻ tên
+    document.addEventListener('transitionend', (ev) => {
+      const t = ev.target
+      if (!(t instanceof Element) || !t.classList.contains('lv-lb-tam') || ev.propertyName !== 'transform') return
+      const d = document.querySelector('.lv-lb-dau')
+      M.dap = { tam: tamHop(t), dau: d ? tamHop(d) : null }
+    }, true)
   })
   await t.goto(`${may.goc}/scripts/thu-live-1011/trang.html?vai=em&sbd=${sbd}${them}`)
   await t.locator('.bpu-hs').waitFor({ timeout: 20000 })
@@ -107,7 +125,6 @@ await thay.mouse.click(600, 300); await ngu(400)
 for (const e of [e1, e3, e4, e5, e7]) await emGui(e.t)
 await ngu(900)
 kiem('trước khi gọi: máy đã gửi ở bảng live, KHÔNG có thẻ tên / dải / tấm nào; máy S2 (chưa gửi) còn ở màn làm bài', (await hop(e1.t)).dai === null && (await hop(e1.t)).soTam === 0 && await e2.t.locator('.lv').count() === 0)
-const truoc = { e1: await hop(e1.t), e3: await hop(e3.t), e4: await hop(e4.t) }
 
 // thầy viết vài nét trên bảng đen (để ảnh có nét thật sát mép trên khung bảng — chỗ thẻ tên KHÔNG được đè)
 const cot = await to.locator('.mc-cot-lam-bai').first().evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height } })
@@ -120,6 +137,8 @@ await viet(cot.x + 14, cot.y + 8, cot.w * 0.5, 3) // nét sát mép TRÊN - TRÁ
 await viet(cot.x + cot.w * 0.55, cot.y + 10, cot.w * 0.38, 3) // sát mép trên - phải
 await viet(cot.x + 30, cot.y + 70, cot.w * 0.6); await viet(cot.x + 30, cot.y + 120, cot.w * 0.45)
 await ngu(2600) // quá 2 giây ⇒ khung bảng được ưu tiên (nở)
+// hộp «trước khi gọi» đo SAU khi khung bảng đã nở (ưu tiên chỉ đổi khi thầy viết sang vùng kia ⇒ từ đây tới lúc gọi bố cục đứng yên)
+const truoc = { e1: await hop(e1.t), e3: await hop(e3.t), e4: await hop(e4.t) }
 /** Điểm ảnh MỰC trên lớp nét đã chốt của bảng trong dải 30 px sát mép trên khung bảng (px CSS) — phải còn nguyên sau khi thẻ tên hiện. */
 const mucDauBang = (t) => t.evaluate(() => {
   const b = document.querySelector('.lv-bang'), c = b && b.querySelector('canvas')
@@ -151,18 +170,34 @@ for (const [ten, k] of Object.entries(g)) {
 }
 kiem('TẤM · không dịch khung GIẤY (hộp giấy trước / sau khi gọi y nguyên); khung bảng chỉ nhường 26 px phía trên cho dải thẻ tên', ['e1', 'e3', 'e4'].every((n) => JSON.stringify(truoc[n].giay) === JSON.stringify(g[n].giay) && Math.abs(g[n].bang[1] - truoc[n].bang[1] - 26) <= 0.6 && Math.abs(g[n].bang[3] - truoc[n].bang[3]) <= 0.6 && g[n].bang[0] === truoc[n].bang[0]),
   `844: giấy ${JSON.stringify(g.e1.giay)} · bảng ${JSON.stringify(truoc.e1.bang)} → ${JSON.stringify(g.e1.bang)}`)
-await chup(e1.t, 'tam-giua-man-844'); await chup(e4.t, 'tam-giua-man-1971'); await chup(e5.t, 'tam-giua-man-may-cua-em-844'); await chup(e2.t, 'tam-giua-man-iphone-doc-xoay-390'); await chup(e3.t, 'tam-giua-man-667')
+// Tấm chỉ đứng 3 giây ⇒ lúc tấm còn giữa màn chỉ chụp ba máy (844, 1971, máy của em được gọi); ảnh 667 + iPhone xoay chụp ở pha «gọi em khác».
+await chup(e1.t, 'tam-giua-man-844'); await chup(e4.t, 'tam-giua-man-1971'); await chup(e5.t, 'tam-giua-man-may-cua-em-844')
 
-// giữa chừng lúc thu nhỏ
-await e1.t.locator('.lv-lb-tam[data-thu]').waitFor({ timeout: 5000 })
-await ngu(120)
-const dangThu = await hop(e1.t)
-await chup(e1.t, 'dang-thu-nho-844')
-kiem('THU NHỎ · giữa chừng: tấm đang nhỏ lại và rời giữa màn về phía thẻ tên (hộp nhỏ hơn, tâm lệch về góc trên khung bảng)', !!dangThu.tam && (dangThu.tam[2] - dangThu.tam[0]) < (g.e1.tam[2] - g.e1.tam[0]) * 0.97 && (dangThu.tam[1] + dangThu.tam[3]) / 2 < g.e1.h / 2 - 2, JSON.stringify(dangThu.tam))
+// giữa chừng lúc thu nhỏ: máy 844 báo NGAY lúc phép dời bắt đầu (bộ quan sát trong trang) rồi chụp liền — chụp mất một hai khung hình nên ảnh rơi vào
+// giữa đường bay. Số đo kiểm lấy trong trang (không phụ thuộc tốc độ chụp); ảnh chỉ để nhìn.
+const treChup = await e1.t.evaluate(() => new Promise((r) => {
+  const xong = () => setTimeout(() => r(Math.round(performance.now() - window.__lb.thu)), 130)
+  if (document.querySelector('.lv-lb-tam[data-thu]')) { xong(); return }
+  const ob = new MutationObserver(() => { if (document.querySelector('.lv-lb-tam[data-thu]')) { ob.disconnect(); xong() } })
+  ob.observe(document, { subtree: true, attributes: true, attributeFilter: ['data-thu'] })
+}))
+writeFileSync(join(ANH, 'that-5-em-len-bang-dang-thu-nho-844.jpg'), await e1.t.screenshot({ type: 'jpeg', quality: 80 }))
+console.log(`  ảnh that-5-em-len-bang-dang-thu-nho-844.jpg (bắt đầu chụp ~${treChup} ms sau khi bắt đầu thu)`)
 await ngu(900)
+const kc = (a, b) => (a && b ? Math.hypot(a[0] - b[0], a[1] - b[1]) : Infinity)
+// số đo giữa chừng lấy ở máy 1180 + iPhone dọc xoay (máy 844 đang bị chụp ảnh — lúc chụp, trang ít khung hình, số đo lệch)
+for (const e of [e7, e2]) {
+  const m = await lb(e.t), t0 = m.thu0, t1 = m.giuaThu?.tam, d = m.giuaThu?.dau
+  kiem(`THU NHỎ · ${e.sbd} giữa chừng (140 ms): tấm CÒN RÕ (độ mờ ${m.giuaThu?.mo}), nhỏ lại (${t0 && t1 ? Math.round(Math.max(t1[2], t1[3])) + ' / ' + Math.round(Math.max(t0[2], t0[3])) : '?'} px) và đang bay về phía dấu cạnh thẻ tên (cách ${Math.round(kc(t1, d))} px, lúc đầu ${Math.round(kc(t0, d))} px)`,
+    !!t0 && !!t1 && !!d && m.giuaThu.mo >= 0.99 && Math.max(t1[2], t1[3]) < Math.max(t0[2], t0[3]) * 0.97 && kc(t1, d) < kc(t0, d) - 2)
+}
+kiem(`THU NHỎ · ảnh máy 844 chụp giữa đường bay (bắt đầu chụp ${treChup} ms sau khi bắt đầu thu)`, treChup >= 100 && treChup < 260)
 for (const e of [e1, e2, e3, e4, e5, e7]) {
   const m = await lb(e.t)
   kiem(`THỜI GIAN · ${e.sbd}: tấm đứng ${Math.round(m.thu - m.hien)} ms (3 giây ± 0,25), thu trong ${Math.round(m.mat - m.thu)} ms (≤ 450 + một khung), chưa lúc nào có hai tấm`, m.hien > 0 && Math.abs(m.thu - m.hien - 3000) <= 250 && m.mat - m.thu > 0 && m.mat - m.thu <= 480 && m.nhieu === 1, JSON.stringify(m.ten))
+  // hạ cánh: lúc phép dời chạy xong, tâm tấm trùng tâm dấu nhỏ (kể cả iPhone dọc xoay CSS — phép đo chuỗi offset theo trục của hình)
+  const dap = m.dap ?? (m.cuoi && m.cuoi.ms >= 370 ? m.cuoi : null)
+  kiem(`HẠ CÁNH · ${e.sbd}${e.w < e.h ? ' (iPhone dọc, hình xoay CSS)' : ''}: tấm bay về ĐÚNG chỗ dấu cạnh thẻ tên (lệch ${dap ? kc(dap.tam, dap.dau).toFixed(1) : '?'} px${m.dap ? '' : ', mẫu khung cuối'})`, !!dap && kc(dap.tam, dap.dau) <= 3, dap ? JSON.stringify(dap) : 'không bắt được lúc dời xong')
 }
 
 // ───────────── SAU KHI THU: thẻ tên + dấu nhỏ ─────────────
@@ -201,14 +236,17 @@ await chup(e6.t, 'vao-muon-chi-the-va-dau-844')
 // ───────────── GỌI EM KHÁC: tấm mới THAY, kể cả lúc tấm cũ chưa tan ─────────────
 await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S3', lyDo: [] })))
 await e1.t.locator('.lv-lb-tam').waitFor({ timeout: 4000 })
-await ngu(1200)
-await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S2', lyDo: [] }))) // tấm «Khánh Vy» mới đứng 1,2 giây
+const lucS3 = Date.now()
+await e2.t.locator('.lv .lv-lb-tam').waitFor({ timeout: 4000 })
+await chup(e2.t, 'tam-giua-man-iphone-doc-xoay-390') // máy S2 (CHƯA gửi, bị ép vào bảng live) thấy tấm của bạn
+await ngu(Math.max(0, 1200 - (Date.now() - lucS3)))
+await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S2', lyDo: [] }))) // tấm của S3 mới đứng ~1,2 giây
 await ngu(600)
 const thayTam = await hop(e1.t), mThay = await lb(e1.t)
 kiem('GỌI EM KHÁC · lúc tấm cũ chưa tan ⇒ tấm mới thay ngay: vẫn MỘT tấm, tên mới «Gia Huy»; thẻ tên đổi theo; chưa lúc nào có hai tấm', thayTam.soTam === 1 && thayTam.chuTam === `${tenDoi('S2')} | Gia Huy | lên bảng` && thayTam.chuThe === 'Gia Huy' && thayTam.soThe === 1 && mThay.nhieu === 1 && mThay.ten.length === 3, JSON.stringify(mThay.ten))
 const cuaS2 = await hop(e2.t), cuaS5 = await hop(e5.t)
 kiem('GỌI EM KHÁC · máy của em vừa được gọi (S2, iPhone xoay) ghi «Em lên bảng»; máy của em cũ (S5) ghi tên bạn', cuaS2.chuTam === `Em lên bảng | Gia Huy · ${tenDoi('S2')}` && cuaS5.chuTam === `${tenDoi('S2')} | Gia Huy | lên bảng`)
-await chup(e1.t, 'goi-em-khac-thay-tam-844'); await chup(e2.t, 'tam-giua-man-may-cua-em-iphone-doc-xoay-390')
+await chup(e1.t, 'goi-em-khac-thay-tam-844'); await chup(e2.t, 'tam-giua-man-may-cua-em-iphone-doc-xoay-390'); await chup(e3.t, 'tam-giua-man-667')
 await ngu(3300)
 const sauThay = await hop(e1.t)
 kiem('GỌI EM KHÁC · 3 giây tính lại từ lời gọi mới rồi thu về dấu cạnh thẻ «Gia Huy»', sauThay.soTam === 0 && sauThay.chuThe === 'Gia Huy' && sauThay.dauMo === 1)

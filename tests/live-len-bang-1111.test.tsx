@@ -141,7 +141,7 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
     qua(GIUA_MS - 60)
     expect(tam()[0]!.getAttribute('data-pha')).toBe('giua')
     qua(80)
-    expect(tam()[0]!.getAttribute('data-pha')).toBe('thu'); expect(tam()[0]!.hasAttribute('data-thu')).toBe(true)
+    expect(tam()[0]!.getAttribute('data-pha')).toBe('thu'); expect(tam()[0]!.hasAttribute('data-thu')).toBe(true); expect(tam()[0]!.hasAttribute('data-tat')).toBe(false)
     expect(dauNho()!.hasAttribute('data-cho')).toBe(false)
     qua(THU_MS + 60)
     expect(tam().length).toBe(0)
@@ -194,14 +194,14 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
     expect([...document.querySelector('.lv')!.children].map((e) => e.className.split(' ')[0]).sort()).toEqual(['lv-khay', 'lv-nam', 'lv-nen', 'lv-thuoc'])
   })
 
-  it('máy của CHÍNH em được gọi ⇒ chữ riêng «Em lên bảng» + tên em · đội; dấu «Em đang lên bảng»', async () => {
+  it('máy của CHÍNH em được gọi ⇒ chữ riêng «Em lên bảng» + tên em · đội; dấu vẫn gọn «đang lên bảng», nhãn đọc màn «Em đang lên bảng»', async () => {
     const st = phong(), m = await dung(st, 'S5')
     gioGia()
     goiLenBang(st, 'S5', [], 3000); m.lai()
     expect(chu(tam()[0]!)).toBe('Em lên bảngMinh Anh · Đội Đồng'); expect(tam()[0]!.hasAttribute('data-em')).toBe(true)
     expect(the()!.getAttribute('aria-label')).toBe('Em trên bảng · Đội Đồng')
     qua(GIUA_MS + 20); qua(THU_MS + 60)
-    expect(tam().length).toBe(0); expect(chu(dauNho())).toBe('Em đang lên bảng')
+    expect(tam().length).toBe(0); expect(chu(dauNho())).toBe('đang lên bảng'); expect(dauNho()!.getAttribute('aria-label')).toBe('Em đang lên bảng')
   })
 
   it('máy yếu: không bay (không đặt phép dời), hết 3 giây tấm tắt, dấu hiện', async () => {
@@ -210,7 +210,7 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
     gioGia()
     goiLenBang(st, 'S5', [], 3000); m.lai()
     qua(GIUA_MS + 20)
-    expect(tam()[0]!.getAttribute('data-pha')).toBe('thu'); expect(tam()[0]!.hasAttribute('data-thu')).toBe(false)
+    expect(tam()[0]!.getAttribute('data-pha')).toBe('thu'); expect(tam()[0]!.hasAttribute('data-thu')).toBe(false); expect(tam()[0]!.hasAttribute('data-tat')).toBe(true)
     qua(THU_MS + 60)
     expect(tam().length).toBe(0); expect(dauNho()!.hasAttribute('data-cho')).toBe(false)
   })
@@ -225,6 +225,9 @@ describe('kiểu (live-em.css): không chặn chạm, ≤ 40 % bề ngang, chỉ
     expect(t).not.toMatch(/backdrop-filter/)
     const thu = luat('.lv-lb-tam[data-thu]')
     expect(thu).toMatch(/transition: transform 0\.4s cubic-bezier\([^)]*\), opacity 0\.14s ease-in 0\.26s/) // 400 ms ≤ 450 ms, chỉ transform + opacity
+    // độ mờ 0 chỉ đi cùng `data-thu` (bay) / `data-tat` (tắt thẳng): đặt ở `data-pha="thu"` thì lúc đo chỗ bay tấm đã tắt phụt (lỗi bắt được bằng ảnh thật 11/11)
+    expect(thu).toMatch(/opacity: 0;/); expect(luat('.lv-lb-tam[data-tat]')).toMatch(/opacity: 0/)
+    expect(luat('.lv-lb-tam[data-pha="thu"]')).not.toMatch(/opacity/)
     expect(THU_MS).toBeLessThanOrEqual(450); expect(GIUA_MS).toBe(3000)
     expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{ \.lv-lb-tam \{ animation: none; \} \.lv-lb-dau \{ transition: none; \} \}/)
     expect(css).toMatch(/html\.may-yeu \.lv-lb-tam \{ animation: none;/)

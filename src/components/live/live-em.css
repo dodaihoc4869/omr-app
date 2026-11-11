@@ -300,9 +300,11 @@ html:not(#_):not(#_):not(#_) .lv .lv-gd section.ht2-lam-de, html:not(#_):not(#_)
 .lv-lb-tam small::before { content: ""; flex: none; width: 0.62em; height: 0.62em; border-radius: 50%; background: var(--doi); }
 .lv-lb-tam[data-em] span { color: var(--tr-chieu-phu); }
 @keyframes lv-lb-vao { from { opacity: 0; transform: translate(-50%, -46%) scale(0.94); } }
-/* hết 3 giây: thu nhỏ bay về chỗ dấu (`--lb-dx` / `--lb-dy` / `--lb-k` do LenBang.tsx đo); máy yếu / giảm chuyển động không có `data-thu` ⇒ tắt ngay */
-.lv-lb-tam[data-pha="thu"] { opacity: 0; animation: none; }
-.lv-lb-tam[data-thu] { transform: translate(-50%, -50%) translate3d(var(--lb-dx, 0px), var(--lb-dy, 0px), 0) scale(var(--lb-k, 0.3)); transition: transform 0.4s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.14s ease-in 0.26s; }
+/* hết 3 giây: thu nhỏ bay về chỗ dấu (`--lb-dx` / `--lb-dy` / `--lb-k` do LenBang.tsx đo); máy yếu / giảm chuyển động: `data-tat` ⇒ tắt ngay.
+   Độ mờ 0 KHÔNG đặt ở `data-pha="thu"`: lúc LenBang.tsx đo chỗ bay, trình duyệt tính kiểu trước khi có `data-thu` ⇒ tấm sẽ tắt phụt, không thấy bay. */
+.lv-lb-tam[data-pha="thu"] { animation: none; }
+.lv-lb-tam[data-tat] { opacity: 0; }
+.lv-lb-tam[data-thu] { opacity: 0; transform: translate(-50%, -50%) translate3d(var(--lb-dx, 0px), var(--lb-dy, 0px), 0) scale(var(--lb-k, 0.3)); transition: transform 0.4s cubic-bezier(0.5, 0, 0.2, 1), opacity 0.14s ease-in 0.26s; }
 @media (prefers-reduced-motion: reduce) { .lv-lb-tam { animation: none; } .lv-lb-dau { transition: none; } }
 html.may-yeu .lv-lb-tam { animation: none; box-shadow: inset 0 0 0 3px var(--doi); }
 html.may-yeu .lv-lb-dau { transition: none; }

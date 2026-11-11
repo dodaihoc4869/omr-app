@@ -9,7 +9,7 @@
 //   · TẤM GIỮA MÀN (`TamLenBang`): màu ĐỘI của em được gọi, tên gọi + «lên bảng» + tên đội; hiện `GIUA_MS` rồi tự THU NHỎ (`THU_MS`, chỉ transform +
 //     opacity) bay về đúng chỗ dấu. Không chặn chạm, không dịch bố cục, bề ngang ≤ 40 % hình. Máy của CHÍNH em được gọi: «Em lên bảng».
 //     Máy yếu / giảm chuyển động ⇒ không bay: tấm tắt, dấu hiện.
-// LUẬT PHÁT (`lucPhatLenBang`): chỉ phát khi lời gọi MỚI tới lúc lớp live đang chạy trên máy. Em vào muộn / nối lại lúc đã có bạn đang lên bảng ⇒ không
+// LUẬT PHÁT (mốc `lucBang` trong LopLive.tsx): chỉ phát khi lời gọi MỚI tới lúc lớp live đang chạy trên máy. Em vào muộn / nối lại lúc đã có bạn đang lên bảng ⇒ không
 // phát lại (chỉ thẻ + dấu). Gọi em khác ⇒ tấm mới THAY tấm cũ (một tấm). Em đang rời màn quá 3 giây mới về ⇒ chỉ còn thẻ + dấu.
 // AN TOÀN: chỉ dùng `viewEm.luot.goi` (tên, đội, đã chấm chưa) — thứ cả lớp vốn thấy trên màn chiếu. Không đáp án; kết quả chấm không hiện ở đây.
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
@@ -40,7 +40,8 @@ export const khoaDang = (em: EmLenBang | null | undefined): string => (em && em.
 
 const mauDoi = (doi: number): CSSProperties => ({ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-chieu-giay'})` })
 const tenDoi = (doi: number): string => DOI_BPU[doi]?.ten ?? ''
-const chuDau = (em: EmLenBang): string => (em.laEm ? 'Em đang lên bảng' : 'đang lên bảng')
+/** Chữ trên dấu: mọi máy cùng «đang lên bảng» (dấu giữ nhỏ); máy của chính em được gọi khác ở tấm giữa màn («Em lên bảng») và ở nhãn đọc màn. */
+const nhanDau = (em: EmLenBang): string => (em.laEm ? 'Em đang lên bảng' : 'đang lên bảng')
 const BtBang = () => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" /><path d="M12 16v4M8 20h8" /></svg>
 
 /** Pha của tấm giữa màn theo mốc phát `luc` (0 = không phát): 'giua' ⇒ 'thu' ⇒ ''. Mốc đổi (gọi em khác) ⇒ bắt đầu lại; mốc về 0 (hết lượt gọi) ⇒ tắt ngay. */
@@ -63,7 +64,7 @@ export function TheLenBang({ em, cho, dau }: { em: EmLenBang; cho: boolean; dau:
   return (
     <>
       <span className="lv-lb-the" style={mauDoi(em.doi)} role="img" aria-label={`${em.laEm ? 'Em' : `Bạn ${em.ten}`} trên bảng${doi ? ` · ${doi}` : ''}`}><i aria-hidden="true" /><b aria-hidden="true">{em.ten}</b></span>
-      {em.dang ? <span ref={dau} className="lv-lb-dau" style={mauDoi(em.doi)} data-cho={cho || undefined} role="img" aria-label={chuDau(em)}><BtBang /><em aria-hidden="true">{chuDau(em)}</em></span> : null}
+      {em.dang ? <span ref={dau} className="lv-lb-dau" style={mauDoi(em.doi)} data-cho={cho || undefined} role="img" aria-label={nhanDau(em)}><BtBang /><em aria-hidden="true">đang lên bảng</em></span> : null}
     </>
   )
 }
@@ -72,6 +73,8 @@ export function TheLenBang({ em, cho, dau }: { em: EmLenBang; cho: boolean; dau:
 export function TamLenBang({ em, pha, rong, dau, dong }: { em: EmLenBang; pha: 'giua' | 'thu'; rong: number; dau: RefObject<HTMLSpanElement | null>; /** false = máy yếu / giảm chuyển động */ dong: boolean }) {
   const tam = useRef<HTMLDivElement>(null)
   // Thu nhỏ: đo chỗ dấu theo toạ độ của HÌNH (cộng dồn offset tới gốc `.lv` — không dùng getBoundingClientRect vì hình có thể xoay 90° bằng CSS).
+  // Lúc đo (offset buộc trình duyệt tính kiểu) tấm phải CÒN RÕ: độ mờ 0 chỉ đi cùng `data-thu` (bay, có chuyển tiếp) hoặc `data-tat` (máy yếu, tắt thẳng) —
+  // gắn độ mờ 0 vào `data-pha="thu"` thì tấm tắt phụt trước khi kịp bay (chuyển tiếp không còn gì để chạy).
   useLayoutEffect(() => {
     const t = tam.current
     if (pha !== 'thu' || !t || !dong) return
@@ -89,7 +92,7 @@ export function TamLenBang({ em, pha, rong, dau, dong }: { em: EmLenBang; pha: '
   }, [pha, dau, dong])
   const doi = tenDoi(em.doi)
   return (
-    <div ref={tam} className="lv-lb-tam" data-pha={pha} data-em={em.laEm || undefined} role="status" style={{ ...mauDoi(em.doi), ['--lb-w' as string]: rong }}>
+    <div ref={tam} className="lv-lb-tam" data-pha={pha} data-tat={(pha === 'thu' && !dong) || undefined} data-em={em.laEm || undefined} role="status" style={{ ...mauDoi(em.doi), ['--lb-w' as string]: rong }}>
       {em.laEm ? <><b>Em lên bảng</b><span>{em.ten}{doi ? ` · ${doi}` : ''}</span></> : <><small>{doi}</small><b>{em.ten}</b><span>lên bảng</span></>}
     </div>
   )
