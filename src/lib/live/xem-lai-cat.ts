@@ -9,16 +9,17 @@ export const LUAT_CAT = {
   luiGoiMs: 2000,
   /** Đoạn «thầy chữa» bắt đầu 3 giây trước nét đầu. */
   luiNetMs: 3000,
-  /** Cụm nét: các nét cách nhau dưới 8 giây; từ 5 nét; từ 30 giây có tiếng. */
+  /** Cụm nét: các nét cách nhau dưới 8 giây; từ 5 nét VÀ (từ 10 giây có tiếng HOẶC buổi không có tiếng) — 11/11 hạ từ 30 giây cho hợp buổi thật. */
   cumNetMs: 8000,
   cumNetSo: 5,
-  chuaTiengMs: 30_000,
+  chuaTiengMs: 10_000,
   /** Lặng từ 6 giây ⇒ vào chỉ mục (giữ 0,5 giây hai đầu); lặng từ 90 giây giữa đoạn ⇒ đoạn dừng, có tiếng / nét lại thì mở phần 2. */
   langMs: 6000,
   langGiuMs: 500,
   langNgatMs: 90_000,
-  /** Đoạn dưới 20 giây tiếng sau khi bỏ lặng ⇒ không thành đoạn. */
-  vunMs: 20_000,
+  /** Đoạn vụn bị bỏ; GIỮ đoạn khi có từ 8 giây tiếng sau khi bỏ lặng HOẶC từ 3 nét (11/11, trước: dưới 20 giây tiếng là bỏ — buổi mic câm mất hết đoạn). */
+  vunMs: 8000,
+  vunNetSo: 3,
   /** Ngưỡng lặng khởi điểm −45 dBFS (hiệu chỉnh ở đợt X3). */
   nguong: mucTuDb(-45),
   /** Buổi không có tiếng: một ô coi là «có hoạt động» khi có nét trong vòng 4 giây. */
@@ -40,7 +41,7 @@ export interface LuotCat {
 }
 export interface DauVaoCat {
   msLive: number
-  /** Chỉ các lượt ĐÃ mở đáp án, theo thứ tự thời gian. */
+  /** Chỉ các lượt được vào trang xem lại (đã mở đáp án, hoặc đã chữa trên bảng — khi đó `moDapAn` = null), theo thứ tự thời gian. */
   luot: LuotCat[]
   /** Mốc nối giữa hai lần live (tắt rồi bật lại) — đoạn không vắt qua. */
   ranh: number[]
@@ -119,7 +120,6 @@ export function catDoan(v: DauVaoCat): { doan: DoanCat[]; lang: KhoangMs[]; lang
     for (const [a, b] of lenBang) cua = cua.flatMap(([x, y]) => (b <= x || a >= y ? [[x, y]] : [[x, a], [b, y]]) as [number, number][])
     for (const r of ranh) cua = cua.flatMap(([x, y]) => (r > x && r < y ? [[x, r], [r, y]] : [[x, y]]) as [number, number][])
     for (const [a, b] of cua) {
-      if (b - a < LUAT_CAT.vunMs) continue
       const trong = net.filter((n) => n.t >= a && n.t < b)
       // cụm đầu tiên đủ 5 nét
       let dau = 0, cum: { t: number; ms: number }[] | null = null
@@ -134,11 +134,11 @@ export function catDoan(v: DauVaoCat): { doan: DoanCat[]; lang: KhoangMs[]; lang
       // đuôi: tới hoạt động cuối (nét hoặc tiếng) trong cửa — bỏ khoảng lặng thô chạm cuối cửa
       let t1 = b
       for (const [x, y] of langTho) if (y >= b && x > t0 && x < t1) t1 = Math.min(b, x + LUAT_CAT.langGiuMs)
-      if (tiengMs(t0, t1) >= LUAT_CAT.chuaTiengMs) tho.push({ loai: 'thay_chua', luot: l.so, sbd: null, t0, t1 })
+      if (!v.coTieng || tiengMs(t0, t1) >= LUAT_CAT.chuaTiengMs) tho.push({ loai: 'thay_chua', luot: l.so, sbd: null, t0, t1 })
     }
   }
 
-  // Luật 4 — lặng từ 90 giây giữa đoạn ⇒ đoạn dừng ở đó, hết lặng thì mở phần kế. Luật 5 — phần dưới 20 giây tiếng bị bỏ.
+  // Luật 4 — lặng từ 90 giây giữa đoạn ⇒ đoạn dừng ở đó, hết lặng thì mở phần kế. Luật 5 — phần vụn (dưới 8 giây tiếng VÀ dưới 3 nét) bị bỏ.
   const doan: DoanCat[] = []
   for (const d of tho.sort((a, b) => a.t0 - b.t0)) {
     let manh: [number, number][] = [[d.t0, d.t1]]
@@ -154,10 +154,10 @@ export function catDoan(v: DauVaoCat): { doan: DoanCat[]; lang: KhoangMs[]; lang
     }
     let phan = 0
     for (const [a, b] of manh) {
-      const coTieng = tiengMs(a, b)
-      if (b <= a || coTieng < LUAT_CAT.vunMs) continue
+      const coTieng = tiengMs(a, b), soNet = net.filter((n) => n.t >= a && n.t < b).length
+      if (b <= a || (coTieng < LUAT_CAT.vunMs && soNet < LUAT_CAT.vunNetSo)) continue
       phan += 1
-      doan.push({ loai: d.loai, luot: d.luot, sbd: d.sbd, t0: Math.round(a), t1: Math.round(b), phan, giayCoTieng: Math.round(coTieng / 1000), soNet: net.filter((n) => n.t >= a && n.t < b).length })
+      doan.push({ loai: d.loai, luot: d.luot, sbd: d.sbd, t0: Math.round(a), t1: Math.round(b), phan, giayCoTieng: Math.round(coTieng / 1000), soNet })
     }
   }
   return { doan: doan.sort((a, b) => a.t0 - b.t0), lang, langTho }

@@ -15,10 +15,10 @@ export type KetQuaEm = 'dung' | 'chua-dung' | null
 
 /** Câu của buổi theo số câu (chỉ câu trong `buoi.json`). */
 export const cauTheoSo = (b: BuoiLiveJson): Map<number, CauBuoiLive> => new Map(b.cau.map((c) => [c.so, c]))
-/** Em làm đúng / chưa đúng câu này; em không gửi (hoặc câu tự luận, hoặc app thầy xem) ⇒ null (không hiện chip). */
+/** Em làm đúng / chưa đúng câu này; em không gửi (hoặc câu tự luận, hoặc app thầy xem, hoặc câu CHƯA mở đáp án — 11/11) ⇒ null (không hiện chip). */
 export function ketQuaEm(c: CauBuoiLive, rieng: TraLiveBuoiHs | null): KetQuaEm {
   const k = rieng?.ketQua?.[c.luot]
-  return !k || c.tuLuan ? null : k.dung ? 'dung' : 'chua-dung'
+  return !k || c.tuLuan || c.moDapAn === false ? null : k.dung ? 'dung' : 'chua-dung'
 }
 /** Các đoạn hợp lệ (câu có trong `buoi.json`), theo thứ tự buổi. Đây cũng là HÀNG PHÁT của trình phát («Đoạn 3/5»). */
 export function doanHopLe(b: BuoiLiveJson): DoanBuoiLive[] {

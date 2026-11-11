@@ -13,10 +13,15 @@ import { chuDapAn, gioPhat, mauDoi, tiLeDung } from './ten-hien'
 
 const doiCss = (doi: number | null): CSSProperties => ({ ['--doi' as string]: mauDoi(doi) })
 
-/** Khối «đáp án đúng» theo loại câu. Trắc nghiệm / đúng–sai có chữ phương án thì tô ngay trên phương án; không thì một dòng. */
+/** Khối «đáp án đúng» theo loại câu. Trắc nghiệm / đúng–sai có chữ phương án thì tô ngay trên phương án; không thì một dòng.
+ *  11/11: câu thầy chữa trên bảng mà CHƯA mở đáp án (`dung` rỗng) ⇒ chỉ hiện phương án / bốn ý, KHÔNG tô, KHÔNG có ô «Đáp án đúng». */
 function DapAn({ c, q, chu }: { c: CauBuoiLive; q: Question; chu: (s: string) => ReactNode }) {
   const d = String(c.dung ?? '').trim().toUpperCase()
-  if (!d) return null
+  if (!d) {
+    if (c.phan === 'I' && q.choices.length >= 2) return <div className="xl-pa" role="list" aria-label="Phương án">{q.choices.slice(0, 4).map((p, i) => <div key={i} role="listitem"><b>{'ABCD'[i]}.</b><span>{chu(p)}</span></div>)}</div>
+    if (c.phan === 'II' && q.ideas.length >= 2) return <div className="xl-pa mot" role="list" aria-label="Bốn ý">{q.ideas.slice(0, 4).map((p, i) => <div key={i} role="listitem"><b>{'abcd'[i]})</b><span>{chu(p)}</span></div>)}</div>
+    return null
+  }
   if (c.phan === 'I' && q.choices.length >= 2) return <div className="xl-pa" role="list" aria-label="Phương án">{q.choices.slice(0, 4).map((p, i) => {
     const kt = 'ABCD'[i]!, dung = kt === d
     return <div key={kt} role="listitem" className={dung ? 'dung' : undefined}><b>{kt}.</b><span>{chu(p)}</span>{dung ? <><BtTich /><span className="sr-only">Đáp án đúng</span></> : null}</div>
@@ -47,12 +52,15 @@ export default function TheCau({ cau: c, doan, ketQua, LC, tenDoi, khiPhat, khon
   const q = thanhCau(c), tl = tiLeDung(c)
   const chu = (s: string): ReactNode => (LC ? <LC.ChemText text={s} /> : s)
   const hay = doan.find((d) => d.dangXem)
+  /** Câu thầy chữa trên bảng mà chưa mở đáp án: buổi không mang đáp án + lời giải của câu này ⇒ không hiện ô đáp án, không hiện nút lời giải. */
+  const kin = c.moDapAn === false
   return <section id={`xl-cau-${c.so}`} className="xl-kinh xl-the" aria-label={`Câu ${c.so}`}>
     <div className="xl-cau-dau"><span className="so-cau so">Câu {c.so}</span>{c.dang ? <span className="xl-chip">{c.dang}</span> : null}
       {ketQua ? <span className={`xl-chip ${ketQua === 'dung' ? 'dung' : 'sai'} em`}>{ketQua === 'dung' ? 'Em làm đúng' : 'Em chưa đúng'}</span> : null}</div>
     {hay ? <div className="xl-hay"><BtSao /><span>Đoạn đáng xem · {hay.dangXem}</span></div> : null}
     <div className="xl-de">{LC ? <LC.DeCau q={q} stt={c.so} /> : <p>{q.text}</p>}</div>
     {c.tuLuan ? <p className="xl-chan" style={{ textAlign: 'left', paddingBottom: 8 }}>Câu tự luận · thầy chữa trên bảng</p> : <DapAn c={c} q={q} chu={chu} />}
+    {kin && !c.tuLuan ? <p className="xl-chan" style={{ textAlign: 'left', paddingBottom: 8 }}>Thầy chữa câu này trên bảng · chưa mở đáp án</p> : null}
     {tl != null ? <div className="xl-lop so"><b>Lớp làm đúng {tl} %</b><span>{c.soDung}/{c.soGui} em</span><div className="thanh" aria-hidden="true"><i style={{ width: `${tl}%` }} /></div></div> : null}
     {doan.map((d) => <Fragment key={d.stt}>
       {khongBia ? null : <button type="button" className="xl-bia-nut" onClick={() => khiPhat(d)} aria-label={`Phát đoạn chữa câu ${c.so}${d.phan > 1 ? ` phần ${d.phan}` : ''} · ${gioPhat(d.t1 - d.t0)}`}><BiaBang dai={gioPhat(d.t1 - d.t0)} nhan={daXem.includes(d.stt) ? 'Đã xem' : undefined} /></button>}
@@ -61,8 +69,8 @@ export default function TheCau({ cau: c, doan, ketQua, LC, tenDoi, khiPhat, khon
         <span className="xl-chip doi" style={doiCss(d.lenBang.doi)}><i className="xl-cham" aria-hidden="true" />{tenDoi[d.lenBang.doi] ?? TEN_DOI_MAC_DINH[d.lenBang.doi] ?? 'Đội'}</span>
         {d.lenBang.dat != null ? <span className={`xl-chip ${d.lenBang.dat ? 'dung' : 'chuy'}`}>{d.lenBang.dat ? 'Đạt' : 'Chưa đạt'}</span> : null}</div> : null}
     </Fragment>)}
-    <button type="button" className="xl-mo" aria-expanded={mo} onClick={() => setMo((v) => !v)}>Xem lời giải của câu {c.so}<BtXuong /></button>
-    {mo ? <div className="xl-giai">{!c.giai ? 'Kho chưa có lời giải cho câu này.'
+    {kin ? null : <button type="button" className="xl-mo" aria-expanded={mo} onClick={() => setMo((v) => !v)}>Xem lời giải của câu {c.so}<BtXuong /></button>}
+    {mo && !kin ? <div className="xl-giai">{!c.giai ? 'Kho chưa có lời giải cho câu này.'
       : LC ? <LC.LoiGiaiCau q={q} solution={c.giai.solution} dapAn={c.dung} hinhLoiGiai={c.giai.anh as Question['hinhAnh']} />
       : typeof c.giai.solution === 'string' ? c.giai.solution : 'Đang mở lời giải…'}</div> : null}
   </section>

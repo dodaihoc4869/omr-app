@@ -41,6 +41,7 @@ export function cuonToiPhan(id: IdPhan, muot = true): void {
 // ---------------------------------------------------------------- khối nạp khi cần ----------------------------------------------------------------
 const napPhanDuoi = () => import('./TrangVeConDuoi')
 const PhanDuoi = lazy(napPhanDuoi)
+const KhoiNoCauPh = lazy(() => import('./KhoiNoCauPh').catch(() => ({ default: (() => null) as unknown as typeof import('./KhoiNoCauPh').default }))) // nợ câu của con (11/11): chỉ tải khi con đang nợ
 type KhoiBac = typeof import('./BacCon')
 let huaBac: Promise<KhoiBac | null> | null = null
 /** Nạp sẵn khối bậc (huy hiệu + thang 12 bậc, làn M) — một lần mỗi phiên; lỗi ⇒ lần sau thử lại, phần bậc ẩn. */
@@ -320,6 +321,7 @@ export function HomNay({ pm, hoc2, tq, k, nowMs }: { pm: PhMoi; hoc2: Hoc2 | nul
               {so.daLam >= so.tong ? <>Con đã <b>{so.du.replace(/ hôm nay$| của ngày$/, '')}</b>{/ hôm nay$/.test(so.du) ? ' hôm nay' : ' của ngày'}.</> : so.daLam === 0 && (nTq ? nTq.soCau === 0 : true) ? <>Con <b>chưa làm câu nào</b> hôm nay.</> : <>Còn <b>{so.xap}{so.tong - so.daLam} câu</b> nữa là {so.du}.</>}
             </p>
           )}
+          {tq?.noCau && <Suspense fallback={null}><KhoiNoCauPh tho={tq.noCau} /></Suspense>}
           {(ghi.length > 0 || hanhTrinh) && (
             <div className="tvc-hn-ghi">
               {ghi.map((g) => <p key={g}>{g}</p>)}

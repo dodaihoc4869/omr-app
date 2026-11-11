@@ -3,7 +3,7 @@
 // (may-chu.mjs). Dữ liệu giả, không chạm máy chủ thật. Thay cho kịch bản «em gửi xong vẫn ở màn câu hỏi» của thu.mjs (luật màn đã đổi 11/11).
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu-2.mjs <thư mục tạm> [thư mục ảnh = docs/ban-ve-live-1011] [tệp số đo = docs/ban-ve-live-1011/so-do-that-2.json]
-// Kịch bản: bật live ⇒ thanh màn chiếu gom vào một nút (K5) ⇒ máy em đang làm: tay nắm mép trái (K4) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy đề soi đúng
+// Kịch bản: bật live ⇒ thanh màn chiếu gom vào một nút (K5) ⇒ máy em đang làm: tay nắm MÉP TRÊN, trên đầu thẻ đội / tên (K4 + M3 — thầy 11/11 lần 2) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy đề soi đúng
 // giấy thầy (B1) ⇒ thầy gạch chân trên giấy ⇒ nét khớp chữ ⇒ thầy gọi lên bảng ⇒ em CHƯA gửi bị ép vào bảng live, có dải đoán / tiếp sức (K2, B3) ⇒
 // tạm dừng / tiếp tục / kết thúc trong cửa sổ nút Live (K3) ⇒ em rời màn ⇒ thẻ ghi kiểu rời (B2) ⇒ chạm hai lần phóng bảng.
 // KHÔNG kiểm được ở đây: TIẾNG (cửa /bpu/live của máy chủ thử trả «chưa cấu hình» — cần Cloudflare Realtime SFU thật + mic thật), khoá xoay Android, iPhone thật.
@@ -109,16 +109,23 @@ await thay.keyboard.press('g'); await ngu(500)
 kiem('K5 · phím tắt vẫn chạy khi thanh gom (G mở lời giải)', await to.locator('.mc-giai:not([hidden])').count() > 0)
 await thay.keyboard.press('g'); await ngu(500)
 
-// ───────────── K4: máy em đang làm bài — chỉ còn tay nắm mép trái ─────────────
+// ───────────── K4 + M3: máy em đang làm bài — chỉ còn tay nắm giữa MÉP TRÊN, ngay trên đầu thẻ đội / tên ─────────────
+/** Hộp của viên tay nắm + các thứ nó không được đè (thẻ đội / tên ở đầu màn, nút «Gửi», giấy đề). */
+const hopNam = (t) => t.evaluate(() => {
+  const h = (k) => { const e = document.querySelector(k); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)] : null }
+  return { vien: h('.lv-nam i'), nam: h('.lv-nam'), tieu: h('.bpu-hs-tieu'), kj: h('.bpu-hs-kj'), lua: h('.bpu-hs-tren .bpu-lua'), gui: h('.bpu-gui-noi'), giay: h('.lv-giay'), bang: h('.lv-bang'), w: innerWidth, h: innerHeight }
+})
+const de = (a, b) => !!a && !!b && a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1]
 await em2.t.locator('.lv-phu.lv-dau .lv-nam').waitFor({ timeout: 8000 })
-const nam2 = await em2.t.locator('.lv-phu .lv-nam').evaluate((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.right)] })
-kiem('K4 · máy em đang làm bài: chỉ còn tay nắm ở MÉP TRÁI (không viên nổi đáy màn), chưa vào bảng', nam2[0] <= 4 && await em2.t.locator('.lv').count() === 0 && await em2.t.locator('.lv-dau-cu, .lv-bat-tieng').count() === 0, `tay nắm x ${nam2[0]}–${nam2[1]}`)
-await chup(em2.t, 'em-cau-hoi-tay-nam-trai-390')
+const n2 = await hopNam(em2.t)
+kiem('M3 · máy em đang làm bài: tay nắm nằm giữa MÉP TRÊN (không viên nổi đáy màn, không còn ở mép trái), chưa vào bảng', n2.vien[1] <= 8 && Math.abs((n2.vien[0] + n2.vien[2]) / 2 - n2.w / 2) <= 2 && await em2.t.locator('.lv').count() === 0 && await em2.t.locator('.lv-dau-cu, .lv-bat-tieng').count() === 0, `viên ${JSON.stringify(n2.vien)}`)
+kiem('M3 · tay nắm ở trên đầu thẻ đội / tên: không đè chữ thẻ, không đè ô kJ, không đè ngọn lửa đội, không đè nút «Gửi»', !de(n2.vien, n2.tieu) && !de(n2.vien, n2.kj) && !de(n2.vien, n2.lua) && !de(n2.nam, n2.gui), JSON.stringify({ tieu: n2.tieu, kj: n2.kj, gui: n2.gui }))
+await chup(em2.t, 'em-cau-hoi-tay-nam-tren-390')
 await em2.t.locator('.lv-phu .lv-nam').tap()
 await em2.t.locator('.lv-phu .lv-khay[data-mo]').waitFor({ timeout: 4000 })
 await ngu(450)
-kiem('K4 · chạm tay nắm ⇒ khay trượt ra từ mép trái, có «Thầy đang live»', (await em2.t.locator('.lv-phu .lv-khay').innerText()).includes('Thầy đang live') && await em2.t.locator('.lv-phu .lv-khay').evaluate((e) => e.getBoundingClientRect().left < 40))
-await chup(em2.t, 'em-cau-hoi-khay-trai-mo-390')
+kiem('M3 · chạm tay nắm ⇒ khay xổ từ mép trên xuống, có «Thầy đang live»', (await em2.t.locator('.lv-phu .lv-khay').innerText()).includes('Thầy đang live') && await em2.t.locator('.lv-phu .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.top < 30 && Math.abs((r.left + r.right) / 2 - innerWidth / 2) <= 2 }))
+await chup(em2.t, 'em-cau-hoi-khay-tren-mo-390')
 await ngu(3300)
 kiem('K4 · khay tự ẩn sau 3 giây', await em2.t.locator('.lv-phu .lv-khay[data-mo]').count() === 0)
 
@@ -164,16 +171,25 @@ const mucGiay = await em.t.evaluate(() => {
 kiem('B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)', mucGiay > 10, `${mucGiay} mẫu điểm ảnh có mực trong ô giấy`)
 await chup(thay, 'giay-thay-gach-chan-1366')
 await chup(em.t, 'giay-em-khop-giay-thay-844')
-await chup(em.t, 'em-khay-trai-dong-844')
-const namEm = await em.t.locator('.lv .lv-nam').evaluate((e) => Math.round(e.getBoundingClientRect().left))
-kiem('K4 · bảng live: tay nắm ở MÉP TRÁI; không còn nút nổi nào trên bảng', namEm <= 6 && await em.t.locator('.lv > .lv-bat-tieng, .lv > .lv-noi').count() === 0, `tay nắm x ${namEm}`)
+await chup(em.t, 'em-khay-tren-dong-844')
+const nb = await hopNam(em.t)
+kiem('M3 · bảng live: tay nắm giữa MÉP TRÊN, không đè giấy đề, không đè bảng đen; không còn nút nổi nào trên bảng', nb.vien[1] <= 8 && Math.abs((nb.vien[0] + nb.vien[2]) / 2 - nb.w / 2) <= 2 && !de(nb.vien, nb.giay) && !de(nb.vien, nb.bang) && await em.t.locator('.lv > .lv-bat-tieng, .lv > .lv-noi').count() === 0, `viên ${JSON.stringify(nb.vien)} · giấy ${JSON.stringify(nb.giay)}`)
 await em.t.locator('.lv .lv-nam').tap()
 await em.t.locator('.lv .lv-khay[data-mo]').waitFor({ timeout: 4000 })
 await ngu(450)
-const khay = await em.t.locator('.lv .lv-khay').evaluate((e) => ({ trai: Math.round(e.getBoundingClientRect().left), chu: e.innerText }))
-kiem('K4 · khay mở từ mép trái: mạng · đội + kJ (ô tiếng nằm trong khay khi buổi có tiếng)', khay.trai < 40 && /kJ/.test(khay.chu), khay.chu.replace(/\s+/g, ' ').slice(0, 90))
-await chup(em.t, 'em-khay-trai-mo-844')
+const khay = await em.t.locator('.lv .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return { tren: Math.round(r.top), duoi: Math.round(r.bottom), giua: Math.round((r.left + r.right) / 2), chu: e.innerText } })
+kiem('M3 · khay xổ từ mép trên, nằm gọn trong màn: mạng · tiếng · đội + kJ', khay.tren >= 0 && khay.tren < 30 && khay.duoi <= 390 && Math.abs(khay.giua - 422) <= 2 && /kJ/.test(khay.chu), `${khay.tren}–${khay.duoi} px · ${khay.chu.replace(/\s+/g, ' ').slice(0, 80)}`)
+await chup(em.t, 'em-khay-tren-mo-844')
 await ngu(3300)
+// các khổ máy khác: 667 × 375 (điện thoại 16:9) và 1180 × 820 (máy bảng) — tay nắm vẫn không đè giấy / bảng
+for (const [w, h] of [[667, 375], [1180, 820]]) {
+  await em.t.setViewportSize({ width: w, height: h }); await ngu(500)
+  const k = await hopNam(em.t)
+  kiem(`M3 · khổ ${w} × ${h}: tay nắm giữa mép trên, không đè giấy đề / bảng đen`, k.vien[1] <= 8 && !de(k.vien, k.giay) && !de(k.vien, k.bang), `viên ${JSON.stringify(k.vien)} · giấy ${JSON.stringify(k.giay)}`)
+  if (w === 667) await chup(em.t, 'em-tay-nam-tren-667')
+  else await chup(em.t, 'em-tay-nam-tren-1180')
+}
+await em.t.setViewportSize({ width: 844, height: 390 }); await ngu(500)
 
 // ───────────── K2: thầy gọi lên bảng ⇒ em CHƯA gửi bị ép vào bảng live ─────────────
 kiem('K2 · trước khi gọi: máy em S2 chưa gửi, còn ở màn làm bài', await em2.t.locator('.lv').count() === 0)
@@ -200,6 +216,17 @@ await to.locator('.mc-lv-cum').click()
 await to.locator('.mc-lv-the [data-lv="tam-dung"]').waitFor({ state: 'visible', timeout: 6000 })
 await ngu(400)
 kiem('K3 · bấm viên Live ⇒ cửa sổ có «Tạm dừng», «Kết thúc live», công tắc «Bảng → máy em»', /Tạm dừng/.test(await to.locator('.mc-lv-the').innerText()) && /Kết thúc live/.test(await to.locator('.mc-lv-the').innerText()))
+// M1: cửa sổ nút Live có dòng chẩn đoán mic + ba nút «Lọc tiếng ồn + khử vọng»; viên Live nêu đúng lý do không có tiếng (máy chủ thử không có SFU)
+await ngu(1500)
+const cdMic = await to.locator('#mc-lv-cd').innerText().catch(() => '')
+kiem('M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)', /Hz · \d kênh/.test(cdMic) && /khử vọng (bật|tắt) · lọc ồn (bật|tắt) · tự chỉnh (bật|tắt)/.test(cdMic) && /cách mở \d\/4/.test(cdMic) && /máy chủ tiếng CHƯA nối/.test(cdMic), cdMic.slice(0, 230))
+kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', await to.locator('.mc-lv-the [data-lv="loc"][data-c="tu"][aria-pressed="true"]').count() === 1 && /Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()) && /khử vọng tắt · lọc ồn tắt · tự chỉnh bật/.test(cdMic), cdMic.slice(0, 220) + ' | ' + (await to.locator('.mc-lv-the').innerText()).replace(/\s+/g, ' ').slice(120, 330))
+kiem('M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung', /Chưa nối máy chủ tiếng/.test(await to.locator('.mc-lv-cum').innerText()))
+kiem('M1 · vạch mức âm ghi đúng trạng thái: đang live ⇒ «Mức âm đang gửi cho lớp»', /Mức âm đang gửi cho lớp/.test(await to.locator('.mc-lv-the').innerText()))
+await to.locator('.mc-lv-the [data-lv="loc"][data-c="bat"]').click(); await ngu(1600)
+const cdBat = await to.locator('#mc-lv-cd').innerText().catch(() => '')
+kiem('M2 · thầy ép «Bật» ⇒ mic mở lại với khử vọng + lọc ồn bật (dòng chẩn đoán đổi theo)', /khử vọng bật · lọc ồn bật/.test(cdBat) && /Đang bật — chống vọng/.test(await to.locator('.mc-lv-the').innerText()), cdBat + ' | bấm=' + await to.locator('.mc-lv-the [data-lv="loc"][aria-pressed="true"]').getAttribute('data-c'))
+await to.locator('.mc-lv-the [data-lv="loc"][data-c="tu"]').click(); await ngu(900)
 await chup(thay, 'thay-cua-so-live-tam-dung-ket-thuc-1366')
 const tBam = await em.t.evaluate(() => performance.now())
 await to.locator('.mc-lv-the [data-lv="tam-dung"]').click()
@@ -212,11 +239,14 @@ kiem('K3 · viên Live ghi «TẠM DỪNG», cửa sổ đổi thành «Tiếp t
 await chup(thay, 'thay-dang-tam-dung-1366')
 await chup(em.t, 'em-thay-tam-dung-844')
 // Thầy viết lúc tạm dừng ⇒ máy em KHÔNG nhận; tiếp tục ⇒ nhận đủ
-/** Số mẫu điểm ảnh có mực trong ô BẢNG ĐEN của máy em (lớp «đã chốt»). */
+/** Số mẫu điểm ảnh có mực trên BẢNG ĐEN của máy em: nét đã chốt của bảng nằm ở khung cuộn `.lv-cuon` (bảng đen cuộn, 11/11); cộng cả phần ô bảng của lớp
+ *  «đã chốt» chung (bản trước khi có khung cuộn). */
 const mucBang = (t) => t.evaluate(() => {
+  let n = 0
+  const dem = (c, x, y, w, h) => { if (w < 1 || h < 1) return; const d = c.getContext('2d').getImageData(x, y, w, h).data; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) n++ }
+  for (const c of document.querySelectorAll('.lv-cuon canvas')) dem(c, 0, 0, c.width, c.height)
   const c = document.querySelector('.lv-cv'), g = document.querySelector('.lv-bang').getBoundingClientRect(), k = c.width / c.getBoundingClientRect().width
-  const d = c.getContext('2d').getImageData(Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k)).data
-  let n = 0; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) n++
+  dem(c, Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k))
   return n
 })
 const mucTruoc = await mucBang(em.t)

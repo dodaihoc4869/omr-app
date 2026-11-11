@@ -108,31 +108,36 @@ describe('bố cục máy em (bo-cuc.ts)', () => {
     expect(VUNG_MAC_DINH.bang[0] * k.Wv - k.ox).toBeCloseTo(k.bang.x, 5)
     expect(VUNG_MAC_DINH.bang[1] * k.Hv - k.oy).toBeCloseTo(k.bang.y, 5)
   })
-  it('điện thoại dài 19,5:9: dải dư bên TRÁI cho tay nắm (thầy 11/11: thanh sang mép trái), vùng chiếu dồn sang phải (không che nét)', () => {
+  it('điện thoại dài 19,5:9: chừa dải 18 px ở MÉP TRÊN cho tay nắm (thầy 11/11 lần 2: thanh lên mép trên), vùng chiếu canh giữa bề ngang (không che đề, không che nét)', () => {
     const k = khungChieu(VUNG_MAC_DINH, 16 / 9), b = boCucEm(844, 390, { trai: 0, phai: 0, duoi: 0 }, k.LW)
     expect(b.namDe).toBe(false)
-    expect(b.x).toBeGreaterThanOrEqual(52 - 0.5)
-    expect(b.x + b.cw).toBeLessThanOrEqual(844 + 0.5)
-    expect(b.ch).toBeCloseTo(390, 0)
+    expect(b.y).toBeGreaterThanOrEqual(18 - 0.5)
+    expect(b.y + b.ch).toBeLessThanOrEqual(390 + 0.5)
+    expect(b.x).toBeCloseTo((844 - b.cw) / 2, 1)
+    expect(b.ch).toBeGreaterThan(390 * 0.94) // chừa dải mà hình nhỏ đi dưới 6 %
   })
-  it('điện thoại 16:9: chừa dải thì hình nhỏ đi quá 6 % ⇒ hình phủ hết bề ngang, tay nắm đè mép (mờ, kéo dọc được); máy bảng: chừa dải (hình nhỏ đi < 6 %)', () => {
+  it('điện thoại 16:9 và máy bảng: hình phủ hết bề ngang, phía trên còn dư ⇒ tay nắm đứng trong dải dư mép trên, không đè vùng chiếu; màn quá sát thì tay nắm đè mép (mờ, tự né nét)', () => {
     const k = khungChieu(VUNG_MAC_DINH, 16 / 9)
     const dt = boCucEm(667, 375, { trai: 0, phai: 0, duoi: 0 }, k.LW)
-    expect(dt.namDe).toBe(true)
+    expect(dt.namDe).toBe(false)
     expect(dt.cw).toBeCloseTo(667, 0)
     expect(dt.x).toBeCloseTo(0, 1)
+    expect(dt.y).toBeGreaterThanOrEqual(18 - 0.5)
     const bang = boCucEm(1180, 820, { trai: 0, phai: 0, duoi: 0 }, k.LW)
     expect(bang.namDe).toBe(false)
-    expect(bang.x).toBeGreaterThanOrEqual(52 - 0.5)
+    expect(bang.y).toBeGreaterThanOrEqual(18 - 0.5)
     expect(bang.x + bang.cw).toBeLessThanOrEqual(1180 + 0.5)
-    expect(bang.y).toBeGreaterThan(0) // vùng chiếu nằm giữa chiều cao
+    // màn thấp tới mức chừa dải làm hình nhỏ đi quá 6 % ⇒ không chừa, tay nắm đè mép trên
+    const sat = boCucEm(1200, 200, { trai: 0, phai: 0, duoi: 0 }, k.LW)
+    expect(sat.namDe).toBe(true)
+    expect(sat.ch).toBeCloseTo(200, 0)
   })
   it('iPhone: máy dọc không khoá ngang được ⇒ xoay CSS, tai thỏ thành mép trái hình, thanh home thành mép phải hình', () => {
     expect(canXoayCss(390, 844, false)).toBe(true)
     expect(canXoayCss(844, 390, false)).toBe(false) // em tự xoay máy ngang ⇒ bỏ xoay CSS
     expect(canXoayCss(390, 844, true)).toBe(false) // Android đã khoá ngang (cỡ trang chưa kịp đổi) ⇒ không xoay chồng
-    expect(anToanHinh({ tren: 47, phai: 0, duoi: 34, trai: 0 }, true)).toEqual({ trai: 47, phai: 34, duoi: 0 })
-    expect(anToanHinh({ tren: 0, phai: 47, duoi: 21, trai: 47 }, false)).toEqual({ trai: 47, phai: 47, duoi: 21 })
+    expect(anToanHinh({ tren: 47, phai: 0, duoi: 34, trai: 0 }, true)).toEqual({ trai: 47, phai: 34, duoi: 0, tren: 0 }) // mép phải máy thành mép TRÊN hình
+    expect(anToanHinh({ tren: 0, phai: 47, duoi: 21, trai: 47 }, false)).toEqual({ trai: 47, phai: 47, duoi: 21, tren: 0 })
     const k = khungChieu(VUNG_MAC_DINH, 16 / 9), at = anToanHinh({ tren: 47, phai: 0, duoi: 34, trai: 0 }, true)
     const b = boCucEm(844, 390, at, k.LW)
     expect(b.x).toBeGreaterThanOrEqual(47)
@@ -140,8 +145,9 @@ describe('bố cục máy em (bo-cuc.ts)', () => {
   })
   it('phóng bảng (chạm hai lần): ô bảng đen phủ kín chiều cao, nằm giữa phần còn lại', () => {
     const k = khungChieu(VUNG_MAC_DINH, 16 / 9), p = boCucPhong(844, 390, { trai: 0, phai: 0, duoi: 0 }, k)
-    expect(k.bang.h * p.s).toBeCloseTo(390, 0)
-    expect(p.x + k.bang.x * p.s).toBeGreaterThanOrEqual(52 - 0.5)
+    expect(k.bang.h * p.s).toBeCloseTo(390 - 18, 0) // chừa dải tay nắm mép trên
+    expect(p.y + k.bang.y * p.s).toBeGreaterThanOrEqual(18 - 0.5)
+    expect(p.x + k.bang.x * p.s).toBeGreaterThanOrEqual(0)
     expect(p.x + (k.bang.x + k.bang.w) * p.s).toBeLessThanOrEqual(844 + 0.5)
   })
 })

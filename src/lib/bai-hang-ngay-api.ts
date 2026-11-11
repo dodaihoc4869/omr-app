@@ -82,7 +82,8 @@ function docEm(x: unknown): EmBaiHangNgay | null {
   const o = dt(x)
   if (!o || typeof o.sbd !== 'string' || !o.sbd) return null
   const ngay = mang(o.ngay, docNgayBai)
-  const lon = dt(o.ngayThieuNhieuNhat)
+  // Nợ câu (11/11): giữ THÔ — thẻ Bài hằng ngày (mảnh lười) đọc chặt bằng `docNoCauXem`; tệp này nằm trong đường mở app nên không kéo thêm mã.
+  const lon = dt(o.ngayThieuNhieuNhat), noCau = dt(o.noCau)
   return {
     sbd: o.sbd,
     hoTen: chu(o.hoTen) || o.sbd,
@@ -97,6 +98,7 @@ function docEm(x: unknown): EmBaiHangNgay | null {
     tongDaLam: soKhongAm(o.tongDaLam),
     // máy chủ cũ chưa có trường ⇒ tính lại từ ô hôm nay (không bịa)
     thieuHomNay: so(o.thieuHomNay) !== null ? soKhongAm(o.thieuHomNay) : (ngay.find((n) => n.homNay)?.thieu ?? 0),
+    ...(noCau ? { noCau: noCau as unknown as NonNullable<EmBaiHangNgay['noCau']> } : {}),
   }
 }
 

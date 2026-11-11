@@ -182,6 +182,22 @@ describe('các màn (đúng số bản vẽ)', () => {
     expect(c.querySelector('.tp-chu-giai')?.textContent).not.toMatch(/phép/)
     expect(c.querySelector('.tp-tuan7 .n[data-nay]')?.getAttribute('data-k')).toBe('hoc')
   })
+  // 11/11 — thầy: «phần làm bù cứu chuỗi … thông minh nhất hiệu quả nhất cho từng học sinh»: đơn vị CÂU, thiếu bao nhiêu bù bấy nhiêu, có hạn và nhịp bù mỗi ngày
+  it('cứu chuỗi kiểu LÀM BÙ (cau: true): ghi số câu còn thiếu, đã bù x/N câu, nhịp mỗi ngày; không còn «mỗi tuần 1 lần», không vẽ 28 ô chặng', () => {
+    const cuu = { hetHan: Date.now() + 2.4 * 86_400_000, daLam: 3, can: 8, soCu: 13, cau: true, ngayLo: '2026-11-09', soNgay: 1 }
+    const chuoi = docTongQuan(M.tongQuanGia({ chuoiNgay: { ...M.CUU(0), so: 1, cuu } }))!.chuoiNgay!
+    expect(chuoi.cuu).toMatchObject({ daLam: 3, can: 8, so: 13, cau: true, ngayLo: '2026-11-09' })
+    ve(<ManCuuChuoi chuoi={chuoi} onDong={() => {}} />)
+    const container = document.body, chu = container.textContent ?? ''
+    expect(chu).toContain('Chuỗi 13 ngày vừa tắt')
+    expect(chu).toContain('Ngày 09/11 em làm thiếu 8 câu, và đã hết bình giữ chuỗi. Thiếu bao nhiêu, bù bấy nhiêu là chuỗi nối lại.')
+    expect(chu).toContain('Làm bù 5 câu trước')
+    expect(container.querySelector('[data-vung="bu-cau"]')!.textContent).toBe('Đã bù 3/8 câucòn 3 ngày · mỗi ngày bù 2 câu là kịp')
+    expect(chu).toContain('câu trả nợ câu cũng tính là câu bù')
+    expect(chu).not.toContain('Mỗi tuần cứu được')
+    expect(container.querySelectorAll('.tp-bu .o')).toHaveLength(0)
+  })
+
   it('cứu chuỗi (tp-6): vừa tắt 0/2 + đồng hồ; cứu xong 2/2 ⇒ sống lại', () => {
     ve(<ManCuuChuoi chuoi={docTongQuan(M.tongQuanGia({ chuoiNgay: M.CUU(0) }))!.chuoiNgay!} onDong={() => {}} />)
     expect(screen.getByRole('heading', { name: 'Chuỗi 12 ngày vừa tắt' })).toBeTruthy()

@@ -138,7 +138,8 @@ function TheCuuNho({ c, onCuu }: { c: ChuoiNgay; onCuu?: () => void }) {
   const cu = c.cuu!
   return <section className="tp-the" aria-label="Cứu chuỗi">
     <div className="tp-dau"><span className="tp-o" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><h2>{cu.so ? `Cứu chuỗi ${cu.so} ngày` : 'Cứu chuỗi'}</h2></div>
-    <p className="tp-phu">Làm đủ mức rồi học bù thêm {cu.can} chặng trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)} · đã bù {cu.daLam}/{cu.can}.</p>
+    <p className="tp-phu">{cu.cau ? `Làm bù ${cu.can - cu.daLam} câu còn thiếu trước ${gioVn(cu.hetHan)} ${thuNgayVn(cu.hetHan)} · đã bù ${cu.daLam}/${cu.can} câu.`
+      : `Làm đủ mức rồi học bù thêm ${cu.can} chặng trước ${gioVn(cu.hetHan)} ${thuNgayVn(cu.hetHan)} · đã bù ${cu.daLam}/${cu.can}.`}</p>
     {onCuu && <div><button type="button" className="tp-nut" data-sac="chinh" onClick={onCuu}>Xem cách cứu chuỗi</button></div>}
   </section>
 }
@@ -260,18 +261,22 @@ export function ManCuuChuoi({ chuoi, onHoc, onDong }: { chuoi: ChuoiNgay; onHoc?
           <span ref={lua} className="tp-lua-nho" data-leo={xong ? undefined : ''} data-to={xong ? '' : undefined} aria-hidden="true"><IcLua /></span>
         </div>
         <h1 style={xong ? { color: 'var(--tr-sao-chu)' } : undefined}>{so ? (xong ? `Chuỗi ${so} ngày đã sống lại!` : `Chuỗi ${so} ngày vừa tắt`) : xong ? 'Chuỗi đã sống lại!' : 'Chuỗi ngày vừa tắt'}</h1>
-        <p className="tp-phu">{xong ? `Em học bù đủ ${cu.can} chặng. Chuỗi giữ nguyên${so ? ` ${so} ngày` : ''}, không mất tinh thể.` : 'Hôm qua em chưa làm đủ mức, và đã hết bình giữ chuỗi.'}</p>
+        <p className="tp-phu">{xong ? `Em học bù đủ ${cu.can} ${cu.cau ? 'câu' : 'chặng'}. Chuỗi giữ nguyên${so ? ` ${so} ngày` : ''}, không mất tinh thể.`
+          : cu.cau ? `${cu.ngayLo ? `Ngày ${cu.ngayLo.slice(8, 10)}/${cu.ngayLo.slice(5, 7)}` : 'Có ngày'} em làm thiếu ${cu.can} câu, và đã hết bình giữ chuỗi. Thiếu bao nhiêu, bù bấy nhiêu là chuỗi nối lại.`
+          : 'Hôm qua em chưa làm đủ mức, và đã hết bình giữ chuỗi.'}</p>
       </div>
       <div className="cot-b">
         <section className="tp-the" aria-label="Cứu chuỗi">
           <div className="tp-dau"><span className="tp-o" data-sac="sao"><Flame size={22} aria-hidden="true" /></span><h2>{so ? `Cứu chuỗi ${so} ngày` : 'Cứu chuỗi'}</h2></div>
-          {!xong && <p className="tp-phu" style={{ color: 'var(--tr-chu)', fontWeight: 800 }}>Học bù {cu.can} chặng trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)}</p>}
+          {!xong && <p className="tp-phu" style={{ color: 'var(--tr-chu)', fontWeight: 800 }}>{cu.cau ? `Làm bù ${cu.can - cu.daLam} câu` : `Học bù ${cu.can} chặng`} trước {gioVn(cu.hetHan)} {thuNgayVn(cu.hetHan)}</p>}
           {!xong && <div className="tp-dh"><b role="timer" aria-label={`Còn ${dongHo(cu.hetHan - bay)}`}>{dongHo(cu.hetHan - bay)}</b><span>còn lại</span></div>}
-          <div className="tp-bu">
+          {cu.cau ? <div className="tp-bu" data-vung="bu-cau">
+            <div className="giua"><b>Đã bù {Math.min(cu.daLam, cu.can)}/{cu.can} câu</b><span>{(() => { const ngay = Math.max(1, Math.ceil((cu.hetHan - bay) / 86_400_000)); return ngay > 1 ? `còn ${ngay} ngày · mỗi ngày bù ${Math.ceil((cu.can - cu.daLam) / ngay)} câu là kịp` : 'hôm nay là ngày cuối' })()}</span></div>
+          </div> : <div className="tp-bu">
             {Array.from({ length: cu.can }, (_, i) => <span key={i} className="o" data-x={i < cu.daLam || undefined} id={i === cu.can - 1 ? 'tp-bu-cuoi' : undefined} aria-hidden="true">{i < cu.daLam ? <Check size={22} strokeWidth={3} /> : i + 1}</span>)}
             <div className="giua"><b>Chặng bù · {Math.min(cu.daLam, cu.can)}/{cu.can}</b><span>tính ngoài mức của hôm đó</span></div>
-          </div>
-          <p className="tp-ghi">Không mất tinh thể. Mỗi tuần cứu được <b>1 lần</b>.</p>
+          </div>}
+          <p className="tp-ghi">{cu.cau ? <>Câu bù là câu em làm <b>thêm sau khi đủ bài của ngày</b>; câu trả nợ câu cũng tính là câu bù. Không mất tinh thể.</> : <>Không mất tinh thể. Mỗi tuần cứu được <b>1 lần</b>.</>}</p>
         </section>
       </div>
     </main>

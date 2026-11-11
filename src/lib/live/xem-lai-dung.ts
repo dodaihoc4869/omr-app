@@ -10,8 +10,8 @@ import type { NetBut } from '../but-bang-loi'
 import { giaiSo, maBangMoi, maNetXong, type MucSo } from './ma-net'
 import { apMuc, datLai, taoBang } from './so-net'
 import { catDoan, chonDangXem, type LuotCat } from './xem-lai-cat'
-import { MUC_MS, type DauKhuc } from './xem-lai-khuc'
-import { DAU_BAN_GHI_NET, ghiNetBin, type BangVangLive, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs } from './xem-lai-kieu'
+import { MUC_MS, mucTuDb, type DauKhuc } from './xem-lai-khuc'
+import { DAU_BAN_GHI_NET, ghiNetBin, type BangVangLive, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs, type LyDoKhongDoan } from './xem-lai-kieu'
 import { BYTE_MOI_KHUNG, MS_MOI_KHUNG } from './xem-lai-mp3'
 import { tenBaiTuDong, tenDoan, tenGoi } from './xem-lai-ten'
 
@@ -33,8 +33,10 @@ export interface SuKienXl {
 }
 /** Một bản ghi nhật ký nét của phòng: 0 = khung sổ nét thầy gửi lúc live · 1 = mốc «làm lại» (đầu mỗi lần bật live) · 2 = khung ẢNH sổ nét lúc bật live. */
 export interface NetXl { loai: 0 | 1 | 2; luc: number; khung: Uint8Array }
-/** Ảnh chụp một lượt lúc mở đáp án (phòng giữ; đáp án + lời giải chỉ có vì lượt ĐÃ mở). */
+/** Ảnh chụp một lượt (phòng giữ). `mo` vắng / true: chụp lúc MỞ ĐÁP ÁN (có đáp án + lời giải). `mo: false` (11/11): lượt CHƯA mở đáp án nhưng thầy đã gọi em
+ *  lên bảng / bật bảng live — KHÔNG mang đáp án, KHÔNG mang lời giải (`dung` = '', `giai` = null); tỉ lệ lớp phòng chấm sẵn. */
 export interface LuotChup {
+  mo?: boolean
   so: number
   bd: number
   qid: string
@@ -71,9 +73,12 @@ export interface DongDoanD1 {
   t0: number; t1: number; giayCoTieng: number; soNet: number; tiLeDung: number | null; dangXem: number; lyDo: string | null
 }
 export interface KetQuaDung {
-  /** false ⇒ không tạo buổi live (mục 5): live dưới 2 phút, không câu nào mở đáp án, hoặc không có đoạn nào. */
+  /** false ⇒ buổi KHÔNG có đoạn xem lại (11/11: vẫn có dòng trong Lịch sử Live của thầy kèm lý do, máy em không thấy): live dưới 15 giây, chưa câu nào được chữa,
+   *  không thu được tiếng và không có nét, hoặc phần chữa quá ngắn. `khong-live` = phòng chưa từng bật live (không có gì để ghi). */
   du: boolean
-  lyDo: '' | 'khong-live' | 'ngan' | 'khong-cau' | 'khong-doan'
+  lyDo: '' | 'khong-live' | LyDoKhongDoan
+  /** Thời lượng live thật (mili-giây, trước khi cắt câu chưa chữa) — dòng «chưa có đoạn xem lại» của thầy hiện số này. */
+  msTho: number
   buoi: BuoiLiveJson
   netBin: Uint8Array<ArrayBuffer>
   tieng: MucTieng[]
@@ -82,7 +87,10 @@ export interface KetQuaDung {
   matTieng: KhoangMs[]
 }
 
-export const LIVE_TOI_THIEU_MS = 120_000
+/** 11/11 (thầy live thử 1 phút ⇒ «kết thúc live chưa thấy có bản ghi»): 120 giây → 15 giây. */
+export const LIVE_TOI_THIEU_MS = 15_000
+/** Buổi «có tiếng» khi có ít nhất một ô 0,5 giây từ −70 dBFS trở lên; mic câm cả buổi (mức 0) ⇒ coi như không có tiếng (không dựng `tieng.mp3`, đoạn tính theo nét). */
+export const NGUONG_CO_AM = mucTuDb(-70)
 const K = MS_MOI_KHUNG
 const sanK = (ms: number): number => Math.floor(ms / K) * K
 const tranK = (ms: number): number => Math.ceil(ms / K) * K
@@ -107,7 +115,9 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
   const lechCua = (p: string): number => lech.get(p) ?? (Number.isFinite(lechChung) ? lechChung : 0)
 
   // ── 3. Trục tiếng THÔ: mảnh = khúc thật / khung câm lấp chỗ thiếu / khoảng không tiếng (buổi không mic) ──
-  const khuc = [...new Map(v.khuc.filter((c) => c.dau.kh > 0).map((c) => [c.khoa, c])).values()]
+  const coAm = v.khuc.some((c) => c.dau.muc.some((m) => m >= NGUONG_CO_AM))
+  const khucTat = [...new Map(v.khuc.filter((c) => c.dau.kh > 0).map((c) => [c.khoa, c])).values()]
+  const khuc = (coAm ? khucTat : [])
     .map((c) => ({ c, w0: c.dau.t0 + lechCua(c.phien), ms: c.dau.kh * K }))
     .sort((a, b) => a.w0 - b.w0 || (a.c.khoa < b.c.khoa ? -1 : 1))
   const daDung = new Set<string>()
@@ -141,23 +151,36 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
   const trongLive = (w: number): boolean => khoang.some(([b, e]) => w >= b && w <= e)
 
   // ── 4. Chương theo lượt (trục thô) + LUẬT AN TOÀN 7 ──
-  interface Chuong { so: number; bd: number; qid: string; w: number; wKet: number; a0: number; a1: number; mo: boolean; chup: LuotChup | null }
+  // 11/11 (thầy: «kết thúc live chưa thấy có bản ghi» — thầy chữa trên bảng mà không bấm mở đáp án): câu vào trang xem lại khi ĐÃ MỞ ĐÁP ÁN (`mo`), HOẶC
+  // khi thầy đã gọi em lên bảng / bảng live đã bật trong lúc câu ấy đang chiếu (`bang`). Câu `bang` mà chưa mở đáp án: KHÔNG mang đáp án, KHÔNG mang lời giải
+  // (ép `dung` = '' và `giai` = null ngay tại đây, dù ảnh chụp có gì). Câu không `mo` cũng không `bang` ⇒ vẫn bị loại và cắt khỏi tiếng + nét như cũ.
+  interface Chuong { so: number; bd: number; qid: string; w: number; wKet: number; a0: number; a1: number; mo: boolean; bang: boolean; bangSan: boolean; chup: LuotChup | null }
+  /** Các khoảng bảng live đang bật (giờ phòng). */
+  const bangBat: [number, number][] = []
+  { let tu: number | null = null
+    for (const e of sk) {
+      if (e.k === 'bang' && e.v === true) { if (tu == null) tu = e.t }
+      else if ((e.k === 'bang' && e.v === false) || e.k === 'tat') { if (tu != null && e.t > tu) bangBat.push([tu, e.t]); tu = null }
+    }
+    if (tu != null && v.nay > tu) bangBat.push([tu, v.nay]) }
   const chuong: Chuong[] = []
   for (const e of sk) {
     if (e.k !== 'luot' || typeof e.so !== 'number') continue
     const truoc = chuong[chuong.length - 1]
     if (truoc && truoc.so === e.so && truoc.bd === (e.bd ?? 0)) continue // phòng ghi lại lượt đang mở ở đầu mỗi lần bật live
     if (truoc) { truoc.wKet = e.t; truoc.a1 = W2A(e.t) }
-    chuong.push({ so: e.so, bd: e.bd ?? 0, qid: e.qid ?? '', w: e.t, wKet: Infinity, a0: W2A(e.t), a1: tongTho, mo: false, chup: null })
+    chuong.push({ so: e.so, bd: e.bd ?? 0, qid: e.qid ?? '', w: e.t, wKet: Infinity, a0: W2A(e.t), a1: tongTho, mo: false, bang: false, bangSan: false, chup: null })
   }
   for (const c of chuong) {
-    const chup = v.luot[c.so]
-    c.mo = sk.some((e) => e.k === 'mo' && e.so === c.so && e.t >= c.w && e.t < c.wKet) && !!chup && (chup.bd === c.bd || !chup.bd || !c.bd)
-    c.chup = c.mo ? chup! : null
+    const chup = v.luot[c.so], khop = !!chup && (chup.bd === c.bd || !chup.bd || !c.bd), ket = Math.min(c.wKet, v.nay)
+    c.mo = khop && chup!.mo !== false && sk.some((e) => e.k === 'mo' && e.so === c.so && e.t >= c.w && e.t < c.wKet)
+    c.bangSan = bangBat.some(([x, y]) => x <= c.w && y > c.w) && trongLive(c.w)
+    c.bang = khop && !c.mo && (sk.some((e) => e.k === 'goi' && e.so === c.so && e.t >= c.w && e.t < c.wKet && trongLive(e.t)) || bangBat.some(([x, y]) => Math.min(y, ket) > Math.max(x, c.w)))
+    c.chup = c.mo || c.bang ? chup! : null
   }
   const cat: [number, number][] = []
   for (const c of chuong) {
-    if (c.mo || !(c.a1 > c.a0)) continue
+    if (c.mo || c.bang || !(c.a1 > c.a0)) continue
     const x = sanK(c.a0), y = Math.min(tongTho, tranK(c.a1)), cuoi = cat[cat.length - 1]
     if (cuoi && x <= cuoi[1]) cuoi[1] = Math.max(cuoi[1], y); else cat.push([x, y])
   }
@@ -186,11 +209,11 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
   // ── 6. Mức âm trên trục cuối ──
   const muc = new Uint8Array(Math.ceil(msLive / MUC_MS))
   const mocNet = new Map<string, number[]>()
+  for (const c of khucTat) { const l = lechCua(c.phien); for (const [id, rel] of c.dau.net) { const ds = mocNet.get(id) ?? []; ds.push(c.dau.t0 + rel + l); mocNet.set(id, ds) } }
   for (const x of khuc) {
     if (!daDung.has(x.c.khoa)) continue
     const d = x.c.dau, l = lechCua(x.c.phien)
     d.muc.forEach((g, j) => { const t = W2A(d.tm + l + j * MUC_MS + MUC_MS / 2); if (trongCat(t)) return; const o = Math.floor(R2F(t) / MUC_MS); if (o < muc.length && g > muc[o]!) muc[o] = g })
-    for (const [id, rel] of d.net) { const ds = mocNet.get(id) ?? []; ds.push(d.t0 + rel + l); mocNet.set(id, ds) }
   }
 
   // ── 7. Nhật ký nét ⇒ `net.bin` ──
@@ -234,7 +257,7 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
       truocTucThi = !viet; lucTruoc = r.luc
     }) }
   khoang.forEach(([b], i) => ds.push({ loai: 'ranh', w: b, i }))
-  for (const c of chuong) if (!c.mo && c.a1 > c.a0 && Number.isFinite(c.wKet)) ds.push({ loai: 'ranh', w: c.wKet, i: c.so })
+  for (const c of chuong) if (!c.mo && !c.bang && c.a1 > c.a0 && Number.isFinite(c.wKet)) ds.push({ loai: 'ranh', w: c.wKet, i: c.so })
   const uuTien = (m: Muc): number => (m.loai === 'moc' || m.loai === 'anh' ? 0 : m.loai === 'ranh' ? 1 : 2)
   ds.sort((x, y) => x.w - y.w || uuTien(x) - uuTien(y) || x.i - y.i)
 
@@ -271,20 +294,22 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
   if (!daPhat) chup(0)
   const netBin = ghiNetBin(ra)
 
-  // ── 8. Câu đã mở đáp án + đoạn ──
+  // ── 8. Câu đã mở đáp án / đã chữa trên bảng + đoạn ──
   const tenEm = new Map(v.ds.map((e) => [e.sbd, e]))
-  const mo = chuong.filter((c) => c.mo && c.chup && R2F(c.a1) > R2F(c.a0))
+  const mo = chuong.filter((c) => (c.mo || c.bang) && c.chup && R2F(c.a1) > R2F(c.a0))
   const cau: CauBuoiLive[] = mo.map((c, i) => {
-    const ch = c.chup!, ten = v.ten[ch.qid]
-    return { so: i + 1, luot: c.so, qid: ch.qid, phan: ch.phan, tuLuan: ch.tuLuan, dang: ten?.dang ?? '', bai: ten?.bai ?? '', cau: ch.cau, dung: ch.dung, giai: ch.giai ?? null,
-      soDung: ch.soDung, soGui: ch.soGui, t0: Math.round(R2F(c.a0)), t1: Math.round(R2F(c.a1)) }
+    const ch = c.chup!, ten = v.ten[ch.qid], kin = !c.mo
+    return { so: i + 1, luot: c.so, qid: ch.qid, phan: ch.phan, tuLuan: ch.tuLuan, dang: ten?.dang ?? '', bai: ten?.bai ?? '', cau: ch.cau, dung: kin ? '' : ch.dung, giai: kin ? null : ch.giai ?? null,
+      soDung: ch.soDung, soGui: ch.soGui, t0: Math.round(R2F(c.a0)), t1: Math.round(R2F(c.a1)), ...(kin ? { moDapAn: false } : {}) }
   })
   const F = (w: number): number => Math.round(R2F(W2A(w)))
   const luotCat: LuotCat[] = mo.map((c, i) => {
     const trong = sk.filter((e) => e.so === c.so && e.t >= c.w && e.t < c.wKet)
     const goi = trong.filter((e) => e.k === 'goi' && typeof e.sbd === 'string').map((e) => ({ t: F(e.t), sbd: e.sbd!, w: e.t }))
-    const moE = trong.find((e) => e.k === 'mo')
+    const moE = c.mo ? trong.find((e) => e.k === 'mo') : undefined
     const bangTay = sk.filter((e) => e.k === 'bang' && e.v === true && e.t >= c.w && e.t < c.wKet && trongLive(e.t) && !goi.some((g) => g.w <= e.t)).map((e) => F(e.t))
+    // Câu chưa mở đáp án mà bảng live đã bật SẴN từ câu trước (thầy để bảng suốt buổi) ⇒ cửa «thầy chữa» mở từ đầu chương.
+    if (!c.mo && c.bangSan && !goi.some((g) => g.w <= c.w)) bangTay.unshift(cau[i]!.t0)
     return { so: c.so, t0: cau[i]!.t0, t1: cau[i]!.t1, moDapAn: moE ? F(moE.t) : null, bangTay, goi: goi.map((g) => ({ t: g.t, sbd: g.sbd })) }
   })
   const ranh = khoang.slice(1).map(([b]) => F(b))
@@ -333,6 +358,7 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
     msLive: Math.round(msLive), msDoan: doan.reduce((s, d) => s + d.t1 - d.t0, 0), byteTieng: coTieng ? tongKhung * BYTE_MOI_KHUNG : 0, byteNet: netBin.length,
     cau, doan, lang, emNoi, mocBang, bangVang: v.bangVang,
   }
-  const lyDo: KetQuaDung['lyDo'] = !khoang.length ? 'khong-live' : msLive < LIVE_TOI_THIEU_MS ? 'ngan' : !cau.length ? 'khong-cau' : !doan.length ? 'khong-doan' : ''
-  return { du: !lyDo, lyDo, buoi, netBin, tieng: coTieng ? tieng : [], doan: dongD1, matTieng }
+  // `ngan` tính trên thời lượng live THẬT (trước khi cắt câu chưa chữa) để lý do hiện cho thầy nói đúng việc đã xảy ra.
+  const lyDo: KetQuaDung['lyDo'] = !khoang.length ? 'khong-live' : tongTho < LIVE_TOI_THIEU_MS ? 'ngan' : !cau.length ? 'khong-cau' : doan.length ? '' : !coTieng && !netViet.length ? 'khong-tieng-net' : 'khong-doan'
+  return { du: !lyDo, lyDo, msTho: Math.round(tongTho), buoi, netBin, tieng: coTieng ? tieng : [], doan: dongD1, matTieng }
 }

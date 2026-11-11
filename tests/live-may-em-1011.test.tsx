@@ -102,7 +102,7 @@ describe('máy em khi thầy live', () => {
     expect(goc.querySelector('.lv-khay')!.textContent).toContain('chưa có tiếng')
     expect(goc.querySelector('.lv-khay .lv-vua')).toBeNull()
     // đề trên giấy là khối đề dùng chung, chỉ xem — không lộ đáp án
-    await waitFor(() => expect(goc.querySelector('.lv-giay')!.textContent).toContain('amine bậc hai'))
+    await waitFor(() => expect(goc.querySelector('.lv-giay')!.textContent).toContain('amine bậc hai'), { timeout: 5000 }) // khối đề của chặng nạp lười
     expect(JSON.stringify(viewEm(st, 'S1').live)).not.toMatch(/"dung"|"giai"/)
     // lượt MỚI ⇒ cờ `bang` tự tắt ⇒ máy em về màn câu hỏi, live (tiếng) còn nguyên
     moLuot(st, { ...cau, qid: 'q2', cau: { ...cau.cau, qid: 'q2' } }, T0 + 9000)
