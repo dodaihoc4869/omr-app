@@ -59,6 +59,14 @@ const tong24 = (j24?.data?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? [
 const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). 15 câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
   ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)]
 if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`)
+// Theo giờ (8 giờ qua): 25 cặp (giờ, câu) đọc nhiều nhất — để thấy câu cũ / câu mới sau mỗi lượt phát hành.
+{ const tu8 = new Date(now - 8 * 3600e3).toISOString()
+  const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tu8, den: now.toISOString() },
+    query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:25,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead} dimensions{query datetimeHour}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const ds = j?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+  bangTop.push('', '#### Theo giờ, 8 giờ qua (giờ UTC · hàng đọc · lượt · 90 ký tự đầu)')
+  for (const x of ds) bangTop.push(`- ${String(x.dimensions.datetimeHour).slice(5, 16)} · ${so(x.sum.rowsRead)} · ${so(x.count)} · \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 90)}\``)
+  if (!ds.length) bangTop.push(`(không đọc được: ${String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
 // LIVE (thầy 11/11 «phần live có tăng thêm tiền không»): Realtime SFU/TURN (gói gồm 1 TB ra/tháng, vượt 0,05 USD/GB) + Durable Object theo vùng 30 ngày qua.
 const tu30 = new Date(now - 30 * 86400e3).toISOString()
 const g30 = async (ten, than) => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
