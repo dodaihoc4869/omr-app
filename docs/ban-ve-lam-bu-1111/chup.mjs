@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// BẢN VẼ THẺ «LÀM BÙ» (thầy 11/11: «hiện thẻ làm bù … cộng dồn … trả tối thiểu như ngân hàng … tối đa 3 ngày … Vẽ tôi xem rồi build»).
+// BẢN VẼ THẺ «NỢ CÂU» (tên đợt: làm bù) (thầy 11/11: «hiện thẻ làm bù … cộng dồn … trả tối thiểu như ngân hàng … tối đa 3 ngày … Vẽ tôi xem rồi build»).
 // Chụp bằng Chromium THẬT trên chính màn Hôm nay của app (component thật, dữ liệu GIẢ của scripts/chup-v2); thẻ «Làm bù» là PHẦN VẼ THÊM bằng HTML + CSS
 // chèn vào trang (chưa có mã thật — chưa duyệt thì chưa build). Màu chỉ dùng biến sẵn có của app học sinh.
 //   npx vite build --config scripts/chup-v2/vite.config.mjs --outDir <thư mục tạm>
@@ -48,26 +48,26 @@ const CSS = `
 const nut = (chon, ten, phu) => `<button type="button" class="lb-nut" aria-pressed="${chon}"><b>${ten}</b><span>${phu}</span></button>`
 /** Bốn trạng thái của thẻ. `cta` = [nhãn nhỏ, tiêu đề, dòng phụ, sắc] của nút chính (vẫn CHỈ MỘT nút chính trên Hôm nay). */
 const CANH = {
-  // Ngày 1 có nợ: 42 câu (nghỉ 1,5 ngày). Tối thiểu = ⌈42 ÷ 4⌉ = 11.
-  toi_thieu: { the: `<section class="lb-the" aria-label="Câu làm bù"><div class="lb-dau"><span class="lb-nhan">Câu làm bù</span><span class="lb-chip">Trả tối thiểu: lần 1/3</span></div>
+  // Ngày 1 có nợ: 42 câu (nghỉ 1,5 ngày). Tối thiểu kiểu ngân hàng = 25 % số nợ, làm tròn lên, sàn 6 câu: ⌈42 × 25 %⌉ = 11.
+  toi_thieu: { the: `<section class="lb-the" aria-label="Nợ câu"><div class="lb-dau"><span class="lb-nhan">Nợ câu</span><span class="lb-chip">Trả tối thiểu: lần 1/3</span></div>
     <div class="lb-so">42<small>câu đang nợ</small></div><p class="lb-loai">Câu mới 20 · Câu sửa 14 · Câu ôn 8</p>
     <div class="lb-chon" role="group" aria-label="Chọn cách trả">${nut(true, 'Trả tối thiểu', '11 câu')}${nut(false, 'Trả hết', '42 câu')}</div>
-    <p class="lb-ghi">Làm bù xong mới tới bài hôm nay. Sau 3 lần trả tối thiểu phải trả hết.</p></section>`,
-    cta: ['Làm bù trước', 'Trả tối thiểu', '11 câu · khoảng 17 phút', 'chu-y'], dong: 'Làm bù 11 câu trước, rồi tới 28 câu hôm nay.' },
-  tra_het: { the: `<section class="lb-the" aria-label="Câu làm bù"><div class="lb-dau"><span class="lb-nhan">Câu làm bù</span><span class="lb-chip">Trả tối thiểu: lần 1/3</span></div>
+    <p class="lb-ghi">Tối thiểu = 25 % số nợ, ít nhất 6 câu. Sau 3 lần trả tối thiểu phải trả hết.</p></section>`,
+    cta: ['Trả nợ câu trước', 'Trả tối thiểu', '11 câu · khoảng 17 phút', 'chu-y'], dong: 'Trả nợ 11 câu trước, rồi tới 28 câu hôm nay.' },
+  tra_het: { the: `<section class="lb-the" aria-label="Nợ câu"><div class="lb-dau"><span class="lb-nhan">Nợ câu</span><span class="lb-chip">Trả tối thiểu: lần 1/3</span></div>
     <div class="lb-so">42<small>câu đang nợ</small></div><p class="lb-loai">Câu mới 20 · Câu sửa 14 · Câu ôn 8</p>
     <div class="lb-chon" role="group" aria-label="Chọn cách trả">${nut(false, 'Trả tối thiểu', '11 câu')}${nut(true, 'Trả hết', '42 câu')}</div>
-    <p class="lb-ghi">Trả hết thì hết nợ, số lần trả tối thiểu tính lại từ đầu.</p></section>`,
-    cta: ['Làm bù trước', 'Trả hết', '42 câu · khoảng 63 phút', 'chu-y'], dong: 'Làm bù 42 câu trước, rồi tới 28 câu hôm nay.' },
+    <p class="lb-ghi">Trả hết thì hết nợ câu, số lần trả tối thiểu tính lại từ đầu.</p></section>`,
+    cta: ['Trả nợ câu trước', 'Trả hết', '42 câu · khoảng 63 phút', 'chu-y'], dong: 'Trả hết 42 câu nợ trước, rồi tới 28 câu hôm nay.' },
   // Đã trả tối thiểu hôm nay ⇒ thẻ thu gọn, bài hôm nay mở.
-  da_tra: { the: `<section class="lb-the" data-muc="gon" aria-label="Câu làm bù"><div class="lb-gon-chu"><b>Còn nợ 31 câu</b><span>Hôm nay đã trả 11 câu · còn 2 lần trả tối thiểu</span></div><button type="button" class="lb-them">Trả thêm</button></section>`,
+  da_tra: { the: `<section class="lb-the" data-muc="gon" aria-label="Nợ câu"><div class="lb-gon-chu"><b>Còn nợ 31 câu</b><span>Hôm nay đã trả 11 câu · còn 2 lần trả tối thiểu</span></div><button type="button" class="lb-them">Trả thêm</button></section>`,
     cta: null, dong: null },
   // Ngày thứ tư: hết quyền trả tối thiểu.
-  phai_het: { the: `<section class="lb-the" data-muc="het" aria-label="Câu làm bù"><div class="lb-dau"><span class="lb-nhan">Câu làm bù</span><span class="lb-chip">Hết 3 lần trả tối thiểu</span></div>
-    <div class="lb-so">10<small>câu đang nợ</small></div><p class="lb-loai">Câu sửa 6 · Câu ôn 4</p>
-    <div class="lb-chon" role="group" aria-label="Chọn cách trả" style="grid-template-columns:1fr">${nut(true, 'Trả hết', '10 câu')}</div>
-    <p class="lb-ghi">Em đã trả tối thiểu 3 lần. Hôm nay trả hết rồi mới làm bài mới.</p></section>`,
-    cta: ['Làm bù trước', 'Trả hết', '10 câu · khoảng 15 phút', 'sai'], dong: 'Trả hết 10 câu nợ, rồi tới 28 câu hôm nay.' },
+  phai_het: { the: `<section class="lb-the" data-muc="het" aria-label="Nợ câu"><div class="lb-dau"><span class="lb-nhan">Nợ câu</span><span class="lb-chip">Hết 3 lần trả tối thiểu</span></div>
+    <div class="lb-so">17<small>câu đang nợ</small></div><p class="lb-loai">Câu sửa 9 · Câu ôn 8</p>
+    <div class="lb-chon" role="group" aria-label="Chọn cách trả" style="grid-template-columns:1fr">${nut(true, 'Trả hết', '17 câu')}</div>
+    <p class="lb-ghi">Em đã trả tối thiểu 3 lần. Hôm nay trả hết nợ câu rồi mới làm bài mới.</p></section>`,
+    cta: ['Trả nợ câu trước', 'Trả hết', '17 câu · khoảng 26 phút', 'sai'], dong: 'Trả hết 17 câu nợ, rồi tới 28 câu hôm nay.' },
 }
 const KHUNG = [
   ['dt-sang-1-tra-toi-thieu', 'toi_thieu', 390, 844, 'light'], ['dt-sang-2-chon-tra-het', 'tra_het', 390, 844, 'light'], ['dt-sang-3-da-tra-toi-thieu', 'da_tra', 390, 844, 'light'],

@@ -1,7 +1,9 @@
-# ĐẶC TẢ — Thẻ «Làm bù»: nợ câu cộng dồn, trả tối thiểu như ngân hàng (11/11/2026)
+# ĐẶC TẢ — Thẻ «Nợ câu»: nợ cộng dồn, trả tối thiểu kiểu ngân hàng (11/11/2026)
 
 Trạng thái: **CHỜ THẦY DUYỆT ẢNH — CHƯA BUILD.**
 Thầy 11/11: «hiện thẻ làm bù bất kì câu mới ôn sửa cộng dồn và bắt làm bù trước rồi mới đến câu mới … Đếm theo câu … cho phép học sinh làm tối thiểu (tự tính toán) giống như trả tối thiểu của ngân hàng. Ghi rõ đang nợ bao nhiêu câu, bấm vào chọn được trả tối thiểu bao nhiêu câu thì được làm câu mới hoặc trả hết … tối đa 3 ngày nợ tối thiểu, đến ngày thứ tư phải trả hết mới được làm tiếp. Vẽ tôi xem rồi build».
+
+Thầy 11/11 (sau bản vẽ lần 1): «Ghi rõ nợ câu nhé theo cơ chế trả tối thiểu kiểu ngân hàng nhé» ⇒ bản vẽ lần 2: nhãn thẻ «Nợ câu», nút chính «Trả nợ câu trước», tối thiểu = 25 % số nợ còn lại (sàn 6 câu) thay cho «chia đều số lần còn lại».
 
 Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍNH màn Hôm nay của app (component thật, dữ liệu giả), thẻ «Làm bù» là phần vẽ thêm. Chạy lại: `node docs/ban-ve-lam-bu-1111/chup.mjs <thư mục build chup-v2>`.
 
@@ -11,8 +13,8 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 - Cảm giác cần đạt: rõ ràng, công bằng, có lối ra. Không doạ.
 
 ## 2. Bố cục
-- **Có nợ, hôm nay chưa trả** (ảnh `dt-sang-1`, `dt-sang-2`, `mb-sang-1`, `mt-sang-1`): lời chào → **thẻ Làm bù** → **nút chính** «Làm bù trước» → thẻ mức hôm nay. Nút chính nằm trọn trong màn đầu của điện thoại cao 844 px. Hôm nay vẫn chỉ MỘT nút chính.
-- Thẻ: nhãn «Câu làm bù» · chip số lần trả tối thiểu · số lớn «N câu đang nợ» · dòng theo loại (Câu mới · Câu sửa · Câu ôn) · hai ô chọn «Trả tối thiểu» / «Trả hết» · một dòng luật.
+- **Có nợ, hôm nay chưa trả** (ảnh `dt-sang-1`, `dt-sang-2`, `mb-sang-1`, `mt-sang-1`): lời chào → **thẻ Nợ câu** → **nút chính** «Trả nợ câu trước» → thẻ mức hôm nay. Nút chính nằm trọn trong màn đầu của điện thoại cao 844 px. Hôm nay vẫn chỉ MỘT nút chính.
+- Thẻ: nhãn «Nợ câu» · chip số lần trả tối thiểu · số lớn «N câu đang nợ» · dòng theo loại (Câu mới · Câu sửa · Câu ôn) · hai ô chọn «Trả tối thiểu» / «Trả hết» · một dòng luật.
 - Chọn ô nào thì nút chính đổi theo: «Trả tối thiểu · 11 câu» hoặc «Trả hết · 42 câu».
 - **Đã trả tối thiểu hôm nay** (ảnh `dt-sang-3`): thẻ mức và nút chính về chỗ cũ (nút chính là bài hôm nay); thẻ gọn «Còn nợ 31 câu» + nút phụ «Trả thêm» nằm dưới nút chính.
 - **Hết 3 lần trả tối thiểu** (ảnh `dt-sang-4`, `dt-toi-4`): thẻ đổi sang màu báo sai, chỉ còn ô «Trả hết».
@@ -22,8 +24,8 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 | Trạng thái | Màn |
 |---|---|
 | Không nợ | Không có thẻ; màn Hôm nay y như hiện nay |
-| Có nợ, chưa trả hôm nay | Thẻ đầy đủ, nút chính «Làm bù trước»; bài hôm nay chưa mở |
-| Đang làm bù | Màn làm bài hiện có, nhãn chặng «Làm bù · x/N câu» |
+| Có nợ, chưa trả hôm nay | Thẻ đầy đủ, nút chính «Trả nợ câu trước»; bài hôm nay chưa mở |
+| Đang trả nợ | Màn làm bài hiện có, nhãn chặng «Trả nợ câu · x/N câu» |
 | Đã trả đủ số đã chọn | Thẻ gọn; bài hôm nay mở |
 | Hết 3 lần trả tối thiểu | Chỉ còn «Trả hết» |
 | Trả hết | Thẻ biến mất; Mol khen một lần |
@@ -37,14 +39,16 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 
 **Trần nợ: 84 câu** (3 ngày). Vượt trần không cộng thêm; câu vẫn nằm trong hàng chờ của em, không mất.
 
-**Trả tối thiểu** = ⌈nợ ÷ (4 − số lần đã trả tối thiểu)⌉, không dưới 6 câu (nợ dưới 6 thì trả hết luôn). Ví dụ nợ 42 câu, mỗi ngày làm đủ bài hôm nay:
+**Trả tối thiểu kiểu ngân hàng** = 25 % số nợ còn lại, làm tròn lên, không dưới 6 câu (nợ dưới 6 thì trả hết luôn). Được trả tối thiểu tối đa 3 lần; ngày thứ tư phải trả hết. Ví dụ nợ 42 câu, mỗi ngày làm đủ bài hôm nay:
 
-| Lần | Nợ đầu ngày | Tối thiểu | Còn nợ |
+| Lần | Nợ đầu ngày | Tối thiểu (25 %, sàn 6) | Còn nợ |
 |---|---|---|---|
 | 1 | 42 | 11 | 31 |
-| 2 | 31 | 11 | 20 |
-| 3 | 20 | 10 | 10 |
-| Ngày thứ tư | 10 | phải trả hết 10 | 0 |
+| 2 | 31 | 8 | 23 |
+| 3 | 23 | 6 | 17 |
+| Ngày thứ tư | 17 | phải trả hết 17 | 0 |
+
+Không tính «lãi»: nợ không tự tăng thêm ngoài phần em làm thiếu của ngày mới.
 
 **Đếm lần trả tối thiểu:** mỗi ngày em chọn trả tối thiểu và làm đủ số đó = 1 lần. Trả hết nợ thì đếm lại từ 0. Ngày em không mở app không mất lần, nhưng nợ vẫn tăng (tới trần).
 
@@ -54,7 +58,7 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 
 **Chuỗi và thưởng:** giữ chuỗi khi làm đủ 28 câu của hôm nay (sau phần trả). Câu làm bù được nguyên tử như câu thường.
 
-**Nói thẳng:** ngày có nợ em làm nhiều hơn 28 câu. Trả tối thiểu: 28 + khoảng 6–21 câu. Trả hết một lần ở mức trần: 28 + 84 = 112 câu.
+**Nói thẳng:** ngày có nợ em làm nhiều hơn 28 câu. Trả tối thiểu: 28 + khoảng 6–21 câu (25 % của tối đa 84). Trả hết một lần ở mức trần: 28 + 84 = 112 câu.
 
 ## 5. Ngoại lệ
 - Em bấm đổi lựa chọn sau khi đã bắt đầu làm bù: được đổi từ tối thiểu lên trả hết; không được đổi ngược sau khi đã vượt số tối thiểu.
@@ -71,7 +75,7 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 - Kế hoạch ngày: số câu cần = số đã chọn trả + 28, vẫn qua `rut28`. Đáp án không xuống máy trước khi nộp — như mọi chặng hiện nay.
 
 ## 7. Nghiệm thu đo bằng máy
-- `tests/lam-bu-1111.test.ts` — luật thuần: phát sinh nợ, trần 84, tối thiểu 42 → 11 · 11 · 10 · 10, lần thứ tư phải trả hết, trả hết thì đếm lại, sàn 6 câu.
+- `tests/lam-bu-1111.test.ts` — luật thuần: phát sinh nợ, trần 84, tối thiểu 42 → 11 · 8 · 6 rồi ngày thứ tư trả hết 17, trả hết thì đếm lại, sàn 6 câu.
 - `tests/lam-bu-may-chu-1111.test.ts` — chốt nợ một lần mỗi ngày, cổng «chưa trả đủ thì chưa mở bài hôm nay», ngày Kiểm tra ôn tập không bị chặn.
 - `tests/lam-bu-giao-dien-1111.test.tsx` — bốn trạng thái của thẻ, chỉ một nút chính, đổi lựa chọn thì nút chính đổi theo.
 - `npm run build && npm run kiem:toc-do` 0 đỏ; `npm run kiem:mau-giu` 0; `npm run check:mau`.
@@ -79,7 +83,7 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 
 ## 8. Sáu điều em tự chọn — thầy muốn khác thì nói
 1. Trần nợ 84 câu.
-2. Tối thiểu chia đều cho số lần còn lại (nợ ÷ 4, rồi ÷ 3, ÷ 2), sàn 6 câu.
+2. Tối thiểu = 25 % số nợ còn lại, sàn 6 câu; không tính lãi.
 3. «3 ngày» đếm theo số lần em thật sự trả tối thiểu, không đếm ngày em vắng.
 4. Ngày Kiểm tra ôn tập: bài kiểm tra đi trước, làm bù sau.
 5. Bài Kiểm tra ôn tập bỏ lỡ: phần chưa làm thành nợ «Câu ôn»; điểm bài đó vẫn chốt như hiện nay.
