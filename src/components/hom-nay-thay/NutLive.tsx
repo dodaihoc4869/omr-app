@@ -11,19 +11,15 @@ export default function NutLive({ className }: { className: string }) {
   const nut = useRef<HTMLButtonElement>(null)
   const [cho, setCho] = useState<Element | null>(null)
   const [dang, setDang] = useState(0)
+  // Việc theo dõi (hỏi lúc rảnh, hỏi lại khi thầy vừa đóng màn chiếu / quay lại tab, 15 giây một lần khi đang xử lý) nằm cả trong mảnh lười.
   useEffect(() => {
-    let song = true
-    const hoi = () => { void import('../../screens/live-xem-lai/gv/lich-su-live-api').then((m) => m.demDangXuLy()).then((n) => { if (song) setDang(n) }).catch(() => {}) }
+    if (cho) return
+    let song = true, dung: (() => void) | undefined
+    const nap = () => { void import('../../screens/live-xem-lai/gv/lich-su-live-api').then((m) => { if (song) dung = m.theoDoiDangXuLy(setDang) }).catch(() => {}) }
     const w = window as Window & { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => number }
-    const h = w.requestIdleCallback ? (w.requestIdleCallback(hoi, { timeout: 5000 }), 0) : window.setTimeout(hoi, 3000)
-    return () => { song = false; if (h) clearTimeout(h) }
+    const h = w.requestIdleCallback ? (w.requestIdleCallback(nap, { timeout: 5000 }), 0) : window.setTimeout(nap, 3000)
+    return () => { song = false; if (h) clearTimeout(h); dung?.() }
   }, [cho])
-  // Đang có buổi xử lý ⇒ hỏi lại mỗi 15 giây tới khi xong (chip tự tắt).
-  useEffect(() => {
-    if (!dang || cho) return
-    const h = setInterval(() => { if (!document.hidden) void import('../../screens/live-xem-lai/gv/lich-su-live-api').then((m) => m.demDangXuLy()).then(setDang).catch(() => {}) }, 15_000)
-    return () => clearInterval(h)
-  }, [dang, cho])
   return (
     <>
       <button ref={nut} type="button" className={className} onClick={() => setCho(nut.current?.closest('.gv2-trang') ?? document.body)} aria-label={dang ? `Live · ${dang} đang xử lý` : 'Live · lịch sử các buổi live'}>

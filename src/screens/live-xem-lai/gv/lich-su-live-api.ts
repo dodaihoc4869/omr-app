@@ -28,3 +28,36 @@ export async function demDangXuLy(): Promise<number> {
   const r = await taiDsLive()
   return r.ok ? r.du.buoi.filter((b) => b.trangThai === 'dang_xu_ly').length : 0
 }
+
+/** Nút «Live» ở Hôm nay theo dõi buổi đang xử lý (11/11, thầy: «kết thúc live chưa thấy có bản ghi» ⇒ vừa tắt live là nút phải thấy ngay, không cần tải lại).
+ *  Hỏi một lần lúc gắn; thầy vừa ĐÓNG / tạm ẩn màn chiếu (tắt live, kết thúc buổi, Esc ra Hôm nay) hoặc quay lại tab ⇒ hỏi lại sau 1,5 giây (phòng ghi dòng
+ *  «đang xử lý» ở nền); đang có buổi xử lý ⇒ hỏi mỗi 15 giây tới khi xong rồi dừng. Tab ẩn bỏ qua. Trả hàm dừng. */
+export function theoDoiDangXuLy(dat: (n: number) => void): () => void {
+  let song = true, lanCuoi = 0
+  let nhip: ReturnType<typeof setInterval> | null = null, hen: ReturnType<typeof setTimeout> | null = null
+  const hoi = (): void => {
+    lanCuoi = Date.now()
+    void demDangXuLy().then((n) => {
+      if (!song) return
+      dat(n)
+      if (n > 0 && !nhip) nhip = setInterval(() => { if (!document.hidden) hoi() }, 15_000)
+      else if (!n && nhip) { clearInterval(nhip); nhip = null }
+    }).catch(() => {})
+  }
+  const lai = (e: Event): void => {
+    const phien = e.type === 'bpu-phien', d = (e as CustomEvent<{ tamAn?: boolean } | null>).detail
+    if (phien && d && !d.tamAn) return // màn chiếu vừa MỞ: chưa có gì mới
+    if (document.hidden || hen || (!phien && Date.now() - lanCuoi < 5000)) return
+    hen = setTimeout(() => { hen = null; hoi() }, 1500)
+  }
+  hoi()
+  window.addEventListener('bpu-phien', lai)
+  document.addEventListener('visibilitychange', lai)
+  return () => {
+    song = false
+    if (nhip) clearInterval(nhip)
+    if (hen) clearTimeout(hen)
+    window.removeEventListener('bpu-phien', lai)
+    document.removeEventListener('visibilitychange', lai)
+  }
+}

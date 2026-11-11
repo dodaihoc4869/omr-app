@@ -13,6 +13,7 @@ import type { Env, ExecutionContext } from './kieu'
 import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { bpuBat, kiemVeBpu } from './phong-binh-phan-ung'
 import { damBaoBangLive, khoaTep, tienToLive, xoaTienTo } from './live-xem-lai'
+import { LIVE_TOI_THIEU_MS } from '../../src/lib/live/xem-lai-dung'
 import { KHUC_TOI_DA, PHIEN_GHI, dauGon, docKhuc, khoaKhuc } from '../../src/lib/live/xem-lai-khuc'
 import { TEP_LIVE, type BuoiLiveDs, type BuoiLiveJson, type QuyenBuoiLive, type TrangThaiBuoiLive } from '../../src/lib/live/xem-lai-kieu'
 import { tachKhung } from '../../src/lib/live/xem-lai-mp3'
@@ -144,7 +145,7 @@ async function hsLenh(env: Env, p: string, b: Row, nay: number): Promise<Respons
   const xacThuc = buoc.xong.then(() => null, (e: unknown) => (e instanceof Error ? e.message : 'Em đăng nhập lại.'))
   if (p === '/hs/live-ds') {
     const doc = env.DB.batch([
-      env.DB.prepare(`SELECT ${COT.split(', ').map((c) => `b.${c}`).join(', ')} FROM live_buoi b WHERE b.trang_thai IN ('xong', 'dang_xu_ly') AND ${SQL_DUOC_XEM} ORDER BY b.bat_luc DESC LIMIT 80`).bind(sbd),
+      env.DB.prepare(`SELECT ${COT.split(', ').map((c) => `b.${c}`).join(', ')} FROM live_buoi b WHERE (b.trang_thai = 'dang_xu_ly' OR (b.trang_thai = 'xong' AND b.so_doan > 0)) AND ${SQL_DUOC_XEM} ORDER BY b.bat_luc DESC LIMIT 80`).bind(sbd),
       env.DB.prepare('SELECT buoi_id, ten FROM live_doan WHERE sbd_len_bang = ?').bind(sbd),
     ]).then((r) => r as unknown as { results?: Row[] }[], () => [{ results: [] as Row[] }, { results: [] as Row[] }])
     const [loi, [buoiR, doanR]] = await Promise.all([xacThuc, doc])
@@ -159,7 +160,7 @@ async function hsLenh(env: Env, p: string, b: Row, nay: number): Promise<Respons
   }
   const id = buoiHop(b.id)
   if (!id) return json({ ok: false, lyDo: 'khong-co' }, 404)
-  const cauBuoi = () => env.DB.prepare(`SELECT b.id, b.ban FROM live_buoi b WHERE b.id = ?2 AND b.trang_thai = 'xong' AND ${SQL_DUOC_XEM}`).bind(sbd, id)
+  const cauBuoi = () => env.DB.prepare(`SELECT b.id, b.ban FROM live_buoi b WHERE b.id = ?2 AND b.trang_thai = 'xong' AND b.so_doan > 0 AND ${SQL_DUOC_XEM}`).bind(sbd, id)
   const doc = env.DB.batch([cauBuoi(), env.DB.prepare('SELECT luot, dung, len_bang FROM bpu_luot WHERE buoi_id = ? AND sbd = ?').bind(id, sbd)])
     .then((r) => r as unknown as { results?: Row[] }[])
     // Bảng `bpu_luot` chưa có (chưa buổi nào kết thúc) ⇒ chỉ hỏi quyền.
@@ -194,11 +195,15 @@ async function gvLenh(env: Env, p: string, b: Row, nay: number, ctx?: ExecutionC
   await damBaoBangLive(env).catch(() => undefined)
   const iso = new Date(nay).toISOString()
   if (p === '/gv/live-ds') {
-    const r = await env.DB.prepare(`SELECT ${COT} FROM live_buoi WHERE trang_thai <> 'dang_xoa' ORDER BY bat_luc DESC LIMIT 500`).all<Row>().then((x) => x.results ?? [], () => [] as Row[])
+    // Cột `ly_do` (11/11, chỉ-thêm, thêm lười lúc chốt buổi 0 đoạn đầu tiên) có thể CHƯA có ⇒ đọc lại không kèm cột ấy.
+    const docDs = (cot: string) => env.DB.prepare(`SELECT ${cot} FROM live_buoi WHERE trang_thai <> 'dang_xoa' ORDER BY bat_luc DESC LIMIT 500`).all<Row>().then((x) => x.results ?? [])
+    const r = await docDs(`${COT}, ly_do`).catch(() => docDs(COT)).catch(() => [] as Row[])
     const han = hanVeLive(nay)
     const buoi = await Promise.all(r.map(async (x) => {
-      const d = dongBuoi(x)
-      return { ...d, byte: so(x.byte), quyen: (str(x.quyen) === 'diem_danh' ? 'diem_danh' : 'lop') as QuyenBuoiLive, ve: d.trangThai === 'xong' ? await kyVeLive(env.MA_BI_MAT, d.id, SBD_THAY, han, d.ban) : null }
+      const d = dongBuoi(x), ly = str(x.ly_do)
+      // Lý do chỉ có nghĩa ở buổi ĐÃ XONG mà 0 đoạn (buổi dựng lại ra đoạn thì cột cũ không còn được đọc).
+      if (d.trangThai === 'xong' && d.soDoan === 0) d.lyDo = ly === 'ngan' || ly === 'khong-cau' || ly === 'khong-tieng-net' || ly === 'khong-doan' ? ly : d.giayLive < LIVE_TOI_THIEU_MS / 1000 ? 'ngan' : d.soCau === 0 ? 'khong-cau' : 'khong-doan'
+      return { ...d, byte: so(x.byte), quyen: (str(x.quyen) === 'diem_danh' ? 'diem_danh' : 'lop') as QuyenBuoiLive, ve: d.trangThai === 'xong' && d.soDoan > 0 ? await kyVeLive(env.MA_BI_MAT, d.id, SBD_THAY, han, d.ban) : null }
     }))
     return json({ ok: true, buoi, tongByte: buoi.reduce((s, x) => s + x.byte, 0) })
   }

@@ -9,7 +9,7 @@ import { taoD1That, type D1That } from './_d1-that'
 import { khucGia, taoR2Gia, type R2Gia } from './_live-xem-lai-gia'
 import { gameToken } from '../server/src/game-v2-auth'
 import { kyVeBpu } from '../server/src/phong-binh-phan-ung'
-import { SQL_LIVE_XEM_LAI } from '../server/src/live-xem-lai'
+import { SQL_LIVE_XEM_LAI, damBaoCotLyDo } from '../server/src/live-xem-lai'
 import { SBD_THAY, cronLiveXemLai, docRange, hanVeLive, kiemVeLive, kyVeLive } from '../server/src/live-xem-lai-lenh'
 import { tachCauLive } from '../scripts/tach-cau-live-xem-lai.mjs'
 import { docDauGon } from '../src/lib/live/xem-lai-khuc'
@@ -196,6 +196,39 @@ describe('/hs/live-* — quyền xem (điểm quyết 3)', () => {
       await goi(duong, { method: 'POST', body: JSON.stringify({ token, ...them }) })
       expect(d1.soLenh.batch - truoc.batch, duong).toBe(1) // một lô đọc
     }
+  })
+})
+
+// 11/11 — thầy: «kết thúc live chưa thấy có bản ghi». Buổi đã live mà chưa có đoạn nào vẫn có dòng (xong, 0 đoạn, kèm lý do) trong Lịch sử Live của THẦY;
+// máy EM chỉ thấy buổi có từ 1 đoạn.
+describe('Buổi đã live nhưng chưa có đoạn xem lại (11/11)', () => {
+  const khongDoan = (id: string, o: { giay?: number; cau?: number; ngay?: string } = {}): void => {
+    themBuoi(id, { ngay: o.ngay, byte: 0 })
+    d1.sql.prepare('UPDATE live_buoi SET so_doan = 0, giay_doan = 0, so_cau = ?, giay_live = ?, ban = 0 WHERE id = ?').run(o.cau ?? 0, o.giay ?? 40, id)
+    d1.sql.prepare('DELETE FROM live_doan WHERE buoi_id = ?').run(id)
+  }
+  it('máy em: /hs/live-ds không trả buổi 0 đoạn, /hs/live-buoi của buổi ấy ⇒ 404; buổi đang xử lý vẫn thấy', async () => {
+    themBuoi('b1'); khongDoan('b0', { ngay: '2026-11-11' }); themBuoi('b9', { tt: 'dang_xu_ly', ngay: '2026-11-12' })
+    const ds = await hs<TraLiveDsHs>('/hs/live-ds', 'A1')
+    expect(ds.j.buoi.map((b) => [b.id, b.trangThai])).toEqual([['b9', 'dang_xu_ly'], ['b1', 'xong']])
+    expect((await hs('/hs/live-buoi', 'A1', { id: 'b0' })).status).toBe(404)
+    expect((await hs('/hs/live-buoi', 'A1', { id: 'b1' })).status).toBe(200)
+  })
+  it('thầy: dòng 0 đoạn có `lyDo`, không có vé mở; cột `ly_do` CHƯA có ⇒ vẫn đọc được (suy lý do từ số liệu); có cột ⇒ đúng lý do đã ghi', async () => {
+    themBuoi('b1'); khongDoan('n1', { giay: 9, ngay: '2026-11-11' }); khongDoan('n2', { giay: 40, cau: 0, ngay: '2026-11-12' }); khongDoan('n3', { giay: 40, cau: 1, ngay: '2026-11-13' })
+    expect((d1.sql.prepare("SELECT COUNT(*) AS n FROM pragma_table_info('live_buoi') WHERE name = 'ly_do'").get() as { n: number }).n).toBe(0)
+    const truoc = await gv<TraLiveDsGv>('/gv/live-ds')
+    expect(truoc.j.buoi.map((b) => [b.id, b.soDoan, b.lyDo ?? null, !!b.ve])).toEqual([['n3', 0, 'khong-doan', false], ['n2', 0, 'khong-cau', false], ['n1', 0, 'ngan', false], ['b1', 2, null, true]])
+    // cột chỉ-thêm (thêm lười lúc chốt buổi 0 đoạn đầu tiên; gọi lại không lỗi, không mất dữ liệu)
+    await damBaoCotLyDo(env); await damBaoCotLyDo({ ...env, DB: { prepare: (q: string) => env.DB.prepare(q), batch: (x: never[]) => env.DB.batch(x) } } as unknown as Env) // lần hai: D1 báo trùng cột ⇒ bỏ qua
+    expect(d1.dem('live_buoi')).toBe(4)
+    d1.sql.prepare("UPDATE live_buoi SET ly_do = 'khong-tieng-net' WHERE id = 'n3'").run()
+    d1.sql.prepare("UPDATE live_buoi SET ly_do = 'khong-doan' WHERE id = 'b1'").run() // buổi CÓ đoạn: cột cũ không được đọc
+    const sau = await gv<TraLiveDsGv>('/gv/live-ds')
+    expect(sau.j.buoi.map((b) => [b.id, b.lyDo ?? null])).toEqual([['n3', 'khong-tieng-net'], ['n2', 'khong-cau'], ['n1', 'ngan'], ['b1', null]])
+    // thầy xoá được dòng 0 đoạn
+    expect((await gv<{ xoa: string[] }>('/gv/live-xoa', { ids: ['n1', 'n2'] })).j.xoa.sort()).toEqual(['n1', 'n2'])
+    expect((await gv<TraLiveDsGv>('/gv/live-ds')).j.buoi.map((b) => b.id)).toEqual(['n3', 'b1'])
   })
 })
 

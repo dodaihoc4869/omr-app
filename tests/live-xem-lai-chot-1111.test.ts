@@ -179,23 +179,120 @@ describe('Chốt buổi ở máy chủ', () => {
     expect(d1.sql.prepare('SELECT ban, trang_thai FROM live_buoi').all()).toEqual([{ ban: 2, trang_thai: 'xong' }])
   })
 
-  it('live dưới 2 phút / không có câu nào mở đáp án ⇒ không tạo buổi live, không hiện ở đâu', async () => {
+  // 11/11 — thầy trên bản sống: «kết thúc live chưa thấy có bản ghi». Trước: live dưới 2 phút / chưa có đoạn ⇒ dòng `live_buoi` bị XOÁ im lặng. Nay: KHÔNG BAO GIỜ
+  // bỏ im một buổi đã live — dòng luôn có trong «Lịch sử Live» của thầy (xong, 0 đoạn, kèm lý do); máy em chỉ thấy buổi có từ 1 đoạn.
+  it('buổi đã live mà chưa có đoạn nào ⇒ VẪN có dòng «xong · 0 đoạn» kèm lý do (không xoá im); chốt lại vẫn một dòng; kết thúc buổi dòng còn nguyên', async () => {
+    const r2 = taoR2Gia(), d1 = taoD1That(), b = await taoBuoiGia({ r2, DB: d1.env.DB }); dong.push(b)
+    const dongD1 = () => d1.sql.prepare('SELECT trang_thai, so_cau, so_doan, giay_live, ly_do FROM live_buoi').all() as Record<string, unknown>[]
+    // (1) live 10 giây rồi tắt ⇒ «live dưới 15 giây»
+    luc(0); await b.ph.gui(b.gv, { t: 'live-bat' }); await b.ph.gui(b.gv, { t: 'live-ghi', tt: 'dang-ghi', dh: T0 - LECH, p: 'p1' })
+    await datKhuc(r2, 'b1', 'p1', 0, khucGia({ t0: T0 - LECH, soDau: 1 }))
+    luc(10_000); await b.ph.gui(b.gv, { t: 'live-tat' })
+    await choXl(b.ph)
+    expect(d1.sql.prepare('SELECT trang_thai FROM live_buoi').all()).toEqual([{ trang_thai: 'dang_xu_ly' }])
+    expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'ngan' })
+    expect(dongD1()).toEqual([{ trang_thai: 'xong', so_cau: 0, so_doan: 0, giay_live: 10, ly_do: 'ngan' }])
+    expect(r2.du.has('live/b1/buoi.json')).toBe(false)
+    // (2) live lại 60 giây, có câu nhưng thầy không mở đáp án, không gọi ai, không bật bảng ⇒ «chưa câu nào được chữa»
+    luc(100_000); await b.ph.gui(b.gv, { t: 'live-bat' }); await b.ph.gui(b.gv, { t: 'live-ghi', tt: 'dang-ghi', dh: T0 + 100_000 - LECH, p: 'p2' })
+    luc(101_000); await b.ph.post('/luot', CAU_GIA('q1'))
+    await b.ph.gui(b.hs[0]!, { t: 'tra', chon: 'A' })
+    for (let i = 0; i < 6; i++) await datKhuc(r2, 'b1', 'p2', i, khucGia({ t0: T0 + 100_000 - LECH + i * MS_KHUC, soDau: 1000 + i * 417 }))
+    luc(160_000); await b.ph.gui(b.gv, { t: 'live-tat' })
+    expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'khong-cau' })
+    expect(dongD1()).toEqual([{ trang_thai: 'xong', so_cau: 0, so_doan: 0, giay_live: 70, ly_do: 'khong-cau' }])
+    // (3) thầy mở đáp án (live đã tắt) nhưng không chữa gì ⇒ có câu, chưa có đoạn: «phần chữa quá ngắn»; khúc + nhật ký vẫn giữ (dựng lại được)
+    luc(170_000); await b.ph.gui(b.gv, { t: 'mo' })
+    expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'khong-doan' })
+    expect(dongD1()).toEqual([{ trang_thai: 'xong', so_cau: 1, so_doan: 0, giay_live: 70, ly_do: 'khong-doan' }])
+    expect([...r2.du.keys()].some((k) => k.startsWith('live/b1/k/'))).toBe(true); expect(r2.du.has('live/b1/buoi.json')).toBe(false)
+    // chốt lại bao nhiêu lần cũng MỘT dòng
+    await chot(b.ph); expect(d1.dem('live_buoi')).toBe(1)
+    // (4) kết thúc buổi mà vẫn chưa có đoạn ⇒ dòng CÒN NGUYÊN (không xoá im), khúc thô chờ cron dọn sau 24 giờ như mọi buổi
+    await b.ph.post('/dong', {})
+    expect(await chot(b.ph)).toMatchObject({ du: false, lyDo: 'khong-doan' })
+    expect(dongD1()).toEqual([{ trang_thai: 'xong', so_cau: 1, so_doan: 0, giay_live: 70, ly_do: 'khong-doan' }])
+  })
+
+  it('live có câu nhưng không thu được tiếng và không có nét ⇒ dòng 0 đoạn với lý do «khong-tieng-net»', async () => {
     const r2 = taoR2Gia(), d1 = taoD1That(), b = await taoBuoiGia({ r2, DB: d1.env.DB }); dong.push(b)
     luc(0); await b.ph.gui(b.gv, { t: 'live-bat' })
     luc(1000); await b.ph.post('/luot', CAU_GIA('q1'))
     await b.ph.gui(b.hs[0]!, { t: 'tra', chon: 'A' })
-    luc(20_000); await b.ph.gui(b.gv, { t: 'mo' })
-    await taiKhuc(r2, 60)
+    luc(5000); await b.ph.gui(b.gv, { t: 'goi', sbd: 'e01', lyDo: [] })
     luc(60_000); await b.ph.gui(b.gv, { t: 'live-tat' })
-    await choXl(b.ph)
-    expect(d1.sql.prepare('SELECT trang_thai FROM live_buoi').all()).toEqual([{ trang_thai: 'dang_xu_ly' }])
-    expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'ngan' })
-    expect(r2.du.has('live/b1/buoi.json')).toBe(false); expect(d1.dem('live_buoi')).toBe(0)
-    // buổi còn mở ⇒ giữ khúc + nhật ký (thầy live tiếp sẽ dựng lại); kết thúc buổi mà vẫn không đủ ⇒ dọn sạch
-    expect([...r2.du.keys()].some((k) => k.startsWith('live/b1/k/'))).toBe(true)
-    await b.ph.post('/dong', {})
-    expect(await chot(b.ph)).toMatchObject({ du: false })
-    expect([...r2.du.keys()].filter((k) => k.startsWith('live/b1/'))).toEqual([])
+    expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'khong-tieng-net' })
+    expect(d1.sql.prepare('SELECT trang_thai, so_cau, so_doan, giay_live, ly_do FROM live_buoi').all()).toEqual([{ trang_thai: 'xong', so_cau: 1, so_doan: 0, giay_live: 60, ly_do: 'khong-tieng-net' }])
+  })
+
+  // Đúng ca của thầy 11/11: live thử khoảng 40 giây, mic câm (mọi ô mức âm = 0), thầy bật bảng live và viết, KHÔNG bấm mở đáp án.
+  it('live 40 giây có nét, mic câm ⇒ có buổi, có đoạn, `coTieng: false`; câu chưa mở đáp án vào theo đường «đã chữa trên bảng» (không đáp án, không lời giải)', async () => {
+    for (const coKhuc of [true, false]) {
+      const r2 = taoR2Gia(), d1 = taoD1That(), b = await taoBuoiGia({ r2, DB: d1.env.DB }); dong.push(b)
+      const { ph, gv, hs } = b
+      await guiBangMoi(ph, gv)
+      luc(0); await ph.gui(gv, { t: 'live-bat' }); await ph.gui(gv, { t: 'live-ghi', tt: 'dang-ghi', dh: T0 - LECH, p: 'p1' })
+      luc(2000); await ph.post('/luot', CAU_GIA('q1'))
+      for (let i = 0; i < 4; i++) { luc(4000 + i * 100); await ph.gui(hs[i]!, { t: 'tra', chon: i < 3 ? 'A' : 'B' }) } // 3/4 đúng
+      luc(8000); await ph.gui(gv, { t: 'live-dat', bang: true }) // thầy BẬT TAY bảng live cho câu này
+      for (let i = 0; i < 6; i++) { luc(12_000 + i * 2000); await guiNet(ph, gv, netGia(`n-${i}`)) }
+      luc(26_000); await ph.gui(hs[4]!, { t: 'tra', chon: 'A' }) // em gửi muộn: tỉ lệ lớp trong ảnh chụp kín được làm mới ⇒ 4/5
+      if (coKhuc) for (let i = 0; i < 4; i++) await datKhuc(r2, 'b1', 'p1', i, khucGia({ t0: T0 - LECH + i * MS_KHUC, soDau: i * 417 + 1, muc: 0 })) // mic câm
+      luc(40_000); await ph.gui(gv, { t: 'live-tat' })
+      const kq = await chot(ph)
+      expect(kq, `coKhuc=${coKhuc}`).toMatchObject({ ok: true, du: true, ban: 1, soCau: 1, soDoan: 1 })
+      const j = docJson(r2), chu = JSON.stringify(j)
+      expect(j.coTieng).toBe(false); expect(j.byteTieng).toBe(0); expect(r2.du.has('live/b1/tieng.mp3')).toBe(false)
+      expect(j.msLive).toBeGreaterThan(39_000); expect(j.msLive).toBeLessThan(41_000)
+      expect(j.doan).toMatchObject([{ loai: 'thay_chua', cau: 1, soNet: 6, lenBang: null }])
+      // AN TOÀN: câu chưa mở đáp án ⇒ `dung` rỗng, `giai` null, có cờ `moDapAn: false`; tỉ lệ lớp vẫn có; không có kết quả từng em
+      expect(j.cau).toMatchObject([{ so: 1, qid: 'q1', dung: '', giai: null, moDapAn: false, soDung: 4, soGui: 5 }])
+      expect(chu).not.toContain('"tra"'); expect(chu).not.toContain('ketQua'); expect(chu).not.toContain('Lời giải q1')
+      expect(new TextDecoder().decode(r2.du.get('live/b1/su-kien.json')!.b)).not.toContain('"dung"')
+      const net = docNetBin(r2.du.get('live/b1/net.bin')!.b).muc.flatMap((m) => { const g = giaiSo(m.khung)!; return g.k === 'net' ? [g.net.id] : [] })
+      expect(net).toEqual(expect.arrayContaining(['n-0', 'n-5']))
+      expect(d1.sql.prepare('SELECT trang_thai, so_cau, so_doan FROM live_buoi').all()).toEqual([{ trang_thai: 'xong', so_cau: 1, so_doan: 1 }])
+    }
+  })
+
+  // LUẬT AN TOÀN 7 sau 11/11 (thầy: «kết thúc live chưa thấy có bản ghi» ⇒ câu thầy đã chữa trên bảng phải vào, dù chưa bấm mở đáp án):
+  //   · câu ĐÃ mở đáp án ⇒ vào đủ (đáp án + lời giải);
+  //   · câu CHƯA mở đáp án nhưng đã GỌI EM LÊN BẢNG hoặc bảng live đang bật ⇒ vào, KHÔNG đáp án, KHÔNG lời giải;
+  //   · câu chưa mở đáp án VÀ chưa từng lên bảng / bảng live ⇒ vẫn bị loại, cắt khỏi tiếng + nét (như trước).
+  it('luật an toàn 7 (bản 11/11): gọi em lên bảng mà chưa mở đáp án ⇒ câu vào KHÔNG kèm đáp án; câu chưa chữa gì ⇒ vẫn bị cắt khỏi tiếng + nét', async () => {
+    const r2 = taoR2Gia(), d1 = taoD1That(), b = await taoBuoiGia({ r2, DB: d1.env.DB }); dong.push(b)
+    const { ph, gv, hs } = b
+    await guiBangMoi(ph, gv)
+    luc(0); await ph.gui(gv, { t: 'live-bat' }); await ph.gui(gv, { t: 'live-ghi', tt: 'dang-ghi', dh: T0 - LECH, p: 'p1' })
+    luc(2000); await ph.post('/luot', CAU_GIA('q1')) // câu 1: gọi e02 lên bảng, chấm Đạt, KHÔNG mở đáp án
+    for (let i = 0; i < 6; i++) await ph.gui(hs[i]!, { t: 'tra', chon: i < 2 ? 'A' : 'C' })
+    luc(10_000); await ph.gui(gv, { t: 'goi', sbd: 'e02', lyDo: [] })
+    for (let i = 0; i < 4; i++) { luc(15_000 + i * 2000); await guiNet(ph, gv, netGia(`len-${i}`)) }
+    luc(50_000); await ph.gui(gv, { t: 'dat', v: true })
+    luc(60_000); await ph.post('/luot', { ...CAU_GIA('q2'), bo: true }) // câu 2: không mở đáp án, không gọi ai, bảng live tắt ⇒ LOẠI
+    luc(60_500); await ph.gui(gv, { t: 'live-dat', bang: false })
+    for (let i = 0; i < 6; i++) await ph.gui(hs[i]!, { t: 'tra', chon: 'A' })
+    for (let i = 0; i < 3; i++) { luc(70_000 + i * 2000); await guiNet(ph, gv, netGia(`an-${i}`)) }
+    luc(100_000); await ph.post('/luot', { ...CAU_GIA('q3'), bo: true }) // câu 3: mở đáp án bình thường
+    for (let i = 0; i < 6; i++) await ph.gui(hs[i]!, { t: 'tra', chon: 'A' })
+    luc(110_000); await ph.gui(gv, { t: 'mo' })
+    await taiKhuc(r2, 130)
+    luc(130_000); await ph.gui(gv, { t: 'live-tat' })
+    expect(await chot(ph)).toMatchObject({ ok: true, du: true, soCau: 2 })
+    const j = docJson(r2), chu = JSON.stringify(j)
+    expect(j.cau.map((c) => [c.so, c.qid, c.dung, c.moDapAn, c.soDung, c.soGui])).toEqual([[1, 'q1', '', false, 2, 6], [2, 'q3', 'A', undefined, 6, 6]])
+    expect(j.cau[0]!.giai).toBeNull(); expect(chu).not.toContain('Lời giải q1'); expect(chu).toContain('Lời giải q3')
+    expect(j.doan[0]).toMatchObject({ loai: 'len_bang', cau: 1, lenBang: { sbd: 'e02', dat: true }, soNet: 4 })
+    // câu 2 (q2) không có thẻ, không có chữ nào của đề, nét của nó không có, tiếng 60–100 giây bị cắt theo khung
+    expect(chu).not.toContain('q2'); expect(chu).not.toContain('Đề của q2')
+    const id = docNetBin(r2.du.get('live/b1/net.bin')!.b).muc.flatMap((m) => { const g = giaiSo(m.khung)!; return g.k === 'net' ? [g.net.id] : [] })
+    expect(id).toContain('len-0'); expect(id.some((x) => x.startsWith('an-'))).toBe(false)
+    const so = soKhungTrong(r2.du.get('live/b1/tieng.mp3')!.b)
+    expect(so.some((n) => n > 2502 && n < 4166)).toBe(false) // khung của 60–100 giây (2501 … 4167, trừ mép làm tròn)
+    expect(so).toContain(2400); expect(so).toContain(4300)
+    expect(j.msLive).toBeGreaterThan(88_000); expect(j.msLive).toBeLessThan(92_000)
+    // chốt lại ⇒ cùng kết quả (bản dựng không tăng)
+    expect(await chot(ph)).toMatchObject({ du: true, doi: false })
   })
 
   it('thầy mở đáp án SAU khi đã tắt live ⇒ dựng lại, câu ấy xuất hiện; bật live lại trong cùng buổi ⇒ nối tiếp một buổi', async () => {
@@ -211,10 +308,13 @@ describe('Chốt buổi ở máy chủ', () => {
     luc(150_000); await ph.gui(gv, { t: 'goi', sbd: 'e03', lyDo: [] })
     await taiKhuc(r2, 240)
     luc(240_000); await ph.gui(gv, { t: 'live-tat' })
-    expect(await chot(ph)).toMatchObject({ du: true, ban: 1, soCau: 1 })
-    expect(JSON.stringify(docJson(r2))).not.toContain('q2')
-    luc(260_000); await ph.gui(gv, { t: 'mo' }) // mở đáp án câu 2 khi live đã tắt
+    // 11/11 (thầy: «kết thúc live chưa thấy có bản ghi»): câu 2 CHƯA mở đáp án nhưng thầy đã gọi e03 lên bảng ⇒ đã vào trang xem lại, KHÔNG kèm đáp án.
+    // (Trước 11/11 chỗ này khẳng định câu 2 chưa có ở đâu cho tới khi mở đáp án — đổi có chủ đích theo luật mới.)
+    expect(await chot(ph)).toMatchObject({ du: true, ban: 1, soCau: 2 })
+    expect(docJson(r2).cau.map((c) => [c.qid, c.dung, c.giai, c.moDapAn])).toEqual([['q1', 'A', docJson(r2).cau[0]!.giai, undefined], ['q2', '', null, false]])
+    luc(260_000); await ph.gui(gv, { t: 'mo' }) // mở đáp án câu 2 khi live đã tắt ⇒ dựng lại, lúc này mới có đáp án
     expect(await chot(ph)).toMatchObject({ du: true, ban: 2, soCau: 2 })
+    expect(docJson(r2).cau.map((c) => [c.qid, c.dung, c.moDapAn])).toEqual([['q1', 'A', undefined], ['q2', 'A', undefined]])
     expect(docJson(r2).doan.map((d) => [d.cau, d.lenBang?.sbd])).toEqual([[1, 'e02'], [2, 'e03']])
     // bật live lại 60 giây (phiên máy ghi mới) rồi tắt ⇒ vẫn MỘT buổi, trục tiếng nối liền
     luc(600_000); await ph.gui(gv, { t: 'live-bat' }); await ph.gui(gv, { t: 'live-ghi', tt: 'dang-ghi', dh: T0 + 600_000 - LECH, p: 'p2' })

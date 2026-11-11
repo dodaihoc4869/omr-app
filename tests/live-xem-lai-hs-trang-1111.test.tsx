@@ -231,6 +231,46 @@ describe('trang buổi live', () => {
     // không lộ số báo danh của bạn lên bảng
     for (const d of buoi.doan) expect(document.body.textContent).not.toContain(d.lenBang!.sbd)
   })
+  // 11/11 — thầy: «kết thúc live chưa thấy có bản ghi» ⇒ câu thầy chữa trên bảng mà CHƯA mở đáp án vẫn vào trang xem lại, `dung` = '' và `giai` = null
+  // (`moDapAn: false`). Thẻ câu không được hiện ô «Đáp án đúng» rỗng, không có nút lời giải, không có chip «Em làm đúng / chưa đúng».
+  it('câu chưa mở đáp án (dung rỗng, giai null): không ô «Đáp án đúng», không nút lời giải, không chip kết quả của em; phương án vẫn hiện, không tô', async () => {
+    const { buoi } = taoBuoiGia()
+    const kin = (so: number) => { const c = buoi.cau.find((x) => x.so === so)!; c.dung = ''; c.giai = null; c.moDapAn = false; return c }
+    const c3kin = kin(3) // câu trả lời ngắn (đáp án 12,95)
+    const tn = buoi.cau.find((c) => c.phan === 'I' && c.so !== 3)!
+    kin(tn.so) // một câu trắc nghiệm
+    datMayChu({ rieng: () => taoRiengGia(buoi), buoi: () => buoi })
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: TOKEN }))
+    render(<XemBuoiLive id={ID_BUOI_GIA} ve="ve-gia" nguon="hs" dong={() => {}} />)
+    await screen.findByText('Phát cả 5 đoạn · 29 phút')
+    const c3 = screen.getByRole('region', { name: 'Câu 3' })
+    expect(within(c3).queryByText('Đáp án đúng')).toBeNull()
+    expect(c3.querySelector('.xl-dap')).toBeNull()
+    expect(c3.textContent).not.toContain('12,95')
+    expect(within(c3).queryByRole('button', { name: /Xem lời giải/ })).toBeNull()
+    expect(within(c3).queryByText('Em chưa đúng')).toBeNull(); expect(within(c3).queryByText('Em làm đúng')).toBeNull()
+    expect(within(c3).getByText('Thầy chữa câu này trên bảng · chưa mở đáp án')).toBeTruthy()
+    // tỉ lệ lớp và đoạn chữa vẫn có
+    expect(within(c3).getByText('Lớp làm đúng 46 %')).toBeTruthy()
+    expect(within(c3).getByRole('button', { name: /Phát đoạn chữa câu 3/ })).toBeTruthy()
+    expect(c3kin.soGui).toBeGreaterThan(0)
+    // câu trắc nghiệm chưa mở đáp án: bốn phương án vẫn hiện nhưng KHÔNG phương án nào được tô
+    const cTn = screen.getByRole('region', { name: `Câu ${tn.so}` })
+    const pa = within(cTn).getByRole('list', { name: 'Phương án' })
+    expect(pa.querySelectorAll('[role="listitem"]').length).toBeGreaterThanOrEqual(2)
+    expect(pa.querySelector('.dung')).toBeNull(); expect(within(cTn).queryByText('Đáp án đúng')).toBeNull()
+    expect(within(cTn).queryByRole('button', { name: /Xem lời giải/ })).toBeNull()
+    // câu ĐÃ mở đáp án bên cạnh không đổi
+    const khac = buoi.cau.find((c) => c.moDapAn !== false && c.phan === 'I')!
+    const cK = screen.getByRole('region', { name: `Câu ${khac.so}` })
+    expect(within(cK).getByRole('button', { name: `Xem lời giải của câu ${khac.so}` })).toBeTruthy()
+    expect(cK.querySelector('.xl-pa .dung')).toBeTruthy()
+    // danh sách đoạn riêng của em: câu chưa mở đáp án không mang nhãn «Câu em chưa đúng»
+    const dsDoan = screen.getByRole('region', { name: 'Danh sách đoạn chữa bài' })
+    const hang3 = [...dsDoan.querySelectorAll('.xl-doan')].find((e) => e.querySelector('.o')?.textContent === '3') as HTMLElement
+    expect(within(hang3).queryByText('Câu em chưa đúng')).toBeNull()
+  })
+
   it('AN TOÀN: không hiện câu / đoạn / kết quả ngoài buoi.json; chỉ gọi đúng ba lệnh', async () => {
     const { buoi: du } = taoBuoiGia()
     // máy chủ đã lọc câu 4 (chưa mở đáp án) khỏi `cau`; giả sử chỉ mục còn sót đoạn trỏ tới câu 4 và kết quả riêng còn lượt của câu 4

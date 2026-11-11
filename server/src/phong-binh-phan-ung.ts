@@ -291,7 +291,7 @@ export class PhongBinhPhanUng {
   private xl: NhatKyXl
 
   constructor(private ctx: DurableObjectState, private env: Env) {
-    this.xl = new NhatKyXl({ ctx, env, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), ghiSom: () => this.ghiD1() })
+    this.xl = new NhatKyXl({ ctx, env, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), ghiSom: () => this.ghiD1(), chamSo })
     this.live = new LiveMay({ ctx, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), bao: (ds) => this.ctx.waitUntil(baoMayCacEm(this.env, ds, 'bpu').catch(() => 0)), xl: this.xl })
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
   }
