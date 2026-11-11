@@ -372,3 +372,28 @@ mic thô). Trễ thêm ≈ 40 ms (gom khung 10 + RNNoise 10 + đệm Web Audio �
 Loa: `src/lib/live/loa.ts` (`setSinkId`) — máy thầy: ô «Loa» + «Thử loa» trong cửa sổ nút Live, áp cho tiếng em nói + tiếng thử; máy em: một hàng «Loa» trong
 khay khi máy có từ hai đầu ra. Có `setSinkId`: Chrome / Edge máy tính, Chrome Android bản mới, Firefox bản mới (theo tài liệu trình duyệt, chưa thử từng máy); KHÔNG có: Safari và mọi trình duyệt trên iPhone
 (ẩn ô chọn). Chỉ thử bằng `setSinkId` giả lập trong test; chưa thử với loa thật.
+
+## 8. «Đề nhấp nháy lên xuống» trên bảng live máy em (11/11, bản sống #1618) — `scripts/thu-live-1011/do-nhap-nhay-1111.mjs`
+
+Thầy: «khi chuyển câu bấm L lên bảng thì máy học sinh vào màn hình live, đề nhấp nháy lên xuống». Đo trên Chromium thật (phòng thật trong Node, dữ liệu giả): ở từng trạng thái gắn `MutationObserver` lên vùng đề của máy em (đếm thêm / gỡ nút, đổi thuộc tính, đổi chữ) và chụp liên tiếp vùng đề, so từng cặp khung liền nhau.
+
+**Tái hiện**: thầy đang live, chuyển sang câu Đúng / Sai (đề bài peptide của ảnh thầy gửi), em CHƯA gửi, thầy gọi bạn lên bảng ⇒ máy em bị ép vào bảng live; máy em 1971 × 1247 (đúng khổ ảnh thầy gửi).
+
+| Trạng thái (máy em 1971 × 1247) | TRƯỚC: đổi `style` của khối đề | TRƯỚC: cặp khung khác nhau | SAU: đổi `style` | SAU: cặp khung khác nhau |
+|---|---|---|---|---|
+| Màn câu hỏi, em chưa gửi | 0 | 0 / 49 | 0 | 0 / 79 |
+| 3 giây đầu bị ép vào bảng live | 372 (124 lần / giây) | 16 / 19 | 0 | 0 / 20 |
+| Bảng live đứng yên | 616 trong 5 giây (123 lần / giây) | 26 / 33 | 0 trong 8 giây | 0 / 54 |
+| Bảng live, thầy đang viết trên bảng | 612 trong 5 giây | 10 / 38 | 0 trong 8 giây | 0 / 66 |
+
+Ở mọi trạng thái, trước lẫn sau: 0 lần thêm / gỡ nút, 0 lần gỡ nút gốc của đề, 0 lần đổi chữ — đề KHÔNG bị dựng lại; thứ đổi là `style` (bề ngang + phép phóng) của chính khối đề.
+
+**Gốc** (`src/components/live/LopLive.tsx`, `GiayDe`; bản sao ở `TrinhPhat.tsx`): tấm giấy đề dựng thường tính hệ số phóng k = (cao giấy − 28) / (cao khối đề) rồi đặt bề ngang khối = (rộng − 36) / k. Cao khối đề lại phụ thuộc bề ngang ấy (chữ xuống dòng khác đi), và `ResizeObserver` gọi tính lại mỗi lần khối đổi cao. Số dòng nhảy bậc nên phép tính không có điểm dừng: k₁ → hẹp hơn → thêm một dòng → k₂ nhỏ hơn → rộng hơn → bớt một dòng → lại k₁… Khối đề đổi cỡ MỖI KHUNG HÌNH, mãi mãi; mắt thấy đề giật lên xuống. Có dao động hay không tuỳ khổ máy + độ dài đề: cùng câu ấy ở 1280 × 800, 1366 × 768, 844 × 390 thì hội tụ sau vài lần (0 lần đổi lúc đứng yên), ở 1971 × 1247 thì không bao giờ dừng.
+
+**Loại trừ** (đo, máy em 844 × 390 và 1280 × 800, 6 giây mỗi trạng thái): giấy soi (`GiayThay`) lúc đứng yên / thầy viết / mở đóng khay / bút tới gần tay nắm: 0 đổi, 0 / 46–52 cặp khung khác. Màn câu hỏi lúc thầy live: khối chữ đề 0 đổi; thứ cử động trong vùng đề là hình giám thị của chặng (`g@transform` ~83 lần / giây — hoạt cảnh theo thiết kế, không phải đề).
+
+**Sửa** (`src/components/live/vua-giay.ts` `chonHeSoGiay`): chọn k MỘT lần cho mỗi (câu, khổ ô giấy) bằng cách dò 9 nấc từ lớn xuống nhỏ, lấy nấc lớn nhất còn vừa chiều cao giấy — hàm thuần của nội dung, không có vòng phản hồi. `ResizeObserver` chỉ gọi dò lại khi khối đề đổi cao vì lý do KHÁC phép đặt của chính mình (ảnh / phông tải xong).
+
+**Test khoá**: `tests/live-de-nhap-nhay-1111.test.tsx` — phép tính cũ dao động với khối có số dòng nhảy bậc, phép dò mới cho cùng kết quả mọi lần gọi và đo không quá 9 lần; bảng live nhận 30 view + 30 trạng thái liên tiếp (số nét, số em, tiếng, giơ tay, bạn nói) ⇒ khối đề là cùng một nút, 0 lần đổi trong ô giấy.
+
+**Chưa làm ở bản vá này** (nằm ở nhánh hai khung độc lập `claude/may-em-doc-lap-1111`): ô giấy lúc em chưa gửi vẫn là thẻ làm bài có nút «Đúng | Sai» mờ; giấy soi của câu chữ thuần vẫn đi theo độ cuộn giấy của thầy (số đo `live.giay` lấy theo khung nhìn của tờ chiếu) — CHƯA đo được trường hợp này có gây nhảy hay không.

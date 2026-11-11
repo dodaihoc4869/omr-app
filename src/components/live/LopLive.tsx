@@ -40,6 +40,7 @@ import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, boCucEm, boCucPhong, canXoayCss, giaiTrang, khungChieu, type KhungChieu, type O } from './bo-cuc'
 import ChonLoa from './ChonLoa'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
+import { chonHeSoGiay } from './vua-giay'
 import GiayThay, { soiDuoc, type BoChu, type CauGiay } from './GiayThay'
 import { taoVeBang, type VeBang } from './ve-bang'
 import './live-em.css'
@@ -87,18 +88,27 @@ function catGiay(bc: { x: number; s: number; w: number; kc: KhungChieu; giay: O 
 /** Tấm giấy đề: khối đề dùng chung dựng ở bề ngang gốc rồi phóng lên cho vừa chiều cao giấy (đề dài ⇒ cỡ nhỏ nhất + cuộn dọc). */
 const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
   const trong = useRef<HTMLDivElement>(null)
+  const K_MIN = 1.3, K_MAX = 2.1
   const [k, setK] = useState(2)
   const coDe = de != null
+  const da = useRef(0)
   useLayoutEffect(() => {
     const el = trong.current
     if (!el) return
-    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(1.3, Math.min(2.1, (cao - 28) / h))) }
+    // Chọn hệ số phóng MỘT lần cho mỗi (câu, khổ ô giấy) bằng cách dò (vua-giay.ts) — bản trước tính lại theo chính chiều cao vừa đổi ⇒ không có điểm dừng,
+    // khối đề đổi cỡ mỗi khung hình («đề nhấp nháy lên xuống», thầy 11/11). Chỉ dò lại khi khối đề đổi cao vì lý do KHÁC (ảnh / phông tải xong).
+    const do1 = () => {
+      const r = chonHeSoGiay((thu) => { el.style.width = `${(rong - 36) / thu}px`; return el.scrollHeight }, cao, K_MIN, K_MAX)
+      el.style.width = `${(rong - 36) / r.k}px`
+      da.current = r.h
+      setK(r.k)
+    }
     do1()
     if (typeof ResizeObserver !== 'function') return
-    const ro = new ResizeObserver(do1)
+    const ro = new ResizeObserver(() => { if (Math.abs((el.scrollHeight || 1) - da.current) > 1) do1() })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [khoa, rong, cao, coDe])
+  }, [khoa, rong, cao, coDe, K_MIN, K_MAX])
   if (!de) return <p className="lv-giay-trong">Thầy đang giảng trên bảng</p>
   return <div className="lv-de"><div ref={trong} className="lv-de-trong" style={{ width: (rong - 36) / k, transform: `scale(${k})` }}>{de}</div></div>
 })
