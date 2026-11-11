@@ -139,21 +139,24 @@ export interface SoTiengNhan {
 export interface SoWebRtc extends Omit<SoTiengNhan, 'mid'> {
   /** RTT tới SFU (ms). */
   rtt: number | null
+  /** Đường nối đang dùng tới SFU: loại ứng viên phía máy này + giao thức, vd. `host/udp`, `srflx/udp`, `relay/tcp` (null = trình duyệt không báo). */
+  duong: string | null
   khac: SoTiengNhan[]
 }
 /** `midChinh` = mid của luồng chính (biết thì chọn đúng; không biết / trình duyệt không báo mid ⇒ luồng tiếng nhận đầu tiên). */
 export function docSoWebRtc(bc: RTCStatsReport, midChinh?: string | null): SoWebRtc {
-  let rtt: number | null = null, rttXa: number | null = null
-  const vao: SoTiengNhan[] = []
+  let rtt: number | null = null, rttXa: number | null = null, ungVien = ''
+  const vao: SoTiengNhan[] = [], uv = new Map<string, string>()
   bc.forEach((x: Record<string, unknown>) => {
     const so = (k: string): number | null => (typeof x[k] === 'number' ? (x[k] as number) : null)
-    if (x.type === 'candidate-pair' && (x.nominated === true || x.selected === true) && so('currentRoundTripTime') != null) rtt = so('currentRoundTripTime')! * 1000
+    if (x.type === 'candidate-pair' && (x.nominated === true || x.selected === true) && so('currentRoundTripTime') != null) { rtt = so('currentRoundTripTime')! * 1000; ungVien = String(x.localCandidateId ?? '') }
+    else if (x.type === 'local-candidate') uv.set(String(x.id ?? ''), `${String(x.candidateType ?? '?')}/${String(x.relayProtocol ?? x.protocol ?? '?')}`)
     else if (x.type === 'inbound-rtp' && (x.kind === 'audio' || x.mediaType === 'audio')) {
       vao.push({ mid: typeof x.mid === 'string' ? x.mid : null, jitter: so('jitter') == null ? null : so('jitter')! * 1000, demTong: so('jitterBufferDelay'), demSo: so('jitterBufferEmittedCount'), goiNhan: so('packetsReceived'), goiMat: so('packetsLost'), mucAm: so('audioLevel') })
     } else if (x.type === 'remote-inbound-rtp' && so('roundTripTime') != null) rttXa = so('roundTripTime')! * 1000
   })
   const chinh = (midChinh ? vao.find((v) => v.mid === midChinh) : undefined) ?? vao[0] ?? null
-  return { rtt: rtt ?? rttXa, jitter: chinh?.jitter ?? null, demTong: chinh?.demTong ?? null, demSo: chinh?.demSo ?? null, goiNhan: chinh?.goiNhan ?? null, goiMat: chinh?.goiMat ?? null, mucAm: chinh?.mucAm ?? null, khac: vao.filter((v) => v !== chinh) }
+  return { rtt: rtt ?? rttXa, duong: uv.get(ungVien) ?? null, jitter: chinh?.jitter ?? null, demTong: chinh?.demTong ?? null, demSo: chinh?.demSo ?? null, goiNhan: chinh?.goiNhan ?? null, goiMat: chinh?.goiMat ?? null, mucAm: chinh?.mucAm ?? null, khac: vao.filter((v) => v !== chinh) }
 }
 
 /** Số đo của luồng tiếng ĐANG GỬI (máy thầy): mức âm của track gắn vào bộ gửi (`media-source` — đo ngay tại nguồn, không cần AudioContext), số byte / gói đã gửi. */

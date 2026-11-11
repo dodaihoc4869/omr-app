@@ -448,6 +448,34 @@ describe('M2 · tiếng trong: luật lọc theo đường vọng + Opus dải r
     expect(suaSdpOpus(SDP)).toContain('maxaveragebitrate=24000')
     expect(suaSdpOpus(SDP)).not.toContain('maxplaybackrate')
   })
+  it('kiểu «khung» (thầy 11/11 «tức thì», Chromium): track mic được xử lý TỪNG KHUNG trong Worker — không qua Web Audio; tự chỉnh âm lượng của trình duyệt vẫn BẬT ở bậc đầu (luồng 48 kHz một kênh); mic câm ở đường ấy ⇒ bậc kế thử mic thô', async () => {
+    let micDangXuLy: TrackGia | null = null
+    const guiW: unknown[] = []
+    vi.stubGlobal('MediaStreamTrackProcessor', class { readable = {}; constructor(o: { track: TrackGia }) { micDangXuLy = o.track } })
+    vi.stubGlobal('MediaStreamTrackGenerator', class extends TrackGia { writable = {}; constructor() { super('khung', {}, () => micDangXuLy?.ra() ?? 0) } })
+    vi.stubGlobal('AudioData', class {})
+    vi.stubGlobal('Worker', class { onmessage = null; onerror = null; postMessage(m: unknown) { guiW.push(m) } terminate() { /* dừng */ } })
+    const U = URL as unknown as { createObjectURL?: unknown; revokeObjectURL?: unknown }, cu = [U.createObjectURL, U.revokeObjectURL]
+    U.createObjectURL = () => 'blob:khung'; U.revokeObjectURL = () => undefined
+    try {
+      thietBi.usb1 = () => 0.3
+      const b = dung()
+      await b.lt.bat({ mic: 'usb1' })
+      expect(goiGum[0]).toMatchObject({ deviceId: { exact: 'usb1' }, echoCancellation: false, noiseSuppression: false, autoGainControl: true, sampleRate: { ideal: 48000 } })
+      expect(b.lt.chanDoan()).toMatchObject({ kieu: 'khung', chuoi: true, gan: true })
+      expect(b.boGui().track!.label).toBe('khung')
+      expect(mucGui(b)).toBeCloseTo(0.3)
+      expect(guiW.length).toBe(1) // một Worker cho một luồng mic
+      // mic chỉ có tín hiệu khi trình duyệt KHÔNG xử lý gì ⇒ thang nới ràng buộc sang mic thô
+      thietBi.usb1 = (rb) => (rb.autoGainControl ? 0 : 0.25)
+      await b.lt.moMic('usb1')
+      await troi(1800)
+      expect(goiGum[goiGum.length - 1]).toMatchObject({ autoGainControl: false })
+      expect(b.lt.trangThai().micTinh).toBe('tot')
+      expect(mucGui(b)).toBeCloseTo(0.25)
+      expect(b.lt.chanDoan().kieu).toBe('khung')
+    } finally { U.createObjectURL = cu[0]; U.revokeObjectURL = cu[1] }
+  })
   it('chuỗi làm rõ tiếng: cộng hai kênh về mono (không chia đôi, không mất kênh có tiếng) → lọc thông cao 80 Hz → nén nâng mức → chặn đỉnh', async () => {
     const b = dung()
     await b.lt.bat({})

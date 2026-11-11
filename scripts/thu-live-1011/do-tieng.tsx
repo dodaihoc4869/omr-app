@@ -221,4 +221,169 @@ const SAU_LOC: CauHinh = { ten: 'sau · chống hú («Tất cả»: bật khử
   await actx.close()
   return buoc
 }
+// ───────────── TRỄ THƯỜNG TRỰC + ĐỘ TRONG (thầy 11/11: «làm cho tức thì», «tiếng phải trong nhất») ─────────────
+// Ba kênh thu CÙNG MỘT đồng hồ mẫu (một AudioContext đo, ScriptProcessor 3 kênh): 0 = mic của thầy (luồng trình duyệt giao) · 1 = đầu ra chuỗi làm rõ tiếng
+// (track đang gửi) · 2 = tiếng nhận được ở «máy em» (sau Opus + đệm rung). Hiệu vị trí mẫu giữa các kênh = trễ từng chặng, chính xác tới mẫu.
+interface CauHinh2 { ten: string; chuoi?: boolean; chuoiKieu?: 'khung' | 'nhanh' | 'nen'; agc?: boolean; loc?: CheDoLoc; opus?: TuyChonOpus; demNhan0?: boolean }
+const trungVi = (a: number[], q = 0.5): number | null => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return Math.round(s[Math.min(s.length - 1, Math.ceil((s.length - 1) * q))]! * 10) / 10 }
+/** FFT cơ số 2 tại chỗ (phần thực / ảo). */
+function fft(re: Float64Array, im: Float64Array): void {
+  const n = re.length
+  for (let i = 1, j = 0; i < n; i++) { let b = n >> 1; for (; j & b; b >>= 1) j ^= b; j ^= b; if (i < j) { const t = re[i]!; re[i] = re[j]!; re[j] = t; const u = im[i]!; im[i] = im[j]!; im[j] = u } }
+  for (let len = 2; len <= n; len <<= 1) {
+    const goc = (-2 * Math.PI) / len, wr = Math.cos(goc), wi = Math.sin(goc)
+    for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const a = i + k, b = a + len / 2, xr = re[b]! * cr - im[b]! * ci, xi = re[b]! * ci + im[b]! * cr; re[b] = re[a]! - xr; im[b] = im[a]! - xi; re[a] = re[a]! + xr; im[a] = im[a]! + xi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t } }
+  }
+}
+/** Tín hiệu sin 1 kHz: SINAD (tín hiệu / (méo + tạp âm), dB) và THD (hài bậc 2–5 so với cơ bản, dB) trong 20 Hz – 20 kHz. Tính trên từng cửa sổ 8192 mẫu
+ *  (170 ms) rồi lấy TRUNG VỊ: mic giả của Chromium thỉnh thoảng hụt một khối ⇒ vài cửa sổ có tiếng «tách» không phải của đường truyền. */
+function doSin(x: Float32Array): { sinad: number; thd: number; mucDb: number; soCuaSo: number } | null {
+  const N = 8192, ds: number[] = [], dt: number[] = []
+  const o = (hz: number) => Math.round((hz * N) / 48000)
+  for (let dau = 0; dau + N <= x.length; dau += N) {
+    const re = new Float64Array(N), im = new Float64Array(N)
+    for (let i = 0; i < N; i++) re[i] = x[dau + i]! * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (N - 1)))
+    fft(re, im)
+    const pho = (i: number) => re[i]! * re[i]! + im[i]! * im[i]!
+    let dinh = o(900)
+    for (let i = o(900); i <= o(1100); i++) if (pho(i) > pho(dinh)) dinh = i
+    const quanh = (k: number) => { let v = 0; for (let i = Math.max(1, k - 4); i <= Math.min(N / 2 - 1, k + 4); i++) v += pho(i); return v }
+    const tin = quanh(dinh)
+    let tong = 0, hai = 0
+    for (let i = o(20); i <= o(20000); i++) tong += pho(i)
+    for (let h = 2; h <= 5; h++) hai += quanh(dinh * h)
+    if (tin <= 0) continue
+    ds.push(10 * Math.log10(tin / Math.max(1e-30, tong - tin))); dt.push(10 * Math.log10(Math.max(1e-30, hai) / tin))
+  }
+  if (!ds.length) return null
+  let e = 0
+  for (let i = 0; i < x.length; i++) e += x[i]! * x[i]!
+  return { sinad: trungVi(ds)!, thd: trungVi(dt)!, mucDb: Math.round(db(Math.sqrt(e / x.length)) * 10) / 10, soCuaSo: ds.length }
+}
+/** Chuỗi xung: vị trí mẫu của từng lần bật (ngưỡng 30 % đỉnh kênh, nghỉ tối thiểu 0,25 giây giữa hai xung). */
+function batXung(x: Float32Array): number[] {
+  let dinh = 0
+  for (let i = 0; i < x.length; i++) { const v = Math.abs(x[i]!); if (v > dinh) dinh = v }
+  const ra: number[] = [], ng = dinh * 0.3
+  if (dinh < 1e-4) return ra
+  for (let i = 0; i < x.length; i++) if (Math.abs(x[i]!) > ng) { ra.push(i); i += 12000 }
+  return ra
+}
+/** Giọng mẫu: mức lúc nói / đỉnh / ồn trong quãng nghỉ (phân khung theo kênh `moc`), độ «thở» (ồn nửa sau quãng nghỉ dài so với nửa đầu), và với kênh `goc`
+ *  (đầu vào bộ mã) cho trước: tỉ số tín hiệu / sai khác dạng sóng theo khung 20 ms đã khớp trễ (segSNR) — méo + tạp âm do bộ mã và đường truyền. */
+function doNoi(x: Float32Array, moc: Float32Array, goc: Float32Array | null) {
+  const K = 960, nk = Math.floor(Math.min(x.length, moc.length) / K)
+  const rms = (m: Float32Array, k: number, lech = 0) => { let e = 0; const d = k * K + lech; if (d < 0 || d + K > m.length) return 0; for (let i = 0; i < K; i++) e += m[d + i]! * m[d + i]!; return Math.sqrt(e / K) }
+  const rm = Array.from({ length: nk }, (_, k) => rms(moc, k))
+  const p95 = [...rm].sort((a, b) => a - b)[Math.floor(nk * 0.95)] || 1e-9
+  const noi = rm.map((v) => v > p95 * 0.1)
+  // khung NGHỈ: chính nó và 5 khung hai bên (100 ms) đều không có tiếng
+  const nghi = rm.map((_, k) => { for (let j = k - 5; j <= k + 5; j++) if (j < 0 || j >= nk || noi[j]) return false; return true })
+  const LECH = 3 * K // đường truyền trễ ≈ 60 ms so với kênh mốc
+  let eN = 0, nN = 0, eG = 0, nG = 0, dinh = 0
+  for (let i = 0; i < x.length; i++) { const v = Math.abs(x[i]!); if (v > dinh) dinh = v }
+  const dau: number[] = [], cuoi: number[] = []
+  for (let k = 0; k < nk; k++) {
+    const v = rms(x, k, LECH)
+    if (noi[k]) { eN += v * v; nN++ } else if (nghi[k]) { eG += v * v; nG++ }
+  }
+  for (let k = 1; k < nk; k++) if (nghi[k] && !nghi[k - 1]) { let c = k; while (c < nk && nghi[c]) c++; if (c - k >= 14) { const g = Math.floor((c - k) / 2); let a = 0, b = 0; for (let j = 0; j < g; j++) { a += rms(x, k + j, LECH) ** 2; b += rms(x, c - g + j, LECH) ** 2 } dau.push(a / g); cuoi.push(b / g) } }
+  const tb = (a: number[]) => a.reduce((s, v) => s + v, 0) / Math.max(1, a.length)
+  let seg: number | null = null
+  if (goc) {
+    // trễ chung: tương quan trên 0,5 giây có năng lượng lớn nhất, dò 0–200 ms
+    let kLon = 0
+    for (let k = 0; k + 25 < nk; k++) if (rm[k]! > rm[kLon]!) kLon = k
+    const d0 = Math.max(0, (kLon - 12) * K), dai = 24000
+    let lon = -1, tre = 0
+    for (let lag = 0; lag <= 9600; lag += 2) { let c = 0; for (let i = 0; i < dai && d0 + i + lag < x.length; i += 2) c += goc[d0 + i]! * x[d0 + i + lag]!; if (c > lon) { lon = c; tre = lag } }
+    const ds: number[] = []
+    for (let k = 0; k < nk; k++) {
+      if (!noi[k]) continue
+      const d = k * K
+      let tot = -1e9
+      for (let lag = tre - 96; lag <= tre + 96; lag++) {
+        if (d + lag < 0 || d + lag + K > x.length) continue
+        let gg = 0, gx = 0, xx = 0
+        for (let i = 0; i < K; i++) { const a = goc[d + i]!, b = x[d + i + lag]!; gg += a * a; gx += a * b; xx += b * b }
+        if (gg < 1e-9 || xx < 1e-12) continue
+        const sai = gg - (gx * gx) / xx // sai khác còn lại sau khi khớp hệ số khuếch đại
+        const snr = 10 * Math.log10(gg / Math.max(1e-12, sai))
+        if (snr > tot) tot = snr
+      }
+      if (tot > -1e8) ds.push(Math.min(60, tot))
+    }
+    seg = ds.length ? Math.round(tb(ds) * 10) / 10 : null
+  }
+  const r1 = (v: number) => Math.round(v * 10) / 10
+  return { rmsNoiDb: r1(db(Math.sqrt(eN / Math.max(1, nN)))), dinhDb: r1(db(dinh)), onNghiDb: r1(db(Math.sqrt(eG / Math.max(1, nG)))), tinTrenOnDb: r1(db(Math.sqrt(eN / Math.max(1, nN))) - db(Math.sqrt(eG / Math.max(1, nG)))),
+    thoDb: dau.length ? r1(10 * Math.log10(tb(cuoi) / Math.max(1e-30, tb(dau)))) : null, soQuangNghi: dau.length, segSnrDb: seg }
+}
+async function do2(ch: CauHinh2, kieu: 'xung' | 'sin' | 'noi', giay: number, cho: number) {
+  const st = taoPhong({ buoiId: 'do', lop: 'L', nay: Date.now(), ds: [{ sbd: 'S1', ten: 'Em', coMat: true, luc: 1 }] })
+  datCoLive(st, { cho: true, sfu: true }, Date.now())
+  let pc2: RTCPeerConnection | null = null, nhan: MediaStreamTrack | null = null, thu: RTCRtpReceiver | null = null
+  const lt = taoLiveThay({
+    ve: 've', goc: 'https://sfu-gia', loc: ch.loc ?? 'tu', chuoi: ch.chuoi, chuoiKieu: ch.chuoiKieu, agc: ch.agc, opus: ch.opus,
+    kenh: { gui: (t) => { if (t.t === 'live-bat') liveBat(st, Date.now()); if (t.t === 'live-tat') liveTat(st, Date.now()); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, Date.now()); if (t.t === 'live-dat') liveDat(st, t as never, Date.now()); if (String(t.t).startsWith('live-')) queueMicrotask(() => lt.nhanTinPhong(viewBang(st))) }, guiNhiPhan: () => undefined },
+    moiTruong: { fetch: (async (u: RequestInfo | URL, o?: RequestInit) => {
+      const b = JSON.parse(String(o?.body ?? '{}')) as { sdp?: string }
+      if (!String(u).endsWith('/noi') || !b.sdp) return new Response(JSON.stringify({ ok: false }))
+      const p = new RTCPeerConnection()
+      p.addEventListener('track', (e) => { nhan = e.track; thu = e.receiver })
+      await p.setRemoteDescription({ type: 'offer', sdp: b.sdp })
+      await p.setLocalDescription(await p.createAnswer())
+      await gomIce(p)
+      pc2 = p
+      return new Response(JSON.stringify({ ok: true, phien: 'p'.repeat(16), sdp: p.localDescription!.sdp }))
+    }) as typeof fetch },
+  })
+  lt.nhanTinPhong(viewBang(st))
+  const kq = await lt.bat({})
+  if (!kq.ok) throw new Error('bật live hỏng: ' + kq.lyDo)
+  for (let i = 0; i < 60 && !nhan; i++) await ngu(100)
+  if (!nhan || !pc2 || !thu) throw new Error('đầu nhận không có track')
+  // máy em thật đặt đệm rung thấp nhất (em.ts); `demNhan0: false` = để mặc định của trình duyệt, cho biết việc ấy đáng bao nhiêu ms
+  if (ch.demNhan0 !== false) { try { (thu as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ } try { (thu as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ } }
+  const the = document.createElement('audio'); the.autoplay = true; the.srcObject = new MediaStream([nhan]); void the.play().catch(() => undefined)
+  const actx = new AudioContext({ sampleRate: 48000, latencyHint: 'interactive' }); await actx.resume()
+  await ngu(cho * 1000) // bộ mã, đệm rung, bộ nâng mức ổn định
+  const mic = lt.luongMic(), gui = lt.trackGui()
+  if (!mic || !gui) throw new Error('không có mic')
+  const gop = actx.createChannelMerger(3)
+  const mono = (l: MediaStream, kenh: number) => { const g = actx.createGain(); g.channelCount = 1; g.channelCountMode = 'explicit'; actx.createMediaStreamSource(l).connect(g); g.connect(gop, 0, kenh) }
+  mono(mic, 0); mono(gui === mic.getAudioTracks()[0] ? mic : new MediaStream([gui]), 1); mono(new MediaStream([nhan]), 2)
+  const N = Math.round(giay * 48000), kenh = [new Float32Array(N), new Float32Array(N), new Float32Array(N)]
+  let vt = 0
+  const sp = actx.createScriptProcessor(4096, 3, 1)
+  sp.onaudioprocess = (e) => { const n = Math.min(4096, N - vt); if (n <= 0) return; for (let c = 0; c < 3; c++) kenh[c]!.set(e.inputBuffer.getChannelData(c).subarray(0, n), vt); vt += n }
+  gop.connect(sp); sp.connect(actx.destination)
+  const doc = async () => { let byte = 0, goi = 0, tre = 0, phat = 0, xl = 0; (await pc2!.getStats()).forEach((x: Record<string, unknown>) => { if (x.type === 'inbound-rtp' && x.kind === 'audio') { byte = Number(x.bytesReceived) || 0; goi = Number(x.packetsReceived) || 0; tre = Number(x.jitterBufferDelay) || 0; phat = Number(x.jitterBufferEmittedCount) || 0; xl = Number(x.totalProcessingDelay) || 0 } }); return { byte, goi, tre, phat, xl } }
+  const a = await doc(), t0 = performance.now()
+  while (vt < N) await ngu(100)
+  const b = await doc(), t1 = performance.now()
+  sp.onaudioprocess = null
+  const cd = lt.chanDoan()
+  const [k0, k1, k2] = kenh as [Float32Array, Float32Array, Float32Array]
+  const ra: Record<string, unknown> = {
+    ten: ch.ten, kieu, kbps: Math.round(((b.byte - a.byte) * 8) / (t1 - t0) * 10) / 10, goiMoiGiay: Math.round(((b.goi - a.goi) * 1000) / (t1 - t0)),
+    demRungMs: b.phat > a.phat ? Math.round(((b.tre - a.tre) / (b.phat - a.phat)) * 10000) / 10 : null, xuLyNhanMs: b.phat > a.phat ? Math.round(((b.xl - a.xl) / (b.phat - a.phat)) * 10000) / 10 : null,
+    mic: { hz: cd.hz, kenh: cd.kenh, vong: cd.vong, on: cd.on, agc: cd.agc, bac: cd.bac, treThuMs: cd.treThu, chuoi: cd.chuoi, kieu: cd.kieu, hzXuLy: cd.hzXuLy },
+  }
+  if (kieu === 'xung') {
+    const x0 = batXung(k0), x1 = batXung(k1), x2 = batXung(k2), dChuoi: number[] = [], dTong: number[] = []
+    for (const r of x0) {
+      const c = x1.find((v) => v >= r - 48 && v < r + 14400), v2 = x2.find((v) => v > r && v < r + 18000)
+      if (c != null) dChuoi.push((c - r) / 48)
+      if (v2 != null) dTong.push((v2 - r) / 48)
+    }
+    Object.assign(ra, { soXung: x0.length, soNhan: dTong.length, chuoiMs: trungVi(dChuoi), chuoiP95: trungVi(dChuoi, 0.95), tongMs: trungVi(dTong), tongP95: trungVi(dTong, 0.95), tongNhoNhat: dTong.length ? Math.round(Math.min(...dTong) * 10) / 10 : null, tongLonNhat: dTong.length ? Math.round(Math.max(...dTong) * 10) / 10 : null })
+  } else if (kieu === 'sin') Object.assign(ra, { sinMic: doSin(k0), sinChuoi: doSin(k1), sinNhan: doSin(k2) })
+  else Object.assign(ra, { noiMic: doNoi(k0, k0, null), noiChuoi: doNoi(k1, k0, null), noiNhan: doNoi(k2, k0, k1) })
+  lt.tat(); lt.huy()
+  try { (pc2 as RTCPeerConnection).close() } catch { /* đã đóng */ }
+  await actx.close()
+  return ra
+}
+;(window as unknown as Record<string, unknown>).__do2 = async (ds: CauHinh2[], kieu: 'xung' | 'sin' | 'noi', giay: number, cho: number) => { const ra = []; for (const ch of ds) ra.push(await do2(ch, kieu, giay, cho)); return ra }
 document.body.textContent = 'Trang đo tiếng Live — chạy bằng scripts/thu-live-1011/do-tieng.mjs'

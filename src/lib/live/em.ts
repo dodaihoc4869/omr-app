@@ -10,7 +10,7 @@ import { nhomKhung, type ViewLiveEm } from '../bpu/phong-live'
 import { giaiGoi, giaiSo } from './ma-net'
 import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
-import { taoSoDo } from './so-do'
+import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
@@ -95,7 +95,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let midThay: string | null = null, banSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
   let okPhien = -1, okDc: boolean | null = null, okNghe: boolean | null = null
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
-  let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, giayLech = false
+  let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, demRung: number | null = null, giayLech = false
   /** Nét đang viết đã phát ra lớp vẽ: id → số điểm đã phát. */
   const dangVe = new Map<string, number>()
 
@@ -170,6 +170,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
           // Tiếng của bạn đang phát mic trên bảng.
           thuBan = e.receiver
           try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
+          try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
           amBan = amBan ?? document.createElement('audio')
           amBan.autoplay = true; amBan.setAttribute('playsinline', '')
           amBan.srcObject = new MediaStream([e.track])
@@ -474,7 +475,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (s.demTong != null && s.demSo != null) {
         if (demTruoc && s.demSo > demTruoc.so) {
           // Trễ tiếng phía máy em ≈ đệm jitter + ~45 ms thu, mã hoá + ~20 ms loa ⇒ D nét = kẹp(trễ tiếng − 60, D theo dao động, 150).
-          const treTieng = ((s.demTong - demTruoc.tong) / (s.demSo - demTruoc.so)) * 1000 + 65
+          demRung = ((s.demTong - demTruoc.tong) / (s.demSo - demTruoc.so)) * 1000
+          const treTieng = demRung + TRE_CO_DINH_EM
           soDo.ghi('tt', treTieng); dem.datDTheoTieng(tt.nghe && !roiMan ? treTieng : null)
         }
         demTruoc = { tong: s.demTong, so: s.demSo }
@@ -569,6 +571,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     bang: (): BangNet => bang,
     khung, mucAm,
     /** Số đo đã thu (trung vị / p95 / lớn nhất): d, j, m, rtt, jt, tt, tn — xem so-do.ts. */
+    /** Trễ tiếng ƯỚC TÍNH miệng thầy → máy này (ms; null = chưa đo được): đệm rung đo tại máy + quãng mạng (coi máy thầy ↔ SFU bằng máy em ↔ SFU) +
+     *  phần máy thầy (≈ 10 ms thu + khung Opus 20 ms). Chưa gồm loa / tai nghe. */
+    treUocTinh: (): number | null => (demRung == null || rtt == null ? null : treTiengUocTinh({ thu: 10, chuoi: 0, ma: treKhungOpus(20), mangThay: rtt, mangEm: rtt, demEm: demRung }).ms),
     soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null }),
     huy,
   }

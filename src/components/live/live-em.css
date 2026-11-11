@@ -82,6 +82,7 @@
 .lv-khay[data-mo] { transform: translate3d(-50%, 0, 0); opacity: 1; visibility: visible; transition-delay: 0s; }
 .lv-khay-dau { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 4px; font-size: 13.5px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 86%, transparent); }
 .lv-khay-dau .lv-vach { margin-left: auto; }
+.lv-khay-dau .lv-tre { font-size: 11.5px; font-weight: 600; opacity: 0.72; white-space: nowrap; }
 .lv-song { display: inline-flex; align-items: center; gap: 3px; height: 16px; color: var(--doi); }
 .lv-song i { display: block; width: 4px; height: 100%; border-radius: 2px; background: currentColor; transform: scaleY(calc(0.25 + var(--lv-am, 0) * 0.75)); transition: transform 0.11s linear; }
 .lv-song i:nth-child(2n) { transform: scaleY(calc(0.4 + var(--lv-am, 0) * 0.6)); }

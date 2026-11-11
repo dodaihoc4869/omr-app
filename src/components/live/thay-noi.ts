@@ -6,7 +6,8 @@
 // Ba mối nối:  tờ ⇄ tệp này: postMessage (giao thức ở đầu src/lib/live-to-chieu.ts)  ·  tệp này ⇄ phòng: cau-live.ts  ·  tệp này ⇄ SFU: taoLiveThay.
 import { taoLoiBut, type NetBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { DOI_BPU, kyHieu, type KieuRoi, type ViewBang } from '../../lib/bpu/phong'
-import type { CheDoLoc, KetQuaBat, LiveThay, TinhMic, TrangThaiLiveThay } from '../../lib/live'
+import type { ChanDoanMic, CheDoLoc, KetQuaBat, LiveThay, TinhMic, TrangThaiLiveThay } from '../../lib/live'
+import { TRE_CHUOI, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from '../../lib/live/so-do'
 import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
 import { maTrang } from './bo-cuc'
@@ -195,7 +196,17 @@ export function dongChanDoan(): string {
   const track = { live: 'đang chạy', muted: 'BỊ TẮT TIẾNG', ended: 'ĐÃ NGẮT', tat: 'thầy đang tắt tiếng', khong: 'chưa mở' }[c.track]
   return [(c.ten || 'chưa có mic') + (c.the ? ' (mục mặc định của máy câm ⇒ đang mở thẳng mic này)' : ''), `luồng ${track}`, `${c.hz ?? '?'} Hz · ${c.kenh ?? '?'} kênh`, `khử vọng ${bt(c.vong)} · lọc ồn ${bt(c.on)} · tự chỉnh ${bt(c.agc)}`, `cách mở ${c.bac + 1}/4`,
     `mức tại mic ${pt(c.muc)} · đang gửi ${pt(c.mucGui)}`, c.kbps == null ? 'chưa gửi' : `${c.kbps} kb/s`, c.gan ? 'bộ gửi cầm mic' : 'bộ gửi CHƯA cầm mic', c.sfu ? 'máy chủ tiếng đã nối' : 'máy chủ tiếng CHƯA nối',
-    `làm rõ tiếng ${c.chuoi ? 'bật' : 'tắt'}`, `bộ đo ${c.ctx}`].join(' · ')
+    `làm rõ tiếng ${c.chuoi ? `bật (${c.kieu})` : 'tắt'}`, `bộ đo ${c.ctx}`, dongTre(c)].filter(Boolean).join(' · ')
+}
+/** «Trễ tiếng ước tính ~N ms» (thầy 11/11 «tức thì»): chỉ cộng số đo được — bộ đệm thu trình duyệt báo, chuỗi làm rõ tiếng, khung Opus, nửa RTT máy thầy ↔ máy
+ *  chủ tiếng, và từ máy em báo về: nửa RTT + đệm rung (trung vị cả lớp). Chưa gồm loa / tai nghe của máy em. */
+function dongTre(c: ChanDoanMic): string {
+  const m = lt?.mang()
+  if (!m || !c.sfu) return ''
+  const so = (o: unknown, k: string): number | null => { const v = (o as Record<string, { tv?: unknown } | null> | null)?.[k]?.tv; return typeof v === 'number' ? v : null }
+  const tt = so(m.em, 'tieng'), rttEm = so(m.em, 'rtt')
+  const u = treTiengUocTinh({ thu: c.treThu ?? 10, chuoi: c.chuoi ? TRE_CHUOI[c.kieu] ?? 0 : 0, ma: treKhungOpus(m.ptime), mangThay: m.rtt, mangEm: rttEm, demEm: tt == null ? null : Math.max(0, tt - TRE_CO_DINH_EM) })
+  return `đường nối ${m.duong ?? '?'} · RTT ${m.rtt == null ? '?' : Math.round(m.rtt)} ms · ${u.du ? `trễ tiếng ước tính ~${u.ms} ms (chưa gồm loa máy em)` : `trễ tiếng phần máy thầy ~${u.ms} ms (chưa có số từ máy em)`}`
 }
 /** Có phòng + công tắc bật ⇒ nạp thư viện, nối sẵn (track câm) để bấm Live là live ngay. */
 function dam(): Promise<void> {

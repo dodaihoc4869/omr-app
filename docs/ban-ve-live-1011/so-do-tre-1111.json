@@ -1,0 +1,1592 @@
+{
+ "cuc-bo": {
+  "luc": "2026-11-11T03:59:24.772Z",
+  "ghiChu": "Chromium thật + mic giả đọc tệp WAV; thư viện taoLiveThay thật → kết nối WebRTC thứ hai trong trang (không SFU thật, không loa / mic thật). Trễ đo giữa ba điểm trong trang bằng cùng một đồng hồ mẫu: mic trình duyệt giao → đầu ra chuỗi → tiếng nhận sau Opus + đệm rung. CHƯA gồm bộ đệm thu của thiết bị và trễ loa.",
+  "xung": [
+   {
+    "ten": "trước (#1603): chuỗi nén + AGC trình duyệt, 64 kb/s, khung 20 ms",
+    "soXung": 162,
+    "chuoiMs": 32,
+    "tongMs": 76.6,
+    "tongP95": 78.8,
+    "tongNhoNhat": 66.6,
+    "tongLonNhat": 78.8,
+    "demRungMs": 30.2,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     78.8,
+     71.1,
+     76.6
+    ]
+   },
+   {
+    "ten": "trước, máy em KHÔNG đặt đệm rung thấp nhất",
+    "soXung": 162,
+    "chuoiMs": 33.3,
+    "tongMs": 82.5,
+    "tongP95": 91.3,
+    "tongNhoNhat": 73.2,
+    "tongLonNhat": 91.3,
+    "demRungMs": 32.7,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     82.5,
+     73.2,
+     91.3
+    ]
+   },
+   {
+    "ten": "trước + khung 10 ms",
+    "soXung": 162,
+    "chuoiMs": 33.3,
+    "tongMs": 77.4,
+    "tongP95": 90.5,
+    "tongNhoNhat": 65.8,
+    "tongLonNhat": 90.5,
+    "demRungMs": 31.4,
+    "goiMoiGiay": 100,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     80.5,
+     68.5,
+     77.4
+    ]
+   },
+   {
+    "ten": "không chuỗi (mic thẳng), AGC trình duyệt, khung 20 ms",
+    "soXung": 162,
+    "chuoiMs": 0,
+    "tongMs": 45.9,
+    "tongP95": 55.9,
+    "tongNhoNhat": 42.1,
+    "tongLonNhat": 55.9,
+    "demRungMs": 30,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": false,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     48.1,
+     42.1,
+     45.9
+    ]
+   },
+   {
+    "ten": "chuỗi nhanh (worklet), AGC tắt, khung 20 ms",
+    "soXung": 162,
+    "chuoiMs": 21.3,
+    "tongMs": 75.6,
+    "tongP95": 77.8,
+    "tongNhoNhat": 52.6,
+    "tongLonNhat": 77.8,
+    "demRungMs": 32.7,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nhanh",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     55.3,
+     77.8,
+     75.6
+    ]
+   },
+   {
+    "ten": "chuỗi từng khung (Worker), AGC tắt, khung 20 ms",
+    "soXung": 162,
+    "chuoiMs": 0,
+    "tongMs": 47,
+    "tongP95": 54.4,
+    "tongNhoNhat": 41.6,
+    "tongLonNhat": 54.4,
+    "demRungMs": 30,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     47,
+     44.3,
+     54.4
+    ]
+   },
+   {
+    "ten": "chuỗi từng khung, AGC tắt, khung 10 ms",
+    "soXung": 162,
+    "chuoiMs": 0,
+    "tongMs": 44.5,
+    "tongP95": 46.5,
+    "tongNhoNhat": 33.8,
+    "tongLonNhat": 46.5,
+    "demRungMs": 30,
+    "goiMoiGiay": 101,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     45.7,
+     44.5,
+     36.5
+    ]
+   },
+   {
+    "ten": "chuỗi từng khung + AGC trình duyệt, khung 20 ms",
+    "soXung": 162,
+    "chuoiMs": 0,
+    "tongMs": 46.1,
+    "tongP95": 46.6,
+    "tongNhoNhat": 43.8,
+    "tongLonNhat": 46.6,
+    "demRungMs": 29.9,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     46.6,
+     46.1,
+     43.8
+    ]
+   },
+   {
+    "ten": "chuỗi từng khung, AGC tắt, khung 20 ms (lượt thứ hai)",
+    "soXung": 162,
+    "chuoiMs": 0,
+    "tongMs": 44.3,
+    "tongP95": 47,
+    "tongNhoNhat": 41.6,
+    "tongLonNhat": 47,
+    "demRungMs": 25.9,
+    "goiMoiGiay": 51,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "baLan": [
+     44.3,
+     47,
+     44.3
+    ]
+   }
+  ],
+  "sin": {
+   "-20": [
+    {
+     "ten": "trước (#1603): chuỗi nén + AGC trình duyệt, 64 kb/s, khung 20 ms",
+     "kieu": "sin",
+     "kbps": 64.3,
+     "goiMoiGiay": 50,
+     "demRungMs": 31.5,
+     "xuLyNhanMs": 26.3,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "nen",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.1,
+      "thd": -80.3,
+      "mucDb": -14.3,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 46,
+      "thd": -79.2,
+      "mucDb": -14.3,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "trước + khung 10 ms",
+     "kieu": "sin",
+     "kbps": 64.8,
+     "goiMoiGiay": 100,
+     "demRungMs": 24.5,
+     "xuLyNhanMs": 20.3,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "nen",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.1,
+      "thd": -80.3,
+      "mucDb": -14.3,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 43.7,
+      "thd": -79.7,
+      "mucDb": -14.3,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "trước + 96 kb/s",
+     "kieu": "sin",
+     "kbps": 95.9,
+     "goiMoiGiay": 50,
+     "demRungMs": 30.6,
+     "xuLyNhanMs": 25.7,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "nen",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.1,
+      "thd": -80.3,
+      "mucDb": -14.3,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 47.3,
+      "thd": -78.8,
+      "mucDb": -14.3,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung, AGC tắt, 64 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 64.4,
+     "goiMoiGiay": 51,
+     "demRungMs": 29.9,
+     "xuLyNhanMs": 21.6,
+     "mic": {
+      "hz": 44100,
+      "kenh": 2,
+      "vong": false,
+      "on": false,
+      "agc": false,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 43.1,
+      "thd": -84.2,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung, AGC tắt, 64 kb/s khung 10 ms",
+     "kieu": "sin",
+     "kbps": 64.8,
+     "goiMoiGiay": 100,
+     "demRungMs": 10,
+     "xuLyNhanMs": 7.5,
+     "mic": {
+      "hz": 44100,
+      "kenh": 2,
+      "vong": false,
+      "on": false,
+      "agc": false,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 41.4,
+      "thd": -83,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung, AGC tắt, 96 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 96.2,
+     "goiMoiGiay": 50,
+     "demRungMs": 20,
+     "xuLyNhanMs": 16.8,
+     "mic": {
+      "hz": 44100,
+      "kenh": 2,
+      "vong": false,
+      "on": false,
+      "agc": false,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 44.8,
+      "thd": -85.4,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung + AGC trình duyệt, 64 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 64.5,
+     "goiMoiGiay": 51,
+     "demRungMs": 29.7,
+     "xuLyNhanMs": 21.3,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 46.1,
+      "thd": -85.6,
+      "mucDb": -17.8,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung + AGC trình duyệt, 96 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 96.5,
+     "goiMoiGiay": 51,
+     "demRungMs": 20,
+     "xuLyNhanMs": 17.4,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 47,
+      "thd": -84.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung + AGC trình duyệt, 64 kb/s khung 10 ms",
+     "kieu": "sin",
+     "kbps": 64.9,
+     "goiMoiGiay": 101,
+     "demRungMs": 29.9,
+     "xuLyNhanMs": 21.8,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 47,
+      "thd": -83.2,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "SAU (mặc định mới của thư viện)",
+     "kieu": "sin",
+     "kbps": 64.5,
+     "goiMoiGiay": 51,
+     "demRungMs": 29.9,
+     "xuLyNhanMs": 21.5,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -23,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -96.9,
+      "mucDb": -17.7,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 46.1,
+      "thd": -85.5,
+      "mucDb": -17.8,
+      "soCuaSo": 35
+     }
+    }
+   ],
+   "-6": [
+    {
+     "ten": "trước (#1603): chuỗi nén + AGC trình duyệt, 64 kb/s, khung 20 ms",
+     "kieu": "sin",
+     "kbps": 64.5,
+     "goiMoiGiay": 51,
+     "demRungMs": 32,
+     "xuLyNhanMs": 27.3,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "nen",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 48.7,
+      "thd": -74.2,
+      "mucDb": -9.3,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 45,
+      "thd": -75.1,
+      "mucDb": -9.3,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "trước + khung 10 ms",
+     "kieu": "sin",
+     "kbps": 64.8,
+     "goiMoiGiay": 100,
+     "demRungMs": 32.7,
+     "xuLyNhanMs": 28,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "nen",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 48.7,
+      "thd": -74.2,
+      "mucDb": -9.3,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 43.5,
+      "thd": -73,
+      "mucDb": -9.3,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "trước + 96 kb/s",
+     "kieu": "sin",
+     "kbps": 96.2,
+     "goiMoiGiay": 50,
+     "demRungMs": 24.1,
+     "xuLyNhanMs": 20,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "nen",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 48.7,
+      "thd": -74.2,
+      "mucDb": -9.3,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 46.8,
+      "thd": -73.8,
+      "mucDb": -9.3,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung, AGC tắt, 64 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 64.1,
+     "goiMoiGiay": 50,
+     "demRungMs": 29.9,
+     "xuLyNhanMs": 23.6,
+     "mic": {
+      "hz": 44100,
+      "kenh": 2,
+      "vong": false,
+      "on": false,
+      "agc": false,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 42.6,
+      "thd": -85.7,
+      "mucDb": -9,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung, AGC tắt, 64 kb/s khung 10 ms",
+     "kieu": "sin",
+     "kbps": 64.9,
+     "goiMoiGiay": 101,
+     "demRungMs": 10,
+     "xuLyNhanMs": 9.6,
+     "mic": {
+      "hz": 44100,
+      "kenh": 2,
+      "vong": false,
+      "on": false,
+      "agc": false,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 41.7,
+      "thd": -87.9,
+      "mucDb": -9,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung, AGC tắt, 96 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 96.2,
+     "goiMoiGiay": 51,
+     "demRungMs": 30,
+     "xuLyNhanMs": 24.1,
+     "mic": {
+      "hz": 44100,
+      "kenh": 2,
+      "vong": false,
+      "on": false,
+      "agc": false,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 44.8,
+      "thd": -91.6,
+      "mucDb": -9,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung + AGC trình duyệt, 64 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 64.3,
+     "goiMoiGiay": 50,
+     "demRungMs": 29.9,
+     "xuLyNhanMs": 23.2,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -15.1,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 46,
+      "thd": -90.1,
+      "mucDb": -15.1,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung + AGC trình duyệt, 96 kb/s khung 20 ms",
+     "kieu": "sin",
+     "kbps": 96.5,
+     "goiMoiGiay": 51,
+     "demRungMs": 20,
+     "xuLyNhanMs": 16.1,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -15,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 47.1,
+      "thd": -89.1,
+      "mucDb": -15,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "chuỗi từng khung + AGC trình duyệt, 64 kb/s khung 10 ms",
+     "kieu": "sin",
+     "kbps": 64.8,
+     "goiMoiGiay": 100,
+     "demRungMs": 29.9,
+     "xuLyNhanMs": 21.4,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -15,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 47,
+      "thd": -86.5,
+      "mucDb": -15,
+      "soCuaSo": 35
+     }
+    },
+    {
+     "ten": "SAU (mặc định mới của thư viện)",
+     "kieu": "sin",
+     "kbps": 64.3,
+     "goiMoiGiay": 50,
+     "demRungMs": 30,
+     "xuLyNhanMs": 25.7,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000
+     },
+     "sinMic": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -9,
+      "soCuaSo": 35
+     },
+     "sinChuoi": {
+      "sinad": 49.2,
+      "thd": -101.1,
+      "mucDb": -15,
+      "soCuaSo": 35
+     },
+     "sinNhan": {
+      "sinad": 45.6,
+      "thd": -89.4,
+      "mucDb": -15.1,
+      "soCuaSo": 35
+     }
+    }
+   ]
+  },
+  "noi": [
+   {
+    "ten": "trước (#1603): chuỗi nén + AGC trình duyệt, 64 kb/s, khung 20 ms",
+    "kieu": "noi",
+    "kbps": 58.1,
+    "goiMoiGiay": 51,
+    "demRungMs": 33.3,
+    "xuLyNhanMs": 28.6,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22.1,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -17.3,
+     "dinhDb": -4.9,
+     "onNghiDb": -38.3,
+     "tinTrenOnDb": 21,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.2,
+     "dinhDb": -4.5,
+     "onNghiDb": -39.9,
+     "tinTrenOnDb": 22.7,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 8
+    }
+   },
+   {
+    "ten": "trước + khung 10 ms",
+    "kieu": "noi",
+    "kbps": 58.7,
+    "goiMoiGiay": 101,
+    "demRungMs": 28.5,
+    "xuLyNhanMs": 23.6,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -17.2,
+     "dinhDb": -4.9,
+     "onNghiDb": -38.3,
+     "tinTrenOnDb": 21.1,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.2,
+     "dinhDb": -4.5,
+     "onNghiDb": -39.8,
+     "tinTrenOnDb": 22.7,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 6.4
+    }
+   },
+   {
+    "ten": "trước + 96 kb/s",
+    "kieu": "noi",
+    "kbps": 96.5,
+    "goiMoiGiay": 51,
+    "demRungMs": 39.6,
+    "xuLyNhanMs": 34.7,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -17.2,
+     "dinhDb": -4.9,
+     "onNghiDb": -38.3,
+     "tinTrenOnDb": 21.1,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.1,
+     "dinhDb": -4.5,
+     "onNghiDb": -39.1,
+     "tinTrenOnDb": 22.1,
+     "thoDb": 0.1,
+     "soQuangNghi": 7,
+     "segSnrDb": 9.6
+    }
+   },
+   {
+    "ten": "chuỗi nén, AGC TẮT, 64 kb/s khung 20 ms",
+    "kieu": "noi",
+    "kbps": 57.9,
+    "goiMoiGiay": 51,
+    "demRungMs": 34.3,
+    "xuLyNhanMs": 29.6,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "nen",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -25.7,
+     "dinhDb": -11.3,
+     "onNghiDb": -55.9,
+     "tinTrenOnDb": 30.1,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.6,
+     "dinhDb": -6.5,
+     "onNghiDb": -42.9,
+     "tinTrenOnDb": 24.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -18.9,
+     "dinhDb": -6,
+     "onNghiDb": -43.6,
+     "tinTrenOnDb": 24.7,
+     "thoDb": -0.1,
+     "soQuangNghi": 7,
+     "segSnrDb": 6.4
+    }
+   },
+   {
+    "ten": "không chuỗi, AGC trình duyệt, 64 kb/s khung 20 ms",
+    "kieu": "noi",
+    "kbps": 56.7,
+    "goiMoiGiay": 51,
+    "demRungMs": 20,
+    "xuLyNhanMs": 17.5,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": false,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22.1,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -22.1,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -21.4,
+     "dinhDb": -7.2,
+     "onNghiDb": -52.8,
+     "tinTrenOnDb": 31.5,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 9.2
+    }
+   },
+   {
+    "ten": "chuỗi từng khung, AGC tắt, 64 kb/s khung 20 ms",
+    "kieu": "noi",
+    "kbps": 57.1,
+    "goiMoiGiay": 51,
+    "demRungMs": 32.2,
+    "xuLyNhanMs": 29.9,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -25.7,
+     "dinhDb": -11.3,
+     "onNghiDb": -55.9,
+     "tinTrenOnDb": 30.1,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.6,
+     "dinhDb": -3.3,
+     "onNghiDb": -48.9,
+     "tinTrenOnDb": 30.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.9,
+     "dinhDb": -2.6,
+     "onNghiDb": -49.8,
+     "tinTrenOnDb": 31.9,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 9.5
+    }
+   },
+   {
+    "ten": "chuỗi từng khung, AGC tắt, 64 kb/s khung 10 ms",
+    "kieu": "noi",
+    "kbps": 57.4,
+    "goiMoiGiay": 101,
+    "demRungMs": 29.9,
+    "xuLyNhanMs": 23.7,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -25.7,
+     "dinhDb": -11.3,
+     "onNghiDb": -55.9,
+     "tinTrenOnDb": 30.1,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.4,
+     "dinhDb": -3.3,
+     "onNghiDb": -48.9,
+     "tinTrenOnDb": 30.5,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -18,
+     "dinhDb": -2.8,
+     "onNghiDb": -49.9,
+     "tinTrenOnDb": 31.9,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 8.7
+    }
+   },
+   {
+    "ten": "chuỗi từng khung, AGC tắt, 96 kb/s khung 20 ms",
+    "kieu": "noi",
+    "kbps": 96.5,
+    "goiMoiGiay": 51,
+    "demRungMs": 30,
+    "xuLyNhanMs": 25.4,
+    "mic": {
+     "hz": 44100,
+     "kenh": 2,
+     "vong": false,
+     "on": false,
+     "agc": false,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -25.7,
+     "dinhDb": -11.3,
+     "onNghiDb": -55.9,
+     "tinTrenOnDb": 30.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.6,
+     "dinhDb": -3.3,
+     "onNghiDb": -48.9,
+     "tinTrenOnDb": 30.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.7,
+     "dinhDb": -2.9,
+     "onNghiDb": -49,
+     "tinTrenOnDb": 31.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 10.5
+    }
+   },
+   {
+    "ten": "chuỗi từng khung + AGC trình duyệt, 64 kb/s khung 20 ms",
+    "kieu": "noi",
+    "kbps": 56.8,
+    "goiMoiGiay": 51,
+    "demRungMs": 29.8,
+    "xuLyNhanMs": 22.2,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.5,
+     "dinhDb": -3.1,
+     "onNghiDb": -47.9,
+     "tinTrenOnDb": 29.4,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.8,
+     "dinhDb": -2.2,
+     "onNghiDb": -49.5,
+     "tinTrenOnDb": 31.7,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 9.4
+    }
+   },
+   {
+    "ten": "chuỗi từng khung + AGC trình duyệt, 96 kb/s khung 20 ms",
+    "kieu": "noi",
+    "kbps": 96.5,
+    "goiMoiGiay": 51,
+    "demRungMs": 29.8,
+    "xuLyNhanMs": 23.2,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.2,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.5,
+     "dinhDb": -3.1,
+     "onNghiDb": -47.9,
+     "tinTrenOnDb": 29.4,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.7,
+     "dinhDb": -3,
+     "onNghiDb": -48.7,
+     "tinTrenOnDb": 31,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 10.7
+    }
+   },
+   {
+    "ten": "chuỗi từng khung + AGC trình duyệt, 64 kb/s khung 10 ms",
+    "kieu": "noi",
+    "kbps": 56.9,
+    "goiMoiGiay": 101,
+    "demRungMs": 30,
+    "xuLyNhanMs": 26.2,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.5,
+     "dinhDb": -3.1,
+     "onNghiDb": -47.9,
+     "tinTrenOnDb": 29.4,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.9,
+     "dinhDb": -2.3,
+     "onNghiDb": -49.5,
+     "tinTrenOnDb": 31.6,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 9.5
+    }
+   },
+   {
+    "ten": "SAU (mặc định mới của thư viện)",
+    "kieu": "noi",
+    "kbps": 56.7,
+    "goiMoiGiay": 51,
+    "demRungMs": 30,
+    "xuLyNhanMs": 26.2,
+    "mic": {
+     "hz": 48000,
+     "kenh": 1,
+     "vong": false,
+     "on": false,
+     "agc": true,
+     "bac": 0,
+     "treThuMs": 10,
+     "chuoi": true,
+     "kieu": "khung",
+     "hzXuLy": 48000
+    },
+    "noiMic": {
+     "rmsNoiDb": -22,
+     "dinhDb": -7.6,
+     "onNghiDb": -51.3,
+     "tinTrenOnDb": 29.3,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiChuoi": {
+     "rmsNoiDb": -18.3,
+     "dinhDb": -3.1,
+     "onNghiDb": -47.9,
+     "tinTrenOnDb": 29.6,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": null
+    },
+    "noiNhan": {
+     "rmsNoiDb": -17.8,
+     "dinhDb": -2.2,
+     "onNghiDb": -49.5,
+     "tinTrenOnDb": 31.7,
+     "thoDb": 0,
+     "soQuangNghi": 7,
+     "segSnrDb": 7.5
+    }
+   }
+  ]
+ }
+}

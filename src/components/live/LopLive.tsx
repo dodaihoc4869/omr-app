@@ -210,6 +210,18 @@ function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, k
   )
 }
 
+/** «Trễ ~N ms» trong khay (thầy 11/11 «tức thì»): trễ tiếng ƯỚC TÍNH miệng thầy → máy này, đọc lại 2 giây một lần lúc khay đang mở. Chưa đo được ⇒ không hiện. */
+function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
+  const [ms, setMs] = useState<number | null>(null)
+  useEffect(() => {
+    let hen: ReturnType<typeof setTimeout> | undefined
+    const doc = () => { setMs(le.current?.treUocTinh?.() ?? null); hen = setTimeout(doc, 2000) }
+    doc()
+    return () => clearTimeout(hen)
+  }, [le])
+  return ms == null ? null : <small className="lv-tre" title="Ước tính, chưa gồm loa / tai nghe">Trễ ~{Math.round(ms / 5) * 5} ms</small>
+}
+
 export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
@@ -299,7 +311,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   /** Các dòng của khay — dùng chung cho bảng live và màn câu hỏi. `dau` = dòng đầu (bảng live: sóng «Thầy đang nói» + vạch mạng). */
   const dongKhay = (dau: ReactNode) => (
     <>
-      <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}</div>
+      <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}{nghe && !tt.nghi ? <TreTieng le={le} /> : null}</div>
       {GIAO_DIEN_DOT_2 ? (
         // Nút chính màu đội: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» (ảnh 28)
         <button type="button" className={`lv-tay${tt.tay ? ' gio' : ''}`} aria-pressed={tt.tay} disabled={!tayDuoc || matMang} onClick={doiTay}>
