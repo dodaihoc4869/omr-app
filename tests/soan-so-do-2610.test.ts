@@ -321,7 +321,7 @@ describe('soạn lô', () => {
     const ai = { run: vi.fn(async (_m: string, _i: unknown) => ({ output_text: '{"a":1}' })) }
     vi.useFakeTimers({ toFake: ['setTimeout'] })
     try {
-      const goi = M.taoGoiGeminiLo({ GEMINI_API_KEY: 'k', AI: ai } as never)
+      const goi = M.taoGoiGeminiLo({ ...taoD1That().env, GEMINI_API_KEY: 'k', AI: ai } as never)
       const p1 = goi({ heThong: 'h', luot: [{ vai: 'user', chu: 'x' }], model: M.MODEL_MAC_DINH })
       await vi.runAllTimersAsync()
       expect(await p1).toMatchObject({ ok: true, model: M.MODEL_CF })
@@ -330,6 +330,27 @@ describe('soạn lô', () => {
       expect(soGemini).toBe(truoc)
       expect(ai.run).toHaveBeenCalledTimes(2)
       expect(ai.run.mock.calls[0]![1]).toMatchObject({ instructions: 'h', input: [{ role: 'user', content: 'x' }] })
+    } finally { globalThis.fetch = goc; vi.useRealTimers() }
+  })
+
+  it('11/11: Workers AI có trần mỗi ngày trong phần miễn phí; hết trần / công tắc tắt ⇒ 429, không gọi; sang ngày mới đếm lại', async () => {
+    const T = await import('../server/src/tran-workers-ai')
+    const goc = globalThis.fetch
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({ error: { message: 'quota' } }), { status: 429 })) as typeof fetch
+    const ai = { run: vi.fn(async () => ({ output_text: '{"a":1}', usage: { input_tokens: 20_000, output_tokens: 60_000 } })) }
+    vi.useFakeTimers({ toFake: ['setTimeout'] })
+    try {
+      const d = taoD1That(), env = { ...d.env, GEMINI_API_KEY: 'k', AI: ai }
+      expect(T.neuronCua(20_000, 60_000)).toBe(Math.ceil((20_000 * 31_818 + 60_000 * 68_182) / 1e6)) // ≈ 4 727 neurons / lượt
+      const goi = M.taoGoiGeminiLo(env as never), hoi = () => goi({ heThong: 'h', luot: [{ vai: 'user', chu: 'x' }], model: M.MODEL_MAC_DINH })
+      const p1 = hoi(); await vi.runAllTimersAsync(); expect(await p1).toMatchObject({ ok: true })
+      expect(await hoi()).toMatchObject({ ok: true }) // 4 727 < 9 000 ⇒ còn gọi
+      expect(await hoi()).toMatchObject({ ok: false, http: 429 }) // 9 454 ≥ 9 000 ⇒ dừng
+      expect(ai.run).toHaveBeenCalledTimes(2)
+      expect(await T.conTranWorkersAi(env as never, Date.now() + 86_400_000)).toBe(true) // ngày mới
+      d.sql.exec("INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) VALUES('workers_ai_tat','1','x')")
+      expect(await T.conTranWorkersAi(env as never, Date.now() + 86_400_000)).toBe(false) // công tắc tắt
+      expect(await T.conTranWorkersAi({} as never)).toBe(false) // không đọc được ⇒ đóng cửa
     } finally { globalThis.fetch = goc; vi.useRealTimers() }
   })
 

@@ -251,11 +251,13 @@ async function docQidDeBaoVe(env: Env, bankR2: string, khoa: string): Promise<re
  *  thì bỏ, không khoá câu nữa. Ca trước mốc mà vẫn đang MỞ thì vẫn khoá như cũ (còn em có thể đang làm). */
 export const MOC_KHOA_CA='2026-09-28T17:00:00.000Z'
 /** Các ca ĐANG BẢO VỆ đề (mở / chưa công bố / còn làm được) — phần chọn ca tách khỏi `protectedQuestions` NGUYÊN VĂN (cùng truy vấn, cùng bộ lọc) để `protectedQuestionsTruCa` dùng chung. */
-async function caDangBaoVe(env:Env,now:number):Promise<Row[]> {
+export async function caDangBaoVe(env:Env,now:number):Promise<Row[]> {
+  // 11/11 (hoá đơn Cloudflare — hàng đọc D1, đo ~271 triệu hàng / 10 giờ): ba phép đếm lượt KHÔNG chạy cho ca ĐÃ ĐÓNG (CASE của SQLite không chạy nhánh bỏ).
+  // Ca «dong» thì số đếm không đổi kết quả lọc dưới: cong_bo ngay/ca_lop_xong là đã công bố, còn lại vẫn bảo vệ; canStillTest cần trang_thai='mo'.
   const all=await env.DB.prepare(`SELECT ca.ma_ca,ca.bank_r2,ca.cap_nhat_luc,ca.trang_thai,ca.cong_bo,ca.het_han_vao,ca.thoi_gian_phut,ca.loai,ca.han_nop,ca.bat_dau,
-    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) entered,
-    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') submitted,
-    (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) active
+    CASE WHEN ca.trang_thai<>'dong' THEN (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) ELSE 0 END entered,
+    CASE WHEN ca.trang_thai<>'dong' THEN (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') ELSE 0 END submitted,
+    CASE WHEN ca.trang_thai<>'dong' THEN (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) ELSE 0 END active
     FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca`).bind(new Date(now).toISOString(),MOC_KHOA_CA).all<Row>()
   return all.results.filter(ca=>{
     const released=ca.cong_bo==='ngay'||ca.cong_bo==='ca_lop_xong'&&(ca.trang_thai==='dong'||Number(ca.entered)>0&&Number(ca.submitted)>=Number(ca.entered))

@@ -21,6 +21,7 @@ import type { BanSoDo, BuocTinh, HienTuong, KetQuaCong, NutSoDo, SoDo, ThuaSo } 
 import { LY_DO_THIEU_SO_DO, docSo, kiemCong } from './so-do-cong'
 import { suaDapAnKho } from './sua-dap-an-kho'
 import { quaTram } from './tram-gemini'
+import { TRAN_NEURON_NGAY, conTranWorkersAi, ghiDungWorkersAi } from './tran-workers-ai'
 import { docCauEmSai } from './hoc-lieu-may-soan'
 import { laCauTuLuan, laMotSoPhanIII } from '../../src/lib/cau-tu-luan'
 import { PHIEN_BAN_SO_DO, chuCauHoi, chuCauHoiMu, chuThuLai, chuThuLaiAnDu, chuThuLaiKhuon, chuThuLaiTrinhBay, chuThuLaiLo, chuThuLaiThieu, loiDanSoDo, type CauCanSoan } from './soan-so-do-loi-dan'
@@ -226,9 +227,16 @@ export function taoGoiGeminiLo(env: Env, hanMs = 60_000): GoiMoHinh {
   // Một lượt soạn = một bộ gọi: Gemini đã 429 (cả model mạnh) một lần ⇒ các câu sau đi thẳng Workers AI, không đốt thêm lượt gọi Gemini.
   let geminiHet = !key
   const cf = env.AI
-  const quaCf = async (heThong: string, luot: readonly LuotHoi[], loiGemini: KetQuaMoHinh) => (cf ? await goiWorkersAi(cf, { heThong, luot }) : loiGemini)
+  // 11/11: Workers AI có TRẦN mỗi ngày trong phần miễn phí (tran-workers-ai.ts) — hết trần ⇒ trả như hết hạn mức (429), máy soạn chạy tiếp hôm sau.
+  const goiCf = async (ai: NonNullable<Env['AI']>, yc: { heThong: string; luot: readonly LuotHoi[] }): Promise<KetQuaMoHinh> => {
+    if (!(await conTranWorkersAi(env))) return { ok: false, http: 429, loi: `HTTP 429 workers-ai hết phần miễn phí hôm nay (trần ${TRAN_NEURON_NGAY} neurons/ngày)` }
+    const kq = await goiWorkersAi(ai, yc)
+    if (kq.ok) await ghiDungWorkersAi(env, kq.vao, kq.ra)
+    return kq
+  }
+  const quaCf = async (heThong: string, luot: readonly LuotHoi[], loiGemini: KetQuaMoHinh) => (cf ? await goiCf(cf, { heThong, luot }) : loiGemini)
   return async ({ heThong, luot, model }) => {
-    if (geminiHet && cf) return await goiWorkersAi(cf, { heThong, luot })
+    if (geminiHet && cf) return await goiCf(cf, { heThong, luot })
     const body = JSON.stringify({
       systemInstruction: { parts: [{ text: heThong }] },
       contents: luot.map((l) => ({ role: l.vai, parts: [{ text: l.chu }] })),

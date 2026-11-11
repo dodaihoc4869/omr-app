@@ -113,6 +113,9 @@ enabled = true
 
 [observability.logs]
 enabled = true
+# 11/11 (hoá đơn Cloudflare — thầy «dùng bản 5 đô/tháng»): Workers Logs gói 5 USD gồm 20 triệu sự kiện/tháng, vượt 0,60 USD/triệu;
+# ~14 triệu lượt gọi/tháng × (1 dòng lượt gọi + các dòng console) vượt mức ⇒ giữ 20 % lượt gọi (ngẫu nhiên). Nhật ký vẫn BẬT để soi sự cố.
+head_sampling_rate = 0.2
 
 # Bảng tin phụ huynh: 00:01 giờ Việt Nam hằng ngày.
 [triggers]
