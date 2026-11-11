@@ -367,7 +367,7 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-tn { gap: 6px; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-pa { min-height: 46px; padding-block: 4px; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-pa-chu { flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--tr-chu-2); }
-:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra :is(.ht2-lam-pa-chu img, :where(.bpu-hs[data-ngang]) .ht2-lam-pa-khoi > .cau-hinh, :where(.bpu-hs[data-ngang]) .ht2-lam-y-chu img, :where(.bpu-hs[data-ngang]) .ht2-lam-y > .cau-hinh) { display: none; }
+:where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra :is(.ht2-lam-pa-chu img, .ht2-lam-pa-khoi > .cau-hinh, .ht2-lam-y-chu img, .ht2-lam-y > .cau-hinh) { display: none; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y { flex-direction: row; align-items: center; gap: 12px; padding-block: 5px; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-ds { padding-inline: 2px; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-dau { flex: 1 1 auto; min-width: 0; align-items: center; gap: 8px; }

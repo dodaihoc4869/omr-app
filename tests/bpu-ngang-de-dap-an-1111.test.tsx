@@ -29,7 +29,9 @@ function luatTrong(dau: string): string[] {
   const het = KHOI.indexOf('\n}', i)
   return KHOI.slice(i + dau.length, het).split('\n').map((x) => x.trim()).filter(Boolean)
 }
-const sinhDoi = (goc: string, luat: string) => { const [sel, than] = [luat.slice(0, luat.indexOf('{')), luat.slice(luat.indexOf('{'))]; return sel.split(',').map((x) => `:where(${goc}) ${x.trim()}`).join(', ') + ' ' + than }
+/** Tách danh sách bộ chọn ở dấu phẩy NGOÀI ngoặc (`:is(a, b)` là một bộ chọn). */
+const tachBoChon = (sel: string): string[] => { const ra = ['']; let d = 0; for (const c of sel) { if (c === ',' && !d) { ra.push(''); continue } d += c === '(' ? 1 : c === ')' ? -1 : 0; ra[ra.length - 1] += c } return ra }
+const sinhDoi = (goc: string, luat: string) => { const [sel, than] = [luat.slice(0, luat.indexOf('{')), luat.slice(luat.indexOf('{'))]; return tachBoChon(sel).map((x) => `:where(${goc}) ${x.trim()}`).join(', ') + ' ' + than }
 
 describe('kiểu: luật ngang + bản sinh đôi cho màn xoay hình (luat-man-live.tsx đặt data-ngang / data-thap)', () => {
   it('ngưỡng một nguồn: hai cột từ 640 px (= màn chặng RONG_NGANG_MIN), máy thấp ≤ 500 px; không còn ngưỡng 700 cũ', () => {
