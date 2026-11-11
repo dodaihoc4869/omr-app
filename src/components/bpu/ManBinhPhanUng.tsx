@@ -15,7 +15,8 @@ import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
 import { cheLiveCua, manEmXa, useHuongLive } from './luat-man-live'
 import { YDeNgang, useThanNgang } from './bo-cuc-ngang'
-import { NutGuiNoi } from './nut-gui-noi'
+import { useTheBienDong } from './the-bien-dong'
+export { THE_BD_MS } from './the-bien-dong'
 import { coQuyenTatMan, conKhoaXoay, dangChiaDoi, dangXinQuyen, docQuyenTatMan, khoaXoay, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
 import KetQuaLenBangEm from './KetQuaLenBangEm'
@@ -148,31 +149,10 @@ export function SoKj({ v, className }: { v: number; className?: string }) {
   }, [v])
   return <b ref={ref} className={`bpu-so${className ? ` ${className}` : ''}`} data-huong={huong ?? undefined} />
 }
-export const THE_BD_MS = 2500
 /** THẺ BIẾN ĐỘNG kJ của em (thầy 09/11): mục `bienDongEm` có `id` mới ⇒ thẻ nhỏ màu đúng (xanh) / sai (đỏ) + ngọn lửa đội + lý do, bay lên rồi mờ (~2,5 s).
  *  Lần đầu nhận view (mở màn / nối lại) chỉ ghi nhớ `id`, không phát lại chuyện cũ. Tối đa 3 thẻ cùng lúc. */
 export function TheBienDong({ ds }: { ds: readonly BienDong[] | undefined }) {
   return <DsTheBienDong the={useTheBienDong(ds)} />
-}
-/** Trạng thái thẻ biến động (tách khỏi chỗ vẽ — 10/11: màn em vẽ thẻ ngay DƯỚI thanh đội đang hiện, trong hay ngoài lớp che, không mất thẻ khi đổi chỗ). */
-function useTheBienDong(ds: readonly BienDong[] | undefined): BienDong[] {
-  const daThay = useRef<number | null>(null)
-  const [the, setThe] = useState<BienDong[]>([])
-  const hen = useRef<ReturnType<typeof setTimeout>[]>([])
-  useEffect(() => {
-    if (!ds) return
-    const max = ds.reduce((m, x) => Math.max(m, x.id), 0)
-    if (daThay.current == null) { daThay.current = max; return }
-    const moi = ds.filter((x) => x.id > daThay.current!)
-    daThay.current = Math.max(daThay.current, max)
-    if (!moi.length) return
-    setThe((c) => [...c, ...moi].slice(-3))
-    // Mỗi thẻ tự gỡ đúng ~2,5 s sau khi hiện (không xếp hàng chờ thẻ trước).
-    const ids = new Set(moi.map((x) => x.id))
-    hen.current.push(setTimeout(() => setThe((c) => c.filter((x) => !ids.has(x.id))), THE_BD_MS))
-  }, [ds])
-  useEffect(() => () => { for (const h of hen.current) clearTimeout(h) }, [])
-  return the
 }
 /** Chồng thẻ biến động: nằm trong `.bpu-bd-neo` (mốc cao 0 đặt ngay dưới thanh đội / dải kết quả) ⇒ thẻ nổi XUỐNG phía dưới, không bao giờ đè thanh đội;
  *  các thẻ xếp cột có khe, không đè nhau. */
@@ -704,6 +684,31 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       {lopLive}
     </div>,
     document.body,
+  )
+}
+
+/** NÚT GỬI NỔI (thầy 10/11 «chuyển nút gửi đáp án sang mép phải giữa màn hình, khi học sinh chọn hết thì tự bật ra, còn chưa chọn hết thì ẩn đi»):
+ *  viên thuốc dọc màu đội dính mép phải, giữa chiều cao màn (`position: fixed`). Chọn đủ (trắc nghiệm: một phương án; đúng–sai: đủ 4 ý; trả lời ngắn: có số)
+ *  ⇒ trượt từ mép vào + rõ dần + nảy nhẹ; bỏ chọn bớt ⇒ thu lại vào mép. Lần ĐẦU bật ra trong lượt ⇒ quầng sáng nhịp 2 lần (lớp `quang` giữ suốt lượt nên
+ *  bật lại không nhấp nháy nữa; lượt mới ⇒ `key` mới ⇒ trạng thái mới). Lúc ẩn: vẫn nằm trong cây (để trượt ra / vào) nhưng `inert` + `aria-hidden` +
+ *  `disabled` ⇒ không chạm, không Tab, máy đọc màn hình bỏ qua.
+ *  KHÔNG CHE phương án / ý đúng–sai / bàn phím số: thân màn chừa lề phải đủ rộng cho nút (`.bpu-hs.co-gui .bpu-hs-than`, chừa suốt lúc có nút — kể cả lúc
+ *  nút ẩn — để bật / ẩn không làm chữ chạy dòng dưới tay em). Nhờ lề ấy bàn phím số cũng nằm gọn bên trái nút ⇒ không cần đặt nút riêng trên bàn phím. */
+function NutGuiNoi({ hien, tuLuan, onGui }: { hien: boolean; tuLuan: boolean; onGui: () => void }) {
+  // Gắn vào màn ở trạng thái ẨN rồi mới bật (một nhịp sau) ⇒ câu tự luận / câu vừa tới đã đủ chọn vẫn thấy nút trượt vào, không hiện bụp.
+  const [vao, setVao] = useState(false)
+  useEffect(() => { setVao(true) }, [])
+  const mo = hien && vao
+  const [quang, setQuang] = useState(false)
+  useEffect(() => { if (mo) setQuang(true) }, [mo])
+  return (
+    <button type="button" className={`bpu-gui-noi${quang ? ' quang' : ''}`} data-hien={mo} aria-label={tuLuan ? 'Em làm xong' : 'Gửi đáp án'}
+      aria-hidden={mo ? undefined : true} inert={!mo} tabIndex={mo ? undefined : -1} disabled={!mo} onClick={onGui}>
+      {tuLuan
+        ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.6 4.6L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3L10.2 13.8M21 3l-6.6 18-4.2-7.2L3 9.6 21 3z" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+      <span>{tuLuan ? 'Xong' : 'Gửi'}</span>
+    </button>
   )
 }
 
