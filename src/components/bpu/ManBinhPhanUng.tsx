@@ -9,7 +9,7 @@
 // màn TỰ CHE «Đã gửi · Nhìn lên bảng để chữa bài» — không còn đề, không nút mở; chỉ mở khi thầy đẩy CÂU MỚI (số lượt đổi). Thầy mở đáp án ⇒ vẫn che,
 // hiện kết quả trên lớp che: em chọn đúng XANH, sai ĐỎ, đáp án đúng luôn XANH.
 // Máy em chỉ nhận `viewEm` từ phòng — không có đáp án tới khi thầy mở. Màn chặng đang làm vẫn nằm nguyên bên dưới (tấm phủ), xong buổi về đúng chỗ.
-import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
+import { Suspense, lazy, startTransition, useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
@@ -218,7 +218,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const [noi, setNoi] = useState(false)
   /** Khoá lượt (số:giờ mở) em vừa BẤM GỬI trên máy (che ngay, không chờ phòng báo lại — mất mạng vẫn che); lượt mới ⇒ số khác ⇒ tự mở. */
   const [cheSo, setCheSo] = useState('')
-  /** Khoá lượt đang chạy hiệu ứng gửi (tia lửa bay lên) — xong ~1,15 s thì đề bên dưới mới gỡ khỏi màn. */
+  /** Khoá lượt đang chạy hiệu ứng gửi — xong ~1,15 s thì gỡ đề khỏi màn. */
   const [bay, setBay] = useState('')
   /** Đã báo phòng «rời» ⇒ app hiện lại thì gửi `ve`. */
   const daBaoRoi = useRef(false)
@@ -496,13 +496,15 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   // 09/11 thầy «che luôn cả em chưa gửi»: thầy mở đáp án ⇒ MỌI máy che (em chưa gửi cũng chỉ thấy kết quả, không đề, không lời giải) — nhìn lên bảng chữa bài.
   const che = !!l && (!!l.emTra || cheSo === khoaLuot || l.pha === 'mo')
   const dangBay = !!l && bay === khoaLuot
+  const daGuiLuot = useRef('') // chặn bấm đúp
   const guiTra = () => {
-    if (!l || !duChon || che) return
+    if (!l || !duChon || che || daGuiLuot.current === khoaLuot) return
+    daGuiLuot.current = khoaLuot
     gui({ t: 'tra', chon: l.tuLuan ? 'xong' : chon })
-    setCheSo(khoaLuot)
-    if (!tinhLang()) setBay(khoaLuot)
+    // che + tia lửa nặng: vẽ sau nhịp đầu ⇒ nút lún / rung ngay
+    startTransition(() => { setCheSo(khoaLuot); if (!tinhLang()) setBay(khoaLuot) })
     try { navigator.vibrate?.([18, 40, 26]) } catch { /* máy không rung */ }
-    // toàn màn hình + xin quyền: lớp ngoài (`chamDau`) lo — lần bấm này nổi bọt lên đó.
+    // toàn màn hình + quyền: `chamDau` (lớp ngoài) lo.
   }
   // HẾT GIỜ mà em chưa gửi (thầy 07/11): khoá, câu để trống — không gửi muộn, không đoán bừa.
   const hetGio = !!l?.han && l.pha === 'tra-loi' && nay >= l.han && !l.emTra
