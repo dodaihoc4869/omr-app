@@ -12,7 +12,7 @@
 //   · Nhiều ngày (12–62 cột): máy tính cuộn ngang TRONG khung (cột tên dính trái) và mở sẵn ở ngày gần nhất + ba cột tổng, một dòng nói cuộn
 //     sang trái để xem ngày cũ; điện thoại mỗi em một thẻ, dải ô ngày xuống dòng (không tràn trang).
 //   · Danh sách dài: 50 em mỗi đợt + "Xem thêm" (chuẩn B16). Mảnh riêng, chỉ tải khi thầy mở thẻ (ngoài precache, vite.config.ts).
-import { chuNoThay } from '../../lib/no-cau-xem'
+import { chuNoThay, docNoCauXem } from '../../lib/no-cau-xem'
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowDownWideNarrow, ChevronRight, RefreshCw, Search } from 'lucide-react'
@@ -86,7 +86,7 @@ function DongEm({ e, ngay, onMo }: { e: EmBaiHangNgay; ngay: readonly string[]; 
   const lon = e.ngayThieuNhieuNhat
   const soNgayQua = e.ngay.filter((n) => !n.homNay).length
   const homNay = e.ngay.find((n) => n.homNay)
-  const no = e.noCau ? chuNoThay(e.noCau) : null
+  const nc = docNoCauXem(e.noCau), no = nc ? chuNoThay(nc) : null
   return (
     <tr className="gvv2-bhn-hang" data-sbd={e.sbd}>
       <th scope="row" className="gvv2-bhn-em-o">
@@ -105,7 +105,7 @@ function DongEm({ e, ngay, onMo }: { e: EmBaiHangNgay; ngay: readonly string[]; 
               {e.lop ? `${e.lop} · ` : ''}SBD {e.sbd}
             </small>
             {no && (
-              <small className="gvv2-bhn-no gvv2-so" data-vung="no-cau" data-het={e.noCau!.phaiTraHet ? 'true' : undefined} title={no.day}>
+              <small className="gvv2-bhn-no gvv2-so" data-vung="no-cau" data-het={nc!.phaiTraHet ? 'true' : undefined} title={no.day}>
                 {no.ngan}
               </small>
             )}
@@ -323,10 +323,10 @@ export default function TheBaiHangNgay({ khoiDau = null }: { khoiDau?: number | 
           ) : (
             <>
               {(() => {
-                const dangNo = loc.filter((e) => e.noCau)
+                const dangNo = loc.flatMap((e) => docNoCauXem(e.noCau) ?? [])
                 return dangNo.length > 0 ? (
                   <p className="gvv2-bhn-ghi gvv2-so" data-vung="tong-no-cau">
-                    <b>{dangNo.length} em đang nợ câu</b> · tổng {dangNo.reduce((t, e) => t + e.noCau!.con, 0)} câu (số nợ ghi dưới tên em; nợ còn lại mỗi đêm cộng 5 % lãi).
+                    <b>{dangNo.length} em đang nợ câu</b> · tổng {dangNo.reduce((t, n) => t + n.con, 0)} câu (số nợ ghi dưới tên em; nợ còn lại mỗi đêm cộng 5 % lãi).
                   </p>
                 ) : null
               })()}
