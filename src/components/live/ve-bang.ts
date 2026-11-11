@@ -10,7 +10,8 @@
 //   · BẢNG ĐEN CUỘN: nét bảng (mã «b_…», y tính theo bảng, có thể > 1) đã chốt nằm trong một KHUNG CẮT đặt đúng ô bảng đen; bên trong là một canvas cao
 //     2,2 lần ô bảng, dời bằng transform (chỉ việc của bộ ghép hình, không vẽ lại) ⇒ cuộn mượt cả trên máy yếu. Canvas chỉ vẽ lại khi tầm nhìn sắp ra
 //     khỏi nó, vào lúc đã đứng yên. Máy em TỰ TRÔI THEO BÚT của thầy: đầu nét / con trỏ ra khỏi tầm nhìn thì trôi tới (`theo`).
-//     Nét trên giấy đề (mã thường) đứng yên như cũ. Không thêm loại khung mạng nào: độ cuộn suy ra từ chính toạ độ nét.
+//     Nét trên giấy đề (mã thường) đứng yên như cũ. Không thêm loại khung mạng nào: độ cuộn của thầy tới qua gói con trỏ có x = 2 (`datBut(…, cuon)`)
+//     ⇒ máy em soi đúng chỗ thầy đang soi; chưa nhận được (em vào muộn, xem lại buổi live) thì suy ra từ chính toạ độ nét / con trỏ.
 //   · CÂY BÚT của thầy (thay chấm tròn vàng) vẽ ngay trên lớp «đang viết», cùng lượt với đuôi nét (tro-but.ts): `datBut` mỗi khung trước `veSong`.
 import type { KhungBut, LoiBut, NetBut, SuKienBut, XuLyBut } from '../../lib/but-bang-loi'
 import { giaiTrang, VUNG_MAC_DINH, type O4 } from './bo-cuc'

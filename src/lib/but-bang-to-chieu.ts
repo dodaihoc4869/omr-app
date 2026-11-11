@@ -455,13 +455,13 @@ ${JS_LOI_BUT}
 ` + /* Thanh bút nằm trên mép phải tấm giấy đề, sát cột bảng đen (không che thẻ tên em); tờ không có cột bảng ⇒ giữa mép trên như cũ. */ `
 ` + /* Đo chỗ cột SO VỚI ĐỢT (đợt đang trượt vào vẫn ra đúng số), và đo lại một nhịp sau khi tờ xếp xong. */ `
   function datThanh() {
-    var W = window.innerWidth, doi = S.but && KH && !N ? datBang() : false, co = S.but && !!B;
+    var W = window.innerWidth, doi = KH && !N ? datBang() : false, co = S.but && !!B;
     butCu.style.left = co ? 'auto' : ''; butCu.style.transform = co ? 'none' : ''; butCu.style.right = co ? Math.round(W - B[0] * W + u() * 0.9) + 'px' : '';
     oThanh = S.but ? butCu.getBoundingClientRect() : null;
     if (doi) veLai(); else veRay();
   }
   function henThanh() { datThanh(); if (S.but) { clearTimeout(hThanh); hThanh = setTimeout(datThanh, 600); } }
-  ['mc-doi-pha', 'mc-bo-cuc-xong'].forEach(function (t) { document.addEventListener(t, function () { if (S.but) henThanh(); }); });
+  ['mc-doi-pha', 'mc-bo-cuc-xong'].forEach(function (t) { document.addEventListener(t, function () { if (S.but || KH) henThanh(); }); });
   function capNut() {
     var a = butCu.querySelector('[data-lui]'), b = butCu.querySelector('[data-toi]'), c = butCu.querySelector('[data-xoa]');
     if (a) a.disabled = !so.coLui(); if (b) b.disabled = !so.coToi(); if (c) c.disabled = !so.ds().length;

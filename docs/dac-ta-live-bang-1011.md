@@ -316,6 +316,23 @@ Thầy: «Khi bấm nút live, khi chuyển câu thì vẫn giữ live tiếng v
 - **Đồng bộ tiếng–nét:** hai kênh đi cùng đường mạng nên phần mạng tự triệt. Máy em đọc `getStats()` mỗi giây lấy trễ đệm tiếng, cộng ~45 ms thu + mã hoá và trễ loa, ra trễ tiếng ước lượng; đặt D nét = kẹp(trễ tiếng − 60, D theo jitter, 150). Nét đi trước tiếng ≤ 80 ms. Mốc tham chiếu: ITU-R BT.1359 (hình sớm hơn tiếng tới ~125 ms người xem chưa nhận ra).
 - Máy yếu: vẽ 30 khung/giây, bỏ quầng con trỏ, D + 16 ms.
 
+### 4.4b Sửa sau khi thầy thử máy thật 11/11 (nhánh `claude/but-dong-bo-1111`) — chỗ khác với 4.4 thì theo mục này
+
+Thầy: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút tức thì mượt mà cực mượt mà» · «thay nút vàng bằng một cái bút nhỏ» · «bảng đen khi live có cuộn vô hạn». Số đo trước / sau: `docs/do-but-dong-bo-1111.md`.
+
+- **Mốc phát là một đồng hồ chạy**, không còn là «bây giờ − D» cứng: mỗi khung tiến `dt × nhịp`, nhịp 0,65–1,6 để bám đích «bây giờ − lệch − D». Nét đang viết hết điểm (lô về muộn, mất gói) ⇒ đồng hồ đứng ở điểm mới nhất; lô tới thì chạy nhanh hơn một chút cho tới khi bắt kịp. Không dồn cả lô vào một khung.
+- **D** = số lớn hơn giữa (p95 dao động + khoảng cách lô p90) và p95 «độ cần» của từng lô (giờ tới − lệch − giờ của điểm mới đầu tiên trong lô), + 4 ms; vẫn kẹp 30–150 ms, đổi ≤ 2 ms mỗi khung.
+- **Gói cuối của nét** máy thầy gửi DataChannel thêm một lần. Vẫn mất ⇒ bản chốt từ sổ nét VÁ điểm thiếu cho nét dở phát nốt (`DemPhat.va`), không xoá nét dở vẽ lại.
+- **Máy thầy gửi điểm ngay sau khung vẽ** (trước: chờ thêm 16 ms), hai gói cách nhau ≥ 12 ms. Con trỏ lơ lửng báo mỗi khung (trước: 20 lần / giây).
+- **Con trỏ = cây bút nhỏ**, vẽ trên lớp «đang viết» cùng lượt với đuôi nét (không còn là phần tử DOM dời mỗi khung — đo CPU ×4 / ×6 thấy mỗi lần dời làm trang tính lại kiểu). Thư viện trả MỘT vị trí `KhungLiveEm.but = { x, y, cham, mau, net }`: đang viết thì ngòi ở đúng đầu nét; nhấc bút thì trượt từ cuối nét tới chỗ lơ lửng kế tiếp (trước: con trỏ đứng ở chỗ lơ lửng cũ suốt nét rồi nhảy).
+- **Đuôi nét dở vẽ đúng dáng nét xong** (đã thon cuối) ⇒ nét chốt không đổi hình.
+- **Bảng đen cuộn — KHÔNG thêm loại khung nào, chỉ thêm quy ước:**
+  - nét bắt đầu trong cột bảng đen mang mã bắt đầu bằng `b_`; toạ độ `y` của nó = y màn + độ cuộn của bảng, tính bằng số lần bề dọc cửa sổ thầy ⇒ `y` có thể > 1 (tối đa 160; `u24 × 100000` chứa tới 167). Khung `0x11` (nét xong) và `0x21` (điểm đang viết) giữ nguyên định dạng. Nét trên giấy đề mã như cũ, `y` trong 0..1.
+  - gói con trỏ `0x22` có **`x > 1,5`** (máy thầy gửi `x = 2`) không phải con trỏ mà là ĐỘ CUỘN của bảng (`y`): máy em soi đúng độ cuộn đó (`KhungLiveEm.cuon`). Máy thầy gửi khi cuộn đổi và nhắc lại mỗi 0,5 giây lúc bút lơ lửng. Bản máy em cũ sẽ coi nó là con trỏ nằm ngoài màn (vô hại).
+  - chưa nhận được độ cuộn (em vào muộn, xem lại buổi live chỉ có sổ nét) ⇒ lớp vẽ tự trôi theo bút: đầu nét / nét vừa tới ra ngoài tầm nhìn thì trôi cho nó về khoảng giữa bảng.
+  - máy em: nét bảng đã chốt nằm trong một khung cắt đặt đúng ô bảng đen, canvas cao 2,2 lần ô bảng dời bằng `transform`; chỉ vẽ lại khi tầm nhìn sắp ra khỏi canvas.
+  - máy thầy cuộn bằng: lăn chuột / hai ngón trên bảng đen, kéo vạch mảnh ở mép phải bảng (bút kéo được), viết sát đáy rồi ngừng 0,9 giây thì bảng tự trôi lên. Đang viết thì không cuộn. Độ cuộn nhớ theo đợt.
+
 ### 4.5 Vào live tức thì
 
 1. Thầy mở tờ chiếu có phòng, công tắc «Sẵn sàng live» bật (tự bật nếu buổi trước của lớp đã dùng Live): app thầy nạp lười mảnh live, phát hai track CÂM (nguồn Web Audio, không đụng mic, đèn mic không sáng) + kênh «net», gửi `live-san`.

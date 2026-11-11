@@ -259,6 +259,21 @@ if (coCuon) {
   await ngu(400)
   await luuAnh(await thay.screenshot({ type: 'png' }), '9-bang-da-cuon-thay.jpg')
   await luuAnh(await em.screenshot({ type: 'png' }), '9-bang-da-cuon-may-em.jpg')
+  // kéo VẠCH CUỘN ở mép phải ô bảng (bút / chuột): kéo xuống 80 px ⇒ bảng đi tiếp xuống 120 px; hoàn tác sau khi cuộn vẫn đúng nét
+  const o = await to.locator('body').evaluate(() => window.__mcBut.vung().bang)
+  const cuonTruocKeo = await to.locator('body').evaluate(() => window.__mcBut.cuon())
+  const xk = o[2] * 1366 - 8, yk = 300
+  await cdpThay.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: xk, y: yk, button: 'left', buttons: 1, clickCount: 1, pointerType: 'pen', force: 0.5 })
+  for (let i = 1; i <= 8; i++) { await cdpThay.send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: xk, y: yk + i * 10, button: 'left', buttons: 1, pointerType: 'pen', force: 0.5 }); await ngu(16) }
+  await cdpThay.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: xk, y: yk + 80, button: 'left', buttons: 0, clickCount: 1, pointerType: 'pen', force: 0 })
+  await ngu(500)
+  const sauKeo = await to.locator('body').evaluate(() => ({ cuon: window.__mcBut.cuon(), net: window.__mcBut.xuat().net.length }))
+  const emKeo = await em.evaluate(() => { const t = document.querySelector('.lv-cuon > div'); return t ? t.style.transform : '' })
+  await to.locator('body').evaluate(() => window.__mcBut.hoanTac())
+  await ngu(300)
+  const sauHoanTac = await to.locator('body').evaluate(() => window.__mcBut.xuat().net.length)
+  kq.bangCuon.keoVachCuon = { cuonTruoc: +cuonTruocKeo.toFixed(4), cuonSau: +sauKeo.cuon.toFixed(4), doiPx: Math.round((sauKeo.cuon - cuonTruocKeo) * 768), kéoKhôngSinhNét: sauKeo.net === net.length, mayEmTheo: emKeo, hoanTacSauCuon: `${sauKeo.net} → ${sauHoanTac} nét` }
+  console.log(`[${TEN}] kéo vạch cuộn:`, JSON.stringify(kq.bangCuon.keoVachCuon))
   // thầy cuộn ngược lên đầu: nét cũ còn nguyên
   await to.locator('body').evaluate(() => window.__mcBut.cuon(0))
   await ngu(300)
