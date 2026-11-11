@@ -1,0 +1,389 @@
+{
+  "i": 451,
+  "assetIndexProvided": 1256,
+  "hash": "522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b.png",
+  "size": [
+    1001,
+    249
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-L3-0197-II-3",
+      "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid và chất hữu cơ **X** (theo phương trình dưới). Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+      "allHinh": [
+        {
+          "hash": "522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b",
+          "where": "VIP27-BDT-L3-0197-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "ef46f312fb8cfa92336c7355c76575330b4bd1da8f2d171b13ee48976a2ede87"
+        }
+      ],
+      "missingHashes": [
+        "522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownArrow10xOpened": true,
+    "ownOOCCH3Macro8xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxvertices/bboxes. ExactliteralOOCCH3intentionallypreserved; noanswerX/nocondensedformulaexpansion. Arrowinkatconcaveapexfromstrokejoinnotclosedfilledtriangle.",
+  "geometry": {
+    "left": {
+      "ringVertices": [
+        [
+          8,
+          104
+        ],
+        [
+          59,
+          75
+        ],
+        [
+          110,
+          104
+        ],
+        [
+          110,
+          162
+        ],
+        [
+          59,
+          191
+        ],
+        [
+          8,
+          162
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            15,
+            108
+          ],
+          [
+            15,
+            157
+          ]
+        ],
+        [
+          [
+            59,
+            84
+          ],
+          [
+            103,
+            109
+          ]
+        ],
+        [
+          [
+            59,
+            182
+          ],
+          [
+            103,
+            157
+          ]
+        ]
+      ],
+      "topBranch": {
+        "text": "OOCCH₃",
+        "bbox": [
+          48,
+          4,
+          155,
+          31
+        ],
+        "bond": [
+          [
+            59,
+            75
+          ],
+          [
+            59,
+            31
+          ]
+        ],
+        "anchor": "FIRSTO",
+        "literal": "O O C C H3, NOtheoryreplacementOCOCH3"
+      },
+      "COOH": {
+        "text": "COOH",
+        "bbox": [
+          151,
+          63,
+          229,
+          87
+        ],
+        "bond": [
+          [
+            110,
+            104
+          ],
+          [
+            148,
+            82
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "caption": {
+        "text": "aspirin",
+        "bbox": [
+          15,
+          212,
+          105,
+          240
+        ],
+        "font": "regularITALICsanslowercase"
+      },
+      "countKnown": {
+        "C": 9,
+        "O": 4,
+        "rings": 1,
+        "innerCCdouble": 3
+      }
+    },
+    "right": {
+      "ringVertices": [
+        [
+          653,
+          104
+        ],
+        [
+          704,
+          75
+        ],
+        [
+          755,
+          104
+        ],
+        [
+          755,
+          162
+        ],
+        [
+          704,
+          191
+        ],
+        [
+          653,
+          162
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            660,
+            108
+          ],
+          [
+            660,
+            157
+          ]
+        ],
+        [
+          [
+            704,
+            84
+          ],
+          [
+            748,
+            109
+          ]
+        ],
+        [
+          [
+            704,
+            182
+          ],
+          [
+            748,
+            157
+          ]
+        ]
+      ],
+      "topOH": {
+        "text": "OH",
+        "bbox": [
+          692,
+          4,
+          733,
+          29
+        ],
+        "bond": [
+          [
+            704,
+            75
+          ],
+          [
+            704,
+            31
+          ]
+        ],
+        "anchor": "FIRSTO"
+      },
+      "COOH": {
+        "text": "COOH",
+        "bbox": [
+          796,
+          63,
+          874,
+          87
+        ],
+        "bond": [
+          [
+            755,
+            104
+          ],
+          [
+            793,
+            82
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "caption": {
+        "text": "salicylic acid",
+        "bbox": [
+          627,
+          212,
+          798,
+          241
+        ],
+        "font": "regularITALICsanslowercase"
+      },
+      "countKnown": {
+        "C": 7,
+        "O": 3,
+        "rings": 1,
+        "innerCCdouble": 3
+      }
+    },
+    "water": {
+      "text": "H₂O",
+      "bbox": [
+        338,
+        120,
+        396,
+        148
+      ],
+      "font": "regularuprightsans"
+    },
+    "plusSigns": [
+      {
+        "text": "+",
+        "bbox": [
+          298,
+          124,
+          316,
+          143
+        ]
+      },
+      {
+        "text": "+",
+        "bbox": [
+          911,
+          124,
+          929,
+          143
+        ]
+      }
+    ],
+    "unknownProduct": {
+      "text": "X",
+      "bbox": [
+        969,
+        113,
+        998,
+        142
+      ],
+      "font": "TRUEBOLDuprightserif",
+      "note": "KEEPXunknown; noanswerformula"
+    },
+    "arrow": {
+      "shaft": [
+        [
+          466,
+          133
+        ],
+        [
+          554,
+          133
+        ]
+      ],
+      "headLegs": [
+        [
+          [
+            543,
+            123
+          ],
+          [
+            554,
+            133
+          ]
+        ],
+        [
+          [
+            543,
+            143
+          ],
+          [
+            554,
+            133
+          ]
+        ]
+      ],
+      "topology": "OPENV2legs+shafttotip, notclosedtriangle/nofilledbase. Nativeapexdarkconcaveinkduejoinedstrokes.",
+      "strokeWidthApprox": 2.5,
+      "conditions": []
+    },
+    "font": "Allchemicalformulalabelsregularuprightsans; captionsregularitalic sans;XTRUEBOLDuprightserif. Nootherbold/italictext.",
+    "countsKnownOnly": {
+      "CExcludingX": 16,
+      "OExcludingX": 8,
+      "rings": 2,
+      "innerCCdoubleRays": 6,
+      "expandedCOdouble": 0,
+      "unknownX": 1,
+      "captions": 2,
+      "arrowOpenVHeads": 1
+    },
+    "noAdded": [
+      "Xanswer/aceticacid",
+      "OCOCH3correction",
+      "expandedcarbonyls",
+      "filledtrianglehead",
+      "reactioncatalyst/temp",
+      "hydrogenlabels",
+      "yield",
+      "molecularformula"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "publicDeAllRefsRead": true,
+    "ownFull2xOpened": true,
+    "ownHead10xOpened": true,
+    "actualChromiumFull3xOpened": true,
+    "hashSvg": "a786bf522d86d013735df30e0463452332f29d1d391e0e8a5c200eee19ea3413",
+    "verdict": "RootPASS+independentreadonlyexactSHAPASS",
+    "measurementLimits": "1pxnativeapprox;notnativeSubpixelmeasurement",
+    "knownCounts": "16C8OincludingwaterEXCLUDINGunknownX;2Ph6innerCCdouble;0expandedCO;literalOOCCH3",
+    "runtimeIndependent": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/aspirin451-native-ddh-a786bf522d86d013735df30e0463452332f29d1d391e0e8a5c200eee19ea3413.svg a786bf522d86d013735df30e0463452332f29d1d391e0e8a5c200eee19ea3413\n451 { x: 0, y: 0, width: 1001, height: 249 }\n",
+    "rootFullRenderSha256": "8161dad5b97d15a494b28d1eb43d10d1ed65bbd5f8a0566e496ee8bcbe6c0192"
+  }
+}

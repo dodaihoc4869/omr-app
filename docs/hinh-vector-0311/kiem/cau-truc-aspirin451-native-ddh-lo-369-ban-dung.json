@@ -1,0 +1,29 @@
+[
+  {
+    "i": 451,
+    "hash": "522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b",
+    "fileNguon": "anh/522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b.png",
+    "svg": "aspirin451-native-ddh-a786bf522d86d013735df30e0463452332f29d1d391e0e8a5c200eee19ea3413.svg",
+    "hashSvg": "a786bf522d86d013735df30e0463452332f29d1d391e0e8a5c200eee19ea3413",
+    "byteSvg": 24717,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L3-0197-II-3",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt. Sau khi uống, aspirin bị thủy phân trong cơ thể sẽ tạo thành salicylic acid và chất hữu cơ **X** (theo phương trình dưới). Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường).",
+        "refs": [
+          {
+            "hash": "522355bcb2332ffe02828f31796fa6f6bdb80485f2fab3858d5a6e82d0a7781b",
+            "where": "VIP27-BDT-L3-0197-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "ef46f312fb8cfa92336c7355c76575330b4bd1da8f2d171b13ee48976a2ede87"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "16knownC8OincludingwaterEXCLUDINGunknownX/2Ph6innerCCdouble/0expandedCOdouble/EXACTcondensedOOCCH3-NOTtheoryOCOCH3/2COOHfirstCanchors/OOCCH3-OHfirstOanchors/1OPENVrighthead-NOfilledtriangle/ALLchemicalregularUPRIGHT-XtrueDAMUPRIGHT/2regularITALICcaptionsaspirin-salicylicacid/SUB3-2/0stereocharge/noXanswer-addedcondition-yield-expandedCO-H",
+    "hashSvgDaSoat": "a786bf522d86d013735df30e0463452332f29d1d391e0e8a5c200eee19ea3413",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
