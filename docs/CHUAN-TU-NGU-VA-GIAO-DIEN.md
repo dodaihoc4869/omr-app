@@ -82,6 +82,7 @@ Người giữ: Boss. Mọi phiên làm giao diện ĐỌC tệp này trước k
 | Một khúc xem lại | **Đoạn** («5 đoạn», «Đoạn 3/5», cột «Số đoạn») | clip, phân cảnh, chương |
 | Đoạn app tự chọn | **Đoạn đáng xem** («Đáng xem nhất · cả lớp sai nhiều nhất») | highlight, đoạn hay |
 | Danh sách các buổi live của thầy | **Lịch sử Live** («7 buổi · 121 MB đã lưu», «Chọn buổi cũ hơn 120 ngày», «Đổi tên buổi live», «Dựng lại») | quản lý video |
+| Buổi đã live nhưng chưa có đoạn nào (11/11, thầy: «kết thúc live chưa thấy có bản ghi») | **Chưa có đoạn xem lại** + lý do bằng chữ thường ngay trên dòng của Lịch sử Live: «· live dưới 15 giây» · «· chưa câu nào được chữa» · «· không thu được tiếng và không có nét» · «· phần chữa quá ngắn». Thẻ câu máy em khi thầy chữa trên bảng mà chưa mở đáp án: «Thầy chữa câu này trên bảng · chưa mở đáp án» (không có ô «Đáp án đúng», không có nút lời giải) | không có bản ghi, lỗi ghi, mã lý do (`ngan`, `khong-cau`…) |
 | Lược chỗ im khi phát | **Bỏ khoảng lặng** («Đã lược 0:42 khoảng lặng») | skip silence, cắt lặng |
 | Trạng thái ghi buổi live | **Đang ghi để xem lại** (viên Live trên màn chiếu; máy em đang bật mic: «Đang ghi để lớp xem lại») · **Chưa ghi được · live vẫn chạy** · **Đang xử lý buổi vừa xong** («1 đang xử lý», «thường xong dưới 1 phút») · «Chưa dựng xong buổi này» | recording, rendering, encode |
 

@@ -8,6 +8,7 @@ import HopXacNhan from '../../../components/HopXacNhan'
 import { layDiaChiMayChu } from '../../../lib/dia-chi-may-chu'
 import { chuDungLuong, phanTenBuoi, soPhut, tenBuoiDayDu, thuNgay, TEN_THAY_TOI_DA } from '../../../lib/live/xem-lai-ten'
 import { useAppStore } from '../../../store/appStore'
+import type { LyDoKhongDoan } from '../../../lib/live/xem-lai-kieu'
 import { doiTenLive, dungLaiLive, taiDsLive, xoaLive, type BuoiGv } from './lich-su-live-api'
 import { coManXemLai, napManXemLai, type PropsMoTuThay } from './diem-noi-hs'
 import './lich-su-live.css'
@@ -19,6 +20,11 @@ const ngayCach = (soNgay: number): string => new Date(Date.now() + 7 * 3_600_000
 const dangChay = (b: BuoiGv): boolean => b.trangThai === 'dang_xu_ly' || b.trangThai === 'dang_ghi'
 /** Buổi thầy thao tác được (chọn, đổi tên, xoá): đã xong hoặc dựng lỗi. */
 const chonDuoc = (b: BuoiGv): boolean => b.trangThai === 'xong' || b.trangThai === 'loi'
+/** Buổi đã live nhưng CHƯA có đoạn xem lại (11/11: không bao giờ bỏ im một buổi đã live — dòng vẫn hiện, kèm lý do bằng chữ; thầy xoá được, em không thấy). */
+const khongDoan = (b: BuoiGv): boolean => b.trangThai === 'xong' && b.soDoan === 0
+const CHU_LY_DO: Record<LyDoKhongDoan, string> = { ngan: 'live dưới 15 giây', 'khong-cau': 'chưa câu nào được chữa', 'khong-tieng-net': 'không thu được tiếng và không có nét', 'khong-doan': 'phần chữa quá ngắn' }
+const chuKhongDoan = (b: BuoiGv): string => `Chưa có đoạn xem lại · ${CHU_LY_DO[b.lyDo ?? 'khong-doan'] ?? CHU_LY_DO['khong-doan']}`
+const thoiLuong = (b: BuoiGv): string => (khongDoan(b) && b.giayLive < 60 ? `${b.giayLive} giây` : `${soPhut(b.giayLive)} phút`)
 const tenDong = (b: BuoiGv): string => (b.trangThai === 'dang_xu_ly' ? [thuNgay(b.ngay), b.lop, 'buổi vừa kết thúc'] : b.trangThai === 'dang_ghi' ? [thuNgay(b.ngay), b.lop, 'đang live'] : [phanTenBuoi(b)]).filter(Boolean).join(' · ')
 
 export default function LichSuLive({ onDong }: { onDong: () => void }) {
@@ -65,6 +71,14 @@ export default function LichSuLive({ onDong }: { onDong: () => void }) {
     const h = setInterval(() => { if (!document.hidden) void tai(true) }, nhipMs)
     return () => clearInterval(h)
   }, [nhipMs, tai])
+  // Thầy vừa đóng / tạm ẩn màn chiếu (tắt live, kết thúc buổi) hoặc quay lại tab ⇒ tải lại ngầm sau 1,5 giây: buổi vừa live hiện ngay, không cần tải lại trang.
+  useEffect(() => {
+    let hen = 0
+    const lai = () => { if (document.hidden || hen) return; hen = window.setTimeout(() => { hen = 0; void tai(true) }, 1500) }
+    window.addEventListener('bpu-phien', lai)
+    document.addEventListener('visibilitychange', lai)
+    return () => { clearTimeout(hen); window.removeEventListener('bpu-phien', lai); document.removeEventListener('visibilitychange', lai) }
+  }, [tai])
   // Khúc tiếng còn kẹt trên máy này từ lần live trước ⇒ tải bù (chỉ nạp mảnh máy ghi khi có cờ).
   useEffect(() => { try { if (localStorage.getItem('ddh.live.ghi-ket') === '1') void import('../../../lib/live/may-ghi').then((m) => m.taiBuKhucKet()).catch(() => {}) } catch { /* không có kho */ } }, [])
 
@@ -180,17 +194,18 @@ export default function LichSuLive({ onDong }: { onDong: () => void }) {
                       </span>
                     ) : b.trangThai === 'dang_ghi' ? <small className="lsl-ghi">Đang ghi để xem lại · xong buổi là tự dựng</small>
                       : b.trangThai === 'loi' ? <small className="lsl-loi">Chưa dựng xong buổi này</small>
+                        : khongDoan(b) ? <small className="lsl-khong-doan">{chuKhongDoan(b)}<span className="gvv2-so"> · {ngayDayDu(b.ngay)} · live từ {gioVn(b.batLuc)}</span></small>
                         : <small><span className="lsl-chi-rong">{ngayDayDu(b.ngay)} · live từ <span className="gvv2-so">{gioVn(b.batLuc)}</span></span><span className="lsl-chi-hep gvv2-so">{[thuNgay(b.ngay), b.lop, `${b.soCau}\u00a0câu`, `${soPhut(b.giayLive)}\u00a0phút`, chuDungLuong(b.byte).replace(' ', '\u00a0')].filter(Boolean).join(' · ')}</span></small>}
                   </span>
                   <span className="lsl-c">{b.lop || 'Mọi lớp'}</span>
-                  <span className="lsl-s gvv2-so">{duoc && b.trangThai === 'xong' ? `${soPhut(b.giayLive)} phút` : '–'}</span>
+                  <span className="lsl-s gvv2-so">{duoc && b.trangThai === 'xong' ? thoiLuong(b) : '–'}</span>
                   <span className="lsl-s gvv2-so">{b.trangThai === 'xong' ? b.soCau : '–'}</span>
                   <span className="lsl-s gvv2-so">{b.trangThai === 'xong' ? b.soDoan : '–'}</span>
                   <span className="lsl-s gvv2-so">{duoc && b.byte ? chuDungLuong(b.byte) : '–'}</span>
                   <span className="lsl-nut">
                     {b.trangThai === 'loi' && <button type="button" className="lsl-mo" disabled={dangDung === b.id} onClick={() => void dungLai(b)}>{dangDung === b.id ? 'Đang dựng…' : 'Dựng lại'}</button>}
-                    {b.trangThai === 'xong' && coManXemLai && b.ve && <button type="button" className="lsl-mo" onClick={() => void moBuoi(b)} aria-label={`Mở buổi ${ten}`}>Mở</button>}
-                    {b.trangThai === 'xong' && <button type="button" className="lsl-bt" onClick={() => moDoiTen(b)} aria-label={`Đổi tên buổi ${ten}`}><Pencil size={18} aria-hidden="true" /></button>}
+                    {b.trangThai === 'xong' && b.soDoan > 0 && coManXemLai && b.ve && <button type="button" className="lsl-mo" onClick={() => void moBuoi(b)} aria-label={`Mở buổi ${ten}`}>Mở</button>}
+                    {b.trangThai === 'xong' && !khongDoan(b) && <button type="button" className="lsl-bt" onClick={() => moDoiTen(b)} aria-label={`Đổi tên buổi ${ten}`}><Pencil size={18} aria-hidden="true" /></button>}
                     {duoc && <button type="button" className="lsl-bt lsl-chi-rong" onClick={() => setHopXoa([b])} aria-label={`Xoá buổi ${ten}`}><Trash2 size={18} aria-hidden="true" /></button>}
                   </span>
                 </div>

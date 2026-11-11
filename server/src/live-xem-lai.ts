@@ -9,7 +9,7 @@
 // cuối (thầy bật live lại / khúc tải bù / mở đáp án muộn ⇒ dựng lại từ khúc gốc) rồi cron dọn.
 // AN TOÀN: LỖI Ở ĐÂY KHÔNG BAO GIỜ ĐƯỢC LÀM HỎNG LIVE — mọi việc chạy nền, bọc bắt lỗi; bảng D1 chưa có ⇒ bỏ qua, live vẫn chạy.
 import type { DurableObjectState, Env, R2NhieuPhan } from './kieu'
-import type { TrangThaiPhong } from '../../src/lib/bpu/phong'
+import { chamTra, type TrangThaiPhong } from '../../src/lib/bpu/phong'
 import { liveHetHan, liveTat } from '../../src/lib/bpu/phong-live'
 import { MANH_NET_BYTE, bangVangCua, giaiNetXl, laTrangThaiGhi, maNetXl, soVet, vetRong, type DauVet } from '../../src/lib/bpu/phong-nhat-ky'
 import { dungBuoi, type KhucVao, type LuotChup, type MucTieng, type NetXl, type SuKienXl } from '../../src/lib/live/xem-lai-dung'
@@ -36,6 +36,15 @@ export const SQL_LIVE_XEM_LAI: readonly string[] = [
   `CREATE INDEX IF NOT EXISTS idx_live_doan_em ON live_doan(sbd_len_bang)`,
 ]
 export const damBaoBangLive = (env: Env): Promise<void> => chayDdlMotLan(env, 'live_xem_lai', SQL_LIVE_XEM_LAI)
+/** 11/11 CHỈ-THÊM: cột `live_buoi.ly_do` — lý do buổi đã live mà chưa có đoạn xem lại (thầy: «kết thúc live chưa thấy có bản ghi» ⇒ buổi nào cũng phải có dòng,
+ *  kèm lý do bằng chữ). Thêm lười, chỉ ở lúc chốt một buổi 0 đoạn (việc nền, hiếm); D1 đã có cột ⇒ báo trùng cột, bỏ qua. Không đụng dữ liệu đang có. */
+const daThemCotLyDo = new WeakSet<object>()
+export async function damBaoCotLyDo(env: Env): Promise<void> {
+  if (!env.DB || daThemCotLyDo.has(env.DB)) return
+  await damBaoBangLive(env).catch(() => undefined)
+  await env.DB.prepare('ALTER TABLE live_buoi ADD COLUMN ly_do TEXT').run().catch(() => undefined)
+  daThemCotLyDo.add(env.DB)
+}
 
 export const tienToLive = (id: string): string => `live/${id}/`
 export const khoaTep = (id: string, tep: string): string => `live/${id}/${tep}`
@@ -62,6 +71,8 @@ export interface ChuXl {
   phat(): void
   /** Ghi sớm kết quả các lượt đã mở đáp án vào `bpu_luot` (để em xem «Em làm đúng / chưa đúng» ngay sau buổi live). */
   ghiSom?(): Promise<void>
+  /** Luật so đáp số Phần III của phòng — chỉ để ĐẾM số em đúng của lượt chưa mở đáp án đang chữa trên bảng (ảnh chụp kín, 11/11). */
+  chamSo?(traLoi: string, dapAn: string): boolean
 }
 interface MetaXl { daLive: boolean; e: number; n: number; nByte: number; luot: number[]; mat: number | null; don: boolean; xoa: boolean }
 interface CauHinhXl { bat: boolean; lop: string }
@@ -111,6 +122,7 @@ export class NhatKyXl {
   private skCho: SuKienXl[] = []
   private netCho: Uint8Array[] = []
   private netTong = 0
+  private chupCho = new Map<number, LuotChup>()
   private henXa: ReturnType<typeof setTimeout> | null = null
   private henChotH: ReturnType<typeof setTimeout> | null = null
   private dangChot = false
@@ -146,11 +158,13 @@ export class NhatKyXl {
     const lv = st.live
     if (!lv || lv.ghi === undefined) return
     if (!lv.bat && lv.ghi !== 'tat') lv.ghi = 'tat'
-    const nay = Date.now(), l = st.luot
+    const nay = Date.now(), l = st.luot, cham = this.chu.chamSo
+    // Lượt CHƯA mở đáp án: chấm tại chỗ chỉ để đếm số em đúng (đáp án không rời khỏi hàm này — bản đông cứng bên dưới để `dung` = '' và `giai` = null).
+    const kin = l && l.pha !== 'mo' && cham ? Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, { dung: chamTra(l, t.chon, cham).dung }])) : null
     // Bản đông cứng của đúng những trường `soVet` đọc (trạng thái thật còn đổi tiếp trước khi việc nền chạy).
     const ban = {
       ketThuc: st.ketThuc, live: { bat: lv.bat, bang: lv.bang, mic: lv.mic ? { sbd: lv.mic.sbd } : null },
-      luot: l ? { so: l.so, batDau: l.batDau, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, dung: l.pha === 'mo' ? l.dung : '', giai: l.pha === 'mo' ? l.giai : null, pha: l.pha, tra: l.tra, ketQua: l.ketQua, goi: l.goi ? { sbd: l.goi.sbd, dat: l.goi.dat } : null } : null,
+      luot: l ? { so: l.so, batDau: l.batDau, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, dung: l.pha === 'mo' ? l.dung : '', giai: l.pha === 'mo' ? l.giai : null, pha: l.pha, tra: l.tra, ketQua: l.pha === 'mo' ? l.ketQua : kin, goi: l.goi ? { sbd: l.goi.sbd, dat: l.goi.dat } : null } : null,
     } as unknown as TrangThaiPhong
     void this.xep(() => this.xuLy(ban, nay)).catch(() => undefined)
   }
@@ -158,14 +172,18 @@ export class NhatKyXl {
     if (this.vet === undefined) this.vet = (await this.kho.get<DauVet>('xl:v')) ?? vetRong()
     const m = await this.docMeta()
     const r = soVet(ban, this.vet, nay)
-    if (!r.suKien.length) { this.vet = r.vet; return }
+    if (!r.suKien.length) {
+      this.vet = r.vet
+      // Ảnh chụp kín được làm mới (thêm em gửi bài / chấm em lên bảng) ⇒ ghi gom cùng nhật ký.
+      if (r.chup && m.daLive) { this.chupCho.set(r.chup.so, r.chup); this.henXaSau() }
+      return
+    }
     const vuaBat = r.suKien.some((e) => e.k === 'bat'), vuaTat = r.suKien.some((e) => e.k === 'tat')
     if (!m.daLive && !vuaBat) { this.vet = r.vet; return } // chưa từng live ⇒ không có gì để xem lại
     this.vet = r.vet
     if (m.xoa && vuaBat) { m.xoa = false; m.don = false } // thầy đã xoá buổi rồi live lại ⇒ ghi buổi mới từ đầu
     for (const e of r.suKien) this.skCho.push(e)
-    // Ảnh chụp lượt quá lớn (đề kèm ảnh nặng) không ghi được ⇒ bỏ câu ấy khỏi bản xem lại, KHÔNG làm đứt nhật ký.
-    if (r.chup) { try { await this.kho.put(`xl:l:${r.chup.so}`, r.chup); if (!m.luot.includes(r.chup.so)) m.luot.push(r.chup.so) } catch (e) { console.error('[live-xem-lai] ảnh chụp lượt lỗi:', e instanceof Error ? e.message : e) } }
+    if (r.chup) { this.chupCho.set(r.chup.so, r.chup); await this.ghiChup(m) }
     if (vuaBat) {
       m.daLive = true; m.mat = null; m.don = false
       if (this.henChotH) { clearTimeout(this.henChotH); this.henChotH = null }
@@ -215,11 +233,17 @@ export class NhatKyXl {
   }
 
   // ── Ghi storage gom 1 giây ──
+  /** Ảnh chụp lượt quá lớn (đề kèm ảnh nặng) không ghi được ⇒ bỏ câu ấy khỏi bản xem lại, KHÔNG làm đứt nhật ký. */
+  private async ghiChup(m: MetaXl): Promise<void> {
+    const ds = [...this.chupCho.values()]; this.chupCho.clear()
+    for (const c of ds) { try { await this.kho.put(`xl:l:${c.so}`, c); if (!m.luot.includes(c.so)) m.luot.push(c.so) } catch (e) { console.error('[live-xem-lai] ảnh chụp lượt lỗi:', e instanceof Error ? e.message : e) } }
+  }
   private henXaSau(): void { if (!this.henXa) this.henXa = setTimeout(() => { this.henXa = null; void this.xa().catch(() => undefined) }, GOM_MS) }
   private xa(): Promise<void> { return this.xep(async () => this.xaNgay(await this.docMeta())) }
   private async xaNgay(m: MetaXl): Promise<void> {
     if (this.henXa) { clearTimeout(this.henXa); this.henXa = null }
     const kho = this.kho
+    if (this.chupCho.size) await this.ghiChup(m)
     try {
       if (this.skCho.length) {
         const ds = this.skCho; this.skCho = []
@@ -294,10 +318,21 @@ export class NhatKyXl {
     const v = { id, ban: 0, lop, suKien, net, khuc, luot, ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), bangVang: bangVangCua(st), ten, tenThay, nay }
     const kq = dungBuoi(v)
     if (!kq.du) {
-      // Live quá ngắn / chưa có câu mở đáp án / chưa có đoạn ⇒ không tạo buổi (không hiện ở đâu). Buổi còn mở thì giữ nhật ký: thầy live tiếp sẽ dựng lại.
-      if (!cu) await this.d1("DELETE FROM live_buoi WHERE id = ? AND trang_thai IN ('dang_ghi', 'dang_xu_ly', 'loi')", id)
-      else await this.d1("UPDATE live_buoi SET trang_thai = 'xong', tien_do = 100, cap_nhat = ? WHERE id = ? AND trang_thai IN ('dang_ghi', 'dang_xu_ly')", new Date(nay).toISOString(), id)
-      if (st.ketThuc && !cu) await this.don(false)
+      // 11/11 (thầy: «kết thúc live chưa thấy có bản ghi»): KHÔNG BAO GIỜ bỏ im một buổi đã live. Chưa có đoạn nào ⇒ dòng vẫn nằm trong «Lịch sử Live» của
+      // thầy ở trạng thái xong, 0 đoạn, kèm LÝ DO (máy em không thấy buổi 0 đoạn). Khúc thô + nhật ký giữ 24 giờ như mọi buổi: khúc tải bù về muộn /
+      // thầy mở đáp án muộn / live tiếp ⇒ dựng lại là có đoạn. Trước 11/11 dòng bị XOÁ ở đây nên thầy không biết vì sao không có bản ghi.
+      const iso = new Date(nay).toISOString(), b = kq.buoi
+      if (kq.lyDo === 'khong-live') await this.d1("DELETE FROM live_buoi WHERE id = ? AND trang_thai IN ('dang_ghi', 'dang_xu_ly', 'loi')", id)
+      else if (cu) await this.d1("UPDATE live_buoi SET trang_thai = 'xong', tien_do = 100, cap_nhat = ? WHERE id = ? AND trang_thai IN ('dang_ghi', 'dang_xu_ly')", iso, id)
+      else {
+        await this.d1(`INSERT INTO live_buoi (id, lop, ngay, bat_luc, tat_luc, ten_tu_dong, so_cau, so_doan, giay_live, giay_doan, byte, trang_thai, tien_do, quyen, ghi_giong_em, ban, tao_luc, cap_nhat)
+          VALUES (?,?,?,?,?,?,?, 0, ?, 0, 0, 'xong', 100, ?, 1, 0, ?, ?)
+          ON CONFLICT(id) DO UPDATE SET lop = excluded.lop, ngay = excluded.ngay, bat_luc = excluded.bat_luc, tat_luc = excluded.tat_luc, ten_tu_dong = excluded.ten_tu_dong, so_cau = excluded.so_cau,
+            so_doan = 0, giay_live = excluded.giay_live, giay_doan = 0, byte = 0, trang_thai = 'xong', tien_do = 100, cap_nhat = excluded.cap_nhat
+          WHERE live_buoi.trang_thai <> 'dang_xoa'`, id, b.lop, b.ngay, b.batLuc, b.tatLuc, b.tenTuDong, b.cau.length, Math.round(kq.msTho / 1000), b.lop ? 'lop' : 'diem_danh', iso, iso)
+        await damBaoCotLyDo(env).catch(() => undefined)
+        await this.d1("UPDATE live_buoi SET ly_do = ? WHERE id = ? AND trang_thai = 'xong' AND so_doan = 0", kq.lyDo, id)
+      }
       return { ok: true, du: false, lyDo: kq.lyDo }
     }
     const dau = await bam(JSON.stringify(kq.buoi) + JSON.stringify(kq.tieng), kq.netBin)

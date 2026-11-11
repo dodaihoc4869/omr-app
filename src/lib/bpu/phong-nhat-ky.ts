@@ -2,7 +2,9 @@
 // Phòng Bình Phản Ứng không phải sửa luật lượt: sau MỖI lần trạng thái đổi, máy chủ gọi `soVet(st, vết cũ, nay)` — hàm so «dấu vết» (đang live? lượt nào,
 // pha nào, gọi ai, chấm chưa, bảng live, mic em) với lần trước rồi trả các DÒNG SỰ KIỆN mới (mở câu, gọi lên bảng, chấm, mở đáp án, lượt mới / bỏ lượt,
 // bảng live bật / tắt, mic em bật / tắt, live bật / tắt). Nhật ký chỉ-nối; máy chủ (server/src/live-xem-lai.ts) ghi gom 1 giây.
-// AN TOÀN: sự kiện không mang đáp án. Ảnh chụp lượt (`chupLuot`, có đáp án + lời giải) CHỈ tạo ở lúc lượt chuyển sang pha «mo».
+// AN TOÀN: sự kiện không mang đáp án. Ảnh chụp lượt CÓ đáp án + lời giải (`chupLuot`) CHỈ tạo ở lúc lượt chuyển sang pha «mo».
+// 11/11 (thầy chữa trên bảng mà không bấm mở đáp án ⇒ «kết thúc live chưa thấy có bản ghi»): lượt CHƯA mở đáp án nhưng đã gọi em lên bảng / bảng live đang bật
+// ⇒ ảnh chụp KÍN (`chupKin`: đề công khai + tỉ lệ lớp + ai lên bảng; KHÔNG đáp án, KHÔNG lời giải), làm mới mỗi khi số em gửi / số em đúng / em lên bảng đổi.
 import { DOI_BPU, diemDoi, soDoiCua, tenNgan, type LuotPhong, type TrangThaiPhong } from './phong'
 import type { LuotChup, NetXl, SuKienXl } from '../live/xem-lai-dung'
 import type { BangVangLive } from '../live/xem-lai-kieu'
@@ -11,7 +13,7 @@ import type { BangVangLive } from '../live/xem-lai-kieu'
 export type TrangThaiGhi = 'dang-ghi' | 'loi' | 'tat'
 export const laTrangThaiGhi = (v: unknown): v is TrangThaiGhi => v === 'dang-ghi' || v === 'loi' || v === 'tat'
 
-export interface DauVet { bat: boolean; luot: string; so: number; pha: string; goi: string; dat: boolean | null; bang: boolean; mic: string }
+export interface DauVet { bat: boolean; luot: string; so: number; pha: string; goi: string; dat: boolean | null; bang: boolean; mic: string; /** Dấu của ảnh chụp kín gần nhất. */ kin?: string }
 export const vetRong = (): DauVet => ({ bat: false, luot: '', so: 0, pha: '', goi: '', dat: null, bang: false, mic: '' })
 
 /** Ảnh chụp lượt lúc mở đáp án: đề công khai, đáp án, lời giải kho, tỉ lệ lớp, ai lên bảng. KHÔNG mang kết quả từng em. */
@@ -21,6 +23,11 @@ export function chupLuot(l: LuotPhong): LuotChup {
     soDung: Object.values(l.ketQua ?? {}).filter((k) => k.dung).length, soGui: Object.keys(l.tra).length,
     goi: l.goi ? { sbd: l.goi.sbd, dat: l.goi.dat } : null,
   }
+}
+
+/** Ảnh chụp KÍN của lượt chưa mở đáp án đang chữa trên bảng. `ketQua` ở đây do máy chủ chấm sẵn (`NhatKyXl.soat`) chỉ để ĐẾM số em đúng. */
+export function chupKin(l: LuotPhong): LuotChup {
+  return { ...chupLuot(l), mo: false, dung: '', giai: null }
 }
 
 /** So dấu vết ⇒ sự kiện mới. Bật live ⇒ ghi lại cả trạng thái đang có (lượt đang mở, em đang trên bảng) để mỗi lần live tự đủ nghĩa. Không sửa `st`. */
@@ -44,6 +51,11 @@ export function soVet(st: TrangThaiPhong, cu: DauVet, nay: number): { vet: DauVe
     v.dat = dat
     if (l.pha === 'mo' && v.pha !== 'mo') { sk.push({ k: 'mo', t: nay, so: l.so }); chup = chupLuot(l) }
     v.pha = l.pha
+    // Đã từng chụp kín lượt này ⇒ tiếp tục làm mới tới khi mở đáp án / sang lượt khác (em còn gửi bài sau khi thầy tắt bảng).
+    if (l.pha !== 'mo' && ((bat && (!!goi || !!lv?.bang)) || (v.kin ?? '').startsWith(`${khoa}|`))) {
+      const c = chupKin(l), dau = `${khoa}|${c.soGui}|${c.soDung}|${c.goi?.sbd ?? ''}|${c.goi?.dat ?? ''}`
+      if (dau !== v.kin) { v.kin = dau; chup = c }
+    }
   }
   const bang = bat && !!lv?.bang
   if (bang !== v.bang) { sk.push({ k: 'bang', t: nay, v: bang }); v.bang = bang }

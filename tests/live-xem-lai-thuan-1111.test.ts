@@ -82,7 +82,7 @@ describe('Tự cắt đoạn (mục 4.4)', () => {
     const r = catDoan(vao({ msLive: 200_000, luot: [{ so: 1, t0: 10_000, t1: 200_000, moDapAn: null, bangTay: [], goi: [{ t: 10_500, sbd: 'a' }, { t: 90_000, sbd: 'b' }] }] }))
     expect(r.doan.map((d) => [d.sbd, d.t0, d.t1])).toEqual([['a', 10_000, 90_000], ['b', 90_000, 200_000]])
   })
-  it('thầy chữa: sau mở đáp án, cụm từ 5 nét và từ 30 giây có tiếng; bắt đầu 3 giây trước nét đầu', () => {
+  it('thầy chữa: sau mở đáp án, cụm từ 5 nét và từ 10 giây có tiếng; bắt đầu 3 giây trước nét đầu', () => {
     const luot = [{ so: 1, t0: 0, t1: 120_000, moDapAn: 30_000, bangTay: [], goi: [] }]
     const r = catDoan(vao({ msLive: 120_000, luot, net: netDeu(40_000, 8) }))
     expect(r.doan).toHaveLength(1)
@@ -92,6 +92,19 @@ describe('Tự cắt đoạn (mục 4.4)', () => {
     expect(catDoan(vao({ msLive: 120_000, luot, net: netDeu(5000, 8) })).doan).toHaveLength(0)
     // 5 nét nhưng cách nhau 9 giây ⇒ không phải một cụm
     expect(catDoan(vao({ msLive: 120_000, luot, net: netDeu(40_000, 5, 9000) })).doan).toHaveLength(0)
+  })
+  // 11/11 — thầy: «kết thúc live chưa thấy có bản ghi» (live thử ngắn, mic câm). Luật 3 hạ 30 giây → 10 giây tiếng; buổi KHÔNG CÓ TIẾNG thì 5 nét là đủ.
+  it('thầy chữa (luật 11/11): đủ 5 nét VÀ (từ 10 giây có tiếng HOẶC buổi không có tiếng)', () => {
+    expect(LUAT_CAT).toMatchObject({ cumNetSo: 5, chuaTiengMs: 10_000, vunMs: 8000, vunNetSo: 3 })
+    const luot = [{ so: 1, t0: 0, t1: 40_000, moDapAn: 2000, bangTay: [], goi: [] }]
+    // 6 nét trong 12 giây, tiếng phủ từ 7 giây tới hết chương (33 giây) ⇒ thành đoạn (trước 11/11 cần 30 giây tiếng: buổi 40 giây gần như không bao giờ đủ)
+    expect(catDoan(vao({ msLive: 40_000, luot, net: netDeu(10_000, 6) })).doan).toMatchObject([{ loai: 'thay_chua', t0: 7000, soNet: 6 }])
+    // có tiếng nhưng phần chữa chỉ 8,5 giây tiếng (còn lại lặng, không nét) ⇒ chưa đủ
+    expect(catDoan(vao({ msLive: 40_000, luot, net: netDeu(10_000, 5, 1000), im: [[15_000, 40_000]] })).doan).toHaveLength(0)
+    // buổi KHÔNG CÓ TIẾNG (mic câm): 5 nét là thành đoạn; 4 nét thì chưa
+    const cam = catDoan(vao({ msLive: 40_000, luot, net: netDeu(10_000, 5), coTieng: false }))
+    expect(cam.doan).toMatchObject([{ loai: 'thay_chua', t0: 7000, soNet: 5 }])
+    expect(catDoan(vao({ msLive: 40_000, luot, net: netDeu(10_000, 4), coTieng: false })).doan).toHaveLength(0)
   })
   it('thầy chữa khi bảng live bật tay (chưa mở đáp án cũng tính từ lúc bật)', () => {
     const r = catDoan(vao({ msLive: 100_000, luot: [{ so: 1, t0: 0, t1: 100_000, moDapAn: 95_000, bangTay: [20_000], goi: [] }], net: netDeu(25_000, 6) }))
@@ -107,10 +120,15 @@ describe('Tự cắt đoạn (mục 4.4)', () => {
     expect(r.doan.map((d) => [d.phan, d.t0, d.t1])).toEqual([[1, 28_000, 100_500], [2, 199_500, 400_000]])
     expect(r.doan[0]!.giayCoTieng).toBe(73) // 72,5 giây có tiếng (phần lặng trong chỉ mục nằm ngoài đoạn), làm tròn
   })
-  it('đoạn vụn (dưới 20 giây tiếng sau khi bỏ lặng) bị bỏ', () => {
-    const luot = [{ so: 1, t0: 0, t1: 60_000, moDapAn: null, bangTay: [], goi: [{ t: 45_000, sbd: 'a' }] }]
-    expect(catDoan(vao({ msLive: 60_000, luot })).doan).toHaveLength(0) // 17 giây
-    expect(catDoan(vao({ msLive: 60_000, luot: [{ ...luot[0]!, goi: [{ t: 30_000, sbd: 'a' }] }] })).doan).toHaveLength(1)
+  // 11/11 (lời thầy như trên): «đoạn vụn» trước là dưới 20 giây tiếng ⇒ bỏ. Nay GIỮ đoạn khi có từ 8 giây tiếng HOẶC từ 3 nét (buổi không có tiếng vẫn ra đoạn từ nét).
+  it('đoạn vụn (dưới 8 giây tiếng VÀ dưới 3 nét) bị bỏ; từ 8 giây tiếng hoặc từ 3 nét thì giữ', () => {
+    const luot = (goi: number) => [{ so: 1, t0: 0, t1: 60_000, moDapAn: null, bangTay: [], goi: [{ t: goi, sbd: 'a' }] }]
+    expect(catDoan(vao({ msLive: 60_000, luot: luot(55_000) })).doan).toHaveLength(0) // 7 giây tiếng, 0 nét
+    expect(catDoan(vao({ msLive: 60_000, luot: luot(45_000) })).doan).toMatchObject([{ loai: 'len_bang', giayCoTieng: 17 }]) // 17 giây: trước 11/11 bị bỏ
+    expect(catDoan(vao({ msLive: 60_000, luot: luot(55_000), net: netDeu(55_500, 3, 1000) })).doan).toMatchObject([{ soNet: 3 }]) // 7 giây tiếng nhưng 3 nét
+    // buổi không có tiếng: gọi em lên bảng, em viết 3 nét ⇒ có đoạn; không nét nào ⇒ không
+    expect(catDoan(vao({ msLive: 60_000, coTieng: false, luot: luot(30_000), net: netDeu(35_000, 3) })).doan).toMatchObject([{ loai: 'len_bang', soNet: 3 }])
+    expect(catDoan(vao({ msLive: 60_000, coTieng: false, luot: luot(30_000) })).doan).toHaveLength(0)
   })
   it('nhiều lần bật / tắt live: đoạn không vắt qua mốc nối', () => {
     const r = catDoan(vao({ msLive: 300_000, ranh: [100_000], luot: [{ so: 1, t0: 0, t1: 300_000, moDapAn: null, bangTay: [], goi: [{ t: 40_000, sbd: 'a' }, { t: 100_000, sbd: 'a' }] }] }))

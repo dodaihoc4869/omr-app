@@ -55,7 +55,8 @@ const NGOAI_LENH: Record<string, string> = {
 /** Làn của app thầy (Code 4) — có thể đổi; chỉ cho phép tồn tại. */
 // + màn Chiếu mã vào thi (28/09): 5 giây/lần hỏi danh sách em đã vào, dừng khi tab ẩn / đóng màn — chỉ chạy khi thầy đang chiếu.
 // + 11/11 Xem lại Live: nút Live ở Hôm nay (15 s) và màn Lịch sử Live (4 s) hỏi lại `/gv/live-ds` CHỈ khi có buổi đang xử lý, tab ẩn bỏ qua, xong ⇒ dừng.
-const LAN_APP_THAY = ['src/components/hom-nay-thay/NutLive.tsx', 'src/screens/live-xem-lai/gv/LichSuLive.tsx', 'src/components/bang-tin/hooks.ts', 'src/screens/ExamMonitorScreen.tsx', 'src/components/TamPhuChieuMa.tsx', 'src/components/day-hoc/BanChieuDiemDanh.tsx'] // 23/10: đồng hồ 1 s «Mã đổi sau m:ss» trên màn chiếu, chỉ vẽ lại ô mã, không gọi máy chủ
+// + 11/11 (sửa «kết thúc live chưa thấy có bản ghi»): nhịp 15 s của nút Live chuyển từ NutLive.tsx sang mảnh lười lich-su-live-api.ts (`theoDoiDangXuLy`) — vẫn CHỈ chạy khi có buổi đang xử lý.
+const LAN_APP_THAY = ['src/screens/live-xem-lai/gv/lich-su-live-api.ts', 'src/screens/live-xem-lai/gv/LichSuLive.tsx', 'src/components/bang-tin/hooks.ts', 'src/screens/ExamMonitorScreen.tsx', 'src/components/TamPhuChieuMa.tsx', 'src/components/day-hoc/BanChieuDiemDanh.tsx'] // 23/10: đồng hồ 1 s «Mã đổi sau m:ss» trên màn chiếu, chỉ vẽ lại ô mã, không gọi máy chủ
 
 const dem = (nguon: string) =>
   nguon

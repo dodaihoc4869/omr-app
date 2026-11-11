@@ -190,11 +190,11 @@ Trục thời gian = trục tiếng (ms từ lúc bật live; các lần tắt /
 
 1. **Chương theo câu:** mỗi lượt là một chương, từ «mở câu» tới trước lượt kế.
 2. **Đoạn «lên bảng»:** bắt đầu 2 giây trước lúc thầy gọi em lên bảng (bảng live tự bật, 4.3c). Kết thúc khi sang lượt mới, bỏ lượt, hoặc tắt live. Chấm Đạt / Chưa đạt và mở đáp án KHÔNG kết thúc đoạn (thầy còn chữa tiếp).
-3. **Đoạn «thầy chữa»** (không gọi ai): trong chương, sau khi mở đáp án hoặc khi bảng live bật tay, nếu có một cụm nét (các nét cách nhau dưới 8 giây) từ 5 nét trở lên VÀ từ 30 giây có tiếng. Bắt đầu 3 giây trước nét đầu.
+3. **Đoạn «thầy chữa»** (không gọi ai): trong chương, sau khi mở đáp án hoặc khi bảng live bật tay, nếu có một cụm nét (các nét cách nhau dưới 8 giây) từ 5 nét trở lên VÀ (từ 10 giây có tiếng HOẶC buổi không có tiếng). Bắt đầu 3 giây trước nét đầu. *(11/11: hạ từ 30 giây; buổi mic câm vẫn ra đoạn từ nét.)*
 4. **Khoảng lặng:** một khoảng là lặng khi mức âm dưới ngưỡng (khởi điểm −45 dBFS, hiệu chỉnh ở đợt thử) VÀ không có nét. Lặng từ 6 giây ⇒ ghi vào chỉ mục, trình phát nhảy qua, giữ 0,5 giây hai đầu. Lặng từ 90 giây giữa đoạn ⇒ đoạn dừng ở đó; có tiếng hoặc nét trở lại thì mở «phần 2».
-5. **Bỏ đoạn vụn:** đoạn có dưới 20 giây tiếng sau khi bỏ lặng thì không thành đoạn.
+5. **Bỏ đoạn vụn:** GIỮ đoạn khi có từ 8 giây tiếng sau khi bỏ lặng HOẶC từ 3 nét; dưới cả hai ngưỡng thì không thành đoạn. *(11/11: trước là dưới 20 giây tiếng thì bỏ.)*
 6. **Em nói:** khoảng mic em bật thành vạch trên thanh tua, có tên em.
-7. **An toàn:** câu CHƯA mở đáp án trong buổi ⇒ không có thẻ câu, không có đoạn; khoảng thời gian của câu ấy bị cắt khỏi `tieng.mp3` và `net.bin` (cắt theo khung MP3, không mã hoá lại).
+7. **An toàn (bản 11/11, thầy: «kết thúc live chưa thấy có bản ghi»):** câu vào trang xem lại khi ĐÃ mở đáp án, HOẶC khi thầy đã gọi em lên bảng / bảng live đã bật trong lúc câu ấy đang chiếu. Câu vào theo đường «đã chữa trên bảng» mà chưa mở đáp án: `dung` = '' và `giai` = null trong `buoi.json` (có cờ `moDapAn: false`), tỉ lệ lớp vẫn có; phòng chỉ giữ ảnh chụp KÍN của lượt ấy (không đáp án, không lời giải). Câu chưa mở đáp án VÀ chưa từng lên bảng / bảng live ⇒ không có thẻ câu, không có đoạn; khoảng thời gian của câu ấy bị cắt khỏi `tieng.mp3` và `net.bin` (cắt theo khung MP3, không mã hoá lại).
 
 Không cắt tệp theo đoạn: đoạn, lặng, vạch đều là chỉ mục trong `buoi.json` ⇒ đổi luật thì dựng lại, không mất gì.
 
@@ -320,7 +320,7 @@ CREATE INDEX IF NOT EXISTS idx_live_doan_em ON live_doan(sbd_len_bang);
 | Hai máy thầy cùng mở | chỉ máy đang giữ live (máy gửi `live-bat`) ghi |
 | Bật / tắt live nhiều lần trong buổi | gộp thành một buổi live, trục thời gian nối liền |
 | Thầy bấm kết thúc buổi khi đang live | tắt live → chốt, như thường |
-| Live rất ngắn (dưới 2 phút, hoặc không có đoạn nào) | không tạo buổi live (xoá khúc), không hiện ở đâu |
+| Live chưa có đoạn nào (bản 11/11) | KHÔNG bỏ im: dòng vẫn có trong Lịch sử Live của thầy (xong, 0 đoạn) kèm lý do «Chưa có đoạn xem lại · live dưới 15 giây / chưa câu nào được chữa / không thu được tiếng và không có nét / phần chữa quá ngắn» (`live_buoi.ly_do`, cột chỉ-thêm); thầy xoá được; máy em chỉ thấy buổi có từ 1 đoạn. Khúc thô giữ 24 giờ như mọi buổi (khúc tải bù / mở đáp án muộn ⇒ dựng lại). Ngưỡng live tối thiểu 120 giây → 15 giây. Mic câm cả buổi (không ô nào từ −70 dBFS) ⇒ `coTieng: false`, đoạn tính theo nét |
 | Buổi không có câu nào mở đáp án | như trên: không có gì được phép hiện |
 | Thầy mở đáp án SAU khi đã chốt (bật live lại rồi mở) | chốt lại, câu ấy xuất hiện, `ban` + 1 |
 | Tên bài / tên dạng rất dài | thẻ: tối đa 2 dòng rồi «…»; dải đáy trình phát: 1 dòng rồi «…»; bấm vào xem đủ |

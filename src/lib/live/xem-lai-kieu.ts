@@ -26,8 +26,11 @@ export interface CauBuoiLive {
   bai: string
   /** Câu công khai — NGUYÊN dạng phòng gửi máy em lúc làm bài (`LuotPhong.cau`), máy em dựng bằng đúng thành phần đề đang có. */
   cau: Record<string, unknown>
-  /** Đáp án đúng (chuỗi như `LuotPhong.dung`). Chỉ có vì câu ĐÃ mở đáp án trong buổi. */
+  /** Đáp án đúng (chuỗi như `LuotPhong.dung`). Chỉ có khi câu ĐÃ mở đáp án trong buổi; câu vào trang theo đường «đã chữa trên bảng» mà chưa mở đáp án ⇒ ''. */
   dung: string
+  /** (11/11, chỉ thêm) false = câu CHƯA mở đáp án trong buổi nhưng thầy đã gọi em lên bảng / bật bảng live cho câu đó (cả lớp đã xem thầy chữa):
+   *  `dung` = '' và `giai` = null — máy em không vẽ ô «Đáp án đúng», không có nút lời giải. Vắng / true = đã mở đáp án. */
+  moDapAn?: boolean
   /** Lời giải kho + ảnh lời giải (như `LuotPhong.giai`); null = kho chưa có. */
   giai: { solution: unknown; anh: { src: string; viTri: string; alt?: string }[] } | null
   /** Tỉ lệ lớp: số em làm đúng / số em đã gửi. */
@@ -169,7 +172,11 @@ export interface BuoiLiveDs {
   /** 0..100 khi `dang_xu_ly`. */
   tienDo: number
   ban: number
+  /** (11/11, chỉ thêm) Buổi đã xong mà KHÔNG có đoạn xem lại nào (`soDoan` = 0): vì sao — `LyDoKhongDoan`. Có đoạn ⇒ vắng / null. Chỉ `/gv/live-ds` trả (máy em không thấy buổi 0 đoạn). */
+  lyDo?: LyDoKhongDoan | null
 }
+/** Vì sao buổi không có đoạn xem lại: live dưới 15 giây · chưa câu nào được chữa · không thu được tiếng và không có nét · phần chữa quá ngắn. */
+export type LyDoKhongDoan = 'ngan' | 'khong-cau' | 'khong-tieng-net' | 'khong-doan'
 
 /** `GET /hs/live-ds` — buổi em được xem (mới nhất trước). Buổi `dang_xoa` không trả; `loi` không trả cho em. */
 export interface TraLiveDsHs {
