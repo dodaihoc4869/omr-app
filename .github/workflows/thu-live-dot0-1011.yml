@@ -21,13 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        may: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
-        pot: ['0', '1']
-        exclude:
-          - may: macos-latest
-            pot: '1'
-          - may: ubuntu-24.04-arm
-            pot: '1'
+        may: [ubuntu-latest]
+        pot: ['1']
     runs-on: ${{ matrix.may }}
     timeout-minutes: 20
     name: dò YouTube (${{ matrix.may }}, PO-token ${{ matrix.pot }})
@@ -45,17 +40,15 @@ jobs:
             python3 -m pip install -q -U bgutil-ytdlp-pot-provider 2>&1 | tail -1
           fi
           yt-dlp --version; curl -s -m 5 -o /dev/null -w 'ip-kiem %{http_code}\n' https://www.youtube.com/
-      - name: Mỗi video thử lần lượt vài client, giãn lượt hỏi; tải 10 KiB đầu tiếng (--test)
+      - name: Lượt cuối — VERBOSE, một video, xem plugin PO-token có vào cuộc không (chỉ in dòng pot / lỗi)
         run: |
           cd "$RUNNER_TEMP"
-          for id in kY0NUO7-fCc PfhFCRGNLKM 2zcCycq9EYc lMa-IohYrs4; do
-            for c in default mweb web web_music tv; do
-              ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
-              if yt-dlp -q --no-warnings --sleep-requests 2 $ea -f bestaudio --test -o "t-$id.%(ext)s" "https://www.youtube.com/watch?v=$id" 2> e.txt; then
-                echo "TẢI ĐƯỢC $id $c $(ls -l t-$id.* | awk '{print $5}') byte"; rm -f t-$id.*; break
-              else echo "LỖI $id $c: $(grep -m1 -o 'ERROR.*' e.txt | cut -c1-120)"; fi
-              sleep 3
-            done
+          curl -s -m 5 http://127.0.0.1:4416/ping || echo "bgutil không trả lời"
+          for c in default mweb web_safari; do
+            ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
+            yt-dlp -v --no-warnings $ea -f bestaudio --test -o "t.%(ext)s" "https://www.youtube.com/watch?v=PfhFCRGNLKM" > v.txt 2>&1 && echo "TẢI ĐƯỢC $c" || echo "LỖI $c"
+            grep -iE 'pot|po.token|bgutil|ERROR|HTTP Error|Downloading .*player|client' v.txt | grep -v '^\[debug\] Command-line' | cut -c1-200 | head -25
+            sleep 20
           done
       - name: Kiểm nguồn tải (HEAD) + tìm kho giọng Việt trên HF (chỉ in tên, giấy phép)
         run: |
