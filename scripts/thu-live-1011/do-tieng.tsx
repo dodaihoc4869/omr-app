@@ -138,13 +138,13 @@ const SAU_LOC: CauHinh = { ten: 'sau · chống hú («Tất cả»: bật khử
  *  WebRTC thứ hai đóng vai «SFU + máy em». Các bước: đổi mic TRƯỚC khi bật live → bật live → đổi mic TRONG lúc live → tạm dừng → tiếp tục → đổi chế độ lọc →
  *  tắt live rồi bật lại. Sau MỖI bước đo Ở PHÍA EM: `inbound-rtp.totalAudioEnergy` phải TĂNG trong ≤ 2 giây (tạm dừng thì phải ĐỨNG YÊN), kèm mức RMS nhận
  *  được, track bộ gửi đang cầm, mức âm bộ gửi báo, vạch mic của thư viện. */
-;(window as unknown as Record<string, unknown>).__doiMic = async () => {
+;(window as unknown as Record<string, unknown>).__doiMic = async (agc?: boolean) => {
   const st = taoPhong({ buoiId: 'do', lop: 'L', nay: Date.now(), ds: [{ sbd: 'S1', ten: 'Em', coMat: true, luc: 1 }] })
   datCoLive(st, { cho: true, sfu: true }, Date.now())
   let pc2: RTCPeerConnection | null = null, nhan: MediaStreamTrack | null = null, soNhan = 0, soDap = 0
   const actx = new AudioContext({ sampleRate: 48000 })
   const lt = taoLiveThay({
-    ve: 've', goc: 'https://sfu-gia', loc: 'tu',
+    ve: 've', goc: 'https://sfu-gia', loc: 'tu', agc,
     kenh: { gui: (t) => { if (t.t === 'live-bat') liveBat(st, Date.now()); if (t.t === 'live-tat') liveTat(st, Date.now()); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, Date.now()); if (t.t === 'live-dat') liveDat(st, t as never, Date.now()); if (String(t.t).startsWith('live-')) queueMicrotask(() => lt.nhanTinPhong(viewBang(st))) }, guiNhiPhan: () => undefined },
     moiTruong: { fetch: (async (u: RequestInfo | URL, o?: RequestInit) => {
       const b = JSON.parse(String(o?.body ?? '{}')) as { sdp?: string }
@@ -199,7 +199,7 @@ const SAU_LOC: CauHinh = { ten: 'sau · chống hú («Tất cả»: bật khử
   const moi = ds[ds.length - 1]
   if (moi && moi !== ds[0]) { await lt.moMic(moi.id); await do1(`đổi sang «${moi.ten}» TRONG lúc live`) }
   lt.tamDung(true); await ngu(1200); await do1('tạm dừng (phía em phải đứng yên)')
-  lt.tamDung(false); await do1('tiếp tục')
+  lt.tamDung(false); await do1('tiếp tục'); await do1('3 giây sau khi tiếp tục')
   lt.datLoc('bat'); await ngu(400); await do1('thầy ép lọc «Bật» (mở lại cùng mic)')
   lt.datLoc('tu'); await ngu(400); await do1('về «Tự động»')
   // GỌI EM LÊN BẢNG, EM BẬT MIC (thầy 11/11, ảnh máy em: «Mic của em · Đang bật» mà «Thầy đang im»): máy thầy kéo tiếng em về ⇒ đàm phán lại trên kết nối

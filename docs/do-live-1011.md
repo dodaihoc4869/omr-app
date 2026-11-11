@@ -110,6 +110,9 @@ Chạy riêng: `node scripts/thu-live-1011/do-tieng.mjs <dist> docs/ban-ve-live-
 | bật live lại | tăng sau 404 ms | −14,3 dBFS | tắt |
 
 Bước đo là 100 ms nên «tăng sau 101 ms» nghĩa là đã tăng ngay ở lần đọc đầu.
+Chạy lại sau khi đổi sang chuỗi từng khung (mục 5): 13 / 13 bước đạt (thêm bước «3 giây sau khi tiếp tục»). Ghi nhận CHƯA kết luận: giây đầu sau «Tiếp tục»
+mức nhận đo được thấp (≈ −27 dBFS, 3 giây sau ≈ −21 dBFS) ở đường có tự chỉnh âm lượng của trình duyệt; ép tắt (`LV_AGC=0`) thì không thấy (≈ −21 dBFS ngay).
+Bản trước cũng thấp ở bước này (≈ −19 … −21 so với −15). Cần nghe trên máy thật trước khi đổi mặc định.
 Bước «em bật mic»: «SFU» giả thêm một đường gửi (tiếng dao động thay giọng em) và gửi LỜI MỜI MỚI; máy thầy trả lời bằng đúng mã thật (`soatEmNoi`). Tiếng thầy
 phía em không đứt qua lần đàm phán lại ấy (mức nhận thấp hơn vì cùng lúc mic thầy mở lại với khử vọng — loa máy thầy đang phát tiếng em).
 

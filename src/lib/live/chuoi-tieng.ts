@@ -13,7 +13,7 @@ export const NEN_RO = { nguong: -32, goi: 20, tiLe: 3 }
 /** Chặn đỉnh của kiểu 'nen': hạ mức trước bộ chặn + ngưỡng chặn (dB). */
 export const CHAN_DINH = { ha: 0.55, nguong: -7 }
 /** Kiểu 'nhanh': mức giọng nhắm tới (RMS lúc có tiếng, biên độ), trần đỉnh, khoảng hệ số nâng, tốc độ trôi (dB / giây). */
-export const LAM_RO = { dich: 0.13, tran: 0.84, nhoNhat: 0.5, lonNhat: 20, len: 2, lenDau: 9, xuong: 6 }
+export const LAM_RO = { dich: 0.13, tran: 0.84, nhoNhat: 0.5, lonNhat: 20, len: 3, lenDau: 9, xuong: 3 }
 
 export type KieuChuoi = 'khung' | 'nhanh' | 'nen'
 export interface ChuoiTieng {
@@ -32,14 +32,16 @@ export interface ChuoiTieng {
 /** Mã của bộ xử lý (chạy trong luồng âm thanh; viết ES5 + lớp, không phụ thuộc gì). Mỗi khối 128 mẫu:
  *  · sàn ồn = mức thấp nhất gần đây (bám xuống nhanh, trôi lên ≈ 1 dB / giây);
  *  · khối là GIỌNG NÓI khi RMS > 4 × sàn ồn và > −56 dBFS ⇒ cập nhật mức giọng trung bình (≈ 0,5 giây) và cho hệ số nâng trôi về `dich / mức giọng`
- *    (lên 2 dB / giây — 9 dB / giây trong 3 giây nói đầu; xuống 6 dB / giây); khối KHÔNG phải giọng nói ⇒ hệ số ĐỨNG YÊN;
+ *    (lên / xuống 3 dB / giây — lên 9 dB / giây trong 3 giây nói đầu; tiếng bật to bất chợt để bộ chặn đỉnh lo, hệ số không tụt theo);
+ *    khối KHÔNG phải giọng nói ⇒ hệ số ĐỨNG YÊN; im quá 1 giây rồi nói lại ⇒ 3 giây nói kế được lên nhanh như lúc đầu (sau «Tiếp tục» tự chỉnh âm lượng
+ *    của trình duyệt đưa tiếng nhỏ đi ≈ 10 dB vài giây — đo 11/11);
  *  · chặn đỉnh từng mẫu: vượt trần ⇒ hạ ngay cho vừa trần, nhả 80 ms. */
 const MA_LAM_RO = `
 class LamRoTieng extends AudioWorkletProcessor {
   constructor(o) {
     super();
     var p = (o && o.processorOptions) || {};
-    this.c = p; this.g = p.g0 > 0 ? p.g0 : 1; this.gl = 1; this.nen = 0.001; this.muc = 0; this.dem = p.g0 > 0 ? 1e6 : 0; this.bao = 0;
+    this.c = p; this.g = p.g0 > 0 ? p.g0 : 1; this.gl = 1; this.nen = 0.001; this.muc = 0; this.dem = 0; this.bao = 0; this.im = 0;
   }
   process(vao, ra) {
     var x = vao[0] && vao[0][0], y = ra[0] && ra[0][0];
@@ -50,12 +52,13 @@ class LamRoTieng extends AudioWorkletProcessor {
     r = Math.sqrt(e / n);
     this.nen = r < this.nen ? this.nen * 0.9 + r * 0.1 : Math.min(0.05, this.nen * 1.0003);
     if (r > this.nen * 4 && r > 0.0015) {
-      this.dem += 1;
+      if (this.im > sampleRate) this.dem = Math.min(this.dem, 40);
+      this.im = 0; this.dem += 1;
       this.muc = this.dem < 40 ? this.muc + (r * r - this.muc) / this.dem : this.muc + (r * r - this.muc) * (n / (0.5 * sampleRate));
       can = Math.max(c.nhoNhat, Math.min(c.lonNhat, c.dich / Math.sqrt(this.muc || 1e-9)));
       buoc = Math.pow(10, ((can > g0 ? (this.dem * n < 3 * sampleRate ? c.lenDau : c.len) : c.xuong) / 20) * (n / sampleRate));
       this.g = can > g0 ? Math.min(can, g0 * buoc) : Math.max(can, g0 / buoc);
-    }
+    } else this.im += n;
     g1 = this.g;
     for (i = 0; i < n; i++) {
       v = x[i] * (g0 + (g1 - g0) * (i + 1) / n); a = v < 0 ? -v : v;
@@ -72,7 +75,7 @@ registerProcessor('lam-ro-tieng', LamRoTieng);
 /** Mã Worker của kiểu 'khung': đọc từng khung tiếng (AudioData) của track mic, cộng các kênh về mono, lọc thông cao 80 Hz, nâng mức + chặn đỉnh (đúng thuật
  *  toán của LamRoTieng ở trên), ghi khung mới cùng mốc giờ. Một khung vào ⇒ một khung ra, không đệm. */
 const MA_KHUNG = `
-var c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
+var c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
 function xuLy(f) {
   var n = f.numberOfFrames, kenh = f.numberOfChannels, s = f.sampleRate, moc = f.timestamp, x = new Float32Array(n), i, k, e = 0, r, g0 = g, can, buoc, v, a, w, al, nha;
   if (!tam || tam.length !== n) tam = new Float32Array(n);
@@ -83,12 +86,13 @@ function xuLy(f) {
   r = Math.sqrt(e / n);
   nen = r < nen ? nen * 0.9 + r * 0.1 : Math.min(0.05, nen * Math.pow(1.0003, n / 128));
   if (r > nen * 4 && r > 0.0015) {
-    dem += n / 128;
+    if (im > s) dem = Math.min(dem, 40);
+    im = 0; dem += n / 128;
     muc = dem < 40 ? muc + (r * r - muc) / Math.max(1, dem * 128 / n) : muc + (r * r - muc) * (n / (0.5 * s));
     can = Math.max(c.nhoNhat, Math.min(c.lonNhat, c.dich / Math.sqrt(muc || 1e-9)));
     buoc = Math.pow(10, ((can > g0 ? (dem * 128 < 3 * s ? c.lenDau : c.len) : c.xuong) / 20) * (n / s));
     g = can > g0 ? Math.min(can, g0 * buoc) : Math.max(can, g0 / buoc);
-  }
+  } else im += n;
   nha = 1 - Math.exp(-1 / (0.08 * s));
   for (i = 0; i < n; i++) {
     v = x[i] * (g0 + (g - g0) * (i + 1) / n); a = v < 0 ? -v : v;
@@ -101,7 +105,7 @@ function xuLy(f) {
 onmessage = function (ev) {
   var d = ev.data, doc, ghi;
   if (!d || !d.vao) return;
-  c = d.c; if (c.g0 > 0) { g = c.g0; dem = 1e6; }
+  c = d.c; if (c.g0 > 0) g = c.g0;
   doc = d.vao.getReader(); ghi = d.ra.getWriter();
   (function buoc() {
     doc.read().then(function (kq) {
@@ -113,7 +117,7 @@ onmessage = function (ev) {
 };
 `
 const daNap = new WeakMap<object, Promise<boolean>>()
-/** Hệ số nâng gần nhất (mở lại mic / đổi mic không phải dò lại từ đầu). */
+/** Hệ số nâng gần nhất: mở lại mic / đổi mic thì BẮT ĐẦU từ hệ số ấy (không tụt về 1), rồi 3 giây nói đầu vẫn trôi nhanh về mức đúng của luồng mới. */
 let gNho = 0
 
 /** Trình duyệt này có chạy được kiểu 'nhanh' không (biết ngay, chưa cần nạp). */

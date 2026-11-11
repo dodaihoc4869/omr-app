@@ -282,12 +282,12 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   const SO_BAC = 4
   const rangBuoc = (loc: boolean, b: number): MediaTrackConstraints => ({
     ...(idDung() ? { deviceId: b >= 3 ? { ideal: idDung()! } : { exact: idDung()! } } : {}),
-    echoCancellation: b >= 1 ? false : loc, noiseSuppression: b >= 1 ? false : loc, autoGainControl: b < 2 ? agcMuon() : !agcMuon(),
+    echoCancellation: b >= 1 ? false : loc, noiseSuppression: b >= 1 ? false : loc, autoGainControl: (b < 2) === (tuy.agc ?? true), // tự chỉnh âm lượng của trình duyệt GIỮ BẬT ở bậc đầu (đo 11/11: không «thở», giữ luồng 48 kHz một kênh); bậc nới thử mic thô
     ...(b < 1 ? { sampleRate: { ideal: 48000 } } : {}),
   })
+  const bacCuoi = (): number => (idDung() ? SO_BAC - 1 : SO_BAC - 2)
   /** Bậc kế có ràng buộc xử lý KHÁC bậc đang chạy (bậc trùng ràng buộc thì bỏ qua — không chờ 1,5 giây vô ích). */
   const bacKe = (): number => { const khoa = (b: number) => { const r = rangBuoc(locXin, b); return `${r.echoCancellation}${r.noiseSuppression}${r.autoGainControl}${JSON.stringify(r.deviceId ?? '')}` }; let b = bac + 1; while (b < bacCuoi() && khoa(b) === khoa(bac)) b += 1; return Math.min(bacCuoi(), b) }
-  const bacCuoi = (): number => (idDung() ? SO_BAC - 1 : SO_BAC - 2)
   const ctxChay = (): boolean => !!amCtx && amCtx.state === 'running'
   function thaLuong(l: MediaStream | null): void { for (const t of l?.getTracks() ?? []) { t.onmute = t.onunmute = t.onended = null; try { t.stop() } catch { /* đã dừng */ } } }
   function goChuoi(): void {
@@ -306,8 +306,6 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   /** CHUỖI LÀM RÕ TIẾNG (src/lib/live/chuoi-tieng.ts): mic → cộng hai kênh về mono → lọc 80 Hz → nâng mức → chặn đỉnh → track gửi cho lớp.
    *  ĐƯỜNG LUI: AudioContext treo / dựng lỗi / chuỗi ra câm ⇒ `trackGui()` trả thẳng track mic — không bao giờ mất tiếng vì chuỗi. */
   const kieuMuon = (): KieuChuoi => tuy.chuoiKieu ?? 'khung'
-  /** Tự chỉnh âm lượng của trình duyệt GIỮ BẬT ở bậc đầu (đo 11/11: không «thở», tín / ồn ngang bản tắt, và giữ luồng 48 kHz một kênh); bậc nới thì thử đường tắt. */
-  const agcMuon = (): boolean => tuy.agc ?? true
   function taoCtx(): AudioContext | null {
     if (amCtx) return amCtx
     try {
@@ -334,7 +332,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   /** Track GỬI cho lớp: track của chuỗi làm rõ tiếng khi chuỗi đang chạy tốt; không thì thẳng track mic. */
   function trackGui(): MediaStreamTrack | null {
     const t = mic?.getAudioTracks()[0] ?? null
-    return t && tuy.chuoi !== false && chuoi && !chuoi.hong && ctxChay() && chuoi.ra.readyState === 'live' ? chuoi.ra : t
+    // chuỗi từng khung chạy trong Worker, không cần AudioContext ⇒ bộ đo treo vẫn dùng được; hai kiểu Web Audio thì phải có bộ xử lý đang chạy
+    return t && tuy.chuoi !== false && chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()) && chuoi.ra.readyState === 'live' ? chuoi.ra : t
   }
   /** Luồng bọc track ĐANG GỬI cho lớp (cho máy ghi «Xem lại Live»); track đổi ⇒ đối tượng luồng mới. Không dựng được `MediaStream` ⇒ luồng mic thô. */
   let luongGuiNho: { t: MediaStreamTrack; l: MediaStream } | null = null
@@ -373,7 +372,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     const nay = mt.dongHo(), dau = nay - lucMo < 1450
     if (t.readyState === 'live' && !tt.micTat) {
       let d = dinh(doDinh, mauDinh)
-      if (d == null && dangLive() && gui && gui.track && nay - gui0 > 1500 && guiSo2.muc != null && nay - guiSo2.luc < 1500) d = guiSo2.muc // bộ đo treo: số đo của bộ gửi
+      if (d == null && dangLive() && gui && gui.track && pc?.connectionState === 'connected' && nay - gui0 > 1500 && guiSo2.muc != null && nay - guiSo2.luc < 1500) d = guiSo2.muc // bộ đo treo: số đo của bộ gửi
       if (d != null) {
         if (d >= NGUONG_CAM && !t.muted) {
           coTin = true; bacTot = bac; lucTin = nay
@@ -420,11 +419,13 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     // (hoặc rơi về mic thô), bất kể ràng buộc mới — mở lại «với bậc khác» mà chưa thả là mở lại y như cũ. Luồng cũ đang câm ⇒ cũng thả trước (không mất gì).
     // Khác thiết bị và luồng cũ đang có tiếng (thầy đổi mic giữa buổi) ⇒ vẫn gắn luồng mới rồi mới thả luồng cũ.
     if (mic && (idMo === idDung() || !coTin)) thaLuong(mic)
-    let luong: MediaStream
+    let luong: MediaStream, thuLai = 0
     for (;;) {
       try { luong = await navigator.mediaDevices.getUserMedia({ audio: rangBuoc(loc, bac) }); break } catch (e) {
         const ten = (e as { name?: string })?.name ?? ''
         if (ten === 'OverconstrainedError' && bac < bacCuoi()) { bac += 1; continue }
+        // vừa thả luồng cũ của chính thiết bị này: hệ điều hành có thể chưa nhả kịp («thiết bị đang bận») ⇒ thử lại ngay vài lần, không chờ vòng 8 giây
+        if (ten === 'NotReadableError' && thuLai++ < 3 && lan === lanMo && !huyRoi) { await new Promise<void>((r) => { mt.hen(() => r(), 300) }); continue }
         if (lan === lanMo && ten !== 'NotAllowedError' && ten !== 'SecurityError' && mic && mic.getAudioTracks()[0]?.readyState !== 'live') dat({ micTinh: 'mat' })
         if (lan === lanMo && mic && !huyRoi) { mt.huyHen(henSoat); henSoat = mt.hen(soatTinHieu, 2000) } // luồng cũ đã thả mà mở lại chưa được ⇒ vòng soát tự thử tiếp
         return { ok: false, lyDo: ten === 'NotAllowedError' || ten === 'SecurityError' ? 'mic-tu-choi' : ten === 'NotFoundError' || ten === 'OverconstrainedError' ? 'khong-mic' : 'mic-loi' }
@@ -523,7 +524,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 4) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
       sfu: !!pc && pc.connectionState === 'connected', loc: tt.loc, bac, ctx: amCtx?.state ?? 'khong',
       hz: cd.sampleRate ?? null, kenh: cd.channelCount ?? null, vong: typeof cd.echoCancellation === 'boolean' ? cd.echoCancellation : cd.echoCancellation == null ? null : true, on: cd.noiseSuppression ?? null, agc: cd.autoGainControl ?? null,
-      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && ctxChay(), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: typeof (cd as { latency?: number }).latency === 'number' ? Math.round((cd as { latency: number }).latency * 1000) : null,
+      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: typeof (cd as { latency?: number }).latency === 'number' ? Math.round((cd as { latency: number }).latency * 1000) : null,
     }
   }
   const khiThietBi = (): void => { tuy.khiThietBi?.(); if (tt.micTinh === 'mat') henMoLaiMic(300) }

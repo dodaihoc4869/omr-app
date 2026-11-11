@@ -234,7 +234,11 @@ kiem('K3 · bấm viên Live ⇒ cửa sổ có «Tạm dừng», «Kết thúc 
 await ngu(1500)
 const cdMic = await to.locator('#mc-lv-cd').innerText().catch(() => '')
 kiem('M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)', /Hz · \d kênh/.test(cdMic) && /khử vọng (bật|tắt) · lọc ồn (bật|tắt) · tự chỉnh (bật|tắt)/.test(cdMic) && /cách mở \d\/4/.test(cdMic) && /máy chủ tiếng CHƯA nối/.test(cdMic), cdMic.slice(0, 230))
-kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', await to.locator('.mc-lv-the [data-lv="loc"][data-c="tu"][aria-pressed="true"]').count() === 1 && /Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()) && /khử vọng tắt · lọc ồn tắt · tự chỉnh bật/.test(cdMic), cdMic.slice(0, 220) + ' | ' + (await to.locator('.mc-lv-the').innerText()).replace(/\s+/g, ' ').slice(120, 330))
+for (let i = 0; i < 16 && !/Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()); i++) await ngu(500)
+{ // đọc MỘT lần trong trang (thẻ vẽ lại mỗi giây theo số đo mic ⇒ hai lần đọc rời có thể rơi vào hai lần vẽ khác nhau)
+  const loc = await to.locator('.mc-lv-the').evaluate((e) => ({ an: e.querySelectorAll('[data-lv="loc"][data-c="tu"][aria-pressed="true"]').length, chu: e.innerText.replace(/\s+/g, ' ') }))
+  kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', loc.an === 1 && /Đang tắt — giọng trong nhất/.test(loc.chu), `nút «Tự động» đang ấn: ${loc.an} · ${loc.chu.slice(120, 300)}`)
+}
 kiem('M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung', /Chưa nối máy chủ tiếng/.test(await to.locator('.mc-lv-cum').innerText()))
 kiem('M1 · vạch mức âm ghi đúng trạng thái: đang live ⇒ «Mức âm đang gửi cho lớp»', /Mức âm đang gửi cho lớp/.test(await to.locator('.mc-lv-the').innerText()))
 await to.locator('.mc-lv-the [data-lv="loc"][data-c="bat"]').click(); await ngu(1600)
