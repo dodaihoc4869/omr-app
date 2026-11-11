@@ -13,6 +13,8 @@ import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
 import { boLoa, theAmLoa } from './loa'
 import { taoLuoiPhat } from './luoi-tieng'
+import { doTieng } from './do-tieng'
+import { ngheThat, type SoTieng } from './so-tieng'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
@@ -104,6 +106,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   /** Đang xin điểm qua đường phụ WebSocket (DataChannel thủng) · mức mạng của nét cho giao diện (0 tốt · 1 đang nới đệm · 2 kém). */
   let troWs = false, mucMang: 0 | 1 | 2 = 0, dNay = 0
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
+  /** ĐO TIẾNG TỪ XA (do-tieng.ts): bản tóm tắt gần nhất (đi kèm `live-do`) + «đang nghe thật» theo năng lượng và thẻ phát (đi kèm `live-ok`). */
+  let tiNay: SoTieng | null = null, ngheTi: boolean | null = null, lucTi = -1e9, dangDoTi = false
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, demRung: number | null = null, giayLech = false
   /** Nét đang viết đã phát ra lớp vẽ: id → số điểm đã phát. */
   const dangVe = new Map<string, number>()
@@ -389,7 +393,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     if (!live?.bat || huyRoi) return
     // (12/11) DataChannel mở nhưng đang THỦNG (mất nhiều gói liền / vừa đứt) ⇒ báo như không có DataChannel: phòng gửi THÊM điểm qua WebSocket (tin cậy);
     // máy em nhận cả hai đường, ghép theo chỉ số điểm. Hết xấu 20 giây thì thôi xin.
-    const coDc = dcMo() && !troWs, nghe = dangNghe()
+    // «N em đang nghe» của thầy tính theo NĂNG LƯỢNG tiếng tới + thẻ đang phát thật (đo 2 giây), không theo cờ
+    const coDc = dcMo() && !troWs, nghe = dangNghe() && ngheTi === true
     if (okPhien === live.phien && okDc === coDc && okNghe === nghe) return
     okPhien = live.phien; okDc = coDc; okNghe = nghe
     tuy.kenh.gui({ t: 'live-ok', dc: coDc, nghe })
@@ -471,13 +476,22 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     if (huyRoi || !live?.bat) return
     const nay = mt.dongHo()
     xaHangSo(nay)
+    if (!dangDoTi && nay - lucTi >= 5000) {
+      lucTi = nay; dangDoTi = true
+      void doTieng(() => ({ pc, n: { thu, the: am }, b: { thu: thuBan, the: amBan }, g: micTx?.sender ?? null }), mt.dongHo, (ms) => new Promise<void>((r) => { mt.hen(r, ms) }))
+        .then((t) => { tiNay = t; const ng = ngheThat(t.n); if (ng !== ngheTi) { ngheTi = ng; baoOk() } }, () => undefined).finally(() => { dangDoTi = false })
+    }
     const xong = (): void => {
       const s = dem.soDo(nay)
       soDo.ghi('d', s.d); soDo.ghi('j', s.jitter); if (s.muon) soDo.ghi('m', s.muonToiDa)
       mucMang = s.muc
       if (s.dung) soDo.ghi('dg', s.dungToiDa)
       soDo.ghi('tn', s.d + (rtt ?? 0) / 2)
-      if (nay - lucDo >= NHIP_DO_MS && !roiMan) { lucDo = nay; const tin = soDo.tinKy(dcMo()); if (tin) tuy.kenh.gui(giayLech ? { ...tin, gl: true } : tin) }
+      if (nay - lucDo >= NHIP_DO_MS) {
+        lucDo = nay
+        const tin = roiMan ? null : soDo.tinKy(dcMo()), ti: SoTieng = { ...(tiNay ?? { cs: pc?.connectionState ?? 'khong', ice: pc?.iceConnectionState ?? 'khong', uv: '' }), tg: tt.tieng, mc: tt.mic, ...(roiMan ? { r: 1 as const } : {}) }
+        tuy.kenh.gui({ ...(tin ?? { t: 'live-do' }), ...(giayLech ? { gl: true } : {}), ti })
+      }
       // Phòng báo có mục mới mà quá 2 giây chưa thấy khung nào ⇒ xin bù (kết nối vừa nối lại, tin lạc).
       if (live && live.soNet > bang.cuoi && henBu == null && nay - lucXinBu > (choSo ? 5000 : 2000)) xinBu()
       henSo = mt.hen(nhipSo, NHIP_SO_MS)
@@ -596,6 +610,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
      *  phần máy thầy (≈ 10 ms thu + khung Opus 20 ms). Chưa gồm loa / tai nghe. */
     treUocTinh: (): number | null => (demRung == null || rtt == null ? null : treTiengUocTinh({ thu: 10, chuoi: 0, ma: treKhungOpus(20), mangThay: rtt, mangEm: rtt, demEm: demRung }).ms),
     /** `mang` (12/11) = mức mạng của nét LÚC NÀY: 0 tốt · 1 đang nới đệm / đang xin đường phụ · 2 kém; `troWs` = đang nhận thêm điểm qua WebSocket. */
+    /** Bản đo tiếng từ xa gần nhất (do-tieng.ts). */
+    doTieng: (): SoTieng | null => tiNay,
     soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null, mang: mucMang, troWs }),
     huy,
   }

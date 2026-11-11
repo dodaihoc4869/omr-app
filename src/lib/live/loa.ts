@@ -1,7 +1,7 @@
 // CHỌN ĐẦU RA ÂM THANH («Loa») cho tiếng app phát trong chế độ Live — thầy 11/11: «làm thêm chọn đầu ra âm thanh để lựa chọn».
 // Dựa trên `HTMLMediaElement.setSinkId` (Chrome / Edge máy tính, Chrome Android bản mới, Firefox 116+; Safari + mọi trình duyệt iPhone CHƯA có ⇒ `coChonLoa()`
 // false ⇒ lớp giao diện ẩn ô chọn). Mã thiết bị '' = «Mặc định của máy». Lựa chọn nhớ ở localStorage (bọc try / catch).
-// 11/11 tối (đưa lại sau lượt lùi khẩn #1622): CHỈ gọi `setSinkId` khi người dùng đã chọn một loa KHÁC mặc định (thẻ đang ở mặc định thì không đụng tới);
+// 11/11 tối (đưa lại sau lượt lùi khẩn (bản phát hành 1622)): CHỈ gọi `setSinkId` khi người dùng đã chọn một loa KHÁC mặc định (thẻ đang ở mặc định thì không đụng tới);
 // công tắc lùi riêng `ddh.live.loa-chon` = `tat` ⇒ coi như trình duyệt không chọn được loa (ẩn ô chọn, không bao giờ gọi `setSinkId`).
 // CẢNH BÁO LOA (nghi phạm «câm cả hai chiều» trên máy thầy): cắm bộ thu mic USB (BOYALINK…) thì Windows hay tự đặt chính bộ thu ấy làm LOA mặc định ⇒ mọi tiếng
 // app phát ra jack tai nghe của bộ thu. `loaTrungMic` so tên loa mặc định với tên mic để cửa sổ nút Live nhắc thầy chọn lại loa.
@@ -24,6 +24,10 @@ export async function dsLoa(): Promise<{ id: string; ten: string }[]> {
   } catch { return [] }
 }
 
+/** Loa đang chọn của trang (null = chưa đọc) + mọi thẻ âm thanh live đã tạo (để áp loa mới). */
+let idLoa: string | null = null
+const cacThe = new Set<HTMLMediaElement>()
+const idNay = (): string => (idLoa ??= coChonLoa() ? loaDaNho() : '')
 /** Loa mặc định của máy có phải CÙNG THIẾT BỊ với mic tên `tenMic` không (vd. «Speakers (BOYALINK)» ↔ «Microphone (BOYALINK)») ⇒ trả tên loa ấy; không ⇒ ''.
  *  Chỉ xét khi đang phát ra loa mặc định (đã chọn loa khác thì thôi). Trình duyệt không cho tên thiết bị ⇒ ''. */
 export async function loaTrungMic(tenMic: string): Promise<string> {
@@ -72,9 +76,6 @@ export async function thuLoa(id: string): Promise<boolean> {
 
 /** BỘ LOA CỦA TRANG (một trang chỉ là máy thầy hoặc máy em): nhớ loa đang chọn, áp cho mọi thẻ âm thanh đã tạo bằng `theAmLoa()` và cho thẻ tạo sau.
  *  Trình duyệt không chọn được đầu ra ⇒ mọi hàm là không-làm-gì. */
-let idLoa: string | null = null
-const cacThe = new Set<HTMLMediaElement>()
-const idNay = (): string => (idLoa ??= coChonLoa() ? loaDaNho() : '')
 /** Thẻ `<audio>` mới cho tiếng live, đã theo loa đang chọn (mặc định ⇒ không đụng `setSinkId`). */
 export function theAmLoa(): HTMLAudioElement { const t = document.createElement('audio'); cacThe.add(t); if (idNay()) void apLoa(t, idNay()); return t }
 export const boLoa = {

@@ -198,7 +198,8 @@ function moc() {
 // ── Trình duyệt ──
 const exe = process.env.PW_CHROMIUM
 const args = ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-audio-capture=${WAV}`]
-if (TU_PHAT) args.push('--autoplay-policy=no-user-gesture-required')
+// Chromium không giao diện mặc định CHO tự phát ⇒ `--tu-phat=0` phải đặt rõ chính sách của Chrome máy thật (cần thao tác của người dùng).
+args.push(TU_PHAT ? '--autoplay-policy=no-user-gesture-required' : '--autoplay-policy=document-user-activation-required')
 const trinh = await chromium.launch({ ...(exe && existsSync(exe) ? { executablePath: exe } : { channel: 'chromium' }), args })
 const nguCanh = await trinh.newContext({ permissions: ['microphone'] })
 await nguCanh.route('**/*', (r) => { const u = r.request().url(); return u.startsWith(GOC) ? r.continue() : r.abort() })
@@ -318,8 +319,8 @@ try {
   await cho(2500)
 
   const dt = async () => ({
-    thay: await thay.evaluate(() => { const c = window.lt.chanDoan?.() ?? {}; const t = window.lt.trangThai(); return { pha: t.pha, tieng: t.tieng, micTinh: t.micTinh, ngheEm: t.ngheEm, emNoi: t.emNoi?.sbd ?? null, micKhac: t.micKhac ?? null, amEmKet: t.amEmKet ?? null, cd: { track: c.track, muc: c.muc, mucGui: c.mucGui, kbps: c.kbps, gan: c.gan, sfu: c.sfu, bac: c.bac, ctx: c.ctx, hz: c.hz, kenh: c.kenh, vong: c.vong, on: c.on, agc: c.agc, chuoi: c.chuoi, kieu: c.kieu, locOn: c.locOn, locOnChay: c.locOnChay, locOnBo: c.locOnBo ?? null, df3: c.df3 ? { tinh: c.df3.tinh, ms: c.df3.ms, vi: c.df3.vi ?? null } : null, luoi: c.luoi ?? null } } }),
-    em: await Promise.all(cacEm.map((e) => e.evaluate(() => { const t = window.le.trangThai(); return { tieng: t.tieng, nghe: t.nghe, mic: t.mic, banNoi: t.banNoi?.sbd ?? null, kenhNet: t.kenhNet, locMic: window.le.locMic?.() ?? null } }))),
+    thay: await thay.evaluate(() => { const c = window.lt.chanDoan?.() ?? {}; const t = window.lt.trangThai(); return { pha: t.pha, tieng: t.tieng, micTinh: t.micTinh, ngheEm: t.ngheEm, emNoi: t.emNoi?.sbd ?? null, micKhac: t.micKhac ?? null, amEmKet: t.amEmKet ?? null, cd: { track: c.track, muc: c.muc, mucGui: c.mucGui, kbps: c.kbps, gan: c.gan, sfu: c.sfu, bac: c.bac, ctx: c.ctx, hz: c.hz, kenh: c.kenh, vong: c.vong, on: c.on, agc: c.agc, chuoi: c.chuoi, kieu: c.kieu, locOn: c.locOn, locOnChay: c.locOnChay, locOnBo: c.locOnBo ?? null, df3: c.df3 ? { tinh: c.df3.tinh, ms: c.df3.ms, vi: c.df3.vi ?? null } : null, luoi: c.luoi ?? null }, ti: window.lt.tiengMay?.().thay ?? null } }),
+    em: await Promise.all(cacEm.map((e) => e.evaluate(() => { const t = window.le.trangThai(); return { tieng: t.tieng, nghe: t.nghe, mic: t.mic, banNoi: t.banNoi?.sbd ?? null, kenhNet: t.kenhNet, locMic: window.le.locMic?.() ?? null, ti: window.le.doTieng?.() ?? null } }))),
   })
   async function doPha(ten, vai) {
     const [a, b, c] = await Promise.all([thay.evaluate(([v, ms]) => window.__do(v, ms), [vai.thay, GIAY * 1000]), s1.evaluate(([v, ms]) => window.__do(v, ms), [vai.s1, GIAY * 1000]), s2.evaluate(([v, ms]) => window.__do(v, ms), [vai.s2, GIAY * 1000])])

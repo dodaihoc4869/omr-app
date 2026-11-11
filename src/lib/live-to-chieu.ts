@@ -261,6 +261,8 @@ export const JS_LIVE_TO_CHIEU = `
       // 11/11 lần 4: «Tất cả» là mặc định ⇒ chữ đúng cả lúc chưa live + dòng phụ nhắc vọng tiếng
       h += '<div class="mc-lv-dong"><span><b>Tiếng trên máy em</b><br>' + (t.tiengLop ? (LV.tt.pha === 'live' ? 'Mọi máy em đang phát tiếng thầy' : 'Bật live là mọi máy em phát tiếng thầy') + '<br>Máy em trong lớp đang bật tiếng: dễ vọng tiếng — nên cho em đeo tai nghe' : 'Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe') + (LV.tt.pha === 'live' ? '<br><b>' + (LV.tt.nghe || 0) + '</b> em đang nghe qua máy' : '') + '</span><span style="display:inline-flex;gap:.4em">'
         + '<button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="0" aria-pressed="' + (!t.tiengLop) + '">Em ở xa</button><button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="1" aria-pressed="' + (!!t.tiengLop) + '">Tất cả</button></span></div>';
+      // 11/11 tối · ĐO TIẾNG TỪ XA: một dòng gọn cho máy thầy + mỗi máy em (máy nào câm thì đứng đầu, ghi rõ vì sao)
+      if (LV.tt.doTieng && LV.tt.doTieng.length) h += '<p class="mc-lv-cd" role="status">' + LV.tt.doTieng.map(lvSach).join('<br>') + '</p>';
     }
     // điểm quyết 4: mặc định TẮT, thầy bật từng buổi — chỉ em có tên trong lớp, đã đăng nhập; không điểm danh, không đội, không kJ
     if (LV.tt.dot2) h += '<div class="mc-lv-dong"><span><b>Cho em ở xa vào xem</b><br>Em có tên trong lớp · không điểm danh, không kJ</span><button type="button" class="mc-lv-n nho" data-lv="xa" data-v="' + (t.xa ? '0' : '1') + '" aria-pressed="' + (!!t.xa) + '">' + (t.xa ? 'Đang bật' : 'Đang tắt') + '</button></div>';

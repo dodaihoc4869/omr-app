@@ -176,6 +176,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   const timThe = (): Promise<string | null> => timTheMacDinh(mic?.getAudioTracks()[0]?.label ?? '')
   /** Chuỗi làm rõ tiếng (Web Audio) của luồng mic đang mở; `hong` = chuỗi ra câm trong khi mic có tiếng ⇒ bỏ chuỗi, gửi thẳng track mic. */
   let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string; vao?: number; vaoLuc?: number } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
+  let lyDoLuoi = '' // lý do lưới an toàn phía gửi đã bỏ chuỗi (chanDoan)
   let guiSo2: { muc: number | null; kbps: number | null; byte: number | null; luc: number } = { muc: null, kbps: null, byte: null, luc: 0 }, lucDocGui = -1e9, gui0 = 0
   /** LUẬT XỬ LÝ TIẾNG (thầy 11/11 «tiếng trong và cực rõ»): khử vọng + lọc ồn của trình duyệt làm đục giọng (nhất là mic cài áo) ⇒ chỉ bật khi CÓ ĐƯỜNG VỌNG:
    *  loa máy thầy đang phát tiếng em nói (11/11 lần 4: hết tính `tiengLop`). Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
@@ -679,7 +680,6 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     tuy.kenh.gui({ t: 'live-san', ss: phienSfu ? { id: phienSfu, tieng: 'thay', kenh: dc ? 'net' : null } : null })
   }
   // LƯỚI AN TOÀN (luoi-tieng.ts): chuỗi ra câm 1,5 giây mà mic vào có tiếng ⇒ gửi thẳng mic; tiếng em tới mà thẻ phát đứng ⇒ bỏ chọn loa, phát lại, báo `amEmKet`.
-  let lyDoLuoi = ''
   const micCoTieng = (): boolean | null => { const k = chuoi?.k; if (k?.vaoLuc && Date.now() - k.vaoLuc < 2500) return (k.vao ?? 0) > 1e-4; const d = dinh(doDinh, mauDinh); return d == null ? null : d >= NGUONG_CAM }
   const luoiGui = taoLuoiGui({ gui: () => gui, dangXuLy: () => !!chuoi && !chuoi.hong && gui?.track === chuoi.ra && !tt.micTat && dangLive(), micCoTieng, mt,
     khiCam: () => { if (chuoi && !chuoi.hong) { chuoi.hong = true; lyDoLuoi = `chuỗi ${chuoi.k.kieu} ra câm 1,5 giây ⇒ gửi thẳng mic`; void ganMic() } } })
@@ -711,6 +711,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     thuMic, datNgheEm, mucAmEm, moiNoi, haTay, tamDung,
     /** (11/11) «Lọc tiếng ồn + khử vọng»: tu / bat / tat · dòng chẩn đoán mic · luồng mic đang mở (thô) · track tiếng đang gửi cho lớp (sau chuỗi làm rõ tiếng). */
     datLoc, datLocOn, chanDoan, luongMic: (): MediaStream | null => mic, trackGui, phatLaiEm: (): void => { void amEm?.play().catch(() => undefined) },
+    /** Cho đo tiếng từ xa (do-tieng.ts): phiên SFU, bộ nhận + thẻ phát tiếng em, bộ gửi; `dangLive` = đang live thật. */
+    nguonDo: () => ({ pc, n: { thu: thuEm, the: amEm as HTMLMediaElement | null }, g: gui, dangLive: dangLive() }),
     /** (Xem lại Live 11/11 — chỉ thêm) Luồng tiếng cho MÁY GHI: tiếng thầy ĐANG GỬI cho lớp — SAU chuỗi làm rõ tiếng (đủ to, đã chặn đỉnh; chuỗi không chạy thì
      *  là thẳng track mic) — + tiếng em đang kéo về (null = không có). Track gửi đổi (đổi mic, chuỗi ⇄ mic thô) ⇒ trả đối tượng luồng MỚI để máy ghi nối lại. */
     luongGhi: (): { mic: MediaStream | null; em: MediaStream | null } => ({ mic: tuBat && tt.tieng === 'mic' ? luongGui() : null, em: tt.emNoi && amEm?.srcObject instanceof MediaStream ? amEm.srcObject : null }),

@@ -8,6 +8,7 @@ import { taoLoiBut, type NetBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { DOI_BPU, kyHieu, type KieuRoi, type ViewBang } from '../../lib/bpu/phong'
 import type { ChanDoanMic, CheDoLoc, KetQuaBat, LiveThay, MucLocOn, TinhMic, TrangThaiLiveThay } from '../../lib/live'
 import { TRE_CHUOI, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from '../../lib/live/so-do'
+import { dongMay, viSaoCam } from '../../lib/live/so-tieng'
 import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
 import { maTrang } from './bo-cuc'
@@ -39,6 +40,8 @@ export interface TtLiveTo {
   emKet: boolean
   /** Lượt đang mở mà còn em chưa gửi — viên live nhắc (đặc tả mục 5). */
   chuaGui: number
+  /** ĐO TIẾNG TỪ XA (11/11 tối): một dòng gọn cho máy thầy + mỗi máy em (do-tieng.ts / so-tieng.ts); máy câm đứng đầu. Rỗng khi chưa live. */
+  doTieng: string[]
   /** `loa` = ô chọn đầu ra âm thanh (null = trình duyệt không chọn được ⇒ ẩn); `thu` = kết quả lần «Thử loa» gần nhất; `trung` = tên loa mặc định nếu đó là
    *  CHÍNH thiết bị của mic (bộ thu USB — Windows hay tự đặt làm loa mặc định ⇒ tiếng app ra jack tai nghe của bộ thu, thầy không nghe thấy). */
   the: { ds: { id: string; ten: string }[]; chon: string; loi: string; tiengLop: boolean; xa: boolean; loa?: { ds: { id: string; ten: string }[]; chon: string; thu?: 'dang' | 'ok' | 'loi'; trung?: string } | null } | null
@@ -148,6 +151,7 @@ function trangThai(): TtLiveTo {
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
     bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm, emKet: !!ttLt?.amEmKet,
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
+    doTieng: live ? dongTieng(em) : [],
     the: the ? { ...the, xa: !!l?.xa } : null, roi, tay, moi, micLoi, nghi: live && !!l?.nghi, dot2: GIAO_DIEN_DOT_2,
     mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong', khac: ttLt.micKhac ?? '' } : null,
     lyDoKT: !live || l?.tieng === 'chua-cau-hinh' ? '' : ttLt?.tieng === 'loi' ? 'Chưa nối máy chủ tiếng'
@@ -158,6 +162,16 @@ function trangThai(): TtLiveTo {
   }
 }
 /** Gửi phòng bố cục giấy đề của tờ (chỉ khi đang live, khi đổi / vừa bật live / phòng nối lại). */
+/** Dòng đo tiếng từ xa: máy thầy (gửi + nghe em) rồi từng máy em — máy có vấn đề lên đầu, tối đa 40 dòng. */
+function dongTieng(em: (sbd: string) => { ten: string }): string[] {
+  const tm = lt?.tiengMay?.()
+  if (!tm) return []
+  const g = tm.thay?.g, ds: string[] = [`Máy thầy gửi: ${g ? `${g.kb} kb/s · mức nguồn ${Math.round(g.muc * 100)}` : 'chưa đo'}${tm.thay ? ` · ICE ${tm.thay.ice}${tm.thay.uv ? ` (${tm.thay.uv})` : ''}` : ''}`]
+  if (ttLt?.emNoi && ttLt.ngheEm) ds.push(dongMay(`Máy thầy nghe ${ttLt.emNoi.ten}`, tm.thay, 'tiếng em'))
+  const may = tm.em.map((x) => ({ d: dongMay(em(x.s).ten, x.ti), xau: viSaoCam(x.ti) !== '' }))
+  may.sort((a, b) => Number(b.xau) - Number(a.xau))
+  return [...ds, ...may.slice(0, 40).map((x) => x.d)]
+}
 function guiGiay(lai = false): void {
   if (lai) giayDaGui = ''
   if (!lt || !view?.live?.bat || giayCuoi === giayDaGui) return
@@ -262,7 +276,7 @@ function nghe(): void {
       const m = tin as { t?: string }
       if (m.t === 'bang') { view = tin as ViewBang; void dam() }
       lt?.nhanTinPhong(tin)
-      if (m.t === 'bang' || m.t === 'live-xem' || m.t === 'live-kq') bao()
+      if (m.t === 'bang' || m.t === 'live-xem' || m.t === 'live-kq' || m.t === 'live-do') bao()
     }
   })
   nghePhong(() => {
