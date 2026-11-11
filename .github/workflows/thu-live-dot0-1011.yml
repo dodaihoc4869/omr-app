@@ -4,16 +4,27 @@
 # Chỉ in SỐ ĐO và đạt / không đạt — không in mã ứng dụng, khoá, mã phiên.
 # NƠI ĐO: máy CI của GitHub (thầy + em cùng một máy, trung tâm dữ liệu nước ngoài) ⇒ kiểm được đường đi chạy thật (SDP, track tiếng, DataChannel),
 # KHÔNG đại diện mạng Việt Nam / 4G / máy em yếu / 300 người nghe — các số đó đo tại lớp (đặc tả mục 7).
+# kieu = tieng-that (11/11): PHÉP THỬ TIẾNG THẬT (scripts/thu-live-dot0-1011/tieng-that.mjs) trên BẢN DỰNG THẬT của từng bản trong `refs` (mỗi bản một
+# việc song song): dist/ + service worker phục vụ như Pages, mic giả là giọng người (một / hai kênh), kiểm từng chiều theo tầng gửi → nhận → phần tử phát.
 name: Thử khả thi Live — Đợt 0 (10/11)
 on:
   workflow_dispatch:
     inputs:
       giay:
-        description: Số giây thầy viết
+        description: Số giây thầy viết (kieu dot0)
         default: '12'
       em:
-        description: Số máy em (1–8)
+        description: Số máy em 1–8 (kieu dot0)
         default: '2'
+      kieu:
+        description: dot0 (bộ thử cũ) · tieng-that (phép thử tiếng thật trên bản dựng thật)
+        default: 'dot0'
+      refs:
+        description: (tieng-that) các bản cần thử, cách nhau dấu phẩy — HEAD = nhánh đang chạy
+        default: 'HEAD,7c0935aab,cc7de387b,e6aa2a569,ca1214048'
+      loc_on:
+        description: (tieng-that) mức lọc ồn của máy thầy — manh / vua / tat
+        default: 'manh'
 permissions:
   contents: read
 concurrency:
@@ -21,6 +32,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   thu:
+    if: ${{ inputs.kieu != 'tieng-that' }}
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
@@ -38,3 +50,61 @@ jobs:
           GIAY: ${{ inputs.giay || '12' }}
           EM: ${{ inputs.em || '2' }}
         run: node scripts/thu-live-dot0-1011.mjs --giay="$GIAY" --em="$EM"
+
+  chuan-bi:
+    if: ${{ inputs.kieu == 'tieng-that' }}
+    runs-on: ubuntu-latest
+    outputs:
+      refs: ${{ steps.r.outputs.refs }}
+    steps:
+      - id: r
+        env:
+          REFS: ${{ inputs.refs }}
+        run: echo "refs=$(node -e 'console.log(JSON.stringify(process.env.REFS.split(",").map((s) => s.trim()).filter((s) => /^[A-Za-z0-9._\/^~-]+$/.test(s))))')" >> "$GITHUB_OUTPUT"
+
+  tieng-that:
+    needs: chuan-bi
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.chuan-bi.outputs.refs) }}
+    name: tiếng thật (${{ matrix.ref }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Mẫu giọng (người thật; một + hai kênh)
+        run: node scripts/thu-live-dot0-1011/giong.mjs "$RUNNER_TEMP/giong"
+      - name: Dựng bản ${{ matrix.ref }} (vite build — đúng bản dựng phát hành)
+        env:
+          REF: ${{ matrix.ref }}
+        run: |
+          if [ "$REF" = "HEAD" ]; then npx vite build > "$RUNNER_TEMP/dung.log" 2>&1 || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }; echo "DIST=$GITHUB_WORKSPACE/dist" >> "$GITHUB_ENV"
+          else
+            git worktree add --detach "$RUNNER_TEMP/wt" "$REF"
+            ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/wt/node_modules"
+            (cd "$RUNNER_TEMP/wt" && npx vite build > "$RUNNER_TEMP/dung.log" 2>&1) || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }
+            echo "DIST=$RUNNER_TEMP/wt/dist" >> "$GITHUB_ENV"
+          fi
+          tail -3 "$RUNNER_TEMP/dung.log"
+      - name: Thử tiếng — mic 2 kênh / 1 kênh, có / không cờ tự phát
+        env:
+          REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
+          REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          REF: ${{ matrix.ref }}
+          LOC_ON: ${{ inputs.loc_on || 'manh' }}
+        run: |
+          rc=0
+          for bien in "giong-2 1" "giong-1 1" "giong-2 0"; do
+            set -- $bien
+            node scripts/thu-live-dot0-1011/tieng-that.mjs --dist="$DIST" --nhan="$REF" --wav="$RUNNER_TEMP/giong/$1.wav" --tu-phat="$2" --loc-on="$LOC_ON" || rc=1
+          done
+          exit $rc
