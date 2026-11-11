@@ -1,0 +1,26 @@
+# XOÁ HAI BẢN THỬ TẢI omr-thu-tai + omr-thu và D1 thử của chúng (thầy 11/11 «Làm mọi thứ để dùng bản 5 đô/tháng thôi»).
+# Chạy một lần; chốt an toàn trong scripts/xoa-worker-thu-1111.mjs (không bao giờ đụng Worker `omr` / D1 thật).
+name: Xoá bản thử tải (một lần)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/xoa-worker-thu-1111.yml']
+permissions:
+  contents: read
+jobs:
+  xoa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Xoá
+        run: node scripts/xoa-worker-thu-1111.mjs
