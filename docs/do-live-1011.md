@@ -585,3 +585,24 @@ CHƯA GẶP (`LV_CHI_MH=1 … do-tach-giong.mjs`), KHÔNG bằng chấm nội b�
 mới đặt `URL_MO_HINH_THAY` (sau lệnh có mã thầy), rồi chạy phép thử CI cho mức này (tải đoạn bài giảng công khai làm mic giả, hoặc kiểm SỐNG nếu không tải được).
 B2 (mô hình có sẵn trên Hugging Face qua runner): KHÔNG làm — điều phối hạ ưu tiên; tra cứu lượt 1 cho thấy các mô hình mở đều 16 kHz hoặc khúc dài (trái tiêu chí trễ / dải).
 
+### 11.5 Quyết của điều phối (11/11 đêm) — trọng số, cách phát hành, dữ liệu cần thêm
+- **Trọng số:** KHÔNG commit trọng số luyện từ giọng thầy / dữ liệu NC (VIVOS) lên nhánh công khai (hệ thống quyền đã chặn một lần — không lách). Trọng số giữ ở thư
+  mục tạm của phiên (`mh/*.tgt`, `ck-*/`). `scripts/thu-live-1011/tach-giong/ckpt/thay-ck1-2000.tgt` (bước 2000, trước khi có dữ liệu NC) đã có trên nhánh thì để yên,
+  không thêm tệp mới.
+- **Cách phát hành (khi có bản đạt đủ 4 tiêu chí — CHƯA làm mã):** tệp mô hình đặt ở R2 RIÊNG, tải qua một lệnh Worker chỉ máy thầy đã đăng nhập (mã thầy) mới lấy
+  được; KHÔNG đặt ở Pages công khai, không vào precache. `URL_MO_HINH_THAY` (src/lib/live/chi-thay.ts) trỏ tới lệnh ấy; `taiMoHinhThay` gửi kèm mã như các lệnh khác
+  của app thầy. Mô hình có dữ liệu NC ⇒ chỉ dùng nội bộ.
+- **Cần bao nhiêu giọng thầy (ƯỚC LƯỢNG, ngoại suy thô):** với 44 s giọng thầy sạch (bước 8000, bản E), giọng chưa gặp chỉ hạ 3,8–12 dB và thầy đã bị hạ 2,2 dB; với 119 s
+  (bản A, trước lọc chặt) thầy giữ tốt hơn nhưng giọng chưa gặp chỉ hạ 3–6 dB (khi đó chưa có kho giọng mở). Theo kinh nghiệm chung của mô hình riêng một người nói, mỗi
+  lần GẤP ĐÔI giọng đích sạch thêm ≈ 2–3 dB mức chặn trên giọng chưa gặp mà không làm thầy xấu đi ⇒ từ ≈ 8 dB lên ≥ 20 dB cần 4–5 lần gấp đôi ⇒ **cỡ 15–30 phút giọng
+  thầy sạch**, đa dạng (giảng, đọc, hỏi, nhấn mạnh, nói to), cộng kho giọng khác nhiều người (đã có VIVOS / LibriSpeech / FLEURS). Đây là ước lượng, chỉ đường cong thật
+  sau khi nạp mới xác nhận được.
+- **Cách nhanh nhất để thầy đưa giọng:** (1) một buổi Live MỘT MÌNH 15–20 phút ở chỗ yên tĩnh (không em nào bật mic), giảng / đọc bình thường rồi kết thúc — bản ghi
+  vào «Xem lại Live», `canh-buoi-moi.sh` tự tải và trích (đi qua MP3 48 kb/s ⇒ dải tới ≈ 11 kHz); hoặc (2) đính kèm thẳng tệp bài giảng tự tải từ YouTube Studio
+  (tệp gốc của thầy, dải rộng) vào cuộc trò chuyện ⇒ đặt vào `giong-thay-youtube/` của phiên, `chuan-bi-yt.py` tự đổi sang hai miền (sạch + MP3) và giữ riêng một tệp
+  để chấm độ sáng. Cách (2) tốt hơn cho miền mic sạch 48 kHz lúc chạy thật.
+- **Đang chạy qua đêm (điều phối dừng sáng 12/11):** luyện C, E; `canh-buoi-moi.sh` (gọi Worker thật bằng mã thầy mỗi 25 phút — không tự dừng); `canh-ck.sh`.
+  Dừng: `pkill -f "ma/luyen.py du-lieu ck-c"` · `pkill -f "ma/luyen.py du-lieu ck-e"` · `pkill -f ma/canh-buoi-moi.sh` · `pkill -f ma/canh-ck.sh`.
+  Đọc số: `do-nhanh.log` (thư mục tạm của phiên); chọn bản bằng bản đo 18 s trên giọng chưa gặp. Lưu ý: FLEURS cum000 (người chấm) lọt vào thư mục luyện từ lần quét
+  bước 8000 tới lần quét bước 10000 ⇒ đừng dùng số FLEURS giữ riêng của C / E trước bước 10000.
+
