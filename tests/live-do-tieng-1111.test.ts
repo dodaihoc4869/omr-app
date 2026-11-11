@@ -23,6 +23,18 @@ describe('phần thuần: «đang nghe thật» + lý do câm + dòng gọn', ()
     expect(viSaoCam({ ...tot, n: { ...tot.n!, pt: { d: 1, ct: 0, m: 0, v: 1 } } })).toMatch(/CHƯA phát/)
     expect(viSaoCam({ ...tot, n: { ...tot.n!, nl: 0 } })).toMatch(/KHÔNG có năng lượng/)
   })
+  it('trình duyệt KHÔNG báo năng lượng (null) ≠ không có tiếng: «nghe thật» dựa vào kb/s + thẻ phát, không kết luận «câm từ nguồn»', () => {
+    const n = { ...tot.n!, nl: null }
+    expect(ngheThat(n)).toBe(true)
+    expect(viSaoCam({ ...tot, n })).toBe('')
+    expect(dongMay('Vy', { ...tot, n })).toBe('Vy: ICE ok (host/udp) · nhận 58 kb/s · năng lượng ? · loa đang phát')
+    expect(sachTieng({ ...tot, n: { ...tot.n, nl: undefined } })?.n?.nl).toBeNull()
+  })
+  it('ICE hỏng làm thư viện đóng phiên (cs khong) ⇒ vẫn nói đúng «ICE hỏng» nhờ lý do lần nối cuối (`l`), không lẫn với «chưa nối»', () => {
+    expect(viSaoCam({ cs: 'khong', ice: 'khong', uv: '', l: 'khong-noi' })).toMatch(/ICE hỏng/)
+    expect(viSaoCam({ cs: 'khong', ice: 'khong', uv: '', l: 've' })).toBe('nối máy chủ tiếng lỗi (ve)')
+    expect(sachTieng({ cs: 'khong', ice: 'khong', uv: '', l: 'khong-noi' })?.l).toBe('khong-noi')
+  })
   it('dòng gọn cho cửa sổ nút Live', () => {
     expect(dongMay('Gia Huy', tot)).toBe('Gia Huy: ICE ok (host/udp) · nhận 58 kb/s · năng lượng ↑ · loa đang phát')
     expect(dongMay('Minh', { cs: 'failed', ice: 'failed', uv: '' })).toBe('Minh: ICE failed · ⚠ ICE hỏng (mạng chặn đường tiếng)')

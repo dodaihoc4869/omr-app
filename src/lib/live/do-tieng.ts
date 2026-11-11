@@ -7,7 +7,7 @@
 import type { SoNhan, SoTieng } from './so-tieng'
 export type { SoNhan, SoTieng } from './so-tieng'
 
-interface AnhNhan { byte: number; goi: number; nl: number; pt: { d: boolean; ct: number; m: boolean; v: number } | null }
+interface AnhNhan { byte: number; goi: number; nl: number | null; pt: { d: boolean; ct: number; m: boolean; v: number } | null }
 interface Anh { luc: number; cs: string; ice: string; uv: string; n: AnhNhan | null; b: AnhNhan | null; g: { byte: number; muc: number; nl: number } | null }
 export interface NguonDo { pc: RTCPeerConnection | null; n?: { thu: RTCRtpReceiver | null; the: HTMLMediaElement | null }; b?: { thu: RTCRtpReceiver | null; the: HTMLMediaElement | null }; g?: RTCRtpSender | null }
 
@@ -15,7 +15,7 @@ const so = (x: unknown): number => (typeof x === 'number' && Number.isFinite(x) 
 async function anhNhan(r: { thu: RTCRtpReceiver | null; the: HTMLMediaElement | null } | undefined): Promise<AnhNhan | null> {
   if (!r?.thu?.getStats) return null
   let a: AnhNhan | null = null
-  try { (await r.thu.getStats()).forEach((s: Record<string, unknown>) => { if (s.type === 'inbound-rtp') a = { byte: so(s.bytesReceived), goi: so(s.packetsReceived), nl: so(s.totalAudioEnergy), pt: null } }) } catch { return null }
+  try { (await r.thu.getStats()).forEach((s: Record<string, unknown>) => { if (s.type === 'inbound-rtp') a = { byte: so(s.bytesReceived), goi: so(s.packetsReceived), nl: typeof s.totalAudioEnergy === 'number' ? s.totalAudioEnergy : null, pt: null } }) } catch { return null }
   const e = r.the
   if (a && e?.srcObject) (a as AnhNhan).pt = { d: e.paused, ct: e.currentTime, m: e.muted, v: e.volume }
   return a
@@ -43,7 +43,7 @@ const r1 = (v: number): number => Math.round(v * 10) / 10
 function hieuNhan(a: AnhNhan | null, b: AnhNhan | null, giay: number): SoNhan | undefined {
   if (!b) return undefined
   const c = a ?? { byte: b.byte, goi: b.goi, nl: b.nl, pt: null }
-  return { kb: Math.max(0, Math.round(((b.byte - c.byte) * 8) / 1000 / giay)), nl: Math.max(0, Math.round((b.nl - c.nl) * 1e5) / 100), goi: Math.max(0, b.goi - c.goi),
+  return { kb: Math.max(0, Math.round(((b.byte - c.byte) * 8) / 1000 / giay)), nl: b.nl == null || c.nl == null ? null : Math.max(0, Math.round((b.nl - c.nl) * 1e5) / 100), goi: Math.max(0, b.goi - c.goi),
     pt: b.pt ? { d: b.pt.d ? 1 : 0, ct: r1(Math.max(0, b.pt.ct - (c.pt?.ct ?? b.pt.ct))), m: b.pt.m ? 1 : 0, v: Math.round(b.pt.v * 100) / 100 } : null }
 }
 /** Hai lần chụp ⇒ bản tóm tắt. */
