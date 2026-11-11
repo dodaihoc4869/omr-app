@@ -525,12 +525,27 @@ Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach
   (đã lọc bằng CAM++ nhưng không chắc sạch hết); bỏ hẳn thì chỉ còn ≈ 47 s.
 - Cột «dải tới −3 dB» của bản đo cũ không dùng được cho mô hình: giọng mẫu là MP3 (không có gì trên 11 kHz) và mô hình hạ dải < 150 Hz ⇒ thước đo dừng ở dải đầu.
 
+- **Bước 3000 → 5000, hai bản song song** (phạt phần lọt mọi ô): A (`TG_L2=1`, `TG_LOT=0,5`) · B (`TG_L2=0,3`, `TG_LOT=1`). Chấm NỘI BỘ (AudioMNIST người giữ riêng,
+  giọng khác thật — người ĐÃ gặp): giọng khác giảm A 19,7 dB / B 28,9 dB (đều ở cả −5 / 2 / 10 dB ⇒ không chỉ học mức to nhỏ). NHƯNG bản đo 18 s (giọng chưa gặp):
+  A giảm 3,2–5,5 dB, thầy một mình 20,5–21,7 dB, mở sau 10–90 ms (xôn xao 0 dB: 250 ms) · B giảm 6,2–11,5 dB, thầy một mình 12,5–13,5 dB, 95 % khung thầy bị hạ,
+  mở sau 250–900 ms ⇒ bỏ B. Đo nhanh A (`do-nhanh.mjs`, mỗi giọng −25 dBFS): thầy giữ riêng bị hạ 2,8 dB · giọng khác thật (đã gặp) 11,7 · LJ nữ 3,8 · VCTK nam 6,2 ·
+  LibriSpeech 5,7 · tiếng Việt máy đọc 10,7. Đường 24 kHz và 48 kHz của lõi cho số TRÙNG nhau (không phải lỗi lõi).
+  ⇒ **Mạng phân biệt theo KHO DỮ LIỆU, chưa theo GIỌNG**: giọng khác luyện chỉ có AudioMNIST (đọc chữ số) + một người thật. Sửa: «người giả» (giọng thầy đổi cao độ +
+  formant ×1,18–1,6 / ×0,72–0,86) làm giọng khác; xin thêm kho giọng mở nhiều người (Common Voice vi CC0 / FLEURS vi CC BY 4.0) qua tác tử YouTube.
+- **Luật luyện từ bước 5000 (thầy chốt):** phạt NĂNG LƯỢNG RA ở khung không có thầy (trọng số tăng dần `TG_IM0` → `TG_IM1` trong 15 000 bước); giọng khác giữ riêng THEO
+  NGƯỜI (người đóng vai em của mọi buổi thử 11/11 chỉ để chấm); giọng thầy trong `emNoi` ± 1 s chỉ giữ khi qua lọc chặt (cos TB ≥ 0,50, nhỏ nhất ≥ 0,40, «khác» ≤ 0,15)
+  ⇒ giọng thầy live còn 37,5 s luyện (tập chấm 75f8acfc giữ nguyên 27 s); YouTube (khi có) là nguồn chính: 60 % mẫu MIỀN SẠCH (thầy YouTube sạch + giọng khác sạch),
+  còn lại miền MP3; chấm thêm miền sạch trên video YouTube giữ riêng; «mở sau» chấm ở mỗi checkpoint.
+
 ### 11.3 Bộ chạy trong app (trên nhánh, ẨN sau cờ — chưa phát hành)
 - Mức «Chỉ giọng thầy» ('thay') trong hàng «Lọc ồn»; chỉ hiện khi `localStorage['ddh.live.chi-thay'] = 'hien'` VÀ có địa chỉ mô hình (`URL_MO_HINH_THAY` — đang null —
   hoặc `ddh.live.chi-thay-url` để thử). Mặc định không chọn; chọn thì nhớ (`ddh.live.loc-on`). Lùi khẩn: `ddh.live.chi-thay = 'tat'`.
 - Chạy trong Worker khung của `chuoi-tieng.ts` (MA_TACH ghép trước MA_KHUNG), 480 mẫu 48 kHz / khung. Đường «Làm rõ»: sau RNNoise (tắt ở mức này), trước nâng mức.
   Đường «Chuẩn trình duyệt»: chuỗi CHỈ-TÁCH (không lọc 80 Hz, không nâng mức) chỉ được gửi khi mức này bật và mô hình không hỏng.
-- Bật / tắt trộn một khung (không «bụp»). LƯỚI: số hỏng ⇒ tắt ngay; mic có giọng mà tiếng ra ≈ 0 suốt 1,5 s ⇒ tự tắt «cam»; hệ số thời gian thực (đo mỗi 2 s trên máy
-  thầy) > 0,6 ⇒ tự tắt «cham»; tải / nạp hỏng ⇒ «loi». Tự tắt ⇒ gửi lại tiếng như trước + ghi lý do (chẩn đoán `luoi`). Test `tests/live-chi-thay-luoi-1111.test.ts`.
+- Bật / tắt trộn một khung (không «bụp»). LƯỚI (luật thầy chốt: CHỈ HỌC SINH NÓI MÀ ĐẦU RA IM LÀ ĐÚNG): chỉ về tiếng gốc khi (a) bộ nhận giọng báo đang có giọng
+  thầy (tin `thayNoi`) ≥ 1,5 s mà tiếng ra hạ ≥ 30 dB ⇒ «cam-thay» — CHƯA có bộ nhận giọng nối vào app nên nhánh này chưa kích; (b) lỗi kỹ thuật: số hỏng ⇒ tắt ngay;
+  tiếng ra ≈ 0 tuyệt đối (< −100 dBFS, sàn −50 dB nên mô hình đúng không chạm) khi mic có tín hiệu 1,5 s ⇒ «cam-ky-thuat»; hệ số thời gian thực (đo mỗi 2 s trên máy
+  thầy) > 0,6 ⇒ «cham»; Worker không báo khung quá 2,5 s ⇒ «ngung»; tải / nạp hỏng ⇒ «loi». Tự tắt ⇒ gửi lại tiếng như trước + ghi lý do (chẩn đoán `luoi`).
+  Test `tests/live-chi-thay-luoi-1111.test.ts` (cả hai nhánh, và «chỉ học sinh nói, ra hạ 40 dB suốt 3 s ⇒ KHÔNG tắt»).
 - Dòng trạng thái trong cửa sổ Live: «Mô hình <bản> · luyện <ngày> · máy này chạy <x> % thời gian thực» hoặc «Đã tự tắt (lý do) — lớp nghe tiếng như trước».
 
