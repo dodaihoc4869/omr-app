@@ -1,0 +1,45 @@
+# ĐO NỢ CÂU + CỨU CHUỖI TRÊN DỮ LIỆU THẬT (CHỈ ĐỌC, 11/11 — thầy: «Học sinh đã hiện nợ chưa thống kê cho tôi»).
+# CHỈ SELECT đếm gộp, nhẹ (tra theo khoá chính / chỉ mục từng em — không quét cả sổ học): không in mã em, tên em. KHÔNG `d1 export`, không ghi.
+# Mỗi câu cách nhau 4 giây (D1 từng 429 khi dồn lệnh).
+name: Đo nợ câu (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/do-no-cau-1111.yml']
+permissions:
+  contents: read
+concurrency:
+  group: do-no-cau
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
+          NAY="date('now','+7 hours')"
+          LAM="(SELECT COUNT(DISTINCT s.qid) FROM su_kien_hoc s WHERE s.sbd=m.sbd AND s.ngay_vn=m.ngay AND s.ket_qua IS NOT NULL AND s.ma_nguon NOT LIKE 'ktcn:%' AND COALESCE(s.nguon,'') NOT IN ('chua_loi','tu_luyen','thi') AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','chan_doan','chua_buoc'))"
+          TRA="COALESCE((SELECT c.so FROM goi_bai_7_no_chon c WHERE c.sbd=m.sbd AND c.ngay=m.ngay),0)"
+
+          q "0 giờ máy chủ (VN)" "SELECT datetime('now','+7 hours') gio_vn"
+          q "A sổ nợ: tổng" "SELECT COUNT(*) em_da_mo_so, SUM(no>0) em_dang_no, COALESCE(SUM(no),0) tong_cau_no, COALESCE(MAX(no),0) no_lon_nhat, SUM(lan>0) em_da_dung_lan_toi_thieu, MIN(den_ngay) chot_cu_nhat, MAX(den_ngay) chot_moi_nhat FROM goi_bai_7_no_em"
+          q "A2 sổ nợ: theo ngày đã chốt tới" "SELECT den_ngay, COUNT(*) em, SUM(no>0) em_dang_no, COALESCE(SUM(no),0) cau_no FROM goi_bai_7_no_em GROUP BY 1 ORDER BY 1"
+          q "B lựa chọn trả nợ đã ghi" "SELECT ngay, kieu, COUNT(*) em, SUM(so) cau_tra_da_chon FROM goi_bai_7_no_chon GROUP BY 1,2 ORDER BY 1,2"
+          q "C em có bài đang trong hạn hôm nay (mẫu số)" "SELECT COUNT(DISTINCT e.sbd) em_co_bai_trong_han FROM goi_bai_7_em e JOIN hoc_sinh h ON h.sbd=e.sbd WHERE COALESCE(h.trang_thai,'') NOT IN ('khoa','da_nghi') AND e.bat_dau <= $NAY AND e.han >= $NAY"
+          q "D hôm nay: tiến độ so với mức (phần chưa làm sẽ thành nợ câu ngày mai nếu em dừng ở đây)" "WITH d AS (SELECT m.sbd, m.muc, $LAM lam FROM goi_bai_7_muc_ngay m WHERE m.ngay = $NAY) SELECT COUNT(*) em_da_co_muc_hom_nay, SUM(lam>=muc) em_du_muc, SUM(lam>0 AND lam<muc) em_dang_lam_do, SUM(lam=0) em_chua_lam_cau_nao, SUM(CASE WHEN lam<muc THEN muc-lam ELSE 0 END) cau_con_thieu, ROUND(AVG(CASE WHEN lam<muc THEN muc-lam END),1) tb_thieu_moi_em, SUM(muc>28) em_muc_tren_28 FROM d"
+          q "D2 hôm nay: em còn thiếu — gộp theo cỡ" "WITH d AS (SELECT m.muc - $LAM t FROM goi_bai_7_muc_ngay m WHERE m.ngay = $NAY) SELECT CASE WHEN t<=0 THEN 'a đủ mức' WHEN t<=6 THEN 'b thiếu 1-6' WHEN t<=14 THEN 'c thiếu 7-14' WHEN t<28 THEN 'd thiếu 15-27' ELSE 'e thiếu cả 28' END co, COUNT(*) em, SUM(MAX(t,0)) cau FROM d GROUP BY 1 ORDER BY 1"
+          q "E Kiểm tra ôn tập hôm nay" "SELECT trang_thai, COUNT(*) bai FROM kiem_tra_ca_nhan WHERE ngay = $NAY GROUP BY 1 ORDER BY 1"
+          q "F cứu chuỗi: ngày lỡ 09/11 và 10/11 (có dòng mức mà số câu < mức gốc)" "WITH d AS (SELECT m.ngay, m.muc - $TRA goc, $LAM lam FROM goi_bai_7_muc_ngay m WHERE m.ngay IN ('2026-11-09','2026-11-10')) SELECT ngay, COUNT(*) em_co_muc, SUM(lam>=goc) em_du, SUM(lam<goc) em_thieu, SUM(CASE WHEN lam<goc THEN goc-lam ELSE 0 END) cau_thieu, SUM(lam<goc AND goc-lam<=6) thieu_1_6, SUM(lam<goc AND goc-lam BETWEEN 7 AND 14) thieu_7_14, SUM(lam<goc AND goc-lam>=15 AND lam>0) thieu_tu_15, SUM(lam=0) khong_lam_cau_nao FROM d GROUP BY 1 ORDER BY 1"
