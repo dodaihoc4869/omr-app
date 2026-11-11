@@ -11,6 +11,7 @@
 import type { DurableObjectState, WsMayChu } from './kieu'
 import type { TrangThaiPhong } from '../../src/lib/bpu/phong'
 import * as LL from '../../src/lib/bpu/phong-live'
+import { sachTieng, type SoTieng } from '../../src/lib/live/so-tieng'
 
 type Row = Record<string, unknown>
 /** Dữ liệu gắn vào kết nối: vai + sbd (đã có) · `x` = phiên live em đã báo `live-ok` · `d` = 1 khi em cần điểm đang viết qua WebSocket ·
@@ -45,7 +46,11 @@ const NHIP_GOI_XA_MS = 120_000
 /** Nhật ký đàm thoại trong kho của phòng: mỗi lần ghi một khoá `nk:<giờ>:<số>` (không đọc–sửa–ghi cả sổ); đọc lại tối đa ngần này khoá. */
 const NK_DOC_TOI_DA = 1000
 
-interface DoEm { luc: number; d: number; j: number; m: number; rtt: number; tt: number; dc: boolean; gl: boolean }
+interface DoEm { luc: number; d: number; j: number; m: number; rtt: number; tt: number; dc: boolean; gl: boolean; ti: SoTieng | null }
+/** ĐO TIẾNG TỪ XA (11/11 tối): một dòng nhật ký máy chủ mỗi 10 giây khi đang live — đọc bằng Workers Logs / `wrangler tail` (không ghi D1). */
+const NHAT_KY_TIENG_MS = 10_000
+/** Một máy ⇒ mảng gọn: [máy, connectionState, ICE, đường, kb/s nhận, năng lượng nhận, thẻ dừng, currentTime tăng, tắt tiếng, âm lượng, kb/s mic gửi, mức mic, tiếng, mic]. */
+const ngan = (s: string, t: SoTieng | null): unknown[] => [s, t?.cs ?? '-', t?.ice ?? '-', t?.uv ?? '', t?.n?.kb ?? null, t?.n?.nl ?? null, t?.n?.pt?.d ?? null, t?.n?.pt?.ct ?? null, t?.n?.pt?.m ?? null, t?.n?.pt?.v ?? null, t?.g?.kb ?? null, t?.g?.muc ?? null, t?.tg ?? '', t?.mc ?? '']
 const so = (v: unknown, tran: number): number => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(tran, Math.round(n)) : -1 }
 function tomTat(ds: number[]): { tv: number; p95: number } | null {
   const s = ds.filter((x) => x >= 0).sort((a, b) => a - b)
@@ -67,6 +72,9 @@ export class LiveMay {
   private henXem: ReturnType<typeof setTimeout> | null = null
   private doEm = new Map<string, DoEm>()
   private lucGuiDo = 0
+  /** Bản đo tiếng gần nhất của máy thầy + lúc ghi nhật ký gần nhất. */
+  private tiThay: SoTieng | null = null
+  private lucNhatKy = 0
   private lucLuuNhip = 0
   private giayLo = 0
   private soLo = 0
@@ -224,7 +232,8 @@ export class LiveMay {
         doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang, giay: j.giay, nghi: j.nghi }, nay)
         if (l.xa && !xaTruoc) this.goiXa(st, nay) // vừa bật «Cho em ở xa vào xem» ⇒ gọi máy các em ở xa
       }
-      else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay) // Xem lại Live: máy ghi báo trạng thái + mẫu đồng hồ
+      else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay)
+      else if (t === 'live-do') { this.tiThay = sachTieng(j.ti); this.nhatKyTieng(st, nay) } // Xem lại Live: máy ghi báo trạng thái + mẫu đồng hồ
       // ĐỢT 2 (đặc tả 4.8): thầy «Thu mic» (một em) / «Tắt mic tất cả» · «Mời nói» · «Hạ hết tay» / hạ tay một em. Phòng gỡ + đóng track ở SFU khi phát view.
       else if (t === 'live-thu-mic') doi = LL.liveThu(st, nay, typeof j.sbd === 'string' && j.sbd ? j.sbd : undefined)
       else if (t === 'live-moi') doi = LL.liveMoi(st, String(j.sbd ?? ''), nay)
@@ -262,17 +271,27 @@ export class LiveMay {
     }
     if (t === 'live-do') {
       if (!l.bat || a.x !== l.phien) return true
-      this.doEm.set(a.s, { luc: nay, d: so(j.d, 2000), j: so(j.j, 5000), m: so(j.m, 60_000), rtt: so(j.rtt, 10_000), tt: so(j.tt, 10_000), dc: j.dc === true, gl: j.gl === true })
+      this.doEm.set(a.s, { luc: nay, d: so(j.d, 2000), j: so(j.j, 5000), m: so(j.m, 60_000), rtt: so(j.rtt, 10_000), tt: so(j.tt, 10_000), dc: j.dc === true, gl: j.gl === true, ti: sachTieng(j.ti) })
+      this.nhatKyTieng(st, nay)
       if (nay - this.lucGuiDo >= NHIP_DO_MS) { this.lucGuiDo = nay; this.guiThay(JSON.stringify({ t: 'live-do', ...this.gomDo(nay) })) }
       return true
     }
     return true
   }
+  /** Nhật ký máy chủ ≤ 1 dòng / 10 giây khi đang live: máy thầy + mọi máy em báo trong 30 giây qua (dạng gọn `ngan`). Không ghi storage / D1. */
+  private nhatKyTieng(st: TrangThaiPhong, nay: number): void {
+    if (!st.live?.bat || nay - this.lucNhatKy < NHAT_KY_TIENG_MS) return
+    this.lucNhatKy = nay
+    const em = [...this.doEm].filter(([, x]) => nay - x.luc <= 30_000).slice(0, 300).map(([s, x]) => ngan(s, x.ti))
+    console.log(JSON.stringify({ live_tieng: { b: st.buoiId, p: st.live.phien, thay: ngan('GV', this.tiThay), em } }))
+  }
   /** Gộp số đo các máy em báo trong 30 giây gần nhất (trung vị + p95 giữa các em). Chỉ trong bộ nhớ. */
   gomDo(nay: number) {
     const ds = [...this.doEm.values()].filter((x) => nay - x.luc <= 30_000)
+    // Đo tiếng từ xa: bản mới nhất của từng máy em (máy thầy hiện một dòng gọn cho mỗi em).
+    const may = [...this.doEm].filter(([, x]) => nay - x.luc <= 30_000 && x.ti).slice(0, 300).map(([s, x]) => ({ s, ti: x.ti }))
     // `giayLech` = số máy em báo giấy đề xuống dòng KHÁC giấy của thầy (rủi ro R3) ⇒ máy đó đang ẩn nét trên giấy.
-    return { so: ds.length, dc: ds.filter((x) => x.dc).length, giayLech: ds.filter((x) => x.gl).length, d: tomTat(ds.map((x) => x.d)), jitter: tomTat(ds.map((x) => x.j)), muon: tomTat(ds.map((x) => x.m)), rtt: tomTat(ds.map((x) => x.rtt)), tieng: tomTat(ds.map((x) => x.tt)) }
+    return { so: ds.length, dc: ds.filter((x) => x.dc).length, giayLech: ds.filter((x) => x.gl).length, d: tomTat(ds.map((x) => x.d)), jitter: tomTat(ds.map((x) => x.j)), muon: tomTat(ds.map((x) => x.m)), rtt: tomTat(ds.map((x) => x.rtt)), tieng: tomTat(ds.map((x) => x.tt)), may }
   }
   private tat(st: TrangThaiPhong, nay: number): boolean {
     const tomTatDo = this.gomDo(nay)

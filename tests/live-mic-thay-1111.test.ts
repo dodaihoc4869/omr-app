@@ -45,11 +45,11 @@ class CtxGia {
   createMediaStreamDestination() { const n = new NutGia(); const t = new TrackGia('chuoi'); t.tinHieu = () => n.muc(); n.stream = new LuongGia([t]); return n }
 }
 class BoGuiGia {
-  lichSu: (TrackGia | null)[] = []; thamSo: unknown = null; byte = 0; dau: TrackGia | null
+  lichSu: (TrackGia | null)[] = []; thamSo: unknown = null; byte = 0; nl = 0; dau: TrackGia | null
   constructor(public track: TrackGia | null) { this.dau = track }
   async replaceTrack(t: TrackGia | null) { this.track = t; this.lichSu.push(t) }
   getParameters() { return { encodings: [{}] } } async setParameters(p: unknown) { this.thamSo = p }
-  async getStats() { this.byte += 8000; return new Map<string, unknown>([['ms', { type: 'media-source', kind: 'audio', audioLevel: this.track ? this.track.ra() : 0, totalAudioEnergy: 1 }], ['out', { type: 'outbound-rtp', kind: 'audio', bytesSent: this.byte, packetsSent: 50 }]]) }
+  async getStats() { this.byte += 8000; return new Map<string, unknown>([['ms', { type: 'media-source', kind: 'audio', audioLevel: this.track ? this.track.ra() : 0, totalAudioEnergy: (this.nl += (this.track ? this.track.ra() : 0) ** 2 * 0.1) }], ['out', { type: 'outbound-rtp', kind: 'audio', bytesSent: this.byte, packetsSent: 50 }]]) }
 }
 const SDP = 'v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10;useinbandfec=1\r\n'
 class PcGia extends EventTarget {
@@ -68,9 +68,11 @@ let thietBi: Record<string, (rb: Rb) => number | Error> = {}
 const goiGum: Rb[] = []
 const moi: TrackGia[] = []
 let ngheThietBi: (() => void) | null = null
+/** Thiết bị thêm vào danh sách `enumerateDevices` (cắm bộ thu sang cổng khác ⇒ mã mới, cùng tên). */
+let dsThem: { kind: string; deviceId: string; label: string }[] = []
 
 function dungTrinhDuyet() {
-  PcGia.ds = []; goiGum.length = 0; moi.length = 0; ctx.state = 'running'; ctx.onstatechange = null; ctx.soNen = []; ngheThietBi = null
+  PcGia.ds = []; goiGum.length = 0; moi.length = 0; ctx.state = 'running'; ctx.onstatechange = null; ctx.soNen = []; ngheThietBi = null; dsThem = []
   thietBi = { default: () => 0.2 }
   vi.stubGlobal('AudioContext', CtxGia)
   ;(window as unknown as { AudioContext: unknown }).AudioContext = CtxGia
@@ -90,25 +92,26 @@ function dungTrinhDuyet() {
       moi.push(t)
       return new LuongGia([t])
     },
-    enumerateDevices: async () => [{ kind: 'audioinput', deviceId: 'default', label: 'Default - Microphone (BOYALINK)' }, { kind: 'audioinput', deviceId: 'communications', label: 'Communications - Microphone (BOYALINK)' }, { kind: 'audioinput', deviceId: 'usb1', label: 'Microphone (BOYALINK)' }, { kind: 'audiooutput', deviceId: 'loa', label: 'Loa' }],
+    enumerateDevices: async () => [{ kind: 'audioinput', deviceId: 'default', label: 'Default - Microphone (BOYALINK)' }, { kind: 'audioinput', deviceId: 'communications', label: 'Communications - Microphone (BOYALINK)' }, { kind: 'audioinput', deviceId: 'usb1', label: 'Microphone (BOYALINK)' }, { kind: 'audiooutput', deviceId: 'loa', label: 'Loa' }, ...dsThem],
     addEventListener: (_: string, f: () => void) => { ngheThietBi = f },
   } })
 }
 const T0 = 1_700_000_000_000
-function dung(tuy: { loc?: 'tu' | 'bat' | 'tat' } = {}) {
+function dung(tuy: { loc?: 'tu' | 'bat' | 'tat'; micTen?: string } = {}) {
   const st: TrangThaiPhong = taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds: [{ sbd: 'S1', ten: 'Em Một', coMat: true, luc: T0 }] })
   datCoLive(st, { cho: true, sfu: true }, T0)
   const tin: Record<string, unknown>[] = [], tt: TrangThaiLiveThay[] = []
   let thietBiDoi = 0
+  const micMoi: string[] = []
   const lt = taoLiveThay({
-    ve: 've-gv', goc: 'https://may-chu.example', loc: tuy.loc, khiThietBi: () => { thietBiDoi += 1 },
+    ve: 've-gv', goc: 'https://may-chu.example', loc: tuy.loc, micTen: tuy.micTen, khiMicMoi: (id) => { micMoi.push(id) }, khiThietBi: () => { thietBiDoi += 1 },
     kenh: { gui: (t) => { tin.push(t); if (t.t === 'live-bat') liveBat(st, T0 + 1); if (t.t === 'live-tat') liveTat(st, T0 + 3); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, T0); if (t.t === 'live-dat') liveDat(st, t as never, T0 + 2); if (t.t === 'live-bat' || t.t === 'live-dat') lt.nhanTinPhong(viewBang(st)) }, guiNhiPhan: () => {} },
     khiTrangThai: (t) => tt.push(t),
     moiTruong: { taoPc: () => new PcGia() as unknown as RTCPeerConnection, fetch: (async (u: string) => new Response(JSON.stringify(String(u).endsWith('/noi') ? { ok: true, phien: 'p'.repeat(16), sdp: SDP } : { ok: true, id: 1 }))) as never },
   })
   lt.nhanTinPhong(viewBang(st))
   const boGui = () => PcGia.ds[PcGia.ds.length - 1]!.boGui!
-  return { st, lt, tin, tt, boGui, bao: () => lt.nhanTinPhong(viewBang(st)), thietBiDoi: () => thietBiDoi }
+  return { st, lt, tin, tt, boGui, micMoi, bao: () => lt.nhanTinPhong(viewBang(st)), thietBiDoi: () => thietBiDoi }
 }
 /** 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): ĐƯỜNG VỌNG duy nhất của luật «Tự động» = loa máy thầy đang phát tiếng em nói (`tiengLop` không còn tính).
  *  `emNoi`: thầy mời S1, máy chủ ghi track mic của em, phòng báo view. `emNoiRaLoa`: thêm thầy bật «Phát tiếng em ra loa lớp». */
@@ -176,7 +179,8 @@ describe('M1c · track ĐANG GỬI luôn là tiếng mic', () => {
     t.readyState = 'ended'; t.onended?.()
     expect(b.lt.trangThai().micTinh).toBe('mat')
     await troi(1000)
-    expect(b.lt.trangThai()).toMatchObject({ micTinh: 'tot', micTen: 'Micro máy tính' })
+    // 11/11 tối: KHÔNG âm thầm — trạng thái ghi rõ mic đã chọn không mở được
+    expect(b.lt.trangThai()).toMatchObject({ micTinh: 'tot', micTen: 'Micro máy tính', micKhac: 'Microphone (usb1)' })
     expect(mucGui(b)).toBeCloseTo(0.2)
     ngheThietBi?.()
     expect(b.thietBiDoi()).toBe(1) // danh sách mic đổi ⇒ lớp giao diện đọc lại
@@ -196,6 +200,26 @@ describe('M1c · track ĐANG GỬI luôn là tiếng mic', () => {
   })
 })
 
+describe('11/11 tối · hàng dự phòng «Tiếng: Làm rõ / Chuẩn trình duyệt»', () => {
+  it('«Chuẩn trình duyệt» ⇒ mở lại mic với khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt, gửi THẲNG mic (bỏ chuỗi); về «Làm rõ» ⇒ chuỗi lại, không xử lý của trình duyệt', async () => {
+    const b = dung()
+    await b.lt.bat({})
+    expect(b.lt.chanDoan().chuoi).toBe(true)
+    b.lt.datKieuTieng(true)
+    await troi(50)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ echoCancellation: true, noiseSuppression: true, autoGainControl: true })
+    const mic = moi[moi.length - 1]!
+    expect(b.boGui().track).toBe(mic) // track mic thô, không qua chuỗi
+    expect(b.lt.chanDoan()).toMatchObject({ chuoi: false, vong: true, on: true, agc: true })
+    expect(mucGui(b)).toBeCloseTo(0.2)
+    b.lt.datKieuTieng(false)
+    await troi(50)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ echoCancellation: false, noiseSuppression: false })
+    expect(b.lt.chanDoan().chuoi).toBe(true)
+    expect(b.boGui().track).not.toBe(moi[moi.length - 1])
+  })
+})
+
 describe('M1a · mic câm: tự nới ràng buộc tới khi có tín hiệu, báo rõ, không dừng lại ở «lỗi»', () => {
   it('mic USB câm khi trình duyệt bật xử lý tiếng ⇒ 1,5 giây sau tự mở lại với khử vọng + lọc ồn TẮT ⇒ có tín hiệu, gắn vào bộ gửi', async () => {
     thietBi.usb1 = (rb) => (rb.echoCancellation || rb.noiseSuppression ? 0 : 0.3)
@@ -212,7 +236,7 @@ describe('M1a · mic câm: tự nới ràng buộc tới khi có tín hiệu, b�
     await troi(6000)
     expect(b.lt.trangThai().micTinh).toBe('tot')
   })
-  it('chỉ mic THÔ mới có tín hiệu ⇒ nới tới bậc tắt cả tự chỉnh âm lượng; mục đích danh câm hẳn ⇒ bậc cuối để thiết bị là «ưu tiên» và lấy được mic có tiếng', async () => {
+  it('chỉ mic THÔ mới có tín hiệu ⇒ nới tới bậc tắt cả tự chỉnh âm lượng; mục đích danh câm hẳn ⇒ GIỮ đúng mic ấy (`exact`), báo `im` — không âm thầm đổi mic', async () => {
     thietBi.usb1 = (rb) => (rb.autoGainControl ? 0 : 0.25)
     const b = dung()
     await b.lt.bat({ mic: 'usb1' })
@@ -224,7 +248,31 @@ describe('M1a · mic câm: tự nới ràng buộc tới khi có tín hiệu, b�
     thietBi.usb1 = () => 0
     await b.lt.moMic('usb1')
     await troi(1800); await troi(1800); await troi(1800)
-    expect(goiGum[goiGum.length - 1]!.deviceId).toEqual({ ideal: 'usb1' })
+    expect(goiGum.every((r) => !r.deviceId || 'exact' in r.deviceId)).toBe(true)
+    expect(goiGum[goiGum.length - 1]!.deviceId).toEqual({ exact: 'usb1' })
+    expect(b.lt.trangThai()).toMatchObject({ micTinh: 'im', micTen: 'Microphone (usb1)', micKhac: '' })
+  })
+  it('11/11 tối · LỖI THẬT «chọn BOYALINK mà lớp nghe mic Intel»: mã mic đã chọn không còn đúng (cắm cổng USB khác) ⇒ tìm lại ĐÚNG mic ấy theo tên, nhớ mã mới', async () => {
+    thietBi.usb2 = () => 0.35
+    dsThem = [{ kind: 'audioinput', deviceId: 'usb2', label: 'Microphone (2- RODE)' }] // Windows thêm «2- » khi cắm lại cổng khác
+    const b = dung({ micTen: 'Microphone (RODE)' })
+    expect((await b.lt.bat({ mic: 'usb-cu' })).ok).toBe(true)
+    expect(goiGum.map((r) => r.deviceId)).toEqual([{ exact: 'usb-cu' }, { exact: 'usb2' }])
+    expect(b.micMoi).toEqual(['usb2'])
+    expect(b.lt.trangThai()).toMatchObject({ micTinh: 'tot', micTen: 'Microphone (usb2)', micKhac: '' })
+    expect(mucGui(b)).toBeCloseTo(0.35)
+  })
+  it('mic đã chọn không có trên máy ⇒ mic mặc định + `micKhac`; cắm vào ⇒ tự về đúng mic đã chọn', async () => {
+    const b = dung({ micTen: 'Microphone (RODE)' })
+    await b.lt.bat({ mic: 'usb-cu' })
+    expect(b.lt.trangThai()).toMatchObject({ micTen: 'Micro máy tính', micKhac: 'Microphone (RODE)' })
+    thietBi.usb3 = () => 0.45
+    dsThem = [{ kind: 'audioinput', deviceId: 'usb3', label: 'Microphone (RODE)' }]
+    ngheThietBi?.()
+    await troi(50)
+    expect(goiGum[goiGum.length - 1]!.deviceId).toEqual({ exact: 'usb3' })
+    expect(b.lt.trangThai()).toMatchObject({ micTen: 'Microphone (usb3)', micKhac: '' })
+    expect(mucGui(b)).toBeCloseTo(0.45)
   })
   it('câm ở MỌI cách mở ⇒ `im` (cửa sổ báo rõ) nhưng cứ 8 giây thử lại cả vòng; thiết bị có tiếng trở lại ⇒ tự về `tot` và lớp nghe được', async () => {
     let coTieng = false

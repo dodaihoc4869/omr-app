@@ -11,6 +11,10 @@ import { giaiGoi, giaiSo } from './ma-net'
 import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
+import { boLoa, theAmLoa } from './loa'
+import { taoLuoiPhat } from './luoi-tieng'
+import { doTieng } from './do-tieng'
+import { ngheThat, type SoTieng } from './so-tieng'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
@@ -77,6 +81,11 @@ const RAI_BU_MS = 3000
 /** Bản chốt của nét đang phát dở chờ tối đa ngần này (đệm phát D ≤ 150 ms + dư) rồi chốt luôn. */
 const CHO_CHOT_MS = 400
 
+/** Âm lượng tiếng thầy trên máy em ĐANG PHÁT MIC: mic có khử vọng của trình duyệt ⇒ 1; không (hoặc chưa biết) ⇒ 0,6. */
+export function amLuongKhiNoi(l: MediaStream | null): number {
+  try { return l?.getAudioTracks()[0]?.getSettings().echoCancellation === true ? 1 : 0.6 } catch { return 0.6 }
+}
+
 export function taoLiveEm(tuy: TuyChonLiveEm) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
   const tt: TrangThaiLiveEm = { duocXem: false, san: false, bat: false, tu: null, tieng: 'cho', nghe: false, kenhNet: 'ws', duBang: false, bang: false, duocMoMic: false, duocMoi: false, tay: false, hangTay: null, mic: 'tat', banNoi: null, nghi: false }
@@ -97,6 +106,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   /** Đang xin điểm qua đường phụ WebSocket (DataChannel thủng) · mức mạng của nét cho giao diện (0 tốt · 1 đang nới đệm · 2 kém). */
   let troWs = false, mucMang: 0 | 1 | 2 = 0, dNay = 0
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
+  /** ĐO TIẾNG TỪ XA (do-tieng.ts): bản tóm tắt gần nhất (đi kèm `live-do`) + «đang nghe thật» theo năng lượng và thẻ phát (đi kèm `live-ok`). */
+  let tiNay: SoTieng | null = null, ngheTi: boolean | null = null, lucTi = -1e9, dangDoTi = false, loiSfu = ''
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, demRung: number | null = null, giayLech = false
   /** Nét đang viết đã phát ra lớp vẽ: id → số điểm đã phát. */
   const dangVe = new Map<string, number>()
@@ -111,12 +122,13 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   const dcMo = (): boolean => !!dc && dc.readyState === 'open'
 
   // ── TIẾNG ──
-  /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ hạ tiếng thầy còn 25 % (loa máy em kề ngay mic của chính nó: khử vọng của
-   *  trình duyệt lọc gần hết, hạ âm lượng bớt phần còn lọt và bớt hú khi có máy khác mở loa gần đó; iPhone không cho trang đổi âm lượng ⇒ ở đó chỉ còn khử vọng). */
+  /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ âm lượng theo `amLuongKhiNoi` (có khử vọng ⇒ 1, không ⇒ 0,6). */
   /** Loa máy em ĐANG PHÁT tiếng thầy thật: có luồng, em không tắt tiếng, trình duyệt không chặn phát, em không rời màn. */
   const dangNghe = (): boolean => !!am && !!am.srcObject && tt.nghe && tt.tieng === 'co' && !roiMan
   const capNhatTieng = (): void => {
-    if (am) { am.muted = !tt.nghe || roiMan; try { am.volume = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? 0.25 : 1 } catch { /* iPhone */ } }
+    // 11/11 tối (thầy: em lên bảng không nghe thầy): bản cũ hạ còn 0,25 — trên điện thoại (trình duyệt chuyển tiếng sang loa thoại khi mic mở) gần như câm.
+    // Khử vọng của trình duyệt ĐANG chạy trên mic em ⇒ để nguyên 1; không có khử vọng ⇒ 0,6 (vẫn nghe rõ, bớt phần lọt vào mic).
+    if (am) { am.muted = !tt.nghe || roiMan; try { am.volume = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? amLuongKhiNoi(micLuong) : 1 } catch { /* iPhone */ } }
     if (amBan) amBan.muted = !tt.nghe || roiMan
   }
   /** Mọi thay đổi trên phiên SFU của máy em đi NỐI TIẾP (một phiên chỉ có một máy trạng thái lời mời / trả lời — tài liệu «Serialize mutations per session»). */
@@ -130,9 +142,10 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   async function moKhoaTieng(): Promise<boolean> {
     daCham = true
     try {
-      am = am ?? document.createElement('audio')
+      am = am ?? theAmLoa()
       am.autoplay = true
       am.setAttribute('playsinline', '')
+      if (amBan?.srcObject) void amBan.play().catch(() => undefined)
       if (am.srcObject) { capNhatTieng(); await am.play(); dat({ tieng: 'co' }); return true }
       // Chưa có luồng tiếng: phát một tệp câm trong cú chạm để trình duyệt ghi nhận thẻ này đã được người dùng cho phát.
       am.src = CAM; am.muted = true
@@ -173,7 +186,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
           thuBan = e.receiver
           try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
           try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-          amBan = amBan ?? document.createElement('audio')
+          amBan = amBan ?? theAmLoa()
           amBan.autoplay = true; amBan.setAttribute('playsinline', '')
           amBan.srcObject = new MediaStream([e.track])
           capNhatTieng()
@@ -184,7 +197,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         // Đệm jitter thấp nhất, để trình duyệt tự thích ứng (đặc tả 4.2).
         try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
         try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-        am = am ?? document.createElement('audio')
+        am = am ?? theAmLoa()
         am.autoplay = true
         am.setAttribute('playsinline', '')
         am.removeAttribute('src')
@@ -206,7 +219,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (!con()) { p.close(); return }
       if (!(await choNoi(p, mt))) throw new Error('khong-noi')
       if (!con()) { p.close(); return }
-      pc = p; phienCuaEm = phien
+      pc = p; phienCuaEm = phien; loiSfu = ''
       p.addEventListener('connectionstatechange', () => {
         if (pc !== pcNay || !con()) return
         // Mất kết nối quá 5 giây ⇒ tạo phiên mới (đặc tả mục 5).
@@ -226,9 +239,10 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       }
       baoOk()
       soatMic()
-    } catch {
+    } catch (e) {
       try { p?.close() } catch { /* đã đóng */ }
       if (!con()) return
+      loiSfu = e instanceof Error ? e.message.slice(0, 20) : 'sfu' // đo từ xa: 'khong-noi' = ICE / DTLS không lên
       pc = null; dc = null; nguonNoi = ''
       dat({ tieng: 'loi', kenhNet: 'ws' })
       baoOk()
@@ -380,7 +394,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     if (!live?.bat || huyRoi) return
     // (12/11) DataChannel mở nhưng đang THỦNG (mất nhiều gói liền / vừa đứt) ⇒ báo như không có DataChannel: phòng gửi THÊM điểm qua WebSocket (tin cậy);
     // máy em nhận cả hai đường, ghép theo chỉ số điểm. Hết xấu 20 giây thì thôi xin.
-    const coDc = dcMo() && !troWs, nghe = dangNghe()
+    // «N em đang nghe» của thầy tính theo NĂNG LƯỢNG tiếng tới + thẻ đang phát thật (đo 2 giây), không theo cờ
+    const coDc = dcMo() && !troWs, nghe = dangNghe() && ngheTi === true
     if (okPhien === live.phien && okDc === coDc && okNghe === nghe) return
     okPhien = live.phien; okDc = coDc; okNghe = nghe
     tuy.kenh.gui({ t: 'live-ok', dc: coDc, nghe })
@@ -462,13 +477,22 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     if (huyRoi || !live?.bat) return
     const nay = mt.dongHo()
     xaHangSo(nay)
+    if (!dangDoTi && nay - lucTi >= 5000) {
+      lucTi = nay; dangDoTi = true
+      void doTieng(() => ({ pc, n: { thu, the: am }, b: { thu: thuBan, the: amBan }, g: micTx?.sender ?? null }), mt.dongHo, (ms) => new Promise<void>((r) => { mt.hen(r, ms) }))
+        .then((t) => { tiNay = t; const ng = ngheThat(t.n); if (ng !== ngheTi) { ngheTi = ng; baoOk() } }, () => undefined).finally(() => { dangDoTi = false })
+    }
     const xong = (): void => {
       const s = dem.soDo(nay)
       soDo.ghi('d', s.d); soDo.ghi('j', s.jitter); if (s.muon) soDo.ghi('m', s.muonToiDa)
       mucMang = s.muc
       if (s.dung) soDo.ghi('dg', s.dungToiDa)
       soDo.ghi('tn', s.d + (rtt ?? 0) / 2)
-      if (nay - lucDo >= NHIP_DO_MS && !roiMan) { lucDo = nay; const tin = soDo.tinKy(dcMo()); if (tin) tuy.kenh.gui(giayLech ? { ...tin, gl: true } : tin) }
+      if (nay - lucDo >= NHIP_DO_MS) {
+        lucDo = nay
+        const tin = roiMan ? null : soDo.tinKy(dcMo()), ti: SoTieng = { ...(tiNay ?? { cs: pc?.connectionState ?? 'khong', ice: pc?.iceConnectionState ?? 'khong', uv: '' }), tg: tt.tieng, mc: tt.mic, ...(roiMan ? { r: 1 as const } : {}), ...(loiSfu && !pc ? { l: loiSfu } : {}) }
+        tuy.kenh.gui({ ...(tin ?? { t: 'live-do' }), ...(giayLech ? { gl: true } : {}), ti })
+      }
       // Phòng báo có mục mới mà quá 2 giây chưa thấy khung nào ⇒ xin bù (kết nối vừa nối lại, tin lạc).
       if (live && live.soNet > bang.cuoi && henBu == null && nay - lucXinBu > (choSo ? 5000 : 2000)) xinBu()
       henSo = mt.hen(nhipSo, NHIP_SO_MS)
@@ -559,7 +583,11 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     xinBu()
     baoOk()
   }
+  // LƯỚI AN TOÀN phía nghe (luoi-tieng.ts): gói tiếng thầy / bạn vẫn tới mà thẻ phát đứng ⇒ bỏ chọn loa, phát lại; vẫn kẹt ⇒ `bi-chan` (khay ghi «Chạm để nghe»).
+  const khiKet = (k: boolean): void => { if (k) dat({ tieng: 'bi-chan' }); else if (tt.tieng === 'bi-chan' && am && !am.paused) dat({ tieng: 'co' }) }
+  const luoi = [taoLuoiPhat({ the: () => am, thu: () => thu, khiKet, mt }), taoLuoiPhat({ the: () => amBan, thu: () => thuBan, khiKet, mt })]
   function huy(): void {
+    for (const l of luoi) l.huy()
     huyRoi = true
     mt.huyHen(henBu); mt.huyHen(henSo); mt.huyHen(henBan); henBu = henSo = henBan = null
     dongSfu()
@@ -573,7 +601,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     trangThai: (): TrangThaiLiveEm => ({ ...tt }),
     nhanView, nhanTinPhong, khiNoiLai,
     moKhoaTieng, datTieng, datRoiMan,
-    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic,
+    batMicLenBang, tatMic, mucAmMic, mucAmBan, dangChoQuyenMic, coLoa: boLoa.co, dsLoa: boLoa.ds, loa: boLoa.id, datLoa: boLoa.dat,
     gioTay, deSau, datGiayLech, datHienBang,
     /** Bảng đã chốt (khoá trang, tỉ lệ vùng viết, mọi nét) — dùng khi lớp vẽ cần dựng lại từ đầu (đổi cỡ, phóng bảng). */
     bang: (): BangNet => bang,
@@ -583,6 +611,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
      *  phần máy thầy (≈ 10 ms thu + khung Opus 20 ms). Chưa gồm loa / tai nghe. */
     treUocTinh: (): number | null => (demRung == null || rtt == null ? null : treTiengUocTinh({ thu: 10, chuoi: 0, ma: treKhungOpus(20), mangThay: rtt, mangEm: rtt, demEm: demRung }).ms),
     /** `mang` (12/11) = mức mạng của nét LÚC NÀY: 0 tốt · 1 đang nới đệm / đang xin đường phụ · 2 kém; `troWs` = đang nhận thêm điểm qua WebSocket. */
+    /** Bản đo tiếng từ xa gần nhất (do-tieng.ts). */
+    doTieng: (): SoTieng | null => tiNay,
     soDo: () => ({ ...soDo.doc(), kenhNet: tt.kenhNet, ban: tt.banNoi ? { ...banSo } : null, mang: mucMang, troWs }),
     huy,
   }

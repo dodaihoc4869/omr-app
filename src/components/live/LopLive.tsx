@@ -42,12 +42,14 @@ import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
+import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
 import { chonHeSoGiay } from './vua-giay'
 import { DauGiay, PhuongAnTinh } from './GiayDung'
 import GiayThay, { soiDuoc, type BoChu, type CauGiay } from './GiayThay'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from './KhungDocLap'
+import { TamLenBang, TheLenBang, emLenBang, khoaDang, usePhaLenBang, type EmLenBang } from './LenBang'
 import './live-em.css'
 
 export interface CauNoiPhongEm { tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }
@@ -81,6 +83,10 @@ export interface PropsLopLive {
   xa?: boolean
   /** Số thứ tự câu của lượt («Câu 3» ở đầu giấy đề dựng tại máy em). */
   so?: number | null
+  /** Lượt của phòng (`viewEm.luot`, mọi màn kể cả em ở xa): có `goi` ⇒ thông báo «lên bảng» giữa màn 3 giây + thẻ tên trên khung bảng (LenBang.tsx).
+   *  Máy của CHÍNH em được gọi nhận ra qua `luot.sbd` (có khi đang ở bảng live — đúng lúc cần chữ «Em lên bảng»). Truyền thẳng lượt (không dựng vật mới) để
+   *  mảnh ManBinhPhanUng nằm trên đường tải mở /ph không to thêm. */
+  lenBang?: Parameters<typeof emLenBang>[0] | null
 }
 
 /** Tấm giấy đề DỰNG THƯỜNG (câu có ảnh / bảng / sơ đồ, giấy lệch giấy thầy): khối đề dùng chung dựng theo bề ngang khung giấy của EM rồi phóng cho vừa
@@ -268,7 +274,7 @@ function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
   return ms == null ? null : <small className="lv-tre" title="Ước tính, chưa gồm loa / tai nghe">Trễ ~{Math.round(ms / 5) * 5} ms</small>
 }
 
-export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so, lenBang }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -335,6 +341,12 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const dangBat = !!tt?.bat
   const [batTruoc, setBatTruoc] = useState(false)
   if (dangBat !== batTruoc) { setBatTruoc(dangBat); lucBat.current = dangBat ? Date.now() : 0 }
+  // EM LÊN BẢNG: mốc phát tấm giữa màn = lúc lời gọi MỚI tới khi lớp này đang chạy. Lớp vừa dựng mà đã có em đang lên bảng (em vào muộn / nối lại) ⇒
+  // mốc 0: không phát lại, chỉ thẻ tên + dấu. Gọi em khác ⇒ mốc mới (tấm mới thay tấm cũ); hết lượt gọi ⇒ mốc 0.
+  const emBang = emLenBang(lenBang ?? undefined, luot?.sbd), khoaBang = khoaDang(emBang)
+  const [bangTruoc, setBangTruoc] = useState(khoaBang)
+  const [lucBang, setLucBang] = useState(0)
+  if (khoaBang !== bangTruoc) { setBangTruoc(khoaBang); setLucBang(khoaBang ? Date.now() : 0) }
   const [moDau, setMoDau] = useState(false)
   /** Khay đã tự mở giới thiệu nút «Tiếng» trong buổi này chưa (một lần mỗi buổi, dù ở màn câu hỏi hay bảng live). */
   const daGioiThieu = useRef(false)
@@ -380,6 +392,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       {coTieng ? (
         <button type="button" className={`lv-vua${nghe && !biChan ? '' : ' tat'}`} aria-pressed={nghe && !biChan} aria-label={biChan ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe && !biChan ? <BtLoa /> : <BtLoaTat />}Tiếng<b>{biChan ? 'Chạm để nghe' : nghe ? 'Đang bật' : 'Đang tắt'}</b></button>
       ) : <p className="lv-ghi">Buổi này live chưa có tiếng trên máy. Em nghe thầy giảng trực tiếp.</p>}
+      {coTieng && nghe ? <ChonLoa le={le} /> : null}
       {coTieng && !nghe ? <p className="lv-ghi">{xa ? 'Em đang xem từ xa: bật tiếng để nghe thầy giảng.' : 'Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì bật tiếng.'}</p> : null}
       {micBang ? (
         <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic lại'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
@@ -401,18 +414,20 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     </div>
   )
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} />
+    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} />
 }
 
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
   tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; so: number | null; luot: ReactNode; coDoi: boolean; dauNam: (mangYeu: boolean) => DauNam[]; gioiThieu: boolean; khiGioiThieu: () => void
-  dongKhay: (dau: ReactNode, them?: ReactNode) => ReactNode; ghi?: boolean }
+  dongKhay: (dau: ReactNode, them?: ReactNode) => ReactNode; ghi?: boolean
+  /** Em đang được gọi lên bảng (null = không) + mốc phát tấm giữa màn (0 = không phát: em vào muộn, lời gọi cũ). */
+  lenBang: EmLenBang | null; lucBang: number }
 /** Khổ HÌNH (đã xoay nếu có) + kiểu giấy của thầy. */
 interface KhoHinh { xoay: boolean; w: number; h: number; giayToi: boolean }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi, lenBang, lucBang }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), kdl = useRef<TayKhungDL>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
@@ -432,6 +447,9 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
   const lucCuoi = useRef(0)
   const layLuc = useCallback(() => lucCuoi.current, [])
   const namY = useRef(0.5)
+  /** Dấu nhỏ «đang lên bảng» cạnh thẻ tên — chỗ tấm giữa màn thu về. */
+  const dauBang = useRef<HTMLSpanElement>(null)
+  const phaBang = usePhaLenBang(lenBang && lenBang.dang ? lucBang : 0)
   // GIẤY ĐỀ GIỐNG GIẤY THẦY (rủi ro R3): bố cục của đúng trang đang chiếu + máy em soi được ⇒ dựng giấy soi rồi tự kiểm; lệch / không soi được ⇒ cách dựng
   // thường + ẨN NÉT TRÊN GIẤY (nét trên bảng đen giữ nguyên), số đo `live-do` mang cờ giấy lệch.
   const [khopGiay, setKhopGiay] = useState(false)
@@ -554,9 +572,11 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
         <KhungDocLap ref={kdl} lop="lv" layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
-          bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet} />
+          bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
+          dauBang={lenBang ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
+      {lenBang && phaBang ? <TamLenBang key={lenBang.khoa} em={lenBang} pha={phaBang} rong={bc?.w ?? 0} dau={dauBang} dong={!giamDong()} /> : null}
       {matMang ? <BaoMatMang layLuc={layLuc} />
         : tt.nghi ? <div className="lv-bao nho" role="status">Thầy tạm dừng live</div>
         : tt.tieng === 'loi' ? <BaoTam ms={6000}>Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</BaoTam>

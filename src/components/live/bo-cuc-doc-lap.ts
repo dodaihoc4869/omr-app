@@ -26,6 +26,10 @@ export const TI_LE_CHU_MAC_DINH = 0.0388
 export const TRE_UU_TIEN_MS = 2000, NHUONG_MS = 4000, NO_MS = 450
 /** Khoá nhớ vạch chia trên máy em (em tự kéo). Vắng = máy tự chia theo thầy. */
 export const KHOA_CHIA = 'ddh.live.chia'
+/** DẢI THẺ TÊN em đang lên bảng (thầy 11/11: thông báo «lên bảng» thu về góc thẻ tên): nằm NGOÀI mép trên khung bảng đen — như thẻ tên trên màn chiếu của
+ *  thầy (hàng trên của cột bảng; ô bảng thầy gửi sang KHÔNG gồm thẻ ấy nên nét của thầy có thể nằm sát mép trên khung bảng ⇒ thẻ không được đè lên khung).
+ *  Khung bảng nhường `DAU_BANG` px (dải cao `DAU_BANG − KHE_DAU`, khe `KHE_DAU` sát khung); khung giấy không đổi. Dải rộng dưới `DAU_DU` px ⇒ dấu chỉ còn hình. */
+export const DAU_BANG = 26, KHE_DAU = 2, DAU_DU = 236
 
 export type Vung = 'giay' | 'bang'
 export interface MocChia { giay: number; giua: number; bang: number }
@@ -70,15 +74,19 @@ export interface BoCucDL {
   /** Bề ngang dùng được để chia (đã trừ khe) + mép trái của nó. */
   x0: number; W: number
 }
-export interface DauVaoDL { w: number; h: number; at: AnToan; kc: KhungChieu; chia: number; phong?: Vung | null }
+export interface DauVaoDL { w: number; h: number; at: AnToan; kc: KhungChieu; chia: number; phong?: Vung | null
+  /** Bề cao (px) nhường cho dải thẻ tên phía trên khung bảng; 0 / vắng = không có dải. */
+  dauBang?: number }
 
 /** HAI KHUNG ĐỘC LẬP. Giấy bên trái bảng (mọi bố cục tờ hiện có); tờ lạ có giấy bên phải ⇒ hai khung đổi bên. */
-export function boCucDocLap({ w, h, at, kc, chia, phong = null }: DauVaoDL): BoCucDL {
+export function boCucDocLap({ w, h, at, kc, chia, phong = null, dauBang = 0 }: DauVaoDL): BoCucDL {
   const A = khungDung(w, h, at), Wd = A.x1 - A.x0, H = A.y1 - A.y0, W = Math.max(1, Wd - KHE_GIUA)
   const p = kep(chia, 0.2, 0.9), trai = kc.giay.x <= kc.bang.x
   const wG0 = Math.round(W * p), wB0 = W - wG0
   const wG = phong === 'giay' ? Wd : wG0, wB = phong === 'bang' ? Wd : wB0
-  const sG = Math.min(wG / kc.giay.w, Math.max(H / kc.giay.h, S_TRAN)), sB = Math.min(wB / kc.bang.w, Math.max(H / kc.bang.h, S_TRAN))
+  // dải thẻ tên chỉ lấy chỗ của khung BẢNG (không quá 1/5 chiều cao); bảng vốn co theo bề ngang nên nét không nhỏ đi, chỉ bớt phần thấy được
+  const dau = kep(dauBang, 0, H * 0.2), HB = H - dau
+  const sG = Math.min(wG / kc.giay.w, Math.max(H / kc.giay.h, S_TRAN)), sB = Math.min(wB / kc.bang.w, Math.max(HB / kc.bang.h, S_TRAN))
   // chỗ đứng: bình thường xếp cạnh nhau; khung đang phóng phủ cả bề ngang, khung kia đứng ngoài màn về phía của nó
   const xT = A.x0, xP = (rong: number): number => A.x1 - rong
   let xG: number, xB: number
@@ -89,10 +97,16 @@ export function boCucDocLap({ w, h, at, kc, chia, phong = null }: DauVaoDL): BoC
   const tw = kc.giay.w * sG, bw = kc.bang.w * sB
   return {
     w, h, chia: p, phong,
-    giay: { x: xG, y: A.y0, w: wG, h: H }, bang: { x: xB, y: A.y0, w: wB, h: H }, sG, sB,
+    giay: { x: xG, y: A.y0, w: wG, h: H }, bang: { x: xB, y: A.y0 + dau, w: wB, h: HB }, sG, sB,
     tam: { x: Math.max(0, (wG - tw) / 2), w: tw, h: kc.giay.h * sG }, oBang: { x: Math.max(0, (wB - bw) / 2), w: bw, h: kc.bang.h * sB },
     vach: phong ? null : (trai ? xG + wG : xB + wB) + KHE_GIUA / 2, x0: A.x0, W,
   }
+}
+
+/** Ô của DẢI THẺ TÊN (px CSS của hình): ngay trên khung bảng, cùng bề ngang, cách khung `KHE_DAU`. Bố cục không nhường chỗ ⇒ null. */
+export function oDauBang(bc: BoCucDL): O | null {
+  const cao = bc.bang.y - bc.giay.y - KHE_DAU
+  return cao > 0 ? { x: bc.bang.x, y: bc.giay.y, w: bc.bang.w, h: cao } : null
 }
 
 /** Số cho lớp vẽ nét (ve-bang.ts `datKhung`): lớp chốt của giấy = đúng tấm giấy; bảng theo cửa sổ thầy ảo riêng. `kc` = khung chiếu của CÙNG trang. */
