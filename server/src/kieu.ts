@@ -138,6 +138,9 @@ export interface Env {
    *  (`wrangler secret put`, workflow cai-realtime-1011.yml), KHÔNG vào git / wrangler.toml. Vắng một trong hai ⇒ cửa `/bpu/live/*` trả `chua-cau-hinh`, live chỉ có hình. */
   REALTIME_APP_ID?: string
   REALTIME_APP_SECRET?: string
+  /** TURN của Cloudflare Realtime (11/11 tối — mạng chặn UDP ⇒ câm cả hai chiều): mã + token API của khoá TURN `omr-turn`; Worker cấp thông tin TURN ngắn hạn (live-sfu.ts). */
+  TURN_KEY_ID?: string
+  TURN_KEY_API_TOKEN?: string
   /** Chỉ có khi lệnh chạy TRONG ngăn của em (ngan-hoc-sinh.ts): kho riêng của đúng em đó. */
   KHO_EM?: KhoEm
   /** Mã bí mật của thầy — đặt bằng `wrangler secret put MA_BI_MAT`, KHÔNG vào git. */

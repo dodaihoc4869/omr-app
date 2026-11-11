@@ -18,7 +18,7 @@
 import type { ViewLiveBang } from '../bpu/phong-live'
 import type { NetBut, SuKienBut } from '../but-bang-loi'
 import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet } from './ma-net'
-import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type MoiTruongLive, type TuyChonOpus } from './sfu'
+import { OPUS_THAY, layIce, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type MoiTruongLive, type TuyChonOpus } from './sfu'
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
 import { BAC_CUOI, coMic, rangBuocMic, timMicTheoTen } from './thang-mic'
 import { theAmLoa } from './loa'
@@ -85,7 +85,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     dat({ pha: 'dang-noi' })
     let p: RTCPeerConnection | null = null
     try {
-      p = mt.taoPc({ iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }], bundlePolicy: 'max-bundle' })
+      p = mt.taoPc({ iceServers: await layIce(mt, tuy.goc, tuy.ve), bundlePolicy: 'max-bundle' }) // STUN + TURN (mạng chặn UDP)
       p.addEventListener('track', (e) => {
         // Track nhận về trên phiên của thầy chỉ có thể là tiếng của em đang phát mic.
         if (e.track.kind !== 'audio') return

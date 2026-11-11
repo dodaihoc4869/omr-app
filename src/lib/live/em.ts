@@ -15,7 +15,7 @@ import { boLoa, theAmLoa } from './loa'
 import { taoLuoiPhat } from './luoi-tieng'
 import { doTieng } from './do-tieng'
 import { ngheThat, type SoTieng } from './so-tieng'
-import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
+import { OPUS_EM, layIce, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
   /** Vé phòng của em (`/hs/bpu/ve` hoặc `/hs/bpu/cua-em`). */
@@ -177,7 +177,9 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     let p: RTCPeerConnection | null = null
     const con = (): boolean => !huyRoi && doiNay === doi
     try {
-      p = mt.taoPc({ iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }], bundlePolicy: 'max-bundle' })
+      const ice = await layIce(mt, tuy.goc, tuy.ve) // STUN + TURN (mạng chặn UDP — 4G / Wi-Fi trường)
+      if (!con()) return
+      p = mt.taoPc({ iceServers: ice, bundlePolicy: 'max-bundle' })
       const pcNay = p
       p.addEventListener('track', (e) => {
         if (!con() || e.track.kind !== 'audio') return
