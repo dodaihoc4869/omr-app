@@ -34,7 +34,12 @@ const HAN_TAI_BU_MS = 24 * 3_600_000
 const enc = new TextEncoder()
 const b64 = (b: Uint8Array): string => { let s = ''; for (const x of b) s += String.fromCharCode(x); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }
 const tuB64 = (s: string): Uint8Array<ArrayBuffer> => { const t = atob(s.replace(/-/g, '+').replace(/_/g, '/')); const b = new Uint8Array(t.length); for (let i = 0; i < t.length; i++) b[i] = t.charCodeAt(i); return b }
-const khoaVe = (biMat: string) => crypto.subtle.importKey('raw', enc.encode(`live|${biMat}`), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify'])
+/** Khoá HMAC dựng MỘT lần cho mỗi mã bí mật (danh sách 80–500 buổi ký 80–500 vé: trước đây dựng lại khoá từng vé). Mã đổi ⇒ dựng khoá mới. */
+let khoaDem: { biMat: string; khoa: Promise<CryptoKey> } | null = null
+const khoaVe = (biMat: string): Promise<CryptoKey> => {
+  if (khoaDem?.biMat !== biMat) khoaDem = { biMat, khoa: crypto.subtle.importKey('raw', enc.encode(`live|${biMat}`), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify']) }
+  return khoaDem.khoa
+}
 const thanVe = (id: string, sbd: string, han: number, ban: number): Uint8Array<ArrayBuffer> => enc.encode(`live|${id}|${sbd}|${han}|${ban}`)
 export const hanVeLive = (nay: number): number => Math.ceil((nay + HAN_VE_LIVE_MS) / 3_600_000) * 3_600_000
 export async function kyVeLive(biMat: string, id: string, sbd: string, han: number, ban: number): Promise<string> {
@@ -195,9 +200,9 @@ async function gvLenh(env: Env, p: string, b: Row, nay: number, ctx?: ExecutionC
   await damBaoBangLive(env).catch(() => undefined)
   const iso = new Date(nay).toISOString()
   if (p === '/gv/live-ds') {
-    // Cột `ly_do` (11/11, chỉ-thêm, thêm lười lúc chốt buổi 0 đoạn đầu tiên) có thể CHƯA có ⇒ đọc lại không kèm cột ấy.
-    const docDs = (cot: string) => env.DB.prepare(`SELECT ${cot} FROM live_buoi WHERE trang_thai <> 'dang_xoa' ORDER BY bat_luc DESC LIMIT 500`).all<Row>().then((x) => x.results ?? [])
-    const r = await docDs(`${COT}, ly_do`).catch(() => docDs(COT)).catch(() => [] as Row[])
+    // Cột `ly_do` (11/11, chỉ-thêm, thêm lười lúc chốt buổi 0 đoạn đầu tiên) có thể CHƯA có ⇒ `SELECT *` lấy cột ấy khi có, không có thì thôi: luôn MỘT câu đọc
+    // (trước: chưa có cột ⇒ câu thứ nhất lỗi rồi đọc lại câu thứ hai = 2 vòng chờ nối tiếp mỗi lần mở Lịch sử Live).
+    const r = await env.DB.prepare("SELECT * FROM live_buoi WHERE trang_thai <> 'dang_xoa' ORDER BY bat_luc DESC LIMIT 500").all<Row>().then((x) => x.results ?? []).catch(() => [] as Row[])
     const han = hanVeLive(nay)
     const buoi = await Promise.all(r.map(async (x) => {
       const d = dongBuoi(x), ly = str(x.ly_do)

@@ -133,7 +133,7 @@ console.log('③ Đổi mic / tạm dừng / đổi lọc LÚC ĐANG LIVE — đ
     const t = await ctx.newPage()
     await t.goto(`${may.goc}/scripts/thu-live-1011/do-tieng.html`)
     await t.waitForFunction(() => typeof window.__doiMic === 'function', null, { timeout: 15000 })
-    ra.doiMic = await t.evaluate(() => window.__doiMic())
+    ra.doiMic = await t.evaluate((a) => window.__doiMic(a), process.env.LV_AGC === '0' ? false : process.env.LV_AGC === '1' ? true : undefined) // LV_AGC=0 / 1: ép tự chỉnh âm lượng của trình duyệt tắt / bật
     let hong = 0
     for (const b of ra.doiMic) {
       const lang = /đứng yên/.test(b.buoc), dat = lang ? b.emNangLuongTangSauMs == null : b.emNangLuongTangSauMs != null && b.emNangLuongTangSauMs <= 2000

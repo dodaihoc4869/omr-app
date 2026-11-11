@@ -37,7 +37,7 @@ const CAU = [
   { qid: 'Q2', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', choices: ['NaCl', 'NaOH', 'HCl', 'NaHCO₃'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Phenol', mucDo: 'hieu', sao: 2, kienThuc: [] },
 ]
 async function trangEm(sbd, w, h, dpr) {
-  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, hasTouch: true, isMobile: true })
+  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, hasTouch: true, isMobile: w < 1200 })
   await chanNgoai(ctx)
   const t = await ctx.newPage()
   t.on('pageerror', (e) => loiTrang.push(`em ${sbd}: ${e.message}`))
@@ -68,7 +68,7 @@ const ctxThay = await trinh.newContext({ viewport: { width: 1366, height: 768 },
 await chanNgoai(ctxThay)
 const thay = await ctxThay.newPage()
 thay.on('pageerror', (e) => loiTrang.push(`thầy: ${e.message}`))
-await thay.goto(`${may.goc}/scripts/thu-live-1011/trang.html?vai=thay`)
+await thay.goto(`${may.goc}/scripts/thu-live-1011/trang.html?vai=thay${process.env.LV_TOI ? '&giay=toi' : ''}`)
 const to = thay.frameLocator('iframe')
 await to.locator('body[data-bo-cuc="xong"]').waitFor({ timeout: 20000 })
 await to.locator('.mc-lv-nut').waitFor({ state: 'visible', timeout: 15000 })
@@ -79,7 +79,21 @@ await chup(thay, 'thay-chua-live-nut-live-trai-1366')
 
 // ───────────── HAI MÁY EM (lượt đang mở, chưa gửi) ─────────────
 await may.moLuot(CAU[0], 'B')
-const em = await trangEm('S1', 844, 390, 2)
+// SĂN LỖI «bảng đen xì không hiện đề» (thầy 11/11): chạy lại kịch bản ở điều kiện khác bằng biến môi trường —
+//   LV_EM=1971x1247@1 (cửa sổ máy tính làm máy em) · LV_TOI=1 (màn chiếu của thầy nền tối) · LV_CUON=1 (thầy cuộn bảng đen trước khi chụp).
+const [emW, emH, emDpr] = (process.env.LV_EM ?? '844x390@2').split(/[x@]/).map(Number)
+const em = await trangEm('S1', emW, emH, emDpr || 1)
+/** GIẤY ĐỀ trên máy em: có bề rộng / cao, nằm trong khung nhìn, có chữ đề, điểm giữa không bị phần tử khác phủ. */
+const giayEm = (t) => t.evaluate(() => {
+  const g = document.querySelector('.lv-giay')
+  if (!g) return { co: false }
+  const r = g.getBoundingClientRect(), o = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height / 2, 60))
+  return { co: true, x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height), trong: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1, chu: (g.innerText || '').replace(/\s+/g, ' ').slice(0, 60), phu: !(o && (g.contains(o) || o === g)), nen: getComputedStyle(g).backgroundColor, mau: getComputedStyle(g).color, man: innerWidth + 'x' + innerHeight }
+})
+async function kiemGiay(nhan) {
+  const g = await giayEm(em.t)
+  kiem(`GIẤY ĐỀ máy em · ${nhan}: có khổ, trong khung nhìn, có chữ đề, không bị phủ`, g.co && g.w > 80 && g.h > 60 && g.trong && /Alcohol|Phenol/.test(g.chu) && !g.phu, JSON.stringify(g))
+}
 await em.t.locator('.bpu-hs').waitFor({ timeout: 20000 })
 const em2 = await trangEm('S2', 390, 844, 3)
 await em2.t.locator('.bpu-hs').waitFor({ timeout: 20000 })
@@ -178,7 +192,7 @@ await em.t.locator('.lv .lv-nam').tap()
 await em.t.locator('.lv .lv-khay[data-mo]').waitFor({ timeout: 4000 })
 await ngu(450)
 const khay = await em.t.locator('.lv .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return { tren: Math.round(r.top), duoi: Math.round(r.bottom), giua: Math.round((r.left + r.right) / 2), chu: e.innerText } })
-kiem('M3 · khay xổ từ mép trên, nằm gọn trong màn: mạng · tiếng · đội + kJ', khay.tren >= 0 && khay.tren < 30 && khay.duoi <= 390 && Math.abs(khay.giua - 422) <= 2 && /kJ/.test(khay.chu), `${khay.tren}–${khay.duoi} px · ${khay.chu.replace(/\s+/g, ' ').slice(0, 80)}`)
+kiem('M3 · khay xổ từ mép trên, nằm gọn trong màn: mạng · tiếng · đội + kJ', khay.tren >= 0 && khay.tren < 30 && khay.duoi <= 390 && khay.giua > 60 && khay.giua < 784 /* tay nắm tự né cây bút của thầy ⇒ khay có thể lệch khỏi giữa */ && /kJ/.test(khay.chu), `${khay.tren}–${khay.duoi} px · ${khay.chu.replace(/\s+/g, ' ').slice(0, 80)}`)
 await chup(em.t, 'em-khay-tren-mo-844')
 await ngu(3300)
 // các khổ máy khác: 667 × 375 (điện thoại 16:9) và 1180 × 820 (máy bảng) — tay nắm vẫn không đè giấy / bảng
@@ -220,7 +234,11 @@ kiem('K3 · bấm viên Live ⇒ cửa sổ có «Tạm dừng», «Kết thúc 
 await ngu(1500)
 const cdMic = await to.locator('#mc-lv-cd').innerText().catch(() => '')
 kiem('M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)', /Hz · \d kênh/.test(cdMic) && /khử vọng (bật|tắt) · lọc ồn (bật|tắt) · tự chỉnh (bật|tắt)/.test(cdMic) && /cách mở \d\/4/.test(cdMic) && /máy chủ tiếng CHƯA nối/.test(cdMic), cdMic.slice(0, 230))
-kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', await to.locator('.mc-lv-the [data-lv="loc"][data-c="tu"][aria-pressed="true"]').count() === 1 && /Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()) && /khử vọng tắt · lọc ồn tắt · tự chỉnh bật/.test(cdMic), cdMic.slice(0, 220) + ' | ' + (await to.locator('.mc-lv-the').innerText()).replace(/\s+/g, ' ').slice(120, 330))
+for (let i = 0; i < 16 && !/Đang tắt — giọng trong nhất/.test(await to.locator('.mc-lv-the').innerText()); i++) await ngu(500)
+{ // đọc MỘT lần trong trang (thẻ vẽ lại mỗi giây theo số đo mic ⇒ hai lần đọc rời có thể rơi vào hai lần vẽ khác nhau)
+  const loc = await to.locator('.mc-lv-the').evaluate((e) => ({ an: e.querySelectorAll('[data-lv="loc"][data-c="tu"][aria-pressed="true"]').length, chu: e.innerText.replace(/\s+/g, ' ') }))
+  kiem('M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)', loc.an === 1 && /Đang tắt — giọng trong nhất/.test(loc.chu), `nút «Tự động» đang ấn: ${loc.an} · ${loc.chu.slice(120, 300)}`)
+}
 kiem('M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung', /Chưa nối máy chủ tiếng/.test(await to.locator('.mc-lv-cum').innerText()))
 kiem('M1 · vạch mức âm ghi đúng trạng thái: đang live ⇒ «Mức âm đang gửi cho lớp»', /Mức âm đang gửi cho lớp/.test(await to.locator('.mc-lv-the').innerText()))
 await to.locator('.mc-lv-the [data-lv="loc"][data-c="bat"]').click(); await ngu(1600)
@@ -249,6 +267,7 @@ const mucBang = (t) => t.evaluate(() => {
   dem(c, Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k))
   return n
 })
+await kiemGiay('đang tạm dừng')
 const mucTruoc = await mucBang(em.t)
 const bang = await to.locator('.mc-cot-lam-bai').first().evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height } })
 await thay.mouse.move(bang.x + 40, bang.y + 120); await thay.mouse.down()
@@ -263,6 +282,14 @@ const m4 = await moc(em.t)
 soDo.k3_tiep_tuc_toi_may_em_ms = Math.round(m4.nghiMat - tBam2)
 await ngu(600)
 const mucSau = await mucBang(em.t)
+await kiemGiay('sau khi tiếp tục')
+if (process.env.LV_CUON) {
+  // thầy cuộn bảng đen (bản bút 11/11) ⇒ giấy đề máy em KHÔNG được trôi theo
+  await thay.mouse.move(bang.x + 80, bang.y + 200); await thay.mouse.wheel(0, 700); await ngu(900)
+  await kiemGiay('sau khi thầy cuộn bảng đen')
+  await chup(em.t, 'san-em-sau-cuon'); await chup(thay, 'san-thay-sau-cuon')
+}
+await chup(em.t, 'san-em'); await chup(thay, 'san-thay')
 kiem('K3 · «Tiếp tục» ⇒ máy em hết dải dừng (≤ 500 ms), nét viết lúc dừng tới máy em một lượt', m4.nghiMat - tBam2 <= 500 && mucSau > mucLucDung + 5, `${soDo.k3_tiep_tuc_toi_may_em_ms} ms · mực trong ô bảng ${mucLucDung} → ${mucSau}`)
 await to.locator('.mc-lv-the [data-lv="the-dong"]').click().catch(() => {})
 
