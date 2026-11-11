@@ -59,8 +59,29 @@ const tong24 = (j24?.data?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? [
 const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). 15 câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
   ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)]
 if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`)
+// LIVE (thầy 11/11 «phần live có tăng thêm tiền không»): Realtime SFU/TURN (gói gồm 1 TB ra/tháng, vượt 0,05 USD/GB) + Durable Object theo vùng 30 ngày qua.
+const tu30 = new Date(now - 30 * 86400e3).toISOString()
+const g30 = async (ten, than) => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
+  query: `query($a:String!){viewer{accounts(filter:{accountTag:$a}){${ten}(limit:10000,filter:{datetime_geq:"${tu30}",datetime_leq:"${now.toISOString()}"}){${than}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  if (!j || j.errors?.length) return { loi: String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 160) }
+  return { ds: j.data?.viewer?.accounts?.[0]?.[ten] ?? [] } }
+const bangLive = ['\n### Live — 30 ngày qua', '']
+for (const ten of ['callsUsageAdaptiveGroups', 'callsTurnUsageAdaptiveGroups']) {
+  const r = await g30(ten, 'sum{egressBytes ingressBytes} dimensions{date}')
+  if (r.loi) { bangLive.push(`- ${ten}: không đọc được (${r.loi})`); continue }
+  const ra = r.ds.reduce((a, x) => a + (Number(x.sum?.egressBytes) || 0), 0), vao = r.ds.reduce((a, x) => a + (Number(x.sum?.ingressBytes) || 0), 0)
+  const ngay = r.ds.filter((x) => Number(x.sum?.egressBytes) > 0).map((x) => `${x.dimensions.date}: ${(x.sum.egressBytes / 1e9).toFixed(3)} GB`).sort()
+  bangLive.push(`- ${ten}: ra ${(ra / 1e9).toFixed(3)} GB, vào ${(vao / 1e9).toFixed(3)} GB (gói 1.000 GB ra/tháng) · ${ngay.slice(-8).join(' · ') || 'không ngày nào có'}`)
+}
+{ const r = await g30('durableObjectsPeriodicGroups', 'sum{activeTime inboundWebsocketMsgCount outboundWebsocketMsgCount} dimensions{namespaceId}')
+  const ns = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/durable_objects/namespaces?per_page=100`, { headers: H }).then((x) => x.json()).catch(() => null)
+  const ten = new Map((ns?.result ?? []).map((x) => [x.id, x.class]))
+  const gop = new Map()
+  for (const x of r.ds ?? []) { const k = ten.get(x.dimensions.namespaceId) ?? 'khác'; const o = gop.get(k) ?? { s: 0, vao: 0, ra: 0 }; o.s += x.sum.activeTime / 1e6; o.vao += x.sum.inboundWebsocketMsgCount; o.ra += x.sum.outboundWebsocketMsgCount; gop.set(k, o) }
+  for (const [k, o] of [...gop].sort((a, b) => b[1].s - a[1].s)) bangLive.push(`- DO ${k}: chạy ${so(o.s)} giây = ${so(o.s * 0.128)} GB-s · tin WebSocket vào ${so(o.vao)}, ra ${so(o.ra)}`)
+  if (r.loi) bangLive.push(`- DO: không đọc được (${r.loi})`) }
 const ket = `\n**Dự báo hoá đơn kỳ này: ${tongDuBao.toFixed(2)} USD** (5 USD gói + phần vượt; chưa gồm Workers Logs — khoá chưa có quyền đọc).`
-const ra = `## Chi phí Cloudflare — ${now.toISOString().slice(0, 16)} UTC\n\n${bang.join('\n')}\n${ket}\n${bangTop.join('\n')}\n`
+const ra = `## Chi phí Cloudflare — ${now.toISOString().slice(0, 16)} UTC\n\n${bang.join('\n')}\n${ket}\n${bangTop.join('\n')}\n${bangLive.join('\n')}\n`
 console.log(ra)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, ra)
 // Đỏ khi dự báo vượt 6 USD (chừa 1 USD cho sai số dự báo của mấy ngày đầu kỳ).
