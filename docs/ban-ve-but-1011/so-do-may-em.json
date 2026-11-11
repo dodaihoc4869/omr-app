@@ -1,40 +1,40 @@
 {
   "ten": "sau",
-  "ngay": "2026-11-11T03:46:48.478Z",
+  "ngay": "2026-11-11T03:59:20.965Z",
   "may": "Chromium không đầu /opt/pw-browsers, thầy 1366 × 768, máy em 844 × 390 @2x; phòng thật trong Node; nét đi WebSocket của phòng (không SFU, không mạng thật)",
   "nhipMuc": {
     "soNet": 65,
     "cachKhungCoMucMs": {
-      "n": 769,
+      "n": 764,
       "trungVi": 16.7,
       "p95": 16.9,
-      "lonNhat": 33.3
+      "lonNhat": 33.8
     },
     "quangDungDaiNhatMoiNetMs": {
       "n": 65,
       "trungVi": 16.9,
       "p95": 18.4,
-      "lonNhat": 33.3
+      "lonNhat": 33.8
     },
     "quangDungTu50Ms": 0,
     "treChamButToiMucMs": {
       "n": 65,
-      "trungVi": 74.7,
-      "p95": 83.4,
-      "lonNhat": 85.1
+      "trungVi": 75.6,
+      "p95": 87.6,
+      "lonNhat": 89
     },
     "conTro": {
-      "khungMucChay": 768,
-      "trongDoConTroDungIm": 19,
-      "dungRoiNhay6px": 1
+      "khungMucChay": 762,
+      "trongDoConTroDungIm": 11,
+      "dungRoiNhay6px": 2
     }
   },
   "uotSoKhoMayEm": {
     "soNet": 5,
     "netCoKhac": 1,
-    "diemAnhKhac": 15,
-    "khac16": 1,
-    "mucLon": 16,
+    "diemAnhKhac": 16,
+    "khac16": 0,
+    "mucLon": 15,
     "ghiChu": "ô bảng đen của máy em ở đúng điểm ảnh thiết bị (@2x)"
   },
   "khungHinhMayEm": [
@@ -47,50 +47,62 @@
       "xuLyMoiKhungMs": {
         "trungVi": 0.1,
         "p95": 0.3,
-        "lonNhat": 0.5
+        "lonNhat": 1.1
       },
-      "luongChinhBanPhanTram": 7.7,
-      "maPhanTram": 1.3,
+      "luongChinhBanPhanTram": 7.6,
+      "maPhanTram": 1.4,
       "boCucPhanTram": 0,
       "tinhKieuPhanTram": 0,
       "soLanBoCuc": 0,
-      "soLanTinhKieu": 0
+      "soLanTinhKieu": 1,
+      "mayThayCungLuc": {
+        "luongChinhBanPhanTram": 7.3,
+        "maPhanTram": 2.1
+      }
     },
     {
       "cpu": "×4",
       "khungMoiGiay": 60,
-      "cachKhungP95Ms": 16.8,
+      "cachKhungP95Ms": 16.7,
       "khungTreHon20Ms": 0,
-      "soKhung": 312,
+      "soKhung": 311,
       "xuLyMoiKhungMs": {
-        "trungVi": 0.3,
-        "p95": 1.4,
-        "lonNhat": 7.3
+        "trungVi": 0.4,
+        "p95": 1.2,
+        "lonNhat": 3.5
       },
-      "luongChinhBanPhanTram": 28.9,
-      "maPhanTram": 4.1,
+      "luongChinhBanPhanTram": 26.9,
+      "maPhanTram": 4,
       "boCucPhanTram": 0,
       "tinhKieuPhanTram": 0,
       "soLanBoCuc": 0,
-      "soLanTinhKieu": 0
+      "soLanTinhKieu": 2,
+      "mayThayCungLuc": {
+        "luongChinhBanPhanTram": 7.5,
+        "maPhanTram": 2.1
+      }
     },
     {
       "cpu": "×6",
       "khungMoiGiay": 60,
-      "cachKhungP95Ms": 16.8,
+      "cachKhungP95Ms": 16.7,
       "khungTreHon20Ms": 0,
-      "soKhung": 318,
+      "soKhung": 319,
       "xuLyMoiKhungMs": {
-        "trungVi": 0.6,
-        "p95": 1.7,
-        "lonNhat": 4.7
+        "trungVi": 0.2,
+        "p95": 1.6,
+        "lonNhat": 3.4
       },
-      "luongChinhBanPhanTram": 40.7,
-      "maPhanTram": 5.7,
+      "luongChinhBanPhanTram": 38.4,
+      "maPhanTram": 5,
       "boCucPhanTram": 0,
       "tinhKieuPhanTram": 0.1,
       "soLanBoCuc": 0,
-      "soLanTinhKieu": 2
+      "soLanTinhKieu": 2,
+      "mayThayCungLuc": {
+        "luongChinhBanPhanTram": 8.3,
+        "maPhanTram": 2.4
+      }
     }
   ],
   "cayBut": {
@@ -99,11 +111,11 @@
   },
   "banTay": {
     "hinhPx": [
-      28,
-      30.5
+      26.5,
+      29.5
     ],
-    "caoBangPx": 374,
-    "caoHinhSoVoiBangPhanTram": 8.2
+    "caoBangPx": 357,
+    "caoHinhSoVoiBangPhanTram": 8.3
   },
   "bangCuon": {
     "thayLanChuot": {
@@ -114,34 +126,34 @@
     "netGiay": 0,
     "yLonNhatCuaNet": 1.297,
     "mayEmTroiTheo": {
-      "truoc": "translate3d(0px, -188px, 0px)",
-      "sau": "translate3d(0px, -197.5px, 0px)",
+      "truoc": "translate3d(0px, -179.5px, 0px)",
+      "sau": "translate3d(0px, -188.5px, 0px)",
       "buocTroiLonNhatMoiKhungPx": 1.5
     },
     "nhipMucKhiDaCuon": {
       "soNet": 19,
       "cachKhungCoMucMs": {
-        "n": 285,
+        "n": 284,
         "trungVi": 16.7,
-        "p95": 16.9,
+        "p95": 16.8,
         "lonNhat": 33.4
       },
       "quangDungDaiNhatMoiNetMs": {
         "n": 19,
-        "trungVi": 16.9,
+        "trungVi": 16.8,
         "p95": 33.4,
         "lonNhat": 33.4
       },
       "quangDungTu50Ms": 0,
       "treChamButToiMucMs": {
         "n": 19,
-        "trungVi": 80.9,
-        "p95": 89.5,
-        "lonNhat": 89.5
+        "trungVi": 79.6,
+        "p95": 86,
+        "lonNhat": 86
       },
       "conTro": {
-        "khungMucChay": 284,
-        "trongDoConTroDungIm": 8,
+        "khungMucChay": 283,
+        "trongDoConTroDungIm": 12,
         "dungRoiNhay6px": 3
       }
     },
@@ -150,7 +162,7 @@
       "cuonSau": 1.0504,
       "doiPx": 120,
       "kéoKhôngSinhNét": true,
-      "mayEmTheo": "translate3d(0px, -442px, 0px)",
+      "mayEmTheo": "translate3d(0px, -421.5px, 0px)",
       "hoanTacSauCuon": "150 → 149 nét"
     }
   },

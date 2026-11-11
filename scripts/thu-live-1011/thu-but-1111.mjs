@@ -210,19 +210,21 @@ console.log(`[${TEN}] ướt so khô máy em:`, JSON.stringify(kq.uotSoKhoMayEm)
 // 3 · KHUNG HÌNH MÁY EM lúc nhận nét ở CPU ×1 / ×4 / ×6 (không chụp ô bảng mỗi khung — chỉ đo khung)
 const cdpEm = await ctxEm.newCDPSession(em)
 await cdpEm.send('Performance.enable')
-const docCdp = async () => Object.fromEntries((await cdpEm.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]))
+const docCdp = async (c = cdpEm) => Object.fromEntries((await c.send('Performance.getMetrics')).metrics.map((m) => [m.name, m.value]))
+// máy THẦY (không bóp CPU) trong cùng quãng viết: luồng chính của trang thầy (tờ chiếu + khung ngoài) bận bao nhiêu phần trăm
+await cdpThay.send('Performance.enable')
 kq.khungHinhMayEm = []
 for (const cpu of [1, 4, 6]) {
   await cdpEm.send('Emulation.setCPUThrottlingRate', { rate: cpu })
   await ngu(300)
   if (process.env.VET && cpu === 4) await trinh.startTracing(em, { categories: ['devtools.timeline', 'disabled-by-default-devtools.timeline', 'cc', 'gpu', 'blink', 'viz'] })
-  const c0 = await docCdp(), t0 = performance.now()
+  const c0 = await docCdp(), th0 = await docCdp(cdpThay), t0 = performance.now()
   await em.evaluate(() => { window.__do.goBoc(); window.__do.cach = []; window.__do.xl = []; window.__do.nhe = true; window.__do.bat = true })
   const r2 = taoNgauNhien(40 + cpu)
   await viet([...vietDong('n = 0,1 mol', 1312, 520 + (cpu === 1 ? 0 : cpu === 4 ? 70 : 140), 38, { rnd: r2, vMax: 900 }), ...vietDong('CH_3COOH', 1500, 520 + (cpu === 1 ? 0 : cpu === 4 ? 70 : 140), 38, { rnd: r2, vMax: 900 })], { nghi: 60 })
   await ngu(500)
   const X = await em.evaluate(() => { window.__do.bat = false; window.__do.nhe = false; window.__do.ganBoc(); return { cach: window.__do.cach, xl: window.__do.xl } })
-  const c1 = await docCdp(), giay = (performance.now() - t0) / 1000
+  const c1 = await docCdp(), th1 = await docCdp(cdpThay), giay = (performance.now() - t0) / 1000
   if (process.env.VET && cpu === 4) {
     const ev = JSON.parse((await trinh.stopTracing()).toString()).traceEvents, ten = {}, luong = {}
     for (const e of ev) if (e.ph === 'M' && e.name === 'thread_name') luong[e.pid + ':' + e.tid] = e.args.name
@@ -232,6 +234,7 @@ for (const cpu of [1, 4, 6]) {
   }
   const kh = tk(X.cach), xl = tk(X.xl), tong = X.cach.reduce((s, v) => s + v, 0)
   const dong = { cpu: '×' + cpu, khungMoiGiay: +(kh.n / (tong / 1000)).toFixed(1), cachKhungP95Ms: kh.p95, khungTreHon20Ms: X.cach.filter((v) => v > 20).length, soKhung: kh.n, xuLyMoiKhungMs: { trungVi: xl.trungVi, p95: xl.p95, lonNhat: xl.lonNhat }, luongChinhBanPhanTram: +((c1.TaskDuration - c0.TaskDuration) / giay * 100).toFixed(1), maPhanTram: +((c1.ScriptDuration - c0.ScriptDuration) / giay * 100).toFixed(1), boCucPhanTram: +((c1.LayoutDuration - c0.LayoutDuration) / giay * 100).toFixed(1), tinhKieuPhanTram: +((c1.RecalcStyleDuration - c0.RecalcStyleDuration) / giay * 100).toFixed(1), soLanBoCuc: c1.LayoutCount - c0.LayoutCount, soLanTinhKieu: c1.RecalcStyleCount - c0.RecalcStyleCount }
+  dong.mayThayCungLuc = { luongChinhBanPhanTram: +((th1.TaskDuration - th0.TaskDuration) / giay * 100).toFixed(1), maPhanTram: +((th1.ScriptDuration - th0.ScriptDuration) / giay * 100).toFixed(1) }
   kq.khungHinhMayEm.push(dong)
   console.log(`[${TEN}] khung hình máy em`, JSON.stringify(dong))
 }
