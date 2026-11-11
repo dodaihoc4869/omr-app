@@ -1,0 +1,202 @@
+/* XEM LẠI LIVE — MÁY EM: danh sách + trang buổi (đợt X2, thầy chốt build 11/11; bản vẽ docs/ban-ve-live-xem-lai-1011 ảnh 05–18, 26, 27). Nạp lười cùng mảnh.
+   Màu: CHỈ biến sẵn có của app học sinh — `--tr-*`, kính `--kinh-*` (app thầy mở xem không có kính ⇒ lùi về `--tr-mat`), màu đội `--doi` = `--p-cam` /
+   `--p-tim-2` / `--p-xanh` / `--p-do`, chữ trên nền màu `--p-trang` / `--p-muc`. Không mã màu thô. Chuyển động: chỉ transform / opacity. */
+.xl { position: fixed; inset: 0; z-index: 2147481000; outline: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  background: var(--tr-nen); color: var(--tr-chu); font-size: 15px; font-weight: 500; line-height: 1.4; text-align: left; }
+.xl *, .xl *::before, .xl *::after { box-sizing: border-box; }
+.xl h1, .xl h2, .xl h3, .xl p { margin: 0; }
+.xl .xl-nut, .xl .xl-lui, .xl .xl-buoi, .xl .xl-bia-nut, .xl .xl-mo, .xl .xl-nen, .xl .xl-tg > button, .xl .xl-doan {
+  font: inherit; color: inherit; border: 0; margin: 0; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.xl button:focus-visible { outline: 3px solid var(--tr-hs-nut); outline-offset: 2px; }
+.xl .so { font-variant-numeric: tabular-nums; }
+/* thẻ phẳng viền 2 px (nền app học sinh là trắng phẳng ⇒ thẻ cần viền rõ để tách khối) */
+.xl-kinh { background: var(--tr-mat); border-radius: 26px; box-shadow: inset 0 0 0 2px var(--tr-vien); }
+.xl-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; background: var(--tr-mat-2); color: var(--tr-chu-2); }
+.xl-chip.chinh { background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+.xl-chip.dung { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); }
+.xl-chip.sai { background: var(--tr-sai-nhat); color: var(--tr-sai-chu); }
+.xl-chip.chuy { background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); }
+.xl-chip.sao { background: var(--tr-sao-nhat); color: var(--tr-sao-chu); }
+.xl-chip.doi { background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 1.5px var(--doi); }
+.xl-cham { display: block; width: 10px; height: 10px; border-radius: 50%; background: var(--doi); flex: none; }
+.xl .xl-nut { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 6px 20px; border-radius: 16px; font-size: 16px; font-weight: 700; text-align: center; transition: transform 0.1s; }
+.xl .xl-nut:active { transform: scale(0.98); }
+.xl .xl-nut.chinh { background: var(--tr-hs-nut); color: var(--tr-trang); }
+.xl .xl-nut.vien { background: var(--tr-mat); color: var(--tr-chu); box-shadow: inset 0 0 0 1.5px var(--tr-vien-2); }
+/* chip «N buổi mới» trên dòng «Live» của tấm «Thêm» (kiểu nằm ở mảnh này: chip chỉ hiện sau khi mảnh đã tải) */
+.xl-chip-moi { margin-left: auto; display: inline-flex; align-items: center; min-height: 28px; padding: 2px 11px; border-radius: 999px; font-size: 13px; font-weight: 700; white-space: nowrap; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+.xl-chip-moi + .tr-menu-mui { margin-left: 6px; }
+
+/* khung trang */
+.xl-trang { max-width: 560px; margin: 0 auto; padding: max(14px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); }
+.xl-dau { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; min-height: 48px; }
+.xl .xl-lui { flex: none; width: 48px; height: 48px; min-height: 48px; padding: 0; border-radius: 50%; display: grid; place-items: center; background: var(--kinh-mat-dam, var(--tr-mat)); box-shadow: inset 0 0 0 1px var(--kinh-vien-2, var(--tr-vien)), var(--tr-bong-2); color: var(--tr-chu); }
+.xl-dau h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; }
+.xl-dau p { font-size: 14px; color: var(--tr-chu-3); font-weight: 600; }
+
+/* ảnh bìa một đoạn: bảng đen thu nhỏ */
+.xl-bia { position: relative; display: block; width: 100%; border-radius: 18px; overflow: hidden; background: var(--tr-chieu-bang); color: var(--tr-chieu-giay); aspect-ratio: 16 / 8.2; }
+.xl-bia::before { content: ""; display: block; padding-top: 51.25%; } /* máy chưa có aspect-ratio (iOS 14) vẫn ra đúng khổ */
+@supports (aspect-ratio: 1) { .xl-bia::before { display: none; } }
+.xl-bia .giay { position: absolute; left: 2.2%; top: 4%; bottom: 4%; width: 60%; border-radius: 10px; background: var(--tr-chieu-giay); }
+.xl-bia .giay i { position: absolute; left: 8%; height: 5.5%; border-radius: 4px; background: var(--tr-chieu-phu); opacity: 0.35; }
+.xl-bia .phan { position: absolute; left: 66%; right: 4%; top: 12%; display: grid; gap: 9%; height: 46%; }
+.xl-bia .phan i { display: block; height: 3px; border-radius: 2px; background: var(--tr-chieu-giay); opacity: 0.7; transform: rotate(-1.2deg); }
+.xl-bia .phan i:first-child { background: var(--p-cam); width: 70%; }
+.xl-bia .phat { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; display: grid; place-items: center; background: var(--tr-chieu-giay); color: var(--tr-chieu-bang); box-shadow: 0 8px 24px var(--tr-chieu-bang); }
+.xl-bia .dai, .xl-bia .nhan { position: absolute; min-height: 26px; padding: 2px 10px; border-radius: 999px; display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; }
+.xl-bia .dai { right: 10px; bottom: 10px; background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); }
+.xl-bia .nhan { left: 10px; top: 10px; font-weight: 800; background: var(--tr-sao); color: var(--p-muc); }
+.xl .xl-bia-nut { display: block; width: 100%; padding: 0; background: none; border-radius: 18px; margin-top: 10px; }
+
+/* ── danh sách buổi live ── */
+.xl-noi { padding: 12px; margin-bottom: 18px; }
+.xl-noi h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; margin: 12px 4px 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.xl-noi .phu { font-size: 14px; color: var(--tr-chu-3); font-weight: 600; margin: 0 4px 10px; }
+.xl-hang { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 4px 12px; }
+.xl-noi .xl-nut { width: 100%; }
+.xl-thang { font-size: 13px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--tr-chu-3); margin: 0 6px 8px; }
+.xl-ds { padding: 4px; margin-bottom: 18px; display: flex; flex-direction: column; }
+.xl .xl-buoi { min-height: 76px; padding: 10px 8px 10px 10px; display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; border-radius: 20px; background: none; }
+.xl .xl-buoi + .xl-buoi { box-shadow: 0 -1px 0 var(--tr-vien); border-radius: 0 0 20px 20px; }
+.xl-ngay { width: 52px; height: 56px; border-radius: 16px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); line-height: 1.1; }
+.xl-ngay small { font-size: 11.5px; font-weight: 700; }
+.xl-ngay b { font-size: 20px; font-weight: 800; }
+.xl-buoi .giua { flex: 1; min-width: 0; }
+.xl-buoi .giua b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 16px; font-weight: 700; line-height: 1.25; }
+.xl-buoi .giua span { display: block; font-size: 13.5px; color: var(--tr-chu-3); font-weight: 600; margin-top: 2px; }
+.xl-buoi > svg { color: var(--tr-chu-3); flex: none; }
+.xl-trong { padding: 28px 20px; text-align: center; }
+.xl-trong .hinh { width: 84px; height: 84px; border-radius: 28px; margin: 0 auto 14px; display: grid; place-items: center; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+.xl-trong b { display: block; font-size: 19px; font-weight: 800; margin-bottom: 6px; }
+.xl-trong p { color: var(--tr-chu-2); max-width: 300px; margin: 0 auto 16px; }
+.xl-xuly { padding: 14px 16px; margin-bottom: 14px; display: flex; gap: 12px; align-items: center; }
+.xl-xuly .vong { position: relative; width: 40px; height: 40px; border-radius: 50%; flex: none; background: var(--tr-mat-3); overflow: hidden; }
+.xl-xuly .vong::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 6px solid transparent; border-top-color: var(--tr-hs-nut); border-right-color: var(--tr-hs-nut); animation: xl-quay 1.1s linear infinite; }
+.xl-xuly .vong::after { content: ""; position: absolute; inset: 6px; border-radius: 50%; background: var(--tr-mat); }
+.xl-xuly b { display: block; font-size: 15.5px; font-weight: 700; }
+.xl-xuly span { font-size: 13.5px; color: var(--tr-chu-3); font-weight: 600; }
+.xl-bao { padding: 12px 14px; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; border-radius: 18px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-weight: 600; font-size: 14px; }
+/* khung xương lúc đang tải */
+.xl-xuong { border-radius: 14px; background: var(--tr-mat-3); animation: xl-tho 1.2s ease-in-out infinite alternate; }
+@keyframes xl-tho { from { opacity: 0.45; } to { opacity: 0.9; } }
+@keyframes xl-quay { to { transform: rotate(360deg); } }
+
+/* ── trang buổi live ── */
+.xl-bia-buoi { position: relative; border-radius: 30px; padding: 22px 20px 20px; color: var(--p-trang); overflow: hidden; margin-bottom: 14px; background: var(--tr-hs-go, var(--tr-hs-nut)); }
+.xl-bia-buoi::before, .xl-bia-buoi::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.8; }
+.xl-bia-buoi::before { right: -22%; top: -46%; width: 76%; padding-top: 76%; background: var(--p-tim-2); }
+.xl-bia-buoi::after { left: -24%; bottom: -58%; width: 70%; padding-top: 70%; background: var(--p-do); opacity: 0.5; }
+.xl-bia-buoi > * { position: relative; z-index: 1; }
+.xl-bia-buoi .tren { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; }
+.xl-bia-buoi .tren i { display: block; width: 8px; height: 8px; border-radius: 50%; background: var(--p-trang); }
+.xl-bia-buoi h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; margin: 10px 0 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.xl-bia-buoi p { font-size: 15px; font-weight: 600; }
+.xl-so { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 18px 0 16px; }
+.xl-so div { border-radius: 18px; padding: 10px 6px; text-align: center; background: var(--tr-hs-nut); box-shadow: inset 0 0 0 1px var(--tr-hs); }
+.xl-so b { display: block; font-size: 24px; font-weight: 800; line-height: 1.1; }
+.xl-so span { white-space: nowrap; font-size: 12.5px; font-weight: 600; }
+.xl .xl-bia-buoi .xl-nut { width: 100%; min-height: 52px; font-size: 16.5px; background: var(--p-trang); color: var(--tr-hs-go, var(--tr-hs-nut)); }
+.xl .xl-nen { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; margin-top: 10px; padding: 8px 12px; border-radius: 16px; background: var(--tr-hs-nut); box-shadow: inset 0 0 0 1px var(--tr-hs); font-size: 14px; font-weight: 700; text-align: left; color: var(--p-trang); line-height: 1.3; }
+.xl-nen span { flex: 1; min-width: 0; }
+.xl-the { padding: 16px; margin-bottom: 14px; }
+.xl-the > h2 { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.xl-the > h2 small { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--tr-chu-3); }
+/* dòng thời gian */
+.xl-tg { position: relative; display: flex; gap: 3px; height: 44px; margin-top: 14px; }
+.xl .xl-tg > button { display: block; height: 100%; min-height: 0; min-width: 3px; padding: 0; border-radius: 0; background: var(--tr-mat-3); position: relative; }
+.xl .xl-tg > button:disabled { cursor: default; opacity: 1; }
+.xl .xl-tg > button.chua { background: var(--doi); min-width: 22px; }
+.xl-tg > button.chua b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13.5px; font-weight: 800; color: var(--p-muc); }
+.xl .xl-tg > button:first-child { border-radius: 14px 0 0 14px; }
+.xl .xl-tg > button:last-child { border-radius: 0 14px 14px 0; }
+.xl-tg > button.hay::after { content: ""; position: absolute; left: 50%; top: -13px; margin-left: -7px; border: 7px solid transparent; border-top-color: var(--tr-sao-chu); }
+.xl-tg-chu { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--tr-chu-3); font-weight: 600; margin-top: 6px; }
+.xl-chu-giai { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font-size: 13px; color: var(--tr-chu-2); font-weight: 600; }
+.xl-chu-giai span { display: inline-flex; align-items: center; gap: 6px; }
+.xl-chu-giai i { display: block; width: 14px; height: 14px; border-radius: 5px; background: var(--tr-mat-3); }
+.xl-chu-giai svg { color: var(--tr-sao-chu); }
+/* bảng vàng */
+.xl-thang-doi { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 20px; background: var(--tr-mat-2); box-shadow: inset 0 0 0 2px var(--doi); margin-bottom: 12px; }
+.xl-thang-doi .cup { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); flex: none; }
+.xl-thang-doi b { display: block; font-size: 19px; font-weight: 800; line-height: 1.15; }
+.xl-thang-doi span { font-size: 13.5px; font-weight: 600; color: var(--tr-chu-2); }
+.xl-doi { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px 10px; font-size: 14px; font-weight: 700; }
+.xl-doi .ten { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+.xl-doi .thanh { height: 14px; border-radius: 7px; background: var(--tr-mat-3); overflow: hidden; }
+.xl-doi .thanh i { display: block; height: 100%; border-radius: 7px; background: var(--doi); }
+.xl-doi .kj { font-weight: 800; white-space: nowrap; }
+.xl-top { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.xl-top div { border-radius: 18px; padding: 10px 8px; text-align: center; background: var(--tr-mat-2); min-width: 0; }
+.xl-top i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; margin: 0 auto 4px; font-style: normal; font-size: 13px; font-weight: 800; background: var(--tr-sao); color: var(--p-muc); }
+.xl-top b { display: block; font-size: 13.5px; font-weight: 700; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xl-top span { font-size: 13px; font-weight: 800; color: var(--tr-sao-chu); }
+.xl-chuoi { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 10px 12px; border-radius: 16px; background: var(--tr-chu-y-nhat); color: var(--tr-chu-y-chu); font-size: 14px; font-weight: 700; }
+/* danh sách đoạn (riêng từng em) */
+.xl .xl-doan { min-height: 60px; padding: 6px 6px; display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; border-radius: 18px; background: none; }
+.xl .xl-doan + .xl-doan { box-shadow: 0 -1px 0 var(--tr-vien); }
+.xl .xl-doan[aria-current='true'] { background: var(--tr-hs-nhat); box-shadow: none; }
+.xl-doan .o { width: 44px; height: 44px; border-radius: 14px; flex: none; display: grid; place-items: center; font-size: 17px; font-weight: 800; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); }
+.xl-doan[aria-current='true'] .o { background: var(--tr-hs-nut); color: var(--tr-trang); }
+.xl-doan .giua { flex: 1; min-width: 0; }
+.xl-doan .giua b { display: block; font-size: 14.5px; font-weight: 700; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xl-doan .giua span { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; font-size: 13px; color: var(--tr-chu-3); font-weight: 600; margin-top: 2px; }
+.xl-doan .giua em { font-style: normal; font-weight: 700; color: var(--tr-chu-y-chu); }
+.xl-doan .giua em.len { color: var(--tr-hs-chu); }
+.xl-doan .giua em.hay { color: var(--tr-sao-chu); }
+.xl-doan .xem { flex: none; color: var(--tr-dung-chu); }
+/* thẻ câu */
+.xl-cau-dau { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.xl-cau-dau .so-cau { min-height: 30px; padding: 2px 12px; border-radius: 999px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 800; background: var(--tr-hs-nut); color: var(--tr-trang); }
+.xl-cau-dau .em { margin-left: auto; }
+.xl-de { font-size: 16.5px; line-height: 1.45; margin-bottom: 10px; overflow-wrap: anywhere; }
+.xl-de .ht2-lam-de { margin: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+.xl-de img { max-width: 100%; height: auto; }
+.xl-pa { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
+.xl-pa.mot { grid-template-columns: minmax(0, 1fr); }
+.xl-pa div { min-height: 44px; padding: 8px 12px; border-radius: 14px; background: var(--tr-mat-2); font-size: 15px; display: flex; align-items: center; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.xl-pa div > b { font-weight: 800; color: var(--tr-chu-3); flex: none; }
+.xl-pa div > span { flex: 1; min-width: 0; }
+.xl-pa div > em { flex: none; font-style: normal; font-weight: 800; }
+.xl-pa div.dung { background: var(--tr-dung-nhat); color: var(--tr-dung-chu); box-shadow: inset 0 0 0 2px var(--tr-dung); }
+.xl-pa div.dung > b { color: var(--tr-dung-chu); }
+.xl-pa div > svg { flex: none; }
+.xl-dap { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; padding: 10px 12px; border-radius: 14px; background: var(--tr-dung-nhat); color: var(--tr-dung-chu); font-weight: 700; margin-bottom: 12px; box-shadow: inset 0 0 0 2px var(--tr-dung); }
+.xl-dap b { font-size: 20px; font-weight: 800; }
+.xl-lop { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.xl-lop .thanh { grid-column: 1 / -1; height: 10px; border-radius: 5px; background: var(--tr-mat-3); overflow: hidden; }
+.xl-lop .thanh i { display: block; height: 100%; border-radius: 5px; background: var(--tr-dung); }
+.xl-lop span { color: var(--tr-chu-3); font-weight: 600; }
+.xl-len { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--tr-chu-2); }
+.xl-len b { color: var(--tr-chu); font-weight: 700; }
+.xl .xl-mo { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 48px; margin-top: 12px; padding: 4px 14px; border-radius: 14px; background: var(--tr-mat-2); font-size: 15px; font-weight: 700; text-align: left; }
+.xl-mo svg { transition: transform 0.16s; flex: none; }
+.xl-mo[aria-expanded='true'] svg { transform: rotate(180deg); }
+.xl-giai { margin-top: 10px; padding: 12px; border-radius: 14px; background: var(--tr-mat-2); font-size: 15px; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-line; }
+.xl-giai img { max-width: 100%; height: auto; }
+.xl-hay { display: flex; align-items: center; gap: 10px; min-height: 44px; margin: 0 0 10px; padding: 6px 12px; border-radius: 14px; background: var(--tr-sao-nhat); color: var(--tr-sao-chu); font-size: 14.5px; font-weight: 700; line-height: 1.3; }
+.xl-ten-doan { font-size: 15px; font-weight: 700; margin-top: 10px; line-height: 1.3; }
+.xl-chan { text-align: center; font-size: 13px; color: var(--tr-chu-3); font-weight: 600; padding: 6px 0 0; }
+/* trình phát nhúng (máy tính): khung giữ chỗ đúng tỉ lệ bảng, điều khiển nằm dưới */
+.xl-phat-nhung { border-radius: 22px; overflow: hidden; background: var(--tr-chieu-bang); margin-bottom: 12px; min-height: 200px; }
+.xl-hai-phat { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; align-items: start; }
+
+/* ngang thấp (điện thoại xoay ngang): hai cột */
+@media (orientation: landscape) and (max-height: 520px) {
+  .xl-trang { max-width: none; }
+  .xl-hai { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+}
+/* máy tính: trang buổi hai cột (trái dính: bìa, dòng thời gian, bảng vàng) */
+@media (min-width: 900px) {
+  .xl-trang { max-width: 760px; padding-top: 28px; }
+  .xl-trang.xl-mt { max-width: 1240px; padding: 28px 32px 60px; display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 0 24px; align-items: start; }
+  .xl-trang.xl-mt > .xl-dau { grid-column: 1 / -1; }
+  .xl-trang.xl-mt .trai { position: sticky; top: 28px; }
+  .xl-trang.xl-mt .xl-bia-buoi h1 { font-size: 36px; }
+  .xl-trang.xl-mt .phai .xl-the { padding: 20px; }
+  .xl-trang.xl-tds .xl-hai { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .xl-trang.xl-tds { max-width: 980px; }
+}
+@media (prefers-reduced-motion: reduce) { .xl-xuong, .xl-xuly .vong::before { animation: none; } .xl-mo svg, .xl .xl-nut { transition: none; } }
+html.may-yeu .xl-xuong, html.may-yeu .xl-xuly .vong::before { animation: none; }
+html.may-yeu .xl-mo svg, html.may-yeu .xl .xl-nut { transition: none; }

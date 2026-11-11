@@ -55,7 +55,7 @@ const KHO_HS_BO = /^assets\/ban-do-3d-three/
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
 // 10/11 thầy «Tải hết mọi thứ xg máy hs để app hs tức thì nhé»: thêm mọi mảnh app học sinh còn sót (khoá đề thi, vào bảng BPU, điểm danh phòng, nhật ký / treo máy khi thi,
 // Hỏi thầy kiểm chứng, làm mới app, phiếu in + PDF «Câu đã làm» kèm thư viện) — kho tải ngầm tải lúc rảnh, một lần mỗi phiên bản.
-const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol|DemNguocThi|NhomSuaHomNay|ViDuMau|LichBaiHs|cau-chuyen|tai-chi-tiet|khoa-de-thi|gan-hs|phong|nhan-lich-su|do-treo-may-thi|HoiThayKiemChung|lam-moi-app|hoi-thay-goc|html-phieu|pdf-cau-da-lam|jspdf\.es\.min|index\.es|html2canvas|html2canvas-pro\.esm|purify\.es|fflate)-[\w-]{8}\.(?:js|css)$/
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol|DemNguocThi|NhomSuaHomNay|ViDuMau|LichBaiHs|cau-chuyen|tai-chi-tiet|khoa-de-thi|gan-hs|phong|nhan-lich-su|do-treo-may-thi|HoiThayKiemChung|lam-moi-app|hoi-thay-goc|xem-lai-live|html-phieu|pdf-cau-da-lam|jspdf\.es\.min|index\.es|html2canvas|html2canvas-pro\.esm|purify\.es|fflate)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
   let dsCho: string[] = []
   return {
@@ -395,6 +395,13 @@ export default defineConfig({
           // LIVE BẢNG (10/11, đợt 1B): lớp bảng live của máy em, phần nối của máy thầy, thư viện WebRTC / mã hoá nét, bộ dựng nét — chỉ nạp khi phòng báo thầy
           // sẵn sàng live (lúc đó chắc chắn đang có mạng) ⇒ kho chạy-lúc, precache giữ trần 170. Tên có đúng 8 ký tự băm để không bắt nhầm `bo-cuc-to-chieu-*`.
           '**/LopLive-*.{js,css}',
+          // XEM LẠI LIVE máy em (11/11): màn danh sách / trang buổi (mở từ «Thêm» → «Live», cần máy chủ) + trình phát + lớp vẽ bảng dùng chung với LopLive ⇒ kho
+          // chạy-lúc, precache giữ trần 170. `xem-lai-live` có trong kho tải ngầm học sinh (KHO_HS_GOC) để bấm «Live» là có ngay.
+          '**/xem-lai-live-*.{js,css}',
+          '**/TrinhPhat-*.{js,css}',
+          '**/ve-bang-*.js',
+          '**/so-net-*.js',
+          '**/ma-net-*.js',
           '**/thay-noi-*.js',
           '**/cau-live-*.js',
           '**/live-????????.js',
@@ -704,6 +711,9 @@ export default defineConfig({
             { name: 'bieu-tuong-them', test: /node_modules[\\/]lucide-react[\\/]/ },
             // fflate (nạp động trong day-ca-may-chu-moi.ts) — đặt tên mảnh rõ để globIgnores ở trên bắt đúng nó (tên tự sinh là `browser-*`, quá chung).
             { name: 'fflate', test: /node_modules[\\/]fflate[\\/]/ },
+            // XEM LẠI LIVE máy em (11/11): danh sách + trang buổi + lớp gọi máy chủ gom MỘT mảnh tên cố định (cửa `hs/index.ts` — tên tự sinh là `index-*`, quá chung)
+            // ⇒ globIgnores + kho tải ngầm học sinh bắt đúng nó. Trình phát (TrinhPhat + máy phát nét, kho nét, đồng hồ) là mảnh lười riêng `TrinhPhat-*`.
+            { name: 'xem-lai-live', test: /src[\\/]screens[\\/]live-xem-lai[\\/]hs[\\/](?!TrinhPhat\.tsx|may-phat\.ts|kho-net\.ts|dong-ho\.ts|phat\.css)[^\\/]+$/, includeDependenciesRecursively: false },
             // 22/10 (màn thi nạp lười Phiếu của em): các mô-đun nhỏ (+ zustand của appStore) CHỈ đi cùng App (đường /gv /p /ph /t, không đường học sinh) bị Rolldown tách
             // thành nhiều tệp ⇒ gom MỘT mảnh: cùng tập đường nên không đường nào tải thêm byte, bớt tệp precache và phần đầu nén từng tệp.
             // 27/10 (tốc độ cổng học sinh / phụ huynh): cụm API ca thi (exam-api + mô-đun chỉ nó dùng) rời DesignSystem về đây — đúng tập đường nạp tĩnh nó
