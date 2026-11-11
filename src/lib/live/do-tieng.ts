@@ -36,7 +36,7 @@ export async function chupTieng(o: NguonDo, luc: number): Promise<Anh> {
   }
   if (o.g?.getStats) {
     // `media-source` ĐÚNG của `outbound-rtp` hiện tại (mediaSourceId): sau `replaceTrack` (mic → chuỗi làm rõ tiếng) báo cáo còn giữ media-source của track CŨ
-    // (mức 0) — đọc «cái cuối cùng» là ra «mức nguồn 0» trong khi đang gửi 100 (số đo thật #1628).
+    // (mức 0) — đọc «cái cuối cùng» là ra «mức nguồn 0» trong khi đang gửi 100 (số đo thật của bản phát hành 1628).
     try {
       const ds: Record<string, unknown>[] = []; (await o.g.getStats()).forEach((s: Record<string, unknown>) => { ds.push(s) })
       const ob = ds.find((s) => s.type === 'outbound-rtp' && (s.kind === 'audio' || s.kind == null)), ms = ds.find((s) => s.type === 'media-source' && s.id === ob?.mediaSourceId)
