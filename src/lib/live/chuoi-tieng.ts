@@ -143,14 +143,18 @@ function locOn(x) {
   lk = k1; lc = c1;
 }
 /* «CHỈ GIỌNG THẦY» (MA_TACH ghép phía trước chuỗi này). pha: 0 tắt · 1 vào (trộn một khung tiếng gốc → mô hình) · 2 chạy · 3 ra (trộn mô hình → gốc).
-   LƯỚI: số hỏng ⇒ tắt ngay; mic có giọng (> −50 dBFS) mà tiếng ra ≈ 0 (< −100 dBFS) suốt 1,5 giây ⇒ tự tắt «cam» (sàn hệ số −50 dB nên lúc hạ giọng
-   khác KHÔNG chạm ngưỡng này — chỉ lõi hỏng mới chạm); hệ số thời gian thực (đo mỗi 2 giây) > 0,6 ⇒ tự tắt «cham». Tự tắt ⇒ báo lớp gọi (gửi lại mic gốc). */
-var tg = null, tgMuon = false, tgPha = 0, tgY = new Float32Array(480), tgIm = 0, tgMs = 0, tgN = 0;
+   LƯỚI (thầy chốt 11/11 đêm: CHỈ HỌC SINH NÓI MÀ ĐẦU RA IM LÀ ĐÚNG — không được coi là câm). Chỉ quay về tiếng gốc khi:
+   (a) bộ nhận giọng báo ĐANG CÓ GIỌNG THẦY (tin { thayNoi: true }) liên tục ≥ 1,5 giây mà tiếng ra nhỏ hơn tiếng vào ≥ 30 dB ⇒ «cam-thay»
+       (chưa có bộ nhận giọng nối vào ⇒ nhánh này không bao giờ kích);
+   (b) LỖI KỸ THUẬT: số hỏng (NaN / vô cực / vượt biên) ⇒ tắt ngay «so-hong»; tiếng ra ≈ 0 tuyệt đối (< −100 dBFS) khi mic có tín hiệu (> −50 dBFS) suốt
+       1,5 giây ⇒ «cam-ky-thuat» (sàn hệ số −50 dB nên mô hình chạy đúng KHÔNG BAO GIỜ ra mức này, kể cả lúc hạ giọng khác); hệ số thời gian thực (đo mỗi
+       2 giây) > 0,6 ⇒ «cham»; khung ngừng chảy ⇒ lớp gọi tự bắt (xetNgungChay). Tự tắt ⇒ báo lớp gọi (gửi lại tiếng như trước + ghi lý do). */
+var tg = null, tgMuon = false, tgPha = 0, tgY = new Float32Array(480), tgIm = 0, tgImThay = 0, tgThay = false, tgMs = 0, tgN = 0;
 function napTach(buf) {
   try { var w = docMoHinh(buf); tg = taoTach(w, 48000); postMessage({ tg: 'chay', h: w.h }); if (tgMuon) tgPha = 1; }
   catch (e) { tg = null; tgPha = 0; postMessage({ tg: 'loi', ly: 'nạp mô hình: ' + (e && e.message || e) }); }
 }
-function tuTat(ly, ngay) { tgMuon = false; tgPha = ngay ? 0 : 3; tgIm = 0; postMessage({ tg: 'tu-tat', ly: ly }); }
+function tuTat(ly, ngay) { tgMuon = false; tgPha = ngay ? 0 : 3; tgIm = 0; tgImThay = 0; postMessage({ tg: 'tu-tat', ly: ly }); }
 function chayTach(x) {
   var i, eIn = 0, eOut = 0, w, t0 = performance.now(), hs, y = tgY;
   for (i = 0; i < 480; i++) { y[i] = x[i]; eIn += x[i] * x[i]; }
@@ -158,7 +162,9 @@ function chayTach(x) {
   tgMs += performance.now() - t0; tgN++;
   for (i = 0; i < 480; i++) { if (!(y[i] === y[i]) || y[i] > 8 || y[i] < -8) { tuTat('so-hong', true); return; } eOut += y[i] * y[i]; }
   if (eIn / 480 > 1e-5) { if (eOut / 480 < 1e-10) tgIm++; else tgIm = 0; }
-  if (tgIm >= 150) { tuTat('cam', true); return; }
+  if (tgIm >= 150) { tuTat('cam-ky-thuat', true); return; }
+  if (tgThay && eIn / 480 > 1e-5) { if (eOut < eIn * 1e-3) tgImThay++; else tgImThay = 0; } else tgImThay = 0;
+  if (tgImThay >= 150) { tuTat('cam-thay', true); return; }
   if (tgN >= 200) { hs = tgMs / tgN / 10; tgMs = 0; tgN = 0; postMessage({ tgRtf: hs }); if (hs > 0.6) { tuTat('cham', false); } }
   if (tgPha === 1) { for (i = 0; i < 480; i++) { w = (i + 1) / 480; x[i] = x[i] * (1 - w) + y[i] * w; } tgPha = 2; }
   else if (tgPha === 3) { for (i = 0; i < 480; i++) { w = (i + 1) / 480; x[i] = y[i] * (1 - w) + x[i] * w; } tgPha = 0; }
@@ -205,6 +211,7 @@ onmessage = function (ev) {
   if (d && d.loc) napLoc(d.loc);
   if (d && 'muc' in d) thDich = d.muc || null;
   if (d && d.tach) napTach(d.tach);
+  if (d && 'thayNoi' in d) tgThay = !!d.thayNoi;
   if (d && 'chiThay' in d) { tgMuon = !!d.chiThay; if (tg) tgPha = tgMuon ? (tgPha === 2 ? 2 : 1) : (tgPha ? 3 : 0); }
   if (!d || !d.vao) return;
   c = d.c; if (c.g0 > 0) g = c.g0;
@@ -218,6 +225,11 @@ onmessage = function (ev) {
   })();
 };
 `
+/** LƯỚI (b) phía lớp gọi: «Chỉ giọng thầy» đang chạy mà Worker không báo khung nào (tin `v`, mỗi 100 khung ≈ 1 giây) quá 2,5 giây ⇒ khung ngừng chảy. */
+export const NGUNG_CHAY_MS = 2500
+export function xetNgungChay(k: Pick<ChuoiTieng, 'tg' | 'vaoLuc'>, batLuc: number, nay: number): boolean {
+  return k.tg === 'chay' && nay - Math.max(k.vaoLuc ?? 0, batLuc) > NGUNG_CHAY_MS
+}
 const daNap = new WeakMap<object, Promise<boolean>>()
 /** Hệ số nâng gần nhất: mở lại mic / đổi mic thì BẮT ĐẦU từ hệ số ấy (không tụt về 1), rồi 3 giây nói đầu vẫn trôi nhanh về mức đúng của luồng mới. */
 let gNho = 0
@@ -258,13 +270,20 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void, chi
     u = URL.createObjectURL(new Blob([MA_TACH, MA_KHUNG], { type: 'text/javascript' }))
     w = new Worker(u)
     const wk = w
-    let muc: MucLocOn = 'tat', daGui = false, daGuiTg = false
+    let muc: MucLocOn = 'tat', daGui = false, daGuiTg = false, batLuc = Date.now()
+    // canh khung ngừng chảy: hẹn giờ MỘT LẦN, đặt lại mỗi khi Worker báo tin (không thêm vòng setInterval)
+    let canh: ReturnType<typeof setTimeout> | null = null
+    const henCanh = (): void => {
+      if (canh) clearTimeout(canh)
+      canh = setTimeout(() => { canh = null; if (muc === 'thay' && xetNgungChay(k, batLuc, Date.now())) { k.tg = 'tu-tat'; k.locOn = 'loi'; k.tgTin = { ...(k.tgTin ?? { ban: '', ngay: '' }), ly: 'ngung' }; try { wk.postMessage({ chiThay: false }) } catch { /* đã dừng */ } khiTuTat?.('ngung') } }, NGUNG_CHAY_MS + 200)
+    }
     wk.onmessage = (e: MessageEvent) => {
       const d = e.data as { g?: number; v?: number; loi?: string; loc?: 'chay' | 'loi'; tg?: 'chay' | 'loi' | 'tu-tat'; h?: TinChiThay; ly?: string; tgRtf?: number }
       if (typeof d?.g === 'number' && d.g > 0) gNho = d.g
       if (typeof d?.v === 'number') { k.vao = d.v; k.vaoLuc = Date.now() }
+      if (muc === 'thay' && k.tg === 'chay') henCanh()
       if (d?.loc && muc !== 'thay') k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc
-      if (d?.tg === 'chay') { k.tgTin = { ban: String(d.h?.ban ?? ''), ngay: String(d.h?.ngay ?? ''), buoc: Number(d.h?.buoc) || undefined }; k.tg = muc === 'thay' ? 'chay' : 'tat' }
+      if (d?.tg === 'chay') { batLuc = Date.now(); k.tgTin = { ban: String(d.h?.ban ?? ''), ngay: String(d.h?.ngay ?? ''), buoc: Number(d.h?.buoc) || undefined }; k.tg = muc === 'thay' ? 'chay' : 'tat' }
       if (d?.tg === 'loi' || d?.tg === 'tu-tat') { k.tg = d.tg; k.tgTin = { ...(k.tgTin ?? { ban: '', ngay: '' }), ly: d.ly ?? d.tg }; daGuiTg = d.tg === 'tu-tat'; khiTuTat?.(d.ly ?? d.tg) }
       if (typeof d?.tgRtf === 'number' && k.tgTin) k.tgTin.rtf = d.tgRtf
       if (muc === 'thay') k.locOn = k.tg === 'chay' ? 'chay' : k.tg === 'tai' ? 'tai' : k.tg === 'tat' ? 'tat' : 'loi'
@@ -294,7 +313,7 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void, chi
     }
     wk.onerror = () => khiHong?.()
     wk.postMessage({ c: { ...LAM_RO, g0: gNho, chiTach }, vao: xl.readable, ra: sinh.writable }, [xl.readable as unknown as Transferable, sinh.writable as unknown as Transferable])
-    return { ra: sinh, don: () => { try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
+    return { ra: sinh, don: () => { if (canh) clearTimeout(canh); try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
   } catch { try { w?.terminate() } catch { /* chưa chạy */ } return null }
 }
 

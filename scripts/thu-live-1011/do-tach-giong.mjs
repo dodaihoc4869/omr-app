@@ -111,13 +111,15 @@ async function chayManh(vao) {
 }
 
 async function chayMoHinh(vao, tT, tO) {
-  const L = new Function(MA_TACH + '\nreturn { docMoHinh: docMoHinh, taoTach: taoTach };')()
+  const L = new Function(MA_TACH + '\nreturn { docMoHinh: docMoHinh, taoTach: taoTach, taoFft: taoFft };')()
   const b = readFileSync(process.env.LV_MH), w = L.docMoHinh(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength))
   const T = L.taoTach(w, HZ), bT = T.bong(), bO = T.bong()
   const ra = new Float32Array(vao.length), rT = new Float32Array(vao.length), rO = new Float32Array(vao.length), nK = Math.floor(vao.length / K)
   let ms = 0
+  const gCao = new Float32Array(nK)
   for (let k = 0; k < nK; k++) {
     const x = vao.slice(k * K, k * K + K), t0 = performance.now(), G = T.khung(x); ms += performance.now() - t0
+    gCao[k] = G[480]
     ra.set(x, k * K)
     const a = tT.slice(k * K, k * K + K); bT(a, G); rT.set(a, k * K)
     const c = tO.slice(k * K, k * K + K); bO(c, G); rO.set(c, k * K)
@@ -125,7 +127,23 @@ async function chayMoHinh(vao, tT, tO) {
   // g[k] = hệ số THẬT trên phần giọng thầy của khung k (ra chậm đúng K mẫu): căn bậc hai năng lượng ra / vào
   const g = new Float32Array(nK)
   for (let k = 0; k + 1 < nK; k++) { let a = 0, c = 0; for (let j = 0; j < K; j++) { a += tT[k * K + j] ** 2; c += rT[(k + 1) * K + j] ** 2 } g[k] = a > 1e-12 ? Math.sqrt(c / a) : 1 }
-  return { ra, tre: K, g, rO, msCuaSo: ms / nK, rtf: ms / nK / 10, usKhung: (ms / nK) * 1000, ban: w.h.ban }
+  // GIỮ DẢI của giọng thầy (đoạn thầy một mình, phần giọng thầy qua mặt nạ / vào): dB theo dải; dải 11–24 kHz = hệ số mô hình đặt cho dải cao lúc thầy nói
+  const fft = L.taoFft(960), hann = Float64Array.from({ length: 960 }, (_, i) => 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / 960)), DAI = [[100, 1000], [1000, 3000], [3000, 6000], [6000, 11000]]
+  const eV = DAI.map(() => 0), eR = DAI.map(() => 0), xr = new Float64Array(960), xi = new Float64Array(960), yr = new Float64Array(960), yi = new Float64Array(960)
+  let cao = 0, nCao = 0
+  for (let k = 0; k + 2 < nK; k++) {
+    if (NHAN_HT[k] !== 1 || NHAN_HT[k + 1] !== 1) continue
+    for (const [src, e, tre] of [[tT, eV, 0], [rT, eR, K]]) {
+      for (let i = 0; i < 960; i++) { xr[i] = (src[k * K + tre + i] ?? 0) * hann[i]; xi[i] = 0 }
+      fft(xr, xi, yr, yi)
+      DAI.forEach(([a, b], j) => { for (let f = Math.ceil(a / 50); f < b / 50; f++) e[j] += yr[f] ** 2 + yi[f] ** 2 })
+    }
+    let el = 0; for (let j = 0; j < K; j++) el += tT[k * K + j] ** 2
+    if (el / K > 1e-5) { cao += gCao[k]; nCao++ }
+  }
+  const giuDai = Object.fromEntries(DAI.map(([a, b], j) => [`${a / 1000}-${b / 1000}kHz`, +(10 * Math.log10(eR[j] / Math.max(eV[j], 1e-20))).toFixed(1)]))
+  giuDai['11-24kHz'] = +(20 * Math.log10(Math.max(cao / Math.max(nCao, 1), 1e-6))).toFixed(1)
+  return { ra, tre: K, g, rO, msCuaSo: ms / nK, rtf: ms / nK / 10, usKhung: (ms / nK) * 1000, ban: w.h.ban, giuDai }
 }
 
 // ── số đo ──
@@ -152,7 +170,9 @@ for (const snr of (process.env.LV_SNR ?? '0,2,10').split(',').map(Number)) {
   for (const [ten, khac] of [...BO.map(([t, f]) => [t, doc(f)]), ['xon-xao', xon]]) {
     const c = canh(khac, snr)
     NHAN_HT = c.nhan
-    const cach = { 'chuan': { ra: c.vao, tre: 0 }, 'manh': await chayManh(c.vao), 'chi-thay': await chayCong(c.vao), ...(process.env.LV_MH ? { 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) } : {}) }
+    // LV_CHI_MH=1: chỉ đo «chuan» + «mo-hinh» (nhanh — bỏ cổng CAM++ và RNNoise khi so các checkpoint)
+    const cach = process.env.LV_CHI_MH ? { 'chuan': { ra: c.vao, tre: 0 }, 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) }
+      : { 'chuan': { ra: c.vao, tre: 0 }, 'manh': await chayManh(c.vao), 'chi-thay': await chayCong(c.vao), ...(process.env.LV_MH ? { 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) } : {}) }
     for (const [ten2, r] of Object.entries(cach)) {
       const tre = r.tre ?? 0
       const khacGiam = db(nl(doan(c.vao, c.nhan, 2)) / nl(doan(r.ra, c.nhan, 2, tre)))
@@ -162,7 +182,7 @@ for (const snr of (process.env.LV_SNR ?? '0,2,10').split(',').map(Number)) {
       let ha = 0, ha1 = 0, tong = 0; if (r.g) for (let k = 0; k < c.nhan.length; k++) if (c.nhan[k] === 1 || c.nhan[k] === 4) { let e = 0; for (let j = 0; j < K; j++) e += (c.tT[k * K + j] ?? 0) ** 2; if (e / K > 1e-6) { tong++; if (r.g[k] < 0.708) { ha++; if (c.nhan[k] === 1) ha1++ } } }
       const dong = { snr, khac: ten, cach: ten2, khacGiamDb: +khacGiam.toFixed(1), chongKhacGiamDb: chongKhac == null ? null : +chongKhac.toFixed(1), thayGiuSiSdr: +tGiu.toFixed(1), chongSiSdr: +chong.toFixed(1), chongSiSdr0: +chong0.toFixed(1),
         thayBiHaPt: r.g ? +((100 * ha) / Math.max(1, tong)).toFixed(1) : null, thayMotMinhBiHa: r.g ? ha1 : null, moSauKhacMs: r.g ? moSau(r.g, c.nhan, c.tT) : null, daiTanHz: daiTan(doan(r.ra, c.nhan, 1, tre), doan(c.vao, c.nhan, 1)), treMs: (tre * 1000) / HZ,
-        msCuaSo: r.msCuaSo ? +r.msCuaSo.toFixed(1) : null, rtf: r.rtf ? +r.rtf.toFixed(3) : null, usKhung: r.usKhung ? +r.usKhung.toFixed(1) : null, bv: r.bv || null }
+        msCuaSo: r.msCuaSo ? +r.msCuaSo.toFixed(1) : null, rtf: r.rtf ? +r.rtf.toFixed(3) : null, usKhung: r.usKhung ? +r.usKhung.toFixed(1) : null, bv: r.bv || null, ...(r.giuDai ? { giuDai: r.giuDai, ban: r.ban } : {}) }
       ketQua.ca.push(dong)
       console.log(JSON.stringify(dong))
       if (process.env.LV_DONG && ten2 === 'chi-thay' && `${snr}-${ten}` === (process.env.LV_CA ?? '0-hs-nam')) { writeFileSync(process.env.LV_DONG, dongTg.join('\n')); process.exit(0) }

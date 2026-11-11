@@ -84,7 +84,7 @@ const ghi = (k: string, v: string): void => { try { localStorage.setItem(k, v) }
 /** Dòng trạng thái «Chỉ giọng thầy»: mô hình bản nào, luyện ngày nào, hệ số thời gian thực ĐO TRÊN MÁY NÀY; tự tắt thì nói lý do. Không chạy ⇒ ''. */
 function dongChiThay(c: ChanDoanMic | undefined): string {
   if (!c || c.locOn !== 'thay') return ''
-  const t = c.tgTin, ly: Record<string, string> = { cam: 'tiếng ra im khi mic có giọng', cham: 'máy chạy không kịp', 'so-hong': 'tính toán hỏng', 'loi-chay': 'lỗi khi chạy', 'tải mô hình': 'không tải được mô hình' }
+  const t = c.tgTin, ly: Record<string, string> = { 'cam-thay': 'thầy đang nói mà tiếng ra im', 'cam-ky-thuat': 'tiếng ra im do lỗi', cham: 'máy chạy không kịp', 'so-hong': 'tính toán hỏng', 'loi-chay': 'lỗi khi chạy', ngung: 'tiếng ngừng chảy', 'tải mô hình': 'không tải được mô hình' }
   if (c.tg === 'tai') return 'Đang tải mô hình giọng thầy…'
   if (c.tg === 'loi' || c.tg === 'tu-tat') return `Đã tự tắt (${ly[t?.ly ?? ''] ?? t?.ly ?? 'lỗi'}) — lớp nghe tiếng như trước`
   if (!t) return ''

@@ -2,7 +2,8 @@
 // của chuoi-tieng.ts); bản đo ngoại tuyến scripts/thu-live-1011/do-tach-giong.mjs và test chạy ĐÚNG chuỗi này. Không phụ thuộc gì, không wasm.
 // Mô hình (luyện bằng scripts/thu-live-1011/tach-giong/luyen/luyen.py): mặt nạ từng ô tần số, mỗi khung 10 ms, KHÔNG nhìn trước.
 //  · STFT căn-Hann 20 ms, bước 10 ms (48 kHz: 960 / 480) ⇒ trễ thuật toán 20 ms (đệm một khung 10 ms + nửa cửa sổ). Một khung 480 mẫu vào ⇒ một khung ra.
-//  · Đặc trưng: log10 |X|² của 221 ô 0–11 kHz (bước 50 Hz — trùng ô của bản luyện 24 kHz cửa sổ 480; |X| chia 2 ở 48 kHz cho cùng thang).
+//  · Đặc trưng: log10 |X|² của NB ô (bản 24 kHz: 221 ô 0–11 kHz, bước 50 Hz — trùng ô của bản luyện cửa sổ 480; |X| × hzLuyen / hz cho cùng thang).
+//    Biến thể đủ dải (đầu mục hzLuyen = 48000, NB = 481) đọc được bằng đúng lõi này.
 //  · Mạng: Dense(221→D, tanh) ⇒ GRU D ⇒ GRU D (+ nối tắt) ⇒ Dense(D→221, sigmoid) = mặt nạ. Ô trên 11 kHz (dải cao, 11–24 kHz) nhân trung bình mặt nạ
 //    6–11 kHz ⇒ giữ ĐỦ DẢI 48 kHz khi thầy nói (giọng sáng như đi thẳng), tắt khi người khác nói.
 // Tệp mô hình (.tgt, tải lười, KHÔNG vào kho / precache): 'TGT1' · u32 độ dài đầu mục JSON (ASCII) · JSON {ban, ngay, D, NB, hiTu, ...} · đệm tới bội 4 ·
@@ -76,7 +77,10 @@ function nhan(x, W, b, J, y) { /* y = x @ W + b (W hàng-trước I×J) */
 function sig(v) { return 1 / (1 + Math.exp(-v)); }
 /* san = SÀN hệ số (mặc định 0,003 ≈ −50 dB): mặt nạ không bao giờ ép tiếng ra tới số 0 ⇒ lưới bắt câm chỉ bắt khi lõi hỏng thật, không bắt lúc đang hạ giọng khác. */
 function taoTach(w, hz, san) {
-  var S = taoStft(hz), D = w.D, NB = w.NB, thang = 24000 / hz, i;
+  /* hzLuyen (đầu mục, mặc định 24000): tần số bản luyện, cửa sổ luôn 20 ms ⇒ ô k cùng tần số k·50 Hz; |X| nhân hzLuyen / hz cho cùng thang.
+     Biến thể ĐỦ DẢI (luyện 48 kHz, NB = 481) ⇒ không còn ô nào phải mượn hệ số dải cao. */
+  var S = taoStft(hz), D = w.D, NB = w.NB, thang = (w.h.hzLuyen || 24000) / hz, i;
+  if (NB > S.K + 1) throw new Error('mô hình rộng hơn dải của luồng');
   san = san == null ? 0.003 : san;
   var f = new Float32Array(NB), a = new Float32Array(D), h1 = new Float32Array(D), h2 = new Float32Array(D), xt = new Float32Array(3 * D), hh = new Float32Array(3 * D), y = new Float32Array(D), m = new Float32Array(NB), G = new Float32Array(S.K + 1);
   function gru(x, h, Wx, Wh, b) {
@@ -99,7 +103,7 @@ function taoTach(w, hz, san) {
     for (k = 0; k < D; k++) y[k] = h2[k] + h1[k];
     nhan(y, w.Wo, w.bo, NB, m);
     for (k = 0; k < NB; k++) { m[k] = sig(m[k]); G[k] = m[k] > san ? m[k] : san; if (k >= w.hiTu) s += m[k]; }
-    o.cao = s / (NB - w.hiTu);
+    o.cao = NB > w.hiTu ? s / (NB - w.hiTu) : 1;
     for (k = NB; k <= S.K; k++) G[k] = o.cao > san ? o.cao : san;
     S.ra(G, x);
     return G;
