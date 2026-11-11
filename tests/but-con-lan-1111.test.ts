@@ -9,6 +9,8 @@ import { taoLoiBut, type NetBut, type SuKienBut } from '../src/lib/but-bang-loi'
 import { JS_BUT_BANG } from '../src/lib/but-bang-to-chieu'
 import { JS_CUON_GIAY } from '../src/lib/but-cuon-giay-to-chieu'
 import { taoHtmlMayChieu, type OBang } from '../src/lib/html-may-chieu'
+import { giaiSo, maNetXong, maXoaNet } from '../src/lib/live/ma-net'
+import { apMuc, taoBang } from '../src/lib/live/so-net'
 
 const L = taoLoiBut()
 const cau = (id: string) => ({ phan: 'I', id, maDe: '', chuyenDe: 'x', dang: 'x', sao: 1, mucDo: '', text: 'Đề bài.', luaChon: ['Một', 'Hai', 'Ba', 'Bốn'], dapAn: 'B', chot: 'Cốt lõi.', lyDo: [], buoc: [] }) as unknown as OBang['cau']
@@ -160,6 +162,33 @@ describe('con lăn khi BÚT BẬT (thầy 11/11)', () => {
     expect(may).toHaveLength(2)
     expect(may[1].diem.map((d) => d[1])).toEqual(t.but.xuat().net[1].diem.map((d) => d[1]))
     expect(may[1].diem[0][1]).toBeCloseTo((GY + 100) / H, 4)
+  })
+
+  it('đường tới máy em: xoa + net-moi có xong đi bằng khung SỔ sẵn có (0x11 nét xong · xoá nét), giải mã + áp vào sổ của em ⇒ nét ở chỗ mới, hiện ngay (không phát lại theo giờ)', () => {
+    const t = moTo(), H = 768
+    t.batBut()
+    for (let k = 0; k < 3; k++) { t.tro('pointerdown', GX - 150, GY + k * 40, { timeStamp: 1000 + k * 100 }); for (let i = 1; i <= 20; i++) t.tro('pointermove', GX - 150 + i * 8, GY + k * 40 + (i % 3), { timeStamp: 1000 + k * 100 + i * 4 }); t.tro('pointerup', GX + 10, GY + k * 40 + 1, { timeStamp: 1000 + k * 100 + 90, buttons: 0 }) }
+    // sổ của em (như phòng đã phát tới): ba nét ở toạ độ màn lúc viết
+    const bang = taoBang(); let stt = 0
+    const ap = (khung: Uint8Array) => { const m = giaiSo(khung)!; m.stt = ++stt; return apMuc(bang, m) }
+    for (const n of t.but.xuat().net) for (const k of maNetXong(n)) ap(k)
+    const sk: SuKienBut[] = []
+    t.but.nghe((s) => { if (s.loai !== 'tro') sk.push(s) })
+    t.lan(GX, GY, 200); t.chayHen()
+    expect(sk.map((s) => s.loai)).toEqual(['xoa', 'net-moi', 'net-moi', 'net-moi'])
+    let byte = 0, raVe: SuKienBut[] = []
+    for (const s of sk) {
+      const khung = s.loai === 'xoa' ? maXoaNet(s.id) : s.loai === 'net-moi' ? maNetXong(s.net, s.vt) : []
+      for (const k of khung) { byte += k.byteLength; raVe = raVe.concat(ap(k)) }
+    }
+    expect(bang.net.map((n) => n.id)).toEqual(t.but.xuat().net.map((n) => n.id))
+    t.but.xuat().net.forEach((n, i) => expect(bang.net[i].diem[0][1]).toBeCloseTo(n.diem[0][1], 4))
+    expect(bang.net[0].diem[0][1]).toBeCloseTo((GY - 200) / H, 4)
+    expect(bang.net[2].diem[0][1]).toBeCloseTo((GY + 80 - 200) / H, 4)
+    // lớp vẽ của em nhận bản CHỐT (net-moi có xong) ⇒ vẽ một lần, không đi qua đệm phát điểm
+    expect(raVe.filter((s) => s.loai === 'net-moi').every((s) => s.loai === 'net-moi' && s.xong)).toBe(true)
+    // cỡ gói báo lại mỗi lần giấy ngừng cuộn: ba nét × 21 điểm ≈ 0,8 KB (9 byte mỗi điểm + đầu nét)
+    expect(byte).toBeLessThan(900)
   })
 
   it('chờ gọi, giấy đang ở TRANG 2 (chữ dời bằng translateY): nét viết ở đó KHÔNG dính vào giấy ⇒ lúc giấy chuyển sang cuộn, nét không nhảy cả trang', () => {
