@@ -85,9 +85,9 @@ def vang(x, rt60, drr):  # vang phòng tổng hợp: đường thẳng + đuôi 
     h *= 10 ** (-drr / 20) / max(np.sqrt((h ** 2).sum()), 1e-9); h[0] = 1.0
     m = 1 << int(np.ceil(np.log2(len(x) + n)))
     return np.fft.irfft(np.fft.rfft(x, m) * np.fft.rfft(h, m), m)[:len(x)].astype(np.float32)
-GIA = float(os.environ.get('TG_GIA', '0.35'))   # tỉ lệ giọng khác là «NGƯỜI GIẢ»
-def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant cùng lúc (nội suy lại) ra ngoài vùng của thầy ⇒ giọng nữ / trẻ (×1,18–1,6) hoặc nam khác (×0,72–0,86)
-    r = rng.uniform(1.18, 1.6) if rng.random() < 0.7 else rng.uniform(0.72, 0.86); m = int(np.ceil(n * r)); x = cat(thay, m)
+GIA = min(0.2, float(os.environ.get('TG_GIA', '0.15')))   # tỉ lệ giọng khác là «NGƯỜI GIẢ» — ≤ 20 % (dao hai lưỡi: mạng có thể học hạ cả thầy lúc nói cao giọng)
+def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant CÙNG LÚC (nội suy lại) với độ lệch LỚN: ×1,25–1,6 (nữ / trẻ) hoặc ×0,68–0,75 (nam trầm hơn)
+    r = rng.uniform(1.25, 1.6) if rng.random() < 0.7 else rng.uniform(0.68, 0.75); m = int(np.ceil(n * r)); x = cat(thay, m)
     return np.interp(np.arange(n) * (m - 1) / max(n - 1, 1), np.arange(m), x).astype(np.float32)
 def mau(thay, khac, am, rr=None):
     """Một mẫu 3 s: (Y phức, S phức) — Y = thầy + giọng khác + ồn, S = chỉ thầy (cùng EQ, cùng vang, cùng mức)."""
