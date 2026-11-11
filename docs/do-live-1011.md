@@ -286,3 +286,89 @@ Trễ: chuỗi 0 → 10 ms khi lọc bật (tổng mic → ra khỏi đệm rung
 lọc; vào / ra chế độ lọc bằng một khung trộn dần. Chỉ chạy khi mic 48 kHz khung 480 mẫu và trình duyệt có kiểu «khung» (Chromium trên máy tính).
 MIC CỦA EM lên bảng (điện thoại) KHÔNG đổi: vẫn dùng lọc ồn + khử vọng của trình duyệt; chưa đo bản nhẹ trên CPU ×4 / ×6, chưa làm đường AudioWorklet cho iPhone.
 
+
+## 7. Lọc ồn lượt 3 (11/11, thầy thử mic cài áo thật ở mức Mạnh: «khử ồn vẫn chưa hiệu quả … phải thật xuất sắc, giọng nói trong rõ ràng»)
+
+**Bộ chọn: DeepFilterNet 3** (mạng nơ-ron toàn dải 48 kHz của Rikorose; mã + mô hình MIT / Apache-2.0). Chạy ở một Worker riêng của máy thầy
+(`src/lib/live/loc-on/df3.ts`), RNNoise lượt 2 làm đường lui (`loc-on/ma-loc.ts`). Sau bộ lọc sâu còn một cổng mềm theo mức giọng; rồi vẫn qua nâng mức + chặn đỉnh.
+
+Đã thử hai bản dựng wasm của libDF (cùng mô hình chính thức `DeepFilterNet3_onnx.tar.gz`, sha256 `c94d91f7…`):
+
+| Bản dựng | Cỡ tải | ms / khung 10 ms (Node, máy đo) | Giọng thật sạch đi qua (SI-SDR) | Mẫu `noisy_snr0.wav` của tác giả (SI-SDR 6,0 dB trước lọc) | Kết luận |
+|---|---|---|---|---|---|
+| `@workadventure/noise-suppression` 0.2.0 (MIT) — `df_bg.wasm` 14,6 MB | 3,98 MB (gzip) + 7,98 MB mô hình | 1,06 | 39,0 dB | 20,0 dB | **DÙNG** |
+| `@lofcz/deepfilternet-web` 0.1.0 — wasm 34 MB, mô hình nằm sẵn bên trong (tract 0.23 + SIMD) | 12,7 MB (gzip) | 0,49 | 28,9 dB | 6,9 dB | nhanh gấp đôi nhưng đầu ra KHÁC bản kia với cùng mô hình (làm hỏng tiếng nói ở mẫu ồn) ⇒ loại |
+
+Không dùng: mô hình 16 kHz (DTLN, NSNet2, GTCRN — cắt dải giọng còn 8 kHz); bản «độ trễ thấp» `DeepFilterNet3_ll` (36 MB, chính gói WorkAdventure ghi đã thử và
+không chọn). GTCRN trong gói sapphi: không đo lại (16 kHz, không làm bộ chính được).
+
+**Phân phối.** Hai tệp nằm ngay trong kho ở `public/loc-on/` (`df3-wasm-0200.bin` 3,98 MB, `df3-mo-hinh-v3.bin` 7,98 MB) ⇒ Pages phục vụ thẳng, KHÔNG cần R2,
+không ai phải tải tay. Giới hạn Cloudflare Pages tra lại 11/11: 25 MiB một tệp, 20 000 tệp một trang (gói miễn phí) — cả hai tệp dưới trần nên không phải cắt
+mảnh. Tệp ngoài kho tải sẵn của service worker (precache vẫn 169 / 170; `kiem-sw` đạt), không nằm trên đường tải mở của app nào (`kiem-toc-do-tai` 0 đỏ); chỉ
+tải khi thầy bật live với lọc ồn Vừa / Mạnh: hai tệp tải song song, có tiến độ trong cửa sổ nút Live, lưu Cache Storage (lần sau đọc từ máy). Chromium trên
+máy đo, tệp từ máy chủ cùng máy: tải + giải nén + dựng + chạy nóng 40 khung = 0,75–0,94 giây; trong lúc đó chạy RNNoise, xong thì đợi một quãng im
+(không có thì tối đa 3 giây), khớp trễ rồi trộn chéo 200 ms.
+
+### 7.1 Ngoại tuyến, GIỌNG THẬT (`do-loc-on.mjs`, mẫu do `tai-mau-loc-on.mjs` tải) — số gốc `docs/ban-ve-live-1011/so-do-loc-on-3-1111.json`
+
+DeepFilterNet 3 học trên giọng người nên coi giọng tổng hợp (răng cưa + cộng hưởng) của bản đo lượt 2 là ồn và xoá sạch (SI-SDR −3 dB) ⇒ bảng này dùng ba
+giọng thật: nam tiếng Anh thu 48 kHz, nữ tiếng Anh gốc 22 kHz (LJ Speech — bản thu vốn có ồn nền nên «giọng sạch» không sạch hẳn), máy đọc nơ-ron tiếng Việt gốc
+16 kHz (KHÔNG phải người thật). Chưa có giọng người Việt thật, chưa có mic cài áo thật, chưa có lớp học thật. Ồn: 4 loại tổng hợp + xôn xao THẬT (5 người, 8 lớp
+chồng nhau) + một bản ghi ồn thật. Mỗi ô ồn: **bớt ồn ở đoạn im (dB)** · SI-SDR hơn «không lọc» ở tín / ồn 0 / 10 / 20 dB.
+
+| Cách lọc | Trễ | Giọng sạch đi qua: SI-SDR nam / nữ / Việt (trong ngoặc: «giữ phổ», không kể pha) | Dải tần | Quạt / điều hoà | Xôn xao thật | Gõ bút / bàn phím | Xe ngoài đường | Ồn thật (bản ghi) |
+|---|---|---|---|---|---|---|---|---|
+| không lọc | 0 | — | — | 0 | 0 | 0 | 0 | 0 |
+| lọc ồn của TRÌNH DUYỆT — WebRTC, Chromium 153 | ≈ 5 ms | 2,4 / 5,5 / 7,5 (25,5 / 19,2 / 31,5) | 12,5 kHz (giọng nam 48 kHz) | 15,6 · 0,6 / −3 / −12,9 | 7,3 · −0,8 / −3,8 / −13,1 | 2,1 · 1,5 / −5,1 / −13,2 | 13,4 · −0,2 / −3,4 / −13 | 17,5 · −0,2 / −4,3 / −13,1 |
+| RNNoise «Vừa» (lượt 2) | 10 ms | 22 / 24,6 / 26 (24,3 / 27,3 / 29) | 20 kHz | 18 · 3,5 / 3,7 / 0,8 | 6,5 · 1,2 / 2,7 / 0,7 | 13,6 · 1,7 / 1,7 / −0,2 | 21,1 · 5,6 / 4,9 / 1,4 | 21,2 · 3,6 / 2,6 / −0,1 |
+| RNNoise «Mạnh» (lượt 2 — bản thầy nghe 11/11) | 10 ms | 19,5 / 22,5 / 23,9 (22 / 24,9 / 27,3) | 20 kHz | 28,1 · 4,6 / 4,4 / 0 | 8,5 · 1,6 / 2,9 / −0,2 | 15,7 · 2,5 / 2,1 / −0,8 | 34,7 · 7,5 / 5,8 / 0,4 | 35,4 · 4,9 / 3,1 / −0,8 |
+| DeepFilterNet 3 thô (không cổng) | 30 ms | 41,8 / 19,3 / 42,6 | 20 kHz | 26,3 · 13,1 / 9,4 / 5,9 | 18,6 · 2,4 / 2,4 / 0,8 | 48,2 · 21,9 / 14,2 / 6,8 | 34,7 · 14,5 / 11,8 / 8,5 | 32,8 · 12,4 / 9,1 / 3,9 |
+| **bộ lọc sâu «Vừa» (lượt 3)** | 30 ms | 37,3 / 20,4 / 41,5 (37,7 / 20,5 / 42,3) | 20 kHz | 21,4 · 12 / 9,1 / 5,9 | 16 · 3,3 / 3,2 / 1,4 | 24,6 · 17,2 / 13 / 6,8 | 23,1 · 13,2 / 11 / 8,1 | 24,9 · 11,5 / 8,8 / 3,9 |
+| **bộ lọc sâu «Mạnh» (lượt 3)** | 30 ms | 32,8 / 19,3 / 38,1 (33,1 / 19,4 / 38,7) | 20 kHz | **36,1** · 13,1 / 9,4 / 5,7 | **22,6** · 2,4 / 2,4 / 0,7 | **60,1** · 21,7 / 14 / 6,6 | **42,9** · 14,5 / 11,6 / 8 | **47,2** · 12,3 / 9 / 3,8 |
+
+Bớt ồn ở đoạn im của «Mạnh» theo tín / ồn 0 / 10 / 20 dB: quạt 40,4 / 37,5 / 30,5 · xôn xao thật 16,8 / 21,4 / 29,7 · gõ 65,1 / 62 / 53,2 · xe 46,8 / 44 / 37,8.
+
+**So với mục tiêu (mức Mạnh):** ồn đều ≥ 30 dB — ĐẠT (36,1; từng mức tín / ồn đều ≥ 30) · xôn xao ≥ 20 dB — ĐẠT ở trung bình (22,6) và khi giọng thầy to hơn
+tiếng xôn xao ≥ 10 dB; CHƯA đạt khi xôn xao to ngang giọng thầy (16,8 ở 0 dB) · tiếng gõ ≥ 15 dB — ĐẠT (60) · giọng sạch SI-SDR ≥ 18 dB, dải ≥ 16 kHz — ĐẠT
+(19,3–38,1; 20 kHz) · giọng vốn rõ không kém «không lọc» — ĐẠT ở trung bình mọi loại ồn (+0,7 … +8 dB); CHƯA đạt ở MỘT ca: máy đọc tiếng Việt trên nền xôn
+xao thật 20 dB kém 2,9 dB (hai giọng người thật cùng ca: +3,6 và +1,3).
+
+**Đối chứng.** (a) không lọc, (b) RNNoise lượt 2, (c) lọc ồn của trình duyệt: Chromium thật dùng tệp WAV làm mic, thu đầu ra
+`getUserMedia({ noiseSuppression: true })` (`do-loc-on-trinh-duyet.mjs`), căn giờ bằng tương quan chéo. Đường đo đã tự kiểm: thu KHÔNG lọc qua cùng đường ra SI-SDR
+46,3 dB, bớt ồn 0 dB. Bộ của trình duyệt làm lệch pha (tách băng) nên SI-SDR dạng sóng của nó rất thấp dù tai nghe vẫn ổn ⇒ thêm chỉ số «giữ phổ» (chỉ so độ
+lớn phổ): giọng sạch 19–32 dB (bộ lọc sâu Mạnh 19–39), dải giọng nam còn 12,5 kHz (bộ lọc sâu: 20 kHz), «giữ phổ» hơn «không lọc» ở quạt +1,9 / +4,1 / −0,1 dB
+(bộ lọc sâu Mạnh +13,4 / +10 / +5,5). **Zoom và Meet bản gốc là mã đóng — KHÔNG đo được ở đây; không thể nói đã hơn Zoom.** Điều đo được: hơn bộ lọc WebRTC của
+Chromium ở mọi loại ồn đã thử, trên tín hiệu nói trên.
+
+### 7.2 Qua đường thật trên Chromium (`do-tre.mjs … that`, `LV_THAT` = giọng nam thật −25 dBFS + ồn thật, tín / ồn 10 dB) — số gốc `so-do-tre-1111.json` mục `loc-on-3`
+
+| Cấu hình | Bộ đang chạy | ms / khung (Worker) | Trễ chuỗi | TỔNG mic → ra khỏi đệm rung (p95) | Ồn ở quãng nghỉ dài: tại mic → sau chuỗi → đầu nhận (dBFS) |
+|---|---|---|---|---|---|
+| không lọc | — | — | 0 | 51,9 (55,7) | −43,6 → −38,1 → −39,8 |
+| «Mạnh» | bộ lọc sâu | 1,2–1,6 | 30 (một lượt đo 40) | 79,7 (79,8); các lượt khác 80,8–83,9 (p95 tới 99,5) | −43,6 → **−93,9** → −96,9 |
+| «Vừa» | bộ lọc sâu | 1,2–1,4 | 30 | 84,9 (84,9); lượt khác 72,6–83,8 | −43,6 → −62,2 → −63,9 |
+
+Trễ thuật toán của bộ lọc sâu: đúng 30 ms (tương quan chéo, ngoại tuyến lẫn Chromium). Tổng ≤ 100 ms — đạt ở trung vị, p95 có lượt sát trần (99,5). Trễ đo bằng
+tương quan chéo trên giọng thật (bộ lọc xoá xung nên không đo bằng chuỗi xung được). CPU: hệ số thời gian thực 0,12–0,16 trên máy đo (Xeon 2,1 GHz, 4 nhân dùng
+chung) — đạt ≤ 0,35. **CPU ×4: KHÔNG đo được** — lệnh hãm CPU của DevTools không tác dụng lên Worker (ms / khung giữ 1,2); ngoại suy ×4 ≈ 5–6,5 ms / khung, sát
+ngưỡng tự lùi 6 ms ⇒ máy chậm gấp 4 máy đo sẽ tự về bộ lọc nhẹ. Đã thấy thật một lần: lúc máy đo quá tải (tải trung bình 7,7 trên 4 nhân) bộ lọc sâu tự bỏ
+(«cham»), tiếng vẫn đi bằng RNNoise (tín / ồn đầu nhận 30 dB), không đứt. Đầu-cuối mic 13 / 13 bước, bộ thử `thu-2.mjs` 64 / 64 đạt với bộ lọc sâu bật.
+
+### 7.3 Đường lui (test `tests/live-loc-on-3-1111.test.ts`, chạy đúng mã Worker của app)
+
+chưa tải xong / lỗi tải ⇒ RNNoise · một khung bộ lọc sâu quá hạn 25 ms ⇒ khung ấy lấy RNNoise đã khớp trễ, rồi trộn chéo trở lại · quá hạn 3 lần trong 30 giây,
+hoặc trung bình > 6 ms / khung (hệ số 0,6) ⇒ bỏ bộ lọc sâu tới lần mở app sau, cửa sổ ghi «Máy này chạy không kịp bộ lọc sâu — đang dùng bộ lọc nhẹ» · RNNoise
+cũng hỏng ⇒ không lọc · Worker chuỗi hỏng ⇒ gửi thẳng mic (như cũ). Công tắc lùi khẩn: localStorage `ddh.live.df3` = `tat`.
+Giới hạn đã biết: (1) mức Mạnh hạ cả giọng người đứng xa mic thầy (em trả lời từ chỗ ngồi) — muốn lớp ở xa nghe các em thì dùng Vừa hoặc mic của em;
+(2) bộ lọc sâu xoá tiếng không phải giọng nói (nhạc, video thầy mở qua loa); (3) bộ lọc sâu cần RNNoise chạy được (dùng cờ có-giọng của nó).
+
+### 7.4 Mic của em lên bảng (Z4) và «Loa» (Z2)
+
+Mic em: `src/lib/live/mic-em.ts` — RNNoise lượt 2 mức Vừa trong AudioWorklet, đặt sau khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt (giữ nguyên). Dùng
+đường này: trình duyệt có AudioWorklet + WebAssembly và AudioContext chạy 48 kHz (Chrome / Edge máy tính và Android, Safari iPhone ≥ 14.5 — CHƯA thử trên iPhone
+thật). Chỉ lọc của trình duyệt: máy yếu (`ddh.mayYeu`), không dựng được, AudioContext chưa chạy, hoặc luồng âm thanh chậm (> 3 ms / khung liền 1 giây ⇒ tự đổi lại
+mic thô). Trễ thêm ≈ 40 ms (gom khung 10 + RNNoise 10 + đệm Web Audio ≈ 21). RNNoise tốn 0,12–0,2 ms / khung trên máy đo (×6 ≈ 1 ms). CHƯA đo: CPU ×4 / ×6 trên
+điện thoại thật lúc lớp vẽ nét đang chạy; «cúi» tiếng em khi thầy đang nói (cần hai mic thật trong một phòng — chưa làm).
+Loa: `src/lib/live/loa.ts` (`setSinkId`) — máy thầy: ô «Loa» + «Thử loa» trong cửa sổ nút Live, áp cho tiếng em nói + tiếng thử; máy em: một hàng «Loa» trong
+khay khi máy có từ hai đầu ra. Có `setSinkId`: Chrome / Edge máy tính, Chrome Android bản mới, Firefox bản mới (theo tài liệu trình duyệt, chưa thử từng máy); KHÔNG có: Safari và mọi trình duyệt trên iPhone
+(ẩn ô chọn). Chỉ thử bằng `setSinkId` giả lập trong test; chưa thử với loa thật.
