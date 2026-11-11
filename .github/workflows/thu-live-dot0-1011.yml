@@ -148,6 +148,8 @@ jobs:
         env:
           REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
           REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          TURN_KEY_ID: ${{ secrets.CF_TURN_KEY_ID }}
+          TURN_KEY_API_TOKEN: ${{ secrets.CF_TURN_KEY_API_TOKEN }}
           REF: ${{ matrix.ref }}
           LOC_ON: ${{ inputs.loc_on || 'manh' }}
         run: |
