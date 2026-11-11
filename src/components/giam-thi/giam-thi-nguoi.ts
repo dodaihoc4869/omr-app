@@ -21,11 +21,13 @@ function coVuaChu(el: HTMLElement): void {
     const ds = [...r.getClientRects()]
     if (ds.length < 2) return // một dòng: max-content đã vừa
     const dong = new Map<number, [number, number]>()
-    for (const d of ds) { if (!d.width) continue; const k = Math.round(d.top); const c = dong.get(k); dong.set(k, c ? [Math.min(c[0], d.left), Math.max(c[1], d.right)] : [d.left, d.right]) }
+    // màn xoay hình 90° bằng CSS (`hopHinh`): dòng chữ đo theo trục của hình — trên = bề ngang màn − phải, trái = trên, phải = dưới, rộng = cao
+    const xoay = !!el.closest('[data-xoay]'), W = window.innerWidth
+    for (const q of ds) { const d = xoay ? { width: q.height, top: W - q.right, left: q.top, right: q.bottom } : q; if (!d.width) continue; const k = Math.round(d.top); const c = dong.get(k); dong.set(k, c ? [Math.min(c[0], d.left), Math.max(c[1], d.right)] : [d.left, d.right]) }
     let rong = 0
     for (const [a, b] of dong.values()) rong = Math.max(rong, b - a)
     const cs = getComputedStyle(el), dem = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth)
-    if (rong > 0 && rong + dem + 1 < el.getBoundingClientRect().width) el.style.width = `${Math.ceil(rong + dem + 1)}px`
+    if (rong > 0 && rong + dem + 1 < hopHinh(el).width) el.style.width = `${Math.ceil(rong + dem + 1)}px`
   } catch { /* trình duyệt cũ: giữ như cũ */ }
 }
 import { rung } from '../../lib/rung'
@@ -723,7 +725,7 @@ export function taoGiamThi(khung: HTMLElement, o: { muc: MucGT; tinh?: boolean; 
       if (oo.cam) el.dataset.cam = oo.cam
       const da = document.createElement('span'), con = document.createElement('span'); con.className = 'an'
       el.append(da, con)
-      const lech = vao === p.khung ? 0 : p.khung.getBoundingClientRect().left - vao.getBoundingClientRect().left
+      const lech = vao === p.khung ? 0 : hopHinh(p.khung).left - hopHinh(vao).left
       el.style.setProperty('--gt-loi-duoi', Math.max(14, lech + p.khung.clientWidth * 0.5 - 7).toFixed(1) + 'px')
       vao.appendChild(el)
       const goChu = !p.tinh && !p.giam && !p.dung
