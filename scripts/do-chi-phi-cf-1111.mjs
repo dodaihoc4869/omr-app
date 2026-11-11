@@ -2,7 +2,8 @@
 // Chỉ GỌI ĐỌC: REST gói đăng ký / lịch sử hoá đơn (in đúng vài trường không bí mật) + GraphQL Analytics số dùng theo ngày của từng dịch vụ.
 // KHÔNG đọc D1 bằng SELECT (tránh cộng thêm hàng đọc khi D1 vừa quá tải), không ghi gì, không in khoá / mã tài khoản / địa chỉ / email.
 const TOKEN = process.env.CF_TOKEN_SACH, ACC = process.env.CF_ACC_SACH, DB = process.env.DB_ID
-const TU = process.env.TU ?? '2026-10-05', DEN = process.env.DEN ?? '2026-11-11'
+// GraphQL giới hạn khoảng ≤ 4 tuần 4 ngày ⇒ 11/10 → 11/11 (đúng một kỳ hoá đơn nếu kỳ chốt ngày 11)
+const TU = process.env.TU ?? '2026-10-11', DEN = process.env.DEN ?? '2026-11-11'
 const H = { authorization: `Bearer ${TOKEN}`, 'content-type': 'application/json' }
 const an = (s) => String(s ?? '').split(ACC).join('<tk>')
 const rest = async (duong) => { try { const r = await fetch(`https://api.cloudflare.com/client/v4${duong.replace('{acc}', ACC)}`, { headers: H }); let j = null; try { j = await r.json() } catch { /* không phải JSON */ } return { st: r.status, j } } catch (e) { return { st: 0, j: null, loi: String(e).slice(0, 120) } } }
@@ -29,8 +30,8 @@ console.log('\n## 1d. D1: cỡ, bản sao đọc')
 
 // ───────── 2. SỐ DÙNG THEO NGÀY (GraphQL Analytics) — truy vấn viết thẳng, mỗi bộ thử vài dạng, in lỗi nếu hỏng ─────────
 const tongKy = []
-const L = (x) => `{datetime_geq:"${TU}T00:00:00Z",datetime_leq:"${DEN}T23:59:59Z"${x ? ',' + x : ''}}`
-const LD = (x) => `{date_geq:"${TU}",date_leq:"${DEN}"${x ? ',' + x : ''}}`
+const L = (x) => `{datetime_geq:"${TU}T00:00:00Z",datetime_leq:"${DEN}T10:00:00Z"${x ? ',' + x : ''}}`
+const LD = (x) => `{date_geq:"${TU}",date_leq:"2026-11-10"${x ? ',' + x : ''}}`
 async function bo(ten, bienThe) {
   console.log(`\n### ${ten}`)
   let loi = []
