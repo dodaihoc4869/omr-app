@@ -20,8 +20,17 @@ KHO, RA, CAMP = sys.argv[1:4]
 D = os.path.join(RA, KHO); os.makedirs(D, exist_ok=True)
 NB_ = {'noiBo': True, 'ghiChuNoiBo': 'kho phi thương mại — thầy duyệt dùng nội bộ 11/11'}
 
+class _XoaKhiDong(io.FileIO):
+    def close(self):
+        super().close()
+        if os.path.exists(self.name): os.remove(self.name)
 def luong(url):
-    return urllib.request.urlopen(urllib.request.Request(url, headers={'User-Agent': 'omr-app-tach-giong/1.0'}), timeout=120)
+    """Tải về tệp tạm (curl, thử lại + NỐI TIẾP khi đứt — đọc thẳng theo dòng từng bị cắt giữa chừng «unexpected end of data»), trả tệp mở; đóng là xoá."""
+    p = os.path.join(RA, f'_tai-{zlib.crc32(url.encode()):08x}')
+    for _ in range(8):
+        if subprocess.run(['curl', '-sSL', '--fail', '--retry', '5', '--retry-delay', '5', '-C', '-', '-A', 'omr-app-tach-giong/1.0', '-o', p, url]).returncode == 0: break
+    else: raise RuntimeError('tải hỏng ' + url)
+    return _XoaKhiDong(p, 'r')
 def doc(b, dang=None):
     """Giải mã GIỮ tần số gốc (≤ 48 kHz) ⇒ (x float32 mono, sr) hoặc (None, 0)."""
     f = ['-f', dang] if dang else []
@@ -71,7 +80,8 @@ def gomNguoi(tep, tam, dau):
     for g in ('FEMALE', 'MALE') * 6:
         ung = sorted([k for k in cum if k['gioi'] == g and k not in cham and 3 <= len(k['ds']) <= max(5, tong * 0.08)], key=lambda k: len(k['ds']))
         if ung and dem < tong * 0.15: k = ung[len(ung) // 2]; cham.append(k); dem += len(k['ds'])
-    TC = np.array([k['tam'] for k in cham]) if cham else np.zeros((0, 512))
+    if not cham and len(cum) >= 2: cham.append(min(cum, key=lambda k: len(k['ds'])))   # ít người (vd FLEURS vi dev+test chỉ 3 người) ⇒ giữ riêng cụm nhỏ nhất
+    TC =np.array([k['tam'] for k in cham]) if cham else np.zeros((0, 512))
     nguoi, boLot = {}, 0
     for k in cum:
         la = k in cham; dd = os.path.join(D, k['id']); os.makedirs(dd, exist_ok=True); giay = 0; so = 0
@@ -91,7 +101,7 @@ if KHO == 'fleurs-vi':
     G = 'https://huggingface.co/datasets/google/fleurs/resolve/main/data/vi_vn/'
     gioi, tam = {}, os.path.join(D, '_tam'); os.makedirs(tam, exist_ok=True)
     for tach in ('dev', 'test'):
-        for dong in csv.reader(io.TextIOWrapper(luong(G + tach + '.tsv'), encoding='utf-8'), delimiter='\t'):
+        for dong in csv.reader(io.TextIOWrapper(io.BufferedReader(luong(G + tach + '.tsv')), encoding='utf-8'), delimiter='\t'):
             if len(dong) > 2: gioi[dong[1]] = next((c for c in dong if c in ('MALE', 'FEMALE', 'OTHER')), None)
     tep, srs = [], set()
     for tach in ('dev', 'test'):

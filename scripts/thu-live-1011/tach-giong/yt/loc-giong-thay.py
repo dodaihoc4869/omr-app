@@ -1,10 +1,10 @@
-# LẤY GIỌNG THẦY TỪ BÀI GIẢNG YOUTUBE — CHẠY TRONG PHIÊN (máy CI bị YouTube chặn «Sign in to confirm you're not a bot», kể cả có PO-token).
-# Tải LẦN LƯỢT từng video (yt-dlp + PO-token bgutil chế độ script, --js-runtimes node, hỏi giãn; KHÔNG cookie / tài khoản), lọc sạch, ghi:
-#   <ra>/<id>.flac (48 kHz mono 16 bit, CHỈ đoạn thầy giảng: bỏ nhạc mở / kết, im lặng dài, tiếng không phải giọng thầy) + <ra>/<id>.json (dải tần, giây, cos)
-#   video GIỮ RIÊNG để chấm (không luyện) ghi vào <ra>/cham/. Mục lục chung: <ra>/muc-luc.json. Tiếng KHÔNG vào git.
-#   python3 -I lay-yt-phien.py <ky-thuat.md> <thư mục tải tạm> <ra> <CAM++.onnx> <silero_vad.onnx> [tâm thầy live .npy]
-# Biến: YT_DLP (đường yt-dlp) · YT_POT (server_home của bgutil) · YT_SO (số video tối đa, 40) · YT_PHUT_TOI_DA (phút sạch tối đa / video, 25) ·
-#       YT_NGHI (giây nghỉ khi bị gắn cờ, 720) · YT_GIU (số video giữ riêng, 2)
+# LỌC GIỌNG THẦY TỪ TỆP BÀI GIẢNG CÓ SẴN (thầy tự tải bài giảng của mình từ YouTube Studio / Google Takeout rồi đưa vào) — KHÔNG tải gì từ mạng.
+# (11/11: tải YouTube từ máy CI và từ phiên đều bị chặn «Sign in to confirm you're not a bot» ⇒ bỏ hẳn đường tải; chỉ còn phần LỌC tệp cục bộ.)
+#   python3 -I loc-giong-thay.py <ky-thuat.md> <thư mục ra> <CAM++.onnx> <silero_vad.onnx> [tâm thầy live .npy]
+# Đầu vào: <ra>/goc/* (mp4 / webm / m4a / mp3 / wav / flac … — mọi thứ ffmpeg đọc được). Tên tệp có mã video 11 kí tự ⇒ ghép tiêu đề + nhóm từ ky-thuat.md.
+# Ra: <ra>/<tên>.flac (48 kHz mono 16 bit, CHỈ đoạn thầy giảng: bỏ nhạc mở / kết, im lặng dài, tiếng không phải giọng thầy) + <ra>/<tên>.json (dải tần, giây,
+#   cos); video GIỮ RIÊNG để chấm (không luyện) ghi vào <ra>/cham/ (video đầu tiên dải rộng ≥ 16 kHz, rồi thêm cho đủ YT_GIU). Mục lục: <ra>/muc-luc.json.
+#   Tiếng KHÔNG đưa vào kho mã. Biến: YT_PHUT_TOI_DA (phút sạch tối đa / video, 25) · YT_GIU (số video giữ riêng, 2)
 # Lọc từng khung 10 ms: Silero VAD ≥ 0,5 (nở ±150 ms) · CAM++ cửa sổ 1,5 s bước 1 s: cos với tâm video ≥ 0,5 VÀ với tâm chung ≥ 0,4 ·
 # không bão hoà · nền yên (khối 5 s: P90 − P10 dB khung ≥ 25) · quãng nghỉ dài còn 0,15 s · đoạn ≥ 1 s · bỏ 2 phút đầu / 1 phút cuối (nhạc mở / kết).
 import sys, os, re, json, glob, subprocess, random, time
@@ -12,11 +12,11 @@ import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'nhieu-that'))
 import onnxruntime as ort
 from camxx import Cam
-MD, TAI, RA, CAMP, VADP = sys.argv[1:6]
-TAM_LIVE = sys.argv[6] if len(sys.argv) > 6 and os.path.exists(sys.argv[6]) else None
+MD, RA, CAMP, VADP = sys.argv[1:5]
+TAM_LIVE = sys.argv[5] if len(sys.argv) > 5 and os.path.exists(sys.argv[5]) else None
 E = os.environ.get
-SO, PHUT_TOI_DA, NGHI, SO_GIU = int(E('YT_SO', '40')), float(E('YT_PHUT_TOI_DA', '25')), int(E('YT_NGHI', '720')), int(E('YT_GIU', '2'))
-os.makedirs(TAI, exist_ok=True); os.makedirs(os.path.join(RA, 'cham'), exist_ok=True)
+PHUT_TOI_DA, SO_GIU = float(E('YT_PHUT_TOI_DA', '25')), int(E('YT_GIU', '2'))
+os.makedirs(os.path.join(RA, 'cham'), exist_ok=True)
 HZ = 48000
 
 ds, nhom, thay = [], '', set()
@@ -24,45 +24,19 @@ for dong in open(MD, encoding='utf-8'):
     if dong.startswith('## '): nhom = dong[3:].strip()
     m = re.match(r'### (.*) \(`([A-Za-z0-9_-]{11})`\)', dong)
     if m and m.group(2) not in thay: thay.add(m.group(2)); ds.append((m.group(2), nhom, m.group(1)))
-theoNhom = {}
-for v in ds: theoNhom.setdefault(v[1], []).append(v)
-rd = random.Random(11)
-for v in theoNhom.values(): rd.shuffle(v)
+TEN = {i: (n, t) for i, n, t in ds}
+GOC = os.path.join(RA, 'goc')
 ung = []
-while len(ung) < SO and any(theoNhom.values()):
-    for n in list(theoNhom):
-        if theoNhom[n] and len(ung) < SO: ung.append(theoNhom[n].pop())
-
+for f in sorted(glob.glob(os.path.join(GOC, '*'))):
+    if not os.path.isfile(f): continue
+    m = re.search(r'(?<![A-Za-z0-9_-])([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])', os.path.basename(f))
+    id = m.group(1) if m and m.group(1) in TEN else re.sub(r'[^A-Za-z0-9_-]', '_', os.path.splitext(os.path.basename(f))[0])[:60]
+    ung.append((id, *TEN.get(id, ('?', os.path.basename(f))), f))
+print(len(ung), 'tệp trong', GOC, flush=True)
 MUC = os.path.join(RA, 'muc-luc.json')
 muc = json.load(open(MUC)) if os.path.exists(MUC) else {'nguon': 'YouTube — bài giảng của thầy Đỗ Đại Học (kênh của thầy); tải để luyện mô hình riêng giọng thầy, KHÔNG phát lại / KHÔNG vào git', 'video': {}}
 cam = Cam(CAMP, 4); vad = ort.InferenceSession(VADP, providers=['CPUExecutionProvider'])
 tamLive = np.load(TAM_LIVE) if TAM_LIVE else None
-
-def biChan(tu):
-    """Máy chủ (googlevideo / google) proxy của phiên từ chối CONNECT kể từ thời điểm tu (UTC, ISO) — đọc nhật ký của chính proxy."""
-    try:
-        st = json.loads(subprocess.run(['curl', '-sS', E('HTTPS_PROXY', '') + '/__agentproxy/status'], capture_output=True, text=True).stdout)
-        return sorted({r['host'].split(':')[0] for r in st.get('recentRelayFailures', []) if r.get('ts', '') >= tu and re.search(r'googlevideo|google\.com|youtube', r.get('host', ''))})
-    except Exception: return []
-def tai(id):
-    """Tải tiếng opus 48 kHz của một video; trả (đường tệp | None, lỗi, máy chủ googlevideo)."""
-    for lan in range(3):
-        for f in glob.glob(os.path.join(TAI, id + '.*')): os.remove(f)
-        t0 = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime())
-        r = subprocess.run([E('YT_DLP', 'yt-dlp'), '-v', '--no-warnings', '--no-progress', '--js-runtimes', 'node', '--sleep-requests', '3', '--sleep-interval', '10', '--max-sleep-interval', '20',
-                            '--extractor-args', 'youtubepot-bgutilscript:server_home=' + E('YT_POT', ''), '-f', '251/bestaudio', '-o', os.path.join(TAI, id + '.%(ext)s'),
-                            f'https://www.youtube.com/watch?v={id}'], capture_output=True, text=True)
-        may = sorted(set(re.findall(r'https://([a-z0-9-]+\.googlevideo\.com)', r.stdout + r.stderr)))
-        tep = [f for f in glob.glob(os.path.join(TAI, id + '.*')) if not f.endswith('.part')]
-        if r.returncode == 0 and tep: return tep[0], '', may
-        loi = (re.findall(r'^ERROR: .*', r.stderr, re.M) or [r.stderr[-300:]])[0][:200]
-        chan = biChan(t0); gv = [h for h in chan if 'googlevideo' in h]
-        if gv: return None, 'proxy chặn: ' + ' '.join(gv), may            # chỉ máy chủ TIẾNG (googlevideo) bị chặn mới tính là «proxy chặn»
-        if chan: loi += ' · proxy từ chối (phụ): ' + ' '.join(chan)
-        if 'not a bot' in loi or 'HTTP Error 429' in loi or 'API page 403' in loi:
-            print(f'  bị gắn cờ ({loi[:80]}) — nghỉ {NGHI} s rồi thử lại', flush=True); time.sleep(NGHI); continue
-        return None, loi, may
-    return None, loi, may
 
 def silero(x16):
     st = np.zeros((2, 1, 128), np.float32); ctx = np.zeros(64, np.float32); o = []; sr = np.array(16000, np.int64)
@@ -90,22 +64,14 @@ def tamChung():
     if not vs: return tamLive
     t = np.mean(vs, 0); return t / (np.linalg.norm(t) + 1e-9)
 
-for id, nh, tieuDe in ung:
+for id, nh, tieuDe, p in ung:
     if id in muc['video'] and muc['video'][id].get('xong'): continue
     t0 = time.time(); print(f'== {id} [{nh}] {tieuDe[:60]}', flush=True)
-    p, loi, may = tai(id)
-    v = {'id': id, 'nhom': nh, 'tieuDe': tieuDe, 'mayChu': may, 'xong': True}
-    if not p:
-        v.update(loi=loi, xong='không tải' if 'proxy' not in loi.lower() else False); muc['video'][id] = v
-        json.dump(muc, open(MUC, 'w'), ensure_ascii=False, indent=1); print('  LỖI', loi, may, flush=True)
-        if loi.startswith('proxy chặn'):   # máy chủ chưa mở (tên lấy từ nhật ký proxy): gom lại, video này tải lại ở lượt sau
-            chan = loi.split(': ', 1)[1].split()
-            v['mayChuBiChan'] = chan; muc['video'][id] = v; json.dump(muc, open(MUC, 'w'), ensure_ascii=False, indent=1)
-            with open(os.path.join(RA, 'may-chu-bi-chan.txt'), 'a') as fh: fh.write(' '.join(chan) + '\n')
-            print('  PROXY CHẶN máy chủ:', chan, flush=True)
-        continue
-    x = np.frombuffer(subprocess.run(['ffmpeg', '-v', 'error', '-i', p, '-ac', '1', '-ar', str(HZ), '-f', 'f32le', '-'], capture_output=True, check=True).stdout, np.float32).copy()
-    os.remove(p)
+    v = {'id': id, 'nhom': nh, 'tieuDe': tieuDe, 'tepGoc': os.path.basename(p), 'xong': True}
+    r = subprocess.run(['ffmpeg', '-v', 'error', '-i', p, '-vn', '-ac', '1', '-ar', str(HZ), '-f', 'f32le', '-'], capture_output=True)
+    if r.returncode != 0 or len(r.stdout) < HZ * 4 * 60:
+        v.update(loi='không đọc được tiếng / ngắn hơn 1 phút', nhan=False); muc['video'][id] = v; json.dump(muc, open(MUC, 'w'), ensure_ascii=False, indent=1); print('  bỏ:', v['loi'], flush=True); continue
+    x = np.frombuffer(r.stdout, np.float32).copy()
     v['giayTho'] = round(len(x) / HZ)
     x16 = np.frombuffer(subprocess.run(['ffmpeg', '-v', 'error', '-f', 'f32le', '-ar', str(HZ), '-ac', '1', '-i', '-', '-ar', '16000', '-f', 'f32le', '-'], input=x.tobytes(), capture_output=True, check=True).stdout, np.float32)
     n = len(x) // 480; fr = x[:n * 480].reshape(n, 480)
@@ -171,5 +137,5 @@ for id, nh, tieuDe in ung:
     muc['tong'] = {'phutLuyen': round(luyen / 60, 1), 'phutCham': round(cham / 60, 1), 'videoLuyen': sum(1 for w in muc['video'].values() if w.get('dung') == 'luyen'),
                    'videoCham': [w['id'] for w in muc['video'].values() if w.get('dung') == 'cham']}
     json.dump(muc, open(MUC, 'w'), ensure_ascii=False, indent=1)
-    print(f'  {v["dung"].upper()} {v["giaySach"] / 60:.1f} phút sạch / {v["giayTho"] / 60:.0f} phút thô · dải {v["dai"]} · cos {v["cosTamVideo_TamChung"]} · {time.time() - t0:.0f} s · máy chủ {may}', flush=True)
+    print(f'  {v["dung"].upper()} {v["giaySach"] / 60:.1f} phút sạch / {v["giayTho"] / 60:.0f} phút thô · dải {v["dai"]} · cos {v["cosTamVideo_TamChung"]} · {time.time() - t0:.0f} s', flush=True)
     print(f'TỔNG {muc["tong"]}', flush=True)

@@ -1,71 +1,162 @@
-# NHÁNH claude/tach-giong-yt-1111 — tệp này THAY NỘI DUNG bản trên main (main giữ nguyên bộ thử Live Đợt 0).
-# LUYỆN MÔ HÌNH «CHỈ GIỌNG THẦY» BẰNG BÀI GIẢNG YOUTUBE CỦA THẦY (11/11, thầy: «lấy thêm giọng ở các bài giảng youtube của tôi nhé để huấn luyện đỉnh nhất»).
-# Repo CÔNG KHAI ⇒ mọi tiếng (YouTube, giọng khác, ồn) CHỈ nằm ở $RUNNER_TEMP: không vào kho, không artifact, không cache.
-# Chỉ đưa về qua git: trọng số .tgt + số chấm JSON / MD ở scripts/thu-live-1011/tach-giong/ckpt-yt/.
-#   kieu = thu-yt : dò YouTube (yt-dlp, nhiều player_client, không cookie / tài khoản) + kiểm các nguồn tải.
+# THỬ KHẢ THI LIVE BẢNG — «Đợt 0» của đặc tả docs/dac-ta-live-bang-1011.md (10/11). Chromium thật (Playwright, mic giả), hai trang THẦY + EM,
+# đúng thư viện src/lib/live + đúng cửa /bpu/live/* (chạy trong Node của lượt này), nối Cloudflare Realtime SFU THẬT bằng hai GitHub secrets
+# CF_REALTIME_APP_ID + CF_REALTIME_APP_SECRET. Chỉ TẠO phiên SFU tạm (tự hết hạn); KHÔNG đụng Worker đang sống, D1, dữ liệu học sinh.
+# Chỉ in SỐ ĐO và đạt / không đạt — không in mã ứng dụng, khoá, mã phiên.
+# NƠI ĐO: máy CI của GitHub (thầy + em cùng một máy, trung tâm dữ liệu nước ngoài) ⇒ kiểm được đường đi chạy thật (SDP, track tiếng, DataChannel),
+# KHÔNG đại diện mạng Việt Nam / 4G / máy em yếu / 300 người nghe — các số đó đo tại lớp (đặc tả mục 7).
+# kieu = tieng-that (11/11): PHÉP THỬ TIẾNG THẬT (scripts/thu-live-dot0-1011/tieng-that.mjs) trên BẢN DỰNG THẬT của từng bản trong `refs` (mỗi bản một
+# việc song song): dist/ + service worker phục vụ như Pages, mic giả là giọng người (một / hai kênh), kiểm từng chiều theo tầng gửi → nhận → phần tử phát.
 name: Thử khả thi Live — Đợt 0 (10/11)
 on:
   workflow_dispatch:
     inputs:
+      giay:
+        description: Số giây thầy viết (kieu dot0)
+        default: '12'
+      em:
+        description: Số máy em 1–8 (kieu dot0)
+        default: '2'
       kieu:
-        description: thu-yt (dò YouTube) · luyen (lấy giọng + luyện)
-        default: 'thu-yt'
+        description: dot0 (bộ thử cũ) · tieng-that (tiếng thật trên bản dựng thật) · phong-that (phòng thật + giao diện đầy đủ + SFU thật)
+        default: 'dot0'
+      refs:
+        description: (tieng-that) các bản cần thử, cách nhau dấu phẩy — HEAD = nhánh đang chạy
+        default: 'HEAD,7c0935aab,cc7de387b,e6aa2a569,ca1214048'
+      loc_on:
+        description: (tieng-that) mức lọc ồn của máy thầy — manh / vua / tat
+        default: 'manh'
 permissions:
   contents: read
 concurrency:
-  group: tach-giong-yt-1111
-  cancel-in-progress: false
+  group: thu-live-dot0-1011
+  cancel-in-progress: true
 jobs:
-  thu-yt:
-    if: ${{ inputs.kieu == 'thu-yt' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        may: [macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.may }}
-    timeout-minutes: 25
-    name: dò YouTube (${{ matrix.may }}, PO-token bgutil)
+  thu:
+    if: ${{ inputs.kieu != 'tieng-that' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Cài yt-dlp + plugin PO-token bgutil (chế độ script, không docker, không tài khoản)
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Thầy phát tiếng + nét, em nhận — đo trễ, RTT, jitter
+        env:
+          REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
+          REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          GIAY: ${{ inputs.giay || '12' }}
+          EM: ${{ inputs.em || '2' }}
+        run: node scripts/thu-live-dot0-1011.mjs --giay="$GIAY" --em="$EM"
+
+  chuan-bi:
+    if: ${{ inputs.kieu == 'tieng-that' || inputs.kieu == 'phong-that' }}
+    runs-on: ubuntu-latest
+    outputs:
+      refs: ${{ steps.r.outputs.refs }}
+    steps:
+      - id: r
+        env:
+          REFS: ${{ inputs.refs }}
+        run: echo "refs=$(node -e 'console.log(JSON.stringify(process.env.REFS.split(",").map((s) => s.trim()).filter((s) => /^[A-Za-z0-9._\/^~-]+$/.test(s))))')" >> "$GITHUB_OUTPUT"
+
+  tieng-that:
+    needs: chuan-bi
+    if: ${{ inputs.kieu == 'tieng-that' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.chuan-bi.outputs.refs) }}
+    name: tiếng thật (${{ matrix.ref }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Mẫu giọng (người thật; một + hai kênh)
+        run: node scripts/thu-live-dot0-1011/giong.mjs "$RUNNER_TEMP/giong"
+      - name: Dựng bản ${{ matrix.ref }} (vite build — đúng bản dựng phát hành)
+        env:
+          REF: ${{ matrix.ref }}
         run: |
-          python3 -m pip install -q -U --break-system-packages "yt-dlp[default]" bgutil-ytdlp-pot-provider 2>&1 | tail -1 || python3 -m pip install -q -U "yt-dlp[default]" bgutil-ytdlp-pot-provider 2>&1 | tail -1
-          git clone -q --depth 1 https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git "$HOME/bgutil-ytdlp-pot-provider"
-          (cd "$HOME/bgutil-ytdlp-pot-provider/server" && npm ci --silent > /dev/null 2>&1 && npx tsc > /dev/null 2>&1; ls build/generate_once.js)
-          yt-dlp --version
-      - name: Client có PO-token (web_safari / mweb / web), 4 video, giãn 15 s
+          if [ "$REF" = "HEAD" ]; then npx vite build > "$RUNNER_TEMP/dung.log" 2>&1 || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }; echo "DIST=$GITHUB_WORKSPACE/dist" >> "$GITHUB_ENV"
+          else
+            git worktree add --detach "$RUNNER_TEMP/wt" "$REF"
+            ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/wt/node_modules"
+            (cd "$RUNNER_TEMP/wt" && npx vite build > "$RUNNER_TEMP/dung.log" 2>&1) || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }
+            echo "DIST=$RUNNER_TEMP/wt/dist" >> "$GITHUB_ENV"
+          fi
+          tail -3 "$RUNNER_TEMP/dung.log"
+      - name: Thử tiếng — mic 2 kênh / 1 kênh, có / không cờ tự phát + chạm
+        env:
+          REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
+          REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          REF: ${{ matrix.ref }}
+          LOC_ON: ${{ inputs.loc_on || 'manh' }}
         run: |
-          cd "$RUNNER_TEMP"
-          for id in kY0NUO7-fCc lMa-IohYrs4 2zcCycq9EYc PfhFCRGNLKM; do
-            for c in web_safari mweb web default; do
-              ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
-              if yt-dlp -v --no-warnings $ea -f bestaudio --test -o "t-$id.%(ext)s" "https://www.youtube.com/watch?v=$id" > v.txt 2>&1; then
-                echo "TẢI ĐƯỢC $id $c $(grep -o 'https://[a-z0-9.-]*googlevideo.com' v.txt | sort -u | head -3 | tr '\n' ' ')"; rm -f t-$id.*; break
-              else echo "LỖI $id $c: $(grep -m1 -o 'ERROR.*' v.txt | cut -c1-110) · pot: $(grep -c 'Retrieved a gvs PO Token' v.txt)"; fi
-              sleep 15
-            done
+          rc=0
+          # mic 2 kênh / 1 kênh có cờ tự phát + chạm như app; rồi KHÔNG cờ, KHÔNG chạm (trình duyệt chặn tự phát ⇒ lưới an toàn phía nghe + «Chạm để nghe»)
+          for bien in "giong-2 1 1" "giong-1 1 1" "giong-2 0 0"; do
+            set -- $bien
+            node scripts/thu-live-dot0-1011/tieng-that.mjs --dist="$DIST" --nhan="$REF" --wav="$RUNNER_TEMP/giong/$1.wav" --tu-phat="$2" --cham="$3" --loc-on="$LOC_ON" || rc=1
           done
-      - name: Kiểm nguồn tải (HEAD) + tìm kho giọng Việt trên HF (chỉ in tên, giấy phép)
+          exit $rc
+
+  # kieu = phong-that (11/11 tối): PHÒNG THẬT (Durable Object của chính bản cần thử, chạy trong Node) + giao diện đầy đủ (tờ chiếu thầy + ManBinhPhanUng/LopLive)
+  # + cửa /bpu/live thật nối SFU thật; trình tự như thầy. Thêm một lượt máy em S2 ở trình duyệt CHẶN UDP (không relay).
+  phong-that:
+    needs: chuan-bi
+    if: ${{ inputs.kieu == 'phong-that' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.chuan-bi.outputs.refs) }}
+    name: phòng thật (${{ matrix.ref }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Mẫu giọng (người thật; một + hai kênh)
+        run: node scripts/thu-live-dot0-1011/giong.mjs "$RUNNER_TEMP/giong"
+      - name: Dựng trang thử của bản ${{ matrix.ref }} (tờ chiếu + ManBinhPhanUng/LopLive thật)
+        env:
+          REF: ${{ matrix.ref }}
         run: |
-          for u in \
-            "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/wespeaker_en_voxceleb_CAM++.onnx" \
-            "https://huggingface.co/datasets/google/fleurs/resolve/main/data/vi_vn/audio/test.tar.gz" \
-            "https://huggingface.co/datasets/google/fleurs/resolve/main/data/vi_vn/audio/dev.tar.gz" \
-            "https://huggingface.co/datasets/google/fleurs/resolve/main/data/vi_vn/test.tsv" \
-            "https://www.openslr.org/resources/141/dev_clean.tar.gz" \
-            "https://us.openslr.org/resources/141/dev_clean.tar.gz" \
-            "https://zenodo.org/records/1227121/files/SCAFE_48k.zip?download=1" \
-            "https://zenodo.org/records/1227121/files/PCAFETER_48k.zip?download=1" \
-            "https://raw.githubusercontent.com/soerenab/AudioMNIST/master/data/01/0_01_0.wav"; do
-            echo "$(curl -sIL -o /dev/null -w '%{http_code} %{size_download} ' "$u") $(curl -sIL "$u" | grep -i '^content-length' | tail -1 | tr -d '\r') $u"
-          done
-          curl -s "https://huggingface.co/api/datasets?search=vietnamese&limit=60&full=true" | python3 -c "
-          import json,sys
-          for d in json.load(sys.stdin):
-              t=d.get('tags',[]); lic=[x for x in t if x.startswith('license:')]; tc=[x for x in t if 'speech' in x or 'audio' in x]
-              if tc: print(d['id'], lic, d.get('gated'), d.get('downloads'))"
+          W="$GITHUB_WORKSPACE"
+          # --configLoader native: cấu hình nạp tại chỗ (đóng gói vào node_modules/.vite-temp thì `import.meta.dirname` trỏ về nhánh đang chạy ⇒ dựng nhầm mã của nhánh)
+          if [ "$REF" != "HEAD" ]; then git worktree add --detach "$RUNNER_TEMP/wt" "$REF"; ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/wt/node_modules"; W="$RUNNER_TEMP/wt"; fi
+          (cd "$W" && npx vite build --configLoader native --config scripts/thu-live-1011/vite.config.mjs --outDir "$RUNNER_TEMP/dist-thu" > "$RUNNER_TEMP/dung.log" 2>&1) || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }
+          echo "WT=$W" >> "$GITHUB_ENV"
+      - name: Thử tiếng qua phòng thật — bình thường, rồi S2 chặn UDP
+        env:
+          REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
+          REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          TURN_KEY_ID: ${{ secrets.CF_TURN_KEY_ID }}
+          TURN_KEY_API_TOKEN: ${{ secrets.CF_TURN_KEY_API_TOKEN }}
+          REF: ${{ matrix.ref }}
+          LOC_ON: ${{ inputs.loc_on || 'manh' }}
+        run: |
+          rc=0
+          node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" || rc=1
+          # MẠNG CHẶN UDP (Wi-Fi trường / 4G khắt khe): chặn mọi gói UDP ra ngoài trừ DNS cho CẢ máy chạy (cờ chính sách IP của Chromium không có hiệu lực ở đây)
+          sudo iptables -I OUTPUT -p udp ! --dport 53 -j DROP
+          node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" --chan-udp=1 --udp-he=1 || rc=1
+          sudo iptables -D OUTPUT -p udp ! --dport 53 -j DROP
+          exit $rc
