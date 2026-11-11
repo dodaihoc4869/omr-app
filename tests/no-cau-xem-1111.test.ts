@@ -85,6 +85,18 @@ it('thầy và phụ huynh thấy đúng số của thẻ em: trước khi em m�
   expect((await thay(k, D12 + 600_000)).ngay.find((n) => n.homNay)).toMatchObject({ daLam: 3, mucToiThieu: 34 })
 })
 
+it('em chưa từng mở app (chưa có sổ nợ) vẫn hiện nợ cho thầy và phụ huynh, tính từ 11/11 — đúng số em sẽ thấy khi mở app', async () => {
+  const k = await kho()
+  const D13 = D11 + 2 * NGAY
+  sang(D13)
+  const xem = { no: 58, con: 58, daTra: 0, toiThieu: 15, kieu: 'toi_thieu', so: 15, daChon: false, muc: 43 }
+  expect((await thay(k, D13)).noCau).toMatchObject(xem)
+  expect((await phuHuynh(k, D13)).noCau).toMatchObject(xem)
+  const em = await lap(k, D13) // em mở app: cùng con số
+  expect(em.t.noCau).toMatchObject({ no: 58, toiThieu: 15, so: 15 })
+  expect((await thay(k, D13 + 1000)).noCau).toMatchObject({ ...em.t.noCau!, daChon: true })
+})
+
 it('bảng nợ chưa có (máy chủ chưa tạo) ⇒ bảng thầy vẫn ra đủ số như cũ, chỉ không có nợ câu', async () => {
   const k = await kho()
   await lap(k, D11)

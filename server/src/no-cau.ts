@@ -12,8 +12,11 @@
 // CÂU LÃI LÀ CÂU NÀO: câu ÔN của chính em — dạng em vừa sai / lâu chưa chạm trước (nợ ôn theo dạng, rut-28.ts), đứng đầu đề của ngày (goi-bai-7-loi.ts).
 // TRẢ TỐI THIỂU = 25 % số nợ, làm tròn lên, không dưới 6 câu (nợ ≤ 6 ⇒ trả hết). Tối đa 3 lần; lần thứ tư phải trả hết. Trả hết nợ ⇒ đếm lại từ 0.
 
-/** Nợ chỉ phát sinh từ ngày này (ngày phát hành); thực tế từ ngày đầu tiên em mở app sau đó. */
+/** Nợ phát sinh từ ngày này (ngày phát hành) cho mọi em có bài. */
 export const NGAY_NO_CAU = '2026-11-11'
+/** Ngày ngay trước mốc: sổ nợ của MỌI em coi như đã chốt tới ngày này (thầy 11/11 «áp dụng luôn cho học sinh») ⇒ ngày 11/11 của em nào cũng được tính, kể cả em
+ *  hôm ấy không mở app (số thật 12:41 11/11: mới 124 / 275 em có sổ — 151 em còn lại nếu chờ «lần đầu mở app» sẽ bị tính chậm một ngày). */
+export const NGAY_TRUOC_NO_CAU = '2026-11-10'
 export const TRAN_NO = 84
 export const TOI_THIEU_PHAN_TRAM = 25
 export const TOI_THIEU_SAN = 6

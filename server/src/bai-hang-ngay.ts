@@ -24,7 +24,7 @@ import { NGAY_BAT_DAU_BAI_HANG_NGAY, NGUONG_THAI_DO as NG, TEN_NHAN_THAI_DO, TOI
 import { CAU_TOI_THIEU } from './hanh-trinh-ngay'
 import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
 import { SQL_KHONG_LAM_LAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
-import { SQL_NO_XEM, gomDongNo, xemNoEm, type NoCauXem } from './no-cau-xem'
+import { SO_XEM_RONG, SQL_NO_XEM, gomDongNo, xemNoEm, type NoCauXem } from './no-cau-xem'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
 import { mucUocGoi7 } from './goi-bai-7-loi'
 import { SQL_TC } from './lam-lai-so'
@@ -294,7 +294,7 @@ export async function docNgayCacEm(env: Env, em: readonly EmGoc[], tu: string, d
         const daLam = cheDo === 'goi7' ? (demGoi.get(k(e.sbd, d)) ?? 0) + (demGap.get(k(e.sbd, d)) ?? 0) : daLamKeHoach(keHoach.get(k(e.sbd, d)), luot.get(k(e.sbd, d)) ?? [])
         return { ...(test?.baiNgayToiThieu?{kiemTra:test}:{}),ngay: d, mucToiThieu: m.muc, daLam, thieu: Math.max(0, m.muc - daLam), datMuc: daLam >= m.muc, mucUocTinh: m.uoc, nguonMuc: m.nguon, tang: m.tang, cheDo, homNay: d === homNay }
       }))
-      const soNo = dongNo?.get(e.sbd)
+      const soNo = dongNo ? dongNo.get(e.sbd) ?? SO_XEM_RONG : undefined
       if (soNo && noRa) {
         const nx = xemNoEm(soNo, ra.get(e.sbd)!.map((n) => ({ ngay: n.ngay, cheDo: n.cheDo === 'hanh-trinh' ? 'khac' as const : n.cheDo, muc: n.cheDo === 'goi7' && (muc7.get(k(e.sbd, n.ngay))?.muc ?? 0) > 0 ? muc7.get(k(e.sbd, n.ngay))!.muc : null, lam: n.daLam, ktNop: ktNgay.get(k(e.sbd, n.ngay))?.nopLuc != null })), homNay)
         if (nx) noRa.set(e.sbd, nx)
