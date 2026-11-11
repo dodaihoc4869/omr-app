@@ -58,13 +58,13 @@ export default function LichSuLive({ onDong }: { onDong: () => void }) {
   }, [])
   const tai = useCallback(async (im = false) => { nhan(await taiDsLive(), im) }, [nhan])
   useEffect(() => { let song = true; void taiDsLive().then((r) => { if (song) nhan(r, false) }); return () => { song = false } }, [nhan])
-  // Buổi đang xử lý / đang ghi ⇒ tự cập nhật mỗi 4 giây tới khi xong (không cần tải lại trang).
-  const coDangChay = !!ds?.some(dangChay)
+  // Buổi đang xử lý ⇒ tự cập nhật mỗi 4 giây tới khi xong (không cần tải lại trang); chỉ có buổi đang live ⇒ 30 giây một lần. Tab ẩn thì bỏ qua.
+  const nhipMs = ds?.some((b) => b.trangThai === 'dang_xu_ly') ? 4000 : ds?.some(dangChay) ? 30_000 : 0
   useEffect(() => {
-    if (!coDangChay) return
-    const h = setInterval(() => { void tai(true) }, 4000)
+    if (!nhipMs) return
+    const h = setInterval(() => { if (!document.hidden) void tai(true) }, nhipMs)
     return () => clearInterval(h)
-  }, [coDangChay, tai])
+  }, [nhipMs, tai])
   // Khúc tiếng còn kẹt trên máy này từ lần live trước ⇒ tải bù (chỉ nạp mảnh máy ghi khi có cờ).
   useEffect(() => { try { if (localStorage.getItem('ddh.live.ghi-ket') === '1') void import('../../../lib/live/may-ghi').then((m) => m.taiBuKhucKet()).catch(() => {}) } catch { /* không có kho */ } }, [])
 

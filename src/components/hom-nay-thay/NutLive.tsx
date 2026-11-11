@@ -21,7 +21,7 @@ export default function NutLive({ className }: { className: string }) {
   // Đang có buổi xử lý ⇒ hỏi lại mỗi 15 giây tới khi xong (chip tự tắt).
   useEffect(() => {
     if (!dang || cho) return
-    const h = setInterval(() => { void import('../../screens/live-xem-lai/gv/lich-su-live-api').then((m) => m.demDangXuLy()).then(setDang).catch(() => {}) }, 15_000)
+    const h = setInterval(() => { if (!document.hidden) void import('../../screens/live-xem-lai/gv/lich-su-live-api').then((m) => m.demDangXuLy()).then(setDang).catch(() => {}) }, 15_000)
     return () => clearInterval(h)
   }, [dang, cho])
   return (
