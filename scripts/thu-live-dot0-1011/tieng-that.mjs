@@ -24,6 +24,7 @@ import { randomBytes } from 'node:crypto'
 import { build } from 'esbuild'
 import { chromium } from 'playwright'
 import { docWav, doiHz, duongBao, tuongQuan } from './giong.mjs'
+import { moc } from './do-trang.mjs'
 
 const ts = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')).map(([k, ...v]) => [k, v.length ? v.join('=') : '1']))
 const DIST = resolve(ts.dist ?? 'dist'), NHAN = ts.nhan ?? 'dist', WAV = resolve(ts.wav ?? ''), LOC_ON = ts['loc-on'] ?? 'manh'
@@ -101,99 +102,6 @@ const mayChu = createServer(async (req, res) => {
 await new Promise((xong) => mayChu.listen(0, '127.0.0.1', xong))
 const GOC = `http://127.0.0.1:${mayChu.address().port}`
 const ve = (v, s) => kyVeBpu(BI_MAT, { b: 'thu-tieng-that', s, v, h: Date.now() + 3_600_000 })
-
-// ── Móc trong trang (chạy trước mã app): ghi mọi PeerConnection, track nhận, thẻ <audio>, luồng mic; hàm đo ──
-function moc() {
-  if (window.__moc) return
-  window.__moc = true
-  window.__pcs = []; window.__tracks = []; window.__am = []; window.__mic = []
-  const P = window.RTCPeerConnection
-  if (P) {
-    const PC = function (...a) { const p = new P(...a); window.__pcs.push(p); p.addEventListener('track', (e) => { if (e.track.kind === 'audio') window.__tracks.push({ pc: p, t: e.track }) }); return p }
-    PC.prototype = P.prototype; Object.setPrototypeOf(PC, P)
-    window.RTCPeerConnection = PC
-  }
-  const ce = Document.prototype.createElement
-  Document.prototype.createElement = function (t, o) { const e = ce.call(this, t, o); if (typeof t === 'string' && t.toLowerCase() === 'audio') window.__am.push(e); return e }
-  const A = window.Audio
-  if (A) { const Au = function (s) { const e = new A(s); window.__am.push(e); return e }; Au.prototype = A.prototype; window.Audio = Au }
-  const bl = new Map(), cu = URL.createObjectURL.bind(URL)
-  URL.createObjectURL = (b) => { const u = cu(b); if (b instanceof Blob) bl.set(u, b); return u }
-  window.__workers = []; window.__ctxs = []
-  const W = window.Worker
-  if (W) { const Wk = function (u, o) { const w = new W(u, o); window.__workers.push(w); w.__loai = '?'; const b = bl.get(String(u)); if (b) b.text().then((t) => { w.__loai = t.includes('xuLy(') ? 'khung' : t.includes('df_process_frame') ? 'df3' : 'khac' }); return w }; Wk.prototype = W.prototype; window.Worker = Wk }
-  const AC = window.AudioContext
-  if (AC) { const Ac = function (o) { const c = new AC(o); if (!window.__dangDo) window.__ctxs.push(c); return c }; Ac.prototype = AC.prototype; Object.setPrototypeOf(Ac, AC); window.AudioContext = Ac }
-  const md = navigator.mediaDevices
-  if (md?.getUserMedia) { const g = md.getUserMedia.bind(md); md.getUserMedia = async (c) => { const s = await g(c); window.__mic.push(s); return s } }
-  const pcSong = () => window.__pcs.filter((p) => p.signalingState !== 'closed')
-  window.__chon = (vai) => {
-    if (vai === 'micTho') { for (let i = window.__mic.length - 1; i >= 0; i--) { const t = window.__mic[i].getAudioTracks()[0]; if (t && t.readyState === 'live') return t } return null }
-    const ds = pcSong(), p = ds[ds.length - 1]
-    if (!p) return null
-    if (vai === 'gui') { const s = p.getSenders().filter((x) => x.track && x.track.kind === 'audio'); return s.length ? s[s.length - 1].track : null }
-    const tr = window.__tracks.filter((x) => x.pc === p).map((x) => x.t)
-    if (vai === 'nhanDau') return tr[0] ?? null
-    if (vai === 'nhanCuoi') return tr.length > (window.__laThay ? 0 : 1) ? tr[tr.length - 1] : null
-    return null
-  }
-  window.__anh = async (t) => {
-    const ra = {}
-    const bcs = await Promise.all(pcSong().map((p) => p.getStats().catch(() => null)))
-    for (const [vai, tr] of Object.entries(t)) {
-      if (!tr || vai === 'micTho') continue
-      for (const bc of bcs) {
-        if (!bc) continue
-        const ds = []; bc.forEach((s) => ds.push(s))
-        if (vai === 'gui') {
-          const ms = ds.find((s) => s.type === 'media-source' && s.kind === 'audio' && s.trackIdentifier === tr.id)
-          if (!ms) continue
-          const ob = ds.find((s) => s.type === 'outbound-rtp' && s.kind === 'audio' && s.mediaSourceId === ms.id)
-          ra[vai] = { byte: ob?.bytesSent ?? 0, goi: ob?.packetsSent ?? 0, muc: ms.audioLevel ?? 0, nl: ms.totalAudioEnergy ?? 0 }
-        } else {
-          const ib = ds.find((s) => s.type === 'inbound-rtp' && s.kind === 'audio' && s.trackIdentifier === tr.id)
-          if (ib) ra[vai] = { byte: ib.bytesReceived ?? 0, goi: ib.packetsReceived ?? 0, muc: ib.audioLevel ?? 0, nl: ib.totalAudioEnergy ?? 0, an: ib.concealedSamples ?? 0, mau: ib.totalSamplesReceived ?? 0 }
-        }
-      }
-    }
-    return ra
-  }
-  window.__phanTu = (t) => {
-    if (!t) return null
-    const e = window.__am.find((a) => { const so = a.srcObject; return so && typeof so.getAudioTracks === 'function' && so.getAudioTracks().some((x) => x.id === t.id) })
-    if (!e) return { co: false, tr: { rs: t.readyState, en: t.enabled, mu: t.muted } }
-    return { co: true, dung: e.paused, tat: e.muted, vol: e.volume, ct: e.currentTime, rs: e.readyState, loa: typeof e.sinkId === 'string' ? e.sinkId : null, tr: { rs: t.readyState, en: t.enabled, mu: t.muted } }
-  }
-  window.__thu = async (t, ms) => {
-    window.__dangDo = true
-    const C = window.__ctxDo ?? (window.__ctxDo = new AudioContext())
-    window.__dangDo = false
-    try { await C.resume() } catch { /* bị chặn */ }
-    const e = {}, nut = []
-    for (const [vai, tr] of Object.entries(t)) {
-      if (!tr) continue
-      const ds = []; e[vai] = ds
-      try {
-        const n = C.createMediaStreamSource(new MediaStream([tr])), sp = C.createScriptProcessor(1024, 1, 1)
-        sp.onaudioprocess = (ev) => { const x = ev.inputBuffer.getChannelData(0); let s = 0; for (let i = 0; i < x.length; i++) s += x[i] * x[i]; ds.push(Math.sqrt(s / x.length)) }
-        n.connect(sp); sp.connect(C.destination); nut.push(n, sp)
-      } catch { /* không đo được */ }
-    }
-    await new Promise((r) => setTimeout(r, ms))
-    for (const n of nut) { try { n.disconnect() } catch { /* đã gỡ */ } }
-    return { d: 1024 / C.sampleRate, st: C.state, e }
-  }
-  window.__do = async (cacVai, ms) => {
-    const t = {}
-    for (const v of cacVai) t[v] = window.__chon(v)
-    const s0 = await window.__anh(t), p0 = {}
-    for (const v of cacVai) p0[v] = window.__phanTu(t[v])
-    const thu = await window.__thu(t, ms)
-    const s1 = await window.__anh(t), p1 = {}
-    for (const v of cacVai) p1[v] = window.__phanTu(t[v])
-    return { co: Object.fromEntries(cacVai.map((v) => [v, !!t[v]])), s0, s1, p0, p1, thu }
-  }
-}
 
 // ── Trình duyệt ──
 const exe = process.env.PW_CHROMIUM
