@@ -1,0 +1,29 @@
+[
+  {
+    "i": 187,
+    "hash": "1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87",
+    "fileNguon": "anh/1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87.png",
+    "svg": "triester187-native-ddh-000f454929e1148cdcc9567d3049d38369ad1db2ca7101ab254a85aee190eafc.svg",
+    "hashSvg": "000f454929e1148cdcc9567d3049d38369ad1db2ca7101ab254a85aee190eafc",
+    "byteSvg": 35328,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-13",
+        "de": "Chất béo X (có cấu tạo như sau) là thành phần chính trong một loại dầu thực vật: Mỗi phát biểu sau đây là đúng hay sai?",
+        "refs": [
+          {
+            "hash": "1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87",
+            "where": "DH-12-C1-B1-P2-II-13.hinh.0.du_lieu",
+            "hashDataUrl": "6455bf35f62b196492a38e5f37aa108131cfb38dc1807d298fc9c7382bd1e0c9"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3literalcondensedacylCH3[CH2]14COO-CH3[CH2]7CH=CH[CH2]7COO-CH3[CH2]4CH=CHCH2CH=CH[CH2]7COO/ALLregularUPRIGHT/3equals/3horizontal2verticalbondsFIRSTCanchors/CH2-CH-CH2right/SQUAREbracketsSUB2-3-4-7-14/0arrows0stereo/noexpandedCO-H-formula-answer",
+    "hashSvgDaSoat": "000f454929e1148cdcc9567d3049d38369ad1db2ca7101ab254a85aee190eafc",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

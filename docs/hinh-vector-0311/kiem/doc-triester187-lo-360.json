@@ -1,0 +1,199 @@
+{
+  "i": 187,
+  "assetIndexProvided": 1158,
+  "hash": "1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87.png",
+  "size": [
+    308,
+    89
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C1-B1-P2-II-13",
+      "de": "Chất béo X (có cấu tạo như sau) là thành phần chính trong một loại dầu thực vật: Mỗi phát biểu sau đây là đúng hay sai?",
+      "allHinh": [
+        {
+          "hash": "1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87",
+          "where": "DH-12-C1-B1-P2-II-13.hinh.0.du_lieu",
+          "hashDataUrl": "6455bf35f62b196492a38e5f37aa108131cfb38dc1807d298fc9c7382bd1e0c9"
+        }
+      ],
+      "missingHashes": [
+        "1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull6xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nearest1pxnativebboxes/centersapprox; literalcondensedtokensreadfromown6x. DoNOTexpand/correctfromfattyacidnames. No scientificassignment/answer.",
+  "geometry": {
+    "rows": [
+      {
+        "acylLiteral": "CH₃[CH₂]₁₄COO",
+        "acylBBox": [
+          150,
+          3,
+          247,
+          18
+        ],
+        "glycerolLiteral": "CH₂",
+        "glycerolBBox": [
+          279,
+          4,
+          305,
+          20
+        ],
+        "singleBond": [
+          [
+            251,
+            9
+          ],
+          [
+            278,
+            9
+          ]
+        ],
+        "baseline": 14,
+        "repeatSubscripts": [
+          {
+            "text": "14",
+            "position": "SUBafterclosingSquare"
+          }
+        ]
+      },
+      {
+        "acylLiteral": "CH₃[CH₂]₇CH=CH[CH₂]₇COO",
+        "acylBBox": [
+          72,
+          37,
+          247,
+          52
+        ],
+        "glycerolLiteral": "CH",
+        "glycerolBBox": [
+          279,
+          38,
+          298,
+          52
+        ],
+        "singleBond": [
+          [
+            251,
+            43
+          ],
+          [
+            278,
+            43
+          ]
+        ],
+        "baseline": 48,
+        "repeatSubscripts": [
+          {
+            "text": "7",
+            "position": "SUBafterfirstclosingSquare"
+          },
+          {
+            "text": "7",
+            "position": "SUBaftersecondclosingSquare"
+          }
+        ]
+      },
+      {
+        "acylLiteral": "CH₃[CH₂]₄CH=CHCH₂CH=CH[CH₂]₇COO",
+        "acylBBox": [
+          3,
+          71,
+          247,
+          86
+        ],
+        "glycerolLiteral": "CH₂",
+        "glycerolBBox": [
+          279,
+          72,
+          304,
+          87
+        ],
+        "singleBond": [
+          [
+            251,
+            77
+          ],
+          [
+            278,
+            77
+          ]
+        ],
+        "baseline": 82,
+        "repeatSubscripts": [
+          {
+            "text": "4",
+            "position": "SUBafterfirstclosingSquare"
+          },
+          {
+            "text": "7",
+            "position": "SUBaftersecondclosingSquare"
+          }
+        ]
+      }
+    ],
+    "glycerolVerticalBonds": [
+      [
+        [
+          285,
+          17
+        ],
+        [
+          285,
+          36
+        ]
+      ],
+      [
+        [
+          285,
+          51
+        ],
+        [
+          285,
+          70
+        ]
+      ]
+    ],
+    "anchors": "BothverticalbondscenterFIRSTCglyphx285 onRIGHTCH₂/CH/CH₂. HorizontalesterbondsafterlastOtoFIRSTC; notH/sub2anchors.",
+    "font": "ALLregularuprightserifblackgray, noactualbold/italic. Digits3/2/14/7/4SUB. CH=CHequalssignliteral2horizontalglyphstrokes; nospacedtokeninsertion. Squarebracketsnotround.",
+    "countsLiteral": {
+      "acylRows": 3,
+      "glycerolLabels": 3,
+      "verticalCCBonds": 2,
+      "horizontalEsterBonds": 3,
+      "literalCCEquals": 3,
+      "literalCOOTokens": 3,
+      "squareBracketPairs": 5,
+      "printedCaptions": 0,
+      "arrows": 0
+    },
+    "noAdded": [
+      "acidnames",
+      "expandedcarbonylO",
+      "hydrogenatoms",
+      "captionX",
+      "repeatn",
+      "reactionarrow",
+      "theorynormalization",
+      "branchCH3",
+      "charges",
+      "extraCCbondbetweencondensedtokens"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": "Root tự mở native FULL và 6x, all1publicde/refs; giữ 3 condensed acyl/3equals/5square pairs/subscripts; không mở rộng CO. Initial root geometry1px sớm đã lưu negative riêng; final chỉ chỉnh 3y+1 và 2feet−1; glyph giữ nguyên."
+}

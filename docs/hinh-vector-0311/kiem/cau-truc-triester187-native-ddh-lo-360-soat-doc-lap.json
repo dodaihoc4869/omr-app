@@ -1,0 +1,17 @@
+[
+  {
+    "i": 187,
+    "hashSvg": "000f454929e1148cdcc9567d3049d38369ad1db2ca7101ab254a85aee190eafc",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở riêng native FULL, câu dẫn/ref DH-12-C1-B1-P2-II-13.hinh.0.du_lieu và fresh Chromium3× FULL/runtime exactSHA; mở macro từng ba hàng và cụm CH₂–CH–CH₂. Giữ nguyên ba công thức CH₃[CH₂]₁₄COO; CH₃[CH₂]₇CH=CH[CH₂]₇COO; CH₃[CH₂]₄CH=CHCH₂CH=CH[CH₂]₇COO. Đủ ba dấu bằng, ngoặc vuông/chỉ số2/3/4/7/14 đúng, ba bond ngang/hai bond đứng neo C đầu cột glycerol đúng nguồn. Tất cả chữ thường thẳng; không thấy cắt/chạm/tràn hoặc khai triển/thêm dữ kiện.",
+    "render": "/workspace/scratch/soat360-187-fresh.png",
+    "macro": [
+      "/workspace/scratch/triester187-macro0.png",
+      "/workspace/scratch/triester187-macro1.png",
+      "/workspace/scratch/triester187-macro2.png",
+      "/workspace/scratch/triester187-macro3.png"
+    ],
+    "hash": "1ffe7bcaa97292e597941bb434ee8234af6d69197d13f608d6ad26268be40f87",
+    "hashSvgDaSoat": "000f454929e1148cdcc9567d3049d38369ad1db2ca7101ab254a85aee190eafc"
+  }
+]
