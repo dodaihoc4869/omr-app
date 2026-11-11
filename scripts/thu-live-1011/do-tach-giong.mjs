@@ -28,6 +28,7 @@ const chuoi = (tep, ten) => new RegExp(`(?:export )?const ${ten} = \`([\\s\\S]*?
 const taoMaCong = () => new Function('postMessage', MA_CONG + '\nreturn { taoCong: taoCong, taoHa: taoHa };')(() => {})
 const taoMaNhan = () => new Function(MA_NHAN + '\nreturn { datPhien: datPhien, nhung: nhung, nhanKhoi: nhanKhoi, cos: cos, chuan: chuan, hoSo: function (h) { hoSo = h; }, ban: function (b) { ban = b; } };')()
 const MA_KHUNG = chuoi('src/lib/live/chuoi-tieng.ts', 'MA_KHUNG')
+const MA_TACH = chuoi('src/lib/live/tach-giong-thay.ts', 'MA_TACH')
 const THAM = new Function('return ' + /THAM_LOC_ON:[^=]*= (\{.*\})\s*$/m.exec(readFileSync(join(GOC, 'src/lib/live/chuoi-tieng.ts'), 'utf8'))[1])()
 
 // ── ONNX Runtime Web + mô hình (LV_TG) ──
@@ -43,13 +44,16 @@ const TRE_QD = 50
 let hat = 12345
 const ngauNhien = () => { hat = (hat * 1103515245 + 12345) >>> 0; return hat / 4294967296 }
 
-const doc = (t) => { const w = docWav(readFileSync(join(MAU, `${t}.wav`))); if (w.hz !== HZ) throw new Error(`${t}: ${w.hz} Hz`); return w.kenh[0] }
+const doc = (t) => { const w = docWav(readFileSync(t.includes('/') ? t : join(MAU, `${t}.wav`))); if (w.hz !== HZ) throw new Error(`${t}: ${w.hz} Hz`); return w.kenh[0] }
 const rmsHoatDong = (x) => { let e = 0, n = 0; for (let i = 0; i + K <= x.length; i += K) { let f = 0; for (let j = 0; j < K; j++) f += x[i + j] ** 2; if (f / K > 1e-6) { e += f; n += K } } return Math.sqrt(e / Math.max(1, n)) }
 const datMuc = (x, db) => { const r = rmsHoatDong(x), k = 10 ** (db / 20) / r; return x.map((v) => v * k) }
 const ha16 = (x) => { const h = taoMaCong().taoHa(HZ), o = []; h(x, x.length, o); return Float32Array.from(o) }
 
 // ── mẫu giọng thầy: 5 giây đầu ⇒ cửa sổ 1,5 s bước 0,75 s ⇒ trung bình (đúng cách mau-giong.ts làm) ──
-const thay = doc('giong-nam'), CAT = 5 * HZ
+// LƯỢT 2 (mục 11): LV_THAY = WAV 48 kHz giọng THẦY THẬT giữ riêng (không dùng luyện; trích từ «Xem lại Live», KHÔNG vào kho) — bắt buộc khi đo mô hình
+// riêng giọng thầy (mô hình coi giọng nam mẫu là «người khác»). LV_KHAC = WAV 48 kHz giọng khác THẬT giữ riêng (thêm hàng «khac-that»).
+// LV_MH = tệp .tgt (mô hình, src/lib/live/tach-giong-thay.ts) ⇒ thêm cách «mo-hinh». LV_SNR = danh sách mức (mặc định 0,2,10 — 2 dB = mức đo thật mục 11.1).
+const thay = doc(process.env.LV_THAY || 'giong-nam'), CAT = 5 * HZ
 const N0 = taoMaNhan(); await N0.datPhien(ort, moHinh)
 async function hocMau(x16) { const e = []; for (let i = 0; i + 24000 <= x16.length; i += 12000) { const v = await N0.nhung(x16.subarray(i, i + 24000)); if (v) e.push(v) } const t = new Float32Array(e[0].length); for (const v of e) for (let i = 0; i < t.length; i++) t[i] += v[i]; return { tam: N0.chuan(t), n: e.length } }
 const mau = await hocMau(ha16(datMuc(thay.subarray(0, CAT), -25)))
@@ -106,6 +110,24 @@ async function chayManh(vao) {
   return { ra, tre: K } // locOn lùi tiếng 10 ms
 }
 
+async function chayMoHinh(vao, tT, tO) {
+  const L = new Function(MA_TACH + '\nreturn { docMoHinh: docMoHinh, taoTach: taoTach };')()
+  const b = readFileSync(process.env.LV_MH), w = L.docMoHinh(b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength))
+  const T = L.taoTach(w, HZ), bT = T.bong(), bO = T.bong()
+  const ra = new Float32Array(vao.length), rT = new Float32Array(vao.length), rO = new Float32Array(vao.length), nK = Math.floor(vao.length / K)
+  let ms = 0
+  for (let k = 0; k < nK; k++) {
+    const x = vao.slice(k * K, k * K + K), t0 = performance.now(), G = T.khung(x); ms += performance.now() - t0
+    ra.set(x, k * K)
+    const a = tT.slice(k * K, k * K + K); bT(a, G); rT.set(a, k * K)
+    const c = tO.slice(k * K, k * K + K); bO(c, G); rO.set(c, k * K)
+  }
+  // g[k] = hệ số THẬT trên phần giọng thầy của khung k (ra chậm đúng K mẫu): căn bậc hai năng lượng ra / vào
+  const g = new Float32Array(nK)
+  for (let k = 0; k + 1 < nK; k++) { let a = 0, c = 0; for (let j = 0; j < K; j++) { a += tT[k * K + j] ** 2; c += rT[(k + 1) * K + j] ** 2 } g[k] = a > 1e-12 ? Math.sqrt(c / a) : 1 }
+  return { ra, tre: K, g, rO, msCuaSo: ms / nK, rtf: ms / nK / 10, usKhung: (ms / nK) * 1000, ban: w.h.ban }
+}
+
 // ── số đo ──
 const db = (e) => 10 * Math.log10(Math.max(e, 1e-20))
 function siSdr(ra, goc) { let a = 0, b = 0; for (let i = 0; i < goc.length; i++) { a += ra[i] * goc[i]; b += goc[i] * goc[i] } const k = a / b; let s = 0, n = 0; for (let i = 0; i < goc.length; i++) { const v = k * goc[i]; s += v * v; n += (ra[i] - v) ** 2 } return n > 0 ? db(s / n) : 99 }
@@ -121,20 +143,20 @@ function daiTan(ra, vao) { // phổ trung bình 4096 điểm (DFT thô theo dả
 }
 function moSau(g, nhan, tT) { let k0 = -1; for (let k = 0; k < nhan.length; k++) if (nhan[k] === 4) { let e = 0; for (let j = 0; j < K; j++) e += (tT[k * K + j] ?? 0) ** 2; if (db(e / K) > -45) { k0 = k; break } } if (k0 < 0) return null; for (let k = k0; k < nhan.length && nhan[k] === 4; k++) if (g[k] >= 0.7) return Math.round(((k - k0) * K * 1000) / HZ); return 9999 }
 
-const BO = [['hs-nam', 'xon-xao-2'], ['hs-nu', 'giong-nu']]
+const BO = [['hs-nam', 'xon-xao-2'], ['hs-nu', 'giong-nu'], ...(process.env.LV_KHAC ? [['khac-that', process.env.LV_KHAC]] : [])]
 const ketQua = { luc: new Date().toISOString(), mau: { giay: CAT / HZ, cuaSo: mau.n }, ca: [] }
-for (const snr of [0, 10]) {
+for (const snr of (process.env.LV_SNR ?? '0,2,10').split(',').map(Number)) {
   const xx = ['xon-xao-1', 'xon-xao-2', 'xon-xao-3', 'xon-xao-4', 'xon-xao-5'].map(doc)
   const dai = Math.max(...xx.map((x) => x.length)), xon = new Float32Array(dai * 2)
   for (const x of xx) for (let i = 0; i < xon.length; i++) xon[i] += x[i % x.length]
   for (const [ten, khac] of [...BO.map(([t, f]) => [t, doc(f)]), ['xon-xao', xon]]) {
     const c = canh(khac, snr)
     NHAN_HT = c.nhan
-    const cach = { 'chuan': { ra: c.vao, tre: 0 }, 'manh': await chayManh(c.vao), 'chi-thay': await chayCong(c.vao) }
+    const cach = { 'chuan': { ra: c.vao, tre: 0 }, 'manh': await chayManh(c.vao), 'chi-thay': await chayCong(c.vao), ...(process.env.LV_MH ? { 'mo-hinh': await chayMoHinh(c.vao, c.tT, c.tO) } : {}) }
     for (const [ten2, r] of Object.entries(cach)) {
       const tre = r.tre ?? 0
       const khacGiam = db(nl(doan(c.vao, c.nhan, 2)) / nl(doan(r.ra, c.nhan, 2, tre)))
-      const chongKhac = r.g ? db(nl(doan(c.tO, c.nhan, 3)) / nl(doan(c.tO.map((v, i) => v * r.g[Math.floor(i / K)]), c.nhan, 3))) : null
+      const chongKhac = r.rO ? db(nl(doan(c.tO, c.nhan, 3)) / nl(doan(r.rO, c.nhan, 3, tre))) : r.g ? db(nl(doan(c.tO, c.nhan, 3)) / nl(doan(c.tO.map((v, i) => v * r.g[Math.floor(i / K)]), c.nhan, 3))) : null
       const tGiu = siSdr(doan(r.ra, c.nhan, 1, tre), doan(c.vao, c.nhan, 1))
       const chong = siSdr(doan(r.ra, c.nhan, 3, tre), doan(c.tT, c.nhan, 3)), chong0 = siSdr(doan(c.vao, c.nhan, 3), doan(c.tT, c.nhan, 3))
       let ha = 0, ha1 = 0, tong = 0; if (r.g) for (let k = 0; k < c.nhan.length; k++) if (c.nhan[k] === 1 || c.nhan[k] === 4) { let e = 0; for (let j = 0; j < K; j++) e += (c.tT[k * K + j] ?? 0) ** 2; if (e / K > 1e-6) { tong++; if (r.g[k] < 0.708) { ha++; if (c.nhan[k] === 1) ha1++ } } }

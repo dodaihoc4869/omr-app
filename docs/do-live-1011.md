@@ -500,3 +500,33 @@ Mã: `scripts/thu-live-1011/tach-giong/nhieu-that/` (tải bằng mã thầy ở
 - Giọng K là ai: F0 ≈ 216–302 Hz (thầy 107–125 Hz), các tâm K của các buổi giống nhau (cos 0,45–0,83), và cửa sổ TRONG `emNoi` giống K nhiều hơn giống thầy ở 6/8 buổi ⇒ chính người đóng vai «em» trong buổi thử, ngồi gần mic thầy (nói trước khi bật / sau khi tắt mic em). Chuyển lượt thầy ↔ K nhiều chỗ < 1 s mà mức hai bên vẫn ngang nhau ⇒ không phải do tự chỉnh âm lượng kéo giọng khác lên (bộ này đổi ≤ vài dB / giây).
 - Giới hạn: buổi THỬ, không phải buổi dạy (lớp thật em ngồi xa hơn ⇒ có thể chênh hơn); không biết buổi nào dùng BOYALINK hay mic mảng của máy (lỗi đã gặp, `src/lib/live/thang-mic.ts`); nói chồng KHÔNG đo trực tiếp được — 4 % «?» chỉ là cận trên của phần lẫn / khó nhận.
 - ⇒ **Hướng B1 (cổng gần mic, cần chênh ≥ 15 dB) bị loại.** Chênh ≈ 2 dB thì chỉ mô hình tách thật mới làm được (B2 / B3). Micro đeo đầu có màng định hướng sát miệng (10.5 mục 1) càng quan trọng: chênh 2 dB là do mic thu được người ngồi cạnh gần bằng thầy.
+
+### 11.2 Mô hình RIÊNG giọng thầy (B3, thầy 20:30: «huấn luyện giọng thầy trong đêm nay luôn») — đường ống chạy, đang luyện, CHƯA đạt
+Mã luyện: `scripts/thu-live-1011/tach-giong/luyen/` (JAX trên CPU — PyTorch không tải được ở phiên này; `luyen.py` · xuất `xuat.py` · trích dữ liệu `trich-du-lieu.py` /
+`them-buoi.py` · tự lấy buổi Live mới mỗi 45 phút `canh-buoi-moi.sh`). Lõi chạy trong app: `src/lib/live/tach-giong-thay.ts` (chuỗi ES5, KHÔNG wasm, không ONNX Runtime).
+Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach-giong/ckpt/` (nhánh `claude/tach-giong-yt-1111` luyện thêm bằng bài giảng YouTube, cùng định dạng).
+- **Kiến trúc:** STFT căn-Hann 20 ms bước 10 ms (48 kHz: 960 / 480) ⇒ trễ thuật toán 20 ms, không nhìn trước. Đặc trưng log-phổ 221 ô 0–11 kHz (bước 50 Hz) ⇒ Dense 192 (tanh)
+  ⇒ GRU 192 ⇒ GRU 192 (+ nối tắt) ⇒ Dense 221 + sigmoid = mặt nạ từng ô. **Dải 11–24 kHz** nhân trung bình mặt nạ 6–11 kHz ⇒ giữ đủ dải 48 kHz khi thầy nói
+  (dữ liệu luyện là MP3 «Xem lại Live» cắt ở ≈ 11 kHz nên mạng không học dải cao). Sàn hệ số −50 dB. 529 nghìn tham số; ≈ 0,53 triệu phép nhân-cộng / khung.
+- **Dữ liệu:** giọng thầy trích từ «Xem lại Live» (cửa sổ 1 s cos CAM++ với tâm thầy TB ≥ 0,40, nhỏ nhất ≥ 0,25, với tâm «khác» ≤ 0,25): 119 s luyện +
+  32 s GIỮ RIÊNG để chấm (buổi 75f8acfc, không bao giờ luyện). Giọng khác: giọng thật trong phòng (94 s, tăng khi có buổi mới; giữ riêng bac5a835 16 s) +
+  AudioMNIST (MIT, 60 người 48 kHz, đi qua đúng đường MP3 24 kHz 48 kb/s; 6 người giữ riêng). Ồn: bản ghi ồn thật + ồn màu. Trộn: thầy −32…−12 dBFS, giọng khác −6…+12 dB
+  so với thầy (đo thật 2 dB), 1–2 người, có đoạn một mình / chồng / bắt đầu / dứt; 12 % mẫu không có thầy. Tăng cường: EQ ngẫu nhiên ±4 dB, đổi tốc độ ±6 % (≈ ±1 bán cung),
+  vang phòng tổng hợp (thầy nhẹ, người khác nặng hơn).
+- **Mất mát:** sai số phổ nén (|.|^0,3) trọng số ×1,6 ở 3–6 kHz, ×2,2 ở 6–11 kHz (giữ độ sáng) + phạt thêm khi mất tiếng thầy + phạt phần giọng khác lọt.
+- **Lõi JS khớp bản luyện:** mặt nạ lệch numpy ≤ 2·10⁻⁸; FFT 960, STFT tái tạo đúng (test `tests/live-tach-giong-thay-1111.test.ts`).
+- **Checkpoint đầu (bước 1000, ≈ 8 phút luyện)** — bản đo 18 s với giọng THẦY THẬT giữ riêng + giọng khác thật giữ riêng (`LV_THAY`, `LV_KHAC`, `LV_MH`; số gốc
+  `docs/ban-ve-live-1011/so-do-tach-giong-mo-hinh-1000-1111.json`): giọng khác giảm **1,9–3,0 dB** (cổng lượt 1: 0,1–2,2; Mạnh: 0–1,6); thầy một mình SI-SDR 19,2 dB;
+  nói chồng ở 2 dB không hại thầy (8,4 → 8,3; giọng khác thật 4,1 → 5,7 — cổng lượt 1 làm hỏng 4,1 → −2,9); mở sau 10–60 ms; hệ số thời gian thực 0,10–0,12
+  (máy phiên, Node, một luồng). **Còn rất xa tiêu chí «giảm ≥ 20 dB».**
+- Cột «dải tới −3 dB» của bản đo cũ không dùng được cho mô hình: giọng mẫu là MP3 (không có gì trên 11 kHz) và mô hình hạ dải < 150 Hz ⇒ thước đo dừng ở dải đầu.
+
+### 11.3 Bộ chạy trong app (trên nhánh, ẨN sau cờ — chưa phát hành)
+- Mức «Chỉ giọng thầy» ('thay') trong hàng «Lọc ồn»; chỉ hiện khi `localStorage['ddh.live.chi-thay'] = 'hien'` VÀ có địa chỉ mô hình (`URL_MO_HINH_THAY` — đang null —
+  hoặc `ddh.live.chi-thay-url` để thử). Mặc định không chọn; chọn thì nhớ (`ddh.live.loc-on`). Lùi khẩn: `ddh.live.chi-thay = 'tat'`.
+- Chạy trong Worker khung của `chuoi-tieng.ts` (MA_TACH ghép trước MA_KHUNG), 480 mẫu 48 kHz / khung. Đường «Làm rõ»: sau RNNoise (tắt ở mức này), trước nâng mức.
+  Đường «Chuẩn trình duyệt»: chuỗi CHỈ-TÁCH (không lọc 80 Hz, không nâng mức) chỉ được gửi khi mức này bật và mô hình không hỏng.
+- Bật / tắt trộn một khung (không «bụp»). LƯỚI: số hỏng ⇒ tắt ngay; mic có giọng mà tiếng ra ≈ 0 suốt 1,5 s ⇒ tự tắt «cam»; hệ số thời gian thực (đo mỗi 2 s trên máy
+  thầy) > 0,6 ⇒ tự tắt «cham»; tải / nạp hỏng ⇒ «loi». Tự tắt ⇒ gửi lại tiếng như trước + ghi lý do (chẩn đoán `luoi`). Test `tests/live-chi-thay-luoi-1111.test.ts`.
+- Dòng trạng thái trong cửa sổ Live: «Mô hình <bản> · luyện <ngày> · máy này chạy <x> % thời gian thực» hoặc «Đã tự tắt (lý do) — lớp nghe tiếng như trước».
+
