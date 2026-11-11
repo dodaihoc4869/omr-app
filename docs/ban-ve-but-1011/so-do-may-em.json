@@ -1,40 +1,40 @@
 {
   "ten": "sau",
-  "ngay": "2026-11-11T02:06:52.106Z",
+  "ngay": "2026-11-11T03:46:48.478Z",
   "may": "Chromium không đầu /opt/pw-browsers, thầy 1366 × 768, máy em 844 × 390 @2x; phòng thật trong Node; nét đi WebSocket của phòng (không SFU, không mạng thật)",
   "nhipMuc": {
     "soNet": 65,
     "cachKhungCoMucMs": {
-      "n": 761,
+      "n": 769,
       "trungVi": 16.7,
       "p95": 16.9,
-      "lonNhat": 33.2
+      "lonNhat": 33.3
     },
     "quangDungDaiNhatMoiNetMs": {
       "n": 65,
       "trungVi": 16.9,
-      "p95": 17.9,
-      "lonNhat": 33.2
+      "p95": 18.4,
+      "lonNhat": 33.3
     },
     "quangDungTu50Ms": 0,
     "treChamButToiMucMs": {
       "n": 65,
-      "trungVi": 74.4,
-      "p95": 82.7,
-      "lonNhat": 87.7
+      "trungVi": 74.7,
+      "p95": 83.4,
+      "lonNhat": 85.1
     },
     "conTro": {
-      "khungMucChay": 760,
-      "trongDoConTroDungIm": 0,
-      "dungRoiNhay6px": 0
+      "khungMucChay": 768,
+      "trongDoConTroDungIm": 19,
+      "dungRoiNhay6px": 1
     }
   },
   "uotSoKhoMayEm": {
     "soNet": 5,
     "netCoKhac": 1,
-    "diemAnhKhac": 17,
+    "diemAnhKhac": 15,
     "khac16": 1,
-    "mucLon": 17,
+    "mucLon": 16,
     "ghiChu": "ô bảng đen của máy em ở đúng điểm ảnh thiết bị (@2x)"
   },
   "khungHinhMayEm": [
@@ -46,11 +46,11 @@
       "soKhung": 315,
       "xuLyMoiKhungMs": {
         "trungVi": 0.1,
-        "p95": 0.2,
+        "p95": 0.3,
         "lonNhat": 0.5
       },
-      "luongChinhBanPhanTram": 11.1,
-      "maPhanTram": 1.2,
+      "luongChinhBanPhanTram": 7.7,
+      "maPhanTram": 1.3,
       "boCucPhanTram": 0,
       "tinhKieuPhanTram": 0,
       "soLanBoCuc": 0,
@@ -61,14 +61,14 @@
       "khungMoiGiay": 60,
       "cachKhungP95Ms": 16.8,
       "khungTreHon20Ms": 0,
-      "soKhung": 310,
+      "soKhung": 312,
       "xuLyMoiKhungMs": {
-        "trungVi": 0.4,
-        "p95": 1.1,
-        "lonNhat": 7.1
+        "trungVi": 0.3,
+        "p95": 1.4,
+        "lonNhat": 7.3
       },
-      "luongChinhBanPhanTram": 41.9,
-      "maPhanTram": 3.9,
+      "luongChinhBanPhanTram": 28.9,
+      "maPhanTram": 4.1,
       "boCucPhanTram": 0,
       "tinhKieuPhanTram": 0,
       "soLanBoCuc": 0,
@@ -76,17 +76,17 @@
     },
     {
       "cpu": "×6",
-      "khungMoiGiay": 59.8,
+      "khungMoiGiay": 60,
       "cachKhungP95Ms": 16.8,
-      "khungTreHon20Ms": 1,
-      "soKhung": 317,
+      "khungTreHon20Ms": 0,
+      "soKhung": 318,
       "xuLyMoiKhungMs": {
-        "trungVi": 0.2,
-        "p95": 1.8,
-        "lonNhat": 5.3
+        "trungVi": 0.6,
+        "p95": 1.7,
+        "lonNhat": 4.7
       },
-      "luongChinhBanPhanTram": 62.6,
-      "maPhanTram": 5.5,
+      "luongChinhBanPhanTram": 40.7,
+      "maPhanTram": 5.7,
       "boCucPhanTram": 0,
       "tinhKieuPhanTram": 0.1,
       "soLanBoCuc": 0,
@@ -95,7 +95,15 @@
   ],
   "cayBut": {
     "dangVietCham": true,
-    "loLungCham": null
+    "loLungCham": true
+  },
+  "banTay": {
+    "hinhPx": [
+      28,
+      30.5
+    ],
+    "caoBangPx": 374,
+    "caoHinhSoVoiBangPhanTram": 8.2
   },
   "bangCuon": {
     "thayLanChuot": {
@@ -106,14 +114,14 @@
     "netGiay": 0,
     "yLonNhatCuaNet": 1.297,
     "mayEmTroiTheo": {
-      "truoc": "translate3d(0px, -190px, 0px)",
+      "truoc": "translate3d(0px, -188px, 0px)",
       "sau": "translate3d(0px, -197.5px, 0px)",
-      "buocTroiLonNhatMoiKhungPx": 1
+      "buocTroiLonNhatMoiKhungPx": 1.5
     },
     "nhipMucKhiDaCuon": {
       "soNet": 19,
       "cachKhungCoMucMs": {
-        "n": 289,
+        "n": 285,
         "trungVi": 16.7,
         "p95": 16.9,
         "lonNhat": 33.4
@@ -127,14 +135,14 @@
       "quangDungTu50Ms": 0,
       "treChamButToiMucMs": {
         "n": 19,
-        "trungVi": 76.5,
-        "p95": 90.9,
-        "lonNhat": 90.9
+        "trungVi": 80.9,
+        "p95": 89.5,
+        "lonNhat": 89.5
       },
       "conTro": {
-        "khungMucChay": 288,
-        "trongDoConTroDungIm": 1,
-        "dungRoiNhay6px": 1
+        "khungMucChay": 284,
+        "trongDoConTroDungIm": 8,
+        "dungRoiNhay6px": 3
       }
     },
     "keoVachCuon": {

@@ -4,6 +4,7 @@
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu-but-1111.mjs <thư mục tạm> [tệp số đo = docs/ban-ve-but-1011/so-do-may-em.json] [thư mục ảnh = docs/ban-ve-but-1011]
 //   Đo bản CŨ: build cùng cấu hình trên một bản giải nén `git archive <commit cũ>` rồi trỏ <thư mục tạm> sang đó, thêm TEN=truoc.
+//   VET=1 ⇒ ở lượt CPU ×4 in thêm luồng chính của từng trang tốn thời gian vào việc gì (vết Chromium) · NHANH=1 ⇒ bỏ phần bảng cuộn + ảnh.
 // ĐO (mỗi khung hình của MÁY EM ghi: giờ · chu vi đuôi nét dở vừa vẽ · số lần tô xuống lớp chốt · chỗ con trỏ — không đọc điểm ảnh nên không làm chậm khung):
 //   · trong từng nét của thầy: khoảng cách giữa hai khung có mực mới (p95, dài nhất) · số quãng đứng ≥ 50 ms · trễ «thầy chạm bút → máy em có mực»
 //   · con trỏ: số khung mực đang chảy mà con trỏ đứng im · số lần con trỏ đang đứng rồi nhảy ≥ 6 px trong một khung
@@ -67,23 +68,37 @@ await em.addInitScript(() => {
   P.quadraticCurveTo = function (a, b, x, y) { if (px === px) dai += Math.hypot(x - px, y - py); px = x; py = y; nq++; return qc.call(this, a, b, x, y) }
   // đa giác nét có nhiều đoạn cong (≥ 6); thân cây bút chỉ có 2 ⇒ không tính nhầm cây bút là mực
   // D.boBut = không vẽ cây bút (để so ảnh nét ướt / khô mà không dính hình bút): bỏ các lệnh tô ít đoạn cong + fillRect trên lớp «đang viết»
-  P.fill = function (...ts) { const c = this.canvas, trongLv = c && c.isConnected && c.closest('.lv'); if (trongLv && nq < 6 && D.boBut && c.width === c.height && !ts.length) return; if (nq >= 6 && trongLv) { if (c.width === c.height) song = Math.max(song, dai); else chot++ } return fl.apply(this, ts) }
+  P.fill = function (...ts) {
+    const c = this.canvas, trongLv = c && c.isConnected && c.closest('.lv'); if (trongLv && nq < 6 && D.boBut && c.width === c.height && !ts.length) return; if (nq >= 6 && trongLv) { if (c.width === c.height) song = Math.max(song, dai); else chot++ } return fl.apply(this, ts) }
   // cây bút vẽ trên canvas (bản 11/11): đai màu của nó là lệnh fillRect duy nhất trên lớp «đang viết» ⇒ gốc phép biến đổi lúc đó = chỗ ngòi bút
   P.fillRect = function (x, y, w, h) {
     const c = this.canvas
     if (c && c.width === c.height && c.isConnected && c.closest('.lv')) { const m = this.getTransform(), k = window.devicePixelRatio || 1, v = /translate3d\(([-0-9.]+)px, ?([-0-9.]+)px/.exec(c.style.transform); but = [m.e / k + (v ? +v[1] : 0), m.f / k + (v ? +v[2] : 0), this.globalAlpha > 0.99]; if (D.boBut) return }
     return fr.call(this, x, y, w, h)
   }
-  let truoc = 0
+  // bàn tay cầm bút (bản 11/11 lần 2): hình dựng sẵn trong một canvas RỜI, dán vào lớp «đang viết» bằng drawImage ⇒ gốc phép biến đổi lúc đó = chỗ ngòi bút
+  const di = P.drawImage
+  P.drawImage = function (anh, ...ts) {
+    const c = this.canvas
+    if (anh && anh.tagName === 'CANVAS' && !anh.isConnected && c && c.width === c.height && c.isConnected && c.closest('.lv')) { const m = this.getTransform(), k = c.width / parseFloat(c.style.width || '1'), v = /translate3d\(([-0-9.]+)px, ?([-0-9.]+)px/.exec(c.style.transform); but = [m.e / k + (v ? +v[1] : 0), m.f / k + (v ? +v[2] : 0), this.globalAlpha > 0.8]; D.hinhTay = [anh.width / k, anh.height / k]; if (D.boBut) return }
+    return di.call(this, anh, ...ts)
+  }
+  // lúc chỉ đo khung hình: gỡ hết các lệnh bọc (bọc từng lệnh vẽ làm chính phép đo nặng lên, nét càng nhiều đỉnh càng nặng)
+  const boc = { beginPath: P.beginPath, quadraticCurveTo: P.quadraticCurveTo, fill: P.fill, fillRect: P.fillRect, drawImage: P.drawImage }
+  D.goBoc = () => { P.beginPath = bp; P.quadraticCurveTo = qc; P.fill = fl; P.fillRect = fr; P.drawImage = di }
+  D.ganBoc = () => { Object.assign(P, boc) }
+  let truoc = 0, butGiu = null
   const vong = (x) => {
     raf(vong)
     if (D.bat && truoc) D.cach.push(x - truoc)
     truoc = x
     if (!D.bat || D.nhe) { song = 0; chot = 0; return }
-    // con trỏ: bản mới = cây bút vẽ trên canvas (ghi ở trên); bản cũ = chấm tròn `.lv-tro` dời bằng transform
+    // con trỏ: bản 11/11 = cây bút / bàn tay vẽ trên lớp «đang viết» (ghi ở fillRect / drawImage phía trên; khung nào bàn tay đứng im không vẽ lại thì
+    // giữ chỗ của khung trước) · bản cũ = chấm tròn `.lv-tro` dời bằng transform
     const b = document.querySelector('.lv-tro')
     let cx = -1, cy = -1
-    if (but) { cx = but[0]; cy = but[1] }
+    if (but) butGiu = but
+    if (butGiu) { cx = butGiu[0]; cy = butGiu[1]; but = butGiu }
     else if (b && b.style.opacity === '1') { const m = /translate3d\(([-0-9.]+)px, ?([-0-9.]+)px/.exec(b.style.transform); if (m) { cx = +m[1]; cy = +m[2] } }
     D.but = but; but = null
     const tr = document.querySelector('.lv-cuon > div')
@@ -200,13 +215,21 @@ kq.khungHinhMayEm = []
 for (const cpu of [1, 4, 6]) {
   await cdpEm.send('Emulation.setCPUThrottlingRate', { rate: cpu })
   await ngu(300)
+  if (process.env.VET && cpu === 4) await trinh.startTracing(em, { categories: ['devtools.timeline', 'disabled-by-default-devtools.timeline', 'cc', 'gpu', 'blink', 'viz'] })
   const c0 = await docCdp(), t0 = performance.now()
-  await em.evaluate(() => { window.__do.cach = []; window.__do.xl = []; window.__do.nhe = true; window.__do.bat = true })
+  await em.evaluate(() => { window.__do.goBoc(); window.__do.cach = []; window.__do.xl = []; window.__do.nhe = true; window.__do.bat = true })
   const r2 = taoNgauNhien(40 + cpu)
   await viet([...vietDong('n = 0,1 mol', 1312, 520 + (cpu === 1 ? 0 : cpu === 4 ? 70 : 140), 38, { rnd: r2, vMax: 900 }), ...vietDong('CH_3COOH', 1500, 520 + (cpu === 1 ? 0 : cpu === 4 ? 70 : 140), 38, { rnd: r2, vMax: 900 })], { nghi: 60 })
   await ngu(500)
-  const X = await em.evaluate(() => { window.__do.bat = false; window.__do.nhe = false; return { cach: window.__do.cach, xl: window.__do.xl } })
+  const X = await em.evaluate(() => { window.__do.bat = false; window.__do.nhe = false; window.__do.ganBoc(); return { cach: window.__do.cach, xl: window.__do.xl } })
   const c1 = await docCdp(), giay = (performance.now() - t0) / 1000
+  if (process.env.VET && cpu === 4) {
+    const ev = JSON.parse((await trinh.stopTracing()).toString()).traceEvents, ten = {}, luong = {}
+    for (const e of ev) if (e.ph === 'M' && e.name === 'thread_name') luong[e.pid + ':' + e.tid] = e.args.name
+    const theo = {}
+    for (const e of ev) if (e.ph === 'X' && e.dur) { const l0 = luong[e.pid + ':' + e.tid] || '?'; if (l0 !== 'CrRendererMain') continue; const l = l0 + e.pid; (theo[l] ||= {}); (theo[l][e.name] ||= [0, 0]); theo[l][e.name][0] += e.dur / 1000; theo[l][e.name][1]++ }
+    for (const l of Object.keys(theo)) { const ds = Object.entries(theo[l]).sort((a, b) => b[1][0] - a[1][0]).slice(0, 14); console.log('VET ' + l + ' (' + giay.toFixed(1) + ' s): ' + ds.map(([n, v]) => n + ' ' + v[0].toFixed(0) + 'ms/' + v[1]).join(' · ')) }
+  }
   const kh = tk(X.cach), xl = tk(X.xl), tong = X.cach.reduce((s, v) => s + v, 0)
   const dong = { cpu: '×' + cpu, khungMoiGiay: +(kh.n / (tong / 1000)).toFixed(1), cachKhungP95Ms: kh.p95, khungTreHon20Ms: X.cach.filter((v) => v > 20).length, soKhung: kh.n, xuLyMoiKhungMs: { trungVi: xl.trungVi, p95: xl.p95, lonNhat: xl.lonNhat }, luongChinhBanPhanTram: +((c1.TaskDuration - c0.TaskDuration) / giay * 100).toFixed(1), maPhanTram: +((c1.ScriptDuration - c0.ScriptDuration) / giay * 100).toFixed(1), boCucPhanTram: +((c1.LayoutDuration - c0.LayoutDuration) / giay * 100).toFixed(1), tinhKieuPhanTram: +((c1.RecalcStyleDuration - c0.RecalcStyleDuration) / giay * 100).toFixed(1), soLanBoCuc: c1.LayoutCount - c0.LayoutCount, soLanTinhKieu: c1.RecalcStyleCount - c0.RecalcStyleCount }
   kq.khungHinhMayEm.push(dong)
@@ -215,26 +238,30 @@ for (const cpu of [1, 4, 6]) {
 await cdpEm.send('Emulation.setCPUThrottlingRate', { rate: 1 })
 
 // 4 · BẢNG ĐEN CUỘN + ẢNH (chỉ bản có bảng cuộn)
-if (coCuon) {
+if (coCuon && !process.env.NHANH) {
   // ảnh cây bút phóng to: thầy đang viết dở một nét (bút chạm bảng) rồi lơ lửng
   const cho = []
   const gui = (type, x, y, ap, buttons) => cho.push(cdpThay.send('Input.dispatchMouseEvent', { type, x: x * K, y: y * K, button: 'left', buttons, clickCount: type === 'mouseMoved' ? 0 : 1, pointerType: 'pen', force: ap }).catch(() => {}))
   const chupBut = async (ten) => {
     const p = await em.evaluate(() => new Promise((xong) => { window.__do.bat = true; requestAnimationFrame(() => requestAnimationFrame(() => { window.__do.bat = false; xong(window.__do.but) })) }))
     if (!p) return null
-    const buf = await em.screenshot({ type: 'png', clip: { x: Math.max(0, p[0] - 58), y: Math.max(0, p[1] - 64), width: 130, height: 96 } })
+    const buf = await em.screenshot({ type: 'png', clip: { x: Math.max(0, p[0] - 78), y: Math.max(0, p[1] - 50), width: 130, height: 96 } })
     await luuAnh(buf, ten, 780)
     return p
   }
   gui('mousePressed', 1700, 640, 0.5, 1)
   for (let i = 1; i <= 30; i++) { gui('mouseMoved', 1700 + i * 2.4, 640 - Math.sin(i / 5) * 16, 0.5, 1); await ngu(6) }
   await Promise.all(cho); await ngu(350)
-  const pCham = await chupBut('9-cay-but-dang-viet.jpg')
+  const pCham = await chupBut('10-tay-dang-viet-phong-to.jpg')
+  await luuAnh(await em.screenshot({ type: 'png' }), '10-tay-dang-viet-may-em-844.jpg')
   gui('mouseReleased', 1772, 640, 0, 0)
   for (let i = 1; i <= 14; i++) { gui('mouseMoved', 1772 + i * 1.6, 640 - i * 2.2, 0, 0); await ngu(16) }
   await Promise.all(cho); await ngu(350)
-  const pLo = await chupBut('9-cay-but-lo-lung.jpg')
+  const pLo = await chupBut('10-tay-lo-lung-phong-to.jpg')
   kq.cayBut = { dangVietCham: pCham ? pCham[2] : null, loLungCham: pLo ? pLo[2] : null }
+  // cỡ hình bàn tay THẬT trên máy em (hình dựng sẵn, kể cả lề bóng) so với bề cao bảng đen. Ba phương án dáng tay: scripts/thu-live-1011/chup-tay.mjs
+  kq.banTay = await em.evaluate(() => { const h = window.__do.hinhTay, cao = Math.round(document.querySelector('.lv-bang').getBoundingClientRect().height); return h ? { hinhPx: [+h[0].toFixed(1), +h[1].toFixed(1)], caoBangPx: cao, caoHinhSoVoiBangPhanTram: +(h[1] / cao * 100).toFixed(1) } : null })
+  console.log(`[${TEN}] bàn tay:`, JSON.stringify(kq.banTay))
 
   // thầy LĂN CHUỘT trên bảng đen ⇒ bảng cuộn; viết tiếp hai dòng ở phần dưới ⇒ máy em tự trôi theo
   const cuon0 = await to.locator('body').evaluate(() => window.__mcBut.cuon())
