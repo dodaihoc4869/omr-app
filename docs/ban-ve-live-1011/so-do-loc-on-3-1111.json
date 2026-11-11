@@ -1,0 +1,5037 @@
+{
+ "luc": "2026-11-11T08:09:35.635Z",
+ "ghiChu": "Ngoại tuyến trong Node, mã lọc của app. Tín / ồn 0 / 10 / 20 dB. Nhóm «that» = giọng thật (số chính), «tongHop» = giọng tổng hợp.",
+ "giong": {
+  "that": [
+   "người thật, nam (thu 48 kHz)",
+   "người thật, nữ (gốc 22 kHz)",
+   "máy đọc tiếng Việt (gốc 16 kHz)"
+  ],
+  "tongHop": [
+   "giọng nam (tổng hợp)",
+   "giọng nữ / trẻ (tổng hợp)"
+  ]
+ },
+ "on": [
+  "quạt / điều hoà",
+  "xôn xao (tổng hợp)",
+  "gõ bút / bàn phím",
+  "xe ngoài đường",
+  "xôn xao THẬT (5 người, 8 lớp)",
+  "ồn thật (bản ghi freesound 2530)"
+ ],
+ "bo": [
+  {
+   "ten": "không lọc",
+   "kb": 0,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": null,
+       "giuPho": null,
+       "den3dBHz": null,
+       "treMs": 0
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": null,
+       "giuPho": null,
+       "den3dBHz": null,
+       "treMs": 0
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": null,
+       "giuPho": null,
+       "den3dBHz": null,
+       "treMs": 0
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      }
+     }
+    },
+    "tongHop": {
+     "sach": {
+      "giọng nam (tổng hợp)": {
+       "siSdr": null,
+       "giuPho": null,
+       "den3dBHz": null,
+       "treMs": 0
+      },
+      "giọng nữ / trẻ (tổng hợp)": {
+       "siSdr": null,
+       "giuPho": null,
+       "den3dBHz": null,
+       "treMs": 0
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 0,
+   "msMoiKhung": 0,
+   "ms95": null,
+   "heSoThoiGianThuc": 0
+  },
+  {
+   "ten": "mic trình duyệt KHÔNG lọc — kiểm đường đo (Chromium 153.0.8010.12)",
+   "kb": 1,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 46.3,
+       "giuPho": 80.8,
+       "den3dBHz": 17772,
+       "treMs": 5
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 0.1,
+       "giamOnItNhat": 0.1,
+       "siSdrHon0": 0.1,
+       "siSdrHon10": 0.1,
+       "siSdrHon20": 0.1,
+       "siSdrHon20XauNhat": 0.1,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0.1,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0.1,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0.1,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 1.1,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 3,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 3.1,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 3.4,
+          "siSdrHon": 3,
+          "giuPhoHon": 3.1
+         },
+         "10": {
+          "giamOn": 0.1,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 0,
+       "giamOnItNhat": 0,
+       "siSdrHon0": 0.1,
+       "siSdrHon10": 0,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": 0,
+       "giuPhoHon0": 0.1,
+       "giuPhoHon10": 0,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 0,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 0.1
+         },
+         "10": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 0,
+          "siSdrHon": 0,
+          "giuPhoHon": 0
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 5,
+   "msMoiKhung": 0,
+   "ms95": null,
+   "heSoThoiGianThuc": 0
+  },
+  {
+   "ten": "lọc ồn của trình duyệt — WebRTC (Chromium 153.0.8010.12)",
+   "kb": 1,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 2.4,
+       "giuPho": 25.5,
+       "den3dBHz": 12471,
+       "treMs": 5.2
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": 5.5,
+       "giuPho": 19.2,
+       "den3dBHz": 20000,
+       "treMs": 5
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": 7.5,
+       "giuPho": 31.5,
+       "den3dBHz": 20000,
+       "treMs": 5
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 15.6,
+       "giamOnItNhat": 3.9,
+       "siSdrHon0": 0.6,
+       "siSdrHon10": -3,
+       "siSdrHon20": -12.9,
+       "siSdrHon20XauNhat": -15,
+       "giuPhoHon0": 1.9,
+       "giuPhoHon10": 4.1,
+       "giuPhoHon20": -0.1,
+       "giuPhoHon20XauNhat": -1.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 3.9,
+          "siSdrHon": -0.8,
+          "giuPhoHon": 1.5
+         },
+         "10": {
+          "giamOn": 19.7,
+          "siSdrHon": -5,
+          "giuPhoHon": 5.2
+         },
+         "20": {
+          "giamOn": 20,
+          "siSdrHon": -15,
+          "giuPhoHon": 0.4
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 8.5,
+          "siSdrHon": 1,
+          "giuPhoHon": 2.3
+         },
+         "10": {
+          "giamOn": 19.6,
+          "siSdrHon": -2.5,
+          "giuPhoHon": 3.4
+         },
+         "20": {
+          "giamOn": 20.1,
+          "siSdrHon": -12.4,
+          "giuPhoHon": -1.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 8.5,
+          "siSdrHon": 1.6,
+          "giuPhoHon": 1.8
+         },
+         "10": {
+          "giamOn": 19.9,
+          "siSdrHon": -1.6,
+          "giuPhoHon": 3.8
+         },
+         "20": {
+          "giamOn": 20.2,
+          "siSdrHon": -11.2,
+          "giuPhoHon": 0.3
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 5.7,
+       "giamOnItNhat": 2.2,
+       "siSdrHon0": -0.8,
+       "siSdrHon10": -4,
+       "siSdrHon20": -13.1,
+       "siSdrHon20XauNhat": -15.2,
+       "giuPhoHon0": 0.9,
+       "giuPhoHon10": 2.1,
+       "giuPhoHon20": -0.5,
+       "giuPhoHon20XauNhat": -1.3,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 2.9,
+          "siSdrHon": -1.7,
+          "giuPhoHon": 1
+         },
+         "10": {
+          "giamOn": 6.3,
+          "siSdrHon": -5.8,
+          "giuPhoHon": 2.8
+         },
+         "20": {
+          "giamOn": 6.8,
+          "siSdrHon": -15.2,
+          "giuPhoHon": 0.3
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 4.4,
+          "siSdrHon": -0.7,
+          "giuPhoHon": 1
+         },
+         "10": {
+          "giamOn": 6,
+          "siSdrHon": -3.7,
+          "giuPhoHon": 1.6
+         },
+         "20": {
+          "giamOn": 7.1,
+          "siSdrHon": -12.6,
+          "giuPhoHon": -1.3
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 2.2,
+          "siSdrHon": -0.2,
+          "giuPhoHon": 0.5
+         },
+         "10": {
+          "giamOn": 7.1,
+          "siSdrHon": -2.5,
+          "giuPhoHon": 1.8
+         },
+         "20": {
+          "giamOn": 8.8,
+          "siSdrHon": -11.3,
+          "giuPhoHon": -0.4
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 2.1,
+       "giamOnItNhat": 0.6,
+       "siSdrHon0": 1.5,
+       "siSdrHon10": -5.1,
+       "siSdrHon20": -13.2,
+       "siSdrHon20XauNhat": -15.3,
+       "giuPhoHon0": 4.1,
+       "giuPhoHon10": 0.3,
+       "giuPhoHon20": -0.2,
+       "giuPhoHon20XauNhat": -0.4,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 4.9,
+          "siSdrHon": 0.4,
+          "giuPhoHon": 4.2
+         },
+         "10": {
+          "giamOn": 0.7,
+          "siSdrHon": -6.7,
+          "giuPhoHon": 0.3
+         },
+         "20": {
+          "giamOn": 0.7,
+          "siSdrHon": -15.3,
+          "giuPhoHon": -0.4
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 4.9,
+          "siSdrHon": 1.7,
+          "giuPhoHon": 4.1
+         },
+         "10": {
+          "giamOn": 0.7,
+          "siSdrHon": -4.7,
+          "giuPhoHon": 0.3
+         },
+         "20": {
+          "giamOn": 0.6,
+          "siSdrHon": -12.8,
+          "giuPhoHon": -0.3
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 5.3,
+          "siSdrHon": 2.3,
+          "giuPhoHon": 4.1
+         },
+         "10": {
+          "giamOn": 0.6,
+          "siSdrHon": -3.8,
+          "giuPhoHon": 0.3
+         },
+         "20": {
+          "giamOn": 0.6,
+          "siSdrHon": -11.6,
+          "giuPhoHon": 0.1
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 13.4,
+       "giamOnItNhat": 2.4,
+       "siSdrHon0": -0.2,
+       "siSdrHon10": -3.4,
+       "siSdrHon20": -13,
+       "siSdrHon20XauNhat": -15.2,
+       "giuPhoHon0": 1.3,
+       "giuPhoHon10": 5.1,
+       "giuPhoHon20": 2.6,
+       "giuPhoHon20XauNhat": 1.9,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 2.4,
+          "siSdrHon": -1.2,
+          "giuPhoHon": 1.3
+         },
+         "10": {
+          "giamOn": 18.5,
+          "siSdrHon": -5.4,
+          "giuPhoHon": 6
+         },
+         "20": {
+          "giamOn": 19.4,
+          "siSdrHon": -15.2,
+          "giuPhoHon": 2.6
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 2.4,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 1.2
+         },
+         "10": {
+          "giamOn": 15.7,
+          "siSdrHon": -3.4,
+          "giuPhoHon": 4
+         },
+         "20": {
+          "giamOn": 19.9,
+          "siSdrHon": -12.5,
+          "giuPhoHon": 1.9
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 3.6,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 1.4
+         },
+         "10": {
+          "giamOn": 19.4,
+          "siSdrHon": -1.5,
+          "giuPhoHon": 5.2
+         },
+         "20": {
+          "giamOn": 19.7,
+          "siSdrHon": -11.2,
+          "giuPhoHon": 3.3
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 7.3,
+       "giamOnItNhat": 3,
+       "siSdrHon0": -0.8,
+       "siSdrHon10": -3.8,
+       "siSdrHon20": -13.1,
+       "siSdrHon20XauNhat": -15.2,
+       "giuPhoHon0": 1.1,
+       "giuPhoHon10": 2.9,
+       "giuPhoHon20": -0.1,
+       "giuPhoHon20XauNhat": -1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 3,
+          "siSdrHon": -1.8,
+          "giuPhoHon": 1.2
+         },
+         "10": {
+          "giamOn": 8.9,
+          "siSdrHon": -5.6,
+          "giuPhoHon": 4
+         },
+         "20": {
+          "giamOn": 9.2,
+          "siSdrHon": -15.2,
+          "giuPhoHon": 0.8
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 5.1,
+          "siSdrHon": -0.5,
+          "giuPhoHon": 1.3
+         },
+         "10": {
+          "giamOn": 9,
+          "siSdrHon": -3.6,
+          "giuPhoHon": 2.3
+         },
+         "20": {
+          "giamOn": 10.2,
+          "siSdrHon": -12.7,
+          "giuPhoHon": -1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 3.6,
+          "siSdrHon": -0.2,
+          "giuPhoHon": 0.9
+         },
+         "10": {
+          "giamOn": 8.3,
+          "siSdrHon": -2.3,
+          "giuPhoHon": 2.5
+         },
+         "20": {
+          "giamOn": 8.6,
+          "siSdrHon": -11.4,
+          "giuPhoHon": -0.2
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 17.5,
+       "giamOnItNhat": 13.8,
+       "siSdrHon0": -0.2,
+       "siSdrHon10": -4.3,
+       "siSdrHon20": -13.1,
+       "siSdrHon20XauNhat": -15.2,
+       "giuPhoHon0": 1.6,
+       "giuPhoHon10": 1.8,
+       "giuPhoHon20": 0.7,
+       "giuPhoHon20XauNhat": 0.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 14.4,
+          "siSdrHon": -1,
+          "giuPhoHon": 1.8
+         },
+         "10": {
+          "giamOn": 19.2,
+          "siSdrHon": -6.1,
+          "giuPhoHon": 1.8
+         },
+         "20": {
+          "giamOn": 19.4,
+          "siSdrHon": -15.2,
+          "giuPhoHon": 0.6
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 14.1,
+          "siSdrHon": 0,
+          "giuPhoHon": 1.7
+         },
+         "10": {
+          "giamOn": 18.4,
+          "siSdrHon": -3.9,
+          "giuPhoHon": 1.7
+         },
+         "20": {
+          "giamOn": 18.3,
+          "siSdrHon": -12.6,
+          "giuPhoHon": 0.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 13.8,
+          "siSdrHon": 0.4,
+          "giuPhoHon": 1.3
+         },
+         "10": {
+          "giamOn": 19.9,
+          "siSdrHon": -2.9,
+          "giuPhoHon": 1.9
+         },
+         "20": {
+          "giamOn": 20,
+          "siSdrHon": -11.4,
+          "giuPhoHon": 1.5
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 5,
+   "msMoiKhung": 0,
+   "ms95": null,
+   "heSoThoiGianThuc": 0
+  },
+  {
+   "ten": "RNNoise «Vừa» (lượt 2)",
+   "kb": 157,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 22,
+       "giuPho": 24.3,
+       "den3dBHz": 20000,
+       "treMs": 10
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": 24.6,
+       "giuPho": 27.3,
+       "den3dBHz": 20000,
+       "treMs": 10
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": 26,
+       "giuPho": 29,
+       "den3dBHz": 20000,
+       "treMs": 10
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 18,
+       "giamOnItNhat": 9,
+       "siSdrHon0": 3.5,
+       "siSdrHon10": 3.7,
+       "siSdrHon20": 0.8,
+       "siSdrHon20XauNhat": 0.4,
+       "giuPhoHon0": 3.6,
+       "giuPhoHon10": 4.3,
+       "giuPhoHon20": 1.1,
+       "giuPhoHon20XauNhat": 0.4,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 9,
+          "siSdrHon": 3.8,
+          "giuPhoHon": 3.9
+         },
+         "10": {
+          "giamOn": 16.7,
+          "siSdrHon": 4.3,
+          "giuPhoHon": 5
+         },
+         "20": {
+          "giamOn": 21.6,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 21.2,
+          "siSdrHon": 3.7,
+          "giuPhoHon": 3.9
+         },
+         "10": {
+          "giamOn": 21.5,
+          "siSdrHon": 3.7,
+          "giuPhoHon": 4.3
+         },
+         "20": {
+          "giamOn": 21.3,
+          "siSdrHon": 0.4,
+          "giuPhoHon": 0.4
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 9,
+          "siSdrHon": 2.9,
+          "giuPhoHon": 3
+         },
+         "10": {
+          "giamOn": 20.7,
+          "siSdrHon": 3.1,
+          "giuPhoHon": 3.5
+         },
+         "20": {
+          "giamOn": 20.8,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.8
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 4.9,
+       "giamOnItNhat": 1.2,
+       "siSdrHon0": 0.4,
+       "siSdrHon10": 1.5,
+       "siSdrHon20": -0.2,
+       "siSdrHon20XauNhat": -0.7,
+       "giuPhoHon0": 0.4,
+       "giuPhoHon10": 1.9,
+       "giuPhoHon20": 0.4,
+       "giuPhoHon20XauNhat": -0.3,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 1.2,
+          "siSdrHon": -0.1,
+          "giuPhoHon": -0.1
+         },
+         "10": {
+          "giamOn": 5.4,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.5
+         },
+         "20": {
+          "giamOn": 6.2,
+          "siSdrHon": 0,
+          "giuPhoHon": 0.9
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 1.2,
+          "siSdrHon": 0.5,
+          "giuPhoHon": 0.5
+         },
+         "10": {
+          "giamOn": 8,
+          "siSdrHon": 2,
+          "giuPhoHon": 2.6
+         },
+         "20": {
+          "giamOn": 11.9,
+          "siSdrHon": -0.7,
+          "giuPhoHon": -0.3
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 2.1,
+          "siSdrHon": 0.8,
+          "giuPhoHon": 0.9
+         },
+         "10": {
+          "giamOn": 2.6,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.7
+         },
+         "20": {
+          "giamOn": 5.6,
+          "siSdrHon": -0.1,
+          "giuPhoHon": 0.6
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 13.6,
+       "giamOnItNhat": 5.1,
+       "siSdrHon0": 1.7,
+       "siSdrHon10": 1.7,
+       "siSdrHon20": -0.2,
+       "siSdrHon20XauNhat": -1.5,
+       "giuPhoHon0": 1.9,
+       "giuPhoHon10": 1.9,
+       "giuPhoHon20": 0.3,
+       "giuPhoHon20XauNhat": -0.9,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 16.2,
+          "siSdrHon": 2.9,
+          "giuPhoHon": 3.1
+         },
+         "10": {
+          "giamOn": 11.2,
+          "siSdrHon": 2.1,
+          "giuPhoHon": 2.4
+         },
+         "20": {
+          "giamOn": 16.2,
+          "siSdrHon": -1.5,
+          "giuPhoHon": -0.9
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 16,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.4
+         },
+         "10": {
+          "giamOn": 15.4,
+          "siSdrHon": 1.7,
+          "giuPhoHon": 1.9
+         },
+         "20": {
+          "giamOn": 14.7,
+          "siSdrHon": 0.5,
+          "giuPhoHon": 1.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 5.1,
+          "siSdrHon": 1,
+          "giuPhoHon": 1.1
+         },
+         "10": {
+          "giamOn": 13.6,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.3
+         },
+         "20": {
+          "giamOn": 13.6,
+          "siSdrHon": 0.3,
+          "giuPhoHon": 0.8
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 21.1,
+       "giamOnItNhat": 20.8,
+       "siSdrHon0": 5.6,
+       "siSdrHon10": 4.9,
+       "siSdrHon20": 1.4,
+       "siSdrHon20XauNhat": 0.6,
+       "giuPhoHon0": 5.8,
+       "giuPhoHon10": 5.4,
+       "giuPhoHon20": 1.9,
+       "giuPhoHon20XauNhat": 1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 21.4,
+          "siSdrHon": 6,
+          "giuPhoHon": 6.2
+         },
+         "10": {
+          "giamOn": 21.2,
+          "siSdrHon": 5.4,
+          "giuPhoHon": 6
+         },
+         "20": {
+          "giamOn": 21,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 21.7,
+          "siSdrHon": 5.5,
+          "giuPhoHon": 5.8
+         },
+         "10": {
+          "giamOn": 21.3,
+          "siSdrHon": 4.8,
+          "giuPhoHon": 5.2
+         },
+         "20": {
+          "giamOn": 21.2,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 20.8,
+          "siSdrHon": 5.1,
+          "giuPhoHon": 5.3
+         },
+         "10": {
+          "giamOn": 20.8,
+          "siSdrHon": 4.6,
+          "giuPhoHon": 5.1
+         },
+         "20": {
+          "giamOn": 20.8,
+          "siSdrHon": 2,
+          "giuPhoHon": 2.7
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 6.5,
+       "giamOnItNhat": 2.3,
+       "siSdrHon0": 1.2,
+       "siSdrHon10": 2.7,
+       "siSdrHon20": 0.7,
+       "siSdrHon20XauNhat": 0.4,
+       "giuPhoHon0": 1.2,
+       "giuPhoHon10": 3.3,
+       "giuPhoHon20": 1.7,
+       "giuPhoHon20XauNhat": 1.2,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 2.6,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 1.5
+         },
+         "10": {
+          "giamOn": 6.5,
+          "siSdrHon": 2.8,
+          "giuPhoHon": 3.5
+         },
+         "20": {
+          "giamOn": 6.8,
+          "siSdrHon": 0.4,
+          "giuPhoHon": 1.4
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 3.2,
+          "siSdrHon": 0.9,
+          "giuPhoHon": 0.9
+         },
+         "10": {
+          "giamOn": 13.8,
+          "siSdrHon": 3,
+          "giuPhoHon": 3.8
+         },
+         "20": {
+          "giamOn": 14,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 2.4
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 2.3,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.1
+         },
+         "10": {
+          "giamOn": 3.9,
+          "siSdrHon": 2.2,
+          "giuPhoHon": 2.7
+         },
+         "20": {
+          "giamOn": 5.3,
+          "siSdrHon": 0.5,
+          "giuPhoHon": 1.2
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 21.2,
+       "giamOnItNhat": 20.4,
+       "siSdrHon0": 3.6,
+       "siSdrHon10": 2.6,
+       "siSdrHon20": -0.1,
+       "siSdrHon20XauNhat": -0.5,
+       "giuPhoHon0": 3.6,
+       "giuPhoHon10": 3,
+       "giuPhoHon20": 0.4,
+       "giuPhoHon20XauNhat": -0.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 21.7,
+          "siSdrHon": 3.8,
+          "giuPhoHon": 3.8
+         },
+         "10": {
+          "giamOn": 21.6,
+          "siSdrHon": 2.9,
+          "giuPhoHon": 3.3
+         },
+         "20": {
+          "giamOn": 21.4,
+          "siSdrHon": -0.5,
+          "giuPhoHon": 0
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 21.8,
+          "siSdrHon": 3,
+          "giuPhoHon": 3.1
+         },
+         "10": {
+          "giamOn": 21.3,
+          "siSdrHon": 2.2,
+          "giuPhoHon": 2.7
+         },
+         "20": {
+          "giamOn": 20.8,
+          "siSdrHon": -0.4,
+          "giuPhoHon": -0.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 20.4,
+          "siSdrHon": 3.9,
+          "giuPhoHon": 4
+         },
+         "10": {
+          "giamOn": 20.9,
+          "siSdrHon": 2.6,
+          "giuPhoHon": 3
+         },
+         "20": {
+          "giamOn": 20.9,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 1.3
+         }
+        }
+       }
+      }
+     }
+    },
+    "tongHop": {
+     "sach": {
+      "giọng nam (tổng hợp)": {
+       "siSdr": 21.5,
+       "giuPho": 28.9,
+       "den3dBHz": 20000,
+       "treMs": 10
+      },
+      "giọng nữ / trẻ (tổng hợp)": {
+       "siSdr": 18.1,
+       "giuPho": 19.4,
+       "den3dBHz": 20000,
+       "treMs": 10
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 18.5,
+       "giamOnItNhat": 17.6,
+       "siSdrHon0": 3.3,
+       "siSdrHon10": 3.6,
+       "siSdrHon20": 2.3,
+       "siSdrHon20XauNhat": 1.5,
+       "giuPhoHon0": 3.5,
+       "giuPhoHon10": 4.4,
+       "giuPhoHon20": 4,
+       "giuPhoHon20XauNhat": 3.6,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 17.6,
+          "siSdrHon": 3.1,
+          "giuPhoHon": 3.3
+         },
+         "10": {
+          "giamOn": 18.1,
+          "siSdrHon": 3.4,
+          "giuPhoHon": 4.2
+         },
+         "20": {
+          "giamOn": 18.3,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 3.6
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 18.4,
+          "siSdrHon": 3.5,
+          "giuPhoHon": 3.7
+         },
+         "10": {
+          "giamOn": 19.5,
+          "siSdrHon": 3.9,
+          "giuPhoHon": 4.6
+         },
+         "20": {
+          "giamOn": 19.3,
+          "siSdrHon": 3.1,
+          "giuPhoHon": 4.5
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 6.1,
+       "giamOnItNhat": 1.1,
+       "siSdrHon0": 0.6,
+       "siSdrHon10": 1.2,
+       "siSdrHon20": -1.3,
+       "siSdrHon20XauNhat": -3.1,
+       "giuPhoHon0": 0.6,
+       "giuPhoHon10": 1.6,
+       "giuPhoHon20": -0.7,
+       "giuPhoHon20XauNhat": -2.9,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 2.2,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 0.6
+         },
+         "10": {
+          "giamOn": 5.8,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.6
+         },
+         "20": {
+          "giamOn": 11.8,
+          "siSdrHon": -3.1,
+          "giuPhoHon": -2.9
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 1.1,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 0.7
+         },
+         "10": {
+          "giamOn": 4.4,
+          "siSdrHon": 1.1,
+          "giuPhoHon": 1.5
+         },
+         "20": {
+          "giamOn": 11,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 1.5
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 6.6,
+       "giamOnItNhat": 2.9,
+       "siSdrHon0": 0.7,
+       "siSdrHon10": 0.9,
+       "siSdrHon20": -1,
+       "siSdrHon20XauNhat": -1.1,
+       "giuPhoHon0": 0.7,
+       "giuPhoHon10": 1,
+       "giuPhoHon20": -0.3,
+       "giuPhoHon20XauNhat": -0.4,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 6.4,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 0.9
+         },
+         "10": {
+          "giamOn": 8.5,
+          "siSdrHon": 1,
+          "giuPhoHon": 1.3
+         },
+         "20": {
+          "giamOn": 13,
+          "siSdrHon": -1.1,
+          "giuPhoHon": -0.2
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 2.9,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 0.6
+         },
+         "10": {
+          "giamOn": 3.5,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 0.8
+         },
+         "20": {
+          "giamOn": 5.2,
+          "siSdrHon": -0.9,
+          "giuPhoHon": -0.4
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 16.5,
+       "giamOnItNhat": 7.5,
+       "siSdrHon0": 5,
+       "siSdrHon10": 4.9,
+       "siSdrHon20": 2.5,
+       "siSdrHon20XauNhat": 1,
+       "giuPhoHon0": 5.2,
+       "giuPhoHon10": 5.6,
+       "giuPhoHon20": 3.6,
+       "giuPhoHon20XauNhat": 2.1,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 7.5,
+          "siSdrHon": 4.4,
+          "giuPhoHon": 4.6
+         },
+         "10": {
+          "giamOn": 17,
+          "siSdrHon": 4.4,
+          "giuPhoHon": 5.3
+         },
+         "20": {
+          "giamOn": 18.1,
+          "siSdrHon": 1,
+          "giuPhoHon": 2.1
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 18.7,
+          "siSdrHon": 5.6,
+          "giuPhoHon": 5.7
+         },
+         "10": {
+          "giamOn": 18.3,
+          "siSdrHon": 5.5,
+          "giuPhoHon": 5.8
+         },
+         "20": {
+          "giamOn": 19.2,
+          "siSdrHon": 3.9,
+          "giuPhoHon": 5.1
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 7.3,
+       "giamOnItNhat": 2.5,
+       "siSdrHon0": 1.5,
+       "siSdrHon10": 2.3,
+       "siSdrHon20": 1.8,
+       "siSdrHon20XauNhat": 1.2,
+       "giuPhoHon0": 1.4,
+       "giuPhoHon10": 2.9,
+       "giuPhoHon20": 3.6,
+       "giuPhoHon20XauNhat": 3.4,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 2.5,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 1.4
+         },
+         "10": {
+          "giamOn": 5.4,
+          "siSdrHon": 2.2,
+          "giuPhoHon": 2.9
+         },
+         "20": {
+          "giamOn": 11.8,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 3.4
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 2.9,
+          "siSdrHon": 1.4,
+          "giuPhoHon": 1.4
+         },
+         "10": {
+          "giamOn": 8.2,
+          "siSdrHon": 2.5,
+          "giuPhoHon": 2.9
+         },
+         "20": {
+          "giamOn": 13.1,
+          "siSdrHon": 2.5,
+          "giuPhoHon": 3.7
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 11.2,
+       "giamOnItNhat": 3.7,
+       "siSdrHon0": 3.1,
+       "siSdrHon10": 2.7,
+       "siSdrHon20": 1.6,
+       "siSdrHon20XauNhat": 0.1,
+       "giuPhoHon0": 3.2,
+       "giuPhoHon10": 3.2,
+       "giuPhoHon20": 2.9,
+       "giuPhoHon20XauNhat": 1.2,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 4.8,
+          "siSdrHon": 2.8,
+          "giuPhoHon": 2.9
+         },
+         "10": {
+          "giamOn": 3.7,
+          "siSdrHon": 1.8,
+          "giuPhoHon": 2.1
+         },
+         "20": {
+          "giamOn": 19.4,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 1.2
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 8.8,
+          "siSdrHon": 3.5,
+          "giuPhoHon": 3.6
+         },
+         "10": {
+          "giamOn": 12.3,
+          "siSdrHon": 3.7,
+          "giuPhoHon": 4.2
+         },
+         "20": {
+          "giamOn": 18.4,
+          "siSdrHon": 3.1,
+          "giuPhoHon": 4.7
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 10,
+   "msMoiKhung": 0.206,
+   "ms95": null,
+   "heSoThoiGianThuc": 0.021
+  },
+  {
+   "ten": "RNNoise «Mạnh» (lượt 2)",
+   "kb": 157,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 19.5,
+       "giuPho": 22,
+       "den3dBHz": 20000,
+       "treMs": 10
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": 22.5,
+       "giuPho": 24.9,
+       "den3dBHz": 20000,
+       "treMs": 10
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": 23.9,
+       "giuPho": 27.3,
+       "den3dBHz": 20000,
+       "treMs": 10
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 28.1,
+       "giamOnItNhat": 11.2,
+       "siSdrHon0": 4.6,
+       "siSdrHon10": 4.4,
+       "siSdrHon20": 0,
+       "siSdrHon20XauNhat": -0.6,
+       "giuPhoHon0": 4.7,
+       "giuPhoHon10": 5,
+       "giuPhoHon20": 0.4,
+       "giuPhoHon20XauNhat": -0.4,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 11.2,
+          "siSdrHon": 4.9,
+          "giuPhoHon": 4.9
+         },
+         "10": {
+          "giamOn": 20.3,
+          "siSdrHon": 4.8,
+          "giuPhoHon": 5.5
+         },
+         "20": {
+          "giamOn": 36.3,
+          "siSdrHon": -0.6,
+          "giuPhoHon": -0.2
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 34,
+          "siSdrHon": 4.9,
+          "giuPhoHon": 5.1
+         },
+         "10": {
+          "giamOn": 36.4,
+          "siSdrHon": 4.4,
+          "giuPhoHon": 5.1
+         },
+         "20": {
+          "giamOn": 35.3,
+          "siSdrHon": -0.4,
+          "giuPhoHon": -0.4
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 11.3,
+          "siSdrHon": 4.1,
+          "giuPhoHon": 4.1
+         },
+         "10": {
+          "giamOn": 33.6,
+          "siSdrHon": 4,
+          "giuPhoHon": 4.4
+         },
+         "20": {
+          "giamOn": 34.3,
+          "siSdrHon": 1,
+          "giuPhoHon": 1.7
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 6.4,
+       "giamOnItNhat": 1.8,
+       "siSdrHon0": 0.5,
+       "siSdrHon10": 1.6,
+       "siSdrHon20": -1.1,
+       "siSdrHon20XauNhat": -1.7,
+       "giuPhoHon0": 0.5,
+       "giuPhoHon10": 2.1,
+       "giuPhoHon20": -0.2,
+       "giuPhoHon20XauNhat": -1.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 1.8,
+          "siSdrHon": -0.1,
+          "giuPhoHon": -0.2
+         },
+         "10": {
+          "giamOn": 6.5,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.4
+         },
+         "20": {
+          "giamOn": 7.7,
+          "siSdrHon": -1.1,
+          "giuPhoHon": 0.2
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 1.8,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 0.5
+         },
+         "10": {
+          "giamOn": 9.8,
+          "siSdrHon": 2.2,
+          "giuPhoHon": 2.9
+         },
+         "20": {
+          "giamOn": 16.5,
+          "siSdrHon": -1.7,
+          "giuPhoHon": -1.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 2.3,
+          "siSdrHon": 1,
+          "giuPhoHon": 1.1
+         },
+         "10": {
+          "giamOn": 2.9,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 2
+         },
+         "20": {
+          "giamOn": 8.1,
+          "siSdrHon": -0.6,
+          "giuPhoHon": 0.2
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 15.7,
+       "giamOnItNhat": 6.2,
+       "siSdrHon0": 2.5,
+       "siSdrHon10": 2.1,
+       "siSdrHon20": -0.8,
+       "siSdrHon20XauNhat": -2.6,
+       "giuPhoHon0": 2.7,
+       "giuPhoHon10": 2.4,
+       "giuPhoHon20": 0.2,
+       "giuPhoHon20XauNhat": -1.5,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 18.4,
+          "siSdrHon": 3.6,
+          "giuPhoHon": 3.9
+         },
+         "10": {
+          "giamOn": 12.8,
+          "siSdrHon": 2.4,
+          "giuPhoHon": 2.9
+         },
+         "20": {
+          "giamOn": 19.3,
+          "siSdrHon": -2.6,
+          "giuPhoHon": -1.5
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 24.1,
+          "siSdrHon": 2.2,
+          "giuPhoHon": 2.3
+         },
+         "10": {
+          "giamOn": 19.1,
+          "siSdrHon": 2.2,
+          "giuPhoHon": 2.5
+         },
+         "20": {
+          "giamOn": 18.1,
+          "siSdrHon": 0.2,
+          "giuPhoHon": 1.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 6.2,
+          "siSdrHon": 1.7,
+          "giuPhoHon": 1.7
+         },
+         "10": {
+          "giamOn": 8.1,
+          "siSdrHon": 1.7,
+          "giuPhoHon": 1.9
+         },
+         "20": {
+          "giamOn": 14.7,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 1
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 34.7,
+       "giamOnItNhat": 32.5,
+       "siSdrHon0": 7.5,
+       "siSdrHon10": 5.8,
+       "siSdrHon20": 0.4,
+       "siSdrHon20XauNhat": -0.9,
+       "giuPhoHon0": 7.7,
+       "giuPhoHon10": 6.6,
+       "giuPhoHon20": 1.3,
+       "giuPhoHon20XauNhat": -0.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 34.9,
+          "siSdrHon": 7.7,
+          "giuPhoHon": 7.9
+         },
+         "10": {
+          "giamOn": 33.2,
+          "siSdrHon": 6,
+          "giuPhoHon": 6.8
+         },
+         "20": {
+          "giamOn": 32.5,
+          "siSdrHon": -0.9,
+          "giuPhoHon": -0.1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 36.3,
+          "siSdrHon": 7.4,
+          "giuPhoHon": 7.9
+         },
+         "10": {
+          "giamOn": 35,
+          "siSdrHon": 5.6,
+          "giuPhoHon": 6.3
+         },
+         "20": {
+          "giamOn": 34.4,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 1.2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 35.3,
+          "siSdrHon": 7.3,
+          "giuPhoHon": 7.5
+         },
+         "10": {
+          "giamOn": 35.2,
+          "siSdrHon": 5.9,
+          "giuPhoHon": 6.6
+         },
+         "20": {
+          "giamOn": 35.3,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 2.7
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 8.5,
+       "giamOnItNhat": 3.2,
+       "siSdrHon0": 1.6,
+       "siSdrHon10": 2.9,
+       "siSdrHon20": -0.2,
+       "siSdrHon20XauNhat": -0.8,
+       "giuPhoHon0": 1.6,
+       "giuPhoHon10": 3.7,
+       "giuPhoHon20": 1,
+       "giuPhoHon20XauNhat": 0.5,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 3.9,
+          "siSdrHon": 2,
+          "giuPhoHon": 2
+         },
+         "10": {
+          "giamOn": 7.5,
+          "siSdrHon": 3,
+          "giuPhoHon": 3.8
+         },
+         "20": {
+          "giamOn": 8.2,
+          "siSdrHon": -0.8,
+          "giuPhoHon": 0.5
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 4.7,
+          "siSdrHon": 1.1,
+          "giuPhoHon": 1.1
+         },
+         "10": {
+          "giamOn": 18.8,
+          "siSdrHon": 3.1,
+          "giuPhoHon": 4.2
+         },
+         "20": {
+          "giamOn": 19.2,
+          "siSdrHon": 0.3,
+          "giuPhoHon": 1.6
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 3.2,
+          "siSdrHon": 1.5,
+          "giuPhoHon": 1.5
+         },
+         "10": {
+          "giamOn": 4.6,
+          "siSdrHon": 2.6,
+          "giuPhoHon": 3.2
+         },
+         "20": {
+          "giamOn": 6.1,
+          "siSdrHon": -0.2,
+          "giuPhoHon": 0.8
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 35.4,
+       "giamOnItNhat": 32.6,
+       "siSdrHon0": 4.9,
+       "siSdrHon10": 3.1,
+       "siSdrHon20": -0.8,
+       "siSdrHon20XauNhat": -1.4,
+       "giuPhoHon0": 5.1,
+       "giuPhoHon10": 3.8,
+       "giuPhoHon20": 0,
+       "giuPhoHon20XauNhat": -0.7,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 37,
+          "siSdrHon": 5.4,
+          "giuPhoHon": 5.5
+         },
+         "10": {
+          "giamOn": 36.6,
+          "siSdrHon": 3.6,
+          "giuPhoHon": 4.2
+         },
+         "20": {
+          "giamOn": 35.6,
+          "siSdrHon": -1.4,
+          "giuPhoHon": -0.6
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 37.1,
+          "siSdrHon": 3.7,
+          "giuPhoHon": 3.8
+         },
+         "10": {
+          "giamOn": 35.4,
+          "siSdrHon": 2.6,
+          "giuPhoHon": 3.3
+         },
+         "20": {
+          "giamOn": 33.1,
+          "siSdrHon": -1.2,
+          "giuPhoHon": -0.7
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 32.6,
+          "siSdrHon": 5.6,
+          "giuPhoHon": 5.9
+         },
+         "10": {
+          "giamOn": 35.5,
+          "siSdrHon": 3.3,
+          "giuPhoHon": 3.9
+         },
+         "20": {
+          "giamOn": 35.6,
+          "siSdrHon": 0.3,
+          "giuPhoHon": 1.3
+         }
+        }
+       }
+      }
+     }
+    },
+    "tongHop": {
+     "sach": {
+      "giọng nam (tổng hợp)": {
+       "siSdr": 18.7,
+       "giuPho": 25.7,
+       "den3dBHz": 20000,
+       "treMs": 10
+      },
+      "giọng nữ / trẻ (tổng hợp)": {
+       "siSdr": 16,
+       "giuPho": 17.4,
+       "den3dBHz": 15793,
+       "treMs": 10
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 28.2,
+       "giamOnItNhat": 25.2,
+       "siSdrHon0": 4.4,
+       "siSdrHon10": 4.5,
+       "siSdrHon20": 1.7,
+       "siSdrHon20XauNhat": 0.3,
+       "giuPhoHon0": 4.6,
+       "giuPhoHon10": 5.5,
+       "giuPhoHon20": 3.6,
+       "giuPhoHon20XauNhat": 2.7,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 25.2,
+          "siSdrHon": 4.1,
+          "giuPhoHon": 4.3
+         },
+         "10": {
+          "giamOn": 26.7,
+          "siSdrHon": 4,
+          "giuPhoHon": 5.1
+         },
+         "20": {
+          "giamOn": 28.6,
+          "siSdrHon": 0.3,
+          "giuPhoHon": 2.7
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 26.7,
+          "siSdrHon": 4.7,
+          "giuPhoHon": 4.9
+         },
+         "10": {
+          "giamOn": 31.4,
+          "siSdrHon": 5,
+          "giuPhoHon": 5.8
+         },
+         "20": {
+          "giamOn": 30.7,
+          "siSdrHon": 3,
+          "giuPhoHon": 4.5
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 7.6,
+       "giamOnItNhat": 1.7,
+       "siSdrHon0": 0.8,
+       "siSdrHon10": 1.2,
+       "siSdrHon20": -2.4,
+       "siSdrHon20XauNhat": -4.7,
+       "giuPhoHon0": 0.8,
+       "giuPhoHon10": 1.8,
+       "giuPhoHon20": -1.7,
+       "giuPhoHon20XauNhat": -4.3,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 3,
+          "siSdrHon": 0.7,
+          "giuPhoHon": 0.7
+         },
+         "10": {
+          "giamOn": 6.8,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.8
+         },
+         "20": {
+          "giamOn": 14.7,
+          "siSdrHon": -4.7,
+          "giuPhoHon": -4.3
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 1.7,
+          "siSdrHon": 0.9,
+          "giuPhoHon": 0.9
+         },
+         "10": {
+          "giamOn": 5.2,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.7
+         },
+         "20": {
+          "giamOn": 14.5,
+          "siSdrHon": -0.1,
+          "giuPhoHon": 1
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 7.8,
+       "giamOnItNhat": 4.4,
+       "siSdrHon0": 1.4,
+       "siSdrHon10": 1.1,
+       "siSdrHon20": -1,
+       "siSdrHon20XauNhat": -2.2,
+       "giuPhoHon0": 1.5,
+       "giuPhoHon10": 1.5,
+       "giuPhoHon20": 0.3,
+       "giuPhoHon20XauNhat": -0.8,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 7.6,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.5
+         },
+         "10": {
+          "giamOn": 8.2,
+          "siSdrHon": 1.1,
+          "giuPhoHon": 1.5
+         },
+         "20": {
+          "giamOn": 15.7,
+          "siSdrHon": -2.2,
+          "giuPhoHon": -0.8
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 4.4,
+          "siSdrHon": 1.4,
+          "giuPhoHon": 1.4
+         },
+         "10": {
+          "giamOn": 4.8,
+          "siSdrHon": 1.2,
+          "giuPhoHon": 1.4
+         },
+         "20": {
+          "giamOn": 6.2,
+          "siSdrHon": 0.3,
+          "giuPhoHon": 1.4
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 24.7,
+       "giamOnItNhat": 9.1,
+       "siSdrHon0": 7,
+       "siSdrHon10": 6.1,
+       "siSdrHon20": 1.4,
+       "siSdrHon20XauNhat": -0.9,
+       "giuPhoHon0": 7.2,
+       "giuPhoHon10": 7,
+       "giuPhoHon20": 2.6,
+       "giuPhoHon20XauNhat": 0,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 9.1,
+          "siSdrHon": 6.1,
+          "giuPhoHon": 6.4
+         },
+         "10": {
+          "giamOn": 24.4,
+          "siSdrHon": 4.9,
+          "giuPhoHon": 6.1
+         },
+         "20": {
+          "giamOn": 27,
+          "siSdrHon": -0.9,
+          "giuPhoHon": 0
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 29.7,
+          "siSdrHon": 7.9,
+          "giuPhoHon": 8.1
+         },
+         "10": {
+          "giamOn": 27.2,
+          "siSdrHon": 7.3,
+          "giuPhoHon": 8
+         },
+         "20": {
+          "giamOn": 30.7,
+          "siSdrHon": 3.7,
+          "giuPhoHon": 5.2
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 9.7,
+       "giamOnItNhat": 3.7,
+       "siSdrHon0": 2,
+       "siSdrHon10": 2.8,
+       "siSdrHon20": 1.2,
+       "siSdrHon20XauNhat": 0.1,
+       "giuPhoHon0": 2,
+       "giuPhoHon10": 3.6,
+       "giuPhoHon20": 3.5,
+       "giuPhoHon20XauNhat": 3.2,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 3.7,
+          "siSdrHon": 2,
+          "giuPhoHon": 2
+         },
+         "10": {
+          "giamOn": 7,
+          "siSdrHon": 2.7,
+          "giuPhoHon": 3.7
+         },
+         "20": {
+          "giamOn": 15.8,
+          "siSdrHon": 0.1,
+          "giuPhoHon": 3.2
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 4.3,
+          "siSdrHon": 2,
+          "giuPhoHon": 2
+         },
+         "10": {
+          "giamOn": 10.4,
+          "siSdrHon": 2.8,
+          "giuPhoHon": 3.4
+         },
+         "20": {
+          "giamOn": 17.3,
+          "siSdrHon": 2.3,
+          "giuPhoHon": 3.8
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 15.5,
+       "giamOnItNhat": 4.2,
+       "siSdrHon0": 4.1,
+       "siSdrHon10": 3.4,
+       "siSdrHon20": 0.5,
+       "siSdrHon20XauNhat": -2,
+       "giuPhoHon0": 4.3,
+       "giuPhoHon10": 4.1,
+       "giuPhoHon20": 2,
+       "giuPhoHon20XauNhat": -1.1,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 6,
+          "siSdrHon": 3.4,
+          "giuPhoHon": 3.6
+         },
+         "10": {
+          "giamOn": 4.2,
+          "siSdrHon": 1.8,
+          "giuPhoHon": 2.4
+         },
+         "20": {
+          "giamOn": 29.5,
+          "siSdrHon": -2,
+          "giuPhoHon": -1.1
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 10.5,
+          "siSdrHon": 4.9,
+          "giuPhoHon": 5
+         },
+         "10": {
+          "giamOn": 16.1,
+          "siSdrHon": 5,
+          "giuPhoHon": 5.9
+         },
+         "20": {
+          "giamOn": 26.9,
+          "siSdrHon": 3,
+          "giuPhoHon": 5
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 10,
+   "msMoiKhung": 0.157,
+   "ms95": null,
+   "heSoThoiGianThuc": 0.016
+  },
+  {
+   "ten": "DeepFilterNet 3 thô (không cổng)",
+   "kb": 11678,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 41.8,
+       "giuPho": 42.9,
+       "den3dBHz": 20000,
+       "treMs": 30
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": 19.3,
+       "giuPho": 19.5,
+       "den3dBHz": 20000,
+       "treMs": 30
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": 42.6,
+       "giuPho": 43.8,
+       "den3dBHz": 20000,
+       "treMs": 30
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 26.3,
+       "giamOnItNhat": 18.7,
+       "siSdrHon0": 13.1,
+       "siSdrHon10": 9.4,
+       "siSdrHon20": 5.9,
+       "siSdrHon20XauNhat": 4.8,
+       "giuPhoHon0": 13.4,
+       "giuPhoHon10": 10.1,
+       "giuPhoHon20": 6,
+       "giuPhoHon20XauNhat": 4.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 36,
+          "siSdrHon": 13.5,
+          "giuPhoHon": 13.9
+         },
+         "10": {
+          "giamOn": 27.9,
+          "siSdrHon": 10.2,
+          "giuPhoHon": 11
+         },
+         "20": {
+          "giamOn": 20.4,
+          "siSdrHon": 6.7,
+          "giuPhoHon": 7.2
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 29.9,
+          "siSdrHon": 13.1,
+          "giuPhoHon": 13.3
+         },
+         "10": {
+          "giamOn": 32,
+          "siSdrHon": 9.3,
+          "giuPhoHon": 9.5
+         },
+         "20": {
+          "giamOn": 25.7,
+          "siSdrHon": 4.8,
+          "giuPhoHon": 4.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 25.4,
+          "siSdrHon": 12.8,
+          "giuPhoHon": 13
+         },
+         "10": {
+          "giamOn": 20.6,
+          "siSdrHon": 8.9,
+          "giuPhoHon": 9.7
+         },
+         "20": {
+          "giamOn": 18.7,
+          "siSdrHon": 6.3,
+          "giuPhoHon": 6.6
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 24.5,
+       "giamOnItNhat": 14.1,
+       "siSdrHon0": 4.2,
+       "siSdrHon10": 5.5,
+       "siSdrHon20": 3.6,
+       "siSdrHon20XauNhat": 2.7,
+       "giuPhoHon0": 3.6,
+       "giuPhoHon10": 6,
+       "giuPhoHon20": 4.4,
+       "giuPhoHon20XauNhat": 3.1,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 15.4,
+          "siSdrHon": 4.7,
+          "giuPhoHon": 4.2
+         },
+         "10": {
+          "giamOn": 14.6,
+          "siSdrHon": 7.5,
+          "giuPhoHon": 8.6
+         },
+         "20": {
+          "giamOn": 24.8,
+          "siSdrHon": 4.9,
+          "giuPhoHon": 6.1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 22.7,
+          "siSdrHon": 3.2,
+          "giuPhoHon": 2.7
+         },
+         "10": {
+          "giamOn": 31.1,
+          "siSdrHon": 6.1,
+          "giuPhoHon": 6.8
+         },
+         "20": {
+          "giamOn": 41.6,
+          "siSdrHon": 3.3,
+          "giuPhoHon": 3.9
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 20.5,
+          "siSdrHon": 4.5,
+          "giuPhoHon": 3.9
+         },
+         "10": {
+          "giamOn": 14.1,
+          "siSdrHon": 2.8,
+          "giuPhoHon": 2.5
+         },
+         "20": {
+          "giamOn": 35.6,
+          "siSdrHon": 2.7,
+          "giuPhoHon": 3.1
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 48.2,
+       "giamOnItNhat": 33.6,
+       "siSdrHon0": 21.9,
+       "siSdrHon10": 14.2,
+       "siSdrHon20": 6.8,
+       "siSdrHon20XauNhat": 3.5,
+       "giuPhoHon0": 23.6,
+       "giuPhoHon10": 15.1,
+       "giuPhoHon20": 7.5,
+       "giuPhoHon20XauNhat": 3.4,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 56.8,
+          "siSdrHon": 22.5,
+          "giuPhoHon": 24.6
+         },
+         "10": {
+          "giamOn": 56.2,
+          "siSdrHon": 14.4,
+          "giuPhoHon": 15.8
+         },
+         "20": {
+          "giamOn": 48.6,
+          "siSdrHon": 7.7,
+          "giuPhoHon": 8.8
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 49.2,
+          "siSdrHon": 21.1,
+          "giuPhoHon": 22
+         },
+         "10": {
+          "giamOn": 51.3,
+          "siSdrHon": 12.9,
+          "giuPhoHon": 13.2
+         },
+         "20": {
+          "giamOn": 45.4,
+          "siSdrHon": 3.5,
+          "giuPhoHon": 3.4
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 46.4,
+          "siSdrHon": 22,
+          "giuPhoHon": 24.1
+         },
+         "10": {
+          "giamOn": 46.7,
+          "siSdrHon": 15.3,
+          "giuPhoHon": 16.4
+         },
+         "20": {
+          "giamOn": 33.6,
+          "siSdrHon": 9.3,
+          "giuPhoHon": 10.3
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 34.7,
+       "giamOnItNhat": 22.4,
+       "siSdrHon0": 14.5,
+       "siSdrHon10": 11.8,
+       "siSdrHon20": 8.5,
+       "siSdrHon20XauNhat": 8.1,
+       "giuPhoHon0": 15,
+       "giuPhoHon10": 12.7,
+       "giuPhoHon20": 9.1,
+       "giuPhoHon20XauNhat": 8.6,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 26.2,
+          "siSdrHon": 14.9,
+          "giuPhoHon": 15.3
+         },
+         "10": {
+          "giamOn": 24.5,
+          "siSdrHon": 11.7,
+          "giuPhoHon": 12.4
+         },
+         "20": {
+          "giamOn": 22.4,
+          "siSdrHon": 8.9,
+          "giuPhoHon": 9.8
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 50.1,
+          "siSdrHon": 14.7,
+          "giuPhoHon": 15.5
+         },
+         "10": {
+          "giamOn": 47.1,
+          "siSdrHon": 11.9,
+          "giuPhoHon": 12.8
+         },
+         "20": {
+          "giamOn": 32,
+          "siSdrHon": 8.1,
+          "giuPhoHon": 8.6
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 38.2,
+          "siSdrHon": 14,
+          "giuPhoHon": 14.3
+         },
+         "10": {
+          "giamOn": 37.1,
+          "siSdrHon": 11.7,
+          "giuPhoHon": 12.8
+         },
+         "20": {
+          "giamOn": 35,
+          "siSdrHon": 8.4,
+          "giuPhoHon": 9
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 18.6,
+       "giamOnItNhat": 14.7,
+       "siSdrHon0": 2.4,
+       "siSdrHon10": 2.4,
+       "siSdrHon20": 0.8,
+       "siSdrHon20XauNhat": -2.8,
+       "giuPhoHon0": 1.8,
+       "giuPhoHon10": 2.2,
+       "giuPhoHon20": 0.7,
+       "giuPhoHon20XauNhat": -3.8,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 14.7,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 0.1
+         },
+         "10": {
+          "giamOn": 16.8,
+          "siSdrHon": 5.5,
+          "giuPhoHon": 5.9
+         },
+         "20": {
+          "giamOn": 16.6,
+          "siSdrHon": 3.9,
+          "giuPhoHon": 4.6
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 19.6,
+          "siSdrHon": 5.8,
+          "giuPhoHon": 5.3
+         },
+         "10": {
+          "giamOn": 16.3,
+          "siSdrHon": 2.5,
+          "giuPhoHon": 2.1
+         },
+         "20": {
+          "giamOn": 32,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 16,
+          "siSdrHon": 0.9,
+          "giuPhoHon": 0.1
+         },
+         "10": {
+          "giamOn": 17.2,
+          "siSdrHon": -0.6,
+          "giuPhoHon": -1.4
+         },
+         "20": {
+          "giamOn": 18.4,
+          "siSdrHon": -2.8,
+          "giuPhoHon": -3.8
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 32.8,
+       "giamOnItNhat": 21,
+       "siSdrHon0": 12.4,
+       "siSdrHon10": 9.1,
+       "siSdrHon20": 3.9,
+       "siSdrHon20XauNhat": 3.1,
+       "giuPhoHon0": 12.6,
+       "giuPhoHon10": 9.6,
+       "giuPhoHon20": 4.3,
+       "giuPhoHon20XauNhat": 3.3,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 31.3,
+          "siSdrHon": 13.4,
+          "giuPhoHon": 13.5
+         },
+         "10": {
+          "giamOn": 27.9,
+          "siSdrHon": 10,
+          "giuPhoHon": 10.7
+         },
+         "20": {
+          "giamOn": 28.1,
+          "siSdrHon": 5.4,
+          "giuPhoHon": 6.1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 43.9,
+          "siSdrHon": 12.1,
+          "giuPhoHon": 12.3
+         },
+         "10": {
+          "giamOn": 36.8,
+          "siSdrHon": 9.1,
+          "giuPhoHon": 9.5
+         },
+         "20": {
+          "giamOn": 27.5,
+          "siSdrHon": 3.3,
+          "giuPhoHon": 3.3
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 43.8,
+          "siSdrHon": 11.7,
+          "giuPhoHon": 12
+         },
+         "10": {
+          "giamOn": 35.1,
+          "siSdrHon": 8.2,
+          "giuPhoHon": 8.7
+         },
+         "20": {
+          "giamOn": 21,
+          "siSdrHon": 3.1,
+          "giuPhoHon": 3.6
+         }
+        }
+       }
+      }
+     }
+    },
+    "tongHop": {
+     "sach": {
+      "giọng nam (tổng hợp)": {
+       "siSdr": -3.4,
+       "giuPho": -3.3,
+       "den3dBHz": 0,
+       "treMs": 30
+      },
+      "giọng nữ / trẻ (tổng hợp)": {
+       "siSdr": -0.1,
+       "giuPho": 0,
+       "den3dBHz": 651,
+       "treMs": 30
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 26.2,
+       "giamOnItNhat": 19.3,
+       "siSdrHon0": 12.4,
+       "siSdrHon10": 9.9,
+       "siSdrHon20": -8.4,
+       "siSdrHon20XauNhat": -15.4,
+       "giuPhoHon0": 12.2,
+       "giuPhoHon10": 10.3,
+       "giuPhoHon20": -10.1,
+       "giuPhoHon20XauNhat": -17.5,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 31.8,
+          "siSdrHon": 12.3,
+          "giuPhoHon": 11.6
+         },
+         "10": {
+          "giamOn": 22.3,
+          "siSdrHon": 9.3,
+          "giuPhoHon": 9.6
+         },
+         "20": {
+          "giamOn": 25.9,
+          "siSdrHon": -15.4,
+          "giuPhoHon": -17.5
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 19.3,
+          "siSdrHon": 12.5,
+          "giuPhoHon": 12.9
+         },
+         "10": {
+          "giamOn": 24,
+          "siSdrHon": 10.4,
+          "giuPhoHon": 11
+         },
+         "20": {
+          "giamOn": 33.7,
+          "siSdrHon": -1.3,
+          "giuPhoHon": -2.6
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 27.8,
+       "giamOnItNhat": 16.6,
+       "siSdrHon0": -2.4,
+       "siSdrHon10": -5.3,
+       "siSdrHon20": -13.4,
+       "siSdrHon20XauNhat": -17.6,
+       "giuPhoHon0": -2.5,
+       "giuPhoHon10": -6.2,
+       "giuPhoHon20": -14.4,
+       "giuPhoHon20XauNhat": -18.7,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 32.1,
+          "siSdrHon": 2.5,
+          "giuPhoHon": 1.7
+         },
+         "10": {
+          "giamOn": 38.7,
+          "siSdrHon": -5.8,
+          "giuPhoHon": -6.8
+         },
+         "20": {
+          "giamOn": 36.1,
+          "siSdrHon": -17.6,
+          "giuPhoHon": -18.7
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 18.8,
+          "siSdrHon": -7.2,
+          "giuPhoHon": -6.6
+         },
+         "10": {
+          "giamOn": 16.6,
+          "siSdrHon": -4.8,
+          "giuPhoHon": -5.6
+         },
+         "20": {
+          "giamOn": 24.5,
+          "siSdrHon": -9.2,
+          "giuPhoHon": -10.1
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 59.7,
+       "giamOnItNhat": 58.3,
+       "siSdrHon0": 8.1,
+       "siSdrHon10": -3.5,
+       "siSdrHon20": -15.7,
+       "siSdrHon20XauNhat": -17.7,
+       "giuPhoHon0": 7.8,
+       "giuPhoHon10": -3.8,
+       "giuPhoHon20": -16.4,
+       "giuPhoHon20XauNhat": -18.3,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 58.3,
+          "siSdrHon": 5.7,
+          "giuPhoHon": 5.5
+         },
+         "10": {
+          "giamOn": 59.3,
+          "siSdrHon": -5.9,
+          "giuPhoHon": -6.2
+         },
+         "20": {
+          "giamOn": 59,
+          "siSdrHon": -17.7,
+          "giuPhoHon": -18.3
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 59.2,
+          "siSdrHon": 10.4,
+          "giuPhoHon": 10.1
+         },
+         "10": {
+          "giamOn": 61.7,
+          "siSdrHon": -1.1,
+          "giuPhoHon": -1.5
+         },
+         "20": {
+          "giamOn": 60.8,
+          "siSdrHon": -13.8,
+          "giuPhoHon": -14.5
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 23.7,
+       "giamOnItNhat": 13.2,
+       "siSdrHon0": 4.7,
+       "siSdrHon10": -5.2,
+       "siSdrHon20": -15.1,
+       "siSdrHon20XauNhat": -21.6,
+       "giuPhoHon0": 3.2,
+       "giuPhoHon10": -6.5,
+       "giuPhoHon20": -16.6,
+       "giuPhoHon20XauNhat": -23.3,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 13.2,
+          "siSdrHon": 2.4,
+          "giuPhoHon": 0.4
+         },
+         "10": {
+          "giamOn": 28.3,
+          "siSdrHon": -10.3,
+          "giuPhoHon": -11.9
+         },
+         "20": {
+          "giamOn": 32.1,
+          "siSdrHon": -21.6,
+          "giuPhoHon": -23.3
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 25.6,
+          "siSdrHon": 6.9,
+          "giuPhoHon": 5.9
+         },
+         "10": {
+          "giamOn": 20.8,
+          "siSdrHon": -0.1,
+          "giuPhoHon": -1
+         },
+         "20": {
+          "giamOn": 22.1,
+          "siSdrHon": -8.7,
+          "giuPhoHon": -9.8
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 17.7,
+       "giamOnItNhat": 14.2,
+       "siSdrHon0": -10,
+       "siSdrHon10": -14.9,
+       "siSdrHon20": -22.1,
+       "siSdrHon20XauNhat": -22.6,
+       "giuPhoHon0": -9.2,
+       "giuPhoHon10": -15.1,
+       "giuPhoHon20": -23,
+       "giuPhoHon20XauNhat": -23.4,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 14.2,
+          "siSdrHon": -9.3,
+          "giuPhoHon": -9
+         },
+         "10": {
+          "giamOn": 14.8,
+          "siSdrHon": -11.5,
+          "giuPhoHon": -12.3
+         },
+         "20": {
+          "giamOn": 27.8,
+          "siSdrHon": -21.6,
+          "giuPhoHon": -22.7
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 15.5,
+          "siSdrHon": -10.7,
+          "giuPhoHon": -9.5
+         },
+         "10": {
+          "giamOn": 16.8,
+          "siSdrHon": -18.2,
+          "giuPhoHon": -17.9
+         },
+         "20": {
+          "giamOn": 16.9,
+          "siSdrHon": -22.6,
+          "giuPhoHon": -23.4
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 29.4,
+       "giamOnItNhat": 23.3,
+       "siSdrHon0": 8.9,
+       "siSdrHon10": -4.4,
+       "siSdrHon20": -16.3,
+       "siSdrHon20XauNhat": -22.6,
+       "giuPhoHon0": 8.3,
+       "giuPhoHon10": -5.2,
+       "giuPhoHon20": -17.2,
+       "giuPhoHon20XauNhat": -23.8,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 32.9,
+          "siSdrHon": 6.4,
+          "giuPhoHon": 5
+         },
+         "10": {
+          "giamOn": 29.9,
+          "siSdrHon": -10.3,
+          "giuPhoHon": -11.4
+         },
+         "20": {
+          "giamOn": 28.1,
+          "siSdrHon": -22.6,
+          "giuPhoHon": -23.8
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 30.3,
+          "siSdrHon": 11.4,
+          "giuPhoHon": 11.5
+         },
+         "10": {
+          "giamOn": 31.7,
+          "siSdrHon": 1.6,
+          "giuPhoHon": 1.1
+         },
+         "20": {
+          "giamOn": 23.3,
+          "siSdrHon": -10,
+          "giuPhoHon": -10.7
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 30,
+   "msMoiKhung": 1.077,
+   "ms95": 1.39,
+   "heSoThoiGianThuc": 0.108
+  },
+  {
+   "ten": "DeepFilterNet 3 «Vừa» (lượt 3)",
+   "kb": 11678,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 37.3,
+       "giuPho": 37.7,
+       "den3dBHz": 20000,
+       "treMs": 30
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": 20.4,
+       "giuPho": 20.5,
+       "den3dBHz": 20000,
+       "treMs": 30
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": 41.5,
+       "giuPho": 42.3,
+       "den3dBHz": 20000,
+       "treMs": 30
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 21.4,
+       "giamOnItNhat": 16.5,
+       "siSdrHon0": 12,
+       "siSdrHon10": 9.1,
+       "siSdrHon20": 5.9,
+       "siSdrHon20XauNhat": 5.1,
+       "giuPhoHon0": 12.7,
+       "giuPhoHon10": 10,
+       "giuPhoHon20": 6.2,
+       "giuPhoHon20XauNhat": 4.7,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 22.5,
+          "siSdrHon": 12.5,
+          "giuPhoHon": 13.2
+         },
+         "10": {
+          "giamOn": 21,
+          "siSdrHon": 9.8,
+          "giuPhoHon": 10.8
+         },
+         "20": {
+          "giamOn": 17.9,
+          "siSdrHon": 6.5,
+          "giuPhoHon": 7.2
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 24.7,
+          "siSdrHon": 12,
+          "giuPhoHon": 12.8
+         },
+         "10": {
+          "giamOn": 26.3,
+          "siSdrHon": 9.1,
+          "giuPhoHon": 9.7
+         },
+         "20": {
+          "giamOn": 25.4,
+          "siSdrHon": 5.1,
+          "giuPhoHon": 4.7
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 19.6,
+          "siSdrHon": 11.6,
+          "giuPhoHon": 12.2
+         },
+         "10": {
+          "giamOn": 18.7,
+          "siSdrHon": 8.3,
+          "giuPhoHon": 9.4
+         },
+         "20": {
+          "giamOn": 16.5,
+          "siSdrHon": 6.1,
+          "giuPhoHon": 6.7
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 17.8,
+       "giamOnItNhat": 12.4,
+       "siSdrHon0": 4.6,
+       "siSdrHon10": 5.6,
+       "siSdrHon20": 3.7,
+       "siSdrHon20XauNhat": 2.8,
+       "giuPhoHon0": 4.4,
+       "giuPhoHon10": 6.3,
+       "giuPhoHon20": 4.6,
+       "giuPhoHon20XauNhat": 3.4,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 12.9,
+          "siSdrHon": 5.1,
+          "giuPhoHon": 4.9
+         },
+         "10": {
+          "giamOn": 13.5,
+          "siSdrHon": 7.3,
+          "giuPhoHon": 8.5
+         },
+         "20": {
+          "giamOn": 19.4,
+          "siSdrHon": 4.8,
+          "giuPhoHon": 6
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 16,
+          "siSdrHon": 4,
+          "giuPhoHon": 3.7
+         },
+         "10": {
+          "giamOn": 23.5,
+          "siSdrHon": 6.2,
+          "giuPhoHon": 7.2
+         },
+         "20": {
+          "giamOn": 27.1,
+          "siSdrHon": 3.5,
+          "giuPhoHon": 4.3
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 15.4,
+          "siSdrHon": 4.7,
+          "giuPhoHon": 4.5
+         },
+         "10": {
+          "giamOn": 12.4,
+          "siSdrHon": 3.3,
+          "giuPhoHon": 3.2
+         },
+         "20": {
+          "giamOn": 20.2,
+          "siSdrHon": 2.8,
+          "giuPhoHon": 3.4
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 24.6,
+       "giamOnItNhat": 21.5,
+       "siSdrHon0": 17.2,
+       "siSdrHon10": 13,
+       "siSdrHon20": 6.8,
+       "siSdrHon20XauNhat": 4.3,
+       "giuPhoHon0": 18,
+       "giuPhoHon10": 13.9,
+       "giuPhoHon20": 7.5,
+       "giuPhoHon20XauNhat": 4.2,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 23.7,
+          "siSdrHon": 17.7,
+          "giuPhoHon": 18.8
+         },
+         "10": {
+          "giamOn": 23,
+          "siSdrHon": 13.2,
+          "giuPhoHon": 14.6
+         },
+         "20": {
+          "giamOn": 25.8,
+          "siSdrHon": 7.5,
+          "giuPhoHon": 8.8
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 27.5,
+          "siSdrHon": 17,
+          "giuPhoHon": 17.8
+         },
+         "10": {
+          "giamOn": 25.6,
+          "siSdrHon": 12.4,
+          "giuPhoHon": 13.1
+         },
+         "20": {
+          "giamOn": 27.5,
+          "siSdrHon": 4.3,
+          "giuPhoHon": 4.2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 21.9,
+          "siSdrHon": 16.7,
+          "giuPhoHon": 17.5
+         },
+         "10": {
+          "giamOn": 21.5,
+          "siSdrHon": 13.2,
+          "giuPhoHon": 14.1
+         },
+         "20": {
+          "giamOn": 24.5,
+          "siSdrHon": 8.6,
+          "giuPhoHon": 9.6
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 23.1,
+       "giamOnItNhat": 18.9,
+       "siSdrHon0": 13.2,
+       "siSdrHon10": 11,
+       "siSdrHon20": 8.1,
+       "siSdrHon20XauNhat": 7.9,
+       "giuPhoHon0": 13.8,
+       "giuPhoHon10": 12.1,
+       "giuPhoHon20": 8.9,
+       "giuPhoHon20XauNhat": 8.6,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 21,
+          "siSdrHon": 13.5,
+          "giuPhoHon": 14.1
+         },
+         "10": {
+          "giamOn": 20.2,
+          "siSdrHon": 11,
+          "giuPhoHon": 11.9
+         },
+         "20": {
+          "giamOn": 18.9,
+          "siSdrHon": 8.4,
+          "giuPhoHon": 9.3
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 27.3,
+          "siSdrHon": 13.4,
+          "giuPhoHon": 14.2
+         },
+         "10": {
+          "giamOn": 27,
+          "siSdrHon": 11.2,
+          "giuPhoHon": 12.3
+         },
+         "20": {
+          "giamOn": 26.5,
+          "siSdrHon": 7.9,
+          "giuPhoHon": 8.6
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 22.5,
+          "siSdrHon": 12.6,
+          "giuPhoHon": 13.1
+         },
+         "10": {
+          "giamOn": 22.4,
+          "siSdrHon": 10.9,
+          "giuPhoHon": 12
+         },
+         "20": {
+          "giamOn": 22.1,
+          "siSdrHon": 8.1,
+          "giuPhoHon": 8.8
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 16,
+       "giamOnItNhat": 12.3,
+       "siSdrHon0": 3.3,
+       "siSdrHon10": 3.2,
+       "siSdrHon20": 1.4,
+       "siSdrHon20XauNhat": -1.9,
+       "giuPhoHon0": 3,
+       "giuPhoHon10": 3.1,
+       "giuPhoHon20": 1.4,
+       "giuPhoHon20XauNhat": -2.7,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 12.3,
+          "siSdrHon": 2,
+          "giuPhoHon": 1.6
+         },
+         "10": {
+          "giamOn": 14.9,
+          "siSdrHon": 5.8,
+          "giuPhoHon": 6.4
+         },
+         "20": {
+          "giamOn": 14.6,
+          "siSdrHon": 4.1,
+          "giuPhoHon": 4.9
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 14.4,
+          "siSdrHon": 5.9,
+          "giuPhoHon": 5.7
+         },
+         "10": {
+          "giamOn": 18.5,
+          "siSdrHon": 3.3,
+          "giuPhoHon": 3.1
+         },
+         "20": {
+          "giamOn": 26.4,
+          "siSdrHon": 2,
+          "giuPhoHon": 2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 12.6,
+          "siSdrHon": 2.1,
+          "giuPhoHon": 1.6
+         },
+         "10": {
+          "giamOn": 14.5,
+          "siSdrHon": 0.5,
+          "giuPhoHon": -0.2
+         },
+         "20": {
+          "giamOn": 15.6,
+          "siSdrHon": -1.9,
+          "giuPhoHon": -2.7
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 24.9,
+       "giamOnItNhat": 22.5,
+       "siSdrHon0": 11.5,
+       "siSdrHon10": 8.8,
+       "siSdrHon20": 3.9,
+       "siSdrHon20XauNhat": 2.9,
+       "giuPhoHon0": 12.1,
+       "giuPhoHon10": 9.7,
+       "giuPhoHon20": 4.3,
+       "giuPhoHon20XauNhat": 3.4,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 24.6,
+          "siSdrHon": 12.4,
+          "giuPhoHon": 13.1
+         },
+         "10": {
+          "giamOn": 24.1,
+          "siSdrHon": 9.6,
+          "giuPhoHon": 10.7
+         },
+         "20": {
+          "giamOn": 25.7,
+          "siSdrHon": 5.3,
+          "giuPhoHon": 6.1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 27.1,
+          "siSdrHon": 11.3,
+          "giuPhoHon": 12
+         },
+         "10": {
+          "giamOn": 26.6,
+          "siSdrHon": 8.9,
+          "giuPhoHon": 9.8
+         },
+         "20": {
+          "giamOn": 25.4,
+          "siSdrHon": 3.4,
+          "giuPhoHon": 3.5
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 24.3,
+          "siSdrHon": 10.8,
+          "giuPhoHon": 11.3
+         },
+         "10": {
+          "giamOn": 23.7,
+          "siSdrHon": 7.9,
+          "giuPhoHon": 8.6
+         },
+         "20": {
+          "giamOn": 22.5,
+          "siSdrHon": 2.9,
+          "giuPhoHon": 3.4
+         }
+        }
+       }
+      }
+     }
+    },
+    "tongHop": {
+     "sach": {
+      "giọng nam (tổng hợp)": {
+       "siSdr": 1.1,
+       "giuPho": 1.1,
+       "den3dBHz": 0,
+       "treMs": 30
+      },
+      "giọng nữ / trẻ (tổng hợp)": {
+       "siSdr": 2.7,
+       "giuPho": 2.7,
+       "den3dBHz": 651,
+       "treMs": 30
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 21.6,
+       "giamOnItNhat": 16.1,
+       "siSdrHon0": 11.2,
+       "siSdrHon10": 9.4,
+       "siSdrHon20": -6.8,
+       "siSdrHon20XauNhat": -13.3,
+       "giuPhoHon0": 11.7,
+       "giuPhoHon10": 10.3,
+       "giuPhoHon20": -8.5,
+       "giuPhoHon20XauNhat": -15.5,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 23,
+          "siSdrHon": 11.3,
+          "giuPhoHon": 11.4
+         },
+         "10": {
+          "giamOn": 21.5,
+          "siSdrHon": 9,
+          "giuPhoHon": 9.7
+         },
+         "20": {
+          "giamOn": 22.4,
+          "siSdrHon": -13.3,
+          "giuPhoHon": -15.5
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 16.1,
+          "siSdrHon": 11.1,
+          "giuPhoHon": 11.9
+         },
+         "10": {
+          "giamOn": 22.6,
+          "siSdrHon": 9.9,
+          "giuPhoHon": 10.9
+         },
+         "20": {
+          "giamOn": 24.3,
+          "siSdrHon": -0.3,
+          "giuPhoHon": -1.5
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 19.2,
+       "giamOnItNhat": 14.4,
+       "siSdrHon0": 0.5,
+       "siSdrHon10": -3.3,
+       "siSdrHon20": -11.1,
+       "siSdrHon20XauNhat": -14.6,
+       "giuPhoHon0": 0.4,
+       "giuPhoHon10": -4.1,
+       "giuPhoHon20": -12.2,
+       "giuPhoHon20XauNhat": -15.7,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 18.3,
+          "siSdrHon": 3.4,
+          "giuPhoHon": 3.1
+         },
+         "10": {
+          "giamOn": 21.1,
+          "siSdrHon": -3.7,
+          "giuPhoHon": -4.6
+         },
+         "20": {
+          "giamOn": 24.2,
+          "siSdrHon": -14.6,
+          "giuPhoHon": -15.7
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 14.4,
+          "siSdrHon": -2.4,
+          "giuPhoHon": -2.3
+         },
+         "10": {
+          "giamOn": 14.9,
+          "siSdrHon": -2.9,
+          "giuPhoHon": -3.6
+         },
+         "20": {
+          "giamOn": 22.4,
+          "siSdrHon": -7.7,
+          "giuPhoHon": -8.6
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 22.1,
+       "giamOnItNhat": 20.2,
+       "siSdrHon0": 8.6,
+       "siSdrHon10": -1.7,
+       "siSdrHon20": -13.3,
+       "siSdrHon20XauNhat": -14.7,
+       "giuPhoHon0": 8.5,
+       "giuPhoHon10": -2,
+       "giuPhoHon20": -14,
+       "giuPhoHon20XauNhat": -15.3,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 22.4,
+          "siSdrHon": 6.7,
+          "giuPhoHon": 6.6
+         },
+         "10": {
+          "giamOn": 22.6,
+          "siSdrHon": -3.6,
+          "giuPhoHon": -3.9
+         },
+         "20": {
+          "giamOn": 25,
+          "siSdrHon": -14.7,
+          "giuPhoHon": -15.3
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 20.2,
+          "siSdrHon": 10.5,
+          "giuPhoHon": 10.5
+         },
+         "10": {
+          "giamOn": 20.3,
+          "siSdrHon": 0.3,
+          "giuPhoHon": 0
+         },
+         "20": {
+          "giamOn": 22,
+          "siSdrHon": -12,
+          "giuPhoHon": -12.7
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 20.2,
+       "giamOnItNhat": 12.1,
+       "siSdrHon0": 5.6,
+       "siSdrHon10": -2.3,
+       "siSdrHon20": -11.8,
+       "siSdrHon20XauNhat": -16.3,
+       "giuPhoHon0": 4.5,
+       "giuPhoHon10": -3.5,
+       "giuPhoHon20": -13.2,
+       "giuPhoHon20XauNhat": -18.1,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 12.1,
+          "siSdrHon": 3.7,
+          "giuPhoHon": 2.1
+         },
+         "10": {
+          "giamOn": 22.4,
+          "siSdrHon": -5.8,
+          "giuPhoHon": -7.4
+         },
+         "20": {
+          "giamOn": 24,
+          "siSdrHon": -16.3,
+          "giuPhoHon": -18.1
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 21,
+          "siSdrHon": 7.6,
+          "giuPhoHon": 6.8
+         },
+         "10": {
+          "giamOn": 19,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 0.4
+         },
+         "20": {
+          "giamOn": 22.6,
+          "siSdrHon": -7.3,
+          "giuPhoHon": -8.4
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 15.2,
+       "giamOnItNhat": 11.7,
+       "siSdrHon0": -3.3,
+       "siSdrHon10": -6,
+       "siSdrHon20": -16.2,
+       "siSdrHon20XauNhat": -16.5,
+       "giuPhoHon0": -3.3,
+       "giuPhoHon10": -6.5,
+       "giuPhoHon20": -17.1,
+       "giuPhoHon20XauNhat": -17.4,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 11.7,
+          "siSdrHon": -3,
+          "giuPhoHon": -3.3
+         },
+         "10": {
+          "giamOn": 12.6,
+          "siSdrHon": -5.5,
+          "giuPhoHon": -6.3
+         },
+         "20": {
+          "giamOn": 23.1,
+          "siSdrHon": -15.8,
+          "giuPhoHon": -16.9
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 12.4,
+          "siSdrHon": -3.5,
+          "giuPhoHon": -3.4
+         },
+         "10": {
+          "giamOn": 13.8,
+          "siSdrHon": -6.4,
+          "giuPhoHon": -6.8
+         },
+         "20": {
+          "giamOn": 17.6,
+          "siSdrHon": -16.5,
+          "giuPhoHon": -17.4
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 21.6,
+       "giamOnItNhat": 19.4,
+       "siSdrHon0": 8.8,
+       "siSdrHon10": -1.9,
+       "siSdrHon20": -12.5,
+       "siSdrHon20XauNhat": -16.6,
+       "giuPhoHon0": 8.6,
+       "giuPhoHon10": -2.6,
+       "giuPhoHon20": -13.6,
+       "giuPhoHon20XauNhat": -18,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 19.4,
+          "siSdrHon": 6.9,
+          "giuPhoHon": 6.1
+         },
+         "10": {
+          "giamOn": 19.4,
+          "siSdrHon": -6.4,
+          "giuPhoHon": -7.6
+         },
+         "20": {
+          "giamOn": 24.2,
+          "siSdrHon": -16.6,
+          "giuPhoHon": -18
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 20.8,
+          "siSdrHon": 10.8,
+          "giuPhoHon": 11.1
+         },
+         "10": {
+          "giamOn": 22.2,
+          "siSdrHon": 2.7,
+          "giuPhoHon": 2.4
+         },
+         "20": {
+          "giamOn": 23.4,
+          "siSdrHon": -8.4,
+          "giuPhoHon": -9.2
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 30,
+   "msMoiKhung": 1.255,
+   "ms95": 1.39,
+   "heSoThoiGianThuc": 0.125
+  },
+  {
+   "ten": "DeepFilterNet 3 «Mạnh» (lượt 3)",
+   "kb": 11678,
+   "nhom": {
+    "that": {
+     "sach": {
+      "người thật, nam (thu 48 kHz)": {
+       "siSdr": 32.8,
+       "giuPho": 33.1,
+       "den3dBHz": 20000,
+       "treMs": 30
+      },
+      "người thật, nữ (gốc 22 kHz)": {
+       "siSdr": 19.3,
+       "giuPho": 19.4,
+       "den3dBHz": 20000,
+       "treMs": 30
+      },
+      "máy đọc tiếng Việt (gốc 16 kHz)": {
+       "siSdr": 38.1,
+       "giuPho": 38.7,
+       "den3dBHz": 20000,
+       "treMs": 30
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 36.1,
+       "giamOnItNhat": 19,
+       "siSdrHon0": 13.1,
+       "siSdrHon10": 9.4,
+       "siSdrHon20": 5.7,
+       "siSdrHon20XauNhat": 4.7,
+       "giuPhoHon0": 13.4,
+       "giuPhoHon10": 10,
+       "giuPhoHon20": 5.5,
+       "giuPhoHon20XauNhat": 3.9,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 39.9,
+          "siSdrHon": 13.5,
+          "giuPhoHon": 13.8
+         },
+         "10": {
+          "giamOn": 28.9,
+          "siSdrHon": 10.1,
+          "giuPhoHon": 10.7
+         },
+         "20": {
+          "giamOn": 21,
+          "siSdrHon": 6.2,
+          "giuPhoHon": 6.3
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 47.3,
+          "siSdrHon": 13.1,
+          "giuPhoHon": 13.4
+         },
+         "10": {
+          "giamOn": 57.7,
+          "siSdrHon": 9.2,
+          "giuPhoHon": 9.4
+         },
+         "20": {
+          "giamOn": 51.4,
+          "siSdrHon": 4.7,
+          "giuPhoHon": 3.9
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 33.9,
+          "siSdrHon": 12.8,
+          "giuPhoHon": 13
+         },
+         "10": {
+          "giamOn": 25.8,
+          "siSdrHon": 8.9,
+          "giuPhoHon": 9.7
+         },
+         "20": {
+          "giamOn": 19,
+          "siSdrHon": 6.1,
+          "giuPhoHon": 6.3
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 27.7,
+       "giamOnItNhat": 14.1,
+       "siSdrHon0": 4.2,
+       "siSdrHon10": 5.5,
+       "siSdrHon20": 3.4,
+       "siSdrHon20XauNhat": 2.6,
+       "giuPhoHon0": 3.6,
+       "giuPhoHon10": 5.9,
+       "giuPhoHon20": 4,
+       "giuPhoHon20XauNhat": 3,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 15.4,
+          "siSdrHon": 4.7,
+          "giuPhoHon": 4.2
+         },
+         "10": {
+          "giamOn": 14.6,
+          "siSdrHon": 7.4,
+          "giuPhoHon": 8.4
+         },
+         "20": {
+          "giamOn": 25,
+          "siSdrHon": 4.5,
+          "giuPhoHon": 5.4
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 22.7,
+          "siSdrHon": 3.2,
+          "giuPhoHon": 2.7
+         },
+         "10": {
+          "giamOn": 34.4,
+          "siSdrHon": 6.1,
+          "giuPhoHon": 6.8
+         },
+         "20": {
+          "giamOn": 65.8,
+          "siSdrHon": 3.3,
+          "giuPhoHon": 3.8
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 20.5,
+          "siSdrHon": 4.5,
+          "giuPhoHon": 4
+         },
+         "10": {
+          "giamOn": 14.1,
+          "siSdrHon": 2.8,
+          "giuPhoHon": 2.5
+         },
+         "20": {
+          "giamOn": 36.9,
+          "siSdrHon": 2.6,
+          "giuPhoHon": 3
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 60.1,
+       "giamOnItNhat": 39.2,
+       "siSdrHon0": 21.7,
+       "siSdrHon10": 14,
+       "siSdrHon20": 6.6,
+       "siSdrHon20XauNhat": 3.5,
+       "giuPhoHon0": 23.3,
+       "giuPhoHon10": 14.9,
+       "giuPhoHon20": 7.2,
+       "giuPhoHon20XauNhat": 3.3,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 68.8,
+          "siSdrHon": 22.2,
+          "giuPhoHon": 24.1
+         },
+         "10": {
+          "giamOn": 68.2,
+          "siSdrHon": 14.1,
+          "giuPhoHon": 15.4
+         },
+         "20": {
+          "giamOn": 61.4,
+          "siSdrHon": 7.2,
+          "giuPhoHon": 8.2
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 73.2,
+          "siSdrHon": 21,
+          "giuPhoHon": 21.8
+         },
+         "10": {
+          "giamOn": 64.4,
+          "siSdrHon": 12.8,
+          "giuPhoHon": 13.1
+         },
+         "20": {
+          "giamOn": 59.1,
+          "siSdrHon": 3.5,
+          "giuPhoHon": 3.3
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 53.4,
+          "siSdrHon": 21.9,
+          "giuPhoHon": 23.9
+         },
+         "10": {
+          "giamOn": 53.4,
+          "siSdrHon": 15.2,
+          "giuPhoHon": 16.3
+         },
+         "20": {
+          "giamOn": 39.2,
+          "siSdrHon": 9,
+          "giuPhoHon": 10
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 42.9,
+       "giamOnItNhat": 22.9,
+       "siSdrHon0": 14.5,
+       "siSdrHon10": 11.6,
+       "siSdrHon20": 8,
+       "siSdrHon20XauNhat": 7.8,
+       "giuPhoHon0": 14.9,
+       "giuPhoHon10": 12.4,
+       "giuPhoHon20": 8.4,
+       "giuPhoHon20XauNhat": 8.2,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 26.2,
+          "siSdrHon": 14.8,
+          "giuPhoHon": 15.1
+         },
+         "10": {
+          "giamOn": 24.5,
+          "siSdrHon": 11.5,
+          "giuPhoHon": 12
+         },
+         "20": {
+          "giamOn": 22.9,
+          "siSdrHon": 8.1,
+          "giuPhoHon": 8.4
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 75.9,
+          "siSdrHon": 14.7,
+          "giuPhoHon": 15.5
+         },
+         "10": {
+          "giamOn": 70.1,
+          "siSdrHon": 11.8,
+          "giuPhoHon": 12.7
+         },
+         "20": {
+          "giamOn": 53.5,
+          "siSdrHon": 7.8,
+          "giuPhoHon": 8.2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 38.4,
+          "siSdrHon": 14,
+          "giuPhoHon": 14.2
+         },
+         "10": {
+          "giamOn": 37.4,
+          "siSdrHon": 11.6,
+          "giuPhoHon": 12.6
+         },
+         "20": {
+          "giamOn": 37,
+          "siSdrHon": 8.1,
+          "giuPhoHon": 8.6
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 22.6,
+       "giamOnItNhat": 14.7,
+       "siSdrHon0": 2.4,
+       "siSdrHon10": 2.4,
+       "siSdrHon20": 0.7,
+       "siSdrHon20XauNhat": -2.9,
+       "giuPhoHon0": 1.8,
+       "giuPhoHon10": 2.2,
+       "giuPhoHon20": 0.5,
+       "giuPhoHon20XauNhat": -3.8,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 14.7,
+          "siSdrHon": 0.6,
+          "giuPhoHon": 0.1
+         },
+         "10": {
+          "giamOn": 16.9,
+          "siSdrHon": 5.4,
+          "giuPhoHon": 5.8
+         },
+         "20": {
+          "giamOn": 16.7,
+          "siSdrHon": 3.6,
+          "giuPhoHon": 4.1
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 19.7,
+          "siSdrHon": 5.8,
+          "giuPhoHon": 5.3
+         },
+         "10": {
+          "giamOn": 28.7,
+          "siSdrHon": 2.5,
+          "giuPhoHon": 2.1
+         },
+         "20": {
+          "giamOn": 53.7,
+          "siSdrHon": 1.3,
+          "giuPhoHon": 1.1
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 16,
+          "siSdrHon": 0.9,
+          "giuPhoHon": 0.1
+         },
+         "10": {
+          "giamOn": 18.5,
+          "siSdrHon": -0.6,
+          "giuPhoHon": -1.4
+         },
+         "20": {
+          "giamOn": 18.8,
+          "siSdrHon": -2.9,
+          "giuPhoHon": -3.8
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 47.2,
+       "giamOnItNhat": 32.3,
+       "siSdrHon0": 12.3,
+       "siSdrHon10": 9,
+       "siSdrHon20": 3.8,
+       "siSdrHon20XauNhat": 3,
+       "giuPhoHon0": 12.5,
+       "giuPhoHon10": 9.5,
+       "giuPhoHon20": 4.1,
+       "giuPhoHon20XauNhat": 3.2,
+       "theoGiong": {
+        "người thật, nam (thu 48 kHz)": {
+         "0": {
+          "giamOn": 32.3,
+          "siSdrHon": 13.3,
+          "giuPhoHon": 13.3
+         },
+         "10": {
+          "giamOn": 32.4,
+          "siSdrHon": 9.8,
+          "giuPhoHon": 10.5
+         },
+         "20": {
+          "giamOn": 47.3,
+          "siSdrHon": 5,
+          "giuPhoHon": 5.5
+         }
+        },
+        "người thật, nữ (gốc 22 kHz)": {
+         "0": {
+          "giamOn": 69.6,
+          "siSdrHon": 12,
+          "giuPhoHon": 12.2
+         },
+         "10": {
+          "giamOn": 60.8,
+          "siSdrHon": 9.1,
+          "giuPhoHon": 9.5
+         },
+         "20": {
+          "giamOn": 51.4,
+          "siSdrHon": 3.2,
+          "giuPhoHon": 3.2
+         }
+        },
+        "máy đọc tiếng Việt (gốc 16 kHz)": {
+         "0": {
+          "giamOn": 48,
+          "siSdrHon": 11.7,
+          "giuPhoHon": 11.9
+         },
+         "10": {
+          "giamOn": 45.6,
+          "siSdrHon": 8.2,
+          "giuPhoHon": 8.7
+         },
+         "20": {
+          "giamOn": 37.5,
+          "siSdrHon": 3,
+          "giuPhoHon": 3.5
+         }
+        }
+       }
+      }
+     }
+    },
+    "tongHop": {
+     "sach": {
+      "giọng nam (tổng hợp)": {
+       "siSdr": -3.4,
+       "giuPho": -3.3,
+       "den3dBHz": 0,
+       "treMs": 30
+      },
+      "giọng nữ / trẻ (tổng hợp)": {
+       "siSdr": -0.1,
+       "giuPho": 0,
+       "den3dBHz": 651,
+       "treMs": 30
+      }
+     },
+     "on": {
+      "quạt / điều hoà": {
+       "giamOn": 33.9,
+       "giamOnItNhat": 21.6,
+       "siSdrHon0": 12.5,
+       "siSdrHon10": 9.9,
+       "siSdrHon20": -8.4,
+       "siSdrHon20XauNhat": -15.4,
+       "giuPhoHon0": 12.3,
+       "giuPhoHon10": 10.3,
+       "giuPhoHon20": -10.1,
+       "giuPhoHon20XauNhat": -17.5,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 32.9,
+          "siSdrHon": 12.3,
+          "giuPhoHon": 11.6
+         },
+         "10": {
+          "giamOn": 33.3,
+          "siSdrHon": 9.4,
+          "giuPhoHon": 9.6
+         },
+         "20": {
+          "giamOn": 34.8,
+          "siSdrHon": -15.4,
+          "giuPhoHon": -17.5
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 21.6,
+          "siSdrHon": 12.6,
+          "giuPhoHon": 13
+         },
+         "10": {
+          "giamOn": 35.1,
+          "siSdrHon": 10.4,
+          "giuPhoHon": 11.1
+         },
+         "20": {
+          "giamOn": 45.6,
+          "siSdrHon": -1.3,
+          "giuPhoHon": -2.6
+         }
+        }
+       }
+      },
+      "xôn xao (tổng hợp)": {
+       "giamOn": 31,
+       "giamOnItNhat": 18.8,
+       "siSdrHon0": -2.4,
+       "siSdrHon10": -5.3,
+       "siSdrHon20": -13.4,
+       "siSdrHon20XauNhat": -17.6,
+       "giuPhoHon0": -2.5,
+       "giuPhoHon10": -6.2,
+       "giuPhoHon20": -14.4,
+       "giuPhoHon20XauNhat": -18.7,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 33.1,
+          "siSdrHon": 2.5,
+          "giuPhoHon": 1.7
+         },
+         "10": {
+          "giamOn": 42.3,
+          "siSdrHon": -5.8,
+          "giuPhoHon": -6.8
+         },
+         "20": {
+          "giamOn": 39.4,
+          "siSdrHon": -17.6,
+          "giuPhoHon": -18.7
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 18.8,
+          "siSdrHon": -7.2,
+          "giuPhoHon": -6.6
+         },
+         "10": {
+          "giamOn": 20.2,
+          "siSdrHon": -4.8,
+          "giuPhoHon": -5.5
+         },
+         "20": {
+          "giamOn": 32,
+          "siSdrHon": -9.2,
+          "giuPhoHon": -10.1
+         }
+        }
+       }
+      },
+      "gõ bút / bàn phím": {
+       "giamOn": 63,
+       "giamOnItNhat": 61.6,
+       "siSdrHon0": 8,
+       "siSdrHon10": -3.5,
+       "siSdrHon20": -15.7,
+       "siSdrHon20XauNhat": -17.7,
+       "giuPhoHon0": 7.8,
+       "giuPhoHon10": -3.8,
+       "giuPhoHon20": -16.4,
+       "giuPhoHon20XauNhat": -18.3,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 61.6,
+          "siSdrHon": 5.7,
+          "giuPhoHon": 5.5
+         },
+         "10": {
+          "giamOn": 63.4,
+          "siSdrHon": -5.9,
+          "giuPhoHon": -6.2
+         },
+         "20": {
+          "giamOn": 63.9,
+          "siSdrHon": -17.7,
+          "giuPhoHon": -18.3
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 61.8,
+          "siSdrHon": 10.4,
+          "giuPhoHon": 10.1
+         },
+         "10": {
+          "giamOn": 63.5,
+          "siSdrHon": -1.1,
+          "giuPhoHon": -1.5
+         },
+         "20": {
+          "giamOn": 63.6,
+          "siSdrHon": -13.8,
+          "giuPhoHon": -14.5
+         }
+        }
+       }
+      },
+      "xe ngoài đường": {
+       "giamOn": 29,
+       "giamOnItNhat": 13.3,
+       "siSdrHon0": 4.7,
+       "siSdrHon10": -5.2,
+       "siSdrHon20": -15.1,
+       "siSdrHon20XauNhat": -21.6,
+       "giuPhoHon0": 3.2,
+       "giuPhoHon10": -6.5,
+       "giuPhoHon20": -16.6,
+       "giuPhoHon20XauNhat": -23.3,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 13.3,
+          "siSdrHon": 2.4,
+          "giuPhoHon": 0.4
+         },
+         "10": {
+          "giamOn": 34.4,
+          "siSdrHon": -10.3,
+          "giuPhoHon": -11.9
+         },
+         "20": {
+          "giamOn": 39.9,
+          "siSdrHon": -21.6,
+          "giuPhoHon": -23.3
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 25.8,
+          "siSdrHon": 6.9,
+          "giuPhoHon": 5.9
+         },
+         "10": {
+          "giamOn": 21.9,
+          "siSdrHon": -0.1,
+          "giuPhoHon": -1
+         },
+         "20": {
+          "giamOn": 38.6,
+          "siSdrHon": -8.7,
+          "giuPhoHon": -9.8
+         }
+        }
+       }
+      },
+      "xôn xao THẬT (5 người, 8 lớp)": {
+       "giamOn": 20.1,
+       "giamOnItNhat": 14.2,
+       "siSdrHon0": -10,
+       "siSdrHon10": -14.8,
+       "siSdrHon20": -22.1,
+       "siSdrHon20XauNhat": -22.6,
+       "giuPhoHon0": -9.2,
+       "giuPhoHon10": -15.1,
+       "giuPhoHon20": -23,
+       "giuPhoHon20XauNhat": -23.4,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 14.2,
+          "siSdrHon": -9.3,
+          "giuPhoHon": -9
+         },
+         "10": {
+          "giamOn": 15.3,
+          "siSdrHon": -11.5,
+          "giuPhoHon": -12.3
+         },
+         "20": {
+          "giamOn": 33.2,
+          "siSdrHon": -21.6,
+          "giuPhoHon": -22.7
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 15.6,
+          "siSdrHon": -10.7,
+          "giuPhoHon": -9.5
+         },
+         "10": {
+          "giamOn": 17.7,
+          "siSdrHon": -18.2,
+          "giuPhoHon": -17.8
+         },
+         "20": {
+          "giamOn": 24.4,
+          "siSdrHon": -22.6,
+          "giuPhoHon": -23.4
+         }
+        }
+       }
+      },
+      "ồn thật (bản ghi freesound 2530)": {
+       "giamOn": 35.3,
+       "giamOnItNhat": 31.5,
+       "siSdrHon0": 8.9,
+       "siSdrHon10": -4.4,
+       "siSdrHon20": -16.3,
+       "siSdrHon20XauNhat": -22.5,
+       "giuPhoHon0": 8.3,
+       "giuPhoHon10": -5.2,
+       "giuPhoHon20": -17.2,
+       "giuPhoHon20XauNhat": -23.8,
+       "theoGiong": {
+        "giọng nam (tổng hợp)": {
+         "0": {
+          "giamOn": 33.8,
+          "siSdrHon": 6.4,
+          "giuPhoHon": 5
+         },
+         "10": {
+          "giamOn": 31.5,
+          "siSdrHon": -10.3,
+          "giuPhoHon": -11.4
+         },
+         "20": {
+          "giamOn": 40.7,
+          "siSdrHon": -22.5,
+          "giuPhoHon": -23.8
+         }
+        },
+        "giọng nữ / trẻ (tổng hợp)": {
+         "0": {
+          "giamOn": 31.5,
+          "siSdrHon": 11.4,
+          "giuPhoHon": 11.5
+         },
+         "10": {
+          "giamOn": 36.5,
+          "siSdrHon": 1.6,
+          "giuPhoHon": 1.1
+         },
+         "20": {
+          "giamOn": 38,
+          "siSdrHon": -10,
+          "giuPhoHon": -10.7
+         }
+        }
+       }
+      }
+     }
+    }
+   },
+   "treMs": 30,
+   "msMoiKhung": 1.217,
+   "ms95": 1.39,
+   "heSoThoiGianThuc": 0.122
+  }
+ ]
+}

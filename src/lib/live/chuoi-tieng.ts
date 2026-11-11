@@ -9,7 +9,7 @@
 // Số đo trước / sau: docs/do-live-1011.md mục 5.
 
 import URL_RNNOISE from './loc-on/rnnoise.wasm?url'
-import { baoChamDf3, coDf3, noiDf3 } from './loc-on/df3'
+import { baoChamDf3, coDf3, noiDf3, tinhDf3 } from './loc-on/df3'
 import { MA_LOC } from './loc-on/ma-loc'
 
 /** Bộ nén nâng mức của kiểu 'nen' (Web Audio tự bù mức theo đường cong nén). */
@@ -51,8 +51,19 @@ export interface ChuoiTieng {
   locOnBo?: 'df3' | 'rn'
   /** Trễ của khâu lọc ồn lúc này (ms): 10 = RNNoise · 30 = đã vào đường DeepFilterNet (kể cả khi đã lùi về RNNoise khớp trễ). */
   locOnTre?: number
+  /** Thời gian bộ lọc sâu xử lý một khung 10 ms (ms, trung bình trượt) — chia 10 ra hệ số thời gian thực. */
+  locOnMs?: number
 }
 
+/** Phần «lọc ồn» của chẩn đoán mic thầy: `locOnBo` = bộ ĐANG ra tiếng ('df3' = bộ lọc sâu DeepFilterNet 3 · 'rn' = bộ nhẹ RNNoise); `locOnTre` = trễ khâu
+ *  lọc lúc này (ms; 0 = không lọc); `df3` = tình trạng bộ lọc sâu ('khong' / 'tai' / 'san' / 'loi' / 'cham'), byte đã tải / tổng, ms mỗi khung 10 ms,
+ *  vì sao bỏ, thời gian tải + dựng. */
+export interface TomTatLocOn { locOnBo: 'df3' | 'rn'; locOnTre: number; df3: { tinh: string; da: number; tong: number; ms: number; vi?: string; msDung?: number } }
+/** `muc` = mức lọc đang dùng ('tat' khi chuỗi không chạy). Đọc chuỗi kiểu 'khung' đang sống của trang (mỗi lúc chỉ một). */
+export function tomTatLocOn(muc: MucLocOn): TomTatLocOn {
+  const d = tinhDf3(), k = chuoiSong, bat = !!k && muc !== 'tat'
+  return { locOnBo: bat ? k.locOnBo ?? 'rn' : 'rn', locOnTre: bat && k.locOn === 'chay' ? k.locOnTre ?? 10 : 0, df3: { tinh: d.tinh, da: d.da, tong: d.tong, ms: Math.round((k?.locOnMs || d.ms) * 100) / 100, vi: d.vi, msDung: d.msDung == null ? undefined : Math.round(d.msDung) } }
+}
 /** Mã của bộ xử lý (chạy trong luồng âm thanh; viết ES5 + lớp, không phụ thuộc gì). Mỗi khối 128 mẫu:
  *  · sàn ồn = mức thấp nhất gần đây (bám xuống nhanh, trôi lên ≈ 1 dB / giây);
  *  · khối là GIỌNG NÓI khi RMS > 4 × sàn ồn và > −56 dBFS ⇒ cập nhật mức giọng trung bình (≈ 0,5 giây) và cho hệ số nâng trôi về `dich / mức giọng`
@@ -99,7 +110,7 @@ registerProcessor('lam-ro-tieng', LamRoTieng);
 /** Mã Worker của kiểu 'khung': đọc từng khung tiếng (AudioData) của track mic, cộng các kênh về mono, lọc thông cao 80 Hz, nâng mức + chặn đỉnh (đúng thuật
  *  toán của LamRoTieng ở trên), ghi khung mới cùng mốc giờ. Một khung vào ⇒ một khung ra, không đệm. */
 export const MA_KHUNG = MA_LOC + `
-var c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null, cong = null, dfS = 0, dfHen = null;
+var c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null, cong = null, dfS = 0, dfHen = null, dfLo = 0, dfLoK = 0;
 /* Nâng mức + chặn đỉnh (đúng thuật toán của LamRoTieng) rồi đóng khung ra. */
 function sau(x, n, s, moc) {
   var i, e = 0, r, g0 = g, can, buoc, v, a, nha;
@@ -120,7 +131,7 @@ function sau(x, n, s, moc) {
     if (a * gl > c.tran) gl = c.tran / a; else gl += (1 - gl) * nha;
     x[i] = v * gl;
   }
-  if (++bao >= 100) { bao = 0; postMessage({ g: g }); }
+  if (++bao >= 100) { bao = 0; postMessage({ g: g, dm: dfMs }); }
   return new AudioData({ format: 'f32-planar', sampleRate: s, numberOfFrames: n, numberOfChannels: 1, timestamp: moc, data: x });
 }
 /* Khung DeepFilterNet trả về qua cổng: ghi số đo; đúng khung đang chờ ⇒ thả cho vòng đọc đi tiếp. */
@@ -129,9 +140,10 @@ function dfNhan(ev) {
   if (!d) return;
   if (d.loi) { if (dfOk) { dfOk = 0; postMessage({ df: 'loi' }); } }
   else if (typeof d.ms === 'number') dfDo(d.ms);
-  if (dfHen && d.s === dfHen.s) { h = dfHen; dfHen = null; clearTimeout(h.hen); h.xong(d.loi ? null : d.k || null); }
+  if (dfHen && d.s === dfHen.s) { h = dfHen; dfHen = null; clearTimeout(h.hen); if (++dfLoK > 3000) dfLo = 0; h.xong(d.loi ? null : d.k || null); }
 }
-/* Một khung vào ⇒ một khung ra (AudioData), hoặc một lời hứa khi phải chờ khung DeepFilterNet (quá 25 ms ⇒ bỏ bộ ấy, khung này lấy đường RNNoise). */
+/* Một khung vào ⇒ một khung ra (AudioData), hoặc một lời hứa khi phải chờ khung DeepFilterNet. Quá 25 ms ⇒ khung này lấy đường RNNoise (đã khớp trễ) rồi
+   trộn chéo trở lại; quá hạn 3 lần trong 30 giây ⇒ bỏ hẳn bộ ấy (báo cham). Một cú khựng lẻ của máy không làm mất bộ lọc sâu cả buổi. */
 function xuLy(f) {
   var n = f.numberOfFrames, kenh = f.numberOfChannels, s = f.sampleRate, moc = f.timestamp, x = new Float32Array(n), i, k, v, a, w, al, goc = null, gui, so;
   if (!tam || tam.length !== n) tam = new Float32Array(n);
@@ -147,7 +159,7 @@ function xuLy(f) {
         so = ++dfS; gui = goc.slice(0);
         try { cong.postMessage({ s: so, k: gui }, [gui.buffer]); } catch (err2) { dfOk = 0; postMessage({ df: 'loi' }); }
         if (dfCho()) return new Promise(function (xong) {
-          dfHen = { s: so, xong: xong, hen: setTimeout(function () { if (!dfHen || dfHen.s !== so) return; dfHen = null; if (dfOk) { dfOk = 0; postMessage({ df: 'cham', han: 1 }); } xong(null); }, 25) };
+          dfHen = { s: so, xong: xong, hen: setTimeout(function () { if (!dfHen || dfHen.s !== so) return; dfHen = null; dfLo += 1; dfLoK = 0; if (dfLo >= 3 && dfOk) { dfOk = 0; postMessage({ df: 'cham', han: 1 }); } xong(null); }, 25) };
         }).then(function (y) { buocDf(x, goc, y); return sau(x, n, s, moc); });
       }
       buocDf(x, goc, null);
@@ -175,6 +187,8 @@ onmessage = function (ev) {
 };
 `
 const daNap = new WeakMap<object, Promise<boolean>>()
+/** Chuỗi kiểu 'khung' dựng gần nhất còn sống (dọn thì thôi). */
+let chuoiSong: ChuoiTieng | null = null
 /** Hệ số nâng gần nhất: mở lại mic / đổi mic thì BẮT ĐẦU từ hệ số ấy (không tụt về 1), rồi 3 giây nói đầu vẫn trôi nhanh về mức đúng của luồng mới. */
 let gNho = 0
 
@@ -198,7 +212,7 @@ function napLamRo(c: AudioContext): Promise<boolean> {
 /** Dựng chuỗi cho luồng mic `l`. `khiLui` = muốn 'nhanh' mà phải chạy 'nen' (worklet nạp hỏng). Ném lỗi nếu Web Audio không dựng được phần đo. */
 let tepLoc: Promise<ArrayBuffer | null> | null = null
 /** Tải tệp bộ lọc ồn MỘT lần (≈ 157 KB, mảnh riêng — không nằm trong kho tải sẵn của service worker). Lỗi ⇒ null. */
-function taiLoc(): Promise<ArrayBuffer | null> {
+export function taiLoc(): Promise<ArrayBuffer | null> {
   if (!tepLoc) tepLoc = (async () => { try { const r = await fetch(URL_RNNOISE); return r.ok ? await r.arrayBuffer() : null } catch { return null } })().then((b) => { if (!b) tepLoc = null; return b })
   return tepLoc
 }
@@ -216,11 +230,12 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void): { 
     let muc: MucLocOn = 'tat', daGui = false
     let goDf: (() => void) | null = null
     wk.onmessage = (e: MessageEvent) => {
-      const d = e.data as { g?: number; loi?: string; loc?: 'chay' | 'loi'; bo?: 'df3' | 'rn'; tre?: number; df?: 'cham' | 'loi' }
+      const d = e.data as { g?: number; loi?: string; loc?: 'chay' | 'loi'; bo?: 'df3' | 'rn'; tre?: number; df?: 'cham' | 'loi'; dm?: number; han?: number; ms?: number }
       if (typeof d?.g === 'number' && d.g > 0) gNho = d.g
+      if (typeof d?.dm === 'number') k.locOnMs = d.dm
       if (d?.loc) k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc
       if (d?.bo) { k.locOnBo = d.bo; k.locOnTre = d.tre ?? 10 }
-      if (d?.df === 'cham') baoChamDf3() // máy chạy không kịp bộ lớn ⇒ bỏ hẳn, Worker đã tự về RNNoise
+      if (d?.df === 'cham') baoChamDf3(d.han ? 'han' : 'tb', d.ms) // máy chạy không kịp bộ lớn ⇒ bỏ hẳn, Worker đã tự về RNNoise
       if (d?.loi) khiHong?.()
     }
     k.locOn = 'tat'; k.locOnBo = 'rn'; k.locOnTre = 10
@@ -235,7 +250,8 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void): { 
     }
     wk.onerror = () => khiHong?.()
     wk.postMessage({ c: { ...LAM_RO, g0: gNho }, vao: xl.readable, ra: sinh.writable }, [xl.readable as unknown as Transferable, sinh.writable as unknown as Transferable])
-    return { ra: sinh, don: () => { try { goDf?.() } catch { /* đã gỡ */ } try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
+    chuoiSong = k
+    return { ra: sinh, don: () => { if (chuoiSong === k) chuoiSong = null; try { goDf?.() } catch { /* đã gỡ */ } try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
   } catch { try { w?.terminate() } catch { /* chưa chạy */ } return null }
 }
 

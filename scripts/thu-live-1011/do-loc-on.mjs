@@ -9,7 +9,8 @@
 //   LV_NS=<thư mục>    thư mục ấy sau khi Chromium đã thu ⇒ thêm bộ «lọc ồn của trình duyệt (WebRTC)» (và «mic trình duyệt không lọc» nếu có ra0-0.wav).
 // Ồn: quạt / điều hoà (ồn hồng + ù 100 Hz, đều), xôn xao (8 giọng tổng hợp; và 8 lớp giọng người thật), gõ bút / bàn phím (xung 2–6 ms), xe ngoài đường
 // (ầm trầm + xe lướt qua + còi), ồn thật (bản ghi) — ở tỉ số tín / ồn 0 / 10 / 20 dB.
-// Đo: bớt ồn ở đoạn im (dB) · SI-SDR so với giọng sạch và mức cải thiện · giọng sạch đi qua bộ lọc còn giữ bao nhiêu (SI-SDR, dải tần tới −3 dB) ·
+// Đo: bớt ồn ở đoạn im (dB) · SI-SDR so với giọng sạch và mức cải thiện · «giữ phổ» (như SI-SDR nhưng chỉ so ĐỘ LỚN phổ, không kể pha) ·
+// giọng sạch đi qua bộ lọc còn giữ bao nhiêu (SI-SDR, giữ phổ, dải tần tới −3 dB) ·
 // trễ thêm (ms) · thời gian xử lý mỗi khung 10 ms (⇒ hệ số thời gian thực). MỤC TIÊU lượt 3 (mức Mạnh): đoạn im — ồn đều ≥ 30 dB, xôn xao ≥ 20 dB,
 // tiếng gõ ≥ 15 dB; giọng sạch SI-SDR ≥ 18 dB, dải ≥ 16 kHz; giọng vốn rõ (20 dB) không kém «không lọc».
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -134,8 +135,45 @@ function onThat(tep) { const g = docWav(tep), m = new Float32Array(HZ * GIAY); f
 
 // ── Số đo ──
 const db = (v) => 10 * Math.log10(Math.max(1e-30, v))
-/** SI-SDR của `y` so với giọng sạch `s` (đã khớp trễ `tre` mẫu). */
-function siSdr(y, s, tre) { let ss = 0, sy = 0; const n = Math.min(s.length, y.length - tre); for (let i = 0; i < n; i++) { ss += s[i] * s[i]; sy += s[i] * y[i + tre] } const a = sy / ss; let e = 0; for (let i = 0; i < n; i++) { const d = y[i + tre] - a * s[i]; e += d * d } return db((a * a * ss) / e) }
+/** SI-SDR của `y` so với giọng sạch `s` (trễ chung `tre` mẫu), MỘT hệ số khuếch đại cho cả tín hiệu, nhưng khớp trễ lại TỪNG CỬA SỔ 100 ms trong ±1 ms
+ *  (lệch làm tương quan lớn nhất): bộ xử lý tiếng của trình duyệt có trễ trôi vài mẫu theo thời gian — không khớp lại thì dạng sóng lệch pha và bị chấm oan.
+ *  Với các bộ trễ cố định (RNNoise, DeepFilterNet) cửa sổ nào cũng chọn lệch 0 nên số không đổi. */
+function siSdr(y, s, tre) {
+  const W = 4800, ds = []
+  let ss = 0, sy = 0
+  for (let d = 0; d + W <= s.length && d + W + tre + 48 <= y.length; d += W) {
+    let e = 0; for (let i = 0; i < W; i += 4) e += s[d + i] * s[d + i]
+    let lon = -1e99, lech = 0
+    if (e > 1e-7) for (let l = -48; l <= 48; l++) { if (d + tre + l < 0) continue; let c = 0; for (let i = 0; i < W; i += 2) c += s[d + i] * y[d + i + tre + l]; if (c > lon) { lon = c; lech = l } }
+    ds.push(lech)
+    for (let i = 0; i < W; i++) { ss += s[d + i] * s[d + i]; sy += s[d + i] * y[d + i + tre + lech] }
+  }
+  const a = sy / ss; let e = 0
+  ds.forEach((lech, k) => { const d = k * W; for (let i = 0; i < W; i++) { const v = y[d + i + tre + lech] - a * s[d + i]; e += v * v } })
+  return db((a * a * ss) / e)
+}
+/** FFT cơ số 2 tại chỗ. */
+function fft(re, im) {
+  const n = re.length
+  for (let i = 1, j = 0; i < n; i++) { let b = n >> 1; for (; j & b; b >>= 1) j ^= b; j ^= b; if (i < j) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t } }
+  for (let len = 2; len <= n; len <<= 1) { const g = (-2 * Math.PI) / len, wr = Math.cos(g), wi = Math.sin(g); for (let i = 0; i < n; i += len) { let cr = 1, ci = 0; for (let k = 0; k < len / 2; k++) { const a = i + k, b = a + len / 2, xr = re[b] * cr - im[b] * ci, xi = re[b] * ci + im[b] * cr; re[b] = re[a] - xr; im[b] = im[a] - xi; re[a] += xr; im[a] += xi; const t = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = t } } }
+}
+/** Độ lớn phổ từng khung (cửa sổ Hann 1024, bước 512; 0 – 12 kHz) của `m` từ mẫu `lech`. */
+function phoDoLon(m, lech, soKhung) {
+  const N = 1024, ra = []
+  for (let k = 0; k < soKhung; k++) { const re = new Float64Array(N), im = new Float64Array(N), d = lech + k * 512; for (let i = 0; i < N; i++) re[i] = (m[d + i] ?? 0) * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (N - 1))); fft(re, im); const a = new Float32Array(256); for (let i = 0; i < 256; i++) a[i] = Math.hypot(re[i + 1], im[i + 1]); ra.push(a) }
+  return ra
+}
+/** GIỮ GIỌNG KHÔNG KỂ PHA (dB): tỉ số năng lượng phổ của giọng sạch / sai khác ĐỘ LỚN phổ giữa đầu ra và giọng sạch (một hệ số khuếch đại chung).
+ *  SI-SDR chấm cả pha: bộ lọc của trình duyệt tách băng làm lệch pha (tai không nghe ra) nên bị SI-SDR chấm rất thấp — chỉ số này công bằng hơn cho nó. */
+function giuPho(y, s, tre) {
+  const n = Math.floor((Math.min(s.length, y.length - tre) - 1024) / 512), S = phoDoLon(s, 0, n), Y = phoDoLon(y, tre, n)
+  let ss = 0, sy = 0
+  for (let k = 0; k < n; k++) for (let i = 0; i < 256; i++) { ss += S[k][i] * S[k][i]; sy += S[k][i] * Y[k][i] }
+  const a = sy / ss; let e = 0
+  for (let k = 0; k < n; k++) for (let i = 0; i < 256; i++) { const v = Y[k][i] - a * S[k][i]; e += v * v }
+  return db((a * a * ss) / e)
+}
 function timTre(y, s) { let lon = -1e99, tre = 0; for (let lag = 0; lag <= 2400; lag++) { let c = 0; for (let i = HZ; i < HZ * 4; i += 3) c += s[i] * y[i + lag]; if (c > lon) { lon = c; tre = lag } } return tre }
 /** Năng lượng từng băng (24 băng trên thang log 100 Hz – 12 kHz) của một khung 1024 mẫu — biến đổi Fourier thẳng trên vài tần số mỗi băng là đủ cho «tiếng nước». */
 function bang(m, d) { const r = []; for (let b = 0; b < 24; b++) { const f = 100 * Math.pow(120, (b + 0.5) / 24), w = (2 * Math.PI * f) / HZ; let re = 0, im = 0; for (let i = 0; i < 1024; i++) { const v = m[d + i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / 1023)); re += v * Math.cos(w * i); im -= v * Math.sin(w * i) } r.push(re * re + im * im) } return r }
@@ -174,7 +212,7 @@ if (process.env.LV_XUAT) {
   writeFileSync(join(dir, 'muc-luc.json'), JSON.stringify(ml, null, 1) + '\n')
   console.log(`Đã ghi ${ml.tep.length} tệp vào ${dir}`); process.exit(0)
 }
-/** Bản Chromium đã thu: căn cả tệp MỘT lần bằng tương quan chéo trên ca đầu (giọng sạch; dò tới 1,5 giây), lùi 5 ms cho chắc, rồi cắt từng ca theo khoá. */
+/** Bản Chromium đã thu: căn cả tệp MỘT lần bằng tương quan chéo trên ca đầu (giọng sạch; dò −0,2 … 1,5 giây), lùi 5 ms cho chắc, rồi cắt từng ca theo khoá. */
 const NS = {}
 function napNs(dir, tienTo) {
   const ml = JSON.parse(readFileSync(join(dir, 'muc-luc.json'), 'utf8')), kho = new Map()
@@ -182,9 +220,9 @@ function napNs(dir, tienTo) {
     if (!existsSync(join(dir, `${tienTo}-${i}.wav`))) return
     const y = docWav(join(dir, `${tienTo}-${i}.wav`)), s = docWav(join(dir, t.tep))
     let lon = -1e99, lech = 0
-    for (let lag = 0; lag <= 72000; lag += 2) { let c = 0; for (let j = HZ; j < HZ * 6; j += 4) c += s[j] * (y[j + lag] ?? 0); if (c > lon) { lon = c; lech = lag } }
-    lech = Math.max(0, lech - 240)
-    t.ca.forEach((khoa, k) => kho.set(khoa, y.subarray(lech + k * HZ * GIAY, lech + (k + 1) * HZ * GIAY)))
+    for (let lag = -9600; lag <= 72000; lag += 2) { let c = 0; for (let j = HZ; j < HZ * 6; j += 4) c += s[j] * (y[j + lag] ?? 0); if (c > lon) { lon = c; lech = lag } }
+    lech -= 240 // âm = trình duyệt đã nuốt mất đoạn đầu tệp trước khi trang kịp thu (đo: 40 ms) ⇒ đệm số 0
+    t.ca.forEach((khoa, k) => { const c = new Float32Array(HZ * GIAY), d0 = lech + k * HZ * GIAY; for (let j = 0; j < c.length; j++) c[j] = y[d0 + j] ?? 0; kho.set(khoa, c) })
   })
   return kho
 }
@@ -215,27 +253,27 @@ for (const b of BO) {
       const t = b.kb ? timTre(k.y, s) : 0
       treG[tg] = b.tre ?? t
       if (tn === 'that' || !Object.keys(NHOM.that).length) { tre = t; ms = k.ms; ms95 = k.ms95 ?? null }
-      sach[tg] = { siSdr: b.kb ? r1(siSdr(k.y, s, t)) : null, den3dBHz: b.kb ? daiTan(k.y, s, t) : null, treMs: r1(t / 48) }
+      sach[tg] = { siSdr: b.kb ? r1(siSdr(k.y, s, t)) : null, giuPho: b.kb ? r1(giuPho(k.y, s, t)) : null, den3dBHz: b.kb ? daiTan(k.y, s, t) : null, treMs: r1(t / 48) }
     }
     if (!Object.keys(sach).length) continue
     for (const [to, o] of Object.entries(ON)) {
-      const giam = [], hon = { 0: [], 10: [], 20: [] }, theoGiong = {}
+      const giam = [], hon = { 0: [], 10: [], 20: [] }, pho = { 0: [], 10: [], 20: [] }, theoGiong = {}
       for (const [tg, g] of Object.entries(GIONG)) for (const snr of [0, 10, 20]) {
         if (!(tg in treG)) continue
         const { s, x } = tinHieu(g, o, snr), treN = treG[tg]
         const y = b.chay(x, [tg, to, snr].join('|')).y
-        const gi = db(onIm(x, g.noi, 0) / onIm(y, g.noi, treN)), ho = siSdr(y, s, treN) - siSdr(x, s, 0)
-        giam.push(gi); hon[snr].push(ho); (theoGiong[tg] ??= {})[snr] = { giamOn: r1(gi), siSdrHon: r1(ho) }
+        const gi = db(onIm(x, g.noi, 0) / onIm(y, g.noi, treN)), ho = siSdr(y, s, treN) - siSdr(x, s, 0), ph = giuPho(y, s, treN) - giuPho(x, s, 0)
+        giam.push(gi); hon[snr].push(ho); pho[snr].push(ph); (theoGiong[tg] ??= {})[snr] = { giamOn: r1(gi), siSdrHon: r1(ho), giuPhoHon: r1(ph) }
       }
-      on[to] = { giamOn: r1(tb(giam)), giamOnItNhat: r1(Math.min(...giam)), siSdrHon0: r1(tb(hon[0])), siSdrHon10: r1(tb(hon[10])), siSdrHon20: r1(tb(hon[20])), siSdrHon20XauNhat: r1(Math.min(...hon[20])), theoGiong }
+      on[to] = { giamOn: r1(tb(giam)), giamOnItNhat: r1(Math.min(...giam)), siSdrHon0: r1(tb(hon[0])), siSdrHon10: r1(tb(hon[10])), siSdrHon20: r1(tb(hon[20])), siSdrHon20XauNhat: r1(Math.min(...hon[20])), giuPhoHon0: r1(tb(pho[0])), giuPhoHon10: r1(tb(pho[10])), giuPhoHon20: r1(tb(pho[20])), giuPhoHon20XauNhat: r1(Math.min(...pho[20])), theoGiong }
     }
     h.nhom[tn] = { sach, on }
   }
   h.treMs = r1(tre / 48); h.msMoiKhung = Math.round(ms * 1000) / 1000; h.ms95 = ms95 == null ? null : Math.round(ms95 * 1000) / 1000; h.heSoThoiGianThuc = Math.round(ms * 100) / 1000
   ra.bo.push(h)
   console.log(`${b.ten} · trễ ${h.treMs} ms · ${h.msMoiKhung} ms/khung (p95 ${h.ms95 ?? '—'})`)
-  for (const [tn, v] of Object.entries(h.nhom)) console.log(`  [${tn}] sạch: ` + Object.entries(v.sach).map(([tg, q]) => `${tg} ${q.siSdr} dB tới ${q.den3dBHz} Hz`).join(' · ') + '\n   '
-    + Object.entries(v.on).map(([to, q]) => `${to}: bớt ${q.giamOn} dB (ít nhất ${q.giamOnItNhat}) · SI-SDR hơn ${q.siSdrHon0} / ${q.siSdrHon10} / ${q.siSdrHon20} (xấu nhất ở 20 dB: ${q.siSdrHon20XauNhat})`).join('\n   '))
+  for (const [tn, v] of Object.entries(h.nhom)) console.log(`  [${tn}] sạch: ` + Object.entries(v.sach).map(([tg, q]) => `${tg} ${q.siSdr} dB (phổ ${q.giuPho}) tới ${q.den3dBHz} Hz`).join(' · ') + '\n   '
+    + Object.entries(v.on).map(([to, q]) => `${to}: bớt ${q.giamOn} dB (ít nhất ${q.giamOnItNhat}) · SI-SDR hơn ${q.siSdrHon0} / ${q.siSdrHon10} / ${q.siSdrHon20} (xấu nhất ở 20 dB: ${q.siSdrHon20XauNhat}) · phổ hơn ${q.giuPhoHon0} / ${q.giuPhoHon10} / ${q.giuPhoHon20} (xấu nhất ${q.giuPhoHon20XauNhat})`).join('\n   '))
 }
 writeFileSync(RA, JSON.stringify(ra, null, 1) + '\n')
 console.log(`\nĐã ghi ${RA}`)

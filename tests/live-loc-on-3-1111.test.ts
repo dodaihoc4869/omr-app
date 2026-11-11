@@ -126,18 +126,20 @@ describe('Z3 · vòng đọc của Worker: chờ khung bộ lọc sâu tối đa
   }
   afterEach(() => { vi.useRealTimers() })
 
-  it('bộ lọc sâu trả lời đều ⇒ nhập cuộc; rồi NGỪNG trả lời ⇒ 25 ms sau khung ấy vẫn ra (đường RNNoise), báo `cham`, các khung sau không chờ nữa', async () => {
+  it('bộ lọc sâu trả lời đều ⇒ nhập cuộc; một khung QUÁ HẠN 25 ms ⇒ khung ấy vẫn ra (đường RNNoise) rồi trộn chéo trở lại; quá hạn 3 lần ⇒ báo `cham`, thôi chờ', async () => {
     vi.useFakeTimers()
-    const tin: unknown[] = [], t = taoTho(tin), x = taoOn(K * 140, 0.05)
+    const tin: unknown[] = [], t = taoTho(tin), x = taoOn(K * 200, 0.05)
     let traLoi = true
     const cong = { onmessage: null as null | ((e: { data: unknown }) => void), postMessage(d: { s: number; k: Float32Array }) { if (traLoi) queueMicrotask(() => cong.onmessage?.({ data: { s: d.s, k: new Float32Array(K), ms: 1 } })) }, close() { /* đóng */ } }
     t.dat(); t.tin({ loc: rnBuf(), muc: THAM_LOC_ON.manh }); t.tin({ df: cong })
     let k = 0
-    for (; k < 100; k++) { const r = t.xuLy(khung(x.subarray(k * K, (k + 1) * K), k * 10000)); expect((await r).data.length).toBe(K); await Promise.resolve() }
+    const buoc = () => { const r = t.xuLy(khung(x.subarray(k * K, (k + 1) * K), k * 10000)); k++; return r }
+    for (; k < 100;) { expect((await buoc()).data.length).toBe(K); await Promise.resolve() }
     expect(t.tt()).toMatchObject({ dfGd: 1, dfOk: 1 })
     expect(t.tt().dfW).toBeGreaterThan(0)
+    // khung quá hạn thứ nhất
     traLoi = false
-    const r = t.xuLy(khung(x.subarray(k * K, (k + 1) * K), k * 10000))
+    const r = buoc()
     expect(typeof (r as Promise<unknown>).then).toBe('function') // đang chờ bộ lọc sâu
     let xong: { data: Float32Array } | null = null
     void (r as Promise<{ data: Float32Array }>).then((a) => { xong = a })
@@ -146,9 +148,18 @@ describe('Z3 · vòng đọc của Worker: chờ khung bộ lọc sâu tối đa
     await vi.advanceTimersByTimeAsync(2)
     expect(xong).not.toBeNull()
     expect(nl(xong!.data, 0, K)).toBeGreaterThan(0) // có tiếng (đường RNNoise), không phải khung câm
+    expect(t.tt()).toMatchObject({ dfOk: 1, dfW: 0 }) // một cú khựng lẻ: CHƯA bỏ bộ lọc sâu
+    expect(tin.some((m) => (m as { df?: string }).df === 'cham')).toBe(false)
+    // bộ lọc sâu trả lời lại ⇒ trộn chéo trở lại
+    traLoi = true
+    for (let i = 0; i < 25; i++) { await buoc(); await Promise.resolve() }
+    expect(t.tt().dfW).toBe(1)
+    // quá hạn thêm hai lần nữa (tổng 3 lần trong 30 giây) ⇒ bỏ hẳn
+    traLoi = false
+    for (let i = 0; i < 2; i++) { const p = buoc() as Promise<{ data: Float32Array }>; await vi.advanceTimersByTimeAsync(26); expect(nl((await p).data, 0, K)).toBeGreaterThan(0) }
     expect(tin).toContainEqual({ df: 'cham', han: 1 })
     expect(t.tt()).toMatchObject({ dfOk: 0, dfW: 0 })
-    const r2 = t.xuLy(khung(x.subarray((k + 1) * K, (k + 2) * K), (k + 1) * 10000))
+    const r2 = buoc()
     expect(typeof (r2 as Promise<unknown>).then).toBe('undefined') // không chờ nữa: ra ngay
     expect(nl((r2 as { data: Float32Array }).data, 0, K)).toBeGreaterThan(0)
   })

@@ -9,7 +9,7 @@
 export const TEP_DF3 = { wasm: 'loc-on/df3-wasm-0200.bin', moHinh: 'loc-on/df3-mo-hinh-v3.bin', coWasm: 3975277, coMoHinh: 7983136, kho: 'ddh-loc-on-df3-0200' }
 
 /** 'khong' = chưa cần / máy không chạy được · 'tai' = đang tải + dựng · 'san' = sẵn sàng · 'loi' = tải / dựng lỗi · 'cham' = máy chạy không kịp (đã bỏ). */
-export interface TinhDf3 { tinh: 'khong' | 'tai' | 'san' | 'loi' | 'cham'; da: number; tong: number; ms: number }
+export interface TinhDf3 { tinh: 'khong' | 'tai' | 'san' | 'loi' | 'cham'; da: number; tong: number; ms: number; /** Vì sao bỏ: 'nong' = chạy nóng đã chậm · 'tb' = trung bình trượt > 6 ms · 'han' = 3 khung quá hạn 25 ms. */ vi?: string; /** Thời gian tải + dựng + chạy nóng (ms). */ msDung?: number }
 
 /** Mã Worker (ES5). Tin vào: { tai: { wasm, moHinh, kho } } một lần; { cong: MessagePort } mỗi lần có chuỗi tiếng mới. Qua cổng: { s, k: Float32Array(480) }
  *  ⇒ { s, k: khung đã lọc (trễ 1440 mẫu), ms }. Tin ra: { da } tiến độ byte · { san: 1, ms, msDung } · { loi }. */
@@ -96,7 +96,7 @@ function dungTho(): void {
   choSan.clear()
 }
 /** Chuỗi tiếng báo bộ này chạy không kịp trên máy (hệ số thời gian thực > 0,6 hoặc một khung quá hạn) ⇒ bỏ hẳn tới lần mở app sau. */
-export function baoChamDf3(): void { if (tinh.tinh === 'cham') return; tinh = { ...tinh, tinh: 'cham' }; dungTho(); bao() }
+export function baoChamDf3(vi = 'tb', ms = 0): void { if (tinh.tinh === 'cham') return; tinh = { ...tinh, tinh: 'cham', vi, ms: ms || tinh.ms }; dungTho(); bao() }
 
 function khoiDong(): boolean {
   if (tho) return true
@@ -108,11 +108,11 @@ function khoiDong(): boolean {
     tinh = { ...TINH0, tinh: 'tai' }
     w.onmessage = (e: MessageEvent) => {
       if (tho !== w) return
-      const d = e.data as { da?: number; san?: number; ms?: number; loi?: string }
+      const d = e.data as { da?: number; san?: number; ms?: number; msDung?: number; loi?: string }
       if (typeof d?.da === 'number') tinh = { ...tinh, da: Math.min(tinh.tong, d.da) }
       if (d?.san) {
-        if ((d.ms ?? 0) > 6) { baoChamDf3(); return }
-        tinh = { ...tinh, tinh: 'san', da: tinh.tong, ms: d.ms ?? 0 }
+        if ((d.ms ?? 0) > 6) { baoChamDf3('nong', d.ms); return }
+        tinh = { ...tinh, tinh: 'san', da: tinh.tong, ms: d.ms ?? 0, msDung: d.msDung }
         for (const f of [...choSan]) f()
         choSan.clear()
       }
