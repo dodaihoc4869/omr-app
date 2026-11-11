@@ -1,0 +1,29 @@
+[
+  {
+    "i": 3,
+    "hash": "009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1",
+    "fileNguon": "anh/009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1.png",
+    "svg": "ala3-native-ddh-8542b4a5ea20c65871724dd776d6a05d3541c35985c5ee5d90f6716e36792dec.svg",
+    "hashSvg": "8542b4a5ea20c65871724dd776d6a05d3541c35985c5ee5d90f6716e36792dec",
+    "byteSvg": 3311,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B3-D1-II-1",
+        "de": "Alpha-linolenic acid (ALA) là một hợp chất thiết yếu, cơ thể không thể tự tổng hợp và phải được cung cấp qua chế độ ăn uống. ALA có vai trò quan trọng trong duy trì sức khoẻ tim mạch và hỗ trợ chức năng não bộ. ALA có công thức cấu tạo sau đây:",
+        "refs": [
+          {
+            "hash": "009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1",
+            "where": "DH-12-C1-B3-D1-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "50bab955aba2be8fdaa9a9f0d0bbd2091708d68b6f54555096443c8cd397c55c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18bareCOPENcoiledchain/3CCdouble1COdouble2raysCONTACTupperOHslope-lowerverticalstem/2O-OHfirstOanchor/TRUEdamUPRIGHTchem/grayuniformthin/0ring0arrows0stereo/noaddedH-formula-caption-answer",
+    "hashSvgDaSoat": "8542b4a5ea20c65871724dd776d6a05d3541c35985c5ee5d90f6716e36792dec",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

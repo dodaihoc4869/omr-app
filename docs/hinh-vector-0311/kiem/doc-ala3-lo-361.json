@@ -1,0 +1,297 @@
+{
+  "i": 3,
+  "assetIndexProvided": 1167,
+  "hash": "009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1.png",
+  "size": [
+    168,
+    165
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C1-B3-D1-II-1",
+      "de": "Alpha-linolenic acid (ALA) là một hợp chất thiết yếu, cơ thể không thể tự tổng hợp và phải được cung cấp qua chế độ ăn uống. ALA có vai trò quan trọng trong duy trì sức khoẻ tim mạch và hỗ trợ chức năng não bộ. ALA có công thức cấu tạo sau đây:",
+      "allHinh": [
+        {
+          "hash": "009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1",
+          "where": "DH-12-C1-B3-D1-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "50bab955aba2be8fdaa9a9f0d0bbd2091708d68b6f54555096443c8cd397c55c"
+        }
+      ],
+      "missingHashes": [
+        "009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull6xOpened": true,
+    "ownCO20xOpened": true,
+    "ownFootPixelRowsChecked": true,
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "freshOwnNarrowOAndOH30xOpened": true
+  },
+  "measurementLimits": "Nativepixelvertices/raysapproxnearest1px; sourcegrayink/blurmeansnofalseprecision. Contactsverifiedownmacro/pixelrows, notinferredfromALAname.",
+  "geometry": {
+    "orderedBareC": [
+      [
+        35,
+        29
+      ],
+      [
+        35,
+        58
+      ],
+      [
+        10,
+        72
+      ],
+      [
+        10,
+        101
+      ],
+      [
+        35,
+        116
+      ],
+      [
+        35,
+        145
+      ],
+      [
+        60,
+        159
+      ],
+      [
+        86,
+        145
+      ],
+      [
+        111,
+        159
+      ],
+      [
+        137,
+        145
+      ],
+      [
+        137,
+        116
+      ],
+      [
+        162,
+        101
+      ],
+      [
+        162,
+        72
+      ],
+      [
+        137,
+        58
+      ],
+      [
+        137,
+        29
+      ],
+      [
+        111,
+        14
+      ],
+      [
+        86,
+        29
+      ],
+      [
+        86,
+        58
+      ]
+    ],
+    "openEnds": {
+      "acidC": [
+        35,
+        29
+      ],
+      "freeMethylEndpoint": [
+        86,
+        58
+      ],
+      "note": "Freeendpoint8658NOTconnectedto351ststem; coiledshapeisNOTcyclic."
+    },
+    "CCDoubleVertexPairs1Based": [
+      [
+        9,
+        10
+      ],
+      [
+        12,
+        13
+      ],
+      [
+        15,
+        16
+      ]
+    ],
+    "innerParallelRays": [
+      [
+        [
+          112,
+          152
+        ],
+        [
+          131,
+          141
+        ]
+      ],
+      [
+        [
+          156,
+          99
+        ],
+        [
+          156,
+          76
+        ]
+      ],
+      [
+        [
+          132,
+          32
+        ],
+        [
+          112,
+          21
+        ]
+      ]
+    ],
+    "carbonyl": {
+      "apex": [
+        35,
+        29
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          5,
+          7,
+          17,
+          21
+        ],
+        "font": "TRUEBOLDuprightsansgray"
+      },
+      "upperRay": [
+        [
+          20,
+          18
+        ],
+        [
+          38,
+          27
+        ]
+      ],
+      "lowerRay": [
+        [
+          17,
+          24
+        ],
+        [
+          35,
+          32
+        ]
+      ],
+      "footTopology": "BOTHCONTACTnative:upperjoinsOHrightslope~3827,lowerjoinsverticalCstem~3532. WHITEwedgebetweenparallelsdoesNOTdisconnectfeet. Nativeverticalstem35,29..58mustremaincontinuous. Noaddedclosurebridge.",
+      "pixelEvidence": {
+        "y29GrayBelow160x": [
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36
+        ],
+        "y30": [
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36
+        ],
+        "y31": [
+          32,
+          33,
+          34,
+          35,
+          36
+        ]
+      }
+    },
+    "OH": {
+      "text": "OH",
+      "bbox": [
+        55,
+        7,
+        78,
+        22
+      ],
+      "anchor": "FIRSTO",
+      "bond": [
+        [
+          35,
+          29
+        ],
+        [
+          51,
+          20
+        ]
+      ],
+      "font": "TRUEBOLDuprightsansgray"
+    },
+    "style": "Graythinuniform~2px bonds; O/OH TRUEBOLDuprightsansgray, noitalic. Whitebackgroundwithsmallnativegrayprintnoiseoutsidefigure notinventeddata.",
+    "counts": {
+      "bareC": 18,
+      "O": 2,
+      "CCdouble": 3,
+      "COdouble": 1,
+      "closedRings": 0,
+      "captions": 0,
+      "explicitOH": 1
+    },
+    "noAdded": [
+      "cyclicclosure",
+      "ALAnamecaption",
+      "carbonnumbers",
+      "hydrogenlabels",
+      "extraCCdouble",
+      "theoryrepositioning",
+      "charges",
+      "arrow",
+      "alias465"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "corrections": [
+    {
+      "field": "geometry.carbonyl.Olabel.font / geometry.OH.font / geometry.style",
+      "old": "regularuprightsansgray;Noactualbold/italictext",
+      "new": "TRUEBOLDuprightsansgray O/OH, noitalic",
+      "reason": "FreshownnarrowO/OH30xshowsheavyOstrokeandcompactcounter, H2pixelwidestraightstems/solidcrossbar at11pxheight. Designheavylettersnotmerelybondwidth; initialFULLfontclassificationincorrect.",
+      "evidence": [
+        "/workspace/scratch/3-OH30x-weight361.png",
+        "/workspace/scratch/3-O30x-weight361.png"
+      ]
+    }
+  ],
+  "rootAudit": "Root tự mở nativeFULL+6x+CO12x, all1publicde/refs; own freshChromiumFULL exact8542b4a5ea20c65871724dd776d6a05d3541c35985c5ee5d90f6716e36792dec/3311B. 18Copenchain3CCdouble1COdouble2feetCONTACT-upperOHslope/lowerverticalstem; 0ring0stereo0arrow/noextraH/formula/caption. O/OHtrueDAMupright confirmed independently after source initial regular correction; builderdam fromFIRST/noSVGnegative."
+}

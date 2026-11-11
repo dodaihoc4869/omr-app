@@ -1,0 +1,16 @@
+[
+  {
+    "i": 3,
+    "hashSvg": "8542b4a5ea20c65871724dd776d6a05d3541c35985c5ee5d90f6716e36792dec",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở RIÊNG native FULL, câu dẫn/ref DH-12-C1-B3-D1-II-1.hinh.0.du_lieu, fresh Chromium3× FULL/runtime exactSHA; macro CO, toàn ba CCdouble/freeend và native O/OH12×nearest. Đếm18C mạch hở, ba nối đôi CC/một carbonyl với hai chân chạm đúng hai nhánh nguồn, không khép vòng ở đầu tự do. Hai glyph O/OH xám đậm thẳng phù hợp nét dày H/thân O nhìn trực tiếp trên nguồn, OH neo theo O đầu; không dựa độ dày bond để suy font. Không thấy chạm glyph/cắt/tràn/dữ kiện H/caption thêm.",
+    "render": "/workspace/scratch/soat361-3-fresh.png",
+    "macro": [
+      "/workspace/scratch/ala3-co.png",
+      "/workspace/scratch/ala3-double-end.png",
+      "/workspace/scratch/ala3-native-glyph.png"
+    ],
+    "hash": "009da405cc26bd7f43abcb0760ec825bce001dd3f2c8c780d615b83b73bed7c1",
+    "hashSvgDaSoat": "8542b4a5ea20c65871724dd776d6a05d3541c35985c5ee5d90f6716e36792dec"
+  }
+]
