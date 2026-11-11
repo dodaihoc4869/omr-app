@@ -22,10 +22,11 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     /** Loa: `coLoa()` false ⇒ trình duyệt không chọn được đầu ra (ẩn ô chọn). `loaTrungMic(ten)` = tên loa mặc định nếu trùng thiết bị với mic `ten`. */
     coLoa: boLoa.co, dsLoa: boLoa.ds, loa: boLoa.id, datLoa: boLoa.dat, thuLoa: boLoa.thu, loaTrungMic: boLoa.trungMic,
     /** Đo tiếng từ xa: máy thầy + từng máy em (sbd ⇒ bản tóm tắt, phòng chuyển về trong `live-do`). */
-    tiengMay: (): { thay: SoTieng | null; em: { s: string; ti: SoTieng }[] } => {
+    tiengMay: (): { thay: SoTieng | null; em: { s: string; ti: SoTieng }[]; keo: boolean; loiKeo: string } => {
       const may = (goc.mang().em as { may?: unknown } | null)?.may
       const em = Array.isArray(may) ? may.flatMap((x) => { const o = x as { s?: unknown; ti?: unknown }; const ti = sachTieng(o?.ti); return typeof o?.s === 'string' && ti ? [{ s: o.s, ti }] : [] }) : []
-      return { thay: tiThay, em }
+      const ng = goc.nguonDo()
+      return { thay: tiThay, em, keo: ng.keo, loiKeo: ng.loiKeo }
     },
     huy: (): void => { het = true; clearInterval(hen); goc.huy() },
   }

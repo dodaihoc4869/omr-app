@@ -12,10 +12,11 @@ import { WebSocketServer } from 'ws'
 const GOC = resolve(import.meta.dirname, '../..')
 const LOAI = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json', '.webp': 'image/webp' }
 
-export async function moMayChu({ dist, sfu = true }) {
+/** `cuaLive(duong, than, phong)` (tuỳ chọn, 11/11 tối — scripts/thu-live-dot0-1011/phong-that.mjs): trả lời `POST /bpu/live/*` bằng cửa THẬT nối SFU thật thay cho «chưa cấu hình». */
+export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GOC }) {
   const tam = mkdtempSync(join(tmpdir(), 'thu-live-'))
   const ra = join(tam, 'phong.mjs')
-  await build({ entryPoints: [join(GOC, 'server/src/phong-binh-phan-ung.ts')], bundle: true, platform: 'node', format: 'esm', outfile: ra, logLevel: 'error', nodePaths: [join(GOC, 'node_modules')] })
+  await build({ entryPoints: [join(gocPhong, 'server/src/phong-binh-phan-ung.ts')], bundle: true, platform: 'node', format: 'esm', outfile: ra, logLevel: 'error', nodePaths: [join(GOC, 'node_modules')] })
   // Cặp WebSocket giả của Workers: phần [1] là phía phòng — `send` chuyển sang kết nối thật của trình duyệt.
   class DauPhong {
     that = null; att = null; tag = ''
@@ -49,7 +50,7 @@ export async function moMayChu({ dist, sfu = true }) {
       try { b = JSON.parse(than || '{}') } catch { /* bỏ qua */ }
       const tra = (o) => { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(o)) }
       if (d.endsWith('/hs/bpu/ve') || d.endsWith('/hs/bpu/cua-em')) return tra({ ok: true, ve: `hs.${String(b.token ?? '').replace(/^tk-/, '') || 'S1'}`, buoiId: 'b1' })
-      if (d.startsWith('/bpu/live/')) return tra({ ok: false, lyDo: 'chua-cau-hinh' })
+      if (d.startsWith('/bpu/live/')) return tra(cuaLive ? await cuaLive(d, b, phong).catch((e) => ({ ok: false, lyDo: 'cua-thu', loi: String(e?.message ?? e).slice(0, 80) })) : { ok: false, lyDo: 'chua-cau-hinh' })
       return tra({ ok: false })
     }
     const p = join(dist, d), pub = join(PUB, d)

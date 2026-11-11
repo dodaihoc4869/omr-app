@@ -19,6 +19,8 @@ export interface TuyChonLiveThay {
   chuoi?: boolean
   /** Kiểu nâng mức của chuỗi: 'khung' (mặc định — từng khung 10 ms trong Worker, không đệm) · 'nhanh' (worklet Web Audio) · 'nen' (hai bộ nén Web Audio). */
   chuoiKieu?: KieuChuoi
+  /** «Tiếng»: 'lam-ro' (mặc định — chuỗi làm rõ tiếng) · 'chuan' = chuẩn trình duyệt (gửi thẳng mic, khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt BẬT). */
+  kieuTieng?: 'lam-ro' | 'chuan'
   /** Lọc ồn RIÊNG trong chuỗi (bỏ trống = 'vua'). */
   locOn?: MucLocOn
   /** Tự chỉnh âm lượng của TRÌNH DUYỆT ở bậc mở đầu (bỏ trống = bật). */

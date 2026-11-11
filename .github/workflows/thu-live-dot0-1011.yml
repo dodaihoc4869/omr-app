@@ -17,7 +17,7 @@ on:
         description: Số máy em 1–8 (kieu dot0)
         default: '2'
       kieu:
-        description: dot0 (bộ thử cũ) · tieng-that (phép thử tiếng thật trên bản dựng thật)
+        description: dot0 (bộ thử cũ) · tieng-that (tiếng thật trên bản dựng thật) · phong-that (phòng thật + giao diện đầy đủ + SFU thật)
         default: 'dot0'
       refs:
         description: (tieng-that) các bản cần thử, cách nhau dấu phẩy — HEAD = nhánh đang chạy
@@ -52,7 +52,7 @@ jobs:
         run: node scripts/thu-live-dot0-1011.mjs --giay="$GIAY" --em="$EM"
 
   chuan-bi:
-    if: ${{ inputs.kieu == 'tieng-that' }}
+    if: ${{ inputs.kieu == 'tieng-that' || inputs.kieu == 'phong-that' }}
     runs-on: ubuntu-latest
     outputs:
       refs: ${{ steps.r.outputs.refs }}
@@ -64,6 +64,7 @@ jobs:
 
   tieng-that:
     needs: chuan-bi
+    if: ${{ inputs.kieu == 'tieng-that' }}
     runs-on: ubuntu-latest
     timeout-minutes: 25
     strategy:
@@ -108,4 +109,52 @@ jobs:
             set -- $bien
             node scripts/thu-live-dot0-1011/tieng-that.mjs --dist="$DIST" --nhan="$REF" --wav="$RUNNER_TEMP/giong/$1.wav" --tu-phat="$2" --cham="$3" --loc-on="$LOC_ON" || rc=1
           done
+          exit $rc
+
+  # kieu = phong-that (11/11 tối): PHÒNG THẬT (Durable Object của chính bản cần thử, chạy trong Node) + giao diện đầy đủ (tờ chiếu thầy + ManBinhPhanUng/LopLive)
+  # + cửa /bpu/live thật nối SFU thật; trình tự như thầy. Thêm một lượt máy em S2 ở trình duyệt CHẶN UDP (không relay).
+  phong-that:
+    needs: chuan-bi
+    if: ${{ inputs.kieu == 'phong-that' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        ref: ${{ fromJSON(needs.chuan-bi.outputs.refs) }}
+    name: phòng thật (${{ matrix.ref }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Mẫu giọng (người thật; một + hai kênh)
+        run: node scripts/thu-live-dot0-1011/giong.mjs "$RUNNER_TEMP/giong"
+      - name: Dựng trang thử của bản ${{ matrix.ref }} (tờ chiếu + ManBinhPhanUng/LopLive thật)
+        env:
+          REF: ${{ matrix.ref }}
+        run: |
+          W="$GITHUB_WORKSPACE"
+          # --configLoader native: cấu hình nạp tại chỗ (đóng gói vào node_modules/.vite-temp thì `import.meta.dirname` trỏ về nhánh đang chạy ⇒ dựng nhầm mã của nhánh)
+          if [ "$REF" != "HEAD" ]; then git worktree add --detach "$RUNNER_TEMP/wt" "$REF"; ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/wt/node_modules"; W="$RUNNER_TEMP/wt"; fi
+          (cd "$W" && npx vite build --configLoader native --config scripts/thu-live-1011/vite.config.mjs --outDir "$RUNNER_TEMP/dist-thu" > "$RUNNER_TEMP/dung.log" 2>&1) || { tail -40 "$RUNNER_TEMP/dung.log"; exit 1; }
+          echo "WT=$W" >> "$GITHUB_ENV"
+      - name: Thử tiếng qua phòng thật — bình thường, rồi S2 chặn UDP
+        env:
+          REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
+          REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
+          REF: ${{ matrix.ref }}
+          LOC_ON: ${{ inputs.loc_on || 'manh' }}
+        run: |
+          rc=0
+          node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" || rc=1
+          # MẠNG CHẶN UDP (Wi-Fi trường / 4G khắt khe): chặn mọi gói UDP ra ngoài trừ DNS cho CẢ máy chạy (cờ chính sách IP của Chromium không có hiệu lực ở đây)
+          sudo iptables -I OUTPUT -p udp ! --dport 53 -j DROP
+          node scripts/thu-live-dot0-1011/phong-that.mjs --dist="$RUNNER_TEMP/dist-thu" --goc-phong="$WT" --nhan="$REF" --wav="$RUNNER_TEMP/giong/giong-2.wav" --loc-on="$LOC_ON" --chan-udp=1 --udp-he=1 || rc=1
+          sudo iptables -D OUTPUT -p udp ! --dport 53 -j DROP
           exit $rc
