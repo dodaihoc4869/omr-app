@@ -28,7 +28,7 @@ const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSyn
 const chanNgoai = (ctx) => ctx.route((u) => !u.href.startsWith(may.goc), (r) => r.abort())
 async function chup(t, ten, tuy = {}) {
   let q = 86, buf
-  do { buf = await t.screenshot({ type: 'jpeg', quality: q, ...tuy }); q -= 6 } while (buf.length > 150 * 1024 && q > 30)
+  do { buf = await t.screenshot({ type: 'jpeg', quality: q, ...tuy }); q -= 6 } while (buf.length > 150 * 1000 && q > 30)
   writeFileSync(join(ANH, `that-2-${ten}.jpg`), buf)
   console.log(`  ảnh that-2-${ten}.jpg ${Math.round(buf.length / 1024)} KB`)
 }
