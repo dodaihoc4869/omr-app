@@ -12,13 +12,14 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 **App thầy (1366 / 1920)**
 - Nút Live (ảnh 01, 02): ba thẻ «Mở live ngay · Hẹn lịch live · Xem lại live»; dưới là ba ô khối có số em; một nút chính «Mở phòng chờ Khối 12».
 - Phòng chờ (03): trái là đấu trường nhìn từ trên; phải là 4 đội + số em + nút lớn «Bắt đầu live».
-- Đang live (04, 05): thanh đầu = trạng thái · sĩ số · công tắc **Học | Bảng** ở giữa · một viên «Âm thanh» (gom mic, loa, kiểu tiếng, thẻ «Đang nói» vào một khay) · «Kết thúc live». Trái: 4 đội + kJ + hàng giơ tay. Giữa: sân (đề hoặc bảng). Phải: cột «Tin nhắn lớp».
+- **Chế độ Học (04) = BÊ NGUYÊN màn live hiện tại** (thầy 12/11: «Chế độ học bê nguyên live hiện tại sang nhé»): tờ chiếu, giấy đề, bảng đen, bút, thanh đáy LIVE, khay nút «thêm», phím tắt — không vẽ lại, không đổi vị trí. Chỉ THÊM hai thứ: công tắc **Học | Bảng** trên thanh đáy và cột «Tin nhắn lớp» đóng / mở (phím M) nổi trên vùng bảng trống.
+- Chế độ Bảng (05): thanh đầu = trạng thái · sĩ số · công tắc Học | Bảng · viên «Âm thanh» · «Kết thúc live». Trái: 4 đội + kJ + hàng giơ tay. Giữa: bảng. Phải: cột «Tin nhắn lớp».
 
 **Máy em (ngang 844 / 667 / 1180, ép ngang + toàn màn hình)**
 - Trang chủ (06): thẻ Live ba trạng thái — đang mở (sáng, có nút «Tham gia») · có lịch · không có.
 - Phòng chờ (08): đấu trường kín màn, 4 ngọn lửa ở 4 góc, cần điều khiển trái, «Tăng tốc» phải.
 - Màn vào live (09): 4 ngọn lửa, tên từng em xếp dưới lửa đội; đội mình viền sáng. Hiện 3 giây rồi vào bài; mở lại từ thanh ẩn («Bốn đội»).
-- Chế độ Học (10): cột trái = 4 lửa + kJ + danh sách đội mình; giữa = đề | phương án.
+- **Chế độ Học (10) = BÊ NGUYÊN màn live máy em hiện tại** (hai khung giấy | bảng, thanh ẩn mép phải, cảnh báo, giơ tay, mic). Chỉ THÊM bong bóng chat vào thanh ẩn sẵn có. Bốn ngọn lửa + danh sách tên xem ở màn vào live và mục «Bốn đội» trong khay.
 - Chế độ Bảng (11): cột trái thu thành dải 44 px (4 lửa nhỏ), bảng chiếm hết.
 - **Thanh ẩn mép phải 44 px:** chỉ còn mũi tên, bong bóng chat (số tin mới), dấu loa. Mọi chức năng khác nằm trong khay (12): nhắn, giơ tay, mic, tiếng thầy, bốn đội, toàn màn hình, rời live.
 - Chat (13): cửa nổi bên phải, có 4 câu bấm nhanh; đóng lại thì tin mới hiện thành bong bóng nhỏ 4 giây cạnh thanh ẩn rồi tự mờ (11).
