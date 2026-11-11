@@ -27,6 +27,8 @@ export function moiTruongMacDinh(): MoiTruongLive {
 export interface KenhPhong {
   gui(tin: Record<string, unknown>): void
   guiNhiPhan(khung: Uint8Array): void
+  /** (12/11, tuỳ chọn) Số byte còn nằm trong hàng chờ gửi của WebSocket (`ws.bufferedAmount`) — máy thầy dùng để KHÔNG dồn thêm điểm cũ khi đường lên nghẽn. */
+  hangCho?(): number
 }
 
 export type TraCua = { ok: boolean; lyDo?: string; phien?: string; sdp?: string; loai?: string; id?: number; tracks?: { ten: string; mid: string }[]; ice?: RTCIceServer[]; dapXong?: boolean; http?: number; ma?: string; buoc?: string }

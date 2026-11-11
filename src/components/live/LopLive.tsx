@@ -437,7 +437,8 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
         if (am > 0.08) noiDen = nay + 1200
         if ((nay < noiDen) !== dangNoi) { dangNoi = nay < noiDen; setThayNoi(dangNoi) }
       }
-      if (nay - lucMang > 2000) { lucMang = nay; const d = lv.soDo().d?.tv; setMang(d == null ? 3 : d <= 70 ? 3 : d <= 115 ? 2 : 1) }
+      // vạch tín hiệu trong khay: theo MỨC MẠNG lúc này của đệm phát (12/11: trước lấy trung vị D cả buổi nên mạng vừa xấu không thấy đổi)
+      if (nay - lucMang > 1000) { lucMang = nay; const m = lv.soDo().mang; setMang(m === 2 ? 1 : m === 1 ? 2 : 3) }
     }
     raf = requestAnimationFrame(khung)
     return () => { cancelAnimationFrame(raf); datNhanBut(null); veB.current = null }

@@ -1,5 +1,5 @@
 {
-  "luc": "2026-11-11T04:02:21.130Z",
+  "luc": "2026-11-11T05:58:31.622Z",
   "may": "máy mô phỏng (không mạng thật, không trình duyệt): node + src/lib/live/noi-suy.ts; mỗi ô = trung vị 5 hạt ngẫu nhiên",
   "moHinh": "thầy viết ~20 giây chữ mẫu 200 Hz, máy thầy 60 khung/giây; mạng trễ nền 30 ms + rung đều 0…J + mất p %; máy em 60 khung/giây (máy yếu 30)",
   "ketQua": [
@@ -71,20 +71,20 @@
         "diemVeTrucTiep": 100
       },
       "sau": {
-        "khungViet": 1078,
-        "khungDung": 0,
-        "phanTramDung": 0,
-        "dungDaiNhatMs": 0,
+        "khungViet": 1074,
+        "khungDung": 1,
+        "phanTramDung": 0.09,
+        "dungDaiNhatMs": 17,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
         "cachMucLonNhat": 16.7,
-        "treTrungVi": 95.6,
+        "treTrungVi": 95.8,
         "treP95": 99.6,
-        "dTrungVi": 63.6,
+        "dTrungVi": 63.8,
         "troLechDauNet": 0,
         "troNhay": 35,
         "troSaiP95": 1.4,
-        "troSaiHon3": 23,
+        "troSaiHon3": 25,
         "netPhaiThay": 0,
         "diemVeTrucTiep": 100
       }
@@ -114,10 +114,10 @@
         "diemVeTrucTiep": 99.9
       },
       "sau": {
-        "khungViet": 1073,
-        "khungDung": 0,
-        "phanTramDung": 0,
-        "dungDaiNhatMs": 0,
+        "khungViet": 1076,
+        "khungDung": 1,
+        "phanTramDung": 0.09,
+        "dungDaiNhatMs": 17,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
         "cachMucLonNhat": 16.7,
@@ -126,7 +126,7 @@
         "dTrungVi": 64.2,
         "troLechDauNet": 0,
         "troNhay": 35,
-        "troSaiP95": 1.2,
+        "troSaiP95": 0.9,
         "troSaiHon3": 12,
         "netPhaiThay": 0,
         "diemVeTrucTiep": 100
@@ -157,7 +157,7 @@
         "diemVeTrucTiep": 99.9
       },
       "sau": {
-        "khungViet": 1082,
+        "khungViet": 1081,
         "khungDung": 2,
         "phanTramDung": 0.19,
         "dungDaiNhatMs": 17,
@@ -165,14 +165,14 @@
         "cachMucP95": 16.7,
         "cachMucLonNhat": 33.3,
         "treTrungVi": 161.9,
-        "treP95": 176.1,
+        "treP95": 175.9,
         "dTrungVi": 128.9,
         "troLechDauNet": 0,
-        "troNhay": 37,
-        "troSaiP95": 1.4,
-        "troSaiHon3": 33,
+        "troNhay": 36,
+        "troSaiP95": 1.3,
+        "troSaiHon3": 40,
         "netPhaiThay": 0,
-        "diemVeTrucTiep": 101.2
+        "diemVeTrucTiep": 99.9
       }
     },
     {
@@ -200,22 +200,22 @@
         "diemVeTrucTiep": 99.8
       },
       "sau": {
-        "khungViet": 1085,
+        "khungViet": 1080,
         "khungDung": 3,
         "phanTramDung": 0.28,
         "dungDaiNhatMs": 33,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
         "cachMucLonNhat": 33.3,
-        "treTrungVi": 161.9,
-        "treP95": 177,
+        "treTrungVi": 162.1,
+        "treP95": 177.1,
         "dTrungVi": 129.2,
         "troLechDauNet": 0,
-        "troNhay": 36,
-        "troSaiP95": 1.5,
-        "troSaiHon3": 35,
+        "troNhay": 35,
+        "troSaiP95": 1.4,
+        "troSaiHon3": 37,
         "netPhaiThay": 0,
-        "diemVeTrucTiep": 99.9
+        "diemVeTrucTiep": 99.8
       }
     },
     {
@@ -250,13 +250,13 @@
         "khungNhayCuc": 0,
         "cachMucP95": 33.3,
         "cachMucLonNhat": 33.3,
-        "treTrungVi": 112.2,
-        "treP95": 115.5,
-        "dTrungVi": 80,
+        "treTrungVi": 112.3,
+        "treP95": 115.6,
+        "dTrungVi": 80.2,
         "troLechDauNet": 0,
-        "troNhay": 59,
+        "troNhay": 60,
         "troSaiP95": 1.2,
-        "troSaiHon3": 8,
+        "troSaiHon3": 7,
         "netPhaiThay": 0,
         "diemVeTrucTiep": 100
       }
@@ -286,20 +286,20 @@
         "diemVeTrucTiep": 99.8
       },
       "sau": {
-        "khungViet": 1079,
-        "khungDung": 3,
-        "phanTramDung": 0.28,
+        "khungViet": 1077,
+        "khungDung": 2,
+        "phanTramDung": 0.19,
         "dungDaiNhatMs": 17,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
         "cachMucLonNhat": 33.3,
-        "treTrungVi": 117.7,
-        "treP95": 130.2,
-        "dTrungVi": 83.9,
+        "treTrungVi": 117.9,
+        "treP95": 130.5,
+        "dTrungVi": 84.3,
         "troLechDauNet": 0,
         "troNhay": 35,
-        "troSaiP95": 1.5,
-        "troSaiHon3": 30,
+        "troSaiP95": 1.4,
+        "troSaiHon3": 27,
         "netPhaiThay": 0,
         "diemVeTrucTiep": 100
       }
@@ -329,15 +329,15 @@
         "diemVeTrucTiep": 100
       },
       "sau": {
-        "khungViet": 1079,
+        "khungViet": 1075,
         "khungDung": 0,
         "phanTramDung": 0,
         "dungDaiNhatMs": 0,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
         "cachMucLonNhat": 16.7,
-        "treTrungVi": 82.5,
-        "treP95": 85.3,
+        "treTrungVi": 82.7,
+        "treP95": 85.4,
         "dTrungVi": 49.9,
         "troLechDauNet": 0,
         "troNhay": 38,
@@ -372,22 +372,22 @@
         "diemVeTrucTiep": 100
       },
       "sau": {
-        "khungViet": 1059,
-        "khungDung": 34,
-        "phanTramDung": 3.23,
-        "dungDaiNhatMs": 133,
+        "khungViet": 1065,
+        "khungDung": 2,
+        "phanTramDung": 0.19,
+        "dungDaiNhatMs": 17,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
-        "cachMucLonNhat": 150,
-        "treTrungVi": 181.4,
-        "treP95": 216,
-        "dTrungVi": 150,
+        "cachMucLonNhat": 33.3,
+        "treTrungVi": 241.5,
+        "treP95": 285.9,
+        "dTrungVi": 206.3,
         "troLechDauNet": 0,
-        "troNhay": 43,
-        "troSaiP95": 5.9,
-        "troSaiHon3": 324,
+        "troNhay": 39,
+        "troSaiP95": 6.6,
+        "troSaiHon3": 473,
         "netPhaiThay": 0,
-        "diemVeTrucTiep": 101.4
+        "diemVeTrucTiep": 100
       }
     },
     {
@@ -415,22 +415,22 @@
         "diemVeTrucTiep": 100
       },
       "sau": {
-        "khungViet": 1048,
-        "khungDung": 95,
-        "phanTramDung": 9.12,
-        "dungDaiNhatMs": 150,
+        "khungViet": 1076,
+        "khungDung": 6,
+        "phanTramDung": 0.56,
+        "dungDaiNhatMs": 50,
         "khungNhayCuc": 0,
         "cachMucP95": 16.7,
-        "cachMucLonNhat": 166.7,
-        "treTrungVi": 184.8,
-        "treP95": 275.3,
-        "dTrungVi": 150,
+        "cachMucLonNhat": 50,
+        "treTrungVi": 305.6,
+        "treP95": 334,
+        "dTrungVi": 268.2,
         "troLechDauNet": 0,
-        "troNhay": 47,
-        "troSaiP95": 5.1,
-        "troSaiHon3": 242,
+        "troNhay": 38,
+        "troSaiP95": 3.7,
+        "troSaiHon3": 161,
         "netPhaiThay": 0,
-        "diemVeTrucTiep": 105
+        "diemVeTrucTiep": 100
       }
     }
   ]

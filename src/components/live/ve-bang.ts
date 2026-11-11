@@ -22,6 +22,8 @@ import { giaiTrang, VUNG_MAC_DINH, type O4 } from './bo-cuc'
 import { O_TAY, coTay, taoTroBut, tiLeTay, veTay, type DangTay, type MauBut } from './tro-but'
 
 type G2 = CanvasRenderingContext2D
+/** Trần diện tích của lớp chốt (điểm ảnh thật). */
+const TRAN_DIEM_ANH = 8e6
 type Hop = [number, number, number, number]
 interface NetCoNho extends NetBut { _k?: string; _d?: Path2D | number[] }
 /** Nét đang viết: `net.diem` lớn dần; `st` = trạng thái xử lý dần; `dong` = mốc đã in xuống lớp chốt; `bang` = nét bảng (cuộn). */
@@ -242,7 +244,11 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     // MẬT ĐỘ ĐIỂM ẢNH THẬT (11/11, thầy: «nét bút sắc nét và mịn tuyệt đối»): nơi gọi kẹp mật độ ở 2,5 (máy yếu 1,5) ⇒ điện thoại mật độ 3 bị trình duyệt
     // kéo giãn canvas 1,2 lần (máy yếu: 2 lần) — nét mờ. Ở đây nâng lên mật độ thật của màn, trần 3 (máy yếu: trần 2).
     const that = typeof devicePixelRatio === 'number' && devicePixelRatio > 0 ? devicePixelRatio : k0.dpr
-    const k = that > k0.dpr ? { ...k0, dpr: Math.min(that, k0.dpr <= 1.5 ? 2 : 3) } : k0
+    let k = that > k0.dpr ? { ...k0, dpr: Math.min(that, k0.dpr <= 1.5 ? 2 : 3) } : k0
+    // KẸP THEO DIỆN TÍCH (12/11): WebKit trên iPhone / iPad có trần bộ nhớ canvas (mỗi canvas ≈ 16,7 triệu điểm ảnh, cả trang cũng có trần) — vượt thì vẽ
+    // chậm hoặc trắng. Lớp chốt (to bằng cả hình) không quá 8 triệu điểm ảnh; hơn thì hạ mật độ cho vừa. iPhone nằm ngang 932 × 430 ở mật độ 3 =
+    // 3,6 triệu, iPad 1366 × 1024 ở mật độ 2 = 5,6 triệu: chưa chạm trần này.
+    if (k.w * k.h * k.dpr * k.dpr > TRAN_DIEM_ANH) k = { ...k, dpr: Math.max(1, Math.floor(Math.sqrt(TRAN_DIEM_ANH / (k.w * k.h)) * 4) / 4) }
     kv = k
     KH = loi.khung(k.Wv, k.Hv)
     cvChot.width = Math.max(1, Math.round(k.w * k.dpr)); cvChot.height = Math.max(1, Math.round(k.h * k.dpr))
