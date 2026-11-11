@@ -1,7 +1,8 @@
 // TRANG THỬ LIVE BẢNG (10/11, đợt 1B) — component THẬT (ManBinhPhanUng + LopLive · tờ chiếu thật + phần nối live của app thầy) nói chuyện với phòng THẬT
 // chạy trong Node (scripts/thu-live-1011/may-chu.mjs). Không máy chủ thật, không dữ liệu học sinh thật.
 //   ?vai=em&sbd=S1 [&yeu=1 máy yếu]      — máy em
-//   ?vai=thay [&giay=toi] [&noi=1]        — tờ chiếu trong khung + cửa sổ app (mic, phòng); noi=1: tờ có cầu nối (mã phiên thu1111)
+//   ?vai=thay [&giay=toi] [&noi=1] [&anh=1] — tờ chiếu trong khung + cửa sổ app (mic, phòng); noi=1: tờ có cầu nối (mã phiên thu1111);
+//                                           anh=1: câu 1 có ẢNH trong thân câu (giấy thầy «lạ» ⇒ máy em dựng giấy thường, ẩn nét trên giấy)
 // Cách chạy: xem đầu tệp scripts/thu-live-1011/thu.mjs
 import '../chup-bpu-de-chang-1011/bat-trong'
 import '../../src/components/m3/m3-tuong-thich.css'
@@ -71,7 +72,9 @@ if (vai === 'em') {
   })
 } else {
   // Tờ chiếu thật, hai đợt (hai câu) — mã câu trùng câu bộ thử mở lượt.
-  const cau = (id: string, text: string, luaChon: string[]) => ({ phan: 'I', id, maDe: '', chuyenDe: 'Alcohol', dang: 'Bậc alcohol', sao: 2, mucDo: '', text, luaChon, dapAn: 'B', chot: 'Bậc alcohol = bậc của C mang nhóm –OH.', lyDo: [{ khoa: 'B', ly: 'C mang –OH nối với 2 C khác.' }], buoc: ['Tìm C mang –OH.', 'Đếm số C nối với nó.'] })
+  /** Ảnh thân câu giả (sơ đồ thí nghiệm vẽ tay bằng SVG) — cùng ảnh bộ thử đưa vào câu của lượt (scripts/thu-live-1011/do-doc-lap-1111.mjs). */
+  const ANH_GIA = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240"><rect width="640" height="240" fill="white"/><g fill="none" stroke="#1f2937" stroke-width="3"><path d="M90 40v120a40 40 0 0 0 80 0V40"/><path d="M70 40h120"/><path d="M130 30v-18h170v60"/><path d="M270 72h60v110a30 30 0 0 1-60 0z"/><path d="M420 60h120v130H420z"/><path d="M300 110h120"/></g><g fill="#2563eb" opacity="0.35"><path d="M92 110h76v50a38 38 0 0 1-76 0z"/><path d="M272 130h56v52a28 28 0 0 1-56 0z"/></g><g font-family="sans-serif" font-size="20" fill="#111827"><text x="78" y="225">Ống 1</text><text x="268" y="230">Ống 2</text><text x="436" y="225">Bình hứng</text></g></svg>')
+  const cau = (id: string, text: string, luaChon: string[]) => ({ phan: 'I', id, maDe: '', chuyenDe: 'Alcohol', dang: 'Bậc alcohol', sao: 2, mucDo: '', text, luaChon, ...(ts.get('anh') === '1' && id === 'Q1' ? { anhThanCau: ANH_GIA } : {}), dapAn: 'B', chot: 'Bậc alcohol = bậc của C mang nhóm –OH.', lyDo: [{ khoa: 'B', ly: 'C mang –OH nối với 2 C khác.' }], buoc: ['Tìm C mang –OH.', 'Đếm số C nối với nó.'] })
   const o = (sbd: string, hoTen: string, c: unknown, soCau: number) => ({ sbd, hoTen, qid: 'Q' + soCau, soCau, sao: 2, cau: c, bacUoc: 2, lop: '12A1', lanLenBang: 3 })
   const html = taoHtmlMayChieu([
     o('S1', 'Nguyễn Thị Hà', cau('Q1', 'Alcohol nào sau đây là alcohol bậc II?', ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH']), 1),

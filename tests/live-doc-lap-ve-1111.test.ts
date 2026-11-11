@@ -92,6 +92,19 @@ describe('hai phép biến đổi: nét giấy / nét bảng ra đúng điểm �
     expect(l.T[0]).toBeCloseTo((KC.Wv * m.bc.sB) / 1920, 6)
     expect(m.bc.sB).not.toBeCloseTo(m.bc.sG, 2)
   })
+  it('nét mã THƯỜNG nhưng bắt đầu trong ô bảng đen (bản ghi / máy thầy trước khi có mã «b_») ⇒ vẫn theo phép của BẢNG, vào canvas bảng; bắt đầu trên giấy ⇒ theo giấy', () => {
+    const m = dung()
+    const x = (B0 + B2) / 2, y = B1 + (B3 - B1) * 0.2
+    m.v.ap({ loai: 'net-moi', trang: TRANG, net: net('n_cu', x, y), xong: true })
+    expect(m.fill(m.cvChot).length).toBe(0)
+    const [px, py] = tam(m.fill(m.cvBang)[0]!), [mx, my] = diemBang(m.bc, KC, x, y), o = m.v.cuon().bang
+    expect(px).toBeCloseTo(mx - o.x, 0); expect(py).toBeCloseTo(my - o.y, 0)
+    // nét dở mã thường trên bảng: đuôi cũng theo phép bảng, cây bút cũng vậy
+    m.v.ap({ loai: 'net-moi', trang: TRANG, net: net('n_do', x, y + 0.1), xong: false })
+    expect(m.v.toiPx(x, y + 0.1, 'n_do')[0]).toBeCloseTo(diemBang(m.bc, KC, x, y + 0.1)[0], 6)
+    m.v.ap({ loai: 'net-moi', trang: TRANG, net: net('n_giay', 0.3, 0.4), xong: true })
+    expect(m.fill(m.cvChot).length).toBeGreaterThan(0)
+  })
   it('`toiPx` (cây bút): điểm trên giấy theo phép giấy trừ độ cuộn của GIẤY; điểm trên bảng theo phép bảng trừ độ cuộn của BẢNG', () => {
     const m = dung()
     const [mx, my] = diemGiay(m.bc, KC, 0.3, 0.5)

@@ -6,7 +6,7 @@
 // Chạy được với CẢ bản cũ (một phép co) lẫn bản mới ⇒ bảng TRƯỚC / SAU:
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <dist>
 //   node scripts/thu-live-1011/do-doc-lap-1111.mjs <dist> <tệp số đo .json> [thư mục ảnh — có thì chụp bộ that-4-em-*.jpg]
-// Biến môi trường: DL_CPU=4 (bóp CPU máy em 844 khi đo khung hình).
+// Biến môi trường: DL_CPU=4 (bóp CPU máy em 844 khi đo khung hình) · DL_ANH=1 (câu có ẢNH: giấy dựng thường — chỉ chụp + đo máy em 844 rồi thôi).
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { chromium } from 'playwright'
@@ -29,7 +29,9 @@ async function chup(t, ten, tuy = {}) {
   writeFileSync(join(ANH, `that-4-em-${ten}.jpg`), buf)
   console.log(`  ảnh that-4-em-${ten}.jpg ${Math.round(buf.length / 1024)} KB`)
 }
-const CAU = { qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Alcohol nào sau đây là alcohol bậc II?', choices: ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Bậc alcohol', mucDo: 'hieu', sao: 2, kienThuc: [] }
+const ANH_GIA = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="640" height="240" viewBox="0 0 640 240"><rect width="640" height="240" fill="white"/><g fill="none" stroke="#1f2937" stroke-width="3"><path d="M90 40v120a40 40 0 0 0 80 0V40"/><path d="M70 40h120"/><path d="M130 30v-18h170v60"/><path d="M270 72h60v110a30 30 0 0 1-60 0z"/><path d="M420 60h120v130H420z"/><path d="M300 110h120"/></g><g fill="#2563eb" opacity="0.35"><path d="M92 110h76v50a38 38 0 0 1-76 0z"/><path d="M272 130h56v52a28 28 0 0 1-56 0z"/></g><g font-family="sans-serif" font-size="20" fill="#111827"><text x="78" y="225">Ống 1</text><text x="268" y="230">Ống 2</text><text x="436" y="225">Bình hứng</text></g></svg>')
+const CO_ANH = !!process.env.DL_ANH
+const CAU = { ...(CO_ANH ? { thanCauImg: ANH_GIA } : {}), qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Alcohol nào sau đây là alcohol bậc II?', choices: ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Bậc alcohol', mucDo: 'hieu', sao: 2, kienThuc: [] }
 const KHO = [['844x390', 844, 390, 2, 'S1'], ['667x375', 667, 375, 2, 'S2'], ['1180x820', 1180, 820, 2, 'S3'], ['1971x1247', 1971, 1247, 1, 'S4'], ['iPhone dọc xoay 390x844', 390, 844, 3, 'S5']]
 
 // ───────────── THẦY ─────────────
@@ -37,7 +39,7 @@ const ctxThay = await trinh.newContext({ viewport: { width: 1366, height: 768 },
 await chanNgoai(ctxThay)
 const thay = await ctxThay.newPage()
 thay.on('pageerror', (e) => loiTrang.push(`thầy: ${e.message}`))
-await thay.goto(`${may.goc}/scripts/thu-live-1011/trang.html?vai=thay`)
+await thay.goto(`${may.goc}/scripts/thu-live-1011/trang.html?vai=thay${CO_ANH ? '&anh=1' : ''}`)
 const to = thay.frameLocator('iframe')
 await to.locator('body[data-bo-cuc="xong"]').waitFor({ timeout: 20000 })
 await to.locator('.mc-lv-nut').waitFor({ state: 'visible', timeout: 15000 })
@@ -45,7 +47,7 @@ await may.moLuot(CAU, 'B')
 
 // ───────────── NĂM MÁY EM ─────────────
 const em = {}
-for (const [ten, w, h, dpr, sbd] of KHO) {
+for (const [ten, w, h, dpr, sbd] of CO_ANH ? KHO.slice(0, 1) : KHO) {
   const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: dpr, hasTouch: true, isMobile: w < 1200 })
   await chanNgoai(ctx)
   const t = await ctx.newPage()
@@ -96,6 +98,20 @@ const do1 = (t, cot = 0.72) => t.evaluate((cot) => {
 }, cot)
 const doHet = async (nhan, kq) => { for (const ten of Object.keys(em)) { (kq[ten] ??= {})[nhan] = await do1(em[ten].t) } }
 const kq = {}
+if (CO_ANH) {
+  // CÂU CÓ ẢNH: giấy thầy «lạ» ⇒ máy em dựng giấy theo bề ngang khung của EM (chữ to tự nhiên, ảnh co vừa khung), nét trên giấy ẩn; bảng đen vẫn co giãn độc lập
+  const t = em['844x390'].t
+  const bang0 = await to.locator('.mc-cot-lam-bai').first().evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height } })
+  await thay.mouse.move(bang0.x + bang0.w * 0.1, bang0.y + bang0.h * 0.3); await thay.mouse.down()
+  for (let i = 1; i <= 30; i++) { await thay.mouse.move(bang0.x + bang0.w * (0.1 + 0.8 * i / 30), bang0.y + bang0.h * (0.3 + 0.03 * Math.sin(i / 3))); await ngu(10) }
+  await thay.mouse.up(); await ngu(2800)
+  const d = await t.evaluate(() => { const g = document.querySelector('.lv-giay'), a = g.querySelector('img'), c = g.querySelector('.lv-de-trong'), chu = g.querySelector('.lv-de-trong p, .lv-de-trong .ht2-lam-de, .lv-de-trong [class*="de"]'); const r = a?.getBoundingClientRect(), G = g.getBoundingClientRect(); const k = c ? c.getBoundingClientRect().width / c.offsetWidth : 1; return { soi: document.querySelector('.lv').hasAttribute('data-soi'), coAnh: !!a, anhTrongKhung: !!r && r.left >= G.left - 1 && r.right <= G.right + 1 && r.width > 40, heSoPhong: Math.round(k * 100) / 100, chuDe: chu ? Math.round(parseFloat(getComputedStyle(chu).fontSize) * k * 100) / 100 : null, giay: [Math.round(G.left), Math.round(G.width)], cvGiayAn: getComputedStyle(g.querySelector('canvas')).display === 'none' } })
+  console.log('câu có ảnh (844 × 390):', JSON.stringify(d))
+  await chup(t, '844-cau-co-anh-giay-dung-thuong')
+  writeFileSync(SO_DO, JSON.stringify({ luc: new Date().toISOString(), cauCoAnh: d, loiTrang }, null, 2) + '\n')
+  await trinh.close(); await may.dong()
+  process.exit(loiTrang.length ? 1 : 0)
+}
 await doHet('vua_vao_bang_trong', kq)
 await chup(em['844x390'].t, '844-vua-vao-giay-uu-tien')
 
@@ -112,7 +128,10 @@ const ke = async (x0, y0, x1, y1, buoc = 30, nghi = 8) => { await thay.mouse.mov
 await ke(bang.x + bang.w * 0.1, bang.y + bang.h * 0.3, bang.x + bang.w * 0.9, bang.y + bang.h * 0.3, 40, 8)
 await ngu(700)
 await doHet('net_dau_tren_bang_chua_qua_2_giay', kq)
-for (let i = 0; i < 5; i++) { await ke(bang.x + bang.w * 0.1, bang.y + bang.h * (0.4 + i * 0.05), bang.x + bang.w * 0.4, bang.y + bang.h * (0.42 + i * 0.05), 22, 12); await ngu(120); if (i === 3) await chup(E.t, '844-bang-dang-no') }
+// chụp đúng LÚC khung bảng đang nở (phép transform đang chạy): chờ khung bảng nhận chuyển động rồi chụp sau 150 ms
+const dangNo = ANH ? E.t.waitForFunction(() => /transform/.test(document.querySelector('.lv-bang')?.style.transition ?? ''), null, { polling: 'raf', timeout: 6000 }).then(async () => { await ngu(150); await chup(E.t, '844-bang-dang-no') }, () => console.log('  (không bắt được lúc khung bảng đang nở)')) : null
+for (let i = 0; i < 5; i++) { await ke(bang.x + bang.w * 0.1, bang.y + bang.h * (0.4 + i * 0.05), bang.x + bang.w * 0.4, bang.y + bang.h * (0.42 + i * 0.05), 22, 12); await ngu(120) }
+await dangNo
 await ngu(900)
 await doHet('thay_viet_bang_qua_2_giay', kq)
 await chup(E.t, '844-bang-uu-tien')
@@ -121,6 +140,10 @@ await chup(em['1180x820'].t, '1180-bang-uu-tien', { scale: 'css' })
 await chup(em['1971x1247'].t, '1971-bang-uu-tien', { scale: 'css' })
 await chup(em['iPhone dọc xoay 390x844'].t, 'iphone-doc-xoay-bang-uu-tien')
 const khung = await E.t.evaluate(() => { const K = window.__kh; K.chay = false; const t = K.t.slice(5).sort((a, b) => a - b); const tb = t.reduce((a, b) => a + b, 0) / Math.max(1, t.length); const dai = K.t.map((d, i) => [Math.round(K.luc[i] - K.luc[0]), Math.round(d)]).filter((x) => x[1] > 34); return { viecDai: K.viec.map((v) => [v[0] - Math.round(K.luc[0]), v[1]]), khungDai: dai, xepLuc: K.xep.map((x) => Math.round(x - K.luc[0])).filter((x, i, a) => !i || x - a[i - 1] > 30), so: t.length, kh_giay: Math.round(1000 / tb * 10) / 10, p95_ms: Math.round(t[Math.floor(t.length * 0.95)] * 10) / 10, dai_nhat_ms: Math.round(t[t.length - 1] * 10) / 10, tren_34ms: t.filter((x) => x > 34).length } })
+// khung hình lúc bố cục ĐỨNG YÊN (đã ưu tiên bảng — không có lần nở nào trong quãng đo): thầy viết tiếp 5 nét
+await E.t.evaluate(() => { const K = (window.__kh2 = { t: [], chay: true }); let truoc = performance.now(); const f = (n) => { K.t.push(n - truoc); truoc = n; if (K.chay) requestAnimationFrame(f) }; requestAnimationFrame(f) })
+for (let i = 0; i < 5; i++) { await ke(bang.x + bang.w * 0.5, bang.y + bang.h * (0.4 + i * 0.05), bang.x + bang.w * 0.85, bang.y + bang.h * (0.42 + i * 0.05), 22, 12); await ngu(120) }
+const khungYen = await E.t.evaluate(() => { const K = window.__kh2; K.chay = false; const t = K.t.slice(5).sort((a, b) => a - b); const tb = t.reduce((a, b) => a + b, 0) / Math.max(1, t.length); return { so: t.length, kh_giay: Math.round(1000 / tb * 10) / 10, p95_ms: Math.round(t[Math.floor(t.length * 0.95)] * 10) / 10, dai_nhat_ms: Math.round(t[t.length - 1] * 10) / 10, tren_34ms: t.filter((x) => x > 34).length } })
 if (cpu > 1) await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 })
 
 // ───────────── THẦY QUAY LẠI GẠCH TRÊN GIẤY ─────────────
@@ -155,10 +178,30 @@ if (kq['844x390'].thay_gach_giay_qua_2_giay.cuonGiay) {
   await chup(E.t, '844-giay-tu-troi-toi-cho-thay')
 }
 
-const ra = { luc: new Date().toISOString(), ghiChu: 'Chromium thật (không phải máy thật), phòng thật trong Node, dữ liệu giả; màn chiếu của thầy 1366 × 768. Cỡ chữ + bề dày nét: px CSS thật trên màn máy em.', dist: DIST, cpu, khungHinh844: khung, muiTen, troi, kq, loiTrang }
+// ───────────── CHẠM HAI LẦN: phóng kín giấy / bảng (844, 667) ─────────────
+const phong = {}
+for (const ten of ['844x390', '667x375']) {
+  const t = em[ten].t, d0 = await do1(t)
+  if (!d0.cuonGiay) break // bản một phép co: không có khung giấy riêng
+  const hai = async (x, y) => { await t.touchscreen.tap(x, y); await ngu(90); await t.touchscreen.tap(x, y); await ngu(900) }
+  await hai(d0.giay[0] + 150, d0.giay[1] + 250)
+  const g = await do1(t)
+  if (ten === '844x390') await chup(t, '844-cham-hai-lan-giay-phu-kin')
+  await hai(d0.giay[0] + 150, d0.giay[1] + 250)
+  const d1 = await do1(t)
+  await hai(d1.bang[0] + d1.bang[2] / 2, d1.bang[1] + 250)
+  const b = await do1(t)
+  if (ten === '844x390') await chup(t, '844-cham-hai-lan-bang-phu-kin')
+  await hai(b.bang[0] + b.bang[2] / 2, b.bang[1] + 250)
+  phong[ten] = { giayPhuKin: { chuDe: g.chuDe, giay: g.giay }, bangPhuKin: { netDai: b.netDai, net: b.net, bang: b.bang }, veLai: (await do1(t)).giay }
+  console.log(`${ten}: chạm hai lần — giấy phủ kín: chữ đề ${g.chuDe} px · bảng phủ kín: nét mẫu dài ${b.netDai} px, dày ${b.net} px`)
+}
+
+const ra = { phong, khungHinh844DungYen: khungYen, luc: new Date().toISOString(), ghiChu: 'Chromium thật (không phải máy thật), phòng thật trong Node, dữ liệu giả; màn chiếu của thầy 1366 × 768. Cỡ chữ + bề dày nét: px CSS thật trên màn máy em.', dist: DIST, cpu, khungHinh844: khung, muiTen, troi, kq, loiTrang }
 writeFileSync(SO_DO, JSON.stringify(ra, null, 2) + '\n')
 for (const ten of Object.keys(kq)) for (const tt of Object.keys(kq[ten])) { const v = kq[ten][tt]; console.log(`${ten.padEnd(26)} ${tt.padEnd(36)} chữ đề ${String(v.chuDe).padStart(6)} px · nét dày ${String(v.net).padStart(5)} dài ${String(v.netDai).padStart(6)} px · giấy ${JSON.stringify(v.giay)} · bảng ${JSON.stringify(v.bang)} · cuộn ${JSON.stringify(v.cuonGiay)}`) }
 console.log('khung hình 844 khi thầy viết (CPU ×' + cpu + '):', JSON.stringify(khung))
+console.log('khung hình 844 đứng yên (CPU ×' + cpu + '):', JSON.stringify(khungYen))
 console.log('mũi tên:', JSON.stringify(muiTen && { mui: muiTen.mui, cuon: muiTen.cuonGiay }), '· tự trôi:', JSON.stringify(troi && { mui: troi.mui, cuon: troi.cuonGiay }))
 if (loiTrang.length) console.log('LỖI TRANG:', loiTrang.slice(0, 5).join(' | '))
 await trinh.close(); await may.dong()

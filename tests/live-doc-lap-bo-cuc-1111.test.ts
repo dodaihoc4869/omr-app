@@ -1,10 +1,10 @@
 // LIVE BẢNG — MÁY EM: GIẤY VÀ BẢNG CO GIÃN ĐỘC LẬP (thầy 11/11: «Làm chuẩn cái này luôn nhé. Tối ưu cho hs nhất có thể»). Phần THUẦN: bo-cuc-doc-lap.ts.
-// Khoá: ba mốc chia theo cỡ chữ thật của đề (sàn 15 px, trần 28 px, trần phép co), hai khung phủ kín bề ngang trong vùng an toàn (kể cả hình xoay), phóng kín
+// Khoá: ba mốc chia theo cỡ chữ thật của đề (sàn 15 px, trần 34 px, trần phép co), hai khung phủ kín bề ngang trong vùng an toàn (kể cả hình xoay), phóng kín
 // một khung, ánh xạ điểm của thầy ⇒ điểm ảnh qua HAI phép biến đổi, tự ưu tiên có trễ 2 giây, giấy tự trôi theo bút + nhường khi em vừa cuộn, chuyển khung êm.
 // Điểm ảnh thật + khung hình thật: scripts/thu-live-1011/do-doc-lap-1111.mjs, thu-2.mjs.
 import { describe, expect, it } from 'vitest'
 import { KHE_GIUA, LE_NGOAI, VUNG_MAC_DINH, anToanHinh, boCucEm, khungChieu } from '../src/components/live/bo-cuc'
-import { KHOA_CHIA, NHUONG_MS, SAN_CHU, S_TRAN, TRAN_CHU, TRE_UU_TIEN_MS, boCucDocLap, buocTroi, chuyenKhung, diemBang, diemGiay, docChia, ghiChia, khungVeDL, laNetBang, mocChia, taoUuTien, troiGiay, vungBut } from '../src/components/live/bo-cuc-doc-lap'
+import { KHOA_CHIA, NHUONG_MS, SAN_CHU, S_TRAN, TRAN_CHU, TRE_UU_TIEN_MS, boCucDocLap, buocTroi, chuyenKhung, diemBang, diemGiay, docChia, ghiChia, khungVeDL, laNetBang, mocChia, netOBang, taoUuTien, troiGiay, vungBut } from '../src/components/live/bo-cuc-doc-lap'
 
 const KHONG = { trai: 0, phai: 0, duoi: 0, tren: 0 }
 const KC = khungChieu(VUNG_MAC_DINH, 16 / 9)
@@ -33,7 +33,7 @@ describe('ba mốc chia bề ngang theo nội dung', () => {
       expect(b.sB / cu.s, ten).toBeGreaterThanOrEqual(w === 844 ? 1.4 : 1.05)
     }
   })
-  it('máy bảng / máy tính: có TRẦN — ưu tiên giấy không đẩy chữ đề quá 28 px (trừ khi mốc giữa vốn đã to hơn), bảng không phóng quá nét thật của thầy', () => {
+  it('máy bảng / máy tính: có TRẦN — ưu tiên giấy không đẩy chữ đề quá 34 px (trừ khi mốc giữa vốn đã to hơn), bảng không phóng quá nét thật của thầy', () => {
     for (const [ten, w, h] of MAY.slice(2)) {
       const m = mocChia(w, h, KHONG, KC, TL)
       const g = boCucDocLap({ w, h, at: KHONG, kc: KC, chia: m.giay }), giua = boCucDocLap({ w, h, at: KHONG, kc: KC, chia: m.giua }), b = boCucDocLap({ w, h, at: KHONG, kc: KC, chia: m.bang })
@@ -118,8 +118,13 @@ describe('ánh xạ nét qua HAI phép biến đổi', () => {
   })
   it('bút đang ở vùng nào: theo mã nét («b_…» = bảng), không có mã thì theo hoành độ trong cột bảng đen', () => {
     expect(laNetBang('b_12')).toBe(true); expect(laNetBang('bx12')).toBe(false)
-    expect(vungBut(VUNG_MAC_DINH.bang, 0.3, 'b_1')).toBe('bang'); expect(vungBut(VUNG_MAC_DINH.bang, 0.8, 'n7')).toBe('giay')
+    expect(vungBut(VUNG_MAC_DINH.bang, 0.3, 'b_1')).toBe('bang'); expect(vungBut(VUNG_MAC_DINH.bang, 0.3, 'n7')).toBe('giay')
     expect(vungBut(VUNG_MAC_DINH.bang, 0.8)).toBe('bang'); expect(vungBut(VUNG_MAC_DINH.bang, 0.3, null)).toBe('giay')
+    // nét mã thường nằm trên cột bảng đen (bản ghi / máy thầy trước khi có mã «b_») vẫn là nét của BẢNG
+    expect(vungBut(VUNG_MAC_DINH.bang, 0.8, 'n7')).toBe('bang')
+    expect(netOBang(VUNG_MAC_DINH.bang, { id: 'n7', diem: [[0.8, 0.3, 0.4, 0]] })).toBe(true)
+    expect(netOBang(VUNG_MAC_DINH.bang, { id: 'n7', diem: [[0.3, 0.3, 0.4, 0], [0.8, 0.3, 0.4, 5]] })).toBe(false) // bắt đầu trên giấy
+    expect(netOBang(VUNG_MAC_DINH.bang, { id: 'b_7', diem: [] })).toBe(true); expect(netOBang(VUNG_MAC_DINH.bang, { id: 'n7', diem: [] })).toBe(false)
   })
 })
 

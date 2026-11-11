@@ -7,6 +7,9 @@
 // tiếng, thanh ẩn sang hẳn góc phải ở giữa bảng đen … đề và bảng đen phải full … ẩn hết vào thanh ẩn»; lần 2 là mép trên) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy + bảng PHỦ KÍN, giấy đề soi đúng
 // giấy thầy (B1) ⇒ thầy gạch chân trên giấy ⇒ nét khớp chữ ⇒ thầy gọi lên bảng ⇒ em CHƯA gửi bị ép vào bảng live, có dải đoán / tiếp sức (K2, B3) ⇒
 // tạm dừng / tiếp tục / kết thúc trong cửa sổ nút Live (K3) ⇒ em rời màn ⇒ thẻ ghi kiểu rời (B2) ⇒ chạm hai lần phóng bảng.
+// 11/11 CHIỀU — «ĐL»: giấy đề và bảng đen co giãn ĐỘC LẬP (KhungDocLap.tsx): vừa vào (bảng trống) giấy được ưu tiên, chữ đề to; nét gạch chân KHỚP chữ (đo điểm ảnh
+// mực trên lớp nét của giấy so với dòng chữ); thầy viết trên bảng quá 2 giây ⇒ khung bảng nở, chữ đề không dưới 15 px; khay có hàng «Tự phóng theo thầy».
+// Bảng số trước / sau + ảnh that-4-em-*: scripts/thu-live-1011/do-doc-lap-1111.mjs.
 // KHÔNG kiểm được ở đây: TIẾNG (cửa /bpu/live của máy chủ thử trả «chưa cấu hình» — cần Cloudflare Realtime SFU thật + mic thật), khoá xoay Android, iPhone thật.
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
@@ -192,13 +195,26 @@ await thay.mouse.move(hop.x + hop.w * 0.42, hop.y + 3); await thay.mouse.down()
 for (let i = 1; i <= 24; i++) { await thay.mouse.move(hop.x + hop.w * (0.42 + 0.3 * i / 24), hop.y + 3 + Math.sin(i / 3) * 1.2); await ngu(8) }
 await thay.mouse.up()
 await ngu(900)
+// (11/11 chiều) lớp nét đã chốt của GIẤY là canvas nằm ngay trên tấm giấy, trong khung cuộn của giấy ⇒ đọc thẳng canvas ấy; kèm hộp bao của mực (px CSS trên tấm giấy)
 const mucGiay = await em.t.evaluate(() => {
-  const c = document.querySelector('.lv-cv'), g = document.querySelector('.lv-giay').getBoundingClientRect(), k = c.width / c.getBoundingClientRect().width
-  const d = c.getContext('2d').getImageData(Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k)).data
-  let n = 0; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) n++
-  return n
+  const c = document.querySelector('.lv-giay canvas'), k = c.width / parseFloat(c.style.width), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data
+  // nét gạch chân = HÀNG nhiều mực nhất (các chấm lẻ do cú bấm chuột khác của kịch bản không tính) ⇒ hộp bao mực trong dải ± 4 px quanh hàng ấy
+  let n = 0, x0 = 1e9, x1 = -1, y0 = 1e9, y1 = -1, dam = 0, hang = 0
+  const dem = new Int32Array(c.height)
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 40) { n++; dem[y]++ }
+  for (let y = 0; y < c.height; y++) if (dem[y] > dam) { dam = dem[y]; hang = y }
+  for (let y = Math.max(0, hang - Math.round(4 * k)); y <= Math.min(c.height - 1, hang + Math.round(4 * k)); y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 40) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y }
+  const tam = c.getBoundingClientRect(), chu = document.querySelector('.lv-gt[data-khop] .lv-gt-chu').getBoundingClientRect()
+  return { n, muc: [x0 / k, y0 / k, x1 / k, y1 / k].map((v) => Math.round(v * 10) / 10), chu: [chu.left - tam.left, chu.top - tam.top, chu.right - tam.left, chu.bottom - tam.top].map((v) => Math.round(v * 10) / 10), coChu: Math.round(parseFloat(getComputedStyle(document.querySelector('.lv-gt-chu')).fontSize) * chu.width / document.querySelector('.lv-gt-chu').offsetWidth * 100) / 100, hien: getComputedStyle(c).display !== 'none' && getComputedStyle(c).visibility !== 'hidden' }
 })
-kiem('B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)', mucGiay > 10, `${mucGiay} mẫu điểm ảnh có mực trong ô giấy`)
+kiem('B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)', mucGiay.n > 10 && mucGiay.hien, `${mucGiay.n} điểm ảnh có mực trên lớp nét của giấy`)
+{ // ĐL · nét KHỚP chữ qua phép biến đổi riêng của giấy: thầy gạch từ 42 % tới 72 % bề ngang khối đề, ngay dưới dòng chữ
+  const [cx0, , cx1, cy1] = mucGiay.chu, rongChu = cx1 - cx0, [mx0, my0, mx1, my1] = mucGiay.muc
+  const lech = Math.max(Math.abs(mx0 - (cx0 + rongChu * 0.42)), Math.abs(mx1 - (cx0 + rongChu * 0.72))) / rongChu
+  soDo.dl_net_khop_chu = { lech_ngang_phan_tram_be_rong_chu: Math.round(lech * 1000) / 10, net_duoi_day_dong_chu_px: Math.round(((my0 + my1) / 2 - cy1) * 10) / 10, co_chu_de_px: mucGiay.coChu }
+  kiem('ĐL · nét gạch chân KHỚP chữ trên giấy đã phóng (hai đầu nét lệch ≤ 2 % bề ngang khối đề; nét nằm ngay dưới dòng chữ, cách ≤ 0,4 cỡ chữ)', lech <= 0.02 && (my0 + my1) / 2 - cy1 > -mucGiay.coChu * 0.15 && (my0 + my1) / 2 - cy1 <= mucGiay.coChu * 0.4, JSON.stringify(soDo.dl_net_khop_chu))
+  kiem('ĐL · 844 × 390, bảng trống ⇒ GIẤY được ưu tiên: chữ đề ≥ 22 px (bản một-phép-co: 17,7 px), tấm giấy rộng bằng khung giấy và cao hơn khung (cuộn được)', mucGiay.coChu >= 22 && await em.t.evaluate(() => { const t = document.querySelector('.lv-kg-tam'), g = document.querySelector('.lv-giay'), c = document.querySelector('.lv-kg-cuon'); return Math.abs(t.offsetWidth - g.offsetWidth) <= 1 && c.scrollHeight > c.clientHeight + 40 && getComputedStyle(c).overflowY === 'auto' }), `chữ đề ${mucGiay.coChu} px`)
+}
 await chup(thay, 'giay-thay-gach-chan-1366')
 await chup(em.t, 'giay-em-khop-giay-thay-844')
 await chup(em.t, 'em-phu-kin-khay-dong-844')
@@ -206,11 +222,13 @@ const nb = await hopNam(em.t)
 soDo.phu_kin_phan_tram = { '844x390': phuKin(nb) }
 kiem('P · bảng live 844 × 390: MỘT tay nắm sát mép phải, giữa chiều cao; không còn nút / viên / huy hiệu nổi nào trên bảng', nb.vien[2] >= nb.w - 6 && nb.vien[2] - nb.vien[0] <= 6 && Math.abs((nb.vien[1] + nb.vien[3]) / 2 - nb.h / 2) <= 3 && await em.t.locator('.lv .lv-nam').count() === 1 && await em.t.locator(NOI).count() === 0, `viên ${JSON.stringify(nb.vien)}`)
 kiem('P · 844 × 390: giấy + bảng PHỦ KÍN ≥ 92 % khung nhìn, lề ngoài ≤ 6 px, khe giữa ≤ 6 px', soDo.phu_kin_phan_tram['844x390'] >= 92 && nb.giay[0] <= 6 && nb.giay[1] <= 6 && nb.w - nb.bang[2] <= 6 && nb.h - nb.bang[3] <= 6 && nb.bang[0] - nb.giay[2] <= 6, `${soDo.phu_kin_phan_tram['844x390']} % · giấy ${JSON.stringify(nb.giay)} · bảng ${JSON.stringify(nb.bang)}`)
-kiem('P · 844 × 390 (điện thoại dài): tay nắm đứng trên phần bảng nới thêm, KHÔNG đè ô bảng thầy viết', !!nb.bangThay && !de(nb.vien, nb.bangThay) && de(nb.vien, nb.bang), `ô bảng của thầy ${JSON.stringify(nb.bangThay)}`)
+// (11/11 chiều: bảng co giãn độc lập ⇒ ô bảng của thầy phủ HẾT bề ngang khung bảng, không còn «phần bảng nới thêm»; tay nắm đè mép phải bảng và tự né khi bút tới gần — kiểm ở khổ 667)
+kiem('ĐL · 844 × 390: ô bảng của thầy phủ hết bề ngang khung bảng (không còn dải bảng trống bên phải); tay nắm đứng trên mép phải bảng', !!nb.bangThay && Math.abs((nb.bangThay[2] - nb.bangThay[0]) - (nb.bang[2] - nb.bang[0])) <= 3 && de(nb.vien, nb.bang), `ô bảng của thầy ${JSON.stringify(nb.bangThay)} · khung bảng ${JSON.stringify(nb.bang)}`)
 await em.t.locator('.lv .lv-nam').tap()
 await em.t.locator('.lv .lv-khay[data-mo]').waitFor({ timeout: 4000 })
 await ngu(350)
 const khay = await em.t.locator('.lv .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return { trai: Math.round(r.left), phai: Math.round(r.right), tren: Math.round(r.top), duoi: Math.round(r.bottom), chu: e.innerText } })
+kiem('ĐL · khay có hàng «Tự phóng theo thầy», đang bật (em chưa kéo vạch chia)', /Tự phóng theo thầy\s*Đang bật/.test(khay.chu))
 kiem('P · khay trượt ra từ mép phải, nằm gọn trong màn, đè lên mép bảng (không đẩy bố cục): mạng · tiếng · đội + kJ', khay.phai <= 844 && khay.phai >= 844 - 14 && khay.tren >= 0 && khay.duoi <= 390 && /kJ/.test(khay.chu) && JSON.stringify((await hopNam(em.t)).giay) === JSON.stringify(nb.giay), `${khay.trai}–${khay.phai} × ${khay.tren}–${khay.duoi} px · ${khay.chu.replace(/\s+/g, ' ').slice(0, 80)}`)
 await chup(em.t, 'em-khay-phai-mo-844')
 // vuốt từ mép phải vào (bắt đầu trên tay nắm) cũng mở khay — trước hết thu khay bằng chạm ra ngoài
@@ -254,7 +272,9 @@ for (const [w, h] of [[667, 375], [1180, 820], [1971, 1247]]) {
     // TỰ NÉ: ở khổ này ô bảng của thầy chạy sát mép phải ⇒ tay nắm đè mép bảng. Thầy viết sát mép phải, ngang tầm tay nắm ⇒ tay nắm mờ hẳn; thầy đi khỏi ⇒ rõ lại.
     const cot = await to.locator('.mc-cot-lam-bai').first().evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height } })
     const mo0 = await em.t.locator('.lv .lv-nam').evaluate((e) => getComputedStyle(e).opacity)
-    const tx = cot.x + cot.w - 10, ty = cot.y + cot.h * 0.5
+    // (11/11 chiều) khung bảng co riêng ⇒ «ngang tầm tay nắm» trên máy em ứng với độ cao nào trên bảng của thầy thì tính từ phép co đang áp
+    const tiLe = (k.bangThay[2] - k.bangThay[0]) / cot.w
+    const tx = cot.x + cot.w - 10, ty = Math.min(cot.y + cot.h * 0.94, cot.y + (k.h / 2 - k.bangThay[1]) / tiLe)
     await thay.mouse.move(tx - 30, ty); await thay.mouse.down()
     for (let i = 1; i <= 10; i++) { await thay.mouse.move(tx - 30 + i * 2.6, ty + Math.sin(i) * 3); await ngu(10) }
     await ngu(250)
@@ -264,6 +284,11 @@ for (const [w, h] of [[667, 375], [1180, 820], [1971, 1247]]) {
     await ngu(1900)
     const sau = await em.t.locator('.lv .lv-nam').evaluate((e) => ({ ne: e.hasAttribute('data-ne'), mo: getComputedStyle(e).opacity }))
     kiem('P · thầy viết sát mép phải ngang tầm tay nắm ⇒ tay nắm MỜ HẲN (không chặn nhìn nét); bút đi khỏi ⇒ rõ lại', luc.ne && Number(luc.mo) < 0.3 && !sau.ne && Number(sau.mo) > 0.9, JSON.stringify({ truoc: mo0, luc, sau }))
+    // ĐL · thầy vừa viết trên bảng, quá 2 giây không quay lại giấy ⇒ khung bảng NỞ (giấy thu lại), chữ đề vẫn ≥ 15 px
+    await ngu(700)
+    const no = await em.t.evaluate(() => { const g = document.querySelector('.lv-giay').getBoundingClientRect(), b = document.querySelector('.lv-bang').getBoundingClientRect(), c = document.querySelector('.lv-gt-chu'); return { giay: Math.round(g.width), bang: Math.round(b.width), chu: Math.round(parseFloat(getComputedStyle(c).fontSize) * c.getBoundingClientRect().width / c.offsetWidth * 100) / 100 } })
+    soDo.dl_667_bang_no = { truoc: { giay: k.giay[2] - k.giay[0], bang: k.bang[2] - k.bang[0] }, sau: no }
+    kiem('ĐL · 667 × 375: thầy viết trên bảng quá 2 giây ⇒ khung bảng nở (rộng hơn lúc giấy được ưu tiên ≥ 60 %), chữ đề KHÔNG dưới 15 px', no.bang >= (k.bang[2] - k.bang[0]) * 1.6 && no.chu >= 14.9, JSON.stringify(soDo.dl_667_bang_no))
     await chup(em.t, 'em-phu-kin-667')
   } else await chup(em.t, `em-phu-kin-${w}`, { scale: 'css' })
 }
@@ -364,8 +389,6 @@ const mucBang = (t) => t.evaluate(() => {
   let n = 0
   const dem = (c, x, y, w, h) => { if (w < 1 || h < 1) return; const d = c.getContext('2d').getImageData(x, y, w, h).data; for (let i = 3; i < d.length; i += 4 * 7) if (d[i] > 40) n++ }
   for (const c of document.querySelectorAll('.lv-cuon canvas')) dem(c, 0, 0, c.width, c.height)
-  const c = document.querySelector('.lv-cv'), g = document.querySelector('.lv-bang').getBoundingClientRect(), k = c.width / c.getBoundingClientRect().width
-  dem(c, Math.round(g.left * k), Math.round(g.top * k), Math.round(g.width * k), Math.round(g.height * k))
   return n
 })
 await kiemGiay('đang tạm dừng')

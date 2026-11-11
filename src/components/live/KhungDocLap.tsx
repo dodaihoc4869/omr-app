@@ -10,7 +10,7 @@
 import { forwardRef, useCallback, useImperativeHandle, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { giaiTrang, khungChieu, type AnToan, type KhungChieu, type VungChieu } from './bo-cuc'
-import { NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, buocTroi, chuyenKhung, docChia, ghiChia, khungVeDL, laNetBang, mocChia, taoUuTien, troiGiay, vungBut, type BoCucDL, type Vung } from './bo-cuc-doc-lap'
+import { NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, buocTroi, chuyenKhung, docChia, ghiChia, khungVeDL, mocChia, netOBang, taoUuTien, troiGiay, vungBut, type BoCucDL, type Vung } from './bo-cuc-doc-lap'
 import { taoVeBang, type VeBang } from './ve-bang'
 
 export interface HinhDL { w: number; h: number; xoay: boolean; at: AnToan }
@@ -71,7 +71,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     /** Bố cục cũ chờ chuyển êm · bố cục của lần dựng trước (để co độ cuộn của giấy) · hẹn dọn sau khi nở xong. */
     cho: null as BoCucDL | null, truoc: null as BoCucDL | null, henNo: undefined as ReturnType<typeof setTimeout> | undefined,
     cuonGiay: 0, dichGiay: null as number | null, cuonAo: 0, lucChamGiay: -1e9, lucChamBang: -1e9, lucKhung: 0, vungBut: 'bang' as Vung, mui: 0, ve: false,
-    chamCuoi: { giay: -1e9, bang: -1e9 }, keoB: null as { id: number; y: number; keo: boolean } | null, keoV: null as { id: number; x0: number } | null,
+    chamCuoi: { giay: -1e9, bang: -1e9 }, chamG: null as { id: number; x: number; y: number; luc: number } | null, keoB: null as { id: number; y: number; keo: boolean } | null, keoV: null as { id: number; x0: number } | null,
   })
 
   const xep = useCallback((dong = false) => {
@@ -156,9 +156,13 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
       v.ap(sk)
       // vào live / bảng mới: bảng đã có nét ⇒ ưu tiên bảng ngay (không chờ 2 giây); bảng trống ⇒ ưu tiên giấy cho em đọc đề
       if (sk.loai === 'trang') {
-        const coBang = sk.net.some((n) => laNetBang(n.id)), truoc = s.uu.dang()
+        const oB = giaiTrang(sk.trang).vung.bang, coBang = sk.net.some((n) => netOBang(oB, n)), truoc = s.uu.dang()
         s.uu.dat(coBang ? 'bang' : 'giay')
         if (truoc !== s.uu.dang() && s.tay == null && P.current.tuUuTien) xep(false)
+      } else if (sk.loai === 'net-moi' && sk.xong && s.vung && s.uu.dang() !== 'bang' && netOBang(s.vung.bang, sk.net)) {
+        // nét bảng tới NGUYÊN CẢ NÉT (nối lại, tua tới trong trình phát): bảng vừa có thêm chữ mà em không thấy thầy viết ⇒ ưu tiên bảng luôn
+        s.uu.dat('bang')
+        if (s.tay == null && !s.phong && P.current.tuUuTien) xep(true)
       }
       P.current.khiNet?.(v)
     },
@@ -203,7 +207,13 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   const nay = (): number => performance.now()
   // ── khung giấy: em cuộn bằng tay ⇒ khung nhường (không tự trôi) 4 giây ──
   const emCuon = (): void => { S.current.lucChamGiay = nay(); S.current.dichGiay = null }
-  const giayXuong = (e: React.PointerEvent): void => { emCuon(); cham('giay', e.timeStamp) }
+  // (chạm = ấn rồi nhả tại chỗ trong 0,3 giây; em vuốt cuộn thì trình duyệt huỷ con trỏ ⇒ hai cú vuốt nhanh KHÔNG bị tính là chạm hai lần)
+  const giayXuong = (e: React.PointerEvent): void => { emCuon(); S.current.chamG = { id: e.pointerId, x: e.clientX, y: e.clientY, luc: e.timeStamp } }
+  const giayNha = (e: React.PointerEvent): void => {
+    const k = S.current.chamG
+    S.current.chamG = null
+    if (k && k.id === e.pointerId && e.timeStamp - k.luc < 300 && Math.abs(e.clientX - k.x) + Math.abs(e.clientY - k.y) < 12) cham('giay', e.timeStamp)
+  }
   const giayCuon = (e: React.UIEvent<HTMLDivElement>): void => { const s = S.current; if (s.dichGiay == null) { s.cuonGiay = e.currentTarget.scrollTop; veB.current?.datCuonGiay(s.cuonGiay) } }
   const toiThay = (e: React.SyntheticEvent): void => { e.stopPropagation(); S.current.lucChamGiay = -1e9 }
   // ── khung bảng: vuốt dọc xem lại phần trên; chạm hai lần phóng kín ──
@@ -267,7 +277,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     <div ref={goc} className={`${L}-dl`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }} data-phong={bc?.phong || undefined}>
       <div ref={kG} className={`${L}-giay`} style={o(bc?.giay)}>
         <div ref={cuonG} className={`${L}-kg-cuon`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflowX: 'hidden', overflowY: soi && bc.tam.h > bc.giay.h + 1 ? 'auto' : 'hidden', touchAction: 'pan-y', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
-          onPointerDown={giayXuong} onTouchMove={emCuon} onWheel={emCuon} onScroll={giayCuon}>
+          onPointerDown={giayXuong} onPointerUp={giayNha} onPointerCancel={() => { S.current.chamG = null }} onTouchMove={emCuon} onWheel={emCuon} onScroll={giayCuon}>
           <div className={`${L}-kg-tam`} style={{ position: 'relative', marginLeft: soi ? bc.tam.x : 0, width: soi ? bc.tam.w : '100%', height: soi ? bc.tam.h : '100%' }}>
             {!bc ? null : p.giay(soi ? { rong: bc.tam.w, cao: bc.tam.h, khung: bc.giay.h } : { rong: bc.giay.w, cao: bc.giay.h, khung: bc.giay.h })}
             <canvas ref={cvChot} className={`${L}-cv`} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', display: p.netGiay ? undefined : 'none' }} />

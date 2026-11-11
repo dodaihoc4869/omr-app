@@ -60,7 +60,7 @@ const giamDong = (): boolean => mayYeu() || (typeof matchMedia !== 'undefined' &
  *  kẹp theo bề ngang khung ⇒ chữ to tự nhiên theo khổ máy). */
 const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | null; khoa: string; rong: number; cao: number }) {
   const trong = useRef<HTMLDivElement>(null)
-  const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 300))
+  const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 340))
   const [k, setK] = useState(kMin)
   const coDe = de != null
   useLayoutEffect(() => {

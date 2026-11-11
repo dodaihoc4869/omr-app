@@ -133,7 +133,14 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     cvTay = doc.createElement('canvas')
     gTay = nguCanh(cvTay)
   }
-  const laBang = (n: { id: string }): boolean => !!gB && loi.laBang(n)
+  /** Nét thuộc BẢNG: mã «b_…»; bố cục độc lập còn tính cả nét mã thường BẮT ĐẦU trong ô bảng đen (bản ghi / máy thầy trước khi có mã «b_»: nét ấy vốn nằm
+   *  trên cột bảng, toạ độ theo cửa sổ thầy = toạ độ bảng lúc chưa cuộn) — hai khung co riêng nên nét phải theo phép của khung nó nằm trên. */
+  const laBang = (n: { id: string; diem?: readonly (readonly number[])[] }): boolean => {
+    if (!gB) return false
+    if (loi.laBang(n)) return true
+    const p = dl && n.diem ? n.diem[0] : undefined
+    return !!p && p[0]! >= B[0] && p[0]! <= B[2] && p[1]! >= B[1] && p[1]! <= B[3]
+  }
   const tron = (v: number): number => { const d = kv!.dpr; return Math.round(v * d) / d }
   const cuonPx = (): number => tron(cuon * bH)
   /** Tầm nhìn của máy em trên bảng (số lần bề dọc cửa sổ thầy) — bố cục độc lập có thể THẤP hơn tầm nhìn của thầy. */
@@ -482,7 +489,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     return ve.length
   }
   /** Điểm (x, y) có tính theo BẢNG CUỘN không: biết mã nét thì theo mã, không thì theo hoành độ (nằm trong cột bảng đen). */
-  const theoBang = (x: number, net?: string): boolean => !!gB && (net ? laBang({ id: net }) : x >= B[0] && x <= B[2])
+  const theoBang = (x: number, net?: string): boolean => { const d = net ? doDang.get(net) : undefined; return !!gB && (d ? d.bang : net && !dl ? laBang({ id: net }) : (!!net && loi.laBang({ id: net })) || (x >= B[0] && x <= B[2])) }
   /** Toạ độ 0..1 (cửa sổ thầy) ⇒ px CSS trong vùng chiếu của máy em. Điểm trên bảng cuộn đã trừ độ cuộn của máy em. `net` = mã nét đang viết (nếu có). */
   function toiPx(x: number, y: number, net?: string): [number, number] {
     if (!kv) return [0, 0]

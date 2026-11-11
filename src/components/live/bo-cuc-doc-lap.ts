@@ -9,7 +9,7 @@
 // GIỚI HẠN HÌNH HỌC (nói thẳng): giấy giữ ĐÚNG cách xuống dòng của giấy thầy (để nét gạch chân khớp chữ) ⇒ cỡ chữ đề tỉ lệ thuận với bề ngang khung
 // giấy; nét bảng tỉ lệ thuận với bề ngang khung bảng. Hai khung chia nhau MỘT bề ngang màn ⇒ không thể cùng lúc to hết cỡ. Vì vậy:
 //   · `chia` = phần bề ngang của GIẤY (0..1). Ba mốc (`mocChia`): ƯU TIÊN GIẤY · GIỮA · ƯU TIÊN BẢNG, tính theo cỡ chữ thật của đề trên giấy thầy:
-//     giấy không hẹp tới mức chữ đề dưới 15 px (`SAN_CHU`), không rộng quá mức chữ 28 px (`TRAN_CHU`); bảng không rộng quá mức nét bằng nét thật của
+//     giấy không hẹp tới mức chữ đề dưới 15 px (`SAN_CHU`), không rộng quá mức chữ 34 px (`TRAN_CHU`); bảng không rộng quá mức nét bằng nét thật của
 //     thầy trên màn 1920 (`S_TRAN`).
 //   · TỰ ƯU TIÊN THEO THẦY (`taoUuTien`): thầy viết trên bảng ⇒ sau 2 giây bảng nở; thầy quay lại gạch trên giấy ⇒ sau 2 giây giấy nở. Em kéo vạch
 //     chia thì theo em (nhớ trên máy); chạm hai lần vào khung nào thì khung đó phủ kín, khung kia trượt ra ngoài màn.
@@ -17,7 +17,7 @@ import { KHE_GIUA, LE_NGOAI, type AnToan, type KhungChieu, type O } from './bo-c
 import type { KhungVe } from './ve-bang'
 
 /** Chữ thường của đề trên máy em không nhỏ hơn / không cần to hơn ngần này (px CSS) khi máy tự chia. */
-export const SAN_CHU = 15, TRAN_CHU = 28
+export const SAN_CHU = 15, TRAN_CHU = 34
 /** Phép co không vượt mức này (px máy em / px lôgic) trừ khi màn cao tới mức «vừa chiều cao» còn lớn hơn: 1,15 ≈ nét to bằng nét của thầy trên màn 1920. */
 export const S_TRAN = 1.15
 /** Giấy thầy mặc định: cỡ chữ đề / bề ngang ô giấy (đo tờ thật 1366: 34,8 / 896) — dùng khi chưa có số đo giấy. */
@@ -116,11 +116,17 @@ export function diemGiay(bc: BoCucDL, kc: KhungChieu, x: number, y: number): [nu
 export function diemBang(bc: BoCucDL, kc: KhungChieu, x: number, y: number): [number, number] {
   return [bc.bang.x + bc.oBang.x + (x * kc.Wv - kc.ox - kc.bang.x) * bc.sB, bc.bang.y + (y * kc.Hv - kc.oy - kc.bang.y) * bc.sB]
 }
-/** Bút của thầy đang ở vùng nào: biết mã nét thì theo mã («b_…» = bảng), không thì theo hoành độ (trong cột bảng đen của thầy). `bang` = ô bảng 0..1. */
+/** Bút của thầy đang ở vùng nào: nét mã «b_…» = bảng; còn lại theo hoành độ (trong cột bảng đen của thầy). `bang` = ô bảng 0..1. */
 export const laNetBang = (id: string): boolean => id.charCodeAt(0) === 98 && id.charCodeAt(1) === 95
 export function vungBut(bang: readonly number[], x: number, net?: string | null): Vung {
-  if (net) return laNetBang(net) ? 'bang' : 'giay'
+  if (net && laNetBang(net)) return 'bang'
   return x >= bang[0]! && x <= bang[2]! ? 'bang' : 'giay'
+}
+/** Nét thuộc BẢNG: mã «b_…», hoặc nét mã thường BẮT ĐẦU trong ô bảng đen (bản ghi / máy thầy trước khi có mã «b_») — cùng luật với lớp vẽ (ve-bang.ts). */
+export function netOBang(bang: readonly number[], n: { id: string; diem: readonly (readonly number[])[] }): boolean {
+  if (laNetBang(n.id)) return true
+  const p = n.diem[0]
+  return !!p && p[0]! >= bang[0]! && p[0]! <= bang[2]! && p[1]! >= bang[1]! && p[1]! <= bang[3]!
 }
 
 /** TỰ ƯU TIÊN THEO THẦY, có trễ: thầy hoạt động ở vùng KHÁC vùng đang ưu tiên ⇒ ghi mốc; trong `tre` ms thầy quay lại vùng đang ưu tiên ⇒ huỷ mốc
