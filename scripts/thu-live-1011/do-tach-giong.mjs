@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ĐO «CHỈ GIỌNG THẦY» (tách giọng theo người nói, 11/11 tối) — NGOẠI TUYẾN trong Node: chuỗi Worker cổng (MA_CONG, tach-giong/ma-cong.mjs) + chuỗi Worker
-// nhận giọng (MA_NHAN, tach-giong/ma-nhan.mjs) + ONNX Runtime Web (wasm, 1 luồng — đúng cách trình duyệt sẽ chạy). KẾT LUẬN: không phát hành (docs/do-live-1011.md mục 9).
+// nhận giọng (MA_NHAN, tach-giong/ma-nhan.mjs) + ONNX Runtime Web (wasm, 1 luồng — đúng cách trình duyệt sẽ chạy). KẾT LUẬN: không phát hành (docs/do-live-1011.md mục 10).
 //   LV_MAU=<thư mục> LV_TG=<thư mục> node scripts/thu-live-1011/do-tach-giong.mjs [tệp số đo = docs/ban-ve-live-1011/so-do-tach-giong-1111.json]
 //   LV_TG (KHÔNG đưa vào kho, 40 MB): `npm i onnxruntime-web@1.20.1` ở thư mục tạm rồi chép dist/ort.wasm.min.mjs, dist/ort-wasm-simd-threaded.mjs,
 //         dist/ort-wasm-simd-threaded.wasm + tệp `wespeaker_en_voxceleb_CAM++.onnx` (bản phát hành «speaker-recongition-models» của sherpa-onnx, k2-fsa;

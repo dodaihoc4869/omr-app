@@ -420,30 +420,30 @@ mic 2 kênh, cửa `/bpu/live`, phòng thật (live-san / live-mic / ss / noi[].
 Chưa tái hiện được trên CI: chặn tự phát của trình duyệt (Chromium không giao diện cho phát dù đặt chính sách) ⇒ lưới phía nghe chỉ có test vitest. Mạng chặn UDP ⇒ cần TURN (mã ở nhánh cục bộ, chờ khoá).
 Mặc định: DeepFilterNet 3 + lọc mic em CHƯA đưa lại (chưa có lượt CI có bộ lọc bật xanh đủ tầng qua phòng thật) ⇒ TẮT; «Loa» hiện, chỉ gọi `setSinkId` khi chọn loa khác mặc định.
 
-## 9. «Chỉ giọng thầy» — tách giọng theo người nói (11/11 tối, thầy: «tách giọng nói của tôi riêng và làm sạch các giọng nói khác … thật đỉnh cao triệt để») — ĐO XONG, **KHÔNG PHÁT HÀNH**
+## 10. «Chỉ giọng thầy» — tách giọng theo người nói (11/11 tối, thầy: «tách giọng nói của tôi riêng và làm sạch các giọng nói khác … thật đỉnh cao triệt để») — ĐO XONG, **KHÔNG PHÁT HÀNH**
 
 Nhánh `claude/tach-giong-1111`. Bản đo: `scripts/thu-live-1011/do-tach-giong.mjs` (mã thử: `scripts/thu-live-1011/tach-giong/ma-cong.mjs`, `ma-nhan.mjs`),
 số gốc `docs/ban-ve-live-1011/so-do-tach-giong-1111.json` (lặp lại được: ồn có hạt cố định, điểm áp dụng sau đúng 50 ms; hai lượt cho số trùng nhau).
 
-### 9.1 Tra cứu (11/11, WebSearch; huggingface.co, groups.google.com, developer.chrome.com BỊ CHẶN ở phiên này ⇒ phần nào chỉ có tóm tắt tìm kiếm thì ghi rõ)
+### 10.1 Tra cứu (11/11, WebSearch; huggingface.co, groups.google.com, developer.chrome.com BỊ CHẶN ở phiên này ⇒ phần nào chỉ có tóm tắt tìm kiếm thì ghi rõ)
 - **`voiceIsolation` (Media Capture Extensions)**: theo tóm tắt tìm kiếm của «Intent to Ship: VoiceIsolation» (blink-dev, 01/2024; https://groups.google.com/a/chromium.org/g/blink-dev/c/hPMvCu-3iPA — không mở được trang gốc) Chrome nhận ràng buộc này trên mọi nền, nhưng CHỈ CÓ TÁC DỤNG nơi hệ điều hành có bộ tách giọng: lúc ra mắt (M123) chỉ ChromeOS, một phần thiết bị. Không thấy nguồn nào nói Chrome / Edge trên Windows làm gì với nó ⇒ trên máy thầy (Chrome Windows, BOYALINK) coi như KHÔNG có tác dụng. Đặc tả: https://w3c.github.io/mediacapture-extensions/.
 - **Mô hình tách giọng theo người nói (PSE / TSE) mã mở chạy được trong trình duyệt, 48 kHz**: KHÔNG tìm thấy bản nào đủ cả ba điều kiện (mã + trọng số mở, chạy thời gian thực CPU wasm, giữ dải 48 kHz).
   pGTCRN / TEA-PSE / pDeepFilterNet / VoiceFilter-Lite: không thấy trọng số công khai. Personalized PercepNet (arXiv 2106.04129), E3Net (2204.00771), PSE của Microsoft (2110.09625): chỉ có bài báo.
   WeSep (2409.15799): bộ công cụ nghiên cứu, mô hình 16 kHz nặng. OpenSpeakerBeam-SS: 16 kHz, tác giả còn ghi «chưa kiểm chất lượng». D-LGTSE (GTCRN làm bộ lọc trước): 16 kHz, Libri2Mix.
   VoxLock (27 triệu tham số, ONNX, có bản thử trên trình duyệt) và tse-conv-tasnet-48k (48 kHz, ONNX từng khúc) nằm trên Hugging Face — phiên này không tải được ⇒ CHƯA KIỂM giấy phép / chất lượng / tốc độ.
 - **Bộ nhúng giọng ONNX nhỏ** (bản phát hành «speaker-recongition-models» của sherpa-onnx, tải được): WeSpeaker CAM++ VoxCeleb (29 MB, 512 chiều, 16 kHz; mô hình CC BY 4.0 theo `docs/pretrained.md` của WeSpeaker, mã Apache-2.0) — tách giọng thầy / người khác SẠCH; WeSpeaker ResNet34 (26 MB) cũng tách được nhưng chậm gấp đôi (97 ms / cửa sổ 0,5 s); CAM++ bản 3D-Speaker (29,6 MB) thì KHÔNG tách được (cos thầy ≈ cos người khác ≈ 0,4 với cùng fbank — bỏ). ONNX Runtime Web 1.20.1 (MIT): wasm 11 MB, chạy một luồng (trang không cách ly cross-origin).
-  Đo CAM++ (Node, wasm 1 luồng, máy chủ CI — máy xách tay của thầy có thể chậm hơn): cửa sổ 0,5 s ≈ 38 ms, 0,75 s ≈ 52 ms; giọng thầy (phần không dùng làm mẫu) cos 0,34–0,60 với mẫu, 6 giọng khác ≤ 0,27.
+  Đo CAM++ (Node, wasm 1 luồng, máy chứa phiên làm việc này — KHÔNG phải máy thầy, máy xách tay có thể chậm hơn): cửa sổ 0,5 s ≈ 38 ms, 0,75 s ≈ 52 ms; giọng thầy (phần không dùng làm mẫu) cos 0,34–0,60 với mẫu, 6 giọng khác ≤ 0,27.
 
-### 9.2 Cách đã thử (vì không có mô hình tách 48 kHz): CỔNG THEO NGƯỜI NÓI
+### 10.2 Cách đã thử (vì không có mô hình tách 48 kHz): CỔNG THEO NGƯỜI NÓI
 Bộ nhận giọng CAM++ 16 kHz chỉ làm BỘ QUYẾT ĐỊNH «đúng giọng thầy không» cho câu đang nói (chấm 0,3–0,75 s tiếng có giọng gần nhất, 100–200 ms một lần, Worker riêng);
 tín hiệu 48 kHz gốc chỉ bị NHÂN HỆ SỐ (mở / hạ −30 dB / hạ −15 dB khi tiếng nhỏ hơn hẳn giọng thầy), không lọc, không đệm. Luật lệch về phía thầy: mặc định mở;
 câu mới sau quãng nghỉ mà to tới dải giọng thầy ⇒ mở; hạ chỉ khi có điểm «người khác» còn tươi, trong dải giọng thầy phải hai điểm liền; 700 ms không có điểm mới ⇒ mở.
 
-### 9.3 Số đo (cảnh 18 s: thầy một mình · người khác một mình · NÓI CHỒNG · người khác · thầy nói NGAY sau người khác, hở 150 ms; giọng thầy = giọng nam thật −25 dBFS)
+### 10.3 Số đo (cảnh 18 s: thầy một mình · người khác một mình · NÓI CHỒNG · người khác · thầy nói NGAY sau người khác, hở 150 ms; giọng thầy = giọng nam thật −25 dBFS)
 «Giọng khác giảm» = năng lượng vào / ra ở đoạn chỉ có người khác. «Giọng thầy giữ» = SI-SDR ra so với vào ở đoạn thầy một mình. «Nói chồng» = SI-SDR so với giọng thầy sạch, vào → ra.
-«Mở sau» = thầy bắt đầu nói ngay sau người khác: bao lâu cổng mới mở (≥ −3 dB). * «Chuẩn trình duyệt» ngoại tuyến coi như đi thẳng (lọc ồn WebRTC không xoá giọng nói; không chạy được ngoài trình duyệt).
+«Mở sau» = đoạn thầy nói ngay sau người khác: từ TIẾNG ĐẦU TIÊN của thầy (khung ≥ −45 dBFS) tới lúc cổng mở (≥ −3 dB). Ở mẫu này tiếng đầu là một âm ngắn (≈ 100 ms, ≈ −30 dBFS) đứng trước câu chính ≈ 0,45 s; câu chính thì cổng mở ĐÚNG lúc (soát lại bằng `LV_DONG`, ca 0 và 10 dB, giọng nam). * «Chuẩn trình duyệt» ngoại tuyến coi như đi thẳng (lọc ồn WebRTC không xoá giọng nói; không chạy được ngoài trình duyệt).
 
-| tín / nhiễu | người khác | cách | giọng khác giảm (dB) | giọng thầy giữ (SI-SDR dB) | nói chồng (SI-SDR dB) | mở sau (ms) | dải tới −3 dB (kHz) | trễ thêm (ms) |
+| tín / nhiễu | người khác | cách | giọng khác giảm (dB) | giọng thầy giữ (SI-SDR dB) | nói chồng (SI-SDR dB) | mở sau, tính từ tiếng đầu (ms) | dải tới −3 dB (kHz) | trễ thêm (ms) |
 |---|---|---|---|---|---|---|---|---|
 | 0 dB | HS nam gần mic | Chuẩn trình duyệt* | 0 | ∞ (không đổi) | −1,7 → −1,7 | — | 23,9 | 0 |
 | 0 dB | HS nam gần mic | Mạnh (RNNoise) | 0 | 18,1 | −1,7 → −1,9 | — | 7,5 | 10 |
@@ -464,17 +464,17 @@ câu mới sau quãng nghỉ mà to tới dải giọng thầy ⇒ mở; hạ ch
 | 10 dB | Xôn xao 5 giọng | Mạnh (RNNoise) | 7,8 | 18,2 | 5,7 → 8,8 | — | 9,6 | 10 |
 | 10 dB | Xôn xao 5 giọng | Chỉ giọng thầy | 7,5 | ∞ | 5,7 → 6,3 | **590** | 23,9 | 0 |
 
-CPU «Chỉ giọng thầy»: bộ nhận giọng 47–55 ms / lượt chấm, hệ số thời gian thực 0,26–0,30 (máy chủ CI; chưa đo trên máy thầy); cổng 13–17 µs / khung 10 ms.
+CPU «Chỉ giọng thầy»: bộ nhận giọng 47–55 ms / lượt chấm, hệ số thời gian thực 0,26–0,30 (máy chứa phiên làm việc này; chưa đo trên máy thầy); cổng 13–17 µs / khung 10 ms.
 Tải lần đầu khi bật: ≈ 40 MB (mô hình 29 MB tách hai tệp vì Pages giới hạn 25 MiB / tệp + wasm 11 MB).
 
-### 9.4 Vì sao KHÔNG phát hành
-- **Cắt đầu câu của thầy khi thầy đáp ngay sau học sinh: 550–600 ms** ở cả 0 và 10 dB — đúng kiểu hỏi–đáp trong lớp. Gốc: bộ nhận giọng cần ≈ 0,3–0,5 s giọng mới kết luận, không có nhìn trước (thêm nhìn trước = thêm trễ, trái luật «tức thì»).
-- **Nói chồng làm hỏng giọng thầy**: 0 dB −1,4 … −6,6 dB SI-SDR; 10 dB giọng nữ 5,4 → 1,3. Nhúng giọng của tiếng chồng giống «người khác» ⇒ cổng hạ cả thầy.
+### 10.4 Vì sao KHÔNG phát hành
+- **Mất tiếng thầy khi thầy đáp ngay sau học sinh**: âm ngắn đầu tiên (≈ 100 ms, đứng trước câu chính) bị hạ −30 dB, tổng ≈ 250 ms tiếng thầy bị hạ (5,5–6,1 % khung có tiếng thầy, toàn bộ ở đoạn này; thầy nói một mình thì 0 khung). Gốc: cổng còn đóng theo điểm «người khác», bộ nhận giọng cần ≈ 0,3–0,5 s giọng mới kết luận, không có nhìn trước (thêm nhìn trước = thêm trễ, trái luật «tức thì»).
+- **Nói chồng làm hỏng giọng thầy**: 0 dB SI-SDR của thầy giảm 1,0–6,6 dB; 10 dB giọng nữ 5,4 → 1,3. Nhúng giọng của tiếng chồng giống «người khác» ⇒ cổng hạ cả thầy.
 - **Lợi ích nhỏ**: giọng khác chỉ giảm 5–8 dB (≈ 0,5 s đầu mỗi câu của người khác vẫn lọt; cổng không tách được tiếng chồng).
 - Sáu lượt chỉnh luật chỉ đổi qua đổi lại giữa «để lọt học sinh» và «cắt thầy» — giới hạn nằm ở cách làm (cổng + quyết định chậm), không ở tham số.
 ⇒ Không đưa vào app (không có mức «Chỉ giọng thầy», không tải mô hình, không đổi đường mic thầy / em). Việc 2 (mẫu giọng tự lấy từ «Xem lại Live») và phép thử thật trên CI không làm vì không phát hành. Máy em giữ nguyên lọc của trình duyệt.
 
-### 9.5 Phương án thay (đề xuất cho thầy)
+### 10.5 Phương án thay (đề xuất cho thầy)
 1. **Micro đeo đầu (headset) có màng định hướng cardioid / supercardioid, đặt sát miệng** thay mic cài áo: giọng thầy to hơn hẳn giọng khác nhờ khoảng cách sát miệng + hướng thu (bớt bao nhiêu dB phải đo bằng mic thật — chưa đo), trễ thêm 0 ms, không cắt đầu câu. Đây là cách «chỉ giọng thầy» thật sự triệt để hiện nay.
 2. Giữ **«Chuẩn trình duyệt»** (đường đã chứng minh có tiếng) làm mặc định.
 3. Phiên sau có mạng tới Hugging Face: thả mô hình tách theo người nói 48 kHz (VoxLock, tse-conv-tasnet-48k …) vào `do-tach-giong.mjs` (đã sẵn cảnh + số đo) và chỉ phát hành nếu: «mở sau» ≤ 50 ms, nói chồng không làm giảm SI-SDR của thầy, giọng khác giảm ≥ 20 dB, hệ số thời gian thực ≤ 0,6 trên máy thầy.

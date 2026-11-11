@@ -1,4 +1,4 @@
-// BẢN THỬ — KHÔNG CÓ TRONG APP (11/11 tối: đo xong, KHÔNG phát hành — lý do + số đo: docs/do-live-1011.md mục 9). Giữ để phiên sau đo lại / so mô hình khác
+// BẢN THỬ — KHÔNG CÓ TRONG APP (11/11 tối: đo xong, KHÔNG phát hành — lý do + số đo: docs/do-live-1011.md mục 10). Giữ để phiên sau đo lại / so mô hình khác
 // bằng scripts/thu-live-1011/do-tach-giong.mjs. Nếu có ngày đưa vào app: chuỗi này chạy trong Worker từ Blob, như MA_KHUNG của src/lib/live/chuoi-tieng.ts.
 // «CHỈ GIỌNG THẦY» (11/11 tối — thầy: «tách giọng nói của tôi riêng và làm sạch các giọng nói khác … giọng của tôi và hs phải trong nhất có thể»).
 // MÃ WORKER CỔNG (chạy từ Blob, viết ES5 không phụ thuộc gì — bản đo ngoại tuyến scripts/thu-live-1011/do-tach-giong.mjs và test chạy ĐÚNG chuỗi này):

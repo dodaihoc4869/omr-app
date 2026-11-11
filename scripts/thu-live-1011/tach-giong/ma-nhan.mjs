@@ -1,4 +1,4 @@
-// BẢN THỬ — KHÔNG CÓ TRONG APP (11/11 tối: đo xong, KHÔNG phát hành — lý do + số đo: docs/do-live-1011.md mục 9). Giữ để phiên sau đo lại / so mô hình khác
+// BẢN THỬ — KHÔNG CÓ TRONG APP (11/11 tối: đo xong, KHÔNG phát hành — lý do + số đo: docs/do-live-1011.md mục 10). Giữ để phiên sau đo lại / so mô hình khác
 // bằng scripts/thu-live-1011/do-tach-giong.mjs. Nếu có ngày đưa vào app: chuỗi này chạy trong Worker từ Blob, như MA_KHUNG của src/lib/live/chuoi-tieng.ts.
 // «CHỈ GIỌNG THẦY» — MÃ WORKER BỘ NHẬN GIỌNG (Worker kiểu module từ Blob; bản đo ngoại tuyến + test chạy đúng chuỗi này).
 // Mô hình: WeSpeaker CAM++ (VoxCeleb, bản ONNX của sherpa-onnx; mô hình CC BY 4.0, mã Apache-2.0) — nhúng giọng 512 chiều từ fbank Kaldi 80 dải, 16 kHz.
