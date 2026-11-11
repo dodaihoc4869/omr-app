@@ -1,0 +1,16 @@
+[
+  {
+    "i": 319,
+    "hashSvg": "7edb8d9333f3b87a2acf86da8ec7fe77cf57e34f0279839a5ea8334a230f8d28",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở riêng native FULL, câu dẫn/ref VIP27-C1-B1-LIPID-II-2.hinh.0.du_lieu và fresh Chromium3× FULL/runtime actualSHA; macro CO/HO nguồn và bản mới/toàn sáu CC. Đếm22C trần/2O/sáu CCdouble/một COdown, mạch hở đầu phải hướng lên. Nguồn thực có khe trắng dưới vertex trước hai tia CO; bản mới giữ khe, không ép tiếp xúc/thêm crossbar. HO/O thường thẳng với HO neo O cuối, không suy nét đậm từ mẫu khác. Không thấy chạm/cắt/tràn hoặc H/tên/công thức/đáp án thêm; flecks nền không diễn giải thành glyph/charge, không dựa alias.",
+    "render": "/workspace/scratch/soat371-319-fresh.png",
+    "macro": [
+      "/workspace/scratch/acid319-native-co.png",
+      "/workspace/scratch/acid319-co.png",
+      "/workspace/scratch/acid319-cc.png"
+    ],
+    "hash": "37231380b2b03f5576e16963d3ae462250a1462a317eb8baa4f43f599edd0d72",
+    "hashSvgDaSoat": "7edb8d9333f3b87a2acf86da8ec7fe77cf57e34f0279839a5ea8334a230f8d28"
+  }
+]

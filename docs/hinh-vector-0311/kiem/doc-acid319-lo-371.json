@@ -1,0 +1,353 @@
+{
+  "i": 319,
+  "assetIndexProvided": 1266,
+  "hash": "37231380b2b03f5576e16963d3ae462250a1462a317eb8baa4f43f599edd0d72",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/37231380b2b03f5576e16963d3ae462250a1462a317eb8baa4f43f599edd0d72.png",
+  "size": [
+    740,
+    113
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B1-LIPID-II-2",
+      "de": "Trong nhiều năm, một số nghiên cứu đã phát hiện ra rằng việc tiêu thụ acid béo Omega-3 như docosahexanoic acid (DHA) giúp giảm tử vong cho nhiều người mắc bệnh tim mạch. Công thức cấu tạo của DHA như hình dưới.",
+      "allHinh": [
+        {
+          "hash": "37231380b2b03f5576e16963d3ae462250a1462a317eb8baa4f43f599edd0d72",
+          "where": "VIP27-C1-B1-LIPID-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "e0790743446bc314af3d6a2bd9ffef58acbd193874b3b0d75c2b280452145138"
+        }
+      ],
+      "missingHashes": [
+        "37231380b2b03f5576e16963d3ae462250a1462a317eb8baa4f43f599edd0d72"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownCO15xOpened": true,
+    "ownHO16xOpened": true,
+    "ownFootPixelRowsChecked": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativecenterline/bboxesapproxnearest1px; chainnonperiodicyvariationliteralretained. Count22fromvisibleverticesNOTDHAname. Exactfootwhitegapverifiedpixelrows; doNOTapplycontactpreservingtheory.",
+  "geometry": {
+    "orderedBareC": [
+      [
+        70,
+        53
+      ],
+      [
+        103,
+        17
+      ],
+      [
+        129,
+        53
+      ],
+      [
+        163,
+        19
+      ],
+      [
+        197,
+        19
+      ],
+      [
+        224,
+        53
+      ],
+      [
+        258,
+        20
+      ],
+      [
+        293,
+        20
+      ],
+      [
+        319,
+        53
+      ],
+      [
+        353,
+        20
+      ],
+      [
+        386,
+        20
+      ],
+      [
+        412,
+        55
+      ],
+      [
+        446,
+        21
+      ],
+      [
+        479,
+        21
+      ],
+      [
+        506,
+        56
+      ],
+      [
+        540,
+        22
+      ],
+      [
+        575,
+        22
+      ],
+      [
+        603,
+        57
+      ],
+      [
+        637,
+        23
+      ],
+      [
+        670,
+        23
+      ],
+      [
+        698,
+        57
+      ],
+      [
+        732,
+        23
+      ]
+    ],
+    "CCDoubleVertexPairs1Based": [
+      [
+        4,
+        5
+      ],
+      [
+        7,
+        8
+      ],
+      [
+        10,
+        11
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        16,
+        17
+      ],
+      [
+        19,
+        20
+      ]
+    ],
+    "innerParallelRays": [
+      [
+        [
+          163,
+          25
+        ],
+        [
+          195,
+          25
+        ]
+      ],
+      [
+        [
+          259,
+          26
+        ],
+        [
+          291,
+          26
+        ]
+      ],
+      [
+        [
+          354,
+          27
+        ],
+        [
+          384,
+          27
+        ]
+      ],
+      [
+        [
+          447,
+          28
+        ],
+        [
+          477,
+          28
+        ]
+      ],
+      [
+        [
+          541,
+          29
+        ],
+        [
+          573,
+          29
+        ]
+      ],
+      [
+        [
+          638,
+          30
+        ],
+        [
+          668,
+          30
+        ]
+      ]
+    ],
+    "HO": {
+      "text": "HO",
+      "bbox": [
+        5,
+        5,
+        41,
+        28
+      ],
+      "anchor": "LASTO",
+      "bond": [
+        [
+          43,
+          18
+        ],
+        [
+          70,
+          53
+        ]
+      ],
+      "font": "regularuprightserif; Hheavyverticals+thinbar/serifsarecontrastNOTautomaticbold"
+    },
+    "carbonyl": {
+      "Cvertex": [
+        70,
+        53
+      ],
+      "downRays": [
+        [
+          [
+            66.5,
+            56
+          ],
+          [
+            66.5,
+            85
+          ]
+        ],
+        [
+          [
+            72.5,
+            56
+          ],
+          [
+            72.5,
+            85
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          61,
+          87,
+          79,
+          107
+        ],
+        "font": "regularuprightserif"
+      },
+      "footTopology": "DISCONNECTEDupperrayfeetnativeWHITEGAPbelowCvertex. DO NOTextendtoC/slopes oraddcrossbar. Nativeblackvertexends53;emptyrows54/55beforefirstCOink56. GaptoOlabelinkalsoabout2pxbelow85.",
+      "pixelEvidenceGrayBelow160": {
+        "y53": [
+          69,
+          70
+        ],
+        "y54": [],
+        "y55": [],
+        "y56": [
+          66,
+          67,
+          72,
+          73
+        ],
+        "y57": [
+          65,
+          66,
+          67,
+          72,
+          73
+        ]
+      },
+      "macro": "/workspace/scratch/319-CO15x-lo371.png"
+    },
+    "font": "HOandOregularuprightserifblackgray; noactualbold/italic, noaddedcaption. HstemsvisuallyheavybecauseTimes-likecontrast, notsameboldsanssource3.",
+    "style": "thinblackgrayuniform~2px; minorbackgroundscanfrecklesoutsidebondsglyphsnotnewscientificdata.",
+    "counts": {
+      "bareC": 22,
+      "CCdouble": 6,
+      "COdouble": 1,
+      "O": 2,
+      "HOtoken": 1,
+      "captions": 0,
+      "arrows": 0,
+      "rings": 0
+    },
+    "noAdded": [
+      "DHAcaption",
+      "C22formula",
+      "CCperiodicnormalization",
+      "COfootcontact",
+      "COcrossbar",
+      "extraHlabels",
+      "aliases1145/1385/811/751",
+      "answer"
+    ],
+    "backgroundScanMarks": {
+      "classification": "Scatteredtinygrayflecksacrossblankbackground, noalignment/repeatedsymbolshape andnotconnectedtobonds/glyphs. ALLpublicstemonlycallsacidstructure, nocharge/radicalmarkreferenced.",
+      "rule": "DoNOTreinterpretflecksascharge/radical/glyph; noneindependentlyclearasmeaningfulisolatedsymbolfromownFULL3x. KeepallactualHO/O/bondink. No reconstructingunreadabletext."
+    }
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "publicDeAllRefsRead": true,
+    "ownFull2xOpened": true,
+    "ownCO6xOpened": true,
+    "actualChromiumFull3xOpened": true,
+    "actualCOMacroOpened": true,
+    "hashSvg": "7edb8d9333f3b87a2acf86da8ec7fe77cf57e34f0279839a5ea8334a230f8d28",
+    "verdict": "RootPASS+independentreadonlyexactSHAPASS",
+    "measurementLimits": "nativeapproxnearest1px;NOsubpixelclaim",
+    "counts": "22bareC2O/6CCdouble1COdoubleDOWN;nativeWHITEgapfeetpreserved;HOlastOregularUPRIGHT",
+    "rootFullRenderSha256": "a78d102962668f1f63b2cdab3290ae9ea1794181405182d072a38825c6561b20",
+    "actualGapGrayRows162to167Min": [
+      255,
+      255,
+      255,
+      255,
+      255,
+      255
+    ],
+    "runtimeIndependent": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/acid319-native-ddh-7edb8d9333f3b87a2acf86da8ec7fe77cf57e34f0279839a5ea8334a230f8d28.svg 7edb8d9333f3b87a2acf86da8ec7fe77cf57e34f0279839a5ea8334a230f8d28\n319 { x: 0, y: 0, width: 740, height: 113 }\n"
+  }
+}
