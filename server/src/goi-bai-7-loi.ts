@@ -75,7 +75,7 @@ export function chonGoi7(a: {
   loaiNgay?: LoaiNgay7 | null
   /** ĐỀ 28 THEO SUẤT (rut-28.ts, thầy 10/11): có ⇒ mọi nguồn lấp 28 suất theo ô thay cho bốn tầng lấp cũ. `oCua` = ô của MỌI câu (gói, sửa, ôn);
    *  `daLamO` = ô của các câu em đã làm hôm nay. Nguồn chính (tầng 0): ngày Sửa = câu sai, ngày khác = câu mới theo lịch. Vắng ⇒ hành vi cũ. */
-  suat?: { oCua: (qid: string) => string; daLamO: readonly string[]; /** mức hôm nay khi > 28 (có câu trả nợ) ⇒ suất chia theo tỉ lệ */ tong?: number }
+  suat?: { oCua: (qid: string) => string; daLamO: readonly string[]; /** mức hôm nay khi > 28 (có câu trả nợ) ⇒ suất chia theo tỉ lệ */ tong?: number; /** số CÂU LÃI còn phải trả hôm nay ⇒ lấy từ hàng ôn của em, đứng đầu đề */ lai?: number }
 }): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number; /** đề theo suất: số câu phải lấy lệch ô (0 = mọi suất đúng ô) */ lech?: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
@@ -123,6 +123,18 @@ export function chonGoi7(a: {
     const dayMoi = (q: CauGoi7, tang: number) => { const hd = !a.sanSang.has(q.qid); day(q.qid, hd ? 'tiep_can' : 'moi', hd, tang, oCua(q)) }
     const hop = (id: string) => !a.daLamNgay.has(id) && !a.chan.has(id)
     const daySua = () => { for (const id of a.sua) if (hop(id) && a.sanSang.has(id)) day(id, 'sua', false, laSua ? 0 : 1, oId(id)) }
+    // CÂU LÃI (nợ câu 11/11, thầy: «số câu lãi lấy từ đâu cho hợp lý và cá nhân hoá cho học sinh nhất»): lãi là giá của việc để lâu, mà thứ mất đi khi để lâu là
+    // TRÍ NHỚ ⇒ câu lãi = câu ÔN của chính em: dạng nợ ôn lớn nhất trước (dạng em vừa sai / lâu chưa chạm, mỗi dạng một câu — hàng `on`, `onSom` đã xếp theo nợ ôn
+    // dạng ở goi-bai-7-suat.ts), hết hàng ôn thì tới câu em đang sai chưa sửa. Không bao giờ là câu mới. Đứng ĐẦU đề (trả lãi trước, gốc sau). Hàng ôn chưa đủ mà
+    // ôn sớm chưa nạp ⇒ cộng vào `lech` để nơi gọi nạp ôn sớm rồi chọn lại (đúng đường nạp lười sẵn có).
+    let lai = Math.max(0, Math.floor(a.suat.lai ?? 0)), laiThieu = 0
+    if (lai) {
+      const layLai = (ds: readonly string[], vai: VaiGoi7) => { for (const id of ds) { if (!lai) break; if (!vaiCua.has(id) && hop(id) && a.sanSang.has(id)) { day(id, vai, false, 0, oId(id)); lai-- } } }
+      layLai(a.on, 'on')
+      if (lai && !a.onSom) laiThieu = lai // còn thiếu câu ôn mà ôn sớm chưa nạp ⇒ báo để nạp (lượt này tạm lấy câu đang sai)
+      layLai(a.onSom ?? [], 'on')
+      layLai(a.sua, 'sua')
+    }
     for (const q of phu) dayMoi(q, 0)
     if (laSua) daySua()
     for (const id of a.chua ?? []) if (hop(id)) day(id, 'chua', true, 1, oId(id))
@@ -133,7 +145,7 @@ export function chonGoi7(a: {
     const demSom = new Map<string, number>()
     for (const id of a.onSom ?? []) { if (!hop(id) || !a.sanSang.has(id)) continue; const o = oId(id), n = demSom.get(o) ?? 0; if (n < muc) { demSom.set(o, n + 1); day(id, 'on', false, 1, o) } }
     const r = rut28Lech({ ung, can: muc, daLamO: a.suat.daLamO, tong: a.suat.tong }), viec2 = r.qids.map((id) => vaiCua.get(id)!)
-    return { viec: viec2, thieuPhu, tuLam: viec2.filter(x => !x.huongDan).length, tiepCan: viec2.filter(x => x.huongDan).length, lech: r.lech }
+    return { viec: viec2, thieuPhu, tuLam: viec2.filter(x => !x.huongDan).length, tiepCan: viec2.filter(x => x.huongDan).length, lech: r.lech + laiThieu }
   }
   for (const q of a.chiTrongMuc ? phu.slice(0, muc) : phu) {
     const huongDan = !a.sanSang.has(q.qid)

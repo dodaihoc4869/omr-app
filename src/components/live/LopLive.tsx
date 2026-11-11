@@ -411,17 +411,11 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       if (!lv || !b2) return
       const k = lv.khung()
       v.datDau(k.dau)
-      v.veSong()
-      const t = tro.current
-      if (t) {
-        const dau = k.tro ?? k.dau[k.dau.length - 1] ?? null
-        if (dau) {
-          const [x, y] = v.toiPx(dau.x, dau.y)
-          t.style.transform = `translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0)`; t.style.opacity = '1'
-          // tay nắm đè mép trên vùng chiếu: nét chạy tới chỗ nó đang đứng ⇒ tự né sang trái / phải
-          if (b2.namDe && nam.current && y < b2.tren + 64 && Math.abs(x - namX.current * b2.w) < 70) { namX.current = x < b2.w / 2 ? 0.8 : 0.2; nam.current.style.left = `${namX.current * 100}%`; if (khay.current) khay.current.style.left = `${namX.current * 100}%` }
-        } else t.style.opacity = '0'
-      }
+      v.datBut(k.but, k.cuon) // cây bút của thầy (11/11, thay chấm tròn vàng): vẽ ngay trên lớp «đang viết», cùng lượt với đuôi nét
+      v.veSong(nay)
+      const p = v.viTriBut()
+      // tay nắm đè mép trên vùng chiếu: nét chạy tới chỗ nó đang đứng ⇒ tự né sang trái / phải
+      if (p && b2.namDe && nam.current && p[1] < b2.tren + 64 && Math.abs(p[0] - namX.current * b2.w) < 70) { namX.current = p[0] < b2.w / 2 ? 0.8 : 0.2; nam.current.style.left = `${namX.current * 100}%`; if (khay.current) khay.current.style.left = `${namX.current * 100}%` }
       if (nay - lucAm > 110) {
         lucAm = nay
         const am = Math.min(1, lv.mucAm() * 3)

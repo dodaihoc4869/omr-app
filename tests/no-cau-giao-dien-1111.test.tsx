@@ -51,7 +51,7 @@ describe('thẻ', () => {
     expect(the.querySelector('.nc-loai')!.textContent).toBe('Câu mới 20 · Câu sửa 14 · Câu ôn 6 · Lãi 2')
     const nut = [...the.querySelectorAll('.nc-nut')]
     expect(nut.map((b) => [b.textContent, b.getAttribute('aria-pressed')])).toEqual([['Trả tối thiểu11 câu', 'true'], ['Trả hết42 câu', 'false']])
-    expect(the.querySelector('.nc-ghi')!.textContent).toBe('Tối thiểu = 25 % số nợ, ít nhất 6 câu. Phần còn nợ tính lãi 5 % mỗi đêm: đêm nay cộng 2 câu.')
+    expect(the.querySelector('.nc-ghi')!.textContent).toBe('Tối thiểu = 25 % số nợ, ít nhất 6 câu. Phần còn nợ tính lãi 5 % mỗi đêm: đêm nay cộng 2 câu. Câu lãi là câu ôn dạng em hay sai.')
   })
   it('bấm «Trả hết» gửi lệnh hoc-tap-no-cau-chon rồi nạp lại Sảnh; bấm ô đang chọn không gửi gì; lỗi thì báo, không nạp lại', async () => {
     const onDoi = vi.fn()

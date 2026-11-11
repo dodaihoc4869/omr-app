@@ -9,6 +9,7 @@
 //      (ngày ấy em không trả nợ được);
 //   3. thiếu = phần 28 câu của chính ngày ấy em chưa làm ⇒ cộng vào nợ, MIỄN LÃI đêm đầu (như khoản mới phát sinh của thẻ ngân hàng);
 //   4. nợ không vượt TRẦN 84 câu (3 ngày).
+// CÂU LÃI LÀ CÂU NÀO: câu ÔN của chính em — dạng em vừa sai / lâu chưa chạm trước (nợ ôn theo dạng, rut-28.ts), đứng đầu đề của ngày (goi-bai-7-loi.ts).
 // TRẢ TỐI THIỂU = 25 % số nợ, làm tròn lên, không dưới 6 câu (nợ ≤ 6 ⇒ trả hết). Tối đa 3 lần; lần thứ tư phải trả hết. Trả hết nợ ⇒ đếm lại từ 0.
 
 /** Nợ chỉ phát sinh từ ngày này (ngày phát hành); thực tế từ ngày đầu tiên em mở app sau đó. */
@@ -106,11 +107,12 @@ export interface TomTatNo {
   /** đã trả hôm nay */ daTra: number
   /** lãi mỗi đêm (%) */ lai: number
   /** lãi sẽ cộng đêm nay nếu em dừng ở đây */ laiDemNay: number
+  /** mức hôm nay (đã gồm số trả) */ muc: number
 }
 /** Tóm tắt gửi app: `daLam` = số câu em đã làm hôm nay, `muc` = mức hôm nay (đã gồm số trả). */
 export function tomTatNo(s: SoNo, chon: { kieu: KieuTra; so: number }, daLam: number, muc: number): TomTatNo | null {
   if (s.no <= 0) return null
   const so = Math.min(nguyen(chon.so), s.no), lam = nguyen(daLam), M = nguyen(muc)
   const daTra = lam >= M && M > 0 ? Math.min(s.no, so + (lam - M)) : Math.min(so, lam), con = s.no - daTra
-  return { no: s.no, con, theoLoai: { ...s.loai }, toiThieu: toiThieuNo(s.no), lan: s.lan, phaiTraHet: phaiTraHet(s), kieu: chon.kieu, so, daTra, lai: LAI_PHAN_TRAM, laiDemNay: laiNo(con) }
+  return { no: s.no, con, theoLoai: { ...s.loai }, toiThieu: toiThieuNo(s.no), lan: s.lan, phaiTraHet: phaiTraHet(s), kieu: chon.kieu, so, daTra, lai: LAI_PHAN_TRAM, laiDemNay: laiNo(con), muc: M }
 }

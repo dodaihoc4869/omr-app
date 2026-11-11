@@ -4,7 +4,8 @@
 //   rtt  = RTT máy em ↔ SFU (ms)                  jt  = jitter tiếng (ms)
 //   tt   = trễ tiếng ước lượng phía máy em (đệm jitter + ~45 ms thu, mã hoá + ~20 ms loa), CHƯA gồm quãng mạng
 //   tn   = trễ nét ước lượng = D + RTT/2 (quãng máy em ↔ SFU; quãng máy thầy ↔ SFU không đo được từ máy em)
-export type TenSoDo = 'd' | 'j' | 'm' | 'rtt' | 'jt' | 'tt' | 'tn'
+//   dg   = quãng đầu nét phải ĐỨNG dài nhất vì hết điểm (ms) — 11/11
+export type TenSoDo = 'd' | 'j' | 'm' | 'rtt' | 'jt' | 'tt' | 'tn' | 'dg'
 export interface TomTatSo { n: number; tv: number; p95: number; max: number }
 const GIU = 600
 

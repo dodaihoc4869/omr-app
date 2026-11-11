@@ -24,6 +24,7 @@ class TrackGia {
   ra(): number { return this.readyState === 'live' && this.enabled && !this.muted ? this.tinHieu() : 0 }
 }
 class LuongGia { constructor(public ds: TrackGia[]) {} getAudioTracks() { return this.ds } getTracks() { return this.ds } }
+const ctx = { state: 'running' as 'running' | 'suspended', onstatechange: null as (() => void) | null, soNen: [] as { hong: boolean; threshold: { value: number }; ratio: { value: number } }[] }
 class NutGia {
   vao: NutGia[] = []; fftSize = 0; channelCount = 2; channelCountMode = ''; channelInterpretation = ''; type = ''
   frequency = { value: 0 }; Q = { value: 0 }; threshold = { value: 0 }; knee = { value: 0 }; ratio = { value: 0 }; attack = { value: 0 }; release = { value: 0 }; gain = { value: 1 }
@@ -34,7 +35,6 @@ class NutGia {
   muc(): number { return this.hong ? 0 : this.nguon ? Math.max(0, ...this.nguon.ds.map((t) => t.ra())) : Math.max(0, ...this.vao.map((n) => n.muc())) }
   getFloatTimeDomainData(m: Float32Array) { m.fill(ctx.state === 'running' ? this.muc() : 0) }
 }
-const ctx = { state: 'running' as 'running' | 'suspended', onstatechange: null as (() => void) | null, soNen: [] as NutGia[] }
 class CtxGia {
   get state() { return ctx.state }
   set onstatechange(f: (() => void) | null) { ctx.onstatechange = f } get onstatechange() { return ctx.onstatechange }

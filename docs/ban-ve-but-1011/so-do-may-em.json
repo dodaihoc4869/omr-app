@@ -1,0 +1,150 @@
+{
+  "ten": "sau",
+  "ngay": "2026-11-11T02:06:52.106Z",
+  "may": "Chromium không đầu /opt/pw-browsers, thầy 1366 × 768, máy em 844 × 390 @2x; phòng thật trong Node; nét đi WebSocket của phòng (không SFU, không mạng thật)",
+  "nhipMuc": {
+    "soNet": 65,
+    "cachKhungCoMucMs": {
+      "n": 761,
+      "trungVi": 16.7,
+      "p95": 16.9,
+      "lonNhat": 33.2
+    },
+    "quangDungDaiNhatMoiNetMs": {
+      "n": 65,
+      "trungVi": 16.9,
+      "p95": 17.9,
+      "lonNhat": 33.2
+    },
+    "quangDungTu50Ms": 0,
+    "treChamButToiMucMs": {
+      "n": 65,
+      "trungVi": 74.4,
+      "p95": 82.7,
+      "lonNhat": 87.7
+    },
+    "conTro": {
+      "khungMucChay": 760,
+      "trongDoConTroDungIm": 0,
+      "dungRoiNhay6px": 0
+    }
+  },
+  "uotSoKhoMayEm": {
+    "soNet": 5,
+    "netCoKhac": 1,
+    "diemAnhKhac": 17,
+    "khac16": 1,
+    "mucLon": 17,
+    "ghiChu": "ô bảng đen của máy em ở đúng điểm ảnh thiết bị (@2x)"
+  },
+  "khungHinhMayEm": [
+    {
+      "cpu": "×1",
+      "khungMoiGiay": 60,
+      "cachKhungP95Ms": 16.7,
+      "khungTreHon20Ms": 0,
+      "soKhung": 315,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.1,
+        "p95": 0.2,
+        "lonNhat": 0.5
+      },
+      "luongChinhBanPhanTram": 11.1,
+      "maPhanTram": 1.2,
+      "boCucPhanTram": 0,
+      "tinhKieuPhanTram": 0,
+      "soLanBoCuc": 0,
+      "soLanTinhKieu": 0
+    },
+    {
+      "cpu": "×4",
+      "khungMoiGiay": 60,
+      "cachKhungP95Ms": 16.8,
+      "khungTreHon20Ms": 0,
+      "soKhung": 310,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.4,
+        "p95": 1.1,
+        "lonNhat": 7.1
+      },
+      "luongChinhBanPhanTram": 41.9,
+      "maPhanTram": 3.9,
+      "boCucPhanTram": 0,
+      "tinhKieuPhanTram": 0,
+      "soLanBoCuc": 0,
+      "soLanTinhKieu": 0
+    },
+    {
+      "cpu": "×6",
+      "khungMoiGiay": 59.8,
+      "cachKhungP95Ms": 16.8,
+      "khungTreHon20Ms": 1,
+      "soKhung": 317,
+      "xuLyMoiKhungMs": {
+        "trungVi": 0.2,
+        "p95": 1.8,
+        "lonNhat": 5.3
+      },
+      "luongChinhBanPhanTram": 62.6,
+      "maPhanTram": 5.5,
+      "boCucPhanTram": 0,
+      "tinhKieuPhanTram": 0.1,
+      "soLanBoCuc": 0,
+      "soLanTinhKieu": 2
+    }
+  ],
+  "cayBut": {
+    "dangVietCham": true,
+    "loLungCham": null
+  },
+  "bangCuon": {
+    "thayLanChuot": {
+      "truoc": 0,
+      "sau": 0.4688
+    },
+    "netBang": 150,
+    "netGiay": 0,
+    "yLonNhatCuaNet": 1.297,
+    "mayEmTroiTheo": {
+      "truoc": "translate3d(0px, -190px, 0px)",
+      "sau": "translate3d(0px, -197.5px, 0px)",
+      "buocTroiLonNhatMoiKhungPx": 1
+    },
+    "nhipMucKhiDaCuon": {
+      "soNet": 19,
+      "cachKhungCoMucMs": {
+        "n": 289,
+        "trungVi": 16.7,
+        "p95": 16.9,
+        "lonNhat": 33.4
+      },
+      "quangDungDaiNhatMoiNetMs": {
+        "n": 19,
+        "trungVi": 16.9,
+        "p95": 33.4,
+        "lonNhat": 33.4
+      },
+      "quangDungTu50Ms": 0,
+      "treChamButToiMucMs": {
+        "n": 19,
+        "trungVi": 76.5,
+        "p95": 90.9,
+        "lonNhat": 90.9
+      },
+      "conTro": {
+        "khungMucChay": 288,
+        "trongDoConTroDungIm": 1,
+        "dungRoiNhay6px": 1
+      }
+    },
+    "keoVachCuon": {
+      "cuonTruoc": 0.8942,
+      "cuonSau": 1.0504,
+      "doiPx": 120,
+      "kéoKhôngSinhNét": true,
+      "mayEmTheo": "translate3d(0px, -442px, 0px)",
+      "hoanTacSauCuon": "150 → 149 nét"
+    }
+  },
+  "loiTrang": []
+}

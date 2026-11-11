@@ -4,6 +4,7 @@
 import { expect, it } from 'vitest'
 import { TRAN_NO, chonMacDinh, chotNgay, chotNo, laiNo, phaiTraHet, soCuaKieu, soNoRong, toiThieuNo, tomTatNo, type NgayNo, type SoNo } from '../server/src/no-cau'
 import { SUAT_28, suatTheoTong, rut28, O_28 } from '../server/src/rut-28'
+import { chonGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
 
 const no = (n: number, lan = 0, loai: Partial<SoNo['loai']> = {}): SoNo => ({ no: n, lan, loai: { moi: n, sua: 0, on: 0, lai: 0, ...loai }, den: '2026-11-11' })
 const ngay = (d: Partial<NgayNo>): NgayNo => ({ ngay: '2026-11-12', muc: 28, so: 0, kieu: null, lam: 0, kt: null, loai: 'moi', ...d })
@@ -98,4 +99,34 @@ it('mức hôm nay > 28 (có câu trả nợ): suất chia đúng tỉ lệ đ�
   const de = rut28({ ung, can: 39, tong: 39 })
   expect(O_28.map((o) => de.filter((q) => q.startsWith(`${o}#`)).length)).toEqual([17, 5, 3, 3, 3, 4, 4])
   expect(rut28({ ung, can: 28 })).toEqual(rut28({ ung, can: 28, tong: 28 }))
+})
+
+// CÂU LÃI LẤY TỪ ĐÂU (thầy 11/11: «số câu lãi lấy từ đâu cho hợp lý và cá nhân hoá cho học sinh nhất»): từ hàng ÔN của chính em (đã xếp theo nợ ôn dạng), đứng đầu đề.
+const O_CUA = (q: string) => q.split('#')[0]!
+const KHO: CauGoi7[] = O_28.flatMap((o) => Array.from({ length: 30 }, (_, i) => ({ qid: `${o}#m${i}`, group: `${o}#m${i}`, maDe: 'x', version: 'v1', phan: o.split('|')[0]!, kho: false, tinhToan: false, kyNang: ['a'] } as unknown as CauGoi7)))
+const ON = ['I|biet#on0', 'III|hieu#on1', 'II|hieu#on2', 'I|hieu#on3', 'I|biet#on4'], SAI = ['I|van_dung#sai0', 'III|van_dung#sai1']
+const vao = (them: Partial<Parameters<typeof chonGoi7>[0]> & { lai?: number }) => chonGoi7({ cau: KHO, daGap: new Set(), daLamNgay: new Set(), quotaCon: 999, chan: new Set(), sua: SAI, on: ON,
+  sanSang: new Set([...KHO.map((c) => c.qid), ...ON, ...SAI, 'I|biet#som0', 'II|van_dung#som1', 'III|hieu#som2']), mucTieuNgay: 39, chiTrongMuc: true, loaiNgay: 'moi',
+  nhomPhu: [{ qids: KHO.map((c) => c.qid), quota: 999 }], suat: { oCua: O_CUA, daLamO: [], tong: 39, lai: them.lai }, ...them })
+it('câu lãi = câu ôn của chính em, đúng thứ tự nợ ôn dạng, đứng ĐẦU đề; tổng số câu của ngày không đổi; không có lãi thì đề như cũ', () => {
+  const khong = vao({ lai: 0 })
+  expect(khong.viec).toHaveLength(39)
+  expect(khong.viec[0]!.vai).toBe('moi') // ngày Học mới: câu mới đứng đầu
+  const co = vao({ lai: 3 })
+  expect(co.viec).toHaveLength(39)
+  expect(co.viec.slice(0, 3).map((v) => [v.qid, v.vai])).toEqual([[ON[0], 'on'], [ON[1], 'on'], [ON[2], 'on']])
+  expect(co.viec[3]!.vai).toBe('moi')
+  expect(co.viec.filter((v) => v.vai === 'moi').length).toBeGreaterThanOrEqual(28) // 28 câu của hôm nay vẫn đủ chỗ
+  expect(co.lech ?? 0).toBe(khong.lech ?? 0)
+})
+it('hàng ôn đến hạn không đủ câu lãi: báo lệch để nơi gọi nạp ôn sớm; có ôn sớm thì lấy tiếp theo nợ ôn dạng; hết cả ôn mới tới câu em đang sai', () => {
+  const thieu = vao({ lai: 7, onSom: undefined })
+  expect(thieu.lech).toBeGreaterThanOrEqual(2) // 5 câu ôn đến hạn < 7 câu lãi, ôn sớm chưa nạp
+  expect(thieu.viec.slice(0, 5).map((v) => v.qid)).toEqual(ON)
+  const som = vao({ lai: 7, onSom: ['I|biet#som0', 'II|van_dung#som1', 'III|hieu#som2'] })
+  expect(som.viec.slice(0, 7).map((v) => v.qid)).toEqual([...ON, 'I|biet#som0', 'II|van_dung#som1'])
+  expect(som.viec.slice(0, 7).every((v) => v.vai === 'on')).toBe(true)
+  const het = vao({ lai: 9, onSom: ['I|biet#som0'] })
+  expect(het.viec.slice(0, 8).map((v) => [v.qid, v.vai])).toEqual([...ON.map((q) => [q, 'on']), ['I|biet#som0', 'on'], [SAI[0], 'sua'], [SAI[1], 'sua']])
+  expect(het.viec).toHaveLength(39)
 })

@@ -5,6 +5,8 @@
 //
 // MÔ HÌNH NÉT        { id, cong: 'but' | 'tay', mau, co, diem: [x, y, apLuc, t][] }
 //   x, y   0..1 theo bề ngang / bề dọc vùng viết (5 số lẻ)      apLuc  0..1 (2 số lẻ)      t  mili-giây kể từ điểm đầu nét
+//   BẢNG ĐEN CUỘN (11/11, thầy: «bảng đen khi live có cuộn vô hạn»): nét viết trên cột bảng đen mang mã bắt đầu bằng «b_» và y = y màn + độ cuộn của bảng
+//   (tính bằng số lần bề dọc vùng viết ⇒ y có thể > 1, tối đa 160). Máy nhận thấy mã «b_» thì vẽ nét trong ô bảng, dời theo độ cuộn của chính nó.
 //   co     bề rộng cơ sở của nét, tính bằng px ở màn 1920 (máy khác nhân dvi / 1920, dvi = min(ngang, dọc × 16 / 9))
 // CÁCH DỰNG NÉT (hàm THUẦN của dữ liệu điểm: cùng một dữ liệu ⇒ cùng một hình ở mọi máy; KHÔNG dùng cột giờ `t` để dựng hình — giờ mẫu sai / dồn cục không làm méo nét):
 //   1. khử rung RẤT NHẸ, không trễ (11/11, thầy: «viết bị nhằng nhằng chưa mượt như goodnote»): chỉ nắn chỗ mẫu ZÍCH-ZẮC sát nhau (bậc thang của toạ độ nguyên px khi đi chậm),
@@ -28,6 +30,7 @@ export type SuKienBut =
   | { loai: 'net-xong'; trang: string; id: string }
   | { loai: 'xoa'; trang: string; id: string[] }
   | { loai: 'trang'; trang: string; net: NetBut[]; tiLe: number }
+  /** Con trỏ lơ lửng. QUY ƯỚC 11/11: `x > 1,5` ⇒ không phải con trỏ mà là ĐỘ CUỘN của bảng đen (`y`, số lần bề dọc vùng viết) — máy nhận cuộn bảng theo. */
   | { loai: 'tro'; trang: string; x: number; y: number }
 /** Khung quy chiếu của vùng viết W × H px: k = dvi / 1920; rw × rh = vùng viết tính bằng «px ở màn 1920». */
 export interface KhungBut { W: number; H: number; k: number; rw: number; rh: number }
@@ -41,11 +44,14 @@ export interface SoBut {
   ds(): NetBut[]
   datTiLe(v: number): void
   doiTrang(khoa: string): void
-  batDau(mo: { cong?: 'but' | 'tay'; mau: string; co: number; diem?: DiemBut }): NetBut
+  /** `bang` = nét viết trên BẢNG ĐEN CUỘN (11/11): mã nét bắt đầu bằng «b_», toạ độ y tính theo bảng (y màn + độ cuộn, có thể > 1). */
+  batDau(mo: { cong?: 'but' | 'tay'; mau: string; co: number; diem?: DiemBut; bang?: boolean }): NetBut
   themDiem(ds: DiemBut[]): void
   ketThuc(huy?: boolean): NetBut | null
   /** Con trỏ bút lơ lửng (chưa chạm): chỉ phát sự kiện `tro`, không đổi nét. */
   tro(x: number, y: number): void
+  /** Báo ĐỘ CUỘN của bảng đen (11/11): phát sự kiện `tro` có `x = 2` (ngoài màn), `y` = độ cuộn. Không thêm loại sự kiện / khung mạng nào. */
+  cuon(v: number): void
   xoa(ids: string[], gop?: boolean): number
   dongGop(): void
   xoaHet(): number
@@ -63,7 +69,8 @@ export interface LoiBut {
   heSo(apLuc: number): number
   moXuLy(net: { co: number }, kh: KhungBut): XuLyBut
   xuLyThem(st: XuLyBut, diem: DiemBut[], den: number): void
-  mocDong(st: XuLyBut, dong: number): number
+  /** `it` = số điểm dồn tối thiểu mới in (mặc định 64). */
+  mocDong(st: XuLyBut, dong: number, it?: number): number
   /** Đuôi tạm; `them` = điểm nối thêm sau mẫu cuối (đầu bút thật, điểm dự đoán), px ở màn 1920. */
   duoiTam(st: XuLyBut, them: number[][] | null): DuoiBut
   /** Đa giác bao của nét từ điểm xử lý `tu` tới `den` (−1 = tới hết, kèm đuôi `duoi` và đầu bo); `xong` = thon cuối nét. Mảng phẳng [x0, y0, x1, y1…] (px ở màn 1920). */
@@ -74,13 +81,17 @@ export interface LoiBut {
   veDaGiac(g: { moveTo(x: number, y: number): void; quadraticCurveTo(a: number, b: number, x: number, y: number): void; closePath(): void }, p: number[]): void
   chamNet(net: NetBut, x: number, y: number, r: number, kh: KhungBut): boolean
   timCham(ds: NetBut[], x: number, y: number, r: number, kh: KhungBut): string[]
+  /** Hộp bao [x0, y0, x1, y1] của nét (toạ độ chuẩn hoá; nhớ lại trên nét). */
+  hop(net: NetBut): number[]
+  /** Nét viết trên bảng đen cuộn (mã bắt đầu bằng «b_»)? */
+  laBang(net: { id: string }): boolean
   taoSo(tuy?: { taoId?: (dem: number) => string; gioiHan?: number }): SoBut
   apSuKien(ds: NetBut[], sk: SuKienBut): NetBut[]
 }
 
 export const JS_LOI_BUT = `
 var LoiBut = (function () {
-  var CHIA = 1e5, PI = Math.PI, MAU0 = 'rgb(244,239,228)';
+  var CHIA = 1e5, PI = Math.PI, MAU0 = 'rgb(244,239,228)', YMAX = 160;
 ` + /* Khử rung: bước trung bình giữa các mẫu ≤ RUNG_A px ⇒ nắn đủ, ≥ RUNG_B px ⇒ không đụng; chỗ zích-zắc nắn RUNG_ZIC phần độ gãy, chỗ cong đều chỉ RUNG_DEU; */ `
 ` + /* không mẫu nào bị dịch quá RUNG_KEP px (px ở màn 1920). */ `
   var RUNG_A = 1, RUNG_B = 2.2, RUNG_ZIC = 0.25, RUNG_DEU = 0.04, RUNG_KEP = 0.55;
@@ -94,7 +105,7 @@ var LoiBut = (function () {
   function xa(ax, ay, bx, by) { ax -= bx; ay -= by; return Math.sqrt(ax * ax + ay * ay); }
   function muot(a, b, v) { v = kep((v - a) / (b - a), 0, 1); return v * v * (3 - 2 * v); }
   function khung(W, H) { var k = Math.min(W, H * 16 / 9) / 1920 || 1; return { W: W, H: H, k: k, rw: W / k, rh: H / k }; }
-  function diem(x, y, ap, t, W, H) { return [tron(kep(x / W, 0, 1), CHIA), tron(kep(y / H, 0, 1), CHIA), tron(kep(ap, 0, 1), 100), Math.max(0, Math.round(t))]; }
+  function diem(x, y, ap, t, W, H) { return [tron(kep(x / W, 0, 1), CHIA), tron(kep(y / H, 0, YMAX), CHIA), tron(kep(ap, 0, 1), 100), Math.max(0, Math.round(t))]; }
 ` + /* Chuột / chạm không có lực: giả theo vận tốc (quang = px ở màn 1920, dt = mili-giây) — đi nhanh thì nhẹ tay (mảnh), đi chậm thì đậm; đổi dần. */ `
   function apLucGia(truoc, quang, dt) { var dich = 0.56 - 0.48 * kep(quang / Math.max(1, dt) / 2.4, 0, 1); return truoc + (dich - truoc) * kep(dt / 70, 0, 1); }
 ` + /* Lực 0..1 ⇒ hệ số bề rộng 0,7 … 1,35 (11/11: hẹp hơn 0,6 … 1,6 cũ — chữ nhỏ ấn mạnh tay không còn bị nét to át chữ). */ `
@@ -188,11 +199,14 @@ var LoiBut = (function () {
     return { X: X, Y: Y, R: R, L: L };
   }
 ` + /* Nét đang viết: phần đã chốt và đã cách đầu bút đủ xa (hơn đoạn thon cuối + ngưỡng «nét ngắn») thì đem in xuống lớp tĩnh. Trả về chỉ số in tới; −1 = chưa cần. */ `
-  function mocDong(st, dong) {
+` + /* it = in khi đã dồn được ít nhất ngần này điểm (mặc định 64). Máy thầy để 160: chữ viết thường không nét nào dài tới đó (đo chữ mẫu cao 28–64 px: nhiều nhất 134 điểm) ⇒ cả nét là MỘT đa giác, */ `
+` + /* lúc đang viết và lúc vẽ lại từ vectơ ra cùng điểm ảnh (chỗ hai khúc in chồng mép lên nhau thì viền đậm hơn một chút). */ `
+  function mocDong(st, dong, it) {
     var m = st.X.length, den = m - 1, giu = st.ban * 2 * (NGAN_B + THON_CUOI) + 3;
-    if (den - dong < 64) return -1;
+    it = it || 64;
+    if (den - dong < it) return -1;
     while (den > dong && st.L[m - 1] - st.L[den] < giu) den--;
-    return den - dong >= 64 ? den : -1;
+    return den - dong >= it ? den : -1;
   }
 
 ` + /* ── 3 + 4 · bán kính thon hai đầu, rồi đa giác bao ── */ `
@@ -267,9 +281,14 @@ var LoiBut = (function () {
   }
 
 ` + /* ── tẩy theo nét: (x, y) chuẩn hoá, r = bán kính tẩy (px ở màn 1920) ── */ `
+  function hop(net) {
+    var d = net.diem, h = net._h, i;
+    if (!h) { h = [1e9, 1e9, -1e9, -1e9]; for (i = 0; i < d.length; i++) { h[0] = Math.min(h[0], d[i][0]); h[1] = Math.min(h[1], d[i][1]); h[2] = Math.max(h[2], d[i][0]); h[3] = Math.max(h[3], d[i][1]); } net._h = h; }
+    return h;
+  }
+  function laBang(net) { return net.id.charCodeAt(0) === 98 && net.id.charCodeAt(1) === 95; }
   function chamNet(net, x, y, r, kh) {
-    var d = net.diem, h = net._h, i, px, py, ax, ay, bx, by, vx, vy, t, rr, mx, my;
-    if (!h) { h = [1, 1, 0, 0]; for (i = 0; i < d.length; i++) { h[0] = Math.min(h[0], d[i][0]); h[1] = Math.min(h[1], d[i][1]); h[2] = Math.max(h[2], d[i][0]); h[3] = Math.max(h[3], d[i][1]); } net._h = h; }
+    var d = net.diem, h = hop(net), i, px, py, ax, ay, bx, by, vx, vy, t, rr, mx, my;
     rr = r + net.co * 0.8; mx = rr / kh.rw; my = rr / kh.rh;
     if (x < h[0] - mx || x > h[2] + mx || y < h[1] - my || y > h[3] + my) return false;
     px = x * kh.rw; py = y * kh.rh; rr *= rr;
@@ -291,7 +310,7 @@ var LoiBut = (function () {
   function sachNet(n, i) {
     var ds = [], j, d;
     if (!n || !n.diem) return null;
-    for (j = 0; j < n.diem.length; j++) { d = n.diem[j]; if (d && isFinite(d[0]) && isFinite(d[1])) ds.push([tron(kep(+d[0], 0, 1), CHIA), tron(kep(+d[1], 0, 1), CHIA), tron(kep(isFinite(d[2]) ? +d[2] : 0.5, 0, 1), 100), Math.max(0, Math.round(+d[3] || 0))]); }
+    for (j = 0; j < n.diem.length; j++) { d = n.diem[j]; if (d && isFinite(d[0]) && isFinite(d[1])) ds.push([tron(kep(+d[0], 0, 1), CHIA), tron(kep(+d[1], 0, YMAX), CHIA), tron(kep(isFinite(d[2]) ? +d[2] : 0.5, 0, 1), 100), Math.max(0, Math.round(+d[3] || 0))]); }
     if (!ds.length) return null;
     return { id: String(n.id || 'n' + i), cong: n.cong === 'tay' ? 'tay' : 'but', mau: /^rgba?\\([0-9., %\\/]+\\)$/.test(n.mau) ? n.mau : MAU0, co: kep(+n.co || 2.3, 0.5, 16), diem: ds };
   }
@@ -325,10 +344,11 @@ var LoiBut = (function () {
       ds: function () { return T.net; },
       datTiLe: function (v) { if (v > 0) tiLe = tron(v, 1e4); },
       doiTrang: function (k) { k = String(k); if (dang) ketThuc(); if (k === khoa) return; khoa = k; T = trang[k] || (trang[k] = { net: [], lui: [], toi: [] }); phat({ loai: 'trang', net: T.net.map(gon), tiLe: tiLe }); },
-      batDau: function (mo) { dang = { id: id(), cong: mo.cong === 'tay' ? 'tay' : 'but', mau: mo.mau, co: mo.co, diem: mo.diem ? [mo.diem] : [] }; phat({ loai: 'net-moi', net: { id: dang.id, cong: dang.cong, mau: dang.mau, co: dang.co, diem: dang.diem.slice() } }); return dang; },
+      batDau: function (mo) { dang = { id: (mo.bang ? 'b_' : '') + id(), cong: mo.cong === 'tay' ? 'tay' : 'but', mau: mo.mau, co: mo.co, diem: mo.diem ? [mo.diem] : [] }; phat({ loai: 'net-moi', net: { id: dang.id, cong: dang.cong, mau: dang.mau, co: dang.co, diem: dang.diem.slice() } }); return dang; },
       themDiem: function (ds) { var i; if (!dang || !ds.length) return; for (i = 0; i < ds.length; i++) dang.diem.push(ds[i]); phat({ loai: 'them-diem', id: dang.id, diem: ds }); },
       ketThuc: ketThuc,
-      tro: function (x, y) { if (tai.length) phat({ loai: 'tro', x: tron(kep(x, 0, 1), 1e4), y: tron(kep(y, 0, 1), 1e4) }); },
+      tro: function (x, y) { if (tai.length) phat({ loai: 'tro', x: tron(kep(x, 0, 1), 1e4), y: tron(kep(y, 0, YMAX), 1e4) }); },
+      cuon: function (v) { if (tai.length) phat({ loai: 'tro', x: 2, y: tron(kep(v, 0, YMAX), 1e4) }); },
       xoa: xoa,
       dongGop: function () { var b = T.lui[T.lui.length - 1]; if (b) b.mo = false; },
       xoaHet: function () { return xoa(T.net.map(function (n) { return n.id; })); },
@@ -356,7 +376,7 @@ var LoiBut = (function () {
     else if (sk.loai === 'xoa') { for (i = ds.length - 1; i >= 0; i--) if (sk.id.indexOf(ds[i].id) >= 0) ds.splice(i, 1); }
     return ds;
   }
-  return { khung: khung, diem: diem, apLucGia: apLucGia, heSo: heSo, moXuLy: moXuLy, xuLyThem: xuLyThem, mocDong: mocDong, vien: vien, dungNet: dungNet, duongTam: duongTam, duoiTam: duoiTam, veDaGiac: veDaGiac, chamNet: chamNet, timCham: timCham, taoSo: taoSo, apSuKien: apSuKien };
+  return { khung: khung, diem: diem, apLucGia: apLucGia, heSo: heSo, moXuLy: moXuLy, xuLyThem: xuLyThem, mocDong: mocDong, vien: vien, dungNet: dungNet, duongTam: duongTam, duoiTam: duoiTam, veDaGiac: veDaGiac, chamNet: chamNet, timCham: timCham, hop: hop, laBang: laBang, taoSo: taoSo, apSuKien: apSuKien };
 })();
 `
 

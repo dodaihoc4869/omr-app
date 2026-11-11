@@ -56,7 +56,7 @@ Tổng em trả 47 câu cho khoản nợ 42 câu: 5 câu là lãi. Trả hết n
 - Lãi cộng vào nợ, đêm sau tính lãi trên cả gốc lẫn lãi (lãi kép). Nợ kể cả lãi không vượt trần 84 câu.
 - Trả nợ thì trừ lãi trước, gốc sau.
 - Ngày Kiểm tra ôn tập không tính lãi (ngày ấy em chỉ làm bài kiểm tra, không trả nợ được).
-- Câu lãi rút như câu trả nợ khác: theo đúng luật đề theo suất của ngày.
+- **Câu lãi lấy từ đâu (thầy 11/11: «số câu lãi lấy từ đâu cho hợp lý và cá nhân hoá cho học sinh nhất»):** lãi là giá của việc để lâu, mà thứ mất đi khi để lâu là trí nhớ ⇒ câu lãi là **câu ÔN của chính em**, không bao giờ là câu mới. Thứ tự lấy: (1) câu ôn đã đến hạn của em, xếp theo «nợ ôn theo dạng» — dạng em vừa sai hoặc lâu chưa làm lên đầu, mỗi dạng một câu rồi mới tới câu thứ hai; (2) chưa đủ thì câu em đã làm ở các bài trước (ôn sớm), cùng cách xếp; (3) hết cả hai mới tới câu em đang sai chưa sửa. Câu lãi đứng ĐẦU đề của ngày (trả lãi trước, gốc sau) và vẫn nằm trong đúng suất phần × mức của đề. Mã: `server/src/goi-bai-7-loi.ts` (khối `suat`, tham số `lai`), số câu lãi còn phải trả hôm nay = lãi nằm trong số đã chọn trả − số đã trả.
 - Thẻ ghi rõ lãi: «Lãi 2» trong dòng theo loại, và «đêm nay cộng 2 câu» nếu em chỉ trả tối thiểu.
 
 **Đếm lần trả tối thiểu:** mỗi ngày em để ở «Trả tối thiểu» và có làm bài (từ 1 câu) mà chưa hết nợ = 1 lần — làm chưa đủ số tối thiểu cũng tính (không lách được bằng cách trả thiếu). Trả hết nợ thì đếm lại từ 0. Ngày em không làm câu nào không mất lần, nhưng nợ vẫn tăng (tới trần).

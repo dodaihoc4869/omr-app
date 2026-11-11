@@ -632,7 +632,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // làm (không câu mới, không câu chờ thầy dạy lại), câu sai lần cuối trước, sai nhiều trước, chưa thành thạo trước, gần lịch ôn trước. Chỉ CPU, không đọc D1.
   const vaoPlan: Parameters<typeof chonGoi7>[0] = { cau,daGap:vuaLam.size||luotNgay.size?new Set([...daGap,...vuaLam,...luotNgay]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua:loaiNgay==='sua'?xepSuaTheoNhom(themSua7(sua,hs,lyDo,ngay),hs.meta):sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn,
     ngay,gapHomNay:new Set([...goi.flatMap(g=>[...g.gapNgay]),...[...vuaLam,...luotNgay].filter(id=>!daGap.has(id))]),loaiNgay }
-  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, toiThieu) : null // đề 28 theo suất (goi-bai-7-suat.ts)
+  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, ml7.noCau) : null // đề 28 theo suất (goi-bai-7-suat.ts)
   let plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
   // Chỉ khi kế hoạch thường còn thiếu mức (hiếm) mới đọc thêm câu đã DÀNH cho Kiểm tra ôn tập sắp tới của em (một lệnh, chỉ mã câu) — ôn sớm không lấy
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.

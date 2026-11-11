@@ -14,7 +14,7 @@ const goc = (q: string): string => { const i = q.indexOf('~'); return i < 0 ? q 
 
 /** Gắn `suat` + xếp hàng ôn theo nợ ôn dạng. Trả hàm xếp hàng ÔN SỚM (nơi gọi chỉ nạp ôn sớm khi đề còn suất lệch ô hoặc thiếu câu). */
 export function apSuat7(vao: Vao, hs: { meta: Meta; tt: ReadonlyMap<string, { lichSu: readonly { ngay: string; dung: boolean }[] }> }, cau: readonly CauGoi7[],
-  daLam: ReadonlySet<string>, ngay: string, giuDau: ReadonlySet<string>, tong?: number): (onSom: readonly string[]) => string[] {
+  daLam: ReadonlySet<string>, ngay: string, giuDau: ReadonlySet<string>, nc?: { muc: number; so: number; daTra: number; theoLoai: { lai: number } } | null): (onSom: readonly string[]) => string[] {
   const goi = new Map(cau.map((c) => [c.qid, c]))
   const metaCua = (q: string) => hs.meta.get(q) ?? hs.meta.get(goc(q))
   const oCua = (q: string): string => { const m = goi.get(q) ?? metaCua(q) ?? goi.get(goc(q)); return oMaTran(m?.phan, m?.mucDo) }
@@ -23,6 +23,7 @@ export function apSuat7(vao: Vao, hs: { meta: Meta; tt: ReadonlyMap<string, { li
   let nho: Map<string, number> | undefined
   const no = () => (nho ??= noOnDang(hs.tt, dang, ngay))
   if (vao.on.length > 1) { const dau: string[] = [], con: string[] = []; for (const q of vao.on) (giuDau.has(q) ? dau : con).push(q); vao.on = [...dau, ...xepOnTheoNo(con, dang, no())] }
-  vao.suat = { oCua, daLamO: [...daLam].map(oCua), tong }
+  // nợ câu: mức hôm nay (> 28) ⇒ suất theo tỉ lệ; câu lãi còn phải trả hôm nay = lãi trong số đã chọn trả − số đã trả (trả lãi trước)
+  vao.suat = { oCua, daLamO: [...daLam].map(oCua), tong: nc?.muc, lai: nc ? Math.max(0, Math.min(nc.so, nc.theoLoai.lai) - nc.daTra) : 0 }
   return (onSom) => xepOnTheoNo(onSom, dang, no())
 }

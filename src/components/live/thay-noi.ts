@@ -67,9 +67,9 @@ export const CHU_TINH_MIC: Record<TinhMic, string> = {
 export const CHU_KIEU_ROI: Record<KieuRoi, string> = { thoat: 'thoát app', an: 'thoát app hoặc khoá màn', noi: 'cửa sổ nổi', chia: 'chia đôi màn hình' }
 
 const KHOA_MIC = 'ddh.live.mic', KHOA_DA_BAT = 'ddh.live.da-bat', KHOA_LOC = 'ddh.live.loc', KHOA_NHAC_GHI = 'ddh.live.ghi-da-nhac'
-const cheDoLoc = (): CheDoLoc => { const v = nho(KHOA_LOC); return v === 'bat' || v === 'tat' ? v : 'tu' }
 const nho = (k: string): string => { try { return localStorage.getItem(k) || '' } catch { return '' } }
 const ghi = (k: string, v: string): void => { try { localStorage.setItem(k, v) } catch { /* đầy / chặn */ } }
+const cheDoLoc = (): CheDoLoc => { const v = nho(KHOA_LOC); return v === 'bat' || v === 'tat' ? v : 'tu' }
 
 let to: Window | null = null
 let lt: LiveThay | null = null

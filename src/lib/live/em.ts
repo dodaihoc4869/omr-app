@@ -8,7 +8,7 @@
 import type { NetBut, SuKienBut } from '../but-bang-loi'
 import { nhomKhung, type ViewLiveEm } from '../bpu/phong-live'
 import { giaiGoi, giaiSo } from './ma-net'
-import { taoDemPhat } from './noi-suy'
+import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo } from './so-do'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
@@ -63,6 +63,10 @@ export interface KhungLiveEm {
   dau: { id: string; x: number; y: number; apLuc: number }[]
   /** Con trỏ bút lơ lửng của thầy; null = ẩn. */
   tro: { x: number; y: number } | null
+  /** (11/11) CÂY BÚT của thầy: MỘT vị trí cho con trỏ — đang viết thì ở đúng đầu nét (`cham`), không thì theo bút lơ lửng; null = ẩn. */
+  but: ButThay | null
+  /** (11/11) Độ cuộn bảng đen của thầy (số lần bề dọc cửa sổ thầy); null = chưa biết ⇒ lớp vẽ tự trôi theo bút. */
+  cuon: number | null
 }
 
 const CAM = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA='
@@ -396,7 +400,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   function xaHangSo(nay: number): void {
     while (hangSo.length) {
       const dau = hangSo[0]!
-      if ('cho' in dau) { if (dem.dangPhat(dau.cho.id) && nay < dau.han) return; chotNet(dau.cho, dau.sk) }
+      // bản chốt tới khi nét dở còn đang phát: vá điểm thiếu (gói cuối mất) cho nét phát nốt, đợi nó xong rồi mới chốt
+      if ('cho' in dau) { if (dem.dangPhat(dau.cho.id) && nay < dau.han) { dem.va(dau.cho.id, dau.cho.diem); return } chotNet(dau.cho, dau.sk) }
       else { dau.don(); for (const sk of dau.ds) but(sk) }
       hangSo.shift()
     }
@@ -440,7 +445,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (n.head && !n.xong) dau.push({ id: n.dau.id, ...n.head })
     }
     if (coCho) xaHangSo(nay)
-    return { dau, tro: k.tro }
+    return { dau, tro: k.tro, but: k.but, cuon: k.cuon }
   }
 
   // ── SỐ ĐO + ĐỒNG BỘ TIẾNG–NÉT ──
@@ -452,6 +457,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     const xong = (): void => {
       const s = dem.soDo(nay)
       soDo.ghi('d', s.d); soDo.ghi('j', s.jitter); if (s.muon) soDo.ghi('m', s.muonToiDa)
+      if (s.dung) soDo.ghi('dg', s.dungToiDa)
       soDo.ghi('tn', s.d + (rtt ?? 0) / 2)
       if (nay - lucDo >= NHIP_DO_MS && !roiMan) { lucDo = nay; const tin = soDo.tinKy(dcMo()); if (tin) tuy.kenh.gui(giayLech ? { ...tin, gl: true } : tin) }
       // Phòng báo có mục mới mà quá 2 giây chưa thấy khung nào ⇒ xin bù (kết nối vừa nối lại, tin lạc).
