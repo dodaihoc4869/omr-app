@@ -45,8 +45,9 @@ const PHAN_BYTE = 5 * 1024 * 1024
 const SK_MOI_MANH = 200
 const NET_TRAN_BYTE = 24 * 1024 * 1024
 const GOM_MS = 1000
-/** Sau khi tắt live chờ máy ghi tải khúc cuối: máy ghi báo `xong` ⇒ chốt ngay; không báo ⇒ chốt sau ngần này. */
-export const HEN_CHOT = { tat: 12_000, baoXong: 300, moMuon: 3000, taiBu: 20_000 }
+/** Sau khi tắt live chờ máy ghi tải khúc cuối: máy ghi báo `xong` ⇒ chốt ngay; không báo ⇒ chốt sau ngần này. Mọi hẹn giữ DƯỚI 10 giây (phòng không còn
+ *  việc gì quá 10 giây thì có thể bị dọn khỏi bộ nhớ, mất hẹn giờ); lỡ mất ⇒ cron mỗi phút chốt lại buổi `dang_xu_ly` quá 5 phút. */
+export const HEN_CHOT = { tat: 8000, baoXong: 300, moMuon: 3000, taiBu: 8000 }
 /** Mỗi bước chốt đọc tối đa ngần này khúc từ R2 (giới hạn yêu cầu con của một lượt chạy) rồi tự gọi bước kế. */
 export const BUOC_CHOT = { khuc: 300 }
 /** Máy thầy mất kết nối ngần này khi đang live ⇒ phòng tự tắt live rồi chốt (cron mỗi phút soát). */
