@@ -14,8 +14,9 @@ import * as LL from '../../src/lib/bpu/phong-live'
 
 type Row = Record<string, unknown>
 /** Dữ liệu gắn vào kết nối: vai + sbd (đã có) · `x` = phiên live em đã báo `live-ok` · `d` = 1 khi em cần điểm đang viết qua WebSocket ·
+ *  `n` = 1 khi máy em báo loa ĐANG PHÁT tiếng thầy (thầy thấy «mấy em đang nghe») ·
  *  `xa` = 1 khi em vào bằng vé «em ở xa» (đợt 2, điểm quyết 4: chỉ xem live — không điểm danh, không đội, không kJ, không gửi đáp án). */
-export interface KemBpu { v: 'gv' | 'hs'; s: string; x?: number; d?: 0 | 1; xa?: 1 }
+export interface KemBpu { v: 'gv' | 'hs'; s: string; x?: number; d?: 0 | 1; n?: 0 | 1; xa?: 1 }
 export interface ChuPhong {
   ctx: DurableObjectState
   doc(): Promise<TrangThaiPhong | null>
@@ -93,13 +94,13 @@ export class LiveMay {
   private boDs(): void { this.dsHs = null; this.dsDiem = null }
 
   /** Số em đang xem (đã báo `live-ok` phiên này, còn nối, không đang rời màn) + số em trong đó cần điểm qua WebSocket. Đếm theo em, không theo kết nối. */
-  demXem(st: TrangThaiPhong, kem?: (KemBpu | null)[]): { xem: number; ws: number } {
+  demXem(st: TrangThaiPhong, kem?: (KemBpu | null)[]): { xem: number; ws: number; nghe: number } {
     const l = st.live
-    if (!l?.bat) return { xem: 0, ws: 0 }
+    if (!l?.bat) return { xem: 0, ws: 0, nghe: 0 }
     const ds = kem ?? this.chu.ctx.getWebSockets('hs').map((ws) => this.kem(ws))
-    const xem = new Set<string>(), canWs = new Set<string>()
-    for (const a of ds) if (a && a.s && a.x === l.phien && !st.roiNay?.includes(a.s)) { xem.add(a.s); if (a.d === 1) canWs.add(a.s) }
-    return { xem: xem.size, ws: canWs.size }
+    const xem = new Set<string>(), canWs = new Set<string>(), nghe = new Set<string>()
+    for (const a of ds) if (a && a.s && a.x === l.phien && !st.roiNay?.includes(a.s)) { xem.add(a.s); if (a.d === 1) canWs.add(a.s); if (a.n === 1) nghe.add(a.s) }
+    return { xem: xem.size, ws: canWs.size, nghe: nghe.size }
   }
   private henBaoXem(): void {
     if (this.henXem) return
@@ -250,9 +251,9 @@ export class LiveMay {
     if (await this.tuTat(st, nay)) return true
     if (t === 'live-ok') {
       if (!l.bat || !LL.duocXemLive(st, a.s)) return true
-      const d: 0 | 1 = j.dc === true ? 0 : 1
-      if (a.x === l.phien && a.d === d) return true
-      a.x = l.phien; a.d = d
+      const d: 0 | 1 = j.dc === true ? 0 : 1, n: 0 | 1 = j.nghe === true ? 1 : 0
+      if (a.x === l.phien && a.d === d && (a.n ?? 0) === n) return true
+      a.x = l.phien; a.d = d; a.n = n
       ws.serializeAttachment(a)
       // Cập nhật danh sách nhận điểm tại chỗ (không dựng lại cả danh sách cho mỗi em báo).
       if (this.dsDiem) { const i = this.dsDiem.indexOf(ws); if (d === 1 && i < 0) this.dsDiem.push(ws); else if (d === 0 && i >= 0) this.dsDiem.splice(i, 1) }

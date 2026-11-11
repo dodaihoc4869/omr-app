@@ -48,14 +48,22 @@ export interface TuyChonOpus {
   bitrate?: number
   /** Khung Opus (ms): 20 mặc định; 10 để thử bớt trễ ở Đợt 0. */
   ptime?: number
+  /** Dải rộng 48 kHz (`maxplaybackrate` / `sprop-maxcapturerate` = 48000) — giọng nói trong, đủ âm gió / âm xuýt. Mặc định không ghi (trình duyệt tự chọn). */
+  rong?: boolean
 }
+/** TIẾNG THẦY (thầy 11/11 «chỉnh tiếng trong và cực rõ»): 64 kb/s mono dải rộng 48 kHz, sửa lỗi trong băng, KHÔNG DTX (DTX cắt đầu chữ sau quãng nghỉ).
+ *  Trước 11/11: 24 kb/s + DTX. 300 em nghe × 64 kb/s ≈ 8,6 GB mỗi giờ live qua SFU (hạn miễn phí 1.000 GB / tháng). */
+export const OPUS_THAY: TuyChonOpus = { bitrate: 64000, dtx: false, fec: true, rong: true }
+/** MIC CỦA EM đang nói: 40 kb/s mono dải rộng, có DTX (em nói từng quãng). */
+export const OPUS_EM: TuyChonOpus = { bitrate: 40000, dtx: true, fec: true, rong: true }
 /** Sửa dòng `a=fmtp` của Opus trong SDP: mono, FEC, DTX, trần bitrate, ptime. Trình duyệt mã hoá theo tham số trong mô tả của BÊN KIA ⇒ máy thầy áp hàm này
  *  cho cả lời mời của mình lẫn câu trả lời của SFU trước khi đặt. Không có Opus ⇒ trả nguyên văn. Thuần. */
 export function suaSdpOpus(sdp: string, o: TuyChonOpus = {}): string {
   const m = /a=rtpmap:(\d+) opus\/48000/i.exec(sdp)
   if (!m) return sdp
   const pt = m[1]!, xuong = sdp.includes('\r\n') ? '\r\n' : '\n'
-  const dat: Record<string, string> = { stereo: '0', 'sprop-stereo': '0', useinbandfec: o.fec === false ? '0' : '1', usedtx: o.dtx === false ? '0' : '1', maxaveragebitrate: String(Math.round(o.bitrate ?? 24000)) }
+  const dat: Record<string, string> = { stereo: '0', 'sprop-stereo': '0', useinbandfec: o.fec === false ? '0' : '1', usedtx: o.dtx === false ? '0' : '1', maxaveragebitrate: String(Math.round(o.bitrate ?? 24000)),
+    ...(o.rong ? { maxplaybackrate: '48000', 'sprop-maxcapturerate': '48000' } : {}) }
   const dong = sdp.split(/\r?\n/)
   let co = false
   for (let i = 0; i < dong.length; i++) {
@@ -146,4 +154,17 @@ export function docSoWebRtc(bc: RTCStatsReport, midChinh?: string | null): SoWeb
   })
   const chinh = (midChinh ? vao.find((v) => v.mid === midChinh) : undefined) ?? vao[0] ?? null
   return { rtt: rtt ?? rttXa, jitter: chinh?.jitter ?? null, demTong: chinh?.demTong ?? null, demSo: chinh?.demSo ?? null, goiNhan: chinh?.goiNhan ?? null, goiMat: chinh?.goiMat ?? null, mucAm: chinh?.mucAm ?? null, khac: vao.filter((v) => v !== chinh) }
+}
+
+/** Số đo của luồng tiếng ĐANG GỬI (máy thầy): mức âm của track gắn vào bộ gửi (`media-source` — đo ngay tại nguồn, không cần AudioContext), số byte / gói đã gửi. */
+export interface SoTiengGui { mucAm: number | null; nangLuong: number | null; byteGui: number | null; goiGui: number | null }
+export function docSoGui(bc: RTCStatsReport): SoTiengGui {
+  const ra: SoTiengGui = { mucAm: null, nangLuong: null, byteGui: null, goiGui: null }
+  bc.forEach((x: Record<string, unknown>) => {
+    const so = (k: string): number | null => (typeof x[k] === 'number' ? (x[k] as number) : null)
+    const tieng = x.kind === 'audio' || x.mediaType === 'audio'
+    if (x.type === 'media-source' && tieng) { ra.mucAm = so('audioLevel') ?? ra.mucAm; ra.nangLuong = so('totalAudioEnergy') ?? ra.nangLuong }
+    else if (x.type === 'outbound-rtp' && tieng) { ra.byteGui = (ra.byteGui ?? 0) + (so('bytesSent') ?? 0); ra.goiGui = (ra.goiGui ?? 0) + (so('packetsSent') ?? 0) }
+  })
+  return ra
 }

@@ -403,6 +403,20 @@ Thầy: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút t
 - Mặc định: em đã vào phòng buổi học (đã điểm danh, `vao: true`).
 - Phương án cho em ở nhà: điểm quyết 4.
 
+
+### 4.3f Mic và tiếng (11/11, lần 2) — chỗ khác với các mục trên thì theo mục này
+
+- **Tay nắm máy em ở MÉP TRÊN**, trên đầu thẻ đội / tên; khay xổ từ trên xuống (thay «mép trái» của 4.3e).
+- **Mở mic theo bậc** (`src/lib/live/thay.ts`): theo luật lọc → tắt khử vọng + lọc ồn → mic thô → thiết bị chỉ là «ưu tiên». Mic chưa hề có tín hiệu sau 1,5 giây ⇒
+  thả luồng cũ rồi mở bậc kế; hết bậc ⇒ «Mic chưa có tín hiệu» và cứ 8 giây chạy lại cả vòng. Thầy để «Mặc định của máy» mà mục ấy câm ⇒ mở thẳng thiết bị
+  thật đứng sau nó (cùng `groupId` / trùng nhãn) trước khi nới bậc. Mic đã có tín hiệu rồi im hẳn (bộ thu có cổng ồn) ⇒ giữ bậc, im 20 giây mới mở lại.
+- **Luật lọc «Tự động»**: khử vọng + lọc ồn TẮT khi không có đường vọng; BẬT khi thầy chọn «Tất cả» hoặc loa máy thầy đang phát tiếng em. Thầy ép «Bật» / «Tắt».
+- **Chuỗi làm rõ tiếng**: cộng hai kênh về mono → lọc thông cao 80 Hz → nén nâng mức → chặn đỉnh. Hỏng / treo ⇒ gửi thẳng track mic.
+- **Vạch mic lúc đang live = tiếng ĐANG GỬI** (số đo của bộ gửi, chỉ khi đã nối máy chủ tiếng), không phải luồng đo tại máy thầy.
+- **Số em đang nghe**: máy em báo `nghe` trong `live-ok` khi loa đang phát tiếng thầy thật; viên Live ghi «N em nghe» cạnh «N em xem»; cửa sổ nút Live nói rõ
+  «Máy em TRONG LỚP đang tắt tiếng» khi thầy để «Em ở xa». Máy em đang tắt tiếng ⇒ nút «Tiếng đang tắt» cạnh tay nắm, một chạm là bật.
+- Số đo: `docs/do-live-1011.md` mục 4.
+
 ## 5. Ngoại lệ
 
 | Tình huống | Xử lý |
