@@ -1,6 +1,8 @@
+// BẢN THỬ — KHÔNG CÓ TRONG APP (11/11 tối: đo xong, KHÔNG phát hành — lý do + số đo: docs/do-live-1011.md mục 9). Giữ để phiên sau đo lại / so mô hình khác
+// bằng scripts/thu-live-1011/do-tach-giong.mjs. Nếu có ngày đưa vào app: chuỗi này chạy trong Worker từ Blob, như MA_KHUNG của src/lib/live/chuoi-tieng.ts.
 // «CHỈ GIỌNG THẦY» — MÃ WORKER BỘ NHẬN GIỌNG (Worker kiểu module từ Blob; bản đo ngoại tuyến + test chạy đúng chuỗi này).
 // Mô hình: WeSpeaker CAM++ (VoxCeleb, bản ONNX của sherpa-onnx; mô hình CC BY 4.0, mã Apache-2.0) — nhúng giọng 512 chiều từ fbank Kaldi 80 dải, 16 kHz.
-// Chạy bằng ONNX Runtime Web 1.20.1 (MIT), wasm SIMD MỘT luồng (trang không cách ly cross-origin). Tệp: public/tach-giong/ (tải lười khi thầy bật).
+// Chạy bằng ONNX Runtime Web 1.20.1 (MIT), wasm SIMD MỘT luồng (trang không cách ly cross-origin). Tệp: xem phần đầu do-tach-giong.mjs (không đưa vào kho).
 // Đo 11/11 (Node, wasm 1 luồng): cửa sổ 0,5 s ≈ 38 ms · 0,75 s ≈ 52 ms; giọng thầy (phần không dùng làm mẫu) cos 0,34–0,60 với mẫu, 6 giọng khác ≤ 0,27.
 // Việc: (1) học mẫu: các đoạn 16 kHz ⇒ nhúng từng cửa sổ 1,5 s (bước 0,75 s); (2) chấm: nhận tiếng 16 kHz + cờ «có tiếng» từng khung 10 ms từ Worker cổng,
 // gom các khung CÓ TIẾNG của câu đang nói (bỏ lại khi câu mới bắt đầu sau quãng nghỉ), chấm 0,3–0,75 s gần nhất (100 ms một lần trong 1,2 giây đầu câu, sau đó 200 ms) ⇒ trả cos với mẫu giọng.

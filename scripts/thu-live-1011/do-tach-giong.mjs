@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-// ĐO «CHỈ GIỌNG THẦY» (tách giọng theo người nói, 11/11 tối) — NGOẠI TUYẾN trong Node bằng CHÍNH mã của app: chuỗi Worker cổng (MA_CONG,
-// src/lib/live/tach-giong/ma-cong.ts) + chuỗi Worker nhận giọng (MA_NHAN, ma-nhan.ts) + ĐÚNG tệp ONNX Runtime / mô hình app tải (public/tach-giong/).
-//   LV_MAU=<thư mục> node scripts/thu-live-1011/do-tach-giong.mjs [tệp số đo = docs/ban-ve-live-1011/so-do-tach-giong-1111.json]
+// ĐO «CHỈ GIỌNG THẦY» (tách giọng theo người nói, 11/11 tối) — NGOẠI TUYẾN trong Node: chuỗi Worker cổng (MA_CONG, tach-giong/ma-cong.mjs) + chuỗi Worker
+// nhận giọng (MA_NHAN, tach-giong/ma-nhan.mjs) + ONNX Runtime Web (wasm, 1 luồng — đúng cách trình duyệt sẽ chạy). KẾT LUẬN: không phát hành (docs/do-live-1011.md mục 9).
+//   LV_MAU=<thư mục> LV_TG=<thư mục> node scripts/thu-live-1011/do-tach-giong.mjs [tệp số đo = docs/ban-ve-live-1011/so-do-tach-giong-1111.json]
+//   LV_TG (KHÔNG đưa vào kho, 40 MB): `npm i onnxruntime-web@1.20.1` ở thư mục tạm rồi chép dist/ort.wasm.min.mjs, dist/ort-wasm-simd-threaded.mjs,
+//         dist/ort-wasm-simd-threaded.wasm + tệp `wespeaker_en_voxceleb_CAM++.onnx` (bản phát hành «speaker-recongition-models» của sherpa-onnx, k2-fsa;
+//         mô hình WeSpeaker VoxCeleb, CC BY 4.0) vào cùng một thư mục.
 //   (mẫu tiếng thật do `tai-mau-loc-on.mjs` tải: giong-nam = «giọng thầy», xon-xao-2 (nam) / giong-nu (nữ) = «học sinh nói gần mic», xon-xao-1..5 = xôn xao)
 // Cảnh 18 giây (48 kHz, nền ồn −65 dBFS): thầy nói một mình · người khác nói một mình · NÓI CHỒNG · người khác nói một mình · thầy nói NGAY sau người khác
 // (khoảng hở 150 ms). Mẫu giọng: 5 giây đầu của giong-nam; phần thầy trong cảnh lấy từ 5,6 giây còn lại (không trùng mẫu).
@@ -19,19 +22,26 @@ const RA = resolve(process.argv[2] ?? join(GOC, 'docs/ban-ve-live-1011/so-do-tac
 const MAU = resolve(process.env.LV_MAU ?? '')
 if (!process.env.LV_MAU || !existsSync(join(MAU, 'giong-nam.wav'))) { console.log('Thiếu LV_MAU (chạy tai-mau-loc-on.mjs trước).'); process.exit(1) }
 const HZ = 48000, K = 480
+import { MA_CONG } from './tach-giong/ma-cong.mjs'
+import { MA_NHAN } from './tach-giong/ma-nhan.mjs'
 const chuoi = (tep, ten) => new RegExp(`(?:export )?const ${ten} = \`([\\s\\S]*?)\``).exec(readFileSync(join(GOC, tep), 'utf8'))[1]
-const MA_CONG = chuoi('src/lib/live/tach-giong/ma-cong.ts', 'MA_CONG'), MA_NHAN = chuoi('src/lib/live/tach-giong/ma-nhan.ts', 'MA_NHAN')
 const taoMaCong = () => new Function('postMessage', MA_CONG + '\nreturn { taoCong: taoCong, taoHa: taoHa };')(() => {})
 const taoMaNhan = () => new Function(MA_NHAN + '\nreturn { datPhien: datPhien, nhung: nhung, nhanKhoi: nhanKhoi, cos: cos, chuan: chuan, hoSo: function (h) { hoSo = h; }, ban: function (b) { ban = b; } };')()
 const MA_KHUNG = chuoi('src/lib/live/chuoi-tieng.ts', 'MA_KHUNG')
 const THAM = new Function('return ' + /THAM_LOC_ON:[^=]*= (\{.*\})\s*$/m.exec(readFileSync(join(GOC, 'src/lib/live/chuoi-tieng.ts'), 'utf8'))[1])()
 
-// ── ONNX Runtime + mô hình: đúng tệp app tải ──
-const PT = join(GOC, 'public/tach-giong')
-const ort = await import(pathToFileURL(join(PT, 'ort-1201.mjs')).href)
-ort.env.wasm.wasmPaths = { mjs: pathToFileURL(join(PT, 'ort-keo-1201.mjs')).href }
-ort.env.wasm.wasmBinary = readFileSync(join(PT, 'ort-1201.bin'))
-const moHinh = Buffer.concat([readFileSync(join(PT, 'cam-vox-1.bin')), readFileSync(join(PT, 'cam-vox-2.bin'))])
+// ── ONNX Runtime Web + mô hình (LV_TG) ──
+if (!process.env.LV_TG) { console.log('Thiếu LV_TG (xem phần đầu tệp).'); process.exit(1) }
+const PT = resolve(process.env.LV_TG)
+const ort = await import(pathToFileURL(join(PT, 'ort.wasm.min.mjs')).href)
+ort.env.wasm.wasmPaths = { mjs: pathToFileURL(join(PT, 'ort-wasm-simd-threaded.mjs')).href }
+ort.env.wasm.wasmBinary = readFileSync(join(PT, 'ort-wasm-simd-threaded.wasm'))
+const moHinh = readFileSync(join(PT, 'wespeaker_en_voxceleb_CAM++.onnx'))
+// Số đo LẶP LẠI ĐƯỢC: ồn nền từ bộ sinh số giả có hạt cố định; điểm của bộ nhận giọng áp dụng sau đúng TRE_QD ms (cỡ thời gian suy luận đo được),
+// bộ nhận giọng bận đúng chừng ấy (lượt tới trong lúc bận thì bỏ) — thời gian suy luận THẬT vẫn đo riêng cho cột CPU.
+const TRE_QD = 50
+let hat = 12345
+const ngauNhien = () => { hat = (hat * 1103515245 + 12345) >>> 0; return hat / 4294967296 }
 
 const doc = (t) => { const w = docWav(readFileSync(join(MAU, `${t}.wav`))); if (w.hz !== HZ) throw new Error(`${t}: ${w.hz} Hz`); return w.kenh[0] }
 const rmsHoatDong = (x) => { let e = 0, n = 0; for (let i = 0; i + K <= x.length; i += K) { let f = 0; for (let j = 0; j < K; j++) f += x[i + j] ** 2; if (f / K > 1e-6) { e += f; n += K } } return Math.sqrt(e / Math.max(1, n)) }
@@ -57,7 +67,7 @@ function canh(khac, snr) {
   dat(tO, O, s(10.4), s(0.5), s(3.5))            // [10,4; 13,9) khác một mình
   dat(tT, T, s(14.05), 0, a)                     // [14,05; …) thầy NGAY sau khác (hở 150 ms)
   for (let k = 0; k < nhan.length; k++) { const t = (k * K) / HZ; nhan[k] = t >= 0.3 && t < 3.1 ? 1 : t >= 3.6 && t < 6.6 ? 2 : t >= 7.1 && t < 9.9 ? 3 : t >= 10.4 && t < 13.9 ? 2 : t >= 14.05 && t < 16.8 ? 4 : 0 }
-  const on = new Float32Array(dai); for (let i = 0; i < dai; i++) on[i] = (Math.random() * 2 - 1) * 10 ** (-65 / 20) * Math.sqrt(3)
+  const on = new Float32Array(dai); for (let i = 0; i < dai; i++) on[i] = (ngauNhien() * 2 - 1) * 10 ** (-65 / 20) * Math.sqrt(3)
   const vao = new Float32Array(dai); for (let i = 0; i < dai; i++) vao[i] = tT[i] + tO[i] + on[i]
   return { vao, tT, tO, on, nhan }
 }
@@ -78,7 +88,7 @@ async function chayCong(vao) {
       const t0 = performance.now(), kq = await NN.nhanKhoi({ x: Float32Array.from(gom), v: Uint8Array.from(co), dau, t })
       const ms = performance.now() - t0
       dongTg.length = process.env.LV_DONG && k < 10 ? 0 : dongTg.length
-      if (kq) { msTong += ms; lan++; banToi = t + ms; cho.push({ luc: t + ms, kq }); if (process.env.LV_DONG) dongTg.push(`qd ${t.toFixed(0)} s=${kq.s.toFixed(2)} n=${kq.n.toFixed(2)}`) }
+      if (kq) { msTong += ms; lan++; banToi = t + TRE_QD; cho.push({ luc: t + TRE_QD, kq }); if (process.env.LV_DONG) dongTg.push(`qd ${t.toFixed(0)} s=${kq.s.toFixed(2)} n=${kq.n.toFixed(2)}`) }
       gom = []; co = []; dau = false
     }
     const u0 = performance.now(); g[k] = cong.buoc(x, n, HZ, t); usCong += (performance.now() - u0) * 1000
