@@ -49,6 +49,10 @@ export interface TtLiveTo {
   mic: { tinh: TinhMic; ten: string; loc: boolean; cheDo: CheDoLoc } | null
   /** Vì sao viên Live ghi không có tiếng ('' = đang có tiếng): chưa có quyền mic / không thấy mic / mic chưa có tín hiệu / chưa nối máy chủ tiếng… */
   lyDoKT: string
+  /** Xem lại Live (11/11): trạng thái máy ghi theo phòng — vắng = công tắc tắt (viên Live không có ngăn ghi). */
+  ghi?: 'dang-ghi' | 'loi' | 'tat'
+  /** Lần đầu máy này ghi buổi live: thẻ nhắc một lần «Thầy không cần bấm gì thêm» (tự tắt sau 9 giây). */
+  nhacGhi?: boolean
 }
 /** Chữ báo tình trạng mic trên cửa sổ nút Live ('' = mic tốt). Mic câm là do ĐƯỜNG TIẾNG của trình duyệt (đã tự thử các cách mở khác), không kết luận thiết bị hỏng. */
 export const CHU_TINH_MIC: Record<TinhMic, string> = {
@@ -60,7 +64,7 @@ export const CHU_TINH_MIC: Record<TinhMic, string> = {
 /** Chữ của từng KIỂU RỜI (máy em báo theo tín hiệu tat-man.ts — không đoán kiểu máy không phân biệt được). */
 export const CHU_KIEU_ROI: Record<KieuRoi, string> = { thoat: 'thoát app', an: 'thoát app hoặc khoá màn', noi: 'cửa sổ nổi', chia: 'chia đôi màn hình' }
 
-const KHOA_MIC = 'ddh.live.mic', KHOA_DA_BAT = 'ddh.live.da-bat', KHOA_LOC = 'ddh.live.loc'
+const KHOA_MIC = 'ddh.live.mic', KHOA_DA_BAT = 'ddh.live.da-bat', KHOA_LOC = 'ddh.live.loc', KHOA_NHAC_GHI = 'ddh.live.ghi-da-nhac'
 const cheDoLoc = (): CheDoLoc => { const v = nho(KHOA_LOC); return v === 'bat' || v === 'tat' ? v : 'tu' }
 const nho = (k: string): string => { try { return localStorage.getItem(k) || '' } catch { return '' } }
 const ghi = (k: string, v: string): void => { try { localStorage.setItem(k, v) } catch { /* đầy / chặn */ } }
@@ -97,6 +101,12 @@ const ma = (khoa: string): string => maCua.get(khoa) ?? maTrang(khoa, null, fals
 const anh = () => ({ trang: ma(guong.khoa), tiLe: guong.tiLe, net: guong.net })
 const mauDoi = (d: number): string => { try { return getComputedStyle(document.documentElement).getPropertyValue(DOI_BPU[d]?.mau ?? '').trim() } catch { return '' } }
 
+let nhacGhiDen = 0
+/** Thẻ nhắc một lần: lần đầu thấy «đang ghi» trên máy này ⇒ hiện 9 giây rồi thôi mãi (nhớ ở máy). */
+function nhacGhi(dangGhi: boolean): boolean {
+  if (dangGhi && !nhacGhiDen && !nho(KHOA_NHAC_GHI)) { nhacGhiDen = Date.now() + 9000; ghi(KHOA_NHAC_GHI, '1'); setTimeout(bao, 9100) }
+  return nhacGhiDen > Date.now()
+}
 function trangThai(): TtLiveTo {
   const l = view?.live ?? null, p = layPhong()
   const ds = view?.ds ?? [], roiNay = l?.bat ? (view?.roiNay ?? []) : []
@@ -132,6 +142,8 @@ function trangThai(): TtLiveTo {
     lyDoKT: !live || l?.tieng === 'chua-cau-hinh' ? '' : ttLt?.tieng === 'loi' ? 'Chưa nối máy chủ tiếng'
       : ttLt?.tieng === 'khong' ? (loiMic === 'mic-tu-choi' ? 'Chưa có quyền mic' : loiMic === 'khong-mic' ? 'Không thấy mic' : loiMic ? 'Mic chưa mở được' : 'Live không tiếng')
       : ttLt?.micTinh === 'im' ? 'Mic chưa có tín hiệu' : ttLt?.micTinh === 'bi-tat' ? 'Mic bị tắt tiếng' : ttLt?.micTinh === 'mat' ? 'Mic bị rút' : '',
+    ...(live && l?.ghi !== undefined ? { ghi: l.ghi } : {}),
+    ...(live && nhacGhi(l?.ghi === 'dang-ghi') ? { nhacGhi: true } : {}),
   }
 }
 /** Gửi phòng bố cục giấy đề của tờ (chỉ khi đang live, khi đổi / vừa bật live / phòng nối lại). */
@@ -145,8 +157,19 @@ function guiGiay(lai = false): void {
 }
 function guiTo(tin: Record<string, unknown>): void { try { to?.postMessage({ nguon: 'bpu-bang', ...tin }, '*') } catch { /* tờ đã đóng */ } }
 let ttCu = '', coEmNoi = false
+// XEM LẠI LIVE (11/11): máy ghi là mảnh nạp lười riêng, chỉ tải khi máy này đang giữ live; tự chạy khi live bật, tự dừng khi live tắt. Lỗi ghi không chặn live.
+let ghiNap = false, ghiMoc: ((sk: SuKienBut) => void) | null = null
+function soatGhi(): void {
+  if (!ghiNap && !(lt && ttLt?.pha === 'live' && view?.live?.bat && view.live.ghi !== undefined)) return
+  ghiNap = true
+  void import('../../lib/live/may-ghi').then((m) => {
+    ghiMoc = m.danhDauNet
+    m.soatMayGhi({ layLuong: lt ? lt.luongGhi : null, pha: ttLt?.pha, live: view?.live, phong: layPhong(), buoiId: view?.buoiId, gui: (t) => { layPhong()?.gui(t) } })
+  }).catch(() => {})
+}
 function bao(): void {
   const tt = trangThai()
+  soatGhi()
   // Nút Live trên bảng Bình Phản Ứng + thẻ gọn thay viền đỏ toàn màn khi đang giảng trên tờ.
   void import('../bpu/gan-gv').then((m) => m.datLive({ co: tt.co, bat: tt.pha === 'live' })).catch(() => {})
   const k = JSON.stringify(tt)
@@ -218,6 +241,8 @@ function nghe(): void {
   })
   view = (layBangCuoi() as ViewBang | null) ?? view
   void dam()
+  // Xem lại Live: khúc tiếng kẹt từ lần live trước (mất mạng) ⇒ tải bù khi thầy mở lại tờ chiếu (chỉ nạp mảnh khi có cờ).
+  try { if (localStorage.getItem('ddh.live.ghi-ket') === '1') void import('../../lib/live/may-ghi').then((m) => m.taiBuKhucKet()).catch(() => {}) } catch { /* không có kho */ }
 }
 
 async function moThe(): Promise<void> {
@@ -312,6 +337,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
         maCua.set(sk.trang, maTrang(sk.trang, vungCua(m.vung), m.giayToi === true))
       }
       if (sk.loai !== 'tro') loi.apSuKien(guong.net, sk)
+      ghiMoc?.(sk) // Xem lại Live: mốc giờ bắt đầu nét (cùng đồng hồ với khúc tiếng)
       lt?.nhanSuKienBut(sk.loai === 'trang' ? { ...sk, trang: ma(sk.trang) } : sk)
       break
     }
@@ -331,6 +357,6 @@ export function bamTuBang(): boolean {
 /** Cho test: xoá trạng thái mô-đun. */
 export function _datLaiLiveThay(): void {
   clearTimeout(henHuy); clearInterval(henMuc); henMuc = undefined
-  lt?.huy(); lt = null; to = null; ttLt = null; view = null; the = null; dangBat = false; ttCu = ''
+  lt?.huy(); lt = null; to = null; ttLt = null; view = null; the = null; dangBat = false; ttCu = ''; ghiNap = false; ghiMoc = null; nhacGhiDen = 0
   guong.khoa = ''; guong.net = []; maCua.clear(); lucRoi.clear(); lucTay.clear(); micLoiThay = null; clearTimeout(henMicLoi); giayCuoi = giayDaGui = ''; liveTruoc = false; coEmNoi = false; loiMic = ''; demMuc = 0
 }

@@ -187,7 +187,7 @@ export const SQL_DEM_GOI7 = `SELECT sbd, ngay_vn AS ngay, COUNT(DISTINCT qid) AS
     AND ((ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}) OR ${SQL_LA_LUOT_CHANG})
   GROUP BY sbd, ngay_vn`
 // Câu học có hướng dẫn (Gói 7) ngày ấy mà sổ chưa có ⇒ cộng thêm (lapGoi7 gộp hai tập mã câu).
-const SQL_DEM_GAP = `SELECT g.sbd AS sbd, date(g.luc, '+7 hours') AS ngay, COUNT(DISTINCT g.qid) AS n FROM goi_bai_7_gap g
+export const SQL_DEM_GAP = `SELECT g.sbd AS sbd, date(g.luc, '+7 hours') AS ngay, COUNT(DISTINCT g.qid) AS n FROM goi_bai_7_gap g
   WHERE g.sbd IN (SELECT value FROM json_each(?1)) AND date(g.luc, '+7 hours') BETWEEN ?2 AND ?3
     AND NOT EXISTS (SELECT 1 FROM su_kien_hoc WHERE su_kien_hoc.sbd = g.sbd AND su_kien_hoc.ngay_vn = date(g.luc, '+7 hours') AND su_kien_hoc.qid = g.qid
       AND su_kien_hoc.ma_nguon NOT LIKE 'ktcn:%' AND ${SQL_KHONG_TU_SUA} AND ${SQL_KHONG_LAM_LAI} AND ((su_kien_hoc.ket_qua IS NOT NULL AND ${SQL_LUOT_GOI7}) OR ${SQL_LA_LUOT_CHANG}))

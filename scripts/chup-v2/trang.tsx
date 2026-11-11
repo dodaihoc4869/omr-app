@@ -718,6 +718,15 @@ if (man === 'hs-mot' && thamSo.get('ns') === '1') Object.assign(SANH_MT, { goi7:
   lichBai: { goiId: 'g7:a', ten: 'Bài 8. Amine', han: '2026-11-17', ngay: (['moi', 'moi', 'moi', 'sua', 'moi', 'moi', 'sua', 'kiem', 'sua', 'sua'] as const).map((loai, i) => ({ ngay: `2026-11-${String(8 + i).padStart(2, '0')}`, loai })) },
   nhomSua: [{ ten: 'Khối lượng muối của amine', so: 8, xong: 3, loai: 'cach' }, { ten: 'Tính base của amine', so: 6, xong: 0, loai: 'nham' }, { ten: 'Đồng phân amine', so: 4, xong: 0, loai: 'tinh' }, { ten: 'Danh pháp amine', so: 10, xong: 0, loai: 'hoc_lai' }],
   kienThucCu: { tong: 10, dat: 7, tyLe: 70 }, goi: [{ id: 'g7:cu', ten: 'Bài 7. Ester', batDau: '2026-11-01', han: '2026-11-08', tong: 84, daGap: 78, con: 6, quota: 28, gapHomNay: 0, quaHan: true, canBoSung: 0, to: ['DH-B7'] }, { id: 'g7:a', ten: 'Bài 8. Amine', batDau: '2026-11-08', han: '2026-11-17', tong: 112, daGap: 56, con: 56, quota: 28, gapHomNay: 0, quaHan: false, canBoSung: 0, to: ['DH-B8'] }], diemDaDo: [] } })
+// 11/11 thẻ «Nợ câu» (bản vẽ docs/ban-ve-lam-bu-1111): `&ns=1&nc=toi_thieu|het|da_tra|phai_het` — ngày Học mới, mức hôm nay = 28 + số câu trả nợ.
+{ const NC = thamSo.get('nc'), g7 = (SANH_MT as { goi7?: Record<string, unknown> }).goi7
+  if (man === 'hs-mot' && NC && g7) {
+    const canh = ({ toi_thieu: { no: 42, lan: 0, kieu: 'toi_thieu', so: 11, lam: 0, loai: { moi: 20, sua: 14, on: 6, lai: 2 } }, het: { no: 42, lan: 0, kieu: 'het', so: 42, lam: 0, loai: { moi: 20, sua: 14, on: 6, lai: 2 } },
+      da_tra: { no: 42, lan: 0, kieu: 'toi_thieu', so: 11, lam: 11, loai: { moi: 20, sua: 14, on: 6, lai: 2 } }, phai_het: { no: 20, lan: 3, kieu: 'het', so: 20, lam: 0, loai: { moi: 0, sua: 9, on: 8, lai: 3 } } } as const)[NC as 'toi_thieu']
+    if (canh) { const muc = 28 + canh.so
+      Object.assign(g7, { loaiNgay: 'moi', nhomSua: undefined, toiThieu: muc, daLamHomNay: canh.lam, tuLamCon: muc - canh.lam,
+        noCau: { no: canh.no, con: canh.no - canh.lam, theoLoai: canh.loai, toiThieu: canh.no <= 6 ? canh.no : Math.max(6, Math.ceil(canh.no * 25 / 100)), lan: canh.lan, phaiTraHet: canh.lan >= 3, kieu: canh.kieu, so: canh.so, daTra: canh.lam, lai: 5, laiDemNay: 0 } })
+      Object.assign(SANH_MT, { theLuc: { con: muc - canh.lam, tong: muc } }) } } }
 if (man === 'hs-mot') {
   try { localStorage.setItem('omr-ai-ddh-co', JSON.stringify({ sbd: '12121212', bat: true, luc: Date.now() })) } catch { /* bỏ qua */ }
   // 28/10 `&moc=N`: nút Tự sửa lỗi đứng sau chặng N (mốc trong ngày đã nhớ) — cảnh «em tới nút Sửa lỗi»: chặng hiện tại nằm SAU nút ⇒ khoá tới khi sửa xong

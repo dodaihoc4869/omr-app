@@ -30,7 +30,8 @@ class NutGia {
   stream: LuongGia | null = null; hong = false
   constructor(public nguon: LuongGia | null = null) {}
   connect(d: NutGia) { d.vao.push(this) } disconnect() { /* gỡ */ } start() { /* dao động */ }
-  muc(): number { return this.hong ? 0 : this.nguon ? Math.max(0, ...this.nguon.ds.map((t) => t.ra())) * this.gain.value : Math.max(0, ...this.vao.map((n) => n.muc())) * this.gain.value }
+  /** Mức tín hiệu đi qua nút (đồ thị giả chỉ kiểm ĐƯỜNG ĐI của tiếng, không mô phỏng hệ số khuếch đại / nén). */
+  muc(): number { return this.hong ? 0 : this.nguon ? Math.max(0, ...this.nguon.ds.map((t) => t.ra())) : Math.max(0, ...this.vao.map((n) => n.muc())) }
   getFloatTimeDomainData(m: Float32Array) { m.fill(ctx.state === 'running' ? this.muc() : 0) }
 }
 const ctx = { state: 'running' as 'running' | 'suspended', onstatechange: null as (() => void) | null, soNen: [] as NutGia[] }

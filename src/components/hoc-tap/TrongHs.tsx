@@ -2,7 +2,8 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { ChuNutChinh, ViecTrong } from './nut-chinh-chu'
-import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { docNoCau, noCauLuc } from '../../lib/no-cau-doc'
+import { lazy, Suspense, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
 import { chuCauMuc, soChangXong, vuotMuc, type SoHomNay } from './lam-bai'
@@ -59,6 +60,7 @@ import type { TenManThuong } from '../thuong/ManThuong'
 const ManThuong = lazy(() => import('../thuong/ManThuong'))
 const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ default: m.TheBenThuong })))
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
+const TheNoCau = lazy(() => import('./TheNoCau'))
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
@@ -122,6 +124,8 @@ export interface PropsMotTrang {
   coCa: boolean; onThi: () => void; token?: string
   soSua: number | null; onChua: () => void; hinhSua?: ReactNode
   kiem?: TomTatKiemTra; ngayKiem: boolean; onKiemTra?: () => void
+  /** Nạp lại Sảnh (sau khi em đổi cách trả nợ câu). */
+  onTaiLai?: () => void
   soBaiTap?: number; coBaiTap?: boolean; onBaiTap: () => void
   /** Dòng nhắc sẵn có của Hôm nay (thiếu câu phù hợp, câu đang giữ cho ca). */
   ghi: string[]
@@ -1002,6 +1006,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const tongNgay = (so && !p.ngayKiem ? so.muc : 0) + tongSuaNay + (ktNgay ? kiem!.tong : 0)
   const daNgay = (so && !p.ngayKiem ? Math.min(so.daLam, so.muc) : 0) + (tongSuaNay ? daSuaNgay : 0) + (ktNgay ? (kiem!.nopLuc !== null ? kiem!.tong : kiem!.daTra) : 0)
   const coTong = tongNgay > 0 && (!!so || !!p.ngayKiem)
+  const nc = so && !p.ngayKiem && chinh !== 'ca' ? docNoCau(p.goi7?.noCau) : null, ncLuc = nc && so ? noCauLuc(nc, so.daLam, so.muc) : null, chuaTraNo = !!ncLuc && ncLuc.conTra > 0
   const duNgay = coTong && daNgay >= tongNgay
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSuaChang && !xongSuaNay && 'Tự sửa lỗi', coBt && !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = ((chinh === 'sua' && du) || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc && !khoaKt
@@ -1024,19 +1029,26 @@ export function MotTrangHs(p: PropsMotTrang) {
 
   // Bi đứng cạnh đường (bản vẽ nâng cấp 27/10) khi đường có ≥ 2 chặng ⇒ lời Bi phía trên chỉ còn bong bóng (không hai Bi).
   // 01/11 tối (thầy «chữ hiện bong bóng trên đầu Mol»): có Mol cạnh đường + lời theo cấp ⇒ bong bóng TRÊN ĐẦU Mol ở mọi hướng màn (thay thẻ riêng ở trên)
+  // NỢ CÂU (11/11, bản vẽ docs/ban-ve-lam-bu-1111): còn phải trả ⇒ thẻ Nợ câu + nút chính đứng TRÊN thẻ mức; đã trả đủ số đã chọn ⇒ thẻ gọn dưới nút chính.
+  const nutChinh = (() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d || chinh === 'ca' || (!so && p.dangTai && !p.ngayKiem)) return null; /* ca mở ⇒ chỉ nút «Vào ca»; đang tải chưa có số ⇒ chưa vẽ */ const Ic = HINH_NUT[d.loai], noHoc = chuaTraNo && d.loai === 'hoc'
+        return <button type="button" className="kb-cta" data-sac={noHoc ? nc!.phaiTraHet ? 'sai' : 'chu-y' : d.loai === 'hoc' && p.loaiNgay === 'sua' && !p.ngayKiem ? 'sai' : SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
+          <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
+          <span className="kb-giua">{noHoc ? <ChuNutChinh v="Trả nợ câu trước" t={nc!.kieu === 'het' ? 'Trả hết' : 'Trả tối thiểu'} phu={`${ncLuc!.conTra} câu · khoảng ${Math.round(ncLuc!.conTra * 1.5)} phút`} /> : <ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} />}</span>
+          <ChevronRight size={22} aria-hidden="true" /></button> })()
   return <div ref={khung} className="dm-khung" data-so-menu={coThuong || undefined} style={{ '--tren-cao': `${trenCao}px` } as CSSProperties}>{tren}
     <main className="da-vo" aria-busy={!so && p.dangTai}><div className="kb-cot-trai">
       {/* THẺ BÀI (thầy 27/10 «thu vào bị giật… cho thanh màu xanh xuống kẻo chèn vào ống nghiệm»): thẻ đầy đủ ĐỨNG YÊN trong luồng (giữ chỗ, không nhảy cuộn);
           cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? <span className="kb-lop">{hs.lop}</span> : null}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
+      {nc && ncLuc && chuaTraNo && <Suspense fallback={null}><TheNoCau nc={nc} daTra={ncLuc.daTra} con={ncLuc.con} gon={false} duMuc={false} token={p.token} onDoi={p.onTaiLai} /></Suspense>}{chuaTraNo && nutChinh}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
       <section className="kb-hero" data-du={duNgay || undefined} data-loai={!p.ngayKiem ? p.loaiNgay : undefined} aria-label={`${!p.ngayKiem && p.loaiNgay ? NHAN_LOAI_NGAY[p.loaiNgay] : 'Tổng câu hôm nay'}${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>
         {loiLuaBi && <LoiBi key={`g${loiLuaBi[2]}`} cam={loiLuaBi[0]} loi={loiLuaBi[1]} cap={capLua} chanNgon={!!cn} goc />}
         <div className="kb-hero-chu">
           <span className="kb-nhan">{duNgay ? 'Xong hết hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : p.loaiNgay ? NHAN_LOAI_NGAY[p.loaiNgay] : 'Tổng câu hôm nay'}</span>
           {coTong ? <div className="kb-so">{daNgay}<small>/{tongNgay} câu</small></div> : <span className="mot-xuong" aria-hidden="true" />}
-          <p className="kb-dong-hero" role={!coTong && p.dangTai ? 'status' : undefined}>{!coTong ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : duNgay ? 'Xong hết việc hôm nay — tới điểm tương đương, dung dịch đã hồng!' : p.ngayKiem ? `Còn ${tongNgay - daNgay} câu nữa là xong bài hôm nay.` : khoaKt ? `Còn ${tongNgay - daNgay} câu · làm Kiểm tra ôn tập trước, rồi mới học chặng.` : `Còn ${tongNgay - daNgay} câu nữa là dung dịch đổi màu.`}</p>
+          <p className="kb-dong-hero" role={!coTong && p.dangTai ? 'status' : undefined}>{!coTong ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : duNgay ? 'Xong hết việc hôm nay — tới điểm tương đương, dung dịch đã hồng!' : chuaTraNo && nc && ncLuc ? `Trả nợ ${ncLuc.conTra} câu trước, rồi tới ${Math.max(0, so!.muc - nc.so)} câu hôm nay.` : p.ngayKiem ? `Còn ${tongNgay - daNgay} câu nữa là xong bài hôm nay.` : khoaKt ? `Còn ${tongNgay - daNgay} câu · làm Kiểm tra ôn tập trước, rồi mới học chặng.` : `Còn ${tongNgay - daNgay} câu nữa là dung dịch đổi màu.`}</p>
         </div>
         {/* vạch trên bình = ranh từng việc theo thứ tự: Kiểm tra ôn tập · từng chặng · Tự sửa lỗi */}
         <BinhHomNay da={daNgay} muc={tongNgay} ranh={chang.reduce<number[]>((a, c) => [...a, (a[a.length - 1] ?? 0) + c.co], ktNgay && !p.ngayKiem ? [kiem!.tong] : [])} />
@@ -1062,11 +1074,7 @@ export function MotTrangHs(p: PropsMotTrang) {
       {p.token && chinh !== 'ca' && laSamsungInternet() && <Suspense fallback={null}><NhacSamsung /></Suspense>}
       {/* 28/10: Sảnh chưa về ⇒ chưa vẽ đường, báo đang tải. */}
       {/* NÚT CHÍNH (viên thuốc lớn + ô bánh quy 12 múi): đúng việc của nút đang làm trên danh sách (cùng onClick thẻ bật ra cũ) */}
-      {(() => { const d = nut.find((n) => n.tt === 'dang' && n.pop.nut?.onClick && !n.pop.nut.tat); if (!d || chinh === 'ca' || (!so && p.dangTai && !p.ngayKiem)) return null; /* ca mở ⇒ chỉ nút «Vào ca»; đang tải chưa có số ⇒ chưa vẽ */ const Ic = HINH_NUT[d.loai]
-        return <button type="button" className="kb-cta" data-sac={d.loai === 'hoc' && p.loaiNgay === 'sua' && !p.ngayKiem ? 'sai' : SAC_POP[d.loai]} onClick={() => { cham(); d.pop.nut!.onClick!() }}>
-          <span className="kb-banh" aria-hidden="true"><svg viewBox="0 0 100 100"><path d={BANH_12} fill="currentColor" stroke="currentColor" strokeWidth={0} /></svg><Ic size={24} strokeWidth={2.6} /></span>
-          <span className="kb-giua"><ChuNutChinh v={d.bong ?? d.pop.nut!.chu} t={d.loai === 'hoc' ? ns ? `Sửa nhóm ${ns.i}` : tenDong(d, nut.slice(0, nut.indexOf(d) + 1).filter((x) => x.loai === 'hoc').length) : d.pop.tieu} phu={phuDong(d)} bai={d.loai === 'hoc' ? ns?.ten ?? (p.tenBai || 'Bài học hôm nay') : undefined} /></span>
-          <ChevronRight size={22} aria-hidden="true" /></button> })()}
+      {!chuaTraNo && nutChinh}{nc && ncLuc && !chuaTraNo && ncLuc.con > 0 && <Suspense fallback={null}><TheNoCau nc={nc} daTra={ncLuc.daTra} con={ncLuc.con} gon duMuc={du} token={p.token} onDoi={p.onTaiLai} /></Suspense>}
       {so && !p.dangTai && !nut.length && <ViecTrong />}
       </div><div className="kb-cot-phai">
       {/* 10/11 thầy duyệt bản vẽ docs/ban-ve-mot-nut-1011 «ẩn hết những phần ở dưới, chỉ để lại một nút»: bỏ nợ bài · Nhóm lỗi · Việc hôm nay · Lịch bài · Bạn bè;
@@ -1157,6 +1165,10 @@ function CongTac({ khoa, ten, Icon, sac }: { khoa: 'ddh.am' | 'ddh.rung' | typeo
 /** Ba mục menu kiểu Duolingo (bản vẽ dm-4, thầy chốt 26/10) — cùng id mục của cổng: Lộ trình = Hôm nay (+ Hành trình) · Luyện tập = Ôn & sửa · Thành tích = Kết quả.
  *  `sac` = màu ô biểu tượng (menu 6 mục 27/10): chính · chú ý · sao. */
 const MENU_DUO = [{ id: 'hom-nay', ten: 'Hôm nay', icon: Sparkles, sac: 'chinh' }, { id: 'on-lai', ten: 'Luyện tập', icon: Wrench, sac: 'chu-y' }, { id: 'ket-qua', ten: 'Thành tích', icon: Trophy, sac: 'sao' }] as const
+/** XEM LẠI LIVE (thầy chốt build 11/11, docs/dac-ta-live-xem-lai-1011.md mục 2.1): dòng «Live» ở tấm Thêm. Màn + lệnh đếm «N buổi mới» nằm ở mảnh lười
+ *  `xem-lai-live` — chỉ tải khi em mở «Thêm» (đường mở app không thêm byte ngoài dòng menu này). */
+const napLive = () => import('../../screens/live-xem-lai/hs')
+const ManLiveHs = lazy(() => napLive().then((m) => ({ default: m.ManLiveHs })))
 let soMenuCham = 0
 export function MenuDocTrong(p: {
   muc: string; ds: readonly { id: string; ten: string; icon: LucideIcon }[]; onMuc: (id: string) => void
@@ -1166,6 +1178,11 @@ export function MenuDocTrong(p: {
 }) {
   const [mo, setMo] = useState(false)
   const [cai, setCai] = useState(false) // tấm con «Cài đặt» đang mở (thay chỗ 6 mục)
+  const [live, setLive] = useState(false) // màn «Xem lại Live» đang mở
+  const [liveMoi, setLiveMoi] = useState(0) // số buổi live em chưa mở (chip «N buổi mới»); mảnh lười tự nhớ 10 phút
+  const tkLive = p.token
+  const dongLive = useCallback(() => setLive(false), [])
+  useEffect(() => { if (mo && !live && tkLive) void napLive().then((m) => m.demBuoiMoi(tkLive)).then(setLiveMoi, () => {}) }, [mo, live, tkLive])
   // Kết quả ca thi «Về Lộ trình» (Boss 27/10): đóng phòng thi ⇒ về đúng mục Lộ trình dù em vào thi từ mục khác (sự kiện do cổng phát khi đóng phòng thi)
   const onMuc = useRef(p.onMuc)
   onMuc.current = p.onMuc
@@ -1177,6 +1194,8 @@ export function MenuDocTrong(p: {
   const caiRef = useRef(false)
   caiRef.current = cai
   const nut = useRef<HTMLButtonElement>(null)
+  const coLive = useRef(false)
+  useEffect(() => { if (coLive.current && !live) nut.current?.focus(); coLive.current = live }, [live]) // đóng màn Live ⇒ tiêu điểm về nút «Thêm»
   // 28/10 MƯỢT: `<html data-menu-cham>` thay `body:has(.tr-menu-cham)` (trong-hs.css) — :has() trên body khiến MỖI lần thêm / gỡ nút ở bất kì đâu
   // (vd đổi câu) Chrome lên lịch kiểm lại cả trang theo tập luật :has() chung (tính lại kiểu mọi <span>…). Đếm tham chiếu: nhiều menu cùng lúc vẫn đúng.
   useLayoutEffect(() => {
@@ -1251,6 +1270,7 @@ export function MenuDocTrong(p: {
       <div ref={oSo} id="tr-menu-dem" className="tr-menu-dem" />
       <div className="tr-menu-ds" hidden={cai}>
         {MENU_DUO.map(({ id, ten, icon: Icon, sac }) => <button key={id} type="button" className="tr-menu-muc" data-k={id} data-hien={id === 'on-lai' || undefined} onClick={chon(() => { p.onMuc(id); dong(true) })} aria-current={p.muc === id ? 'page' : undefined}><span className="tr-menu-o" data-sac={sac} aria-hidden="true"><Icon size={20} /></span>{ten}</button>)}
+        {p.token && <button type="button" className="tr-menu-muc" onClick={chon(() => { setMo(false); setLive(true) })}><span className="tr-menu-o" data-sac="chinh" aria-hidden="true"><IconNet d={['M21.2 12a9.2 9.2 0 1 1-18.4 0 9.2 9.2 0 0 1 18.4 0z', 'M10 8.6v6.8l5.6-3.4z']} /></span>Live{liveMoi > 0 && <span className="xl-chip-moi">{liveMoi} buổi mới</span>}<ChevronRight size={20} aria-hidden="true" className="tr-menu-mui" /></button>}
         {/* thầy 02/11 khuya: Kiểm tra lên thanh nổi ⇒ tấm Thêm hiện Luyện tập (MENU_DUO «on-lai», data-hien), bỏ Ca kiểm tra; bỏ
             «Hỏi A.I Đỗ Đại Học» (đã có nút A.I riêng ngoài thanh) */}
         {p.token && !coDd && <button type="button" className="tr-menu-muc" data-hien onClick={chon(() => { setTt({ loai: 'cho', buoi: null }); setTimeout(() => oNhap.current?.focus()) })}><span className="tr-menu-o" data-sac="tin" aria-hidden="true"><QrCode size={20} /></span>Điểm danh</button>}
@@ -1266,5 +1286,6 @@ export function MenuDocTrong(p: {
         <button ref={p.nutCuaEm} type="button" className="tr-menu-muc" onClick={chon(() => { dong(false); p.onCuaEm() })} aria-haspopup="dialog" aria-expanded={p.moCuaEm}><span className="tr-menu-o tr-menu-anh" aria-hidden="true">{p.chuDau}</span>Của em</button>
       </div>
     </nav>
+    {live && <Suspense fallback={null}><ManLiveHs dong={dongLive} /></Suspense>}
   </>
 }

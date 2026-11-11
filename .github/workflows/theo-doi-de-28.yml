@@ -47,3 +47,8 @@ jobs:
           q "4 Kiểm tra ôn tập — theo ngày" "SELECT k.ngay, SUM(k.trang_thai='da_nop') da_nop, SUM(k.trang_thai='het_han') het_han, SUM(k.trang_thai IN ('hen','can_lam')) chua_lam, SUM(k.trang_thai='cho_nguon') cho_nguon, ROUND(AVG(CASE WHEN k.trang_thai='da_nop' THEN k.diem END),2) diem_tb, SUM(CASE WHEN k.trang_thai='da_nop' AND k.diem>=8 THEN 1 ELSE 0 END) tu_8_diem FROM kiem_tra_ca_nhan k WHERE k.ngay >= $TU AND k.ngay <= date('now','+7 hours') GROUP BY 1 ORDER BY 1"
 
           q "4b ngày Kiểm tra ôn tập: em đã nộp bài còn làm thêm bao nhiêu câu bài tập (từ 11/11 phải là 0)" "SELECT k.ngay, COUNT(*) em_nop, SUM(CASE WHEN EXISTS(SELECT 1 FROM su_kien_hoc s WHERE s.sbd=k.sbd AND s.ngay_vn=k.ngay AND s.ket_qua IS NOT NULL AND s.ma_nguon NOT LIKE 'ktcn:%' AND s.nguon NOT IN ('thi','chua_loi','tu_luyen') AND COALESCE(s.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')) THEN 1 ELSE 0 END) em_lam_them_bai FROM kiem_tra_ca_nhan k WHERE k.ngay >= $TU AND k.trang_thai='da_nop' GROUP BY 1 ORDER BY 1"
+
+          # NỢ CÂU (11/11, server/src/no-cau.ts): sổ nợ gộp theo cỡ + lựa chọn trả nợ theo ngày — chỉ đếm gộp.
+          q "5 nợ câu: sổ nợ đầu ngày gần nhất — gộp theo cỡ" "SELECT CASE WHEN no=0 THEN 'a 0' WHEN no<12 THEN 'b 1-11' WHEN no<28 THEN 'c 12-27' WHEN no<56 THEN 'd 28-55' WHEN no<84 THEN 'e 56-83' ELSE 'f 84 (trần)' END co, COUNT(*) em, SUM(no) cau_no, SUM(COALESCE(json_extract(loai_json,'\$.lai'),0)) cau_lai, SUM(lan>=3) em_het_lan_toi_thieu, MAX(den_ngay) chot_den FROM goi_bai_7_no_em GROUP BY 1 ORDER BY 1"
+
+          q "5b nợ câu: lựa chọn trả nợ — theo ngày" "SELECT ngay, kieu, COUNT(*) em, SUM(so) cau_tra_da_chon, ROUND(AVG(so),1) tb_cau FROM goi_bai_7_no_chon WHERE ngay >= $TU GROUP BY 1,2 ORDER BY 1,2"

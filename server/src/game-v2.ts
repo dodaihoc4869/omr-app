@@ -404,6 +404,7 @@ async function gameV2Tho(env:Env,action:string,b:Record<string,unknown>,ctx?:Exe
       // Ô "đã làm/M câu hôm nay" sau mỗi câu: lệnh nhẹ 3 truy vấn chỉ đọc (khẩn 12/10 22h30) — thay lượt nạp lại cả sảnh (`lapGoi7`) sau mỗi câu.
       if(action==='hoc-tap-dem')return giu.dem&&giu.dem.sbd===sbd?giu.dem.p:g7.demHomNay7(env,sbd,Date.now())
       // Làm lại cuối chặng kiểu Duolingo (26/10, goi-bai-7-lam-lai.ts): câu anh em cho câu em vừa sai, có hỗ trợ, không EXP.
+      if(action==='hoc-tap-no-cau-chon')return import('./no-cau-d1').then(m=>m.chonNoCau7(env,sbd,b,Date.now())) // nợ câu 11/11: em đổi trả tối thiểu / trả hết
       if(action==='hoc-tap-lam-lai')return import('./goi-bai-7-lam-lai').then(m=>m.lamLaiCuoiChang7(env,sbd,b,Date.now()))
       // GÓI BÀI CẢ NGÀY TRÊN MÁY EM (thầy 29/10 22:05 «cách khác hoàn toàn để app hs load tức thì ở mọi thời điểm», goi-ngay.ts): lập gói NỀN (không ai chờ) · mở phiên từ
       // một chặng của gói (máy em đã hiện câu; một đợt đọc + một lệnh ghi, không lập kế hoạch). Công tắc tắt / không phải em thử ⇒ `tat` / `GOI_TAT` (máy em đi đường cũ).

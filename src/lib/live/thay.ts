@@ -317,6 +317,15 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     const t = mic?.getAudioTracks()[0] ?? null
     return t && tuy.chuoi !== false && chuoi && !chuoi.hong && ctxChay() && chuoi.ra.readyState === 'live' ? chuoi.ra : t
   }
+  /** Luồng bọc track ĐANG GỬI cho lớp (cho máy ghi «Xem lại Live»); track đổi ⇒ đối tượng luồng mới. Không dựng được `MediaStream` ⇒ luồng mic thô. */
+  let luongGuiNho: { t: MediaStreamTrack; l: MediaStream } | null = null
+  function luongGui(): MediaStream | null {
+    const t = trackGui()
+    if (!t || !mic) return null
+    if (t === mic.getAudioTracks()[0] || typeof MediaStream !== 'function') return mic
+    if (luongGuiNho?.t !== t) luongGuiNho = { t, l: new MediaStream([t]) }
+    return luongGuiNho.l
+  }
   /** Gắn tiếng mic đang mở vào bộ gửi (đang live, không phải «Live không tiếng»). Trả true nếu bộ gửi đang cầm tiếng mic. `dangBat` = đang trong `bat()`
    *  (phòng chưa kịp báo `bat`). */
   async function ganMic(dangBat = false): Promise<boolean> {
@@ -715,6 +724,9 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     thuMic, datNgheEm, mucAmEm, moiNoi, haTay, tamDung,
     /** (11/11) «Lọc tiếng ồn + khử vọng»: tu / bat / tat · dòng chẩn đoán mic · luồng mic đang mở (thô) · track tiếng đang gửi cho lớp (sau chuỗi làm rõ tiếng). */
     datLoc, chanDoan, luongMic: (): MediaStream | null => mic, trackGui,
+    /** (Xem lại Live 11/11 — chỉ thêm) Luồng tiếng cho MÁY GHI: tiếng thầy ĐANG GỬI cho lớp — SAU chuỗi làm rõ tiếng (đủ to, đã chặn đỉnh; chuỗi không chạy thì
+     *  là thẳng track mic) — + tiếng em đang kéo về (null = không có). Track gửi đổi (đổi mic, chuỗi ⇄ mic thô) ⇒ trả đối tượng luồng MỚI để máy ghi nối lại. */
+    luongGhi: (): { mic: MediaStream | null; em: MediaStream | null } => ({ mic: tuBat && tt.tieng === 'mic' ? luongGui() : null, em: tt.emNoi && amEm?.srcObject instanceof MediaStream ? amEm.srcObject : null }),
     nhanTinPhong, khiNoiLai,
     /** Số đo: gói đã gửi theo đường, RTT máy thầy ↔ SFU, số đo gộp của các máy em (phòng báo 10 giây một lần). */
     soDo: () => ({ ...dem, rtt, em: doEm, kenhNet: tt.kenhNet, emNoi: tt.emNoi ? { ...emSo } : null }),

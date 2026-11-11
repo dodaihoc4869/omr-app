@@ -1,0 +1,5 @@
+/* NÚT «LIVE» Ở ĐẦU MÀN HÔM NAY (11/11): điện thoại vốn ẩn các nút phụ ở đầu màn (trong-gv-hom-nay.css) — riêng nút Live phải bấm được ở mọi khổ
+ * (bản vẽ docs/ban-ve-live-xem-lai-1011 ảnh 30). Lớp đang có ca kiểm tra mở ⇒ giữ luật cũ (đầu màn chỉ còn việc theo dõi ca). Không màu mới. */
+@media (max-width: 900px) {
+  [data-trong='gv'] .gvhn-1210 .gvhn-dau:not([data-co-ca]) > .gvhn-nut-phu.gvhn-nut-live { display: inline-flex; }
+}

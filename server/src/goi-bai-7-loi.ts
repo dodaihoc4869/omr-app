@@ -75,7 +75,7 @@ export function chonGoi7(a: {
   loaiNgay?: LoaiNgay7 | null
   /** ĐỀ 28 THEO SUẤT (rut-28.ts, thầy 10/11): có ⇒ mọi nguồn lấp 28 suất theo ô thay cho bốn tầng lấp cũ. `oCua` = ô của MỌI câu (gói, sửa, ôn);
    *  `daLamO` = ô của các câu em đã làm hôm nay. Nguồn chính (tầng 0): ngày Sửa = câu sai, ngày khác = câu mới theo lịch. Vắng ⇒ hành vi cũ. */
-  suat?: { oCua: (qid: string) => string; daLamO: readonly string[] }
+  suat?: { oCua: (qid: string) => string; daLamO: readonly string[]; /** mức hôm nay khi > 28 (có câu trả nợ) ⇒ suất chia theo tỉ lệ */ tong?: number }
 }): { viec: ViecGoi7[]; thieuPhu: number; tuLam: number; tiepCan: number; /** đề theo suất: số câu phải lấy lệch ô (0 = mọi suất đúng ô) */ lech?: number } {
   const viec: ViecGoi7[] = [], used = new Set<string>()
   const muc = Math.max(0, a.mucTieuNgay ?? 24)
@@ -132,7 +132,7 @@ export function chonGoi7(a: {
     // ôn sớm (tầng cuối, kho vài nghìn câu): mỗi ô chỉ cần tối đa `muc` ứng viên ⇒ không đưa cả kho vào vòng chọn (luật tốc độ)
     const demSom = new Map<string, number>()
     for (const id of a.onSom ?? []) { if (!hop(id) || !a.sanSang.has(id)) continue; const o = oId(id), n = demSom.get(o) ?? 0; if (n < muc) { demSom.set(o, n + 1); day(id, 'on', false, 1, o) } }
-    const r = rut28Lech({ ung, can: muc, daLamO: a.suat.daLamO }), viec2 = r.qids.map((id) => vaiCua.get(id)!)
+    const r = rut28Lech({ ung, can: muc, daLamO: a.suat.daLamO, tong: a.suat.tong }), viec2 = r.qids.map((id) => vaiCua.get(id)!)
     return { viec: viec2, thieuPhu, tuLam: viec2.filter(x => !x.huongDan).length, tiepCan: viec2.filter(x => x.huongDan).length, lech: r.lech }
   }
   for (const q of a.chiTrongMuc ? phu.slice(0, muc) : phu) {
