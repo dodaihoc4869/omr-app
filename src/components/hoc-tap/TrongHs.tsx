@@ -2,7 +2,7 @@
 // hướng Duolingo + chất Hoá), NẠP LƯỜI qua nap-trong-hs.ts (chỉ khi `<html data-trong>`): Lộ trình · Luyện tập · Thành tích + menu dọc mép phải (Điểm danh đầu menu, A.I Đỗ Đại Học dưới 3 mục). Cùng số, cùng
 // chữ nút, cùng lệnh với bản cũ — chỉ đổi trình bày. Kiểu ở styles/trong-hs.css (nạp cùng mảnh này ⇒ vẽ là đã có kiểu).
 import { ChuNutChinh, ViecTrong } from './nut-chinh-chu'
-import { docNoCau, noCauLuc } from '../../lib/no-cau-doc'
+import { ncTho, noCauLuc } from '../../lib/no-cau-doc'
 import { lazy, Suspense, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { Award, Check, CheckCircle2, ChevronRight, ClipboardCheck, FlaskConical, Flame, GraduationCap, History, Layers, LineChart, Lock, PenLine, Play, QrCode, RefreshCw, Route, Sparkles, Target, Trophy, Wrench, type LucideIcon } from 'lucide-react'
@@ -1006,7 +1006,7 @@ export function MotTrangHs(p: PropsMotTrang) {
   const tongNgay = (so && !p.ngayKiem ? so.muc : 0) + tongSuaNay + (ktNgay ? kiem!.tong : 0)
   const daNgay = (so && !p.ngayKiem ? Math.min(so.daLam, so.muc) : 0) + (tongSuaNay ? daSuaNgay : 0) + (ktNgay ? (kiem!.nopLuc !== null ? kiem!.tong : kiem!.daTra) : 0)
   const coTong = tongNgay > 0 && (!!so || !!p.ngayKiem)
-  const nc = so && !p.ngayKiem && chinh !== 'ca' ? docNoCau(p.goi7?.noCau) : null, ncLuc = nc && so ? noCauLuc(nc, so.daLam, so.muc) : null, chuaTraNo = !!ncLuc && ncLuc.conTra > 0
+  const nc = so && !p.ngayKiem && chinh !== 'ca' ? ncTho(p.goi7?.noCau) : null, ncLuc = nc && so ? noCauLuc(nc, so.daLam, so.muc) : null, chuaTraNo = !!ncLuc && ncLuc.conTra > 0
   const duNgay = coTong && daNgay >= tongNgay
   const tiepTheo = [kiemLam && 'Kiểm tra ôn tập', coSuaChang && !xongSuaNay && 'Tự sửa lỗi', coBt && !!p.soBaiTap && 'Bài tập về nhà'].filter(Boolean) as string[]
   const hocThem = ((chinh === 'sua' && du) || chinh === 'bt' || (chinh === 'kiem' && !p.ngayKiem)) && !p.khoaHoc && !khoaKt

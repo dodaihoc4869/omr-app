@@ -58,7 +58,7 @@ export function docTomTatGoi7(x:unknown):TomTatGoi7|undefined {
   if(x.bat!==true||!laNgay(x.ngay)||!laSo(x.toiThieu)||x.toiThieu<=0||!laSo(x.daLamHomNay)||!Array.isArray(x.goi))return
   const goi = x.goi.map(docGoi).filter((g):g is NonNullable<typeof g> => g!==null)
   if(!goi.length)return
-  const tang = docTang(x.tang)
+  const tang = docTang(x.tang), kc = so0(x.khoaCaThi), ln = x.loaiNgay
   return { bat:true, ngay:x.ngay, toiThieu:x.toiThieu, daLamHomNay:x.daLamHomNay, tuLamCon:so0(x.tuLamCon), tiepCanCon:so0(x.tiepCanCon), thieuPhu:so0(x.thieuPhu),
-    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), ...(so0(x.khoaCaThi)>0?{khoaCaThi:so0(x.khoaCaThi)}:{}), ...(x.loaiNgay==='moi'||x.loaiNgay==='sua'?{loaiNgay:x.loaiNgay}:{}),nhomSua:x.nhomSua,lichBai:x.lichBai,noCau:x.noCau, kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
+    thieuNgay:so0(x.thieuNgay), canHoTro:x.canHoTro===true, ...(tang?{tang}:{}), ...(kc>0?{khoaCaThi:kc}:{}), ...(ln==='moi'||ln==='sua'?{loaiNgay:ln}:{}),nhomSua:x.nhomSua,lichBai:x.lichBai,noCau:x.noCau, kienThucCu:docKienThuc(x.kienThucCu), goi, diemDaDo:Array.isArray(x.diemDaDo)?x.diemDaDo.filter(laDiem):[] }
 }

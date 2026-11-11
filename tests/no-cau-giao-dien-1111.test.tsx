@@ -3,7 +3,8 @@
 // Khoá: bộ đọc chặt · số sống theo «đã làm hôm nay» cùng luật máy chủ · bốn trạng thái của thẻ · bấm ô chọn gửi đúng lệnh rồi nạp lại Sảnh.
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { docNoCau, laiDem, noCauLuc, type NoCau } from '../src/lib/no-cau-doc'
+import { noCauLuc, type NoCau } from '../src/lib/no-cau-doc'
+import { docNoCau, laiDem } from '../src/components/hoc-tap/TheNoCau'
 import { tomTatNo, laiNo } from '../server/src/no-cau'
 import { docTomTatGoi7 } from '../src/lib/goi-bai-7'
 

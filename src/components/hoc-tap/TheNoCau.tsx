@@ -3,13 +3,28 @@
 // Luật ở máy chủ (server/src/no-cau.ts); thẻ chỉ hiện số và gửi lựa chọn `hoc-tap-no-cau-chon`.
 import { useState } from 'react'
 import { goiHoa2 } from '../hoa2/api'
-import { laiDem, type KieuTraNo, type NoCau } from '../../lib/no-cau-doc'
+import type { KieuTraNo, NoCau } from '../../lib/no-cau-doc'
+/** Lãi một đêm trên số câu còn nợ (làm tròn lên). Ở mảnh lười để lõi mở app không gánh. */
+export const laiDem = (con: number, phanTram: number): number => (con > 0 ? Math.ceil(con * phanTram / 100) : 0)
 import '../../styles/no-cau.css'
 
+const so = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? Math.floor(v) : null)
+/** Đọc CHẶT tóm tắt `goi7.noCau`; lệch kiểu ⇒ null ⇒ không vẽ thẻ. Nằm ở mảnh lười (lõi mở app chỉ dùng `ncTho`). */
+export function docNoCau(x: unknown): NoCau | null {
+  if (!x || typeof x !== 'object') return null
+  const r = x as Record<string, unknown>, l = (r.theoLoai ?? {}) as Record<string, unknown>
+  const no = so(r.no), toiThieu = so(r.toiThieu), lan = so(r.lan), chon = so(r.so), lai = so(r.lai)
+  if (!no || toiThieu === null || lan === null || chon === null || lai === null || chon > no || toiThieu > no || (r.kieu !== 'toi_thieu' && r.kieu !== 'het')) return null
+  return { no, theoLoai: { moi: so(l.moi) ?? 0, sua: so(l.sua) ?? 0, on: so(l.on) ?? 0, lai: so(l.lai) ?? 0 }, toiThieu, lan, phaiTraHet: r.phaiTraHet === true, kieu: r.kieu, so: chon, lai }
+}
 const NHAN_LOAI: readonly (readonly [keyof NoCau['theoLoai'], string])[] = [['moi', 'Câu mới'], ['sua', 'Câu sửa'], ['on', 'Câu ôn'], ['lai', 'Lãi']]
 
 /** `daTra` / `con` = số sống theo «đã làm hôm nay»; `gon` = đã trả đủ số đã chọn (thẻ gọn dưới nút chính); `duMuc` = đã đủ mức hôm nay. */
-export default function TheNoCau({ nc, daTra, con, gon, duMuc, token, onDoi }: { nc: NoCau; daTra: number; con: number; gon: boolean; duMuc: boolean; token?: string; onDoi?: () => void }) {
+export default function TheNoCau(p: { nc: unknown; daTra: number; con: number; gon: boolean; duMuc: boolean; token?: string; onDoi?: () => void }) {
+  const n = docNoCau(p.nc)
+  return n && <TheNoCauTrong {...p} nc={n} />
+}
+function TheNoCauTrong({ nc, daTra, con, gon, duMuc, token, onDoi }: { nc: NoCau; daTra: number; con: number; gon: boolean; duMuc: boolean; token?: string; onDoi?: () => void }) {
   const [dang, setDang] = useState<KieuTraNo | null>(null), [loi, setLoi] = useState('')
   const kieu = dang ?? nc.kieu
   const chon = (k: KieuTraNo) => {
@@ -24,7 +39,7 @@ export default function TheNoCau({ nc, daTra, con, gon, duMuc, token, onDoi }: {
     {!duMuc && nc.kieu !== 'het' && <button type="button" className="nc-them" onClick={() => chon('het')} disabled={!!dang}>Trả hết</button>}
   </section>
   const het = nc.phaiTraHet, motNut = het || nc.toiThieu >= nc.no
-  const loai = NHAN_LOAI.filter(([k]) => nc.theoLoai[k] > 0).map(([k, ten]) => `${ten} ${nc.theoLoai[k]}`).join(' · ')
+  const loai = NHAN_LOAI.filter(([k]) => (nc.theoLoai[k] ?? 0) > 0).map(([k, ten]) => `${ten} ${nc.theoLoai[k]}`).join(' · ')
   const nut = (k: KieuTraNo, ten: string, so: number) => <button type="button" className="nc-nut" aria-pressed={kieu === k || motNut} onClick={() => chon(k)} disabled={!!dang}><b>{ten}</b><span>{so} câu</span></button>
   return <section className="nc-the" data-muc={het ? 'het' : undefined} aria-label="Nợ câu">
     <div className="nc-dau"><span className="nc-nhan">Nợ câu</span><span className="nc-chip">{het ? 'Hết 3 lần trả tối thiểu' : `Trả tối thiểu: lần ${Math.min(3, nc.lan + 1)}/3`}</span></div>
