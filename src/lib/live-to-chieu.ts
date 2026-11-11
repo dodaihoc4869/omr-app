@@ -253,7 +253,7 @@ export const JS_LIVE_TO_CHIEU = `
         h += '<div class="mc-lv-dong"><span><b>Lọc tiếng ồn + khử vọng</b><br>' + (mi.loc ? 'Đang bật — chống vọng, chống hú' : 'Đang tắt — giọng trong nhất') + '</span><span style="display:inline-flex;gap:.3em">'
           + '<button type="button" class="mc-lv-n nho" data-lv="loc" data-c="tu" aria-pressed="' + (mi.cheDo === 'tu') + '">Tự động</button><button type="button" class="mc-lv-n nho" data-lv="loc" data-c="bat" aria-pressed="' + (mi.cheDo === 'bat') + '">Bật</button><button type="button" class="mc-lv-n nho" data-lv="loc" data-c="tat" aria-pressed="' + (mi.cheDo === 'tat') + '">Tắt</button></span></div>';
       }
-      h += '<div class="mc-lv-dong"><span><b>Tiếng trên máy em</b><br>Em trong lớp nghe thầy trực tiếp</span><span style="display:inline-flex;gap:.4em">'
+      h += '<div class="mc-lv-dong"><span><b>Tiếng trên máy em</b><br>' + (t.tiengLop ? 'Mọi máy em đang phát tiếng thầy' : 'Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe') + (LV.tt.pha === 'live' ? '<br><b>' + (LV.tt.nghe || 0) + '</b> em đang nghe qua máy' : '') + '</span><span style="display:inline-flex;gap:.4em">'
         + '<button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="0" aria-pressed="' + (!t.tiengLop) + '">Em ở xa</button><button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="1" aria-pressed="' + (!!t.tiengLop) + '">Tất cả</button></span></div>';
     }
     // điểm quyết 4: mặc định TẮT, thầy bật từng buổi — chỉ em có tên trong lớp, đã đăng nhập; không điểm danh, không đội, không kJ
@@ -308,6 +308,7 @@ export const JS_LIVE_TO_CHIEU = `
         for (i = 0; i < 7; i++) h += '<i style="height:' + [36, 59, 82, 100, 73, 45, 27][i] + '%"></i>';
         lvCum.innerHTML = '<span><i class="cham"></i>' + (t.nghi ? 'TẠM DỪNG' : 'LIVE') + ' <b id="mc-lv-dh">' + lvDongHo(t.tu || Date.now()) + '</b></span>'
           + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + ' em xem</small></span>'
+          + (t.coTieng && !t.khongTieng && !t.nghi ? '<span class="' + (t.xem && !t.nghe ? 'im' : '') + '" aria-label="Số em đang nghe tiếng thầy qua máy"><b>' + (t.nghe || 0) + '</b><small> em nghe</small></span>' : '')
           + (t.nghi ? '' : t.coTieng && !t.khongTieng && !t.lyDoKT ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>' + lvSach(t.lyDoKT || 'Không tiếng') + '</span>')
           + lvNganGhi(t);
         LV.hDh = setInterval(function () { var d = document.getElementById('mc-lv-dh'); if (d && LV.tt && LV.tt.tu) d.textContent = lvDongHo(LV.tt.tu); if (LV.moRoi) lvVeRoi(); lvBaoGiay(); if (LV.tt && LV.tt.ghi === 'tat' && !lvCum.querySelector('.ghi-loi') && Date.now() - (LV.tt.tu || Date.now()) > 15000) lvVe(); }, 1000);

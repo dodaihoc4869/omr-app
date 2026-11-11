@@ -1,14 +1,14 @@
 {
-  "luc": "2026-11-11T00:24:34.652Z",
+  "luc": "2026-11-11T02:28:31.606Z",
   "ghiChu": "Chromium thật, phòng thật trong Node, dữ liệu giả; KHÔNG có tiếng (SFU chưa cấu hình ở máy chủ thử).",
   "soDo": {
-    "k1_gui_toi_bang_ms": 42.9,
+    "k1_gui_toi_bang_ms": 24.6,
     "b1_so_khoi_chu": 5,
     "b1_lech_lon_nhat_phan_nghin_be_rong_giay": 1,
-    "k2_tin_phong_toi_bang_ms": 56.1,
-    "k3_tam_dung_toi_may_em_ms": 123,
-    "k3_tiep_tuc_toi_may_em_ms": 127,
-    "k1_gui_toi_bang_lan_2_ms": 13.1
+    "k2_tin_phong_toi_bang_ms": 26.5,
+    "k3_tam_dung_toi_may_em_ms": 134,
+    "k3_tiep_tuc_toi_may_em_ms": 137,
+    "k1_gui_toi_bang_lan_2_ms": 16.3
   },
   "kiem": [
     {
@@ -42,12 +42,17 @@
       "them": ""
     },
     {
-      "ten": "K4 · máy em đang làm bài: chỉ còn tay nắm ở MÉP TRÁI (không viên nổi đáy màn), chưa vào bảng",
+      "ten": "M3 · máy em đang làm bài: tay nắm nằm giữa MÉP TRÊN (không viên nổi đáy màn, không còn ở mép trái), chưa vào bảng",
       "dat": true,
-      "them": "tay nắm x 0–30"
+      "them": "viên [172,5,218,12]"
     },
     {
-      "ten": "K4 · chạm tay nắm ⇒ khay trượt ra từ mép trái, có «Thầy đang live»",
+      "ten": "M3 · tay nắm ở trên đầu thẻ đội / tên: không đè chữ thẻ, không đè ô kJ, không đè ngọn lửa đội, không đè nút «Gửi»",
+      "dat": true,
+      "them": "{\"tieu\":[66,18,304,58],\"kj\":[314,16,374,60],\"gui\":[410,380,466,464]}"
+    },
+    {
+      "ten": "M3 · chạm tay nắm ⇒ khay xổ từ mép trên xuống, có «Thầy đang live»",
       "dat": true,
       "them": ""
     },
@@ -59,7 +64,7 @@
     {
       "ten": "K1 · em bấm Gửi ⇒ máy em TỰ về bảng live (≤ 200 ms từ cú bấm)",
       "dat": true,
-      "them": "42.9 ms"
+      "them": "24.6 ms"
     },
     {
       "ten": "K6 · vào bảng sau khi gửi: không có viên «Thầy đang live» chớp giữa màn",
@@ -84,17 +89,27 @@
     {
       "ten": "B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)",
       "dat": true,
-      "them": "78 mẫu điểm ảnh có mực trong ô giấy"
+      "them": "71 mẫu điểm ảnh có mực trong ô giấy"
     },
     {
-      "ten": "K4 · bảng live: tay nắm ở MÉP TRÁI; không còn nút nổi nào trên bảng",
+      "ten": "M3 · bảng live: tay nắm giữa MÉP TRÊN, không đè giấy đề, không đè bảng đen; không còn nút nổi nào trên bảng",
       "dat": true,
-      "them": "tay nắm x 2"
+      "them": "viên [399,5,445,12] · giấy [69,23,536,385]"
     },
     {
-      "ten": "K4 · khay mở từ mép trái: mạng · đội + kJ (ô tiếng nằm trong khay khi buổi có tiếng)",
+      "ten": "M3 · khay xổ từ mép trên, nằm gọn trong màn: mạng · tiếng · đội + kJ",
       "dat": true,
-      "them": "Thầy đang im Tiếng Đang tắt Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì "
+      "them": "10–221 px · Thầy đang im Tiếng Đang tắt Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai"
+    },
+    {
+      "ten": "M3 · khổ 667 × 375: tay nắm giữa mép trên, không đè giấy đề / bảng đen",
+      "dat": true,
+      "them": "viên [311,5,357,12] · giấy [5,28,440,365]"
+    },
+    {
+      "ten": "M3 · khổ 1180 × 820: tay nắm giữa mép trên, không đè giấy đề / bảng đen",
+      "dat": true,
+      "them": "viên [567,5,613,12] · giấy [8,120,778,718]"
     },
     {
       "ten": "K2 · trước khi gọi: máy em S2 chưa gửi, còn ở màn làm bài",
@@ -104,7 +119,7 @@
     {
       "ten": "K2 · thầy gọi lên bảng ⇒ máy em chưa gửi vào bảng live NGAY (≤ 200 ms từ tin phòng)",
       "dat": true,
-      "them": "56.1 ms"
+      "them": "26.5 ms"
     },
     {
       "ten": "K2 · không ai gửi hộ đáp án em chọn dở (phòng không có bài của S2)",
@@ -127,9 +142,34 @@
       "them": ""
     },
     {
+      "ten": "M1 · cửa sổ nút Live có dòng chẩn đoán mic (tên mic · luồng · Hz · kênh · ba bộ xử lý · cách mở · mức âm · bộ gửi · máy chủ tiếng)",
+      "dat": true,
+      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng tắt · lọc ồn tắt · tự chỉnh bật · cách mở 1/4 · mức tại mic 100 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật · "
+    },
+    {
+      "ten": "M2 · «Lọc tiếng ồn + khử vọng»: mặc định «Tự động», đang TẮT khi không có đường vọng (giọng trong nhất)",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "M1 · viên Live nêu đúng lý do không có tiếng (ở đây: chưa nối máy chủ tiếng), không còn «Không tiếng» chung chung",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "M1 · vạch mức âm ghi đúng trạng thái: đang live ⇒ «Mức âm đang gửi cho lớp»",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "M2 · thầy ép «Bật» ⇒ mic mở lại với khử vọng + lọc ồn bật (dòng chẩn đoán đổi theo)",
+      "dat": true,
+      "them": "Fake Default Audio Input · luồng đang chạy · 48000 Hz · 1 kênh · khử vọng bật · lọc ồn bật · tự chỉnh bật · cách mở 1/4 · mức tại mic 0 · đang gửi — · chưa gửi · bộ gửi CHƯA cầm mic · máy chủ tiếng CHƯA nối · làm rõ tiếng bật · bộ đo running | bấm=bat"
+    },
+    {
       "ten": "K3 · «Tạm dừng» ⇒ máy em hiện «Thầy tạm dừng live» (≤ 500 ms kể từ lúc bấm)",
       "dat": true,
-      "them": "123 ms"
+      "them": "134 ms"
     },
     {
       "ten": "K3 · viên Live ghi «TẠM DỪNG», cửa sổ đổi thành «Tiếp tục»; phiên live giữ nguyên",
@@ -144,7 +184,7 @@
     {
       "ten": "K3 · «Tiếp tục» ⇒ máy em hết dải dừng (≤ 500 ms), nét viết lúc dừng tới máy em một lượt",
       "dat": true,
-      "them": "127 ms · mực trong ô bảng 0 → 67"
+      "them": "137 ms · mực trong ô bảng 0 → 55"
     },
     {
       "ten": "B2 · thẻ «em rời màn» ghi KIỂU rời (Chromium máy tính không phân biệt được khoá màn ⇒ «thoát app hoặc khoá màn»)",
@@ -154,7 +194,7 @@
     {
       "ten": "Chạm hai lần vào bảng đen ⇒ phóng bảng (ô bảng rộng hơn), có dòng «Chạm hai lần để về toàn cảnh»",
       "dat": true,
-      "them": "244 → 255 px"
+      "them": "233 → 243 px"
     },
     {
       "ten": "Thầy chuyển câu ⇒ máy em về màn câu hỏi để làm (live còn, tay nắm mép trái)",
@@ -164,7 +204,7 @@
     {
       "ten": "K1 · câu thứ hai: gửi xong lại tự về bảng live",
       "dat": true,
-      "them": "13.1 ms"
+      "them": "16.3 ms"
     },
     {
       "ten": "K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», thanh hết gom",

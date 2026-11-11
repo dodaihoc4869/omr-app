@@ -66,6 +66,12 @@
 .lv-nam-hh { position: absolute; left: calc(50% + 30px); top: 2px; width: 34px; height: 34px; margin-top: 0; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); pointer-events: none;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--doi) 28%, transparent), 0 6px 18px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent); }
 .lv-nam-hh svg { width: 20px; height: 20px; }
+/* «Tiếng đang tắt» cạnh tay nắm (bên trái, khay đóng): một chạm là bật. Cao 22 px — nằm gọn trong dải mép trên, vùng chạm nới ra 44 px bằng ::after. */
+.lv .lv-tieng-tat, .lv-phu .lv-tieng-tat { position: absolute; right: calc(50% + 42px); top: var(--lv-at-tren, 0px); height: 22px; min-height: 22px; margin: 0; padding: 0 9px 0 6px; border: 1px solid var(--p-cam); border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;
+  background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); font-family: inherit; font-size: 12px; font-weight: 700; line-height: 1; white-space: nowrap; z-index: 6; pointer-events: auto; cursor: pointer; }
+.lv-tieng-tat::after { content: ""; position: absolute; left: -6px; right: -6px; top: -6px; bottom: -16px; }
+.lv-tieng-tat svg { width: 14px; height: 14px; color: var(--p-cam); }
+.lv-tieng-tat:focus-visible { outline: 3px solid var(--tr-chieu-giay); outline-offset: 2px; }
 
 /* Khay điều khiển: kính mờ tối, xổ từ mép trên xuống (canh theo tay nắm) */
 .lv-khay { position: absolute; left: 50%; top: calc(var(--lv-at-tren, 0px) + 10px); width: 216px; max-height: calc(100% - var(--lv-at-tren, 0px) - 20px); overflow-y: auto; overscroll-behavior: contain; border-radius: 26px; padding: 12px; color: var(--tr-chieu-giay); z-index: 2;

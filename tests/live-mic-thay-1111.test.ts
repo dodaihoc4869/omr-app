@@ -15,7 +15,7 @@ import { datCoLive, liveBat, liveDat, liveSan, liveTat } from '../src/lib/bpu/ph
 // ── Trình duyệt giả ──
 type Rb = { deviceId?: { exact?: string; ideal?: string }; echoCancellation?: boolean; noiseSuppression?: boolean; autoGainControl?: boolean; channelCount?: number }
 class TrackGia {
-  kind = 'audio'; readyState: 'live' | 'ended' = 'live'; muted = false; enabled = true; contentHint = ''
+  kind = 'audio'; readyState: 'live' | 'ended' = 'live'; muted = false; enabled = true; contentHint = ''; thietBi = ''
   onmute: (() => void) | null = null; onunmute: (() => void) | null = null; onended: (() => void) | null = null
   constructor(public label: string, public rb: Rb = {}, public tinHieu: () => number = () => 0.2) {}
   stop() { this.readyState = 'ended' }
@@ -82,7 +82,11 @@ function dungTrinhDuyet() {
       if (!tb) throw Object.assign(new Error('không có'), { name: 'OverconstrainedError' })
       const kq = tb(rb)
       if (kq instanceof Error) throw kq
-      const t = new TrackGia(id === 'default' ? 'Micro máy tính' : `Microphone (${id})`, rb, () => { const v = thietBi[id]?.(rb); return typeof v === 'number' ? v : 0 })
+      // CHROMIUM THẬT (đo 11/11): thiết bị còn một luồng đang mở ⇒ lần mở mới nhận lại ĐÚNG cấu hình xử lý của luồng ấy, bất kể ràng buộc mới.
+      const dangMo = moi.filter((x) => x.readyState === 'live' && x.thietBi === id)[0]
+      const ap: Rb = dangMo ? { ...rb, echoCancellation: dangMo.rb.echoCancellation, noiseSuppression: dangMo.rb.noiseSuppression, autoGainControl: dangMo.rb.autoGainControl } : rb
+      const t = new TrackGia(id === 'default' ? 'Micro máy tính' : `Microphone (${id})`, ap, () => { const v = thietBi[id]?.(ap); return typeof v === 'number' ? v : 0 })
+      t.thietBi = id
       moi.push(t)
       return new LuongGia([t])
     },
@@ -234,6 +238,85 @@ describe('M1a · mic câm: tự nới ràng buộc tới khi có tín hiệu, b�
     expect(b.lt.trangThai().micTinh).toBe('tot')
     expect(mucGui(b)).toBeCloseTo(0.2)
   })
+  it('bộ thu có CỔNG ỒN: đã có tín hiệu rồi ra số 0 tuyệt đối khi thầy ngừng nói ⇒ KHÔNG nới bậc, không báo `im` (không phải lỗi); im liền 20 giây mới mở lại ĐÚNG bậc đang chạy; im 60 giây mới báo `im`; nói lại ⇒ `tot`', async () => {
+    let noi = true
+    thietBi.usb1 = () => (noi ? 0.3 : 0)
+    const b = dung()
+    await b.lt.bat({ mic: 'usb1' })
+    await troi(2000)
+    expect(b.lt.chanDoan()).toMatchObject({ bac: 0, agc: true })
+    noi = false
+    const soGoi = goiGum.length
+    await troi(15000)
+    expect(goiGum.length).toBe(soGoi) // 15 giây im: chưa đụng gì
+    expect(b.lt.trangThai().micTinh).toBe('tot')
+    await troi(8000)
+    expect(goiGum.length).toBe(soGoi + 1) // im liền 20 giây: mở lại, vẫn bậc 0 (giữ tự chỉnh âm lượng)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ deviceId: { exact: 'usb1' }, autoGainControl: true })
+    expect(b.lt.chanDoan().bac).toBe(0)
+    expect(b.lt.trangThai().micTinh).toBe('tot')
+    await troi(45000)
+    expect(b.lt.trangThai().micTinh).toBe('im')
+    expect(b.lt.chanDoan().bac).toBe(0)
+    noi = true
+    await troi(1000)
+    expect(b.lt.trangThai().micTinh).toBe('tot')
+    expect(mucGui(b)).toBeCloseTo(0.3)
+  })
+  it('không xin lọc thì bậc 0 trùng bậc 1 ⇒ mic câm nhảy thẳng sang mic thô (bớt 1,5 giây chờ)', async () => {
+    thietBi.usb1 = (rb) => (rb.autoGainControl ? 0 : 0.25)
+    const b = dung()
+    await b.lt.bat({ mic: 'usb1' })
+    await troi(1800)
+    expect(goiGum.length).toBe(2)
+    expect(goiGum[1]).toMatchObject({ echoCancellation: false, noiseSuppression: false, autoGainControl: false })
+    expect(b.lt.trangThai().micTinh).toBe('tot')
+  })
+  it('bậc đã bị nới vì mic câm: luật tự động KHÔNG xin lọc lại lần hai (không lặp vòng mở mic); thầy BẤM «Bật» ⇒ thử lại từ bậc 0 với khử vọng + lọc ồn', async () => {
+    let hong = true
+    thietBi.usb1 = (rb) => (hong && rb.echoCancellation ? 0 : 0.3)
+    const b = dung()
+    await b.lt.bat({ mic: 'usb1' })
+    b.lt.dat({ tiengLop: true }) // có đường vọng ⇒ tự xin lọc
+    await troi(50)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ echoCancellation: true })
+    await troi(1800) // lọc làm mic câm ⇒ nới bậc
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ echoCancellation: false })
+    expect(b.lt.chanDoan()).toMatchObject({ bac: 1, vong: false })
+    const soGoi = goiGum.length
+    b.bao(); b.bao(); await troi(5000)
+    expect(goiGum.length).toBe(soGoi) // tin phòng tới liên tục cũng không mở lại
+    hong = false
+    b.lt.datLoc('bat'); await troi(50)
+    expect(goiGum.length).toBe(soGoi + 1)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ deviceId: { exact: 'usb1' }, echoCancellation: true, noiseSuppression: true, autoGainControl: true })
+    await troi(3000)
+    expect(b.lt.chanDoan()).toMatchObject({ bac: 0, vong: true, on: true })
+    expect(b.lt.trangThai()).toMatchObject({ micTinh: 'tot', loc: true })
+    expect(mucGui(b)).toBeCloseTo(0.3)
+  })
+  it('MÁY THẬT 11/11: mục «Default - Microphone (BOYALINK)» ra luồng câm, mục đích danh của chính mic ấy có tín hiệu ⇒ thầy để «Mặc định của máy» thì tự mở THẲNG thiết bị thật trùng nhãn, lớp nghe được; dòng chẩn đoán nói rõ', async () => {
+    thietBi.default = () => 0
+    thietBi.usb1 = () => 0.3
+    const b = dung()
+    await b.lt.bat({})
+    expect(goiGum[0]).not.toHaveProperty('deviceId')
+    expect(mucGui(b)).toBe(0)
+    await troi(1800)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ deviceId: { exact: 'usb1' }, echoCancellation: false, noiseSuppression: false, autoGainControl: true }) // chưa phải nới bậc nào
+    expect(moi[0]!.readyState).toBe('ended') // luồng mặc định câm đã thả
+    expect(b.lt.trangThai()).toMatchObject({ micTinh: 'tot', micTen: 'Microphone (usb1)' })
+    expect(mucGui(b)).toBeCloseTo(0.3)
+    expect(b.lt.chanDoan()).toMatchObject({ the: true, bac: 0, gan: true })
+    await troi(10_000)
+    expect(goiGum.length).toBe(2) // đã có tín hiệu ⇒ không mở lại nữa
+    // thầy tự chọn lại «Mặc định của máy» ⇒ thử lại mục mặc định từ đầu
+    thietBi.default = () => 0.2
+    await b.lt.moMic('')
+    await troi(1800)
+    expect(b.lt.chanDoan().the).toBe(false)
+    expect(mucGui(b)).toBeCloseTo(0.2)
+  })
   it('`track.muted` (nút tắt tiếng của mic / hệ điều hành) ⇒ `bi-tat`; hết tắt ⇒ `tot`', async () => {
     const b = dung()
     await b.lt.bat({})
@@ -272,6 +355,28 @@ describe('M1b · AudioContext treo: vạch và «mic đang im» không còn nói
     await troi(0)
     expect(b.boGui().track!.label).toBe('chuoi')
     expect(mucGui(b)).toBeCloseTo(0.2)
+  })
+  it('ĐANG LIVE: vạch mic = tiếng ĐANG GỬI (số đo của bộ gửi), không phải luồng đo tại chỗ — máy thầy có tín hiệu mà chưa nối máy chủ tiếng ⇒ vạch đứng 0 (không báo «có tiếng» giả)', async () => {
+    const b = dung()
+    await b.lt.moMic()
+    expect(b.lt.mucAm()).toBeGreaterThan(0.5) // chưa live: tiếng thầy nói thử (đo tại chỗ)
+    await b.lt.bat({})
+    await troi(2000)
+    expect(b.lt.mucAm()).toBeGreaterThan(0.5)
+    PcGia.ds[PcGia.ds.length - 1]!.connectionState = 'disconnected'
+    await troi(500)
+    expect(b.lt.mucAm()).toBe(0)
+    expect(b.lt.chanDoan()).toMatchObject({ sfu: false })
+    expect(b.lt.chanDoan().muc).toBeGreaterThan(0.5) // tại mic vẫn có tín hiệu — chính là ca «vạch chạy mà em không nghe»
+    PcGia.ds[PcGia.ds.length - 1]!.connectionState = 'connected'
+    // bộ gửi cầm track khác (câm) ⇒ vạch theo bộ gửi
+    const gui = b.boGui(), that = gui.track
+    gui.track = new TrackGia('câm', {}, () => 0)
+    await troi(500); b.lt.mucAm(); await troi(200)
+    expect(b.lt.mucAm()).toBe(0)
+    gui.track = that
+    await troi(500); b.lt.mucAm(); await troi(200)
+    expect(b.lt.mucAm()).toBeGreaterThan(0.5)
   })
   it('bộ đo treo mà mic câm ⇒ vẫn phát hiện được bằng mức âm của bộ gửi và tự nới ràng buộc', async () => {
     ctx.state = 'suspended'

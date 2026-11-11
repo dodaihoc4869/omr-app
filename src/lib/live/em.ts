@@ -89,7 +89,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let amCtx: AudioContext | null = null, doAm: AnalyserNode | null = null, mauAm: Float32Array<ArrayBuffer> | null = null
   let amBan: HTMLAudioElement | null = null, thuBan: RTCRtpReceiver | null = null, banDangKeo = '', henBan: unknown = null
   let midThay: string | null = null, banSo: { goi: number; mucAm: number } = { goi: 0, mucAm: 0 }
-  let okPhien = -1, okDc: boolean | null = null
+  let okPhien = -1, okDc: boolean | null = null, okNghe: boolean | null = null
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, giayLech = false
   /** Nét đang viết đã phát ra lớp vẽ: id → số điểm đã phát. */
@@ -99,7 +99,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   const dat = (o: Partial<TrangThaiLiveEm>): void => {
     let doiTt = false
     for (const k of Object.keys(o) as (keyof TrangThaiLiveEm)[]) if (tt[k] !== o[k]) { (tt as unknown as Record<string, unknown>)[k] = o[k]; doiTt = true }
-    if (doiTt) bao()
+    if (doiTt) { bao(); if ('nghe' in o || 'tieng' in o) baoOk() } // nghe / hết nghe ⇒ báo phòng (thầy thấy «mấy em đang nghe»)
   }
   const but = (sk: SuKienBut): void => { try { tuy.khiBut?.(sk) } catch { /* lớp vẽ lỗi không làm hỏng luồng nhận */ } }
   const dcMo = (): boolean => !!dc && dc.readyState === 'open'
@@ -107,6 +107,8 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   // ── TIẾNG ──
   /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ hạ tiếng thầy còn 25 % (loa máy em kề ngay mic của chính nó: khử vọng của
    *  trình duyệt lọc gần hết, hạ âm lượng bớt phần còn lọt và bớt hú khi có máy khác mở loa gần đó; iPhone không cho trang đổi âm lượng ⇒ ở đó chỉ còn khử vọng). */
+  /** Loa máy em ĐANG PHÁT tiếng thầy thật: có luồng, em không tắt tiếng, trình duyệt không chặn phát, em không rời màn. */
+  const dangNghe = (): boolean => !!am && !!am.srcObject && tt.nghe && tt.tieng === 'co' && !roiMan
   const capNhatTieng = (): void => {
     if (am) { am.muted = !tt.nghe || roiMan; try { am.volume = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? 0.25 : 1 } catch { /* iPhone */ } }
     if (amBan) amBan.muted = !tt.nghe || roiMan
@@ -135,7 +137,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   /** Em bật / tắt nghe tiếng thầy (nút «Tiếng: Đang bật / Đang tắt»). */
   function datTieng(nghe: boolean): void { ngheDat = nghe; dat({ nghe }); capNhatTieng(); if (nghe) { phatTieng(); soatMic() } }
   /** Rời màn (đặc tả 4.7): tiếng NGỪNG trong lúc em ở app khác; về lại nghe tiếp từ hiện tại, không phát bù. */
-  function datRoiMan(roi: boolean): void { roiMan = roi; if (roi) tatMic(); capNhatTieng(); if (!roi) { dem.xoa(); phatTieng(); soatMic() } }
+  function datRoiMan(roi: boolean): void { roiMan = roi; if (roi) tatMic(); capNhatTieng(); baoOk(); if (!roi) { dem.xoa(); phatTieng(); soatMic() } }
 
   // ── SFU ──
   function dongSfu(): void {
@@ -369,10 +371,10 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   /** Báo phòng em đã sẵn sàng xem (để đếm «em xem») + em có DataChannel hay cần điểm qua WebSocket. Gửi lại khi phiên / đường điểm đổi. */
   function baoOk(): void {
     if (!live?.bat || huyRoi) return
-    const coDc = dcMo()
-    if (okPhien === live.phien && okDc === coDc) return
-    okPhien = live.phien; okDc = coDc
-    tuy.kenh.gui({ t: 'live-ok', dc: coDc })
+    const coDc = dcMo(), nghe = dangNghe()
+    if (okPhien === live.phien && okDc === coDc && okNghe === nghe) return
+    okPhien = live.phien; okDc = coDc; okNghe = nghe
+    tuy.kenh.gui({ t: 'live-ok', dc: coDc, nghe })
   }
   function xinBu(): void {
     henBu = null
@@ -535,7 +537,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   }
   /** WebSocket của phòng vừa nối lại ⇒ xin bù sổ nét từ số thứ tự cuối đã có + báo lại `live-ok`. */
   function khiNoiLai(): void {
-    okPhien = -1; okDc = null; choSo = false
+    okPhien = -1; okDc = null; okNghe = null; choSo = false
     if (!live?.duocXem) return
     mt.huyHen(henBu); henBu = null
     xinBu()

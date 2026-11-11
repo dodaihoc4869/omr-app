@@ -139,6 +139,25 @@ describe('K2 · thầy gọi lên bảng ⇒ ép cả lớp vào bảng live, kh
 })
 
 describe('K3 · K4 · tạm dừng + khay mép trái', () => {
+  it('TIẾNG ĐANG TẮT (thầy 11/11: live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết): khay đóng vẫn có nút «Tiếng đang tắt» cạnh tay nắm, MỘT chạm là bật; thầy tạm dừng / buổi chưa có tiếng ⇒ không hiện', async () => {
+    const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0)
+    moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 100); moDapAn(st, T0 + 200, (a, b) => a === b)
+    const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
+    render(<Man token="tok" buoiId="b1" onDong={() => {}} />)
+    await waitFor(() => expect(WsGia.ds.length).toBe(1))
+    const ws = WsGia.ds[0]!, bao = () => ws.nhan(viewEm(st, 'S1'))
+    liveBat(st, T0 + 1000); bao()
+    await waitFor(() => expect(lop('.lv')).toBe(1))
+    expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'tat' }) // em trong lớp, thầy để «Em ở xa»
+    const nut = await screen.findByLabelText('Tiếng thầy đang tắt. Chạm để bật')
+    expect(nut.textContent).toBe('Tiếng đang tắt')
+    liveDat(st, { nghi: true }, T0 + 2000); bao()
+    await waitFor(() => expect(screen.queryByLabelText('Tiếng thầy đang tắt. Chạm để bật')).toBeNull())
+    liveDat(st, { nghi: false }, T0 + 3000); bao()
+    fireEvent.click(await screen.findByLabelText('Tiếng thầy đang tắt. Chạm để bật'))
+    await waitFor(() => expect(screen.queryByLabelText('Tiếng thầy đang tắt. Chạm để bật')).toBeNull()) // đã bật ⇒ nút mất
+    expect(screen.getByLabelText('Tiếng thầy: đang bật. Chạm để tắt')).toBeTruthy() // ô «Tiếng» trong khay cũng đã bật
+  })
   it('thầy tạm dừng ⇒ bảng live ghi «Thầy tạm dừng live» (khay cũng ghi); tiếp tục ⇒ hết; lớp bảng KHÔNG dựng lại (không nháy)', async () => {
     const st = phong(); moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 100); moDapAn(st, T0 + 200, (a, b) => a === b)
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')

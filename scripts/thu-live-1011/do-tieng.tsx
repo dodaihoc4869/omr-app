@@ -134,4 +134,66 @@ const SAU_LOC: CauHinh = { ten: 'sau · chống hú («Tất cả»: bật khử
   return diem
 }
 ;(window as unknown as Record<string, unknown>).__treChuoi = treChuoi
+/** M1c ĐẦU-CUỐI TRÊN CHROMIUM THẬT (thầy 11/11: chọn đích danh mic, vạch máy thầy chạy, bật «Tất cả» mà em vẫn không nghe): thư viện thật của thầy → kết nối
+ *  WebRTC thứ hai đóng vai «SFU + máy em». Các bước: đổi mic TRƯỚC khi bật live → bật live → đổi mic TRONG lúc live → tạm dừng → tiếp tục → đổi chế độ lọc →
+ *  tắt live rồi bật lại. Sau MỖI bước đo Ở PHÍA EM: `inbound-rtp.totalAudioEnergy` phải TĂNG trong ≤ 2 giây (tạm dừng thì phải ĐỨNG YÊN), kèm mức RMS nhận
+ *  được, track bộ gửi đang cầm, mức âm bộ gửi báo, vạch mic của thư viện. */
+;(window as unknown as Record<string, unknown>).__doiMic = async () => {
+  const st = taoPhong({ buoiId: 'do', lop: 'L', nay: Date.now(), ds: [{ sbd: 'S1', ten: 'Em', coMat: true, luc: 1 }] })
+  datCoLive(st, { cho: true, sfu: true }, Date.now())
+  let pc2: RTCPeerConnection | null = null, nhan: MediaStreamTrack | null = null
+  const lt = taoLiveThay({
+    ve: 've', goc: 'https://sfu-gia', loc: 'tu',
+    kenh: { gui: (t) => { if (t.t === 'live-bat') liveBat(st, Date.now()); if (t.t === 'live-tat') liveTat(st, Date.now()); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, Date.now()); if (t.t === 'live-dat') liveDat(st, t as never, Date.now()); if (String(t.t).startsWith('live-')) queueMicrotask(() => lt.nhanTinPhong(viewBang(st))) }, guiNhiPhan: () => undefined },
+    moiTruong: { fetch: (async (u: RequestInfo | URL, o?: RequestInit) => {
+      const b = JSON.parse(String(o?.body ?? '{}')) as { sdp?: string }
+      if (!String(u).endsWith('/noi') || !b.sdp) return new Response(JSON.stringify({ ok: false }))
+      const p = new RTCPeerConnection()
+      p.addEventListener('track', (e) => { nhan = e.track })
+      await p.setRemoteDescription({ type: 'offer', sdp: b.sdp })
+      await p.setLocalDescription(await p.createAnswer())
+      await gomIce(p)
+      pc2 = p
+      return new Response(JSON.stringify({ ok: true, phien: 'p'.repeat(16), sdp: p.localDescription!.sdp }))
+    }) as typeof fetch },
+  })
+  lt.nhanTinPhong(viewBang(st))
+  const ds = (await lt.dsMic()).filter((d) => d.id !== 'default')
+  // KHÔNG tắt tiếng thẻ <audio>: Chromium tính `totalAudioEnergy` SAU âm lượng phát ⇒ thẻ tắt tiếng thì năng lượng luôn 0 dù tiếng vẫn tới.
+  const the = document.createElement('audio'); the.autoplay = true
+  const actx = new AudioContext({ sampleRate: 48000 }); await actx.resume()
+  const song = actx.createAnalyser(); song.fftSize = 2048
+  let dangNoi: MediaStreamTrack | null = null, nguon: MediaStreamAudioSourceNode | null = null
+  /** Như máy em: track tiếng thầy gắn vào <audio> (Chromium chỉ giải mã luồng đang được phát) + bộ đo. */
+  const noiNhan = () => { if (!nhan || nhan === dangNoi) return; dangNoi = nhan; const l = new MediaStream([nhan]); the.srcObject = l; void the.play().catch(() => undefined); try { nguon?.disconnect() } catch { /* chưa nối */ } nguon = actx.createMediaStreamSource(l); nguon.connect(song) }
+  const nangLuong = async (): Promise<number> => { let v = 0; if (pc2) (await pc2.getStats()).forEach((x: Record<string, unknown>) => { if (x.type === 'inbound-rtp' && x.kind === 'audio') v = Number(x.totalAudioEnergy) || 0 }); return v }
+  const m = new Float32Array(song.fftSize), buoc: Record<string, unknown>[] = []
+  /** Đo ngay sau bước `ten`: mấy ms thì năng lượng phía em bắt đầu tăng (null = không tăng trong 2 giây), rồi RMS nhận được trong 1 giây kế. */
+  const do1 = async (ten: string) => {
+    for (let i = 0; i < 40 && !nhan; i++) await ngu(50)
+    noiNhan()
+    const e0 = await nangLuong(), t0 = performance.now()
+    let tang: number | null = null, e1 = e0
+    while (performance.now() - t0 < 2000) { await ngu(100); e1 = await nangLuong(); if (e1 - e0 > 1e-4) { tang = Math.round(performance.now() - t0); break } }
+    let s = 0, n = 0, vach = 0
+    for (const het = performance.now() + 1000; performance.now() < het;) { song.getFloatTimeDomainData(m); for (let i = 0; i < m.length; i++) s += m[i]! * m[i]!; n += m.length; vach = Math.max(vach, lt.mucAm()); await ngu(40) }
+    const cd = lt.chanDoan()
+    buoc.push({ buoc: ten, mic: cd.ten, boGuiCamMic: cd.gan, emNangLuongTangSauMs: tang, nhanRmsDb: Math.round(db(Math.sqrt(s / Math.max(1, n))) * 10) / 10, boGuiBao: cd.mucGui == null ? null : Math.round(cd.mucGui * 100) / 100, vach: Math.round(vach * 100) / 100, vong: cd.vong, bac: cd.bac })
+  }
+  const bat = async () => { const kq = await lt.bat({}); if (!kq.ok) throw new Error(`bật live hỏng: ${kq.lyDo}`) }
+  if (ds[0]) await lt.moMic(ds[0].id) // thầy chọn đích danh một mic TRƯỚC khi bật live
+  await bat(); await do1(`chọn «${ds[0]?.ten ?? 'mặc định'}» trước khi bật live ⇒ bật live`)
+  const moi = ds[ds.length - 1]
+  if (moi && moi !== ds[0]) { await lt.moMic(moi.id); await do1(`đổi sang «${moi.ten}» TRONG lúc live`) }
+  lt.tamDung(true); await ngu(1200); await do1('tạm dừng (phía em phải đứng yên)')
+  lt.tamDung(false); await do1('tiếp tục')
+  lt.datLoc('bat'); await ngu(400); await do1('thầy ép lọc «Bật» (mở lại cùng mic)')
+  lt.datLoc('tu'); await ngu(400); await do1('về «Tự động»')
+  lt.tat(); await ngu(1200); await do1('kết thúc live (phía em phải đứng yên)')
+  await bat(); await do1('bật live lại')
+  lt.tat(); lt.huy()
+  try { (pc2 as RTCPeerConnection | null)?.close() } catch { /* đã đóng */ }
+  await actx.close()
+  return buoc
+}
 document.body.textContent = 'Trang đo tiếng Live — chạy bằng scripts/thu-live-1011/do-tieng.mjs'

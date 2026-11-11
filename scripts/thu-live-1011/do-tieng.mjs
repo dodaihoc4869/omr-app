@@ -6,7 +6,7 @@
 // Đo: (1) quét tần 50 Hz → 20 kHz: dải tần còn lại ở đầu nhận (Hz tại −3 dB / −10 dB so với vùng 300–3000 Hz), tốc độ bit thật, trễ đệm nhận;
 //     (2) giọng nói tổng hợp ở ba mức vào (−35 / −25 / −15 dBFS RMS): mức RMS lúc có tiếng + đỉnh ở đầu nhận (mục tiêu −18 … −14 dBFS, đỉnh không vỡ);
 //     (3) trễ thêm của chuỗi làm rõ tiếng (dựng ngoại tuyến).
-import { existsSync, mkdtempSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { chromium } from 'playwright'
@@ -100,8 +100,9 @@ function daiTan(pho, nguong) {
 }
 
 const ra = { luc: new Date().toISOString(), ghiChu: 'Chromium thật + mic giả đọc tệp WAV; thư viện taoLiveThay thật → kết nối WebRTC thứ hai trong trang (không SFU thật, không trễ mạng). Giọng nói là tín hiệu TỔNG HỢP, không phải người thật.', quetTan: [], giongNoi: [], treChuoiMs: null }
+const CHI_DOI_MIC = process.argv[4] === 'doi-mic' // chỉ chạy bước ③ (nhanh): node … do-tieng.mjs <dist> <tệp số đo> doi-mic
 console.log('① Quét tần 50 Hz → 20 kHz')
-{
+if (!CHI_DOI_MIC) {
   const { kq, tre, goc } = await chay(ghiWav('quet.wav', quetTan()), 11, ['truoc', 'sau', 'sau-loc'])
   ra.treChuoiMs = tre
   ra.phoGoc = goc
@@ -115,14 +116,37 @@ console.log('① Quét tần 50 Hz → 20 kHz')
   console.log(`  trễ thêm của chuỗi làm rõ tiếng: ${tre} ms`)
 }
 console.log('② Giọng nói tổng hợp ở ba mức vào')
-for (const muc of [-35, -25, -15]) {
+for (const muc of CHI_DOI_MIC ? [] : [-35, -25, -15]) {
   const { kq } = await chay(ghiWav(`noi${muc}.wav`, giongNoi(muc)), 9, ['truoc', 'sau'])
   for (const x of kq) {
     ra.giongNoi.push({ mucVaoDb: muc, cauHinh: x.ten, rmsNoiDb: x.rmsNoiDb, rmsDb: x.rmsDb, dinhDb: x.dinhDb, kbps: x.kbps })
     console.log(`  vào ${muc} dBFS · ${x.ten.split(' (')[0]}: RMS lúc có tiếng ${x.rmsNoiDb} dBFS · đỉnh ${x.dinhDb} dBFS · ${x.kbps} kb/s`)
   }
 }
-writeFileSync(RA, JSON.stringify(ra, null, 1) + '\n')
+console.log('③ Đổi mic / tạm dừng / đổi lọc LÚC ĐANG LIVE — đo ở đầu nhận')
+{
+  const wav = ghiWav('noi-doi.wav', giongNoi(-25))
+  const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSync(exe).isFile() ? exe : undefined, args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-audio-capture=${wav}`, '--autoplay-policy=no-user-gesture-required'] })
+  try {
+    const ctx = await trinh.newContext({ permissions: ['microphone'] })
+    await ctx.route((u) => !u.href.startsWith(may.goc), (r) => r.abort())
+    const t = await ctx.newPage()
+    await t.goto(`${may.goc}/scripts/thu-live-1011/do-tieng.html`)
+    await t.waitForFunction(() => typeof window.__doiMic === 'function', null, { timeout: 15000 })
+    ra.doiMic = await t.evaluate(() => window.__doiMic())
+    let hong = 0
+    for (const b of ra.doiMic) {
+      const lang = /đứng yên/.test(b.buoc), dat = lang ? b.emNangLuongTangSauMs == null : b.emNangLuongTangSauMs != null && b.emNangLuongTangSauMs <= 2000
+      if (!dat) hong += 1
+      console.log(`  ${dat ? '✓' : '✗'} ${b.buoc}: năng lượng phía em ${b.emNangLuongTangSauMs == null ? 'KHÔNG tăng trong 2 giây' : `tăng sau ${b.emNangLuongTangSauMs} ms`} · đầu nhận ${b.nhanRmsDb} dBFS · mic «${b.mic}» · bộ gửi ${b.boGuiCamMic ? 'cầm mic' : 'KHÔNG cầm mic'} · bộ gửi báo ${b.boGuiBao} · vạch ${b.vach} · khử vọng ${b.vong} · bậc ${b.bac}`)
+    }
+    ra.doiMicDat = hong === 0
+    if (hong) process.exitCode = 1
+  } finally { await trinh.close() }
+}
+// chỉ chạy bước ③ ⇒ giữ số đo ① ② đã có trong tệp, chỉ thay phần `doiMic`
+const ghi = CHI_DOI_MIC && existsSync(RA) ? { ...JSON.parse(readFileSync(RA, 'utf8')), doiMic: ra.doiMic, doiMicDat: ra.doiMicDat, lucDoiMic: ra.luc } : ra
+writeFileSync(RA, JSON.stringify(ghi, null, 1) + '\n')
 console.log(`\nĐã ghi ${RA}`)
 await may.dong()
-process.exit(0)
+process.exit(process.exitCode ?? 0)

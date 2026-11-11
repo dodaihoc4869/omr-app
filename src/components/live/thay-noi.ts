@@ -18,6 +18,8 @@ export interface TtLiveTo {
   pha: 'tat' | 'dang-bat' | 'live'
   tu: number | null
   xem: number
+  /** Số em đang NGHE tiếng thầy qua máy (máy em báo loa đang phát thật). */
+  nghe: number
   tong: number
   lop: string
   /** Worker đã có khoá tiếng (SFU). Chưa ⇒ live chỉ có hình. */
@@ -132,7 +134,7 @@ function trangThai(): TtLiveTo {
   const micLoi = ml && micLoiThay && Date.now() - micLoiThay.luc < 15_000 ? em(ml.sbd).ten : ''
   return {
     co: !!l && (!!p || live), pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
-    xem: ttLt?.xem ?? l?.xem ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
+    xem: ttLt?.xem ?? l?.xem ?? 0, nghe: ttLt?.xemNghe ?? l?.nghe ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
     coTieng: l?.tieng !== 'chua-cau-hinh', khongTieng: ttLt?.tieng === 'khong' || ttLt?.tieng === 'loi', micIm: !!ttLt?.micIm,
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
     bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm,
@@ -191,7 +193,7 @@ export function dongChanDoan(): string {
   if (!c) return ''
   const bt = (v: boolean | null) => (v == null ? '?' : v ? 'bật' : 'tắt'), pt = (v: number | null) => (v == null ? '—' : String(Math.round(v * 100)))
   const track = { live: 'đang chạy', muted: 'BỊ TẮT TIẾNG', ended: 'ĐÃ NGẮT', tat: 'thầy đang tắt tiếng', khong: 'chưa mở' }[c.track]
-  return [c.ten || 'chưa có mic', `luồng ${track}`, `${c.hz ?? '?'} Hz · ${c.kenh ?? '?'} kênh`, `khử vọng ${bt(c.vong)} · lọc ồn ${bt(c.on)} · tự chỉnh ${bt(c.agc)}`, `cách mở ${c.bac + 1}/4`,
+  return [(c.ten || 'chưa có mic') + (c.the ? ' (mục mặc định của máy câm ⇒ đang mở thẳng mic này)' : ''), `luồng ${track}`, `${c.hz ?? '?'} Hz · ${c.kenh ?? '?'} kênh`, `khử vọng ${bt(c.vong)} · lọc ồn ${bt(c.on)} · tự chỉnh ${bt(c.agc)}`, `cách mở ${c.bac + 1}/4`,
     `mức tại mic ${pt(c.muc)} · đang gửi ${pt(c.mucGui)}`, c.kbps == null ? 'chưa gửi' : `${c.kbps} kb/s`, c.gan ? 'bộ gửi cầm mic' : 'bộ gửi CHƯA cầm mic', c.sfu ? 'máy chủ tiếng đã nối' : 'máy chủ tiếng CHƯA nối',
     `làm rõ tiếng ${c.chuoi ? 'bật' : 'tắt'}`, `bộ đo ${c.ctx}`].join(' · ')
 }

@@ -153,12 +153,14 @@ interface PropsKhay {
   namX: MutableRefObject<number>
   lopNam?: string
   huyHieu?: ReactNode
+  /** Nút nổi cạnh tay nắm khi khay đóng (vd. «Tiếng đang tắt» — một chạm là bật). */
+  kem?: ReactNode
   children: ReactNode
 }
 /** TAY NẮM + KHAY ở MÉP TRÊN (thầy 11/11 lần 2: «thanh ẩn trên app hs chuyển lên mép trên đầu của phần thẻ tên»): viên thuốc nằm ngang giữa mép trên; chạm ⇒
  *  khay xổ từ trên xuống; vuốt xuống từ tay nắm ⇒ khay bám ngón tay; chạm ngoài / 3 giây không chạm ⇒ thu. Kéo ngang ⇒ dời tay nắm dọc mép trên.
  *  Dùng cho cả bảng live lẫn màn câu hỏi. */
-function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, children }: PropsKhay) {
+function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, kem, children }: PropsKhay) {
   const khayTrong = useRef<HTMLDivElement | null>(null)
   const khay = khayRef ?? khayTrong
   const henThu = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
@@ -202,6 +204,7 @@ function Khay({ mo, datMo, xoay, rong, namRef, khayRef, namX, lopNam, huyHieu, c
     <>
       <button ref={namRef} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'} aria-expanded={mo}
         onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}><i />{mo ? null : huyHieu}</button>
+      {mo ? null : kem}
       <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={hoanThu}>{children}</div>
     </>
   )
@@ -289,6 +292,10 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const tayDuoc = !micMo && !duocMoi && tt.mic !== 'xin-quyen'
   const huyHieu = micMo ? <b className="lv-nam-hh mic" aria-label="Mic của em đang bật"><BtMic /></b>
     : tt.tay ? <b className="lv-nam-hh" aria-label={`Em đang giơ tay, thứ ${tt.hangTay ?? ''} trong hàng`}><BtTay /></b> : null
+  /** TIẾNG ĐANG TẮT (thầy 11/11: thầy live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết): khay đóng vẫn thấy rõ, MỘT chạm là bật.
+   *  Trình duyệt chặn phát ⇒ cùng nút ấy «Chạm để nghe thầy». */
+  const nutTieng = tt.bat && !tt.nghi && tt.tieng !== 'chua-cau-hinh' && (!nghe || tt.tieng === 'bi-chan')
+    ? <button type="button" className="lv-tieng-tat" aria-label={nghe ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : 'Tiếng thầy đang tắt. Chạm để bật'} onClick={() => { le.current?.datTieng(true); void le.current?.moKhoaTieng() }}><BtLoaTat />{nghe ? 'Chạm để nghe thầy' : 'Tiếng đang tắt'}</button> : null
   /** Các dòng của khay — dùng chung cho bảng live và màn câu hỏi. `dau` = dòng đầu (bảng live: sóng «Thầy đang nói» + vạch mạng). */
   const dongKhay = (dau: ReactNode) => (
     <>
@@ -313,7 +320,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   )
   if (che === 'dau') return (
     <div className="lv-phu lv-dau" role="group" aria-label="Thầy đang live" style={{ ...(MAU_CHIEU as CSSProperties), ...(doi ? {} : { ['--doi' as string]: 'var(--tr-chieu-giay)' }) }}>
-      <Khay mo={moDau} datMo={setMoDau} rong={() => window.innerWidth} namX={namXDau} lopNam={`de song${micMo ? ' noi' : ''}`} huyHieu={huyHieu}>
+      <Khay mo={moDau} datMo={setMoDau} rong={() => window.innerWidth} namX={namXDau} lopNam={`de song${micMo ? ' noi' : ''}`} huyHieu={huyHieu} kem={nutTieng}>
         {dongKhay(<span>{tt.banNoi ? `Bạn ${tenNgan(tt.banNoi.ten)} đang nói` : 'Thầy đang live'}</span>)}
       </Khay>
       {tamMoi ?? (tt.mic === 'tu-choi' ? <BaoTam ms={8000}>Máy em chưa cho dùng mic. Em mở Cài đặt của trình duyệt để cho phép, hoặc phát biểu sau.</BaoTam>
@@ -321,17 +328,17 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     </div>
   )
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} huyHieu={huyHieu} dongKhay={dongKhay} ghi={!!view.ghi} />
+    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} huyHieu={huyHieu} nutTieng={nutTieng} dongKhay={dongKhay} ghi={!!view.ghi} />
 }
 
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
-  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; luot: ReactNode; coDoi: boolean; huyHieu: ReactNode
+  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; luot: ReactNode; coDoi: boolean; huyHieu: ReactNode; nutTieng: ReactNode
   dongKhay: (dau: ReactNode) => ReactNode; ghi?: boolean }
 interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; namDe: boolean; kc: KhungChieu; giayToi: boolean; tren: number }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, luot, coDoi, huyHieu, dongKhay, ghi }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, luot, coDoi, huyHieu, nutTieng, dongKhay, ghi }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
@@ -504,7 +511,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
         : tt.mic === 'tu-choi' || tt.mic === 'loi' ? <div className="lv-bao nho duoi" role="status">{tt.mic === 'tu-choi' ? 'Máy em chưa cho dùng mic. Em mở Cài đặt của trình duyệt để cho phép, hoặc phát biểu sau.' : 'Chưa bật được mic · em nói to cho thầy nghe'}</div>
         : banNoi && !phongTo && !luot ? <div ref={daiBan} className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}
       <Khay mo={mo} datMo={setMo} xoay={() => !!bcRef.current?.xoay} rong={() => bcRef.current?.w ?? window.innerWidth} namRef={nam} khayRef={khay} namX={namX}
-        lopNam={`${bc?.namDe ? 'de' : ''}${(thayNoi && nghe) || micMo ? ' noi' : ''}`} huyHieu={huyHieu}>
+        lopNam={`${bc?.namDe ? 'de' : ''}${(thayNoi && nghe) || micMo ? ' noi' : ''}`} huyHieu={huyHieu} kem={nutTieng}>
         {dongKhay(<>{thayNoi ? <><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><span>Thầy đang nói</span></> : <span>Thầy đang im</span>}<Vach n={matMang ? 0 : mang} /></>)}
       </Khay>
     </div>

@@ -186,6 +186,13 @@ describe('B2 + đợt 2 trên màn chiếu', () => {
     expect(t.cot().textContent).toContain('đã mời · chờ em bật mic')
     expect(t.cot().textContent).toContain('Nguyễn Thị Hà: chưa bật được mic')
   })
+  it('viên Live đếm cả số em ĐANG NGHE cạnh số em xem; cửa sổ nói rõ hậu quả của «Em ở xa» (máy em trong lớp đang tắt tiếng)', () => {
+    expect(JS_LIVE_TO_CHIEU).toContain("'</b><small> em nghe</small></span>'")
+    expect(JS_LIVE_TO_CHIEU).toContain("(t.xem && !t.nghe ? 'im' : '')") // có em xem mà 0 em nghe ⇒ tô cảnh báo
+    expect(JS_LIVE_TO_CHIEU).toContain('Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe')
+    expect(JS_LIVE_TO_CHIEU).toContain("'</b> em đang nghe qua máy'")
+    expect(JS_LIVE_TO_CHIEU).not.toContain('Em trong lớp nghe thầy trực tiếp')
+  })
   it('công tắc «Cho em ở xa vào xem» chỉ hiện khi giao diện đợt 2 mở (`dot2`)', () => {
     const t = dungTo(), the = { ds: [], chon: '', loi: '', tiengLop: false, xa: false }
     t.bom({ ...NEN, the })
