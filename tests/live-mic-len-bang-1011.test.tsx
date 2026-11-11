@@ -1,6 +1,5 @@
-// LIVE BẢNG — MIC CỦA EM ĐƯỢC GỌI LÊN BẢNG (đặc tả mục 4.3c). 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): mic TẮT SẴN, em chạm mới bật
-// (trước: thầy 10/11 «tự động bật mic cho bạn lên bảng»). Lớp bảng live thật (LopLive) với thư viện
-// live GIẢ (điều khiển được trạng thái `mic`, `duocMoMic`, `banNoi`). Khoá: phòng cho phép ⇒ khay tự mở, em chạm dòng «Mic của em» mới gọi `batMicLenBang`; thẻ «Mic của em đang bật» LUÔN HIỆN
+// LIVE BẢNG — EM ĐƯỢC GỌI LÊN BẢNG: MIC TỰ BẬT (thầy 10/11 «tự động bật mic cho bạn lên bảng»; đặc tả mục 4.3c). Lớp bảng live thật (LopLive) với thư viện
+// live GIẢ (điều khiển được trạng thái `mic`, `duocMoMic`, `banNoi`). Khoá: phòng cho phép ⇒ tự gọi `batMicLenBang`; thẻ «Mic của em đang bật» LUÔN HIỆN
 // khi mic mở, có «Tắt mic»; em tự tắt ⇒ không tự bật lại, còn «Bật mic lại»; bị từ chối quyền ⇒ báo nhẹ kèm cách bật; máy khác ⇒ «Bạn … đang nói»;
 // hộp hỏi quyền mic đang hiện ⇒ bộ bắt rời màn coi như đang xin quyền (không báo «cửa sổ nổi»).
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
@@ -34,14 +33,6 @@ async function dung() {
   render(<LopLive ve="ve" goc="https://may-chu" guiTho={() => {}} dangKy={dangKy} view={view} che="bang" de={null} khoaDe="q1" doi={{ ten: 'Đội Kali', ky: 'K', kj: 120 }} matMang={false} roi={false} />)
   await waitFor(() => expect(document.querySelector('.lv')).toBeTruthy())
 }
-/** Trạng thái nền của tệp này là tiếng đang tắt (`nghe: false`) ⇒ khay tự mở giới thiệu nút «Tiếng» lúc vào (một lần mỗi buổi). Chờ nó mở rồi cho em chạm ra
- *  ngoài để thu — các ca dưới đo đúng lần khay tự mở VÌ MIC, sau khi lượt giới thiệu tiếng đã dùng xong. */
-async function thuKhayDau() {
-  const mo = () => !!document.querySelector('.lv-khay[data-mo]')
-  await waitFor(() => expect(mo()).toBe(true))
-  fireEvent.pointerDown(document.body)
-  await waitFor(() => expect(mo()).toBe(false))
-}
 beforeEach(() => { goi.length = 0; choQuyen = false; _datLaiTatMan() })
 afterEach(() => { _datLaiTatMan() })
 
@@ -49,24 +40,12 @@ describe('mic của em lên bảng', () => {
   // 11/11 (thầy «ô tắt mở tiếng ẩn hết vào thanh»): mic của em lên bảng điều khiển TRONG khay (dòng «Mic của em · Đang bật / Đang tắt»), tay nắm mang huy hiệu
   // mic khi mic đang mở — không còn thẻ / nút nổi riêng trên bảng.
   // 11/11 LẦN 3 (thầy: «Chuyển mic, tắt tiếng, thanh ẩn sang hẳn góc phải … thiết kế ẩn hết vào thanh ẩn»): huy hiệu mic tròn nổi ⇒ DẤU mic rất nhỏ ngay trên tay nắm.
-  // 11/11 LẦN 4 (thầy: «Tự động bật tiếng, tự động tắt mic cho hs khi vào live»): em được gọi lên bảng mic KHÔNG còn tự bật — mic TẮT SẴN, khay tự mở vài
-  // giây cho em thấy dòng «Mic của em · Đang tắt», em CHẠM dòng ấy mới gọi `batMicLenBang` (rồi cơ chế thử lại 1,5 giây cũ chạy).
-  it('phòng cho phép ⇒ mic KHÔNG tự bật (tắt sẵn), khay tự mở có dòng «Mic của em · Đang tắt»; em chạm dòng ấy mới bật ⇒ «Đang bật» + huy hiệu mic trên tay nắm; em tắt ⇒ không tự bật lại, bấm dòng ấy để bật lại; hết lượt gọi ⇒ sạch', async () => {
+  it('phòng cho phép ⇒ mic TỰ BẬT; khay có dòng «Mic của em · Đang bật» + huy hiệu mic trên tay nắm; em tắt ⇒ không tự bật lại, bấm dòng ấy để bật lại; hết lượt gọi ⇒ sạch', async () => {
     await dung()
     expect(goi).toEqual([])
-    const nutMic = () => document.querySelector<HTMLButtonElement>('.lv-khay .lv-vua.mic')
-    const khayMo = () => !!document.querySelector('.lv-khay[data-mo]')
-    await thuKhayDau()
     dat({ duocMoMic: true })
-    await waitFor(() => expect(khayMo()).toBe(true)) // khay tự mở cho em thấy dòng mic
-    expect(nutMic()!.textContent).toContain('Mic của em'); expect(nutMic()!.textContent).toContain('Đang tắt')
-    expect(nutMic()!.getAttribute('aria-pressed')).toBe('false')
-    expect(nutMic()!.getAttribute('aria-label')).toBe('Mic của em: đang tắt. Chạm để bật mic')
-    await act(async () => { await new Promise((r) => setTimeout(r, 1700)) }) // quá một nhịp thử lại: vẫn KHÔNG tự bật
-    expect(goi).toEqual([])
-    expect(document.querySelector('.lv-nam .lv-nam-dau [data-dau="mic"]')).toBeNull()
-    fireEvent.click(nutMic()!) // em chạm ⇒ mới bật
     await waitFor(() => expect(goi).toContain('bat'))
+    const nutMic = () => document.querySelector<HTMLButtonElement>('.lv-khay .lv-vua.mic')
     dat({ mic: 'xin-quyen' })
     expect(nutMic()!.textContent).toContain('Đang bật…')
     dat({ mic: 'dang-phat' })
@@ -80,7 +59,7 @@ describe('mic của em lên bảng', () => {
     const soBat = goi.filter((x) => x === 'bat').length
     fireEvent.click(nutMic()!)
     expect(goi).toContain('tat')
-    await waitFor(() => expect(nutMic()!.getAttribute('aria-label')).toContain('Chạm để bật mic'))
+    await waitFor(() => expect(nutMic()!.getAttribute('aria-label')).toContain('bật mic lại'))
     expect(document.querySelector('.lv-nam .lv-nam-dau [data-dau="mic"]')).toBeNull()
     await act(async () => { await new Promise((r) => setTimeout(r, 1700)) }) // quá một nhịp thử lại: KHÔNG tự bật lại
     expect(goi.filter((x) => x === 'bat').length).toBe(soBat)
@@ -91,47 +70,9 @@ describe('mic của em lên bảng', () => {
     await waitFor(() => expect(nutMic()).toBeNull())
   })
 
-  // TEST MỚI 11/11 lần 4 — khoá: khay chỉ tự mở MỘT lần mỗi lượt gọi (không mở lặp), lượt gọi mới mic lại TẮT SẴN dù lượt trước em đã bật.
-  it('khay tự mở MỘT lần mỗi lượt gọi (em thu khay ⇒ không tự mở lại); lượt gọi mới ⇒ mic lại tắt sẵn, không tự bật, khay lại tự mở', async () => {
-    await dung()
-    const nutMic = () => document.querySelector<HTMLButtonElement>('.lv-khay .lv-vua.mic')
-    const khayMo = () => !!document.querySelector('.lv-khay[data-mo]')
-    await thuKhayDau()
-    dat({ duocMoMic: true })
-    await waitFor(() => expect(khayMo()).toBe(true))
-    fireEvent.pointerDown(document.body) // em chạm ra ngoài ⇒ khay thu
-    await waitFor(() => expect(khayMo()).toBe(false))
-    dat({ tay: false }); dat({ banNoi: null }); dat({ duocMoMic: true }) // trạng thái đổi lặt vặt trong cùng lượt gọi
-    await act(async () => { await new Promise((r) => setTimeout(r, 200)) })
-    expect(khayMo()).toBe(false) // không mở lặp
-    expect(goi).toEqual([])
-    // em mở khay, chạm «Mic của em» ⇒ bật
-    fireEvent.click(nutMic()!)
-    await waitFor(() => expect(goi.filter((x) => x === 'bat').length).toBe(1))
-    dat({ mic: 'dang-phat' })
-    // hết lượt gọi (thư viện tự thả mic) rồi thầy gọi em lượt MỚI
-    dat({ duocMoMic: false, mic: 'tat' })
-    await waitFor(() => expect(nutMic()).toBeNull())
-    dat({ duocMoMic: true })
-    await waitFor(() => expect(khayMo()).toBe(true)) // lượt mới ⇒ khay lại tự mở
-    expect(nutMic()!.textContent).toContain('Đang tắt')
-    await act(async () => { await new Promise((r) => setTimeout(r, 1700)) })
-    expect(goi.filter((x) => x === 'bat').length).toBe(1) // mic lại TẮT SẴN: không tự bật dù lượt trước em đã bật
-    // em được MỜI NÓI (đợt 2) không dùng khay tự mở: có tấm «Thầy mời em nói» riêng
-    dat({ duocMoMic: false }); await waitFor(() => expect(nutMic()).toBeNull())
-    fireEvent.pointerDown(document.body); await waitFor(() => expect(khayMo()).toBe(false))
-    dat({ duocMoMic: true, duocMoi: true })
-    await act(async () => { await new Promise((r) => setTimeout(r, 200)) })
-    expect(khayMo()).toBe(false)
-  })
-
   it('bị từ chối quyền mic ⇒ báo nhẹ kèm cách bật, không hỏi lại dồn dập', async () => {
     await dung()
-    dat({ duocMoMic: true })
-    await waitFor(() => expect(document.querySelector('.lv-khay .lv-vua.mic')).toBeTruthy())
-    expect(goi).toEqual([]) // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): em chạm mới xin quyền mic
-    fireEvent.click(document.querySelector('.lv-khay .lv-vua.mic')!)
-    await waitFor(() => expect(goi).toContain('bat'))
+    dat({ duocMoMic: true }); await waitFor(() => expect(goi).toContain('bat'))
     const so = goi.length
     dat({ mic: 'tu-choi' })
     expect(screen.getByText(/Máy em chưa cho dùng mic/)).toBeTruthy()
