@@ -64,7 +64,7 @@ function giongNoi(rmsDb, onDb) {
 // CẤU HÌNH SO SÁNH. «trước» = bản đang sống (#1603): chuỗi hai bộ nén, tự chỉnh âm lượng của trình duyệt bật, Opus 64 kb/s khung 20 ms.
 const O64 = { bitrate: 64000, dtx: false, fec: true, rong: true }
 const TRUOC = { ten: 'trước (#1603): chuỗi nén + AGC trình duyệt, 64 kb/s, khung 20 ms', chuoiKieu: 'nen', agc: true, opus: { ...O64, ptime: 20 } }
-const SAU = { ten: 'SAU (mặc định mới của thư viện)' }
+const SAU = { ten: 'SAU (mặc định của thư viện, lọc ồn riêng tắt)', locOn: 'tat' }
 const KHUNG = { chuoiKieu: 'khung', agc: false }
 const KHUNG_AGC = { chuoiKieu: 'khung', agc: true }
 const DS = {
@@ -112,6 +112,14 @@ if (CHI.includes('sin')) {
     ra.sin[muc] = await chay(ghiWav(`sin${muc}.wav`, sin1k(muc)), DS.sin, 'sin', 6, 7)
     for (const x of ra.sin[muc]) console.log(`  ${x.ten}\n     tại mic: SINAD ${x.sinMic?.sinad} · sau chuỗi: SINAD ${x.sinChuoi?.sinad}, THD ${x.sinChuoi?.thd}, mức ${x.sinChuoi?.mucDb} · NHẬN: SINAD ${x.sinNhan?.sinad}, THD ${x.sinNhan?.thd}, mức ${x.sinNhan?.mucDb} · ${x.kbps} kb/s`)
   }
+}
+if (CHI.includes('on')) {
+  // LỌC ỒN (11/11): giọng −25 dBFS trên nền ồn trắng −35 dBFS (tín / ồn tại mic ≈ 10 dB) qua đường thật — không lọc / lọc của trình duyệt / lọc riêng Vừa / Mạnh
+  const O = { opus: { ...O64, ptime: 20 } }
+  const dsOn = [{ ...O, ten: 'không lọc', locOn: 'tat' }, { ...O, ten: 'lọc ồn + khử vọng của TRÌNH DUYỆT (lọc riêng tắt)', locOn: 'tat', loc: 'bat' }, { ...O, ten: 'lọc riêng «Vừa»', locOn: 'vua' }, { ...O, ten: 'lọc riêng «Mạnh»', locOn: 'manh' }]
+  console.log('④ Giọng nói −25 dBFS trên nền ồn −35 dBFS — lọc ồn')
+  ra.on = await chay(ghiWav('on.wav', giongNoi(-25, -35)), dsOn, 'noi', 20, 8)
+  for (const x of ra.on) console.log(`  ${x.ten}\n     NHẬN: nói ${x.noiNhan.rmsNoiDb} dBFS · đỉnh ${x.noiNhan.dinhDb} · ồn quãng nghỉ ${x.noiNhan.onNghiDb} · tín / ồn ${x.noiNhan.tinTrenOnDb} dB (tại mic ${x.noiMic.tinTrenOnDb}) · «thở» ${x.noiNhan.thoDb} dB · segSNR ${x.noiNhan.segSnrDb} dB · lọc: ${x.mic.locOn} (${x.mic.locOnChay})`)
 }
 if (CHI.includes('noi')) {
   console.log('③ Giọng nói −25 dBFS trên nền ồn −55 dBFS')

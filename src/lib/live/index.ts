@@ -20,6 +20,7 @@
 //   em được gọi lên bảng (`trangThai().duocMoMic`) ⇒ le.batMicLenBang() (hoặc tuỳ chọn `tuBatMic: true`) · le.tatMic() · le.mucAmMic()
 //   bộ bắt rời màn: bỏ qua mất tiêu điểm khi `le.dangChoQuyenMic()` (hộp hỏi quyền mic đang hiện).
 // MÁY THẦY thêm: lt.dat({ bang: true|false }) bật / tắt tay bảng live · lt.thuMic() · lt.datNgheEm(b) · lt.mucAmEm() · trangThai().emNoi / .bang
+export type { MucLocOn } from './chuoi-tieng'
 export { taoLiveThay, type AnhBang, type ChanDoanMic, type CheDoLoc, type KetQuaBat, type LiveThay, type TinhMic, type TrangThaiLiveThay, type TuyChonLiveThay } from './thay'
 export { taoLiveEm, type KetQuaMicEm, type KhungLiveEm, type LiveEm, type TrangThaiLiveEm, type TuyChonLiveEm } from './em'
 export type { KenhPhong, MoiTruongLive, TuyChonOpus } from './sfu'

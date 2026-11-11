@@ -418,6 +418,8 @@ export default defineConfig({
           // (nạp khi bấm nút Live ở Hôm nay) ⇒ kho chạy-lúc; tệp wasm KHÔNG BAO GIỜ vào precache.
           '**/may-ghi-*.js',
           '**/mp3-*.wasm',
+          // LỌC ỒN CỦA LIVE (11/11): bộ lọc RNNoise của máy thầy tải sau khi bật live (src/lib/live/chuoi-tieng.ts) ⇒ không vào precache.
+          '**/rnnoise-*.wasm',
           '**/LichSuLive-*.{js,css}',
           '**/lich-su-live-api-*.js',
           '**/xem-lai-ten-*.js',
