@@ -828,7 +828,7 @@ async function startGoi7Thuc(env: Env, sbd: string, now: number, gsSom?: Promise
   const refs: RefGoi7[] = [], questions: Record<string,unknown>[] = [], riengQ: PrivateQuestion[] = []
   const kiemHoiThay = new Set(lap.hs.hoiThayDenHan ?? [])
   const satHan = !(await duoSom) || lap.goi.some(g => g.quota > g.gapNgay.size && soNgayCon7(ngayVn7(now), g.han) <= 1) // cờ tắt ⇒ giữ thứ tự cũ
-  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem])]
+  const lanThu: (() => readonly (ViecGoi7 | RefGoi7)[])[] = [...(viec.length ? [() => viec] : []), () => xepBai6(lap.plan.viec, lap.pDung, { giuThuTu: satHan }), ...(lap.daLamNgay < lap.toiThieu ? [lap.duPhong] : [lap.hocThem, lap.duPhong])]
   const cauGoi = new Map(lap.goi.flatMap(g=>g.cau).map(c=>[c.qid,c] as const).reverse())
   // Chặng theo ranh 6 câu; chặng cuối của mức chỉ phần còn lại (mức 28 = 4 × 6 + 4). Đã đủ mức ⇒ «Học thêm câu mới» luôn đủ MỘT chặng 6 câu (luật 29/10;
   // 09/11 mức cố định 28: 28 % 6 = 4 từng làm chặng học thêm chỉ còn 2 câu).

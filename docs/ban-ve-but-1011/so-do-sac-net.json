@@ -1,0 +1,467 @@
+{
+  "luc": "2026-11-11T02:51:15.739Z",
+  "may": "Chromium không đầu /opt/pw-browsers (vẽ bằng phần mềm); ảnh chụp màn thật theo điểm ảnh thiết bị; nét cỡ 1,7 màu phấn trắng trên bảng đen",
+  "donVi": "điểm ảnh thật",
+  "ketQua": [
+    {
+      "ban": "cu",
+      "matDo": 1,
+      "kho": "1280 × 720",
+      "canvas": [
+        {
+          "nen": [
+            1280,
+            720
+          ],
+          "hien": [
+            1280,
+            720
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 1.223,
+          "goMep": 0.0848,
+          "goBeRong": 0.0327,
+          "docMep": 0.484,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 19.3
+        },
+        "song": {
+          "beRongTrungBinh": 1.219,
+          "goMep": 0.0593,
+          "goBeRong": 0.0646,
+          "docMep": 0.496,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 12.9
+        },
+        "luc": {
+          "beRongTrungBinh": 1.208,
+          "goMep": 0.0609,
+          "goBeRong": 0.0722,
+          "docMep": 0.477,
+          "bacXam": 55,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "cu",
+      "matDo": 1.25,
+      "kho": "1537 × 749",
+      "canvas": [
+        {
+          "nen": [
+            1921,
+            936
+          ],
+          "hien": [
+            1921.25,
+            936.25
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 1.585,
+          "goMep": 0.0777,
+          "goBeRong": 0.077,
+          "docMep": 0.485,
+          "bacXam": 56,
+          "dutHat": 0,
+          "sangKhongDeu": 9.8
+        },
+        "song": {
+          "beRongTrungBinh": 1.585,
+          "goMep": 0.1941,
+          "goBeRong": 0.0822,
+          "docMep": 0.484,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 8.2
+        },
+        "luc": {
+          "beRongTrungBinh": 1.561,
+          "goMep": 0.0527,
+          "goBeRong": 0.0612,
+          "docMep": 0.493,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "cu",
+      "matDo": 1.5,
+      "kho": "1281 × 721",
+      "canvas": [
+        {
+          "nen": [
+            1922,
+            1082
+          ],
+          "hien": [
+            1921.5,
+            1081.5
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 1.834,
+          "goMep": 0.0681,
+          "goBeRong": 0.0748,
+          "docMep": 0.483,
+          "bacXam": 57,
+          "dutHat": 0,
+          "sangKhongDeu": 11.8
+        },
+        "song": {
+          "beRongTrungBinh": 1.835,
+          "goMep": 0.0589,
+          "goBeRong": 0.0719,
+          "docMep": 0.477,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 7.1
+        },
+        "luc": {
+          "beRongTrungBinh": 1.852,
+          "goMep": 0.0465,
+          "goBeRong": 0.057,
+          "docMep": 0.494,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "cu",
+      "matDo": 2,
+      "kho": "1280 × 720",
+      "canvas": [
+        {
+          "nen": [
+            2560,
+            1440
+          ],
+          "hien": [
+            2560,
+            1440
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 2.445,
+          "goMep": 0.0744,
+          "goBeRong": 0.0267,
+          "docMep": 0.491,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 6.6
+        },
+        "song": {
+          "beRongTrungBinh": 2.423,
+          "goMep": 0.066,
+          "goBeRong": 0.0694,
+          "docMep": 0.481,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 4.5
+        },
+        "luc": {
+          "beRongTrungBinh": 2.424,
+          "goMep": 0.0558,
+          "goBeRong": 0.0948,
+          "docMep": 0.491,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "cu",
+      "matDo": 3,
+      "kho": "1280 × 720",
+      "canvas": [
+        {
+          "nen": [
+            3840,
+            2160
+          ],
+          "hien": [
+            3840,
+            2160
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 3.656,
+          "goMep": 0.0796,
+          "goBeRong": 0.0383,
+          "docMep": 0.491,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 4.9
+        },
+        "song": {
+          "beRongTrungBinh": 3.657,
+          "goMep": 0.0663,
+          "goBeRong": 0.0744,
+          "docMep": 0.478,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 3.3
+        },
+        "luc": {
+          "beRongTrungBinh": 3.611,
+          "goMep": 0.0318,
+          "goBeRong": 0.0532,
+          "docMep": 0.499,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "moi",
+      "matDo": 1,
+      "kho": "1280 × 720",
+      "canvas": [
+        {
+          "nen": [
+            1280,
+            720
+          ],
+          "hien": [
+            1280,
+            720
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 1.396,
+          "goMep": 0.1152,
+          "goBeRong": 0.0651,
+          "docMep": 0.454,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 9.8
+        },
+        "song": {
+          "beRongTrungBinh": 1.396,
+          "goMep": 0.0684,
+          "goBeRong": 0.064,
+          "docMep": 0.463,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 8.2
+        },
+        "luc": {
+          "beRongTrungBinh": 1.378,
+          "goMep": 0.0975,
+          "goBeRong": 0.11,
+          "docMep": 0.447,
+          "bacXam": 52,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "moi",
+      "matDo": 1.25,
+      "kho": "1537 × 749",
+      "canvas": [
+        {
+          "nen": [
+            1921,
+            936
+          ],
+          "hien": [
+            1921,
+            936
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 1.759,
+          "goMep": 0.0979,
+          "goBeRong": 0.0858,
+          "docMep": 0.456,
+          "bacXam": 58,
+          "dutHat": 0,
+          "sangKhongDeu": 9.2
+        },
+        "song": {
+          "beRongTrungBinh": 1.758,
+          "goMep": 0.1972,
+          "goBeRong": 0.0912,
+          "docMep": 0.458,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 7.1
+        },
+        "luc": {
+          "beRongTrungBinh": 1.738,
+          "goMep": 0.0825,
+          "goBeRong": 0.0893,
+          "docMep": 0.463,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "moi",
+      "matDo": 1.5,
+      "kho": "1281 × 721",
+      "canvas": [
+        {
+          "nen": [
+            1922,
+            1082
+          ],
+          "hien": [
+            1921.99,
+            1081.99
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 2.007,
+          "goMep": 0.0817,
+          "goBeRong": 0.099,
+          "docMep": 0.454,
+          "bacXam": 58,
+          "dutHat": 0,
+          "sangKhongDeu": 8.2
+        },
+        "song": {
+          "beRongTrungBinh": 2.005,
+          "goMep": 0.0653,
+          "goBeRong": 0.0869,
+          "docMep": 0.448,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 5.1
+        },
+        "luc": {
+          "beRongTrungBinh": 2.029,
+          "goMep": 0.0703,
+          "goBeRong": 0.092,
+          "docMep": 0.464,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "moi",
+      "matDo": 2,
+      "kho": "1280 × 720",
+      "canvas": [
+        {
+          "nen": [
+            2560,
+            1440
+          ],
+          "hien": [
+            2560,
+            1440
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 2.621,
+          "goMep": 0.0945,
+          "goBeRong": 0.0417,
+          "docMep": 0.462,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 6.1
+        },
+        "song": {
+          "beRongTrungBinh": 2.595,
+          "goMep": 0.0726,
+          "goBeRong": 0.0744,
+          "docMep": 0.46,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 4.2
+        },
+        "luc": {
+          "beRongTrungBinh": 2.6,
+          "goMep": 0.0741,
+          "goBeRong": 0.1168,
+          "docMep": 0.463,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    },
+    {
+      "ban": "moi",
+      "matDo": 3,
+      "kho": "1280 × 720",
+      "canvas": [
+        {
+          "nen": [
+            3840,
+            2160
+          ],
+          "hien": [
+            3840,
+            2160
+          ]
+        }
+      ],
+      "net": {
+        "thang": {
+          "beRongTrungBinh": 3.832,
+          "goMep": 0.0928,
+          "goBeRong": 0.0601,
+          "docMep": 0.461,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 4.5
+        },
+        "song": {
+          "beRongTrungBinh": 3.828,
+          "goMep": 0.0713,
+          "goBeRong": 0.0808,
+          "docMep": 0.447,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": 2.7
+        },
+        "luc": {
+          "beRongTrungBinh": 3.79,
+          "goMep": 0.0566,
+          "goBeRong": 0.0927,
+          "docMep": 0.467,
+          "bacXam": 59,
+          "dutHat": 0,
+          "sangKhongDeu": null
+        }
+      }
+    }
+  ]
+}

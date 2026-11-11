@@ -109,6 +109,8 @@ export function docConTongQuan(raw: unknown): ConTongQuan | null {
     goiYDaDung: { so: nguyen(gy.so) ?? 0, tong: nguyen(gy.tong) ?? 0 },
     goiY: goiY.slice(0, 5),
     catBot: raw.catBot === true,
+    // Nợ câu (11/11): giữ THÔ — mảnh lười KhoiNoCauPh đọc chặt (đường mở app không nặng thêm khi con không nợ)
+    ...(laDoiTuong(raw.noCau) ? { noCau: raw.noCau as unknown as NonNullable<KetQuaConTongQuan['noCau']> } : {}),
   }
 }
 

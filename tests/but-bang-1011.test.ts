@@ -330,6 +330,12 @@ function moTo() {
 const netMau: NetBut = { id: 'x1', cong: 'but', mau: 'rgb(255,210,122)', co: 2.3, diem: [[0.7, 0.3, 0.3, 0], [0.75, 0.32, 0.5, 40], [0.8, 0.3, 0.3, 80]] as DiemBut[] }
 
 describe('bút trên tờ chiếu', () => {
+  // 11/11 (thầy: «màn live của thầy hiện bảng đen xì ko hiện đề», máy em bình thường): lớp hiện mực phủ CẢ TỜ không được xin `desynchronized` —
+  // trên card đồ hoạ thật lớp ấy có thể thành lớp phủ đặc, nền đen che giấy đề. Khoá: không canvas nào của bút xin chế độ đó.
+  it('không canvas nào của bút xin vẽ thẳng lên màn (desynchronized) — tránh nền đen che đề trên máy thầy', () => {
+    expect(JS_BUT_BANG).not.toMatch(/nguCanh\(\s*cv[A-Za-z]*\s*,\s*true\s*\)/)
+    expect(JS_BUT_BANG).toContain('nguCanh(cvT, false)')
+  })
   it('B bật bút: hai canvas trên tờ (lớp hiện mực + lớp bắt con trỏ; 11/11 lớp đã chốt và ô nháp nằm ngoài màn), thanh bút có 5 màu · 4 cỡ · tẩy · hoàn tác · làm lại · xoá hết · tắt; mặc định phấn trắng, nét MẢNH (chữ nhỏ không bị nét to át chữ)', () => {
     const t = moTo()
     expect(t.doc.querySelectorAll('canvas.mc-but')).toHaveLength(2)

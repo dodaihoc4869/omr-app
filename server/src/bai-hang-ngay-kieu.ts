@@ -58,6 +58,8 @@ export interface NgayBaiEm {
 }
 
 export interface EmBaiHangNgay {
+  /** Nợ câu hiện tại của em (11/11, no-cau-xem.ts); vắng = không nợ / chưa có sổ nợ. */
+  noCau?: import('./no-cau-xem').NoCauXem
   sbd: string
   hoTen: string
   /** Tên lớp hiệu lực ("12 - Tinh Hoa"; chưa gán ⇒ mặc định theo khối). */

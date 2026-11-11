@@ -206,3 +206,57 @@ npx vitest run tests/but-dong-bo-1111
 ```
 
 Bản cũ: `git archive 50b46004e src | tar -x -C <thư mục>` rồi nối `server/` của repo vào cùng thư mục.
+
+## 8. Lần 2 (11/11, sau khi thầy thử Wacom thật)
+
+Thầy: «Viết đã rất mượt, bạn làm cho nét bút sắc nét và mịn tuyệt đối và tốc độ mượt tức thì hơn nữa, cây bút hiện lên máy học sinh ngắn và nhỏ hơn để ko gây mất tập trung, có hiển thị tay cầm bút giống người viết, nhỏ phù hợp tinh tế đẹp và thân thiện ko bị rối mắt».
+
+Mọi số dưới đây đo trên Chromium không đầu (canvas vẽ bằng phần mềm, không có GPU), KHÔNG phải máy thật. «Trước» ở mục 8.1 = commit 261667b7c (bản đang sống #1601); ở mục 8.2 = commit 50b46004e (bản trước khi làm bút, cùng nền với các mục trên).
+
+### 8.1 Nét sắc + mịn (N1)
+
+Đo: `node scripts/but-bang-1011/do-sac-net.mjs` — ba nét lí tưởng (thẳng nghiêng, sóng, lực đổi dần), cỡ 1,7 màu phấn, chụp màn theo điểm ảnh thiết bị. Số đầy đủ: `docs/ban-ve-but-1011/so-do-sac-net.json`.
+
+Nguyên nhân tìm được:
+
+1. **Nét phấn mảnh sáng không đều dọc nét.** Trình duyệt khử răng cưa theo số độ phủ, mắt thấy theo ánh sáng (độ phủ ^ 2,2): nét rơi đúng một hàng điểm ảnh thì sáng, rơi giữa hai hàng thì mỗi hàng 50–60 % nên tối hẳn — nhìn như hạt. Sửa: màu sáng tô thêm một lượt 55 % cùng đa giác (`LoiBut.buSang`); mực sẫm không bù.
+2. **Cả lớp bị co giãn ở mật độ lẻ.** Canvas đặt cỡ hiện 100vw / 100 % trong khi nền làm tròn theo điểm ảnh ⇒ lệch chưa tới một điểm ảnh, đủ để trình duyệt lấy mẫu lại cả lớp. Sửa: cỡ hiện = cỡ nền / mật độ; máy thầy dựng lại canvas khi mật độ đổi mà cửa sổ không đổi cỡ.
+3. **Máy em kẹp mật độ 2,5 (máy yếu 1,5)** ⇒ điện thoại mật độ 3 bị kéo giãn 1,2 lần. Sửa: dùng mật độ thật tới 3 (máy yếu tới 2).
+
+| Mật độ | Lượng sáng dọc nét lệch (thẳng / sóng) trước | sau | Canvas nền so cỡ hiện trước | sau |
+|---|---|---|---|---|
+| 1 | 19,3 / 12,9 % | 9,8 / 8,2 % | khớp | khớp |
+| 1,25 | 9,8 / 8,2 % | 9,2 / 7,1 % | 1921 × 936 hiện 1921,25 × 936,25 | 1921 × 936 |
+| 1,5 | 11,8 / 7,1 % | 8,2 / 5,1 % | 1922 × 1082 hiện 1921,5 × 1081,5 | 1921,99 × 1081,99 |
+| 2 | 6,6 / 4,5 % | 6,1 / 4,2 % | khớp | khớp |
+| 3 | 4,9 / 3,3 % | 4,5 / 2,7 % | khớp | khớp |
+
+Gồ mép (độ lệch chuẩn của mép so với đường lí tưởng) ở mật độ 1: 0,085 / 0,059 / 0,061 → 0,115 / 0,068 / 0,098 điểm ảnh (cao hơn một chút vì mép đậm lên, vẫn dưới 0,2). Số bậc xám ở mép 55–59 cả hai bản. Nét đứt hạt: 0 cả hai bản. Bề rộng phủ ở mật độ 1: 1,22 → 1,40 điểm ảnh. Ảnh phóng 8 lần: `10-net-x8-{truoc,sau}-dpr{1,2}.jpg`.
+
+Giới hạn: ở mật độ 1 nét 1,7 vẫn còn lệch sáng ~10 % (giới hạn của một hàng điểm ảnh); chưa đo riêng máy em ở mật độ 3 (cùng bộ vẽ, chỉ khác trần mật độ).
+
+### 8.2 Tức thì hơn (N2)
+
+**Máy em** — `node scripts/thu-live-1011/thu-but-1111.mjs` (844 × 390 @2x, phòng thật trong Node, nét đi WebSocket của phòng), cùng một bộ đo cho hai bản:
+
+| | Trước (50b46004e) | Sau |
+|---|---|---|
+| Luồng chính bận, CPU ×1 / ×4 / ×6 | 9,0 / 31,5 / 47,6 % | 7,6 / 26,9 / 38,4 % |
+| Khung hình / giây, ×1 / ×4 / ×6 | 60 / 60 / 60 | 60 / 60 / 60 |
+| Số lần tính lại kiểu trong 5 giây viết | 57–67 | 1–2 |
+| Con trỏ đứng im lúc mực đang chảy | 731 / 747 khung | 11 / 762 khung |
+| Nét ướt khác nét khô | 5 / 5 nét, 70 điểm ảnh | 1 / 5 nét, 16 điểm ảnh (mức khử răng cưa) |
+| Trễ chạm bút → có mực (trung vị / p95) | 70,1 / 81,3 ms | 75,6 / 87,6 ms |
+
+Tìm ra bằng vết Chromium (`VET=1`): mỗi khung hình trình duyệt nộp lại MỌI canvas đang hiện, vẽ hay không; phần đó chiếm gần hết thời gian luồng chính (5,2 giây viết ở CPU ×4: 1552 ms cho ba lớp, 741 ms khi ẩn lớp giấy rỗng). Vì vậy: lớp rỗng thì ẩn; bàn tay dán vào lớp «đang viết» (không thêm lớp, không đụng DOM); bàn tay đứng im thì không vẽ. Đã thử và bỏ: bàn tay là lớp DOM dời bằng `transform` (×4: 51 %), bàn tay trong canvas nhỏ riêng (×4: 45–53 %).
+
+**Chưa đạt:** trễ chạm bút → mực (đo ở ĐẦU nét, đường WebSocket của phòng) 70,1 → 75,6 ms. Đường này thầy gửi 34 ms một lô; độ đệm mới tính theo «độ cần» của lô (~50 ms, bản cũ 36 ms) nên điểm đầu nét hiện muộn hơn ~5 ms. Tính trên CẢ nét thì không chậm hơn: mô phỏng cùng đường này trễ 84,7 → 82,5 ms (máy thầy gửi sớm hơn 16 ms), và khi mạng rung / mất gói bản cũ đứng 65–160 khung, bản mới 34–95 (bảng mục 2, số mới trong `so-do-dem-phat.json`). Không rút độ đệm xuống dưới «độ cần»: nét sẽ khựng lại. Đường chính (DataChannel): sàn độ đệm 30 → 22 ms, mô phỏng mạng sạch trễ 79 (bản cũ) → 63 (lần 1) → 55 ms, 0 khung đứng (`do-dem-phat.mjs`).
+
+**Máy thầy** — không đổi cách vẽ ở lần này (vẫn không dự đoán, mẫu tới khung nào vẽ khung đó, canvas xin `desynchronized`). Thời gian xử lí mỗi khung 0,68 ms ở CPU ×4 giữ nguyên: đo lại thấy `LoiBut.vien` chỉ tốn 7–16 µs một lượt; phần còn lại là việc tô lên nháp rồi chép một lần (giữ cho không nháy) nay nằm trong lượt vẽ thay vì lúc trình duyệt nộp khung. Tổng luồng chính của trang thầy trong cùng buổi đo (1366 × 768, không bóp CPU): 8,9–9,9 % → 7,3–8,3 %. Chưa thử được trên Wacom + GPU thật: lợi ích của `desynchronized` / `pointerrawupdate` không đo được ở Chromium không đầu.
+
+### 8.3 Bàn tay cầm bút (N3)
+
+- Ba phương án, vẽ bằng đúng hàm của app: `10-tay-ba-phuong-an.jpg` (`node scripts/thu-live-1011/chup-tay.mjs`). Chọn **A · bàn tay mềm** (`nam`): đủ ngón trỏ + ngón cái nên ra dáng tay người viết, vẫn một khối gọn. B (`gon`) gọn hơn nhưng giống con trỏ hơn giống tay; C (`vien`) rối ở cỡ nhỏ.
+- Cỡ: bàn tay ≈ 5,5 % bề cao bảng đen (kẹp 15–44 px); trên điện thoại 844 × 390 hình dán cả lề 26,5 × 29,5 px. Cây bút dài 0,75 bề cao bàn tay.
+- Trên máy em: `10-tay-dang-viet-may-em-844.jpg`, phóng to `10-tay-dang-viet-phong-to.jpg`, lơ lửng `10-tay-lo-lung-phong-to.jpg`. Trong trình phát «Xem lại Live»: `10-tay-trong-trinh-phat-844.jpg`.
+- Màu: `--tr-chieu-giay` (tay), `--tr-chieu-bang` (viền, bóng), `--p-cam` (thân bút), ngòi mang màu mực đang viết.

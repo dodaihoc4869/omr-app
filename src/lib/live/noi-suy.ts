@@ -2,7 +2,8 @@
 // Vấn đề: gói điểm tới thưa và không đều (16–50 ms, có dao động, có mất) trong khi màn vẽ 60 khung/giây ⇒ vẽ ngay khi gói tới thì nét giật từng khúc.
 // Cách làm (11/11 làm lại sau khi thầy thử máy thật: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút tức thì mượt mà cực mượt mà»):
 //   · mỗi điểm mang giờ theo ĐỒNG HỒ THẦY; độ lệch đồng hồ = giá trị NHỎ NHẤT của (giờ nhận − tGui) trong ~10 giây gần nhất;
-//   · ĐỘ ĐỆM D = số lớn hơn trong hai số, + 4 ms, kẹp 30–150 ms, mỗi khung đổi tối đa 2 ms:
+//   · ĐỘ ĐỆM D = số lớn hơn trong hai số, + 3 ms, kẹp 22–150 ms (sàn 30 → 22 từ 11/11 lần 2: đồng hồ phát đã biết đứng chờ khi hết điểm nên sàn thấp
+//     không còn gây nhảy cục; mô phỏng đường DataChannel sạch: trễ 63 → 55 ms, 0 khung đứng), mỗi khung đổi tối đa 2 ms:
 //       (a) p95 dao động giờ tới trong 2 giây + KHOẢNG CÁCH LÔ lớn (p90 của ~40 lô gần nhất, không phải trung bình);
 //       (b) p95 của «ĐỘ CẦN» từng lô = (giờ tới − lệch) − giờ của điểm MỚI đầu tiên trong lô: đúng bằng độ đệm ít nhất để điểm đó không tới muộn. Số này gồm
 //           cả phần máy thầy gom lô chậm / bận (điểm sinh ra lâu rồi mới được gửi) — dao động mạng ở (a) không thấy được phần đó;
@@ -79,7 +80,7 @@ const NHAY_MS = 400
 /** Nét dở im lặng quá ngần này (gói cuối + tin nhấc đều mất) ⇒ thôi giữ đồng hồ, bản chốt từ sổ nét sẽ thay. */
 const BO_GIU_MS = 350
 /** Dư an toàn cộng vào D (ms). */
-const DU_MS = 4
+const DU_MS = 3
 
 /** D nét theo trễ tiếng ước lượng (đặc tả 4.4): kẹp(trễ tiếng − 60, D theo dao động, trần). Chưa có số tiếng ⇒ D theo dao động. */
 export function dNetTheoTieng(treTieng: number | null, dJitter: number, tran = 150): number {
@@ -88,7 +89,7 @@ export function dNetTheoTieng(treTieng: number | null, dJitter: number, tran = 1
 }
 
 export function taoDemPhat(tuy: TuyChonDem = {}) {
-  const dMin = tuy.dMin ?? 30, dMax = tuy.dMax ?? 150, buoc = tuy.buoc ?? 2, cuaSo = tuy.cuaSo ?? 2000, them = tuy.mayYeu ? 16 : 0
+  const dMin = tuy.dMin ?? 22, dMax = tuy.dMax ?? 150, buoc = tuy.buoc ?? 2, cuaSo = tuy.cuaSo ?? 2000, them = tuy.mayYeu ? 16 : 0
   const net = new Map<string, NetDem>()
   let troHang: { t: number; x: number; y: number }[] = []
   // Độ cuộn bảng đen của thầy (gói `tro` có x > 1,5): hàng chờ theo giờ gửi + giá trị đã tới mốc phát.

@@ -385,6 +385,10 @@ export default defineConfig({
           '**/LichBaiHs-*.{js,css}', // 10/11 khối B: thẻ Lịch bài (Lộ trình nạp lười) ⇒ ngoài precache, có trong kho tải ngầm KHO_HS_GOC
           '**/ViDuMau-*.{js,css}', // 10/11 khối B lát 6: tấm ví dụ mẫu (nạp khi bấm) ⇒ ngoài precache, có trong kho tải ngầm KHO_HS_GOC
           '**/NhomSuaHomNay-*.{js,css}', // 09/11 khối B lát 3: thẻ Nhóm lỗi hôm nay (chỉ ngày Sửa, Lộ trình nạp lười) ⇒ ngoài precache (giữ 170), có trong kho tải ngầm KHO_HS_GOC
+          // 11/11 nợ câu: thẻ Nợ câu của học sinh (Hôm nay nạp lười, có trong kho tải ngầm KHO_HS_GOC qua TrongHs) + khối nợ câu của phụ huynh — chỉ tải khi em đang nợ
+          // ⇒ ngoài precache (#1604 đỏ: 173 tệp, trần 170).
+          '**/TheNoCau-*.{js,css}',
+          '**/KhoiNoCauPh-*.{js,css}',
           '**/DemNguocThi-*.{js,css}', // 09/11 thẻ đếm ngược ngày thi: ngoài precache (giữ 170); thầy 09/11 «tải hết mọi thứ xuống máy học sinh như hiện tại» ⇒ VÀO lại kho tải ngầm (KHO_HS_GOC)
           '**/be-vietnam-pro-*-500-normal-*.woff2',
           '**/be-vietnam-pro-*-800-normal-*.woff2',

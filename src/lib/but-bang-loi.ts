@@ -85,6 +85,8 @@ export interface LoiBut {
   hop(net: NetBut): number[]
   /** Nét viết trên bảng đen cuộn (mã bắt đầu bằng «b_»)? */
   laBang(net: { id: string }): boolean
+  /** Độ đậm của lượt tô BÙ SÁNG cho màu nét này (0 = không bù: mực sẫm). Nơi vẽ: tô đa giác xong, đặt `globalAlpha` bằng số này rồi tô thêm một lượt. */
+  buSang(mau: string): number
   taoSo(tuy?: { taoId?: (dem: number) => string; gioiHan?: number }): SoBut
   apSuKien(ds: NetBut[], sk: SuKienBut): NetBut[]
 }
@@ -286,6 +288,12 @@ var LoiBut = (function () {
     if (!h) { h = [1e9, 1e9, -1e9, -1e9]; for (i = 0; i < d.length; i++) { h[0] = Math.min(h[0], d[i][0]); h[1] = Math.min(h[1], d[i][1]); h[2] = Math.max(h[2], d[i][0]); h[3] = Math.max(h[3], d[i][1]); } net._h = h; }
     return h;
   }
+` + /* BÙ SÁNG cho nét MÀU SÁNG trên nền tối (11/11, thầy: «nét bút sắc nét và mịn tuyệt đối»). Trình duyệt chống răng cưa theo SỐ độ phủ, mà mắt thấy theo ÁNH SÁNG */ `
+` + /* (độ phủ ^ 2,2): nét phấn mảnh rơi đúng một hàng điểm ảnh thì sáng rõ, rơi giữa hai hàng thì mỗi hàng 50–60 % ⇒ tối hẳn đi — nét lổn nhổn như hạt (đo ở */ `
+` + /* mật độ 1: lượng sáng dọc nét lệch 19 %). Bù: tô thêm MỘT lượt cùng đa giác với độ đậm này ⇒ điểm ảnh mép đậm lên (a → a + 0,55 a (1 − a)), điểm phủ kín giữ nguyên. */ `
+` + /* Mực sẫm (mực xanh trên giấy) không bù. Máy thầy, máy em, trình phát đều hỏi hàm này ⇒ cùng một hình. */ `
+  var BU_SANG = {};
+  function buSang(mau) { var v = BU_SANG[mau], m; if (v == null) { m = /(\\d+)[, ]+(\\d+)[, ]+(\\d+)/.exec(mau); v = BU_SANG[mau] = m && m[1] * 0.3 + m[2] * 0.59 + m[3] * 0.11 > 150 ? 0.55 : 0; } return v; }
   function laBang(net) { return net.id.charCodeAt(0) === 98 && net.id.charCodeAt(1) === 95; }
   function chamNet(net, x, y, r, kh) {
     var d = net.diem, h = hop(net), i, px, py, ax, ay, bx, by, vx, vy, t, rr, mx, my;
@@ -376,7 +384,7 @@ var LoiBut = (function () {
     else if (sk.loai === 'xoa') { for (i = ds.length - 1; i >= 0; i--) if (sk.id.indexOf(ds[i].id) >= 0) ds.splice(i, 1); }
     return ds;
   }
-  return { khung: khung, diem: diem, apLucGia: apLucGia, heSo: heSo, moXuLy: moXuLy, xuLyThem: xuLyThem, mocDong: mocDong, vien: vien, dungNet: dungNet, duongTam: duongTam, duoiTam: duoiTam, veDaGiac: veDaGiac, chamNet: chamNet, timCham: timCham, hop: hop, laBang: laBang, taoSo: taoSo, apSuKien: apSuKien };
+  return { khung: khung, diem: diem, apLucGia: apLucGia, heSo: heSo, moXuLy: moXuLy, xuLyThem: xuLyThem, mocDong: mocDong, vien: vien, dungNet: dungNet, duongTam: duongTam, duoiTam: duoiTam, veDaGiac: veDaGiac, chamNet: chamNet, timCham: timCham, hop: hop, laBang: laBang, buSang: buSang, taoSo: taoSo, apSuKien: apSuKien };
 })();
 `
 

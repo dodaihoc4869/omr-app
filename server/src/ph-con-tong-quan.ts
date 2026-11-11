@@ -252,7 +252,8 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
   const pKh = hoi(env, 'SELECT ngay, dao_json, doan_json FROM srs2_ke_hoach WHERE sbd = ? AND ngay >= ? AND ngay <= ?', sbd, tuNgay, homNay)
   // đủ mọi ngày từ `tuNgay` (mốc 01/10, khoảng dài dần) + ngày đã lưu gần nhất trước đó để ước tính tầng
   const pMuc = hoi(env, `SELECT ngay, tang, toi_thieu FROM hanh_trinh_v3_ngay WHERE sbd = ? AND ngay <= ? ORDER BY ngay DESC LIMIT ${Math.max(60, soNgayDoc + 1)}`, sbd, homNay)
-  const pChung = ngayBaiCuaMotEm(env, sbd, tuNgay, homNay, homNay).catch(() => null)
+  const noRa = new Map<string, import('./no-cau-xem').NoCauXem>() // nợ câu của con (11/11): đọc cùng lệnh đọc mức, cùng số với thầy và với con
+  const pChung = ngayBaiCuaMotEm(env, sbd, tuNgay, homNay, homNay, noRa).catch(() => null)
 
   // 1 · sổ: CHỈ lần làm, KHÔNG sự kiện còn giấu, KHÔNG lượt của ca chưa công bố. Lỗi ⇒ trả lỗi (không lùi về câu lệnh không lọc).
   let rSo: Row[]
@@ -402,6 +403,7 @@ export async function phConTongQuan(envGoc: Env, b: Row, nowMs: number = Date.no
       goiYDaDung,
     }),
     catBot,
+    ...(noRa.get(sbd) ? { noCau: noRa.get(sbd) } : {}),
   }
   return ra
 }
