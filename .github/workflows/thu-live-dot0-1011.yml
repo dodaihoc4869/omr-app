@@ -21,34 +21,34 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        may: [ubuntu-latest]
-        pot: ['1']
+        may: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.may }}
-    timeout-minutes: 20
-    name: dò YouTube (${{ matrix.may }}, PO-token ${{ matrix.pot }})
+    timeout-minutes: 25
+    name: dò YouTube (${{ matrix.may }}, PO-token bgutil)
     steps:
       - uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
-      - name: Cài yt-dlp (+ plugin PO-token bgutil nếu pot = 1, không tài khoản)
-        env:
-          POT: ${{ matrix.pot }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Cài yt-dlp + plugin PO-token bgutil (chế độ script, không docker, không tài khoản)
         run: |
-          python3 -m pip install -q -U --break-system-packages "yt-dlp[default]" 2>&1 | tail -1 || python3 -m pip install -q -U "yt-dlp[default]" 2>&1 | tail -1
-          if [ "$POT" = 1 ]; then
-            docker run --name bgutil -d -p 4416:4416 --init brainicism/bgutil-ytdlp-pot-provider > /dev/null && sleep 5
-            python3 -m pip install -q -U bgutil-ytdlp-pot-provider 2>&1 | tail -1
-          fi
-          yt-dlp --version; curl -s -m 5 -o /dev/null -w 'ip-kiem %{http_code}\n' https://www.youtube.com/
-      - name: Lượt cuối — VERBOSE, một video, xem plugin PO-token có vào cuộc không (chỉ in dòng pot / lỗi)
+          python3 -m pip install -q -U --break-system-packages "yt-dlp[default]" bgutil-ytdlp-pot-provider 2>&1 | tail -1 || python3 -m pip install -q -U "yt-dlp[default]" bgutil-ytdlp-pot-provider 2>&1 | tail -1
+          git clone -q --depth 1 https://github.com/Brainicism/bgutil-ytdlp-pot-provider.git "$HOME/bgutil-ytdlp-pot-provider"
+          (cd "$HOME/bgutil-ytdlp-pot-provider/server" && npm ci --silent > /dev/null 2>&1 && npx tsc > /dev/null 2>&1; ls build/generate_once.js)
+          yt-dlp --version
+      - name: Client có PO-token (web_safari / mweb / web), 4 video, giãn 15 s
         run: |
           cd "$RUNNER_TEMP"
-          curl -s -m 5 http://127.0.0.1:4416/ping || echo "bgutil không trả lời"
-          for c in default mweb web_safari; do
-            ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
-            yt-dlp -v --no-warnings $ea -f bestaudio --test -o "t.%(ext)s" "https://www.youtube.com/watch?v=PfhFCRGNLKM" > v.txt 2>&1 && echo "TẢI ĐƯỢC $c" || echo "LỖI $c"
-            grep -iE 'pot|po.token|bgutil|ERROR|HTTP Error|Downloading .*player|client' v.txt | grep -v '^\[debug\] Command-line' | cut -c1-200 | head -25
-            sleep 20
+          for id in kY0NUO7-fCc lMa-IohYrs4 2zcCycq9EYc PfhFCRGNLKM; do
+            for c in web_safari mweb web default; do
+              ea=""; [ "$c" != default ] && ea="--extractor-args youtube:player_client=$c"
+              if yt-dlp -v --no-warnings $ea -f bestaudio --test -o "t-$id.%(ext)s" "https://www.youtube.com/watch?v=$id" > v.txt 2>&1; then
+                echo "TẢI ĐƯỢC $id $c $(grep -o 'https://[a-z0-9.-]*googlevideo.com' v.txt | sort -u | head -3 | tr '\n' ' ')"; rm -f t-$id.*; break
+              else echo "LỖI $id $c: $(grep -m1 -o 'ERROR.*' v.txt | cut -c1-110) · pot: $(grep -c 'Retrieved a gvs PO Token' v.txt)"; fi
+              sleep 15
+            done
           done
       - name: Kiểm nguồn tải (HEAD) + tìm kho giọng Việt trên HF (chỉ in tên, giấy phép)
         run: |
