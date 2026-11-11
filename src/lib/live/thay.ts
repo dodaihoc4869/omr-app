@@ -21,6 +21,7 @@ import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, ma
 import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type KenhPhong, type MoiTruongLive, type TuyChonOpus } from './sfu'
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
 import { dungChuoiTieng, type KieuChuoi, type MucLocOn } from './chuoi-tieng'
+import { tinhDf3 } from './loc-on/df3'
 
 export interface TuyChonLiveThay {
   /** Vé phòng vai thầy (`/gv/bpu/mo` trả về). */
@@ -81,6 +82,11 @@ export interface ChanDoanMic {
   /** Mức lọc ồn riêng thầy chọn + tình trạng thật ('chay' / 'tai' / 'tat' / 'loi' / 'khong' = máy này không chạy được bộ lọc riêng). */
   locOn: MucLocOn
   locOnChay: string
+  /** Bộ lọc ồn ĐANG ra tiếng: 'df3' = bộ lọc sâu DeepFilterNet 3 · 'rn' = bộ nhẹ RNNoise. `df3` = tình trạng tải / chạy của bộ lọc sâu + tiến độ tải (byte). */
+  locOnBo: 'df3' | 'rn'
+  /** Trễ khâu lọc ồn riêng lúc này (ms; 0 = không lọc). */
+  locOnTre: number
+  df3: { tinh: string; da: number; tong: number }
   hzXuLy: number | null
   treThu: number | null
   /** Chuỗi làm rõ tiếng (cộng kênh, lọc 80 Hz, nén nâng mức, chặn đỉnh) đang chạy; false = đang gửi thẳng track mic. */
@@ -269,7 +275,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   const idDung = (): string | null => idThe ?? micId
   const timThe = (): Promise<string | null> => timTheMacDinh(mic?.getAudioTracks()[0]?.label ?? '')
   /** Chuỗi làm rõ tiếng (Web Audio) của luồng mic đang mở; `hong` = chuỗi ra câm trong khi mic có tiếng ⇒ bỏ chuỗi, gửi thẳng track mic. */
-  let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
+  let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string; locOnBo?: 'df3' | 'rn'; locOnTre?: number } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
   let guiSo2: { muc: number | null; kbps: number | null; byte: number | null; luc: number } = { muc: null, kbps: null, byte: null, luc: 0 }, lucDocGui = -1e9, gui0 = 0
   /** LUẬT XỬ LÝ TIẾNG (thầy 11/11 «tiếng trong và cực rõ»): khử vọng + lọc ồn của trình duyệt làm đục giọng (nhất là mic cài áo) ⇒ chỉ bật khi CÓ ĐƯỜNG VỌNG:
    *  máy em trong lớp đang phát tiếng thầy ra loa (`tiengLop` — «Tất cả»), hoặc loa máy thầy đang phát tiếng em nói. Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
@@ -522,7 +528,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 3) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
       sfu: !!pc && pc.connectionState === 'connected', loc: tt.loc, bac, ctx: amCtx?.state ?? 'khong',
       hz: cd.sampleRate ?? null, kenh: cd.channelCount ?? null, vong: typeof cd.echoCancellation === 'boolean' ? cd.echoCancellation : cd.echoCancellation == null ? null : true, on: cd.noiseSuppression ?? null, agc: cd.autoGainControl ?? null,
-      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: ((l) => (typeof l === 'number' && l >= 0 && l <= 0.2 ? Math.round(l * 1000) : null))((cd as { latency?: number }).latency), // ngoài 0–200 ms = trình điều khiển báo bậy (mic USB báo số âm ⇒ «trễ −121 ms»)
+      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', locOnBo: chuoi && !chuoi.hong && mucLocOn !== 'tat' ? chuoi.k.locOnBo ?? 'rn' : 'rn', locOnTre: chuoi && !chuoi.hong && mucLocOn !== 'tat' && chuoi.k.locOn === 'chay' ? chuoi.k.locOnTre ?? 10 : 0, df3: (() => { const d = tinhDf3(); return { tinh: d.tinh, da: d.da, tong: d.tong } })(), hzXuLy: amCtx?.sampleRate ?? null, treThu: ((l) => (typeof l === 'number' && l >= 0 && l <= 0.2 ? Math.round(l * 1000) : null))((cd as { latency?: number }).latency), // ngoài 0–200 ms = trình điều khiển báo bậy (mic USB báo số âm ⇒ «trễ −121 ms»)
     }
   }
   const khiThietBi = (): void => { tuy.khiThietBi?.(); if (tt.micTinh === 'mat') henMoLaiMic(300) }

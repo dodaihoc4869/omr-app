@@ -50,7 +50,8 @@ export interface TtLiveTo {
   dot2: boolean
   /** MIC (11/11): tình trạng mic đang mở, tên, khử vọng + lọc ồn có đang áp không, chế độ thầy chọn (tự động / luôn bật / luôn tắt). null = chưa mở mic. */
   /** `locOn` = mức lọc ồn riêng thầy chọn; `locOnChay` = tình trạng thật của bộ lọc ('chay' / 'tai' / 'tat' / 'loi' / 'khong'). */
-  mic: { tinh: TinhMic; ten: string; loc: boolean; cheDo: CheDoLoc; locOn: MucLocOn; locOnChay: string } | null
+  /** `bo` = bộ đang ra tiếng ('df3' = bộ lọc sâu · 'rn' = bộ lọc nhẹ); `sau` = tình trạng bộ lọc sâu ('khong' / 'tai' / 'san' / 'loi' / 'cham') + MB đã tải / tổng. */
+  mic: { tinh: TinhMic; ten: string; loc: boolean; cheDo: CheDoLoc; locOn: MucLocOn; locOnChay: string; bo: 'df3' | 'rn'; sau: string; sauDa: number; sauTong: number } | null
   /** Vì sao viên Live ghi không có tiếng ('' = đang có tiếng): chưa có quyền mic / không thấy mic / mic chưa có tín hiệu / chưa nối máy chủ tiếng… */
   lyDoKT: string
   /** Xem lại Live (11/11): trạng thái máy ghi theo phòng — vắng = công tắc tắt (viên Live không có ngăn ghi). */
@@ -84,6 +85,7 @@ let the: TtLiveTo['the'] = null
 let dangBat = false
 let henHuy: ReturnType<typeof setTimeout> | undefined
 let henMuc: ReturnType<typeof setInterval> | undefined
+let thoiNgheSau: (() => void) | null = null
 /** Gương của bảng thầy (ảnh trạng thái cho thư viện: bật live sau khi đã viết, phòng xin lại sổ). */
 const loi = taoLoiBut()
 const guong: { khoa: string; tiLe: number; net: NetBut[] } = { khoa: '', tiLe: 16 / 9, net: [] }
@@ -144,7 +146,7 @@ function trangThai(): TtLiveTo {
     bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm,
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
     the: the ? { ...the, xa: !!l?.xa } : null, roi, tay, moi, micLoi, nghi: live && !!l?.nghi, dot2: GIAO_DIEN_DOT_2,
-    mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong' } : null,
+    mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong', ...locSau() } : null,
     lyDoKT: !live || l?.tieng === 'chua-cau-hinh' ? '' : ttLt?.tieng === 'loi' ? 'Chưa nối máy chủ tiếng'
       : ttLt?.tieng === 'khong' ? (loiMic === 'mic-tu-choi' ? 'Chưa có quyền mic' : loiMic === 'khong-mic' ? 'Không thấy mic' : loiMic ? 'Mic chưa mở được' : 'Live không tiếng')
       : ttLt?.micTinh === 'im' ? 'Mic chưa có tín hiệu' : ttLt?.micTinh === 'bi-tat' ? 'Mic bị tắt tiếng' : ttLt?.micTinh === 'mat' ? 'Mic bị rút' : '',
@@ -173,6 +175,11 @@ function soatGhi(): void {
     m.soatMayGhi({ layLuong: lt ? lt.luongGhi : null, pha: ttLt?.pha, live: view?.live, phong: layPhong(), buoiId: view?.buoiId, gui: (t) => { layPhong()?.gui(t) } })
   }).catch(() => {})
 }
+/** Tình trạng bộ lọc sâu (DeepFilterNet 3) cho cửa sổ nút Live: bộ nào đang ra tiếng + tiến độ tải tính bằng MB (một chữ số lẻ). */
+function locSau(): { bo: 'df3' | 'rn'; sau: string; sauDa: number; sauTong: number } {
+  const c = lt?.chanDoan?.(), mb = (b: number): number => Math.round(b / 104857.6) / 10
+  return { bo: c?.locOnBo ?? 'rn', sau: c?.df3?.tinh ?? 'khong', sauDa: mb(c?.df3?.da ?? 0), sauTong: mb(c?.df3?.tong ?? 0) }
+}
 function bao(): void {
   const tt = trangThai()
   soatGhi()
@@ -199,7 +206,7 @@ export function dongChanDoan(): string {
   const track = { live: 'đang chạy', muted: 'BỊ TẮT TIẾNG', ended: 'ĐÃ NGẮT', tat: 'thầy đang tắt tiếng', khong: 'chưa mở' }[c.track]
   return [(c.ten || 'chưa có mic') + (c.the ? ' (mục mặc định của máy câm ⇒ đang mở thẳng mic này)' : ''), `luồng ${track}`, `${c.hz ?? '?'} Hz · ${c.kenh ?? '?'} kênh`, `khử vọng ${bt(c.vong)} · lọc ồn ${bt(c.on)} · tự chỉnh ${bt(c.agc)}`, `cách mở ${c.bac + 1}/4`,
     `mức tại mic ${pt(c.muc)} · đang gửi ${pt(c.mucGui)}`, c.kbps == null ? 'chưa gửi' : `${c.kbps} kb/s`, c.gan ? 'bộ gửi cầm mic' : 'bộ gửi CHƯA cầm mic', c.sfu ? 'máy chủ tiếng đã nối' : 'máy chủ tiếng CHƯA nối',
-    `làm rõ tiếng ${c.chuoi ? `bật (${c.kieu})` : 'tắt'}`, `lọc ồn ${c.locOn} (${c.locOnChay})`, `bộ đo ${c.ctx}`, dongTre(c)].filter(Boolean).join(' · ')
+    `làm rõ tiếng ${c.chuoi ? `bật (${c.kieu})` : 'tắt'}`, `lọc ồn ${c.locOn} (${c.locOnChay}, bộ ${c.locOnBo === 'df3' ? 'sâu' : 'nhẹ'}${c.df3.tinh === 'khong' || c.df3.tinh === 'san' ? '' : ', bộ sâu ' + c.df3.tinh})`, `bộ đo ${c.ctx}`, dongTre(c)].filter(Boolean).join(' · ')
 }
 /** «Trễ tiếng ước tính ~N ms» (thầy 11/11 «tức thì»): chỉ cộng số đo được — bộ đệm thu trình duyệt báo, chuỗi làm rõ tiếng, khung Opus, nửa RTT máy thầy ↔ máy
  *  chủ tiếng, và từ máy em báo về: nửa RTT + đệm rung (trung vị cả lớp). Chưa gồm loa / tai nghe của máy em. */
@@ -208,7 +215,7 @@ function dongTre(c: ChanDoanMic): string {
   if (!m || !c.sfu) return ''
   const so = (o: unknown, k: string): number | null => { const v = (o as Record<string, { tv?: unknown } | null> | null)?.[k]?.tv; return typeof v === 'number' ? v : null }
   const tt = so(m.em, 'tieng'), rttEm = so(m.em, 'rtt')
-  const u = treTiengUocTinh({ thu: c.treThu ?? 10, chuoi: c.chuoi ? TRE_CHUOI[c.kieu] ?? 0 : 0, ma: treKhungOpus(m.ptime), mangThay: m.rtt, mangEm: rttEm, demEm: tt == null ? null : Math.max(0, tt - TRE_CO_DINH_EM) })
+  const u = treTiengUocTinh({ thu: c.treThu ?? 10, chuoi: c.chuoi ? (TRE_CHUOI[c.kieu] ?? 0) + (c.locOnTre ?? 0) : 0, ma: treKhungOpus(m.ptime), mangThay: m.rtt, mangEm: rttEm, demEm: tt == null ? null : Math.max(0, tt - TRE_CO_DINH_EM) })
   return `đường nối ${m.duong ?? '?'} · RTT ${m.rtt == null ? '?' : Math.round(m.rtt)} ms · ${u.ms <= 0 ? 'trễ tiếng chưa đo được' : u.du ? `trễ tiếng ước tính ~${u.ms} ms (chưa gồm loa máy em)` : `trễ tiếng phần máy thầy ~${u.ms} ms (chưa có số từ máy em)`}`
 }
 /** Có phòng + công tắc bật ⇒ nạp thư viện, nối sẵn (track câm) để bấm Live là live ngay. */
@@ -216,9 +223,10 @@ function dam(): Promise<void> {
   const p = layPhong()
   if (lt || !p || !view?.live) return Promise.resolve()
   if (dangNap) return dangNap
-  dangNap = import('../../lib/live').then(({ taoLiveThay }) => {
+  dangNap = import('../../lib/live').then(({ taoLiveThay, ngheDf3 }) => {
     const p2 = layPhong()
     if (lt || !p2) return
+    if (!thoiNgheSau) thoiNgheSau = ngheDf3(() => { if (lt) bao() }) // tiến độ tải bộ lọc sâu ⇒ cửa sổ nút Live vẽ lại
     lt = taoLiveThay({
       ve: p2.ve, goc: p2.goc,
       kenh: { gui: (t) => { layPhong()?.gui(t) }, guiNhiPhan: (k) => { layPhong()?.guiNhiPhan(k) }, hangCho: () => layPhong()?.hangCho() ?? 0 },
