@@ -107,7 +107,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let troWs = false, mucMang: 0 | 1 | 2 = 0, dNay = 0
   let henBu: unknown = null, choSo = false, lucXinBu = -1e9
   /** ĐO TIẾNG TỪ XA (do-tieng.ts): bản tóm tắt gần nhất (đi kèm `live-do`) + «đang nghe thật» theo năng lượng và thẻ phát (đi kèm `live-ok`). */
-  let tiNay: SoTieng | null = null, ngheTi: boolean | null = null, lucTi = -1e9, dangDoTi = false
+  let tiNay: SoTieng | null = null, ngheTi: boolean | null = null, lucTi = -1e9, dangDoTi = false, loiSfu = ''
   let henSo: unknown = null, lucDo = 0, demTruoc: { tong: number; so: number } | null = null, mucAmThay = 0, rtt: number | null = null, demRung: number | null = null, giayLech = false
   /** Nét đang viết đã phát ra lớp vẽ: id → số điểm đã phát. */
   const dangVe = new Map<string, number>()
@@ -219,7 +219,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       if (!con()) { p.close(); return }
       if (!(await choNoi(p, mt))) throw new Error('khong-noi')
       if (!con()) { p.close(); return }
-      pc = p; phienCuaEm = phien
+      pc = p; phienCuaEm = phien; loiSfu = ''
       p.addEventListener('connectionstatechange', () => {
         if (pc !== pcNay || !con()) return
         // Mất kết nối quá 5 giây ⇒ tạo phiên mới (đặc tả mục 5).
@@ -239,9 +239,10 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       }
       baoOk()
       soatMic()
-    } catch {
+    } catch (e) {
       try { p?.close() } catch { /* đã đóng */ }
       if (!con()) return
+      loiSfu = e instanceof Error ? e.message.slice(0, 20) : 'sfu' // đo từ xa: 'khong-noi' = ICE / DTLS không lên
       pc = null; dc = null; nguonNoi = ''
       dat({ tieng: 'loi', kenhNet: 'ws' })
       baoOk()
@@ -489,7 +490,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       soDo.ghi('tn', s.d + (rtt ?? 0) / 2)
       if (nay - lucDo >= NHIP_DO_MS) {
         lucDo = nay
-        const tin = roiMan ? null : soDo.tinKy(dcMo()), ti: SoTieng = { ...(tiNay ?? { cs: pc?.connectionState ?? 'khong', ice: pc?.iceConnectionState ?? 'khong', uv: '' }), tg: tt.tieng, mc: tt.mic, ...(roiMan ? { r: 1 as const } : {}) }
+        const tin = roiMan ? null : soDo.tinKy(dcMo()), ti: SoTieng = { ...(tiNay ?? { cs: pc?.connectionState ?? 'khong', ice: pc?.iceConnectionState ?? 'khong', uv: '' }), tg: tt.tieng, mc: tt.mic, ...(roiMan ? { r: 1 as const } : {}), ...(loiSfu && !pc ? { l: loiSfu } : {}) }
         tuy.kenh.gui({ ...(tin ?? { t: 'live-do' }), ...(giayLech ? { gl: true } : {}), ti })
       }
       // Phòng báo có mục mới mà quá 2 giây chưa thấy khung nào ⇒ xin bù (kết nối vừa nối lại, tin lạc).
