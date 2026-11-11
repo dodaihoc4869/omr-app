@@ -2,7 +2,7 @@
 // Vấn đề: gói điểm tới thưa và không đều (16–50 ms, có dao động, có mất) trong khi màn vẽ 60 khung/giây ⇒ vẽ ngay khi gói tới thì nét giật từng khúc.
 // Cách làm (11/11 làm lại sau khi thầy thử máy thật: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút tức thì mượt mà cực mượt mà»):
 //   · mỗi điểm mang giờ theo ĐỒNG HỒ THẦY; độ lệch đồng hồ = giá trị NHỎ NHẤT của (giờ nhận − tGui) trong ~10 giây gần nhất;
-//   · ĐỘ ĐỆM D = số lớn hơn trong hai số, + 3 ms, kẹp 22–450 ms (trần 150 → 450 từ 12/11, xem cuối; sàn 30 → 22 từ 11/11 lần 2: đồng hồ phát đã biết đứng chờ khi hết điểm nên sàn thấp
+//   · ĐỘ ĐỆM D = số lớn hơn trong hai số, + 3 ms, kẹp 14–450 ms (trần 150 → 450 từ 12/11, xem cuối; sàn 30 → 22 từ 11/11 lần 2, 22 → 14 từ 12/11: đồng hồ phát đã biết đứng chờ khi hết điểm nên sàn thấp
 //     không còn gây nhảy cục; mô phỏng đường DataChannel sạch: trễ 63 → 55 ms, 0 khung đứng), mỗi khung đổi tối đa 2 ms:
 //       (a) p95 dao động giờ tới trong 2 giây + KHOẢNG CÁCH LÔ lớn (p90 của ~40 lô gần nhất, không phải trung bình);
 //       (b) p95 của «ĐỘ CẦN» từng lô = (giờ tới − lệch) − giờ của điểm MỚI đầu tiên trong lô: đúng bằng độ đệm ít nhất để điểm đó không tới muộn. Số này gồm
@@ -28,7 +28,7 @@ import type { DiemBut } from '../but-bang-loi'
 import type { DauNet, GoiDiem } from './ma-net'
 
 export interface TuyChonDem {
-  /** Kẹp dưới / trên của D (ms). Mặc định 22 … 450. */
+  /** Kẹp dưới / trên của D (ms). Mặc định 14 … 450. */
   dMin?: number
   dMax?: number
   /** D đổi tối đa mỗi khung (ms). */
@@ -98,6 +98,11 @@ const CAN_MS = 80, NHIP_CAN = 0.3
 const CUA_CHAM = 10_000, TINH_LAI_MS = 100
 /** Trần của phần D theo trễ tiếng (ms) — không đổi khi trần D theo dao động lên 450. */
 const TRAN_TIENG = 150
+/** VỀ SÀN NHANH (12/11, thầy: «nét bút bị chậm hơn»): mẫu rung quá `RUNG_MS` = mạng đang rung; hai mẫu như vậy cách nhau > 1,5 giây = hai ĐỢT rung.
+ *  30 giây qua chỉ có một đợt (rung lẻ) và đã yên `YEN_MS` ⇒ độ đệm chỉ tính trên các mẫu SAU đợt rung và rút nhanh gấp đôi (12 % tốc độ phát) —
+ *  về sàn trong ~2 giây. Rung lặp lại (≥ 2 đợt) hoặc đợt NẶNG (có gói muộn từ `RUNG_NANG_MS`: TCP chặn đầu hàng, vừa đứt) ⇒ giữ cửa sổ chậm 10 giây
+ *  như cũ, không rút vội rồi lại khựng. */
+const RUNG_MS = 25, YEN_MS = 300, DOT_CACH_MS = 1500, DOT_NHO_MS = 30_000, RUNG_NANG_MS = 250
 /** Xin đường phụ WebSocket trong ngần này ms kể từ lần thủng / lô tới quá muộn gần nhất · lô tới muộn hơn độ đệm quá ngần này ms mới tính là «đứng lâu». */
 const TRO_MS = 20_000, DUNG_LAU_MS = 100
 /** Nét dở im lặng quá ngần này TRONG KHI gói khác vẫn tới (gói cuối + tin nhấc của nó đều mất) ⇒ thôi giữ đồng hồ, bản chốt từ sổ nét sẽ thay.
@@ -115,7 +120,7 @@ export function dNetTheoTieng(treTieng: number | null, dJitter: number, tran = 1
 }
 
 export function taoDemPhat(tuy: TuyChonDem = {}) {
-  const dMin = tuy.dMin ?? 22, dMax = tuy.dMax ?? 450, buoc = tuy.buoc ?? 2, cuaSo = tuy.cuaSo ?? 2000, them = tuy.mayYeu ? 16 : 0
+  const dMin = tuy.dMin ?? 14, dMax = tuy.dMax ?? 450, buoc = tuy.buoc ?? 2, cuaSo = tuy.cuaSo ?? 2000, them = tuy.mayYeu ? 16 : 0
   const net = new Map<string, NetDem>()
   // Nét vừa phát XONG / vừa có bản chốt: gói điểm của nó còn tới muộn (gói lặp, mạng rung, đường phụ chậm) thì bỏ — không dựng lại thành một nét «ma».
   const daXong = new Map<string, number>()
@@ -132,6 +137,9 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
   let muon = 0, muonToiDa = 0, mat = 0, goi = 0, dung = 0, dungToiDa = 0, dungNay = 0, vut = 0
   // phân vị đã tính (làm mới mỗi 100 ms) · lúc nhận gói gần nhất của đường chính · lúc thủng / lô tới quá muộn gần nhất · mức muộn lớn nhất 5 giây qua
   let dJ = 0, lucTinh = -1e9, lucGoi = -1e9, lucXau = -1e9, lucDungLau = -1e9, dungLau = 0, lucPhu = -1e9
+  // lúc có mẫu rung gần nhất · lúc bắt đầu của các đợt rung trong 30 giây qua · đang ở chế độ về sàn nhanh
+  let lucRung = -1e9, dotRung: number[] = [], veNhanh = false, rungLon = 0
+  const ghiRung = (nhan: number, muc: number): void => { if (nhan - lucRung > DOT_CACH_MS) { rungLon = 0; dotRung.push(nhan); while (dotRung.length && nhan - dotRung[0]! > DOT_NHO_MS) dotRung.shift() } if (muc > rungLon) rungLon = muc; lucRung = nhan }
   /** Chờ vá một lỗ dài `rong` ms bao lâu: chỉ chờ khi đường phụ ĐANG chảy (vừa nhận gói của nó trong 3 giây) — không có ai vá thì nối thẳng ngay. */
   const hanVa = (nay: number, rong: number): number => (nay - lucPhu < 3000 ? Math.min(CHO_VA_MS, Math.max(40, rong)) : 0)
   // Màu nét gần nhất (cho ngòi của cây bút).
@@ -148,7 +156,9 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     if (xo !== xoMoc) { xoTruoc = xo === xoMoc + 1 ? xoNay : Infinity; xoNay = Infinity; xoMoc = xo }
     const lechGoi = nhan - g.tGui
     if (lechGoi < xoNay) xoNay = lechGoi
-    mau.push({ luc: nhan, j: Math.max(0, lechGoi - lech()) })
+    const j = Math.max(0, lechGoi - lech())
+    if (j > RUNG_MS) ghiRung(nhan, j)
+    mau.push({ luc: nhan, j })
     if (mau.length > 1400) mau = mau.slice(-1000)
     if (tGuiTruoc >= 0 && g.tGui > tGuiTruoc && g.tGui - tGuiTruoc <= 120) {
       cachLo.push(Math.max(8, g.tGui - tGuiTruoc))
@@ -196,7 +206,7 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
         if (v >= 0 && v < dMax + 150) { can.push({ luc: nhan, v }); if (can.length > 1400) can = can.slice(-1000) }
         // lô tới MUỘN hơn độ đệm đang dùng quá 100 ms = đầu nét vừa phải đứng vì mạng (khác với thầy dừng tay giữa nét: lúc đó điểm kế tới vẫn «tươi»)
         const tre = v - d
-        if (tre > DUNG_LAU_MS) { lucXau = nhan; if (tre > dungLau || nhan - lucDungLau > 5000) { dungLau = tre; lucDungLau = nhan } }
+        if (tre > DUNG_LAU_MS) { ghiRung(nhan, v); lucXau = nhan; if (tre > dungLau || nhan - lucDungLau > 5000) { dungLau = tre; lucDungLau = nhan } }
       }
       const tre = tp - n.gio[k]!
       if (tre > 0 && n.soPhat > 0) { muon += 1; if (tre > muonToiDa) muonToiDa = tre }
@@ -221,8 +231,13 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     if (nay - lucTinh < TINH_LAI_MS && nay >= lucTinh) return dJ
     lucTinh = nay
     while (can.length && nay - can[0]!.luc > CUA_CHAM) can.shift()
-    const j = Math.max(p95(nay), phanVi(mau, (i) => mau[i]!.j, nay, CUA_CHAM, 0.9))
-    const c = Math.max(phanVi(can, (i) => can[i]!.v, nay, cuaSo, 0.95), phanVi(can, (i) => can[i]!.v, nay, CUA_CHAM, 0.9))
+    while (dotRung.length && nay - dotRung[0]! > DOT_NHO_MS) dotRung.shift()
+    // rung lẻ đã yên ⇒ chỉ nhìn các mẫu sau đợt rung; còn lại: cửa sổ nhanh 2 giây + cửa sổ chậm 10 giây
+    const yen = nay - lucRung
+    veNhanh = dotRung.length <= 1 && rungLon < RUNG_NANG_MS && yen > YEN_MS
+    const ngan = veNhanh ? Math.min(cuaSo, yen - 1) : cuaSo, dai = veNhanh ? ngan : CUA_CHAM
+    const j = Math.max(phanVi(mau, (i) => mau[i]!.j, nay, ngan, 0.95), phanVi(mau, (i) => mau[i]!.j, nay, dai, 0.9))
+    const c = Math.max(phanVi(can, (i) => can[i]!.v, nay, ngan, 0.95), phanVi(can, (i) => can[i]!.v, nay, dai, 0.9))
     return (dJ = kep(Math.max(j + lo, c) + DU_MS + them, dMin + them, dMax))
   }
 
@@ -232,8 +247,9 @@ export function taoDemPhat(tuy: TuyChonDem = {}) {
     const dich = Math.max(dJitter, dNetTheoTieng(treTieng, dJitter, Math.min(TRAN_TIENG, dMax)))
     const dt = nay - nayTruoc, dtc = dt > 0 ? Math.min(dt, 100) : 0
     nayTruoc = nay
-    // nới nhanh (≤ `buoc` ms mỗi 16,7 ms = 12 % tốc độ phát), rút chậm bằng nửa — theo thời gian thật
-    d += kep(dich - d, -buoc * 0.5 * (dtc || 16.7) / 16.7, buoc * (dtc || 16.7) / 16.7)
+    // nới ≤ `buoc` ms mỗi 16,7 ms = 12 % tốc độ phát; rút bằng nửa — riêng rung LẺ đã yên thì rút cũng 12 % (đã thử rút 12 % mọi lúc: mất gói theo chùm
+    // đứng nhiều hơn); theo thời gian thật
+    d += kep(dich - d, -buoc * (veNhanh ? 1 : 0.5) * (dtc || 16.7) / 16.7, buoc * (dtc || 16.7) / 16.7)
     if (!Number.isFinite(lech())) return { net: [], tro: null, but: null, d, cuon: cuonNay }
     // ── đồng hồ phát ──
     const muc = nay - lech() - d
