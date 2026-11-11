@@ -295,3 +295,7 @@ export async function cronLiveXemLai(env: Env, nay = Date.now()): Promise<{ soat
   if (canXoa.length) ra.xoa = (await xoaBuoiDanhDau(env, canXoa)).xoa.length
   return ra
 }
+/** Lời gọi gọn cho cron mỗi phút của index.ts (tệp ấy không được to thêm): chạy lưới đỡ, ghi nhật ký khi có việc, không ném lỗi. */
+export async function cronLive(env: Env): Promise<void> {
+  try { const r = await cronLiveXemLai(env, Date.now()); if (r.chot || r.xoa || r.don) console.log('[live-xem-lai] cron', JSON.stringify(r)) } catch (e) { console.error('[live-xem-lai] cron lỗi:', e instanceof Error ? e.message : e) }
+}
