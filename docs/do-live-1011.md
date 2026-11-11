@@ -554,3 +554,34 @@ Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach
   Test `tests/live-chi-thay-luoi-1111.test.ts` (cả hai nhánh, và «chỉ học sinh nói, ra hạ 40 dB suốt 3 s ⇒ KHÔNG tắt»).
 - Dòng trạng thái trong cửa sổ Live: «Mô hình <bản> · luyện <ngày> · máy này chạy <x> % thời gian thực» hoặc «Đã tự tắt (lý do) — lớp nghe tiếng như trước».
 
+### 11.4 Trạng thái cuối lượt 2 (11/11 ≈ 22:05 giờ VN) — CHƯA ĐẠT, KHÔNG PHÁT HÀNH (mức «Chỉ giọng thầy» vẫn ẩn)
+Đo nhanh mỗi checkpoint (`do-nhanh.mjs`: lõi JS 48 kHz, mỗi giọng −25 dBFS, số dB bị hạ):
+
+| bản | thầy giữ riêng (mong ≈ 0) | thầy nói to / cao giọng | giọng khác thật | LJ nữ | VCTK nam | LibriSpeech 1320 | tiếng Việt máy đọc | AudioMNIST đủ dải | kho mở chưa gặp |
+|---|---|---|---|---|---|---|---|---|---|
+| a-5000 (chưa có kho mở) | 2,8 | 3,2 | 11,7 | 3,8 | 6,2 | 5,7 | 10,7 | 32,5 | 4,9 |
+| c-7000 (+ LibriSpeech, người giả) | 3,6 | 4,8 | 14,1 | 4,6 | 11,3 | 14,3 | 12,2 | 37,7 | 8,9 |
+| e-7000 (giữ thầy hơn) | 3,2 | 3,6 | 15,8 | 4,4 | 14,1 | 19,5 | 13,9 | 46,7 | 9,1 |
+
+Bốn tiêu chí (mục 10.5) — bản đo 18 s, giọng THẦY THẬT giữ riêng (miền MP3), mức 0 / 2 / 10 dB:
+
+| tiêu chí | a-5000 (giữ thầy tốt nhất) | e-7000 (hạ giọng khác nhiều nhất) | đạt? |
+|---|---|---|---|
+| mở sau ≤ 50 ms | 10–40 ms phần lớn; giọng khác thật 0 dB 90 ms; xôn xao 0 dB 250 ms | 40–60 ms; xôn xao 250 ms | KHÔNG |
+| nói chồng không làm giảm SI-SDR thầy | giọng khác thật tăng (2,1 → 4,1); giọng nam / xôn xao giảm (8,4 → 7,0; 16,4 → 9,6) | giảm hầu hết (4,1 → −1,5; 16,4 → 4,5) | KHÔNG |
+| giọng khác giảm ≥ 20 dB | 3,2–5,5 dB | 3,2–6,8 dB (một mình); 4,6–13,4 dB lúc chồng | KHÔNG |
+| hệ số thời gian thực ≤ 0,6 | 0,08–0,12 | 0,13–0,21 (máy phiên, Node một luồng, đang luyện song song) | ĐẠT (máy phiên) |
+| (thêm) thầy một mình SI-SDR · giữ dải | 20,5–21,7 dB | 10–10,6 dB; 6–11 kHz −6,4 dB, dải 11–24 kHz −14 dB (đục) | — |
+
+**Kết luận:** chưa bản nào đạt. Gốc: giọng thầy để luyện quá ít (live sau lọc chặt 44 s; YouTube chưa vào được) ⇒ hạ giọng khác thêm bao nhiêu là
+hạ / làm đục thầy bấy nhiêu; kho giọng mở (LibriSpeech) làm giọng chưa gặp tăng rõ (VCTK 6 → 14 dB, LibriSpeech 6 → 19,5 dB) nhưng giọng nữ LJ vẫn chỉ 4 dB.
+Vỡ số (NaN) ở bước 7000 lúc thêm thông thấp: đã sửa (mục 11.2), các checkpoint hỏng đã bỏ.
+**Đang chạy tiếp (nền, `setsid nohup`, ghi checkpoint mỗi 1000 bước, chạy lại thì tự nạp checkpoint mới nhất):** lượt C (`TG_L2=1,5 TG_LOT=0,3 TG_IM1=0,2 TG_GIA=0,15`) và E
+(`TG_L2=2,5 TG_LOT=0,2 TG_IM1=0,1 TG_GIA=0,1`) từ bước 7000 — phạt khung không-thầy NHẸ lại để không đẩy hai hàng «thầy» xấu thêm; `canh-buoi-moi.sh` (25 phút: buổi Live
+mới, YouTube `giong-thay-youtube/`, kho mở `giong-khac-mo/`); `canh-ck.sh` (đo nhanh mỗi checkpoint ⇒ `do-nhanh.log` ở thư mục tạm). Chọn bản bằng bản đo 18 s trên giọng
+CHƯA GẶP (`LV_CHI_MH=1 … do-tach-giong.mjs`), KHÔNG bằng chấm nội bộ. Trọng số trong kho: `scripts/thu-live-1011/tach-giong/ckpt/thay-ck1-2000.tgt`; các bản sau
+(a-5000, c-/e-7000 …) chỉ ở thư mục tạm của phiên (`mh/*.tgt`) — chưa đưa vào kho.
+**Việc kế:** nạp giờ YouTube làm nguồn giọng thầy chính (miền sạch), VIVOS / FLEURS / Common Voice cho giọng Việt nhiều người; chỉ khi bản đo 18 s đạt đủ 4 tiêu chí
+mới đặt `URL_MO_HINH_THAY` (sau lệnh có mã thầy), rồi chạy phép thử CI cho mức này (tải đoạn bài giảng công khai làm mic giả, hoặc kiểm SỐNG nếu không tải được).
+B2 (mô hình có sẵn trên Hugging Face qua runner): KHÔNG làm — điều phối hạ ưu tiên; tra cứu lượt 1 cho thấy các mô hình mở đều 16 kHz hoặc khúc dài (trái tiêu chí trễ / dải).
+
