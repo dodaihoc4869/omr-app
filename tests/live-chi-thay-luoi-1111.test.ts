@@ -1,11 +1,14 @@
 // «CHỈ GIỌNG THẦY» lượt 2 — LƯỚI trong Worker khung (MA_TACH + MA_KHUNG của src/lib/live/chuoi-tieng.ts, chạy ĐÚNG chuỗi ấy):
 //  · bật / tắt trộn một khung, tắt xong là tiếng gốc;
-//  · lõi ra số hỏng ⇒ tắt NGAY, khung đó đi tiếng gốc; mic có giọng mà tiếng ra ≈ 0 suốt 1,5 giây ⇒ tự tắt «cam»; chạy chậm (hệ số > 0,6) ⇒ tự tắt «cham»;
+//  · luật thầy chốt 11/11 đêm: CHỈ HỌC SINH NÓI MÀ ĐẦU RA IM LÀ ĐÚNG ⇒ không tự tắt. Chỉ quay về tiếng gốc khi (a) bộ nhận giọng báo đang có giọng thầy ≥ 1,5 s
+//    mà tiếng ra im (≤ −30 dB so với vào) ⇒ «cam-thay»; hoặc (b) lỗi kỹ thuật: số hỏng ⇒ tắt NGAY, tiếng ra ≈ 0 tuyệt đối ⇒ «cam-ky-thuat», chậm ⇒ «cham»,
+//    khung ngừng chảy ⇒ xetNgungChay;
 //  · công tắc lùi khẩn + cờ hiện mức (src/lib/live/chi-thay.ts).
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { MA_TACH } from '../src/lib/live/tach-giong-thay'
+import { NGUNG_CHAY_MS, xetNgungChay } from '../src/lib/live/chuoi-tieng'
 import { chiThayCo, chiThayTatKhan, taiMoHinhThay } from '../src/lib/live/chi-thay'
 
 const MA_KHUNG = /const MA_KHUNG = `([\s\S]*?)`/.exec(readFileSync(resolve(__dirname, '../src/lib/live/chuoi-tieng.ts'), 'utf8'))![1]!
@@ -57,15 +60,52 @@ describe('lưới «Chỉ giọng thầy» trong Worker khung', () => {
     expect(tin.find((t) => t.tg === 'tu-tat')).toMatchObject({ ly: 'so-hong' }); expect(W.lay().pha).toBe(0)
   })
 
-  it('mic có giọng mà tiếng ra ≈ 0 suốt 1,5 giây ⇒ tự tắt «cam»; 1,4 giây thì chưa', () => {
+  it('(b) lỗi kỹ thuật: mic có tín hiệu mà tiếng ra ≈ 0 tuyệt đối suốt 1,5 giây ⇒ tự tắt «cam-ky-thuat»; 1,4 giây thì chưa', () => {
     const { W, tin, khung } = taoWorker()
     W.nhan({ chiThay: true }); W.nhan({ tach: tepGia() })
     W.lay().tg!.khung = (x: Float32Array) => x.fill(0)
     for (let k = 0; k < 140; k++) khung(giong(k))
     expect(tin.some((t) => t.tg === 'tu-tat')).toBe(false)
     for (let k = 140; k < 151; k++) khung(giong(k))
-    expect(tin.find((t) => t.tg === 'tu-tat')).toMatchObject({ ly: 'cam' })
+    expect(tin.find((t) => t.tg === 'tu-tat')).toMatchObject({ ly: 'cam-ky-thuat' })
     const x = giong(200); expect(Array.from(khung(x.slice()))).toEqual(Array.from(x))
+  })
+
+  it('CHỈ HỌC SINH NÓI (không có tin «thầy đang nói») mà tiếng ra hạ 40 dB suốt 3 giây ⇒ ĐÚNG, KHÔNG tự tắt', () => {
+    const { W, tin, khung } = taoWorker()
+    W.nhan({ chiThay: true }); W.nhan({ tach: tepGia() })
+    W.lay().tg!.khung = (x: Float32Array) => { for (let i = 0; i < x.length; i++) x[i]! *= 0.01; return x }
+    for (let k = 0; k < 300; k++) khung(giong(k))
+    expect(tin.some((t) => t.tg === 'tu-tat')).toBe(false); expect(W.lay().pha).toBe(2)
+  })
+
+  it('(a) bộ nhận giọng báo ĐANG CÓ GIỌNG THẦY mà tiếng ra hạ ≥ 30 dB suốt 1,5 giây ⇒ «cam-thay», về tiếng gốc; báo thầy thôi nói ⇒ đếm lại', () => {
+    const { W, tin, khung } = taoWorker()
+    W.nhan({ chiThay: true }); W.nhan({ tach: tepGia() })
+    W.lay().tg!.khung = (x: Float32Array) => { for (let i = 0; i < x.length; i++) x[i]! *= 0.01; return x }
+    W.nhan({ thayNoi: true })
+    for (let k = 0; k < 100; k++) khung(giong(k))
+    W.nhan({ thayNoi: false }); khung(giong(100)); W.nhan({ thayNoi: true }) // ngắt quãng ⇒ đếm lại từ đầu
+    for (let k = 101; k < 240; k++) khung(giong(k))
+    expect(tin.some((t) => t.tg === 'tu-tat')).toBe(false)
+    for (let k = 240; k < 260; k++) khung(giong(k))
+    expect(tin.find((t) => t.tg === 'tu-tat')).toMatchObject({ ly: 'cam-thay' })
+    const x = giong(300); expect(Array.from(khung(x.slice()))).toEqual(Array.from(x))
+  })
+
+  it('(a) thầy đang nói và tiếng ra giữ giọng (chỉ hạ 6 dB) ⇒ không tự tắt', () => {
+    const { W, tin, khung } = taoWorker()
+    W.nhan({ chiThay: true }); W.nhan({ tach: tepGia() }); W.nhan({ thayNoi: true })
+    W.lay().tg!.khung = (x: Float32Array) => { for (let i = 0; i < x.length; i++) x[i]! *= 0.5; return x }
+    for (let k = 0; k < 300; k++) khung(giong(k))
+    expect(tin.some((t) => t.tg === 'tu-tat')).toBe(false)
+  })
+
+  it('(b) khung ngừng chảy: mô hình đang chạy mà Worker im quá 2,5 giây ⇒ lớp gọi bắt được', () => {
+    expect(xetNgungChay({ tg: 'chay', vaoLuc: 10_000 }, 0, 10_000 + NGUNG_CHAY_MS - 1)).toBe(false)
+    expect(xetNgungChay({ tg: 'chay', vaoLuc: 10_000 }, 0, 10_000 + NGUNG_CHAY_MS + 1)).toBe(true)
+    expect(xetNgungChay({ tg: 'tat', vaoLuc: 10_000 }, 0, 99_999)).toBe(false)
+    expect(xetNgungChay({ tg: 'chay', vaoLuc: undefined }, 50_000, 50_000 + 1000)).toBe(false) // vừa bật, chưa có tin nào
   })
 
   it('mic im (thầy không nói) thì tiếng ra nhỏ KHÔNG bị coi là câm', () => {

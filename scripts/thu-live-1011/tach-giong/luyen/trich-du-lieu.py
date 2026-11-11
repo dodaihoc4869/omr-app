@@ -31,7 +31,11 @@ for id in sorted(os.listdir(RA)):
         sl = slice(k, k + 100)
         sT[sl] += a; minT[sl] = np.minimum(minT[sl], a); maxKt[sl] = np.maximum(maxKt[sl], c)
         minK[sl] = np.minimum(minK[sl], c); maxTk[sl] = np.maximum(maxTk[sl], a); phu[sl] += 1
-    thay = (phu > 0) & (sT / np.maximum(phu, 1) >= 0.40) & (minT >= 0.25) & (maxKt <= 0.25)
+    b = json.load(open(os.path.join(RA, id, 'buoi.json'))); t = (np.arange(n) + 0.5) * 0.01; em = np.zeros(n, bool)
+    for e in b['emNoi']: em |= (t >= e['t0'] / 1000 - 1) & (t <= e['t1'] / 1000 + 1)
+    tb = sT / np.maximum(phu, 1)
+    # ngoài emNoi ± 1 s: TB ≥ 0,40, nhỏ nhất ≥ 0,25, «khác» ≤ 0,25 · TRONG emNoi ± 1 s (có thể lẫn giọng em): lọc chặt TB ≥ 0,50, nhỏ nhất ≥ 0,40, «khác» ≤ 0,15
+    thay = (phu > 0) & np.where(em, (tb >= 0.50) & (minT >= 0.40) & (maxKt <= 0.15), (tb >= 0.40) & (minT >= 0.25) & (maxKt <= 0.25))
     khac = (phu > 0) & (minK >= 0.40) & (maxTk <= 0.20)
     for ten, m in (('thay', thay), ('khac', khac)):
         k = 0; i = 0
