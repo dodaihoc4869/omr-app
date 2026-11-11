@@ -1,0 +1,1 @@
+EXPLAIN QUERY PLAN SELECT DISTINCT l.qid,l.luc FROM json_each('["x"]') r CROSS JOIN loi_giai_hoi l ON l.sbd='["x"]' AND l.qid>=r.value AND l.qid<r.value||char(1114111) WHERE (l.co_ho_so=1 OR l.nguon LIKE '%:tro_ly' OR l.nguon LIKE '%:goi_y' OR l.nguon LIKE '%:thay_go' OR l.nguon LIKE '%:giai_kho' OR l.nguon='goi7:sau_nop') AND l.luc>='["x"]'

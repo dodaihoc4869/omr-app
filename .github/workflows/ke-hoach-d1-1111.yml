@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   push:
     branches: [claude/trusting-ritchie-xo0ipg]
-    paths: ['.github/workflows/ke-hoach-d1-1111.yml', 'scripts/ke-hoach-d1-1111.ts']
+    paths: ['.github/workflows/ke-hoach-d1-1111.yml', 'scripts/ke-hoach-d1-1111/**']
 permissions:
   contents: read
 concurrency:
@@ -30,9 +30,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          npx -y esbuild@0.28.1 scripts/ke-hoach-d1-1111.ts --bundle --platform=node --format=esm --outfile=/tmp/kh.mjs --log-level=warning && node /tmp/kh.mjs
           q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(x.detail??JSON.stringify(x))}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 3; }
-          q "Chỉ mục" "SELECT name,tbl_name FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','loi_giai_hoi','chua_loi_dot') ORDER BY tbl_name,name"
+          q "Chỉ mục" "SELECT name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','loi_giai_hoi','chua_loi_dot') ORDER BY tbl_name,name"
           q "sqlite_stat1 có không" "SELECT COUNT(*) n FROM sqlite_master WHERE name='sqlite_stat1'"
-          q "Kế hoạch su_kien_hoc (mới)" "$(cat /tmp/kh-skh.sql)"
-          q "Kế hoạch loi_giai_hoi (mới)" "$(cat /tmp/kh-hoi.sql)"
+          for f in scripts/ke-hoach-d1-1111/*.sql; do q "Kế hoạch $f" "$(cat $f)"; done
