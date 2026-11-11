@@ -48,3 +48,25 @@ D1 đọc 3,29 tỉ hàng/ngày ⇒ ~99 tỉ/tháng ⇒ **~74 USD**; D1 ghi 2,39
 | E | Bật cảnh báo chi tiêu trong dash (Notifications → Usage-based billing) | — | Báo sớm trước khi bị trừ |
 
 Hoàn tiền / khiếu nại (ví dụ phần thử tải 31/10): chỉ qua bộ phận Billing Support của Cloudflare.
+
+## 6. Đã làm tối 11/11 (thầy «Làm mọi thứ để dùng bản 5 đô/tháng thôi»)
+
+Số đo kỳ mới (00:00 → 11:49 UTC 11/11, máy `theo-doi-chi-phi-cf.yml`): D1 đọc 2,32 tỉ hàng trong nửa ngày ⇒ dự báo 141 tỉ/kỳ (gói gồm 25 tỉ) ⇒ ~117 USD;
+Worker CPU dự báo 259 triệu ms (gói 30 triệu) ⇒ ~4,6 USD; lượt gọi Worker 20,6 triệu (gói 10 triệu) ⇒ ~3,2 USD. D1 ghi, DO thời gian: trong gói.
+
+| Việc | Trạng thái | Số trước (24 giờ) |
+|---|---|---|
+| Xoá Worker `omr-thu-tai`, `omr-thu` + 2 D1 thử (vùng DO `omr-thu_*` đi theo) | XONG 18:34 VN, run 43013003785 | 44,5 tr hàng ghi + 7,7 tỉ hàng đọc + 13 tr giây DO / kỳ trước |
+| Lần làm câu sai: `qid IN … OR tc IN …` ⇒ 2 nhánh đi chỉ mục (`chua-cau-sai-adapter.ts`) | chờ phát hành | 1,19 tỉ hàng, 3.048 hàng/lượt |
+| Dấu hỗ trợ câu sai: quét mọi dấu của em ⇒ dò khoảng qid trên khoá chính | chờ phát hành | 0,55 tỉ hàng, 1.384 hàng/lượt |
+| Ca bảo vệ đề: không đếm lượt của ca đã đóng (`game-v2-bank.ts`) | chờ phát hành | 0,41 tỉ hàng, 1.456 hàng/lượt |
+| Cron gói sửa mỗi phút: chỉ mục bộ phận đợt mở (`chi-muc-luc-chay.ts`, dựng 00:01) | chờ phát hành | 0,13 tỉ hàng, 98.216 hàng/lượt |
+| Workers AI: trần 9.000 neurons/ngày (phần miễn phí 10.000) + công tắc `cau_hinh.workers_ai_tat` | chờ phát hành | 27/10: 1,61 tr neurons ≈ 17,6 USD |
+| Workers Logs: lấy mẫu 20 % lượt gọi (vẫn bật) | chờ phát hành | chưa đo được (khoá thiếu quyền) |
+| Máy theo dõi chi phí 23:17 VN mỗi đêm, đỏ khi dự báo > 6 USD + 15 câu D1 đọc nặng nhất | XONG | — |
+
+Kế hoạch truy vấn trên D1 THẬT (EXPLAIN, `ke-hoach-d1-1111.yml`): nhánh qid ⇒ `idx_skh_em_qid_ngay`, nhánh tc ⇒ `idx_skh_em_tc`, dấu hỗ trợ ⇒ `idx_lg_hoi_em_cau_luc (sbd, qid>?, qid<?)`.
+Test so cũ ↔ mới: `tests/doc-loi-dau-chi-muc-1111.test.ts`, `tests/ca-bao-ve-dem-mo-1111.test.ts`.
+
+Còn lại sau đợt này (theo bảng 15 câu): chua_loi_dot `qid_chuan=? OR content_group=?` (~157 tr/ngày), hanh_trinh_v4_canh (~124 tr), giao kho sai cả lớp (~88 tr, do thầy bấm),
+cau_meta (~74 tr) … và lượt gọi + CPU Worker (~7,8 USD/kỳ) — đợt sau, sau khi đo lại 24 giờ.
