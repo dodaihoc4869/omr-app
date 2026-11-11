@@ -2,7 +2,7 @@
 //   K1  «Khi chuyển câu, máy hs nhận câu nhưng khi bấm nộp thì không tự về màn live» ⇒ em bấm Gửi là về bảng live NGAY (không chờ phòng báo lại).
 //   K2  «Bấm lên bảng là phải ép hết mọi hs vào live không chờ nộp xong» ⇒ cờ phòng `bang` ép cả em chưa gửi; máy em KHÔNG gửi hộ đáp án đang chọn dở.
 //   K3  «Tạm dừng» ⇒ máy em hiện «Thầy tạm dừng live».
-//   K4  tay nắm + khay ở MÉP TRÁI; ô tiếng nằm trong khay; không còn viên «Thầy đang live» nổi ở đáy màn.
+//   K4  tay nắm + khay ở MÉP TRÊN (thầy 11/11 lần 2; lần 1 là mép trái); ô tiếng nằm trong khay; không còn viên «Thầy đang live» nổi ở đáy màn.
 //   K6  vào bảng sau khi gửi không có viên «Thầy đang live» chớp giữa màn.
 //   B2  tin `roi` mang kiểu rời (`an` trên máy không phân biệt được khoá màn; `chia` khi chia đôi màn hình).
 //   B3  bảng live không nuốt việc của lượt: dải đoán / tiếp sức gửi đúng lệnh `doan` / `tiep`.
@@ -156,14 +156,16 @@ describe('K3 · K4 · tạm dừng + khay mép trái', () => {
     await waitFor(() => expect(screen.queryByText('Thầy tạm dừng live')).toBeNull())
     expect(document.querySelector('.lv')).toBe(goc)
   })
-  it('tay nắm + khay neo MÉP TRÁI, trượt từ trái; ô tiếng trong khay; không còn viên «Thầy đang live» nổi đáy màn, không còn nút nổi «Bật mic lại»', () => {
+  it('tay nắm + khay neo MÉP TRÊN, xổ từ trên xuống, chừa tai thỏ; ô tiếng trong khay; không còn viên «Thầy đang live» nổi đáy màn, không còn nút nổi «Bật mic lại»', () => {
     const css = readFileSync('src/components/live/live-em.css', 'utf8'), tsx = readFileSync('src/components/live/LopLive.tsx', 'utf8')
     const luat = (bo: string) => { const i = css.indexOf(`\n${bo} {`); return i < 0 ? '' : css.slice(i, css.indexOf('}', i)) }
-    expect(luat('.lv .lv-nam, .lv-phu .lv-nam')).toMatch(/left: calc\(var\(--lv-at-trai, 0px\) \+ 2px\)/)
-    expect(luat('.lv .lv-nam, .lv-phu .lv-nam')).not.toMatch(/right:/)
-    expect(luat('.lv-khay')).toMatch(/left: calc\(var\(--lv-at-trai, 0px\) \+ 10px\)/)
-    expect(luat('.lv-khay')).toMatch(/translate3d\(-236px, -50%, 0\)/)
-    expect(luat('.lv-khay')).not.toMatch(/right:/)
+    expect(luat('.lv .lv-nam, .lv-phu .lv-nam')).toMatch(/left: 50%; top: var\(--lv-at-tren, 0px\)/)
+    expect(luat('.lv .lv-nam, .lv-phu .lv-nam')).not.toMatch(/right:|bottom:/)
+    expect(luat('.lv-nam i')).toMatch(/width: 46px; height: 7px/) // viên thuốc nằm ngang
+    expect(luat('.lv-khay')).toMatch(/left: 50%; top: calc\(var\(--lv-at-tren, 0px\) \+ 10px\)/)
+    expect(luat('.lv-khay')).toMatch(/translate3d\(-50%, calc\(-100% - 24px\), 0\)/)
+    expect(luat('.lv-khay[data-mo]')).toMatch(/translate3d\(-50%, 0, 0\)/)
+    expect(luat('.lv-phu')).toMatch(/--lv-at-tren: env\(safe-area-inset-top, 0px\)/) // màn câu hỏi: không đè tai thỏ
     expect(tsx).not.toContain('className="lv-dau') // viên nổi cũ
     expect(tsx).not.toContain('lv-bat-tieng') // nút nổi «Bật mic lại» / «Chạm để bật tiếng»
     expect(tsx).toMatch(/className=\{`lv-vua mic/) // mic của em nằm trong khay

@@ -32,6 +32,8 @@ export interface TuyChonLiveThay {
   opus?: TuyChonOpus
   /** Chế độ «Lọc tiếng ồn + khử vọng» thầy đã chọn lần trước (mặc định `tu` = tự động theo đường vọng). */
   loc?: CheDoLoc
+  /** false ⇒ KHÔNG dùng chuỗi làm rõ tiếng (gửi thẳng track mic) — công tắc lùi khẩn + để đo «trước / sau». Mặc định bật. */
+  chuoi?: boolean
   /** Danh sách mic của máy vừa đổi (cắm / rút) ⇒ lớp giao diện đọc lại `dsMic()`. */
   khiThietBi?: () => void
   moiTruong?: Partial<MoiTruongLive>
@@ -113,6 +115,8 @@ const NGUONG_TIENG = 0.04
 const NGUONG_CAM = 2e-5
 /** Bộ nén nâng mức của chuỗi làm rõ tiếng (Web Audio tự bù mức theo đường cong nén): tiếng nhỏ được kéo lên, tiếng to bị ghìm. Số đo: docs/do-live-1011.md. */
 export const NEN_RO = { nguong: -32, goi: 20, tiLe: 3 }
+/** Bộ chặn đỉnh đứng sau: hạ mức 0,55 lần rồi nén cứng từ −7 dB (Web Audio tự bù ≈ +4 dB) ⇒ đỉnh ra không vượt ≈ −2,5 dBFS, mức giọng nói ≈ −15 dBFS RMS. */
+export const CHAN_DINH = { ha: 0.55, nguong: -7 }
 
 export function taoLiveThay(tuy: TuyChonLiveThay) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
@@ -298,19 +302,20 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       tron.connect(doAm)
       const cao = c.createBiquadFilter(); cao.type = 'highpass'; cao.frequency.value = 80; cao.Q.value = 0.707
       const nen = c.createDynamicsCompressor(); nen.threshold.value = NEN_RO.nguong; nen.knee.value = NEN_RO.goi; nen.ratio.value = NEN_RO.tiLe; nen.attack.value = 0.005; nen.release.value = 0.2
-      const chan = c.createDynamicsCompressor(); chan.threshold.value = -4; chan.knee.value = 0; chan.ratio.value = 20; chan.attack.value = 0.001; chan.release.value = 0.08
+      const ha = c.createGain(); ha.gain.value = CHAN_DINH.ha
+      const chan = c.createDynamicsCompressor(); chan.threshold.value = CHAN_DINH.nguong; chan.knee.value = 0; chan.ratio.value = 20; chan.attack.value = 0.001; chan.release.value = 0.08
       const doRa = c.createAnalyser(); doRa.fftSize = 1024; mauRa = new Float32Array(doRa.fftSize)
       const dich = c.createMediaStreamDestination(); dich.channelCount = 1
-      tron.connect(cao); cao.connect(nen); nen.connect(chan); chan.connect(doRa); chan.connect(dich)
+      tron.connect(cao); cao.connect(nen); nen.connect(ha); ha.connect(chan); chan.connect(doRa); chan.connect(dich)
       const ra = dich.stream.getAudioTracks()[0]
-      nut.push(cao, nen, chan, doRa, dich)
+      nut.push(cao, nen, ha, chan, doRa, dich)
       if (ra) { try { ra.contentHint = 'speech' } catch { /* trình duyệt cũ */ } chuoi = { ra, doRa, nut, hong: false } }
     } catch { chuoi = null }
   }
   /** Track GỬI cho lớp: track của chuỗi làm rõ tiếng khi chuỗi đang chạy tốt; không thì thẳng track mic. */
   function trackGui(): MediaStreamTrack | null {
     const t = mic?.getAudioTracks()[0] ?? null
-    return t && chuoi && !chuoi.hong && ctxChay() && chuoi.ra.readyState === 'live' ? chuoi.ra : t
+    return t && tuy.chuoi !== false && chuoi && !chuoi.hong && ctxChay() && chuoi.ra.readyState === 'live' ? chuoi.ra : t
   }
   /** Gắn tiếng mic đang mở vào bộ gửi (đang live, không phải «Live không tiếng»). Trả true nếu bộ gửi đang cầm tiếng mic. `dangBat` = đang trong `bat()`
    *  (phòng chưa kịp báo `bat`). */
@@ -419,7 +424,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   /** Mức âm 0..1 cho vạch mic = tiếng SẼ / ĐANG gửi cho lớp (sau chuỗi làm rõ tiếng). Bộ đo AudioContext treo ⇒ mức âm của bộ gửi (`getStats`, làm mới ≤ 4 lần / giây). */
   function mucAm(): number {
     let v = 0
-    if (ctxChay() && (chuoi && !chuoi.hong && mauRa ? true : !!doAm && !!mauAm)) v = Math.min(1, (chuoi && !chuoi.hong && mauRa ? rms(chuoi.doRa, mauRa) : rms(doAm!, mauAm!)) * 4)
+    const ra = tuy.chuoi !== false && chuoi && !chuoi.hong && mauRa ? chuoi.doRa : null
+    if (ctxChay() && (ra || (doAm && mauAm))) v = Math.min(1, (ra ? rms(ra, mauRa!) : rms(doAm!, mauAm!)) * 4)
     else {
       void amCtx?.resume().catch(() => undefined)
       if (mt.dongHo() - lucDocGui > 250) docGui()
@@ -450,7 +456,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 4) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
       sfu: !!pc && pc.connectionState === 'connected', loc: tt.loc, bac, ctx: amCtx?.state ?? 'khong',
       hz: cd.sampleRate ?? null, kenh: cd.channelCount ?? null, vong: typeof cd.echoCancellation === 'boolean' ? cd.echoCancellation : cd.echoCancellation == null ? null : true, on: cd.noiseSuppression ?? null, agc: cd.autoGainControl ?? null,
-      chuoi: !!chuoi && !chuoi.hong && ctxChay(),
+      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && ctxChay(),
     }
   }
   const khiThietBi = (): void => { tuy.khiThietBi?.(); if (tt.micTinh === 'mat') henMoLaiMic(300) }

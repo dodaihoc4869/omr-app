@@ -1,0 +1,137 @@
+// TRANG ĐO TIẾNG LIVE (11/11, thầy: «chỉnh tiếng trong và cực rõ», «học sinh nghe được nhưng hơi nhỏ») — thư viện THẬT `taoLiveThay` (mở mic, luật lọc, chuỗi làm
+// rõ tiếng, sửa SDP Opus, `setParameters`) phát tiếng tới MỘT RTCPeerConnection thứ hai NGAY TRONG TRANG đóng vai «SFU + máy em» (Cloudflare Realtime SFU chỉ
+// chuyển tiếp gói RTP, không mã hoá lại ⇒ số đo bộ mã ở đây đúng với đường thật; KHÔNG có trễ mạng). Nguồn tiếng: mic giả của Chromium đọc tệp WAV
+// (`--use-file-for-fake-audio-capture`). Cách chạy: scripts/thu-live-1011/do-tieng.mjs.
+import { taoLiveThay, type CheDoLoc } from '../../src/lib/live'
+import type { TuyChonOpus } from '../../src/lib/live/sfu'
+import { CHAN_DINH, NEN_RO } from '../../src/lib/live/thay'
+import { taoPhong, viewBang } from '../../src/lib/bpu/phong'
+import { datCoLive, liveBat, liveDat, liveSan, liveTat } from '../../src/lib/bpu/phong-live'
+
+interface CauHinh { ten: string; loc: CheDoLoc; chuoi: boolean; opus?: TuyChonOpus }
+const gomIce = (pc: RTCPeerConnection) => new Promise<void>((xong) => { if (pc.iceGatheringState === 'complete') { xong(); return } const h = setTimeout(xong, 1500); pc.addEventListener('icegatheringstatechange', () => { if (pc.iceGatheringState === 'complete') { clearTimeout(h); xong() } }) })
+const ngu = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const db = (v: number) => (v > 0 ? 20 * Math.log10(v) : -160)
+
+/** Phát `giay` giây qua đúng đường của thư viện với `ch`, thu ở đầu nhận: phổ giữ đỉnh (dB theo tần số), RMS / đỉnh, tốc độ bit thật, trễ đệm nhận. */
+async function doMot(ch: CauHinh, giay: number) {
+  const st = taoPhong({ buoiId: 'do', lop: 'L', nay: Date.now(), ds: [{ sbd: 'S1', ten: 'Em', coMat: true, luc: 1 }] })
+  datCoLive(st, { cho: true, sfu: true }, Date.now())
+  let pc2: RTCPeerConnection | null = null
+  let nhan: MediaStreamTrack | null = null
+  const lt = taoLiveThay({
+    ve: 've', goc: 'https://sfu-gia', loc: ch.loc, chuoi: ch.chuoi, opus: ch.opus,
+    kenh: { gui: (t) => { if (t.t === 'live-bat') liveBat(st, Date.now()); if (t.t === 'live-tat') liveTat(st, Date.now()); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, Date.now()); if (t.t === 'live-dat') liveDat(st, t as never, Date.now()); if (t.t === 'live-bat' || t.t === 'live-dat') lt.nhanTinPhong(viewBang(st)) }, guiNhiPhan: () => {} },
+    moiTruong: {
+      fetch: (async (u: RequestInfo | URL, o?: RequestInit) => {
+        const b = JSON.parse(String(o?.body ?? '{}')) as { sdp?: string }
+        if (!String(u).endsWith('/noi') || !b.sdp) return new Response(JSON.stringify({ ok: false }))
+        pc2 = new RTCPeerConnection()
+        pc2.addEventListener('track', (e) => { nhan = e.track; try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ } })
+        await pc2.setRemoteDescription({ type: 'offer', sdp: b.sdp })
+        await pc2.setLocalDescription(await pc2.createAnswer())
+        await gomIce(pc2)
+        return new Response(JSON.stringify({ ok: true, phien: 'p'.repeat(16), sdp: pc2.localDescription!.sdp }))
+      }) as typeof fetch,
+    },
+  })
+  lt.nhanTinPhong(viewBang(st))
+  const kq = await lt.bat({})
+  if (!kq.ok) throw new Error(`bật live hỏng: ${kq.lyDo}`)
+  for (let i = 0; i < 60 && !nhan; i++) await ngu(100)
+  if (!nhan || !pc2) throw new Error('đầu nhận không có track')
+  // Như máy em: gắn luồng vào <audio> (Chromium chỉ giải mã luồng WebRTC đang được phát) + đo bằng Web Audio.
+  const luong = new MediaStream([nhan])
+  const the = document.createElement('audio'); the.srcObject = luong; the.muted = true; void the.play().catch(() => undefined)
+  const actx = new AudioContext({ sampleRate: 48000 })
+  await actx.resume()
+  const nguon = actx.createMediaStreamSource(luong)
+  const pho = actx.createAnalyser(); pho.fftSize = 8192; pho.smoothingTimeConstant = 0; pho.minDecibels = -140
+  const song = actx.createAnalyser(); song.fftSize = 2048
+  nguon.connect(pho); nguon.connect(song)
+  await ngu(2500) // bỏ đoạn đầu (bộ mã + tự chỉnh âm lượng ổn định)
+  const giu = new Float32Array(pho.frequencyBinCount).fill(-200), kh = new Float32Array(pho.frequencyBinCount), m = new Float32Array(song.fftSize)
+  let tong = 0, dem = 0, dinh = 0
+  const rmsKhung: number[] = []
+  const so0 = await (pc2 as RTCPeerConnection).getStats(), t0 = performance.now()
+  for (const het = t0 + giay * 1000; performance.now() < het;) {
+    pho.getFloatFrequencyData(kh)
+    for (let i = 0; i < kh.length; i++) if (kh[i]! > giu[i]!) giu[i] = kh[i]!
+    song.getFloatTimeDomainData(m)
+    let s = 0
+    for (let i = 0; i < m.length; i++) { const v = m[i]!; s += v * v; if (Math.abs(v) > dinh) dinh = Math.abs(v) }
+    tong += s; dem += m.length; rmsKhung.push(Math.sqrt(s / m.length))
+    await ngu(25)
+  }
+  const so1 = await (pc2 as RTCPeerConnection).getStats(), t1 = performance.now()
+  const doc = (bc: RTCStatsReport) => { let byte = 0, tre = 0, phat = 0; bc.forEach((x: Record<string, unknown>) => { if (x.type === 'inbound-rtp' && x.kind === 'audio') { byte = Number(x.bytesReceived) || 0; tre = Number(x.jitterBufferDelay) || 0; phat = Number(x.jitterBufferEmittedCount) || 0 } }); return { byte, tre, phat } }
+  const a = doc(so0), b = doc(so1)
+  // RMS lúc CÓ tiếng (bỏ khung lặng dưới −50 dBFS — quãng nghỉ giữa các âm tiết)
+  const coTieng = rmsKhung.filter((v) => v > 0.00316)
+  const rmsNoi = coTieng.length ? Math.sqrt(coTieng.reduce((s, v) => s + v * v, 0) / coTieng.length) : 0
+  // Phổ: gom về 96 điểm theo thang log 50 Hz … 22 kHz
+  const hzMoiO = 48000 / pho.fftSize, diem: [number, number][] = []
+  for (let k = 0; k < 96; k++) {
+    const f0 = 50 * Math.pow(440, k / 96), f1 = 50 * Math.pow(440, (k + 1) / 96)
+    let lon = -200
+    for (let i = Math.max(1, Math.floor(f0 / hzMoiO)); i <= Math.min(giu.length - 1, Math.ceil(f1 / hzMoiO)); i++) if (giu[i]! > lon) lon = giu[i]!
+    diem.push([Math.round(Math.sqrt(f0 * f1)), Math.round(lon * 10) / 10])
+  }
+  const cd = lt.chanDoan()
+  lt.tat(); lt.huy()
+  try { (pc2 as RTCPeerConnection).close() } catch { /* đã đóng */ }
+  await actx.close()
+  return {
+    ten: ch.ten, pho: diem, rmsDb: Math.round(db(Math.sqrt(tong / Math.max(1, dem))) * 10) / 10, rmsNoiDb: Math.round(db(rmsNoi) * 10) / 10, dinhDb: Math.round(db(dinh) * 10) / 10,
+    kbps: Math.round(((b.byte - a.byte) * 8) / (t1 - t0) * 10) / 10, demNhanMs: b.phat > a.phat ? Math.round(((b.tre - a.tre) / (b.phat - a.phat)) * 1000) : null,
+    cauHinhMic: { hz: cd.hz, kenh: cd.kenh, vong: cd.vong, on: cd.on, agc: cd.agc, bac: cd.bac, chuoi: cd.chuoi, ctx: cd.ctx },
+  }
+}
+
+/** Trễ thêm của chuỗi làm rõ tiếng (lọc 80 Hz → nén nâng mức → chặn đỉnh): dựng ngoại tuyến, đo vị trí đỉnh của một xung. */
+async function treChuoi(): Promise<number> {
+  const c = new OfflineAudioContext(1, 48000, 48000)
+  const dem = c.createBuffer(1, 48000, 48000); dem.getChannelData(0)[4800] = 0.5
+  const nguon = c.createBufferSource(); nguon.buffer = dem
+  const cao = c.createBiquadFilter(); cao.type = 'highpass'; cao.frequency.value = 80; cao.Q.value = 0.707
+  const nen = c.createDynamicsCompressor(); nen.threshold.value = NEN_RO.nguong; nen.knee.value = NEN_RO.goi; nen.ratio.value = NEN_RO.tiLe; nen.attack.value = 0.005; nen.release.value = 0.2
+  const ha = c.createGain(); ha.gain.value = CHAN_DINH.ha
+  const chan = c.createDynamicsCompressor(); chan.threshold.value = CHAN_DINH.nguong; chan.knee.value = 0; chan.ratio.value = 20; chan.attack.value = 0.001; chan.release.value = 0.08
+  nguon.connect(cao); cao.connect(nen); nen.connect(ha); ha.connect(chan); chan.connect(c.destination); nguon.start()
+  const ra = (await c.startRendering()).getChannelData(0)
+  let vt = 0, lon = 0
+  for (let i = 0; i < ra.length; i++) if (Math.abs(ra[i]!) > lon) { lon = Math.abs(ra[i]!); vt = i }
+  return Math.round(((vt - 4800) / 48) * 10) / 10
+}
+
+const TRUOC: CauHinh = { ten: 'trước 11/11 (khử vọng + lọc ồn bật, 24 kb/s có DTX, không chuỗi)', loc: 'bat', chuoi: false, opus: { bitrate: 24000, dtx: true, rong: false } }
+const SAU: CauHinh = { ten: 'sau · mặc định (không đường vọng: tắt khử vọng + lọc ồn, 64 kb/s, có chuỗi làm rõ tiếng)', loc: 'tu', chuoi: true }
+const SAU_LOC: CauHinh = { ten: 'sau · chống hú («Tất cả»: bật khử vọng + lọc ồn, 64 kb/s, có chuỗi)', loc: 'bat', chuoi: true }
+;(window as unknown as Record<string, unknown>).__doTieng = async (giay: number, ca: string[]) => {
+  const ra = []
+  for (const ch of [TRUOC, SAU, SAU_LOC]) if (ca.includes(ch === TRUOC ? 'truoc' : ch === SAU ? 'sau' : 'sau-loc')) ra.push(await doMot(ch, giay))
+  return ra
+}
+/** PHỔ GỐC: cùng tệp nguồn, mic THÔ (không xử lý, không bộ mã), cùng cách đo ⇒ mốc để trừ ra đường truyền (phổ giữ đỉnh của tiếng quét tần tự nó không phẳng). */
+;(window as unknown as Record<string, unknown>).__doGoc = async (giay: number) => {
+  const luong = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } })
+  const actx = new AudioContext({ sampleRate: 48000 })
+  await actx.resume()
+  const pho = actx.createAnalyser(); pho.fftSize = 8192; pho.smoothingTimeConstant = 0; pho.minDecibels = -140
+  actx.createMediaStreamSource(luong).connect(pho)
+  await ngu(500)
+  const giu = new Float32Array(pho.frequencyBinCount).fill(-200), kh = new Float32Array(pho.frequencyBinCount)
+  for (const het = performance.now() + giay * 1000; performance.now() < het;) { pho.getFloatFrequencyData(kh); for (let i = 0; i < kh.length; i++) if (kh[i]! > giu[i]!) giu[i] = kh[i]!; await ngu(25) }
+  const hzMoiO = 48000 / pho.fftSize, diem: [number, number][] = []
+  for (let k = 0; k < 96; k++) {
+    const f0 = 50 * Math.pow(440, k / 96), f1 = 50 * Math.pow(440, (k + 1) / 96)
+    let lon = -200
+    for (let i = Math.max(1, Math.floor(f0 / hzMoiO)); i <= Math.min(giu.length - 1, Math.ceil(f1 / hzMoiO)); i++) if (giu[i]! > lon) lon = giu[i]!
+    diem.push([Math.round(Math.sqrt(f0 * f1)), Math.round(lon * 10) / 10])
+  }
+  for (const t of luong.getTracks()) t.stop()
+  await actx.close()
+  return diem
+}
+;(window as unknown as Record<string, unknown>).__treChuoi = treChuoi
+document.body.textContent = 'Trang đo tiếng Live — chạy bằng scripts/thu-live-1011/do-tieng.mjs'
