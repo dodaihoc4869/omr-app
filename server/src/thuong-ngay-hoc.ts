@@ -7,7 +7,7 @@
 // dựng `NhatKyChuoi` từng em và gọi đúng hàm thuần của B3 ⇒ số giống hệt màn học sinh (cửa sổ đọc ≤ SO_NGAY_DOC của B3).
 import type { D1PreparedStatement, Env } from './kieu'
 import { themNgay } from './ho-so-nam-kt'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, sqlCotKt, sqlCotTraNo, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, NGAY_KT_CHI_28, sqlCotKt, sqlCotTraNo, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 import { str, num, type Row } from './thuong-b-chung'
 import { laNgayBaoTri } from './ngay-bao-tri'
 
@@ -26,7 +26,8 @@ export const sqlSoCau = (tapEm: string = TAP_EM_JSON): string =>
   `SELECT sbd, ngay_vn AS n, COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) AS c,
       CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN ${SQL_SO_CAU_MUC} ELSE 0 END AS c7,
       CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN (SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn) END AS m,
-      ${sqlCotTraNo('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')} AS tn, ${sqlCotKt('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')} AS kt
+      CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN ${sqlCotTraNo('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')} END AS tn,
+      CASE WHEN ngay_vn >= '${NGAY_KT_CHI_28}' THEN ${sqlCotKt('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')} END AS kt
     FROM su_kien_hoc WHERE sbd IN ${tapEm} AND ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_CO_KET_QUA_HOAC_LUOT} GROUP BY sbd, ngay_vn`
 /** Ngày tự sửa xong (B3). `?2` = ngày đầu cửa sổ. Chỉ mục idx_cld_sbd_trang_thai(sbd, trang_thai_day, …). */
 export const sqlTuSua = (tapEm: string = TAP_EM_JSON): string =>
