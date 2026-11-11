@@ -17,6 +17,30 @@ console.log(`# Khoảng ngày (UTC): ${TU} → ${DEN}`)
 { const r = await rest('/accounts/{acc}/workers/scripts'); console.log(`\n## 0b. Worker: HTTP ${r.st} ${r.j?.success === false ? loiNgan(r.j.errors) : ''}`)
   for (const x of r.j?.result ?? []) console.log(JSON.stringify({ ten: x.id, tao: x.created_on, sua: x.modified_on, nhatKy: x.observability ?? x.logpush ?? null, cron: x.has_modules === undefined ? undefined : null })) }
 if (process.env.CHI_NS === '1') process.exit(0)
+// LƯỢT 7 (CHI_NS=2): mọi D1 của tài khoản · Worker thử còn gắn D1 thật / còn lịch chạy không · lượt gọi theo Worker theo ngày · Durable Object hàng đọc/ghi
+if (process.env.CHI_NS === '2') {
+  const T0 = '2026-10-11T00:00:00Z', T1 = '2026-11-10T23:59:59Z'
+  { const r = await rest('/accounts/{acc}/d1/database?per_page=100'); console.log(`\n## 7a. Mọi D1: HTTP ${r.st}`)
+    for (const x of r.j?.result ?? []) console.log(JSON.stringify({ id: x.uuid, ten: x.name, coMB: x.file_size ? Math.round(x.file_size / 1e6) : null, tao: x.created_at })) }
+  for (const w of ['omr-thu', 'omr-thu-tai']) {
+    const a = await rest(`/accounts/{acc}/workers/scripts/${w}/settings`)
+    console.log(`\n## 7b. ${w} — gắn kết: HTTP ${a.st}`)
+    for (const b of a.j?.result?.bindings ?? []) console.log('  ', JSON.stringify({ loai: b.type, ten: b.name, d1: b.id ?? b.database_id, lop: b.class_name, bucket: b.bucket_name }))
+    const c = await rest(`/accounts/{acc}/workers/scripts/${w}/schedules`)
+    console.log(`   lịch chạy: HTTP ${c.st} ${JSON.stringify((c.j?.result?.schedules ?? []).map((x) => x.cron))}`)
+  }
+  const q = async (ten, than, loc) => { const j = await gql(`query($a:String!){viewer{accounts(filter:{accountTag:$a}){${ten}(limit:10000,filter:${loc}){${than}}}}}`, { a: ACC }); if (j.errors?.length) { console.log(`LỖI ${ten}: ${loiNgan(j.errors)}`); return [] } return j?.data?.viewer?.accounts?.[0]?.[ten] ?? [] }
+  const L = `{datetime_geq:"${T0}",datetime_leq:"${T1}"}`
+  console.log('\n## 7c. D1 theo từng database (11/10 → hết 10/11 UTC)')
+  for (const x of await q('d1AnalyticsAdaptiveGroups', 'sum{rowsRead rowsWritten readQueries writeQueries} dimensions{databaseId}', L)) console.log(JSON.stringify({ db: x.dimensions.databaseId, ...x.sum }))
+  console.log('\n## 7d. Worker thử theo ngày (lượt gọi, CPU ms)')
+  for (const x of await q('workersInvocationsAdaptive', 'sum{requests cpuTimeUs} dimensions{date scriptName}', `{datetime_geq:"2026-10-25T00:00:00Z",datetime_leq:"2026-11-11T10:00:00Z",scriptName_in:["omr-thu","omr-thu-tai"]}`)) console.log(x.dimensions.date, x.dimensions.scriptName, x.sum.requests, Math.round(x.sum.cpuTimeUs / 1000))
+  console.log('\n## 7e. Durable Object theo vùng — hàng đọc / ghi / tin WebSocket vào (11/10 → hết 10/11)')
+  for (const x of await q('durableObjectsPeriodicGroups', 'sum{activeTime rowsRead rowsWritten inboundWebsocketMsgCount} dimensions{namespaceId}', L)) console.log(JSON.stringify({ vung: x.dimensions.namespaceId, giayChay: Math.round(x.sum.activeTime / 1e6), ...x.sum, activeTime: undefined }))
+  console.log('\n## 7f. Tổng kỳ 11/10 → hết 10/11 (bỏ 11/11)')
+  for (const [ten, than] of [['d1AnalyticsAdaptiveGroups', 'sum{rowsRead rowsWritten}'], ['workersInvocationsAdaptive', 'sum{requests cpuTimeUs}'], ['durableObjectsInvocationsAdaptiveGroups', 'sum{requests}'], ['durableObjectsPeriodicGroups', 'sum{activeTime}']]) for (const x of await q(ten, than, L)) console.log(ten, JSON.stringify(x.sum))
+  process.exit(0)
+}
 // ───────── 1. HOÁ ĐƠN / GÓI ĐĂNG KÝ (REST) ─────────
 console.log('\n## 1a. Gói đăng ký của tài khoản (/accounts/{acc}/subscriptions)')
 { const r = await rest('/accounts/{acc}/subscriptions'); console.log(`HTTP ${r.st} ${r.j?.success === false ? loiNgan(r.j.errors) : ''}`)
