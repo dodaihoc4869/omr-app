@@ -1,0 +1,569 @@
+{
+  "i": 665,
+  "assetIndexProvidedByParent": 1041,
+  "hash": "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5.png",
+  "size": [
+    679,
+    212
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DB-12-B8-D1-III-438",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ).\nMỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ sau: Để sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+      "allHinh": [
+        {
+          "hash": "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5",
+          "where": "DB-12-B8-D1-III-438.hinh.0.du_lieu",
+          "hashDataUrl": "a12ee1d17eeeaebf9605a4963aeacd21a3396930b2748271a94a45e243d59f24"
+        }
+      ],
+      "missingHashes": [
+        "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5"
+      ]
+    },
+    {
+      "qid": "DH-12-C3-B9-P1-III-34",
+      "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ).\nMỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ sau: Để sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+      "allHinh": [
+        {
+          "hash": "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5",
+          "where": "DH-12-C3-B9-P1-III-34.hinh.0.du_lieu",
+          "hashDataUrl": "a12ee1d17eeeaebf9605a4963aeacd21a3396930b2748271a94a45e243d59f24"
+        }
+      ],
+      "missingHashes": [
+        "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 2,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownLeftLabel16xOpened": true,
+    "ownRightLabel16xOpened": true,
+    "ownArrow8xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativecenterline/bbox approximate nearest1px; explicitfirstC/N glyphanchors preserve literal. Atomcountsindependent fromlabelsnotanswer.",
+  "geometry": {
+    "left": {
+      "phenylVertices": [
+        [
+          21,
+          98
+        ],
+        [
+          58,
+          77
+        ],
+        [
+          94,
+          98
+        ],
+        [
+          94,
+          140
+        ],
+        [
+          58,
+          161
+        ],
+        [
+          21,
+          140
+        ]
+      ],
+      "phenylInnerDouble": [
+        [
+          [
+            26,
+            101
+          ],
+          [
+            26,
+            137
+          ]
+        ],
+        [
+          [
+            59,
+            83
+          ],
+          [
+            89,
+            101
+          ]
+        ],
+        [
+          [
+            59,
+            155
+          ],
+          [
+            89,
+            137
+          ]
+        ]
+      ],
+      "centralBareC": [
+        131,
+        77
+      ],
+      "centralBonds": [
+        [
+          [
+            94,
+            98
+          ],
+          [
+            131,
+            77
+          ]
+        ],
+        [
+          [
+            131,
+            77
+          ],
+          [
+            167,
+            98
+          ]
+        ],
+        [
+          [
+            131,
+            77
+          ],
+          [
+            131,
+            45
+          ]
+        ]
+      ],
+      "piperidineBareC": [
+        [
+          167,
+          98
+        ],
+        [
+          203,
+          77
+        ],
+        [
+          240,
+          98
+        ],
+        [
+          240,
+          140
+        ],
+        [
+          203,
+          161
+        ]
+      ],
+      "piperidineBonds": [
+        [
+          [
+            167,
+            98
+          ],
+          [
+            203,
+            77
+          ]
+        ],
+        [
+          [
+            203,
+            77
+          ],
+          [
+            240,
+            98
+          ]
+        ],
+        [
+          [
+            240,
+            98
+          ],
+          [
+            240,
+            140
+          ]
+        ],
+        [
+          [
+            240,
+            140
+          ],
+          [
+            203,
+            161
+          ]
+        ],
+        [
+          [
+            203,
+            161
+          ],
+          [
+            175,
+            145
+          ]
+        ],
+        [
+          [
+            167,
+            98
+          ],
+          [
+            167,
+            132
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "text": "COOH",
+          "bbox": [
+            124,
+            29,
+            174,
+            42
+          ],
+          "bondAnchor": "FIRSTC",
+          "CcenterX": 131
+        },
+        {
+          "text": "ClH₂N",
+          "bbox": [
+            126,
+            133,
+            175,
+            150
+          ],
+          "bondAnchor": "RIGHTNcenter167;upperbondtoNtop;lowerbondfromNlowerright",
+          "literalEvidence": "Cl capitalC+lowercasel; H2sub; Nright. NOTCH2N/ClH/charge."
+        }
+      ],
+      "caption": {
+        "text": "Ritalinic acid hydrochloride",
+        "bbox": [
+          49,
+          192,
+          240,
+          208
+        ]
+      },
+      "counts": {
+        "C": 13,
+        "N": 1,
+        "O": 2,
+        "Cl": 1,
+        "phenylInnerDoubles": 3,
+        "rings": 2
+      }
+    },
+    "right": {
+      "phenylVertices": [
+        [
+          394,
+          97
+        ],
+        [
+          430,
+          76
+        ],
+        [
+          466,
+          97
+        ],
+        [
+          466,
+          139
+        ],
+        [
+          430,
+          160
+        ],
+        [
+          394,
+          139
+        ]
+      ],
+      "phenylInnerDouble": [
+        [
+          [
+            399,
+            100
+          ],
+          [
+            399,
+            136
+          ]
+        ],
+        [
+          [
+            431,
+            82
+          ],
+          [
+            461,
+            100
+          ]
+        ],
+        [
+          [
+            431,
+            154
+          ],
+          [
+            461,
+            136
+          ]
+        ]
+      ],
+      "centralBareC": [
+        502,
+        76
+      ],
+      "centralBonds": [
+        [
+          [
+            466,
+            97
+          ],
+          [
+            502,
+            76
+          ]
+        ],
+        [
+          [
+            502,
+            76
+          ],
+          [
+            539,
+            97
+          ]
+        ],
+        [
+          [
+            502,
+            76
+          ],
+          [
+            502,
+            44
+          ]
+        ]
+      ],
+      "piperidineBareC": [
+        [
+          539,
+          97
+        ],
+        [
+          575,
+          76
+        ],
+        [
+          612,
+          97
+        ],
+        [
+          612,
+          139
+        ],
+        [
+          575,
+          160
+        ]
+      ],
+      "piperidineBonds": [
+        [
+          [
+            539,
+            97
+          ],
+          [
+            575,
+            76
+          ]
+        ],
+        [
+          [
+            575,
+            76
+          ],
+          [
+            612,
+            97
+          ]
+        ],
+        [
+          [
+            612,
+            97
+          ],
+          [
+            612,
+            139
+          ]
+        ],
+        [
+          [
+            612,
+            139
+          ],
+          [
+            575,
+            160
+          ]
+        ],
+        [
+          [
+            575,
+            160
+          ],
+          [
+            547,
+            144
+          ]
+        ],
+        [
+          [
+            539,
+            97
+          ],
+          [
+            539,
+            131
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "text": "COOCH₃",
+          "bbox": [
+            495,
+            27,
+            561,
+            43
+          ],
+          "bondAnchor": "FIRSTC",
+          "CcenterX": 502
+        },
+        {
+          "text": "ClH₂N",
+          "bbox": [
+            497,
+            132,
+            546,
+            149
+          ],
+          "bondAnchor": "RIGHTNcenter539",
+          "literalEvidence": "Ownright16x confirms ClH2N notCH2N."
+        }
+      ],
+      "caption": {
+        "text": "methylphenidate hydrochloride",
+        "bbox": [
+          412,
+          187,
+          625,
+          204
+        ]
+      },
+      "counts": {
+        "C": 14,
+        "N": 1,
+        "O": 2,
+        "Cl": 1,
+        "phenylInnerDoubles": 3,
+        "rings": 2
+      }
+    },
+    "arrow": {
+      "shaft": [
+        [
+          262,
+          119
+        ],
+        [
+          373,
+          119
+        ]
+      ],
+      "headTriangle": [
+        [
+          373,
+          119
+        ],
+        [
+          361,
+          115
+        ],
+        [
+          361,
+          123
+        ]
+      ],
+      "headStyle": "oneFILLEDrighthead, shafttotip",
+      "condition": {
+        "text": "+ CH₃OH/HCl",
+        "bbox": [
+          261,
+          94,
+          361,
+          110
+        ],
+        "font": "regular uprightserif; slashliteral noaddedspacearoundslash"
+      }
+    },
+    "font": "ALLformula/conditions/captions regular upright serif. Neithertrueboldnoritalic. PreserveRcapitalleft/methylphenidatelowercaseright. H2/CH3 subscriptnumbers. Lowercasel inCl distinctfromcapitalI.",
+    "countsTotal": {
+      "C": 27,
+      "O": 4,
+      "N": 2,
+      "Cl": 2,
+      "sixMemberRings": 4,
+      "phenylInnerDoubles": 6,
+      "reactionHeads": 1,
+      "caption": 2,
+      "charges": 0,
+      "stereowedges": 0
+    },
+    "noAdded": [
+      "HClseparatedsaltformula",
+      "charges",
+      "stereochemistry",
+      "COdoubleexpandedfromCOOH",
+      "yield75%fromstem",
+      "productwater",
+      "H2NHglyphreplacement",
+      "answer"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only clear, noCount/unreviewedSVG",
+  "rootAudit": {
+    "nativeFull": true,
+    "native4x": true,
+    "allPublicDeAndRefs": true,
+    "freshChromium3xFull": true,
+    "exactSvg": "3bfdb15dec20e8de0c75ec49c968590e15dab2b2bdaed1c611ba20bc795d3b34",
+    "notes": "Hai ClH₂N literal giữ N anchor/COOH và COOCH3 firstC anchors, 6 inner phenyl doubles/4 six rings/27C4O2N2Cl/ALLregularUPRIGHT/1filledrighthead/noHCl-salt-rewrite/noanswer. Root mở native FULL+native4x và actualFULL3x riêng."
+  }
+}

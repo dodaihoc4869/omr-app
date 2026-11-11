@@ -1,0 +1,18 @@
+{
+  "lo": 348,
+  "newMainChanges": "So347 sửa Live mic/xem lại/bút bảng và workflow lịch kiểm tra; app-server/CSS/test/workflow đổi, Vite-font-mốc nguyênbyte, chưa gộp.",
+  "productionChangedThisBatch": false,
+  "colorViolations": 1153,
+  "colorCheckerFiles": 227,
+  "sizeBaselineRed": {
+    "file": "server/src/index.ts",
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainMocSha": "2c8c45be8ab06dfb7ee3d825eecc0a6eca1f642068971483bf6e3c2f52d058c1",
+  "branchMocSha": "f762cef714985c2b200e382d62736fdbf06c5c6262f026da94b2d477dbd46fde",
+  "latestMainBuildSpeedRequiredBeforeMergeRelease": true,
+  "scope": "Cổng lô348 chỉ nhánh hiện tại, productionoldfonts/assets; chưa phải latestmain build-speed/full.",
+  "main": "7c0935aaba503b3764cc815fc59a94f0ee0fc2c8",
+  "comparedToMain347": "6a20ce3b51019def5cba2a514a89f2a38238ad58"
+}

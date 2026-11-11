@@ -1,0 +1,40 @@
+[
+  {
+    "i": 665,
+    "hash": "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5",
+    "fileNguon": "anh/7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5.png",
+    "svg": "ritalin-native665-ddh-3bfdb15dec20e8de0c75ec49c968590e15dab2b2bdaed1c611ba20bc795d3b34.svg",
+    "hashSvg": "3bfdb15dec20e8de0c75ec49c968590e15dab2b2bdaed1c611ba20bc795d3b34",
+    "byteSvg": 43339,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DB-12-B8-D1-III-438",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ).\nMỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ sau: Để sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+        "refs": [
+          {
+            "hash": "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5",
+            "where": "DB-12-B8-D1-III-438.hinh.0.du_lieu",
+            "hashDataUrl": "a12ee1d17eeeaebf9605a4963aeacd21a3396930b2748271a94a45e243d59f24"
+          }
+        ]
+      },
+      {
+        "qid": "DH-12-C3-B9-P1-III-34",
+        "de": "Thuốc Ritalin là chất kích thích hệ thần kinh trung ương được sử dụng phổ biến nhất trong điều trị rối loạn tăng động giảm chú ý và chứng rối loạn giấc ngủ (ngủ rũ).\nMỗi viên thuốc ritalin chứa 10 mg methylphenidate hydrochloride được điều chế theo sơ đồ sau: Để sản xuất 5 triệu hộp thuốc ritalin loại 30 viên/hộp với hiệu suất là 75% tính theo ritalinic acid hydrochloride thì cần dùng tối thiểu bao nhiêu tấn ritalinic acid hydrochloride? (Kết quả làm tròn đến hàng phần mười)",
+        "refs": [
+          {
+            "hash": "7abb62aaac77b7555b582e98602f5072d7d11502c8d7cefa476e8339f9cac3d5",
+            "where": "DH-12-C3-B9-P1-III-34.hinh.0.du_lieu",
+            "hashDataUrl": "a12ee1d17eeeaebf9605a4963aeacd21a3396930b2748271a94a45e243d59f24"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "27C4O2N2Cl/4sixrings6phenylinnerdouble/2literalClH2N-rightNanchors/COOHleft-COOCH3right-firstCanchors/ALLregularUPRIGHT/2exactcaptions-Ritalinic acid hydrochloride-methylphenidate hydrochloride/+CH3OH/HCl-1FILLEDrighthead/0charges0stereo/noaddedHClsplit-COdouble-water-yield75-answer",
+    "hashSvgDaSoat": "3bfdb15dec20e8de0c75ec49c968590e15dab2b2bdaed1c611ba20bc795d3b34",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
