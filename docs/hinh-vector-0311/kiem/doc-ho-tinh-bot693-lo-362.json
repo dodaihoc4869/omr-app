@@ -1,0 +1,488 @@
+{
+  "i": 693,
+  "assetIndexProvided": 1172,
+  "hash": "807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c.png",
+  "size": [
+    829,
+    346
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C2-B6-II-29",
+      "de": "Để tiến hành kiểm chứng tính chất hóa học của tinh bột, một học sinh đã tiến hành thí nghiệm như sau:",
+      "allHinh": [
+        {
+          "hash": "807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c",
+          "where": "DH-12-C2-B6-II-29.hinh.0.du_lieu",
+          "hashDataUrl": "da089ed996648a961f48acbe780ad98a266eabf8dca9bbe1fcb37f7316fc9716"
+        }
+      ],
+      "missingHashes": [
+        "807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownVerticalMacro4xOpened": true,
+    "ownConditionMacro4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativebbox/centerlinecoordinatesapproxnearest1px; exactliteralcase/readingsfromownmacros. X/Y/Z/Tremainunknownsourceletters, noanswerinference.",
+  "geometry": {
+    "boxes": [
+      {
+        "rect": [
+          9,
+          18,
+          149,
+          81
+        ],
+        "radius": 12,
+        "fill": "white",
+        "outline": "black~1.8px",
+        "shadow": {
+          "offset": [
+            7,
+            7
+          ],
+          "fill": "gray~#c4c4c4",
+          "sameRadius": true,
+          "outline": false
+        },
+        "lines": [
+          {
+            "text": "Dung dịch",
+            "bbox": [
+              30,
+              24,
+              129,
+              45
+            ]
+          },
+          {
+            "text": "hồ tinh bột",
+            "bbox": [
+              28,
+              49,
+              129,
+              72
+            ]
+          }
+        ]
+      },
+      {
+        "rect": [
+          340,
+          19,
+          481,
+          82
+        ],
+        "radius": 12,
+        "fill": "white",
+        "outline": "black~1.8px",
+        "shadow": {
+          "offset": [
+            7,
+            7
+          ],
+          "fill": "gray~#c4c4c4",
+          "sameRadius": true,
+          "outline": false
+        },
+        "lines": [
+          {
+            "text": "Dung dịch X",
+            "bbox": [
+              350,
+              39,
+              468,
+              61
+            ]
+          }
+        ]
+      },
+      {
+        "rect": [
+          670,
+          20,
+          810,
+          83
+        ],
+        "radius": 12,
+        "fill": "white",
+        "outline": "black~1.8px",
+        "shadow": {
+          "offset": [
+            7,
+            7
+          ],
+          "fill": "gray~#c4c4c4",
+          "sameRadius": true,
+          "outline": false
+        },
+        "lines": [
+          {
+            "text": "Màu xanh tím",
+            "bbox": [
+              678,
+              40,
+              804,
+              62
+            ]
+          }
+        ]
+      },
+      {
+        "rect": [
+          674,
+          270,
+          814,
+          333
+        ],
+        "radius": 12,
+        "fill": "white",
+        "outline": "black~1.8px",
+        "shadow": {
+          "offset": [
+            7,
+            7
+          ],
+          "fill": "gray~#c4c4c4",
+          "sameRadius": true,
+          "outline": false
+        },
+        "lines": [
+          {
+            "text": "Dung dịch",
+            "bbox": [
+              695,
+              275,
+              794,
+              297
+            ]
+          },
+          {
+            "text": "màu vàng",
+            "bbox": [
+              697,
+              302,
+              791,
+              324
+            ]
+          }
+        ]
+      },
+      {
+        "rect": [
+          348,
+          271,
+          489,
+          334
+        ],
+        "radius": 12,
+        "fill": "white",
+        "outline": "black~1.8px",
+        "shadow": {
+          "offset": [
+            7,
+            7
+          ],
+          "fill": "gray~#c4c4c4",
+          "sameRadius": true,
+          "outline": false
+        },
+        "lines": [
+          {
+            "text": "Dung dịch T",
+            "bbox": [
+              360,
+              290,
+              478,
+              312
+            ]
+          }
+        ]
+      },
+      {
+        "rect": [
+          83,
+          272,
+          238,
+          334
+        ],
+        "radius": 12,
+        "fill": "white",
+        "outline": "black~1.8px",
+        "shadow": {
+          "offset": [
+            7,
+            7
+          ],
+          "fill": "gray~#c4c4c4",
+          "sameRadius": true,
+          "outline": false
+        },
+        "lines": [
+          {
+            "text": "Kết tủa đỏ gạch",
+            "bbox": [
+              88,
+              290,
+              231,
+              312
+            ]
+          }
+        ]
+      }
+    ],
+    "arrows": [
+      {
+        "shaft": [
+          [
+            149,
+            49
+          ],
+          [
+            336,
+            49
+          ]
+        ],
+        "head": [
+          [
+            336,
+            49
+          ],
+          [
+            319,
+            44
+          ],
+          [
+            319,
+            54
+          ]
+        ],
+        "direction": "RIGHT",
+        "above": {
+          "text": "dd HCl 1 M, t⁰",
+          "bbox": [
+            169,
+            22,
+            304,
+            44
+          ],
+          "note": "ordinary0SUPaftert, notdegreecircle"
+        },
+        "below": {
+          "text": "(1)",
+          "bbox": [
+            223,
+            56,
+            250,
+            77
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            481,
+            50
+          ],
+          [
+            666,
+            50
+          ]
+        ],
+        "head": [
+          [
+            666,
+            50
+          ],
+          [
+            650,
+            45
+          ],
+          [
+            650,
+            55
+          ]
+        ],
+        "direction": "RIGHT",
+        "above": {
+          "text": "2 mL dung dịch Y",
+          "bbox": [
+            485,
+            26,
+            647,
+            48
+          ]
+        },
+        "below": {
+          "text": "(2)",
+          "bbox": [
+            554,
+            54,
+            581,
+            75
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            741,
+            83
+          ],
+          [
+            741,
+            266
+          ]
+        ],
+        "head": [
+          [
+            741,
+            266
+          ],
+          [
+            736,
+            248
+          ],
+          [
+            746,
+            248
+          ]
+        ],
+        "direction": "DOWN",
+        "labels": [
+          {
+            "text": "Thêm 5 mL dd Y",
+            "bbox": [
+              718,
+              87,
+              738,
+              243
+            ],
+            "rotation": 90
+          },
+          {
+            "text": "chờ 5 phút",
+            "bbox": [
+              744,
+              117,
+              765,
+              211
+            ],
+            "rotation": 90
+          }
+        ],
+        "note": "LabelsatDIFFERENTstarty; leftlinebegins87/right117; keeptextorientation+90, notstackuprightletters."
+      },
+      {
+        "shaft": [
+          [
+            674,
+            301
+          ],
+          [
+            493,
+            301
+          ]
+        ],
+        "head": [
+          [
+            493,
+            301
+          ],
+          [
+            510,
+            296
+          ],
+          [
+            510,
+            306
+          ]
+        ],
+        "direction": "LEFT",
+        "above": {
+          "text": "dung dịch NaOH",
+          "bbox": [
+            515,
+            275,
+            667,
+            295
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            344,
+            302
+          ],
+          [
+            242,
+            302
+          ]
+        ],
+        "head": [
+          [
+            242,
+            302
+          ],
+          [
+            259,
+            297
+          ],
+          [
+            259,
+            307
+          ]
+        ],
+        "direction": "LEFT",
+        "above": {
+          "text": "+ Z, t⁰",
+          "bbox": [
+            267,
+            277,
+            326,
+            298
+          ],
+          "note": "Zcapital; ordinary0SUPaftert"
+        }
+      }
+    ],
+    "font": "ALLboxlabels/arrowlabels/stepsregularuprightserifblack, noactualbold/italic. t0SUPin2conditions only; dd/NaOH/mLcaseexact.",
+    "counts": {
+      "roundedBoxes": 6,
+      "grayShadows": 6,
+      "filledArrowheads": 5,
+      "rightHeads": 2,
+      "downHeads": 1,
+      "leftHeads": 2,
+      "verticalRotatedStrings": 2,
+      "stepNumbers": 2
+    },
+    "noAdded": [
+      "glucose/iodine/NaOHanswerinsideX/Y/Z/T",
+      "newsteps3-5",
+      "temperaturevalues",
+      "degreesignreplacementfortsup0",
+      "boldboxtext",
+      "arrowbeyondboxes",
+      "reactionchemicalformula",
+      "caption"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": "Root tự mở nativeFULL/all1publicde+refs vàfreshactualChromiumFULL3x;6boxes6shadows5filledheads2RIGHT1DOWN2LEFT/2ROT90strings/2SUP0. InitialNaOHquásátviềnREJECTEDgiữexactbytes+JPG;finalONLYlabel20→18.5centerbaselinegeometrygiữ/newSHAfreshrootreadonlyALL."
+}

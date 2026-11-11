@@ -1,0 +1,16 @@
+[
+  {
+    "i": 693,
+    "hashSvg": "d410e40aadf572bceda68b6f33739142571540794d56e7f926bd748ea2652db3",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, câu dẫn/ref DH-12-C2-B6-II-29.hinh.0.du_lieu và fresh Chromium3× FULL/runtime actualSHA; macro toàn sáu box/hai hàng conditions/hai chuỗi dọc. Giữ sáu box bo tròn trắng với sáu bóng xám lệch phải-dưới; năm đầu đặc theo RIGHT RIGHT DOWN LEFT LEFT. Đủ dd HCl 1 M, t⁰/(1), 2 mL dung dịch Y/(2), Thêm 5 mL dd Y/chờ 5 phút xoay dọc, dung dịch NaOH, + Z,t⁰ và các nhãn box đúng chữ/hướng; X/Y/Z/T giữ literal. Tất cả thường thẳng; nhãn NaOH có khe trắng trước viền box vàng, không thấy chạm/cắt/tràn hay điều kiện/đáp án thêm.",
+    "render": "/workspace/scratch/soat362-693-fresh.png",
+    "macro": [
+      "/workspace/scratch/ho693-top.png",
+      "/workspace/scratch/ho693-bottom.png",
+      "/workspace/scratch/ho693-vertical.png"
+    ],
+    "hash": "807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c",
+    "hashSvgDaSoat": "d410e40aadf572bceda68b6f33739142571540794d56e7f926bd748ea2652db3"
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "i": 693,
+    "hash": "807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c",
+    "fileNguon": "anh/807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c.png",
+    "svg": "ho-tinh-bot693-native-ddh-d410e40aadf572bceda68b6f33739142571540794d56e7f926bd748ea2652db3.svg",
+    "hashSvg": "d410e40aadf572bceda68b6f33739142571540794d56e7f926bd748ea2652db3",
+    "byteSvg": 81012,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C2-B6-II-29",
+        "de": "Để tiến hành kiểm chứng tính chất hóa học của tinh bột, một học sinh đã tiến hành thí nghiệm như sau:",
+        "refs": [
+          {
+            "hash": "807eea795fe28a1ca601d075e7ac4c22342922725bf7bc660490a1245b21307c",
+            "where": "DH-12-C2-B6-II-29.hinh.0.du_lieu",
+            "hashDataUrl": "da089ed996648a961f48acbe780ad98a266eabf8dca9bbe1fcb37f7316fc9716"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "6whiteROUNDboxes6grayRIGHTDOWNshadows/5FILLEDheads2RIGHT1DOWN2LEFT/ALLregularUPRIGHT/2verticalROT90labelsEXACTThêm5mLddY-chờ5phút/2SUP0/2stepnums/EXACTX-Y-Z-T-ddHCl1M-2mL-dungdịchNaOH-Kếttủađỏgạch/0extraheads/noX-Y-Zanswers-newconditions",
+    "hashSvgDaSoat": "d410e40aadf572bceda68b6f33739142571540794d56e7f926bd748ea2652db3",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
