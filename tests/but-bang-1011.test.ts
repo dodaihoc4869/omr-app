@@ -38,9 +38,11 @@ describe('chuỗi JS chèn vào tờ', () => {
 })
 
 describe('toạ độ chuẩn hoá theo vùng viết', () => {
-  it('điểm = [x 0..1, y 0..1, lực 0..1, ms]: gọn 5 số lẻ, kẹp trong vùng', () => {
+  it('điểm = [x 0..1, y 0..160, lực 0..1, ms]: gọn 5 số lẻ, kẹp trong vùng (11/11: y vượt 1 = nét trên bảng đen đã cuộn; x, lực, giờ vẫn kẹp như cũ)', () => {
     expect(L.diem(960, 540, 0.4567, 12.6, 1920, 1080)).toEqual([0.5, 0.5, 0.46, 13])
-    expect(L.diem(-30, 5000, 2, -4, 1920, 1080)).toEqual([0, 1, 1, 0])
+    expect(L.diem(-30, 5000, 2, -4, 1920, 1080)).toEqual([0, 4.62963, 1, 0])
+    expect(L.diem(3000, -8, 0.5, 0, 1920, 1080)).toEqual([1, 0, 0.5, 0])
+    expect(L.diem(0, 1080 * 999, 0.5, 0, 1920, 1080)[1]).toBe(160)
     expect(L.diem(1234.5678, 321.987, 0.5, 0, 1920, 1080)).toEqual([0.643, 0.29814, 0.5, 0])
   })
   it('cùng một nét vẽ ở 1920×1080 và 1280×720 ⇒ cùng đa giác trong hệ «px màn 1920» (máy khác vẽ lại đúng)', () => {
@@ -298,7 +300,8 @@ describe('xuất / nhập + sự kiện cho việc phát live', () => {
     so.batDau({ mau: 'rgb(244,239,228)', co: 2.3, diem: [0.5, 0.5, 0.3, 0] }); so.themDiem([[0.6, 0.5, 0.3, 5]]); so.ketThuc(true); kiem()
     so.doiTrang('7'); expect(sk[sk.length - 1]).toMatchObject({ loai: 'trang', trang: '7', net: [] }); kiem()
     viet(0.5); so.doiTrang(''); kiem()
-    so.tro(0.123456, 2); expect(sk.pop()).toEqual({ loai: 'tro', trang: '', x: 0.1235, y: 1 }); kiem()
+    so.tro(0.123456, 2); expect(sk.pop()).toEqual({ loai: 'tro', trang: '', x: 0.1235, y: 2 }); kiem() // y > 1: con trỏ trên bảng đã cuộn (11/11)
+    so.tro(7, -3); expect(sk.pop()).toEqual({ loai: 'tro', trang: '', x: 1, y: 0 })
     huy(); viet(0.8); so.tro(0.5, 0.5); expect(sk).toHaveLength(0)
   })
 })
@@ -327,7 +330,7 @@ function moTo() {
 const netMau: NetBut = { id: 'x1', cong: 'but', mau: 'rgb(255,210,122)', co: 2.3, diem: [[0.7, 0.3, 0.3, 0], [0.75, 0.32, 0.5, 40], [0.8, 0.3, 0.3, 80]] as DiemBut[] }
 
 describe('bút trên tờ chiếu', () => {
-  it('B bật bút: hai lớp canvas (tĩnh + sống), thanh bút có 5 màu · 4 cỡ · tẩy · hoàn tác · làm lại · xoá hết · tắt; mặc định phấn trắng, nét MẢNH (chữ nhỏ không bị nét to át chữ)', () => {
+  it('B bật bút: hai canvas trên tờ (lớp hiện mực + lớp bắt con trỏ; 11/11 lớp đã chốt và ô nháp nằm ngoài màn), thanh bút có 5 màu · 4 cỡ · tẩy · hoàn tác · làm lại · xoá hết · tắt; mặc định phấn trắng, nét MẢNH (chữ nhỏ không bị nét to át chữ)', () => {
     const t = moTo()
     expect(t.doc.querySelectorAll('canvas.mc-but')).toHaveLength(2)
     t.phim('b')
@@ -398,7 +401,7 @@ describe('bút trên tờ chiếu', () => {
     t.doc.querySelector<HTMLButtonElement>('[data-xoa]')!.click(); expect(t.but.xuat().net).toHaveLength(0)
     t.doc.querySelector<HTMLButtonElement>('[data-lui]')!.click(); expect(t.but.xuat().net).toHaveLength(1)
   })
-  it('API cho việc live: bộ máy dựng nét, bảng màu / cỡ, vùng giấy / bảng; bút lơ lửng phát sự kiện tro (≤ 20 lần / giây)', () => {
+  it('API cho việc live: bộ máy dựng nét, bảng màu / cỡ, vùng giấy / bảng; bút lơ lửng phát sự kiện tro (mỗi khung một lần, cách nhau > 15 ms)', () => {
     const t = moTo(), sk: SuKienBut[] = []
     expect(t.but.loi.dungNet(netMau, t.but.loi.khung(1920, 1080)).length).toBeGreaterThan(20)
     expect(t.but.mau.map((m) => m[0])).toEqual(['rgb(244,239,228)', 'rgb(255,210,122)', 'rgb(110,231,183)', 'rgb(253,164,175)', 'rgb(36,86,201)'])

@@ -1,0 +1,272 @@
+{
+  "luc": "2026-11-11T01:29:19.458Z",
+  "may": "Chromium headless /opt/pw-browsers, 1920×1080, điểm ảnh ×1, bút 200 Hz qua CDP (pointerType pen)",
+  "vungSoi": [
+    1290,
+    150,
+    600,
+    420
+  ],
+  "ketQua": [
+    {
+      "ban": "moi",
+      "cpu": "×1",
+      "kieuNhac": "đứng yên 150 ms rồi nhấc",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 578,
+        "khungCoLui": 75,
+        "diemAnhLui1": 1453,
+        "diemAnhLui16": 187,
+        "mucLuiLon": 85
+      },
+      "sauNhac": {
+        "khungCoLui": 0,
+        "diemAnhLui1": 0,
+        "diemAnhLui16": 0,
+        "mucLuiLon": 0
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 476,
+        "khac16": 21,
+        "mucLon": 63
+      },
+      "loi": [],
+      "uotSoKho": {
+        "soNet": 39,
+        "netCoKhac": 0,
+        "diemAnhKhac": 0,
+        "khac16": 0,
+        "mucLon": 0
+      }
+    },
+    {
+      "ban": "moi",
+      "cpu": "×1",
+      "kieuNhac": "nhấc ngay khi đang đi",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 496,
+        "khungCoLui": 76,
+        "diemAnhLui1": 1388,
+        "diemAnhLui16": 198,
+        "mucLuiLon": 90
+      },
+      "sauNhac": {
+        "khungCoLui": 3,
+        "diemAnhLui1": 49,
+        "diemAnhLui16": 9,
+        "mucLuiLon": 42
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 468,
+        "khac16": 24,
+        "mucLon": 63
+      },
+      "loi": []
+    },
+    {
+      "ban": "moi",
+      "cpu": "×4",
+      "kieuNhac": "đứng yên 150 ms rồi nhấc",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 482,
+        "khungCoLui": 71,
+        "diemAnhLui1": 1373,
+        "diemAnhLui16": 180,
+        "mucLuiLon": 113
+      },
+      "sauNhac": {
+        "khungCoLui": 0,
+        "diemAnhLui1": 0,
+        "diemAnhLui16": 0,
+        "mucLuiLon": 0
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 482,
+        "khac16": 20,
+        "mucLon": 64
+      },
+      "loi": [],
+      "uotSoKho": {
+        "soNet": 39,
+        "netCoKhac": 0,
+        "diemAnhKhac": 0,
+        "khac16": 0,
+        "mucLon": 0
+      }
+    },
+    {
+      "ban": "moi",
+      "cpu": "×4",
+      "kieuNhac": "nhấc ngay khi đang đi",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 419,
+        "khungCoLui": 65,
+        "diemAnhLui1": 1234,
+        "diemAnhLui16": 173,
+        "mucLuiLon": 87
+      },
+      "sauNhac": {
+        "khungCoLui": 2,
+        "diemAnhLui1": 71,
+        "diemAnhLui16": 4,
+        "mucLuiLon": 29
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 400,
+        "khac16": 26,
+        "mucLon": 59
+      },
+      "loi": []
+    },
+    {
+      "ban": "cu",
+      "cpu": "×1",
+      "kieuNhac": "đứng yên 150 ms rồi nhấc",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 578,
+        "khungCoLui": 418,
+        "diemAnhLui1": 7514,
+        "diemAnhLui16": 4325,
+        "mucLuiLon": 255
+      },
+      "sauNhac": {
+        "khungCoLui": 39,
+        "diemAnhLui1": 376,
+        "diemAnhLui16": 226,
+        "mucLuiLon": 131
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 946,
+        "khac16": 61,
+        "mucLon": 63
+      },
+      "loi": [],
+      "uotSoKho": {
+        "soNet": 39,
+        "netCoKhac": 39,
+        "diemAnhKhac": 396,
+        "khac16": 229,
+        "mucLon": 131
+      }
+    },
+    {
+      "ban": "cu",
+      "cpu": "×1",
+      "kieuNhac": "nhấc ngay khi đang đi",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 498,
+        "khungCoLui": 337,
+        "diemAnhLui1": 6188,
+        "diemAnhLui16": 3478,
+        "mucLuiLon": 255
+      },
+      "sauNhac": {
+        "khungCoLui": 27,
+        "diemAnhLui1": 874,
+        "diemAnhLui16": 643,
+        "mucLuiLon": 255
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 977,
+        "khac16": 65,
+        "mucLon": 64
+      },
+      "loi": []
+    },
+    {
+      "ban": "cu",
+      "cpu": "×4",
+      "kieuNhac": "đứng yên 150 ms rồi nhấc",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 434,
+        "khungCoLui": 254,
+        "diemAnhLui1": 4993,
+        "diemAnhLui16": 2947,
+        "mucLuiLon": 255
+      },
+      "sauNhac": {
+        "khungCoLui": 39,
+        "diemAnhLui1": 376,
+        "diemAnhLui16": 226,
+        "mucLuiLon": 131
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 912,
+        "khac16": 59,
+        "mucLon": 64
+      },
+      "loi": [],
+      "uotSoKho": {
+        "soNet": 39,
+        "netCoKhac": 39,
+        "diemAnhKhac": 394,
+        "khac16": 229,
+        "mucLon": 131
+      }
+    },
+    {
+      "ban": "cu",
+      "cpu": "×4",
+      "kieuNhac": "nhấc ngay khi đang đi",
+      "net": 39,
+      "may": {
+        "duocNgay": true,
+        "coRaw": true
+      },
+      "dangViet": {
+        "khungCoDoi": 391,
+        "khungCoLui": 229,
+        "diemAnhLui1": 4657,
+        "diemAnhLui16": 2611,
+        "mucLuiLon": 255
+      },
+      "sauNhac": {
+        "khungCoLui": 17,
+        "diemAnhLui1": 423,
+        "diemAnhLui16": 245,
+        "mucLuiLon": 255
+      },
+      "veLaiTuVecto": {
+        "diemAnhKhac": 942,
+        "khac16": 73,
+        "mucLon": 65
+      },
+      "loi": []
+    }
+  ]
+}
