@@ -417,6 +417,7 @@ export default defineConfig({
           '**/LichSuLive-*.{js,css}',
           '**/lich-su-live-api-*.js',
           '**/xem-lai-ten-*.js',
+          '**/xem-lai-kieu-*.js', // hợp đồng net.bin dùng chung máy ghi + trình phát — chỉ nạp khi live / xem lại
           // Lời giải Kính (thầy chốt 02/11): khung + bộ tải sẵn chỉ app học sinh dùng ⇒ kho chạy-lúc + kho tải ngầm học sinh (KHO_HS_GOC), precache giữ 170.
           '**/LoiGiaiKinhHs-*.{js,css}',
           '**/tai-san-*.js',
