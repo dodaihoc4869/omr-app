@@ -465,7 +465,16 @@ describe('M2 · tiếng trong: luật lọc theo đường vọng + Opus dải r
       expect(b.lt.chanDoan()).toMatchObject({ kieu: 'khung', chuoi: true, gan: true })
       expect(b.boGui().track!.label).toBe('khung')
       expect(mucGui(b)).toBeCloseTo(0.3)
-      expect(guiW.length).toBe(1) // một Worker cho một luồng mic
+      expect(guiW.length).toBeGreaterThanOrEqual(1) // một Worker cho một luồng mic (tin đầu: luồng vào / ra)
+      // LỌC ỒN RIÊNG (11/11): mặc định «Vừa»; thầy đổi mức ⇒ Worker nhận phần tiếng gốc trộn lại, KHÔNG mở lại mic
+      const soMo = goiGum.length
+      expect(b.lt.chanDoan().locOn).toBe('vua')
+      b.lt.datLocOn('manh')
+      expect(guiW[guiW.length - 1]).toMatchObject({ kho: 0.06 })
+      b.lt.datLocOn('tat')
+      expect(guiW[guiW.length - 1]).toMatchObject({ kho: 1 })
+      expect(b.lt.chanDoan()).toMatchObject({ locOn: 'tat', locOnChay: 'tat' })
+      expect(goiGum.length).toBe(soMo)
       // mic chỉ có tín hiệu khi trình duyệt KHÔNG xử lý gì ⇒ thang nới ràng buộc sang mic thô
       thietBi.usb1 = (rb) => (rb.autoGainControl ? 0 : 0.25)
       await b.lt.moMic('usb1')

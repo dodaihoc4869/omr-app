@@ -8,6 +8,8 @@
 // Worklet nạp không được (trình duyệt cũ, bị chặn) ⇒ tự về 'nen' (và báo `khiLui`).
 // Số đo trước / sau: docs/do-live-1011.md mục 5.
 
+import URL_RNNOISE from './loc-on/rnnoise.wasm?url'
+
 /** Bộ nén nâng mức của kiểu 'nen' (Web Audio tự bù mức theo đường cong nén). */
 export const NEN_RO = { nguong: -32, goi: 20, tiLe: 3 }
 /** Chặn đỉnh của kiểu 'nen': hạ mức trước bộ chặn + ngưỡng chặn (dB). */
@@ -16,6 +18,12 @@ export const CHAN_DINH = { ha: 0.55, nguong: -7 }
 export const LAM_RO = { dich: 0.13, tran: 0.84, nhoNhat: 0.5, lonNhat: 20, len: 3, lenDau: 9, xuong: 3 }
 
 export type KieuChuoi = 'khung' | 'nhanh' | 'nen'
+/** LỌC ỒN RIÊNG (thầy 11/11 «lọc ồn chưa ngon … để giọng thầy và hs trong sáng nhất»): RNNoise (mạng nơ-ron nhỏ, BSD-3; bản wasm của gói
+ *  `@sapphi-red/web-noise-suppressor` 0.4.1, MIT) chạy ngay trong Worker của kiểu 'khung', TRƯỚC khâu nâng mức. Ba mức = phần tiếng GỐC trộn lại
+ *  (giữ một chút nền để giọng không «chết»; đo: docs/do-live-1011.md mục 6): Mạnh 6 % (ồn đều bớt ≈ 20 dB) · Vừa 25 % (≈ 11 dB, giữ dải tần giọng) · Tắt.
+ *  Bộ lọc trễ đúng 10 ms; tiếng gốc được lùi 10 ms cho khớp trước khi trộn. Chỉ chạy với khung 480 mẫu 48 kHz; không thì bỏ qua. */
+export type MucLocOn = 'manh' | 'vua' | 'tat'
+export const KHO_LOC_ON: Record<MucLocOn, number> = { manh: 0.06, vua: 0.25, tat: 1 }
 export interface ChuoiTieng {
   /** Track gửi cho lớp (null = không dựng được đầu ra ⇒ gửi thẳng track mic). */
   ra: MediaStreamTrack | null
@@ -27,6 +35,10 @@ export interface ChuoiTieng {
   nut: AudioNode[]
   /** Kiểu ĐANG chạy: 'cho' = worklet đang nạp (tiếng đi thẳng, chưa nâng mức). */
   kieu: KieuChuoi | 'cho'
+  /** Đặt mức lọc ồn riêng (chỉ kiểu 'khung' có). Tệp bộ lọc tải lười lần đầu cần tới; tải / chạy lỗi ⇒ chuỗi chạy tiếp không lọc. */
+  datLocOn?: (muc: MucLocOn) => void
+  /** Bộ lọc ồn riêng: 'chay' = đang lọc · 'tai' = đang tải · 'tat' · 'loi' = tải / chạy lỗi (đang không lọc). */
+  locOn?: 'chay' | 'tai' | 'tat' | 'loi'
 }
 
 /** Mã của bộ xử lý (chạy trong luồng âm thanh; viết ES5 + lớp, không phụ thuộc gì). Mỗi khối 128 mẫu:
@@ -75,14 +87,43 @@ registerProcessor('lam-ro-tieng', LamRoTieng);
 /** Mã Worker của kiểu 'khung': đọc từng khung tiếng (AudioData) của track mic, cộng các kênh về mono, lọc thông cao 80 Hz, nâng mức + chặn đỉnh (đúng thuật
  *  toán của LamRoTieng ở trên), ghi khung mới cùng mốc giờ. Một khung vào ⇒ một khung ra, không đệm. */
 const MA_KHUNG = `
-var c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
+var rn = null, kho = 1, khoDich = 1, tre = 0, cu = new Float32Array(480), c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
+function napLoc(buf) {
+  var bo, x;
+  try {
+    x = new WebAssembly.Instance(new WebAssembly.Module(buf), { env: { emscripten_memcpy_big: function (d, s, n) { new Uint8Array(bo.buffer).copyWithin(d, s, s + n); }, emscripten_resize_heap: function () { return 0; }, __assert_fail: function () { throw new Error('rnnoise'); } } }).exports;
+    bo = x.memory;
+    if (x.emscripten_stack_init) x.emscripten_stack_init();
+    if (x.__wasm_call_ctors) x.__wasm_call_ctors();
+    if (x.rnnoise_get_frame_size() !== 480) throw new Error('khung');
+    rn = { x: x, bo: bo, st: x.rnnoise_create(0), pv: x.malloc(1920), pr: x.malloc(1920) };
+    postMessage({ loc: 'chay' });
+  } catch (e) { rn = null; postMessage({ loc: 'loi' }); }
+}
+/* Lọc ồn một khung 480 mẫu 48 kHz tại chỗ. Vào / ra chế độ lọc bằng MỘT khung chuyển (trộn dần khung này với khung trước) ⇒ không «bụp»;
+   trong chế độ lọc: ra = lọc × (1 − kho) + gốc lùi 10 ms × kho; kho trôi về đích mỗi khung tối đa 0,05. */
+function locOn(x) {
+  var muon = rn && khoDich < 1, i, w, f, r, k0 = kho, k1;
+  if (!tre && !muon) return;
+  if (tre && !muon && kho >= 1) { for (i = 0; i < 480; i++) { w = (i + 1) / 480; x[i] = cu[i] * (1 - w) + x[i] * w; } tre = 0; return; }
+  f = new Float32Array(rn.bo.buffer, rn.pv, 480);
+  for (i = 0; i < 480; i++) f[i] = x[i] * 32768 + (Math.random() - 0.5) * 0.1;
+  rn.x.rnnoise_process_frame(rn.st, rn.pr, rn.pv);
+  r = new Float32Array(rn.bo.buffer, rn.pr, 480);
+  if (!tre) { for (i = 0; i < 480; i++) { w = (i + 1) / 480; f[i] = x[i]; x[i] = x[i] * (1 - w) + cu[i] * w; cu[i] = f[i]; } tre = 1; kho = 1; return; }
+  k1 = khoDich > kho ? Math.min(khoDich, kho + 0.05) : Math.max(khoDich, kho - 0.05);
+  for (i = 0; i < 480; i++) { w = k0 + (k1 - k0) * (i + 1) / 480; f[i] = x[i]; x[i] = r[i] / 32768 * (1 - w) + cu[i] * w; cu[i] = f[i]; }
+  kho = k1;
+}
 function xuLy(f) {
   var n = f.numberOfFrames, kenh = f.numberOfChannels, s = f.sampleRate, moc = f.timestamp, x = new Float32Array(n), i, k, e = 0, r, g0 = g, can, buoc, v, a, w, al, nha;
   if (!tam || tam.length !== n) tam = new Float32Array(n);
   for (k = 0; k < kenh; k++) { f.copyTo(tam, { planeIndex: k, format: 'f32-planar' }); for (i = 0; i < n; i++) x[i] += tam[i]; }
   f.close();
   if (s !== hz) { hz = s; w = 2 * Math.PI * 80 / s; al = Math.sin(w) / (2 * 0.707); a = 1 + al; b0 = (1 + Math.cos(w)) / 2 / a; b1 = -(1 + Math.cos(w)) / a; b2 = b0; a1 = -2 * Math.cos(w) / a; a2 = (1 - al) / a; }
-  for (i = 0; i < n; i++) { v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = v; x[i] = v; e += v * v; }
+  for (i = 0; i < n; i++) { v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = v; x[i] = v; }
+  if (n === 480 && s === 48000) { try { locOn(x); } catch (err) { rn = null; tre = 0; kho = 1; postMessage({ loc: 'loi' }); } } else if (!tre) cu.fill(0);
+  for (i = 0; i < n; i++) e += x[i] * x[i];
   r = Math.sqrt(e / n);
   nen = r < nen ? nen * 0.9 + r * 0.1 : Math.min(0.05, nen * Math.pow(1.0003, n / 128));
   if (r > nen * 4 && r > 0.0015) {
@@ -104,6 +145,8 @@ function xuLy(f) {
 }
 onmessage = function (ev) {
   var d = ev.data, doc, ghi;
+  if (d && d.loc) napLoc(d.loc);
+  if (d && typeof d.kho === 'number') khoDich = d.kho;
   if (!d || !d.vao) return;
   c = d.c; if (c.g0 > 0) g = c.g0;
   doc = d.vao.getReader(); ghi = d.ra.getWriter();
@@ -138,8 +181,15 @@ function napLamRo(c: AudioContext): Promise<boolean> {
 }
 
 /** Dựng chuỗi cho luồng mic `l`. `khiLui` = muốn 'nhanh' mà phải chạy 'nen' (worklet nạp hỏng). Ném lỗi nếu Web Audio không dựng được phần đo. */
+let tepLoc: Promise<ArrayBuffer | null> | null = null
+/** Tải tệp bộ lọc ồn MỘT lần (≈ 157 KB, mảnh riêng — không nằm trong kho tải sẵn của service worker). Lỗi ⇒ null. */
+function taiLoc(): Promise<ArrayBuffer | null> {
+  if (!tepLoc) tepLoc = (async () => { try { const r = await fetch(URL_RNNOISE); return r.ok ? await r.arrayBuffer() : null } catch { return null } })().then((b) => { if (!b) tepLoc = null; return b })
+  return tepLoc
+}
+
 /** Kiểu 'khung': trả track đã xử lý + hàm dọn; không dựng được ⇒ null. `khiHong` = Worker báo lỗi giữa chừng (lớp gọi bỏ chuỗi, gửi thẳng track mic). */
-function dungKhung(t: MediaStreamTrack, khiHong?: () => void): { ra: MediaStreamTrack; don: () => void } | null {
+function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void): { ra: MediaStreamTrack; don: () => void } | null {
   if (!coKhung()) return null
   let w: Worker | null = null, u = ''
   try {
@@ -148,7 +198,17 @@ function dungKhung(t: MediaStreamTrack, khiHong?: () => void): { ra: MediaStream
     u = URL.createObjectURL(new Blob([MA_KHUNG], { type: 'text/javascript' }))
     w = new Worker(u)
     const wk = w
-    wk.onmessage = (e: MessageEvent) => { const d = e.data as { g?: number; loi?: string }; if (typeof d?.g === 'number' && d.g > 0) gNho = d.g; if (d?.loi) khiHong?.() }
+    let muc: MucLocOn = 'tat', daGui = false
+    wk.onmessage = (e: MessageEvent) => { const d = e.data as { g?: number; loi?: string; loc?: 'chay' | 'loi' }; if (typeof d?.g === 'number' && d.g > 0) gNho = d.g; if (d?.loc) k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc; if (d?.loi) khiHong?.() }
+    k.locOn = 'tat'
+    k.datLocOn = (m) => {
+      muc = m
+      try { wk.postMessage({ kho: KHO_LOC_ON[m] }) } catch { /* Worker đã dừng */ }
+      if (m === 'tat') { if (k.locOn !== 'loi') k.locOn = 'tat'; return }
+      if (daGui) { if (k.locOn === 'tat') k.locOn = 'chay'; return }
+      daGui = true; k.locOn = 'tai'
+      void taiLoc().then((b) => { if (!b) { k.locOn = 'loi'; daGui = false; return } try { const ban = b.slice(0); wk.postMessage({ loc: ban, kho: KHO_LOC_ON[muc] }, [ban]) } catch { k.locOn = 'loi' } })
+    }
     wk.onerror = () => khiHong?.()
     wk.postMessage({ c: { ...LAM_RO, g0: gNho }, vao: xl.readable, ra: sinh.writable }, [xl.readable as unknown as Transferable, sinh.writable as unknown as Transferable])
     return { ra: sinh, don: () => { try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
@@ -166,7 +226,7 @@ export function dungChuoiTieng(c: AudioContext, l: MediaStream, o: { kieu: KieuC
   tron.connect(doAm); tron.connect(doDinh)
   const k: ChuoiTieng = { ra: null, doAm, doDinh, doRa: null, nut, kieu: 'cho' }
   const micT = l.getAudioTracks()[0]
-  const kh = o.kieu === 'khung' && micT ? dungKhung(micT, o.khiHong) : null
+  const kh = o.kieu === 'khung' && micT ? dungKhung(micT, k, o.khiHong) : null
   if (kh) {
     // Web Audio chỉ còn ĐO đầu ra (vạch mic), không nằm trên đường tiếng
     const doRa = c.createAnalyser(); doRa.fftSize = 1024
