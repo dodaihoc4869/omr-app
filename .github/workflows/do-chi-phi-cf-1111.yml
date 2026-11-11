@@ -17,6 +17,7 @@ jobs:
     timeout-minutes: 10
     env:
       DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
+      CHI_NS: '1' # lượt 6: chỉ đối chiếu vùng Durable Object + danh sách Worker
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

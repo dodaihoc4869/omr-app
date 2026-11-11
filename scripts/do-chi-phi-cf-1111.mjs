@@ -11,6 +11,12 @@ const gql = async (query, variables = {}) => { const r = await fetch('https://ap
 const loiNgan = (e) => an((e ?? []).map((x) => x.message).join(' | ')).slice(0, 300)
 
 console.log(`# Khoảng ngày (UTC): ${TU} → ${DEN}`)
+// 0. Đối chiếu mã vùng Durable Object → tên lớp / Worker; danh sách Worker (tên, ngày sửa) — chỉ đọc
+{ const r = await rest('/accounts/{acc}/workers/durable_objects/namespaces?per_page=100'); console.log(`\n## 0a. Vùng Durable Object: HTTP ${r.st} ${r.j?.success === false ? loiNgan(r.j.errors) : ''}`)
+  for (const x of r.j?.result ?? []) console.log(JSON.stringify({ id: x.id, lop: x.class, worker: x.script, ten: x.name, sqlite: x.use_sqlite })) }
+{ const r = await rest('/accounts/{acc}/workers/scripts'); console.log(`\n## 0b. Worker: HTTP ${r.st} ${r.j?.success === false ? loiNgan(r.j.errors) : ''}`)
+  for (const x of r.j?.result ?? []) console.log(JSON.stringify({ ten: x.id, tao: x.created_on, sua: x.modified_on, nhatKy: x.observability ?? x.logpush ?? null, cron: x.has_modules === undefined ? undefined : null })) }
+if (process.env.CHI_NS === '1') process.exit(0)
 // ───────── 1. HOÁ ĐƠN / GÓI ĐĂNG KÝ (REST) ─────────
 console.log('\n## 1a. Gói đăng ký của tài khoản (/accounts/{acc}/subscriptions)')
 { const r = await rest('/accounts/{acc}/subscriptions'); console.log(`HTTP ${r.st} ${r.j?.success === false ? loiNgan(r.j.errors) : ''}`)
