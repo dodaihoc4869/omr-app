@@ -17,6 +17,8 @@ jobs:
   do:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    env:
+      DB_ID: d2e6d322-374a-45d7-83a3-9fac486b23f1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

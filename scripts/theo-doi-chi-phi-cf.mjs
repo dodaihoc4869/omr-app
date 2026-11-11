@@ -48,8 +48,16 @@ for (const [ten, dung, dv, goi, gia, lam] of dong) {
   tongDuBao += tien
   bang.push(`| ${ten} | ${so(dung)} ${dv} | ${so(duBao)} | ${so(goi)} | ${Math.round(duBao / goi * 100)}% | ${tien.toFixed(2)} |`)
 }
+// Câu D1 đọc nhiều hàng nhất 24 giờ qua (để biết phải sửa câu nào khi D1 hàng đọc vượt). Chữ câu lệnh có tham số «?», không có dữ liệu em.
+const tuQ = new Date(now - 86400e3).toISOString()
+const jq = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
+  query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:15,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
+const top = jq?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
+  ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)]
+if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`)
 const ket = `\n**Dự báo hoá đơn kỳ này: ${tongDuBao.toFixed(2)} USD** (5 USD gói + phần vượt; chưa gồm Workers Logs — khoá chưa có quyền đọc).`
-const ra = `## Chi phí Cloudflare — ${now.toISOString().slice(0, 16)} UTC\n\n${bang.join('\n')}\n${ket}\n`
+const ra = `## Chi phí Cloudflare — ${now.toISOString().slice(0, 16)} UTC\n\n${bang.join('\n')}\n${ket}\n${bangTop.join('\n')}\n`
 console.log(ra)
 if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, ra)
 // Đỏ khi dự báo vượt 6 USD (chừa 1 USD cho sai số dự báo của mấy ngày đầu kỳ).
