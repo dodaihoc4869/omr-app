@@ -25,6 +25,7 @@ vi.mock('../src/lib/live', () => ({
     }
   },
 }))
+const dangKy = () => {}
 beforeEach(() => { _datLaiTatMan() })
 
 /** Khối đề giả: chữ dài `dai` px xuống dòng theo bề ngang ⇒ cao = số dòng × 30 + 40 (nhảy bậc theo số dòng — đúng thứ làm phép tính cũ dao động). */
@@ -93,4 +94,3 @@ describe('bảng live đang hiện: cập nhật live không chạm cây DOM c�
     expect(doi.filter((m) => m.type !== 'childList').length).toBe(0)
   })
 })
-const dangKy = () => {}
