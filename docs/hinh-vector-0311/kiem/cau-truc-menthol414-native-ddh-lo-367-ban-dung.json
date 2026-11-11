@@ -1,0 +1,29 @@
+[
+  {
+    "i": 414,
+    "hash": "4a1ad16b17f29233ee8d9e48ca58342419559ab9485170dcd775e31cd95e68aa",
+    "fileNguon": "anh/4a1ad16b17f29233ee8d9e48ca58342419559ab9485170dcd775e31cd95e68aa.png",
+    "svg": "menthol414-native-ddh-b1f37799ea4c574170c05221c4cd2686970655a12d70497a60a5c673486c0b3b.svg",
+    "hashSvg": "b1f37799ea4c574170c05221c4cd2686970655a12d70497a60a5c673486c0b3b",
+    "byteSvg": 14778,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L3-0197-II-1",
+        "de": "Menthone có mùi thơm bạc hà sử dụng làm hương liệu mỹ phẩm, nước hoa, được sản xuất từ menthol theo sơ đồ sau:",
+        "refs": [
+          {
+            "hash": "4a1ad16b17f29233ee8d9e48ca58342419559ab9485170dcd775e31cd95e68aa",
+            "where": "VIP27-BDT-L3-0197-II-1.hinh.0.du_lieu",
+            "hashDataUrl": "2ad4d34cfaf6db636edfb153459fa820b731370e3e29ad0719340b74ac6f5bbe"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "20C2O/2sixrings10Ceach/8branchC4each/0CCdouble1COdouble2splitfeetCONTACTverticalRIGHTedge-lowerLEFTslope/nativeWHITEwedgeNOTgap/1FILLEDrighthead/ALLregularUPRIGHT/Menthol-Menthone/EXACTK2Cr2O7/HplusSUB227-SUPplus/OHfirstOanchor/0stereo0standaloneH/noaddedwater-yield-condition-answer",
+    "hashSvgDaSoat": "b1f37799ea4c574170c05221c4cd2686970655a12d70497a60a5c673486c0b3b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
