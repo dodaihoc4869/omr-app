@@ -3,22 +3,24 @@
 // của chặng (bề rộng, cỡ chữ, cách xếp phương án khác tờ chiếu) ⇒ nét lệch chữ.
 // CÁCH LÀM: tờ chiếu ĐO từng khối chữ của giấy (src/lib/live-to-chieu.ts `lvDoGiay`: vị trí, bề rộng, cỡ chữ, cao dòng, chỗ hết chữ — CHỈ SỐ ĐO, không chữ,
 // không đáp án) ⇒ phòng (`live.giay`) ⇒ máy em đặt từng khối vào ĐÚNG ô ấy trên một tấm giấy cùng bề rộng lôgic (px của cửa sổ thầy) rồi co cả tấm cho vừa
-// ô giấy trên máy. Chữ dựng bằng CÙNG hàm của tờ chiếu (`chuHtml` — src/lib/html-phieu.ts), cùng phông Be Vietnam Pro của app, từ câu công khai của lượt
-// (`viewEm.luot.cau` — không có đáp án).
+// ô giấy trên máy. Chữ dựng bằng `ChemText` của màn làm bài (màn Bình Phản Ứng truyền vào — đã nằm sẵn trong máy em; cùng bộ tách công thức với `chuHtml`
+// của tờ chiếu, xem ghi chú ở src/lib/html-phieu.ts; KHÔNG nhập html-phieu vào mảnh live: 200 KB), cùng phông Be Vietnam Pro của app, từ câu công khai của
+// lượt (`viewEm.luot.cau` — không có đáp án). Chỗ nào hai bộ dựng ra khác nhau thì bước tự kiểm bên dưới bắt được.
 // TỰ KIỂM (R3): dựng xong, máy em đo lại từng khối chữ (chiều cao + chỗ hết chữ) và so với số đo của thầy. KHỚP ⇒ hiện giấy soi, nét trên giấy giữ.
 // LỆCH (phông chưa tải, câu trên tờ khác câu của lượt, khối máy em chưa soi được…) ⇒ trả về cách dựng thường (đủ nội dung, dễ đọc) và báo lớp trên ẨN NÉT
 // TRÊN GIẤY (nét trên bảng đen không bị ảnh hưởng) + số đo `live-do` mang cờ `gl`.
-import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { Fragment, memo, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type ReactNode } from 'react'
 import type { GiayThay as BoCucGiay } from '../../lib/bpu/phong-live'
-import { chuHtml } from '../../lib/html-phieu'
 
 /** Phần câu công khai giấy soi cần (không có đáp án). */
 export interface CauGiay { phan: string; text?: string; choices?: readonly string[]; ideas?: readonly string[] }
 const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
 /** Chỉ số trong một khối của bố cục (xem `GiayThay` ở phong-live.ts). */
 const LOAI = 0, TT = 1, X = 2, Y = 3, W = 4, H = 5, CO = 6, DONG = 7, DAM = 8, HET_X = 9, HET_Y = 10
-/** Như `chuDeChieu` của tờ chiếu: giữ dấu xuống dòng của người soạn, mỗi dòng qua `chuHtml`. */
-const chuDe = (s: string | undefined): string => String(s ?? '').replace(/\r\n?/g, '\n').replace(/<br\s*\/?\s*>/gi, '\n').split('\n').map((d) => chuHtml(d)).join('<br>')
+/** Bộ dựng chữ có công thức Hoá của màn làm bài (`ChemText`). */
+export type BoChu = ComponentType<{ text: string }>
+/** Như `chuDeChieu` của tờ chiếu: giữ dấu xuống dòng của người soạn, mỗi dòng dựng riêng. */
+const dongChu = (s: string | undefined): string[] => String(s ?? '').replace(/\r\n?/g, '\n').replace(/<br\s*\/?\s*>/gi, '\n').split('\n')
 
 /** So số đo của máy em với của thầy cho MỘT khối chữ: chiều cao lệch dưới 0,4 dòng, chỗ hết chữ lệch ngang dưới 1,2 % bề rộng (ít nhất 3 px), dọc dưới 0,3 dòng. */
 export function khoiKhop(thay: readonly number[], em: { cao: number; hetX: number; hetY: number }): boolean {
@@ -47,6 +49,7 @@ function datDauHet(el: HTMLElement): HTMLElement | null {
 interface Props {
   giay: BoCucGiay
   q: CauGiay
+  Chu: BoChu
   tuLuan: boolean
   /** Ô giấy trên máy em (px lôgic của vùng chiếu). */
   rong: number
@@ -56,7 +59,7 @@ interface Props {
   duPhong: ReactNode
 }
 
-export default memo(function GiayThay({ giay, q, tuLuan, rong, khiKhop, duPhong }: Props) {
+export default memo(function GiayThay({ giay, q, Chu, tuLuan, rong, khiKhop, duPhong }: Props) {
   const goc = useRef<HTMLDivElement>(null)
   const [khop, setKhop] = useState<boolean | null>(null)
   const khiKhopRef = useRef(khiKhop)
@@ -64,7 +67,7 @@ export default memo(function GiayThay({ giay, q, tuLuan, rong, khiKhop, duPhong 
   /** Chữ của từng khối: loại 2 = đề, 3 = phương án / ý thứ `tt`, 6 = dòng trả lời ngắn. */
   const chu = useMemo(() => {
     const pa = q.phan === 'II' ? (q.ideas ?? []) : (q.choices ?? [])
-    return { de: chuDe(q.text), pa: pa.map((x) => chuDe(x)), ngan: tuLuan ? 'Tự luận — em trình bày lời giải đầy đủ lên bảng.' : 'Trả lời ngắn — em viết kết quả và trình bày các bước lên bảng.' }
+    return { de: q.text ?? '', pa: pa.map((x) => String(x ?? '')), ngan: tuLuan ? 'Tự luận — em trình bày lời giải đầy đủ lên bảng.' : 'Trả lời ngắn — em viết kết quả và trình bày các bước lên bảng.' }
   }, [q, tuLuan])
   const khoa = useMemo(() => JSON.stringify(giay.o), [giay])
 
@@ -108,10 +111,11 @@ export default memo(function GiayThay({ giay, q, tuLuan, rong, khiKhop, duPhong 
           if (loai === 5) return <i key={i} className="lv-gt-khung" style={{ ...o(b), height: b[H] }} />
           if (loai === 0) return <b key={i} className="lv-gt-o lv-gt-so" style={{ ...o(b), ...kieuChu(b) }}>Câu {tt || ''}</b>
           if (loai === 1) return <span key={i} className="lv-gt-o lv-gt-phan" style={{ ...o(b, { width: undefined }), ...kieuChu(b) }}>Phần {q.phan}{tuLuan ? ' · Tự luận' : TEN_PHAN[q.phan] ? ` · ${TEN_PHAN[q.phan]}` : ''}</span>
-          if (loai === 4) return <b key={i} className="lv-gt-o lv-gt-ky" style={{ ...o(b), height: b[H], ...kieuChu(b) }}>{(q.phan === 'II' ? 'abcd' : 'ABCD')[tt] ?? tt + 1}</b>
-          const html = loai === 2 ? chu.de : loai === 3 ? (chu.pa[tt] ?? '') : loai === 6 ? chu.ngan : ''
+          if (loai === 4) return <b key={i} className="lv-gt-o lv-gt-ky" style={{ ...o(b), height: b[H], ...kieuChu(b) }}>{(q.phan === 'II' ? 'abcd' : 'ABCD')[tt] ?? tt + 1}.</b>
           if (loai !== 2 && loai !== 3 && loai !== 6) return null
-          return <div key={`${i}:${html.length}`} className={`lv-gt-o lv-gt-chu${loai === 6 ? ' ngan' : ''}`} data-kiem={i} style={{ ...o(b), ...kieuChu(b) }} dangerouslySetInnerHTML={{ __html: html }} />
+          const van = loai === 2 ? chu.de : loai === 3 ? (chu.pa[tt] ?? '') : chu.ngan
+          // `key` theo chữ: chữ đổi ⇒ dựng nút mới (dấu «hết chữ» chèn tay không kẹt lại trong nút cũ)
+          return <div key={`${i}:${van}`} className={`lv-gt-o lv-gt-chu${loai === 6 ? ' ngan' : ''}`} data-kiem={i} style={{ ...o(b), ...kieuChu(b) }}>{loai === 6 ? van : dongChu(van).map((d, j) => <Fragment key={j}>{j ? <br /> : null}<Chu text={d} /></Fragment>)}</div>
         })}
       </div>
       {khop === true ? null : duPhong}

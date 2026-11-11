@@ -114,6 +114,44 @@ describe('K4 · K5 · nút Live đầu thanh, cửa sổ neo trái, thanh gom v�
   })
 })
 
+describe('B1 · tờ đo bố cục giấy đề', () => {
+  it('biểu thức chính quy trong chuỗi chèn vào tờ còn nguyên dấu gạch chéo ngược (viết `\\\\s` trong nguồn) — lỗi này làm tờ báo nhầm «giấy có khối lạ»', () => {
+    expect(JS_LIVE_TO_CHIEU).toContain('/\\S/.test(n.data)')
+    expect(JS_LIVE_TO_CHIEU).toContain('(^|\\s)(mc-de|mc-ds-pa|mc-ngan)(\\s|$)')
+    expect(JS_LIVE_TO_CHIEU).toContain(".replace(/\\D+/g, '')")
+    expect(JS_LIVE_TO_CHIEU).not.toMatch(/\/S\/\.test|\(\^\|s\)/)
+  })
+  it('tờ có giấy đề chữ thường ⇒ gửi app bố cục CHỈ GỒM SỐ (không chữ đề, không đáp án), `la` = false; giấy có ảnh ⇒ `la` = true', () => {
+    document.body.innerHTML = '<div class="mc-thanh" id="mc-thanh"></div><div id="dot"><div class="mc-vung-de"><div class="mc-de-dau"><span class="mc-de-so">Câu 7</span><span class="mc-de-phan">Phần I · Trắc nghiệm</span></div><div class="mc-than"><div class="mc-de">Chất nào là amine bậc hai?</div><div class="mc-ds-pa mc-auto-options"><div class="mc-pa mc-pa-dung"><span class="mc-ky">A</span><span class="mc-pa-chu">CH3NH2</span></div><div class="mc-pa"><span class="mc-ky">B</span><span class="mc-pa-chu">CH3NHCH3</span></div></div></div><div class="mc-giai">Đáp án B vì …</div></div></div>'
+    const gui: Tin[] = []
+    vi.spyOn(window, 'postMessage').mockImplementation(((m: Tin) => { gui.push(m) }) as never)
+    // jsdom không dàn trang ⇒ giả hộp của mọi phần tử (đủ để tờ coi là «đang hiện»)
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function (this: Element) { const sau = this.classList.contains('mc-vung-de') ? 0 : 20; return { left: 10 + sau, top: 10 + sau, right: 910, bottom: 710, width: 900 - sau, height: 700 - sau, x: 10, y: 10, toJSON() {} } as DOMRect })
+    ;(Range.prototype as unknown as { getClientRects: () => unknown[] }).getClientRects = () => [{ left: 380, right: 400, top: 60, bottom: 90 }]
+    ;(window as unknown as { __mcBut: unknown }).__mcBut = { trang: () => '3', nghe() {}, vung: () => ({}), xuat: () => ({ tiLe: 16 / 9, net: [] }), bat() {} }
+    const thanh = document.getElementById('mc-thanh')!
+    for (const dich of [document, window] as EventTarget[]) { const goc = dich.addEventListener.bind(dich); vi.spyOn(dich, 'addEventListener').mockImplementation(((loai: string, f: EventListener, tuy?: boolean | AddEventListenerOptions) => { daGan.push([dich, loai, f, tuy]); goc(loai, f, tuy) }) as never) }
+    new Function('body', 'tao', 'thanh', 'dichApp', 'baoNhanh', 'dot', JS_LIVE_TO_CHIEU)(document.body, (the: string, lop: string, cha: HTMLElement) => { const e = document.createElement(the); e.className = lop; cha.appendChild(e); return e }, thanh, () => window, () => {}, () => document.getElementById('dot'))
+    vi.mocked(document.addEventListener).mockRestore(); vi.mocked(window.addEventListener).mockRestore()
+    window.dispatchEvent(new MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'live-tt', tt: NEN }, source: window }))
+    vi.advanceTimersByTime(100)
+    const g = gui.filter((m) => m.viec === 'giay').pop()!.giay as { k: string; w: number; h: number; la: boolean; o: number[][] }
+    expect(g).toMatchObject({ k: '3', w: 900, h: 700, la: false })
+    expect(g.o.map((b) => b[0])).toEqual([0, 1, 2, 5, 4, 3, 5, 4, 3]) // số câu · phần · đề · (khung, ký hiệu, chữ) × 2 phương án
+    expect(g.o[0]![1]).toBe(7) // «Câu 7» đi bằng SỐ
+    expect(g.o.every((b) => b.length === 11 && b.every((n) => Number.isInteger(n)))).toBe(true)
+    const chu = JSON.stringify(g)
+    expect(chu).not.toMatch(/amine|CH3|Đáp án|dung/) // không chữ đề, không lời giải, không dấu phương án đúng
+    // giấy có ảnh ⇒ máy em không soi (dùng cách dựng thường, ẩn nét trên giấy)
+    document.querySelector('.mc-than')!.appendChild(document.createElement('img'))
+    vi.advanceTimersByTime(1100)
+    expect((gui.filter((m) => m.viec === 'giay').pop()!.giay as { la: boolean }).la).toBe(true)
+    expect(g.o[2]!.slice(9)).toEqual([400 - 10 - 20, 60 - 10 - 20]) // chỗ hết chữ của khối đề, tính từ góc hộp chữ
+    delete (window as unknown as { __mcBut?: unknown }).__mcBut
+    delete (Range.prototype as unknown as { getClientRects?: unknown }).getClientRects
+  })
+})
+
 describe('B2 + đợt 2 trên màn chiếu', () => {
   it('thẻ «em rời màn» mở ra ghi kiểu rời của từng em; em báo bằng bản cũ (không kiểu) ⇒ ghi «rời màn»', () => {
     const t = dungTo()

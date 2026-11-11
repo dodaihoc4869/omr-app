@@ -12,7 +12,8 @@
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType } from 'react'
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
-import { DOI_BPU, KJ, kyHieu, tenNgan, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
+import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
+import { cheLiveCua, manEmXa } from './luat-man-live'
 import { coQuyenTatMan, conKhoaXoay, dangChiaDoi, dangXinQuyen, docQuyenTatMan, khoaXoay, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
 import { giuSang } from './giu-sang'
 import KetQuaLenBangEm from './KetQuaLenBangEm'
@@ -227,7 +228,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const cauLive = useRef<{ tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }>({ tin: null, noiLai: null })
   const dangKyLive = useCallback((c: typeof cauLive.current) => { cauLive.current = c }, [])
   const [veLive, setVeLive] = useState<{ ve: string; goc: string } | null>(null)
-  /** LIVE đợt 2 (điểm quyết 4): em vào bằng vé «em ở xa» (thuộc lớp, chưa điểm danh, thầy bật «Cho em ở xa vào xem») ⇒ chỉ xem live: không đội, không kJ. */
+  /** LIVE đợt 2: em vào bằng vé «em ở xa» (thuộc lớp, chưa điểm danh) ⇒ chỉ xem live: không đội, không kJ. */
   const [veXa, setVeXa] = useState(false)
   const dung = useRef(false)
   const loi = useRef(0)
@@ -253,10 +254,10 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
    *  vẫn chưa ghi ⇒ GỬI BÙ `roi` (rồi `ve` nếu em đã quay lại). Chưa nối (`gui` trả false) ⇒ tin nằm hàng chờ, nối lại tự gửi — không cần bù. */
   const buRoi = useRef<number | null>(null)
   const kiemBu = useRef(false)
-  /** Kiểu của lần rời gần nhất (11/11 — màn chiếu lúc live ghi rõ kiểu): xem `KIEU_ROI` ở phong.ts. Gửi kèm `roi` (và tin bù). */
+  /** Kiểu của lần rời gần nhất (11/11, `KIEU_ROI` ở phong.ts) — gửi kèm `roi` và tin bù. */
   const kieuRoi = useRef<KieuRoi>('an')
-  /** BÁO RỜI: gửi `roi` ngay (đồng bộ). Một lần cho tới khi về lại (phòng cũng chặn trùng). `kieu` vắng ⇒ tự suy: cửa sổ nổi ⇒ `noi`; trang ẩn ⇒ `thoat`
-   *  nếu máy phân biệt được khoá màn (chắc chắn thoát / chuyển app), `an` nếu không (thoát app hoặc khoá màn — không đoán). */
+  /** BÁO RỜI: gửi `roi` ngay (đồng bộ). Một lần cho tới khi về lại (phòng cũng chặn trùng). `kieu` vắng ⇒ cửa sổ nổi `noi`; trang ẩn: `thoat` nếu máy
+   *  phân biệt được khoá màn, `an` nếu không (không đoán). */
   const baoRoi = useCallback((laNoi: boolean, kieu?: KieuRoi) => {
     setNoi(laNoi); setVuaRoi(true)
     if (daBaoRoi.current) return
@@ -557,10 +558,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     )
     day = <button type="button" className="bpu-nut" onClick={onDong}>Về chặng đang làm</button>
   } else if (xaEm && !vuaRoi) {
-    // EM Ở XA (live đợt 2, điểm quyết 4): chỉ xem live. Thầy đang live ⇒ lớp bảng live phủ lên màn này; chưa live / thầy tắt «cho em ở xa» ⇒ màn chờ, đóng được.
-    const dangLive = !!v.live?.bat
-    than = <div className="bpu-hs-giua"><h3>{dangLive ? 'Thầy đang live' : v.live?.duocXem ? 'Em đang xem từ xa' : 'Thầy chưa mở xem từ xa'}</h3><p>{dangLive ? 'Bảng và tiếng thầy đang hiện lên máy em…' : 'Khi thầy bật live, bảng và tiếng thầy tự hiện ở đây.'}</p><p className="nho">Em xem từ xa: không điểm danh, không tính kJ. Lúc thầy đang live mà em rời màn thì thầy thấy tên em.</p></div>
-    if (!dangLive) day = <button type="button" className="bpu-nut phu" onClick={onDong}>Đóng</button>
+    ;[than, day] = manEmXa(!!v.live?.bat, !!v.live?.duocXem, onDong)
   } else if (vuaRoi) {
     // SỬA CÓ CHỦ ĐÍCH 09/11 (lần 2, luật chặt «thoát màn hình cảnh báo bị trừ cả đội và cá nhân»): nhắc rõ mức trừ (em và đội), giọng tế nhị.
     const tru = xaEm ? null : <p className="bpu-tru">Rời màn hình: em −{KJ.roiMan} kJ · đội −{KJ.roiMan} kJ</p>
@@ -665,48 +663,14 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     else nutGui = <NutGuiNoi key={khoaLuot} hien={duChon} tuLuan={!!l.tuLuan} onGui={guiTra} />
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
-  // LIVE BẢNG (10/11). Thầy chốt tối 10/11: live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu; máy em vẫn là màn câu hỏi như thường (thêm dấu nhỏ
-  // «Thầy đang live» + nút tiếng). Chỉ khi cờ phòng `live.bang` bật (thầy gọi em lên bảng / bật tay) mới sang BẢNG LIVE toàn màn xoay ngang; lượt mới ⇒ cờ tắt
-  // ⇒ về màn câu hỏi dọc. Phòng chưa có cờ (bản trước đợt 1C) ⇒ suy ra đúng luật ấy từ lượt: đang có em được gọi. Em được gọi ⇒ mic tự bật (lớp live lo).
+  // LIVE BẢNG (10/11; luật màn sửa 11/11 sau khi thầy test máy thật): live = TIẾNG chạy suốt buổi, qua mọi lần chuyển câu. Em đang làm câu ⇒ màn câu hỏi +
+  // tay nắm «Thầy đang live» mép trái; gửi xong / thầy gọi lên bảng ⇒ BẢNG LIVE toàn màn xoay ngang. Phòng chưa có cờ `bang` (bản trước 1C) ⇒ suy từ lượt.
   const lv = v?.live ?? null
   const liveBat = !!lv?.bat && !v?.ketThuc
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
-  // LUẬT MÀN LÚC LIVE — thầy test máy thật 11/11:
-  //  (K1) «Khi chuyển câu, máy hs nhận câu nhưng khi bấm nộp thì không tự về màn live» ⇒ đang live, màn câu hỏi CHỈ hiện lúc em đang làm (lượt đang mở,
-  //       em chưa gửi, chưa hết giờ). Em bấm gửi (`cheSo` đổi ngay trên máy, không chờ phòng) / hết giờ / thầy mở đáp án / chưa có lượt ⇒ về BẢNG LIVE ngay.
-  //  (K2) «Bấm lên bảng là phải ép hết mọi hs vào live không chờ nộp xong» ⇒ cờ phòng `live.bang` (tự bật khi thầy gọi em lên bảng; thầy bật tay bằng
-  //       «Bảng → máy em») ÉP mọi máy vào bảng live kể cả em chưa gửi. Lượt đã khoá theo luật gọi lên bảng đang có (`nhanTra` ⇒ `da-khoa`): đáp án em
-  //       chọn dở KHÔNG được gửi hộ. Đáp án / lời giải vẫn chỉ xuống máy em sau khi thầy mở.
-  //  (K6) Chuyển cảnh tức thì: không chờ tia lửa gửi bay xong (kết quả gửi hiện ở dải lượt trên bảng live).
-  const dangLam = !!l && l.pha === 'tra-loi' && !che && !hetGio
-  const cheLive = !liveBat || vuaRoi ? 'an' : xaEm || coBang || !dangLam ? 'bang' : 'dau'
+  // Luật màn lúc live (11/11: em gửi xong tự về bảng live; thầy gọi lên bảng ép cả lớp vào bảng) — `cheLiveCua` ở luat-man-live.tsx.
+  const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !!l && l.pha === 'tra-loi' && !che && !hetGio })
   const khong = () => {}
-  // DẢI VIỆC CỦA LƯỢT trên bảng live: gọi bạn lên bảng ⇒ đoán + tiếp sức (trước 11/11 bảng live phủ kín làm mất hai việc này); thầy chấm / mở đáp án ⇒
-  // kết quả lên bảng + kết quả của em. Cùng lệnh `doan` / `tiep` với màn thường. Em ở xa không có đội ⇒ không có dải.
-  let luotLive: React.ReactNode = null
-  if (cheLive === 'bang' && e && !xaEm && l) {
-    const g = l.goi
-    if ((l.pha === 'goi' || l.pha === 'lam-bang') && g && g.sbd !== e.sbd) {
-      const khoa = g.emDoan !== null || g.dat != null
-      luotLive = (
-        <>
-          <b className="ky" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }}>{kyHieu(g.ten)}</b>
-          <span className="ten">{g.emDoan === null ? `Em đoán ${tenNgan(g.ten)} làm đúng không?` : `${tenNgan(g.ten)} đang lên bảng`}</span>
-          <button type="button" aria-pressed={g.emDoan === 1} disabled={khoa} onClick={() => gui({ t: 'doan', v: 1 })}>Làm đúng</button>
-          <button type="button" aria-pressed={g.emDoan === 0} disabled={khoa} onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
-          <button type="button" className="tiep" style={{ ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{g.doi === doi ? 'Tiếp sức' : 'Cổ vũ'} · {g.emTiep}/10</button>
-        </>
-      )
-    } else if (l.pha === 'mo' || (g && g.dat != null)) {
-      const k = l.pha === 'mo' ? l.ketQua : null, kb = !!l.emTra?.kb
-      const cuaEm = l.pha !== 'mo' || l.tuLuan ? null : kb ? { kq: '', chu: `Em đã báo chưa biết làm${k ? ` · ${dauKj(k.kj)} kJ` : ''}` } : !l.emTra ? { kq: 'sai', chu: 'Em chưa gửi câu này' } : k?.dung ? { kq: 'dung', chu: `Chính xác! ${dauKj(k.kj)} kJ` } : { kq: 'sai', chu: `Chưa đúng${k && k.kj ? ` · ${dauKj(k.kj)} kJ` : ''}` }
-      luotLive = cuaEm || ketQuaBang ? <>{cuaEm ? <span className="kq" data-kq={cuaEm.kq || undefined}>{cuaEm.chu}</span> : null}{ketQuaBang}</> : null
-    } else if (l.pha === 'tra-loi') {
-      // Em vừa gửi (hoặc hết giờ) ⇒ đã về bảng live: dải báo «Đã gửi» thay cho lớp che của màn câu hỏi.
-      const daGui = !!l.emTra || cheSo === khoaLuot
-      luotLive = <span className="kq">{daGui ? `${l.emTra?.kb ? 'Em đã báo chưa biết làm' : l.tuLuan ? 'Đã báo thầy em làm xong' : 'Đã gửi'} · ${l.daGui}/${l.coMat} bạn đã ${l.tuLuan ? 'xong' : 'gửi'}` : 'Hết giờ — câu này để trống'}</span>
-    }
-  }
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<>
     <LC.DeCau q={q} stt={l.so} />
     {l.tuLuan ? null : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value="" onChon={khong} khoa /> : l.phan === 'II' ? <LC.ChonDungSai q={q} value="" onChon={khong} khoa /> : null}
@@ -715,7 +679,8 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     <Suspense fallback={null}>
       <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} dangKy={dangKyLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
         doi={e && !xaEm ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi}
-        q={q && l ? q : null} tuLuan={!!l?.tuLuan} luot={luotLive} xa={xaEm} />
+        q={q && l ? q : null} Chu={LC?.ChemText} tuLuan={!!l?.tuLuan} xa={xaEm}
+        luot={cheLive === 'bang' && e && !xaEm && l ? { l, sbd: e.sbd, doi, daGuiMay: cheSo === khoaLuot, ketQuaBang, gui } : null} />
     </Suspense>
   ) : null
 

@@ -144,16 +144,19 @@
 .lv-gt-o { position: absolute; margin: 0; padding: 0; letter-spacing: 0; word-spacing: 0; text-align: left; white-space: normal; word-break: normal; overflow-wrap: normal; -webkit-hyphens: none; hyphens: none; }
 .lv-gt-o sub { font-size: 0.72em; vertical-align: -0.25em; line-height: 0; }
 .lv-gt-o sup { font-size: 0.72em; vertical-align: 0.42em; line-height: 0; }
-.lv-gt-so { white-space: nowrap; }
-.lv-gt-phan { white-space: nowrap; opacity: 0.72; }
+.lv-gt-so, .lv-gt-phan { white-space: nowrap; padding: 0.32em 0.85em; margin: -0.32em -0.85em; border-radius: 999px; }
+.lv-gt-so { background: color-mix(in srgb, var(--tr-chieu-nhan) 16%, transparent); }
+.lv-gt-phan { background: var(--tr-chieu-the); color: var(--tr-chieu-phu); }
 .lv-gt-chu.ngan { opacity: 0.72; }
-.lv-gt-ky { text-align: center; border-radius: 0.35em; background: color-mix(in srgb, var(--tr-chieu-nhan) 16%, transparent); color: var(--tr-chieu-nhan); }
+.lv-gt-ky { white-space: nowrap; color: var(--tr-chieu-nhan); }
 .lv-gt-khung { position: absolute; display: block; }
 .lv-gt-het { display: inline; }
 /* giấy soi theo kiểu giấy THẦY đang chọn (sáng / tối), không theo máy em */
 .lv[data-soi] .lv-giay { background: var(--tr-chieu-giay); color: var(--tr-chieu-chu); }
 .lv[data-soi][data-giay="toi"] .lv-giay { background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); }
-.lv[data-soi][data-giay="toi"] .lv-gt-ky { background: color-mix(in srgb, var(--tr-chieu-nhan-toi) 18%, transparent); color: var(--tr-chieu-nhan-toi); }
+.lv[data-soi][data-giay="toi"] .lv-gt-ky { color: var(--tr-chieu-nhan-toi); }
+.lv[data-soi][data-giay="toi"] .lv-gt-so { background: color-mix(in srgb, var(--tr-chieu-nhan-toi) 20%, transparent); }
+.lv[data-soi][data-giay="toi"] .lv-gt-phan { background: var(--tr-chieu-mat-3); color: var(--tr-chieu-giay); }
 
 /* Nút chính màu đội trong khay: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» */
 .lv .lv-tay { width: 100%; min-height: 54px; margin-top: 8px; padding: 6px 14px; border: 0; border-radius: 16px; display: flex; align-items: center; gap: 10px; font: inherit; font-size: 16.5px; font-weight: 800; text-align: left; cursor: pointer;

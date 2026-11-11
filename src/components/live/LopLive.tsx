@@ -29,7 +29,8 @@ import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, boCucEm, boCucPhong, canXoayCss, giaiTrang, khungChieu, type KhungChieu } from './bo-cuc'
-import GiayThay, { soiDuoc, type CauGiay } from './GiayThay'
+import { daiLuot, type DuLieuLuot } from './DaiLuot'
+import GiayThay, { soiDuoc, type BoChu, type CauGiay } from './GiayThay'
 import { taoVeBang, type VeBang } from './ve-bang'
 import './live-em.css'
 
@@ -55,9 +56,11 @@ export interface PropsLopLive {
   roi: boolean
   /** Câu công khai của lượt (không đáp án) — để dựng giấy đề GIỐNG giấy của thầy (GiayThay.tsx); null ⇒ chỉ có cách dựng thường `de`. */
   q?: CauGiay | null
+  /** Bộ dựng chữ có công thức của màn làm bài (`ChemText`) — giấy soi dùng lại, không nạp thêm gì. Vắng ⇒ không soi. */
+  Chu?: BoChu
   tuLuan?: boolean
-  /** Dải việc của LƯỢT hiện trên bảng live (đoán bạn lên bảng, tiếp sức, kết quả của em) — màn Bình Phản Ứng dựng. */
-  luot?: ReactNode
+  /** Dữ liệu cho dải việc của LƯỢT trên bảng live (đoán bạn lên bảng, tiếp sức, kết quả của em) — dựng ở DaiLuot.tsx. */
+  luot?: DuLieuLuot | null
   /** Em ở xa (thuộc lớp, chưa điểm danh, thầy bật «Cho em ở xa vào xem»). */
   xa?: boolean
 }
@@ -200,7 +203,7 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, huyHieu, ch
   )
 }
 
-export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, tuLuan, luot, xa }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -314,17 +317,17 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     </div>
   )
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} tuLuan={!!tuLuan} luot={luot} coDoi={!!doi} huyHieu={huyHieu} dongKhay={dongKhay} />
+    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} huyHieu={huyHieu} dongKhay={dongKhay} />
 }
 
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
-  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; tuLuan: boolean; luot: ReactNode; coDoi: boolean; huyHieu: ReactNode
+  tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; luot: ReactNode; coDoi: boolean; huyHieu: ReactNode
   dongKhay: (dau: ReactNode) => ReactNode }
 interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; namDe: boolean; kc: KhungChieu; giayToi: boolean; trai: number }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, tuLuan, luot, coDoi, huyHieu, dongKhay }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, luot, coDoi, huyHieu, dongKhay }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
@@ -346,7 +349,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
   // thường + ẨN NÉT TRÊN GIẤY (nét trên bảng đen giữ nguyên), số đo `live-do` mang cờ giấy lệch.
   const [khopGiay, setKhopGiay] = useState(false)
   const datKhop = useCallback((k: boolean) => setKhopGiay(k), [])
-  const soi = !!q && soiDuoc(giay, giaiTrang(bc ? trang.current.trang : '').khoa)
+  const soi = !!q && !!Chu && soiDuoc(giay, giaiTrang(bc ? trang.current.trang : '').khoa)
   const netGiay = soi && khopGiay
   useEffect(() => { le.current?.datGiayLech(!netGiay) }, [le, netGiay])
 
@@ -472,7 +475,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
         {bc && kc ? (
           <div className="lv-chieu" style={{ width: kc.LW, height: kc.LH, transform: `translate3d(${bc.x}px,${bc.y}px,0) scale(${bc.s})` }}>
             <div className="lv-giay" style={o(kc.giay)}>
-              {soi && giay && q ? <GiayThay giay={giay} q={q} tuLuan={tuLuan} rong={kc.giay.w} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={kc.giay.w} cao={kc.giay.h} />} />
+              {soi && giay && q && Chu ? <GiayThay giay={giay} q={q} Chu={Chu} tuLuan={tuLuan} rong={kc.giay.w} khiKhop={datKhop} duPhong={<GiayDe de={de} khoa={khoaDe} rong={kc.giay.w} cao={kc.giay.h} />} />
                 : <GiayDe de={de} khoa={khoaDe} rong={kc.giay.w} cao={kc.giay.h} />}
             </div>
             <div className="lv-bang" style={o(kc.bang)}>{coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>}</div>

@@ -307,9 +307,9 @@ export const JS_LIVE_TO_CHIEU = `
     function hop(e) { var r = e.getBoundingClientRect(), s = getComputedStyle(e), pl = parseFloat(s.paddingLeft) || 0, pt = parseFloat(s.paddingTop) || 0; return { x: r.left - G.left + pl, y: r.top - G.top + pt, w: r.width - pl - (parseFloat(s.paddingRight) || 0), h: r.height - pt - (parseFloat(s.paddingBottom) || 0), s: s, r: r }; }
     function het(e, b) {
       var w = document.createTreeWalker(e, 4, null, false), n, cuoi = null, dai, rg, rs, r;
-      while ((n = w.nextNode())) if (/\S/.test(n.data)) cuoi = n;
+      while ((n = w.nextNode())) if (/\\S/.test(n.data)) cuoi = n;
       if (!cuoi) return [0, 0];
-      dai = cuoi.data.replace(/\s+$/, '').length; rg = document.createRange(); rg.setStart(cuoi, Math.max(0, dai - 1)); rg.setEnd(cuoi, dai);
+      dai = cuoi.data.replace(/\\s+$/, '').length; rg = document.createRange(); rg.setStart(cuoi, Math.max(0, dai - 1)); rg.setEnd(cuoi, dai);
       rs = rg.getClientRects(); r = rs.length ? rs[rs.length - 1] : rg.getBoundingClientRect();
       return [r.right - G.left - b.x, r.top - G.top - b.y];
     }
@@ -321,8 +321,8 @@ export const JS_LIVE_TO_CHIEU = `
       o.push([loai, tt, b.x, b.y, b.w, b.h, co * 10, (parseFloat(b.s.lineHeight) || co * 1.2) * 10, (parseInt(b.s.fontWeight, 10) || 400) / 100, k[0], k[1]].map(Math.round));
     }
     la = !!th.querySelector('img,table,svg,canvas,video,.katex,.ex-demo,.q-bang-cuon,.mc-anh') || th.querySelectorAll('.mc-de').length !== 1;
-    for (i = 0; i < th.children.length; i++) { c = th.children[i]; if (!/(^|\s)(mc-de|mc-ds-pa|mc-ngan)(\s|$)/.test(c.className) && c.getBoundingClientRect().height > 1) la = true; }
-    e = g.querySelector('.mc-de-so'); them(0, e ? Math.min(23, parseInt(String(e.textContent).replace(/\D+/g, ''), 10) || 0) : 0, e, false);
+    for (i = 0; i < th.children.length; i++) { c = th.children[i]; if (!/(^|\\s)(mc-de|mc-ds-pa|mc-ngan)(\\s|$)/.test(c.className) && c.getBoundingClientRect().height > 1) la = true; }
+    e = g.querySelector('.mc-de-so'); them(0, e ? Math.min(23, parseInt(String(e.textContent).replace(/\\D+/g, ''), 10) || 0) : 0, e, false);
     them(1, 0, g.querySelector('.mc-de-phan'), false);
     them(2, 0, th.querySelector('.mc-de'), true);
     ds = th.querySelectorAll('.mc-ds-pa > .mc-pa');

@@ -9,6 +9,8 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import * as L from '../src/lib/bpu/phong'
 import * as LL from '../src/lib/bpu/phong-live'
 import { datWebSocketPairGia, taoPhongGia, viewCuoi } from './_live-phong-gia'
+import { cheLiveCua } from '../src/components/bpu/luat-man-live'
+import { khoiKhop, soiDuoc } from '../src/components/live/GiayThay'
 
 const SS = { id: 'a1b2c3d4e5f60718293a4b5c6d7e8f90', tieng: 'thay', kenh: 'net' }
 const PHIEN_EM = 'e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1', DAP_AN = 'ĐÁP-ÁN-BÍ-MẬT-XYZ'
@@ -294,5 +296,39 @@ describe('ĐỢT 2 · phòng thật (Durable Object trên kho giả)', () => {
     expect(viewCuoi(xa).live).toMatchObject({ duocXem: true, bat: true, bang: true, xa: true })
     await ph.gui(xa, { t: 'roi', k: 'an' })
     expect(viewCuoi(gv)).toMatchObject({ roiNay: ['XA'], roiKieu: { XA: 'an' } })
+  })
+})
+
+describe('K1 · K2 · luật màn máy em lúc live (thuần)', () => {
+  const nen = { liveBat: true, vuaRoi: false, xaEm: false, coBang: false, dangLam: false }
+  it('chưa live / đang hiện cảnh báo rời màn ⇒ `an`; đang làm câu ⇒ `dau`; gửi xong, hết giờ, mở đáp án, chưa có lượt ⇒ `bang`', () => {
+    expect(cheLiveCua({ ...nen, liveBat: false })).toBe('an')
+    expect(cheLiveCua({ ...nen, vuaRoi: true })).toBe('an')
+    expect(cheLiveCua({ ...nen, dangLam: true })).toBe('dau')
+    expect(cheLiveCua(nen)).toBe('bang') // K1
+  })
+  it('cờ phòng `bang` (gọi lên bảng / bật tay) ép cả em đang làm vào bảng; em ở xa luôn xem bảng', () => {
+    expect(cheLiveCua({ ...nen, dangLam: true, coBang: true })).toBe('bang') // K2
+    expect(cheLiveCua({ ...nen, dangLam: true, xaEm: true })).toBe('bang')
+  })
+})
+
+describe('B1 · tự kiểm giấy đề (thuần)', () => {
+  // khối chữ của thầy: rộng 800, cao 96 (hai dòng 48 px), hết chữ ở x = 512, dòng thứ hai (y = 52)
+  const thay = [2, 0, 30, 90, 800, 96, 280, 480, 4, 512, 52]
+  it('khớp khi chiều cao và chỗ hết chữ lệch trong ngưỡng; xuống dòng khác (thêm một dòng / hết chữ lệch xa) ⇒ lệch', () => {
+    expect(khoiKhop(thay, { cao: 96, hetX: 512, hetY: 52 })).toBe(true)
+    expect(khoiKhop(thay, { cao: 98, hetX: 518, hetY: 54 })).toBe(true) // sai số làm tròn
+    expect(khoiKhop(thay, { cao: 144, hetX: 120, hetY: 100 })).toBe(false) // máy em xuống thêm một dòng
+    expect(khoiKhop(thay, { cao: 96, hetX: 560, hetY: 52 })).toBe(false) // cùng số dòng nhưng chữ ngắt chỗ khác
+    expect(khoiKhop(thay, { cao: 48, hetX: 790, hetY: 4 })).toBe(false) // máy em chỉ một dòng
+  })
+  it('chỉ soi khi bố cục đúng trang đang chiếu, không có khối lạ, có khối đề', () => {
+    const g = { k: '3', w: 1260, h: 980, la: false, o: [thay] }
+    expect(soiDuoc(g, '3')).toBe(true)
+    expect(soiDuoc(g, '4')).toBe(false) // thầy đã sang trang khác, bố cục mới chưa tới
+    expect(soiDuoc({ ...g, la: true }, '3')).toBe(false) // giấy có ảnh / bảng / sơ đồ
+    expect(soiDuoc({ ...g, o: [[0, 3, 1, 1, 50, 20, 190, 230, 7, 0, 0]] }, '3')).toBe(false)
+    expect(soiDuoc(null, '3')).toBe(false)
   })
 })
