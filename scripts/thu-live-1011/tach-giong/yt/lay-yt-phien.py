@@ -38,17 +38,27 @@ muc = json.load(open(MUC)) if os.path.exists(MUC) else {'nguon': 'YouTube — b�
 cam = Cam(CAMP, 4); vad = ort.InferenceSession(VADP, providers=['CPUExecutionProvider'])
 tamLive = np.load(TAM_LIVE) if TAM_LIVE else None
 
+def biChan(tu):
+    """Máy chủ (googlevideo / google) proxy của phiên từ chối CONNECT kể từ thời điểm tu (UTC, ISO) — đọc nhật ký của chính proxy."""
+    try:
+        st = json.loads(subprocess.run(['curl', '-sS', E('HTTPS_PROXY', '') + '/__agentproxy/status'], capture_output=True, text=True).stdout)
+        return sorted({r['host'].split(':')[0] for r in st.get('recentRelayFailures', []) if r.get('ts', '') >= tu and re.search(r'googlevideo|google\.com|youtube', r.get('host', ''))})
+    except Exception: return []
 def tai(id):
     """Tải tiếng opus 48 kHz của một video; trả (đường tệp | None, lỗi, máy chủ googlevideo)."""
     for lan in range(3):
         for f in glob.glob(os.path.join(TAI, id + '.*')): os.remove(f)
+        t0 = time.strftime('%Y-%m-%dT%H:%M:%S', time.gmtime())
         r = subprocess.run([E('YT_DLP', 'yt-dlp'), '-v', '--no-warnings', '--no-progress', '--js-runtimes', 'node', '--sleep-requests', '3', '--sleep-interval', '10', '--max-sleep-interval', '20',
                             '--extractor-args', 'youtubepot-bgutilscript:server_home=' + E('YT_POT', ''), '-f', '251/bestaudio', '-o', os.path.join(TAI, id + '.%(ext)s'),
                             f'https://www.youtube.com/watch?v={id}'], capture_output=True, text=True)
         may = sorted(set(re.findall(r'https://([a-z0-9-]+\.googlevideo\.com)', r.stdout + r.stderr)))
         tep = [f for f in glob.glob(os.path.join(TAI, id + '.*')) if not f.endswith('.part')]
         if r.returncode == 0 and tep: return tep[0], '', may
-        loi = (re.findall(r'ERROR:.*', r.stderr) or [r.stderr[-300:]])[-1][:200]
+        loi = (re.findall(r'^ERROR: .*', r.stderr, re.M) or [r.stderr[-300:]])[0][:200]
+        chan = biChan(t0); gv = [h for h in chan if 'googlevideo' in h]
+        if gv: return None, 'proxy chặn: ' + ' '.join(gv), may            # chỉ máy chủ TIẾNG (googlevideo) bị chặn mới tính là «proxy chặn»
+        if chan: loi += ' · proxy từ chối (phụ): ' + ' '.join(chan)
         if 'not a bot' in loi or 'HTTP Error 429' in loi or 'API page 403' in loi:
             print(f'  bị gắn cờ ({loi[:80]}) — nghỉ {NGHI} s rồi thử lại', flush=True); time.sleep(NGHI); continue
         return None, loi, may
@@ -88,11 +98,8 @@ for id, nh, tieuDe in ung:
     if not p:
         v.update(loi=loi, xong='không tải' if 'proxy' not in loi.lower() else False); muc['video'][id] = v
         json.dump(muc, open(MUC, 'w'), ensure_ascii=False, indent=1); print('  LỖI', loi, may, flush=True)
-        if 'proxy' in loi.lower() or 'Tunnel' in loi:   # máy chủ googlevideo chưa mở: lấy tên từ nhật ký proxy, gom lại, tải sau
-            try:
-                st = json.loads(subprocess.run(['curl', '-sS', E('HTTPS_PROXY', '') + '/__agentproxy/status'], capture_output=True, text=True).stdout)
-                chan = sorted({r['host'].split(':')[0] for r in st.get('recentRelayFailures', []) if 'googlevideo' in r.get('host', '')})
-            except Exception: chan = []
+        if loi.startswith('proxy chặn'):   # máy chủ chưa mở (tên lấy từ nhật ký proxy): gom lại, video này tải lại ở lượt sau
+            chan = loi.split(': ', 1)[1].split()
             v['mayChuBiChan'] = chan; muc['video'][id] = v; json.dump(muc, open(MUC, 'w'), ensure_ascii=False, indent=1)
             with open(os.path.join(RA, 'may-chu-bi-chan.txt'), 'a') as fh: fh.write(' '.join(chan) + '\n')
             print('  PROXY CHẶN máy chủ:', chan, flush=True)
