@@ -1,0 +1,18 @@
+{
+  "lo": 350,
+  "newMainChanges": "So349 sửa Live giảm trễ tiếng/mic và màn chiếu đen/cây bút/nét sắc; app-server/CSS/tests đổi, Vite-font-mốc nguyênbyte, chưa gộp.",
+  "productionChangedThisBatch": false,
+  "colorViolations": 1161,
+  "colorCheckerFiles": 237,
+  "sizeBaselineRed": {
+    "file": "server/src/index.ts",
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainMocSha": "2c8c45be8ab06dfb7ee3d825eecc0a6eca1f642068971483bf6e3c2f52d058c1",
+  "branchMocSha": "f762cef714985c2b200e382d62736fdbf06c5c6262f026da94b2d477dbd46fde",
+  "latestMainBuildSpeedRequiredBeforeMergeRelease": true,
+  "scope": "Cổng lô350 chỉ nhánh hiện tại, productionoldfonts/assets; chưa phải latestmain build-speed/full.",
+  "main": "99267cb80fceb583ae93b82a470ab21601529390",
+  "comparedToMain349": "27495346c0da685ec0c537992c51a35eb3353ec7"
+}

@@ -1,0 +1,494 @@
+{
+  "i": 552,
+  "assetIndexProvided": 1097,
+  "hash": "67c822ae315e25c56ea969c9f2415ac4026aeade889a00aa0bb31804360dcd67",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/67c822ae315e25c56ea969c9f2415ac4026aeade889a00aa0bb31804360dcd67.png",
+  "size": [
+    1282,
+    104
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-10-C3-B14-D1-I-5",
+      "de": "Công thức electron nào sau đây **không** đủ electron theo quy tắc octet?",
+      "allHinh": [
+        {
+          "hash": "67c822ae315e25c56ea969c9f2415ac4026aeade889a00aa0bb31804360dcd67",
+          "where": "DH-10-C3-B14-D1-I-5.hinh.0.du_lieu",
+          "hashDataUrl": "d34e675cbcbec2f2cd2bfacee310610645f07a0d05a3615a8913a9a5d1e9a9f2"
+        }
+      ],
+      "missingHashes": [
+        "67c822ae315e25c56ea969c9f2415ac4026aeade889a00aa0bb31804360dcd67"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownAllFourPanel5xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelredcomponentcentroids measuredafterindependentmacrovisualcount; glyphbboxesapproxnearest1px. Countnotinferredfromoctet.",
+  "geometry": {
+    "panels": [
+      {
+        "caption": {
+          "text": "A.",
+          "bbox": [
+            5,
+            73,
+            39,
+            98
+          ],
+          "font": "truebold uprightserif"
+        },
+        "atoms": [
+          {
+            "text": "H",
+            "bbox": [
+              45,
+              21,
+              70,
+              46
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "N",
+            "bbox": [
+              87,
+              21,
+              114,
+              46
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "H",
+            "bbox": [
+              130,
+              21,
+              155,
+              46
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "H",
+            "bbox": [
+              87,
+              65,
+              113,
+              91
+            ],
+            "font": "regular uprightserif"
+          }
+        ],
+        "redDotCenters": [
+          [
+            80.11,
+            38.43
+          ],
+          [
+            80.17,
+            25.98
+          ],
+          [
+            92.71,
+            10.91
+          ],
+          [
+            93.34,
+            54.48
+          ],
+          [
+            106.05,
+            54.5
+          ],
+          [
+            106.89,
+            11.0
+          ],
+          [
+            120.86,
+            27.16
+          ],
+          [
+            120.92,
+            39.77
+          ]
+        ],
+        "redDotCount": 8,
+        "redDotRadius": "about3.7nativepx, filledred, noblackoutline",
+        "trailingPrintPeriod": {
+          "text": ".",
+          "center": [
+            173,
+            95
+          ],
+          "radius": "about2.2nativepx",
+          "color": "blackgray",
+          "role": "literalprintedpunctuation separatefromelectrons; MUSTretain"
+        },
+        "notes": "A8:2lonepairABOVEN+3pairedHconnections; noactualbondlines."
+      },
+      {
+        "caption": {
+          "text": "B.",
+          "bbox": [
+            358,
+            73,
+            391,
+            98
+          ],
+          "font": "truebold uprightserif"
+        },
+        "atoms": [
+          {
+            "text": "H",
+            "bbox": [
+              397,
+              21,
+              423,
+              46
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "B",
+            "bbox": [
+              439,
+              21,
+              464,
+              46
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "H",
+            "bbox": [
+              483,
+              21,
+              509,
+              46
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "H",
+            "bbox": [
+              440,
+              65,
+              466,
+              91
+            ],
+            "font": "regular uprightserif"
+          }
+        ],
+        "redDotCenters": [
+          [
+            432.39,
+            25.87
+          ],
+          [
+            432.49,
+            38.59
+          ],
+          [
+            445.98,
+            54.17
+          ],
+          [
+            458.5,
+            54.15
+          ],
+          [
+            473.18,
+            39.4
+          ],
+          [
+            473.26,
+            26.56
+          ]
+        ],
+        "redDotCount": 6,
+        "redDotRadius": "about3.7nativepx, filledred, noblackoutline",
+        "trailingPrintPeriod": {
+          "text": ".",
+          "center": [
+            525,
+            95
+          ],
+          "radius": "about2.2nativepx",
+          "color": "blackgray",
+          "role": "literalprintedpunctuation separatefromelectrons; MUSTretain"
+        },
+        "notes": "B6:ONLY3pairsleft/right/bottom, ZEROtopdots;preserveincorrectoctet."
+      },
+      {
+        "caption": {
+          "text": "C.",
+          "bbox": [
+            714,
+            73,
+            748,
+            98
+          ],
+          "font": "truebold uprightserif"
+        },
+        "atoms": [
+          {
+            "text": "O",
+            "bbox": [
+              774,
+              57,
+              799,
+              83
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "C",
+            "bbox": [
+              832,
+              57,
+              855,
+              83
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "O",
+            "bbox": [
+              887,
+              57,
+              911,
+              83
+            ],
+            "font": "regular uprightserif"
+          }
+        ],
+        "redDotCenters": [
+          [
+            776.67,
+            91.0
+          ],
+          [
+            776.7,
+            48.7
+          ],
+          [
+            790.67,
+            91.0
+          ],
+          [
+            790.7,
+            48.7
+          ],
+          [
+            810.28,
+            77.78
+          ],
+          [
+            810.36,
+            63.5
+          ],
+          [
+            822.3,
+            77.7
+          ],
+          [
+            822.36,
+            63.5
+          ],
+          [
+            861.64,
+            63.5
+          ],
+          [
+            861.7,
+            77.7
+          ],
+          [
+            874.0,
+            63.5
+          ],
+          [
+            874.0,
+            77.67
+          ],
+          [
+            890.7,
+            51.3
+          ],
+          [
+            891.3,
+            92.3
+          ],
+          [
+            904.0,
+            51.33
+          ],
+          [
+            905.3,
+            92.3
+          ]
+        ],
+        "redDotCount": 16,
+        "redDotRadius": "about3.7nativepx, filledred, noblackoutline",
+        "trailingPrintPeriod": {
+          "text": ".",
+          "center": [
+            929,
+            95
+          ],
+          "radius": "about2.2nativepx",
+          "color": "blackgray",
+          "role": "literalprintedpunctuation separatefromelectrons; MUSTretain"
+        },
+        "notes": "C16:4dotsperO-Cgap in2×2 grid, Ooutertop2bottom2each;OCOliteral."
+      },
+      {
+        "caption": {
+          "text": "D.",
+          "bbox": [
+            1068,
+            73,
+            1102,
+            98
+          ],
+          "font": "truebold uprightserif"
+        },
+        "atoms": [
+          {
+            "text": "Cl",
+            "bbox": [
+              1127,
+              57,
+              1162,
+              83
+            ],
+            "font": "regular uprightserif"
+          },
+          {
+            "text": "Cl",
+            "bbox": [
+              1178,
+              57,
+              1211,
+              83
+            ],
+            "font": "regular uprightserif"
+          }
+        ],
+        "redDotCenters": [
+          [
+            1117.67,
+            77.0
+          ],
+          [
+            1117.7,
+            62.7
+          ],
+          [
+            1131.67,
+            48.0
+          ],
+          [
+            1131.67,
+            91.0
+          ],
+          [
+            1145.67,
+            48.0
+          ],
+          [
+            1145.67,
+            91.0
+          ],
+          [
+            1167.3,
+            62.7
+          ],
+          [
+            1167.33,
+            77.0
+          ],
+          [
+            1182.67,
+            48.0
+          ],
+          [
+            1184.7,
+            92.3
+          ],
+          [
+            1196.18,
+            48.0
+          ],
+          [
+            1198.3,
+            92.3
+          ],
+          [
+            1215.67,
+            77.0
+          ],
+          [
+            1215.7,
+            62.7
+          ]
+        ],
+        "redDotCount": 14,
+        "redDotRadius": "about3.7nativepx, filledred, noblackoutline",
+        "trailingPrintPeriod": {
+          "text": ".",
+          "center": [
+            1240,
+            95
+          ],
+          "radius": "about2.2nativepx",
+          "color": "blackgray",
+          "role": "literalprintedpunctuation separatefromelectrons; MUSTretain"
+        },
+        "notes": "D14:ClcasecapitalC+lowerl, 2shareddotsbetween,6outerdotsperCl; noCl-Clstroke."
+      }
+    ],
+    "counts": {
+      "redDots": 44,
+      "redDotsByPanel": [
+        8,
+        6,
+        16,
+        14
+      ],
+      "blackTrailingPeriods": 4,
+      "captionPeriods": 4,
+      "bondLines": 0
+    },
+    "noAdded": [
+      "octetcorrectionB",
+      "grayperiodasredDot",
+      "covalentbondlines",
+      "charges",
+      "correctanswerhighlight",
+      "molecularnames"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "sourceonly/noSVG/noCount",
+  "rootAudit": {
+    "nativeFull": true,
+    "native3x": true,
+    "allPublicDeAndRefs": true,
+    "freshChromium3xFull": true,
+    "exactSvg": "83a9c63279209ca075e81ae1b06be28964ce91f113ae63f542badc76b9846de5",
+    "notes": "Root mở native FULL/native3x và freshactualFULL3x. 44red=A8B6C16D14, BZEROtopdots, nooctetfix; A.-D.trueDAMupright/atomsregularupright;Cl C+lowerl;4blacktrailingperiods separatefromelectrons/0bondlines0charges/NOanswer."
+  }
+}
