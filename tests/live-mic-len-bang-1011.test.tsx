@@ -39,6 +39,7 @@ afterEach(() => { _datLaiTatMan() })
 describe('mic của em lên bảng', () => {
   // 11/11 (thầy «ô tắt mở tiếng ẩn hết vào thanh»): mic của em lên bảng điều khiển TRONG khay (dòng «Mic của em · Đang bật / Đang tắt»), tay nắm mang huy hiệu
   // mic khi mic đang mở — không còn thẻ / nút nổi riêng trên bảng.
+  // 11/11 LẦN 3 (thầy: «Chuyển mic, tắt tiếng, thanh ẩn sang hẳn góc phải … thiết kế ẩn hết vào thanh ẩn»): huy hiệu mic tròn nổi ⇒ DẤU mic rất nhỏ ngay trên tay nắm.
   it('phòng cho phép ⇒ mic TỰ BẬT; khay có dòng «Mic của em · Đang bật» + huy hiệu mic trên tay nắm; em tắt ⇒ không tự bật lại, bấm dòng ấy để bật lại; hết lượt gọi ⇒ sạch', async () => {
     await dung()
     expect(goi).toEqual([])
@@ -51,13 +52,15 @@ describe('mic của em lên bảng', () => {
     expect(nutMic()!.textContent).toContain('Mic của em'); expect(nutMic()!.textContent).toContain('Đang bật')
     expect(nutMic()!.getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByText('Thầy và cả lớp đang nghe em.')).toBeTruthy()
-    expect(document.querySelector('.lv-nam .lv-nam-hh.mic')!.getAttribute('aria-label')).toBe('Mic của em đang bật') // khay đóng vẫn biết mic đang mở
+    expect(document.querySelector('.lv-nam .lv-nam-dau [data-dau="mic"]')!.getAttribute('title')).toBe('mic của em đang bật') // khay đóng vẫn biết mic đang mở
+    expect(document.querySelector('.lv-nam')!.getAttribute('aria-label')).toContain('mic của em đang bật')
+    expect(document.querySelector('.lv-nam-hh')).toBeNull() // hết huy hiệu tròn nổi
     expect(document.querySelector('.lv > .lv-noi, .lv > .lv-bat-tieng')).toBeNull() // không còn thẻ / nút nổi riêng trên bảng
     const soBat = goi.filter((x) => x === 'bat').length
     fireEvent.click(nutMic()!)
     expect(goi).toContain('tat')
     await waitFor(() => expect(nutMic()!.getAttribute('aria-label')).toContain('bật mic lại'))
-    expect(document.querySelector('.lv-nam .lv-nam-hh')).toBeNull()
+    expect(document.querySelector('.lv-nam .lv-nam-dau [data-dau="mic"]')).toBeNull()
     await act(async () => { await new Promise((r) => setTimeout(r, 1700)) }) // quá một nhịp thử lại: KHÔNG tự bật lại
     expect(goi.filter((x) => x === 'bat').length).toBe(soBat)
     fireEvent.click(nutMic()!)

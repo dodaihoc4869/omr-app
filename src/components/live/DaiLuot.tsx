@@ -1,5 +1,6 @@
 // LIVE BẢNG — DẢI VIỆC CỦA LƯỢT trên bảng live (11/11, sửa chỗ lệch B3: «bảng live trên máy em đang che trò đoán / tiếp sức»; đặc tả 4.3c). Nạp lười cùng LopLive.
-// Bảng live phủ kín màn Bình Phản Ứng nên các việc của lượt hiện ngay TRÊN bảng, gọn ở góc trái dưới:
+// Bảng live phủ kín màn Bình Phản Ứng nên các việc của lượt hiện ngay TRÊN bảng — DẢI MỎNG sát đáy, góc trái (thầy 11/11 lần 3: giấy + bảng phủ kín, dải không
+// che quá một dòng); em đoán xong (hoặc thầy đã chấm) ⇒ thu về MỘT VIÊN NHỎ: tên bạn + điều em đoán + nút tiếp sức.
 //   · thầy gọi bạn lên bảng ⇒ «Em đoán … làm đúng không?» + «Làm đúng» / «Chưa đúng» + «Tiếp sức» / «Cổ vũ» — cùng lệnh `doan` / `tiep` với màn thường;
 //   · thầy chấm / mở đáp án ⇒ kết quả lên bảng + kết quả của em (đúng / chưa đúng, kJ);
 //   · em vừa gửi (đã tự về bảng live) ⇒ «Đã gửi · n/m bạn đã gửi»; hết giờ chưa gửi ⇒ «Hết giờ — câu này để trống».
@@ -25,13 +26,22 @@ export function daiLuot({ l, sbd, doi, daGuiMay, ketQuaBang, gui }: DuLieuLuot):
   const g = l.goi
   if ((l.pha === 'goi' || l.pha === 'lam-bang') && g && g.sbd !== sbd) {
     const khoa = g.emDoan !== null || g.dat != null, mau = { ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }
+    const tiep = <button type="button" className="tiep" style={mau} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{g.doi === doi ? 'Tiếp sức' : 'Cổ vũ'} · {g.emTiep}/10</button>
+    // đã đoán / thầy đã chấm ⇒ viên nhỏ (hai nút đoán đã khoá thì không cần chiếm chỗ trên giấy nữa)
+    if (khoa) return (
+      <>
+        <b className="ky" style={mau}>{kyHieu(g.ten)}</b>
+        <span className="ten">{g.emDoan === null ? `${tenNgan(g.ten)} đang lên bảng` : `Em đoán ${tenNgan(g.ten)} ${g.emDoan === 1 ? 'làm đúng' : 'chưa đúng'}`}</span>
+        {tiep}
+      </>
+    )
     return (
       <>
         <b className="ky" style={mau}>{kyHieu(g.ten)}</b>
-        <span className="ten">{g.emDoan === null ? `Em đoán ${tenNgan(g.ten)} làm đúng không?` : `${tenNgan(g.ten)} đang lên bảng`}</span>
-        <button type="button" aria-pressed={g.emDoan === 1} disabled={khoa} onClick={() => gui({ t: 'doan', v: 1 })}>Làm đúng</button>
-        <button type="button" aria-pressed={g.emDoan === 0} disabled={khoa} onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
-        <button type="button" className="tiep" style={mau} disabled={g.emTiep >= 10} onClick={() => gui({ t: 'tiep' })}>{g.doi === doi ? 'Tiếp sức' : 'Cổ vũ'} · {g.emTiep}/10</button>
+        <span className="ten">Em đoán {tenNgan(g.ten)} làm đúng không?</span>
+        <button type="button" onClick={() => gui({ t: 'doan', v: 1 })}>Làm đúng</button>
+        <button type="button" onClick={() => gui({ t: 'doan', v: 0 })}>Chưa đúng</button>
+        {tiep}
       </>
     )
   }

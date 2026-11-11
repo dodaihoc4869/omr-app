@@ -18,6 +18,9 @@ describe('trễ tiếng ước tính', () => {
     expect(TRE_CHUOI.nhanh).toBeGreaterThan(15)
     expect(TRE_CHUOI.nen).toBeGreaterThan(TRE_CHUOI.nhanh!)
     expect(TRE_CO_DINH_EM).toBe(65) // đệm phát nét của máy em đang dựa vào hằng số này
+    // MÁY THẬT 11/11: mic USB báo bộ đệm thu ÂM ⇒ từng hiện «trễ tiếng ước tính −121 ms». Phần nào âm / không phải số thì bỏ, tổng không bao giờ âm.
+    expect(treTiengUocTinh({ thu: -158, chuoi: 0, ma: 17, mangThay: 24, mangEm: 20, demEm: 8 }).ms).toBe(17 + 12 + 10 + 8)
+    expect(treTiengUocTinh({ thu: NaN, chuoi: 0, ma: 17, mangThay: -5, mangEm: null, demEm: null }).ms).toBe(17)
   })
   it('đường nối tới SFU đọc từ `getStats`: loại ứng viên + giao thức của cặp đang dùng, kèm RTT (thầy nhìn được có rơi về TURN / TCP không)', () => {
     const bc = (uv: Record<string, unknown>) => new Map<string, unknown>([
@@ -44,9 +47,9 @@ describe('Opus của thầy + bộ nâng mức', () => {
   })
   it('bộ nâng mức nhẹ tay: nhắm −18 … −14 dBFS RMS, trần đỉnh dưới 0 dBFS, trôi chậm (không «thở»)', () => {
     const db = (v: number) => 20 * Math.log10(v)
-    expect(db(LAM_RO.dich)).toBeGreaterThanOrEqual(-18)
+    expect(db(LAM_RO.dich)).toBeGreaterThanOrEqual(-19) // đo ở đầu nhận: mức nói ≈ đích + 2 dB ⇒ rơi vào −18 … −14 dBFS
     expect(db(LAM_RO.dich)).toBeLessThanOrEqual(-14)
-    expect(db(LAM_RO.tran)).toBeLessThan(-1)
+    expect(db(LAM_RO.tran)).toBeLessThanOrEqual(-2) // đỉnh gửi đi ≤ −2 dBFS
     expect(db(LAM_RO.tran)).toBeGreaterThan(-3) // chặn đỉnh chỉ chạm khi sắp vỡ
     expect(LAM_RO.len).toBeLessThanOrEqual(3) // dB / giây
   })

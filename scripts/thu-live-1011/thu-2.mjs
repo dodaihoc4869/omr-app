@@ -3,7 +3,8 @@
 // (may-chu.mjs). Dữ liệu giả, không chạm máy chủ thật. Thay cho kịch bản «em gửi xong vẫn ở màn câu hỏi» của thu.mjs (luật màn đã đổi 11/11).
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu-2.mjs <thư mục tạm> [thư mục ảnh = docs/ban-ve-live-1011] [tệp số đo = docs/ban-ve-live-1011/so-do-that-2.json]
-// Kịch bản: bật live ⇒ thanh màn chiếu gom vào một nút (K5) ⇒ máy em đang làm: tay nắm MÉP TRÊN, trên đầu thẻ đội / tên (K4 + M3 — thầy 11/11 lần 2) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy đề soi đúng
+// Kịch bản: bật live ⇒ thanh màn chiếu gọn, nút phụ trong khay của nút «thêm» (K5) ⇒ máy em đang làm: tay nắm MÉP PHẢI, đứng trên nút «Gửi» (P — thầy 11/11 LẦN 3: «Chuyển mic, tắt
+// tiếng, thanh ẩn sang hẳn góc phải ở giữa bảng đen … đề và bảng đen phải full … ẩn hết vào thanh ẩn»; lần 2 là mép trên) ⇒ em GỬI ⇒ tự về bảng live (K1), giấy + bảng PHỦ KÍN, giấy đề soi đúng
 // giấy thầy (B1) ⇒ thầy gạch chân trên giấy ⇒ nét khớp chữ ⇒ thầy gọi lên bảng ⇒ em CHƯA gửi bị ép vào bảng live, có dải đoán / tiếp sức (K2, B3) ⇒
 // tạm dừng / tiếp tục / kết thúc trong cửa sổ nút Live (K3) ⇒ em rời màn ⇒ thẻ ghi kiểu rời (B2) ⇒ chạm hai lần phóng bảng.
 // KHÔNG kiểm được ở đây: TIẾNG (cửa /bpu/live của máy chủ thử trả «chưa cấu hình» — cần Cloudflare Realtime SFU thật + mic thật), khoá xoay Android, iPhone thật.
@@ -27,7 +28,7 @@ const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSyn
 const chanNgoai = (ctx) => ctx.route((u) => !u.href.startsWith(may.goc), (r) => r.abort())
 async function chup(t, ten, tuy = {}) {
   let q = 86, buf
-  do { buf = await t.screenshot({ type: 'jpeg', quality: q, ...tuy }); q -= 6 } while (buf.length > 150 * 1024 && q > 30)
+  do { buf = await t.screenshot({ type: 'jpeg', quality: q, ...tuy }); q -= 6 } while (buf.length > 150 * 1000 && q > 30)
   writeFileSync(join(ANH, `that-2-${ten}.jpg`), buf)
   console.log(`  ảnh that-2-${ten}.jpg ${Math.round(buf.length / 1024)} KB`)
 }
@@ -108,13 +109,14 @@ await chup(thay, 'thay-cua-so-bat-live-trai-1366')
 await to.locator('.mc-lv-the [data-lv="bat-dau"]').click().catch(() => to.locator('.mc-lv-the [data-lv="khong-tieng"]').click())
 await to.locator('.mc-lv-cum b#mc-lv-dh').waitFor({ timeout: 10000 })
 await ngu(500)
-// K5: thanh gom vào một nút
-const an = async () => to.locator('#mc-phim-nhom, #mc-len-bang, #mc-cai-btn').evaluateAll((ds) => ds.filter((e) => e.getClientRects().length > 0).length)
-kiem('K5 · đang live: thanh dưới gom — nhóm phím / «Lên bảng» / «Cài đặt» ẩn sau MỘT nút lưới', await an() === 0 && await to.locator('.mc-lv-gon').isVisible())
+// K5 (sửa chiều 11/11, thầy: «Phần nút ở dưới chưa gọn»): thanh gọn ở MỌI trạng thái — nút phụ nằm trong khay của nút «thêm» (src/lib/thanh-day-to-chieu.ts),
+// «Lên bảng» ở lại trên thanh. Kiểm kỹ từng khổ + ảnh that-3-thanh-*: scripts/thu-live-1011/thu-thanh-day-1111.mjs.
+const an = async () => to.locator('#mc-khay button').evaluateAll((ds) => ds.filter((e) => e.getClientRects().length > 0 && getComputedStyle(e).visibility === 'visible').length)
+kiem('K5 · đang live: nút phụ nằm trong khay đang đóng; trên thanh còn «Lên bảng» + nút «thêm»', await an() === 0 && await to.locator('#mc-them').isVisible() && await to.locator('#mc-len-bang').isVisible())
 await chup(thay, 'thay-thanh-gom-1366')
-await to.locator('.mc-lv-gon').click()
+await to.locator('#mc-them').click()
 await ngu(350)
-kiem('K5 · bấm nút lưới ⇒ các nút xoè ra, không tràn màn 1366', await an() >= 2 && await to.locator('#mc-cai-btn').evaluate((e) => e.getBoundingClientRect().right <= 1366))
+kiem('K5 · bấm nút «thêm» ⇒ khay xoè, nằm trọn trong màn 1366', await an() >= 2 && await to.locator('#mc-khay').evaluate((e) => e.getBoundingClientRect().right <= 1366 && e.getBoundingClientRect().left >= 0))
 await chup(thay, 'thay-thanh-xoe-1366')
 await thay.mouse.click(600, 300)
 await ngu(250)
@@ -123,25 +125,38 @@ await thay.keyboard.press('g'); await ngu(500)
 kiem('K5 · phím tắt vẫn chạy khi thanh gom (G mở lời giải)', await to.locator('.mc-giai:not([hidden])').count() > 0)
 await thay.keyboard.press('g'); await ngu(500)
 
-// ───────────── K4 + M3: máy em đang làm bài — chỉ còn tay nắm giữa MÉP TRÊN, ngay trên đầu thẻ đội / tên ─────────────
-/** Hộp của viên tay nắm + các thứ nó không được đè (thẻ đội / tên ở đầu màn, nút «Gửi», giấy đề). */
+// ───────────── P (11/11 lần 3): máy em đang làm bài — MỘT tay nắm ở MÉP PHẢI, đứng TRÊN nút «Gửi» nổi; khay trượt ra bên trái cột nút «Gửi» ─────────────
+/** Hộp của viên tay nắm + các thứ liên quan (nút «Gửi», giấy đề, bảng đen, ô bảng của thầy = khung cuộn của lớp vẽ, khay). */
 const hopNam = (t) => t.evaluate(() => {
   const h = (k) => { const e = document.querySelector(k); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)] : null }
-  return { vien: h('.lv-nam i'), nam: h('.lv-nam'), tieu: h('.bpu-hs-tieu'), kj: h('.bpu-hs-kj'), lua: h('.bpu-hs-tren .bpu-lua'), gui: h('.bpu-gui-noi'), giay: h('.lv-giay'), bang: h('.lv-bang'), w: innerWidth, h: innerHeight }
+  return { vien: h('.lv-nam i'), nam: h('.lv-nam'), tieu: h('.bpu-hs-tieu'), kj: h('.bpu-hs-kj'), gui: h('.bpu-gui-noi[data-hien="true"]'), giay: h('.lv-giay'), bang: h('.lv-bang'), bangThay: h('.lv-cuon'), khay: h('.lv-khay'), w: innerWidth, h: innerHeight }
 })
 const de = (a, b) => !!a && !!b && a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1]
+/** Diện tích (giấy + bảng) / diện tích khung nhìn — đo trên DOM thật. */
+const phuKin = (k) => Math.round(((k.giay[2] - k.giay[0]) * (k.giay[3] - k.giay[1]) + (k.bang[2] - k.bang[0]) * (k.bang[3] - k.bang[1])) / (k.w * k.h) * 1000) / 10
+const NOI = '.lv-dau-cu, .lv-bat-tieng, .lv-tieng-tat, .lv-nam-hh, .lv > .lv-noi' // mọi thứ từng nổi riêng: nay không được còn
 await em2.t.locator('.lv-phu.lv-dau .lv-nam').waitFor({ timeout: 8000 })
+await em2.t.getByRole('radio', { name: /^A/ }).first().click({ timeout: 5000 }).catch(() => {}) // chọn dở, KHÔNG gửi ⇒ nút «Gửi» nổi hiện ra
+await em2.t.locator('.bpu-gui-noi[data-hien="true"]').waitFor({ timeout: 5000 })
+await ngu(450)
 const n2 = await hopNam(em2.t)
-kiem('M3 · máy em đang làm bài: tay nắm nằm giữa MÉP TRÊN (không viên nổi đáy màn, không còn ở mép trái), chưa vào bảng', n2.vien[1] <= 8 && Math.abs((n2.vien[0] + n2.vien[2]) / 2 - n2.w / 2) <= 2 && await em2.t.locator('.lv').count() === 0 && await em2.t.locator('.lv-dau-cu, .lv-bat-tieng').count() === 0, `viên ${JSON.stringify(n2.vien)}`)
-kiem('M3 · tay nắm ở trên đầu thẻ đội / tên: không đè chữ thẻ, không đè ô kJ, không đè ngọn lửa đội, không đè nút «Gửi»', !de(n2.vien, n2.tieu) && !de(n2.vien, n2.kj) && !de(n2.vien, n2.lua) && !de(n2.nam, n2.gui), JSON.stringify({ tieu: n2.tieu, kj: n2.kj, gui: n2.gui }))
-await chup(em2.t, 'em-cau-hoi-tay-nam-tren-390')
+kiem('P · máy em đang làm bài: MỘT tay nắm sát MÉP PHẢI (không còn ở mép trên / mép trái, không nút nổi nào khác), chưa vào bảng', n2.vien[2] >= n2.w - 6 && n2.vien[2] <= n2.w && n2.vien[2] - n2.vien[0] <= 6 && await em2.t.locator('.lv-nam').count() === 1 && await em2.t.locator('.lv').count() === 0 && await em2.t.locator(NOI).count() === 0, `viên ${JSON.stringify(n2.vien)}`)
+kiem('P · tay nắm đứng TRÊN nút «Gửi» nổi: vùng chạm 44 × 76 không chạm nút «Gửi» (cách ≥ 8 px), không đè thẻ đội / ô kJ', !!n2.gui && n2.nam[3] <= n2.gui[1] - 8 && n2.nam[2] - n2.nam[0] >= 44 && n2.nam[3] - n2.nam[1] >= 76 && !de(n2.nam, n2.tieu) && !de(n2.nam, n2.kj), JSON.stringify({ nam: n2.nam, gui: n2.gui }))
+await chup(em2.t, 'em-cau-hoi-tay-nam-phai-nut-gui-390')
 await em2.t.locator('.lv-phu .lv-nam').tap()
 await em2.t.locator('.lv-phu .lv-khay[data-mo]').waitFor({ timeout: 4000 })
-await ngu(450)
-kiem('M3 · chạm tay nắm ⇒ khay xổ từ mép trên xuống, có «Thầy đang live»', (await em2.t.locator('.lv-phu .lv-khay').innerText()).includes('Thầy đang live') && await em2.t.locator('.lv-phu .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return r.top >= 0 && r.top < 30 && Math.abs((r.left + r.right) / 2 - innerWidth / 2) <= 2 }))
-await chup(em2.t, 'em-cau-hoi-khay-tren-mo-390')
-await ngu(3300)
-kiem('K4 · khay tự ẩn sau 3 giây', await em2.t.locator('.lv-phu .lv-khay[data-mo]').count() === 0)
+await ngu(350)
+const k2 = await hopNam(em2.t)
+kiem('P · chạm tay nắm ⇒ khay trượt ra từ phải, dừng BÊN TRÁI cột nút «Gửi» (không che nút), nằm gọn trong màn, có «Thầy đang live»', (await em2.t.locator('.lv-phu .lv-khay').innerText()).includes('Thầy đang live') && k2.khay[2] <= k2.gui[0] - 4 && k2.khay[0] >= 0 && k2.khay[1] >= 0 && k2.khay[3] <= k2.h && !de(k2.khay, k2.gui), JSON.stringify({ khay: k2.khay, gui: k2.gui }))
+await chup(em2.t, 'em-cau-hoi-khay-phai-mo-390')
+await ngu(2600)
+kiem('P · khay còn mở ở giây thứ 3 (tự thu sau 4 giây không chạm)', await em2.t.locator('.lv-phu .lv-khay[data-mo]').count() === 1)
+await ngu(1500)
+kiem('P · khay tự thu sau 4 giây', await em2.t.locator('.lv-phu .lv-khay[data-mo]').count() === 0)
+await em2.t.locator('.lv-phu .lv-nam').tap()
+await em2.t.locator('.lv-phu .lv-khay[data-mo]').waitFor({ timeout: 4000 })
+await em2.t.touchscreen.tap(120, 700); await ngu(350)
+kiem('P · chạm ra ngoài khay ⇒ thu ngay', await em2.t.locator('.lv-phu .lv-khay[data-mo]').count() === 0)
 
 // ───────────── K1: em gửi ⇒ tự về bảng live ─────────────
 await ngu(1200) // thầy bật live đã quá 1,5 giây ⇒ lần vào bảng này phải «tức thì», không viên chào
@@ -163,7 +178,8 @@ const doThay = await to.locator('body').evaluate(() => {
   return [...g.querySelectorAll('.mc-than .mc-de, .mc-than .mc-pa-chu')].map((e) => { const r = e.getBoundingClientRect(); return [(r.left - G.left) / G.width, (r.top - G.top) / G.width, r.width / G.width, r.height / G.width].map((v) => Math.round(v * 1000)) })
 })
 const doEm = await em.t.evaluate(() => {
-  const g = document.querySelector('.lv-giay'), G = g.getBoundingClientRect()
+  // so với TẤM GIẤY SOI (`.lv-gt` = đúng ô giấy của thầy); ô giấy vẽ `.lv-giay` nay nới rộng hơn ô của thầy (phủ kín)
+  const g = document.querySelector('.lv-giay'), G = g.querySelector('.lv-gt').getBoundingClientRect()
   return [...g.querySelectorAll('.lv-gt-chu:not(.ngan)')].map((e) => { const r = e.getBoundingClientRect(); return [(r.left - G.left) / G.width, (r.top - G.top) / G.width, r.width / G.width, r.height / G.width].map((v) => Math.round(v * 1000)) })
 })
 const lech = doThay.length === doEm.length && doThay.length > 0 ? Math.max(...doThay.flatMap((a, i) => a.map((v, j) => Math.abs(v - doEm[i][j])))) : -1
@@ -185,29 +201,76 @@ const mucGiay = await em.t.evaluate(() => {
 kiem('B1 · thầy gạch chân trên giấy ⇒ nét hiện TRÊN GIẤY của máy em (giấy khớp nên không bị ẩn)', mucGiay > 10, `${mucGiay} mẫu điểm ảnh có mực trong ô giấy`)
 await chup(thay, 'giay-thay-gach-chan-1366')
 await chup(em.t, 'giay-em-khop-giay-thay-844')
-await chup(em.t, 'em-khay-tren-dong-844')
+await chup(em.t, 'em-phu-kin-khay-dong-844')
 const nb = await hopNam(em.t)
-kiem('M3 · bảng live: tay nắm giữa MÉP TRÊN, không đè giấy đề, không đè bảng đen; không còn nút nổi nào trên bảng', nb.vien[1] <= 8 && Math.abs((nb.vien[0] + nb.vien[2]) / 2 - nb.w / 2) <= 2 && !de(nb.vien, nb.giay) && !de(nb.vien, nb.bang) && await em.t.locator('.lv > .lv-bat-tieng, .lv > .lv-noi').count() === 0, `viên ${JSON.stringify(nb.vien)} · giấy ${JSON.stringify(nb.giay)}`)
+soDo.phu_kin_phan_tram = { '844x390': phuKin(nb) }
+kiem('P · bảng live 844 × 390: MỘT tay nắm sát mép phải, giữa chiều cao; không còn nút / viên / huy hiệu nổi nào trên bảng', nb.vien[2] >= nb.w - 6 && nb.vien[2] - nb.vien[0] <= 6 && Math.abs((nb.vien[1] + nb.vien[3]) / 2 - nb.h / 2) <= 3 && await em.t.locator('.lv .lv-nam').count() === 1 && await em.t.locator(NOI).count() === 0, `viên ${JSON.stringify(nb.vien)}`)
+kiem('P · 844 × 390: giấy + bảng PHỦ KÍN ≥ 92 % khung nhìn, lề ngoài ≤ 6 px, khe giữa ≤ 6 px', soDo.phu_kin_phan_tram['844x390'] >= 92 && nb.giay[0] <= 6 && nb.giay[1] <= 6 && nb.w - nb.bang[2] <= 6 && nb.h - nb.bang[3] <= 6 && nb.bang[0] - nb.giay[2] <= 6, `${soDo.phu_kin_phan_tram['844x390']} % · giấy ${JSON.stringify(nb.giay)} · bảng ${JSON.stringify(nb.bang)}`)
+kiem('P · 844 × 390 (điện thoại dài): tay nắm đứng trên phần bảng nới thêm, KHÔNG đè ô bảng thầy viết', !!nb.bangThay && !de(nb.vien, nb.bangThay) && de(nb.vien, nb.bang), `ô bảng của thầy ${JSON.stringify(nb.bangThay)}`)
 await em.t.locator('.lv .lv-nam').tap()
 await em.t.locator('.lv .lv-khay[data-mo]').waitFor({ timeout: 4000 })
-await ngu(450)
-const khay = await em.t.locator('.lv .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return { tren: Math.round(r.top), duoi: Math.round(r.bottom), giua: Math.round((r.left + r.right) / 2), chu: e.innerText } })
-kiem('M3 · khay xổ từ mép trên, nằm gọn trong màn: mạng · tiếng · đội + kJ', khay.tren >= 0 && khay.tren < 30 && khay.duoi <= 390 && khay.giua > 60 && khay.giua < 784 /* tay nắm tự né cây bút của thầy ⇒ khay có thể lệch khỏi giữa */ && /kJ/.test(khay.chu), `${khay.tren}–${khay.duoi} px · ${khay.chu.replace(/\s+/g, ' ').slice(0, 80)}`)
-await chup(em.t, 'em-khay-tren-mo-844')
-await ngu(3300)
-// các khổ máy khác: 667 × 375 (điện thoại 16:9) và 1180 × 820 (máy bảng) — tay nắm vẫn không đè giấy / bảng
-for (const [w, h] of [[667, 375], [1180, 820]]) {
-  await em.t.setViewportSize({ width: w, height: h }); await ngu(500)
-  const k = await hopNam(em.t)
-  kiem(`M3 · khổ ${w} × ${h}: tay nắm giữa mép trên, không đè giấy đề / bảng đen`, k.vien[1] <= 8 && !de(k.vien, k.giay) && !de(k.vien, k.bang), `viên ${JSON.stringify(k.vien)} · giấy ${JSON.stringify(k.giay)}`)
-  if (w === 667) await chup(em.t, 'em-tay-nam-tren-667')
-  else await chup(em.t, 'em-tay-nam-tren-1180')
+await ngu(350)
+const khay = await em.t.locator('.lv .lv-khay').evaluate((e) => { const r = e.getBoundingClientRect(); return { trai: Math.round(r.left), phai: Math.round(r.right), tren: Math.round(r.top), duoi: Math.round(r.bottom), chu: e.innerText } })
+kiem('P · khay trượt ra từ mép phải, nằm gọn trong màn, đè lên mép bảng (không đẩy bố cục): mạng · tiếng · đội + kJ', khay.phai <= 844 && khay.phai >= 844 - 14 && khay.tren >= 0 && khay.duoi <= 390 && /kJ/.test(khay.chu) && JSON.stringify((await hopNam(em.t)).giay) === JSON.stringify(nb.giay), `${khay.trai}–${khay.phai} × ${khay.tren}–${khay.duoi} px · ${khay.chu.replace(/\s+/g, ' ').slice(0, 80)}`)
+await chup(em.t, 'em-khay-phai-mo-844')
+// vuốt từ mép phải vào (bắt đầu trên tay nắm) cũng mở khay — trước hết thu khay bằng chạm ra ngoài
+await em.t.touchscreen.tap(200, 120); await ngu(350)
+kiem('P · chạm ra ngoài ⇒ khay thu', await em.t.locator('.lv .lv-khay[data-mo]').count() === 0)
+{
+  const cdp = await em.ctx.newCDPSession(em.t), diem = (x, y) => [{ x, y, id: 1, radiusX: 6, radiusY: 6, force: 1 }]
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: diem(838, 195) })
+  for (const x of [820, 790, 750, 700, 650]) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: diem(x, 196) }); await ngu(16) }
+  const giua = await em.t.locator('.lv .lv-khay').evaluate((e) => ({ kieu: e.style.transform, phai: Math.round(e.getBoundingClientRect().right) }))
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] })
+  await ngu(350)
+  kiem('P · vuốt từ mép phải vào (trên tay nắm) ⇒ khay bám ngón tay rồi mở', /translate3d/.test(giua.kieu) && await em.t.locator('.lv .lv-khay[data-mo]').count() === 1, JSON.stringify(giua))
+  await cdp.detach()
+}
+await ngu(4300)
+kiem('P · khay tự thu sau 4 giây không chạm', await em.t.locator('.lv .lv-khay[data-mo]').count() === 0)
+// DẤU TRẠNG THÁI trên tay nắm — máy chủ thử không có tiếng / mic nên DỰNG TAY đúng mã mà LopLive dựng (vitest live-may-em-mep-phai-1111 khoá phần lôgic);
+// ở đây chỉ chụp cho thầy xem cỡ + chỗ của bốn dấu: tiếng đang tắt · mic đang bật · đang giơ tay · mạng yếu.
+await em.t.evaluate(() => {
+  const bt = (d) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`
+  const hinh = { tieng: '<path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/><path d="M16 9.5l5 5m0-5l-5 5"/>', mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>', tay: '<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5V4a1.5 1.5 0 0 1 3 0v7m0-5.5a1.5 1.5 0 0 1 3 0V12m0-3a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1.6a6 6 0 0 1-4.8-2.4L4.5 14.4a1.6 1.6 0 0 1 2.4-2.1L8 13.4"/>', mang: '<path d="M5 20v-4M12 20v-9M19 20V5"/>' }
+  const s = document.createElement('span'); s.className = 'lv-nam-dau'; s.id = 'thu-dau'
+  s.innerHTML = Object.keys(hinh).map((k) => `<b data-dau="${k}">${bt(hinh[k])}</b>`).join('')
+  document.querySelector('.lv .lv-nam').appendChild(s)
+})
+await ngu(200)
+const dau = await em.t.evaluate(() => [...document.querySelectorAll('#thu-dau b')].map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width), Math.round(r.height)] }))
+kiem('P · bốn dấu trạng thái (dựng tay): mỗi dấu 15 px, xếp dọc ngay trên viên thuốc, sát mép phải, không ra ngoài màn', dau.length === 4 && dau.every((d) => d[2] === 15 && d[3] === 15 && d[0] >= 844 - 18 && d[0] + d[2] <= 844 && d[1] >= 0), JSON.stringify(dau))
+await chup(em.t, 'em-dau-trang-thai-dung-tay-844')
+await chup(em.t, 'em-dau-trang-thai-can-canh-844', { clip: { x: 844 - 150, y: 195 - 110, width: 150, height: 220 } })
+await em.t.evaluate(() => document.getElementById('thu-dau')?.remove())
+// các khổ máy khác: 667 × 375 (điện thoại 16:9), 1180 × 820 (máy bảng), 1971 × 1247 (cửa sổ máy tính như ảnh thầy gửi) — phủ kín ≥ 92 %, tay nắm sát mép phải giữa chiều cao
+for (const [w, h] of [[667, 375], [1180, 820], [1971, 1247]]) {
+  await em.t.setViewportSize({ width: w, height: h }); await ngu(600)
+  const k = await hopNam(em.t), pk = phuKin(k)
+  soDo.phu_kin_phan_tram[`${w}x${h}`] = pk
+  kiem(`P · khổ ${w} × ${h}: giấy + bảng phủ kín ≥ 92 %, lề ngoài ≤ 6 px bốn phía; tay nắm sát mép phải, giữa chiều cao`, pk >= 92 && k.giay[0] <= 6 && k.giay[1] <= 6 && k.w - k.bang[2] <= 6 && k.h - k.bang[3] <= 6 && k.h - k.giay[3] <= 6 && k.vien[2] >= k.w - 6 && Math.abs((k.vien[1] + k.vien[3]) / 2 - k.h / 2) <= 3, `${pk} % · giấy ${JSON.stringify(k.giay)} · bảng ${JSON.stringify(k.bang)} · ô bảng của thầy ${JSON.stringify(k.bangThay)}`)
+  await kiemGiay(`khổ ${w} × ${h}`)
+  if (w === 667) {
+    // TỰ NÉ: ở khổ này ô bảng của thầy chạy sát mép phải ⇒ tay nắm đè mép bảng. Thầy viết sát mép phải, ngang tầm tay nắm ⇒ tay nắm mờ hẳn; thầy đi khỏi ⇒ rõ lại.
+    const cot = await to.locator('.mc-cot-lam-bai').first().evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height } })
+    const mo0 = await em.t.locator('.lv .lv-nam').evaluate((e) => getComputedStyle(e).opacity)
+    const tx = cot.x + cot.w - 10, ty = cot.y + cot.h * 0.5
+    await thay.mouse.move(tx - 30, ty); await thay.mouse.down()
+    for (let i = 1; i <= 10; i++) { await thay.mouse.move(tx - 30 + i * 2.6, ty + Math.sin(i) * 3); await ngu(10) }
+    await ngu(250)
+    const luc = await em.t.locator('.lv .lv-nam').evaluate((e) => ({ ne: e.hasAttribute('data-ne'), mo: getComputedStyle(e).opacity }))
+    await chup(em.t, 'em-tay-nam-ne-net-667')
+    await thay.mouse.up(); await thay.mouse.move(cot.x + 60, cot.y + 60)
+    await ngu(1900)
+    const sau = await em.t.locator('.lv .lv-nam').evaluate((e) => ({ ne: e.hasAttribute('data-ne'), mo: getComputedStyle(e).opacity }))
+    kiem('P · thầy viết sát mép phải ngang tầm tay nắm ⇒ tay nắm MỜ HẲN (không chặn nhìn nét); bút đi khỏi ⇒ rõ lại', luc.ne && Number(luc.mo) < 0.3 && !sau.ne && Number(sau.mo) > 0.9, JSON.stringify({ truoc: mo0, luc, sau }))
+    await chup(em.t, 'em-phu-kin-667')
+  } else await chup(em.t, `em-phu-kin-${w}`, { scale: 'css' })
 }
 await em.t.setViewportSize({ width: 844, height: 390 }); await ngu(500)
 
 // ───────────── K2: thầy gọi lên bảng ⇒ em CHƯA gửi bị ép vào bảng live ─────────────
-kiem('K2 · trước khi gọi: máy em S2 chưa gửi, còn ở màn làm bài', await em2.t.locator('.lv').count() === 0)
-await em2.t.getByRole('radio', { name: /^A/ }).first().click({ timeout: 5000 }).catch(() => {}) // chọn dở, KHÔNG gửi
+kiem('K2 · trước khi gọi: máy em S2 chưa gửi (đang chọn dở phương án A), còn ở màn làm bài', await em2.t.locator('.lv').count() === 0)
 await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S1', lyDo: ['Chưa lên bảng buổi này'] })))
 await em2.t.locator('.lv').waitFor({ timeout: 4000 })
 const m2 = await moc(em2.t)
@@ -217,13 +280,51 @@ const st = may.trangThai()
 kiem('K2 · không ai gửi hộ đáp án em chọn dở (phòng không có bài của S2)', !st.luot.tra.S2 && !!st.luot.tra.S1)
 await ngu(600)
 kiem('B3 · bảng live không nuốt trò đoán / tiếp sức: dải «Em đoán … làm đúng không?» + «Làm đúng» · «Chưa đúng» · tiếp sức', /Em đoán .* làm đúng không\?/.test(await em2.t.locator('.lv-luot').innerText()) && await em2.t.locator('.lv-luot button').count() === 3)
-await chup(em2.t, 'em-bi-ep-vao-live-dai-doan-390')
+// P · iPhone máy dọc (390 × 844, không khoá ngang được ⇒ hình xoay 90° bằng CSS): «mép phải» là mép phải của HÌNH = đáy máy (phía thanh home)
+/** Hộp theo trục của HÌNH đã xoay 90° thuận kim: x hình = y máy, y hình = (bề ngang máy − x máy). */
+const hopXoay = (t) => t.evaluate(() => {
+  const W = innerWidth, h = (k) => { const e = document.querySelector(k); if (!e) return null; const r = e.getBoundingClientRect(); return [Math.round(r.top), Math.round(W - r.right), Math.round(r.bottom), Math.round(W - r.left)] }
+  return { xoay: document.querySelector('.lv').hasAttribute('data-xoay'), vien: h('.lv-nam i'), nam: h('.lv-nam'), giay: h('.lv-giay'), bang: h('.lv-bang'), luot: h('.lv-luot'), w: innerHeight, h: innerWidth }
+})
+const x1 = await hopXoay(em2.t)
+soDo.phu_kin_phan_tram['iPhone dọc xoay 844x390'] = phuKin(x1)
+kiem('P · iPhone máy dọc xoay CSS: tay nắm ở mép phải của HÌNH (đáy máy), giữa chiều cao hình; giấy + bảng phủ kín ≥ 92 %', x1.xoay && x1.vien[2] >= x1.w - 6 && Math.abs((x1.vien[1] + x1.vien[3]) / 2 - x1.h / 2) <= 3 && phuKin(x1) >= 92, `${phuKin(x1)} % · viên ${JSON.stringify(x1.vien)}`)
+kiem('P · dải lượt (chưa đoán): DẢI MỎNG sát đáy hình, cao ≤ 36 px, cách đáy ≤ 8 px — che không quá một dòng', x1.luot[3] - x1.luot[1] <= 36 && x1.h - x1.luot[3] <= 8 && x1.luot[0] <= 12, `dải ${JSON.stringify(x1.luot)}`)
+await chup(em2.t, 'em-iphone-doc-xoay-dai-doan-390')
+// vùng an toàn GIẢ (Chromium máy tính không có tai thỏ): tai thỏ 47 px ở đỉnh máy, thanh home 34 px ở đáy máy ⇒ sau xoay là mép trái / mép phải của hình
+await em2.t.addStyleTag({ content: '.lv-thuoc { padding: 47px 0px 34px 0px !important; }' })
+await em2.t.evaluate(() => window.dispatchEvent(new Event('resize'))); await ngu(500)
+const x2 = await hopXoay(em2.t)
+kiem('P · iPhone xoay + vùng an toàn (giả 47 / 34): giấy chừa tai thỏ bên trái hình, bảng + tay nắm chừa thanh home bên phải hình', x2.giay[0] >= 47 + 3 && x2.giay[0] <= 47 + 6 && x2.bang[2] <= x2.w - 34 - 3 && x2.vien[2] <= x2.w - 34 && x2.vien[2] >= x2.w - 34 - 6 && x2.nam[2] <= x2.w - 34 + 1, `giấy ${JSON.stringify(x2.giay)} · bảng ${JSON.stringify(x2.bang)} · viên ${JSON.stringify(x2.vien)}`)
+await chup(em2.t, 'em-iphone-doc-xoay-vung-an-toan-gia-390')
+{ // chạm tay nắm khi hình xoay ⇒ khay ra từ mép phải HÌNH (đáy máy), nằm trong vùng an toàn
+  await em2.t.locator('.lv .lv-nam').tap(); await em2.t.locator('.lv .lv-khay[data-mo]').waitFor({ timeout: 4000 }); await ngu(350)
+  const kx = await em2.t.evaluate(() => { const r = document.querySelector('.lv .lv-khay').getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.right), Math.round(r.bottom)] })
+  kiem('P · iPhone xoay: khay ra từ mép phải của hình (đáy máy), trên thanh home, gọn trong màn', kx[3] <= 844 - 34 && kx[3] >= 844 - 34 - 14 && kx[0] >= 0 && kx[2] <= 390 && kx[1] >= 47, JSON.stringify(kx))
+  await chup(em2.t, 'em-iphone-doc-xoay-khay-mo-390')
+  await em2.t.touchscreen.tap(195, 200); await ngu(350)
+}
+{ // chạm hai lần phóng bảng vẫn chạy khi hình xoay
+  const ob = await em2.t.locator('.lv-cuon').evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, dai: Math.max(r.width, r.height) } })
+  await em2.t.touchscreen.tap(ob.x, ob.y); await ngu(90); await em2.t.touchscreen.tap(ob.x, ob.y); await ngu(500)
+  const dai2 = await em2.t.locator('.lv-cuon').evaluate((e) => { const r = e.getBoundingClientRect(); return Math.max(r.width, r.height) })
+  kiem('P · iPhone xoay: chạm hai lần vào bảng đen vẫn phóng bảng (ô bảng của thầy to ra), có dòng «Chạm hai lần để về toàn cảnh»', dai2 > ob.dai * 1.005 && (await em2.t.locator('.lv-bao').allInnerTexts()).join(' ').includes('Chạm hai lần để về toàn cảnh'), `${Math.round(ob.dai)} → ${Math.round(dai2)} px`)
+  const ob2 = await em2.t.locator('.lv-cuon').evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 } })
+  await em2.t.touchscreen.tap(ob2.x, ob2.y); await ngu(90); await em2.t.touchscreen.tap(ob2.x, ob2.y); await ngu(500)
+  kiem('P · iPhone xoay: chạm hai lần nữa ⇒ về toàn cảnh, dải lượt hiện lại', await em2.t.locator('.lv-luot').count() === 1)
+}
+const rongDai = await em2.t.locator('.lv-luot').evaluate((e) => e.offsetWidth)
 await em2.t.locator('.lv-luot button', { hasText: 'Làm đúng' }).tap()
+await em2.t.locator('.lv-luot', { hasText: /Em đoán .* làm đúng$|Em đoán .* làm đúng(Tiếp sức|Cổ vũ)/ }).waitFor({ timeout: 4000 }).catch(() => {})
+await ngu(300)
 await em2.t.locator('.lv-luot button.tiep').tap()
 await ngu(500)
 const g = may.trangThai().luot.goi
 kiem('B3 · bấm trên dải ⇒ phòng nhận đoán + tiếp sức của S2', g.duDoan.S2 === 1 && (g.tiep.S2 ?? 0) >= 1, JSON.stringify({ doan: g.duDoan.S2, tiep: g.tiep.S2 }))
-await chup(em2.t, 'em-da-doan-390')
+const gon = await em2.t.locator('.lv-luot').evaluate((e) => ({ rong: e.offsetWidth, cao: e.offsetHeight, nut: e.querySelectorAll('button').length, chu: e.innerText.replace(/\s+/g, ' ') }))
+soDo.dai_luot_px = { chua_doan: rongDai, da_doan: gon.rong, cao: gon.cao }
+kiem('P · em đoán xong ⇒ dải thu về MỘT VIÊN NHỎ: chỉ còn tên bạn + điều em đoán + nút tiếp sức, hẹp hơn hẳn, cao ≤ 36 px', gon.nut === 1 && gon.rong < rongDai * 0.75 && gon.cao <= 36 && /Em đoán .* làm đúng/.test(gon.chu), `${rongDai} → ${gon.rong} px · ${gon.chu}`)
+await chup(em2.t, 'em-iphone-doc-xoay-da-doan-vien-nho-390')
 
 // ───────────── K3: tạm dừng / tiếp tục / kết thúc trong cửa sổ nút Live ─────────────
 await to.locator('.mc-lv-cum').click()
@@ -318,7 +419,7 @@ await ngu(400)
 // ───────────── K1 (tiếp): câu mới ⇒ về màn câu hỏi; K3: kết thúc live ─────────────
 await may.moLuot(CAU[1], 'B')
 await em.t.locator('.lv').waitFor({ state: 'detached', timeout: 6000 })
-kiem('Thầy chuyển câu ⇒ máy em về màn câu hỏi để làm (live còn, tay nắm mép trái)', await em.t.locator('.lv-phu.lv-dau').count() === 1 && await em.t.locator('.bpu-gui-noi').count() === 1)
+kiem('Thầy chuyển câu ⇒ máy em về màn câu hỏi để làm (live còn, tay nắm mép phải)', await em.t.locator('.lv-phu.lv-dau').count() === 1 && await em.t.locator('.bpu-gui-noi').count() === 1)
 await emGui(em.t)
 await em.t.locator('.lv').waitFor({ timeout: 4000 })
 const m5 = await moc(em.t)
@@ -329,7 +430,7 @@ await to.locator('.mc-lv-the [data-lv="tat"]').waitFor({ state: 'visible', timeo
 await to.locator('.mc-lv-the [data-lv="tat"]').click()
 await em.t.locator('.lv').waitFor({ state: 'detached', timeout: 6000 })
 await ngu(400)
-kiem('K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», thanh hết gom', may.trangThai().live.bat === false && await to.locator('.mc-lv-nut').isVisible() && await to.locator('.mc-lv-gon').isHidden() && await em.t.locator('.lv-phu').count() === 0)
+kiem('K3 · «Kết thúc live» bấm MỘT lần ⇒ hết live: máy em về màn Bình Phản Ứng, màn chiếu về nút «Live», nút «thêm» vẫn ở cuối thanh', may.trangThai().live.bat === false && await to.locator('.mc-lv-nut').isVisible() && await to.locator('#mc-them').isVisible() && await em.t.locator('.lv-phu').count() === 0)
 await chup(thay, 'thay-sau-ket-thuc-1366')
 
 // AN TOÀN: suốt kịch bản, trước khi thầy mở đáp án, không tin nào tới máy em mang đáp án
