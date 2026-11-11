@@ -200,6 +200,26 @@ describe('M1c · track ĐANG GỬI luôn là tiếng mic', () => {
   })
 })
 
+describe('11/11 tối · hàng dự phòng «Tiếng: Làm rõ / Chuẩn trình duyệt»', () => {
+  it('«Chuẩn trình duyệt» ⇒ mở lại mic với khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt, gửi THẲNG mic (bỏ chuỗi); về «Làm rõ» ⇒ chuỗi lại, không xử lý của trình duyệt', async () => {
+    const b = dung()
+    await b.lt.bat({})
+    expect(b.lt.chanDoan().chuoi).toBe(true)
+    b.lt.datKieuTieng(true)
+    await troi(50)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ echoCancellation: true, noiseSuppression: true, autoGainControl: true })
+    const mic = moi[moi.length - 1]!
+    expect(b.boGui().track).toBe(mic) // track mic thô, không qua chuỗi
+    expect(b.lt.chanDoan()).toMatchObject({ chuoi: false, vong: true, on: true, agc: true })
+    expect(mucGui(b)).toBeCloseTo(0.2)
+    b.lt.datKieuTieng(false)
+    await troi(50)
+    expect(goiGum[goiGum.length - 1]).toMatchObject({ echoCancellation: false, noiseSuppression: false })
+    expect(b.lt.chanDoan().chuoi).toBe(true)
+    expect(b.boGui().track).not.toBe(moi[moi.length - 1])
+  })
+})
+
 describe('M1a · mic câm: tự nới ràng buộc tới khi có tín hiệu, báo rõ, không dừng lại ở «lỗi»', () => {
   it('mic USB câm khi trình duyệt bật xử lý tiếng ⇒ 1,5 giây sau tự mở lại với khử vọng + lọc ồn TẮT ⇒ có tín hiệu, gắn vào bộ gửi', async () => {
     thietBi.usb1 = (rb) => (rb.echoCancellation || rb.noiseSuppression ? 0 : 0.3)

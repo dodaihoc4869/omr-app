@@ -35,7 +35,13 @@ export async function chupTieng(o: NguonDo, luc: number): Promise<Anh> {
     } catch { /* trình duyệt cũ */ }
   }
   if (o.g?.getStats) {
-    try { const x = { byte: 0, muc: 0, nl: 0 }; (await o.g.getStats()).forEach((s: Record<string, unknown>) => { if (s.type === 'outbound-rtp') x.byte = so(s.bytesSent); else if (s.type === 'media-source') { x.muc = so(s.audioLevel); x.nl = so(s.totalAudioEnergy) } }); g = x } catch { /* bỏ */ }
+    // `media-source` ĐÚNG của `outbound-rtp` hiện tại (mediaSourceId): sau `replaceTrack` (mic → chuỗi làm rõ tiếng) báo cáo còn giữ media-source của track CŨ
+    // (mức 0) — đọc «cái cuối cùng» là ra «mức nguồn 0» trong khi đang gửi 100 (số đo thật #1628).
+    try {
+      const ds: Record<string, unknown>[] = []; (await o.g.getStats()).forEach((s: Record<string, unknown>) => { ds.push(s) })
+      const ob = ds.find((s) => s.type === 'outbound-rtp' && (s.kind === 'audio' || s.kind == null)), ms = ds.find((s) => s.type === 'media-source' && s.id === ob?.mediaSourceId)
+      g = { byte: so(ob?.bytesSent), muc: so(ms?.audioLevel), nl: so(ms?.totalAudioEnergy) }
+    } catch { /* bỏ */ }
   }
   return { luc, cs: pc?.connectionState ?? 'khong', ice: pc?.iceConnectionState ?? 'khong', uv, n: await anhNhan(o.n), b: await anhNhan(o.b), g }
 }
@@ -55,9 +61,35 @@ export function tomTatTieng(a: Anh, b: Anh): SoTieng {
   if (b.g) ra.g = { kb: Math.max(0, Math.round(((b.g.byte - (a.g?.byte ?? b.g.byte)) * 8) / 1000 / giay)), muc: Math.round(b.g.muc * 1000) / 1000, nl: Math.max(0, Math.round((b.g.nl - (a.g?.nl ?? b.g.nl)) * 1e5) / 100) }
   return ra
 }
-/** Một cửa sổ đo `ms` (mặc định 2 giây). */
+/** MỨC TIẾNG GIẢI MÃ THẬT ở phía nghe: AnalyserNode trên chính track nhận (một AudioContext dùng chung cho cả trang, nút đo giữ theo track). Trả hàm lấy mẫu;
+ *  AudioContext không chạy được (chưa có chạm) ⇒ null. Không nối ra loa (chỉ đo). */
+let ctxDo: AudioContext | null = null
+const nutDo = new WeakMap<MediaStreamTrack, { a: AnalyserNode; m: Float32Array<ArrayBuffer> }>()
+function boDo(t: MediaStreamTrack | null | undefined): (() => number | null) | null {
+  if (!t || t.readyState !== 'live' || typeof AudioContext === 'undefined') return null
+  try {
+    ctxDo ??= new AudioContext()
+    if (ctxDo.state !== 'running') void ctxDo.resume().catch(() => undefined)
+    let n = nutDo.get(t)
+    if (!n) { const a = ctxDo.createAnalyser(); a.fftSize = 2048; ctxDo.createMediaStreamSource(new MediaStream([t])).connect(a); n = { a, m: new Float32Array(a.fftSize) }; nutDo.set(t, n) }
+    const nut = n, c = ctxDo
+    return () => { if (c.state !== 'running') return null; nut.a.getFloatTimeDomainData(nut.m); let s = 0; for (let i = 0; i < nut.m.length; i++) s += nut.m[i]! * nut.m[i]!; return s / nut.m.length }
+  } catch { return null }
+}
+/** Một cửa sổ đo `ms` (mặc định 2 giây): hai lần chụp số đo + lấy mẫu mức giải mã 10 lần / giây giữa hai lần chụp (dBFS = trung bình công suất). */
 export async function doTieng(lay: () => NguonDo, dongHo: () => number, cho: (ms: number) => Promise<void>, ms = 2000): Promise<SoTieng> {
-  const a = await chupTieng(lay(), dongHo())
-  await cho(ms)
-  return tomTatTieng(a, await chupTieng(lay(), dongHo()))
+  const o = lay(), a = await chupTieng(o, dongHo())
+  const doN = boDo(o.n?.thu?.track), doB = boDo(o.b?.thu?.track), cong = { n: [0, 0], b: [0, 0] }
+  const lan = Math.max(1, Math.round(ms / 100))
+  for (let i = 0; i < lan; i++) {
+    await cho(ms / lan)
+    const x = doN?.(), y = doB?.()
+    if (x != null) { cong.n[0] += x; cong.n[1] += 1 }
+    if (y != null) { cong.b[0] += y; cong.b[1] += 1 }
+  }
+  const t = tomTatTieng(a, await chupTieng(lay(), dongHo()))
+  const dbfs = (c: number[]): number | null => (c[1]! ? Math.round(10 * Math.log10(Math.max(1e-10, c[0]! / c[1]!))) : null)
+  if (t.n) t.n.db = dbfs(cong.n)
+  if (t.b) t.b.db = dbfs(cong.b)
+  return t
 }

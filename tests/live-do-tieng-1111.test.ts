@@ -21,7 +21,7 @@ describe('phần thuần: «đang nghe thật» + lý do câm + dòng gọn', ()
     expect(viSaoCam({ cs: 'failed', ice: 'failed', uv: '' })).toMatch(/ICE hỏng/)
     expect(viSaoCam({ ...tot, n: { ...tot.n!, kb: 0 } })).toMatch(/không nhận được gói/)
     expect(viSaoCam({ ...tot, n: { ...tot.n!, pt: { d: 1, ct: 0, m: 0, v: 1 } } })).toMatch(/CHƯA phát/)
-    expect(viSaoCam({ ...tot, n: { ...tot.n!, nl: 0 } })).toMatch(/KHÔNG có năng lượng/)
+    expect(viSaoCam({ ...tot, n: { ...tot.n!, nl: 0 } })).toMatch(/KHÔNG có tiếng/)
   })
   it('trình duyệt KHÔNG báo năng lượng (null) ≠ không có tiếng: «nghe thật» dựa vào kb/s + thẻ phát, không kết luận «câm từ nguồn»', () => {
     const n = { ...tot.n!, nl: null }
@@ -34,6 +34,14 @@ describe('phần thuần: «đang nghe thật» + lý do câm + dòng gọn', ()
     expect(viSaoCam({ cs: 'khong', ice: 'khong', uv: '', l: 'khong-noi' })).toMatch(/ICE hỏng/)
     expect(viSaoCam({ cs: 'khong', ice: 'khong', uv: '', l: 've' })).toBe('nối máy chủ tiếng lỗi (ve)')
     expect(sachTieng({ cs: 'khong', ice: 'khong', uv: '', l: 'khong-noi' })?.l).toBe('khong-noi')
+  })
+  it('mức GIẢI MÃ thật (dBFS) có thì dùng thay năng lượng: dòng ghi «nghe −24 dBFS»; dưới −70 dBFS ⇒ câm từ nguồn; thẻ tắt tiếng / âm lượng thấp ghi rõ', () => {
+    const n = { ...tot.n!, db: -24 }
+    expect(dongMay('Huy', { ...tot, n })).toBe('Huy: ICE ok (host/udp) · nhận 58 kb/s · nghe -24 dBFS · loa đang phát')
+    expect(ngheThat({ ...n, db: -85 })).toBe(false)
+    expect(viSaoCam({ ...tot, n: { ...n, db: -85 } })).toMatch(/câm từ nguồn/)
+    expect(dongMay('Huy', { ...tot, n: { ...n, pt: { d: 0, ct: 2, m: 0, v: 0.25 } } })).toContain('thẻ âm lượng 25%')
+    expect(sachTieng({ ...tot, n: { ...n, db: -24.4 } })?.n?.db).toBe(-24.4)
   })
   it('dòng gọn cho cửa sổ nút Live', () => {
     expect(dongMay('Gia Huy', tot)).toBe('Gia Huy: ICE ok (host/udp) · nhận 58 kb/s · năng lượng ↑ · loa đang phát')
@@ -51,7 +59,8 @@ describe('đo trên trình duyệt (bộ nhận / bộ gửi / thẻ phát giả
     let byte = 0, nl = 0, ct = 10, gb = 0
     const the = { srcObject: {}, paused: false, muted: false, volume: 1, get currentTime() { return ct } } as unknown as HTMLMediaElement
     const thu = { getStats: async () => new Map([['i', { type: 'inbound-rtp', bytesReceived: byte, packetsReceived: byte / 100, totalAudioEnergy: nl }]]) } as unknown as RTCRtpReceiver
-    const g = { getStats: async () => new Map<string, unknown>([['o', { type: 'outbound-rtp', bytesSent: gb }], ['m', { type: 'media-source', audioLevel: 0.3, totalAudioEnergy: gb / 1e5 }]]) } as unknown as RTCRtpSender
+    // sau replaceTrack báo cáo còn media-source của track CŨ (mức 0) — phải đọc đúng cái `outbound-rtp.mediaSourceId` trỏ tới (số đo thật #1628: «mức nguồn 0»)
+    const g = { getStats: async () => new Map<string, unknown>([['o', { type: 'outbound-rtp', kind: 'audio', bytesSent: gb, mediaSourceId: 'm2' }], ['m2', { type: 'media-source', id: 'm2', kind: 'audio', audioLevel: 0.3, totalAudioEnergy: gb / 1e5 }], ['m1', { type: 'media-source', id: 'm1', kind: 'audio', audioLevel: 0, totalAudioEnergy: 0 }]]) } as unknown as RTCRtpSender
     const pc = { connectionState: 'connected', iceConnectionState: 'connected', getStats: async () => new Map<string, unknown>([['l1', { type: 'local-candidate', id: 'l1', candidateType: 'relay', relayProtocol: 'tcp' }], ['cp', { type: 'candidate-pair', nominated: true, state: 'succeeded', localCandidateId: 'l1' }]]) } as unknown as RTCPeerConnection
     const a = await chupTieng({ pc, n: { thu, the }, g }, 0)
     byte = 16_000; nl = 0.05; ct = 12; gb = 15_000
