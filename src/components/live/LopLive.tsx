@@ -395,7 +395,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
         <button type="button" className={`lv-vua${nghe && !biChan ? '' : ' tat'}`} aria-pressed={nghe && !biChan} aria-label={biChan ? 'Máy chưa phát được tiếng thầy. Chạm để nghe' : nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe && !biChan ? <BtLoa /> : <BtLoaTat />}Tiếng<b>{biChan ? 'Chạm để nghe' : nghe ? 'Đang bật' : 'Đang tắt'}</b></button>
       ) : <p className="lv-ghi">Buổi này live chưa có tiếng trên máy. Em nghe thầy giảng trực tiếp.</p>}
       {coTieng && nghe ? <ChonLoa le={le} /> : null}
-      {/* 11/11 tối (#1630 «không nghe thấy gì»): phát tiếng qua WebAudio thay thẻ <audio> — gọi trong cú chạm, nhớ ở máy (nghe-wa.ts) */}
+      {/* 11/11 tối (bản phát hành 1630 «không nghe thấy gì»): phát tiếng qua WebAudio thay thẻ <audio> — gọi trong cú chạm, nhớ ở máy (nghe-wa.ts) */}
       {coTieng && nghe ? <button type="button" className={`lv-vua lv-wa${tt.quaWa ? '' : ' tat'}`} aria-pressed={tt.quaWa} onClick={() => le.current?.datNgheWa(!tt.quaWa)}><BtLoa />{tt.quaWa ? 'Đang nghe cách khác' : 'Vẫn không nghe?'}<b>{tt.quaWa ? 'Chạm để về cách thường' : 'Thử cách khác'}</b></button> : null}
       {coTieng && !nghe ? <p className="lv-ghi">{xa ? 'Em đang xem từ xa: bật tiếng để nghe thầy giảng.' : 'Đang ngồi trong lớp: em nghe thầy trực tiếp. Đeo tai nghe thì bật tiếng.'}</p> : null}
       {micBang ? (
