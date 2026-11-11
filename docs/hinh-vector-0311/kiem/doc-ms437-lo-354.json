@@ -1,0 +1,522 @@
+{
+  "i": 437,
+  "assetIndexProvided": 1106,
+  "hash": "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce.png",
+  "size": [
+    795,
+    420
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-11-C3-B12-I-33",
+      "de": "Trong ruộng lúa, ao, hồ,… thường chứa các vật thể hữu cơ. Khi các vật thể hữu cơ đó bị phân hủy trong điều kiện không có oxygen sinh ra hydrocarbon (X) ở thể khí. Người ta đã lợi dụng hiện tượng này để làm các hầm biogas trong chăn nuôi gia súc, tạo khí (X) sử dụng đun nấu hoặc chạy máy,… Kết quả phân tích nguyên tố của (X) có 25%H về khối lượng. Phân tử khối của hợp chất này được xác định thông qua kết quả phổ khối lượng với peak ion phân tử có giá trị m/z lớn nhất.\nCông thức phân tử của (X) là",
+      "allHinh": [
+        {
+          "hash": "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce",
+          "where": "DH-11-C3-B12-I-33.hinh.0.du_lieu",
+          "hashDataUrl": "0e249f703027c78b74b901952b9f061855b9dceef800e8d22b75fb2f475c77b5"
+        }
+      ],
+      "missingHashes": [
+        "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownBaseline2xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativepixelheight/coordinatesapproximatelynearest1px; labelnumerals12..16identifyprintedpeaks only. NOinventedexactabundance/intensitypercent/scientificmassassignment. Graypixelrangesmayincludelabelsink, sopeakstartsconfirmedvisuallyfromFULL.",
+  "geometry": {
+    "axes": {
+      "vertical": [
+        [
+          86,
+          29
+        ],
+        [
+          85,
+          355
+        ]
+      ],
+      "baseline": [
+        [
+          85,
+          355
+        ],
+        [
+          764,
+          357
+        ]
+      ],
+      "style": "thinblackgray~1.4px, NOarrowheads, slightnativebaseline2pxfalltorightnotnormalized"
+    },
+    "xTicks": [
+      {
+        "text": "11",
+        "centerX": 85,
+        "stem": [
+          [
+            85,
+            355.0
+          ],
+          [
+            85,
+            362
+          ]
+        ],
+        "labelBBox": [
+          72,
+          365,
+          98,
+          384
+        ]
+      },
+      {
+        "text": "12",
+        "centerX": 182,
+        "stem": [
+          [
+            182,
+            355.2857142857143
+          ],
+          [
+            182,
+            362
+          ]
+        ],
+        "labelBBox": [
+          169,
+          365,
+          195,
+          384
+        ]
+      },
+      {
+        "text": "13",
+        "centerX": 278,
+        "stem": [
+          [
+            278,
+            355.5684830633284
+          ],
+          [
+            278,
+            362
+          ]
+        ],
+        "labelBBox": [
+          265,
+          365,
+          291,
+          384
+        ]
+      },
+      {
+        "text": "14",
+        "centerX": 375,
+        "stem": [
+          [
+            375,
+            355.8541973490427
+          ],
+          [
+            375,
+            362
+          ]
+        ],
+        "labelBBox": [
+          362,
+          365,
+          388,
+          384
+        ]
+      },
+      {
+        "text": "15",
+        "centerX": 473,
+        "stem": [
+          [
+            473,
+            356.14285714285717
+          ],
+          [
+            473,
+            362
+          ]
+        ],
+        "labelBBox": [
+          460,
+          365,
+          486,
+          384
+        ]
+      },
+      {
+        "text": "16",
+        "centerX": 569,
+        "stem": [
+          [
+            569,
+            356.4256259204713
+          ],
+          [
+            569,
+            362
+          ]
+        ],
+        "labelBBox": [
+          556,
+          365,
+          582,
+          384
+        ]
+      },
+      {
+        "text": "17",
+        "centerX": 666,
+        "stem": [
+          [
+            666,
+            356.7113402061856
+          ],
+          [
+            666,
+            362
+          ]
+        ],
+        "labelBBox": [
+          653,
+          365,
+          679,
+          384
+        ]
+      },
+      {
+        "text": "18",
+        "centerX": 764,
+        "stem": [
+          [
+            764,
+            357.0
+          ],
+          [
+            764,
+            362
+          ]
+        ],
+        "labelBBox": [
+          751,
+          365,
+          777,
+          384
+        ]
+      }
+    ],
+    "yTicks": [
+      {
+        "text": "0",
+        "centerY": 355,
+        "stem": [
+          [
+            77,
+            355
+          ],
+          [
+            85,
+            355
+          ]
+        ],
+        "labelBBox": [
+          60,
+          345,
+          75,
+          365
+        ]
+      },
+      {
+        "text": "20",
+        "centerY": 289,
+        "stem": [
+          [
+            77,
+            289
+          ],
+          [
+            85,
+            289
+          ]
+        ],
+        "labelBBox": [
+          49,
+          279,
+          75,
+          299
+        ]
+      },
+      {
+        "text": "40",
+        "centerY": 224,
+        "stem": [
+          [
+            77,
+            224
+          ],
+          [
+            85,
+            224
+          ]
+        ],
+        "labelBBox": [
+          49,
+          214,
+          75,
+          234
+        ]
+      },
+      {
+        "text": "60",
+        "centerY": 159,
+        "stem": [
+          [
+            77,
+            159
+          ],
+          [
+            85,
+            159
+          ]
+        ],
+        "labelBBox": [
+          49,
+          149,
+          75,
+          169
+        ]
+      },
+      {
+        "text": "80",
+        "centerY": 94,
+        "stem": [
+          [
+            77,
+            94
+          ],
+          [
+            85,
+            94
+          ]
+        ],
+        "labelBBox": [
+          49,
+          84,
+          75,
+          104
+        ]
+      },
+      {
+        "text": "100",
+        "centerY": 29,
+        "stem": [
+          [
+            77,
+            29
+          ],
+          [
+            85,
+            29
+          ]
+        ],
+        "labelBBox": [
+          38,
+          19,
+          75,
+          39
+        ]
+      }
+    ],
+    "peaks": [
+      {
+        "label": "12",
+        "centerX": 182,
+        "topY": 344,
+        "baselineY": 355,
+        "shaft": [
+          [
+            182,
+            344
+          ],
+          [
+            182,
+            355
+          ]
+        ],
+        "pixelHeight": 11,
+        "labelBBox": [
+          172,
+          323,
+          193,
+          339
+        ]
+      },
+      {
+        "label": "13",
+        "centerX": 278,
+        "topY": 321,
+        "baselineY": 355.5,
+        "shaft": [
+          [
+            278,
+            321
+          ],
+          [
+            278,
+            355.5
+          ]
+        ],
+        "pixelHeight": 34.5,
+        "labelBBox": [
+          268,
+          300,
+          289,
+          316
+        ]
+      },
+      {
+        "label": "14",
+        "centerX": 375,
+        "topY": 290,
+        "baselineY": 356,
+        "shaft": [
+          [
+            375,
+            290
+          ],
+          [
+            375,
+            356
+          ]
+        ],
+        "pixelHeight": 66,
+        "labelBBox": [
+          365,
+          269,
+          386,
+          285
+        ]
+      },
+      {
+        "label": "15",
+        "centerX": 473,
+        "topY": 68,
+        "baselineY": 356,
+        "shaft": [
+          [
+            473,
+            68
+          ],
+          [
+            473,
+            356
+          ]
+        ],
+        "pixelHeight": 288,
+        "labelBBox": [
+          463,
+          47,
+          484,
+          63
+        ]
+      },
+      {
+        "label": "16",
+        "centerX": 569,
+        "topY": 31,
+        "baselineY": 356.5,
+        "shaft": [
+          [
+            569,
+            31
+          ],
+          [
+            569,
+            356.5
+          ]
+        ],
+        "pixelHeight": 325.5,
+        "labelBBox": [
+          559,
+          10,
+          580,
+          26
+        ]
+      }
+    ],
+    "labels": [
+      {
+        "text": "Cường độ tương đối (%)",
+        "bbox": [
+          11,
+          83,
+          35,
+          325
+        ],
+        "rotation": -90,
+        "font": "regularuprightsans rotated;nottruebold"
+      },
+      {
+        "text": "m/z",
+        "bbox": [
+          734,
+          391,
+          773,
+          411
+        ],
+        "font": "italiclowercasesans;slashliteral"
+      }
+    ],
+    "font": "Allticknumerals/peaklabels regular upright sans blackgray, noactualbold; m/zitalic.",
+    "counts": {
+      "peaks": 5,
+      "peakLabels": 5,
+      "xTickLabels": 8,
+      "yTickLabels": 6,
+      "axisHeads": 0,
+      "grid": 0
+    },
+    "nonPeaks": "11 atoriginyaxis/17/18 nativeDOWNtickstems; doNOTaddUPpeaks. Nativebaselineprintunevennessnotextrapeaks.",
+    "noAdded": [
+      "CH4answer",
+      "peakionannotations",
+      "extra17peak",
+      "exactintensitynumbers",
+      "title",
+      "grid",
+      "arrowheads",
+      "x0",
+      "percentvaluesoverpeaks"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "nativeFull2xOpened": true,
+    "allPublicDeRead": true,
+    "geometryAgrees": true,
+    "actualSvgReviewed": true,
+    "actualSvgHash": "ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7",
+    "freshChromiumScale": 3,
+    "actualFullOpened": true,
+    "verdict": "Đạt riêng nguồn437; không suy giá trị cường độ hoặc font global"
+  }
+}

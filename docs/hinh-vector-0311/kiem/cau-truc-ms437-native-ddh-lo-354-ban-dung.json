@@ -1,0 +1,29 @@
+[
+  {
+    "i": 437,
+    "hash": "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce",
+    "fileNguon": "anh/4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce.png",
+    "svg": "ms437-native-ddh-ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7.svg",
+    "hashSvg": "ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7",
+    "byteSvg": 31546,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B12-I-33",
+        "de": "Trong ruộng lúa, ao, hồ,… thường chứa các vật thể hữu cơ. Khi các vật thể hữu cơ đó bị phân hủy trong điều kiện không có oxygen sinh ra hydrocarbon (X) ở thể khí. Người ta đã lợi dụng hiện tượng này để làm các hầm biogas trong chăn nuôi gia súc, tạo khí (X) sử dụng đun nấu hoặc chạy máy,… Kết quả phân tích nguyên tố của (X) có 25%H về khối lượng. Phân tử khối của hợp chất này được xác định thông qua kết quả phổ khối lượng với peak ion phân tử có giá trị m/z lớn nhất.\nCông thức phân tử của (X) là",
+        "refs": [
+          {
+            "hash": "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce",
+            "where": "DH-11-C3-B12-I-33.hinh.0.du_lieu",
+            "hashDataUrl": "0e249f703027c78b74b901952b9f061855b9dceef800e8d22b75fb2f475c77b5"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5peaks12-16nativeheights11-34.5-66-288-325.5PIXELSnotexactpercent/8Xlabels11-18/6Ylabels0-100/14tickstems/regularUPRIGHTnumbers-Ylabelrotated/mzREGULARITALIC/baseline355LEFT357RIGHTdrift/0heads0grid/noextra17peak-ionannotation-answer-intensitylabels",
+    "hashSvgDaSoat": "ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

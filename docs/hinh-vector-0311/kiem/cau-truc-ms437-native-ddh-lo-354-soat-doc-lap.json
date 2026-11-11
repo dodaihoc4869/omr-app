@@ -1,0 +1,16 @@
+[
+  {
+    "i": 437,
+    "hashSvg": "ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở PNG nguồn FULL, toàn bộ câu dẫn/ref DH-11-C3-B12-I-33.hinh.0.du_lieu; fresh Chromium 3× FULL và macro toàn baseline, trục Y, đỉnh15–16. Đúng năm peak12–16, giữ độ cao theo hình nguồn thay vì chuẩn hóa theo phần trăm; tám nhãn X11–18/sáu nhãn Y0–100 và14 chân tick. Nhãn cường độ xoay, số thường thẳng, m/z thường nghiêng đúng; baseline hơi dốc xuống phải như nguồn, không có peak17/đầu mũi tên/lưới/nhãn ion hoặc đáp án thêm. Không thấy chữ chạm/cắt/tràn.",
+    "render": "/workspace/scratch/soat263-437.png",
+    "macro": [
+      "/workspace/scratch/ms437-baseline.png",
+      "/workspace/scratch/ms437-y.png",
+      "/workspace/scratch/ms437-peaks.png"
+    ],
+    "hash": "4ecd270f71940e30440aea81a712a6f19c1f6f3a4f3a5a92993a1ebd41e101ce",
+    "hashSvgDaSoat": "ea789b6098b13c4d9c230654a30f874bd886f7a656dda67c53c2371cf95ce8b7"
+  }
+]

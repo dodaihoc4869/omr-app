@@ -1,0 +1,20 @@
+{
+  "lo": 354,
+  "main": "733b9246fb7faa9cb7dac4ab4808c4e884d47458",
+  "previousMain": "6901841e82d81fbc9a2eed4196b0e58411f9c551",
+  "merged": false,
+  "changes": "Bút canvas đặc trên máy thầy, giảm đệm máy em; thanh ẩn mép phải/phủ kín màn; hiển thị trễ/mức tiếng. App/CSS/tests đổi.",
+  "viteChanged": false,
+  "fontAndSpeedThresholdChanged": false,
+  "checkColor": {
+    "violations": 1182,
+    "checkerFiles": 239,
+    "baselineRed": true
+  },
+  "sizeBaseline": {
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf",
+    "red": true
+  },
+  "scope": "Chỉ đo build-speed nhánh nguyên byte; latestmainbuild-speed/full theo tên/ca thi/nooverlap bắt buộc trước merge-release. Không tích hợp/không phát hành."
+}
