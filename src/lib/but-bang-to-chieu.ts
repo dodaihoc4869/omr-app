@@ -66,7 +66,7 @@ ${JS_LOI_BUT}
   S.mau = MAU_BUT[0][0]; S.co = CO_BUT[1][0];
   function nguCanh(c, song) { try { return c.getContext ? c.getContext('2d', song ? { desynchronized: true } : undefined) : null; } catch (e) { return null; } }
   function gio() { return window.performance && performance.now ? performance.now() : Date.now(); }
-  var cvT = tao('canvas', 'mc-but', body), cv = tao('canvas', 'mc-but mc-but-song', body), butCu = tao('div', 'mc-but-cu', body), ray = tao('div', 'mc-but-ray', body), rayTay = tao('i', '', ray);
+  var cvT = tao('canvas', 'mc-but', body), cv = tao('canvas', 'mc-but mc-but-song', body), butCu = tao('div', 'mc-but-cu', body), rayBut = tao('div', 'mc-but-ray', body), rayTay = tao('i', '', rayBut);
 ` + /* cvT = lớp HIỆN mực (duy nhất) · cvC = lớp ĐÃ CHỐT (ngoài màn) · cvS = ô NHÁP (ngoài màn) · cv = chỉ bắt con trỏ */ `
   var cvC = tao('canvas'), cvS = tao('canvas');
 ` + /* 11/11 (thầy: «màn live của thầy hiện bảng đen xì ko hiện đề», máy em bình thường): lớp HIỆN mực phủ cả tờ KHÔNG xin desynchronized nữa — trên card đồ hoạ thật (Windows, toàn màn hình) lớp vẽ-thẳng-lên-màn có thể bị đưa lên làm lớp phủ ĐẶC, mất trong suốt ⇒ nền đen che giấy đề. Chromium không đầu không lộ. */ `
@@ -309,10 +309,10 @@ ${JS_LOI_BUT}
 ` + /* Vạch cuộn: dài bằng phần bảng đang thấy so với cả phần đã viết. */ `
   function veRay() {
     var co = !!B && S.but, dai;
-    ray.className = 'mc-but-ray' + (co ? ' mc-co' : '');
+    rayBut.className = 'mc-but-ray' + (co ? ' mc-co' : '');
     if (!co) return;
     dai = Math.max(cuon + B[3], daiBang + 0.25) - B[1];
-    ray.style.left = Math.round(B[2] * KH.W - u() * 0.7) + 'px'; ray.style.top = Math.round(B[1] * KH.H + u()) + 'px'; ray.style.height = Math.round((B[3] - B[1]) * KH.H - u() * 2) + 'px';
+    rayBut.style.left = Math.round(B[2] * KH.W - u() * 0.7) + 'px'; rayBut.style.top = Math.round(B[1] * KH.H + u()) + 'px'; rayBut.style.height = Math.round((B[3] - B[1]) * KH.H - u() * 2) + 'px';
     rayTay.style.top = (cuon / dai * 100) + '%'; rayTay.style.height = ((B[3] - B[1]) / dai * 100) + '%';
   }
   cv.addEventListener('wheel', function (e) {
