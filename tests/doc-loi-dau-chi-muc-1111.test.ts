@@ -95,3 +95,18 @@ describe('docNhieuTrangThaiLoiDau — câu đi chỉ mục trả đúng tập d�
     expect(ke(SQL_LOI_DAU_HOI)).toMatch(/SEARCH l USING INDEX \w+ \(sbd=\? AND qid>\? AND qid<\?\)/)
   })
 })
+
+describe('cron gói sửa mỗi phút đi chỉ mục đợt mở (11/11)', () => {
+  it('sau khi dựng chỉ mục cron đêm, câu tìm em còn đợt mở chỉ quét idx_cld_mo_em', async () => {
+    const { CHI_MUC_CRON_DEM } = await import('../server/src/chi-muc-luc-chay')
+    const { BANG_GOI_SUA, SQL_GOI_SUA } = await import('../server/src/goi-sua-dem')
+    const d = taoD1That()
+    for (const s of [...SQL_GOI_SUA, ...CHI_MUC_CRON_DEM]) d.sql.exec(s)
+    const q = `SELECT d.sbd AS sbd FROM chua_loi_dot d WHERE d.trang_thai_day<>'da_tu_sua' AND d.dong_luc IS NULL
+        AND NOT EXISTS (SELECT 1 FROM ${BANG_GOI_SUA} g WHERE g.sbd=d.sbd AND g.ngay=?1 AND (g.so>=0 OR g.luc>?2))
+      GROUP BY d.sbd ORDER BY MAX(d.cap_nhat_luc) DESC LIMIT ?3`
+    expect((await import('node:fs')).readFileSync('server/src/goi-sua-dem.ts', 'utf8')).toContain(q.split('\n')[0]!.trim())
+    const ke = (d.sql.prepare(`EXPLAIN QUERY PLAN ${q}`).all() as { detail: string }[]).map((x) => x.detail).join('\n')
+    expect(ke).toMatch(/SCAN d USING (COVERING )?INDEX idx_cld_mo_em/)
+  })
+})
