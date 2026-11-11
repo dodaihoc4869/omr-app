@@ -1,0 +1,29 @@
+[
+  {
+    "i": 751,
+    "hash": "8bc777193598ac8f00477a916f4b80e671cba65edb5d5590f984a3afc7490869",
+    "fileNguon": "anh/8bc777193598ac8f00477a916f4b80e671cba65edb5d5590f984a3afc7490869.png",
+    "svg": "dha751-native-ddh-272551b1ba8e612337e51302fb70da5785a506ed3f7d0e31dd21a65097090dc2.svg",
+    "hashSvg": "272551b1ba8e612337e51302fb70da5785a506ed3f7d0e31dd21a65097090dc2",
+    "byteSvg": 38363,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-II-12",
+        "de": "DHA (Docosahexaenoic acid) là một acid béo rất cần thiết cho sự phát triển trí não, thị giác của con người, giúp tăng khả năng miễn dịch và giảm nguy cơ phát triển dị ứng của trẻ. Oleic acid rất tốt cho việc hỗ trợ các vấn đề tim mạch, kiểm soát lượng đường nạp vào trong cơ thể, đồng thời cũng là chất chống oxy hóa hiệu quả. Cho cấu trúc của DHA và oleic acid như hình sau:",
+        "refs": [
+          {
+            "hash": "8bc777193598ac8f00477a916f4b80e671cba65edb5d5590f984a3afc7490869",
+            "where": "DH-12-C1-B1-P2-II-12.hinh.0.du_lieu",
+            "hashDataUrl": "83ac5b2eca8c89e520e7e2821393c98852b1f47b1e5f0386cfcba45dbe59f3fb"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "TOP21bareC+COOHfirstC22C6CCdouble/BOTTOM18C1CCdouble1COdouble2raysCONTACT+nativeSHORTfootjoin/4Ototal/COOH-O-OHregularUPRIGHT/2TRUEdamITALICcaptionsEXACTDHA(nhiệtđộnóngchảy-44sup_oC)-Oleicacid(nhiệtđộnóngchảy14sup_oC)/NOspaceafterminus/0arrows0stereo/noextraC35544-expandedtopCOOH-H-formula-answer-noalias1385-811-1145",
+    "hashSvgDaSoat": "272551b1ba8e612337e51302fb70da5785a506ed3f7d0e31dd21a65097090dc2",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
