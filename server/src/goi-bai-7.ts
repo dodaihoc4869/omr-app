@@ -6,7 +6,7 @@ import { SQL_GOI7 } from './goi-bai-7-schema'
 import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
 import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7, type LoaiNgay7 } from './goi-bai-7-loi'
-import { docMucLoai7, loaiNgayEm7 } from './goi-bai-7-loai-ngay'
+import { docMucLoai7, loaiNgayEm7, noCau7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
 import { lichBaiEm7 } from './goi-bai-7-lich-bai'
 import { apSuat7, NGAY_DE_28 } from './goi-bai-7-suat'
@@ -623,7 +623,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   const onCan=batKt?on.filter(id=>eligible(id)&&!suaCan.includes(id)&&!chua.includes(id)):[]
   const giuOn=batKt?Math.min(6,onCan.length):0
   const muc7 = (!batKt ? await chotSom : null) ?? await chotMucNgay7(env,sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,giuOn+suaCan.length,goi.some(g=>g.kiemNhe),goi.map(g=>g.id),loaiGhi)
-  let toiThieu = muc7.muc
+  let toiThieu = await noCau7(env,sbd,ngay,now,ml7,muc7.muc,soDaLam)
   const kiemNhe=goi.some(g=>g.kiemNhe)
   // 12 chỗ của ngày kiểm tra giữ tiến độ bài đang trong hạn; nợ cũ vẫn ở hàng đợi.
   // Khối B: ngày học mới ⇒ câu mới tới hết mức 28 (hạn gần trước); ngày sửa lỗi ⇒ 0 câu mới theo lịch (thiếu thì lấp cuối cho đủ 28); không loại ⇒ như cũ
@@ -632,7 +632,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // làm (không câu mới, không câu chờ thầy dạy lại), câu sai lần cuối trước, sai nhiều trước, chưa thành thạo trước, gần lịch ôn trước. Chỉ CPU, không đọc D1.
   const vaoPlan: Parameters<typeof chonGoi7>[0] = { cau,daGap:vuaLam.size||luotNgay.size?new Set([...daGap,...vuaLam,...luotNgay]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua:loaiNgay==='sua'?xepSuaTheoNhom(themSua7(sua,hs,lyDo,ngay),hs.meta):sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn,
     ngay,gapHomNay:new Set([...goi.flatMap(g=>[...g.gapNgay]),...[...vuaLam,...luotNgay].filter(id=>!daGap.has(id))]),loaiNgay }
-  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan) : null // đề 28 theo suất (goi-bai-7-suat.ts)
+  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, toiThieu) : null // đề 28 theo suất (goi-bai-7-suat.ts)
   let plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
   // Chỉ khi kế hoạch thường còn thiếu mức (hiếm) mới đọc thêm câu đã DÀNH cho Kiểm tra ôn tập sắp tới của em (một lệnh, chỉ mã câu) — ôn sớm không lấy
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.
@@ -679,7 +679,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
     const q = new Set(g.cau.map(c => c.qid)), ds = hs.cau.filter(c => q.has(c.qid))
     if (ds.some(c => tangCuaCau(c) !== null)) tangGoi.set(g.id, tangCuaEm(ds, hs.tt, nhom7))
   }
-  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi, loaiNgay, nhomSua: loaiNgay === 'sua' ? nhomSua7(plan.viec, hs, lyDo, daLamNgay, ngay) : [], lichBai: lichBaiEm7(ngay, goi, ml7, loaiNgay, conMoi7, soSua, soMoiCon, plan.viec) }
+  return { goi, plan, hs, chan, control, kienThucCu, diemDaDo, toiThieu, daLamNgay:soDaLam, tang, tangGoi, vuaLam, nghi, duPhong, hocThem, daLamTap: daLamNgay as ReadonlySet<string>, soVua, pDung: engine.pDung ?? {}, khoaCaThi, loaiNgay, nhomSua: loaiNgay === 'sua' ? nhomSua7(plan.viec, hs, lyDo, daLamNgay, ngay) : [], lichBai: lichBaiEm7(ngay, goi, ml7, loaiNgay, conMoi7, soSua, soMoiCon, plan.viec), noCau: ml7.noCau }
 }
 
 type LapGoi7 = NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
@@ -724,7 +724,7 @@ export function tomTatGoi7(lap: NonNullable<Awaited<ReturnType<typeof lapGoi7>>>
   }),
     tuLamCon:dem7(lap.plan.tuLam),tiepCanCon:dem7(lap.plan.tiepCan),thieuPhu:dem7(lap.plan.thieuPhu),thieuNgay:Math.max(0,lap.toiThieu-lap.daLamNgay-lap.plan.viec.length),kienThucCu:lap.kienThucCu,
     canHoTro:lap.plan.tuLam*2+lap.plan.tiepCan*3>60 || lap.plan.thieuPhu>0 || lap.daLamNgay+lap.plan.viec.length<lap.toiThieu,
-    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}),...(lap.loaiNgay ? { loaiNgay: lap.loaiNgay } : {}),...(lap.nhomSua?.length ? { nhomSua: lap.nhomSua } : {}),...(lap.lichBai ? { lichBai: lap.lichBai } : {}) }
+    mucTieuDiem:7,diemDaDo:lap.diemDaDo.filter(laDiemDaDo7),toiThieu:lap.toiThieu,daLamHomNay:lap.daLamNgay,...(lap.noCau?{noCau:lap.noCau}:{}),...(lap.khoaCaThi ? { khoaCaThi: lap.khoaCaThi } : {}),...(lap.loaiNgay ? { loaiNgay: lap.loaiNgay } : {}),...(lap.nhomSua?.length ? { nhomSua: lap.nhomSua } : {}),...(lap.lichBai ? { lichBai: lap.lichBai } : {}) }
 }
 
 const dangMoChang7 = new WeakMap<object, Map<string, Promise<Record<string, unknown> | null>>>()

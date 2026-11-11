@@ -1,0 +1,31 @@
+/* THẺ «NỢ CÂU» (thầy 11/11 duyệt bản vẽ docs/ban-ve-lam-bu-1111). Màu: chỉ biến sẵn có của app học sinh (chú ý — cam; sai — hồng). Nạp cùng mảnh lười TheNoCau. */
+.nc-the { margin: 0; padding: 14px 16px; border-radius: 26px; background: var(--tr-chu-y-nhat); box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-chu-y) 45%, transparent); color: var(--tr-chu); display: flex; flex-direction: column; gap: 8px; }
+.nc-the[data-muc='het'] { background: var(--tr-sai-nhat); box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-sai) 45%, transparent); }
+.nc-the[data-muc='gon'] { background: var(--tr-mat-2); box-shadow: inset 0 0 0 2px var(--tr-vien); flex-direction: row; align-items: center; gap: 12px; padding: 12px 14px 12px 18px; }
+.nc-dau { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.nc-nhan { font-size: 13.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--tr-chu-y-chu); }
+.nc-the[data-muc='het'] .nc-nhan { color: var(--tr-sai-chu); }
+.nc-chip { font-size: 12.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; background: var(--tr-mat); color: var(--tr-chu-y-chu); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-chu-y) 45%, transparent); }
+.nc-the[data-muc='het'] .nc-chip { color: var(--tr-sai-chu); box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--tr-sai) 45%, transparent); }
+.nc-so { font-size: 40px; font-weight: 800; line-height: 1; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.nc-so small { font-size: .4em; font-weight: 750; letter-spacing: 0; color: var(--tr-chu-2); margin-left: 6px; }
+.nc-loai { margin: -2px 0 0; font-size: 14px; font-weight: 650; color: var(--tr-chu-2); }
+.nc-chon { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 2px; }
+.nc-chon[data-mot] { grid-template-columns: 1fr; }
+.nc-nut { min-height: 56px; padding: 8px 14px; border: 0; border-radius: 18px; background: var(--tr-mat); color: var(--tr-chu); font: inherit; text-align: left; display: flex; flex-direction: column; gap: 2px; justify-content: center; box-shadow: inset 0 0 0 2px var(--tr-vien); cursor: pointer; }
+.nc-nut:disabled { cursor: default; }
+.nc-nut b { font-size: 15.5px; font-weight: 800; }
+.nc-nut span { font-size: 13px; font-weight: 650; color: var(--tr-chu-3); }
+.nc-nut[aria-pressed='true'] { box-shadow: inset 0 0 0 3px var(--tr-chu-y-nut); }
+.nc-nut[aria-pressed='true'] b { color: var(--tr-chu-y-chu); }
+.nc-the[data-muc='het'] .nc-nut[aria-pressed='true'] { box-shadow: inset 0 0 0 3px var(--tr-sai); }
+.nc-the[data-muc='het'] .nc-nut[aria-pressed='true'] b { color: var(--tr-sai-chu); }
+.nc-ghi { margin: 0; font-size: 13px; font-weight: 600; line-height: 1.4; color: var(--tr-chu-2); }
+.nc-ghi[role='alert'] { color: var(--tr-sai-chu); }
+.nc-gon-chu { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.nc-gon-chu b { font-size: 15.5px; font-weight: 800; }
+.nc-gon-chu span { font-size: 13px; font-weight: 650; color: var(--tr-chu-3); }
+.nc-them { min-height: 44px; padding: 0 14px; border: 0; border-radius: 14px; background: var(--tr-mat); color: var(--tr-chu-y-chu); font: inherit; font-size: 14px; font-weight: 800; box-shadow: inset 0 0 0 2px color-mix(in oklab, var(--tr-chu-y) 45%, transparent); cursor: pointer; white-space: nowrap; }
+/* thứ tự khi còn phải trả: lời chào → thẻ Nợ câu → nút chính → thẻ mức (nút chính nằm trọn trong màn đầu) */
+.nc-the + .kb-cta { margin: 14px 0 18px; }
+.kb-cta + .nc-the { margin-top: 14px; }

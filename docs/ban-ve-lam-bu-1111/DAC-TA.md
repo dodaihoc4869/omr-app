@@ -1,6 +1,6 @@
 # ĐẶC TẢ — Thẻ «Nợ câu»: nợ cộng dồn, trả tối thiểu kiểu ngân hàng (11/11/2026)
 
-Trạng thái: **CHỜ THẦY DUYỆT ẢNH — CHƯA BUILD.**
+Trạng thái: **THẦY DUYỆT 11/11 («Duyệt build đẩy lên bản sống luôn») — ĐÃ BUILD.** Thầy thêm cùng ngày: «Tính lãi như ngân hàng luôn nhé» ⇒ luật lãi ở mục 4. Ảnh của bản đã build (component thật): thư mục `that/` (`node docs/ban-ve-lam-bu-1111/chup-that.mjs <thư mục build chup-v2>`).
 Thầy 11/11: «hiện thẻ làm bù bất kì câu mới ôn sửa cộng dồn và bắt làm bù trước rồi mới đến câu mới … Đếm theo câu … cho phép học sinh làm tối thiểu (tự tính toán) giống như trả tối thiểu của ngân hàng. Ghi rõ đang nợ bao nhiêu câu, bấm vào chọn được trả tối thiểu bao nhiêu câu thì được làm câu mới hoặc trả hết … tối đa 3 ngày nợ tối thiểu, đến ngày thứ tư phải trả hết mới được làm tiếp. Vẽ tôi xem rồi build».
 
 Thầy 11/11 (sau bản vẽ lần 1): «Ghi rõ nợ câu nhé theo cơ chế trả tối thiểu kiểu ngân hàng nhé» ⇒ bản vẽ lần 2: nhãn thẻ «Nợ câu», nút chính «Trả nợ câu trước», tối thiểu = 25 % số nợ còn lại (sàn 6 câu) thay cho «chia đều số lần còn lại».
@@ -35,33 +35,42 @@ Bản vẽ: 9 ảnh Chromium thật trong thư mục này — chụp trên CHÍN
 ## 4. Luật tính (đếm theo câu)
 **Nợ phát sinh.** Hết một ngày, thiếu = mức của ngày (28) − số câu em đã làm của ngày đó. Phần thiếu cộng vào nợ, ghi theo loại ngày: ngày Học mới → «Câu mới», ngày Sửa → «Câu sửa», ngày Kiểm tra ôn tập (phần chưa trả lời) và ngày ôn → «Câu ôn».
 
-**Không phát sinh nợ:** các ngày trước khi bật tính năng; ngày em chưa có bài; ngày kho hết câu (mức đã hạ).
+**Không phát sinh nợ:** các ngày trước khi bật tính năng; ngày em không mở app mà cũng không có bài nào đang trong hạn (lớp chưa được giao bài, nghỉ giữa hai bài — ngày ấy cũng không tính lãi); ngày kho hết câu (mức đã hạ).
 
 **Trần nợ: 84 câu** (3 ngày). Vượt trần không cộng thêm; câu vẫn nằm trong hàng chờ của em, không mất.
 
 **Trả tối thiểu kiểu ngân hàng** = 25 % số nợ còn lại, làm tròn lên, không dưới 6 câu (nợ dưới 6 thì trả hết luôn). Được trả tối thiểu tối đa 3 lần; ngày thứ tư phải trả hết. Ví dụ nợ 42 câu, mỗi ngày làm đủ bài hôm nay:
 
-| Lần | Nợ đầu ngày | Tối thiểu (25 %, sàn 6) | Còn nợ |
-|---|---|---|---|
-| 1 | 42 | 11 | 31 |
-| 2 | 31 | 8 | 23 |
-| 3 | 23 | 6 | 17 |
-| Ngày thứ tư | 17 | phải trả hết 17 | 0 |
+| Lần | Nợ đầu ngày | Tối thiểu (25 %, sàn 6) | Còn nợ | Lãi đêm ấy (5 %) | Nợ sáng hôm sau |
+|---|---|---|---|---|---|
+| 1 | 42 | 11 | 31 | 2 | 33 |
+| 2 | 33 | 9 | 24 | 2 | 26 |
+| 3 | 26 | 7 | 19 | 1 | 20 |
+| Ngày thứ tư | 20 | phải trả hết 20 | 0 | 0 | 0 |
 
-Không tính «lãi»: nợ không tự tăng thêm ngoài phần em làm thiếu của ngày mới.
+Tổng em trả 47 câu cho khoản nợ 42 câu: 5 câu là lãi. Trả hết ngay ngày đầu thì chỉ 42 câu.
 
-**Đếm lần trả tối thiểu:** mỗi ngày em chọn trả tối thiểu và làm đủ số đó = 1 lần. Trả hết nợ thì đếm lại từ 0. Ngày em không mở app không mất lần, nhưng nợ vẫn tăng (tới trần).
+**LÃI kiểu ngân hàng (thầy 11/11 «Tính lãi như ngân hàng luôn»).** Mỗi đêm, số nợ CÒN LẠI sau phần em đã trả trong ngày bị cộng **5 %**, làm tròn lên (còn nợ là có ít nhất 1 câu lãi). Chi tiết:
+- Trả hết thì không có lãi.
+- Phần thiếu của chính ngày hôm ấy được **miễn lãi đêm đầu** (như khoản mới phát sinh của thẻ ngân hàng): thiếu hôm nay, mai trả hết thì không mất câu lãi nào.
+- Lãi cộng vào nợ, đêm sau tính lãi trên cả gốc lẫn lãi (lãi kép). Nợ kể cả lãi không vượt trần 84 câu.
+- Trả nợ thì trừ lãi trước, gốc sau.
+- Ngày Kiểm tra ôn tập không tính lãi (ngày ấy em chỉ làm bài kiểm tra, không trả nợ được).
+- Câu lãi rút như câu trả nợ khác: theo đúng luật đề theo suất của ngày.
+- Thẻ ghi rõ lãi: «Lãi 2» trong dòng theo loại, và «đêm nay cộng 2 câu» nếu em chỉ trả tối thiểu.
 
-**Thứ tự trong ngày:** làm bù đủ số đã chọn → mới mở 28 câu hôm nay. Hôm nay làm thiếu thì phần thiếu thành nợ ngày mai.
+**Đếm lần trả tối thiểu:** mỗi ngày em để ở «Trả tối thiểu» và có làm bài (từ 1 câu) mà chưa hết nợ = 1 lần — làm chưa đủ số tối thiểu cũng tính (không lách được bằng cách trả thiếu). Trả hết nợ thì đếm lại từ 0. Ngày em không làm câu nào không mất lần, nhưng nợ vẫn tăng (tới trần).
 
-**Câu làm bù là câu nào:** rút từ hàng chờ của chính em bằng đúng luật đề theo suất (`rut28`), ưu tiên loại của khoản nợ cũ nhất; hết loại đó thì lấy loại kế. Câu đầu tiên em làm trong ngày tính vào trả nợ cho tới khi đủ số đã chọn — không cần loại phiên riêng.
+**Thứ tự trong ngày — MỘT CON SỐ:** mức hôm nay = 28 + số câu trả nợ đã chọn (ví dụ 39). Câu em làm đầu tiên trong ngày tính vào trả nợ cho tới khi đủ số đã chọn, sau đó mới tính vào 28 câu hôm nay. Hôm nay làm thiếu thì phần thiếu thành nợ ngày mai. Làm VƯỢT mức hôm nay (học thêm) bao nhiêu câu thì nợ giảm thêm bấy nhiêu.
 
-**Chuỗi và thưởng:** giữ chuỗi khi làm đủ 28 câu của hôm nay (sau phần trả). Câu làm bù được nguyên tử như câu thường.
+**Câu trả nợ là câu nào:** rút từ hàng chờ của chính em bằng đúng luật đề theo suất (`rut28`) của hôm nay; mức 39 câu thì 7 ô của đề chia đúng tỉ lệ đề 28 (17 · 5 · 3 · 3 · 3 · 4 · 4). Không có loại phiên riêng. KHÁC bản vẽ: không ưu tiên riêng «loại của khoản nợ cũ nhất» — số theo loại trên thẻ chỉ cho biết nợ sinh ra từ ngày loại nào; câu thật vẫn theo hàng chờ của em (câu mới chưa học, câu sai chưa sửa, dạng tới hạn ôn).
 
-**Nói thẳng:** ngày có nợ em làm nhiều hơn 28 câu. Trả tối thiểu: 28 + khoảng 6–21 câu (25 % của tối đa 84). Trả hết một lần ở mức trần: 28 + 84 = 112 câu.
+**Chuỗi và thưởng:** giữ chuỗi khi làm đủ mức hôm nay (số trả nợ đã chọn + 28). Câu trả nợ được nguyên tử như câu thường.
+
+**Nói thẳng:** ngày có nợ em làm nhiều hơn 28 câu. Trả tối thiểu: 28 + khoảng 6–21 câu (25 % của tối đa 84). Trả hết một lần ở mức trần: 28 + 84 = 112 câu. Có lãi nên càng trả chậm càng phải làm nhiều câu hơn.
 
 ## 5. Ngoại lệ
-- Em bấm đổi lựa chọn sau khi đã bắt đầu làm bù: được đổi từ tối thiểu lên trả hết; không được đổi ngược sau khi đã vượt số tối thiểu.
+- Em bấm đổi lựa chọn: đổi qua lại được trong ngày khi chưa hết 3 lần trả tối thiểu (mức hôm nay đổi theo). Câu đã làm không mất: sổ nợ đếm theo tổng số câu em làm trong ngày.
 - Bấm lặp nút chính: lệnh chọn có khoá chống lặp (như lệnh mở chặng).
 - Qua nửa đêm khi đang làm bù: câu đã làm tính cho ngày em làm; ngày mới tính lại nợ.
 - Ca kiểm tra trên lớp đang mở: không bị nợ chặn.
@@ -69,22 +78,31 @@ Không tính «lãi»: nợ không tự tăng thêm ngoài phần em làm thiế
 - Thầy sửa / rút câu của bài: nợ đếm theo số câu, không gắn mã câu ⇒ không lệch.
 
 ## 6. Dữ liệu và chi phí máy chủ
-- Hai bảng CHỈ-THÊM: `lam_bu_no(sbd, ngay, loai, so, luc)` (khoản nợ từng ngày) và `lam_bu_chon(sbd, ngay, kieu, so, luc)` (lựa chọn mỗi ngày).
-- Chốt nợ của các ngày trước ở lần mở app đầu tiên trong ngày, ghi CÙNG lô với dòng mức 28; đọc CÙNG câu đọc mức ngày ⇒ **0 đợt chờ D1 thêm** trên lệnh nóng.
-- Tóm tắt trả về trong `goi7.lamBu = { no, theoLoai, toiThieu, lanToiThieu, chon, daTraHomNay }`. Một lệnh mới `hoc-tap-lam-bu-chon { kieu: 'toi_thieu' | 'het' }`.
+- Hai bảng CHỈ-THÊM (goi-bai-7-schema.ts): `no_cau_em(sbd, no, lan, loai_json, den_ngay, luc)` (sổ nợ của em: nợ đầu ngày kế sau `den_ngay`, số lần đã trả tối thiểu, nợ theo loại kể cả lãi) và `no_cau_chon(sbd, ngay, kieu, so, goc, luc)` (lựa chọn mỗi ngày; `goc` = mức gốc của ngày, mức hôm nay = goc + so).
+- Sổ nợ + lựa chọn hôm nay đọc CÙNG câu đọc mức ngày ⇒ ngày thường **0 đợt chờ D1 thêm** trên lệnh nóng. Riêng lần lập ĐẦU TIÊN của ngày (thường là lượt lập sẵn ban đêm, không ai chờ) thêm 1 lô đọc các ngày đã qua + 1 lô ghi (chốt nợ, lựa chọn mặc định «trả tối thiểu», nâng mức hôm nay). Không chốt trong 2 phút đầu ngày (chờ dòng sổ của câu làm lúc 23:59).
+- Tóm tắt trả về trong `goi7.noCau = { no, con, theoLoai: { moi, sua, on, lai }, toiThieu, lan, phaiTraHet, kieu, so, daTra, lai, laiDemNay }`. Một lệnh mới `hoc-tap-no-cau-chon { kieu: 'toi_thieu' | 'het' }`. Mã: `server/src/no-cau.ts` (luật thuần), `server/src/no-cau-d1.ts`, `src/components/hoc-tap/TheNoCau.tsx` (mảnh lười), `src/lib/no-cau-doc.ts`.
 - Kế hoạch ngày: số câu cần = số đã chọn trả + 28, vẫn qua `rut28`. Đáp án không xuống máy trước khi nộp — như mọi chặng hiện nay.
 
 ## 7. Nghiệm thu đo bằng máy
-- `tests/lam-bu-1111.test.ts` — luật thuần: phát sinh nợ, trần 84, tối thiểu 42 → 11 · 8 · 6 rồi ngày thứ tư trả hết 17, trả hết thì đếm lại, sàn 6 câu.
-- `tests/lam-bu-may-chu-1111.test.ts` — chốt nợ một lần mỗi ngày, cổng «chưa trả đủ thì chưa mở bài hôm nay», ngày Kiểm tra ôn tập không bị chặn.
-- `tests/lam-bu-giao-dien-1111.test.tsx` — bốn trạng thái của thẻ, chỉ một nút chính, đổi lựa chọn thì nút chính đổi theo.
+- `tests/no-cau-1111.test.ts` — luật thuần: phát sinh nợ, trần 84, lãi 5 %, tối thiểu 42 → 11 · 9 · 7 rồi ngày thứ tư trả hết 20, trả hết thì đếm lại, sàn 6 câu, suất chia theo tỉ lệ khi mức > 28.
+- `tests/no-cau-may-chu-1111.test.ts` — chốt nợ một lần mỗi ngày, mức hôm nay = 28 + số trả, lập lại không cộng dồn, lệnh đổi lựa chọn, em vắng nhiều ngày tới trần, bảng hỏng thì học như cũ.
+- `tests/no-cau-giao-dien-1111.test.tsx` — bộ đọc chặt, số sống khớp máy chủ, bốn trạng thái của thẻ, bấm ô chọn gửi đúng lệnh rồi nạp lại Sảnh.
 - `npm run build && npm run kiem:toc-do` 0 đỏ; `npm run kiem:mau-giu` 0; `npm run check:mau`.
-- Ảnh Chromium của 9 khung: 0 lỗi trang, 0 tràn ngang, 0 đích bấm dưới 44 px (đã đạt ở bản vẽ).
+- Ảnh Chromium của 9 khung trên component THẬT (`that/`): 0 lỗi trang, 0 tràn ngang, 0 đích bấm dưới 44 px; nút chính nằm trọn trong màn đầu điện thoại 844 px (đáy nút 692–710).
 
-## 8. Sáu điều em tự chọn — thầy muốn khác thì nói
+## 8. Những điều em tự chọn — thầy muốn khác thì nói
 1. Trần nợ 84 câu.
-2. Tối thiểu = 25 % số nợ còn lại, sàn 6 câu; không tính lãi.
+2. Tối thiểu = 25 % số nợ còn lại, sàn 6 câu. Lãi 5 % mỗi đêm trên số còn nợ, làm tròn lên; miễn lãi đêm đầu cho phần thiếu mới; ngày Kiểm tra ôn tập không tính lãi.
 3. «3 ngày» đếm theo số lần em thật sự trả tối thiểu, không đếm ngày em vắng.
 4. Ngày Kiểm tra ôn tập: bài kiểm tra đi trước, làm bù sau.
-5. Bài Kiểm tra ôn tập bỏ lỡ: phần chưa làm thành nợ «Câu ôn»; điểm bài đó vẫn chốt như hiện nay.
+5. Bài Kiểm tra ôn tập bỏ lỡ (không nộp): 28 câu thành nợ «Câu ôn»; đã nộp thì không nợ, kể cả còn câu bỏ trống (đã tính vào điểm). Điểm bài đó vẫn chốt như hiện nay.
 6. Chưa trừ ngày nghỉ có phép (app chưa có chỗ thầy đánh dấu cho việc này).
+7. Nợ tính từ ngày đầu tiên em mở app sau khi phát hành (11/11); các ngày trước đó không tính. Em vắng lâu: chỉ xét 7 ngày gần nhất (đằng nào cũng chạm trần 84).
+8. Số lớn trên thẻ mức là tổng của ngày (ví dụ 0/39 câu), dòng dưới ghi «Trả nợ 11 câu trước, rồi tới 28 câu hôm nay» — bản vẽ ghi 0/28; đổi để số trên thẻ, bình và các chặng là MỘT con số.
+9. Thẻ gọn (đã trả tối thiểu): nút «Trả hết» thay cho «Trả thêm»; đã đủ mức hôm nay thì thẻ nhắc «học thêm câu nào, nợ giảm câu ấy» (không đổi mức, không ảnh hưởng chuỗi).
+
+## 9. Chưa làm ở đợt này
+- Thầy và phụ huynh xem nợ câu của từng em (đợt 2).
+- Nhãn chặng «Trả nợ câu · x/N câu» trong màn làm bài; lời khen của Mol khi trả hết.
+- Trừ ngày nghỉ có phép.
+
