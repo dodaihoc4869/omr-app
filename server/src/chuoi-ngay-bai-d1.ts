@@ -6,7 +6,7 @@
 // Lượt 2–4 lỗi / bảng chưa có ⇒ coi như rỗng; lượt 1 lỗi ⇒ trả null (nơi gọi giữ số cũ, không bịa).
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
-import { chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { chuoiNgayCuaEm, ngayVn, NGAY_CHUOI_DU_MUC, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, NGAY_KT_CHI_28, sqlCotTraNo, type ChuoiNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 
 export const SQL_CHUOI_BINH = [
   'CREATE TABLE IF NOT EXISTS chuoi_binh_mua (id TEXT PRIMARY KEY, sbd TEXT NOT NULL, so INTEGER NOT NULL, nguon TEXT NOT NULL, luc TEXT NOT NULL)',
@@ -18,6 +18,14 @@ const rongNeuLoi = (p: Promise<{ results?: Row[] }>) => p.then((r) => r.results 
 
 export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Promise<NhatKyChuoi> {
   const homNay = ngayVn(nowMs), tu = lui(homNay, SO_NGAY_DOC), tuIso = `${lui(tu, 1)}T00:00:00Z`
+  // (11/11, luật làm bù cứu chuỗi + ngày Kiểm tra ôn tập) CÙNG lệnh đọc mức: `tn` = số câu trả nợ câu đã cộng vào mức hôm ấy (mức gốc = m − tn); các dòng
+  // `kt` ≠ NULL = ngày Kiểm tra ôn tập từ NGAY_KT_CHI_28 (1 đã nộp · 0 chưa nộp) — đọc THẲNG lịch kiểm tra, không phụ thuộc sổ học (em nộp bài trắng vẫn là đã nộp).
+  // Bảng nợ / lịch kiểm tra chưa có ⇒ lệnh lỗi ⇒ đọc lại câu cũ (chỉ mức).
+  const docMuc = (moi: boolean) => (moi
+    ? env.DB.prepare(`SELECT m.ngay AS n, m.muc AS m, ${sqlCotTraNo('m.sbd', 'm.ngay')} AS tn, NULL AS kt FROM goi_bai_7_muc_ngay m WHERE m.sbd = ?1 AND m.ngay >= ?2 AND m.ngay <= ?3
+        UNION ALL SELECT k.ngay, 0, NULL, MAX(CASE WHEN k.trang_thai = 'da_nop' THEN 1 ELSE 0 END) FROM kiem_tra_ca_nhan k
+          WHERE k.sbd = ?1 AND k.ngay >= '${NGAY_KT_CHI_28}' AND k.ngay <= ?3 AND k.trang_thai <> 'cho_nguon' GROUP BY k.ngay`)
+    : env.DB.prepare('SELECT ngay AS n, muc AS m FROM goi_bai_7_muc_ngay WHERE sbd = ?1 AND ngay >= ?2 AND ngay <= ?3')).bind(sbd, NGAY_CHUOI_DU_MUC, homNay).all<Row>()
   const [sk, sua, phep, mua, muc] = await Promise.all([
     // c7 (02/11): câu tính mức = sổ + câu HỌC CÁCH GIẢI chưa có trong sổ (SQL_SO_CAU_MUC) — đúng số «Đủ x/y câu» của Lộ trình. Chỉ ngày từ mốc mới đọc thêm.
     env.DB.prepare(`SELECT ngay_vn AS n, COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) AS c, CASE WHEN ngay_vn >= ? THEN ${SQL_SO_CAU_MUC} ELSE 0 END AS c7
@@ -27,7 +35,7 @@ export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Prom
     rongNeuLoi(env.DB.prepare("SELECT DISTINCT date(b.mo_luc, '+7 hours') AS n FROM buoi_hoc_diem_danh d JOIN buoi_hoc b ON b.id = d.buoi_id WHERE d.sbd = ? AND d.trang_thai = 'co_phep' AND b.mo_luc >= ?").bind(sbd, tuIso).all<Row>()),
     rongNeuLoi(env.DB.prepare(`SELECT ${SQL_COT_BINH_MUA} FROM chuoi_binh_mua m WHERE m.sbd = ? AND m.luc >= ? GROUP BY n`).bind(sbd, tuIso).all<Row>()),
     // (28/10) mức câu đã chốt từng ngày — luật chuỗi «đủ mức hôm nay». Cùng đợt (song song), không thêm vòng chờ.
-    rongNeuLoi(env.DB.prepare('SELECT ngay AS n, muc AS m FROM goi_bai_7_muc_ngay WHERE sbd = ? AND ngay >= ? AND ngay <= ?').bind(sbd, NGAY_CHUOI_DU_MUC, homNay).all<Row>()),
+    rongNeuLoi(docMuc(true).catch(() => docMuc(false))),
   ])
   const ngay = (x: Row) => String(x.n ?? '')
   return {
@@ -37,6 +45,8 @@ export async function docNhatKyChuoi(env: Env, sbd: string, nowMs: number): Prom
     mua: new Map(mua.map((x) => [ngay(x), Number(x.s) || 0] as const)),
     soCau7: new Map((sk.results ?? []).filter((x) => ngay(x) >= NGAY_CHUOI_DU_MUC).map((x) => [ngay(x), Number(x.c7) || 0] as const)),
     muc: new Map(muc.filter((x) => Number(x.m) > 0).map((x) => [ngay(x), Number(x.m)] as const)),
+    traNo: new Map(muc.filter((x) => Number(x.tn) > 0).map((x) => [ngay(x), Number(x.tn)] as const)),
+    kt: new Map(muc.filter((x) => x.kt === 0 || x.kt === 1).map((x) => [ngay(x), x.kt === 1] as const)),
     datLai: new Set(mua.filter((x) => Number(x.r) === 1).map(ngay).filter(Boolean)),
   }
 }

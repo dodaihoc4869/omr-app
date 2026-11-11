@@ -14,7 +14,8 @@ export type KieuNgay = 'hoc' | 'binh' | 'phep' | 'tat' | 'cuu' | 'cho'
 export interface NgayChuoi { ngay: string; kieu: KieuNgay }
 export interface ChuoiNgay {
   so: number; giuChuoi: number; sucChua: number; lich7: NgayChuoi[]
-  cuu?: { hetHan: number; daLam: number; can: number; so?: number }
+  /** `cau` (11/11, luật làm bù): `daLam` / `can` tính theo CÂU (thiếu bao nhiêu bù bấy nhiêu), `ngayLo` = ngày lỡ cũ nhất đang chờ bù; vắng ⇒ luật cũ, tính theo chặng. */
+  cuu?: { hetHan: number; daLam: number; can: number; so?: number; cau?: true; ngayLo?: string }
   binhVuaDo?: string
   /** (gộp đợt 3) lịch 30 ngày gần nhất + chuỗi dài nhất — máy chủ chỉ gửi ở /hs/thuong; vắng ⇒ màn chỉ hiện lịch tuần, ẩn ô «chuỗi dài nhất». */
   lich30?: NgayChuoi[]
@@ -121,7 +122,7 @@ export function docChuoiNgay(x: unknown): ChuoiNgay | undefined {
   const cu = dt(o.cuu), het = docMoc(cu?.hetHan), da = soNg(cu?.daLam), can = soNg(cu?.can)
   // máy chủ B3 gửi số chuỗi cũ ở `soCu` (hợp đồng ban đầu ghi `so`) — đọc cả hai
   const soCu = soNg(cu?.soCu) || soNg(cu?.so)
-  if (cu && het !== undefined && da !== undefined && can) kq.cuu = { hetHan: het, daLam: da, can, ...(soCu ? { so: soCu } : {}) }
+  if (cu && het !== undefined && da !== undefined && can) kq.cuu = { hetHan: het, daLam: da, can, ...(soCu ? { so: soCu } : {}), ...(cu.cau === true ? { cau: true as const, ...(chu(cu.ngayLo) ? { ngayLo: chu(cu.ngayLo) } : {}) } : {}) }
   const bv = chu(o.binhVuaDo); if (bv) kq.binhVuaDo = bv
   const l30 = mang(o.lich30, docNgay); if (l30?.length) kq.lich30 = l30.slice(-30)
   const dn = soNg(o.daiNhat); if (dn !== undefined) kq.daiNhat = Math.max(dn, s)

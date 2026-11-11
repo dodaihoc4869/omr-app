@@ -7,7 +7,7 @@
 // dựng `NhatKyChuoi` từng em và gọi đúng hàm thuần của B3 ⇒ số giống hệt màn học sinh (cửa sổ đọc ≤ SO_NGAY_DOC của B3).
 import type { D1PreparedStatement, Env } from './kieu'
 import { themNgay } from './ho-so-nam-kt'
-import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
+import { CAU_MOT_BAI, chuoiNgayCuaEm, ngayDatChuoi, ngayVn as ngayVnMs, NGAY_CHUOI_DU_MUC, phepConGiuChuoi, SO_NGAY_DOC, SQL_CO_KET_QUA_HOAC_LUOT, SQL_COT_BINH_MUA, SQL_SO_CAU_MUC, sqlCotKt, sqlCotTraNo, type ChuoiNgay, type KieuNgay, type NhatKyChuoi } from './chuoi-ngay-bai'
 import { str, num, type Row } from './thuong-b-chung'
 import { laNgayBaoTri } from './ngay-bao-tri'
 
@@ -25,7 +25,8 @@ export const sqlSoCau = (tapEm: string = TAP_EM_JSON): string =>
   // (28/10) + c7 = câu tính MỨC (đúng tập Gói 7; 02/11 + câu học cách giải, SQL_SO_CAU_MUC — một số với B3) · m = mức câu đã chốt của ngày — luật chuỗi «đủ mức hôm nay» (chỉ ngày từ NGAY_CHUOI_DU_MUC).
   `SELECT sbd, ngay_vn AS n, COUNT(DISTINCT CASE WHEN ket_qua IS NOT NULL THEN qid END) AS c,
       CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN ${SQL_SO_CAU_MUC} ELSE 0 END AS c7,
-      CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN (SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn) END AS m
+      CASE WHEN ngay_vn >= '${NGAY_CHUOI_DU_MUC}' THEN (SELECT g.muc FROM goi_bai_7_muc_ngay g WHERE g.sbd = su_kien_hoc.sbd AND g.ngay = su_kien_hoc.ngay_vn) END AS m,
+      ${sqlCotTraNo('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')} AS tn, ${sqlCotKt('su_kien_hoc.sbd', 'su_kien_hoc.ngay_vn')} AS kt
     FROM su_kien_hoc WHERE sbd IN ${tapEm} AND ngay_vn BETWEEN ?2 AND ?3 AND ${SQL_CO_KET_QUA_HOAC_LUOT} GROUP BY sbd, ngay_vn`
 /** Ngày tự sửa xong (B3). `?2` = ngày đầu cửa sổ. Chỉ mục idx_cld_sbd_trang_thai(sbd, trang_thai_day, …). */
 export const sqlTuSua = (tapEm: string = TAP_EM_JSON): string =>
@@ -51,19 +52,22 @@ export function cauNhatKy(env: Env, tapEm: string, thamSo1: string, tu: string, 
 export const cauNhatKyDs = (env: Env, dsSbd: readonly string[], tu: string, den: string): D1PreparedStatement[] =>
   cauNhatKy(env, TAP_EM_JSON, JSON.stringify([...new Set(dsSbd)]), tu, den)
 
-type NhatKyGhi = { soCau: Map<string, number>; tuSua: Set<string>; phep: Set<string>; mua: Map<string, number>; datLai: Set<string>; soCau7: Map<string, number>; muc: Map<string, number> }
+type NhatKyGhi = { soCau: Map<string, number>; tuSua: Set<string>; phep: Set<string>; mua: Map<string, number>; datLai: Set<string>; soCau7: Map<string, number>; muc: Map<string, number>; traNo: Map<string, number>; kt: Map<string, boolean> }
 /** Gộp kết quả bốn câu ⇒ sbd → NhatKyChuoi (đúng kiểu của B3). */
 export function gopNhatKy(rSo: Row[] | undefined, rSua: Row[] | undefined, rPhep: Row[] | undefined, rMua: Row[] | undefined): Map<string, NhatKyChuoi> {
   const ra = new Map<string, NhatKyGhi>()
   const lay = (sbd: string): NhatKyGhi => {
     let m = ra.get(sbd)
-    if (!m) ra.set(sbd, (m = { soCau: new Map(), tuSua: new Set(), phep: new Set(), mua: new Map(), datLai: new Set(), soCau7: new Map(), muc: new Map() }))
+    if (!m) ra.set(sbd, (m = { soCau: new Map(), tuSua: new Set(), phep: new Set(), mua: new Map(), datLai: new Set(), soCau7: new Map(), muc: new Map(), traNo: new Map(), kt: new Map() }))
     return m
   }
   for (const x of rSo ?? []) {
     const m = lay(str(x.sbd)), n = str(x.n)
     m.soCau.set(n, num(x.c))
     if (n >= NGAY_CHUOI_DU_MUC) { m.soCau7.set(n, num(x.c7)); if (num(x.m) > 0) m.muc.set(n, num(x.m)) }
+    // (11/11) phần trả nợ câu của ngày (mức gốc = m − tn) · ngày Kiểm tra ôn tập đã nộp / chưa nộp — cùng luật với chuỗi một em (chuoi-ngay-bai-d1.ts)
+    if (num(x.tn) > 0) m.traNo.set(n, num(x.tn))
+    if (x.kt === 0 || x.kt === 1) m.kt.set(n, x.kt === 1)
   }
   for (const x of rSua ?? []) if (str(x.n)) lay(str(x.sbd)).tuSua.add(str(x.n))
   for (const x of rPhep ?? []) if (str(x.n)) lay(str(x.sbd)).phep.add(str(x.n))

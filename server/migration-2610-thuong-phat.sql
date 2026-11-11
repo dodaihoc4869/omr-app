@@ -94,6 +94,9 @@ CREATE INDEX IF NOT EXISTS idx_thuong_bai_xong_ngay_chung ON thuong_bai_xong(nga
 -- Mức câu hôm nay của Gói 7: bảng vốn do goi-bai-7-schema.ts dựng lúc chạy (đã có trên D1 thật — câu này không làm gì ở đó). Khai lại ĐÚNG định nghĩa
 -- để lệnh /hs/thuong và câu cuối bài đọc được mục tiêu ngày ngay cả ở môi trường chưa mở Gói 7 lần nào.
 CREATE TABLE IF NOT EXISTS goi_bai_7_muc_ngay (sbd TEXT NOT NULL,ngay TEXT NOT NULL,tang INTEGER NOT NULL,toi_thieu_tang INTEGER NOT NULL,quota INTEGER NOT NULL,muc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay));
+-- (11/11) Lựa chọn trả nợ câu mỗi ngày: bảng vốn do goi-bai-7-schema.ts dựng lúc chạy (đã có trên D1 thật). Khai lại ĐÚNG định nghĩa vì câu đọc chuỗi
+-- (thuong-ngay-hoc.ts `sqlSoCau`, luật làm bù cứu chuỗi) đọc cột `so` của bảng này ⇒ phải luôn chạy được, kể cả ở môi trường chưa mở Gói 7 lần nào.
+CREATE TABLE IF NOT EXISTS goi_bai_7_no_chon (sbd TEXT NOT NULL,ngay TEXT NOT NULL,kieu TEXT NOT NULL,so INTEGER NOT NULL,goc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay));
 
 -- Mốc bắt đầu của hệ (ngày VN chạy migration): thăng hoa / cược chỉ xét ngày ≥ mốc (trước mốc chưa có dữ liệu «bài xong»).
 INSERT OR IGNORE INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES ('thuong_moc', date('now', '+7 hours'), datetime('now'));
