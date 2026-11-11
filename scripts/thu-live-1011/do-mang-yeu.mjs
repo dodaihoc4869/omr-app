@@ -44,12 +44,19 @@ function baiViet() {
 const GOI_TOI_DA = 110, MAU = 'rgb(244,239,228)'
 
 /** Một lượt. `cu` = máy em bản cũ (không xin đường phụ) · `cuThay` = máy thầy gửi theo luật cũ (mặc định theo `cu`). `o`: { duong: 'dc' | 'ws', rung, mat, chum, dut: [chu kì ms, dài ms], don, dcRot, hol, fps, tron } */
-function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
+function chay(taoDemPhat, cu, o, hat, cuThay = cu, nhipCu = cuThay) {
   const rn = taoNgauNhien(hat), bai = baiViet(), LECH = 987_654, TRE = 30
   const tHet = bai[bai.length - 1][bai[bai.length - 1].length - 1][3] + 600
+  // bản mới: phòng nhận 60 lô / giây ⇒ WebSocket 17 ms một lô (o.phongCu: phòng chưa đẩy bản mới ⇒ 27 ms); lô đầu của mỗi nét đi ngay
+  // (`nhipCu` = nhịp gửi của bản #1614: 34 ms, lô đầu không được ưu tiên). Lớp có em mạng xấu (độ đệm em báo về > 200 ms, máy thầy biết sau ~1 giây) ⇒ về 34 ms
   const KEM = cuThay ? 1 : 3
+  let dBao = 0, dBaoLuc = 0
+  // WebSocket: 34 ms một lô (đã thử 17 ms + lô đầu của nét đi ngay: o.wsDay — em mạng xấu đứng nhiều hơn nên không dùng)
+  const cachWs = () => (o.wsDay && !nhipCu && dBao <= 200 ? 17 : 34)
   // quãng đứt: bắt đầu ở giây 3, lặp theo chu kì
   const dutLuc = (t) => { if (!o.dut) return null; const [ck, dai] = o.dut, k = Math.floor((t - 3000) / ck); if (t < 3000) return null; const a = 3000 + k * ck; return t < a + dai ? a + dai : null }
+  // rung: cả buổi (o.rung) hoặc chỉ trong một quãng (o.rungDoan = [từ, tới, ms])
+  const rungLuc = (t) => (o.rungDoan ? (t >= o.rungDoan[0] && t < o.rungDoan[1] ? o.rungDoan[2] : 0) : o.rung || 0)
   const coDcEm = (t) => o.duong === 'dc' && !(o.dcRot && t >= o.dcRot)
   // ── đường truyền ──
   const toi = [] // { nhan, g, ws } — luôn xếp theo giờ tới (gói tới sau không được chặn gói tới trước)
@@ -62,10 +69,10 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
     // mất theo chùm (Gilbert): trạng thái xấu mất 70 %, vào xấu với xác suất sao cho tỉ lệ mất trung bình ≈ o.mat
     if (o.chum) { xau = xau ? rn() < 0.75 : rn() < (o.mat / 100) / 2.8; if (xau && rn() < 0.7) return }
     else if (rn() < (o.mat || 0) / 100) return
-    xep({ nhan: t + TRE + rn() * (o.rung || 0), g, ws: false })
+    xep({ nhan: t + TRE + rn() * rungLuc(t), g, ws: false })
   }
   const guiWs = (g, t) => {
-    let den = t + TRE + rn() * Math.min(o.rung || 0, 60)
+    let den = t + TRE + rn() * (o.duong === 'ws' ? rungLuc(t) : Math.min(rungLuc(t), 60))
     const het = dutLuc(t)
     if (het != null) den = het + 60 + rn() * 80
     else if (rn() < (o.hol ?? (o.mat || 0) / 100 / 2)) den += 200 + rn() * 600 // gói phải gửi lại: chặn cả hàng
@@ -80,7 +87,7 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
   const xa = (t, cuoiNet) => {
     henXa = null
     const canWs = xemWs > 0, dcDuoc = cuoiNet || t - lucDc >= 12
-    let wsDuoc = canWs && (cuoiNet || t - lucWs >= 34), conDc = false, conWs = false, daDc = false
+    let wsDuoc = canWs && (cuoiNet || t - lucWs >= cachWs()), conDc = false, conWs = false, daDc = false
     for (const s of st) {
       const tong = s.daMoi
       if (!tong || s.xong) continue
@@ -107,7 +114,7 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
       if (xong) troCho = null
     }
     if (daDc) lucDc = t
-    if (conDc) henXa = t + Math.max(1, 12 - (t - lucDc)); else if (conWs) henXa = t + Math.max(1, 34 - (t - lucWs))
+    if (conDc) henXa = t + Math.max(1, 12 - (t - lucDc)); else if (conWs) henXa = t + Math.max(1, cachWs() - (t - lucWs))
   }
   const chot = [] // bản chốt từ sổ nét: { nhan, id, diem }
   const nhacLai = [] // tin nhấc nhắc lại có hẹn: { luc, g }
@@ -119,7 +126,7 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
     if (t < khungThay) return
     khungThay += 1000 / 60
     let co = false
-    for (const s of st) { if (s.xong) continue; let n = s.daMoi; while (n < s.m.length && s.m[n][3] <= t) n++; if (n > s.daMoi) { co = true; s.daMoi = n } }
+    for (const s of st) { if (s.xong) continue; let n = s.daMoi; while (n < s.m.length && s.m[n][3] <= t) n++; if (n > s.daMoi) { co = true; if (!s.daMoi && o.wsDay && !nhipCu) lucDc = lucWs = -1e9; s.daMoi = n } }
     const p = tro(t)
     if (p && t - lucTro > 15) { lucTro = t; troCho = p; co = true }
     if (co) xa(t + 0.5, false)
@@ -140,7 +147,8 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
   const dem = taoDemPhat({}), khungEm = 1000 / (o.fps || 60), tr = (v) => (o.tron ? Math.round(v) : v)
   const tNet = new Map(bai.map((m, i) => ['n' + i, m]))
   const daPhat = new Map(), tDauTruoc = new Map()
-  let dNay = 0, luotEm = 7, troWs = false, suaHinh = 0
+  const dBaoCho = []
+  let dNay = 0, veSan = 0, dTruocRung = 0, luotEm = 7, troWs = false, suaHinh = 0
   let dungNay = 0, dungDai = 0, dungHon100 = 0, vut = 0, troNhay = 0, troTruoc = null, lucTroTruoc = 0
   const tre = [], tiLe = [], ds = []
   const buocEm = (t) => {
@@ -162,6 +170,9 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
     }
     const k = dem.khung(nay)
     ds.push(k.d); dNay = k.d
+    if (t - dBaoLuc >= 1000) { dBaoLuc = t; dBaoCho.push({ luc: t + 1000, v: k.d }) }
+    while (dBaoCho.length && dBaoCho[0].luc <= t) dBao = dBaoCho.shift().v
+    if (o.rungDoan && t > o.rungDoan[1]) { if (k.d > dTruocRung + 6) veSan = t - o.rungDoan[1]; } else if (o.rungDoan && t < o.rungDoan[0]) dTruocRung = k.d
     // đường phụ: máy em báo phòng, máy thầy biết sau 250 ms (đang đứt thì khi mạng có lại)
     if (!cu && dem.canTro && o.duong === 'dc') { const can = dem.canTro(nay) || !coDcEm(t); if (can !== troWs) { troWs = can; xemWsDoi = { luc: (dutLuc(t) ?? t) + 250, v: can ? 1 : 0 } } }
     else if (o.dcRot && t >= o.dcRot && !troWs) { troWs = true; xemWsDoi = { luc: t + 250, v: 1 } } // bản cũ: kênh đóng thì cũng báo
@@ -192,13 +203,20 @@ function chay(taoDemPhat, cu, o, hat, cuThay = cu) {
   if (dungNay > 100) dungHon100++
   const s = (a) => [...a].sort((x, y) => x - y), pv = (a, p) => { const b = s(a); return b.length ? +b[Math.min(b.length - 1, Math.floor(b.length * p))].toFixed(1) : 0 }
   const tb = tiLe.reduce((x, y) => x + y, 0) / Math.max(1, tiLe.length), ps = tiLe.reduce((x, y) => x + (y - tb) * (y - tb), 0) / Math.max(1, tiLe.length)
-  return { dungHon100, dungDaiNhatMs: Math.round(dungDai), hienVut: vut, doDeu: +(Math.sqrt(ps) / (tb || 1)).toFixed(2), treTrungVi: pv(tre, 0.5), treP95: pv(tre, 0.95), troNhay, suaHinh, dTrungVi: pv(ds, 0.5), dLonNhat: pv(ds, 1) }
+  return { dungHon100, dungDaiNhatMs: Math.round(dungDai), hienVut: vut, doDeu: +(Math.sqrt(ps) / (tb || 1)).toFixed(2), treTrungVi: pv(tre, 0.5), treP95: pv(tre, 0.95), troNhay, suaHinh, dTrungVi: pv(ds, 0.5), dLonNhat: pv(ds, 1), ...(o.rungDoan ? { veSanMs: Math.round(veSan) } : {}) }
 }
 
-const moi = await nap(GOC, 'moi'), cuTao = process.env.GOC_CU ? await nap(resolve(process.env.GOC_CU), 'cu') : null
+const moi = await nap(GOC, 'moi'), cuTao = process.env.GOC_CU ? await nap(resolve(process.env.GOC_CU), 'cu') : null, tao1614 = process.env.GOC_1614 ? await nap(resolve(process.env.GOC_1614), 'b1614') : null
+// SO_HAT=<n> ⇒ trung vị của n hạt ngẫu nhiên (mặc định 5)
+const HAT = Array.from({ length: Number(process.env.SO_HAT) || 5 }, (_, i) => i + 1)
 const KICH_BAN = [
   ['Mạng tốt (rung 0, mất 0)', { duong: 'dc' }],
   ['Mạng tốt, đường WebSocket', { duong: 'ws', hol: 0 }],
+  ['(đã thử, không dùng) WebSocket 17 ms một lô · mạng tốt', { duong: 'ws', hol: 0, wsDay: true }],
+  ['(đã thử, không dùng) WebSocket 17 ms một lô · 5 % gói bị chặn đầu hàng', { duong: 'ws', rung: 30, hol: 0.05, wsDay: true }],
+  ['Rung 30 ms · mất 0 %', { duong: 'dc', rung: 30 }],
+  ['Rung 150 ms trong 5 giây (giây 4–9) rồi tốt lại', { duong: 'dc', rungDoan: [4000, 9000, 150] }],
+  ['Rung 150 ms trong 5 giây rồi tốt lại · đường WebSocket', { duong: 'ws', hol: 0, rungDoan: [4000, 9000, 150] }],
   ['Mất gói 5 % · rung 30', { duong: 'dc', mat: 5, rung: 30 }],
   ['Mất gói 15 % · rung 30', { duong: 'dc', mat: 15, rung: 30 }],
   ['Mất gói 30 % · rung 30', { duong: 'dc', mat: 30, rung: 30 }],
@@ -217,21 +235,24 @@ const KICH_BAN = [
   ['iPhone 30 khung/giây, đồng hồ 1 ms · mạng tốt', { duong: 'dc', fps: 30, tron: true }],
   ['iPhone 30 khung/giây · «Wi-Fi 1 vạch»', { duong: 'dc', mat: 15, chum: true, rung: 150, dut: [5000, 500], fps: 30, tron: true }],
 ]
-const in1 = (r) => `đứng > 100 ms: ${r.dungHon100} lần, dài nhất ${r.dungDaiNhatMs} ms · hiện vụt ${r.hienVut} · độ đều ${r.doDeu} · trễ ${r.treTrungVi} / p95 ${r.treP95} ms · con trỏ nhảy ${r.troNhay} · sửa hình ${r.suaHinh} nét · D ${r.dTrungVi} (lớn nhất ${r.dLonNhat})`
+const in1 = (r) => `đứng > 100 ms: ${r.dungHon100} lần, dài nhất ${r.dungDaiNhatMs} ms · hiện vụt ${r.hienVut} · độ đều ${r.doDeu} · trễ ${r.treTrungVi} / p95 ${r.treP95} ms · con trỏ nhảy ${r.troNhay} · sửa hình ${r.suaHinh} nét · D ${r.dTrungVi} (lớn nhất ${r.dLonNhat})${r.veSanMs != null ? ` · VỀ SÀN sau ${r.veSanMs} ms` : ''}`
 const kq = []
 for (const [ten, o] of KICH_BAN) {
   if (process.env.CHI && !ten.includes(process.env.CHI)) continue
   if (process.env.TUNG_HAT && cuTao) { for (const [nhan, tao, cu, cuThay] of [['TRƯỚC', cuTao, true, true], ['CHÉO', cuTao, true, false], ['SAU', moi, false, false]]) console.log(ten, nhan, 'con trỏ nhảy theo hạt:', [1, 2, 3, 4, 5, 6, 7, 8, 9].map((h) => chay(tao, cu, o, h * 13, cuThay).troNhay).join(' ')); continue }
   if (process.env.SOI) { console.log(ten, JSON.stringify(chay(moi, false, o, 13))); continue }
   // trung vị của 5 hạt ngẫu nhiên cho từng số đo
-  const tv = (tao, cu, cuThay = cu) => { const ds = [1, 2, 3, 4, 5].map((h) => chay(tao, cu, o, h * 13, cuThay)), ra = {}; for (const k of Object.keys(ds[0])) ra[k] = [...ds.map((d) => d[k])].sort((a, b) => a - b)[2]; return ra }
+  const tv = (tao, cu, cuThay = cu, nhipCu = cuThay) => { const ds = HAT.map((h) => chay(tao, cu, o, h * 13, cuThay, nhipCu)), ra = {}; for (const k of Object.keys(ds[0])) ra[k] = [...ds.map((d) => d[k])].sort((a, b) => a - b)[HAT.length >> 1]; return ra }
   const dong = { kichBan: ten, cauHinh: o }
+  // GOC_1614=<cây của bản #1614> ⇒ cột «bản #1614» (đệm phát #1614 + luật gửi #1614: gói kèm 3 lô, 34 ms một lô WebSocket)
+  if (tao1614) dong.ban1614 = tv(tao1614, false, false, true)
   if (cuTao) dong.truoc = tv(cuTao, true)
   dong.sau = tv(moi, false)
   // TƯƠNG THÍCH NGƯỢC: máy em BẢN CŨ (tab chưa tải lại) nhận gói của máy thầy bản mới
   if (cuTao && process.env.CHEO) dong.emCuThayMoi = tv(cuTao, true, false)
   kq.push(dong)
   console.log(`[${ten}]`)
+  if (dong.ban1614) console.log('   #1614: ' + in1(dong.ban1614))
   if (dong.truoc) console.log('   TRƯỚC: ' + in1(dong.truoc))
   console.log('   SAU:   ' + in1(dong.sau))
   if (dong.emCuThayMoi) console.log('   EM CŨ + THẦY MỚI: ' + in1(dong.emCuThayMoi))

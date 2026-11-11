@@ -36,6 +36,8 @@ async function do1(trinh, tep, ten, cpu, dung) {
   const t = await ctx.newPage()
   const loi = []
   t.on('pageerror', (e) => loi.push(e.message))
+  // phép đo này soi lớp mực phủ cả tờ (`canvas.mc-but`) ⇒ tắt lớp bảng đặc (12/11); lớp bảng đặc đo riêng ở do-bang-nhanh.mjs
+  await t.addInitScript(() => { try { localStorage.setItem('ddh.but.nhanh', 'tat') } catch { /* không có kho */ } })
   await t.addInitScript((V) => {
     const D = (window.__nh = { bat: false, cham: false, khung: [], anh: {}, danh: '', nhac: -1 })
     const raf = window.requestAnimationFrame.bind(window)

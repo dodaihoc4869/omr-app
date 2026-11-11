@@ -1,6 +1,6 @@
 // @vitest-environment node
 // LIVE BẢNG — đệm phát + nội suy nét phía máy em (src/lib/live/noi-suy.ts, đặc tả mục 4.4). Chuỗi giờ tới GIẢ: đều · dao động 80 ms · mất 10 %.
-// Khoá: đầu nét tiến mỗi khung hình, KHÔNG BAO GIỜ lùi; D trong 22–150 ms (sàn 30 → 22 từ 11/11), đổi ≤ 2 ms mỗi khung; đồng hồ hai máy lệch bất kỳ vẫn đúng;
+// Khoá: đầu nét tiến mỗi khung hình, KHÔNG BAO GIỜ lùi; D trong 14–150 ms ở các kịch bản này (sàn 30 → 22 từ 11/11, → 14 từ 12/11; trần 450), đổi ≤ 2 ms mỗi khung; đồng hồ hai máy lệch bất kỳ vẫn đúng;
 // hết điểm thì giữ đầu nét (không đoán xa); đồng bộ tiếng–nét theo trễ tiếng.
 import { describe, expect, it } from 'vitest'
 import type { DiemBut } from '../src/lib/but-bang-loi'
@@ -50,7 +50,7 @@ function chay(kb: KichBan, tuy?: Parameters<typeof taoDemPhat>[0]) {
   }
   return { ra, diem, ds, lui, xong, khungViet, khungDung, dungDaiNhat, soDo: dem.soDo(t0 + 99_999) }
 }
-const dTrongKhoang = (ds: number[], a = 22, b = 150) => ds.every((d) => d >= a - 1e-9 && d <= b + 1e-9)
+const dTrongKhoang = (ds: number[], a = 14, b = 150) => ds.every((d) => d >= a - 1e-9 && d <= b + 1e-9)
 const buocToiDa = (ds: number[]) => Math.max(...ds.slice(1).map((d, i) => Math.abs(d - ds[i]!)))
 
 describe('đệm phát nét', () => {
@@ -104,7 +104,7 @@ describe('đệm phát nét', () => {
     for (let t = 1100; t < 3000; t += 16) { const n = dem.khung(t).net[0]; if (n?.head) cuoi = n.head; expect(n?.xong ?? false).toBe(false) }
     expect(cuoi).toMatchObject({ x: 0.2, y: 0.2 })
     const yeu = taoDemPhat({ mayYeu: true })
-    expect(yeu.khung(0).d).toBeGreaterThanOrEqual(38) // sàn 22 (11/11) + 16
+    expect(yeu.khung(0).d).toBeGreaterThanOrEqual(30) // sàn 14 (12/11) + 16
   })
   it('con trỏ lơ lửng: nội suy theo cùng mốc phát; đứng yên quá 1,5 giây không có gói ⇒ ẩn', () => {
     const dem = taoDemPhat()

@@ -1,0 +1,240 @@
+{
+  "luc": "2026-11-11T07:19:08.598Z",
+  "may": "Chromium không đầu /opt/pw-browsers (vẽ bằng phần mềm, KHÔNG cấp desynchronized ⇒ lớp bảng đặc phải ép bật), 1920 × 1080, bút 200 Hz qua CDP",
+  "matDo": [
+    {
+      "matDo": 1,
+      "thuong": {
+        "nhanh": {
+          "bat": false,
+          "duoc": 0,
+          "cap": true
+        },
+        "coLopBang": false
+      },
+      "bangDac": {
+        "nhanh": {
+          "bat": true,
+          "duoc": 2,
+          "cap": true
+        },
+        "coLopBang": true,
+        "lopBang": {
+          "diemAnh": [
+            630,
+            873
+          ],
+          "hienTaiDiemAnhThietBi": [
+            1280,
+            120,
+            630,
+            873
+          ]
+        },
+        "sauDoiCo": {
+          "bat": true,
+          "duoc": 2,
+          "cap": true
+        }
+      },
+      "soNet": [
+        24,
+        24
+      ],
+      "soAnh": {
+        "1-viet": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "1920 × 1080"
+        },
+        "2-cuon": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "1920 × 1080"
+        },
+        "3-viet-tiep": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "1920 × 1080"
+        },
+        "4-hoan-tac": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "1920 × 1080"
+        },
+        "5-tay": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "1920 × 1080"
+        },
+        "6-doi-co": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "1600 × 900"
+        }
+      },
+      "khongNhay": {
+        "thuong": {
+          "khungViet": 376,
+          "mucLui16": 74,
+          "luiLon": 78,
+          "netUotKho": 17,
+          "netUotKhacKho": 0,
+          "diemAnhUotKhacKho": 0
+        },
+        "bangDac": {
+          "khungViet": 379,
+          "mucLui16": 80,
+          "luiLon": 69,
+          "netUotKho": 17,
+          "netUotKhacKho": 0,
+          "diemAnhUotKhacKho": 0
+        }
+      },
+      "khung": {
+        "×1": {
+          "thuong": {
+            "msMoiKhung": 0.271,
+            "msKhungLon": 4.5,
+            "khungMoiGiay": 60
+          },
+          "bangDac": {
+            "msMoiKhung": 0.317,
+            "msKhungLon": 2.8,
+            "khungMoiGiay": 60
+          }
+        },
+        "×4": {
+          "thuong": {
+            "msMoiKhung": 1.326,
+            "msKhungLon": 12.2,
+            "khungMoiGiay": 36
+          },
+          "bangDac": {
+            "msMoiKhung": 1.375,
+            "msKhungLon": 14.7,
+            "khungMoiGiay": 39
+          }
+        }
+      },
+      "loiTrang": []
+    },
+    {
+      "matDo": 1.5,
+      "thuong": {
+        "nhanh": {
+          "bat": false,
+          "duoc": 0,
+          "cap": true
+        },
+        "coLopBang": false
+      },
+      "bangDac": {
+        "nhanh": {
+          "bat": true,
+          "duoc": 2,
+          "cap": true
+        },
+        "coLopBang": true,
+        "lopBang": {
+          "diemAnh": [
+            945,
+            1310
+          ],
+          "hienTaiDiemAnhThietBi": [
+            1920,
+            180,
+            945,
+            1309.992
+          ]
+        },
+        "sauDoiCo": {
+          "bat": true,
+          "duoc": 2,
+          "cap": true
+        }
+      },
+      "soNet": [
+        24,
+        24
+      ],
+      "soAnh": {
+        "1-viet": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "2880 × 1620"
+        },
+        "2-cuon": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "2880 × 1620"
+        },
+        "3-viet-tiep": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "2880 × 1620"
+        },
+        "4-hoan-tac": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "2880 × 1620"
+        },
+        "5-tay": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 0,
+          "lechLonNhat": 0,
+          "coAnh": "2880 × 1620"
+        },
+        "6-doi-co": {
+          "diemAnhKhacVungGiay": 0,
+          "diemAnhKhacVungBang": 3160,
+          "lechLonNhat": 244,
+          "coAnh": "2400 × 1350"
+        }
+      },
+      "khongNhay": {
+        "thuong": {
+          "khungViet": 377,
+          "mucLui16": 155,
+          "luiLon": 80,
+          "netUotKho": 17,
+          "netUotKhacKho": 0,
+          "diemAnhUotKhacKho": 0
+        },
+        "bangDac": {
+          "khungViet": 377,
+          "mucLui16": 145,
+          "luiLon": 93,
+          "netUotKho": 17,
+          "netUotKhacKho": 0,
+          "diemAnhUotKhacKho": 0
+        }
+      },
+      "khung": {
+        "×1": {
+          "thuong": {
+            "msMoiKhung": 0.305,
+            "msKhungLon": 3.8,
+            "khungMoiGiay": 60
+          },
+          "bangDac": {
+            "msMoiKhung": 0.286,
+            "msKhungLon": 0.8,
+            "khungMoiGiay": 60
+          }
+        }
+      },
+      "loiTrang": []
+    }
+  ]
+}
