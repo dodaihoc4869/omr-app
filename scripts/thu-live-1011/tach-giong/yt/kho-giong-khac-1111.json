@@ -1,0 +1,126 @@
+{
+ "ngay": "2026-11-11",
+ "thuMucTrongPhien": "scratchpad/giong-khac-mo/<kho>/<người>/*.flac + <kho>/ds.json (tiếng KHÔNG vào git)",
+ "kho": {
+  "aishell": {
+   "ten": "AISHELL-1 (OpenSLR 33) — 60 người đầu, ≤ 3 phút / người",
+   "giayPhep": "Apache 2.0",
+   "noiBo": false,
+   "sr_goc": [
+    16000
+   ],
+   "nguoiLuyen": 52,
+   "nguoiCham": 8,
+   "namNuLuyen": [
+    21,
+    31
+   ],
+   "gioLuyen": 2.64,
+   "gioCham": 0.4,
+   "ghiChu": "tiếng Trung (có thanh điệu) — đa dạng giọng"
+  },
+  "demand": {
+   "ten": "DEMAND (Zenodo 1227121) — OMEETING / PCAFETER / SCAFE, kênh 1 + 9",
+   "giayPhep": "CC BY-SA 3.0",
+   "noiBo": false,
+   "sr_goc": [
+    48000
+   ],
+   "nguoiLuyen": null,
+   "nguoiCham": null,
+   "namNuLuyen": null,
+   "gioLuyen": null,
+   "gioCham": null,
+   "gioOn": 0.5,
+   "tepLuyen": 5,
+   "tepCham": 1,
+   "ghiChu": "ồn thật DẢI RỘNG 48 kHz (phòng họp, căng-tin xôn xao, quán cà phê); tapLuyen / tapCham là danh sách TỆP"
+  },
+  "fleurs-vi": {
+   "ten": "FLEURS vi_vn (google/fleurs, dev + test)",
+   "giayPhep": "CC BY 4.0",
+   "noiBo": false,
+   "sr_goc": [
+    16000
+   ],
+   "nguoiLuyen": 2,
+   "nguoiCham": 1,
+   "namNuLuyen": [
+    2,
+    0
+   ],
+   "gioLuyen": 2.82,
+   "gioCham": 1.37,
+   "ghiChu": "FLEURS vi dev + test chỉ có 3 người (CAM++: cos cùng người 0,8–0,95, khác người 0,2–0,5 — phân bố hai đỉnh rõ), cả ba nam ⇒ giữ riêng nguyên một người (cum000) để chấm"
+  },
+  "fosd": {
+   "ten": "FPT Open Speech Data (FOSD) (doof-ferb/fpt_fosd, một mảnh train-00000-of-00002.parquet)",
+   "giayPhep": "CC BY 4.0",
+   "noiBo": false,
+   "sr_goc": [
+    16000,
+    48000
+   ],
+   "nguoiLuyen": 11,
+   "nguoiCham": 10,
+   "namNuLuyen": [
+    3,
+    8
+   ],
+   "gioLuyen": 2.08,
+   "gioCham": 0.51,
+   "ghiChu": "CAM++ (WeSpeaker VoxCeleb) 8 s đầu mỗi tệp; tâm cụm cos ≥ 0,55; gộp tâm ≥ 0,6; cụm < 3 tệp bỏ"
+  },
+  "librispeech": {
+   "ten": "LibriSpeech dev-clean + test-clean (OpenSLR 12)",
+   "giayPhep": "CC BY 4.0",
+   "noiBo": false,
+   "sr_goc": [
+    16000
+   ],
+   "nguoiLuyen": 72,
+   "nguoiCham": 8,
+   "namNuLuyen": [
+    36,
+    36
+   ],
+   "gioLuyen": 9.47,
+   "gioCham": 1.04,
+   "ghiChu": "1320 và 8230 là giọng «xôn xao» trong bản đo 18 s (do-tach-giong.mjs, mẫu tai-mau-loc-on.mjs) ⇒ luôn ở tập chấm"
+  },
+  "vivos": {
+   "ten": "VIVOS (AILAB-VNUHCM)",
+   "giayPhep": "CC BY-NC-SA 4.0",
+   "noiBo": true,
+   "sr_goc": [
+    16000
+   ],
+   "nguoiLuyen": 46,
+   "nguoiCham": 19,
+   "namNuLuyen": [
+    22,
+    24
+   ],
+   "gioLuyen": 3.1,
+   "gioCham": 0.75,
+   "ghiChu": "tách người theo kho: train ⇒ luyện, test ⇒ chấm (hai tập người khác nhau)"
+  },
+  "vlsp2020": {
+   "ten": "VLSP 2020 VinAI 100 h (doof-ferb/vlsp2020_vinai_100h, một mảnh train-00000-of-00035.parquet)",
+   "giayPhep": "CC BY 4.0",
+   "noiBo": false,
+   "sr_goc": [
+    16000
+   ],
+   "nguoiLuyen": 4,
+   "nguoiCham": 12,
+   "namNuLuyen": [
+    2,
+    2
+   ],
+   "gioLuyen": 1.19,
+   "gioCham": 0.56,
+   "ghiChu": "CAM++ (WeSpeaker VoxCeleb) 8 s đầu mỗi tệp; tâm cụm cos ≥ 0,55; gộp tâm ≥ 0,6; cụm < 3 tệp bỏ"
+  }
+ }
+}

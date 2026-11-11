@@ -221,7 +221,7 @@ elif KHO == 'musan-noise':
                 dd = os.path.join(D, ph[2]); os.makedirs(dd, exist_ok=True); ghiFlac(x, sr, os.path.join(dd, ph[-1][:-4] + '.flac')); tong += len(x) / sr; srs.add(sr)
                 (tepC if zlib.crc32(ph[-1].encode()) % 10 == 0 else tepL).append(ph[2] + '/' + ph[-1][:-4])
             elif daQua and len(ph) >= 2 and ph[1] not in ('noise', ''): break
-    ds = {'kho': 'MUSAN — phần noise (OpenSLR 17)', 'giayPhep': 'theo từng thư mục (musan/noise/*/LICENSE): free-sound CC0 / CC BY, sound-bible CC BY / phạm vi công cộng',
+    ds = {'kho': 'MUSAN — phần noise (OpenSLR 17)', 'loai': 'on', 'giayPhep': 'theo từng thư mục (musan/noise/*/LICENSE): free-sound CC0 / CC BY, sound-bible CC BY / phạm vi công cộng',
           'licenseGoc': lic, 'nguon': G, 'sr_goc': sorted(srs), 'dinhDang': 'FLAC mono 16 bit, giữ tần số gốc; ≤ 3 giờ', 'giay': round(tong),
           'nguoi': {}, 'tapLuyen': tepL, 'tapCham': tepC, 'ghiChu': 'ồn, không có người: tapLuyen / tapCham là danh sách TỆP (crc32 % 10 == 0 ⇒ chấm)'}
 elif KHO == 'aishell':
@@ -251,6 +251,25 @@ elif KHO == 'aishell':
     for i, k in enumerate(ks): nguoi[k]['tap'] = 'cham' if i % 8 == 3 else 'luyen'; nguoi[k]['giay'] = round(nguoi[k]['giay'])
     ds = {'kho': 'AISHELL-1 (OpenSLR 33) — 60 người đầu, ≤ 3 phút / người', 'giayPhep': 'Apache 2.0', 'nguon': G, 'sr_goc': sorted(srs), 'dinhDang': 'FLAC mono 16 bit, giữ tần số gốc',
           'nguoi': nguoi, 'tapLuyen': [k for k in ks if nguoi[k]['tap'] == 'luyen'], 'tapCham': [k for k in ks if nguoi[k]['tap'] == 'cham'], 'ghiChu': 'tiếng Trung (có thanh điệu) — đa dạng giọng'}
+elif KHO == 'demand':
+    import zipfile
+    G = 'https://zenodo.org/records/1227121/files/'
+    tepL, tepC, tong, srs = [], [], 0.0, set()
+    for moi in ('OMEETING', 'PCAFETER', 'SCAFE'):   # phòng họp · căng-tin (xôn xao) · quán cà phê — ghi 48 kHz bằng mảng 16 mic, lấy kênh 1 và 9
+        zp = os.path.join(RA, f'_{moi}.zip')
+        with luong(G + f'{moi}_48k.zip?download=1') as r, open(zp, 'wb') as fh: shutil.copyfileobj(r, fh, 1 << 20)
+        with zipfile.ZipFile(zp) as z:
+            for n in z.namelist():
+                if not re.fullmatch(rf'{moi}/ch0[19]\.wav', n): continue
+                x, sr = doc(z.read(n), 'wav')
+                if x is None: continue
+                dd = os.path.join(D, moi); os.makedirs(dd, exist_ok=True); t = os.path.basename(n)[:-4]
+                ghiFlac(x, sr, os.path.join(dd, t + '.flac')); tong += len(x) / sr; srs.add(sr)
+                (tepC if t == 'ch09' and moi == 'OMEETING' else tepL).append(f'{moi}/{t}')
+        os.remove(zp)
+    ds = {'kho': 'DEMAND (Zenodo 1227121) — OMEETING / PCAFETER / SCAFE, kênh 1 + 9', 'loai': 'on', 'giayPhep': 'CC BY-SA 3.0', 'nguon': G, 'sr_goc': sorted(srs),
+          'dinhDang': 'FLAC mono 16 bit 48 kHz gốc', 'giay': round(tong), 'nguoi': {}, 'tapLuyen': tepL, 'tapCham': tepC,
+          'ghiChu': 'ồn thật DẢI RỘNG 48 kHz (phòng họp, căng-tin xôn xao, quán cà phê); tapLuyen / tapCham là danh sách TỆP'}
 else: sys.exit('kho lạ')
 assert not set(ds['tapLuyen']) & set(ds['tapCham'])
 json.dump(ds, open(os.path.join(D, 'ds.json'), 'w'), ensure_ascii=False, indent=1)

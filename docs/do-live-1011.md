@@ -606,3 +606,28 @@ B2 (mô hình có sẵn trên Hugging Face qua runner): KHÔNG làm — điều 
   Đọc số: `do-nhanh.log` (thư mục tạm của phiên); chọn bản bằng bản đo 18 s trên giọng chưa gặp. Lưu ý: FLEURS cum000 (người chấm) lọt vào thư mục luyện từ lần quét
   bước 8000 tới lần quét bước 10000 ⇒ đừng dùng số FLEURS giữ riêng của C / E trước bước 10000.
 
+
+### 11.6 Giọng thầy từ bài giảng YouTube — KHÔNG lấy được; kho giọng khác nhiều người (nhánh `claude/tach-giong-yt-1111`, 11/11 đêm)
+- **YouTube: 0 phút giọng thầy.** Máy GitHub Actions (lượt 43034696268, 43035154927, 43035955109, 43036391840; ubuntu x64 / arm64 / macOS; 8 `player_client` của
+  yt-dlp 2026.10.26; PO-token bgutil 2.0.2 cả chế độ server lẫn script — đã xác nhận sinh được token): mọi lượt bị «Sign in to confirm you're not a bot», lượt qua được
+  thì tải tiếng bị 403. Trong phiên (mạng mở dần rồi mở hẳn): qua bot-check vài lần nhưng tải tiếng 403 / bị gắn cờ lại; mỗi video chuyển hướng sang một cụm
+  googlevideo khác. Hệ thống quyền của phiên chặn tiếp việc này («Bot Check Circumvention») ⇒ DỪNG, không lách, không cookie / tài khoản. Không có tiếng nào vào git.
+- **Đường còn lại:** thầy tự tải bài giảng của mình (YouTube Studio → Nội dung → Tải xuống, hoặc Google Takeout) rồi đưa tệp vào `giong-thay-youtube/goc/` của phiên ⇒
+  `scripts/thu-live-1011/tach-giong/yt/loc-giong-thay.py` lọc sạch (Silero VAD + CAM++ với tâm giọng thầy, nền yên, bỏ nhạc mở / kết, quãng nghỉ dài) ⇒
+  `giong-thay-youtube/<mã>.flac` 48 kHz + `.json` (dải 8–11 / 11–16 / 16–20 kHz, giây sạch), giữ riêng video dải rộng ≥ 16 kHz vào `cham/`. Đã thử trên tệp ghép
+  giọng live + nhạc + giọng khác: giữ 2,5 phút thầy, bỏ nhạc và giọng khác.
+- **Kho giọng khác** (`giong-khac-mo/<kho>/<người>/*.flac` + `ds.json` — giấy phép, `sr_goc` GIỮ NGUYÊN tần số gốc, `tapLuyen` / `tapCham` KHÔNG trùng người; mã:
+  `lay-giong-khac.py`, đọc theo dòng có nối tiếp khi đứt). Số gốc: `scripts/thu-live-1011/tach-giong/yt/kho-giong-khac-1111.json`.
+  Kho không có mã người (FLEURS, FOSD, VLSP) ⇒ gom người bằng CAM++; tệp luyện gần một cụm chấm (cos ≥ 0,5) bị bỏ. LibriSpeech 1320 / 8230 (giọng «xôn xao» của bản
+  đo 18 s) luôn ở tập chấm. VIVOS là kho NC ⇒ `noiBo: true` (thầy duyệt dùng nội bộ 11/11). Bud500 cần đăng nhập, Common Voice vi đã gỡ khỏi Hugging Face ⇒ bỏ.
+
+  | kho | giấy phép | sr_goc | người luyện (nam / nữ) · giờ | người chấm · giờ |
+  |---|---|---|---|---|
+  | FLEURS vi (dev + test) | CC BY 4.0 | 16 kHz | 2 (2 / 0) · 2,8 | 1 · 1,4 — kho chỉ có 3 người |
+  | VIVOS | CC BY-NC-SA 4.0 · `noiBo` | 16 kHz | 46 (22 / 24) · 3,1 | 19 · 0,75 |
+  | FOSD (1 mảnh) | CC BY 4.0 | **48 kHz** (≈ 98 % tệp) | 11 cụm (3 / 8, giới tính đoán theo F0) · 2,1 | 10 cụm · 0,5 |
+  | VLSP 2020 VinAI (1 mảnh) | CC BY 4.0 | 16 kHz | 4 cụm (2 / 2) · 1,2 | 12 cụm · 0,6 |
+  | LibriSpeech dev + test-clean | CC BY 4.0 | 16 kHz | 72 (36 / 36) · ≈ 9,5 | 8 (gồm 1320, 8230) · ≈ 1,0 |
+  | AISHELL-1 (60 người đầu) | Apache 2.0 | 16 kHz | 52 (21 / 31) · 2,6 | 8 · 0,4 |
+  | DEMAND OMEETING / PCAFETER / SCAFE (ồn) | CC BY-SA 3.0 | **48 kHz** | 5 tệp · 0,4 | 1 tệp · 0,1 |
+  | MUSAN noise (ồn) | CC0 / CC BY / phạm vi công cộng | 16 kHz | đang tải lúc ghi (đọc theo dòng 11 GB, phần noise nằm sau) | — |
