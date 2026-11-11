@@ -1,0 +1,31 @@
+# THEO DÕI CHI PHÍ CLOUDFLARE HẰNG ĐÊM (CHỈ ĐỌC, 11/11 — thầy «Làm mọi thứ để dùng bản 5 đô/tháng thôi»). Kịch bản: scripts/theo-doi-chi-phi-cf.mjs.
+# 23:17 giờ VN mỗi đêm: bảng số dùng từ đầu kỳ, dự báo cả kỳ, so hạn mức gói 5 USD. Dự báo > 6 USD ⇒ ĐỎ (GitHub gửi thư). Không đọc D1, không ghi.
+name: Theo dõi chi phí Cloudflare (chỉ đọc)
+on:
+  schedule:
+    - cron: '17 16 * * *'
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/theo-doi-chi-phi-cf.yml', 'scripts/theo-doi-chi-phi-cf.mjs']
+permissions:
+  contents: read
+concurrency:
+  group: theo-doi-chi-phi-cf
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo và dự báo (chỉ đọc)
+        run: node scripts/theo-doi-chi-phi-cf.mjs
