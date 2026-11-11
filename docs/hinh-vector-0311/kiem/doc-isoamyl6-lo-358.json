@@ -1,0 +1,567 @@
+{
+  "i": 6,
+  "assetIndexProvided": 1143,
+  "hash": "00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba.png",
+  "size": [
+    1141,
+    150
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-11-C3-B14-D2-II-1",
+      "de": "Một học sinh tiến hành tổng hợp isoamyl acetate (thành phần chính của dầu chuối) từ acetic acid và isoamyl alcohol theo phương trình hóa học ở hình dưới.\nSau thí nghiệm, tiến hành phân tách sản phẩm. Ghi phổ hồng ngoại của acetic acid, isoamyl alcohol và isoamyl acetate. Cho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như sau: O–H (alcohol): 3650–3200 cm⁻¹; O–H (carboxylic acid): 3300–2500 cm⁻¹; C=O (ester, carboxylic acid): 1780–1650 cm⁻¹.",
+      "allHinh": [
+        {
+          "hash": "00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba",
+          "where": "DH-11-C3-B14-D2-II-1.hinh.0.du_lieu",
+          "hashDataUrl": "a7d2069b7b7e9af146d53cec90fee88b79acca1e38f772d47c01699df5c468c7"
+        }
+      ],
+      "missingHashes": [
+        "00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownArrow6xOpened": true,
+    "ownLeftCO10xOpened": true,
+    "ownRightCO10xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativepixelcenterline/bboxesnearest1pxapprox. RastermacroprovesexplicitshortCOfootbridgeandhalfharpoonorientation; doNOTnormalizefromchemistry.",
+  "geometry": {
+    "acid": {
+      "carbonylCenter": [
+        83,
+        64
+      ],
+      "labels": [
+        {
+          "text": "H₃C",
+          "bbox": [
+            5,
+            75,
+            58,
+            103
+          ],
+          "anchor": "LASTCright"
+        },
+        {
+          "text": "O",
+          "bbox": [
+            72,
+            10,
+            95,
+            35
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            109,
+            75,
+            154,
+            101
+          ],
+          "anchor": "FIRSTO"
+        }
+      ],
+      "singleBonds": [
+        [
+          [
+            60,
+            78
+          ],
+          [
+            83,
+            64
+          ]
+        ],
+        [
+          [
+            83,
+            64
+          ],
+          [
+            106,
+            78
+          ]
+        ]
+      ],
+      "carbonylRays": [
+        [
+          [
+            79,
+            38
+          ],
+          [
+            79,
+            64
+          ]
+        ],
+        [
+          [
+            87,
+            38
+          ],
+          [
+            87,
+            64
+          ]
+        ]
+      ],
+      "shortFootJoin": [
+        [
+          79,
+          64
+        ],
+        [
+          87,
+          64
+        ]
+      ],
+      "note": "Bothverticalfeetcontactleft/rightarms+shortactualhorizontalnativejoinbetween, retainliteralnotgenericapex.",
+      "caption": {
+        "text": "Acetic acid",
+        "bbox": [
+          10,
+          107,
+          167,
+          138
+        ]
+      },
+      "C": 2,
+      "O": 2
+    },
+    "alcohol": {
+      "bareC": [
+        [
+          323,
+          60
+        ],
+        [
+          359,
+          80
+        ],
+        [
+          394,
+          60
+        ]
+      ],
+      "labels": [
+        {
+          "text": "HO",
+          "bbox": [
+            253,
+            67,
+            297,
+            95
+          ],
+          "anchor": "ORIGHT"
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            383,
+            3,
+            438,
+            34
+          ],
+          "anchor": "FIRSTC"
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            418,
+            68,
+            472,
+            99
+          ],
+          "anchor": "FIRSTC"
+        }
+      ],
+      "bonds": [
+        [
+          [
+            300,
+            73
+          ],
+          [
+            323,
+            60
+          ]
+        ],
+        [
+          [
+            323,
+            60
+          ],
+          [
+            359,
+            80
+          ]
+        ],
+        [
+          [
+            359,
+            80
+          ],
+          [
+            394,
+            60
+          ]
+        ],
+        [
+          [
+            394,
+            60
+          ],
+          [
+            394,
+            34
+          ]
+        ],
+        [
+          [
+            394,
+            60
+          ],
+          [
+            417,
+            73
+          ]
+        ]
+      ],
+      "caption": {
+        "text": "Isoamyl alcohol",
+        "bbox": [
+          245,
+          110,
+          470,
+          141
+        ]
+      },
+      "C": 5,
+      "O": 1
+    },
+    "ester": {
+      "carbonylCenter": [
+        800,
+        68
+      ],
+      "bareAlkoxyC": [
+        [
+          872,
+          68
+        ],
+        [
+          907,
+          88
+        ],
+        [
+          942,
+          68
+        ]
+      ],
+      "labels": [
+        {
+          "text": "H₃C",
+          "bbox": [
+            721,
+            79,
+            774,
+            106
+          ],
+          "anchor": "LASTC"
+        },
+        {
+          "text": "O",
+          "bbox": [
+            789,
+            14,
+            812,
+            39
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            823,
+            78,
+            846,
+            104
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            931,
+            14,
+            986,
+            44
+          ],
+          "anchor": "FIRSTC"
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            966,
+            78,
+            1022,
+            107
+          ],
+          "anchor": "FIRSTC"
+        }
+      ],
+      "singleBonds": [
+        [
+          [
+            777,
+            82
+          ],
+          [
+            800,
+            68
+          ]
+        ],
+        [
+          [
+            800,
+            68
+          ],
+          [
+            822,
+            81
+          ]
+        ],
+        [
+          [
+            849,
+            81
+          ],
+          [
+            872,
+            68
+          ]
+        ],
+        [
+          [
+            872,
+            68
+          ],
+          [
+            907,
+            88
+          ]
+        ],
+        [
+          [
+            907,
+            88
+          ],
+          [
+            942,
+            68
+          ]
+        ],
+        [
+          [
+            942,
+            68
+          ],
+          [
+            942,
+            43
+          ]
+        ],
+        [
+          [
+            942,
+            68
+          ],
+          [
+            965,
+            81
+          ]
+        ]
+      ],
+      "carbonylRays": [
+        [
+          [
+            796,
+            42
+          ],
+          [
+            796,
+            68
+          ]
+        ],
+        [
+          [
+            804,
+            42
+          ],
+          [
+            804,
+            68
+          ]
+        ]
+      ],
+      "shortFootJoin": [
+        [
+          796,
+          68
+        ],
+        [
+          804,
+          68
+        ]
+      ],
+      "caption": {
+        "text": "Isoamyl acetate",
+        "bbox": [
+          765,
+          111,
+          984,
+          141
+        ]
+      },
+      "C": 7,
+      "O": 2
+    },
+    "water": {
+      "text": "H₂O",
+      "bbox": [
+        1079,
+        64,
+        1138,
+        92
+      ]
+    },
+    "plusSigns": [
+      {
+        "text": "+",
+        "bbox": [
+          185,
+          71,
+          205,
+          94
+        ]
+      },
+      {
+        "text": "+",
+        "bbox": [
+          1047,
+          63,
+          1067,
+          86
+        ]
+      }
+    ],
+    "equilibrium": {
+      "upperShaft": [
+        [
+          516,
+          74
+        ],
+        [
+          697,
+          74
+        ]
+      ],
+      "upperFilledHalfHead": [
+        [
+          697,
+          74
+        ],
+        [
+          683,
+          69
+        ],
+        [
+          683,
+          74
+        ]
+      ],
+      "upperDirection": "RIGHT/halfheadABOVE",
+      "lowerShaft": [
+        [
+          516,
+          80
+        ],
+        [
+          696,
+          80
+        ]
+      ],
+      "lowerFilledHalfHead": [
+        [
+          516,
+          80
+        ],
+        [
+          530,
+          85
+        ],
+        [
+          530,
+          80
+        ]
+      ],
+      "lowerDirection": "LEFT/halfheadBELOW",
+      "condition": {
+        "text": "H₂SO₄ đặc, t°",
+        "bbox": [
+          535,
+          32,
+          681,
+          60
+        ],
+        "font": "truebold uprightserif",
+        "literalSup": "smallroundsuperscriptaftert; nativeappearslittleo/circle, doNOTbaseline0oraddtemperaturevalue"
+      }
+    },
+    "font": "3captions+conditionTRUEBOLDuprightserif; allchemicalformula+signsregularuprightsans. Subscripts2/3/4preserved. Noitaliclabels.",
+    "countsExcludingCatalyst": {
+      "C": 14,
+      "O": 6,
+      "COdouble": 2,
+      "halfHarpoonHeads": 2,
+      "captions": 3,
+      "waterTokens": 1,
+      "stereo": 0
+    },
+    "noAdded": [
+      "reactionyield",
+      "IRbandsfromstem",
+      "namesanswers",
+      "fulltriangleheads",
+      "deleteCOfootjoins",
+      "sulfatecharges",
+      "temperaturevalue",
+      "hydrogensonskeletalbareC"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "bothCOAndProduct4xAndHeads6xAndCondition6xOpened": true,
+    "allPublicDeRefsRead": true,
+    "trueDamCaptionsCondition": true
+  },
+  "rootCandidateHistory": {
+    "rejectedHash": "d25c21ca1883004bc7b776e051e8b2005620a88cb17517a65862fb12b87d525f",
+    "finalHash": "0ac4dc39a628adfa689293ef36beb599ca9e055e562676a2d0b4ccddc107342a",
+    "onlyChange": "3 captions32→28, trueDAM/anchors/baselines/allotherpathsunchanged",
+    "rootFreshFinalFullOpened": true
+  }
+}

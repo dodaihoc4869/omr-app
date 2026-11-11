@@ -1,0 +1,16 @@
+[
+  {
+    "i": 6,
+    "hashSvg": "0ac4dc39a628adfa689293ef36beb599ca9e055e562676a2d0b4ccddc107342a",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở riêng native FULL/câu dẫn-ref DH-11-C3-B14-D2-II-1.hinh.0.du_lieu và fresh Chromium3× FULL với runtime exactSHA; macro hai carbonyl, hai nửa đầu cân bằng, captions/chỉ số. Đếm14C6O kể cả nước, không tính xúc tác; hai carbonyl giữ mối nối chân ngắn như nguồn, HO nối O cuối/H₃C nối C cuối/CH₃ nối C đầu. Đúng nửa đầu đặc trên hướng phải nằm trên shaft, dưới hướng trái nằm dưới; ba captions và điều kiện đậm thẳng, hóa học thường thẳng với chỉ số đúng. Acetic acid không cắt mép trái; không thấy chạm/cắt/tràn hoặc nhiệt độ/IR/đáp án thêm.",
+    "render": "/workspace/scratch/soat358-6-fresh.png",
+    "macro": [
+      "/workspace/scratch/isoamyl6-left.png",
+      "/workspace/scratch/isoamyl6-heads.png",
+      "/workspace/scratch/isoamyl6-right.png"
+    ],
+    "hash": "00f765ef9dd9789294d0708d736ec839ec59ad2dbd6a135ed5a6c02b002c37ba",
+    "hashSvgDaSoat": "0ac4dc39a628adfa689293ef36beb599ca9e055e562676a2d0b4ccddc107342a"
+  }
+]
