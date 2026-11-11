@@ -88,13 +88,5 @@ for (const [tu, den] of [['2026-10-11', '2026-11-11'], ['2026-11-10', '2026-11-1
   } catch (e) { console.log('2b lỗi', String(e).slice(0, 120)) }
 }
 
-// ───────── 3. TRUY VẤN D1 GHI / ĐỌC NHIỀU NHẤT (2 ngày mẫu) ─────────
-for (const [tu, den] of [[`${DEN}T00:00:00Z`, `${DEN}T10:00:00Z`], ['2026-11-05T00:00:00Z', '2026-11-05T23:59:59Z']]) {
-  for (const theo of ['rowsWritten', 'rowsRead']) {
-    const j = await gql(`query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:15,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_${theo}_DESC]){count sum{rowsRead rowsWritten queryDurationMs} dimensions{query}}}}}`, { a: ACC, db: DB, tu, den })
-    console.log(`\n## 3. D1 — 15 câu nhiều ${theo} nhất, ${tu} → ${den}`)
-    if (j.errors?.length) { console.log('LỖI: ' + loiNgan(j.errors)); continue }
-    for (const x of j?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []) console.log(`lan=${x.count} ghi=${x.sum.rowsWritten} doc=${x.sum.rowsRead} giay=${Math.round(x.sum.queryDurationMs / 1000)} :: ${String(x.dimensions.query).replace(/\s+/g, ' ').slice(0, 230)}`)
-  }
-}
+if (process.env.MUC3 === '1') {} // mục 3 (15 câu D1 ghi / đọc nhiều nhất) đã chạy lượt #1 — bỏ cho nhật ký gọn
 console.log('\n## TỔNG CẢ KHOẢNG (từng bộ số liệu)'); for (const [t, o] of tongKy) console.log(t, JSON.stringify(o))
