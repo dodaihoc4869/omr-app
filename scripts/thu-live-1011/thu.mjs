@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// LƯU Ý 11/11: luật màn máy em + thanh màn chiếu đã đổi sau khi thầy test máy thật (đặc tả 4.3e) — nhiều phép kiểm dưới đây theo luật CŨ («gửi xong vẫn ở màn
+// câu hỏi», nút «Tắt live» trên thanh, tay nắm mép phải) sẽ trượt. Kịch bản hiện hành: scripts/thu-live-1011/thu-2.mjs. Tệp này giữ để tham khảo phần đo khung hình.
 // BỘ THỬ LIVE BẢNG (10/11, đợt 1B) — Chromium THẬT, HAI TRANG (thầy + em) qua phòng THẬT chạy trong Node (may-chu.mjs). Dữ liệu giả.
 //   npx vite build --config scripts/thu-live-1011/vite.config.mjs --outDir <thư mục tạm>
 //   node scripts/thu-live-1011/thu.mjs <thư mục tạm> [thư mục ảnh = docs/ban-ve-live-1011] [tệp số đo = docs/ban-ve-live-1011/so-do-that.json]

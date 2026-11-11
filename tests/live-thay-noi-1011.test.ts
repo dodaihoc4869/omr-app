@@ -202,7 +202,7 @@ describe('phần nối live của máy thầy', () => {
 
 describe('mặt live trên tờ chiếu (chuỗi chèn vào tờ)', () => {
   it('có đủ nút / chữ chuẩn, không mã màu thô, cú pháp JS hợp lệ', () => {
-    for (const chu of ['Live', 'Tắt live', 'Bắt đầu live', 'em rời màn', 'Bảng', 'Thu mic', 'Live không tiếng', 'Lọc tiếng ồn + khử vọng']) expect(JS_LIVE_TO_CHIEU).toContain(chu)
+    for (const chu of ['Live', 'Kết thúc live', 'Tạm dừng', 'Tiếp tục', 'Bắt đầu live', 'em rời màn', 'Bảng', 'Thu mic', 'Live không tiếng', 'Lọc tiếng ồn + khử vọng']) expect(JS_LIVE_TO_CHIEU).toContain(chu)
     expect(JS_LIVE_TO_CHIEU).not.toMatch(/stream|phát sóng|trực tuyến|mute|kick/i) // bảng từ chuẩn: Live · Tiếng · Thu mic
     expect(CSS_LIVE_TO_CHIEU + JS_LIVE_TO_CHIEU).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(/i)
     expect(JS_LIVE_TO_CHIEU).not.toMatch(/=>|\bconst\b|\blet\b|`/) // tờ chạy cả trên máy chiếu cũ: ES5
