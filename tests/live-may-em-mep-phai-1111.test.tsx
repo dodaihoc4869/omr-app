@@ -179,9 +179,8 @@ describe('bảng live máy em: mọi điều khiển trong MỘT thanh ẩn ở 
     dau = { nghe: true }
     await dung('bang')
     const W = window.innerWidth, H = window.innerHeight
-    const s = Number(/scale\(([\d.]+)\)/.exec(document.querySelector<HTMLElement>('.lv-chieu')!.style.transform)![1])
-    const t = /translate3d\(([-\d.]+)px,\s*([-\d.]+)px/.exec(document.querySelector<HTMLElement>('.lv-chieu')!.style.transform)!
-    const o = (k: string) => { const e = document.querySelector<HTMLElement>(k)!.style, x = Number(t[1]) + parseFloat(e.left) * s, y = Number(t[2]) + parseFloat(e.top) * s; return { x, y, w: parseFloat(e.width) * s, h: parseFloat(e.height) * s } }
+    // (11/11 chiều: hai khung co giãn độc lập — khung giấy / khung bảng đặt thẳng bằng px của hình, không còn lớp `.lv-chieu` co chung)
+    const o = (k: string) => { const e = document.querySelector<HTMLElement>(k)!.style; return { x: parseFloat(e.left), y: parseFloat(e.top), w: parseFloat(e.width), h: parseFloat(e.height) } }
     const g = o('.lv-giay'), b = o('.lv-bang')
     expect(g.x).toBeCloseTo(4, 1); expect(b.x + b.w).toBeCloseTo(W - 4, 1)
     for (const v of [g, b]) { expect(v.y).toBeCloseTo(4, 1); expect(v.y + v.h).toBeCloseTo(H - 4, 1) }
