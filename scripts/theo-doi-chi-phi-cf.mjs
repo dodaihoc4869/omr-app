@@ -53,7 +53,10 @@ const tuQ = new Date(now - 86400e3).toISOString()
 const jq = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
   query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:15,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
 const top = jq?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
-const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
+const j24 = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
+  query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den}){sum{rowsRead rowsWritten}}}}}` }) }).then((r) => r.json()).catch(() => null)
+const tong24 = (j24?.data?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? []).reduce((a, x) => a + (Number(x.sum?.rowsRead) || 0), 0)
+const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). 15 câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
   ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)]
 if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`)
 const ket = `\n**Dự báo hoá đơn kỳ này: ${tongDuBao.toFixed(2)} USD** (5 USD gói + phần vượt; chưa gồm Workers Logs — khoá chưa có quyền đọc).`
