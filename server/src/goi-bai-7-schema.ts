@@ -33,6 +33,6 @@ export const SQL_GOI7: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS goi_bai_7_sua_em (goi_id TEXT NOT NULL,request_id TEXT NOT NULL,payload TEXT NOT NULL,nonce TEXT NOT NULL,ack_json TEXT NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(goi_id,request_id))`,
   // CHỈ THÊM 11/11 (no-cau.ts, thầy duyệt bản vẽ docs/ban-ve-lam-bu-1111): NỢ CÂU — sổ nợ của em (nợ đầu ngày kế sau `den_ngay`, số lần đã trả tối thiểu, nợ theo loại)
   // và lựa chọn trả nợ mỗi ngày (`goc` = mức gốc của ngày; mức hôm nay = goc + so).
-  `CREATE TABLE IF NOT EXISTS no_cau_em (sbd TEXT PRIMARY KEY,no INTEGER NOT NULL,lan INTEGER NOT NULL,loai_json TEXT NOT NULL,den_ngay TEXT NOT NULL,luc TEXT NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS no_cau_chon (sbd TEXT NOT NULL,ngay TEXT NOT NULL,kieu TEXT NOT NULL,so INTEGER NOT NULL,goc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay))`,
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_no_em (sbd TEXT PRIMARY KEY,no INTEGER NOT NULL,lan INTEGER NOT NULL,loai_json TEXT NOT NULL,den_ngay TEXT NOT NULL,luc TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS goi_bai_7_no_chon (sbd TEXT NOT NULL,ngay TEXT NOT NULL,kieu TEXT NOT NULL,so INTEGER NOT NULL,goc INTEGER NOT NULL,luc TEXT NOT NULL,PRIMARY KEY(sbd,ngay))`,
 ]
