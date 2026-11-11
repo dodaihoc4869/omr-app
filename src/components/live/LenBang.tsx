@@ -92,7 +92,7 @@ export function TamLenBang({ em, pha, rong, dau, dong }: { em: EmLenBang; pha: '
   }, [pha, dau, dong])
   const doi = tenDoi(em.doi)
   return (
-    <div ref={tam} className="lv-lb-tam" data-pha={pha} data-tat={(pha === 'thu' && !dong) || undefined} data-em={em.laEm || undefined} role="status" style={{ ...mauDoi(em.doi), ['--lb-w' as string]: rong }}>
+    <div ref={tam} className="lv-lb-tam" data-pha={pha} data-tat={(pha === 'thu' && !dong) || undefined} data-em={em.laEm || undefined} role="status" style={{ ...mauDoi(em.doi), '--lb-w': rong } as CSSProperties}>
       {em.laEm ? <><b>Em lên bảng</b><span>{em.ten}{doi ? ` · ${doi}` : ''}</span></> : <><small>{doi}</small><b>{em.ten}</b><span>lên bảng</span></>}
     </div>
   )
