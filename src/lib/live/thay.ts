@@ -20,6 +20,7 @@ import type { NetBut, SuKienBut } from '../but-bang-loi'
 import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet } from './ma-net'
 import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type KenhPhong, type MoiTruongLive, type TuyChonOpus } from './sfu'
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
+import { theAmLoa } from './loa'
 import { dungChuoiTieng, type KieuChuoi, type MucLocOn } from './chuoi-tieng'
 
 export interface TuyChonLiveThay {
@@ -188,7 +189,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
         thuEm = e.receiver
         try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
         try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-        amEm = amEm ?? document.createElement('audio')
+        amEm = amEm ?? theAmLoa()
         amEm.autoplay = true
         amEm.srcObject = new MediaStream([e.track])
         amEm.muted = !tt.ngheEm

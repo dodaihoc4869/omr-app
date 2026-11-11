@@ -1992,5 +1992,237 @@
     }
    }
   ]
+ },
+ "loc-on-3": {
+  "luc": "2026-11-11T08:43:24.998Z",
+  "ghiChu": "Chromium thật + mic giả đọc tệp WAV; thư viện taoLiveThay thật → kết nối WebRTC thứ hai trong trang (không SFU thật, không loa / mic thật). Trễ đo giữa ba điểm trong trang bằng cùng một đồng hồ mẫu: mic trình duyệt giao → đầu ra chuỗi → tiếng nhận sau Opus + đệm rung. CHƯA gồm bộ đệm thu của thiết bị và trễ loa.",
+  "that": {
+   "cpu1": [
+    {
+     "ten": "không lọc",
+     "kieu": "that",
+     "kbps": 62.4,
+     "goiMoiGiay": 51,
+     "demRungMs": 39.5,
+     "xuLyNhanMs": 31.3,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000,
+      "locOn": "tat",
+      "locOnChay": "tat",
+      "locOnBo": "rn",
+      "locOnTre": 0,
+      "df3": {
+       "tinh": "khong",
+       "da": 0,
+       "tong": 11958413,
+       "ms": 0
+      }
+     },
+     "that": {
+      "soCuaSo": 12,
+      "chuoiMs": 0,
+      "chuoiP95": 0,
+      "tongMs": 51.9,
+      "tongP95": 55.7
+     },
+     "noiMic": {
+      "rmsNoiDb": -25,
+      "dinhDb": -6.3,
+      "onNghiDb": -43,
+      "tinTrenOnDb": 18,
+      "thoDb": -1.1,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "noiChuoi": {
+      "rmsNoiDb": -18.6,
+      "dinhDb": -2.2,
+      "onNghiDb": -37.7,
+      "tinTrenOnDb": 19.1,
+      "thoDb": -0.2,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "noiNhan": {
+      "rmsNoiDb": -18.1,
+      "dinhDb": 0,
+      "onNghiDb": -39.3,
+      "tinTrenOnDb": 21.2,
+      "thoDb": -0.8,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "nghiChuoi": {
+      "soQuang": 1,
+      "micDb": -43.6,
+      "raDb": -38.1
+     },
+     "nghiNhan": {
+      "soQuang": 1,
+      "micDb": -43.6,
+      "raDb": -39.8
+     }
+    },
+    {
+     "ten": "lọc riêng «Mạnh»",
+     "kieu": "that",
+     "kbps": 55.9,
+     "goiMoiGiay": 51,
+     "demRungMs": 37.9,
+     "xuLyNhanMs": 31.3,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000,
+      "locOn": "manh",
+      "locOnChay": "chay",
+      "locOnBo": "df3",
+      "locOnTre": 30,
+      "df3": {
+       "tinh": "san",
+       "da": 11958413,
+       "tong": 11958413,
+       "ms": 1.59,
+       "msDung": 938
+      }
+     },
+     "that": {
+      "soCuaSo": 12,
+      "chuoiMs": 40,
+      "chuoiP95": 40,
+      "tongMs": 79.7,
+      "tongP95": 79.8
+     },
+     "noiMic": {
+      "rmsNoiDb": -25.1,
+      "dinhDb": -6.3,
+      "onNghiDb": -42.9,
+      "tinTrenOnDb": 17.8,
+      "thoDb": -1.1,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "noiChuoi": {
+      "rmsNoiDb": -16.3,
+      "dinhDb": -2.2,
+      "onNghiDb": -51,
+      "tinTrenOnDb": 34.7,
+      "thoDb": -34.7,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "noiNhan": {
+      "rmsNoiDb": -16.3,
+      "dinhDb": -0.1,
+      "onNghiDb": -44.6,
+      "tinTrenOnDb": 28.3,
+      "thoDb": -48.2,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "nghiChuoi": {
+      "soQuang": 1,
+      "micDb": -43.6,
+      "raDb": -93.9
+     },
+     "nghiNhan": {
+      "soQuang": 1,
+      "micDb": -43.6,
+      "raDb": -96.9
+     }
+    },
+    {
+     "ten": "lọc riêng «Vừa»",
+     "kieu": "that",
+     "kbps": 63.3,
+     "goiMoiGiay": 51,
+     "demRungMs": 30,
+     "xuLyNhanMs": 25.7,
+     "mic": {
+      "hz": 48000,
+      "kenh": 1,
+      "vong": false,
+      "on": false,
+      "agc": true,
+      "bac": 0,
+      "treThuMs": 10,
+      "chuoi": true,
+      "kieu": "khung",
+      "hzXuLy": 48000,
+      "locOn": "vua",
+      "locOnChay": "chay",
+      "locOnBo": "df3",
+      "locOnTre": 30,
+      "df3": {
+       "tinh": "san",
+       "da": 11958413,
+       "tong": 11958413,
+       "ms": 1.43,
+       "msDung": 938
+      }
+     },
+     "that": {
+      "soCuaSo": 12,
+      "chuoiMs": 30,
+      "chuoiP95": 30,
+      "tongMs": 84.9,
+      "tongP95": 84.9
+     },
+     "noiMic": {
+      "rmsNoiDb": -25.1,
+      "dinhDb": -6.3,
+      "onNghiDb": -42.9,
+      "tinTrenOnDb": 17.8,
+      "thoDb": -1.1,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "noiChuoi": {
+      "rmsNoiDb": -16.2,
+      "dinhDb": -2.2,
+      "onNghiDb": -50.3,
+      "tinTrenOnDb": 34.1,
+      "thoDb": -11.4,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "noiNhan": {
+      "rmsNoiDb": -16.2,
+      "dinhDb": -0.1,
+      "onNghiDb": -43.6,
+      "tinTrenOnDb": 27.3,
+      "thoDb": -25.3,
+      "soQuangNghi": 3,
+      "segSnrDb": null
+     },
+     "nghiChuoi": {
+      "soQuang": 1,
+      "micDb": -43.6,
+      "raDb": -62.2
+     },
+     "nghiNhan": {
+      "soQuang": 1,
+      "micDb": -43.6,
+      "raDb": -63.9
+     }
+    }
+   ]
+  }
  }
 }
