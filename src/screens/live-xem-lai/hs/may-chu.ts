@@ -14,6 +14,21 @@ const GOC_MAC_DINH = 'https://omr.ttadodaihoc.workers.dev'
 const HAN_MS = 15_000
 export const NHO_DS_MS = 10 * 60_000
 
+/** Vòng hỏi lại NỐI TIẾP: lượt sau chỉ hẹn khi lượt trước xong (không bao giờ hai lượt bay cùng lúc); `chay()` trả false / ném lỗi ⇒ thưa dần ×2, trần 30 giây.
+ *  (Cùng luật `batVongTrucTiep` của src/lib/nhip-ben-vung.ts — viết gọn tại đây để mảnh nạp sẵn của mọi app không phải giữ thêm hàm ấy.) Trả hàm dừng. */
+export function batVongHoiLai(chay: () => Promise<unknown> | unknown, ms: number): () => void {
+  let dung = false, loi = 0, hen: ReturnType<typeof setTimeout> | undefined
+  const buoc = async (): Promise<void> => {
+    if (dung) return
+    let hong = false
+    try { hong = (await chay()) === false } catch { hong = true }
+    loi = hong ? loi + 1 : 0
+    if (!dung) hen = setTimeout(() => void buoc(), Math.min(30_000, ms * 2 ** Math.min(loi, 3)))
+  }
+  hen = setTimeout(() => void buoc(), ms)
+  return () => { dung = true; clearTimeout(hen) }
+}
+
 export async function gocMayChu(): Promise<string> {
   let u = ''
   try { u = await layDiaChiMayChu('') } catch { /* dùng mặc định */ }

@@ -3,10 +3,9 @@
 // tới khi xong) · mất mạng (hiện danh sách đã lưu trên máy) · lỗi máy chủ («Thử lại»). Chỉ gọi `GET /hs/live-ds` (nhớ 10 phút).
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { TraLiveDsHs } from '../../../lib/live/xem-lai-kieu'
-import { batVongTrucTiep } from '../../../lib/nhip-ben-vung'
 import { BtLive, BtLui, BtMatMang, BtMui, BtPhat } from './bieu-tuong'
 import { HOI_LAI_DANG_DUNG_MS } from './kieu'
-import { dsDaLuu, taiDs, type KetQua } from './may-chu'
+import { batVongHoiLai, dsDaLuu, taiDs, type KetQua } from './may-chu'
 import { chuDaXem, docDaMo, docDaXem, khoaEm } from './nho-may'
 import { dongNgay, nhanThang, soPhut, tachNgay, tenBai, tenDayDu } from './ten-hien'
 
@@ -39,8 +38,7 @@ export default function DanhSachLive({ token, dong, onMo }: { token: string; don
   // buổi đang dựng ⇒ tự hỏi lại: lượt sau chỉ hẹn khi lượt trước xong, lỗi thì thưa dần, tab ẩn thì bỏ lượt (vòng hỏi trực tiếp của app, không `setInterval`)
   useEffect(() => {
     if (!dangDung) return
-    const v = batVongTrucTiep(async () => { if (document.hidden) return true; const k = await taiDs(token, true); nhan(k); return k.ok }, HOI_LAI_DANG_DUNG_MS)
-    return () => v.dung()
+    return batVongHoiLai(async () => { if (document.hidden) return true; const k = await taiDs(token, true); nhan(k); return k.ok }, HOI_LAI_DANG_DUNG_MS)
   }, [dangDung, token, nhan])
   const matMang = tt.loai === 'ok' && tt.matMang
   useEffect(() => { if (!matMang) return; const f = () => void tai(true); window.addEventListener('online', f); return () => window.removeEventListener('online', f) }, [matMang, tai])

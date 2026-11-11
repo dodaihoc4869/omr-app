@@ -14,12 +14,11 @@ import { taoVeBang, type VeBang } from '../../../components/live/ve-bang'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
 import { taoLoiBut, type SuKienBut } from '../../../lib/but-bang-loi'
 import { TEP_LIVE, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
-import { batVongTrucTiep } from '../../../lib/nhip-ben-vung'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
 import { nhayLang, taoDongHoRieng, taoLamMuot, tongHang, tuViTriHang, viTriHang } from './dong-ho'
 import { taoKhoNet, type KhoNet } from './kho-net'
 import { AN_SAU_MS, thanhCau, type MangChang } from './kieu'
-import { duongTep, taiKhucNet } from './may-chu'
+import { batVongHoiLai, duongTep, taiKhucNet } from './may-chu'
 import { taoMayPhat, type MayPhat } from './may-phat'
 import { chuDapAn, gioPhat, mauDoi } from './ten-hien'
 import './phat.css'
@@ -293,9 +292,9 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       void tuaRef.current(S.current.vt, S.current.gioCuoi)
     }
     document.addEventListener('visibilitychange', an); window.addEventListener('offline', mat); window.addEventListener('online', noi)
-    // đang báo mất mạng ⇒ tự thử lại, lượt sau chỉ hẹn khi lượt trước xong, thưa dần khi còn hỏng (cùng luật vòng hỏi trực tiếp của app)
-    const v = batVongTrucTiep(() => { if (S.current.matMang && (typeof navigator === 'undefined' || navigator.onLine !== false)) noi() }, THU_LAI_MS)
-    return () => { document.removeEventListener('visibilitychange', an); window.removeEventListener('offline', mat); window.removeEventListener('online', noi); v.dung() }
+    // đang báo mất mạng ⇒ tự thử lại, lượt sau chỉ hẹn khi lượt trước xong, không `setInterval` (cùng luật vòng hỏi trực tiếp của app)
+    const dungVong = batVongHoiLai(() => { if (S.current.matMang && (typeof navigator === 'undefined' || navigator.onLine !== false)) noi() }, THU_LAI_MS)
+    return () => { document.removeEventListener('visibilitychange', an); window.removeEventListener('offline', mat); window.removeEventListener('online', noi); dungVong() }
   }, [dungPhat])
   // tiếng: tua trước khi có siêu dữ liệu, đang đệm, lỗi tệp (404 = thầy đã gỡ)
   useEffect(() => {
