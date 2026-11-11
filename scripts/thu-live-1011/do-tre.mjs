@@ -83,13 +83,21 @@ DS.noi = [...DS.sin.slice(0, 3), { ten: 'chuỗi nén, AGC TẮT, 64 kb/s khung 
 
 const may = await moMayChu({ dist: DIST })
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium'
-async function chay(wav, ds, kieu, giay, cho) {
+async function chay(wav, ds, kieu, giay, cho, hamCpu = 1) {
   const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSync(exe).isFile() ? exe : undefined, args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', `--use-file-for-fake-audio-capture=${wav}`, '--autoplay-policy=no-user-gesture-required'] })
   try {
     const ctx = await trinh.newContext({ permissions: ['microphone'] })
     await ctx.route((u) => !u.href.startsWith(may.goc), (r) => r.abort())
     const t = await ctx.newPage()
     t.on('pageerror', (e) => console.log('  lỗi trang:', e.message))
+    if (hamCpu > 1) {
+      // Hãm CPU ×N như DevTools: luồng chính của trang + MỌI Worker trang dựng (Worker chuỗi tiếng, Worker bộ lọc sâu) — Worker là đích riêng nên phải tự gắn.
+      const cdp = await ctx.newCDPSession(t)
+      let so = 0
+      cdp.on('Target.attachedToTarget', (e) => { void cdp.send('Target.sendMessageToTarget', { sessionId: e.sessionId, message: JSON.stringify({ id: ++so, method: 'Emulation.setCPUThrottlingRate', params: { rate: hamCpu } }) }).catch(() => undefined) })
+      await cdp.send('Target.setAutoAttach', { autoAttach: true, waitForDebuggerOnStart: false, flatten: false })
+      await cdp.send('Emulation.setCPUThrottlingRate', { rate: hamCpu })
+    }
     await t.goto(`${may.goc}/scripts/thu-live-1011/do-tieng.html`)
     await t.waitForFunction(() => typeof window.__do2 === 'function', null, { timeout: 15000 })
     return await t.evaluate(([d, k, g, c]) => window.__do2(d, k, g, c), [ds, kieu, giay, cho])
@@ -125,6 +133,18 @@ if (CHI.includes('noi')) {
   console.log('③ Giọng nói −25 dBFS trên nền ồn −55 dBFS')
   ra.noi = await chay(ghiWav('noi.wav', giongNoi(-25, -55)), DS.noi, 'noi', 20, 8)
   for (const x of ra.noi) console.log(`  ${x.ten}\n     NHẬN: nói ${x.noiNhan.rmsNoiDb} dBFS · đỉnh ${x.noiNhan.dinhDb} · ồn quãng nghỉ ${x.noiNhan.onNghiDb} · tín / ồn ${x.noiNhan.tinTrenOnDb} dB (tại mic ${x.noiMic.tinTrenOnDb}) · «thở» ${x.noiNhan.thoDb} dB (${x.noiNhan.soQuangNghi} quãng) · segSNR ${x.noiNhan.segSnrDb} dB · ${x.kbps} kb/s`)
+}
+if (CHI.includes('that')) {
+  // BỘ LỌC SÂU (lượt 3): giọng NGƯỜI THẬT trên nền ồn (WAV 48 kHz một kênh ở biến môi trường LV_THAT — vd. do `tai-mau-loc-on.mjs` + trộn ồn) qua đường thật.
+  // Bộ lọc sâu coi xung / giọng tổng hợp là ồn ⇒ trễ đo bằng tương quan chéo. Chờ 14 giây cho bộ lọc tải + dựng + nhập cuộc rồi mới thu 16 giây.
+  const O = { opus: { ...O64, ptime: 20 } }, wav = resolve(process.env.LV_THAT ?? '')
+  const ds = [{ ...O, ten: 'không lọc', locOn: 'tat' }, { ...O, ten: 'lọc riêng «Mạnh»', locOn: 'manh' }, { ...O, ten: 'lọc riêng «Vừa»', locOn: 'vua' }]
+  ra.that = {}
+  for (const ham of (process.env.LV_HAM ?? '1,4').split(',').map(Number)) {
+    console.log(`⑤ Giọng người thật trên nền ồn — CPU ×${ham}`)
+    ra.that['cpu' + ham] = await chay(wav, ds, 'that', 16, 14, ham)
+    for (const x of ra.that['cpu' + ham]) console.log(`  ${x.ten}\n     bộ ${x.mic.locOnBo} (bộ sâu: ${x.mic.df3?.tinh}${x.mic.df3?.vi ? ' vì ' + x.mic.df3.vi : ''}, ${x.mic.df3?.ms} ms/khung, dựng ${x.mic.df3?.msDung ?? '—'} ms) · trễ chuỗi ${x.that.chuoiMs} (p95 ${x.that.chuoiP95}) · TỔNG mic → nhận ${x.that.tongMs} (p95 ${x.that.tongP95}; ${x.that.soCuaSo} cửa sổ) · đệm rung ${x.demRungMs} · sau chuỗi: nói ${x.noiChuoi.rmsNoiDb} dBFS (tại mic ${x.noiMic.rmsNoiDb}) · ồn ở quãng nghỉ dài: mic ${x.nghiChuoi?.micDb} → sau chuỗi ${x.nghiChuoi?.raDb} → NHẬN ${x.nghiNhan?.raDb} dBFS (${x.nghiChuoi?.soQuang} quãng)`)
+  }
 }
 const cu = existsSync(RA) ? JSON.parse(readFileSync(RA, 'utf8')) : {}
 cu[NHAN] = { ...(cu[NHAN] ?? {}), ...ra }

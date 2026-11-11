@@ -13,13 +13,14 @@
 //   · Vạch mức âm có nguồn thứ hai KHÔNG cần AudioContext: `sender.getStats()` (`media-source.audioLevel`) = tiếng ĐANG GỬI cho lớp; AudioContext bị treo
 //     thì vạch, «mic đang im» và nhịp `live-nhip` vẫn đúng.
 //   · Tiếng trong: Opus 64 kb/s dải rộng, không DTX (`OPUS_THAY`); khử vọng + lọc ồn của trình duyệt làm đục giọng mic cài áo ⇒ chỉ bật khi CÓ đường vọng
-//     (máy em trong lớp phát loa — «Tất cả»; hoặc loa máy thầy đang phát tiếng em) — luật ở `canLoc()`; thầy ép tay được (`datLoc`).
+//     (loa máy thầy đang phát tiếng em) — luật ở `canLoc()`; thầy ép tay được (`datLoc`).
 // SFU chưa cấu hình (`tieng: 'chua-cau-hinh'`) hoặc nối hỏng ⇒ live vẫn chạy phần HÌNH qua WebSocket.
 import type { ViewLiveBang } from '../bpu/phong-live'
 import type { NetBut, SuKienBut } from '../but-bang-loi'
 import { DIEM_TOI_DA_MOT_GOI, maBangMoi, maGoiDiem, maNetXong, maNhac, maTro, maXoaNet } from './ma-net'
 import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDinh, suaSdpOpus, docSoWebRtc, traLoiMoi, type KenhPhong, type MoiTruongLive, type TuyChonOpus } from './sfu'
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
+import { theAmLoa } from './loa'
 import { dungChuoiTieng, type KieuChuoi, type MucLocOn } from './chuoi-tieng'
 
 export interface TuyChonLiveThay {
@@ -188,7 +189,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
         thuEm = e.receiver
         try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
         try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-        amEm = amEm ?? document.createElement('audio')
+        amEm = amEm ?? theAmLoa()
         amEm.autoplay = true
         amEm.srcObject = new MediaStream([e.track])
         amEm.muted = !tt.ngheEm
@@ -272,9 +273,10 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
   let guiSo2: { muc: number | null; kbps: number | null; byte: number | null; luc: number } = { muc: null, kbps: null, byte: null, luc: 0 }, lucDocGui = -1e9, gui0 = 0
   /** LUẬT XỬ LÝ TIẾNG (thầy 11/11 «tiếng trong và cực rõ»): khử vọng + lọc ồn của trình duyệt làm đục giọng (nhất là mic cài áo) ⇒ chỉ bật khi CÓ ĐƯỜNG VỌNG:
-   *  máy em trong lớp đang phát tiếng thầy ra loa (`tiengLop` — «Tất cả»), hoặc loa máy thầy đang phát tiếng em nói. Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
+   *  loa máy thầy đang phát tiếng em nói (11/11 lần 4: hết tính `tiengLop`). Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
    *  lượng. Thầy ép «Luôn bật» / «Luôn tắt» bằng `datLoc`. */
-  const canLoc = (): boolean => (cheDoLoc === 'bat' ? true : cheDoLoc === 'tat' ? false : !!live?.tiengLop || (tt.ngheEm && !!tt.emNoi))
+  // 11/11 lần 4 (`tiengLop` nay mặc định bật): bỏ `tiengLop` khỏi luật — khử vọng chỉ khử tiếng do CHÍNH MÁY THẦY phát; tiếng loa máy em lọt vào mic thì không khử được.
+  const canLoc = (): boolean => (cheDoLoc === 'bat' ? true : cheDoLoc === 'tat' ? false : tt.ngheEm && !!tt.emNoi)
   /** RÀNG BUỘC NỚI DẦN (mic USB có thể ra luồng CÂM khi trình duyệt bật xử lý tiếng): 0 theo luật lọc · 1 tắt khử vọng + lọc ồn · 2 mic thô · 3 mic thô +
    *  thiết bị chỉ là «ưu tiên». KHÔNG ép `channelCount` (chuỗi làm rõ tiếng tự cộng hai kênh về mono). */
   const SO_BAC = 4
@@ -701,7 +703,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     const emNoi = n ? { sbd: n.sbd, ten: n.ten, doi: n.doi, xa: n.xa } : null
     // Mặc định chỉ phát ra loa khi em ở xa: em đứng ngay trong lớp mà loa lớp phát lại giọng em qua mic máy em ⇒ vọng / hú.
     const ngheEm = ngheEmDat ?? !!n?.xa
-    if ((tt.emNoi?.sbd ?? '') !== (emNoi?.sbd ?? '') || tt.ngheEm !== ngheEm) dat({ emNoi, ngheEm })
+    // 11/11 lần 4: soát lọc NGAY khi hai giá trị này đổi (`soatLoc()` của `nhanLive` chạy trước dòng này ⇒ chậm một view).
+    if ((tt.emNoi?.sbd ?? '') !== (emNoi?.sbd ?? '') || tt.ngheEm !== ngheEm) { dat({ emNoi, ngheEm }); soatLoc() }
     if (amEm) amEm.muted = !ngheEm
     if (!n) { emDangKeo = ''; thuEm = null; if (amEm) amEm.srcObject = null; return }
     if (!ngheEm || !pc || !phienSfu || emDangKeo === n.ss.id) return
@@ -748,7 +751,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       if (!nghiNay && live.bat && tuBat) { net.clear(); const anh = tuy.layAnh?.(); if (anh) guiAnh(anh) }
     }
     if (tt.nghi !== nghiNay) dat({ nghi: nghiNay })
-    soatLoc() // «Tất cả» / em ở xa đang nói ⇒ có đường vọng ⇒ đổi chế độ lọc của mic đang mở
+    soatLoc() // có đường vọng ⇒ đổi chế độ lọc của mic đang mở
     if (live.bat && tuBat) daThayBat = true
     // Phòng tự tắt (hết buổi, quá 15 phút) — chỉ tin khi đã từng thấy phòng xác nhận lần bật này (view cũ còn trên đường không được tắt nhầm).
     else if (!live.bat && tuBat && daThayBat) { tuBat = false; ngatMic(); if (gui) void gui.replaceTrack(trackCam).catch(() => undefined) }

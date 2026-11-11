@@ -91,7 +91,7 @@ describe('tải phòng live: 300 kết nối × 30 lô/giây', () => {
     expect(tb(ms)).toBeLessThan(1)
     // Đối chứng: một lần đổi trạng thái (phát `viewBang` + 300 `viewEm`).
     const a = performance.now()
-    await ph.gui(gv, { t: 'live-dat', tiengLop: true })
+    await ph.gui(gv, { t: 'live-dat', tiengLop: false }) // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): `tiengLop` mặc định đã bật ⇒ gửi `true` không đổi gì (không phát view); đổi sang «Em ở xa» mới là một lần đổi trạng thái
     const view = performance.now() - a
     expect(dem.chu).toBe(SO_EM + 1)
     console.log(`[đo] phòng live, ${SO_EM} kết nối giả: mỗi khung nét xong (~2,3 KB) trung bình ${tb(ms).toFixed(4)} ms · p95 ${p(ms, 0.95).toFixed(4)} ms; MỘT lần phát view đầy đủ cho cả lớp = ${view.toFixed(2)} ms (vì vậy view chỉ phát khi trạng thái đổi)`)

@@ -142,7 +142,9 @@ describe('K2 · thầy gọi lên bảng ⇒ ép cả lớp vào bảng live, kh
 describe('K3 · K4 · tạm dừng + khay mép phải', () => {
   // 11/11 LẦN 3 — sửa có chủ đích: trước đây (lần 2) khay đóng có nút nổi «Tiếng đang tắt» cạnh tay nắm. Thầy: «thiết kế ẩn hết vào thanh ẩn» ⇒ bỏ nút nổi;
   // tay nắm mang DẤU loa gạch rất nhỏ, và lần ĐẦU trong buổi khay tự mở 3 giây cho em thấy nút «Tiếng» (một chạm là bật) rồi tự thu.
-  it('TIẾNG ĐANG TẮT (thầy 11/11: live «Em ở xa», máy em trong lớp mặc định tắt tiếng mà không ai biết): KHÔNG còn nút nổi; tay nắm có dấu «tiếng đang tắt», khay tự mở lần đầu, nút «Tiếng» trong khay MỘT chạm là bật; thầy tạm dừng ⇒ hết dấu', async () => {
+  // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): máy em trong lớp nay MẶC ĐỊNH BẬT tiếng ⇒ không dấu, khay không tự mở; trạng thái «tiếng tắt» của test này
+  // dựng bằng đường thật: thầy chọn «Em ở xa» (`live-dat { tiengLop: false }`).
+  it('TIẾNG ĐANG TẮT (thầy 11/11: live «Em ở xa», máy em trong lớp tắt tiếng mà không ai biết): KHÔNG còn nút nổi; tay nắm có dấu «tiếng đang tắt», khay tự mở lần đầu, nút «Tiếng» trong khay MỘT chạm là bật; thầy tạm dừng ⇒ hết dấu', async () => {
     const st = phong(); datCoLive(st, { cho: true, sfu: true }, T0)
     moLuot(st, cau, T0); nhanTra(st, 'S1', 'B', T0 + 100); moDapAn(st, T0 + 200, (a, b) => a === b)
     const { default: Man } = await import('../src/components/bpu/ManBinhPhanUng')
@@ -151,8 +153,13 @@ describe('K3 · K4 · tạm dừng + khay mép phải', () => {
     const ws = WsGia.ds[0]!, bao = () => ws.nhan(viewEm(st, 'S1'))
     liveBat(st, T0 + 1000); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
-    expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'tat' }) // em trong lớp, thầy để «Em ở xa»
     const dau = () => document.querySelector('.lv .lv-nam .lv-nam-dau [data-dau="tieng"]')
+    // mặc định mới: tiếng BẬT ⇒ ô «Tiếng» ghi «Đang bật», tay nắm không có dấu, khay không tự mở
+    expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'bat' })
+    await screen.findByLabelText('Tiếng thầy: đang bật. Chạm để tắt')
+    expect(dau()).toBeNull(); expect(document.querySelector('.lv .lv-khay')!.hasAttribute('data-mo')).toBe(false)
+    liveDat(st, { tiengLop: false }, T0 + 1500); bao() // thầy chọn «Em ở xa»
+    expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'tat' }) // em trong lớp, thầy để «Em ở xa»
     await waitFor(() => expect(dau()).toBeTruthy())
     expect(dau()!.getAttribute('title')).toBe('tiếng đang tắt')
     expect(document.querySelector('.lv .lv-nam')!.getAttribute('aria-label')).toMatch(/khay điều khiển · tiếng đang tắt$/)

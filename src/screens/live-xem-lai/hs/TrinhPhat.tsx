@@ -14,6 +14,7 @@ import { createPortal } from 'react-dom'
 import { anToanHinh, canXoayCss, giaiTrang, khungChieu } from '../../../components/live/bo-cuc'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from '../../../components/live/KhungDocLap'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
+import { chonHeSoGiay } from '../../../components/live/vua-giay'
 import type { SuKienBut } from '../../../lib/but-bang-loi'
 import { TEP_LIVE, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
@@ -63,13 +64,21 @@ const GiayDe = memo(function GiayDe({ de, khoa, rong, cao }: { de: ReactNode | n
   const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 340))
   const [k, setK] = useState(kMin)
   const coDe = de != null
+  const da = useRef(0)
   useLayoutEffect(() => {
     const el = trong.current
     if (!el) return
-    const do1 = () => { const h = el.scrollHeight || 1; setK(Math.max(kMin, Math.min(kMax, (cao - 28) / h))) }
+    // Chọn hệ số phóng MỘT lần cho mỗi (câu, khổ ô giấy) bằng cách dò (vua-giay.ts) — bản trước tính lại theo chính chiều cao vừa đổi ⇒ không có điểm dừng,
+    // khối đề đổi cỡ mỗi khung hình («đề nhấp nháy lên xuống», thầy 11/11). Chỉ dò lại khi khối đề đổi cao vì lý do KHÁC (ảnh / phông tải xong).
+    const do1 = () => {
+      const r = chonHeSoGiay((thu) => { el.style.width = `${(rong - 36) / thu}px`; return el.scrollHeight }, cao, kMin, kMax)
+      el.style.width = `${(rong - 36) / r.k}px`
+      da.current = r.h
+      setK(r.k)
+    }
     do1()
     if (typeof ResizeObserver !== 'function') return
-    const ro = new ResizeObserver(do1)
+    const ro = new ResizeObserver(() => { if (Math.abs((el.scrollHeight || 1) - da.current) > 1) do1() })
     ro.observe(el)
     return () => ro.disconnect()
   }, [khoa, rong, cao, coDe, kMin, kMax])

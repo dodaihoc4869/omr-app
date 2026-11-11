@@ -66,10 +66,36 @@ describe('luật phòng live (thuần)', () => {
     expect(L.viewBang(st).live).toMatchObject({ bat: true, tieng: 'chua-cau-hinh', ss: null })
     expect(L.viewEm(st, 'S1').live).toMatchObject({ bat: true, tieng: 'chua-cau-hinh', ss: null })
   })
-  it('điểm quyết 3 + 4: em trong lớp mặc định TẮT tiếng, em ở xa mặc định bật; «cho em ở xa» mặc định tắt', () => {
+  // TEST MỚI 11/11 lần 4 (thầy: «Tự động bật tiếng, tự động tắt mic cho hs khi vào live») — khoá mặc định mới của `tiengLop`.
+  it('vào live tự BẬT tiếng: phòng mới + `liveBat` ⇒ em đã điểm danh trong lớp `tieng: bat`; thầy chọn «Em ở xa» ⇒ `tat`, bật live lại lần hai trong buổi KHÔNG tự bật lại; phòng cũ còn `tiengLop: false` ⇒ lần bật đầu tự bật; thầy đã chọn «Em ở xa» TRƯỚC khi bật ⇒ giữ', () => {
+    const st = phong()
+    expect(st.live!.tiengLop).toBe(true)
+    LL.liveSan(st, { ss: SS }, 1500); LL.liveBat(st, 2000)
+    expect(L.viewEm(st, 'S1').live).toMatchObject({ duocXem: true, bat: true, phien: 1, tieng: 'bat' })
+    expect(L.viewBang(st).live).toMatchObject({ tiengLop: true })
+    expect(LL.liveDat(st, { tiengLop: false }, 2100)).toBe(true) // thầy chọn «Em ở xa»
+    expect(L.viewEm(st, 'S1').live).toMatchObject({ tieng: 'tat' })
+    LL.liveTat(st, 2200); expect(LL.liveBat(st, 2300)).toBe(true) // bật lại lần hai trong buổi: giữ lựa chọn của thầy
+    expect(L.viewEm(st, 'S1').live).toMatchObject({ bat: true, phien: 2, tieng: 'tat' })
+    expect(L.viewBang(st).live).toMatchObject({ tiengLop: false })
+    // phòng mở trước 11/11 (còn `tiengLop: false`, thầy chưa chọn gì) ⇒ lần bật live ĐẦU của buổi tự bật
+    const cu = phong(); cu.live!.tiengLop = false
+    LL.liveBat(cu, 2000)
+    expect(L.viewEm(cu, 'S1').live).toMatchObject({ bat: true, tieng: 'bat' })
+    // thầy mở cửa sổ nút Live, chọn «Em ở xa» TRƯỚC khi bật live ⇒ lần bật đầu KHÔNG ghi đè lựa chọn ấy
+    const chon = phong()
+    expect(LL.liveDat(chon, { tiengLop: false }, 1900)).toBe(true)
+    LL.liveBat(chon, 2000)
+    expect(L.viewEm(chon, 'S1').live).toMatchObject({ bat: true, phien: 1, tieng: 'tat' })
+    expect(L.viewBang(chon).live).toMatchObject({ tiengLop: false })
+  })
+  // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): em trong lớp nay mặc định BẬT tiếng; thầy chọn «Em ở xa» (`live-dat { tiengLop: false }`) ⇒ tắt.
+  it('điểm quyết 3 + 4: em trong lớp mặc định BẬT tiếng (thầy chọn «Em ở xa» ⇒ tắt), em ở xa luôn bật; «cho em ở xa» mặc định tắt', () => {
     const st = phong()
     LL.liveSan(st, { ss: SS }, 1500); LL.liveBat(st, 2000)
-    expect(st.live).toMatchObject({ xa: false, tiengLop: false })
+    expect(st.live).toMatchObject({ xa: false, tiengLop: true })
+    expect(L.viewEm(st, 'S1').live).toMatchObject({ duocXem: true, bat: true, tieng: 'bat', ss: SS })
+    expect(LL.liveDat(st, { tiengLop: false }, 2100)).toBe(true)
     expect(L.viewEm(st, 'S1').live).toMatchObject({ duocXem: true, bat: true, tieng: 'tat', ss: SS })
     // S3 thuộc lớp nhưng chưa điểm danh: chưa được xem, không nhận phiên SFU.
     expect(LL.duocXemLive(st, 'S3')).toBe(false)
@@ -169,7 +195,7 @@ describe('phòng live (Durable Object)', () => {
     await ph.khoi([{ sbd: 'S1' }, { sbd: 'S2' }, { sbd: 'S3' }])
     const gv = await ph.noi('gv'), em = [await ph.noi('hs', 'S1'), await ph.noi('hs', 'S2'), await ph.noi('hs', 'S3')]
     await ph.gui(gv, { t: 'live-bat' })
-    for (const w of em) await ph.gui(w, { t: 'live-ok', dc: true }) // máy em trong lớp mặc định tắt tiếng
+    for (const w of em) await ph.gui(w, { t: 'live-ok', dc: true }) // máy em chưa báo `nghe` (loa chưa phát tiếng thầy thật)
     await vi.advanceTimersByTimeAsync(400)
     expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toEqual({ t: 'live-xem', xem: 3, ws: 0, nghe: 0 })
     const truoc = em.map((w) => w.tin.length)
@@ -180,8 +206,8 @@ describe('phòng live (Durable Object)', () => {
     await ph.gui(em[0]!, { t: 'live-ok', dc: true, nghe: false })
     await vi.advanceTimersByTimeAsync(400)
     expect(chu(gv).filter((m) => m.t === 'live-xem').pop()).toMatchObject({ xem: 3, nghe: 1 })
-    await ph.gui(gv, { t: 'live-dat', tiengLop: true })
-    expect(viewCuoi(gv).live).toMatchObject({ xem: 3, nghe: 1 })
+    await ph.gui(gv, { t: 'live-dat', tiengLop: false }) // 11/11 lần 4 (thầy: tự bật tiếng, tự tắt mic khi vào live): `tiengLop` mặc định đã bật ⇒ đổi sang «Em ở xa» mới là một lần đổi trạng thái (phát view)
+    expect(viewCuoi(gv).live).toMatchObject({ xem: 3, nghe: 1, tiengLop: false })
   })
   it('công tắc tắt / phòng mở bằng Worker bản cũ (không gửi `live`): không khối live, lệnh live và khung nhị phân đều bị bỏ, luật cũ chạy y nguyên', async () => {
     for (const live of [{ cho: false, sfu: true }, null]) {
