@@ -61,12 +61,14 @@ Worker CPU dự báo 259 triệu ms (gói 30 triệu) ⇒ ~4,6 USD; lượt gọ
 | Dấu hỗ trợ câu sai: quét mọi dấu của em ⇒ dò khoảng qid trên khoá chính | chờ phát hành | 0,55 tỉ hàng, 1.384 hàng/lượt |
 | Ca bảo vệ đề: không đếm lượt của ca đã đóng (`game-v2-bank.ts`) | chờ phát hành | 0,41 tỉ hàng, 1.456 hàng/lượt |
 | Cron gói sửa mỗi phút: chỉ mục bộ phận đợt mở (`chi-muc-luc-chay.ts`, dựng 00:01) | chờ phát hành | 0,13 tỉ hàng, 98.216 hàng/lượt |
-| Workers AI: trần 9.000 neurons/ngày (phần miễn phí 10.000) + công tắc `cau_hinh.workers_ai_tat` | chờ phát hành | 27/10: 1,61 tr neurons ≈ 17,6 USD |
-| Workers Logs: lấy mẫu 20 % lượt gọi (vẫn bật) | chờ phát hành | chưa đo được (khoá thiếu quyền) |
+| Workers AI: trần 9.000 neurons/ngày UTC (phần miễn phí 10.000; hệ số neurons/token là ƯỚC LƯỢNG) + công tắc `cau_hinh.workers_ai_tat` | chờ phát hành | 27/10: 1,61 tr neurons ≈ 17,6 USD |
+| Workers Logs lấy mẫu | TẠM HOÃN: phiên Live đang soi nhật ký `live_tieng`; chưa đo được số sự kiện (khoá thiếu quyền) | — |
 | Máy theo dõi chi phí 23:17 VN mỗi đêm, đỏ khi dự báo > 6 USD + 15 câu D1 đọc nặng nhất | XONG | — |
 
 Kế hoạch truy vấn trên D1 THẬT (EXPLAIN, `ke-hoach-d1-1111.yml`): nhánh qid ⇒ `idx_skh_em_qid_ngay`, nhánh tc ⇒ `idx_skh_em_tc`, dấu hỗ trợ ⇒ `idx_lg_hoi_em_cau_luc (sbd, qid>?, qid<?)`.
 Test so cũ ↔ mới: `tests/doc-loi-dau-chi-muc-1111.test.ts`, `tests/ca-bao-ve-dem-mo-1111.test.ts`.
 
-Còn lại sau đợt này (theo bảng 15 câu): chua_loi_dot `qid_chuan=? OR content_group=?` (~157 tr/ngày), hanh_trinh_v4_canh (~124 tr), giao kho sai cả lớp (~88 tr, do thầy bấm),
-cau_meta (~74 tr) … và lượt gọi + CPU Worker (~7,8 USD/kỳ) — đợt sau, sau khi đo lại 24 giờ.
+Số thật 24 giờ tới 12:08 UTC 11/11: D1 đọc **3,97 tỉ hàng** (gói ~0,83 tỉ/ngày); 4 câu sửa đợt này = 2,28 tỉ ⇒ còn ~**1,69 tỉ/ngày** (15 câu nặng nhất còn lại ~0,78 tỉ,
+đuôi dài ngoài top-15 ~0,91 tỉ). Dự báo sau đợt này: D1 đọc ~25 USD + CPU ~4,5 USD + lượt gọi ~3,2 USD + 5 USD gói ≈ **38 USD/kỳ** (trước: ~127 USD).
+Muốn về ~5–10 USD cần thêm 2–3 đợt: chua_loi_dot `qid_chuan=? OR content_group=?` + chèn kèm (~157 tr), hanh_trinh_v4_canh (~125 tr), giao kho sai cả lớp (~88 tr),
+cau_meta (~75 tr), game_v2_session (~72 tr), kiểm em có tồn tại (~69 tr)… + giảm lượt gọi và CPU Worker. Máy theo dõi đêm sẽ ĐỎ (GitHub gửi thư) tới khi dự báo ≤ 6 USD.
