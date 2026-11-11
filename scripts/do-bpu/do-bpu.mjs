@@ -72,14 +72,12 @@ async function doEm() {
   const m0 = await tgChinh(cdp)
   await t.waitForTimeout(2000)
   const m1 = await tgChinh(cdp)
-  const dap = t.locator('[role="radio"], .bpu-hs-pa, [data-pa], button.pa').first()
-  const ds = []
-  const nut = await t.$$('button, [role="radio"]')
+  await t.$$('button, [role="radio"]')
   // các nút phương án = nút không phải «Gửi đáp án», có chữ A./B./...
   const pa = t.locator('button:has-text("CH3N"), button:has-text("C6H5"), [role="radio"]')
   const n = await pa.count()
   for (let i = 0; i < Math.min(n, 4); i++) { await pa.nth(i % n).tap({ timeout: 5000 }).catch(() => {}); await t.waitForTimeout(250) }
-  const t1 = await t.evaluate(() => performance.now())
+  await t.evaluate(() => performance.now())
   await t.locator('button:has-text("Gửi đáp án")').tap({ timeout: 5000 }).catch(() => {})
   await t.waitForTimeout(1500)
   const sk = await t.evaluate(() => window.__sk)
@@ -92,7 +90,7 @@ async function doGoiLen() {
   const { ngu, t } = await trang('bang', '&tre=350')
   await t.waitForTimeout(1500); await t.evaluate(() => window.__day()); await t.waitForSelector('.bb-tl', { timeout: 30000 })
   await t.waitForTimeout(2500)
-  const t0 = await t.evaluate(() => performance.now())
+  await t.evaluate(() => performance.now())
   await t.keyboard.press('l')
   await t.waitForFunction(() => !document.querySelector('.bb-chinh:disabled') && document.body.textContent.includes('Mời') || window.__goi, { timeout: 8000 }).catch(() => {})
   await t.waitForTimeout(100)

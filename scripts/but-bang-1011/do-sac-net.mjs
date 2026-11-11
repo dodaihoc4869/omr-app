@@ -70,7 +70,7 @@ function phanTich(anh, rong, cao, d, B, ten) {
     const yT = Math.round(tam((X + 0.5) / d) * d), y1 = Math.max(0, yT - 14), y2 = Math.min(cao - 1, yT + 14)
     let nen = 255
     for (let Y = y1; Y <= y2; Y++) nen = Math.min(nen, sang(X, Y))
-    let s = 0, sy = 0, dm = 0, lon = 0
+    let lon = 0
     const a = []
     for (let Y = y1; Y <= y2; Y++) { const v = Math.max(0, sang(X, Y) - nen); a.push(v); if (v > lon) lon = v }
     cot.push({ X, a, y1, lon })

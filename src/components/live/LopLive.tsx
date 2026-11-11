@@ -48,9 +48,11 @@ import type { Vung } from './bo-cuc-doc-lap'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
 import { chonHeSoGiay } from './vua-giay'
 import { DauGiay, PhuongAnTinh } from './GiayDung'
-import GiayThay, { soiDuoc, type BoChu, type CauGiay } from './GiayThay'
+import GiayThay, { type BoChu, type CauGiay } from './GiayThay'
+import { soiDuoc } from './giay-thay-do'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from './KhungDocLap'
-import { TamLenBang, TheLenBang, emLenBang, khoaDang, usePhaLenBang, type EmLenBang } from './LenBang'
+import { TamLenBang, TheLenBang } from './LenBang'
+import { emLenBang, khoaDang, usePhaLenBang, type EmLenBang } from './len-bang-tinh'
 import './live-em.css'
 
 export interface CauNoiPhongEm { tin: ((d: unknown) => void) | null; noiLai: (() => void) | null }

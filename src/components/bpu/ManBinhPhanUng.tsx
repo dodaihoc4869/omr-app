@@ -14,7 +14,8 @@ import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
 import { cheLiveCua, manEmXa, useHuongLive } from './luat-man-live'
-import { YDeNgang, useThanNgang } from './bo-cuc-ngang'
+import { YDeNgang } from './bo-cuc-ngang'
+import { useThanNgang } from './bo-cuc-ngang-do'
 import { useTheBienDong } from './the-bien-dong'
 export { THE_BD_MS } from './the-bien-dong'
 import { coQuyenTatMan, conKhoaXoay, dangChiaDoi, dangXinQuyen, docQuyenTatMan, khoaXoay, kiemKhoaMan, xinQuyenTatMan } from './tat-man'
@@ -357,7 +358,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     window.addEventListener('pageshow', hien)
     window.addEventListener('focus', hien) // tắt cửa sổ nổi / chạm lại vào app ⇒ về lại
     return () => { document.removeEventListener('visibilitychange', hien); window.removeEventListener('pageshow', hien); window.removeEventListener('focus', hien) }
-  }, [gui])
+  }, [gui, veLai]) // veLai ← thuVe ← [gui]: đổi đúng cùng lượt với gui ⇒ hiệu ứng chạy lại y như trước
 
   // Đồng hồ êm (không đổi màu, không nháy — luật C14).
   const coHan = !!v?.luot?.han && v.luot.pha === 'tra-loi'

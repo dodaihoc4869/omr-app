@@ -5,9 +5,7 @@
 // AN TOÀN: chỉ dùng câu công khai của lượt (không đáp án); không dựng lời giải.
 import type { ReactNode } from 'react'
 import type { BoChu, CauGiay } from './GiayThay'
-
-/** Tên phần của câu trên đầu giấy (dùng chung với giấy soi GiayThay.tsx). */
-export const TEN_PHAN: Record<string, string> = { I: 'Trắc nghiệm', II: 'Đúng / Sai', III: 'Trả lời ngắn' }
+import { TEN_PHAN } from './ten-phan-giay'
 
 /** Dòng đầu giấy: «Câu 3» + «Phần II · Đúng / Sai» (như đầu giấy của tờ chiếu). */
 export function DauGiay({ q, so, tuLuan }: { q: CauGiay; so?: number | null; tuLuan: boolean }) {

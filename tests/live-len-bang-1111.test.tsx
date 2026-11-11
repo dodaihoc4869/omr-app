@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { chamLenBang, goiLenBang, lamBang, moDapAn, moLuot, nhanTra, taoPhong, viewEm, DOI_BPU, type TrangThaiPhong } from '../src/lib/bpu/phong'
 import { VUNG_MAC_DINH, khungChieu } from '../src/components/live/bo-cuc'
 import { DAU_BANG, KHE_DAU, boCucDocLap, mocChia, oDauBang } from '../src/components/live/bo-cuc-doc-lap'
-import { GIUA_MS, THU_MS, emLenBang, khoaDang } from '../src/components/live/LenBang'
+import { GIUA_MS, THU_MS, emLenBang, khoaDang } from '../src/components/live/len-bang-tinh'
 import { _datLaiTatMan } from '../src/components/bpu/tat-man'
 
 type Tt = Record<string, unknown>

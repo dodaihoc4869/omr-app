@@ -109,9 +109,11 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     if (!cvChot.current || !cvSong.current) return
     const v = taoVeBang(taoLoiBut(), cvChot.current, cvSong.current, noiB.current)
     veB.current = v
-    P.current.khiTay?.(S.current.tay != null)
+    // `S.current` là MỘT vật suốt đời khung (không bao giờ gán lại) ⇒ giữ tay cầm cho lượt dọn — đọc `henNo` lúc dọn như trước.
+    const s = S.current
+    P.current.khiTay?.(s.tay != null)
     xep()
-    return () => { veB.current = null; S.current.daDat = false; clearTimeout(S.current.henNo) }
+    return () => { veB.current = null; s.daDat = false; clearTimeout(s.henNo) }
   }, [xep])
   // Giấy đổi giữa «soi khớp» và «dựng thường», đổi cỡ chữ của giấy thầy, bật / tắt tự ưu tiên ⇒ chia lại.
   const daDung = useRef(false)

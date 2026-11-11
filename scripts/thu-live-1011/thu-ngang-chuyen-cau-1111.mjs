@@ -126,7 +126,6 @@ const trang = (t) => t.evaluate(() => {
     toanMan: !!document.fullscreenElement, nc: window.__nc,
   }
 })
-const docNc = (t) => t.evaluate(() => ({ ...window.__nc }))
 const datLaiNc = (t) => t.evaluate(() => { window.__nc.docKhiCau = 0; window.__nc.nhat = [] })
 const ghiChu = (s) => `${s.vp} · hình ${s.hinh.join('×')}${s.gXoay ? ' (gốc xoay CSS)' : ''}${s.lvXoay ? ' (bảng xoay CSS)' : ''}`
 

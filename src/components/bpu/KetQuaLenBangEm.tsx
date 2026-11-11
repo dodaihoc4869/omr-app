@@ -11,7 +11,7 @@ import { DOI_BPU, tenNgan, type ViewEm } from '../../lib/bpu/phong'
 type Goi = NonNullable<NonNullable<ViewEm['luot']>['goi']>
 const dau = (n: number) => (n > 0 ? `+${n.toLocaleString('vi-VN')}` : `−${Math.abs(n).toLocaleString('vi-VN')}`)
 /** Tên gọi = HAI chữ cuối (thầy 10/11 «tên ghi 2 chữ ra ví dụ Minh Anh»), cùng hàm `tenNgan` của bảng chiếu. */
-export const tenGoiEm = tenNgan
+const tenGoiEm = tenNgan
 
 export default function KetQuaLenBangEm({ g, laEm, kjEm }: { g: Goi; laEm: boolean; kjEm?: number | null }) {
   if (g.dat == null) return null

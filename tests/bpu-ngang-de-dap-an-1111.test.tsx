@@ -13,7 +13,8 @@ import { cauCongKhai } from '../server/src/cau-theo-qid'
 import type { PrivateQuestion, Question } from '../src/game/than-thu-v2/core'
 import { CAO_KHUNG_THAP, RONG_HAI_COT } from '../src/components/bpu/luat-man-live'
 import { RONG_NGANG_MIN } from '../src/components/hoc-tap/bo-cuc-lam'
-import { YDeNgang, coPhieu, doCotTra } from '../src/components/bpu/bo-cuc-ngang'
+import { YDeNgang } from '../src/components/bpu/bo-cuc-ngang'
+import { coPhieu, doCotTra } from '../src/components/bpu/bo-cuc-ngang-do'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-chu' }))
 
