@@ -164,7 +164,7 @@ export const JS_LIVE_TO_CHIEU = `
     var b = e.target.closest && e.target.closest('[data-thu]');
     if (b) { lvGui('thu-mic', b.getAttribute('data-thu') ? { sbd: b.getAttribute('data-thu') } : null); return; }
     b = e.target.closest && e.target.closest('[data-nghe]');
-    if (b) { lvGui('nghe-em', { v: b.getAttribute('data-nghe') === '1' }); return; }
+    if (b) { lvGui(b.getAttribute('data-nghe') === 'lai' ? 'nghe-em-lai' : 'nghe-em', { v: b.getAttribute('data-nghe') === '1' }); return; }
     // đợt 2: «Mời nói» · «Hạ hết tay» · mở / thu hàng giơ tay
     b = e.target.closest && e.target.closest('[data-moi]');
     if (b) { lvGui('moi', { sbd: b.getAttribute('data-moi') }); return; }
@@ -192,6 +192,8 @@ export const JS_LIVE_TO_CHIEU = `
       if (mLoi) h += '<p class="loi">' + lvSach(mLoi) + ': chưa bật được mic</p>';
       // em đứng trong lớp: loa lớp phát lại giọng em qua mic máy em dễ hú ⇒ mặc định tắt; em ở xa ⇒ mặc định bật. Thầy đổi tại đây.
       if (noi.length) h += '<div class="mc-lv-dong" style="margin-top:0"><span><b>Phát tiếng em ra loa lớp</b><br>Em đứng cạnh loa thì nên tắt (dễ hú)</span><button type="button" class="mc-lv-n nho" data-nghe="' + (LV.tt.ngheEm ? '0' : '1') + '" aria-pressed="' + (!!LV.tt.ngheEm) + '">' + (LV.tt.ngheEm ? 'Đang bật' : 'Đang tắt') + '</button></div>';
+      // 11/11 tối · lưới an toàn phía nghe: tiếng em tới máy thầy mà trình duyệt chưa cho phát ⇒ một lần chạm
+      if (noi.length && LV.tt.ngheEm && LV.tt.emKet) h += '<div class="mc-lv-dong" style="margin-top:0" role="alert"><span><b>Máy chưa phát được tiếng em</b><br>Trình duyệt chặn tự phát — chạm để nghe</span><button type="button" class="mc-lv-n nho" data-nghe="lai">Chạm để nghe</button></div>';
       if (noi.length) h += '<div class="mc-lv-cuoi"><button type="button" class="mc-lv-n nho" data-thu="">Tắt mic tất cả</button></div>';
       h += '</div>';
     }

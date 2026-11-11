@@ -35,6 +35,8 @@ export interface TtLiveTo {
   noi: { sbd: string; ten: string; ky: string; doi: string; mau: string }[]
   /** Máy thầy có đang phát tiếng em ra loa lớp không (mặc định chỉ khi em ở xa — chống hú). */
   ngheEm: boolean
+  /** Tiếng em tới mà thẻ phát của máy thầy bị trình duyệt chặn / đứng (lưới an toàn) ⇒ tờ hiện «Chạm để nghe». */
+  emKet: boolean
   /** Lượt đang mở mà còn em chưa gửi — viên live nhắc (đặc tả mục 5). */
   chuaGui: number
   /** `loa` = ô chọn đầu ra âm thanh (null = trình duyệt không chọn được ⇒ ẩn); `thu` = kết quả lần «Thử loa» gần nhất; `trung` = tên loa mặc định nếu đó là
@@ -144,7 +146,7 @@ function trangThai(): TtLiveTo {
     xem: ttLt?.xem ?? l?.xem ?? 0, nghe: ttLt?.xemNghe ?? l?.nghe ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
     coTieng: l?.tieng !== 'chua-cau-hinh', khongTieng: ttLt?.tieng === 'khong' || ttLt?.tieng === 'loi', micIm: !!ttLt?.micIm,
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
-    bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm,
+    bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm, emKet: !!ttLt?.amEmKet,
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
     the: the ? { ...the, xa: !!l?.xa } : null, roi, tay, moi, micLoi, nghi: live && !!l?.nghi, dot2: GIAO_DIEN_DOT_2,
     mic: ttLt && ttLt.micTinh !== 'chua' ? { tinh: ttLt.micTinh, ten: ttLt.micTen, loc: ttLt.loc, cheDo: cheDoLoc(), locOn: mucLocOn(), locOnChay: lt?.chanDoan?.().locOnChay ?? 'khong', khac: ttLt.micKhac ?? '' } : null,
@@ -351,6 +353,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'tam-dung': lt?.tamDung(m.v === true); break
     case 'giay': { let k = ''; try { k = m.giay && typeof m.giay === 'object' ? JSON.stringify(m.giay) : '' } catch { k = '' } if (k.length <= 1500) { giayCuoi = k; guiGiay() } break }
     case 'nghe-em': lt?.datNgheEm(m.v === true); break
+    case 'nghe-em-lai': lt?.phatLaiEm(); break
     case 'anh': {
       guong.khoa = String(m.trang ?? ''); guong.tiLe = Number(m.tiLe) || 16 / 9; guong.net = Array.isArray(m.net) ? (m.net as NetBut[]) : []
       maCua.set(guong.khoa, maTrang(guong.khoa, vungCua(m.vung), m.giayToi === true))

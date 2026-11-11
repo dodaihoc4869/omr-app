@@ -22,6 +22,7 @@ import { OPUS_THAY, choIce, choKenhMo, choNoi, docSoGui, goiCua, moiTruongMacDin
 import { dsMic, timTheMacDinh } from './thiet-bi-mic'
 import { BAC_CUOI, coMic, rangBuocMic, timMicTheoTen } from './thang-mic'
 import { theAmLoa } from './loa'
+import { taoLuoiGui, taoLuoiPhat } from './luoi-tieng'
 import { dungChuoiTieng, type KieuChuoi, type MucLocOn } from './chuoi-tieng'
 
 import type { AnhBang, ChanDoanMic, CheDoLoc, KetQuaBat, TrangThaiLiveThay, TuyChonLiveThay } from './thay-kieu'
@@ -174,7 +175,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   const idDung = (): string | null => (macDinhTam ? null : idThe ?? micId)
   const timThe = (): Promise<string | null> => timTheMacDinh(mic?.getAudioTracks()[0]?.label ?? '')
   /** Chuỗi làm rõ tiếng (Web Audio) của luồng mic đang mở; `hong` = chuỗi ra câm trong khi mic có tiếng ⇒ bỏ chuỗi, gửi thẳng track mic. */
-  let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
+  let chuoi: { ra: MediaStreamTrack; doRa: AnalyserNode; nut: AudioNode[]; hong: boolean; k: { kieu: string; datLocOn?: (m: MucLocOn) => void; locOn?: string; vao?: number; vaoLuc?: number } } | null = null, chuoiDo: AudioNode[] | null = null, mauRa: Float32Array<ArrayBuffer> | null = null
   let guiSo2: { muc: number | null; kbps: number | null; byte: number | null; luc: number } = { muc: null, kbps: null, byte: null, luc: 0 }, lucDocGui = -1e9, gui0 = 0
   /** LUẬT XỬ LÝ TIẾNG (thầy 11/11 «tiếng trong và cực rõ»): khử vọng + lọc ồn của trình duyệt làm đục giọng (nhất là mic cài áo) ⇒ chỉ bật khi CÓ ĐƯỜNG VỌNG:
    *  loa máy thầy đang phát tiếng em nói (11/11 lần 4: hết tính `tiengLop`). Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
@@ -425,7 +426,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
       muc: d, mucGui: gui && guiSo2.muc != null ? Math.min(1, guiSo2.muc * 3) : null, kbps: guiSo2.kbps, gan: !!gui && !!t && (gui.track === t || (!!chuoi && gui.track === chuoi.ra)),
       sfu: !!pc && pc.connectionState === 'connected', loc: tt.loc, bac, ctx: amCtx?.state ?? 'khong',
       hz: cd.sampleRate ?? null, kenh: cd.channelCount ?? null, vong: typeof cd.echoCancellation === 'boolean' ? cd.echoCancellation : cd.echoCancellation == null ? null : true, on: cd.noiseSuppression ?? null, agc: cd.autoGainControl ?? null,
-      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', hzXuLy: amCtx?.sampleRate ?? null, treThu: ((l) => (typeof l === 'number' && l >= 0 && l <= 0.2 ? Math.round(l * 1000) : null))((cd as { latency?: number }).latency), // ngoài 0–200 ms = trình điều khiển báo bậy (mic USB báo số âm ⇒ «trễ −121 ms»)
+      chuoi: tuy.chuoi !== false && !!chuoi && !chuoi.hong && (chuoi.k.kieu === 'khung' || ctxChay()), the: !!idThe, kieu: chuoi?.k.kieu ?? 'khong', locOn: mucLocOn, locOnChay: chuoi && !chuoi.hong ? chuoi.k.locOn ?? 'khong' : 'khong', luoi: lyDoLuoi, hzXuLy: amCtx?.sampleRate ?? null, treThu: ((l) => (typeof l === 'number' && l >= 0 && l <= 0.2 ? Math.round(l * 1000) : null))((cd as { latency?: number }).latency), // ngoài 0–200 ms = trình điều khiển báo bậy (mic USB báo số âm ⇒ «trễ −121 ms»)
     }
   }
   // cắm lại đúng mic đã chọn (kể cả khi mã đổi) ⇒ tự về mic ấy
@@ -677,9 +678,15 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     if (tt.pha === 'chua' || tt.pha === 'dang-noi') return
     tuy.kenh.gui({ t: 'live-san', ss: phienSfu ? { id: phienSfu, tieng: 'thay', kenh: dc ? 'net' : null } : null })
   }
+  // LƯỚI AN TOÀN (luoi-tieng.ts): chuỗi ra câm 1,5 giây mà mic vào có tiếng ⇒ gửi thẳng mic; tiếng em tới mà thẻ phát đứng ⇒ bỏ chọn loa, phát lại, báo `amEmKet`.
+  let lyDoLuoi = ''
+  const micCoTieng = (): boolean | null => { const k = chuoi?.k; if (k?.vaoLuc && Date.now() - k.vaoLuc < 2500) return (k.vao ?? 0) > 1e-4; const d = dinh(doDinh, mauDinh); return d == null ? null : d >= NGUONG_CAM }
+  const luoiGui = taoLuoiGui({ gui: () => gui, dangXuLy: () => !!chuoi && !chuoi.hong && gui?.track === chuoi.ra && !tt.micTat && dangLive(), micCoTieng, mt,
+    khiCam: () => { if (chuoi && !chuoi.hong) { chuoi.hong = true; lyDoLuoi = `chuỗi ${chuoi.k.kieu} ra câm 1,5 giây ⇒ gửi thẳng mic`; void ganMic() } } })
+  const luoiPhat = taoLuoiPhat({ the: () => amEm, thu: () => thuEm, khiKet: (k) => dat({ amEmKet: k }), mt })
   function huy(): void {
     if (tuBat) tat()
-    huyRoi = true
+    huyRoi = true; luoiGui.huy(); luoiPhat.huy()
     mt.huyHen(henXa); mt.huyHen(henNhip); henXa = henNhip = null
     ngatMic()
     try { trackCam?.stop() } catch { /* đã dừng */ }
@@ -703,7 +710,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     dat: (o: { xa?: boolean; tiengLop?: boolean; bang?: boolean; giay?: unknown }): void => { tuy.kenh.gui({ t: 'live-dat', ...o }) },
     thuMic, datNgheEm, mucAmEm, moiNoi, haTay, tamDung,
     /** (11/11) «Lọc tiếng ồn + khử vọng»: tu / bat / tat · dòng chẩn đoán mic · luồng mic đang mở (thô) · track tiếng đang gửi cho lớp (sau chuỗi làm rõ tiếng). */
-    datLoc, datLocOn, chanDoan, luongMic: (): MediaStream | null => mic, trackGui,
+    datLoc, datLocOn, chanDoan, luongMic: (): MediaStream | null => mic, trackGui, phatLaiEm: (): void => { void amEm?.play().catch(() => undefined) },
     /** (Xem lại Live 11/11 — chỉ thêm) Luồng tiếng cho MÁY GHI: tiếng thầy ĐANG GỬI cho lớp — SAU chuỗi làm rõ tiếng (đủ to, đã chặn đỉnh; chuỗi không chạy thì
      *  là thẳng track mic) — + tiếng em đang kéo về (null = không có). Track gửi đổi (đổi mic, chuỗi ⇄ mic thô) ⇒ trả đối tượng luồng MỚI để máy ghi nối lại. */
     luongGhi: (): { mic: MediaStream | null; em: MediaStream | null } => ({ mic: tuBat && tt.tieng === 'mic' ? luongGui() : null, em: tt.emNoi && amEm?.srcObject instanceof MediaStream ? amEm.srcObject : null }),

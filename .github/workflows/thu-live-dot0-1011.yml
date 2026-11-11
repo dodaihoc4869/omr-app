@@ -95,7 +95,7 @@ jobs:
             echo "DIST=$RUNNER_TEMP/wt/dist" >> "$GITHUB_ENV"
           fi
           tail -3 "$RUNNER_TEMP/dung.log"
-      - name: Thử tiếng — mic 2 kênh / 1 kênh, có / không cờ tự phát
+      - name: Thử tiếng — mic 2 kênh / 1 kênh, có / không cờ tự phát + chạm
         env:
           REALTIME_APP_ID: ${{ secrets.CF_REALTIME_APP_ID }}
           REALTIME_APP_SECRET: ${{ secrets.CF_REALTIME_APP_SECRET }}
@@ -103,8 +103,9 @@ jobs:
           LOC_ON: ${{ inputs.loc_on || 'manh' }}
         run: |
           rc=0
-          for bien in "giong-2 1" "giong-1 1" "giong-2 0"; do
+          # mic 2 kênh / 1 kênh có cờ tự phát + chạm như app; rồi KHÔNG cờ, KHÔNG chạm (trình duyệt chặn tự phát ⇒ lưới an toàn phía nghe + «Chạm để nghe»)
+          for bien in "giong-2 1 1" "giong-1 1 1" "giong-2 0 0"; do
             set -- $bien
-            node scripts/thu-live-dot0-1011/tieng-that.mjs --dist="$DIST" --nhan="$REF" --wav="$RUNNER_TEMP/giong/$1.wav" --tu-phat="$2" --loc-on="$LOC_ON" || rc=1
+            node scripts/thu-live-dot0-1011/tieng-that.mjs --dist="$DIST" --nhan="$REF" --wav="$RUNNER_TEMP/giong/$1.wav" --tu-phat="$2" --cham="$3" --loc-on="$LOC_ON" || rc=1
           done
           exit $rc

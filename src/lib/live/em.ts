@@ -12,6 +12,7 @@ import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
 import { boLoa, theAmLoa } from './loa'
+import { taoLuoiPhat } from './luoi-tieng'
 import { OPUS_EM, choIce, choKenhMo, choNoi, docSoWebRtc, goiCua, moiTruongMacDinh, suaSdpOpus, traLoiMoi, type KenhPhong, type MoiTruongLive } from './sfu'
 
 export interface TuyChonLiveEm {
@@ -140,6 +141,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       am = am ?? theAmLoa()
       am.autoplay = true
       am.setAttribute('playsinline', '')
+      if (amBan?.srcObject) void amBan.play().catch(() => undefined)
       if (am.srcObject) { capNhatTieng(); await am.play(); dat({ tieng: 'co' }); return true }
       // Chưa có luồng tiếng: phát một tệp câm trong cú chạm để trình duyệt ghi nhận thẻ này đã được người dùng cho phát.
       am.src = CAM; am.muted = true
@@ -566,7 +568,11 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
     xinBu()
     baoOk()
   }
+  // LƯỚI AN TOÀN phía nghe (luoi-tieng.ts): gói tiếng thầy / bạn vẫn tới mà thẻ phát đứng ⇒ bỏ chọn loa, phát lại; vẫn kẹt ⇒ `bi-chan` (khay ghi «Chạm để nghe»).
+  const khiKet = (k: boolean): void => { if (k) dat({ tieng: 'bi-chan' }); else if (tt.tieng === 'bi-chan' && am && !am.paused) dat({ tieng: 'co' }) }
+  const luoi = [taoLuoiPhat({ the: () => am, thu: () => thu, khiKet, mt }), taoLuoiPhat({ the: () => amBan, thu: () => thuBan, khiKet, mt })]
   function huy(): void {
+    for (const l of luoi) l.huy()
     huyRoi = true
     mt.huyHen(henBu); mt.huyHen(henSo); mt.huyHen(henBan); henBu = henSo = henBan = null
     dongSfu()

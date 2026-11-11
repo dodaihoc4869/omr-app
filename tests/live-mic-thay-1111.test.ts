@@ -45,11 +45,11 @@ class CtxGia {
   createMediaStreamDestination() { const n = new NutGia(); const t = new TrackGia('chuoi'); t.tinHieu = () => n.muc(); n.stream = new LuongGia([t]); return n }
 }
 class BoGuiGia {
-  lichSu: (TrackGia | null)[] = []; thamSo: unknown = null; byte = 0; dau: TrackGia | null
+  lichSu: (TrackGia | null)[] = []; thamSo: unknown = null; byte = 0; nl = 0; dau: TrackGia | null
   constructor(public track: TrackGia | null) { this.dau = track }
   async replaceTrack(t: TrackGia | null) { this.track = t; this.lichSu.push(t) }
   getParameters() { return { encodings: [{}] } } async setParameters(p: unknown) { this.thamSo = p }
-  async getStats() { this.byte += 8000; return new Map<string, unknown>([['ms', { type: 'media-source', kind: 'audio', audioLevel: this.track ? this.track.ra() : 0, totalAudioEnergy: 1 }], ['out', { type: 'outbound-rtp', kind: 'audio', bytesSent: this.byte, packetsSent: 50 }]]) }
+  async getStats() { this.byte += 8000; return new Map<string, unknown>([['ms', { type: 'media-source', kind: 'audio', audioLevel: this.track ? this.track.ra() : 0, totalAudioEnergy: (this.nl += (this.track ? this.track.ra() : 0) ** 2 * 0.1) }], ['out', { type: 'outbound-rtp', kind: 'audio', bytesSent: this.byte, packetsSent: 50 }]]) }
 }
 const SDP = 'v=0\r\no=- 1 2 IN IP4 127.0.0.1\r\ns=-\r\nt=0 0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\na=mid:0\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 minptime=10;useinbandfec=1\r\n'
 class PcGia extends EventTarget {
