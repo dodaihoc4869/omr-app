@@ -478,3 +478,25 @@ Tải lần đầu khi bật: ≈ 40 MB (mô hình 29 MB tách hai tệp vì Pag
 1. **Micro đeo đầu (headset) có màng định hướng cardioid / supercardioid, đặt sát miệng** thay mic cài áo: giọng thầy to hơn hẳn giọng khác nhờ khoảng cách sát miệng + hướng thu (bớt bao nhiêu dB phải đo bằng mic thật — chưa đo), trễ thêm 0 ms, không cắt đầu câu. Đây là cách «chỉ giọng thầy» thật sự triệt để hiện nay.
 2. Giữ **«Chuẩn trình duyệt»** (đường đã chứng minh có tiếng) làm mặc định.
 3. Phiên sau có mạng tới Hugging Face: thả mô hình tách theo người nói 48 kHz (VoxLock, tse-conv-tasnet-48k …) vào `do-tach-giong.mjs` (đã sẵn cảnh + số đo) và chỉ phát hành nếu: «mở sau» ≤ 50 ms, nói chồng không làm giảm SI-SDR của thầy, giọng khác giảm ≥ 20 dB, hệ số thời gian thực ≤ 0,6 trên máy thầy.
+
+## 11. Tách giọng thầy — LƯỢT 2 (11/11 đêm, thầy: «Phải tách được giọng. Làm mọi cách đi nhé»; 20:30: «huấn luyện giọng thầy trong đêm nay luôn … giữ được độ sáng rõ của giọng nói»)
+
+### 11.1 Đo nhiễu THẬT trên «Xem lại Live» (A) — giọng khác chỉ thấp hơn giọng thầy ≈ 2 dB ⇒ cổng gần mic KHÔNG làm được
+Mã: `scripts/thu-live-1011/tach-giong/nhieu-that/` (tải bằng mã thầy ở biến môi trường, không in / không ghi; tệp tiếng và nhúng giọng chỉ ở thư mục tạm). Số gốc (chỉ số, không giọng): `docs/ban-ve-live-1011/so-do-nhieu-that-1111.json`.
+- Nguồn: 5 buổi thử tối 11/11 (18:36–19:24 giờ VN) có tiếng: `4a551f8e`, `75f8acfc`, `bac5a835`, `c444eb20`, `c4f8ad99`; bỏ `1aca71b0` (4 s ngoài `emNoi`), `6c325251` và `7847bb30` (`emNoi` phủ cả buổi). Tệp tiếng = mic thầy sau xử lý của trình duyệt (24 kHz, MP3 48 kb/s; tự chỉnh âm lượng bật).
+- Cách: vùng chỉ có thầy = bỏ `emNoi` ± 1 s và khoảng lặng (354 s). Khung 10 ms có tiếng = > −60 dBFS và Silero VAD (MIT) ≥ 0,5. Cửa sổ 1 s bước 0,25 s ⇒ CAM++ (chép sang Python, fbank y hệt `ma-nhan.mjs`, soát lại: cho số trùng lượt 1) ⇒ cos với tâm giọng thầy (tâm tự tìm: cụm to nhất, lặp lấy cos > 0,5). Phân bố cos có HAI ĐỈNH rõ (0,0–0,2 và 0,5–0,75) ⇒ T = cos ≥ 0,40, K = ≤ 0,25, «?» = giữa.
+- Kết quả (giây có tiếng: T 66,6 s · K 68,0 s · «?» 4,9 s):
+
+| buổi | T giây | T dBFS P10 / P50 / P90 | K giây | K dBFS P10 / P50 / P90 | thầy − khác (P50, dB) | K / thời gian có tiếng | F0 thầy / khác (Hz) |
+|---|---|---|---|---|---|---|---|
+| 4a551f8e | 46,1 | −39,8 / −20,5 / −12,3 | 9,9 | −45,7 / −27,1 / −12,6 | 6,6 | 17 % | 125 / 271 |
+| 75f8acfc | 15,3 | −40,1 / −18,0 / −11,5 | 3,4 | −37,7 / −19,3 / −11,0 | 1,3 | 18 % | 117 / 107 |
+| bac5a835 | 2,7 | −43,9 / −14,0 / −10,4 | 11,9 | −39,3 / −19,9 / −11,1 | 5,9 | 78 % | 125 / 229 |
+| c444eb20 | 1,4 | −37,2 / −13,5 / −9,9 | 10,2 | −40,4 / −20,9 / −11,6 | 7,4 | 88 % | 119 / 216 |
+| c4f8ad99 | 1,1 | −45,1 / −27,3 / −20,6 | 32,6 | −42,8 / −22,9 / −12,3 | −4,4 | 92 % | 107 / 302 |
+| **gộp** | 66,6 | −40,2 / −20,0 / −11,7 | 68,0 | −42,5 / −22,1 / −12,0 | **2,1** | **49 %** | — |
+
+- **Giọng khác chỉ thấp hơn giọng thầy 2,1 dB (trung vị; từng buổi −4,4 … +7,4 dB); P90 của giọng khác TO HƠN trung vị giọng thầy 8 dB.** Giọng khác chiếm 49 % thời gian có tiếng ngoài lúc em bật mic.
+- Giọng K là ai: F0 ≈ 216–302 Hz (thầy 107–125 Hz), các tâm K của các buổi giống nhau (cos 0,45–0,83), và cửa sổ TRONG `emNoi` giống K nhiều hơn giống thầy ở 6/8 buổi ⇒ chính người đóng vai «em» trong buổi thử, ngồi gần mic thầy (nói trước khi bật / sau khi tắt mic em). Chuyển lượt thầy ↔ K nhiều chỗ < 1 s mà mức hai bên vẫn ngang nhau ⇒ không phải do tự chỉnh âm lượng kéo giọng khác lên (bộ này đổi ≤ vài dB / giây).
+- Giới hạn: buổi THỬ, không phải buổi dạy (lớp thật em ngồi xa hơn ⇒ có thể chênh hơn); không biết buổi nào dùng BOYALINK hay mic mảng của máy (lỗi đã gặp, `src/lib/live/thang-mic.ts`); nói chồng KHÔNG đo trực tiếp được — 4 % «?» chỉ là cận trên của phần lẫn / khó nhận.
+- ⇒ **Hướng B1 (cổng gần mic, cần chênh ≥ 15 dB) bị loại.** Chênh ≈ 2 dB thì chỉ mô hình tách thật mới làm được (B2 / B3). Micro đeo đầu có màng định hướng sát miệng (10.5 mục 1) càng quan trọng: chênh 2 dB là do mic thu được người ngồi cạnh gần bằng thầy.
