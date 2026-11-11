@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1132,
+    "hash": "cb5dd679b235fd78860781d1f7306c0ff9f3ba72452a74836b0687ff4f374b42",
+    "fileNguon": "anh/cb5dd679b235fd78860781d1f7306c0ff9f3ba72452a74836b0687ff4f374b42.png",
+    "svg": "isoamyl1132-native-ddh-e12ed81d013a2f3bfee00961cb61c9b2b8cbb2bc797aa2a89fd67f23db5eb4d8.svg",
+    "hashSvg": "e12ed81d013a2f3bfee00961cb61c9b2b8cbb2bc797aa2a89fd67f23db5eb4d8",
+    "byteSvg": 50658,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-L7-0701-II-4",
+        "de": "Trong công nghiệp thực phẩm và mỹ phẩm, isoamyl acetate là một ester mang mùi hương đặc trưng của quả chuối chín (thường gọi là dầu chuối), được ứng dụng rộng rãi để làm chất tạo hương. Một học sinh tiến hành tổng hợp isoamyl acetate từ acetic acid và isoamyl alcohol theo phương trình hóa học sau (*). Sau thí nghiệm, tách các hợp chất hữu cơ từ hỗn hợp thu được ra khỏi nhau rồi tiến hành đo phổ hồng ngoại của từng chất. Cho biết số sóng hấp thụ đặc trưng của một số liên kết trên phổ hồng ngoại như sau:",
+        "refs": [
+          {
+            "hash": "cb5dd679b235fd78860781d1f7306c0ff9f3ba72452a74836b0687ff4f374b42",
+            "where": "VIP27-BDT-L7-0701-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "57d6d180e5241ac4e2bb4947f5453b411de0f1ed380162676e242f33d6cebcbf"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "14C6OincludingwaterEXCLUDINGcatalyst/2COdouble2splitfeetCONTACTslopes-nativeV/noaddedcrossbar/2FULLfilledtrianglesTOPrightBOTTOMleft/ALLregularUPRIGHT3captions-condition-chemicals/EXACT(*)farRIGHT/SUB2-3-4/tSUPo/4topedgeUNKNOWNfragmentsretainedNOrestorecuttext/0stereocharge/noIRbands-yield-answer-NOalias6",
+    "hashSvgDaSoat": "e12ed81d013a2f3bfee00961cb61c9b2b8cbb2bc797aa2a89fd67f23db5eb4d8",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
