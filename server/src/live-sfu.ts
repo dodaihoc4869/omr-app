@@ -35,6 +35,7 @@ const ICE = [{ urls: 'stun:stun.cloudflare.com:3478' }]
  *  trickle ICE). Thiếu secret / lỗi ⇒ `null` ⇒ máy khách chạy như cũ (chỉ STUN), không chặn live. 0 lệnh D1. */
 const TTL_TURN_GIAY = 86_400, DEM_TURN_MS = 4 * 3_600_000, LOI_TURN_MS = 60_000
 export const turnDaCauHinh = (env: Pick<Env, 'TURN_KEY_ID' | 'TURN_KEY_API_TOKEN'>): boolean => !!env.TURN_KEY_ID && !!env.TURN_KEY_API_TOKEN
+const str = (v: unknown): string => (typeof v === 'string' ? v : '')
 /** Giữ đúng dạng `RTCIceServer`: chỉ stun: / turn: / turns:, bỏ cổng 53, thông tin đăng nhập là chuỗi. */
 export function locTurn(v: unknown): Row[] {
   const ra: Row[] = []
@@ -71,7 +72,6 @@ export const xoaDemTurn = (): void => { demTurn = null; dangTurn = null }
 const MA_PHIEN = /^[A-Za-z0-9_-]{8,128}$/
 const TEN = /^[a-z0-9-]{1,32}$/
 const MID = /^[A-Za-z0-9]{1,16}$/
-const str = (v: unknown): string => (typeof v === 'string' ? v : '')
 const phienHop = (v: unknown): string => (MA_PHIEN.test(str(v)) ? str(v) : '')
 const sdpHop = (v: unknown): string => { const s = str(v); return s.length >= 20 && s.length <= SDP_TOI_DA && s.startsWith('v=') ? s : '' }
 
