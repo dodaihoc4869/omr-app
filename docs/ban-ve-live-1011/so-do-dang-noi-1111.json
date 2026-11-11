@@ -1,0 +1,283 @@
+{
+  "luc": "2026-11-11T12:29:25.527Z",
+  "ghiChu": "Chromium thật, tờ chiếu thật có cầu nối, phòng thật trong Node, dữ liệu giả (trạng thái «có em nói» bơm từ trang thử).",
+  "soDo": {
+    "1180_dau": {
+      "noi": "noi",
+      "nhan": "Thêm nút điều khiển, đang bật: Bút, Minh Anh đang nói, 2 em giơ tay",
+      "hien": true,
+      "trai": 2,
+      "nen": "rgb(197, 34, 31)",
+      "w": 40
+    },
+    "1180_khay": {
+      "goc": {
+        "w": 485,
+        "h": 165
+      },
+      "coDai": {
+        "w": 485,
+        "h": 165
+      },
+      "dai": {
+        "l": 685,
+        "r": 1170,
+        "t": 537,
+        "b": 589,
+        "w": 485
+      },
+      "nut": [
+        {
+          "chu": "Đang nói · Minh Anh 2 em giơ tay N",
+          "cao": 40
+        },
+        {
+          "chu": "Thu mic",
+          "cao": 40
+        }
+      ]
+    },
+    "1366_dau": {
+      "noi": "noi",
+      "nhan": "Thêm nút điều khiển, đang bật: Bút, Minh Anh đang nói, 2 em giơ tay",
+      "hien": true,
+      "trai": 2,
+      "nen": "rgb(197, 34, 31)",
+      "w": 40
+    },
+    "1366_khay": {
+      "goc": {
+        "w": 560,
+        "h": 170
+      },
+      "coDai": {
+        "w": 560,
+        "h": 170
+      },
+      "dai": {
+        "l": 796,
+        "r": 1356,
+        "t": 471,
+        "b": 524,
+        "w": 560
+      },
+      "nut": [
+        {
+          "chu": "Đang nói · Minh Anh 2 em giơ tay N",
+          "cao": 40
+        },
+        {
+          "chu": "Thu mic",
+          "cao": 40
+        }
+      ]
+    },
+    "1920_dau": {
+      "noi": "noi",
+      "nhan": "Thêm nút điều khiển, đang bật: Bút, Minh Anh đang nói, 2 em giơ tay",
+      "hien": true,
+      "trai": 2,
+      "nen": "rgb(197, 34, 31)",
+      "w": 50
+    },
+    "1920_khay": {
+      "goc": {
+        "w": 788,
+        "h": 237
+      },
+      "coDai": {
+        "w": 788,
+        "h": 237
+      },
+      "dai": {
+        "l": 1122,
+        "r": 1910,
+        "t": 668,
+        "b": 743,
+        "w": 788
+      },
+      "nut": [
+        {
+          "chu": "Đang nói · Minh Anh 2 em giơ tay N",
+          "cao": 56
+        },
+        {
+          "chu": "Thu mic",
+          "cao": 56
+        }
+      ]
+    }
+  },
+  "kiem": [
+    {
+      "ten": "1180×820 · có em nói: thẻ «Đang nói» KHÔNG tự hiện, góc phải dưới trống",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · nút «thêm» có dấu đỏ ở góc trái (data-noi = noi), nhãn đọc tên em",
+      "dat": true,
+      "them": "rgb(197, 34, 31) · Thêm nút điều khiển, đang bật: Bút, Minh Anh đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "1180×820 · dải KHÔNG làm khay nở: khay giữ đúng bề rộng / bề cao như lúc không có em nói",
+      "dat": true,
+      "them": "khay 485×165 ⇒ 485×165"
+    },
+    {
+      "ten": "1180×820 · dải nằm trọn trong màn, ngay trên khay (không đè), rộng ít nhất bằng khay",
+      "dat": true,
+      "them": "{\"l\":685,\"r\":1170,\"t\":537,\"b\":589,\"w\":485}"
+    },
+    {
+      "ten": "1180×820 · dải có mục «Đang nói · Minh Anh» + dòng «2 em giơ tay» + ô phím N và nút «Thu mic»; mỗi nút ≥ 40 px",
+      "dat": true,
+      "them": "Đang nói · Minh Anh 2 em giơ tay N 40px | Thu mic 40px"
+    },
+    {
+      "ten": "1180×820 · hai chạm: «Thu mic» trong khay ⇒ gửi app thu mic đúng em, khay thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"}]"
+    },
+    {
+      "ten": "1180×820 · bấm mục «Đang nói» ⇒ khay thu, thẻ mở đầy đủ (Thu mic · Phát tiếng em ra loa lớp · Tắt mic tất cả · 2 em giơ tay), dấu trên nút «thêm» tắt",
+      "dat": true,
+      "them": "Đang nói MA Nguyễn Minh Anh Đội Natri · mic đang bật Thu mic Phát tiếng em ra loa lớp Em đứng cạnh loa thì nên tắt (dễ hú) Đang tắt Tắt mic tất cả 2 em giơ tay "
+    },
+    {
+      "ten": "1180×820 · Esc thu thẻ, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · phím N mở thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1180×820 · chỉ có em giơ tay: dấu dạng vòng (data-noi = tay), thẻ không tự hiện",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, 2 em giơ tay"
+    },
+    {
+      "ten": "1180×820 · hết em nói / giơ tay: dấu mất, dải rỗng",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · có em nói: thẻ «Đang nói» KHÔNG tự hiện, góc phải dưới trống",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · nút «thêm» có dấu đỏ ở góc trái (data-noi = noi), nhãn đọc tên em",
+      "dat": true,
+      "them": "rgb(197, 34, 31) · Thêm nút điều khiển, đang bật: Bút, Minh Anh đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "1366×768 · dải KHÔNG làm khay nở: khay giữ đúng bề rộng / bề cao như lúc không có em nói",
+      "dat": true,
+      "them": "khay 560×170 ⇒ 560×170"
+    },
+    {
+      "ten": "1366×768 · dải nằm trọn trong màn, ngay trên khay (không đè), rộng ít nhất bằng khay",
+      "dat": true,
+      "them": "{\"l\":796,\"r\":1356,\"t\":471,\"b\":524,\"w\":560}"
+    },
+    {
+      "ten": "1366×768 · dải có mục «Đang nói · Minh Anh» + dòng «2 em giơ tay» + ô phím N và nút «Thu mic»; mỗi nút ≥ 40 px",
+      "dat": true,
+      "them": "Đang nói · Minh Anh 2 em giơ tay N 40px | Thu mic 40px"
+    },
+    {
+      "ten": "1366×768 · hai chạm: «Thu mic» trong khay ⇒ gửi app thu mic đúng em, khay thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"}]"
+    },
+    {
+      "ten": "1366×768 · bấm mục «Đang nói» ⇒ khay thu, thẻ mở đầy đủ (Thu mic · Phát tiếng em ra loa lớp · Tắt mic tất cả · 2 em giơ tay), dấu trên nút «thêm» tắt",
+      "dat": true,
+      "them": "Đang nói MA Nguyễn Minh Anh Đội Natri · mic đang bật Thu mic Phát tiếng em ra loa lớp Em đứng cạnh loa thì nên tắt (dễ hú) Đang tắt Tắt mic tất cả 2 em giơ tay "
+    },
+    {
+      "ten": "1366×768 · Esc thu thẻ, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · phím N mở thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1366×768 · chỉ có em giơ tay: dấu dạng vòng (data-noi = tay), thẻ không tự hiện",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, 2 em giơ tay"
+    },
+    {
+      "ten": "1366×768 · hết em nói / giơ tay: dấu mất, dải rỗng",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · có em nói: thẻ «Đang nói» KHÔNG tự hiện, góc phải dưới trống",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · nút «thêm» có dấu đỏ ở góc trái (data-noi = noi), nhãn đọc tên em",
+      "dat": true,
+      "them": "rgb(197, 34, 31) · Thêm nút điều khiển, đang bật: Bút, Minh Anh đang nói, 2 em giơ tay"
+    },
+    {
+      "ten": "1920×1080 · dải KHÔNG làm khay nở: khay giữ đúng bề rộng / bề cao như lúc không có em nói",
+      "dat": true,
+      "them": "khay 788×237 ⇒ 788×237"
+    },
+    {
+      "ten": "1920×1080 · dải nằm trọn trong màn, ngay trên khay (không đè), rộng ít nhất bằng khay",
+      "dat": true,
+      "them": "{\"l\":1122,\"r\":1910,\"t\":668,\"b\":743,\"w\":788}"
+    },
+    {
+      "ten": "1920×1080 · dải có mục «Đang nói · Minh Anh» + dòng «2 em giơ tay» + ô phím N và nút «Thu mic»; mỗi nút ≥ 40 px",
+      "dat": true,
+      "them": "Đang nói · Minh Anh 2 em giơ tay N 56px | Thu mic 56px"
+    },
+    {
+      "ten": "1920×1080 · hai chạm: «Thu mic» trong khay ⇒ gửi app thu mic đúng em, khay thu",
+      "dat": true,
+      "them": "[{\"nguon\":\"to-chieu\",\"loai\":\"live\",\"viec\":\"thu-mic\",\"sbd\":\"S1\"}]"
+    },
+    {
+      "ten": "1920×1080 · bấm mục «Đang nói» ⇒ khay thu, thẻ mở đầy đủ (Thu mic · Phát tiếng em ra loa lớp · Tắt mic tất cả · 2 em giơ tay), dấu trên nút «thêm» tắt",
+      "dat": true,
+      "them": "Đang nói MA Nguyễn Minh Anh Đội Natri · mic đang bật Thu mic Phát tiếng em ra loa lớp Em đứng cạnh loa thì nên tắt (dễ hú) Đang tắt Tắt mic tất cả 2 em giơ tay "
+    },
+    {
+      "ten": "1920×1080 · Esc thu thẻ, bút vẫn bật",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · phím N mở thẻ; chạm ra ngoài thu",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "1920×1080 · chỉ có em giơ tay: dấu dạng vòng (data-noi = tay), thẻ không tự hiện",
+      "dat": true,
+      "them": "Thêm nút điều khiển, đang bật: Bút, 2 em giơ tay"
+    },
+    {
+      "ten": "1920×1080 · hết em nói / giơ tay: dấu mất, dải rỗng",
+      "dat": true,
+      "them": ""
+    },
+    {
+      "ten": "Không lỗi JavaScript trên trang nào",
+      "dat": true,
+      "them": ""
+    }
+  ]
+}
