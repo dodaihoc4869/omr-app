@@ -11,7 +11,7 @@ import { forwardRef, useCallback, useImperativeHandle, useLayoutEffect, useMemo,
 import { flushSync } from 'react-dom'
 import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { giaiTrang, khungChieu, type AnToan, type KhungChieu, type VungChieu } from './bo-cuc'
-import { NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, buocTroi, chuyenKhung, docChia, ghiChia, khungVeDL, mocChia, netOBang, taoUuTien, troiGiay, vungBut, type BoCucDL, type Vung } from './bo-cuc-doc-lap'
+import { DAU_BANG, DAU_DU, NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, buocTroi, chuyenKhung, docChia, ghiChia, khungVeDL, mocChia, netOBang, oDauBang, taoUuTien, troiGiay, vungBut, type BoCucDL, type Vung } from './bo-cuc-doc-lap'
 import { taoVeBang, type VeBang } from './ve-bang'
 
 export interface HinhDL { w: number; h: number; xoay: boolean; at: AnToan }
@@ -49,6 +49,8 @@ export interface PropsKhungDL {
   tamGoc?: { rong: number; cao: number } | null
   /** Chữ gợi ý khi bảng đen chưa có nét. */
   bangTrong?: ReactNode
+  /** DẢI THẺ TÊN em đang lên bảng (LenBang.tsx): có ⇒ khung bảng nhường `DAU_BANG` px phía trên, dải nằm NGOÀI mép trên khung bảng (không đè nét). */
+  dauBang?: ReactNode
   /** Em chạm vào nền (trước khi xét chạm hai lần). Trả true ⇒ nơi dùng đã xử lí, bỏ qua. */
   khiCham?: () => boolean | void
   khiPhong?: (v: Vung | null) => void
@@ -63,7 +65,7 @@ const NO_DANG = 'cubic-bezier(0.3, 0.7, 0.2, 1)'
 
 export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref) {
   const goc = useRef<HTMLDivElement>(null), kG = useRef<HTMLDivElement>(null), cuonG = useRef<HTMLDivElement>(null), kB = useRef<HTMLDivElement>(null), net = useRef<HTMLDivElement>(null)
-  const cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), vach = useRef<HTMLDivElement>(null), noiB = useRef<HTMLDivElement>(null)
+  const cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), vach = useRef<HTMLDivElement>(null), noiB = useRef<HTMLDivElement>(null), dauB = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
   const [d, setD] = useState<{ bc: BoCucDL; kc: KhungChieu; vung: VungChieu } | null>(null)
   const P = useRef(p)
@@ -91,7 +93,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const { vung } = giaiTrang(tr.trang), kc = khungChieu(vung, tr.tiLe)
     const moc = mocChia(hinh.w, hinh.h, hinh.at, kc, q.tiLeChu === undefined ? TI_LE_CHU_MAC_DINH : q.tiLeChu)
     const chia = s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
-    const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong })
+    const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong, dauBang: q.dauBang ? DAU_BANG : 0 })
     const cu = s.bc
     s.cho = dong && q.dong && cu && cu.w === moi.w && cu.h === moi.h && (cu.sG !== moi.sG || cu.sB !== moi.sB || cu.giay.x !== moi.giay.x || cu.bang.x !== moi.bang.x) ? cu : null
     s.bc = moi; s.kc = kc; s.vung = vung
@@ -113,7 +115,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   }, [xep])
   // Giấy đổi giữa «soi khớp» và «dựng thường», đổi cỡ chữ của giấy thầy, bật / tắt tự ưu tiên ⇒ chia lại.
   const daDung = useRef(false)
-  useLayoutEffect(() => { if (daDung.current) xep(false); daDung.current = true }, [p.netGiay, p.tiLeChu, p.tuUuTien, xep])
+  const coDau = !!p.dauBang
+  useLayoutEffect(() => { if (daDung.current) xep(false); daDung.current = true }, [p.netGiay, p.tiLeChu, p.tuUuTien, coDau, xep])
 
   /** Dọn kiểu của lần nở trước (cũng gọi khi lần nở mới chen vào). */
   const donNo = useCallback(() => {
@@ -121,7 +124,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     clearTimeout(s.henNo); s.henNo = undefined
     for (const a of s.hoat) { try { a.cancel() } catch { /* đã xong */ } }
     s.hoat = []
-    for (const e of [kG.current, kB.current]) if (e && s.bc) e.style.height = `${s.bc.giay.h}px`
+    if (s.bc) { if (kG.current) kG.current.style.height = `${s.bc.giay.h}px`; if (kB.current) kB.current.style.height = `${s.bc.bang.h}px` }
   }, [])
   // Sau mỗi lần xếp: giữ chỗ em đang đọc trên giấy, rồi (nếu được) cho hai khung NỞ / THU êm từ bố cục cũ sang bố cục mới — chỉ transform.
   useLayoutEffect(() => {
@@ -145,6 +148,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     kG.current.style.height = `${moi.giay.h / Math.min(1, k.giay.r)}px`; kB.current.style.height = `${moi.bang.h / Math.min(1, k.bang.r)}px`
     chay(kG.current, k.giay.dx, 0, k.giay.r); chay(kB.current, k.bang.dx, 0, k.bang.r); chay(net.current, n.dx, n.dy, n.r)
     if (cu.vach != null && moi.vach != null) chay(vach.current, cu.vach - moi.vach, 0, 1)
+    chay(dauB.current, cu.bang.x - moi.bang.x, 0, 1) // dải thẻ tên đi theo mép trái khung bảng
     s.henNo = setTimeout(donNo, NO_MS + 40)
   }, [d, donNo, datKhungVe])
 
@@ -282,7 +286,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     xep(true)
   }
 
-  const L = p.lop, bc = d?.bc
+  const L = p.lop, bc = d?.bc, oDau = bc && p.dauBang ? oDauBang(bc) : null
   const o = (v: { x: number; y: number; w: number; h: number } | undefined): CSSProperties => ({ position: 'absolute', left: v?.x ?? 0, top: v?.y ?? 0, width: v?.w ?? 0, height: v?.h ?? 0, overflow: 'hidden', transformOrigin: '0 0', willChange: 'transform' })
   // giấy dựng thường (không soi được) ⇒ lớp «đang viết» cắt khỏi khung giấy (nét trên giấy ẩn; nét bảng giữ nguyên)
   const catNet = (): CSSProperties | undefined => {
@@ -317,6 +321,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
         {p.bangTrong}
         <button type="button" className={`${L}-ve`} onPointerDown={(e) => e.stopPropagation()} onClick={veThay}>Về chỗ thầy đang viết</button>
       </div>
+      {oDau ? <div ref={dauB} className={`${L}-dau-bang`} data-hep={oDau.w < DAU_DU || undefined} style={{ position: 'absolute', left: oDau.x, top: oDau.y, width: oDau.w, height: oDau.h, pointerEvents: 'none' }}>{p.dauBang}</div> : null}
       {bc?.vach == null ? null : (
         <div ref={vach} className={`${L}-vach-chia`} role="separator" aria-orientation="vertical" aria-label="Kéo để chia lại bề ngang giấy đề và bảng đen" style={{ position: 'absolute', left: bc.vach - 15, top: bc.giay.y, width: 30, height: bc.giay.h, touchAction: 'none' }}
           onPointerDown={vachXuong} onPointerMove={vachDi} onPointerUp={vachNha} onPointerCancel={vachNha}><i /></div>
