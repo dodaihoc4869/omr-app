@@ -7,12 +7,16 @@ import { DUONG_KENH } from './kenh-day'
 import { gvBuoiHoc, hsDiemDanh } from './buoi-hoc'
 import { gameIdentity } from './game-v2-auth'
 import { DUONG_LIVE, cuaLive } from './live-sfu'
+import { cuaXemLai } from './live-xem-lai-lenh'
 import { DUONG_PHONG_BPU, baoPhongVaoLop, dongPhongBpu, gvBpuLuot, gvBpuMo, hsBpuCuaEm, hsBpuVe, vaoPhongBpu } from './phong-binh-phan-ung'
 
 type Row = Record<string, unknown>
 
 export function wsThang(req: Request, env: Env, ctx?: ExecutionContext): Promise<Response> | null {
   const u = req.url
+  // XEM LẠI LIVE (11/11, live-xem-lai-lenh.ts): tải khúc tiếng, tệp buổi live có `Range`, lệnh `/hs/live-*` `/gv/live-*` — đi thẳng để index.ts không to thêm.
+  const xl = cuaXemLai(req, env, ctx)
+  if (xl) return xl
   // LIVE BẢNG (10/11, live-sfu.ts): cửa `/bpu/live/*` làm trung gian tới Cloudflare Realtime SFU — kiểm vé `bpu|`, 0 lệnh D1; đi thẳng để index.ts không to thêm.
   if (req.method === 'POST') return u.includes(DUONG_LIVE) && new URL(u).pathname.startsWith(DUONG_LIVE) ? cuaLive(req, env) : null
   if (req.method !== 'GET') return null

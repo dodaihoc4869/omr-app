@@ -22,6 +22,8 @@ export interface ChuPhong {
   nho(): TrangThaiPhong | null | undefined
   luu(henNghi?: boolean): Promise<void>
   phat(): void
+  /** XEM LẠI LIVE (11/11, live-xem-lai.ts — chỉ thêm): nhật ký nét kèm giờ + tin `live-ghi` của máy ghi. Vắng ⇒ không ghi gì. */
+  xl?: { khung(k: Uint8Array, nay: number): void; bat(so: readonly Uint8Array[], nay: number): void; tinGhi(st: TrangThaiPhong, j: Row, nay: number): boolean }
 }
 
 /** Sổ nét lưu theo MẢNH: mỗi mảnh tối đa ngần này khung (khung ≤ 16 KB ⇒ mảnh ≤ 512 KB, dưới trần 2 MB một giá trị của Durable Object lớp SQLite). */
@@ -149,6 +151,7 @@ export class LiveMay {
     }
     if (!this.daXinAnh && (ds.length > SO_MEM.muc || this.soByte > SO_MEM.byte)) { this.daXinAnh = true; this.gui(ws, '{"t":"live-can-anh"}') }
     LL.liveNhip(st, nay)
+    if (l.bat) this.chu.xl?.khung(k, nay) // Xem lại Live: nhật ký nét chỉ-nối
     this.lamMoiDs(nay, l.phien)
     for (const w of this.dsHs!) this.gui(w, goc)
   }
@@ -204,9 +207,10 @@ export class LiveMay {
       if (t === 'live-san') doi = LL.liveSan(st, { san: j.san !== false, ss: j.ss }, nay)
       else if (t === 'live-bat') {
         doi = LL.liveBat(st, nay)
-        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
+        if (doi) { this.doEm.clear(); this.boDs(); this.lucLuuNhip = nay; if (this.chu.xl) this.chu.xl.bat(await this.docSo(st), nay) } else this.gui(ws, JSON.stringify({ t: 'live-kq', lenh: 'bat', ok: false, lyDo: l.bat ? 'dang-live' : 'tat' }))
       } else if (t === 'live-tat') { doi = this.tat(st, nay) }
       else if (t === 'live-dat') doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang }, nay)
+      else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay) // Xem lại Live: máy ghi báo trạng thái + mẫu đồng hồ
       else if (t === 'live-thu-mic') doi = LL.liveThuMic(st, nay) // thầy bấm «Thu mic»: phòng gỡ + đóng track ở SFU khi phát view
       else if (t === 'live-nhip') {
         LL.liveNhip(st, nay)

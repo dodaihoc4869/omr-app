@@ -42,6 +42,8 @@ export interface LivePhong {
   soNet: number
   /** Lần cuối thầy có dấu hiệu đang live (bật, nhịp có tiếng / có nét, nét xong) — quá `TU_TAT_LIVE_MS` ⇒ phòng tự tắt live. */
   nhip: number
+  /** XEM LẠI LIVE (11/11 — chỉ thêm): trạng thái máy ghi của máy thầy tự báo. VẮNG = công tắc `cau_hinh.live_xem_lai` tắt ⇒ view không có ngăn «Đang ghi». */
+  ghi?: 'dang-ghi' | 'loi' | 'tat'
 }
 
 /** Thầy quên tắt live: mic im + không nét 15 phút (hoặc máy thầy mất hẳn) ⇒ tự tắt (đặc tả mục 5). */
@@ -222,6 +224,8 @@ export function viewLiveBang(st: TrangThaiPhong, dem?: { xem: number; ws: number
     san: l.san, bat: l.bat, tu: l.tu, phien: l.phien, ss: l.ss, xem: dem?.xem ?? 0, ws: dem?.ws ?? 0,
     tay: l.tay, noi: viewNoi(st, l), bang: !!l.bang, xa: l.xa, tiengLop: l.tiengLop, soNet: l.soNet,
     tieng: (l.sfu ? 'bat' : 'chua-cau-hinh') as Exclude<TiengLive, 'tat'>,
+    /** Xem lại Live: 'dang-ghi' | 'loi' | 'tat'; vắng = công tắc tắt (màn chiếu không vẽ ngăn ghi). */
+    ...(l.ghi !== undefined ? { ghi: l.ghi } : {}),
   }
 }
 /** Em đang phát mic (mảng tối đa MỘT phần tử): tên, đội, `xa` = em ở xa (chưa điểm danh tại lớp ⇒ máy thầy mới tự phát tiếng em ra loa),
@@ -248,6 +252,8 @@ export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
     /** `emDuocMoi` = em ĐƯỢC PHÉP bật mic lúc này (em đang được gọi lên bảng); `emNoi` = track mic của em đang được phòng ghi nhận. */
     emDuocMoi: duoc && duocPhatMic(st, sbd), emNoi: l.mic?.sbd === sbd,
     noi: duoc ? viewNoi(st, l) : [],
+    /** Xem lại Live (điểm quyết 2): buổi live này đang được ghi ⇒ máy em đang bật mic hiện «Đang ghi để lớp xem lại». */
+    ...(duoc && l.bat && l.ghi === 'dang-ghi' ? { ghi: true } : {}),
   }
 }
 export type ViewLiveBang = ReturnType<typeof viewLiveBang>
