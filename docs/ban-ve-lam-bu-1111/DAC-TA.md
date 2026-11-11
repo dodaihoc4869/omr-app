@@ -97,7 +97,7 @@ Tổng em trả 47 câu cho khoản nợ 42 câu: 5 câu là lãi. Trả hết n
 4. Ngày Kiểm tra ôn tập: bài kiểm tra đi trước, làm bù sau.
 5. Bài Kiểm tra ôn tập bỏ lỡ (không nộp): 28 câu thành nợ «Câu ôn»; đã nộp thì không nợ, kể cả còn câu bỏ trống (đã tính vào điểm). Điểm bài đó vẫn chốt như hiện nay.
 6. Chưa trừ ngày nghỉ có phép (app chưa có chỗ thầy đánh dấu cho việc này).
-7. Nợ tính từ ngày đầu tiên em mở app sau khi phát hành (11/11); các ngày trước đó không tính. Em vắng lâu: chỉ xét 7 ngày gần nhất (đằng nào cũng chạm trần 84).
+7. Nợ tính từ **11/11 cho MỌI em có bài**, kể cả em hôm ấy không mở app (thầy 11/11 «áp dụng luôn cho học sinh»; sửa trưa 11/11 — bản sáng tính từ «ngày đầu em mở app», số thật 12:41 cho thấy mới 124 / 275 em có sổ). Các ngày trước 11/11 không tính. Em vắng lâu: chỉ xét 7 ngày gần nhất (đằng nào cũng chạm trần 84).
 8. Số lớn trên thẻ mức là tổng của ngày (ví dụ 0/39 câu), dòng dưới ghi «Trả nợ 11 câu trước, rồi tới 28 câu hôm nay» — bản vẽ ghi 0/28; đổi để số trên thẻ, bình và các chặng là MỘT con số.
 9. Thẻ gọn (đã trả tối thiểu): nút «Trả hết» thay cho «Trả thêm»; đã đủ mức hôm nay thì thẻ nhắc «học thêm câu nào, nợ giảm câu ấy» (không đổi mức, không ảnh hưởng chuỗi).
 
@@ -105,7 +105,7 @@ Tổng em trả 47 câu cho khoản nợ 42 câu: 5 câu là lãi. Trả hết n
 - **App thầy** — bảng «Bài hằng ngày» (Hôm nay › Nhịp học › Xem bảng từng ngày): em đang nợ có dòng «Nợ N câu» ngay dưới tên (hết 3 lần trả tối thiểu: «Nợ N câu · phải trả hết», nền đậm). Rê chuột / trình đọc màn hình đọc câu đầy đủ: nợ đầu ngày theo loại, số lần đã trả tối thiểu, hôm nay em chọn gì và đã trả bao nhiêu (hoặc «Hôm nay em chưa mở app»), lãi đêm nay. Trên bảng có dòng tổng «N em đang nợ câu · tổng X câu».
 - **App phụ huynh** — trang «Hôm nay của con», ngay dưới số câu hôm nay: khối «Con đang nợ N câu» + nợ theo loại + hôm nay con chọn trả gì, đã trả bao nhiêu + luật lãi và số lần trả tối thiểu còn lại. Con không nợ thì không có khối.
 - **Một con số cho ba bên:** hai lệnh `/gv/bai-hang-ngay` và `/ph/con-tong-quan` dùng chung một hàm đọc; sổ nợ đọc CÙNG lệnh đọc mức Gói 7 (0 lệnh D1 thêm, 0 đợt chờ thêm) và tính bằng đúng luật của học sinh (`server/src/no-cau-xem.ts`). Em chưa mở app từ sau ngày chốt sổ: máy tính tiếp các ngày đã qua bằng cùng luật (tối đa 7 ngày) ⇒ con số thầy / phụ huynh thấy là con số em sẽ thấy khi mở app.
-- Em chưa từng mở app từ sau ngày phát hành (chưa có sổ nợ) thì chưa hiện nợ — đúng luật «nợ tính từ ngày đầu em mở app».
+- Em chưa từng mở app từ sau ngày phát hành (chưa có sổ nợ) vẫn hiện nợ cho thầy / phụ huynh, tính từ 11/11 — đúng con số em sẽ thấy khi mở app.
 - Ảnh thật: `thay-ph/` (9 khung; `node docs/ban-ve-lam-bu-1111/chup-thay-ph.mjs <thư mục build chup-v2>`). Test: `tests/no-cau-xem-1111.test.ts`, thêm ca trong `tests/bai-hang-ngay-gv-1210.test.tsx`, `tests/ph-con-tong-quan-man-1210.test.tsx`.
 
 ## 10. Chưa làm

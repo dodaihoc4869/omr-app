@@ -4,7 +4,7 @@
 // Hai bảng CHỈ-THÊM (goi-bai-7-schema.ts): `goi_bai_7_no_em` (sổ nợ của em) · `goi_bai_7_no_chon` (lựa chọn trả nợ mỗi ngày, kèm mức gốc của ngày).
 import type { Env, D1PreparedStatement } from './kieu'
 import { congNgay7, ngayVn7 } from './goi-bai-7-loi'
-import { NGAY_NO_CAU, chonMacDinh, chotNo, soCuaKieu, tomTatNo, type KieuTra, type LoaiNo, type NgayNo, type SoNo, type TomTatNo } from './no-cau'
+import { NGAY_NO_CAU, NGAY_TRUOC_NO_CAU, chonMacDinh, chotNo, soCuaKieu, soNoRong, tomTatNo, type KieuTra, type LoaiNo, type NgayNo, type SoNo, type TomTatNo } from './no-cau'
 
 type Row = Record<string, unknown>
 export interface ChonNo { kieu: KieuTra; so: number; goc: number; /** lúc ghi lựa chọn — so với lúc tạo dòng mức để biết dòng mức vừa bị lập lại */ luc: string }
@@ -72,10 +72,13 @@ export async function noCau7(env: Env, sbd: string, ngay: string, now: number, m
   try {
     const hq = congNgay7(ngay, -1), luc = new Date(now).toISOString()
     let s = doc.em, chon = doc.chon
-    if (!s) { // lần đầu của em: mở sổ, nợ 0, tính từ hôm nay — ghi nền, không ai chờ (luật tốc độ: không thêm đợt chờ D1 vào lượt lập)
-      env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_no_em(sbd,no,lan,loai_json,den_ngay,luc) VALUES(?,0,0,?,?,?)').bind(sbd, '{}', hq, luc).run()
-        .catch((e: unknown) => console.error('[no-cau] chưa mở được sổ nợ:', e instanceof Error ? e.message : e))
-      return muc
+    if (!s) { // em chưa có sổ: coi như sổ nợ 0 đã chốt tới NGAY_TRUOC_NO_CAU ⇒ mọi em tính nợ từ 11/11, không phụ thuộc hôm nào em mở app lần đầu
+      s = soNoRong(NGAY_TRUOC_NO_CAU)
+      if (s.den >= hq) { // chưa có ngày nào để chốt (chính ngày 11/11): chỉ mở sổ — ghi nền, không ai chờ (luật tốc độ: không thêm đợt chờ D1 vào lượt lập)
+        env.DB.prepare('INSERT OR IGNORE INTO goi_bai_7_no_em(sbd,no,lan,loai_json,den_ngay,luc) VALUES(?,0,0,?,?,?)').bind(sbd, '{}', s.den, luc).run()
+          .catch((e: unknown) => console.error('[no-cau] chưa mở được sổ nợ:', e instanceof Error ? e.message : e))
+        return muc
+      }
     }
     const lenh: D1PreparedStatement[] = []
     if (s.den < hq) {

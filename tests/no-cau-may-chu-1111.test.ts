@@ -139,6 +139,17 @@ it('em vắng nhiều ngày: nợ cộng dồn có lãi nhưng không quá trầ
   expect(await chonNoCau7(k.env, 'S1', { kieu: 'het' }, D16 + 2000)).toMatchObject({ so: 84, muc: 112 })
 })
 
+it('ÁP DỤNG CHO MỌI EM TỪ 11/11 (thầy: «áp dụng luôn cho học sinh»): em chưa từng mở app, lần đầu mở ngày 13/11 ⇒ nợ đã tính cả 11/11 và 12/11', async () => {
+  const k = await kho()
+  expect(await docNo7(k.env, 'S1', '2026-11-13')).toMatchObject({ em: null, chon: null }) // chưa có sổ
+  const D13 = D11 + 2 * NGAY
+  sang(D13)
+  const a = await lap(k, D13)
+  expect(a.t.noCau).toMatchObject({ no: 28 + 2 + 28, toiThieu: 15, kieu: 'toi_thieu', so: 15, lan: 0 }) // 11/11 thiếu 28; đêm 12/11 lãi 2 + thiếu 28
+  expect(a.l.toiThieu).toBe(43)
+  expect(await docNo7(k.env, 'S1', '2026-11-13')).toMatchObject({ em: { no: 58, den: '2026-11-12' }, chon: { kieu: 'toi_thieu', so: 15, goc: 28 } })
+})
+
 it('em vắng những ngày KHÔNG có bài nào trong hạn (lớp chưa được giao bài) ⇒ không nợ, không lãi', async () => {
   const k = await kho()
   await lap(k, D11)

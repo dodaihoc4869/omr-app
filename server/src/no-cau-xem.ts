@@ -4,7 +4,7 @@
 // Em chưa mở app từ sau ngày chốt sổ: tính tiếp các ngày đã qua bằng ĐÚNG luật `chotNo` (no-cau.ts) trên số «đã làm / mức» của bảng ⇒ con số thầy thấy
 // là con số em sẽ thấy khi mở app (nhãn «theo loại» của ngày vắng có thể lệch — chỉ là nhãn).
 import { congNgay7 } from './goi-bai-7-loi'
-import { NGAY_NO_CAU, chonMacDinh, chotNo, tomTatNo, type KieuTra, type NgayNo, type SoNo, type TomTatNo } from './no-cau'
+import { NGAY_NO_CAU, NGAY_TRUOC_NO_CAU, chonMacDinh, chotNo, soNoRong, tomTatNo, type KieuTra, type NgayNo, type SoNo, type TomTatNo } from './no-cau'
 
 type Row = Record<string, unknown>
 /** Tóm tắt nợ câu của một em cho thầy / phụ huynh. `daChon` = hôm nay em đã mở app (đã có lựa chọn trả nợ); chưa ⇒ số theo lựa chọn mặc định. */
@@ -17,6 +17,8 @@ export const SQL_NO_XEM = ` UNION ALL SELECT sbd,den_ngay,lan,no,'e',loai_json F
 
 const so0 = (v: unknown): number => { const n = Math.floor(Number(v)); return Number.isFinite(n) && n > 0 ? n : 0 }
 const chu = (v: unknown): string => (typeof v === 'string' ? v : '')
+/** Em chưa có dòng nào trong các bảng nợ: vẫn tính nợ từ 11/11 theo số «đã làm / mức» của bảng. */
+export const SO_XEM_RONG: SoXem = { so: null, chon: new Map(), loai: new Map(), goi: [] }
 export interface SoXem { so: SoNo | null; chon: Map<string, { kieu: KieuTra; so: number; goc: number }>; loai: Map<string, string>; goi: { tu: string; den: string }[] }
 /** Gom các dòng `k` ≠ null của câu đọc trên theo em. */
 export function gomDongNo(rows: readonly Row[]): Map<string, SoXem> {
@@ -41,9 +43,9 @@ export function gomDongNo(rows: readonly Row[]): Map<string, SoXem> {
 export interface NgayXem { ngay: string; cheDo: 'goi7' | 'kiem-tra' | 'khac'; muc: number | null; lam: number; ktNop?: boolean }
 /** Nợ câu hiện tại của em (null = chưa có sổ hoặc không nợ). `ngay` = dãy ngày của bảng, gồm hôm nay. */
 export function xemNoEm(x: SoXem, ngay: readonly NgayXem[], homNay: string, mucVang = 28): NoCauXem | null {
-  if (!x.so || homNay < NGAY_NO_CAU) return null
+  if (homNay < NGAY_NO_CAU) return null
   const hq = congNgay7(homNay, -1)
-  let s = x.so
+  let s = x.so ?? soNoRong(NGAY_TRUOC_NO_CAU) // em chưa có sổ: tính từ 11/11 như mọi em (cùng luật noCau7)
   if (s.den < hq) {
     const tu = [congNgay7(s.den, 1), congNgay7(homNay, -7), NGAY_NO_CAU].sort().pop()!
     const ds: NgayNo[] = []

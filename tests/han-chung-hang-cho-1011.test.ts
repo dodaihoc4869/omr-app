@@ -123,6 +123,8 @@ describe('giao bài trên D1 giả — hàng chờ, giao sớm, hết hạn chư
     const SAU = Date.parse(`${han}T02:00:00Z`) + 5 * NGAY_MS // 5 ngày sau hạn
     vi.setSystemTime(SAU)
     xoaMoiDem()
+    // 11/11 (nợ câu áp cho mọi em từ 11/11): ca này kiểm CẤU TRÚC đề khi hết hạn, không kiểm nợ ⇒ cho S1 một sổ nợ sạch, đã chốt tới hôm qua (em không vắng ngày nào)
+    k.d.sql.prepare("INSERT INTO goi_bai_7_no_em(sbd,no,lan,loai_json,den_ngay,luc) VALUES('S1',0,0,'{}',?,'x')").run(new Date(SAU - NGAY_MS + 7 * 3_600_000).toISOString().slice(0, 10))
     const conDo = await lapGoi7(k.env, 'S1', SAU)
     expect(conDo!.loaiNgay).toBe('moi')
     expect(conDo!.plan.viec).toHaveLength(28)
