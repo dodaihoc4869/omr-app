@@ -1,0 +1,29 @@
+[
+  {
+    "i": 50,
+    "hash": "0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338",
+    "fileNguon": "anh/0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338.png",
+    "svg": "nguyen-tu-xy-native50-ddh-6863690e69f4b1695bbce1a37033cc698934baa2f8bc6c5237002095b59de6a6.svg",
+    "hashSvg": "6863690e69f4b1695bbce1a37033cc698934baa2f8bc6c5237002095b59de6a6",
+    "byteSvg": 6740,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-10-C3-B11-III-14",
+        "de": "Cho mô hình cấu tạo nguyên tử của nguyên tố X và Y như hình dưới đây.\nNguyên tố X và Y có thể tham gia liên kết với nhau, tạo nên hợp chất ion. Hợp chất tạo thành có tổng số bao nhiêu nguyên tử?",
+        "refs": [
+          {
+            "hash": "0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338",
+            "where": "DH-10-C3-B11-III-14.hinh.0.du_lieu",
+            "hashDataUrl": "495a55ad3c6fc839a26cac6ef2d93ee500d0d4eed4cd38548863ca9b3826565e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "2atomsX-YregularUPRIGHT/4solidellipses2dashednuclei19visibleirregularrunsEACH-longupperleft/12BLACKdotsX9=2inner7outer-Y3=2inner1outer/2XTOPdotsCROPPEDnativeedge0/dotsOVERorbits/0charge0arrows/noaddedatomicnumber-name-shelllabels-solution-noeven20dashnormalize",
+    "hashSvgDaSoat": "6863690e69f4b1695bbce1a37033cc698934baa2f8bc6c5237002095b59de6a6",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

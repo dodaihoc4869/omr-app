@@ -1,0 +1,435 @@
+{
+  "i": 50,
+  "assetIndexProvided": 1096,
+  "hash": "0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338.png",
+  "size": [
+    510,
+    172
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-10-C3-B11-III-14",
+      "de": "Cho mô hình cấu tạo nguyên tử của nguyên tố X và Y như hình dưới đây.\nNguyên tố X và Y có thể tham gia liên kết với nhau, tạo nên hợp chất ion. Hợp chất tạo thành có tổng số bao nhiêu nguyên tử?",
+      "allHinh": [
+        {
+          "hash": "0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338",
+          "where": "DH-10-C3-B11-III-14.hinh.0.du_lieu",
+          "hashDataUrl": "495a55ad3c6fc839a26cac6ef2d93ee500d0d4eed4cd38548863ca9b3826565e"
+        }
+      ],
+      "missingHashes": [
+        "0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "ownNucleus10xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Nativepixelapproximatecenters/bounds. Angulardashintervals measurednativegrayinkafterownmacro; sourceprintstyle notscientificdata. NOatomicnumberinference.",
+  "geometry": {
+    "panels": [
+      {
+        "letter": {
+          "text": "X",
+          "bbox": [
+            101,
+            66,
+            122,
+            88
+          ],
+          "font": "regularuprightsans"
+        },
+        "solidOrbits": [
+          {
+            "center": [
+              113.5,
+              79
+            ],
+            "rx": 85.5,
+            "ry": 78,
+            "bounds": [
+              28,
+              1,
+              199,
+              157
+            ]
+          },
+          {
+            "center": [
+              114,
+              79
+            ],
+            "rx": 59,
+            "ry": 53.5,
+            "bounds": [
+              55,
+              25.5,
+              173,
+              132.5
+            ]
+          }
+        ],
+        "dashedNucleus": {
+          "center": [
+            112,
+            78
+          ],
+          "rx": 33,
+          "ry": 30,
+          "anglesClockwiseDegreesFromRight": [
+            [
+              0,
+              8
+            ],
+            [
+              19,
+              27
+            ],
+            [
+              37,
+              45
+            ],
+            [
+              55,
+              65
+            ],
+            [
+              75,
+              83
+            ],
+            [
+              93,
+              101
+            ],
+            [
+              111,
+              121
+            ],
+            [
+              129,
+              139
+            ],
+            [
+              149,
+              158
+            ],
+            [
+              166,
+              175
+            ],
+            [
+              185,
+              194
+            ],
+            [
+              203,
+              223
+            ],
+            [
+              231,
+              242
+            ],
+            [
+              250,
+              258
+            ],
+            [
+              270,
+              277
+            ],
+            [
+              287,
+              295
+            ],
+            [
+              305,
+              314
+            ],
+            [
+              323,
+              331
+            ],
+            [
+              341,
+              349
+            ]
+          ],
+          "note": "19visibleinkruns, oneLONGupperleft203..223deg run, doNOTregularizeequal20dashes"
+        },
+        "innerDots": [
+          {
+            "center": [
+              55,
+              78
+            ],
+            "radius": 6.5
+          },
+          {
+            "center": [
+              173,
+              78
+            ],
+            "radius": 6.5
+          }
+        ],
+        "outerDots": [
+          {
+            "center": [
+              28.5,
+              78
+            ],
+            "radius": 6.5
+          },
+          {
+            "center": [
+              104,
+              2.5
+            ],
+            "radius": 7
+          },
+          {
+            "center": [
+              123,
+              2.5
+            ],
+            "radius": 7
+          },
+          {
+            "center": [
+              199,
+              68.5
+            ],
+            "radius": 7
+          },
+          {
+            "center": [
+              199,
+              84.5
+            ],
+            "radius": 7
+          },
+          {
+            "center": [
+              106.5,
+              156.5
+            ],
+            "radius": 7
+          },
+          {
+            "center": [
+              123,
+              156.5
+            ],
+            "radius": 7
+          }
+        ],
+        "count": {
+          "inner": 2,
+          "outer": 7,
+          "total": 9
+        },
+        "edgeContacts": "TOP2blackdots clippedatcanvasTOP y0; outerellipsealsoapproachesy1. Blackdotscoverorbitcontacts. Keepclippingliteral, noadditionofmissingdot."
+      },
+      {
+        "letter": {
+          "text": "Y",
+          "bbox": [
+            385,
+            66,
+            405,
+            88
+          ],
+          "font": "regularuprightsans"
+        },
+        "solidOrbits": [
+          {
+            "center": [
+              394,
+              79.5
+            ],
+            "rx": 85.5,
+            "ry": 78,
+            "bounds": [
+              308.5,
+              1.5,
+              479.5,
+              157.5
+            ]
+          },
+          {
+            "center": [
+              394.5,
+              79
+            ],
+            "rx": 58.5,
+            "ry": 53.5,
+            "bounds": [
+              336,
+              25.5,
+              453,
+              132.5
+            ]
+          }
+        ],
+        "dashedNucleus": {
+          "center": [
+            393,
+            78
+          ],
+          "rx": 33,
+          "ry": 30,
+          "anglesClockwiseDegreesFromRight": [
+            [
+              0,
+              8
+            ],
+            [
+              19,
+              27
+            ],
+            [
+              38,
+              45
+            ],
+            [
+              57,
+              65
+            ],
+            [
+              75,
+              85
+            ],
+            [
+              95,
+              103
+            ],
+            [
+              112,
+              122
+            ],
+            [
+              131,
+              139
+            ],
+            [
+              149,
+              157
+            ],
+            [
+              166,
+              175
+            ],
+            [
+              185,
+              194
+            ],
+            [
+              204,
+              222
+            ],
+            [
+              231,
+              240
+            ],
+            [
+              250,
+              258
+            ],
+            [
+              268,
+              276
+            ],
+            [
+              287,
+              295
+            ],
+            [
+              305,
+              314
+            ],
+            [
+              323,
+              331
+            ],
+            [
+              341,
+              349
+            ]
+          ],
+          "note": "19visibleinkruns includingLONGupperleft204..222deg, noeven20dashnormalization"
+        },
+        "innerDots": [
+          {
+            "center": [
+              336,
+              78
+            ],
+            "radius": 6.5
+          },
+          {
+            "center": [
+              453.5,
+              78
+            ],
+            "radius": 6.5
+          }
+        ],
+        "outerDots": [
+          {
+            "center": [
+              479.5,
+              78
+            ],
+            "radius": 6.5
+          }
+        ],
+        "count": {
+          "inner": 2,
+          "outer": 1,
+          "total": 3
+        },
+        "edgeContacts": "Dotsdrawnoverorbitswithblackcontact, noadditionaldot onemptyouterleft/top/bottom."
+      }
+    ],
+    "style": "Thin darkgray continuous ellipses anddarkgraydashednuclei; blackflatfilleddots, whitebackground. X/Ylettersblackregularsans noactualbold/italic.",
+    "counts": {
+      "solidEllipses": 4,
+      "dashedEllipses": 2,
+      "blackElectronDots": 12,
+      "letters": 2,
+      "charges": 0,
+      "arrows": 0
+    },
+    "noAdded": [
+      "atomicnumbers",
+      "elementnames",
+      "electrondashminus",
+      "bondarrow",
+      "charges",
+      "newdots",
+      "nucleusfill",
+      "solution",
+      "labelsKLM"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFull": true,
+    "native4x": true,
+    "allPublicDeAndRefs": true,
+    "freshChromium3xFull": true,
+    "exactSvg": "6863690e69f4b1695bbce1a37033cc698934baa2f8bc6c5237002095b59de6a6",
+    "notes": "Root nativeFULL+native4x và freshactualFULL3x riêng. X9=2inner7outer/Y3=2inner1outer;12blackdotsOVER4ellipses/2dashednuclei19irregularrunsEACH(longupperleft)/2XTOPdotsCROPPEDnativeedge0/X-YregularUPRIGHT/noaddedatomicnumber-name-shelllabels-charge-arrow-answer."
+  }
+}

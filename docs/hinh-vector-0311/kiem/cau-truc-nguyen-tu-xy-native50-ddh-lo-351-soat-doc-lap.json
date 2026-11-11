@@ -1,0 +1,18 @@
+[
+  {
+    "i": 50,
+    "hashSvg": "6863690e69f4b1695bbce1a37033cc698934baa2f8bc6c5237002095b59de6a6",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở native FULL, câu dẫn/ref DH-10-C3-B11-III-14.hinh.0.du_lieu và Chromium 3× mới FULL; so macro riêng cả hai nhân nguồn và bản mới cùng mép trên. Đúng X9 chấm (2 trong/7 ngoài: hai trên bị cắt mép như nguồn), Y3 chấm (2 trong/1 ngoài); 12 chấm đen phủ lên 4 ellipse. Hai vòng nhân giữ 19 nét đứt nhìn thấy mỗi vòng, nét dài trên trái và độ chia không đều đúng nguồn. X/Y DDH thường thẳng, không thêm số nguyên tử/điện tích/tên/lời giải; không thấy cắt ngoài phần cắt có sẵn ở nguồn, chạm glyph hay tràn.",
+    "render": "/workspace/scratch/soat263-50.png",
+    "macro": [
+      "/workspace/scratch/xy50-nucleus.png",
+      "/workspace/scratch/xy50-Y.png",
+      "/workspace/scratch/xy50-top.png",
+      "/workspace/scratch/xy50-native-nucleus.png",
+      "/workspace/scratch/xy50-native-Y.png"
+    ],
+    "hash": "0a1f5033580d482522571f387cc7078260c41e2f7087c7640a5247dc1e96b338",
+    "hashSvgDaSoat": "6863690e69f4b1695bbce1a37033cc698934baa2f8bc6c5237002095b59de6a6"
+  }
+]
