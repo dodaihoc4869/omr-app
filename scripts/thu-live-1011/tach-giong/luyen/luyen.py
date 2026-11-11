@@ -86,7 +86,7 @@ def vang(x, rt60, drr):  # vang phòng tổng hợp: đường thẳng + đuôi 
     m = 1 << int(np.ceil(np.log2(len(x) + n)))
     return np.fft.irfft(np.fft.rfft(x, m) * np.fft.rfft(h, m), m)[:len(x)].astype(np.float32)
 # KHO GIỌNG MỞ (giong-khac-mo/, tác tử YouTube tải: FLEURS vi / LibriSpeech CC BY 4.0, Common Voice vi CC0 …): <kho>/<tập luyen|cham>/<người>/*.flac|wav hoặc ds.json.
-# KHÔNG dùng kho có điều khoản phi thương mại (VIVOS CC BY-NC-SA …) — trung tâm là cơ sở có thu phí. Người ở tập «cham» không bao giờ vào luyện.
+# Kho phi thương mại (VIVOS CC BY-NC-SA …) dùng theo DUYỆT NỘI BỘ của thầy 11/11 ~22:00 ⇒ mô hình chỉ dùng nội bộ. Người ở tập «cham» không bao giờ vào luyện.
 MO = []; TI_MO = float(os.environ.get('TG_TI_MO', '0.45'))
 def napMo():
     global MO

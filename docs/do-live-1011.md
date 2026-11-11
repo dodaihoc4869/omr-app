@@ -537,6 +537,11 @@ Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach
   ⇒ giọng thầy live còn 37,5 s luyện (tập chấm 75f8acfc giữ nguyên 27 s); YouTube (khi có) là nguồn chính: 60 % mẫu MIỀN SẠCH (thầy YouTube sạch + giọng khác sạch),
   còn lại miền MP3; chấm thêm miền sạch trên video YouTube giữ riêng; «mở sau» chấm ở mỗi checkpoint.
 
+- **Kho giọng mở (giọng khác nhiều người, `chuan-bi-mo.py`):** LibriSpeech (CC BY 4.0), FLEURS vi (CC BY 4.0), Common Voice vi (CC0) và **VIVOS (CC BY-NC-SA — PHI
+  THƯƠNG MẠI)**: thầy DUYỆT dùng nội bộ (11/11 ~22:00: «Kho phi thương mại … tôi chỉ dùng nội bộ thôi, bạn tải thoải mái đi») ⇒ **mô hình luyện có dữ liệu NC, CHỈ DÙNG
+  NỘI BỘ**; danh sách kho NC đã nạp ghi ở `du-lieu/mo/kho-nc.json` của lượt luyện. Tách luyện / chấm theo người; người có trong bản đo 18 s luôn ở tập chấm. Thông thấp
+  ngẫu nhiên chung cả mẫu (4 / 8 kHz / nguyên, không rộng hơn dải gốc hẹp nhất) để mạng không học mẹo «dải rộng ⇒ thầy».
+
 ### 11.3 Bộ chạy trong app (trên nhánh, ẨN sau cờ — chưa phát hành)
 - Mức «Chỉ giọng thầy» ('thay') trong hàng «Lọc ồn»; chỉ hiện khi `localStorage['ddh.live.chi-thay'] = 'hien'` VÀ có địa chỉ mô hình (`URL_MO_HINH_THAY` — đang null —
   hoặc `ddh.live.chi-thay-url` để thử). Mặc định không chọn; chọn thì nhớ (`ddh.live.loc-on`). Lùi khẩn: `ddh.live.chi-thay = 'tat'`.
