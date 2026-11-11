@@ -1,0 +1,29 @@
+[
+  {
+    "i": 617,
+    "hash": "728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e",
+    "fileNguon": "anh/728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e.png",
+    "svg": "acid-xanh617-native-ddh-664e4ba9c46fc6b7d0bda7a2f9f80a7e9b3e0da6ffa45ba4c48df845dbaf5cd4.svg",
+    "hashSvg": "664e4ba9c46fc6b7d0bda7a2f9f80a7e9b3e0da6ffa45ba4c48df845dbaf5cd4",
+    "byteSvg": 3711,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-BDT-KTTX-601-I-17",
+        "de": "Linoleic acid (có cấu tạo như hình) là một trong những acid béo có lợi cho sức khỏe tim mạch, ngăn ngừa các bệnh về tim, động mạch vành. Phát biểu nào sau đây **không** đúng?",
+        "refs": [
+          {
+            "hash": "728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e",
+            "where": "VIP27-BDT-KTTX-601-I-17.hinh.0.du_lieu",
+            "hashDataUrl": "5683d85f0423cac5e2535284331d9b2578439a30b268c6b4d9fadb6eb64527a1"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "18bareC2O/2CCdouble1COdoubleDOWN2raysCONTACT2slopingarms-nativeVapexNOcrossbar/BLUEuniformthin-roundends/regularUPRIGHTO-OHfirstOanchor/0stereo0arrows/noaddedH-name-formula-omegaanswer-noalias321",
+    "hashSvgDaSoat": "664e4ba9c46fc6b7d0bda7a2f9f80a7e9b3e0da6ffa45ba4c48df845dbaf5cd4",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

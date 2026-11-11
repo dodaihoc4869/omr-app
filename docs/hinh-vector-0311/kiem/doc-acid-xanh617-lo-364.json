@@ -1,0 +1,230 @@
+{
+  "i": 617,
+  "assetIndexProvided": 1220,
+  "hash": "728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e.png",
+  "size": [
+    664,
+    139
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-BDT-KTTX-601-I-17",
+      "de": "Linoleic acid (có cấu tạo như hình) là một trong những acid béo có lợi cho sức khỏe tim mạch, ngăn ngừa các bệnh về tim, động mạch vành. Phát biểu nào sau đây **không** đúng?",
+      "allHinh": [
+        {
+          "hash": "728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e",
+          "where": "VIP27-BDT-KTTX-601-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "5683d85f0423cac5e2535284331d9b2578439a30b268c6b4d9fadb6eb64527a1"
+        }
+      ],
+      "missingHashes": [
+        "728e3cfe0ffaf4749bc3727dc3d3cf065ebf9a54032453f9346c1501212e263e"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownCO8xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Approx1pxnativecenters/rays, no18Cinferencefromlinoleicname. COcontactsourceprovenmacro; suggestedfeetmustremainonbuildslopes notcreatefalsegapfromrounding.",
+  "geometry": {
+    "orderedBareC": [
+      [
+        9,
+        17
+      ],
+      [
+        39,
+        67
+      ],
+      [
+        70,
+        17
+      ],
+      [
+        100,
+        67
+      ],
+      [
+        131,
+        17
+      ],
+      [
+        161,
+        67
+      ],
+      [
+        222,
+        67
+      ],
+      [
+        253,
+        17
+      ],
+      [
+        284,
+        67
+      ],
+      [
+        345,
+        67
+      ],
+      [
+        376,
+        17
+      ],
+      [
+        407,
+        67
+      ],
+      [
+        438,
+        17
+      ],
+      [
+        468,
+        67
+      ],
+      [
+        499,
+        17
+      ],
+      [
+        529,
+        67
+      ],
+      [
+        560,
+        17
+      ],
+      [
+        591,
+        67
+      ]
+    ],
+    "CCDoubleVertexPairs1Based": [
+      [
+        6,
+        7
+      ],
+      [
+        9,
+        10
+      ]
+    ],
+    "innerParallelRays": [
+      [
+        [
+          167,
+          59
+        ],
+        [
+          218,
+          59
+        ]
+      ],
+      [
+        [
+          290,
+          59
+        ],
+        [
+          340,
+          59
+        ]
+      ]
+    ],
+    "carbonyl": {
+      "acidC": [
+        591,
+        67
+      ],
+      "raysDown": [
+        [
+          [
+            587,
+            60.55
+          ],
+          [
+            587,
+            103
+          ]
+        ],
+        [
+          [
+            595,
+            60.6
+          ],
+          [
+            595,
+            103
+          ]
+        ]
+      ],
+      "note": "Native2feetatUPPERends ofDOWNraysCONTACTrespectiveleft/rightslope~y60. BothslopescontinueandmeetVapex59167. Noaddedflatcrossbarat60or67; native Vjoins, nofootwhitegap. Coordinatesy60.55/60.6calculatedfromstoredslopestopreservecontact notsubpixelrasterclaim.",
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          579,
+          107,
+          602,
+          133
+        ],
+        "font": "regularuprightserifblue"
+      }
+    },
+    "OH": {
+      "text": "OH",
+      "bbox": [
+        610,
+        4,
+        658,
+        32
+      ],
+      "anchor": "FIRSTO",
+      "bond": [
+        [
+          591,
+          67
+        ],
+        [
+          611,
+          35
+        ]
+      ],
+      "font": "regularuprightserifblue"
+    },
+    "style": "ALLmoleculeblue~#2525ff/nativeedgeantialias, bondwidthabout3px withsoftscanedges; O/OHserifnormalcontrastnottruebold/italic. Whitebackground.",
+    "counts": {
+      "bareC": 18,
+      "CCdouble": 2,
+      "COdouble": 1,
+      "O": 2,
+      "captions": 0,
+      "arrows": 0,
+      "closedRings": 0
+    },
+    "noAdded": [
+      "acidnamecaption",
+      "Hlabels",
+      "COOHcondensedreplacement",
+      "flatCOfootbridge",
+      "disconnectedCOfeet",
+      "carbonnumbers",
+      "theoryE/Znormalization",
+      "alias"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": "Root tự mở nativeFULL3x+CO8x/all1publicde+refs/freshactualChromiumFULL3x exact664e4ba9c46fc6b7d0bda7a2f9f80a7e9b3e0da6ffa45ba4c48df845dbaf5cd4/3711B. 18bareC2CCdouble1COdoubleDOWN2rayscontact2slopingarms/Vapexkhôngcrossbar. 2Oregularuprightblue/OHfirstO. Feetgiao tính từ tọa độapprox để tránh khe giả;khôngclaimnativeSubpixel."
+}
