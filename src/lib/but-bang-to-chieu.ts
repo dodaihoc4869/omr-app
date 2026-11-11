@@ -69,7 +69,8 @@ ${JS_LOI_BUT}
   var cvT = tao('canvas', 'mc-but', body), cv = tao('canvas', 'mc-but mc-but-song', body), butCu = tao('div', 'mc-but-cu', body), ray = tao('div', 'mc-but-ray', body), rayTay = tao('i', '', ray);
 ` + /* cvT = lớp HIỆN mực (duy nhất) · cvC = lớp ĐÃ CHỐT (ngoài màn) · cvS = ô NHÁP (ngoài màn) · cv = chỉ bắt con trỏ */ `
   var cvC = tao('canvas'), cvS = tao('canvas');
-  var gT = nguCanh(cvT, true), gC = nguCanh(cvC, false), gS = nguCanh(cvS, false), g2 = gC && gS ? gT : null, so = LoiBut.taoSo(), KH = null, dpr = 1;
+` + /* 11/11 (thầy: «màn live của thầy hiện bảng đen xì ko hiện đề», máy em bình thường): lớp HIỆN mực phủ cả tờ KHÔNG xin desynchronized nữa — trên card đồ hoạ thật (Windows, toàn màn hình) lớp vẽ-thẳng-lên-màn có thể bị đưa lên làm lớp phủ ĐẶC, mất trong suốt ⇒ nền đen che giấy đề. Chromium không đầu không lộ. */ `
+  var gT = nguCanh(cvT, false), gC = nguCanh(cvC, false), gS = nguCanh(cvS, false), g2 = gC && gS ? gT : null, so = LoiBut.taoSo(), KH = null, dpr = 1;
 ` + /* N = nét đang viết · CHO = bút đã hết chạm mà máy chưa báo nhấc (chạm lại ⇒ mở nét mới) · XT = lượt kéo tẩy · KC = lượt kéo vạch cuộn */ `
 ` + /* ban = ô của đuôi vừa hiện (điểm ảnh thiết bị) · UO = ô hình vừa chép lên lớp hiện · luotBut = lần cuối thấy bút (chặn chạm tay) */ `
 ` + /* coRaw = trình duyệt đưa từng mẫu ngay · veNgay = vẽ trước đầu nét ngay khi mẫu tới · tVe = thời gian một lượt vẽ (ms, trung bình trượt) · DO = số đo của ô đo bút (null = ô tắt) */ `
