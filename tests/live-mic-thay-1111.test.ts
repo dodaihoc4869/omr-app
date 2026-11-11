@@ -470,9 +470,9 @@ describe('M2 · tiếng trong: luật lọc theo đường vọng + Opus dải r
       const soMo = goiGum.length
       expect(b.lt.chanDoan().locOn).toBe('vua')
       b.lt.datLocOn('manh')
-      expect(guiW[guiW.length - 1]).toMatchObject({ kho: 0.06 })
+      expect(guiW[guiW.length - 1]).toMatchObject({ muc: { noi: 0.25, im: 0.05, san: 0.25 } }) // lúc nói giữ 25 % tiếng gốc ở băng thấp, lúc im lọc sâu + cổng −12 dB
       b.lt.datLocOn('tat')
-      expect(guiW[guiW.length - 1]).toMatchObject({ kho: 1 })
+      expect(guiW[guiW.length - 1]).toMatchObject({ muc: null })
       expect(b.lt.chanDoan()).toMatchObject({ locOn: 'tat', locOnChay: 'tat' })
       expect(goiGum.length).toBe(soMo)
       // mic chỉ có tín hiệu khi trình duyệt KHÔNG xử lý gì ⇒ thang nới ràng buộc sang mic thô
