@@ -4,7 +4,7 @@ S=${TG_TAM:?đặt TG_TAM}
 WT=$(cd "$(dirname "$0")/../../../.." && pwd)
 cd "$S"
 while true; do
-  for d in ck-c ck-d ck-e ck-f; do
+  for d in ck-c ck-d ck-e ck-f ck-g; do
     [ -d "$d" ] || continue
     for ck in "$d"/ck-*.pkl; do
       [ -f "$ck" ] || continue

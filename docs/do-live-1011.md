@@ -555,6 +555,7 @@ Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach
 - Dòng trạng thái trong cửa sổ Live: «Mô hình <bản> · luyện <ngày> · máy này chạy <x> % thời gian thực» hoặc «Đã tự tắt (lý do) — lớp nghe tiếng như trước».
 
 ### 11.4 Trạng thái cuối lượt 2 (11/11 ≈ 22:05 giờ VN) — CHƯA ĐẠT, KHÔNG PHÁT HÀNH (mức «Chỉ giọng thầy» vẫn ẩn)
+> **Đính chính (lượt 3, 11.7):** bản đo 18 s dùng `LV_THAY` dài bị lỗi dựng cảnh ⇒ «giọng khác giảm» và «mở sau» của MÔ HÌNH ở 11.2 và mục này đo SAI (thấp hơn thật nhiều); số đúng ở 11.7.
 Đo nhanh mỗi checkpoint (`do-nhanh.mjs`: lõi JS 48 kHz, mỗi giọng −25 dBFS, số dB bị hạ):
 
 | bản | thầy giữ riêng (mong ≈ 0) | thầy nói to / cao giọng | giọng khác thật | LJ nữ | VCTK nam | LibriSpeech 1320 | tiếng Việt máy đọc | AudioMNIST đủ dải | kho mở chưa gặp |
@@ -606,3 +607,86 @@ B2 (mô hình có sẵn trên Hugging Face qua runner): KHÔNG làm — điều 
   Đọc số: `do-nhanh.log` (thư mục tạm của phiên); chọn bản bằng bản đo 18 s trên giọng chưa gặp. Lưu ý: FLEURS cum000 (người chấm) lọt vào thư mục luyện từ lần quét
   bước 8000 tới lần quét bước 10000 ⇒ đừng dùng số FLEURS giữ riêng của C / E trước bước 10000.
 
+
+### 11.7 Lượt 3 (12/11 rạng sáng, giờ VN) — 4 tiêu chí trên bản đo 18 s ĐÃ SỬA, thêm giọng thầy trong `emNoi`, lượt F giữ thầy — CHƯA ĐẠT, KHÔNG PHÁT HÀNH (mức «Chỉ giọng thầy» vẫn ẩn)
+(11.6 — YouTube / kho giọng mở — ở nhánh `claude/tach-giong-yt-1111`.) Mã: `luyen/them-thay-em-noi.py`, `luyen/tom-do18.py`, `luyen/do-trang-thai.mjs`, sửa `do-tach-giong.mjs`;
+số gốc, trọng số, tiếng chỉ ở thư mục tạm của phiên (`lv3/`, `mh/`, `ck-*/`, `du-lieu-f/`) — không vào kho.
+
+**Sự cố máy:** máy phiên khởi động lại ≈ 02:27 (19:27 UTC) ⇒ C, E, `canh-ck.sh` chết ở bước ≈ 29 300 (checkpoint 29 000 còn). 05:01 khởi lại E (tự nạp ck-029000,
+thêm `TG_IM_TU=20000` để `lamIm` không tăng lại từ 0,05) và `canh-ck.sh`; C không chạy lại (nhường chỗ cho F). Chạy nền có thể chết như vậy: chạy lại `chay-luyen.sh` là tự nạp checkpoint mới nhất.
+
+**LỖI CỦA BẢN ĐO 18 s (đã sửa):** `canh()` đặt khúc thầy và khúc nói chồng dài `nT / 2` — đúng 2,8 s với `giong-nam.wav` (lượt 1), nhưng với `LV_THAY` = giọng thầy
+thật 32 s thì dài 13,5 s ⇒ thầy nói LIỀN từ 0,3 tới 18,2 s và giọng khác kéo tới 18,2 s ⇒ hai đoạn «khác một mình» và đoạn «thầy sau khác» thật ra là NÓI CHỒNG.
+⇒ **mọi số «giọng khác giảm» (3–7 dB) và «mở sau» của MÔ HÌNH ở 11.2 / 11.4 là SAI, thấp hơn thật nhiều**; «thầy một mình», giữ dải, hệ số thời gian thực không bị ảnh hưởng.
+Nay mỗi khúc đúng 2,8 s (giong-nam không đổi ⇒ số lượt 1 giữ nguyên). Soát chéo bằng `do-trang-thai.mjs` (cùng đoạn giọng khác 3 s chạy riêng): cùng cỡ số với bản đã sửa.
+Mức vào của đoạn chồng thấp hơn mức danh định (SI-SDR vào −5,6…−9,3 dB ở «0 dB») vì khúc giọng thầy đặt vào đó có quãng lặng — số vẫn so vào → ra trên cùng một đoạn.
+
+#### (1) Bốn tiêu chí — bản đo 18 s đã sửa
+Giọng thầy thật giữ riêng (75f8acfc, miền MP3, −25 dBFS); giọng khác: VCTK nam, LJ nữ, người đóng vai em giữ riêng (bac5a835), xôn xao 5 giọng; thấp hơn thầy 0 / 2 / 10 dB.
+`LV_CHI_MH=1 LV_THAY=… LV_KHAC=… LV_MH=<.tgt> node scripts/thu-live-1011/do-tach-giong.mjs <ra.json>`, tóm bằng `python3 luyen/tom-do18.py <ra.json>`.
+
+| tiêu chí (10.5) | C-28000 | E-28000 | E-34000 | F-31000 (chỉ đổi tham số) | F-33000 (+ giọng thầy mới) | đạt? |
+|---|---|---|---|---|---|---|
+| mở sau ≤ 50 ms | 0–30 | 0–30 | 0–50 | 0–20 | 0 | ĐẠT |
+| nói chồng không giảm SI-SDR thầy (12 ca, vào → ra) | tăng 11 / 12; 10 dB giọng nam 4,6 → 4,2 | tăng 10 / 12 (1 ca bằng); xôn xao 0 dB −8,5 → −8,7 | tăng 11 / 12; xôn xao 0 dB −8,5 → −8,8 | tăng 10 / 12 (1 ca bằng); xôn xao 0 dB −8,5 → −9,0 | tăng 11 / 12; 10 dB nam 4,6 → 4,5 | GẦN (mỗi bản giảm ≤ 0,5 dB ở 1 ca) |
+| giọng khác giảm ≥ 20 dB (một mình): VCTK nam · LJ nữ · em thật · xôn xao | 14–17 · 23–27 · 20–26 · **7** | 14–17 · 20–31 · 22–28 · **5** | 17–24 · 28–30 · 23–27 · **6–7** | 12–16 · 20–26 · 17–19 · **4–5** | 7–8 · 12–16 · 12–16 · **3** | KHÔNG |
+| hệ số thời gian thực ≤ 0,6 (máy phiên, Node 1 luồng) | 0,08–0,09 | 0,08–0,10 | 0,08–0,09 | 0,08–0,10 | 0,08–0,11 | ĐẠT (máy phiên) |
+| thầy bị hạ, đoạn thầy một mình (mong ≤ 0,5 dB) | 1,3–1,5 | 1,2–1,3 | 1,3–1,5 | 1,0–1,1 | **0,8–0,9** | KHÔNG |
+| giữ dải (dB): 0,1–1 / 1–3 / 3–6 / 6–11 / 11–24 kHz | −1,5 / −0,8 / −2,0 / −2,6 / −9,5 | −1,3 / −0,8 / −2,1 / −5,2 / −7,5 | −1,4 / −1,0 / −2,2 / −4,5 / −7,2 | −1,1 / −0,7 / −1,4 / −2,5 / −5,6 | −0,9 / −0,5 / −0,9 / −0,9 / −4,4 | — |
+| SI-SDR thầy một mình (dB) | 7,2–8,1 | 7,6–8,5 | 6,9–7,3 | 8,1–9,0 | 9,2–10,9 | — |
+
+- **Dải −3 dB:** cột cũ `daiTanHz` dừng ở 117 Hz vì mô hình cắt dưới ≈ 150 Hz (thước quét từ dải thấp) ⇒ báo theo dải. KHÔNG có bản ghi giọng thầy 48 kHz (YouTube không tải được,
+  «Xem lại Live» là MP3 24 kHz) ⇒ 0,1–11 kHz đo trên giọng MP3; riêng 11–24 kHz là hệ số mô hình đặt cho dải cao, KHÔNG phụ thuộc tiếng vào (đặc trưng chỉ lấy 0–11 kHz) ⇒
+  đúng cho mic 48 kHz. F-33000: ≥ −0,9 dB từ 150 Hz tới 11 kHz, −4,4 dB ở 11–24 kHz ⇒ dải −3 dB ≈ 0,15–11 kHz.
+- **Vì sao dải cao tối:** 11–24 kHz = trung bình KHÔNG trọng số của mặt nạ 6–11 kHz (`o.cao`, `tach-giong-thay.ts`) — ô yếu (giữa các hài, ồn) kéo xuống ⇒ F-33000 −4,4 dB trong khi
+  6–11 kHz theo năng lượng chỉ −0,9. Sửa: trung bình theo năng lượng (∑M·|Y|² / ∑|Y|²) ở lõi + `cham()` của `luyen.py` + test `live-tach-giong-thay-1111` — CHƯA làm.
+- **Trạng thái mang sang** (`do-trang-thai.mjs`, E-28000, giọng khác 0 dB, giọng khác giảm theo 0–0,25 / 0,25–0,5 / 0,5–1 / 1–2 / 2–3 s): VCTK nam qua bộ tách MỚI 35 / 50 / 48 / 50 / 29 dB;
+  sau 2,8 s thầy nói 18 / 22 / 26 / 19 / 13 dB; sau 2,8 s nói chồng 18 / 27 / 23 / 15 / 11 dB (em thật: mới 20–50, sau chồng 14–28) ⇒ mạng «nhớ» đang có thầy và nới tay nhiều giây.
+  Mẫu luyện: thầy nói gần suốt mẫu 2 s (chỉ hở ≤ 0,6 s) ⇒ chưa từng gặp «thầy dừng, người khác nói một mình vài giây».
+- **Xôn xao 5 giọng chỉ giảm 3–7 dB** (từng giọng một 12–31 dB): mẫu luyện chỉ có 1–2 người khác.
+- Đo nhanh (`do-nhanh.mjs`) giờ cùng cỡ với bản 18 s đã sửa ở từng giọng (E-28000: VCTK nam 14,6 / 16,4 dB) ⇒ vẫn dùng lọc checkpoint được, nhưng không thấy xôn xao và trạng thái mang sang.
+
+#### (2) Thêm giọng thầy — 37,5 s → 55,2 s tiếng thầy luyện (+17,7 s, +47 %; tính cả quãng nghỉ bộ luyện chèn: 46 → 68 s)
+- Worker `/gv/live-ds` có 9 buổi, ĐỀU đã có ở máy (thêm `7847bb30` đã xoá trên Worker, bản ở máy còn) ⇒ không có buổi mới. Hai buổi sau 19:10 (1bb2fcd1 20:04, f2c39a2d 21:16):
+  cos với tâm thầy rất thấp (f2c39a2d P99 0,35 cả trong lẫn ngoài `emNoi`) ⇒ 0 s; chưa rõ vì sao (mic khác, hay thầy ít nói).
+- `them-thay-em-noi.py`: khung 10 ms trong `emNoi` ± 1 s là thầy khi ≥ 3 cửa sổ CAM++ 1 s phủ nó và MỌI cửa sổ có cos-thầy ≥ T, cos-em ≤ E (cos-em = max với tâm giọng em của
+  từng đoạn `emNoi` — cửa sổ cos-thầy ≤ 0,2 — và tâm «khác» chung); đoạn ≥ 0,5 s; không trùng khung đã có. Ngưỡng hiệu chỉnh ở MỨC KHUNG trên tập giữ riêng: dương = thầy
+  75f8acfc; âm = 83 giọng chưa gặp đi qua MP3 24 kHz 48 kb/s (kho mở tập chấm, AudioMNIST giữ riêng, em thật giữ riêng, giọng mẫu). Lần đầu chọn ở mức CỬA SỔ
+  (T 0,636 · E 0,192) ⇒ ở mức khung gần như 0 khung qua ⇒ chọn lại: **T = 0,494, E = 0,25** — khung thầy giữ riêng qua 64,6 %; giọng khác một mình lọt **0,15 %** (ngưỡng ≤ 1 %
+  là T 0,412); hỗn hợp thầy + giọng khác thấp hơn 0 / 6 / 10 / 20 dB lọt 4,3 / 9,7 / 14 / 20 % khung ⇒ một phần khung mới có thể lẫn giọng em thấp hơn ≈ 10 dB.
+- Tăng gần hết từ 4a551f8e (+15,2 s); 6c325251, c444eb20 +1 s; 1aca71b0 +0,5 s; các buổi còn lại 0 (cửa sổ qua ngưỡng nằm rời rạc, hiếm khung có MỌI cửa sổ phủ cùng qua). Tập chấm 75f8acfc
+  giữ nguyên (27 s). Giọng mới chỉ ở `du-lieu-f/` (lượt F); E giữ dữ liệu cũ. Vẫn xa mức cần (15–30 phút, 11.5).
+
+#### (3) Lượt F — nhắm GIỮ GIỌNG THẦY
+Khởi 05:10 từ E-28000 (chép `ck-giu/e-ck-028000.pkl` ⇒ `ck-f/`), tới 40 000 bước:
+`TG_DL=du-lieu-f TG_L2=4 TG_LOT=0.05 TG_IM0=0.1 TG_IM1=0.1 TG_GIA=0.05 bash luyen/chay-luyen.sh ck-f 40000` (E: L2 2,5 · LOT 0,2 · IM 0,05 → 0,1 · GIA 0,1). Theo hàm mất mát:
+- `l3` (LOT) phạt `(M·|Y − S|)^0,6` ở MỌI ô, kể cả ô có thầy; |Y − S| gồm cả ồn và dư MP3, ô cao tần có tín / ồn kém nhất ⇒ là số hạng duy nhất kéo mặt nạ xuống ngay trên
+  giọng thầy (E-28000 −5,2 dB ở 6–11 kHz) ⇒ hạ mạnh 0,2 → 0,05.
+- `l2` (L2) chỉ phạt khi ra NHỎ hơn thầy (`relu(St − Sh)²`) ⇒ tăng vừa 2,5 → 4. Ở ô mạng chưa chắc là thầy (xác suất p), mặt nạ tối ưu theo nén 0,3 ≈
+  p(1 + L2) / (p(1 + L2) + (1 − p)(1 + LOT)) ⇒ tăng L2 / giảm LOT nâng mặt nạ ở cả thầy LẪN giọng khác mạng còn phân vân.
+- `l4` (IM) chỉ ở khung KHÔNG có thầy — số hạng duy nhất nhắm đúng đoạn người khác nói một mình ⇒ giữ 0,1 (= E), IM0 = IM1 để không tăng lại từ 0,05.
+- GIA («người giả» = giọng thầy đổi cao độ) dạy mạng hạ cả thầy lúc cao giọng (hàng «thầy nói to» bị hạ nhiều nhất) ⇒ 0,1 → 0,05.
+
+Kết quả: F-33000 giữ thầy tốt nhất từ trước tới nay (thầy bị hạ 0,8–0,9 dB, 6–11 kHz −0,9 dB, mở sau 0, nói chồng không hại) NHƯNG giọng khác chỉ giảm 7–16 dB (E-28000 14–31).
+⇒ **đổi trọng số chỉ trượt dọc MỘT đường đánh đổi** (giống sáu lượt chỉnh cổng ở 10.4) — F KHÔNG «tốt hơn rõ» E; chưa bản nào đạt đủ 4 tiêu chí + giữ thầy.
+F-35000 (bản đo 18 s): thầy bị hạ 1,0–1,1 dB · VCTK nam 7–9 · LJ nữ 16–23 · em thật 15–23 · xôn xao 4 dB · nói chồng không giảm ca nào ⇒ F dao động quanh cùng chỗ.
+Đo nhanh F (thầy / thầy nói to, dB hạ): 28000 2,1 / 3,3 ⇒ 31000 1,7 / 2,8 ⇒ 33000 1,4 / 2,4 ⇒ 34000 1,8 / 3,1 ⇒ 35000 2,1 / 3,2.
+E chạy tiếp (E-34000): giọng khác một mình 17–30 dB (VCTK nam 17–24) nhưng thầy bị hạ 1,3–1,5 dB, 6–11 kHz −4,5 dB — đi ngược chiều F trên cùng đường đánh đổi.
+
+#### (4) Việc kế — mã đã có trong `luyen.py`, MẶC ĐỊNH TẮT (E / F chạy lại vẫn y như cũ)
+- `TG_LUOT` = tỉ lệ mẫu LUÂN LƯỢT: thầy dừng một quãng 35–80 % mẫu, người khác vào sau 0–0,4 s và nói một mình tới quanh lúc thầy nói lại (± 0,3 s); nên kèm `TG_GIAY ≥ 4`
+  ⇒ nhắm «trạng thái mang sang».
+- `TG_XON` = tỉ lệ mẫu XÔN XAO: 3–5 người nói cùng lúc, mỗi giọng chia √n ⇒ nhắm hàng xôn xao 3–7 dB.
+- Dải cao theo năng lượng (mục 1); nguồn giọng thầy sạch dài (buổi Live một mình / tệp gốc YouTube Studio, 11.5) vẫn là nút thắt: F cho thấy giữ thầy và chặn giọng
+  khác cùng phụ thuộc mạng CHẮC CHẮN bao nhiêu về giọng thầy, chỉnh trọng số không thay được dữ liệu.
+- **Lượt G (đang chạy, khởi 06:09 khi E dừng ở 40 000):** từ F-37000, cùng tham số + dữ liệu F, thêm `TG_LUOT=0.3 TG_XON=0.15 TG_GIAY=4`, tới 60 000 bước
+  (`TG_DL=du-lieu-f TG_L2=4 TG_LOT=0.05 TG_IM0=0.1 TG_IM1=0.1 TG_GIA=0.05 TG_LUOT=0.3 TG_XON=0.15 TG_GIAY=4 bash luyen/chay-luyen.sh ck-g 60000`; 0,7 s / bước).
+  Khác F ở HAI chỗ: cách dựng mẫu (luân lượt + xôn xao, mẫu 4 s) và lịch học (tới 60 000 ⇒ tốc độ học ở bước 37 000 ≈ 5·10⁻⁴ thay vì ≈ 1·10⁻⁴ của F, vốn đã gần cuối lịch).
+  Chấm G bằng bản đo 18 s (hàng xôn xao, nhóm 1–2 s / 2–4 s, «sau thầy», «thầy bị hạ»), không bằng đo nhanh (đo nhanh dựng bộ tách mới cho mỗi tệp ⇒ không thấy trạng thái
+  mang sang). Vài nghìn bước chưa đổi thì CHƯA bác được ý này.
+
+#### (5) Chạy nền khi kết thúc lượt 3 (thư mục tạm của phiên)
+E đã tự dừng ở 40 000 (06:08). Đang chạy: F (tới 40 000 rồi tự dừng), G (tới 60 000), `canh-ck.sh` (xuất + đo nhanh mỗi checkpoint của ck-c / ck-e / ck-f / ck-g ⇒ `do-nhanh.log`).
+Dừng: `pkill -f "ma/luyen.py du-lieu-f ck-f"` · `pkill -f "ma/luyen.py du-lieu-f ck-g"` · `pkill -f ma/canh-ck.sh` (E nếu chạy lại: `pkill -f "ma/luyen.py du-lieu ck-e"`).
+`canh-buoi-moi.sh` vẫn TẮT. Checkpoint giữ riêng (không bị xoay vòng): `ck-giu/` (e-28000 / 29000 / 30000, c-29000, f-33000 / 35000 / 37000).
+Bản đo 18 s một checkpoint: `bash lv3/do18.sh ck-x-NNNNN` (thư mục tạm) ⇒ `lv3/do18-ck-x-NNNNN.json`, rồi `tom-do18.py`.

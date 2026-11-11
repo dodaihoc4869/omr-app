@@ -95,6 +95,7 @@ def napMo():
     except Exception: dai = {}
     MO = [(rf(f), float(dai.get(os.path.basename(f)[:-4], 8000))) for f in sorted(glob.glob(os.path.join(goc, '*.f32')))]
 napMo()
+XON = float(os.environ.get('TG_XON', '0'))     # tỉ lệ mẫu XÔN XAO 3–5 người (xem mau())
 LUOT = float(os.environ.get('TG_LUOT', '0'))   # tỉ lệ mẫu LUÂN LƯỢT (xem mau()); nên kèm TG_GIAY ≥ 4 để quãng một mình đủ dài
 GIA = min(0.2, float(os.environ.get('TG_GIA', '0.15')))   # tỉ lệ giọng khác là «NGƯỜI GIẢ» — ≤ 20 % (dao hai lưỡi: mạng có thể học hạ cả thầy lúc nói cao giọng)
 def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant CÙNG LÚC (nội suy lại) với độ lệch LỚN: ×1,25–1,6 (nữ / trẻ) hoặc ×0,68–0,75 (nam trầm hơn)
@@ -118,6 +119,10 @@ def mau(thay, khac, am, rr=None):
     if rng.random() < 0.4 and t.any(): t = vang(t, rng.uniform(0.1, 0.35), rng.uniform(6, 20))
     n_k = 0 if rng.random() < 0.15 else (2 if rng.random() < 0.2 else 1); i = np.zeros(L, np.float32)
     if luot: n_k = max(n_k, 1)
+    # XÔN XAO (lượt 3, TG_XON = tỉ lệ mẫu, mặc định 0 = như cũ): 3–5 người nói cùng lúc (lớp ồn ào). Mẫu cũ chỉ 1–2 người ⇒ bản đo 18 s (đã sửa) cho «xôn xao
+    # 5 giọng» chỉ giảm 3–5 dB trong khi từng giọng một giảm 12–30 dB (mục 11.7). Mỗi giọng chia √n để tổng vẫn quanh mức cũ so với thầy.
+    xon = XON > 0 and rng.random() < XON
+    if xon: n_k = int(rng.integers(3, 6))
     dai = 12000.0   # dải gốc hẹp nhất trong mẫu (Hz): giọng thầy / AudioMNIST / giọng thật trong lớp ≥ 11 kHz; kho mở 16 kHz chỉ tới 8 kHz
     for _ in range(n_k):
         u = rng.random()
@@ -134,7 +139,7 @@ def mau(thay, khac, am, rr=None):
         elif rng.random() < 0.6:  # chỉ nói một khúc ⇒ có lúc một mình, lúc chồng, có điểm bắt đầu / dứt
             a = rng.integers(0, L // 2); b = rng.integers(a + L // 4, L + 1); s[:a] = 0; s[b:] = 0
         r = rmsHd(s)
-        if r > 0: i += s / r * 10 ** (-rng.uniform(-8, 8) / 20)   # đo thật: giọng khác thấp hơn thầy ≈ 2 dB (−4,4…+7,4)
+        if r > 0: i += s / r * 10 ** (-rng.uniform(-8, 8) / 20) / (np.sqrt(n_k) if xon else 1.0)   # đo thật: giọng khác thấp hơn thầy ≈ 2 dB (−4,4…+7,4)
     rt = rmsHd(t)
     if rt > 0: t = t / rt; i = i  # giọng khác đã tính theo mức thầy = 1
     else: i = i * 10 ** (rng.uniform(-12, 0) / 20)
