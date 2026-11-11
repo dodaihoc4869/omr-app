@@ -1,0 +1,574 @@
+{
+  "i": 554,
+  "assetIndexProvided": 1113,
+  "hash": "67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99.png",
+  "size": [
+    835,
+    431
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-11-C3-B12-III-6",
+      "de": "Phổ khối lượng của naphtalene được cho trong hình dưới đây:\nPhân tử khối của naphtalene có giá trị là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99",
+          "where": "DH-11-C3-B12-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "d64ceb28fb7abfca9371738731154f34d6fd043a199f56e7d57bfd38b7f582da"
+        }
+      ],
+      "missingHashes": [
+        "67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownFusedRings6xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativepixelcenterlines/bboxes/radiiapprox1px; peakwidthsdistinguishedwithnativepixelRGBscan. Printedm/zlabels51/64/102/128 literal, noassignmentofnewexactintensitypercent.",
+  "geometry": {
+    "axes": {
+      "vertical": [
+        [
+          92,
+          0
+        ],
+        [
+          92,
+          385
+        ]
+      ],
+      "horizontal": [
+        [
+          92,
+          385
+        ],
+        [
+          817,
+          385
+        ]
+      ],
+      "style": "tealblue~2px continuous, NOarrowheads",
+      "crop": "YshaftcontinuesoffTOPnativey0.100ticky36isNOTaxisupperendpoint. Preservetopcrop."
+    },
+    "xTicks": [
+      {
+        "text": "20",
+        "centerX": 169,
+        "stem": [
+          [
+            169,
+            385
+          ],
+          [
+            169,
+            397
+          ]
+        ],
+        "labelBBox": [
+          154,
+          400,
+          185,
+          421
+        ]
+      },
+      {
+        "text": "40",
+        "centerX": 265,
+        "stem": [
+          [
+            265,
+            385
+          ],
+          [
+            265,
+            397
+          ]
+        ],
+        "labelBBox": [
+          250,
+          400,
+          281,
+          421
+        ]
+      },
+      {
+        "text": "60",
+        "centerX": 362,
+        "stem": [
+          [
+            362,
+            385
+          ],
+          [
+            362,
+            397
+          ]
+        ],
+        "labelBBox": [
+          347,
+          400,
+          378,
+          421
+        ]
+      },
+      {
+        "text": "80",
+        "centerX": 459,
+        "stem": [
+          [
+            459,
+            385
+          ],
+          [
+            459,
+            397
+          ]
+        ],
+        "labelBBox": [
+          444,
+          400,
+          475,
+          421
+        ]
+      },
+      {
+        "text": "100",
+        "centerX": 555,
+        "stem": [
+          [
+            555,
+            385
+          ],
+          [
+            555,
+            397
+          ]
+        ],
+        "labelBBox": [
+          540,
+          400,
+          571,
+          421
+        ]
+      },
+      {
+        "text": "120",
+        "centerX": 652,
+        "stem": [
+          [
+            652,
+            385
+          ],
+          [
+            652,
+            397
+          ]
+        ],
+        "labelBBox": [
+          637,
+          400,
+          668,
+          421
+        ]
+      },
+      {
+        "text": "140",
+        "centerX": 749,
+        "stem": [
+          [
+            749,
+            385
+          ],
+          [
+            749,
+            397
+          ]
+        ],
+        "labelBBox": [
+          734,
+          400,
+          765,
+          421
+        ]
+      }
+    ],
+    "yTicks": [
+      {
+        "text": "0",
+        "centerY": 385,
+        "stem": [
+          [
+            83,
+            385
+          ],
+          [
+            92,
+            385
+          ]
+        ],
+        "labelBBox": [
+          67,
+          374,
+          81,
+          396
+        ]
+      },
+      {
+        "text": "20",
+        "centerY": 315,
+        "stem": [
+          [
+            83,
+            315
+          ],
+          [
+            92,
+            315
+          ]
+        ],
+        "labelBBox": [
+          55,
+          304,
+          81,
+          326
+        ]
+      },
+      {
+        "text": "40",
+        "centerY": 246,
+        "stem": [
+          [
+            83,
+            246
+          ],
+          [
+            92,
+            246
+          ]
+        ],
+        "labelBBox": [
+          55,
+          235,
+          81,
+          257
+        ]
+      },
+      {
+        "text": "60",
+        "centerY": 176,
+        "stem": [
+          [
+            83,
+            176
+          ],
+          [
+            92,
+            176
+          ]
+        ],
+        "labelBBox": [
+          55,
+          165,
+          81,
+          187
+        ]
+      },
+      {
+        "text": "80",
+        "centerY": 106,
+        "stem": [
+          [
+            83,
+            106
+          ],
+          [
+            92,
+            106
+          ]
+        ],
+        "labelBBox": [
+          55,
+          95,
+          81,
+          117
+        ]
+      },
+      {
+        "text": "100",
+        "centerY": 36,
+        "stem": [
+          [
+            83,
+            36
+          ],
+          [
+            92,
+            36
+          ]
+        ],
+        "labelBBox": [
+          43,
+          25,
+          81,
+          47
+        ]
+      }
+    ],
+    "peaks": [
+      {
+        "label": "51",
+        "shaft": [
+          [
+            316.5,
+            307
+          ],
+          [
+            316.5,
+            385
+          ]
+        ],
+        "nativePixelHeight": 78,
+        "strokeWidth": 2,
+        "labelBBox": [
+          303.5,
+          281,
+          330.5,
+          303
+        ]
+      },
+      {
+        "label": "64",
+        "shaft": [
+          [
+            385,
+            329
+          ],
+          [
+            385,
+            385
+          ]
+        ],
+        "nativePixelHeight": 56,
+        "strokeWidth": 3,
+        "labelBBox": [
+          372,
+          303,
+          399,
+          325
+        ]
+      },
+      {
+        "label": "102",
+        "shaft": [
+          [
+            569.5,
+            351
+          ],
+          [
+            569.5,
+            385
+          ]
+        ],
+        "nativePixelHeight": 34,
+        "strokeWidth": 2,
+        "labelBBox": [
+          550.5,
+          325,
+          589.5,
+          347
+        ]
+      },
+      {
+        "label": "128",
+        "shaft": [
+          [
+            699.5,
+            38
+          ],
+          [
+            699.5,
+            385
+          ]
+        ],
+        "nativePixelHeight": 347,
+        "strokeWidth": 2,
+        "labelBBox": [
+          680.5,
+          12,
+          719.5,
+          34
+        ]
+      }
+    ],
+    "peakColorRGB": [
+      145,
+      23,
+      99
+    ],
+    "peakWidthEvidence": {
+      "51y340": "x316grayedge+317dark, ~2px",
+      "64y345": "x384/385/386alldarkRGB1452399=>3px",
+      "102y365": "x569grayedge+570dark,~2px",
+      "128y200": "x699dark+700grayedge,~2px"
+    },
+    "labels": [
+      {
+        "text": "Cường độ tương đối (%)",
+        "bbox": [
+          12,
+          49,
+          40,
+          314
+        ],
+        "rotation": -90,
+        "font": "regularuprightsansrotatednottruebold"
+      },
+      {
+        "text": "m/z",
+        "bbox": [
+          789,
+          398,
+          827,
+          419
+        ],
+        "font": "italiclowercase sans"
+      }
+    ],
+    "fusedStructure": {
+      "leftHex": [
+        [
+          459,
+          98
+        ],
+        [
+          497,
+          76
+        ],
+        [
+          535,
+          98
+        ],
+        [
+          535,
+          142
+        ],
+        [
+          497,
+          165
+        ],
+        [
+          459,
+          142
+        ]
+      ],
+      "rightHex": [
+        [
+          535,
+          98
+        ],
+        [
+          572,
+          76
+        ],
+        [
+          610,
+          98
+        ],
+        [
+          610,
+          142
+        ],
+        [
+          572,
+          165
+        ],
+        [
+          535,
+          142
+        ]
+      ],
+      "sharedEdge": [
+        [
+          535,
+          98
+        ],
+        [
+          535,
+          142
+        ]
+      ],
+      "sharedEdgeDrawCount": 1,
+      "innerCircles": [
+        {
+          "center": [
+            496.5,
+            120.5
+          ],
+          "rx": 23.5,
+          "ry": 24
+        },
+        {
+          "center": [
+            572,
+            120.5
+          ],
+          "rx": 23.5,
+          "ry": 24
+        }
+      ],
+      "style": "blackthinuniform~2px,nofill/noalternatingdoublebonds",
+      "bareCCount": 10,
+      "explicitH": 0,
+      "caption": 0
+    },
+    "font": "Allnumericlabels/ticksregularuprightsansblack; m/zitalic; nostructuretext.",
+    "counts": {
+      "peaks": 4,
+      "peakLabels": 4,
+      "xTickLabels": 7,
+      "yTickLabels": 6,
+      "axisHeads": 0,
+      "hexRings": 2,
+      "innerCircles": 2,
+      "bareC": 10,
+      "grid": 0
+    },
+    "noAdded": [
+      "naphthalenename",
+      "C10H8formula",
+      "explicitH",
+      "alternatingdoublebonds",
+      "axisarrowhead",
+      "topwhitepadding",
+      "newintensitypercentlabels",
+      "tinyextraMSpeaks",
+      "answer"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "nativeFull2xOpened": true,
+    "allPublicDeRead": true,
+    "geometryAgrees": true,
+    "actualSvgReviewed": true,
+    "baselineLayer": "BlueaxesOVERmagenta as native RGB row385. Samples x384/385/386/569/699 row385=(57,135,154), contrasted magenta row383.",
+    "actualSvgHash": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+    "freshChromiumScale": 3,
+    "actualFullOpened": true,
+    "verdict": "Đạt riêng nguồn554; giữ2circles/sharededge/unequalwidths/currentfontglobalHOLD",
+    "reviewCorrectionProof": "soat-ms554-lo-355-nhan-dinh-cu-da-dinh-chinh.json"
+  }
+}

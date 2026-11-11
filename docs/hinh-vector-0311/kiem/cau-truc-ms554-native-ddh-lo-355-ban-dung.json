@@ -1,0 +1,29 @@
+[
+  {
+    "i": 554,
+    "hash": "67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99",
+    "fileNguon": "anh/67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99.png",
+    "svg": "ms554-native-ddh-c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62.svg",
+    "hashSvg": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+    "byteSvg": 33566,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-11-C3-B12-III-6",
+        "de": "Phổ khối lượng của naphtalene được cho trong hình dưới đây:\nPhân tử khối của naphtalene có giá trị là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99",
+            "where": "DH-11-C3-B12-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "d64ceb28fb7abfca9371738731154f34d6fd043a199f56e7d57bfd38b7f582da"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4MAGENTApeaks51-64-102-128/64width3others2native/7X6Y13ticks/BLUEaxesOVERpeaks-YTOPcroppednative0/2fusedhex10bareC2innercirclesONEsharededge/regularUPRIGHTnums-rotYlabel-mzREGULARITALIC/0H0heads0grid/noalternatingdouble-names-formula-answer-intensityinference",
+    "hashSvgDaSoat": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

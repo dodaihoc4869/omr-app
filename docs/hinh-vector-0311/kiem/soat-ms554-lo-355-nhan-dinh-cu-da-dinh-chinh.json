@@ -1,0 +1,64 @@
+{
+  "i": 554,
+  "hashSvg": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+  "dinhChinh": "Thu hồi negative thiếu cạnh chung: FULL cũ/mới và macro rộng cũ/mới byte-identical; probe macro(285,170) đen. Macro rộng do tool trình bày trông trắng ở giữa, nhưng file có nét; macro hẹp actual tự mở xác nhận cạnh đứng liên tục. Chưa chứng minh nguyên nhân lớp hiển thị; không khẳng định chỉ nhìn nhầm hay raster lỗi. SVG không sửa. Giữ negative ban đầu làm audit, không dùng làm verdict hiện tại.",
+  "renderMoi": "/workspace/scratch/soat355-554-fresh.png",
+  "macroMoi": "/workspace/scratch/ms554-shared-fresh.png",
+  "lo": 355,
+  "oldReview": [
+    {
+      "i": 554,
+      "hashSvg": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+      "nguoiSoat": "soat_hinh_vector",
+      "ketQua": "Cần sửa: đã tự mở nguồn FULL, câu dẫn/ref và fresh Chromium3× FULL/macro. SVG thiếu cạnh đứng CHUNG nối hai đỉnh lõm giữa hai vòng; native có nét đứng rõ khoảng x535,y98..143. Bản mới chỉ có chu vi ngoài và hai vòng tròn, làm sai connectivity hai vòng ngưng tụ. Cần thêm đúng cạnh chung theo nguồn rồi render/soát mới; chưa Đạt. Bốn peak/nhãn/trục đã nhìn nhưng không dùng để miễn lỗi cấu trúc.",
+      "render": "/workspace/scratch/soat263-554.png",
+      "macro": [
+        "/workspace/scratch/ms554-rings.png",
+        "/workspace/scratch/ms554-native-rings.png",
+        "/workspace/scratch/ms554-base.png",
+        "/workspace/scratch/ms554-top.png"
+      ]
+    }
+  ],
+  "provenance": {
+    "/workspace/scratch/ms554-rings.png": "ed4c7f646d8477982c2ed55a1389b958c16ba0ad312d18506fdfea999193103d",
+    "/workspace/scratch/ms554-rings-fresh.png": "ed4c7f646d8477982c2ed55a1389b958c16ba0ad312d18506fdfea999193103d",
+    "/workspace/scratch/soat263-554.png": "7e74b7a5e2f5c6ffb239afd9de590d335feba84bfb735b78067cd30c541197c3",
+    "/workspace/scratch/soat355-554-fresh.png": "7e74b7a5e2f5c6ffb239afd9de590d335feba84bfb735b78067cd30c541197c3",
+    "/workspace/scratch/agent-render355.cjs": "72cc1d74b0dfd494eff81fc0a381dba797da0ddd34995fa6054c2fe8b10acab7",
+    "/workspace/scratch/agent-render355-fresh.cjs": "8574bf3af17de58d57209d77667749cb60a05d5887f093044e8a2095c41682e0",
+    "/workspace/omr-vector/docs/hinh-vector-0311/kiem/ms554-native-ddh-c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62.svg": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+    "macroOldCenter": [
+      0,
+      0,
+      0
+    ],
+    "macroNewCenter": [
+      0,
+      0,
+      0
+    ],
+    "macroPixelIdentical": true,
+    "svgActualReadPath": "/workspace/omr-vector/docs/hinh-vector-0311/kiem/ms554-native-ddh-c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62.svg",
+    "note": "Renderer reads fs.readFileSync(p+m.svg) directly from current metadata, setContent actual bytes. Both scripts archived; old render did not record runtime SHA, so no retroactive claim of runtime log. Old/new FULL and macro byte SHA/pixel equality independently verified now. Narrow macro actual opened confirms line."
+  },
+  "classification": "REVIEW_INVALID: nhận định thiếu cạnh đã thu hồi; KHÔNG SVGnegative; SVG nguyênbyte",
+  "rootIndependentCheck": {
+    "macroSize": [
+      560,
+      350
+    ],
+    "macroCenter": [
+      285,
+      170
+    ],
+    "rgb": [
+      0,
+      0,
+      0
+    ],
+    "fiveVerticalSamplesAllBlack": true,
+    "ownFreshRootNarrowMacroOpened": true
+  },
+  "runtimeLog": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ms554-native-ddh-c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62.svg c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62\n554 { x: 0, y: 0, width: 835, height: 431 }\n"
+}

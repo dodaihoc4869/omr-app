@@ -1,0 +1,18 @@
+[
+  {
+    "i": 554,
+    "hashSvg": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt sau soát lại fresh runtime exactSHA: tự mở nguồn FULL/câu dẫn/ref DH-11-C3-B12-III-6, fresh Chromium3× FULL và macro hẹp cạnh chung; cạnh đứng nối hai junction thực có, đúng hai lục giác ngưng tụ10C với hai vòng tròn trong. Negative trước được thu hồi với audit byte/pixel vì macro rộng hiển thị gây bất đồng, file cũ/mới byte-identical và pixel tâm cạnh đen. Đúng bốn peak magenta51/64/102/128, peak64 dày hơn; bảy X/sáu Y/13ticks, trục xanh phủ chân peak, đầu Y cắt mép native0, số/nhãnY thường thẳng và m/z thường nghiêng. Không thấy chạm/cắt thêm ngoài crop nguồn hay dữ kiện thêm.",
+    "render": "/workspace/scratch/soat355-554-fresh.png",
+    "macro": [
+      "/workspace/scratch/ms554-shared-fresh.png",
+      "/workspace/scratch/ms554-native-rings.png",
+      "/workspace/scratch/ms554-rings-fresh.png",
+      "/workspace/scratch/ms554-base.png",
+      "/workspace/scratch/ms554-top.png"
+    ],
+    "hash": "67f97d4a211c8e55299e26486bbb64eafcc71480c057384e8f3e6757a8eb0e99",
+    "hashSvgDaSoat": "c085b661834eab54ccb0ace28f977b70243d72f821d5a6387c7b6ea350dfec62"
+  }
+]
