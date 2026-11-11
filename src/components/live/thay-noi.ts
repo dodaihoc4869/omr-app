@@ -82,7 +82,9 @@ const ghi = (k: string, v: string): void => { try { localStorage.setItem(k, v) }
 /** «Lọc ồn» thầy chọn lần trước (mặc định Vừa). */
 const mucLocOn = (): MucLocOn => { const v = nho('ddh.live.loc-on'); return v === 'manh' || v === 'tat' ? v : 'vua' }
 /** «Tiếng» thầy chọn lần trước: 'chuan' = chuẩn trình duyệt (dự phòng kiểu Meet); mặc định «Làm rõ». */
-const kieuTieng = (): 'lam-ro' | 'chuan' => (nho('ddh.live.kieu-tieng') === 'chuan' ? 'chuan' : 'lam-ro')
+// 11/11 tối (thầy + nhiều học sinh thử bản sống: đường truyền thông, máy em «loa đang phát» mà KHÔNG nghe thấy gì; Meet trên cùng máy, cùng mic chạy bình thường)
+// ⇒ MẶC ĐỊNH «Chuẩn trình duyệt» (gửi thẳng mic, khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt — kiểu Meet); «Làm rõ» (chuỗi khung) chỉ khi thầy chọn.
+const kieuTieng = (): 'lam-ro' | 'chuan' => (nho('ddh.live.kieu-tieng') === 'lam-ro' ? 'lam-ro' : 'chuan')
 const cheDoLoc = (): CheDoLoc => { const v = nho(KHOA_LOC); return v === 'bat' || v === 'tat' ? v : 'tu' }
 
 let to: Window | null = null
@@ -380,7 +382,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'nghe-em': lt?.datNgheEm(m.v === true); break
     case 'nghe-em-lai': lt?.phatLaiEm(); break
     // «Tiếng: Làm rõ / Chuẩn trình duyệt» — áp NGAY, nhớ ở máy
-    case 'kieu-tieng': { const v = m.v === 'chuan' ? 'chuan' : 'lam-ro'; ghi('ddh.live.kieu-tieng', v === 'chuan' ? 'chuan' : ''); lt?.datKieuTieng(v === 'chuan'); bao(); setTimeout(bao, 900); break }
+    case 'kieu-tieng': { const v = m.v === 'chuan' ? 'chuan' : 'lam-ro'; ghi('ddh.live.kieu-tieng', v === 'chuan' ? '' : 'lam-ro'); lt?.datKieuTieng(v === 'chuan'); bao(); setTimeout(bao, 900); break }
     case 'anh': {
       guong.khoa = String(m.trang ?? ''); guong.tiLe = Number(m.tiLe) || 16 / 9; guong.net = Array.isArray(m.net) ? (m.net as NetBut[]) : []
       maCua.set(guong.khoa, maTrang(guong.khoa, vungCua(m.vung), m.giayToi === true))
