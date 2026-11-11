@@ -90,8 +90,8 @@ export const taiBuoiRieng = (token: string, id: string): Promise<KetQua<TraLiveB
 export const duongTep = (goc: string, id: string, tep: TepLive, ve: string): string => `${goc}/live-tep/${encodeURIComponent(id)}/${tep}?ve=${encodeURIComponent(ve)}`
 const laBuoi = (j: Record<string, unknown>): boolean => j.v === 1 && Array.isArray(j.cau) && Array.isArray(j.doan) && Array.isArray(j.mocBang)
 /** `buoi.json` của một buổi. 404 ⇒ 'go'; vé sai / hết hạn (401, 403) ⇒ 'loi' (nơi gọi xin vé mới qua `/hs/live-buoi` rồi thử lại). */
-export async function taiBuoiJson(id: string, ve: string): Promise<KetQua<BuoiLiveJson>> {
-  const k = await goi(duongTep(await gocMayChu(), id, TEP_LIVE.buoi, ve))
+export async function taiBuoiJson(id: string, ve: string, goc?: string): Promise<KetQua<BuoiLiveJson>> {
+  const k = await goi(duongTep(goc || (await gocMayChu()), id, TEP_LIVE.buoi, ve))
   if ('loai' in k) return { ok: false, loai: 'mang' }
   if (k.r.status === 404) return { ok: false, loai: 'go' }
   if (!k.r.ok) return { ok: false, loai: 'loi' }

@@ -11,6 +11,7 @@ import type { BuoiLiveJson, TraLiveBuoiHs, TraLiveDsHs } from '../src/lib/live/x
 import { MenuDocTrong } from '../src/components/hoc-tap/TrongHs'
 import XemBuoiLive, { ManLiveHs, demBuoiMoi } from '../src/screens/live-xem-lai/hs'
 import { HOI_LAI_DANG_DUNG_MS } from '../src/screens/live-xem-lai/hs/kieu'
+import MoTuThay from '../src/screens/live-xem-lai/hs/MoTuThay'
 import { _quenDs, NHO_DS_MS } from '../src/screens/live-xem-lai/hs/may-chu'
 import { chuDaXem, danhDauXem, docDaXem, khoaEm } from '../src/screens/live-xem-lai/hs/nho-may'
 import { dangXemNhat, doanHopLe, dongThoiGian, sapDoan } from '../src/screens/live-xem-lai/hs/sap-doan'
@@ -261,6 +262,19 @@ describe('trang buổi live', () => {
     expect(screen.queryByText('Em chưa đúng')).toBeNull(); expect(screen.queryByText('Em làm đúng')).toBeNull(); expect(screen.queryByText('Câu em chưa đúng')).toBeNull()
     expect([...document.querySelectorAll('.xl-doan .o')].map((e) => e.textContent)).toEqual(['1', '2', '3', '4', '5'])
     expect(screen.getByRole('button', { name: 'Về Lịch sử Live' })).toBeTruthy()
+  })
+  it('điểm nối app thầy `MoTuThay({ buoi, ve, goc, onDong })`: đọc tệp tại gốc máy chủ thầy đưa, bằng vé của thầy; máy chủ thật trả kèm `ok: true`', async () => {
+    const { buoi } = taoBuoiGia()
+    localStorage.setItem('omr_student_portal_auth', JSON.stringify({ token: TOKEN })) // máy thầy có sẵn phiên học sinh cũng KHÔNG được gọi lệnh của em
+    datMayChu({ rieng: () => taoRiengGia(buoi), buoi: () => ({ ok: true, ...buoi }) as unknown as typeof buoi })
+    const onDong = vi.fn()
+    render(<MoTuThay buoi={taoDsGia(buoi).buoi[0]!} ve="ve-thay" goc="https://goc-thay.test/" onDong={onDong} />)
+    await screen.findByText('Phát cả 5 đoạn · 29 phút')
+    const ds = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls.map((c) => String(c[0]))
+    expect(ds).toEqual([`https://goc-thay.test/live-tep/${ID_BUOI_GIA}/buoi.json?ve=ve-thay`])
+    expect(screen.queryByText('Em chưa đúng')).toBeNull(); expect(screen.queryByText('Câu em chưa đúng')).toBeNull(); expect(screen.queryByText('Em lên bảng')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: 'Về Lịch sử Live' }))
+    expect(onDong).toHaveBeenCalledOnce()
   })
   it('thầy đã gỡ buổi (404) ⇒ «Thầy đã gỡ buổi này.» + «Về danh sách»; lỗi khác ⇒ «Thử lại»', async () => {
     datMayChu({ rieng: () => 'go', buoi: () => 'go' })

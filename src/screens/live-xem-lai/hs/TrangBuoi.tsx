@@ -22,6 +22,8 @@ export interface PropsTrangBuoi {
   nguon: 'hs' | 'gv'
   /** Token phiên của em (chỉ `nguon: 'hs'`). */
   token?: string
+  /** Gốc máy chủ nơi gọi đưa sẵn (app thầy); vắng ⇒ địa chỉ máy chủ của app học sinh. */
+  goc?: string
   dong: () => void
   nhanLui?: string
 }
@@ -41,7 +43,7 @@ function useKhoRong(q: string): boolean {
   return khop
 }
 
-export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui = 'Về danh sách buổi live' }: PropsTrangBuoi) {
+export default function TrangBuoi({ id, ve: veDau, nguon, token, goc: gocVao, dong, nhanLui = 'Về danh sách buổi live' }: PropsTrangBuoi) {
   const [tt, setTt] = useState<TrangThai>({ loai: 'tai' })
   const [lan, setLan] = useState(0)
   const [daXem, setDaXem] = useState<number[]>([])
@@ -50,13 +52,14 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
     let huy = false
     void (async () => {
       const hRieng = nguon === 'hs' && token ? taiBuoiRieng(token, id) : null
-      const [goc, kb0, kr] = await Promise.all([gocMayChu(), veDau ? taiBuoiJson(id, veDau) : null, hRieng])
+      const gocSan = gocVao ? gocVao.replace(/\/+$/, '') : ''
+      const [goc, kb0, kr] = await Promise.all([gocSan || gocMayChu(), veDau ? taiBuoiJson(id, veDau, gocSan) : null, hRieng])
       if (huy) return
       if (kr && !kr.ok && kr.loai === 'go') { setTt({ loai: 'go' }); return }
       const rieng = kr?.ok ? kr.d : null
       let ve = veDau, kb = kb0
       // vé từ danh sách đã hết hạn / chưa có ⇒ dùng vé mới của `/hs/live-buoi`
-      if ((!kb || (!kb.ok && kb.loai === 'loi')) && rieng && rieng.ve !== veDau) { ve = rieng.ve; kb = await taiBuoiJson(id, ve); if (huy) return }
+      if ((!kb || (!kb.ok && kb.loai === 'loi')) && rieng && rieng.ve !== veDau) { ve = rieng.ve; kb = await taiBuoiJson(id, ve, gocSan); if (huy) return }
       if (!kb || !ve) { setTt({ loai: 'loi' }); return }
       if (!kb.ok) { setTt({ loai: kb.loai === 'go' ? 'go' : 'loi' }); return }
       if (khoa) danhDauMo(khoa, id)
@@ -64,7 +67,7 @@ export default function TrangBuoi({ id, ve: veDau, nguon, token, dong, nhanLui =
       setTt({ loai: 'ok', buoi: kb.d, ve, rieng, goc })
     })()
     return () => { huy = true }
-  }, [id, veDau, nguon, token, khoa, lan])
+  }, [id, veDau, nguon, token, gocVao, khoa, lan])
 
   // Thành phần đề của màn làm bài (mảnh đã nằm trong kho tải ngầm của app học sinh); chưa về ⇒ đề hiện chữ trơn.
   const [LC, setLC] = useState<MangChang | null>(null)

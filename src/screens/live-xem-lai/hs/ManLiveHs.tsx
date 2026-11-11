@@ -31,8 +31,8 @@ export default function ManLiveHs({ token: tokenVao, dong }: { token?: string; d
 }
 
 /** ĐIỂM VÀO DÙNG CHUNG: mở xem một buổi. `nguon: 'gv'` (app thầy, nút «Mở» ở Lịch sử Live) ⇒ không có phần riêng từng em. */
-export function XemBuoiLive({ id, ve, nguon, dong }: { id: string; ve: string; nguon: 'hs' | 'gv'; dong: () => void }) {
+export function XemBuoiLive({ id, ve, nguon, goc, dong }: { id: string; ve: string; nguon: 'hs' | 'gv'; /** Gốc máy chủ (app thầy đưa sẵn). */ goc?: string; dong: () => void }) {
   return <Khung nhan="Xem lại buổi live" khoa={id} lui={dong}>
-    <TrangBuoi id={id} ve={ve} nguon={nguon} token={nguon === 'hs' ? tokenEm() || undefined : undefined} dong={dong} nhanLui={nguon === 'gv' ? 'Về Lịch sử Live' : 'Về danh sách buổi live'} />
+    <TrangBuoi id={id} ve={ve} nguon={nguon} goc={goc} token={nguon === 'hs' ? tokenEm() || undefined : undefined} dong={dong} nhanLui={nguon === 'gv' ? 'Về Lịch sử Live' : 'Về danh sách buổi live'} />
   </Khung>
 }

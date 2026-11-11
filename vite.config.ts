@@ -400,6 +400,7 @@ export default defineConfig({
           '**/xem-lai-live-*.{js,css}',
           '**/hs-????????.js', // cửa của mảnh (src/screens/live-xem-lai/hs/index.ts — Rolldown đặt tên theo thư mục) + phần hợp đồng dùng chung; đúng 8 ký tự băm để không bắt nhầm `gan-hs-*`
           '**/TrinhPhat-*.{js,css}',
+          '**/MoTuThay-*.js', // cửa app thầy bấm «Mở» ở Lịch sử Live (nhập lười) — bọc mỏng quanh mảnh xem-lai-live
           '**/ve-bang-*.js',
           '**/so-net-*.js',
           '**/ma-net-*.js',
