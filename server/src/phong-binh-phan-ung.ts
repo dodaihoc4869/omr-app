@@ -15,7 +15,7 @@ import { baoMayCacEm } from './ngan-hoc-sinh'
 import { docCauHinhDem } from './cau-hinh-dem'
 import { dongTrackSfu, sfuDaCauHinh } from './live-sfu'
 import { LiveMay, type KemBpu } from './phong-live'
-import { datCoLive, duocPhatMic, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
+import { GIAO_DIEN_DOT_2, datCoLive, duocPhatMic, laEmXaDangLive, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
 import { KHOA_CH_XEM_LAI, NhatKyXl, xemLaiBat } from './live-xem-lai'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
@@ -44,14 +44,15 @@ export function liveBangBat(giaTri: string | null): boolean {
 }
 
 // ── Vé ──
-export interface VeBpu { b: string; s: string; v: 'gv' | 'hs'; h: number }
+/** `x: 1` = vé «em ở xa» (live đợt 2, điểm quyết 4): chỉ xem live — phòng không tính điểm danh, không nhận đáp án. */
+export interface VeBpu { b: string; s: string; v: 'gv' | 'hs'; h: number; x?: 1 }
 const TIEN_TO = 'bpu|'
 const enc = new TextEncoder()
 const b64 = (b: Uint8Array) => { let s = ''; for (const x of b) s += String.fromCharCode(x); return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '') }
 const tuB64 = (s: string) => { const t = atob(s.replace(/-/g, '+').replace(/_/g, '/')); const b = new Uint8Array(t.length); for (let i = 0; i < t.length; i++) b[i] = t.charCodeAt(i); return b }
 const khoa = (biMat: string) => crypto.subtle.importKey('raw', enc.encode(TIEN_TO + biMat), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign', 'verify'])
 export async function kyVeBpu(biMat: string, ve: VeBpu): Promise<string> {
-  const than = b64(enc.encode(JSON.stringify({ b: ve.b, s: ve.s, v: ve.v, h: ve.h })))
+  const than = b64(enc.encode(JSON.stringify({ b: ve.b, s: ve.s, v: ve.v, h: ve.h, ...(ve.x === 1 ? { x: 1 } : {}) })))
   return `${than}.${b64(new Uint8Array(await crypto.subtle.sign('HMAC', await khoa(biMat), enc.encode(TIEN_TO + than))))}`
 }
 export async function kiemVeBpu(biMat: string, chuoi: unknown, nay = Date.now()): Promise<VeBpu | null> {
@@ -63,7 +64,7 @@ export async function kiemVeBpu(biMat: string, chuoi: unknown, nay = Date.now())
     const v = JSON.parse(new TextDecoder().decode(tuB64(than))) as VeBpu
     if (typeof v.b !== 'string' || !v.b || typeof v.s !== 'string' || (v.v !== 'gv' && v.v !== 'hs') || typeof v.h !== 'number' || v.h < nay) return null
     if (v.v === 'hs' && !v.s) return null
-    return { b: v.b, s: v.s, v: v.v, h: v.h }
+    return { b: v.b, s: v.s, v: v.v, h: v.h, ...(v.x === 1 && v.v === 'hs' ? { x: 1 as const } : {}) }
   } catch { return null }
 }
 
@@ -224,11 +225,24 @@ export async function hsBpuCuaEm(env: Env, b: Row, nay = Date.now()): Promise<Ro
   if (!bpuBat(env)) return { ok: false, lyDo: 'tat' }
   let sbd: string
   try { sbd = await gameIdentity(env, b) } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
+  const gio = new Date(nay).toISOString()
   const r = await env.DB.prepare(`SELECT d.buoi_id FROM buoi_hoc_diem_danh d JOIN buoi_hoc bh ON bh.id = d.buoi_id
-      WHERE d.sbd = ? AND d.trang_thai = 'co_mat' AND bh.dong_luc IS NULL AND bh.het_han > ? ORDER BY bh.mo_luc DESC LIMIT 1`).bind(sbd, new Date(nay).toISOString()).first<Row>().catch(() => null)
+      WHERE d.sbd = ? AND d.trang_thai = 'co_mat' AND bh.dong_luc IS NULL AND bh.het_han > ? ORDER BY bh.mo_luc DESC LIMIT 1`).bind(sbd, gio).first<Row>().catch(() => null)
   const buoiId = buoiHop(r?.buoi_id)
-  if (!buoiId) return { ok: true, buoiId: null }
-  return { ok: true, buoiId, ve: await kyVeBpu(env.MA_BI_MAT, { b: buoiId, s: sbd, v: 'hs', h: nay + HAN_VE_BPU_MS }) }
+  if (buoiId) return { ok: true, buoiId, ve: await kyVeBpu(env.MA_BI_MAT, { b: buoiId, s: sbd, v: 'hs', h: nay + HAN_VE_BPU_MS }) }
+  if (!GIAO_DIEN_DOT_2) return { ok: true, buoiId: null } // đợt 2 chưa mở giao diện ⇒ đường này y như trước (đúng một lệnh D1)
+  // LIVE đợt 2 (điểm quyết 4 — em ở xa): em CHƯA điểm danh mới tới đây (em có mặt đi đúng một lệnh D1 như cũ). Tìm buổi đang mở của LỚP em rồi hỏi PHÒNG
+  // của buổi (0 D1): thầy đang live và đang bật «Cho em ở xa vào xem» thì phát vé «em ở xa» (chỉ xem — phòng không tính điểm danh, không nhận đáp án).
+  const ds = await env.DB.prepare(`SELECT bh.id AS buoi_id FROM buoi_hoc bh JOIN hoc_sinh h ON h.sbd = ?1
+      WHERE bh.dong_luc IS NULL AND bh.het_han > ?2 AND TRIM(COALESCE(bh.lop, '')) <> '' AND COALESCE(h.trang_thai, '') <> 'khoa' AND ${SQL_TEN_LOP} = TRIM(bh.lop)
+      ORDER BY bh.mo_luc DESC LIMIT 2`).bind(sbd, gio).all<Row>().then((x) => x.results ?? []).catch(() => [] as Row[])
+  for (const x of ds) {
+    const id = buoiHop(x.buoi_id)
+    if (!id) continue
+    const xa = await goiPhong(env, id, '/live-xa', { sbd }).catch(() => null)
+    if (xa?.ok) return { ok: true, buoiId: id, xa: true, ve: await kyVeBpu(env.MA_BI_MAT, { b: id, s: sbd, v: 'hs', h: nay + HAN_VE_BPU_MS, x: 1 }) }
+  }
+  return { ok: true, buoiId: null }
 }
 
 /** Em vừa điểm danh bằng mã ⇒ báo phòng của buổi (nếu đang mở) để bảng hiện em vào lớp NGAY, rồi qua kênh đẩy mở màn chờ Bình Phản Ứng trên máy em
@@ -258,7 +272,7 @@ export async function vaoPhongBpu(req: Request, env: Env): Promise<Response> {
   if (req.headers.get('upgrade')?.toLowerCase() !== 'websocket') return new Response('Cần WebSocket', { status: 426 })
   const ve = await kiemVeBpu(env.MA_BI_MAT, new URL(req.url).searchParams.get('ve'))
   if (!ve) return new Response('Vé không hợp lệ', { status: 403 })
-  const h = new Headers({ upgrade: 'websocket', 'x-bpu-vai': ve.v, 'x-bpu-sbd': ve.s })
+  const h = new Headers({ upgrade: 'websocket', 'x-bpu-vai': ve.v, 'x-bpu-sbd': ve.s, ...(ve.x === 1 ? { 'x-bpu-xa': '1' } : {}) })
   return phongCua(env, ve.b).fetch(new Request(`https://bpu${DUONG_PHONG_BPU}`, { method: 'GET', headers: h }))
 }
 
@@ -278,7 +292,7 @@ export class PhongBinhPhanUng {
 
   constructor(private ctx: DurableObjectState, private env: Env) {
     this.xl = new NhatKyXl({ ctx, env, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), ghiSom: () => this.ghiD1() })
-    this.live = new LiveMay({ ctx, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), xl: this.xl })
+    this.live = new LiveMay({ ctx, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), bao: (ds) => this.ctx.waitUntil(baoMayCacEm(this.env, ds, 'bpu').catch(() => 0)), xl: this.xl })
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
   }
 
@@ -310,6 +324,7 @@ export class PhongBinhPhanUng {
     // Đọc dữ liệu gắn của các máy em MỘT lần: vừa để đếm «em đang xem live», vừa để phát view của từng em.
     // LIVE: track mic vừa bị thu (chấm xong, lượt mới, tắt live, em rời màn…) ⇒ đóng ở SFU, không chờ máy em.
     for (const m of rutMicDong(st)) this.ctx.waitUntil(dongTrackSfu(this.env, m.id, [m.mid]).catch(() => false))
+    this.live.ghiNhatKy(st) // LIVE đợt 2: nhật ký đàm thoại (giơ tay, mời, nói, thu mic) vào kho của phòng — không D1
     const hs = this.ctx.getWebSockets('hs'), kem = hs.map((ws) => ws.deserializeAttachment() as KemBpu | null)
     const bang = JSON.stringify(L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st, kem) : undefined))
     for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, bang)
@@ -373,7 +388,7 @@ export class PhongBinhPhanUng {
       const v = req.headers.get('x-bpu-vai') === 'gv' ? 'gv' : 'hs', s = req.headers.get('x-bpu-sbd') ?? ''
       const cap = new WebSocketPair()
       this.ctx.acceptWebSocket(cap[1], [v])
-      cap[1].serializeAttachment({ v, s } satisfies KemBpu)
+      cap[1].serializeAttachment({ v, s, ...(v === 'hs' && req.headers.get('x-bpu-xa') === '1' ? { xa: 1 as const } : {}) } satisfies KemBpu)
       this.live.noiMoi() // kết nối mới ⇒ dựng lại danh sách máy em giữ sẵn (nhận khung sổ nét ngay)
       return new Response(null, { status: 101, webSocket: cap[0] } as ResponseInit)
     }
@@ -422,6 +437,9 @@ export class PhongBinhPhanUng {
       return json({ ok: true, so: l.so, coMat: st.ds.filter((e) => e.vao).map((e) => e.sbd) })
     }
     if (u.pathname === '/dong') { await this.ketThucBuoi(); return json({ ok: true }) }
+    // LIVE đợt 2: `/hs/bpu/cua-em` hỏi «em này có được vào xem từ xa lúc này không» (0 D1) · đọc nhật ký đàm thoại của buổi.
+    if (u.pathname === '/live-xa') return json({ ok: laEmXaDangLive(st, str(b.sbd)) })
+    if (u.pathname === '/live-nk') return json({ ok: true, nk: await this.live.docNhatKy() })
     if (u.pathname === '/live-mic') {
       // Cửa `/bpu/live/phat` của Worker: hỏi quyền phát mic của em / báo track mic SFU đã nhận.
       const sbd = str(b.sbd)
@@ -458,11 +476,13 @@ export class PhongBinhPhanUng {
     let doi = j.t === 'chao-ve', gom = false
     if (a.v === 'hs') {
       const s = a.s
+      // Vé «em ở xa» (live đợt 2): chỉ xem — không điểm danh, không gửi đáp án, không đoán / tiếp sức; vẫn bị bắt rời màn.
+      if (a.xa && j.t !== 'roi' && j.t !== 've') return
       if (j.t === 'tra') {
         const r = L.nhanTra(st, s, str(j.chon), nay, j.kb === true)
         this.gui(ws, JSON.stringify({ t: 'tra-kq', ...r }))
         doi = r.ok
-      } else if (j.t === 'roi') doi = L.roiMan(st, s, nay)
+      } else if (j.t === 'roi') doi = L.roiMan(st, s, nay, L.kieuRoiCua(j.k))
       else if (j.t === 've') doi = L.veMan(st, s, nay) // em quay lại app sau `roi` (thầy 09/11: bảng tắt báo động của em)
       else if (j.t === 'doan') doi = L.duDoan(st, s, j.v ? 1 : 0, nay)
       else if (j.t === 'tiep') { doi = L.tiepSuc(st, s, nay); gom = true }

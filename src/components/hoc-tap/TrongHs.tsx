@@ -1036,7 +1036,7 @@ export function MotTrangHs(p: PropsMotTrang) {
         <div className="kb-hero-chu">
           <span className="kb-nhan">{duNgay ? 'Xong hết hôm nay' : p.ngayKiem ? 'Ngày Kiểm tra ôn tập' : p.loaiNgay ? NHAN_LOAI_NGAY[p.loaiNgay] : 'Tổng câu hôm nay'}</span>
           {coTong ? <div className="kb-so">{daNgay}<small>/{tongNgay} câu</small></div> : <span className="mot-xuong" aria-hidden="true" />}
-          <p className="kb-dong-hero" role={!coTong && p.dangTai ? 'status' : undefined}>{!coTong ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : duNgay ? 'Xong hết việc hôm nay — tới điểm tương đương, dung dịch đã hồng!' : p.ngayKiem || khoaKt ? `Còn ${tongNgay - daNgay} câu · làm Kiểm tra ôn tập trước, rồi mới học chặng.` : `Còn ${tongNgay - daNgay} câu nữa là dung dịch đổi màu.`}</p>
+          <p className="kb-dong-hero" role={!coTong && p.dangTai ? 'status' : undefined}>{!coTong ? (p.dangTai ? 'Đang tải bài học hôm nay…' : '') : duNgay ? 'Xong hết việc hôm nay — tới điểm tương đương, dung dịch đã hồng!' : p.ngayKiem ? `Còn ${tongNgay - daNgay} câu nữa là xong bài hôm nay.` : khoaKt ? `Còn ${tongNgay - daNgay} câu · làm Kiểm tra ôn tập trước, rồi mới học chặng.` : `Còn ${tongNgay - daNgay} câu nữa là dung dịch đổi màu.`}</p>
         </div>
         {/* vạch trên bình = ranh từng việc theo thứ tự: Kiểm tra ôn tập · từng chặng · Tự sửa lỗi */}
         <BinhHomNay da={daNgay} muc={tongNgay} ranh={chang.reduce<number[]>((a, c) => [...a, (a[a.length - 1] ?? 0) + c.co], ktNgay && !p.ngayKiem ? [kiem!.tong] : [])} />

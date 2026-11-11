@@ -5,8 +5,9 @@
 // cửa sổ riêng không chắc có quyền mic, và WebSocket của phòng vốn ở app (BangBinhPhanUng, qua cau-live.ts).
 // Ba mối nối:  tờ ⇄ tệp này: postMessage (giao thức ở đầu src/lib/live-to-chieu.ts)  ·  tệp này ⇄ phòng: cau-live.ts  ·  tệp này ⇄ SFU: taoLiveThay.
 import { taoLoiBut, type NetBut, type SuKienBut } from '../../lib/but-bang-loi'
-import { DOI_BPU, kyHieu, type ViewBang } from '../../lib/bpu/phong'
+import { DOI_BPU, kyHieu, type KieuRoi, type ViewBang } from '../../lib/bpu/phong'
 import type { KetQuaBat, LiveThay, TrangThaiLiveThay } from '../../lib/live'
+import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
 import { maTrang } from './bo-cuc'
 
@@ -33,13 +34,24 @@ export interface TtLiveTo {
   ngheEm: boolean
   /** Lượt đang mở mà còn em chưa gửi — viên live nhắc (đặc tả mục 5). */
   chuaGui: number
-  the: { ds: { id: string; ten: string }[]; chon: string; loi: string; tiengLop: boolean } | null
+  the: { ds: { id: string; ten: string }[]; chon: string; loi: string; tiengLop: boolean; xa: boolean } | null
+  /** `kieu` (11/11): em rời bằng cách nào — chữ đã soạn sẵn theo tín hiệu máy em báo; '' = máy em bản cũ không báo. */
+  roi: { sbd: string; ten: string; ky: string; doi: string; mau: string; luc: number; kieu: string }[]
+  /** ĐỢT 2 (đặc tả 4.8): hàng giơ tay theo thứ tự · em đang được mời mà chưa bật mic · tên em vừa không bật được mic ('' = không). */
+  tay: { sbd: string; ten: string; ky: string; doi: string; mau: string; luc: number }[]
+  moi: { sbd: string; ten: string; ky: string; doi: string; mau: string } | null
+  micLoi: string
+  /** Thầy đang TẠM DỪNG live (11/11): viên Live ghi «TẠM DỪNG», cửa sổ nút Live có «Tiếp tục». */
+  nghi: boolean
+  /** Giao diện đợt 2 (công tắc «Cho em ở xa vào xem») đã mở chưa — cờ `GIAO_DIEN_DOT_2`. */
+  dot2: boolean
   /** Xem lại Live (11/11): trạng thái máy ghi theo phòng — vắng = công tắc tắt (viên Live không có ngăn ghi). */
   ghi?: 'dang-ghi' | 'loi' | 'tat'
   /** Lần đầu máy này ghi buổi live: thẻ nhắc một lần «Thầy không cần bấm gì thêm» (tự tắt sau 9 giây). */
   nhacGhi?: boolean
-  roi: { sbd: string; ten: string; ky: string; doi: string; mau: string; luc: number }[]
 }
+/** Chữ của từng KIỂU RỜI (máy em báo theo tín hiệu tat-man.ts — không đoán kiểu máy không phân biệt được). */
+export const CHU_KIEU_ROI: Record<KieuRoi, string> = { thoat: 'thoát app', an: 'thoát app hoặc khoá màn', noi: 'cửa sổ nổi', chia: 'chia đôi màn hình' }
 
 const KHOA_MIC = 'ddh.live.mic', KHOA_DA_BAT = 'ddh.live.da-bat', KHOA_NHAC_GHI = 'ddh.live.ghi-da-nhac'
 const nho = (k: string): string => { try { return localStorage.getItem(k) || '' } catch { return '' } }
@@ -61,6 +73,13 @@ const guong: { khoa: string; tiLe: number; net: NetBut[] } = { khoa: '', tiLe: 1
 const maCua = new Map<string, string>()
 /** Em đang rời màn: số báo danh ⇒ giờ máy thầy thấy lần đầu. */
 const lucRoi = new Map<string, number>()
+/** Em đang giơ tay: số báo danh ⇒ giờ máy thầy thấy lần đầu (đồng hồ máy thầy — không lệch với đồng hồ máy chủ). */
+const lucTay = new Map<string, number>()
+/** «Chưa bật được mic»: khoá của lần báo ⇒ giờ máy thầy thấy; hiện 15 giây rồi tự mất. */
+let micLoiThay: { khoa: string; luc: number } | null = null
+let henMicLoi: ReturnType<typeof setTimeout> | undefined
+/** Bố cục giấy đề gần nhất của tờ (chuỗi JSON) — gửi phòng khi đổi, khi phòng nối lại, khi vừa bật live. */
+let giayCuoi = '', giayDaGui = '', liveTruoc = false
 let daNghe = false
 
 const ma = (khoa: string): string => maCua.get(khoa) ?? maTrang(khoa, null, false)
@@ -77,14 +96,25 @@ function trangThai(): TtLiveTo {
   const l = view?.live ?? null, p = layPhong()
   const ds = view?.ds ?? [], roiNay = l?.bat ? (view?.roiNay ?? []) : []
   for (const s of [...lucRoi.keys()]) if (!roiNay.includes(s)) lucRoi.delete(s)
+  /** Tên + ký hiệu + đội của một em (em ở xa — chưa điểm danh — không có đội). */
+  const em = (sbd: string) => { const e = ds.find((x) => x.sbd === sbd), xa = !!e && !e.vao; return { sbd, ten: e?.ten ?? sbd, ky: kyHieu(e?.ten ?? sbd), doi: !e ? '' : xa ? 'Em ở xa' : (DOI_BPU[e.doi]?.ten ?? ''), mau: e && !xa ? mauDoi(e.doi) : '' } }
   const roi = roiNay.map((sbd) => {
     if (!lucRoi.has(sbd)) lucRoi.set(sbd, Date.now())
-    const e = ds.find((x) => x.sbd === sbd)
-    return { sbd, ten: e?.ten ?? sbd, ky: kyHieu(e?.ten ?? sbd), doi: e ? (DOI_BPU[e.doi]?.ten ?? '') : '', mau: e ? mauDoi(e.doi) : '', luc: lucRoi.get(sbd)! }
+    const k = view?.roiKieu?.[sbd]
+    return { ...em(sbd), luc: lucRoi.get(sbd)!, kieu: k ? (CHU_KIEU_ROI[k] ?? '') : '' }
   })
   const lu = view?.luot ?? null
   const live = !!l?.bat
   const noi = (live ? (l?.noi ?? []) : []).map((n) => ({ sbd: n.sbd, ten: n.ten, ky: kyHieu(n.ten), doi: n.xa ? 'Em ở xa' : (DOI_BPU[n.doi]?.ten ?? ''), mau: n.xa ? '' : mauDoi(n.doi) }))
+  // ĐỢT 2: hàng giơ tay · em đang được mời (chưa bật mic) · em vừa không bật được mic.
+  const dsTay = live ? (l?.tay ?? []) : []
+  for (const s of [...lucTay.keys()]) if (!dsTay.some((x) => x.sbd === s)) lucTay.delete(s)
+  const tay = dsTay.map((x) => { if (!lucTay.has(x.sbd)) lucTay.set(x.sbd, Date.now()); return { ...em(x.sbd), luc: lucTay.get(x.sbd)! } })
+  const moi = live && l?.moi && !noi.some((n) => n.sbd === l.moi!.sbd) ? em(l.moi.sbd) : null
+  const ml = live ? (l?.micLoi ?? null) : null
+  if (!ml) micLoiThay = null
+  else if (micLoiThay?.khoa !== `${ml.sbd}:${ml.luc}`) { micLoiThay = { khoa: `${ml.sbd}:${ml.luc}`, luc: Date.now() }; clearTimeout(henMicLoi); henMicLoi = setTimeout(bao, 15_200) }
+  const micLoi = ml && micLoiThay && Date.now() - micLoiThay.luc < 15_000 ? em(ml.sbd).ten : ''
   return {
     co: !!l && (!!p || live), pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
     xem: ttLt?.xem ?? l?.xem ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
@@ -92,13 +122,22 @@ function trangThai(): TtLiveTo {
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
     bang: live && !!l?.bang, noi, ngheEm: !!ttLt?.ngheEm,
     chuaGui: live && lu && lu.pha === 'tra-loi' ? Math.max(0, ds.filter((e) => e.vao).length - lu.daGui.length) : 0,
-    the, roi,
+    the: the ? { ...the, xa: !!l?.xa } : null, roi, tay, moi, micLoi, nghi: live && !!l?.nghi, dot2: GIAO_DIEN_DOT_2,
     ...(live && l?.ghi !== undefined ? { ghi: l.ghi } : {}),
     ...(live && nhacGhi(l?.ghi === 'dang-ghi') ? { nhacGhi: true } : {}),
   }
 }
+/** Gửi phòng bố cục giấy đề của tờ (chỉ khi đang live, khi đổi / vừa bật live / phòng nối lại). */
+function guiGiay(lai = false): void {
+  if (lai) giayDaGui = ''
+  if (!lt || !view?.live?.bat || giayCuoi === giayDaGui) return
+  giayDaGui = giayCuoi
+  let g: unknown = null
+  try { g = giayCuoi ? JSON.parse(giayCuoi) : null } catch { g = null }
+  lt.dat({ giay: g })
+}
 function guiTo(tin: Record<string, unknown>): void { try { to?.postMessage({ nguon: 'bpu-bang', ...tin }, '*') } catch { /* tờ đã đóng */ } }
-let ttCu = ''
+let ttCu = '', coEmNoi = false
 // XEM LẠI LIVE (11/11): máy ghi là mảnh nạp lười riêng, chỉ tải khi máy này đang giữ live; tự chạy khi live bật, tự dừng khi live tắt. Lỗi ghi không chặn live.
 let ghiNap = false, ghiMoc: ((sk: SuKienBut) => void) | null = null
 function soatGhi(): void {
@@ -118,7 +157,10 @@ function bao(): void {
   if (k !== ttCu) { ttCu = k; guiTo({ lenh: 'live-tt', tt }) }
   // vạch mức mic: chỉ chạy khi thẻ mic đang mở hoặc đang live có tiếng
   const canMuc = !!lt && (!!the || (tt.pha === 'live' && tt.coTieng && !tt.khongTieng))
-  if (canMuc && !henMuc) henMuc = setInterval(() => { guiTo({ lenh: 'live-muc', v: lt?.mucAm() ?? 0 }) }, 90)
+  coEmNoi = tt.noi.length > 0
+  // vừa bật live ⇒ gửi bố cục giấy đề đang có
+  if ((tt.pha === 'live') !== liveTruoc) { liveTruoc = tt.pha === 'live'; if (liveTruoc) guiGiay(true) }
+  if (canMuc && !henMuc) henMuc = setInterval(() => { guiTo({ lenh: 'live-muc', v: lt?.mucAm() ?? 0, em: coEmNoi ? (lt?.mucAmEm() ?? 0) : 0 }) }, 90)
   else if (!canMuc && henMuc) { clearInterval(henMuc); henMuc = undefined }
 }
 
@@ -159,7 +201,7 @@ function nghe(): void {
   })
   nghePhong(() => {
     clearTimeout(henHuy)
-    if (layPhong()) { lt?.khiNoiLai(); void dam() }
+    if (layPhong()) { lt?.khiNoiLai(); guiGiay(true); void dam() }
     // phòng rớt: chờ nối lại 25 giây (mạng chập chờn, thầy chọn câu khác); quá ⇒ bảng đã đóng hẳn ⇒ tắt live, thả mic
     else henHuy = setTimeout(() => { if (!layPhong()) { view = null; huy() } }, 25_000)
     bao()
@@ -174,7 +216,7 @@ async function moThe(): Promise<void> {
   await dam()
   const l = view?.live
   if (!lt || !l) return
-  the = { ds: [], chon: nho(KHOA_MIC), loi: '', tiengLop: !!l.tiengLop }
+  the = { ds: [], chon: nho(KHOA_MIC), loi: '', tiengLop: !!l.tiengLop, xa: !!l.xa }
   bao()
   if (l.tieng === 'chua-cau-hinh') return
   let kq = await lt.moMic(the.chon || null)
@@ -193,7 +235,7 @@ async function bat(khongTieng: boolean): Promise<void> {
   const kq: KetQuaBat = await lt.bat({ mic: the && !the.loi ? null : nho(KHOA_MIC) || null, khongTieng })
   dangBat = false
   if (kq.ok) { the = null; ghi(KHOA_DA_BAT, '1') }
-  else if (kq.lyDo === 'mic-tu-choi' || kq.lyDo === 'khong-mic' || kq.lyDo === 'mic-loi') the = { ds: the?.ds ?? [], chon: the?.chon ?? '', loi: kq.lyDo, tiengLop: !!view?.live?.tiengLop }
+  else if (kq.lyDo === 'mic-tu-choi' || kq.lyDo === 'khong-mic' || kq.lyDo === 'mic-loi') the = { ds: the?.ds ?? [], chon: the?.chon ?? '', loi: kq.lyDo, tiengLop: !!view?.live?.tiengLop, xa: !!view?.live?.xa }
   bao()
 }
 /** Bấm «Live» (trên tờ hoặc trên bảng). Đang live ⇒ mở lại thẻ mic. Lần đầu ⇒ thẻ chọn mic; các lần sau live ngay với mic đã nhớ. */
@@ -206,7 +248,7 @@ function bam(): void {
   else void moThe()
 }
 
-type TinTo = { viec?: unknown; id?: unknown; v?: unknown; sk?: unknown; trang?: unknown; tiLe?: unknown; net?: unknown; vung?: unknown; giayToi?: unknown }
+type TinTo = { viec?: unknown; id?: unknown; v?: unknown; sk?: unknown; trang?: unknown; tiLe?: unknown; net?: unknown; vung?: unknown; giayToi?: unknown; sbd?: unknown; giay?: unknown }
 const vungCua = (v: unknown) => (v && typeof v === 'object' ? (v as { giay?: number[]; bang?: number[] }) : null)
 
 /** Tin `{ nguon: 'to-chieu', loai: 'live', viec, … }` từ tờ chiếu (nghe-to-chieu.ts chuyển vào). */
@@ -226,7 +268,14 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'tat': lt?.tat(); the = null; bao(); break
     // công tắc «Bảng → máy em» (bật / tắt tay cờ `live.bang`) · «Thu mic» em đang nói — phòng xử (đợt 1C)
     case 'bang': lt?.dat({ bang: m.v === true }); break
-    case 'thu-mic': lt?.thuMic(); break
+    // «Thu mic» một em (kèm `sbd`) / «Tắt mic tất cả» (không `sbd`) · đợt 2: «Mời nói», «Hạ hết tay», công tắc «Cho em ở xa vào xem», bố cục giấy đề
+    case 'thu-mic': lt?.thuMic(typeof m.sbd === 'string' && m.sbd ? m.sbd : undefined); break
+    case 'moi': if (typeof m.sbd === 'string' && m.sbd) lt?.moiNoi(m.sbd); break
+    case 'ha-tay': lt?.haTay(typeof m.sbd === 'string' && m.sbd ? m.sbd : undefined); break
+    case 'xa': if (GIAO_DIEN_DOT_2) lt?.dat({ xa: m.v === true }); break
+    // «Tạm dừng» / «Tiếp tục» trong cửa sổ nút Live (thầy 11/11); «Kết thúc live» = `tat` ở trên
+    case 'tam-dung': lt?.tamDung(m.v === true); break
+    case 'giay': { let k = ''; try { k = m.giay && typeof m.giay === 'object' ? JSON.stringify(m.giay) : '' } catch { k = '' } if (k.length <= 1500) { giayCuoi = k; guiGiay() } break }
     case 'nghe-em': lt?.datNgheEm(m.v === true); break
     case 'anh': {
       guong.khoa = String(m.trang ?? ''); guong.tiLe = Number(m.tiLe) || 16 / 9; guong.net = Array.isArray(m.net) ? (m.net as NetBut[]) : []
@@ -270,5 +319,5 @@ export function bamTuBang(): boolean {
 export function _datLaiLiveThay(): void {
   clearTimeout(henHuy); clearInterval(henMuc); henMuc = undefined
   lt?.huy(); lt = null; to = null; ttLt = null; view = null; the = null; dangBat = false; ttCu = ''; ghiNap = false; ghiMoc = null; nhacGhiDen = 0
-  guong.khoa = ''; guong.net = []; maCua.clear(); lucRoi.clear()
+  guong.khoa = ''; guong.net = []; maCua.clear(); lucRoi.clear(); lucTay.clear(); micLoiThay = null; clearTimeout(henMicLoi); giayCuoi = giayDaGui = ''; liveTruoc = false; coEmNoi = false
 }

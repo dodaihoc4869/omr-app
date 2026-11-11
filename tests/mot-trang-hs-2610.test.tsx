@@ -298,6 +298,9 @@ describe('Lộ trình (Hôm nay kiểu Duolingo)', () => {
     expect(tieuDe()).toBe('Kiểm tra ôn tập')
     expect(cta()!.getAttribute('data-sac')).toBe('tin')
     expect(screen.queryByRole('region', { name: 'Bài học hôm nay' })).toBeNull()
+    // thầy 11/11 (ảnh màn Hôm nay «Ngày Kiểm tra ôn tập 12/28 câu»: «bỏ câu này đi»): ngày chỉ có bài kiểm tra KHÔNG còn chặng nào ⇒ không nói «rồi mới học chặng»
+    expect(document.querySelector('.kb-dong-hero')!.textContent).not.toContain('rồi mới học chặng')
+    expect(document.querySelector('.kb-dong-hero')!.textContent).toMatch(/^Còn \d+ câu nữa là xong bài hôm nay\.$/)
     fireEvent.click(cta()!)
     expect(onKiemTra).toHaveBeenCalledOnce()
   })

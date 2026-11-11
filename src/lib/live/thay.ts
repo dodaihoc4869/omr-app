@@ -48,6 +48,8 @@ export interface TrangThaiLiveThay {
   emNoi: { sbd: string; ten: string; doi: number; xa: boolean } | null
   /** Máy thầy có phát tiếng của em ra loa không. Mặc định: CHỈ khi em ở xa (em đứng trong lớp mà loa lớp phát lại giọng em thì hú); `datNgheEm` để đổi. */
   ngheEm: boolean
+  /** Thầy đang TẠM DỪNG live (11/11): mic tắt tiếng, nét không gửi; phiên giữ nguyên. */
+  nghi: boolean
   loi?: string
 }
 export type KetQuaBat = { ok: true } | { ok: false; lyDo: 'mic-tu-choi' | 'khong-mic' | 'mic-loi' | 'dang-live' | 'chua-san' }
@@ -61,7 +63,7 @@ const NGUONG_TIENG = 0.04
 
 export function taoLiveThay(tuy: TuyChonLiveThay) {
   const mt: MoiTruongLive = { ...moiTruongMacDinh(), ...tuy.moiTruong }
-  const tt: TrangThaiLiveThay = { pha: 'chua', tieng: 'chua', kenhNet: 'ws', micTat: false, micIm: false, xem: 0, xemWs: 0, tu: null, mayKhacLive: false, bang: false, emNoi: null, ngheEm: false }
+  const tt: TrangThaiLiveThay = { pha: 'chua', tieng: 'chua', kenhNet: 'ws', micTat: false, micIm: false, xem: 0, xemWs: 0, tu: null, mayKhacLive: false, bang: false, emNoi: null, ngheEm: false, nghi: false }
   let live: ViewLiveBang = null
   let pc: RTCPeerConnection | null = null, dc: RTCDataChannel | null = null, phienSfu = ''
   let gui: RTCRtpSender | null = null
@@ -225,7 +227,7 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     if (huyRoi || !dangLive()) return
     const nay = mt.dongHo()
     mucAm()
-    dat({ micIm: tt.tieng === 'mic' && nay - lucTieng > MIC_IM_MS })
+    dat({ micIm: tt.tieng === 'mic' && !tt.nghi && nay - lucTieng > MIC_IM_MS })
     // Có tiếng hoặc có nét trong 30 giây qua ⇒ báo phòng thầy còn đang live (im + không nét 15 phút thì phòng tự tắt).
     if (nay - lucNhip >= NHIP_MS) { if (nay - lucTieng < NHIP_MS || nay - lucNet < NHIP_MS) tuy.kenh.gui({ t: 'live-nhip' }); lucNhip = nay }
     // Trên phiên của thầy, luồng tiếng NHẬN duy nhất là tiếng của em đang phát mic.
@@ -281,8 +283,9 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   /** Xả lô điểm: DataChannel mỗi ~16 ms (kèm lặp lô trước); WebSocket ≥ 34 ms một lô (≤ 30 lô/giây) và chỉ khi có máy em cần. */
   function xa(): void {
     henXa = null
-    // Chỉ phát điểm đang viết khi máy em đang HIỆN bảng live (đang live mà lớp ở màn câu hỏi thì chỉ có tiếng; nét xong vẫn vào sổ).
-    if (!dangLive() || !live!.bang) { for (const n of net.values()) { n.daDc = n.truocDc = n.daWs = n.diem.length } troCho = null; return }
+    // 11/11 (thầy «bấm nộp thì tự về màn live»): em gửi xong là ở bảng live dù cờ phòng `bang` tắt ⇒ điểm đang viết phát SUỐT lúc live (máy em đang ở màn câu
+    // hỏi tự bỏ). Đang TẠM DỪNG ⇒ không phát.
+    if (!dangLive() || live!.nghi) { for (const n of net.values()) { n.daDc = n.truocDc = n.daWs = n.diem.length } troCho = null; return }
     const nay = mt.dongHo(), phien = live!.phien, tGui = tLive(), coDc = dcMo()
     const canWs = !coDc || tt.xemWs > 0
     let conWs = false, wsDuoc = canWs && nay - lucWs >= WS_CACH_MS
@@ -332,6 +335,8 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
    *   net-moi có `xong` (hoàn tác xoá / làm lại) ⇒ nét vào sổ tại đúng vị trí `vt`;  xoa ⇒ xoá khỏi sổ;  trang ⇒ bảng mới + các nét sẵn có;  tro ⇒ con trỏ. */
   function nhanSuKienBut(sk: SuKienBut): void {
     if (!live) return
+    // TẠM DỪNG (11/11): ngừng gửi nét — bỏ mọi sự kiện bút; lúc tiếp tục gửi lại ảnh trạng thái của trang đang chiếu (`nhanLive`) nên bảng máy em khớp ngay.
+    if (live.bat && live.nghi) { if (sk.loai === 'trang' || sk.loai === 'net-xong' || sk.loai === 'xoa') net.clear(); return }
     if (sk.loai === 'them-diem') {
       const n = net.get(sk.id)
       if (!n || !sk.diem.length) return
@@ -388,9 +393,14 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     })
   }
   /** Thầy bấm «Thu mic»: phòng gỡ quyền + đóng track của em ở SFU (có hiệu lực cả khi máy em không nghe lệnh). */
-  function thuMic(): void { tuy.kenh.gui({ t: 'live-thu-mic' }) }
+  function thuMic(sbd?: string): void { tuy.kenh.gui(sbd ? { t: 'live-thu-mic', sbd } : { t: 'live-thu-mic' }) }
+  /** ĐỢT 2 (đặc tả 4.8): thầy «Mời nói» một em trong hàng giơ tay · «Hạ hết tay» (không `sbd`) / hạ tay một em. */
+  function moiNoi(sbd: string): void { tuy.kenh.gui({ t: 'live-moi', sbd }) }
+  function haTay(sbd?: string): void { tuy.kenh.gui(sbd ? { t: 'live-ha-tay', sbd } : { t: 'live-ha-tay' }) }
   /** Bật / tắt phát tiếng của em ra loa máy thầy (ghi đè mặc định «chỉ em ở xa»). */
   function datNgheEm(nghe: boolean): void { ngheEmDat = nghe; soatEmNoi() }
+  /** «Tạm dừng» / «Tiếp tục» (thầy 11/11): báo phòng; tiếng mic tắt / bật NGAY tại máy (không chờ phòng báo lại). Phiên SFU, track, kênh nét giữ nguyên. */
+  function tamDung(nghi: boolean): void { if (!dangLive()) return; datTiengMic(!nghi); tuy.kenh.gui({ t: 'live-dat', nghi }) }
   /** Mức âm tiếng em đang nói 0..1 (cần đang nghe em). */
   function mucAmEm(): number {
     if (!tt.emNoi) return 0
@@ -400,8 +410,17 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
 
   // ── TIN TỪ PHÒNG ──
   function nhanLive(l: ViewLiveBang | undefined): void {
+    const nghiTruoc = !!live?.bat && !!live.nghi
     live = l ?? null
     if (!live) return
+    // TẠM DỪNG / TIẾP TỤC theo phòng (11/11): dừng ⇒ tắt tiếng mic tại nguồn (không đổi track, không đàm phán lại ⇒ tiếp tục là có tiếng ngay);
+    // tiếp tục ⇒ bật tiếng + gửi ảnh trạng thái của trang đang chiếu (nét thầy viết lúc dừng tới máy em một lượt).
+    const nghiNay = live.bat && !!live.nghi
+    if (nghiNay !== nghiTruoc) {
+      datTiengMic(!nghiNay)
+      if (!nghiNay && live.bat && tuBat) { net.clear(); const anh = tuy.layAnh?.(); if (anh) guiAnh(anh) }
+    }
+    if (tt.nghi !== nghiNay) dat({ nghi: nghiNay })
     if (live.bat && tuBat) daThayBat = true
     // Phòng tự tắt (hết buổi, quá 15 phút) — chỉ tin khi đã từng thấy phòng xác nhận lần bật này (view cũ còn trên đường không được tắt nhầm).
     else if (!live.bat && tuBat && daThayBat) { tuBat = false; ngatMic(); if (gui) void gui.replaceTrack(trackCam).catch(() => undefined) }
@@ -447,8 +466,9 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
     nhanSuKienBut, guiAnh,
     /** Công tắc buổi: `xa` = cho em ở xa vào xem (điểm quyết 4), `tiengLop` = máy em trong lớp cũng phát tiếng (điểm quyết 3). */
     /** …và `bang` = bật / tắt TAY bảng live trên máy em (giảng trên bảng mà không gọi ai). */
-    dat: (o: { xa?: boolean; tiengLop?: boolean; bang?: boolean }): void => { tuy.kenh.gui({ t: 'live-dat', ...o }) },
-    thuMic, datNgheEm, mucAmEm,
+    /** …và `giay` = bố cục giấy đề đang chiếu (chỉ số đo; null = xoá) để máy em dựng giấy giống giấy của thầy. */
+    dat: (o: { xa?: boolean; tiengLop?: boolean; bang?: boolean; giay?: unknown }): void => { tuy.kenh.gui({ t: 'live-dat', ...o }) },
+    thuMic, datNgheEm, mucAmEm, moiNoi, haTay, tamDung,
     /** (Xem lại Live 11/11 — chỉ thêm) Luồng tiếng cho MÁY GHI: mic thầy đang phát lên SFU + tiếng em đang kéo về (null = không có). Không đổi gì ở live. */
     luongGhi: (): { mic: MediaStream | null; em: MediaStream | null } => ({ mic: tuBat && tt.tieng === 'mic' ? mic : null, em: tt.emNoi && amEm?.srcObject instanceof MediaStream ? amEm.srcObject : null }),
     nhanTinPhong, khiNoiLai,

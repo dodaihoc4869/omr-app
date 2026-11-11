@@ -3,7 +3,7 @@
 // giữ trạng thái và gọi các hàm này; app thầy / máy em chỉ dùng phần chia đội + chữ. KHÔNG đọc mạng, KHÔNG đọc đồng hồ (nơi gọi truyền `nay`).
 // BẤT BIẾN AN TOÀN: `viewEm` không bao giờ mang đáp án (`dung`) khi lượt chưa mở đáp án — test tests/bpu-phong-0611.test.ts khoá.
 // Điểm trong buổi là «kJ» (năng lượng) — KHÔNG phải «tinh thể» (tinh thể là phần thưởng tích luỹ sẵn có của app học sinh).
-import { laEmXaDangLive, liveKhiGoi, liveKhiLuotMoi, liveTat, liveThuMic, viewLiveBang, viewLiveEm, type LivePhong } from './phong-live'
+import { laEmXaDangLive, liveKhiGoi, liveKhiLuotMoi, liveKhiRoi, liveTat, liveThuMic, viewLiveBang, viewLiveEm, type LivePhong } from './phong-live'
 
 export type PhanCau = 'I' | 'II' | 'III'
 export type PhaLuot = 'tra-loi' | 'goi' | 'lam-bang' | 'mo'
@@ -114,6 +114,8 @@ export interface TrangThaiPhong {
   /** Em ĐANG Ở NGOÀI APP (thầy 09/11 «thoát app là báo động viền đỏ nhấp nháy trên bảng cộng thẻ tên»): `roiMan` thêm, `veMan` gỡ; lượt mới / mở đáp án ⇒ rỗng.
    *  Phòng lưu trước 09/11 không có ⇒ coi như rỗng. */
   roiNay?: string[]
+  /** KIỂU RỜI của từng em đang rời (11/11, thẻ «em rời màn» lúc live ghi rõ kiểu): máy em tự báo theo tín hiệu tat-man.ts — xem `KIEU_ROI`. Chỉ thêm. */
+  roiKieu?: Record<string, KieuRoi>
   /** Biến động kJ mới nhất (≤ `BIEN_DONG_GIU`, `id` tăng dần). Phòng lưu trước 09/11 không có ⇒ rỗng. */
   bienDong?: BienDong[]
   /** LIVE BẢNG (10/11, luật ở phong-live.ts — CHỈ THÊM): bật / tắt, phiên SFU của thầy, công tắc buổi. Phòng lưu trước 10/11 không có ⇒ coi như tắt. */
@@ -283,7 +285,7 @@ export function boLuot(st: TrangThaiPhong, nay: number): boolean {
   if (!l || l.pha === 'mo') return false
   // Số lượt KHÔNG lùi (khác `boLuotRong`): lượt mới mang số mới ⇒ bảng / máy em không nhận nhầm trạng thái của lượt vừa bỏ (gọi em, phương án, đã gửi).
   st.luot = null
-  liveKhiLuotMoi(st) // LIVE: không còn ai trên bảng ⇒ thu mic, máy em về màn câu hỏi
+  liveKhiLuotMoi(st, nay) // LIVE: không còn ai trên bảng ⇒ thu mic, máy em về màn câu hỏi
   st.capNhat = nay
   return true
 }
@@ -298,7 +300,7 @@ export function moLuot(st: TrangThaiPhong, c: { qid: string; phan: PhanCau; tuLu
     han: c.hanGiay && c.hanGiay > 0 ? nay + c.hanGiay * 1000 : null, pha: 'tra-loi', tra: {}, roiMe: [], goi: null, ketQua: null, kich: false, giai: c.giai ?? null,
   }
   // LIVE (thầy 10/11 «khi chuyển câu thì vẫn giữ live tiếng với hs, màn hình hs hiện câu hỏi như bình thường»): tắt BẢNG live, thu mic; KHÔNG tắt live.
-  liveKhiLuotMoi(st)
+  liveKhiLuotMoi(st, nay)
   st.capNhat = nay
   return st.luot
 }
@@ -321,10 +323,22 @@ export function nhanTra(st: TrangThaiPhong, sbd: string, chon: string, nay: numb
   return { ok: true }
 }
 
+/** KIỂU RỜI máy em báo kèm tin `roi` (chỉ những kiểu máy THẬT SỰ phân biệt được — tat-man.ts):
+ *  thoat = trang ẩn trên máy phân biệt được khoá màn (Android có quyền IdleDetector) ⇒ chắc chắn thoát / chuyển app ·
+ *  an = trang ẩn trên máy KHÔNG phân biệt được (iPhone, iPad, Android chưa cho quyền) ⇒ thoát app hoặc khoá màn ·
+ *  noi = app còn hiện nhưng mất tiêu điểm (cửa sổ nổi, bong bóng chat) · chia = cửa sổ co lại (chia đôi màn hình). */
+export const KIEU_ROI = ['thoat', 'an', 'noi', 'chia'] as const
+export type KieuRoi = (typeof KIEU_ROI)[number]
+export const kieuRoiCua = (v: unknown): KieuRoi | null => (KIEU_ROI as readonly unknown[]).includes(v) ? (v as KieuRoi) : null
+function ghiKieuRoi(st: TrangThaiPhong, sbd: string, kieu: KieuRoi | null | undefined): void {
+  const k = { ...(st.roiKieu ?? {}) }
+  if (kieu) k[sbd] = kieu; else delete k[sbd]
+  st.roiKieu = k
+}
 /** Em rời màn (máy em tự đo): đếm lần, ghi vào lượt, ĐANG RỜI (`roiNay`) ⇒ bảng báo động viền đỏ nhấp nháy + thẻ tên.
  *  LUẬT CHẶT 09/11 (thầy «thoát màn hình cảnh báo bị trừ cả đội và cá nhân»): mỗi LẦN RỜI MỚI (em chưa nằm trong `roiNay`) ⇒ em −50 (kẹp ≥ 0), đội −50;
  *  máy em báo trùng (`roi` hai lần trước khi `ve`) không trừ lần hai. Rớt kết nối WebSocket KHÔNG phải rời màn (chỉ khi máy em tự báo `roi`). */
-export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
+export function roiMan(st: TrangThaiPhong, sbd: string, nay: number, kieu?: KieuRoi | null): boolean {
   const e = em(st, sbd)
   // 09/11 (lần 3): rời màn tính MỌI LÚC trong buổi (cả lúc chờ giữa lượt, sau mở đáp án) — em chỉ thoát khi thầy kết thúc buổi.
   if (!e || st.ketThuc) return false
@@ -332,13 +346,14 @@ export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   if (!e.vao) {
     if (!laEmXaDangLive(st, sbd)) return false
     e.roi += 1
-    liveThuMic(st, nay, sbd)
+    liveKhiRoi(st, sbd, nay); ghiKieuRoi(st, sbd, kieu)
     st.roiNay = [...(st.roiNay ?? []).filter((s) => s !== sbd), sbd]
     st.capNhat = nay
     return true
   }
   e.roi += 1
-  liveThuMic(st, nay, sbd) // LIVE: em đang phát mic mà rời màn ⇒ thu mic
+  liveKhiRoi(st, sbd, nay) // LIVE: em rời màn ⇒ thu mic, thôi lời mời, ra khỏi hàng giơ tay
+  ghiKieuRoi(st, sbd, kieu)
   if (st.luot && st.luot.pha !== 'mo' && !st.luot.roiMe.includes(sbd)) st.luot.roiMe.push(sbd)
   if (!st.roiNay?.includes(sbd)) {
     const kjEm = congEm(e, -KJ.roiMan)
@@ -353,6 +368,7 @@ export function roiMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
 export function veMan(st: TrangThaiPhong, sbd: string, nay: number): boolean {
   if (!st.roiNay?.includes(sbd)) return false
   st.roiNay = st.roiNay.filter((s) => s !== sbd)
+  if (st.roiKieu?.[sbd]) ghiKieuRoi(st, sbd, null)
   st.capNhat = nay
   return true
 }
@@ -362,14 +378,14 @@ export function goiLenBang(st: TrangThaiPhong, sbd: string, lyDo: readonly strin
   if (!l || l.pha === 'mo' || !em(st, sbd)) return false
   l.pha = 'goi'
   l.goi = { sbd, lyDo: lyDo.map((x) => String(x).slice(0, 200)).slice(0, 3), duDoan: {}, tiep: {}, dat: null }
-  liveKhiGoi(st) // LIVE (thầy 10/11): gọi lên bảng ⇒ máy em chuyển sang bảng live ngay
+  liveKhiGoi(st, nay) // LIVE (thầy 10/11): gọi lên bảng ⇒ máy em chuyển sang bảng live ngay
   st.capNhat = nay
   return true
 }
 export function lamBang(st: TrangThaiPhong, nay: number): boolean {
   const l = st.luot
   if (!l || !l.goi || l.pha === 'mo') return false
-  l.pha = 'lam-bang'; liveKhiGoi(st); st.capNhat = nay
+  l.pha = 'lam-bang'; liveKhiGoi(st, nay); st.capNhat = nay
   return true
 }
 export function duDoan(st: TrangThaiPhong, sbd: string, v: 0 | 1, nay: number): boolean {
@@ -498,6 +514,8 @@ export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: st
     buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, soDoi: soDoiCua(st), vuaVao: st.vuaVao, lichSu: st.lichSu,
     /** Em đang ở ngoài app trong lượt chưa mở đáp án (thầy 09/11) — bảng vẽ viền đỏ nhấp nháy + thẻ tên khi mảng khác rỗng. */
     roiNay: st.roiNay ?? [],
+    /** Kiểu rời của từng em đang rời (máy em báo; em báo bằng bản cũ ⇒ không có). */
+    roiKieu: st.roiKieu ?? {},
     /** Biến động kJ mới nhất (thầy 09/11): mỗi `id` mới ⇒ số kJ bay vào ống đội + lý do. */
     bienDong: st.bienDong ?? [],
     ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, chuoi: e.chuoi, roi: e.roi, daLenBang: e.daLenBang })),
@@ -512,7 +530,7 @@ export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: st
   }
 }
 /** `roiNay` TUỲ CHỌN ở kiểu (bảng dựng sẵn view rỗng lúc chờ phòng) — `viewBang` luôn gửi mảng. `live` tuỳ chọn: phòng bản trước 10/11 không gửi. */
-export type ViewBang = Omit<ReturnType<typeof viewBang>, 'roiNay' | 'bienDong' | 'live'> & { roiNay?: string[]; bienDong?: BienDong[]; live?: ReturnType<typeof viewLiveBang> }
+export type ViewBang = Omit<ReturnType<typeof viewBang>, 'roiNay' | 'roiKieu' | 'bienDong' | 'live'> & { roiNay?: string[]; roiKieu?: Record<string, KieuRoi>; bienDong?: BienDong[]; live?: ReturnType<typeof viewLiveBang> }
 
 /** Thông tin cho MÁY EM: chỉ việc của em; KHÔNG đáp án trước khi mở. */
 export function viewEm(st: TrangThaiPhong, sbd: string) {
@@ -541,4 +559,4 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
 /** `live` tuỳ chọn ở kiểu: phòng bản trước 10/11 không gửi. */
 export type ViewEm = Omit<ReturnType<typeof viewEm>, 'live'> & { live?: ReturnType<typeof viewLiveEm> }
 
-export function ketThuc(st: TrangThaiPhong, nay: number): void { liveTat(st, nay); st.ketThuc = true; st.roiNay = []; st.capNhat = nay }
+export function ketThuc(st: TrangThaiPhong, nay: number): void { liveTat(st, nay); st.ketThuc = true; st.roiNay = []; st.roiKieu = {}; st.capNhat = nay }

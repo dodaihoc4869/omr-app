@@ -82,6 +82,8 @@ export interface DurableObjectStorage {
   get<T = unknown>(khoa: string): Promise<T | undefined>
   put(khoa: string, v: unknown): Promise<void>
   delete(khoa: string): Promise<boolean>
+  /** Đọc các khoá theo tiền tố (nhật ký đàm thoại của phòng live). */
+  list<T = unknown>(o?: { prefix?: string; limit?: number }): Promise<Map<string, T>>
   setAlarm(luc: number): Promise<void>
   getAlarm(): Promise<number | null>
   deleteAlarm(): Promise<void>
