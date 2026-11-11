@@ -57,12 +57,16 @@ describe('bảng đen cuộn trên máy em', () => {
     // ô bảng đi theo khoá trang (làm tròn phần nghìn cửa sổ thầy) rồi tròn theo điểm ảnh ⇒ lệch dưới 2 px
     for (const [co, muon] of [[o.x, BANG[0] * 1600], [o.y, BANG[1] * 900], [o.w, (BANG[2] - BANG[0]) * 1600], [o.h, (BANG[3] - BANG[1]) * 900]]) expect(Math.abs(co - muon)).toBeLessThan(2)
     const truocC = m.lenh(m.cvChot).filter((x) => x.loai === 'fill').length, truocB = m.lenh(m.cvBang).filter((x) => x.loai === 'fill').length
+    // nét phấn (màu sáng) tô HAI lượt: lượt chính + lượt bù sáng 55 % (LoiBut.buSang) — mép nét đều sáng, nét mảnh không lổn nhổn
     m.v.ap({ loai: 'net-moi', trang: TRANG, net: net('n1', 0.3, 30, 0.2), xong: true })
-    expect(m.lenh(m.cvChot).filter((x) => x.loai === 'fill').length).toBe(truocC + 1)
+    expect(m.lenh(m.cvChot).filter((x) => x.loai === 'fill').map((x) => x.mo).slice(truocC)).toEqual([1, 0.55])
     expect(m.lenh(m.cvBang).filter((x) => x.loai === 'fill').length).toBe(truocB)
     m.v.ap({ loai: 'net-moi', trang: TRANG, net: net('b_n2', 0.3), xong: true })
-    expect(m.lenh(m.cvChot).filter((x) => x.loai === 'fill').length).toBe(truocC + 1)
-    expect(m.lenh(m.cvBang).filter((x) => x.loai === 'fill').length).toBe(truocB + 1)
+    expect(m.lenh(m.cvChot).filter((x) => x.loai === 'fill').length).toBe(truocC + 2)
+    expect(m.lenh(m.cvBang).filter((x) => x.loai === 'fill').map((x) => x.mo).slice(truocB)).toEqual([1, 0.55])
+    // mực sẫm (mực xanh trên giấy) không bù
+    m.v.ap({ loai: 'net-moi', trang: TRANG, net: { ...net('n3', 0.5, 30, 0.2), mau: 'rgb(36,86,201)' }, xong: true })
+    expect(m.lenh(m.cvChot).filter((x) => x.loai === 'fill').length).toBe(truocC + 3)
   })
   it('nét bảng có y > 1 (thầy đã cuộn): máy em TỰ TRÔI tới — êm dần từng khung (không nhảy một phát), bút về khoảng giữa bảng; `toiPx` đã trừ độ cuộn', () => {
     const m = dung()

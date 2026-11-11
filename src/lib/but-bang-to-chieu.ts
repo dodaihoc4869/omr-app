@@ -88,6 +88,10 @@ ${JS_LOI_BUT}
     var W = window.innerWidth, H = window.innerHeight, tt;
     dpr = Math.min(window.devicePixelRatio || 1, 3); KH = LoiBut.khung(W, H); ban = UO = null; B = null;
     [cvT, cvC].forEach(function (c) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); });
+` + /* cỡ HIỆN của lớp mực = đúng cỡ nền / mật độ (không để 100vw × 100vh): cửa sổ có cỡ điểm ảnh lẻ (Windows phóng 125 % / 150 %, phóng trình duyệt) thì */ `
+` + /* 100vw lệch cỡ nền chưa tới một điểm ảnh — đủ để trình duyệt co giãn cả lớp, nét mờ đi từng quãng */ `
+    cvT.style.width = cvT.width / dpr + 'px'; cvT.style.height = cvT.height / dpr + 'px';
+    datMatDo();
     cv.width = cv.height = 1; CY = Math.round(cuon * H * dpr);
 ` + /* lớp hiện có thật sự được vẽ thẳng lên màn (không chờ ghép khung) không: chỉ khi đó vẽ ngay trong lúc nhận mẫu mới có ích (ghi lại cho ô đo bút; không tự bật) */ `
     try { tt = gT && gT.getContextAttributes ? gT.getContextAttributes() : null; } catch (e) { tt = null; }
@@ -104,6 +108,15 @@ ${JS_LOI_BUT}
     if (m) { BX = Math.round(m[0] * W * dpr); BY = Math.round(m[1] * H * dpr); BW = Math.round((m[2] - m[0]) * W * dpr); BH = Math.round((m[3] - m[1]) * H * dpr); }
     return true;
   }
+` + /* Mật độ điểm ảnh đổi mà cửa sổ không đổi cỡ (kéo cửa sổ sang màn khác) ⇒ dựng lại canvas. */ `
+  var mqMatDo = null;
+  function datMatDo() {
+    if (!window.matchMedia) return;
+    if (mqMatDo && mqMatDo.removeEventListener) mqMatDo.removeEventListener('change', doiMatDo);
+    mqMatDo = window.matchMedia('(resolution: ' + (window.devicePixelRatio || 1) + 'dppx)');
+    if (mqMatDo.addEventListener) mqMatDo.addEventListener('change', doiMatDo);
+  }
+  function doiMatDo() { if (KH) { ketNet(false); coCanvas(); conTro(); henThanh(); } }
   function trongBang(x, y) { return !!B && x >= B[0] * KH.W && x <= B[2] * KH.W && y >= B[1] * KH.H && y <= B[3] * KH.H; }
 ` + /* Bật / tắt chế độ vẽ trước đầu nét ngay khi mẫu tới. Chỉ khi bật mới nghe pointerrawupdate (nghe là trình duyệt phải phát thêm sự kiện cho từng mẫu). */ `
   function datVeNgay(b) {
@@ -127,11 +140,13 @@ ${JS_LOI_BUT}
   }
 ` + /* Tô một đa giác lên canvas c có gốc (ox, oy) điểm ảnh thiết bị. bang = nét bảng: dời theo độ cuộn, cắt trong ô bảng đen. */ `
   function toDaGiac(c, p, mau, bang, ox, oy) {
-    var s = dpr * KH.k;
+    var s = dpr * KH.k, bu;
     ox = ox || 0; oy = oy || 0;
     if (bang) { c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.beginPath(); c.rect(BX - ox, BY - oy, BW, BH); c.clip(); }
     c.setTransform(s, 0, 0, s, -ox, -oy - (bang ? CY : 0)); c.globalCompositeOperation = 'source-over'; c.fillStyle = mau;
     c.beginPath(); LoiBut.veDaGiac(c, p); c.fill();
+` + /* bù sáng cho nét phấn (xem LoiBut.buSang): tô thêm một lượt mờ ⇒ mép nét đều sáng, nét mảnh không lổn nhổn */ `
+    if (bu = LoiBut.buSang(mau)) { c.globalAlpha = bu; c.fill(); c.globalAlpha = 1; }
     if (bang) c.restore();
   }
 ` + /* Chép NGUYÊN điểm ảnh ô (w × h) từ canvas nguon (gốc 0, 0) sang c tại (x, y): thay hẳn điểm ảnh cũ, không pha trộn. */ `
@@ -155,6 +170,7 @@ ${JS_LOI_BUT}
         if (n._k !== khoaD) { p = LoiBut.dungNet(n, KH); n._k = khoaD; if (coD) { n._d = new Path2D(); LoiBut.veDaGiac(n._d, p); } else n._d = p; }
         gC.globalCompositeOperation = n.cong === 'tay' ? 'destination-out' : 'source-over'; gC.fillStyle = n.mau;
         if (coD) gC.fill(n._d); else { gC.beginPath(); LoiBut.veDaGiac(gC, n._d); gC.fill(); }
+        if (n.cong !== 'tay' && (p = LoiBut.buSang(n.mau))) { gC.globalAlpha = p; if (coD) gC.fill(n._d); else gC.fill(); gC.globalAlpha = 1; }
       }
       if (luot) gC.restore();
     }

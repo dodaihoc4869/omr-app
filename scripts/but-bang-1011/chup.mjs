@@ -28,7 +28,7 @@ export const html = taoHtmlMayChieu([
 ] as never, { tenBuoi: 'Buổi chữa 10/11' } as never)
 `)
   const ra = join(TAM, ten + '.mjs')
-  await build({ entryPoints: [vao], bundle: true, platform: 'node', format: 'esm', outfile: ra, logLevel: 'warning', nodePaths: [join(GOC, 'node_modules')], loader: { '.css': 'empty', '.svg': 'dataurl', '.png': 'dataurl', '.woff2': 'dataurl', '.woff': 'dataurl' } })
+  await build({ entryPoints: [vao], bundle: true, platform: 'node', format: 'esm', outfile: ra, logLevel: 'warning', nodePaths: [join(GOC, 'node_modules')], loader: { '.css': 'empty', '.svg': 'dataurl', '.png': 'dataurl', '.woff2': 'dataurl', '.woff': 'dataurl', '.wasm': 'empty' } })
   const tep = join(TAM, ten + '.html')
   writeFileSync(tep, (await import(pathToFileURL(ra).href)).html)
   return tep

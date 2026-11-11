@@ -100,6 +100,9 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     g.setTransform(s, 0, 0, s, -gx * kv!.dpr, -gy * kv!.dpr)
     g.globalCompositeOperation = tay ? 'destination-out' : 'source-over'; g.fillStyle = mau
     g.beginPath(); loi.veDaGiac(g, p); g.fill()
+    // bù sáng cho nét phấn (như máy thầy, `LoiBut.buSang`): thêm một lượt tô mờ ⇒ mép đều sáng, nét mảnh không lổn nhổn
+    const bu = tay ? 0 : loi.buSang(mau)
+    if (bu) { g.globalAlpha = bu; g.fill(); g.globalAlpha = 1 }
     g.globalCompositeOperation = 'source-over'
   }
   /** Tô xuống lớp ĐÃ CHỐT của đúng vùng (giấy / bảng). */
@@ -127,6 +130,8 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     g.globalCompositeOperation = n.cong === 'tay' ? 'destination-out' : 'source-over'; g.fillStyle = n.mau
     if (coPath) g.fill(n._d as Path2D)
     else { g.beginPath(); loi.veDaGiac(g, n._d as number[]); g.fill() }
+    const bu = n.cong === 'tay' ? 0 : loi.buSang(n.mau)
+    if (bu) { g.globalAlpha = bu; if (coPath) g.fill(n._d as Path2D); else g.fill(); g.globalAlpha = 1 }
     g.globalCompositeOperation = 'source-over'
   }
   function xoaSong(): void {
@@ -173,7 +178,7 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     if (!kv || !khung || !cvB || !gB) return
     const d = kv.dpr
     bx = tron(B[0] * kv.Wv - kv.ox); by = tron(B[1] * kv.Hv - kv.oy); bw = tron((B[2] - B[0]) * kv.Wv); bh = tron((B[3] - B[1]) * kv.Hv)
-    HB = Math.min(tron(bh * CAO_BANG), Math.floor(4096 / d))
+    HB = tron(Math.min(bh * CAO_BANG, 4096 / d))
     khung.style.width = `${bw}px`; khung.style.height = `${bh}px`; khung.style.transform = `translate3d(${bx}px,${by}px,0)`
     cvB.width = Math.max(1, Math.round(bw * d)); cvB.height = Math.max(1, Math.round(HB * d))
     cvB.style.width = `${bw}px`; cvB.style.height = `${HB}px`
@@ -200,14 +205,20 @@ export function taoVeBang(loi: LoiBut, cvChot: HTMLCanvasElement, cvSong: HTMLCa
     apCuon()
   }
   /** Đổi cỡ / tỉ lệ: đặt lại hai canvas, dựng lại trạng thái nét dở theo khung mới, vẽ lại. */
-  function datKhung(k: KhungVe): void {
+  function datKhung(k0: KhungVe): void {
+    // MẬT ĐỘ ĐIỂM ẢNH THẬT (11/11, thầy: «nét bút sắc nét và mịn tuyệt đối»): nơi gọi kẹp mật độ ở 2,5 (máy yếu 1,5) ⇒ điện thoại mật độ 3 bị trình duyệt
+    // kéo giãn canvas 1,2 lần (máy yếu: 2 lần) — nét mờ. Ở đây nâng lên mật độ thật của màn, trần 3 (máy yếu: trần 2).
+    const that = typeof devicePixelRatio === 'number' && devicePixelRatio > 0 ? devicePixelRatio : k0.dpr
+    const k = that > k0.dpr ? { ...k0, dpr: Math.min(that, k0.dpr <= 1.5 ? 2 : 3) } : k0
     kv = k
     KH = loi.khung(k.Wv, k.Hv)
     cvChot.width = Math.max(1, Math.round(k.w * k.dpr)); cvChot.height = Math.max(1, Math.round(k.h * k.dpr))
+    // cỡ HIỆN = đúng cỡ nền / mật độ (không để 100 %): cỡ điểm ảnh lẻ thì 100 % lệch cỡ nền chưa tới một điểm ảnh, đủ để cả lớp bị co giãn, mờ từng quãng
+    cvChot.style.width = `${cvChot.width / k.dpr}px`; cvChot.style.height = `${cvChot.height / k.dpr}px`
     // lớp sống: vuông, cạnh theo cỡ nét trên máy này (đuôi nét dở thường ≤ ~540 px ở màn 1920), không lớn hơn hình
     canh = Math.round(Math.max(200, Math.min(520, 700 * KH.k, k.w, k.h)))
     cvSong.width = cvSong.height = Math.max(1, Math.round(canh * k.dpr))
-    cvSong.style.width = cvSong.style.height = `${canh}px`
+    cvSong.style.width = cvSong.style.height = `${cvSong.width / k.dpr}px`
     dichSong(0, 0)
     ban = null
     // màu cây bút: biến màu sẵn có của bảng live (gắn tại gốc `.lv`), đọc một lần mỗi lần xếp lại
