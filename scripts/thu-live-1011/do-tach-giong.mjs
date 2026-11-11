@@ -70,7 +70,9 @@ function canh(khac, snr) {
   const nT = T.length, a = Math.min(Math.floor(nT / 2), s(2.8)), b2 = Math.min(nT - a, s(2.8))
   dat(tT, T, s(0.3), 0, a)                       // [0,3; 3,1) thầy một mình
   dat(tO, O, s(3.6), 0, s(3))                    // [3,6; 6,6) khác một mình
-  dat(tT, T, s(7.1), a, b2); dat(tO, O, s(7.1), s(3) % O.length, b2) // [7,1; 9,9) chồng
+  // [7,1; 9,9) chồng — mỗi khúc đặt mức RIÊNG (thầy −25, khác −25 − snr dBFS) ⇒ tín / nhiễu TẠI CHỖ đúng nhãn (trước: khúc thầy thật ở đây có quãng lặng ⇒ «0 dB» thực tế −6…−9 dB)
+  const o0 = s(3) % O.length, tC = datMuc(T.subarray(a, a + b2), -25), oC = datMuc(O.subarray(o0, o0 + b2), -25 - snr)
+  dat(tT, tC, s(7.1), 0, b2); dat(tO, oC, s(7.1), 0, b2)
   dat(tO, O, s(10.4), s(0.5), s(3.5))            // [10,4; 13,9) khác một mình
   dat(tT, T, s(14.05), 0, a)                     // [14,05; …) thầy NGAY sau khác (hở 150 ms)
   for (let k = 0; k < nhan.length; k++) { const t = (k * K) / HZ; nhan[k] = t >= 0.3 && t < 3.1 ? 1 : t >= 3.6 && t < 6.6 ? 2 : t >= 7.1 && t < 9.9 ? 3 : t >= 10.4 && t < 13.9 ? 2 : t >= 14.05 && t < 16.8 ? 4 : 0 }
