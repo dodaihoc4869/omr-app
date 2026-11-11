@@ -2,14 +2,25 @@
 // CHỈ THÊM vào phòng Bình Phản Ứng: mọi trường cũ giữ nguyên, máy em / bảng bản cũ gặp trường lạ thì bỏ qua. KHÔNG đọc mạng, KHÔNG đọc đồng hồ.
 // Dùng chung: Durable Object (server/src/phong-live.ts gọi các hàm này), `viewBang` / `viewEm` (phong.ts) gắn khối `live`, thư viện máy khách (src/lib/live).
 // BẤT BIẾN AN TOÀN: không trường nào của `live` mang đáp án / lời giải — test tests/live-an-toan-dap-an-1011.test.ts khoá.
-// ĐỢT 1A (nền): bật / tắt, sẵn sàng, công tắc buổi, ai được xem, tiếng theo điểm quyết 3, rời màn theo điểm quyết 2. `tay` / `noi` (giơ tay, mời nói — Đợt 2)
-// đã có chỗ trong trạng thái để hợp đồng không đổi, đợt này luôn rỗng.
+// ĐỢT 1A (nền): bật / tắt, sẵn sàng, công tắc buổi, ai được xem, tiếng theo điểm quyết 3, rời màn theo điểm quyết 2.
+// ĐỢT 2 (11/11, đặc tả 4.8 — đàm thoại hai chiều): hàng giơ tay `tay`, lời mời `moi` (MỘT em), em không bật được mic `micLoi`, nhật ký `nk` (ai giơ tay,
+// được mời, nói từ giờ nào tới giờ nào, bị thu mic — phòng rút ra kho của Durable Object, KHÔNG D1), bố cục giấy đề của thầy `giay` (máy em soi đúng giấy).
 import type { TrangThaiPhong } from './phong'
 
 /** Phiên SFU của thầy cho máy em kéo về: `id` = mã phiên, `tieng` = tên track tiếng, `kenh` = tên DataChannel điểm đang viết (null ⇒ điểm đi WebSocket). Không phải bí mật. */
 export interface PhienSfuThay { id: string; tieng: string | null; kenh: string | null }
 
 export interface MicEm { sbd: string; id: string; tieng: string; mid: string; luc: number }
+/** Một dòng NHẬT KÝ ĐÀM THOẠI (đặc tả 4.8 mục 8). `k`: tay = em giơ tay · ha = em tự hạ · ha-het = thầy hạ (một em / cả hàng) · moi = thầy mời nói ·
+ *  de-sau = em bấm «Để sau» · mic-loi = máy em không bật được mic · noi = em bắt đầu nói · thoi = em thôi nói (`tu` = giờ bắt đầu, `vi` = vì sao). Không ghi âm. */
+export interface MucNhatKy { k: 'tay' | 'ha' | 'ha-het' | 'moi' | 'de-sau' | 'mic-loi' | 'noi' | 'thoi'; sbd: string; luc: number; tu?: number; vi?: ViThoi }
+/** Vì sao em thôi nói: thay = thầy «Thu mic» · em = em bấm «Xong, tắt mic» · moi-khac = thầy mời / gọi em khác · roi = em rời màn · mat = em mất kết nối ·
+ *  luot = chấm xong / mở đáp án / lượt mới · tat = tắt live, hết buổi. */
+export type ViThoi = 'thay' | 'em' | 'moi-khac' | 'roi' | 'mat' | 'luot' | 'tat'
+/** BỐ CỤC GIẤY ĐỀ CỦA THẦY (đặc tả rủi ro R3): `k` = khoá trang, `w` × `h` = ô giấy (px của cửa sổ thầy), `la` = giấy có khối máy em không soi được
+ *  (bảng số liệu, sơ đồ thí nghiệm…), `o` = các khối: [loại, thứ tự, x, y, rộng, cao, cỡ chữ × 10, cao dòng × 10, độ đậm / 100, x cuối chữ, y cuối chữ].
+ *  Loại: 0 số câu · 1 tên phần · 2 đề · 3 chữ phương án · 4 ký hiệu phương án · 5 khung phương án · 6 dòng trả lời ngắn · 7 ảnh. Chỉ là SỐ ĐO — không chữ, không đáp án. */
+export interface GiayThay { k: string; w: number; h: number; la: boolean; o: number[][] }
 export interface LivePhong {
   /** Công tắc `cau_hinh.live_bang` (máy chủ nạp mỗi lần thầy mở phòng). Tắt ⇒ view không có khối `live`, mọi tin `live-*` bị bỏ. */
   cho: boolean
@@ -42,7 +53,24 @@ export interface LivePhong {
   soNet: number
   /** Lần cuối thầy có dấu hiệu đang live (bật, nhịp có tiếng / có nét, nét xong) — quá `TU_TAT_LIVE_MS` ⇒ phòng tự tắt live. */
   nhip: number
+  /** ĐỢT 2 — em đang được thầy MỜI NÓI (một em mỗi lúc): em này được phép bật mic tới khi nói xong / thầy thu mic / thầy mời em khác. */
+  moi?: { sbd: string; luc: number } | null
+  /** Em vừa không bật được mic sau khi được mời (từ chối quyền / máy lỗi) ⇒ màn chiếu ghi «chưa bật được mic». Xoá khi thầy mời tiếp / tắt live. */
+  micLoi?: { sbd: string; luc: number; ly: 'tu-choi' | 'loi' } | null
+  /** Em LÊN BẢNG vừa bị thầy thu mic trong lượt gọi này ⇒ máy em không tự bật lại (xoá khi gọi em khác / lượt mới). */
+  camMic?: string | null
+  /** Nhật ký đàm thoại CHƯA rút ra kho (phòng rút mỗi lần phát view). */
+  nk?: MucNhatKy[]
+  /** Bố cục giấy đề thầy đang chiếu (máy thầy gửi qua `live-dat { giay }`). */
+  giay?: GiayThay | null
+  /** TẠM DỪNG (thầy 11/11 «cần thêm nút tạm dừng live»): live vẫn `bat`, phiên SFU giữ nguyên; máy thầy tắt tiếng + ngừng gửi nét, máy em hiện «Thầy tạm dừng live».
+   *  Tiếp tục ⇒ có lại ngay. Thầy đặt bằng `live-dat { nghi }` (chỉ khi đang live). Chỉ thêm — phòng / máy bản cũ không có ⇒ coi như không dừng.
+   *  Tên trường là `nghi` (KHÔNG đặt `dung`: trùng khoá đáp án `dung` mà test an toàn soát trên mọi tin tới máy em). */
+  nghi?: boolean
 }
+/** ĐỢT 2 (giơ tay, mời nói, em ở xa) — luật phòng + máy chủ đã có và có test, nhưng GIAO DIỆN CHƯA MỞ (11/11: phiên chính dời đợt 2 sang lượt sau, chờ thử
+ *  tiếng trên máy thật). Bật cờ này ⇒ máy em hiện nút «Giơ tay», màn chiếu hiện công tắc «Cho em ở xa vào xem». */
+export const GIAO_DIEN_DOT_2 = false
 
 /** Thầy quên tắt live: mic im + không nét 15 phút (hoặc máy thầy mất hẳn) ⇒ tự tắt (đặc tả mục 5). */
 export const TU_TAT_LIVE_MS = 15 * 60_000
@@ -51,6 +79,10 @@ export const KHUNG_TOI_DA = 16 * 1024
 /** Thầy gửi điểm đang viết qua WebSocket (đường dự phòng) tối đa ngần này lô mỗi giây; phòng bỏ phần vượt (có dư cho dồn gói mạng). */
 export const LO_MOI_GIAY = 30
 export const LO_MOI_GIAY_TRAN = 45
+/** Hàng giơ tay dài nhất (em thứ 41 trở đi bấm không vào hàng — thầy hạ bớt rồi giơ lại). */
+export const TAY_TOI_DA = 40
+/** Nhật ký chờ rút dài nhất (phòng rút mỗi lần phát view nên bình thường chỉ vài dòng). */
+const NK_CHO_TOI_DA = 200
 
 /** MÃ KHUNG NHỊ PHÂN. Sổ nét (đúng + đủ, phòng đánh số thứ tự và lưu): byte 0 = mã, byte 1..4 = stt u32 LE (thầy gửi 0, phòng ghi).
  *  Điểm đang viết (không lưu, phòng chuyển nguyên văn): byte 0 = mã, byte 1..2 = phiên u16 LE, byte 3..6 = tGui u32 LE. Mã hoá đầy đủ: src/lib/live/ma-net.ts. */
@@ -63,29 +95,42 @@ export function nhomKhung(ma: number): 'so' | 'diem' | null {
 /** Mục sổ nét làm sổ bắt đầu lại (xoá sạch / bảng mới) ⇒ phòng dọn phần cũ. */
 export const laMucDonSo = (ma: number): boolean => ma === MA_SO.xoaHet || ma === MA_SO.bangMoi
 
-const liveMoi = (): LivePhong => ({ cho: false, sfu: false, san: false, bat: false, tu: null, phien: 0, ss: null, tay: [], noi: [], bang: false, mic: null, micDong: [], xa: false, tiengLop: false, soNet: 0, nhip: 0 })
+const liveTrong = (): LivePhong => ({ cho: false, sfu: false, san: false, bat: false, tu: null, phien: 0, ss: null, tay: [], noi: [], bang: false, mic: null, micDong: [], xa: false, tiengLop: false, soNet: 0, nhip: 0, moi: null, micLoi: null, camMic: null, nk: [], giay: null })
 /** Khối live của phòng; phòng lưu trước 10/11 (chưa có) ⇒ null = coi như công tắc tắt tới khi thầy mở lại phòng. */
 export const liveCua = (st: Pick<TrangThaiPhong, 'live'>): LivePhong | null => st.live ?? null
 const liveMo = (st: TrangThaiPhong): LivePhong | null => (st.live && st.live.cho && !st.ketThuc ? st.live : null)
 
 /** Máy chủ nạp công tắc + trạng thái khoá SFU mỗi lần thầy mở phòng (`/khoi`). Tắt công tắc khi đang live ⇒ tắt live. Trả true nếu có đổi. */
 export function datCoLive(st: TrangThaiPhong, o: { cho: boolean; sfu: boolean }, nay: number): boolean {
-  const l = st.live ?? (st.live = liveMoi())
+  const l = st.live ?? (st.live = liveTrong())
   if (l.cho === o.cho && l.sfu === o.sfu) return false
   l.cho = o.cho; l.sfu = o.sfu
-  if (!o.cho) { l.bat = false; l.tu = null; l.san = false; l.ss = null; l.tay = []; l.bang = false; thuMic(l) }
-  if (!o.sfu) { l.ss = null; thuMic(l) }
+  if (!o.cho) { l.bat = false; l.tu = null; l.san = false; l.ss = null; l.bang = false; thuMic(l, nay, 'tat'); donDamThoai(l) }
+  if (!o.sfu) { l.ss = null; thuMic(l, nay, 'tat') }
   st.capNhat = nay
   return true
 }
 
-/** Gỡ track mic đang phát (nếu có) + xếp vào hàng chờ đóng ở SFU. Trả true nếu có gỡ. */
-function thuMic(l: LivePhong): boolean {
+/** Ghi một dòng nhật ký đàm thoại vào hàng chờ rút (quá dài ⇒ bỏ dòng cũ nhất). */
+function ghiNk(l: LivePhong, m: MucNhatKy): void { l.nk = [...(l.nk ?? []), m].slice(-NK_CHO_TOI_DA) }
+/** Rút nhật ký đàm thoại chờ ghi (phòng gọi mỗi lần phát view rồi nối vào kho của Durable Object — không D1). */
+export function rutNhatKy(st: TrangThaiPhong): MucNhatKy[] {
+  const l = st.live
+  if (!l?.nk?.length) return []
+  const ds = l.nk
+  l.nk = []
+  return ds
+}
+/** Xoá hàng giơ tay + lời mời (tắt live, công tắc tắt, bật live mới). */
+function donDamThoai(l: LivePhong): void { l.tay = []; l.moi = null; l.micLoi = null; l.camMic = null; l.nghi = false }
+/** Gỡ track mic đang phát (nếu có) + xếp vào hàng chờ đóng ở SFU + ghi nhật ký «nói từ … tới …». Trả true nếu có gỡ. */
+function thuMic(l: LivePhong, nay?: number, vi: ViThoi = 'luot'): boolean {
   const m = l.mic
   l.noi = []
   if (!m) return false
   l.mic = null
   l.micDong = [...(l.micDong ?? []), { id: m.id, mid: m.mid }].slice(-8)
+  ghiNk(l, { k: 'thoi', sbd: m.sbd, luc: Math.max(m.luc, nay ?? l.nhip), tu: m.luc, vi })
   return true
 }
 const MA_PHIEN = /^[A-Za-z0-9_-]{8,128}$/
@@ -115,8 +160,8 @@ export function liveSan(st: TrangThaiPhong, o: { san?: boolean; ss?: unknown }, 
 export function liveBat(st: TrangThaiPhong, nay: number): boolean {
   const l = liveMo(st)
   if (!l || l.bat) return false
-  l.bat = true; l.san = true; l.tu = nay; l.phien += 1; l.nhip = nay; l.tay = []
-  thuMic(l)
+  l.bat = true; l.san = true; l.tu = nay; l.phien += 1; l.nhip = nay
+  thuMic(l, nay, 'tat'); donDamThoai(l)
   // Bật live khi thầy ĐANG gọi một em lên bảng ⇒ máy em vào bảng live ngay; còn lại máy em giữ màn câu hỏi, chỉ có tiếng.
   l.bang = !!st.luot?.goi && st.luot.pha !== 'mo'
   st.capNhat = nay
@@ -126,53 +171,188 @@ export function liveBat(st: TrangThaiPhong, nay: number): boolean {
 export function liveTat(st: TrangThaiPhong, nay: number): boolean {
   const l = st.live
   if (!l || !l.bat) return false
-  l.bat = false; l.tu = null; l.tay = []; l.bang = false
-  thuMic(l)
+  l.bat = false; l.tu = null; l.bang = false
+  thuMic(l, nay, 'tat'); donDamThoai(l)
   st.capNhat = nay
   return true
 }
 /** `live-dat`: công tắc buổi — cho em ở xa vào xem (điểm quyết 4), tiếng trên máy em trong lớp (điểm quyết 3), và `bang` = thầy bật / tắt TAY bảng live
  *  trên máy em (giảng trên bảng mà không gọi ai; chỉ khi đang live). */
-export function liveDat(st: TrangThaiPhong, o: { xa?: unknown; tiengLop?: unknown; bang?: unknown }, nay: number): boolean {
+export function liveDat(st: TrangThaiPhong, o: { xa?: unknown; tiengLop?: unknown; bang?: unknown; giay?: unknown; nghi?: unknown }, nay: number): boolean {
   const l = liveMo(st)
   if (!l) return false
   const xa = typeof o.xa === 'boolean' ? o.xa : l.xa, tiengLop = typeof o.tiengLop === 'boolean' ? o.tiengLop : l.tiengLop
   const bang = typeof o.bang === 'boolean' && l.bat ? o.bang : !!l.bang
-  if (xa === l.xa && tiengLop === l.tiengLop && bang === !!l.bang) return false
-  l.xa = xa; l.tiengLop = tiengLop; l.bang = bang
+  // `giay` (đợt 2, rủi ro R3): bố cục giấy đề thầy đang chiếu — null ⇒ xoá; sai dạng ⇒ giữ cái đang có.
+  const giay = o.giay === null ? null : o.giay === undefined ? (l.giay ?? null) : (chuanGiay(o.giay) ?? l.giay ?? null)
+  const doiGiay = JSON.stringify(giay) !== JSON.stringify(l.giay ?? null)
+  // `nghi` (11/11): tạm dừng / tiếp tục — chỉ khi đang live. Tạm dừng ⇒ thu mic của em đang nói, thôi lời mời; tiếp tục ⇒ tính lại nhịp «thầy còn live».
+  const nghi = typeof o.nghi === 'boolean' && l.bat ? o.nghi : !!l.nghi
+  if (xa === l.xa && tiengLop === l.tiengLop && bang === !!l.bang && !doiGiay && nghi === !!l.nghi) return false
+  if (nghi !== !!l.nghi) { l.nghi = nghi; l.nhip = nay; if (nghi) { thuMic(l, nay, 'tat'); l.moi = null } }
+  // Tắt «cho em ở xa»: em ở xa không còn được xem ⇒ ra khỏi hàng giơ tay, thôi nói, thôi được mời.
+  if (l.xa && !xa) for (const e of st.ds) if (!e.vao) boEm(l, e.sbd, nay, 'thay')
+  l.xa = xa; l.tiengLop = tiengLop; l.bang = bang; l.giay = giay
   st.capNhat = nay
   return true
+}
+const soNguyen = (v: unknown, tu: number, den: number): number | null => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= tu && n <= den ? n : null }
+/** Chuẩn hoá bố cục giấy máy thầy gửi (chỉ SỐ; tối đa 24 khối, mỗi khối 11 số trong khoảng hợp lệ). Sai dạng ⇒ null. */
+export function chuanGiay(v: unknown): GiayThay | null {
+  const x = (v ?? null) as Record<string, unknown> | null
+  if (!x || typeof x !== 'object' || typeof x.k !== 'string' || x.k.length > 60 || !Array.isArray(x.o) || x.o.length > 24) return null
+  const w = soNguyen(x.w, 80, 8000), h = soNguyen(x.h, 80, 8000)
+  if (w == null || h == null) return null
+  const o: number[][] = []
+  for (const b of x.o as unknown[]) {
+    if (!Array.isArray(b) || b.length !== 11) return null
+    const so = b.map((n, i) => soNguyen(n, i < 2 ? 0 : -8000, i === 0 ? 7 : i === 1 ? 23 : 16000))
+    if (so.some((n) => n == null)) return null
+    o.push(so as number[])
+  }
+  return { k: x.k, w, h, la: x.la === true, o }
 }
 
 // ── BẢNG LIVE theo lượt + MIC của em được gọi lên bảng (thầy 10/11) ──
 // «Khi bấm nút live, khi chuyển câu thì vẫn giữ live tiếng với hs, màn hình hs hiện câu hỏi như bình thường, khi bấm gọi lên bảng … lập tức màn hình hs chuyển
 //  sang chế độ live để xem thầy và bạn được gọi lên bảng chữa bài, tự động bật mic cho bạn lên bảng».
+/** Mic đang phát là của em được thầy MỜI NÓI (không phải em lên bảng). */
+const laMicDuocMoi = (l: LivePhong): boolean => !!l.mic && !!l.moi && l.moi.sbd === l.mic.sbd
 /** Thầy vừa gọi em lên bảng / cho em bắt đầu làm bảng (phong.ts gọi sau `goiLenBang` / `lamBang`): đang live ⇒ bật bảng live; mic của em KHÁC đang phát ⇒ thu. */
-export function liveKhiGoi(st: TrangThaiPhong): void {
+export function liveKhiGoi(st: TrangThaiPhong, nay?: number): void {
   const l = st.live
   if (!l?.bat) return
   l.bang = true
-  if (l.mic && l.mic.sbd !== st.luot?.goi?.sbd) thuMic(l)
+  // Một em nói một lúc: em lên bảng tự bật mic ⇒ lời mời nói đang treo (đợt 2) thôi hiệu lực, mic của em khác thu về.
+  l.moi = null; l.camMic = null
+  if (l.mic && l.mic.sbd !== st.luot?.goi?.sbd) thuMic(l, nay, 'moi-khac')
 }
 /** Mở lượt mới / bỏ lượt dở (phong.ts gọi): máy em về màn câu hỏi bình thường (`bang` tắt), tiếng VẪN chạy (không đụng `bat`, `phien`, `ss`); thu mic. */
-export function liveKhiLuotMoi(st: TrangThaiPhong): void {
+export function liveKhiLuotMoi(st: TrangThaiPhong, nay?: number): void {
   const l = st.live
   if (!l) return
-  l.bang = false
-  thuMic(l)
+  l.bang = false; l.camMic = null
+  // Em đang nói theo LỜI MỜI của thầy (đợt 2) không gắn với lượt ⇒ nói tiếp qua lượt mới; chỉ mic của em lên bảng mới thu.
+  if (!laMicDuocMoi(l)) thuMic(l, nay, 'luot')
 }
 /** Thầy chấm Đạt / Chưa đạt, em rời màn, hết buổi (phong.ts gọi): thu mic; `bang` GIỮ (thầy còn chữa tiếp trên bảng tới lượt mới). `sbd` ⇒ chỉ khi đúng em đó đang phát. */
-export function liveThuMic(st: TrangThaiPhong, nay: number, sbd?: string): boolean {
+export function liveThuMic(st: TrangThaiPhong, nay: number, sbd?: string, vi: ViThoi = sbd != null ? 'mat' : 'luot'): boolean {
   const l = st.live
   if (!l?.mic || (sbd != null && l.mic.sbd !== sbd)) return false
-  thuMic(l)
+  // Không nêu em (chấm xong / mở đáp án) ⇒ chỉ nhắm mic của em LÊN BẢNG; em đang nói theo lời mời của thầy nói tiếp.
+  if (sbd == null && laMicDuocMoi(l)) return false
+  thuMic(l, nay, vi)
   st.capNhat = nay
   return true
 }
-/** AI ĐƯỢC PHÁT MIC: đang live, đúng em đang được gọi lên bảng của lượt chưa mở đáp án, thầy chưa chấm, em không đang rời màn. Một em mỗi lúc. */
+
+// ── ĐỢT 2 · ĐÀM THOẠI HAI CHIỀU (đặc tả 4.8): giơ tay ⇒ hàng chờ ⇒ thầy mời ⇒ em bật mic ⇒ cả lớp nghe ⇒ thu mic ──
+/** Gỡ MỘT em khỏi mọi chỗ của đàm thoại (hàng tay, lời mời, mic). Trả true nếu có gỡ. */
+function boEm(l: LivePhong, sbd: string, nay: number, vi: ViThoi): boolean {
+  let doi = false
+  if (l.tay.some((x) => x.sbd === sbd)) { l.tay = l.tay.filter((x) => x.sbd !== sbd); doi = true }
+  if (l.moi?.sbd === sbd) { l.moi = null; doi = true }
+  if (l.mic?.sbd === sbd) doi = thuMic(l, nay, vi) || doi
+  return doi
+}
+/** EM bấm «Giơ tay» (`gio` true) / chạm lần nữa để hạ (`gio` false). Chỉ khi đang live và em được xem; em đang nói / đang được mời / đang rời màn không vào hàng. */
+export function liveTay(st: TrangThaiPhong, sbd: string, gio: boolean, nay: number): boolean {
+  const l = liveMo(st)
+  if (!l || !l.bat || !sbd) return false
+  const co = l.tay.some((x) => x.sbd === sbd)
+  if (!gio) {
+    if (!co) return false
+    l.tay = l.tay.filter((x) => x.sbd !== sbd)
+    ghiNk(l, { k: 'ha', sbd, luc: nay })
+  } else {
+    if (co || !duocXemLive(st, sbd) || l.mic?.sbd === sbd || l.moi?.sbd === sbd || st.roiNay?.includes(sbd) || l.tay.length >= TAY_TOI_DA) return false
+    l.tay = [...l.tay, { sbd, luc: nay }]
+    ghiNk(l, { k: 'tay', sbd, luc: nay })
+  }
+  st.capNhat = nay
+  return true
+}
+/** THẦY «Hạ hết tay» (không `sbd`) hoặc hạ tay một em. */
+export function liveHaTay(st: TrangThaiPhong, nay: number, sbd?: string): boolean {
+  const l = liveMo(st)
+  if (!l || !l.tay.length) return false
+  const bo = sbd == null ? l.tay : l.tay.filter((x) => x.sbd === sbd)
+  if (!bo.length) return false
+  for (const x of bo) ghiNk(l, { k: 'ha-het', sbd: x.sbd, luc: nay })
+  l.tay = sbd == null ? [] : l.tay.filter((x) => x.sbd !== sbd)
+  st.capNhat = nay
+  return true
+}
+/** THẦY «Mời nói»: em ra khỏi hàng tay, thành em được mời (MỘT em mỗi lúc — em đang nói / đang được mời trước đó thôi). Em phải đang được xem live, không đang rời màn. */
+export function liveMoi(st: TrangThaiPhong, sbd: string, nay: number): boolean {
+  const l = liveMo(st)
+  if (!l || !l.bat || !sbd || !duocXemLive(st, sbd) || st.roiNay?.includes(sbd)) return false
+  if (l.moi?.sbd === sbd) return false
+  if (l.mic && l.mic.sbd !== sbd) thuMic(l, nay, 'moi-khac')
+  l.tay = l.tay.filter((x) => x.sbd !== sbd)
+  l.moi = { sbd, luc: nay }; l.micLoi = null
+  ghiNk(l, { k: 'moi', sbd, luc: nay })
+  st.capNhat = nay
+  return true
+}
+/** EM bấm «Để sau» trên tấm «Thầy mời em nói»: thôi lời mời (tay đã hạ từ lúc được mời; muốn nói em giơ tay lại). */
+export function liveDeSau(st: TrangThaiPhong, sbd: string, nay: number): boolean {
+  const l = st.live
+  if (!l?.moi || l.moi.sbd !== sbd || l.mic?.sbd === sbd) return false
+  l.moi = null
+  ghiNk(l, { k: 'de-sau', sbd, luc: nay })
+  st.capNhat = nay
+  return true
+}
+/** MÁY EM báo không bật được mic sau khi được mời (em / máy từ chối quyền, mic lỗi): lời mời thôi, màn chiếu ghi «chưa bật được mic». */
+export function liveMicLoi(st: TrangThaiPhong, sbd: string, ly: unknown, nay: number): boolean {
+  const l = st.live
+  if (!l?.moi || l.moi.sbd !== sbd) return false
+  l.moi = null
+  if (l.mic?.sbd === sbd) thuMic(l, nay, 'em')
+  l.micLoi = { sbd, luc: nay, ly: ly === 'tu-choi' ? 'tu-choi' : 'loi' }
+  ghiNk(l, { k: 'mic-loi', sbd, luc: nay })
+  st.capNhat = nay
+  return true
+}
+/** THẦY «Thu mic» (một em) / «Tắt mic tất cả» (không `sbd`): gỡ lời mời + mic; em lên bảng bị thu ⇒ không tự bật lại trong lượt gọi này. */
+export function liveThu(st: TrangThaiPhong, nay: number, sbd?: string): boolean {
+  const l = st.live
+  if (!l) return false
+  let doi = false
+  const m = l.mic
+  if (l.moi && (sbd == null || l.moi.sbd === sbd)) { l.moi = null; doi = true }
+  if (m && (sbd == null || m.sbd === sbd)) {
+    if (st.luot?.goi?.sbd === m.sbd) l.camMic = m.sbd
+    doi = thuMic(l, nay, 'thay') || doi
+  }
+  if (doi) st.capNhat = nay
+  return doi
+}
+/** EM bấm «Xong, tắt mic» (hoặc máy em mất quyền mic giữa chừng): gỡ mic của CHÍNH em; em được mời ⇒ lời mời xong. */
+export function liveEmTatMic(st: TrangThaiPhong, sbd: string, nay: number): boolean {
+  const l = st.live
+  if (!l || (l.mic?.sbd !== sbd && l.moi?.sbd !== sbd)) return false
+  if (l.mic?.sbd === sbd) thuMic(l, nay, 'em')
+  if (l.moi?.sbd === sbd) l.moi = null
+  st.capNhat = nay
+  return true
+}
+/** Em RỜI MÀN (phong.ts gọi): thôi nói, thôi được mời, ra khỏi hàng tay. */
+export function liveKhiRoi(st: TrangThaiPhong, sbd: string, nay: number): boolean {
+  const l = st.live
+  if (!l || !boEm(l, sbd, nay, 'roi')) return false
+  st.capNhat = nay
+  return true
+}
+/** AI ĐƯỢC PHÁT MIC (một em mỗi lúc): đang live, em không đang rời màn, và
+ *  · em đang được thầy MỜI NÓI (đợt 2 — em trong lớp hay em ở xa đang được xem live); hoặc
+ *  · không có lời mời nào: đúng em đang được gọi lên bảng của lượt chưa mở đáp án, thầy chưa chấm, chưa bị thầy thu mic trong lượt gọi này. */
 export function duocPhatMic(st: TrangThaiPhong, sbd: string): boolean {
   const l = liveMo(st), g = st.luot?.goi
-  return !!l && l.bat && l.sfu && !!sbd && !!g && g.sbd === sbd && g.dat == null && st.luot!.pha !== 'mo' && !st.roiNay?.includes(sbd) && st.ds.some((e) => e.sbd === sbd)
+  if (!l || !l.bat || l.nghi || !l.sfu || !sbd || st.roiNay?.includes(sbd) || !st.ds.some((e) => e.sbd === sbd)) return false
+  if (l.moi) return l.moi.sbd === sbd && duocXemLive(st, sbd)
+  return !!g && g.sbd === sbd && g.dat == null && st.luot!.pha !== 'mo' && l.camMic !== sbd
 }
 /** Máy chủ ghi track mic của em SAU khi SFU đã nhận track (cửa `/bpu/live/phat`). Em không (còn) được phép ⇒ false (máy chủ đóng track vừa tạo). */
 export function liveMicBat(st: TrangThaiPhong, o: { sbd: string; id: unknown; tieng: unknown; mid: unknown }, nay: number): boolean {
@@ -180,9 +360,11 @@ export function liveMicBat(st: TrangThaiPhong, o: { sbd: string; id: unknown; ti
   if (!l || !duocPhatMic(st, o.sbd)) return false
   const id = typeof o.id === 'string' && MA_PHIEN.test(o.id) ? o.id : '', tieng = typeof o.tieng === 'string' && TEN_NGUON.test(o.tieng) ? o.tieng : '', mid = typeof o.mid === 'string' && /^[A-Za-z0-9]{1,16}$/.test(o.mid) ? o.mid : ''
   if (!id || !tieng || !mid) return false
-  if (l.mic) thuMic(l)
+  if (l.mic) thuMic(l, nay, 'moi-khac')
   l.mic = { sbd: o.sbd, id, tieng, mid, luc: nay }
   l.noi = [o.sbd]
+  l.tay = l.tay.filter((x) => x.sbd !== o.sbd)
+  ghiNk(l, { k: 'noi', sbd: o.sbd, luc: nay })
   l.nhip = nay
   st.capNhat = nay
   return true
@@ -198,7 +380,7 @@ export function rutMicDong(st: TrangThaiPhong): { id: string; mid: string }[] {
 /** Thầy còn đang live thật (nhịp có tiếng / có nét, nét xong, lô điểm). Không phát view. */
 export function liveNhip(st: TrangThaiPhong, nay: number): void { if (st.live?.bat) st.live.nhip = nay }
 /** Đang live mà quá 15 phút không dấu hiệu nào của thầy ⇒ cần tự tắt. */
-export const liveHetHan = (st: TrangThaiPhong, nay: number): boolean => !!st.live?.bat && nay - st.live.nhip > TU_TAT_LIVE_MS
+export const liveHetHan = (st: TrangThaiPhong, nay: number): boolean => !!st.live?.bat && nay - st.live.nhip > TU_TAT_LIVE_MS * (st.live.nghi ? 4 : 1) // đang tạm dừng (mic im, không nét) ⇒ chờ lâu gấp bốn: 60 phút
 
 /** AI XEM ĐƯỢC (mục 4.9): em đã vào phòng buổi học; em thuộc lớp CHƯA điểm danh chỉ khi thầy bật «cho em ở xa»; em lạ không bao giờ. */
 export function duocXemLive(st: TrangThaiPhong, sbd: string): boolean {
@@ -221,6 +403,10 @@ export function viewLiveBang(st: TrangThaiPhong, dem?: { xem: number; ws: number
   return {
     san: l.san, bat: l.bat, tu: l.tu, phien: l.phien, ss: l.ss, xem: dem?.xem ?? 0, ws: dem?.ws ?? 0,
     tay: l.tay, noi: viewNoi(st, l), bang: !!l.bang, xa: l.xa, tiengLop: l.tiengLop, soNet: l.soNet,
+    /** ĐỢT 2: em đang được mời nói (chưa / đang bật mic) · em vừa không bật được mic. */
+    moi: l.moi ?? null, micLoi: l.micLoi ?? null,
+    /** Thầy đang TẠM DỪNG live. */
+    nghi: l.bat && !!l.nghi,
     tieng: (l.sfu ? 'bat' : 'chua-cau-hinh') as Exclude<TiengLive, 'tat'>,
   }
 }
@@ -242,12 +428,20 @@ export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
   const tieng: TiengLive = !l.sfu ? 'chua-cau-hinh' : e?.vao && !l.tiengLop ? 'tat' : 'bat'
   return {
     duocXem: duoc, san: duoc && l.san, bat: duoc && l.bat, tu: duoc ? l.tu : null, phien: l.phien, ss: duoc ? l.ss : null, tieng, soNet: l.soNet,
-    /** Máy em có hiện BẢNG LIVE không (false ⇒ giữ màn câu hỏi bình thường, tiếng vẫn chạy khi `bat`). */
-    bang: duoc && l.bat && !!l.bang,
-    emTay: hang >= 0, hangTay: hang >= 0 ? hang + 1 : null,
-    /** `emDuocMoi` = em ĐƯỢC PHÉP bật mic lúc này (em đang được gọi lên bảng); `emNoi` = track mic của em đang được phòng ghi nhận. */
+    /** Máy em có hiện BẢNG LIVE không (false ⇒ giữ màn câu hỏi bình thường, tiếng vẫn chạy khi `bat`). Em Ở XA không có màn câu hỏi ⇒ luôn xem bảng khi live. */
+    bang: duoc && l.bat && (!!l.bang || !e!.vao),
+    /** Thầy đang TẠM DỪNG live ⇒ máy em hiện «Thầy tạm dừng live» (tiếng và nét ngừng tới, phiên giữ nguyên). */
+    nghi: duoc && l.bat && !!l.nghi,
+    /** Em Ở XA (thuộc lớp, chưa điểm danh, thầy bật «Cho em ở xa vào xem»): không đội, không kJ — khay ẩn dòng đội. */
+    xa: duoc && !e!.vao,
+    emTay: duoc && hang >= 0, hangTay: duoc && hang >= 0 ? hang + 1 : null,
+    /** `emDuocMoi` = em ĐƯỢC PHÉP bật mic lúc này (em đang được gọi lên bảng, hoặc thầy mời nói); `emNoi` = track mic của em đang được phòng ghi nhận. */
     emDuocMoi: duoc && duocPhatMic(st, sbd), emNoi: l.mic?.sbd === sbd,
+    /** ĐỢT 2: thầy đang MỜI em nói ⇒ tấm «Thầy mời em nói» (em phải chạm «Bật mic và nói» — mic không tự bật như lúc lên bảng). */
+    emMoi: duoc && l.bat && l.moi?.sbd === sbd,
     noi: duoc ? viewNoi(st, l) : [],
+    /** Bố cục giấy đề thầy đang chiếu (chỉ số đo) — máy em dựng giấy cùng bề rộng, cùng cỡ chữ. */
+    giay: duoc && l.bat ? (l.giay ?? null) : null,
   }
 }
 export type ViewLiveBang = ReturnType<typeof viewLiveBang>
