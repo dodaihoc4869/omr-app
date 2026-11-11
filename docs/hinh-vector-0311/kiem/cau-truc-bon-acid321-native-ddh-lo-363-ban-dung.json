@@ -1,0 +1,29 @@
+[
+  {
+    "i": 321,
+    "hash": "37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415",
+    "fileNguon": "anh/37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415.png",
+    "svg": "bon-acid321-native-ddh-395a1d35606277e84d096a7541a158ea52a2a7e5677a5e58c8506c401635f0cf.svg",
+    "hashSvg": "395a1d35606277e84d096a7541a158ea52a2a7e5677a5e58c8506c401635f0cf",
+    "byteSvg": 12990,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "DH-12-C1-B1-P2-III-6",
+        "de": "Cho dãy các chất sau: Có bao nhiêu chất thuộc loại acid béo omega-6 trong dãy?",
+        "refs": [
+          {
+            "hash": "37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415",
+            "where": "DH-12-C1-B1-P2-III-6.hinh.0.du_lieu",
+            "hashDataUrl": "9f1b89cebd6ae37555ee55264e3dc131bab1a80013b2f9c4e058576030329d53"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4OPENchains19-13-17-19bareC+COOHfirstC=20-14-18-20C/5-1-2-3CCdouble/72C8Ototal/4literalcondensedCOOHregularUPRIGHT-firstCanchors/row3COOHUPothersDOWN/0stereo0arrows/no18Cnormalize-expandedCO-H-names-omegaanswer",
+    "hashSvgDaSoat": "395a1d35606277e84d096a7541a158ea52a2a7e5677a5e58c8506c401635f0cf",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

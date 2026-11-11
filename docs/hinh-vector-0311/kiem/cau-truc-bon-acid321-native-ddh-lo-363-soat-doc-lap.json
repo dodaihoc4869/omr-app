@@ -1,0 +1,17 @@
+[
+  {
+    "i": 321,
+    "hashSvg": "395a1d35606277e84d096a7541a158ea52a2a7e5677a5e58c8506c401635f0cf",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự mở riêng native FULL, câu dẫn/ref DH-12-C1-B1-P2-III-6.hinh.0.du_lieu và fresh Chromium3× FULL/runtime exactSHA final; mở macro cả bốn hàng bao gồm endpoint COOH. Đếm riêng C trần19/13/17/19 cộng C đầu COOH thành20/14/18/20, tổng72C8O; nối đôi CC5/1/2/3 đúng vị trí từng hàng nguồn. COOH hàng3 hướng lên, các hàng khác xuống, neo C đầu; chữ thường thẳng/nét mạch mảnh, không tự chuẩn hóa sốC theo tên. Không thấy chạm/cắt/tràn, caption/đáp án thêm. Không carry oldcd8b; oldFULL giữ riêng và không có oldpositive.",
+    "render": "/workspace/scratch/soat363-final-321-fresh.png",
+    "macro": [
+      "/workspace/scratch/acid321-row0.png",
+      "/workspace/scratch/acid321-row1.png",
+      "/workspace/scratch/acid321-row2.png",
+      "/workspace/scratch/acid321-row3.png"
+    ],
+    "hash": "37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415",
+    "hashSvgDaSoat": "395a1d35606277e84d096a7541a158ea52a2a7e5677a5e58c8506c401635f0cf"
+  }
+]

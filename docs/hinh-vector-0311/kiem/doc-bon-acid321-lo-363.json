@@ -1,0 +1,637 @@
+{
+  "i": 321,
+  "assetIndexProvided": 1160,
+  "hash": "37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415.png",
+  "size": [
+    398,
+    277
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "DH-12-C1-B1-P2-III-6",
+      "de": "Cho dãy các chất sau: Có bao nhiêu chất thuộc loại acid béo omega-6 trong dãy?",
+      "allHinh": [
+        {
+          "hash": "37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415",
+          "where": "DH-12-C1-B1-P2-III-6.hinh.0.du_lieu",
+          "hashDataUrl": "9f1b89cebd6ae37555ee55264e3dc131bab1a80013b2f9c4e058576030329d53"
+        }
+      ],
+      "missingHashes": [
+        "37423984c506c2524a8581e31ca1bfb54ca597a91a4b5cba4a473a9804af7415"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxvertices/bboxes, vertexcountsindependentfromacidnames. COOHanchorlabeltipsNOTscientificCpositions; doNOTaddverticesatbondtips.",
+  "geometry": {
+    "rows": [
+      {
+        "bareVertices": [
+          [
+            7,
+            38
+          ],
+          [
+            22,
+            14
+          ],
+          [
+            36,
+            38
+          ],
+          [
+            64,
+            38
+          ],
+          [
+            78,
+            14
+          ],
+          [
+            92,
+            38
+          ],
+          [
+            120,
+            38
+          ],
+          [
+            135,
+            14
+          ],
+          [
+            149,
+            38
+          ],
+          [
+            177,
+            38
+          ],
+          [
+            191,
+            14
+          ],
+          [
+            205,
+            38
+          ],
+          [
+            233,
+            38
+          ],
+          [
+            247,
+            14
+          ],
+          [
+            262,
+            38
+          ],
+          [
+            289,
+            38
+          ],
+          [
+            304,
+            14
+          ],
+          [
+            318,
+            38
+          ],
+          [
+            332,
+            14
+          ]
+        ],
+        "bareCCount": 19,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            340,
+            28,
+            388,
+            43
+          ],
+          "bond": [
+            [
+              332,
+              14
+            ],
+            [
+              341,
+              29
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "note": "BondtipbeforelabelinkNOTextraC; formulaCOOHcondensedNOexplicitC=O."
+        },
+        "CCountIncludingCOOHC": 20,
+        "CCDoubleVertexPairs1Based": [
+          [
+            3,
+            4
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              39,
+              33
+            ],
+            [
+              61,
+              33
+            ]
+          ],
+          [
+            [
+              95,
+              33
+            ],
+            [
+              117,
+              33
+            ]
+          ],
+          [
+            [
+              152,
+              33
+            ],
+            [
+              174,
+              33
+            ]
+          ],
+          [
+            [
+              208,
+              33
+            ],
+            [
+              230,
+              33
+            ]
+          ],
+          [
+            [
+              265,
+              33
+            ],
+            [
+              286,
+              33
+            ]
+          ]
+        ],
+        "CCdoubleCount": 5
+      },
+      {
+        "bareVertices": [
+          [
+            9,
+            117
+          ],
+          [
+            23,
+            93
+          ],
+          [
+            37,
+            117
+          ],
+          [
+            51,
+            93
+          ],
+          [
+            65,
+            117
+          ],
+          [
+            79,
+            93
+          ],
+          [
+            107,
+            93
+          ],
+          [
+            122,
+            117
+          ],
+          [
+            136,
+            93
+          ],
+          [
+            150,
+            117
+          ],
+          [
+            164,
+            93
+          ],
+          [
+            178,
+            117
+          ],
+          [
+            192,
+            93
+          ]
+        ],
+        "bareCCount": 13,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            201,
+            108,
+            249,
+            123
+          ],
+          "bond": [
+            [
+              192,
+              93
+            ],
+            [
+              201,
+              108
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "note": "BondtipbeforelabelinkNOTextraC; formulaCOOHcondensedNOexplicitC=O."
+        },
+        "CCountIncludingCOOHC": 14,
+        "CCDoubleVertexPairs1Based": [
+          [
+            6,
+            7
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              82,
+              98
+            ],
+            [
+              104,
+              98
+            ]
+          ]
+        ],
+        "CCdoubleCount": 1
+      },
+      {
+        "bareVertices": [
+          [
+            9,
+            192
+          ],
+          [
+            23,
+            168
+          ],
+          [
+            37,
+            192
+          ],
+          [
+            51,
+            168
+          ],
+          [
+            65,
+            192
+          ],
+          [
+            79,
+            168
+          ],
+          [
+            107,
+            168
+          ],
+          [
+            122,
+            192
+          ],
+          [
+            136,
+            168
+          ],
+          [
+            164,
+            168
+          ],
+          [
+            178,
+            192
+          ],
+          [
+            192,
+            168
+          ],
+          [
+            206,
+            192
+          ],
+          [
+            220,
+            168
+          ],
+          [
+            234,
+            192
+          ],
+          [
+            248,
+            168
+          ],
+          [
+            262,
+            192
+          ]
+        ],
+        "bareCCount": 17,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            272,
+            159,
+            320,
+            174
+          ],
+          "bond": [
+            [
+              262,
+              192
+            ],
+            [
+              271,
+              176
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "note": "BondtipbeforelabelinkNOTextraC; formulaCOOHcondensedNOexplicitC=O."
+        },
+        "CCountIncludingCOOHC": 18,
+        "CCDoubleVertexPairs1Based": [
+          [
+            6,
+            7
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              82,
+              173
+            ],
+            [
+              104,
+              173
+            ]
+          ],
+          [
+            [
+              139,
+              173
+            ],
+            [
+              161,
+              173
+            ]
+          ]
+        ],
+        "CCdoubleCount": 2
+      },
+      {
+        "bareVertices": [
+          [
+            7,
+            261
+          ],
+          [
+            21,
+            237
+          ],
+          [
+            35,
+            261
+          ],
+          [
+            49,
+            237
+          ],
+          [
+            63,
+            261
+          ],
+          [
+            77,
+            237
+          ],
+          [
+            105,
+            237
+          ],
+          [
+            120,
+            261
+          ],
+          [
+            134,
+            237
+          ],
+          [
+            162,
+            237
+          ],
+          [
+            176,
+            261
+          ],
+          [
+            190,
+            237
+          ],
+          [
+            218,
+            237
+          ],
+          [
+            232,
+            261
+          ],
+          [
+            246,
+            237
+          ],
+          [
+            260,
+            261
+          ],
+          [
+            274,
+            237
+          ],
+          [
+            288,
+            261
+          ],
+          [
+            302,
+            237
+          ]
+        ],
+        "bareCCount": 19,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            314,
+            252,
+            363,
+            268
+          ],
+          "bond": [
+            [
+              302,
+              237
+            ],
+            [
+              311,
+              252
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "note": "BondtipbeforelabelinkNOTextraC; formulaCOOHcondensedNOexplicitC=O."
+        },
+        "CCountIncludingCOOHC": 20,
+        "CCDoubleVertexPairs1Based": [
+          [
+            6,
+            7
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "innerParallelRays": [
+          [
+            [
+              80,
+              242
+            ],
+            [
+              102,
+              242
+            ]
+          ],
+          [
+            [
+              137,
+              242
+            ],
+            [
+              159,
+              242
+            ]
+          ],
+          [
+            [
+              193,
+              242
+            ],
+            [
+              215,
+              242
+            ]
+          ]
+        ],
+        "CCdoubleCount": 3
+      }
+    ],
+    "font": "ALL4COOHregularuprightsansblack, noactualbold/italic. Bondsblackthinuniform~1.5px. Noacidnames/rowcaptions.",
+    "counts": {
+      "bareCByRow": [
+        19,
+        13,
+        17,
+        19
+      ],
+      "CIncludingCOOHByRow": [
+        20,
+        14,
+        18,
+        20
+      ],
+      "CCDoubleByRow": [
+        5,
+        1,
+        2,
+        3
+      ],
+      "COOHlabels": 4,
+      "explicitCOdouble": 0,
+      "Ototal": 8,
+      "arrows": 0,
+      "captions": 0
+    },
+    "noAdded": [
+      "18Callrows",
+      "omega6answer",
+      "acidnames",
+      "expandedCOOH",
+      "extraCattip",
+      "E/Zlabels",
+      "rowlabelsABCD",
+      "hydrogenlabels",
+      "charges",
+      "aliases"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootAudit": "Root tự mở nativeFULL4x+topend6x/all1publicde+refs/freshactualFULL. Initialcd8b1ace X tuần hoàn bỏ native1–2pxdrift+innerliney1px đã loại giữ exactSVGbytes+JPG; final ONLYvertices/rays/endbonds native, glyph/count/literal giữ/freshnewSHAALL. Tọa độ native approximate, không phải đo subpixel."
+}
