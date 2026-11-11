@@ -12,7 +12,7 @@ while true; do
       [ -f "mh/$ten.tgt" ] && continue
       venv/bin/python -I ma/xuat.py "$ck" "mh/$ten.tgt" "$ten" > /dev/null 2>&1 || continue
       node "$WT/scripts/thu-live-1011/tach-giong/luyen/do-nhanh.mjs" "$WT/src/lib/live/tach-giong-thay.ts" "mh/$ten.tgt" \
-        thay=cham/thay-that.wav khac-that=cham/khac-that.wav lj-nu=mau/giong-nu.wav vctk-nam=mau/xon-xao-2.wav libri=mau/xon-xao-3.wav viet-tts=mau/giong-viet.wav thay-to=cham/thay-to.wav >> do-nhanh.log 2>&1
+        thay=cham/thay-that.wav khac-that=cham/khac-that.wav lj-nu=mau/giong-nu.wav vctk-nam=mau/xon-xao-2.wav libri=mau/xon-xao-3.wav viet-tts=mau/giong-viet.wav thay-to=cham/thay-to.wav am-du-dai=cham/am-du-dai.wav mo-cham=cham/mo-cham.wav >> do-nhanh.log 2>&1
     done
   done
   sleep 60

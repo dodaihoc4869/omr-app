@@ -9,5 +9,6 @@ while true; do
   bash ma/giai-ma.sh "$S/live"
   python3 -I ma/them-buoi.py "$S/live" lv-tg/wespeaker_en_voxceleb_CAM++.onnx do-a du-lieu/live 2>&1 | tail -20
   python3 -I ma/chuan-bi-yt.py "$S/giong-thay-youtube" du-lieu 2>&1 | tail -5
+  python3 -I ma/chuan-bi-mo.py "$S/giong-khac-mo" du-lieu 2>&1 | tail -3
   sleep 1500
 done

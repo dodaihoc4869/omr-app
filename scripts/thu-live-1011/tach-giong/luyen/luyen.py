@@ -85,6 +85,16 @@ def vang(x, rt60, drr):  # vang phòng tổng hợp: đường thẳng + đuôi 
     h *= 10 ** (-drr / 20) / max(np.sqrt((h ** 2).sum()), 1e-9); h[0] = 1.0
     m = 1 << int(np.ceil(np.log2(len(x) + n)))
     return np.fft.irfft(np.fft.rfft(x, m) * np.fft.rfft(h, m), m)[:len(x)].astype(np.float32)
+# KHO GIỌNG MỞ (giong-khac-mo/, tác tử YouTube tải: FLEURS vi / LibriSpeech CC BY 4.0, Common Voice vi CC0 …): <kho>/<tập luyen|cham>/<người>/*.flac|wav hoặc ds.json.
+# KHÔNG dùng kho có điều khoản phi thương mại (VIVOS CC BY-NC-SA …) — trung tâm là cơ sở có thu phí. Người ở tập «cham» không bao giờ vào luyện.
+MO = []; TI_MO = float(os.environ.get('TG_TI_MO', '0.45'))
+def napMo():
+    global MO
+    goc = os.path.join(DL, 'mo')   # chuan-bi-mo.py đổi sẵn: mo/<kho>__<người>.f32 (24 kHz) + mo/dai.json {tên: dải gốc Hz}
+    try: dai = json.load(open(os.path.join(goc, 'dai.json')))
+    except Exception: dai = {}
+    MO = [(rf(f), float(dai.get(os.path.basename(f)[:-4], 8000))) for f in sorted(glob.glob(os.path.join(goc, '*.f32')))]
+napMo()
 GIA = min(0.2, float(os.environ.get('TG_GIA', '0.15')))   # tỉ lệ giọng khác là «NGƯỜI GIẢ» — ≤ 20 % (dao hai lưỡi: mạng có thể học hạ cả thầy lúc nói cao giọng)
 def nguoiGia(thay, n):  # «người giả»: giọng thầy đổi cao độ + formant CÙNG LÚC (nội suy lại) với độ lệch LỚN: ×1,25–1,6 (nữ / trẻ) hoặc ×0,68–0,75 (nam trầm hơn)
     r = rng.uniform(1.25, 1.6) if rng.random() < 0.7 else rng.uniform(0.68, 0.75); m = int(np.ceil(n * r)); x = cat(thay, m)
@@ -94,9 +104,12 @@ def mau(thay, khac, am, rr=None):
     t = (tocDo(thay, L) if rng.random() < 0.5 else cat(thay, L)) if rng.random() > 0.12 else np.zeros(L, np.float32)
     if rng.random() < 0.4 and t.any(): t = vang(t, rng.uniform(0.1, 0.35), rng.uniform(6, 20))
     n_k = 0 if rng.random() < 0.15 else (2 if rng.random() < 0.2 else 1); i = np.zeros(L, np.float32)
+    dai = 12000.0   # dải gốc hẹp nhất trong mẫu (Hz): giọng thầy / AudioMNIST / giọng thật trong lớp ≥ 11 kHz; kho mở 16 kHz chỉ tới 8 kHz
     for _ in range(n_k):
         u = rng.random()
         if u < GIA: s = nguoiGia(thay, L)
+        elif MO and u < GIA + TI_MO:   # kho giọng mở nhiều người (giong-khac-mo/: FLEURS, LibriSpeech …)
+            nguon, bw = MO[rng.integers(len(MO))]; s = cat(nguon, L).copy(); dai = min(dai, bw)
         else:
             nguon = khac if khac is not None and rng.random() < 0.4 else am[rng.integers(len(am))]
             s = (tocDo(nguon, L) if rng.random() < 0.3 else cat(nguon, L)).copy()
@@ -114,8 +127,12 @@ def mau(thay, khac, am, rr=None):
         on = np.fft.irfft((rng.standard_normal(L // 2 + 1) + 1j * rng.standard_normal(L // 2 + 1)) * fr ** (-rng.uniform(0, 2) / 2), L).astype(np.float32)
     ro = rmsHd(on); on = on / max(ro, 1e-9) * 10 ** (-rng.uniform(10, 45) / 20)
     muc = 10 ** (rng.uniform(-32, -12) / 20)
-    S = stft((t * muc)[None])[0] * eq(None)
-    Y = S + stft(((i + on) * muc)[None])[0]
+    # THÔNG THẤP NGẪU NHIÊN CHUNG cho cả mẫu (thầy + giọng khác + ồn): cắt 4 / 8 kHz / để nguyên, rồi không rộng hơn dải gốc hẹp nhất trong mẫu ⇒ trong một mẫu
+    # hai bên luôn cùng dải — mạng KHÔNG học được mẹo «có năng lượng trên 8 kHz ⇒ thầy» (kho mở 16 kHz) rồi lọt giọng học sinh thật qua mic đủ dải.
+    u = rng.random(); cat_ = 4000.0 if u < 0.15 else 8000.0 if u < 0.45 else 99999.0; cat_ = min(cat_, dai)
+    lp = np.clip((cat_ - np.arange(N // 2 + 1) * 50.0) / 500.0, 0, 1).astype(np.float32) if cat_ < 12000 else 1.0
+    S = stft((t * muc)[None])[0] * eq(None) * lp
+    Y = S + stft(((i + on) * muc)[None])[0] * lp
     return Y, S
 
 # ── chuẩn hoá đặc trưng (cố định, ghi vào checkpoint) ──
@@ -255,7 +272,7 @@ for b in range(b0, SO_BUOC):
     P, O, l = buoc(P, O, f, Ya, Sa, Ia, jnp.float32(lamImLuc(b))); ls.append(float(l))
     if (b + 1) % 100 == 0:
         print(f'bước {b + 1} mất mát {np.mean(ls):.4f} · {(time.time() - t0) / 100:.2f} s/bước', flush=True); ls = []; t0 = time.time()
-    if (b + 1) % 2000 == 0: napDuLieu(); print(f'dữ liệu: YouTube {0 if YT_S is None else len(YT_S) / HZ:.0f} s · thầy luyện {len(THAY) / HZ:.0f} s · khác thật {0 if KHAC is None else len(KHAC) / HZ:.0f} s', flush=True)
+    if (b + 1) % 2000 == 0: napDuLieu(); napMo(); print(f'kho mở: {len(MO)} người', flush=True); print(f'dữ liệu: YouTube {0 if YT_S is None else len(YT_S) / HZ:.0f} s · thầy luyện {len(THAY) / HZ:.0f} s · khác thật {0 if KHAC is None else len(KHAC) / HZ:.0f} s', flush=True)
     if (b + 1) % 1000 == 0:
         with open(os.path.join(CK, f'ck-{b + 1:06d}.pkl'), 'wb') as fh: pickle.dump({'P': jax.device_get(P), 'O': jax.device_get(O), 'buoc': b + 1, 'MU': MU, 'SD': SD}, fh)
         for cu in sorted(glob.glob(os.path.join(CK, 'ck-*.pkl')))[:-3]: os.remove(cu)
