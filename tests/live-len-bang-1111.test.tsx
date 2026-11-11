@@ -129,7 +129,7 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
     expect(t.style.getPropertyValue('--doi')).toBe(`var(${DOI_BPU[2].mau})`) // màu đội của Minh Anh, không phải đội của em cầm máy (Natri)
     expect(t.parentElement).toBe(document.querySelector('.lv')) // nổi trên lớp bảng: không nằm trong khung nào ⇒ không dịch bố cục
     // thẻ tên đã ở chỗ; dấu giữ chỗ nhưng CHƯA hiện (tấm sẽ bay về đó)
-    expect(chu(the())).toBe('Minh Anh'); expect(the()!.getAttribute('aria-label')).toBe('Bạn Minh Anh trên bảng · Đội Đồng')
+    expect(chu(the())).toBe('Minh Anh'); expect(the()!.getAttribute('aria-label')).toBe('Bạn Minh Anh lên bảng · Đội Đồng')
     expect(dauNho()!.hasAttribute('data-cho')).toBe(true)
     // khung bảng nhường đúng 26 px cho dải thẻ tên; dải nằm ngoài khung bảng (anh em với khung, không lồng)
     expect(parseFloat(document.querySelector<HTMLElement>('.lv-bang')!.style.height)).toBe(caoTruoc - DAU_BANG)
@@ -199,7 +199,7 @@ describe('máy em đang ở bảng live: thầy gọi em lên bảng', () => {
     gioGia()
     goiLenBang(st, 'S5', [], 3000); m.lai()
     expect(chu(tam()[0]!)).toBe('Em lên bảngMinh Anh · Đội Đồng'); expect(tam()[0]!.hasAttribute('data-em')).toBe(true)
-    expect(the()!.getAttribute('aria-label')).toBe('Em trên bảng · Đội Đồng')
+    expect(the()!.getAttribute('aria-label')).toBe('Em lên bảng · Đội Đồng')
     qua(GIUA_MS + 20); qua(THU_MS + 60)
     expect(tam().length).toBe(0); expect(chu(dauNho())).toBe('đang lên bảng'); expect(dauNho()!.getAttribute('aria-label')).toBe('Em đang lên bảng')
   })

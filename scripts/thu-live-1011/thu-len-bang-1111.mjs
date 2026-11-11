@@ -194,7 +194,7 @@ for (const e of [e7, e2]) {
 kiem(`THU NHỎ · ảnh máy 844 chụp giữa đường bay (bắt đầu chụp ${treChup} ms sau khi bắt đầu thu)`, treChup >= 100 && treChup < 260)
 for (const e of [e1, e2, e3, e4, e5, e7]) {
   const m = await lb(e.t)
-  kiem(`THỜI GIAN · ${e.sbd}: tấm đứng ${Math.round(m.thu - m.hien)} ms (3 giây ± 0,25), thu trong ${Math.round(m.mat - m.thu)} ms (≤ 450 + một khung), chưa lúc nào có hai tấm`, m.hien > 0 && Math.abs(m.thu - m.hien - 3000) <= 250 && m.mat - m.thu > 0 && m.mat - m.thu <= 480 && m.nhieu === 1, JSON.stringify(m.ten))
+  kiem(`THỜI GIAN · ${e.sbd}: tấm đứng ${Math.round(m.thu - m.hien)} ms (3 giây ± 0,25), thu trong ${Math.round(m.mat - m.thu)} ms (chuyển tiếp 400 ms, gỡ ở 440 ms; cho trễ ≤ 80 ms vì máy thử chạy 7 trang Chromium cùng lúc), chưa lúc nào có hai tấm`, m.hien > 0 && Math.abs(m.thu - m.hien - 3000) <= 250 && m.mat - m.thu >= 400 && m.mat - m.thu <= 520 && m.nhieu === 1, JSON.stringify(m.ten))
   // hạ cánh: lúc phép dời chạy xong, tâm tấm trùng tâm dấu nhỏ (kể cả iPhone dọc xoay CSS — phép đo chuỗi offset theo trục của hình)
   const dap = m.dap ?? (m.cuoi && m.cuoi.ms >= 370 ? m.cuoi : null)
   kiem(`HẠ CÁNH · ${e.sbd}${e.w < e.h ? ' (iPhone dọc, hình xoay CSS)' : ''}: tấm bay về ĐÚNG chỗ dấu cạnh thẻ tên (lệch ${dap ? kc(dap.tam, dap.dau).toFixed(1) : '?'} px${m.dap ? '' : ', mẫu khung cuối'})`, !!dap && kc(dap.tam, dap.dau) <= 3, dap ? JSON.stringify(dap) : 'không bắt được lúc dời xong')
@@ -264,9 +264,35 @@ await emGui(e1.t); await ngu(700)
 const moi = await hop(e1.t)
 kiem('LƯỢT MỚI · thẻ tên + dải mất; khung bảng cao lại như trước khi gọi', moi.the === null && moi.dai === null && moi.soTam === 0 && Math.abs((moi.bang[3] - moi.bang[1]) - (truoc.e1.bang[3] - truoc.e1.bang[1])) <= 0.6, `bảng ${JSON.stringify(moi.bang)}`)
 
+// ───────────── BẢNG ĐANG NHƯỜNG GIẤY (khung bảng hẹp, dải `data-hep`): thầy bấm «Lên bảng» lúc bảng còn trống ─────────────
+// Thầy gạch chân trên GIẤY (quá 2 giây ⇒ giấy được ưu tiên, khung bảng hẹp: 844 ~166 px) rồi mới gọi ⇒ dấu chỉ còn hình tròn nhỏ; thẻ tên vẫn đủ chữ,
+// không đè nhau, hạ cánh đúng.
+{
+  const de = await to.locator('.mc-than .mc-de').first().evaluate((e) => { const r = e.getBoundingClientRect(); return { x: r.left, y: r.bottom, w: r.width } })
+  await viet(de.x + de.w * 0.3, de.y + 3, de.w * 0.4, 1.2)
+  await ngu(2600)
+}
+const hepTruoc = { e1: await hop(e1.t), e3: await hop(e3.t) }
+await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S3', lyDo: [] })))
+await e1.t.locator('.lv-lb-tam').waitFor({ timeout: 4000 })
+await e3.t.locator('.lv .lv-lb-tam').waitFor({ timeout: 4000 })
+await ngu(3000 + 900)
+const hepTen = (t) => t.evaluate(() => { const b = document.querySelector('.lv-lb-the b'); return b ? { du: b.scrollWidth <= b.clientWidth + 0.5, chu: b.textContent } : null })
+let coHep = 0
+for (const [ten, e] of [['e1', e1], ['e3', e3]]) {
+  const k = await hop(e.t), m = await lb(e.t), tn = await hepTen(e.t), rongDai = k.dai ? k.dai[2] - k.dai[0] : 0
+  if (k.hep) coHep++
+  kiem(`BẢNG HẸP · ${ten} ${k.w} × ${k.h}: khung bảng ${Math.round(hepTruoc[ten].bang ? hepTruoc[ten].bang[2] - hepTruoc[ten].bang[0] : 0)} px ⇒ dải ${Math.round(rongDai)} px${k.hep ? ' (data-hep: dấu chỉ còn hình)' : ''}; thẻ «${tn?.chu}» đủ chữ, dấu cạnh thẻ không đè, cả hai trong dải, ngoài khung bảng; hạ cánh lệch ${m.dap ? kc(m.dap.tam, m.dap.dau).toFixed(1) : '?'} px`,
+    k.soTam === 0 && !!tn && tn.du && k.hep === (rongDai < 236) && !!k.dau && !giao(k.the, k.dau) && k.dau[0] >= k.the[2] + 3 && k.dau[2] <= k.dai[2] + 0.5 && k.the[0] >= k.dai[0] - 0.5
+    && !giao(k.the, k.bang) && !giao(k.dau, k.bang) && !giao(k.the, k.giay) && !giao(k.dau, k.giay) && (!k.hep || k.dau[2] - k.dau[0] <= 23) && k.dauMo === 1 && !!m.dap && kc(m.dap.tam, m.dap.dau) <= 3,
+    `dải ${JSON.stringify(k.dai)} · thẻ ${JSON.stringify(k.the)} · dấu ${JSON.stringify(k.dau)} · bảng ${JSON.stringify(k.bang)}`)
+}
+kiem('BẢNG HẸP · đã thật sự thử dải hẹp (ít nhất một máy có data-hep)', coHep > 0)
+await chup(e1.t, 'bang-hep-dau-chi-hinh-844'); await chup(e3.t, 'bang-hep-dau-chi-hinh-667')
+
 // ───────────── MÁY YẾU: không bay ─────────────
 const e8 = await trangEm('S8', 844, 390, 2, '&yeu=1')
-await emGui(e8.t); await ngu(600)
+await e8.t.locator('.lv').waitFor({ timeout: 8000 }); await ngu(600) // đang có bạn S3 lên bảng ⇒ máy vào thẳng bảng live (không phát lại tấm)
 await thay.evaluate(() => window.__ws.send(JSON.stringify({ t: 'goi', sbd: 'S1', lyDo: [] })))
 await e8.t.locator('.lv-lb-tam').waitFor({ timeout: 4000 })
 await ngu(500)

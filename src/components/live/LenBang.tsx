@@ -63,7 +63,7 @@ export function TheLenBang({ em, cho, dau }: { em: EmLenBang; cho: boolean; dau:
   const doi = tenDoi(em.doi)
   return (
     <>
-      <span className="lv-lb-the" style={mauDoi(em.doi)} role="img" aria-label={`${em.laEm ? 'Em' : `Bạn ${em.ten}`} trên bảng${doi ? ` · ${doi}` : ''}`}><i aria-hidden="true" /><b aria-hidden="true">{em.ten}</b></span>
+      <span className="lv-lb-the" style={mauDoi(em.doi)} role="img" aria-label={`${em.laEm ? 'Em' : `Bạn ${em.ten}`} lên bảng${doi ? ` · ${doi}` : ''}`}><i aria-hidden="true" /><b aria-hidden="true">{em.ten}</b></span>
       {em.dang ? <span ref={dau} className="lv-lb-dau" style={mauDoi(em.doi)} data-cho={cho || undefined} role="img" aria-label={nhanDau(em)}><BtBang /><em aria-hidden="true">đang lên bảng</em></span> : null}
     </>
   )
