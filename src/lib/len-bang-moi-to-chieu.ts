@@ -758,7 +758,7 @@ ${JS_THANH_DAY}
   function moPhim() {
     var ds = [['L', 'Gọi em lên bảng (hiệu ứng gọi tên)'], ['G', 'Mở / đóng lời giải (ngay dưới đề, trong 2/3)'], ['Space', 'Lời giải đang mở: hiện mục tiếp — hết mục thì lật trang / cuộn'],
       ['↓ PageDown', 'Chờ gọi: lật trang của câu · Đang chữa: cuộn một khung'], ['↑ PageUp', 'Trang trước / cuộn lên'], ['← →', 'Đổi đợt'],
-      ['C', 'Thầy chữa câu này (không gọi em)'], ['X', 'Học sinh làm sai câu này (giờ, ca, thời gian làm)'], ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], PHIM_BUT[0], PHIM_BUT[1], PHIM_BUT[2], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
+      ['C', 'Thầy chữa câu này (không gọi em)'], ['X', 'Học sinh làm sai câu này (giờ, ca, thời gian làm)'], ['D / K', 'Ghi Đạt / Chưa đạt'], ['T', 'Dải thống kê cả lớp'], PHIM_BUT[0], PHIM_BUT[1], PHIM_BUT[2], ['Tab', 'Lưới tổng quan các đợt'], ['số + Enter', 'Nhảy tới đợt'], ['Home / End', 'Đợt đầu / cuối'], ['V', 'Live: bật live / mở cửa sổ Live'], ['N', 'Live: mở / đóng thẻ «Đang nói» (em đang nói, em giơ tay)'], ['F', 'Toàn màn hình'], ['Esc', 'Đóng lớp đang mở'], ['?', 'Bảng này']];
     phim.innerHTML = '<div class="mc-h"><h2>Phím tắt</h2><dl>' + ds.map(function (x) { return '<dt>' + x[0].split(' ').map(function (k) { return k === '/' || k === '+' || k === 'số' ? k : '<kbd>' + k + '</kbd>'; }).join(' ') + '</dt><dd>' + x[1] + '</dd>'; }).join('') + '</dl></div>';
     phim.classList.add('mc-mo');
   }
