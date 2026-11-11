@@ -1,0 +1,18 @@
+{
+  "lo": 344,
+  "newMainChanges": "So343 chỉnh TrongHs và test một trang HS, thêm đặc tả/ảnh làm bù; server/Vite/font/mốc nguyênbyte.",
+  "productionChangedThisBatch": false,
+  "colorViolations": 955,
+  "colorCheckerFiles": 186,
+  "sizeBaselineRed": {
+    "file": "server/src/index.ts",
+    "bytes": 297644,
+    "sha256": "6dcb6ec27a48a83722658c956485e0b64e83c22a784e4d210357582d877e3adf"
+  },
+  "mainMocSha": "2c8c45be8ab06dfb7ee3d825eecc0a6eca1f642068971483bf6e3c2f52d058c1",
+  "branchMocSha": "f762cef714985c2b200e382d62736fdbf06c5c6262f026da94b2d477dbd46fde",
+  "latestMainBuildSpeedRequiredBeforeMergeRelease": true,
+  "scope": "Cổng lô344 chỉ nhánh hiện tại, productionoldfonts/assets; chưa phải latestmain build-speed/full.",
+  "main": "de7513e6f6dc5a71c83998649bc69689b4f3570f",
+  "comparedToMain343": "50b46004ea298baf037f9231945c7f63a7414a7a"
+}

@@ -1,0 +1,537 @@
+{
+  "i": 1017,
+  "hash": "b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0.png",
+  "size": [
+    900,
+    248
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C5-B17-D1-I-15",
+      "de": "Các đồ thị (1), (2), (3), (4) trong hình biểu diễn sự phụ thuộc khối lượng của điện cực theo thời gian điện phân khi duy trì cường độ dòng điện một chiều không đổi.\nTiến hành điện phân dung dịch $\\ce{CuSO4}$ với anode bằng copper (Cu) và cathode bằng thép. Đồ thị nào biểu diễn đúng nhất sự biến thiên khối lượng của anode trong quá trình điện phân?",
+      "allHinh": [
+        {
+          "hash": "b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0",
+          "where": "VIP27-C5-B17-D1-I-15.hinh.0.du_lieu",
+          "hashDataUrl": "9b2b29c60b9ec40f47232bc8b8f3efafa59fd50d7d079371d5702b9bb1a98e98"
+        }
+      ],
+      "missingHashes": [
+        "b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "affectedQids": [
+      "VIP27-C5-B17-D1-I-15"
+    ],
+    "newFullIfSourceAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownPanel1Macro3xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "coordinateMeaning": "Native pixel centerline/bbox approximately nearest1px. These are graphic locations, NOT mass/time numeric measurements. Parent should inspect native arrowheads/ink independently.",
+  "geometry": {
+    "classification": "Four independent conceptual graphs, single horizontal row, preserve source option order.",
+    "panels": [
+      {
+        "caption": {
+          "text": "(1)",
+          "bbox": [
+            110,
+            217,
+            137,
+            234
+          ],
+          "font": "truebold upright serif"
+        },
+        "origin": [
+          52,
+          189
+        ],
+        "axes": {
+          "vertical": [
+            [
+              52,
+              189
+            ],
+            [
+              52,
+              18
+            ]
+          ],
+          "horizontal": [
+            [
+              52,
+              189
+            ],
+            [
+              196,
+              189
+            ]
+          ],
+          "heads": "Two FILLED triangular heads; UP and RIGHT. No head at origin.",
+          "verticalTriangle": [
+            [
+              52,
+              18
+            ],
+            [
+              47,
+              27
+            ],
+            [
+              57,
+              27
+            ]
+          ],
+          "horizontalTriangle": [
+            [
+              196,
+              189
+            ],
+            [
+              187,
+              184
+            ],
+            [
+              187,
+              194
+            ]
+          ]
+        },
+        "plotLine": [
+          [
+            52,
+            120
+          ],
+          [
+            184,
+            120
+          ]
+        ],
+        "labels": [
+          {
+            "text": "Khối lượng điện cực",
+            "bbox": [
+              24,
+              21,
+              45,
+              179
+            ],
+            "rotation": -90,
+            "font": "regular upright serif rotated"
+          },
+          {
+            "text": "Thời gian",
+            "bbox": [
+              127,
+              198,
+              193,
+              213
+            ],
+            "font": "regular upright serif"
+          },
+          {
+            "text": "0",
+            "bbox": [
+              41,
+              192,
+              50,
+              205
+            ],
+            "font": "regular upright serif"
+          }
+        ]
+      },
+      {
+        "caption": {
+          "text": "(2)",
+          "bbox": [
+            335,
+            217,
+            362,
+            234
+          ],
+          "font": "truebold upright serif"
+        },
+        "origin": [
+          278,
+          189
+        ],
+        "axes": {
+          "vertical": [
+            [
+              278,
+              189
+            ],
+            [
+              278,
+              18
+            ]
+          ],
+          "horizontal": [
+            [
+              278,
+              189
+            ],
+            [
+              423,
+              189
+            ]
+          ],
+          "heads": "Two FILLED triangular heads; UP and RIGHT. No head at origin.",
+          "verticalTriangle": [
+            [
+              278,
+              18
+            ],
+            [
+              273,
+              27
+            ],
+            [
+              283,
+              27
+            ]
+          ],
+          "horizontalTriangle": [
+            [
+              423,
+              189
+            ],
+            [
+              414,
+              184
+            ],
+            [
+              414,
+              194
+            ]
+          ]
+        },
+        "plotLine": [
+          [
+            278,
+            120
+          ],
+          [
+            405,
+            59
+          ]
+        ],
+        "labels": [
+          {
+            "text": "Khối lượng điện cực",
+            "bbox": [
+              250,
+              21,
+              271,
+              179
+            ],
+            "rotation": -90,
+            "font": "regular upright serif rotated"
+          },
+          {
+            "text": "Thời gian",
+            "bbox": [
+              353,
+              198,
+              420,
+              213
+            ],
+            "font": "regular upright serif"
+          },
+          {
+            "text": "0",
+            "bbox": [
+              266,
+              192,
+              275,
+              205
+            ],
+            "font": "regular upright serif"
+          }
+        ]
+      },
+      {
+        "caption": {
+          "text": "(3)",
+          "bbox": [
+            556,
+            217,
+            584,
+            234
+          ],
+          "font": "truebold upright serif"
+        },
+        "origin": [
+          500,
+          189
+        ],
+        "axes": {
+          "vertical": [
+            [
+              500,
+              189
+            ],
+            [
+              500,
+              18
+            ]
+          ],
+          "horizontal": [
+            [
+              500,
+              189
+            ],
+            [
+              644,
+              189
+            ]
+          ],
+          "heads": "Two FILLED triangular heads; UP and RIGHT. No head at origin.",
+          "verticalTriangle": [
+            [
+              500,
+              18
+            ],
+            [
+              495,
+              27
+            ],
+            [
+              505,
+              27
+            ]
+          ],
+          "horizontalTriangle": [
+            [
+              644,
+              189
+            ],
+            [
+              635,
+              184
+            ],
+            [
+              635,
+              194
+            ]
+          ]
+        },
+        "plotLine": [
+          [
+            500,
+            120
+          ],
+          [
+            632,
+            161
+          ]
+        ],
+        "labels": [
+          {
+            "text": "Khối lượng điện cực",
+            "bbox": [
+              472,
+              21,
+              493,
+              179
+            ],
+            "rotation": -90,
+            "font": "regular upright serif rotated"
+          },
+          {
+            "text": "Thời gian",
+            "bbox": [
+              575,
+              198,
+              642,
+              213
+            ],
+            "font": "regular upright serif"
+          },
+          {
+            "text": "0",
+            "bbox": [
+              489,
+              192,
+              498,
+              205
+            ],
+            "font": "regular upright serif"
+          }
+        ]
+      },
+      {
+        "caption": {
+          "text": "(4)",
+          "bbox": [
+            798,
+            217,
+            826,
+            234
+          ],
+          "font": "truebold upright serif"
+        },
+        "origin": [
+          744,
+          189
+        ],
+        "axes": {
+          "vertical": [
+            [
+              744,
+              189
+            ],
+            [
+              744,
+              18
+            ]
+          ],
+          "horizontal": [
+            [
+              744,
+              189
+            ],
+            [
+              888,
+              189
+            ]
+          ],
+          "heads": "Two FILLED triangular heads; UP and RIGHT. No head at origin.",
+          "verticalTriangle": [
+            [
+              744,
+              18
+            ],
+            [
+              739,
+              27
+            ],
+            [
+              749,
+              27
+            ]
+          ],
+          "horizontalTriangle": [
+            [
+              888,
+              189
+            ],
+            [
+              879,
+              184
+            ],
+            [
+              879,
+              194
+            ]
+          ]
+        },
+        "plotLine": [
+          [
+            744,
+            189
+          ],
+          [
+            873,
+            87
+          ]
+        ],
+        "labels": [
+          {
+            "text": "Khối lượng điện cực",
+            "bbox": [
+              716,
+              21,
+              737,
+              179
+            ],
+            "rotation": -90,
+            "font": "regular upright serif rotated"
+          },
+          {
+            "text": "Thời gian",
+            "bbox": [
+              819,
+              198,
+              886,
+              213
+            ],
+            "font": "regular upright serif"
+          },
+          {
+            "text": "0",
+            "bbox": [
+              733,
+              192,
+              742,
+              205
+            ],
+            "font": "regular upright serif"
+          }
+        ]
+      }
+    ],
+    "counts": {
+      "panels": 4,
+      "axisShafts": 8,
+      "filledHeads": 8,
+      "plotSegments": 4,
+      "zeroLabels": 4,
+      "xLabels": 4,
+      "yLabels": 4,
+      "boldCaptions": 4,
+      "ticks": 0,
+      "grid": 0,
+      "numericDataLabels": 0
+    },
+    "lineNotes": [
+      "Panel1 finite horizontal frompositiveyintercept.",
+      "Panel2 rises frompositiveyintercept, doesnotstartorigin.",
+      "Panel3 falls frompositiveyintercept, stopsabovexaxis.",
+      "Panel4 rises FROMorigin; endpointnotextraarrowhead."
+    ],
+    "noAdded": [
+      "massunits",
+      "timeunits",
+      "numericticks",
+      "grid",
+      "plotlinearrowheads",
+      "correctoptionhighlight",
+      "electrode/copperlabels",
+      "solution"
+    ]
+  },
+  "corrections": [
+    {
+      "field": "size",
+      "oldEarlyChat": [
+        900,
+        243
+      ],
+      "newVerifiedPillow": [
+        900,
+        248
+      ],
+      "reason": "Earlyvisualestimateincorrect; native exactsize readwithPillow."
+    }
+  ],
+  "actualSvgReviewed": false,
+  "rootAudit": {
+    "nativeFullOpened": true,
+    "allPublicDeRead": true,
+    "actualChromium3xFullOpened": true,
+    "hashSvg": "4607903da7db3844578d764f5c95135694b325bd8363cfc210f06668b5ed9a77",
+    "details": "4plots/8filledheads/4zero/regularaxislabels/4trueDAMcaptions; first3intercepty120,lastorigin744189. Noaddedunit/grid/ticks/answer. Sourceactual900×248 (earlyagent243wrongcorrected)."
+  }
+}

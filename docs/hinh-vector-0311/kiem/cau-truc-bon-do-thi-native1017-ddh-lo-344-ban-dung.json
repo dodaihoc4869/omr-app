@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1017,
+    "hash": "b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0",
+    "fileNguon": "anh/b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0.png",
+    "svg": "bon-do-thi-native1017-ddh-4607903da7db3844578d764f5c95135694b325bd8363cfc210f06668b5ed9a77.svg",
+    "hashSvg": "4607903da7db3844578d764f5c95135694b325bd8363cfc210f06668b5ed9a77",
+    "byteSvg": 67180,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B17-D1-I-15",
+        "de": "Các đồ thị (1), (2), (3), (4) trong hình biểu diễn sự phụ thuộc khối lượng của điện cực theo thời gian điện phân khi duy trì cường độ dòng điện một chiều không đổi.\nTiến hành điện phân dung dịch $\\ce{CuSO4}$ với anode bằng copper (Cu) và cathode bằng thép. Đồ thị nào biểu diễn đúng nhất sự biến thiên khối lượng của anode trong quá trình điện phân?",
+        "refs": [
+          {
+            "hash": "b6651243b7a6642011831be7cbc88f2794d09bac1d30f46a8545583dd8a54fb0",
+            "where": "VIP27-C5-B17-D1-I-15.hinh.0.du_lieu",
+            "hashDataUrl": "9b2b29c60b9ec40f47232bc8b8f3efafa59fd50d7d079371d5702b9bb1a98e98"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4graphs4straightlines-horizontal-rising-falling-originrising/8FILLEDheads/4origin0/4regularuprightKhối lượng điện cực-Thời gian/4trueDAMuprightcaptions1-4/0ticks0grid/noaddedunits-data-answer",
+    "hashSvgDaSoat": "4607903da7db3844578d764f5c95135694b325bd8363cfc210f06668b5ed9a77",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
