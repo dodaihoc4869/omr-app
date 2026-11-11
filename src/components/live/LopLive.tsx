@@ -145,13 +145,13 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, nang, de, 
       {tt.tieng !== 'chua-cau-hinh' ? <button type="button" aria-pressed={nghe} aria-label={nghe ? 'Tiếng thầy: đang bật. Chạm để tắt' : 'Tiếng thầy: đang tắt. Chạm để bật'} onClick={doiTieng}>{nghe ? <BtLoa /> : <BtLoaTat />}</button> : null}
     </div>
   )
-  return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} doi={doi} matMang={matMang} emTat={emTat && duocMic} batMic={batMic} tatMic={tatMic} />
+  return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} doi={doi} matMang={matMang} emTat={emTat && duocMic} batMic={batMic} tatMic={tatMic} ghi={!!view.ghi} />
 }
 
-interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; doi: PropsLopLive['doi']; matMang: boolean; emTat: boolean; batMic: () => void; tatMic: () => void }
+interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; doi: PropsLopLive['doi']; matMang: boolean; emTat: boolean; batMic: () => void; tatMic: () => void; /** Xem lại Live: buổi live đang được ghi (điểm quyết 2). */ ghi?: boolean }
 interface BoCuc { xoay: boolean; w: number; h: number; s: number; x: number; y: number; namDe: boolean; kc: KhungChieu; giayToi: boolean }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, tatMic }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic, tatMic, ghi }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), cvChot = useRef<HTMLCanvasElement>(null), cvSong = useRef<HTMLCanvasElement>(null), tro = useRef<HTMLDivElement>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const veB = useRef<VeBang | null>(null)
@@ -343,7 +343,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, doi, matMang, emTat, batMic,
         : phongTo ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
       {/* Em lên bảng: mic đang mở thì thẻ LUÔN HIỆN (không tự ẩn). Máy khác: dải «Bạn … đang nói». */}
       {micMo || tt.mic === 'xin-quyen' ? (
-        <div ref={theMic} className="lv-noi" role="status"><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><b>{micMo ? 'Mic của em đang bật' : 'Đang bật mic…'}</b><small>Thầy và cả lớp đang nghe</small><button type="button" onClick={tatMic}>Tắt mic</button></div>
+        <div ref={theMic} className="lv-noi" role="status"><span className="lv-song" aria-hidden="true"><i /><i /><i /><i /><i /></span><b>{micMo ? 'Mic của em đang bật' : 'Đang bật mic…'}</b><small>Thầy và cả lớp đang nghe</small>{ghi ? <small>Đang ghi để lớp xem lại</small> : null}<button type="button" onClick={tatMic}>Tắt mic</button></div>
       ) : emTat ? <button type="button" className="lv-bat-tieng mic" onClick={batMic}><BtMic />Bật mic lại</button>
         : tt.mic === 'tu-choi' || tt.mic === 'loi' ? <div className="lv-bao nho duoi" role="status">{tt.mic === 'tu-choi' ? 'Máy em chưa cho dùng mic · em nói to cho thầy nghe, hoặc mở Cài đặt trình duyệt để cho phép' : 'Chưa bật được mic · em nói to cho thầy nghe'}</div>
         : banNoi && !phongTo ? <div ref={daiBan} className="lv-bao nho duoi ban" role="status" style={{ ['--doi' as string]: `var(${DOI_BPU[banNoi.doi]?.mau ?? '--tr-chieu-giay'})` }}><span className="ky" aria-hidden="true">{kyHieu(banNoi.ten)}</span>Bạn {tenNgan(banNoi.ten)} đang nói<span className="lv-song" aria-hidden="true"><i /><i /><i /></span></div> : null}

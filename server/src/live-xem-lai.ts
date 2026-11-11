@@ -163,7 +163,8 @@ export class NhatKyXl {
     this.vet = r.vet
     if (m.xoa && vuaBat) { m.xoa = false; m.don = false } // thầy đã xoá buổi rồi live lại ⇒ ghi buổi mới từ đầu
     for (const e of r.suKien) this.skCho.push(e)
-    if (r.chup) { await this.kho.put(`xl:l:${r.chup.so}`, r.chup); if (!m.luot.includes(r.chup.so)) m.luot.push(r.chup.so) }
+    // Ảnh chụp lượt quá lớn (đề kèm ảnh nặng) không ghi được ⇒ bỏ câu ấy khỏi bản xem lại, KHÔNG làm đứt nhật ký.
+    if (r.chup) { try { await this.kho.put(`xl:l:${r.chup.so}`, r.chup); if (!m.luot.includes(r.chup.so)) m.luot.push(r.chup.so) } catch (e) { console.error('[live-xem-lai] ảnh chụp lượt lỗi:', e instanceof Error ? e.message : e) } }
     if (vuaBat) {
       m.daLive = true; m.mat = null; m.don = false
       if (this.henChotH) { clearTimeout(this.henChotH); this.henChotH = null }

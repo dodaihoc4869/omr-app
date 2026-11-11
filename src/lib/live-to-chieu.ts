@@ -26,6 +26,12 @@ body.mc .mc-thanh .mc-lv-cum{flex:none;display:inline-flex;align-items:stretch;m
 .mc-lv-muc i{display:block;width:.28em;border-radius:.1em;background:color-mix(in srgb,var(--mc-bang-chu) 35%,transparent)}
 .mc-lv-muc i.b{background:var(--mc-bang-chu)}
 .mc-lv-cum.vang{background:var(--mc-qua-nen);color:var(--mc-qua-chu);box-shadow:none}
+/* Xem lại Live (11/11): ngăn «Đang ghi để xem lại» trong viên Live; chưa ghi được ⇒ ngăn vàng, live vẫn chạy. Thẻ nhắc một lần dùng lại khung .mc-lv-noi. */
+.mc-lv-cum>span.ghi-loi{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}
+.mc-lv-ghi-nhac h3{display:flex;align-items:center;gap:.4em}
+.mc-lv-ghi-nhac p{margin:calc(var(--u)*.3) 0 0;color:var(--mc-bang-phu);font:500 calc(var(--u)*.9)/1.45 var(--mc-sans)}
+.mc-lv-ghi-nhac p b{color:var(--mc-bang-chu)}
+@media (max-width:1180px){.mc-lv-cum>span.ghi b{display:none}}
 .mc-lv-cum .im{animation:mcLvNhay 1s steps(2,jump-none) infinite}
 @keyframes mcLvNhay{from{background:transparent;color:inherit}to{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}}
 body.mc-live .mc-thanh [data-k="T"] .mc-nut-chu,body.mc-live .mc-thanh [data-k="Tab"] .mc-nut-chu{display:none}
@@ -139,6 +145,8 @@ export const JS_LIVE_TO_CHIEU = `
     function ky(e) { var m = lvMau(e.mau); return '<b class="mc-lv-ky"' + (m ? ' style="--doi:' + m + '"' : '') + '>' + lvSach(e.ky) + '</b>'; }
     lvVien.hidden = !n;
     if (!n) LV.moRoi = false;
+    // Xem lại Live: thẻ nhắc MỘT lần «Thầy không cần bấm gì thêm» (app thầy quyết lúc hiện, tự tắt sau vài giây)
+    if (live && LV.tt.nhacGhi) h += '<div class="mc-lv-noi mc-lv-ghi-nhac" role="status"><h3>' + LV_BT.mic + 'Đang tự ghi để lớp xem lại</h3><p><b>Thầy không cần bấm gì thêm.</b></p><p>Tắt live hoặc kết thúc buổi là app tự cắt đoạn, đặt tên và dựng trang xem lại.</p></div>';
     // em lên bảng đang mở mic: thẻ «Đang nói» + «Thu mic»
     if (noi.length) {
       h += '<div class="mc-lv-noi" role="status"><h3>Đang nói</h3>';
@@ -188,6 +196,13 @@ export const JS_LIVE_TO_CHIEU = `
     else h += '<button type="button" class="mc-lv-n do" data-lv="' + (LV.tt.coTieng ? 'bat-dau' : 'khong-tieng') + '"><i></i>Bắt đầu live</button><button type="button" class="mc-lv-n" data-lv="the-dong">Để sau</button>';
     lvThe.innerHTML = h + '</div>';
   }
+  /** Xem lại Live: ngăn ghi của viên Live. ghi vắng = công tắc tắt ⇒ không vẽ. Máy ghi chưa báo trong 15 giây đầu ⇒ chưa vẽ gì (đang khởi động). */
+  function lvNganGhi(t) {
+    if (!t.ghi) return '';
+    if (t.ghi === 'dang-ghi') return '<span class="ghi" role="status">' + LV_BT.mic + 'Đang ghi<b>&nbsp;để xem lại</b></span>';
+    if (t.ghi === 'loi' || Date.now() - (t.tu || Date.now()) > 15000) return '<span class="ghi-loi" role="status">Chưa ghi được · live vẫn chạy</span>';
+    return '';
+  }
   function lvVeMuc(v) {
     var ds = lvCum.querySelectorAll('.mc-lv-muc i'), n = Math.round(Math.min(1, v * 2.2) * ds.length), i, th = document.getElementById('mc-lv-th'), nx = document.getElementById('mc-lv-nx');
     for (i = 0; i < ds.length; i++) ds[i].className = i < n ? 'b' : '';
@@ -212,8 +227,9 @@ export const JS_LIVE_TO_CHIEU = `
         for (i = 0; i < 7; i++) h += '<i style="height:' + [36, 59, 82, 100, 73, 45, 27][i] + '%"></i>';
         lvCum.innerHTML = '<span><i class="cham"></i>LIVE <b id="mc-lv-dh">' + lvDongHo(t.tu || Date.now()) + '</b></span>'
           + '<span>' + LV_BT.mat + '<b>' + t.xem + '</b><small>/' + t.tong + ' em xem</small></span>'
-          + (t.coTieng && !t.khongTieng ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>Không tiếng</span>');
-        LV.hDh = setInterval(function () { var d = document.getElementById('mc-lv-dh'); if (d && LV.tt && LV.tt.tu) d.textContent = lvDongHo(LV.tt.tu); if (LV.moRoi) lvVeRoi(); }, 1000);
+          + (t.coTieng && !t.khongTieng ? '<span class="' + (t.micIm ? 'im' : '') + '" aria-label="Mức mic">' + LV_BT.mic + (t.micIm ? 'Mic đang im' : '<span class="mc-lv-muc">' + h + '</span>') + '</span>' : '<span>Không tiếng</span>')
+          + lvNganGhi(t);
+        LV.hDh = setInterval(function () { var d = document.getElementById('mc-lv-dh'); if (d && LV.tt && LV.tt.tu) d.textContent = lvDongHo(LV.tt.tu); if (LV.moRoi) lvVeRoi(); if (LV.tt && LV.tt.ghi === 'tat' && !lvCum.querySelector('.ghi-loi') && Date.now() - (LV.tt.tu || Date.now()) > 15000) lvVe(); }, 1000);
       }
     }
     lvVeThe();
