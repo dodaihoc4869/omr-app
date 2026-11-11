@@ -81,10 +81,24 @@ describe('docNhieuTrangThaiLoiDau — câu đi chỉ mục trả đúng tập d�
     expect((d.sql.prepare(SKH_CU).all('E1', TU_NGAY, tat, tcList) as unknown[]).length).toBeGreaterThanOrEqual(10)
     expect((d.sql.prepare(HOI_CU).all('E1', `${TU_NGAY}T00:00:00`) as unknown[]).length).toBeGreaterThanOrEqual(10)
   })
-  it('đường thật (env.DB) chạy được và có kết quả', async () => {
-    const d = dung(7)
-    const ra = await docNhieuTrangThaiLoiDau(d.env, 'E1', ['Q1', 'H5~ss1', 'tc:Z9'], '2026-11-11')
-    expect(ra.size).toBeGreaterThan(0)
+  it('đầu-cuối: docNhieuTrangThaiLoiDau với câu MỚI cho đúng y Map kết quả (cả loiHoc) như với câu CŨ', async () => {
+    let thay = 0
+    for (const hat of [1, 7, 42, 2026]) {
+      const d = dung(hat), goc = d.env.DB
+      // Bản «cũ»: thay đúng hai câu mới bằng câu cũ, sắp lại tham số; mọi câu khác giữ nguyên.
+      const envCu = { ...d.env, DB: { ...goc, prepare: (q: string) => {
+        if (q === SQL_LOI_DAU_SKH) { thay++; return { bind: (...a: unknown[]) => goc.prepare(SKH_CU).bind(a[0], a[2], a[1], a[4]) } }
+        if (q === SQL_LOI_DAU_HOI) { thay++; return { bind: (...a: unknown[]) => goc.prepare(HOI_CU).bind(a[1], a[2]) } }
+        return goc.prepare(q)
+      } } } as unknown as typeof d.env
+      for (const sbd of ['E1', 'E2']) for (const qs of [['Q1'], ['Q1', 'H5~ss1', 'tc:Z9'], ['Q12#2', 'H50', 'Q2~bt1'], ['Q1', 'Q12', 'Q2', 'H5', 'H50', 'Z9']]) {
+        const moi = await docNhieuTrangThaiLoiDau(d.env, sbd, qs, '2026-11-11')
+        const cu = await docNhieuTrangThaiLoiDau(envCu, sbd, qs, '2026-11-11')
+        expect([...moi].sort()).toEqual([...cu].sort())
+        if (sbd === 'E1' && qs.length > 3) expect(moi.size).toBeGreaterThan(0)
+      }
+    }
+    expect(thay).toBe(4 * 2 * 4 * 2) // mọi lượt bản cũ đều chạy đúng hai câu cũ
   })
   it('kế hoạch truy vấn: nhánh qid đi idx_skh_em_qid_ngay, nhánh tc đi idx_skh_em_tc, dấu hỗ trợ dò khoảng qid', () => {
     const d = taoD1That()
