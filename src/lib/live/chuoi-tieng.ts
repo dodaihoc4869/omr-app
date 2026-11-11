@@ -44,6 +44,9 @@ export interface ChuoiTieng {
   datLocOn?: (muc: MucLocOn) => void
   /** Bộ lọc ồn riêng: 'chay' = đang lọc · 'tai' = đang tải · 'tat' · 'loi' = tải / chạy lỗi (đang không lọc). */
   locOn?: 'chay' | 'tai' | 'tat' | 'loi'
+  /** Kiểu 'khung': mức RMS mic VÀO (trước xử lý) Worker báo mỗi giây + lúc báo (Date.now) — lưới an toàn phía gửi biết mic có tiếng mà không cần AudioContext. */
+  vao?: number
+  vaoLuc?: number
 }
 
 /** Mã của bộ xử lý (chạy trong luồng âm thanh; viết ES5 + lớp, không phụ thuộc gì). Mỗi khối 128 mẫu:
@@ -92,7 +95,7 @@ registerProcessor('lam-ro-tieng', LamRoTieng);
 /** Mã Worker của kiểu 'khung': đọc từng khung tiếng (AudioData) của track mic, cộng các kênh về mono, lọc thông cao 80 Hz, nâng mức + chặn đỉnh (đúng thuật
  *  toán của LamRoTieng ở trên), ghi khung mới cùng mốc giờ. Một khung vào ⇒ một khung ra, không đệm. */
 const MA_KHUNG = `
-var rn = null, thDich = null, tre = 0, cu = new Float32Array(480), lk = 1, lc = 1, giu = 0, mucNoi = 0, z1 = [0, 0, 0, 0], z2 = [0, 0, 0, 0], T0 = { noi: 1, im: 1, cao: 1, san: 1 }, lb0 = 0, lb1 = 0, la1 = 0, la2 = 0, c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
+var vt = 0, rn = null, thDich = null, tre = 0, cu = new Float32Array(480), lk = 1, lc = 1, giu = 0, mucNoi = 0, z1 = [0, 0, 0, 0], z2 = [0, 0, 0, 0], T0 = { noi: 1, im: 1, cao: 1, san: 1 }, lb0 = 0, lb1 = 0, la1 = 0, la2 = 0, c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
 function napLoc(buf) {
   var bo, x;
   try {
@@ -135,6 +138,8 @@ function xuLy(f) {
   if (!tam || tam.length !== n) tam = new Float32Array(n);
   for (k = 0; k < kenh; k++) { f.copyTo(tam, { planeIndex: k, format: 'f32-planar' }); for (i = 0; i < n; i++) x[i] += tam[i]; }
   f.close();
+  for (i = 0, e = 0; i < n; i++) e += x[i] * x[i];
+  vt += e / n; e = 0;
   if (s !== hz) { hz = s; w = 2 * Math.PI * 80 / s; al = Math.sin(w) / (2 * 0.707); a = 1 + al; b0 = (1 + Math.cos(w)) / 2 / a; b1 = -(1 + Math.cos(w)) / a; b2 = b0; a1 = -2 * Math.cos(w) / a; a2 = (1 - al) / a; }
   for (i = 0; i < n; i++) { v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = v; x[i] = v; }
   if (n === 480 && s === 48000) { try { locOn(x); } catch (err) { rn = null; tre = 0; lk = 1; lc = 1; postMessage({ loc: 'loi' }); } } else if (!tre) cu.fill(0);
@@ -155,7 +160,7 @@ function xuLy(f) {
     if (a * gl > c.tran) gl = c.tran / a; else gl += (1 - gl) * nha;
     x[i] = v * gl;
   }
-  if (++bao >= 100) { bao = 0; postMessage({ g: g }); }
+  if (++bao >= 100) { postMessage({ g: g, v: Math.sqrt(vt / bao) }); bao = 0; vt = 0; }
   return new AudioData({ format: 'f32-planar', sampleRate: s, numberOfFrames: n, numberOfChannels: 1, timestamp: moc, data: x });
 }
 onmessage = function (ev) {
@@ -214,7 +219,7 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void): { 
     w = new Worker(u)
     const wk = w
     let muc: MucLocOn = 'tat', daGui = false
-    wk.onmessage = (e: MessageEvent) => { const d = e.data as { g?: number; loi?: string; loc?: 'chay' | 'loi' }; if (typeof d?.g === 'number' && d.g > 0) gNho = d.g; if (d?.loc) k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc; if (d?.loi) khiHong?.() }
+    wk.onmessage = (e: MessageEvent) => { const d = e.data as { g?: number; v?: number; loi?: string; loc?: 'chay' | 'loi' }; if (typeof d?.g === 'number' && d.g > 0) gNho = d.g; if (typeof d?.v === 'number') { k.vao = d.v; k.vaoLuc = Date.now() } if (d?.loc) k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc; if (d?.loi) khiHong?.() }
     k.locOn = 'tat'
     k.datLocOn = (m) => {
       muc = m
