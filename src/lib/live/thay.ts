@@ -274,7 +274,10 @@ export function taoLiveThay(tuy: TuyChonLiveThay) {
   /** LUẬT XỬ LÝ TIẾNG (thầy 11/11 «tiếng trong và cực rõ»): khử vọng + lọc ồn của trình duyệt làm đục giọng (nhất là mic cài áo) ⇒ chỉ bật khi CÓ ĐƯỜNG VỌNG:
    *  máy em trong lớp đang phát tiếng thầy ra loa (`tiengLop` — «Tất cả»), hoặc loa máy thầy đang phát tiếng em nói. Còn lại: tắt hai bộ ấy, giữ tự chỉnh âm
    *  lượng. Thầy ép «Luôn bật» / «Luôn tắt» bằng `datLoc`. */
-  const canLoc = (): boolean => (cheDoLoc === 'bat' ? true : cheDoLoc === 'tat' ? false : !!live?.tiengLop || (tt.ngheEm && !!tt.emNoi))
+  // 11/11 lần 4 (thầy: «Tự động bật tiếng … cho hs khi vào live» ⇒ `tiengLop` nay mặc định BẬT): bỏ điều kiện `tiengLop` khỏi luật tự động. Khử vọng của
+  // trình duyệt chỉ khử được tiếng do CHÍNH MÁY THẦY phát ra loa (nó cần tín hiệu tham chiếu); tiếng từ loa máy em trong lớp lọt vào mic thầy thì nó không khử
+  // được, bật lên chỉ làm đục giọng. Tự động = chỉ khi loa máy thầy đang phát tiếng em nói.
+  const canLoc = (): boolean => (cheDoLoc === 'bat' ? true : cheDoLoc === 'tat' ? false : tt.ngheEm && !!tt.emNoi)
   /** RÀNG BUỘC NỚI DẦN (mic USB có thể ra luồng CÂM khi trình duyệt bật xử lý tiếng): 0 theo luật lọc · 1 tắt khử vọng + lọc ồn · 2 mic thô · 3 mic thô +
    *  thiết bị chỉ là «ưu tiên». KHÔNG ép `channelCount` (chuỗi làm rõ tiếng tự cộng hai kênh về mono). */
   const SO_BAC = 4

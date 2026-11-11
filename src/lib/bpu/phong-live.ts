@@ -97,7 +97,7 @@ export function nhomKhung(ma: number): 'so' | 'diem' | null {
 /** Mục sổ nét làm sổ bắt đầu lại (xoá sạch / bảng mới) ⇒ phòng dọn phần cũ. */
 export const laMucDonSo = (ma: number): boolean => ma === MA_SO.xoaHet || ma === MA_SO.bangMoi
 
-const liveTrong = (): LivePhong => ({ cho: false, sfu: false, san: false, bat: false, tu: null, phien: 0, ss: null, tay: [], noi: [], bang: false, mic: null, micDong: [], xa: false, tiengLop: false, soNet: 0, nhip: 0, moi: null, micLoi: null, camMic: null, nk: [], giay: null })
+const liveTrong = (): LivePhong => ({ cho: false, sfu: false, san: false, bat: false, tu: null, phien: 0, ss: null, tay: [], noi: [], bang: false, mic: null, micDong: [], xa: false, tiengLop: true, soNet: 0, nhip: 0, moi: null, micLoi: null, camMic: null, nk: [], giay: null })
 /** Khối live của phòng; phòng lưu trước 10/11 (chưa có) ⇒ null = coi như công tắc tắt tới khi thầy mở lại phòng. */
 export const liveCua = (st: Pick<TrangThaiPhong, 'live'>): LivePhong | null => st.live ?? null
 const liveMo = (st: TrangThaiPhong): LivePhong | null => (st.live && st.live.cho && !st.ketThuc ? st.live : null)
@@ -162,6 +162,9 @@ export function liveSan(st: TrangThaiPhong, o: { san?: boolean; ss?: unknown }, 
 export function liveBat(st: TrangThaiPhong, nay: number): boolean {
   const l = liveMo(st)
   if (!l || l.bat) return false
+  // Thầy 11/11 lần 4: «Tự động bật tiếng … cho hs khi vào live» ⇒ lần bật live ĐẦU của buổi, máy em trong lớp cũng phát tiếng (phòng mở trước 11/11 còn giữ `tiengLop: false`).
+  // Các lần bật sau trong buổi giữ lựa chọn của thầy («Em ở xa» / «Tất cả»).
+  if (l.phien === 0) l.tiengLop = true
   l.bat = true; l.san = true; l.tu = nay; l.phien += 1; l.nhip = nay
   thuMic(l, nay, 'tat'); donDamThoai(l)
   // Bật live khi thầy ĐANG gọi một em lên bảng ⇒ máy em vào bảng live ngay; còn lại máy em giữ màn câu hỏi, chỉ có tiếng.
