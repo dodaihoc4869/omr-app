@@ -166,11 +166,11 @@ describe('doCotTra — kiểu phiếu khi (và chỉ khi) cột trả lời đ�
     const tra = document.querySelector<HTMLElement>('.bpu-tra')!
     Object.defineProperty(tra, 'scrollHeight', { configurable: true, value: cao })
     Object.defineProperty(tra, 'clientHeight', { configurable: true, value: khung })
-    const goc = window.getComputedStyle
-    vi.spyOn(window, 'getComputedStyle').mockImplementation((e, p) => (e instanceof HTMLElement && e.matches('.bpu-hs-than') ? ({ display: luoi ? 'grid' : 'flex' } as CSSStyleDeclaration) : goc(e, p)))
+    // ngang: cột đề là hộp thật (lưới hai cột) · dọc: `display: contents` ⇒ không có hộp
+    vi.spyOn(document.querySelector<HTMLElement>('.bpu-cot-de')!, 'getClientRects').mockImplementation(() => (luoi ? [new DOMRect(0, 0, 300, 300)] : []) as unknown as DOMRectList)
     return document.querySelector<HTMLElement>('.bpu-hs')!
   }
-  it('ngang (lưới) + cột tràn ⇒ data-gon; vừa ⇒ gỡ; dọc (không lưới) ⇒ không bao giờ; câu không có phương án / ý ⇒ không', () => {
+  it('ngang (cột đề có hộp) + cột tràn ⇒ data-gon; vừa ⇒ gỡ; dọc (cột đề display: contents) ⇒ không bao giờ; câu không có phương án / ý ⇒ không', () => {
     const g = dung(true, 520, 300)
     doCotTra(g)
     expect(g.querySelector('.bpu-cau')!.hasAttribute('data-gon')).toBe(true)

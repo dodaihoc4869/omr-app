@@ -45,15 +45,16 @@ export function YDeNgang({ q, Chu, tuLuan }: { q: Question; Chu?: ComponentType<
 export const coPhieu = (q: Pick<Question, 'phan' | 'choices' | 'ideas'> | null | undefined, tuLuan: boolean): boolean =>
   !!q && !tuLuan && (q.phan === 'II' ? q.ideas : q.phan === 'I' ? q.choices : [])?.length > 0
 
-/** Đặt / gỡ `data-gon` trên thân màn câu hỏi: chỉ khi thân đang là lưới hai cột (ngang) và cột trả lời đầy đủ phải cuộn mới thấy hết. Đo trong lượt dựng
+/** Đặt / gỡ `data-gon` trên thân màn câu hỏi: chỉ khi thân đang là hai cột (ngang — cột đề có hộp) và cột trả lời đầy đủ phải cuộn mới thấy hết. Đo trong lượt dựng
  *  (trước khi vẽ ⇒ không nháy), đo lại khi đổi khổ / xoay máy, khi phông nạp xong và hai nhịp sau (công thức, ảnh phương án nạp lười). Không vòng đo: gỡ cờ →
  *  đọc một lần → đặt cờ, chạy theo sự kiện, không theo ResizeObserver trên chính cột (đổi cờ đổi cỡ cột). */
 export function doCotTra(goc: HTMLElement | null): void {
   const than = goc?.querySelector<HTMLElement>('.bpu-hs-than.bpu-cau')
   if (!than) return
-  const tra = than.querySelector<HTMLElement>(':scope > .bpu-tra')
+  const tra = than.querySelector<HTMLElement>(':scope > .bpu-tra'), cot = than.querySelector<HTMLElement>(':scope > .bpu-cot-de')
   than.removeAttribute('data-gon')
-  if (!tra || !than.hasAttribute('data-phieu') || getComputedStyle(than).display !== 'grid') return
+  // dọc: cột đề là `display: contents` (không có hộp) ⇒ không bao giờ kiểu phiếu. Hỏi hộp thay vì getComputedStyle: rẻ hơn, nhất là máy yếu.
+  if (!tra || !than.hasAttribute('data-phieu') || !cot?.getClientRects().length) return
   if (tra.scrollHeight > tra.clientHeight + 1) than.setAttribute('data-gon', '')
 }
 /** Thuộc tính cho thân màn (`<main>`): màn câu hỏi ⇒ `.bpu-cau` (+ `data-phieu` khi có phương án / ý) và đo cột trả lời; màn khác ⇒ thân cuộn như cũ.
