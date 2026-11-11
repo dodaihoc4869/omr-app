@@ -167,14 +167,15 @@ TS = jnp.asarray(TS / TS.mean())
 def matMat(p, f, Ya, Sa, Ia, lamIm):
     M = matNa(p, f)
     c = 0.3
-    Sh = (M * Ya) ** c; St = Sa ** c
+    # +1e-7 trong mọi lũy thừa: ô bị thông thấp có biên độ ĐÚNG 0 ⇒ đạo hàm x^0,3 tại 0 vô cực ⇒ NaN (lượt 11/11 22:30 vỡ ở bước 7000 vì thế)
+    Sh = (M * Ya + 1e-7) ** c; St = (Sa + 1e-7) ** c
     l1 = jnp.mean(TS * (Sh - St) ** 2)
     l2 = jnp.mean(TS * jax.nn.relu(St - Sh) ** 2)          # mất tiếng thầy ⇒ phạt thêm
-    l3 = jnp.mean(TS * (M * Ia) ** (2 * c))                    # phần giọng khác / ồn còn lọt (mọi ô)
+    l3 = jnp.mean(TS * (M * Ia + 1e-7) ** (2 * c))             # phần giọng khác / ồn còn lọt (mọi ô)
     # KHUNG KHÔNG CÓ THẦY (chỉ giọng khác / ồn): phạt NĂNG LƯỢNG RA (tỉ lệ ra / vào của khung) — trọng số lamIm tăng dần theo bước
     eS = jnp.sum(Sa ** 2, -1); eY = jnp.sum(Ya ** 2, -1) + 1e-9; eR = jnp.sum((M * Ya) ** 2, -1)
     khongThay = (eS < 1e-3 * eY).astype(jnp.float32)
-    l4 = jnp.sum(khongThay * (eR / eY) ** 0.5) / (jnp.sum(khongThay) + 1.0)
+    l4 = jnp.sum(khongThay * jnp.sqrt(eR / eY + 1e-10)) / (jnp.sum(khongThay) + 1.0)
     return l1 + LAM_L2 * l2 + LAM_LOT * l3 + lamIm * l4
 lich = optax.warmup_cosine_decay_schedule(1e-4, 1.5e-3, min(500, SO_BUOC // 4), max(SO_BUOC, 1000), 5e-5)
 toiUu = optax.chain(optax.clip_by_global_norm(1.0), optax.adam(lich))
@@ -273,6 +274,8 @@ for b in range(b0, SO_BUOC):
     if (b + 1) % 100 == 0:
         print(f'bước {b + 1} mất mát {np.mean(ls):.4f} · {(time.time() - t0) / 100:.2f} s/bước', flush=True); ls = []; t0 = time.time()
     if (b + 1) % 2000 == 0: napDuLieu(); napMo(); print(f'kho mở: {len(MO)} người', flush=True); print(f'dữ liệu: YouTube {0 if YT_S is None else len(YT_S) / HZ:.0f} s · thầy luyện {len(THAY) / HZ:.0f} s · khác thật {0 if KHAC is None else len(KHAC) / HZ:.0f} s', flush=True)
+    if not np.isfinite(float(l)):  # vỡ số ⇒ dừng, KHÔNG ghi checkpoint hỏng (chạy lại sẽ nạp checkpoint tốt gần nhất)
+        print('VỠ SỐ (NaN) ở bước', b + 1, '— dừng', flush=True); sys.exit(2)
     if (b + 1) % 1000 == 0:
         with open(os.path.join(CK, f'ck-{b + 1:06d}.pkl'), 'wb') as fh: pickle.dump({'P': jax.device_get(P), 'O': jax.device_get(O), 'buoc': b + 1, 'MU': MU, 'SD': SD}, fh)
         for cu in sorted(glob.glob(os.path.join(CK, 'ck-*.pkl')))[:-3]: os.remove(cu)
