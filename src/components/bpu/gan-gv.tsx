@@ -334,7 +334,10 @@ function ganTo(html: string, KhungXemPhieu: typeof import('../KhungXemPhieu').de
   // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
   // Che TRƯỚC khi khung tờ gắn vào trang ⇒ khung đầu tiên của tờ (cả dải xám 48 px trên cùng) đã ẩn.
   if (khung && !bangAn() && !tamAn) cheTo(true)
-  toGoc!.render(<KhungXemPhieu html={html} ten={TEN_TO} dong={() => (khung ? tamAnTatCa() : dongTo())} />)
+  // Buổi live theo khối: tờ của bảng KHÔNG tự đóng / tự ra Hôm nay. KhungXemPhieu đóng theo sự kiện «quay lại» của trình duyệt (popstate) — mà tờ RIÊNG của tấm
+  // hoạt động lúc đóng cũng phát đúng sự kiện đó ⇒ tờ của bảng (đang ẩn dưới tấm) tưởng thầy bấm thoát, đẩy cả buổi ra Hôm nay (bắt được bằng bộ thử 12/11).
+  // Nay: tấm đang ở trên ⇒ bỏ qua; còn lại đi đúng đường Esc của buổi live (lùi MỘT màn).
+  toGoc!.render(<KhungXemPhieu html={html} ten={TEN_TO} dong={() => { if (phienLive) { if (!hdTren) escRaHomNay() } else if (khung) tamAnTatCa(); else dongTo() }} />)
   requestAnimationFrame(() => { if (khung && !bangAn()) khung.querySelector<HTMLElement>('.bpu-bang')?.focus() })
   return ''
 }

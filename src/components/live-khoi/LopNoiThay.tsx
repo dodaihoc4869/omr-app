@@ -30,7 +30,7 @@ export default function LopNoiThay() {
   // Tấm hoạt động (đầu giờ / chữa câu / ôn tập) của «Học» đang mở. Đóng tấm mà buổi chưa có bài nào đang chiếu ⇒ quay lại bảng chọn (không để màn trống).
   const [hdMo, setHdMo] = useState(false)
   useEffect(() => {
-    const f = (e: Event) => { const mo = (e as CustomEvent<boolean>).detail === true; setHdMo(mo); if (!mo && layView()?.live?.khoi?.che === 'hoc' && (!coToChieu() || laToBang())) setChon(true) }
+    const f = (e: Event) => { const mo = (e as CustomEvent<boolean>).detail === true; setHdMo(mo); const vv = layView(); if (!mo && vv?.live?.khoi?.che === 'hoc' && !vv.luot && (!coToChieu() || laToBang())) setChon(true) }
     window.addEventListener('bpu-hd', f)
     return () => window.removeEventListener('bpu-hd', f)
   }, [])
