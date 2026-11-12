@@ -4,7 +4,7 @@ import type { Env, D1PreparedStatement } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
 import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
-import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
+import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7, sqlThemEmGoi7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7, type LoaiNgay7 } from './goi-bai-7-loi'
 import { docMucLoai7, loaiNgayEm7, noCau7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
@@ -127,8 +127,8 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     ])
   }
   // Em mới chuyển/đăng ký lớp cũng nhận bài, không tạo lại tiến độ của em cũ.
-  await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han)
-    SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON ${sqlTenLopHs('h')}=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlQuyetDinhNhan7('g','h.sbd')} AND ${KHONG_CA}`).run()
+  // 12/11: dò khoá chính trước, tick bung một lần (goi-bai-7-quyen.ts) — ~27 nghìn ⇒ vài nghìn dòng/lượt, bảng y hệt.
+  await env.DB.prepare(sqlThemEmGoi7(sqlTenLopHs('h'),KHONG_CA)).run()
   return { soGoi, soEm, soCau, hoan: false }
 }
 

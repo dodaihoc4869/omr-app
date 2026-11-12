@@ -139,7 +139,7 @@ export async function cronBonChiSo(env: Env, nowMs: number, caoDiem = false): Pr
   if (caoDiem || (phut >= 18 * 60 && phut < 23 * 60 + 30)) return { chay: false, lyDo: 'cao_diem' }
   await damBaoBangBon(env)
   const w = cuaSoTinh(nowMs)
-  const em = await docDanhSachEm(env, [])
+  const em = await docDanhSachEm(env, [], nowMs) // 12/11: danh sách Gói 7 dùng chung ≤ 5 phút với cron Sảnh (goi-bai-7-em-nhan.ts) — việc nền
   if (!em?.length) return { chay: false, lyDo: 'khong_em' }
   // bản của hôm nay VÀ đúng phiên bản bộ máy (`ban` = BAN_BON) mới coi là xong — bản cũ trong ngày được tính lại dần (01/11, đánh giá v2).
   const xong = new Set((await hoi(env, "SELECT sbd FROM bon_chi_so_em WHERE ngay = ?1 AND json_valid(so_lieu_json) AND json_extract(so_lieu_json, '$.ban') = ?2", w.homNay, BAN_BON)).map((x) => str(x.sbd)))
