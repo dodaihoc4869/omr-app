@@ -106,6 +106,15 @@ Mỗi lượt in 14 ngày gần nhất. Mốc dưới đây là 14 ngày 27/10 �
 
 Ghi chú: mức 28 câu/ngày mới có từ 09/11, nên chỉ số 2 của các ngày trước chỉ để tham khảo. Từ 07/11 mỗi ngày có 40 – 54 bài Kiểm tra ôn tập ở trạng thái chờ nguồn.
 
+**Đổi thước đo 12/11** (thầy «làm luôn cả hai việc»):
+- Chỉ số 1 nay đọc dòng **1g** (28 câu Gói 7 em đã làm) và **1d** (28 câu Gói 7 máy đã giao) — chỉ câu của đề Gói 7, BỎ câu làm lại cuối chặng (app không tính vào mức).
+  Dòng «1+2» cũ lẫn câu game ngoài đề / luyện đề ⇒ mốc 0,2 % ở trên KHÔNG so được với 1g/1d. Số đầu tiên của 1g/1d (11/11, trước khi sửa): ngày Sửa 1d 15/137 đề đúng
+  18/4/6, 87 đề thiếu câu trả lời ngắn; 87/87 em ấy vẫn còn câu trả lời ngắn đã sai chưa sửa (tb 32,6) ⇒ không phải kho hết.
+- Lỗi tìm được: câu làm lại cuối chặng / tự luyện không tính vào mức nhưng từng chiếm suất đề 28 ⇒ phần I tràn sang suất phần II/III. Sửa 12/11 (commit 332819b37),
+  hiệu lực từ đề ngày 13/11; đo xác nhận bằng dòng 1d ngày 13/11 (đọc 14/11). Mức giải thích bao nhiêu phần còn chờ số đo.
+- «Lượt sửa đúng» (3b) đổi định nghĩa: câu lần trước sai, lần này đúng — MỌI kênh (trước chỉ kênh chua_loi, ~1.400/ngày). Số mới: 10/11 = 599, 11/11 = 441 lượt.
+
+
 ## 7. Build (sau khi thầy duyệt) — không đổi giao diện
 1. `server/src/rut-28.ts`: hàm thuần `rut28(ứng viên, {kịpHạn})` + một bảng ma trận dùng chung (bỏ ba bản chép). Test khoá: 10 000 đề giả, đề nào cũng đủ 28 và đúng phần khi kho còn câu.
 2. `chonGoi7`: thay phần xếp câu mới + bốn tầng lấp bằng một lời gọi `rut28`; bỏ `giuOn`, `onSom`, nhánh hạ mức.
