@@ -50,14 +50,15 @@ for (const [ten, dung, dv, goi, gia, lam] of dong) {
 }
 // Câu D1 đọc nhiều hàng nhất 24 giờ qua (để biết phải sửa câu nào khi D1 hàng đọc vượt). Chữ câu lệnh có tham số «?», không có dữ liệu em.
 const tuQ = new Date(now - 86400e3).toISOString()
+const SO_TOP = Math.min(100, Math.max(5, Number(process.env.SO_TOP) || 60)) // 12/11 đợt 3: 60 câu (trước 15) — phần đuôi ~0,7 tỉ hàng/ngày cũng phải sửa
 const jq = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
-  query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:15,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:${SO_TOP},filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
 const top = jq?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
 const j24 = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
   query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den}){sum{rowsRead rowsWritten}}}}}` }) }).then((r) => r.json()).catch(() => null)
 const tong24 = (j24?.data?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? []).reduce((a, x) => a + (Number(x.sum?.rowsRead) || 0), 0)
-const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). 15 câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
-  ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)]
+const bangTop = [`\n### ${SO_TOP} câu D1 đọc nhiều hàng nhất 24 giờ qua`, '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). ${SO_TOP} câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Hàng ghi | Lượt | Hàng/lượt | Câu (260 ký tự đầu) |', '|---|---|---|---|---|',
+  ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.sum.rowsWritten)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 260)}\` |`)]
 if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`)
 // Theo giờ (8 giờ qua): 25 cặp (giờ, câu) đọc nhiều nhất — để thấy câu cũ / câu mới sau mỗi lượt phát hành.
 { const tu8 = new Date(now - 8 * 3600e3).toISOString()
