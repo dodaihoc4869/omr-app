@@ -16,3 +16,4 @@
 /* Luật ô nhập toàn cục của giao diện «Trong» ([data-trong] input: nền, viền, bóng) không áp vào ô nhắn tin — ô nằm trong viên nhập xanh than. */
 html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus-visible { background: transparent; border: 0; border-radius: 0; box-shadow: none; outline: 0; padding: 0; min-height: 0; color: var(--lk-chu); }
 .lke-roi { position: absolute; left: max(8px, env(safe-area-inset-left, 0px)); top: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--lk-mat) 80%, transparent); color: var(--lk-chu-3); font: inherit; font-size: 12.5px; cursor: pointer; opacity: .8; }
+.lke.xong { pointer-events: auto; }

@@ -1,0 +1,34 @@
+/* MÀN VINH DANH (12/11). Màu: bảng xanh than cố định của gốc lớp nổi (--lk-*) + màu đội qua --doi; không màu thô. Chuyển động chỉ transform + opacity. */
+.vd { position: absolute; inset: 0; z-index: 40; pointer-events: auto; overflow: hidden; display: grid; place-items: center; container-type: size; color: var(--lk-chu);
+  background: radial-gradient(70% 60% at 50% 18%, color-mix(in srgb, var(--doi) 34%, var(--lk-nen)), var(--lk-nen) 72%); animation: vd-vao .35s ease-out both; }
+@keyframes vd-vao { from { opacity: 0; } }
+.vd-than { position: relative; width: min(680px, 94%); max-height: 96%; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; overflow-y: auto; padding: 8px 0; }
+.vd-nhan { margin: 0; padding: 4px 14px; border-radius: 99px; background: color-mix(in srgb, var(--lk-mat) 80%, transparent); font-size: 12.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--lk-chu-2); }
+.vd-cup { display: flex; gap: 18px; justify-content: center; }
+.vd-ngon { position: relative; display: grid; place-items: center; width: 92px; height: 112px; animation: vd-nay .6s cubic-bezier(.2, 1.4, .4, 1) .15s both; }
+@keyframes vd-nay { from { opacity: 0; transform: scale(.4) translateY(30px); } }
+.vd-hao { position: absolute; inset: -30%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--doi) 60%, transparent), transparent); animation: vd-tho 2.4s ease-in-out infinite alternate; }
+@keyframes vd-tho { from { opacity: .55; transform: scale(.9); } to { opacity: 1; transform: scale(1.08); } }
+.vd-lua { position: relative; width: 100%; height: 100%; overflow: visible; transform-origin: 50% 100%; animation: vd-lay .5s ease-in-out infinite alternate; }
+@keyframes vd-lay { from { transform: scaleY(1) rotate(-1.5deg); } to { transform: scaleY(1.05) rotate(1.5deg); } }
+.vd-lua .n { fill: var(--doi); } .vd-lua .g { fill: color-mix(in srgb, var(--doi) 50%, var(--lk-chu)); } .vd-lua .l { fill: var(--lk-chu); }
+.vd-ngon b { position: absolute; bottom: 14%; font-size: 22px; font-weight: 800; color: var(--lk-nen); }
+.vd h2 { margin: 2px 0 0; font-size: clamp(22px, 6cqh + 8px, 40px); font-weight: 800; line-height: 1.15; color: color-mix(in srgb, var(--doi) 62%, var(--lk-chu)); animation: vd-len .4s ease-out .35s both; }
+@keyframes vd-len { from { opacity: 0; transform: translateY(12px); } }
+.vd-kj { margin: 0; font-size: 15px; color: var(--lk-chu-2); animation: vd-len .4s ease-out .45s both; } .vd-kj b { font-size: 24px; color: var(--lk-chu); }
+.vd-bang { list-style: none; margin: 8px 0 0; padding: 0; width: 100%; display: grid; gap: 6px; animation: vd-len .4s ease-out .55s both; }
+.vd-bang li { display: grid; grid-template-columns: 30px minmax(96px, auto) 1fr auto; align-items: center; gap: 10px; min-height: 40px; padding: 4px 12px 4px 6px; border-radius: 14px; background: color-mix(in srgb, var(--lk-mat) 86%, transparent); box-shadow: inset 0 0 0 1.5px var(--lk-vien); text-align: left; }
+.vd-bang li[data-nhat] { box-shadow: inset 0 0 0 2px var(--doi); } .vd-bang li[data-toi] { background: color-mix(in srgb, var(--doi) 18%, var(--lk-mat)); }
+.vd-h { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--doi); color: var(--lk-nen); font-weight: 800; }
+.vd-t { font-weight: 800; color: color-mix(in srgb, var(--doi) 62%, var(--lk-chu)); white-space: nowrap; } .vd-t small { margin-left: 8px; font-weight: 600; color: var(--lk-chu-3); }
+.vd-thanh { height: 10px; border-radius: 6px; background: var(--lk-mat-2); overflow: hidden; } .vd-thanh i { display: block; height: 100%; border-radius: 6px; background: var(--doi); transform-origin: 0 50%; transition: transform .9s cubic-bezier(.2, .8, .2, 1) .7s; }
+.vd-bang b { font-weight: 800; white-space: nowrap; }
+.vd-sao { margin: 6px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; font-size: 13px; } .vd-sao span { width: 100%; font-weight: 800; color: var(--lk-chu-3); }
+.vd-sao em { font-style: normal; font-weight: 700; padding: 4px 10px; border-radius: 99px; background: color-mix(in srgb, var(--doi) 20%, var(--lk-mat)); } .vd-sao em[data-toi] { box-shadow: inset 0 0 0 2px var(--doi); }
+.vd-nut { margin-top: 8px; min-width: 160px; min-height: 48px; padding: 0 24px; border: 0; border-radius: 16px; background: var(--lk-nhan); color: var(--lk-chu); font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 var(--lk-nhan-go); }
+.vd-phao { position: absolute; inset: 0; pointer-events: none; }
+.vd-phao i { position: absolute; top: -4%; width: 9px; height: 15px; border-radius: 2px; background: var(--doi); opacity: 0; animation: vd-roi 3.6s linear infinite; transform: scale(var(--s)); }
+.vd-phao i[data-k='1'] { background: var(--lk-chu); border-radius: 50%; height: 9px; } .vd-phao i[data-k='2'] { background: color-mix(in srgb, var(--doi) 55%, var(--lk-chu)); }
+@keyframes vd-roi { 0% { opacity: 0; transform: translateY(0) rotate(0) scale(var(--s)); } 8% { opacity: .95; } 100% { opacity: 0; transform: translateY(108cqh) rotate(560deg) scale(var(--s)); } }
+@container (max-height: 420px) { .vd-ngon { width: 60px; height: 74px; } .vd-ngon b { font-size: 15px; } .vd-bang li { min-height: 32px; } .vd-sao span { width: auto; } .vd-than { gap: 3px; } .vd-nut { min-height: 44px; margin-top: 4px; } }
+@media (prefers-reduced-motion: reduce) { .vd, .vd-ngon, .vd h2, .vd-kj, .vd-bang, .vd-hao, .vd-lua { animation: none; } .vd-phao { display: none; } .vd-thanh i { transition: none; } }

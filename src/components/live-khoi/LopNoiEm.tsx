@@ -2,11 +2,12 @@
 import { Suspense, lazy, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { useChatLop } from './ChatEm'
-import { dangKy, guiTho, kenh, layKho } from './em-khoi'
+import { dangKy, dongKhoi, guiTho, kenh, layKho } from './em-khoi'
 import './em-khoi.css'
 
 const TroGiuLua = lazy(() => import('./TroGiuLua'))
 const ManBonDoi = lazy(() => import('./ManBonDoi'))
+const ManVinhDanh = lazy(() => import('./ManVinhDanh'))
 const NutChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.NutChatEm })))
 const BongTinMoi = lazy(() => import('./ChatEm').then((m) => ({ default: m.BongTinMoi })))
 const CuaChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.CuaChatEm })))
@@ -51,6 +52,7 @@ export default function LopNoiEm() {
   }, [cho])
   const chat = useChatLop(gd === 'dang' ? kenh : null)
   useEffect(() => { if (chatMo) chat.danhDauDoc() }, [chatMo, chat.ds.length]) // eslint-disable-line react-hooks/exhaustive-deps
+  if (s.xong && s.toi) return <div className="lke xong" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}><Suspense fallback={null}><ManVinhDanh ds={s.ds} kj={s.kj} toi={s.toi} onDong={dongKhoi} /></Suspense></div>
   if (!s.khoi || !s.toi || (cho && roiCho)) return null
   return (
     <div className={`lke${cho ? ' cho' : ''}`} data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>

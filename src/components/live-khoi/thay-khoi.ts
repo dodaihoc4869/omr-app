@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { ViewBang } from '../../lib/bpu/phong'
 import { xongLiveKhoi } from '../../lib/live-khoi/api'
-import type { KenhLop, KhoiLive, LichLive, LoaiTinLop, TinLop } from '../../lib/live-khoi/kieu'
+import type { KenhLop, KhoiLive, LichLive, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
 
 const KHOA = 'ddh.gv.live-khoi'
@@ -27,6 +27,10 @@ export function phienCua(buoiId: string): PhienKhoi | null { const p = phien ?? 
 
 // ── Kho nhỏ: bản xem mới nhất của bảng + kênh lớp ──
 let view: ViewBang | null = null
+let ketQua: { ds: NguoiLop[]; kj: number[] } | null = null
+export const layKetQua = () => ketQua
+/** Thầy đóng màn vinh danh. */
+export function dongVinhDanh(): void { ketQua = null; go() }
 export const layView = (): ViewBang | null => view
 const nghe = new Set<() => void>()
 const phatDoi = (): void => { for (const f of nghe) f() }
@@ -77,8 +81,10 @@ export async function moBangLiveKhoi(o: { lich: LichLive; buoiId: string; ma: st
 export function ngheBangKhoi(): void { batNghe() }
 /** Thầy kết thúc buổi học ⇒ đóng lịch live của khối (máy em tắt thẻ Live). */
 export function khiKetThucBuoi(buoiId: string): void {
-  const p = phienCua(buoiId)
-  go(); view = null
+  const p = phienCua(buoiId), v = view
+  // Buổi live theo khối ⇒ giữ lớp nổi để vinh danh đội thắng (kJ chốt lấy từ bản xem cuối); thầy đóng thì gỡ.
+  if (v?.live?.khoi && v.buoiId === buoiId && khung) { ketQua = { ds: v.ds.filter((e) => e.vao).map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, kj: e.kj })), kj: [0, 1, 2, 3].map((d) => v.ds.reduce((s, e) => s + (e.doi === d ? e.kj : 0), 0) + (v.doiThuong[d] ?? 0)) }; phatDoi() } else go()
+  view = null
   if (!p) return
   ghiPhien(null)
   void xongLiveKhoi(p.id)

@@ -95,6 +95,15 @@ await thay.locator('.lkt-che button').nth(0).click(); await ngu(1500)
 kiem('về Học: tờ hiện lại giấy đề', await to.locator('body.mc-che-bang').count() === 0)
 await chup(em1, '10-em-che-do-hoc-844')
 
+// ── 5. Kết thúc buổi ⇒ vinh danh đội thắng ──
+await thay.evaluate(() => { window.__ketThucKhoi(); window.__ws.send('{"t":"ket-thuc"}') }); await ngu(1600)
+kiem('em 1: màn vinh danh hiện, có tên đội thắng + xếp hạng', await em1.locator('.lke .vd h2').isVisible() && (await em1.locator('.vd-bang li').count()) >= 2, await em1.locator('.vd h2').innerText().catch(() => ''))
+kiem('thầy: màn vinh danh hiện', await thay.locator('.lkt .vd h2').isVisible())
+kiem('vinh danh không tràn (em 844×390)', await em1.evaluate(() => { const t = document.querySelector('.vd-than'); return !!t && t.scrollHeight <= t.clientHeight + 1 }))
+await ngu(1200); await chup(em1, '14-em-vinh-danh-844'); await chup(thay, '14-thay-vinh-danh-1366')
+await em1.locator('.vd-nut').click(); await ngu(300)
+kiem('em 1: bấm Đóng ⇒ gỡ lớp nổi', (await em1.locator('.lke').count()) === 0)
+
 kiem('0 lỗi trang', loiTrang.length === 0, loiTrang.slice(0, 3).join(' | '))
 await trinh.close(); await may.dong()
 const hong = ket.filter((k) => !k.dat)

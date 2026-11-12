@@ -4,6 +4,7 @@ import { docDsLich, donLich, khoiTuLop, lichChoEm, type LichLiveMc } from '../se
 import { KenhLopMay } from '../server/src/kenh-lop-may'
 import { chuanKhoi, liveDat, viewLiveBang, viewLiveEm } from '../src/lib/bpu/phong-live'
 import { taoPhong, vaoLop, type TrangThaiPhong } from '../src/lib/bpu/phong'
+import { saoBuoi, xepHangDoi } from '../src/components/live-khoi/ManVinhDanh'
 
 const NAY = Date.UTC(2026, 10, 12, 12, 0, 0)
 const lich = (o: Partial<LichLiveMc>): LichLiveMc => ({ id: 'a', khoi: 12, batDau: NAY, ten: '', trangThai: 'hen', luc: NAY, ...o })
@@ -159,6 +160,21 @@ describe('kênh lớp', () => {
     const n = hs2.tin.length
     k.soatDs(st); expect(hs2.tin.length).toBe(n)
     vaoLop(st, 'S3', NAY); k.soatDs(st); expect(hs2.tin.length).toBe(n + 1)
+    expect((doc(hs2).at(-1)!.ds as unknown[][])[0]).toHaveLength(4) // kèm kJ từng em
+    // kết thúc buổi ⇒ phát đúng MỘT lần danh sách + kJ chốt (màn vinh danh)
+    st.ketThuc = true; const n2 = hs2.tin.length; k.soatDs(st); k.soatDs(st); expect(hs2.tin.length).toBe(n2 + 1); st.ketThuc = false; k.soatDs(st)
     const rieng = taoWs(); em(rieng, 'S1', { t: 'lop-xin' }); expect(doc(rieng)[0]!.t).toBe('lop-ds'); expect(hs1.tin.length).toBe(hs2.tin.length)
+  })
+})
+
+describe('vinh danh đội thắng', () => {
+  const ds = [{ sbd: 'a', ten: 'An', doi: 0, kj: 300 }, { sbd: 'b', ten: 'Bình', doi: 1, kj: 500 }, { sbd: 'c', ten: 'Chi', doi: 1, kj: 0 }, { sbd: 'd', ten: 'Dũng', doi: 2, kj: 120 }]
+  it('xếp hạng theo kJ đội, chỉ đội có em; bằng kJ ⇒ cùng hạng', () => {
+    expect(xepHangDoi(ds, [300, 650, 120, 999]).map((x) => [x.doi, x.hang])).toEqual([[1, 1], [0, 2], [2, 3]])
+    expect(xepHangDoi(ds, [400, 400, 100, 0]).map((x) => [x.doi, x.hang])).toEqual([[0, 1], [1, 1], [2, 3]])
+    expect(xepHangDoi([], [1, 2, 3, 4])).toEqual([])
+  })
+  it('ngôi sao buổi học: ba em nhiều kJ nhất, bỏ em 0 kJ', () => {
+    expect(saoBuoi(ds).map((e) => e.sbd)).toEqual(['b', 'a', 'd'])
   })
 })

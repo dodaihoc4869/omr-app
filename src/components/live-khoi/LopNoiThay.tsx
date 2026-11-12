@@ -4,16 +4,18 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { dangKy, datKhoi, kenh, layView, phienCua } from './thay-khoi'
+import { dangKy, datKhoi, dongVinhDanh, kenh, layKetQua, layView, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
 const TroGiuLua = lazy(() => import('./TroGiuLua'))
+const ManVinhDanh = lazy(() => import('./ManVinhDanh'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 
 export default function LopNoiThay() {
   const v = useSyncExternalStore(dangKy, layView)
   const k = v?.live?.khoi ?? null
+  const kq = useSyncExternalStore(dangKy, layKetQua)
   const [chat, setChat] = useState(false)
   const [moi, setMoi] = useState(0)
   // Đếm tin mới chỉ khi cột đang đóng (nghe lại mỗi lần đóng / mở); mở cột ⇒ về 0 ngay trong thao tác bấm.
@@ -30,6 +32,7 @@ export default function LopNoiThay() {
     window.addEventListener('keydown', f, true)
     return () => window.removeEventListener('keydown', f, true)
   }, [k?.gd])
+  if (kq) return <div className="lkt" style={{ ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties}><Suspense fallback={null}><ManVinhDanh ds={kq.ds} kj={kq.kj} toi={null} onDong={dongVinhDanh} /></Suspense></div>
   if (!v || !k || v.ketThuc) return null
   return (
     <div className="lkt" style={{ ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties}>

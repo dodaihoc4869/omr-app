@@ -9,7 +9,7 @@ import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { KenhLop, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
 
-export interface KhoEm { khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
+export interface KhoEm { /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
 let kho: KhoEm = { khoi: null, toi: null, ds: [], kj: [0, 0, 0, 0], noi: false }
 let ws: WebSocket | null = null
 let goc: Root | null = null
@@ -44,11 +44,13 @@ function nhanTinPhongEm(d: unknown): void {
     const khoi = !j.ketThuc && live?.khoi && e?.vao ? live.khoi : null
     const toi = e?.sbd ? { sbd: e.sbd, ten: e.ten ?? e.sbd, doi: e.doi ?? 0 } : null
     const doi = JSON.stringify(khoi) !== JSON.stringify(kho.khoi) || JSON.stringify(toi) !== JSON.stringify(kho.toi)
+    if (j.ketThuc && kho.khoi && kho.toi) { dat({ xong: true, khoi: null }); return }
+    if (kho.xong) return
     if (khoi && !kho.khoi) guiTho({ t: 'lop-xin' })
     if (doi) dat({ khoi, toi })
     if (khoi) gan(); else if (khung) go()
   } else if (j.t === 'lop-ds') {
-    const ds = (Array.isArray(j.ds) ? j.ds : []).flatMap((x) => (Array.isArray(x) && typeof x[0] === 'string' ? [{ sbd: x[0], ten: String(x[1] ?? x[0]), doi: Number(x[2]) || 0 }] : []))
+    const ds = (Array.isArray(j.ds) ? j.ds : []).flatMap((x) => (Array.isArray(x) && typeof x[0] === 'string' ? [{ sbd: x[0], ten: String(x[1] ?? x[0]), doi: Number(x[2]) || 0, kj: Number(x[3]) || 0 }] : []))
     dat({ ds, kj: [0, 1, 2, 3].map((i) => Number((j.kj as unknown[] | undefined)?.[i]) || 0) })
   } else if (j.t === 'lop' && typeof j.k === 'string') for (const f of tai.get(j.k as LoaiTinLop) ?? []) { try { f(j as unknown as TinLop) } catch { /* nơi nghe lỗi */ } }
 }
@@ -59,10 +61,10 @@ export function noiKhoi(w: WebSocket): void {
   w.addEventListener('open', () => { if (ws === w) dat({ noi: true }) })
   w.addEventListener('message', (e: MessageEvent) => { if (ws === w) nhanTinPhongEm(e.data) })
   // Rớt mà 8 giây không có kết nối mới (em đóng màn, thầy kết thúc) ⇒ gỡ lớp nổi; màn tự nối lại thì `noiKhoi` chạy với kết nối mới.
-  w.addEventListener('close', () => { if (ws !== w) return; dat({ noi: false }); setTimeout(() => { if (ws === w) dongKhoi() }, 8000) })
+  w.addEventListener('close', () => { if (ws !== w) return; dat({ noi: false }); setTimeout(() => { if (ws === w && !kho.xong) dongKhoi() }, 8000) })
 }
 /** Màn Bình Phản Ứng đóng hẳn (thầy kết thúc / em rời) ⇒ gỡ lớp nổi. */
-function dongKhoi(): void { ws = null; go(); kho = { khoi: null, toi: null, ds: [], kj: [0, 0, 0, 0], noi: false } }
+export function dongKhoi(): void { ws = null; go(); kho = { khoi: null, toi: null, ds: [], kj: [0, 0, 0, 0], noi: false } }
 
 export const layKho = (): KhoEm => kho
 export const dangKy = (f: () => void) => { nghe.add(f); return () => { nghe.delete(f) } }

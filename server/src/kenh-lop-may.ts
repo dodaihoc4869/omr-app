@@ -29,12 +29,13 @@ export class KenhLopMay {
   }
   /** Danh sách em ĐÃ VÀO + kJ bốn đội — máy em dựng màn «Bốn đội», gắn tên / đội cho đốm trong trò. */
   dsLop(st: TrangThaiPhong): string {
-    return JSON.stringify({ t: 'lop-ds', ds: st.ds.filter((e) => e.vao).map((e) => [e.sbd, e.ten, e.doi]), kj: [0, 1, 2, 3].map((d) => diemDoi(st, d)) })
+    return JSON.stringify({ t: 'lop-ds', ds: st.ds.filter((e) => e.vao).map((e) => [e.sbd, e.ten, e.doi, e.kj]), kj: [0, 1, 2, 3].map((d) => diemDoi(st, d)) })
   }
   /** Gọi mỗi lần phòng phát view: sĩ số / đội đổi ⇒ phát lại danh sách (chỉ khi là buổi live theo khối). */
   soatDs(st: TrangThaiPhong): void {
     if (!st.live?.khoi) return
-    const dau = st.ds.map((e) => (e.vao ? `${e.sbd}:${e.doi}` : '')).join(',')
+    // Kết thúc buổi ⇒ phát MỘT lần danh sách + kJ chốt để máy em dựng màn vinh danh.
+    const dau = st.ketThuc ? 'xong' : st.ds.map((e) => (e.vao ? `${e.sbd}:${e.doi}` : '')).join(',')
     if (dau === this.dauDs) return
     this.dauDs = dau
     this.moiMay(this.dsLop(st), false)
