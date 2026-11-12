@@ -17,6 +17,10 @@ const DUNG: CauDaCham = { d: true, tu: true, tinh: true }
 const SAI: CauDaCham = { d: false, tu: true, tinh: true }
 const goc = (x: Partial<SoLieuGiuChan> = {}): SoLieuGiuChan => ({ conLai: 4, lamLai: false, soCau: 6, daCham: [DUNG, SAI], coThuong: true, ...x })
 
+// 12/11: «Tiếp tục» bỏ mọi chạm trong 600 ms đầu sau dải sai (chống lướt) ⇒ test đẩy đồng hồ qua khoá trước khi bấm
+let dongHo: { mockRestore: () => void } | null = null, lech = 0
+const quaKhoa = () => { lech += 700; if (!dongHo) { const goc = Date.now; dongHo = vi.spyOn(Date, 'now').mockImplementation(() => goc() + lech) } }
+afterEach(() => { dongHo?.mockRestore(); dongHo = null; lech = 0 })
 describe('lời giữ chân (hàm thuần)', () => {
   it('đúng số câu còn lại; còn ≤ 1 ⇒ «chỉ 1 câu nữa thôi»; vòng làm lại nói câu làm lại', () => {
     expect(loiGiuChan(goc()).tieuDe).toBe('Đừng đi mà, chỉ còn 4 câu nữa là xong chặng rồi!')
@@ -77,6 +81,7 @@ const lamCau = async (dung: boolean) => {
   fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
   await screen.findByRole('heading', { name: dung ? 'Chính xác!' : 'Chưa đúng' })
   if (!dung) fireEvent.click(screen.getByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
+  if (!dung) quaKhoa()
 }
 const X = () => screen.getByRole('button', { name: 'Lưu và về Hôm nay' })
 

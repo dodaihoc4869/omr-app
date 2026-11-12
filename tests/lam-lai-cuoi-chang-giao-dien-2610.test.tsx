@@ -12,6 +12,10 @@ vi.mock('../src/components/hoa2/api', async (goc) => ({ ...(await goc<typeof imp
 // «Kiểm tra» của màn Duo đi theo luồng (doc-luong-nop.ts) — ở test đi qua cùng `goiHoa2` giả như trước (không dòng tạm).
 vi.mock('../src/components/hoa2/doc-luong-nop', async () => { const api = await import('../src/components/hoa2/api'); return { nopCauLuong: (token: string, du: Record<string, unknown>, giay: number) => api.goiHoa2('answer', token, du, giay) } })
 afterEach(() => { cleanup(); vi.clearAllMocks(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); delete document.documentElement.dataset.trong })
+// 12/11: «Tiếp tục» bỏ mọi chạm trong 600 ms đầu sau dải sai (chống lướt) ⇒ test đẩy đồng hồ qua khoá trước khi bấm
+let dongHo: { mockRestore: () => void } | null = null, lech = 0
+const quaKhoa = () => { lech += 700; if (!dongHo) { const goc = Date.now; dongHo = vi.spyOn(Date, 'now').mockImplementation(() => goc() + lech) } }
+afterEach(() => { dongHo?.mockRestore(); dongHo = null; lech = 0 })
 
 const nen = { maDe: 'DH-12-B1', version: 'v1', hinhAnh: [], dang: 'D0', tenDang: 'Amine', mucDo: 'NB', sao: 0, kienThuc: [], ideas: [] }
 const c1 = { ...nen, qid: 'q1', group: 'g1', phan: 'I' as const, text: 'Câu một: chất nào là amine bậc hai?', choices: ['CH3NH2', '(CH3)2NH', '(CH3)3N', 'C6H5NH2'], vaiGoi7: 'on' }
@@ -86,6 +90,7 @@ describe('màn Duo («Trong»)', () => {
     moMan()
     await tra(c1.text, 0)
     fireEvent.click(await screen.findByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
+    quaKhoa()
     fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))
     await tra(c2.text, 0)
     const tiep = await screen.findByRole('button', { name: 'Tiếp tục' })
@@ -108,6 +113,7 @@ describe('màn Duo («Trong»)', () => {
     moMan()
     await tra(c1.text, 0)
     fireEvent.click(await screen.findByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
+    quaKhoa()
     fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))
     await tra(c2.text, 0)
     fireEvent.click(await screen.findByRole('button', { name: 'Tiếp tục' }))

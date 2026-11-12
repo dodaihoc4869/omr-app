@@ -9,6 +9,7 @@
 //   B2  thẻ «em rời màn» ghi KIỂU rời.   Đợt 2: thẻ gọn «N em giơ tay» ⇒ hàng chờ + «Mời nói» + «Hạ hết tay»; công tắc em ở xa chỉ hiện khi cờ `dot2` bật.
 // + phần nối ở app (thay-noi.ts): tin `tam-dung` của tờ ⇒ thư viện `tamDung`; trạng thái gửi tờ có `nghi`, `roi[].kieu`.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { readFileSync } from 'node:fs'
 import { CSS_LIVE_TO_CHIEU, JS_LIVE_TO_CHIEU } from '../src/lib/live-to-chieu'
 import { goiLenBang, moLuot, roiMan, taoPhong, viewBang, type TrangThaiPhong } from '../src/lib/bpu/phong'
 import { datCoLive, liveBat, liveDat } from '../src/lib/bpu/phong-live'
@@ -177,12 +178,21 @@ describe('B2 + đợt 2 trên màn chiếu', () => {
     expect(t.cot().textContent).toContain('đã mời · chờ em bật mic')
     expect(t.cot().textContent).toContain('Nguyễn Thị Hà: chưa bật được mic')
   })
-  it('viên Live đếm cả số em ĐANG NGHE cạnh số em xem; cửa sổ nói rõ hậu quả của «Em ở xa» (máy em trong lớp đang tắt tiếng)', () => {
+  // SỬA CÓ CHỦ ĐÍCH 12/11 — thầy: bỏ chữ giải thích («làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): cửa sổ không còn câu
+  // «Máy em TRONG LỚP đang tắt tiếng…» / «N em đang nghe qua máy» — nút «Em ở xa» / «Tất cả» được nhấn nói chế độ, số em nghe đứng cạnh nhãn «Máy em».
+  it('viên Live đếm cả số em ĐANG NGHE cạnh số em xem; cửa sổ ghi số em nghe cạnh nhãn «Máy em», nút đang nhấn nói chế độ tiếng máy em', () => {
     expect(JS_LIVE_TO_CHIEU).toContain("'</b><small> em nghe</small></span>'")
     expect(JS_LIVE_TO_CHIEU).toContain("(t.xem && !t.nghe ? 'im' : '')") // có em xem mà 0 em nghe ⇒ tô cảnh báo
-    expect(JS_LIVE_TO_CHIEU).toContain('Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe')
-    expect(JS_LIVE_TO_CHIEU).toContain("'</b> em đang nghe qua máy'")
+    expect(JS_LIVE_TO_CHIEU).not.toContain('Máy em TRONG LỚP đang tắt tiếng')
+    expect(JS_LIVE_TO_CHIEU).not.toContain('em đang nghe qua máy')
     expect(JS_LIVE_TO_CHIEU).not.toContain('Em trong lớp nghe thầy trực tiếp')
+    const t = dungTo()
+    t.bom({ ...NEN, nghe: 7, the: { ds: [], chon: '', loi: '', tiengLop: false, xa: false } })
+    const hang = [...t.the().querySelectorAll<HTMLElement>('.mc-lv-cai')].find((x) => x.querySelector('[data-lv="tieng-lop"]'))!
+    expect(hang.querySelector('b')!.textContent).toBe('Máy em 7 em nghe')
+    expect(hang.querySelector('[data-v="0"]')!.getAttribute('aria-pressed')).toBe('true') // «Em ở xa»
+    bam(hang, 'Tất cả')
+    expect(t.viec('tieng-lop')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'tieng-lop', v: true }])
   })
   it('công tắc «Cho em ở xa vào xem» chỉ hiện khi giao diện đợt 2 mở (`dot2`)', () => {
     const t = dungTo(), the = { ds: [], chon: '', loi: '', tiengLop: false, xa: false }
@@ -251,14 +261,150 @@ describe('«Chỉ giọng thầy» trên bảng mic của tờ chiếu (12/11 tr
     bam(t.the(), 'Chỉ giọng thầy')
     expect(t.viec('loc-on')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'loc-on', v: 'thay' }])
   })
-  it('đang chọn «Chỉ giọng thầy» ⇒ nút ấy được nhấn, dòng giải thích + dòng trạng thái mô hình; lùi khẩn (coThay false) ⇒ không có nút', () => {
+  // SỬA CÓ CHỦ ĐÍCH 12/11 — thầy: bỏ chữ giải thích: không còn dòng «Chỉ giọng thầy — hạ giọng người khác»; dòng mô hình chuyển vào «Chi tiết» (đóng sẵn).
+  it('đang chọn «Chỉ giọng thầy» ⇒ nút ấy được nhấn, KHÔNG dòng giải thích, dòng trạng thái mô hình nằm trong «Chi tiết»; lùi khẩn (coThay false) ⇒ không có nút', () => {
     const t = dungTo()
     t.bom({ ...NEN, the: THE, mic: { ...MIC, coThay: true, locOn: 'thay', tg: 'Mô hình ck-h-51000' } })
     const b = [...t.the().querySelectorAll<HTMLElement>('[data-lv="loc-on"]')].find((x) => x.getAttribute('data-c') === 'thay')!
     expect(b.getAttribute('aria-pressed')).toBe('true')
-    expect(t.the().textContent).toContain('Chỉ giọng thầy — hạ giọng người khác')
-    expect(t.the().textContent).toContain('Mô hình ck-h-51000')
+    expect(t.the().textContent).not.toContain('hạ giọng người khác')
+    const ct = t.the().querySelector<HTMLDetailsElement>('details.mc-lv-ct')!
+    expect(ct.open).toBe(false)
+    expect(ct.textContent).toContain('Mô hình ck-h-51000')
     t.bom({ ...NEN, the: THE, mic: { ...MIC, coThay: false } })
     expect(t.the().querySelector('[data-c="thay"]')).toBeNull()
+  })
+})
+
+// BẢNG MIC GỌN — thầy yêu cầu thẳng 12/11 trưa (kèm ảnh bảng mic Live trên màn chiếu): «làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng».
+// Mỗi cài đặt MỘT hàng (nhãn · thanh phân đoạn); không câu mô tả; chữ chỉ khi có vấn đề; «Chi tiết» (đóng sẵn) giữ dòng mô hình + đo tiếng + chẩn đoán mic.
+// Bố cục thật (mọi nút một hàng cùng đỉnh, ≥ 40 px, bảng không tràn mép trên ở 1366×768 / 1920×1080) đo bằng Chromium: ảnh + số đo của phiên 12/11.
+describe('bảng mic gọn (12/11 trưa)', () => {
+  const THE = { ds: [{ id: 'boya', ten: 'Microphone (BOYALINK)' }, { id: 'arr', ten: 'Microphone Array (Realtek(R) Audio)' }], chon: 'boya', loi: '', tiengLop: true, xa: false,
+    loa: { ds: [{ id: 'spk', ten: 'Speakers (Realtek(R) Audio)' }, { id: 'hdmi', ten: 'EPSON PJ (HDMI)' }], chon: 'spk' } }
+  const MIC = { tinh: 'tot', ten: 'Microphone (BOYALINK)', loc: false, cheDo: 'tu', locOn: 'vua', locOnChay: 'chay', khac: '', kieuTieng: 'lam-ro' }
+  const DO = ['Máy thầy gửi: 65 kb/s · mức nguồn 41 · ICE connected (udp)', 'Máy thầy nhận tiếng em: chưa có em nào đang nói', 'Đỗ Đại Học: ICE ok · 48 kb/s']
+  const LIVE = { ...NEN, bang: true, doTieng: DO, the: THE, mic: MIC, lyDoKT: '' }
+  const canh = (t: ReturnType<typeof dungTo>) => [...t.the().querySelectorAll('.mc-lv-canh')].map((p) => (p.textContent ?? '').trim())
+  const muc = (cd: string) => { window.dispatchEvent(new MessageEvent('message', { data: { nguon: 'bpu-bang', lenh: 'live-muc', v: 0.7, em: 0, cd }, source: window })) }
+
+  it('không còn câu mô tả / phụ đề: trạng thái bình thường chỉ có nhãn + nút; mọi đoạn chữ (p) chỉ nằm trong «Chi tiết»', () => {
+    const t = dungTo()
+    t.bom(LIVE)
+    const chu = t.the().textContent ?? ''
+    for (const bo of ['em đã vào phòng', 'Mức âm đang gửi cho lớp', 'bớt ồn nền', 'giữ giọng tự nhiên', 'chuỗi làm rõ', 'như Meet', 'chống vọng', 'giọng trong nhất', 'Tiếng em nói sẽ phát ra loa này',
+      'Mọi máy em đang phát tiếng thầy', 'đeo tai nghe', 'Đưa cả lớp vào bảng live ngay', 'Cắm lại bộ thu', 'Tiếng trên máy em']) expect(chu, bo).not.toContain(bo)
+    expect(canh(t)).toEqual([])
+    expect(t.the().querySelectorAll('[role="alert"]').length).toBe(0)
+    expect([...t.the().querySelectorAll('p')].every((p) => p.closest('details.mc-lv-ct'))).toBe(true)
+    expect(t.the().querySelector('h3')!.textContent).toBe('Đang live')
+    muc('')
+    expect(document.getElementById('mc-lv-nx')!.textContent).toBe('Hơi to') // mức âm: vạch + chữ ngắn
+  })
+  it('mỗi cài đặt MỘT hàng: nhãn ngắn + MỘT thanh phân đoạn chứa mọi nút của nó; Loa: ô chọn + «Thử loa» cùng hàng; «Chỉ giọng thầy» (4 nút) ⇒ thanh xuống hàng riêng dưới nhãn', () => {
+    const t = dungTo()
+    t.bom(LIVE)
+    const hang = [...t.the().querySelectorAll<HTMLElement>('.mc-lv-cai')]
+    expect(hang.map((h) => h.querySelector('b')!.firstChild!.textContent)).toEqual(['Mức âm', 'Lọc ồn', 'Tiếng', 'Khử vọng', 'Máy em', 'Bảng → máy em'])
+    for (const h of hang.slice(1)) {
+      const seg = h.querySelectorAll('.mc-lv-seg')
+      expect(seg.length).toBe(1)
+      expect(h.querySelectorAll('button').length).toBe(seg[0]!.querySelectorAll('button').length)
+      expect(seg[0]!.getAttribute('role')).toBe('group')
+    }
+    expect(hang.map((h) => h.querySelectorAll('button').length)).toEqual([0, 3, 2, 3, 2, 1])
+    expect(hang.some((h) => h.classList.contains('doc'))).toBe(false)
+    const loa = t.the().querySelector('.mc-lv-loa')!
+    expect(loa.querySelector('select[data-c="loa"]')).toBeTruthy()
+    expect(loa.querySelector('[data-lv="thu-loa"]')!.textContent).toBe('Thử loa')
+    t.bom({ ...LIVE, mic: { ...MIC, coThay: true } })
+    expect(t.the().querySelector('[data-c="thay"]')!.closest('.mc-lv-cai')!.classList.contains('doc')).toBe(true)
+    // CSS: thanh phân đoạn không xuống dòng lộn xộn; nút trong bảng ≥ 40 px; luật mới chỉ trong bảng (thẻ «Đang nói» giữ .mc-lv-n.nho cũ)
+    expect(CSS_LIVE_TO_CHIEU).toContain('.mc-lv-seg{display:flex;')
+    expect(CSS_LIVE_TO_CHIEU).toContain('.mc-lv-seg .mc-lv-n{flex:1 1 auto;height:max(40px,')
+    expect(CSS_LIVE_TO_CHIEU).not.toMatch(/flex-wrap:wrap/)
+    expect(CSS_LIVE_TO_CHIEU).toContain('.mc-lv-n.nho{height:calc(var(--u)*2.3)')
+    expect(CSS_LIVE_TO_CHIEU).toMatch(/\.mc-lv-the\{max-height:calc\(100vh - var\(--u\)\*6\);overflow-y:auto/)
+  })
+  it('cảnh báo CHỈ khi có vấn đề, mỗi thứ một dòng ngắn: mic dự phòng · mic im / bị tắt / bị rút · «Chỉ giọng thầy» tự tắt · mất đường tiếng · loa', () => {
+    const t = dungTo()
+    t.bom({ ...LIVE, mic: { ...MIC, khac: 'Microphone (BOYALINK)', ten: 'Microphone Array (Realtek(R) Audio)' } })
+    expect(canh(t)).toEqual(['Không mở được BOYALINK — đang dùng mic máy'])
+    expect(t.the().querySelector('.mc-lv-ct')!.textContent).toContain('Đã chọn «Microphone (BOYALINK)» · lớp đang nghe Microphone Array (Realtek(R) Audio)')
+    t.bom({ ...LIVE, mic: { ...MIC, coThay: true, locOn: 'thay', tg: 'Đã tự tắt (máy chạy không kịp) — lớp nghe tiếng như trước' } })
+    expect(canh(t)).toEqual(['Chỉ giọng thầy đã tự tắt: máy chạy không kịp'])
+    t.bom({ ...LIVE, mic: { ...MIC, coThay: true, locOn: 'thay', tg: 'Đang tải mô hình giọng thầy…' } })
+    expect(canh(t)).toEqual([]) // đang tải: không phải lỗi ⇒ chỉ ở «Chi tiết»
+    for (const [tinh, dau] of [['im', 'Mic chưa có tín hiệu'], ['bi-tat', 'Mic đang bị tắt tiếng'], ['mat', 'Mic vừa bị rút']]) {
+      t.bom({ ...LIVE, mic: { ...MIC, tinh } })
+      expect(canh(t).length).toBe(1)
+      expect(canh(t)[0]).toMatch(new RegExp('^' + dau))
+    }
+    t.bom({ ...LIVE, khongTieng: true, lyDoKT: 'Mạng chặn đường tiếng' })
+    expect(canh(t)).toEqual(['Mạng chặn đường tiếng — lớp chưa nghe tiếng thầy'])
+    t.bom({ ...LIVE, the: { ...THE, loa: { ...THE.loa, thu: 'loi', trung: 'Microphone (BOYALINK)' } } })
+    expect(canh(t)).toEqual(['Loa đang là bộ thu mic — chọn loa khác rồi bấm «Thử loa»', 'Chưa phát được ra loa này — chọn loa khác'])
+    t.bom(LIVE)
+    expect(canh(t)).toEqual([])
+    // lý do tự tắt đọc từ dòng trạng thái app soạn — đổi chữ ở thay-noi.ts thì cảnh báo câm ⇒ khoá chữ
+    expect(readFileSync('src/components/live/thay-noi.ts', 'utf8')).toContain('`Đã tự tắt (${')
+  })
+  it('«Chi tiết» ở cuối, mặc định ĐÓNG, chữ nhỏ: tên mic + dòng mô hình + đo tiếng + chẩn đoán mic (#mc-lv-cd); đang mở thì giữ mở qua mỗi lần vẽ lại; đóng bảng rồi mở ⇒ đóng', () => {
+    const t = dungTo()
+    t.bom({ ...LIVE, mic: { ...MIC, coThay: true, locOn: 'thay', tg: 'Mô hình ck-h-51000 · luyện 12/11 · máy này chạy 8 % thời gian thực' } })
+    const ct = () => t.the().querySelector<HTMLDetailsElement>('details.mc-lv-ct')!
+    expect(ct().open).toBe(false)
+    expect(t.the().lastElementChild).toBe(ct())
+    expect(ct().querySelector('summary')!.textContent).toBe('Chi tiết')
+    for (const d of [...DO, 'Mô hình ck-h-51000 · luyện 12/11']) expect(ct().textContent).toContain(d)
+    muc('mic «Microphone (BOYALINK)» · 48000 Hz')
+    expect(ct().querySelector('#mc-lv-cd')!.textContent).toBe('mic «Microphone (BOYALINK)» · 48000 Hz')
+    ct().open = true
+    t.bom({ ...LIVE, doTieng: [...DO.slice(0, 2), 'Đỗ Đại Học: ICE ok · 50 kb/s'] }) // app gửi lại ~1 giây / lần
+    expect(ct().open).toBe(true)
+    expect(ct().textContent).toContain('50 kb/s')
+    expect(ct().querySelector('#mc-lv-cd')!.textContent).toBe('mic «Microphone (BOYALINK)» · 48000 Hz') // chẩn đoán mic không mất khi vẽ lại
+    muc('mic mới')
+    expect(document.getElementById('mc-lv-cd')!.textContent).toBe('mic mới')
+    t.bom({ ...LIVE, the: null })
+    expect(t.the().hidden).toBe(true)
+    t.bom(LIVE)
+    expect(ct().open).toBe(false)
+  })
+  it('GIỮ NGUYÊN mọi data-lv / data-c / data-v, aria-pressed và tin gửi app', () => {
+    const t = dungTo()
+    t.bom({ ...LIVE, mic: { ...MIC, coThay: true, locOn: 'manh', cheDo: 'bat', kieuTieng: 'chuan' } })
+    const ds = [...t.the().querySelectorAll<HTMLElement>('[data-lv]')].map((b) => b.getAttribute('data-lv') + ':' + (b.getAttribute('data-c') ?? b.getAttribute('data-v') ?? '') + (b.getAttribute('aria-pressed') === 'true' ? '*' : ''))
+    expect(ds).toEqual(['loc-on:manh*', 'loc-on:vua', 'loc-on:tat', 'loc-on:thay', 'kieu-tieng:lam-ro', 'kieu-tieng:chuan*', 'loc:tu', 'loc:bat*', 'loc:tat', 'thu-loa:', 'tieng-lop:0', 'tieng-lop:1*',
+      'bang:0*', 'tam-dung:1', 'tat:', 'the-dong:'])
+    bam(t.the(), 'Bật')
+    bam(t.the(), 'Chuẩn trình duyệt')
+    bam(t.the(), 'Vừa')
+    bam(t.the(), 'Thử loa')
+    bam(t.the(), 'Đang bật')
+    expect(t.gui.filter((m) => m.loai === 'live' && m.viec !== 'chao').map((m) => [m.viec, m.v])).toEqual([['loc', 'bat'], ['kieu-tieng', 'chuan'], ['loc-on', 'vua'], ['thu-loa', undefined], ['bang', false]])
+    const chon = (sel: string, v: string) => { const s = t.the().querySelector<HTMLSelectElement>(sel)!; s.value = v; s.dispatchEvent(new Event('change', { bubbles: true })) }
+    chon('select[aria-label="Chọn mic"]', 'arr')
+    chon('select[data-c="loa"]', 'hdmi')
+    expect(t.viec('chon-mic')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'chon-mic', id: 'arr' }])
+    expect(t.viec('chon-loa')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'chon-loa', id: 'hdmi' }])
+  })
+  it('chưa live: «Bật live cho lớp …» + «Bắt đầu live» / «Để sau», không phụ đề; mic lỗi ⇒ một dòng + «Live không tiếng» / «Thử lại» / «Để sau»; buổi chưa có tiếng ⇒ nói một dòng', () => {
+    const t = dungTo()
+    const CHUA = { ...NEN, pha: 'tat', tu: null, doTieng: [], the: THE, mic: MIC, lyDoKT: '' }
+    t.bom(CHUA)
+    expect(t.the().querySelector('h3')!.textContent).toBe('Bật live cho lớp 12A1')
+    expect(t.the().textContent).not.toContain('sẽ thấy màn chiếu này')
+    expect([...t.the().querySelectorAll('.mc-lv-hang button')].map((b) => (b.textContent ?? '').trim())).toEqual(['Bắt đầu live', 'Để sau'])
+    expect(t.the().querySelector('[data-lv="bang"]')).toBeNull()
+    expect(canh(t)).toEqual([])
+    t.bom({ ...CHUA, the: { ...THE, loi: 'mic-tu-choi' } })
+    expect(canh(t)).toEqual(['Chưa dùng được mic: trình duyệt chưa cho dùng mic'])
+    expect([...t.the().querySelectorAll('.mc-lv-hang button')].map((b) => (b.textContent ?? '').trim())).toEqual(['Live không tiếng', 'Thử lại', 'Để sau'])
+    t.bom({ ...CHUA, coTieng: false })
+    expect(canh(t)).toEqual(['Buổi này live chưa có tiếng trên máy em'])
+    expect(t.the().querySelector('details')).toBeNull()
+    bam(t.the(), /Bắt đầu live/)
+    expect(t.viec('khong-tieng').length).toBe(1)
   })
 })

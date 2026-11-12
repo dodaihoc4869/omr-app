@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản vẽ «Vì sao em sai?» dừng hẳn</title>
+<style>
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(/node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:500;src:url(/node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(/node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:700;src:url(/node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-700-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(/node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:'Be Vietnam Pro';font-weight:800;src:url(/node_modules/@fontsource/be-vietnam-pro/files/be-vietnam-pro-vietnamese-800-normal.woff2) format('woff2')}
+
+/* Biến màu: chép ĐÚNG từ bản vẽ đã duyệt docs/ban-ve-moi-on-sua-0911 (= src/styles/trong-hs-mau.css), không thêm màu mới. */
+:root{--tr-nen:#fff;--tr-mat:#fff;--tr-mat-2:#f7f7f7;--tr-mat-3:#e5e5e5;--tr-vien:#e5e5e5;--tr-chu:#1b1938;--tr-chu-2:#3a385e;--tr-chu-3:#47456d;--tr-trang:#fff;
+ --tr-dung:#00d396;--tr-dung-nhat:#c2ffdd;--tr-dung-chu:#007c58;--tr-dung-nut:#00c993;--tr-dung-day:#009e73;
+ --tr-sai:#f90072;--tr-sai-nhat:#ffe3e7;--tr-sai-chu:#c70b5b;--tr-sai-day:#c60059;
+ --tr-chu-y:#ff8c51;--tr-chu-y-nhat:#ffeee0;--tr-chu-y-chu:#b24f19;--tr-chu-y-nut:#f06b27;--tr-chu-y-day:#ce6837;
+ --tr-tin:#00dffe;--tr-tin-nhat:#dbf5fa;--tr-tin-chu:#007889;--tr-tin-day:#009eb5;
+ --tr-sao:#feba00;--tr-sao-nhat:#fff5d4;--tr-sao-chu:#956400;
+ --tr-hs:#6c71ff;--tr-hs-nut:#584dff;--tr-hs-go:#3f00dc;--tr-hs-nhat:#e6eaff;--tr-hs-chu:#565bbd;--tr-hs-tren:#fff;--tr-phu:rgba(75,75,75,.5)}
+:root[data-toi]{--tr-nen:#131f24;--tr-mat:#202f36;--tr-mat-2:#263840;--tr-mat-3:#37464f;--tr-vien:#37464f;--tr-chu:#f1f7fb;--tr-chu-2:#dce6ec;--tr-chu-3:#c4d0d6;--tr-trang:#131f24;
+ --tr-dung:#00d497;--tr-dung-nhat:#18382a;--tr-dung-chu:#00df9f;--tr-dung-nut:#00d497;--tr-dung-day:#00aa76;
+ --tr-sai:#f7498f;--tr-sai-nhat:#43272f;--tr-sai-chu:#ff9bba;--tr-sai-day:#cc146f;
+ --tr-chu-y:#ff9447;--tr-chu-y-nhat:#422a1a;--tr-chu-y-chu:#ffa569;--tr-chu-y-nut:#ff9447;--tr-chu-y-day:#de6a00;
+ --tr-tin:#00bfd4;--tr-tin-nhat:#0e373d;--tr-tin-chu:#00d5ed;--tr-tin-day:#0097ab;
+ --tr-sao:#ffc735;--tr-sao-nhat:#3b2f14;--tr-sao-chu:#ecb400;
+ --tr-hs:#7772ff;--tr-hs-nut:#7772ff;--tr-hs-go:#3f00dc;--tr-hs-nhat:#2c2e47;--tr-hs-chu:#b1b6ff;--tr-hs-tren:#fff;--tr-phu:rgba(0,0,0,.6)}
+body{margin:0;background:var(--tr-nen);color:var(--tr-chu);font-family:'Be Vietnam Pro',system-ui,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+html{color-scheme:light}:root[data-toi]{color-scheme:dark}
+*{box-sizing:border-box}
+.khung{min-height:100dvh;display:flex;flex-direction:column;max-width:720px;margin:0 auto}
+.thanh{display:flex;align-items:center;gap:12px;padding:14px 16px 6px}
+.thanh .x{width:32px;height:32px;border-radius:10px;color:var(--tr-chu-3);display:grid;place-items:center;font-weight:800;font-size:20px}
+.tien{flex:1;height:14px;border-radius:999px;background:var(--tr-mat-3);overflow:hidden}.tien i{display:block;height:100%;width:46%;border-radius:999px;background:var(--tr-dung)}
+.de{padding:10px 16px 0;flex:1}
+.de .nhan{font-size:13px;font-weight:800;color:var(--tr-chu-3);letter-spacing:.02em}
+.de p.cau{margin:6px 0 12px;font-size:17px;font-weight:700;line-height:1.45}
+.pa{display:grid;gap:8px}
+.pa div{padding:12px 14px;border-radius:14px;box-shadow:inset 0 0 0 2px var(--tr-vien);font-size:15px;font-weight:600;color:var(--tr-chu-2)}
+.pa div[data-em]{box-shadow:inset 0 0 0 2px var(--tr-sai);background:var(--tr-sai-nhat);color:var(--tr-sai-chu)}
+/* DẢI KẾT QUẢ «Chưa đúng» (dính đáy như bản sống) */
+.dai{position:sticky;bottom:0;background:var(--tr-sai-nhat);padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0}
+.dai h2{margin:0;display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;color:var(--tr-sai-chu)}
+.dai h2 svg{width:24px;height:24px;stroke:currentColor;stroke-width:3.2;fill:none;stroke-linecap:round}
+.dai .dap{margin:4px 0 0;font-size:15px;font-weight:700;color:var(--tr-sai-chu)}
+.dai .giai{margin:4px 0 0;font-size:14px;font-weight:500;line-height:1.45;color:var(--tr-chu-2)}
+.dai .giai a{color:var(--tr-sai-chu);font-weight:800;text-decoration:none;white-space:nowrap}
+/* ——— BẢN MỚI: «Vì sao em sai?» gọn, ba hàng chọn một ——— */
+.vs{margin-top:10px;padding:10px;border-radius:16px;background:var(--tr-mat)}
+.vs-dau{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 4px 6px}
+.vs-dau h3{margin:0;font-size:15px;font-weight:800;color:var(--tr-chu)}
+.vs-dau span{font-size:12.5px;font-weight:700;color:var(--tr-chu-3)}
+.vs-dau span[data-xong]{color:var(--tr-dung-chu)}
+.o{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:6px 10px;margin:0;border:0;border-radius:12px;background:transparent;font:inherit;text-align:left;color:var(--tr-chu-2);cursor:pointer}
+.o + .o{margin-top:2px}
+.o .tron{flex:none;width:22px;height:22px;border-radius:50%;box-shadow:inset 0 0 0 2px var(--tr-vien);display:grid;place-items:center}
+.o .chu{flex:1;min-width:0}
+.o .chu b{display:block;font-size:14.5px;font-weight:800;line-height:1.25;color:var(--tr-chu)}
+.o .chu small{display:block;font-size:12.5px;font-weight:500;line-height:1.3;color:var(--tr-chu-3)}
+.o .ai{flex:none;padding:2px 8px;border-radius:999px;background:var(--tr-hs-nhat);color:var(--tr-hs-chu);font-size:11.5px;font-weight:800}
+.o[aria-pressed=true]{background:var(--tr-sai-nhat);box-shadow:inset 0 0 0 2px var(--tr-sai)}
+.o[aria-pressed=true] .tron{background:var(--tr-sai);box-shadow:none}
+.o[aria-pressed=true] .tron::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--tr-trang)}
+.nut{display:block;width:100%;min-height:52px;margin-top:12px;border:0;border-radius:16px;font:inherit;font-size:16px;font-weight:800;letter-spacing:.02em;cursor:pointer}
+.nut[data-tat]{background:var(--tr-mat);box-shadow:inset 0 0 0 2px var(--tr-vien);color:var(--tr-chu-3)}
+.nut:not([data-tat]){background:var(--tr-sai);color:var(--tr-trang);box-shadow:0 4px 0 var(--tr-sai-day)}
+/* ——— BẢN HIỆN TẠI (để so): 3 ô ngang, chữ xuống hàng ——— */
+.cu .ly-do{margin-top:10px}.cu h3{margin:0;font-size:15px;font-weight:800}.cu .goi{margin:2px 0 0;font-size:13px;font-weight:500;color:var(--tr-chu-3)}
+.cu .o3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.cu .o3 button{min-height:48px;padding:6px;border:0;border-radius:14px;background:var(--tr-mat);box-shadow:inset 0 0 0 1.5px var(--tr-vien);font:inherit;font-size:13.5px;font-weight:800;line-height:1.2;color:var(--tr-chu-2)}
+.cu .o3 button[aria-pressed=true]{background:var(--tr-sai-chu);box-shadow:none;color:var(--tr-trang)}
+.ghi{position:absolute;top:8px;right:8px;max-width:46%;padding:6px 10px;border:2px dashed var(--tr-vien);border-radius:12px;background:var(--tr-nen);font-size:12px;font-weight:700;color:var(--tr-chu-3)}
+/* KHỔ NGANG (điện thoại xoay ngang, Fold mở, máy tính bảng, máy tính) — GIỮ THIẾT KẾ DUOLINGO đang chạy (thầy 12/11): thanh đáy rộng hết màn, kết quả bên trái,
+   «Tiếp tục» bên phải; ba ô lý do một hàng. Chỉ đổi cách chờ: không chọn sẵn, chưa chọn thì nút tắt. */
+@media (min-width:700px),(orientation:landscape) and (max-height:500px){
+ .khung{max-width:none}.de{width:100%;max-width:1000px;margin:0 auto}
+ .dai{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:24px;align-items:end;border-radius:0;padding:18px max(24px,calc((100% - 1000px)/2)) 22px}
+ .dai > :not(.nut){grid-column:1}.dai .nut{grid-column:2;grid-row:1/span 9;align-self:end;width:auto;min-width:180px;padding:0 28px;margin:0}
+ .vs{background:transparent;padding:0;margin-top:8px}.vs-dau{padding:0 0 6px}
+ .vs .hang{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .o{justify-content:center;min-height:48px;padding:6px 10px;border-radius:14px;background:var(--tr-mat);box-shadow:inset 0 0 0 1.5px var(--tr-vien);text-align:center}
+ .o + .o{margin-top:0}.o .tron,.o .chu small{display:none}.o .chu{flex:none}.o .chu b{font-size:14px}
+ .o[aria-pressed=true]{background:var(--tr-sai-chu);box-shadow:none}.o[aria-pressed=true] .chu b{color:var(--tr-trang)}
+ .o .ai{margin-left:4px}
+}
+@media (orientation:landscape) and (max-height:500px){.thanh{padding-top:8px}.de p.cau{font-size:15px;margin:4px 0 8px}.pa{grid-template-columns:1fr 1fr}.pa div{padding:8px 12px}.dai{padding-top:10px;padding-bottom:10px}.dai .giai{display:none}}
+</style>
+</head>
+<body>
+<div class="khung" id="k"></div>
+<script>
+const q = new URLSearchParams(location.hash.slice(1)), man = q.get('man') || 'chua'
+if (q.get('toi')) document.documentElement.setAttribute('data-toi', '')
+const LY = [['tinh', 'Tính / đọc đề sai', 'Nhầm số, nhầm đơn vị, đọc sót đề'], ['cach', 'Chưa biết cách', 'Chưa biết phải bắt đầu từ đâu'], ['nham', 'Hiểu nhầm', 'Nhầm khái niệm hoặc tính chất']]
+const chon = man === 'da' ? 'cach' : ''
+const ai = man === 'ai' ? 'nham' : ''
+const xSvg = '<svg viewBox="0 0 24 24"><path d="M7 7 17 17M17 7 7 17"/></svg>'
+const dau = '<div class="thanh"><span class="x">✕</span><div class="tien"><i></i></div></div>'
+const de = '<div class="de"><div class="nhan">CÂU 13 · PHẦN I</div><p class="cau">Cho 5,6 gam Fe tác dụng hết với dung dịch HCl dư. Thể tích khí H₂ thu được (đktc) là</p><div class="pa"><div>A. 1,12 lít</div><div data-em>B. 3,36 lít</div><div>C. 2,24 lít</div><div>D. 4,48 lít</div></div></div>'
+const kq = '<h2>' + xSvg + 'Chưa đúng</h2><p class="dap">Đáp án đúng: C. 2,24 lít</p><p class="giai">n<sub>Fe</sub> = 0,1 mol ⇒ n<sub>H₂</sub> = 0,1 mol ⇒ V = 2,24 lít. <a href="#">Lời giải từng bước</a></p>'
+let dai
+if (man === 'truoc') {
+  dai = '<section class="dai cu">' + kq + '<div class="ly-do"><h3>Vì sao em sai?</h3><p class="goi">A.I Đỗ Đại Học đoán em mắc đúng bẫy của phương án B. Không phải thì chạm ô khác.</p><div class="o3">' +
+    LY.map(([m, t]) => '<button aria-pressed="' + (m === 'nham') + '">' + t + '</button>').join('') + '</div></div><button class="nut">Tiếp tục</button>' +
+    '<div class="ghi">HIỆN TẠI: A.I chọn sẵn ⇒ «Tiếp tục» sáng ngay, chạm 2 lần là lướt qua</div></section>'
+} else {
+  const daChon = !!chon
+  dai = '<section class="dai">' + kq + '<div class="vs" role="radiogroup" aria-label="Vì sao em sai?"><div class="vs-dau"><h3>Vì sao em sai?</h3><span' + (daChon ? ' data-xong' : '') + '>' + (daChon ? '✓ Đã ghi' : 'Chọn 1 ý') + '</span></div>' +
+    '<div class="hang">' + LY.map(([m, t, g]) => '<button class="o" role="radio" aria-pressed="' + (m === chon) + '"><span class="tron"></span><span class="chu"><b>' + t + '</b><small>' + g + '</small></span>' + (m === ai ? '<span class="ai">A.I đoán</span>' : '') + '</button>').join('') + '</div>' +
+    '</div><button class="nut"' + (daChon ? '' : ' data-tat') + '>' + (daChon ? 'Tiếp tục' : 'Chọn một ý để tiếp tục') + '</button></section>'
+}
+document.getElementById('k').innerHTML = dau + de + dai
+</script>
+</body>
+</html>
