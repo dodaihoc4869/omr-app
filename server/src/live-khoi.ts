@@ -5,7 +5,7 @@
 import type { Env, ExecutionContext } from './kieu'
 type Row = Record<string, unknown>
 import { gameIdentityHaiBuoc } from './game-v2-auth'
-import { gvBuoiHoc } from './buoi-hoc'
+import { lenhMoBuoi, sanSangBuoiHoc, type LenhD1 } from './buoi-hoc'
 import { baoPhongVaoLop } from './phong-binh-phan-ung'
 import { baoMayCacEm } from './ngan-hoc-sinh'
 
@@ -58,9 +58,10 @@ async function doc(env: Env): Promise<LichLiveMc[]> {
   const r = await env.DB.prepare('SELECT gia_tri FROM cau_hinh WHERE khoa = ?').bind(KHOA_LIVE_KHOI).first<Row>().catch(() => null)
   return docDsLich(r?.gia_tri)
 }
-const ghi = (env: Env, ds: readonly LichLiveMc[], nay: number) =>
+const lenhGhi = (env: Env, ds: readonly LichLiveMc[], nay: number) =>
   env.DB.prepare('INSERT INTO cau_hinh (khoa, gia_tri, cap_nhat_luc) VALUES (?, ?, ?) ON CONFLICT(khoa) DO UPDATE SET gia_tri = excluded.gia_tri, cap_nhat_luc = excluded.cap_nhat_luc')
-    .bind(KHOA_LIVE_KHOI, JSON.stringify(ds), new Date(nay).toISOString()).run()
+    .bind(KHOA_LIVE_KHOI, JSON.stringify(ds), new Date(nay).toISOString())
+const ghi = (env: Env, ds: readonly LichLiveMc[], nay: number) => lenhGhi(env, ds, nay).run()
 /** Sĩ số + số báo danh từng khối (em chưa khoá). Một lệnh D1. */
 async function emTheoKhoi(env: Env): Promise<Record<10 | 11 | 12, string[]>> {
   const ra: Record<10 | 11 | 12, string[]> = { 10: [], 11: [], 12: [] }
@@ -77,7 +78,8 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), 
   // TỨC THÌ (thầy 12/11 «mở phòng live chưa tức thì»): mọi lệnh đọc đi MỘT đợt song song (ca đang mở chỉ đọc khi mở phòng); việc báo máy các em chạy SAU
   // câu trả lời (`ctx.waitUntil`) ⇒ thầy không chờ 80–100 lượt gọi ngăn.
   const docCa = p === '/gv/bpu/khoi-mo' ? env.DB.prepare("SELECT ma_ca, TRIM(COALESCE(lop, '')) AS lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi'").all<Row>().then((r) => r.results ?? []).catch(() => [] as Row[]) : Promise.resolve([] as Row[])
-  const [tho, em, ca] = await Promise.all([doc(env), emTheoKhoi(env), docCa])
+  // + mở phòng: bảng buổi học dựng sẵn (một lần mỗi isolate) chạy CÙNG đợt đọc này ⇒ bước mở buổi phía dưới không thêm đợt chờ nào
+  const [tho, em, ca] = await Promise.all([doc(env), emTheoKhoi(env), docCa, p === '/gv/bpu/khoi-mo' ? sanSangBuoiHoc(env).catch(() => undefined) : undefined])
   const bao = async (sbds: readonly string[]): Promise<void> => { const v = baoMayCacEm(env, sbds, 'live').catch(() => 0); if (ctx) { try { ctx.waitUntil(v); return } catch { /* không có ctx thật */ } } await v }
   let ds = donLich(tho, nay)
   if (p === '/gv/bpu/khoi-ds') return traDs(ds, em)
@@ -118,25 +120,27 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), 
     // Khối đang có ca kiểm tra mở ⇒ không mở live (CLAUDE.md «đang có ca thi mở»).
     const caMo = ca.find((c) => khoiTuLop(c.lop) === khoi)
     if (caMo) return { ok: false, lyDo: 'ca-mo', error: `Khối ${khoi} đang có ca kiểm tra mở (${str(caMo.ma_ca)}). Ca đóng xong thầy mở live.` }
-    let ma = ''
+    // MỞ TỨC THÌ (thầy 12/11 «mở quá chậm», màn báo «Máy chủ trả lời chậm»): trước đây mở buổi qua `gvBuoiHoc` = 4 đợt chờ D1 nối tiếp (dựng bảng, chèn, đọc
+    // lại buổi, đọc điểm danh + danh sách CẢ TRƯỜNG) rồi mới ghi lịch. Nay chèn buổi + ghi lịch đi MỘT batch ⇒ cả lệnh còn 2 đợt chờ (đọc · ghi).
+    let moBuoi: LenhD1 | null = null
     if (!x?.buoiId) {
       const ngay = new Date(nay + 7 * 3_600_000).toISOString().slice(5, 10).split('-').reverse().join('/')
       const ten = (x?.ten || str(b.ten).trim().slice(0, 60)) || `Live Khối ${khoi}`
       // `lop = «Live Khối N»` (không lớp thật nào tên vậy): đánh dấu buổi LIVE ⇒ nút «Lên bảng» / điểm danh trên lớp không nhận nhầm buổi này;
       // danh sách phòng chỉ gồm em đã bấm «Tham gia».
-      const r = await gvBuoiHoc(env, { action: 'mo', lop: `${LOP_LIVE}${khoi}`, ten: `${ten} · ${ngay}`.slice(0, 80) }, nay)
-      const buoi = (r.buoi ?? null) as Row | null
-      if (r.ok !== true || !buoi || !str(buoi.id)) return { ok: false, error: str(r.error) || 'Chưa mở được buổi live. Thầy thử lại.' }
-      ma = str(buoi.ma)
-      if (x) { x.buoiId = str(buoi.id); x.ten = x.ten || ten }
-      else { x = { id: taoId(nay), khoi, batDau: nay, ten, trangThai: 'cho', buoiId: str(buoi.id), luc: nay }; ds.push(x) }
+      const mb = lenhMoBuoi(env, { lop: `${LOP_LIVE}${khoi}`, ten: `${ten} · ${ngay}`.slice(0, 80) }, nay)
+      moBuoi = mb.lenh
+      if (x) { x.buoiId = mb.id; x.ten = x.ten || ten }
+      else { x = { id: taoId(nay), khoi, batDau: nay, ten, trangThai: 'cho', buoiId: mb.id, luc: nay }; ds.push(x) }
     }
     if (x.trangThai === 'hen') x.trangThai = 'cho'
     x.luc = nay
     ds = donLich(ds, nay)
-    await ghi(env, ds, nay)
+    try {
+      if (moBuoi) await env.DB.batch([moBuoi, lenhGhi(env, ds, nay)]); else await ghi(env, ds, nay)
+    } catch { return { ok: false, error: 'Chưa mở được buổi live. Thầy thử lại.' } }
     await bao(em[khoi])
-    return { ...traDs(ds, em), lich: raLich(x), buoiId: x.buoiId, ma }
+    return { ...traDs(ds, em), lich: raLich(x), buoiId: x.buoiId, ma: '' }
   }
   if (p === '/gv/bpu/khoi-bat-dau' || p === '/gv/bpu/khoi-xong') {
     const x = ds.find((y) => y.id === str(b.id))

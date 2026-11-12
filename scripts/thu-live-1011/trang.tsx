@@ -79,6 +79,15 @@ if (vai === 'gv') {
       cauGia('Q1', 'Alcohol nào sau đây là alcohol bậc II?', ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH']),
       cauGia('Q2', 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', ['NaCl', 'NaOH', 'HCl', 'NaHCO₃']),
     ] as never))
+    // Tấm hoạt động thật (Chữa câu khó, Kiểm tra đầu giờ…) KHÔNG chiếu qua gan-gv: nó tự dựng <KhungXemPhieu> của riêng mình (cổng ra <body>, z 99999).
+    // Hàm này dựng đúng một tờ như vậy (tên khác tờ của bảng) để kiểm «bấm Chiếu lên bảng ở tấm hoạt động ⇒ tờ nằm TRÊN tấm».
+    ;(window as unknown as { __chieuToRieng: () => Promise<void> }).__chieuToRieng = async () => {
+      const [{ default: Khung }, { createRoot }, React] = await Promise.all([import('../../src/components/KhungXemPhieu'), import('react-dom/client'), import('react')])
+      const k = document.createElement('div'); k.setAttribute('data-to-rieng', ''); document.body.appendChild(k)
+      const g = createRoot(k)
+      ;(window as unknown as { __dongToRieng: () => void }).__dongToRieng = () => { g.unmount(); k.remove() }
+      g.render(React.createElement(Khung, { html: '<!doctype html><html><body style="margin:0;background:#f4efe4;font:700 40px sans-serif"><div id="to-rieng" style="padding:60px">TỜ RIÊNG CỦA TẤM HOẠT ĐỘNG</div></body></html>', ten: 'Chữa câu khó · tờ chiếu', dong: () => { g.unmount(); k.remove() } }))
+    }
     ;(window as unknown as { __sanSang: boolean }).__sanSang = true
   })
 } else if (vai === 'em') {

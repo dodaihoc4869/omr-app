@@ -58,7 +58,7 @@ export default function LopNoiEm() {
   useEffect(() => {
     if (!cho) return
     const f = () => {
-      try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().then(() => (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.('landscape')).catch(() => {}) } catch { /* không hỗ trợ */ }
+      try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().then(() => (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.('landscape-primary')).catch(() => {}) } catch { /* không hỗ trợ */ }
     }
     window.addEventListener('pointerdown', f, { once: true })
     return () => window.removeEventListener('pointerdown', f)

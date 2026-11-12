@@ -98,6 +98,13 @@ const trenHd = (p) => p.evaluate(() => { const e = document.elementFromPoint(inn
 await lk('hoc'); await ngu(800)
 await gv.locator('.lkt-chon .bcc-hd-the').nth(2).click(); await ngu(2200)
 kiem('3i mở «Chữa câu khó» từ bảng trắng: tấm hoạt động ở trên', (await trenHd(gv)) === 'thd', await trenHd(gv))
+// (thầy 12/11 lần 2 «bấm chiếu lên bảng xong bấm lên bảng không vào màn chiếu») tấm hoạt động THẬT tự mở tờ riêng (không qua bảng) ⇒ tờ đó phải nằm TRÊN tấm
+await gv.evaluate(() => window.__chieuToRieng()); await ngu(1200)
+const trenRieng = await gv.evaluate(() => { const e = document.elementFromPoint(innerWidth * 0.4, innerHeight * 0.45); const k = e?.closest('.lop-xem-phieu'); return k ? `to:${k.getAttribute('aria-label')}` : e?.closest('.thd') ? 'thd' : 'khác' })
+kiem('3j tấm hoạt động tự mở tờ riêng («Chiếu lên bảng»): tờ nằm TRÊN tấm, có nút đóng để quay lại', trenRieng === 'to:Chữa câu khó · tờ chiếu' && await gv.locator('.lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu"] .khung-phieu-thanh, .lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu"] .nut-dong-phieu').first().isVisible(), trenRieng)
+await chup(gv, '3-to-rieng-tren-tam')
+await gv.evaluate(() => window.__dongToRieng()); await ngu(400)
+kiem('3j2 đóng tờ riêng ⇒ về tấm hoạt động', (await trenHd(gv)) === 'thd', await trenHd(gv))
 const loiHd = await gv.evaluate(() => window.__chieuCauGia()); await ngu(3500)
 kiem('3k chiếu câu TỪ tấm hoạt động: tấm KHÔNG còn che màn chiếu; phòng sang «hoc»', loiHd === '' && ['bang-bpu', 'to'].includes(await trenHd(gv)) && st()?.live?.khoi?.che === 'hoc', `${await trenHd(gv)} · che ${st()?.live?.khoi?.che}`)
 kiem('3l máy em vào nhận đề (không còn ở bảng danh sách / bảng trắng)', (await em1.locator('.lke .bd').count()) === 0 && await em1.locator('.bpu-hs').isVisible())
