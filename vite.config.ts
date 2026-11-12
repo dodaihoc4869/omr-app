@@ -586,6 +586,9 @@ export default defineConfig({
           // Gọi lên bảng, Lên bảng chiến dịch, Cài đặt, Chiến dịch, Mở ca, danh sách chiến dịch đã giao — đều đã ngoài precache): phần tính chiến dịch `tinh`
           // (nay gộp cả bộ chọn em), Sửa chiến dịch, API OMNI của thầy, cây thư mục mục đích, Bài hôm nay, đồng bộ thư mục ⇒ kho chạy-lúc.
           '**/{tinh,SuaEmNhanBai,api-omni,cay-muc-dich,bai-hom-nay,dong-bo-thu-muc}-*.{js,css}',
+          // «Chỉ giọng thầy» của Live (12/11, đường thử chỉ-thầy, mặc định tắt): cờ / tải mô hình + lõi tách CHỈ máy thầy nạp khi chọn mức này (mô hình luôn cần mạng)
+          // ⇒ kho chạy-lúc, không thêm tệp precache.
+          '**/{chi-thay,tach-giong-thay}-*.js',
           // Bù chỗ cho phần OMNI của Sảnh em (≈ 14 KB, mảnh khởi động): "Làm câu ôn" (bảng nhiệm vụ cũ) nạp LƯỜI khi em bấm và mọi việc của nó cần máy chủ
           // (tải câu, chấm) — mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc (như Tu luyện 30/09).
           '**/LamCauOn-*.{js,css}',

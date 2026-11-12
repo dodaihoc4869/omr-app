@@ -8,6 +8,11 @@ import { guiThuMucKho } from '../components/chien-dich/api-omni'
 import { ngayVn } from '../components/chien-dich/ngay'
 import { chiaLo, dsThuMucKho, LO_THU_MUC } from './cay-muc-dich'
 
+// CÔNG TẮC ẨN «Chỉ giọng thầy» của Live (12/11, đường thử chỉ-thầy — src/lib/live/chi-thay.ts): link app thầy có `chi-thay=bat` / `chi-thay=tat`.
+// Mảnh này là việc nền App.tsx nạp lười khi vỏ app thầy ĐÃ MỞ KHOÁ (không chạy ở /hs, /ph, link phiếu / thi) ⇒ đọc tham số ở đây, KHÔNG thêm byte nào
+// vào đường mở app thầy (luật tốc độ, docs/moc-toc-do.json — mốc chỉ hạ).
+if (typeof location !== 'undefined' && location.search.includes('chi-thay=')) void import('./live/chi-thay').then((m) => m.apChiThayUrl(location.search)).catch(() => {})
+
 export const KHOA_NGAY_THU_MUC = 'ddh.thuMucKho.ngay'
 
 function docNgay(): string {
