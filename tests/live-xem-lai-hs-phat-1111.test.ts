@@ -39,15 +39,39 @@ describe('đồng hồ phát', () => {
     d.dat(60_000, 9000); d.phat(9000)
     expect(d.doc(9500)).toBe(61_000)
   })
-  it('làm mượt audio.currentTime: nội suy giữa hai lần cập nhật, tiếng đứng thì nét đứng, không lùi trừ khi tua', () => {
+  it('làm mượt audio.currentTime: tự chạy giữa hai lần cập nhật, tiếng đứng thì nét đứng, tua thì theo ngay, tạm dừng thì đúng số của audio', () => {
     const m = taoLamMuot()
     expect(m.doc(5000, 0, true, 1)).toBe(5000)
-    expect(m.doc(5000, 16, true, 1)).toBe(5016) // trình duyệt chưa cập nhật ⇒ tự ước
-    expect(m.doc(5000, 33, true, 2)).toBe(5066) // tốc độ 2×
-    expect(m.doc(5040, 50, true, 1)).toBe(5066) // con số mới nhỏ hơn mốc đã hiện một chút ⇒ không lùi
-    expect(m.doc(5040, 2000, true, 1)).toBe(5290) // tiếng đứng (đang đệm): chỉ ước tối đa 250 ms rồi đứng
-    expect(m.doc(1000, 2016, true, 1)).toBe(1000) // tua lùi (lệch quá 250 ms) ⇒ theo ngay
+    expect(m.doc(5000, 16, true, 1)).toBe(5016) // trình duyệt chưa cập nhật ⇒ tự chạy theo đồng hồ máy
+    const a = m.doc(5040, 50, true, 1) // con số mới NHỎ hơn mốc đã hiện (5050) một chút ⇒ không đứng, không lùi: vẫn tiến, chỉ chậm lại chút
+    expect(a).toBeGreaterThan(5016 + 34 * 0.75 - 0.001); expect(a).toBeLessThan(5050)
+    expect(m.doc(5040, 2000, true, 1)).toBe(5440) // tiếng đứng (đang đệm): đi nốt tối đa 400 ms rồi đứng
+    expect(m.doc(5040, 2500, true, 1)).toBe(5440)
+    expect(m.doc(1000, 2516, true, 1)).toBe(1000) // tua lùi (lệch quá 250 ms) ⇒ theo ngay
     expect(m.doc(1000, 9000, false, 1)).toBe(1000) // tạm dừng ⇒ đúng con số của audio
+    expect(m.doc(1000, 9500, true, 2)).toBe(1000) // phát lại: bắt đầu đúng từ số của audio
+    expect(m.doc(1000, 9516, true, 2)).toBe(1032) // tốc độ 2×
+  })
+  it('NÉT MƯỢT (thầy 13/11 «nét bút xem lại bị giật»): giờ tiếng cập nhật thưa, lệch nhịp ⇒ đồng hồ vẫn tiến ĐỀU từng khung, không khựng, không nhảy, vẫn bám tiếng', () => {
+    // Điện thoại: trình duyệt chỉ đổi `currentTime` ~4–10 lần / giây, mỗi lần lệch ±25 ms so với giờ thật (độ trễ loa, lịch cập nhật). 60 khung / giây, 20 giây.
+    for (const td of [1, 1.5, 2]) {
+      const m = taoLamMuot()
+      let hat = 12345, tAudio = 100_000, kyCapNhat = 0, truoc = -1, lechLon = 0
+      const buoc: number[] = []
+      const ngau = () => { hat = (hat * 1103515245 + 12345) & 0x7fffffff; return hat / 0x7fffffff }
+      for (let k = 0; k < 1200; k++) {
+        const nay = k * (1000 / 60), that = 100_000 + nay * td
+        if (nay >= kyCapNhat) { tAudio = Math.round(that + (ngau() - 0.5) * 50); kyCapNhat = nay + 100 + ngau() * 150 }
+        const t = m.doc(tAudio, nay, true, td)
+        if (truoc >= 0) buoc.push(t - truoc)
+        truoc = t
+        if (k > 120) lechLon = Math.max(lechLon, Math.abs(t - that))
+      }
+      const chuan = (1000 / 60) * td
+      expect(Math.min(...buoc)).toBeGreaterThan(chuan * 0.74) // không khựng (trước đây có khung đứng im: bước 0)
+      expect(Math.max(...buoc)).toBeLessThan(chuan * 1.26) // không nhảy (trước đây có khung nhảy vài chục ms)
+      expect(lechLon).toBeLessThan(60) // vẫn khớp tiếng (lệch dưới 60 ms sau 2 giây đầu)
+    }
   })
   it('hàng phát ↔ thanh tua', () => {
     const hang = [{ t0: 100_000, t1: 160_000 }, { t0: 300_000, t1: 330_000 }]

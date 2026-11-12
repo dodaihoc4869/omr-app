@@ -30,6 +30,23 @@ Mỗi dòng trong `ds`:
 | `luc`, `gio`, `ngay` | mốc ms, giờ Việt Nam `HH:MM`, ngày Việt Nam `YYYY-MM-DD` |
 | `buoiId`, `phong`, `khoi` | mã buổi, tên phòng live, khối |
 
+## Thống kê buổi (tin kết thúc)
+`POST https://omr.ttadodaihoc.workers.dev/gv/bpu/live-thong-ke` — cùng mã GV. Thân: `{ buoiId? }`; bỏ trống ⇒ buổi live theo khối mở gần nhất. Dùng được cả lúc đang live lẫn sau khi buổi kết thúc. Mã buổi lấy ở `lich[].buoiId` của `/gv/bpu/khoi-ds`.
+
+Trả về:
+
+| Trường | Nghĩa |
+|---|---|
+| `buoiId`, `ten`, `khoi`, `moLuc`, `dongLuc` | buổi nào, khối mấy, giờ mở / đóng (ISO, `dongLuc` null = chưa đóng) |
+| `coPhong`, `dangLive`, `ketThuc` | phòng có trả lời không, đang live không, buổi đã kết thúc chưa |
+| `siSo`, `soCoMat`, `soVang` | sĩ số khối (em chưa khoá), số em đã vào live, số em KHÔNG vào live |
+| `coMat[]` | `{ sbd, ten, lop, roi }` — em đã vào, `roi` = số lần rời màn hình (xếp nhiều → ít) |
+| `roiMan[]` | `{ sbd, ten, lop, lan }` — chỉ các em có rời màn hình |
+| `moiRa[]` | `{ sbd, ten, lop, soLan, lan, gio, trangThai }` — em bị mời ra; `soLan` = số lượt bị mời ra trong buổi, `lan` = số lần rời ở lượt cuối, `trangThai`: `cho` (chưa được vào lại) · `tu-choi` · `da-vao-lai` |
+| `vang[]` | `{ sbd, ten, lop }` — em thuộc khối nhưng không vào live |
+
+Lưu ý: `roi` chỉ đếm lúc đang live (Học / Bảng), không đếm ở phòng chờ. `coPhong: false` (phòng chưa mở / không trả lời) ⇒ `coMat` rỗng, `vang` = cả khối: đừng gửi tin dựa trên số đó.
+
 ## Cách dùng gợi ý
 - Hỏi 20–30 giây một lần, CHỈ trong giờ có buổi live (mỗi lượt hỏi là một lệnh đọc D1).
 - Nhắn phụ huynh theo dòng `ra`. Dòng `tu` ⇒ nhắn thêm «Thầy không cho em vào lại buổi này». Dòng `vao` đến trước khi kịp nhắn `ra` không xoá việc em đã rời màn hình đủ số lần; văn phòng tự quyết có nhắn hay không.
@@ -37,4 +54,4 @@ Mỗi dòng trong `ds`:
 
 ## Chưa có
 - Chưa có lệnh để văn phòng đánh dấu «đã nhắn». Cần thì thêm sau (`/gv/bpu/moi-ra-xong`).
-- Chưa thử trên buổi live thật; đã thử bằng test máy chủ `tests/live-moi-ra-van-phong-1311.test.ts`.
+- Chưa thử trên buổi live thật; đã thử bằng test máy chủ `tests/live-moi-ra-van-phong-1311.test.ts` (5 test).

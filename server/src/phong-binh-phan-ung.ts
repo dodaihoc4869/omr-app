@@ -73,6 +73,8 @@ export async function kiemVeBpu(biMat: string, chuoi: unknown, nay = Date.now())
 
 const buoiHop = (id: unknown): string => { const s = str(id).trim(); return /^[A-Za-z0-9_-]{1,64}$/.test(s) ? s : '' }
 const phongCua = (env: Env, buoiId: string) => env.PHONG_BPU!.get(env.PHONG_BPU!.idFromName(`bpu:${buoiId}`), { locationHint: 'apac' })
+/** Máy chủ hỏi phòng số liệu thống kê của buổi (`/gv/bpu/live-thong-ke`). Không có phòng / mã buổi lạ ⇒ `{ ok: false }`. */
+export const bpuThongKe = (env: Env, buoiId: string): Promise<Row> => (env.PHONG_BPU && buoiHop(buoiId) ? goiPhong(env, buoiHop(buoiId), '/tk', {}).catch(() => ({ ok: false })) : Promise.resolve({ ok: false }))
 async function goiPhong(env: Env, buoiId: string, duong: string, than: unknown): Promise<Row> {
   const r = await phongCua(env, buoiId).fetch(new Request(`https://bpu${duong}`, { method: 'POST', body: JSON.stringify(than), headers: { 'content-type': 'application/json' } }))
   return (await r.json().catch(() => ({ ok: false, error: 'Phòng không trả lời.' }))) as Row
@@ -405,6 +407,8 @@ export class PhongBinhPhanUng {
     if (req.method !== 'POST') return json({ ok: false }, 405)
     const b = (await req.json().catch(() => ({}))) as Row
     const nay = Date.now()
+    // THỐNG KÊ BUỔI cho văn phòng trực live (13/11): ai đã vào, mỗi em rời màn mấy lần. Đọc-chỉ, không đổi trạng thái, dùng được cả sau khi buổi kết thúc.
+    if (u.pathname === '/tk') { const st = await this.doc(); return json(st ? { ok: true, phong: st.lop, ketThuc: st.ketThuc, dangLive: !!st.live?.bat, em: st.ds.map((e) => [e.sbd, e.ten, e.vao ? 1 : 0, e.roi]) } : { ok: false, lyDo: 'chua-mo' }) }
     if (u.pathname === '/tt-doc') return json({ ok: true, tt: (await this.ctx.storage.get('tt')) ?? null })
     if (u.pathname === '/tt-ghi') {
       const moi = chuanTienTrinh(b.tt), cu = chuanTienTrinh(await this.ctx.storage.get('tt'))
