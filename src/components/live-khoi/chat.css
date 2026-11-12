@@ -66,6 +66,8 @@
 
 .lc-bong-cho { position: absolute; right: var(--lc-cach-phai, 52px); top: 44px; z-index: 4; max-width: min(250px, 60%); pointer-events: none; }
 .lc-bong-noi { padding: 7px 12px; border: 2px solid var(--lc-vien); border-radius: 14px 14px 4px 14px; background: var(--lc-mat); box-shadow: var(--lc-bong); font-size: 13.5px; line-height: 1.35; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; animation: lc-bong-hien 4.3s linear both; }
+/* Tin của THẦY ở lại lâu hơn (thầy 12/11 «thầy nhắn mà hs không thấy»): 12 giây thay vì 4,3 giây, viền màu thầy cho nổi. */
+.lc-bong-noi.thay { animation-duration: 12s; border-color: var(--tr-hs); }
 .lc-bong-noi b { margin-right: 6px; color: color-mix(in srgb, var(--lc-doi) 70%, var(--lc-chu)); }
 .lc-bong-noi sub { font-size: 0.72em; line-height: 0; }
 @keyframes lc-bong-hien { 0% { opacity: 0; transform: translateY(6px); } 5%, 93% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px); } }

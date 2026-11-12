@@ -43,6 +43,7 @@ import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang, giuKhoaNgang } from './bo-cuc'
+import { laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
 import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
@@ -176,8 +177,9 @@ type HuongMan = { lock?: (h: string) => Promise<void>; unlock?: () => void; type
 const huongMan = (): HuongMan | null => (typeof screen !== 'undefined' ? ((screen as Screen & { orientation?: HuongMan }).orientation ?? null) : null)
 
 /** Dấu trạng thái rất nhỏ trên tay nắm (khay đóng vẫn biết): `nhan` = chữ cho trình đọc màn (nối vào nhãn của tay nắm). */
-export interface DauNam { loai: 'tieng' | 'mic' | 'tay' | 'mang'; nhan: string }
-const BT_DAU: Record<DauNam['loai'], () => ReactNode> = { tieng: BtLoaTat, mic: BtMic, tay: BtTay, mang: BtMang }
+export interface DauNam { loai: 'tieng' | 'mic' | 'tay' | 'mang' | 'tin'; nhan: string }
+const BtTin = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" /></svg>
+const BT_DAU: Record<DauNam['loai'], () => ReactNode> = { tieng: BtLoaTat, mic: BtMic, tay: BtTay, mang: BtMang, tin: BtTin }
 /** Khay tự thu sau ngần này ms không chạm; lần tự mở đầu buổi (tiếng đang tắt) thì ngắn hơn. */
 const THU_MS = 4000, GIOI_THIEU_MS = 3000
 
@@ -225,7 +227,7 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiTh
   }, [mo, datMo, khay, nam])
   const keo = useRef<{ id: number; x0: number; y0: number; kieu: '' | 'ngang' | 'doc' } | null>(null)
   /** Toạ độ con trỏ theo trục của HÌNH (hình xoay 90° ⇒ đổi trục). */
-  const toaDo = (e: { clientX: number; clientY: number }) => (xoay?.() ? { x: e.clientY, y: window.innerWidth - e.clientX } : { x: e.clientX, y: e.clientY })
+  const toaDo = (e: { clientX: number; clientY: number }) => (xoay?.() ? toaDoXoay(e, { left: 0, top: 0, right: window.innerWidth, bottom: window.innerHeight }) : { x: e.clientX, y: e.clientY })
   /** Quãng khay phải trượt để ra hẳn ngoài mép phải (bề rộng khay + khoảng cách tới mép). */
   const quang = () => { const k = khay.current; return k ? k.offsetWidth + 16 + (parseFloat(getComputedStyle(k).right) || 0) : 240 }
   const namXuong = (e: React.PointerEvent<HTMLButtonElement>) => {
@@ -430,6 +432,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     if (micMo) ds.push({ loai: 'mic', nhan: 'mic của em đang bật' })
     if (tt.tay) ds.push({ loai: 'tay', nhan: `em đang giơ tay${tt.hangTay ? `, thứ ${tt.hangTay} trong hàng` : ''}` })
     if (mangYeu) ds.push({ loai: 'mang', nhan: 'mạng yếu' })
+    if (tinLk > 0) ds.push({ loai: 'tin', nhan: `${tinLk} tin nhắn mới` })
     return ds
   }
   /** Các dòng của khay — dùng chung cho bảng live và màn câu hỏi. `dau` = dòng đầu (bảng live: sóng «Thầy đang nói» + vạch mạng). */
@@ -540,7 +543,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
   /** Đo khổ hình + vùng an toàn của máy (đọc thước `env(safe-area-inset-*)`). */
   const doHinh = useCallback((): HinhDL => {
     const W = window.innerWidth, H = window.innerHeight
-    const xoay = canXoayCss(W, H, khoaNgang.current)
+    const xoay = canXoayCss(W, H, khoaNgang.current) && laDienThoai() // máy tính / máy tính bảng không bao giờ bị xoay hình (chieu-xoay.ts)
     const cs = thuoc.current ? getComputedStyle(thuoc.current) : null
     const px = (v: string | undefined) => parseFloat(v || '0') || 0
     return { xoay, w: xoay ? H : W, h: xoay ? W : H, at: anToanHinh({ tren: px(cs?.paddingTop), phai: px(cs?.paddingRight), duoi: px(cs?.paddingBottom), trai: px(cs?.paddingLeft) }, xoay) }
@@ -630,7 +633,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <BtChia />Tự phóng theo thầy<b>{tayChia ? 'Đang tắt' : 'Đang bật'}</b></button>
   )
   return (
-    <div ref={goc} className="lv" data-xoay={bc?.xoay || undefined} data-vao={vao || undefined} data-mat={matMang || undefined} data-giay={bc?.giayToi ? 'toi' : 'sang'} data-soi={netGiay || undefined} style={kieu} role="region" aria-label="Thầy đang live: bảng chữa bài">
+    <div ref={goc} className="lv" data-xoay={bc?.xoay ? thuocTinhXoay() : undefined} data-vao={vao || undefined} data-mat={matMang || undefined} data-giay={bc?.giayToi ? 'toi' : 'sang'} data-soi={netGiay || undefined} style={kieu} role="region" aria-label="Thầy đang live: bảng chữa bài">
       <div ref={thuoc} className="lv-thuoc" aria-hidden="true" />
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}

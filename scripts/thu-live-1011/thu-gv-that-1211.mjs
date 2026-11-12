@@ -19,8 +19,9 @@ const kiem = (ten, dat, them = '') => { ket.push({ ten, dat: !!dat }); console.l
 const exe = process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium'
 const trinh = await chromium.launch({ executablePath: existsSync(exe) && statSync(exe).isFile() ? exe : undefined, args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] })
 const may = await moMayChu({ dist: DIST })
-const mo = async (duong, w, h) => {
-  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, permissions: ['microphone'] })
+const mo = async (duong, w, h, dienThoai = false) => {
+  // `dienThoai`: máy chạm thật (pointer: coarse) — chỉ điện thoại mới bị xoay hình khi cầm dọc; cửa sổ dọc trên máy tính thì KHÔNG (chieu-xoay.ts)
+  const ctx = await trinh.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, permissions: ['microphone'], ...(dienThoai ? { hasTouch: true, isMobile: true } : {}) })
   await ctx.route((u) => !u.href.startsWith(may.goc), (r) => r.abort())
   const p = await ctx.newPage()
   p.on('pageerror', (e) => loiTrang.push(`${duong}: ${e.message.slice(0, 160)}`))
@@ -49,7 +50,8 @@ const lk = async (v) => {
   await f.locator(`.mc-khay-lk [data-lk="${v}"]`).click()
 }
 const em1 = await mo('vai=em&sbd=S1', 844, 390)
-const em2 = await mo('vai=em&sbd=S2', 390, 844) // em cầm DỌC
+const em2 = await mo('vai=em&sbd=S2', 390, 844, true) // em cầm DỌC, điện thoại
+const em3 = await mo('vai=em&sbd=S3', 500, 800) // cửa sổ DỌC trên máy tính (chuột)
 await gv.waitForFunction(() => window.__sanSang); await ngu(400)
 
 // ── 1. Mở phòng chờ ──
@@ -66,6 +68,7 @@ await gv.locator('.lkt-bat-dau').click(); await ngu(3200)
 kiem('2a máy thầy: SẢNH danh sách', (await trenCung(gv)) === 'sanh' && (await gv.locator('.lkt-cho.sanh .lkt-doi li:not(.rong)').count()) === 8)
 kiem('2b live TỰ BẬT, không cần tờ, không bấm nút Live', st()?.live?.bat === true && (await gv.locator('.lop-xem-phieu').count()) === 0)
 kiem('2c phòng: chế độ «sanh»; máy em ở bảng danh sách bốn đội', st()?.live?.khoi?.che === 'sanh' && (await em1.locator('.lke .bd').count()) === 1)
+kiem('2d2 cửa sổ dọc trên MÁY TÍNH không bị xoay hình (thầy 12/11 «vẫn bị ép xoay ngang»)', await em3.evaluate(() => !document.querySelector('[data-xoay]')))
 kiem('2d em cầm DỌC bị ép ngang (xoay hình)', await em2.evaluate(() => !!document.querySelector('.lke[data-xoay]')))
 await chup(gv, '2-sanh'); await chup(em1, '2-em-danh-sach'); await chup(em2, '2-em-doc-ep-ngang')
 
@@ -118,8 +121,8 @@ kiem('3n Esc lần nữa: đóng tấm, về bài đang dạy (không ra sảnh,
 const loiChieu = await gv.evaluate(() => window.__chieuCauGia()); await ngu(3500)
 kiem('4a chiếu được bài', loiChieu === '', loiChieu)
 kiem('4b câu được CHIẾU ⇒ phòng tự sang «hoc» (lượt mới), live vẫn bật', st()?.live?.khoi?.che === 'hoc' && !!st()?.luot && st()?.live?.bat === true, JSON.stringify({ che: st()?.live?.khoi?.che, luot: st()?.luot?.so }))
-kiem('4c máy thầy: bảng Bình Phản Ứng HIỆN (màn đua như bên Lên bảng)', (await bangBpu(gv)) === 'visible' && (await trenCung(gv)) === 'bang-bpu', `${await bangBpu(gv)} · ${await trenCung(gv)}`)
-kiem('4d cụm Học | Bảng · Lớp · Tin nhắn nằm trên cùng, bấm được', await gv.locator('.lkt-che button').count() === 2 && await gv.evaluate(() => { const b = document.querySelector('.lkt-che button'); const r = b.getBoundingClientRect(); return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === b }))
+kiem('4c «Học» KHÔNG còn màn đua (thầy 12/11 «bỏ hẳn bình phản ứng đi, tất cả làm việc trên màn chiếu»): bảng Bình Phản Ứng ẩn, câu hiện trên màn chiếu', (await bangBpu(gv)) === 'hidden' && (await trenCung(gv)) === 'to', `${await bangBpu(gv)} · ${await trenCung(gv)}`)
+kiem('4d không còn cụm nổi của app; mọi nút nằm trong khay nút bốn ô của tờ', (await gv.locator('.lkt-vien').count()) === 0 && await gv.frameLocator('.lop-xem-phieu iframe').locator('#mc-them').isVisible())
 kiem('4e máy em: bảng danh sách đóng, vào câu hỏi; nút nhắn tin ẨN lúc làm câu', (await em1.locator('.lke .bd').count()) === 0 && (await em1.locator('.lke-mep').count()) === 0 && await em1.locator('.bpu-hs').isVisible())
 kiem('4f em cầm dọc: màn câu hỏi vẫn ép ngang', await em2.evaluate(() => !!document.querySelector('.bpu-hs[data-xoay]')))
 await chup(gv, '4-hoc-bang-dua'); await chup(em1, '4-em-cau-hoi'); await chup(em2, '4-em-doc-cau-hoi')
@@ -128,7 +131,7 @@ await chup(gv, '4-hoc-bang-dua'); await chup(em1, '4-em-cau-hoi'); await chup(em
 await gv.keyboard.press('Escape'); await ngu(500)
 kiem('5a Esc: lùi về sảnh', (await trenCung(gv)) === 'sanh')
 await gv.locator('.lkt-cho.sanh .lkt-ve').last().click(); await ngu(500)
-kiem('5b «Quay lại bài»: về màn đang dạy', (await trenCung(gv)) === 'bang-bpu')
+kiem('5b «Quay lại bài»: về màn chiếu đang dạy', (await trenCung(gv)) === 'to')
 
 // ── 6. Sang «Bảng» ⇒ bảng xanh than kín màn cả hai phía, viết được ở MỌI chỗ ──
 await lk('bang'); await ngu(2200)
@@ -153,14 +156,20 @@ await chup(gv, '6-bang'); await chup(em1, '6-em-bang'); await chup(em2, '6-em-do
 
 // ── 7. Về «Học» ⇒ quay lại đúng bài đang dạy (không phải chọn lại) ──
 await lk('hoc'); await ngu(1800)
-kiem('7 về «Học»: phòng «hoc», bảng đua hiện lại, không mở chọn bài', st()?.live?.khoi?.che === 'hoc' && (await trenCung(gv)) === 'bang-bpu' && (await gv.locator('.lkt-chon').count()) === 0)
+kiem('7 về «Học»: phòng «hoc», vẫn ở màn chiếu (không màn đua), không mở chọn bài', st()?.live?.khoi?.che === 'hoc' && (await trenCung(gv)) === 'to' && (await bangBpu(gv)) === 'hidden' && (await gv.locator('.lkt-chon').count()) === 0)
 
 // 7d. (thầy 12/11, ảnh màn Đúng–sai khổ ngang) câu ĐÚNG–SAI trên máy em: cột phải hiện ĐỦ chữ từng ý + nút Đúng | Sai bên cạnh (giống chặng), không rút gọn «…»
 await may.moLuot({ qid: 'DS1', maDe: 'm', version: '1', group: 'g', phan: 'II', text: 'Peptide X có cấu trúc như sau: H₂N–CH(CH₃)–CO–NH–CH(CH₂CH₂COOH)–CO–NH–CH₂–COOH. Mỗi phát biểu sau đây là đúng hay sai?', choices: [], ideas: ['X là một tetrapeptide.', 'Trong phân tử peptide X có chứa 3 liên kết peptide.', 'Tên viết tắt của peptide X là Ala-Val-Gly.', 'Trong cấu tạo của X, amino acid đầu N là alanine và amino acid đầu C là glycine.'], hinhAnh: [], dang: null, tenDang: 'Peptide', mucDo: 'hieu', sao: 2, kienThuc: [] }, 'SSSĐ'); await ngu(2500)
-for (const [ten, p] of [['ngang', em1], ['dọc ép ngang', em2]]) {
-  const ds = await p.evaluate(() => { const y = [...document.querySelectorAll('.bpu-tra .ht2-lam-y')]; return { gon: !!document.querySelector('.bpu-cau[data-gon]'), n: y.length, cat: y.filter((e) => { const c = e.querySelector('.ht2-lam-y-chu'); return !c || c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1 }).length, canh: y.filter((e) => { const c = e.querySelector('.ht2-lam-y-chu'), n = e.querySelector('.ht2-lam-y-nut'); if (!c || !n) return false; const oc = c.closest('.ht2-lam-y-dau') ?? c; return n.offsetLeft >= oc.offsetLeft + oc.offsetWidth - 4 && n.offsetTop < oc.offsetTop + oc.offsetHeight && c.offsetWidth > 60 }).length, lap: document.querySelector('.bpu-y-de') ? getComputedStyle(document.querySelector('.bpu-y-de')).display : 'không có' } })
-  kiem(`7d Đúng–sai máy em (${ten}): đủ 4 ý, KHÔNG cắt chữ, nút Đúng | Sai đứng cạnh ý, không lặp danh sách ý bên cột đề`, !ds.gon && ds.n === 4 && ds.cat === 0 && ds.canh === 4 && (ds.lap === 'none' || ds.lap === 'không có'), JSON.stringify(ds))
+for (const [ten, p] of [['ngang', em1], ['điện thoại dọc ép ngang', em2]]) {
+  const ds = await p.evaluate(() => { const y = [...document.querySelectorAll('.bpu-tra .ht2-lam-y')], tra = document.querySelector('.bpu-tra'); return { gon: !!document.querySelector('.bpu-cau[data-gon]'), n: y.length, cat: y.filter((e) => { const c = e.querySelector('.ht2-lam-y-chu'); return !c || c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1 }).length, tron: y.filter((e) => { const d = e.querySelector('.ht2-lam-y-dau'), n = e.querySelector('.ht2-lam-y-nut'); return !!d && !!n && d.offsetWidth > (tra?.clientWidth ?? 0) * 0.8 && n.offsetTop >= d.offsetTop + d.offsetHeight - 2 }).length, lap: document.querySelector('.bpu-y-de') ? getComputedStyle(document.querySelector('.bpu-y-de')).display : 'không có' } })
+  kiem(`7d Đúng–sai máy em (${ten}): đủ 4 ý, KHÔNG cắt chữ, chữ ý chiếm TRỌN hàng, nút Đúng | Sai nằm dưới; không lặp danh sách ý bên cột đề`, !ds.gon && ds.n === 4 && ds.cat === 0 && ds.tron === 4 && (ds.lap === 'none' || ds.lap === 'không có'), JSON.stringify(ds))
 }
+// vách kéo giữa cột đề và cột chọn: kéo sang trái ⇒ cột chọn rộng ra
+const rong0 = await em1.evaluate(() => document.querySelector('.bpu-tra')?.clientWidth ?? 0)
+const vachO = await em1.locator('.bpu-cau > .bpu-vach').boundingBox()
+if (vachO) { await em1.mouse.move(vachO.x + vachO.width / 2, vachO.y + 120); await em1.mouse.down(); await em1.mouse.move(vachO.x - 110, vachO.y + 130, { steps: 6 }); await em1.mouse.up(); await ngu(300) }
+const rong1 = await em1.evaluate(() => document.querySelector('.bpu-tra')?.clientWidth ?? 0)
+kiem('7e kéo vách giữa đề và phần chọn: cột chọn rộng ra (di chuyển được cửa sổ đề / chọn ý)', !!vachO && rong1 > rong0 + 60, `cột chọn ${rong0} → ${rong1} px`)
 await chup(em1, '7-em-dung-sai'); await chup(em2, '7-em-doc-dung-sai')
 const trangHoc = await gv.frameLocator('.lop-xem-phieu iframe').locator('body').evaluate(() => ({ trang: window.__mcBut.trang(), net: window.__mcBut.xuat().net.length }))
 await lk('bang'); await ngu(1800)

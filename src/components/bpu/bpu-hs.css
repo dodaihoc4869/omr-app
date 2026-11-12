@@ -290,6 +290,8 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
    lưới hai cột khi xoay ngang, lề cột gợi ý) — khối nằm gọn trong thân màn Bình Phản Ứng, thân vẫn chừa lề phải cho nút «Gửi» nổi. Không màu mới. */
 .bpu-hs.m3 .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex: none; flex-direction: column; gap: 12px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
 .bpu-tra { display: flex; flex: none; flex-direction: column; gap: 12px; min-width: 0; }
+/* Vách kéo giữa cột đề và cột chọn (thầy 12/11 «có thể di chuyển cửa sổ đề và chọn ý») — chỉ có ở khổ ngang; dọc thì ẩn. */
+.bpu-vach { display: none; }
 /* Xoay ngang: đề (giám thị) cột trái · phần trả lời cột phải; nhãn loại câu nằm trên, trọn bề ngang. */
 @media (orientation: landscape) and (min-width: 640px) {
   .bpu-hs-than > .bpu-chip { grid-column: 1 / -1; justify-self: start; }
@@ -307,6 +309,8 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
    mép phải hình ⇐ đáy máy (thanh home), đáy hình ⇐ mép trái máy, mép trái hình ⇐ đỉnh máy (tai thỏ). */
 .bpu-hs[data-xoay] { inset: 0 auto auto 0; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%);
   padding-top: env(safe-area-inset-right, 0px); padding-left: env(safe-area-inset-top, 0px); padding-right: env(safe-area-inset-bottom, 0px); }
+/* xoay NGƯỢC (em cầm ngang chiều kia — live/chieu-xoay.ts): vùng an toàn đổi bên theo */
+.bpu-hs[data-xoay="nguoc"] { transform: rotate(-90deg) translateX(-100%); padding-top: env(safe-area-inset-left, 0px); padding-left: env(safe-area-inset-bottom, 0px); padding-right: env(safe-area-inset-top, 0px); }
 .bpu-hs[data-xoay] .bpu-hs-day { padding-bottom: calc(16px + env(safe-area-inset-left, 0px)); }
 .bpu-hs[data-xoay] .bpu-gui-noi { right: max(12px, env(safe-area-inset-bottom, 0px)); }
 .bpu-hs[data-xoay].co-gui .bpu-hs-than { padding-right: calc(max(12px, env(safe-area-inset-bottom, 0px)) - env(safe-area-inset-bottom, 0px) + 64px); }
@@ -358,9 +362,14 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
   .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut { flex: none; grid-template-columns: repeat(2, minmax(58px, auto)); }
   .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut button { padding-inline: 8px; }
   .bpu-hs-tren ~ .bpu-bd-neo .bpu-bd { right: calc(50% + 24px); padding-inline: 16px 0; }
-  .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 14px; }
-  .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: center; grid-area: 1 / 2; grid-template-columns: repeat(2, minmax(64px, auto)); }
-  .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) > .cau-hinh { grid-column: 1 / -1; margin: 0; }
+  .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding-block: 8px; }
+  .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: flex-end; grid-template-columns: repeat(2, minmax(96px, auto)); }
+  .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut button { min-height: 40px; }
+  .bpu-hs-than.bpu-cau { position: relative; }
+  .bpu-hs-than.bpu-cau[data-chia] { grid-template-columns: minmax(0, var(--bpu-trai, 1fr)) minmax(0, var(--bpu-phai, 1fr)); }
+  .bpu-cau > .bpu-vach { display: block; position: absolute; top: 0; bottom: 0; width: 22px; z-index: 3; cursor: col-resize; touch-action: none; }
+  .bpu-cau > .bpu-vach::after { content: ""; position: absolute; left: 9px; top: 14px; bottom: 14px; width: 4px; border-radius: 4px; background: var(--tr-vien); }
+  .bpu-cau > .bpu-vach[data-keo]::after { background: var(--tr-hs); }
 }
 :where(.bpu-hs[data-ngang]) .bpu-hs-than.bpu-cau { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; padding-top: 0; padding-bottom: 0; }
 :where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-cot-de { grid-column: 1; grid-row: 1 / -1; display: flex; flex-direction: column; gap: 12px; min-height: 0; padding: 14px 6px 32px 0; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; -webkit-mask-image: linear-gradient(to bottom, var(--tr-chu) calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, var(--tr-chu) calc(100% - 28px), transparent); }
@@ -378,9 +387,14 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut { flex: none; grid-template-columns: repeat(2, minmax(58px, auto)); }
 :where(.bpu-hs[data-ngang]) .bpu-cau[data-gon] .bpu-tra .ht2-lam-y-nut button { padding-inline: 8px; }
 :where(.bpu-hs[data-ngang]) .bpu-hs-tren ~ .bpu-bd-neo .bpu-bd { right: calc(50% + 24px); padding-inline: 16px 0; }
-:where(.bpu-hs[data-ngang]) .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 14px; }
-:where(.bpu-hs[data-ngang]) .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: center; grid-area: 1 / 2; grid-template-columns: repeat(2, minmax(64px, auto)); }
-:where(.bpu-hs[data-ngang]) .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) > .cau-hinh { grid-column: 1 / -1; margin: 0; }
+:where(.bpu-hs[data-ngang]) .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) { display: flex; flex-direction: column; align-items: stretch; gap: 6px; padding-block: 8px; }
+:where(.bpu-hs[data-ngang]) .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut { align-self: flex-end; grid-template-columns: repeat(2, minmax(96px, auto)); }
+:where(.bpu-hs[data-ngang]) .bpu-cau:not([data-gon]) > .bpu-tra .ht2-lam-ds .ht2-lam-y:not([data-ket]) .ht2-lam-y-nut button { min-height: 40px; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than.bpu-cau { position: relative; }
+:where(.bpu-hs[data-ngang]) .bpu-hs-than.bpu-cau[data-chia] { grid-template-columns: minmax(0, var(--bpu-trai, 1fr)) minmax(0, var(--bpu-phai, 1fr)); }
+:where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-vach { display: block; position: absolute; top: 0; bottom: 0; width: 22px; z-index: 3; cursor: col-resize; touch-action: none; }
+:where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-vach::after { content: ""; position: absolute; left: 9px; top: 14px; bottom: 14px; width: 4px; border-radius: 4px; background: var(--tr-vien); }
+:where(.bpu-hs[data-ngang]) .bpu-cau > .bpu-vach[data-keo]::after { background: var(--tr-hs); }
 @media (orientation: landscape) and (min-width: 640px) and (max-height: 500px) {
   .bpu-hs-tren, .bpu-hs-tren.co-doi { gap: 8px; padding: 3px 16px; }
   .bpu-hs-tren .bpu-lua { width: 24px; height: 29px; }

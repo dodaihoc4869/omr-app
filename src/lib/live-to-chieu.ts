@@ -460,7 +460,7 @@ export const JS_LIVE_TO_CHIEU = `
     var m = e.data, truoc;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
-    if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
+    if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; LV.lkChat = m.chat === true; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
     if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl') { LV.bangNhap = 1; if (m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); } return; }
     if (m.lenh !== 'live-tt') return;
     truoc = LV.tt; LV.tt = m.tt || null;
@@ -497,6 +497,8 @@ export const JS_LIVE_TO_CHIEU = `
       else if (x === 'chat') { ds[i].firstChild.textContent = moi > 0 ? 'Tin nhắn · ' + (moi > 99 ? '99+' : moi) + ' mới' : 'Tin nhắn'; ds[i].classList.toggle('mc-bat', moi > 0); }
     }
   }
+  // Cột tin nhắn của app đang mở mà thầy bấm vào tờ (ngoài khay nút bốn ô) ⇒ báo app thu cột (app không thấy được cú bấm trong tờ).
+  document.addEventListener('pointerdown', function (e) { var t = e.target; if (!LV.lkChat || (t && t.closest && t.closest('#mc-khay,#mc-them'))) return; LV.lkChat = false; lvGui('lk', { v: 'ngoai' }); }, true);
   function lvCheBang() {
     var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb;
     if (!trang && !(LV.tt && LV.tt.khoi)) return;

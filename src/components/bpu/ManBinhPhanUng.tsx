@@ -14,7 +14,8 @@ import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
 import { cheLiveCua, manEmXa, useHuongLive } from './luat-man-live'
-import { YDeNgang } from './bo-cuc-ngang'
+import { ngheVeLai } from './ve-lai-nhanh'
+import { YDeNgang, VachChia } from './bo-cuc-ngang'
 import { useThanNgang } from './bo-cuc-ngang-do'
 import { useTheBienDong } from './the-bien-dong'
 export { THE_BD_MS } from './the-bien-dong'
@@ -282,7 +283,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     dung.current = false
     let hen: ReturnType<typeof setTimeout> | undefined
     let ping: ReturnType<typeof setInterval> | undefined
-    const henLai = (ms?: number) => { if (dung.current) return; clearTimeout(hen); hen = setTimeout(() => void noi(), ms ?? LUI_MS[Math.min(loi.current++, LUI_MS.length - 1)]) }
+    const henLai = (ms?: number) => { if (dung.current) return; clearTimeout(hen); hen = setTimeout(() => { hen = undefined; void noi() }, ms ?? LUI_MS[Math.min(loi.current++, LUI_MS.length - 1)]) }
     async function noi() {
       if (dung.current) return
       try {
@@ -340,8 +341,9 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     }
     // Kết nối «mở» nhưng đã chết (phòng im sau `ve`): bỏ hẳn, nối mới ngay. Đang nối dở (ws rỗng) ⇒ để luồng nối lại sẵn có lo, không mở hai kết nối.
     noiLai.current = () => { const w = ws.current; if (!w || w.readyState !== 1) return; ws.current = null; clearInterval(ping); try { w.close() } catch { /* đã đóng */ } loi.current = 0; henLai(0) }
+    const goVe = ngheVeLai({ ws: () => ws.current, noiNgay: () => { if (hen !== undefined) { loi.current = 0; henLai(0) } }, boNoiChet: () => noiLai.current?.() })
     void noi()
-    return () => { dung.current = true; noiLai.current = null; clearTimeout(henVe.current); clearTimeout(hen); clearInterval(ping); try { ws.current?.close() } catch { /* đã đóng */ } ws.current = null }
+    return () => { goVe(); dung.current = true; noiLai.current = null; clearTimeout(henVe.current); clearTimeout(hen); clearInterval(ping); try { ws.current?.close() } catch { /* đã đóng */ } ws.current = null }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, buoiId])
 
@@ -631,7 +633,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
             <div className="bpu-loi-giai"><Suspense fallback={<div aria-busy="true" style={{ minHeight: 120 }} />}>
               <LoiGiaiKinhHs qid={String(l.qid ?? q.qid)} phan={l.phan} choices={q.choices} ideas={q.ideas} dapAn={l.dung} duPhong={<LoiGiaiDuPhong LG={LC.LoiGiaiCau as unknown as LoiGiaiCauKieu} q={q} solution={l.giai?.solution ?? null} dapAn={l.dung} hinhLoiGiai={(l.giai?.anh ?? []) as Question['hinhAnh']} />} />
             </Suspense></div>
-          ) : null}</div></div>
+          ) : null}</div></div><VachChia />
           <div className="duo-tra bpu-tra">{l.tuLuan ? <div className="bpu-the">Câu này thầy chữa trên bảng, máy không chấm. Em làm ra giấy, xong thì bấm nút bên dưới.</div>
             : !LC ? <p className="nho">Đang tải phương án…</p> : l.phan === 'I' ? <LC.ChonTracNghiem q={q} value={chonHien} onChon={(x) => setChon(x)} khoa={che || daMo || hetGio} />
             : l.phan === 'II' ? <LC.ChonDungSai q={q} value={chonHien.padEnd(4, ' ')} onChon={(i, x) => setChon((c) => { const a = c.padEnd(4, ' ').split(''); a[i] = x; return a.join('') })} khoa={che || daMo || hetGio} />

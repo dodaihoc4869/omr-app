@@ -132,7 +132,9 @@ let liveTt = { co: false, bat: false }
 export function datCheLive(c: 'cho' | 'sanh' | 'hoc' | 'bang'): void { if (cheLive !== c) { cheLive = c; apAnLive() } }
 function apAnLive(): void {
   if (!khung) return
-  const an = phienLive && (cheLive !== 'hoc' || !hien?.qid)
+  // Thầy 12/11 (ảnh màn đua): «phần học bỏ hẳn phần này đi, chỉ hiện câu luôn trên màn chiếu … chuyển câu lên bảng giữ nguyên trên màn chiếu không đổi màn nữa»
+  // ⇒ suốt buổi live bảng LUÔN ẩn (vẫn gắn: giữ nối phòng, mở lượt, chấm). Mọi thao tác nằm trên tờ + khay nút bốn ô.
+  const an = phienLive
   if (an === khung.hasAttribute('data-an-live')) return
   khung.toggleAttribute('data-an-live', an)
   if (!khung.hasAttribute('data-an')) baoAnHien(an)
