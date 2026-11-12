@@ -1,0 +1,655 @@
+{
+  "i": 320,
+  "assetIndexProvided": 1397,
+  "hash": "373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7.png",
+  "size": [
+    606,
+    155
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-21",
+      "de": "Phospholipid là thành phần quan trọng của màng tế bào. Chất X là một trong các phospholipid và có công thức cấu tạo như hình.",
+      "allHinh": [
+        {
+          "hash": "373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7",
+          "where": "VIP27-CDK-ESTER-TN-II-21.hinh.0.du_lieu",
+          "hashDataUrl": "df8548ceaff77045b326712e08354651df1051c0dc3ff510f828e77e68c7b7bf"
+        }
+      ],
+      "missingHashes": [
+        "373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "allAffectedQuestionsOnlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/396-phospho3x.png",
+      "/workspace/scratch/396-phospho-head4x.png",
+      "/workspace/scratch/396-phospho-braces4x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "literalRows": [
+      "CH₃–[CH₂]₁₄–COO–CH₂",
+      "CH₃–[CH₂]₁₆–COO–CH–CH₂–O–P–O–CH₂CH₂NH₃⁺"
+    ],
+    "counts": {
+      "C": 39,
+      "O": 8,
+      "N": 1,
+      "P": 1,
+      "negativeCharges": 1,
+      "positiveCharges": 1,
+      "expandedDoubleBondPairs": 1,
+      "underbraces": 2,
+      "COInCondensedCOO": 2
+    },
+    "countBasis": "Uppertail1+14+carbonyl1=16C, lowertail1+16+carbonyl1=18C, glycerol3C, terminalethyl2C. Oxygen4ester+1glycerolO+3P-attachedO=8. Do not expand condensed COO into drawn CO.",
+    "font": {
+      "allChem": "Regular upright serif; subscripts3/2/14/16 lowered, charges−/+ raised",
+      "captions": "Regular upright serif, NOTitalic and no truebold claim",
+      "literalQuotes": "Curly double quote pairs around Đuôi and Đầu only"
+    },
+    "topCrop": {
+      "touchingY0": [
+        "Upper CH3/[CH2]/COO/CH2 text tops",
+        "Upper Ominus top"
+      ],
+      "instruction": "Keep native155-high canvas; do not restore top glyph overshoot or add padding to infer uncropped source."
+    },
+    "topTokens": [
+      {
+        "text": "CH₃",
+        "bboxApprox": [
+          1,
+          0,
+          48,
+          27
+        ]
+      },
+      {
+        "text": "[CH₂]₁₄",
+        "bboxApprox": [
+          66,
+          0,
+          151,
+          28
+        ]
+      },
+      {
+        "text": "COO",
+        "bboxApprox": [
+          167,
+          0,
+          225,
+          21
+        ]
+      },
+      {
+        "text": "CH₂",
+        "bboxApprox": [
+          239,
+          0,
+          286,
+          27
+        ]
+      }
+    ],
+    "topHorizontalBonds": [
+      [
+        [
+          50,
+          13
+        ],
+        [
+          64,
+          13
+        ]
+      ],
+      [
+        [
+          153,
+          13
+        ],
+        [
+          167,
+          13
+        ]
+      ],
+      [
+        [
+          227,
+          13
+        ],
+        [
+          239,
+          13
+        ]
+      ]
+    ],
+    "glycerolVertical": [
+      [
+        248,
+        26
+      ],
+      [
+        248,
+        42
+      ]
+    ],
+    "bottomTokens": [
+      {
+        "text": "CH₃",
+        "bboxApprox": [
+          1,
+          46,
+          48,
+          73
+        ]
+      },
+      {
+        "text": "[CH₂]₁₆",
+        "bboxApprox": [
+          66,
+          46,
+          151,
+          73
+        ]
+      },
+      {
+        "text": "COO",
+        "bboxApprox": [
+          167,
+          46,
+          225,
+          66
+        ]
+      },
+      {
+        "text": "CH",
+        "bboxApprox": [
+          239,
+          46,
+          277,
+          66
+        ]
+      },
+      {
+        "text": "CH₂",
+        "bboxApprox": [
+          293,
+          46,
+          340,
+          73
+        ]
+      },
+      {
+        "text": "O",
+        "bboxApprox": [
+          357,
+          46,
+          375,
+          66
+        ]
+      },
+      {
+        "text": "P",
+        "bboxApprox": [
+          392,
+          46,
+          407,
+          66
+        ]
+      },
+      {
+        "text": "O",
+        "bboxApprox": [
+          422,
+          46,
+          441,
+          66
+        ]
+      },
+      {
+        "text": "CH₂CH₂NH₃⁺",
+        "bboxApprox": [
+          456,
+          42,
+          605,
+          73
+        ]
+      }
+    ],
+    "bottomHorizontalBonds": [
+      [
+        [
+          50,
+          59
+        ],
+        [
+          64,
+          59
+        ]
+      ],
+      [
+        [
+          153,
+          59
+        ],
+        [
+          167,
+          59
+        ]
+      ],
+      [
+        [
+          227,
+          59
+        ],
+        [
+          239,
+          59
+        ]
+      ],
+      [
+        [
+          279,
+          59
+        ],
+        [
+          292,
+          59
+        ]
+      ],
+      [
+        [
+          342,
+          59
+        ],
+        [
+          355,
+          59
+        ]
+      ],
+      [
+        [
+          377,
+          59
+        ],
+        [
+          391,
+          59
+        ]
+      ],
+      [
+        [
+          409,
+          59
+        ],
+        [
+          421,
+          59
+        ]
+      ],
+      [
+        [
+          443,
+          59
+        ],
+        [
+          456,
+          59
+        ]
+      ]
+    ],
+    "phosphate": {
+      "upperLiteral": "O⁻",
+      "upperBBoxApprox": [
+        389,
+        0,
+        420,
+        20
+      ],
+      "upSingle": [
+        [
+          399,
+          26
+        ],
+        [
+          399,
+          42
+        ]
+      ],
+      "downDouble": [
+        [
+          [
+            396.5,
+            70
+          ],
+          [
+            396.5,
+            85
+          ]
+        ],
+        [
+          [
+            401,
+            70
+          ],
+          [
+            401,
+            85
+          ]
+        ]
+      ],
+      "lowerLiteral": "O",
+      "lowerBBoxApprox": [
+        389,
+        89,
+        409,
+        108
+      ],
+      "glyphGaps": "Rayends preserve white gaps to P/O glyphs; no bare P vertex or extra bonds.",
+      "terminalLiteral": "NH₃⁺ (N before H,3sub,+sup), not H3N+ or neutralNH3"
+    },
+    "underbraces": [
+      "M1 107 C17 114 45 115 87 113.5 C119 112.5 144 112 160 117 C166 118 168 120 170 119 C178 115 191 113.5 215 113 C244 112 258 114 279 114 C308 113.5 327 113 341 106.5",
+      "M359 107 C370 114 392 114 410 113.5 C438 112 455 111 468 115 C475 117 478 119 482 119 C489 114 501 113 516 113 C540 112.5 552 114.5 564 114 C584 113.5 598 111.5 605 107"
+    ],
+    "noAdded": [
+      "No reaction arrow",
+      "No title X",
+      "No additional captions",
+      "No explicit CO expansion",
+      "No hydrophobic/hydrophilic labels beyond exact Vietnamese captions"
+    ],
+    "singleBonds": [
+      [
+        [
+          248,
+          26
+        ],
+        [
+          248,
+          42
+        ]
+      ],
+      [
+        [
+          399,
+          26
+        ],
+        [
+          399,
+          42
+        ]
+      ],
+      [
+        [
+          279,
+          59
+        ],
+        [
+          292,
+          59
+        ]
+      ],
+      [
+        [
+          342,
+          59
+        ],
+        [
+          355,
+          59
+        ]
+      ],
+      [
+        [
+          377,
+          59
+        ],
+        [
+          391,
+          59
+        ]
+      ],
+      [
+        [
+          409,
+          59
+        ],
+        [
+          421,
+          59
+        ]
+      ],
+      [
+        [
+          443,
+          59
+        ],
+        [
+          456,
+          59
+        ]
+      ]
+    ],
+    "phosphateDoubleRays": [
+      [
+        [
+          396.5,
+          70
+        ],
+        [
+          396.5,
+          85
+        ]
+      ],
+      [
+        [
+          401,
+          70
+        ],
+        [
+          401,
+          85
+        ]
+      ]
+    ],
+    "braceSourceGuides": {
+      "left": {
+        "orderedGuideApprox": [
+          [
+            1,
+            107
+          ],
+          [
+            12,
+            111
+          ],
+          [
+            28,
+            113
+          ],
+          [
+            50,
+            114
+          ],
+          [
+            87,
+            113.5
+          ],
+          [
+            119,
+            113
+          ],
+          [
+            145,
+            114.5
+          ],
+          [
+            160,
+            117
+          ],
+          [
+            170,
+            119
+          ],
+          [
+            178,
+            116.5
+          ],
+          [
+            191,
+            114.5
+          ],
+          [
+            215,
+            113
+          ],
+          [
+            244,
+            113
+          ],
+          [
+            279,
+            114
+          ],
+          [
+            308,
+            113
+          ],
+          [
+            327,
+            111
+          ],
+          [
+            341,
+            106.5
+          ]
+        ],
+        "centerTip": [
+          170,
+          119
+        ],
+        "caption": {
+          "literal": "“Đuôi” không phân cực",
+          "bboxApprox": [
+            63,
+            133,
+            282,
+            152
+          ]
+        }
+      },
+      "right": {
+        "orderedGuideApprox": [
+          [
+            359,
+            107
+          ],
+          [
+            369,
+            111
+          ],
+          [
+            386,
+            113
+          ],
+          [
+            410,
+            113.5
+          ],
+          [
+            437,
+            113
+          ],
+          [
+            455,
+            113
+          ],
+          [
+            468,
+            115
+          ],
+          [
+            477,
+            117
+          ],
+          [
+            482,
+            119
+          ],
+          [
+            488,
+            116.5
+          ],
+          [
+            498,
+            114.5
+          ],
+          [
+            516,
+            113
+          ],
+          [
+            540,
+            113.5
+          ],
+          [
+            564,
+            114
+          ],
+          [
+            584,
+            112.5
+          ],
+          [
+            598,
+            110
+          ],
+          [
+            605,
+            107
+          ]
+        ],
+        "centerTip": [
+          482,
+          119
+        ],
+        "caption": {
+          "literal": "“Đầu” phân cực",
+          "bboxApprox": [
+            408,
+            132,
+            555,
+            152
+          ]
+        }
+      },
+      "strokeApprox": 1,
+      "shape": "Handdrawn uneven low brace curves. Guidepoints describe source trace, NOTperiodic normalized mirrored brace. Eachbrace read independently."
+    }
+  },
+  "measurementLimits": "Native approximate pixelboxes and guidepoints ±1–2px. Handdrawn brace guides not analytic scientific data. FULL3x and separatehead4x opened; brace4x viewer resized but FULLnative and originalgeometry retained.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootOwnReview": {
+    "nativeFull3x": true,
+    "allPublicDe": true,
+    "literalNH3PlusTopOMinus": true,
+    "individualBraces": true,
+    "sourceApproxNotSubpixel": true
+  }
+}

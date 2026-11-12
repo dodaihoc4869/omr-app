@@ -1,0 +1,29 @@
+[
+  {
+    "i": 320,
+    "hash": "373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7",
+    "fileNguon": "anh/373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7.png",
+    "svg": "phospho320-native-ddh-3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6.svg",
+    "hashSvg": "3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6",
+    "byteSvg": 46281,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-21",
+        "de": "Phospholipid là thành phần quan trọng của màng tế bào. Chất X là một trong các phospholipid và có công thức cấu tạo như hình.",
+        "refs": [
+          {
+            "hash": "373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7",
+            "where": "VIP27-CDK-ESTER-TN-II-21.hinh.0.du_lieu",
+            "hashDataUrl": "df8548ceaff77045b326712e08354651df1051c0dc3ff510f828e77e68c7b7bf"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "39C8O1N1Pfromliteral14and16/2condensedrowsCH3-[CH2]14-COO-CH2andCH3-[CH2]16-COO-CH-CH2-O-P-O-CH2CH2NH3plus/2SQUAREpairsSUB1416/1PdoubleOdown2rays-OminusUP-NH3plusRIGHT/ALLregularUPRIGHT/2individualnonperiodicunderbraces/EXACTcurlyquotes“Đuôi”khôngphâncực-“Đầu”phâncực/topnativecropKEEP/0arrows-stereo/NOaddedH-charge-label-name-answer-alias",
+    "hashSvgDaSoat": "3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

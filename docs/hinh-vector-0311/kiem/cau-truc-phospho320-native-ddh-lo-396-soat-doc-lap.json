@@ -1,0 +1,21 @@
+[
+  {
+    "i": 320,
+    "hashSvg": "3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-ESTER-TN-II-21.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và rows/glycerol/P=O-headcharges/bracescaptionmacros. Hai literalrows CH₃-[CH₂]₁₄-COO-CH₂ và CH₃-[CH₂]₁₆-COO-CH-CH₂-O-P-O-CH₂CH₂NH₃⁺ đúng,39C8O1N1P, hai squarepairs và sub14/16/2/3 rõ. O⁻trên/P=Odưới với tia đứng tách glyph, hai brace vẽ riêng/curlyquotes “Đuôi”khôngphâncực/“Đầu”phâncực thường thẳng đúng scope. Crop trên giữ native, không thấy glyphchạm/cắt thêm/tràn/charge hay label/đápán thêm.",
+    "render": "/workspace/scratch/soat396-320-fresh.png",
+    "macro": [
+      "/workspace/scratch/phospho320-rows.png",
+      "/workspace/scratch/phospho320-head.png",
+      "/workspace/scratch/phospho320-braces.png"
+    ],
+    "hash": "373319ed9e4314805a845235ba4f731a554a19c458fdba62e83dbc2b93f4a8c7",
+    "hashSvgDaSoat": "3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6",
+    "runtimeProof": {
+      "file": "/workspace/scratch/phospho320-runtime.log",
+      "sha256": "8f3c40e20d2160b030fda6f2dcfd9537a303e176aa9e5e4586a42b960670f9b9",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/phospho320-native-ddh-3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6.svg 3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6\n320 { x: 0, y: 0, width: 606, height: 155 }\nPOSTSHOT_SHA 3bcf774292b4d9933517f62a83bf355f08bd354ad60c87fe6d4abc5e7c23f2c6\nCOMMAND node /workspace/scratch/agent-render396.cjs; content fs.readFileSync(actual SVG) via page.setContent\n"
+    }
+  }
+]
