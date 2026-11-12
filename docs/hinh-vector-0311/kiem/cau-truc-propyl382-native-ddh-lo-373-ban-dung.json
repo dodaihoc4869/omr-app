@@ -1,0 +1,29 @@
+[
+  {
+    "i": 382,
+    "hash": "4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf",
+    "fileNguon": "anh/4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf.png",
+    "svg": "propyl382-native-ddh-324f434c6b418c6b0255f49381a5b05c72829e7704dfaa9517ad56824d525c03.svg",
+    "hashSvg": "324f434c6b418c6b0255f49381a5b05c72829e7704dfaa9517ad56824d525c03",
+    "byteSvg": 1648,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B1-ESTER-I-18",
+        "de": "Propyl tiglate là một chất có mùi táo. Cho công thức cấu tạo của propyl tiglate (hình dưới) và số sóng hấp thụ của một số liên kết trên phổ hồng ngoại: O–H (alcohol) 3650 – 3200 $cm^{-1}$; O–H (carboxylic acid) 3300 – 2500 $cm^{-1}$; C=O (ester, carboxylic acid) 1780 – 1650 $cm^{-1}$.\nPhát biểu nào sau đây **không** đúng?",
+        "refs": [
+          {
+            "hash": "4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf",
+            "where": "VIP27-C1-B1-ESTER-I-18.hinh.0.du_lieu",
+            "hashDataUrl": "0a59c40ed3e8414911c90010f39478d3bceac2a89333014251abb06bf867be80"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "7FULLvisiblebareC+1branchDOWNthroughBOTTOMcrop-endpointUNKNOWN-totalCUNKNOWN/2OregularUPRIGHT/1CCdouble1COdouble2splitfeetCONTACTslopes-nativeV-NOcrossbar/335x106nativecropKEEP/0arrows-stereo-captions/noaddedH-methylendpoint-8Cclaim-name-IRnumbers-answer-noalias",
+    "hashSvgDaSoat": "324f434c6b418c6b0255f49381a5b05c72829e7704dfaa9517ad56824d525c03",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

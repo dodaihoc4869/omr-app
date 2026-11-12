@@ -1,0 +1,270 @@
+{
+  "i": 382,
+  "assetIndexProvided": 1260,
+  "hash": "4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf.png",
+  "size": [
+    335,
+    106
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B1-ESTER-I-18",
+      "de": "Propyl tiglate là một chất có mùi táo. Cho công thức cấu tạo của propyl tiglate (hình dưới) và số sóng hấp thụ của một số liên kết trên phổ hồng ngoại: O–H (alcohol) 3650 – 3200 $cm^{-1}$; O–H (carboxylic acid) 3300 – 2500 $cm^{-1}$; C=O (ester, carboxylic acid) 1780 – 1650 $cm^{-1}$.\nPhát biểu nào sau đây **không** đúng?",
+      "allHinh": [
+        {
+          "hash": "4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf",
+          "where": "VIP27-C1-B1-ESTER-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "0a59c40ed3e8414911c90010f39478d3bceac2a89333014251abb06bf867be80"
+        }
+      ],
+      "missingHashes": [
+        "4495871a7bf311921cd6031bfb16b6bda5492b36097cfc956c5d2ac5d54e66bf"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull6xOpened": true,
+    "ownCO12xOpened": true,
+    "ownBottomCrop15xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativepixelcoords/bboxesapprox1px. Croppedbranchendpointnotvisible, totalmolecularCUNKNOWNwithoutrestoration; doNOTinferfrompropyl/tiglatename. Footfractionsonstoredslopestopreserveactualcontact, notsubpixelrastermeasurement.",
+  "geometry": {
+    "leftAcylBareC": [
+      [
+        7,
+        85
+      ],
+      [
+        50,
+        60
+      ],
+      [
+        98,
+        87
+      ],
+      [
+        140,
+        63
+      ]
+    ],
+    "leftAcylPath": [
+      [
+        7,
+        85
+      ],
+      [
+        50,
+        60
+      ],
+      [
+        98,
+        87
+      ],
+      [
+        140,
+        63
+      ]
+    ],
+    "CCDouble": {
+      "main": [
+        [
+          50,
+          60
+        ],
+        [
+          98,
+          87
+        ]
+      ],
+      "innerParallel": [
+        [
+          44,
+          64
+        ],
+        [
+          90,
+          91
+        ]
+      ],
+      "note": "Offsetparallelend90,91stopsbeforeC98,87native. DoNOTforceparallelraytovertexoraddbridge."
+    },
+    "croppedBranch": {
+      "from": [
+        98,
+        87
+      ],
+      "visibleShaft": [
+        [
+          98,
+          87
+        ],
+        [
+          98,
+          106
+        ]
+      ],
+      "nativeCropY": 106,
+      "direction": "DOWNthroughBOTTOMcanvas",
+      "endpointVisible": false,
+      "note": "Noadditionalcarbonendpointpositionverified. Keepcutbondrightthroughviewboundary; noendcap/glyph/extendedcanvas/methylrestoration."
+    },
+    "carbonyl": {
+      "C": [
+        140,
+        63
+      ],
+      "O": {
+        "text": "O",
+        "bbox": [
+          130,
+          4,
+          150,
+          29
+        ],
+        "font": "regularuprightserifblackgray"
+      },
+      "rays": [
+        [
+          [
+            136,
+            31
+          ],
+          [
+            136,
+            65.29
+          ]
+        ],
+        [
+          [
+            144,
+            31
+          ],
+          [
+            144,
+            65.38
+          ]
+        ]
+      ],
+      "apexJoin": [
+        [
+          136,
+          65.29
+        ],
+        [
+          140,
+          63
+        ],
+        [
+          144,
+          65.38
+        ]
+      ],
+      "feet": "BOTHverticalfeetCONTACTslopes, nativeshallowarchedVbetweenfeet. Noactualfootwhitegap. WhitegapbeforeOinknative."
+    },
+    "esterO": {
+      "text": "O",
+      "bbox": [
+        184,
+        82,
+        206,
+        105
+      ],
+      "anchor": "O",
+      "leftBond": [
+        [
+          140,
+          63
+        ],
+        [
+          182,
+          88
+        ]
+      ],
+      "rightBond": [
+        [
+          208,
+          91
+        ],
+        [
+          246,
+          65
+        ]
+      ],
+      "font": "regularuprightserifblackgray"
+    },
+    "rightAlkoxyBareC": [
+      [
+        246,
+        65
+      ],
+      [
+        288,
+        94
+      ],
+      [
+        327,
+        72
+      ]
+    ],
+    "rightPath": [
+      [
+        246,
+        65
+      ],
+      [
+        288,
+        94
+      ],
+      [
+        327,
+        72
+      ]
+    ],
+    "font": "2Oregularuprightserif; noactualbold/italic/labels/captions.",
+    "style": "Thinuniformblackgraybonds~2px; preservewhitebackground/croppedlowerbranch.",
+    "countsObserved": {
+      "fullyVisibleBareC": 7,
+      "croppedBranchBeyondFrame": 1,
+      "totalMolecularC": "UNKNOWN_notrestored",
+      "O": 2,
+      "CCdouble": 1,
+      "COdouble": 1,
+      "captions": 0,
+      "arrows": 0
+    },
+    "uncertain": "Exactposition/numberofatomsbeyondlowercropnotrecoverablefromnative, noattempttorestore. ALLvisiblegeometryclear.",
+    "noAdded": [
+      "full8Cfromname",
+      "croppedmethylendpoint",
+      "captionpropyl tiglate",
+      "IRnumbersfromstem",
+      "hydrogens",
+      "extendcanvas",
+      "alias",
+      "answer"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only literalcroppreserved/noSVG/noCount",
+  "rootReview": {
+    "nativeFullOpened": true,
+    "publicDeAllRefsRead": true,
+    "freshChromium3xFullOpened": true,
+    "COmacroOpened": true,
+    "hashSvg": "324f434c6b418c6b0255f49381a5b05c72829e7704dfaa9517ad56824d525c03",
+    "verdict": "Đạt phần nhìn thấy; nhánh dưới cắt native giữ nguyên, tổng C chưa xác định. Chân CO tiếp xúc, khe O sạch; không khôi phục atom/nhãn ngoài ảnh."
+  },
+  "independentRuntime": {
+    "sha256": "cc316a7c5208a70777f8ab62f4c809e306379fa60b5610f348b4473b97102b7d",
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/propyl382-native-ddh-324f434c6b418c6b0255f49381a5b05c72829e7704dfaa9517ad56824d525c03.svg 324f434c6b418c6b0255f49381a5b05c72829e7704dfaa9517ad56824d525c03\n382 { x: 0, y: 0, width: 335, height: 106 }\n"
+  }
+}

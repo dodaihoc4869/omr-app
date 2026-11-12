@@ -1,0 +1,17 @@
+{
+  "lo": 373,
+  "main": "8adb06f300cae7bd12b69fca0a68f193820b785a",
+  "previousMain": "dc126c67170babf3b0676485878ac6851ef53b07",
+  "merged": false,
+  "filesSincePrevious": [
+    ".github/workflows/soi-18-4-6-1211.yml",
+    ".github/workflows/theo-doi-de-28.yml",
+    "tests/do-de-28-goi7-1211.test.ts"
+  ],
+  "scope": "Chỉ 2 workflows chẩn đoán SQL chỉ đọc và test đo đề28. App/server/Vite/font/mốc không đổi so dc126c67. Không gộp main. Latestmain full theo tên/build-speed vẫn bắt buộc trước merge-release.",
+  "colorBaseline": {
+    "violations": 1245,
+    "checkerFiles": 262
+  },
+  "productionSharedChangedThisBatch": false
+}
