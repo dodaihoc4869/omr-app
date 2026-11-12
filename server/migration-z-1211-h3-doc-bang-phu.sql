@@ -13,4 +13,4 @@ CREATE INDEX IF NOT EXISTS nkc_em_toi_han ON nam_kt_cau(sbd, moc_on_ke) WHERE tr
 CREATE INDEX IF NOT EXISTS nkc_em_chua_kp ON nam_kt_cau(sbd, trang_thai) WHERE trang_thai IN ('dang_on','moi_sai');
 -- (Q7) Tổng EXP mùa của em (server/src/exp-d1.ts lenhTongSo, điều kiện CAS dieuKienTongSo, docTongSoSom) + nhánh EXP dòng thời gian em (gv-hom-nay-v2.ts):
 -- đo 24h 7.429 lượt × ~1.449 hàng — trước đọc mọi dòng của em qua (sbd, ngay_vn) rồi tra bảng. Chỉ mục PHỦ: chỉ đọc dòng từ đầu mùa, không chạm bảng.
-CREATE INDEX IF NOT EXISTS exp_so_em_luc ON exp_so(sbd, luc, exp, ngay_vn);
+-- (12/11 22:10: bỏ exp_so_em_luc — ghi thêm mỗi dòng EXP đắt hơn số hàng đọc tiết kiệm)

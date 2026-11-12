@@ -55,10 +55,7 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   //  · hồ sơ câu khi lập kế hoạch (ke-hoach-ngay-d1.ts docHoSoD1): câu tới hạn / đếm câu chưa khắc phục chỉ đọc đúng dòng cần.
   "CREATE INDEX IF NOT EXISTS nkc_em_toi_han ON nam_kt_cau(sbd, moc_on_ke) WHERE trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL",
   "CREATE INDEX IF NOT EXISTS nkc_em_chua_kp ON nam_kt_cau(sbd, trang_thai) WHERE trang_thai IN ('dang_on','moi_sai')",
-  //  · tổng EXP mùa của em (exp-d1.ts lenhTongSo / CAS / đọc sớm) + EXP dòng thời gian: chỉ mục phủ.
-  'CREATE INDEX IF NOT EXISTS exp_so_em_luc ON exp_so(sbd, luc, exp, ngay_vn)',
-  //  · dòng thời gian em ở màn thầy (gv-hom-nay-v2.ts): chỉ mục phủ bộ phận của nhánh sổ học.
-  "CREATE INDEX IF NOT EXISTS skh_em_dong_tg ON su_kien_hoc(sbd, nguon, ma_nguon, ngay_vn, luc, ket_qua, giay) WHERE nguon NOT IN ('thi','len_bang')",
+  //  (12/11 22:10: BỎ exp_so_em_luc + skh_em_dong_tg — ghi D1 đắt gấp 1.000 lần đọc; mỗi dòng sổ / EXP mới +1 hàng ghi lỗ hơn số hàng đọc tiết kiệm.)
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {

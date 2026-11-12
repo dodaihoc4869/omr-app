@@ -241,9 +241,8 @@ describe('Q7 tổng EXP: chỉ mục phủ (sbd, luc, exp, ngay_vn)', () => {
     for (let i = 0; i < 120; i++) { const j = (i * 53) % 120; ins.run(`k${j}`, `E${j % 3}`, `2026-11-${String(1 + (j % 10)).padStart(2, '0')}`, 'cau', j % 7 - 1, `2026-11-${String(1 + (j % 10)).padStart(2, '0')}T0${j % 10}:00:00.000Z`) }
     const chay = () => ['E0', 'E1', 'E2', 'E9'].flatMap((s) => [...['', '2026-11-04', '2026-11-04T05:00:00.000Z', '2027'].map((m) => d.sql.prepare(Q_TONG_EXP).get(s, m)), d.sql.prepare(Q_EXP_NGAY).all(s, s)])
     const moi = chay()
-    expect(keHoach(d.sql, Q_TONG_EXP)).toContain('SEARCH exp_so USING COVERING INDEX exp_so_em_luc (sbd=? AND luc>?)')
-    expect(keHoach(d.sql, Q_EXP_NGAY)).toContain('SEARCH exp_so USING COVERING INDEX exp_so_em_luc (sbd=?)')
-    d.sql.exec('DROP INDEX exp_so_em_luc')
+    // 12/11 22:10 phiên chính: BỎ chỉ mục exp_so_em_luc + skh_em_dong_tg — ghi D1 đắt gấp 1.000 lần đọc (1 USD vs 0,001 USD / triệu hàng); mỗi dòng sổ / EXP mới +1 hàng ghi (~10–20 nghìn/ngày) để tiết kiệm ~4–6 triệu hàng đọc/ngày ⇒ lỗ. SỬA CÓ CHỦ Ý.
+    expect(keHoach(d.sql, Q_TONG_EXP).join('\n')).not.toMatch(/exp_so_em_luc/)
     expect(moi).toEqual(chay())
     expect(moi.some((x: any) => x?.e > 0)).toBe(true)
   })
@@ -253,11 +252,6 @@ describe('Q7 tổng EXP: chỉ mục phủ (sbd, luc, exp, ngay_vn)', () => {
     expect(ma).toContain('(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e')
     expect(ma).toContain('(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) = ?')
     expect(ma).toContain('(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= mua.s) AS e')
-    const d = taoD1That()
-    expect(keHoach(d.sql, "UPDATE game_v2_profile SET revision = revision + 1 WHERE sbd = ? AND (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) = ?").join('\n'))
-      .toMatch(/SEARCH exp_so USING COVERING INDEX exp_so_em_luc \(sbd=\? AND luc>\?\)/)
-    expect(keHoach(d.sql, "WITH mua AS (SELECT '2026-11-01' AS s) SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= mua.s) AS e FROM mua").join('\n'))
-      .toMatch(/SEARCH exp_so USING COVERING INDEX exp_so_em_luc \(sbd=\? AND luc>\?\)/)
   })
 })
 
@@ -314,10 +308,8 @@ describe('Q8 dòng thời gian em: chỉ mục phủ bộ phận sổ học + ch
     const chay = () => ['E0', 'E1', 'E9'].flatMap((s) => LOAI.flatMap((l) => ['9999-12-31T00:00:00.000Z', '2026-11-06T03:00:00.000Z'].flatMap((truoc) =>
       [true, false].map((cb) => d.sql.prepare(ngoai(cb)).all(...[s, s, s, s, s, ...(cb ? [s] : [])], truoc, l)))))
     const moi = chay()
-    const ke = keHoach(d.sql, ngoai(true))
-    expect(ke).toContain('SEARCH s USING COVERING INDEX skh_em_dong_tg (sbd=?)')
-    expect(ke).toContain('SEARCH exp_so USING COVERING INDEX exp_so_em_luc (sbd=?)')
-    d.sql.exec('DROP INDEX skh_em_dong_tg'); d.sql.exec('DROP INDEX exp_so_em_luc')
+    // 12/11 22:10 phiên chính: BỎ chỉ mục exp_so_em_luc + skh_em_dong_tg — ghi D1 đắt gấp 1.000 lần đọc (1 USD vs 0,001 USD / triệu hàng); mỗi dòng sổ / EXP mới +1 hàng ghi (~10–20 nghìn/ngày) để tiết kiệm ~4–6 triệu hàng đọc/ngày ⇒ lỗ. SỬA CÓ CHỦ Ý.
+    expect(keHoach(d.sql, ngoai(true)).join('\n')).not.toMatch(/skh_em_dong_tg|exp_so_em_luc/)
     expect(moi).toEqual(chay())
     expect(moi[0]!.length).toBe(31)
   })
@@ -330,7 +322,7 @@ describe('Q8 dòng thời gian em: chỉ mục phủ bộ phận sổ học + ch
 
 // ------------------------------------------------------------------ Chỉ mục mới không đổi kế hoạch câu khác trên cùng bảng + có trong cron đêm
 describe('chỉ mục H3: câu khác trên cùng bảng giữ kế hoạch; bảng lớn có trong CHI_MUC_CRON_DEM', () => {
-  const MOI = ['ktcn_chua_mo', 'nkc_em_toi_han', 'nkc_em_chua_kp', 'exp_so_em_luc', 'skh_em_dong_tg', 'goi_bai_7_tao']
+  const MOI = ['ktcn_chua_mo', 'nkc_em_toi_han', 'nkc_em_chua_kp', 'goi_bai_7_tao']
   const CAU_KHAC: string[] = [
     `SELECT json FROM kiem_tra_ca_nhan k WHERE sbd = ? AND nop_luc IS NULL AND ${sqlKhongBaoTriBo('k', T)}`, // ai-ddh.ts
     "SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>?) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?", // cron chốt hết hạn
@@ -348,8 +340,8 @@ describe('chỉ mục H3: câu khác trên cùng bảng giữ kế hoạch; bả
   })
   it('chỉ mục bảng lớn: migration ↔ CHI_MUC_CRON_DEM giống hệt câu', async () => {
     const { readFileSync } = await import('node:fs')
-    const mig = readFileSync('server/migration-z-1211-h3-doc-bang-phu.sql', 'utf8') + readFileSync('server/migration-z-1211-h3-skh-dong-tg.sql', 'utf8')
-    for (const ten of ['nkc_em_toi_han', 'nkc_em_chua_kp', 'exp_so_em_luc', 'skh_em_dong_tg']) {
+    const mig = readFileSync('server/migration-z-1211-h3-doc-bang-phu.sql', 'utf8')
+    for (const ten of ['nkc_em_toi_han', 'nkc_em_chua_kp']) {
       const cron = CHI_MUC_CRON_DEM.find((s) => s.includes(` ${ten} `))
       expect(cron).toBeTruthy()
       expect(mig).toContain(cron! + ';')
