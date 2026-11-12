@@ -14,7 +14,10 @@ import { envGhiRieng } from './doc-d1-theo-luot'
 import { giaiNen, nen } from './kho-chung'
 
 let bat = !(globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.VITEST
-export function batBangTinhChung(b: boolean): void { bat = b }
+/** Câu dò lỗi (thiếu bảng — D1 chưa chạy migration) ⇒ tạm không dùng tới mốc này (ms), đi thẳng đường cũ. */
+let tatDen = 0
+const TAT_KHI_LOI_MS = 60_000
+export function batBangTinhChung(b: boolean): void { bat = b; tatDen = 0 }
 
 export const LENH_BANG_TINH_CHUNG = ['CREATE TABLE IF NOT EXISTS bang_tinh_chung (khoa TEXT PRIMARY KEY, dau TEXT NOT NULL, json TEXT NOT NULL, luc INTEGER NOT NULL)'] as const
 /** Trên ngưỡng này (ký tự JSON) thì nén gzip ⇒ base64 (tiền tố `z`); sau nén vẫn quá trần thì không cất (D1: dòng ≤ 2 MB). */
@@ -56,7 +59,7 @@ export async function docChung<R>(env: Env, ten: string, sql: string, thamSo: st
 }
 /** Như `docChung` nhưng CHỈ khi dùng được bản tính sẵn (công tắc bật, có bảng dấu + dòng dấu): không dùng được ⇒ null (nơi gọi tự đi đường cũ của mình). */
 export async function docChungNeuCo<R>(env: Env, ten: string, sql: string, thamSo: string, bang: readonly string[], lenh: () => D1PreparedStatement): Promise<{ results: R[] } | null> {
-  if (!bat) return null
+  if (!bat || Date.now() < tatDen) return null
   const khoa = `${ten}.${bamNgan(sql)}|${thamSo}`
   let d: unknown = null
   try {
@@ -65,7 +68,7 @@ export async function docChungNeuCo<R>(env: Env, ten: string, sql: string, thamS
       try { const v = await moJson(String(r.j)); if (Array.isArray(v)) return { results: v as R[] } } catch { /* dòng cất hỏng ⇒ đọc lại, cất đè */ }
     }
     d = r?.d ?? null
-  } catch { return null } // bảng dấu / bảng cất chưa có
+  } catch { tatDen = Date.now() + TAT_KHI_LOI_MS; return null } // bảng dấu / bảng cất chưa có ⇒ một phút sau mới thử lại (khỏi thêm một câu hỏng mỗi lượt)
   if (d == null) return null
   const [s, r] = await env.DB.batch<Record<string, unknown>>([env.DB.prepare(`SELECT ${btDauBang(bang)} AS d`), lenh()])
   const rows = (r?.results ?? []) as R[]

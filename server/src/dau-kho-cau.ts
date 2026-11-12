@@ -14,10 +14,12 @@ export const BT_DAU_KHO = `COALESCE((SELECT dau FROM dau_bang WHERE ten = 'game_
 export const SQL_DAU_KHO_CAU = `SELECT ${BT_DAU_KHO} d`
 
 /** Dấu kho hiện tại; lỗi đọc ⇒ '' (nơi gọi coi như "không chắc" ⇒ đọc lại đầy đủ như cũ). */
+let cuDen = 0 // câu dấu mới lỗi (D1 chưa chạy migration-z-1211-h2-goi-nhieu.sql) ⇒ một phút đi thẳng câu cũ, khỏi thêm một câu hỏng mỗi lượt
 export async function dauKhoCau(env: Env): Promise<string> {
   try {
-    const r = await env.DB.prepare(SQL_DAU_KHO_CAU).first<{ d: string | null }>()
-      .catch(() => env.DB.prepare(SQL_DAU_KHO_CAU_CU).first<{ d: string | null }>()) // D1 chưa chạy migration-z-1211-h2-goi-nhieu.sql
+    const r = Date.now() < cuDen ? await env.DB.prepare(SQL_DAU_KHO_CAU_CU).first<{ d: string | null }>()
+      : await env.DB.prepare(SQL_DAU_KHO_CAU).first<{ d: string | null }>()
+        .catch(() => { cuDen = Date.now() + 60_000; return env.DB.prepare(SQL_DAU_KHO_CAU_CU).first<{ d: string | null }>() })
     return String(r?.d ?? '')
   } catch {
     return ''
