@@ -68,6 +68,13 @@ if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? 
   bangTop.push('', '#### Theo giờ, 8 giờ qua (giờ UTC · hàng đọc · lượt · 90 ký tự đầu)')
   for (const x of ds) bangTop.push(`- ${String(x.dimensions.datetimeHour).slice(5, 16)} · ${so(x.sum.rowsRead)} · ${so(x.count)} · \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 90)}\``)
   if (!ds.length) bangTop.push(`(không đọc được: ${String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
+// 13/11: 25 câu GHI nhiều hàng nhất 24 giờ qua (1 hàng ghi = giá 1.000 hàng đọc ⇒ khoản ghi ~2,9 triệu/ngày là khoản vượt lớn).
+{ const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
+    query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:25,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsWritten_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const ds = j?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+  bangTop.push('', '### 25 câu D1 GHI nhiều hàng nhất 24 giờ qua', '', '| Hàng ghi | Hàng đọc | Lượt | Ghi/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|---|')
+  for (const x of ds) bangTop.push(`| ${so(x.sum.rowsWritten)} | ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsWritten / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)
+  if (!ds.length) bangTop.push(`(không đọc được: ${String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
 // 13/11: THEO GIỜ 50 giờ qua (giờ VN) — mọi khoản tính tiền, để so cùng khung giờ trước / sau một lượt phát hành (dự báo cả kỳ tuyến tính nên trễ).
 { const tu50 = new Date(now - 50 * 3600e3).toISOString(), den = now.toISOString()
   const gio = async (ten, than, locThem = '') => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
