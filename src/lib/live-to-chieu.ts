@@ -127,6 +127,32 @@ body.mc .mc-thanh .mc-lv-gon{flex:none;display:inline-grid;place-items:center;wi
 @media (prefers-reduced-motion:reduce){.mc-lv-gon svg{transition:none}}
 @media (prefers-reduced-motion:reduce){.mc-lv-vien.nhay,.mc-lv-cum .im{animation:none}.mc-lv-thuoc i{transition:none}}
 html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
+/* 12/11 · BẢNG MIC GỌN (thầy: «gọn lại, bỏ hết mấy chỗ giải thích, trực quan dễ dùng»): mỗi cài đặt MỘT hàng — cột nhãn · thanh phân đoạn (nút ≥ 40 px);
+   chữ chỉ khi có vấn đề (.mc-lv-canh); «Chi tiết» thu gọn ở cuối. Mọi luật ở đây CHỈ trong .mc-lv-the: .mc-lv-n.nho / .mc-lv-dong của thẻ «Đang nói» giữ nguyên.
+   Bảng cao quá màn (khổ thấp) ⇒ tự cuộn trong khung, không tràn mép trên. */
+.mc-lv-the{max-height:calc(100vh - var(--u)*6);overflow-y:auto;overscroll-behavior:contain}
+.mc-lv-the .mc-lv-chon{margin-top:calc(var(--u)*.6)}
+.mc-lv-cai{display:grid;grid-template-columns:calc(var(--u)*7.6) minmax(0,1fr);align-items:center;gap:calc(var(--u)*.6);margin-top:calc(var(--u)*.6)}
+.mc-lv-cai.doc{grid-template-columns:minmax(0,1fr);gap:calc(var(--u)*.35)}
+.mc-lv-cai>b{min-width:0;font:700 calc(var(--u)*.95)/1.25 var(--mc-sans)}
+.mc-lv-cai small{display:block;color:var(--mc-bang-phu);font:600 calc(var(--u)*.78) var(--mc-sans);font-variant-numeric:tabular-nums}
+.mc-lv-seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--mc-bang-nut)}
+.mc-lv-seg .mc-lv-n{flex:1 1 auto;height:max(40px,calc(var(--u)*2.4));padding:0 .7em;box-shadow:none;font:700 calc(var(--u)*.92) var(--mc-sans)}
+.mc-lv-am{display:flex;align-items:center;gap:calc(var(--u)*.6)}
+.mc-lv-am .mc-lv-thuoc{display:block;flex:1;margin:0}
+.mc-lv-am #mc-lv-nx{flex:none;min-width:calc(var(--u)*6.2);text-align:right;color:var(--mc-bang-phu);font:600 calc(var(--u)*.85) var(--mc-sans)}
+.mc-lv-loa{display:flex;align-items:center;gap:calc(var(--u)*.6);margin-top:calc(var(--u)*.6)}
+.mc-lv-loa .mc-lv-chon{flex:1;min-width:0;margin:0}
+.mc-lv-loa .mc-lv-n[aria-busy="true"]{opacity:.6}
+.mc-lv-the .mc-lv-canh{display:flex;align-items:flex-start;gap:.45em;margin-top:calc(var(--u)*.5);font:700 calc(var(--u)*.9)/1.35 var(--mc-sans)}
+.mc-lv-the .mc-lv-canh svg{width:1.15em;height:1.15em;margin-top:.1em}
+.mc-lv-ct{margin-top:calc(var(--u)*.3)}
+.mc-lv-ct summary{display:flex;align-items:center;min-height:max(40px,calc(var(--u)*2.4));color:var(--mc-bang-phu);font:600 calc(var(--u)*.8) var(--mc-sans);cursor:pointer;gap:.5em;list-style:none}
+.mc-lv-ct summary::-webkit-details-marker{display:none}
+.mc-lv-ct summary::before{content:'';width:.42em;height:.42em;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+.mc-lv-ct[open]>summary::before{transform:rotate(45deg)}
+.mc-lv-ct summary:focus-visible{outline:3px solid var(--mc-vang-noi);outline-offset:2px}
+.mc-lv-ct .mc-lv-cd{margin-top:0}
 `
 
 export const JS_LIVE_TO_CHIEU = `
@@ -285,68 +311,84 @@ export const JS_LIVE_TO_CHIEU = `
     }
     if (window.__mcKhay && window.__mcKhay.noi) window.__mcKhay.noi(mic ? 'noi' : nt ? 'tay' : '', doc);
   }
+  // BẢNG MIC GỌN (thầy 12/11 trưa, kèm ảnh màn chiếu: «làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): MỖI cài đặt MỘT hàng
+  // (nhãn ngắn · thanh phân đoạn), bỏ mọi dòng mô tả; chữ CHỈ hiện khi có vấn đề (lvCanh, một dòng ngắn); dòng mô hình «Chỉ giọng thầy» + đo tiếng + chẩn đoán
+  // mic gom vào «Chi tiết» ở cuối (đóng sẵn; đang mở thì giữ mở qua mỗi lần vẽ lại ~1 giây / lần, đóng bảng rồi mở lại ⇒ đóng). data-lv / data-c / data-v giữ nguyên.
+  function lvCanh(s) { return '<p class="loi mc-lv-canh" role="alert">' + LV_BT.roi + '<span>' + s + '</span></p>'; }
+  function lvCai(nhan, nut, doc, phu) { return '<div class="mc-lv-cai' + (doc ? ' doc' : '') + '"><b>' + nhan + (phu || '') + '</b><span class="mc-lv-seg" role="group" aria-label="' + nhan + '">' + nut + '</span></div>'; }
+  function lvChon(lv, k, gt, chu, bat) { return '<button type="button" class="mc-lv-n" data-lv="' + lv + '" data-' + k + '="' + gt + '" aria-pressed="' + !!bat + '">' + chu + '</button>'; }
+  // «Microphone (BOYALINK)» ⇒ «BOYALINK»: tên trong ngoặc là tên thiết bị thầy nhận ra
+  function lvTenMic(s) { s = String(s || ''); var a = s.indexOf('('), b = s.lastIndexOf(')'); return a > 0 && b > a + 1 ? s.slice(a + 1, b) : s; }
   function lvVeThe() {
-    var t = LV.tt && LV.tt.the, h, i, m, loi, mi, cd = document.getElementById('mc-lv-cd');
+    var t = LV.tt && LV.tt.the, h, i, m, loi, mi = null, ly, ct = lvThe.querySelector('.mc-lv-ct'), cd = document.getElementById('mc-lv-cd');
+    LV.ctMo = !!(t && ct && !lvThe.hidden && ct.open);
     cd = cd ? cd.textContent : '';
     lvThe.hidden = !t;
     if (!t) return;
-    loi = t.loi === 'mic-tu-choi' ? 'trình duyệt chưa cho dùng mic' : t.loi === 'khong-mic' ? 'máy này không thấy mic nào' : t.loi === 'mic-ban' ? 'mic đang bị ứng dụng khác giữ (Zoom, OBS…) hoặc bộ thu lỗi — tắt ứng dụng ấy / cắm lại bộ thu' : t.loi ? 'mic chưa mở được' : '';
-    h = '<h3>' + (LV.tt.pha === 'live' ? (LV.tt.nghi ? 'Đang tạm dừng live' : 'Đang live') : 'Bật live cho ' + (LV.tt.lop ? 'lớp ' + lvSach(LV.tt.lop) : 'cả lớp')) + '</h3>'
-      + '<p>' + (LV.tt.tong || 0) + ' em đã vào phòng sẽ thấy màn chiếu này' + (LV.tt.coTieng ? ' và nghe tiếng thầy ngay.' : '. Buổi này live chưa có tiếng trên máy em.') + '</p>';
+    loi = t.loi === 'mic-tu-choi' ? 'trình duyệt chưa cho dùng mic' : t.loi === 'khong-mic' ? 'máy này không thấy mic nào' : t.loi === 'mic-ban' ? 'mic đang bị ứng dụng khác giữ (Zoom, OBS…) — tắt ứng dụng ấy hoặc cắm lại bộ thu' : t.loi ? 'mic chưa mở được' : '';
+    h = '<h3>' + (LV.tt.pha === 'live' ? (LV.tt.nghi ? 'Đang tạm dừng live' : 'Đang live') : 'Bật live cho ' + (LV.tt.lop ? 'lớp ' + lvSach(LV.tt.lop) : 'cả lớp')) + '</h3>';
+    if (!LV.tt.coTieng) h += lvCanh('Buổi này live chưa có tiếng trên máy em');
+    // mất đường tiếng giữa buổi (mạng chặn / chưa nối máy chủ tiếng) — lỗi mic thì đã có dòng riêng bên dưới
+    else if (LV.tt.pha === 'live' && LV.tt.khongTieng && LV.tt.lyDoKT && !loi) h += lvCanh(lvSach(LV.tt.lyDoKT) + ' — lớp chưa nghe tiếng thầy');
     if (LV.tt.coTieng) {
-      if (loi) h += '<p class="loi">Chưa dùng được mic: ' + loi + '.</p>';
+      if (loi) h += lvCanh('Chưa dùng được mic: ' + loi);
       else {
         h += '<label class="mc-lv-chon">' + LV_BT.mic + '<select aria-label="Chọn mic">';
         for (i = 0; i < t.ds.length; i++) { m = t.ds[i]; h += '<option value="' + lvSach(m.id) + '"' + (m.id === t.chon ? ' selected' : '') + '>Mic: ' + lvSach(m.ten) + '</option>'; }
         if (!t.ds.length) h += '<option>Mic mặc định của máy</option>';
-        // vạch mức âm: trước khi live = tiếng thầy nói thử; đang live = tiếng ĐANG GỬI cho lớp; đang tạm dừng = lớp không nghe
         mi = LV.tt.mic || { tinh: 'chua', ten: '', loc: false, cheDo: 'tu', locOn: 'vua', locOnChay: 'tat' };
-        h += '</select></label><div class="mc-lv-dong"><span>' + (LV.tt.pha !== 'live' ? 'Mức âm khi thầy nói thử' : LV.tt.nghi ? 'Đang tạm dừng — lớp không nghe' : 'Mức âm đang gửi cho lớp') + '</span><span id="mc-lv-nx"></span></div><div class="mc-lv-thuoc"><i id="mc-lv-th"></i></div>';
-        if (LV_MIC[mi.tinh]) h += '<p class="loi" role="alert">' + LV_MIC[mi.tinh] + '</p>';
-        // 11/11 tối: mic đã chọn không có trên máy ⇒ app dùng mic mặc định — NÓI RÕ, không âm thầm đổi mic
-        if (mi.khac) h += '<p class="loi" role="alert">Không mở được «' + lvSach(mi.khac) + '» — lớp đang nghe ' + lvSach(mi.ten || 'mic mặc định của máy') + '. Cắm lại bộ thu là app tự về mic ấy.</p>';
-        // khử vọng + lọc ồn làm đục giọng ⇒ «Tự động» chỉ bật khi có đường vọng (loa máy thầy đang phát tiếng em nói); thầy ép tay được
-        // LỌC ỒN RIÊNG (11/11): ba mức, tách khỏi khử vọng. Máy không chạy được bộ lọc riêng ⇒ nói rõ, nút vẫn ghi nhớ lựa chọn.
-        h += '<div class="mc-lv-dong"><span><b>Lọc ồn</b><br>' + (mi.locOnChay === 'khong' ? 'Máy này chưa chạy được bộ lọc riêng' : mi.locOn === 'thay' ? 'Chỉ giọng thầy — hạ giọng người khác' + (mi.tg ? '<br>' + lvSach(mi.tg) : '') : mi.locOnChay === 'loi' ? 'Chưa tải được bộ lọc — đang không lọc' : mi.locOnChay === 'tai' ? 'Đang tải bộ lọc…' : mi.locOn === 'manh' ? 'Mạnh — phòng ồn; lúc im lọc sâu hơn' : mi.locOn === 'tat' ? 'Tắt — giữ nguyên tiếng mic' : 'Vừa — bớt ồn nền, giữ giọng tự nhiên') + '</span><span style="display:inline-flex;gap:.3em' + (mi.coThay ? ';flex-wrap:wrap' : '') + '">'
-          + '<button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="manh" aria-pressed="' + (mi.locOn === 'manh') + '">Mạnh</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="vua" aria-pressed="' + (mi.locOn !== 'manh' && mi.locOn !== 'tat' && mi.locOn !== 'thay') + '">Vừa</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="tat" aria-pressed="' + (mi.locOn === 'tat') + '">Tắt</button>'
-          + (mi.coThay ? '<button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="thay" aria-pressed="' + (mi.locOn === 'thay') + '">Chỉ giọng thầy</button>' : '') + '</span></div>';
-        // 11/11 tối · HÀNG DỰ PHÒNG: «Chuẩn trình duyệt» = gửi thẳng mic với khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt (như Meet), bỏ chuỗi làm rõ
-        h += '<div class="mc-lv-dong"><span><b>Tiếng</b><br>' + (mi.kieuTieng === 'chuan' ? 'Chuẩn trình duyệt — như Meet (khử vọng, lọc ồn, tự chỉnh của trình duyệt)' : 'Làm rõ — chuỗi làm rõ tiếng + lọc ồn bên dưới') + '</span><span style="display:inline-flex;gap:.3em">'
-          + '<button type="button" class="mc-lv-n nho" data-lv="kieu-tieng" data-c="lam-ro" aria-pressed="' + (mi.kieuTieng !== 'chuan') + '">Làm rõ</button><button type="button" class="mc-lv-n nho" data-lv="kieu-tieng" data-c="chuan" aria-pressed="' + (mi.kieuTieng === 'chuan') + '">Chuẩn trình duyệt</button></span></div>';
-        h += '<div class="mc-lv-dong"><span><b>Khử vọng</b><br>' + (mi.loc ? 'Đang bật — chống vọng, chống hú' : 'Đang tắt — giọng trong nhất') + '</span><span style="display:inline-flex;gap:.3em">'
-          + '<button type="button" class="mc-lv-n nho" data-lv="loc" data-c="tu" aria-pressed="' + (mi.cheDo === 'tu') + '">Tự động</button><button type="button" class="mc-lv-n nho" data-lv="loc" data-c="bat" aria-pressed="' + (mi.cheDo === 'bat') + '">Bật</button><button type="button" class="mc-lv-n nho" data-lv="loc" data-c="tat" aria-pressed="' + (mi.cheDo === 'tat') + '">Tắt</button></span></div>';
+        // vạch mức âm + chữ ngắn (Chưa nghe thấy / Hơi nhỏ / Vừa đủ / Hơi to — lvVeMuc)
+        h += '</select></label><div class="mc-lv-cai"><b>Mức âm</b><span class="mc-lv-am"><span class="mc-lv-thuoc"><i id="mc-lv-th"></i></span><span id="mc-lv-nx"></span></span></div>';
+        if (LV_MIC[mi.tinh]) h += lvCanh(LV_MIC[mi.tinh]);
+        // mic đã chọn không có trên máy ⇒ app dùng mic mặc định — NÓI RÕ (tên đầy đủ hai mic ở «Chi tiết»)
+        if (mi.khac) h += lvCanh('Không mở được ' + lvSach(lvTenMic(mi.khac)) + ' — đang dùng mic máy');
+        // Lọc ồn: 3 mức (+ «Chỉ giọng thầy» khi cờ bật ⇒ 4 nút, thanh phân đoạn xuống hàng riêng dưới nhãn)
+        h += lvCai('Lọc ồn', lvChon('loc-on', 'c', 'manh', 'Mạnh', mi.locOn === 'manh') + lvChon('loc-on', 'c', 'vua', 'Vừa', mi.locOn !== 'manh' && mi.locOn !== 'tat' && mi.locOn !== 'thay') + lvChon('loc-on', 'c', 'tat', 'Tắt', mi.locOn === 'tat')
+          + (mi.coThay ? lvChon('loc-on', 'c', 'thay', 'Chỉ giọng thầy', mi.locOn === 'thay') : ''), mi.coThay);
+        if (mi.locOnChay === 'khong') h += lvCanh('Máy này chưa chạy được bộ lọc ồn');
+        else if (mi.locOnChay === 'loi' && mi.locOn !== 'thay' && mi.locOn !== 'tat') h += lvCanh('Chưa tải được bộ lọc ồn — đang không lọc');
+        // «Chỉ giọng thầy» tự tắt: lý do nằm trong ngoặc của dòng trạng thái thay-noi.ts gửi («Đã tự tắt (…) — lớp nghe tiếng như trước»)
+        ly = mi.locOn === 'thay' && mi.tg && mi.tg.indexOf('Đã tự tắt') === 0 ? mi.tg.slice(mi.tg.indexOf('(') + 1, mi.tg.lastIndexOf(')')) : '';
+        if (ly) h += lvCanh('Chỉ giọng thầy đã tự tắt: ' + lvSach(ly));
+        h += lvCai('Tiếng', lvChon('kieu-tieng', 'c', 'lam-ro', 'Làm rõ', mi.kieuTieng !== 'chuan') + lvChon('kieu-tieng', 'c', 'chuan', 'Chuẩn trình duyệt', mi.kieuTieng === 'chuan'));
+        h += lvCai('Khử vọng', lvChon('loc', 'c', 'tu', 'Tự động', mi.cheDo === 'tu') + lvChon('loc', 'c', 'bat', 'Bật', mi.cheDo === 'bat') + lvChon('loc', 'c', 'tat', 'Tắt', mi.cheDo === 'tat'));
       }
-      // LOA (11/11 tối): đầu ra cho tiếng app phát trên máy thầy (tiếng em nói, tiếng thử). Trình duyệt không chọn được đầu ra ⇒ t.loa rỗng ⇒ không hiện.
+      // LOA: ô chọn + «Thử loa» cùng một hàng. Trình duyệt không chọn được đầu ra ⇒ t.loa rỗng ⇒ không hiện.
       if (t.loa && t.loa.ds && t.loa.ds.length) {
-        if (t.loa.trung) h += '<p class="loi" role="alert">Loa của máy đang là «' + lvSach(t.loa.trung) + '» — chính bộ thu mic, thường không có loa: tiếng em nói sẽ không ra loa máy. Thầy chọn lại Loa bên dưới rồi bấm «Thử loa».</p>';
-        h += '<label class="mc-lv-chon">' + LV_BT.loa + '<select aria-label="Chọn loa" data-c="loa">';
+        if (t.loa.trung) h += lvCanh('Loa đang là bộ thu mic — chọn loa khác rồi bấm «Thử loa»');
+        h += '<div class="mc-lv-loa"><label class="mc-lv-chon">' + LV_BT.loa + '<select aria-label="Chọn loa" data-c="loa">';
         for (i = 0; i < t.loa.ds.length; i++) { m = t.loa.ds[i]; h += '<option value="' + lvSach(m.id) + '"' + (m.id === t.loa.chon ? ' selected' : '') + '>Loa: ' + lvSach(m.ten) + '</option>'; }
-        h += '</select></label><div class="mc-lv-dong"><span>' + (t.loa.thu === 'ok' ? 'Đã phát tiếng thử ra loa này' : t.loa.thu === 'loi' ? 'Chưa phát được ra loa này — thử chọn loa khác' : t.loa.thu === 'dang' ? 'Đang phát tiếng thử…' : 'Tiếng em nói sẽ phát ra loa này') + '</span><span><button type="button" class="mc-lv-n nho" data-lv="thu-loa">Thử loa</button></span></div>';
+        h += '</select></label><button type="button" class="mc-lv-n" data-lv="thu-loa"' + (t.loa.thu === 'dang' ? ' aria-busy="true"' : '') + '>Thử loa</button></div>';
+        if (t.loa.thu === 'loi') h += lvCanh('Chưa phát được ra loa này — chọn loa khác');
       }
-      // 11/11 lần 4: «Tất cả» là mặc định ⇒ chữ đúng cả lúc chưa live + dòng phụ nhắc vọng tiếng
-      h += '<div class="mc-lv-dong"><span><b>Tiếng trên máy em</b><br>' + (t.tiengLop ? (LV.tt.pha === 'live' ? 'Mọi máy em đang phát tiếng thầy' : 'Bật live là mọi máy em phát tiếng thầy') + '<br>Máy em trong lớp đang bật tiếng: dễ vọng tiếng — nên cho em đeo tai nghe' : 'Máy em TRONG LỚP đang tắt tiếng — bấm «Tất cả», hoặc em mở khay bật «Tiếng» mới nghe') + (LV.tt.pha === 'live' ? '<br><b>' + (LV.tt.nghe || 0) + '</b> em đang nghe qua máy' : '') + '</span><span style="display:inline-flex;gap:.4em">'
-        + '<button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="0" aria-pressed="' + (!t.tiengLop) + '">Em ở xa</button><button type="button" class="mc-lv-n nho" data-lv="tieng-lop" data-v="1" aria-pressed="' + (!!t.tiengLop) + '">Tất cả</button></span></div>';
-      // 11/11 tối · ĐO TIẾNG TỪ XA: một dòng gọn cho máy thầy + mỗi máy em (máy nào câm thì đứng đầu, ghi rõ vì sao)
-      if (LV.tt.doTieng && LV.tt.doTieng.length) h += '<p class="mc-lv-cd" role="status">' + LV.tt.doTieng.map(lvSach).join('<br>') + '</p>';
+      // tiếng trên máy em: «Em ở xa» / «Tất cả» (mặc định); đang live ⇒ số em đang nghe qua máy cạnh nhãn
+      h += lvCai('Máy em', lvChon('tieng-lop', 'v', '0', 'Em ở xa', !t.tiengLop) + lvChon('tieng-lop', 'v', '1', 'Tất cả', !!t.tiengLop), false, LV.tt.pha === 'live' ? '<small>' + (LV.tt.nghe || 0) + ' em nghe</small>' : '');
     }
     // điểm quyết 4: mặc định TẮT, thầy bật từng buổi — chỉ em có tên trong lớp, đã đăng nhập; không điểm danh, không đội, không kJ
-    if (LV.tt.dot2) h += '<div class="mc-lv-dong"><span><b>Cho em ở xa vào xem</b><br>Em có tên trong lớp · không điểm danh, không kJ</span><button type="button" class="mc-lv-n nho" data-lv="xa" data-v="' + (t.xa ? '0' : '1') + '" aria-pressed="' + (!!t.xa) + '">' + (t.xa ? 'Đang bật' : 'Đang tắt') + '</button></div>';
-    if (LV.tt.pha === 'live') h += '<div class="mc-lv-dong"><span><b>Bảng → máy em</b><br>Đưa cả lớp vào bảng live ngay, kể cả em chưa gửi</span><button type="button" class="mc-lv-n nho" data-lv="bang" data-v="' + (LV.tt.bang ? '0' : '1') + '" aria-pressed="' + (!!LV.tt.bang) + '">' + (LV.tt.bang ? 'Đang bật' : 'Đang tắt') + '</button></div>';
+    if (LV.tt.dot2) h += lvCai('Cho em ở xa vào xem', lvChon('xa', 'v', t.xa ? '0' : '1', t.xa ? 'Đang bật' : 'Đang tắt', !!t.xa));
+    // «Bảng → máy em»: ép cả lớp vào bảng live kể cả em chưa gửi (tự bật khi gọi em lên bảng, tự tắt khi sang lượt mới)
+    if (LV.tt.pha === 'live') h += lvCai('Bảng → máy em', lvChon('bang', 'v', LV.tt.bang ? '0' : '1', LV.tt.bang ? 'Đang bật' : 'Đang tắt', !!LV.tt.bang));
     h += '<div class="mc-lv-hang">';
     if (LV.tt.pha === 'live') {
-      // «Bảng → máy em»: ép cả lớp vào bảng live kể cả em chưa gửi (tự bật khi gọi em lên bảng, tự tắt khi sang lượt mới) · «Tạm dừng» ⇄ «Tiếp tục» · «Kết thúc live»
+      // «Tạm dừng» ⇄ «Tiếp tục» · «Kết thúc live» · «Xong»
       h += '<button type="button" class="mc-lv-n" data-lv="tam-dung" data-v="' + (LV.tt.nghi ? '0' : '1') + '" aria-pressed="' + (!!LV.tt.nghi) + '" style="flex:1">' + (LV.tt.nghi ? 'Tiếp tục' : 'Tạm dừng') + '</button>'
         + '<button type="button" class="mc-lv-n do" data-lv="tat"><i></i>Kết thúc live</button><button type="button" class="mc-lv-n" data-lv="the-dong">Xong</button>';
     }
     else if (loi) h += '<button type="button" class="mc-lv-n do" data-lv="khong-tieng"><i></i>Live không tiếng</button><button type="button" class="mc-lv-n" data-lv="thu-lai">Thử lại</button><button type="button" class="mc-lv-n" data-lv="the-dong">Để sau</button>';
     else h += '<button type="button" class="mc-lv-n do" data-lv="' + (LV.tt.coTieng ? 'bat-dau' : 'khong-tieng') + '"><i></i>Bắt đầu live</button><button type="button" class="mc-lv-n" data-lv="the-dong">Để sau</button>';
-    // dòng chẩn đoán mic (app gửi ≈ 1 lần / giây) — thầy chụp gửi khi còn lỗi tiếng
-    lvThe.innerHTML = h + '</div>' + (LV.tt.coTieng ? '<p class="mc-lv-cd" id="mc-lv-cd">' + lvSach(cd) + '</p>' : '');
+    h += '</div>';
+    // «Chi tiết» (đóng sẵn, chữ nhỏ): tên đầy đủ mic đã chọn / mic đang dùng · dòng mô hình «Chỉ giọng thầy» · đo tiếng từ xa (máy thầy + mỗi máy em, máy câm
+    // đứng đầu) · dòng chẩn đoán mic app gửi ≈ 1 lần / giây (#mc-lv-cd) — thầy mở ra chụp gửi khi còn lỗi tiếng
+    if (LV.tt.coTieng) {
+      m = (mi && mi.khac ? ['Đã chọn «' + lvSach(mi.khac) + '» · lớp đang nghe ' + lvSach(mi.ten || 'mic mặc định của máy')] : []).concat(mi && mi.tg ? [lvSach(mi.tg)] : [], (LV.tt.doTieng || []).map(lvSach));
+      h += '<details class="mc-lv-ct"' + (LV.ctMo ? ' open' : '') + '><summary>Chi tiết</summary>' + (m.length ? '<p class="mc-lv-cd" role="status">' + m.join('<br>') + '</p>' : '') + '<p class="mc-lv-cd" id="mc-lv-cd">' + lvSach(cd) + '</p></details>';
+    }
+    lvThe.innerHTML = h;
   }
   var LV_MIC = {
-    'bi-tat': 'Trình duyệt báo mic đang bị tắt tiếng (nút tắt tiếng trên mic / bộ thu, hoặc Windows đang tắt tiếng mic này).',
-    im: 'Mic này chưa có tín hiệu qua trình duyệt dù app đã tự thử mọi cách mở. Mic không dây: bật bộ phát, kiểm tra đã ghép với bộ thu. Hoặc thầy chọn mục mic đích danh (không phải «Mặc định») hoặc chụp dòng chữ nhỏ bên dưới gửi lại.',
-    mat: 'Mic vừa bị rút. Đang chờ cắm lại — hoặc thầy chọn mic khác.'
+    'bi-tat': 'Mic đang bị tắt tiếng — bật lại trên mic / bộ thu hoặc trong Windows',
+    im: 'Mic chưa có tín hiệu — bật bộ phát mic, hoặc chọn mic theo tên (không chọn «Mặc định»)',
+    mat: 'Mic vừa bị rút — cắm lại hoặc chọn mic khác'
   };
   /** Xem lại Live: ngăn ghi của viên Live. ghi vắng = công tắc tắt ⇒ không vẽ. Máy ghi chưa báo trong 15 giây đầu ⇒ chưa vẽ gì (đang khởi động). */
   function lvNganGhi(t) {
