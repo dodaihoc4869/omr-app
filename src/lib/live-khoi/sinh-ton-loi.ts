@@ -29,8 +29,12 @@ export const BAT_TU_MS = 2000
 export const LO_GAN = 70
 /** Đứng yên trong bụi chừng này thì súng ngừng bắn (ẩn hẳn, máu hồi). */
 export const AN_YEN_MS = 400
-/** Máu mất mỗi giây theo cấp súng 1..4 của bên bắn. */
-export const SAT_THUONG_GIAY = [30, 40, 50, 60] as const
+/** Máu mất mỗi giây theo cấp súng 1..4 của bên bắn (thầy 13/11: «cho đạn của 4 cấp súng bắn nhanh hơn chút nữa» ⇒ nhịp bắn nhanh hơn 1/3, sát thương tăng 20%; trước là 30 · 40 · 50 · 60). */
+export const SAT_THUONG_GIAY = [36, 48, 60, 72] as const
+/** Nhịp bắn (ms giữa hai phát) theo cấp súng — hình đạn và tiếng súng cùng theo số này (trước: 333 · 333 · 333 · 1000). */
+export const NHIP_BAN_MS = [250, 250, 250, 700] as const
+/** Đạn bay từ nòng tới mục tiêu trong chừng này ms (trước: 230 · 230 · 230 · 380). */
+export const DAN_BAY_MS = [170, 170, 170, 280] as const
 /** Máy bù chỗ bắn yếu hơn người. */
 const HE_MAY = 0.67
 /** Cấp 3 «Súng Sấm»: nảy sang MỘT đối thủ gần mục tiêu; cấp 4 «Pháo Sao»: nổ lan quanh mục tiêu — đều nửa sát thương. */

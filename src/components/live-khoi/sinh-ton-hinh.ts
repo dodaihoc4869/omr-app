@@ -48,7 +48,16 @@ const MAM: Net[] = [
 ]
 const QUAI: Net[] = [['M-13,-45 Q4,-34 25,-27', '', 'muc', 5.4], ['M-13,-45 Q4,-34 25,-27', '', 'day', 2.6]]
 const ANG_TEN: Net[] = [['M-14,-80 L-21,-97', '', 'muc', 4.4], ['M-14,-80 L-21,-97', '', 'chu2', 2], [tron(-21.6, -99, 5), 'tin', 'muc', 1.6]]
-const netThan = (doi: number, may: boolean): Net[] => [[tron(-27, -29, 5.6), 'ao', 'muc', 1.6], ...MU[doi], ...AO, ...(doi === 2 ? MAM : []), ...QUAI, ...(may ? ANG_TEN : [])]
+/** KHỐI SÁNG TỐI (thầy chốt bản vẽ «2D có chiều sâu» 12/11 tối: docs/ban-ve-sinh-ton-chieu-sau-1211/02-bon-be-ma-1366.jpg): nắng từ trên-trái ⇒ nửa phải áo
+ *  sẫm hơn, dưới áo khoác vai có bóng, đỉnh mũ có vệt sáng. Mặt tròn bóng lên bằng một lớp chuyển sắc phủ lúc nướng (xem `nuong`). */
+const KHOI: Net[] = [
+  ['M0,-85 C19,-85 25,-69 25,-53 C25,-40 28,-25 30,-13 l-5,6 C20,-22 15,-40 14,-55 C13,-70 9,-80 0,-85Z', 'muc', '', 0, 0.13],
+  ['M-27,-27 q7,8 14.5,0 q7.25,8 14.5,0 q7.25,8 14.5,0 q7,8 13,0 l1.5,6 q-14,8 -29,2 q-14.5,6 -29,-2Z', 'muc', '', 0, 0.1],
+  ['M-17,-71 Q-12,-79 -4,-80', '', 'trang', 5, 0.62],
+]
+/** Thân bé ma KHÔNG lật theo hướng ngắm (để nắng luôn từ trên-trái); chỉ tay sau, quai đeo, ăng-ten đổi bên. */
+const netThan = (doi: number): Net[] => [...MU[doi], ...AO, ...(doi === 2 ? MAM : []), ...KHOI]
+const netBen = (may: boolean): Net[] => [[tron(-27, -29, 5.6), 'ao', 'muc', 1.6], ...QUAI, ...(may ? ANG_TEN : [])]
 
 // ── Bốn cấp súng (chĩa sang phải, gốc = khớp đeo bên hông) ──
 const N = 'muc' as const
@@ -114,29 +123,60 @@ function bangDoi(b: BangMau, doi: number): Record<Khoa, Rgb> {
     muc: b.muc, trang: b.trang, sao: b.sao, tin: b.tin, kim: pha(b.chu, b.vien, 0.06), kim2: pha(b.chu, b.vien, 0.36), chu2: b.chu2,
   }
 }
-function nuong(net: readonly Net[], bang: Record<Khoa, Rgb>, khung: readonly [number, number, number, number], doPhan: number): Anh {
+/** Tô `kim` (thân súng) bằng chuyển sắc sáng trên → sẫm dưới cho ra khối; `dao` = súng sẽ bị lật dọc lúc vẽ (chĩa trái) ⇒ đảo chiều để sáng vẫn ở trên. */
+function veNet(g: CanvasRenderingContext2D, net: readonly Net[], bang: Record<Khoa, Rgb>, kimLoai: 0 | 1 | -1): void {
+  let kim: CanvasGradient | null = null
+  if (kimLoai) {
+    kim = g.createLinearGradient(0, -18 * kimLoai, 0, 18 * kimLoai)
+    kim.addColorStop(0, mau(bang.trang)); kim.addColorStop(0.5, mau(bang.kim)); kim.addColorStop(1, mau(pha(bang.kim2, bang.muc, 0.12)))
+  }
+  for (const [d, to, vien, day, dam] of net) {
+    const p = new Path2D(d)
+    g.globalAlpha = dam ?? 1
+    if (to) { g.fillStyle = to === 'kim' && kim ? kim : mau(bang[to]); g.fill(p) }
+    if (vien) { g.strokeStyle = mau(bang[vien]); g.lineWidth = day ?? 1.6; g.stroke(p) }
+  }
+  g.globalAlpha = 1
+}
+function taoVai(khung: readonly [number, number, number, number], doPhan: number): [HTMLCanvasElement, CanvasRenderingContext2D | null] {
   const [x, y, w, h] = khung, cv = document.createElement('canvas')
   cv.width = Math.max(1, Math.ceil(w * doPhan)); cv.height = Math.max(1, Math.ceil(h * doPhan))
-  const g = cv.getContext('2d')
-  if (g && typeof Path2D === 'function') {
-    g.setTransform(doPhan, 0, 0, doPhan, -x * doPhan, -y * doPhan)
-    g.lineCap = 'round'; g.lineJoin = 'round'
-    for (const [d, to, vien, day, dam] of net) {
-      const p = new Path2D(d)
-      g.globalAlpha = dam ?? 1
-      if (to) { g.fillStyle = mau(bang[to]); g.fill(p) }
-      if (vien) { g.strokeStyle = mau(bang[vien]); g.lineWidth = day ?? 1.6; g.stroke(p) }
-    }
-  }
-  return { cv, x, y, w, h }
+  const g = typeof Path2D === 'function' ? cv.getContext('2d') : null
+  if (g) { g.setTransform(doPhan, 0, 0, doPhan, -x * doPhan, -y * doPhan); g.lineCap = 'round'; g.lineJoin = 'round' }
+  return [cv, g]
 }
-export interface BoHinh { than(doi: number, may: boolean): Anh; sung(doi: number, cap: number): Anh }
-/** Bộ hình nướng dần theo nhu cầu ở độ phân giải `doPhan` (điểm ảnh cho một đơn vị hình). Đổi cỡ màn / đổi màu ⇒ tạo bộ mới. */
-export function taoBoHinh(bang: BangMau, doPhan: number): BoHinh {
+export interface BoHinh {
+  /** Thân bé ma; `trai` = súng đeo bên trái (đang chĩa sang trái). Hình đã đúng chiều — KHÔNG lật lúc vẽ. */ than(doi: number, may: boolean, trai?: boolean): Anh
+  /** Súng chĩa sang phải; `trai` = bản dành cho lúc vẽ lật dọc (chĩa trái). */ sung(doi: number, cap: number, trai?: boolean): Anh
+}
+/** Bộ hình nướng dần theo nhu cầu ở độ phân giải `doPhan` (điểm ảnh cho một đơn vị hình). Đổi cỡ màn / đổi màu ⇒ tạo bộ mới. `phang` = máy yếu: bỏ khối sáng tối. */
+export function taoBoHinh(bang: BangMau, doPhan: number, phang = false): BoHinh {
   const nho = new Map<string, Anh>()
   const lay = (khoa: string, tao: () => Anh): Anh => { let a = nho.get(khoa); if (!a) { a = tao(); nho.set(khoa, a) } return a }
+  const nuongThan = (doi: number, may: boolean, trai: boolean): Anh => {
+    const [x, y, w, h] = KHUNG_THAN, [cv, g] = taoVai(KHUNG_THAN, doPhan), b = bangDoi(bang, doi)
+    if (g) {
+      // tay sau + quai đeo + ăng-ten: lật theo bên đeo súng; thân và khối sáng tối giữ nguyên chiều
+      const ben = netBen(may)
+      g.save(); if (trai) g.scale(-1, 1); veNet(g, ben.slice(0, 1), b, 0); g.restore()
+      veNet(g, phang ? netThan(doi).slice(0, -KHOI.length) : netThan(doi), b, 0)
+      if (!phang) {
+        // mặt tròn bóng lên: điểm sáng phía nắng, sẫm dần về mép khuất
+        const q = g.createRadialGradient(-5.4, -63, 1, -1.5, -59, 19)
+        q.addColorStop(0, mau(bang.trang, 0.42)); q.addColorStop(0.45, mau(bang.trang, 0)); q.addColorStop(1, mau(bang.muc, 0.3))
+        g.fillStyle = q; g.fill(new Path2D(elip(0, -58, 16.5, 15.6)))
+      }
+      g.save(); if (trai) g.scale(-1, 1); veNet(g, ben.slice(1), b, 0); g.restore()
+    }
+    return { cv, x, y, w, h }
+  }
+  const nuongSung = (doi: number, cap: number, trai: boolean): Anh => {
+    const [x, y, w, h] = KHUNG_SUNG, [cv, g] = taoVai(KHUNG_SUNG, doPhan * SUNG_HE)
+    if (g) veNet(g, netSung(cap), bangDoi(bang, doi), phang ? 0 : trai ? -1 : 1)
+    return { cv, x, y, w, h }
+  }
   return {
-    than: (doi, may) => lay(`t${doi}${may ? 1 : 0}`, () => nuong(netThan(doi, may), bangDoi(bang, doi), KHUNG_THAN, doPhan)),
-    sung: (doi, cap) => lay(`s${doi}${cap}`, () => nuong(netSung(cap), bangDoi(bang, doi), KHUNG_SUNG, doPhan * SUNG_HE)),
+    than: (doi, may, trai = false) => lay(`t${doi}${may ? 1 : 0}${trai ? 1 : 0}`, () => nuongThan(doi, may, trai)),
+    sung: (doi, cap, trai = false) => lay(`s${doi}${cap}${trai && !phang ? 1 : 0}`, () => nuongSung(doi, cap, trai)),
   }
 }
