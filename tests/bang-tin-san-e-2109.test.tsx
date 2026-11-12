@@ -231,7 +231,7 @@ const yen = async (ms = 50) => act(async () => void (await vi.advanceTimersByTim
     nap.song = () => ok({ ok: true, song: 'hỏng' })
     nap.bangTin = null
     render(<HomNayScreen />)
-    expect(await screen.findByText('Chào thầy Học')).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Chưa đọc được bảng tin' })).toBeTruthy() // 12/11: bỏ màn dự phòng «Chào thầy Học» (thầy «xoá hẳn đi») — SỬA CÓ CHỦ Ý
   })
   it('lần đầu MẤT MẠNG ⇒ bản 3 ngay (không trắng); nhịp kế lệnh sống trả lời được ⇒ CHUYỂN sang sàn', async () => {
     dongHoGia()

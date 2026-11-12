@@ -1,11 +1,12 @@
 // MÀN HÔM NAY của thầy — BẢN 3 = BẢNG TIN (thầy chốt bản vẽ 21/09; đề bài docs/dac-ta-cu/prompt-bang-tin-thay-v3.md; bản vẽ docs/ban-ve-bang-tin-v3-2109/).
 // Thầy chỉ ĐỌC: một lệnh chỉ-đọc `/gv/bang-tin` (hợp đồng docs/hop-dong-bang-tin-v3-2109.md) trả đủ cho cả màn; tự làm mới mỗi 60 giây (dừng khi tab ẩn).
-// Máy chủ CHƯA có lệnh (404) hoặc chưa từng đọc được ⇒ rơi về bản 2 (HomNayCu) qua các lệnh cũ — không báo lỗi đỏ. Đang chờ lần đầu ⇒ khung xương (không màn trắng).
+// Chưa từng đọc được ⇒ thẻ «Chưa đọc được bảng tin» (BangTinLoi) và vòng tự làm mới thử lại; BỎ HẲN màn dự phòng bản 2 «Chào thầy Học» (HomNayCu) — thầy 12/11:
+// «load lại nhiều lần vẫn bị vào màn này, xoá hẳn đi» (màn đó toàn ô «Không đọc được…»). Đang chờ lần đầu ⇒ khung xương (không màn trắng).
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAppStore } from '../store/appStore'
 import { layBangTin, type BangTin, type EmCanDeY } from '../lib/bang-tin-thay'
 import { layCanGiup, lyDoCanGiup } from '../lib/hom-nay-v2'
-import BangTinV3, { BangTinXuong } from '../components/bang-tin/BangTin'
+import BangTinV3, { BangTinLoi, BangTinXuong } from '../components/bang-tin/BangTin'
 import type { DungNhip } from '../components/bang-tin/cac-khoi'
 import { useTuLamMoi } from '../components/bang-tin/hooks'
 import { BANG_NHIP_THAY, TUY_CHON_NHIP_THAY } from '../lib/nhip-may-thay'
@@ -13,7 +14,6 @@ import BangTinSan from '../components/bang-tin-san/BangTinSan'
 import { useSanSong } from '../components/bang-tin-san/use-san-song'
 import { useSucKhoeMay } from '../components/bang-tin-san/use-suc-khoe'
 import type { DuLieuSan } from '../lib/bang-tin-san/kieu'
-import HomNayCu from './HomNayCu'
 
 /**
  * MÀN HÔM NAY = BẢNG TIN KIỂU SÀN GIAO DỊCH (thầy chốt mẫu 21/09; hợp đồng docs/hop-dong-bang-tin-song-2109.md): hỏi `/gv/bang-tin-song` mỗi 10 giây. Máy chủ chưa có lệnh / cờ `cau_hinh.bang_tin_san = tat` /
@@ -69,6 +69,6 @@ function HomNayBan3() {
   const dsTraCuu = useMemo(() => classList.map((h) => ({ sbd: h.sbd, hoTen: h.hoTen, lop: h.lop })), [classList])
 
   if (!tt.xong) return <BangTinXuong />
-  if (!tt.bt) return <HomNayCu />
+  if (!tt.bt) return <BangTinLoi chu="Máy chủ chưa trả bảng tin hôm nay." />
   return <BangTinV3 du={tt.bt} nayMs={nayMs} dsTraCuu={dsTraCuu} onMoEm={moToanCanh} onMoCa={moChiTietCa} dungNhip={dungNhip} taiTatCaCanDeY={taiTatCaCanDeY} />
 }
