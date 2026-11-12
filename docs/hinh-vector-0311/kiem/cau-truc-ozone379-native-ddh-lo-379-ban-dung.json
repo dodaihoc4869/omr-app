@@ -1,0 +1,29 @@
+[
+  {
+    "i": 204,
+    "hash": "2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13",
+    "fileNguon": "anh/2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13.png",
+    "svg": "ozone379-native-ddh-2e885bb8b8198103952c68f35844aa33920d40a3c9efbc8fee2d5b2c15692a8b.svg",
+    "hashSvg": "2e885bb8b8198103952c68f35844aa33920d40a3c9efbc8fee2d5b2c15692a8b",
+    "byteSvg": 17731,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-HC11-D3-III-3",
+        "de": "Liên kết đôi C=C bị oxi hóa bằng phản ứng ozone phân khử tạo ra các sản phẩm hữu cơ chứa oxygen. Nếu thực hiện ozone phân và khử ngay bằng chất khử êm dịu như dimethyl sulfide $\\ce{(CH3)2S}$ thì thu được sản phẩm theo sơ đồ như hình.\nCho hydrocarbon Z mạch hở có công thức phân tử $\\ce{C6H12}$ ozone phân khử theo điều kiện trên thì thu được hai chất hữu cơ là $\\ce{CH3COCH3}$ và $\\ce{CH3CH2CHO}$.\nCho Z tác dụng với $\\ce{Br2}$ ($\\ce{CCl4}$) thu được chất hữu cơ T có công thức phân tử $\\ce{C6H12Br2}$. Khi đánh số trên mạch chính để đọc tên T theo danh pháp IUPAC thì tổng chỉ số vị trí nhánh và nhóm thế là bao nhiêu?",
+        "refs": [
+          {
+            "hash": "2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13",
+            "where": "VIP27-C1-HC11-D3-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "81d2f205669ef65a272b1671201bb05378d039616db53553d323b50d21aeb116"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4knownBAREC2explicitO-8RgroupsUNKNOWNtotalC-EXCLconditionC/1CCdoubleMAINLOWERy40-ALL4RarmsCONTACT-upperSHORTy35.5FREEbothends/2COdouble2splitfeetCONTACTrespectiveRarms-WHITEgapbeforeexplicitO-NOcrossbar/LEFTC39938-RIGHTC53537-nonperiodicCOy36-40vs35-39/ALLregularUPRIGHT-8Rsup1234-NOprintedC/1FILLEDskinnyRIGHThead/EXACT1.O3-2.(CH3)2S-SUB3-2/0stereo-charge-caption/NOaddedH-Rvalues-alkenename-Tformula-yield-answer-alias",
+    "hashSvgDaSoat": "2e885bb8b8198103952c68f35844aa33920d40a3c9efbc8fee2d5b2c15692a8b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

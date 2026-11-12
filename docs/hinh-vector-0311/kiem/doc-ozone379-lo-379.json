@@ -1,0 +1,995 @@
+{
+  "i": 204,
+  "assetIndexProvided": 1287,
+  "hash": "2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13.png",
+  "size": [
+    591,
+    75
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-HC11-D3-III-3",
+      "de": "Liên kết đôi C=C bị oxi hóa bằng phản ứng ozone phân khử tạo ra các sản phẩm hữu cơ chứa oxygen. Nếu thực hiện ozone phân và khử ngay bằng chất khử êm dịu như dimethyl sulfide $\\ce{(CH3)2S}$ thì thu được sản phẩm theo sơ đồ như hình.\nCho hydrocarbon Z mạch hở có công thức phân tử $\\ce{C6H12}$ ozone phân khử theo điều kiện trên thì thu được hai chất hữu cơ là $\\ce{CH3COCH3}$ và $\\ce{CH3CH2CHO}$.\nCho Z tác dụng với $\\ce{Br2}$ ($\\ce{CCl4}$) thu được chất hữu cơ T có công thức phân tử $\\ce{C6H12Br2}$. Khi đánh số trên mạch chính để đọc tên T theo danh pháp IUPAC thì tổng chỉ số vị trí nhánh và nhóm thế là bao nhiêu?",
+      "allHinh": [
+        {
+          "hash": "2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13",
+          "where": "VIP27-C1-HC11-D3-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "81d2f205669ef65a272b1671201bb05378d039616db53553d323b50d21aeb116"
+        }
+      ],
+      "missingHashes": [
+        "2276a130d622173c5cf79894104a6748cec76bd1736ace099197d89cc9d52b13"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "ownBothCO12xOpened": true,
+    "ownArrow6xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownFreshCC15xAndBothCOPixelRowsChecked": true
+  },
+  "measurementLimits": "Nativecenterlines/bboxapproxnearest1px. RsuperscriptsandbareCsourceverified; no totalCassignedunknownRgroups. ExplicitOwhitespacepreserved, noCglyphinserted.",
+  "geometry": {
+    "reactant": {
+      "bareC": [
+        [
+          43,
+          40
+        ],
+        [
+          68,
+          40
+        ]
+      ],
+      "doubleCC": [
+        [
+          [
+            45,
+            35.5
+          ],
+          [
+            66,
+            35.5
+          ]
+        ],
+        [
+          [
+            43,
+            40
+          ],
+          [
+            68,
+            40
+          ]
+        ]
+      ],
+      "Rlabels": [
+        {
+          "text": "R¹",
+          "bbox": [
+            6,
+            4,
+            28,
+            24
+          ]
+        },
+        {
+          "text": "R²",
+          "bbox": [
+            0,
+            51,
+            23,
+            72
+          ]
+        },
+        {
+          "text": "R³",
+          "bbox": [
+            91,
+            4,
+            113,
+            25
+          ]
+        },
+        {
+          "text": "R⁴",
+          "bbox": [
+            91,
+            51,
+            113,
+            72
+          ]
+        }
+      ],
+      "Rarms": [
+        [
+          [
+            26,
+            23
+          ],
+          [
+            43,
+            40
+          ]
+        ],
+        [
+          [
+            26,
+            56
+          ],
+          [
+            43,
+            40
+          ]
+        ],
+        [
+          [
+            68,
+            40
+          ],
+          [
+            86,
+            23
+          ]
+        ],
+        [
+          [
+            68,
+            40
+          ],
+          [
+            86,
+            56
+          ]
+        ]
+      ],
+      "note": "ALL4RarmsjoinMAINLOWERliney40;UPPERinnerparallel45..66y35.5FLOATSwithwhitegapsbothends. OldabstractC38symmetricwrong."
+    },
+    "leftProduct": {
+      "bareC": [
+        399,
+        38
+      ],
+      "Rlabels": [
+        {
+          "text": "R¹",
+          "bbox": [
+            363,
+            3,
+            385,
+            23
+          ]
+        },
+        {
+          "text": "R²",
+          "bbox": [
+            358,
+            51,
+            380,
+            72
+          ]
+        }
+      ],
+      "Rarms": [
+        [
+          [
+            382,
+            22
+          ],
+          [
+            399,
+            38
+          ]
+        ],
+        [
+          [
+            382,
+            56
+          ],
+          [
+            399,
+            38
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          418,
+          31,
+          432,
+          46
+        ]
+      },
+      "COparallelRays": [
+        [
+          [
+            396.875,
+            36
+          ],
+          [
+            416,
+            36
+          ]
+        ],
+        [
+          [
+            397.111,
+            40
+          ],
+          [
+            416,
+            40
+          ]
+        ]
+      ],
+      "nativeJunction": "2feetjoincorrespondingupper/lowerRarmswithbareCtinyVnotch/source. Noaddedverticalclosurebar. Oinkstarts419approx, keep~2pxwhitegapafter416."
+    },
+    "rightProduct": {
+      "bareC": [
+        535,
+        37
+      ],
+      "Rlabels": [
+        {
+          "text": "R³",
+          "bbox": [
+            559,
+            3,
+            580,
+            23
+          ]
+        },
+        {
+          "text": "R⁴",
+          "bbox": [
+            559,
+            51,
+            580,
+            72
+          ]
+        }
+      ],
+      "Rarms": [
+        [
+          [
+            535,
+            37
+          ],
+          [
+            553,
+            21
+          ]
+        ],
+        [
+          [
+            535,
+            37
+          ],
+          [
+            553,
+            56
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          503,
+          31,
+          517,
+          46
+        ]
+      },
+      "COparallelRays": [
+        [
+          [
+            519,
+            35
+          ],
+          [
+            537.25,
+            35
+          ]
+        ],
+        [
+          [
+            519,
+            39
+          ],
+          [
+            536.895,
+            39
+          ]
+        ]
+      ],
+      "nativeJunction": "2feetcontactrespectiveupper/lowerRarms, tinyVnotch/source;whitegapbetweenOinkright516andline519. NoextraCglyph/closurebar."
+    },
+    "productPlus": {
+      "text": "+",
+      "bbox": [
+        460,
+        29,
+        470,
+        42
+      ]
+    },
+    "arrow": {
+      "shaft": [
+        [
+          169,
+          39.5
+        ],
+        [
+          317,
+          39.5
+        ]
+      ],
+      "filledTriangle": [
+        [
+          317,
+          39.5
+        ],
+        [
+          294,
+          37
+        ],
+        [
+          294,
+          42
+        ]
+      ],
+      "above": {
+        "text": "1. O₃",
+        "bbox": [
+          211,
+          18,
+          253,
+          36
+        ]
+      },
+      "below": {
+        "text": "2. (CH₃)₂S",
+        "bbox": [
+          194,
+          49,
+          278,
+          67
+        ]
+      },
+      "conditionNote": "1./2.periodsliteral;O3andCH3/parenthesis2SUB. Noextrastepname."
+    },
+    "font": "ALLregularuprightsansblackgray, notbold/italic. Rnumbers1-4SUPnotSUB; allRlettersupright.",
+    "countsKnown": {
+      "bareStructuralC": 4,
+      "unknownRLabels": 8,
+      "totalStructuralC": "UNKNOWNbecauseRgroups",
+      "explicitProductO": 2,
+      "CCdouble": 1,
+      "COdouble": 2,
+      "filledHeads": 1,
+      "conditionKnownC": 2,
+      "captions": 0
+    },
+    "noAdded": [
+      "alkenenameanswer",
+      "Tformulaanswer",
+      "Cglyphsatbarejunctions",
+      "Rgroupsvalues",
+      "charges",
+      "reactionyield",
+      "Hlabels",
+      "carbonylfeetforceoverOink",
+      "alias"
+    ]
+  },
+  "actualSvgReviewed": true,
+  "status": "Final2e885 independently passed",
+  "corrections": [
+    {
+      "field": "reactantANDbothproductjunctions/rays",
+      "oldReactant": {
+        "bareC": [
+          [
+            44,
+            38
+          ],
+          [
+            67,
+            38
+          ]
+        ],
+        "doubleCC": [
+          [
+            [
+              44,
+              36
+            ],
+            [
+              67,
+              36
+            ]
+          ],
+          [
+            [
+              44,
+              40
+            ],
+            [
+              67,
+              40
+            ]
+          ]
+        ],
+        "Rlabels": [
+          {
+            "text": "R¹",
+            "bbox": [
+              6,
+              4,
+              28,
+              24
+            ]
+          },
+          {
+            "text": "R²",
+            "bbox": [
+              0,
+              51,
+              23,
+              72
+            ]
+          },
+          {
+            "text": "R³",
+            "bbox": [
+              91,
+              4,
+              113,
+              25
+            ]
+          },
+          {
+            "text": "R⁴",
+            "bbox": [
+              91,
+              51,
+              113,
+              72
+            ]
+          }
+        ],
+        "Rarms": [
+          [
+            [
+              26,
+              23
+            ],
+            [
+              44,
+              38
+            ]
+          ],
+          [
+            [
+              26,
+              56
+            ],
+            [
+              44,
+              38
+            ]
+          ],
+          [
+            [
+              67,
+              38
+            ],
+            [
+              86,
+              23
+            ]
+          ],
+          [
+            [
+              67,
+              38
+            ],
+            [
+              86,
+              56
+            ]
+          ]
+        ],
+        "note": "MainC2endpointsbareatjunctions, notlabelC."
+      },
+      "newReactant": {
+        "bareC": [
+          [
+            43,
+            40
+          ],
+          [
+            68,
+            40
+          ]
+        ],
+        "doubleCC": [
+          [
+            [
+              45,
+              35.5
+            ],
+            [
+              66,
+              35.5
+            ]
+          ],
+          [
+            [
+              43,
+              40
+            ],
+            [
+              68,
+              40
+            ]
+          ]
+        ],
+        "Rlabels": [
+          {
+            "text": "R¹",
+            "bbox": [
+              6,
+              4,
+              28,
+              24
+            ]
+          },
+          {
+            "text": "R²",
+            "bbox": [
+              0,
+              51,
+              23,
+              72
+            ]
+          },
+          {
+            "text": "R³",
+            "bbox": [
+              91,
+              4,
+              113,
+              25
+            ]
+          },
+          {
+            "text": "R⁴",
+            "bbox": [
+              91,
+              51,
+              113,
+              72
+            ]
+          }
+        ],
+        "Rarms": [
+          [
+            [
+              26,
+              23
+            ],
+            [
+              43,
+              40
+            ]
+          ],
+          [
+            [
+              26,
+              56
+            ],
+            [
+              43,
+              40
+            ]
+          ],
+          [
+            [
+              68,
+              40
+            ],
+            [
+              86,
+              23
+            ]
+          ],
+          [
+            [
+              68,
+              40
+            ],
+            [
+              86,
+              56
+            ]
+          ]
+        ],
+        "note": "ALL4RarmsjoinMAINLOWERliney40;UPPERinnerparallel45..66y35.5FLOATSwithwhitegapsbothends. OldabstractC38symmetricwrong."
+      },
+      "oldLeftProduct": {
+        "bareC": [
+          400,
+          38
+        ],
+        "Rlabels": [
+          {
+            "text": "R¹",
+            "bbox": [
+              363,
+              3,
+              385,
+              23
+            ]
+          },
+          {
+            "text": "R²",
+            "bbox": [
+              358,
+              51,
+              380,
+              72
+            ]
+          }
+        ],
+        "Rarms": [
+          [
+            [
+              382,
+              22
+            ],
+            [
+              400,
+              38
+            ]
+          ],
+          [
+            [
+              382,
+              56
+            ],
+            [
+              400,
+              38
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            418,
+            31,
+            432,
+            46
+          ]
+        },
+        "COparallelRays": [
+          [
+            [
+              397.75,
+              36
+            ],
+            [
+              416,
+              36
+            ]
+          ],
+          [
+            [
+              398,
+              40
+            ],
+            [
+              416,
+              40
+            ]
+          ]
+        ],
+        "nativeJunction": "2feetjoincorrespondingupper/lowerRarmswithbareCtinyVnotch/source. Noaddedverticalclosurebar. Oinkstarts419approx, keep~2pxwhitegapafter416."
+      },
+      "newLeftProduct": {
+        "bareC": [
+          399,
+          38
+        ],
+        "Rlabels": [
+          {
+            "text": "R¹",
+            "bbox": [
+              363,
+              3,
+              385,
+              23
+            ]
+          },
+          {
+            "text": "R²",
+            "bbox": [
+              358,
+              51,
+              380,
+              72
+            ]
+          }
+        ],
+        "Rarms": [
+          [
+            [
+              382,
+              22
+            ],
+            [
+              399,
+              38
+            ]
+          ],
+          [
+            [
+              382,
+              56
+            ],
+            [
+              399,
+              38
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            418,
+            31,
+            432,
+            46
+          ]
+        },
+        "COparallelRays": [
+          [
+            [
+              396.875,
+              36
+            ],
+            [
+              416,
+              36
+            ]
+          ],
+          [
+            [
+              397.111,
+              40
+            ],
+            [
+              416,
+              40
+            ]
+          ]
+        ],
+        "nativeJunction": "2feetjoincorrespondingupper/lowerRarmswithbareCtinyVnotch/source. Noaddedverticalclosurebar. Oinkstarts419approx, keep~2pxwhitegapafter416."
+      },
+      "oldRightProduct": {
+        "bareC": [
+          535,
+          38
+        ],
+        "Rlabels": [
+          {
+            "text": "R³",
+            "bbox": [
+              559,
+              3,
+              580,
+              23
+            ]
+          },
+          {
+            "text": "R⁴",
+            "bbox": [
+              559,
+              51,
+              580,
+              72
+            ]
+          }
+        ],
+        "Rarms": [
+          [
+            [
+              535,
+              38
+            ],
+            [
+              553,
+              21
+            ]
+          ],
+          [
+            [
+              535,
+              38
+            ],
+            [
+              553,
+              56
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            503,
+            31,
+            517,
+            46
+          ]
+        },
+        "COparallelRays": [
+          [
+            [
+              519,
+              36
+            ],
+            [
+              537.12,
+              36
+            ]
+          ],
+          [
+            [
+              519,
+              40
+            ],
+            [
+              537,
+              40
+            ]
+          ]
+        ],
+        "nativeJunction": "2feetcontactrespectiveupper/lowerRarms, tinyVnotch/source;whitegapbetweenOinkright516andline519. NoextraCglyph/closurebar."
+      },
+      "newRightProduct": {
+        "bareC": [
+          535,
+          37
+        ],
+        "Rlabels": [
+          {
+            "text": "R³",
+            "bbox": [
+              559,
+              3,
+              580,
+              23
+            ]
+          },
+          {
+            "text": "R⁴",
+            "bbox": [
+              559,
+              51,
+              580,
+              72
+            ]
+          }
+        ],
+        "Rarms": [
+          [
+            [
+              535,
+              37
+            ],
+            [
+              553,
+              21
+            ]
+          ],
+          [
+            [
+              535,
+              37
+            ],
+            [
+              553,
+              56
+            ]
+          ]
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            503,
+            31,
+            517,
+            46
+          ]
+        },
+        "COparallelRays": [
+          [
+            [
+              519,
+              35
+            ],
+            [
+              537.25,
+              35
+            ]
+          ],
+          [
+            [
+              519,
+              39
+            ],
+            [
+              536.895,
+              39
+            ]
+          ]
+        ],
+        "nativeJunction": "2feetcontactrespectiveupper/lowerRarms, tinyVnotch/source;whitegapbetweenOinkright516andline519. NoextraCglyph/closurebar."
+      },
+      "reason": "OwnfreshnativeCC15x+bothCO12xandpixelrows:reactantjunctionsMAINLOWERy40,upperfree35.5. Productsindependentleft39938/rays36,40;right53537/rays35,39. Initialsymmetricabstractpositionswrong. DoNOTnormalize3figures.",
+      "evidence": [
+        "/workspace/scratch/204-nativeCC15x-own.png",
+        "/workspace/scratch/204-leftCO12x-lo379.png",
+        "/workspace/scratch/204-rightCO12x-lo379.png"
+      ],
+      "pixelEvidence": {
+        "reactant37": [
+          40,
+          71
+        ],
+        "reactant38": [
+          41,
+          70
+        ],
+        "reactant39": [
+          42,
+          69
+        ],
+        "reactant40": "continuous43..68",
+        "reactant41": [
+          42,
+          69
+        ],
+        "leftCOy38": [
+          399
+        ],
+        "leftCOy36": "397..403+resttorayend",
+        "leftCOy40": "397..403+resttorayend",
+        "rightCOy37": [
+          535
+        ],
+        "rightCOy35": "532..537+rayleft",
+        "rightCOy39": "532..537+rayleft"
+      }
+    }
+  ],
+  "rootNativeFullAllPublicDeAndOwnCC15xBothCO12xOpened": true,
+  "rootFreshActualFull3xAndThreeMacrosOpened": {
+    "hashSvg": "2e885bb8b8198103952c68f35844aa33920d40a3c9efbc8fee2d5b2c15692a8b",
+    "bytes": 17731,
+    "full": "/workspace/scratch/root379-204.png",
+    "note": "BarejunctionsNOprintedC; CCmainlowerCONTACT-uppershortFREE; twoCOsplitfeetCONTACTrespectiveRarms/nativeLEFTvsRIGHT1pxYdrift; explicitOgaps; 8Rsup1234/conditionsSUB3-2/1filledhead; allregularUPRIGHT/noaddedH-charge-name-answer. Nativeapprox notsubpixel."
+  },
+  "readonlyFinalRuntime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/ozone379-native-ddh-2e885bb8b8198103952c68f35844aa33920d40a3c9efbc8fee2d5b2c15692a8b.svg 2e885bb8b8198103952c68f35844aa33920d40a3c9efbc8fee2d5b2c15692a8b\n204 { x: 0, y: 0, width: 591, height: 75 }\n"
+}
