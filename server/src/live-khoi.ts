@@ -11,6 +11,8 @@ import { baoMayCacEm } from './ngan-hoc-sinh'
 
 export const KHOA_LIVE_KHOI = 'live_khoi'
 const TOI_DA_LICH = 30
+/** TÀI KHOẢN THỬ của thầy (thầy 12/11: «cho sbd này test mọi lớp»): thấy và vào được live của MỌI khối, kể cả khi hồ sơ không có lớp. */
+const SBD_THU = new Set(['12121212'])
 /** Phòng chờ / đang live quá 6 giờ không ai đụng ⇒ coi như đã xong (thầy quên bấm kết thúc). */
 const HAN_PHONG_MS = 6 * 3_600_000
 /** Lịch hẹn quá giờ 30 phút mà thầy chưa mở ⇒ máy em thôi hiện; quá 24 giờ ⇒ gỡ khỏi danh sách. */
@@ -44,9 +46,9 @@ export function donLich(ds: readonly LichLiveMc[], nay: number): LichLiveMc[] {
     .sort((a, b) => a.batDau - b.batDau)
     .slice(0, TOI_DA_LICH)
 }
-/** Buổi máy em của khối `khoi` được thấy lúc `nay`: phòng đang mở trước, rồi lịch hẹn gần nhất chưa trễ quá 30 phút. THUẦN. */
-export function lichChoEm(ds: readonly LichLiveMc[], khoi: number, nay: number): LichLiveMc | null {
-  const cua = donLich(ds, nay).filter((x) => x.khoi === khoi)
+/** Buổi máy em của khối `khoi` được thấy lúc `nay`: phòng đang mở trước, rồi lịch hẹn gần nhất chưa trễ quá 30 phút. `khoi = null` = tài khoản thử (mọi khối). THUẦN. */
+export function lichChoEm(ds: readonly LichLiveMc[], khoi: number | null, nay: number): LichLiveMc | null {
+  const cua = donLich(ds, nay).filter((x) => khoi === null || x.khoi === khoi)
   return cua.find((x) => x.trangThai === 'dang') ?? cua.find((x) => x.trangThai === 'cho') ?? cua.find((x) => x.trangThai === 'hen' && nay - x.batDau < HEN_TRE_MS) ?? null
 }
 const raLich = (x: LichLiveMc): Row => ({ id: x.id, khoi: x.khoi, batDau: x.batDau, ten: x.ten, trangThai: x.trangThai, ...(x.buoiId ? { buoiId: x.buoiId } : {}) })
@@ -155,7 +157,10 @@ export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
   const ds = donLich(await dsGoc, nay)
   if (!ds.length) return p.endsWith('khoi-vao') ? { ok: false, error: 'Thầy chưa mở live.' } : { ok: true, trangThai: 'khong' }
   const h = await env.DB.prepare("SELECT lop, ho_ten FROM hoc_sinh WHERE sbd = ? AND COALESCE(trang_thai, '') <> 'khoa' LIMIT 1").bind(sbd).first<Row>().catch(() => null)
-  const khoi = khoiTuLop(h?.lop), x = khoi ? lichChoEm(ds, khoi, nay) : null
+  // Hồ sơ không có lớp ⇒ đọc lớp ở danh sách cổng (em mới chỉ có trong danh sách đăng nhập).
+  const thu = SBD_THU.has(sbd)
+  const lopCong = h?.lop || thu ? null : await env.DB.prepare('SELECT lop FROM danh_sach WHERE sbd = ? LIMIT 1').bind(sbd).first<Row>().catch(() => null)
+  const khoi = khoiTuLop(h?.lop) ?? khoiTuLop(lopCong?.lop), x = thu ? lichChoEm(ds, null, nay) : khoi ? lichChoEm(ds, khoi, nay) : null
   if (p === '/hs/bpu/khoi-cua-em') return x ? { ok: true, trangThai: x.trangThai, khoi: x.khoi, ten: x.ten, batDau: x.batDau } : { ok: true, trangThai: 'khong' }
   if (p === '/hs/bpu/khoi-vao') {
     if (!x || x.trangThai === 'hen' || !x.buoiId) return { ok: false, error: x ? 'Chưa tới giờ. Thầy mở phòng là em vào được.' : 'Không có live cho khối của em.' }

@@ -123,19 +123,9 @@ import { chiaGoiDe, dongGoiDe, dungGoiDe } from './khoa-de-thi'
 import { dongPhongDau, veDauChoEm } from './dau-ion-ve'
 import { bpuGv, bpuHs, gvBuoiHocBpu, hsDiemDanhBao, wsThang } from './ws-thang'
 import { chiaDeTruoc, deTruoc, goiDapAnEm, goiDeCuaCa, maAnCa } from './de-truoc'
+import { CORS } from './cors'
+import { DUONG_MO_HINH_THAY, moHinhThay } from './mo-hinh-thay'
 
-// CORS — app chạy ở `dodaihoc4869.github.io`, Worker ở `workers.dev`, nên MỌI
-// lượt gọi đều là chéo nguồn. Thiếu mấy dòng này là trình duyệt chặn sạch và
-// máy em chỉ thấy "lỗi mạng" — không có cách nào đoán ra từ phía em.
-//
-// Mở cho mọi nguồn, đúng như Apps Script đang làm: lệnh của học sinh vốn không
-// đòi mã bí mật, khoá theo nguồn không thêm an toàn mà chỉ thêm chỗ hỏng.
-const CORS = {
-  'access-control-allow-origin': '*',
-  'access-control-allow-methods': 'GET, POST, OPTIONS',
-  'access-control-allow-headers': 'content-type, x-ma-bi-mat',
-  'access-control-max-age': '86400',
-}
 const JSON_HEADERS = { 'content-type': 'application/json;charset=utf-8', ...CORS }
 /** Bộ não A.I đã gỡ (thầy lệnh 28/09/2026): lời trả cho mọi lệnh cũ của chức năng này. */
 const DA_GO_BO_NAO = 'Chức năng đã gỡ'
@@ -3564,6 +3554,8 @@ const boXuLy = {
     const envDoc: Env = env.DB?.withSession ? { ...env, DB: gan(env.DB.withSession('first-unconstrained'), env.DB) } : env
 
     if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS })
+    // Mô hình «Chỉ giọng thầy» (mo-hinh-thay.ts): chỉ mã thầy, không chạm D1 ⇒ trước cổng làm mới.
+    if (p === DUONG_MO_HINH_THAY) return moHinhThay(req, env, laThay(req, env, {}))
     // RESET TOÀN APP 00:01 thứ Hai 21/09 (reset-toan-app.ts): trong cửa sổ đóng băng [00:00, 00:20] giờ VN mà job CHƯA xong thì mọi lệnh trả lời tử tế để máy khách
     // không coi là lỗi đăng nhập/mất mạng. Ngoài cửa sổ: không tốn truy vấn nào. Chỉ chuyển hướng và /khoe được qua.
     // Tối ưu 05/10: đệm cổng còn hạn ⇒ quyết ngay (không D1, y như `dangLamMoi`). Đệm hết hạn ⇒ lệnh game CHỈ chạm D1 (`laLenhCongSongSong`) cho lượt đọc cổng chạy

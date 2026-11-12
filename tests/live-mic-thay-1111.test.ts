@@ -11,6 +11,12 @@ import { taoLiveThay, type TrangThaiLiveThay } from '../src/lib/live'
 import { OPUS_EM, OPUS_THAY, docSoGui, suaSdpOpus } from '../src/lib/live/sfu'
 import { taoPhong, viewBang, type TrangThaiPhong } from '../src/lib/bpu/phong'
 import { datCoLive, liveBat, liveDat, liveMicBat, liveMoi, liveSan, liveTat, liveThuMic } from '../src/lib/bpu/phong-live'
+import { LAM_RO, THAM_LOC_ON, type MucLocOn } from '../src/lib/live/chuoi-tieng'
+
+// «CHỈ GIỌNG THẦY» (12/11): đếm số lần lõi tách được NẠP (mảnh lười) + mô hình giả (không gọi mạng) — mục «Chỉ giọng thầy — mặc định không đổi» cuối tệp.
+const tachGiong = vi.hoisted(() => ({ nap: 0 }))
+vi.mock('../src/lib/live/tach-giong-thay', async (goc) => { tachGiong.nap += 1; return await goc() })
+vi.mock('../src/lib/live/chi-thay', async (goc) => ({ ...(await goc<typeof import('../src/lib/live/chi-thay')>()), taiMoHinhThay: async () => new ArrayBuffer(64) }))
 
 // ── Trình duyệt giả ──
 type Rb = { deviceId?: { exact?: string; ideal?: string }; echoCancellation?: boolean; noiseSuppression?: boolean; autoGainControl?: boolean; channelCount?: number }
@@ -97,14 +103,14 @@ function dungTrinhDuyet() {
   } })
 }
 const T0 = 1_700_000_000_000
-function dung(tuy: { loc?: 'tu' | 'bat' | 'tat'; micTen?: string } = {}) {
+function dung(tuy: { loc?: 'tu' | 'bat' | 'tat'; micTen?: string; kieuTieng?: 'lam-ro' | 'chuan'; locOn?: MucLocOn } = {}) {
   const st: TrangThaiPhong = taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds: [{ sbd: 'S1', ten: 'Em Một', coMat: true, luc: T0 }] })
   datCoLive(st, { cho: true, sfu: true }, T0)
   const tin: Record<string, unknown>[] = [], tt: TrangThaiLiveThay[] = []
   let thietBiDoi = 0
   const micMoi: string[] = []
   const lt = taoLiveThay({
-    ve: 've-gv', goc: 'https://may-chu.example', loc: tuy.loc, micTen: tuy.micTen, khiMicMoi: (id) => { micMoi.push(id) }, khiThietBi: () => { thietBiDoi += 1 },
+    ve: 've-gv', goc: 'https://may-chu.example', loc: tuy.loc, micTen: tuy.micTen, kieuTieng: tuy.kieuTieng, locOn: tuy.locOn, khiMicMoi: (id) => { micMoi.push(id) }, khiThietBi: () => { thietBiDoi += 1 },
     kenh: { gui: (t) => { tin.push(t); if (t.t === 'live-bat') liveBat(st, T0 + 1); if (t.t === 'live-tat') liveTat(st, T0 + 3); if (t.t === 'live-san') liveSan(st, { san: t.san !== false, ss: t.ss }, T0); if (t.t === 'live-dat') liveDat(st, t as never, T0 + 2); if (t.t === 'live-bat' || t.t === 'live-dat') lt.nhanTinPhong(viewBang(st)) }, guiNhiPhan: () => {} },
     khiTrangThai: (t) => tt.push(t),
     moiTruong: { taoPc: () => new PcGia() as unknown as RTCPeerConnection, fetch: (async (u: string) => new Response(JSON.stringify(String(u).endsWith('/noi') ? { ok: true, phien: 'p'.repeat(16), sdp: SDP } : { ok: true, id: 1 }))) as never },
@@ -589,5 +595,100 @@ describe('M2 · tiếng trong: luật lọc theo đường vọng + Opus dải r
   it('số đo luồng gửi đọc từ `getStats`: mức âm tại nguồn + byte đã gửi', () => {
     const bc = new Map<string, unknown>([['a', { type: 'media-source', kind: 'audio', audioLevel: 0.31, totalAudioEnergy: 2 }], ['b', { type: 'outbound-rtp', kind: 'audio', bytesSent: 16000, packetsSent: 100 }], ['c', { type: 'outbound-rtp', kind: 'video', bytesSent: 999 }]])
     expect(docSoGui(bc as unknown as RTCStatsReport)).toEqual({ mucAm: 0.31, nangLuong: 2, byteGui: 16000, goiGui: 100 })
+  })
+})
+
+describe('«Chỉ giọng thầy» — mặc định không đổi (12/11, đường thử chỉ-thầy, mặc định tắt)', () => {
+  /** Trình duyệt có kiểu «khung» (Chromium): ghi lại mọi Worker, mọi tin gửi Worker, mọi Blob mã Worker. */
+  function khungGia() {
+    const ws: { tin: unknown[]; onmessage: ((e: { data: unknown }) => void) | null }[] = [], blob: Blob[] = []
+    let micDangXuLy: TrackGia | null = null
+    vi.stubGlobal('MediaStreamTrackProcessor', class { readable = {}; constructor(o: { track: TrackGia }) { micDangXuLy = o.track } })
+    vi.stubGlobal('MediaStreamTrackGenerator', class extends TrackGia { writable = {}; constructor() { super('khung', {}, () => micDangXuLy?.ra() ?? 0) } })
+    vi.stubGlobal('AudioData', class {})
+    vi.stubGlobal('Worker', class { tin: unknown[] = []; onmessage = null; onerror = null; constructor() { ws.push(this as never) } postMessage(m: unknown) { this.tin.push(m) } terminate() { /* dừng */ } })
+    const U = URL as unknown as { createObjectURL?: unknown; revokeObjectURL?: unknown }, cu = [U.createObjectURL, U.revokeObjectURL]
+    U.createObjectURL = (b: Blob) => { blob.push(b); return `blob:${blob.length}` }; U.revokeObjectURL = () => undefined
+    return { ws, blob, tra: () => { U.createObjectURL = cu[0]; U.revokeObjectURL = cu[1] } }
+  }
+  const micGoc = (b: ReturnType<typeof dung>) => b.lt.luongMic()!.getAudioTracks()[0]
+  /** Chờ chuỗi nạp lười xong (import() lõi ⇒ tải mô hình ⇒ gửi Worker { tachMa, tach }) — máy bận thì vài vòng vi điều phối. */
+  const choLoi = (tin: unknown[]) => vi.waitFor(async () => { await vi.dynamicImportSettled(); if (!tin.some((t) => typeof t === 'object' && t !== null && 'tachMa' in t)) throw new Error('chưa nạp xong') }, { timeout: 8000, interval: 20 })
+
+  for (const kieuTieng of ['lam-ro', 'chuan'] as const) for (const locOn of ['vua', 'manh', 'tat'] as const) {
+    it(`Tiếng «${kieuTieng}» · Lọc ồn «${locOn}»: một Worker chỉ có mã khung, tin gửi Worker đúng dạng cũ, track gửi như cũ, không nạp lõi tách`, async () => {
+      const g = khungGia()
+      try {
+        const napTruoc = tachGiong.nap
+        const b = dung({ kieuTieng, locOn })
+        await b.lt.bat({})
+        expect(g.ws.length).toBe(1); expect(g.blob.length).toBe(1)
+        const ma = await g.blob[0]!.text()
+        expect(ma).toContain('function xuLy(f)'); expect(ma).not.toMatch(/function (docMoHinh|taoTach)\b/)
+        const tin = g.ws[0]!.tin as Record<string, unknown>[]
+        // tin đầu: luồng vào / ra + cấu hình làm rõ tiếng — KHÔNG có khoá nào mới
+        expect(Object.keys(tin[0]!).sort()).toEqual(['c', 'ra', 'vao'])
+        expect(Object.keys(tin[0]!.c as object).sort()).toEqual([...Object.keys(LAM_RO), 'g0'].sort())
+        expect(tin[1]).toEqual({ muc: THAM_LOC_ON[locOn] })
+        // Làm rõ ⇒ gửi chuỗi; Chuẩn trình duyệt ⇒ gửi thẳng mic (như trước)
+        expect(b.lt.trackGui()).toBe(kieuTieng === 'chuan' ? micGoc(b) : b.boGui().track)
+        expect(b.boGui().track!.label).toBe(kieuTieng === 'chuan' ? 'Micro máy tính' : 'khung')
+        expect(b.lt.chanDoan()).toMatchObject({ locOn, chuoi: kieuTieng !== 'chuan' })
+        expect('tg' in b.lt.chanDoan()).toBe(false); expect('tgTin' in b.lt.chanDoan()).toBe(false)
+        // đổi mức / đổi kiểu tiếng ⇒ tin y như cũ, không tin «Chỉ giọng thầy» nào
+        const khac: MucLocOn = locOn === 'manh' ? 'tat' : 'manh'
+        b.lt.datLocOn(khac); expect(tin[tin.length - 1]).toEqual({ muc: THAM_LOC_ON[khac] })
+        const soTin = tin.length
+        b.lt.datKieuTieng(kieuTieng !== 'chuan'); await troi(10)
+        expect(tin.length).toBe(soTin)
+        expect(b.boGui().track!.label).toBe(kieuTieng !== 'chuan' ? 'Micro máy tính' : 'khung')
+        b.lt.datKieuTieng(kieuTieng === 'chuan'); await troi(10)
+        expect(b.boGui().track!.label).toBe(kieuTieng === 'chuan' ? 'Micro máy tính' : 'khung')
+        expect(tin.length).toBe(soTin)
+        expect(tin.some((t) => 'chiThay' in t || 'chiTach' in t || 'tachMa' in t || 'tach' in t)).toBe(false)
+        await vi.dynamicImportSettled()
+        expect(tachGiong.nap).toBe(napTruoc) // lõi tách chưa từng được nạp
+      } finally { g.tra() }
+    })
+  }
+
+  it('chọn «Chỉ giọng thầy» ⇒ MỚI nạp lõi + mô hình; Chuẩn trình duyệt gửi chuỗi chỉ-tách; tự tắt ⇒ gửi lại mic gốc; rời mức ⇒ như cũ', async () => {
+    const g = khungGia()
+    try {
+      const b = dung({ kieuTieng: 'chuan' })
+      await b.lt.bat({})
+      const w = g.ws[0]!, tin = w.tin as Record<string, unknown>[]
+      expect(b.boGui().track).toBe(micGoc(b))
+      b.lt.datLocOn('thay')
+      expect(tin[tin.length - 1]).toEqual({ muc: null, chiThay: true, chiTach: true })
+      await choLoi(tin)
+      expect(tachGiong.nap).toBeGreaterThanOrEqual(1)
+      const gui = tin.find((t) => 'tachMa' in t)!
+      expect(gui.tach).toBeInstanceOf(ArrayBuffer)
+      expect(await g.blob[g.blob.length - 1]!.text()).toMatch(/function docMoHinh\b/) // lõi đi bằng Blob riêng ⇒ importScripts
+      expect(b.boGui().track!.label).toBe('khung') // đang tải: chuỗi chỉ-tách (tiếng đi thẳng qua Worker)
+      w.onmessage!({ data: { tg: 'chay', h: { ban: 'thu', ngay: '2026-11-11' } } })
+      expect(b.lt.chanDoan()).toMatchObject({ locOn: 'thay', locOnChay: 'chay', tg: 'chay', tgTin: { ban: 'thu', ngay: '2026-11-11' } })
+      // đổi kiểu tiếng khi đang chạy ⇒ báo Worker đường mới (đổi ràng buộc mic có thể mở lại mic ⇒ chuỗi MỚI cũng tự bật lại «Chỉ giọng thầy»)
+      b.lt.datKieuTieng(false); expect(tin[tin.length - 1]).toEqual({ chiTach: false })
+      await troi(2000)
+      b.lt.datKieuTieng(true); await troi(2000)
+      const w2 = g.ws[g.ws.length - 1]!, tin2 = w2.tin as Record<string, unknown>[]
+      await choLoi(tin2) // chuỗi mới (nếu mở lại mic) cũng nạp xong lõi + mô hình
+      if (w2 !== w) expect(tin2).toContainEqual({ muc: null, chiThay: true, chiTach: true })
+      else expect(tin2[tin2.length - 1]).toEqual({ chiTach: true })
+      w2.onmessage!({ data: { tg: 'chay', h: { ban: 'thu', ngay: '2026-11-11' } } }); await troi(10)
+      expect(b.boGui().track!.label).toBe('khung')
+      // lưới: mô hình tự tắt ⇒ gửi lại mic gốc + ghi lý do
+      w2.onmessage!({ data: { tg: 'tu-tat', ly: 'cham' } }); await troi(10)
+      expect(b.boGui().track).toBe(micGoc(b))
+      expect(b.lt.chanDoan()).toMatchObject({ tg: 'tu-tat', tgTin: { ly: 'cham' } })
+      expect(b.lt.chanDoan().luoi).toContain('Chỉ giọng thầy tự tắt')
+      // rời mức ⇒ tin rời + mic gốc (Chuẩn trình duyệt)
+      b.lt.datLocOn('vua'); await troi(10)
+      expect(tin2[tin2.length - 1]).toEqual({ muc: THAM_LOC_ON.vua, chiThay: false })
+      expect(b.boGui().track).toBe(micGoc(b))
+      expect('tg' in b.lt.chanDoan()).toBe(false)
+    } finally { g.tra() }
   })
 })

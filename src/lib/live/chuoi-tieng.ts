@@ -9,6 +9,7 @@
 // Số đo trước / sau: docs/do-live-1011.md mục 5.
 
 import URL_RNNOISE from './loc-on/rnnoise.wasm?url'
+// «Chỉ giọng thầy»: tach-giong-thay.ts (lõi + móc Worker + phần máy thầy) KHÔNG nhập tĩnh — nạp bằng import() CHỈ khi thầy chọn mức 'thay' (`dungKhung`).
 
 /** Bộ nén nâng mức của kiểu 'nen' (Web Audio tự bù mức theo đường cong nén). */
 export const NEN_RO = { nguong: -32, goi: 20, tiLe: 3 }
@@ -27,8 +28,12 @@ export type KieuChuoi = 'khung' | 'nhanh' | 'nen'
  *     đóng êm ≈ 100 ms, giữ 120 ms sau tiếng cuối).
  *  CÓ GIỌNG = bộ lọc báo xác suất có giọng > 0,6 VÀ khung đã lọc to hơn −15 dB so với mức giọng gần đây (xôn xao nhỏ không mở được cổng).
  *  Chỉ chạy với khung 480 mẫu 48 kHz; không thì bỏ qua. */
-export type MucLocOn = 'manh' | 'vua' | 'tat'
-export const THAM_LOC_ON: Record<MucLocOn, { noi: number; im: number; cao: number; san: number } | null> = { manh: { noi: 0.25, im: 0.05, cao: 0.9, san: 0.25 }, vua: { noi: 0.5, im: 0.2, cao: 1, san: 0.4 }, tat: null }
+export type MucLocOn = 'manh' | 'vua' | 'tat' | 'thay'
+/** 'thay' = «CHỈ GIỌNG THẦY» (lượt 2, docs/do-live-1011.md mục 11): RNNoise TẮT, mô hình riêng giọng thầy (tach-giong-thay.ts) chạy trong cùng Worker. */
+export const THAM_LOC_ON: Record<MucLocOn, { noi: number; im: number; cao: number; san: number } | null> = { manh: { noi: 0.25, im: 0.05, cao: 0.9, san: 0.25 }, vua: { noi: 0.5, im: 0.2, cao: 1, san: 0.4 }, tat: null, thay: null }
+/** Tình trạng mô hình «Chỉ giọng thầy» trong Worker: tai · chay · tat · loi (nạp / tải hỏng) · tu-tat (lưới tự tắt: câm / chậm / số hỏng). */
+export type TinhChiThay = 'tai' | 'chay' | 'tat' | 'loi' | 'tu-tat'
+export interface TinChiThay { ban: string; ngay: string; buoc?: number; rtf?: number; ly?: string }
 export interface ChuoiTieng {
   /** Track gửi cho lớp (null = không dựng được đầu ra ⇒ gửi thẳng track mic). */
   ra: MediaStreamTrack | null
@@ -42,11 +47,16 @@ export interface ChuoiTieng {
   kieu: KieuChuoi | 'cho'
   /** Đặt mức lọc ồn riêng (chỉ kiểu 'khung' có). Tệp bộ lọc tải lười lần đầu cần tới; tải / chạy lỗi ⇒ chuỗi chạy tiếp không lọc. */
   datLocOn?: (muc: MucLocOn) => void
+  /** «Chỉ giọng thầy» (đã từng bật trên chuỗi này): đổi đường «Chuẩn trình duyệt» (chỉ mô hình) ⇄ «Làm rõ». Chưa bật bao giờ: không làm gì. */
+  datChiTach?: (chiTach: boolean) => void
   /** Bộ lọc ồn riêng: 'chay' = đang lọc · 'tai' = đang tải · 'tat' · 'loi' = tải / chạy lỗi (đang không lọc). */
   locOn?: 'chay' | 'tai' | 'tat' | 'loi'
   /** Kiểu 'khung': mức RMS mic VÀO (trước xử lý) Worker báo mỗi giây + lúc báo (Date.now) — lưới an toàn phía gửi biết mic có tiếng mà không cần AudioContext. */
   vao?: number
   vaoLuc?: number
+  /** «Chỉ giọng thầy»: tình trạng + tin (bản mô hình, ngày luyện, hệ số thời gian thực đo NGAY trên máy này, lý do tự tắt). */
+  tg?: TinhChiThay
+  tgTin?: TinChiThay | null
 }
 
 /** Mã của bộ xử lý (chạy trong luồng âm thanh; viết ES5 + lớp, không phụ thuộc gì). Mỗi khối 128 mẫu:
@@ -92,6 +102,10 @@ class LamRoTieng extends AudioWorkletProcessor {
 }
 registerProcessor('lam-ro-tieng', LamRoTieng);
 `
+// «CHỈ GIỌNG THẦY» trong MA_KHUNG (chú thích để NGOÀI chuỗi mã — chuỗi gửi nguyên văn xuống máy, kể cả máy em qua mảnh live): chỉ ba móc, mặc định đứng yên.
+//  · tgMoc = hàm chạy mô hình của lõi nạp lười (tach-giong-thay.ts: MA_TACH + MA_MOC_TACH, gửi bằng { tachMa } ⇒ importScripts) — null tới khi thầy chọn mức 'thay'.
+//  · tgChi = đường «Chuẩn trình duyệt» khi chạy «Chỉ giọng thầy»: không lọc 80 Hz, không nâng mức — chỉ mô hình (tắt / tự tắt ⇒ tiếng đi thẳng). Chỉ lớp gọi đã
+//    từng bật «Chỉ giọng thầy» mới gửi { chiTach } ⇒ chưa bật bao giờ thì luôn false: đường xử lý GIỐNG TỪNG BIT bản trước (tests/live-chi-thay-mac-dinh-1211.test.ts).
 /** Mã Worker của kiểu 'khung': đọc từng khung tiếng (AudioData) của track mic, cộng các kênh về mono, lọc thông cao 80 Hz, nâng mức + chặn đỉnh (đúng thuật
  *  toán của LamRoTieng ở trên), ghi khung mới cùng mốc giờ. Một khung vào ⇒ một khung ra, không đệm. */
 const MA_KHUNG = `
@@ -133,6 +147,7 @@ function locOn(x) {
   }
   lk = k1; lc = c1;
 }
+var tgChi = false, tgMoc = null; /* «Chỉ giọng thầy»: chú thích ở trên MA_KHUNG */
 function xuLy(f) {
   var n = f.numberOfFrames, kenh = f.numberOfChannels, s = f.sampleRate, moc = f.timestamp, x = new Float32Array(n), i, k, e = 0, r, g0 = g, can, buoc, v, a, w, al, nha;
   if (!tam || tam.length !== n) tam = new Float32Array(n);
@@ -140,9 +155,15 @@ function xuLy(f) {
   f.close();
   for (i = 0, e = 0; i < n; i++) e += x[i] * x[i];
   vt += e / n; e = 0;
+  if (tgChi) {
+    if (tgMoc) tgMoc(x, n, s);
+    if (++bao >= 100) { postMessage({ v: Math.sqrt(vt / bao) }); bao = 0; vt = 0; }
+    return new AudioData({ format: 'f32-planar', sampleRate: s, numberOfFrames: n, numberOfChannels: 1, timestamp: moc, data: x });
+  }
   if (s !== hz) { hz = s; w = 2 * Math.PI * 80 / s; al = Math.sin(w) / (2 * 0.707); a = 1 + al; b0 = (1 + Math.cos(w)) / 2 / a; b1 = -(1 + Math.cos(w)) / a; b2 = b0; a1 = -2 * Math.cos(w) / a; a2 = (1 - al) / a; }
   for (i = 0; i < n; i++) { v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = v; x[i] = v; }
   if (n === 480 && s === 48000) { try { locOn(x); } catch (err) { rn = null; tre = 0; lk = 1; lc = 1; postMessage({ loc: 'loi' }); } } else if (!tre) cu.fill(0);
+  if (tgMoc) tgMoc(x, n, s);
   for (i = 0; i < n; i++) e += x[i] * x[i];
   r = Math.sqrt(e / n);
   nen = r < nen ? nen * 0.9 + r * 0.1 : Math.min(0.05, nen * Math.pow(1.0003, n / 128));
@@ -167,6 +188,9 @@ onmessage = function (ev) {
   var d = ev.data, doc, ghi;
   if (d && d.loc) napLoc(d.loc);
   if (d && 'muc' in d) thDich = d.muc || null;
+  if (d && d.tachMa) { try { importScripts(d.tachMa); tgMoc = tgKhung; } catch (e) { postMessage({ tg: 'loi', ly: 'nạp lõi: ' + (e && e.message || e) }); return; } }
+  if (tgMoc) tgTin(d);
+  if (d && 'chiTach' in d) tgChi = !!d.chiTach;
   if (!d || !d.vao) return;
   c = d.c; if (c.g0 > 0) g = c.g0;
   doc = d.vao.getReader(); ghi = d.ra.getWriter();
@@ -208,8 +232,14 @@ function taiLoc(): Promise<ArrayBuffer | null> {
   return tepLoc
 }
 
-/** Kiểu 'khung': trả track đã xử lý + hàm dọn; không dựng được ⇒ null. `khiHong` = Worker báo lỗi giữa chừng (lớp gọi bỏ chuỗi, gửi thẳng track mic). */
-function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void): { ra: MediaStreamTrack; don: () => void } | null {
+/** Công tắc lùi khẩn «Chỉ giọng thầy» (bản đọc nhỏ của `chiThayTatKhan` — chi-thay.ts — để mảnh live dùng chung với máy em không phải kéo theo chi-thay). */
+const tatKhanChiThay = (): boolean => { try { return localStorage.getItem('ddh.live.chi-thay') === 'tat' } catch { return false } }
+/** Kiểu 'khung': trả track đã xử lý + hàm dọn; không dựng được ⇒ null. `khiHong` = Worker báo lỗi giữa chừng (lớp gọi bỏ chuỗi, gửi thẳng track mic).
+ *  «CHỈ GIỌNG THẦY» chỉ chạy khi thầy chọn mức 'thay': lúc ấy mới nạp lười `tach-giong-thay.ts` (lõi + móc Worker + phần máy thầy) rồi tải mô hình.
+ *  `chiTach()` = đang ở «Chuẩn trình duyệt» ⇒ Worker chỉ chạy mô hình (không lọc 80 Hz, không nâng mức); `khiTuTat` = mô hình tự tắt / hỏng.
+ *  Mức KHÁC 'thay' (mặc định): mã Worker chạy y như trước, tin gửi Worker và tình trạng `locOn` y như trước khi có mức này
+ *  (tests/live-chi-thay-mac-dinh-1211.test.ts, tests/live-mic-thay-1111.test.ts mục «Chỉ giọng thầy — mặc định không đổi»). */
+function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void, chiTach?: () => boolean, khiTuTat?: (ly: string) => void): { ra: MediaStreamTrack; don: () => void } | null {
   if (!coKhung()) return null
   let w: Worker | null = null, u = ''
   try {
@@ -219,23 +249,50 @@ function dungKhung(t: MediaStreamTrack, k: ChuoiTieng, khiHong?: () => void): { 
     w = new Worker(u)
     const wk = w
     let muc: MucLocOn = 'tat', daGui = false
-    wk.onmessage = (e: MessageEvent) => { const d = e.data as { g?: number; v?: number; loi?: string; loc?: 'chay' | 'loi' }; if (typeof d?.g === 'number' && d.g > 0) gNho = d.g; if (typeof d?.v === 'number') { k.vao = d.v; k.vaoLuc = Date.now() } if (d?.loc) k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc; if (d?.loi) khiHong?.() }
+    // «Chỉ giọng thầy»: `rn` = tình trạng THẬT của bộ lọc ồn RNNoise (trả lại đúng khi rời mức 'thay'); `tach` = phần máy thầy (mảnh nạp lười)
+    let rn: NonNullable<ChuoiTieng['locOn']> = 'tat', daTungThay = false, tach: { bat(): void; tin(d: object): void; roi(): void; don(): void } | null = null, napTach: Promise<void> | null = null
+    wk.onmessage = (e: MessageEvent) => {
+      const d = e.data as { g?: number; v?: number; loi?: string; loc?: 'chay' | 'loi'; tg?: string; tgRtf?: number }
+      if (typeof d?.g === 'number' && d.g > 0) gNho = d.g
+      if (typeof d?.v === 'number') { k.vao = d.v; k.vaoLuc = Date.now() }
+      if (d?.loc) { rn = d.loc; if (muc !== 'thay') k.locOn = d.loc === 'chay' && muc === 'tat' ? 'tat' : d.loc }
+      if (tach && d && (d.tg || typeof d.tgRtf === 'number' || muc === 'thay')) tach.tin(d)
+      if (d?.loi) khiHong?.()
+    }
+    /** Bật «Chỉ giọng thầy»: Worker thôi lọc RNNoise + (Chuẩn trình duyệt) đi thẳng NGAY; lần đầu nạp lười phần còn lại rồi tải mô hình. */
+    const batThay = (): void => {
+      muc = 'thay'; daTungThay = true
+      try { wk.postMessage({ muc: null, chiThay: true, chiTach: !!chiTach?.() }) } catch { /* Worker đã dừng */ }
+      if (tach) { tach.bat(); return }
+      k.tg = 'tai'; k.locOn = 'tai'
+      if (!napTach) {
+        napTach = import('./tach-giong-thay').then((m) => { tach = m.ganTachGiong({ wk, k, muc: () => muc, khiTuTat }); if (muc === 'thay') tach.bat() }, () => {
+          napTach = null; k.tg = 'loi'; k.tgTin = { ban: '', ngay: '', ly: 'nạp lõi' }; if (muc === 'thay') { k.locOn = 'loi'; khiTuTat?.('nạp lõi') }
+        })
+      }
+    }
     k.locOn = 'tat'
     k.datLocOn = (m) => {
+      if (m === 'thay' && tatKhanChiThay()) m = 'tat' // công tắc lùi khẩn: localStorage ddh.live.chi-thay = 'tat' (src/lib/live/chi-thay.ts)
+      if (m === 'thay') { batThay(); return }
+      const roi = muc === 'thay'
       muc = m
-      try { wk.postMessage({ muc: THAM_LOC_ON[m] }) } catch { /* Worker đã dừng */ }
+      try { wk.postMessage(roi ? { muc: THAM_LOC_ON[m], chiThay: false } : { muc: THAM_LOC_ON[m] }) } catch { /* Worker đã dừng */ }
+      if (roi) { tach?.roi(); if (k.tg === 'tai') k.tg = 'tat'; k.locOn = rn }
       if (m === 'tat') { if (k.locOn !== 'loi') k.locOn = 'tat'; return }
       if (daGui) { if (k.locOn === 'tat') k.locOn = 'chay'; return }
-      daGui = true; k.locOn = 'tai'
-      void taiLoc().then((b) => { if (!b) { k.locOn = 'loi'; daGui = false; return } try { const ban = b.slice(0); wk.postMessage({ loc: ban, muc: THAM_LOC_ON[muc] }, [ban]) } catch { k.locOn = 'loi' } })
+      daGui = true; k.locOn = 'tai'; rn = 'tai'
+      void taiLoc().then((b) => { if (!b) { rn = 'loi'; if (muc !== 'thay') k.locOn = 'loi'; daGui = false; return } try { const ban = b.slice(0); wk.postMessage({ loc: ban, muc: THAM_LOC_ON[muc] }, [ban]) } catch { rn = 'loi'; if (muc !== 'thay') k.locOn = 'loi' } })
     }
+    /** «Chuẩn trình duyệt» ⇄ «Làm rõ» sau khi đã từng bật «Chỉ giọng thầy» trên chuỗi này (chưa bật bao giờ: không gửi gì — Worker y như trước). */
+    k.datChiTach = (b) => { if (daTungThay) { try { wk.postMessage({ chiTach: b }) } catch { /* Worker đã dừng */ } } }
     wk.onerror = () => khiHong?.()
     wk.postMessage({ c: { ...LAM_RO, g0: gNho }, vao: xl.readable, ra: sinh.writable }, [xl.readable as unknown as Transferable, sinh.writable as unknown as Transferable])
-    return { ra: sinh, don: () => { try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
+    return { ra: sinh, don: () => { tach?.don(); try { wk.terminate() } catch { /* đã dừng */ } try { URL.revokeObjectURL(u) } catch { /* đã thu */ } } }
   } catch { try { w?.terminate() } catch { /* chưa chạy */ } return null }
 }
 
-export function dungChuoiTieng(c: AudioContext, l: MediaStream, o: { kieu: KieuChuoi; khiLui?: () => void; khiHong?: () => void }): ChuoiTieng {
+export function dungChuoiTieng(c: AudioContext, l: MediaStream, o: { kieu: KieuChuoi; khiLui?: () => void; khiHong?: () => void; chiTach?: () => boolean; khiTuTat?: (ly: string) => void }): ChuoiTieng {
   const vao = c.createMediaStreamSource(l)
   // Cộng hai kênh về mono (bộ thu hai kênh chỉ có tiếng ở MỘT kênh không bị mất, không bị chia đôi).
   const tron = c.createGain(); tron.channelCount = 1; tron.channelCountMode = 'explicit'; tron.channelInterpretation = 'discrete'
@@ -246,7 +303,7 @@ export function dungChuoiTieng(c: AudioContext, l: MediaStream, o: { kieu: KieuC
   tron.connect(doAm); tron.connect(doDinh)
   const k: ChuoiTieng = { ra: null, doAm, doDinh, doRa: null, nut, kieu: 'cho' }
   const micT = l.getAudioTracks()[0]
-  const kh = o.kieu === 'khung' && micT ? dungKhung(micT, k, o.khiHong) : null
+  const kh = o.kieu === 'khung' && micT ? dungKhung(micT, k, o.khiHong, o.chiTach, o.khiTuTat) : null
   if (kh) {
     // Web Audio chỉ còn ĐO đầu ra (vạch mic), không nằm trên đường tiếng
     const doRa = c.createAnalyser(); doRa.fftSize = 1024

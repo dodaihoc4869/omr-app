@@ -1,0 +1,43 @@
+# SOI LIVE THEO KHỐI (CHỈ ĐỌC, 12/11) — thầy báo «số báo danh … nút live không sáng tham gia». Số báo danh nhập tay lúc chạy, CHE trong nhật ký.
+# Chỉ SELECT: lớp / khối của em ở hồ sơ + danh sách cổng, lịch live theo khối đang lưu, buổi học đang mở.
+name: Soi Live theo khối (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      sbd:
+        description: 'Số báo danh (che trong nhật ký)'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  soi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Che số báo danh
+        run: |
+          S=$(jq -r '.inputs.sbd' "$GITHUB_EVENT_PATH" | tr -cd '0-9A-Za-z')
+          echo "::add-mask::$S"
+          echo "SBD_EM=$S" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Soi (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          S="'${SBD_EM}'"
+          q() { echo "== $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" | jq -c ".[0].results" || echo "(lỗi)"; }
+          echo "Giờ VN: $(TZ=Asia/Ho_Chi_Minh date '+%d/%m %H:%M')"
+          q "hồ sơ em: lớp (khối) · tên lớp · trạng thái" "SELECT lop, ten_lop, COALESCE(trang_thai,'') trang_thai FROM hoc_sinh WHERE sbd=$S"
+          q "danh sách cổng: lớp" "SELECT lop FROM danh_sach WHERE sbd=$S"
+          q "lịch live theo khối đang lưu" "SELECT gia_tri, cap_nhat_luc FROM cau_hinh WHERE khoa='live_khoi'"
+          q "các giá trị lớp trong hồ sơ (đếm)" "SELECT COALESCE(lop,'') lop, COUNT(*) n FROM hoc_sinh WHERE COALESCE(trang_thai,'')<>'khoa' GROUP BY 1 ORDER BY n DESC LIMIT 12"
+          q "buổi học đang mở" "SELECT id, substr(ten,1,40) ten, lop, mo_luc FROM buoi_hoc WHERE dong_luc IS NULL ORDER BY mo_luc DESC LIMIT 5"
+          q "em đã điểm danh buổi nào hôm nay" "SELECT buoi_id, cach, trang_thai, luc FROM buoi_hoc_diem_danh WHERE sbd=$S ORDER BY luc DESC LIMIT 3"
