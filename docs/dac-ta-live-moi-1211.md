@@ -100,4 +100,8 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 9. **«Học» khi chưa có bài:** mở bảng chọn; chọn hoạt động (đầu giờ / chữa câu / ôn tập) ⇒ tấm hoạt động nổi TRÊN tờ; Esc đóng tấm ⇒ về bảng chọn.
 10. **Mic của em (bản vẽ 05 + 12):** khay thanh vàng máy em có «Giơ tay» và «Mic của em» (tắt sẵn); ở bảng danh sách có nút giơ tay + tấm «Thầy mời em nói». Máy thầy: thẻ góc dưới-trái «N em giơ tay · Mời nói · Hạ hết tay», em đang nói có «Tắt mic em». Dùng nguyên luật đàm thoại đợt 2 của phòng (mỗi lúc một em nói, cả lớp nghe); cờ `GIAO_DIEN_DOT_2` của buổi trên lớp vẫn tắt.
 11. **Bong bóng tin mới máy em:** gọn ở góc trên-phải (trong phần bảng), tối đa 30% bề ngang.
+12. **Máy em chỉ vào «Học» khi có câu được CHIẾU (thầy 12/11):** thầy bấm «Học», mở bảng chọn, mở hoạt động — phòng chưa đổi chế độ, máy em ở nguyên màn đang xem. Phòng mở lượt mới (bất kể chiếu bằng đường nào) ⇒ app thầy mới báo «hoc». Phòng báo «hoc» mà chưa có lượt ⇒ máy em ở bảng danh sách. Em gửi xong / thầy gọi lên bảng ⇒ ép vào màn chiếu (luật sẵn có `cheLiveCua`).
+13. **Cụm Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm trong khay nút bốn ô của tờ** (nhóm «Buổi live», `lvLk` ở `src/lib/live-to-chieu.ts`; tờ báo bấm bằng việc `lk` → sự kiện `ddh-lkt`; số tin mới đi ngược bằng `ddh-lkt-moi` → lệnh `live-lk`). Cụm nổi của app chỉ còn lúc bảng đua đang hiện. Mở khay ⇒ cột tin nhắn tự thu.
+14. **Chế độ Bảng ẩn thẻ tên** (thẻ em trên tờ, dải thẻ tên máy em) và ẩn các nhóm nút của câu trong khay.
+15. **Màn câu hỏi khổ ngang giống chặng (áp cho cả buổi trên lớp):** kiểu phiếu rút gọn TẮT (`KIEU_PHIEU` ở `src/components/bpu/bo-cuc-ngang-do.ts`); cột trả lời hiện đủ chữ, Đúng–sai có nút Đúng | Sai đứng cạnh ý, cột tự cuộn.
 
