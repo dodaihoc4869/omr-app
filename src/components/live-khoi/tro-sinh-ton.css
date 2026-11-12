@@ -3,6 +3,13 @@
    Thầy 12/11: «những hướng dẫn cho chữ nhỏ thôi nét thanh cho đỡ chiếm màn hình» ⇒ mọi dòng hướng dẫn 12 px, nét thanh, một dòng.
    Màu: chỉ biến có sẵn (--tr-*, --p-*, --doi), pha bằng color-mix. */
 .st { --st-kinh: color-mix(in srgb, var(--tr-nen) 86%, transparent); }
+/* «2D có chiều sâu» (thầy chốt 12/11 tối): nắng chéo từ trên-trái + viền tối quanh màn là MỘT lớp CSS tĩnh nằm trên canvas, dưới các lớp chữ ⇒ không tốn
+   lượt vẽ nào của canvas. Kiểu phẳng (máy yếu, giảm chuyển động, máy tự hạ vì vẽ không kịp) thì ẩn. */
+.st-phu { position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(ellipse 78% 78% at 50% 50%, transparent 58%, color-mix(in srgb, var(--tr-nen) 62%, transparent) 100%),
+    linear-gradient(135deg, color-mix(in srgb, var(--tr-tin) 9%, transparent) 0%, transparent 42%, color-mix(in srgb, var(--tr-nen) 46%, transparent) 100%); }
+.st[data-phang] .st-phu { display: none; }
+@media (prefers-reduced-motion: reduce) { .st-phu { display: none; } }
 /* Cả màn là vùng cử chỉ: vuốt để chạy, chạm để tới. */
 .st-vung { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
 .st .st-bang { font-size: 13px; padding: 5px 12px; }

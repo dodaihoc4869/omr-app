@@ -1,7 +1,7 @@
 // TRÒ «SINH TỒN» phòng chờ Live theo khối (thầy chốt 12/11, đặc tả docs/dac-ta-sinh-ton-1211.md mục 4, 7) — lõi thuần src/lib/live-khoi/sinh-ton-loi.ts.
 import { describe, expect, it } from 'vitest'
 import {
-  AN_YEN_MS, BAT_TU_MS, BK_NV, HOI_CHO_MS, HOI_SINH_MS, LO_GAN, MAU_DAY, TAM_NHIN_X, TAM_NHIN_Y, TAM_XA, TOC_DO, VAN_CHOI_MS, VAN_MS, anVoi, buocToi, capBanDo, chanDuong, chonMucTieu, conLai, dangAn, dangChet,
+  AN_YEN_MS, BAT_TU_MS, BK_NV, DAN_BAY_MS, HOI_CHO_MS, HOI_SINH_MS, LO_GAN, MAU_DAY, NHIP_BAN_MS, TAM_NHIN_X, TAM_NHIN_Y, TAM_XA, TOC_DO, VAN_CHOI_MS, VAN_MS, anVoi, buocToi, capBanDo, chanDuong, chonMucTieu, conLai, dangAn, dangChet,
   dangNghi, diChuyen, docDong, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type NhanVat,
 } from '../src/lib/live-khoi/sinh-ton-loi'
 
@@ -89,8 +89,11 @@ describe('sát thương (bên bị bắn tự tính từ ảnh chụp)', () => {
   const toi = { id: 'T', x: 800, y: 700, doi: 0 }
   it('cấp súng càng cao càng mất nhiều máu; máy bắn yếu hơn người; đồng đội và kẻ đã bị hạ không gây sát thương', () => {
     const mat = (o: Partial<NhanVat> & { id: string }) => satThuong(toi, [nv({ x: 900, y: 700, t: 'T', ...o })], 1).tong
-    expect([mat({ id: 'A', cap: 1 }), mat({ id: 'A', cap: 2 }), mat({ id: 'A', cap: 3 }), mat({ id: 'A', cap: 4 })]).toEqual([30, 40, 50, 60])
-    expect(mat({ id: '~3', cap: 1 })).toBeCloseTo(20.1, 1)
+    expect([mat({ id: 'A', cap: 1 }), mat({ id: 'A', cap: 2 }), mat({ id: 'A', cap: 3 }), mat({ id: 'A', cap: 4 })]).toEqual([36, 48, 60, 72])
+    expect(mat({ id: '~3', cap: 1 })).toBeCloseTo(24.12, 1)
+    // Nhịp bắn nhanh (thầy 13/11): ba cấp đầu 4 phát / giây, Pháo Sao 0,7 giây một phát; đạn tới đích trước phát kế.
+    expect([...NHIP_BAN_MS]).toEqual([250, 250, 250, 700])
+    for (let i = 0; i < 4; i++) expect(DAN_BAY_MS[i]).toBeLessThan(NHIP_BAN_MS[i])
     expect(laMay('~3')).toBe(true); expect(laMay('S3')).toBe(false)
     expect(mat({ id: 'A', doi: 0 })).toBe(0); expect(mat({ id: 'A', mau: 0 })).toBe(0); expect(mat({ id: 'A', t: 'nguoi-khac' })).toBe(0)
   })
@@ -107,15 +110,15 @@ describe('sát thương (bên bị bắn tự tính từ ảnh chụp)', () => {
   })
   it('nhiều kẻ cùng bắn ⇒ cộng dồn; `ai` = kẻ gây nhiều nhất', () => {
     const kq = satThuong(toi, [nv({ id: 'A', x: 900, y: 700, t: 'T', cap: 1 }), nv({ id: 'B', x: 700, y: 700, t: 'T', cap: 3, doi: 2 })], 0.25)
-    expect(kq.tong).toBeCloseTo((30 + 50) * 0.25); expect(kq.ai).toBe('B')
+    expect(kq.tong).toBeCloseTo((36 + 60) * 0.25); expect(kq.ai).toBe('B')
   })
   it('Súng Sấm nảy sang MỘT đối thủ gần mục tiêu nhất; Pháo Sao nổ lan quanh mục tiêu — đều nửa sát thương', () => {
     const mt = nv({ id: 'M', x: 865, y: 700, doi: 0 }) // đồng đội của T đang bị bắn, cách T 65
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 3 }), mt], 1).tong).toBe(25)
+    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 3 }), mt], 1).tong).toBe(30)
     // Có đồng đội khác đứng gần mục tiêu hơn ⇒ tia nảy sang bạn ấy, không sang T.
     expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 3 }), mt, nv({ id: 'N', x: 885, y: 700, doi: 0 })], 1).tong).toBe(0)
     expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), mt], 1).tong).toBe(0) // phải trong 60 mới dính nổ lan
-    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), { ...mt, x: 850 }], 1).tong).toBe(30)
+    expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 4 }), { ...mt, x: 850 }], 1).tong).toBe(36)
     expect(satThuong(toi, [nv({ id: 'A', x: 1000, y: 700, t: 'M', cap: 2 }), mt], 1).tong).toBe(0)
   })
 })

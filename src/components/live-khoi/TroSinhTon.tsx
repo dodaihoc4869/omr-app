@@ -7,11 +7,12 @@ import { DOI_BPU } from '../../lib/bpu/phong'
 import { toaDoXoay } from '../live/chieu-xoay'
 import type { KenhLop, NguoiLop, SinhTonAnh, SinhTonGui, TinLop } from '../../lib/live-khoi/kieu'
 import {
-  ANH_MS, CAP_TOI_DA, HOP_BK, MAU_DAY, NHIP_GUI_MS, NHIP_NHAC_MS, SUNG_TEN, buocToi, chonMucTieu, anVoi, conLai, dangAn, dangChet, dangNghi, docDong, hopSo, laMay, ngoaiVong,
+  ANH_MS, CAP_TOI_DA, HOP_BK, MAU_DAY, NHIP_BAN_MS, NHIP_GUI_MS, NHIP_NHAC_MS, SUNG_TEN, buocToi, chonMucTieu, anVoi, conLai, dangAn, dangChet, dangNghi, docDong, hopSo, laMay, ngoaiVong,
   nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type BanDo, type Diem, type NhanVat, type Toi,
 } from '../../lib/live-khoi/sinh-ton-loi'
 import { datTat, docTat, moAm, tieng, tiengBan } from './sinh-ton-am'
 import { pha, taoBoHinh, type BangMau, type BoHinh, type Rgb } from './sinh-ton-hinh'
+import { taoBoSan, type BoSan } from './sinh-ton-san'
 import { K_NV, veBanDoNho, veKhung, type NvVe, type SoBay } from './sinh-ton-ve'
 import './tro-giu-lua.css'
 import './tro-sinh-ton.css'
@@ -161,7 +162,12 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     // ── Khung vẽ ──
     let W = 0, H = 0, ti = 1, dpr = 1
     let bm = docBangMau(goc)
-    let hinh: BoHinh = taoBoHinh(bm, 1)
+    let hinh: BoHinh = taoBoHinh(bm, 1, nhe)
+    let san: BoSan = taoBoSan(bm, 1)
+    /** KIỂU PHẲNG: máy yếu ngay từ đầu, hoặc TỰ HẠ khi máy vẽ không kịp (xem `doNhip`) ⇒ bỏ bóng đổ + ánh sáng, về đúng mức vẽ của bản trước. */
+    let phang = nhe
+    /** Đếm khung chậm trong cửa sổ 120 khung (bỏ 60 khung đầu lúc còn nướng ảnh). */
+    let soKhung = 0, soCham = 0
     setBang(bm)
     const doKhung = () => {
       W = goc.clientWidth; H = goc.clientHeight
@@ -170,7 +176,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       vai.width = Math.round(W * dpr); vai.height = Math.round(H * dpr)
       // Mọi máy thấy CÙNG diện tích sân (máy to không nhìn xa hơn máy nhỏ); máy thầy thấy cả sân.
       ti = xem ? Math.min(W / (bd.rong + 40), H / (bd.cao + 40)) : Math.max(0.5, Math.min(1.7, Math.sqrt((W * H) / (1000 * 520))))
-      hinh = taoBoHinh(bm, K_NV * ti * dpr)
+      hinh = taoBoHinh(bm, K_NV * ti * dpr, phang)
+      // Ảnh vật trên sân nướng ở đúng độ nét màn (máy thầy xem cả sân ⇒ tỉ lệ nhỏ, ảnh nhỏ theo).
+      san = taoBoSan(bm, ti * dpr)
     }
     const doiMau = () => { bm = docBangMau(goc); setBang(bm); doKhung() }
 
@@ -271,6 +279,14 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       const dt = luc - lucTruoc
       if (nhipKhung && dt < nhipKhung - 3) return
       lucTruoc = luc
+      // TỰ HẠ: hơn 1/4 số khung trong cửa sổ 120 khung chậm hơn 19 ms (dưới ~48 khung / giây) ⇒ chuyển hẳn sang kiểu phẳng cho tới khi rời phòng chờ.
+      if (!phang && dt < 250 && ++soKhung > 60) {
+        if (dt > 19) soCham++
+        if (soKhung >= 180) {
+          if (soCham > 30) { phang = true; goc.setAttribute('data-phang', '1'); doKhung() }
+          soKhung = 60; soCham = 0
+        }
+      }
       const nay = Date.now() + lech
       const nghi = dangNghi(nay), van = vanSo(nay), v = vong(bd, nay)
       const matMang = soAnh > 0 && luc - lucAnh > 2500
@@ -402,13 +418,13 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       // Tiếng súng đi cùng nhịp đạn trên màn (cùng công thức nhịp với sinh-ton-ve.ts); chỉ máy em đang chơi mới kêu.
       if (!xem) for (const e of nvVe) {
         if (!e.ban) continue
-        const nhip = Math.floor((luc + bamSo(e.id) * 37) / (e.cap === 4 ? 1000 : 333))
+        const nhip = Math.floor((luc + bamSo(e.id) * 37) / NHIP_BAN_MS[e.cap - 1])
         if (nhipBan.get(e.id) === nhip) continue
         nhipBan.set(e.id, nhip)
         tiengBan(e.cap, e.toi, e.toi ? 1 : Math.max(0, 1 - Math.hypot(e.x - tt.x, e.y - tt.y) / 620))
       }
       if (nhipBan.size > 160) nhipBan.clear()
-      veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, nhe, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, so })
+      veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, san, nhe: phang, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, so })
       const nho = nhoRef.current, gn = nho?.getContext('2d')
       if (nho && gn && luc - lucNho >= 500) {
         lucNho = luc
@@ -493,8 +509,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
 
   const tenToi = toi ? DOI_BPU[doiToi].ten : ''
   return (
-    <div className="gl st" ref={gocRef} style={bienDoi(doiToi)} data-xem={xem ? '1' : undefined}>
+    <div className="gl st" ref={gocRef} style={bienDoi(doiToi)} data-xem={xem ? '1' : undefined} data-phang={mayYeu ? '1' : undefined}>
       <canvas className="gl-san" ref={vaiRef} aria-hidden="true" />
+      <div className="st-phu" aria-hidden="true" />
       {xem ? null : <div className="st-vung" onPointerDown={xuong} onPointerMove={di} onPointerUp={buong} onPointerCancel={buong} onLostPointerCapture={buong} />}
       <div className="gl-bang st-bang" role="group" aria-label={`Lượt hạ ván ${gio.van}: ${DOI_BPU.map((d, i) => `${d.ten} ${diem[i]}`).join(', ')}. Còn ${gio.con}`}>
         {DOI_BPU.map((d, i) => (

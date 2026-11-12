@@ -6,7 +6,7 @@ let ctx: AudioContext | null = null
 let tong: GainNode | null = null
 let on: AudioBuffer | null = null
 let tat = false
-/** Mốc giờ (giây của AudioContext) các tiếng súng gần đây — để giữ trần 7 tiếng / 0,25 giây. */
+/** Mốc giờ (giây của AudioContext) các tiếng súng gần đây — để giữ trần 7 tiếng / 0,25 giây (nhịp bắn 4 phát / giây ⇒ mỗi súng tối đa 1 tiếng trong cửa sổ này). */
 const ganDay: number[] = []
 const KHOA_TAT = 'ddh.sinhton.am'
 
