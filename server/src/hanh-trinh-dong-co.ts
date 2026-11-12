@@ -23,6 +23,7 @@ import { chonBandit, type BangBandit, type CachCuu } from './bandit'
 import type { QCau, SuKienOmni, XacNhanThay } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { bam } from './srs2-loi'
+import { docCanhLopMotLuot } from './hanh-trinh-canh-lop'
 
 type Row=Record<string,unknown>
 export { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
@@ -50,7 +51,6 @@ export function phanBoCanThiep(rs:readonly Row[],qs:readonly QuanSatHanhTrinh[],
   }).filter(x=>x.d.dungLuc!==null)
 }
 
-const SQL_CANH_LOP=`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) nChua,SUM(dung_chua) dungChua,COUNT(DISTINCT sbd) soEm FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each(?)) AND cap_nhat_luc>=? AND n_co+n_chua>0 GROUP BY tu,den`
 /**
  * CẠNH TIÊN QUYẾT CẢ LỚP. Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 23h — số đo D1 thật: câu tổng hợp này ~9.700 lần/ngày × 26 ms, ~9.400 dòng/lần): số
  * liệu cả lớp đổi chậm ⇒ nhớ 10 phút theo isolate (khoá D1 gốc), THEO TỪNG kỹ năng đích `den` — GROUP BY (tu, den) nên dòng của mỗi `den` độc lập; em sau
@@ -68,8 +68,11 @@ async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<
   if(!d||now-d.luc>=han||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
   const dem=d,ds=[...new Set(targets)],thieu=ds.filter(t=>!dem.theoDen.has(t)),moi=new Map<string,CanhHoc[]>(thieu.map(t=>[t,[]]))
   if(thieu.length){
-    for(const x of (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(thieu),dem.moc).all<CanhHoc>()).results??[])moi.get(String(x.den))?.push(x)
-    for(const [t,a] of moi)dem.theoDen.set(t,a)
+    // 12/11 (G1 giảm chi phí D1, hanh-trinh-canh-lop.ts): cùng MỘT lượt đọc — bảng cộng sẵn do cron dựng (đã dựng ⇒ không nhớ đệm isolate để lệch không
+    // chồng thêm); chưa dựng / quá hạn ⇒ câu cũ y nguyên và nhớ đệm như trước.
+    const r=await docCanhLopMotLuot(env,thieu,now,dem.moc)
+    for(const x of r.ds)moi.get(String(x.den))?.push(x)
+    if(!r.tong)for(const [t,a] of moi)dem.theoDen.set(t,a)
   }
   const so=(a:string,b:string)=>a<b?-1:a>b?1:0
   return ds.flatMap(t=>moi.get(t)??dem.theoDen.get(t)??[]).sort((a,b)=>so(String(a.tu),String(b.tu))||so(String(a.den),String(b.den)))

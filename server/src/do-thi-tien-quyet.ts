@@ -51,6 +51,10 @@ function wilson(n:number,y:number):[number,number] {
   const z=1.96,p=y/n,d=1+z*z/n,a=(p+z*z/(2*n))/d,b=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n))/d
   return [a-b,a+b]
 }
+/** Ngưỡng tối thiểu của một cạnh học — DÙNG CHUNG với bảng cạnh cả lớp cộng sẵn (hanh-trinh-canh-lop.ts lọc HAVING đúng ba ngưỡng này: cạnh dưới ngưỡng
+ *  không bao giờ qua `canhDangHoc` nên bỏ trước không đổi kết quả). */
+export const CANH_HOC_TOI_THIEU={soEm:20,nCo:30,nChua:30} as const
 export function canhDangHoc(ds:readonly CanhHoc[]):CanhHoc[] {
-  return ds.filter(c=>c.tu.startsWith('nen:') && !c.den.startsWith('nen:') && (c.soEm??1)>=20 && c.nCo>=30 && c.nChua>=30 && wilson(c.nCo,c.dungCo)[0]>wilson(c.nChua,c.dungChua)[1])
+  const m=CANH_HOC_TOI_THIEU
+  return ds.filter(c=>c.tu.startsWith('nen:') && !c.den.startsWith('nen:') && (c.soEm??1)>=m.soEm && c.nCo>=m.nCo && c.nChua>=m.nChua && wilson(c.nCo,c.dungCo)[0]>wilson(c.nChua,c.dungChua)[1])
 }
