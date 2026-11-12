@@ -28,6 +28,8 @@
 .xp-bang { position: absolute; border-radius: 28px; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px var(--tr-chieu-mat-3); }
 /* ── HAI KHUNG ĐỘC LẬP (11/11 chiều, components/live/KhungDocLap.tsx): vị trí / khổ đặt bằng `style`; ở đây màu + dáng của vạch chia, mũi tên trên giấy, nút về chỗ thầy ── */
 .xp .xp-giay, .xp .xp-bang { border-radius: 12px; }
+/* Chế độ Bảng: vạch mờ chia bảng 2/3 trái · 1/3 phải, đúng chỗ vạch trên bảng của thầy lúc live (thầy 13/11: xem lại «bị mất dòng kẻ chia 2/3 bảng»). */
+.xp-bang .xp-ke { position: absolute; top: 0; width: 2px; background: color-mix(in srgb, var(--tr-chieu-giay) 14%, transparent); pointer-events: none; }
 /* giấy đề kiểu tờ chiếu trong trình phát (components/live/GiayDung.tsx): phương án / ý là chữ đề, thân đề không khung thẻ */
 .xp .lv-gd { display: flex; flex-direction: column; gap: 12px; text-align: left; }
 .xp .lv-gd-dau { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13.5px; line-height: 1.2; }

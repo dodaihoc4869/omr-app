@@ -61,16 +61,28 @@ export function taoDongHoRieng() {
 }
 export type DongHoRieng = ReturnType<typeof taoDongHoRieng>
 
-/** Làm mượt `audio.currentTime` (ms): nội suy theo tốc độ phát giữa hai lần trình duyệt cập nhật; không lùi khi đang phát trừ lúc tua (lệch quá 250 ms). */
+/** Mỗi khung hình chỉ sửa chừng này phần của độ lệch so với tiếng, và không quá `SUA_TRAN` lần quãng vừa đi ⇒ nét luôn tiến đều (0,75–1,25 lần tốc độ phát). */
+export const SUA_MOI_KHUNG = 0.08, SUA_TRAN = 0.25
+/** Trình duyệt thôi cập nhật giờ tiếng quá chừng này (giờ thật) ⇒ coi là tiếng đang đứng. */
+export const TIENG_DUNG_MS = 400
+/** Làm mượt `audio.currentTime` (ms) — ĐỒNG HỒ BÁM PHA (thầy 13/11: «nét bút xem lại bị giật … làm cho nét bút mượt như lúc live»).
+ *  Trước: mỗi lần trình duyệt cập nhật giờ tiếng, đồng hồ nhảy theo con số mới (số mới nhỏ hơn mốc đã hiện ⇒ ĐỨNG chờ, lớn hơn ⇒ NHẢY) ⇒ đầu nét khựng /
+ *  giật theo từng lần cập nhật (điện thoại cập nhật thưa và không đều). Nay: đồng hồ tự chạy theo đồng hồ máy × tốc độ phát, chỉ nắn DẦN về giờ tiếng
+ *  (mỗi khung một phần nhỏ độ lệch) ⇒ nét đi đều ở mọi khung hình, vẫn khớp tiếng. Lệch quá `TRAN_UOC_MS` (tua, nhảy khoảng lặng) ⇒ theo ngay.
+ *  Tiếng đứng (trình duyệt thôi cập nhật quá `TIENG_DUNG_MS`) ⇒ nét đi nốt tới mốc ước rồi đứng, không chạy trước tiếng. Tạm dừng ⇒ đúng con số của audio. */
 export function taoLamMuot() {
-  let tAm = -1, luc = 0, ra = 0
+  let tAm = -1, luc = 0, ra = 0, lucRa = 0, chayCu = false
   return {
     doc(tAudio: number, nay: number, chay: boolean, td: number): number {
-      if (!chay) { tAm = tAudio; luc = nay; return (ra = tAudio) }
+      if (!chay || !chayCu) { tAm = tAudio; luc = nay; lucRa = nay; chayCu = chay; return (ra = tAudio) }
       if (tAudio !== tAm) { tAm = tAudio; luc = nay }
-      const uoc = tAm + Math.min(TRAN_UOC_MS, Math.max(0, nay - luc) * td)
-      if (uoc >= ra || ra - uoc > TRAN_UOC_MS) ra = uoc
-      return ra
+      const di = Math.max(0, nay - lucRa) * td, cho = Math.max(0, nay - luc) // `cho` = giờ THẬT từ lần cập nhật cuối (không nhân tốc độ)
+      lucRa = nay
+      const am = tAm + Math.min(TIENG_DUNG_MS, cho) * td, uoc = ra + di, lech = am - uoc
+      if (Math.abs(lech) > TRAN_UOC_MS * Math.max(1, td)) return (ra = am)
+      if (cho > TIENG_DUNG_MS) return (ra = ra >= am ? ra : Math.min(am, uoc))
+      const sua = Math.max(-SUA_TRAN * di, Math.min(SUA_TRAN * di, lech * SUA_MOI_KHUNG))
+      return (ra = uoc + sua)
     },
   }
 }
