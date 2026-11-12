@@ -6,7 +6,7 @@
 import { oMaTran } from './ma-tran-rut-moi'
 import { noOnDang, xepOnTheoNo } from './rut-28'
 export { NGAY_DE_28 } from './rut-28'
-/** Từ ngày này chỉ câu TÍNH VÀO MỨC (không gồm câu làm lại cuối chặng / tự luyện / lướt) chiếm suất đề 28. */
+/** Từ ngày này chỉ câu TÍNH VÀO MỨC (không gồm câu làm lại cuối chặng / tự luyện) chiếm suất đề 28. */
 export const NGAY_O_CHI_CAU_TINH = '2026-11-13'
 import type { chonGoi7, CauGoi7 } from './goi-bai-7-loi'
 
@@ -28,7 +28,7 @@ export function apSuat7(vao: Vao, hs: { meta: Meta; tt: ReadonlyMap<string, { li
   if (vao.on.length > 1) { const dau: string[] = [], con: string[] = []; for (const q of vao.on) (giuDau.has(q) ? dau : con).push(q); vao.on = [...dau, ...xepOnTheoNo(con, dang, no())] }
   // nợ câu: mức hôm nay (> 28) ⇒ suất theo tỉ lệ; câu lãi còn phải trả hôm nay = lãi trong số đã chọn trả − số đã trả (trả lãi trước)
   // 12/11 (đo thật 11/11: ngày Sửa chỉ 15/137 đề đúng 18/4/6, 87 đề thiếu câu trả lời ngắn dù 87/87 em còn câu trả lời ngắn chưa sửa): `daLam` gồm cả câu
-  // LÀM LẠI CUỐI CHẶNG / tự luyện / lướt — các câu ấy KHÔNG tính vào mức (`soDaLam`) nhưng từng chiếm suất ⇒ phần I tràn sang suất phần II/III. Nay chỉ câu
+  // LÀM LẠI CUỐI CHẶNG / tự luyện — các câu ấy KHÔNG tính vào mức (`soDaLam`) nhưng từng chiếm suất ⇒ phần I tràn sang suất phần II/III. Nay chỉ câu
   // tính vào mức (`daTinh`) chiếm suất. Từ NGAY_O_CHI_CAU_TINH (đổi giữa ngày làm đổi phần đề còn lại của em đang làm dở).
   const chiemSuat = daTinh && ngay >= NGAY_O_CHI_CAU_TINH ? daTinh : daLam
   vao.suat = { oCua, daLamO: [...chiemSuat].map(oCua), tong: nc?.muc, lai: nc ? Math.max(0, Math.min(nc.so, nc.theoLoai.lai) - nc.daTra) : 0 }

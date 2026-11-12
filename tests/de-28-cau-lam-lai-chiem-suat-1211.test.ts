@@ -1,5 +1,5 @@
 // 12/11 (thầy «làm luôn cả hai việc» — đo thật 11/11: ngày Sửa chỉ 15/137 đề máy giao đúng 18/4/6, 87 đề thiếu câu trả lời ngắn, trong khi 87/87 em vẫn còn
-// câu trả lời ngắn đã sai chưa sửa ⇒ không phải kho hết). Nguyên nhân: câu LÀM LẠI CUỐI CHẶNG (và tự luyện / lướt) KHÔNG tính vào mức (`soDaLam`) nhưng
+// câu trả lời ngắn đã sai chưa sửa ⇒ không phải kho hết). Nguyên nhân: câu LÀM LẠI CUỐI CHẶNG (và tự luyện) KHÔNG tính vào mức (`soDaLam`) nhưng
 // từng CHIẾM SUẤT đề 28 (`daLamO` lấy từ `daLam`) ⇒ phần I tràn sang suất phần II/III. Nay chỉ câu tính vào mức (`daTinh`) chiếm suất, từ NGAY_O_CHI_CAU_TINH.
 import { describe, expect, it } from 'vitest'
 import { chonGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'
