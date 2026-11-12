@@ -3,9 +3,9 @@
 // Sát thương do bên BỊ bắn tự tính từ ảnh chụp (ai khai `t` = mình) ⇒ không có gói «đạn»; đạn trên màn chỉ là hình vẽ.
 import type { SinhTonDong } from './kieu'
 
-/** Một ván = 90 giây chơi + 5 giây bảng kết quả; `vanSo` = hạt giống chung cả phòng. */
-export const VAN_CHOI_MS = 90_000
-export const VAN_MS = 95_000
+/** Một ván = 2 phút chơi + 5 giây bảng kết quả (thầy 12/11 tối: «cho màn chơi nhiều thời gian hơn chút»; trước là 90 giây); `vanSo` = hạt giống chung cả phòng. */
+export const VAN_CHOI_MS = 120_000
+export const VAN_MS = 125_000
 export const MAU_DAY = 100
 /** TẦM NHÌN = tầm súng (thầy 12/11 chiều: «tự bắn khi thấy đối thủ gần nhất», không phải tới sát mới bắn): súng bắn đối thủ gần nhất nằm trong khung nhìn.
  *  Máy em truyền đúng khung màn hình của mình; không truyền (máy bù chỗ) thì dùng khung mặc định nửa rộng × nửa cao dưới đây — cỡ màn điện thoại ngang. */
@@ -131,7 +131,7 @@ export function trongBui(bd: BanDo, x: number, y: number): boolean {
   }
   return false
 }
-/** Vòng an toàn co dần trong 90 giây: từ kín sân về 42% bán trục. */
+/** Vòng an toàn co dần suốt thời gian chơi của ván: từ kín sân về 42% bán trục. */
 export function vong(bd: BanDo, nay: number): Vong {
   const t = kep((((nay % VAN_MS) + VAN_MS) % VAN_MS) / VAN_CHOI_MS, 0, 1)
   const he = Math.SQRT2 + (0.42 - Math.SQRT2) * t

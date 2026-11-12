@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: phím «/» hỏi nhanh Hiểu / Chưa hiểu (live theo khối)</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --giay: #f4efe4; --muc: #1f2429; --chu: #f1f7fb; --chu3: #8fa1ab; --vang: #f5a524; --xanh: #34e3a4; --hong: #ff8a5c; --k: calc(100vw / 1366); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; overflow: hidden; }
+.man { position: fixed; inset: 0; display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr calc(56 * var(--k)); gap: calc(10 * var(--k)); padding: calc(10 * var(--k)); }
+.man.em { grid-template-columns: 66fr 34fr; grid-template-rows: 1fr; padding: calc(8 * var(--k)) calc(26 * var(--k)) calc(8 * var(--k)) calc(8 * var(--k)); }
+.giay { background: var(--giay); color: var(--muc); border-radius: calc(18 * var(--k)); padding: calc(22 * var(--k)) calc(34 * var(--k)); font-size: calc(30 * var(--k)); line-height: 1.5; min-width: 0; }
+.chip { display: flex; gap: calc(10 * var(--k)); margin-bottom: calc(12 * var(--k)); font-size: calc(16 * var(--k)); font-weight: 800; }
+.chip b { background: #d9e4fb; padding: calc(4 * var(--k)) calc(14 * var(--k)); border-radius: 99px; }
+.chip span { background: #e6e0d2; color: #5d6770; padding: calc(4 * var(--k)) calc(14 * var(--k)); border-radius: 99px; }
+.bang { position: relative; border-radius: calc(18 * var(--k)); min-width: 0; }
+.man.em .bang { border: 2px solid #33434c; }
+.viet { position: absolute; left: 6%; top: 5%; width: 86%; opacity: .9; }
+.thanh { grid-column: 1 / -1; background: #1a262c; border-radius: calc(16 * var(--k)); display: flex; align-items: center; gap: calc(14 * var(--k)); padding: 0 calc(10 * var(--k)); font-weight: 800; }
+.live { background: #c8262b; border-radius: 99px; padding: calc(7 * var(--k)) calc(16 * var(--k)); font-size: calc(15 * var(--k)); }
+.dot { color: var(--vang); font-size: calc(17 * var(--k)); } .gian { flex: 1; }
+.phim { display: inline-grid; place-items: center; min-width: calc(30 * var(--k)); height: calc(30 * var(--k)); padding: 0 calc(8 * var(--k)); border-radius: calc(8 * var(--k)); background: #2c3a42; border: 1.5px solid #4a5a63; border-bottom-width: calc(3.5 * var(--k)); font-size: calc(16 * var(--k)); }
+.goi { color: var(--chu3); font-size: calc(14 * var(--k)); font-weight: 700; display: flex; align-items: center; gap: calc(8 * var(--k)); }
+.nam { position: fixed; right: calc(8 * var(--k)); top: 46%; width: calc(8 * var(--k)); height: calc(84 * var(--k)); border-radius: 99px; background: #e8a13a; }
+/* ── MÁY EM: hai phím ở chính giữa phần bảng 1/3 bên phải ── */
+.hoi { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(86%, calc(330 * var(--k) * var(--z, 1))); padding: calc(18 * var(--k) * var(--z, 1)) calc(16 * var(--k) * var(--z, 1)) calc(16 * var(--k) * var(--z, 1)); border-radius: calc(26 * var(--k) * var(--z, 1)); text-align: center;
+  background: linear-gradient(160deg, rgba(58,78,90,.82), rgba(24,36,43,.9)); border: 1.5px solid rgba(255,255,255,.14); box-shadow: 0 calc(24 * var(--k)) calc(60 * var(--k)) rgba(0,0,0,.5), 0 0 calc(70 * var(--k)) rgba(52,227,164,.12), inset 0 1px 0 rgba(255,255,255,.2); }
+.hoi h3 { margin: 0 0 calc(4 * var(--k) * var(--z, 1)); font-size: calc(21 * var(--k) * var(--z, 1)); font-weight: 800; }
+.hoi p { margin: 0 0 calc(14 * var(--k) * var(--z, 1)); font-size: calc(13.5 * var(--k) * var(--z, 1)); color: var(--chu3); font-weight: 600; }
+.hai { display: grid; grid-template-columns: 1fr 1fr; gap: calc(12 * var(--k) * var(--z, 1)); }
+.nut { position: relative; padding: calc(12 * var(--k) * var(--z, 1)) 0 calc(11 * var(--k) * var(--z, 1)); border-radius: calc(20 * var(--k) * var(--z, 1)); font-weight: 800; color: #0d2b20; background: linear-gradient(180deg, #7ff5c9, var(--xanh)); box-shadow: 0 calc(5 * var(--k)) 0 #129267, 0 0 calc(34 * var(--k)) rgba(52,227,164,.45), inset 0 1px 0 rgba(255,255,255,.7); }
+.nut.k2 { color: #3a1503; background: linear-gradient(180deg, #ffc09d, var(--hong)); box-shadow: 0 calc(5 * var(--k)) 0 #b94b1d, 0 0 calc(34 * var(--k)) rgba(255,138,92,.45), inset 0 1px 0 rgba(255,255,255,.7); }
+.nut b { display: block; font-size: calc(46 * var(--k) * var(--z, 1)); line-height: 1; }
+.nut span { display: block; margin-top: calc(4 * var(--k) * var(--z, 1)); font-size: calc(15.5 * var(--k) * var(--z, 1)); }
+.nut.mo { opacity: .28; filter: saturate(.4); box-shadow: none; }
+.nut.chon { transform: translateY(calc(3 * var(--k))); box-shadow: 0 calc(2 * var(--k)) 0 #129267, 0 0 0 calc(4 * var(--k)) rgba(255,255,255,.9), 0 0 calc(60 * var(--k)) rgba(52,227,164,.8); }
+.nut.chon::after { content: '✓'; position: absolute; right: calc(-8 * var(--k)); top: calc(-10 * var(--k)); width: calc(28 * var(--k) * var(--z, 1)); height: calc(28 * var(--k) * var(--z, 1)); border-radius: 50%; background: #fff; color: #129267; display: grid; place-items: center; font-size: calc(17 * var(--k) * var(--z, 1)); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.da-gui { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: calc(9 * var(--k) * 1.25); padding: calc(9 * var(--k) * 1.25) calc(18 * var(--k) * 1.25) calc(9 * var(--k) * 1.25) calc(10 * var(--k) * 1.25); border-radius: 99px; font-size: calc(17 * var(--k) * 1.25); font-weight: 800; white-space: nowrap; background: rgba(24,36,43,.9); border: 1.5px solid rgba(52,227,164,.6); box-shadow: 0 0 calc(40 * var(--k)) rgba(52,227,164,.35); opacity: .92; }
+.da-gui b { display: grid; place-items: center; width: calc(26 * var(--k) * 1.25); height: calc(26 * var(--k) * 1.25); border-radius: 50%; background: var(--xanh); color: #0d2b20; }
+.hoi small { display: block; margin-top: calc(13 * var(--k) * var(--z, 1)); font-size: calc(12.5 * var(--k) * var(--z, 1)); color: var(--chu3); font-weight: 600; }
+/* ── MÁY THẦY: «bầu trời» kết quả — mỗi em là một đốm sáng bay về phía Hiểu / Chưa hiểu ── */
+.troi { position: absolute; inset: calc(6 * var(--k)); border-radius: calc(22 * var(--k)); overflow: hidden; border: 1.5px solid rgba(255,255,255,.12);
+  background: radial-gradient(120% 70% at 22% 30%, rgba(52,227,164,.30), transparent 60%), radial-gradient(120% 70% at 80% 34%, rgba(255,138,92,.28), transparent 60%), radial-gradient(90% 60% at 50% 100%, rgba(120,110,255,.22), transparent 70%), linear-gradient(180deg, #0c1a22, #0a1218);
+  box-shadow: 0 calc(24 * var(--k)) calc(70 * var(--k)) rgba(0,0,0,.55), inset 0 0 calc(80 * var(--k)) rgba(120,110,255,.12); }
+.troi h3 { position: absolute; left: 0; right: 0; top: calc(16 * var(--k)); margin: 0; text-align: center; font-size: calc(20 * var(--k)); font-weight: 800; letter-spacing: .02em; text-shadow: 0 0 calc(18 * var(--k)) rgba(255,255,255,.45); }
+.troi h3 small { display: block; margin-top: calc(3 * var(--k)); font-size: calc(13 * var(--k)); color: var(--chu3); font-weight: 700; text-shadow: none; }
+.cot { position: absolute; top: calc(78 * var(--k)); width: 50%; text-align: center; }
+.cot.a { left: 0; } .cot.b { left: 50%; }
+.cot .so { font-size: calc(74 * var(--k)); font-weight: 800; line-height: 1; }
+.cot.a .so { color: #8dffd6; text-shadow: 0 0 calc(26 * var(--k)) rgba(52,227,164,.95), 0 0 calc(70 * var(--k)) rgba(52,227,164,.6); }
+.cot.b .so { color: #ffc3a3; text-shadow: 0 0 calc(26 * var(--k)) rgba(255,138,92,.95), 0 0 calc(70 * var(--k)) rgba(255,138,92,.6); }
+.cot .nh { margin-top: calc(4 * var(--k)); font-size: calc(15 * var(--k)); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: calc(7 * var(--k)); }
+.cot .nh .phim { min-width: calc(24 * var(--k)); height: calc(24 * var(--k)); font-size: calc(13 * var(--k)); padding: 0; }
+.dom { position: absolute; border-radius: 50%; }
+.dom.a { background: radial-gradient(circle at 38% 34%, #fff, #8dffd6 34%, #34e3a4 62%, rgba(52,227,164,0) 72%); box-shadow: 0 0 calc(16 * var(--k)) rgba(52,227,164,.9), 0 0 calc(38 * var(--k)) rgba(52,227,164,.5); }
+.dom.b { background: radial-gradient(circle at 38% 34%, #fff, #ffd2ba 34%, #ff8a5c 62%, rgba(255,138,92,0) 72%); box-shadow: 0 0 calc(16 * var(--k)) rgba(255,138,92,.9), 0 0 calc(38 * var(--k)) rgba(255,138,92,.5); }
+.duoi { position: absolute; height: calc(2.4 * var(--k)); border-radius: 99px; transform-origin: 100% 50%; }
+.duoi.a { background: linear-gradient(90deg, transparent, rgba(141,255,214,.9)); } .duoi.b { background: linear-gradient(90deg, transparent, rgba(255,195,163,.9)); }
+.sao { position: absolute; width: calc(3 * var(--k)); height: calc(3 * var(--k)); border-radius: 50%; background: #fff; box-shadow: 0 0 calc(8 * var(--k)) #fff; }
+.vong { position: absolute; left: 50%; bottom: calc(96 * var(--k)); transform: translateX(-50%); width: 84%; }
+.vong .ray { height: calc(10 * var(--k)); border-radius: 99px; background: rgba(255,255,255,.1); overflow: hidden; display: flex; box-shadow: inset 0 0 0 1px rgba(255,255,255,.1); }
+.vong .ray i { display: block; height: 100%; } .vong .ray i.a { background: linear-gradient(90deg, #34e3a4, #8dffd6); box-shadow: 0 0 calc(16 * var(--k)) rgba(52,227,164,.9); } .vong .ray i.b { background: linear-gradient(90deg, #ffb08a, #ff8a5c); box-shadow: 0 0 calc(16 * var(--k)) rgba(255,138,92,.9); }
+.vong p { margin: calc(7 * var(--k)) 0 0; text-align: center; font-size: calc(13.5 * var(--k)); font-weight: 700; color: var(--chu3); }
+.vong p b { color: var(--chu); }
+.ten { position: absolute; left: 6%; right: 6%; bottom: calc(14 * var(--k)); display: flex; flex-wrap: wrap; justify-content: center; gap: calc(6 * var(--k)); max-height: calc(70 * var(--k)); overflow: hidden; }
+.ten span { font-size: calc(12.5 * var(--k)); font-weight: 700; padding: calc(3.5 * var(--k)) calc(10 * var(--k)); border-radius: 99px; background: rgba(255,138,92,.16); border: 1px solid rgba(255,138,92,.55); color: #ffd2ba; white-space: nowrap; }
+.ten em { font-style: normal; font-size: calc(12.5 * var(--k)); font-weight: 800; color: var(--chu3); padding: calc(3.5 * var(--k)) 0; }
+</style></head><body>
+<div id="goc"></div>
+<script>
+var k = new URLSearchParams(location.search).get('k') || 'em'
+var giay = '<section class="giay"><div class="chip"><b>Câu 3</b><span>Phần III · Trả lời ngắn</span></div>Hoà tan hoàn toàn 5,6 gam Fe trong dung dịch H₂SO₄ loãng, dư. Thể tích khí H₂ thu được ở đkc là bao nhiêu lít? (làm tròn đến hàng phần trăm)</section>'
+var viet = '<svg class="viet" viewBox="0 0 300 70" fill="none" stroke="#e8eef2" stroke-width="2.2" stroke-linecap="round"><path d="M8 22 q10 -14 20 0 t20 0 M56 22 h34 M100 14 v16 M108 22 h40"/><path d="M8 52 h60 M78 44 l12 16 M90 44 l-12 16 M100 52 h70"/></svg>'
+function thanh(mo) { return '<footer class="thanh"><span class="live">● LIVE 21:05</span><span class="dot">◂ &nbsp;Câu 3/5&nbsp; ▸</span><span class="gian"></span><span class="goi">' + (mo ? 'Đang hỏi «Hiểu chưa?» · bấm <b class="phim">/</b> lần nữa để đóng' : 'Bấm <b class="phim">/</b> để hỏi nhanh «Hiểu chưa?»') + '</span></footer>' }
+function hoi(chon, z) { return '<div class="hoi" style="--z:' + z + '"><h3>Em hiểu chưa?</h3><p>Thầy đang hỏi cả lớp</p><div class="hai"><div class="nut' + (chon === 1 ? ' chon' : chon ? ' mo' : '') + '"><b>1</b><span>Hiểu</span></div><div class="nut k2' + (chon === 2 ? ' chon' : chon ? ' mo' : '') + '"><b>2</b><span>Chưa hiểu</span></div></div><small>' + (chon ? 'Đã gửi thầy · chạm phím kia nếu muốn đổi' : 'Chạm một phím · máy tính thì bấm 1 hoặc 2') + '</small></div>' }
+// đốm sáng: [loại, x%, y%, cỡ, có đuôi (góc độ, dài)]
+function troi(a, b, tong, dom, ten, xong) {
+  var h = '<div class="troi"><h3>Hiểu chưa?<small>' + (xong ? 'Cả lớp đã trả lời' : 'Các em đang trả lời…') + '</small></h3>'
+  var sao = [[8, 20], [30, 12], [52, 26], [71, 15], [90, 24], [16, 60], [44, 66], [63, 58], [86, 63], [36, 44], [95, 46], [5, 42]]
+  for (var i = 0; i < sao.length; i++) h += '<i class="sao" style="left:' + sao[i][0] + '%;top:' + sao[i][1] + '%;opacity:' + (0.25 + (i % 4) * 0.2) + '"></i>'
+  h += '<div class="cot a"><div class="so">' + a + '</div><div class="nh"><b class="phim">1</b>Hiểu</div></div><div class="cot b"><div class="so">' + b + '</div><div class="nh"><b class="phim">2</b>Chưa hiểu</div></div>'
+  for (i = 0; i < dom.length; i++) { var d = dom[i], c = 'calc(' + d[3] + ' * var(--k))'
+    if (d[4]) h += '<i class="duoi ' + d[0] + '" style="left:calc(' + d[1] + '% - ' + d[5] + ' * var(--k));top:calc(' + d[2] + '% + ' + d[3] / 2 + ' * var(--k));width:calc(' + d[5] + ' * var(--k));transform:rotate(' + d[4] + 'deg)"></i>'
+    h += '<i class="dom ' + d[0] + '" style="left:' + d[1] + '%;top:' + d[2] + '%;width:' + c + ';height:' + c + '"></i>' }
+  h += '<div class="vong"><div class="ray"><i class="a" style="width:' + (a / tong * 100) + '%"></i><i class="b" style="width:' + (b / tong * 100) + '%"></i></div><p><b>' + (a + b) + '/' + tong + '</b> em đã trả lời' + (xong ? ' · <b>' + Math.round(a / (a + b) * 100) + ' %</b> hiểu' : '') + '</p></div>'
+  h += '<div class="ten">' + (ten.length ? '<em>Chưa hiểu:</em>' : '') + ten.map(function (t) { return '<span>' + t + '</span>' }).join('') + '</div></div>'
+  return h
+}
+var cumA = [['a', 14, 46, 20], ['a', 22, 50, 26], ['a', 30, 45, 18], ['a', 18, 56, 22], ['a', 27, 58, 24], ['a', 35, 54, 20], ['a', 11, 54, 16], ['a', 24, 43, 15], ['a', 33, 62, 17], ['a', 16, 63, 19], ['a', 39, 47, 16], ['a', 21, 66, 14]]
+var cumB = [['b', 66, 48, 22], ['b', 74, 52, 26], ['b', 82, 47, 18], ['b', 70, 58, 20], ['b', 79, 60, 22]]
+var bay = [['a', 44, 70, 18, -152, 46], ['a', 6, 72, 16, -40, 40], ['b', 92, 70, 18, -138, 44], ['a', 50, 60, 14, -168, 38]]
+var h = ''
+if (k === 'em') h = '<div class="man em">' + giay + '<section class="bang">' + viet + hoi(0, innerWidth < 900 ? 1.25 : 1) + '</section></div><i class="nam"></i>'
+// (thầy 12/11 «học sinh chọn xong tự ẩn luôn») em vừa chạm: hai phím biến mất ngay, chỉ còn dấu báo nhỏ «Đã gửi thầy» hiện chừng 1 giây rồi tự tắt
+if (k === 'em-da') h = '<div class="man em">' + giay + '<section class="bang">' + viet + '<div class="da-gui"><b>✓</b>Đã gửi thầy</div></section></div><i class="nam"></i>'
+if (k === 'thay') h = '<div class="man">' + giay + '<section class="bang">' + troi(12, 5, 30, cumA.concat(cumB, bay), ['Trần Gia Bảo', 'Lê Minh Khôi', 'Ngô Thu Hà', 'Phạm Đức Anh', 'Vũ Hải Yến'], false) + '</section>' + thanh(true) + '</div>'
+if (k === 'thay-kq') h = '<div class="man">' + giay + '<section class="bang">' + troi(23, 7, 30, cumA.concat([['a', 9, 47, 18], ['a', 29, 51, 16], ['a', 37, 59, 18], ['a', 13, 59, 14], ['a', 26, 63, 16], ['a', 41, 53, 15], ['a', 19, 46, 15], ['a', 32, 66, 15], ['a', 8, 62, 15], ['a', 43, 62, 14], ['a', 36, 43, 14]], cumB, [['b', 86, 55, 20], ['b', 76, 44, 16]]), ['Trần Gia Bảo', 'Lê Minh Khôi', 'Ngô Thu Hà', 'Phạm Đức Anh', 'Vũ Hải Yến', 'Đỗ Quang Huy', 'Bùi Lan Chi'], true) + '</section>' + thanh(true) + '</div>'
+document.getElementById('goc').innerHTML = h
+</script></body></html>

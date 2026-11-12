@@ -60,6 +60,8 @@ export class KenhLopMay {
     const x = (j.x ?? null) as Row | null
     if (!x || typeof x !== 'object') return true
     const thay = a.v === 'gv', e = thay ? null : st.ds.find((h) => h.sbd === a.s)
+    // MÁY TÍNH của thầy (12/11): chỉ thầy gửi; phòng chuyển tiếp nguyên gói cho mọi máy em, không nhớ gì (máy thầy tự nhắc lại mỗi 4 giây cho em vào muộn).
+    if (j.k === 'mt') { if (thay) { const d = JSON.stringify({ t: 'lop', k: 'mt', s: 'gv', n: '', d: -1, l: nay, x }); if (d.length <= 8000) this.moiMay(d, false) } return true }
     if (!thay && (!e || !e.vao || a.xa)) return true
     if (j.k === 'chat') {
       if (x.xin === 1) { for (const t of this.chat) this.gui(ws, JSON.stringify({ t: 'lop', ...t })); if (this.khoa) this.gui(ws, JSON.stringify({ t: 'lop', k: 'chat', s: 'gv', n: '', d: -1, l: nay, x: { tat: true } })); return true }

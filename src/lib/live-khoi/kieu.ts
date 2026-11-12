@@ -9,7 +9,7 @@ export interface LiveCuaEm { trangThai: 'khong' | 'hen' | 'cho' | 'dang'; khoi?:
 export interface NguoiLop { sbd: string; ten: string; doi: number; /** kJ của em trong buổi (phòng gửi kèm danh sách lớp). */ kj?: number }
 
 /** KÊNH LỚP: tin đi qua kết nối sẵn có của phòng, phòng chỉ chuyển tiếp trong bộ nhớ (0 D1). `chat` = nhắn cả lớp · `tro` = trò Sinh Tồn ở phòng chờ. */
-export type LoaiTinLop = 'chat' | 'tro'
+export type LoaiTinLop = 'chat' | 'tro' | 'mt'
 /** Tin phòng phát xuống: `s` = số báo danh người gửi do PHÒNG đóng dấu ('gv' = thầy, '' = phòng), `n` tên, `d` đội (-1 = không đội), `l` giờ phòng (ms). */
 export interface TinLop { k: LoaiTinLop; s: string; n: string; d: number; l: number; x: unknown }
 export interface KenhLop { gui(k: LoaiTinLop, x: unknown): void; nghe(k: LoaiTinLop, f: (tin: TinLop) => void): () => void }

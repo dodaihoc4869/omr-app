@@ -383,6 +383,35 @@ html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 @keyframes bpu-bao-chay-rung { 0%, 100% { transform: none; } 10% { transform: translateX(-0.6vmin) rotate(-1deg); } 20% { transform: translateX(0.6vmin) rotate(1deg); } 30% { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .bpu-bao-chay::before, .bpu-bao-chay-the, .bpu-bao-chay-the .coi { animation: none; } }
 html.may-yeu .bpu-bao-chay::before, html.may-yeu .bpu-bao-chay-the, html.may-yeu .bpu-bao-chay-the .coi { animation: none; }
+/* 12/11 tối (thầy «chỉ hiện 2 giây rồi ẩn xuống dưới nhấp nháy, khi ẩn xuống bỏ hiệu ứng nhấp nháy xung quanh màn hình»): sau 2 giây lớp phủ thu thành
+   viên nhỏ ở mép dưới — KHÔNG viền quanh màn, chỉ viên tự nhấp nháy. */
+.bpu-bao-chay.gon { place-items: end center; }
+.bpu-bao-chay.gon::before { display: none; }
+.bpu-bao-chay-gon { display: flex; align-items: center; gap: 0.6em; max-width: min(86vw, 1100px); margin-bottom: max(74px, 10.5vh); padding: 0.5em 1.1em 0.5em 0.8em; border-radius: 999px; background: var(--tr-sai); color: var(--tr-chieu-giay);
+  font: 600 clamp(15px, 1.45vw, 28px)/1.25 'Be Vietnam Pro', 'Noto Sans', sans-serif; box-shadow: 0 0.4em 1.4em color-mix(in srgb, var(--tr-sai) 45%, transparent); animation: bpu-bao-chay-gon 0.9s ease-in-out infinite alternate; }
+.bpu-bao-chay-gon i { flex: none; width: 0.7em; height: 0.7em; border-radius: 50%; background: currentColor; }
+.bpu-bao-chay-gon b { flex: none; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.82em; }
+.bpu-bao-chay-gon span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes bpu-bao-chay-gon { from { opacity: 1; } to { opacity: 0.42; } }
+@media (prefers-reduced-motion: reduce) { .bpu-bao-chay-gon { animation: none; } }
+html.may-yeu .bpu-bao-chay-gon { animation: none; }
+/* 12/11 tối lần 2 (thầy «bỏ luôn cảnh báo to đùng đó, hiện cảnh báo tinh tế gọn gàng»): chỉ còn MỘT viên kính nhỏ ở mép dưới — nền tối trong, viền đỏ mảnh,
+   chấm đỏ đập nhẹ; không thẻ to, không viền quanh màn. (Các luật `.bpu-bao-chay-the*` / `.bpu-bao-chay-gon*` ở trên GIỮ KHAI BÁO CŨ theo luật giữ màu, không còn dựng.) */
+.bpu-bao-chay.nhe { place-items: end center; }
+.bpu-bao-chay.nhe::before { display: none; }
+.bpu-roi-gon { display: flex; align-items: center; gap: 0.6em; max-width: min(80vw, 980px); margin-bottom: max(74px, 10.5vh); padding: 0.42em 1.05em 0.42em 0.75em; border-radius: 999px;
+  background: color-mix(in srgb, var(--tr-chieu-mat) 86%, transparent); color: var(--tr-chieu-giay); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-sai) 62%, transparent), 0 0.5em 1.6em color-mix(in srgb, var(--tr-chieu-bang) 72%, transparent);
+  font: 600 clamp(14px, 1.2vw, 23px)/1.3 'Be Vietnam Pro', 'Noto Sans', sans-serif; animation: bpu-roi-vao 0.45s cubic-bezier(.3, 1.35, .5, 1) both; }
+.bpu-roi-gon i { position: relative; flex: none; width: 0.62em; height: 0.62em; border-radius: 50%; background: var(--tr-sai); }
+.bpu-roi-gon i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 0.12em var(--tr-sai); animation: bpu-roi-dap 1.6s ease-out infinite; }
+.bpu-roi-gon b { flex: none; font-weight: 800; font-size: 0.8em; letter-spacing: 0.07em; text-transform: uppercase; color: color-mix(in srgb, var(--tr-sai) 55%, var(--tr-chieu-giay)); }
+.bpu-roi-gon span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes bpu-roi-vao { from { opacity: 0; transform: translateY(0.9em) scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes bpu-roi-dap { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(2.6); } }
+@media (prefers-reduced-motion: reduce) { .bpu-roi-gon, .bpu-roi-gon i::after { animation: none; } }
+html.may-yeu .bpu-roi-gon { animation: none; -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--tr-chieu-mat); }
+html.may-yeu .bpu-roi-gon i::after { animation: none; }
 /* Ô tên em đang rời màn: quầng đỏ (cùng màu báo cháy) — cả lớp thấy ngay trên dải tên. */
 .bpu-bang .bb-o.roi { box-shadow: 0 12px 40px color-mix(in srgb, var(--tr-sai) 45%, transparent); }
 .bpu-bang .bb-o.roi .nhan-roi { background: var(--tr-sai); color: var(--giay); }

@@ -41,6 +41,8 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/lib/live/thay-them.ts': 1, // 11/11 Đo tiếng từ xa (máy thầy): 5 s đo 2 giây số liệu tiếng của chính máy (getStats cục bộ), CHỈ khi đang live; 10 s gửi một tin `live-do` qua WebSocket của phòng — 0 D1; live tắt ⇒ bỏ qua
   'src/lib/live/may-ghi.ts': 2, // 11/11 Xem lại Live (máy ghi trên máy thầy, CHỈ khi đang live): 1 s soát luồng mic (cục bộ) + 10 s gửi tin `live-ghi` (mẫu đồng hồ) qua WebSocket của phòng — 0 D1; live tắt ⇒ dừng
   'src/components/live-khoi/TheLiveEm.tsx': 1, // 12/11 Live theo khối (thẻ Live trang chủ em): 30 s vẽ lại «còn N giờ M phút» CHỈ khi đang có lịch hẹn, cục bộ; vòng HỎI `/hs/bpu/khoi-cua-em` đi qua batNhipBenVung (60 s ± 10 s, tab ẩn không gọi)
+  'src/components/may-tinh/MayTinhThay.tsx': 1, // 12/11 máy tính FX4869 (máy thầy): 4 s gửi lại MỘT tin nhỏ qua kết nối phòng sẵn có cho em vào muộn — chỉ khi máy tính ĐANG HIỆN; ẩn máy tính / hết live ⇒ dừng. Không gọi máy chủ (0 fetch, 0 D1)
+  'src/components/may-tinh/MayTinhEm.tsx': 1, // 12/11 máy tính FX4869 (máy em): 3 s soát «thầy im quá 13 giây thì cất máy tính» — cục bộ, không gọi máy chủ; chỉ chạy trong buổi live (lớp nổi live gỡ là dừng)
   'src/components/live-khoi/BangLiveThay.tsx': 1, // 12/11 Live theo khối (bảng «Live» máy thầy): 30 s vẽ lại giờ để nút «Mở phòng chờ» của buổi hẹn hiện đúng lúc còn ≤ 30 phút, cục bộ, không gọi máy chủ; đóng bảng ⇒ dừng
   'src/lib/live-to-chieu.ts': 1, // 10/11 Live (tờ chiếu, trong iframe): 1 s vẽ đồng hồ «LIVE 12:34» CHỈ khi đang live; cục bộ, không gọi máy chủ
   'src/lib/dong-ho-thi.ts': 1, // kho giờ màn thi/luyện đề/bài gia đình giao/kiểm tra cá nhân (28/09): 1 s, chỉ chạy khi có nút lá đồng hồ nghe

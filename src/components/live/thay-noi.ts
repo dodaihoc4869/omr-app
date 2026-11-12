@@ -230,6 +230,9 @@ const TRANG_BANG = 'bl'
 // LIVE THEO KHỐI: cụm Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm trong khay nút bốn ô của tờ (thầy 12/11). Tờ bấm ⇒ việc `lk` ⇒ sự kiện cửa sổ `ddh-lkt` cho lớp
 // nổi (LopNoiThay); lớp nổi báo số tin nhắn mới bằng sự kiện `ddh-lkt-moi` ⇒ lệnh `live-lk` xuống tờ.
 let lkMoi = 0, lkChat = false
+// Máy tính FX4869 đang hiện hay ẩn (lớp nổi báo bằng `ddh-mt`) ⇒ lệnh `live-mt` xuống tờ để nút máy tính sáng / tắt.
+let mtMo = false
+if (typeof window !== 'undefined') window.addEventListener('ddh-mt', (e) => { mtMo = (e as CustomEvent<boolean>).detail === true; guiTo({ lenh: 'live-mt', mo: mtMo }) })
 if (typeof window !== 'undefined') window.addEventListener('ddh-lkt-moi', (e) => { const d = (e as CustomEvent<{ moi?: number; chat?: boolean }>).detail ?? {}; lkMoi = Number(d.moi) || 0; lkChat = d.chat === true; guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }) })
 let bangLuu: { buoi: string; goi: { v: 1; tiLe: number; net: NetBut[] } } | null = null, bangSan = false
 /** `ca` = sự kiện mang CẢ trang (tờ vừa mở trang / gửi ảnh trạng thái): trang rỗng lúc đó là tờ MỚI chưa nhận lại nét (khung tờ dùng lại nên không phân
@@ -449,7 +452,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
   if (view?.live?.khoi && nguon) { const tr = toTren(); if (tr && tr !== nguon) return } // tờ đang bị che: không cho chen vào gương bảng
   if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false; if (view?.live?.khoi && m.viec !== 'chao') guiTo({ lenh: 'live-anh' }) }
   switch (m.viec) {
-    case 'chao': bangSan = false; nopCu = ''; bao(); guiNop(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); break
+    case 'chao': bangSan = false; nopCu = ''; bao(); guiNop(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); if (mtMo) guiTo({ lenh: 'live-mt', mo: true }); break
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
     case 'bang-xin': { const co = !!bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length > 0; bangSan = true; guiTo({ lenh: 'live-bang-nhap', goi: co ? bangLuu!.goi : { v: 1, tiLe: 0, net: [] } }); if (!co) giuBang(true); break }
     case 'bam': bam(); break

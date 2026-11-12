@@ -48,7 +48,7 @@ describe('Opus của thầy + bộ nâng mức', () => {
   it('bộ nâng mức nhẹ tay: nhắm −18 … −14 dBFS RMS, trần đỉnh dưới 0 dBFS, trôi chậm (không «thở»)', () => {
     const db = (v: number) => 20 * Math.log10(v)
     expect(db(LAM_RO.dich)).toBeGreaterThanOrEqual(-19) // đo ở đầu nhận: mức nói ≈ đích + 2 dB ⇒ rơi vào −18 … −14 dBFS
-    expect(db(LAM_RO.dich)).toBeLessThanOrEqual(-14)
+    expect(db(LAM_RO.dich)).toBeLessThanOrEqual(-13.9) // SỬA CÓ CHỦ ĐÍCH 12/11 21:15 — thầy: «hs kêu tiếng của thầy hơi bé» ⇒ đích 0,2 (−14 dBFS), không cao hơn
     expect(db(LAM_RO.tran)).toBeLessThanOrEqual(-2) // đỉnh gửi đi ≤ −2 dBFS
     expect(db(LAM_RO.tran)).toBeGreaterThan(-3) // chặn đỉnh chỉ chạm khi sắp vỡ
     expect(LAM_RO.len).toBeLessThanOrEqual(3) // dB / giây

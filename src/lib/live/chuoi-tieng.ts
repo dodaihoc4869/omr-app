@@ -16,7 +16,9 @@ export const NEN_RO = { nguong: -32, goi: 20, tiLe: 3 }
 /** Chặn đỉnh của kiểu 'nen': hạ mức trước bộ chặn + ngưỡng chặn (dB). */
 export const CHAN_DINH = { ha: 0.55, nguong: -7 }
 /** Kiểu 'nhanh': mức giọng nhắm tới (RMS lúc có tiếng, biên độ), trần đỉnh, khoảng hệ số nâng, tốc độ trôi (dB / giây). */
-export const LAM_RO = { dich: 0.12, tran: 0.78, nhoNhat: 0.5, lonNhat: 20, len: 3, lenDau: 9, xuong: 3 }
+// 12/11 21:15 (thầy giữa giờ dạy: «hs kêu tiếng của thầy hơi bé», đã bấm «Làm rõ» vẫn nhỏ ⇒ phát hành gấp): mức đích 0,12 → 0,2 (−18,4 → −14 dBFS,
+// to hơn 4,4 dB); trần chặn đỉnh giữ 0,78 (≈ −2,2 dBFS, chừa chỗ cho Opus) ⇒ to hơn mà không vỡ.
+export const LAM_RO = { dich: 0.2, tran: 0.78, nhoNhat: 0.5, lonNhat: 20, len: 3, lenDau: 9, xuong: 3 }
 
 export type KieuChuoi = 'khung' | 'nhanh' | 'nen'
 /** LỌC ỒN RIÊNG (thầy 11/11 «lọc ồn chưa ngon … để giọng thầy và hs trong sáng nhất»): RNNoise (mạng nơ-ron nhỏ, BSD-3; bản wasm của gói
