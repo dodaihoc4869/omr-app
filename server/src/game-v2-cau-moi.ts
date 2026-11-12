@@ -6,6 +6,7 @@
 //   • Câu TRÙM đã ra HÔM NAY trong chặng của các em ⇒ CHẶN hẳn khi kho còn câu khác; chỉ khi hết mới dùng lại, câu ra LÂU NHẤT trước (`chonMotHaiTrum`, `docTrumRaHomNay`).
 // Chỉ ĐỌC. Hàm thuần `tachMoiCu` / `chonLauNhat` / `buCauLauNhat` / `chonMotHaiTrum` không đọc D1 (test được).
 import type { Env } from './kieu'
+import { dangKyXoaDem } from './dem-chung'
 
 /** Câu đọc CŨ (giữ làm đường lùi khi D1 chưa có bảng `cau_lam_cuoi`): đọc mọi dòng sổ của em. */
 export const SQL_DA_LAM_CU = 'SELECT qid, MAX(luc) AS luc FROM su_kien_hoc WHERE sbd = ? GROUP BY qid'
@@ -20,6 +21,7 @@ const DAU_NAP = `EXISTS (SELECT 1 FROM cau_lam_cuoi WHERE sbd = '*' AND qid = '*
 export const SQL_DA_LAM = `SELECT qid, luc FROM cau_lam_cuoi WHERE sbd = (SELECT ?1 WHERE ${DAU_NAP})
   UNION ALL SELECT qid, MAX(luc) AS luc FROM su_kien_hoc WHERE sbd = (SELECT ?1 WHERE NOT ${DAU_NAP}) GROUP BY qid`
 let bangTomTatLoiLuc = 0
+dangKyXoaDem(() => { bangTomTatLoiLuc = 0 })
 /** Lần làm gần nhất (ms) của mỗi câu em ĐÃ LÀM ở BẤT KỲ nguồn nào, mọi ngày (sổ học `su_kien_hoc`, qua bảng tính sẵn `cau_lam_cuoi`). Lỗi đọc ⇒ rỗng (không chặn thêm). */
 export async function docCauDaLamMoiNguon(env: Env, sbd: string): Promise<Map<string, number>> {
   const ra = new Map<string, number>()

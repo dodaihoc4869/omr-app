@@ -100,6 +100,10 @@ describe('G5 (a) — lần cuối em làm mỗi câu: bảng tính sẵn cau_lam
     expect(await Promise.all(['E0', 'E1', 'E2', 'E3', 'KHONG-CO'].map(async (s) => sapXep(await docCauDaLamMoiNguon(env, s))))).toEqual(truoc)
     const tep = readFileSync('server/migration-z-1211-cau-lam-cuoi.sql', 'utf8')
     d.sql.exec(tep); d.sql.exec(tep) // chạy hai lần: vô hại
+    expect(d.sql.prepare("SELECT COUNT(*) n FROM cau_lam_cuoi WHERE sbd='*'").get()).toEqual({ n: 0 }) // dấu ở tệp riêng, chạy sau khi soát
+    // soát như hướng dẫn trong tệp dấu: số dòng bảng = số cặp (sbd, qid) của sổ
+    expect(d.sql.prepare("SELECT COUNT(*) n FROM cau_lam_cuoi WHERE sbd <> '*'").get()).toEqual(d.sql.prepare('SELECT COUNT(*) n FROM (SELECT 1 FROM su_kien_hoc GROUP BY sbd, qid)').get())
+    d.sql.exec(readFileSync('server/migration-z-1211-dau-cau-lam-cuoi.sql', 'utf8'))
     expect(d.sql.prepare("SELECT COUNT(*) n FROM cau_lam_cuoi WHERE sbd='*'").get()).toEqual({ n: 1 })
     for (const [i, s] of ['E0', 'E1', 'E2', 'E3', 'KHONG-CO'].entries()) expect(sapXep(new Map((d.sql.prepare(SQL_DA_LAM).all(s) as { qid: string; luc: string }[]).map((x) => [x.qid, Date.parse(x.luc)])))).toEqual(truoc[i])
     // bỏ dấu ⇒ nhánh sổ, cùng kết quả
@@ -273,6 +277,18 @@ describe('G5 (d) — docLanLam > 200 câu: một lượt đọc sổ dùng chung
     const c = await docLanLam(gop, 'E1', qids, MOC)
     expect(c.length).toBe(rieng.b.length + 1)
     expect(c).toEqual(await docLanLam(env, 'E1', qids, MOC))
+    // THỨ TỰ THẬT của hồ sơ (docHoSo2): lượt chính từ mốc X bắt đầu TRƯỚC (đang bay), ôn bài cũ cả sổ bắt đầu sau ⇒ chỉ đọc thêm phần `luc < X`
+    const gop2 = { ...env, DB: gopDocD1(env.DB) } as Env
+    const ds2 = batSql(gop2)
+    const pChinh = docLanLam(gop2, 'E1', qids, MOC)
+    const pOn = docLanLam(gop2, 'E1', qids.slice(30), '')
+    const [chinh, on] = await Promise.all([pChinh, pOn])
+    expect(chinh).toEqual(await docLanLam(env, 'E1', qids, MOC))
+    expect(on).toEqual(await docLanLam(env, 'E1', qids.slice(30), ''))
+    expect(ds2.filter((s) => /FROM su_kien_hoc WHERE sbd = \? AND luc >= \?/.test(s)).length).toBe(1)
+    expect(ds2.filter((s) => /FROM su_kien_hoc WHERE sbd = \? AND luc < \?/.test(s)).length).toBe(1)
+    // em khác không dùng nhầm sổ của em này
+    expect(await docLanLam(gop2, 'E2', qids, '')).toEqual(await docLanLam(env, 'E2', qids, ''))
     d.sql.close()
   })
 })
