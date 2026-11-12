@@ -31,6 +31,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
           q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(x.detail??JSON.stringify(x))}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 3; }
-          q "Chỉ mục" "SELECT name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','loi_giai_hoi','chua_loi_dot') ORDER BY tbl_name,name"
+          # 12/11 tối (đợt 2 giảm chi phí): cỡ bảng (MAX(rowid) — đọc 1 hàng) + chỉ mục hiện có, để biết dựng chỉ mục mới tốn bao lâu / bao nhiêu hàng.
+          for t in su_kien_hoc chua_loi_dot hanh_trinh_v4_canh goi_bai_7_em goi_bai_7_ngay hoc_sinh cau_meta luot danh_sach loi_giai_hoi sua_goi_ngay chua_loi_thay; do q "Cỡ $t" "SELECT MAX(rowid) n FROM $t"; done
+          q "Chỉ mục" "SELECT tbl_name,name FROM sqlite_master WHERE type='index' AND tbl_name IN ('su_kien_hoc','loi_giai_hoi','chua_loi_dot','hanh_trinh_v4_canh','goi_bai_7_em','cau_meta','luot','danh_sach','sua_goi_ngay','chua_loi_thay') ORDER BY tbl_name,name"
           q "sqlite_stat1 có không" "SELECT COUNT(*) n FROM sqlite_master WHERE name='sqlite_stat1'"
-          for f in scripts/ke-hoach-d1-1111/*.sql; do q "Kế hoạch $f" "$(cat $f)"; done
