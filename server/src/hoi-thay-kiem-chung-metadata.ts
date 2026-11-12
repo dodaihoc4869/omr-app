@@ -1,6 +1,7 @@
 // Đọc nhẹ lịch kiểm cho Tự sửa lỗi, kể cả câu chưa có chua_loi_dot.
 // Gắn statement này vào batch danh sách đang có; không gọi từng câu, không phát lời giải/đáp án.
 // ?1 = SBD đã xác thực, ?2 = giờ máy chủ ms.
+// 12/11: «còn đợt mở cho câu hoặc cùng nhóm» tách hai NOT EXISTS (chỉ mục (sbd, qid_chuan) và (sbd, content_group, dong_luc)) thay OR quét mọi đợt của em.
 export const SQL_LICH_KIEM_HOI_THAY = `SELECT DISTINCT k.qid_goc qid,
   COALESCE(json_extract(q.json,'$.tenDang'),'') ten,
   COALESCE(json_extract(q.json,'$.phan'),'') phan,
@@ -12,8 +13,8 @@ export const SQL_LICH_KIEM_HOI_THAY = `SELECT DISTINCT k.qid_goc qid,
   JOIN de_kho d ON d.ma_de=q.ma_de AND COALESCE(d.da_xoa,0)=0
   JOIN game_v2_index i ON i.ma_de=d.ma_de AND i.source_version=d.cap_nhat_luc
   WHERE k.sbd=?1 AND json_extract(q.json,'$.reviewed')=1
-    AND NOT EXISTS(SELECT 1 FROM chua_loi_dot d WHERE d.sbd=k.sbd AND d.dong_luc IS NULL
-      AND d.trang_thai_day<>'da_tu_sua' AND (d.qid_chuan=k.qid_goc OR (d.content_group<>'' AND d.content_group=k.nhom_goc)))
+    AND NOT EXISTS(SELECT 1 FROM chua_loi_dot d WHERE d.sbd=k.sbd AND d.qid_chuan=k.qid_goc AND d.dong_luc IS NULL AND d.trang_thai_day<>'da_tu_sua')
+    AND NOT EXISTS(SELECT 1 FROM chua_loi_dot d WHERE k.nhom_goc<>'' AND d.sbd=k.sbd AND d.content_group=k.nhom_goc AND d.dong_luc IS NULL AND d.trang_thai_day<>'da_tu_sua')
     AND ((k.trang_thai='dang_lam' AND k.het_han_luc>?2) OR (k.trang_thai='da_nop' AND k.den_han IS NOT NULL))
     AND NOT EXISTS(SELECT 1 FROM hoi_thay_kiem n WHERE n.sbd=k.sbd AND n.qid_goc=k.qid_goc
       AND ((n.trang_thai='da_nop' AND (n.phat_luc>k.phat_luc OR (n.phat_luc=k.phat_luc AND n.id>k.id)))

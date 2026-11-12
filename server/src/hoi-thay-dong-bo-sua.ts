@@ -6,6 +6,9 @@ import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { ngayVn } from './su-kien-hoc'
 import { emCoGhi } from './dem-ke-hoach'
 import { tachSongSinh } from './loi-hoc-luat'
+// 12/11: «đợt mở của em cho roots/nhóm» đi hai nhánh chỉ mục (sbd, qid_chuan) / (sbd, content_group) thay `sbd=?1 AND CAU_DOT` (OR ⇒ quét mọi đợt của em).
+// CAU_DOT còn giữ ở câu khoá theo id (một hàng theo khoá chính, không quét).
+import { DOT_MO_EM_ROOTS } from './chua-dot-nhom-sql'
 
 type DongRevision = { id?: string; qid?: string; revision: number }
 export interface KetQuaDongBoSuaHoiThay { daXacNhan: boolean; soDotDong: number; soYeuCauDong: number }
@@ -88,7 +91,7 @@ export async function dongBoSuaLoiHoiThay(env: Env, sbd: string, qidVao: string,
       (SELECT version FROM game_v2_question WHERE qid=?2 LIMIT 1) source_version,
       (SELECT content_group FROM game_v2_question WHERE qid=?2 LIMIT 1) source_group,
       (SELECT json_group_array(qid) FROM roots) roots_json`).bind(sbd, qid),
-    env.DB.prepare(`${ROOTS} SELECT id,revision FROM chua_loi_dot WHERE sbd=?1 AND ${CAU_DOT} AND dong_luc IS NULL`).bind(sbd, qid),
+    env.DB.prepare(`${ROOTS} SELECT id,revision FROM chua_loi_dot WHERE ${DOT_MO_EM_ROOTS}`).bind(sbd, qid),
     env.DB.prepare(`${ROOTS} SELECT qid,revision FROM hoi_thay_can_giup WHERE sbd=?1 AND qid IN(SELECT qid FROM roots) AND trang_thai IN('can_thay','da_ho_tro')`).bind(sbd, qid),
     env.DB.prepare(`${ROOTS} SELECT id,qid_goc,qid_kiem,version_kiem,version_goc,nhom_goc,dung,assistance,nop_luc,khoa_noi_dung FROM hoi_thay_kiem
       WHERE sbd=?1 AND qid_goc IN(SELECT qid FROM roots) AND trang_thai='da_nop' AND nop_luc<=?3 ORDER BY phat_luc DESC LIMIT 64`).bind(sbd, qid, nowMs),
@@ -119,7 +122,7 @@ export async function dongBoSuaLoiHoiThay(env: Env, sbd: string, qidVao: string,
     SET trang_thai='da_xac_nhan',revision=revision+1,cap_nhat_luc=?7
     WHERE sbd=?1 AND qid=?8 AND revision=?9 AND trang_thai IN('can_thay','da_ho_tro') AND EXISTS(
       ${ROOTS} SELECT 1 WHERE ${GUARD}
-        AND NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=?1 AND ${CAU_DOT} AND dong_luc IS NULL))`)
+        AND NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE ${DOT_MO_EM_ROOTS}))`)
     .bind(...tham, nowMs, h.qid, h.revision))
   const soHelp = lenh.length - soDot
   // Ôn chung cũng khép được lịch kiểm đặc biệt. Chỉ dọn hạn của đúng bản nguồn hiện tại; lịch duy trì chung không đổi.
@@ -128,9 +131,9 @@ export async function dongBoSuaLoiHoiThay(env: Env, sbd: string, qidVao: string,
       AND version_goc=json_extract(?6,'$.version') AND nhom_goc=json_extract(?6,'$.group')
       AND qid_goc IN(${ROOTS} SELECT qid FROM roots)
       AND EXISTS(${ROOTS} SELECT 1 WHERE ${GUARD}
-        AND NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=?1 AND ${CAU_DOT} AND dong_luc IS NULL))`).bind(...tham))
+        AND NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE ${DOT_MO_EM_ROOTS}))`).bind(...tham))
   lenh.push(env.DB.prepare(`${ROOTS} SELECT CASE WHEN ${GUARD}
-    AND NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=?1 AND ${CAU_DOT} AND dong_luc IS NULL)
+    AND NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE ${DOT_MO_EM_ROOTS})
     THEN 1 ELSE 0 END hop_le`).bind(...tham))
   const kq = await env.DB.batch<{ hop_le?: number }>(lenh)
   const soDotDong = kq.slice(0, soDot).reduce((s, r) => s + (r.meta.changes || 0), 0)

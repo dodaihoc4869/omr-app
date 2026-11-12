@@ -17,6 +17,7 @@ import {
   docLuatChua,
 } from './chua-cau-sai-adapter'
 import { tinhTienDo } from './chua-cau-sai-fsm'
+import { SQL_DOT_MO_THEO_CAU, SQL_THEM_DOT, SQL_THEM_DOT_MO_LAI, sqlDotMoDau } from './chua-dot-nhom-sql'
 import {
   anhMoi,
   chamProbe,
@@ -284,10 +285,8 @@ export async function moDot(env: Env, b: Obj): Promise<Response> {
  *  (da_tu_sua, khoá revision — như hàng sinh ra đã đóng ở `trangThaiDayBanDau`). Sổ không thấy lần sai nào (chưa công bố…) ⇒ KHÔNG đóng, vì lần sai có thể hiện
  *  lại. Cả hai trường hợp trả kèm `dotId` để máy em tính «xong phần hôm nay» thay vì dừng ở lỗi. Đường lỗi: thêm một lượt đọc, không đụng đường thường. */
 async function chuaCoLoi(env: Env, sbd: string, qid: string, dong: boolean): Promise<Response> {
-  const mo = await env.DB.prepare(
-    `SELECT id,revision FROM chua_loi_dot WHERE sbd=? AND dong_luc IS NULL AND (qid_chuan=? OR (content_group<>'' AND content_group=(SELECT content_group FROM game_v2_question WHERE qid=? LIMIT 1))) ORDER BY giao_luc ASC,id ASC LIMIT 4`,
-  )
-    .bind(sbd, qid, qid)
+  const mo = await env.DB.prepare(SQL_DOT_MO_THEO_CAU) // 12/11: hai nhánh chỉ mục thay OR (chua-dot-nhom-sql.ts)
+    .bind(sbd, qid)
     .all<{ id: string; revision: number }>()
   const ds = mo.results ?? []
   if (dong && ds.length) {
@@ -320,9 +319,7 @@ export async function giaoDotCuaEm(
   const dauSom = docTrangThaiLoiDau(env, sbd, qid, ngayVn(Date.now()))
   const cfgSom = docCauHinh(env), hSom = docHocLieuNho(env, qid), qSom = cauDuocNho(env, sbd, qid)
   // 29/10 (thầy «Mở câu quá lâu»): đợt đang mở của em cho câu này (cần nhóm nội dung của câu) đọc NGAY khi có câu, CÙNG đợt với phần còn lại — trước: thêm một đợt nối tiếp sau cùng.
-  const cuSom = qSom.then((q0) => env.DB.prepare(
-    `SELECT * FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL ORDER BY giao_luc ASC,id ASC LIMIT 1`,
-  )
+  const cuSom = qSom.then((q0) => env.DB.prepare(sqlDotMoDau('*'))
     .bind(sbd, qid, q0?.group ?? '')
     .first<Obj>())
   for (const p of [cfgSom, hSom, qSom, cuSom]) p.catch(() => {})
@@ -345,10 +342,7 @@ export async function giaoDotCuaEm(
         : 'can_chan_doan'
   // Giao và chốt cửa sổ đo một lần; không kéo dài cửa sổ khi em quay lại hay sai tiếp.
   const idMoLai = 'cl-' + (await bam([sbd, q?.group || qid, dau.saiCuoiLuc ?? now, 'mo-lai'])).slice(0, 40)
-  const [, , dongDotMoi] = await env.DB.batch([env.DB.prepare(
-    `INSERT OR IGNORE INTO chua_loi_dot(id,sbd,qid_chuan,content_group,cohort_id,nguon_sai,phien_ban_cau,mo_luc,sai_cuoi_luc,trang_thai_day,ly_do_thieu,policy_snapshot,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc)
-    SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL)`,
-  )
+  const [, , dongDotMoi] = await env.DB.batch([env.DB.prepare(SQL_THEM_DOT)
     .bind(
       id,
       sbd,
@@ -372,10 +366,7 @@ export async function giaoDotCuaEm(
     ),
   // MỞ LẠI SAU KHI ĐÃ ĐÓNG (chữa câu gọn 25/10): mã đợt băm theo lần sai ĐẦU (`moLuc` cố định suốt cửa sổ sổ học) ⇒ em sai lại sau khi đợt đã đóng thì
   // INSERT OR IGNORE trên đụng đúng dòng cũ và trả "Đã tự sửa" mãi. Có lần sai SAU lúc đóng muộn nhất của họ câu ⇒ thêm đợt MỚI (mã theo lần sai cuối) — chỉ thêm dòng.
-  env.DB.prepare(
-    `INSERT OR IGNORE INTO chua_loi_dot(id,sbd,qid_chuan,content_group,cohort_id,nguon_sai,phien_ban_cau,mo_luc,sai_cuoi_luc,trang_thai_day,ly_do_thieu,policy_snapshot,giao_luc,chot_do_luc,tao_luc,cap_nhat_luc)
-    SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND (dong_luc IS NULL OR dong_luc>=?))`,
-  ).bind(
+  env.DB.prepare(SQL_THEM_DOT_MO_LAI).bind(
     idMoLai, sbd, qid, q?.group ?? '', cfg.cohortId, dau.loiHoc.nguonSai, q?.version ?? '', dau.saiCuoiLuc ?? now, dau.saiCuoiLuc ?? now, tt, h.lyDo,
     JSON.stringify(cfg), now, now + cfg.cuaSoDoNgay * 86400000, now, now, sbd, qid, q?.group ?? '', dau.saiCuoiLuc ?? now,
   ),
@@ -383,9 +374,7 @@ export async function giaoDotCuaEm(
   ]) // 13/10: đọc lại đợt CÙNG lô ghi (bớt một đợt D1)
   let dot = dongDau(dongDotMoi)
   if (!dot) {
-    const winner = await env.DB.prepare(
-      `SELECT qid_chuan FROM chua_loi_dot WHERE sbd=? AND (qid_chuan=? OR (content_group<>'' AND content_group=?)) AND dong_luc IS NULL ORDER BY giao_luc ASC,id ASC LIMIT 1`,
-    )
+    const winner = await env.DB.prepare(sqlDotMoDau('qid_chuan'))
       .bind(sbd, qid, q?.group ?? '')
       .first<{ qid_chuan: string }>()
     if (winner) return giaoDotCuaEm(env, sbd, winner.qid_chuan, choDongDotLech)
