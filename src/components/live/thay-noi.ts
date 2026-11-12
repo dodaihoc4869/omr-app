@@ -415,11 +415,12 @@ function bam(): void {
   else void moThe()
 }
 /** Máy đã từng live (bấm là live ngay) nhưng CHƯA tự chọn Krisp lần nào: có mic Krisp ⇒ mở thẻ mic một lần (tự chọn Krisp, thầy nói thử thấy vạch) thay vì live ngay. */
+let khongKrisp = false // đã dò một lần trong phiên mà không có Krisp ⇒ các lần bấm Live sau vào thẳng, khỏi liệt kê thiết bị lại
 async function batHoacKrisp(): Promise<void> {
   await dam()
-  const ds = lt ? await lt.dsMic().catch(() => []) : []
+  const ds = !khongKrisp && lt ? await lt.dsMic().catch(() => []) : []
   if (ds.some((d) => /krisp/i.test(d.ten))) await moThe()
-  else await bat(false)
+  else { khongKrisp = ds.length > 0 || khongKrisp; await bat(false) }
 }
 
 type TinTo = { viec?: unknown; id?: unknown; v?: unknown; sk?: unknown; trang?: unknown; tiLe?: unknown; net?: unknown; vung?: unknown; giayToi?: unknown; sbd?: unknown; giay?: unknown }
