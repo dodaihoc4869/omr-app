@@ -1,0 +1,29 @@
+[
+  {
+    "i": 137,
+    "hash": "188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1",
+    "fileNguon": "anh/188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1.png",
+    "svg": "visco137-native-ddh-707256b8d1a1260a2949b0d963dedc2e9462e2efc4292fee01a191a1a3530b4a.svg",
+    "hashSvg": "707256b8d1a1260a2949b0d963dedc2e9462e2efc4292fee01a191a1a3530b4a",
+    "byteSvg": 54476,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D1-III-4",
+        "de": "Tơ visco được sản xuất phổ biến từ bột gỗ của cây như tre, đậu nành, mía,... theo sơ đồ như hình.\nTừ 10 tấn cellulose người ta điều chế được 9,5 tấn tơ visco. Hiệu suất của quá trình điều chế là bao nhiêu %?",
+        "refs": [
+          {
+            "hash": "188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1",
+            "where": "VIP27-C4-B14-D1-III-4.hinh.0.du_lieu",
+            "hashDataUrl": "e6b27dc188def00cf985a83e0e2b776c39bfbb58f50ad2d5f78e50fb8b185a90"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3squarepairs3nSUB/LEFT-RIGHT[C6H7O2(OH)3]n-MID[C6H7O2(OH)2-O-C-SNa]n/explicitC=Sdown2separatedshaftsWHITEgapsNOTskeletalSplitFeet/2FILLEDrightheads/EXACT1.NaOH-2.CS2-+H2SO4(loãng)/ALLregularUPRIGHT-3regularITALICcaptionsEXACTCellulose-Cellulose xangtogenate-Tơ visco/MIDcaptionBOTTOMCROPnative116/NOcharges-byproducts-yieldanswer-namefix-noalias1365",
+    "hashSvgDaSoat": "707256b8d1a1260a2949b0d963dedc2e9462e2efc4292fee01a191a1a3530b4a",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,331 @@
+{
+  "i": 137,
+  "assetIndexProvided": 1351,
+  "hash": "188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1.png",
+  "size": [
+    1269,
+    116
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B14-D1-III-4",
+      "de": "Tơ visco được sản xuất phổ biến từ bột gỗ của cây như tre, đậu nành, mía,... theo sơ đồ như hình.\nTừ 10 tấn cellulose người ta điều chế được 9,5 tấn tơ visco. Hiệu suất của quá trình điều chế là bao nhiêu %?",
+      "allHinh": [
+        {
+          "hash": "188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1",
+          "where": "VIP27-C4-B14-D1-III-4.hinh.0.du_lieu",
+          "hashDataUrl": "e6b27dc188def00cf985a83e0e2b776c39bfbb58f50ad2d5f78e50fb8b185a90"
+        }
+      ],
+      "missingHashes": [
+        "188f3639318c45d8c6280f145365fd11b1e3cfc2d7a620f6857f9d91833505e1"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownBranch5xOpened": true,
+    "ownArrow5xOpened": true,
+    "ownCroppedCaption4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownCaptionReopenedSeparatelyToConfirmG": true
+  },
+  "measurementLimits": "Nativeapprox1pxtextbboxes/bondpositions; literalcroppedcaptionvisibletextread, donotrestorebottomoutline/extendcanvas. Perrepeatcountsnotwholepolymermolecularcountsunknownn.",
+  "geometry": {
+    "leftFormula": {
+      "text": "[C₆H₇O₂(OH)₃]ₙ",
+      "bbox": [
+        30,
+        24,
+        228,
+        55
+      ],
+      "baselineApprox": 47,
+      "note": "All6/7/2/3andnSUB;squareouterbracketsroundOHparentheses."
+    },
+    "middleFormula": {
+      "prefix": {
+        "text": "[C₆H₇O₂(OH)₂",
+        "bbox": [
+          428,
+          20,
+          607,
+          51
+        ],
+        "baselineApprox": 42
+      },
+      "O": {
+        "text": "O",
+        "bbox": [
+          614,
+          21,
+          636,
+          43
+        ]
+      },
+      "C": {
+        "text": "C",
+        "bbox": [
+          659,
+          20,
+          681,
+          43
+        ]
+      },
+      "suffix": {
+        "text": "SNa]ₙ",
+        "bbox": [
+          711,
+          19,
+          782,
+          51
+        ]
+      },
+      "horizontalSingleBonds": [
+        [
+          [
+            605,
+            31
+          ],
+          [
+            612,
+            31
+          ]
+        ],
+        [
+          [
+            637,
+            31
+          ],
+          [
+            656,
+            31
+          ]
+        ],
+        [
+          [
+            684,
+            31
+          ],
+          [
+            708,
+            31
+          ]
+        ]
+      ],
+      "doubleSbranch": {
+        "Slabel": {
+          "text": "S",
+          "bbox": [
+            662,
+            69,
+            679,
+            92
+          ]
+        },
+        "twoShafts": [
+          [
+            [
+              665,
+              48
+            ],
+            [
+              665,
+              66
+            ]
+          ],
+          [
+            [
+              673,
+              48
+            ],
+            [
+              673,
+              66
+            ]
+          ]
+        ],
+        "whiteGapRule": "ExplicitCinkbottom42 thenraystarts48=>whitegap;rayends66thenSlabel69. DoNOTextendtobareC/splitfeetcontact.",
+        "Canchor": "printedCcenter670, notbarevertex"
+      },
+      "literal": "Nocharges/minussigns; -O-C-SNa areSINGLEbondswithC=SbranchDOWN. Noalternateformula spelling."
+    },
+    "rightFormula": {
+      "text": "[C₆H₇O₂(OH)₃]ₙ",
+      "bbox": [
+        1058,
+        21,
+        1257,
+        53
+      ],
+      "baselineApprox": 44
+    },
+    "arrows": [
+      {
+        "shaft": [
+          [
+            241,
+            37
+          ],
+          [
+            412,
+            37
+          ]
+        ],
+        "filledTriangle": [
+          [
+            412,
+            37
+          ],
+          [
+            395,
+            32
+          ],
+          [
+            395,
+            42
+          ]
+        ],
+        "above": {
+          "text": "1. NaOH",
+          "bbox": [
+            269,
+            7,
+            382,
+            31
+          ]
+        },
+        "below": {
+          "text": "2. CS₂",
+          "bbox": [
+            269,
+            48,
+            355,
+            79
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            795,
+            36
+          ],
+          [
+            1040,
+            36
+          ]
+        ],
+        "filledTriangle": [
+          [
+            1040,
+            36
+          ],
+          [
+            1023,
+            31
+          ],
+          [
+            1023,
+            41
+          ]
+        ],
+        "above": {
+          "text": "+ H₂SO₄ (loãng)",
+          "bbox": [
+            819,
+            1,
+            1020,
+            30
+          ]
+        }
+      }
+    ],
+    "captions": [
+      {
+        "text": "Cellulose",
+        "bbox": [
+          71,
+          89,
+          183,
+          115
+        ],
+        "font": "regularITALICserif"
+      },
+      {
+        "text": "Cellulose xangtogenate",
+        "bbox": [
+          484,
+          97,
+          780,
+          116
+        ],
+        "font": "regularITALICserif",
+        "crop": "BOTTOMcutnativey116; preserve. Literalx-a-n-g-t-o-g-e-n-a-t-e, sourcegBETWEENnand t. No terminologycorrection."
+      },
+      {
+        "text": "Tơ visco",
+        "bbox": [
+          1103,
+          77,
+          1203,
+          105
+        ],
+        "font": "regularITALICserif"
+      }
+    ],
+    "font": "Allformulas/conditionsregularuprightserifblack;3captionsregularitalicserifnotbold. nSUB/digitsSUBliteral;nomathsup.",
+    "countsPerPrintedUnit": {
+      "left": {
+        "C": 6,
+        "O": 5
+      },
+      "middle": {
+        "C": 7,
+        "O": 5,
+        "S": 2,
+        "Na": 1,
+        "explicitCSdouble": 1
+      },
+      "right": {
+        "C": 6,
+        "O": 5
+      },
+      "wholePolymerAtomCounts": "UNKNOWNn",
+      "arrows": 2,
+      "captions": 3
+    },
+    "noAdded": [
+      "xanthogenatespellingfix",
+      "charges",
+      "sulfateproduct/byproducts",
+      "nvalue",
+      "yieldanswer",
+      "boldcaptions",
+      "restoredcroppedglyphs",
+      "alias1365",
+      "expandedcellulosestructure"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "corrections": [
+    {
+      "field": "geometry.captions[1].text",
+      "oldIncorrect": "Cellulose xantogenate",
+      "newOwnLiteral": "Cellulose xangtogenate",
+      "reason": "Ownreopenedcaption4xandseparate7xexplicitgBETWEENnand t visible; initialtranscriptionomittedg. Source-onlyfixbeforebuilder.",
+      "evidence": [
+        "/workspace/scratch/137-caption4x-lo389.png",
+        "/workspace/scratch/native389-caption.png"
+      ]
+    }
+  ]
+}
