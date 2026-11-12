@@ -72,10 +72,11 @@ export const useLyDoSai = (qid: string): LyDoSai | undefined => { useSyncExterna
 export function choCauSai(qid: string): () => void {
   nap()
   khoaDen = Date.now() + KHOA_TIEP_MS
-  if (daChon.has(qid)) return () => {}
+  // dải đóng (sang câu khác / chốt an toàn) ⇒ bỏ khoá luôn: khoá chỉ thuộc câu sai đang hiện, không lan sang «Tiếp tục» của câu kế
+  if (daChon.has(qid)) return () => { khoaDen = 0 }
   cho.add(qid)
   bao()
-  return () => { if (cho.delete(qid)) bao() }
+  return () => { khoaDen = 0; if (cho.delete(qid)) bao() }
 }
 
 type Pa = 'A' | 'B' | 'C' | 'D'

@@ -12,6 +12,10 @@ import {
 } from '../src/lib/hieu-ung/dieu-kien'
 import { anMung, boHaGon, cheDoMayNay, napAnMung } from '../src/lib/hieu-ung/nap'
 
+// 12/11: «Tiếp tục» bỏ mọi chạm trong 600 ms đầu sau dải sai (chống lướt) ⇒ test đẩy đồng hồ qua khoá trước khi bấm
+let dongHo: { mockRestore: () => void } | null = null, lech = 0
+const quaKhoa = () => { lech += 700; if (!dongHo) { const goc = Date.now; dongHo = vi.spyOn(Date, 'now').mockImplementation(() => goc() + lech) } }
+afterEach(() => { dongHo?.mockRestore(); dongHo = null; lech = 0 })
 describe('chọn chế độ theo máy', () => {
   it('giảm chuyển động ⇒ tĩnh (thắng cả máy yếu); máy yếu ⇒ gọn; còn lại đầy đủ', () => {
     expect(cheDoAnMung({ mayYeu: false, giamChuyenDong: false })).toBe('day-du')
@@ -220,6 +224,7 @@ describe('màn làm chặng không vỡ khi hiệu ứng chạy', () => {
       fireEvent.click(screen.getByRole('radio', { name: dung ? /^A/ : /^B/ }))
       fireEvent.click(screen.getByRole('button', { name: 'Kiểm tra' }))
       if (!dung) fireEvent.click(await screen.findByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
+      if (!dung) quaKhoa()
       await screen.findByRole('button', { name: 'Tiếp tục' })
       const the = document.querySelector<HTMLElement>(`.ht2-lam-pa[data-ket=${dung ? 'dung' : 'sai'}]`)!
       await waitFor(() => expect(the.style.animation).toBe('none'))

@@ -15,6 +15,10 @@ vi.mock('../src/components/hoa2/api', async (goc) => ({ ...await goc<typeof impo
 vi.mock('../src/components/hoa2/doc-luong-nop', async () => { const api = await import('../src/components/hoa2/api'); return { nopCauLuong: (token: string, du: Record<string, unknown>, giay: number) => api.goiHoa2('answer', token, du, giay) } })
 beforeEach(() => { document.documentElement.dataset.trong = 'hs' })
 afterEach(() => { cleanup(); vi.mocked(goiHoa2).mockReset(); localStorage.clear(); delete document.documentElement.dataset.trong })
+// 12/11: «Tiếp tục» bỏ mọi chạm trong 600 ms đầu sau dải sai (chống lướt) ⇒ test đẩy đồng hồ qua khoá trước khi bấm
+let dongHo: { mockRestore: () => void } | null = null, lech = 0
+const quaKhoa = () => { lech += 700; if (!dongHo) { const goc = Date.now; dongHo = vi.spyOn(Date, 'now').mockImplementation(() => goc() + lech) } }
+afterEach(() => { dongHo?.mockRestore(); dongHo = null; lech = 0 })
 
 const nen = { maDe: 'de-8', version: 'v1', group: 'g', hinhAnh: [], dang: null, tenDang: 'Hợp chất chứa nitrogen', mucDo: 'hieu', sao: 0, kienThuc: [], ideas: [] }
 const C1 = { ...nen, qid: 'q1', phan: 'I' as const, text: 'Số đồng phân amine bậc một tạo alcohol là', choices: ['2', '8', '3', '4'] }
@@ -131,6 +135,7 @@ describe('hiệu ứng đúng / sai kiểu Duolingo (thầy 26/10)', () => {
     expect(goc.querySelector('.duo-ket .duo-tick[data-sai]')).not.toBeNull()
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'B', solution: {} })
     fireEvent.click(screen.getByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
+    quaKhoa()
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
     await screen.findByText(C2.text)
     expect(screen.getByRole('progressbar').getAttribute('aria-valuenow')).toBe('1') // sang câu sau mới nhích
