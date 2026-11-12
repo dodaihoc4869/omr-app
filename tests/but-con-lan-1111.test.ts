@@ -183,8 +183,9 @@ describe('con lăn khi BÚT BẬT (thầy 11/11)', () => {
     }
     expect(bang.net.map((n) => n.id)).toEqual(t.but.xuat().net.map((n) => n.id))
     t.but.xuat().net.forEach((n, i) => expect(bang.net[i].diem[0][1]).toBeCloseTo(n.diem[0][1], 4))
-    expect(bang.net[0].diem[0][1]).toBeCloseTo((GY - 200) / H, 4)
-    expect(bang.net[2].diem[0][1]).toBeCloseTo((GY + 80 - 200) / H, 4)
+    // 12/11 «bút kẻ thì tự nắn thẳng»: ba nét thử là ba đường kẻ ngang 160 px hơi rung (±2 px) ⇒ được nắn ngang hẳn, y dời tối đa 1 px (≈ 0,0013)
+    expect(bang.net[0].diem[0][1]).toBeCloseTo((GY - 200) / H, 2)
+    expect(bang.net[2].diem[0][1]).toBeCloseTo((GY + 80 - 200) / H, 2)
     // lớp vẽ của em nhận bản CHỐT (net-moi có xong) ⇒ vẽ một lần, không đi qua đệm phát điểm
     expect(raVe.filter((s) => s.loai === 'net-moi').every((s) => s.loai === 'net-moi' && s.xong)).toBe(true)
     // cỡ gói báo lại mỗi lần giấy ngừng cuộn: ba nét × 21 điểm ≈ 0,8 KB (9 byte mỗi điểm + đầu nét)

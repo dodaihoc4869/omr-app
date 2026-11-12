@@ -388,7 +388,8 @@ var LoiBut = (function () {
       if (m) {
 ` + /* nét tay đang phát dở ⇒ gỡ; nét đã nắn vào sổ như MỘT nét xong với mã mới (máy em, bản ghi nhận nguyên nét qua sự kiện net-moi xong) */ `
         cu = n.id; phat({ loai: 'xoa', id: [cu] });
-        n = { id: (cu.indexOf('b_') === 0 ? 'b_' : '') + id(), cong: n.cong, mau: n.mau, co: n.co, diem: m, nan: 1 };
+` + /* GIỮ chính đối tượng nét (tờ gắn thêm trường riêng lên nó: nét thuộc giấy đề, độ cuộn lúc viết…) — chỉ đổi mã và điểm */ `
+        n.id = (cu.indexOf('b_') === 0 ? 'b_' : '') + id(); n.diem = m; n.nan = 1;
         T.net.push(n); ghi({ l: 'them', ds: [{ net: n, vt: T.net.length - 1 }] }); phat({ loai: 'net-moi', net: gon(n), vt: T.net.length - 1, xong: true });
         return n;
       }

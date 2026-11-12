@@ -264,13 +264,13 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiTh
     if (k.kieu === 'ngang') datMo(k.x0 - p.x > quang() * 0.3)
     else if (!k.kieu) datMo((m) => !m)
   }
-  const ds = dau ?? []
+  const het = dau ?? [], ds = het.filter((d) => d.loai !== 'loa') // «loa đang bật» = trạng thái thường: chỉ là chấm sáng, không đọc thành dấu
   return (
     <>
-      <button ref={nam} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={`${mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'}${ds.length ? ` · ${ds.map((d) => d.nhan).join(' · ')}` : ''}`} aria-expanded={mo}
+      <button ref={nam} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={`${mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'}${ds.length ? ` · ${ds.map((d) => d.nhan).join(' · ')}` : ''}`} aria-expanded={mo} data-dau={ds.length ? ds.map((d) => d.loai).join(' ') : undefined}
         onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}>
         {/* thầy 12/11: chỉ còn HAI chấm sáng — loa đang bật (trên thanh), mic của em đang bật (dưới thanh, nhấp nháy); các dấu khác nằm trong khay + nhãn đọc màn hình */}
-        <i />{ds.some((d) => d.loai === 'loa') ? <span className="lv-nam-cham loa" aria-hidden="true" /> : null}{ds.some((d) => d.loai === 'mic') ? <span className="lv-nam-cham mic" aria-hidden="true" /> : null}
+        <i />{het.some((d) => d.loai === 'loa') ? <span className="lv-nam-cham loa" aria-hidden="true" /> : null}{ds.some((d) => d.loai === 'mic') ? <span className="lv-nam-cham mic" aria-hidden="true" /> : null}
       </button>
       <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={() => { hanThu.current = THU_MS; hoanThu() }}>{children}</div>
     </>
