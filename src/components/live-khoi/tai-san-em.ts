@@ -13,6 +13,7 @@ export function taiSanEm(): void {
   daEm = true
   ranh(() => {
     im(import('../bpu/gan-hs')); im(import('./LopNoiEm')); im(import('./TroGiuLua')); im(import('./ChatEm')); im(import('./ManBonDoi'))
-    ranh(() => { im(import('../live/LopLive')); im(import('./ManVinhDanh')) })
+    // Bảng live (LopLive) không tải ở đây: màn phòng tự nạp nó ngay khi thầy sẵn sàng tiếng (`live.san`), và nhập ở đây làm tách thêm một mảnh dùng chung vào precache.
+    ranh(() => { im(import('./ManVinhDanh')) })
   })
 }
