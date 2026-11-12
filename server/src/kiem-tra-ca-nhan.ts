@@ -302,6 +302,20 @@ export async function chotKtCn(env: Env, r: Row, now: number, hetHan = false) {
   return r
 }
 
+/** 13/11: chặng mở lại được (một lần) — đã HẾT GIỜ (không phải em bấm nộp sớm: chốt_lúc trống hoặc = hạn), em CHƯA TRẢ LỜI câu nào, chưa mở lại lần nào
+ *  (`mo_lai` = 1 khi đã có dòng kiem_tra_ca_nhan_mo_lai), còn ≥ 1 phút tới hạn bài. Bài đã nộp: nơi gọi tự loại. */
+export const SQL_CHANG_KEM_MO_LAI = 'SELECT c.*,EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_mo_lai m WHERE m.bai_id=c.bai_id AND m.stt=c.stt) AS mo_lai FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=?'
+export function moLaiDuoc(cr: Row, qids: readonly string[], t: Record<string, unknown>, phanQ: ReadonlyMap<string, string>, hanBai: number, now: number): boolean {
+  const han = Number(cr.han)
+  if (Number(cr.mo_lai) || !(now >= han) || (cr.chot_luc != null && Number(cr.chot_luc) < han) || now + 60_000 >= hanBai) return false
+  return !qids.some((q) => duTraKt(phanQ.get(q) ?? '', typeof t[q] === 'string' ? (t[q] as string) : ''))
+}
+const phanCuaDe = (d: ReturnType<typeof de>) => new Map(d.cau.map((c) => [c.q.qid, c.q.phan]))
+async function coTheMoLaiChang(env: Env, r: Row, row: Row, qids: readonly string[], phanQ: ReadonlyMap<string, string>, now: number): Promise<boolean> {
+  if (r.nop_luc || !(now >= Number(row.han))) return false
+  const m = await env.DB.prepare('SELECT 1 AS c FROM kiem_tra_ca_nhan_mo_lai WHERE bai_id=? AND stt=?').bind(r.id, row.stt).first<Row>().catch(() => ({ c: 1 }))
+  return moLaiDuoc({ ...row, mo_lai: m ? 1 : 0 }, qids, tra(r), phanQ, Number(r.han_luc), now)
+}
 export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, now: number): Promise<Row> {
   if (!await coKtCn(env)) throw new Error('Kiểm tra riêng chưa được bật.')
   let r=await docBai(env,sbd,s(b.id)), d=de(r)
@@ -314,11 +328,11 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     // 27/10 tốc độ (thầy: «chỗ bấm kiểm tra phải tức thì»): `kemKetQua` (CHỈ-THÊM) ⇒ bài đã nộp trả luôn phần chữa trong CÙNG lượt — máy em khỏi gọi
     // hoc-tap-ktcn-ket-qua nối tiếp. Đọc chặng và dựng kết quả chạy song song; kết quả giống hệt lệnh ket-qua (chốt lại rồi ketQuaKt).
     const kem=b.kemKetQua===true&&!!r.nop_luc?chotKtCn(env,r,now).then(async x=>({x,k:await ketGonKt(env,s(x.id),sbd,de(x).cau,await ketQuaKt(env,x,now),b)})):null
-    const [rows,kq]=await Promise.all([env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>(),kem])
+    const [rows,kq]=await Promise.all([env.DB.prepare(SQL_CHANG_KEM_MO_LAI).bind(r.id).all<Row>().catch(()=>env.DB.prepare('SELECT *,1 AS mo_lai FROM kiem_tra_ca_nhan_chang WHERE bai_id=?').bind(r.id).all<Row>()),kem])
     if(kq)r=kq.x
     // daTra từng chặng (đợt 20, CHỈ-THÊM): đếm chặt như tomTatKt từ đề + tra_json đã đọc sẵn ở docBai — không thêm lượt D1.
     const t=tra(r),phanQ=new Map(d.cau.map(c=>[c.q.qid,c.q.phan]))
-    return {ok:true,kiemTra:tomTatKt(r,now),...(kq?kq.k:{}),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr?Number(cr.han):null,daChot:!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
+    return {ok:true,kiemTra:tomTatKt(r,now),...(kq?kq.k:{}),chang:d.chang.map((c,i)=>{const cr=rows.results.find(v=>Number(v.stt)===i);const lai=!!cr&&!r.nop_luc&&moLaiDuoc(cr,c.qids,t,phanQ,Number(r.han_luc),now);return {stt:i,soCau:c.qids.length,giay:c.giay,han:cr&&!lai?Number(cr.han):null,daChot:!lai&&!!cr&&(!!cr.chot_luc||now>=Number(cr.han)),daTra:c.qids.filter(q=>duTraKt(phanQ.get(q)??'',typeof t[q]==='string'?t[q]:'')).length}})}
   }
   if (now<Number(r.mo_luc)) throw new Error('Chưa đến lịch kiểm tra của em.')
   if (laKtBaoTriBo(r,now)) throw new Error(CHU_BAO_TRI_KT)
@@ -352,9 +366,20 @@ export async function ktCnAction(env: Env, sbd: string, action: string, b: Row, 
     // 24:00, và "Không cho làm chặng 3"): từ 16/10 mỗi câu nộp ở bài thường cũng ghi `loi_giai_hoi` (nguồn 'goi7:sau_nop' — game-v2.ts) ⇒ đề kiểm tra có câu em
     // vừa làm trong 12 giờ là chặng bị khoá, kể cả chặng ĐÃ MỞ, tới hạn thì chốt 0 câu. Nay em luôn mở/làm tiếp được; câu em xem phần chữa trong 12 giờ trước
     // khi mở chặng (hoặc trong lúc làm) vẫn tính điểm bài nhưng ghi sổ là CÓ TRỢ GIÚP (`trongXemChua12h` lúc chốt) — không tính là kiểm chứng độc lập.
+    // 13/11 (em 10041 «đi học về không cho làm chặng 3, 4»; đo 01–12/11: 36 lượt bài): bấm mở chặng rồi rời app ⇒ đồng hồ chặng chạy hết khi em vắng, chặng khoá
+    // với 0 câu trả lời. Nay chặng HẾT GIỜ mà em CHƯA TRẢ LỜI câu nào được MỞ LẠI MỘT LẦN, đủ giờ của chặng (không quá hạn bài; vẫn chỉ một chặng chạy cùng lúc).
+    const moLai=!!row&&await coTheMoLaiChang(env,r,row,ch.qids,phanCuaDe(d),now)
+    if (moLai) {
+      await env.DB.batch([
+        env.DB.prepare(`INSERT OR IGNORE INTO kiem_tra_ca_nhan_mo_lai(bai_id,stt,luc) SELECT ?1,?2,?3 WHERE EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE id=?1 AND nop_luc IS NULL AND han_luc>?3) AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang WHERE bai_id=?1 AND stt<>?2 AND chot_luc IS NULL AND han>?3)`).bind(r.id,stt,now),
+        env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET bat_dau=?3,han=?4,chot_luc=NULL WHERE bai_id=?1 AND stt=?2 AND EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_mo_lai m WHERE m.bai_id=?1 AND m.stt=?2 AND m.luc=?3)').bind(r.id,stt,now,Math.min(Number(r.han_luc),now+ch.giay*1000)),
+      ])
+    }
     await env.DB.prepare(`INSERT OR IGNORE INTO kiem_tra_ca_nhan_chang(bai_id,stt,bat_dau,han) SELECT ?,?,?,? WHERE EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE id=? AND nop_luc IS NULL AND han_luc>?) AND NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt<>? AND chot_luc IS NULL AND han>?)`).bind(r.id,stt,now,Math.min(Number(r.han_luc),now+ch.giay*1000),r.id,now,r.id,stt,now).run()
     row=await env.DB.prepare('SELECT * FROM kiem_tra_ca_nhan_chang WHERE bai_id=? AND stt=?').bind(r.id,stt).first<Row>()
     if (!row) throw new Error('Em hoàn thành chặng đang mở trước nhé.')
+    // Được mở lại mà chưa mở được (đang chạy chặng khác) ⇒ KHÔNG chốt (giữ quyền mở lại), báo làm xong chặng đang mở.
+    if (moLai&&now>=Number(row.han)) throw new Error('Em hoàn thành chặng đang mở trước nhé.')
     if (now>=Number(row.han)&&!row.chot_luc) { await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=han WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(r.id,stt).run(); row.chot_luc=row.han }
     // CẢ chặng đều là câu tạm giữ ⇒ KHÔNG báo lỗi (thầy 03/11 «bỏ hẳn lỗi kiểu này»): chặng tự chốt rỗng, em đi tiếp; câu giữ chưa trả lời không tính điểm (chotKtCn).
     if (!csMo.length&&!row.chot_luc) { const c=Math.min(now,Number(row.han)); await env.DB.prepare('UPDATE kiem_tra_ca_nhan_chang SET chot_luc=? WHERE bai_id=? AND stt=? AND chot_luc IS NULL').bind(c,r.id,stt).run(); row.chot_luc=c }

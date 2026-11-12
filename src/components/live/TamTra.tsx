@@ -40,7 +40,7 @@ export function TamTra({ so, phan, tuLuan, soPa = 4, tra, onGui, dem }: { so: nu
     </div>
   )
   return (
-    <div className="lv-tra" role="group" aria-label={`Trả lời câu ${so}`} onPointerDown={(e) => { dung(e); setCham((n) => n + 1) }} onPointerMove={dung} onPointerUp={dung} onWheel={dung} onClick={dung} onDoubleClick={dung}>
+    <div className={`lv-tra${!tuLuan && phan !== 'I' && phan !== 'II' ? ' nhap-so' : ''}`} role="group" aria-label={`Trả lời câu ${so}`} onPointerDown={(e) => { dung(e); setCham((n) => n + 1) }} onPointerMove={dung} onPointerUp={dung} onWheel={dung} onClick={dung} onDoubleClick={dung}>
       <button type="button" className="lv-tra-nam trong" aria-expanded aria-label="Thu phần chọn đáp án" onClick={() => setMo(false)}><i aria-hidden="true" /></button>
       <div className="lv-tra-dau">
         <span>Câu {so} · {tuLuan ? 'em làm ra giấy' : phan === 'I' ? 'chọn một đáp án' : phan === 'II' ? 'chọn Đúng / Sai cho từng ý' : 'nhập đáp số'}</span>

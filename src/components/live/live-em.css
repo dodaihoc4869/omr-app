@@ -389,6 +389,33 @@ html.may-yeu .lv-song i { transition: none; }
 .lv-tra-phim { flex: 1 1 320px; display: flex; gap: 4px; }
 .lv-tra-phim .lv-tra-nut { font-size: 17px; padding: 0; }
 .lv-tra .lv-tra-gui { flex: 0 0 auto; min-height: 44px; margin-bottom: 3px; padding: 0 18px; border: 0; border-radius: 13px; background: var(--tr-hs); box-shadow: 0 3px 0 var(--tr-hs-go); color: var(--tr-trang); font: inherit; font-size: 16px; font-weight: 800; white-space: nowrap; }
+/* NHẬP ĐÁP SỐ (trả lời ngắn) — CÂN LẠI (thầy 13/11: «phần số hơi bé, trong khi trên vẫn thừa chỗ, cân đối lại … mà không tăng kích thước phần nhập»).
+   Trước: 12 phím số dồn MỘT hàng (trên điện thoại mỗi phím chỉ 21–32 px), hàng trên bỏ trống nửa phải. Nay, CÙNG số hàng / cùng bề cao:
+   · khung vừa (điện thoại nằm ngang): cột trái = ô đáp số + Xoá, dưới là nút Gửi; cột phải = phím số 6 × 2, phím to gần gấp đôi;
+   · khung hẹp: hàng trên ô đáp số (giãn hết chỗ) + Xoá + Gửi; dưới là phím 6 × 2;
+   · khung giấy từ 650 px (ruột khung chứa ≥ 634 px; bố cục cũ đã gọn MỘT hàng): giữ nguyên — đổi sang hai hàng sẽ làm phần nhập cao lên. Tính theo BỀ NGANG KHUNG GIẤY (truy vấn khung chứa); trình duyệt cũ không hỗ trợ ⇒ giữ bố cục cũ. */
+.lv-duoi { container-type: inline-size; container-name: lv-duoi; }
+@container lv-duoi (max-width: 633px) {
+  .lv-tra.nhap-so .lv-tra-phim { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 5px; }
+  .lv-tra.nhap-so .lv-tra-phim .lv-tra-nut { font-size: 21px; }
+  .lv-tra.nhap-so .lv-tra-so output { flex: 1 1 auto; }
+}
+@container lv-duoi (min-width: 420px) and (max-width: 633px) {
+  .lv-tra.nhap-so { display: grid; grid-template-columns: minmax(172px, 30%) minmax(0, 1fr); grid-template-areas: "nam nam" "dau dau" "so phim" "gui phim"; align-items: stretch; }
+  .lv-duoi[data-thap] .lv-tra.nhap-so { grid-template-areas: "nam nam" "so phim" "gui phim"; } /* máy thấp: dòng đầu ẩn ⇒ bỏ hẳn hàng lưới của nó (không thừa một khe) */
+  .lv-tra.nhap-so .lv-tra-nam.trong { grid-area: nam; }
+  .lv-tra.nhap-so .lv-tra-dau { grid-area: dau; }
+  .lv-tra.nhap-so .lv-tra-so { grid-area: so; min-width: 0; }
+  .lv-tra.nhap-so .lv-tra-so output { min-width: 0; } /* ô đáp số + Xoá nằm gọn trong cột trái, không lấn sang phím số */
+  .lv-tra.nhap-so .lv-tra-gui { grid-area: gui; padding: 0 8px; }
+  .lv-tra.nhap-so .lv-tra-phim { grid-area: phim; }
+}
+@container lv-duoi (max-width: 419px) {
+  .lv-tra.nhap-so .lv-tra-so { flex: 1 1 96px; min-width: 0; }
+  .lv-tra.nhap-so .lv-tra-so output { min-width: 40px; }
+  .lv-tra.nhap-so .lv-tra-phim { flex: 1 1 100%; order: 3; }
+  .lv-tra.nhap-so .lv-tra-gui { order: 2; padding: 0 10px; font-size: 14.5px; }
+}
 .lv-tra .lv-tra-gui:disabled { margin-bottom: 0; background: var(--tr-chieu-mat-2); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); color: color-mix(in srgb, var(--tr-chieu-giay) 38%, transparent); }
 /* CON DẤU đóng giữa CẢ MÀN, đè cả sang phần đề (thầy 12/11, bản vẽ 26) */
 .lv .lv-dau-dat { position: absolute; left: 50%; top: 47%; z-index: 30; padding: 0.16em 0.55em; border: 0.11em solid currentColor; border-radius: 0.3em; outline: 0.04em solid currentColor; outline-offset: 0.12em; background: color-mix(in srgb, currentColor 10%, transparent); text-transform: uppercase; color: var(--tr-sai); font-size: clamp(40px, 17vmin, 132px); font-weight: 900; line-height: 1.05; text-align: center; letter-spacing: 0.06em; white-space: nowrap; pointer-events: none; transform: translate(-50%, -50%) rotate(-10deg); animation: lv-dau-dong 3s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
