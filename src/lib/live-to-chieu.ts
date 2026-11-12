@@ -461,7 +461,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
     if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
-    if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl' && m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); return; }
+    if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl') { LV.bangNhap = 1; if (m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); } return; }
     if (m.lenh !== 'live-tt') return;
     truoc = LV.tt; LV.tt = m.tt || null;
     lvCheBang();
@@ -486,6 +486,8 @@ export const JS_LIVE_TO_CHIEU = `
       for (i = 0; i < ds.length; i++) { b = document.createElement('button'); b.type = 'button'; b.className = 'mc-nut-phim'; b.setAttribute('data-lk', ds[i][0]); b.innerHTML = '<span class="mc-nut-chu">' + ds[i][1] + '</span>'; g.appendChild(b); }
       g.addEventListener('click', function (e) { var n = e.target.closest ? e.target.closest('[data-lk]') : null; if (n) lvGui('lk', { v: n.getAttribute('data-lk') }); });
       k.insertBefore(g, k.firstChild);
+      // khay vừa mở ⇒ báo app thu cột tin nhắn (cột nằm ngay trên thanh đáy bên phải, đè đúng chỗ khay; tờ nằm dưới lớp của app nên không tự nổi lên được)
+      if (window.MutationObserver) new MutationObserver(function () { var mo = document.body.classList.contains('mc-khay-mo'); if (mo && !LV.lkMo) lvGui('lk', { v: 'khay' }); LV.lkMo = mo; }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     }
     ds = g.querySelectorAll('[data-lk]');
     for (i = 0; i < ds.length; i++) {
@@ -504,7 +506,8 @@ export const JS_LIVE_TO_CHIEU = `
     // app giữ bản sao suốt buổi và trả lại khi tờ mới xin (đổi bài, bảng trắng ⇄ bài) — lệnh live-bang-nhap.
     if (window.__mcBut && window.__mcBut.rieng) window.__mcBut.rieng(cb ? 'bl' : '');
     lvLk(cb);
-    if (cb && window.__mcBut && !LV.bangXin) { LV.bangXin = 1; setTimeout(function () { lvGui('bang-xin'); }, 80); }
+    // xin lại tới khi NHẬN được lúc đang ở trang bl (tờ bài vừa mở có thể còn «Bảng» một nhịp rồi sang «Học»: câu trả lời tới lúc đã rời trang bl ⇒ lần sau xin lại)
+    if (cb && window.__mcBut && !LV.bangNhap && !LV.bangHen) LV.bangHen = setTimeout(function () { LV.bangHen = 0; lvGui('bang-xin'); }, 80);
     if (b.classList.contains('mc-che-bang') === cb) return;
     b.classList.toggle('mc-che-bang', cb);
     try { window.dispatchEvent(new Event('resize')); } catch (e) {}

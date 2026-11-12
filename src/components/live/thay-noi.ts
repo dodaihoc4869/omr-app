@@ -388,7 +388,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
   switch (m.viec) {
     case 'chao': bangSan = false; bao(); if (lkMoi) guiTo({ lenh: 'live-lk', moi: lkMoi }); break
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
-    case 'bang-xin': bangSan = true; if (bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length) guiTo({ lenh: 'live-bang-nhap', goi: bangLuu.goi }); else giuBang(true); break
+    case 'bang-xin': { const co = !!bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length > 0; bangSan = true; guiTo({ lenh: 'live-bang-nhap', goi: co ? bangLuu!.goi : { v: 1, tiLe: 0, net: [] } }); if (!co) giuBang(true); break }
     case 'bam': bam(); break
     case 'the-dong': if (the) { the = null; lt?.thaMic(); bao() } break
     case 'chon-loa': if (the?.loa && typeof m.id === 'string') { the = { ...the, loa: { ...the.loa, chon: m.id, thu: undefined } }; bao(); void lt?.datLoa(m.id).then(() => napLoa()) } break

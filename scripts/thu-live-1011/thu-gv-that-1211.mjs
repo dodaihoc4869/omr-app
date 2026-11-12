@@ -168,7 +168,11 @@ const oGv = gv.locator('.lkt-chat input, .lkt-chat textarea').first(); await oGv
 const bong = await em1.evaluate(() => { const b = document.querySelector('.lke-bong .lc-bong-noi'), r = b?.getBoundingClientRect(); return r ? { w: Math.round(r.width), h: Math.round(r.height), l: Math.round(r.left), t: Math.round(r.top), W: innerWidth, H: innerHeight } : null })
 kiem('8f thầy nhắn: bong bóng máy em nằm ngang, gọn ở góc trên-phải', !!bong && bong.w > 90 && bong.h < 90 && bong.l > bong.W * 0.55 && bong.t < bong.H * 0.3, JSON.stringify(bong))
 await chup(em1, '8-em-bong-tin')
-await lk('chat'); await ngu(300)
+// mở khay nút bốn ô lúc cột tin nhắn đang mở ⇒ cột tự thu (khay nằm đúng chỗ đó, không bị đè)
+await gv.frameLocator('.lop-xem-phieu iframe').locator('#mc-them').click(); await ngu(500)
+kiem('8f2 mở khay nút bốn ô ⇒ cột tin nhắn máy thầy tự thu, khay bấm được', (await gv.locator('.lkt-chat').count()) === 0 && await gv.frameLocator('.lop-xem-phieu iframe').locator('.mc-khay-lk [data-lk="lop"]').isVisible())
+await chup(gv, '8-gv-khay')
+await gv.frameLocator('.lop-xem-phieu iframe').locator('#mc-them').click(); await ngu(300)
 
 // ── 8M. MIC CỦA EM (thầy 12/11 «cài mic của hs vào»): em giơ tay trong khay thanh vàng ⇒ máy thầy hiện hàng giơ tay ⇒ «Mời nói» ⇒ máy em có tấm mời ──
 await em1.locator('.lv-nam').first().click(); await ngu(500)
