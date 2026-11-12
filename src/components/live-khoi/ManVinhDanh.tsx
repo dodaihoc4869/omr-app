@@ -3,18 +3,9 @@
 import { useEffect, useMemo, type CSSProperties } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
 import type { NguoiLop } from '../../lib/live-khoi/kieu'
+import { saoBuoi, xepHangDoi } from '../../lib/live-khoi/vinh-danh'
 import './man-vinh-danh.css'
 
-/** Xếp hạng bốn đội theo kJ (cao trước; bằng nhau ⇒ cùng hạng). Chỉ tính đội có em. THUẦN. */
-export function xepHangDoi(ds: readonly NguoiLop[], kj: readonly number[]): { doi: number; kj: number; soEm: number; hang: number }[] {
-  const co = DOI_BPU.map((_, d) => ({ doi: d, kj: Math.round(kj[d] ?? 0), soEm: ds.filter((e) => e.doi === d).length })).filter((x) => x.soEm > 0)
-  co.sort((a, b) => b.kj - a.kj || a.doi - b.doi)
-  return co.map((x) => ({ ...x, hang: 1 + co.findIndex((y) => y.kj === x.kj) }))
-}
-/** Ba em nhiều kJ nhất buổi (bỏ em 0 kJ). THUẦN. */
-export function saoBuoi(ds: readonly NguoiLop[]): NguoiLop[] {
-  return ds.filter((e) => (e.kj ?? 0) > 0).sort((a, b) => (b.kj ?? 0) - (a.kj ?? 0) || a.ten.localeCompare(b.ten, 'vi')).slice(0, 3)
-}
 // 26 mảnh pháo giấy: lệch ngang / trễ / cỡ cố định (không ngẫu nhiên ⇒ ảnh chụp ổn định).
 const MANH = Array.from({ length: 26 }, (_, i) => ({ x: (i * 37) % 100, d: (i * 173) % 2400, s: 0.7 + ((i * 29) % 7) / 10, m: i % 4 }))
 const Lua = () => (

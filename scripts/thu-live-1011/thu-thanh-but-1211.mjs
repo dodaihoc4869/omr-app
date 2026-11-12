@@ -10,7 +10,6 @@
 import { existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { chromium } from 'playwright'
-import sharp from 'sharp'
 import { moMayChu } from './may-chu.mjs'
 
 const GOC = resolve(import.meta.dirname, '../..')
@@ -61,9 +60,8 @@ async function keoToi(x, y) {
   return do1()
 }
 async function chup(ten) {
-  const buf = await thay.screenshot({ type: 'png' })
-  let q = 86, ra
-  do { ra = await sharp(buf).jpeg({ quality: q, mozjpeg: true }).toBuffer(); q -= 6 } while (ra.length > 150 * 1024 && q > 30)
+  let q = 88, ra
+  do { ra = await thay.screenshot({ type: 'jpeg', quality: q }); q -= 6 } while (ra.length > 150 * 1024 && q > 30)
   writeFileSync(join(ANH, ten), ra); console.log(`  ảnh ${ten} ${Math.round(ra.length / 1024)} KB`)
 }
 /** Số điểm ảnh có mực trên lớp hiện mực của bút. */

@@ -4,7 +4,7 @@ import { docDsLich, donLich, khoiTuLop, lichChoEm, type LichLiveMc } from '../se
 import { KenhLopMay } from '../server/src/kenh-lop-may'
 import { chuanKhoi, liveDat, viewLiveBang, viewLiveEm } from '../src/lib/bpu/phong-live'
 import { taoPhong, vaoLop, type TrangThaiPhong } from '../src/lib/bpu/phong'
-import { saoBuoi, xepHangDoi } from '../src/components/live-khoi/ManVinhDanh'
+import { saoBuoi, xepHangDoi } from '../src/lib/live-khoi/vinh-danh'
 
 const NAY = Date.UTC(2026, 10, 12, 12, 0, 0)
 const lich = (o: Partial<LichLiveMc>): LichLiveMc => ({ id: 'a', khoi: 12, batDau: NAY, ten: '', trangThai: 'hen', luc: NAY, ...o })
