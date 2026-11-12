@@ -374,6 +374,8 @@ export default defineConfig({
           // Live theo khối (12/11): mọi mảnh của tính năng (bảng Live máy thầy, thẻ Live, lớp nổi, trò Sinh Tồn, chat, màn bốn đội) chỉ dùng khi ĐANG có mạng
           // (live) ⇒ kho chạy-lúc, không vào precache (giữ trần 170 tệp).
           '**/{BangLiveThay,ChatEm,ChatThay,LopNoiEm,LopNoiThay,ManBonDoi,TheLiveEm,TroSinhTon,chu-gio,em-khoi,thay-khoi,kieu,ManVinhDanh,vinh-danh}-*.{js,css}', // `kieu-*` = hằng dùng chung của src/lib/live-khoi/kieu.ts
+          // Máy tính «Đỗ Đại Học FX4869» (12/11): chỉ hiện trong buổi live (đang có mạng) ⇒ kho chạy-lúc. `dong-bo-????????` = mảnh chung mặt máy + CSS (8 dấu ? = đúng mã băm, không bắt nhầm `dong-bo-thu-muc-*`).
+          '**/{MayTinhThay,MayTinhEm}-*.js', '**/dong-bo-????????.{js,css}',
           '**/chieu-xoay-*.js', // luật xoay hình lúc live (src/components/live/chieu-xoay.ts) — chỉ dùng trong buổi live (đang có mạng)
           '**/mau-????????.js', // bảng màu xanh than của live theo khối (src/lib/live-khoi/mau.ts) — 8 dấu ? = đúng mã băm, không bắt nhầm `mau-chieu-*`
           // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.

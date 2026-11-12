@@ -2,6 +2,7 @@
 // Đoạn JS (ES5) chèn vào cuối JS_LIVE_TO_CHIEU (cùng phạm vi: LV · lvGui · body · dot · pha · S · dauKq · baoNhanh). Tách tệp riêng vì cổng cỡ tệp.
 // Tin ra: { nguon:'to-chieu', loai:'live', viec:'len', sbd? } · { …, viec:'cham', dat }   ·   tin vào: { nguon:'bpu-bang', lenh:'live-bao', chu } (live-to-chieu.ts).
 import { JS_LIVE_NOP } from './live-nop-to-chieu'
+import { CSS_LIVE_MT, JS_LIVE_MT } from './live-mt-to-chieu'
 
 export const CSS_LIVE_KHOI = `
 .mc-lv-dau{position:fixed;left:50%;top:47%;z-index:60;padding:.16em .55em;border:.11em solid currentColor;border-radius:.3em;outline:.04em solid currentColor;outline-offset:.12em;background:color-mix(in srgb,color-mix(in srgb,currentColor 12%,var(--mc-bang-chu)) 92%,transparent);color:var(--mc-do);font:900 clamp(48px,15vmin,150px)/1.05 var(--mc-sans);letter-spacing:.06em;text-align:center;white-space:nowrap;pointer-events:none;transform:translate(-50%,-50%) rotate(-10deg);animation:mc-lv-dau 3s cubic-bezier(.2,.9,.3,1) both}
@@ -9,7 +10,7 @@ export const CSS_LIVE_KHOI = `
 .mc-lv-dau small{display:block;margin-top:.25em;font-size:.2em;font-weight:800;letter-spacing:.12em}
 @keyframes mc-lv-dau{0%{opacity:0;transform:translate(-50%,-58%) rotate(-16deg) scale(3)}7%{opacity:1;transform:translate(-50%,-50%) rotate(-10deg) scale(.9)}10%{transform:translate(-50%,-50%) rotate(-8deg) scale(1.06)}13%{transform:translate(-50%,-50%) rotate(-11deg) scale(.98)}16%,86%{opacity:1;transform:translate(-50%,-50%) rotate(-10deg) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) rotate(-10deg) scale(1.03)}}
 @media (prefers-reduced-motion:reduce){.mc-lv-dau{animation:none}}
-`
+${CSS_LIVE_MT}`
 
 export const JS_LIVE_KHOI_TO_CHIEU = `
   // CỠ CHỮ ĐỀ CỦA BUỔI LIVE (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá»): máy em soi ĐÚNG cách xuống dòng của giấy thầy (để nét
@@ -79,4 +80,4 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.
   window.addEventListener('keydown', function (e) { if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation(); }, true);
   document.addEventListener('keydown', function (e) { var t = e.target; if ((e.key !== 'l' && e.key !== 'L') || e.ctrlKey || e.metaKey || e.altKey || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return; lvXinGoi(e); }, true);
-${JS_LIVE_NOP}`
+${JS_LIVE_NOP}${JS_LIVE_MT}`
