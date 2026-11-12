@@ -1,0 +1,389 @@
+{
+  "i": 132,
+  "assetIndexProvided": 1408,
+  "hash": "180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f.png",
+  "size": [
+    242,
+    195
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-39",
+      "de": "Geranyl acetate là chất lỏng có màu vàng có mùi thơm của hoa hồng. Geranyl acetate là một thành phần tự nhiên của hơn 60 loại tinh dầu và có nhiều trong tinh dầu hoa hồng (công thức như hình).",
+      "allHinh": [
+        {
+          "hash": "180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f",
+          "where": "VIP27-CDK-ESTER-TN-II-39.hinh.0.du_lieu",
+          "hashDataUrl": "7b1bf4a427b03a57eaccab34f731cc88cd71ac01c28c01f9d14694c8842febfa"
+        }
+      ],
+      "missingHashes": [
+        "180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/399-full4x.png",
+      "/workspace/scratch/399-co8x.png",
+      "/workspace/scratch/399-cc18x.png",
+      "/workspace/scratch/399-left8x.png",
+      "/workspace/scratch/399-bottom8x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "fullyInsideBareC": 8,
+      "partlyClippedLeftBoundaryJunctions": 2,
+      "visibleO": 2,
+      "CCDoublePairs": 2,
+      "CODoublePairs": 1,
+      "bottomCutContinuations": 2,
+      "totalMolecularC": "UNKNOWN from croppedsource; do not infer geranyl formula"
+    },
+    "insideBareCPositions": [
+      [
+        37,
+        8
+      ],
+      [
+        37,
+        47
+      ],
+      [
+        74,
+        68
+      ],
+      [
+        110,
+        47
+      ],
+      [
+        183,
+        47
+      ],
+      [
+        219,
+        68
+      ],
+      [
+        37,
+        131
+      ],
+      [
+        37,
+        174
+      ]
+    ],
+    "leftBoundaryJunctions": [
+      [
+        0,
+        68
+      ],
+      [
+        0,
+        110
+      ]
+    ],
+    "mainPathGuides": {
+      "upperLeftToO": [
+        [
+          0,
+          110
+        ],
+        [
+          0,
+          68
+        ],
+        [
+          37,
+          47
+        ]
+      ],
+      "CC1TwoRays": [
+        [
+          [
+            40,
+            44.5
+          ],
+          [
+            77,
+            65.5
+          ]
+        ],
+        [
+          [
+            36.5,
+            50
+          ],
+          [
+            72,
+            71
+          ]
+        ]
+      ],
+      "toEsterO": [
+        [
+          74,
+          68
+        ],
+        [
+          110,
+          47
+        ],
+        [
+          135,
+          61
+        ]
+      ],
+      "lowerLeftToCC2": [
+        [
+          0,
+          110
+        ],
+        [
+          37,
+          131
+        ]
+      ],
+      "CC2TwoRays": [
+        [
+          [
+            34,
+            133
+          ],
+          [
+            34,
+            173
+          ]
+        ],
+        [
+          [
+            40.5,
+            133
+          ],
+          [
+            40.5,
+            173
+          ]
+        ]
+      ],
+      "bottomJoin": [
+        [
+          34,
+          173
+        ],
+        [
+          37,
+          174
+        ],
+        [
+          40.5,
+          173
+        ]
+      ],
+      "lowerCutBranches": [
+        [
+          [
+            37,
+            174
+          ],
+          [
+            1,
+            194
+          ]
+        ],
+        [
+          [
+            37,
+            174
+          ],
+          [
+            74,
+            194
+          ]
+        ]
+      ],
+      "upperMethyl": [
+        [
+          37,
+          47
+        ],
+        [
+          37,
+          8
+        ]
+      ]
+    },
+    "CCLiteralTopology": "CC(1) separateparallel rays with small native end offsets: do not force upperfloatingstroke tobranchjunction. CC(2) main incoming diagonal endsaround37,131 between two verticaltops34/40.5 at133; preserve tiny gaps rather than add crossbar at top. Bottomshortjoin contacts2lowerarms.",
+    "ester": {
+      "OBridgeBBoxApprox": [
+        138,
+        57,
+        155,
+        75
+      ],
+      "leftBondEnd": [
+        135,
+        61
+      ],
+      "rightBond": [
+        [
+          158,
+          62
+        ],
+        [
+          181,
+          47.5
+        ]
+      ],
+      "carbonylBareC": [
+        183,
+        47
+      ],
+      "carbonylRays": [
+        [
+          [
+            179.5,
+            24
+          ],
+          [
+            179.5,
+            46
+          ]
+        ],
+        [
+          [
+            186,
+            24
+          ],
+          [
+            186,
+            47
+          ]
+        ]
+      ],
+      "nativeApexJoin": [
+        [
+          179.5,
+          46.5
+        ],
+        [
+          183,
+          47
+        ],
+        [
+          186,
+          47
+        ]
+      ],
+      "carbonylOBoxApprox": [
+        174,
+        0,
+        192,
+        17
+      ],
+      "methylArm": [
+        [
+          185.5,
+          48
+        ],
+        [
+          219,
+          68
+        ]
+      ],
+      "leftFootEvidence": {
+        "pixelRows": "x179y46=0, x180y47=181, x179y48=0; gray diagonalbridge, not a full white-row disconnect",
+        "interpretation": "Narrow8x shows white interior wedge beside leftstem, but faintgray native contact toincomingarm. Keep literal ray/armpositions, do not impose broad chemicaljunction."
+      },
+      "rightFoot": "Continuous native join tooutgoingarm",
+      "rootLeftFootCalculated": [
+        179.5,
+        48.44565217391305
+      ]
+    },
+    "labels": [
+      {
+        "text": "(1)",
+        "bboxApprox": [
+          31,
+          68,
+          54,
+          84
+        ],
+        "font": "Regular upright serif"
+      },
+      {
+        "text": "(2)",
+        "bboxApprox": [
+          5,
+          145,
+          28,
+          161
+        ],
+        "font": "Regular upright serif"
+      },
+      {
+        "text": "Geranyl acetate",
+        "bboxApprox": [
+          87,
+          116,
+          241,
+          134
+        ],
+        "font": "TRUEBOLD ITALIC serif; capitalG lowercase rest"
+      }
+    ],
+    "chemicalFont": "O regular upright serif, no actual bold; topcarbonylO croppedatnativey0.",
+    "crop": {
+      "left": "Verticalstrokeonx0 fromy68to110 partiallyclipped atleftframe; twojunctions visible onlyboundaryink, no new leftpadding",
+      "bottom": "Branches from37,174 extend toleft/rightbottomnativey194, not clearfree-endcaps. Treat continuation beyondframe UNKNOWN, do not synthesize terminalC/endH.",
+      "top": "CarbonylO topcrosses/touchesnativey0; no restoreupperglyph"
+    },
+    "noAdded": [
+      "No molecularformula",
+      "No additional methyl beyondcut",
+      "No stereo labels",
+      "No restoredhiddenbranch",
+      "No correctionofcroppedfigurefromknownname"
+    ]
+  },
+  "measurementLimits": "Nativeapprox pixelcenterlines ±1–2px. CCend offsets keptliteral rather than normalized. Pixeldata only used toclassify contact graybridge vs fullwhitegap; noSVG reviewed.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootOwnReview": {
+    "nativeFull5x": true,
+    "nativeCOLeftAndBottom10x": true,
+    "allPublicDe": true,
+    "captionTrueDamItalic": true,
+    "unknownBottomContinuationsNotCarbonCount": true,
+    "sourceApproxNotSubpixel": true,
+    "ownGrayBridgePixels": {
+      "17946": 0,
+      "18047": 181,
+      "17948": 0
+    },
+    "calculatedCOFootNotMeasuredSubpixel": true,
+    "sourceOnlyFootAudit": {
+      "agentVerticalRayEnd": [
+        179.5,
+        46
+      ],
+      "builderRayWithNativeGrayBridgeToIncomingArm": [
+        179.5,
+        48.44565217391305
+      ],
+      "meaning": "Giữ tiếp xúc mảnh có thật ở nguồn, không coi nêm trắng nội tại là ngắt; không thêm cầu nối ngang/không đo dưới pixel."
+    }
+  }
+}

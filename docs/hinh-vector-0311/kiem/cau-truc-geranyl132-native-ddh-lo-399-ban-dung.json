@@ -1,0 +1,29 @@
+[
+  {
+    "i": 132,
+    "hash": "180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f",
+    "fileNguon": "anh/180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f.png",
+    "svg": "geranyl132-native-ddh-d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace.svg",
+    "hashSvg": "d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace",
+    "byteSvg": 14711,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-39",
+        "de": "Geranyl acetate là chất lỏng có màu vàng có mùi thơm của hoa hồng. Geranyl acetate là một thành phần tự nhiên của hơn 60 loại tinh dầu và có nhiều trong tinh dầu hoa hồng (công thức như hình).",
+        "refs": [
+          {
+            "hash": "180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f",
+            "where": "VIP27-CDK-ESTER-TN-II-39.hinh.0.du_lieu",
+            "hashDataUrl": "7b1bf4a427b03a57eaccab34f731cc88cd71ac01c28c01f9d14694c8842febfa"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8FULLinsidebareC+2LEFTboundarypartialjunctions-2BOTTOMcutcontinuationsUNKNOWNtotalC/2OregularUPRIGHT/2CCdoubleSEPARATEoffsetrays-CC2TOPtinyGAPSKEEP-BOTTOMshortjoin/1CO2verticalraysLEFTnativegraybridge-RIGHTcontact/2regularUPRIGHTnums(1)(2)/EXACTGeranyl acetateTRUEdamITALIC/LEFTx0strokeCROP-BOTTOM2armsCROP-TOPcarbonylOCROP/NOrestoredhiddenbranch-molecularformula-H-stereo-arrow-answer-alias1248",
+    "hashSvgDaSoat": "d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

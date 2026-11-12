@@ -1,0 +1,21 @@
+[
+  {
+    "i": 132,
+    "hashSvg": "d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-ESTER-TN-II-39.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và CO/2CC/crop/captionmacros. Giữ8C trần trong đầy đủ+hai junctionméptrái chưa đầy đủ/hai continuationcắt đáy nên không gán tổngC hay phục hồi nhánh. Hai O thường thẳng, CO hai tia đứng leftbridge/rightcontact; CC offsetrays riêng, CCdưới TOPtinygaps/BOTTOMshortjoin giữ nguồn không ép nối. (1)(2) thường thẳng/Geranyl acetate đậm nghiêng đúng; top/left/bottomcrop giữ, không thấy cắt thêm/chạm/tràn/H/công thức/đápán thêm. Không alias1248, giao điểm tính không nhận native subpixel.",
+    "render": "/workspace/scratch/soat399-132-fresh.png",
+    "macro": [
+      "/workspace/scratch/geranyl132-co.png",
+      "/workspace/scratch/geranyl132-cc-crop.png",
+      "/workspace/scratch/geranyl132-caption.png"
+    ],
+    "hash": "180517339e2af6468b2daee8b441d3eb6a05ef333f893882f64cdedde244811f",
+    "hashSvgDaSoat": "d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace",
+    "runtimeProof": {
+      "file": "/workspace/scratch/geranyl132-runtime.log",
+      "sha256": "46bcdce6f3fa75ed9e923e5e1ebad4a81f97007bf76dd5ff6684262f39f6a26c",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/geranyl132-native-ddh-d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace.svg d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace\n132 { x: 0, y: 0, width: 242, height: 195 }\nPOSTSHOT_SHA d6ca01d7558ce961391364c8f142923564e98abdd857ba8cef682e2b55a62ace\nCOMMAND node /workspace/scratch/agent-render399.cjs; content actual SVG fs.readFileSync via page.setContent\n"
+    }
+  }
+]
