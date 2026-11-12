@@ -68,6 +68,20 @@ if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? 
   bangTop.push('', '#### Theo giờ, 8 giờ qua (giờ UTC · hàng đọc · lượt · 90 ký tự đầu)')
   for (const x of ds) bangTop.push(`- ${String(x.dimensions.datetimeHour).slice(5, 16)} · ${so(x.sum.rowsRead)} · ${so(x.count)} · \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 90)}\``)
   if (!ds.length) bangTop.push(`(không đọc được: ${String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
+// 13/11: THEO GIỜ 50 giờ qua (giờ VN) — mọi khoản tính tiền, để so cùng khung giờ trước / sau một lượt phát hành (dự báo cả kỳ tuyến tính nên trễ).
+{ const tu50 = new Date(now - 50 * 3600e3).toISOString(), den = now.toISOString()
+  const gio = async (ten, than, locThem = '') => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
+    query: `query($a:String!){viewer{accounts(filter:{accountTag:$a}){${ten}(limit:10000,filter:{datetime_geq:"${tu50}",datetime_leq:"${den}"${locThem}}){${than}}}}}` }) }).then((r) => r.json()).catch(() => null)
+    const m = new Map(); for (const x of j?.data?.viewer?.accounts?.[0]?.[ten] ?? []) { const k = x.dimensions.datetimeHour; const o = m.get(k) ?? {}; for (const [kk, v] of Object.entries(x.sum ?? {})) o[kk] = (o[kk] ?? 0) + (Number(v) || 0); m.set(k, o) } return m }
+  const [mD1, mWk, mDo] = await Promise.all([
+    gio('d1AnalyticsAdaptiveGroups', 'sum{rowsRead rowsWritten} dimensions{datetimeHour}'),
+    gio('workersInvocationsAdaptive', 'sum{requests cpuTimeUs} dimensions{datetimeHour}'),
+    gio('durableObjectsInvocationsAdaptiveGroups', 'sum{requests} dimensions{datetimeHour}')])
+  const cacGio = [...new Set([...mD1.keys(), ...mWk.keys(), ...mDo.keys()])].sort()
+  const vn = (t) => { const d = new Date(new Date(t).getTime() + 7 * 3600e3); return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')} ${String(d.getUTCHours()).padStart(2, '0')}h` }
+  bangTop.push('', '### Theo giờ, 50 giờ qua (giờ VN)', '', '| Giờ VN | D1 hàng đọc | D1 hàng ghi | Worker lượt | Worker CPU ms | DO lượt |', '|---|---|---|---|---|---|')
+  for (const k of cacGio) { const a = mD1.get(k) ?? {}, w = mWk.get(k) ?? {}, d = mDo.get(k) ?? {}
+    bangTop.push(`| ${vn(k)} | ${so(a.rowsRead)} | ${so(a.rowsWritten)} | ${so(w.requests)} | ${so(w.cpuTimeUs == null ? null : w.cpuTimeUs / 1000)} | ${so(d.requests)} |`) } }
 // LIVE (thầy 11/11 «phần live có tăng thêm tiền không»): Realtime SFU/TURN (gói gồm 1 TB ra/tháng, vượt 0,05 USD/GB) + Durable Object theo vùng 30 ngày qua.
 const tu30 = new Date(now - 30 * 86400e3).toISOString()
 const g30 = async (ten, than) => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
