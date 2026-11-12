@@ -1,6 +1,6 @@
 // SỔ «MỜI RA KHỎI LỚP» CỦA BUỔI LIVE (thầy 13/11, luật rời màn — src/lib/bpu/phong-luat.ts). Văn phòng trực live (Javis DDH) cần biết NGAY em nào vừa bị
 // mời ra / bị thầy từ chối / được vào lại để nhắn Zalo cho phụ huynh ⇒ phòng ghi từng việc vào bảng `live_moi_ra` (CHỈ-THÊM, DDL lúc chạy) và văn phòng đọc
-// qua `POST /gv/bpu/moi-ra` (mã GV như các lệnh văn phòng khác). App KHÔNG tự nhắn phụ huynh. Hợp đồng: docs/hop-dong-live-moi-ra-van-phong-1311.md.
+// qua `POST /gv/bpu/moi-ra` (mã GV như các lệnh văn phòng khác). Tin kết thúc buổi lấy số liệu ở `POST /gv/bpu/live-thong-ke`. App KHÔNG tự nhắn phụ huynh. Hợp đồng: docs/hop-dong-live-moi-ra-van-phong-1311.md.
 import type { SuKienLuat } from '../../src/lib/bpu/phong-luat'
 import type { Env } from './kieu'
 import { chayDdlMotLan } from './ddl-mot-lan'
@@ -43,4 +43,46 @@ export async function gvLiveMoiRa(env: Env, b: Row, nowMs = Date.now()): Promise
     luc: num(r.luc), gio: gioVn(num(r.luc)), ngay: ngayVn(num(r.luc)), buoiId: str(r.buoi_id), phong: str(r.phong), khoi: num(r.khoi),
   }))
   return { ok: true, ds, moc: ds.length ? ds[ds.length - 1]!.stt : sau }
+}
+
+// ───────────────────────── THỐNG KÊ BUỔI LIVE (tin kết thúc của văn phòng) ─────────────────────────
+const khoiCua = (lop: unknown): number => Number(/(?:^|\D)(1[0-2])(?:\D|$)/.exec(str(lop))?.[1] ?? 0)
+/** `POST /gv/bpu/live-thong-ke { buoiId? }` — số liệu MỘT buổi live theo khối cho tin kết thúc của văn phòng: sĩ số khối, em có mặt, em KHÔNG vào live, số lần
+ *  rời màn của từng em, em bị mời ra (đang chờ / bị từ chối / đã vào lại). Bỏ `buoiId` ⇒ buổi live mở gần nhất. Đọc-chỉ: một đợt D1 + một lượt hỏi phòng.
+ *  `hoiPhong` = cách hỏi phòng (truyền vào để tệp này không kéo theo mã phòng; test thay bằng phòng giả). */
+export async function gvLiveThongKe(env: Env, b: Row, hoiPhong: (buoiId: string) => Promise<Row>): Promise<Row> {
+  let id = str(b.buoiId).trim()
+  if (!id) id = str((await env.DB.prepare("SELECT id FROM buoi_hoc WHERE lop LIKE 'Live Khối %' ORDER BY mo_luc DESC LIMIT 1").first<Row>().catch(() => null))?.id)
+  if (!id) return { ok: false, lyDo: 'khong-co-buoi', error: 'Chưa có buổi live nào.' }
+  const docMoiRa = env.DB.prepare('SELECT sbd, ten, loai, lan, n, luc FROM live_moi_ra WHERE buoi_id = ? ORDER BY stt').bind(id).all<Row>().then((r) => r.results ?? []).catch(() => [] as Row[])
+  const [[buoiR, hsR], tk, sk] = await Promise.all([
+    env.DB.batch([
+      env.DB.prepare('SELECT id, ten, lop, mo_luc, dong_luc FROM buoi_hoc WHERE id = ?').bind(id),
+      env.DB.prepare("SELECT sbd, ho_ten, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'"),
+    ]),
+    hoiPhong(id), docMoiRa,
+  ])
+  const buoi = (buoiR?.results as Row[] | undefined)?.[0]
+  if (!buoi) return { ok: false, lyDo: 'khong-co-buoi', error: 'Không có buổi này.' }
+  const khoi = khoiCua(buoi.lop), hs = new Map<string, { ten: string; lop: string; khoi: number }>()
+  for (const h of (hsR?.results as Row[] | undefined) ?? []) hs.set(str(h.sbd), { ten: str(h.ho_ten), lop: str(h.ten_lop) || str(h.lop), khoi: khoiCua(h.lop) || khoiCua(h.ten_lop) })
+  const ten = (sbd: string, duPhong = ''): string => hs.get(sbd)?.ten || duPhong || sbd, lop = (sbd: string): string => hs.get(sbd)?.lop ?? ''
+  // phòng: [sbd, tên, đã vào (1/0), số lần rời màn]
+  const em = (Array.isArray(tk.em) ? (tk.em as unknown[]) : []).flatMap((x) => (Array.isArray(x) && str(x[0]) ? [{ sbd: str(x[0]), ten: ten(str(x[0]), str(x[1])), lop: lop(str(x[0])), vao: num(x[2]) === 1, roi: num(x[3]) }] : []))
+  const coMat = em.filter((e) => e.vao), daVao = new Set(coMat.map((e) => e.sbd))
+  const vang = khoi ? [...hs].filter(([sbd, h]) => h.khoi === khoi && !daVao.has(sbd)).map(([sbd, h]) => ({ sbd, ten: h.ten, lop: h.lop })) : []
+  // sổ mời ra: gộp theo em — lần mời ra cuối + việc xảy ra sau đó
+  const moiRa = new Map<string, { sbd: string; ten: string; lop: string; soLan: number; lan: number; gio: string; trangThai: 'cho' | 'tu-choi' | 'da-vao-lai' }>()
+  for (const r of sk) {
+    const sbd = str(r.sbd), loai = str(r.loai), cu = moiRa.get(sbd)
+    if (loai === 'ra') moiRa.set(sbd, { sbd, ten: ten(sbd, str(r.ten)), lop: lop(sbd), soLan: (cu?.soLan ?? 0) + 1, lan: num(r.lan), gio: gioVn(num(r.luc)), trangThai: 'cho' })
+    else if (cu) cu.trangThai = loai === 'tu' ? 'tu-choi' : 'da-vao-lai'
+  }
+  return {
+    ok: true, buoiId: id, ten: str(buoi.ten), khoi, moLuc: str(buoi.mo_luc), dongLuc: str(buoi.dong_luc) || null, coPhong: tk.ok === true, dangLive: tk.dangLive === true, ketThuc: tk.ketThuc === true || !!str(buoi.dong_luc),
+    siSo: khoi ? coMat.length + vang.length : coMat.length, soCoMat: coMat.length, soVang: vang.length,
+    coMat: coMat.map((e) => ({ sbd: e.sbd, ten: e.ten, lop: e.lop, roi: e.roi })).sort((x, y) => y.roi - x.roi || x.ten.localeCompare(y.ten, 'vi')),
+    roiMan: coMat.filter((e) => e.roi > 0).map((e) => ({ sbd: e.sbd, ten: e.ten, lop: e.lop, lan: e.roi })).sort((x, y) => y.lan - x.lan),
+    moiRa: [...moiRa.values()], vang: vang.sort((x, y) => x.lop.localeCompare(y.lop, 'vi') || x.ten.localeCompare(y.ten, 'vi')),
+  }
 }

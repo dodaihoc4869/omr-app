@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 import worker from '../server/src/index'
 import { goiWorker, taoD1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
-import { ghiMoiRa, gvLiveMoiRa } from '../server/src/live-moi-ra'
+import { ghiMoiRa, gvLiveMoiRa, gvLiveThongKe } from '../server/src/live-moi-ra'
 import { liveBat, liveDat } from '../src/lib/bpu/phong-live'
 import { datLuat, layChoGhiLuat, luatDuyet } from '../src/lib/bpu/phong-luat'
 import { roiMan, taoPhong, vaoLop, veMan, type TrangThaiPhong } from '../src/lib/bpu/phong'
@@ -70,5 +70,33 @@ describe('/gv/bpu/moi-ra — văn phòng đọc sổ', () => {
     expect((await gvLiveMoiRa(env, {}, NAY + 2 * 86_400_000) as { ds: unknown[] }).ds).toEqual([])
     expect((await gvLiveMoiRa(env, { buoiId: 'khac' }, NAY + 120_000) as { ds: unknown[] }).ds).toEqual([])
     expect((await gvLiveMoiRa(env, { toiDa: 1 }, NAY + 120_000) as { ds: unknown[] }).ds).toHaveLength(1)
+  })
+})
+
+describe('/gv/bpu/live-thong-ke — số liệu cho tin kết thúc buổi của văn phòng', () => {
+  const themBuoi = (d: ReturnType<typeof taoD1That>, id: string, lop: string, mo: string) => d.sql.prepare('INSERT INTO buoi_hoc (id, ten, lop, bi_mat, mo_luc, het_han, dong_luc, cap_nhat_luc) VALUES (?,?,?,?,?,?,?,?)').run(id, `Live · ${id}`, lop, 'x', mo, mo, null, mo)
+  const themEm = (d: ReturnType<typeof taoD1That>, sbd: string, ten: string, lop: string) => d.sql.prepare('INSERT INTO hoc_sinh (sbd, ho_ten, lop, mat_khau, cap_nhat_luc) VALUES (?,?,?,?,?)').run(sbd, ten, lop, 'mk123456', 'x')
+  // phòng giả: S1 vào, rời 3 lần; S2 vào, không rời; S7 có tên trong phòng nhưng chưa bấm tham gia
+  const phongGia = async () => ({ ok: true, phong: 'Live Khối 10', ketThuc: true, dangLive: false, em: [['S1', 'Gia Bảo', 1, 3], ['S2', 'Minh Khôi', 1, 0], ['S7', 'Em chưa vào', 0, 0]] })
+  it('có mặt, vắng (em của khối không vào live), số lần rời màn, em bị mời ra kèm việc xảy ra sau đó', async () => {
+    const { d, env } = moi() // đã có S1 lớp 10
+    themEm(d, 'S2', 'Lê Minh Khôi', '10'); themEm(d, 'S3', 'Phạm Thu Hà', '10'); themEm(d, 'S9', 'Em Khối Khác', '11')
+    themBuoi(d, 'b1', 'Live Khối 10', '2026-11-13T12:00:00.000Z')
+    await ghiMoiRa(env, BUOI, [{ loai: 'ra', sbd: 'S1', luc: NAY, lan: 3, n: 3 }, { loai: 'tu', sbd: 'S1', luc: NAY + 60_000 }])
+    const r = await gvLiveThongKe(env, { buoiId: 'b1' }, phongGia) as Record<string, any>
+    expect(r).toMatchObject({ ok: true, buoiId: 'b1', khoi: 10, coPhong: true, ketThuc: true, siSo: 3, soCoMat: 2, soVang: 1 })
+    expect(r.coMat).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', roi: 3 }, { sbd: 'S2', ten: 'Lê Minh Khôi', lop: '10', roi: 0 }])
+    expect(r.roiMan).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', lan: 3 }])
+    expect(r.vang).toEqual([{ sbd: 'S3', ten: 'Phạm Thu Hà', lop: '10' }]) // em khối 11 không tính; S7 chưa bấm tham gia không có hồ sơ khối 10 ⇒ không tính
+    expect(r.moiRa).toEqual([{ sbd: 'S1', ten: 'Trần Gia Bảo', lop: '10', soLan: 1, lan: 3, gio: '19:30', trangThai: 'tu-choi' }])
+  })
+  it('bỏ buoiId ⇒ buổi live mở gần nhất; phòng không trả lời ⇒ vẫn trả sĩ số và sổ mời ra; chưa có buổi ⇒ báo rõ; cần mã GV', async () => {
+    const { d, env } = moi()
+    expect(await gvLiveThongKe(env, {}, phongGia)).toMatchObject({ ok: false, lyDo: 'khong-co-buoi' })
+    themBuoi(d, 'cu', 'Live Khối 12', '2026-11-10T12:00:00.000Z'); themBuoi(d, 'moi', 'Live Khối 10', '2026-11-13T12:00:00.000Z'); themBuoi(d, 'lop-thuong', '12A', '2026-11-14T12:00:00.000Z')
+    const r = await gvLiveThongKe(env, {}, async () => ({ ok: false })) as Record<string, any>
+    expect(r).toMatchObject({ ok: true, buoiId: 'moi', khoi: 10, coPhong: false, soCoMat: 0, soVang: 1, moiRa: [] })
+    expect((await goiWorker(worker, env, '/gv/bpu/live-thong-ke', {}, false)).ok).toBe(false)
+    expect(await goiWorker(worker, env, '/gv/bpu/live-thong-ke', { buoiId: 'moi' }, true)).toMatchObject({ ok: true, buoiId: 'moi', coPhong: false })
   })
 })
