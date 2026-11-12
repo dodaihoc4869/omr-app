@@ -1,0 +1,545 @@
+{
+  "i": 502,
+  "assetIndexProvided": 1345,
+  "hash": "5c9a883925f510724263de76113c585134b2750ba84769b77099ecc2e9a2d2f1",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5c9a883925f510724263de76113c585134b2750ba84769b77099ecc2e9a2d2f1.png",
+  "size": [
+    806,
+    171
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B13-II-3",
+      "de": "Cao su thiên nhiên là một loại polymer được tạo bởi các mắt xích isoprene. Cấu trúc của một đoạn mạch cao su thiên nhiên như hình thứ nhất.\nMuốn sử dụng được trong thực tế, người ta phải thực hiện quá trình lưu hóa cao su thiên nhiên để tạo ra cao su lưu hóa theo sơ đồ ở hình thứ hai.\nQuá trình lưu hóa cao su là quá trình thay thế hai nguyên tử H ở hai nhóm $\\ce{CH2}$ trong các mạch polymer bằng cầu disulfide ($\\ce{-S-S-}$).",
+      "allHinh": [
+        {
+          "hash": "5c9a883925f510724263de76113c585134b2750ba84769b77099ecc2e9a2d2f1",
+          "where": "VIP27-C4-B13-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "4343bc98b7a53321330a94eb06a31a776e3d26c4f97e642d89a1821f477873a6"
+        },
+        {
+          "hash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503",
+          "where": "VIP27-C4-B13-II-3.hinh.1.du_lieu",
+          "hashDataUrl": "40a1e6cbea0171b9b3e68c8696110bbb772a194e0cbb4066857be9b86c3b75eb"
+        }
+      ],
+      "missingHashes": [
+        "5c9a883925f510724263de76113c585134b2750ba84769b77099ecc2e9a2d2f1",
+        "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfONLYThisAdmitted": 0,
+    "partialOnly": true,
+    "missingPartnerI": 723,
+    "missingPartnerHash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503"
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownLeft4xOpened": true,
+    "ownH20xFontOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxbboxes/shaftpositionsnotuniformnormalized. Literaltext-boxedgebondanchorsretained, NOTchemicalC-centerforcedifprintedbondtouchessubscriptedge.",
+  "geometry": {
+    "labels": [
+      {
+        "text": "CH₂",
+        "bbox": [
+          45,
+          100,
+          96,
+          127
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "C",
+        "bbox": [
+          111,
+          54,
+          132,
+          78
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "C",
+        "bbox": [
+          169,
+          54,
+          189,
+          78
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          198,
+          100,
+          249,
+          127
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          262,
+          54,
+          315,
+          81
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "C",
+        "bbox": [
+          327,
+          100,
+          348,
+          124
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "C",
+        "bbox": [
+          386,
+          100,
+          407,
+          124
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          415,
+          54,
+          468,
+          81
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          479,
+          100,
+          532,
+          127
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "C",
+        "bbox": [
+          544,
+          54,
+          565,
+          78
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "C",
+        "bbox": [
+          603,
+          54,
+          624,
+          78
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₂",
+        "bbox": [
+          633,
+          100,
+          685,
+          127
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₃",
+        "bbox": [
+          46,
+          8,
+          99,
+          36
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          198,
+          8,
+          220,
+          31
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₃",
+        "bbox": [
+          262,
+          145,
+          315,
+          171
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          414,
+          145,
+          436,
+          169
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "CH₃",
+        "bbox": [
+          478,
+          8,
+          532,
+          36
+        ],
+        "font": "TRUEBOLDuprightsans"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          631,
+          8,
+          653,
+          31
+        ],
+        "font": "TRUEBOLDuprightsans"
+      }
+    ],
+    "singleBonds": [
+      [
+        [
+          14,
+          112
+        ],
+        [
+          45,
+          112
+        ]
+      ],
+      [
+        [
+          94,
+          104
+        ],
+        [
+          113,
+          77
+        ]
+      ],
+      [
+        [
+          97,
+          33
+        ],
+        [
+          113,
+          54
+        ]
+      ],
+      [
+        [
+          188,
+          54
+        ],
+        [
+          201,
+          33
+        ]
+      ],
+      [
+        [
+          188,
+          79
+        ],
+        [
+          201,
+          100
+        ]
+      ],
+      [
+        [
+          243,
+          104
+        ],
+        [
+          263,
+          79
+        ]
+      ],
+      [
+        [
+          313,
+          79
+        ],
+        [
+          328,
+          100
+        ]
+      ],
+      [
+        [
+          328,
+          126
+        ],
+        [
+          311,
+          154
+        ]
+      ],
+      [
+        [
+          404,
+          100
+        ],
+        [
+          417,
+          79
+        ]
+      ],
+      [
+        [
+          404,
+          126
+        ],
+        [
+          415,
+          142.5
+        ]
+      ],
+      [
+        [
+          467,
+          79
+        ],
+        [
+          482,
+          101
+        ]
+      ],
+      [
+        [
+          528,
+          104
+        ],
+        [
+          546,
+          77
+        ]
+      ],
+      [
+        [
+          532,
+          33
+        ],
+        [
+          547,
+          54
+        ]
+      ],
+      [
+        [
+          621,
+          54
+        ],
+        [
+          634,
+          33
+        ]
+      ],
+      [
+        [
+          621,
+          79
+        ],
+        [
+          635,
+          100
+        ]
+      ],
+      [
+        [
+          685,
+          112
+        ],
+        [
+          720,
+          112
+        ]
+      ]
+    ],
+    "doubleBonds": [
+      [
+        [
+          [
+            133,
+            64
+          ],
+          [
+            167,
+            64
+          ]
+        ],
+        [
+          [
+            133,
+            68
+          ],
+          [
+            167,
+            68
+          ]
+        ]
+      ],
+      [
+        [
+          [
+            350,
+            110
+          ],
+          [
+            383,
+            110
+          ]
+        ],
+        [
+          [
+            350,
+            114
+          ],
+          [
+            383,
+            114
+          ]
+        ]
+      ],
+      [
+        [
+          [
+            566,
+            64
+          ],
+          [
+            600,
+            64
+          ]
+        ],
+        [
+          [
+            566,
+            68
+          ],
+          [
+            600,
+            68
+          ]
+        ]
+      ]
+    ],
+    "nativeAnchorNotes": [
+      "FirstCH3printedbbox46..99, bondstarts9733nearRIGHTsub3edge→11354; doNOTpulltoFIRSTC55becausechemistry.",
+      "MiddlelowerCH3bond328126→311154nearRIGHTsub3edge;thirdtopCH3bond53233→54754 likewisegroupedge.",
+      "CH2groupsentered/exitedoppositelabelboxsides, preservingnativeglyphwhitegaps. Firstfreeend14,112→45,112 entersFIRSTCleftink;lastfree685112→720112leavesRIGHTsub2edge, notFIRSTC637.",
+      "Known6explicitCglyphs; preserveeach2double-rayendwhitegapbeforeCink. NoextraCglyphatgroupedge."
+    ],
+    "font": "ALLlabelstrueBOLDuprightsans(sourceHmacroheavy3pxstems+bar), noitalic. Digits2/3SUB, allbondsgraythinuniform~1.3px.",
+    "countsObserved": {
+      "explicitCLabels": 6,
+      "CH2Labels": 6,
+      "CH3Labels": 3,
+      "standaloneHLabels": 3,
+      "totalKnownC": 15,
+      "knownHIncludingGroups": 24,
+      "CCdouble": 3,
+      "singleBondShaftsIncludingFreeEnds": 16,
+      "freeEnds": 2,
+      "captions": 0,
+      "rings": 0,
+      "brackets": 0
+    },
+    "crop": "MiddlebottomCH3sub3atnativebottomedge171, preservecrop/noaddedpaddingrestoration.",
+    "noTheoryNormalize": [
+      "Noisoprenemonomeranswer",
+      "NoSbridgesfrompartner",
+      "NoCH3anchorcorrectiontoC",
+      "NochangedEZorientation",
+      "Nopolymername",
+      "NoHdeletion",
+      "Noaliases",
+      "Noaddedrepeatn"
+    ],
+    "croppedBottomCH3": {
+      "groupBBoxVisible": [
+        262,
+        145,
+        315,
+        171
+      ],
+      "baselineMainCHApprox": 165,
+      "sub3VisibleBBoxApprox": [
+        301,
+        160,
+        315,
+        171
+      ],
+      "nativeLastPixelRow": 170,
+      "status": "SUB3continuesintobottomboundary/cropped, fullglyphloweroutlineNOTvisible. Keepviewheight171clip,noexpandcanvas/restorehiddenlowerpart.",
+      "baselinePrecision": "Approx1px, NOTinfermissingglyphfromtheoryfontshape."
+    }
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFull3xOpened": true,
+    "topGlyphBottomCrop6xOpened": true,
+    "allPublicDeAll2RefsRead": true,
+    "trueDamConfirmedIndependently": true,
+    "nativeHeight171CropRetained": true,
+    "compoundFont28ActualAdvanceChecked": true,
+    "sourceApproxNotSubpixel": true
+  },
+  "rootCorrection": {
+    "oldApproxEndpoint": [
+      418,
+      147
+    ],
+    "ownNativeH12xWhiteGapConfirmed": true,
+    "initialActualSvgRejected": "822fdda7a7c265a04d67b8c691741d53c09751baa79394a4f1b04c6c08a6ee3f",
+    "finalCalculatedEndpoint": [
+      415,
+      142.5
+    ],
+    "sameAngle": true,
+    "endpointCalculatedNotNativeSubpixel": true,
+    "otherGeometryGlyphsUnchanged": true
+  },
+  "sourceStageStatus": "source-only/noSVG/noCount",
+  "finalStage": {
+    "hashSvg": "3e38a4c4091bae7b0823c31b7a138ba62572563691a208017ac22dc72ba8a091",
+    "actualSvgReviewed": true,
+    "readonlyProof": "/workspace/scratch/soat-poly502-lo384.json",
+    "runtime": "/workspace/scratch/poly502-final-runtime.log",
+    "newFull": 0
+  }
+}
