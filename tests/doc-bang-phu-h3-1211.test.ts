@@ -8,6 +8,8 @@ import { sqlGvKtCn, sqlGvKtCnCu, gvKtCn } from '../server/src/kiem-tra-ca-nhan-t
 import { SQL_KT_CN } from '../server/src/kiem-tra-ca-nhan-schema'
 import { ngayKt, congNgayKt, dauNgayKt } from '../server/src/kiem-tra-ca-nhan-loi'
 import { sqlTenLopHs } from '../server/src/goi-bai-7'
+import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
+import { SQL_SAN_SANG, BANG_SAN_SANG, SQL_SAN_SANG_LECH } from '../server/src/san-sang'
 
 const NGAY = 86_400_000
 const T = Date.UTC(2026, 10, 12, 13, 0, 0) // 20:00 VN — khung học
@@ -245,6 +247,42 @@ describe('Q7 tổng EXP: chỉ mục phủ (sbd, luc, exp, ngay_vn)', () => {
       .toMatch(/SEARCH exp_so USING COVERING INDEX exp_so_em_luc \(sbd=\? AND luc>\?\)/)
     expect(keHoach(d.sql, "WITH mua AS (SELECT '2026-11-01' AS s) SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= mua.s) AS e FROM mua").join('\n'))
       .toMatch(/SEARCH exp_so USING COVERING INDEX exp_so_em_luc \(sbd=\? AND luc>\?\)/)
+  })
+})
+
+// ------------------------------------------------------------------ Q1 · cron lập sẵn Sảnh: em có bản lệch dấu (san-sang.ts)
+/** Câu CŨ (trước 12/11 tối): `goi_moi` dò mọi dòng nhận gói của em. */
+const SQL_SAN_SANG_LECH_CU = `SELECT x.value AS sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.value ORDER BY g.created_at DESC LIMIT 1) AS gan,
+        EXISTS(SELECT 1 FROM goi_bai_7_em e2 JOIN goi_bai_7 g2 ON g2.id=e2.goi_id WHERE e2.sbd=x.value AND g2.tao_luc > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch')) AS goi_moi
+        FROM json_each(?) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.value AND s.ngay=? AND s.dau LIKE ? ORDER BY x.value`
+describe('Q1 lập sẵn Sảnh: «gói mới» đi từ gói tạo sau lúc lập bản', () => {
+  it('y hệt câu cũ (cùng dòng, cùng thứ tự) + kế hoạch đi từ chỉ mục lúc tạo gói', () => {
+    const d = taoD1That()
+    for (const q of SQL_GOI7) d.sql.exec(q)
+    for (const q of SQL_SAN_SANG) d.sql.exec(q)
+    const LUC = Date.UTC(2026, 10, 12, 10, 0, 0), iso = (ms: number) => new Date(ms).toISOString()
+    const goi = d.sql.prepare("INSERT INTO goi_bai_7(id,tick_id,lop,khoa_bai,ten,bat_dau,han,tao_luc) VALUES(?,?,'12A','b','B','2026-11-01','2026-11-30',?)")
+    const nhan = d.sql.prepare("INSERT INTO goi_bai_7_em(goi_id,sbd,bat_dau,han) VALUES(?,?,'2026-11-01','2026-11-30')")
+    // g1 cũ, g2 tạo đúng lúc lập bản (không «sau»), g3 tạo sau 1 ms, g4 tạo sau nhưng chỉ E2 nhận.
+    goi.run('g1', 't1', iso(LUC - 86_400_000)); goi.run('g2', 't2', iso(LUC)); goi.run('g3', 't3', iso(LUC + 1)); goi.run('g4', 't4', iso(LUC + 3_600_000))
+    for (const s of ['E0', 'E1', 'E2', 'E3', 'E4']) nhan.run('g1', s)
+    nhan.run('g2', 'E0'); nhan.run('g2', 'E3'); nhan.run('g3', 'E1'); nhan.run('g4', 'E2'); nhan.run('g4', 'E9')
+    const ss = d.sql.prepare(`INSERT INTO ${BANG_SAN_SANG}(sbd,ngay,luc,dau) VALUES(?,?,?,?)`)
+    ss.run('E0', '2026-11-12', LUC, 'v9§a'); ss.run('E1', '2026-11-12', LUC, 'v9§b'); ss.run('E2', '2026-11-12', LUC + 7_200_000, 'v9§c')
+    ss.run('E3', '2026-11-12', LUC - 5, 'v9§d'); ss.run('E4', '2026-11-11', LUC, 'v9§e'); ss.run('E5', '2026-11-12', LUC, 'v8§f')
+    const ses = d.sql.prepare("INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,'{}',?)")
+    ses.run('s1', 'E0', '2026-11-12T01:00:00.000Z'); ses.run('s2', 'E0', '2026-11-12T03:00:00.000Z'); ses.run('s3', 'E3', '2026-11-10T03:00:00.000Z')
+    const em = JSON.stringify(['E0', 'E1', 'E2', 'E3', 'E4', 'E5', 'E9'])
+    for (const [ngay, dau] of [['2026-11-12', 'v9§%'], ['2026-11-11', 'v9§%'], ['2026-11-12', 'v8§%']] as const) {
+      const moi = d.sql.prepare(SQL_SAN_SANG_LECH).all(em, ngay, dau)
+      expect(moi).toEqual(d.sql.prepare(SQL_SAN_SANG_LECH_CU).all(em, ngay, dau))
+    }
+    const r = d.sql.prepare(SQL_SAN_SANG_LECH).all(em, '2026-11-12', 'v9§%') as { sbd: string; goi_moi: number }[]
+    expect(r.map((x) => `${x.sbd}:${x.goi_moi}`)).toEqual(['E0:0', 'E1:1', 'E2:0', 'E3:1'])
+    const ke = keHoach(d.sql, SQL_SAN_SANG_LECH)
+    expect(ke.some((x) => /SEARCH g2 USING (COVERING )?INDEX goi_bai_7_tao \(tao_luc>\?\)/.test(x))).toBe(true)
+    expect(ke.some((x) => /SEARCH e2 USING COVERING INDEX sqlite_autoindex_goi_bai_7_em_1 \(goi_id=\? AND sbd=\?\)/.test(x))).toBe(true)
+    expect(ke.join('\n')).not.toMatch(/goi_bai_7_em_sbd/)
   })
 })
 
