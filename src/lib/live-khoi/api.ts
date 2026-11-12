@@ -23,7 +23,12 @@ export const suaLichLive = (id: string, o: { khoi: KhoiLive; batDau: number; ten
 export const huyLichLive = (id: string) => lenhDs('/gv/bpu/khoi-huy', { id })
 /** Mở PHÒNG CHỜ cho khối (mở ngay, hoặc mở buổi đã hẹn khi có `id`). Máy chủ tự mở buổi học của khối và trả `buoiId` để bảng nối phòng. */
 export async function moLiveKhoi(o: { khoi: KhoiLive; id?: string; ten?: string }): Promise<KetQuaLenh<{ lich: LichLive; buoiId: string; ma: string }>> {
-  const r = await goiLenh('/gv/bpu/khoi-mo', o, CHUA_CO)
+  let r = await goiLenh('/gv/bpu/khoi-mo', o, CHUA_CO)
+  // Máy chủ trả lời chậm (thầy 12/11): lệnh có thể ĐÃ chạy xong phía máy chủ ⇒ hỏi lại lịch; phòng của khối đã mở thì vào lại ĐÚNG phòng đó (không mở phòng thứ hai).
+  if (!r.ok && r.loai === 'cham') {
+    const d = await taiLichLive(), l = d.ok ? d.du.lich.find((x) => x.khoi === o.khoi && (x.trangThai === 'cho' || x.trangThai === 'dang') && x.buoiId) : undefined
+    if (l) r = await goiLenh('/gv/bpu/khoi-mo', { khoi: o.khoi, id: l.id }, CHUA_CO)
+  }
   if (!r.ok) return r
   const lich = docLich(r.du.lich)
   if (!lich || typeof r.du.buoiId !== 'string') return { ok: false, loai: 'khong_doc_duoc', chu: 'Máy chủ trả lời lạ. Thầy thử lại.' }

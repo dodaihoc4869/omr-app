@@ -110,6 +110,19 @@ async function tenLopCuaMotEm(env: Env, sbd: string): Promise<string> {
 }
 
 // ───────────────────────── LỆNH CỦA THẦY ─────────────────────────
+/** MỞ BUỔI KHÔNG ĐỌC LẠI (thầy 12/11, Live theo khối «mở quá chậm … làm cho tức thì»): trả mã buổi mới + lệnh chèn CHƯA chạy để nơi gọi ghép vào MỘT batch D1
+ *  với lệnh ghi của mình (live-khoi.ts: chèn buổi + ghi lịch = một đợt chờ; không đọc lại buổi, không đọc danh sách cả trường như `xemBuoi`). */
+export type LenhD1 = ReturnType<ReturnType<Env['DB']['prepare']>['bind']>
+export function lenhMoBuoi(env: Env, o: { lop: string; ten: string }, nowMs: number): { id: string; lenh: LenhD1 } {
+  const nay = new Date(nowMs).toISOString(), id = taoId(nowMs)
+  return {
+    id,
+    lenh: env.DB.prepare('INSERT INTO buoi_hoc (id, ten, lop, bi_mat, mo_luc, het_han, dong_luc, cap_nhat_luc) VALUES (?,?,?,?,?,?,NULL,?)')
+      .bind(id, o.ten.slice(0, TOI_DA_TEN), o.lop.slice(0, 40), taoBiMat(), nay, new Date(nowMs + HAN_BUOI_MS).toISOString(), nay),
+  }
+}
+/** Bảng buổi học đã dựng (một lần mỗi isolate) — nơi gọi chờ SONG SONG với đợt đọc của mình trước khi chạy `lenhMoBuoi`. */
+export const sanSangBuoiHoc = (env: Env): Promise<void> => taoBang(env)
 
 /** `POST /gv/buoi-hoc {action, ...}` — một cửa cho mọi việc của thầy với buổi học. */
 export async function gvBuoiHoc(env: Env, b: Row, nowMs: number = Date.now()): Promise<Row> {
@@ -120,10 +133,8 @@ export async function gvBuoiHoc(env: Env, b: Row, nowMs: number = Date.now()): P
   if (action === 'mo') {
     const lop = str(b.lop).slice(0, 40)
     const ten = (str(b.ten) || `Buổi học ${ngayVnCua(nowMs).split('-').reverse().join('/')}${lop ? ` · ${lop}` : ''}`).slice(0, TOI_DA_TEN)
-    const id = taoId(nowMs)
-    await env.DB.prepare('INSERT INTO buoi_hoc (id, ten, lop, bi_mat, mo_luc, het_han, dong_luc, cap_nhat_luc) VALUES (?,?,?,?,?,?,NULL,?)')
-      .bind(id, ten, lop, taoBiMat(), nay, new Date(nowMs + HAN_BUOI_MS).toISOString(), nay)
-      .run()
+    const { id, lenh } = lenhMoBuoi(env, { lop, ten }, nowMs)
+    await lenh.run()
     return xemBuoi(env, id, nowMs, b.kemLop === true)
   }
 
