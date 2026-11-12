@@ -43,6 +43,7 @@ import { daNho, envGhiRieng, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { boTroTheoQid } from './song-sinh-game'
+import { dsXep } from './ds-xep'
 import { damBaoBangTuHoanThien } from './tu-hoan-thien'
 import { TEN_NEN } from './thang-tu-go'
 import { phanTram, soP } from '../../src/lib/omni-chu'
@@ -347,13 +348,15 @@ const vknTuDong = (x: Row): Vkn => ({
   id: str(x.id), maDang: str(x.ma_dang), ten: str(x.ten), tenLoi: x.ten_loi == null || str(x.ten_loi) === '' ? null : str(x.ten_loi),
   nhanNen: x.nhan_nen == null || str(x.nhan_nen) === '' ? null : str(x.nhan_nen), thuTu: Number(x.thu_tu) || 0,
 })
+export const SQL_NHAN_NEN_LUI = 'SELECT b.qid_mau, b.nhan_nen_json FROM json_each(?) j CROSS JOIN cau_bo_tro b WHERE b.qid_mau = j.value'
 /** Nhãn nền từng bước của câu (`cau_bo_tro.nhan_nen_json`): theo băm nội dung (loi_giai_cau), lùi theo `qid_mau`. */
 async function docNhanNen(env: Env, qids: readonly string[]): Promise<Map<string, { buoc: number; nen: string }[]>> {
   const ra = new Map<string, { buoc: number; nen: string }[]>()
   if (!qids.length) return ra
   // Gói R 15/10 (đọc kho câu gom đợt): lượt LÙI theo `qid_mau` đọc CÙNG đợt với bổ trợ theo nội dung, cho mọi câu được hỏi — trước: chờ bổ trợ xong rồi mới đọc
   // phần thiếu (một đợt D1 nối tiếp). Câu đã có nhãn từ bổ trợ bị bỏ qua ĐÚNG như vòng lặp cũ (`!ra.has`) ⇒ kết quả y hệt; chỉ đọc thừa dòng của câu ấy.
-  const luiP = env.DB.prepare('SELECT qid_mau, nhan_nen_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each(?))').bind(dsJson(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // 12/11 (H2): nối thẳng danh sách đã xếp (ds-xep.ts) — D1 khỏi đọc danh sách lần hai; cùng dòng, cùng thứ tự như `IN (json_each)` cũ.
+  const luiP = env.DB.prepare(SQL_NHAN_NEN_LUI).bind(dsXep(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const bt = await boTroTheoQid(env, qids).catch(() => new Map())
   for (const [q, b] of bt) if (b.nhanNen?.length) ra.set(q, b.nhanNen)
   const thieu = qids.filter((q) => !ra.has(q))

@@ -6,6 +6,7 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 import { dongBoTro, docBangSongSinh, songSinhDuDuLieu, type BoTro, type SongSinh } from './cau-bo-tro'
 import { loaiQidAo, tachSongSinh } from './loi-hoc-luat'
 import { phuQidAoMoi } from './ban-khac-ao'
+import { dsXep } from './ds-xep'
 
 type Obj = Record<string, unknown>
 
@@ -47,6 +48,7 @@ function phu(q: PrivateQuestion, ss: SongSinh, i: number, them: { choices: strin
   }
 }
 
+export const SQL_BO_TRO_THEO_QID = 'SELECT lc.qid AS qid_hoi, b.* FROM json_each(?) j CROSS JOIN loi_giai_cau lc CROSS JOIN cau_bo_tro b WHERE lc.qid = j.value AND b.bam = lc.bam'
 /** Học liệu bổ trợ theo qid câu gốc (qid → băm qua `loi_giai_cau`). */
 export async function boTroTheoQid(env: Env, qids: readonly string[]): Promise<Map<string, BoTro>> {
   const ra = new Map<string, BoTro>()
@@ -54,8 +56,8 @@ export async function boTroTheoQid(env: Env, qids: readonly string[]): Promise<M
   if (!ds.length) return ra
   // MỘT truy vấn (JOIN qid → băm → học liệu), không tạo bảng trên đường đọc: kế hoạch ngày có ngân sách vòng D1 (do-toi-uu-may-chu-2809).
   // Bảng chưa có (chưa nạp học liệu lần nào) ⇒ lỗi ⇒ rỗng.
-  const r = await env.DB.prepare(`SELECT lc.qid AS qid_hoi, b.* FROM loi_giai_cau lc JOIN cau_bo_tro b ON b.bam = lc.bam WHERE lc.qid IN (SELECT value FROM json_each(?))`)
-    .bind(JSON.stringify(ds)).all<Obj>().catch(() => ({ results: [] as Obj[] }))
+  // 12/11 (H2, 32.799 lượt/ngày × 412 hàng): nối thẳng danh sách đã xếp (ds-xep.ts) thay cho `IN (json_each)` — D1 khỏi đọc danh sách lần hai; cùng dòng, cùng thứ tự.
+  const r = await env.DB.prepare(SQL_BO_TRO_THEO_QID).bind(dsXep(ds)).all<Obj>().catch(() => ({ results: [] as Obj[] }))
   for (const x of r.results ?? []) ra.set(String(x.qid_hoi), dongBoTro(x))
   return ra
 }

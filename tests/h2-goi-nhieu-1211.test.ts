@@ -7,6 +7,11 @@ import { caDangBaoVe } from '../server/src/game-v2-bank'
 import { chayDdlMotLan, lamMoiTenDoiTuongChung, SQL_TEN_DOI_TUONG, SQL_TEN_DOI_TUONG_CU } from '../server/src/ddl-mot-lan'
 import { dauKhoCau, SQL_DAU_KHO_CAU_CU } from '../server/src/dau-kho-cau'
 import { SQL_VAN_TAY, SQL_VAN_TAY_CU } from '../server/src/hanh-trinh-hop-nhat'
+import { boTroTheoQid, SQL_BO_TRO_THEO_QID } from '../server/src/song-sinh-game'
+import { SQL_NHAN_NEN_LUI } from '../server/src/omni-d1'
+import { docNoiDung, docNoiDungGon, SQL_NOI_DUNG, SQL_NOI_DUNG_GON } from '../server/src/tu-luyen-cau-sai'
+import { SQL_CAU_GON } from '../server/src/cau-gon'
+import { dsXep } from '../server/src/ds-xep'
 import type { Env } from '../server/src/kieu'
 
 type Row = Record<string, unknown>
@@ -211,5 +216,65 @@ describe('dấu bảng (dau_bang) — trigger giữ dấu đúng mọi kiểu gh
     }
     const kh = keHoach(d.sql, SQL_VAN_TAY, 'x')
     for (const t of ['dau_bang']) expect(kh.filter((x) => x.startsWith(`SEARCH ${t} USING INDEX sqlite_autoindex_${t}_1 (ten=?)`)).length, kh.join('\n')).toBe(3)
+  })
+})
+
+// ---------------------------------------------------------------- (5)(6)(10) IN (json_each) ⇒ nối thẳng danh sách đã xếp
+describe('(5)(6)(10) nối thẳng json_each (danh sách bỏ trùng + xếp BINARY) — dòng ra y hệt `IN (SELECT value FROM json_each(?))`', () => {
+  const CU5 = 'SELECT lc.qid AS qid_hoi, b.* FROM loi_giai_cau lc JOIN cau_bo_tro b ON b.bam = lc.bam WHERE lc.qid IN (SELECT value FROM json_each(?))'
+  const CU6 = 'SELECT qid_mau, nhan_nen_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each(?))'
+  const CU10 = `SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+       WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid IN (SELECT value FROM json_each(?))`
+  const CU10G = `SELECT game_v2_question.qid AS qid, game_v2_question.content_group AS content_group, ${SQL_CAU_GON}
+        FROM game_v2_question JOIN de_kho d ON d.ma_de = game_v2_question.ma_de
+        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+       WHERE COALESCE(d.da_xoa, 0) = 0 AND game_v2_question.qid IN (SELECT value FROM json_each(?)) AND json_valid(game_v2_question.json)`
+  /** qid có chữ thường/hoa, số, tiếng Việt, ký tự ngoài BMP, chuỗi rỗng — thứ tự BINARY khác thứ tự JS ở vài cặp. */
+  const QID = ['q1', 'q10', 'q2', 'Q1', 'DE-1~ss0', 'câu-ơ', 'cau-o', '\u{1F600}x', '～x', '', 'q99', 'zz', 'a b']
+  function datKho() {
+    const d = taoD1That()
+    let k = 0
+    for (const [i, q] of QID.entries()) {
+      if (i % 4 !== 3) d.sql.prepare("INSERT INTO loi_giai_cau(qid,bam,ma_de,dang,cap_nhat_luc) VALUES(?,?,'DE','d','x')").run(q, `b${i % 5}`)
+      for (let r = 0; r < (i % 3); r++) d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,nhan_nen_json,song_sinh_json,cap_nhat_luc) VALUES(?,?,?,?,'x')").run(`m${k++}`, q, `[{"buoc":${r},"nen":"n${i}"}]`, '[]')
+      for (const de of ['DE1', 'DE2', 'DE3'].slice(0, 1 + (i % 3))) d.sql.prepare("INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES(?,?,'1',?,'d',?)").run(de, q, `g${i}`, i % 5 === 4 ? '{hong' : JSON.stringify({ text: `${de}:${q}`, reviewed: true, choiceImgs: ['', 'x'] }))
+    }
+    for (let i = 0; i < 5; i++) d.sql.prepare("INSERT INTO cau_bo_tro(bam,qid_mau,nhan_nen_json,cap_nhat_luc) VALUES(?,?,?,'x')").run(`b${i}`, `mau${i}`, `[{"buoc":1,"nen":"b${i}"}]`)
+    d.sql.exec("INSERT INTO de_kho(ma_de,da_xoa,cap_nhat_luc) VALUES('DE1',0,'v1'),('DE2',1,'v1'),('DE3',0,'v3'),('DE4',0,'v9')")
+    d.sql.exec("INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('DE1','v1','t'),('DE2','v1','t'),('DE3','v3','t')")
+    return d
+  }
+  const DS = [QID, [...QID].reverse(), ['q2', 'q1', 'q2', 'khong-co', 'q1', ''], ['\u{1F600}x', '～x', 'câu-ơ', 'cau-o'], [], ['khong-co']]
+  it('mọi danh sách (trùng, đảo, rỗng, khoá vắng, ký tự ngoài BMP): cùng dòng, cùng thứ tự', () => {
+    const d = datKho()
+    for (const ds of DS) {
+      for (const [cu, moi] of [[CU5, SQL_BO_TRO_THEO_QID], [CU6, SQL_NHAN_NEN_LUI], [CU10, SQL_NOI_DUNG], [CU10G, SQL_NOI_DUNG_GON]] as const) {
+        const a = d.sql.prepare(cu).all(JSON.stringify(ds)), b = d.sql.prepare(moi).all(dsXep(ds))
+        expect(b, `${moi.slice(0, 60)} ${JSON.stringify(ds)}`).toEqual(a)
+      }
+    }
+    expect(d.sql.prepare(CU10).all(JSON.stringify(QID)).length).toBeGreaterThan(QID.length) // có câu nhiều tờ ⇒ phép so thứ tự có nghĩa
+  })
+  it('hàm thật (boTroTheoQid, docNoiDung, docNoiDungGon): Map trả về y hệt (cả thứ tự khoá)', async () => {
+    const d = datKho()
+    const goc = d.env.DB
+    const cu = (s: string) => s === SQL_BO_TRO_THEO_QID ? CU5 : s === SQL_NOI_DUNG ? CU10 : s === SQL_NOI_DUNG_GON ? CU10G : s
+    const envCu = { ...d.env, DB: { ...goc, prepare: (s: string) => goc.prepare(cu(s)) } } as unknown as Env
+    for (const ds of DS) {
+      for (const f of [boTroTheoQid, docNoiDung, docNoiDungGon] as ((e: Env, q: string[]) => Promise<Map<string, unknown>>)[]) {
+        const a = [...(await f(envCu, [...ds])).entries()], b = [...(await f(d.env, [...ds])).entries()]
+        expect(JSON.stringify(b)).toBe(JSON.stringify(a))
+      }
+    }
+  })
+  it('EXPLAIN: json_each là vòng ngoài, bảng đi chỉ mục; không còn LIST SUBQUERY (dựng chỉ mục tạm từ danh sách)', () => {
+    const d = datKho()
+    for (const q of [SQL_BO_TRO_THEO_QID, SQL_NHAN_NEN_LUI, SQL_NOI_DUNG, SQL_NOI_DUNG_GON]) {
+      const kh = keHoach(d.sql, q, '[]')
+      expect(kh[0], kh.join('\n')).toMatch(/^SCAN j VIRTUAL TABLE/)
+      expect(kh.filter((x) => /LIST SUBQUERY|^SCAN (lc|b|q|d|g|game_v2_question|cau_bo_tro|loi_giai_cau)\b/.test(x)), kh.join('\n')).toEqual([])
+    }
+    expect(dsXep(['b', 'a', 'b', '\u{1F600}', '～'])).toBe(JSON.stringify(['a', 'b', '～', '\u{1F600}']))
   })
 })
