@@ -58,13 +58,10 @@ describe('Live theo khối — chữ đề trên máy em to hơn', () => {
     expect(ham).toContain("localStorage.setItem('mc-projector-scale', goc)")
     expect(to).toContain('if (!trang) lvCoChu();')
   })
-  it('đang chọn đáp án: màn rộng thì giấy nới tới 70 %, điện thoại không hẹp hơn trước', () => {
-    const chia = (w: number) => Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, w)), Math.min(0.7, 1 - 420 / Math.max(1, w)))
-    expect(doc('src/components/live/KhungDocLap.tsx')).toContain('q.coTra ? Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, hinh.w)), Math.min(0.7, 1 - 420 / Math.max(1, hinh.w)))')
-    expect(chia(844)).toBeCloseTo(0.6, 2)
-    expect(chia(1280)).toBeGreaterThan(0.66)
-    expect(chia(1971)).toBe(0.7)
-    expect(chia(480)).toBe(0.35)
+  it('đang chọn đáp án NGAY TRÊN ĐỀ (thầy 12/11 chiều, bản vẽ 23–25): ưu tiên giấy 78 %, em kéo vạch chia tới 90 %', () => {
+    const k = doc('src/components/live/KhungDocLap.tsx')
+    expect(k).toContain("const chia = s.tay ?? (q.coTra ? 0.78 : q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)")
+    expect(k).toContain('datTay(Math.max(0.25, Math.min(0.9,')
   })
   it('đề dựng riêng trên máy em (câu có hình / bảng): hệ số phóng lớn hơn bản trước', () => {
     expect(doc('src/components/live/LopLive.tsx')).toContain('const kMin = Math.max(1, Math.min(1.9, rong / 420)), kMax = Math.max(1.3, Math.min(3.2, rong / 300))')

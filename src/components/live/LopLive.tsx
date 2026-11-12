@@ -494,8 +494,8 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   // LIVE THEO KHỐI: tấm chọn đáp án hiện trong khung bảng khi lượt đang nhận trả lời (thầy bấm «Lên bảng» — cờ phòng `bang` / đã gọi em — thì ẩn dù em chưa gửi);
   // con dấu Đạt / Không đạt 3 giây khi thầy chấm em lên bảng.
   const l0 = luot?.l, goi0 = lenBang?.goi
-  const bangTra = view.khoi && tra && l0 && l0.pha === 'tra-loi' && !tt.bang && !l0.goi ? <TamTra so={l0.so} phan={l0.phan} tuLuan={!!l0.tuLuan} soPa={q?.choices?.length || 4} tra={tra} onGui={onGui} /> : null
-  const dauDat = view.khoi ? <DauDat khoa={lenBang && goi0 ? `${lenBang.so}:${goi0.sbd}` : ''} dat={goi0?.dat} /> : null
+  const bangTra = view.khoi && tra && l0 && l0.pha === 'tra-loi' && !tt.bang && !l0.goi ? <TamTra so={l0.so} phan={l0.phan} tuLuan={!!l0.tuLuan} soPa={q?.choices?.length || 4} tra={tra} onGui={onGui} dem={`${l0.daGui}/${l0.coMat}`} /> : null
+  const dauDat = view.khoi ? <DauDat khoa={lenBang && goi0 ? `${lenBang.so}:${goi0.sbd}` : ''} dat={goi0?.dat} ten={goi0?.ten} /> : null
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500} bangTra={bangTra} dauDat={dauDat}
     epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot({ ...luot, conLam: !!bangTra }) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
 }
@@ -650,9 +650,10 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
         <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
-          coTra={!!bangTra} bangTrong={<>{dauDat}{bangTra ?? (coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>)}</>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
+          coTra={!!bangTra} duoiGiay={bangTra} bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
           dauBang={lenBang && epPhong !== 'bang' ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>
+      {dauDat}
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
       {lenBang && phaBang ? <TamLenBang key={lenBang.khoa} em={lenBang} pha={phaBang} rong={bc?.w ?? 0} dau={dauBang} dong={!giamDong()} /> : null}
       {matMang ? <BaoMatMang layLuc={layLuc} />

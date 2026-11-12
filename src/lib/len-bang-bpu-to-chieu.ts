@@ -161,7 +161,7 @@ export const JS_LEN_BANG_BPU = `
     xoaLua();
     dauKq(String(chiSo()), dat);
     try { var app = dichApp(); if (app) app.postMessage({ nguon: 'to-chieu', loai: 'bpu-cham', dat: !!dat }, '*'); } catch (x) { /* app đã đóng */ }
-    baoNhanh((dat ? 'Đạt' : 'Chưa đạt') + ' — về Bình Phản Ứng');
+    baoNhanh((dat ? 'Đạt' : 'Chưa đạt') + (document.body.classList.contains('mc-lk') ? '' : ' — về Bình Phản Ứng')); // buổi live theo khối: ở nguyên màn chiếu, không có màn đua để về
     return true;
   }
 `

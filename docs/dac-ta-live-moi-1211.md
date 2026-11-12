@@ -137,3 +137,8 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Bấm ⇒ tấm chỉ phủ CỘT BẢNG ĐEN (giấy đề, thanh đáy giữ nguyên): số đã nộp, thanh đúng / sai, «Đã nộp» xếp nhanh nhất trước (hạng · màu đội · tên đủ · giây · đáp án · đúng / sai; tự luận không chấm; em báo «chưa biết làm» ghi rõ), «Chưa nộp» = em có mặt chưa gửi. Bấm lần nữa để đóng.
     - Dữ liệu: view của THẦY thêm `luot.nop` (chỉ khi phòng có cờ khối — `src/lib/bpu/phong.ts`); app gửi tờ lệnh `live-nop` (`thay-noi.ts` `guiNop`); tờ vẽ `src/lib/live-nop-to-chieu.ts`. Máy em không bao giờ nhận.
     - Viên nhắc cũ «Lượt đang mở · N em chưa gửi» không hiện ở buổi live theo khối (nút đã đếm). Nút bốn ô nay là viên bo góc 64 % nằm giữa vùng bấm (vùng bấm giữ nguyên).
+33. **Chọn đáp án NGAY TRÊN ĐỀ** (thầy 12/11 chiều, bản vẽ `docs/ban-ve-live-moi-1211/23–27` duyệt «ok chốt build đẩy vượt luôn») — thay mục 22 (tấm trong khung bảng):
+    - Dải chọn neo đáy khung GIẤY ĐỀ (`KhungDocLap` `duoiGiay`, `TamTra.tsx`): trắc nghiệm A B C D · Đúng–sai bốn nhóm a–d · trả lời ngắn ô số + phím số · nút gửi; ghi «n/m bạn đã gửi». Vùng đọc / cuộn của đề dừng ngay trên dải. Điện thoại ngang: dải gọn một hàng, ẩn dòng tiêu đề.
+    - Bảng đen KHÔNG còn tấm chọn ⇒ đang chọn thì giấy rộng 78 % (em kéo vạch chia tới 90 %).
+    - Gửi xong / thầy bấm «Lên bảng» ⇒ dải tự ẩn như cũ.
+34. **Con dấu ĐẠT / KHÔNG ĐẠT đóng giữa CẢ MÀN, đè cả sang phần đề**, kèm tên em lên bảng, 3 giây (`TamTra.tsx` `DauDat`, vẽ ở gốc màn live). **Máy thầy cũng đóng dấu** trên màn chiếu khi chấm (`src/lib/live-khoi-to-chieu.ts` `lvDau`, mọi đường chấm của tờ). **Dải dưới bỏ thẻ «Đạt / Chưa đạt»** — chỉ còn kết quả của chính em (`DaiLuot.tsx`).

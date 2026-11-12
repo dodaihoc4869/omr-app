@@ -33,7 +33,7 @@
 // 12/11 · BẢNG MIC GỌN (thầy: «làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): mỗi cài đặt MỘT hàng — cột nhãn · thanh phân đoạn
 // (nút ≥ 40 px); chữ chỉ khi có vấn đề (.mc-lv-canh); «Chi tiết» thu gọn ở cuối. Luật CSS mới CHỈ trong .mc-lv-the: .mc-lv-n.nho / .mc-lv-dong của thẻ «Đang nói»
 // giữ nguyên. Bảng cao quá màn (khổ thấp) ⇒ tự cuộn trong khung, không tràn mép trên.
-import { JS_LIVE_KHOI_TO_CHIEU } from './live-khoi-to-chieu'
+import { CSS_LIVE_KHOI, JS_LIVE_KHOI_TO_CHIEU } from './live-khoi-to-chieu'
 import { CSS_LIVE_NOP } from './live-nop-to-chieu'
 
 export const CSS_LIVE_TO_CHIEU = `
@@ -156,7 +156,7 @@ html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
 .mc-lv-ct[open]>summary::before{transform:rotate(45deg)}
 .mc-lv-ct summary:focus-visible{outline:3px solid var(--mc-vang-noi);outline-offset:2px}
 .mc-lv-ct .mc-lv-cd{margin-top:0}
-${CSS_LIVE_NOP}`
+${CSS_LIVE_NOP}${CSS_LIVE_KHOI}`
 
 export const JS_LIVE_TO_CHIEU = `
   // ── V · live bảng (thầy 10/11) — mặt của tờ; máy chạy ở app: src/components/live/thay-noi.ts ──

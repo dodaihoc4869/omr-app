@@ -55,8 +55,11 @@ export interface PropsKhungDL {
   /** Em chạm vào nền (trước khi xét chạm hai lần). Trả true ⇒ nơi dùng đã xử lí, bỏ qua. */
   /** LIVE THEO KHỐI (12/11): thầy chọn chế độ «Bảng» ⇒ ép khung bảng phủ kín (`'bang'`); về «Học» (`null`) ⇒ trả hai khung. Vắng ⇒ như cũ. */
   epPhong?: Vung | null
-  /** Tấm chọn đáp án đang hiện trong khung bảng ⇒ nới bảng cho đủ rộng. */
+  /** Em đang chọn đáp án (dải `duoiGiay` đang hiện) ⇒ ưu tiên GIẤY: đề rộng tới 78 % khi em chưa tự kéo vạch chia. */
   coTra?: boolean
+  /** DẢI NEO ĐÁY KHUNG GIẤY (thầy 12/11 «phần chọn đáp án cho hiện nút luôn lên đề … bỏ đáp án ở bên bảng đen để hs kéo được đề to nhất có thể», bản vẽ 23–25):
+   *  nút chọn đáp án nằm trên đề. Khung đo chiều cao dải ⇒ vùng đọc / cuộn của đề dừng ngay trên dải (dòng cuối không bị che). */
+  duoiGiay?: ReactNode
   khiCham?: () => boolean | void
   khiPhong?: (v: Vung | null) => void
   /** Vạch chia đang do em giữ (true) hay máy tự chia theo thầy (false) — báo lúc dựng và mỗi lần đổi. */
@@ -97,9 +100,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const s = S.current, q = P.current, hinh = q.layHinh(), tr = q.layTrang()
     const { vung } = giaiTrang(tr.trang), kc = khungChieu(vung, tr.tiLe)
     const moc = mocChia(hinh.w, hinh.h, hinh.at, kc, q.tiLeChu === undefined ? TI_LE_CHU_MAC_DINH : q.tiLeChu)
-    // `coTra` (live theo khối: tấm chọn đáp án đang hiện trong khung bảng) ⇒ bảng phải đủ rộng cho tấm (≥ ~330 px), bất kể em / máy đang ưu tiên giấy
-    // (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn»): màn rộng (máy tính bảng, máy tính) ⇒ lúc em đọc đề + chọn đáp án giấy nới tới 70 %, bảng còn ≥ 420 px cho tấm chọn
-    const chia = q.coTra ? Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, hinh.w)), Math.min(0.7, 1 - 420 / Math.max(1, hinh.w))) : s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
+    // `coTra` (live theo khối, em đang chọn đáp án ngay trên đề): bảng đen không còn giữ tấm chọn ⇒ ưu tiên giấy — đề rộng 78 % (em kéo vạch chia thì theo em, tới 90 %)
+    const chia = s.tay ?? (q.coTra ? 0.78 : q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
     const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong, dauBang: q.dauBang ? DAU_BANG : 0, vua: q.epPhong === 'bang' })
     const cu = s.bc
     s.cho = dong && q.dong && cu && cu.w === moi.w && cu.h === moi.h && (cu.sG !== moi.sG || cu.sB !== moi.sB || cu.giay.x !== moi.giay.x || cu.bang.x !== moi.bang.x) ? cu : null
@@ -297,11 +299,24 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const dx = toaDo(e).x - k.x0
     if (Math.abs(dx) < 4) return
     const trai = s.kc.giay.x <= s.kc.bang.x, x = b.vach + dx - b.x0
-    datTay(Math.max(0.25, Math.min(0.8, trai ? x / b.W : 1 - x / b.W)))
+    datTay(Math.max(0.25, Math.min(0.9, trai ? x / b.W : 1 - x / b.W)))
     xep(true)
   }
 
   const L = p.lop, bc = d?.bc, oDau = bc && p.dauBang ? oDauBang(bc) : null
+  // Dải dưới khung giấy: đo chiều cao thật (dải tự xuống hàng theo bề ngang giấy) ⇒ vùng đọc của đề = khung giấy trừ dải
+  const duoi = useRef<HTMLDivElement>(null), coDuoi = !!p.duoiGiay
+  const [caoDuoi, setCaoDuoi] = useState(0)
+  useLayoutEffect(() => {
+    const el = duoi.current
+    if (!coDuoi || !el) { setCaoDuoi(0); return }
+    const do1 = () => setCaoDuoi(Math.round(el.offsetHeight))
+    do1()
+    if (typeof ResizeObserver !== 'function') return
+    const ro = new ResizeObserver(do1)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [coDuoi])
   const o = (v: { x: number; y: number; w: number; h: number } | undefined): CSSProperties => ({ position: 'absolute', left: v?.x ?? 0, top: v?.y ?? 0, width: v?.w ?? 0, height: v?.h ?? 0, overflow: 'hidden', transformOrigin: '0 0', willChange: 'transform' })
   // giấy dựng thường (không soi được) ⇒ lớp «đang viết» cắt khỏi khung giấy (nét trên giấy ẩn; nét bảng giữ nguyên)
   const catNet = (): CSSProperties | undefined => {
@@ -313,20 +328,21 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   const soi = p.netGiay && !!bc
   /** Chữ đề: giấy soi có khổ gốc ⇒ dựng ở khổ gốc rồi co; còn lại dựng theo khổ trên máy em. Cùng khổ thì KHÔNG dựng lại (khung nở / thu chỉ đổi phép co). */
   const goc0 = soi && p.tamGoc && p.tamGoc.rong > 0 ? p.tamGoc : null
-  const rongDung = !bc ? 0 : goc0 ? goc0.rong : soi ? bc.tam.w : bc.giay.w, caoDung = !bc ? 0 : goc0 ? goc0.cao : soi ? bc.tam.h : bc.giay.h
+  const rongDung = !bc ? 0 : goc0 ? goc0.rong : soi ? bc.tam.w : bc.giay.w, caoDung = !bc ? 0 : goc0 ? goc0.cao : soi ? bc.tam.h : Math.max(60, bc.giay.h - caoDuoi)
   const dungGiay = p.giay
   const noiDung = useMemo(() => (rongDung > 0 ? dungGiay({ rong: rongDung, cao: caoDung }) : null), [dungGiay, rongDung, caoDung])
   // (cùng MỘT cây phần tử từ khung hình đầu — lớp vẽ giữ canvas và khung bảng suốt đời lớp; chưa có bố cục thì hai khung rỗng, khổ 0)
   return (
     <div ref={goc} className={`${L}-dl`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }} data-phong={bc?.phong || undefined}>
       <div ref={kG} className={`${L}-giay`} style={o(bc?.giay)}>
-        <div ref={cuonG} className={`${L}-kg-cuon`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', overflowX: 'hidden', overflowY: soi && bc.tam.h > bc.giay.h + 1 ? 'auto' : 'hidden', touchAction: 'pan-y', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
+        <div ref={cuonG} className={`${L}-kg-cuon`} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: caoDuoi ? `calc(100% - ${caoDuoi}px)` : '100%', overflowX: 'hidden', overflowY: soi && bc.tam.h > bc.giay.h - caoDuoi + 1 ? 'auto' : 'hidden', touchAction: 'pan-y', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
           onPointerDown={giayXuong} onPointerUp={giayNha} onPointerCancel={() => { S.current.chamG = null }} onTouchMove={emCuon} onWheel={emCuon} onScroll={giayCuon}>
           <div className={`${L}-kg-tam`} style={{ position: 'relative', marginLeft: soi ? bc.tam.x : 0, width: soi ? bc.tam.w : '100%', height: soi ? bc.tam.h : '100%' }}>
             <div style={goc0 && bc ? { position: 'absolute', left: 0, top: 0, width: goc0.rong, height: goc0.cao, transformOrigin: '0 0', transform: `scale(${bc.tam.w / goc0.rong})` } : { position: 'absolute', left: 0, top: 0, width: '100%', height: '100%' }}>{noiDung}</div>
             <canvas ref={cvChot} className={`${L}-cv`} aria-hidden="true" style={{ position: 'absolute', left: 0, top: 0, pointerEvents: 'none', display: p.netGiay ? undefined : 'none' }} />
           </div>
         </div>
+        {coDuoi ? <div ref={duoi} className={`${L}-duoi`} data-thap={bc && bc.h < 480 ? '' : undefined}>{p.duoiGiay}</div> : null}
         <button type="button" className={`${L}-mui`} data-huong="duoi" onPointerDown={toiThay} onClick={toiThay}>Thầy đang viết ở dưới ↓</button>
         <button type="button" className={`${L}-mui`} data-huong="tren" onPointerDown={toiThay} onClick={toiThay}>Thầy đang viết ở trên ↑</button>
       </div>
