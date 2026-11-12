@@ -655,12 +655,11 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     else nutGui = <NutGuiNoi key={khoaLuot} hien={duChon} tuLuan={!!l.tuLuan} onGui={guiTra} />
   } else than = <div className="bpu-hs-giua"><h3>Đang tải câu…</h3></div>
 
-  // LIVE BẢNG: live = TIẾNG suốt buổi, qua mọi lần chuyển câu. Luật màn (`cheLiveCua`: làm câu ⇒ màn câu hỏi + tay nắm; gửi xong / gọi lên bảng ⇒ bảng live)
-  // + hướng màn (`useHuongLive`: đã xem bảng ngang ⇒ câu mới vẫn ngang) ở luat-man-live.tsx. Phòng chưa có cờ `bang` (bản trước 1C) ⇒ suy từ lượt.
+  // LIVE: luật màn `cheLiveCua` + hướng `useHuongLive` (luat-man-live.tsx). Live theo khối: KHÔNG có màn câu hỏi — em chọn ngay trên bảng (live/TamTra.tsx).
   const lv = v?.live ?? null
   const liveBat = !!lv?.bat && !v?.ketThuc
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
-  const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !!l && l.pha === 'tra-loi' && !che && !hetGio })
+  const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !lv?.khoi && !!l && l.pha === 'tra-loi' && !che && !hetGio })
   const hl = useHuongLive(cheLive, liveBat, lv?.khoi?.gd === 'dang')
   const thanNgang = useThanNgang(gocRef, laCau ? q : null, !!l?.tuLuan, `${khoaLuot}|${LC ? 1 : 0}|${hl.the.style?.width}x${hl.the.style?.height}`)
   // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
@@ -670,7 +669,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
       <LopLive ve={veLive.ve} goc={veLive.goc} guiTho={(d) => { try { ws.current?.send(d as string) } catch { /* rớt */ } }} dangKy={dangKyLive} view={lv} che={cheLive} nang={!!day} de={deLive} khoaDe={q?.qid ?? ''}
         doi={e && !xaEm ? { ten: tenDoi, ky: DOI_BPU[doi]?.ky ?? '', kj: kjDoiSo } : null} matMang={tt === 'mat-mang'} roi={!!e?.dangRoi || vuaRoi}
         q={q && l ? q : null} Chu={LC?.ChemText} tuLuan={!!l?.tuLuan} xa={xaEm} so={l?.so ?? null}
-        luot={cheLive === 'bang' && e && !xaEm && l ? { l, sbd: e.sbd, doi, daGuiMay: cheSo === khoaLuot, ketQuaBang, gui } : null} lenBang={l} giuNgang={hl.giu} xoayDau={hl.xoay} />
+        luot={cheLive === 'bang' && e && !xaEm && l ? { l, sbd: e.sbd, doi, daGuiMay: cheSo === khoaLuot, ketQuaBang, gui } : null} lenBang={l} giuNgang={hl.giu} xoayDau={hl.xoay} tra={che || hetGio ? null : { chon, dat: setChon, phim: phimSo }} onGui={duChon ? guiTra : undefined} />
     </Suspense>
   ) : null
 

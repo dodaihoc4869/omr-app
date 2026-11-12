@@ -153,7 +153,7 @@ describe('K3 · K4 · tạm dừng + khay mép phải', () => {
     const ws = WsGia.ds[0]!, bao = () => ws.nhan(viewEm(st, 'S1'))
     liveBat(st, T0 + 1000); bao()
     await waitFor(() => expect(lop('.lv')).toBe(1))
-    const dau = () => document.querySelector('.lv .lv-nam .lv-nam-dau [data-dau="tieng"]')
+    const dau = () => document.querySelector('.lv .lv-nam[data-dau~="tieng"]') // 12/11: dấu nằm ở `data-dau` của tay nắm (không còn huy hiệu nổi)
     // mặc định mới: tiếng BẬT ⇒ ô «Tiếng» ghi «Đang bật», tay nắm không có dấu, khay không tự mở
     expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'bat' })
     await screen.findByLabelText('Tiếng thầy: đang bật. Chạm để tắt')
@@ -161,7 +161,6 @@ describe('K3 · K4 · tạm dừng + khay mép phải', () => {
     liveDat(st, { tiengLop: false }, T0 + 1500); bao() // thầy chọn «Em ở xa»
     expect(viewEm(st, 'S1').live).toMatchObject({ tieng: 'tat' }) // em trong lớp, thầy để «Em ở xa»
     await waitFor(() => expect(dau()).toBeTruthy())
-    expect(dau()!.getAttribute('title')).toBe('tiếng đang tắt')
     expect(document.querySelector('.lv .lv-nam')!.getAttribute('aria-label')).toMatch(/khay điều khiển · tiếng đang tắt$/)
     expect(lop('.lv-tieng-tat')).toBe(0); expect(screen.queryByText('Tiếng đang tắt')).toBeNull() // viên nổi cũ đã bỏ
     await waitFor(() => expect(document.querySelector('.lv .lv-khay')!.hasAttribute('data-mo')).toBe(true)) // lần đầu: khay tự mở

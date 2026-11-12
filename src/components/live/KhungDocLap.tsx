@@ -55,6 +55,8 @@ export interface PropsKhungDL {
   /** Em chạm vào nền (trước khi xét chạm hai lần). Trả true ⇒ nơi dùng đã xử lí, bỏ qua. */
   /** LIVE THEO KHỐI (12/11): thầy chọn chế độ «Bảng» ⇒ ép khung bảng phủ kín (`'bang'`); về «Học» (`null`) ⇒ trả hai khung. Vắng ⇒ như cũ. */
   epPhong?: Vung | null
+  /** Tấm chọn đáp án đang hiện trong khung bảng ⇒ nới bảng cho đủ rộng. */
+  coTra?: boolean
   khiCham?: () => boolean | void
   khiPhong?: (v: Vung | null) => void
   /** Vạch chia đang do em giữ (true) hay máy tự chia theo thầy (false) — báo lúc dựng và mỗi lần đổi. */
@@ -95,7 +97,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const s = S.current, q = P.current, hinh = q.layHinh(), tr = q.layTrang()
     const { vung } = giaiTrang(tr.trang), kc = khungChieu(vung, tr.tiLe)
     const moc = mocChia(hinh.w, hinh.h, hinh.at, kc, q.tiLeChu === undefined ? TI_LE_CHU_MAC_DINH : q.tiLeChu)
-    const chia = s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
+    // `coTra` (live theo khối: tấm chọn đáp án đang hiện trong khung bảng) ⇒ bảng phải đủ rộng cho tấm (≥ ~330 px), bất kể em / máy đang ưu tiên giấy
+    const chia = q.coTra ? Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, hinh.w))) : s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
     const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong, dauBang: q.dauBang ? DAU_BANG : 0, vua: q.epPhong === 'bang' })
     const cu = s.bc
     s.cho = dong && q.dong && cu && cu.w === moi.w && cu.h === moi.h && (cu.sG !== moi.sG || cu.sB !== moi.sB || cu.giay.x !== moi.giay.x || cu.bang.x !== moi.bang.x) ? cu : null
@@ -163,6 +166,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     if (!r) return { x: e.clientX, y: e.clientY }
     return P.current.layHinh().xoay ? toaDoXoay(e, r) : { x: e.clientX - r.left, y: e.clientY - r.top }
   }
+  const coTra = !!p.coTra
+  useEffect(() => { xep(true) }, [coTra, xep])
   const epPhong = p.epPhong
   useEffect(() => { if (epPhong === undefined || S.current.phong === epPhong) return; S.current.phong = epPhong; P.current.khiPhong?.(epPhong); xep(true) }, [epPhong, xep])
   /** Chạm hai lần vào khung nào ⇒ khung đó phủ kín; hai lần nữa ⇒ về hai khung. */

@@ -129,30 +129,56 @@ describe('kênh lớp', () => {
     expect(em(hs1, 'S1', { t: 'lop', k: 'chat', x: { c: 'x' } })).toBe(true)
     expect(hs2.tin).toHaveLength(0)
   })
-  it('trò: chỉ chạy ở phòng chờ; phòng gom vị trí, phát MỘT ảnh chụp mỗi 250 ms, kẹp trong sân, ghi thu phục khác đội', () => {
+  // Giây thứ 10 của một ván (không rơi vào 5 giây bảng kết quả, không sát mép ván).
+  const T0 = Math.ceil(NAY / 95_000) * 95_000 + 10_000
+  it('trò Sinh Tồn: chỉ chạy ở phòng chờ; phòng gom vị trí, phát MỘT ảnh chụp mỗi 250 ms, kẹp trong sân, máy bù đủ 4 mỗi đội, ghi lượt hạ khác đội', () => {
     vi.useFakeTimers()
     try {
+      vi.setSystemTime(T0)
       const { em, hs1, hs2, gv, st } = kenhGia('cho')
       vaoLop(st, 'S3', NAY)
       const doi = (s: string) => st.ds.find((e) => e.sbd === s)!.doi
       st.ds.find((e) => e.sbd === 'S2')!.doi = (doi('S1') + 1) % 4
-      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [100.4, 9999, 50] } }, NAY)
-      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [200, 200, 50] } }, NAY + 50) // quá nhanh ⇒ bỏ
-      em(hs2, 'S2', { t: 'lop', k: 'tro', x: { p: [300, 300, 20], a: 'S1' } }, NAY + 60)
+      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [100.4, 9999, 50, 9], t: 'S2' } }, T0)
+      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [200, 200, 50, 1] } }, T0 + 50) // quá nhanh ⇒ bỏ
+      em(hs2, 'S2', { t: 'lop', k: 'tro', x: { p: [300, 300, 0, 2], a: 'S1', t: 'khong-co' } }, T0 + 60)
       expect(gv.tin).toHaveLength(0)
       vi.advanceTimersByTime(260)
-      const anh = doc(hs1).at(-1)!.x as { ds: Record<string, number[]>; an: unknown[] }
-      expect(anh.ds.S1).toEqual([100, 600, 50, doi('S1')])
-      expect(anh.ds.S2?.slice(0, 3)).toEqual([300, 300, 20])
-      expect(anh.an).toEqual([['S1', 'S2', 20]])
+      const anh = doc(hs1).at(-1)!.x as { ds: Record<string, [number, number, number, number, number, string]>; an: unknown[]; d: number[]; v: number; c: number }
+      // S1: y kẹp trong sân 1000, cấp kẹp về 4; mục tiêu S2 chưa có lúc gói S1 tới ⇒ bỏ. S2: mục tiêu không có thật ⇒ bỏ.
+      expect(anh.ds.S1).toEqual([100, 1000, 50, doi('S1'), 4, ''])
+      expect(anh.ds.S2).toEqual([300, 300, 0, doi('S2'), 2, ''])
+      expect(anh.an).toEqual([['S1', 'S2']])
+      expect(anh.d[doi('S1')]).toBe(1)
+      expect(anh.v).toBe(1); expect(anh.c).toBe(0)
+      // Hai em thật ở hai đội ⇒ 3 + 3 + 4 + 4 máy; mã máy bắt đầu bằng '~'; 0 lượt D1 (phòng giả không có D1).
+      const may = Object.keys(anh.ds).filter((id) => id.startsWith('~'))
+      expect(may).toHaveLength(14)
+      expect([0, 1, 2, 3].map((d) => Object.values(anh.ds).filter((r) => r[3] === d).length)).toEqual([4, 4, 4, 4])
       expect(doc(gv)).toHaveLength(1)
-      // thầy bấm Bắt đầu ⇒ trò dừng hẳn
+      // báo «bị hạ» lặp trong 2,5 giây ⇒ chỉ tính một lượt
+      em(hs2, 'S2', { t: 'lop', k: 'tro', x: { p: [300, 300, 0, 1], a: 'S1' } }, T0 + 400)
+      vi.advanceTimersByTime(260)
+      expect((doc(hs1).at(-1)!.x as { d: number[] }).d[doi('S1')]).toBe(1)
+      // thầy bấm Bắt đầu ⇒ trò dừng hẳn, máy bù rời sân
       st.live!.khoi!.gd = 'dang'
       vi.advanceTimersByTime(1000)
       const n = hs1.tin.length
-      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [1, 1, 10] } }, NAY + 5000)
+      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [1, 1, 10, 1] } }, T0 + 5000)
       vi.advanceTimersByTime(1000)
       expect(hs1.tin.length).toBe(n)
+    } finally { vi.useRealTimers() }
+  })
+  it('trò Sinh Tồn: hộp tiếp tế — em chạm ĐẦU TIÊN của mỗi hộp được nhận', () => {
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(T0)
+      const { em, hs1, hs2 } = kenhGia('cho')
+      const soHop = Math.floor(T0 / 20_000)
+      em(hs1, 'S1', { t: 'lop', k: 'tro', x: { p: [800, 500, 60, 1], h: soHop } }, T0)
+      em(hs2, 'S2', { t: 'lop', k: 'tro', x: { p: [800, 500, 60, 1], h: soHop } }, T0 + 10)
+      vi.advanceTimersByTime(260)
+      expect((doc(hs2).at(-1)!.x as { h: [number, string] }).h).toEqual([soHop, 'S1'])
     } finally { vi.useRealTimers() }
   })
   it('danh sách bốn đội: chỉ em đã vào; phát lại khi sĩ số đổi; `lop-xin` trả riêng máy hỏi', () => {

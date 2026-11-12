@@ -322,6 +322,55 @@ var LoiBut = (function () {
     if (!ds.length) return null;
     return { id: String(n.id || 'n' + i), cong: n.cong === 'tay' ? 'tay' : 'but', mau: /^rgba?\\([0-9., %\\/]+\\)$/.test(n.mau) ? n.mau : MAU0, co: kep(+n.co || 2.3, 0.5, 16), diem: ds };
   }
+` + /* ── NẮN HÌNH KHI NHẤC BÚT (thầy 12/11: «bút mà kẻ thì tự nắn thẳng, vẽ hình thì tự căn chỉnh lại hình khi nhấc bút»). Trả mảng điểm MỚI, hoặc null = giữ nét tay. ── */ `
+` + /* Chỉ nắn nét ĐỦ DÀI / ĐỦ TO (chữ viết, dấu gạch, số khoanh tròn nhỏ không bị đụng): đường kẻ ≥ 9 % bề dọc bảng và gần thẳng ⇒ đoạn thẳng (lệch < 6° thì */ `
+` + /* thành ngang / dọc hẳn); nét khép kín ≥ 9 % ⇒ tròn / elip, hoặc tam giác / tứ giác cạnh thẳng (tứ giác gần vuông ⇒ chữ nhật ngay ngắn). x tính theo bề */ `
+` + /* ngang, y theo bề dọc nên đổi về cùng đơn vị bằng `tiLe` trước khi đo. */ `
+  function nanHinh(diem, tiLe) {
+    var n = diem.length, T = tiLe > 0 ? tiLe : 16 / 9, P = [], i, j, L = 0, dx, dy, D, x0, y0, x1, y1, lech = 0, t0, t1, ap = 0, minX = 1e9, minY = 1e9, maxX = -1e9, maxY = -1e9, W, H, cheo, cx, cy, a, b, sai, goc, dinh, ra, k, m, u, v, g;
+    if (n < 6) return null;
+    for (i = 0; i < n; i++) { P.push([diem[i][0] * T, diem[i][1]]); ap += diem[i][2]; if (P[i][0] < minX) minX = P[i][0]; if (P[i][0] > maxX) maxX = P[i][0]; if (P[i][1] < minY) minY = P[i][1]; if (P[i][1] > maxY) maxY = P[i][1]; if (i) L += Math.sqrt((P[i][0] - P[i - 1][0]) * (P[i][0] - P[i - 1][0]) + (P[i][1] - P[i - 1][1]) * (P[i][1] - P[i - 1][1])); }
+    ap = tron(ap / n, 100); t0 = diem[0][3]; t1 = diem[n - 1][3];
+    x0 = P[0][0]; y0 = P[0][1]; x1 = P[n - 1][0]; y1 = P[n - 1][1]; dx = x1 - x0; dy = y1 - y0; D = Math.sqrt(dx * dx + dy * dy);
+    W = maxX - minX; H = maxY - minY; cheo = Math.sqrt(W * W + H * H);
+    function diemRa(ds) { var r = [], q; for (q = 0; q < ds.length; q++) r.push([tron(kep(ds[q][0] / T, 0, 1), CHIA), tron(kep(ds[q][1], 0, YMAX), CHIA), ap, Math.round(t0 + (t1 - t0) * q / Math.max(1, ds.length - 1))]); return r; }
+` + /* 1 · ĐOẠN THẲNG */ `
+    if (D >= 0.09 && L <= D * 1.08) {
+      for (i = 1; i < n - 1; i++) { u = Math.abs((P[i][0] - x0) * dy - (P[i][1] - y0) * dx) / D; if (u > lech) lech = u; }
+      if (lech <= Math.max(0.006, D * 0.045)) {
+        goc = Math.abs(Math.atan2(dy, dx)) * 180 / Math.PI;
+        if (goc < 6 || goc > 174) y1 = y0 = (y0 + y1) / 2; else if (Math.abs(goc - 90) < 6) x1 = x0 = (x0 + x1) / 2;
+        return diemRa([[x0, y0], [(x0 + x1) / 2, (y0 + y1) / 2], [x1, y1]]);
+      }
+      return null;
+    }
+` + /* 2 · HÌNH KHÉP KÍN */ `
+    if (cheo < 0.09 || D > cheo * 0.28 || L < cheo * 1.9) return null;
+    cx = (minX + maxX) / 2; cy = (minY + maxY) / 2; a = W / 2; b = H / 2;
+    if (a < 0.012 || b < 0.012) return null;
+` + /* đỉnh: rút gọn Douglas–Peucker trên đường khép kín (ngưỡng 7 % đường chéo) */ `
+    function rut(tu, den, eps, giu) { var xa = 0, ki = -1, q, ex = P[den][0] - P[tu][0], ey = P[den][1] - P[tu][1], el = Math.sqrt(ex * ex + ey * ey) || 1, w; for (q = tu + 1; q < den; q++) { w = Math.abs((P[q][0] - P[tu][0]) * ey - (P[q][1] - P[tu][1]) * ex) / el; if (w > xa) { xa = w; ki = q; } } if (ki >= 0 && xa > eps) { rut(tu, ki, eps, giu); giu.push(ki); rut(ki, den, eps, giu); } }
+    m = 0; u = 0; for (i = 1; i < n; i++) { v = (P[i][0] - x0) * (P[i][0] - x0) + (P[i][1] - y0) * (P[i][1] - y0); if (v > u) { u = v; m = i; } }
+    dinh = [0]; rut(0, m, cheo * 0.07, dinh); dinh.push(m); rut(m, n - 1, cheo * 0.07, dinh);
+` + /* tròn / elip: mọi điểm cách đều «bán kính chuẩn hoá» 1 */ `
+    sai = 0; for (i = 0; i < n; i++) { u = (P[i][0] - cx) / a; v = (P[i][1] - cy) / b; sai += Math.abs(Math.sqrt(u * u + v * v) - 1); } sai /= n;
+    if (sai < 0.13 && dinh.length !== 3 && dinh.length !== 4) {
+      if (Math.abs(a - b) < Math.max(a, b) * 0.16) a = b = (a + b) / 2;
+      ra = []; g = Math.atan2(y0 - cy, x0 - cx); for (i = 0; i <= 44; i++) ra.push([cx + a * Math.cos(g + i * Math.PI / 22), cy + b * Math.sin(g + i * Math.PI / 22)]);
+      return diemRa(ra);
+    }
+    if (dinh.length !== 3 && dinh.length !== 4) return null;
+    ra = []; for (i = 0; i < dinh.length; i++) ra.push([P[dinh[i]][0], P[dinh[i]][1]]);
+` + /* tứ giác gần vuông góc với trục ⇒ chữ nhật ngay ngắn theo khung bao */ `
+    if (ra.length === 4) {
+      k = 0; for (i = 0; i < 4; i++) { j = (i + 1) % 4; g = Math.abs(Math.atan2(ra[j][1] - ra[i][1], ra[j][0] - ra[i][0])) * 180 / Math.PI; g = Math.min(g, 180 - g); if (g < 14 || g > 76) k++; }
+      if (k === 4) { g = Math.abs(ra[1][0] - ra[0][0]) > Math.abs(ra[1][1] - ra[0][1]); u = ra[0][0] < cx; v = ra[0][1] < cy; ra = g ? [[u ? minX : maxX, v ? minY : maxY], [u ? maxX : minX, v ? minY : maxY], [u ? maxX : minX, v ? maxY : minY], [u ? minX : maxX, v ? maxY : minY]] : [[u ? minX : maxX, v ? minY : maxY], [u ? minX : maxX, v ? maxY : minY], [u ? maxX : minX, v ? maxY : minY], [u ? maxX : minX, v ? minY : maxY]]; }
+    }
+` + /* cạnh thẳng, góc sắc: mỗi cạnh chia 6 khúc, đỉnh lặp lại ba lần cho bộ làm trơn không vo tròn góc */ `
+    m = []; for (i = 0; i < ra.length; i++) { j = (i + 1) % ra.length; m.push(ra[i], ra[i], ra[i]); for (k = 1; k < 6; k++) m.push([ra[i][0] + (ra[j][0] - ra[i][0]) * k / 6, ra[i][1] + (ra[j][1] - ra[i][1]) * k / 6]); }
+    m.push(ra[0], ra[0]);
+    return diemRa(m);
+  }
   function taoSo(tuy) {
     tuy = tuy || {};
     var khoa = '', T = { net: [], lui: [], toi: [] }, trang = { '': T }, tai = [], dang = null, dem = 0, tiLe = 16 / 9, GIOI = tuy.gioiHan || 300;
@@ -335,6 +384,15 @@ var LoiBut = (function () {
     function ketThuc(huy) {
       var n = dang; if (!n) return null; dang = null;
       if (huy || !n.diem.length) { phat({ loai: 'xoa', id: [n.id] }); return null; }
+      var m = tuy.nan === false || n.cong !== 'but' ? null : nanHinh(n.diem, tiLe), cu;
+      if (m) {
+` + /* nét tay đang phát dở ⇒ gỡ; nét đã nắn vào sổ như MỘT nét xong với mã mới (máy em, bản ghi nhận nguyên nét qua sự kiện net-moi xong) */ `
+        cu = n.id; phat({ loai: 'xoa', id: [cu] });
+` + /* GIỮ chính đối tượng nét (tờ gắn thêm trường riêng lên nó: nét thuộc giấy đề, độ cuộn lúc viết…) — chỉ đổi mã và điểm */ `
+        n.id = (cu.indexOf('b_') === 0 ? 'b_' : '') + id(); n.diem = m; n.nan = 1;
+        T.net.push(n); ghi({ l: 'them', ds: [{ net: n, vt: T.net.length - 1 }] }); phat({ loai: 'net-moi', net: gon(n), vt: T.net.length - 1, xong: true });
+        return n;
+      }
       T.net.push(n); ghi({ l: 'them', ds: [{ net: n, vt: T.net.length - 1 }] }); phat({ loai: 'net-xong', id: n.id });
       return n;
     }

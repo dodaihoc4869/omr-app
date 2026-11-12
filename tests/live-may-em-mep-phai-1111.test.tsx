@@ -42,7 +42,9 @@ async function dung(che: 'bang' | 'dau' = 'bang', them: { matMang?: boolean } = 
   return { doi: (c: 'bang' | 'dau', t?: { matMang?: boolean }) => r.rerender(ve(c, t)) }
 }
 const khayMo = () => !!document.querySelector('.lv-khay')?.hasAttribute('data-mo')
-const dauNam = () => [...document.querySelectorAll('.lv-nam .lv-nam-dau [data-dau]')].map((e) => e.getAttribute('data-dau'))
+// 12/11 (thầy: tay nắm chỉ còn chấm loa / mic, «còn lại ẩn hết vào thanh màu vàng»): các dấu không còn là huy hiệu nổi — danh sách nằm ở `data-dau` của tay nắm
+// (cùng nội dung với nhãn đọc màn hình); trên màn chỉ còn chấm mic (`.lv-nam-cham.mic`) và chấm loa (`.lv-nam-cham.loa`).
+const dauNam = () => (document.querySelector('.lv-nam')?.getAttribute('data-dau') ?? '').split(' ').filter(Boolean)
 beforeEach(() => { goi.length = 0; dau = {}; _datLaiTatMan() })
 afterEach(() => { _datLaiTatMan() })
 

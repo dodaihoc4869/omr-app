@@ -11,7 +11,7 @@ import { batTiengLai, dangKy, datKhoi, kenh, layDangMo, layView, lenhMic, phienC
 import './thay-khoi.css'
 import './em-khoi.css'
 
-const TroGiuLua = lazy(() => import('./TroGiuLua'))
+const TroSinhTon = lazy(() => import('./TroSinhTon'))
 const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
@@ -259,20 +259,22 @@ function PhongChoThay({ v, khoi }: { v: ViewBang; khoi: number }) {
         <span className="gian" />
         <button type="button" className="lkt-dong" onClick={() => void dong()} disabled={dang}>Đóng phòng</button>
       </header>
-      <div className="lkt-san"><Suspense fallback={null}><TroGiuLua toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi /></Suspense></div>
+      <div className="lkt-san"><Suspense fallback={null}><TroSinhTon toi={null} ds={dsLop} kenh={kenh} soEm={vao.length} xemThoi /></Suspense></div>
       <div className="lkt-doi">
         {DOI_BPU.map((d, i) => {
           const em = vao.filter((e) => e.doi === i)
+          // Trò Sinh Tồn: mỗi đội luôn đủ 4 trên sân — thiếu em thì máy bù (cùng luật với phòng: src/lib/live-khoi/sinh-ton-may.ts).
+          const soMay = vao.length ? Math.max(0, 4 - em.length) : 0
           return (
             <section key={d.ky} style={{ ['--doi' as string]: `var(${d.mau})` }}>
-              <h3><b>{d.ky}</b>{d.ten}<small>{em.length} em</small></h3>
-              <ul>{em.map((e) => <li key={e.sbd}>{e.ten}</li>)}{em.length ? null : <li className="rong">Chưa có em nào</li>}</ul>
+              <h3><b>{d.ky}</b>{d.ten}<small>{em.length} em{soMay ? ` · ${soMay} máy` : ''}</small></h3>
+              <ul>{em.map((e) => <li key={e.sbd}>{e.ten}</li>)}{Array.from({ length: soMay }, (_, k) => <li key={`may-${k}`} className="may">Máy</li>)}{em.length || soMay ? null : <li className="rong">Chưa có em nào</li>}</ul>
             </section>
           )
         })}
       </div>
       <footer>
-        <p>Các em đang chơi Giữ Lửa trong lúc chờ. Em vào sau tự được xếp vào đội.{loi ? <strong role="alert"> {loi}</strong> : null}</p>
+        <p>Các em đang chơi Sinh Tồn trong lúc chờ. Đội thiếu người có máy bù cho đủ 4; em vào sau tự thay máy.{loi ? <strong role="alert"> {loi}</strong> : null}</p>
         <button type="button" className="lkt-bat-dau" onClick={() => void batDau()} disabled={dang}>{dang ? 'Đang bắt đầu…' : 'Bắt đầu live'}</button>
       </footer>
     </div>

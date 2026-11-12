@@ -123,8 +123,16 @@ kiem('4a chiếu được bài', loiChieu === '', loiChieu)
 kiem('4b câu được CHIẾU ⇒ phòng tự sang «hoc» (lượt mới), live vẫn bật', st()?.live?.khoi?.che === 'hoc' && !!st()?.luot && st()?.live?.bat === true, JSON.stringify({ che: st()?.live?.khoi?.che, luot: st()?.luot?.so }))
 kiem('4c «Học» KHÔNG còn màn đua (thầy 12/11 «bỏ hẳn bình phản ứng đi, tất cả làm việc trên màn chiếu»): bảng Bình Phản Ứng ẩn, câu hiện trên màn chiếu', (await bangBpu(gv)) === 'hidden' && (await trenCung(gv)) === 'to', `${await bangBpu(gv)} · ${await trenCung(gv)}`)
 kiem('4d không còn cụm nổi của app; mọi nút nằm trong khay nút bốn ô của tờ', (await gv.locator('.lkt-vien').count()) === 0 && await gv.frameLocator('.lop-xem-phieu iframe').locator('#mc-them').isVisible())
-kiem('4e máy em: bảng danh sách đóng, vào câu hỏi; nút nhắn tin ẨN lúc làm câu', (await em1.locator('.lke .bd').count()) === 0 && (await em1.locator('.lke-mep').count()) === 0 && await em1.locator('.bpu-hs').isVisible())
-kiem('4f em cầm dọc: màn câu hỏi vẫn ép ngang', await em2.evaluate(() => !!document.querySelector('.bpu-hs[data-xoay]')))
+// (thầy 12/11, bản vẽ 15–18 đã duyệt) máy em KHÔNG đổi sang màn câu hỏi: vẫn ở màn chiếu, tấm chọn đáp án hiện ngay trên bảng
+const tamTra = (p) => p.evaluate(() => { const t = document.querySelector('.lv-bang .lv-tra'), b = document.querySelector('.lv-bang'); if (!t || !b) return null; const a = t.getBoundingClientRect(), c = b.getBoundingClientRect(), tren = document.elementFromPoint(a.left + a.width / 2, a.top + a.height / 2); return { rong: Math.round(a.width), khongTran: t.scrollWidth <= t.clientWidth + 1 && [...t.querySelectorAll('button, .lv-tra-dau')].every((x) => { const r = x.getBoundingClientRect(); return r.left >= a.left - 1 && r.right <= a.right + 1 }), trongBang: a.left >= c.left - 1 && a.right <= c.right + 1 && a.bottom <= c.bottom + 1 && a.top >= c.top - 1, nut: t.querySelectorAll('.lv-tra-tn .lv-tra-nut').length, hang: t.querySelectorAll('.lv-tra-hang').length, phim: t.querySelectorAll('.lv-tra-phim .lv-tra-nut').length, gui: !t.querySelector('.lv-tra-gui')?.disabled, chamDuoc: !!tren?.closest('.lv-tra') } })
+const tt4 = await tamTra(em1)
+kiem('4e máy em: bảng danh sách đóng, VẪN ở màn chiếu (giấy đề + bảng); tấm chọn A B C D nằm gọn trong khung bảng, chưa chọn thì chưa gửi được', (await em1.locator('.lke .bd').count()) === 0 && !!tt4 && tt4.trongBang && tt4.rong >= 240 && tt4.khongTran && tt4.nut === 4 && !tt4.gui && tt4.chamDuoc && await em1.evaluate(() => { const g = document.querySelector('.lv-giay')?.getBoundingClientRect(); return !!g && g.width > 100 }), JSON.stringify(tt4))
+kiem('4f điện thoại cầm dọc: màn chiếu xoay ngang, cũng có tấm chọn', await em2.evaluate(() => !!document.querySelector('.lv[data-xoay]') && !!document.querySelector('.lv-bang .lv-tra')))
+await chup(em1, '4-em-chon-trac-nghiem'); await chup(em2, '4-em-doc-chon-trac-nghiem')
+await em1.locator('.lv-tra-tn .lv-tra-nut').nth(1).click(); await ngu(250)
+kiem('4g em chọn B: nút gửi sáng «Gửi đáp án B»', await em1.locator('.lv-tra-gui').isEnabled() && /B/.test(await em1.locator('.lv-tra-gui').innerText()))
+await em1.locator('.lv-tra-gui').click(); await ngu(900)
+kiem('4h gửi xong: tấm chọn TỰ ẨN, phòng nhận đáp án của em; máy em vẫn ở màn chiếu', (await em1.locator('.lv-tra').count()) === 0 && !!st()?.luot?.tra?.S1 && await em1.locator('.lv-bang').isVisible(), JSON.stringify(st()?.luot?.tra?.S1 ?? null))
 await chup(gv, '4-hoc-bang-dua'); await chup(em1, '4-em-cau-hoi'); await chup(em2, '4-em-doc-cau-hoi')
 
 // ── 5. Esc ở «Học» ⇒ về sảnh; «Quay lại bài» ──
@@ -160,17 +168,26 @@ kiem('7 về «Học»: phòng «hoc», vẫn ở màn chiếu (không màn đua
 
 // 7d. (thầy 12/11, ảnh màn Đúng–sai khổ ngang) câu ĐÚNG–SAI trên máy em: cột phải hiện ĐỦ chữ từng ý + nút Đúng | Sai bên cạnh (giống chặng), không rút gọn «…»
 await may.moLuot({ qid: 'DS1', maDe: 'm', version: '1', group: 'g', phan: 'II', text: 'Peptide X có cấu trúc như sau: H₂N–CH(CH₃)–CO–NH–CH(CH₂CH₂COOH)–CO–NH–CH₂–COOH. Mỗi phát biểu sau đây là đúng hay sai?', choices: [], ideas: ['X là một tetrapeptide.', 'Trong phân tử peptide X có chứa 3 liên kết peptide.', 'Tên viết tắt của peptide X là Ala-Val-Gly.', 'Trong cấu tạo của X, amino acid đầu N là alanine và amino acid đầu C là glycine.'], hinhAnh: [], dang: null, tenDang: 'Peptide', mucDo: 'hieu', sao: 2, kienThuc: [] }, 'SSSĐ'); await ngu(2500)
-for (const [ten, p] of [['ngang', em1], ['điện thoại dọc ép ngang', em2]]) {
-  const ds = await p.evaluate(() => { const y = [...document.querySelectorAll('.bpu-tra .ht2-lam-y')], tra = document.querySelector('.bpu-tra'); return { gon: !!document.querySelector('.bpu-cau[data-gon]'), n: y.length, cat: y.filter((e) => { const c = e.querySelector('.ht2-lam-y-chu'); return !c || c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1 }).length, tron: y.filter((e) => { const d = e.querySelector('.ht2-lam-y-dau'), n = e.querySelector('.ht2-lam-y-nut'); return !!d && !!n && d.offsetWidth > (tra?.clientWidth ?? 0) * 0.8 && n.offsetTop >= d.offsetTop + d.offsetHeight - 2 }).length, lap: document.querySelector('.bpu-y-de') ? getComputedStyle(document.querySelector('.bpu-y-de')).display : 'không có' } })
-  kiem(`7d Đúng–sai máy em (${ten}): đủ 4 ý, KHÔNG cắt chữ, chữ ý chiếm TRỌN hàng, nút Đúng | Sai nằm dưới; không lặp danh sách ý bên cột đề`, !ds.gon && ds.n === 4 && ds.cat === 0 && ds.tron === 4 && (ds.lap === 'none' || ds.lap === 'không có'), JSON.stringify(ds))
-}
-// vách kéo giữa cột đề và cột chọn: kéo sang trái ⇒ cột chọn rộng ra
-const rong0 = await em1.evaluate(() => document.querySelector('.bpu-tra')?.clientWidth ?? 0)
-const vachO = await em1.locator('.bpu-cau > .bpu-vach').boundingBox()
-if (vachO) { await em1.mouse.move(vachO.x + vachO.width / 2, vachO.y + 120); await em1.mouse.down(); await em1.mouse.move(vachO.x - 110, vachO.y + 130, { steps: 6 }); await em1.mouse.up(); await ngu(300) }
-const rong1 = await em1.evaluate(() => document.querySelector('.bpu-tra')?.clientWidth ?? 0)
-kiem('7e kéo vách giữa đề và phần chọn: cột chọn rộng ra (di chuyển được cửa sổ đề / chọn ý)', !!vachO && rong1 > rong0 + 60, `cột chọn ${rong0} → ${rong1} px`)
+const tt7 = await tamTra(em1)
+kiem('7d Đúng–sai: tấm bốn hàng a–d (Đúng | Sai) trong khung bảng, đề đủ ý ở giấy bên cạnh', !!tt7 && tt7.trongBang && tt7.rong >= 240 && tt7.khongTran && tt7.hang === 4 && !tt7.gui, JSON.stringify(tt7))
+for (let i = 0; i < 4; i++) { await em1.locator('.lv-tra-hang').nth(i).locator('.lv-tra-nut').nth(i === 3 ? 0 : 1).click(); await ngu(80) }
+kiem('7e chọn đủ 4 ý ⇒ gửi được', await em1.locator('.lv-tra-gui').isEnabled())
 await chup(em1, '7-em-dung-sai'); await chup(em2, '7-em-doc-dung-sai')
+await em1.locator('.lv-tra-gui').click(); await ngu(900)
+kiem('7f gửi Đúng–sai: phòng nhận «SSSD», tấm tự ẩn', st()?.luot?.tra?.S1?.chon === 'SSSD' && (await em1.locator('.lv-tra').count()) === 0, JSON.stringify(st()?.luot?.tra?.S1 ?? null))
+// thầy bấm «Lên bảng» (gọi một em) ⇒ tấm chọn của em CHƯA gửi (em2) tự ẩn; thầy chấm ⇒ con dấu giữa bảng mọi máy em trong 3 giây
+const WsNode = (await import('node:module')).createRequire(import.meta.url)('ws')
+const gvWs = new WsNode(may.goc.replace('http', 'ws') + '/bpu/phong?ve=gv'); await new Promise((r) => gvWs.once('open', r))
+kiem('7g em chưa gửi (điện thoại) đang có tấm chọn', (await em2.locator('.lv-tra').count()) === 1)
+gvWs.send(JSON.stringify({ t: 'goi', sbd: 'S1', lyDo: [] })); await ngu(1200)
+kiem('7h thầy gọi lên bảng ⇒ tấm chọn của em chưa gửi TỰ ẨN', (await em2.locator('.lv-tra').count()) === 0 && !!st()?.luot?.goi, JSON.stringify(st()?.luot?.goi ?? null))
+gvWs.send(JSON.stringify({ t: 'dat', v: true })); await ngu(700)
+const dau = await em1.evaluate(() => { const d = document.querySelector('.lv-bang .lv-dau-dat'), b = document.querySelector('.lv-bang'); if (!d || !b) return null; const a = d.getBoundingClientRect(), c = b.getBoundingClientRect(); return { chu: d.textContent, giua: Math.abs((a.left + a.right) / 2 - (c.left + c.right) / 2) < c.width * 0.12 && Math.abs((a.top + a.bottom) / 2 - (c.top + c.bottom) / 2) < c.height * 0.15 } })
+kiem('7i thầy bấm Đạt ⇒ con dấu «ĐẠT» giữa bảng máy em (cả máy em khác)', !!dau && dau.chu === 'ĐẠT' && dau.giua && (await em2.locator('.lv-dau-dat').count()) === 1, JSON.stringify(dau))
+await chup(em1, '7-em-dau-dat')
+await ngu(3200)
+kiem('7k sau 3 giây con dấu tự mất', (await em1.locator('.lv-dau-dat').count()) === 0)
+gvWs.close()
 const trangHoc = await gv.frameLocator('.lop-xem-phieu iframe').locator('body').evaluate(() => ({ trang: window.__mcBut.trang(), net: window.__mcBut.xuat().net.length }))
 await lk('bang'); await ngu(1800)
 const mucB2 = await mucEm(em1), aGv2 = await mucVung(gv, ...netA.gv), aEm2 = await mucVung(em1, ...netA.em)

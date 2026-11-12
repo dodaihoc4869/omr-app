@@ -1,23 +1,35 @@
-// KÊNH LỚP của Live theo khối (12/11; hợp đồng src/lib/live-khoi/kieu.ts): CHAT cả lớp + trò GIỮ LỬA ở phòng chờ + danh sách bốn đội.
+// KÊNH LỚP của Live theo khối (12/11; hợp đồng src/lib/live-khoi/kieu.ts): CHAT cả lớp + trò SINH TỒN ở phòng chờ (có máy bù chỗ) + danh sách bốn đội.
 // Phòng chỉ CHUYỂN TIẾP trong bộ nhớ: 0 D1, 0 storage. Phòng ngủ rồi thức lại ⇒ mất chat cũ / ảnh trò (chấp nhận — đặc tả mục 4).
 import type { DurableObjectState, WsMayChu } from './kieu'
 import type { KemBpu } from './phong-live'
 import { diemDoi, type TrangThaiPhong } from '../../src/lib/bpu/phong'
-import { CHAT_DAI, CHAT_NHIP_MS, SAN_CAO, SAN_RONG, type TinLop } from '../../src/lib/live-khoi/kieu'
+import { CHAT_DAI, CHAT_NHIP_MS, type SinhTonDong, type TinLop } from '../../src/lib/live-khoi/kieu'
+import { CAP_TOI_DA, MAU_DAY, capBanDo, dangNghi, hopSo, laMay, taoBanDo, vanSo, type BanDo, type NhanVat } from '../../src/lib/live-khoi/sinh-ton-loi'
+import { buocMay, khopMay, mayLenCap, mayThanh, type May } from '../../src/lib/live-khoi/sinh-ton-may'
 
 type Row = Record<string, unknown>
 const CHAT_GIU = 200
 const TRO_NHIP_MS = 250
 const TRO_GUI_MS = 180
 const TRO_IM_MS = 5000
+/** Một em chỉ được báo «bị hạ» mỗi 2,5 giây (hồi sinh mất 3 giây) — chặn báo lặp. */
+const TRO_HA_MS = 2500
 const kep = (v: unknown, tu: number, den: number): number | null => { const n = Math.round(Number(v)); return Number.isFinite(n) ? Math.min(den, Math.max(tu, n)) : null }
 
 export class KenhLopMay {
   private chat: TinLop[] = []
   private khoa = false
   private lucChat = new Map<string, number>()
-  private tro = new Map<string, { p: [number, number, number, number]; luc: number; gui: number }>()
-  private an: [string, string, number][] = []
+  private tro = new Map<string, { p: SinhTonDong; luc: number; gui: number; ha: number }>()
+  private an: [string, string][] = []
+  private may: May[] = []
+  private diem: [number, number, number, number] = [0, 0, 0, 0]
+  private van = -1
+  /** Số thứ tự ván kể từ lúc trò bắt đầu ở phòng này (hiện trên màn: «Ván 2»). */
+  private soVan = 0
+  private bd: BanDo = taoBanDo(0)
+  private hop: [number, string] = [-1, '']
+  private lucNhip = 0
   private hen: ReturnType<typeof setTimeout> | null = null
   private dauDs = ''
   constructor(private ctx: DurableObjectState, private nho: () => TrangThaiPhong | null | undefined) {}
@@ -70,25 +82,62 @@ export class KenhLopMay {
       if (thay || st.live.khoi.gd !== 'cho') return true
       const cu = this.tro.get(a.s)
       if (cu && nay - cu.gui < TRO_GUI_MS) return true
-      const p = Array.isArray(x.p) ? x.p : [], px = kep(p[0], 0, SAN_RONG), py = kep(p[1], 0, SAN_CAO), m = kep(p[2], 10, 400)
-      if (px == null || py == null || m == null) return true
-      this.tro.set(a.s, { p: [px, py, m, e!.doi], luc: nay, gui: nay })
-      // Máy BỊ thu phục tự báo; chỉ nhận khi đốm kia có thật, khác đội.
-      const an = typeof x.a === 'string' ? this.tro.get(x.a) : null
-      if (an && an.p[3] !== e!.doi && this.an.length < 40) this.an.push([x.a as string, a.s, cu?.p[2] ?? m])
-      if (!this.hen) this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS)
+      const p = Array.isArray(x.p) ? x.p : [], px = kep(p[0], 0, this.bd.rong), py = kep(p[1], 0, this.bd.cao), mau = kep(p[2], 0, MAU_DAY), cap = kep(p[3], 1, CAP_TOI_DA)
+      if (px == null || py == null || mau == null || cap == null) return true
+      const doi = e!.doi
+      // Mục tiêu khai phải có thật và khác đội; kẻ hạ cũng vậy.
+      const doiCua = (id: unknown): number => (typeof id !== 'string' || id === a.s ? -1 : this.tro.get(id)?.p[3] ?? this.may.find((m) => m.id === id)?.doi ?? -1)
+      const dt = doiCua(x.t)
+      const moi = { p: [px, py, mau, doi, cap, dt >= 0 && dt !== doi ? (x.t as string) : ''] as SinhTonDong, luc: nay, gui: nay, ha: cu?.ha ?? 0 }
+      this.tro.set(a.s, moi)
+      const da = doiCua(x.a)
+      if (da >= 0 && da !== doi && nay - moi.ha >= TRO_HA_MS && !dangNghi(nay) && this.an.length < 60) {
+        moi.ha = nay
+        this.ghiHa(x.a as string, a.s, da)
+      }
+      // Hộp tiếp tế: em chạm đầu tiên của mỗi hộp được nhận.
+      if (typeof x.h === 'number' && x.h === hopSo(nay) && this.hop[0] !== x.h && mau > 0 && !dangNghi(nay)) this.hop = [x.h, a.s]
+      if (!this.hen) { this.lucNhip = nay; this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS) }
       return true
     }
     return true
   }
+  private ghiHa(ai: string, bi: string, doiAi: number): void {
+    this.an.push([ai, bi])
+    this.diem[doiAi]++
+    if (laMay(ai)) { const m = this.may.find((v) => v.id === ai); if (m) mayLenCap(m) }
+  }
+  private dungTro(): void { this.tro.clear(); this.an = []; this.may = []; this.van = -1; this.soVan = 0; this.diem = [0, 0, 0, 0]; this.hop = [-1, ''] }
   private nhipTro(): void {
     this.hen = null
     const st = this.nho(), nay = Date.now()
     for (const [s, v] of this.tro) if (nay - v.luc > TRO_IM_MS) this.tro.delete(s)
-    if (!st || st.ketThuc || st.live?.khoi?.gd !== 'cho' || !this.tro.size) { this.tro.clear(); this.an = []; return }
-    const ds: Record<string, [number, number, number, number]> = {}
+    if (!st || st.ketThuc || st.live?.khoi?.gd !== 'cho' || !this.tro.size) { this.dungTro(); return }
+    // Ván mới: xoá điểm, chọn cỡ bản đồ theo sĩ số, máy về trại.
+    const van = vanSo(nay)
+    const soEm = [0, 0, 0, 0]
+    for (const v of this.tro.values()) soEm[v.p[3]]++
+    if (van !== this.van) {
+      // Ván ĐẦU (trò vừa bắt đầu) giữ lượt hạ đã ghi trước nhịp đầu; các ván sau xoá điểm.
+      if (this.van !== -1) { this.diem = [0, 0, 0, 0]; this.an = [] }
+      this.van = van; this.soVan++; this.may = []
+      this.bd = taoBanDo(capBanDo(soEm.reduce((t, n) => t + Math.max(4, n), 0)))
+    }
+    this.may = khopMay(this.bd, this.may, soEm, nay, Math.random)
+    const that: NhanVat[] = []
+    for (const [s, v] of this.tro) that.push({ id: s, x: v.p[0], y: v.p[1], mau: v.p[2], doi: v.p[3], cap: v.p[4], t: v.p[5] })
+    const dt = Math.min(1000, Math.max(0, nay - this.lucNhip))
+    this.lucNhip = nay
+    const anhMay = this.may.map(mayThanh)
+    for (let i = 0; i < this.may.length; i++) {
+      const m = this.may[i], khac = that.concat(anhMay.filter((_, k) => k !== i))
+      const ai = buocMay(this.bd, m, khac, nay, dt, Math.random)
+      if (ai) { const k = khac.find((n) => n.id === ai); if (k) this.ghiHa(ai, m.id, k.doi) }
+    }
+    const ds: Record<string, SinhTonDong> = {}
     for (const [s, v] of this.tro) ds[s] = v.p
-    this.moiMay(JSON.stringify({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: nay, x: { ds, an: this.an } }))
+    for (const m of this.may) ds[m.id] = [Math.round(m.x), Math.round(m.y), Math.round(m.mau), m.doi, m.cap, m.t]
+    this.moiMay(JSON.stringify({ t: 'lop', k: 'tro', s: '', n: '', d: -1, l: nay, x: { ds, an: this.an, d: this.diem, v: this.soVan, c: this.bd.cap, h: this.hop } }))
     this.an = []
     this.hen = setTimeout(() => this.nhipTro(), TRO_NHIP_MS)
   }
