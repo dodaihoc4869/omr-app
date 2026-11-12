@@ -504,7 +504,7 @@ Mã: `scripts/thu-live-1011/tach-giong/nhieu-that/` (tải bằng mã thầy ở
 ### 11.2 Mô hình RIÊNG giọng thầy (B3, thầy 20:30: «huấn luyện giọng thầy trong đêm nay luôn») — đường ống chạy, đang luyện, CHƯA đạt
 Mã luyện: `scripts/thu-live-1011/tach-giong/luyen/` (JAX trên CPU — PyTorch không tải được ở phiên này; `luyen.py` · xuất `xuat.py` · trích dữ liệu `trich-du-lieu.py` /
 `them-buoi.py` · tự lấy buổi Live mới mỗi 45 phút `canh-buoi-moi.sh`). Lõi chạy trong app: `src/lib/live/tach-giong-thay.ts` (chuỗi ES5, KHÔNG wasm, không ONNX Runtime).
-Trọng số `.tgt` (2,1 MB, không chứa tiếng): `scripts/thu-live-1011/tach-giong/ckpt/` (nhánh `claude/tach-giong-yt-1111` luyện thêm bằng bài giảng YouTube, cùng định dạng).
+Trọng số `.tgt` (2,1 MB, không chứa tiếng): chỉ ở thư mục tạm của phiên — bản bước 2000 từng ở `tach-giong/ckpt/`, đã gỡ khỏi kho 12/11 (nhánh `claude/tach-giong-yt-1111` luyện thêm bằng bài giảng YouTube, cùng định dạng).
 - **Kiến trúc:** STFT căn-Hann 20 ms bước 10 ms (48 kHz: 960 / 480) ⇒ trễ thuật toán 20 ms, không nhìn trước. Đặc trưng log-phổ 221 ô 0–11 kHz (bước 50 Hz) ⇒ Dense 192 (tanh)
   ⇒ GRU 192 ⇒ GRU 192 (+ nối tắt) ⇒ Dense 221 + sigmoid = mặt nạ từng ô. **Dải 11–24 kHz** nhân trung bình mặt nạ 6–11 kHz ⇒ giữ đủ dải 48 kHz khi thầy nói
   (dữ liệu luyện là MP3 «Xem lại Live» cắt ở ≈ 11 kHz nên mạng không học dải cao). Sàn hệ số −50 dB. 529 nghìn tham số; ≈ 0,53 triệu phép nhân-cộng / khung.
@@ -580,16 +580,16 @@ Vỡ số (NaN) ở bước 7000 lúc thêm thông thấp: đã sửa (mục 11.
 **Đang chạy tiếp (nền, `setsid nohup`, ghi checkpoint mỗi 1000 bước, chạy lại thì tự nạp checkpoint mới nhất):** lượt C (`TG_L2=1,5 TG_LOT=0,3 TG_IM1=0,2 TG_GIA=0,15`) và E
 (`TG_L2=2,5 TG_LOT=0,2 TG_IM1=0,1 TG_GIA=0,1`) từ bước 7000 — phạt khung không-thầy NHẸ lại để không đẩy hai hàng «thầy» xấu thêm; `canh-buoi-moi.sh` (25 phút: buổi Live
 mới, YouTube `giong-thay-youtube/`, kho mở `giong-khac-mo/`); `canh-ck.sh` (đo nhanh mỗi checkpoint ⇒ `do-nhanh.log` ở thư mục tạm). Chọn bản bằng bản đo 18 s trên giọng
-CHƯA GẶP (`LV_CHI_MH=1 … do-tach-giong.mjs`), KHÔNG bằng chấm nội bộ. Trọng số trong kho: `scripts/thu-live-1011/tach-giong/ckpt/thay-ck1-2000.tgt`; các bản sau
-(a-5000, c-/e-7000 …) chỉ ở thư mục tạm của phiên (`mh/*.tgt`) — chưa đưa vào kho.
+CHƯA GẶP (`LV_CHI_MH=1 … do-tach-giong.mjs`), KHÔNG bằng chấm nội bộ. Trọng số bước 2000 (`ckpt/thay-ck1-2000.tgt`) từng có trong kho — ĐÃ GỠ khỏi đầu nhánh 12/11 (11.8); mọi bản
+(a-5000, c-/e-7000 …) chỉ ở thư mục tạm của phiên (`mh/*.tgt`) — không đưa vào kho.
 **Việc kế:** nạp giờ YouTube làm nguồn giọng thầy chính (miền sạch), VIVOS / FLEURS / Common Voice cho giọng Việt nhiều người; chỉ khi bản đo 18 s đạt đủ 4 tiêu chí
 mới đặt `URL_MO_HINH_THAY` (sau lệnh có mã thầy), rồi chạy phép thử CI cho mức này (tải đoạn bài giảng công khai làm mic giả, hoặc kiểm SỐNG nếu không tải được).
 B2 (mô hình có sẵn trên Hugging Face qua runner): KHÔNG làm — điều phối hạ ưu tiên; tra cứu lượt 1 cho thấy các mô hình mở đều 16 kHz hoặc khúc dài (trái tiêu chí trễ / dải).
 
 ### 11.5 Quyết của điều phối (11/11 đêm) — trọng số, cách phát hành, dữ liệu cần thêm
 - **Trọng số:** KHÔNG commit trọng số luyện từ giọng thầy / dữ liệu NC (VIVOS) lên nhánh công khai (hệ thống quyền đã chặn một lần — không lách). Trọng số giữ ở thư
-  mục tạm của phiên (`mh/*.tgt`, `ck-*/`). `scripts/thu-live-1011/tach-giong/ckpt/thay-ck1-2000.tgt` (bước 2000, trước khi có dữ liệu NC) đã có trên nhánh thì để yên,
-  không thêm tệp mới.
+  mục tạm của phiên (`mh/*.tgt`, `ck-*/`). `scripts/thu-live-1011/tach-giong/ckpt/thay-ck1-2000.tgt` (bước 2000, lỡ vào kho ở 130fc02ae) — 12/11 điều phối quyết GỠ khỏi đầu
+  nhánh (không viết lại lịch sử, 11.8); không thêm tệp mới.
 - **Cách phát hành (khi có bản đạt đủ 4 tiêu chí — CHƯA làm mã):** tệp mô hình đặt ở R2 RIÊNG, tải qua một lệnh Worker chỉ máy thầy đã đăng nhập (mã thầy) mới lấy
   được; KHÔNG đặt ở Pages công khai, không vào precache. `URL_MO_HINH_THAY` (src/lib/live/chi-thay.ts) trỏ tới lệnh ấy; `taiMoHinhThay` gửi kèm mã như các lệnh khác
   của app thầy. Mô hình có dữ liệu NC ⇒ chỉ dùng nội bộ.

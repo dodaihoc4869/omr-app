@@ -30,6 +30,7 @@ def noi(ds, ho=(0.05, 0.6)):
     for x in ds: o += [x, np.zeros(int(rng.uniform(*ho) * HZ), np.float32)]
     return np.concatenate(o)
 YT_GIO = float(os.environ.get('TG_YT_GIO', '1.0'))  # mỗi lần quét nạp tối đa chừng ấy giờ YouTube mỗi miền (xoay vòng tệp ⇒ RAM có hạn)
+YT_TI = float(os.environ.get('TG_YT_TI', '0.6'))  # tỉ lệ mẫu lấy giọng thầy YouTube SẠCH (khác = kho mở / AudioMNIST); phần còn lại chia đôi YouTube-MP3 / thầy Live
 def napDuLieu():  # quét lại mỗi 2000 bước: buổi Live mới (canh-buoi-moi.sh) + tệp YouTube mới (chuan-bi-yt.py) tự vào tập luyện; tập chấm giữ cố định
     global THAY, THAY_V, KHAC, KHAC_V, YT_S, YT_M
     ys = sorted(glob.glob(os.path.join(DL, 'yt/sach/*.f32'))); rng.shuffle(ys); chon, tong = [], 0
@@ -213,7 +214,7 @@ matNaJ = jax.jit(matNa)
 def chonMien():
     """MIỀN của một mẫu: có YouTube ⇒ 60 % SẠCH (thầy YouTube sạch + giọng khác sạch — đúng miền mic 48 kHz lúc chạy thật), còn lại miền MP3
     (thầy live / YouTube qua MP3 + giọng khác MP3 / giọng thật trong lớp). Không trộn hai miền trong một mẫu (mạng sẽ học «có nén = thầy»)."""
-    if YT_S is not None and rng.random() < 0.6: return YT_S, None, AM_SL
+    if YT_S is not None and rng.random() < YT_TI: return YT_S, None, AM_SL
     return (THAY if YT_M is None or rng.random() < 0.5 else YT_M), KHAC, AM_L
 def loBatch(thay, khac, am, n):
     Y, S = zip(*[mau(*chonMien()) for _ in range(n)]); Y = np.stack(Y); S = np.stack(S)
