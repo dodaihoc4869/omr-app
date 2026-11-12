@@ -4,7 +4,7 @@
 // Chi phí: thẻ Live máy em = 1 lệnh đọc khoá chính (+1 lệnh đọc khối của em CHỈ khi đang có lịch); thầy bấm = 1 đọc + 1 ghi.
 import type { Env } from './kieu'
 type Row = Record<string, unknown>
-import { gameIdentity } from './game-v2-auth'
+import { gameIdentityHaiBuoc } from './game-v2-auth'
 import { gvBuoiHoc } from './buoi-hoc'
 import { baoPhongVaoLop } from './phong-binh-phan-ung'
 import { baoMayCacEm } from './ngan-hoc-sinh'
@@ -147,9 +147,14 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
 
 /** `/hs/bpu/khoi-cua-em` · `/hs/bpu/khoi-vao` (token em). */
 export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()): Promise<Row> {
-  let sbd: string
-  try { sbd = await gameIdentity(env, b) } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
-  const ds = donLich(await doc(env), nay)
+  // Đọc lịch (cau_hinh) chạy CÙNG đợt với kiểm mật khẩu (D1) — một đợt chờ thay vì hai; token sai vẫn ném trước, không tốn lượt đọc nào.
+  let sbd: string, dsGoc: Promise<LichLiveMc[]>
+  try {
+    const hb = await gameIdentityHaiBuoc(env, b)
+    dsGoc = doc(env); dsGoc.catch(() => 0)
+    sbd = await hb.xong
+  } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
+  const ds = donLich(await dsGoc, nay)
   if (!ds.length) return p.endsWith('khoi-vao') ? { ok: false, error: 'Thầy chưa mở live.' } : { ok: true, trangThai: 'khong' }
   const h = await env.DB.prepare("SELECT lop, ho_ten FROM hoc_sinh WHERE sbd = ? AND COALESCE(trang_thai, '') <> 'khoa' LIMIT 1").bind(sbd).first<Row>().catch(() => null)
   // Hồ sơ không có lớp ⇒ đọc lớp ở danh sách cổng (em mới chỉ có trong danh sách đăng nhập).
