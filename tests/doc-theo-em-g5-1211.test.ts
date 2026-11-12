@@ -292,3 +292,22 @@ describe('G5 (d) — docLanLam > 200 câu: một lượt đọc sổ dùng chung
     d.sql.close()
   })
 })
+
+describe('G5 — đổi số báo danh (/gv/doi-sbd) với bảng dẫn xuất cau_lam_cuoi', () => {
+  it('bảng không vào danh sách quét; trigger chuyển dòng của em sang số mới; bảng vẫn = GROUP BY của sổ', async () => {
+    const { doiSbd } = await import('../server/src/doi-sbd')
+    const d = taoD1That()
+    const env = d.env as unknown as Env
+    ghiSo(d.sql, '153169|100042|Q1', '100042', 'Q1', '2026-10-01T00:00:00Z')
+    ghiSo(d.sql, 'k2', '100042', 'Q2-100042', '2026-10-02T00:00:00Z')
+    ghiSo(d.sql, 'k3', '10042', 'Q1', '2026-10-03T00:00:00Z')
+    const cot = (await doiSbd(env, { cu: '100042', moi: '10048', lietKeCot: true })).cot as string[]
+    expect(cot.some((x) => x.startsWith('cau_lam_cuoi.'))).toBe(false)
+    expect(await doiSbd(env, { cu: '100042', moi: '10048', chayThat: true })).toMatchObject({ ok: true })
+    expect(d.sql.prepare("SELECT sbd, qid, luc FROM cau_lam_cuoi WHERE sbd <> '*' ORDER BY sbd, qid").all())
+      .toEqual(d.sql.prepare('SELECT sbd, qid, MAX(luc) AS luc FROM su_kien_hoc GROUP BY sbd, qid ORDER BY sbd, qid').all())
+    expect(sapXep(await docCauDaLamMoiNguon(env, '10048'))).toEqual(sapXep(mapCu(d.sql, '10048')))
+    expect(await docCauDaLamMoiNguon(env, '100042')).toEqual(new Map())
+    d.sql.close()
+  })
+})
