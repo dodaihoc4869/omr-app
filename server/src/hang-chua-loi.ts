@@ -14,6 +14,7 @@ import { boTroTheoQid } from './song-sinh-game'
 import type { BoTro } from './cau-bo-tro'
 import { apSongSinh } from './song-sinh-game'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import { dangKyXoaDem } from './dem-chung'
 
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
@@ -23,6 +24,13 @@ const str = (v: unknown) => (v == null ? '' : String(v))
  *  nó — kết quả không đổi). Không thống kê (D1 không có sqlite_stat1) bộ lập kế hoạch chọn (sbd, qid) vì GROUP BY ⇒ chỉ định thẳng; thiếu chỉ mục ⇒ lỗi ⇒ câu cũ. */
 export const CHI_MUC_CHUA_DUNG = 'INDEXED BY idx_skh_em_chua_dung'
 export const DK_CHUA_DUNG = 'ket_qua IS NOT 1'
+let thieuChiMucLuc = 0
+dangKyXoaDem(() => { thieuChiMucLuc = 0 })
+/** Câu MỚI (chỉ mục bộ phận) rồi câu CŨ khi lỗi. D1 chưa có chỉ mục («no such index») ⇒ nhớ 10 phút mỗi isolate, đi thẳng câu cũ (không thêm lượt chờ mỗi lần). */
+export function quaChiMucChuaDung<T>(moi: () => Promise<T>, cu: () => Promise<T>): Promise<T> {
+  if (Date.now() - thieuChiMucLuc < 600_000) return cu()
+  return moi().catch((e: unknown) => { if (/idx_skh_em_chua_dung/.test(String(e))) thieuChiMucLuc = Date.now(); return cu() })
+}
 /**
  * NGUỒN THỨ 4: qid → lúc sai TỰ LÀM sớm nhất từ 29/09, mọi kênh. Bỏ: sự kiện đọc lời giải, lượt lướt (OMNI 3), lượt có hỗ trợ, sự kiện bị che (ca chưa công bố —
  * công bố xong mới kéo, như nguồn ca; câu ca thi chỉ tính khi ca ĐÃ công bố — không lộ câu thi). Bỏ trống chỉ tính sai ở ca thi (kênh khác NULL có thể là "chưa làm"). Lỗi đọc ⇒ rỗng.
@@ -37,7 +45,7 @@ export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, st
     GROUP BY qid`
   let rows: Row[]
   const doc = (q: string) => env.DB.prepare(q).bind(sbd, TU_NGAY).all<Row>().then((r) => r.results ?? [])
-  try { rows = await doc(sql(true, true)).catch(() => doc(sql(true))) } catch {
+  try { rows = await quaChiMucChuaDung(() => doc(sql(true, true)), () => doc(sql(true))) } catch {
     try { rows = await doc(sql(false)) } catch { return ra }
   }
   for (const x of rows) {

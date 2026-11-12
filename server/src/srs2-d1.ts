@@ -10,7 +10,7 @@ import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import { docNhipKenh, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
-import { apLuatChung, chonBanSongSinh, CHI_MUC_CHUA_DUNG, DK_CHUA_DUNG, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
+import { apLuatChung, chonBanSongSinh, CHI_MUC_CHUA_DUNG, DK_CHUA_DUNG, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2, quaChiMucChuaDung } from './hang-chua-loi'
 import { canThanTu, nhanMocDuyTri } from './omni-can-than'
 import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, thamSoTheoLyDo, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
 import { docThamSoEmVaLyDo, lyDoHieuLuc } from './ly-do-sai'
@@ -723,13 +723,13 @@ export async function docQidSaiTaiLop(env: Env, sbd: string, hoiThay?: { now: nu
   const cu = `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY qid`
   // H1 (12/11): chỉ mục bộ phận lượt chưa đúng — dò (sbd, nguon, ket_qua = 0), phủ qid/luc ⇒ chỉ đọc dòng sai tại lớp (trước: mọi dòng sổ của em). Thiếu chỉ mục ⇒ câu cũ.
   const cm = cu.replace('su_kien_hoc WHERE', `su_kien_hoc ${CHI_MUC_CHUA_DUNG} WHERE ${DK_CHUA_DUNG} AND`)
-  const docCu = () => env.DB.prepare(cm).bind(sbd).all<Row>().catch(() => env.DB.prepare(cu).bind(sbd).all<Row>()).catch(() => ({ results: [] as Row[] }))
+  const docCu = () => quaChiMucChuaDung(() => env.DB.prepare(cm).bind(sbd).all<Row>(), () => env.DB.prepare(cu).bind(sbd).all<Row>()).catch(() => ({ results: [] as Row[] }))
   // Một hàng phụ tối đa12 mã, cùng truy vấn đã có trên bảng sổ luôn tồn tại.
   // Không thêm đợt D1; thiếu schema mới thì đọc lại query cũ, không mất nợ tại lớp.
   const hop = (q: string) => env.DB.prepare(`${q} UNION ALL SELECT NULL,
     (SELECT json_group_array(qid_goc) FROM (${sqlCauHoiThayDenHan('x.sbd', 'x.now')}))
     FROM (SELECT ? AS sbd,? AS now) x`).bind(sbd, sbd, hoiThay!.now).all<Row>()
-  const r = hoiThay ? await hop(cm).catch(() => hop(cu)).catch(docCu) : await docCu()
+  const r = hoiThay ? await quaChiMucChuaDung(() => hop(cm), () => hop(cu)).catch(docCu) : await docCu()
   if (hoiThay) hoiThay.nhan(parseMang((r.results ?? []).find(x => x.qid == null)?.luc))
   const rows = (r.results ?? []).filter(x => x.qid != null)
   if (!rows.length) return ra
@@ -767,7 +767,7 @@ export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<st
       GROUP BY s.qid`
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(cau(true, true)).bind(sbd).all<Row>().catch(() => env.DB.prepare(cau(true)).bind(sbd).all<Row>())).results ?? []
+    rows = (await quaChiMucChuaDung(() => env.DB.prepare(cau(true, true)).bind(sbd).all<Row>(), () => env.DB.prepare(cau(true)).bind(sbd).all<Row>())).results ?? []
   } catch {
     try {
       rows = (await env.DB.prepare(cau(false)).bind(sbd).all<Row>()).results ?? []

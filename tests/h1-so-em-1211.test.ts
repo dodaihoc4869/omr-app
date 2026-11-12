@@ -133,6 +133,17 @@ describe('H1 (b) — chỉ mục bộ phận lượt chưa đúng: ba câu nợ 
       }
     })
   }
+  it('D1 chưa có chỉ mục: lượt đầu lỗi ⇒ câu cũ; các lượt sau (10 phút) đi thẳng câu cũ — không thêm lượt chờ', async () => {
+    const d = dungSo(7)
+    d.sql.exec('DROP INDEX idx_skh_em_chua_dung')
+    const env = d.env as unknown as Env, log = ghiLai(env)
+    const a = await docQidSaiV2(env, 'E1')
+    expect(log.filter((x) => x.loi).length).toBe(1)
+    const n = log.length
+    const b = await docQidSaiV2(env, 'E1'); await docQidSaiCaDaCongBo(env, 'E1'); await docQidSaiTaiLop(env, 'E1')
+    expect(b).toEqual(a)
+    expect(log.slice(n).filter((x) => /INDEXED BY/.test(x.q))).toEqual([])
+  })
   it('chỉ mục có trong migration VÀ trong danh sách dựng cron đêm (cùng định nghĩa)', () => {
     const ddl = 'CREATE INDEX IF NOT EXISTS idx_skh_em_chua_dung ON su_kien_hoc(sbd, nguon, ket_qua, qid, luc, ma_nguon) WHERE ket_qua IS NOT 1'
     expect(readFileSync('server/migration-z-1211-skh-chua-dung.sql', 'utf8')).toContain(ddl)
