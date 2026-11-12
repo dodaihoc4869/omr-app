@@ -1,0 +1,29 @@
+[
+  {
+    "i": 936,
+    "hash": "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff",
+    "fileNguon": "anh/a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff.png",
+    "svg": "fuel936-native-ddh-42154dddc52a85edffa8495a6831b3586f82ab8df5fe914717e049f43b47ac6e.svg",
+    "hashSvg": "42154dddc52a85edffa8495a6831b3586f82ab8df5fe914717e049f43b47ac6e",
+    "byteSvg": 36417,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C5-B17-D2-II-3",
+        "de": "Pin nhiên liệu ethanol – oxygen được đặc biệt quan tâm do có nguồn nhiên liệu sinh học dồi dào. Phản ứng xảy ra trong pin ethanol – oxygen phóng điện ở 25 °C trong dung dịch chất điện li là potassium hydroxide (KOH) như sau:\n$\\ce{C2H5OH(l) + 3O2(g) -> 2CO2(g) + 3H2O(l)}$ (1) $\\Delta_r H^\\circ$ = –1366,8 kJ\nQuá trình hoạt động của pin ethanol – oxygen được mô tả ở hình bên. Biết rằng pin ethanol – oxygen chuyển hoá 60% năng lượng của phản ứng thành điện năng.\n(AEM: Anion Exchange Membrane: Màng trao đổi anion).",
+        "refs": [
+          {
+            "hash": "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff",
+            "where": "VIP27-C5-B17-D2-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "4ad9e2a0552016e5912f6fd21a6215fb93da99639d5261ccfec32e3ce1ea2974"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "21PURPLEellipses12LEFT8RIGHT1legend/6PURPLEfilledheads2RIGHT2UP2DOWN/4OHsupMINUS4BLACKLEFTfilledheads/3GRAYportheadsRIGHT-LEFT-LEFT/3zonesorange-blue-red/2nativeNECKS2grayterminals1wire3up3downresistor/EXACTElectron Flow-Load-Anode-AEM-Cathode-C2H5OH-O2+2H2O-CO2+H2O/ALLregularUPRIGHT-SUB25-SUPminus/3OPENports/NOaddedH-label-charge-currentvalue-formula-answer-alias",
+    "hashSvgDaSoat": "42154dddc52a85edffa8495a6831b3586f82ab8df5fe914717e049f43b47ac6e",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

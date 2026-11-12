@@ -1,0 +1,675 @@
+{
+  "i": 936,
+  "assetIndexProvided": 1374,
+  "hash": "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff",
+  "size": [
+    469,
+    370
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C5-B17-D2-II-3",
+      "de": "Pin nhiên liệu ethanol – oxygen được đặc biệt quan tâm do có nguồn nhiên liệu sinh học dồi dào. Phản ứng xảy ra trong pin ethanol – oxygen phóng điện ở 25 °C trong dung dịch chất điện li là potassium hydroxide (KOH) như sau:\n$\\ce{C2H5OH(l) + 3O2(g) -> 2CO2(g) + 3H2O(l)}$ (1) $\\Delta_r H^\\circ$ = –1366,8 kJ\nQuá trình hoạt động của pin ethanol – oxygen được mô tả ở hình bên. Biết rằng pin ethanol – oxygen chuyển hoá 60% năng lượng của phản ứng thành điện năng.\n(AEM: Anion Exchange Membrane: Màng trao đổi anion).",
+      "refs": [
+        {
+          "hash": "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff",
+          "where": "VIP27-C5-B17-D2-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "4ad9e2a0552016e5912f6fd21a6215fb93da99639d5261ccfec32e3ce1ea2974"
+        }
+      ]
+    }
+  ],
+  "rootOwnReview": {
+    "nativeFull3x": true,
+    "leftRightParticlesTop4x": true,
+    "allPublicDe": true,
+    "answersRead": false,
+    "nativeApproxNotSubpixel": true,
+    "freshChromiumFull3xOpened": true,
+    "freshTopAndLabelsMacrosOpened": true,
+    "actualSha256": "42154dddc52a85edffa8495a6831b3586f82ab8df5fe914717e049f43b47ac6e",
+    "actualNoClippingCollision": true
+  },
+  "counts": {
+    "leftPurpleParticles": 12,
+    "rightPurpleParticles": 8,
+    "legendPurpleParticles": 1,
+    "purpleArrows": 6,
+    "OHminus": 4,
+    "blackLeftArrows": 4,
+    "grayPortArrows": 3,
+    "resistorUpperPeaks": 3,
+    "resistorLowerTroughs": 3
+  },
+  "literal": "Electron Flow/Load/Anode/AEM/Cathode/C₂H₅OH/O₂ + 2H₂O/CO₂ + H₂O/4OHsupminus",
+  "noAdded": "Noaddedlabels/charges/particles/currentvalues/formulaanswer/noalias",
+  "status": "root+readonly finalpassed",
+  "measurementLimits": "Mỗi tọa độ native xấp xỉ theo bản gốc; không khẳng định đo subpixel. Nền raster có hạt in không phải hạt điện tử thêm. Chỉ21ellipse tím có chủ đích; highlightdot/grayterminalgradient theo nét gốc.",
+  "independentSourceOnlyAudit": {
+    "i": 936,
+    "assetIndexProvided": 1374,
+    "hash": "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff",
+    "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff.png",
+    "size": [
+      469,
+      370
+    ],
+    "manifestPresent": false,
+    "publicQuestions": [
+      {
+        "qid": "VIP27-C5-B17-D2-II-3",
+        "de": "Pin nhiên liệu ethanol – oxygen được đặc biệt quan tâm do có nguồn nhiên liệu sinh học dồi dào. Phản ứng xảy ra trong pin ethanol – oxygen phóng điện ở 25 °C trong dung dịch chất điện li là potassium hydroxide (KOH) như sau:\n$\\ce{C2H5OH(l) + 3O2(g) -> 2CO2(g) + 3H2O(l)}$ (1) $\\Delta_r H^\\circ$ = –1366,8 kJ\nQuá trình hoạt động của pin ethanol – oxygen được mô tả ở hình bên. Biết rằng pin ethanol – oxygen chuyển hoá 60% năng lượng của phản ứng thành điện năng.\n(AEM: Anion Exchange Membrane: Màng trao đổi anion).",
+        "allHinh": [
+          {
+            "hash": "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff",
+            "where": "VIP27-C5-B17-D2-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "4ad9e2a0552016e5912f6fd21a6215fb93da99639d5261ccfec32e3ce1ea2974"
+          }
+        ],
+        "missingHashes": [
+          "a938d31b4d0bb0aeb6871f20df9755193a32e70240c71f2c7b55c3104a0382ff"
+        ]
+      }
+    ],
+    "fullClosure": {
+      "futureFullIfPassed": 1,
+      "allAffectedQuestionsHaveOnlyThisSource": true
+    },
+    "review": {
+      "nativeFullOpened": true,
+      "ownZoomsOpened": [
+        "/workspace/scratch/393-full2x.png",
+        "/workspace/scratch/936-leftdots5x.png",
+        "/workspace/scratch/936-rightdots5x.png",
+        "/workspace/scratch/936-EAM10x.png"
+      ],
+      "allPublicDeRead": true,
+      "answersRead": false
+    },
+    "measurementLimits": "Native approximate pixel centerlines, usually ±1–2px. Gradients and antialiasing are visual; not quantitative scientific measurements. Geometry below is source-only, not SVG review.",
+    "geometry": {
+      "literalCorrection": {
+        "confirmedNative": "AEM",
+        "publicStem": "AEM",
+        "noEAMTypo": true,
+        "warning": "No lower-right gas port and no lower-right H2O label; do not add from fuel-cell theory."
+      },
+      "counts": {
+        "purpleInteriorLeft": 12,
+        "purpleInteriorRight": 8,
+        "purpleLegend": 1,
+        "purpleTotal": 21,
+        "purpleFilledArrowheads": 6,
+        "blackBlueOHLeftHeads": 4,
+        "grayGasArrowheads": 3,
+        "totalHeads": 13,
+        "loadResistor": 1,
+        "loadUpPeaks": 3,
+        "loadDownPeaks": 3,
+        "electrodeTabs": 2,
+        "gasPorts": 3
+      },
+      "font": {
+        "allLabels": "Regular upright sans; no actual bold claim",
+        "chemicalSubscripts": [
+          "C2H5OH",
+          "CO2 + H2O",
+          "O2 + 2H2O"
+        ],
+        "OHminus": "OH with superscript minus, four instances",
+        "bottomLiteral": [
+          "Anode",
+          "AEM",
+          "Cathode"
+        ],
+        "legendTwoLines": [
+          "Electron",
+          "Flow"
+        ]
+      },
+      "purpleDots": {
+        "left": [
+          [
+            144,
+            145
+          ],
+          [
+            128,
+            156
+          ],
+          [
+            142,
+            173
+          ],
+          [
+            123,
+            181
+          ],
+          [
+            147,
+            199
+          ],
+          [
+            131,
+            206
+          ],
+          [
+            124,
+            230
+          ],
+          [
+            145,
+            232
+          ],
+          [
+            145,
+            259
+          ],
+          [
+            127,
+            285
+          ],
+          [
+            150,
+            305
+          ],
+          [
+            131,
+            317
+          ]
+        ],
+        "right": [
+          [
+            319,
+            149
+          ],
+          [
+            309,
+            175
+          ],
+          [
+            326,
+            191
+          ],
+          [
+            309,
+            213
+          ],
+          [
+            331,
+            241
+          ],
+          [
+            307,
+            253
+          ],
+          [
+            328,
+            279
+          ],
+          [
+            311,
+            308
+          ]
+        ],
+        "legend": [
+          80,
+          21
+        ],
+        "radiusApprox": 4.5,
+        "legendRadiusApprox": 4,
+        "appearance": "Purple dark rim, softer lighter center; retain elliptical raster proportions where visible."
+      },
+      "purpleArrows": [
+        {
+          "from": [
+            155,
+            19
+          ],
+          "tip": [
+            181,
+            19
+          ],
+          "direction": "RIGHT"
+        },
+        {
+          "from": [
+            266,
+            19
+          ],
+          "tip": [
+            292,
+            19
+          ],
+          "direction": "RIGHT"
+        },
+        {
+          "from": [
+            117,
+            83
+          ],
+          "tip": [
+            117,
+            55
+          ],
+          "direction": "UP"
+        },
+        {
+          "from": [
+            136,
+            132
+          ],
+          "tip": [
+            136,
+            100
+          ],
+          "direction": "UP"
+        },
+        {
+          "from": [
+            333,
+            51
+          ],
+          "tip": [
+            333,
+            80
+          ],
+          "direction": "DOWN"
+        },
+        {
+          "from": [
+            320,
+            99
+          ],
+          "tip": [
+            320,
+            133
+          ],
+          "direction": "DOWN"
+        }
+      ],
+      "OHArrows": [
+        {
+          "from": [
+            241,
+            160
+          ],
+          "tip": [
+            214,
+            160
+          ],
+          "labelBaselineApprox": [
+            246,
+            165
+          ]
+        },
+        {
+          "from": [
+            211,
+            210
+          ],
+          "tip": [
+            186,
+            210
+          ],
+          "labelBaselineApprox": [
+            217,
+            215
+          ]
+        },
+        {
+          "from": [
+            200,
+            264
+          ],
+          "tip": [
+            174,
+            264
+          ],
+          "labelBaselineApprox": [
+            205,
+            269
+          ]
+        },
+        {
+          "from": [
+            235,
+            314
+          ],
+          "tip": [
+            209,
+            314
+          ],
+          "labelBaselineApprox": [
+            240,
+            319
+          ]
+        }
+      ],
+      "gasArrows": [
+        {
+          "from": [
+            63,
+            172
+          ],
+          "tip": [
+            95,
+            172
+          ],
+          "direction": "RIGHT",
+          "label": "C₂H₅OH",
+          "bboxApprox": [
+            18,
+            164,
+            60,
+            180
+          ]
+        },
+        {
+          "from": [
+            95,
+            294
+          ],
+          "tip": [
+            63,
+            294
+          ],
+          "direction": "LEFT",
+          "label": "CO₂ + H₂O",
+          "bboxApprox": [
+            5,
+            287,
+            59,
+            303
+          ]
+        },
+        {
+          "from": [
+            406,
+            171
+          ],
+          "tip": [
+            374,
+            171
+          ],
+          "direction": "LEFT",
+          "label": "O₂ + 2H₂O",
+          "bboxApprox": [
+            411,
+            163,
+            468,
+            179
+          ]
+        }
+      ],
+      "wireResistor": {
+        "leftWire": [
+          [
+            136,
+            90
+          ],
+          [
+            136,
+            42
+          ],
+          [
+            180,
+            42
+          ]
+        ],
+        "resistorVertices": [
+          [
+            180,
+            42
+          ],
+          [
+            189,
+            30
+          ],
+          [
+            201,
+            55
+          ],
+          [
+            213,
+            30
+          ],
+          [
+            225,
+            55
+          ],
+          [
+            237,
+            30
+          ],
+          [
+            248,
+            58
+          ],
+          [
+            255,
+            42
+          ]
+        ],
+        "rightWire": [
+          [
+            255,
+            42
+          ],
+          [
+            318,
+            42
+          ],
+          [
+            318,
+            90
+          ]
+        ],
+        "strokeApprox": 1.5,
+        "label": {
+          "literal": "Load",
+          "bboxApprox": [
+            211,
+            66,
+            241,
+            79
+          ]
+        },
+        "tabs": [
+          [
+            129,
+            88,
+            143,
+            95
+          ],
+          [
+            311,
+            88,
+            325,
+            95
+          ]
+        ]
+      },
+      "cell": {
+        "outerFrameApprox": [
+          95,
+          120,
+          374,
+          347
+        ],
+        "roundedCornersRadiusApprox": 10,
+        "strokeApprox": 2,
+        "verticalBoundaries": {
+          "leftYellowOuter": 114,
+          "yellowBlue": 161,
+          "blueRed": 296,
+          "redOuter": 344
+        },
+        "regions": {
+          "anodeYellow": [
+            114,
+            120,
+            161,
+            347
+          ],
+          "membraneBlue": [
+            161,
+            120,
+            296,
+            347
+          ],
+          "cathodeRed": [
+            296,
+            120,
+            344,
+            347
+          ]
+        },
+        "leftNeck": [
+          125,
+          95,
+          149,
+          120
+        ],
+        "rightNeck": [
+          309,
+          95,
+          329,
+          120
+        ],
+        "appearance": "Flat diagram with subtle yellow/orange, cyan-blue and red fills; not photograph. White side channels.",
+        "openWallPathsApprox": {
+          "upperLeft": [
+            [
+              18,
+              156
+            ],
+            [
+              95,
+              156
+            ],
+            [
+              95,
+              130
+            ]
+          ],
+          "middleLeft": [
+            [
+              18,
+              184
+            ],
+            [
+              95,
+              184
+            ],
+            [
+              95,
+              273
+            ],
+            [
+              18,
+              273
+            ]
+          ],
+          "lowerLeft": [
+            [
+              18,
+              311
+            ],
+            [
+              95,
+              311
+            ],
+            [
+              95,
+              337
+            ]
+          ],
+          "upperRight": [
+            [
+              374,
+              130
+            ],
+            [
+              374,
+              156
+            ],
+            [
+              427,
+              156
+            ]
+          ],
+          "middleAndLowerRight": [
+            [
+              427,
+              184
+            ],
+            [
+              374,
+              184
+            ],
+            [
+              374,
+              337
+            ]
+          ]
+        },
+        "warning": "Right wall continuous below upper-right inlet; no bottom-right outlet. Top/bottom frame joins rounded side walls, do not close three port openings."
+      },
+      "labels": [
+        {
+          "text": "Electron",
+          "bboxApprox": [
+            92,
+            14,
+            141,
+            27
+          ]
+        },
+        {
+          "text": "Flow",
+          "bboxApprox": [
+            103,
+            29,
+            131,
+            42
+          ]
+        },
+        {
+          "text": "Anode",
+          "bboxApprox": [
+            118,
+            353,
+            159,
+            367
+          ]
+        },
+        {
+          "text": "AEM",
+          "bboxApprox": [
+            212,
+            353,
+            241,
+            367
+          ]
+        },
+        {
+          "text": "Cathode",
+          "bboxApprox": [
+            295,
+            353,
+            346,
+            367
+          ]
+        }
+      ]
+    },
+    "actualSvgReviewed": false,
+    "status": "source-only/noSVG/noCount",
+    "uncertainties": [
+      "Exact antialiased dot ellipse radii and gradient stops are visual approximations, not data values.",
+      "Port corner radii and resistor scan line drift approximate; individual listed vertices should not be periodic-normalized."
+    ]
+  }
+}
