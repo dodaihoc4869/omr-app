@@ -6,12 +6,36 @@
 //   • Câu TRÙM đã ra HÔM NAY trong chặng của các em ⇒ CHẶN hẳn khi kho còn câu khác; chỉ khi hết mới dùng lại, câu ra LÂU NHẤT trước (`chonMotHaiTrum`, `docTrumRaHomNay`).
 // Chỉ ĐỌC. Hàm thuần `tachMoiCu` / `chonLauNhat` / `buCauLauNhat` / `chonMotHaiTrum` không đọc D1 (test được).
 import type { Env } from './kieu'
+import { dangKyXoaDem } from './dem-chung'
 
-/** Lần làm gần nhất (ms) của mỗi câu em ĐÃ LÀM ở BẤT KỲ nguồn nào, mọi ngày (sổ học `su_kien_hoc`, đi chỉ mục (sbd, qid)). Lỗi đọc ⇒ rỗng (không chặn thêm). */
+/** Câu đọc CŨ (giữ làm đường lùi khi D1 chưa có bảng `cau_lam_cuoi`): đọc mọi dòng sổ của em. */
+export const SQL_DA_LAM_CU = 'SELECT qid, MAX(luc) AS luc FROM su_kien_hoc WHERE sbd = ? GROUP BY qid'
+/**
+ * G5 12/11 (hoá đơn D1: câu cũ ~1.863 hàng × 54 nghìn lượt/ngày ≈ 100 triệu hàng đọc): đọc bảng tính sẵn `cau_lam_cuoi` (MỘT dòng mỗi câu em đã làm; trigger
+ * trên sổ giữ đúng = MAX(luc) theo (em, câu) — server/migration-z-1211-cau-lam-cuoi.sql) khi có DẤU đã nạp (sbd '*', qid '*'); chưa có dấu ⇒ CÙNG câu SQL tính
+ * thẳng từ sổ như cũ (hai nhánh loại trừ nhau, một lệnh, không thêm vòng chờ). Bảng chưa có (lỗi) ⇒ câu cũ, nhớ 10 phút mỗi isolate để không thử lại mỗi lượt.
+ */
+// Điều kiện dấu nằm TRONG khoá dò (`sbd = (SELECT ?1 WHERE …)`): nhánh không dùng có khoá NULL ⇒ bỏ qua cả vòng dò, không đọc dòng nào (đặt điều kiện ngoài
+// khoá thì SQLite kiểm SAU mỗi lượt dò chỉ mục ⇒ nhánh sổ vẫn duyệt mọi dòng của em).
+const DAU_NAP = `EXISTS (SELECT 1 FROM cau_lam_cuoi WHERE sbd = '*' AND qid = '*')`
+export const SQL_DA_LAM = `SELECT qid, luc FROM cau_lam_cuoi WHERE sbd = (SELECT ?1 WHERE ${DAU_NAP})
+  UNION ALL SELECT qid, MAX(luc) AS luc FROM su_kien_hoc WHERE sbd = (SELECT ?1 WHERE NOT ${DAU_NAP}) GROUP BY qid`
+let bangTomTatLoiLuc = 0
+dangKyXoaDem(() => { bangTomTatLoiLuc = 0 })
+/** Lần làm gần nhất (ms) của mỗi câu em ĐÃ LÀM ở BẤT KỲ nguồn nào, mọi ngày (sổ học `su_kien_hoc`, qua bảng tính sẵn `cau_lam_cuoi`). Lỗi đọc ⇒ rỗng (không chặn thêm). */
 export async function docCauDaLamMoiNguon(env: Env, sbd: string): Promise<Map<string, number>> {
   const ra = new Map<string, number>()
   try {
-    const r = await env.DB.prepare('SELECT qid, MAX(luc) AS luc FROM su_kien_hoc WHERE sbd = ? GROUP BY qid').bind(sbd).all<{ qid: string; luc: string }>()
+    type D = { qid: string; luc: string }
+    let r: { results?: D[] }
+    if (Date.now() - bangTomTatLoiLuc < 600_000) r = await env.DB.prepare(SQL_DA_LAM_CU).bind(sbd).all<D>()
+    else {
+      try { r = await env.DB.prepare(SQL_DA_LAM).bind(sbd).all<D>() } catch (e) {
+        if (!/cau_lam_cuoi/.test(e instanceof Error ? e.message : String(e))) throw e
+        bangTomTatLoiLuc = Date.now()
+        r = await env.DB.prepare(SQL_DA_LAM_CU).bind(sbd).all<D>()
+      }
+    }
     for (const x of r.results ?? []) { const t = Date.parse(String(x.luc)); ra.set(String(x.qid), Number.isFinite(t) ? t : 0) }
   } catch (e) {
     console.error('[cau-moi] không đọc được sổ học (bỏ qua bộ lọc câu đã làm):', e instanceof Error ? e.message : e)

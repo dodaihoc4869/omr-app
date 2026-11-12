@@ -225,6 +225,9 @@ export const BANG_GIU: readonly string[] = [
   'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc',
   // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10) — sinh sau lần 21/09: GIỮ = không đụng. Dẫn xuất từ sổ su_kien_hoc (GIỮ).
   'nhip_hoc_doi_pho_ngay',
+  // «Lần cuối em làm mỗi câu» tính sẵn (G5 12/11, migration-z-1211-cau-lam-cuoi.sql): dẫn xuất từ sổ su_kien_hoc (GIỮ), trigger giữ đúng ⇒ GIỮ.
+  // KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `cau_lam_cuoi_sau_*`.
+  'cau_lam_cuoi',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */
