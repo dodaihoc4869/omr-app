@@ -1,0 +1,563 @@
+{
+  "i": 424,
+  "assetIndexProvided": 1313,
+  "hash": "4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7.png",
+  "size": [
+    671,
+    121
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C2-B7-D2-I-12",
+      "de": "Trong một loại polysacchride, liên kết giữa các gốc glucose được biểu diễn như sau:\nLiên kết được xác định bằng mũi tên được gọi là",
+      "allHinh": [
+        {
+          "hash": "4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7",
+          "where": "VIP27-C2-B7-D2-I-12.hinh.0.du_lieu",
+          "hashDataUrl": "32ad8a05a35cf00679d68428e6148997c21d355421ad98694f307aacfc1306da"
+        }
+      ],
+      "missingHashes": [
+        "4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownLeftWave10xOpened": true,
+    "ownRightWave10xOpened": true,
+    "ownLeader10xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxorderedturns/centers, irregularwaverasterverifiedownmacros. No periodicfitting/countatomicoutsidewavecaps.",
+  "geometry": {
+    "rings": [
+      {
+        "bareC": [
+          [
+            93,
+            64
+          ],
+          [
+            127,
+            28
+          ],
+          [
+            207,
+            64
+          ],
+          [
+            179,
+            96
+          ],
+          [
+            120,
+            96
+          ]
+        ],
+        "thinPath": [
+          [
+            93,
+            64
+          ],
+          [
+            127,
+            28
+          ],
+          [
+            163,
+            28
+          ]
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            169,
+            13,
+            194,
+            38
+          ]
+        },
+        "OtoC": [
+          [
+            191,
+            44
+          ],
+          [
+            207,
+            64
+          ]
+        ],
+        "frontPath": [
+          [
+            93,
+            64
+          ],
+          [
+            120,
+            96
+          ],
+          [
+            179,
+            96
+          ],
+          [
+            207,
+            64
+          ]
+        ]
+      },
+      {
+        "bareC": [
+          [
+            272,
+            64
+          ],
+          [
+            304,
+            28
+          ],
+          [
+            383,
+            64
+          ],
+          [
+            356,
+            96
+          ],
+          [
+            298,
+            96
+          ]
+        ],
+        "thinPath": [
+          [
+            272,
+            64
+          ],
+          [
+            304,
+            28
+          ],
+          [
+            339,
+            28
+          ]
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            346,
+            13,
+            371,
+            38
+          ]
+        },
+        "OtoC": [
+          [
+            369,
+            44
+          ],
+          [
+            383,
+            64
+          ]
+        ],
+        "frontPath": [
+          [
+            272,
+            64
+          ],
+          [
+            298,
+            96
+          ],
+          [
+            356,
+            96
+          ],
+          [
+            383,
+            64
+          ]
+        ]
+      },
+      {
+        "bareC": [
+          [
+            455,
+            64
+          ],
+          [
+            487,
+            28
+          ],
+          [
+            565,
+            64
+          ],
+          [
+            539,
+            96
+          ],
+          [
+            481,
+            96
+          ]
+        ],
+        "thinPath": [
+          [
+            455,
+            64
+          ],
+          [
+            487,
+            28
+          ],
+          [
+            522,
+            28
+          ]
+        ],
+        "O": {
+          "text": "O",
+          "bbox": [
+            528,
+            13,
+            553,
+            38
+          ]
+        },
+        "OtoC": [
+          [
+            551,
+            44
+          ],
+          [
+            565,
+            64
+          ]
+        ],
+        "frontPath": [
+          [
+            455,
+            64
+          ],
+          [
+            481,
+            96
+          ],
+          [
+            539,
+            96
+          ],
+          [
+            565,
+            64
+          ]
+        ]
+      }
+    ],
+    "bridges": [
+      {
+        "text": "O",
+        "bbox": [
+          225,
+          80,
+          250,
+          105
+        ],
+        "bonds": [
+          [
+            [
+              207,
+              64
+            ],
+            [
+              223,
+              80
+            ]
+          ],
+          [
+            [
+              252,
+              79
+            ],
+            [
+              272,
+              64
+            ]
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          405,
+          83,
+          430,
+          108
+        ],
+        "bonds": [
+          [
+            [
+              383,
+              64
+            ],
+            [
+              401,
+              81
+            ]
+          ],
+          [
+            [
+              432,
+              81
+            ],
+            [
+              455,
+              64
+            ]
+          ]
+        ]
+      }
+    ],
+    "terminalO": {
+      "text": "O",
+      "bbox": [
+        588,
+        83,
+        613,
+        108
+      ],
+      "bond": [
+        [
+          565,
+          64
+        ],
+        [
+          583,
+          82
+        ]
+      ],
+      "note": "NopropershorthandOH/Hadded;rightwavebeginsafterOwhitegap."
+    },
+    "leftCap": {
+      "orderedTurns": [
+        [
+          9,
+          101
+        ],
+        [
+          11,
+          104
+        ],
+        [
+          15,
+          97
+        ],
+        [
+          20,
+          104
+        ],
+        [
+          25,
+          97
+        ],
+        [
+          30,
+          104
+        ],
+        [
+          34,
+          97
+        ],
+        [
+          39,
+          104
+        ],
+        [
+          44,
+          97
+        ],
+        [
+          49,
+          104
+        ],
+        [
+          53,
+          97
+        ],
+        [
+          58,
+          104
+        ],
+        [
+          63,
+          97
+        ],
+        [
+          66,
+          100
+        ],
+        [
+          68,
+          98
+        ]
+      ],
+      "connectionToRing": [
+        [
+          68,
+          98
+        ],
+        [
+          93,
+          64
+        ]
+      ],
+      "crests": 6,
+      "troughs": 6,
+      "strokeWidth": 2.2,
+      "note": "Initialdownhook/6fulloscillations+shallowexitbend, noforcedperfectperiod. Leftfreeendnotarrow."
+    },
+    "rightCap": {
+      "orderedTurns": [
+        [
+          615,
+          98
+        ],
+        [
+          617,
+          101
+        ],
+        [
+          621,
+          95
+        ],
+        [
+          625,
+          101
+        ],
+        [
+          630,
+          95
+        ],
+        [
+          633,
+          101
+        ],
+        [
+          638,
+          95
+        ],
+        [
+          641,
+          101
+        ],
+        [
+          646,
+          95
+        ],
+        [
+          650,
+          101
+        ],
+        [
+          654,
+          95
+        ],
+        [
+          657,
+          99
+        ]
+      ],
+      "crests": 5,
+      "troughs": 5,
+      "strokeWidth": 2.2,
+      "note": "SeparateafterterminalOinkwhitegap;lastfallends65799,nohead/noextraoscillation."
+    },
+    "leader": {
+      "shaft": [
+        [
+          441,
+          5
+        ],
+        [
+          400,
+          67
+        ]
+      ],
+      "filledTriangle": [
+        [
+          400,
+          67
+        ],
+        [
+          406,
+          46
+        ],
+        [
+          420,
+          53
+        ]
+      ],
+      "direction": "DOWNLEFT",
+      "note": "OneFULLfilledhead;TIP40067freestandingaboveinterunitbond, doNOTextendtosnappoint."
+    },
+    "font": "All6Oregularuprightserifblack, noactualbold/italic; coloredsubpixelfringesnativealiasnotblue/orangechemicalcolor.",
+    "bondStyle": "Allring/frontlinesTHINUNIFORMblack~2px, nofrontbold/TAPER/stereowedge. Wavecaps~2px.",
+    "countsVisible": {
+      "bareC": 15,
+      "ringO": 3,
+      "bridgeO": 2,
+      "terminalO": 1,
+      "O": 6,
+      "rings": 3,
+      "wavecaps": 2,
+      "leftWaveCrestsTr": 6,
+      "rightWaveCrestsTr": 5,
+      "filledHeads": 1,
+      "explicitH": 0,
+      "OH": 0,
+      "tapers": 0,
+      "captions": 0,
+      "outsidePolymerC": "UNKNOWN_notinferred"
+    },
+    "noAdded": [
+      "OH/CH2OH/H",
+      "Cnumbers",
+      "linkagenameanswer",
+      "stereowedges",
+      "periodicwave",
+      "extraCattips",
+      "outsidepolymeratoms",
+      "leadercontact",
+      "captions"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFull3xOpened": true,
+    "leftRightHead8xOpened": true,
+    "allPublicDeAllRefsRead": true,
+    "sourceApproxNotSubpixel": true,
+    "wavesTurnsIndividuallyKept": true,
+    "regularO6NoHNoStereoNoCaption": true,
+    "noAlias": true
+  },
+  "sourceStageStatus": "source-only/noSVG/noCount",
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79",
+    "readonlyProof": "cau-truc-poly424-native-ddh-lo-383-soat-doc-lap.json",
+    "runtime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/poly424-native-ddh-180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79.svg 180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79\n424 { x: 0, y: 0, width: 671, height: 121 }\nPOSTSHOT_SHA 180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79\n",
+    "newFull": 1
+  }
+}

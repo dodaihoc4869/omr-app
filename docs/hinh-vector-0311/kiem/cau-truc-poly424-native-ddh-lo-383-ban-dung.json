@@ -1,0 +1,29 @@
+[
+  {
+    "i": 424,
+    "hash": "4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7",
+    "fileNguon": "anh/4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7.png",
+    "svg": "poly424-native-ddh-180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79.svg",
+    "hashSvg": "180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79",
+    "byteSvg": 5913,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B7-D2-I-12",
+        "de": "Trong một loại polysacchride, liên kết giữa các gốc glucose được biểu diễn như sau:\nLiên kết được xác định bằng mũi tên được gọi là",
+        "refs": [
+          {
+            "hash": "4bc37a96c7dc321b5e13d889373a4b67f7929c72911a58032a405bb0c96361b7",
+            "where": "VIP27-C2-B7-D2-I-12.hinh.0.du_lieu",
+            "hashDataUrl": "32ad8a05a35cf00679d68428e6148997c21d355421ad98694f307aacfc1306da"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "15visiblebareC6O-3ringO2bridgeO1terminalO/3sixringsALLthinUNIFORM/2cutwavecapsLEFT6crests6troughs-RIGHT5crests5troughs-individualnonperiodicturns/1FULLFILLEDleaderDOWNLEFTtip40067FREEabovebond/ALL6OregularUPRIGHT/0H-OH-CH2OH-TAPER-stereo-caption/UNKNOWNoutsidepolymerC-NOaddedlinkagename-answer-alias",
+    "hashSvgDaSoat": "180d64bc845b178b867c763122a0066026bb1ca3907d677ba71d60be2de0ee79",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
