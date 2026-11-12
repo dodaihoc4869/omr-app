@@ -2725,7 +2725,7 @@ function idThietBiCuaLuot(a: { idThietBi?: string } | null | undefined): string 
       try {
         const tt = await trangThaiPhongCho(url, maCa.trim())
         if (!con) return
-        // Đấu Nguyên Tử: báo game phòng chờ dừng NGAY (đóng kết nối, dừng vẽ) trước khi vào bài.
+        // Trò phòng chờ: báo trò dừng NGAY (đóng kết nối, dừng vẽ) trước khi vào bài.
         if (tt.batDau) { setCho((c) => (c && !c.batDau ? { ...c, batDau: true } : c)); void vaoSauBatDau() }
       } catch (e) {
         // Ca bị thầy huỷ giữa lúc chờ: nói thẳng, đừng để em đứng mãi.

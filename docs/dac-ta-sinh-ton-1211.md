@@ -135,3 +135,10 @@ Thầy: «giữ 2d thêm bóng đổ ánh sáng cho có chiều sâu, vẽ lại
 - **Đã đo (Chromium, bản dev):** 0 lỗi trang; chưa bấm ⇒ 0 kết nối; nút «Chơi» 60 px, «Thoát trò» ≥ 44 px không đè nút loa; 0 lớp đè / tràn ở ba khổ; 58–62 khung / giây; mã 4000 ⇒ trò gỡ + «vào bài» sau ≤ 11 ms, đúng một lần, không nối lại. Mảnh tải lúc vào phòng chờ: thẻ sảnh 11 KB (4,8 KB nén) thay mảnh DauIon 85 KB; màn trò (19 KB nén) chỉ tải khi bấm «Chơi».
 - **CHƯA thử:** điện thoại thật (toàn màn + khoá ngang Android, xoay hình iPhone), nhiều máy qua mạng thật, Durable Object thật ngủ / thức, ca đông trên 78 em. **Tiếng (13/11):** ở phòng chờ ca trò mặc định TẮT tiếng (`TroSinhTon` nhận `imLang`; em bấm loa mới bật, không ghi vào máy nên không đổi lựa chọn loa ở phòng live) — phiên tự chọn, thầy muốn mặc định bật thì bỏ `imLang` ở `SanhSinhTon.tsx`.
 
+
+## Xoá trò «Đấu Nguyên Tử» (13/11, thầy: «Xóa game đấu nguyên tử đi nhé»)
+
+- **Đã xoá:** lõi trò `src/lib/dau-ion/*`, tờ kiểu `dau-ion.css`, luật phòng `server/src/dau-ion-phong.ts`, 4 tệp test của trò, bản vẽ + ảnh (`docs/ban-ve-dau-ion-*`, `docs/anh-dau-ion-*`, `docs/ban-ve-game-ban-sung-3010`). Khoá sha256 tệp gỡ: `docs/xoa-dau-nguyen-tu-1311/mau-tep-da-go.json`.
+- **Giữ (Sinh Tồn đang dùng), chỉ còn tên kỹ thuật «dau-ion»:** lớp Durable Object `PhongDauIon` + ràng buộc `PHONG_DAU_ION` (đổi tên lớp cần migration), công tắc `TAT_DAU_ION`, vé `server/src/dau-ion-ve.ts` (tiền tố ký `dau-ion|`), đường WebSocket `/dau-ion/<ca>`. Lớp mạng máy em đổi tên `mang-sanh-ca.ts` (bỏ gói nhị phân của trò cũ). Hằng số dùng chung (mã đóng, trần 78 em, 8 phòng) nay ở `server/src/sinh-ton-ca.ts`.
+- **Máy còn mảnh trò cũ trong bộ nhớ đệm:** gói vào không có `tro` ⇒ phòng đóng mã 4010 «Trò ở phòng chờ đã đổi sang Sinh Tồn. Em tải lại trang để chơi nhé.» (máy cũ hiểu là sảnh chưa mở, không nối lại; phần «Tập với A.I» chạy tại máy của mảnh cũ không cần máy chủ).
+- **`/dong` (thầy bấm Bắt đầu):** nay đóng mã 4000 cả kết nối vừa mở chưa kịp gửi vé (trước chỉ đóng em đã vào trò).

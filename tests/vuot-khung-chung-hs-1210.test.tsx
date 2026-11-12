@@ -85,16 +85,15 @@ describe('thanh trên Hôm nay không tràn ngang ⇒ khung nhìn không bị n�
 })
 
 describe('Phòng chờ: bàn chơi không nuốt cú vuốt dọc', () => {
-  // 31/10 cập nhật CÓ CHỦ Ý: «Đấu Nguyên Tử 2» (thầy duyệt docs/DE-XUAT-DAU-ION-V2-3110.md) thay tờ ban-nguyen-to.css bằng dau-ion.css; bỏ hai cần,
-  // CẢ màn trận là vùng kéo (cần nổi) ⇒ khoá chạm nằm ở .dn-man (phủ kín khung nhìn), thẻ sảnh trong phòng chờ vẫn cuộn bình thường.
-  it('Đấu Nguyên Tử 2 (31/10): thẻ game trong phòng chờ KHÔNG có vùng nuốt cú vuốt; chỉ màn trận (phủ kín khung nhìn) mới khoá chạm', () => {
-    const css = doc('src/components/phong-cho/dau-ion.css')
-    // Thẻ + ảnh bìa ở sảnh là khối / canvas thường (không touch-action: none) ⇒ vuốt dọc vẫn cuộn phòng chờ.
-    expect(giaTriCuoi(css, '.dn-bia canvas', 'touch-action')).toBeUndefined()
-    expect(giaTriCuoi(css, '.dn-the', 'touch-action')).toBeUndefined()
-    // Màn trận cố định (.dn-man) là vùng kéo ở bất kỳ đâu — không cuộn, có overscroll-behavior: contain.
-    expect(giaTriCuoi(css, '.dn-man', 'touch-action')).toBe('none')
-    expect(giaTriCuoi(css, '.dn-man', 'position')).toBe('fixed')
-    expect(giaTriCuoi(css, '.dn-man', 'overscroll-behavior')).toBe('contain')
+  // 13/11 cập nhật CÓ CHỦ Ý (thầy: «Xóa game đấu nguyên tử đi nhé»): trò phòng chờ nay là «Sinh Tồn bốn đội» (sanh-sinh-ton.css thay dau-ion.css) — cùng luật:
+  // thẻ sảnh trong phòng chờ vẫn cuộn bình thường, chỉ màn trò (phủ kín khung nhìn) mới khoá chạm.
+  it('Sinh Tồn bốn đội (13/11): thẻ trò trong phòng chờ KHÔNG có vùng nuốt cú vuốt; chỉ màn trò (phủ kín khung nhìn) mới khoá chạm', () => {
+    const css = doc('src/components/phong-cho/sanh-sinh-ton.css')
+    // Thẻ ở sảnh là khối thường (không touch-action: none) ⇒ vuốt dọc vẫn cuộn phòng chờ.
+    expect(giaTriCuoi(css, '.sst-the', 'touch-action')).toBeUndefined()
+    // Màn trò cố định (.sst-man) là vùng vuốt ở bất kỳ đâu — không cuộn, có overscroll-behavior: contain.
+    expect(giaTriCuoi(css, '.sst-man', 'touch-action')).toBe('none')
+    expect(giaTriCuoi(css, '.sst-man', 'position')).toBe('fixed')
+    expect(giaTriCuoi(css, '.sst-man', 'overscroll-behavior')).toBe('contain')
   })
 })

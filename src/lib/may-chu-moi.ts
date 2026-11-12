@@ -226,7 +226,7 @@ export async function goiWorker<T = Record<string, unknown>>(
 }
 
 export interface KetQuaVaoThiMoi {
-  /** Vé vào Sảnh đấu «Đấu Nguyên Tử» — chỉ có ở nhánh phòng chờ (`cach: 'cho'`). */
+  /** Vé vào trò phòng chờ «Sinh Tồn bốn đội» — chỉ có ở nhánh phòng chờ (`cach: 'cho'`). */
   veDau?: string
   ok: boolean
   cach?: 'moi' | 'khoi_phuc' | 'duyet_lai'

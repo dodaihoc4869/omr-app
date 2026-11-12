@@ -14,7 +14,7 @@ import { KHOA_NHO_MAY_YEU, dangCheDoMayYeu } from '../../lib/may-yeu'
 import { PHIEN_BAN_ST, type KenhLop, type NguoiLop, type TinLop } from '../../lib/live-khoi/kieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { laDienThoai, thuocTinhXoay } from '../live/chieu-xoay'
-import { MangDau, duongPhong, type TinMang } from './dau-ion-mang'
+import { MangDau, duongPhong, type TinMang } from './mang-sanh-ca'
 
 const napTro = () => import('../live-khoi/TroSinhTon')
 const TroSinhTon = lazy(napTro)
@@ -117,7 +117,6 @@ export default function SanhSinhTon({ maCa, veDau, batDau, onBatDau }: SanhSinhT
   const dungHet = useCallback(() => { luot.current++; mangRef.current?.dong(); mangRef.current = null; raToanMan() }, [])
 
   const nhanTin = useCallback((t: TinMang) => {
-    if (t.k === 'anh') return
     if (t.k === 'mo') { setLanMat(0); return }
     if (t.k === 'mat') {
       setMang('mat'); setLanMat(t.lan)

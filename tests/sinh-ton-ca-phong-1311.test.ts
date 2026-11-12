@@ -1,14 +1,13 @@
 // @vitest-environment node
 // TRÒ «SINH TỒN» Ở PHÒNG CHỜ CA KIỂM TRA (thầy 13/11: «Chuyển luôn game này sang cả phòng chờ của ca kiểm tra») — phòng của ca (server/src/sinh-ton-ca.ts,
-// luật thuần) + Durable Object `PhongDauIon` (cùng vé, cùng công tắc, cùng lệnh `/dong` với Đấu Nguyên Tử) + máy trò dùng chung (sinh-ton-may-chu.ts).
+// luật thuần) + Durable Object `PhongDauIon` (vé, công tắc, lệnh `/dong` của phòng chờ ca) + máy trò dùng chung (sinh-ton-may-chu.ts).
 // Khoá: vào bằng vé ⇒ đội ít em thật nhất; cùng số báo danh ở máy khác ⇒ kết nối cũ đóng 4002; em thứ 79 ⇒ 4009 «sang:1»; nhịp 250 ms phát đúng MỘT ảnh
 // `{ t: 'lop', k: 'tro' }` có máy bù đủ 4 mỗi đội; em rời ⇒ `st-ds` mới + máy bù lại; thầy bắt đầu ⇒ `{ t: 'dong' }` + đóng 4000; hết em thật ⇒ phòng được
-// ngủ; phòng thức dậy dựng lại đúng đội; giao thức Đấu Nguyên Tử cũ vẫn chạy cạnh; 0 lệnh D1 (phòng không có D1).
+// ngủ; phòng thức dậy dựng lại đúng đội; máy còn mảnh trò Đấu Nguyên Tử cũ (đã xoá 13/11) bị đóng 4010; 0 lệnh D1 (phòng không có D1).
 import { describe, expect, it, vi } from 'vitest'
-import { MA_DONG, PHIEN_BAN, TRAN_KET_NOI, type KetNoi } from '../server/src/dau-ion-phong'
 import { PhongDauIon } from '../server/src/phong-dau-ion'
 import { kyVeDau } from '../server/src/dau-ion-ve'
-import { CHU_BAN_CU_ST, PhongSinhTonCa, type KemSinhTon } from '../server/src/sinh-ton-ca'
+import { CHU_BAN_CU_ST, CHU_TRO_CU, MA_DONG, PhongSinhTonCa, TRAN_KET_NOI, type KemSinhTon, type KetNoi } from '../server/src/sinh-ton-ca'
 import { MaySinhTon, TRO_NHIP_MS } from '../server/src/sinh-ton-may-chu'
 import { PHIEN_BAN_ST, type SinhTonAnh, type SinhTonGui } from '../src/lib/live-khoi/kieu'
 import { VAN_MS } from '../src/lib/live-khoi/sinh-ton-loi'
@@ -228,7 +227,7 @@ const veKy = (s: string, c = '123456', h = Date.now() + 60_000) => kyVeDau('bi-m
 const vaoSt = async (d: PhongDauIon, w: WsMayChu, s: string) => d.webSocketMessage(w, JSON.stringify({ t: 'vao', v: PHIEN_BAN_ST, tro: 'st', ve: await veKy(s) }))
 const docTin = (w: { gui: string[] }) => w.gui.map((x) => JSON.parse(x) as Record<string, unknown>)
 
-describe('Durable Object của ca — Sinh Tồn đi cùng cửa, cùng vé, cùng lệnh đóng với Đấu Nguyên Tử', () => {
+describe('Durable Object của ca — Sinh Tồn: cửa, vé, lệnh đóng của phòng chờ ca', () => {
   it('gói `vao` có `tro: "st"` + vé đúng ca ⇒ vào phòng Sinh Tồn (`st-vao`), kết nối gắn `st: 1` và giữ mã ca', async () => {
     const { d, taoWs } = doGia()
     const w = taoWs()
@@ -282,14 +281,23 @@ describe('Durable Object của ca — Sinh Tồn đi cùng cửa, cùng vé, cù
     await d.webSocketClose(b)
     expect(docTin(a).at(-1)).toEqual({ t: 'st-ds', ds: [['S1', 'Bạn S1', 0]] })
   })
-  it('POST /dong (thầy bấm Bắt đầu) ⇒ CẢ HAI trò cùng đóng 4000: máy chơi Sinh Tồn và máy còn mảnh Đấu Nguyên Tử cũ', async () => {
+  it('máy còn mảnh trò Đấu Nguyên Tử cũ (gói vào không có `tro`) ⇒ đóng 4010 «tải lại trang», không vào phòng, không ảnh hưởng em đang chơi', async () => {
     const { d, taoWs } = doGia()
     const st = taoWs(), cu = taoWs()
     await vaoSt(d, st, 'S1')
-    await d.webSocketMessage(cu, JSON.stringify({ t: 'vao', v: PHIEN_BAN, ve: await veKy('S2'), nt: 0 }))
-    expect(cu.gui[0]).toContain('"t":"chao"') // giao thức Đấu Nguyên Tử cũ vẫn chạy
+    const truoc = st.gui.length
+    await d.webSocketMessage(cu, JSON.stringify({ t: 'vao', v: 4, ve: await veKy('S2'), nt: 0 }))
+    expect(cu.ma).toBe(MA_DONG.tat); expect(cu.ly).toBe(CHU_TRO_CU); expect(CHU_TRO_CU).toMatch(/tải lại trang/)
+    expect(cu.gui).toEqual([])
+    expect(st.gui.length).toBe(truoc); expect(st.ma).toBeUndefined()
+  })
+  it('POST /dong (thầy bấm Bắt đầu) ⇒ MỌI kết nối đóng 4000: em đang chơi Sinh Tồn và cả kết nối vừa mở chưa kịp gửi vé', async () => {
+    const { d, taoWs } = doGia()
+    const st = taoWs(), moi = taoWs()
+    await vaoSt(d, st, 'S1')
     await d.fetch(new Request('https://phong-dau/dong', { method: 'POST' }))
-    for (const w of [st, cu]) { expect(w.gui.at(-1)).toBe('{"t":"dong","ly":"bat-dau"}'); expect(w.ma).toBe(MA_DONG.batDau) }
+    expect(st.gui.at(-1)).toBe('{"t":"dong","ly":"bat-dau"}'); expect(st.ma).toBe(MA_DONG.batDau)
+    expect(moi.ma).toBe(MA_DONG.batDau)
   })
   it('phòng ngủ rồi thức (bộ nhớ mất): gói trò kế tiếp dựng lại em đúng đội từ kết nối; `/dong` lúc phòng vừa thức vẫn đóng 4000', async () => {
     vi.useFakeTimers()

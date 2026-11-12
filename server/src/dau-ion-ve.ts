@@ -1,8 +1,8 @@
-// VÉ VÀO SẢNH ĐẤU «Đấu Nguyên Tử» + cửa Worker → phòng đấu. Vé = HMAC-SHA256 bằng MA_BI_MAT (tiền tố riêng `dau-ion|`, không lẫn token game/thi),
+// VÉ VÀO TRÒ PHÒNG CHỜ CA KIỂM TRA («Sinh Tồn bốn đội»; trò «Đấu Nguyên Tử» cũ đã xoá 13/11 — tên tệp / tiền tố vé / đường `/dau-ion/` giữ để vé và máy đang mở không gãy) + cửa Worker → phòng của ca. Vé = HMAC-SHA256 bằng MA_BI_MAT (tiền tố riêng `dau-ion|`, không lẫn token game/thi),
 // do lệnh vào thi phát ở nhánh phòng chờ (`cach: 'cho'`) từ dữ liệu ĐÃ đọc sẵn ⇒ 0 lệnh D1 thêm. Phòng đấu chỉ kiểm chữ ký, không đọc D1.
-// Công tắc: biến Worker `TAT_DAU_ION` có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng ⇒ máy em chỉ còn «Tập với A.I» (chạy cục bộ).
+// Công tắc: biến Worker `TAT_DAU_ION` có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng ⇒ thẻ trò ở phòng chờ mờ đi.
 import type { Env } from './kieu'
-import type { VeDau } from './dau-ion-phong'
+import type { VeDau } from './sinh-ton-ca'
 
 const TIEN_TO = 'dau-ion|'
 /** Vé sống 2 giờ (dài hơn mọi phòng chờ). */
@@ -48,7 +48,7 @@ export async function veDauChoEm(env: Env, maCa: string, sbd: string, hoTen: unk
   try { return await kyVeDau(env.MA_BI_MAT, { c: maCa, s: sbd, t: tenGoi(hoTen), h: Date.now() + HAN_VE_MS }) } catch { return undefined }
 }
 
-/** Tối đa phòng mỗi ca (khớp SO_PHONG_TOI_DA ở dau-ion-phong.ts). Phòng 0 giữ tên cũ `dau-ion:<ca>`; phòng k ≥ 1: `dau-ion:<ca>:<k>`. */
+/** Tối đa phòng mỗi ca (khớp SO_PHONG_TOI_DA ở sinh-ton-ca.ts). Phòng 0 giữ tên cũ `dau-ion:<ca>`; phòng k ≥ 1: `dau-ion:<ca>:<k>`. */
 const SO_PHONG = 8
 const phongCua = (env: Env, maCa: string, so = 0) => env.PHONG_DAU_ION!.get(env.PHONG_DAU_ION!.idFromName(so ? `dau-ion:${maCa}:${so}` : `dau-ion:${maCa}`), { locationHint: 'apac' })
 
@@ -62,7 +62,7 @@ export async function dongPhongDau(env: Env, maCa: string): Promise<void> {
 export async function vaoPhongDau(req: Request, env: Env): Promise<Response> {
   const [ma, soChu] = decodeURIComponent(new URL(req.url).pathname.slice('/dau-ion/'.length)).trim().split('/')
   const maCa = (ma ?? '').trim(), so = soChu === undefined ? 0 : Number(soChu)
-  if (!dauIonBat(env)) return new Response('Đấu Nguyên Tử đang tắt', { status: 410 })
+  if (!dauIonBat(env)) return new Response('Trò phòng chờ đang tắt', { status: 410 })
   if (!/^[A-Za-z0-9_-]{1,40}$/.test(maCa) || !(Number.isInteger(so) && so >= 0 && so < SO_PHONG)) return new Response('Mã ca không hợp lệ', { status: 400 })
   if (req.headers.get('upgrade')?.toLowerCase() !== 'websocket') return new Response('Cần WebSocket', { status: 426 })
   const h = new Headers(req.headers)

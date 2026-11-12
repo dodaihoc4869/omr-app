@@ -528,7 +528,7 @@ export default defineConfig({
           '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
         // 13/11: phòng chờ ca chơi «Sinh Tồn bốn đội» (thẻ sảnh SanhSinhTon thay DauIon; màn trò TroSinhTon đã ở danh sách Live theo khối phía trên).
-        '**/{ChuyenBay,DauIon,SanhSinhTon}-*.{js,css}',
+        '**/{ChuyenBay,SanhSinhTon}-*.{js,css}',
           '**/404.html',
           // Trang đo tốc độ (02/10): luôn đi thẳng ra mạng để đo đúng, không lưu trên máy.
           '**/cai-kiem-toc-do.html',

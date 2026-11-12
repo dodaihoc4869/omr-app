@@ -203,6 +203,8 @@ for (const x of GON_MA_2710.files) GAME_DA_GO.set(x.path, x.sha256)
 for (const x of JSON.parse(readFileSync(new URL('../docs/dau-ion-v2-3110/mau-tep-da-go.json', import.meta.url), 'utf8')).files) GAME_DA_GO.set(x.path, x.sha256)
 // 01/11: thầy bỏ khối «bài bổ sung chờ thầy duyệt» ở màn Theo dõi ca, chốt bản vẽ trang duyệt mới ⇒ xoá NGUYÊN KhungBaiBoSung.tsx, khoá sha256 (cùng cách).
 for (const x of JSON.parse(readFileSync(new URL('../docs/duyet-bo-sung-0111/mau-tep-da-go.json', import.meta.url), 'utf8')).files) GAME_DA_GO.set(x.path, x.sha256)
+// 13/11: thầy «Xóa game đấu nguyên tử đi nhé» (trò «Sinh Tồn bốn đội» đã thay ở phòng chờ ca) ⇒ xoá NGUYÊN tờ kiểu + lõi trò cũ, khoá sha256 (cùng cách).
+for (const x of JSON.parse(readFileSync(new URL('../docs/xoa-dau-nguyen-tu-1311/mau-tep-da-go.json', import.meta.url), 'utf8')).files) GAME_DA_GO.set(x.path, x.sha256)
 
 // MÀU THẦY RA LỆNH THÊM — ngoại lệ ĐÓNG (09/10/2026, thầy: "Quét bảng màu từ Bảng G (ngà voi #FFFEF6, xanh ngọc #10B981, xanh navy #0F3D3A,
 // vàng #F7A800) cập nhật vào tailwind…", rồi "Build rồi đẩy luôn"). Đúng BA khai báo gốc ở tokens.css (xanh ngọc trùng --xanh có sẵn nên không cần);

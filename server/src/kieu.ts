@@ -126,9 +126,9 @@ export interface Env {
   TAT_DEM_PHAN_HOI?: string
   /** Bật đọc qua bản sao D1 gần nhất trong ngăn học sinh (Sessions API + dấu trang riêng của em, ngan-hoc-sinh.ts). Mặc định tắt. */
   BAT_BAN_SAO_NGAN?: string
-  /** Phòng đấu «Đấu Nguyên Tử» của phòng chờ thi (server/src/phong-dau-ion.ts, 30/10): một Durable Object mỗi ca. Vắng ⇒ không phát vé, máy em chỉ Tập với A.I. */
+  /** Phòng trò «Sinh Tồn bốn đội» của phòng chờ ca kiểm tra (server/src/phong-dau-ion.ts; tên ràng buộc giữ từ trò Đấu Nguyên Tử đã xoá 13/11): một Durable Object mỗi ca. Vắng ⇒ không phát vé, thẻ trò mờ. */
   PHONG_DAU_ION?: DurableObjectNamespace
-  /** Công tắc tắt Đấu Nguyên Tử trên mạng: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (máy em còn Tập với A.I cục bộ). */
+  /** Công tắc tắt trò phòng chờ ca: có giá trị ⇒ không phát vé, cửa trả 410, phòng đang mở bị đóng (thẻ trò mờ). */
   TAT_DAU_ION?: string
   /** Bình Phản Ứng (06/11, server/src/phong-binh-phan-ung.ts): một Durable Object mỗi buổi học — cả lớp cùng làm câu thầy chiếu. Vắng ⇒ tắt. */
   PHONG_BPU?: DurableObjectNamespace

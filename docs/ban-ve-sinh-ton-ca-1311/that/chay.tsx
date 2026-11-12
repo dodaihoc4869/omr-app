@@ -8,7 +8,7 @@ import '../../../src/styles/trong.css'
 import '../../../src/styles/trong-hs-mau.css'
 import PhongChoGame from '../../../src/components/PhongChoGame'
 import { PhongSinhTonCa } from '../../../server/src/sinh-ton-ca'
-import type { KetNoi } from '../../../server/src/dau-ion-phong'
+import type { KetNoi } from '../../../server/src/sinh-ton-ca'
 import type { SinhTonAnh } from '../../../src/lib/live-khoi/kieu'
 import { buocToi, chonMucTieu, dangChet, docDong, nhanDon, satThuong, taoBanDo, taoToi, type NhanVat } from '../../../src/lib/live-khoi/sinh-ton-loi'
 

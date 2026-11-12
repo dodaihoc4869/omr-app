@@ -4318,7 +4318,7 @@ export { BanBiA } from './ban-bi-a-dong'
 export { TramGemini } from './tram-gemini'
 export { NganHocSinh } from './ngan-hoc-sinh'
 export { NganGomD1 } from './gom-lien-ngan'
-// Đấu Nguyên Tử (30/10): phòng đấu của phòng chờ thi — một Durable Object mỗi ca (migration `dau-ion-v1`).
+// Phòng trò Sinh Tồn của phòng chờ ca — một Durable Object mỗi ca (migration `dau-ion-v1`).
 export { PhongDauIon } from './phong-dau-ion'
 export { PhongBinhPhanUng } from './phong-binh-phan-ung'
 const xuatWorker = {

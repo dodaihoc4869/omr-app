@@ -1,13 +1,28 @@
 // PHÒNG «SINH TỒN» CỦA CA KIỂM TRA (thầy 13/11: «Chuyển luôn game này sang cả phòng chờ của ca kiểm tra») — luật thuần, test được không cần Cloudflare.
-// Cùng Durable Object với Đấu Nguyên Tử (phong-dau-ion.ts), cùng vé, cùng mã đóng (dau-ion-phong.ts); trò do MaySinhTon tính (sinh-ton-may-chu.ts — đúng
+// Chạy trong Durable Object của ca (phong-dau-ion.ts), vào bằng vé (dau-ion-ve.ts); trò do MaySinhTon tính (sinh-ton-may-chu.ts — đúng
 // máy trò của phòng chờ Live theo khối). 0 D1, 0 storage, không có đáp án / điểm nào đi qua đây.
 //  · Em vào bằng vé đã kiểm ⇒ xếp vào ĐỘI ÍT EM THẬT NHẤT (bằng nhau ⇒ đội số nhỏ). Cùng số báo danh mở ở máy khác ⇒ kết nối cũ đóng 4002.
 //  · Đủ 78 em ⇒ đóng 4009 «sang:k+1» (máy em tự nối phòng kế, tối đa 8 phòng một ca).
 //  · Máy em gửi chuỗi JSON `{ t: 'st', x: SinhTonGui }`; phòng phát mỗi 250 ms MỘT ảnh `{ t: 'lop', k: 'tro', … }` (đúng dạng TinLop ⇒ màn TroSinhTon dùng chung).
 //  · Thầy bấm Bắt đầu ⇒ `dongTatCa('bat-dau')`: báo `{ t: 'dong' }` rồi đóng mọi kết nối mã 4000 — trò không được cản việc vào bài.
 import type { SinhTonGui } from '../../src/lib/live-khoi/kieu'
-import { MA_DONG, SO_PHONG_TOI_DA, TRAN_KET_NOI, type KetNoi, type VeDau } from './dau-ion-phong'
 import { MaySinhTon } from './sinh-ton-may-chu'
+
+/** Một kết nối của phòng (bọc WebSocket để luật test được không cần Cloudflare). */
+export interface KetNoi {
+  gui(d: string | Uint8Array): void
+  dong(ma: number, lyDo: string): void
+  /** Ghi dữ liệu nhỏ lên kết nối (sống qua lúc phòng ngủ). */
+  ghiKem(v: unknown): void
+}
+/** Nội dung vé đã kiểm: mã ca, số báo danh, tên gọi, hạn (ms). */
+export interface VeDau { c: string; s: string; t: string; h: number }
+/** Tối đa em mỗi phòng. Quá ⇒ sang phòng kế. */
+export const TRAN_KET_NOI = 78
+/** Tối đa phòng mỗi ca (8 × 78 = 624 em). */
+export const SO_PHONG_TOI_DA = 8
+/** Mã đóng kết nối — máy em (mang-sanh / MangDau) không nối lại với các mã này. */
+export const MA_DONG = { veSai: 4003, thayMay: 4002, day: 4009, batDau: 4000, tat: 4010 } as const
 
 /** Dữ liệu gắn trên kết nối (sống qua lúc phòng ngủ): `st: 1` = kết nối của trò Sinh Tồn, số báo danh, tên gọi, đội 0..3. */
 export interface KemSinhTon { st: 1; s: string; t: string; doi: number }
@@ -17,6 +32,8 @@ interface NguoiSt { sbd: string; ten: string; doi: number; kn: KetNoi }
 /** Gói của máy em dài nhất chừng 90 ký tự; quá 400 ⇒ bỏ. */
 const GOI_DAI = 400
 export const CHU_BAN_CU_ST = 'Trò Sinh Tồn đã có bản mới. Em tải lại trang để chơi nhé.'
+/** Máy còn mảnh trò cũ (đã xoá 13/11) trong bộ nhớ đệm gửi gói vào kiểu cũ ⇒ đóng 4010 kèm dòng này. */
+export const CHU_TRO_CU = 'Trò ở phòng chờ đã đổi sang Sinh Tồn. Em tải lại trang để chơi nhé.'
 
 export class PhongSinhTonCa {
   private nguoi = new Map<string, NguoiSt>()

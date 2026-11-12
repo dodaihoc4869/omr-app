@@ -60,8 +60,9 @@ class_name = "TramGemini"
 name = "NGAN_HS"
 class_name = "NganHocSinh"
 
-# Đấu Nguyên Tử (30/10, server/src/phong-dau-ion.ts): phòng đấu bắn nhau của phòng chờ thi — MỘT Durable Object mỗi ca (idFromName `dau-ion:<mã ca>`),
-# WebSocket Hibernation, lớp SQLite (gói nào cũng dùng được), 0 lệnh D1. Tắt nhanh: biến/secret `TAT_DAU_ION` (xem docs/dac-ta-game-ban-sung-3010.md).
+# Phòng trò của phòng chờ ca kiểm tra (server/src/phong-dau-ion.ts) — nay chạy «Sinh Tồn bốn đội»; trò Đấu Nguyên Tử đã xoá 13/11, tên lớp / ràng buộc
+# giữ nguyên (đổi tên lớp cần migration). MỘT Durable Object mỗi ca (idFromName `dau-ion:<mã ca>`),
+# WebSocket Hibernation, lớp SQLite (gói nào cũng dùng được), 0 lệnh D1. Tắt nhanh: biến/secret `TAT_DAU_ION`.
 [[durable_objects.bindings]]
 name = "PHONG_DAU_ION"
 class_name = "PhongDauIon"

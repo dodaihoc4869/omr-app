@@ -1,13 +1,12 @@
-// KẾT NỐI SẢNH ĐẤU «Đấu Nguyên Tử» — một WebSocket tới phòng đấu của ca (Durable Object, máy chủ Worker). Chỉ mở khi em bấm vào Sảnh đấu.
-// Không dùng setInterval: ping 25 giây và nối lại lùi dần (1 → 2 → 4 → 8 giây, tối đa 5 lần) đều bằng setTimeout. Đóng sạch khi game tháo khỏi màn.
+// KẾT NỐI TRÒ PHÒNG CHỜ CA KIỂM TRA («Sinh Tồn bốn đội») — một WebSocket tới phòng của ca (Durable Object, máy chủ Worker). Chỉ mở khi em bấm «Chơi».
+// (Trò «Đấu Nguyên Tử» cũ đã xoá 13/11; đường `/dau-ion/` là tên kỹ thuật của cửa phòng, giữ nguyên.)
+// Không dùng setInterval: ping 25 giây và nối lại lùi dần (1 → 2 → 4 → 8 giây, tối đa 5 lần) đều bằng setTimeout. Đóng sạch khi trò tháo khỏi màn.
 // Mã đóng của phòng: 4000 thầy bắt đầu thi · 4010 công tắc tắt · 4003 vé sai/hết hạn · 4002 mở ở máy khác · 4009 sảnh đầy ⇒ KHÔNG nối lại.
-// 3 ĐẤU 3 (01/11): 4009 kèm lý do «sang:k» = phòng này đã đủ 78 em ⇒ TỰ nối ngay phòng k của ca (…/dau-ion/<ca>/<k>), em không phải làm gì.
-import { docAnh, type Anh } from '../../lib/dau-ion/goi'
+// 4009 kèm lý do «sang:k» = phòng này đã đủ 78 em ⇒ TỰ nối ngay phòng k của ca (…/dau-ion/<ca>/<k>), em không phải làm gì.
 
 export type TinMang =
   | { k: 'mo' }
   | { k: 'json'; j: Record<string, unknown> }
-  | { k: 'anh'; a: Anh }
   | { k: 'mat'; lan: number }
   | { k: 'dong'; ma: number; ly: string }
 
@@ -36,15 +35,12 @@ export class MangDau {
     if (this.daDong) return
     let ws: WebSocket
     try { ws = new WebSocket(this.url) } catch { this.matKetNoi(); return }
-    ws.binaryType = 'arraybuffer'
     this.ws = ws
     ws.onopen = () => { this.lan = 0; this.gui(this.goiVao()); this.bao({ k: 'mo' }); this.hen() }
     ws.onmessage = (e) => {
       this.hen()
-      if (typeof e.data === 'string') {
-        if (e.data === '{"t":"pong"}') return
-        try { const j = JSON.parse(e.data); if (j && typeof j === 'object') this.bao({ k: 'json', j }) } catch { /* gói hỏng: bỏ */ }
-      } else { const a = docAnh(e.data as ArrayBuffer); if (a) this.bao({ k: 'anh', a }) }
+      if (typeof e.data !== 'string' || e.data === '{"t":"pong"}') return
+      try { const j = JSON.parse(e.data); if (j && typeof j === 'object') this.bao({ k: 'json', j }) } catch { /* gói hỏng: bỏ */ }
     }
     ws.onclose = (e) => {
       if (this.ws !== ws) return
@@ -71,12 +67,11 @@ export class MangDau {
     this.henPing = window.setTimeout(() => { this.gui({ t: 'ping' }); this.hen() }, 25_000)
   }
 
-  gui(o: Record<string, unknown> | Uint8Array): void {
+  gui(o: Record<string, unknown>): void {
     const ws = this.ws
     if (!ws || ws.readyState !== 1) return
-    try { ws.send(o instanceof Uint8Array ? (o as Uint8Array<ArrayBuffer>) : JSON.stringify(o)) } catch { /* đang đóng */ }
+    try { ws.send(JSON.stringify(o)) } catch { /* đang đóng */ }
   }
-  get mo_(): boolean { return this.ws?.readyState === 1 }
 
   /** Đóng hẳn (rời màn, thầy bắt đầu thi): không nối lại, huỷ mọi hẹn giờ. */
   dong(): void {

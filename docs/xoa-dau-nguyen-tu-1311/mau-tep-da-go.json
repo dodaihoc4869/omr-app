@@ -1,0 +1,17 @@
+{
+ "ghiChu": "13/11/2026 — thầy: «Xóa game đấu nguyên tử đi nhé» (sau khi trò «Sinh Tồn bốn đội» đã thay ở phòng chờ ca kiểm tra, 13/11). Xoá NGUYÊN tệp của trò cũ: tờ kiểu dau-ion.css (bảng --dn-* chỉ trò cũ dùng; thẻ mới sanh-sinh-ton.css chỉ dùng token app học sinh) và lõi trò src/lib/dau-ion/*. Khoá sha256 đúng bản bị gỡ.",
+ "files": [
+  {
+   "path": "src/components/phong-cho/dau-ion.css",
+   "sha256": "fb908fabe750ef9d56faee4df099e533a7a02c07f12a393462b58601645caa33"
+  },
+  {
+   "path": "src/lib/dau-ion/goi.ts",
+   "sha256": "8baf2723208559cb573d2a57b98ea3858ab375f577c8f133bbeb6cda9e28b36b"
+  },
+  {
+   "path": "src/lib/dau-ion/loi.ts",
+   "sha256": "ce2976966a43873447c2d4a1cfcc8e417622f24fd4332dce461526d9e4212ed1"
+  }
+ ]
+}

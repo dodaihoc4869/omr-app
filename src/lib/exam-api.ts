@@ -224,7 +224,7 @@ export type KetQuaVaoThi =
       thoiGianPhut: number
       congBo: CongBoDiem
       tenCa: string
-      /** Vé vào Sảnh đấu «Đấu Nguyên Tử» (game phòng chờ). Vắng ⇒ máy chủ tắt game mạng, em chỉ Tập với A.I. */
+      /** Vé vào trò phòng chờ «Sinh Tồn bốn đội». Vắng ⇒ máy chủ tắt trò, thẻ trò mờ. */
       veDau?: string
     }
   | {
