@@ -82,14 +82,14 @@ describe('công tắc ẩn của app thầy + tải mô hình có mã thầy (sr
     vi.stubGlobal('localStorage', ls)
     const m = await import('../src/lib/live/chi-thay')
     await m.apChiThayUrl('?vai=gv', async () => 'https://may-chu.example')
-    expect(kho.size).toBe(0); expect(m.chiThayCo()).toBe(false)
+    expect(kho.size).toBe(0); expect(m.chiThayCo()).toBe(true) // 12/11 trưa: nút luôn hiện ở app thầy, link không đổi gì
     await m.apChiThayUrl('?vai=gv&chi-thay=bat', async () => 'https://may-chu.example/')
     expect(kho.get('ddh.live.chi-thay')).toBe('hien')
     expect(kho.get('ddh.live.chi-thay-url')).toBe('https://may-chu.example/gv/mo-hinh-thay')
     expect(m.chiThayCo()).toBe(true)
     await m.apChiThayUrl('?chi-thay=tat', async () => 'https://may-chu.example')
     expect(m.chiThayTatKhan()).toBe(true); expect(m.chiThayCo()).toBe(false)
-    expect(m.URL_MO_HINH_THAY).toBeNull() // chưa phát hành chung: chỉ chạy khi thầy bật bằng link
+    expect(m.URL_MO_HINH_THAY).toBeNull() // chưa phát hành chung: địa chỉ = máy chủ của app (cần mã thầy)
   })
 
   it('mã thầy CHỈ gửi kèm khi địa chỉ mô hình đúng nguồn máy chủ của app; nguồn khác ⇒ không gửi mã', async () => {

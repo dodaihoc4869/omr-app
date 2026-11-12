@@ -139,15 +139,20 @@ describe('cờ / công tắc lùi khẩn «Chỉ giọng thầy»', () => {
   const kho = new Map<string, string>()
   const ls = { getItem: (k: string) => kho.get(k) ?? null, setItem: (k: string, v: string) => void kho.set(k, v), removeItem: (k: string) => void kho.delete(k) }
   afterEach(() => { kho.clear(); delete (globalThis as { localStorage?: unknown }).localStorage })
-  it('mặc định ẨN (chưa phát hành); cờ «hien» + có địa chỉ mô hình mới hiện; «tat» = lùi khẩn, không hiện, không tải', async () => {
+  it('12/11 trưa: nút LUÔN hiện ở app thầy (không cần link); địa chỉ trong máy trước, không có thì lệnh mô hình của máy chủ; «tat» = lùi khẩn, không hiện', async () => {
     ;(globalThis as { localStorage?: unknown }).localStorage = ls
-    expect(chiThayCo()).toBe(false)
-    kho.set('ddh.live.chi-thay', 'hien'); expect(chiThayCo()).toBe(false) // chưa có địa chỉ
-    kho.set('ddh.live.chi-thay-url', 'https://vi-du.invalid/m.tgt'); expect(chiThayCo()).toBe(true)
-    let goi = 0
-    const b = await taiMoHinhThay((async () => { goi++; return new Response(new Uint8Array(64)) }) as unknown as typeof fetch, async () => ({}))
-    expect(b?.byteLength).toBe(64); expect(goi).toBe(1)
+    expect(chiThayCo()).toBe(true) // máy chưa từng mở link bật
+    const diaChi: string[] = []
+    const laySo = (async (u: string) => { diaChi.push(u); return new Response(new Uint8Array(64)) }) as unknown as typeof fetch
+    const b0 = await taiMoHinhThay(laySo, async () => ({}), async () => 'https://may-chu.invalid/gv/mo-hinh-thay')
+    expect(b0?.byteLength).toBe(64); expect(diaChi).toEqual(['https://may-chu.invalid/gv/mo-hinh-thay'])
     kho.set('ddh.live.chi-thay', 'tat'); expect(chiThayTatKhan()).toBe(true); expect(chiThayCo()).toBe(false)
+  })
+  it('không đọc được địa chỉ máy chủ và máy không có địa chỉ riêng ⇒ không tải (null), không gọi mạng', async () => {
+    ;(globalThis as { localStorage?: unknown }).localStorage = ls
+    let goi = 0
+    const b = await taiMoHinhThay((async () => { goi++; return new Response(new Uint8Array(64)) }) as unknown as typeof fetch, async () => ({}), async () => null)
+    expect(b).toBeNull(); expect(goi).toBe(0)
   })
 })
 

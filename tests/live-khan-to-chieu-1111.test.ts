@@ -239,3 +239,26 @@ describe('phần nối ở app: tạm dừng + kiểu rời tới tờ', () => {
     M._datLaiLiveThay()
   })
 })
+
+describe('«Chỉ giọng thầy» trên bảng mic của tờ chiếu (12/11 trưa — nút luôn hiện ở app thầy, src/lib/live/chi-thay.ts)', () => {
+  const THE = { ds: [{ id: 'm1', ten: 'Microphone (BOYALINK)' }], chon: 'm1', loi: '', tiengLop: false, xa: false }
+  const MIC = { tinh: 'tot', ten: 'Microphone (BOYALINK)', loc: false, cheDo: 'tu', locOn: 'manh', locOnChay: 'chay', khac: '', kieuTieng: 'lam-ro', tg: '' }
+  it('mic.coThay ⇒ hàng «Lọc ồn» có 4 nút Mạnh / Vừa / Tắt / Chỉ giọng thầy; bấm ⇒ gửi loc-on = thay', () => {
+    const t = dungTo()
+    t.bom({ ...NEN, the: THE, mic: { ...MIC, coThay: true } })
+    const nut = [...t.the().querySelectorAll<HTMLElement>('[data-lv="loc-on"]')].map((b) => (b.textContent ?? '').trim())
+    expect(nut).toEqual(['Mạnh', 'Vừa', 'Tắt', 'Chỉ giọng thầy'])
+    bam(t.the(), 'Chỉ giọng thầy')
+    expect(t.viec('loc-on')).toEqual([{ nguon: 'to-chieu', loai: 'live', viec: 'loc-on', v: 'thay' }])
+  })
+  it('đang chọn «Chỉ giọng thầy» ⇒ nút ấy được nhấn, dòng giải thích + dòng trạng thái mô hình; lùi khẩn (coThay false) ⇒ không có nút', () => {
+    const t = dungTo()
+    t.bom({ ...NEN, the: THE, mic: { ...MIC, coThay: true, locOn: 'thay', tg: 'Mô hình ck-h-51000' } })
+    const b = [...t.the().querySelectorAll<HTMLElement>('[data-lv="loc-on"]')].find((x) => x.getAttribute('data-c') === 'thay')!
+    expect(b.getAttribute('aria-pressed')).toBe('true')
+    expect(t.the().textContent).toContain('Chỉ giọng thầy — hạ giọng người khác')
+    expect(t.the().textContent).toContain('Mô hình ck-h-51000')
+    t.bom({ ...NEN, the: THE, mic: { ...MIC, coThay: false } })
+    expect(t.the().querySelector('[data-c="thay"]')).toBeNull()
+  })
+})
