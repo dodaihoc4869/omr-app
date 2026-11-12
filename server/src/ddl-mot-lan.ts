@@ -37,7 +37,7 @@ export const SQL_TEN_DOI_TUONG = `SELECT 1 AS k, ten_json AS t FROM ddl_ten_chun
   LIMIT (SELECT CASE WHEN EXISTS (SELECT 1 FROM ddl_ten_chung WHERE id = 1) THEN 0 ELSE -1 END))`
 export const LENH_TEN_CHUNG = ['CREATE TABLE IF NOT EXISTS ddl_ten_chung (id INTEGER PRIMARY KEY CHECK (id = 1), ten_json TEXT NOT NULL, luc INTEGER NOT NULL)'] as const
 const SQL_CHEP_TEN = `INSERT INTO ddl_ten_chung (id, ten_json, luc) SELECT 1, json_group_array(name), ? FROM sqlite_master WHERE ${DK_TEN}
-  ON CONFLICT(id) DO UPDATE SET ten_json = excluded.ten_json, luc = excluded.luc`
+  ON CONFLICT(id) DO UPDATE SET ten_json = excluded.ten_json, luc = excluded.luc WHERE ten_json <> excluded.ten_json` // không đổi ⇒ không ghi (GHI đắt gấp 1.000 ĐỌC)
 function tapTen(rows: readonly { k?: unknown; t?: unknown }[]): Set<string> | null {
   const chep = rows.find((x) => Number(x.k) === 1)
   if (!chep) return new Set(rows.map((x) => String(x.t)))

@@ -51,8 +51,10 @@ async function cat(env: Env, khoa: string, dau: string, rows: unknown[]): Promis
   let json = JSON.stringify(rows)
   if (json.length > NGUONG_NEN) json = 'z' + await nen(json)
   if (json.length > TRAN_CAT) return
+  // isolate khác vừa cất cùng dấu (dưới một giờ) ⇒ không ghi lại (GHI đắt gấp 1.000 ĐỌC)
   await env.DB.prepare(`INSERT INTO bang_tinh_chung (khoa, dau, json, luc) VALUES (?, ?, ?, ?)
-    ON CONFLICT(khoa) DO UPDATE SET dau = excluded.dau, json = excluded.json, luc = excluded.luc`).bind(khoa, dau, json, Date.now()).run()
+    ON CONFLICT(khoa) DO UPDATE SET dau = excluded.dau, json = excluded.json, luc = excluded.luc
+    WHERE bang_tinh_chung.dau <> excluded.dau OR bang_tinh_chung.luc < excluded.luc - 3600000`).bind(khoa, dau, json, Date.now()).run()
 }
 
 /**
