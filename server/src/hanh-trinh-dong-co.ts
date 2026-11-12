@@ -20,6 +20,7 @@ import { quanSatDocLap, chuoiSaiKyNang, type QuanSatHanhTrinh } from './hanh-tri
 import { fitHalfLife, henHalfLife } from './half-life'
 import { dungDoThi, canhDangHoc, type CanhHoc } from './do-thi-tien-quyet'
 import { chonBandit, type BangBandit, type CachCuu } from './bandit'
+import { docBanditLop } from './hanh-trinh-bandit-lop'
 import type { QCau, SuKienOmni, XacNhanThay } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { bam } from './srs2-loi'
@@ -150,7 +151,8 @@ export function docTruocDongCo(env:Env,sbd:string,now:number,ghi=true):DocTruocD
     allowed:soKem.then(x=>khoaHopLe(env,sbd,now,x)),
     xacNhan:sau(()=>env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<XacNhanThay>()),
     offers:sau(()=>env.DB.prepare('SELECT * FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND goi_luc>=? AND do_luc IS NULL ORDER BY goi_luc DESC,ngay DESC,moc DESC LIMIT 96').bind(sbd,now-15*86400000).all<Row>()),
-    stats:sau(()=>env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>()),
+    // 12/11 (H3): số bandit CẢ LỚP đọc bảng cộng sẵn (hanh-trinh-bandit-lop.ts, lệch ≤ một chu kỳ dựng); chưa dựng / quá hạn ⇒ câu cũ, cùng một lượt D1.
+    stats:sau(()=>docBanditLop(env,now)),
     rewards:sau(()=>env.DB.prepare('SELECT do_receipt FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND do_receipt IS NOT NULL').bind(sbd).all<{do_receipt:string}>()),
     moHinh:som(docMoHinhV6(env)),
     chonV6:ddl6?som(ddl6.then(()=>docChonV6(env,sbd,now))):null,

@@ -3459,6 +3459,7 @@ const boXuLy = {
       await import('./chien-dich-tv').then(m=>m.lapChiMucTv(env,Date.now())).then(r=>{if(r.lap||r.loi)console.log('[chien-dich-tv] lập',JSON.stringify(r))}).catch(e=>console.error('[chien-dich-tv] cron lỗi:',e))
       // Cạnh cả lớp cộng sẵn (12/11, hanh-trinh-canh-lop.ts): đọc mốc, cũ thì dựng lại.
       {const p=import('./hanh-trinh-canh-lop').then(m=>m.dungCanhLopNeuCu(env,Date.now())).catch(e=>console.error('[canh-lop]',e))
+        .then(()=>import('./hanh-trinh-bandit-lop')).then(m=>m.dungBanditLopNeuCu(env,Date.now())).catch(e=>console.error('[bandit-lop]',e)) // 12/11 H3: bandit cả lớp cộng sẵn
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
       // Ngoài cao điểm, chuẩn bị nguồn cho từng ít em trước khi các em mở app.
       const gioVn=new Date(Date.now()+7*3600000).getUTCHours()
