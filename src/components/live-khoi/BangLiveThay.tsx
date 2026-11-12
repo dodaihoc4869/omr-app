@@ -2,7 +2,7 @@
 // Ba thẻ: «Mở live ngay» · «Hẹn lịch live» · «Xem lại live». Mảnh nạp lười từ nút «Live» ở Hôm nay (NutLive.tsx), vẽ đè lên vùng nội dung Hôm nay
 // (khung cha mang [data-blt-mo] ⇒ các khối Hôm nay ẩn). Một lúc chỉ MỘT phòng: đã có phòng chờ / đang live ⇒ chỉ còn «Vào lại phòng».
 import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { taiSanThay } from './tai-san'
+import { taiSanThay } from './tai-san-thay'
 import { henLichLive, huyLichLive, moLiveKhoi, suaLichLive, taiLichLive, type DsLichLive } from '../../lib/live-khoi/api'
 import type { KhoiLive, LichLive } from '../../lib/live-khoi/kieu'
 import { chuGio, chuNgayGio, cungNgay, mocTuO, oNgay } from './chu-gio'

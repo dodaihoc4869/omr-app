@@ -128,13 +128,13 @@ describe('Thẻ Live trang chủ em', () => {
     expect(screen.queryByRole('alert')).toBeNull()
   })
 
-  it('hỏi lại khoảng 60 giây / lần (50–70 giây, lệch pha) khi tab hiện; tab ẩn không hỏi; quay lại tab và sự kiện «ddh-live-khoi» ⇒ hỏi ngay', async () => {
+  it('hỏi lại khoảng 2 phút / lần (100–140 giây, lệch pha) khi tab hiện; tab ẩn không hỏi; quay lại tab và sự kiện «ddh-live-khoi» ⇒ hỏi ngay', async () => {
     render(<TheLiveEm token="tk" />)
     await troi(10)
     expect(goiLoai('cuaEm').length).toBe(1)
-    await troi(49_000)
+    await troi(99_000)
     expect(goiLoai('cuaEm').length).toBe(1)
-    await troi(21_100)
+    await troi(41_100)
     expect(goiLoai('cuaEm').length).toBe(2)
     act(() => datHien('hidden'))
     await troi(180_000)

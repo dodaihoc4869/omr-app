@@ -4,7 +4,7 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { dangKy, datKhoi, kenh, layDangMo, layView, phienCua, toBang } from './thay-khoi'
+import { dangKy, datKhoi, kenh, layDangMo, datToBang, laToBang, layView, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
@@ -25,14 +25,14 @@ export default function LopNoiThay() {
   const [sanhTay, setSanh] = useState(false)
   const sanh = sanhTay || k?.che === 'sanh'
   const [loi, setLoi] = useState('')
-  const sangHoc = (): void => { toBang.trang = false; setChon(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
+  const sangHoc = (): void => { datToBang(false); setChon(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
   /** Đổi chế độ: báo phòng (máy em đổi theo) + bảo đảm máy thầy có đúng thứ để dạy — Học cần bài (mở chọn bài), Bảng cần tờ bảng (dựng bảng trắng). */
   const doiChe = (c: 'hoc' | 'bang'): void => {
     if (!k) return
     setSanh(false); setLoi('')
     // «Học» khi chưa có bài: chọn bài TRƯỚC, chiếu xong mới báo phòng (máy em ở nguyên màn đang xem tới lúc có bài).
-    if (c === 'hoc') { if (chuaCoTo() || toBang.trang) { setChon(true); return } datKhoi({ ...k, che: 'hoc' }) }
-    else { datKhoi({ ...k, che: 'bang' }); setChon(false); if (chuaCoTo()) { toBang.trang = true; void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) { toBang.trang = false; setLoi(l); setSanh(true) } }) } }
+    if (c === 'hoc') { if (chuaCoTo() || laToBang()) { setChon(true); return } datKhoi({ ...k, che: 'hoc' }) }
+    else { datKhoi({ ...k, che: 'bang' }); setChon(false); if (chuaCoTo()) { datToBang(true); void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) { datToBang(false); setLoi(l); setSanh(true) } }) } }
   }
   const [k1, setK1] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
   useEffect(() => { const f = () => setK1(Math.min(window.innerWidth / 1920, window.innerHeight / 1080)); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f) }, [])
@@ -142,7 +142,7 @@ function PhongChoThay({ v, khoi }: { v: ViewBang; khoi: number }) {
     setDang(true); setLoi('')
     // Bắt đầu ⇒ cả lớp (máy thầy lẫn máy em) vào bảng danh sách; dựng sẵn tờ BẢNG TRẮNG bên dưới để tiếng thầy bật ngay (live tự bật khi tờ sẵn sàng).
     datKhoi({ k: khoi, gd: 'dang', che: 'sanh' })
-    if (chuaCoTo()) { toBang.trang = true; void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) toBang.trang = false }) }
+    if (chuaCoTo()) { datToBang(true); void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) datToBang(false) }) }
     const p = phienCua(v.buoiId)
     const r = p ? await batDauLiveKhoi(p.id) : null
     if (r && !r.ok) setLoi(r.chu)

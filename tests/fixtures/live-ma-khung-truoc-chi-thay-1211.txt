@@ -1,0 +1,84 @@
+
+var vt = 0, rn = null, thDich = null, tre = 0, cu = new Float32Array(480), lk = 1, lc = 1, giu = 0, mucNoi = 0, z1 = [0, 0, 0, 0], z2 = [0, 0, 0, 0], T0 = { noi: 1, im: 1, cao: 1, san: 1 }, lb0 = 0, lb1 = 0, la1 = 0, la2 = 0, c = null, g = 1, gl = 1, nen = 0.001, muc = 0, dem = 0, im = 0, x1 = 0, x2 = 0, y1 = 0, y2 = 0, hz = 0, b0 = 1, b1 = 0, b2 = 0, a1 = 0, a2 = 0, bao = 0, tam = null;
+function napLoc(buf) {
+  var bo, x;
+  try {
+    x = new WebAssembly.Instance(new WebAssembly.Module(buf), { env: { emscripten_memcpy_big: function (d, s, n) { new Uint8Array(bo.buffer).copyWithin(d, s, s + n); }, emscripten_resize_heap: function () { return 0; }, __assert_fail: function () { throw new Error('rnnoise'); } } }).exports;
+    bo = x.memory;
+    if (x.emscripten_stack_init) x.emscripten_stack_init();
+    if (x.__wasm_call_ctors) x.__wasm_call_ctors();
+    if (x.rnnoise_get_frame_size() !== 480) throw new Error('khung');
+    rn = { x: x, bo: bo, st: x.rnnoise_create(0), pv: x.malloc(1920), pr: x.malloc(1920) };
+    postMessage({ loc: 'chay' });
+  } catch (e) { rn = null; postMessage({ loc: 'loi' }); }
+}
+/* Thông thấp Butterworth bậc 2 ở 3,5 kHz (48 kHz) để tách băng; băng cao = tín hiệu − băng thấp (cộng lại đúng nguyên tín hiệu). */
+(function () { var w0 = 2 * Math.PI * 3500 / 48000, al = Math.sin(w0) / (2 * Math.SQRT1_2), a0 = 1 + al; lb0 = (1 - Math.cos(w0)) / 2 / a0; lb1 = (1 - Math.cos(w0)) / a0; la1 = -2 * Math.cos(w0) / a0; la2 = (1 - al) / a0; })();
+function thap(v, z) { var o = lb0 * v + lb1 * z[0] + lb0 * z[1] - la1 * z[2] - la2 * z[3]; z[1] = z[0]; z[0] = v; z[3] = z[2]; z[2] = o; return o; }
+/* Lọc ồn một khung 480 mẫu 48 kHz tại chỗ (thuật toán trộn: xem THAM_LOC_ON; bản đo ngoại tuyến chép đúng hàm này: scripts/thu-live-1011/do-loc-on.mjs).
+   Vào / ra chế độ lọc bằng MỘT khung chuyển (trộn dần khung này với khung trước) nên không «bụp»; tắt thì trôi về tiếng gốc rồi mới ra. */
+function locOn(x) {
+  var muon = rn && thDich, th = thDich || T0, i, w, f, r, e = 0, rw, vad, noi, k1, c1, cao1, k0 = lk, c0 = lc, goc, kk;
+  if (!tre && !muon) return;
+  if (tre && !muon && lk >= 1 && lc > 0.99) { for (i = 0; i < 480; i++) { w = (i + 1) / 480; x[i] = cu[i] * (1 - w) + x[i] * w; } tre = 0; return; }
+  f = new Float32Array(rn.bo.buffer, rn.pv, 480);
+  for (i = 0; i < 480; i++) f[i] = x[i] * 32768 + (Math.random() - 0.5) * 0.1;
+  vad = rn.x.rnnoise_process_frame(rn.st, rn.pr, rn.pv);
+  r = new Float32Array(rn.bo.buffer, rn.pr, 480);
+  if (!tre) { for (i = 0; i < 480; i++) { w = (i + 1) / 480; f[i] = x[i]; x[i] = x[i] * (1 - w) + cu[i] * w; cu[i] = f[i]; } tre = 1; lk = 1; lc = 1; return; }
+  for (i = 0; i < 480; i++) e += r[i] * r[i];
+  rw = Math.sqrt(e / 480) / 32768; mucNoi = Math.max(mucNoi * 0.9995, rw);
+  if (vad > 0.6 && rw > 0.18 * mucNoi) giu = 12; else if (giu > 0) giu -= 1;
+  noi = giu > 0; k1 = noi ? th.noi : Math.max(th.im, lk - 0.1); c1 = noi ? 1 : th.san + (lc - th.san) * 0.9048; cao1 = noi ? th.cao : 0;
+  for (i = 0; i < 480; i++) {
+    w = (i + 1) / 480; kk = k0 + (k1 - k0) * w; goc = cu[i]; f[i] = x[i];
+    x[i] = (thap(r[i] / 32768 * (1 - kk) + goc * kk, z1) + (goc - thap(goc, z2)) * (cao1 > kk ? cao1 : kk)) * (c0 + (c1 - c0) * w);
+    cu[i] = f[i];
+  }
+  lk = k1; lc = c1;
+}
+function xuLy(f) {
+  var n = f.numberOfFrames, kenh = f.numberOfChannels, s = f.sampleRate, moc = f.timestamp, x = new Float32Array(n), i, k, e = 0, r, g0 = g, can, buoc, v, a, w, al, nha;
+  if (!tam || tam.length !== n) tam = new Float32Array(n);
+  for (k = 0; k < kenh; k++) { f.copyTo(tam, { planeIndex: k, format: 'f32-planar' }); for (i = 0; i < n; i++) x[i] += tam[i]; }
+  f.close();
+  for (i = 0, e = 0; i < n; i++) e += x[i] * x[i];
+  vt += e / n; e = 0;
+  if (s !== hz) { hz = s; w = 2 * Math.PI * 80 / s; al = Math.sin(w) / (2 * 0.707); a = 1 + al; b0 = (1 + Math.cos(w)) / 2 / a; b1 = -(1 + Math.cos(w)) / a; b2 = b0; a1 = -2 * Math.cos(w) / a; a2 = (1 - al) / a; }
+  for (i = 0; i < n; i++) { v = b0 * x[i] + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2; x2 = x1; x1 = x[i]; y2 = y1; y1 = v; x[i] = v; }
+  if (n === 480 && s === 48000) { try { locOn(x); } catch (err) { rn = null; tre = 0; lk = 1; lc = 1; postMessage({ loc: 'loi' }); } } else if (!tre) cu.fill(0);
+  for (i = 0; i < n; i++) e += x[i] * x[i];
+  r = Math.sqrt(e / n);
+  nen = r < nen ? nen * 0.9 + r * 0.1 : Math.min(0.05, nen * Math.pow(1.0003, n / 128));
+  if (r > nen * 4 && r > 0.0015) {
+    if (im > s) dem = Math.min(dem, 40);
+    im = 0; dem += n / 128;
+    muc = dem < 40 ? muc + (r * r - muc) / Math.max(1, dem * 128 / n) : muc + (r * r - muc) * (n / (0.5 * s));
+    can = Math.max(c.nhoNhat, Math.min(c.lonNhat, c.dich / Math.sqrt(muc || 1e-9)));
+    buoc = Math.pow(10, ((can > g0 ? (dem * 128 < 3 * s ? c.lenDau : c.len) : c.xuong) / 20) * (n / s));
+    g = can > g0 ? Math.min(can, g0 * buoc) : Math.max(can, g0 / buoc);
+  } else im += n;
+  nha = 1 - Math.exp(-1 / (0.08 * s));
+  for (i = 0; i < n; i++) {
+    v = x[i] * (g0 + (g - g0) * (i + 1) / n); a = v < 0 ? -v : v;
+    if (a * gl > c.tran) gl = c.tran / a; else gl += (1 - gl) * nha;
+    x[i] = v * gl;
+  }
+  if (++bao >= 100) { postMessage({ g: g, v: Math.sqrt(vt / bao) }); bao = 0; vt = 0; }
+  return new AudioData({ format: 'f32-planar', sampleRate: s, numberOfFrames: n, numberOfChannels: 1, timestamp: moc, data: x });
+}
+onmessage = function (ev) {
+  var d = ev.data, doc, ghi;
+  if (d && d.loc) napLoc(d.loc);
+  if (d && 'muc' in d) thDich = d.muc || null;
+  if (!d || !d.vao) return;
+  c = d.c; if (c.g0 > 0) g = c.g0;
+  doc = d.vao.getReader(); ghi = d.ra.getWriter();
+  (function buoc() {
+    doc.read().then(function (kq) {
+      if (kq.done) { try { ghi.close(); } catch (e) {} return; }
+      try { ghi.write(xuLy(kq.value)); } catch (e) { postMessage({ loi: String(e) }); return; }
+      buoc();
+    }, function (e) { postMessage({ loi: String(e) }); });
+  })();
+};

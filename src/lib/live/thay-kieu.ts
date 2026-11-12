@@ -68,6 +68,9 @@ export interface ChanDoanMic {
   /** Mức lọc ồn riêng thầy chọn + tình trạng thật ('chay' / 'tai' / 'tat' / 'loi' / 'khong' = máy này không chạy được bộ lọc riêng). */
   locOn: MucLocOn
   locOnChay: string
+  /** «Chỉ giọng thầy» (lượt 2, chưa phát hành): tình trạng mô hình + bản / ngày luyện / hệ số thời gian thực đo trên máy này / lý do tự tắt. */
+  tg?: string | null
+  tgTin?: { ban: string; ngay: string; buoc?: number; rtf?: number; ly?: string } | null
   hzXuLy: number | null
   treThu: number | null
   /** Chuỗi làm rõ tiếng (cộng kênh, lọc 80 Hz, nén nâng mức, chặn đỉnh) đang chạy; false = đang gửi thẳng track mic. */
