@@ -134,6 +134,10 @@ describe('hiệu ứng đúng / sai kiểu Duolingo (thầy 26/10)', () => {
     expect(goc.querySelector('.duo-kq-bi')).toBeNull() // 27/10: dải như Duolingo — dấu tròn ×, không Bi
     expect(goc.querySelector('.duo-ket .duo-tick[data-sai]')).not.toBeNull()
     vi.mocked(goiHoa2).mockResolvedValueOnce({ correct: true, answer: 'B', solution: {} })
+    fireEvent.keyDown(window, { key: 'Enter' }) // 12/11 (bản vẽ docs/ban-ve-vi-sao-sai-1211 mục 5): chưa chọn lý do ⇒ Enter không đi
+    expect(screen.queryByText(C2.text)).toBeNull()
+    fireEvent.keyDown(window, { key: '2' }) // phím 1/2/3 chọn nhanh lý do trên máy tính
+    expect(screen.getByRole('button', { name: 'Chưa biết cách' }).getAttribute('aria-pressed')).toBe('true')
     fireEvent.click(screen.getByRole('button', { name: 'Chưa biết cách' })) // SỬA CÓ CHỦ ĐÍCH 09/11 (khối B «Vì sao em sai?», thầy duyệt docs/ban-ve-moi-on-sua-0911): câu sai phải chạm một lý do mới «Tiếp tục»
     quaKhoa()
     fireEvent.click(screen.getByRole('button', { name: 'Tiếp tục' }))
