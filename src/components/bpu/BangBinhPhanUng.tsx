@@ -74,7 +74,7 @@ export interface PropsBang {
   /** (08/11) Gọi em xong ⇒ giao em cho TỜ CHIẾU CŨ (màn lên bảng nguyên bản); trả false ⇒ không có tờ, bảng tự lo như cũ. */
   lenBangTo?: (em: { sbd: string; ten: string; goiNgay?: boolean; mau?: string; doi?: string }) => boolean
   /** (08/11) Đăng kí nơi nhận «Đạt / Chưa đạt» thầy bấm trên tờ ⇒ bảng ghi kết quả + mở đáp án. */
-  dangKyChamTo?: (f: ((dat: boolean) => void) | null) => void
+  dangKyChamTo?: (f: ((dat: boolean) => void) | null, g?: () => void) => void
   /** (09/11) Chọn câu ngay trên bảng ⇒ dựng tờ + chiếu (trả lời báo lỗi, rỗng = đã chiếu). Không có ⇒ không hiện «Chọn câu». `moi` = lượt mới dù phòng có lượt câu ấy. */
   onChieuCau?: (ds: CauDayHoc[], moi?: boolean) => Promise<string>
   /** (09/11) Mở từ nút Điểm danh ⇒ LUÔN hiện màn điểm danh (kể cả phòng đang có lượt) tới khi thầy chọn câu. */
@@ -381,11 +381,6 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
 
   // GỌI LÊN BẢNG: lõi chọn em đã chốt ⇒ electron nhảy qua ứng viên ⇒ gửi phòng. Lỗi đọc ⇒ rút đều trong các em đã gửi.
   // Thầy bấm Đạt / Chưa đạt trên tờ cũ ⇒ ghi như phím D / F của bảng rồi mở đáp án (bảng đã hiện lại).
-  useEffect(() => {
-    if (!dangKyChamTo) return
-    dangKyChamTo((dat) => { gui({ t: 'dat', v: dat }); setTimeout(() => gui({ t: 'mo' }), 150) })
-    return () => dangKyChamTo(null)
-  }, [dangKyChamTo, gui])
   const goiLen = useCallback(async (boQua: string[] = []) => {
     if (!v?.luot || dangGoi) return
     const lc = v.luot
@@ -428,6 +423,11 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
     }
     setUng({ ds: dsUng, soi: null })
   }, [v, dangGoi, gui, yeu, L, hien, lenBangTo])
+  useEffect(() => {
+    if (!dangKyChamTo) return
+    dangKyChamTo((dat) => { gui({ t: 'dat', v: dat }); setTimeout(() => gui({ t: 'mo' }), 150) }, () => void goiLen())
+    return () => dangKyChamTo(null)
+  }, [dangKyChamTo, gui, goiLen])
 
   // 09/11 thầy «không tự động gọi lên bảng»: cả lớp gửi xong KHÔNG tự gọi em nữa — thầy bấm L (hoặc Space) khi sẵn sàng.
   // Thẻ «Mời em lên bảng» hiện ~4 giây ⇒ thu về góc, chiếu đề cho em làm.

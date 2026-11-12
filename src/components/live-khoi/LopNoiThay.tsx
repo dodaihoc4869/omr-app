@@ -74,15 +74,19 @@ export default function LopNoiThay() {
   const sangHoc = (): void => { setChon(false); setSanh(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
   // MỘT LUẬT ĐIỀU HƯỚNG (thầy 12/11 «làm chuẩn logic đi»):
   //  · «Học» ở BẢNG DANH SÁCH = mở bảng chọn bài / hoạt động (bấm MỘT lần là chọn được). Muốn quay lại thứ đang chiếu thì có nút «Về màn chiếu».
-  //  · «Học» trong khay nút bốn ô của tờ: đang có bài ⇒ về bài đó ngay; chưa có bài ⇒ mở bảng chọn.
+  //  · «Học» trong khay nút bốn ô của tờ: đang có bài / tấm hoạt động đang mở ⇒ về đúng màn đó ngay; chưa có gì ⇒ mở bảng chọn.
   //  · «Bảng»: tờ của bảng lên trên (bảng trắng nếu chưa có tờ), nét bảng giữ nguyên.
   //  · Chọn xong / mở hoạt động / chiếu tờ ⇒ rời danh sách sang màn đó. Esc lùi một màn, không đóng / huỷ gì: mọi thứ còn nguyên để «Về màn chiếu».
   const doiChe = (c: 'hoc' | 'bang', tuSanh = false): void => {
     if (!k) return
     setLoi('')
     if (c === 'hoc') {
-      if (tuSanh || !coTo() || laToBang()) { setChon(true); return }
-      toLenTren(); setSanh(false); setChon(false); datKhoi({ ...k, che: 'hoc' })
+      // (thầy 12/11 «từ bảng sang học lại chuyển sang màn chọn không lưu màn học tức thì») màn Học đang dở = tờ bài của bảng HOẶC tấm hoạt động đang mở
+      // (Chữa câu khó… + tờ riêng của nó; lúc sang «Bảng» em dựng bảng trắng đè lên) ⇒ về đúng màn ấy; chỉ khi chưa có gì mới mở bảng chọn.
+      const coBai = coTo() && !laToBang()
+      if (tuSanh || (!coBai && !hdMo)) { setChon(true); return }
+      if (coBai) toLenTren(); else hienHoatDong()
+      setSanh(false); setChon(false); datKhoi({ ...k, che: 'hoc' })
     } else {
       toLenTren(); setSanh(false); setChon(false); datKhoi({ ...k, che: 'bang' })
       if (!coTo()) dungBangTrang()
@@ -140,7 +144,7 @@ export default function LopNoiThay() {
       {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} loi={loi} coVe={coToChieu()} onChe={(c) => doiChe(c, true)} onDong={() => setSanh(false)} /> : null}
       {chon ? (
         <div className="lkt-chon"><div className="lkt-san-khau" style={{ ['--k' as string]: k1 }}>
-          <div className="lkt-chon-dau"><i aria-hidden="true" />Live Khối {k.k}<small>{v.ds.filter((e) => e.vao).length} em trong phòng</small></div>
+          <div className="lkt-chon-dau"><i aria-hidden="true" />Live Khối {k.k}<small>{v.ds.filter((e) => e.vao).length} em trong phòng</small>{coToChieu() ? <button type="button" className="lkt-ve chinh" onClick={() => { setChon(false); setSanh(false) }}>Về màn chiếu</button> : null}</div>
           <Suspense fallback={<div className="lkt-dang-mo" role="status">Đang mở chọn bài…</div>}>
             <ChonCauBpu live buoiId={v.buoiId} lop={v.lop} buocDau="hd" onDong={() => setChon(false)}
               onChieu={async (ds) => { const l = await chieuCau(ds); if (!l) sangHoc(); return l }}

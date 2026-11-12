@@ -389,9 +389,8 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       const o = huongMan()
       if (!o?.lock || !document.fullscreenElement) { khoaRoi = false; setDaKhoa(false); return }
       khoaXoay()
-      // MỘT chiều ngang (thầy 12/11 «chỉ giữ xoay ngang, đang làm máy hs lại xoay ngang lộn lại»): `landscape` cho máy tự lật giữa hai chiều ngang theo cảm
-      // biến, và có thể ngược với chiều xoay hình CSS (rotate 90°) của màn câu hỏi. `landscape-primary` = đúng chiều của xoay hình ⇒ không bao giờ lộn.
-      void o.lock('landscape-primary').then(() => { if (song) { khoaRoi = true; khoaXoay(); setDaKhoa(true) } }, () => { if (song) { khoaRoi = false; setDaKhoa(false) } })
+      // CHỈ ÉP NGANG, không khoá một chiều (thầy 12/11 lần 2 «chỉ ép ngang không khóa theo chiều cố định nào cả»): em cầm ngang bên nào máy tự theo bên ấy.
+      void o.lock('landscape').then(() => { if (song) { khoaRoi = true; khoaXoay(); setDaKhoa(true) } }, () => { if (song) { khoaRoi = false; setDaKhoa(false) } })
     }
     khoa()
     document.addEventListener('fullscreenchange', khoa)

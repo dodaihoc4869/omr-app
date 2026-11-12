@@ -33,6 +33,8 @@
 // 12/11 · BẢNG MIC GỌN (thầy: «làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): mỗi cài đặt MỘT hàng — cột nhãn · thanh phân đoạn
 // (nút ≥ 40 px); chữ chỉ khi có vấn đề (.mc-lv-canh); «Chi tiết» thu gọn ở cuối. Luật CSS mới CHỈ trong .mc-lv-the: .mc-lv-n.nho / .mc-lv-dong của thẻ «Đang nói»
 // giữ nguyên. Bảng cao quá màn (khổ thấp) ⇒ tự cuộn trong khung, không tràn mép trên.
+import { JS_LIVE_KHOI_TO_CHIEU } from './live-khoi-to-chieu'
+
 export const CSS_LIVE_TO_CHIEU = `
 body.mc-che-bang .mc-vung-de,body.mc-che-bang .mc-trang{display:none!important}
 body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai{display:block!important;grid-column:1/-1!important;grid-row:1/-1!important}
@@ -502,6 +504,7 @@ export const JS_LIVE_TO_CHIEU = `
     var m = e.data, truoc;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
+    if (m.lenh === 'live-bao') { baoNhanh(String(m.chu || ''), 4200); return; }
     if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; LV.lkChat = m.chat === true; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
     if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl') { LV.bangNhap = 1; if (m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); } return; }
     if (m.lenh !== 'live-tt') return;
@@ -541,26 +544,12 @@ export const JS_LIVE_TO_CHIEU = `
   }
   // Cột tin nhắn của app đang mở mà thầy bấm vào tờ (ngoài khay nút bốn ô) ⇒ báo app thu cột (app không thấy được cú bấm trong tờ).
   document.addEventListener('pointerdown', function (e) { var t = e.target; if (!LV.lkChat || (t && t.closest && t.closest('#mc-khay,#mc-them'))) return; LV.lkChat = false; lvGui('lk', { v: 'ngoai' }); }, true);
-  // CỠ CHỮ ĐỀ CỦA BUỔI LIVE (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá»): máy em soi ĐÚNG cách xuống dòng của giấy thầy (để nét
-  // gạch chân khớp chữ) nên chữ máy em to theo chữ của tờ. Buổi live mặc định «Chữ rất lớn» (1,2); thầy đổi trong Cài đặt của tờ thì máy em theo ngay và
-  // nhớ RIÊNG cho live (mc-lk-scale) — cỡ chữ buổi trên lớp (mc-projector-scale) giữ nguyên.
-  function lvCoChu() {
-    var sz = document.getElementById('mc-size'), goc = null, luu = null;
-    if (!sz || LV.coChu) return;
-    LV.coChu = 1;
-    try { goc = localStorage.getItem('mc-projector-scale'); luu = localStorage.getItem('mc-lk-scale'); } catch (e) {}
-    sz.value = luu || (parseFloat(sz.value) > 1.2 ? sz.value : '1.2');
-    if (!sz.value) sz.value = '1.2';
-    document.documentElement.style.setProperty('--mc-scale', sz.value);
-    if (window.__mcFitOptions) window.__mcFitOptions();
-    if (window.__mcBoCuc) window.__mcBoCuc.doiLai();
-    sz.addEventListener('change', function () { try { localStorage.setItem('mc-lk-scale', sz.value); if (goc === null) localStorage.removeItem('mc-projector-scale'); else localStorage.setItem('mc-projector-scale', goc); } catch (e) {} });
-  }
   function lvCheBang() {
     var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb;
     if (!trang && !(LV.tt && LV.tt.khoi)) return;
     b.classList.add('mc-lk');
     if (!trang) lvCoChu();
+    setTimeout(lvNutLen, 0);
     cb = trang || !!(LV.tt && LV.tt.cheBang);
     // BẢNG CÓ TRANG RIÊNG (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang bl của bộ máy bút, tách khỏi nét của từng câu;
     // app giữ bản sao suốt buổi và trả lại khi tờ mới xin (đổi bài, bảng trắng ⇄ bài) — lệnh live-bang-nhap.
@@ -574,6 +563,6 @@ export const JS_LIVE_TO_CHIEU = `
     if (window.__mcBut) { if (cb) window.__mcBut.bat(true); setTimeout(lvAnh, 150); }
   }
   lvCheBang();
-  window.__mcLive = { tt: function () { return LV.tt; }, bam: lvBam };
+${JS_LIVE_KHOI_TO_CHIEU}  window.__mcLive = { tt: function () { return LV.tt; }, bam: lvBam };
   lvGui('chao');
 `

@@ -33,6 +33,14 @@ let boQid = ''
 let tamAn = false
 // Buổi LIVE THEO KHỐI (12/11) — khai ở đầu tệp vì các hàm phía dưới đọc: phiên đang có là buổi live · chế độ lớp nổi báo · hàm Esc lùi một màn.
 let phienLive = false
+/** Buổi live theo khối: máy thầy GIỮ cỡ cửa sổ trình duyệt (thầy 12/11 «vẫn có một chỗ bấm vào full màn hình trên app gv, sửa triệt để»). Chặn TẠI GỐC:
+ *  suốt phiên live mọi lời xin toàn màn hình của cửa sổ app (bảng, màn khác, mã viết sau này) thành rỗng; đang toàn màn hình thì thoát. Hết phiên ⇒ trả lại. */
+function khoaToanMan(k: boolean): void {
+  try {
+    const de = document.documentElement as unknown as { requestFullscreen?: unknown }
+    if (k) { de.requestFullscreen = () => Promise.resolve(); if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } else delete de.requestFullscreen
+  } catch { /* trình duyệt lạ */ }
+}
 let cheLive: 'cho' | 'sanh' | 'hoc' | 'bang' = 'cho'
 let escLive: (() => boolean) | null = null
 
@@ -102,7 +110,10 @@ export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
 // Hàm gắn vào bảng ĐỨNG YÊN (module): bảng có hiệu ứng phụ thuộc chúng (nối phòng) ⇒ hàm mới mỗi lần vẽ sẽ làm rớt nối mỗi lần chuyển câu.
 const khongMo = (chu: string, caPhong: boolean) => { if (phienLive) { useAppStore.getState().showToast(chu, 'warn'); return } dongBang(); if (caPhong) nghiDen = Date.now() + 5 * 60_000; useAppStore.getState().showToast(chu, 'warn') }
 const tatBpu = () => { if (phienLive) return; dongBang(); nghiDen = Date.now() + 60 * 60_000; useAppStore.getState().showToast('Bình Phản Ứng đang tắt trên máy chủ.', 'warn') }
-const dangKyCham = (f: ((dat: boolean) => void) | null) => { nhanCham = f }
+let nhanGoi: (() => void) | null = null
+const dangKyCham = (f: ((dat: boolean) => void) | null, g?: () => void) => { nhanCham = f; nhanGoi = f ? g ?? null : null }
+/** Buổi live: tờ xin gọi một em lên bảng (bảng ẩn nên không bấm «Lên bảng» trên bảng được) ⇒ bảng chọn em đúng luật của phím L rồi giao lại cho tờ. */
+export function goiTuTo(): void { if (phienLive) nhanGoi?.() }
 const toiQuaTo = (d: 1 | -1) => toiCau(d)
 // ESC MỘT LẦN Ở BẤT KỲ ĐÂU ⇒ RA HÔM NAY (thầy 09/11 «khi bấm esc thoát hẳn ra màn hôm nay ở bất kì chỗ nào, hiện tại phải bấm rất nhiều lượt»):
 // nghe ở pha BẮT (trước mọi bảng / bảng chọn / tấm) — bỏ qua các lớp con; tờ chiếu trong khung (iframe) báo Esc qua tin `bpu-esc` (nghe-to-chieu.ts).
@@ -220,7 +231,7 @@ export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?:
     return
   }
   if (khung) { dongBang(); dongTo() } // buổi khác ⇒ đóng phiên cũ
-  phienLive = !!o.live; cheLive = 'cho'
+  phienLive = !!o.live; cheLive = 'cho'; khoaToanMan(phienLive)
   // Mở mới ⇒ LUÔN màn điểm danh (thầy 09/11 «thoát ra hẳn thì không có chỗ vào lại màn điểm danh»), kể cả phòng còn lượt cũ; chọn câu ⇒ hết cờ.
   hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr, diemDanh: true }
   veBang()
@@ -408,7 +419,7 @@ export function baoHetCau(d: 1 | -1): void {
 export function dongBang(): void {
   if (liveTt.bat) layPhong()?.gui({ t: 'live-tat' }) // bảng đóng hẳn (nối phòng sắp rớt) ⇒ tắt live trước, máy em không kẹt ở bảng live
   anViLive = false
-  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; hien = null; tamAn = false; boQid = ''
+  goc?.unmount(); goc = null; khung?.remove(); khung = null; nhanCham = null; nhanGoi = null; hien = null; tamAn = false; boQid = ''; khoaToanMan(false)
   document.documentElement.removeAttribute('data-bpu-an')
   traAnTam(); cheTo(false); capLiveGon() // bảng đóng (lùi về tờ: G, câu không gửi được…) ⇒ tờ hiện như thường
   try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
@@ -477,7 +488,7 @@ function phimKhiAn(e: KeyboardEvent): void {
 export function lenBangTo(em: { sbd: string; ten: string; goiNgay?: boolean; mau?: string; doi?: string }): boolean {
   if (!nguonTo || !khung) return false
   anViLive = false
-  try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten, goiNgay: em.goiNgay !== false, mau: em.mau ?? '', doi: em.doi ?? '' } }, '*') } catch { return false }
+  try { nguonTo.postMessage({ nguon: 'bpu-bang', lenh: 'len-bang', em: { sbd: em.sbd, ten: em.ten, goiNgay: phienLive || em.goiNgay !== false, mau: em.mau ?? '', doi: em.doi ?? '' } }, '*') } catch { return false }
   anBang()
   try { nguonTo.focus() } catch { /* tờ chặn */ }
   return true

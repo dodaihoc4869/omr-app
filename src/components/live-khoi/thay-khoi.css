@@ -97,3 +97,4 @@ html[data-live-khoi][data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình
 
 .lkt-ve.chinh { background: var(--p-xanh); color: var(--tr-chieu-bang) !important; box-shadow: 0 3px 0 var(--p-xanh-dam); }
 .lkt-ve-noi { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); pointer-events: auto; }
+.lkt-chon-dau .lkt-ve { font-size: 17px; margin-left: 10px; pointer-events: auto; }

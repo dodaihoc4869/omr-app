@@ -390,6 +390,17 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
     case 'bang-xin': { const co = !!bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length > 0; bangSan = true; guiTo({ lenh: 'live-bang-nhap', goi: co ? bangLuu!.goi : { v: 1, tiLe: 0, net: [] } }); if (!co) giuBang(true); break }
     case 'bam': bam(); break
+    // Tờ trong buổi live theo khối báo «Lên bảng» / chấm (thầy 12/11 «lên bảng máy hs chưa hiện thông báo, bấm đạt không đạt cũng chưa hiện») ⇒ lệnh vào phòng:
+    // máy em hiện «… lên bảng» + con dấu. Không sbd = tờ chưa có em ⇒ bảng (đang ẩn) chọn em như phím L. Em chưa vào phòng ⇒ nói rõ cho thầy trên tờ.
+    case 'len': {
+      const sbd = typeof m.sbd === 'string' ? m.sbd : ''
+      if (!view?.live?.khoi) break
+      if (!sbd) { void import('../bpu/gan-gv').then((g) => g.goiTuTo()).catch(() => {}); break }
+      if (!view.luot || view.luot.pha === 'mo' || !view.ds.some((e) => e.sbd === sbd && e.vao)) { guiTo({ lenh: 'live-bao', chu: !view.luot || view.luot.pha === 'mo' ? 'Câu này đã mở đáp án — máy các em không hiện «lên bảng» nữa' : 'Em này chưa vào phòng live — máy các em chưa hiện «lên bảng». Thầy gọi em khác nhé' }); break }
+      layPhong()?.gui({ t: 'goi', sbd, lyDo: [] }); setTimeout(() => layPhong()?.gui({ t: 'lam-bang' }), 250)
+      break
+    }
+    case 'cham': if (view?.live?.khoi) { layPhong()?.gui({ t: 'dat', v: (m as { dat?: unknown }).dat === true }); setTimeout(() => layPhong()?.gui({ t: 'mo' }), 150) } break
     case 'the-dong': if (the) { the = null; lt?.thaMic(); bao() } break
     case 'chon-loa': if (the?.loa && typeof m.id === 'string') { the = { ...the, loa: { ...the.loa, chon: m.id, thu: undefined } }; bao(); void lt?.datLoa(m.id).then(() => napLoa()) } break
     case 'thu-loa': if (the?.loa && lt) { the = { ...the, loa: { ...the.loa, thu: 'dang' } }; bao(); void lt.thuLoa().then((ok) => { if (the?.loa) { the = { ...the, loa: { ...the.loa, thu: ok ? 'ok' : 'loi' } }; bao() } }) } break
