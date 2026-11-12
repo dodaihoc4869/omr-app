@@ -4,7 +4,7 @@ Thầy 12/11: «Cái chọn ý nó bị thoát nhanh quá chưa kịp nhìn, cho
 đẹp và gọn hơn ở màn dọc, vẽ tôi xem trước khi build».
 
 Ảnh (Chromium thật, `node docs/ban-ve-vi-sao-sai-1211/chup.mjs`): `dt-sang-0-hien-tai` (bản đang chạy, để so) · `dt-sang-1-chua-chon` · `dt-sang-2-ai-doan` ·
-`dt-sang-3-da-chon` · `dt-toi-1/3` · `dt-nho-sang-1` (360×640) · `mb-sang-3` (máy tính bảng) · `mt-sang-1`, `mt-toi-3` (máy tính).
+`dt-sang-3-da-chon` · `dt-toi-1/3` · `dt-nho-sang-1` (360×640) · khổ ngang kiểu Duolingo: `ngang-sang-1/3` (điện thoại xoay ngang), `fold-sang-1`, `mb-sang-3`, `mt-sang-1`, `mt-toi-3`.
 
 ## 1. Mục tiêu sư phạm + ai dùng
 Học sinh, câu luyện tập ở Lộ trình vừa làm SAI. Em phải DỪNG LẠI, nhìn đáp án đúng, tự gọi tên lỗi của mình (Tính / đọc đề sai · Chưa biết cách · Hiểu nhầm)
@@ -18,7 +18,9 @@ Vì sao đang «thoát nhanh» (đọc mã `src/components/hoc-tap/KetSaiDuo.tsx
 - Điện thoại dọc (chính): dải «Chưa đúng» → đáp án đúng + một dòng lời giải ngắn + «Lời giải từng bước» → thẻ «Vì sao em sai?» (góc phải: «Chọn 1 ý» / «✓ Đã ghi»)
   → BA HÀNG chọn một (vòng tròn + tên lý do + một dòng giải thích), mỗi hàng cao ≥ 48 px → nút chính rộng hết dải.
 - Thay ba ô ngang hiện tại (chữ «Tính / đọc đề sai» bị bẻ hai dòng, khó đọc) bằng ba hàng dọc gọn, chữ một dòng.
-- Máy tính bảng / máy tính: ba hàng thành ba cột cạnh nhau. Điện thoại xoay ngang: giữ dạng gọn một hàng ba ô như hiện tại (đã có, không đổi).
+- KHỔ NGANG — điện thoại xoay ngang, Fold mở, máy tính bảng, máy tính (thầy 12/11: «phải giữ thiết kế của Duolingo»): GIỮ thanh đáy Duolingo đang chạy — rộng hết
+  màn, kết quả bên trái, nút chính bên phải, ba ô lý do MỘT HÀNG (không dòng giải thích phụ). Chỉ đổi cách chờ như mục 3/5. Ảnh: `ngang-sang-1/3`, `fold-sang-1`
+  (884×1104), `mb-sang-3`, `mt-sang-1`, `mt-toi-3`.
 
 ## 3. Trạng thái
 - Vừa hiện, chưa chọn: nút xám «Chọn một ý để tiếp tục» (tắt). KHÔNG chọn sẵn.
