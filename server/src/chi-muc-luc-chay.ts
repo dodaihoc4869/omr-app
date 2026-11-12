@@ -3,6 +3,8 @@
 // Lỗi (bảng chưa có ở D1 mới…) chỉ ghi log; KHÔNG thử lại trong cùng isolate (tránh dội D1 mỗi lượt).
 // Chỉ thêm chỉ mục cho bảng NHỎ (≤ vài chục nghìn dòng). Bảng lớn (> vài trăm nghìn dòng) chỉ đưa vào migration để Boss chạy tay.
 import type { Env } from './kieu'
+import { lamMoiTenDoiTuongChung } from './ddl-mot-lan'
+import { donBangTinhChung } from './bang-tinh-chung'
 
 export const CHI_MUC_LUC_CHAY: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS game_v2_attempt_session ON game_v2_attempt(session, sbd)',
@@ -29,6 +31,9 @@ export function damBaoChiMuc(env: Env): Promise<void> {
  */
 export const CHI_MUC_CRON_DEM: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS idx_luot_ca_tt ON luot(ma_ca, trang_thai, het_gio_luc)',
+  // 12/11 (H2, bản sao server/migration-z-1211-h2-goi-nhieu.sql): bảng `ca` nhỏ — đếm/kiểm ca đang mở (493 nghìn lượt/ngày) và ca còn bảo vệ đề (caDangBaoVe).
+  'CREATE INDEX IF NOT EXISTS idx_ca_trang_thai ON ca(trang_thai)',
+  "CREATE INDEX IF NOT EXISTS idx_ca_bao_ve ON ca(ma_ca) WHERE trang_thai<>'da_xoa' AND (trang_thai<>'dong' OR COALESCE(cong_bo,'') NOT IN ('ngay','ca_lop_xong'))",
   // Quét tối ưu 30/09 (bản sao server/migration-3009-chi-muc-quet-cuoi.sql; EXPLAIN trước = "SCAN <bảng>"):
   //  · EXP hôm nay (`docExpHomNay`, mỗi lần em mở app qua /hs/ke-hoach-ngay) lọc game_v2_reward theo sbd + ngày — bảng ≈ một dòng mỗi câu game.
   'CREATE INDEX IF NOT EXISTS idx_game_v2_reward_sbd ON game_v2_reward(sbd, created_at)',
@@ -49,7 +54,23 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   // 11/11 (hoá đơn Cloudflare — D1 hàng đọc): cron gói sửa MỖI PHÚT (goi-sua-dem.ts cronGoiSuaDem) quét cả bảng chua_loi_dot (~98 nghìn hàng/lượt,
   // 133 triệu hàng/ngày) chỉ để tìm em còn đợt MỞ ⇒ chỉ mục bộ phận chỉ chứa đợt mở, theo em (đủ cột cho GROUP BY sbd + MAX(cap_nhat_luc)).
   "CREATE INDEX IF NOT EXISTS idx_cld_mo_em ON chua_loi_dot(sbd, cap_nhat_luc) WHERE dong_luc IS NULL AND trang_thai_day<>'da_tu_sua'",
+  // 12/11 (hoá đơn D1 hàng đọc, ~300 triệu/ngày): nhánh NHÓM của «đợt của em cho câu hoặc cùng nhóm» (chua-dot-nhom-sql.ts). Bản sao server/migration-1211-chua-dot-nhom.sql.
+  'CREATE INDEX IF NOT EXISTS idx_cld_sbd_nhom ON chua_loi_dot(sbd, content_group, dong_luc)',
+  // 12/11 tối (H3 đợt 3, hoá đơn D1 hàng đọc): bảng LỚN ⇒ dựng 00:01 VN. Bản sao server/migration-z-1211-h3-doc-bang-phu.sql (+ -h3-skh-dong-tg.sql).
+  //  · hồ sơ câu khi lập kế hoạch (ke-hoach-ngay-d1.ts docHoSoD1): câu tới hạn / đếm câu chưa khắc phục chỉ đọc đúng dòng cần.
+  "CREATE INDEX IF NOT EXISTS nkc_em_toi_han ON nam_kt_cau(sbd, moc_on_ke) WHERE trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL",
+  "CREATE INDEX IF NOT EXISTS nkc_em_chua_kp ON nam_kt_cau(sbd, trang_thai) WHERE trang_thai IN ('dang_on','moi_sai')",
+  //  (12/11 22:10: BỎ exp_so_em_luc + skh_em_dong_tg — ghi D1 đắt gấp 1.000 lần đọc; mỗi dòng sổ / EXP mới +1 hàng ghi lỗ hơn số hàng đọc tiết kiệm.)
+  // 12/11 đợt 3 H1: chỉ mục bộ phận lượt CHƯA ĐÚNG của sổ (ba câu nợ của kế hoạch ngày — hang-chua-loi.ts CHI_MUC_CHUA_DUNG). Bản sao server/migration-z-1211-skh-chua-dung.sql.
+  'CREATE INDEX IF NOT EXISTS idx_skh_em_chua_dung ON su_kien_hoc(sbd, nguon, ket_qua, qid, luc, ma_nguon) WHERE ket_qua IS NOT 1',
 ]
+/** 12/11 (H2): cron mỗi phút gọi — phút x7 (mỗi 10 phút) chép danh sách tên đối tượng lược đồ cho mọi isolate (ddl-mot-lan.ts `ddl_ten_chung`): một lần đọc
+ *  sqlite_master thay cho mỗi isolate mới (~760 hàng). Không ném. */
+export async function chepTenDinhKy(env: Env, now = Date.now()): Promise<boolean> {
+  const phut = new Date(now).getUTCMinutes()
+  if (phut === 7) await donBangTinhChung(env, now) // mỗi giờ: bỏ dòng tính sẵn quá tuổi (không còn dùng được) — bảng không phình
+  return phut % 10 === 7 ? lamMoiTenDoiTuongChung(env, now) : false
+}
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {
   let loi = 0

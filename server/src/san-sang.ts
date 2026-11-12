@@ -337,6 +337,11 @@ async function dauNhieuEm(env: Env, sbds: readonly string[], now: number): Promi
   return null
 }
 
+/** 12/11 tối (H3, đo 24h: 1.183 lượt × ~30.879 hàng): `goi_moi` đi từ GÓI TẠO SAU lúc lập bản (chỉ mục goi_bai_7_tao, thường 0–vài gói) rồi dò khoá chính
+ *  (goi_id, sbd) của dòng nhận gói — cùng điều kiện, cùng kết quả (câu cũ: tests/doc-bang-phu-h3-1211.test.ts); không còn đọc mọi gói của từng em. */
+export const SQL_SAN_SANG_LECH = `SELECT x.value AS sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.value ORDER BY g.created_at DESC LIMIT 1) AS gan,
+        EXISTS(SELECT 1 FROM goi_bai_7 g2 CROSS JOIN goi_bai_7_em e2 WHERE g2.tao_luc > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch') AND e2.goi_id=g2.id AND e2.sbd=x.value) AS goi_moi
+        FROM json_each(?) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.value AND s.ngay=? AND s.dau LIKE ? ORDER BY x.value`
 /**
  * CRON LẬP SẴN (cả ngày, trừ 00:00–00:14): chuẩn bị Sảnh + chặng đầu cho MỌI em còn đang nhận gói — trước hết em CHƯA có bản hôm nay (hoặc bản theo cách tính dấu cũ), rồi (còn chỗ) em có bản
  * nhưng DẤU ĐÃ ĐỔI (thầy giao bài / đổi cấu hình / gói mới… — dấu chung đổi là mọi bản của mọi em lệch cùng lúc ⇒ lượt mở app đầu của em phải lập lại ~3 s; thầy 29/10 «mở app phải tức thì 100%»).
@@ -352,20 +357,19 @@ export async function cronSanSangDem(env: Env, now: number, toiDa?: number): Pro
     await chayDdlMotLan(env, BANG_SAN_SANG, SQL_SAN_SANG)
     const g7 = await import('./goi-bai-7')
     if (!(await g7.coGoi7(env)).bat) return 0
-    const { sqlEmDangNhan7 } = await import('./goi-bai-7-quyen')
     const ngay = ngayVn7(now)
     // Em đang nhận ≥ 1 gói (cùng các điều kiện JOIN / quyền như danh sách gói của em), chưa bị khoá.
-    const emNhan = `SELECT DISTINCT e.sbd FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id
-      JOIN hoc_sinh h ON h.sbd=e.sbd AND ${g7.sqlTenLopHs('h')}=g.lop JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlEmDangNhan7('e', 'g', 'h')}`
-    const chua = await env.DB.prepare(`SELECT x.sbd FROM (${emNhan}) x WHERE NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?) ORDER BY x.sbd LIMIT ?`)
-      .bind(ngay, BAN_DAU + '§%', toiDa).all<{ sbd: string }>()
+    // 12/11 (đo D1 thật 24h: câu danh sách em ở đây ~28 nghìn dòng/lượt, chạy HAI lần mỗi phút — `chua` và `co`): đọc danh sách MỘT lần bằng câu ít dòng
+    // (goi-bai-7-em-nhan.ts, cùng tập em, xếp theo sbd), dùng chung bản tính ≤ 5 phút với cron Bốn bảng (một dòng D1), rồi đưa vào hai câu dưới qua json_each.
+    // Hai câu cho kết quả y hệt trên cùng danh sách; danh sách của cron chậm tối đa 5 phút (việc nền — em mở app vẫn tự lập).
+    const emNhan = JSON.stringify((await (await import('./goi-bai-7-em-nhan')).docEmNhan7Cron(env, now)).map((r) => r.sbd))
+    const chua = await env.DB.prepare(`SELECT x.value AS sbd FROM json_each(?) x WHERE NOT EXISTS (SELECT 1 FROM ${BANG_SAN_SANG} s WHERE s.sbd=x.value AND s.ngay=? AND s.dau LIKE ?) ORDER BY x.value LIMIT ?`)
+      .bind(emNhan, ngay, BAN_DAU + '§%', toiDa).all<{ sbd: string }>()
     const ds = (chua.results ?? []).map((r) => String(r.sbd))
     // Còn chỗ ⇒ vá bản đã LỆCH DẤU (so với dấu hiện tại), em học gần đây nhất trước, bỏ em đang học dở.
     if (ds.length < toiDa) {
       // `goi_moi` = em có gói TẠO SAU lúc lập bản (thầy vừa giao bài / thêm câu cho lớp) ⇒ kế hoạch CHẮC CHẮN đổi ⇒ lập lại TRƯỚC (thầy 29/10 «Lớp 12 đã được giao thêm câu mới, nạp luôn nhé»).
-      const co = await env.DB.prepare(`SELECT x.sbd, s.dau, (SELECT g.created_at FROM game_v2_session g WHERE g.sbd=x.sbd ORDER BY g.created_at DESC LIMIT 1) AS gan,
-        EXISTS(SELECT 1 FROM goi_bai_7_em e2 JOIN goi_bai_7 g2 ON g2.id=e2.goi_id WHERE e2.sbd=x.sbd AND g2.tao_luc > strftime('%Y-%m-%dT%H:%M:%fZ', s.luc/1000.0, 'unixepoch')) AS goi_moi
-        FROM (${emNhan}) x JOIN ${BANG_SAN_SANG} s ON s.sbd=x.sbd AND s.ngay=? AND s.dau LIKE ?`).bind(ngay, BAN_DAU + '§%').all<{ sbd: string; dau: string; gan: string | null; goi_moi: number }>()
+      const co = await env.DB.prepare(SQL_SAN_SANG_LECH).bind(emNhan, ngay, BAN_DAU + '§%').all<{ sbd: string; dau: string; gan: string | null; goi_moi: number }>()
       const hang = (co.results ?? []).sort((a, b) => Number(b.goi_moi) - Number(a.goi_moi) || String(b.gan ?? '').localeCompare(String(a.gan ?? '')))
       const canTim = toiDa - ds.length
       const caoDiem = new Date(now + 7 * 3600000).getUTCHours() >= 19

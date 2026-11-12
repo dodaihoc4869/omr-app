@@ -258,7 +258,10 @@ export async function caDangBaoVe(env:Env,now:number):Promise<Row[]> {
     CASE WHEN ca.trang_thai<>'dong' THEN (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca) ELSE 0 END entered,
     CASE WHEN ca.trang_thai<>'dong' THEN (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='da_nop') ELSE 0 END submitted,
     CASE WHEN ca.trang_thai<>'dong' THEN (SELECT COUNT(*) FROM luot l WHERE l.ma_ca=ca.ma_ca AND l.trang_thai='dang_lam' AND (l.het_gio_luc IS NULL OR l.het_gio_luc>?)) ELSE 0 END active
-    FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca`).bind(new Date(now).toISOString(),MOC_KHOA_CA).all<Row>()
+    FROM ca WHERE ca.trang_thai<>'da_xoa' AND (ca.trang_thai<>'dong' OR COALESCE(ca.cong_bo,'') NOT IN ('ngay','ca_lop_xong'))
+    AND (ca.trang_thai='mo' OR COALESCE(NULLIF(ca.bat_dau,''),ca.cap_nhat_luc)>=?) ORDER BY ca.ma_ca`).bind(new Date(now).toISOString(),MOC_KHOA_CA).all<Row>()
+  // 12/11 (H2): điều kiện thứ hai CHÉP NGUYÊN VĂN WHERE của chỉ mục bộ phận idx_ca_bao_ve (migration-z-1211-h2-goi-nhieu.sql) ⇒ chỉ đọc ca CÓ THỂ còn bảo vệ:
+  // ca ĐÃ ĐÓNG mà cong_bo ngay/ca_lop_xong luôn bị bộ lọc dưới bỏ (released, canStillTest=false) ⇒ kết quả y hệt (tests/h2-goi-nhieu-1211.test.ts).
   return all.results.filter(ca=>{
     const released=ca.cong_bo==='ngay'||ca.cong_bo==='ca_lop_xong'&&(ca.trang_thai==='dong'||Number(ca.entered)>0&&Number(ca.submitted)>=Number(ca.entered))
     const entryEnd=Date.parse(str(ca.het_han_vao));const homeworkEnd=Date.parse(str(ca.han_nop))

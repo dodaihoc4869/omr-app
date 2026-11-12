@@ -27,7 +27,30 @@ export interface TuyChonNhipThay {
   luiDanMs?: readonly number[]
   heSoToiDa?: number
   tranMs?: number
+  /** MÁY ĐỂ YÊN (12/11 giảm chi phí Cloudflare — máy thầy mở Hôm nay cả ngày): không chạm / gõ / di chuột ≥ `RANH_SAU_MS` ⇒ hỏi theo `tranMs` (trần đã duyệt của vòng);
+   *  thầy chạm lại ⇒ hỏi ngay (chặn dội như cũ) rồi về nhịp thường. CHỈ cho vòng bảng tin + chip sức khoẻ — KHÔNG cho vòng coi ca thi. */
+  chamKhiRanh?: boolean
 }
+
+/** Không thao tác bao lâu thì coi là máy để yên (ms). */
+export const RANH_SAU_MS = 3 * 60_000
+let lanThaoTac = Date.now()
+const nguoiNghe = new Set<() => void>()
+let daGanNghe = false
+function ganNgheThaoTac(): void {
+  if (daGanNghe || typeof window === 'undefined') return
+  daGanNghe = true
+  const cham = () => {
+    const ranh = Date.now() - lanThaoTac >= RANH_SAU_MS
+    lanThaoTac = Date.now()
+    if (ranh) for (const f of nguoiNghe) f()
+  }
+  for (const ev of ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart']) window.addEventListener(ev, cham, { passive: true, capture: true })
+}
+/** Máy thầy đang để yên (không thao tác ≥ RANH_SAU_MS). */
+export const mayDeYen = (bay = Date.now()): boolean => bay - lanThaoTac >= RANH_SAU_MS
+/** Chỉ để test: đặt mốc thao tác cuối. */
+export const datLanThaoTac = (ms: number): void => { lanThaoTac = ms }
 
 /** BẢNG LÙI khi lỗi liên tiếp (mili-giây, giữ ở mức cuối). Mặc định cho Bảng tin sàn + bản 3: 30 → 60 → 120 s (Boss duyệt). */
 export const LUI_MAC_DINH_THAY: readonly number[] = [30_000, 60_000, 120_000]
@@ -41,10 +64,11 @@ export const LUI_SONG_CA_MS: readonly number[] = [10_000, 20_000]
  * thầy đang coi ca thi thật); chip sức khoẻ 10 s → 20 s. Vòng KHÔNG có trong bảng này = nhịp gốc × tối đa 4 (mặc định của Code 2) — thêm vòng mới thì đặt trần ở đây.
  */
 export const TUY_CHON_NHIP_THAY = {
-  bangTinSan: { heSoToiDa: 4, tranMs: 30_000 },
-  bangTinV3: { heSoToiDa: 2, tranMs: 120_000 },
+  // chamKhiRanh (12/11): máy để yên ≥ 3 phút ⇒ sàn 30 s · bản 3 120 s · chip 20 s (đúng trần đã duyệt); chạm lại ⇒ hỏi ngay.
+  bangTinSan: { heSoToiDa: 4, tranMs: 30_000, chamKhiRanh: true },
+  bangTinV3: { heSoToiDa: 2, tranMs: 120_000, chamKhiRanh: true },
   theoDoiCa: { heSoToiDa: 2, tranMs: 40_000, luiDanMs: LUI_THEO_DOI_CA_MS },
-  sucKhoeMay: { heSoToiDa: 2, tranMs: 20_000 },
+  sucKhoeMay: { heSoToiDa: 2, tranMs: 20_000, chamKhiRanh: true },
   /** PHÒNG CHỜ (Theo dõi ca khi chưa bấm Bắt đầu thi + màn Chiếu mã, thầy 28/09): 5 s → máy chủ bận ×2 = 10 s; lỗi lùi 30 → 40 s như Theo dõi ca. */
   phongCho: { heSoToiDa: 2, tranMs: 10_000, luiDanMs: LUI_THEO_DOI_CA_MS },
   /** NHỊP SỐNG của ca đang chạy (thầy 29/09 "thời gian thực"): lệnh NHẸ `/ca/nhip` 3 s/lần (src/lib/nhip-song-ca.ts) → máy chủ bận ×2 = 6 s; lỗi lùi 10 → 20 s
@@ -58,21 +82,26 @@ export const TUY_CHON_NHIP_THAY = {
  */
 export function useNhipThay(chay: () => Promise<unknown> | unknown, coSoMs: number, bat = true, o: TuyChonNhipThay = {}): void {
   const luiDanMs = o.luiDanMs ?? LUI_MAC_DINH_THAY
-  const { heSoToiDa, tranMs } = o
+  const { heSoToiDa, tranMs, chamKhiRanh } = o
   const goi = useRef(chay)
   goi.current = chay
   useEffect(() => {
     if (!bat || typeof document === 'undefined') return
-    const nhip = batNhipBenVung(() => goi.current(), { coSoMs, lechMs: 0, chanDoiMs: Math.min(CHAN_DOI_MS, coSoMs), chayNgay: false, luiDanMs, heSoToiDa, tranMs })
+    // Máy để yên ⇒ hẹn không sớm hơn trần của vòng (đọc lại MỖI lần hẹn) — qua `datGio` nên lõi nhịp dùng chung (app em / phụ huynh) không thêm byte nào.
+    const yen = chamKhiRanh && tranMs && tranMs > coSoMs ? tranMs : 0
+    const datGio = yen ? (f: () => void, ms: number) => setTimeout(f, mayDeYen() ? Math.max(ms, yen) : ms) : undefined
+    const nhip = batNhipBenVung(() => goi.current(), { coSoMs, lechMs: 0, chanDoiMs: Math.min(CHAN_DOI_MS, coSoMs), chayNgay: false, luiDanMs, heSoToiDa, tranMs, datGio })
     const kich = () => nhip.kich()
     document.addEventListener('visibilitychange', kich)
     window.addEventListener('focus', kich)
     window.addEventListener('online', kich)
+    if (yen) { ganNgheThaoTac(); nguoiNghe.add(kich) }
     return () => {
       nhip.dung()
+      nguoiNghe.delete(kich)
       document.removeEventListener('visibilitychange', kich)
       window.removeEventListener('focus', kich)
       window.removeEventListener('online', kich)
     }
-  }, [coSoMs, bat, luiDanMs, heSoToiDa, tranMs])
+  }, [coSoMs, bat, luiDanMs, heSoToiDa, tranMs, chamKhiRanh])
 }

@@ -4,6 +4,7 @@
 //   · chỉ 00:30–05:59 giờ VN (ngoài giờ học), mỗi phút MỘT lô `LO_DEM` đợt (đo 28/10: 14 287 đợt mở cũ, lô 200 ≈ 0,58 s D1 ⇒ lô 60 ≈ 0,18 s, ~240 phút một vòng) theo con trỏ id (chỉ mục bộ phận `idx_cld_mo_cu` dựng 00:01, chi-muc-luc-chay.ts);
 //   · lô = một batch: chọn cửa sổ + đóng + lưu con trỏ (cau_hinh `tu_sua_dong_cu`); hết bảng ⇒ con trỏ về đầu, đêm sau xét lại (lượt đúng mới có thể tới);
 //   · không thưởng nguyên tử (lượt đúng ở kênh khác đã có nguyên tử của kênh ấy).
+// 12/11 (D1 thật: câu này 102 nghìn hàng/lượt): điều kiện luật tự làm dò họ câu theo (sbd, qid) thay vì quét cả sổ của em theo giờ — xem `sqlDaTuSuaDungLai`.
 import type { Env } from './kieu'
 import { NGAY_CUA_SO_GON, sqlDaTuSuaDungLai } from './chua-gon'
 

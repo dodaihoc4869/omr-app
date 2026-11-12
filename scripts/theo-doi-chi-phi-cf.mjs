@@ -50,14 +50,15 @@ for (const [ten, dung, dv, goi, gia, lam] of dong) {
 }
 // Câu D1 đọc nhiều hàng nhất 24 giờ qua (để biết phải sửa câu nào khi D1 hàng đọc vượt). Chữ câu lệnh có tham số «?», không có dữ liệu em.
 const tuQ = new Date(now - 86400e3).toISOString()
+const SO_TOP = Math.min(100, Math.max(5, Number(process.env.SO_TOP) || 60)) // 12/11 đợt 3: 60 câu (trước 15) — phần đuôi ~0,7 tỉ hàng/ngày cũng phải sửa
 const jq = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
-  query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:15,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:${SO_TOP},filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsRead_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
 const top = jq?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
 const j24 = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
   query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1AnalyticsAdaptiveGroups(limit:10000,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den}){sum{rowsRead rowsWritten}}}}}` }) }).then((r) => r.json()).catch(() => null)
 const tong24 = (j24?.data?.viewer?.accounts?.[0]?.d1AnalyticsAdaptiveGroups ?? []).reduce((a, x) => a + (Number(x.sum?.rowsRead) || 0), 0)
-const bangTop = ['\n### 15 câu D1 đọc nhiều hàng nhất 24 giờ qua', '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). 15 câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Lượt | Hàng/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|',
-  ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)]
+const bangTop = [`\n### ${SO_TOP} câu D1 đọc nhiều hàng nhất 24 giờ qua`, '', `Tổng hàng đọc D1 thật 24 giờ qua: **${so(tong24)}** (gói: ~833 triệu/ngày). ${SO_TOP} câu dưới: ${so(top.reduce((a, x) => a + x.sum.rowsRead, 0))}.`, '', '| Hàng đọc | Hàng ghi | Lượt | Hàng/lượt | Câu (260 ký tự đầu) |', '|---|---|---|---|---|',
+  ...top.map((x) => `| ${so(x.sum.rowsRead)} | ${so(x.sum.rowsWritten)} | ${so(x.count)} | ${so(x.sum.rowsRead / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 260)}\` |`)]
 if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`)
 // Theo giờ (8 giờ qua): 25 cặp (giờ, câu) đọc nhiều nhất — để thấy câu cũ / câu mới sau mỗi lượt phát hành.
 { const tu8 = new Date(now - 8 * 3600e3).toISOString()
@@ -67,6 +68,47 @@ if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? 
   bangTop.push('', '#### Theo giờ, 8 giờ qua (giờ UTC · hàng đọc · lượt · 90 ký tự đầu)')
   for (const x of ds) bangTop.push(`- ${String(x.dimensions.datetimeHour).slice(5, 16)} · ${so(x.sum.rowsRead)} · ${so(x.count)} · \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 90)}\``)
   if (!ds.length) bangTop.push(`(không đọc được: ${String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
+// 13/11: 25 câu GHI nhiều hàng nhất 24 giờ qua (1 hàng ghi = giá 1.000 hàng đọc ⇒ khoản ghi ~2,9 triệu/ngày là khoản vượt lớn).
+{ const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
+    query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:25,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsWritten_DESC]){count sum{rowsRead rowsWritten} dimensions{query}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const ds = j?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+  bangTop.push('', '### 25 câu D1 GHI nhiều hàng nhất 24 giờ qua', '', '| Hàng ghi | Hàng đọc | Lượt | Ghi/lượt | Câu (200 ký tự đầu) |', '|---|---|---|---|---|')
+  for (const x of ds) bangTop.push(`| ${so(x.sum.rowsWritten)} | ${so(x.sum.rowsRead)} | ${so(x.count)} | ${so(x.sum.rowsWritten / Math.max(1, x.count))} | \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 200)}\` |`)
+  if (!ds.length) bangTop.push(`(không đọc được: ${String((j?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
+// 13/11: câu GHI nhiều nhất theo GIỜ (24 giờ) — biết khoản ghi lớn chạy một lần đêm hay rải cả ngày; và lượt gọi / CPU theo tên script (Worker omr vs Pages Functions).
+{ const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC, db: process.env.DB_ID ?? '', tu: tuQ, den: now.toISOString() },
+    query: `query($a:String!,$db:String!,$tu:Time!,$den:Time!){viewer{accounts(filter:{accountTag:$a}){d1QueriesAdaptiveGroups(limit:30,filter:{databaseId:$db,datetime_geq:$tu,datetime_leq:$den},orderBy:[sum_rowsWritten_DESC]){count sum{rowsWritten} dimensions{query datetimeHour}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const ds = j?.data?.viewer?.accounts?.[0]?.d1QueriesAdaptiveGroups ?? []
+  bangTop.push('', '#### Câu ghi nhiều nhất theo giờ (giờ UTC · hàng ghi · lượt · 80 ký tự đầu)')
+  for (const x of ds) bangTop.push(`- ${String(x.dimensions.datetimeHour).slice(5, 16)} · ${so(x.sum.rowsWritten)} · ${so(x.count)} · \`${String(x.dimensions.query).replace(/\s+/g, ' ').replace(/[|`]/g, ' ').slice(0, 80)}\``)
+  const k = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
+    query: `query($a:String!){viewer{accounts(filter:{accountTag:$a}){workersInvocationsAdaptive(limit:1000,filter:{datetime_geq:"${tuQ}",datetime_leq:"${now.toISOString()}"}){sum{requests cpuTimeUs subrequests} dimensions{scriptName}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const gop = new Map(); for (const x of k?.data?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) { const o = gop.get(x.dimensions.scriptName) ?? { r: 0, c: 0, s: 0 }; o.r += x.sum.requests; o.c += x.sum.cpuTimeUs / 1000; o.s += x.sum.subrequests; gop.set(x.dimensions.scriptName, o) }
+  bangTop.push('', '#### Theo tên script, 24 giờ qua (lượt · CPU ms · lượt gọi phụ)')
+  for (const [ten, o] of [...gop].sort((a, b) => b[1].r - a[1].r)) bangTop.push(`- ${ten}: ${so(o.r)} · ${so(o.c)} · ${so(o.s)}`)
+  if (!gop.size) bangTop.push(`(không đọc được: ${String((k?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) 
+  // Soi «__unknown__»: Pages Functions? chia theo giờ (giờ UTC) + bộ Pages Functions riêng.
+  const u = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
+    query: `query($a:String!){viewer{accounts(filter:{accountTag:$a}){w:workersInvocationsAdaptive(limit:1000,filter:{datetime_geq:"${tuQ}",datetime_leq:"${now.toISOString()}",scriptName:"__unknown__"}){sum{requests cpuTimeUs errors} dimensions{datetimeHour status}} p:pagesFunctionsInvocationsAdaptiveGroups(limit:1000,filter:{datetime_geq:"${tuQ}",datetime_leq:"${now.toISOString()}"}){sum{requests errors} dimensions{date}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const acc = u?.data?.viewer?.accounts?.[0]
+  const theoGio = new Map(); for (const x of acc?.w ?? []) { const kk = `${String(x.dimensions.datetimeHour).slice(5, 13)} ${x.dimensions.status}`; theoGio.set(kk, (theoGio.get(kk) ?? 0) + x.sum.requests) }
+  bangTop.push('', '#### __unknown__ theo giờ UTC · trạng thái · lượt', ...[...theoGio].sort().map(([kk, n]) => `- ${kk} · ${so(n)}`))
+  bangTop.push(`- Pages Functions 24 giờ: ${so((acc?.p ?? []).reduce((t, x) => t + x.sum.requests, 0))} lượt`)
+  if (u?.errors?.length) bangTop.push(`(lỗi soi: ${String(u.errors.map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 300)})`) }
+// 13/11: THEO GIỜ 50 giờ qua (giờ VN) — mọi khoản tính tiền, để so cùng khung giờ trước / sau một lượt phát hành (dự báo cả kỳ tuyến tính nên trễ).
+{ const tu50 = new Date(now - 50 * 3600e3).toISOString(), den = now.toISOString()
+  const gio = async (ten, than, locThem = '') => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
+    query: `query($a:String!){viewer{accounts(filter:{accountTag:$a}){${ten}(limit:10000,filter:{datetime_geq:"${tu50}",datetime_leq:"${den}"${locThem}}){${than}}}}}` }) }).then((r) => r.json()).catch(() => null)
+    const m = new Map(); for (const x of j?.data?.viewer?.accounts?.[0]?.[ten] ?? []) { const k = x.dimensions.datetimeHour; const o = m.get(k) ?? {}; for (const [kk, v] of Object.entries(x.sum ?? {})) o[kk] = (o[kk] ?? 0) + (Number(v) || 0); m.set(k, o) } return m }
+  const [mD1, mWk, mDo] = await Promise.all([
+    gio('d1AnalyticsAdaptiveGroups', 'sum{rowsRead rowsWritten} dimensions{datetimeHour}'),
+    gio('workersInvocationsAdaptive', 'sum{requests cpuTimeUs} dimensions{datetimeHour}'),
+    gio('durableObjectsInvocationsAdaptiveGroups', 'sum{requests} dimensions{datetimeHour}')])
+  const cacGio = [...new Set([...mD1.keys(), ...mWk.keys(), ...mDo.keys()])].sort()
+  const vn = (t) => { const d = new Date(new Date(t).getTime() + 7 * 3600e3); return `${String(d.getUTCDate()).padStart(2, '0')}/${String(d.getUTCMonth() + 1).padStart(2, '0')} ${String(d.getUTCHours()).padStart(2, '0')}h` }
+  bangTop.push('', '### Theo giờ, 50 giờ qua (giờ VN)', '', '| Giờ VN | D1 hàng đọc | D1 hàng ghi | Worker lượt | Worker CPU ms | DO lượt |', '|---|---|---|---|---|---|')
+  for (const k of cacGio) { const a = mD1.get(k) ?? {}, w = mWk.get(k) ?? {}, d = mDo.get(k) ?? {}
+    bangTop.push(`| ${vn(k)} | ${so(a.rowsRead)} | ${so(a.rowsWritten)} | ${so(w.requests)} | ${so(w.cpuTimeUs == null ? null : w.cpuTimeUs / 1000)} | ${so(d.requests)} |`) } }
 // LIVE (thầy 11/11 «phần live có tăng thêm tiền không»): Realtime SFU/TURN (gói gồm 1 TB ra/tháng, vượt 0,05 USD/GB) + Durable Object theo vùng 30 ngày qua.
 const tu30 = new Date(now - 30 * 86400e3).toISOString()
 const g30 = async (ten, than) => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },

@@ -41,6 +41,7 @@ const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/lib/live/thay-them.ts': 1, // 11/11 Đo tiếng từ xa (máy thầy): 5 s đo 2 giây số liệu tiếng của chính máy (getStats cục bộ), CHỈ khi đang live; 10 s gửi một tin `live-do` qua WebSocket của phòng — 0 D1; live tắt ⇒ bỏ qua
   'src/lib/live/may-ghi.ts': 2, // 11/11 Xem lại Live (máy ghi trên máy thầy, CHỈ khi đang live): 1 s soát luồng mic (cục bộ) + 10 s gửi tin `live-ghi` (mẫu đồng hồ) qua WebSocket của phòng — 0 D1; live tắt ⇒ dừng
   'src/components/live-khoi/TheLiveEm.tsx': 1, // 12/11 Live theo khối (thẻ Live trang chủ em): 30 s vẽ lại «còn N giờ M phút» CHỈ khi đang có lịch hẹn, cục bộ; vòng HỎI `/hs/bpu/khoi-cua-em` đi qua batNhipBenVung (60 s ± 10 s, tab ẩn không gọi)
+  'src/components/live-khoi/HoiHieuThay.tsx': 1, // 12/11 phím / «Hiểu chưa?» (máy thầy): 4 s gửi lại MỘT tin nhỏ «đang hỏi» qua kết nối phòng cho em vào muộn — chỉ khi bảng hỏi ĐANG MỞ; bấm / đóng là dừng. Không gọi máy chủ
   'src/components/may-tinh/MayTinhThay.tsx': 1, // 12/11 máy tính FX4869 (máy thầy): 4 s gửi lại MỘT tin nhỏ qua kết nối phòng sẵn có cho em vào muộn — chỉ khi máy tính ĐANG HIỆN; ẩn máy tính / hết live ⇒ dừng. Không gọi máy chủ (0 fetch, 0 D1)
   'src/components/may-tinh/MayTinhEm.tsx': 1, // 12/11 máy tính FX4869 (máy em): 3 s soát «thầy im quá 13 giây thì cất máy tính» — cục bộ, không gọi máy chủ; chỉ chạy trong buổi live (lớp nổi live gỡ là dừng)
   'src/components/live-khoi/BangLiveThay.tsx': 1, // 12/11 Live theo khối (bảng «Live» máy thầy): 30 s vẽ lại giờ để nút «Mở phòng chờ» của buổi hẹn hiện đúng lúc còn ≤ 30 phút, cục bộ, không gọi máy chủ; đóng bảng ⇒ dừng
@@ -125,8 +126,11 @@ describe('mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua nhip-ben-vun
     expect(doc('src/lib/ph-moi/use-tat-ca-ve-con.ts')).toMatch(/NHIP_PH_MOI_MS = 180_000/)
     expect(doc('src/lib/nhip-ben-vung.ts')).toMatch(/NHIP_NEN_MS = 180_000/)
   })
-  it('hiện diện: 60 s ± 10 s (máy chủ coi online trong 90 s — chậm hơn nữa là hiện "offline" oan)', () => {
-    expect(doc('src/lib/app-presence.ts')).toMatch(/coSoMs:\s*60_000,\s*lechMs:\s*10_000/)
+  // SỬA CÓ CHỦ Ý 12/11 giảm chi phí: máy chủ nới cửa sổ online 90 → 180 s (teacher-news.ts) ⇒ hiện diện 120 s ± 30 s (lệch mặc định; tối đa 150 s < 180 s).
+  it('hiện diện: 120 s ± 30 s (máy chủ coi online trong 180 s — chậm hơn nữa là hiện "offline" oan)', () => {
+    expect(doc('src/lib/app-presence.ts')).toMatch(/coSoMs:\s*120_000,\s*heSoToiDa:\s*1\}/)
+    expect(doc('src/lib/nhip-ben-vung.ts')).toMatch(/LECH_NHIP_MS = 30_000/)
+    expect(doc('server/src/teacher-news.ts')).toMatch(/CUA_SO_ONLINE_MS\s*=\s*180_000/)
   })
 })
 

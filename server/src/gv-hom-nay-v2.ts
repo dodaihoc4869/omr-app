@@ -382,7 +382,8 @@ const chuThoiGian = (giay: number): string => {
 export const mucNhip = (soCau: number): 0 | 1 | 2 | 3 => (soCau <= 0 ? 0 : soCau <= 4 ? 1 : soCau <= 14 ? 2 : 3)
 
 // D1 THẬT chỉ cho TỐI ĐA 5 term trong MỘT truy vấn UNION (6 term ⇒ "too many terms in compound SELECT" ⇒ khối dòng thời gian VẮNG khi có nhánh canh_bao_thay): ba term đầu gói trong một truy vấn con (mỗi nhóm ngoặc đếm riêng).
-const DONG_THOI_GIAN = (coCanhBao: boolean) => `
+// 12/11 tối (H3): câu dòng thời gian giữ nguyên; chỉ mục phủ skh_em_dong_tg / exp_so_em_luc đã BỎ (ghi D1 đắt gấp 1.000 lần đọc — lỗ).
+export const DONG_THOI_GIAN = (coCanhBao: boolean) => `
   SELECT luc, loai, ma, ten, n1, n2, n3, n4, txt FROM (
   SELECT l.nop_luc AS luc, 'ca' AS loai, l.ma_ca AS ma, COALESCE(c.ten_ca, '') AS ten, l.tong AS n1, l.so_lan_roi_man AS n2, l.tong_giay_roi_man AS n3,
          CAST(ROUND((julianday(l.nop_luc) - julianday(l.vao_luc)) * 1440) AS INTEGER) AS n4, '' AS txt

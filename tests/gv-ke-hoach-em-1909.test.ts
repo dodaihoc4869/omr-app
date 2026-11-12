@@ -8,7 +8,9 @@ import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 
-const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}" ORDER BY rowid`).all())
+// Bảng WITHOUT ROWID (vd cau_lam_cuoi, G5 12/11) không có rowid ⇒ băm theo thứ tự khoá chính (thứ tự quét của chính bảng ấy).
+const khongRowid = (d: D1That, t: string) => /WITHOUT\s+ROWID/i.test(String((d.sql.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(t) as { sql?: string } | undefined)?.sql ?? ''))
+const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}"${khongRowid(d, t) ? '' : ' ORDER BY rowid'}`).all())
 const bamTatCa = (d: D1That) => Object.fromEntries((d.sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all() as { name: string }[]).map((x) => [x.name, bam(d, x.name)]))
 const CAM_GHI = /^\s*(INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|ALTER|VACUUM|PRAGMA\s+\w+\s*=)/i
 /** Ghi lại MỌI câu SQL đi qua D1 giả (cả prepare lẫn batch). */

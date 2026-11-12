@@ -42,8 +42,9 @@ jobs:
           const che = (x) => String(x).replace(/\d{5,}/g, '<so>').replace(/[0-9a-f]{20,}/gi, '<id>').slice(0, 400)
           const nhom = new Map(), loi = []
           for (const e of ev) {
-            const url = e?.event?.request?.url; if (!url) continue
-            let p; try { p = new URL(url).pathname } catch { continue }
+            const url = e?.event?.request?.url
+            // 13/11: lượt cron (không có url) cũng gom + soát lỗi — trước đây bị bỏ qua.
+            let p; if (!url) p = e?.event?.cron ? `cron ${e.event.cron}` : `(không url) ${e?.eventType ?? '?'}`; else try { p = new URL(url).pathname } catch { continue }
             p = p.replace(/\/[0-9a-f-]{20,}/gi, '/<id>').replace(/\/\d{4,}/g, '/<so>')
             const st = e?.event?.response?.status ?? (e.outcome === 'ok' ? '?' : e.outcome)
             const g = nhom.get(p) ?? { n: 0, w: [], st: {} }; g.n++

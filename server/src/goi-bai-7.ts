@@ -4,7 +4,8 @@ import type { Env, D1PreparedStatement } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
 import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
-import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7 } from './goi-bai-7-quyen'
+import { docXemGan7 } from './goi-bai-7-xem-gan'
+import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7, sqlThemEmGoi7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7, type LoaiNgay7 } from './goi-bai-7-loi'
 import { docMucLoai7, loaiNgayEm7, noCau7 } from './goi-bai-7-loai-ngay'
 import { nhomSua7, xepSuaTheoNhom, themSua7 } from './goi-bai-7-nhom-sua'
@@ -35,6 +36,7 @@ import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { envGhiRieng, lenhTrong } from './doc-d1-theo-luot'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { docChung } from './bang-tinh-chung'
 import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 import { cungTap, layKeHoach7, nhoKeHoach7, xemKeHoach7 } from './goi-bai-7-nho'
 import { dangKyKichThuoc } from './dem-chung'
@@ -127,8 +129,8 @@ async function dongBoThat7(env: Env, now: number, tran: number, lop: string): Pr
     ])
   }
   // Em mới chuyển/đăng ký lớp cũng nhận bài, không tạo lại tiến độ của em cũ.
-  await env.DB.prepare(`INSERT OR IGNORE INTO goi_bai_7_em(goi_id,sbd,bat_dau,han)
-    SELECT g.id,h.sbd,g.bat_dau,g.han FROM goi_bai_7 g JOIN hoc_sinh h ON ${sqlTenLopHs('h')}=g.lop AND COALESCE(h.trang_thai,'')<>'khoa' JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE ${sqlQuyetDinhNhan7('g','h.sbd')} AND ${KHONG_CA}`).run()
+  // 12/11: dò khoá chính trước, tick bung một lần (goi-bai-7-quyen.ts) — ~27 nghìn ⇒ vài nghìn dòng/lượt, bảng y hệt.
+  await env.DB.prepare(sqlThemEmGoi7(sqlTenLopHs('h'),KHONG_CA)).run()
   return { soGoi, soEm, soCau, hoan: false }
 }
 
@@ -366,7 +368,7 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
   const khoiSom = som(docKhoiEm(env, sbd))
   const daLamSom = som(docDaLamVaVuaLam7(env, sbd, ngay, now))
   const xemChuaSom = som(Promise.all([
-    env.DB.prepare('SELECT DISTINCT qid FROM loi_giai_hoi WHERE sbd=? AND julianday(luc)>=julianday(?)-0.5').bind(sbd,new Date(now).toISOString()).all<{qid:string}>(),
+    docXemGan7(env,sbd,now),
     env.DB.prepare('SELECT goi_id,qid,version FROM goi_bai_7_chua WHERE goi_id IN(SELECT value FROM json_each(?))').bind(JSON.stringify(goi.map(g=>g.id))).all<Row>(),
   ]))
   const kiemSom = som(env.DB.prepare('SELECT goi_id,ma_de,diem,nop_luc,json FROM goi_bai_7_kiem WHERE sbd=? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 30').bind(sbd).all<Row>())
@@ -459,7 +461,8 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
   }
   if (!e) {
     // Cùng nhịp với lượt đọc điểm (không `await` nào trước) ⇒ lớp gom lệnh gửi chung một lô như hai câu cũ.
-    const r = await env.DB.prepare(SQL_KN_TINH).bind(thamSo).all<Row>()
+    // 12/11 (H2: 5.553 lượt/ngày × 4.502 hàng): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) + omni_q — cùng dòng câu cũ.
+    const r = await docChung<Row>(env, 'kn7', SQL_KN_TINH, khoa, ['game_v2_index', 'omni_q'], () => env.DB.prepare(SQL_KN_TINH).bind(thamSo))
     e = { luc: now, kiem: now, dau: '', tinh: gonKnTinh(r.results ?? []) }
     bang.delete(khoa); bang.set(khoa, e)
     let tong = 0; for (const v of bang.values()) tong += v.tinh.ba.length / 3

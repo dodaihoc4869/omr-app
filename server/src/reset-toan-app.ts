@@ -213,16 +213,27 @@ export const BANG_GIU: readonly string[] = [
   'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi', 'omni_buoc_sai',
   // Thử tải 28/10 (migration-2810-tai-cao-diem.sql): bảng TÍNH SẴN từ hồ sơ / kho (tự hết hiệu lực theo mốc ảnh chụp, ngày, dấu kho) ⇒ GIỮ = không đụng.
   'kho_chup', 'omni_p_gon', 'omni_prior_em',
+  // 12/11 H2 (migration-z-1211-h2-goi-nhieu.sql): dấu bảng do trigger / nơi ghi giữ + bản tính sẵn tự hết hiệu lực theo dấu + bản chép tên lược đồ ⇒ GIỮ
+  // (xoá `dau_bang` = tắt lặng lẽ bản tính sẵn tới khi chạy lại migration).
+  'dau_bang', 'bang_tinh_chung', 'ddl_ten_chung',
   // Tự sửa lỗi theo ngày (#554, 28/10) — chưa được phân loại ⇒ cổng reset đỏ trên main; GIỮ = không đụng (an toàn nhất, như goi_bai_7_*).
   'tu_sua_khoa_ngay', 'tu_sua_viec_ngay', 'tu_sua_muc_tieu_ngay',
   // Gói Tự sửa lỗi đóng sẵn (31/10, goi-sua-dem.ts): chỉ dấu «đã đóng gói hôm nay», tự hết hiệu lực theo ngày ⇒ GIỮ = không đụng.
   'sua_goi_ngay',
   // Hành trình v4: hồ sơ trí nhớ/đồ thị và receipt can thiệp đi cùng sổ học, như OMNI ⇒ GIỮ.
-  'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_loai_ngay','goi_bai_7_ly_do','goi_bai_7_no_em','goi_bai_7_no_chon','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em',
+  'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_loai_ngay','goi_bai_7_ly_do','goi_bai_7_no_em','goi_bai_7_no_chon','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em','goi_bai_7_em_nhan_dem',
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
+  // Cạnh cả lớp cộng sẵn (12/11, hanh-trinh-canh-lop.ts): dẫn xuất từ hanh_trinh_v4_canh (GIỮ) ⇒ GIỮ cho nhất quán; cron dựng lại ≤ 2 giờ.
+  'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc', 'hanh_trinh_v4_bandit_lop', 'hanh_trinh_v4_bandit_lop_moc',
   // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10) — sinh sau lần 21/09: GIỮ = không đụng. Dẫn xuất từ sổ su_kien_hoc (GIỮ).
   'nhip_hoc_doi_pho_ngay',
+  // «Lần cuối em làm mỗi câu» tính sẵn (G5 12/11, migration-z-1211-cau-lam-cuoi.sql): dẫn xuất từ sổ su_kien_hoc (GIỮ), trigger giữ đúng ⇒ GIỮ.
+  // KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `cau_lam_cuoi_sau_*`.
+  'cau_lam_cuoi',
+  // Số dòng sổ + mốc tiếp nhận của từng em tính sẵn (H1 12/11, migration-z-1211-a-so-em-dem.sql): dẫn xuất từ sổ (GIỮ), trigger giữ đúng ⇒ GIỮ.
+  // KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `so_em_dem_sau_*`.
+  'so_em_dem',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */

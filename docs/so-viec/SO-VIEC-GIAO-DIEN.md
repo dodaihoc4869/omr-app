@@ -538,3 +538,4 @@ Luật: vòng nền của app HS/PH ≥ 180 giây ± 30 giây lệch ngẫu nhi�
 - 12/11 · Claude (session_01Ghxeuvnx4C3QF1jc4p46Ce, Live theo khối — luồng chốt) · xếp loại 1 vòng mới, không gọi máy chủ: `src/components/live-khoi/thay-khoi.ts` 600 ms giữ nút «Kết thúc buổi» + viên «Vào lại» ở Hôm nay khi thầy Esc ra ngoài lúc đang live (chỉ đụng DOM; hết buổi dừng).
 
 - 12/11 · Live · máy tính «Đỗ Đại Học FX4869» thêm HAI vòng hẹn giờ, đã xếp loại trong `tests/nhip-bang-2109.test.ts`: `MayTinhThay.tsx` 4 s gửi lại một tin nhỏ qua kết nối phòng (chỉ khi máy tính đang hiện, cho em vào muộn); `MayTinhEm.tsx` 3 s soát hết hạn cục bộ. Cả hai không gọi máy chủ, hết live là dừng.
+- 12/11 · Live · phím «/» Hiểu chưa: thêm MỘT vòng hẹn giờ đã xếp loại — `HoiHieuThay.tsx` 4 s gửi lại tin «đang hỏi» qua kết nối phòng (chỉ khi bảng hỏi đang mở). Máy em dùng hẹn giờ một lần (không vòng).

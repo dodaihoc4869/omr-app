@@ -1,7 +1,8 @@
 import type { Env } from '../server/src/kieu'
 import { execFileSync } from 'node:child_process'
 import { dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7, sqlTenLopHs } from '../server/src/goi-bai-7'
-import { sqlEmDangNhan7, sqlQuyetDinhNhan7 } from '../server/src/goi-bai-7-quyen'
+import { sqlEmDangNhan7 } from '../server/src/goi-bai-7-quyen'
+import { sqlChotQuotaNgay7, SQL_QUOTA0_NGAY7, SQL_CHUA_NHAN7 } from '../server/src/goi-bai-7-em-nhan'
 import { ngayVn7 } from '../server/src/goi-bai-7-loi'
 import { phanLai0911 } from './phan-lai-0911'
 // Giữ cùng cổng ca thi/lượt đang làm; không in tên/mã/đáp án học sinh.
@@ -40,16 +41,9 @@ for(let i=0;i<20;i++){const r=await dongBoGoi7(env,now,100,'',true);if(r.hoan)th
 // 09/11 thầy «phân luôn lại câu cho toàn bộ học sinh»: áp mức 28 + hạn chung cho gói đang chạy — MỘT lần (scripts/phan-lai-0911.ts).
 console.log(JSON.stringify(await phanLai0911(env as unknown as Env,now)))
 // Chốt quota cho cả những em chưa mở app, dựa trên câu gốc/bản đã thực sự gặp.
-await db.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota)
-  SELECT e.goi_id,e.sbd,?,CAST((COUNT(c.qid)+MAX(1,CAST(julianday(e.han)-julianday(?)+1 AS INT))-1)/MAX(1,CAST(julianday(e.han)-julianday(?)+1 AS INT)) AS INT)
-  FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL
-    JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop JOIN goi_bai_7_cau c ON c.goi_id=e.goi_id
-  WHERE ${sqlEmDangNhan7('e','g','h')} AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')
-    AND NOT EXISTS(SELECT 1 FROM su_kien_hoc WHERE su_kien_hoc.sbd=e.sbd AND su_kien_hoc.qid=c.qid AND json_extract(su_kien_hoc.raw_json,'$.ht_cau_version')=c.version AND su_kien_hoc.ket_qua IS NOT NULL
-      AND ngay_vn<? AND ${SQL_LUOT_GOI7})
-    AND NOT EXISTS(SELECT 1 FROM goi_bai_7_gap x WHERE x.goi_id=e.goi_id AND x.sbd=e.sbd AND x.qid=c.qid AND x.version=c.version AND date(x.luc,'+7 hours')<?)
-  GROUP BY e.goi_id,e.sbd,e.han`).bind(ngay,ngay,ngay,ngay,ngay).run()
-await db.prepare(`INSERT OR IGNORE INTO goi_bai_7_ngay(goi_id,sbd,ngay,quota) SELECT e.goi_id,e.sbd,?,0 FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id=e.goi_id JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop WHERE ${sqlEmDangNhan7('e','g','h')} AND NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')`).bind(ngay).run()
+// 12/11 (đo D1 thật: 72 lượt × ~317 nghìn dòng): câu ở goi-bai-7-em-nhan.ts — bỏ cặp (gói, em) đã có dòng hôm nay trước khi đếm câu, danh sách tick bung một lần.
+await db.prepare(sqlChotQuotaNgay7(SQL_LUOT_GOI7)).bind(ngay).run()
+await db.prepare(SQL_QUOTA0_NGAY7).bind(ngay).run()
 const stats=(await query(`WITH goi AS (SELECT g.* FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL),
   em AS (SELECT e.goi_id,e.sbd FROM goi_bai_7_em e JOIN goi g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop WHERE ${sqlEmDangNhan7('e','g','h')})
   SELECT (SELECT COUNT(*) FROM goi) soGoi,(SELECT COUNT(DISTINCT sbd) FROM em) soEm,
@@ -61,9 +55,6 @@ if(stats.emChuaCoQuota)throw new Error('Còn học sinh chưa có lịch phủ c
 const sources=await db.prepare('SELECT b.ma_to_json FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL').all<{ma_to_json:string}>()
 let goiNguonChuaDu=0;for(const s of sources.results)if(!await duNguonGoi7(env,mang7(s.ma_to_json)))goiNguonChuaDu++
 const chuaDuyet=await db.prepare("SELECT COUNT(*) n FROM goi_bai_7_cau c JOIN goi_bai_7 g ON g.id=c.goi_id JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL WHERE json_extract(c.meta_json,'$.hopLe')=0").first<{n:number}>()
-const chuaNhan=await db.prepare(`SELECT COUNT(*) n FROM hoc_sinh h WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(
-  SELECT 1 FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL
-  WHERE g.lop=${sqlTenLopHs('h')} AND ${sqlQuyetDinhNhan7('g','h.sbd')}
-    AND NOT EXISTS(SELECT 1 FROM goi_bai_7_em e WHERE e.goi_id=g.id AND e.sbd=h.sbd))`).first<{n:number}>()
+const chuaNhan=await db.prepare(SQL_CHUA_NHAN7).first<{n:number}>()
 if(chuaNhan?.n)throw new Error('Còn học sinh của lớp đã chọn bài chưa nhận gói.')
 console.log(JSON.stringify({apGoi7:true,ngay,...stats,goiNguonChuaDu,cauChuaDuyet:chuaDuyet?.n??0,hocSinhDaChonChuaNhanGoi:chuaNhan?.n??0,giuKetQuaDaNop:true}))

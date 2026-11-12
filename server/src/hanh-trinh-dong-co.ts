@@ -20,15 +20,19 @@ import { quanSatDocLap, chuoiSaiKyNang, type QuanSatHanhTrinh } from './hanh-tri
 import { fitHalfLife, henHalfLife } from './half-life'
 import { dungDoThi, canhDangHoc, type CanhHoc } from './do-thi-tien-quyet'
 import { chonBandit, type BangBandit, type CachCuu } from './bandit'
+import { docBanditLop } from './hanh-trinh-bandit-lop'
 import type { QCau, SuKienOmni, XacNhanThay } from './omni-kieu'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { bam } from './srs2-loi'
+import { docCanhLopMotLuot } from './hanh-trinh-canh-lop'
 
 type Row=Record<string,unknown>
 export { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 import { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 
 const KHONG_CA="NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')"
+/** 13/11: đưa về 0 cạnh CÒN SỐ của em đã rời đồ thị mới (?1 lúc, ?2 sbd, ?3 mốc cũ, ?4 JSON khoá `tu\u001fden` của đồ thị mới). */
+export const SQL_XOA_CANH_ROI=`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=?1 WHERE sbd=?2 AND cap_nhat_luc<=?3 AND n_co+n_chua+dung_co+dung_chua>0 AND tu||char(31)||den NOT IN (SELECT value FROM json_each(?4)) AND ${KHONG_CA}`
 export interface DongCoHanhTrinh {
   v5?:BoChonV5; chan:Set<string>; hen:Map<string,string>; trongSo:Record<string,number>; canThiep?:{qid:string;nhom:string;kn:string;context:string;cach:CachCuu;xacSuat:number}; soQuanSat:number; soHalfLife:number; soCanhHoc:number; p8:number
   /** 26/10 (bài 6 câu kiểu Duolingo, bai-6-cau.ts): xác suất em làm đúng từng câu (OMNI) — để xếp chặng quanh ~80% đúng. Chỉ đọc, không vào lịch. */
@@ -50,7 +54,6 @@ export function phanBoCanThiep(rs:readonly Row[],qs:readonly QuanSatHanhTrinh[],
   }).filter(x=>x.d.dungLuc!==null)
 }
 
-const SQL_CANH_LOP=`SELECT tu,den,SUM(n_co) nCo,SUM(dung_co) dungCo,SUM(n_chua) nChua,SUM(dung_chua) dungChua,COUNT(DISTINCT sbd) soEm FROM hanh_trinh_v4_canh WHERE den IN (SELECT value FROM json_each(?)) AND cap_nhat_luc>=? AND n_co+n_chua>0 GROUP BY tu,den`
 /**
  * CẠNH TIÊN QUYẾT CẢ LỚP. Giờ cao điểm 20:00–23:59 VN (khẩn 12/10 23h — số đo D1 thật: câu tổng hợp này ~9.700 lần/ngày × 26 ms, ~9.400 dòng/lần): số
  * liệu cả lớp đổi chậm ⇒ nhớ 10 phút theo isolate (khoá D1 gốc), THEO TỪNG kỹ năng đích `den` — GROUP BY (tu, den) nên dòng của mỗi `den` độc lập; em sau
@@ -68,8 +71,11 @@ async function docCanhLop(env:Env,targets:readonly string[],now:number):Promise<
   if(!d||now-d.luc>=han||now<d.luc){d={luc:now,moc:now-7*86400000,theoDen:new Map()};demCanh.set(goc,d)}
   const dem=d,ds=[...new Set(targets)],thieu=ds.filter(t=>!dem.theoDen.has(t)),moi=new Map<string,CanhHoc[]>(thieu.map(t=>[t,[]]))
   if(thieu.length){
-    for(const x of (await env.DB.prepare(SQL_CANH_LOP).bind(JSON.stringify(thieu),dem.moc).all<CanhHoc>()).results??[])moi.get(String(x.den))?.push(x)
-    for(const [t,a] of moi)dem.theoDen.set(t,a)
+    // 12/11 (G1 giảm chi phí D1, hanh-trinh-canh-lop.ts): cùng MỘT lượt đọc — bảng cộng sẵn do cron dựng (đã dựng ⇒ không nhớ đệm isolate để lệch không
+    // chồng thêm); chưa dựng / quá hạn ⇒ câu cũ y nguyên và nhớ đệm như trước.
+    const r=await docCanhLopMotLuot(env,thieu,now,dem.moc)
+    for(const x of r.ds)moi.get(String(x.den))?.push(x)
+    if(!r.tong)for(const [t,a] of moi)dem.theoDen.set(t,a)
   }
   const so=(a:string,b:string)=>a<b?-1:a>b?1:0
   return ds.flatMap(t=>moi.get(t)??dem.theoDen.get(t)??[]).sort((a,b)=>so(String(a.tu),String(b.tu))||so(String(a.den),String(b.den)))
@@ -147,7 +153,8 @@ export function docTruocDongCo(env:Env,sbd:string,now:number,ghi=true):DocTruocD
     allowed:soKem.then(x=>khoaHopLe(env,sbd,now,x)),
     xacNhan:sau(()=>env.DB.prepare('SELECT sbd,ma_dang AS maDang,ket,luc FROM omni_xac_nhan WHERE sbd=? AND luc<=?').bind(sbd,new Date(now).toISOString()).all<XacNhanThay>()),
     offers:sau(()=>env.DB.prepare('SELECT * FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND goi_luc>=? AND do_luc IS NULL ORDER BY goi_luc DESC,ngay DESC,moc DESC LIMIT 96').bind(sbd,now-15*86400000).all<Row>()),
-    stats:sau(()=>env.DB.prepare(`SELECT context,cach,SUM(CASE WHEN ket_qua=1 THEN 1 ELSE 0 END) dung,SUM(CASE WHEN ket_qua=0 THEN 1 ELSE 0 END) sai FROM hanh_trinh_v4_can_thiep WHERE do_luc>=? AND ket_qua IS NOT NULL GROUP BY context,cach`).bind(now-90*86400000).all<BangBandit>()),
+    // 12/11 (H3): số bandit CẢ LỚP đọc bảng cộng sẵn (hanh-trinh-bandit-lop.ts, lệch ≤ một chu kỳ dựng); chưa dựng / quá hạn ⇒ câu cũ, cùng một lượt D1.
+    stats:sau(()=>docBanditLop(env,now)),
     rewards:sau(()=>env.DB.prepare('SELECT do_receipt FROM hanh_trinh_v4_can_thiep WHERE sbd=? AND do_receipt IS NOT NULL').bind(sbd).all<{do_receipt:string}>()),
     moHinh:som(docMoHinhV6(env)),
     chonV6:ddl6?som(ddl6.then(()=>docChonV6(env,sbd,now))):null,
@@ -260,7 +267,9 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const commands=[
     ...ghiTruoc,
     ...ghiTre,
-    ...(giuCanh?[]:[env.DB.prepare(`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=? WHERE sbd=? AND cap_nhat_luc<=? AND ${KHONG_CA}`).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now))]),
+    // 13/11 (giảm GHI D1 — số đo 24 giờ: câu này 326 nghìn dòng ghi/ngày): chỉ đưa về 0 cạnh CÒN SỐ mà KHÔNG còn trong đồ thị mới. Cạnh còn trong đồ thị do
+    // câu chèn dưới ghi đè (cùng số, cùng mốc như trước); cạnh đã bằng 0 thì mọi nơi đọc đều bỏ (`n_co+n_chua>0`) ⇒ kết quả đọc y hệt, bớt ghi đúp.
+    ...(giuCanh?[]:[env.DB.prepare(SQL_XOA_CANH_ROI).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now),JSON.stringify(rows.map(c=>`${c.tu}\u001f${c.den}`)))]),
     env.DB.prepare(`INSERT INTO hanh_trinh_v4_em SELECT ?,?,?,?,? WHERE ${KHONG_CA} ON CONFLICT(sbd) DO UPDATE SET cursor=excluded.cursor,phien_ban=excluded.phien_ban,mo_hinh_json=excluded.mo_hinh_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_em.cap_nhat_luc`).bind(sbd,cursor,'ht4-0910-v1',JSON.stringify(snapshot),now),
     ...(giuCanh?[]:[env.DB.prepare(`INSERT INTO hanh_trinh_v4_canh SELECT ?,json_extract(value,'$.tu'),json_extract(value,'$.den'),json_extract(value,'$.nCo'),json_extract(value,'$.dungCo'),json_extract(value,'$.nChua'),json_extract(value,'$.dungChua'),? FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(sbd,tu,den) DO UPDATE SET n_co=excluded.n_co,dung_co=excluded.dung_co,n_chua=excluded.n_chua,dung_chua=excluded.dung_chua,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_canh.cap_nhat_luc`).bind(sbd,now,JSON.stringify(rows))]),
   ]

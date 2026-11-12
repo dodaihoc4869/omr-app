@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { liveCuaEm, vaoLiveKhoi } from '../../lib/live-khoi/api'
 import { taiSanEm } from './tai-san-em'
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
+import { henKhiCoKenh } from '../../lib/kenh-co'
 import type { LiveCuaEm } from '../../lib/live-khoi/kieu'
 import { chuConLai, chuGioLive } from './chu-gio'
 import './the-live-em.css'
@@ -42,7 +43,8 @@ export default function TheLiveEm({ token }: { token: string }) {
       if (r.trangThai !== ttCu.current) { ttCu.current = r.trangThai; setLoi('') }
       setTt(r); setNay(Date.now())
     }
-    const nhip = batNhipBenVung(hoi, { coSoMs: HOI_MS, lechMs: LECH_MS, chanDoiMs: CHAN_DOI_MS, heSoToiDa: 1 })
+    // 12/11 giảm chi phí: kênh đẩy mở ⇒ mọi đổi trạng thái live đã báo tức thì (`ddh-live-khoi`; nối lại sau khi đứt cũng hỏi lại) ⇒ lưới an toàn 6 phút.
+    const nhip = batNhipBenVung(hoi, { coSoMs: HOI_MS, lechMs: LECH_MS, chanDoiMs: CHAN_DOI_MS, heSoToiDa: 1, datGio: henKhiCoKenh })
     const doiHien = () => nhip.kich()
     const day = () => { void hoi() }
     document.addEventListener('visibilitychange', doiHien)

@@ -11,6 +11,7 @@ import { gvLop } from './ten-lop'
 import { laCauTuLuan } from './cam-tu-luan'
 import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { DemTheoKho } from './dau-kho-cau'
+import { docChung } from './bang-tinh-chung'
 import { khoaCau } from '../../src/lib/khu-trung-cau'
 import { hangTuTiLe, khoiLuongCan, NGAY_DEM, NGUONG_BAO_NO_NGAY, soNgayTraNo, phatLaiCau, soNgayConLai, soNgayGiua, sucChua, congNgay, TRAN_NGAY, HANG_MUC_DO, type HangEm, type LanLam, type TrangThaiCau } from './srs2-loi'
 import { xoaDemChienDich, chanDoanEm, chuaBatDau, dauNgayVn, docBatDauMap, docChienDichKemBatDau, docChienDichTuDong, docRaiDeuMap, ghiBatDau, ghiRaiDeu, docCoHoa2Tu, docHoSoDangCaLop, docLoaiCau, docMetaCau, docMocThemCaLop, hangTuHoSo, KHOA_CO_HOA2, lanLamTuDong, mocTinhCua, ngayVnCua, noCuCaLop, type ChienDich, type NoCuEm } from './srs2-d1'
@@ -108,9 +109,12 @@ export async function cauCuaToChiTiet(env: Env, maDe: readonly string[]): Promis
   const v = await demCauCuaTo.lay(env, JSON.stringify(maDe), Date.now(), () => cauCuaToChiTietD1(env, maDe), (x) => x.qids.length + 1)
   return { qids: [...v.qids], theoTo: { ...v.theoTo }, theoMucDo: { ...v.theoMucDo }, theoPhan: { ...(v.theoPhan ?? {}) }, theoO: { ...(v.theoO ?? {}) } }
 }
+const SQL_CAU_CUA_TO = `SELECT ma_de, qid, ${SQL_CAU_GON} FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`
 async function cauCuaToChiTietD1(env: Env, maDe: readonly string[]): Promise<CauCuaTo> {
   // 14/10: đọc câu RÚT GỌN (cau-gon.ts — không ảnh/lời giải, ~650 so với ~3.950 ký tự/câu): chỉ cần duyệt / tự luận / phần / mức độ. Dòng JSON hỏng bị bỏ như cũ.
-  const r = await env.DB.prepare(`SELECT ma_de, qid, ${SQL_CAU_GON} FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`).bind(JSON.stringify(maGocCuaTo(maDe))).all<Row>()
+  // 12/11 (H2: 4.297 lượt/ngày × 2.469 hàng): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) — cùng dòng câu cũ.
+  const thamSo = JSON.stringify(maGocCuaTo(maDe))
+  const r = await docChung<Row>(env, 'cct', SQL_CAU_CUA_TO, thamSo, ['game_v2_index'], () => env.DB.prepare(SQL_CAU_CUA_TO).bind(thamSo))
   const theoGoc = new Map<string, { qid: string; phan: string; mucDo: string }[]>()
   for (const x of r.results ?? []) {
     const q = cauGonTuDong(x)

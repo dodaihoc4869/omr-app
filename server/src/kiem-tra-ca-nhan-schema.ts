@@ -8,5 +8,7 @@ export const SQL_KT_CN = [
   `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_dieu_phoi (sbd TEXT PRIMARY KEY,lop TEXT NOT NULL,thu_luc INTEGER NOT NULL,loi TEXT NOT NULL DEFAULT '')`,
   // KHẨN 13/10 (D1 quá tải): số liệu lịch tính sẵn lúc lập đề — đọc lịch không bóc JSON đề lớn trong SQL. Chỉ-thêm.
   `CREATE TABLE IF NOT EXISTS kiem_tra_ca_nhan_meta (id TEXT PRIMARY KEY,meta_json TEXT NOT NULL)`,
+  // 12/11 (H3): cron «làm mới đề trước ngày kiểm tra» (dongBoKtCn) chỉ xét lịch CHƯA MỞ, CHƯA NỘP — trước quét cả bảng mỗi phút (đo 24h: 2.022 lượt × ~4.535 hàng).
+  `CREATE INDEX IF NOT EXISTS ktcn_chua_mo ON kiem_tra_ca_nhan(mo_luc) WHERE nop_luc IS NULL`,
 ] as const
 export const damBaoKtCn = (env: Env) => chayDdlMotLan(env, 'kiem_tra_ca_nhan_v1', SQL_KT_CN)

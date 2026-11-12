@@ -39,7 +39,9 @@ const VANG_PHU_KIEN_XOA = ['vang_so', 'phu_kien_so_huu', 'phu_kien_dang_mac'] as
 const GAME_XOA = ['game_v2_profile', 'than_thu', 'exp_so', 'manh_khien_so', 'cnh_exp_account', 'srs2_ke_hoach', 'ruong_bat_linh', 'doan_luot', 'btvn', 'btvn_em', 'mom_bai', 'ke_hoach_ngay', 'parent_daily_news', 'ph_giao_them'] as const
 
 const bangHienCo = (d: D1That) => (d.sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY name").all() as { name: string }[]).map((x) => x.name)
-const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}" ORDER BY rowid`).all())
+// Bảng WITHOUT ROWID (vd cau_lam_cuoi, G5 12/11) không có rowid ⇒ băm theo thứ tự khoá chính (thứ tự quét của chính bảng ấy).
+const khongRowid = (d: D1That, t: string) => /WITHOUT\s+ROWID/i.test(String((d.sql.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(t) as { sql?: string } | undefined)?.sql ?? ''))
+const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}"${khongRowid(d, t) ? '' : ' ORDER BY rowid'}`).all())
 const dem = (d: D1That, t: string) => (bangHienCo(d).includes(t) ? Number((d.sql.prepare(`SELECT COUNT(*) AS n FROM "${t}"`).get() as { n: number }).n) : 0)
 const bamTatCa = (d: D1That, ds: readonly string[]) => Object.fromEntries(ds.filter((t) => bangHienCo(d).includes(t)).map((t) => [t, bam(d, t)]))
 /** Bảng GIỮ mà job KHÔNG được đổi một byte (trừ ba bảng job chỉ ghi vài dòng: cấu hình, mùa game, mã đã dùng). */

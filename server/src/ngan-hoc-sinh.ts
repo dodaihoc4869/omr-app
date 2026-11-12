@@ -45,6 +45,11 @@ export const DUONG_CHAM_NGAN = '/__ngan/cham'
  *  đang mở của em. Chỉ qua binding, kèm dấu `DAU_BAO_NGAN` (Worker luôn xoá dấu này ở lệnh / kênh của máy khách). */
 export const DUONG_BAO_NGAN = '/__ngan/bao'
 export const DAU_BAO_NGAN = 'x-ngan-bao'
+/** BÁO THEO LÔ (12/11 giảm chi phí — DO 115 nghìn lượt/ngày, gói ~33 nghìn): Worker → MỘT lượt mỗi ngăn trung chuyển mang cả danh sách em ⇒ trung chuyển tự gọi ngăn
+ *  của từng em. N em = N + k lượt ngăn (k = số trung chuyển, 2–8) thay vì 2N. Chỉ qua binding, kèm `DAU_BAO_NGAN` (Worker luôn xoá dấu này ở lệnh / kênh của máy khách;
+ *  đường `/__ngan/*` không bao giờ được Worker chuyển vào ngăn). Thân `{tien, ds:[sbd]}`. */
+export const DUONG_BAO_LO_NGAN = '/__ngan/bao-lo'
+const TOI_DA_BAO_LO = 2000
 export const KHOA_NGAN_DINH = 'ngan_dinh'
 export const KHOA_NGAN_DINH_KHOA = 'ngan_dinh_khoa'
 const RE_TEN_DINH = /^dinh\|(k\|)?\d{1,4}$/
@@ -196,6 +201,17 @@ export class NganHocSinh {
       this.phat({ k: new Set([loai]), tru: new Set() })
       return new Response(null, { status: 204, headers: { 'x-ngan': '1' } })
     }
+    // BÁO THEO LÔ (ngăn trung chuyển): gọi ngăn `<tien><sbd>` của từng em — get() không gợi ý ⇒ ngăn chưa có thì tạo cạnh trung chuyển (= cạnh D1), đúng như lệnh đầu.
+    if (duong === DUONG_BAO_LO_NGAN && req.method === 'POST' && req.headers.has(DAU_BAO_NGAN)) {
+      const ns = this.env.NGAN_HS
+      const loai = (req.headers.get(DAU_BAO_NGAN) ?? '').replace(/[^a-z]/g, '').slice(0, 12) || 'goi'
+      const j = (await req.json().catch(() => null)) as { tien?: unknown; ds?: unknown } | null
+      const tien = typeof j?.tien === 'string' && RE_TIEN_D1.test(j.tien) ? j.tien : ''
+      const ds = Array.isArray(j?.ds) ? [...new Set(j.ds.map((x) => String(x ?? '').trim()).filter((x) => /^[0-9A-Za-z_-]{1,40}$/.test(x)))].slice(0, TOI_DA_BAO_LO) : []
+      if (!ns || !tien) return new Response(JSON.stringify({ n: 0 }), { status: 400, headers: { 'content-type': 'application/json' } })
+      const n = await baoTungNgan(ds, (sbd) => ns.get(ns.idFromName(`${tien}${sbd}`)), loai)
+      return new Response(JSON.stringify({ n }), { headers: { 'content-type': 'application/json', 'x-ngan': '1' } })
+    }
     if (!xuLy) return new Response(JSON.stringify({ ok: false, error: 'Máy chủ đang khởi động, em thử lại nhé.', maLoi: 'MAY_CHU_BAN' }), { status: 503, headers: { 'content-type': 'application/json' } })
     const state = this.state
     const ctx = { waitUntil: (p: Promise<unknown>) => state.waitUntil(p), passThroughOnException() {} } as unknown as ExecutionContext
@@ -294,9 +310,10 @@ export class NganHocSinh {
   async webSocketError(ws: WsMayChu): Promise<void> { try { ws.close(1011, 'loi') } catch { /* đã đóng */ } }
 }
 
-/** Đường của app HỌC SINH đi qua ngăn (đều mang `token` game của em). */
+/** Đường của app HỌC SINH đi qua ngăn (đều mang `token` game của em). `/hs/kenh-ve` (12/11 giảm chi phí) KHÔNG qua ngăn: chỉ kiểm chữ ký token + ký vé, 0 lệnh D1
+ *  ⇒ đi ngăn chỉ tốn thêm 1–2 lượt Durable Object mỗi lần máy em nối lại kênh đẩy (mỗi lần quay lại app trên điện thoại). */
 export const laDuongNgan = (p: string): boolean =>
-  (p.startsWith('/game-v2/') || (p.startsWith('/hs/') && p !== '/hs/dang-nhap') || p === '/presence' || p.startsWith('/notifications/') || p.startsWith('/mom/'))
+  (p.startsWith('/game-v2/') || (p.startsWith('/hs/') && p !== '/hs/dang-nhap' && p !== '/hs/kenh-ve') || p === '/presence' || p.startsWith('/notifications/') || p.startsWith('/mom/'))
 
 /** SBD trong phần dữ liệu (chưa kiểm chữ ký — chỉ để CHỌN NGĂN; ngăn vẫn kiểm token đầy đủ như cũ). */
 export function sbdChonNgan(b: unknown): string | null {
@@ -520,14 +537,32 @@ export async function baoMayCacEm(env: Env, sbds: readonly string[], loai = 'goi
   let cd: CauHinhDinh | null = null
   try { cd = env.TAT_NGAN_DINH ? null : await dsDinh(env, ctx) } catch { cd = null }
   const ds = [...new Set(sbds.map((x) => String(x ?? '').trim()).filter(Boolean))]
+  if (!cd?.ds.length) return baoTungNgan(ds, (sbd) => ns.get(ns.idFromName(`${TIEN_TO_NGAN}${sbd}`), { locationHint: 'apac' }), loai)
+  // Có ngăn trung chuyển ⇒ BÁO THEO LÔ: mỗi trung chuyển MỘT lượt mang danh sách em của nó (cùng cách chia `bamSbd` như vaoNgan). Lô hỏng (trung chuyển bận / bản
+  // cũ chưa có đường lô) ⇒ báo lẻ từng em qua trung chuyển như trước — kết quả y hệt.
+  const nhom = new Map<string, string[]>()
+  for (const sbd of ds) { const t = cd.ds[bamSbd(sbd) % cd.ds.length]!; const g = nhom.get(t); if (g) g.push(sbd); else nhom.set(t, [sbd]) }
+  const kq = await Promise.all([...nhom].map(async ([tenDinh, em]) => {
+    try {
+      const r = await ns.get(ns.idFromName(tenDinh)).fetch(new Request(`https://ngan${DUONG_BAO_LO_NGAN}`, {
+        method: 'POST', headers: { 'content-type': 'application/json', [DAU_TRONG_NGAN]: '1', [DAU_BAO_NGAN]: loai }, body: JSON.stringify({ tien: cd!.tien, ds: em }),
+      }))
+      const j = r.ok ? ((await r.json().catch(() => null)) as { n?: unknown } | null) : null
+      if (j && typeof j.n === 'number') return j.n
+    } catch { /* lô hỏng ⇒ báo lẻ */ }
+    return baoTungNgan(em, () => ns.get(ns.idFromName(tenDinh)), loai, (sbd) => `${cd!.tien}${sbd}`)
+  }))
+  return kq.reduce((a, b) => a + b, 0)
+}
+
+/** Báo từng em (tối đa 8 lượt song song); `chuyen` ⇒ đi qua ngăn trung chuyển với dấu chuyển tới ngăn `chuyen(sbd)`. Trả số em đã báo. Không ném lỗi. */
+async function baoTungNgan(ds: readonly string[], stubCua: (sbd: string) => { fetch(r: Request): Promise<Response> }, loai: string, chuyen?: (sbd: string) => string): Promise<number> {
   let n = 0, i = 0
   const mot = async (sbd: string) => {
     const h = new Headers({ [DAU_TRONG_NGAN]: '1', [DAU_SBD_NGAN]: sbd, [DAU_BAO_NGAN]: loai })
+    if (chuyen) h.set(DAU_CHUYEN_NGAN, chuyen(sbd))
     try {
-      let stub: ReturnType<typeof ns.get>
-      if (cd?.ds.length) { h.set(DAU_CHUYEN_NGAN, `${cd.tien}${sbd}`); stub = ns.get(ns.idFromName(cd.ds[bamSbd(sbd) % cd.ds.length]!)) }
-      else stub = ns.get(ns.idFromName(`${TIEN_TO_NGAN}${sbd}`), { locationHint: 'apac' })
-      const r = await stub.fetch(new Request(`https://ngan${DUONG_BAO_NGAN}`, { method: 'POST', headers: h }))
+      const r = await stubCua(sbd).fetch(new Request(`https://ngan${DUONG_BAO_NGAN}`, { method: 'POST', headers: h }))
       if (r.status === 204) n++
     } catch { /* ngăn bận / lỗi ⇒ máy em tự đọc lại khi mở app */ }
   }

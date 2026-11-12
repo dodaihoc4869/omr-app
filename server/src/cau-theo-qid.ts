@@ -167,16 +167,22 @@ export async function layCauChoEm(env: Env, sbd: string, xin: string[], choPhepT
   // Truy vấn 1: em có thật không, và trong các qid xin, em đã từng gặp những câu nào. (Em có thật = như `laHocSinhThat`.)
   // 06/10 (làn A, câu NGHI sai đáp án): cổng cuối của em loại câu đang 'nghi' ⇒ danh sách câu nghi đọc GỘP vào chính truy vấn này (thêm MỘT cột, không thêm truy vấn — giữ ngân sách 4 truy vấn
   // của `tests/cau-theo-qid-1909.test.ts`). Bảng chưa có / lỗi ⇒ chạy lại không cột ấy (cổng tự đọc như thường, đệm 60 s).
+  // G5 12/11 (hoá đơn D1: 489 nghìn lượt/ngày × 179 hàng): (1) `da_gap` dò MỘT dòng mỗi qid xin (EXISTS trên chỉ mục (sbd, qid)) thay vì đọc mọi lần làm của
+  // em với các câu ấy — cùng tập, cùng thứ tự (qid tăng dần như lượt dò chỉ mục cũ); (2) cột `nghi` chỉ đọc dòng câu nghi có gốc (phần trước '~', như
+  // `qidGocKhoi`) trùng gốc của một qid xin (dò khoá chính, ≤ 2 × 20 lượt) thay vì QUÉT cả bảng `cau_nghi_dap_an` mỗi lượt. Mọi nơi dùng `nghi` chỉ hỏi
+  // gốc của câu trong `xin` (cổng khối `congKhoi` với câu trả ra, chua-cau-sai `has(qid)`) ⇒ cùng kết quả. Không thêm truy vấn.
+  const GOC_XIN = `(SELECT DISTINCT CASE WHEN instr(value, '~') > 0 THEN substr(value, 1, instr(value, '~') - 1) ELSE value END AS g FROM json_each(?2))`
   const sqlTruyVan1 = (kemNghi: boolean) =>
-    `SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?) OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?)
+    `SELECT CASE WHEN EXISTS (SELECT 1 FROM hoc_sinh WHERE sbd = ?1) OR EXISTS (SELECT 1 FROM danh_sach WHERE sbd = ?1) OR EXISTS (SELECT 1 FROM luot WHERE sbd = ?1)
                  THEN 1 ELSE 0 END AS co,
-            (SELECT json_group_array(qid) FROM (SELECT DISTINCT qid FROM su_kien_hoc WHERE sbd = ? AND qid IN (SELECT value FROM json_each(?)))) AS da_gap,
+            (SELECT json_group_array(value) FROM (SELECT DISTINCT x.value FROM json_each(?2) x WHERE EXISTS (SELECT 1 FROM su_kien_hoc s WHERE s.sbd = ?1 AND s.qid = x.value) ORDER BY x.value)) AS da_gap,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = 'cau_snapshot') AS co_snapshot,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = 'pham_vi_hoc') AS co_pham_vi,
             (SELECT gia_tri FROM cau_hinh WHERE khoa = 'ngan_sach_luot') AS co_ngan_sach${kemNghi ? `,
-            (SELECT json_group_array(qid) FROM (SELECT qid FROM cau_nghi_dap_an WHERE trang_thai = 'nghi' LIMIT 5000)) AS nghi` : ''}`
+            (SELECT json_group_array(qid) FROM (SELECT n.qid FROM ${GOC_XIN} r JOIN cau_nghi_dap_an n ON n.qid = r.g WHERE n.trang_thai = 'nghi'
+              UNION ALL SELECT n.qid FROM ${GOC_XIN} r JOIN cau_nghi_dap_an n ON n.qid >= r.g || '~' AND n.qid < r.g || char(127) WHERE n.trang_thai = 'nghi')) AS nghi` : ''}`
   type Dong1 = { co: number; da_gap: string | null; co_snapshot: string | null; co_pham_vi: string | null; co_ngan_sach: string | null; nghi?: string | null }
-  const hoi1 = (kemNghi: boolean) => env.DB.prepare(sqlTruyVan1(kemNghi)).bind(sbd, sbd, sbd, sbd, JSON.stringify(xin)).first<Dong1>()
+  const hoi1 = (kemNghi: boolean) => env.DB.prepare(sqlTruyVan1(kemNghi)).bind(sbd, JSON.stringify(xin)).first<Dong1>()
   let r: Dong1 | null
   try {
     r = await hoi1(true)

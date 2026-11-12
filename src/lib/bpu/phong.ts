@@ -342,6 +342,13 @@ export function roiMan(st: TrangThaiPhong, sbd: string, nay: number, kieu?: Kieu
   const e = em(st, sbd)
   // 09/11 (lần 3): rời màn tính MỌI LÚC trong buổi (cả lúc chờ giữa lượt, sau mở đáp án) — em chỉ thoát khi thầy kết thúc buổi.
   if (!e || st.ketThuc) return false
+  // PHÒNG CHỜ live theo khối (thầy 12/11 tối «bỏ luôn cảnh báo lúc học sinh đang chơi game trong phòng chờ, bắt đầu vào live bảng hoặc học mới bật cảnh báo»):
+  // chỉ NHỚ em đang ở ngoài (để lúc bắt đầu live em còn ở ngoài thì tên mới hiện) — không đếm lần rời, không trừ kJ, không biến động, bảng không báo.
+  if (st.live?.khoi?.gd === 'cho') {
+    if (st.roiNay?.includes(sbd)) return false
+    st.roiNay = [...(st.roiNay ?? []), sbd]; st.capNhat = nay
+    return true
+  }
   // LIVE (10/11, điểm quyết 2): em Ở XA đang xem live (thuộc lớp, chưa điểm danh ⇒ không đội, không kJ) rời màn ⇒ CHỈ cảnh báo tên trên màn chiếu, không trừ gì.
   if (!e.vao) {
     if (!laEmXaDangLive(st, sbd)) return false
@@ -513,7 +520,7 @@ export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: st
     live,
     buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, soDoi: soDoiCua(st), vuaVao: st.vuaVao, lichSu: st.lichSu,
     /** Em đang ở ngoài app trong lượt chưa mở đáp án (thầy 09/11) — bảng vẽ viền đỏ nhấp nháy + thẻ tên khi mảng khác rỗng. */
-    roiNay: st.roiNay ?? [],
+    roiNay: st.live?.khoi?.gd === 'cho' ? [] : st.roiNay ?? [], // phòng chờ live khối: chưa báo rời màn (12/11)
     /** Kiểu rời của từng em đang rời (máy em báo; em báo bằng bản cũ ⇒ không có). */
     roiKieu: st.roiKieu ?? {},
     /** Biến động kJ mới nhất (thầy 09/11): mỗi `id` mới ⇒ số kJ bay vào ống đội + lý do. */

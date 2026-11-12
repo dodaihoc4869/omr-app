@@ -52,7 +52,8 @@ export function soVet(st: TrangThaiPhong, cu: DauVet, nay: number): { vet: DauVe
     if (l.pha === 'mo' && v.pha !== 'mo') { sk.push({ k: 'mo', t: nay, so: l.so }); chup = chupLuot(l) }
     v.pha = l.pha
     // Đã từng chụp kín lượt này ⇒ tiếp tục làm mới tới khi mở đáp án / sang lượt khác (em còn gửi bài sau khi thầy tắt bảng).
-    if (l.pha !== 'mo' && ((bat && (!!goi || !!lv?.bang)) || (v.kin ?? '').startsWith(`${khoa}|`))) {
+    // LIVE THEO KHỐI (12/11): câu nào chiếu trong buổi cũng được chụp kín (không đáp án, không lời giải) — thầy chữa trên tờ / bảng mà không cần gọi em hay mở đáp án.
+    if (l.pha !== 'mo' && ((bat && (!!goi || !!lv?.bang || !!lv?.khoi)) || (v.kin ?? '').startsWith(`${khoa}|`))) {
       const c = chupKin(l), dau = `${khoa}|${c.soGui}|${c.soDung}|${c.goi?.sbd ?? ''}|${c.goi?.dat ?? ''}`
       if (dau !== v.kin) { v.kin = dau; chup = c }
     }

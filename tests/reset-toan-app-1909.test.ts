@@ -36,7 +36,9 @@ const HO_SO_GIU = ['su_kien_hoc', 'nam_kt_cau', 'nam_kt_dang', 'tien_do_hs', 'qi
 const CA_THI_GIU = ['ca', 'luot', 'chi_tiet_cau', 'ban_do_sai', 'phong_cho', 'chan_vao', 'trang_thai', 'phieu', 'kho_ca_them', 'nhan_xet', 'de_rieng', 'dong_bo', 'nop_khac_phuc', 'tien_do_ca'] as const
 
 const bangHienCo = (d: D1That) => (d.sql.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%' ORDER BY name").all() as { name: string }[]).map((x) => x.name)
-const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}" ORDER BY rowid`).all())
+// Bảng WITHOUT ROWID (vd cau_lam_cuoi, G5 12/11) không có rowid ⇒ băm theo thứ tự khoá chính (thứ tự quét của chính bảng ấy).
+const khongRowid = (d: D1That, t: string) => /WITHOUT\s+ROWID/i.test(String((d.sql.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name=?").get(t) as { sql?: string } | undefined)?.sql ?? ''))
+const bam = (d: D1That, t: string) => JSON.stringify(d.sql.prepare(`SELECT * FROM "${t}"${khongRowid(d, t) ? '' : ' ORDER BY rowid'}`).all())
 /** Số dòng của bảng; bảng CHƯA TỒN TẠI (danh sách XOÁ có thể nêu trước bảng của migration chưa gộp, job bỏ qua bảng thiếu) tính 0. */
 const dem = (d: D1That, t: string) => (bangHienCo(d).includes(t) ? Number((d.sql.prepare(`SELECT COUNT(*) AS n FROM "${t}"`).get() as { n: number }).n) : 0)
 const bamTatCa = (d: D1That, ds: readonly string[]) => Object.fromEntries(ds.filter((t) => bangHienCo(d).includes(t)).map((t) => [t, bam(d, t)]))

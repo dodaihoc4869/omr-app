@@ -3,6 +3,7 @@ import { execFileSync } from 'node:child_process'
 import type { Env } from '../server/src/kieu'
 import { docHoSo2 } from '../server/src/srs2-d1'
 import { dongCoHanhTrinh } from '../server/src/hanh-trinh-dong-co'
+import { SO_SU_KIEN_GAN_KIEM, SQL_CHON_EM_KIEM, SQL_LICH_SU_EM } from './kiem-dong-co-chon-em'
 const token=process.env.CLOUDFLARE_API_TOKEN,account=process.env.CLOUDFLARE_ACCOUNT_ID
 if(!token||!account) throw new Error('Thiếu cấu hình Cloudflare.')
 let soDoc=0
@@ -25,7 +26,10 @@ const env={DB:db,DE:{async get(key:string){const body=execFileSync('npx',['wrang
 async function main(){
   // Cùng cổng giờ vào ca/lượt đang làm với phát hành; không bỏ qua kiểm đọc sâu.
   await import('./kiem-phat-hanh-chua.mjs')
-  const em=await db.prepare(`SELECT h.sbd,COUNT(s.khoa) n FROM hoc_sinh h LEFT JOIN su_kien_hoc s ON s.sbd=h.sbd WHERE COALESCE(h.trang_thai,'')<>'khoa' AND EXISTS(SELECT 1 FROM chien_dich c,json_each(c.sbd_json) j WHERE c.id LIKE 'hanh-trinh-v3-khoi-%' AND c.trang_thai='dang_chay' AND j.value=h.sbd) GROUP BY h.sbd ORDER BY n DESC,h.sbd LIMIT 1`).first<{sbd:string;n:number}>()
+  // 12/11: không đếm cả sổ mỗi lượt — chọn em nặng nhất trong SO_SU_KIEN_GAN_KIEM sự kiện mới nhất (kiem-dong-co-chon-em.ts); không ai ⇒ đếm cả sổ như cũ.
+  const chon=await db.prepare(SQL_CHON_EM_KIEM).bind(SO_SU_KIEN_GAN_KIEM).first<{sbd:string;n:number}>()
+  const em0=chon&&Number(chon.n)>0?chon:await db.prepare(SQL_CHON_EM_KIEM).bind(-1).first<{sbd:string;n:number}>()
+  const em=em0?{sbd:em0.sbd,n:Number((await db.prepare(SQL_LICH_SU_EM).bind(em0.sbd).first<{n:number}>())?.n??0)}:null
   if(!em) throw new Error('Chưa có học sinh thuộc ba hành trình.')
   const now=Date.now(),ngay=new Date(now+7*3600000).toISOString().slice(0,10)
   const hs=await docHoSo2(env,em.sbd,ngay)

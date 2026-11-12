@@ -10,10 +10,10 @@
 //     bảng đệm không đổi hồ sơ (test). Không vòng lặp: prior chỉ đọc hồ sơ THÔ, hồ sơ thô không dùng prior.
 //   · β câu (`omni_beta_cau`) = trung vị thời gian lượt đúng tự làm 60 ngày (việc đêm). Thiếu ⇒ ước lượng theo phần × mức (omni-toc-do.ts).
 // Mọi đường đọc của em/PH: lỗi ⇒ trả giá trị an toàn (hồ sơ rỗng / null), KHÔNG làm hỏng Sảnh, trả lời, PH.
-import { docBetaDong, ghiBetaNho, layBetaNho } from './beta-dem'
+import { coTheNapBetaDu, docBetaDong, ghiBetaNho, layBetaNho, napBetaDu } from './beta-dem'
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
-import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { dauKhoCau, dauTruocLucDoc, SQL_TANG_PHIEN } from './dau-kho-cau'
 import { layKhoChung, xoaKhoChung, type KhoChung } from './kho-chung'
 import { LENH_BANG_DIEM_GON, lenhDiemGon } from './diem-gon'
 import {
@@ -38,11 +38,12 @@ import { congNgay, soNgayGiua } from './srs2-loi'
 import { ngayVn, phanTuQid } from './su-kien-hoc'
 import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
 import { docCauHinhDem } from './cau-hinh-dem'
-import { DemTTL } from './dem-chung'
+import { DemTTL, dangKyXoaDem } from './dem-chung'
 import { daNho, envGhiRieng, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { boTroTheoQid } from './song-sinh-game'
+import { dsXep } from './ds-xep'
 import { damBaoBangTuHoanThien } from './tu-hoan-thien'
 import { TEN_NEN } from './thang-tu-go'
 import { phanTram, soP } from '../../src/lib/omni-chu'
@@ -347,13 +348,15 @@ const vknTuDong = (x: Row): Vkn => ({
   id: str(x.id), maDang: str(x.ma_dang), ten: str(x.ten), tenLoi: x.ten_loi == null || str(x.ten_loi) === '' ? null : str(x.ten_loi),
   nhanNen: x.nhan_nen == null || str(x.nhan_nen) === '' ? null : str(x.nhan_nen), thuTu: Number(x.thu_tu) || 0,
 })
+export const SQL_NHAN_NEN_LUI = 'SELECT b.qid_mau, b.nhan_nen_json FROM json_each(?) j CROSS JOIN cau_bo_tro b WHERE b.qid_mau = j.value'
 /** Nhãn nền từng bước của câu (`cau_bo_tro.nhan_nen_json`): theo băm nội dung (loi_giai_cau), lùi theo `qid_mau`. */
 async function docNhanNen(env: Env, qids: readonly string[]): Promise<Map<string, { buoc: number; nen: string }[]>> {
   const ra = new Map<string, { buoc: number; nen: string }[]>()
   if (!qids.length) return ra
   // Gói R 15/10 (đọc kho câu gom đợt): lượt LÙI theo `qid_mau` đọc CÙNG đợt với bổ trợ theo nội dung, cho mọi câu được hỏi — trước: chờ bổ trợ xong rồi mới đọc
   // phần thiếu (một đợt D1 nối tiếp). Câu đã có nhãn từ bổ trợ bị bỏ qua ĐÚNG như vòng lặp cũ (`!ra.has`) ⇒ kết quả y hệt; chỉ đọc thừa dòng của câu ấy.
-  const luiP = env.DB.prepare('SELECT qid_mau, nhan_nen_json FROM cau_bo_tro WHERE qid_mau IN (SELECT value FROM json_each(?))').bind(dsJson(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // 12/11 (H2): nối thẳng danh sách đã xếp (ds-xep.ts) — D1 khỏi đọc danh sách lần hai; cùng dòng, cùng thứ tự như `IN (json_each)` cũ.
+  const luiP = env.DB.prepare(SQL_NHAN_NEN_LUI).bind(dsXep(qids)).all<Row>().catch(() => ({ results: [] as Row[] }))
   const bt = await boTroTheoQid(env, qids).catch(() => new Map())
   for (const [q, b] of bt) if (b.nhanNen?.length) ra.set(q, b.nhanNen)
   const thieu = qids.filter((q) => !ra.has(q))
@@ -753,6 +756,8 @@ export async function docBetaVaTau(env: Env, qids: readonly string[], sbds: read
     const thieu = nho ? [...new Set(qids)].filter((q) => !nho.has(q)) : null
     const tuNho = () => { const m = new Map<string, number>(); for (const q of qids) { const b = nho!.get(q); if (b != null) m.set(q, b) } return m }
     if (nho && thieu && !thieu.length) return [tuNho(), await docTauEm(env, sbds)] as [Map<string, number>, Map<string, number>]
+    // 12/11 (H2): thiếu β ⇒ nạp cả bảng β qua bản tính sẵn dùng chung (beta-dem.ts) SONG SONG với τ (cùng một đợt); không dùng được ⇒ câu UNION như cũ.
+    if (nho && thieu && coTheNapBetaDu()) { const [du, tau] = await Promise.all([napBetaDu(env, nho), docTauEm(env, sbds)]); if (du) return [tuNho(), tau] as [Map<string, number>, Map<string, number>] }
     const r = await env.DB.prepare(`SELECT 'b' AS k, qid AS id, beta AS v FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?1))
       UNION ALL SELECT 't', sbd, tau FROM omni_em WHERE n_tau >= 5 AND sbd IN (SELECT value FROM json_each(?2))`).bind(thieu ? dsJson(thieu) : dq, de).all<Row>().catch(() => null)
     if (!r) return [await docBeta(env, qids), new Map<string, number>()] as [Map<string, number>, Map<string, number>]
@@ -998,6 +1003,10 @@ async function priorChoNhieuEm(env: Env, sbds: readonly string[], homNay: string
 
 // ---------------------------------------------------------------- hồ sơ trực tiếp (đệm 60 s)
 const khoaDemSo = (sbds: readonly string[]): string => `omni_dem_so|${dsJson(sbds)}`
+import { SQL_DEM_SO, SQL_DEM_SO_CU } from './omni-d1-so-em'
+export { SQL_DEM_SO, SQL_DEM_SO_CU }
+let soEmDemLoiLuc = 0
+dangKyXoaDem(() => { soEmDemLoiLuc = 0 })
 async function demSoDong(env: Env, sbds: readonly string[]): Promise<Map<string, DemSo>> {
   const ra = new Map<string, DemSo>()
   if (!sbds.length) return ra
@@ -1005,8 +1014,11 @@ async function demSoDong(env: Env, sbds: readonly string[]): Promise<Map<string,
   // Nhớ theo lượt (tối ưu 05/10): MỘT request hỏi số đếm sổ của cùng (các) em nhiều lần (đoán trước lúc trả lời, Sảnh: lập kế hoạch rồi phần OMNI) ⇒ một lượt đọc;
   // lượt ghi `su_kien_hoc` của chính request ⇒ đếm lại.
   const rows = await nhoTheoLuot(env.DB, khoaDemSo(sbds), async () => {
+    const q = (s: string) => env.DB.prepare(s).bind(ds).all<Row>().then((r) => r.results ?? [])
     try {
-      return (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(COALESCE(received_at, 0)) AS r FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
+      // H1 (12/11): bảng tính sẵn `so_em_dem` (một dòng mỗi em) — bảng chưa có ⇒ câu đếm cũ, nhớ 10 phút mỗi isolate (không thử lại mỗi lượt).
+      if (Date.now() - soEmDemLoiLuc > 600_000) return await q(SQL_DEM_SO).catch((e: unknown) => { if (!/so_em_dem/.test(String(e))) throw e; soEmDemLoiLuc = Date.now(); return q(SQL_DEM_SO_CU) })
+      return await q(SQL_DEM_SO_CU)
     } catch {
       // D1 cũ chưa có `received_at`: khoá theo số dòng + giờ học lớn nhất (đệm dòng sổ không dùng — r âm không bao giờ khớp)
       const cu = (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(luc) AS l FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
@@ -1528,6 +1540,7 @@ export async function tinhBetaMoiCau(env: Env, nowMs: number, ts: ThamSoOmni = T
   }
   // Một giao dịch cho mỗi gói; gói đầu có DELETE ⇒ bảng không bao giờ "rỗng giữa chừng" lâu hơn một gói.
   for (let i = 0; i < lenh.length; i += LENH_MOI_GOI) await env.DB.batch(lenh.slice(i, i + LENH_MOI_GOI))
+  await env.DB.prepare(SQL_TANG_PHIEN).bind('omni_beta_cau').run().catch(() => undefined) // 12/11 H2: β đổi ⇒ bản tính sẵn β cũ (bang-tinh-chung.ts)
   return so
 }
 /** Em đang bật OMNI (theo SBD tăng dần) sau `sau`, tối đa `n`. */

@@ -1,6 +1,6 @@
 // APP GIÁO VIÊN · G2 — màn HÔM NAY. Mọi số hiện ra phải đến từ lệnh máy chủ (docs/hop-dong-gv-hom-nay-2109.md); chưa có ⇒ "đang chờ máy chủ", KHÔNG bịa số.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { useAppStore } from '../src/store/appStore'

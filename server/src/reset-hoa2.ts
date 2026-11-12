@@ -110,17 +110,26 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'omni_chung_chi', 'omni_xac_nhan', 'omni_ca_chot', 'omni_lo_dien', 'omni_ve', 'omni_de_thu', 'srs2_ke_hoach_omni', 'omni_q_gan', 'omni_q_nhat_ky', 'omni_q_nghi', 'omni_buoc_sai',
   // Thử tải 28/10 (migration-2810-tai-cao-diem.sql): bảng TÍNH SẴN từ hồ sơ / kho (tự hết hiệu lực theo mốc ảnh chụp, ngày, dấu kho) · Tự sửa lỗi theo ngày (#554) ⇒ GIỮ.
   'kho_chup', 'omni_p_gon', 'omni_prior_em', 'tu_sua_khoa_ngay', 'tu_sua_viec_ngay', 'tu_sua_muc_tieu_ngay',
+  // 12/11 H2 (migration-z-1211-h2-goi-nhieu.sql): dấu bảng do trigger / nơi ghi giữ + bản tính sẵn tự hết hiệu lực theo dấu + bản chép tên lược đồ ⇒ GIỮ
+  // (xoá `dau_bang` = tắt lặng lẽ bản tính sẵn tới khi chạy lại migration).
+  'dau_bang', 'bang_tinh_chung', 'ddl_ten_chung',
   // Gói Tự sửa lỗi đóng sẵn (31/10, goi-sua-dem.ts): chỉ dấu «đã đóng gói hôm nay», tự hết hiệu lực theo ngày ⇒ GIỮ = không đụng.
   'sua_goi_ngay',
   // Hành trình v4: hồ sơ trí nhớ/đồ thị và receipt can thiệp đi cùng sổ học, như OMNI ⇒ GIỮ.
-  'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_loai_ngay','goi_bai_7_ly_do','goi_bai_7_no_em','goi_bai_7_no_chon','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em',
+  'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_loai_ngay','goi_bai_7_ly_do','goi_bai_7_no_em','goi_bai_7_no_chon','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em','goi_bai_7_em_nhan_dem',
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
+  // Cạnh cả lớp cộng sẵn (12/11, hanh-trinh-canh-lop.ts): dẫn xuất từ hanh_trinh_v4_canh (GIỮ) ⇒ GIỮ cho nhất quán; cron dựng lại ≤ 2 giờ.
+  'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc', 'hanh_trinh_v4_bandit_lop', 'hanh_trinh_v4_bandit_lop_moc',
   // Bảng vận hành đã GIỮ lần 21/09: bộ não A.I, bảng lưu em đã gỡ, nhật ký máy, thử thách riêng (kết quả ở sổ).
   'ai_ho_so_ngay', 'ai_dieu_chinh', 'ai_ban_tin', 'hoc_sinh_da_go', 'danh_sach_da_go', 'nhat_ky_may', 'thu_thach_rieng',
   // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10): dẫn xuất từ sổ su_kien_hoc (GIỮ) ⇒ GIỮ cho nhất quán (như nam_kt_cau).
   // Trigger trên sổ trỏ tới bảng này: xoá DỮ LIỆU thì được, KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `nhip_hoc_doi_pho_sau_*`.
   'nhip_hoc_doi_pho_ngay',
+  // «Lần cuối em làm mỗi câu» tính sẵn (G5 12/11, migration-z-1211-cau-lam-cuoi.sql): dẫn xuất từ sổ (GIỮ), trigger giữ đúng ⇒ GIỮ (xoá dữ liệu mà còn dấu ⇒ sai).
+  'cau_lam_cuoi',
+  // Số dòng sổ của từng em tính sẵn (H1 12/11, migration-z-1211-a-so-em-dem.sql): dẫn xuất từ sổ (GIỮ), trigger giữ đúng ⇒ GIỮ (không DROP khi còn trigger).
+  'so_em_dem',
 ]
 
 /** Có ca thi đang mở (`trang_thai = 'mo'`, trừ ca đo tải)? MỘT truy vấn. Không đọc được bảng `ca` ⇒ HOÃN cho chắc (không chắc là không có ca mở). */

@@ -20,6 +20,7 @@ export class KenhLopMay {
   private chat: TinLop[] = []
   private khoa = false
   private lucChat = new Map<string, number>()
+  private lucHieu = new Map<string, number>()
   private tro = new Map<string, { p: SinhTonDong; luc: number; gui: number; ha: number }>()
   private an: [string, string][] = []
   private may: May[] = []
@@ -61,6 +62,17 @@ export class KenhLopMay {
     if (!x || typeof x !== 'object') return true
     const thay = a.v === 'gv', e = thay ? null : st.ds.find((h) => h.sbd === a.s)
     // MÁY TÍNH của thầy (12/11): chỉ thầy gửi; phòng chuyển tiếp nguyên gói cho mọi máy em, không nhớ gì (máy thầy tự nhắc lại mỗi 4 giây cho em vào muộn).
+    // HỎI NHANH «Hiểu chưa?» (thầy 12/11, phím /): thầy mở / đóng ⇒ chuyển tiếp cho mọi máy em; em trả lời 1 (hiểu) / 2 (chưa hiểu) ⇒ phòng đóng dấu tên rồi
+    // chỉ gửi cho MÁY THẦY (bạn khác không thấy ai chưa hiểu). Không nhớ gì, 0 D1; mỗi em tối đa một tin mỗi 400 ms.
+    if (j.k === 'hieu') {
+      if (thay) { const d = JSON.stringify({ t: 'lop', k: 'hieu', s: 'gv', n: '', d: -1, l: nay, x: { mo: x.mo === true, n: kep(x.n, 0, 2e9) ?? 0 } }); this.moiMay(d, false) }
+      else if (e && (x.v === 1 || x.v === 2) && nay - (this.lucHieu.get(a.s) ?? 0) >= 400) {
+        this.lucHieu.set(a.s, nay)
+        const d = JSON.stringify({ t: 'lop', k: 'hieu', s: a.s, n: e.ten, d: e.doi, l: nay, x: { v: x.v, n: kep(x.n, 0, 2e9) ?? 0 } })
+        for (const ws of this.ctx.getWebSockets('gv')) this.gui(ws, d)
+      }
+      return true
+    }
     if (j.k === 'mt') { if (thay) { const d = JSON.stringify({ t: 'lop', k: 'mt', s: 'gv', n: '', d: -1, l: nay, x }); if (d.length <= 8000) this.moiMay(d, false) } return true }
     if (!thay && (!e || !e.vao || a.xa)) return true
     if (j.k === 'chat') {

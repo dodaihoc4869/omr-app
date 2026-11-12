@@ -34,11 +34,13 @@ describe('BẢNG NHỊP của app thầy', () => {
 
 describe('MÁY CHỦ ĐỀ NGHỊ GIÃN (nhipDeNghi): hệ số × nhịp gốc, kẹp TRẦN riêng từng vòng của thầy', () => {
   it('bảng trần: sàn ≤ 30 s (10 s ×4 kẹp), bản 3 ≤ 120 s, Theo dõi ca ≤ 40 s (thầy đang coi ca thi thật), chip ≤ 20 s', () => {
-    expect(TUY_CHON_NHIP_THAY.bangTinSan).toEqual({ heSoToiDa: 4, tranMs: 30_000 })
-    expect(TUY_CHON_NHIP_THAY.bangTinV3).toEqual({ heSoToiDa: 2, tranMs: 120_000 })
+    // SỬA CÓ CHỦ Ý 12/11 giảm chi phí: ba vòng bảng tin + chip thêm `chamKhiRanh` (máy để yên ≥ 3 phút ⇒ hỏi theo đúng trần dưới đây); vòng coi ca thi KHÔNG có.
+    expect(TUY_CHON_NHIP_THAY.bangTinSan).toEqual({ heSoToiDa: 4, tranMs: 30_000, chamKhiRanh: true })
+    expect(TUY_CHON_NHIP_THAY.bangTinV3).toEqual({ heSoToiDa: 2, tranMs: 120_000, chamKhiRanh: true })
     expect(TUY_CHON_NHIP_THAY.theoDoiCa.tranMs).toBeLessThanOrEqual(40_000)
     expect(TUY_CHON_NHIP_THAY.theoDoiCa.heSoToiDa).toBe(2)
-    expect(TUY_CHON_NHIP_THAY.sucKhoeMay).toEqual({ heSoToiDa: 2, tranMs: 20_000 })
+    expect(TUY_CHON_NHIP_THAY.sucKhoeMay).toEqual({ heSoToiDa: 2, tranMs: 20_000, chamKhiRanh: true })
+    for (const k of ['theoDoiCa', 'phongCho', 'songCa'] as const) expect('chamKhiRanh' in TUY_CHON_NHIP_THAY[k], k).toBe(false)
   })
   const dat = (heSo: number) => { for (let i = 0; i < 3; i++) ghiHeSo(heSo) }
   /** Số lần gọi trong `ms` đầu sau khi bật vòng với nhịp gốc `coSo`. */

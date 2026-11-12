@@ -1,4 +1,5 @@
 import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
+import { docSoTuMoc } from './so-em-tu-moc'
 import { laHanhTrinh, ungVienHanhTrinh } from './hanh-trinh-hop-nhat'
 import { coLoThuSucHanhTrinh, tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
 import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
@@ -9,7 +10,7 @@ import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import { docNhipKenh, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
-import { apLuatChung, chonBanSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
+import { apLuatChung, chonBanSongSinh, CHI_MUC_CHUA_DUNG, DK_CHUA_DUNG, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2, quaChiMucChuaDung } from './hang-chua-loi'
 import { canThanTu, nhanMocDuyTri } from './omni-can-than'
 import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, thamSoTheoLyDo, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
 import { docThamSoEmVaLyDo, lyDoHieuLuc } from './ly-do-sai'
@@ -443,14 +444,15 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
  * Câu SQL đọc siêu dữ liệu câu từ D1 (`qids` đã khử trùng, khác rỗng). B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy; lệch ⇒ CÙNG câu
  * đọc thẳng `game_v2_question` như cũ (cau-meta.ts). Thứ tự: mã câu tăng dần, các dòng cùng câu theo `rowid` (`thu_tu`) — đúng thứ tự dò chỉ mục
  * `game_v2_question_qid` của câu cũ.
+ * G5 12/11: KHOP trong danh sách qid ⇒ nhánh không dùng có danh sách rỗng, không dò dòng nào.
  */
 function docMetaCauD1(env: Env, qids: readonly string[]): Promise<Row[]> {
   return env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, phan, muc_do, ten_dang, sao, lop_json, gon, anh_pa, anh_y, hinh_gon, j_qid, j_version, thu_tu
-      FROM cau_meta WHERE ${KHOP} AND qid IN (SELECT value FROM json_each(?1))
+      FROM cau_meta WHERE qid IN (SELECT value FROM json_each(?1) WHERE ${KHOP})
       UNION ALL
       SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao, COALESCE(json_extract(json,'$.lop'), json_extract(json,'$.khoi')) AS lop_json,
         ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version, rowid AS thu_tu
-      FROM game_v2_question WHERE NOT ${KHOP} AND qid IN (SELECT value FROM json_each(?1)) AND json_valid(json)
+      FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?1) WHERE NOT ${KHOP}) AND json_valid(json)
       ORDER BY qid, thu_tu`).bind(JSON.stringify(qids)).all<Row>().then((r) => (r.results ?? []).map(({ thu_tu: _t, ...x }) => x))
 }
 /** Dòng đệm: tính sẵn cờ tự luận (đúng `tuLuanTuMeta`) rồi bỏ JSON câu rút gọn / cờ ảnh — đệm nhẹ, `metaCauTuDong` dùng `tu_luan`. */
@@ -577,12 +579,7 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
       .map((x) => ({ qid: x.qid, ngay_vn: x.ngay_vn, luc: x.luc, ket_qua: x.ket_qua, assistance: x.assistance, visibility: x.visibility, nguon: x.nguon, purpose: x.purpose, tc: tcCua(x.raw_json), khoa: x.khoa }))
       .sort((a, b) => (str(a.luc) < str(b.luc) ? -1 : str(a.luc) > str(b.luc) ? 1 : str(a.khoa) < str(b.khoa) ? -1 : str(a.khoa) > str(b.khoa) ? 1 : 0))
   } else if (goc.length > 200) {
-    const sql = (coVis: boolean) => `SELECT qid, ngay_vn, luc, ket_qua, ${coVis ? 'assistance, visibility, purpose,' : ''} nguon, ${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd = ? AND luc >= ? ${coVis ? `AND (${SQL_LA_LAN_LAM_GIU_CHAN_DOAN})` : ''}`
-    try {
-      rows = (await env.DB.prepare(sql(true)).bind(sbd, tuLuc).all<Row>()).results ?? []
-    } catch {
-      rows = (await env.DB.prepare(sql(false)).bind(sbd, tuLuc).all<Row>()).results ?? []
-    }
+    rows = await docSoTuMoc(env, sbd, tuLuc) // G5 12/11: dùng chung trong lượt — so-em-tu-moc.ts
   } else {
     try {
       // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
@@ -724,12 +721,15 @@ export function theLucChienDichVuaDong(ds: readonly ChienDich[], homNay: string)
 export async function docQidSaiTaiLop(env: Env, sbd: string, hoiThay?: { now: number; nhan: (qid: string[]) => void }): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
   const cu = `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY qid`
-  const docCu = () => env.DB.prepare(cu).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // H1 (12/11): chỉ mục bộ phận lượt chưa đúng — dò (sbd, nguon, ket_qua = 0), phủ qid/luc ⇒ chỉ đọc dòng sai tại lớp (trước: mọi dòng sổ của em). Thiếu chỉ mục ⇒ câu cũ.
+  const cm = cu.replace('su_kien_hoc WHERE', `su_kien_hoc ${CHI_MUC_CHUA_DUNG} WHERE ${DK_CHUA_DUNG} AND`)
+  const docCu = () => quaChiMucChuaDung(() => env.DB.prepare(cm).bind(sbd).all<Row>(), () => env.DB.prepare(cu).bind(sbd).all<Row>()).catch(() => ({ results: [] as Row[] }))
   // Một hàng phụ tối đa12 mã, cùng truy vấn đã có trên bảng sổ luôn tồn tại.
   // Không thêm đợt D1; thiếu schema mới thì đọc lại query cũ, không mất nợ tại lớp.
-  const r = hoiThay ? await env.DB.prepare(`${cu} UNION ALL SELECT NULL,
+  const hop = (q: string) => env.DB.prepare(`${q} UNION ALL SELECT NULL,
     (SELECT json_group_array(qid_goc) FROM (${sqlCauHoiThayDenHan('x.sbd', 'x.now')}))
-    FROM (SELECT ? AS sbd,? AS now) x`).bind(sbd, sbd, hoiThay.now).all<Row>().catch(docCu) : await docCu()
+    FROM (SELECT ? AS sbd,? AS now) x`).bind(sbd, sbd, hoiThay!.now).all<Row>()
+  const r = hoiThay ? await quaChiMucChuaDung(() => hop(cm), () => hop(cu)).catch(docCu) : await docCu()
   if (hoiThay) hoiThay.nhan(parseMang((r.results ?? []).find(x => x.qid == null)?.luc))
   const rows = (r.results ?? []).filter(x => x.qid != null)
   if (!rows.length) return ra
@@ -759,14 +759,15 @@ async function cauKhoKhongTuLuan(env: Env, qids: readonly string[]): Promise<Set
  */
 export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  const cau = (coVis: boolean) =>
-    `SELECT s.qid, MIN(s.luc) AS luc FROM su_kien_hoc s JOIN ca c ON c.ma_ca = s.ma_nguon
-      WHERE s.sbd = ? AND s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1 AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}
+  // H1 (12/11): `cm` ⇒ chỉ mục bộ phận lượt chưa đúng — dò (sbd, nguon = 'thi'), chỉ dòng sai / trống. Thiếu chỉ mục ⇒ lỗi ⇒ câu cũ.
+  const cau = (coVis: boolean, cm = false) =>
+    `SELECT s.qid, MIN(s.luc) AS luc FROM su_kien_hoc s${cm ? ` ${CHI_MUC_CHUA_DUNG}` : ''} JOIN ca c ON c.ma_ca = s.ma_nguon
+      WHERE s.sbd = ? AND s.nguon = 'thi' AND ${cm ? `s.${DK_CHUA_DUNG} AND ` : ''}COALESCE(s.ket_qua, 0) <> 1 AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}
         ${coVis ? "AND COALESCE(s.visibility, '') <> 'embargoed'" : ''}
       GROUP BY s.qid`
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(cau(true)).bind(sbd).all<Row>()).results ?? []
+    rows = (await quaChiMucChuaDung(() => env.DB.prepare(cau(true, true)).bind(sbd).all<Row>(), () => env.DB.prepare(cau(true)).bind(sbd).all<Row>())).results ?? []
   } catch {
     try {
       rows = (await env.DB.prepare(cau(false)).bind(sbd).all<Row>()).results ?? []
