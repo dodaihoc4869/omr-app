@@ -309,19 +309,17 @@ export async function docSoDaLamNgay7(env: Env, sbd: string, ngay: string, now?:
 const VUA_LAM_MS = 15 * 60_000
 /**
  * ĐÃ LÀM HÔM NAY = sổ học (`su_kien_hoc`) ∪ câu học có hướng dẫn ∪ CÂU VỪA TRẢ LỜI (≤ 15 phút, trong ngày VN) đọc từ `game_v2_attempt`.
- * LỖI 13/10 20:11 (em báo "còn một câu mà nó báo hoàn thành", sảnh 23/24): lệnh nộp câu ghi `game_v2_attempt` NGAY trong lô chấm, còn dòng sổ học ghi SAU
- * khi đã trả lời máy em (`ctx.waitUntil`). Mở chặng / đếm ngay sau câu cuối ⇒ sổ chưa có câu ấy ⇒ bộ đếm 23/24 và kế hoạch xếp LẠI đúng câu vừa làm,
- * còn `startGoi7` (luật 13/10 không phát lại câu vừa trả lời) bỏ nó ⇒ chặng rỗng ⇒ "Em đã hoàn thành…". Nay kế hoạch + bộ đếm cùng thấy câu vừa làm
- * ngay. Cùng đợt đọc (không thêm vòng chờ D1); chỉ mục `game_v2_attempt(sbd, created_at)`.
+ * LỖI 13/10 20:11 («còn một câu mà nó báo hoàn thành»): dòng sổ ghi SAU khi trả lời máy em (`ctx.waitUntil`) ⇒ mở chặng ngay sau câu cuối thì sổ chưa có
+ * câu ấy ⇒ chặng rỗng. Nay kế hoạch + bộ đếm cùng thấy câu vừa làm ngay (cùng đợt đọc; chỉ mục `game_v2_attempt(sbd, created_at)`).
  * MỘT SỐ VỚI LỊCH NGÀY (lỗi 13/10 22h, thầy: "app báo đủ mức rồi mà hôm nay lại báo thiếu" — Hôm nay 24/24, lịch ngày 19/24): (1) tập ĐÃ LÀM thêm ĐÚNG mã
  * sổ ghi (mã đã phát, kể cả bản ảo `~ss|bt|ydN` / lần `#n`) — trước cộng mã GỐC ⇒ câu ảo vừa làm đếm hai lần (mã sổ + mã gốc) suốt 15 phút, kế hoạch
  * tưởng đủ mức, ngừng phát câu; (2) chỉ thêm lượt CHƯA có dòng sổ — lượt đã ghi sổ thì sổ quyết định như lịch ngày (lướt / chẩn đoán không tính).
  * `vuaLam` (chặn phát lại) giữ cả mã đã phát lẫn mã gốc (`tachSongSinh`).
- * `now` vắng ⇒ như cũ (chỉ sổ). Lỗi đọc bảng lượt ⇒ bỏ phần thêm, như cũ.
+ * `now` vắng ⇒ chỉ sổ; lỗi đọc bảng lượt ⇒ bỏ phần thêm. `daTinh` = câu tính vào mức (chiếm suất đề 28).
  * KHÔNG TÍNH CÂU TỰ SỬA LỖI (lỗi 28/10, ảnh thầy: «Đủ 14/12 câu · 2/2 chặng» mà nút Sửa lỗi còn 2): lượt `chua_loi` từng cộng vào mức ⇒ kế hoạch bớt câu
  * học, chặng cuối tự «xong» dù em chưa học. Tự sửa lỗi là nút riêng trên Lộ trình (đếm riêng, thưởng riêng) ⇒ mức / chặng chỉ đếm câu học.
  */
-export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now?: number): Promise<{ daLam: Set<string>; vuaLam: Set<string>; soVua: number; soDaLam: number; luot: Set<string> }> {
+export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now?: number): Promise<{ daLam: Set<string>; vuaLam: Set<string>; soVua: number; soDaLam: number; luot: Set<string>; daTinh: Set<string> }> {
   const tu = now === undefined ? '' : new Date(Math.max(now - VUA_LAM_MS, Date.parse(`${ngay}T00:00:00+07:00`))).toISOString()
   const [done, guidedToday, vua] = await Promise.all([
     // (29/10) + lượt LƯỚT của chặng và cờ `ll` (làm lại cuối chặng): `daLam` GIỮ cả hai (không phát lại), `soDaLam` chỉ đếm câu của chặng.
@@ -338,7 +336,7 @@ export async function docDaLamVaVuaLam7(env: Env, sbd: string, ngay: string, now
   const vuaLam = new Set<string>()
   // Lượt vừa trả lời mà sổ chưa kịp có: tính ngay vào số đã làm hôm nay (kể cả câu có gợi ý / hỗ trợ), TRỪ câu lướt hoặc câu làm lại cuối chặng.
   for(const r of vua.results){const q=str(r.qid);if(!q)continue;vuaLam.add(q);vuaLam.add(tachSongSinh(q).goc);if(!Number(r.co_so)){daLamNgay.add(q);if(!Number(r.khong_tinh))tinh.add(q)}}
-  return { daLam: daLamNgay, vuaLam, soVua: vua.results.length, soDaLam: tinh.size, luot: chiLuot }
+  return { daLam: daLamNgay, vuaLam, soVua: vua.results.length, soDaLam: tinh.size, luot: chiLuot, daTinh: tinh }
 }
 /**
  * LỆNH NHẸ `hoc-tap-dem` (khẩn 12/10 22h30 — thầy: "tối ưu triệt để máy chủ cho học sinh làm bài tập giờ cao điểm"). Số đo D1 thật 24 giờ: mỗi câu
@@ -600,7 +598,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   const chotSom = batKtSom.then(bat => bat === false ? chotMucNgay7(envGhiRieng(env),sbd,ngay,tang,goi.reduce((n,g)=>n+g.quota,0),now,false,som7.mucSom,0,goi.some(g=>g.kiemNhe),goi.map(g=>g.id),loaiGhi) : null).catch(() => null)
   const engine = await dongCoHanhTrinh(env,sbd,now,hs,chan,true,dongCo,{ghiTruoc:ghiTre7,hoan})
   const sanSang = new Set(hs.cau.filter(c => !engine.chan.has(c.qid) && !chan.has(c.qid) && !chan.has(hs.meta.get(c.qid)?.group??'') && !hs.meta.get(c.qid)?.tuLuan).map(c => c.qid))
-  const { daLam: daLamNgay, vuaLam, soVua, soDaLam, luot: luotNgay } = await daLamSom
+  const { daLam: daLamNgay, vuaLam, soVua, soDaLam, luot: luotNgay, daTinh } = await daLamSom
   const [views,teacherCorrections]=await xemChuaSom
   const vuaXem=new Set(views.results.map(r=>r.qid)),daGap = new Set(goi.flatMap(g => [...g.daGap]))
   // Hồ sơ đọc tối đa 12 lịch kiểm trong query mốc đã có. Chỉ đổi thứ tự ôn/sửa, giữ nguyên quota câu mới.
@@ -632,7 +630,7 @@ async function lapGoi7Tho(env: Env, sbd: string, now: number, gsSom?: Promise<{ 
   // làm (không câu mới, không câu chờ thầy dạy lại), câu sai lần cuối trước, sai nhiều trước, chưa thành thạo trước, gần lịch ôn trước. Chỉ CPU, không đọc D1.
   const vaoPlan: Parameters<typeof chonGoi7>[0] = { cau,daGap:vuaLam.size||luotNgay.size?new Set([...daGap,...vuaLam,...luotNgay]):daGap,daLamNgay:khongXep,quotaCon,sanSang,chan,sua:loaiNgay==='sua'?xepSuaTheoNhom(themSua7(sua,hs,lyDo,ngay),hs.meta):sua,on:batKt?[...onCan,...on.filter(id=>!onCan.includes(id))]:on,chua,trongSo:engine.trongSo,nhomPhu,chiTrongMuc:true,giuOn,
     ngay,gapHomNay:new Set([...goi.flatMap(g=>[...g.gapNgay]),...[...vuaLam,...luotNgay].filter(id=>!daGap.has(id))]),loaiNgay }
-  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, ml7.noCau) : null // đề 28 theo suất (goi-bai-7-suat.ts)
+  const xepSom = ngay >= NGAY_DE_28 && !kiemNhe ? apSuat7(vaoPlan, hs, cau, daLamNgay, ngay, kiemDenHan, ml7.noCau, daTinh) : null // đề 28 theo suất (goi-bai-7-suat.ts)
   let plan = chonGoi7({ ...vaoPlan, mucTieuNgay:Math.max(0,toiThieu-soDaLam) })
   // Chỉ khi kế hoạch thường còn thiếu mức (hiếm) mới đọc thêm câu đã DÀNH cho Kiểm tra ôn tập sắp tới của em (một lệnh, chỉ mã câu) — ôn sớm không lấy
   // trước câu của đề kiểm tra; ngày thường không thêm lệnh D1 nào.

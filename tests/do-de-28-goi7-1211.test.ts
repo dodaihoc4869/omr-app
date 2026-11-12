@@ -25,6 +25,10 @@ it('đo đề 28: câu game ngoài đề làm TRƯỚC không làm hỏng 18/4/6
   let k = 0
   for (let i = 30; i < 33; i++) sk.run(`k${k++}`, 'E1', `Q${i}`, 'game', 'S9', 1, `${ngay}T00:00:0${i - 30}Z`, ngay)
   for (let i = 0; i < 28; i++) sk.run(`k${k++}`, 'E1', i < 14 ? `Q${i}` : `Q${i}~ss1`, 'game', i < 14 ? 'S1' : 'S2', 1, `${ngay}T01:${String(i).padStart(2, '0')}:00Z`, ngay)
+  db.prepare('INSERT INTO game_v2_question(ma_de,qid,version,content_group,json) VALUES(?,?,?,?,?)').run('D', 'QX', '1', '', JSON.stringify({ phan: 'I' }))
+  // câu LÀM LẠI cuối chặng (song sinh của câu vừa sai): có trong phiên + sổ nhưng KHÔNG thuộc 28 câu ⇒ cả 1g lẫn 1d phải bỏ
+  db.prepare('INSERT INTO game_v2_session(id,sbd,json,created_at) VALUES(?,?,?,?)').run('S3', 'E1', JSON.stringify({ goi7: 1, questions: [{ qid: 'Q36~ss2', lamLaiCuoi: true }, { qid: 'Q37~ss2', lamLaiCuoi: true }] }), c.replace(/Z$/, '0Z'))
+  db.prepare(`INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,ket_qua,luc,ngay_vn,raw_json) VALUES(?,?,?,?,?,?,?,?,?)`).run(`k${k++}`, 'E1', 'QX~ss1', 'game', 'S1', 0, `${ngay}T00:30:00Z`, ngay, '{"ll":1}')
   // sửa đúng: E1 sai Q5 hôm trước rồi đúng hôm nay (đã có lượt đúng ở trên)
   sk.run(`k${k++}`, 'E1', 'Q5', 'game', 'S0', 0, `2026-11-01T00:00:00Z`, '2026-11-01')
   const g = db.prepare(sub(Q.Q1G!)).all() as Record<string, number>[]
