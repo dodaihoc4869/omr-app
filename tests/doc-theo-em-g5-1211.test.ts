@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs'
 import { taoD1That, type D1That } from './_d1-that'
 import { docCauDaLamMoiNguon, SQL_DA_LAM, SQL_DA_LAM_CU } from '../server/src/game-v2-cau-moi'
 import { dongBoCauMeta, KHOP, KHOP_DAY_DU } from '../server/src/cau-meta'
-import { docMetaCau, docLanLam } from '../server/src/srs2-d1'
+import { docMetaCau, docLanLam, MOC_DA_DOC } from '../server/src/srs2-d1'
 import { layCauChoEm } from '../server/src/cau-theo-qid'
 import { gopDocD1 } from '../server/src/doc-d1-theo-luot'
 import { xoaMoiDem } from '../server/src/dem-chung'
@@ -264,6 +264,9 @@ describe('G5 (d) — docLanLam > 200 câu: một lượt đọc sổ dùng chung
     const rieng = { a: await docLanLam(env, 'E1', qids, ''), b: await docLanLam(env, 'E1', qids, MOC) }
     expect(rieng.a.length).toBeGreaterThan(rieng.b.length)
     expect(rieng.b.length).toBeGreaterThan(0)
+    // D1 sống lâu (không có sổ nhớ theo lượt) ⇒ không ghi gì vào bảng mốc (không phình bộ nhớ isolate)
+    for (let i = 0; i < 5; i++) await docLanLam(env, `E${i}`, qids, i ? MOC : '')
+    expect(MOC_DA_DOC.has(env.DB as unknown as object)).toBe(false)
     // một request (bản gộp): cả sổ trước, mốc sau ⇒ một lần đọc
     const gop = { ...env, DB: gopDocD1(env.DB) } as Env
     const ds = batSql(gop)

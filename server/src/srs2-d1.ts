@@ -560,15 +560,9 @@ export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map
 export interface BenLanLam { songSinh: Map<string, { i: number; luc: string }[]>; chanDoan: Map<string, string[]> }
 export const benLanLamMoi = (): BenLanLam => ({ songSinh: new Map(), chanDoan: new Map() })
 
-/** G5 12/11: các mốc `docLanLam` (> 200 câu) đã đọc sổ của mỗi em trong lượt (theo bản gộp D1 của lượt) — để lần đọc cả sổ sau chỉ đọc phần trước mốc. */
-const MOC_DA_DOC = new WeakMap<object, Map<string, Set<string>>>()
-function mocDaDoc(db: Env["DB"], sbd: string): Set<string> {
-  let m = MOC_DA_DOC.get(db as unknown as object)
-  if (!m) { m = new Map(); MOC_DA_DOC.set(db as unknown as object, m) }
-  let t = m.get(sbd)
-  if (!t) { t = new Set(); m.set(sbd, t) }
-  return t
-}
+/** G5 12/11: các mốc `docLanLam` (> 200 câu) đã đọc sổ của mỗi em trong lượt — CHỈ ghi khi D1 của lượt có sổ nhớ theo lượt (bản gộp, sống một request) để lần
+ *  đọc cả sổ sau chỉ đọc phần trước mốc. D1 sống lâu (env của isolate / ngăn) không bao giờ có mục ⇒ không phình bộ nhớ. */
+export const MOC_DA_DOC = new WeakMap<object, Map<string, Set<string>>>()
 /** Lần làm của em với các câu (mọi nguồn). Bỏ sự kiện CHE (ca chưa công bố); bỏ trống tính là sai; `assistance='assisted'` ⇒ có gợi ý. */
 export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = '', ben?: BenLanLam): Promise<LanLam[]> {
   if (!qids.length) return []
@@ -602,12 +596,22 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
       }
     }
     const docTu = (moc: string, f = doc(moc, false)) => nhoTheoLuot(env.DB, khoaSo(moc), f, ['su_kien_hoc'])
-    const daDoc = mocDaDoc(env.DB, sbd)
-    const x = tuLuc ? '' : [...daDoc].filter((m) => m && daNho(env.DB, khoaSo(m))).sort()[0]
-    daDoc.add(tuLuc) // ghi TRƯỚC khi chờ: lần gọi sau trong lúc lần này đang đọc cũng dùng chung được
-    if (tuLuc && daNho(env.DB, khoaSo(''))) rows = (await docTu('')).filter((r) => str(r.luc) >= tuLuc)
-    else if (x && !daNho(env.DB, khoaSo(''))) rows = await docTu('', async () => { const [a, b] = await Promise.all([doc(x, true)(), docTu(x)]); return [...a, ...b] })
-    else rows = await docTu(tuLuc)
+    const khoaDb = env.DB as unknown as object
+    const daDoc = MOC_DA_DOC.get(khoaDb)?.get(sbd)
+    const x = tuLuc || !daDoc ? '' : [...daDoc].filter((m) => m && daNho(env.DB, khoaSo(m))).sort()[0]
+    let p: Promise<Row[]>
+    if (tuLuc && daNho(env.DB, khoaSo(''))) p = docTu('').then((r) => r.filter((y) => str(y.luc) >= tuLuc))
+    else if (x && !daNho(env.DB, khoaSo(''))) p = docTu('', async () => { const [a, b] = await Promise.all([doc(x, true)(), docTu(x)]); return [...a, ...b] })
+    else p = docTu(tuLuc)
+    // Ghi mốc TRƯỚC khi chờ (lần gọi sau trong lúc lần này đang đọc cũng dùng chung được), và chỉ khi sổ nhớ theo lượt thật sự giữ lần đọc này.
+    if (daNho(env.DB, khoaSo(tuLuc))) {
+      let m = MOC_DA_DOC.get(khoaDb)
+      if (!m) { m = new Map(); MOC_DA_DOC.set(khoaDb, m) }
+      let t = m.get(sbd)
+      if (!t) { t = new Set(); m.set(sbd, t) }
+      t.add(tuLuc)
+    }
+    rows = await p
   } else {
     try {
       // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
