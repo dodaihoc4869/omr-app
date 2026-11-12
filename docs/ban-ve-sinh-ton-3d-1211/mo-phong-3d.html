@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ 3D trò Sinh Tồn 12/11</title>
+<style>
+/* BẢN VẼ 3D (mô phỏng, KHÔNG phải mã app): MỘT cảnh three.js thật (WebGL) — đúng công nghệ sẽ dùng khi build ⇒ ảnh chụp là hình thật của máy dựng hình,
+   không phải tranh vẽ tay. Màu chép đúng biến đang có của phòng chờ: --tr-nen #131f24 · --tr-vien #37464f · --tr-chu #f1f7fb · đội --p-cam / --p-tim-2 /
+   --p-xanh / --p-do · --tr-dung #00d497 · --tr-tin #00bfd4 · --tr-sao #ffc735 · mực --p-muc #1a2332. Lớp chữ phủ trên giữ nguyên như bản 2D đang sống. */
+@font-face { font-family: 'DDH Rounded'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH Rounded'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+:root { --nen:#131f24; --nen-2:#0e181c; --mat:#202f36; --mat-2:#263840; --vien:#37464f; --chu:#f1f7fb; --chu-2:#c4d0d6; --chu-3:#9db0b9;
+  --d0:#f59e0b; --d1:#8b5cf6; --d2:#10b981; --d3:#ef4444; --dung:#00d497; --dung-day:#00aa76; --chu-y:#ff9447; --sai:#f7498f; --tin:#00bfd4; --sao:#ffc735; --muc:#1a2332;
+  --kinh: color-mix(in srgb, var(--nen) 86%, transparent); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; }
+body { font-family: 'DDH Rounded', system-ui, sans-serif; background: var(--nen-2); color: var(--chu); font-size: 14px; line-height: 1.35; font-weight: 700; -webkit-font-smoothing: antialiased; }
+b, h1, h2 { font-weight: 800; }
+button { font: inherit; color: inherit; border: 0; background: none; }
+#goc, #goc canvas.san { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+#phu { position: absolute; inset: 0; pointer-events: none; }
+.kinh { background: var(--kinh); border: 2px solid var(--vien); white-space: nowrap; }
+.roi { position: absolute; left: 8px; top: 6px; min-height: 44px; padding: 0 12px; border-radius: 12px; font-weight: 700; font-size: 12.5px; color: var(--chu-3); background: color-mix(in srgb, var(--mat) 80%, transparent); }
+.am { position: absolute; left: 8px; top: 56px; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: color-mix(in srgb, var(--mat) 70%, transparent); color: var(--chu-2); }
+.am svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.bang { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 5px 12px; border-radius: 14px; font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bang .o { display: inline-flex; align-items: center; gap: 5px; } .bang .o i { width: 10px; height: 10px; border-radius: 50%; background: var(--doi); }
+.bang .o.toi-o { text-decoration: underline; text-decoration-color: var(--doi); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.bang .mo { color: var(--chu-3); font-weight: 700; } .bang .gio { padding-left: 12px; border-left: 2px solid var(--vien); color: var(--chu-2); }
+.tin { position: absolute; right: 8px; top: 8px; list-style: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.tin li { padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; background: var(--kinh); white-space: nowrap; }
+.tin b, .bao b { font-weight: 700; color: color-mix(in srgb, var(--doi) 78%, var(--chu)); }
+.nho { position: absolute; padding: 2px 10px; border-radius: 99px; font-size: 12px; font-weight: 500; line-height: 1.5; white-space: nowrap; color: var(--chu-2); background: var(--kinh); }
+.cho { left: 50%; bottom: 8px; transform: translateX(-50%); } .cho i { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--chu-y); }
+.sc { left: 8px; bottom: 8px; display: flex; align-items: center; gap: 6px; } .sc i { width: 7px; height: 7px; border-radius: 50%; background: var(--vien); } .sc i.co { background: var(--doi); }
+.bao { left: 50%; top: 46px; transform: translateX(-50%); border: 1px solid color-mix(in srgb, var(--dung) 60%, var(--vien)); }
+.bd { position: absolute; right: 8px; bottom: 8px; width: 138px; border-radius: 12px; padding: 4px 4px 2px; }
+.bd svg { display: block; width: 100%; border-radius: 8px; background: var(--nen-2); }
+.bd span { display: block; text-align: center; font-size: 12px; font-weight: 500; color: var(--chu-3); line-height: 1.5; }
+.nhan { position: absolute; transform: translate(-50%, -100%); text-align: center; white-space: nowrap; font-size: 12.5px; font-weight: 800; text-shadow: 0 0 3px var(--nen-2), 0 0 3px var(--nen-2), 0 1px 2px var(--nen-2); }
+.nhan.may { font-weight: 700; color: var(--chu-2); }
+.nhan u { display: block; margin: 2px auto 0; width: var(--r, 42px); height: 9px; border-radius: 5px; background: var(--nen-2); padding: 2px; text-decoration: none; }
+.nhan u s { display: block; height: 100%; border-radius: 3px; background: var(--mau, var(--dung)); text-decoration: none; }
+.nhan img { display: block; margin: 0 auto -1px; width: 20px; height: 25px; }
+.so { position: absolute; transform: translate(-50%, -50%); font-size: 15px; font-weight: 800; color: var(--sao); text-shadow: 0 0 4px var(--nen-2), 0 0 4px var(--nen-2); white-space: nowrap; }
+@media (max-width: 720px) { .bang { left: auto; right: 8px; transform: none; gap: 9px; padding: 5px 10px; } .bang .gio { padding-left: 9px; } .tin { top: 48px; } .cho { left: 8px; bottom: 30px; transform: none; } .bao { top: 58px; left: 60px; transform: none; } }
+/* bảng nhân vật / súng */
+.tieu { position: absolute; left: 40px; top: 26px; right: 40px; } .tieu h1 { font-size: 26px; } .tieu p { margin-top: 4px; font-size: 15px; color: var(--chu-2); font-weight: 600; }
+.the { position: absolute; transform: translate(-50%, 0); text-align: center; white-space: nowrap; }
+.the h2 { font-size: 21px; color: color-mix(in srgb, var(--doi) 70%, var(--chu)); } .the p { font-size: 14px; color: var(--chu-2); font-weight: 600; } .the p b { color: var(--chu); }
+.the .ky { display: inline-grid; place-items: center; width: 34px; height: 34px; margin-bottom: 4px; border-radius: 50%; background: var(--doi); color: var(--nen-2); font-weight: 800; }
+.chan { position: absolute; left: 40px; right: 40px; bottom: 22px; padding: 10px 16px; border-radius: 16px; background: var(--mat); border: 2px solid var(--vien); font-size: 14px; color: var(--chu-2); font-weight: 600; }
+.chan b { color: var(--chu); }
+/* máy thầy */
+.gv { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 360px; grid-template-rows: auto 1fr auto; gap: 14px 16px; padding: 18px 24px; pointer-events: none; }
+.gv .dau { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+.vien { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 99px; background: var(--mat-2); font-weight: 800; font-size: 15px; } .vien i { width: 9px; height: 9px; border-radius: 50%; background: var(--chu-y); }
+.gv .dong-p { margin-left: auto; min-height: 44px; padding: 0 18px; border-radius: 14px; border: 2px solid color-mix(in srgb, var(--d3) 55%, transparent); color: color-mix(in srgb, var(--d3) 60%, var(--chu)); font-weight: 800; }
+.gv .khung { position: relative; border-radius: 18px; overflow: hidden; border: 2px solid var(--vien); min-height: 0; }
+.gv .doi-ds { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.gv .doi { flex: 1; padding: 8px 12px; border-radius: 16px; background: color-mix(in srgb, var(--doi) 10%, var(--mat)); border: 2px solid color-mix(in srgb, var(--doi) 55%, var(--vien)); overflow: hidden; }
+.gv .doi .h { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; color: color-mix(in srgb, var(--doi) 70%, var(--chu)); }
+.gv .doi .h b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--doi); color: var(--nen-2); font-size: 14px; }
+.gv .doi .h span { margin-left: auto; font-size: 13px; color: var(--chu-2); font-weight: 700; }
+.gv .doi .ds { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 8px; margin-top: 6px; }
+.gv .doi .ds em { font-style: normal; padding: 3px 10px; border-radius: 8px; background: var(--mat-2); font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gv .doi .ds em.may { background: none; box-shadow: inset 0 0 0 1.5px var(--vien); color: var(--chu-3); }
+.gv .chan2 { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; font-size: 15px; color: var(--chu-2); }
+.gv .bat { margin-left: auto; min-height: 56px; padding: 0 40px; border-radius: 16px; background: var(--dung); color: #06281d; font-weight: 800; font-size: 16px; box-shadow: 0 5px 0 var(--dung-day); }
+</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js", "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }</script>
+</head>
+<body>
+<div id="goc"></div><div id="phu"></div>
+<script type="module">
+import * as THREE from 'three'
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
+
+const Q = new URLSearchParams(location.search), MAN = Q.get('man') || 'tran'
+const DOI = [
+  { ten: 'Đội Natri', ky: 'Na', nv: 'Ma Natri', mau: '#f59e0b', mo: 'mũ trùm chỏm xoáy' }, { ten: 'Đội Kali', ky: 'K', nv: 'Ma Kali', mau: '#8b5cf6', mo: 'mũ trùm tai mèo' },
+  { ten: 'Đội Đồng', ky: 'Cu', nv: 'Ma Đồng', mau: '#10b981', mo: 'mũ trùm mầm lá' }, { ten: 'Đội Canxi', ky: 'Ca', nv: 'Ma Canxi', mau: '#ef4444', mo: 'mũ trùm hai búi tròn' },
+]
+const SUNG_TEN = ['Súng Hạt', 'Súng Đôi', 'Súng Sấm', 'Pháo Sao']
+const M = { nen: '#172a31', nen2: '#0e181c', vien: '#37464f', chu: '#f1f7fb', muc: '#1a2332', dung: '#00d497', tin: '#00bfd4', sao: '#ffc735', kim: '#e8eef2', kim2: '#aab8c2' }
+const SR = 1600, SC = 1000, K_NV = 0.74, K_SUNG = 0.9
+const mau = (h) => new THREE.Color(h)
+const pha = (a, b, t) => mau(a).lerp(mau(b), t)
+const vl = (o) => new THREE.MeshStandardMaterial({ roughness: 0.7, metalness: 0, ...o })
+const sang = (c, cuong = 1.6) => new THREE.MeshStandardMaterial({ color: c, emissive: c, emissiveIntensity: cuong, roughness: 0.4 })
+
+// ── bản đồ: đúng mẫu đối xứng của bản đang sống (src/lib/live-khoi/sinh-ton-loi.ts) ──
+const doiXung = (ds) => ds.flatMap(([x, y, w, h]) => { const t = new Set(), kq = []; for (const [a, b] of [[x, y], [SR - x - w, y], [x, SC - y - h], [SR - x - w, SC - y - h]]) { const k = a + ',' + b; if (!t.has(k)) { t.add(k); kq.push([a, b, w, h]) } } return kq })
+const TUONG = doiXung([[262, 150, 44, 130], [110, 312, 130, 44], [450, 262, 170, 44], [650, 372, 44, 92], [650, 372, 112, 44], [778, 60, 44, 96]])
+const THUNG = doiXung([[372, 424, 54, 54], [566, 104, 54, 54], [60, 473, 54, 54]])
+const BUI = doiXung([[340, 150, 150, 92], [205, 452, 130, 96], [715, 190, 170, 86], [470, 620, 140, 90]])
+const TRAI = [[130, 122], [1470, 122], [130, 878], [1470, 878]]
+const VONG = { rx: 690, ry: 430 }
+
+// ── hoạ tiết vẽ bằng canvas ──
+function veCanvas(w, h, ve) { const c = document.createElement('canvas'); c.width = w; c.height = h; ve(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t }
+const HT_SAN = veCanvas(1600, 1000, (g, w, h) => {
+  g.fillStyle = M.nen; g.fillRect(0, 0, w, h)
+  // ô gạch lớn so le hai tông + mạch gạch mờ
+  for (let j = 0; j < h / 80; j++) for (let i = 0; i < w / 80; i++) { g.fillStyle = (i + j) % 2 ? 'rgba(255,255,255,.022)' : 'rgba(0,0,0,.05)'; g.fillRect(i * 80, j * 80, 80, 80) }
+  g.strokeStyle = 'rgba(241,247,251,.07)'; g.lineWidth = 2
+  for (let x = 0; x <= w; x += 80) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke() }
+  for (let y = 0; y <= h; y += 80) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke() }
+  const q = g.createRadialGradient(w / 2, h / 2, 80, w / 2, h / 2, 900); q.addColorStop(0, 'rgba(120,200,220,.10)'); q.addColorStop(1, 'rgba(0,0,0,.22)'); g.fillStyle = q; g.fillRect(0, 0, w, h)
+})
+const HT_QUANG = veCanvas(128, 128, (g) => { const q = g.createRadialGradient(64, 64, 2, 64, 64, 64); q.addColorStop(0, 'rgba(255,255,255,1)'); q.addColorStop(0.25, 'rgba(255,255,255,.55)'); q.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = q; g.fillRect(0, 0, 128, 128) })
+const HT_VONG = veCanvas(8, 128, (g) => { const q = g.createLinearGradient(0, 0, 0, 128); q.addColorStop(0, 'rgba(255,255,255,0)'); q.addColorStop(0.75, 'rgba(255,255,255,.35)'); q.addColorStop(1, 'rgba(255,255,255,.95)'); g.fillStyle = q; g.fillRect(0, 0, 8, 128) })
+const LUA = ['M32 4C35 17 50 25 54 40c4 17-7 34-22 34S6 57 10 40c2-8 7-12 9-19 3 7 6 10 9 11-1-10 1-19 4-28z', 'M32 28c2 9 12 14 14 24 2 12-5 21-14 21s-16-9-14-21c1-5 4-9 6-13 1 4 3 7 6 8-1-7 0-13 2-19z', 'M32 47c2 6 8 9 8 16a8 8 0 0 1-16 0c0-7 6-10 8-16z']
+const canvasLua = (c) => { const cv = document.createElement('canvas'); cv.width = 128; cv.height = 160; const g = cv.getContext('2d'); g.scale(2, 2); g.lineWidth = 5; g.strokeStyle = M.nen2; g.stroke(new Path2D(LUA[0])); g.fillStyle = c; g.fill(new Path2D(LUA[0])); g.fillStyle = '#' + pha(c, M.sao, 0.6).getHexString(); g.fill(new Path2D(LUA[1])); g.fillStyle = '#' + pha('#ffffff', M.sao, 0.4).getHexString(); g.fill(new Path2D(LUA[2])); return cv }
+const quang = (c, co, dam = 0.9) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: HT_QUANG, color: c, transparent: true, opacity: dam, blending: THREE.AdditiveBlending, depthWrite: false })); s.scale.set(co, co, 1); return s }
+const datCho = (o, x, y, z) => { o.position.set(x, y, z); return o }
+const bong = (m) => { m.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } }); return m }
+
+// ── BÉ MA 3D (gốc = mặt đất dưới chân, mặt quay về +z) ──
+const gau = (g) => { const p = g.attributes.position; for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < 15) { const goc = Math.atan2(p.getZ(i), p.getX(i)); p.setY(i, y - 5 * Math.abs(Math.sin(goc * 3)) * (1 - y / 15)) } } g.computeVertexNormals(); return g }
+function ma(doi, o = {}) {
+  const c = DOI[doi].mau, G = new THREE.Group()
+  const ao = vl({ color: pha(c, '#ffffff', 0.92), side: THREE.DoubleSide, roughness: 0.82 }), mMau = vl({ color: c, roughness: 0.55 }), mToi = vl({ color: pha(c, M.muc, 0.36) }), mNhat = vl({ color: pha(c, '#ffffff', 0.6), side: THREE.DoubleSide })
+  const them = (hinh, vat, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(hinh, vat); m.position.set(x, y, z); G.add(m); return m }
+  // áo choàng (hình tiện tròn xoay, gấu áo sáu múi) + mũ trùm tròn; mặt màu đội lồi ra qua miệng mũ
+  const duong = new THREE.SplineCurve([[15, 52], [21, 47], [25, 40], [26.5, 30], [28.5, 20], [30.5, 10], [31.5, 3]].map(([r, y]) => new THREE.Vector2(r, y))).getPoints(28)
+  them(gau(new THREE.LatheGeometry(duong, 64)), ao)
+  them(new THREE.TorusGeometry(29.4, 1.9, 10, 64), mMau, 0, 21, 0).rotation.x = Math.PI / 2 // viền gấu áo màu đội
+  them(gau(new THREE.LatheGeometry(new THREE.SplineCurve([[19, 49], [25, 44], [29.5, 36], [31.5, 30], [32, 27.5]].map(([r, y]) => new THREE.Vector2(r, y))).getPoints(16), 64)), mNhat) // áo khoác vai
+  them(new THREE.SphereGeometry(25, 48, 36), ao, 0, 63, 0).scale.set(1, 1.04, 1) // mũ trùm
+  them(new THREE.SphereGeometry(18.6, 40, 30), vl({ color: c, roughness: 0.4, emissive: c, emissiveIntensity: 0.2 }), 0, 61, 9.4).scale.set(1, 0.98, 0.95) // mặt màu đội
+  const vanh = them(new THREE.TorusGeometry(14.4, 2.3, 12, 48), mToi, 0, 61, 20.6); vanh.scale.set(1, 0.98, 1) // vành miệng mũ
+  for (const s of [-1, 1]) {
+    them(new THREE.SphereGeometry(3.5, 18, 14), vl({ color: M.muc, roughness: 0.2 }), s * 5.9, 61.5, 25.9).scale.set(1, 1.42, 0.5)
+    them(new THREE.SphereGeometry(1.3, 10, 8), vl({ color: '#ffffff', emissive: '#ffffff', emissiveIntensity: 0.7 }), s * 5.9 + 1.2, 63.8, 27.4)
+    them(new THREE.SphereGeometry(2.7, 14, 10), mNhat, s * 10, 54.8, 23.8).scale.set(1, 0.6, 0.35)
+    them(new THREE.SphereGeometry(5.6, 16, 12), ao, s * 28, 30, 5) // tay
+  }
+  them(new THREE.SphereGeometry(4.4, 16, 12), new THREE.MeshStandardMaterial({ color: M.sao, metalness: 0.6, roughness: 0.3 }), 0, 41, 25.4)
+  // mũ trùm riêng từng đội
+  if (doi === 0) {
+    const d = new THREE.CatmullRomCurve3([new THREE.Vector3(-2, 84, 0), new THREE.Vector3(-5, 96, 0), new THREE.Vector3(3, 105, 0), new THREE.Vector3(13, 100, 0)])
+    them(new THREE.TubeGeometry(d, 24, 6.4, 16), ao); them(new THREE.SphereGeometry(5.4, 16, 12), mMau, 15, 99.5, 0)
+  } else if (doi === 1) for (const s of [-1, 1]) {
+    const tai = them(new THREE.ConeGeometry(9.5, 26, 24), ao, s * 16, 91, 0); tai.rotation.z = -s * 0.36
+    const trong = them(new THREE.ConeGeometry(5.4, 16, 16), mMau, s * 16, 89.5, 4.8); trong.rotation.z = -s * 0.36
+  } else if (doi === 2) {
+    them(new THREE.CylinderGeometry(1.5, 1.5, 11, 8), mMau, 0, 93, 0)
+    for (const s of [-1, 1]) { const la = them(new THREE.SphereGeometry(10, 18, 12), mMau, s * 9.5, 101, 0); la.scale.set(1, 0.3, 0.6); la.rotation.z = s * 0.5 }
+  } else for (const s of [-1, 1]) { them(new THREE.SphereGeometry(9.4, 18, 14), ao, s * 19, 83, 0); them(new THREE.SphereGeometry(4.6, 14, 10), mMau, s * 19, 83, 6.8) }
+  // quai đeo chéo vai
+  them(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(-17, 45, 17), new THREE.Vector3(2, 37, 27), new THREE.Vector3(26, 28, 12)]), 16, 2.1, 8), vl({ color: pha(c, M.muc, 0.55) }))
+  if (o.may) { const cot = them(new THREE.CylinderGeometry(1.2, 1.2, 19, 8), vl({ color: '#c4d0d6' }), -19, 92, 0); cot.rotation.z = 0.42; them(new THREE.SphereGeometry(5, 14, 10), sang(M.tin, 1.4), -23, 102, 0) }
+  G.scale.setScalar(K_NV)
+  return bong(G)
+}
+
+// ── BỐN CẤP SÚNG 3D (chĩa +x, gốc = khớp đeo) ──
+function sung(cap, doi, ban) {
+  const c = DOI[doi].mau, G = new THREE.Group()
+  const kim = new THREE.MeshStandardMaterial({ color: M.kim, metalness: 0.55, roughness: 0.28 }), mMau = new THREE.MeshStandardMaterial({ color: c, metalness: 0.35, roughness: 0.38 }), toi = new THREE.MeshStandardMaterial({ color: pha(c, M.muc, 0.42), metalness: 0.5, roughness: 0.4 }), den = new THREE.MeshStandardMaterial({ color: M.muc, metalness: 0.6, roughness: 0.35 })
+  const them = (h, v, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(h, v); m.position.set(x, y, z); G.add(m); return m }
+  const tru = (r1, r2, dai, v, x, y = 0, z = 0) => { const m = them(new THREE.CylinderGeometry(r1, r2, dai, 24), v, x, y, z); m.rotation.z = -Math.PI / 2; return m }
+  let nong = 44
+  if (cap === 1) {
+    const than = them(new THREE.CapsuleGeometry(9.5, 15, 8, 20), kim, 3); than.rotation.z = Math.PI / 2
+    tru(5.6, 5.6, 24, toi, 27); tru(7.8, 7.8, 6, den, 40); tru(3, 3, 6.4, sang(c), 40)
+    them(new THREE.SphereGeometry(5.6, 18, 14), sang(c, 1.3), 3, 8.6, 0); tru(5, 6, 6, toi, -16); nong = 44
+  } else if (cap === 2) {
+    them(new RoundedBoxGeometry(42, 27, 24, 5, 7), kim, 2); them(new RoundedBoxGeometry(8, 28, 25, 2, 2), mMau, -6)
+    for (const s of [-1, 1]) { tru(4.8, 4.8, 32, toi, 36, 0, s * 6.6); tru(6.4, 6.4, 6, den, 50, 0, s * 6.6); tru(2.6, 2.6, 6.4, sang(c), 50, 0, s * 6.6); them(new THREE.SphereGeometry(3.8, 14, 10), sang(c, 1.3), 11, 13.5, s * 6) }
+    const vay = them(new THREE.ConeGeometry(9, 15, 4), toi, -2, 19, 0); vay.scale.set(1.4, 1, 0.35); nong = 54
+  } else if (cap === 3) {
+    them(new RoundedBoxGeometry(40, 26, 22, 4, 6), toi, 0); them(new RoundedBoxGeometry(27, 15, 23, 3, 3), kim, -1)
+    tru(5.2, 5.2, 46, kim, 37); tru(7, 7, 12, mMau, -25)
+    for (const x of [24, 35, 46]) { const v = them(new THREE.TorusGeometry(9.4, 2.7, 12, 28), sang(c, 1.5), x); v.rotation.y = Math.PI / 2 }
+    for (const s of [-1, 1]) { const cang = them(new RoundedBoxGeometry(20, 4, 5, 2, 1.6), toi, 64, s * 8.5, 0); cang.rotation.z = s * 0.42 }
+    them(new THREE.SphereGeometry(3.2, 12, 10), sang('#ffffff', 2), 68, 0, 0); G.add(datCho(quang(c, 34, 0.8), 68, 0, 0)); nong = 70
+  } else {
+    them(new RoundedBoxGeometry(48, 36, 34, 6, 12), mMau, -2); them(new RoundedBoxGeometry(34, 24, 35.5, 4, 7), kim, -3)
+    tru(19, 11, 40, toi, 40); for (const x of [29, 41]) { const v = them(new THREE.TorusGeometry(x === 29 ? 13 : 16.4, 2.6, 10, 30), kim, x); v.rotation.y = Math.PI / 2 }
+    const vanh = them(new THREE.TorusGeometry(20, 3.2, 12, 36), den, 60); vanh.rotation.y = Math.PI / 2
+    tru(15.5, 15.5, 2, sang(M.sao, 1.8), 59); them(new THREE.SphereGeometry(8, 20, 16), sang(M.sao, 1.6), -3, 0, 17.5).scale.set(1, 1, 0.5)
+    them(new RoundedBoxGeometry(24, 8, 9, 3, 3), toi, 1, 22, 0)
+    for (const s of [-1, 1]) { const canh = them(new THREE.ConeGeometry(8, 18, 4), toi, -30, s * 13, 0); canh.rotation.z = Math.PI / 2 + s * 0.5; canh.scale.set(1, 1, 0.4) }
+    G.add(datCho(quang(M.sao, 46, 0.7), 62, 0, 0)); nong = 64
+  }
+  if (ban) { them(new THREE.SphereGeometry(4.6, 12, 10), sang('#ffffff', 2.4), nong + 4); G.add(datCho(quang(M.sao, 44, 1), nong + 5, 0, 0)) }
+  G.userData.nong = nong
+  G.scale.setScalar(K_SUNG)
+  return bong(G)
+}
+/** Bé ma + súng, đặt trên sân. o: { doi, x, y(z sân), goc (độ; 0 = +x, 90 = về phía máy quay), cap, ban, may, toi, mo } */
+function nhanVat(o) {
+  const G = new THREE.Group(), than = ma(o.doi, o), rad = (o.goc ?? 0) * Math.PI / 180
+  // thân quay nửa chừng theo hướng ngắm nhưng luôn để lộ mặt (không quay lưng hẳn về máy quay)
+  than.rotation.y = Math.max(-0.7, Math.min(0.7, Math.atan2(Math.cos(rad), Math.max(0.2, Math.abs(Math.sin(rad)) + 0.6)) * 0.62))
+  G.add(than)
+  const s = sung(o.cap ?? 1, o.doi, o.ban), ben = Math.cos(rad) < 0 ? -1 : 1
+  s.position.set(ben * 25 * K_NV, 27 * K_NV, 14 * K_NV); s.rotation.y = -rad
+  G.add(s)
+  G.position.set(o.x, 5 + (o.nhun ?? 0), o.y)
+  if (o.mo != null && o.mo < 1) G.traverse((m) => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = o.mo } })
+  G.userData = { o, nongX: o.x + ben * 25 * K_NV + Math.cos(rad) * s.userData.nong * K_SUNG, nongZ: o.y + 14 * K_NV + Math.sin(rad) * s.userData.nong * K_SUNG }
+  return G
+}
+
+// ── dựng sân ──
+function taoSan(scene) {
+  const nen = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000), vl({ color: '#0b1418', roughness: 1 })); nen.rotation.x = -Math.PI / 2; nen.position.set(800, -2, 500); nen.receiveShadow = true; scene.add(nen)
+  const san = new THREE.Mesh(new RoundedBoxGeometry(SR, 8, SC, 6, 40), vl({ map: HT_SAN, roughness: 0.9 })); san.position.set(800, -4, 500); san.receiveShadow = true; scene.add(san)
+  const go = new THREE.Mesh(new RoundedBoxGeometry(SR + 28, 14, SC + 28, 6, 48), vl({ color: '#2b3a43', roughness: 0.8 })); go.position.set(800, -8.5, 500); go.receiveShadow = true; scene.add(go)
+  const mTuong = vl({ color: '#55656f', roughness: 0.78 }), mNoc = vl({ color: '#73858f', roughness: 0.7 })
+  for (const [x, y, w, h] of TUONG) {
+    const t = new THREE.Mesh(new RoundedBoxGeometry(w, 52, h, 5, 9), mTuong); t.position.set(x + w / 2, 26, y + h / 2); scene.add(bong(t))
+    const n = new THREE.Mesh(new RoundedBoxGeometry(w - 9, 4, h - 9, 3, 2), mNoc); n.position.set(x + w / 2, 52.5, y + h / 2); scene.add(bong(n))
+  }
+  const mThung = vl({ color: '#c9962e', roughness: 0.75 }), mNep = vl({ color: '#7d5a17', roughness: 0.8 })
+  for (const [x, y, w, h] of THUNG) {
+    const g = new THREE.Group()
+    g.add(new THREE.Mesh(new RoundedBoxGeometry(w, 46, h, 4, 6), mThung))
+    for (const r of [Math.PI / 4, -Math.PI / 4]) { const nep = new THREE.Mesh(new RoundedBoxGeometry(62, 3.5, 8, 2, 1.5), mNep); nep.position.y = 23.5; nep.rotation.y = r; g.add(nep) }
+    for (const [dx, dz, rw, rd] of [[0, h / 2, w, 4], [0, -h / 2, w, 4], [w / 2, 0, 4, h], [-w / 2, 0, 4, h]]) for (const dy of [-17, 17]) { const v = new THREE.Mesh(new THREE.BoxGeometry(rw + 1.5, 5, rd + 1.5), mNep); v.position.set(dx, dy, dz); g.add(v) }
+    g.position.set(x + w / 2, 23, y + h / 2); scene.add(bong(g))
+  }
+  // bụi: cụm khối đa diện ba tông xanh (kiểu low-poly)
+  const mLa = ['#0c6c49', '#11875c', '#17a06e'].map((c) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, flatShading: true }))
+  for (const [bx, by, bw, bh] of BUI) {
+    const cx = bx + bw / 2, cy = by + bh / 2, nho = Math.min(bw, bh)
+    for (let i = 0; i < 10; i++) {
+      const t = i / 9 * Math.PI * 2, r = i === 9 ? 0 : (0.62 + 0.1 * Math.sin(i * 2.4)) * 1.15, co = i === 9 ? nho * 0.44 : nho * (0.3 + 0.05 * Math.cos(i * 1.7))
+      const la = new THREE.Mesh(new THREE.IcosahedronGeometry(co, 1), mLa[i % 3]); la.position.set(cx + Math.cos(t) * bw * 0.34 * r, co * (i === 9 ? 0.75 : 0.55), cy + Math.sin(t) * bh * 0.3 * r); la.rotation.set(i, i * 2.1, i * 0.7); la.scale.y = 0.82; scene.add(bong(la))
+    }
+  }
+  // trại bốn đội: bệ sáng màu đội + ngọn lửa + đèn màu
+  TRAI.forEach(([x, y], d) => {
+    const c = DOI[d].mau
+    const dia = new THREE.Mesh(new THREE.CylinderGeometry(84, 88, 5, 56), vl({ color: pha(c, M.nen, 0.55), emissive: c, emissiveIntensity: 0.22 })); dia.scale.z = 0.72; dia.position.set(x, 2, y); dia.receiveShadow = true; scene.add(dia)
+    const vanh = new THREE.Mesh(new THREE.TorusGeometry(84, 2.6, 8, 64), sang(c, 1.2)); vanh.rotation.x = Math.PI / 2; vanh.scale.y = 0.72; vanh.position.set(x, 5, y); scene.add(vanh)
+    const l = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvasLua(c)), transparent: true, depthWrite: false })); l.material.map.colorSpace = THREE.SRGBColorSpace; l.scale.set(52, 65, 1); l.position.set(x, 44, y - 6); scene.add(l)
+    scene.add(datCho(quang(c, 230, 0.35), x, 40, y))
+    const den = new THREE.PointLight(c, 26000, 420, 1.9); den.position.set(x, 70, y); scene.add(den)
+  })
+  // hộp tiếp tế giữa sân
+  const hop = new THREE.Group()
+  hop.add(new THREE.Mesh(new RoundedBoxGeometry(40, 26, 30, 4, 5), vl({ color: '#06b98a', roughness: 0.5 })))
+  const nap = new THREE.Mesh(new RoundedBoxGeometry(42, 10, 32, 4, 4), vl({ color: '#5fe7c2', roughness: 0.45 })); nap.position.y = 16; hop.add(nap)
+  for (const [w, h] of [[5, 16], [16, 5]]) { const v = new THREE.Mesh(new RoundedBoxGeometry(w, h, 2, 2, 1), sang('#ffffff', 0.9)); v.position.set(0, 0, 15.6); hop.add(v) }
+  hop.position.set(800, 30, 500); hop.rotation.y = 0.35; scene.add(bong(hop))
+  const vh = new THREE.Mesh(new THREE.TorusGeometry(64, 1.6, 6, 64), sang(M.sao, 1)); vh.rotation.x = Math.PI / 2; vh.position.set(800, 1.5, 500); scene.add(vh)
+  scene.add(datCho(quang(M.sao, 190, 0.3), 800, 26, 500))
+  const dh = new THREE.PointLight(M.sao, 16000, 300, 1.9); dh.position.set(800, 70, 500); scene.add(dh)
+  // vòng an toàn: bức tường năng lượng trong suốt
+  const tuong = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 150, 128, 1, true), new THREE.MeshBasicMaterial({ color: M.tin, alphaMap: HT_VONG, transparent: true, opacity: 0.55, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }))
+  tuong.scale.set(VONG.rx, 1, VONG.ry); tuong.position.set(800, 75, 500); scene.add(tuong)
+  const day = new THREE.Mesh(new THREE.TorusGeometry(1, 0.004, 6, 160), sang(M.tin, 1.6)); day.rotation.x = Math.PI / 2; day.scale.set(VONG.rx, VONG.ry, 300); day.position.set(800, 1.4, 500); scene.add(day)
+}
+// ── đạn theo cấp súng ──
+function dan(scene, x0, z0, x1, z1, f, doi, cap) {
+  const c = DOI[doi].mau, y = 26, dx = x1 - x0, dz = z1 - z0, dai = Math.hypot(dx, dz), ux = dx / dai, uz = dz / dai, bx = x0 + dx * f, bz = z0 + dz * f
+  const them = (m, x, z, yy = y) => { m.position.set(x, yy, z); scene.add(m); return m }
+  if (cap === 3) {
+    const diem = [], n = Math.max(4, Math.round(dai / 30))
+    for (let i = 0; i <= n; i++) { const t = i / n, l = i === 0 || i === n ? 0 : (((i * 7919 + 13) % 17) - 8) * 1.5; diem.push(new THREE.Vector3(x0 + dx * t - uz * l, y + (i % 2 ? 5 : -3) * (i === 0 || i === n ? 0 : 1), z0 + dz * t + ux * l)) }
+    const d = new THREE.CatmullRomCurve3(diem, false, 'catmullrom', 0.05)
+    scene.add(new THREE.Mesh(new THREE.TubeGeometry(d, n * 6, 1.8, 6), sang('#ffffff', 2.6)))
+    scene.add(new THREE.Mesh(new THREE.TubeGeometry(d, n * 6, 5, 8), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending, depthWrite: false })))
+    them(quang(c, 70, 0.9), x1, z1); const l = new THREE.PointLight(c, 9000, 260, 2); them(l, x1, z1, 40)
+    return
+  }
+  if (cap === 4) {
+    them(new THREE.Mesh(new THREE.SphereGeometry(11, 20, 16), sang(M.sao, 2.2)), bx, bz); them(quang(c, 110, 1), bx, bz); them(quang(M.sao, 60, 1), bx, bz)
+    const duoi = new THREE.Mesh(new THREE.ConeGeometry(9, 56, 16, 1, true), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }))
+    duoi.rotation.z = Math.PI / 2; duoi.rotation.y = -Math.atan2(uz, ux) + Math.PI; them(duoi, bx - ux * 30, bz - uz * 30)
+    const l = new THREE.PointLight(c, 14000, 300, 2); them(l, bx, bz, 44); return
+  }
+  for (const l of cap === 2 ? [-6, 6] : [0]) {
+    const ax = bx - uz * l, az = bz + ux * l
+    const v = new THREE.Mesh(new THREE.CapsuleGeometry(cap === 2 ? 3 : 4.6, cap === 2 ? 12 : 4, 6, 12), sang(c, 2.2)); v.rotation.z = Math.PI / 2; v.rotation.y = -Math.atan2(uz, ux); them(v, ax, az)
+    them(quang(c, 46, 0.9), ax, az)
+    const vet = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 2.4, 34, 8), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.4, blending: THREE.AdditiveBlending, depthWrite: false })); vet.rotation.z = Math.PI / 2; vet.rotation.y = -Math.atan2(uz, ux); them(vet, ax - ux * 20, az - uz * 20)
+  }
+}
+
+// ── máy dựng hình + ánh sáng ──
+function taoCanh(khung, W, H) {
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
+  r.setPixelRatio(2); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.12
+  r.domElement.className = 'san'; khung.appendChild(r.domElement)
+  const scene = new THREE.Scene(); scene.background = mau(M.nen2); scene.fog = new THREE.Fog(M.nen2, 1500, 3400)
+  scene.add(new THREE.HemisphereLight('#cfeeff', '#16252b', 1.25))
+  return { r, scene }
+}
+function den(scene, tx, tz, tam = 760) {
+  const d = new THREE.DirectionalLight('#fff0d8', 2.7); d.position.set(tx - 380, 760, tz - 120); d.target.position.set(tx, 0, tz); scene.add(d, d.target)
+  d.castShadow = true; d.shadow.mapSize.set(2048, 2048); d.shadow.radius = 5; d.shadow.bias = -0.0006; d.shadow.normalBias = 1.2
+  Object.assign(d.shadow.camera, { left: -tam, right: tam, top: tam, bottom: -tam, near: 50, far: 2400 }); d.shadow.camera.updateProjectionMatrix()
+  const vien = new THREE.DirectionalLight('#8fd8ff', 0.75); vien.position.set(tx + 500, 380, tz + 600); vien.target.position.set(tx, 0, tz); scene.add(vien, vien.target)
+}
+const mayQuay = (W, H, tx, tz, cao, lui, fov = 30) => { const c = new THREE.PerspectiveCamera(fov, W / H, 20, 6000); c.position.set(tx, cao, tz + lui); c.lookAt(tx, 18, tz); c.updateMatrixWorld(); return c }
+const chieu = (cam, W, H, x, y, z) => { const v = new THREE.Vector3(x, y, z).project(cam); return [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H] }
+
+// ── lớp chữ phủ (như bản 2D đang sống) ──
+const phu = document.getElementById('phu')
+const B = (d, c) => `<b style="--doi:${DOI[d].mau}">${c}</b>`
+const bangDiem = (d = [7, 5, 4, 2], gio = '1:18', van = 2) => `<div class="bang kinh">${DOI.map((x, i) => `<span class="o${i === 0 ? ' toi-o' : ''}" style="--doi:${x.mau}"><i></i>${x.ky} ${d[i]}</span>`).join('')}<span class="mo">lượt hạ</span><span class="gio">Ván ${van} · còn ${gio}</span></div>`
+const NUT = `<button class="roi" type="button">Rời phòng chờ</button><button class="am" type="button" aria-label="Tắt tiếng trò chơi"><svg viewBox="0 0 24 24"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6m2.6-8.6a8 8 0 0 1 0 11.2"/></svg></button>`
+const capSung = (cap, doi = 0) => `<div class="nho sc" style="--doi:${DOI[doi].mau}">${[1, 2, 3, 4].map((i) => `<i class="${i <= cap ? 'co' : ''}"></i>`).join('')}Súng cấp ${cap} · ${SUNG_TEN[cap - 1]}</div>`
+const dongCho = (n = 8) => `<div class="nho cho"><i></i>Phòng chờ · ${n} em đã vào · chờ thầy bấm Bắt đầu</div>`
+function banDo(nvs, toi) {
+  return `<div class="bd kinh"><svg viewBox="0 0 ${SR} ${SC}"><ellipse cx="800" cy="500" rx="${VONG.rx}" ry="${VONG.ry}" fill="none" stroke="var(--tin)" stroke-width="16" stroke-dasharray="50 40"/>
+    ${TUONG.concat(THUNG).map(([x, y, w, h]) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="var(--vien)"/>`).join('')}${TRAI.map(([x, y], d) => `<circle cx="${x}" cy="${y}" r="62" fill="${DOI[d].mau}" opacity=".45"/>`).join('')}
+    ${nvs.filter((n) => !n.toi && n.doi === toi.doi).map((n) => `<circle cx="${n.x}" cy="${n.y - 30}" r="34" fill="${DOI[n.doi].mau}"/>`).join('')}<circle cx="${toi.x}" cy="${toi.y - 30}" r="38" fill="${DOI[toi.doi].mau}" stroke="#fff" stroke-width="16"/></svg><span>Bản đồ · vòng an toàn</span></div>`
+}
+const anhLua = (d) => canvasLua(DOI[d].mau).toDataURL()
+function nhanTen(cam, W, H, ds) {
+  return ds.filter((n) => n.ten).map((n) => {
+    const [x, y] = chieu(cam, W, H, n.x, (n.may ? 112 : 104) * K_NV + 6, n.y), m = n.mau ?? 100
+    return `<div class="nhan${n.may ? ' may' : ''}" style="left:${x}px;top:${y}px;${n.mo != null && n.mo < 1 ? 'opacity:.8;' : ''}">${n.toi ? `<img src="${anhLua(n.doi)}" alt="">` : ''}${n.ten}<u style="--r:${n.toi ? 52 : 42}px;--mau:${m > 55 ? 'var(--dung)' : m > 25 ? 'var(--sao)' : 'var(--sai)'}"><s style="width:${m}%"></s></u></div>`
+  }).join('')
+}
+
+// ── cảnh giao tranh dùng chung ──
+const EM = { doi: 0, x: 590, y: 346, goc: -6, ban: true, toi: true, ten: 'Hà (em)', mau: 72, cap: 3 }
+const CANH = [
+  EM, { doi: 0, x: 478, y: 452, goc: 50, ban: true, may: true, ten: 'Máy', mau: 100 }, { doi: 0, x: 272, y: 520, goc: 12, ten: 'Nam', mau: 88, cap: 2 },
+  { doi: 1, x: 866, y: 316, goc: 170, ban: true, ten: 'Huy', mau: 34, cap: 2 }, { doi: 1, x: 990, y: 440, goc: 178, ban: true, may: true, ten: 'Máy', mau: 90 },
+  { doi: 2, x: 600, y: 548, goc: -122, ban: true, ten: 'Bảo', mau: 60 }, { doi: 3, x: 1140, y: 346, goc: 157, ban: true, ten: 'Đức Anh', mau: 100, cap: 4 },
+]
+/** [chỉ số người bắn, chỉ số mục tiêu, phần đường đạn đã bay] */
+const BAN = [[0, 3, 1], [3, 0, 0.55], [1, 5, 0.5], [5, 1, 0.45], [6, 4, 0.6]]
+function datNguoi(scene, ds, ban = BAN) {
+  const nv = ds.map((o) => { const g = nhanVat(o); scene.add(g); return g })
+  for (const [a, b, f] of ban) if (ds[a] && ds[b]) dan(scene, nv[a].userData.nongX, nv[a].userData.nongZ, ds[b].x, ds[b].y + 8, f, ds[a].doi, ds[a].cap ?? 1)
+  const toi = ds.find((n) => n.toi)
+  if (toi) {
+    const v = new THREE.Mesh(new THREE.TorusGeometry(31, 1.7, 8, 48), sang('#ffffff', 0.9)); v.rotation.x = Math.PI / 2; v.scale.y = 1; v.position.set(toi.x, 1.6, toi.y); scene.add(v)
+    const d = new THREE.Mesh(new THREE.CircleGeometry(30, 40), new THREE.MeshBasicMaterial({ color: DOI[toi.doi].mau, transparent: true, opacity: 0.28, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.set(toi.x, 1.2, toi.y); scene.add(d)
+  }
+  return nv
+}
+
+const goc = document.getElementById('goc'), W = innerWidth, H = innerHeight
+const MAN_VE = {
+  tran() {
+    const { r, scene } = taoCanh(goc, W, H); taoSan(scene); den(scene, EM.x + 60, EM.y + 30)
+    datNguoi(scene, CANH)
+    // ?goc=thap: CÙNG cảnh, máy quay hạ thấp (để thấy đây là khối 3D thật có chiều sâu) — không phải góc chơi mặc định.
+    const thap = Q.get('goc') === 'thap', he = Math.max(1, 2.05 / (W / H) * 0.62 + 0.38), cam = thap ? mayQuay(W, H, EM.x + 150, EM.y + 40, 250, 720, 34) : mayQuay(W, H, EM.x + 110, EM.y + 70, 700 * he, 440 * he)
+    r.render(scene, cam)
+    const [sx, sy] = chieu(cam, W, H, 950, 70, 300)
+    phu.innerHTML = nhanTen(cam, W, H, CANH) + `<div class="so" style="left:${sx}px;top:${sy}px">−12 máu</div>` + NUT + bangDiem() + `<ul class="tin"><li>${B(0, 'Em')} hạ ${B(2, 'Lan')}</li><li>${B(3, 'Đức Anh')} hạ ${B(1, 'Máy')}</li></ul>` + banDo(CANH, EM) + capSung(3) + dongCho()
+  },
+  bui() {
+    const em = { doi: 0, x: 800, y: 250, goc: 30, toi: true, ten: 'Hà (em)', mau: 46, cap: 2, mo: 0.55 }
+    const ds = [em, { doi: 1, x: 986, y: 372, goc: 200, ten: 'Huy', mau: 80, cap: 2 }, { doi: 1, x: 1076, y: 250, goc: 190, may: true, ten: 'Máy', mau: 100 }, { doi: 0, x: 560, y: 452, goc: 0, may: true, ten: 'Máy', mau: 70 }]
+    const { r, scene } = taoCanh(goc, W, H); taoSan(scene); den(scene, 830, 290); datNguoi(scene, ds, [])
+    const cam = mayQuay(W, H, 830, 310, 700, 440); r.render(scene, cam)
+    phu.innerHTML = nhanTen(cam, W, H, ds) + NUT + bangDiem([7, 6, 4, 2], '0:58') + banDo(ds, em) + capSung(2) + dongCho() + `<div class="nho bao">Đang ẩn trong bụi · đội khác không thấy em · máu đang hồi</div>`
+  },
+  'nhan-vat'() {
+    const { r, scene } = taoCanh(goc, W, H); scene.background = mau('#16252c'); scene.fog = null
+    const nen = new THREE.Mesh(new THREE.CircleGeometry(900, 64), vl({ color: '#1c2f37', roughness: 0.95 })); nen.rotation.x = -Math.PI / 2; nen.receiveShadow = true; scene.add(nen)
+    den(scene, 0, 0, 420)
+    const cam = new THREE.PerspectiveCamera(24, W / H, 10, 3000); cam.position.set(0, 150, 900); cam.lookAt(0, 42, 0); cam.updateMatrixWorld()
+    let the = ''
+    DOI.forEach((d, i) => {
+      const x = (i - 1.5) * 150
+      const be = new THREE.Mesh(new THREE.CylinderGeometry(52, 58, 12, 48), vl({ color: pha(d.mau, '#1c2f37', 0.55), emissive: d.mau, emissiveIntensity: 0.18 })); be.position.set(x, 6, 0); scene.add(bong(be))
+      const v = new THREE.Mesh(new THREE.TorusGeometry(52, 1.6, 8, 48), sang(d.mau, 1.1)); v.rotation.x = Math.PI / 2; v.position.set(x, 12.5, 0); scene.add(v)
+      const g = nhanVat({ doi: i, x, y: 0, goc: 28, cap: 1 }); g.position.y = 20; g.scale.setScalar(1.28); scene.add(g)
+      scene.add(datCho(quang(d.mau, 300, 0.22), x, 70, -60))
+      const l = new THREE.PointLight(d.mau, 9000, 260, 2); l.position.set(x, 30, 70); scene.add(l)
+      const [sx, sy] = chieu(cam, W, H, x, -2, 60)
+      the += `<div class="the" style="left:${sx}px;top:${sy}px;--doi:${d.mau}"><span class="ky">${d.ky}</span><h2>${d.nv}</h2><p>${d.ten} · ${d.mo}</p></div>`
+    })
+    r.render(scene, cam)
+    phu.innerHTML = `<div class="tieu"><h1>Bốn bé ma · bản 3D</h1><p>Cùng thiết kế thầy đã chốt (mặt màu đội, áo choàng trắng viền màu đội, mỗi đội một kiểu mũ trùm) — nay là khối 3D có ánh sáng, bóng đổ, lơ lửng trên mặt sân.</p></div>${the}
+      <div class="chan"><b>Giữ nguyên luật chơi.</b> Chỉ đổi cách dựng hình: máy đủ mạnh hiện 3D; máy yếu hoặc không có WebGL tự dùng lại bản 2D đang sống.</div>`
+  },
+  sung() {
+    const { r, scene } = taoCanh(goc, W, H); scene.background = mau('#16252c'); scene.fog = null
+    const nen = new THREE.Mesh(new THREE.CircleGeometry(900, 64), vl({ color: '#1c2f37', roughness: 0.95 })); nen.rotation.x = -Math.PI / 2; nen.receiveShadow = true; scene.add(nen)
+    den(scene, 0, 0, 420)
+    const cam = new THREE.PerspectiveCamera(24, W / H, 10, 3000); cam.position.set(0, 200, 760); cam.lookAt(0, 46, 0); cam.updateMatrixWorld()
+    const mo = [['Có sẵn từ đầu ván', 'Đạn hạt tròn'], ['Sau 1 lượt hạ', 'Cặp đạn song song'], ['Sau 2 lượt hạ', 'Tia sét, nảy sang đối thủ đứng gần'], ['Sau 3 lượt hạ', 'Cầu lửa sao, nổ lan']]
+    let the = ''
+    for (let i = 0; i < 4; i++) {
+      const x = (i - 1.5) * 152, c = DOI[i].mau
+      const be = new THREE.Mesh(new THREE.CylinderGeometry(56, 62, 10, 48), vl({ color: pha(c, '#1c2f37', 0.6), emissive: c, emissiveIntensity: 0.14 })); be.position.set(x, 5, 0); scene.add(bong(be))
+      const s = sung(i + 1, i, false); s.scale.setScalar(1.7); s.position.set(x - 30, 70, 0); s.rotation.set(0, 0.5, 0.12); scene.add(s)
+      const tru = new THREE.Mesh(new THREE.CylinderGeometry(3, 5, 50, 12), vl({ color: '#55656f' })); tru.position.set(x - 16, 34, 0); scene.add(bong(tru))
+      dan(scene, x - 44, 84, x + 46, 84, i === 2 ? 1 : 0.8, i, i + 1)
+      scene.children.filter((o) => o.isPointLight && Math.abs(o.position.x - x) < 80 && o.position.z > 60).forEach((o) => { o.intensity *= 0.35 })
+      const [sx, sy] = chieu(cam, W, H, x, -2, 100)
+      the += `<div class="the" style="left:${sx}px;top:${sy}px;--doi:${c}"><span class="ky">${i + 1}</span><h2>${SUNG_TEN[i]}</h2><p><b>Cấp ${i + 1}</b> · ${mo[i][0]}</p><p>${mo[i][1]}</p></div>`
+    }
+    r.render(scene, cam)
+    phu.innerHTML = `<div class="tieu"><h1>Bốn cấp súng · bốn loại đạn · bản 3D</h1><p>Súng kim loại bóng, lõi năng lượng phát sáng màu đội; đạn tự phát sáng và hắt sáng lên mặt sân, tường và bé ma ở gần.</p></div>${the}`
+  },
+  gv() {
+    phu.innerHTML = `<div class="gv"><div class="dau"><span class="vien"><i></i>Phòng chờ · Khối 12</span><span class="vien">Đã vào 8 em</span><span class="vien">Trò Sinh Tồn</span><button class="dong-p" type="button">Đóng phòng</button></div>
+      <div class="khung" id="khung"></div>
+      <div class="doi-ds">${[['Nguyễn Thị Hà', 'Đỗ Hoàng Nam', 'Trần Minh Anh'], ['Lê Gia Huy', 'Phạm Khánh Vy'], ['Ngô Gia Bảo', 'Vũ Ngọc Lan'], ['Bùi Đức Anh']].map((hs, i) => `<div class="doi" style="--doi:${DOI[i].mau}"><div class="h"><b>${DOI[i].ky}</b>${DOI[i].ten}<span>${hs.length} em · ${4 - hs.length} máy</span></div><div class="ds">${hs.map((t) => `<em>${t}</em>`).join('')}${'<em class="may">Máy</em>'.repeat(4 - hs.length)}</div></div>`).join('')}</div>
+      <div class="chan2">Các em đang chơi Sinh Tồn trong lúc chờ. Đội thiếu người có máy bù cho đủ 4; em vào sau tự thay máy.<button class="bat" type="button">Bắt đầu live</button></div></div>`
+    const khung = document.getElementById('khung'), kw = khung.clientWidth, kh = khung.clientHeight
+    const tatCa = [...CANH.map((n) => ({ ...n, toi: false, ten: n.ten === 'Hà (em)' ? 'Hà' : n.ten })),
+      { doi: 0, x: 196, y: 256, goc: 20, ten: 'Minh Anh' }, { doi: 1, x: 1404, y: 430, goc: 170, ten: 'Vy' }, { doi: 1, x: 1250, y: 440, goc: 200, may: true, ten: 'Máy', mau: 60 },
+      { doi: 2, x: 196, y: 780, goc: -20, ten: 'Lan' }, { doi: 2, x: 610, y: 830, goc: -10, may: true, ten: 'Máy', mau: 80 }, { doi: 2, x: 350, y: 640, goc: -30, may: true, ten: 'Máy', mau: 46 },
+      { doi: 3, x: 1400, y: 700, goc: 190, may: true, ten: 'Máy' }, { doi: 3, x: 1180, y: 880, goc: 200, may: true, ten: 'Máy' }, { doi: 3, x: 960, y: 720, goc: 230, may: true, ten: 'Máy', mau: 30 }]
+    const { r, scene } = taoCanh(khung, kw, kh); taoSan(scene); den(scene, 800, 500, 1100); datNguoi(scene, tatCa)
+    const cam = mayQuay(kw, kh, 800, 540, 1560, 1250, 30); r.render(scene, cam)
+    khung.insertAdjacentHTML('beforeend', `<div style="position:absolute;inset:0">${nhanTen(cam, kw, kh, tatCa)}${bangDiem()}</div>`)
+  },
+}
+await document.fonts.ready
+;(MAN_VE[MAN] || MAN_VE.tran)()
+document.body.dataset.xong = '1'
+</script>
+</body>
+</html>
