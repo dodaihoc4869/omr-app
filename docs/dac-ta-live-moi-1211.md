@@ -96,3 +96,8 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 5. **Máy thầy:** cụm Học | Bảng · Lớp · Tin nhắn ở thanh đáy (lên thanh trên khi bảng đua hiện); cột tin nhắn cao 1/3. Trong buổi live bảng đua không có nút «Đóng» và viên «Live».
 6. **Máy em:** «Nhắn cả lớp» và «Bốn đội» nằm trong khay của thanh vàng (sự kiện cửa sổ `ddh-lk`); cửa nhắn tin cao 1/3 sát mép phải, tự đóng khi em vào làm câu. Danh sách bốn đội hiện ĐỦ tên, không cắt «…».
 7. **Chưa thử:** lớp thật nhiều máy, tiếng thật qua SFU, iPhone thật.
+8. **Bảng có trang riêng, giữ nét suốt buổi (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»):** chế độ Bảng viết vào trang `bl` của bộ máy bút, tách khỏi nét của từng câu. App giữ bản sao nét theo mã buổi (`thay-noi.ts` `giuBang`) và trả lại khi tờ mới xin (`bang-xin` → `live-bang-nhap`) — bảng trắng ⇄ bài, đổi bài đều không mất. Tải lại trang thì mất bản sao (phòng vẫn còn sổ nét cho máy em).
+9. **«Học» khi chưa có bài:** mở bảng chọn; chọn hoạt động (đầu giờ / chữa câu / ôn tập) ⇒ tấm hoạt động nổi TRÊN tờ; Esc đóng tấm ⇒ về bảng chọn.
+10. **Mic của em (bản vẽ 05 + 12):** khay thanh vàng máy em có «Giơ tay» và «Mic của em» (tắt sẵn); ở bảng danh sách có nút giơ tay + tấm «Thầy mời em nói». Máy thầy: thẻ góc dưới-trái «N em giơ tay · Mời nói · Hạ hết tay», em đang nói có «Tắt mic em». Dùng nguyên luật đàm thoại đợt 2 của phòng (mỗi lúc một em nói, cả lớp nghe); cờ `GIAO_DIEN_DOT_2` của buổi trên lớp vẫn tắt.
+11. **Bong bóng tin mới máy em:** gọn ở góc trên-phải (trong phần bảng), tối đa 30% bề ngang.
+

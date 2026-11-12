@@ -459,6 +459,7 @@ export const JS_LIVE_TO_CHIEU = `
     var m = e.data, truoc;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
+    if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl' && m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); return; }
     if (m.lenh !== 'live-tt') return;
     truoc = LV.tt; LV.tt = m.tt || null;
     lvCheBang();
@@ -476,6 +477,10 @@ export const JS_LIVE_TO_CHIEU = `
     if (!trang && !(LV.tt && LV.tt.khoi)) return;
     b.classList.add('mc-lk');
     cb = trang || !!(LV.tt && LV.tt.cheBang);
+    // BẢNG CÓ TRANG RIÊNG (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang bl của bộ máy bút, tách khỏi nét của từng câu;
+    // app giữ bản sao suốt buổi và trả lại khi tờ mới xin (đổi bài, bảng trắng ⇄ bài) — lệnh live-bang-nhap.
+    if (window.__mcBut && window.__mcBut.rieng) window.__mcBut.rieng(cb ? 'bl' : '');
+    if (cb && window.__mcBut && !LV.bangXin) { LV.bangXin = 1; setTimeout(function () { lvGui('bang-xin'); }, 80); }
     if (b.classList.contains('mc-che-bang') === cb) return;
     b.classList.toggle('mc-che-bang', cb);
     try { window.dispatchEvent(new Event('resize')); } catch (e) {}

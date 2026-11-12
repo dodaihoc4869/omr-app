@@ -68,6 +68,14 @@ export default function LopNoiEm() {
     return () => window.removeEventListener('ddh-lk', f)
   }, [])
   useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lk-tin', { detail: chat.moi })) }, [chat.moi])
+  // Mic của em ở bảng danh sách (màn live nằm dưới lớp này): trạng thái do LopLive báo (`ddh-lk-mic`), lệnh gửi lại bằng `ddh-lk`.
+  const [mic, setMic] = useState<{ tay: boolean; hang: number | null; moi: boolean; mic: '' | 'xin' | 'mo' }>({ tay: false, hang: null, moi: false, mic: '' })
+  useEffect(() => {
+    const f = (e: Event) => { const d = (e as CustomEvent<typeof mic>).detail; if (d) setMic(d) }
+    window.addEventListener('ddh-lk-mic', f)
+    return () => window.removeEventListener('ddh-lk-mic', f)
+  }, [])
+  const lenhLk = (d: string): void => { window.dispatchEvent(new CustomEvent('ddh-lk', { detail: d })) }
   useEffect(() => { if (chatMo) chat.danhDauDoc() }, [chatMo, chat.ds.length]) // eslint-disable-line react-hooks/exhaustive-deps
   if (s.xong && s.toi) return <div className="lke xong" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}><Suspense fallback={null}><ManVinhDanh ds={s.ds} kj={s.kj} toi={s.toi} onDong={dongKhoi} /></Suspense></div>
   if (dangVao) return <div className="lke cho dang-vao" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }} role="status"><p><i aria-hidden="true" />Đang vào phòng live…</p></div>
@@ -81,9 +89,19 @@ export default function LopNoiEm() {
         {!cho && (sanh || !bonDoi) ? (
           <>
             {chatMo ? <CuaChatEm chat={chat} toiSbd={s.toi.sbd} onDong={() => setChatMo(false)} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
+            {sanh && (mic.moi || mic.mic) ? (
+              <div className="lke-moi" role="dialog" aria-label="Mic của em">
+                {mic.mic === 'mo' ? <><p><b>Mic của em đang bật</b>Thầy và cả lớp đang nghe em.</p><button type="button" onClick={() => lenhLk('mic-tat')}>Tắt mic</button></>
+                  : mic.mic === 'xin' ? <p><b>Đang bật mic…</b>Máy hỏi quyền thì em bấm Cho phép.</p>
+                    : <><p><b>Thầy mời em nói</b>Bật mic để thầy và cả lớp nghe em.</p><button type="button" className="chinh" onClick={() => lenhLk('mic-bat')}>Bật mic và nói</button><button type="button" onClick={() => lenhLk('de-sau')}>Để sau</button></>}
+              </div>
+            ) : null}
             {hienMep ? (
               <div className="lke-mep" role="group" aria-label="Live theo khối">
                 <NutChatEm moi={chat.moi} onMo={() => setChatMo((c) => !c)} />
+                <button type="button" className={`lke-doi lke-tay${mic.tay ? ' gio' : ''}`} aria-pressed={mic.tay} disabled={mic.moi || mic.mic !== ''} aria-label={mic.tay ? `Đang giơ tay${mic.hang ? `, thứ ${mic.hang} trong hàng` : ''}. Chạm để hạ tay` : 'Giơ tay xin nói'} title={mic.tay ? 'Đang giơ tay — chạm để hạ' : 'Giơ tay xin nói'} onClick={() => lenhLk('tay')}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5a1.5 1.5 0 0 1 3 0V11m0-5a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a5 5 0 0 1-4.3-2.5L4.5 14a1.4 1.4 0 0 1 2.3-1.6L8 14" /></svg>
+                </button>
                 <button type="button" className="lke-doi" aria-label="Bốn đội" title="Bốn đội" onClick={() => { guiTho({ t: 'lop-xin' }); setBonDoi('xem') }}>
                   <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-5 1 2 2 2 2 2 0-3 0-5 1-8z" /></svg>
                 </button>

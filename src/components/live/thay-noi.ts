@@ -208,6 +208,19 @@ function guiGiay(lai = false): void {
   try { g = giayCuoi ? JSON.parse(giayCuoi) : null } catch { g = null }
   lt.dat({ giay: g })
 }
+// BẢNG CỦA BUỔI LIVE THEO KHỐI (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang riêng `bl` của tờ; app giữ bản sao nét
+// suốt buổi (theo mã buổi) và trả lại cho tờ MỚI khi tờ xin (`bang-xin`) — đổi bài, bảng trắng ⇄ bài đều không mất nét. `bangSan` = tờ hiện tại đã xin xong
+// (trước đó trang `bl` của tờ mới còn rỗng — không được ghi đè bản đang giữ).
+const TRANG_BANG = 'bl'
+let bangLuu: { buoi: string; goi: { v: 1; tiLe: number; net: NetBut[] } } | null = null, bangSan = false
+/** `ca` = sự kiện mang CẢ trang (tờ vừa mở trang / gửi ảnh trạng thái): trang rỗng lúc đó là tờ MỚI chưa nhận lại nét (khung tờ dùng lại nên không phân
+ *  biệt được tờ cũ / mới) ⇒ không ghi đè bản đang giữ. Thầy tự xoá hết thì đi bằng sự kiện xoá nét ⇒ vẫn ghi. */
+function giuBang(ca = false): void {
+  const b = view?.buoiId ?? ''
+  if (!bangSan || !b || guong.khoa !== TRANG_BANG) return
+  if (ca && !guong.net.length && bangLuu?.buoi === b && bangLuu.goi.net.length) return
+  bangLuu = { buoi: b, goi: { v: 1, tiLe: guong.tiLe, net: guong.net.slice() } }
+}
 function guiTo(tin: Record<string, unknown>): void { try { to?.postMessage({ nguon: 'bpu-bang', ...tin }, '*') } catch { /* tờ đã đóng */ } }
 let ttCu = '', coEmNoi = false
 // XEM LẠI LIVE (11/11): máy ghi là mảnh nạp lười riêng, chỉ tải khi máy này đang giữ live; tự chạy khi live bật, tự dừng khi live tắt. Lỗi ghi không chặn live.
@@ -367,9 +380,10 @@ const vungCua = (v: unknown) => (v && typeof v === 'object' ? (v as { giay?: num
 export function nhanTinTo(d: unknown, nguon: Window | null): void {
   const m = (d ?? {}) as TinTo
   nghe()
-  if (nguon && nguon !== to) { to = nguon; ttCu = '' }
+  if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false }
   switch (m.viec) {
-    case 'chao': bao(); break
+    case 'chao': bangSan = false; bao(); break
+    case 'bang-xin': bangSan = true; if (bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length) guiTo({ lenh: 'live-bang-nhap', goi: bangLuu.goi }); else giuBang(true); break
     case 'bam': bam(); break
     case 'the-dong': if (the) { the = null; lt?.thaMic(); bao() } break
     case 'chon-loa': if (the?.loa && typeof m.id === 'string') { the = { ...the, loa: { ...the.loa, chon: m.id, thu: undefined } }; bao(); void lt?.datLoa(m.id).then(() => napLoa()) } break
@@ -401,6 +415,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'anh': {
       guong.khoa = String(m.trang ?? ''); guong.tiLe = Number(m.tiLe) || 16 / 9; guong.net = Array.isArray(m.net) ? (m.net as NetBut[]) : []
       maCua.set(guong.khoa, maTrang(guong.khoa, vungCua(m.vung), m.giayToi === true))
+      giuBang(true)
       lt?.guiAnh(anh())
       break
     }
@@ -419,6 +434,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
         maCua.set(sk.trang, maTrang(sk.trang, vungCua(m.vung), m.giayToi === true))
       }
       if (sk.loai !== 'tro') loi.apSuKien(guong.net, sk)
+      if (sk.loai !== 'tro' && sk.loai !== 'them-diem') giuBang(sk.loai === 'trang')
       ghiMoc?.(sk) // Xem lại Live: mốc giờ bắt đầu nét (cùng đồng hồ với khúc tiếng)
       lt?.nhanSuKienBut(sk.loai === 'trang' ? { ...sk, trang: ma(sk.trang) } : sk)
       break
@@ -449,5 +465,5 @@ export function bamTuBang(): boolean {
 export function _datLaiLiveThay(): void {
   clearTimeout(henHuy); clearInterval(henMuc); henMuc = undefined
   lt?.huy(); lt = null; to = null; ttLt = null; view = null; the = null; dangBat = false; ttCu = ''; ghiNap = false; ghiMoc = null; nhacGhiDen = 0
-  guong.khoa = ''; guong.net = []; maCua.clear(); lucRoi.clear(); lucTay.clear(); micLoiThay = null; clearTimeout(henMicLoi); giayCuoi = giayDaGui = ''; liveTruoc = false; coEmNoi = false; loiMic = ''; demMuc = 0
+  guong.khoa = ''; guong.net = []; bangLuu = null; bangSan = false; maCua.clear(); lucRoi.clear(); lucTay.clear(); micLoiThay = null; clearTimeout(henMicLoi); giayCuoi = giayDaGui = ''; liveTruoc = false; coEmNoi = false; loiMic = ''; demMuc = 0
 }

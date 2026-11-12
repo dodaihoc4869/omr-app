@@ -35,10 +35,14 @@ let tamAn = false
 let phienLive = false
 let cheLive: 'cho' | 'sanh' | 'hoc' | 'bang' = 'cho'
 let escLive: (() => boolean) | null = null
+
 let hdGoc: Root | null = null
 let hdKhung: HTMLDivElement | null = null
 let toGoc: Root | null = null
 let toKhung: HTMLDivElement | null = null
+/** Tờ đang mở là tờ BẢNG TRẮNG của live theo khối (chưa có bài) — đặt ở `ganTo`, nên đúng cả khi thầy đổi câu bằng đường khác (phím C trên bảng đua). */
+let toBangTrang = false
+export function laToBang(): boolean { return toBangTrang && !!toKhung }
 /** Bảng đang lui sau tấm buổi dạy (moHoatDong) — tờ của khối báo câu ⇒ bảng hiện lại. */
 let anViHd = false
 /** Bước Điểm danh (app thầy) muốn biết khi bảng đóng. */
@@ -280,6 +284,7 @@ export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise
   if (!hdKhung) { hdKhung = document.createElement('div'); hdKhung.setAttribute('data-bpu-hd', ''); document.body.appendChild(hdKhung); hdGoc = createRoot(hdKhung) }
   ngheEsc()
   hdGoc!.render(<Tam key={hd} hd={hd} coBang={!!khung} onDong={dongHoatDong} />)
+  try { window.dispatchEvent(new CustomEvent('bpu-hd', { detail: true })) } catch { /* test */ }
   if (khung && !bangAn()) { anViHd = true; anBang() }
 }
 function moHoatDongTuBang(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): void { void moHoatDong(hd) }
@@ -296,7 +301,9 @@ export async function ketThucBuoiHoc(buoiId: string): Promise<string> {
   return ''
 }
 export function dongHoatDong(): void {
+  const coHd = !!hdKhung
   hdGoc?.unmount(); hdGoc = null; hdKhung?.remove(); hdKhung = null
+  if (coHd) { try { window.dispatchEvent(new CustomEvent('bpu-hd', { detail: false })) } catch { /* test */ } }
   if (anViHd) { anViHd = false; hienBang() }
 }
 
@@ -306,7 +313,8 @@ export const coToChieu = (): boolean => !!toKhung || !!hdKhung
 function dongTo(): void { toGoc?.unmount(); toGoc = null; toKhung?.remove(); toKhung = null; nguonTo = null; if (hien) veBang() }
 /** Dựng tờ từ câu đã chọn (câu bấm đứng đầu) rồi chiếu. Trả lời báo lỗi (rỗng = đã chiếu). */
 /** Gắn tờ chiếu (khung trong app) dưới bảng. */
-function ganTo(html: string, KhungXemPhieu: typeof import('../KhungXemPhieu').default): string {
+function ganTo(html: string, KhungXemPhieu: typeof import('../KhungXemPhieu').default, bangTrang = false): string {
+  toBangTrang = bangTrang
   if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
   // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
   // Che TRƯỚC khi khung tờ gắn vào trang ⇒ khung đầu tiên của tờ (cả dải xám 48 px trên cùng) đã ẩn.
@@ -323,7 +331,7 @@ export async function chieuBangTrang(): Promise<string> {
     const cau = { phan: 'I', id: QID_BANG, maDe: '', chuyenDe: '', dang: '', sao: 1, mucDo: '', text: '', luaChon: [], dapAn: '', chot: '', lyDo: [] }
     const html = taoHtmlMayChieu([{ sbd: '', hoTen: '', qid: QID_BANG, soCau: 1, sao: 1, bacUoc: 1, cau }] as never, { tenBuoi: 'Live · Bảng', nutAiSai: false } as never)
     // Cờ trên <body>: tờ này LUÔN là bảng kín màn (không giấy đề, không nút đợt / lên bảng) — CSS + JS ở live-to-chieu.ts.
-    return ganTo(html.replace('<body', '<body data-bang-trang=""'), KhungXemPhieu)
+    return ganTo(html.replace('<body', '<body data-bang-trang=""'), KhungXemPhieu, true)
   } catch (e) { return e instanceof Error ? e.message : 'Chưa dựng được bảng.' }
 }
 export async function chieuCau(ds: CauDayHoc[], moi = false): Promise<string> {

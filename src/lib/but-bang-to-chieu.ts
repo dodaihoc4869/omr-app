@@ -587,7 +587,8 @@ ${JS_LOI_BUT}
   function lamLai() { ketNet(false); if (so.lamLai()) { veLai(); capNut(); } }
   function xoaBut() { ketNet(false); if (so.xoaHet()) { veLai(); capNut(); } }
 ` + /* Vào đợt: nét của đợt cũ cất lại, bảng hiện nét của đợt này (đợt chưa viết ⇒ bảng sạch). */ `
-  function butTrang() { ketNet(false); XT = null; CHO = null; KC = null; dungCuon(); clearTimeout(hPhatGiay); doOGiay(); so.doiTrang(String(chiSo())); cuon = CUON[so.trang()] || 0; CY = KH ? Math.round(cuon * KH.H * dpr) : 0; veLai(); capNut(); henThanh(); so.cuon(cuon); }
+  var RIENG = '';
+  function butTrang() { ketNet(false); XT = null; CHO = null; KC = null; dungCuon(); clearTimeout(hPhatGiay); doOGiay(); so.doiTrang(RIENG || String(chiSo())); cuon = CUON[so.trang()] || 0; CY = KH ? Math.round(cuon * KH.H * dpr) : 0; veLai(); capNut(); henThanh(); so.cuon(cuon); }
   butCu.addEventListener('click', function (e) {
     var b = e.target.closest && e.target.closest('button'); if (!b || b.disabled) return;
     if (b.getAttribute('data-m')) { S.mau = b.getAttribute('data-m'); S.tay = false; }
@@ -621,6 +622,7 @@ ${JS_LOI_BUT}
     nhap: function (goi) { if (!KH) coCanvas(); ketNet(false); var n = so.nhap(goi); veLai(); capNut(); return n; },
     nghe: ngheBut, trang: so.trang, hoanTac: hoanTac, lamLai: lamLai, xoaHet: xoaBut,
     bat: function (b) { if (!!b !== S.but) batBut(); },
+    rieng: function (k) { k = k || ''; if (k !== RIENG) { RIENG = k; butTrang(); } },
 ` + /* cho việc live: bộ máy dựng nét, bảng màu / cỡ, và ô giấy đề / ô bảng đen của đợt đang chiếu tính theo vùng viết [x0, y0, x1, y1] (0..1) */ `
     loi: LoiBut, mau: MAU_BUT, co: CO_BUT,
 ` + /* ô đo bút: doBut(true / false) bật / tắt, trả về số đo hiện có · veNgay(true / false) bật / tắt chế độ vẽ ngay khi mẫu tới (thử nghiệm, mặc định tắt) */ `

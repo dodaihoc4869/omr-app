@@ -30,10 +30,6 @@ export function phienCua(buoiId: string): PhienKhoi | null { const p = phien ?? 
 
 // ── Kho nhỏ: bản xem mới nhất của bảng + kênh lớp ──
 let view: ViewBang | null = null
-/** Tờ đang mở là tờ BẢNG TRẮNG (chưa chọn bài) ⇒ sang «Học» thì mở chọn bài. */
-let toBangTrang = false
-export const laToBang = (): boolean => toBangTrang
-export function datToBang(v: boolean): void { toBangTrang = v }
 /** Thầy vừa bấm «Mở phòng chờ»: khối đang mở ⇒ lớp nổi hiện NGAY («Đang mở phòng chờ…»), không chờ bảng nối phòng. Phòng trả bản xem có cờ khối / 15 giây ⇒ thôi. */
 let dangMo: number | null = null
 let henMo: ReturnType<typeof setTimeout> | undefined
@@ -91,13 +87,15 @@ function soatNgoai(): void {
   if (!henNgoai) henNgoai = setInterval(() => { if (gg?.phienDangCo()?.tamAn) gangNutKt(buoiId); else goNgoai() }, 600)
 }
 let nen: HTMLDivElement | null = null
-function go(): void { goc?.unmount(); khung?.remove(); nen?.remove(); goc = null; khung = null; nen = null; toBangTrang = false; document.documentElement.removeAttribute('data-live-khoi'); goNgoai() }
+function go(): void { goc?.unmount(); khung?.remove(); nen?.remove(); goc = null; khung = null; nen = null; document.documentElement.removeAttribute('data-live-khoi'); goNgoai() }
 function datDangMo(k: number | null): void { clearTimeout(henMo); dangMo = k; if (k != null) henMo = setTimeout(() => { datDangMo(null); if (!view?.live?.khoi) go() }, 15_000); phatDoi() }
 const tai = new Map<LoaiTinLop, Set<(t: TinLop) => void>>()
 export const kenh: KenhLop = {
   gui: (k, x) => layPhong()?.gui({ t: 'lop', k, x }),
   nghe: (k, f) => { let s = tai.get(k); if (!s) { s = new Set(); tai.set(k, s) } s.add(f); return () => { s.delete(f) } },
 }
+/** Đàm thoại hai chiều (giơ tay ⇒ thầy mời ⇒ em bật mic): lệnh của thầy tới phòng — luật có sẵn ở phong-live.ts (`liveMoi`, `liveHaTay`, `liveThu`). */
+export const lenhMic = (t: 'live-moi' | 'live-ha-tay' | 'live-thu-mic', sbd?: string): void => layPhong()?.gui(sbd ? { t, sbd } : { t })
 export const datKhoi = (k: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }): void => layPhong()?.gui({ t: 'live-dat', khoi: k })
 // TỰ BẬT TIẾNG (thầy 12/11): buổi đã «Bắt đầu live» (`gd = dang`) mà phòng chưa ghi nhận live ⇒ bật qua phần live máy thầy (thay-noi.ts), thử lại mỗi
 // 2 giây tới khi phòng báo `bat` (tối đa 8 lần). Đã bật được MỘT lần trong buổi ⇒ thôi tự bật (thầy tự «Kết thúc live» / «Tạm dừng» trên tờ được tôn trọng).

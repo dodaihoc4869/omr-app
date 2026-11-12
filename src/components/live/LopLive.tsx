@@ -395,6 +395,16 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   }, [canKhoa])
 
   const tinLk = useTinLk()
+  // LIVE THEO KHỐI — lúc em ở bảng danh sách (lớp nổi che màn live): lớp nổi vẽ nút Giơ tay / tấm mời / mic và báo sang đây bằng sự kiện `ddh-lk`;
+  // đây báo lại trạng thái bằng `ddh-lk-mic`. Chạy NGAY trong cú chạm của em (trình duyệt chỉ cho mở mic khi có thao tác).
+  const coKhoi = !!view.khoi, tayNay = !!tt?.tay, hangNay = tt?.hangTay ?? null, micNay = tt?.mic === 'dang-phat' || tt?.mic === 'dang-noi' ? 'mo' : tt?.mic === 'xin-quyen' ? 'xin' : ''
+  useEffect(() => {
+    if (!coKhoi) return
+    const f = (e: Event) => { const d = (e as CustomEvent<string>).detail; if (d === 'tay') doiTay(); else if (d === 'mic-bat') batMicMoi(); else if (d === 'mic-tat') tatMic(); else if (d === 'de-sau') deSau() }
+    window.addEventListener('ddh-lk', f)
+    return () => window.removeEventListener('ddh-lk', f)
+  }, [coKhoi, doiTay, batMicMoi, tatMic, deSau])
+  useEffect(() => { if (coKhoi) window.dispatchEvent(new CustomEvent('ddh-lk-mic', { detail: { tay: tayNay, hang: hangNay, moi: duocMoi, mic: micNay } })) }, [coKhoi, tayNay, hangNay, duocMoi, micNay])
   if (!tt || che === 'an') return null
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
   const coTieng = tt.tieng !== 'chua-cau-hinh'
@@ -428,7 +438,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       {/* tiếng thầy ĐÃ tới máy (giải mã > −50 dBFS) mà em chưa chạm từ lúc vào live: một chạm = play() + AudioContext.resume() */}
       {tt.chamNghe && !tt.nghi ? <button type="button" className="lv-vua" style={{ minHeight: 64, fontSize: 18, width: '100%' }} onClick={() => { void le.current?.moKhoaTieng() }}><BtLoa />Chạm để nghe<b>Tiếng thầy đã tới máy</b></button> : null}
       <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}{nghe && !tt.nghi ? <TreTieng le={le} /> : null}</div>
-      {GIAO_DIEN_DOT_2 ? (
+      {GIAO_DIEN_DOT_2 || view.khoi ? (
         // Nút chính màu đội: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» (ảnh 28)
         <button type="button" className={`lv-tay${tt.tay ? ' gio' : ''}`} aria-pressed={tt.tay} disabled={!tayDuoc || matMang} onClick={doiTay}>
           <BtTay />{tt.tay ? <span>Đang giơ tay<small>{tt.hangTay ? `Em thứ ${tt.hangTay} trong hàng · ` : ''}chạm để hạ tay</small></span> : <span>Giơ tay</span>}
@@ -445,6 +455,12 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
         <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic lại'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
           <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : 'Đang tắt'}</b></button>
       ) : null}
+      {/* LIVE THEO KHỐI (thầy 12/11 «cài mic của hs vào», bản vẽ 12): «Mic của em» LUÔN có trong khay — tắt sẵn; giơ tay, thầy mời thì chạm để nói. */}
+      {view.khoi && !micBang ? (
+        <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} disabled={!micMo && tt.mic !== 'xin-quyen' && !duocMoi} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMicMoi}>
+          <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : duocMoi ? 'Chạm để nói' : 'Đang tắt'}</b></button>
+      ) : null}
+      {view.khoi && !micBang && !micMo && !duocMoi ? <p className="lv-ghi">Muốn nói: bấm Giơ tay, thầy mời thì mic của em mới bật.</p> : null}
       {micBang && micMo ? <p className="lv-ghi">Thầy và cả lớp đang nghe em.{view.ghi ? ' Đang ghi để lớp xem lại.' : ''}</p> : null}
       {khoaChuaGui ? <p className="lv-ghi">Thầy đã gọi bạn lên bảng — câu này đã khoá, em chưa gửi nên để trống.</p> : null}
       {/* LIVE THEO KHỐI (thầy 12/11 «ẩn cả cái chat với ngọn lửa vào thanh màu vàng»): nhắn cả lớp + bốn đội nằm trong khay này; lớp nổi (live-khoi) nghe sự kiện. */}

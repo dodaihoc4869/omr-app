@@ -6,8 +6,8 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { chieuBangTrang, chieuCau, coToChieu, datEscLive, ketThucBuoiHoc, moHoatDong } from '../bpu/gan-gv'
-import { batTiengLai, dangKy, datKhoi, datToBang, kenh, laToBang, layDangMo, layView, phienCua } from './thay-khoi'
+import { chieuBangTrang, chieuCau, coToChieu, datEscLive, dongHoatDong, ketThucBuoiHoc, laToBang, moHoatDong } from '../bpu/gan-gv'
+import { batTiengLai, dangKy, datKhoi, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
@@ -27,13 +27,20 @@ export default function LopNoiThay() {
   const [sanhTay, setSanh] = useState(false)
   const [loi, setLoi] = useState('')
   const dang = k?.gd === 'dang'
+  // Tấm hoạt động (đầu giờ / chữa câu / ôn tập) của «Học» đang mở. Đóng tấm mà buổi chưa có bài nào đang chiếu ⇒ quay lại bảng chọn (không để màn trống).
+  const [hdMo, setHdMo] = useState(false)
+  useEffect(() => {
+    const f = (e: Event) => { const mo = (e as CustomEvent<boolean>).detail === true; setHdMo(mo); if (!mo && layView()?.live?.khoi?.che === 'hoc' && (!coToChieu() || laToBang())) setChon(true) }
+    window.addEventListener('bpu-hd', f)
+    return () => window.removeEventListener('bpu-hd', f)
+  }, [])
   // Bảng Bình Phản Ứng đang HIỆN (màn đua của «Học») ⇒ cụm nút dời lên khoảng trống thanh trên của bảng; đang ở tờ ⇒ nằm trên thanh đáy của tờ.
   const [bangHien, setBangHien] = useState(false)
   useEffect(() => { const f = (e: Event) => setBangHien((e as CustomEvent<boolean>).detail !== true); window.addEventListener('bpu-an-hien', f); return () => window.removeEventListener('bpu-an-hien', f) }, [])
   const sanh = dang && (sanhTay || k.che === 'sanh')
   const [k1, setK1] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
   useEffect(() => { const f = () => setK1(Math.min(window.innerWidth / 1920, window.innerHeight / 1080)); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f) }, [])
-  const dungBangTrang = (): void => { datToBang(true); void chieuBangTrang().then((l) => { if (l) { datToBang(false); setLoi(l); setSanh(true) } }) }
+  const dungBangTrang = (): void => { void chieuBangTrang().then((l) => { if (l) { setLoi(l); setSanh(true) } }) }
   // Vào lại giữa buổi (tải lại trang, Esc rồi quay lại) mà chưa có tờ: Học ⇒ mở chọn bài, Bảng ⇒ dựng lại bảng trắng. Không để lộ màn trống.
   const che = dang ? k.che : null
   useEffect(() => {
@@ -42,7 +49,7 @@ export default function LopNoiThay() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [che])
   /** Bài đã chiếu / hoạt động đã mở ⇒ BÂY GIỜ mới báo phòng sang «Học» (máy em ở nguyên màn đang xem tới lúc có bài). */
-  const sangHoc = (): void => { datToBang(false); setChon(false); setSanh(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
+  const sangHoc = (): void => { setChon(false); setSanh(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
   const doiChe = (c: 'hoc' | 'bang'): void => {
     if (!k) return
     setLoi('')
@@ -76,6 +83,7 @@ export default function LopNoiThay() {
     if (!dang) return false
     if (chat) { setChat(false); return true }
     if (chon) { setChon(false); return true }
+    if (hdMo) { dongHoatDong(); return true }
     if (sanh) return false
     setSanh(true)
     return true
@@ -108,12 +116,41 @@ export default function LopNoiThay() {
           <Suspense fallback={null}>
             <ChonCauBpu live buoiId={v.buoiId} lop={v.lop} buocDau="hd" onDong={() => setChon(false)}
               onChieu={async (ds) => { const l = await chieuCau(ds); if (!l) sangHoc(); return l }}
-              onHoatDong={(hd) => { sangHoc(); void moHoatDong(hd) }}
+              onHoatDong={(hd) => { setChon(false); setSanh(false); if (k.che !== 'hoc') datKhoi({ ...k, che: 'hoc' }); void moHoatDong(hd) }}
               onKetThuc={() => ketThucBuoiHoc(v.buoiId)} />
           </Suspense>
         </div></div>
       ) : null}
+      <HangTay v={v} />
       {chat ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
+    </div>
+  )
+}
+
+/** HÀNG GIƠ TAY + MIC CỦA EM (thầy 12/11 «cài mic của hs vào», bản vẽ 05): thẻ nhỏ góc dưới-trái, chỉ hiện khi có em giơ tay / được mời / đang nói.
+ *  Mỗi lúc MỘT em nói (luật phòng); em nói thì thầy và cả lớp cùng nghe. */
+function HangTay({ v }: { v: ViewBang }) {
+  const l = v.live
+  const [mo, setMo] = useState(true)
+  if (!l?.bat) return null
+  const ten = (sbd: string): string => v.ds.find((e) => e.sbd === sbd)?.ten ?? sbd
+  const noi = l.noi[0] ?? null, moi = !noi && l.moi ? l.moi.sbd : '', tay = l.tay
+  if (!noi && !moi && !tay.length) return null
+  return (
+    <div className="lkt-tay" role="group" aria-label="Mic của các em">
+      {noi ? <div className="lkt-tay-noi"><i aria-hidden="true" /><b>{noi.ten}</b><span>đang nói</span><button type="button" onClick={() => lenhMic('live-thu-mic', noi.sbd)}>Tắt mic em</button></div> : null}
+      {moi ? <div className="lkt-tay-noi cho"><i aria-hidden="true" /><b>{ten(moi)}</b><span>đã mời, chờ em bật mic</span><button type="button" onClick={() => lenhMic('live-thu-mic', moi)}>Thôi</button></div> : null}
+      {tay.length ? (
+        <>
+          <button type="button" className="lkt-tay-dau" aria-expanded={mo} onClick={() => setMo((m) => !m)}><b>{tay.length}</b> em giơ tay<span aria-hidden="true">{mo ? '▾' : '▸'}</span></button>
+          {mo ? (
+            <ul>
+              {tay.map((t, i) => <li key={t.sbd}><span>{i + 1}. {ten(t.sbd)}</span><button type="button" onClick={() => lenhMic('live-moi', t.sbd)}>Mời nói</button></li>)}
+              <li className="het"><button type="button" onClick={() => lenhMic('live-ha-tay')}>Hạ hết tay</button></li>
+            </ul>
+          ) : null}
+        </>
+      ) : null}
     </div>
   )
 }

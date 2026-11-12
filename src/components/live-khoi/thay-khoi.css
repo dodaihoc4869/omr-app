@@ -67,3 +67,25 @@ html[data-live-khoi] .lop-xem-phieu .khung-phieu-thanh, html[data-live-khoi] .lo
 
 /* Buổi live theo khối: bảng đua KHÔNG có nút «Đóng» (Esc lùi về sảnh, kết thúc ở sảnh / nút Kết thúc buổi) — thầy 12/11 «không hiện nút Đóng trơ trọi». */
 html[data-live-khoi] .bpu-bang .bb-dong { display: none; }
+
+/* Tấm hoạt động của «Học» (đầu giờ / chữa câu / ôn tập) phải nằm TRÊN tờ (bảng trắng đang mở có z 99999) — thầy 12/11 «chọn sang học mà không chọn được bài». */
+html[data-live-khoi] .thd { z-index: 100010; }
+
+/* Hàng giơ tay + mic của em: thẻ nhỏ góc dưới-trái, trên thanh đáy của tờ; nằm trên cả sảnh. */
+.lkt-tay { position: fixed; left: 14px; bottom: 66px; z-index: 6; display: grid; gap: 6px; width: min(300px, 44vw); padding: 8px; border-radius: 16px; background: var(--tr-chieu-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien), 0 14px 36px color-mix(in srgb, var(--tr-chieu-bang) 70%, transparent); color: var(--tr-chieu-giay); font-size: 14px; pointer-events: auto; }
+.lkt-tay button { min-height: 34px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--tr-hs); color: var(--tr-chu); font: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; }
+.lkt-tay-noi { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 8px; border-radius: 12px; background: color-mix(in srgb, var(--tr-dung) 18%, transparent); }
+.lkt-tay-noi.cho { background: var(--tr-chieu-mat-2); }
+.lkt-tay-noi i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--tr-dung); }
+.lkt-tay-noi.cho i { background: var(--tr-chu-y); }
+.lkt-tay-noi b { min-width: 0; overflow-wrap: anywhere; }
+.lkt-tay-noi span { flex: 1; min-width: 0; color: color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent); font-size: 12.5px; }
+.lkt-tay-noi button { background: var(--tr-chieu-mat-2); color: var(--tr-chieu-giay); box-shadow: inset 0 0 0 1.5px var(--tr-vien); }
+.lkt-tay .lkt-tay-dau { display: flex; align-items: center; gap: 6px; width: 100%; background: transparent; color: var(--tr-chieu-giay); font-weight: 700; padding: 0 8px; }
+.lkt-tay .lkt-tay-dau b { display: grid; place-items: center; min-width: 26px; height: 26px; border-radius: 99px; background: var(--tr-chu-y); color: var(--tr-chieu-bang); font-size: 13px; }
+.lkt-tay .lkt-tay-dau span { margin-left: auto; }
+.lkt-tay ul { display: grid; gap: 4px; max-height: 34vh; margin: 0; padding: 0; overflow-y: auto; list-style: none; }
+.lkt-tay li { display: flex; align-items: center; gap: 8px; padding: 2px 2px 2px 8px; border-radius: 10px; background: var(--tr-chieu-mat-2); }
+.lkt-tay li span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.lkt-tay li.het { background: transparent; justify-content: flex-end; padding: 0; }
+.lkt-tay li.het button { background: transparent; color: color-mix(in srgb, var(--tr-chieu-giay) 75%, transparent); font-weight: 700; }
