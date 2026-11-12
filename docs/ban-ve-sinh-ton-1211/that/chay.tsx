@@ -10,7 +10,7 @@ import type { KenhLop, NguoiLop, TinLop } from '../../../src/lib/live-khoi/kieu'
 import { chonMucTieu, docDong, satThuong, taoBanDo, taoToi, buocToi, nhanDon, dangChet, type NhanVat } from '../../../src/lib/live-khoi/sinh-ton-loi'
 
 const Q = new URLSearchParams(location.search)
-const xem = Q.get('xem') === '1', soBan = Math.max(0, Math.min(40, Number(Q.get('ban') ?? 3)))
+const xem = Q.get('xem') === '1', soBan = Math.max(0, Math.min(110, Number(Q.get('ban') ?? 3)))
 const TEN = ['Nguyễn Thị Hà', 'Đỗ Hoàng Nam', 'Lê Gia Huy', 'Ngô Gia Bảo', 'Bùi Đức Anh', 'Trần Minh Anh', 'Phạm Khánh Vy', 'Vũ Ngọc Lan']
 const ds: NguoiLop[] = Array.from({ length: soBan + 1 }, (_, i) => ({ sbd: `S${i}`, ten: TEN[i % TEN.length], doi: i % 4 }))
 const st = { ketThuc: false, live: { khoi: { k: 12, gd: 'cho', che: 'hoc' } }, ds: ds.map((e) => ({ ...e, vao: true, kj: 0 })), doiThuong: [0, 0, 0, 0] }

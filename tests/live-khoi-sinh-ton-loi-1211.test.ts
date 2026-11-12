@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   AN_YEN_MS, BAT_TU_MS, BK_NV, DAN_BAY_MS, HOI_CHO_MS, HOI_SINH_MS, LO_GAN, MAU_DAY, NHIP_BAN_MS, TAM_NHIN_X, TAM_NHIN_Y, TAM_XA, TOC_DO, VAN_CHOI_MS, VAN_MS, anVoi, buocToi, capBanDo, chanDuong, chonMucTieu, conLai, dangAn, dangChet,
-  dangNghi, diChuyen, docDong, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type NhanVat,
+  SO_CO_SAN, dangNghi, diChuyen, docDong, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type NhanVat,
 } from '../src/lib/live-khoi/sinh-ton-loi'
 
 /** Giây thứ 10 của một ván (đang chơi, vòng an toàn còn rộng). */
@@ -20,11 +20,68 @@ describe('bản đồ', () => {
     // Trại và giữa sân (hộp tiếp tế) không bị vật chặn đè.
     for (const p of [...bd.trai, { x: 800, y: 500 }]) expect(diChuyen(bd, p.x, p.y, 1, 0).x).toBe(p.x + 1)
   })
-  it('sĩ số lớn ⇒ sân lớn hơn, cùng mẫu', () => {
-    expect([capBanDo(16), capBanDo(24), capBanDo(25), capBanDo(60), capBanDo(61), capBanDo(100)]).toEqual([0, 0, 1, 1, 2, 2])
-    const to = taoBanDo(2)
-    expect([to.rong, to.cao, to.tuong.length]).toEqual([3200, 2000, bd.tuong.length])
-    expect(taoBanDo(7).cap).toBe(0)
+  // Thầy 13/11: «Tùy theo số lượng hs thì bản đồ được mở rộng ra hơn để chơi cho thú vị».
+  it('sĩ số lớn ⇒ sân mở rộng theo năm cỡ; sân lớn GHÉP thêm khu (thêm chỗ nấp), không chỉ phóng to', () => {
+    expect([16, 20, 21, 36, 37, 64, 65, 96, 97, 300].map(capBanDo)).toEqual([0, 0, 1, 1, 2, 2, 3, 3, 4, 4])
+    expect(SO_CO_SAN).toBe(5)
+    expect([0, 1, 2, 3, 4].map((c) => { const b = taoBanDo(c); return [b.cap, b.rong, b.cao] })).toEqual([[0, 1600, 1000], [1, 2400, 1500], [2, 3200, 2000], [3, 4800, 2000], [4, 4800, 3000]])
+    // Cỡ 1 = cùng một khu phóng 1,5 lần; cỡ 2–4 = ghép 4 · 6 · 9 khu, vật chặn giữ nguyên cỡ ⇒ số tường / thùng / bụi nhân theo số khu.
+    expect(taoBanDo(1).tuong.length).toBe(bd.tuong.length)
+    for (const [c, khu] of [[2, 4], [3, 6], [4, 9]] as const) {
+      const b = taoBanDo(c)
+      expect([b.tuong.length, b.thung.length, b.bui.length]).toEqual([bd.tuong.length * khu, bd.thung.length * khu, bd.bui.length * khu])
+      expect(b.tuong[0].w).toBe(bd.tuong[0].w)
+    }
+    for (const c of [7, -1, 1.5, Number.NaN]) expect(taoBanDo(c).cap).toBe(0)
+  })
+  it('mọi cỡ sân: đối xứng hai trục, trại ở bốn góc ngoài, trại + giữa sân không bị chặn, bốn trại và giữa sân thông nhau trên lưới tìm đường', () => {
+    for (let c = 0; c < SO_CO_SAN; c++) {
+      const b = taoBanDo(c)
+      const gan = (a: number, d: number) => Math.abs(a - d) < 1e-6
+      const guong = (ds: { x: number; y: number; w: number; h: number }[]) => ds.every((t) =>
+        ds.some((u) => gan(u.x, b.rong - t.x - t.w) && gan(u.y, t.y) && gan(u.w, t.w) && gan(u.h, t.h)) && ds.some((u) => gan(u.y, b.cao - t.y - t.h) && gan(u.x, t.x) && gan(u.w, t.w) && gan(u.h, t.h)))
+      expect(guong(b.tuong), `tường cỡ ${c}`).toBe(true); expect(guong(b.thung), `thùng cỡ ${c}`).toBe(true); expect(guong(b.bui), `bụi cỡ ${c}`).toBe(true)
+      // Không vật nào thò ra ngoài sân.
+      for (const v of [...b.chan, ...b.bui]) expect(v.x >= 0 && v.y >= 0 && v.x + v.w <= b.rong && v.y + v.h <= b.cao, `vật trong sân cỡ ${c}`).toBe(true)
+      const he = b.trai[0].x / 130
+      expect(b.trai).toEqual([{ x: 130 * he, y: 122 * he }, { x: b.rong - 130 * he, y: 122 * he }, { x: 130 * he, y: b.cao - 122 * he }, { x: b.rong - 130 * he, y: b.cao - 122 * he }])
+      const giua = { x: b.rong / 2, y: b.cao / 2 }
+      for (const p of [...b.trai, giua]) expect(diChuyen(b, p.x, p.y, 1, 0).x, `điểm trống cỡ ${c}`).toBe(p.x + 1)
+      // Loang trên lưới từ trại đội 0: phải tới ba trại kia và giữa sân (máy bù tìm được đường, không đội nào bị nhốt).
+      const O = 40 // ô lưới tìm đường của lõi
+      const o = (p: { x: number; y: number }) => Math.min(b.hang - 1, Math.floor(p.y / O)) * b.cot + Math.min(b.cot - 1, Math.floor(p.x / O))
+      const tham = new Uint8Array(b.cot * b.hang), hang: number[] = [o(b.trai[0])]
+      tham[hang[0]] = 1
+      while (hang.length) {
+        const k = hang.pop()!, i = k % b.cot, j = (k - i) / b.cot
+        for (const [di, dj] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+          const x = i + di, y = j + dj, m = y * b.cot + x
+          if (x < 0 || y < 0 || x >= b.cot || y >= b.hang || tham[m] || b.luoi[m]) continue
+          tham[m] = 1; hang.push(m)
+        }
+      }
+      for (const p of [...b.trai, giua]) expect(tham[o(p)], `thông đường cỡ ${c}`).toBe(1)
+      // Máy bù tìm được đường thật từ trại ra giữa sân.
+      expect(timDuong(b, b.trai[0].x, b.trai[0].y, giua.x, giua.y).length, `tìm đường cỡ ${c}`).toBeGreaterThan(0)
+    }
+  })
+  it('trại đã ngoài vòng an toàn (cuối ván) ⇒ hồi sinh ngay trong vòng, phía trại mình, không kẹt vật chặn — sân lớn không phải chạy bộ qua vùng mất máu', () => {
+    const cuoiVan = 1000 * VAN_MS + VAN_CHOI_MS - 5000
+    for (let c = 0; c < SO_CO_SAN; c++) {
+      const b = taoBanDo(c), v = vong(b, cuoiVan)
+      for (let doi = 0; doi < 4; doi++) for (const hat of [0, 0.3, 0.7]) {
+        const toi = taoToi(b, doi, cuoiVan, hat), trai = b.trai[doi]
+        expect(ngoaiVong(v, trai.x, trai.y), `trại ngoài vòng cỡ ${c}`).toBe(true)
+        expect(ngoaiVong(v, toi.x, toi.y), `hồi sinh trong vòng cỡ ${c} đội ${doi}`).toBe(false)
+        // Vẫn ở góc phần tư của trại mình.
+        expect(Math.sign(toi.x - b.rong / 2)).toBe(Math.sign(trai.x - b.rong / 2)); expect(Math.sign(toi.y - b.cao / 2)).toBe(Math.sign(trai.y - b.cao / 2))
+        // Không kẹt: nhích được ít nhất một hướng.
+        expect([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => { const p = diChuyen(b, toi.x, toi.y, dx * 6, dy * 6); return Math.hypot(p.x - toi.x, p.y - toi.y) > 5 }), `không kẹt cỡ ${c} đội ${doi}`).toBe(true)
+      }
+    }
+    // Đầu ván (vòng còn kín sân): vẫn hồi sinh đúng trại.
+    const dau = taoToi(bd, 0, T0, 0)
+    expect([dau.x, dau.y]).toEqual([130 + 66, 122])
   })
   it('ván 2 phút + 5 giây bảng kết quả; vòng an toàn co dần', () => {
     expect([VAN_CHOI_MS, VAN_MS]).toEqual([120_000, 125_000])

@@ -82,17 +82,21 @@ export const vanSo = (nay: number): number => Math.floor(nay / VAN_MS)
 export const dangNghi = (nay: number): boolean => ((nay % VAN_MS) + VAN_MS) % VAN_MS >= VAN_CHOI_MS
 export const conLai = (nay: number): number => Math.max(0, VAN_CHOI_MS - (((nay % VAN_MS) + VAN_MS) % VAN_MS))
 export const hopSo = (nay: number): number => Math.floor(nay / HOP_MS)
-/** Cỡ bản đồ theo số nhân vật trên sân: tới 24 ⇒ 0, tới 60 ⇒ 1, hơn ⇒ 2. */
-export const capBanDo = (soNhanVat: number): number => (soNhanVat <= 24 ? 0 : soNhanVat <= 60 ? 1 : 2)
+/** Cỡ bản đồ theo số nhân vật trên sân (em thật + máy bù, ít nhất 16) — thầy 13/11: «Tùy theo số lượng hs thì bản đồ được mở rộng ra hơn để chơi cho thú vị»:
+ * tới 20 ⇒ 0 · tới 36 ⇒ 1 · tới 64 ⇒ 2 · tới 96 ⇒ 3 · hơn ⇒ 4 (xem CO_SAN). Cỡ chỉ đổi ở ĐẦU VÁN. */
+export const capBanDo = (soNhanVat: number): number => (soNhanVat <= 20 ? 0 : soNhanVat <= 36 ? 1 : soNhanVat <= 64 ? 2 : soNhanVat <= 96 ? 3 : 4)
 const kep = (v: number, a: number, b: number): number => (v < a ? a : v > b ? b : v)
 
-// ── Bản đồ: một phần tư rồi lấy đối xứng hai trục ⇒ bốn đội công bằng. Cỡ lớn = cùng mẫu nhân hệ số. ──
+// ── Bản đồ: một phần tư rồi lấy đối xứng hai trục ⇒ một KHU 1600 × 1000, bốn đội công bằng. Sân lớn = phóng khu (cỡ 1) hoặc GHÉP nhiều khu cạnh nhau
+//    (cỡ 2–4: thêm đấu trường, thêm chỗ nấp, mật độ vật chặn giữ nguyên). Khu tự đối xứng ⇒ ghép bao nhiêu khu sân vẫn đối xứng hai trục. ──
 const RONG = 1600
 const CAO = 1000
 const PT_TUONG: readonly (readonly number[])[] = [[262, 150, 44, 130], [110, 312, 130, 44], [450, 262, 170, 44], [650, 372, 44, 92], [650, 372, 112, 44], [778, 60, 44, 96]]
 const PT_THUNG: readonly (readonly number[])[] = [[372, 424, 54, 54], [566, 104, 54, 54], [60, 473, 54, 54]]
 const PT_BUI: readonly (readonly number[])[] = [[340, 150, 150, 92], [205, 452, 130, 96], [715, 190, 170, 86], [470, 620, 140, 90]]
-const HE_CAP = [1, 1.5, 2]
+/** Năm cỡ sân: [hệ số phóng, số khu ngang, số khu dọc] — 1600 × 1000 · 2400 × 1500 · 3200 × 2000 · 4800 × 2000 · 4800 × 3000. */
+const CO_SAN: readonly (readonly [number, number, number])[] = [[1, 1, 1], [1.5, 1, 1], [1, 2, 2], [1, 3, 2], [1, 3, 3]]
+export const SO_CO_SAN = CO_SAN.length
 function doiXung(ds: readonly (readonly number[])[], he: number): ChuNhat[] {
   const kq: ChuNhat[] = []
   for (const [x, y, w, h] of ds) {
@@ -110,19 +114,28 @@ function doiXung(ds: readonly (readonly number[])[], he: number): ChuNhat[] {
 const trongHop = (c: ChuNhat, x: number, y: number, noi: number): boolean => x > c.x - noi && x < c.x + c.w + noi && y > c.y - noi && y < c.y + c.h + noi
 const NHO_BAN_DO: (BanDo | undefined)[] = []
 export function taoBanDo(cap: number): BanDo {
-  const c = cap === 1 || cap === 2 ? cap : 0
+  const c = Number.isInteger(cap) && cap > 0 && cap < CO_SAN.length ? cap : 0
   const co = NHO_BAN_DO[c]
   if (co) return co
-  const he = HE_CAP[c], rong = RONG * he, cao = CAO * he
-  const tuong = doiXung(PT_TUONG, he), thung = doiXung(PT_THUNG, he), chan = [...tuong, ...thung]
+  const [he, ngang, doc] = CO_SAN[c], rk = RONG * he, ck = CAO * he, rong = rk * ngang, cao = ck * doc
+  // Một khu rồi chép sang các ô ngang × dọc (khu tự đối xứng ⇒ chép tịnh tiến là đủ).
+  const ghep = (ds: readonly (readonly number[])[]): ChuNhat[] => {
+    const mot = doiXung(ds, he)
+    if (ngang === 1 && doc === 1) return mot
+    const kq: ChuNhat[] = []
+    for (let j = 0; j < doc; j++) for (let i = 0; i < ngang; i++) for (const v of mot) kq.push({ x: v.x + i * rk, y: v.y + j * ck, w: v.w, h: v.h })
+    return kq
+  }
+  const tuong = ghep(PT_TUONG), thung = ghep(PT_THUNG), chan = [...tuong, ...thung]
   const cot = Math.ceil(rong / O), hang = Math.ceil(cao / O), luoi = new Uint8Array(cot * hang)
   for (let j = 0; j < hang; j++) for (let i = 0; i < cot; i++) {
     const x = i * O + O / 2, y = j * O + O / 2
     if (chan.some((v) => trongHop(v, x, y, BK_NV + 2))) luoi[j * cot + i] = 1
   }
   const bd: BanDo = {
-    cap: c, rong, cao, tuong, thung, bui: doiXung(PT_BUI, he), chan, cot, hang, luoi,
-    trai: [[130, 122], [RONG - 130, 122], [130, CAO - 122], [RONG - 130, CAO - 122]].map(([x, y]) => ({ x: x * he, y: y * he })),
+    cap: c, rong, cao, tuong, thung, bui: ghep(PT_BUI), chan, cot, hang, luoi,
+    // Trại bốn đội ở bốn góc NGOÀI của cả sân.
+    trai: [[130 * he, 122 * he], [rong - 130 * he, 122 * he], [130 * he, cao - 122 * he], [rong - 130 * he, cao - 122 * he]].map(([x, y]) => ({ x, y })),
   }
   NHO_BAN_DO[c] = bd
   return bd
@@ -268,13 +281,21 @@ export function satThuong(toi: { id: string; x: number; y: number; doi: number }
 }
 
 // ── Bé ma của chính em ──
-/** Chỗ hồi sinh quanh trại đội, lệch theo `hat` (0..1) để cả đội không chồng lên nhau. */
-export function choTrai(bd: BanDo, doi: number, hat: number): Diem {
+/** Chỗ hồi sinh quanh trại đội, lệch theo `hat` (0..1) để cả đội không chồng lên nhau. Có `nay` và trại đã nằm NGOÀI vòng an toàn (nửa sau ván — sân lớn
+ *  thì đường về vòng dài gấp mấy lần) ⇒ hồi sinh ngay mép trong của vòng, trên đường từ trại về giữa sân, né vật chặn. */
+export function choTrai(bd: BanDo, doi: number, hat: number, nay?: number): Diem {
   const t = bd.trai[kep(Math.floor(doi), 0, 3)], goc = hat * Math.PI * 2
-  return { x: t.x + Math.cos(goc) * 66, y: t.y + Math.sin(goc) * 44 }
+  let x = t.x + Math.cos(goc) * 66, y = t.y + Math.sin(goc) * 44
+  if (nay === undefined) return { x, y }
+  const v = vong(bd, nay)
+  if (!ngoaiVong(v, x, y)) return { x, y }
+  const r = 0.9 / Math.hypot((x - v.cx) / v.rx, (y - v.cy) / v.ry)
+  x = v.cx + (x - v.cx) * r; y = v.cy + (y - v.cy) * r
+  for (let i = 0; i < 24 && bi(bd, x, y); i++) { x += (v.cx - x) * 0.06; y += (v.cy - y) * 0.06 }
+  return { x, y }
 }
 export function taoToi(bd: BanDo, doi: number, nay: number, hat = 0): Toi {
-  const p = choTrai(bd, doi, hat)
+  const p = choTrai(bd, doi, hat, nay)
   return { x: p.x, y: p.y, mau: MAU_DAY, doi: kep(Math.floor(doi), 0, 3), cap: 1, chetDen: 0, batTuDen: nay + BAT_TU_MS, lucTrung: 0, lucDong: nay, van: vanSo(nay), duong: [] }
 }
 export const dangChet = (tt: Toi, nay: number): boolean => tt.chetDen > nay

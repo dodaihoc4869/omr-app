@@ -142,3 +142,21 @@ Thầy: «giữ 2d thêm bóng đổ ánh sáng cho có chiều sâu, vẽ lại
 - **Giữ (Sinh Tồn đang dùng), chỉ còn tên kỹ thuật «dau-ion»:** lớp Durable Object `PhongDauIon` + ràng buộc `PHONG_DAU_ION` (đổi tên lớp cần migration), công tắc `TAT_DAU_ION`, vé `server/src/dau-ion-ve.ts` (tiền tố ký `dau-ion|`), đường WebSocket `/dau-ion/<ca>`. Lớp mạng máy em đổi tên `mang-sanh-ca.ts` (bỏ gói nhị phân của trò cũ). Hằng số dùng chung (mã đóng, trần 78 em, 8 phòng) nay ở `server/src/sinh-ton-ca.ts`.
 - **Máy còn mảnh trò cũ trong bộ nhớ đệm:** gói vào không có `tro` ⇒ phòng đóng mã 4010 «Trò ở phòng chờ đã đổi sang Sinh Tồn. Em tải lại trang để chơi nhé.» (máy cũ hiểu là sảnh chưa mở, không nối lại; phần «Tập với A.I» chạy tại máy của mảnh cũ không cần máy chủ).
 - **`/dong` (thầy bấm Bắt đầu):** nay đóng mã 4000 cả kết nối vừa mở chưa kịp gửi vé (trước chỉ đóng em đã vào trò).
+
+## Sân mở rộng theo số học sinh (13/11, thầy: «Tùy theo số lượng hs thì bản đồ đc mở rộng ra hơn để chơi cho thú vị nhé»)
+
+- **Năm cỡ sân** theo số nhân vật trên sân lúc ĐẦU VÁN (em thật + máy bù, mỗi đội ít nhất 4 ⇒ ít nhất 16) — `capBanDo` / `CO_SAN` ở `src/lib/live-khoi/sinh-ton-loi.ts`:
+
+| Cỡ | Số nhân vật | Sân | Cách dựng |
+|---|---|---|---|
+| 0 | tới 20 | 1600 × 1000 | một khu |
+| 1 | 21–36 | 2400 × 1500 | một khu phóng 1,5 lần |
+| 2 | 37–64 | 3200 × 2000 | ghép 2 × 2 khu |
+| 3 | 65–96 | 4800 × 2000 | ghép 3 × 2 khu |
+| 4 | từ 97 | 4800 × 3000 | ghép 3 × 3 khu |
+
+- Trước đó chỉ ba cỡ (tới 24 · tới 60 · hơn), sân lớn là cùng một khu phóng to 1,5 / 2 lần (tường to ra, chỗ nấp không thêm). Nay sân lớn **ghép thêm khu**: mỗi khu là một đấu trường đủ tường, thùng, bụi cỡ gốc ⇒ lớp đông có thêm chỗ nấp và đường vòng. Khu tự đối xứng nên sân ghép vẫn đối xứng hai trục, bốn trại ở bốn góc ngoài, hộp tiếp tế và tâm vòng an toàn ở giữa sân.
+- Máy em báo «Lớp đông hơn · sân mở rộng» / «Sân thu gọn lại» khi cỡ đổi giữa hai ván.
+- **Hồi sinh:** trại đã nằm ngoài vòng an toàn (nửa sau ván) ⇒ hồi sinh ngay mép trong của vòng, phía trại mình (`choTrai` nhận `nay`); trước đây em phải chạy bộ qua vùng mất máu — ở sân 4800 mất chừng 9 giây. Chữ bảng bị hạ: «Em hồi sinh ở phía trại …».
+- Giao thức phòng chờ ca `PHIEN_BAN_ST` 1 → 2 (cỡ 2 đổi nghĩa, thêm cỡ 3 · 4): máy còn mảnh cũ bị đóng 4010 «tải lại trang». Phòng chờ live không có phiên bản: máy chưa tải lại trang sẽ dựng sai sân ở cỡ 2 trở lên cho tới khi tải lại.
+- **Đã đo (Chromium không chip đồ hoạ, bản dev, `docs/ban-ve-sinh-ton-1211/that/?ban=N`):** 0 lỗi trang; máy thầy xem cả sân 1366 × 768: 61 khung / giây (28 em, cỡ 1) · 61 (51 em, cỡ 2) · 60 (81 em, cỡ 3) · 57 (105 em, cỡ 4); máy em 844 × 390: 61 (cỡ 2, cỡ 3). **CHƯA thử** lớp thật đông người, điện thoại thật.

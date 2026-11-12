@@ -223,9 +223,12 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       }
       const nay = Date.now() + lech
       lucAnh = luc; soAnh++
-      if (typeof anh.c === 'number' && anh.c !== bd.cap) {
-        bd = taoBanDo(anh.c)
-        if (!xem) tt = { ...taoToi(bd, doiEm, nay, hat), cap: tt.cap, mau: tt.mau }
+      // Cỡ sân đổi ở đầu ván theo số nhân vật (bản đồ nhớ sẵn theo cỡ ⇒ so đúng đối tượng; cỡ lạ quy về 0, không dựng lại mỗi nhịp).
+      const bdMoi = typeof anh.c === 'number' ? taoBanDo(anh.c) : bd
+      if (bdMoi !== bd) {
+        const roiRong = bdMoi.rong * bdMoi.cao > bd.rong * bd.cao
+        bd = bdMoi
+        if (!xem) { tt = { ...taoToi(bd, doiEm, nay, hat), cap: tt.cap, mau: tt.mau }; if (soAnh > 1) baoVui(roiRong ? 'Lớp đông hơn · sân mở rộng' : 'Sân thu gọn lại', luc) }
         doKhung()
       }
       const dongToi = xem ? null : docDong(sbd, anh.ds[sbd])
@@ -557,7 +560,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       {biHa && !ketQua ? (
         <div className="st-ha" role="status">
           <h2>{biHa.ai ? <><b style={bienDoi(biHa.doi)}>{biHa.ai} · {DOI_BPU[kepDoi(biHa.doi)].ten}</b> vừa hạ em</> : 'Em hết máu ngoài vòng an toàn'}</h2>
-          <p>Em hồi sinh ở trại {tenToi}</p>
+          <p>Em hồi sinh ở phía trại {tenToi}</p>
           <div className="st-dem">{biHa.giay}</div>
           <small>giây nữa</small>
         </div>

@@ -31,4 +31,5 @@ export interface SinhTonGui { p: [number, number, number, number]; t?: string; a
 export interface SinhTonAnh { ds: Record<string, SinhTonDong>; an: [string, string][]; d: [number, number, number, number]; v: number; c: number; h: [number, string] }
 /** Phiên bản giao thức trò Sinh Tồn ở phòng chờ CA KIỂM TRA (13/11; phòng: server/src/sinh-ton-ca.ts). Gói vào `{ t: 'vao', tro: 'st', v, ve }` phải mang đúng số
  *  này; đổi dạng `SinhTonGui` / `SinhTonAnh` không tương thích ⇒ tăng số, máy còn mảnh cũ bị phòng đóng sạch (mã 4010) thay vì nhận ảnh nó không đọc được. */
-export const PHIEN_BAN_ST = 1
+// 2 (13/11): năm cỡ sân — cỡ 2 đổi nghĩa (ghép 2 × 2 khu), thêm cỡ 3 · 4 ⇒ máy còn mảnh cũ dựng sai sân.
+export const PHIEN_BAN_ST = 2

@@ -16,7 +16,7 @@ export interface May {
 /** Số máy mỗi đội cần có, theo số em thật đang chơi của từng đội. */
 export const soMayCan = (soEm: readonly number[]): number[] => [0, 1, 2, 3].map((d) => Math.max(0, SO_MOI_DOI - (soEm[d] ?? 0)))
 export function taoMay(bd: BanDo, id: string, doi: number, nay: number, hat: number): May {
-  const p = choTrai(bd, doi, hat)
+  const p = choTrai(bd, doi, hat, nay)
   return { id, doi, x: p.x, y: p.y, mau: MAU_DAY, cap: 1, t: '', chetDen: 0, batTuDen: nay + BAT_TU_MS, lucTrung: 0, ungVien: '', nhipThay: 0, duong: [], dich: null, lucDuong: 0, lucDich: 0 }
 }
 /** Cho khớp số máy với số em thật: thừa ⇒ máy ÍT MÁU nhất của đội rời sân; thiếu ⇒ thêm máy ở trại. Trả danh sách mới. */
@@ -39,7 +39,7 @@ const tamBui = (bd: BanDo): Diem[] => bd.bui.map((b) => ({ x: b.x + b.w / 2, y: 
 /** Một nhịp của MỘT máy (đổi tại chỗ). `ds` = mọi nhân vật KHÁC trên sân. Trả mã kẻ vừa hạ máy này ('' = còn sống). */
 export function buocMay(bd: BanDo, m: May, ds: readonly NhanVat[], nay: number, dtMs: number, rnd: () => number): string {
   if (m.chetDen > nay) return ''
-  if (m.chetDen) { const p = choTrai(bd, m.doi, rnd()); Object.assign(m, { x: p.x, y: p.y, mau: MAU_DAY, cap: 1, t: '', chetDen: 0, batTuDen: nay + BAT_TU_MS, duong: [], dich: null, ungVien: '', nhipThay: 0 }) }
+  if (m.chetDen) { const p = choTrai(bd, m.doi, rnd(), nay); Object.assign(m, { x: p.x, y: p.y, mau: MAU_DAY, cap: 1, t: '', chetDen: 0, batTuDen: nay + BAT_TU_MS, duong: [], dich: null, ungVien: '', nhipThay: 0 }) }
   const dt = dtMs / 1000, v = vong(bd, nay), nghi = dangNghi(nay)
   // 1. Trúng đạn / hồi máu / ngoài vòng.
   if (!nghi && nay >= m.batTuDen) {
