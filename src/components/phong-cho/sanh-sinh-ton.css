@@ -1,0 +1,52 @@
+/* SẢNH «SINH TỒN BỐN ĐỘI» của phòng chờ ca kiểm tra (thầy 13/11: «Chuyển luôn game này sang cả phòng chờ của ca kiểm tra»).
+   Thẻ sảnh theo token app học sinh --tr-* (có dự phòng token chung của tokens.css cho máy tắt giao diện «Trong») — cùng cách thẻ Đấu Nguyên Tử cũ đã làm.
+   Màn trò nằm ở document.body (portal), nền xanh than cố định gắn nội tuyến ở gốc (.sst-man: --tr-* và --lk-*, src/lib/live-khoi/mau.ts).
+   Màu đội đọc biến máy chiếu --p-* (đúng DOI_BPU). Không mã màu thô. */
+.sst-the {
+  --sst-mat: var(--tr-mat, var(--the)); --sst-mat-2: var(--tr-mat-2, var(--the-2)); --sst-vien: var(--tr-vien, var(--vien));
+  --sst-chu: var(--tr-chu, var(--muc)); --sst-chu-2: var(--tr-chu-2, var(--nhat)); --sst-chu-3: var(--tr-chu-3, var(--mo));
+  --sst-nut: var(--tr-hs-nut, var(--tim)); --sst-nut-day: var(--tr-hs-day, var(--lg-nhan)); --sst-tren-nut: var(--tr-trang, var(--muc-nguoc)); --sst-dung: var(--tr-dung, var(--xanh));
+  background: var(--sst-mat); color: var(--sst-chu); border: 2px solid var(--sst-vien); border-radius: 22px; box-shadow: 0 4px 0 var(--sst-vien);
+  padding: 16px; display: flex; flex-direction: column; gap: 12px; font-family: var(--sans); font-size: 15px; text-align: left;
+}
+.sst-the *, .sst-man * { box-sizing: border-box; }
+.sst-mat { font-size: 11px; font-weight: 700; letter-spacing: .1em; color: var(--sst-chu-3); }
+.sst-the h2 { margin: 2px 0 0; font-size: 22px; font-weight: 800; line-height: 1.2; }
+.sst-ta { margin: 0; font-size: 15px; line-height: 1.5; color: var(--sst-chu-2); }
+/* Bốn đội: chấm màu + ký hiệu + tên — màu không phải kênh thông tin duy nhất. */
+.sst-doi { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.sst-doi li { display: inline-flex; align-items: center; gap: 6px; min-width: 0; padding: 4px 10px 4px 8px; border-radius: 99px; background: var(--sst-mat-2); font-size: 13px; font-weight: 700; color: var(--sst-chu-2); }
+.sst-doi i { width: 10px; height: 10px; border-radius: 50%; background: var(--d); flex: none; }
+/* Hai lớp (.sst-the .sst-nut): thắng luật nút chung của giao diện «Trong» — cùng lý do thẻ cũ viết .dn-nut.dn-nut-chinh. */
+.sst-the .sst-nut { width: 100%; min-height: 60px; border: 0; border-radius: 18px; background: var(--sst-nut); color: var(--sst-tren-nut); box-shadow: inset 0 -4px 0 var(--sst-nut-day);
+  font: inherit; font-size: 22px; font-weight: 800; letter-spacing: .02em; cursor: pointer; touch-action: manipulation; transition: transform .1s; }
+.sst-the .sst-nut:active { transform: translateY(2px); }
+.sst-the .sst-nut:disabled { opacity: .55; cursor: default; }
+.sst-nut:focus-visible, .sst-thoat:focus-visible { outline: 3px solid var(--sst-nut, var(--lk-chu)); outline-offset: 3px; }
+.sst-phu { margin: 0; min-height: 20px; font-size: 13px; line-height: 1.5; color: var(--sst-chu-3); text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.sst-cham { width: 8px; height: 8px; border-radius: 50%; background: var(--sst-dung); flex: none; animation: sst-nhip 1.2s ease-in-out infinite; }
+@keyframes sst-nhip { 50% { opacity: .3; } }
+.sst-dong { display: flex; flex-direction: column; gap: 4px; padding: 18px; border-radius: 16px; background: var(--sst-mat-2); text-align: center; }
+.sst-dong strong { font-size: 18px; }
+.sst-dong span { font-size: 14px; color: var(--sst-chu-3); }
+
+/* ── MÀN TRÒ: phủ kín khung nhìn; điện thoại cầm dọc ⇒ xoay hình 90° (cùng phép xoay với .lke[data-xoay] của Live theo khối, chiều theo chieu-xoay.ts). ── */
+.sst-man { position: fixed; inset: 0; z-index: 80; overflow: hidden; background: var(--lk-nen); color: var(--lk-chu); font-family: var(--sans); font-weight: 600;
+  touch-action: none; overscroll-behavior: contain; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.sst-man[data-xoay] { inset: 0 auto auto 0; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
+.sst-man[data-xoay="nguoc"] { transform: rotate(-90deg) translateX(-100%); }
+.sst-tai { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; font-size: 17px; font-weight: 800; color: var(--lk-chu-2); }
+/* Góc trên-trái (chỗ nút «Rời phòng chờ» bên live); nút loa của trò nằm ngay dưới ở top 56 px. */
+.sst-man .sst-thoat { position: absolute; left: max(8px, env(safe-area-inset-left, 0px)); top: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px;
+  background: color-mix(in srgb, var(--lk-mat) 80%, transparent); color: var(--lk-chu-3); font: inherit; font-size: 12.5px; cursor: pointer; opacity: .8; touch-action: manipulation; }
+
+/* Thầy bấm Bắt đầu: dải nhẹ «Sắp vào thi · 3 · 2 · 1» 1,5 giây (chỉ CSS, không hẹn giờ). Nằm ở document.body ⇒ đọc thẳng token app. */
+.sst-sap-thi { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 12px); transform: translateX(-50%); z-index: 90; display: flex; align-items: center; gap: 10px;
+  padding: 8px 18px; border-radius: 20px; background: var(--tr-mat, var(--the)); color: var(--tr-chu, var(--muc)); border: 2px solid var(--tr-vien, var(--vien));
+  box-shadow: 0 4px 0 var(--tr-vien, var(--vien)); font-family: var(--sans); font-size: 16px; font-weight: 800; pointer-events: none; animation: sst-sap 1.5s ease-out forwards; }
+.sst-sap-thi i { font-style: normal; color: var(--tr-chu-3, var(--mo)); }
+.sst-sap-thi b { min-width: 20px; text-align: center; color: var(--tr-chu-3, var(--mo)); opacity: .35; animation: sst-so .5s ease-out forwards; }
+.sst-sap-thi b:nth-of-type(2) { animation-delay: .5s; } .sst-sap-thi b:nth-of-type(3) { animation-delay: 1s; }
+@keyframes sst-so { 30%, 100% { opacity: 1; color: var(--tr-hs-chu, var(--lg-nhan)); } }
+@keyframes sst-sap { 0%, 85% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sst-cham, .sst-sap-thi, .sst-sap-thi b { animation: none; opacity: 1; } .sst-the .sst-nut { transition: none; } }
