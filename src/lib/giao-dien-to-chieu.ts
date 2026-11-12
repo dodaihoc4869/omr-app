@@ -28,7 +28,7 @@ export const GIAO_DIEN_TO_CHIEU = {
   MUNG_NEN: '#c4eed0',
   MUNG_CHU: '#072100',
   /** Nền bảng "tắt sáng", giấy ấm, chữ, chữ phụ — đúng bản vẽ. */
-  NEN_BANG: '#15181c',
+  NEN_BANG: '#131f24',
   GIAY: '#f4efe4',
   CHU: '#22262b',
   PHU: '#5b6168',
@@ -85,7 +85,7 @@ body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim[data-k="K"]:hover{background-color:
 
 export const CSS_GIAO_DIEN_TO_CHIEU = `
 /* ═══ GIAO DIỆN MỚI (M3) — ba bản vẽ đã chốt ═══ */
-:root{--mc-bang:#15181c;--mc-bang-chu:#f4efe4;--mc-bang-phu:rgba(244,239,228,.55);--mc-bang-vien:rgba(244,239,228,.22);--mc-bang-nut:rgba(244,239,228,.14);
+:root{--mc-bang:#131f24;--mc-bang-chu:#f4efe4;--mc-bang-phu:rgba(244,239,228,.55);--mc-bang-vien:rgba(244,239,228,.22);--mc-bang-nut:rgba(244,239,228,.14);
   --mc-giay:#f4efe4;--mc-chu:#22262b;--mc-phu:#5b6168;--mc-nhan:#0b57d0;--mc-chip:#d3e3fd;--mc-chip-chu:#041e49;--mc-the:#e7e1d3;
   --mc-thanh-nen:#22262b;--mc-lam-nen:#c4eed0;--mc-lam-chu:#072100;--mc-chua-nen:#c2e7ff;--mc-chua-chu:#001d35;--mc-qua-nen:#fdd663;--mc-qua-chu:#3b2f00;
   --mc-mung-nen:#c4eed0;--mc-mung-chu:#072100}

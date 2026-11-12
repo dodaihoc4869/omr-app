@@ -1,0 +1,18 @@
+/* LIVE THEO KHỐI — lớp nổi máy em. Màu: bảng xanh than cố định gắn nội tuyến ở gốc (.lke: --tr-* và --lk-*, src/lib/live-khoi/mau.ts). */
+[data-live-khoi-em] { position: fixed; inset: 0; z-index: 2147482600; pointer-events: none; }
+.lke { position: absolute; inset: 0; pointer-events: none; color: var(--lk-chu); font-weight: 600; }
+.lke[data-xoay] { inset: 0 auto auto 0; transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
+.lke.cho { pointer-events: auto; background: var(--lk-nen); }
+.lke > * { pointer-events: auto; }
+.lke-mep { position: absolute; right: max(0px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(8px); display: flex; flex-direction: column; gap: 6px; padding: 4px 2px 4px 4px; border-radius: 14px 0 0 14px; background: color-mix(in srgb, var(--lk-mat) 88%, transparent); box-shadow: inset 0 0 0 1.5px var(--lk-vien); opacity: .78; transition: opacity .2s; }
+.lke-mep:hover, .lke-mep:focus-within { opacity: 1; }
+.lke-doi { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 12px; background: transparent; color: var(--lk-chu-2); cursor: pointer; }
+.lke-doi svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lke-bong { position: absolute; right: calc(56px + env(safe-area-inset-right, 0px)); top: 50%; max-width: min(280px, 46%); pointer-events: none; }
+/* Các mảnh con luôn xanh than: chat (--lc-*) và màn bốn đội đọc bảng cố định của gốc. */
+.lke .lc-goc, .lkt .lc-goc { --lc-nen: var(--lk-nen); --lc-mat: var(--lk-mat); --lc-mat-2: var(--lk-mat-2); --lc-vien: var(--lk-vien); --lc-chu: var(--lk-chu); --lc-chu-2: var(--lk-chu-2); --lc-chu-3: var(--lk-chu-3); --lc-nhan: var(--lk-nhan); --lc-nhan-go: var(--lk-nhan-go); --lc-sai: var(--lk-sai); --lc-chu-y: var(--lk-chu-y); }
+.lke .bd { background: radial-gradient(90% 70% at 50% 0%, var(--lk-mat), var(--lk-nen)); color: var(--lk-chu); }
+@media (prefers-reduced-motion: reduce) { .lke-mep { transition: none; } }
+/* Luật ô nhập toàn cục của giao diện «Trong» ([data-trong] input: nền, viền, bóng) không áp vào ô nhắn tin — ô nằm trong viên nhập xanh than. */
+html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus-visible { background: transparent; border: 0; border-radius: 0; box-shadow: none; outline: 0; padding: 0; min-height: 0; color: var(--lk-chu); }
+.lke-roi { position: absolute; left: max(8px, env(safe-area-inset-left, 0px)); top: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--lk-mat) 80%, transparent); color: var(--lk-chu-3); font: inherit; font-size: 12.5px; cursor: pointer; opacity: .8; }

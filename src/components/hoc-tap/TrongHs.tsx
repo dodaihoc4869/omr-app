@@ -62,6 +62,7 @@ const TheBenThuong = lazy(() => import('../thuong/ManThuong').then((m) => ({ def
 // Thẻ nhắc Samsung Internet (27/10): mảnh riêng chỉ máy Samsung Internet tải; tải hỏng ⇒ không vẽ gì.
 // mảnh ngoài precache: mất mạng lúc nạp ⇒ không vẽ thẻ (không làm hỏng Hôm nay)
 const TheNoCau = lazy(() => import('./TheNoCau').catch(() => ({ default: (() => null) as unknown as typeof import('./TheNoCau').default })))
+const TheLiveEm = lazy(() => import('../live-khoi/TheLiveEm').catch(() => ({ default: (() => null) as unknown as typeof import('../live-khoi/TheLiveEm').default })))
 const NhacSamsung = lazy(() => import('./NhacSamsung').catch(() => ({ default: () => null })))
 // Màn phủ tạm đóng (27/10): đi cùng mảnh nạp lười ManThuong, chỉ tải khi thầy đang đóng app (28/10 tác tử tốc độ: trước nằm trong mảnh này ⇒ mọi lần mở
 // Lộ trình cõng ~0,6 KB nén mã chỉ dùng lúc đóng). Không thêm mảnh / tệp precache mới (precache đang ở trần 170 tệp).
@@ -1042,6 +1043,8 @@ export function MotTrangHs(p: PropsMotTrang) {
           cuộn qua ⇒ DẢI GỌN 54px (tên bài · thanh mảnh · chặng) dính dưới hàng bộ đếm, cross-fade opacity + translateY 200 ms; sau dải là nền trang đặc + mép mờ
           ⇒ nút chặng / linh vật trượt khuất gọn dưới dải. Dải nằm trong khối cao 0 ⇒ không chiếm chỗ. */}
       {dauKinh(<><p>{ngayTuan()}{hs?.lop ? <span className="kb-lop">{hs.lop}</span> : null}</p><h1>Chào {p.ten || 'em'}</h1></>, true)}
+      {/* THẺ LIVE THEO KHỐI (12/11) ngay dưới lời chào trang chủ: nạp lười, không có buổi cho khối em ⇒ không vẽ gì. */}
+      {p.token && <Suspense fallback={null}><TheLiveEm token={p.token} /></Suspense>}
       {nc && ncLuc && chuaTraNo && <Suspense fallback={null}><TheNoCau nc={nc} daTra={ncLuc.daTra} con={ncLuc.con} gon={false} duMuc={false} token={p.token} onDoi={p.onTaiLai} /></Suspense>}{chuaTraNo && nutChinh}
       {/* HỆ KÍNH (thầy chốt 02/11): thẻ «Mức hôm nay» — số lớn + bình tam giác (thay thẻ bài). Tên bài + việc + chặng giữ nguyên nguồn cũ. */}
       <section className="kb-hero" data-du={duNgay || undefined} data-loai={!p.ngayKiem ? p.loaiNgay : undefined} aria-label={`${!p.ngayKiem && p.loaiNgay ? NHAN_LOAI_NGAY[p.loaiNgay] : 'Tổng câu hôm nay'}${coTong ? `: ${daNgay}/${tongNgay}` : ''}${duNgay ? ' · đã xong' : ''}${p.viec ? ` · ${chuViecBai(p.viec, so)}` : ''}`} aria-busy={!coTong && p.dangTai}>

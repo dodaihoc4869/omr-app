@@ -1,11 +1,12 @@
 // NÚT «LIVE» Ở ĐẦU MÀN HÔM NAY, ngay trước «Điểm danh» (thầy chốt build 11/11; đặc tả docs/dac-ta-live-xem-lai-1011.md mục 2.2, điểm quyết 5 — không thêm mục
-// thanh bên). Bấm ⇒ màn «Lịch sử Live» (mảnh nạp lười src/screens/live-xem-lai/gv/) vẽ đè lên vùng nội dung Hôm nay. Buổi vừa xong đang dựng ⇒ chip «1 đang xử lý»
-// (hỏi lúc Hôm nay rảnh, cũng bằng mảnh lười ⇒ nút này chỉ thêm vài chục byte vào mảnh Hôm nay).
+// thanh bên). 12/11 (Live theo khối, docs/dac-ta-live-moi-1211.md): bấm ⇒ BẢNG «Live» ba thẻ «Mở live ngay · Hẹn lịch live · Xem lại live» (mảnh nạp lười
+// src/components/live-khoi/BangLiveThay.tsx) vẽ đè lên vùng nội dung Hôm nay; «Xem lại live» là màn «Lịch sử Live» cũ. Buổi vừa xong đang dựng ⇒ chip
+// «1 đang xử lý» (hỏi lúc Hôm nay rảnh, cũng bằng mảnh lười ⇒ nút này chỉ thêm vài chục byte vào mảnh Hôm nay).
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import './nut-live.css'
 
-const LichSuLive = lazy(() => import('../../screens/live-xem-lai/gv/LichSuLive'))
+const BangLiveThay = lazy(() => import('../live-khoi/BangLiveThay'))
 
 export default function NutLive({ className }: { className: string }) {
   const nut = useRef<HTMLButtonElement>(null)
@@ -22,13 +23,13 @@ export default function NutLive({ className }: { className: string }) {
   }, [cho])
   return (
     <>
-      <button ref={nut} type="button" className={className} onClick={() => setCho(nut.current?.closest('.gv2-trang') ?? document.body)} aria-label={dang ? `Live · ${dang} đang xử lý` : 'Live · lịch sử các buổi live'}>
+      <button ref={nut} type="button" className={className} onClick={() => setCho(nut.current?.closest('.gv2-trang') ?? document.body)} aria-label={dang ? `Live · ${dang} đang xử lý` : 'Live'}>
         {/* Biểu tượng «phát» vẽ tại chỗ: không thêm biểu tượng mới vào mảnh biểu tượng dùng chung của app thầy (đường mở /gv không thêm byte). */}
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m10 8 6 4-6 4z" /></svg>
         Live
         {dang > 0 && <span className="gvv2-chip" data-tang="1">{dang} đang xử lý</span>}
       </button>
-      {cho && createPortal(<Suspense fallback={null}><LichSuLive onDong={() => setCho(null)} /></Suspense>, cho)}
+      {cho && createPortal(<Suspense fallback={null}><BangLiveThay onDong={() => setCho(null)} onMoPhong={(o) => { setCho(null); void import('../bpu/gan-gv').then((m) => m.moBangLiveKhoi(o)) }} /></Suspense>, cho)}
     </>
   )
 }

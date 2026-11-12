@@ -27,6 +27,8 @@ const CHO_PHEP = new Set([
   // Bảng Bình Phản Ứng dùng LẠI đúng bảng màu tờ máy chiếu (thầy duyệt 08/11, docs/ban-ve-bpu-giay-0811 «nền dịu mắt giống màn chiếu cũ, đo chính xác»):
   // màn chiếu cố định, không theo nền app; test `bpu-mau-chieu-0811` khoá từng mã bằng tờ.
   'lib/bpu/mau-chieu.ts',
+  // 12/11 Live theo khối (thầy: «nền xanh than tối chuẩn doligo»): bảng xanh than CỐ ĐỊNH chép đúng nền tối app học sinh, gắn nội tuyến ở lớp nổi live.
+  'lib/live-khoi/mau.ts',
   'lib/experiments/catalog.ts',
   'lib/experiments/render.ts',
   // nhe.ts = phần nhẹ tách từ render.ts (máy yếu 29/09) — hai hình NO₂ / Rutherford dời nguyên văn, cùng lý do.

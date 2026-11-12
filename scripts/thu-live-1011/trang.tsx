@@ -96,6 +96,11 @@ if (vai === 'em') {
     ;(window as unknown as { __ws: WebSocket }).__ws = w // bộ thử đóng vai bảng Bình Phản Ứng: gửi lệnh «gọi em lên bảng»
   }
   noi()
+  // ?khoi=1 (12/11, Live theo khối): máy này giữ phiên live Khối 12 của buổi b1 ⇒ lớp nổi máy thầy (phòng chờ, Học | Bảng, tin nhắn) dựng trên tờ.
+  if (ts.get('khoi') === '1') {
+    try { localStorage.setItem('ddh.gv.live-khoi', JSON.stringify({ id: 'l1', khoi: 12, buoiId: 'b1' })) } catch { /* chặn lưu */ }
+    void import('../../src/components/live-khoi/thay-khoi').then((m) => m.ngheBangKhoi())
+  }
 }
 document.documentElement.dataset.trong = vai === 'em' ? 'hs' : 'gv'
 if (vai === 'em') document.documentElement.setAttribute('data-ht2', '')

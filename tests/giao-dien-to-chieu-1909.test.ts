@@ -58,13 +58,13 @@ const o = (sbd: string, hoTen: string, extra: Partial<OBang> = {}): OBang => ({
 
 // ─────────────────────────── 1. MARKUP + CSS ───────────────────────────
 describe('bảng màu, hào quang theo hệ, tế nhị trước lớp', () => {
-  it('bốn kiểu giấy giữ nguyên bốn GIÁ TRỊ cũ; nền bảng luôn tối (#15181c) và giấy ấm (#f4efe4) là mặc định', () => {
+  it('bốn kiểu giấy giữ nguyên bốn GIÁ TRỊ cũ; nền bảng luôn tối (xanh than #131f24, thầy 12/11) và giấy ấm (#f4efe4) là mặc định', () => {
     const h = taoHtmlMayChieu([o('A', 'An')], {})
     for (const v of ['matte-light', 'soft', 'matte-dark', 'dark']) expect(h).toContain(`<option value="${v}">`)
-    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('--mc-bang:#15181c')
+    expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('--mc-bang:#131f24')
     expect(CSS_GIAO_DIEN_TO_CHIEU).toContain('--mc-giay:#f4efe4')
     expect(CSS_GIAO_DIEN_TO_CHIEU).toMatch(/:root\[data-projector\] body\.mc[^{]*\{background:var\(--mc-bang\)!important/)
-    expect(GIAO_DIEN_TO_CHIEU.NEN_BANG).toBe('#15181c')
+    expect(GIAO_DIEN_TO_CHIEU.NEN_BANG).toBe('#131f24')
     expect(GIAO_DIEN_TO_CHIEU.GIAY).toBe('#f4efe4')
   })
 

@@ -11,6 +11,7 @@ import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
 import { hienKetQua, tatTheKq } from './TheKetQuaLenBang'
 import { layPhong } from './cau-live'
+import type { LichLive } from '../../lib/live-khoi/kieu'
 
 let goc: Root | null = null
 let khung: HTMLDivElement | null = null
@@ -110,11 +111,17 @@ export function escRaHomNay(): boolean {
 // (lần đầu) hoặc khi đang live mà thầy bấm «Đang live» (cụm điều khiển — mic, «Bảng → máy em», «Tắt live» — nằm trên tờ). Esc / P đưa bảng về, live vẫn chạy.
 // Đang live mà bảng đang lui (thầy giảng trên tờ) ⇒ ẩn viền đỏ toàn màn «Rời màn hình» (bpu-bang.css) — tờ có thẻ gọn «N em rời màn» không che bảng.
 let liveTt = { co: false, bat: false }
+let daTuBat = false
+/** LIVE THEO KHỐI (12/11): nút Live ở Hôm nay mở phòng chờ của khối — lớp nổi máy thầy nạp lười (src/components/live-khoi/thay-khoi.tsx). */
+export const moBangLiveKhoi = (o: { lich: LichLive; buoiId: string; ma: string }): Promise<void> => import('../live-khoi/thay-khoi').then((m) => m.moBangLiveKhoi(o))
 /** Bảng đang lui vì live (không phải vì em lên bảng) ⇒ D / K / F ở app không chấm ai. */
 let anViLive = false
 export function datLive(tt: { co: boolean; bat: boolean }): void {
   if (tt.co === liveTt.co && tt.bat === liveTt.bat) return
   liveTt = tt
+  // LIVE THEO KHỐI (12/11): `co` chỉ bật ở buổi live của khối (thay-noi.ts) ⇒ tờ vừa sẵn sàng là tự bật live một lần, thầy không phải tìm nút.
+  if (!tt.co) daTuBat = false
+  else if (!tt.bat && !daTuBat) { daTuBat = true; bamLive() }
   capLiveGon()
   if (hien && khung) veBang()
 }
@@ -186,6 +193,7 @@ export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?:
   // Mở mới ⇒ LUÔN màn điểm danh (thầy 09/11 «thoát ra hẳn thì không có chỗ vào lại màn điểm danh»), kể cả phòng còn lượt cũ; chọn câu ⇒ hết cờ.
   hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr, diemDanh: true }
   veBang()
+  void import('../live-khoi/thay-khoi').then((m) => m.ngheBangKhoi()).catch(() => {})
   phatPhien()
 }
 // ESC = RA HÔM NAY, GIỮ NGUYÊN CHỖ DỞ (thầy 09/11 «khi tôi bấm esc thì out hẳn ra màn hôm nay, bấm vào điểm danh thì vào đúng chỗ đang dở»): ẩn bảng + tờ +
@@ -255,6 +263,7 @@ export async function ketThucBuoiHoc(buoiId: string): Promise<string> {
   const { dongBuoiHoc } = await import('../../lib/buoi-hoc-api')
   const r = await dongBuoiHoc(buoiId)
   if (!r.ok) return r.chu
+  void import('../live-khoi/thay-khoi').then((m) => m.khiKetThucBuoi(buoiId)).catch(() => {})
   dongBang(); dongHoatDong(); dongTo()
   try { useAppStore.getState().setScreen('tongquan') } catch { /* app học sinh / test */ } // 10/11: một lần bấm ⇒ bảng đóng, về Hôm nay
   useAppStore.getState().showToast('Đã kết thúc buổi học', 'success')

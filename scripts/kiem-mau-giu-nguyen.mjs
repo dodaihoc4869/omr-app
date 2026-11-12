@@ -273,7 +273,11 @@ for (const x of JSON.parse(readFileSync(new URL('../docs/ban-ve-nut-net-0711/mau
 const BANG_HS_DOI_DUOC = new Set(['src/styles/trong-hs-mau.css', 'src/components/loi-giai-kinh/loi-giai-kinh.css'])
 for (const k of ['--tr-nen: #121129', '--tr-mat: #1c1b3a', '--tr-mat-2: #24234a', '--tr-mat-3: #312f5e', '--tr-vien: #2f2d59', '--tr-vien-2: #403e72', '--tr-chu: #f1f0ff']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1 // 28/10 tối đo theo Duolingo
 for (const k of ['--tr-nen: #131f24', '--tr-mat: #202f36', '--tr-mat-2: #2a3a42', '--tr-mat-3: #37464f', '--tr-vien: #37464f', '--tr-vien-2: #4a5b64', '--tr-chu: #f2f1ea']) MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] = (MAU_CU_THAY_RA_LENH[`src/styles/trong.css · ${k}`] ?? 0) + 1
+// 12/11 thầy (Live theo khối): «Phần bảng đen của chế độ học chuyển nền thành xanh than doligo nhé để thầy và hs dịu mắt» ⇒ nền bảng đen của tờ chiếu
+// #15181c → #131f24 (đúng --tr-nen nền tối app học sinh): đúng MỘT khai báo, đúng tệp. Bảng `MAU_XANH_THAN` (src/lib/live-khoi/mau.ts) chép cùng bảng ấy.
+MAU_CU_THAY_RA_LENH['src/lib/giao-dien-to-chieu.ts · --mc-bang: #15181c'] = (MAU_CU_THAY_RA_LENH['src/lib/giao-dien-to-chieu.ts · --mc-bang: #15181c'] ?? 0) + 1
 const MAU_THAY_RA_LENH = new Set([
+  'src/lib/giao-dien-to-chieu.ts · --mc-bang: #131f24',
   'src/styles/tokens.css · --v2-nga-voi: #fffef6',
   'src/styles/tokens.css · --v2-xanh-than: #0f3d3a',
   'src/styles/tokens.css · --v2-vang: #f7a800',

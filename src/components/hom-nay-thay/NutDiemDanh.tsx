@@ -59,7 +59,7 @@ export default function NutDiemDanh({ className }: { className: string }) {
     ) : null}
     <button type="button" className={className} onPointerEnter={hoiSom} onPointerDown={hoiSom} onFocus={hoiSom} onClick={() => void bam()} disabled={dang}>
       <Users size={18} aria-hidden="true" />
-      {dang ? 'Đang mở…' : 'Điểm danh'}
+      {dang ? 'Đang mở…' : 'Lên bảng'}
     </button>
     </>
   )

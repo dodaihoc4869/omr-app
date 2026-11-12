@@ -7,7 +7,7 @@
 //   · BẢNG: `.…-bang` (khung, cắt) > khung cuộn `.lv-cuon` của lớp vẽ (canvas nét đã chốt của bảng, dời bằng transform).
 //   · LỚP «ĐANG VIẾT» `.…-net`: một canvas nhỏ đi theo đầu bút, chạy trong cả hình.
 // Mỗi khung hình KHÔNG vẽ lại React: mũi tên «Thầy đang viết ở dưới», nút «Về chỗ thầy đang viết» bật / tắt bằng thuộc tính.
-import { forwardRef, useCallback, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
 import { giaiTrang, khungChieu, type AnToan, type KhungChieu, type VungChieu } from './bo-cuc'
@@ -52,6 +52,8 @@ export interface PropsKhungDL {
   /** DẢI THẺ TÊN em đang lên bảng (LenBang.tsx): có ⇒ khung bảng nhường `DAU_BANG` px phía trên, dải nằm NGOÀI mép trên khung bảng (không đè nét). */
   dauBang?: ReactNode
   /** Em chạm vào nền (trước khi xét chạm hai lần). Trả true ⇒ nơi dùng đã xử lí, bỏ qua. */
+  /** LIVE THEO KHỐI (12/11): thầy chọn chế độ «Bảng» ⇒ ép khung bảng phủ kín (`'bang'`); về «Học» (`null`) ⇒ trả hai khung. Vắng ⇒ như cũ. */
+  epPhong?: Vung | null
   khiCham?: () => boolean | void
   khiPhong?: (v: Vung | null) => void
   /** Vạch chia đang do em giữ (true) hay máy tự chia theo thầy (false) — báo lúc dựng và mỗi lần đổi. */
@@ -160,6 +162,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     if (!r) return { x: e.clientX, y: e.clientY }
     return P.current.layHinh().xoay ? { x: e.clientY - r.top, y: r.right - e.clientX } : { x: e.clientX - r.left, y: e.clientY - r.top }
   }
+  const epPhong = p.epPhong
+  useEffect(() => { if (epPhong === undefined || S.current.phong === epPhong) return; S.current.phong = epPhong; P.current.khiPhong?.(epPhong); xep(true) }, [epPhong, xep])
   /** Chạm hai lần vào khung nào ⇒ khung đó phủ kín; hai lần nữa ⇒ về hai khung. */
   const cham = (v: Vung, luc: number): void => {
     const s = S.current

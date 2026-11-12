@@ -74,3 +74,15 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 3. kJ trong trò phòng chờ không tính vào kJ buổi học?
 4. Tên trò «Giữ Lửa» và luật ở mục 4.
 5. Đội chia lại mỗi buổi live theo khối (không lấy đội của lớp trên lớp)?
+
+## Bản đã build (12/11) — khác đặc tả ở đâu
+- **Lịch live không thêm bảng D1:** nằm trong một dòng `cau_hinh` (khoá `live_khoi`, JSON ≤ 30 buổi) ⇒ không migration. Lệnh: `/gv/bpu/khoi-ds | khoi-hen | khoi-huy | khoi-mo | khoi-bat-dau | khoi-xong`, `/hs/bpu/khoi-cua-em | khoi-vao` (`server/src/live-khoi.ts`).
+- **Phòng theo khối = buổi học + phòng Bình Phản Ứng sẵn có.** Em bấm «Tham gia» ⇒ ghi điểm danh `cach = 'live'` ⇒ vào phòng như em có mặt (đội, kJ, trả lời). Cờ `live.khoi { k, gd, che }` của phòng quyết định phòng chờ / chế độ.
+- **Thẻ Live máy em:** hỏi máy chủ lúc mở trang chủ, mỗi ~60 giây khi tab đang hiện, và ngay khi kênh đẩy báo `live` (thầy mở / hẹn / bắt đầu / kết thúc). Lịch hẹn chỉ hiện giờ + đếm ngược; **em vào được khi thầy đã mở phòng chờ** (không tự mở trước 10 phút — phòng cần máy thầy).
+- **Nút «Bắt đầu live»:** trò dừng, máy em hiện màn Bốn đội 3 giây. Tiếng + bảng bắt đầu khi thầy chọn bài và tờ chiếu sẵn sàng (live tự bật một lần, lần đầu hỏi chọn mic như cũ).
+- **Chế độ Học** = nguyên màn live cũ. **Chế độ Bảng:** tờ thầy ẩn giấy đề, bảng máy em phủ kín. Công tắc + nút «Tin nhắn» (phím M) nằm góc trên phải máy thầy.
+- **Buổi dạy trên lớp («Lên bảng», trước là «Điểm danh»):** không còn nút Live trên bảng và trên tờ (cờ `co` chỉ bật khi phòng có `live.khoi`).
+- **Nền bảng đen** của tờ chiếu, bảng Bình Phản Ứng và bảng live máy em: `#15181c` → xanh than `#131f24` (áp cho cả buổi trên lớp).
+- **Chat:** 1 tin / 2 giây / em, 200 ký tự, phòng giữ 200 tin trong RAM, hết buổi là mất. **Trò Giữ Lửa:** máy em gửi ≤ 4 gói / giây, phòng phát một ảnh chụp / 250 ms, chỉ chạy ở phòng chờ; kJ của trò không vào kJ buổi học.
+- Bộ thử trình duyệt thật: `scripts/thu-live-1011/thu-khoi-1211.mjs` (21 kiểm; ảnh `that-*.jpg` trong thư mục bản vẽ).
+- **Chưa thử:** lớp thật nhiều máy, tiếng thật qua SFU ở buổi live theo khối, iPhone thật (xoay hình), tải 80–100 em trong phòng chờ.

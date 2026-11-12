@@ -49,11 +49,13 @@ export async function gvBuoiHocBpu(env: Env, b: Row): Promise<Row> {
 export async function bpuHs(env: Env, p: string, b: Row): Promise<Row> {
   if (p === '/hs/bpu/ve') return hsBpuVe(env, b)
   if (p === '/hs/bpu/cua-em') return hsBpuCuaEm(env, b)
+  if (p.startsWith('/hs/bpu/khoi-')) return (await import('./live-khoi')).hsLiveKhoi(env, p, b)
   return { ok: false, error: 'Không có lệnh này.' }
 }
 /** `/gv/bpu/*` (sau chốt mã bí mật của thầy). */
 export async function bpuGv(env: Env, p: string, b: Row): Promise<Row> {
   if (p === '/gv/bpu/mo') return gvBpuMo(env, b)
   if (p === '/gv/bpu/luot') return gvBpuLuot(env, b)
+  if (p.startsWith('/gv/bpu/khoi-')) return (await import('./live-khoi')).gvLiveKhoi(env, p, b)
   return { ok: false, error: 'Không có lệnh này.' }
 }
