@@ -14,6 +14,11 @@ export const LUI_NOI_MS: readonly number[] = [2_000, 5_000, 15_000, 30_000, 60_0
 const NHIP_PING_MS = 50_000
 /** Hai tin sát nhau ⇒ một lượt đọc lại. */
 const GOP_MS = 400
+/** NỐI LẠI NGAY SAU KHI QUAY LẠI APP (12/11 giảm chi phí): app ẩn ≥ `AN_LAU_MS` thì mọi vòng nền (Sảnh, kế hoạch, EXP, bài mẹ giao — chặn dội 20 s) đã TỰ đọc lại lúc
+ *  hiện ⇒ lần nối lại KHÔNG phát `SU_KIEN_DOI` (cổng em sẽ đọc lại đúng mấy lệnh ấy lần nữa) mà chỉ đọc phần KHÔNG có vòng quay-lại-app: thưởng + Tự sửa lỗi — bớt 3
+ *  lệnh trùng mỗi lần mở lại app. Đang ở màn làm bài / kiểm tra (`data-dang-lam-bai`) ⇒ phát như cũ (cổng hoãn tới lúc em về rồi đọc đủ). */
+export const AN_LAU_MS = 25_000
+const NOI_SAU_HIEN_MS = 15_000
 /** Báo thẻ khác cùng máy sau khi lệnh ghi xong (≈ CHO_PHAT_MS của máy chủ: việc phụ sau phản hồi đã ghi) — gom mọi lệnh trong khoảng này thành MỘT tin. */
 export const CHO_BC_MS = 1200
 /** Đường lệnh LÀM ĐỔI tiến độ — CÙNG danh sách `LENH_DOI` của server/src/kenh-day.ts (test kenh-day-the-0311 khoá hai bên khớp nhau). */
@@ -26,12 +31,15 @@ export function moKenhDay(token: string): () => void {
   let hen: ReturnType<typeof setTimeout> | undefined, ping: ReturnType<typeof setTimeout> | undefined, gop: ReturnType<typeof setTimeout> | undefined
   const an = () => typeof document !== 'undefined' && document.hidden
   const tatPing = () => { if (ping) clearTimeout(ping); ping = undefined }
+  // Cờ «kênh đang mở» `globalThis.ddhKenh` (lib/kenh-co.ts `henKhiCoKenh`): vòng lưới an toàn của thẻ Live thưa ra khi kênh mở.
+  const datCo = (mo: boolean) => { (globalThis as { ddhKenh?: 1 }).ddhKenh = mo ? 1 : undefined }
   // Ping nối tiếp bằng hẹn giờ một lần (không vòng `setInterval` — tests/nhip-bang-2109): app ẩn thì không gửi, chỉ hẹn lại.
   const henPing = (w: WebSocket) => { ping = setTimeout(() => { if (!an() && w.readyState === 1) { try { w.send('p') } catch { /* đang đóng */ } } if (ws === w) henPing(w) }, NHIP_PING_MS) }
   const henLai = () => {
     if (dung || hen) return
     hen = setTimeout(() => { hen = undefined; void noi() }, LUI_NOI_MS[Math.min(loi++, LUI_NOI_MS.length - 1)])
   }
+  let anLuc = an() ? Date.now() : 0, hienLuc = 0
   const bao = () => {
     if (gop) return
     gop = setTimeout(() => { gop = undefined; window.dispatchEvent(new CustomEvent(SU_KIEN_DOI)) }, GOP_MS)
@@ -56,13 +64,23 @@ export function moKenhDay(token: string): () => void {
         loi = 0
         tatPing()
         henPing(w)
+        datCo(true)
         // NỐI LẠI (31/10): lúc mất kết nối máy kia có thể đã làm bài — tin đẩy khi ấy không tới ⇒ đọc lại một lượt. Lần nối ĐẦU không cần (màn vừa tự đọc lúc mở).
-        if (daMo) { bao(); napGoi(false) }
+        if (daMo) {
+          const sauHien = anLuc > 0 && hienLuc - anLuc >= AN_LAU_MS && Date.now() - hienLuc < NOI_SAU_HIEN_MS
+          if (sauHien && document.documentElement.dataset.dangLamBai === undefined) {
+            void import('../components/thuong/dung-thuong').then((m) => m.capNhatTongQuan(token)).catch(() => {})
+            void import('./tu-sua-loi').then((m) => m.taiTuSuaLoi(token, { moi: true })).catch(() => {})
+          } else bao()
+          napGoi(false)
+          // Kênh đứt lúc app ĐANG HIỆN (tin «live» lúc đứt có thể đã lỡ; thẻ Live thưa nhịp khi kênh mở) ⇒ thẻ Live hỏi lại một lượt. Quay lại app thì thẻ đã tự hỏi.
+          if (!sauHien) { try { window.dispatchEvent(new Event('ddh-live-khoi')) } catch { /* trình duyệt cũ */ } }
+        }
         daMo = true
       }
       // BÌNH PHẢN ỨNG (06/11): tin `bpu` = thầy vừa chiếu câu cho cả lớp ⇒ CHỈ mở màn Bình Phản Ứng (không đọc lại Lộ trình: 40 máy đọc cùng lúc là nghẽn).
       w.onmessage = (e) => { if (typeof e.data !== 'string' || !e.data.includes('"doi"')) return; if (e.data.includes('"live"')) { try { window.dispatchEvent(new Event('ddh-live-khoi')) } catch { /* trình duyệt cũ */ } return } if (e.data.includes('"bpu"')) { void import('../components/bpu/gan-hs').then((m) => m.moBpuHs(token, null)).catch(() => {}); return } if (e.data.includes('"goi"')) napGoi(true); bao() }
-      w.onclose = () => { if (ws !== w) return; ws = null; tatPing(); henLai() }
+      w.onclose = () => { if (ws !== w) return; ws = null; datCo(false); tatPing(); henLai() }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     } catch {
       henLai()
@@ -89,7 +107,11 @@ export function moKenhDay(token: string): () => void {
     return p
   }
   if (bc) { bc.onmessage = () => { if (!an()) bao() }; window.fetch = boc }
-  const khiHien = () => { if (!an() && !ws) { if (hen) { clearTimeout(hen); hen = undefined } void noi() } }
+  const khiHien = () => {
+    if (an()) { anLuc = Date.now(); return }
+    if (anLuc > hienLuc) hienLuc = Date.now()
+    if (!ws) { if (hen) { clearTimeout(hen); hen = undefined } void noi() }
+  }
   document.addEventListener('visibilitychange', khiHien)
   window.addEventListener('online', khiHien)
   void noi()
@@ -105,6 +127,7 @@ export function moKenhDay(token: string): () => void {
     window.removeEventListener('online', khiHien)
     const w = ws
     ws = null
+    datCo(false)
     try { w?.close(1000) } catch { /* đã đóng */ }
   }
 }

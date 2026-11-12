@@ -1,5 +1,7 @@
 import type {Env} from './kieu'
 import {newsDay} from './parent-news'
+/** Cửa sổ «đang online» (12/11 giảm chi phí: 90 → 180 s; máy gửi hiện diện 120 s ± 15 s — src/lib/app-presence.ts). Số online cập nhật chậm hơn tối đa ~90 s khi em rời app. */
+export const CUA_SO_ONLINE_MS = 180_000
 export function teacherDayRange(day:string){
  if(!/^\d{4}-\d{2}-\d{2}$/.test(day)||!Number.isFinite(Date.parse(day)))throw new Error('Ngày không hợp lệ.')
  const start=new Date(`${day}T00:01:00+07:00`)
@@ -23,7 +25,7 @@ export async function teacherNews(env:Env,b:Record<string,unknown>){
  ])
  const submittedHomework=await query(`SELECT COUNT(*) n FROM (SELECT khoa,nop_luc FROM btvn_em UNION SELECT khoa,json_extract(du_lieu,'$.nop_luc') nop_luc FROM btvn_em_lich_su) WHERE nop_luc>=? AND nop_luc<?`)
  const daily=(await env.DB.prepare('SELECT role,COUNT(*) visits FROM app_presence WHERE day=? GROUP BY role').bind(day).all<Record<string,any>>()).results
- const online=(await env.DB.prepare('SELECT role,COUNT(DISTINCT session_id) online FROM app_presence WHERE last_seen>=? GROUP BY role').bind(new Date(Date.now()-90000).toISOString()).all<Record<string,any>>()).results
+ const online=(await env.DB.prepare('SELECT role,COUNT(DISTINCT session_id) online FROM app_presence WHERE last_seen>=? GROUP BY role').bind(new Date(Date.now()-CUA_SO_ONLINE_MS).toISOString()).all<Record<string,any>>()).results
  const visits=['gv','hs','ph'].map(role=>({role,visits:Number(daily.find(x=>x.role===role)?.visits||0),online:Number(online.find(x=>x.role===role)?.online||0)}))
  return {ok:true,visits,day,updatedAt:new Date().toISOString(),exams,homework,examSubmitted:Number(submissions[0]?.n||0),homeworkSubmitted:Number(submittedHomework[0]?.n||0),board:board[0],changes}
 }
