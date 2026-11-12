@@ -1,0 +1,72 @@
+/* HỎI NHANH «Hiểu chưa?» — phím / (thầy 12/11 tối, bản vẽ docs/ban-ve-live-moi-1211/38–41). Màu: chỉ pha từ --p-* của app và bảng màn chiếu / xanh than
+   gắn nội tuyến ở gốc; xanh = hiểu (--p-xanh), cam = chưa hiểu (--p-cam pha --p-do). */
+.hh-lop { position: fixed; inset: 0; z-index: 2147483050; pointer-events: none; --k: min(calc(100vw / 1366), calc(100vh / 768));
+  --hh-a: color-mix(in srgb, var(--p-xanh) 62%, var(--p-trang)); --hh-b: color-mix(in srgb, var(--p-do) 42%, color-mix(in srgb, var(--p-cam) 70%, var(--p-trang))); }
+/* ── MÁY THẦY: «bầu trời» ở phần bảng 1/3 bên phải ── */
+.hh-troi { position: absolute; right: calc(12 * var(--k)); top: calc(14 * var(--k)); bottom: calc(78 * var(--k)); width: calc(33.333vw - 22 * var(--k)); border-radius: calc(22 * var(--k)); overflow: hidden; color: var(--p-trang);
+  font-family: inherit; font-weight: 700; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .12), 0 calc(24 * var(--k)) calc(70 * var(--k)) rgb(0 0 0 / .55), inset 0 0 calc(80 * var(--k)) color-mix(in srgb, var(--p-tim) 16%, transparent);
+  background: radial-gradient(120% 70% at 22% 30%, color-mix(in srgb, var(--p-xanh) 34%, transparent), transparent 60%), radial-gradient(120% 70% at 80% 34%, color-mix(in srgb, var(--hh-b) 30%, transparent), transparent 60%),
+    radial-gradient(90% 60% at 50% 100%, color-mix(in srgb, var(--p-tim) 26%, transparent), transparent 70%), linear-gradient(180deg, color-mix(in srgb, var(--tr-chieu-bang) 86%, black), color-mix(in srgb, var(--tr-chieu-bang) 60%, black));
+  animation: hh-vao 0.45s cubic-bezier(.2, 1.2, .4, 1) both; }
+@keyframes hh-vao { from { opacity: 0; transform: translateY(calc(18 * var(--k))) scale(0.96); } to { opacity: 1; transform: none; } }
+.hh-troi::before { content: ''; position: absolute; inset: -30%; background: conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--p-tim-2) 20%, transparent), transparent 40%, color-mix(in srgb, var(--p-xanh) 16%, transparent), transparent 75%); animation: hh-xoay 16s linear infinite; }
+@keyframes hh-xoay { to { transform: rotate(360deg); } }
+.hh-troi > * { position: absolute; }
+.hh-troi h3 { left: 0; right: 0; top: calc(16 * var(--k)); margin: 0; text-align: center; font-size: calc(20 * var(--k)); font-weight: 800; letter-spacing: 0.02em; text-shadow: 0 0 calc(18 * var(--k)) rgb(255 255 255 / .45); }
+.hh-troi h3 small { display: block; margin-top: calc(3 * var(--k)); font-size: calc(13 * var(--k)); font-weight: 700; color: color-mix(in srgb, var(--p-trang) 62%, var(--tr-chieu-phu)); text-shadow: none; }
+.hh-sao { width: calc(3 * var(--k)); height: calc(3 * var(--k)); border-radius: 50%; background: var(--p-trang); box-shadow: 0 0 calc(8 * var(--k)) var(--p-trang); animation: hh-lap-lanh 2.6s ease-in-out infinite alternate; }
+@keyframes hh-lap-lanh { from { opacity: 0.15; } to { opacity: 0.9; } }
+.hh-cot { top: calc(78 * var(--k)); width: 50%; text-align: center; }
+.hh-cot.a { left: 0; } .hh-cot.b { left: 50%; }
+.hh-so { display: inline-block; font-size: calc(74 * var(--k)); font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; animation: hh-nay 0.5s cubic-bezier(.2, 1.6, .4, 1) both; }
+@keyframes hh-nay { from { transform: scale(1.35); filter: brightness(1.6); } to { transform: none; filter: none; } }
+.hh-cot.a .hh-so { color: color-mix(in srgb, var(--hh-a) 70%, var(--p-trang)); text-shadow: 0 0 calc(26 * var(--k)) var(--p-xanh), 0 0 calc(70 * var(--k)) color-mix(in srgb, var(--p-xanh) 60%, transparent); }
+.hh-cot.b .hh-so { color: color-mix(in srgb, var(--hh-b) 60%, var(--p-trang)); text-shadow: 0 0 calc(26 * var(--k)) var(--hh-b), 0 0 calc(70 * var(--k)) color-mix(in srgb, var(--hh-b) 60%, transparent); }
+.hh-nh { margin-top: calc(4 * var(--k)); font-size: calc(15 * var(--k)); font-weight: 800; display: flex; align-items: center; justify-content: center; gap: calc(7 * var(--k)); }
+.hh-nh kbd, .hh-chan kbd { display: inline-grid; place-items: center; min-width: calc(24 * var(--k)); height: calc(24 * var(--k)); padding: 0 calc(5 * var(--k)); border-radius: calc(7 * var(--k)); font: inherit; font-size: calc(13 * var(--k));
+  background: var(--tr-chieu-mat-2); box-shadow: inset 0 0 0 1.5px var(--tr-chieu-phu), 0 calc(2.5 * var(--k)) 0 var(--tr-chieu-mat); }
+/* đốm sáng: mỗi em một đốm, bay từ mép vào cụm của mình rồi lơ lửng */
+.hh-dom { border-radius: 50%; margin: calc(var(--c) / -2) 0 0 calc(var(--c) / -2); width: var(--c); height: var(--c); animation: hh-bay 0.9s cubic-bezier(.16, .9, .3, 1.15) both, hh-lo-lung 3.4s ease-in-out var(--tre) infinite alternate; }
+.hh-dom.a { background: radial-gradient(circle at 38% 34%, var(--p-trang), var(--hh-a) 36%, var(--p-xanh) 62%, transparent 72%); box-shadow: 0 0 calc(16 * var(--k)) var(--p-xanh), 0 0 calc(38 * var(--k)) color-mix(in srgb, var(--p-xanh) 50%, transparent); }
+.hh-dom.b { background: radial-gradient(circle at 38% 34%, var(--p-trang), color-mix(in srgb, var(--hh-b) 50%, var(--p-trang)) 36%, var(--hh-b) 62%, transparent 72%); box-shadow: 0 0 calc(16 * var(--k)) var(--hh-b), 0 0 calc(38 * var(--k)) color-mix(in srgb, var(--hh-b) 50%, transparent); }
+.hh-dom::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: 0 0 0 calc(2 * var(--k)) currentColor; opacity: 0; animation: hh-toa 0.9s ease-out 0.75s both; }
+.hh-dom.a { color: var(--hh-a); } .hh-dom.b { color: var(--hh-b); }
+@keyframes hh-bay { from { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.3); filter: blur(calc(3 * var(--k))) brightness(2); } 60% { opacity: 1; filter: none; } to { opacity: 1; transform: none; } }
+@keyframes hh-lo-lung { from { translate: 0 calc(-3 * var(--k)); } to { translate: 0 calc(3 * var(--k)); } }
+@keyframes hh-toa { from { opacity: 0.9; transform: scale(1); } to { opacity: 0; transform: scale(3.2); } }
+.hh-vong { left: 8%; right: 8%; bottom: calc(96 * var(--k)); }
+.hh-ray { height: calc(10 * var(--k)); border-radius: 99px; overflow: hidden; display: flex; background: rgb(255 255 255 / .1); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .1); }
+.hh-ray i { display: block; height: 100%; transition: width 0.5s cubic-bezier(.2, .9, .3, 1); }
+.hh-ray i.a { background: linear-gradient(90deg, var(--p-xanh), var(--hh-a)); box-shadow: 0 0 calc(16 * var(--k)) var(--p-xanh); }
+.hh-ray i.b { background: linear-gradient(90deg, color-mix(in srgb, var(--hh-b) 60%, var(--p-trang)), var(--hh-b)); box-shadow: 0 0 calc(16 * var(--k)) var(--hh-b); }
+.hh-vong p { margin: calc(7 * var(--k)) 0 0; text-align: center; font-size: calc(13.5 * var(--k)); color: color-mix(in srgb, var(--p-trang) 62%, var(--tr-chieu-phu)); }
+.hh-vong p b { color: var(--p-trang); }
+.hh-ten { left: 6%; right: 6%; bottom: calc(34 * var(--k)); display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-end; gap: calc(6 * var(--k)); max-height: calc(58 * var(--k)); overflow: hidden; }
+.hh-ten span { font-size: calc(12.5 * var(--k)); padding: calc(3.5 * var(--k)) calc(10 * var(--k)); border-radius: 99px; white-space: nowrap; color: color-mix(in srgb, var(--hh-b) 40%, var(--p-trang));
+  background: color-mix(in srgb, var(--hh-b) 16%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--hh-b) 55%, transparent); animation: hh-vao 0.35s ease-out both; }
+.hh-ten em { font-style: normal; font-size: calc(12.5 * var(--k)); font-weight: 800; padding: calc(3.5 * var(--k)) 0; color: color-mix(in srgb, var(--p-trang) 62%, var(--tr-chieu-phu)); }
+.hh-chan { left: 0; right: 0; bottom: calc(9 * var(--k)); display: flex; align-items: center; justify-content: center; gap: calc(6 * var(--k)); font-size: calc(11.5 * var(--k)); color: color-mix(in srgb, var(--p-trang) 50%, var(--tr-chieu-phu)); }
+.hh-chan kbd { min-width: calc(20 * var(--k)); height: calc(20 * var(--k)); font-size: calc(11.5 * var(--k)); color: var(--p-trang); }
+/* ── MÁY EM: hai phím ở chính giữa phần bảng 1/3 bên phải (nằm trong lớp nổi live, tự xoay theo lớp) ── */
+.hh-em { position: absolute; left: 66%; right: 0; top: 0; bottom: 0; z-index: 38; display: grid; place-items: center; pointer-events: none !important;
+  --hh-a: color-mix(in srgb, var(--p-xanh) 62%, var(--p-trang)); --hh-b: color-mix(in srgb, var(--p-do) 42%, color-mix(in srgb, var(--p-cam) 70%, var(--p-trang))); }
+.hh-the { width: min(90%, 320px); padding: 16px 14px 14px; border-radius: 24px; text-align: center; pointer-events: auto; color: var(--p-trang);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--lk-mat, var(--p-muc)) 88%, var(--p-trang)), var(--lk-nen, var(--p-muc))); box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / .14), inset 0 1px 0 rgb(255 255 255 / .2), 0 20px 50px rgb(0 0 0 / .5), 0 0 60px color-mix(in srgb, var(--p-xanh) 14%, transparent);
+  animation: hh-em-vao 0.35s cubic-bezier(.2, 1.3, .4, 1) both; }
+@keyframes hh-em-vao { from { opacity: 0; transform: scale(0.86); } to { opacity: 1; transform: none; } }
+.hh-the h3 { margin: 0 0 2px; font-size: 19px; font-weight: 800; }
+.hh-the p { margin: 0 0 12px; font-size: 13px; font-weight: 600; opacity: 0.66; }
+.hh-hai { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.hh-nut { min-width: 0; min-height: 84px; padding: 10px 0 9px; border: 0; border-radius: 18px; font: inherit; font-weight: 800; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; color: var(--p-muc);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--hh-a) 70%, var(--p-trang)), var(--hh-a)); box-shadow: 0 5px 0 color-mix(in srgb, var(--p-xanh) 70%, black), 0 0 30px color-mix(in srgb, var(--p-xanh) 45%, transparent), inset 0 1px 0 rgb(255 255 255 / .7); transition: transform 0.08s; }
+.hh-nut.k2 { background: linear-gradient(180deg, color-mix(in srgb, var(--hh-b) 60%, var(--p-trang)), var(--hh-b)); box-shadow: 0 5px 0 color-mix(in srgb, var(--hh-b) 62%, black), 0 0 30px color-mix(in srgb, var(--hh-b) 45%, transparent), inset 0 1px 0 rgb(255 255 255 / .7); }
+.hh-nut:active { transform: translateY(4px); }
+.hh-nut b { display: block; font-size: 42px; line-height: 1; }
+.hh-nut span { display: block; margin-top: 3px; font-size: 15px; }
+.hh-the small { display: block; margin-top: 11px; font-size: 12px; font-weight: 600; opacity: 0.62; }
+.hh-da { display: flex; align-items: center; gap: 9px; padding: 8px 16px 8px 9px; border-radius: 99px; font-size: 16px; font-weight: 800; white-space: nowrap; color: var(--p-trang);
+  background: color-mix(in srgb, var(--lk-nen, var(--p-muc)) 92%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--p-xanh) 60%, transparent), 0 0 36px color-mix(in srgb, var(--p-xanh) 35%, transparent); animation: hh-da 1.1s ease-out both; }
+.hh-da i { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-style: normal; background: var(--hh-a); color: var(--p-muc); }
+@keyframes hh-da { 0% { opacity: 0; transform: scale(0.8); } 18%, 70% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .hh-troi, .hh-troi::before, .hh-sao, .hh-so, .hh-dom, .hh-dom::after, .hh-the { animation: none; } }
+html.may-yeu .hh-the { animation: none; }

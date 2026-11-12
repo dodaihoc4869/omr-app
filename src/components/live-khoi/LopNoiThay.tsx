@@ -15,6 +15,7 @@ const TroSinhTon = lazy(() => import('./TroSinhTon'))
 const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 const MayTinhThay = lazy(() => import('../may-tinh/MayTinhThay'))
+const HoiHieuThay = lazy(() => import('./HoiHieuThay'))
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
 
 export default function LopNoiThay() {
@@ -26,6 +27,8 @@ export default function LopNoiThay() {
   const [chon, setChon] = useState(false)
   // Máy tính «Đỗ Đại Học FX4869» (thầy 12/11): nút máy tính trên thanh đáy của tờ bật / tắt; nổi trên màn chiếu, đồng bộ sang máy em.
   const [mt, setMt] = useState(false)
+  // Phím / (thầy 12/11): hỏi nhanh cả lớp «Hiểu chưa?» — bấm mở, bấm lần nữa đóng.
+  const [hieu, setHieu] = useState(false)
   /** Bảng danh sách: null = theo phòng (phòng đang «sanh» thì hiện) · true = thầy tự mở (Esc, nút «Lớp») · false = thầy đã RỜI danh sách sang màn chiếu / tấm
    *  hoạt động dù phòng còn «sanh» (máy em chỉ đổi khi có câu được chiếu). */
   const [sanhTay, setSanh] = useState<boolean | null>(null)
@@ -104,16 +107,16 @@ export default function LopNoiThay() {
   // Cụm điều khiển nằm trong khay nút bốn ô của TỜ (thầy 12/11 «phần nút này bị rối, chuyển nó vào trong cái 4 nút»): tờ báo bấm bằng sự kiện `ddh-lkt`
   // (qua thay-noi.ts); số tin mới báo ngược lại bằng `ddh-lkt-moi`. Cụm nổi của app chỉ còn lúc BẢNG ĐUA đang hiện (tờ bị che, không có nút bốn ô).
   const lenhTo = useRef<(v: string) => void>(() => {})
-  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'mt') setMt((c) => !c); else if (v === 'khay' || v === 'ngoai') setChat(false) }
+  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'mt') setMt((c) => !c); else if (v === 'hieu') setHieu((c) => !c); else if (v === 'khay' || v === 'ngoai') setChat(false) }
   useEffect(() => { const f = (e: Event) => lenhTo.current(String((e as CustomEvent<string>).detail)); window.addEventListener('ddh-lkt', f); return () => window.removeEventListener('ddh-lkt', f) }, [])
-  // PHÍM TAB ở cửa sổ app (tấm hoạt động, lúc tiêu điểm không nằm trong tờ) = đổi Học ⇄ Bảng; trong tờ thì tờ tự nghe (live-khoi-to-chieu.ts). Bảng danh sách /
+  // PHÍM / ở cửa sổ app = hỏi nhanh «Hiểu chưa?» (cùng chỗ nghe với Tab). PHÍM TAB ở cửa sổ app (tấm hoạt động, lúc tiêu điểm không nằm trong tờ) = đổi Học ⇄ Bảng; trong tờ thì tờ tự nghe (live-khoi-to-chieu.ts). Bảng danh sách /
   // bảng chọn / đang gõ tin nhắn: Tab giữ nghĩa thường.
   const tabDuoc = dang && !sanh && !chon
   useEffect(() => {
     if (!tabDuoc) return
     const f = (e: KeyboardEvent) => {
-      if (e.key !== 'Tab' || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || (e.target as HTMLElement | null)?.closest?.('input,textarea,select,[contenteditable]')) return
-      e.preventDefault(); lenhTo.current(layView()?.live?.khoi?.che === 'bang' ? 'hoc' : 'bang')
+      if ((e.key !== 'Tab' && e.key !== '/') || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || e.repeat || (e.target as HTMLElement | null)?.closest?.('input,textarea,select,[contenteditable]')) return
+      e.preventDefault(); lenhTo.current(e.key === '/' ? 'hieu' : layView()?.live?.khoi?.che === 'bang' ? 'hoc' : 'bang')
     }
     window.addEventListener('keydown', f, true)
     return () => window.removeEventListener('keydown', f, true)
@@ -177,6 +180,7 @@ export default function LopNoiThay() {
       <HangTay v={v} />
       {chat ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
       {mtHien ? <Suspense fallback={null}><MayTinhThay kenh={kenh} /></Suspense> : null}
+      {hieu && dang && !sanh && !chon ? <Suspense fallback={null}><HoiHieuThay kenh={kenh} tong={v.live?.xem || v.ds.filter((e) => e.vao).length} /></Suspense> : null}
     </div>
   )
 }

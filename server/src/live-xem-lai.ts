@@ -163,7 +163,7 @@ export class NhatKyXl {
     const kin = l && l.pha !== 'mo' && cham ? Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, { dung: chamTra(l, t.chon, cham).dung }])) : null
     // Bản đông cứng của đúng những trường `soVet` đọc (trạng thái thật còn đổi tiếp trước khi việc nền chạy).
     const ban = {
-      ketThuc: st.ketThuc, live: { bat: lv.bat, bang: lv.bang, mic: lv.mic ? { sbd: lv.mic.sbd } : null },
+      ketThuc: st.ketThuc, live: { bat: lv.bat, bang: lv.bang, mic: lv.mic ? { sbd: lv.mic.sbd } : null, khoi: lv.khoi ?? null },
       luot: l ? { so: l.so, batDau: l.batDau, qid: l.qid, phan: l.phan, tuLuan: l.tuLuan, cau: l.cau, dung: l.pha === 'mo' ? l.dung : '', giai: l.pha === 'mo' ? l.giai : null, pha: l.pha, tra: l.tra, ketQua: l.pha === 'mo' ? l.ketQua : kin, goi: l.goi ? { sbd: l.goi.sbd, dat: l.goi.dat } : null } : null,
     } as unknown as TrangThaiPhong
     void this.xep(() => this.xuLy(ban, nay)).catch(() => undefined)
@@ -315,7 +315,7 @@ export class NhatKyXl {
     const ten = await traTenCau(env, Object.values(luot).map((x) => x.qid), lop)
     const banCu = Math.max(cu?.ban ?? 0, cu ? 0 : Number(dong?.ban) && str(dong?.trang_thai) === 'xong' ? Number(dong?.ban) : 0)
     const tenThay = str(dong?.ten_thay).trim() || null
-    const v = { id, ban: 0, lop, suKien, net, khuc, luot, ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), bangVang: bangVangCua(st), ten, tenThay, nay }
+    const v = { id, ban: 0, lop, suKien, net, khuc, luot, ds: st.ds.map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi })), bangVang: bangVangCua(st), ten, tenThay, nay, khoi: !!st.live?.khoi || lop.startsWith('Live Khối ') }
     const kq = dungBuoi(v)
     if (!kq.du) {
       // 11/11 (thầy: «kết thúc live chưa thấy có bản ghi»): KHÔNG BAO GIỜ bỏ im một buổi đã live. Chưa có đoạn nào ⇒ dòng vẫn nằm trong «Lịch sử Live» của
