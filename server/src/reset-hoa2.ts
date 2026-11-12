@@ -113,7 +113,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   // Gói Tự sửa lỗi đóng sẵn (31/10, goi-sua-dem.ts): chỉ dấu «đã đóng gói hôm nay», tự hết hiệu lực theo ngày ⇒ GIỮ = không đụng.
   'sua_goi_ngay',
   // Hành trình v4: hồ sơ trí nhớ/đồ thị và receipt can thiệp đi cùng sổ học, như OMNI ⇒ GIỮ.
-  'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_loai_ngay','goi_bai_7_ly_do','goi_bai_7_no_em','goi_bai_7_no_chon','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em',
+  'goi_bai_7','goi_bai_7_cau','goi_bai_7_em','goi_bai_7_gap','goi_bai_7_ngay','goi_bai_7_chua','goi_bai_7_kiem','goi_bai_7_muc_ngay','goi_bai_7_loai_ngay','goi_bai_7_ly_do','goi_bai_7_no_em','goi_bai_7_no_chon','goi_bai_7_sua_han','goi_bai_7_tick_em','goi_bai_7_chon_em','goi_bai_7_revision','goi_bai_7_sua_em','goi_bai_7_em_nhan_dem',
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
   // Cạnh cả lớp cộng sẵn (12/11, hanh-trinh-canh-lop.ts): dẫn xuất từ hanh_trinh_v4_canh (GIỮ) ⇒ GIỮ cho nhất quán; cron dựng lại ≤ 2 giờ.
