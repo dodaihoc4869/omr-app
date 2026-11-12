@@ -1,0 +1,29 @@
+[
+  {
+    "i": 178,
+    "hash": "1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8",
+    "fileNguon": "anh/1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8.png",
+    "svg": "pet178-native-ddh-b607323a572ae46c4cd3433d58d195c54e466d7bba5616fa0f19f53d67f45b92.svg",
+    "hashSvg": "b607323a572ae46c4cd3433d58d195c54e466d7bba5616fa0f19f53d67f45b92",
+    "byteSvg": 70471,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D1-II-3",
+        "de": "Poly(ethylene terephthalate) (viết tắt là PET) là một loại polymer được sử dụng phổ biến để sản xuất chai nhựa, màng mỏng và sợi dệt (tơ Lapsan). Trong công nghiệp, một nhà máy tổng hợp PET từ nguyên liệu đầu là p-xylene theo sơ đồ rút gọn như hình.",
+        "refs": [
+          {
+            "hash": "1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8",
+            "where": "VIP27-C4-B14-D1-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "af3a06214c1d28a94b830026e2aa8e10ae34f56aca57e1cd116b9ac7d6d47073"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "26C9OstructuresEXCLconditions/3Ph9innerCCdouble-XyleneupperLEFTlowerLEFTverticalRIGHT-TPAopposite-Producthorizontal/2explicitCOverticalraysWHITEgapbeforeCglyph/2OPENVheads/ONLY2HpercentTRUEdam-othersregularUPRIGHT/SUB23-tSUPo-nSUB/EXACTp-xylene-Terephthalic acid (TPA)-Poly (ethylene terephthalate) (PET)/HOlastO-CH3firstC-COOHfirstC/terminalHOoutsideLEFT-HoutsideRIGHT/NOtheorynormalize-addedH2O-formula-answer-alias",
+    "hashSvgDaSoat": "b607323a572ae46c4cd3433d58d195c54e466d7bba5616fa0f19f53d67f45b92",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

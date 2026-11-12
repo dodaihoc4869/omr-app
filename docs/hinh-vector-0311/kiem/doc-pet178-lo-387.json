@@ -1,0 +1,919 @@
+{
+  "i": 178,
+  "assetIndexProvided": 1349,
+  "hash": "1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8.png",
+  "size": [
+    1372,
+    254
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B14-D1-II-3",
+      "de": "Poly(ethylene terephthalate) (viết tắt là PET) là một loại polymer được sử dụng phổ biến để sản xuất chai nhựa, màng mỏng và sợi dệt (tơ Lapsan). Trong công nghiệp, một nhà máy tổng hợp PET từ nguyên liệu đầu là p-xylene theo sơ đồ rút gọn như hình.",
+      "allHinh": [
+        {
+          "hash": "1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8",
+          "where": "VIP27-C4-B14-D1-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "af3a06214c1d28a94b830026e2aa8e10ae34f56aca57e1cd116b9ac7d6d47073"
+        }
+      ],
+      "missingHashes": [
+        "1ebe6e2361de96b0ab43b975e77de63f918b34b48a708b9af521b544b8c123b8"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownProduct2xOpened": true,
+    "ownXyleneAndTPA2xEachOpened": true,
+    "ownTop2xOpened": true,
+    "ownH10xOpened": true,
+    "ownCaption4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxcenterlines/bboxes, explicitCglyphpreservinggaps—notbareCfeet. Topnamesliteralcase/spacespreserved. Noanswer/yieldnormalization.",
+  "geometry": {
+    "topNames": [
+      {
+        "text": "p-xylene",
+        "bbox": [
+          16,
+          5,
+          118,
+          35
+        ],
+        "font": "regularuprightserif"
+      },
+      {
+        "text": "Terephthalic acid (TPA)",
+        "bbox": [
+          288,
+          5,
+          577,
+          36
+        ],
+        "font": "regularuprightserif"
+      },
+      {
+        "text": "Poly (ethylene terephthalate) (PET)",
+        "bbox": [
+          868,
+          3,
+          1294,
+          37
+        ],
+        "font": "regularuprightserif",
+        "note": "ONEspaceafterPolybefore(, ONEspacebefore(PET)"
+      }
+    ],
+    "arrows": [
+      {
+        "shaft": [
+          [
+            132,
+            23
+          ],
+          [
+            269,
+            23
+          ]
+        ],
+        "openV": [
+          [
+            [
+              260,
+              15
+            ],
+            [
+              269,
+              23
+            ]
+          ],
+          [
+            [
+              260,
+              31
+            ],
+            [
+              269,
+              23
+            ]
+          ]
+        ],
+        "above": {
+          "text": "+O₂, xt, tᵒ",
+          "bbox": [
+            159,
+            0,
+            240,
+            19
+          ],
+          "font": "regularuprightserif"
+        },
+        "below": {
+          "text": "H = 85%",
+          "bbox": [
+            166,
+            26,
+            238,
+            41
+          ],
+          "font": "TRUEBOLDuprightserif"
+        }
+      },
+      {
+        "shaft": [
+          [
+            595,
+            23
+          ],
+          [
+            853,
+            23
+          ]
+        ],
+        "openV": [
+          [
+            [
+              844,
+              15
+            ],
+            [
+              853,
+              23
+            ]
+          ],
+          [
+            [
+              844,
+              31
+            ],
+            [
+              853,
+              23
+            ]
+          ]
+        ],
+        "above": {
+          "text": "+Ethylene glycol (EG), xt, tᵒ",
+          "bbox": [
+            625,
+            0,
+            826,
+            20
+          ],
+          "font": "regularuprightserif"
+        },
+        "below": {
+          "text": "H =90%",
+          "bbox": [
+            690,
+            26,
+            760,
+            41
+          ],
+          "font": "TRUEBOLDuprightserif",
+          "note": "Nativegapafterequalsnarrower;preservevisiblecontentnotnewnumbers"
+        }
+      }
+    ],
+    "xylene": {
+      "ringVertices": [
+        [
+          26,
+          137
+        ],
+        [
+          61,
+          117
+        ],
+        [
+          95,
+          137
+        ],
+        [
+          95,
+          177
+        ],
+        [
+          61,
+          197
+        ],
+        [
+          26,
+          177
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            33,
+            141
+          ],
+          [
+            61,
+            125
+          ]
+        ],
+        [
+          [
+            88,
+            141
+          ],
+          [
+            88,
+            173
+          ]
+        ],
+        [
+          [
+            33,
+            173
+          ],
+          [
+            61,
+            189
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "text": "CH₃",
+          "bbox": [
+            53,
+            68,
+            97,
+            92
+          ],
+          "bond": [
+            [
+              61,
+              117
+            ],
+            [
+              61,
+              91
+            ]
+          ],
+          "anchor": "FIRSTC"
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            53,
+            231,
+            97,
+            254
+          ],
+          "bond": [
+            [
+              61,
+              197
+            ],
+            [
+              61,
+              229
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "note": "SUB3atnativebottom254clipifneeded"
+        }
+      ],
+      "C": 8
+    },
+    "TPA": {
+      "ringVertices": [
+        [
+          359,
+          128
+        ],
+        [
+          398,
+          105
+        ],
+        [
+          437,
+          128
+        ],
+        [
+          437,
+          174
+        ],
+        [
+          398,
+          197
+        ],
+        [
+          359,
+          174
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            366,
+            132
+          ],
+          [
+            366,
+            170
+          ]
+        ],
+        [
+          [
+            399,
+            114
+          ],
+          [
+            430,
+            132
+          ]
+        ],
+        [
+          [
+            399,
+            188
+          ],
+          [
+            430,
+            170
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "text": "COOH",
+          "bbox": [
+            390,
+            50,
+            457,
+            73
+          ],
+          "bond": [
+            [
+              398,
+              105
+            ],
+            [
+              398,
+              74
+            ]
+          ],
+          "anchor": "FIRSTC"
+        },
+        {
+          "text": "COOH",
+          "bbox": [
+            390,
+            232,
+            457,
+            254
+          ],
+          "bond": [
+            [
+              398,
+              197
+            ],
+            [
+              398,
+              230
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "note": "Bottomlabelnearcutedge"
+        }
+      ],
+      "C": 8,
+      "O": 4
+    },
+    "polymer": {
+      "ringVertices": [
+        [
+          954,
+          153
+        ],
+        [
+          975,
+          116
+        ],
+        [
+          1018,
+          116
+        ],
+        [
+          1039,
+          153
+        ],
+        [
+          1018,
+          189
+        ],
+        [
+          975,
+          189
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            963,
+            151
+          ],
+          [
+            980,
+            123
+          ]
+        ],
+        [
+          [
+            1013,
+            123
+          ],
+          [
+            1030,
+            151
+          ]
+        ],
+        [
+          [
+            980,
+            182
+          ],
+          [
+            1013,
+            182
+          ]
+        ]
+      ],
+      "labels": [
+        {
+          "text": "HO",
+          "bbox": [
+            823,
+            141,
+            859,
+            165
+          ],
+          "anchor": "LASTO"
+        },
+        {
+          "text": "C",
+          "bbox": [
+            897,
+            142,
+            917,
+            165
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            898,
+            105,
+            916,
+            129
+          ]
+        },
+        {
+          "text": "C",
+          "bbox": [
+            1063,
+            142,
+            1083,
+            165
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            1063,
+            105,
+            1082,
+            129
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            1108,
+            142,
+            1128,
+            165
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            1151,
+            142,
+            1192,
+            166
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            1211,
+            142,
+            1253,
+            166
+          ]
+        },
+        {
+          "text": "O",
+          "bbox": [
+            1274,
+            142,
+            1294,
+            165
+          ]
+        },
+        {
+          "text": "H",
+          "bbox": [
+            1313,
+            142,
+            1332,
+            165
+          ]
+        }
+      ],
+      "COdoubleRays": [
+        [
+          [
+            [
+              903,
+              132
+            ],
+            [
+              903,
+              141
+            ]
+          ],
+          [
+            [
+              911,
+              132
+            ],
+            [
+              911,
+              141
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              1069,
+              132
+            ],
+            [
+              1069,
+              141
+            ]
+          ],
+          [
+            [
+              1077,
+              132
+            ],
+            [
+              1077,
+              141
+            ]
+          ]
+        ]
+      ],
+      "COGapRule": "2EXPLICITCglyphs, verticalrayends141leavewhitegapbeforeCink142..;upperwhitegaptoOink129..132. DoNOTextendlinesintoglyph/forcebareCsplitfeet.",
+      "singleBonds": [
+        [
+          [
+            860,
+            153
+          ],
+          [
+            895,
+            153
+          ]
+        ],
+        [
+          [
+            919,
+            153
+          ],
+          [
+            954,
+            153
+          ]
+        ],
+        [
+          [
+            1039,
+            153
+          ],
+          [
+            1061,
+            153
+          ]
+        ],
+        [
+          [
+            1085,
+            153
+          ],
+          [
+            1105,
+            153
+          ]
+        ],
+        [
+          [
+            1131,
+            153
+          ],
+          [
+            1148,
+            153
+          ]
+        ],
+        [
+          [
+            1194,
+            153
+          ],
+          [
+            1209,
+            153
+          ]
+        ],
+        [
+          [
+            1255,
+            153
+          ],
+          [
+            1272,
+            153
+          ]
+        ],
+        [
+          [
+            1297,
+            153
+          ],
+          [
+            1311,
+            153
+          ]
+        ]
+      ],
+      "parentheses": {
+        "leftCurveGuides": [
+          [
+            891,
+            91
+          ],
+          [
+            879,
+            112
+          ],
+          [
+            874,
+            143
+          ],
+          [
+            878,
+            177
+          ],
+          [
+            892,
+            199
+          ]
+        ],
+        "rightCurveGuides": [
+          [
+            1285,
+            92
+          ],
+          [
+            1298,
+            113
+          ],
+          [
+            1303,
+            145
+          ],
+          [
+            1298,
+            176
+          ],
+          [
+            1285,
+            195
+          ]
+        ],
+        "nSub": {
+          "text": "n",
+          "bbox": [
+            1304,
+            184,
+            1320,
+            204
+          ],
+          "font": "regularuprightsans",
+          "note": "nLOWoutsideRIGHTparenthesis"
+        }
+      },
+      "C": 10,
+      "O": 5,
+      "note": "TerminalHOandHliteral;product5OincludingHOleft. DoNOTremoveHOtogetstandardrepeatstoichiometry."
+    },
+    "font": "Moleculelabelsregularuprightsans; topnames/conditionsregularuprightserif; ONLYH85/H90TRUEBOLDserif. Sub2/3/4andnsubliteral, tsmallroundoSUP.",
+    "countsStructuresOnly": {
+      "C": 26,
+      "O": 9,
+      "phenylRings": 3,
+      "innerCCdouble": 9,
+      "explicitCOdouble": 2,
+      "topOpenVHeads": 2,
+      "parenthesisPairs": 1,
+      "nSub": 1
+    },
+    "noAdded": [
+      "H2Oproduct",
+      "nrepeatcorrection",
+      "boldallnames",
+      "yieldanswer",
+      "externalcaption",
+      "splitfeetforcesexplicitC",
+      "alias"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "corrections": [
+    {
+      "field": "geometry.xylene.innerDoubleRays",
+      "oldIncorrectTPAOrientation": [
+        [
+          [
+            33,
+            141
+          ],
+          [
+            33,
+            173
+          ]
+        ],
+        [
+          [
+            62,
+            125
+          ],
+          [
+            88,
+            140
+          ]
+        ],
+        [
+          [
+            62,
+            188
+          ],
+          [
+            88,
+            173
+          ]
+        ]
+      ],
+      "newOwnNativeXylene": [
+        [
+          [
+            33,
+            141
+          ],
+          [
+            61,
+            125
+          ]
+        ],
+        [
+          [
+            88,
+            141
+          ],
+          [
+            88,
+            173
+          ]
+        ],
+        [
+          [
+            33,
+            173
+          ],
+          [
+            61,
+            189
+          ]
+        ]
+      ],
+      "reason": "OwnreopenednativeXYLmacroshowsUPPERLEFT/RIGHTvertical/LOWERLEFTdoublepositions. InitialsourceJSONmistakenlyusedoppositeTPAorientation. Source-onlycorrectionbeforefirstSVG, noSVGnegative.",
+      "evidence": "/workspace/scratch/178-xyl2x.png"
+    }
+  ],
+  "sourceCorrection": {
+    "oldSourceOnlyXyleneRaysWrong": [
+      [
+        [
+          33,
+          141
+        ],
+        [
+          61,
+          125
+        ]
+      ],
+      [
+        [
+          88,
+          141
+        ],
+        [
+          88,
+          173
+        ]
+      ],
+      [
+        [
+          33,
+          173
+        ],
+        [
+          61,
+          189
+        ]
+      ]
+    ],
+    "correctOwn8xXyleneRays": [
+      [
+        [
+          33,
+          141
+        ],
+        [
+          61,
+          125
+        ]
+      ],
+      [
+        [
+          88,
+          141
+        ],
+        [
+          88,
+          173
+        ]
+      ],
+      [
+        [
+          33,
+          173
+        ],
+        [
+          61,
+          189
+        ]
+      ]
+    ],
+    "reason": "Xylene upperLEFT/lowerLEFT/verticalRIGHT; old agent source-only rays copied TPA orientation WRONG. Root correct BEFORE first builder; no SVG negative. NativeapproxNOTsubpixel."
+  },
+  "rootReview": {
+    "nativeFull2x": true,
+    "ownProductTop3x": true,
+    "ownXylene8x": true,
+    "allPublicDeAllRefs": true,
+    "topNamesRegular24DueDdhActualAdvance": true
+  },
+  "rootSvgCorrection": {
+    "oldHashSvg": "a969b2ff2dfb1d854bdfd0b21fc3224a36ee7328f83b9985ddd907d44f9382b7",
+    "reason": "secondcondition t/o actual collision",
+    "onlyChange": "superscript o x822→829; all other glyphs and geometry unchanged",
+    "oldEvidence": "pet178-lo-387-ban-cu-bi-loai.json"
+  },
+  "sourceStageStatus": "source-only/noSVG/noCount",
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "b607323a572ae46c4cd3433d58d195c54e466d7bba5616fa0f19f53d67f45b92",
+    "readonlyProof": "/workspace/scratch/soat-pet178-lo387.json",
+    "runtime": "/workspace/scratch/pet178-runtime.log",
+    "newFull": 1
+  }
+}
