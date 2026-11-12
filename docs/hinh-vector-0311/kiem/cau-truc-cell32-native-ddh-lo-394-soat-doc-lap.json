@@ -1,0 +1,20 @@
+[
+  {
+    "i": 32,
+    "hashSvg": "3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-OXHK-II-23.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và hatch/topbatterywave/leadercaptionmacros. Own nguồn rowprobe xác nhận57nhóm nét ngang y90..323 không đều, bản mới giữ57hatch không gọi tick. Hai rodsxám/2batterybarslongLEFTshortRIGHT/hai vòng dấu vẽ+LEFT−RIGHT đúng; sóng phủ rods/hatch,7crest7trough nội thất+boundarycresttrái/partialtroughphải không nhận8chu kỳ trọn. Hai miệng trên mở/leader đặc lên trái dừng tự do,4.5V dấu chấm/5A/Màng ngăn xốp thường thẳng đúng. Không thấy glyphchạm/cắt/tràn hoặc bubble/ion/anode-label/đápán thêm.",
+    "render": "/workspace/scratch/soat394-32-fresh.png",
+    "macro": [
+      "/workspace/scratch/cell32-hatch.png",
+      "/workspace/scratch/cell32-topwave.png",
+      "/workspace/scratch/cell32-leader.png"
+    ],
+    "hash": "06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087",
+    "hashSvgDaSoat": "3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba",
+    "runtimeLog": {
+      "sha256": "b56e475ca62322e6dab231d2ce481bcacc66f3ef55b30b2b1a8ef45525589d67",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/cell32-native-ddh-3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba.svg 3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba\n32 { x: 0, y: 0, width: 393, height: 389 }\nPOSTSHOT_SHA 3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba\n"
+    }
+  }
+]

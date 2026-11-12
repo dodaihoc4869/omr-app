@@ -1,0 +1,1207 @@
+{
+  "i": 32,
+  "assetIndexProvided": 1379,
+  "hash": "06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087.png",
+  "size": [
+    393,
+    389
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-OXHK-II-23",
+      "de": "Một nhóm học sinh tiến hành thí nghiệm điện phân điều chế chlorine và so sánh tính oxi hóa của chlorine với iodine như sau:\nCho vào bình điện phân (có màng ngăn xốp) 300 mL dung dịch hỗn hợp NaCl 2 M, KI 2 M và vài giọt dung dịch hồ tinh bột, nối bình điện phân với nguồn điện một chiều (như hình vẽ bên). Nhóm học sinh trên tiến hành điện phân trong thời gian 30 phút với cường độ không đổi là 5 A thấy phần dung dịch bên phía anode chuyển sang màu xanh. Biết số mol electron đi qua dây dẫn được tính bằng công thức: $n = \\dfrac{I.t}{96500}$, trong đó: I là cường độ dòng điện (A), t là thời gian (giây).\nSau khi tra cứu được các giá trị thế điện cực chuẩn $E^o_{Cl_2/2Cl^-} = 1,36$ V; $E^o_{I_2/2I^-} = 0,54$ V, nhóm học sinh đưa ra nhận định “Trong quá trình điện phân trên, ở anode chỉ có ion $\\ce{Cl-}$ bị oxi hóa thành $\\ce{Cl2}$, $\\ce{Cl2}$ phản ứng với dung dịch KI tạo ra $\\ce{I2}$ làm xanh hồ tinh bột”.",
+      "allHinh": [
+        {
+          "hash": "06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087",
+          "where": "VIP27-CDK-OXHK-II-23.hinh.0.du_lieu",
+          "hashDataUrl": "49fcc475b70c14a4ccf69489a9ec87ba1a8674394a48f3aa407aae1861d952c4"
+        }
+      ],
+      "missingHashes": [
+        "06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyOneHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/394-full3x.png",
+      "/workspace/scratch/394-hatch8x.png",
+      "/workspace/scratch/394-top6x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "membraneHorizontalStrokes": 57,
+      "batteryBars": 2,
+      "electrodes": 2,
+      "polarityCircles": 2,
+      "leaderArrows": 1
+    },
+    "font": {
+      "4.5V": "Regular upright serif; decimal DOT literal, no space before V",
+      "5A": "Regular upright serif; no space",
+      "Màng ngăn xốp": "Regular upright serif, not italic/actual bold"
+    },
+    "labels": [
+      {
+        "literal": "4.5V",
+        "bboxApprox": [
+          176,
+          35,
+          223,
+          54
+        ]
+      },
+      {
+        "literal": "5A",
+        "bboxApprox": [
+          194,
+          58,
+          220,
+          76
+        ]
+      },
+      {
+        "literal": "Màng ngăn xốp",
+        "bboxApprox": [
+          178,
+          335,
+          327,
+          360
+        ]
+      }
+    ],
+    "battery": {
+      "leftLongBar": [
+        [
+          197.5,
+          9
+        ],
+        [
+          197.5,
+          28
+        ]
+      ],
+      "rightShortBar": [
+        [
+          201.5,
+          14
+        ],
+        [
+          201.5,
+          24
+        ]
+      ],
+      "wireLeft": [
+        [
+          197,
+          19
+        ],
+        [
+          143.5,
+          19
+        ],
+        [
+          143.5,
+          87
+        ]
+      ],
+      "wireRight": [
+        [
+          202,
+          19
+        ],
+        [
+          255,
+          19
+        ],
+        [
+          255,
+          87
+        ]
+      ],
+      "strokeApprox": 1.2
+    },
+    "polarity": {
+      "implementation": "Drawn circle outlines with separate crossing/short horizontal strokes, no assumption Unicode circled glyph",
+      "plus": {
+        "center": [
+          128.5,
+          25.5
+        ],
+        "radius": 7,
+        "horizontal": [
+          [
+            122,
+            25.5
+          ],
+          [
+            135,
+            25.5
+          ]
+        ],
+        "vertical": [
+          [
+            128.5,
+            19
+          ],
+          [
+            128.5,
+            32
+          ]
+        ]
+      },
+      "minus": {
+        "center": [
+          269.5,
+          25.5
+        ],
+        "radius": 7,
+        "horizontal": [
+          [
+            263,
+            25.5
+          ],
+          [
+            276,
+            25.5
+          ]
+        ]
+      }
+    },
+    "vessel": {
+      "strokeApprox": 1,
+      "outerLeftBottomRight": [
+        [
+          9,
+          87
+        ],
+        [
+          9,
+          327
+        ],
+        [
+          389,
+          327
+        ],
+        [
+          389,
+          87
+        ]
+      ],
+      "topLeftOpeningLip": [
+        [
+          9,
+          87
+        ],
+        [
+          31,
+          87
+        ],
+        [
+          31,
+          60
+        ]
+      ],
+      "topLeftInnerLip": [
+        [
+          74,
+          60
+        ],
+        [
+          74,
+          87
+        ],
+        [
+          328,
+          87
+        ],
+        [
+          328,
+          60
+        ]
+      ],
+      "topRightOuterLip": [
+        [
+          371,
+          60
+        ],
+        [
+          371,
+          87
+        ],
+        [
+          389,
+          87
+        ]
+      ],
+      "rightBoundaryAt389": "Native retains white margin to393; do not recenter or extend."
+    },
+    "electrodes": [
+      {
+        "bboxApprox": [
+          129,
+          87,
+          158,
+          211
+        ],
+        "fillApprox": "#858585"
+      },
+      {
+        "bboxApprox": [
+          241,
+          87,
+          269,
+          211
+        ],
+        "fillApprox": "#858585"
+      }
+    ],
+    "membrane": {
+      "strokes": [
+        {
+          "yRows": [
+            90,
+            91
+          ],
+          "centerY": 90.5,
+          "from": [
+            195,
+            90.5
+          ],
+          "to": [
+            207,
+            90.5
+          ]
+        },
+        {
+          "yRows": [
+            95
+          ],
+          "centerY": 95.0,
+          "from": [
+            195,
+            95.0
+          ],
+          "to": [
+            206,
+            95.0
+          ]
+        },
+        {
+          "yRows": [
+            99
+          ],
+          "centerY": 99.0,
+          "from": [
+            195,
+            99.0
+          ],
+          "to": [
+            206,
+            99.0
+          ]
+        },
+        {
+          "yRows": [
+            103
+          ],
+          "centerY": 103.0,
+          "from": [
+            195,
+            103.0
+          ],
+          "to": [
+            208,
+            103.0
+          ]
+        },
+        {
+          "yRows": [
+            107,
+            108
+          ],
+          "centerY": 107.5,
+          "from": [
+            195,
+            107.5
+          ],
+          "to": [
+            206,
+            107.5
+          ]
+        },
+        {
+          "yRows": [
+            111,
+            112
+          ],
+          "centerY": 111.5,
+          "from": [
+            194,
+            111.5
+          ],
+          "to": [
+            206,
+            111.5
+          ]
+        },
+        {
+          "yRows": [
+            116
+          ],
+          "centerY": 116.0,
+          "from": [
+            195,
+            116.0
+          ],
+          "to": [
+            206,
+            116.0
+          ]
+        },
+        {
+          "yRows": [
+            120
+          ],
+          "centerY": 120.0,
+          "from": [
+            195,
+            120.0
+          ],
+          "to": [
+            207,
+            120.0
+          ]
+        },
+        {
+          "yRows": [
+            124
+          ],
+          "centerY": 124.0,
+          "from": [
+            195,
+            124.0
+          ],
+          "to": [
+            207,
+            124.0
+          ]
+        },
+        {
+          "yRows": [
+            128,
+            129
+          ],
+          "centerY": 128.5,
+          "from": [
+            195,
+            128.5
+          ],
+          "to": [
+            206,
+            128.5
+          ]
+        },
+        {
+          "yRows": [
+            132,
+            133
+          ],
+          "centerY": 132.5,
+          "from": [
+            195,
+            132.5
+          ],
+          "to": [
+            206,
+            132.5
+          ]
+        },
+        {
+          "yRows": [
+            137
+          ],
+          "centerY": 137.0,
+          "from": [
+            195,
+            137.0
+          ],
+          "to": [
+            207,
+            137.0
+          ]
+        },
+        {
+          "yRows": [
+            141
+          ],
+          "centerY": 141.0,
+          "from": [
+            195,
+            141.0
+          ],
+          "to": [
+            207,
+            141.0
+          ]
+        },
+        {
+          "yRows": [
+            145
+          ],
+          "centerY": 145.0,
+          "from": [
+            195,
+            145.0
+          ],
+          "to": [
+            207,
+            145.0
+          ]
+        },
+        {
+          "yRows": [
+            149
+          ],
+          "centerY": 149.0,
+          "from": [
+            195,
+            149.0
+          ],
+          "to": [
+            207,
+            149.0
+          ]
+        },
+        {
+          "yRows": [
+            153,
+            154
+          ],
+          "centerY": 153.5,
+          "from": [
+            195,
+            153.5
+          ],
+          "to": [
+            206,
+            153.5
+          ]
+        },
+        {
+          "yRows": [
+            157,
+            158
+          ],
+          "centerY": 157.5,
+          "from": [
+            195,
+            157.5
+          ],
+          "to": [
+            206,
+            157.5
+          ]
+        },
+        {
+          "yRows": [
+            162
+          ],
+          "centerY": 162.0,
+          "from": [
+            195,
+            162.0
+          ],
+          "to": [
+            206,
+            162.0
+          ]
+        },
+        {
+          "yRows": [
+            166
+          ],
+          "centerY": 166.0,
+          "from": [
+            195,
+            166.0
+          ],
+          "to": [
+            206,
+            166.0
+          ]
+        },
+        {
+          "yRows": [
+            170
+          ],
+          "centerY": 170.0,
+          "from": [
+            195,
+            170.0
+          ],
+          "to": [
+            206,
+            170.0
+          ]
+        },
+        {
+          "yRows": [
+            174
+          ],
+          "centerY": 174.0,
+          "from": [
+            195,
+            174.0
+          ],
+          "to": [
+            206,
+            174.0
+          ]
+        },
+        {
+          "yRows": [
+            178
+          ],
+          "centerY": 178.0,
+          "from": [
+            195,
+            178.0
+          ],
+          "to": [
+            206,
+            178.0
+          ]
+        },
+        {
+          "yRows": [
+            182
+          ],
+          "centerY": 182.0,
+          "from": [
+            195,
+            182.0
+          ],
+          "to": [
+            206,
+            182.0
+          ]
+        },
+        {
+          "yRows": [
+            186,
+            187
+          ],
+          "centerY": 186.5,
+          "from": [
+            195,
+            186.5
+          ],
+          "to": [
+            206,
+            186.5
+          ]
+        },
+        {
+          "yRows": [
+            190,
+            191
+          ],
+          "centerY": 190.5,
+          "from": [
+            195,
+            190.5
+          ],
+          "to": [
+            206,
+            190.5
+          ]
+        },
+        {
+          "yRows": [
+            195
+          ],
+          "centerY": 195.0,
+          "from": [
+            195,
+            195.0
+          ],
+          "to": [
+            207,
+            195.0
+          ]
+        },
+        {
+          "yRows": [
+            199
+          ],
+          "centerY": 199.0,
+          "from": [
+            195,
+            199.0
+          ],
+          "to": [
+            207,
+            199.0
+          ]
+        },
+        {
+          "yRows": [
+            203
+          ],
+          "centerY": 203.0,
+          "from": [
+            195,
+            203.0
+          ],
+          "to": [
+            207,
+            203.0
+          ]
+        },
+        {
+          "yRows": [
+            207
+          ],
+          "centerY": 207.0,
+          "from": [
+            195,
+            207.0
+          ],
+          "to": [
+            207,
+            207.0
+          ]
+        },
+        {
+          "yRows": [
+            211,
+            212
+          ],
+          "centerY": 211.5,
+          "from": [
+            195,
+            211.5
+          ],
+          "to": [
+            206,
+            211.5
+          ]
+        },
+        {
+          "yRows": [
+            215,
+            216
+          ],
+          "centerY": 215.5,
+          "from": [
+            195,
+            215.5
+          ],
+          "to": [
+            206,
+            215.5
+          ]
+        },
+        {
+          "yRows": [
+            220
+          ],
+          "centerY": 220.0,
+          "from": [
+            195,
+            220.0
+          ],
+          "to": [
+            206,
+            220.0
+          ]
+        },
+        {
+          "yRows": [
+            224
+          ],
+          "centerY": 224.0,
+          "from": [
+            195,
+            224.0
+          ],
+          "to": [
+            206,
+            224.0
+          ]
+        },
+        {
+          "yRows": [
+            228
+          ],
+          "centerY": 228.0,
+          "from": [
+            195,
+            228.0
+          ],
+          "to": [
+            206,
+            228.0
+          ]
+        },
+        {
+          "yRows": [
+            232
+          ],
+          "centerY": 232.0,
+          "from": [
+            195,
+            232.0
+          ],
+          "to": [
+            206,
+            232.0
+          ]
+        },
+        {
+          "yRows": [
+            236
+          ],
+          "centerY": 236.0,
+          "from": [
+            195,
+            236.0
+          ],
+          "to": [
+            206,
+            236.0
+          ]
+        },
+        {
+          "yRows": [
+            240
+          ],
+          "centerY": 240.0,
+          "from": [
+            195,
+            240.0
+          ],
+          "to": [
+            206,
+            240.0
+          ]
+        },
+        {
+          "yRows": [
+            244,
+            245
+          ],
+          "centerY": 244.5,
+          "from": [
+            195,
+            244.5
+          ],
+          "to": [
+            206,
+            244.5
+          ]
+        },
+        {
+          "yRows": [
+            249
+          ],
+          "centerY": 249.0,
+          "from": [
+            195,
+            249.0
+          ],
+          "to": [
+            206,
+            249.0
+          ]
+        },
+        {
+          "yRows": [
+            253
+          ],
+          "centerY": 253.0,
+          "from": [
+            195,
+            253.0
+          ],
+          "to": [
+            206,
+            253.0
+          ]
+        },
+        {
+          "yRows": [
+            257
+          ],
+          "centerY": 257.0,
+          "from": [
+            195,
+            257.0
+          ],
+          "to": [
+            206,
+            257.0
+          ]
+        },
+        {
+          "yRows": [
+            261
+          ],
+          "centerY": 261.0,
+          "from": [
+            195,
+            261.0
+          ],
+          "to": [
+            206,
+            261.0
+          ]
+        },
+        {
+          "yRows": [
+            265,
+            266
+          ],
+          "centerY": 265.5,
+          "from": [
+            195,
+            265.5
+          ],
+          "to": [
+            206,
+            265.5
+          ]
+        },
+        {
+          "yRows": [
+            269,
+            270
+          ],
+          "centerY": 269.5,
+          "from": [
+            195,
+            269.5
+          ],
+          "to": [
+            206,
+            269.5
+          ]
+        },
+        {
+          "yRows": [
+            274
+          ],
+          "centerY": 274.0,
+          "from": [
+            195,
+            274.0
+          ],
+          "to": [
+            207,
+            274.0
+          ]
+        },
+        {
+          "yRows": [
+            278
+          ],
+          "centerY": 278.0,
+          "from": [
+            195,
+            278.0
+          ],
+          "to": [
+            207,
+            278.0
+          ]
+        },
+        {
+          "yRows": [
+            282
+          ],
+          "centerY": 282.0,
+          "from": [
+            195,
+            282.0
+          ],
+          "to": [
+            207,
+            282.0
+          ]
+        },
+        {
+          "yRows": [
+            286
+          ],
+          "centerY": 286.0,
+          "from": [
+            195,
+            286.0
+          ],
+          "to": [
+            207,
+            286.0
+          ]
+        },
+        {
+          "yRows": [
+            290,
+            291
+          ],
+          "centerY": 290.5,
+          "from": [
+            195,
+            290.5
+          ],
+          "to": [
+            206,
+            290.5
+          ]
+        },
+        {
+          "yRows": [
+            294,
+            295
+          ],
+          "centerY": 294.5,
+          "from": [
+            195,
+            294.5
+          ],
+          "to": [
+            206,
+            294.5
+          ]
+        },
+        {
+          "yRows": [
+            299
+          ],
+          "centerY": 299.0,
+          "from": [
+            195,
+            299.0
+          ],
+          "to": [
+            206,
+            299.0
+          ]
+        },
+        {
+          "yRows": [
+            303
+          ],
+          "centerY": 303.0,
+          "from": [
+            195,
+            303.0
+          ],
+          "to": [
+            206,
+            303.0
+          ]
+        },
+        {
+          "yRows": [
+            307
+          ],
+          "centerY": 307.0,
+          "from": [
+            195,
+            307.0
+          ],
+          "to": [
+            206,
+            307.0
+          ]
+        },
+        {
+          "yRows": [
+            311
+          ],
+          "centerY": 311.0,
+          "from": [
+            195,
+            311.0
+          ],
+          "to": [
+            206,
+            311.0
+          ]
+        },
+        {
+          "yRows": [
+            315
+          ],
+          "centerY": 315.0,
+          "from": [
+            195,
+            315.0
+          ],
+          "to": [
+            206,
+            315.0
+          ]
+        },
+        {
+          "yRows": [
+            319
+          ],
+          "centerY": 319.0,
+          "from": [
+            195,
+            319.0
+          ],
+          "to": [
+            206,
+            319.0
+          ]
+        },
+        {
+          "yRows": [
+            323,
+            324
+          ],
+          "centerY": 323.5,
+          "from": [
+            195,
+            323.5
+          ],
+          "to": [
+            206,
+            323.5
+          ]
+        }
+      ],
+      "strokeWidthApprox": 1,
+      "color": "Gray-to-black antialiased raster variation. Each row is a hatch stroke, not a particle/quantitative unit.",
+      "overlap": "Water surface crosses strokes near y103..112; keep both layer strokes rather than reading overlap as extra hatch."
+    },
+    "waterSurface": {
+      "orderedExtremaApprox": [
+        [
+          9,
+          103
+        ],
+        [
+          33,
+          112
+        ],
+        [
+          59,
+          103
+        ],
+        [
+          84,
+          112
+        ],
+        [
+          109,
+          103
+        ],
+        [
+          135,
+          112
+        ],
+        [
+          160,
+          103
+        ],
+        [
+          186,
+          112
+        ],
+        [
+          211,
+          103
+        ],
+        [
+          237,
+          112
+        ],
+        [
+          263,
+          103
+        ],
+        [
+          288,
+          112
+        ],
+        [
+          314,
+          103
+        ],
+        [
+          339,
+          112
+        ],
+        [
+          365,
+          103
+        ],
+        [
+          389,
+          112
+        ]
+      ],
+      "interpretation": "7 full interior high crests (x59..365),7 full interior low troughs(x33..339), plus left boundary crest and right boundary descending-to-trough endpoint. Boundary extrema are cut by vessel, not added complete periods.",
+      "strokeApprox": 1,
+      "shape": "Smooth low sinusoidal-like wave, native extrema guides individually approximate; no scientific period count inferred."
+    },
+    "leader": {
+      "shaftFrom": [
+        246,
+        337
+      ],
+      "headTip": [
+        217,
+        313
+      ],
+      "headBaseApprox": [
+        [
+          222,
+          315
+        ],
+        [
+          219,
+          319
+        ]
+      ],
+      "headType": "Small filled arrow pointing UPLEFT to membrane near its lower end",
+      "strokeApprox": 1
+    },
+    "noAdded": [
+      "No gas bubbles",
+      "No anode/cathode text",
+      "No extra axis/ticks",
+      "Do not replace dot decimal4.5V with comma",
+      "Do not infer chemical ions or colors from stem"
+    ]
+  },
+  "measurementLimits": "Native pixel approximations ±1–2px; hatch runs selected by dark horizontal footprint then visually checked in own8x macro. Water extrema approximate visual guides, no quantitative wave significance. No SVG reviewed.",
+  "actualSvgReviewed": true,
+  "status": "root+readonly finalpassed",
+  "rootOwnReview": {
+    "nativeFull3x": true,
+    "hatch8xTopWaveLeader5x": true,
+    "allPublicDe": true,
+    "rowProjection55BandsBecause3HatchesWaveMerge": true,
+    "actualHatchCountVisually57": true,
+    "waveExtremaOwnPixelRows": true,
+    "nativeApproxNotSubpixel": true,
+    "actualFull3x": true,
+    "actualHatchTopLeaderMacros": true,
+    "actualFinalSHA": "3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba"
+  }
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "i": 32,
+    "hash": "06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087",
+    "fileNguon": "anh/06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087.png",
+    "svg": "cell32-native-ddh-3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba.svg",
+    "hashSvg": "3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba",
+    "byteSvg": 21768,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-OXHK-II-23",
+        "de": "Một nhóm học sinh tiến hành thí nghiệm điện phân điều chế chlorine và so sánh tính oxi hóa của chlorine với iodine như sau:\nCho vào bình điện phân (có màng ngăn xốp) 300 mL dung dịch hỗn hợp NaCl 2 M, KI 2 M và vài giọt dung dịch hồ tinh bột, nối bình điện phân với nguồn điện một chiều (như hình vẽ bên). Nhóm học sinh trên tiến hành điện phân trong thời gian 30 phút với cường độ không đổi là 5 A thấy phần dung dịch bên phía anode chuyển sang màu xanh. Biết số mol electron đi qua dây dẫn được tính bằng công thức: $n = \\dfrac{I.t}{96500}$, trong đó: I là cường độ dòng điện (A), t là thời gian (giây).\nSau khi tra cứu được các giá trị thế điện cực chuẩn $E^o_{Cl_2/2Cl^-} = 1,36$ V; $E^o_{I_2/2I^-} = 0,54$ V, nhóm học sinh đưa ra nhận định “Trong quá trình điện phân trên, ở anode chỉ có ion $\\ce{Cl-}$ bị oxi hóa thành $\\ce{Cl2}$, $\\ce{Cl2}$ phản ứng với dung dịch KI tạo ra $\\ce{I2}$ làm xanh hồ tinh bột”.",
+        "refs": [
+          {
+            "hash": "06bf3c7cd9bfd4d98c50b1cdae3795ff21e0e580668e497fa0a2886972a6c087",
+            "where": "VIP27-CDK-OXHK-II-23.hinh.0.du_lieu",
+            "hashDataUrl": "49fcc475b70c14a4ccf69489a9ec87ba1a8674394a48f3aa407aae1861d952c4"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "57INDIVIDUALhorizontalhatchNOTticks-nonperiodic90.5..323.5/2GRAYelectrodes/2batterybarsLONGLEFT-shortRIGHT/2DRAWNpolaritycirclesPLUSLEFT-MINUSRIGHT/7interiorcrests7interiortroughs+LEFTboundarycrestRIGHTpartialtrough/BLACKwaveOVERhatch-electrodes/1FILLEDupleftleaderFREEtip217313/EXACT4.5V-DOT-5A-Màng ngăn xốp/ALLregularUPRIGHT/2OPENtopmouths/NOaddedbubbles-anodecathode-ions-colors-quantities-answer-alias",
+    "hashSvgDaSoat": "3bf0cca0027361e26843031e067e2f1ecdede4125b8c3789255bd27a7b62d1ba",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
