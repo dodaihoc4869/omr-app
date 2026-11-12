@@ -1,0 +1,29 @@
+[
+  {
+    "i": 729,
+    "hash": "886fba7f301e8e8326a5740d2e0ebc95134c3e2fa11613eee663234f431fb07e",
+    "fileNguon": "anh/886fba7f301e8e8326a5740d2e0ebc95134c3e2fa11613eee663234f431fb07e.png",
+    "svg": "naph377-native-ddh-e343accdeef5efcb1de6f80a67cfcf341133ad2c6cd0d0d97bcb558b17cf9ea3.svg",
+    "hashSvg": "e343accdeef5efcb1de6f80a67cfcf341133ad2c6cd0d0d97bcb558b17cf9ea3",
+    "byteSvg": 39011,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D1-III-5",
+        "de": "Thuốc chữa ghẻ DEP (diethyl phthalate) được sản xuất từ nguồn nguyên liệu đầu là naphthalene và ethyl alcohol theo sơ đồ các quá trình chuyển hoá như hình dưới.\nĐể sản xuất được 1 tấn DEP cần lượng tối thiểu các chất là x tấn naphthalene với y tấn ethyl alcohol. Tổng giá trị x + y bằng bao nhiêu? (Không làm tròn các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "886fba7f301e8e8326a5740d2e0ebc95134c3e2fa11613eee663234f431fb07e",
+            "where": "VIP27-C1-B3-D1-III-5.hinh.0.du_lieu",
+            "hashDataUrl": "78b0a618122a535730f3b204a1b13213742a14ddf33b4815e6ad27ed7955f560"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "38C10OstructuresONLYEXCLreagentsconditions/5sixrings14innerCCdouble2anhydridefiveRings/4COdouble-upperLEFTfeetWHITEgap-upperRIGHTcontact-bottomBOTHcontact/2FILLEDrightheads/EXACTbothV2O5-tSUPo-bothH1-75%-85%/SUB125-regularUPRIGHTchemconditions-ONLY75-85regularITALIC/2literalCOOC2H5FIRSTCanchors-NOexpandedproductCO/0stereo-captions/NOH2normalize-catalystfix-yieldanswer-noalias982",
+    "hashSvgDaSoat": "e343accdeef5efcb1de6f80a67cfcf341133ad2c6cd0d0d97bcb558b17cf9ea3",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
