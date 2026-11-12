@@ -127,10 +127,12 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     const nhe = mayYeu || giam
     const nhipKhung = nhe ? 1000 / 30 : 0
     const hat = bamSo(sbd) / 997
+    /** Đội của em THEO PHÒNG (dòng của chính em trong ảnh chụp là chuẩn): phòng vừa chia lại đội mà máy chưa kịp nhận thì vẫn không bắn nhầm đồng đội. */
+    let doiEm = doiToi
 
     // ── Trạng thái trò (không qua React: đổi 60 lần / giây) ──
     let bd: BanDo = taoBanDo(0)
-    let tt: Toi = taoToi(bd, doiToi, Date.now(), hat)
+    let tt: Toi = taoToi(bd, doiEm, Date.now(), hat)
     let noi: Record<string, NoiSuy> = {}
     /** Lệch giờ phòng so với đồng hồ máy (ms), làm mượt theo dấu `l` của từng ảnh chụp. */
     let lech = 0, coLech = false
@@ -169,7 +171,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
 
     // ── Tin trận, dòng chữ nhỏ (DOM, chỉ đặt lại khi đổi) ──
     const tenCua = (id: string): string => (laMay(id) ? 'Máy' : !xem && id === sbd ? 'Em' : tenNgan(dsRef.current.find((n) => n.sbd === id)?.ten ?? `Bạn ${id}`))
-    const doiCua = (id: string): number => (!xem && id === sbd ? doiToi : noi[id]?.nv.doi ?? dsRef.current.find((n) => n.sbd === id)?.doi ?? 0)
+    const doiCua = (id: string): number => (!xem && id === sbd ? doiEm : noi[id]?.nv.doi ?? dsRef.current.find((n) => n.sbd === id)?.doi ?? 0)
     const themTin = (manh: ManhTin[], luc: number) => {
       dsTin = [...dsTin, { id: ++soTin, het: luc + TIN_SONG_MS, manh }].slice(-2)
       setTin(dsTin)
@@ -200,9 +202,11 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       lucAnh = luc; soAnh++
       if (typeof anh.c === 'number' && anh.c !== bd.cap) {
         bd = taoBanDo(anh.c)
-        if (!xem) tt = { ...taoToi(bd, doiToi, nay, hat), cap: tt.cap, mau: tt.mau }
+        if (!xem) tt = { ...taoToi(bd, doiEm, nay, hat), cap: tt.cap, mau: tt.mau }
         doKhung()
       }
+      const dongToi = xem ? null : docDong(sbd, anh.ds[sbd])
+      if (dongToi && dongToi.doi !== doiEm) { doiEm = dongToi.doi; tt = { ...taoToi(bd, doiEm, nay, hat), cap: tt.cap }; mucTieu = '' }
       const moi: Record<string, NoiSuy> = {}
       const emThatCu = [0, 0, 0, 0]
       for (const id in noi) if (!laMay(id)) emThatCu[noi[id].nv.doi]++
@@ -220,7 +224,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         } else {
           moi[id] = { nv, tx: nv.x, ty: nv.y, luc, goc: nv.x > bd.rong / 2 ? Math.PI : 0 }
           // Em mới vào giữa trận: đội còn thiếu người thì em thay một máy.
-          if (soAnh > 1 && !laMay(id)) baoVui(`${tenCua(id)} vào ${DOI_BPU[nv.doi].ten}${emThatCu[nv.doi] + (!xem && nv.doi === doiToi ? 1 : 0) < 4 ? ' · thay một máy' : ''}`, luc)
+          if (soAnh > 1 && !laMay(id)) baoVui(`${tenCua(id)} vào ${DOI_BPU[nv.doi].ten}${emThatCu[nv.doi] + (!xem && nv.doi === doiEm ? 1 : 0) < 4 ? ' · thay một máy' : ''}`, luc)
         }
       }
       noi = moi
@@ -245,7 +249,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       // Em bị bắn: tự tính từ ảnh chụp (ai khai đang bắn em).
       const quanh: NhanVat[] = []
       for (const id in noi) quanh.push(noi[id].nv)
-      const don = satThuong({ id: sbd, x: tt.x, y: tt.y, doi: doiToi }, quanh, ANH_MS / 1000)
+      const don = satThuong({ id: sbd, x: tt.x, y: tt.y, doi: doiEm }, quanh, ANH_MS / 1000)
       const song = !dangChet(tt, nay)
       tt = nhanDon(tt, don.tong, nay)
       if (song && dangChet(tt, nay)) { choA = don.ai; keHa = don.ai }
@@ -273,7 +277,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       }
       khac.length = n
       if (!xem) {
-        if (van !== tt.van) { tt = taoToi(bd, doiToi, nay, hat); soHa.clear(); mucTieu = ''; vao.current.cham = null }
+        if (van !== tt.van) { tt = taoToi(bd, doiEm, nay, hat); soHa.clear(); mucTieu = ''; vao.current.cham = null }
         const i = vao.current
         let dx = i.cx, dy = i.cy
         for (const ma in PHIM) if (i.phim[ma]) { dx += PHIM[ma][0]; dy += PHIM[ma][1] }
@@ -290,7 +294,16 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         if (songTruoc && dangChet(tt, nay)) keHa = ''
         if (tt.x !== xCu || tt.y !== yCu) huong = Math.atan2(tt.y - yCu, tt.x - xCu)
         const chet = dangChet(tt, nay)
-        if (luc - lucNgam >= 100) { lucNgam = luc; mucTieu = chet || nghi || dangAn(bd, tt, nay) ? '' : chonMucTieu(bd, tt, khac) }
+        // Súng bắn đối thủ gần nhất ĐANG HIỆN TRÊN MÀN của em (lùi mép 24 px để thấy rõ bé ma, không chỉ thấy mép áo).
+        if (luc - lucNgam >= 100) {
+          lucNgam = luc
+          const nx = (W / 2 - 24) / ti, ny = (H / 2 - 24) / ti
+          let tx = Math.max(W / 2 / ti - 40, Math.min(bd.rong + 40 - W / 2 / ti, tt.x)), ty = Math.max(H / 2 / ti - 40, Math.min(bd.cao + 40 - H / 2 / ti, tt.y - 34))
+          if (W / ti >= bd.rong + 80) tx = bd.rong / 2
+          if (H / ti >= bd.cao + 80) ty = bd.cao / 2
+          // Bé ma cao chừng 70 đơn vị: lấy thân (chân + 34) làm điểm «đang thấy».
+          mucTieu = chet || nghi || dangAn(bd, tt, nay) ? '' : chonMucTieu(bd, tt, khac, { x0: tx - nx, y0: ty - ny + 34, x1: tx + nx, y1: ty + ny + 34 })
+        }
         // Hộp tiếp tế: chạm là xin phòng (em chạm đầu tiên được nhận).
         const soHop = hopSo(nay)
         if (!chet && !nghi && hop[0] !== soHop && choH !== soHop && Math.hypot(tt.x - bd.rong / 2, tt.y - bd.cao / 2) < HOP_BK) choH = soHop
@@ -349,11 +362,11 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       // ── Dựng danh sách vẽ ──
       let m = 0
       const them = (): NvVe => nvVe[m] ?? (nvVe[m] = { id: '', x: 0, y: 0, mau: 0, doi: 0, cap: 1, goc: 0, ban: false, dx: 0, dy: 0, may: false, toi: false, mo: 1, ten: '', an: false })
-      const viTri = (id: string): NhanVat | undefined => (!xem && id === sbd ? { id, x: tt.x, y: tt.y, mau: tt.mau, doi: doiToi, cap: tt.cap, t: mucTieu } : khac.find((k) => k.id === id))
+      const viTri = (id: string): NhanVat | undefined => (!xem && id === sbd ? { id, x: tt.x, y: tt.y, mau: tt.mau, doi: doiEm, cap: tt.cap, t: mucTieu } : khac.find((k) => k.id === id))
       for (const k of khac) {
         // Đối thủ ẩn trong bụi: em không thấy (máy thầy thấy hết, vẽ mờ).
         const an = !k.t && trongBui(bd, k.x, k.y)
-        if (!xem && k.mau > 0 && anVoi(bd, k, tt.x, tt.y, doiToi)) continue
+        if (!xem && k.mau > 0 && anVoi(bd, k, tt.x, tt.y, doiEm)) continue
         const o = noi[k.id], mt = k.t ? viTri(k.t) : undefined, e = them()
         if (mt) o.goc = Math.atan2(mt.y - 34 - (k.y - 25), mt.x - k.x)
         else if (Math.hypot(o.nv.x - o.tx, o.nv.y - o.ty) > 4) o.goc = Math.atan2(o.nv.y - o.ty, o.nv.x - o.tx)
@@ -368,7 +381,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       if (!xem) {
         const chet = dangChet(tt, nay), mt = mucTieu ? khac.find((k) => k.id === mucTieu) : undefined, e = them()
         if (mt) huong = Math.atan2(mt.y - 34 - (tt.y - 25), mt.x - tt.x)
-        e.id = sbd; e.x = tt.x; e.y = tt.y; e.mau = chet ? 0 : tt.mau; e.doi = doiToi; e.cap = tt.cap; e.goc = huong
+        e.id = sbd; e.x = tt.x; e.y = tt.y; e.mau = chet ? 0 : tt.mau; e.doi = doiEm; e.cap = tt.cap; e.goc = huong
         e.ban = !!mt; e.dx = mt?.x ?? 0; e.dy = mt?.y ?? 0; e.may = false; e.toi = true
         e.an = !chet && dangAn(bd, tt, nay); e.mo = chet ? 0.25 : e.an ? 0.6 : 1; e.ten = `${tenNgan(toi?.ten ?? '')} (em)`
         m++
@@ -384,7 +397,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         lucNho = luc
         const r = 130, c = Math.round((r * bd.cao) / bd.rong), d2 = Math.min(2, window.devicePixelRatio || 1)
         if (nho.width !== Math.round(r * d2)) { nho.width = Math.round(r * d2); nho.height = Math.round(c * d2) }
-        veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiToi)
+        veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiEm)
       }
     }
     const chay = () => { if (!rafId && !document.hidden) { lucTruoc = 0; rafId = requestAnimationFrame(khung) } }

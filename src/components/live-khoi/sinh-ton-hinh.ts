@@ -99,8 +99,8 @@ const SUNG: Net[][] = [
 const netSung = (cap: number): Net[] => [[tron(0, 0, 6.2), 'muc'], ...SUNG[cap - 1], [tron(0, 0, 5), 'ao', 'muc', 1.6]]
 /** Đầu nòng (x, hệ của súng) theo cấp — chỗ chớp lửa và nơi đạn bay ra. */
 export const SUNG_NONG = [46, 55, 71, 67] as const
-/** Súng to hơn nét vẽ gốc chừng này so với bé ma. */
-export const SUNG_HE = 1.12
+/** Cỡ súng so với nét vẽ gốc (thầy 12/11 chiều: «súng nhỏ hơn phù hợp với con ma»; trước là 1,12). */
+export const SUNG_HE = 0.9
 /** Khớp đeo súng trong hệ của bé ma (bên phải; chĩa trái thì đổi dấu x). */
 export const KHOP = { x: 27, y: -25 } as const
 /** Khung bao của hình bé ma và của súng (hệ riêng từng hình). */
