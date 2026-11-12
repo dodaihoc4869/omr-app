@@ -10,7 +10,7 @@
 //     bảng đệm không đổi hồ sơ (test). Không vòng lặp: prior chỉ đọc hồ sơ THÔ, hồ sơ thô không dùng prior.
 //   · β câu (`omni_beta_cau`) = trung vị thời gian lượt đúng tự làm 60 ngày (việc đêm). Thiếu ⇒ ước lượng theo phần × mức (omni-toc-do.ts).
 // Mọi đường đọc của em/PH: lỗi ⇒ trả giá trị an toàn (hồ sơ rỗng / null), KHÔNG làm hỏng Sảnh, trả lời, PH.
-import { docBetaDong, ghiBetaNho, layBetaNho } from './beta-dem'
+import { coTheNapBetaDu, docBetaDong, ghiBetaNho, layBetaNho, napBetaDu } from './beta-dem'
 import type { Env } from './kieu'
 import { KHOP } from './cau-meta'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
@@ -756,6 +756,8 @@ export async function docBetaVaTau(env: Env, qids: readonly string[], sbds: read
     const thieu = nho ? [...new Set(qids)].filter((q) => !nho.has(q)) : null
     const tuNho = () => { const m = new Map<string, number>(); for (const q of qids) { const b = nho!.get(q); if (b != null) m.set(q, b) } return m }
     if (nho && thieu && !thieu.length) return [tuNho(), await docTauEm(env, sbds)] as [Map<string, number>, Map<string, number>]
+    // 12/11 (H2): thiếu β ⇒ nạp cả bảng β qua bản tính sẵn dùng chung (beta-dem.ts) SONG SONG với τ (cùng một đợt); không dùng được ⇒ câu UNION như cũ.
+    if (nho && thieu && coTheNapBetaDu()) { const [du, tau] = await Promise.all([napBetaDu(env, nho), docTauEm(env, sbds)]); if (du) return [tuNho(), tau] as [Map<string, number>, Map<string, number>] }
     const r = await env.DB.prepare(`SELECT 'b' AS k, qid AS id, beta AS v FROM omni_beta_cau WHERE qid IN (SELECT value FROM json_each(?1))
       UNION ALL SELECT 't', sbd, tau FROM omni_em WHERE n_tau >= 5 AND sbd IN (SELECT value FROM json_each(?2))`).bind(thieu ? dsJson(thieu) : dq, de).all<Row>().catch(() => null)
     if (!r) return [await docBeta(env, qids), new Map<string, number>()] as [Map<string, number>, Map<string, number>]

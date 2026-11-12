@@ -42,3 +42,6 @@ CREATE TRIGGER IF NOT EXISTS dau_bang_ob_sua AFTER UPDATE ON omni_beta_cau BEGIN
 CREATE TRIGGER IF NOT EXISTS dau_bang_ob_xoa AFTER DELETE ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
 INSERT OR REPLACE INTO dau_bang (ten, dau) SELECT 'game_v2_index', COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index;
 INSERT OR IGNORE INTO dau_bang (ten, dau) SELECT x.value, CAST(CAST(strftime('%s','now') AS INTEGER) * 1000 AS TEXT) FROM json_each('["cau_hoi","chien_dich","game_v2_question","omni_q","omni_beta_cau"]') x;
+
+-- (9)(1)(12)(7) BẢN TÍNH SẴN DÙNG CHUNG (server/src/bang-tinh-chung.ts): kết quả thô của câu đọc kho, một dòng mỗi (câu, tham số), gắn dấu các bảng nguồn ở trên.
+CREATE TABLE IF NOT EXISTS bang_tinh_chung (khoa TEXT PRIMARY KEY, dau TEXT NOT NULL, json TEXT NOT NULL, luc INTEGER NOT NULL);
