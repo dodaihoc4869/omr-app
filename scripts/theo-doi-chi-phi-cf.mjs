@@ -86,7 +86,15 @@ if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? 
   const gop = new Map(); for (const x of k?.data?.viewer?.accounts?.[0]?.workersInvocationsAdaptive ?? []) { const o = gop.get(x.dimensions.scriptName) ?? { r: 0, c: 0, s: 0 }; o.r += x.sum.requests; o.c += x.sum.cpuTimeUs / 1000; o.s += x.sum.subrequests; gop.set(x.dimensions.scriptName, o) }
   bangTop.push('', '#### Theo tên script, 24 giờ qua (lượt · CPU ms · lượt gọi phụ)')
   for (const [ten, o] of [...gop].sort((a, b) => b[1].r - a[1].r)) bangTop.push(`- ${ten}: ${so(o.r)} · ${so(o.c)} · ${so(o.s)}`)
-  if (!gop.size) bangTop.push(`(không đọc được: ${String((k?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) }
+  if (!gop.size) bangTop.push(`(không đọc được: ${String((k?.errors ?? []).map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 200)})`) 
+  // Soi «__unknown__»: Pages Functions? chia theo giờ (giờ UTC) + bộ Pages Functions riêng.
+  const u = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
+    query: `query($a:String!){viewer{accounts(filter:{accountTag:$a}){w:workersInvocationsAdaptive(limit:1000,filter:{datetime_geq:"${tuQ}",datetime_leq:"${now.toISOString()}",scriptName:"__unknown__"}){sum{requests cpuTimeUs errors} dimensions{datetimeHour status}} p:pagesFunctionsInvocationsAdaptiveGroups(limit:1000,filter:{datetime_geq:"${tuQ}",datetime_leq:"${now.toISOString()}"}){sum{requests errors} dimensions{date}}}}}` }) }).then((r) => r.json()).catch(() => null)
+  const acc = u?.data?.viewer?.accounts?.[0]
+  const theoGio = new Map(); for (const x of acc?.w ?? []) { const kk = `${String(x.dimensions.datetimeHour).slice(5, 13)} ${x.dimensions.status}`; theoGio.set(kk, (theoGio.get(kk) ?? 0) + x.sum.requests) }
+  bangTop.push('', '#### __unknown__ theo giờ UTC · trạng thái · lượt', ...[...theoGio].sort().map(([kk, n]) => `- ${kk} · ${so(n)}`))
+  bangTop.push(`- Pages Functions 24 giờ: ${so((acc?.p ?? []).reduce((t, x) => t + x.sum.requests, 0))} lượt`)
+  if (u?.errors?.length) bangTop.push(`(lỗi soi: ${String(u.errors.map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 300)})`) }
 // 13/11: THEO GIỜ 50 giờ qua (giờ VN) — mọi khoản tính tiền, để so cùng khung giờ trước / sau một lượt phát hành (dự báo cả kỳ tuyến tính nên trễ).
 { const tu50 = new Date(now - 50 * 3600e3).toISOString(), den = now.toISOString()
   const gio = async (ten, than, locThem = '') => { const j = await fetch('https://api.cloudflare.com/client/v4/graphql', { method: 'POST', headers: H, body: JSON.stringify({ variables: { a: ACC },
