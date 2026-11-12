@@ -45,7 +45,7 @@ html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH'
 .ps b { font-weight: 600; padding: 0 .25em; } .ps b + b { border-top: calc(1.6 * var(--u)) solid currentColor; }
 .hang { display: grid; gap: calc(6 * var(--u)); margin-top: calc(7 * var(--u)); }
 .h6 { grid-template-columns: repeat(6, 1fr); } .h5 { grid-template-columns: repeat(5, 1fr); gap: calc(7 * var(--u)); }
-.dau-phim { display: grid; grid-template-columns: 1fr 1fr calc(92 * var(--u)) 1fr 1fr; gap: calc(6 * var(--u)); align-items: center; margin-top: calc(12 * var(--u)); }
+.dau-phim { display: grid; grid-template-columns: 1fr 1fr calc(58 * var(--u)) 1fr 1fr; gap: calc(6 * var(--u)); align-items: center; margin-top: calc(12 * var(--u)); }
 .p { position: relative; height: calc(27 * var(--u)); border-radius: calc(8 * var(--u)); display: grid; place-items: center; font-size: calc(12.5 * var(--u)); font-weight: 800; color: #e9eff3;
   background: linear-gradient(180deg, #56636d, #3b464f); box-shadow: 0 calc(2.5 * var(--u)) 0 #12171b, 0 1px 0 rgba(255,255,255,.25) inset; }
 .p small { position: absolute; left: 0; right: 0; top: calc(-11 * var(--u)); text-align: center; font-size: calc(8 * var(--u)); font-weight: 800; color: #f5c451; letter-spacing: .02em; }
@@ -55,10 +55,13 @@ html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH'
 .p.xoa { height: calc(38 * var(--u)); font-size: calc(15 * var(--u)); border-radius: calc(10 * var(--u)); background: linear-gradient(180deg, #ff9a52, #ea6a12); color: #fff; box-shadow: 0 calc(3 * var(--u)) 0 #8f3c05, 0 1px 0 rgba(255,255,255,.45) inset; }
 .p.bang { height: calc(38 * var(--u)); font-size: calc(21 * var(--u)); border-radius: calc(10 * var(--u)); background: linear-gradient(180deg, #8a84ff, #5a4ff0); color: #fff; box-shadow: 0 calc(3 * var(--u)) 0 #2c1fb5, 0 1px 0 rgba(255,255,255,.45) inset; }
 .p.nhan { transform: translateY(calc(2.5 * var(--u))); box-shadow: 0 0 0 calc(2.5 * var(--u)) #f5a524, 0 0 calc(16 * var(--u)) rgba(245,165,36,.7); }
-.dpad { height: calc(60 * var(--u)); border-radius: 50%; background: radial-gradient(circle at 50% 40%, #6a7782, #39444d); box-shadow: 0 calc(3 * var(--u)) 0 #12171b, 0 1px 0 rgba(255,255,255,.3) inset; position: relative; }
-.dpad::after { content: '▲'; position: absolute; left: 0; right: 0; top: 8%; text-align: center; font-size: calc(9 * var(--u)); color: #dfe7ec; }
-.dpad::before { content: '◀            ▶'; position: absolute; left: 0; right: 0; top: 38%; text-align: center; font-size: calc(9 * var(--u)); color: #dfe7ec; white-space: pre; }
-.dpad i { position: absolute; left: 0; right: 0; bottom: 8%; text-align: center; font-size: calc(9 * var(--u)); color: #dfe7ec; font-style: normal; }
+.dpad { justify-self: center; width: calc(50 * var(--u)); height: calc(50 * var(--u)); border-radius: 50%; position: relative; background: radial-gradient(circle at 50% 36%, #6d7a85, #3a454e 70%); box-shadow: 0 calc(2.5 * var(--u)) 0 #12171b, 0 1px 0 rgba(255,255,255,.3) inset, 0 0 0 calc(2 * var(--u)) #1b2228; }
+.dpad::after { content: ''; position: absolute; left: 50%; top: 50%; width: calc(16 * var(--u)); height: calc(16 * var(--u)); margin: calc(-8 * var(--u)) 0 0 calc(-8 * var(--u)); border-radius: 50%; background: radial-gradient(circle at 50% 35%, #4a565f, #2a333a); box-shadow: 0 1px 0 rgba(255,255,255,.18) inset; }
+.dpad i { position: absolute; width: 0; height: 0; border: calc(3.6 * var(--u)) solid transparent; }
+.dpad i.t { left: 50%; top: calc(6 * var(--u)); margin-left: calc(-3.6 * var(--u)); border-top: 0; border-bottom: calc(5 * var(--u)) solid #e3eaee; }
+.dpad i.d { left: 50%; bottom: calc(6 * var(--u)); margin-left: calc(-3.6 * var(--u)); border-bottom: 0; border-top: calc(5 * var(--u)) solid #e3eaee; }
+.dpad i.tr { top: 50%; left: calc(6 * var(--u)); margin-top: calc(-3.6 * var(--u)); border-left: 0; border-right: calc(5 * var(--u)) solid #e3eaee; }
+.dpad i.ph { top: 50%; right: calc(6 * var(--u)); margin-top: calc(-3.6 * var(--u)); border-right: 0; border-left: calc(5 * var(--u)) solid #e3eaee; }
 .mt.em-xem { pointer-events: none; }
 .mt .nhan-em { position: absolute; left: 50%; top: calc(-13 * var(--u)); transform: translateX(-50%); background: #f5a524; color: #2a1a00; font-size: calc(11 * var(--u)); font-weight: 800; padding: calc(3 * var(--u)) calc(12 * var(--u)); border-radius: 99px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
 .bong { position: fixed; border: calc(2.5 * var(--k)) dashed rgba(245,165,36,.75); border-radius: calc(26 * var(--k)); }
@@ -74,7 +77,7 @@ function mayTinh(o) {
     + '<div class="keo"><span><i></i>KÉO ĐỂ DỜI</span><span>fx · THPT<b class="pin"></b></span></div>'
     + '<div class="lcd"><div class="tt"><span>D</span><span>Math</span><span>▲</span><span style="margin-left:auto">Ans = 0,25</span></div>'
     + '<div class="bt">' + o.bt + '</div><div class="kq">' + o.kq + '</div></div>'
-    + '<div class="dau-phim">' + P('sh', 'SHIFT') + P('al', 'ALPHA') + '<span class="dpad"><i>▼</i></span>' + P('', 'MENU') + P('', 'ON') + '</div>'
+    + '<div class="dau-phim">' + P('sh', 'SHIFT') + P('al', 'ALPHA') + '<span class="dpad"><i class="t"></i><i class="d"></i><i class="tr"></i><i class="ph"></i></span>' + P('', 'MENU') + P('', 'ON') + '</div>'
     + '<div class="hang h6" style="margin-top:calc(16 * var(--u))">' + P('', 'x⁻¹', 'x!') + P('', '√▫', '∛▫') + P('', 'x²', 'x³') + P('', 'x▫', 'ʸ√▫') + P('', 'log', '10ˣ') + P('', 'ln', 'eˣ') + '</div>'
     + '<div class="hang h6" style="margin-top:calc(15 * var(--u))">' + P('', '(−)', 'A') + P('', '° ′ ″', 'B') + P('', 'sin', 'sin⁻¹') + P('', 'cos', 'cos⁻¹') + P('', 'tan', 'tan⁻¹') + P('', 'S⇔D', 'a b/c') + '</div>'
     + '<div class="hang h6" style="margin-top:calc(15 * var(--u))">' + P('', 'STO', 'RCL') + P('', 'ENG', '∠') + P('', '(', '%') + P('', ')', ',') + P('', '▫/▫', 'hỗn số') + P('', 'M+', 'M−') + '</div>'
