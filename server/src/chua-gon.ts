@@ -16,9 +16,14 @@ export const NGAY_CUA_SO_GON = 14
 /** Mốc 12 giờ của luật tự làm (a). */
 export const GIO_LOI_GIAI_GAN = 12
 
-/** Họ câu trong sổ: câu gốc `q` và mọi bản của nó (~ss/~bt/~yd/~n, #n). Ba khoảng trên chỉ mục (sbd, qid). */
+/** Họ câu trong sổ: câu gốc `q` và mọi bản của nó (~ss/~bt/~yd/~n, #n). Ba khoảng qid — LƯU Ý: đứng sau `sbd=…` ở NGOÀI ngoặc thì SQLite KHÔNG
+ *  tách OR thành ba lượt dò chỉ mục (sbd, qid) mà đi (sbd) rồi lọc cả sổ của em (EXPLAIN 12/11) ⇒ câu nóng dùng `sqlHoCauEm`. */
 export const sqlHoCau = (cot: string, q: string) =>
   `(${cot}=${q} OR (${cot}>${q}||'~' AND ${cot}<${q}||'~~') OR (${cot}>${q}||'#' AND ${cot}<${q}||'#~'))`
+/** Như `sbd=… AND sqlHoCau(qid, q)` (cùng tập dòng) nhưng `sbd` lặp trong từng nhánh OR ⇒ SQLite dò MULTI-INDEX OR ba khoảng (sbd=? AND qid…)
+ *  trên chỉ mục (sbd, qid, …) thay vì quét cả sổ của em (D1 12/11: câu đóng đợt 61–102 nghìn hàng/lượt). `a` = bí danh bảng có cột sbd, qid. */
+export const sqlHoCauEm = (a: string, sbd: string, q: string) =>
+  `((${a}.sbd=${sbd} AND ${a}.qid=${q}) OR (${a}.sbd=${sbd} AND ${a}.qid>${q}||'~' AND ${a}.qid<${q}||'~~') OR (${a}.sbd=${sbd} AND ${a}.qid>${q}||'#' AND ${a}.qid<${q}||'#~'))`
 
 /** Lượt làm thật của em (như SQL_LA_LAN_LAM), không gợi ý, không bị giấu. */
 const laLanTuLam = (a: string) =>
@@ -27,16 +32,19 @@ const laLanTuLam = (a: string) =>
 /**
  * Điều kiện SQL "đợt `d` đã có lượt đúng qua luật tự làm sau lần sai cuối" (d = alias bảng chua_loi_dot; `sbd` = biểu thức sbd, mặc định tham số ?2).
  * Dùng chung cho câu đóng tự động (danh sách), cron đêm đóng đợt cũ (`sbd` = cột `d.sbd`, chua-gon-dem.ts) và test.
+ * KẾ HOẠCH (12/11, hoá đơn D1 — hai câu đóng đợt 85 + 107 triệu hàng/ngày): mọi truy vấn con dò họ câu bằng `sqlHoCauEm` (MULTI-INDEX OR trên (sbd, qid…))
+ * và cột `luc` / `ngay_vn` mang dấu `+` (toán tử một ngôi, giá trị TEXT không đổi) ⇒ SQLite không chọn chỉ mục (sbd, luc) / (sbd, ngay_vn) để quét cả sổ
+ * của em theo giờ. Tập dòng y hệt bản cũ (tests/chua-gon-quet-1211.test.ts so cũ↔mới).
  */
 export function sqlDaTuSuaDungLai(d: string, sbd = '?2'): string {
   const Q = `${d}.qid_chuan`
   const saiCuoi = (cot: 'luc' | 'ngay_vn') =>
-    `(SELECT w.${cot} FROM su_kien_hoc w WHERE w.sbd=${sbd} AND ${sqlHoCau('w.qid', Q)} AND COALESCE(w.ket_qua,0)=0 AND ${laLanTuLam('w')} ORDER BY w.luc DESC LIMIT 1)`
-  return `EXISTS (SELECT 1 FROM su_kien_hoc c WHERE c.sbd=${sbd} AND ${sqlHoCau('c.qid', Q)} AND c.ket_qua=1 AND ${laLanTuLam('c')}
-    AND c.luc > ${saiCuoi('luc')}
-    AND (c.qid<>${Q} OR c.ngay_vn > ${saiCuoi('ngay_vn')})
-    AND NOT EXISTS (SELECT 1 FROM loi_giai_hoi g WHERE g.sbd=${sbd} AND ${sqlHoCau('g.qid', Q)} AND g.luc<=c.luc AND g.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours'))
-    AND NOT EXISTS (SELECT 1 FROM su_kien_hoc x WHERE x.sbd=${sbd} AND ${sqlHoCau('x.qid', Q)} AND x.purpose='xem_loi_giai' AND x.luc<=c.luc AND x.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours')))`
+    `(SELECT w.${cot} FROM su_kien_hoc w WHERE ${sqlHoCauEm('w', sbd, Q)} AND COALESCE(w.ket_qua,0)=0 AND ${laLanTuLam('w')} ORDER BY +w.luc DESC LIMIT 1)`
+  return `EXISTS (SELECT 1 FROM su_kien_hoc c WHERE ${sqlHoCauEm('c', sbd, Q)} AND c.ket_qua=1 AND ${laLanTuLam('c')}
+    AND +c.luc > ${saiCuoi('luc')}
+    AND (c.qid<>${Q} OR +c.ngay_vn > ${saiCuoi('ngay_vn')})
+    AND NOT EXISTS (SELECT 1 FROM loi_giai_hoi g WHERE ${sqlHoCauEm('g', sbd, Q)} AND +g.luc<=c.luc AND +g.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours'))
+    AND NOT EXISTS (SELECT 1 FROM su_kien_hoc x WHERE ${sqlHoCauEm('x', sbd, Q)} AND x.purpose='xem_loi_giai' AND +x.luc<=c.luc AND +x.luc>=strftime('%Y-%m-%dT%H:%M:%fZ',c.luc,'-${GIO_LOI_GIAI_GAN} hours')))`
 }
 
 /** Câu đóng tự động: ?1 = bây giờ (ms), ?2 = sbd, ?3 = mốc đầu cửa sổ (ms). */
