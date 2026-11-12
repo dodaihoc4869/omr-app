@@ -73,7 +73,7 @@ export interface LivePhong {
   camMic?: string | null
   /** Nhật ký đàm thoại CHƯA rút ra kho (phòng rút mỗi lần phát view). */
   nk?: MucNhatKy[]
-  /** LIVE THEO KHỐI (12/11, docs/dac-ta-live-moi-1211.md): buổi này là live cho cả khối `k`; `gd` = `cho` (phòng chờ, em chơi Giữ Lửa) | `dang` (thầy đã bấm
+  /** LIVE THEO KHỐI (12/11, docs/dac-ta-live-moi-1211.md): buổi này là live cho cả khối `k`; `gd` = `cho` (phòng chờ, em chơi Sinh Tồn) | `dang` (thầy đã bấm
    *  Bắt đầu); `che` = `hoc` (màn live như cũ) | `bang` (bảng kín màn máy em). Thầy đặt bằng `live-dat { khoi }`. Vắng ⇒ buổi trên lớp như trước. */
   khoi?: KhoiPhong | null
   /** Bố cục giấy đề thầy đang chiếu (máy thầy gửi qua `live-dat { giay }`). */

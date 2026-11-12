@@ -381,7 +381,7 @@ describe('docBtvnDungNhip — nhip.btvnDungNhip chống số vô lý', () => {
   })
 })
 
-describe('HomNayScreen — /gv/bang-tin có ⇒ Bảng tin; chưa có ⇒ bản 2 dự phòng; chờ ⇒ khung xương', () => {
+describe('HomNayScreen — /gv/bang-tin có ⇒ Bảng tin; không đọc được ⇒ thẻ lỗi (bỏ bản 2 dự phòng 12/11); chờ ⇒ khung xương', () => {
   const nap: { bangTin: unknown; hom: unknown; cho: boolean } = { bangTin: MAU_DAY, hom: { ok: true, btvn: { soEmCoLo: 148, soEmDungNhip: 97, dangChay: [] } }, cho: false }
   const goi: string[] = []
   beforeEach(() => {
@@ -436,18 +436,18 @@ describe('HomNayScreen — /gv/bang-tin có ⇒ Bảng tin; chưa có ⇒ bản 
     }
   })
 
-  it('lệnh /gv/bang-tin CHƯA CÓ (404) ⇒ rơi về bản 2 qua các lệnh cũ, không lỗi đỏ; bản dự phòng còn nút Lấy bản mới', async () => {
+  it('lệnh /gv/bang-tin không đọc được ⇒ thẻ «Chưa đọc được bảng tin», KHÔNG còn màn dự phòng «Chào thầy Học» (thầy 12/11 «xoá hẳn đi» — SỬA CÓ CHỦ Ý), không gọi lệnh cũ', async () => {
     nap.bangTin = null
     render(<HomNayScreen />)
-    expect(await screen.findByText('Chào thầy Học')).toBeTruthy()
-    expect(screen.getByRole('button', { name: /Lấy bản mới/ })).toBeTruthy()
-    expect(screen.queryByRole('alert')).toBeNull()
+    expect(await screen.findByRole('heading', { name: 'Chưa đọc được bảng tin' })).toBeTruthy()
+    expect(screen.queryByText('Chào thầy Học')).toBeNull()
+    expect(goi).not.toContain('/ke-hoach/hom-nay-thay')
   })
 
-  it('thân trả sai dạng (thiếu nhip) ⇒ cũng rơi về bản 2, không vẽ bảng tin rỗng', async () => {
+  it('thân trả sai dạng (thiếu nhip) ⇒ cũng thẻ «Chưa đọc được bảng tin», không vẽ bảng tin rỗng', async () => {
     nap.bangTin = { ok: true, baiTap: [] }
     const { container } = render(<HomNayScreen />)
-    expect(await screen.findByText('Chào thầy Học')).toBeTruthy()
+    expect(await screen.findByRole('heading', { name: 'Chưa đọc được bảng tin' })).toBeTruthy()
     expect(container.querySelector('[data-khung="bang-tin-v3"]')).toBeNull()
   })
 

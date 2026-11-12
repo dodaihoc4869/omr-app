@@ -1,7 +1,7 @@
 // LIVE THEO KHỐI — MÁY EM (thầy chốt build 12/11; đặc tả docs/dac-ta-live-moi-1211.md, bản vẽ docs/ban-ve-live-moi-1211 ảnh 08–13).
 // Màn Bình Phản Ứng + màn live sẵn có giữ nguyên (chế độ «Học» = màn live cũ). Tệp này nghe CHÍNH kết nối phòng của màn ấy (`noiKhoi(w)`, một dòng ở
 // ManBinhPhanUng) rồi tự dựng lớp nổi riêng khi phòng báo buổi là live theo khối (`live.khoi`):
-//   · `gd = 'cho'`  ⇒ phòng chờ kín màn, ép ngang, trò Giữ Lửa bốn đội;
+//   · `gd = 'cho'`  ⇒ phòng chờ kín màn, ép ngang, trò Sinh Tồn bốn đội;
 //   · thầy bấm Bắt đầu ⇒ màn «Bốn đội» 3 giây rồi vào bài;
 //   · `gd = 'dang'` ⇒ nút chat nhỏ ở mép phải (số tin mới), bong bóng tin mới tự mờ, cửa nhắn cả lớp, nút xem lại bốn đội.
 // Mọi mảnh nặng (trò chơi, chat, màn bốn đội) nạp lười ⇒ buổi dạy trên lớp không tải gì thêm.

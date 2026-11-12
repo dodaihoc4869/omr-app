@@ -1,4 +1,5 @@
-/* TRÒ «GIỮ LỬA» ở phòng chờ Live theo khối (thầy duyệt bản vẽ 12/11: docs/ban-ve-live-moi-1211/08-em-phong-cho-giu-lua-844.jpg).
+/* (12/11 chiều: trò «Giữ Lửa» đã thay bằng «Sinh Tồn» — TroSinhTon.tsx dùng lại khung .gl, bảng điểm .gl-bang, tin trận .gl-tin của tệp này; các lớp còn lại giữ nguyên theo luật giữ màu.)
+   TRÒ «GIỮ LỬA» ở phòng chờ Live theo khối (thầy duyệt bản vẽ 12/11: docs/ban-ve-live-moi-1211/08-em-phong-cho-giu-lua-844.jpg).
    Sân vẽ trên MỘT canvas; tệp này chỉ lo các lớp DOM phủ trên: bảng điểm, tin trận, dải phòng chờ, cần ảo, nút «Tăng tốc».
    Màu: chỉ biến có sẵn (--tr-*, --p-*), pha bằng color-mix. `--gl-le` (lề cần / nút) do TroGiuLua.tsx đặt theo khung để không đè ngọn lửa góc. */
 .gl { container: gl / inline-size; position: absolute; inset: 0; overflow: hidden; background: var(--tr-nen); color: var(--tr-chu); touch-action: none; user-select: none; -webkit-user-select: none;

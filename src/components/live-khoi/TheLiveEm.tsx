@@ -95,7 +95,7 @@ export default function TheLiveEm({ token }: { token: string }) {
         <span className="tle-bieu" aria-hidden="true"><BieuLive /></span>
         <div className="tle-chu">
           <b>{tt.trangThai === 'dang' ? `Thầy đang live${khoi}` : `Thầy đang mở phòng chờ${khoi}`}</b>
-          <span>{tt.ten || (tt.trangThai === 'dang' ? 'Vào học cùng cả khối.' : 'Vào chơi Giữ Lửa trong lúc chờ thầy.')}</span>
+          <span>{tt.ten || (tt.trangThai === 'dang' ? 'Vào học cùng cả khối.' : 'Vào chơi Sinh Tồn trong lúc chờ thầy.')}</span>
         </div>
         <button type="button" className="tle-nut" disabled={dangVao} onClick={() => { void thamGia() }}>{dangVao ? 'Đang vào…' : 'Tham gia'}</button>
       </div>

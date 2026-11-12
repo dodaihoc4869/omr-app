@@ -13,8 +13,8 @@ const doc = (f: string) => fs.readFileSync(path.join(process.cwd(), f), 'utf8')
 
 describe('khối lô BTVN (KhoiBtvnLo đã gỡ 27/10 — chỉ còn soát màn sống)', () => {
   it('khối lô BTVN nay CHỈ ở màn Giao BTVN — tab theo dõi, đọc lệnh Hôm nay chỉ đọc; màn Hôm nay bản 2 đã thay bằng ô Việc gấp (thầy lệnh 21/09, sửa CÓ CHỦ Ý)', () => {
-    expect(doc('src/screens/HomNayCu.tsx')).not.toContain('KhoiBtvnLo')
-    expect(doc('src/screens/HomNayCu.tsx')).toContain('<ViecGap />')
+    // 12/11: màn dự phòng HomNayCu đã xoá hẳn (thầy) — Hôm nay chỉ còn Bảng tin, không mang khối lô BTVN
+    expect(doc('src/screens/HomNayScreen.tsx')).not.toContain('KhoiBtvnLo')
     const pc = doc('src/screens/PhanCongScreen.tsx')
     // Thiết kế lại 21/09 (thầy chốt 18:1x, đề docs/dac-ta-cu/prompt-btvn-da-giao-thiet-ke-lai-2109.md §1.E): mục "Bài tập về nhà đã giao" KHÔNG còn dựng KhoiBtvnLo (bốn bài hiện hai lần) — sửa CÓ CHỦ Ý.
     expect(pc).not.toContain('KhoiBtvnLo')

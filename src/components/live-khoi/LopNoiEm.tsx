@@ -1,4 +1,4 @@
-// LIVE THEO KHỐI — LỚP NỔI MÁY EM (mặt; kho + nối phòng ở em-khoi.ts): phòng chờ có trò Giữ Lửa, màn bốn đội, nút chat mép phải, bong bóng tin mới.
+// LIVE THEO KHỐI — LỚP NỔI MÁY EM (mặt; kho + nối phòng ở em-khoi.ts): phòng chờ có trò Sinh Tồn, màn bốn đội, nút chat mép phải, bong bóng tin mới.
 import { laDienThoai, thuocTinhXoay } from '../live/chieu-xoay'
 import { Suspense, lazy, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
@@ -6,7 +6,7 @@ import { useChatLop } from './ChatEm'
 import { dangKy, dongKhoi, guiTho, kenh, layKho } from './em-khoi'
 import './em-khoi.css'
 
-const TroGiuLua = lazy(() => import('./TroGiuLua'))
+const TroSinhTon = lazy(() => import('./TroSinhTon'))
 const ManBonDoi = lazy(() => import('./ManBonDoi'))
 const ManVinhDanh = lazy(() => import('./ManVinhDanh'))
 const NutChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.NutChatEm })))
@@ -86,7 +86,7 @@ export default function LopNoiEm() {
   return (
     <div className={`lke${cho ? ' cho' : ''}`} data-xoay={xoay ? thuocTinhXoay() : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>
       <Suspense fallback={null}>
-        {cho ? <TroGiuLua toi={s.toi} ds={s.ds} kenh={kenh} soEm={Math.max(1, s.ds.length)} mayYeu={mayYeu()} xoay={xoay} /> : null}
+        {cho ? <TroSinhTon toi={s.toi} ds={s.ds} kenh={kenh} soEm={Math.max(1, s.ds.length)} mayYeu={mayYeu()} xoay={xoay} /> : null}
         {cho ? <button type="button" className="lke-roi" onClick={() => { setRoiCho(true); try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }}>Rời phòng chờ</button> : null}
         {!cho && (sanh || bonDoi) ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} /> : null}
         {!cho && (sanh || !bonDoi) ? (

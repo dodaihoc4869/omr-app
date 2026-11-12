@@ -69,14 +69,18 @@ export const useChoLyDoSai = (): boolean => useSyncExternalStore(dangKy, () => c
 /** Lý do em đã chạm cho câu (đọc lại khi kho đổi). */
 export const useLyDoSai = (qid: string): LyDoSai | undefined => { useSyncExternalStore(dangKy, () => ban, () => 0); nap(); return daChon.get(qid) }
 /** Dải câu sai hiện (chưa có lý do) ⇒ bắt đầu chờ; trả hàm thôi chờ (rời câu / ô lý do không chạm được). */
+let cauHoi: string | null = null // câu sai đang hiện ô «Vì sao em sai?» (phím 1/2/3 trên máy tính chọn nhanh — đặc tả docs/ban-ve-vi-sao-sai-1211 mục 5)
+export const cauDangHoiLy = (): string | null => cauHoi
 export function choCauSai(qid: string): () => void {
   nap()
   khoaDen = Date.now() + KHOA_TIEP_MS
+  cauHoi = qid
   // dải đóng (sang câu khác / chốt an toàn) ⇒ bỏ khoá luôn: khoá chỉ thuộc câu sai đang hiện, không lan sang «Tiếp tục» của câu kế
-  if (daChon.has(qid)) return () => { khoaDen = 0 }
+  const thoi = () => { khoaDen = 0; if (cauHoi === qid) cauHoi = null }
+  if (daChon.has(qid)) return thoi
   cho.add(qid)
   bao()
-  return () => { khoaDen = 0; if (cho.delete(qid)) bao() }
+  return () => { thoi(); if (cho.delete(qid)) bao() }
 }
 
 type Pa = 'A' | 'B' | 'C' | 'D'

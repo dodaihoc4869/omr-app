@@ -3,7 +3,7 @@ import { lazy, startTransition, Suspense, useEffect, useLayoutEffect, useRef, us
 import { TheChonCach } from './TheChonCach'
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Clock, Flame, Info, Lightbulb, PenLine, RefreshCw, Target, X as XIcon } from 'lucide-react'
 import { ChemText } from '../../lib/chem-format'
-import { useChoLyDoSai, choLyDoSai, thanLyDoSai, daGuiLyDoSai, CHU_CHO_LY_DO } from './vi-sao-sai'
+import { useChoLyDoSai, choLyDoSai, thanLyDoSai, daGuiLyDoSai, CHU_CHO_LY_DO, cauDangHoiLy, chonLyDoSai, LY_DO_SAI } from './vi-sao-sai'
 import { KetSai } from './KetSaiDuo'
 import { ChipChuaChac } from './ChipChuaChac'
 // Trình bày phương trình + «không» phủ định (lib/chem-trinh-bay.tsx) — 07/11 nạp cùng gói KaTeX (katex-goi.ts), không import ở đây nữa (một mảnh, không thêm tên mảnh vào bảng nạp trước).
@@ -1100,6 +1100,7 @@ export default function ManLamBaiTap({ token, sbd, onVe, onCapNhat, onChua, onVa
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat || !q || moLoiGiai || gui.current || document.documentElement.hasAttribute('data-gyc-cot-phai')) return
     const t = e.target instanceof HTMLElement ? e.target : null
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT|A)$/.test(t.tagName) || t.closest('[role=dialog], .aid-tam'))) return
+    if (k && /^[1-3]$/.test(e.key) && cauDangHoiLy() === q.qid) { e.preventDefault(); chonLyDoSai(q.qid, LY_DO_SAI[Number(e.key) - 1]![0]); return } // «Vì sao em sai?»: 1/2/3 chọn nhanh
     if (t?.tagName === 'BUTTON' && t.getAttribute('role') !== 'radio') return
     const so = 'ABCD'.indexOf(e.key.toUpperCase()) >= 0 ? e.key.toUpperCase() : /^[1-4]$/.test(e.key) ? 'ABCD'[Number(e.key) - 1]! : ''
     if (so && dangTraLoi && q.phan === 'I' && !nop) { e.preventDefault(); doiTra(so); return }
