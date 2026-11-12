@@ -142,3 +142,9 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Bảng đen KHÔNG còn tấm chọn ⇒ đang chọn thì giấy rộng 78 % (em kéo vạch chia tới 90 %).
     - Gửi xong / thầy bấm «Lên bảng» ⇒ dải tự ẩn như cũ.
 34. **Con dấu ĐẠT / KHÔNG ĐẠT đóng giữa CẢ MÀN, đè cả sang phần đề**, kèm tên em lên bảng, 3 giây (`TamTra.tsx` `DauDat`, vẽ ở gốc màn live). **Máy thầy cũng đóng dấu** trên màn chiếu khi chấm (`src/lib/live-khoi-to-chieu.ts` `lvDau`, mọi đường chấm của tờ). **Dải dưới bỏ thẻ «Đạt / Chưa đạt»** — chỉ còn kết quả của chính em (`DaiLuot.tsx`).
+35. **Chuyển Học ⇄ Bảng: một nguồn nét, đổi tức thì, phím Tab** (thầy 12/11 «khi chuyển qua lại hai chế độ thì bị lỗi tọa độ bút» · «phải cực kì mượt mà chuẩn xác, lưu lại mọi thứ … cho tôi một phím tắt»):
+    - GỐC LỖI: buổi live có thể có hai tờ cùng sống (tờ bài / tờ riêng của tấm hoạt động + bảng trắng bị che); tờ nào gửi tin sau cùng thì thành nguồn ⇒ nét và ô bảng lẫn nhau trên máy em. Nay nguồn = tờ ĐANG HIỆN TRÊN CÙNG (`thay-noi.ts` `toTren` / `chonTo`); tờ bị che gửi gì cũng bỏ; đổi nguồn ⇒ tờ mới gửi lại toàn bộ bảng (`live-anh`).
+    - «Bảng» dùng CHÍNH tờ đang hiện (trang bút riêng `bl`), không dựng tờ thứ hai (`LopNoiThay` `doiChe`, `gan-gv` `toDangHien`). Bảng trắng chỉ dựng khi chưa có tờ nào hiện.
+    - Tờ đổi bố cục TRƯỚC rồi mới đổi trang bút ⇒ ô giấy / ô bảng gửi máy em đúng ngay từ sự kiện đầu (`live-to-chieu.ts` `lvCheBang`); thầy bấm thì tờ đổi NGAY, phòng xác nhận sau (`lvDoiChe`).
+    - **Phím Tab** = đổi Học ⇄ Bảng (trong tờ và ở cửa sổ app khi đang ở tấm hoạt động); khay ghi «phím Tab đổi Học ⇄ Bảng».
+36. **Máy em không còn lệnh khoá xoay của hệ điều hành** (thầy 12/11 lần 3 «khi vào live màn hình học sinh vẫn tự quay một lần, bỏ triệt để — ép ngang nhưng không khoá xoay»): máy dọc ⇒ xoay hình trong app (`chieu-xoay.ts`); em xoay máy tự do.

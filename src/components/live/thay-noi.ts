@@ -240,6 +240,8 @@ function giuBang(ca = false): void {
   if (ca && !guong.net.length && bangLuu?.buoi === b && bangLuu.goi.net.length) return
   bangLuu = { buoi: b, goi: { v: 1, tiLe: guong.tiLe, net: guong.net.slice() } }
 }
+function guiTo(tin: Record<string, unknown>): void { try { to?.postMessage({ nguon: 'bpu-bang', ...tin }, '*') } catch { /* tờ đã đóng */ } }
+let ttCu = '', coEmNoi = false
 // MỘT NGUỒN DUY NHẤT (thầy 12/11 «khi chuyển qua lại hai chế độ thì bị lỗi tọa độ bút … phải cực kì mượt mà chuẩn xác»). Buổi live theo khối có thể có HAI tờ
 // cùng sống (tờ bài / tờ riêng của tấm hoạt động + bảng trắng đang bị che): trước đây tờ nào gửi tin sau cùng thì thành nguồn ⇒ nét và ô bảng của hai tờ lẫn
 // vào nhau trên máy em. Nay nguồn = tờ ĐANG HIỆN TRÊN CÙNG (lớp phủ `.lop-xem-phieu` cuối cùng không bị ẩn); tờ bị che gửi gì cũng bỏ; đổi nguồn ⇒ xin tờ mới
@@ -254,8 +256,6 @@ function chonTo(): void {
   const tr = toTren()
   if (tr && tr !== to) { to = tr; ttCu = ''; nopCu = ''; bangSan = false; guiTo({ lenh: 'live-anh' }) }
 }
-function guiTo(tin: Record<string, unknown>): void { try { to?.postMessage({ nguon: 'bpu-bang', ...tin }, '*') } catch { /* tờ đã đóng */ } }
-let ttCu = '', coEmNoi = false
 // XEM LẠI LIVE (11/11): máy ghi là mảnh nạp lười riêng, chỉ tải khi máy này đang giữ live; tự chạy khi live bật, tự dừng khi live tắt. Lỗi ghi không chặn live.
 let ghiNap = false, ghiMoc: ((sk: SuKienBut) => void) | null = null
 function soatGhi(): void {
