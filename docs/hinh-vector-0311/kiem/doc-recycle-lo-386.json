@@ -1,0 +1,1036 @@
+{
+  "i": 467,
+  "assetIndexProvided": 1348,
+  "hash": "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565.png",
+  "size": [
+    791,
+    131
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B14-D1-I-17",
+      "de": "Sử dụng thông tin dưới đây để trả lời các câu số 17 – 18: Cho các vật liệu polymer thuộc loại chất dẻo mô tả như hình dưới đây. Các polymer này có thể tái chế được, các kí hiệu này thường được in trên bao bì, vỏ hộp, đồ dùng,… để giúp nhận biết vật liệu polymer cũng như thuận lợi trong việc thu gom và tái chế.\nTrong đời sống, nhiều hộ gia đình có thói quen tái sử dụng nhiều lần các chai nhựa đựng nước tinh khiết (thường có kí hiệu số 1 - PET) để đựng nước sôi hoặc nước trà nóng. Dưới góc độ hoá học và tính chất vật liệu, phát biểu nào sau đây đánh giá đúng nhất về thói quen này?",
+      "allHinh": [
+        {
+          "hash": "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565",
+          "where": "VIP27-C4-B14-D1-I-17.hinh.0.du_lieu",
+          "hashDataUrl": "48ab4859c5ae70ecc127a6d89d82cb35be0dd9dfae66ee6825b525ceda023c0e"
+        }
+      ],
+      "missingHashes": [
+        "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565"
+      ]
+    },
+    {
+      "qid": "VIP27-C4-B14-D1-I-18",
+      "de": "Sử dụng thông tin dưới đây để trả lời các câu số 17 – 18: Cho các vật liệu polymer thuộc loại chất dẻo mô tả như hình dưới đây. Các polymer này có thể tái chế được, các kí hiệu này thường được in trên bao bì, vỏ hộp, đồ dùng,… để giúp nhận biết vật liệu polymer cũng như thuận lợi trong việc thu gom và tái chế.\nKhi thảo luận về thành phần hoá học và phương pháp điều chế các loại vật liệu polymer trên, một nhóm học sinh đưa ra một số ý kiến đánh giá như sau:\n(1) Tất cả 6 loại polymer có kí hiệu trên đều được tổng hợp bằng phản ứng trùng hợp.\n(2) Nhựa PVC (kí hiệu số 3) trong thành phần phân tử có chứa nguyên tố chlorine, do đó khi bị đốt cháy sẽ sinh ra khí độc, gây ô nhiễm môi trường.\n(3) HDPE và LDPE là các polymer có thành phần nguyên tố giống nhau.\n(4) PS (kí hiệu số 6) là polymer được tổng hợp từ phản ứng trùng ngưng styrene, thường được dùng để sản xuất hộp xốp đựng thức ăn nhanh.\nCác ý kiến đánh giá **không** đúng là",
+      "allHinh": [
+        {
+          "hash": "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565",
+          "where": "VIP27-C4-B14-D1-I-18.hinh.0.du_lieu",
+          "hashDataUrl": "48ab4859c5ae70ecc127a6d89d82cb35be0dd9dfae66ee6825b525ceda023c0e"
+        }
+      ],
+      "missingHashes": [
+        "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 2,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownEachSixIcons3xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Eachiconnativepart/digit/captionbboxmeasuredblackpixelafterown6separatezooms; guides/trianglesturnpointsmanualapprox1pxNOTautomatictrace. SourceBBoxesrecordnativevariation; guidebodymustbemansmoothedtofillpartbbox—notdeclareidenticalalias1192.",
+  "geometry": {
+    "icons": [
+      {
+        "number": "1",
+        "caption": "PET",
+        "numberBBox": [
+          60,
+          43,
+          67,
+          61
+        ],
+        "captionBBox": [
+          44,
+          102,
+          86,
+          121
+        ],
+        "numberCenter": [
+          63.5,
+          52.0
+        ],
+        "captionCenter": [
+          65.0,
+          111.5
+        ],
+        "arrowPartNativeBBoxes": {
+          "top": [
+            44,
+            9,
+            96,
+            48
+          ],
+          "left": [
+            18,
+            39,
+            52,
+            87
+          ],
+          "bottom": [
+            60,
+            52,
+            112,
+            94
+          ]
+        },
+        "manualCenterlineGuides": {
+          "top": [
+            [
+              48,
+              33
+            ],
+            [
+              57,
+              17
+            ],
+            [
+              65,
+              13
+            ],
+            [
+              72,
+              17
+            ],
+            [
+              85,
+              39
+            ]
+          ],
+          "left": [
+            [
+              52,
+              82
+            ],
+            [
+              32,
+              82
+            ],
+            [
+              24,
+              80
+            ],
+            [
+              22,
+              75
+            ],
+            [
+              36,
+              49
+            ]
+          ],
+          "bottom": [
+            [
+              95,
+              55
+            ],
+            [
+              105,
+              72
+            ],
+            [
+              107,
+              78
+            ],
+            [
+              101,
+              82
+            ],
+            [
+              68,
+              82
+            ]
+          ]
+        },
+        "fullFilledHeadTrianglesApprox": {
+          "top": [
+            [
+              96,
+              31
+            ],
+            [
+              90,
+              48
+            ],
+            [
+              73,
+              42
+            ]
+          ],
+          "left": [
+            [
+              43,
+              39
+            ],
+            [
+              25,
+              44
+            ],
+            [
+              48,
+              58
+            ]
+          ],
+          "bottom": [
+            [
+              60,
+              82
+            ],
+            [
+              73,
+              69
+            ],
+            [
+              73,
+              94
+            ]
+          ]
+        },
+        "style": "3broadsolidblackcurvedarrows~8pxbodywidth/roundedcorners;headsFILLEDnotopen/hollow, noextrafoldlines."
+      },
+      {
+        "number": "2",
+        "caption": "HDPE",
+        "numberBBox": [
+          187,
+          42,
+          198,
+          61
+        ],
+        "captionBBox": [
+          164,
+          102,
+          222,
+          121
+        ],
+        "numberCenter": [
+          192.5,
+          51.5
+        ],
+        "captionCenter": [
+          193.0,
+          111.5
+        ],
+        "arrowPartNativeBBoxes": {
+          "top": [
+            172,
+            9,
+            224,
+            48
+          ],
+          "left": [
+            146,
+            39,
+            180,
+            87
+          ],
+          "bottom": [
+            189,
+            52,
+            240,
+            95
+          ]
+        },
+        "manualCenterlineGuides": {
+          "top": [
+            [
+              176,
+              33
+            ],
+            [
+              185,
+              17
+            ],
+            [
+              193,
+              13
+            ],
+            [
+              200,
+              17
+            ],
+            [
+              213,
+              39
+            ]
+          ],
+          "left": [
+            [
+              180,
+              82
+            ],
+            [
+              160,
+              82
+            ],
+            [
+              152,
+              80
+            ],
+            [
+              150,
+              75
+            ],
+            [
+              164,
+              49
+            ]
+          ],
+          "bottom": [
+            [
+              224,
+              55
+            ],
+            [
+              234,
+              72
+            ],
+            [
+              236,
+              78
+            ],
+            [
+              230,
+              82
+            ],
+            [
+              197,
+              82
+            ]
+          ]
+        },
+        "fullFilledHeadTrianglesApprox": {
+          "top": [
+            [
+              224,
+              31
+            ],
+            [
+              218,
+              48
+            ],
+            [
+              201,
+              42
+            ]
+          ],
+          "left": [
+            [
+              171,
+              39
+            ],
+            [
+              153,
+              44
+            ],
+            [
+              176,
+              58
+            ]
+          ],
+          "bottom": [
+            [
+              189,
+              82
+            ],
+            [
+              202,
+              69
+            ],
+            [
+              202,
+              94
+            ]
+          ]
+        },
+        "style": "3broadsolidblackcurvedarrows~8pxbodywidth/roundedcorners;headsFILLEDnotopen/hollow, noextrafoldlines."
+      },
+      {
+        "number": "3",
+        "caption": "PVC",
+        "numberBBox": [
+          315,
+          42,
+          326,
+          61
+        ],
+        "captionBBox": [
+          299,
+          102,
+          343,
+          121
+        ],
+        "numberCenter": [
+          320.5,
+          51.5
+        ],
+        "captionCenter": [
+          321.0,
+          111.5
+        ],
+        "arrowPartNativeBBoxes": {
+          "top": [
+            300,
+            9,
+            352,
+            48
+          ],
+          "left": [
+            274,
+            39,
+            308,
+            87
+          ],
+          "bottom": [
+            316,
+            52,
+            367,
+            95
+          ]
+        },
+        "manualCenterlineGuides": {
+          "top": [
+            [
+              304,
+              33
+            ],
+            [
+              313,
+              17
+            ],
+            [
+              321,
+              13
+            ],
+            [
+              328,
+              17
+            ],
+            [
+              341,
+              39
+            ]
+          ],
+          "left": [
+            [
+              308,
+              82
+            ],
+            [
+              288,
+              82
+            ],
+            [
+              280,
+              80
+            ],
+            [
+              278,
+              75
+            ],
+            [
+              292,
+              49
+            ]
+          ],
+          "bottom": [
+            [
+              351,
+              55
+            ],
+            [
+              361,
+              72
+            ],
+            [
+              363,
+              78
+            ],
+            [
+              357,
+              82
+            ],
+            [
+              324,
+              82
+            ]
+          ]
+        },
+        "fullFilledHeadTrianglesApprox": {
+          "top": [
+            [
+              352,
+              31
+            ],
+            [
+              346,
+              48
+            ],
+            [
+              329,
+              42
+            ]
+          ],
+          "left": [
+            [
+              299,
+              39
+            ],
+            [
+              281,
+              44
+            ],
+            [
+              304,
+              58
+            ]
+          ],
+          "bottom": [
+            [
+              316,
+              82
+            ],
+            [
+              329,
+              69
+            ],
+            [
+              329,
+              94
+            ]
+          ]
+        },
+        "style": "3broadsolidblackcurvedarrows~8pxbodywidth/roundedcorners;headsFILLEDnotopen/hollow, noextrafoldlines."
+      },
+      {
+        "number": "4",
+        "caption": "LDPE",
+        "numberBBox": [
+          443,
+          42,
+          455,
+          61
+        ],
+        "captionBBox": [
+          421,
+          102,
+          476,
+          121
+        ],
+        "numberCenter": [
+          449.0,
+          51.5
+        ],
+        "captionCenter": [
+          448.5,
+          111.5
+        ],
+        "arrowPartNativeBBoxes": {
+          "top": [
+            428,
+            9,
+            480,
+            48
+          ],
+          "left": [
+            401,
+            39,
+            436,
+            87
+          ],
+          "bottom": [
+            444,
+            51,
+            495,
+            94
+          ]
+        },
+        "manualCenterlineGuides": {
+          "top": [
+            [
+              432,
+              33
+            ],
+            [
+              441,
+              17
+            ],
+            [
+              449,
+              13
+            ],
+            [
+              456,
+              17
+            ],
+            [
+              469,
+              39
+            ]
+          ],
+          "left": [
+            [
+              435,
+              82
+            ],
+            [
+              415,
+              82
+            ],
+            [
+              407,
+              80
+            ],
+            [
+              405,
+              75
+            ],
+            [
+              419,
+              49
+            ]
+          ],
+          "bottom": [
+            [
+              479,
+              55
+            ],
+            [
+              489,
+              72
+            ],
+            [
+              491,
+              78
+            ],
+            [
+              485,
+              82
+            ],
+            [
+              452,
+              82
+            ]
+          ]
+        },
+        "fullFilledHeadTrianglesApprox": {
+          "top": [
+            [
+              480,
+              31
+            ],
+            [
+              474,
+              48
+            ],
+            [
+              457,
+              42
+            ]
+          ],
+          "left": [
+            [
+              426,
+              39
+            ],
+            [
+              408,
+              44
+            ],
+            [
+              431,
+              58
+            ]
+          ],
+          "bottom": [
+            [
+              444,
+              82
+            ],
+            [
+              457,
+              69
+            ],
+            [
+              457,
+              94
+            ]
+          ]
+        },
+        "style": "3broadsolidblackcurvedarrows~8pxbodywidth/roundedcorners;headsFILLEDnotopen/hollow, noextrafoldlines."
+      },
+      {
+        "number": "5",
+        "caption": "PP",
+        "numberBBox": [
+          570,
+          42,
+          582,
+          61
+        ],
+        "captionBBox": [
+          562,
+          102,
+          591,
+          121
+        ],
+        "numberCenter": [
+          576.0,
+          51.5
+        ],
+        "captionCenter": [
+          576.5,
+          111.5
+        ],
+        "arrowPartNativeBBoxes": {
+          "top": [
+            555,
+            9,
+            607,
+            48
+          ],
+          "left": [
+            529,
+            39,
+            563,
+            87
+          ],
+          "bottom": [
+            572,
+            52,
+            622,
+            95
+          ]
+        },
+        "manualCenterlineGuides": {
+          "top": [
+            [
+              559,
+              33
+            ],
+            [
+              568,
+              17
+            ],
+            [
+              576,
+              13
+            ],
+            [
+              583,
+              17
+            ],
+            [
+              596,
+              39
+            ]
+          ],
+          "left": [
+            [
+              563,
+              82
+            ],
+            [
+              543,
+              82
+            ],
+            [
+              535,
+              80
+            ],
+            [
+              533,
+              75
+            ],
+            [
+              547,
+              49
+            ]
+          ],
+          "bottom": [
+            [
+              607,
+              55
+            ],
+            [
+              617,
+              72
+            ],
+            [
+              619,
+              78
+            ],
+            [
+              613,
+              82
+            ],
+            [
+              580,
+              82
+            ]
+          ]
+        },
+        "fullFilledHeadTrianglesApprox": {
+          "top": [
+            [
+              607,
+              31
+            ],
+            [
+              601,
+              48
+            ],
+            [
+              584,
+              42
+            ]
+          ],
+          "left": [
+            [
+              554,
+              39
+            ],
+            [
+              536,
+              44
+            ],
+            [
+              559,
+              58
+            ]
+          ],
+          "bottom": [
+            [
+              572,
+              82
+            ],
+            [
+              585,
+              69
+            ],
+            [
+              585,
+              94
+            ]
+          ]
+        },
+        "style": "3broadsolidblackcurvedarrows~8pxbodywidth/roundedcorners;headsFILLEDnotopen/hollow, noextrafoldlines."
+      },
+      {
+        "number": "6",
+        "caption": "PS",
+        "numberBBox": [
+          698,
+          42,
+          710,
+          61
+        ],
+        "captionBBox": [
+          690,
+          102,
+          718,
+          121
+        ],
+        "numberCenter": [
+          704.0,
+          51.5
+        ],
+        "captionCenter": [
+          704.0,
+          111.5
+        ],
+        "arrowPartNativeBBoxes": {
+          "top": [
+            684,
+            9,
+            736,
+            48
+          ],
+          "left": [
+            657,
+            39,
+            692,
+            87
+          ],
+          "bottom": [
+            700,
+            52,
+            751,
+            94
+          ]
+        },
+        "manualCenterlineGuides": {
+          "top": [
+            [
+              688,
+              33
+            ],
+            [
+              697,
+              17
+            ],
+            [
+              705,
+              13
+            ],
+            [
+              712,
+              17
+            ],
+            [
+              725,
+              39
+            ]
+          ],
+          "left": [
+            [
+              691,
+              82
+            ],
+            [
+              671,
+              82
+            ],
+            [
+              663,
+              80
+            ],
+            [
+              661,
+              75
+            ],
+            [
+              675,
+              49
+            ]
+          ],
+          "bottom": [
+            [
+              735,
+              55
+            ],
+            [
+              745,
+              72
+            ],
+            [
+              747,
+              78
+            ],
+            [
+              741,
+              82
+            ],
+            [
+              708,
+              82
+            ]
+          ]
+        },
+        "fullFilledHeadTrianglesApprox": {
+          "top": [
+            [
+              736,
+              31
+            ],
+            [
+              730,
+              48
+            ],
+            [
+              713,
+              42
+            ]
+          ],
+          "left": [
+            [
+              682,
+              39
+            ],
+            [
+              664,
+              44
+            ],
+            [
+              687,
+              58
+            ]
+          ],
+          "bottom": [
+            [
+              700,
+              82
+            ],
+            [
+              713,
+              69
+            ],
+            [
+              713,
+              94
+            ]
+          ]
+        },
+        "style": "3broadsolidblackcurvedarrows~8pxbodywidth/roundedcorners;headsFILLEDnotopen/hollow, noextrafoldlines."
+      }
+    ],
+    "font": "ALL6numbersand6captionsTRUEBOLDuprightsansblack (captionscondensedappearance), nocursive/italic. LiteralPET/HDPE/PVC/LDPE/PP/PS, noadditionalwords.",
+    "counts": {
+      "icons": 6,
+      "broadCurvedArrowParts": 18,
+      "fullFilledHeads": 18,
+      "numericLabels": 6,
+      "captions": 6
+    },
+    "noAdded": [
+      "alias1192",
+      "recycling7",
+      "extrafoldtriangles",
+      "plasticusageanswer",
+      "expandedpolymernames",
+      "colorfills",
+      "hollowheads"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFull": true,
+    "ownFull3x": true,
+    "ownFirstIcon8x": true,
+    "ownOtherFiveIcons3x": true,
+    "all2PublicDeAndRefs": true,
+    "freshActualFull3x": true,
+    "actualEachSixIcons3x": true,
+    "nativeGeometryApproxNotSubpixel": true,
+    "manualFilledPaths": true,
+    "noAutoTrace": true
+  },
+  "sourceStageStatus": "source-only/noSVG/noCount",
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "20d76f9e0a42c693d1fbbd32974196d9ea9842ad50546ed5476337faa83de5d6",
+    "readonlyProof": "/workspace/scratch/soat-recycle-lo386.json",
+    "runtime": "/workspace/scratch/recycle-runtime.log",
+    "newFull": 2
+  }
+}

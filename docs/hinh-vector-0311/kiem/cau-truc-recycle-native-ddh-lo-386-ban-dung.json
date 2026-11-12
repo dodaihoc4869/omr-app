@@ -1,0 +1,40 @@
+[
+  {
+    "i": 467,
+    "hash": "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565",
+    "fileNguon": "anh/5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565.png",
+    "svg": "recycle-native-ddh-20d76f9e0a42c693d1fbbd32974196d9ea9842ad50546ed5476337faa83de5d6.svg",
+    "hashSvg": "20d76f9e0a42c693d1fbbd32974196d9ea9842ad50546ed5476337faa83de5d6",
+    "byteSvg": 15306,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D1-I-17",
+        "de": "Sử dụng thông tin dưới đây để trả lời các câu số 17 – 18: Cho các vật liệu polymer thuộc loại chất dẻo mô tả như hình dưới đây. Các polymer này có thể tái chế được, các kí hiệu này thường được in trên bao bì, vỏ hộp, đồ dùng,… để giúp nhận biết vật liệu polymer cũng như thuận lợi trong việc thu gom và tái chế.\nTrong đời sống, nhiều hộ gia đình có thói quen tái sử dụng nhiều lần các chai nhựa đựng nước tinh khiết (thường có kí hiệu số 1 - PET) để đựng nước sôi hoặc nước trà nóng. Dưới góc độ hoá học và tính chất vật liệu, phát biểu nào sau đây đánh giá đúng nhất về thói quen này?",
+        "refs": [
+          {
+            "hash": "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565",
+            "where": "VIP27-C4-B14-D1-I-17.hinh.0.du_lieu",
+            "hashDataUrl": "48ab4859c5ae70ecc127a6d89d82cb35be0dd9dfae66ee6825b525ceda023c0e"
+          }
+        ]
+      },
+      {
+        "qid": "VIP27-C4-B14-D1-I-18",
+        "de": "Sử dụng thông tin dưới đây để trả lời các câu số 17 – 18: Cho các vật liệu polymer thuộc loại chất dẻo mô tả như hình dưới đây. Các polymer này có thể tái chế được, các kí hiệu này thường được in trên bao bì, vỏ hộp, đồ dùng,… để giúp nhận biết vật liệu polymer cũng như thuận lợi trong việc thu gom và tái chế.\nKhi thảo luận về thành phần hoá học và phương pháp điều chế các loại vật liệu polymer trên, một nhóm học sinh đưa ra một số ý kiến đánh giá như sau:\n(1) Tất cả 6 loại polymer có kí hiệu trên đều được tổng hợp bằng phản ứng trùng hợp.\n(2) Nhựa PVC (kí hiệu số 3) trong thành phần phân tử có chứa nguyên tố chlorine, do đó khi bị đốt cháy sẽ sinh ra khí độc, gây ô nhiễm môi trường.\n(3) HDPE và LDPE là các polymer có thành phần nguyên tố giống nhau.\n(4) PS (kí hiệu số 6) là polymer được tổng hợp từ phản ứng trùng ngưng styrene, thường được dùng để sản xuất hộp xốp đựng thức ăn nhanh.\nCác ý kiến đánh giá **không** đúng là",
+        "refs": [
+          {
+            "hash": "5518f8180cbb31e2158c8eab5bd299bcf2263fa9471bf59791f34576e4865565",
+            "where": "VIP27-C4-B14-D1-I-18.hinh.0.du_lieu",
+            "hashDataUrl": "48ab4859c5ae70ecc127a6d89d82cb35be0dd9dfae66ee6825b525ceda023c0e"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "6recycleicons18FILLEDheads3EACH/6nums1-6TRUEdamUPRIGHT/6captionsEXACTPET-HDPE-PVC-LDPE-PP-PS-TRUEdamUPRIGHT/6separatenativeparts-noPeriodicAlias/0chemicalbonds-charge-captiontitle/NOadded7OTHER-polymerformulas-answer-noalias1192/1source2fullIFpass",
+    "hashSvgDaSoat": "20d76f9e0a42c693d1fbbd32974196d9ea9842ad50546ed5476337faa83de5d6",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
