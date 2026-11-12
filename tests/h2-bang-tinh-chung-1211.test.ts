@@ -118,7 +118,7 @@ describe('nơi dùng: kết quả y hệt đường cũ qua trượt / trúng / 
     }
     expect(dongCat(d).some((x) => x.khoa.startsWith('kn7.'))).toBe(true)
   })
-  it('(7) docChiMucTheoDang + (12) cauCuaToChiTiet: y hệt; sửa kho ⇒ theo dữ liệu mới', async () => {
+  it('(12) cauCuaToChiTiet (+ (7) docChiMucTheoDang: giữ câu cũ — xem bang-tinh-chung.ts): y hệt; sửa kho ⇒ theo dữ liệu mới', async () => {
     const d = taoD1That(); datKho(d)
     for (const buoc of ['', "UPDATE game_v2_question SET json=json_set(json,'$.reviewed',json('true')) WHERE qid='DE0-4'", "DELETE FROM game_v2_question WHERE qid='DE1-2'", "INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('DE1','DE1-99','1','g','d1','{\"reviewed\":true,\"phan\":\"I\"}')"]) {
       if (buoc) ghiKho(d, buoc)

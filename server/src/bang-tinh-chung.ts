@@ -1,6 +1,7 @@
 // BẢN TÍNH SẴN DÙNG CHUNG THEO DẤU BẢNG (12/11 H2, hoá đơn D1 hàng đọc — đích ≤ 5 đô/tháng).
 // Vì sao: vài câu đọc KHO (gần như tĩnh) chạy hàng nghìn lượt/ngày, mỗi lượt đọc lại vài trăm – vài nghìn hàng y hệt lần trước: ma trận nhãn Gói 7
-// (5.553 × 4.502), β câu (29.039 × 797), câu của tờ (4.297 × 2.469), chỉ mục câu theo dạng (80.916 × 109). Đệm trong isolate không cứu được (rất nhiều
+// (5.553 × 4.502), β câu (29.039 × 797), câu của tờ (4.297 × 2.469). KHÔNG dùng cho câu ít hàng (chỉ mục theo dạng, 109 hàng): mỗi lần kho đổi, mỗi khoá
+// phải cất lại (~2 hàng GHI = ~2.000 hàng đọc) — hàng trăm khoá dạng × vài lần đổi kho/ngày thì lỗ. Đệm trong isolate không cứu được (rất nhiều
 // isolate ngắn hạn — xem kho-chung.ts). Nay: KẾT QUẢ THÔ của câu (đúng các dòng D1 trả) cất MỘT dòng trong `bang_tinh_chung`, khoá theo (tên câu + băm câu
 // SQL + tham số), gắn DẤU của đúng các bảng nguồn (`dau_bang` — migration-z-1211-h2-goi-nhieu.sql: kho = dấu game_v2_index do trigger giữ, câu kho chỉ
 // ghi cùng lô với nó; omni_q / β = số phiên NƠI GHI tăng mỗi lô + MAX(rowid) — không trigger theo dòng vì GHI đắt gấp 1.000 ĐỌC). Lưới an toàn: dòng cất > 24 giờ ⇒ trượt.
@@ -85,7 +86,8 @@ export async function docChungNeuCo<R>(env: Env, ten: string, sql: string, thamS
   return { results: rows }
 }
 
-/** Cron mỗi giờ: xoá dòng cất quá `TUOI_TOI_DA_MS` (câu dò đã coi là trượt) — bảng không phình theo khoá cũ (danh sách tờ đổi…). Không ném. */
+/** Cron mỗi giờ: xoá dòng cất 7 ngày không ai cất lại (khoá không còn dùng — danh sách tờ đổi…) ⇒ bảng không phình. Không xoá dòng quá 24 giờ mà khoá còn dùng:
+ *  lượt trượt kế tiếp cất đè (một hàng ghi) thay vì xoá + cất (hai). Không ném. */
 export async function donBangTinhChung(env: Env, now: number): Promise<number> {
-  try { const r = await env.DB.prepare('DELETE FROM bang_tinh_chung WHERE luc < ?').bind(now - TUOI_TOI_DA_MS).run(); return Number(r.meta?.changes ?? 0) } catch { return 0 }
+  try { const r = await env.DB.prepare('DELETE FROM bang_tinh_chung WHERE luc < ?').bind(now - 7 * 86_400_000).run(); return Number(r.meta?.changes ?? 0) } catch { return 0 }
 }

@@ -40,7 +40,6 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { damBaoCauNenTuDong } from './omni-cau-nen-sinh'
 import { LENH_OMNI_CAN_THAN, canThanTu, ghiBuocSai, phanCanThanChoTraLoi } from './omni-can-than'
 import { chonBuocTuKhai, docBuocSaiGanDay } from './omni-buoc-sai-uu-tien'
-import { docChung } from './bang-tinh-chung'
 
 type Row = Record<string, unknown>
 const str = (v: unknown): string => (v == null ? '' : String(v))
@@ -420,16 +419,13 @@ async function metaTuDong(env: Env, rows: readonly Row[], pv: PhamViChon, khiCoM
 }
 const SQL_CHI_MUC = "SELECT qid, ma_de, json_extract(json,'$.reviewed') AS rv FROM game_v2_question"
 /** Lượt ĐỌC đầu của `metaTheoDang` (chỉ mục câu theo dạng) — không phụ thuộc phạm vi ⇒ nơi gọi bắt đầu SỚM được (tối ưu 05/10, thang làm lại). */
-// 12/11 (H2: 80.916 lượt/ngày × 109 hàng): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) — cùng dòng câu cũ.
-const SQL_CHI_MUC_DANG = `${SQL_CHI_MUC} WHERE dang = ?`
-const docChiMucDang = (env: Env, maDang: string) => docChung<Row>(env, 'cmd', SQL_CHI_MUC_DANG, maDang, ['game_v2_index'], () => env.DB.prepare(SQL_CHI_MUC_DANG).bind(maDang))
 export async function docChiMucTheoDang(env: Env, maDang: string): Promise<Row[]> {
-  const r = await docChiMucDang(env, maDang)
+  const r = await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()
   return r.results ?? []
 }
 /** `som` (tối ưu 05/10, chỉ-thêm): `chiMuc` = `docChiMucTheoDang` đã bắt đầu sớm; `khiCoMaTo` = gọi khi biết các tờ ứng viên. Vắng ⇒ y hệt cũ. */
 export async function metaTheoDang(env: Env, maDang: string, pv: PhamViChon, som?: { chiMuc?: Promise<Row[]>; khiCoMaTo?: (maTo: string[]) => void }): Promise<MetaCau[]> {
-  const rows = som?.chiMuc ? await som.chiMuc : ((await docChiMucDang(env, maDang)).results ?? [])
+  const rows = som?.chiMuc ? await som.chiMuc : ((await env.DB.prepare(`${SQL_CHI_MUC} WHERE dang = ?`).bind(maDang).all<Row>()).results ?? [])
   return metaTuDong(env, rows, pv, som?.khiCoMaTo)
 }
 async function metaTheoPhamVi(env: Env, pv: PhamViChon): Promise<MetaCau[]> {
