@@ -114,7 +114,8 @@ describe('màn câu hỏi: hai cột «một bên đề một bên chọn đáp 
     const than = document.querySelector('.bpu-hs-than')!
     expect(than.classList.contains('bpu-cau')).toBe(true)
     expect(than.hasAttribute('data-phieu')).toBe(true)
-    expect([...than.children].slice(0, 2).map((x) => x.className)).toEqual(['bpu-cot-de', 'duo-tra bpu-tra'])
+    // 12/11: giữa hai cột có VÁCH KÉO (thầy «có thể di chuyển cửa sổ đề và chọn ý») — khổ dọc CSS ẩn vách
+    expect([...than.children].slice(0, 3).map((x) => x.className)).toEqual(['bpu-cot-de', 'bpu-vach', 'duo-tra bpu-tra'])
     const cot = than.querySelector(':scope > .bpu-cot-de')!
     expect([...cot.children].map((x) => x.classList[0])).toEqual(['m3-chip', 'ht-app', 'bpu-y-de', 'bpu-sau-tra'])
     const y = [...cot.querySelectorAll('.bpu-y-de > li')]

@@ -2,6 +2,7 @@
 // Mỗi em là một đốm lửa màu đội: gom hạt để lớn, tránh đốm lớn đội khác, mang năng lượng về góc đội. Luật nằm cả ở LÕI THUẦN src/lib/live-khoi/tro-loi.ts;
 // tệp này chỉ lo: MỘT canvas (vòng requestAnimationFrame, tab ẩn ⇒ dừng), điều khiển (cần ảo / nút / bàn phím), kênh lớp, và vài lớp DOM phủ trên.
 // Máy yếu / giảm chuyển động ⇒ 30 khung / giây, bỏ hào quang. Màu đọc từ biến CSS của app (không mã màu thô). kJ trong trò KHÔNG cộng vào kJ buổi học.
+import { toaDoXoay } from '../live/chieu-xoay'
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
 import { SAN_CAO, SAN_RONG, type KenhLop, type NguoiLop, type TinLop, type TroAnh } from '../../lib/live-khoi/kieu'
@@ -423,7 +424,7 @@ export default function TroGiuLua({ toi, ds, kenh, soEm, mayYeu = false, xoay = 
   // ── Cần ảo: chạm đâu trong nửa trái, cần hiện đó. Toạ độ đổi về hệ của KHUNG như src/components/live/KhungDocLap.tsx (lớp live xoay 90° bằng CSS). ──
   const toaDo = (e: SuKienTro) => {
     const r = (vaiRef.current ?? e.currentTarget).getBoundingClientRect()
-    return xoay ? { x: e.clientY - r.top, y: r.right - e.clientX } : { x: e.clientX - r.left, y: e.clientY - r.top }
+    return xoay ? toaDoXoay(e, r) : { x: e.clientX - r.left, y: e.clientY - r.top }
   }
   const datNum = (dx: number, dy: number) => { if (numRef.current) numRef.current.style.transform = dx || dy ? `translate(${dx}px, ${dy}px)` : '' }
   const canXuong = (e: SuKienTro<HTMLDivElement>) => {

@@ -1,4 +1,5 @@
 // BÌNH PHẢN ỨNG × LIVE — luật «máy em đang ở màn nào» + màn chờ của em ở xa. Tách khỏi ManBinhPhanUng.tsx (cổng cỡ tệp); cùng mảnh nạp lười với màn ấy.
+import { laDienThoai, thuocTinhXoay } from '../live/chieu-xoay'
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 
 /** MÀN CỦA MÁY EM LÚC THẦY LIVE — thầy test máy thật 11/11:
@@ -40,7 +41,7 @@ export const CAO_KHUNG_THAP = 500
  *  hình đầu tiên đã xoay, không nháy dọc. Chỉ nghe đổi cỡ khi đang live. Trả: `giu` = giữ khoá ngang (LopLive) · `xoay` = gốc màn đang xoay hình ·
  *  `the` = thuộc tính + kiểu cho gốc `.bpu-hs` (`data-xoay`; `data-ngang` / `data-thap` = điều kiện @media ngang mà HÌNH thoả — trang dọc nên @media
  *  không khớp, bpu-hs.css nhắc lại đúng các luật ấy; khổ HÌNH = trang đổi trục). */
-export function useHuongLive(che: 'an' | 'dau' | 'bang', liveBat: boolean, ep = false): { giu: boolean; xoay: boolean; the: { 'data-xoay'?: ''; 'data-ngang'?: ''; 'data-thap'?: ''; style?: CSSProperties } } {
+export function useHuongLive(che: 'an' | 'dau' | 'bang', liveBat: boolean, ep = false): { giu: boolean; xoay: boolean; the: { 'data-xoay'?: '' | 'nguoc'; 'data-ngang'?: ''; 'data-thap'?: ''; style?: CSSProperties } } {
   const [kho, setKho] = useState<readonly [number, number]>(() => [window.innerWidth, window.innerHeight])
   useEffect(() => {
     if (!liveBat && !ep) return
@@ -56,9 +57,10 @@ export function useHuongLive(che: 'an' | 'dau' | 'bang', liveBat: boolean, ep = 
   // (danh sách, câu hỏi, kết quả); riêng lớp bảng live tự xoay lấy nên gốc màn không xoay chồng.
   const moi = ep ? (doc ? 'xoay' : 'ngang') : buocHuongLive(huong, che, liveBat, doc)
   if (moi !== huong) setHuong(moi)
-  const xoay = ep ? che !== 'bang' && doc : xoayManCau(moi, che, doc)
+  // chỉ ĐIỆN THOẠI mới bị xoay hình (máy tính / máy tính bảng không bao giờ) — live/chieu-xoay.ts
+  const xoay = (ep ? che !== 'bang' && doc : xoayManCau(moi, che, doc)) && laDienThoai()
   if (!xoay) return { giu: moi !== null, xoay, the: {} }
-  return { giu: true, xoay, the: { 'data-xoay': '', ...(kho[1] >= RONG_HAI_COT ? { 'data-ngang': '' } : {}), ...(kho[0] <= CAO_KHUNG_THAP ? { 'data-thap': '' } : {}), style: { width: kho[1], height: kho[0] } } }
+  return { giu: true, xoay, the: { 'data-xoay': thuocTinhXoay(), ...(kho[1] >= RONG_HAI_COT ? { 'data-ngang': '' } : {}), ...(kho[0] <= CAO_KHUNG_THAP ? { 'data-thap': '' } : {}), style: { width: kho[1], height: kho[0] } } }
 }
 
 /** EM Ở XA (live đợt 2, điểm quyết 4 — vé «em ở xa»): chỉ xem live. Thầy đang live ⇒ lớp bảng live phủ lên màn này; chưa live / thầy tắt «cho em ở xa» ⇒ màn
