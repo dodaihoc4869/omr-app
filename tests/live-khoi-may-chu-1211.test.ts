@@ -26,6 +26,8 @@ describe('lịch live theo khối', () => {
     const ds = [lich({ id: 'h12', batDau: NAY + 3_600_000 }), lich({ id: 'c12', trangThai: 'cho', buoiId: 'b' }), lich({ id: 'h11', khoi: 11, batDau: NAY - 31 * 60_000 })]
     expect(lichChoEm(ds, 12, NAY)?.id).toBe('c12')
     expect(lichChoEm(ds, 10, NAY)).toBeNull()
+    expect(lichChoEm(ds, null, NAY)?.id).toBe('c12') // tài khoản thử của thầy: mọi khối
+    expect(lichChoEm([lich({ id: 'c10', khoi: 10, trangThai: 'dang', buoiId: 'b' })], null, NAY)?.id).toBe('c10')
     expect(lichChoEm(ds, 11, NAY)).toBeNull()
     expect(lichChoEm([lich({ id: 'h11', khoi: 11, batDau: NAY - 29 * 60_000 })], 11, NAY)?.id).toBe('h11')
   })
