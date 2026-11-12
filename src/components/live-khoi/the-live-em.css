@@ -1,0 +1,25 @@
+/* THẺ «LIVE» Ở TRANG CHỦ MÁY EM (12/11; bản vẽ docs/ban-ve-live-moi-1211 ảnh 06). Chỉ biến màu sẵn có của app học sinh (--tr-*, trong-hs-mau.css) ⇒ tự đúng
+ * cả sáng lẫn tối. Không màu mới. Thẻ nằm ngay trên khối Điểm danh (cùng thứ tự `order` với khối ấy trong tấm «Thêm»). */
+.tle-khung { display: grid; gap: 6px; flex: none; min-width: 0; }
+.tle { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; flex: none; min-width: 0; padding: 12px 14px; border: 2px solid var(--tr-vien); border-radius: 20px; background: var(--tr-mat); color: var(--tr-chu); text-align: left; }
+html:root[data-trong='hs'] .tr-menu.tr-menu > :is(.tle, .tle-khung) { order: 3; }
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 700px) {
+  [data-trong] .tr-menu > :is(.tle, .tle-khung) { grid-column: 1 / -1; }
+}
+.tle-bieu { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--tr-hs-nhat); color: var(--tr-hs); }
+.tle-chu { flex: 1 1 150px; display: grid; gap: 2px; min-width: 0; line-height: 1.3; }
+.tle-chu b { font-size: 17px; font-weight: 800; overflow-wrap: anywhere; }
+.tle-chu span { color: var(--tr-chu-2); font-size: 14.5px; overflow-wrap: anywhere; }
+
+/* Thầy đang mở phòng chờ / đang live: thẻ sáng */
+.tle:is([data-tt='cho'], [data-tt='dang']) { border-color: var(--tr-sai); background: var(--tr-sai-nhat); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tr-sai) 18%, transparent); }
+.tle:is([data-tt='cho'], [data-tt='dang']) .tle-bieu { background: color-mix(in srgb, var(--tr-sai) 22%, transparent); color: var(--tr-sai); }
+.tle:is([data-tt='cho'], [data-tt='dang']) .tle-bieu svg { animation: tle-nhip 1.4s ease-in-out infinite alternate; }
+@keyframes tle-nhip { to { opacity: 0.45; transform: scale(0.9); } }
+.tle-nut { flex: 1 0 auto; min-width: 112px; min-height: 48px; padding: 0 20px 4px; border: 0; border-radius: 16px; background: var(--tr-hs-nut); color: var(--tr-hs-tren); font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; box-shadow: inset 0 -4px 0 var(--tr-hs-go); touch-action: manipulation; }
+.tle-nut:active { transform: translateY(1px); }
+.tle-nut:disabled { opacity: 0.7; cursor: default; transform: none; }
+.tle-nut:focus-visible { outline: 3px solid var(--tr-hs); outline-offset: 2px; }
+.tle-loi { margin: 0; padding: 0 6px; color: var(--tr-sai-chu); font-size: 14.5px; font-weight: 700; line-height: 1.35; }
+@media (prefers-reduced-motion: reduce) { .tle:is([data-tt='cho'], [data-tt='dang']) .tle-bieu svg { animation: none; } }
+html.may-yeu .tle-bieu svg { animation: none !important; }

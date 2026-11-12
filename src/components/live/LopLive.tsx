@@ -449,7 +449,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     </div>
   )
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
+    epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
 }
 
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
@@ -457,6 +457,8 @@ interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk:
   vaoMoi: boolean
   tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; so: number | null; luot: ReactNode; coDoi: boolean; dauNam: (mangYeu: boolean) => DauNam[]; gioiThieu: boolean; khiGioiThieu: () => void
   dongKhay: (dau: ReactNode, them?: ReactNode) => ReactNode; ghi?: boolean
+  /** Live theo khối: chế độ «Bảng» ⇒ `'bang'` (khung bảng phủ kín), «Học» ⇒ null; buổi thường ⇒ undefined. */
+  epPhong?: Vung | null
   /** Em đang được gọi lên bảng (null = không) + mốc phát tấm giữa màn (0 = không phát: em vào muộn, lời gọi cũ). */
   lenBang: EmLenBang | null; lucBang: number
   /** Lớp ngoài đã khoá ngang được (Android, toàn màn hình) ⇒ trang dọc thoáng qua không phải xoay hình CSS. */
@@ -464,7 +466,7 @@ interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk:
 /** Khổ HÌNH (đã xoay nếu có) + kiểu giấy của thầy. */
 interface KhoHinh { xoay: boolean; w: number; h: number; giayToi: boolean }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi, lenBang, lucBang, daKhoa }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi, lenBang, lucBang, daKhoa, epPhong }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), kdl = useRef<TayKhungDL>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
@@ -596,7 +598,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div ref={thuoc} className="lv-thuoc" aria-hidden="true" />
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
-        <KhungDocLap ref={kdl} lop="lv" layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
+        <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
           bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
           dauBang={lenBang ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>

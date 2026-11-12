@@ -34,6 +34,7 @@
 //   trắng ngà = --mc-bang-chu · vàng = --mc-vang-noi · xanh ngọc = --mc-ll-dung (tối) · hồng = --mc-ll-sai (tối) · mực xanh = màu bút xanh cũ.
 import { JS_LOI_BUT } from './but-bang-loi'
 import { JS_CUON_GIAY } from './but-cuon-giay-to-chieu'
+import { CSS_THANH_HUT, JS_THANH_HUT } from './but-thanh-hut-to-chieu'
 
 export const CSS_BUT_BANG = `
 /* 7b · bút viết bảng 10/11: lớp sống nằm trên lớp tĩnh; thanh bút gọn */
@@ -41,16 +42,11 @@ canvas.mc-but-song{z-index:30}
 /* 12/11 · lớp BẢNG ĐẶC (vẽ thẳng lên màn): nằm trong cột bảng, làm nền của nó — dưới thẻ tên / chữ của cột, dưới thanh bút */
 canvas.mc-but-bang{position:absolute;z-index:-1;pointer-events:none;border-radius:inherit;image-rendering:pixelated}
 .mc-cot-nhanh{isolation:isolate}
+/* thanh bút: dáng gọn + hút mép + tự mờ ở but-thanh-hut-to-chieu.ts (nối cuối chuỗi này, ghi đè các luật dưới) */
 .mc-but-cu{gap:calc(var(--u)*.3);padding:calc(var(--u)*.3) calc(var(--u)*.55);border:1px solid color-mix(in srgb,var(--mc-b) 16%,transparent);user-select:none;-webkit-user-select:none;white-space:nowrap}
-.mc-but-cu .mc-m{flex:none;width:calc(var(--u)*1.6);height:calc(var(--u)*1.6);margin:0 calc(var(--u)*.12);padding:0;transition:transform .12s}
 .mc-but-cu .mc-m.mc-chon{border-color:transparent;transform:scale(.8);box-shadow:0 0 0 calc(var(--u)*.14) var(--mc-thanh2),0 0 0 calc(var(--u)*.3) var(--mc-b)}
 .mc-but-cu .mc-bv{flex:none;width:1px;align-self:stretch;margin:calc(var(--u)*.25) calc(var(--u)*.2);background:color-mix(in srgb,var(--mc-b) 22%,transparent)}
-.mc-but-cu .mc-n{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:.35em;min-width:calc(var(--u)*2);min-height:calc(var(--u)*2);padding:0 .65em}
-.mc-but-cu .mc-n[disabled]{opacity:.32;cursor:default}
-.mc-but-cu{transition:opacity .15s}
-.mc-but-cu.mc-viet{opacity:.18;pointer-events:none}
 .mc-but-cu .mc-n svg{width:1.2em;height:1.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.mc-but-cu .mc-bc{padding:0}
 .mc-but-cu .mc-bc i{display:block;border-radius:50%;background:currentColor}
 .mc-but-cu kbd{font:inherit;font-size:.8em;opacity:.7;padding:0 .35em;border-radius:.3em;border:1px solid color-mix(in srgb,currentColor 45%,transparent)}
 /* ô đo bút (Alt + B): góc dưới trái, không bắt con trỏ ⇒ vẫn viết xuyên qua được */
@@ -66,7 +62,7 @@ canvas.mc-but-bang{position:absolute;z-index:-1;pointer-events:none;border-radiu
 .mc-but-ray.mc-co{display:block}
 .mc-but-ray i{position:absolute;left:0;right:0;min-height:8px;border-radius:9em;background:color-mix(in srgb,var(--mc-b) 42%,transparent)}
 @media print{.mc-but-do,.mc-but-ray,canvas.mc-but-bang{display:none!important}}
-`
+${CSS_THANH_HUT}`
 
 export const JS_BUT_BANG = `
 ` + /* ── B · bút viết bảng (thầy 10/11) — bộ máy dựng nét: but-bang-loi.ts ── */ `
@@ -109,7 +105,7 @@ ${JS_LOI_BUT}
   var coRaw = 'onpointerrawupdate' in window, veNgay = false, ngheRaw = false, tVe = 0, DO = null, oDo = null, luotDo = 0, duocNgay = false, kyKh = 1e9, khTb = 0, khDem = 0, khSach = 0, khPhat = 0, tuTat = false;
   var khungSau = window.requestAnimationFrame ? function (f) { return window.requestAnimationFrame(f); } : function (f) { return setTimeout(f, 16); };
   butCu.setAttribute('role', 'toolbar'); butCu.setAttribute('aria-label', 'Bút viết bảng');
-` + /* giấy đề cuộn (con lăn khi bút bật, nét trên giấy cuộn theo đề): but-cuon-giay-to-chieu.ts */ `${JS_CUON_GIAY}
+` + /* giấy đề cuộn (con lăn khi bút bật, nét trên giấy cuộn theo đề): but-cuon-giay-to-chieu.ts */ `${JS_CUON_GIAY}${JS_THANH_HUT}
   function coCanvas() {
     var W = window.innerWidth, H = window.innerHeight;
     dpr = Math.min(window.devicePixelRatio || 1, 3); KH = LoiBut.khung(W, H); ban = UO = null; B = null;
@@ -557,18 +553,18 @@ ${JS_LOI_BUT}
     var vach = '<i class="mc-bv"></i>';
     butCu.innerHTML = MAU_BUT.map(function (m) { return '<button type="button" class="mc-m' + (!S.tay && S.mau === m[0] ? ' mc-chon' : '') + '" style="background:' + m[0] + '" data-m="' + m[0] + '" aria-label="' + m[1] + '" title="' + m[1] + '"></button>'; }).join('') + vach +
       CO_BUT.map(function (c) { return nutBut(' mc-bc' + (!S.tay && S.co === c[0] ? ' mc-chon' : ''), 'data-c="' + c[0] + '"', c[1], '<i style="width:' + c[2] + ';height:' + c[2] + '"></i>'); }).join('') + vach +
-      nutBut(S.tay ? ' mc-chon' : '', 'data-tay="1"', 'Tẩy theo nét (E)', hinh('M7 21h13M5.5 13.5 14 5l6 6-8.5 8.5a2 2 0 0 1-2.8 0l-3.2-3.2a2 2 0 0 1 0-2.8ZM9.5 9.5l6 6') + 'Tẩy') +
+      nutBut(S.tay ? ' mc-chon' : '', 'data-tay="1"', 'Tẩy theo nét (E)', hinh('M7 21h13M5.5 13.5 14 5l6 6-8.5 8.5a2 2 0 0 1-2.8 0l-3.2-3.2a2 2 0 0 1 0-2.8ZM9.5 9.5l6 6')) +
       nutBut('', 'data-lui="1"', 'Hoàn tác (Ctrl + Z)', hinh('M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11')) +
       nutBut('', 'data-toi="1"', 'Làm lại (Ctrl + Y)', hinh('m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13')) +
       nutBut('', 'data-xoa="1"', 'Xoá hết nét của câu này (hoàn tác được)', hinh('M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3')) + vach +
-      nutBut('', 'data-tat="1"', 'Tắt bút (B)', 'Tắt <kbd>B</kbd>');
+      nutBut('', 'data-tat="1"', 'Tắt bút (B)', hinh('M6 6l12 12M18 6 6 18'));
     capNut(); conTro(); henThanh();
   }
 ` + /* Thanh bút nằm trên mép phải tấm giấy đề, sát cột bảng đen (không che thẻ tên em); tờ không có cột bảng ⇒ giữa mép trên như cũ. */ `
 ` + /* Đo chỗ cột SO VỚI ĐỢT (đợt đang trượt vào vẫn ra đúng số), và đo lại một nhịp sau khi tờ xếp xong. */ `
   function datThanh() {
-    var W = window.innerWidth, doiG = !!KH && !N && doOGiay(), doi = (KH && !N ? datBang() : false) || doiG, co = S.but && !!B;
-    butCu.style.left = co ? 'auto' : ''; butCu.style.transform = co ? 'none' : ''; butCu.style.right = co ? Math.round(W - B[0] * W + u() * 0.9) + 'px' : '';
+    var doiG = !!KH && !N && doOGiay(), doi = (KH && !N ? datBang() : false) || doiG, co = S.but && !!B;
+    hutDat(co);
     oThanh = S.but ? butCu.getBoundingClientRect() : null;
     if (doi) veLai(); else veRay();
   }

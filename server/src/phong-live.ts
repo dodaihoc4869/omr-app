@@ -229,7 +229,7 @@ export class LiveMay {
       } else if (t === 'live-tat') { doi = this.tat(st, nay) }
       else if (t === 'live-dat') {
         const xaTruoc = l.xa
-        doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang, giay: j.giay, nghi: j.nghi }, nay)
+        doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang, giay: j.giay, nghi: j.nghi, khoi: j.khoi }, nay)
         if (l.xa && !xaTruoc) this.goiXa(st, nay) // vừa bật «Cho em ở xa vào xem» ⇒ gọi máy các em ở xa
       }
       else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay)

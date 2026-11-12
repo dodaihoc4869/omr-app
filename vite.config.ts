@@ -371,6 +371,9 @@ export default defineConfig({
         // vẫn tải được, tải một lần rồi cất ở kho chạy-lúc (`omr-manh-chay-lan`, xem src/sw.ts). `scripts/kiem-sw.mjs` chặn precache phình to lại.
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm,data,woff2}'],
         globIgnores: [
+          // Live theo khối (12/11): mọi mảnh của tính năng (bảng Live máy thầy, thẻ Live, lớp nổi, trò Giữ Lửa, chat, màn bốn đội) chỉ dùng khi ĐANG có mạng
+          // (live) ⇒ kho chạy-lúc, không vào precache (giữ trần 170 tệp).
+          '**/{BangLiveThay,ChatEm,ChatThay,LopNoiEm,LopNoiThay,ManBonDoi,TheLiveEm,TroGiuLua,chu-gio,em-khoi,thay-khoi,kieu,ManVinhDanh,vinh-danh}-*.{js,css}', // `kieu-*` = hằng dùng chung của src/lib/live-khoi/kieu.ts
           // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.
           '**/BangBinhPhanUng-*.{js,css}',
           '**/DangChieuBpu-*.{js,css}', // bước «Đang chiếu» của Hành trình (07/11) — mảnh lười máy thầy, ngoài precache

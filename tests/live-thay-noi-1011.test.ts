@@ -32,9 +32,11 @@ class WsGia extends EventTarget { readyState = 1; binaryType = 'blob'; gui: unkn
   nhan(v: unknown) { this.dispatchEvent(Object.assign(new Event('message'), { data: JSON.stringify(v) })) } }
 
 const T0 = Date.now()
-function phong(coLive = true): TrangThaiPhong {
+// 12/11: Live chỉ còn ở buổi LIVE THEO KHỐI ⇒ phòng giả mặc định mang cờ `khoi`; `khoi = false` = buổi dạy trên lớp (không có nút Live).
+function phong(coLive = true, khoi = true): TrangThaiPhong {
   const st = taoPhong({ buoiId: 'b1', lop: '12A1', nay: T0, ds: [{ sbd: 'S1', ten: 'Nguyễn Thị Hà', coMat: true, luc: T0 }, { sbd: 'S2', ten: 'Lê Gia Huy', coMat: true, luc: T0 }, { sbd: 'S3', ten: 'Phạm Khánh Vy', coMat: false, luc: null }] })
   if (coLive) datCoLive(st, { cho: true, sfu: true }, T0)
+  if (coLive && khoi) st.live!.khoi = { k: 12, gd: 'dang', che: 'hoc' }
   return st
 }
 const cau = { qid: 'q1', phan: 'I' as const, tuLuan: false, cau: { qid: 'q1', text: 'Đề', choices: ['a', 'b', 'c', 'd'] }, dung: 'B', hanGiay: 60 }
@@ -66,6 +68,19 @@ describe('phần nối live của máy thầy', () => {
     expect(ttCuoi().co).toBe(false)
     expect(goi.some(([t]) => t === 'noiSan')).toBe(false)
     expect(ws.binaryType).toBe('arraybuffer')
+  })
+
+  it('12/11 buổi dạy trên lớp (phòng không có cờ khối) ⇒ KHÔNG có nút Live trên tờ; buổi live theo khối ở chế độ Bảng ⇒ tờ nhận `cheBang` khi đang live', async () => {
+    const { M, to, ws, ttCuoi, noi } = await dung()
+    M.nhanTinTo({ viec: 'chao' }, to); noi(); ws.nhan(viewBang(phong(true, false)))
+    await cho(); await cho()
+    expect(ttCuoi()).toMatchObject({ co: false, pha: 'tat' })
+    const st = phong()
+    st.live!.khoi = { k: 12, gd: 'dang', che: 'bang' }
+    ws.nhan(viewBang(st)); await cho()
+    expect(ttCuoi()).toMatchObject({ co: true, cheBang: false })
+    liveSan(st, { san: true, ss: null }, T0); liveBat(st, T0 + 1); ws.nhan(viewBang(st)); await cho()
+    expect(ttCuoi()).toMatchObject({ co: true, pha: 'live', cheBang: true })
   })
 
   it('phòng bật công tắc ⇒ nút Live; lần đầu bấm ⇒ thẻ chọn mic (mở mic, liệt kê mic); «Bắt đầu live» ⇒ bat; lần sau bấm là live ngay', async () => {

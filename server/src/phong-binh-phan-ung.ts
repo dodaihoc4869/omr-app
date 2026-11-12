@@ -17,6 +17,7 @@ import { dongTrackSfu, sfuDaCauHinh } from './live-sfu'
 import { LiveMay, type KemBpu } from './phong-live'
 import { GIAO_DIEN_DOT_2, datCoLive, duocPhatMic, laEmXaDangLive, liveMicBat, rutMicDong } from '../../src/lib/bpu/phong-live'
 import { KHOA_CH_XEM_LAI, NhatKyXl, xemLaiBat } from './live-xem-lai'
+import { KenhLopMay } from './kenh-lop-may'
 
 declare const WebSocketPair: { new (): { 0: WsMayChu; 1: WsMayChu } }
 declare const WebSocketRequestResponsePair: { new (yeuCau: string, traLoi: string): unknown }
@@ -289,10 +290,13 @@ export class PhongBinhPhanUng {
   private live: LiveMay
   /** XEM LẠI LIVE (11/11, live-xem-lai.ts): nhật ký sự kiện + nét, chốt buổi ở máy chủ. Lỗi ở đây không bao giờ làm hỏng live. */
   private xl: NhatKyXl
+  /** LIVE THEO KHỐI (12/11, kenh-lop-may.ts): chat cả lớp + trò phòng chờ + danh sách bốn đội — chỉ chuyển tiếp trong bộ nhớ. */
+  private lop: KenhLopMay
 
   constructor(private ctx: DurableObjectState, private env: Env) {
     this.xl = new NhatKyXl({ ctx, env, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), ghiSom: () => this.ghiD1(), chamSo })
     this.live = new LiveMay({ ctx, doc: () => this.doc(), nho: () => this.st, luu: (h) => this.luu(h), phat: () => this.phat(), bao: (ds) => this.ctx.waitUntil(baoMayCacEm(this.env, ds, 'bpu').catch(() => 0)), xl: this.xl })
+    this.lop = new KenhLopMay(ctx, () => this.st)
     try { ctx.setWebSocketAutoResponse?.(new WebSocketRequestResponsePair('{"t":"ping"}', '{"t":"pong"}')) } catch { /* môi trường test */ }
   }
 
@@ -324,6 +328,7 @@ export class PhongBinhPhanUng {
     // Đọc dữ liệu gắn của các máy em MỘT lần: vừa để đếm «em đang xem live», vừa để phát view của từng em.
     // LIVE: track mic vừa bị thu (chấm xong, lượt mới, tắt live, em rời màn…) ⇒ đóng ở SFU, không chờ máy em.
     for (const m of rutMicDong(st)) this.ctx.waitUntil(dongTrackSfu(this.env, m.id, [m.mid]).catch(() => false))
+    this.lop.soatDs(st)
     this.live.ghiNhatKy(st) // LIVE đợt 2: nhật ký đàm thoại (giơ tay, mời, nói, thu mic) vào kho của phòng — không D1
     const hs = this.ctx.getWebSockets('hs'), kem = hs.map((ws) => ws.deserializeAttachment() as KemBpu | null)
     const bang = JSON.stringify(L.viewBang(st, chamSo, st.live?.bat ? this.live.demXem(st, kem) : undefined))
@@ -472,6 +477,7 @@ export class PhongBinhPhanUng {
       j = { t: 'chao-ve' } as Row
     }
     if (st.ketThuc) return
+    if (this.lop.tin(ws, a, j, st, nay)) return
     if (await this.live.tinChu(ws, a, j, st, nay)) return
     let doi = j.t === 'chao-ve', gom = false
     if (a.v === 'hs') {

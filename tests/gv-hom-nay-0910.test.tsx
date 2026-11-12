@@ -322,7 +322,8 @@ describe('màn Hôm nay của thầy — số từ API', () => {
       await waitFor(() => expect(viec.querySelectorAll('li').length).toBe(2))
       const nut = [...container.querySelectorAll('.gvv2-nut-chinh')]
       // SỬA CÓ CHỦ ĐÍCH 09/11 (thầy «chuyển nút điểm danh ra màn hôm nay, bỏ hẳn thẻ hành trình»): không còn mục Hành trình; màn `chiendich` sáng mục Hôm nay.
-      expect(nut.map((n) => n.textContent)).toEqual(['Điểm danh'])
+      // SỬA CÓ CHỦ ĐÍCH 12/11 (thầy, Live theo khối: «đổi nút điểm danh ở app gv thành Lên bảng»).
+      expect(nut.map((n) => n.textContent)).toEqual(['Lên bảng'])
       const b = [...viec.querySelectorAll('li')].map((x) => x.querySelector('b')?.textContent)
       expect(b).toEqual(['Học sinh hỏi · 2 lượt', 'Không có chỗ cần thầy chữa hôm nay.'])
       expect(viec.textContent).toContain('chờ thầy chữa · Kiểm tra 12A1')

@@ -24,6 +24,7 @@ import KetQuaLenBangEm from './KetQuaLenBangEm'
 import type { Question } from '../../game/than-thu-v2/core'
 // Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
 type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
+import { noiKhoi } from '../live-khoi/em-khoi'
 import './bpu-hs.css'
 // LỜI GIẢI SAU KHI MỞ ĐÁP ÁN (thầy 07/11): đúng khối lời giải của màn làm bài — có bản Kính ⇒ Kính + nút «Lời giải thu gọn»; chưa có ⇒ lời giải thu gọn đầy đủ.
 const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
@@ -59,7 +60,7 @@ function BinhNho() {
   )
 }
 /** NGỌN LỬA ĐỘI (thầy 09/11): ba lớp lửa màu đội (`--doi`) lay chập chờn + đốm than bay — chỉ transform/opacity; máy yếu / giảm chuyển động ⇒ tĩnh. */
-function NgonLua({ doi, ky, to }: { doi: number; ky?: string; to?: boolean }) {
+export function NgonLua({ doi, ky, to }: { doi: number; ky?: string; to?: boolean }) {
   return (
     <span className={`bpu-lua${to ? ' to' : ''}`} style={{ ['--doi' as string]: `var(${DOI_BPU[doi]?.mau ?? '--tr-tin'})` }} aria-hidden="true">
       <i className="hao" />
@@ -295,6 +296,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
         if (!j?.ok || !j.ve) { setTt('mat-mang'); henLai(); return }
         const w = new WebSocket(`${goc.replace(/^http/, 'ws')}/bpu/phong?ve=${encodeURIComponent(j.ve)}`)
         ws.current = w
+        noiKhoi(w)
         w.binaryType = 'arraybuffer' // live: khung nét nhị phân
         setVeLive((c) => (c && c.ve === j.ve && c.goc === goc ? c : { ve: String(j.ve), goc }))
         const xa = j.xa === true
