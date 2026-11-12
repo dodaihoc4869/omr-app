@@ -1,4 +1,5 @@
-import { daNho, docDongLop, gopDocD1, nhoTheoLuot } from './doc-d1-theo-luot'
+import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
+import { docSoTuMoc } from './so-em-tu-moc'
 import { laHanhTrinh, ungVienHanhTrinh } from './hanh-trinh-hop-nhat'
 import { coLoThuSucHanhTrinh, tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
 import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
@@ -443,8 +444,7 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
  * Câu SQL đọc siêu dữ liệu câu từ D1 (`qids` đã khử trùng, khác rỗng). B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy; lệch ⇒ CÙNG câu
  * đọc thẳng `game_v2_question` như cũ (cau-meta.ts). Thứ tự: mã câu tăng dần, các dòng cùng câu theo `rowid` (`thu_tu`) — đúng thứ tự dò chỉ mục
  * `game_v2_question_qid` của câu cũ.
- * G5 12/11: điều kiện khớp đặt TRONG danh sách qid (`json_each … WHERE KHOP`) — nhánh không dùng có danh sách rỗng ⇒ không dò dòng nào (trước: điều kiện
- * kiểm SAU mỗi lượt dò chỉ mục ⇒ nhánh thừa vẫn đọc mọi dòng của các qid ấy).
+ * G5 12/11: KHOP trong danh sách qid ⇒ nhánh không dùng có danh sách rỗng, không dò dòng nào.
  */
 function docMetaCauD1(env: Env, qids: readonly string[]): Promise<Row[]> {
   return env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, phan, muc_do, ten_dang, sao, lop_json, gon, anh_pa, anh_y, hinh_gon, j_qid, j_version, thu_tu
@@ -560,9 +560,6 @@ export async function docLoaiCau(env: Env, qids: readonly string[]): Promise<Map
 export interface BenLanLam { songSinh: Map<string, { i: number; luc: string }[]>; chanDoan: Map<string, string[]> }
 export const benLanLamMoi = (): BenLanLam => ({ songSinh: new Map(), chanDoan: new Map() })
 
-/** G5 12/11: các mốc `docLanLam` (> 200 câu) đã đọc sổ của mỗi em trong lượt — CHỈ ghi khi D1 của lượt có sổ nhớ theo lượt (bản gộp, sống một request) để lần
- *  đọc cả sổ sau chỉ đọc phần trước mốc. D1 sống lâu (env của isolate / ngăn) không bao giờ có mục ⇒ không phình bộ nhớ. */
-export const MOC_DA_DOC = new WeakMap<object, Map<string, Set<string>>>()
 /** Lần làm của em với các câu (mọi nguồn). Bỏ sự kiện CHE (ca chưa công bố); bỏ trống tính là sai; `assistance='assisted'` ⇒ có gợi ý. */
 export async function docLanLam(env: Env, sbd: string, qids: readonly string[], tuLuc = '', ben?: BenLanLam): Promise<LanLam[]> {
   if (!qids.length) return []
@@ -582,36 +579,7 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
       .map((x) => ({ qid: x.qid, ngay_vn: x.ngay_vn, luc: x.luc, ket_qua: x.ket_qua, assistance: x.assistance, visibility: x.visibility, nguon: x.nguon, purpose: x.purpose, tc: tcCua(x.raw_json), khoa: x.khoa }))
       .sort((a, b) => (str(a.luc) < str(b.luc) ? -1 : str(a.luc) > str(b.luc) ? 1 : str(a.khoa) < str(b.khoa) ? -1 : str(a.khoa) > str(b.khoa) ? 1 : 0))
   } else if (goc.length > 200) {
-    const sql = (coVis: boolean, truoc = false) => `SELECT qid, ngay_vn, luc, ket_qua, ${coVis ? 'assistance, visibility, purpose,' : ''} nguon, ${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd = ? AND luc ${truoc ? '<' : '>='} ? ${coVis ? `AND (${SQL_LA_LAN_LAM_GIU_CHAN_DOAN})` : ''}`
-    // G5 12/11 (hoá đơn D1: câu này ~3.386 hàng × 18 nghìn lượt/ngày): kết quả KHÔNG phụ thuộc tập câu (lọc theo câu ở dưới) ⇒ trong CÙNG một lượt (bản gộp,
-    // nhớ theo lượt; lệnh ghi sổ xoá bản nhớ) các lần đọc sổ của cùng em không đọc lại dòng nào: cùng mốc ⇒ dùng chung; đã đọc cả sổ (mốc rỗng) ⇒ lọc `luc >= mốc`
-    // tại chỗ; đã đọc từ mốc X mà nay cần cả sổ (hồ sơ: lượt chính từ mốc X chạy TRƯỚC, ôn bài cũ cả sổ chạy sau) ⇒ chỉ đọc thêm phần `luc < X` rồi nối (chỉ mục
-    // (sbd, luc) trả dòng theo luc tăng ⇒ cùng thứ tự với một lần đọc cả sổ). Ngoài bản gộp ⇒ đọc như cũ.
-    const khoaSo = (moc: string) => `srs2_lan_lam_tu_moc|${sbd}|${moc}`
-    const doc = (moc: string, truoc: boolean) => async (): Promise<Row[]> => {
-      try {
-        return (await env.DB.prepare(sql(true, truoc)).bind(sbd, moc).all<Row>()).results ?? []
-      } catch {
-        return (await env.DB.prepare(sql(false, truoc)).bind(sbd, moc).all<Row>()).results ?? []
-      }
-    }
-    const docTu = (moc: string, f = doc(moc, false)) => nhoTheoLuot(env.DB, khoaSo(moc), f, ['su_kien_hoc'])
-    const khoaDb = env.DB as unknown as object
-    const daDoc = MOC_DA_DOC.get(khoaDb)?.get(sbd)
-    const x = tuLuc || !daDoc ? '' : [...daDoc].filter((m) => m && daNho(env.DB, khoaSo(m))).sort()[0]
-    let p: Promise<Row[]>
-    if (tuLuc && daNho(env.DB, khoaSo(''))) p = docTu('').then((r) => r.filter((y) => str(y.luc) >= tuLuc))
-    else if (x && !daNho(env.DB, khoaSo(''))) p = docTu('', async () => { const [a, b] = await Promise.all([doc(x, true)(), docTu(x)]); return [...a, ...b] })
-    else p = docTu(tuLuc)
-    // Ghi mốc TRƯỚC khi chờ (lần gọi sau trong lúc lần này đang đọc cũng dùng chung được), và chỉ khi sổ nhớ theo lượt thật sự giữ lần đọc này.
-    if (daNho(env.DB, khoaSo(tuLuc))) {
-      let m = MOC_DA_DOC.get(khoaDb)
-      if (!m) { m = new Map(); MOC_DA_DOC.set(khoaDb, m) }
-      let t = m.get(sbd)
-      if (!t) { t = new Set(); m.set(sbd, t) }
-      t.add(tuLuc)
-    }
-    rows = await p
+    rows = await docSoTuMoc(env, sbd, tuLuc) // G5 12/11: dùng chung trong lượt — so-em-tu-moc.ts
   } else {
     try {
       // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
