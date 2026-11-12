@@ -2,8 +2,9 @@ import { Component, lazy, Suspense, type ReactNode } from 'react'
 import LogoHocSinh from './LogoHocSinh'
 import { laManThi } from './m3'
 import './phong-cho/phong-cho.css'
-// Đấu Nguyên Tử (30/10): game bắn nhau với bạn cùng phòng chờ — mảnh nạp lười, chỉ tải khi em đã ở phòng chờ.
-const DauIon = lazy(() => import('./phong-cho/DauIon'))
+// Sinh Tồn bốn đội (thầy 13/11: «Chuyển luôn game này sang cả phòng chờ của ca kiểm tra» — thay Đấu Nguyên Tử 30/10): trò của phòng chờ Live theo khối, chơi
+// với bạn cùng phòng chờ ca. Thẻ sảnh là mảnh nạp lười, chỉ tải khi em đã ở phòng chờ; màn trò chỉ tải khi em bấm «Chơi».
+const SanhSinhTon = lazy(() => import('./phong-cho/SanhSinhTon'))
 
 /** Mảnh game tải lỗi chỉ thay ô chơi; màn chờ và vòng nhận lệnh vào bài vẫn sống. */
 class DuPhongGame extends Component<{ children: ReactNode }, { loi: boolean }> {
@@ -11,20 +12,20 @@ class DuPhongGame extends Component<{ children: ReactNode }, { loi: boolean }> {
   static getDerivedStateFromError() { return { loi: true } }
   render() {
     return this.state.loi
-      ? <div className="pc-loading" role="status">Mini-game chưa tải được. Em vẫn sẽ vào bài khi Thầy bắt đầu.</div>
+      ? <div className="pc-loading" role="status">Trò chơi chưa tải được. Em vẫn sẽ vào bài khi Thầy bắt đầu.</div>
       : this.props.children
   }
 }
 
 interface PhongChoGameProps {
-  /** `veDau`: vé vào Sảnh đấu (lệnh vào thi phát); `batDau`: màn cha vừa thấy thầy bắt đầu ⇒ game dừng ngay, đóng kết nối. */
+  /** `veDau`: vé vào trò của phòng chờ (lệnh vào thi phát); `batDau`: màn cha vừa thấy thầy bắt đầu ⇒ trò dừng ngay, đóng kết nối. */
   cho?: { thoiGianPhut?: number; tenCa?: string; lop?: string; maCa?: string; veDau?: string; batDau?: boolean } | null
   loiCho?: string | null
-  /** Sảnh Đấu Ion báo «thầy vừa bấm Bắt đầu» (WebSocket, 31/10) ⇒ màn cha vào thi NGAY, không đợi nhịp hỏi phòng chờ. */
+  /** Phòng trò chơi báo «thầy vừa bấm Bắt đầu» (WebSocket, 31/10) ⇒ màn cha vào thi NGAY, không đợi nhịp hỏi phòng chờ. */
   onBatDau?: () => void
 }
 
-/** Màn chờ chỉ trình bày ca thật và mini-game cục bộ. ExamTakeScreen vẫn quyết định lúc vào bài. */
+/** Màn chờ chỉ trình bày ca thật và trò chơi trong lúc chờ. ExamTakeScreen vẫn quyết định lúc vào bài. */
 export default function PhongChoGame({ cho, loiCho, onBatDau }: PhongChoGameProps) {
   const phong = <section className="pc-room" aria-label="Phòng chờ thi trực tuyến">
     <header className="pc-brand"><div><LogoHocSinh size={44} hienChu={false} /><span>AVOGADRO<small>Học một chút, tiến một bước.</small></span></div><span className="pc-room-label">Phòng chờ</span></header>
@@ -40,7 +41,7 @@ export default function PhongChoGame({ cho, loiCho, onBatDau }: PhongChoGameProp
         </div>}
         {loiCho && <div className="pc-error" role="status">{loiCho}</div>}
       </div>
-      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><DauIon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} onBatDau={onBatDau} /></Suspense></DuPhongGame>
+      <DuPhongGame><Suspense fallback={<div className="pc-loading" role="status">Đang chuẩn bị trò chơi…</div>}><SanhSinhTon maCa={cho?.maCa} veDau={cho?.veDau} batDau={!!cho?.batDau} onBatDau={onBatDau} /></Suspense></DuPhongGame>
       <p className="pc-assurance">Điểm chơi chỉ để vui trong lúc chờ.</p>
     </div>
   </section>

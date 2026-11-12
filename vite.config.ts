@@ -55,7 +55,7 @@ const KHO_HS_BO = /^assets\/ban-do-3d-three/
 // Gốc chọn tay: mảnh nạp lười CHỈ app học sinh dùng (đồ thị từ vỏ học sinh lan sang cả màn thầy qua mảnh chung ⇒ không lấy trọn). Mỗi gốc kéo theo mảnh nó nạp TĨNH + CSS.
 // 10/11 thầy «Tải hết mọi thứ xg máy hs để app hs tức thì nhé»: thêm mọi mảnh app học sinh còn sót (khoá đề thi, vào bảng BPU, điểm danh phòng, nhật ký / treo máy khi thi,
 // Hỏi thầy kiểm chứng, làm mới app, phiếu in + PDF «Câu đã làm» kèm thư viện) — kho tải ngầm tải lúc rảnh, một lần mỗi phiên bản.
-const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|DauIon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol|DemNguocThi|NhomSuaHomNay|ViDuMau|LichBaiHs|cau-chuyen|tai-chi-tiet|khoa-de-thi|gan-hs|phong|nhan-lich-su|do-treo-may-thi|HoiThayKiemChung|lam-moi-app|hoi-thay-goc|xem-lai-live|hs|html-phieu|pdf-cau-da-lam|jspdf\.es\.min|index\.es|html2canvas|html2canvas-pro\.esm|purify\.es|fflate)-[\w-]{8}\.(?:js|css)$/
+const KHO_HS_GOC = /^assets\/(?:TrongHs|ManLamBaiTap|LoiGiaiKinhHs|tai-san|kinh-kiem|HinhVeLaiCuaCau|TheHinhVeLai|hieu-ung|hieu-ung-an-mung|mol-dong|vua-phuong-an|lua-dong|lua-gian|bi-dong|Bi|GiamThi|giam-thi|ManThuong|KetBaiThuong|thuong-gon|thuong-chung|trong-lam-bai|ChuaGonDuo|duo-sua|TamGiuChan|giu-chan|KhungKiemTra|ThiDuo|BiNop|KetQuaSauNop|ManKiemTraCaNhan|TheKiemTraCaNhan|TheKiemTraCon|BangKiemTraCaNhan|kiem-tra-ca-nhan|LuyenDeChuan|LuyenDeCauTruc|ManTuLuyen|ManTuChua|ManChuaCauSai|ManTienBo|ManDiemSo|LichSuCaEm|CauDaLam|HopHoiThay|BongBongAiDdh|LamCauOn|TheBaiHangNgay|TheBaiDaDay|KhungLoiGiai|ThanhSoCauChua|HoSoCuaEmHs|HoSoHocThatEm|BaoCaoCaCuaEm|NhacSamsung|kenh-day|SanhSinhTon|TroSinhTon|PhongChoGame|TheDiemDanhHs|DiemDanhBuoi|TamThongBaoHs|icon-tab-mol|DemNguocThi|NhomSuaHomNay|ViDuMau|LichBaiHs|cau-chuyen|tai-chi-tiet|khoa-de-thi|gan-hs|phong|nhan-lich-su|do-treo-may-thi|HoiThayKiemChung|lam-moi-app|hoi-thay-goc|xem-lai-live|hs|html-phieu|pdf-cau-da-lam|jspdf\.es\.min|index\.es|html2canvas|html2canvas-pro\.esm|purify\.es|fflate)-[\w-]{8}\.(?:js|css)$/
 function khoNapTruocHs(): Plugin {
   let dsCho: string[] = []
   return {
@@ -527,7 +527,8 @@ export default defineConfig({
           // Cầu nối Cowork `window.__ddh` (26/10): App.tsx nạp LƯỜI sau khi thầy mở khoá ⇒ kho chạy-lúc; tải hỏng (mất mạng) ⇒ chỉ thiếu cầu nối, app chạy như thường.
           '**/cau-noi-ddh-*.js',
         // Mini-game phòng chờ chỉ tải lúc vào màn, dùng kho chạy-lúc hiện có.
-        '**/{ChuyenBay,DauIon}-*.{js,css}',
+        // 13/11: phòng chờ ca chơi «Sinh Tồn bốn đội» (thẻ sảnh SanhSinhTon thay DauIon; màn trò TroSinhTon đã ở danh sách Live theo khối phía trên).
+        '**/{ChuyenBay,DauIon,SanhSinhTon}-*.{js,css}',
           '**/404.html',
           // Trang đo tốc độ (02/10): luôn đi thẳng ra mạng để đo đúng, không lưu trên máy.
           '**/cai-kiem-toc-do.html',
