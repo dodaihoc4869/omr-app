@@ -1,0 +1,769 @@
+{
+  "i": 85,
+  "assetIndexProvided": 1307,
+  "hash": "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74.png",
+  "size": [
+    550,
+    193
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C2-B5-I-9",
+      "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+      "allHinh": [
+        {
+          "hash": "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+          "where": "VIP27-C2-B5-I-9.hinh.0.du_lieu",
+          "hashDataUrl": "f401228a4d5a04ab985f6d2a7988adbf3b88136a1b57c38567699da0e484ad73"
+        },
+        {
+          "hash": "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+          "where": "VIP27-C2-B5-I-9.hinh.1.du_lieu",
+          "hashDataUrl": "9f40eac1d85527e9ee1ca7d2e29ab08584177ba1d3562f7b9022014c4f67ff63"
+        },
+        {
+          "hash": "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+          "where": "VIP27-C2-B5-I-9.hinh.2.du_lieu",
+          "hashDataUrl": "26df8961e75a2eddf095d6e6e4a17a88121328f5f9f0455d30707ad075e86993"
+        },
+        {
+          "hash": "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a",
+          "where": "VIP27-C2-B5-I-9.hinh.3.du_lieu",
+          "hashDataUrl": "371261f4d0bc0699cf566dea57cadfa2302aab7b235311fa6938fb819f00bad5"
+        }
+      ],
+      "missingHashes": [
+        "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+        "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+        "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfONLYThisAdmitted": 0,
+    "partialOnly": true,
+    "otherMissingI": [
+      728,
+      550
+    ],
+    "alreadyAdmittedI": [
+      1366
+    ]
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxcenters/bboxes; i85independentnotalias1366. Verticaltaperbroadfeetnative. Nooptionanswer/theorynormalization.",
+  "geometry": {
+    "leftRing": {
+      "bareC": {
+        "C5": [
+          85,
+          54
+        ],
+        "C4": [
+          27,
+          94
+        ],
+        "C3": [
+          78,
+          129
+        ],
+        "C2": [
+          162,
+          129
+        ],
+        "C1": [
+          218,
+          91
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          152,
+          43,
+          171,
+          65
+        ]
+      },
+      "thinBonds": [
+        [
+          [
+            85,
+            54
+          ],
+          [
+            27,
+            94
+          ]
+        ],
+        [
+          [
+            85,
+            54
+          ],
+          [
+            148,
+            54
+          ]
+        ],
+        [
+          [
+            173,
+            62
+          ],
+          [
+            218,
+            91
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            27,
+            94
+          ],
+          [
+            78,
+            132
+          ],
+          [
+            78,
+            126
+          ]
+        ],
+        [
+          [
+            218,
+            91
+          ],
+          [
+            162,
+            132
+          ],
+          [
+            162,
+            126
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          78,
+          129
+        ],
+        [
+          162,
+          129
+        ]
+      ],
+      "width": 6,
+      "CH2OH": {
+        "text": "CH₂OH",
+        "bbox": [
+          78,
+          0,
+          153,
+          23
+        ],
+        "bond": [
+          [
+            85,
+            54
+          ],
+          [
+            85,
+            25
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "freeOH": [
+        {
+          "text": "OH",
+          "bbox": [
+            19,
+            125,
+            56,
+            148
+          ],
+          "bond": [
+            [
+              27,
+              94
+            ],
+            [
+              27,
+              122
+            ]
+          ],
+          "orientation": "DOWN"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            70,
+            76,
+            107,
+            99
+          ],
+          "bond": [
+            [
+              78,
+              129
+            ],
+            [
+              78,
+              99
+            ]
+          ],
+          "orientation": "UP"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            153,
+            161,
+            190,
+            184
+          ],
+          "bond": [
+            [
+              162,
+              129
+            ],
+            [
+              162,
+              158
+            ]
+          ],
+          "orientation": "DOWN"
+        }
+      ]
+    },
+    "bridgeO": {
+      "text": "O",
+      "bbox": [
+        238,
+        110,
+        257,
+        133
+      ],
+      "bonds": [
+        [
+          [
+            218,
+            91
+          ],
+          [
+            235,
+            109
+          ]
+        ],
+        [
+          [
+            258,
+            111
+          ],
+          [
+            284,
+            94
+          ]
+        ]
+      ]
+    },
+    "rightOpenChain": {
+      "bareC": {
+        "C5": [
+          340,
+          54
+        ],
+        "C4": [
+          284,
+          94
+        ],
+        "C3": [
+          333,
+          129
+        ],
+        "C2": [
+          417,
+          129
+        ]
+      },
+      "thinBond": [
+        [
+          340,
+          54
+        ],
+        [
+          284,
+          94
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            284,
+            94
+          ],
+          [
+            333,
+            132
+          ],
+          [
+            333,
+            126
+          ]
+        ],
+        [
+          [
+            463,
+            98
+          ],
+          [
+            417,
+            132
+          ],
+          [
+            417,
+            126
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          333,
+          129
+        ],
+        [
+          417,
+          129
+        ]
+      ],
+      "width": 6,
+      "CH2OH": {
+        "text": "CH₂OH",
+        "bbox": [
+          332,
+          0,
+          409,
+          23
+        ],
+        "bond": [
+          [
+            340,
+            54
+          ],
+          [
+            340,
+            25
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "freeOH": [
+        {
+          "text": "OH",
+          "bbox": [
+            383,
+            43,
+            421,
+            66
+          ],
+          "bond": [
+            [
+              340,
+              54
+            ],
+            [
+              380,
+              54
+            ]
+          ],
+          "orientation": "RIGHT"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            325,
+            161,
+            363,
+            184
+          ],
+          "bond": [
+            [
+              333,
+              129
+            ],
+            [
+              333,
+              158
+            ]
+          ],
+          "orientation": "DOWN"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            409,
+            76,
+            447,
+            99
+          ],
+          "bond": [
+            [
+              417,
+              129
+            ],
+            [
+              417,
+              99
+            ]
+          ],
+          "orientation": "UP"
+        }
+      ],
+      "aldehyde": {
+        "text": "CH=O",
+        "bbox": [
+          466,
+          80,
+          530,
+          103
+        ],
+        "anchor": "FIRSTC",
+        "note": "Narrowtaperend46398isinkendpointbeforelabel, NOTextraCvertex. LiteralexplicitH, noexpandedC=O/charges."
+      }
+    },
+    "tinyMark": {
+      "center": [
+        538,
+        185
+      ],
+      "radius": 1.5,
+      "fill": "black",
+      "intent": "UNKNOWNnondata",
+      "preserve": true,
+      "note": "ExactlyONEisolatedbottomRIGHTdot; nocharge/radical/ellipsisinterpretation."
+    },
+    "font": "ALLlabelsregularuprightserif, noactualbold/italic;CH2OH2SUB. Boldonlyfrontbonds/tapers.",
+    "counts": {
+      "C": 12,
+      "O": 11,
+      "freeOHExcludingCH2OH": 6,
+      "CH2OH": 2,
+      "hydroxylOIncludingCH2OH": 8,
+      "ringO": 1,
+      "bridgeO": 1,
+      "aldehydeO": 1,
+      "closedRings": 1,
+      "tapers": 4,
+      "boldFront": 2,
+      "tinyUnknownDots": 1,
+      "captions": 0
+    },
+    "noTheoryNormalize": [
+      "DoNOTcorrectPAstereo",
+      "Noalias1366",
+      "NoOHdeletion",
+      "NoCH2endpointreplacement",
+      "NoCnums",
+      "Noanswer",
+      "Noaddedrightcycle",
+      "Noextraglyphatunknownmark"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootReview": {
+    "nativeFull3xOpened": true,
+    "allPublicDeAll4RefsRead": true,
+    "nativePixelInkChecked": true,
+    "geometryApproxNotSubpixel": true,
+    "noAliasNoTheoryNormalize": true,
+    "newFullOnlyAfterAll4": true
+  },
+  "builderGeometry": {
+    "size": [
+      550,
+      193
+    ],
+    "z": 22,
+    "thin": [
+      [
+        [
+          85,
+          54
+        ],
+        [
+          27,
+          94
+        ]
+      ],
+      [
+        [
+          85,
+          54
+        ],
+        [
+          148,
+          54
+        ]
+      ],
+      [
+        [
+          173,
+          62
+        ],
+        [
+          218,
+          91
+        ]
+      ],
+      [
+        [
+          85,
+          54
+        ],
+        [
+          85,
+          25
+        ]
+      ],
+      [
+        [
+          27,
+          94
+        ],
+        [
+          27,
+          122
+        ]
+      ],
+      [
+        [
+          78,
+          129
+        ],
+        [
+          78,
+          99
+        ]
+      ],
+      [
+        [
+          162,
+          129
+        ],
+        [
+          162,
+          158
+        ]
+      ],
+      [
+        [
+          218,
+          91
+        ],
+        [
+          235,
+          109
+        ]
+      ],
+      [
+        [
+          258,
+          111
+        ],
+        [
+          284,
+          94
+        ]
+      ],
+      [
+        [
+          340,
+          54
+        ],
+        [
+          284,
+          94
+        ]
+      ],
+      [
+        [
+          340,
+          54
+        ],
+        [
+          340,
+          25
+        ]
+      ],
+      [
+        [
+          340,
+          54
+        ],
+        [
+          380,
+          54
+        ]
+      ],
+      [
+        [
+          333,
+          129
+        ],
+        [
+          333,
+          158
+        ]
+      ],
+      [
+        [
+          417,
+          129
+        ],
+        [
+          417,
+          99
+        ]
+      ]
+    ],
+    "tapers": [
+      [
+        [
+          27,
+          94
+        ],
+        [
+          78,
+          129
+        ]
+      ],
+      [
+        [
+          218,
+          91
+        ],
+        [
+          162,
+          129
+        ]
+      ],
+      [
+        [
+          284,
+          94
+        ],
+        [
+          333,
+          129
+        ]
+      ],
+      [
+        [
+          463,
+          98
+        ],
+        [
+          417,
+          129
+        ]
+      ]
+    ],
+    "fronts": [
+      [
+        [
+          78,
+          129
+        ],
+        [
+          162,
+          129
+        ]
+      ],
+      [
+        [
+          333,
+          129
+        ],
+        [
+          417,
+          129
+        ]
+      ]
+    ],
+    "Os": [
+      [
+        161.5,
+        63
+      ],
+      [
+        246.5,
+        129
+      ]
+    ],
+    "CH2OH": [
+      [
+        85,
+        20
+      ],
+      [
+        340,
+        20
+      ]
+    ],
+    "OH": [
+      [
+        27,
+        144
+      ],
+      [
+        78,
+        94
+      ],
+      [
+        162,
+        181
+      ],
+      [
+        333,
+        181
+      ],
+      [
+        417,
+        94
+      ]
+    ],
+    "OHright": [
+      384,
+      63
+    ],
+    "CHO": [
+      466,
+      98
+    ],
+    "tiny": [
+      538,
+      185,
+      1.5
+    ]
+  },
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4",
+    "readonlyProof": "cau-truc-ba-pa-open-native-ddh-lo-382-soat-doc-lap.json",
+    "runtime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open85-native-ddh-d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4.svg d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4\n85 { x: 0, y: 0, width: 550, height: 193 }\nACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open728-native-ddh-c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5.svg c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5\n728 { x: 0, y: 0, width: 562, height: 193 }\nACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open550-native-ddh-2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431.svg 2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431\n550 { x: 0, y: 0, width: 531, height: 187 }\nPOSTSHOT_SHA 85 d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4\nPOSTSHOT_SHA 728 c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5\nPOSTSHOT_SHA 550 2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431\n",
+    "newFullOnlyAll4": true
+  }
+}

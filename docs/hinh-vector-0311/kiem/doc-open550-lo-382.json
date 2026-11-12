@@ -1,0 +1,617 @@
+{
+  "i": 550,
+  "hash": "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a",
+  "native": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a.png",
+  "size": [
+    531,
+    187
+  ],
+  "ownOpened": [
+    "native FULL",
+    "/workspace/scratch/source550-full3x.png",
+    "/workspace/scratch/source550-front4x.png"
+  ],
+  "qid": "VIP27-C2-B5-I-9",
+  "publicDe": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+  "allRefs": [
+    "VIP27-C2-B5-I-9.hinh.0.du_lieu:11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+    "VIP27-C2-B5-I-9.hinh.1.du_lieu:f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+    "VIP27-C2-B5-I-9.hinh.2.du_lieu:885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+    "VIP27-C2-B5-I-9.hinh.3.du_lieu:674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a"
+  ],
+  "counts": {
+    "C": 12,
+    "O": 11,
+    "freeOH": 6,
+    "CH2OH": 2,
+    "ringO": 1,
+    "bridgeO": 1,
+    "taper": 4,
+    "boldFront": 2
+  },
+  "geometryApproxNative": {
+    "leftBack": [
+      [
+        20,
+        95
+      ],
+      [
+        79,
+        60
+      ],
+      [
+        141,
+        60
+      ]
+    ],
+    "leftRingO": {
+      "text": "O",
+      "anchorApprox": [
+        154,
+        66
+      ],
+      "bonds": [
+        [
+          [
+            165,
+            66
+          ],
+          [
+            211,
+            92
+          ]
+        ]
+      ]
+    },
+    "leftFrontCenters": [
+      [
+        71,
+        127
+      ],
+      [
+        155,
+        127
+      ]
+    ],
+    "leftTapers": [
+      [
+        [
+          20,
+          95
+        ],
+        [
+          71,
+          124
+        ],
+        [
+          71,
+          130
+        ]
+      ],
+      [
+        [
+          211,
+          92
+        ],
+        [
+          155,
+          124
+        ],
+        [
+          155,
+          130
+        ]
+      ]
+    ],
+    "leftFrontStroke": [
+      [
+        71,
+        127
+      ],
+      [
+        155,
+        127
+      ]
+    ],
+    "leftBranches": [
+      {
+        "text": "OH",
+        "bond": [
+          [
+            20,
+            95
+          ],
+          [
+            20,
+            68
+          ]
+        ],
+        "textApproxBaseline": 62,
+        "firstOApproxX": 20
+      },
+      {
+        "text": "CH2OH",
+        "bond": [
+          [
+            79,
+            60
+          ],
+          [
+            79,
+            33
+          ]
+        ],
+        "textApproxBaseline": 28,
+        "firstCApproxX": 79
+      },
+      {
+        "text": "OH",
+        "bond": [
+          [
+            71,
+            127
+          ],
+          [
+            71,
+            153
+          ]
+        ],
+        "textApproxBaseline": 173,
+        "firstOApproxX": 71
+      },
+      {
+        "text": "OH",
+        "bond": [
+          [
+            155,
+            127
+          ],
+          [
+            155,
+            153
+          ]
+        ],
+        "textApproxBaseline": 173,
+        "firstOApproxX": 155
+      }
+    ],
+    "bridge": {
+      "bonds": [
+        [
+          [
+            211,
+            92
+          ],
+          [
+            230,
+            109
+          ]
+        ],
+        [
+          [
+            250,
+            110
+          ],
+          [
+            277,
+            95
+          ]
+        ]
+      ],
+      "text": "O",
+      "approxBaseline": 126,
+      "approxCenterX": 240
+    },
+    "rightBack": [
+      [
+        277,
+        95
+      ],
+      [
+        335,
+        60
+      ],
+      [
+        375,
+        60
+      ]
+    ],
+    "rightFrontCenters": [
+      [
+        328,
+        127
+      ],
+      [
+        411,
+        127
+      ]
+    ],
+    "rightTapers": [
+      [
+        [
+          277,
+          95
+        ],
+        [
+          328,
+          124
+        ],
+        [
+          328,
+          130
+        ]
+      ],
+      [
+        [
+          457,
+          100
+        ],
+        [
+          411,
+          124
+        ],
+        [
+          411,
+          130
+        ]
+      ]
+    ],
+    "rightFrontStroke": [
+      [
+        328,
+        127
+      ],
+      [
+        411,
+        127
+      ]
+    ],
+    "rightBranches": [
+      {
+        "text": "CH2OH",
+        "bond": [
+          [
+            335,
+            60
+          ],
+          [
+            335,
+            33
+          ]
+        ],
+        "textApproxBaseline": 28,
+        "firstCApproxX": 335
+      },
+      {
+        "text": "OH",
+        "bond": [
+          [
+            335,
+            60
+          ],
+          [
+            375,
+            60
+          ]
+        ],
+        "textApproxBaseline": 66,
+        "firstOApproxX": 389
+      },
+      {
+        "text": "OH",
+        "bond": [
+          [
+            328,
+            127
+          ],
+          [
+            328,
+            100
+          ]
+        ],
+        "textApproxBaseline": 95,
+        "firstOApproxX": 328
+      },
+      {
+        "text": "OH",
+        "bond": [
+          [
+            411,
+            127
+          ],
+          [
+            411,
+            153
+          ]
+        ],
+        "textApproxBaseline": 173,
+        "firstOApproxX": 411
+      },
+      {
+        "text": "CH=O",
+        "stemEndpoint": [
+          457,
+          100
+        ],
+        "textApproxBaseline": 99,
+        "firstCApproxX": 470
+      }
+    ]
+  },
+  "notes": [
+    "All coordinates nearest1px APPROX from own native/full3x/front4x; not subpixel measurement. Verify builder glyph ink bboxes, baseline numbers approximate not authority.",
+    "Four taper bases VERTICAL at frontC x71/155/328/411, y127±3; two horizontal fronts6px, preserve no spikes.",
+    "Right OH at frontLEFT UP x328; right frontRIGHT OH DOWN x411. This is source550 and differs1366; do not mirror/template.",
+    "LEFT OHup at20; both frontOHdown. Rightback OH horizontal, right end literal CH=O firstC not expanded skeleton.",
+    "All labels regular upright serif in native; map regular DDH; sub2 in CH2OH; no printedH/caption/number/charge/stereo labels.",
+    "Source is hinh3 of four; no answer read/assumed, no theory correction."
+  ],
+  "status": "source-only; no SVG reviewed/noCount",
+  "rootReview": {
+    "nativeFull3xOpened": true,
+    "allPublicDeAll4RefsRead": true,
+    "nativePixelInkChecked": true,
+    "geometryApproxNotSubpixel": true,
+    "noAliasNoTheoryNormalize": true,
+    "newFullOnlyAfterAll4": true
+  },
+  "builderGeometry": {
+    "size": [
+      531,
+      187
+    ],
+    "z": 22,
+    "thin": [
+      [
+        [
+          20,
+          95
+        ],
+        [
+          79,
+          60
+        ],
+        [
+          141,
+          60
+        ]
+      ],
+      [
+        [
+          165,
+          66
+        ],
+        [
+          211,
+          92
+        ]
+      ],
+      [
+        [
+          79,
+          60
+        ],
+        [
+          79,
+          33
+        ]
+      ],
+      [
+        [
+          20,
+          95
+        ],
+        [
+          20,
+          68
+        ]
+      ],
+      [
+        [
+          71,
+          127
+        ],
+        [
+          71,
+          153
+        ]
+      ],
+      [
+        [
+          155,
+          127
+        ],
+        [
+          155,
+          153
+        ]
+      ],
+      [
+        [
+          211,
+          92
+        ],
+        [
+          230,
+          109
+        ]
+      ],
+      [
+        [
+          250,
+          110
+        ],
+        [
+          277,
+          95
+        ]
+      ],
+      [
+        [
+          277,
+          95
+        ],
+        [
+          335,
+          60
+        ],
+        [
+          375,
+          60
+        ]
+      ],
+      [
+        [
+          335,
+          60
+        ],
+        [
+          335,
+          33
+        ]
+      ],
+      [
+        [
+          328,
+          127
+        ],
+        [
+          328,
+          100
+        ]
+      ],
+      [
+        [
+          411,
+          127
+        ],
+        [
+          411,
+          153
+        ]
+      ]
+    ],
+    "tapers": [
+      [
+        [
+          20,
+          95
+        ],
+        [
+          71,
+          127
+        ]
+      ],
+      [
+        [
+          211,
+          92
+        ],
+        [
+          155,
+          127
+        ]
+      ],
+      [
+        [
+          277,
+          95
+        ],
+        [
+          328,
+          127
+        ]
+      ],
+      [
+        [
+          457,
+          100
+        ],
+        [
+          411,
+          127
+        ]
+      ]
+    ],
+    "fronts": [
+      [
+        [
+          71,
+          127
+        ],
+        [
+          155,
+          127
+        ]
+      ],
+      [
+        [
+          328,
+          127
+        ],
+        [
+          411,
+          127
+        ]
+      ]
+    ],
+    "Os": [
+      [
+        154,
+        67
+      ],
+      [
+        240,
+        128
+      ]
+    ],
+    "CH2OH": [
+      [
+        79,
+        29
+      ],
+      [
+        335,
+        29
+      ]
+    ],
+    "OH": [
+      [
+        20,
+        64
+      ],
+      [
+        71,
+        174
+      ],
+      [
+        155,
+        174
+      ],
+      [
+        328,
+        96
+      ],
+      [
+        411,
+        174
+      ]
+    ],
+    "OHright": [
+      379,
+      67
+    ],
+    "CHO": [
+      462,
+      100
+    ],
+    "tiny": null
+  },
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431",
+    "readonlyProof": "cau-truc-ba-pa-open-native-ddh-lo-382-soat-doc-lap.json",
+    "runtime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open85-native-ddh-d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4.svg d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4\n85 { x: 0, y: 0, width: 550, height: 193 }\nACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open728-native-ddh-c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5.svg c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5\n728 { x: 0, y: 0, width: 562, height: 193 }\nACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open550-native-ddh-2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431.svg 2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431\n550 { x: 0, y: 0, width: 531, height: 187 }\nPOSTSHOT_SHA 85 d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4\nPOSTSHOT_SHA 728 c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5\nPOSTSHOT_SHA 550 2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431\n",
+    "newFullOnlyAll4": true
+  }
+}

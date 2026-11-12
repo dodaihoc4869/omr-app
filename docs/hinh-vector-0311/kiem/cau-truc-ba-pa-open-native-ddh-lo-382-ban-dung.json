@@ -1,0 +1,83 @@
+[
+  {
+    "i": 85,
+    "hash": "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+    "fileNguon": "anh/11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74.png",
+    "svg": "open85-native-ddh-d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4.svg",
+    "hashSvg": "d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4",
+    "byteSvg": 15266,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B5-I-9",
+        "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+        "refs": [
+          {
+            "hash": "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+            "where": "VIP27-C2-B5-I-9.hinh.0.du_lieu",
+            "hashDataUrl": "f401228a4d5a04ab985f6d2a7988adbf3b88136a1b57c38567699da0e484ad73"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C11O/6freeOH+2CH2OH=8hydroxylO/LEFT1Haworth5bareC1ringO-RIGHTopen4bareC+literalCH=O-FIRSTC/1bridgeO/4TAPER2boldfront6pxVERTICALfeet/ALLregularUPRIGHT-SUB2-FIRSTC-FIRSTO/0captionarrownums/NOtheorynormalize-PAanswer-addedH-rightRing-alias/LEFTbackOHdown-frontLEFTup-frontRIGHTdown/RIGHTfrontLEFTdown-frontRIGHTup/1tinyBOTTOMRIGHTdotUNKNOWNretain",
+    "hashSvgDaSoat": "d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 728,
+    "hash": "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+    "fileNguon": "anh/885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84.png",
+    "svg": "open728-native-ddh-c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5.svg",
+    "hashSvg": "c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5",
+    "byteSvg": 15276,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B5-I-9",
+        "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+        "refs": [
+          {
+            "hash": "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+            "where": "VIP27-C2-B5-I-9.hinh.2.du_lieu",
+            "hashDataUrl": "26df8961e75a2eddf095d6e6e4a17a88121328f5f9f0455d30707ad075e86993"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C11O/6freeOH+2CH2OH=8hydroxylO/LEFT1Haworth5bareC1ringO-RIGHTopen4bareC+literalCH=O-FIRSTC/1bridgeO/4TAPER2boldfront6pxVERTICALfeet/ALLregularUPRIGHT-SUB2-FIRSTC-FIRSTO/0captionarrownums/NOtheorynormalize-PAanswer-addedH-rightRing-alias/LEFTbackOHdown-frontLEFTup-frontRIGHTdown/RIGHTfrontLEFTup-frontRIGHTdown/1tinyBOTTOMRIGHTfragmentCROPrightedgeUNKNOWNretain/NOTepsilon728",
+    "hashSvgDaSoat": "c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5",
+    "nguoiSoat": "soat_hinh_vector"
+  },
+  {
+    "i": 550,
+    "hash": "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a",
+    "fileNguon": "anh/674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a.png",
+    "svg": "open550-native-ddh-2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431.svg",
+    "hashSvg": "2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431",
+    "byteSvg": 15046,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B5-I-9",
+        "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+        "refs": [
+          {
+            "hash": "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a",
+            "where": "VIP27-C2-B5-I-9.hinh.3.du_lieu",
+            "hashDataUrl": "371261f4d0bc0699cf566dea57cadfa2302aab7b235311fa6938fb819f00bad5"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C11O/6freeOH+2CH2OH=8hydroxylO/LEFT1Haworth5bareC1ringO-RIGHTopen4bareC+literalCH=O-FIRSTC/1bridgeO/4TAPER2boldfront6pxVERTICALfeet/ALLregularUPRIGHT-SUB2-FIRSTC-FIRSTO/0captionarrownums/NOtheorynormalize-PAanswer-addedH-rightRing-alias/LEFTbackOHup-bothfrontOHdown/RIGHTfrontLEFTup-frontRIGHTdown/0tinyfragment",
+    "hashSvgDaSoat": "2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

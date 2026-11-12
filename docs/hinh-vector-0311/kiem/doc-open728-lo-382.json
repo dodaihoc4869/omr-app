@@ -1,0 +1,771 @@
+{
+  "i": 728,
+  "assetIndexParent": 1309,
+  "hash": "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+  "file": "anh/885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84.png",
+  "size": [
+    562,
+    193
+  ],
+  "shaVerified": true,
+  "nguoiDoc": "soat_nguon_3",
+  "repoModified": false,
+  "sourceOnly": true,
+  "noSVGNoAdmission": true,
+  "notEpsilon728": true,
+  "nativeFullOpened": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84.png",
+  "ownZoomsOpened": [
+    "/workspace/scratch/native728-382-zoom.png",
+    "/workspace/scratch/native728-382-fragment.png"
+  ],
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C2-B5-I-9",
+      "maDe": "VIP27-C2-B5",
+      "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+      "allHinh": [
+        {
+          "hash": "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+          "where": "VIP27-C2-B5-I-9.hinh.0.du_lieu",
+          "hashDataUrl": "f401228a4d5a04ab985f6d2a7988adbf3b88136a1b57c38567699da0e484ad73",
+          "manifestPresent": false
+        },
+        {
+          "hash": "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+          "where": "VIP27-C2-B5-I-9.hinh.1.du_lieu",
+          "hashDataUrl": "9f40eac1d85527e9ee1ca7d2e29ab08584177ba1d3562f7b9022014c4f67ff63",
+          "manifestPresent": true
+        },
+        {
+          "hash": "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+          "where": "VIP27-C2-B5-I-9.hinh.2.du_lieu",
+          "hashDataUrl": "26df8961e75a2eddf095d6e6e4a17a88121328f5f9f0455d30707ad075e86993",
+          "manifestPresent": false
+        },
+        {
+          "hash": "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a",
+          "where": "VIP27-C2-B5-I-9.hinh.3.du_lieu",
+          "hashDataUrl": "371261f4d0bc0699cf566dea57cadfa2302aab7b235311fa6938fb819f00bad5",
+          "manifestPresent": false
+        }
+      ]
+    }
+  ],
+  "publicReadScope": "Allmatchingpublicde/refs as preserved ininventory; noanswerread/no_live_fetch_claim",
+  "closure": "oneqidfourhinh; target728notmanifest, f706...1366present; other11343... and674df... absent atread. Notalias1366, nofullclosureclaim.",
+  "sourceLiteral": {
+    "atomO": [
+      {
+        "text": "O",
+        "bboxApprox": [
+          153,
+          49,
+          172,
+          68
+        ]
+      },
+      {
+        "text": "O",
+        "bboxApprox": [
+          242,
+          111,
+          261,
+          131
+        ]
+      }
+    ],
+    "CH2OH": [
+      {
+        "text": "CH₂OH",
+        "bboxApprox": [
+          76,
+          8,
+          153,
+          28
+        ],
+        "bondAtom": "firstC/leftC"
+      },
+      {
+        "text": "CH₂OH",
+        "bboxApprox": [
+          342,
+          8,
+          419,
+          28
+        ],
+        "bondAtom": "firstC/leftC"
+      }
+    ],
+    "OH": [
+      {
+        "bboxApprox": [
+          15,
+          126,
+          48,
+          146
+        ],
+        "orientation": "downfromleftback22,97"
+      },
+      {
+        "bboxApprox": [
+          67,
+          79,
+          102,
+          98
+        ],
+        "orientation": "upfromleftfront76,130"
+      },
+      {
+        "bboxApprox": [
+          154,
+          160,
+          189,
+          180
+        ],
+        "orientation": "downfromleftfrontright163,130"
+      },
+      {
+        "bboxApprox": [
+          395,
+          49,
+          430,
+          69
+        ],
+        "orientation": "rightfromrightupper350,59"
+      },
+      {
+        "bboxApprox": [
+          334,
+          79,
+          369,
+          99
+        ],
+        "orientation": "upfromrightfront343,130"
+      },
+      {
+        "bboxApprox": [
+          422,
+          160,
+          456,
+          180
+        ],
+        "orientation": "downfromrightfrontright430,130"
+      }
+    ],
+    "aldehyde": {
+      "text": "CH=O",
+      "bboxApprox": [
+        482,
+        82,
+        548,
+        102
+      ],
+      "preserve": "literalCH=O with Hexplicit and inlineequal; do not shortenCHO or draw Hseparately/addC=Ooutside",
+      "terminalBondEnd": [
+        477,
+        101
+      ]
+    },
+    "totalTextNodes": 11,
+    "countOH": 6,
+    "countCH2OH": 2,
+    "countOAtoms": 2,
+    "countCH_equals_O": 1,
+    "noOtherText": "NoHlabels/carbonnumbers/captions/arrows/sourceletters observed."
+  },
+  "geometryNativeApprox": {
+    "leftVertices": {
+      "leftBack": [
+        22,
+        97
+      ],
+      "upperLeft": [
+        84,
+        59
+      ],
+      "ringOTextAnchor": [
+        162,
+        59
+      ],
+      "rightBack": [
+        221,
+        94
+      ],
+      "frontRight": [
+        163,
+        130
+      ],
+      "frontLeft": [
+        76,
+        130
+      ]
+    },
+    "leftThinEdges": [
+      {
+        "from": [
+          22,
+          97
+        ],
+        "to": [
+          84,
+          59
+        ]
+      },
+      {
+        "from": [
+          84,
+          59
+        ],
+        "to": [
+          149,
+          59
+        ]
+      },
+      {
+        "from": [
+          175,
+          65
+        ],
+        "to": [
+          221,
+          94
+        ]
+      }
+    ],
+    "leftBranches": [
+      {
+        "from": [
+          84,
+          59
+        ],
+        "to": [
+          84,
+          31
+        ],
+        "label": "CH₂OHfirstC"
+      },
+      {
+        "from": [
+          22,
+          97
+        ],
+        "to": [
+          22,
+          122
+        ],
+        "label": "OHdown"
+      },
+      {
+        "from": [
+          76,
+          130
+        ],
+        "to": [
+          76,
+          101
+        ],
+        "label": "OHup"
+      },
+      {
+        "from": [
+          163,
+          130
+        ],
+        "to": [
+          163,
+          156
+        ],
+        "label": "OHdown"
+      }
+    ],
+    "centralLink": [
+      {
+        "from": [
+          221,
+          94
+        ],
+        "to": [
+          240,
+          111
+        ]
+      },
+      {
+        "atom": "O",
+        "center": [
+          252,
+          121
+        ]
+      },
+      {
+        "from": [
+          264,
+          113
+        ],
+        "to": [
+          288,
+          97
+        ]
+      }
+    ],
+    "rightVertices": {
+      "backLeft": [
+        288,
+        97
+      ],
+      "upperLeft": [
+        350,
+        59
+      ],
+      "frontLeft": [
+        343,
+        130
+      ],
+      "frontRight": [
+        430,
+        130
+      ],
+      "terminalBondEnd": [
+        477,
+        101
+      ]
+    },
+    "rightThinBranches": [
+      {
+        "from": [
+          288,
+          97
+        ],
+        "to": [
+          350,
+          59
+        ]
+      },
+      {
+        "from": [
+          350,
+          59
+        ],
+        "to": [
+          350,
+          31
+        ],
+        "label": "CH₂OHfirstC"
+      },
+      {
+        "from": [
+          350,
+          59
+        ],
+        "to": [
+          391,
+          59
+        ],
+        "label": "OHright"
+      },
+      {
+        "from": [
+          343,
+          130
+        ],
+        "to": [
+          343,
+          101
+        ],
+        "label": "OHup"
+      },
+      {
+        "from": [
+          430,
+          130
+        ],
+        "to": [
+          430,
+          156
+        ],
+        "label": "OHdown"
+      }
+    ],
+    "rightNoClosedRing": "Native rightback288,97 branchesup350,59 andfront343,130; no Ojoiningupper350 toCHO/terminal. Preserveopen geometry; do notcompletefamiliarHaworth ring.",
+    "tapers": [
+      {
+        "thinTip": [
+          22,
+          97
+        ],
+        "wideFootCenter": [
+          76,
+          130
+        ],
+        "foot": "verticalfoot nearx76"
+      },
+      {
+        "thinTip": [
+          221,
+          94
+        ],
+        "wideFootCenter": [
+          163,
+          130
+        ],
+        "foot": "verticalfoot nearx163"
+      },
+      {
+        "thinTip": [
+          288,
+          97
+        ],
+        "wideFootCenter": [
+          343,
+          130
+        ],
+        "foot": "verticalfoot nearx343"
+      },
+      {
+        "thinTip": [
+          477,
+          101
+        ],
+        "wideFootCenter": [
+          430,
+          130
+        ],
+        "foot": "verticalfoot nearx430"
+      }
+    ],
+    "boldFronts": [
+      {
+        "from": [
+          76,
+          130
+        ],
+        "to": [
+          163,
+          130
+        ],
+        "orientation": "horizontal",
+        "nativeThicknessApprox": 6
+      },
+      {
+        "from": [
+          343,
+          130
+        ],
+        "to": [
+          430,
+          130
+        ],
+        "orientation": "horizontal",
+        "nativeThicknessApprox": 6
+      }
+    ],
+    "counts": {
+      "TAPER": 4,
+      "boldFrontHorizontal": 2,
+      "verticalOHBranch": 5,
+      "horizontalOHBranch": 1,
+      "verticalCH2OHBranch": 2
+    },
+    "verticalFeetWarning": "Atwidefeet/endpoints ofall4TAPER, keepbranchlegs exactlyverticalx76/163/343/430 andboldhorizontal, not slantedfeet oroverextendedwedgepastvertex. Widthmustmatchnativeperspective, notstereochemicalnormalizedwedges."
+  },
+  "unknownCroppedFragment": {
+    "classification": "UNKNOWN; do notassignletter/number/answer/punctuation",
+    "nativeDarkPixelBBoxThreshold200": [
+      558,
+      182,
+      562,
+      187
+    ],
+    "touchesRightEdge": true,
+    "shape": "tinyblackroundedlump clippedbyrightcanvas atx561; core559..560,y183..185, antialiasaround.",
+    "retain": "Retain atsamereferencerightbottomrelation asuninterpretedgraphic;do notdeleteasnoise orresolvebytheory/1366alias.",
+    "ownZoom": "/workspace/scratch/native728-382-fragment.png"
+  },
+  "warnings": [
+    "Question askswhichstructureiscorrect; deliberatelywrongoptionsmustremainwrong. Noanswer/theorynormalization.",
+    "Useonlythisnativehash forgeometry. Donotcopy1366orothertargetasset basedonsameqid.",
+    "Coordinatesapproxnativepixelmap; finalbuildermustfreshopenoriginal, preserve11literals/allbranches/fragment."
+  ],
+  "rootReview": {
+    "nativeFull3xOpened": true,
+    "allPublicDeAll4RefsRead": true,
+    "nativePixelInkChecked": true,
+    "geometryApproxNotSubpixel": true,
+    "noAliasNoTheoryNormalize": true,
+    "newFullOnlyAfterAll4": true
+  },
+  "builderGeometry": {
+    "size": [
+      562,
+      193
+    ],
+    "z": 23,
+    "thin": [
+      [
+        [
+          22,
+          97
+        ],
+        [
+          84,
+          59
+        ]
+      ],
+      [
+        [
+          84,
+          59
+        ],
+        [
+          149,
+          59
+        ]
+      ],
+      [
+        [
+          175,
+          65
+        ],
+        [
+          221,
+          94
+        ]
+      ],
+      [
+        [
+          84,
+          59
+        ],
+        [
+          84,
+          31
+        ]
+      ],
+      [
+        [
+          22,
+          97
+        ],
+        [
+          22,
+          122
+        ]
+      ],
+      [
+        [
+          76,
+          130
+        ],
+        [
+          76,
+          101
+        ]
+      ],
+      [
+        [
+          163,
+          130
+        ],
+        [
+          163,
+          156
+        ]
+      ],
+      [
+        [
+          221,
+          94
+        ],
+        [
+          240,
+          111
+        ]
+      ],
+      [
+        [
+          264,
+          113
+        ],
+        [
+          288,
+          97
+        ]
+      ],
+      [
+        [
+          288,
+          97
+        ],
+        [
+          350,
+          59
+        ]
+      ],
+      [
+        [
+          350,
+          59
+        ],
+        [
+          350,
+          31
+        ]
+      ],
+      [
+        [
+          350,
+          59
+        ],
+        [
+          391,
+          59
+        ]
+      ],
+      [
+        [
+          343,
+          130
+        ],
+        [
+          343,
+          101
+        ]
+      ],
+      [
+        [
+          430,
+          130
+        ],
+        [
+          430,
+          156
+        ]
+      ]
+    ],
+    "tapers": [
+      [
+        [
+          22,
+          97
+        ],
+        [
+          76,
+          130
+        ]
+      ],
+      [
+        [
+          221,
+          94
+        ],
+        [
+          163,
+          130
+        ]
+      ],
+      [
+        [
+          288,
+          97
+        ],
+        [
+          343,
+          130
+        ]
+      ],
+      [
+        [
+          477,
+          101
+        ],
+        [
+          430,
+          130
+        ]
+      ]
+    ],
+    "fronts": [
+      [
+        [
+          76,
+          130
+        ],
+        [
+          163,
+          130
+        ]
+      ],
+      [
+        [
+          343,
+          130
+        ],
+        [
+          430,
+          130
+        ]
+      ]
+    ],
+    "Os": [
+      [
+        162,
+        67
+      ],
+      [
+        252,
+        129
+      ]
+    ],
+    "CH2OH": [
+      [
+        84,
+        28
+      ],
+      [
+        350,
+        28
+      ]
+    ],
+    "OH": [
+      [
+        22,
+        144
+      ],
+      [
+        76,
+        97
+      ],
+      [
+        163,
+        178
+      ],
+      [
+        343,
+        97
+      ],
+      [
+        430,
+        178
+      ]
+    ],
+    "OHright": [
+      395,
+      67
+    ],
+    "CHO": [
+      482,
+      101
+    ],
+    "tiny": [
+      560.5,
+      184.5,
+      2
+    ]
+  },
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5",
+    "readonlyProof": "cau-truc-ba-pa-open-native-ddh-lo-382-soat-doc-lap.json",
+    "runtime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open85-native-ddh-d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4.svg d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4\n85 { x: 0, y: 0, width: 550, height: 193 }\nACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open728-native-ddh-c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5.svg c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5\n728 { x: 0, y: 0, width: 562, height: 193 }\nACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open550-native-ddh-2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431.svg 2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431\n550 { x: 0, y: 0, width: 531, height: 187 }\nPOSTSHOT_SHA 85 d2598315e2defc4c668dd5fc6894936b2fb02a79cee01f79ab2414684f4c65a4\nPOSTSHOT_SHA 728 c80f23ef814320a6d4b831ce3dcd530b3462f49e460100bc89b5bd42150283e5\nPOSTSHOT_SHA 550 2b9d275a5275ac626c02aa65a89ea2c96210a58f8fa962fdfa4f48e613544431\n",
+    "newFullOnlyAll4": true
+  }
+}
