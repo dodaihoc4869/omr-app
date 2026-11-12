@@ -48,6 +48,17 @@ export default function LopNoiThay() {
     if (che === 'hoc') setChon(true); else dungBangTrang()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [che])
+  // MÁY EM CHỈ VÀO «HỌC» KHI CÓ CÂU ĐƯỢC CHIẾU (thầy 12/11 «đợi thầy chọn câu xong bấm chiếu lên bảng thì máy em mới vào phần nhận đề»): thầy bấm «Học», mở
+  // bảng chọn, mở hoạt động — phòng CHƯA đổi chế độ, máy em ở nguyên màn đang xem. Phòng mở LƯỢT MỚI (bất kể chiếu bằng đường nào: bảng chọn, hoạt động chữa
+  // câu, phím C trên bảng đua) ⇒ lúc đó mới sang «hoc». Lượt đang mở mà thầy tự chuyển «Bảng» thì không bị kéo về.
+  const luotSo = v?.luot?.so ?? 0
+  const luotCu = useRef(luotSo)
+  useEffect(() => {
+    const moi = luotSo > luotCu.current
+    luotCu.current = luotSo
+    const kk = layView()?.live?.khoi
+    if (moi && kk && kk.gd === 'dang' && kk.che !== 'hoc') { setChon(false); setSanh(false); datKhoi({ ...kk, che: 'hoc' }) }
+  }, [luotSo])
   /** Bài đã chiếu / hoạt động đã mở ⇒ BÂY GIỜ mới báo phòng sang «Học» (máy em ở nguyên màn đang xem tới lúc có bài). */
   const sangHoc = (): void => { setChon(false); setSanh(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
   const doiChe = (c: 'hoc' | 'bang'): void => {
@@ -66,6 +77,13 @@ export default function LopNoiThay() {
   // Đếm tin mới chỉ khi cột đang đóng (nghe lại mỗi lần đóng / mở); mở cột ⇒ về 0 ngay trong thao tác bấm.
   useEffect(() => (chat ? undefined : kenh.nghe('chat', (t) => { if ((t.x as { c?: string } | null)?.c && t.s !== 'gv') setMoi((n) => n + 1) })), [chat])
   const doiChat = (): void => { setMoi(0); setChat((c) => !c) }
+  // Cụm điều khiển nằm trong khay nút bốn ô của TỜ (thầy 12/11 «phần nút này bị rối, chuyển nó vào trong cái 4 nút»): tờ báo bấm bằng sự kiện `ddh-lkt`
+  // (qua thay-noi.ts); số tin mới báo ngược lại bằng `ddh-lkt-moi`. Cụm nổi của app chỉ còn lúc BẢNG ĐUA đang hiện (tờ bị che, không có nút bốn ô).
+  const lenhTo = useRef<(v: string) => void>(() => {})
+  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat() }
+  useEffect(() => { const f = (e: Event) => lenhTo.current(String((e as CustomEvent<string>).detail)); window.addEventListener('ddh-lkt', f); return () => window.removeEventListener('ddh-lkt', f) }, [])
+  const moiBao = chat ? 0 : moi
+  useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lkt-moi', { detail: moiBao })) }, [moiBao])
   // Phím M đóng / mở cột tin nhắn (không khi thầy đang gõ chữ).
   useEffect(() => {
     if (!dang) return
@@ -94,7 +112,8 @@ export default function LopNoiThay() {
   if (k.gd === 'cho') return <div className="lkt" style={KIEU}><PhongChoThay v={v} khoi={k.k} /></div>
   return (
     <div className="lkt" style={KIEU}>
-      <div className="lkt-vien" data-tren={bangHien && k.che === 'hoc' ? '' : undefined} role="group" aria-label="Chế độ live">
+      {bangHien && k.che === 'hoc' ? (
+      <div className="lkt-vien" data-tren="" role="group" aria-label="Chế độ live">
         <div className="lkt-che" role="radiogroup" aria-label="Chế độ">
           {(['hoc', 'bang'] as const).map((c) => (
             <button key={c} type="button" role="radio" aria-checked={k.che === c} className={k.che === c ? 'chon' : ''} onClick={() => doiChe(c)}
@@ -109,6 +128,7 @@ export default function LopNoiThay() {
           <span>Tin nhắn</span>{moi > 0 && !chat ? <em aria-label={`${moi} tin mới`}>{moi > 99 ? '99+' : moi}</em> : null}
         </button>
       </div>
+      ) : null}
       {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} loi={loi} onChe={doiChe} onDong={() => setSanh(false)} /> : null}
       {chon ? (
         <div className="lkt-chon"><div className="lkt-san-khau" style={{ ['--k' as string]: k1 }}>
@@ -116,7 +136,7 @@ export default function LopNoiThay() {
           <Suspense fallback={null}>
             <ChonCauBpu live buoiId={v.buoiId} lop={v.lop} buocDau="hd" onDong={() => setChon(false)}
               onChieu={async (ds) => { const l = await chieuCau(ds); if (!l) sangHoc(); return l }}
-              onHoatDong={(hd) => { setChon(false); setSanh(false); if (k.che !== 'hoc') datKhoi({ ...k, che: 'hoc' }); void moHoatDong(hd) }}
+              onHoatDong={(hd) => { setChon(false); setSanh(false); void moHoatDong(hd) }}
               onKetThuc={() => ketThucBuoiHoc(v.buoiId)} />
           </Suspense>
         </div></div>

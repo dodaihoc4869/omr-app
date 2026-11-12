@@ -212,6 +212,10 @@ function guiGiay(lai = false): void {
 // suốt buổi (theo mã buổi) và trả lại cho tờ MỚI khi tờ xin (`bang-xin`) — đổi bài, bảng trắng ⇄ bài đều không mất nét. `bangSan` = tờ hiện tại đã xin xong
 // (trước đó trang `bl` của tờ mới còn rỗng — không được ghi đè bản đang giữ).
 const TRANG_BANG = 'bl'
+// LIVE THEO KHỐI: cụm Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm trong khay nút bốn ô của tờ (thầy 12/11). Tờ bấm ⇒ việc `lk` ⇒ sự kiện cửa sổ `ddh-lkt` cho lớp
+// nổi (LopNoiThay); lớp nổi báo số tin nhắn mới bằng sự kiện `ddh-lkt-moi` ⇒ lệnh `live-lk` xuống tờ.
+let lkMoi = 0
+if (typeof window !== 'undefined') window.addEventListener('ddh-lkt-moi', (e) => { lkMoi = Number((e as CustomEvent<number>).detail) || 0; guiTo({ lenh: 'live-lk', moi: lkMoi }) })
 let bangLuu: { buoi: string; goi: { v: 1; tiLe: number; net: NetBut[] } } | null = null, bangSan = false
 /** `ca` = sự kiện mang CẢ trang (tờ vừa mở trang / gửi ảnh trạng thái): trang rỗng lúc đó là tờ MỚI chưa nhận lại nét (khung tờ dùng lại nên không phân
  *  biệt được tờ cũ / mới) ⇒ không ghi đè bản đang giữ. Thầy tự xoá hết thì đi bằng sự kiện xoá nét ⇒ vẫn ghi. */
@@ -382,7 +386,8 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
   nghe()
   if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false }
   switch (m.viec) {
-    case 'chao': bangSan = false; bao(); break
+    case 'chao': bangSan = false; bao(); if (lkMoi) guiTo({ lenh: 'live-lk', moi: lkMoi }); break
+    case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
     case 'bang-xin': bangSan = true; if (bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length) guiTo({ lenh: 'live-bang-nhap', goi: bangLuu.goi }); else giuBang(true); break
     case 'bam': bam(); break
     case 'the-dong': if (the) { the = null; lt?.thaMic(); bao() } break

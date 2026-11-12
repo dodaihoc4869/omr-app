@@ -39,7 +39,9 @@ export default function LopNoiEm() {
   const [roiCho, setRoiCho] = useState(false)
   const gdCu = useRef<typeof gd>(null)
   // SẢNH (thầy 12/11): thầy đã bấm Bắt đầu mà chưa chọn chế độ ⇒ máy em ở bảng danh sách bốn đội (đã nghe được thầy) tới khi thầy chọn Học / Bảng.
-  const sanh = gd === 'dang' && s.khoi?.che === 'sanh'
+  // + (thầy 12/11 «bấm vào học là máy học sinh đã hiện vào màn chiếu, bên trái là một ô trắng»): phòng báo «hoc» mà CHƯA có lượt câu nào ⇒ em vẫn ở bảng
+  // danh sách chờ thầy chiếu câu — không vào màn chiếu rỗng.
+  const sanh = gd === 'dang' && (s.khoi?.che === 'sanh' || (s.khoi?.che === 'hoc' && !s.coLuot))
   useEffect(() => { if (gd === 'dang' && gdCu.current !== 'dang') guiTho({ t: 'lop-xin' }); gdCu.current = gd }, [gd])
   // Thầy 12/11: nút nhắn tin + ngọn lửa ẨN lúc em làm bài / thầy chữa bài (chế độ «Học» đang có câu); hiện ở danh sách, ở chế độ «Bảng», và lúc chờ câu.
   // Ngoài sảnh, hai nút này nằm trong khay của thanh vàng (màn live sẵn có — LopLive) và báo sang đây bằng sự kiện `ddh-lk`.
