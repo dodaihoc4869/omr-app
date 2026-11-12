@@ -35,13 +35,16 @@ export default function LopNoiEm() {
   const dangVao = !s.khoi && !!s.dangVao && !s.xong
   const cho = gd === 'cho' || dangVao
   const { xoay, style } = useXoay(!cho)
-  const [bonDoi, setBonDoi] = useState<'chao' | 'xem' | null>(null)
+  const [bonDoi, setBonDoi] = useState<'xem' | null>(null)
   const [chatMo, setChatMo] = useState(false)
   /** Em tự rời phòng chờ (về màn Bình Phản Ứng bên dưới, đóng được như thường); thầy bấm Bắt đầu thì vẫn vào live. */
   const [roiCho, setRoiCho] = useState(false)
   const gdCu = useRef<typeof gd>(null)
-  // Thầy vừa bấm Bắt đầu (cho → dang), hoặc em vào khi thầy đã bắt đầu ⇒ màn «Bốn đội» một lần.
-  useEffect(() => { if (gd === 'dang' && gdCu.current !== 'dang') { guiTho({ t: 'lop-xin' }); setBonDoi('chao') } gdCu.current = gd }, [gd])
+  // SẢNH (thầy 12/11): thầy đã bấm Bắt đầu mà chưa chọn chế độ ⇒ máy em ở bảng danh sách bốn đội (đã nghe được thầy) tới khi thầy chọn Học / Bảng.
+  const sanh = gd === 'dang' && s.khoi?.che === 'sanh'
+  useEffect(() => { if (gd === 'dang' && gdCu.current !== 'dang') guiTho({ t: 'lop-xin' }); gdCu.current = gd }, [gd])
+  const [sanhCu, setSanhCu] = useState(sanh)
+  if (sanhCu !== sanh) { setSanhCu(sanh); if (!sanh) setBonDoi(null) }
   // Phòng chờ: xin toàn màn hình + khoá ngang ở lần chạm đầu (trình duyệt chỉ cho sau thao tác của em); không được thì xoay hình.
   useEffect(() => {
     if (!cho) return
@@ -61,8 +64,8 @@ export default function LopNoiEm() {
       <Suspense fallback={null}>
         {cho ? <TroGiuLua toi={s.toi} ds={s.ds} kenh={kenh} soEm={Math.max(1, s.ds.length)} mayYeu={mayYeu()} xoay={xoay} /> : null}
         {cho ? <button type="button" className="lke-roi" onClick={() => { setRoiCho(true); try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }}>Rời phòng chờ</button> : null}
-        {!cho && bonDoi ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} tuDong={bonDoi === 'chao' ? 3000 : undefined} /> : null}
-        {!cho && !bonDoi ? (
+        {!cho && (sanh || bonDoi) ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} /> : null}
+        {!cho && (sanh || !bonDoi) ? (
           <>
             {chatMo ? <CuaChatEm chat={chat} toiSbd={s.toi.sbd} onDong={() => setChatMo(false)} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
             <div className="lke-mep" role="group" aria-label="Live theo khối">

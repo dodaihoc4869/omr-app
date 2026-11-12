@@ -59,13 +59,14 @@ kiem('em 1: màn Bốn đội hiện, có tên em', await em1.locator('.lke .bd'
 await chup(em1, '09-em-bon-doi-844')
 kiem('em 1: trò đã dừng', (await em1.locator('.gl').count()) === 0)
 await ngu(3300)
-kiem('em 1: màn Bốn đội tự đóng sau 3 giây, còn nút chat ở mép', (await em1.locator('.lke .bd').count()) === 0 && await em1.locator('.lke-mep button').first().isVisible())
+kiem('em 1: VẪN ở bảng danh sách khi thầy chưa chọn chế độ (không tự đóng), có nút chat', (await em1.locator('.lke .bd').count()) === 1 && await em1.locator('.lke-mep button').first().isVisible() && may.trangThai()?.live?.khoi?.che === 'sanh')
 // ── 2b. Sảnh: danh sách các em + chọn chế độ (thầy 12/11) ──
 kiem('thầy: sau Bắt đầu là SẢNH danh sách 8 em theo đội, hai nút chế độ', await thay.locator('.lkt-cho.sanh').isVisible() && (await thay.locator('.lkt-cho.sanh .lkt-doi li:not(.rong)').count()) === 8 && (await thay.locator('.lkt-che-to').count()) === 2)
 kiem('thầy: không lộ bảng Bình Phản Ứng (điểm danh / đua top)', (await thay.locator('.bpu-bang').count()) === 0 || !(await thay.locator('.bpu-bang').first().isVisible()))
 await chup(thay, '03b-thay-sanh-1366')
 await thay.locator('.lkt-che-to').nth(1).click(); await ngu(2500)
 kiem('chọn Bảng ở sảnh ⇒ phòng sang chế độ Bảng, dựng tờ BẢNG TRẮNG, sảnh đóng', may.trangThai()?.live?.khoi?.che === 'bang' && (await thay.locator('.lop-xem-phieu iframe').count()) === 1 && (await thay.locator('.lkt-cho.sanh').count()) === 0)
+kiem('em 1: thầy chọn chế độ ⇒ bảng danh sách đóng, sang đúng chế độ', (await em1.locator('.lke .bd').count()) === 0)
 kiem('thầy: công tắc Học | Bảng + nút Tin nhắn', await thay.locator('.lkt-che button').count() === 2 && await thay.locator('.lkt-nut-chat').last().isVisible())
 
 // ── 3. Chat ──
@@ -102,7 +103,7 @@ const khoBang = await em1.evaluate(() => { const b = document.querySelector('.lv
 kiem('em 1: bảng live phủ gần kín màn', !!khoBang && khoBang[0] > 844 * 0.85, JSON.stringify(khoBang))
 await chup(thay, '05-thay-che-do-bang-1366'); await chup(em1, '11-em-che-do-bang-844')
 await thay.locator('.lkt-che button').nth(0).click(); await ngu(1800)
-kiem('về Học: tờ hiện lại giấy đề', await to.locator('body.mc-che-bang').count() === 0)
+kiem('bấm Học khi chưa có bài ⇒ máy em GIỮ chế độ Bảng tới khi thầy chọn xong bài', may.trangThai()?.live?.khoi?.che === 'bang')
 kiem('về Học khi mới có bảng trắng ⇒ mở bảng CHỌN BÀI của live', await thay.locator('.lkt-chon .bcc').isVisible())
 await chup(thay, '04b-thay-chon-bai-1366')
 await chup(em1, '10-em-che-do-hoc-844')

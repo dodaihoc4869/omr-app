@@ -5,7 +5,7 @@
 //   · bảng Bình Phản Ứng ở màn điểm danh ⇒ «Xong điểm danh» ⇒ «Hôm nay làm gì?» (có «Kết thúc buổi học»).
 // TỨC THÌ: `napSan()` (Hôm nay rảnh thì gọi) tải sẵn mảnh bảng; `hoiSom()` (chạm / rê vào nút) hỏi máy chủ buổi đang mở TRƯỚC khi bấm xong.
 // Mã đổi mỗi phút ⇒ khi bảng còn mở, đọc lại buổi 15 giây một lần (một lệnh nhẹ `xem`) và cập nhật mã trên bảng; bảng đóng ⇒ thôi đọc.
-import { buoiDangMo, linkDiemDanh, moBuoiHoc, xemBuoiHoc, type BuoiHoc, laBuoiLive } from '../buoi-hoc-api'
+import { buoiDangMo, linkDiemDanh, moBuoiHoc, xemBuoiHoc, type BuoiHoc } from '../buoi-hoc-api'
 import type { KetQuaLenh } from '../goi-lenh-thay'
 
 const GAN_DAY_MS = 3 * 3_600_000
@@ -23,7 +23,7 @@ export function napSan(): void { void napGan().catch(() => {}) }
 /** Buổi đang mở gần đây (≤ 3 giờ) — nút «Kết thúc» cạnh Điểm danh ở Hôm nay. */
 export async function buoiMoGanDay(): Promise<string | null> {
   const r = await hoiSom()
-  return r.ok ? r.du.find((b) => !laBuoiLive(b) && Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id ?? null : null
+  return r.ok ? r.du.find((b) => !(b.lop ?? '').startsWith('Live Khối ') && Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id ?? null : null
 }
 /** Hỏi sớm buổi đang mở (chạm / rê vào nút) — lần bấm ngay sau dùng lại kết quả (≤ 20 giây). */
 export function hoiSom(): Promise<KetQuaLenh<BuoiHoc[]>> {
@@ -31,6 +31,7 @@ export function hoiSom(): Promise<KetQuaLenh<BuoiHoc[]>> {
   return som.p
 }
 
+// Buổi LIVE THEO KHỐI (12/11): máy chủ đặt lớp «Live Khối N» ⇒ nút «Lên bảng» bỏ qua buổi này (live có lối vào riêng ở nút Live).
 export type KetQuaDiemDanh = { loai: 'chieu' } | { loai: 'loi'; chu: string }
 
 export async function batDauDiemDanh(): Promise<KetQuaDiemDanh> {
@@ -41,7 +42,7 @@ export async function batDauDiemDanh(): Promise<KetQuaDiemDanh> {
   const [dm, g] = await Promise.all([hoiSom(), napGan()])
   som = null
   if (!dm.ok) return { loai: 'loi', chu: dm.chu }
-  const mo = dm.du.find((b) => !laBuoiLive(b) && Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS) ?? null
+  const mo = dm.du.find((b) => !(b.lop ?? '').startsWith('Live Khối ') && Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS) ?? null
   const goc = window.location.origin
   const lk = (ma: string | null) => (ma ? linkDiemDanh(goc, ma) : null)
   let id = '', ma: string | null = null

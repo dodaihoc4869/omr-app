@@ -28,6 +28,8 @@ export function phienCua(buoiId: string): PhienKhoi | null { const p = phien ?? 
 
 // ── Kho nhỏ: bản xem mới nhất của bảng + kênh lớp ──
 let view: ViewBang | null = null
+/** Tờ đang mở là tờ BẢNG TRẮNG (chưa chọn bài) ⇒ sang «Học» thì mở chọn bài. */
+export const toBang = { trang: false }
 /** Thầy vừa bấm «Mở phòng chờ»: khối đang mở ⇒ lớp nổi hiện NGAY («Đang mở phòng chờ…»), không chờ bảng nối phòng. Phòng trả bản xem có cờ khối / 15 giây ⇒ thôi. */
 let dangMo: number | null = null
 let henMo: ReturnType<typeof setTimeout> | undefined
@@ -35,7 +37,7 @@ export const layDangMo = (): number | null => dangMo
 export const layView = (): ViewBang | null => view
 const nghe = new Set<() => void>()
 const phatDoi = (): void => { for (const f of nghe) f() }
-function go(): void { goc?.unmount(); khung?.remove(); goc = null; khung = null }
+function go(): void { goc?.unmount(); khung?.remove(); goc = null; khung = null; toBang.trang = false }
 function datDangMo(k: number | null): void { clearTimeout(henMo); dangMo = k; if (k != null) henMo = setTimeout(() => { datDangMo(null); if (!view?.live?.khoi) go() }, 15_000); phatDoi() }
 const tai = new Map<LoaiTinLop, Set<(t: TinLop) => void>>()
 export const kenh: KenhLop = {

@@ -4,15 +4,13 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { dangKy, datKhoi, kenh, layDangMo, layView, phienCua } from './thay-khoi'
+import { dangKy, datKhoi, kenh, layDangMo, layView, phienCua, toBang } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
 const TroGiuLua = lazy(() => import('./TroGiuLua'))
 const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 /** Chưa có tờ giảng / tấm hoạt động nào đang mở ⇒ buổi live đang ở bước chọn bài. */
-/** Tờ đang mở là tờ BẢNG TRẮNG (chưa chọn bài) ⇒ sang «Học» thì mở chọn bài. */
-let toBangTrang = false
 const chuaCoTo = (): boolean => !document.querySelector('.lop-xem-phieu, [data-bpu-hd]')
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 
@@ -24,14 +22,17 @@ export default function LopNoiThay() {
   // CHỌN BÀI của riêng buổi live (không qua màn điểm danh / màn đua của bảng): mở sẵn khi chưa có tờ giảng; thầy mở lại bằng nút «Chọn bài».
   const [chon, setChon] = useState(false)
   // SẢNH (thầy 12/11: «bấm bắt đầu live thì phải vào bảng danh sách học sinh vào live, sau đó tôi chọn chế độ»): hiện ngay sau «Bắt đầu live» khi chưa có tờ.
-  const [sanh, setSanh] = useState(chuaCoTo)
+  const [sanhTay, setSanh] = useState(false)
+  const sanh = sanhTay || k?.che === 'sanh'
   const [loi, setLoi] = useState('')
+  const sangHoc = (): void => { toBang.trang = false; setChon(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
   /** Đổi chế độ: báo phòng (máy em đổi theo) + bảo đảm máy thầy có đúng thứ để dạy — Học cần bài (mở chọn bài), Bảng cần tờ bảng (dựng bảng trắng). */
   const doiChe = (c: 'hoc' | 'bang'): void => {
     if (!k) return
-    datKhoi({ ...k, che: c }); setSanh(false); setLoi('')
-    if (c === 'hoc') { if (chuaCoTo() || toBangTrang) setChon(true) }
-    else { setChon(false); if (chuaCoTo()) { toBangTrang = true; void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) { toBangTrang = false; setLoi(l); setSanh(true) } }) } }
+    setSanh(false); setLoi('')
+    // «Học» khi chưa có bài: chọn bài TRƯỚC, chiếu xong mới báo phòng (máy em ở nguyên màn đang xem tới lúc có bài).
+    if (c === 'hoc') { if (chuaCoTo() || toBang.trang) { setChon(true); return } datKhoi({ ...k, che: 'hoc' }) }
+    else { datKhoi({ ...k, che: 'bang' }); setChon(false); if (chuaCoTo()) { toBang.trang = true; void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) { toBang.trang = false; setLoi(l); setSanh(true) } }) } }
   }
   const [k1, setK1] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
   useEffect(() => { const f = () => setK1(Math.min(window.innerWidth / 1920, window.innerHeight / 1080)); window.addEventListener('resize', f); return () => window.removeEventListener('resize', f) }, [])
@@ -70,14 +71,14 @@ export default function LopNoiThay() {
               <span>Tin nhắn</span>{moi > 0 && !chat ? <em aria-label={`${moi} tin mới`}>{moi > 99 ? '99+' : moi}</em> : null}
             </button>
           </div>
-          {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} coTo={!chuaCoTo()} loi={loi} onChe={doiChe} onDong={() => setSanh(false)} /> : null}
+          {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} loi={loi} onChe={doiChe} onDong={() => setSanh(false)} /> : null}
           {chon && !sanh ? (
             <div className="lkt-chon"><div className="lkt-san-khau" style={{ ['--k' as string]: k1 }}>
               <div className="lkt-chon-dau"><i aria-hidden="true" />Live Khối {k.k}<small>{v.ds.filter((e) => e.vao).length} em trong phòng</small></div>
               <Suspense fallback={null}>
                 <ChonCauBpu live buoiId={v.buoiId} lop={v.lop} buocDau="hd" onDong={() => setChon(false)}
-                  onChieu={async (ds) => { const m = await import('../bpu/gan-gv'), l = await m.chieuCau(ds); if (!l) { toBangTrang = false; setChon(false) } return l }}
-                  onHoatDong={(hd) => { toBangTrang = false; setChon(false); void import('../bpu/gan-gv').then((m) => m.moHoatDong(hd)) }}
+                  onChieu={async (ds) => { const m = await import('../bpu/gan-gv'), l = await m.chieuCau(ds); if (!l) sangHoc(); return l }}
+                  onHoatDong={(hd) => { sangHoc(); void import('../bpu/gan-gv').then((m) => m.moHoatDong(hd)) }}
                   onKetThuc={async () => (await import('../bpu/gan-gv')).ketThucBuoiHoc(v.buoiId)} />
               </Suspense>
             </div></div>
@@ -90,7 +91,13 @@ export default function LopNoiThay() {
 }
 
 /** SẢNH LIVE: danh sách các em đã vào theo bốn đội + hai nút chọn chế độ. */
-function SanhLive({ v, khoi, che, coTo, loi, onChe, onDong }: { v: ViewBang; khoi: number; che: 'hoc' | 'bang'; coTo: boolean; loi: string; onChe: (c: 'hoc' | 'bang') => void; onDong: () => void }) {
+function SanhLive({ v, khoi, che, loi, onChe, onDong }: { v: ViewBang; khoi: number; che: 'hoc' | 'bang' | 'sanh'; loi: string; onChe: (c: 'hoc' | 'bang') => void; onDong: () => void }) {
+  const coTo = che !== 'sanh'
+  // Tiếng: live tự bật khi tờ sẵn sàng; lần đầu máy này phải chọn mic trên tờ ⇒ quá 3 giây chưa bật thì mời thầy mở thẻ chọn mic.
+  const dangNghe = !!v.live?.bat
+  const [choMic, setChoMic] = useState(false)
+  useEffect(() => { if (dangNghe) return; const h = setTimeout(() => setChoMic(true), 3000); return () => clearTimeout(h) }, [dangNghe])
+
   const vao = useMemo(() => v.ds.filter((e) => e.vao), [v.ds])
   const [dangKt, setDangKt] = useState(false)
   const ketThuc = async () => { if (dangKt) return; setDangKt(true); const m = await import('../bpu/gan-gv'); if (await m.ketThucBuoiHoc(v.buoiId)) setDangKt(false) }
@@ -99,6 +106,8 @@ function SanhLive({ v, khoi, che, coTo, loi, onChe, onDong }: { v: ViewBang; kho
       <header>
         <span className="lkt-the live"><i aria-hidden="true" />Đang live · Khối {khoi}</span>
         <span className="lkt-the">{vao.length} em trong phòng</span>
+        <span className="lkt-the" data-tieng={dangNghe ? 'bat' : 'cho'}>{dangNghe ? 'Các em đang nghe thầy' : 'Tiếng đang bật…'}</span>
+        {!dangNghe && choMic && che === 'sanh' ? <button type="button" className="lkt-ve" onClick={onDong}>Chọn mic</button> : null}
         <span className="gian" />
         {coTo ? <button type="button" className="lkt-ve" onClick={onDong}>Quay lại bài</button> : null}
         <button type="button" className="lkt-dong" onClick={() => void ketThuc()} disabled={dangKt}>{dangKt ? 'Đang kết thúc…' : 'Kết thúc live'}</button>
@@ -115,9 +124,9 @@ function SanhLive({ v, khoi, che, coTo, loi, onChe, onDong }: { v: ViewBang; kho
         })}
       </div>
       <footer>
-        <p>Thầy chọn chế độ để bắt đầu dạy. Đổi qua lại bất cứ lúc nào bằng công tắc ở góc trên phải.{loi ? <strong role="alert"> {loi}</strong> : null}</p>
-        <button type="button" className="lkt-che-to" data-chon={che === 'hoc' && coTo || undefined} onClick={() => onChe('hoc')}><b>Học</b><span>Chọn bài, chiếu câu, cả lớp làm trên máy</span></button>
-        <button type="button" className="lkt-che-to" data-chon={che === 'bang' && coTo || undefined} onClick={() => onChe('bang')}><b>Bảng</b><span>Bảng kín màn máy em để giảng lý thuyết</span></button>
+        <p>Các em đang ở bảng danh sách này. Thầy chọn chế độ, máy các em chuyển theo ngay.{loi ? <strong role="alert"> {loi}</strong> : null}</p>
+        <button type="button" className="lkt-che-to" data-chon={che === 'hoc' || undefined} onClick={() => onChe('hoc')}><b>Học</b><span>Chọn bài, chiếu câu, cả lớp làm trên máy</span></button>
+        <button type="button" className="lkt-che-to" data-chon={che === 'bang' || undefined} onClick={() => onChe('bang')}><b>Bảng</b><span>Bảng kín màn máy em để giảng lý thuyết</span></button>
       </footer>
     </div>
   )
@@ -131,7 +140,9 @@ function PhongChoThay({ v, khoi }: { v: ViewBang; khoi: number }) {
   const batDau = async () => {
     if (dang) return
     setDang(true); setLoi('')
-    datKhoi({ k: khoi, gd: 'dang', che: 'hoc' })
+    // Bắt đầu ⇒ cả lớp (máy thầy lẫn máy em) vào bảng danh sách; dựng sẵn tờ BẢNG TRẮNG bên dưới để tiếng thầy bật ngay (live tự bật khi tờ sẵn sàng).
+    datKhoi({ k: khoi, gd: 'dang', che: 'sanh' })
+    if (chuaCoTo()) { toBang.trang = true; void import('../bpu/gan-gv').then((m) => m.chieuBangTrang()).then((l) => { if (l) toBang.trang = false }) }
     const p = phienCua(v.buoiId)
     const r = p ? await batDauLiveKhoi(p.id) : null
     if (r && !r.ok) setLoi(r.chu)

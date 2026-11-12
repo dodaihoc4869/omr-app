@@ -22,3 +22,4 @@ html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt
 .lke.dang-vao i { width: 14px; height: 14px; border-radius: 50%; background: var(--lk-chu-y); animation: lke-nhip 1s ease-in-out infinite alternate; }
 @keyframes lke-nhip { from { opacity: .35; transform: scale(.8); } to { opacity: 1; transform: scale(1.15); } }
 .lkt-dang-mo { position: absolute; inset: 0; pointer-events: auto; display: grid; place-items: center; background: var(--lk-nen); color: var(--lk-chu-2); font-size: 20px; font-weight: 800; }
+.lke-mep { z-index: 35; } .lke-bong, .lke .lc-goc { z-index: 36; }

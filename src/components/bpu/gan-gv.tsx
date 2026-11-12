@@ -5,7 +5,7 @@
 // 09/11 (thầy «trùng tu lại toàn bộ màn này»): MỘT gốc bảng cho cả điểm danh lẫn các lượt (`moBangDiemDanh` → «Xong điểm danh» → chọn câu ngay trên bảng
 // `chieuCau` ⇒ tờ chiếu dựng sẵn nằm dưới bảng); gọi lên bảng ⇒ bảng THU NHỎ vào tờ cũ, chấm Đạt / Chưa đạt ⇒ bảng PHÓNG LẠI.
 import { createRoot, type Root } from 'react-dom/client'
-import { buoiDangMo, laBuoiLive, type BuoiHoc } from '../../lib/buoi-hoc-api'
+import { buoiDangMo, type BuoiHoc } from '../../lib/buoi-hoc-api'
 import { useAppStore } from '../../store/appStore'
 import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
@@ -60,7 +60,7 @@ async function layBuoi(tuDong: boolean): Promise<string | null> {
   // Tin TỰ ĐỘNG chỉ theo buổi mở trong 4 giờ gần nhất HOẶC buổi máy này đang xem hôm nay (bước Điểm danh nhớ `ddh.gv.buoi-xem`): thầy quên kết thúc
   // buổi sáng thì tối chiếu lớp khác KHÔNG đẩy câu xuống máy các em lớp sáng (đang ở nhà); buổi dài hơn 4 giờ mà thầy vẫn đang dạy thì vẫn chạy.
   const nho = buoiDangXem()
-  ds = ds.filter((b) => !laBuoiLive(b)) // buổi live theo khối có bảng riêng (mở từ nút Live), không nhận tin của tờ chiếu buổi trên lớp
+  ds = ds.filter((b) => !(b.lop ?? '').startsWith('Live Khối ')) // buổi live theo khối có bảng riêng (mở từ nút Live), không nhận tin của tờ chiếu buổi trên lớp
   const id = (tuDong ? ds.find((b) => b.id === nho || Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id : ds[0]?.id) ?? null
   if (!id && !tuDong) useAppStore.getState().showToast('Chưa có buổi điểm danh đang mở. Thầy mở Điểm danh trước, các em vào lớp bằng mã.', 'warn')
   return id
