@@ -1,0 +1,29 @@
+[
+  {
+    "i": 20,
+    "hash": "037423b9b5863a9a62c23919676a73905a46f394d00d4a8887f7b30c3b6a45f3",
+    "fileNguon": "anh/037423b9b5863a9a62c23919676a73905a46f394d00d4a8887f7b30c3b6a45f3.png",
+    "svg": "urea20-native-ddh-4e48cb3143763ee901c87a1c6168cc292a3c7bc1ce5d6d6a41a13642c4eaf5db.svg",
+    "hashSvg": "4e48cb3143763ee901c87a1c6168cc292a3c7bc1ce5d6d6a41a13642c4eaf5db",
+    "byteSvg": 15996,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D1-II-4",
+        "de": "Keo dán poly(urea-formaldehyde) được dùng làm chất kết dính trong gỗ ván ép, chất dẻo,... và được điều chế từ urea và formaldehyde (cấu tạo một đoạn mạch như hình).\nKhi kết hợp với các chất đóng rắn như $\\ce{NH4Cl}$, HOOC-COOH, $\\ce{HOCH(CH3)COOH}$ để kết nối các mạch polymer với nhau tạo thành mạng không gian, đồng thời các nhóm C=O, -NH- tạo các liên kết với các nhóm chức có trong gỗ ván ép, chất dẻo,..",
+        "refs": [
+          {
+            "hash": "037423b9b5863a9a62c23919676a73905a46f394d00d4a8887f7b30c3b6a45f3",
+            "where": "VIP27-C4-B14-D1-II-4.hinh.0.du_lieu",
+            "hashDataUrl": "b7af72758c5d7f7b6b2ab638e115304cd7654a41385c63fdbe477dd91034d3b4"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "10C10N6O/9NH1N/4mainCO1branchCO-4mainCH2-1branchCH2/CO1CO2LEFTwhitegap-CO3CO4LEFTcontact-ALLRIGHTcontact/branchinnerUPPERRIGHTfreegapKEEP/2shortdashesEACHend/ALLregularUPRIGHT-NHliteral-OHfirstO/0ring-arrow-caption-charge/NOaddedH-n-name-formula-answer-noalias9661358",
+    "hashSvgDaSoat": "4e48cb3143763ee901c87a1c6168cc292a3c7bc1ce5d6d6a41a13642c4eaf5db",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
