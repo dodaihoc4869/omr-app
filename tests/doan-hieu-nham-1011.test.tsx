@@ -3,7 +3,7 @@
 // đọc đề / đếm nhận định ⇒ không đoán. Không bao giờ chọn sẵn «Tính / đọc đề sai». Câu ví dụ lấy nguyên văn từ lời giải thật trong kho (docs/do-tai-d1).
 import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup, render } from '@testing-library/react'
-import { daGuiLyDoSai, doanHieuNham, thanLyDoSai } from '../src/components/hoc-tap/vi-sao-sai'
+import { choLyDoSai, daGuiLyDoSai, doanHieuNham, thanLyDoSai } from '../src/components/hoc-tap/vi-sao-sai'
 import { KetSai } from '../src/components/hoc-tap/KetSaiDuo'
 
 afterEach(() => { cleanup(); daGuiLyDoSai(thanLyDoSai()); localStorage.clear() })
@@ -22,19 +22,23 @@ describe('doanHieuNham', () => {
   })
 })
 
-describe('KetSai chọn sẵn', () => {
+describe('KetSai A.I đoán — chỉ gợi ý, không chọn sẵn (thầy 12/11 «cho dừng hẳn lại để học sinh chọn rồi bấm tiếp»)', () => {
   const pa = ['pH', 'pOH', '[H⁺]', '[OH⁻]']
   const lg = { tungPa: { A: { viSao: '-log[OH⁻] là pOH, không phải pH.' }, B: { viSao: 'Đúng: pOH = -log[OH⁻].' }, C: { viSao: '4 là pOH, chưa đổi sang pH = 14 - 4 = 10.' } }, chot: 'pOH = -log[OH⁻].' }
-  it('phương án bẫy ⇒ «Hiểu nhầm» chọn sẵn, dòng A.I đoán, Tiếp tục mở; em đổi được', () => {
+  it('phương án bẫy ⇒ nhãn «A.I đoán» cạnh «Hiểu nhầm», KHÔNG chọn sẵn, «Tiếp tục» vẫn chờ em chạm', () => {
     const { container, getByRole } = render(<KetSai qid="k1" dap="Đáp án đúng: B. pOH" giai="" laLamLai={false} pa={pa} lg={lg} em="A" da="B" />)
-    expect(getByRole('button', { name: 'Hiểu nhầm' }).getAttribute('aria-pressed')).toBe('true')
-    expect(container.querySelector('.ly-goi-y')!.textContent).toBe('A.I Đỗ Đại Học đoán em mắc đúng bẫy của phương án A. Không phải thì chạm ô khác.')
-    expect(thanLyDoSai()).toEqual({ ly: [['k1', 'nham']] })
+    for (const t of ['Tính / đọc đề sai', 'Chưa biết cách', 'Hiểu nhầm']) expect(getByRole('button', { name: t }).getAttribute('aria-pressed')).toBe('false')
+    expect(getByRole('button', { name: 'Hiểu nhầm' }).querySelector('.ai')!.textContent).toBe('A.I đoán')
+    expect(container.querySelectorAll('.o-ly .ai')).toHaveLength(1)
+    expect(container.querySelector('.ly-goi-y')!.textContent).toBe('A.I Đỗ Đại Học đoán em mắc bẫy của phương án A.')
+    expect(choLyDoSai()).toBe(true)
+    expect(thanLyDoSai()).toEqual({})
   })
-  it('phương án lỗi tính ⇒ không chọn sẵn, em phải chạm', () => {
+  it('phương án lỗi tính ⇒ không nhãn A.I, em phải chạm', () => {
     const { container, getByRole } = render(<KetSai qid="k2" dap="Đáp án đúng: B. pOH" giai="" laLamLai={false} pa={pa} lg={lg} em="C" da="B" />)
     for (const t of ['Tính / đọc đề sai', 'Chưa biết cách', 'Hiểu nhầm']) expect(getByRole('button', { name: t }).getAttribute('aria-pressed')).toBe('false')
-    expect(container.querySelector('.ly-goi-y')!.textContent).toBe('Chạm một ô để A.I Đỗ Đại Học xếp cách sửa hợp với em.')
+    expect(container.querySelector('.o-ly .ai')).toBeNull()
+    expect(container.querySelector('.ly-goi-y')).toBeNull()
     expect(thanLyDoSai()).toEqual({})
   })
 })

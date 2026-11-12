@@ -9,8 +9,12 @@ import { useSyncExternalStore } from 'react'
 export type LyDoSai = 'tinh' | 'cach' | 'nham'
 export const LY_DO_SAI: readonly (readonly [LyDoSai, string])[] = [['tinh', 'Tính / đọc đề sai'], ['cach', 'Chưa biết cách'], ['nham', 'Hiểu nhầm']]
 export const laLyDoSai = (x: unknown): x is LyDoSai => x === 'tinh' || x === 'cach' || x === 'nham'
+/** Dòng giải thích ngắn dưới tên lý do (điện thoại dọc — bản vẽ docs/ban-ve-vi-sao-sai-1211, thầy duyệt 12/11). */
+export const GOI_Y_LY_DO: Readonly<Record<LyDoSai, string>> = { tinh: 'Nhầm số, nhầm đơn vị, đọc sót đề', cach: 'Chưa biết phải bắt đầu từ đâu', nham: 'Nhầm khái niệm hoặc tính chất' }
 /** Chữ nút chính khi em chưa chạm lý do. */
-export const CHU_CHO_LY_DO = 'Chọn một lý do để tiếp tục'
+export const CHU_CHO_LY_DO = 'Chọn 1 ý để tiếp tục'
+/** Chống lướt (thầy 12/11 «bị thoát nhanh quá chưa kịp nhìn»): «Tiếp tục» nằm đúng chỗ «Kiểm tra» ⇒ chạm đúp là lướt qua; bỏ mọi chạm trong khoảng này sau khi dải sai hiện. */
+export const KHOA_TIEP_MS = 600
 
 const KHOA = 'ddh.lyDoSai'
 const TOI_DA_GUI = 20 // một lệnh nộp mang tối đa 20 lý do (hàng dài hơn ⇒ các lệnh sau mang tiếp)
@@ -20,6 +24,7 @@ const chuaChac = new Set<string>() // câu sửa em bật «Chưa chắc» (kh�
 const nghe = new Set<() => void>()
 let ban = 0
 let daNap = false
+let khoaDen = 0 // mốc (ms) trước đó «Tiếp tục» không đi — chống chạm đúp từ «Kiểm tra»
 const bao = () => { ban++; for (const f of nghe) f() }
 const nap = () => {
   if (daNap) return
@@ -41,7 +46,7 @@ export function chonLyDoSai(qid: string, ly: LyDoSai): void {
   bao()
 }
 /** Có câu sai đang hiện mà em chưa chạm lý do ⇒ «Tiếp tục» (nút / phím Enter) chưa đi. */
-export const choLyDoSai = (): boolean => cho.size > 0
+export const choLyDoSai = (): boolean => cho.size > 0 || Date.now() < khoaDen
 /** Phần THÊM của thân lệnh nộp câu: `{ ly: [[qid, lý do], …] }` (vắng hàng ⇒ {}) + `tuTin: 'chua_chac'` nếu em bật chip cho câu `qid` (đọc là dùng hết). */
 export function thanLyDoSai(qid?: string): { ly?: [string, LyDoSai][]; tuTin?: 'chua_chac' } {
   nap()
@@ -66,6 +71,7 @@ export const useLyDoSai = (qid: string): LyDoSai | undefined => { useSyncExterna
 /** Dải câu sai hiện (chưa có lý do) ⇒ bắt đầu chờ; trả hàm thôi chờ (rời câu / ô lý do không chạm được). */
 export function choCauSai(qid: string): () => void {
   nap()
+  khoaDen = Date.now() + KHOA_TIEP_MS
   if (daChon.has(qid)) return () => {}
   cho.add(qid)
   bao()
