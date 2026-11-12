@@ -86,10 +86,13 @@ describe('cờ kênh đang mở ⇒ vòng lưới an toàn thưa ra', () => {
     dong()
     expect(kenhDayDangMo()).toBe(false)
   })
-  it('đứt lúc app đang hiện rồi nối lại ⇒ thẻ Live hỏi lại một lượt (ddh-live-khoi)', async () => {
+  it('đứt lúc app đang hiện rồi nối lại ⇒ thẻ Live hỏi lại một lượt (ddh-live-khoi); đứt lúc ẩn ⇒ không (thẻ tự hỏi khi app hiện lại)', async () => {
     const live = vi.fn()
     window.addEventListener('ddh-live-khoi', live)
     await kich(null)
+    expect(live).toHaveBeenCalledTimes(1)
+    await kich(10_000)
+    await kich(AN_LAU_MS + 5_000)
     window.removeEventListener('ddh-live-khoi', live)
     expect(live).toHaveBeenCalledTimes(1)
   })

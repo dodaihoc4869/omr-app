@@ -39,7 +39,7 @@ export function moKenhDay(token: string): () => void {
     if (dung || hen) return
     hen = setTimeout(() => { hen = undefined; void noi() }, LUI_NOI_MS[Math.min(loi++, LUI_NOI_MS.length - 1)])
   }
-  let anLuc = an() ? Date.now() : 0, hienLuc = 0
+  let anLuc = an() ? Date.now() : 0, hienLuc = 0, dutKhiHien = false
   const bao = () => {
     if (gop) return
     gop = setTimeout(() => { gop = undefined; window.dispatchEvent(new CustomEvent(SU_KIEN_DOI)) }, GOP_MS)
@@ -73,14 +73,14 @@ export function moKenhDay(token: string): () => void {
             void import('./tu-sua-loi').then((m) => m.taiTuSuaLoi(token, { moi: true })).catch(() => {})
           } else bao()
           napGoi(false)
-          // Kênh đứt lúc app ĐANG HIỆN (tin «live» lúc đứt có thể đã lỡ; thẻ Live thưa nhịp khi kênh mở) ⇒ thẻ Live hỏi lại một lượt. Quay lại app thì thẻ đã tự hỏi.
-          if (!sauHien) { try { window.dispatchEvent(new Event('ddh-live-khoi')) } catch { /* trình duyệt cũ */ } }
+          // Kênh đứt lúc app ĐANG HIỆN (tin «live» lúc đứt có thể đã lỡ; thẻ Live thưa nhịp khi kênh mở) ⇒ thẻ Live hỏi lại một lượt. Đứt lúc ẩn ⇒ quay lại app thẻ đã tự hỏi.
+          if (dutKhiHien) { try { window.dispatchEvent(new Event('ddh-live-khoi')) } catch { /* trình duyệt cũ */ } }
         }
         daMo = true
       }
       // BÌNH PHẢN ỨNG (06/11): tin `bpu` = thầy vừa chiếu câu cho cả lớp ⇒ CHỈ mở màn Bình Phản Ứng (không đọc lại Lộ trình: 40 máy đọc cùng lúc là nghẽn).
       w.onmessage = (e) => { if (typeof e.data !== 'string' || !e.data.includes('"doi"')) return; if (e.data.includes('"live"')) { try { window.dispatchEvent(new Event('ddh-live-khoi')) } catch { /* trình duyệt cũ */ } return } if (e.data.includes('"bpu"')) { void import('../components/bpu/gan-hs').then((m) => m.moBpuHs(token, null)).catch(() => {}); return } if (e.data.includes('"goi"')) napGoi(true); bao() }
-      w.onclose = () => { if (ws !== w) return; ws = null; datCo(false); tatPing(); henLai() }
+      w.onclose = () => { if (ws !== w) return; ws = null; dutKhiHien = !an(); datCo(false); tatPing(); henLai() }
       w.onerror = () => { try { w.close() } catch { /* đã đóng */ } }
     } catch {
       henLai()
