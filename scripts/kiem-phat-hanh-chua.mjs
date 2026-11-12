@@ -31,7 +31,9 @@ if (process.argv.includes('--schema')) {
   const tables = await query("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table' AND name IN ('chua_loi_dot','chua_loi_hoc_lieu','chua_loi_phien','chua_loi_item','chua_loi_nop','chua_loi_thay','chua_loi_trai_nghiem','chua_loi_tu_receipt','chua_loi_chua_lop')")
   const triggers = await query("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='trigger' AND name IN ('chua_giao_sai_sau_ghi','chua_giao_sai_sau_cong_bo')")
   if (tables[0].n !== 9 || triggers[0].n !== 2) throw new Error('Schema vòng chữa chưa đủ.')
-  const stats = await query("SELECT (SELECT COUNT(*) FROM chua_loi_dot) AS soDot,(SELECT COUNT(*) FROM chua_loi_hoc_lieu WHERE trang_thai='du_dung') AS hocLieuDaDuyet,(SELECT COUNT(*) FROM hoc_sinh) AS soHocSinh")
+  // 12/11 (hoá đơn D1): COUNT(*) cả chua_loi_dot quét ~75 nghìn hàng mỗi lượt kiểm (258 lượt/ngày ≈ 19,5 triệu hàng) ⇒ chỉ in id dòng cuối (MAX(rowid): một lần dò
+  // khoá) — số này CHỈ để đọc nhật ký, không cổng nào dựa vào; tên khác để không nhầm là số đếm.
+  const stats = await query("SELECT (SELECT MAX(rowid) FROM chua_loi_dot) AS dongDotCuoi,(SELECT COUNT(*) FROM chua_loi_hoc_lieu WHERE trang_thai='du_dung') AS hocLieuDaDuyet,(SELECT COUNT(*) FROM hoc_sinh) AS soHocSinh")
   console.log(JSON.stringify({ soBang: tables[0].n, soTrigger: triggers[0].n, ...stats[0] }))
 }
 if (process.argv.includes('--live')) {

@@ -102,15 +102,32 @@ export function toiDaGoiSua(now: number): number {
   return p % 5 === 0 ? 1 : 0
 }
 
+/** Đợt còn mở — ĐÚNG điều kiện chỉ mục bộ phận `idx_cld_mo_em` (chi-muc-luc-chay.ts, migration-1211-chua-loi-quet.sql). */
+const DOT_MO = (a: string) => `${a}.dong_luc IS NULL AND ${a}.trang_thai_day<>'da_tu_sua'`
+/**
+ * Em còn đợt mở, chưa có gói hôm nay (hoặc giữ chỗ «đang đóng» đã quá hạn), em có đợt mở cập nhật gần nhất trước. ?1 = ngày VN, ?2 = mốc giữ chỗ (ms), ?3 = số em.
+ * Bản cũ (`SELECT d.sbd FROM chua_loi_dot d WHERE <mở> AND NOT EXISTS(gói) GROUP BY d.sbd ORDER BY MAX(d.cap_nhat_luc) DESC`) duyệt MỌI đợt mở mỗi phút
+ * (D1 12/11: 49,6 nghìn hàng/lượt × ~2 nghìn lượt = 98 triệu hàng/ngày). Nay NHẢY từng em, đi LÙI trên `idx_cld_mo_em` (sbd, cap_nhat_luc): mỗi bước một lần dò
+ * khoảng `sbd < em trước` theo (sbd DESC, cap_nhat_luc DESC) LIMIT 1 ⇒ ra em kế + MAX(cap_nhat_luc) của em ấy cùng một chỗ; mỗi em một lần dò gói (khoá chính)
+ * ⇒ ~5 hàng/em có đợt mở. Chỉ dò KHOẢNG (không `sbd=?`): với `sbd=?` SQLite chọn chỉ mục đầy đủ idx_cld_em_cap_nhat (cả đợt đã đóng). Hạt giống = char(1114111)
+ * (lớn hơn mọi sbd), dòng hạt giống có cn NULL nên bị lọc. Cùng tập em, cùng thứ tự (trùng `cap_nhat_luc` thì thứ tự không định — như bản cũ).
+ * tests/chua-gon-quet-1211.test.ts so cũ↔mới + khoá kế hoạch.
+ */
+const KE_EM = (cot: 'sbd' | 'cap_nhat_luc') =>
+  `(SELECT d.${cot} FROM chua_loi_dot d WHERE ${DOT_MO('d')} AND d.sbd<em.sbd ORDER BY d.sbd DESC,d.cap_nhat_luc DESC LIMIT 1)`
+export const SQL_EM_CAN_GOI = `WITH RECURSIVE em(sbd,cn) AS (SELECT char(1114111),NULL
+    UNION ALL SELECT ${KE_EM('sbd')},${KE_EM('cap_nhat_luc')} FROM em WHERE em.sbd IS NOT NULL)
+  SELECT em.sbd AS sbd FROM em WHERE em.cn IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM ${BANG_GOI_SUA} g WHERE g.sbd=em.sbd AND g.ngay=?1 AND (g.so>=0 OR g.luc>?2))
+  ORDER BY em.cn DESC LIMIT ?3`
+
 /** CRON mỗi phút: em còn câu cần sửa, chưa có gói hôm nay (em vừa học gần đây trước) ⇒ đóng gói. Trả số em đã đóng. */
 export async function cronGoiSuaDem(env: Env, now: number, toiDa: number = toiDaGoiSua(now)): Promise<number> {
   if (toiDa <= 0 || !env.DE) return 0
   try {
     await chayDdlMotLan(env, BANG_GOI_SUA, SQL_GOI_SUA)
     const ngay = ngayVn(now)
-    const rs = await env.DB.prepare(`SELECT d.sbd AS sbd FROM chua_loi_dot d WHERE d.trang_thai_day<>'da_tu_sua' AND d.dong_luc IS NULL
-        AND NOT EXISTS (SELECT 1 FROM ${BANG_GOI_SUA} g WHERE g.sbd=d.sbd AND g.ngay=?1 AND (g.so>=0 OR g.luc>?2))
-      GROUP BY d.sbd ORDER BY MAX(d.cap_nhat_luc) DESC LIMIT ?3`).bind(ngay, now - GIU_CHO_MS, toiDa).all<{ sbd: string }>()
+    const rs = await env.DB.prepare(SQL_EM_CAN_GOI).bind(ngay, now - GIU_CHO_MS, toiDa).all<{ sbd: string }>()
     let n = 0
     for (const r of rs.results ?? []) if ((await dongGoiSuaEm(env, String(r.sbd), now)) !== null) n++
     return n

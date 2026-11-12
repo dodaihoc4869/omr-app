@@ -10,7 +10,7 @@ import { SQL_DA_CONG_BO } from '../server/src/cong-bo-diem'
 import { SQL_DAU_HO_TRO_CHUA } from '../server/src/dau-ho-tro-chua'
 import { TU_NGAY } from '../server/src/loi-hoc-luat'
 import { CHI_MUC_CRON_DEM } from '../server/src/chi-muc-luc-chay'
-import { BANG_GOI_SUA, SQL_GOI_SUA } from '../server/src/goi-sua-dem'
+import { SQL_EM_CAN_GOI, SQL_GOI_SUA } from '../server/src/goi-sua-dem'
 import { readFileSync } from 'node:fs'
 
 // Bản sao NGUYÊN VĂN hai câu cũ (trước 11/11) — làm chuẩn so sánh.
@@ -114,14 +114,12 @@ describe('docNhieuTrangThaiLoiDau — câu đi chỉ mục trả đúng tập d�
 })
 
 describe('cron gói sửa mỗi phút đi chỉ mục đợt mở (11/11)', () => {
-  it('sau khi dựng chỉ mục cron đêm, câu tìm em còn đợt mở chỉ quét idx_cld_mo_em', () => {
+  it('sau khi dựng chỉ mục cron đêm, câu tìm em còn đợt mở chỉ đi idx_cld_mo_em (12/11: nhảy từng em, không quét — tests/chua-gon-quet-1211.test.ts)', () => {
     const d = taoD1That()
     for (const s of [...SQL_GOI_SUA, ...CHI_MUC_CRON_DEM]) d.sql.exec(s)
-    const q = `SELECT d.sbd AS sbd FROM chua_loi_dot d WHERE d.trang_thai_day<>'da_tu_sua' AND d.dong_luc IS NULL
-        AND NOT EXISTS (SELECT 1 FROM ${BANG_GOI_SUA} g WHERE g.sbd=d.sbd AND g.ngay=?1 AND (g.so>=0 OR g.luc>?2))
-      GROUP BY d.sbd ORDER BY MAX(d.cap_nhat_luc) DESC LIMIT ?3`
-    expect(readFileSync('server/src/goi-sua-dem.ts', 'utf8')).toContain(q.split('\n')[0]!.trim())
-    const ke = (d.sql.prepare(`EXPLAIN QUERY PLAN ${q}`).all() as { detail: string }[]).map((x) => x.detail).join('\n')
-    expect(ke).toMatch(/SCAN d USING (COVERING )?INDEX idx_cld_mo_em/)
+    expect(readFileSync('server/src/goi-sua-dem.ts', 'utf8')).toContain('DB.prepare(SQL_EM_CAN_GOI)')
+    const ke = (d.sql.prepare(`EXPLAIN QUERY PLAN ${SQL_EM_CAN_GOI}`).all() as { detail: string }[]).map((x) => x.detail).join('\n')
+    expect(ke).toMatch(/SEARCH d USING (COVERING )?INDEX idx_cld_mo_em/)
+    expect(ke).not.toMatch(/SCAN d\b/)
   })
 })

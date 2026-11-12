@@ -21,19 +21,21 @@ async function bam(x: unknown) {
     .map((n) => n.toString(16).padStart(2, '0'))
     .join('')
 }
+// Hàng chiếu: ĐI TỪ chua_loi_thay (CROSS JOIN giữ thứ tự vòng lặp — t trước, dò `idx_clt_cho` (trang_thai, gui_luc) nếu đã dựng, migration-1211-chua-loi-quet.sql)
+// rồi dò đợt theo khoá chính. Trước 12/11 SQLite quét cả chua_loi_dot (~75 nghìn hàng/lượt, 18 triệu hàng/ngày). Cùng dòng, cùng thứ tự (tests/chua-gon-quet-1211.test.ts).
+export const SQL_HANG_CHIEU =
+  `SELECT d.*,h.ho_ten,h.lop AS ten_lop,p.snapshot_json,
+    (SELECT n.tra_loi FROM chua_loi_nop n WHERE n.dot_id=d.id ORDER BY n.nop_luc DESC,n.rowid DESC LIMIT 1) AS tra_loi,
+    (SELECT i.public_json FROM chua_loi_nop n JOIN chua_loi_item i ON i.id=n.item_id WHERE n.dot_id=d.id ORDER BY n.nop_luc DESC,n.rowid DESC LIMIT 1) AS cau_cuoi,
+    t.gui_luc FROM chua_loi_thay t CROSS JOIN chua_loi_dot d ON d.id=t.dot_id
+    JOIN hoc_sinh h ON h.sbd=d.sbd JOIN chua_loi_phien p ON p.id=(SELECT id FROM chua_loi_phien WHERE dot_id=d.id ORDER BY lan_gap_lai DESC,so_luot DESC LIMIT 1)
+    WHERE t.trang_thai='cho_thay' AND d.trang_thai_day='can_thay' AND (?='' OR h.lop=?) ORDER BY t.gui_luc,d.id LIMIT 501`
 async function docHang(
   env: Env,
   lop: string,
 ): Promise<{ ds: NhomChuaTrenLop[]; conNua: boolean }> {
   const cfg = await docCauHinh(env)
-  const rows = await env.DB.prepare(
-    `SELECT d.*,h.ho_ten,h.lop AS ten_lop,p.snapshot_json,
-    (SELECT n.tra_loi FROM chua_loi_nop n WHERE n.dot_id=d.id ORDER BY n.nop_luc DESC,n.rowid DESC LIMIT 1) AS tra_loi,
-    (SELECT i.public_json FROM chua_loi_nop n JOIN chua_loi_item i ON i.id=n.item_id WHERE n.dot_id=d.id ORDER BY n.nop_luc DESC,n.rowid DESC LIMIT 1) AS cau_cuoi,
-    t.gui_luc FROM chua_loi_thay t JOIN chua_loi_dot d ON d.id=t.dot_id
-    JOIN hoc_sinh h ON h.sbd=d.sbd JOIN chua_loi_phien p ON p.id=(SELECT id FROM chua_loi_phien WHERE dot_id=d.id ORDER BY lan_gap_lai DESC,so_luot DESC LIMIT 1)
-    WHERE t.trang_thai='cho_thay' AND d.trang_thai_day='can_thay' AND (?='' OR h.lop=?) ORDER BY t.gui_luc,d.id LIMIT 501`,
-  )
+  const rows = await env.DB.prepare(SQL_HANG_CHIEU)
     .bind(lop, lop)
     .all<Obj>()
   const nhom = new Map<string, NhomChuaTrenLop>()
