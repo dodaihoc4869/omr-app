@@ -15,6 +15,8 @@ export interface DuLieuLuot {
   doi: number
   /** Em vừa bấm gửi trên máy (phòng chưa kịp báo lại). */
   daGuiMay: boolean
+  /** Live theo khối: em đang ở bảng mà VẪN còn được trả lời (tấm chọn đang hiện) ⇒ không báo «Hết giờ». */
+  conLam?: boolean
   /** Nhãn kết quả lên bảng (Đạt / Chưa đạt) do màn Bình Phản Ứng dựng sẵn; null = chưa chấm. */
   ketQuaBang: ReactNode
   gui: (tin: { t: string; v?: number }) => unknown
@@ -22,7 +24,7 @@ export interface DuLieuLuot {
 const dauKj = (n: number): string => (n > 0 ? `+${n.toLocaleString('vi-VN')}` : n < 0 ? `−${Math.abs(n).toLocaleString('vi-VN')}` : '0')
 
 /** Nội dung dải; null ⇒ không có gì để hiện (LopLive không vẽ dải). */
-export function daiLuot({ l, sbd, doi, daGuiMay, ketQuaBang, gui }: DuLieuLuot): ReactNode {
+export function daiLuot({ l, sbd, doi, daGuiMay, ketQuaBang, gui, conLam }: DuLieuLuot): ReactNode {
   const g = l.goi
   if ((l.pha === 'goi' || l.pha === 'lam-bang') && g && g.sbd !== sbd) {
     const khoa = g.emDoan !== null || g.dat != null, mau = { ['--doi' as string]: `var(${DOI_BPU[g.doi]?.mau})` }
@@ -55,7 +57,7 @@ export function daiLuot({ l, sbd, doi, daGuiMay, ketQuaBang, gui }: DuLieuLuot):
   }
   if (l.pha === 'tra-loi') {
     const daGui = !!l.emTra || daGuiMay
-    return <span className="kq">{daGui ? `${l.emTra?.kb ? 'Em đã báo chưa biết làm' : l.tuLuan ? 'Đã báo thầy em làm xong' : 'Đã gửi'} · ${l.daGui}/${l.coMat} bạn đã ${l.tuLuan ? 'xong' : 'gửi'}` : 'Hết giờ — câu này để trống'}</span>
+    return <span className="kq">{daGui ? `${l.emTra?.kb ? 'Em đã báo chưa biết làm' : l.tuLuan ? 'Đã báo thầy em làm xong' : 'Đã gửi'} · ${l.daGui}/${l.coMat} bạn đã ${l.tuLuan ? 'xong' : 'gửi'}` : conLam ? `Em chọn đáp án ở bảng · ${l.daGui}/${l.coMat} bạn đã gửi` : 'Hết giờ — câu này để trống'}</span>
   }
   return null
 }

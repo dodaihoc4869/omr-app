@@ -364,7 +364,7 @@ ${JS_LOI_BUT}
       if (UO) chep(gC, cvS, UO[0], UO[1], UO[2], UO[3]);
       ban = UO = null;
     }
-    so.ketThuc(); capNut();
+    y = so.ketThuc(); if (y && y.nan) veLai(); capNut();
     tx0 = n.tx; ty0 = n.ty;
 ` + /* viết sát đáy bảng rồi ngừng 0,9 giây ⇒ bảng tự trôi lên, dòng vừa viết về khoảng 2/5 bảng (chạm bút lại thì thôi) */ `
     if (n.bang && B) {

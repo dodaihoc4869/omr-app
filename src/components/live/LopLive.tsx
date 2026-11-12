@@ -291,6 +291,7 @@ function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
 
 // Live theo khối: hai nút khay «Nhắn cả lớp» / «Bốn đội» báo sang lớp nổi (LopNoiEm) bằng sự kiện cửa sổ — hai mảnh không nhập nhau.
 const phatLk = (d: 'chat' | 'doi'): void => { window.dispatchEvent(new CustomEvent('ddh-lk', { detail: d })) }
+const BtTin = () => <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" /></svg>
 const BtLk = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
 function useTinLk(): number {
   const [n, setN] = useState(0)
@@ -475,7 +476,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       {khoaChuaGui ? <p className="lv-ghi">Thầy đã gọi bạn lên bảng — câu này đã khoá, em chưa gửi nên để trống.</p> : null}
       {/* LIVE THEO KHỐI (thầy 12/11 «ẩn cả cái chat với ngọn lửa vào thanh màu vàng»): nhắn cả lớp + bốn đội nằm trong khay này; lớp nổi (live-khoi) nghe sự kiện. */}
       {view.khoi ? <>
-        <button type="button" className="lv-vua" onClick={() => phatLk('chat')}><BtLk d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" />Nhắn cả lớp<b>{tinLk ? `${tinLk} tin mới` : 'Mở'}</b></button>
+        <button type="button" className="lv-vua" onClick={() => phatLk('chat')}><BtTin />Nhắn cả lớp<b>{tinLk ? `${tinLk} tin mới` : 'Mở'}</b></button>
         <button type="button" className="lv-vua" onClick={() => phatLk('doi')}><BtLk d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-5 1 2 2 2 2 2 0-3 0-5 1-8z" />Bốn đội<b>Xem</b></button>
       </> : null}
       {them}
@@ -497,7 +498,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const bangTra = view.khoi && tra && l0 && l0.pha === 'tra-loi' && !tt.bang && !l0.goi ? <TamTra so={l0.so} phan={l0.phan} tuLuan={!!l0.tuLuan} soPa={q?.choices?.length || 4} tra={tra} onGui={onGui} /> : null
   const dauDat = view.khoi ? <DauDat khoa={lenBang && goi0 ? `${lenBang.so}:${goi0.sbd}` : ''} dat={goi0?.dat} /> : null
   return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500} bangTra={bangTra} dauDat={dauDat}
-    epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
+    epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot({ ...luot, conLam: !!bangTra }) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
 }
 
 // Live theo khối: khay báo lớp nổi mở nhắn tin / bốn đội; lớp nổi báo lại số tin chưa đọc.
@@ -650,7 +651,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
         <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
-          bangTrong={<>{bangTra ?? (coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>)}{dauDat}</>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
+          coTra={!!bangTra} bangTrong={<>{dauDat}{bangTra ?? (coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>)}</>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
           dauBang={lenBang && epPhong !== 'bang' ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
