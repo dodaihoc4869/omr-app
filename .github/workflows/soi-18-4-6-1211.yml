@@ -1,0 +1,39 @@
+# SOI VÌ SAO 11/11 ÍT EM ĐÚNG 18/4/6 (CHỈ ĐỌC, 12/11): nguồn của 28 câu đầu + đo lại chỉ trên câu Gói 7 (ma_nguon g7:%). Chỉ SELECT đếm gộp, không in mã/tên em.
+#   1. tỉ lệ em-ngày ĐÚNG 18 · 4 · 6 trong 28 câu đầu của ngày;   2. tỉ lệ em làm ĐỦ 28 câu;
+#   3. lỗi tồn (câu mà lần làm gần nhất là sai);                   4. điểm Kiểm tra ôn tập.
+# Mỗi lượt in đủ 14 ngày gần nhất ⇒ một lượt bất kỳ đã thấy xu hướng, không cần lưu trạng thái. CHỈ SELECT đếm gộp — không in mã em, tên em. KHÔNG `d1 export`.
+# Tự chạy 00:20 giờ VN mỗi ngày (ngoài giờ học); mỗi câu cách nhau 4 giây (D1 từng 429 khi dồn lệnh). Đặc tả: docs/de-xuat-28-cau-v6-1011.md.
+name: Soi 18/4/6 ngày 11/11 (chỉ đọc)
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/trusting-ritchie-xo0ipg]
+    paths: ['.github/workflows/soi-18-4-6-1211.yml']
+permissions:
+  contents: read
+concurrency:
+  group: soi-18-4-6
+  cancel-in-progress: true
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Đo (chỉ SELECT)
+        working-directory: server
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+        run: |
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
+          q "A nguồn của 28 câu đầu ngày 11/11 (em đủ 28)" "WITH s AS (SELECT s0.sbd, CASE WHEN instr(s0.qid,'~')>0 THEN substr(s0.qid,1,instr(s0.qid,'~')-1) ELSE s0.qid END goc, MIN(s0.luc) luc, MIN(s0.nguon) nguon, MIN(substr(s0.ma_nguon,1,3)) mn FROM su_kien_hoc s0 WHERE (s0.ngay_vn='2026-11-11' AND s0.ket_qua IS NOT NULL AND COALESCE(s0.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND s0.ma_nguon NOT LIKE 'ktcn:%' AND s0.nguon NOT IN ('thi','chua_loi','tu_luyen')) GROUP BY s0.sbd, goc), r AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY luc, goc) k, COUNT(*) OVER (PARTITION BY sbd) n FROM s) SELECT nguon, mn tien_to_ma_nguon, COUNT(*) cau, COUNT(DISTINCT sbd) em FROM r WHERE n>=28 AND k<=28 GROUP BY 1,2 ORDER BY 3 DESC LIMIT 20"
+          
+          q "B câu thiếu phần (không tra được phan) trong 28 câu đầu" "WITH s AS (SELECT s0.sbd, CASE WHEN instr(s0.qid,'~')>0 THEN substr(s0.qid,1,instr(s0.qid,'~')-1) ELSE s0.qid END goc, MIN(s0.luc) luc FROM su_kien_hoc s0 WHERE (s0.ngay_vn='2026-11-11' AND s0.ket_qua IS NOT NULL AND COALESCE(s0.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND s0.ma_nguon NOT LIKE 'ktcn:%' AND s0.nguon NOT IN ('thi','chua_loi','tu_luyen')) GROUP BY s0.sbd, goc), r AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY luc, goc) k, COUNT(*) OVER (PARTITION BY sbd) n FROM s) SELECT COALESCE((SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=r.goc LIMIT 1),'(không có)') phan, COUNT(*) cau FROM r WHERE n>=28 AND k<=28 GROUP BY 1"
+          
+          q "C chỉ câu Gói 7 (ma_nguon g7:%): đúng / sát 18-4-6 theo loại ngày" "WITH s AS (SELECT s0.sbd, CASE WHEN instr(s0.qid,'~')>0 THEN substr(s0.qid,1,instr(s0.qid,'~')-1) ELSE s0.qid END goc, MIN(s0.luc) luc FROM su_kien_hoc s0 WHERE (s0.ngay_vn='2026-11-11' AND s0.ket_qua IS NOT NULL AND COALESCE(s0.purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc') AND s0.ma_nguon NOT LIKE 'ktcn:%' AND s0.nguon NOT IN ('thi','chua_loi','tu_luyen')) AND s0.ma_nguon LIKE 'g7:%' GROUP BY s0.sbd, goc), r AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY sbd ORDER BY luc, goc) k, COUNT(*) OVER (PARTITION BY sbd) n FROM s), e AS (SELECT r.sbd, MAX(n) n, SUM(k<=28 AND p='I') i, SUM(k<=28 AND p='II') ii, SUM(k<=28 AND p='III') iii FROM (SELECT r.*, (SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=r.goc LIMIT 1) p FROM r) r GROUP BY r.sbd) SELECT COALESCE(l.loai,'-') loai, COUNT(*) em, SUM(n>=28) du_28, SUM(n>=28 AND i=18 AND ii=4 AND iii=6) dung, SUM(n>=28 AND ABS(i-18)<=1 AND ABS(ii-4)<=1 AND ABS(iii-6)<=1) sat, ROUND(AVG(CASE WHEN n>=28 THEN i END),1) tb_I, ROUND(AVG(CASE WHEN n>=28 THEN ii END),1) tb_II, ROUND(AVG(CASE WHEN n>=28 THEN iii END),1) tb_III FROM e LEFT JOIN goi_bai_7_loai_ngay l ON l.sbd=e.sbd AND l.ngay='2026-11-11' GROUP BY 1"
