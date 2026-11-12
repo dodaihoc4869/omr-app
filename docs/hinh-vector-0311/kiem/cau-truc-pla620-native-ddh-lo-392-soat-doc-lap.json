@@ -1,0 +1,21 @@
+[
+  {
+    "i": 620,
+    "hashSvg": "f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt FINAL: tự mở RIÊNG native FULL/publicde-ref VIP27-C4-B14-D2-II-3.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và acid/lactide/PLA/conditions-headmacros. Ba cấu trúc18C in/14O (n chưa biết), sáu CO hai tia contact đúng nhánh riêng, một lactidering/hai terminalHOtrái-OHphải/ngoặcvuông+nsub đúng. Ba đầu đặc phải/xuống/xuốngphải; ba xt,tᵒ thường nghiêng và ba số thường, cả ba supo đều tách t trắng. Hóa học thường thẳng/Lactic acid-Lactide thường/PLA riêng đậm; không thấy chạm/cắt/tràn hoặc H/nước/stereo/đápán thêm. Không carry hai candidate cũ bị loại hoặc alias.",
+    "render": "/workspace/scratch/soat392-620-fresh.png",
+    "macro": [
+      "/workspace/scratch/pla620-acid.png",
+      "/workspace/scratch/pla620-lactide.png",
+      "/workspace/scratch/pla620-pla.png",
+      "/workspace/scratch/pla620-conditions.png"
+    ],
+    "hash": "731c0b070e264b928f7082058346989791a64dbad1902dcc25716357a2ce471f",
+    "hashSvgDaSoat": "f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f",
+    "runtimeLog": {
+      "sha256": "69930912e50a0242ac28720c6f8ac0e352f89caa7c977dd6fb881ec55a3539e3",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/pla620-native-ddh-f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f.svg f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f\n620 { x: 0, y: 0, width: 546, height: 485 }\nPOSTSHOT_SHA f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f\n"
+    }
+  }
+]

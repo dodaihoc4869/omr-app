@@ -1,0 +1,29 @@
+[
+  {
+    "i": 620,
+    "hash": "731c0b070e264b928f7082058346989791a64dbad1902dcc25716357a2ce471f",
+    "fileNguon": "anh/731c0b070e264b928f7082058346989791a64dbad1902dcc25716357a2ce471f.png",
+    "svg": "pla620-native-ddh-f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f.svg",
+    "hashSvg": "f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f",
+    "byteSvg": 46502,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D2-II-3",
+        "de": "Poly(lactic acid) là một loại polymer nhiệt dẻo được sản xuất từ các nguồn nguyên liệu tự nhiên như tinh bột ngô, rễ sắn hoặc mía. Trong môi trường ủ công nghiệp (độ ẩm cao và nhiệt độ trên 60°C), PLA phân hủy hoàn toàn thành $\\ce{CO2}$ và $\\ce{H2O}$. Trong hóa học và kỹ thuật vật liệu, đây là một trong những loại nhựa sinh học phổ biến nhất hiện nay. Từ nguyên liệu là lactic acid, PLA được tổng hợp theo sơ đồ bên cạnh.",
+        "refs": [
+          {
+            "hash": "731c0b070e264b928f7082058346989791a64dbad1902dcc25716357a2ce471f",
+            "where": "VIP27-C4-B14-D2-II-3.hinh.0.du_lieu",
+            "hashDataUrl": "c1c217a22f147841a41610af3857c7682675bd850672423de9692e94938d839b"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "3structuresLactic acid-Lactide-PLA/18printedC14O-UNKNOWNn/6COdouble2separatedraysEACH-contactrespectivearms/1lactidering/1SQUAREpair+nSUB-terminalHOLEFT-OHRIGHT/3FILLEDheadsRIGHT-DOWN-DOWNRIGHT/3xt,tSUPoREGULARITALIC-3regularnums/chemicalALLregularUPRIGHT-2regularcaptions-PLAonlyTRUEdam/NOaddedH-water-yield-stereo-formula-answer-alias",
+    "hashSvgDaSoat": "f18d2ade46e82b74886e7bca691780e338a29afd3d0c6338732bbf4cc5eea35f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
