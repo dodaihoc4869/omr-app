@@ -1,0 +1,581 @@
+{
+  "i": 1130,
+  "assetIndexProvided": 1404,
+  "hash": "cae704cdbfb0c3fadbc7ba1ef8f682c5560bc25dfce466654249de2f7baaff26",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/cae704cdbfb0c3fadbc7ba1ef8f682c5560bc25dfce466654249de2f7baaff26.png",
+  "size": [
+    866,
+    106
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-36",
+      "de": "Acid béo omega-3 và omega-6 là những acid béo không no, trong phân tử chứa nhóm C=C đầu tiên ở vị trí carbon số 3 và 6 (tính từ nhóm –CH₃). Công thức của arachidonic acid (ARA) và docosahexaenoic acid (DHA) như hình.",
+      "allHinh": [
+        {
+          "hash": "cae704cdbfb0c3fadbc7ba1ef8f682c5560bc25dfce466654249de2f7baaff26",
+          "where": "VIP27-CDK-ESTER-TN-II-36.hinh.0.du_lieu",
+          "hashDataUrl": "99f06ed69823a1eab2172ca974aa4de990ff61fd740022a975b9bf792ebb8644"
+        }
+      ],
+      "missingHashes": [
+        "cae704cdbfb0c3fadbc7ba1ef8f682c5560bc25dfce466654249de2f7baaff26"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/397-full3x.png",
+      "/workspace/scratch/397-left4x.png",
+      "/workspace/scratch/397-right4x.png",
+      "/workspace/scratch/397-leftco4x.png",
+      "/workspace/scratch/397-rightco4x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "font": "All chemical H3C/O/OH and captions regular upright serif; no actual bold/italic. H3C has3subscript. Source black scan ink with colored antialias fringes, not intentional blue/orange atom colors.",
+    "left": {
+      "bareVerticesOrderedFromExplicitH3C": [
+        [
+          53,
+          24
+        ],
+        [
+          53,
+          54
+        ],
+        [
+          79,
+          69
+        ],
+        [
+          105,
+          54
+        ],
+        [
+          105,
+          24
+        ],
+        [
+          132,
+          9
+        ],
+        [
+          158,
+          24
+        ],
+        [
+          158,
+          54
+        ],
+        [
+          184,
+          69
+        ],
+        [
+          210,
+          54
+        ],
+        [
+          210,
+          24
+        ],
+        [
+          237,
+          9
+        ],
+        [
+          263,
+          24
+        ],
+        [
+          263,
+          54
+        ],
+        [
+          289,
+          69
+        ],
+        [
+          315,
+          54
+        ],
+        [
+          315,
+          24
+        ],
+        [
+          342,
+          9
+        ],
+        [
+          368,
+          24
+        ]
+      ],
+      "bareCountIncludingCarbonyl": 19,
+      "explicitH3CCarbonCount": 1,
+      "totalC": 20,
+      "O": 2,
+      "CCDouble": 4,
+      "explicitStart": {
+        "literal": "H₃C",
+        "bboxApprox": [
+          0,
+          2,
+          32,
+          19
+        ],
+        "anchor": "LAST C center~27",
+        "bond": [
+          [
+            35,
+            14
+          ],
+          [
+            53,
+            24
+          ]
+        ]
+      },
+      "CCExtraParallelRays": [
+        [
+          [
+            104,
+            21
+          ],
+          [
+            130,
+            7
+          ]
+        ],
+        [
+          [
+            157,
+            56
+          ],
+          [
+            183,
+            72
+          ]
+        ],
+        [
+          [
+            209,
+            21
+          ],
+          [
+            235,
+            7
+          ]
+        ],
+        [
+          [
+            262,
+            56
+          ],
+          [
+            288,
+            72
+          ]
+        ]
+      ],
+      "CCMainBondVertexPairs1Based": [
+        [
+          5,
+          6
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          14,
+          15
+        ]
+      ],
+      "carbonyl": {
+        "bareC": [
+          368,
+          24
+        ],
+        "upperRay": [
+          [
+            366,
+            22
+          ],
+          [
+            384,
+            11.5
+          ]
+        ],
+        "lowerRay": [
+          [
+            368,
+            26
+          ],
+          [
+            387,
+            15.5
+          ]
+        ],
+        "upperO": {
+          "literal": "O",
+          "bboxApprox": [
+            387,
+            2,
+            400,
+            16
+          ]
+        },
+        "OH": {
+          "literal": "OH",
+          "bboxApprox": [
+            361,
+            48,
+            387,
+            61
+          ],
+          "anchor": "FIRST O~367"
+        },
+        "verticalOHArm": [
+          [
+            368,
+            26
+          ],
+          [
+            368,
+            44
+          ]
+        ],
+        "contact": "OwnCOmacro: upperfoot meets incoming upper-left slope just before apex; lowerfoot meets vertical OH stem/native small join. Neither ray has full white disconnect. Explicit O and OH text still have white glyph gaps.",
+        "rootUpperFootCalculated": [
+          366,
+          22.846153846153847
+        ]
+      },
+      "caption": {
+        "literal": "Arachidomic acid (ARA)",
+        "bboxApprox": [
+          138,
+          88,
+          330,
+          104
+        ],
+        "baselineApprox": 102,
+        "typoPreserve": "m in Arachidomic, NOT n from public stem/name"
+      }
+    },
+    "right": {
+      "bareVerticesOrderedFromExplicitH3C": [
+        [
+          489,
+          21
+        ],
+        [
+          489,
+          51
+        ],
+        [
+          515,
+          66
+        ],
+        [
+          541,
+          51
+        ],
+        [
+          541,
+          21
+        ],
+        [
+          568,
+          6
+        ],
+        [
+          594,
+          21
+        ],
+        [
+          594,
+          51
+        ],
+        [
+          620,
+          66
+        ],
+        [
+          646,
+          51
+        ],
+        [
+          646,
+          21
+        ],
+        [
+          673,
+          6
+        ],
+        [
+          699,
+          21
+        ],
+        [
+          699,
+          51
+        ],
+        [
+          725,
+          66
+        ],
+        [
+          751,
+          51
+        ],
+        [
+          751,
+          21
+        ],
+        [
+          778,
+          6
+        ],
+        [
+          804,
+          21
+        ],
+        [
+          804,
+          51
+        ],
+        [
+          834,
+          58
+        ]
+      ],
+      "bareCountIncludingCarbonyl": 21,
+      "explicitH3CCarbonCount": 1,
+      "totalC": 22,
+      "O": 2,
+      "CCDouble": 6,
+      "explicitStart": {
+        "literal": "H₃C",
+        "bboxApprox": [
+          437,
+          0,
+          468,
+          16
+        ],
+        "anchor": "LAST C~463",
+        "bond": [
+          [
+            471,
+            12
+          ],
+          [
+            489,
+            21
+          ]
+        ]
+      },
+      "CCExtraParallelRays": [
+        [
+          [
+            488,
+            54
+          ],
+          [
+            514,
+            69
+          ]
+        ],
+        [
+          [
+            540,
+            18
+          ],
+          [
+            566,
+            4
+          ]
+        ],
+        [
+          [
+            593,
+            54
+          ],
+          [
+            619,
+            69
+          ]
+        ],
+        [
+          [
+            645,
+            18
+          ],
+          [
+            671,
+            4
+          ]
+        ],
+        [
+          [
+            698,
+            54
+          ],
+          [
+            724,
+            69
+          ]
+        ],
+        [
+          [
+            750,
+            18
+          ],
+          [
+            776,
+            4
+          ]
+        ]
+      ],
+      "CCMainBondVertexPairs1Based": [
+        [
+          2,
+          3
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          11,
+          12
+        ],
+        [
+          14,
+          15
+        ],
+        [
+          17,
+          18
+        ]
+      ],
+      "carbonyl": {
+        "bareC": [
+          834,
+          58
+        ],
+        "upperRay": [
+          [
+            832,
+            56
+          ],
+          [
+            849,
+            46
+          ]
+        ],
+        "lowerRay": [
+          [
+            834,
+            60
+          ],
+          [
+            852,
+            50
+          ]
+        ],
+        "upperO": {
+          "literal": "O",
+          "bboxApprox": [
+            853,
+            37,
+            865,
+            51
+          ]
+        },
+        "OH": {
+          "literal": "OH",
+          "bboxApprox": [
+            827,
+            83,
+            854,
+            97
+          ],
+          "anchor": "FIRST O~834"
+        },
+        "verticalOHArm": [
+          [
+            834,
+            60
+          ],
+          [
+            834,
+            79
+          ]
+        ],
+        "contact": "OwnrightCOmacro independently shows topfoot touching incoming shallow left slope, lowerfoot touching vertical stem/native small horizontal join. No full white gap; do not carry gap from other fattyacid sources.",
+        "rootUpperFootCalculated": [
+          832,
+          57.53333333333333
+        ]
+      },
+      "caption": {
+        "literal": "Docosahexaenoic acid (DHA)",
+        "bboxApprox": [
+          561,
+          86,
+          790,
+          102
+        ],
+        "baselineApprox": 100
+      }
+    },
+    "totalKnownPrinted": {
+      "C": 42,
+      "O": 4,
+      "CCDouble": 10,
+      "CODouble": 2
+    },
+    "noBranches": "Both open chains, no off-chain methyl branch except explicit terminal H3C text; no rings.",
+    "noAdded": [
+      "No omega numbering",
+      "No molecular formulas",
+      "No cis/trans symbols",
+      "No captions corrected from terminology",
+      "No added H on bare chain vertices"
+    ]
+  },
+  "measurementLimits": "Each side independently opened4x and vertexcount taken from actual ordered path, not name/formula. Coordinates nativeapprox ±1–2px; listed COfeet are approximate contact guides from actual ink, not exact calculated intersections. Some nearly periodic chain spacing is native visual repetition; eachlastCO has different slope, preserve.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootOwnReview": {
+    "nativeFull3x": true,
+    "nativeEachChainAndBothCO8x": true,
+    "allPublicDe": true,
+    "left20Right22CarbonsOwnCount": true,
+    "ArachidomicMConfirmed": true,
+    "allRegularUpright": true,
+    "sourceApproxNotSubpixel": true,
+    "feetCalculatedFromApproxIncomingSlopes": true,
+    "verticalOHArmsContinuousFromCOVertex": true
+  }
+}

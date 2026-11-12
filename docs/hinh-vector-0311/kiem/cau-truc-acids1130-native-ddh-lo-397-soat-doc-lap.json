@@ -1,0 +1,22 @@
+[
+  {
+    "i": 1130,
+    "hashSvg": "9d18501cd0315041975711060ef5656166acba799924bfbb84c5d09fec10f852",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-ESTER-TN-II-36.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và từng hai mạch/CO/captionmacros. Trái20C4CCdouble/phải22C6CCdouble tổng42C4O; H₃CneoCcuối/sub3, OHneoOđầu đúng. Hai CO hai tia contact incomingLEFTslope và RIGHTverticalOHarm theo nguồn, không crossbar/gap giả. Tất cả thường thẳng, literal Arachidomic acid (ARA) m không n và Docosahexaenoic acid (DHA) đúng; không thấy chạm/cắt/tràn hay H/tênomega/số/stereo/đápán thêm. Không dùng alias; giao điểm tính không nhận là đo subpixel nguồn.",
+    "render": "/workspace/scratch/soat397-1130-fresh.png",
+    "macro": [
+      "/workspace/scratch/acids1130-left.png",
+      "/workspace/scratch/acids1130-right.png",
+      "/workspace/scratch/acids1130-coleft.png",
+      "/workspace/scratch/acids1130-coright.png"
+    ],
+    "hash": "cae704cdbfb0c3fadbc7ba1ef8f682c5560bc25dfce466654249de2f7baaff26",
+    "hashSvgDaSoat": "9d18501cd0315041975711060ef5656166acba799924bfbb84c5d09fec10f852",
+    "runtimeProof": {
+      "file": "/workspace/scratch/acids1130-runtime.log",
+      "sha256": "36c35327c6e4068f31803309dff7217f80d2b67ebd3ccfe26e0b039e417aae3c",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/acids1130-native-ddh-9d18501cd0315041975711060ef5656166acba799924bfbb84c5d09fec10f852.svg 9d18501cd0315041975711060ef5656166acba799924bfbb84c5d09fec10f852\n1130 { x: 0, y: 0, width: 866, height: 106 }\nPOSTSHOT_SHA 9d18501cd0315041975711060ef5656166acba799924bfbb84c5d09fec10f852\nCOMMAND node /workspace/scratch/agent-render397.cjs; content actual SVG bytes fs.readFileSync(p+m.svg) via page.setContent\n"
+    }
+  }
+]
