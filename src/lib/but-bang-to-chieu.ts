@@ -42,6 +42,13 @@ canvas.mc-but-song{z-index:30}
 /* 12/11 · lớp BẢNG ĐẶC (vẽ thẳng lên màn): nằm trong cột bảng, làm nền của nó — dưới thẻ tên / chữ của cột, dưới thanh bút */
 canvas.mc-but-bang{position:absolute;z-index:-1;pointer-events:none;border-radius:inherit;image-rendering:pixelated}
 .mc-cot-nhanh{isolation:isolate}
+/* thanh bút: dáng gọn + hút mép + tự mờ ở but-thanh-hut-to-chieu.ts (nối cuối chuỗi này, ghi đè các luật dưới) */
+.mc-but-cu{gap:calc(var(--u)*.3);padding:calc(var(--u)*.3) calc(var(--u)*.55);border:1px solid color-mix(in srgb,var(--mc-b) 16%,transparent);user-select:none;-webkit-user-select:none;white-space:nowrap}
+.mc-but-cu .mc-m.mc-chon{border-color:transparent;transform:scale(.8);box-shadow:0 0 0 calc(var(--u)*.14) var(--mc-thanh2),0 0 0 calc(var(--u)*.3) var(--mc-b)}
+.mc-but-cu .mc-bv{flex:none;width:1px;align-self:stretch;margin:calc(var(--u)*.25) calc(var(--u)*.2);background:color-mix(in srgb,var(--mc-b) 22%,transparent)}
+.mc-but-cu .mc-n svg{width:1.2em;height:1.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mc-but-cu .mc-bc i{display:block;border-radius:50%;background:currentColor}
+.mc-but-cu kbd{font:inherit;font-size:.8em;opacity:.7;padding:0 .35em;border-radius:.3em;border:1px solid color-mix(in srgb,currentColor 45%,transparent)}
 /* ô đo bút (Alt + B): góc dưới trái, không bắt con trỏ ⇒ vẫn viết xuyên qua được */
 .mc-but-do{position:fixed;left:calc(var(--u)*1);bottom:calc(var(--u)*5.2);z-index:31;min-width:calc(var(--u)*30);padding:calc(var(--u)*.7) calc(var(--u)*1);border-radius:calc(var(--u)*.7);background:var(--mc-thanh2);color:var(--mc-b);border:1px solid color-mix(in srgb,var(--mc-b) 18%,transparent);font:500 max(13px,calc(var(--u)*.92))/1.5 var(--mc-sans);pointer-events:none;font-variant-numeric:tabular-nums}
 .mc-but-do[hidden]{display:none}

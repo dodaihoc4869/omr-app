@@ -4,8 +4,8 @@
 //   · `CSS_THANH_HUT` nối vào cuối `CSS_BUT_BANG`; `JS_THANH_HUT` chèn vào GIỮA `JS_BUT_BANG` (but-bang-to-chieu.ts), cùng phạm vi với bộ máy bút:
 //     butCu · S · B · u · datThanh · oThanh. Tách tệp riêng vì cổng cỡ tệp.
 //   · DÁNG: ô bấm vuông `--o` (≥ 32 px) xếp sát nhau, hình bên trong nhỏ (chấm màu 14 px, biểu tượng 16 px); thanh dày `--o` − 2 px, nền kính tối.
-//   · HÚT MÉP: nắm thanh (vùng chấm ở đầu thanh, nền thanh, hoặc kéo từ một nút quá ngưỡng) ⇒ thả ra thanh trượt 180 ms và dính mép GẦN NHẤT
-//     (trên / dưới / trái / phải), giữ chỗ dọc theo mép; mép trái / phải ⇒ xếp dọc; mép dưới ⇒ nằm trên thanh đáy `.mc-thanh`.
+//   · HÚT MÉP: nắm thanh (vùng chấm ở đầu thanh, nền thanh, hoặc kéo từ một nút quá ngưỡng) ⇒ thả ra thanh trượt 180 ms và dính mép GẦN CON TRỎ NHẤT
+//     (trên / dưới / trái / phải), giữ chỗ dọc theo mép (đổi ngang ↔ dọc thì tâm thanh về chỗ con trỏ); mép trái / phải ⇒ xếp dọc; mép dưới ⇒ nằm trên thanh đáy `.mc-thanh`.
 //     Nhớ ở localStorage `ddh.but.thanh` = «mép:tỉ lệ» (tỉ lệ = tâm thanh / bề dài mép, 0..1). Chưa nhớ ⇒ mép trên, chỗ như cũ
 //     (giữa màn; tờ có cột bảng đen ⇒ sát mép trái cột bảng).
 //   · TỰ MỜ: nghỉ ⇒ mờ 0,32 + lùi 6 px sát mép; con trỏ (không đè nút) vào vùng 24 px quanh thanh hoặc tiêu điểm bàn phím trong thanh ⇒ sáng;
@@ -24,7 +24,7 @@ const MEP: MepHut[] = ['tren', 'duoi', 'trai', 'phai']
 /** Kẹp v vào [a, b]; khoảng rỗng (b < a: thanh dài hơn màn) ⇒ a. */
 export function kepHut(v: number, a: number, b: number): number { return b < a ? a : v < a ? a : v > b ? b : v }
 
-/** Mép gần tâm thanh nhất. `day` = bề cao thanh đáy (mép dưới tính từ đỉnh thanh đáy). Hoà ⇒ trên, dưới, trái, phải. */
+/** Mép gần điểm (cx, cy) nhất — tờ đưa vào chỗ con trỏ lúc thả. `day` = bề cao thanh đáy (mép dưới tính từ đỉnh thanh đáy). Hoà ⇒ trên, dưới, trái, phải. */
 export function chonMepHut(cx: number, cy: number, W: number, H: number, day: number): MepHut {
   const d = [cy, H - day - cy, cx, W - cx]
   let k = 0
@@ -65,15 +65,14 @@ export const CSS_THANH_HUT = `
 .mc-but-cu .mc-m,.mc-but-cu .mc-n{flex:none;box-sizing:border-box;width:var(--o);height:var(--o);min-width:0;min-height:0;margin:-2px 0;border:0;border-radius:50%;background-clip:content-box!important}
 .mc-but-cu[data-mep=trai] button,.mc-but-cu[data-mep=phai] button{margin:0 -2px}
 .mc-but-cu .mc-m{padding:calc(var(--o)/2 - 7px)}
-.mc-but-cu .mc-m.mc-chon{outline:1.5px solid var(--mc-b);outline-offset:calc(11px - var(--o)/2)}
+.mc-but-cu .mc-m.mc-chon{transform:none;box-shadow:none;outline:1.5px solid var(--mc-b);outline-offset:calc(11px - var(--o)/2)}
 .mc-but-cu .mc-n{display:inline-flex;align-items:center;justify-content:center;padding:4px;background-color:transparent}
 .mc-but-cu .mc-n:hover{background-color:color-mix(in srgb,var(--mc-b) 16%,transparent)}
 .mc-but-cu .mc-n.mc-chon{background-color:var(--mc-b)}
 .mc-but-cu .mc-n[disabled]{opacity:.32;cursor:default;background-color:transparent}
 .mc-but-cu button:focus-visible{outline:2px solid var(--mc-vang-noi);outline-offset:-3px}
-.mc-but-cu .mc-n svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.mc-but-cu .mc-bc i{display:block;border-radius:50%;background:currentColor}
-.mc-but-cu .mc-bv{flex:none;width:1px;height:14px;margin:0 3px;background:color-mix(in srgb,var(--mc-b) 22%,transparent)}
+.mc-but-cu .mc-n svg{width:16px;height:16px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mc-but-cu .mc-bv{align-self:center;height:14px;margin:0 3px}
 .mc-but-cu[data-mep=trai] .mc-bv,.mc-but-cu[data-mep=phai] .mc-bv{width:14px;height:1px;margin:3px 0}
 @media (prefers-reduced-motion:reduce){.mc-but-cu{transition:none}}
 `
@@ -142,15 +141,17 @@ export const JS_THANH_HUT = `${JS_LOI_HUT}
     if (k !== hGan) { hGan = k; hutSang(k); }
   }, { passive: true });
   function hutTha(e) {
-    var k = hKeo, W = window.innerWidth, H = window.innerHeight, cx, cy, m;
+    var k = hKeo, W = window.innerWidth, H = window.innerHeight, cx, cy, m, ngang, tx, ty;
     if (!k || e.pointerId !== k.id) return;
     hKeo = null;
 ` + /* thả xong luôn hẹn mờ; con trỏ còn ở gần thì lần rê kế tiếp bật sáng lại */ `
     hGan = false; hutSang(false);
     if (!k.keo) return;
     cx = k.l + k.dx + butCu.offsetWidth / 2; cy = k.t + k.dy + butCu.offsetHeight / 2;
-    m = HUT.mep(cx, cy, W, H, hutDay());
-    hNho = { mep: m, t: Math.min(1, Math.max(0, m === 'tren' || m === 'duoi' ? cx / W : cy / H)) };
+` + /* mép = mép gần CON TRỎ nhất. Chỗ dọc mép: thanh giữ nguyên chiều ⇒ đúng chỗ vừa kéo tới; thanh đổi ngang ↔ dọc ⇒ tâm thanh về chỗ con trỏ */ `
+    m = HUT.mep(e.clientX, e.clientY, W, H, hutDay()); ngang = m === 'tren' || m === 'duoi';
+    if (ngang !== (butCu.offsetWidth >= butCu.offsetHeight)) { tx = e.clientX; ty = e.clientY; } else { tx = cx; ty = cy; }
+    hNho = { mep: m, t: Math.min(1, Math.max(0, ngang ? tx / W : ty / H)) };
     try { window.localStorage.setItem('ddh.but.thanh', HUT.ghi(hNho.mep, hNho.t)); } catch (e2) {}
 ` + /* đặt vào chỗ mới ngay, rồi trượt từ chỗ vừa thả về (tâm → tâm, vì thanh có thể vừa đổi ngang ↔ dọc) */ `
     butCu.style.transform = ''; henThanh();

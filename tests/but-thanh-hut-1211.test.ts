@@ -80,6 +80,10 @@ describe('thanh bút hút mép · công thức thuần', () => {
   })
 })
 
+// ───────────────────────── gắn vào tờ chiếu (JSDOM) ─────────────────────────
+const cau = (id: string) => ({ phan: 'I', id, maDe: '', chuyenDe: 'x', dang: 'x', sao: 1, mucDo: '', text: 'Đề bài.', luaChon: ['Một', 'Hai', 'Ba', 'Bốn'], dapAn: 'B', chot: 'Cốt lõi.', lyDo: [], buoc: [] }) as unknown as OBang['cau']
+const o = (sbd: string, hoTen: string): OBang => ({ sbd, hoTen, qid: `DE-I-${sbd}`, soCau: 3, sao: 1, cau: cau(`DE-I-${sbd}`), bacUoc: 2, lop: '12A1', lanLenBang: 1 } as OBang)
+
 describe('thanh bút hút mép · chuỗi chèn vào tờ', () => {
   it('ES5, không backtick, không ${ — cùng luật với các đoạn JS khác của tờ', () => {
     for (const js of [JS_LOI_HUT, JS_THANH_HUT]) {
@@ -110,9 +114,6 @@ describe('thanh bút hút mép · chuỗi chèn vào tờ', () => {
   })
 })
 
-// ───────────────────────── gắn vào tờ chiếu (JSDOM) ─────────────────────────
-const cau = (id: string) => ({ phan: 'I', id, maDe: '', chuyenDe: 'x', dang: 'x', sao: 1, mucDo: '', text: 'Đề bài.', luaChon: ['Một', 'Hai', 'Ba', 'Bốn'], dapAn: 'B', chot: 'Cốt lõi.', lyDo: [], buoc: [] }) as unknown as OBang['cau']
-const o = (sbd: string, hoTen: string): OBang => ({ sbd, hoTen, qid: `DE-I-${sbd}`, soCau: 3, sao: 1, cau: cau(`DE-I-${sbd}`), bacUoc: 2, lop: '12A1', lanLenBang: 1 } as OBang)
 function moTo(nho?: string) {
   const hen: (() => void)[] = []
   const dom = new JSDOM(taoHtmlMayChieu([o('A', 'An'), o('B', 'Bình')]), {
@@ -176,13 +177,13 @@ describe('thanh bút hút mép · trên tờ thật (JSDOM)', () => {
     expect(t.thanh().classList.contains('mc-keo')).toBe(false); expect(t.nho()).toBeNull(); expect(t.thanh().getAttribute('data-mep')).toBe('tren')
     t.thanh().querySelector<HTMLButtonElement>('.mc-m[aria-label="Phấn vàng"]')!.click()
     expect(t.thanh().querySelector('.mc-m.mc-chon')!.getAttribute('aria-label')).toBe('Phấn vàng')
-    // JSDOM: cửa sổ 1024 × 768, thanh 0 × 0 tại (0, 0) ⇒ tâm sau khi kéo = quãng kéo (980, 300): gần mép phải nhất
+    // JSDOM: cửa sổ 1024 × 768, thanh 0 × 0 tại (0, 0) ⇒ tâm sau khi kéo = quãng kéo (980, 300); con trỏ thả ở (990, 310): gần mép phải nhất
     t.tro(t.thanh(), 'pointerdown', 10, 10); t.tro(t.doc, 'pointermove', 500, 200)
     expect(t.thanh().classList.contains('mc-keo')).toBe(true); expect(t.thanh().style.transform).toBe('translate(490px,190px)')
     t.tro(t.doc, 'pointermove', 990, 310); t.tro(t.doc, 'pointerup', 990, 310, 0)
     expect(t.thanh().classList.contains('mc-keo')).toBe(false); expect(t.thanh().style.transform).toBe('')
     expect(t.thanh().getAttribute('data-mep')).toBe('phai')
-    expect(t.nho()).toBe(ghiNhoThanhHut('phai', 300 / 768))
+    expect(t.nho()).toBe(ghiNhoThanhHut('phai', 310 / 768))
     expect(t.thanh().querySelector('.mc-m.mc-chon')!.getAttribute('aria-label'), 'kéo thanh không đổi bút').toBe('Phấn vàng')
   })
   it('cú bấm sinh ra ngay sau khi thả thanh không bấm nhầm vào nút; cú bấm sau đó vẫn bình thường', () => {
