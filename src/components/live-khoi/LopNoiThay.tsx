@@ -19,6 +19,9 @@ const HoiHieuThay = lazy(() => import('./HoiHieuThay'))
 const LuatRoiThay = lazy(() => import('./LuatRoiThay'))
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
 
+/** Có tờ RIÊNG đang mở (lớp phủ tờ chiếu không phải tờ Bình Phản Ứng)? Lớp phủ là cổng gắn thẳng vào <body> ⇒ chỉ theo dõi con trực tiếp của body. */
+const coToRieng = (): boolean => !!document.querySelector('.lop-xem-phieu:not([aria-label="Tờ chiếu Bình Phản Ứng"])')
+const ngheToRieng = (f: () => void): (() => void) => { const mo = new MutationObserver(f); mo.observe(document.body, { childList: true }); return () => mo.disconnect() }
 export default function LopNoiThay() {
   const v = useSyncExternalStore(dangKy, layView)
   const k = v?.live?.khoi ?? null
@@ -47,6 +50,7 @@ export default function LopNoiThay() {
   }, [])
   // Tấm hoạt động đang nằm TRÊN tờ của bảng (thầy Esc từ màn chiếu về tấm để chọn câu kế) ⇒ một nút «Về màn chiếu»: tờ lên lại nguyên trạng, tấm vẫn mở bên dưới.
   const [hdTren, setHdTren] = useState(false)
+  const toRieng = useSyncExternalStore(ngheToRieng, coToRieng) // tờ riêng của tấm hoạt động đang mở ⇒ ẩn nút nổi «Về màn chiếu»
   useEffect(() => { const f = (e: Event) => setHdTren((e as CustomEvent<boolean>).detail === true); window.addEventListener('bpu-hd-tren', f); return () => window.removeEventListener('bpu-hd-tren', f) }, [])
   const sanh = dang && (sanhTay ?? k.che === 'sanh')
   const [k1, setK1] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
@@ -165,7 +169,7 @@ export default function LopNoiThay() {
   if (k.gd === 'cho') return <div className="lkt" style={KIEU}><PhongChoThay v={v} khoi={k.k} /></div>
   return (
     <div className="lkt" style={KIEU}>
-      {!sanh && !chon && hdMo && hdTren && coTo() ? <button type="button" className="lkt-ve chinh lkt-ve-noi" onClick={toLenTren}>Về màn chiếu</button> : null}
+      {!sanh && !chon && hdMo && hdTren && !toRieng && coTo() ? <button type="button" className="lkt-ve chinh lkt-ve-noi" onClick={toLenTren}>Về màn chiếu</button> : null}
       {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} loi={loi} coVe={coToChieu()} onChe={(c) => doiChe(c, true)} onDong={() => setSanh(false)} /> : null}
       {chon ? (
         <div className="lkt-chon"><div className="lkt-san-khau" style={{ ['--k' as string]: k1 }}>

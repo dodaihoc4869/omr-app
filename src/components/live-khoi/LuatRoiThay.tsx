@@ -12,7 +12,9 @@ export default function LuatRoiThay({ luat, ds, onDuyet }: { luat: LuatBang; ds:
   if (!luat.ra.length && !luat.cam.length && !nhac.length && !luat.so.length) return null
   const chep = (): void => {
     const t = tinBaoVanPhong(luat, ten)
-    void (navigator.clipboard?.writeText(t) ?? Promise.reject(new Error('không có bộ nhớ tạm'))).then(() => { setDaChep(true); setTimeout(() => setDaChep(false), 2200) }, () => { window.prompt('Chép tin này gửi Javis DDH:', t) })
+    const xong = (): void => { setDaChep(true); setTimeout(() => setDaChep(false), 2200) }
+    const duPhong = (): void => { const o = document.createElement('textarea'); o.value = t; o.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(o); o.select(); try { if (document.execCommand('copy')) xong() } catch { /* máy không cho chép */ } o.remove() }
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(t).then(xong, duPhong); else duPhong()
   }
   const doi = (s: string): string => { const e = em.get(s); return e && DOI_BPU[e.doi] ? `${DOI_BPU[e.doi]!.ten} · ` : '' }
   return (
