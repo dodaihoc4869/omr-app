@@ -57,3 +57,9 @@ export async function dungBanditLopNeuCu(env: Env, now: number): Promise<{ dung:
   const gianh = Number(r[1]?.meta?.changes ?? 0) > 0
   return gianh ? { dung: true, soDong: Number(r[3]?.meta?.changes ?? 0) } : { dung: false }
 }
+
+/** Cron mỗi phút (index.ts `scheduled`): cạnh lớp (G1) rồi bandit lớp — mỗi việc lỗi riêng chỉ ghi log, như dòng cron cũ của cạnh lớp. */
+export async function dungCanhVaBanditLop(env: Env): Promise<void> {
+  await import('./hanh-trinh-canh-lop').then((m) => m.dungCanhLopNeuCu(env, Date.now())).catch((e) => console.error('[canh-lop]', e))
+  await dungBanditLopNeuCu(env, Date.now()).catch((e) => console.error('[bandit-lop]', e))
+}

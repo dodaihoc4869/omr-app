@@ -2,7 +2,7 @@
 // H3 đợt 3 giảm chi phí D1 (12/11 tối): câu đọc bảng phụ / cron — so cũ↔mới trên D1 thật trong bộ nhớ + khoá kế hoạch truy vấn (EXPLAIN QUERY PLAN).
 import { describe, it, expect } from 'vitest'
 import { taoD1That } from './_d1-that'
-import { SQL_BANDIT_CU, SQL_BANDIT_DOC, docBanditLop, dungBanditLopNeuCu, HAN_DUNG_BANDIT_MS, CUA_SO_BANDIT_MS, chuKyDungBandit } from '../server/src/hanh-trinh-bandit-lop'
+import { SQL_BANDIT_CU, SQL_BANDIT_DOC, docBanditLop, dungBanditLopNeuCu, dungCanhVaBanditLop, HAN_DUNG_BANDIT_MS, CUA_SO_BANDIT_MS, chuKyDungBandit } from '../server/src/hanh-trinh-bandit-lop'
 import { metaKt, sqlDocKtCnMeta, sqlDocKtCnMetaCu, dongBoKtCn, PHUT_BU_META_KT, docKtCn } from '../server/src/kiem-tra-ca-nhan'
 import { sqlGvKtCn, sqlGvKtCnCu, gvKtCn } from '../server/src/kiem-tra-ca-nhan-thay'
 import { SQL_KT_CN } from '../server/src/kiem-tra-ca-nhan-schema'
@@ -54,6 +54,14 @@ describe('Q2 bandit cả lớp cộng sẵn', () => {
     const T3 = T2 + HAN_DUNG_BANDIT_MS + 1
     d.sql.prepare("UPDATE hanh_trinh_v4_can_thiep SET ket_qua=0 WHERE context='yeu'").run()
     expect((await docBanditLop(d.env, T3)).results).toEqual(cuBandit(d.sql, T3))
+  })
+  it('móc cron (index.ts) dựng cả cạnh lớp lẫn bandit lớp', async () => {
+    const d = taoD1That(); napCanThiep(d.sql)
+    await dungCanhVaBanditLop(d.env)
+    expect((d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v4_bandit_lop_moc WHERE luc>0').get() as { n: number }).n).toBe(1)
+    expect((d.sql.prepare('SELECT COUNT(*) n FROM hanh_trinh_v4_canh_lop_moc WHERE luc>0').get() as { n: number }).n).toBe(1)
+    const { readFileSync } = await import('node:fs')
+    expect(readFileSync('server/src/index.ts', 'utf8')).toContain("import('./hanh-trinh-bandit-lop').then(m=>m.dungCanhVaBanditLop(env))")
   })
   it('lô giành mốc: hai cron cùng phút chỉ một lô dựng', async () => {
     const d = taoD1That(); napCanThiep(d.sql)
