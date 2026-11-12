@@ -39,6 +39,12 @@ html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH'
 .so i { width: 2px; height: 55%; background: var(--hs); margin-left: 3px; }
 .phim { display: flex; gap: calc(5px * var(--k)); flex: 1 1 auto; }
 .phim .nut { min-width: calc(34px * var(--k)); }
+/* THANH XÁM NHỎ ở mép dưới đề: dải chọn thu vào đây, chạm thì hiện, không chạm thì tự thu */
+.nam-duoi { position: absolute; left: 50%; bottom: calc(5px * var(--k)); transform: translateX(-50%); width: calc(92px * var(--k)); height: calc(9px * var(--k)); min-height: 6px; border-radius: 99px; background: #8d979c; box-shadow: 0 1px 0 rgba(255,255,255,.5), 0 2px 6px rgba(0,0,0,.18); }
+.nam-duoi.cham::after { content: ''; position: absolute; right: calc(-14px * var(--k)); top: 50%; width: calc(8px * var(--k)); height: calc(8px * var(--k)); min-width: 6px; min-height: 6px; margin-top: calc(-4px * var(--k)); border-radius: 50%; background: var(--hs); }
+.dai.co-nam { padding-top: calc(16px * var(--k)); }
+.dai.co-nam::before { content: ''; position: absolute; left: 50%; top: calc(5px * var(--k)); transform: translateX(-50%); width: calc(64px * var(--k)); height: calc(6px * var(--k)); min-height: 4px; border-radius: 99px; background: #6f7b82; }
+.ghi { position: absolute; left: 50%; bottom: calc(24px * var(--k)); transform: translateX(-50%); padding: calc(6px * var(--k)) calc(14px * var(--k)); border-radius: 99px; background: rgba(32,44,51,.9); color: var(--chu2); font-size: calc(14px * var(--k)); font-weight: 700; white-space: nowrap; }
 /* dải kết quả gọn (không còn thẻ Đạt / Chưa đạt) */
 .kq { position: absolute; left: calc(10px * var(--k)); bottom: calc(10px * var(--k)); padding: calc(11px * var(--k)) calc(20px * var(--k)); border-radius: 99px; background: rgba(32,44,51,.97); color: var(--vang); font-size: calc(17px * var(--k)); font-weight: 800; }
 /* CON DẤU — đè giữa CẢ MÀN (cả đề lẫn bảng) */
@@ -67,6 +73,9 @@ var h = ''
 if (k === 'ds') h = '<div class="man">' + giay(DE.ds, daiDs('D S ')) + bangTrong + '</div>'
 if (k === 'tn') h = '<div class="man">' + giay(DE.tn, daiTn('B')) + bangTrong + '</div>'
 if (k === 'so') h = '<div class="man">' + giay(DE.so, daiSo()) + bangTrong + '</div>'
+if (k === 'thu') h = '<div class="man">' + giay(DE.ds, '<i class="nam-duoi cham"></i>') + bangTrong + '</div>'
+if (k === 'thu-moi') h = '<div class="man">' + giay(DE.ds, '<span class="ghi">Chạm thanh xám để chọn đáp án</span><i class="nam-duoi"></i>') + bangTrong + '</div>'
+if (k === 'mo') h = '<div class="man">' + giay(DE.ds, daiDs('D S ').replace('class="dai"', 'class="dai co-nam"')) + bangTrong + '</div>'
 if (k === 'dau') h = '<div class="man" style="grid-template-columns:66fr 34fr">' + giay(DE.ds, '<div class="kq">Chưa đúng · +50 kJ</div>') + bangNet + '</div><div class="dau">KHÔNG ĐẠT<small>ĐỖ ĐẠI HỌC · LÊN BẢNG</small></div>'
 if (k === 'thay') h = '<div class="man thay">' + giay(DE.ds).replace('font-size', 'x') + '<section class="bang" style="border:0"><div class="the">Nguyễn Thị Hà</div><svg class="net" viewBox="0 0 300 160" fill="none" stroke="#e8eef2" stroke-width="2.4" stroke-linecap="round"><path d="M10 30 q20 -22 40 0 t40 0 M110 30 h60"/><path d="M30 80 q30 -10 60 0 M40 110 h110"/></svg></section><footer class="thanh"><span class="live">● LIVE 14:20</span><span style="color:#f5a524">◂ Câu 2/5 ▸</span><span style="background:#cfe3ff;color:#12325f;padding:5px 12px;border-radius:99px;font-size:14px">ĐANG CHỮA</span></footer></div><div class="dau dat">ĐẠT<small>NGUYỄN THỊ HÀ · LÊN BẢNG</small></div>'
 document.getElementById('goc').innerHTML = h

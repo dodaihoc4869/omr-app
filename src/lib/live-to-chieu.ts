@@ -507,6 +507,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
     if (m.lenh === 'live-bao') { baoNhanh(String(m.chu || ''), 4200); return; }
     if (m.lenh === 'live-nop') { lvNop(m); return; }
+    if (m.lenh === 'live-anh') { LV.vungCu = ''; LV.giayCu = ''; lvAnh(); lvBaoGiay(); return; } // app vừa chọn tờ này làm nguồn ⇒ gửi lại toàn bộ bảng + giấy
     if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; LV.lkChat = m.chat === true; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
     if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl') { LV.bangNhap = 1; if (m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); } return; }
     if (m.lenh !== 'live-tt') return;
@@ -528,10 +529,10 @@ export const JS_LIVE_TO_CHIEU = `
     if (!k) return;
     if (!g) {
       g = LV.lk = document.createElement('div'); g.className = 'mc-khay-nhom mc-khay-lk'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Buổi live');
-      g.innerHTML = '<span class="mc-khay-ten" aria-hidden="true">Buổi live</span>';
+      g.innerHTML = '<span class="mc-khay-ten" aria-hidden="true">Buổi live · phím Tab đổi Học ⇄ Bảng</span>';
       ds = [['hoc', 'Học'], ['bang', 'Bảng'], ['lop', 'Lớp'], ['chon', 'Chọn bài'], ['chat', 'Tin nhắn']];
       for (i = 0; i < ds.length; i++) { b = document.createElement('button'); b.type = 'button'; b.className = 'mc-nut-phim'; b.setAttribute('data-lk', ds[i][0]); b.innerHTML = '<span class="mc-nut-chu">' + ds[i][1] + '</span>'; g.appendChild(b); }
-      g.addEventListener('click', function (e) { var n = e.target.closest ? e.target.closest('[data-lk]') : null; if (n) lvGui('lk', { v: n.getAttribute('data-lk') }); });
+      g.addEventListener('click', function (e) { var n = e.target.closest ? e.target.closest('[data-lk]') : null, v = n ? n.getAttribute('data-lk') : ''; if (v === 'hoc' || v === 'bang') lvDoiChe(v); else if (n) lvGui('lk', { v: v }); });
       k.insertBefore(g, k.firstChild);
       // khay vừa mở ⇒ báo app thu cột tin nhắn (cột nằm ngay trên thanh đáy bên phải, đè đúng chỗ khay; tờ nằm dưới lớp của app nên không tự nổi lên được)
       if (window.MutationObserver) new MutationObserver(function () { var mo = document.body.classList.contains('mc-khay-mo'); if (mo && !LV.lkMo) lvGui('lk', { v: 'khay' }); LV.lkMo = mo; }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
@@ -547,22 +548,32 @@ export const JS_LIVE_TO_CHIEU = `
   // Cột tin nhắn của app đang mở mà thầy bấm vào tờ (ngoài khay nút bốn ô) ⇒ báo app thu cột (app không thấy được cú bấm trong tờ).
   document.addEventListener('pointerdown', function (e) { var t = e.target; if (!LV.lkChat || (t && t.closest && t.closest('#mc-khay,#mc-them'))) return; LV.lkChat = false; lvGui('lk', { v: 'ngoai' }); }, true);
   function lvCheBang() {
-    var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb;
+    var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb, doi;
     if (!trang && !(LV.tt && LV.tt.khoi)) return;
     b.classList.add('mc-lk');
     if (!trang) lvCoChu();
     setTimeout(lvNutLen, 0);
     cb = trang || !!(LV.tt && LV.tt.cheBang);
+    // ĐỔI NGAY KHI THẦY BẤM (phím Tab / khay): tờ bài đổi tức thì trên máy thầy, phòng xác nhận sau — phòng báo cùng giá trị thì thôi giữ; quá 2,5 giây chưa thấy thì theo phòng
+    if (!trang && LV.cheEp != null) { if (LV.cheEp === cb || Date.now() > LV.cheHan) LV.cheEp = null; else cb = LV.cheEp; }
+    doi = b.classList.contains('mc-che-bang') !== cb;
+    // ĐỔI BỐ CỤC TRƯỚC, ĐỔI TRANG BÚT SAU (thầy 12/11 «khi chuyển qua lại hai chế độ thì bị lỗi tọa độ bút»): sự kiện «trang» của bút mang ô giấy / ô bảng —
+    // trước đây đo lúc CHƯA đổi bố cục ⇒ máy em vẽ nét theo ô cũ tới khi tờ báo lại (~0,7 giây). Nay ô đo đúng bố cục mới ngay từ sự kiện đầu.
+    if (doi) { b.classList.toggle('mc-che-bang', cb); void b.offsetHeight; }
     // BẢNG CÓ TRANG RIÊNG (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang bl của bộ máy bút, tách khỏi nét của từng câu;
     // app giữ bản sao suốt buổi và trả lại khi tờ mới xin (đổi bài, bảng trắng ⇄ bài) — lệnh live-bang-nhap.
     if (window.__mcBut && window.__mcBut.rieng) window.__mcBut.rieng(cb ? 'bl' : '');
     lvLk(cb);
     // xin lại tới khi NHẬN được lúc đang ở trang bl (tờ bài vừa mở có thể còn «Bảng» một nhịp rồi sang «Học»: câu trả lời tới lúc đã rời trang bl ⇒ lần sau xin lại)
     if (cb && window.__mcBut && !LV.bangNhap && !LV.bangHen) LV.bangHen = setTimeout(function () { LV.bangHen = 0; lvGui('bang-xin'); }, 80);
-    if (b.classList.contains('mc-che-bang') === cb) return;
-    b.classList.toggle('mc-che-bang', cb);
+    if (!doi) return;
     try { window.dispatchEvent(new Event('resize')); } catch (e) {}
     if (window.__mcBut) { if (cb) window.__mcBut.bat(true); setTimeout(lvAnh, 150); }
+  }
+  // Thầy bấm đổi chế độ trên CHÍNH tờ này (phím Tab, nút Học / Bảng trong khay): đổi ngay rồi mới báo app. Tờ bảng trắng không tự đổi (app quyết về bài nào).
+  function lvDoiChe(v) {
+    if (!document.body.hasAttribute('data-bang-trang') && LV.tt && LV.tt.khoi) { LV.cheEp = v === 'bang'; LV.cheHan = Date.now() + 2500; lvCheBang(); }
+    lvGui('lk', { v: v });
   }
   lvCheBang();
 ${JS_LIVE_KHOI_TO_CHIEU}  window.__mcLive = { tt: function () { return LV.tt; }, bam: lvBam };

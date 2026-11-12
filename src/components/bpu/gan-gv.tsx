@@ -306,6 +306,8 @@ export function hdDuoi(): boolean { return !!hdKhung && !hdTren }
 export function coTo(): boolean { return !!toKhung }
 /** Đưa tờ của bảng lên trên tấm hoạt động (thầy chọn «Bảng» / về bài lúc tấm hoạt động còn mở bên dưới). */
 export function toLenTren(): void { datHdTren(false) }
+/** Đang có tờ chiếu HIỆN trên màn (tờ của bảng hoặc tờ riêng của tấm hoạt động — không tính tờ đang bị ẩn dưới tấm). */
+export function toDangHien(): boolean { try { return Array.from(document.querySelectorAll<HTMLElement>('.lop-xem-phieu')).some((k) => getComputedStyle(k).visibility !== 'hidden') } catch { return false } }
 export function hienHoatDong(): void { if (!hdKhung) return; datHdTren(true); if (khung && !bangAn()) { anViHd = true; anBang() } }
 export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
   const { default: Tam } = await import('./TamHoatDong')

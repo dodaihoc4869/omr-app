@@ -20,12 +20,16 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
     if (!sz || LV.coChu) return;
     LV.coChu = 1;
     try { goc = localStorage.getItem('mc-projector-scale'); luu = localStorage.getItem('mc-lk-scale'); } catch (e) {}
+    // tờ ghi cỡ chữ vào bộ nhớ «buổi trên lớp» ở MỌI lần đổi cỡ cửa sổ (kể cả lúc đổi Học ⇄ Bảng) ⇒ sau mỗi lần ấy trả lại giá trị của buổi trên lớp
+    function tra() { try { if (goc === null) localStorage.removeItem('mc-projector-scale'); else localStorage.setItem('mc-projector-scale', goc); } catch (e) {} }
     sz.value = luu || (parseFloat(sz.value) > 1.2 ? sz.value : '1.2');
     if (!sz.value) sz.value = '1.2';
     document.documentElement.style.setProperty('--mc-scale', sz.value);
     if (window.__mcFitOptions) window.__mcFitOptions();
     if (window.__mcBoCuc) window.__mcBoCuc.doiLai();
-    sz.addEventListener('change', function () { try { localStorage.setItem('mc-lk-scale', sz.value); if (goc === null) localStorage.removeItem('mc-projector-scale'); else localStorage.setItem('mc-projector-scale', goc); } catch (e) {} });
+    sz.addEventListener('change', function () { try { localStorage.setItem('mc-lk-scale', sz.value); } catch (e) {} tra(); });
+    window.addEventListener('resize', tra);
+    document.addEventListener('fullscreenchange', tra);
   }
   // LÊN BẢNG / CHẤM TRONG BUỔI LIVE THEO KHỐI (thầy 12/11 «lên bảng máy hs chưa hiện thông báo, bấm đạt không đạt cũng chưa hiện»). Buổi live bảng Bình
   // Phản Ứng ẩn nên mọi việc gọi / chấm làm TRÊN TỜ — tờ phải báo app để app gửi lệnh vào phòng (máy em hiện «… lên bảng», con dấu Đạt / Không đạt):
@@ -64,6 +68,14 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   function lvNutLen() { var n = document.getElementById('mc-len-bang'); if (!n || !lvKhoi() || lvPha() || lvS.bpuLen) return; if (n.hidden) n.hidden = false; if (n.disabled) n.disabled = false; if (n.textContent !== 'Lên bảng') n.textContent = 'Lên bảng'; }
   (function () { var n = document.getElementById('mc-len-bang'); if (!n) return; new MutationObserver(lvNutLen).observe(n, { attributes: true, attributeFilter: ['hidden', 'disabled'] }); })();
   document.addEventListener('click', function (e) { var t = e.target; if (t && t.closest && t.closest('#mc-len-bang')) lvXinGoi(e); }, true);
+  // PHÍM TAB = đổi Học ⇄ Bảng (thầy 12/11 «cho tôi một phím tắt trên bàn phím để chuyển đổi giữa hai chế độ cực kì mượt mà chuẩn xác»): đổi NGAY trên tờ
+  // (lvDoiChe) rồi báo app; nét của từng chế độ nằm ở trang bút riêng nên đổi qua lại không mất gì.
+  window.addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (e.key !== 'Tab' || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || !(LV.tt && LV.tt.khoi) || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return;
+    e.preventDefault(); e.stopImmediatePropagation();
+    lvDoiChe(body.classList.contains('mc-che-bang') ? 'hoc' : 'bang');
+  }, true);
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.
   window.addEventListener('keydown', function (e) { if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation(); }, true);
   document.addEventListener('keydown', function (e) { var t = e.target; if ((e.key !== 'l' && e.key !== 'L') || e.ctrlKey || e.metaKey || e.altKey || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return; lvXinGoi(e); }, true);

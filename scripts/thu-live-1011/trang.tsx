@@ -88,6 +88,16 @@ if (vai === 'gv') {
       ;(window as unknown as { __dongToRieng: () => void }).__dongToRieng = () => { g.unmount(); k.remove() }
       g.render(React.createElement(Khung, { html: '<!doctype html><html><body style="margin:0;background:#f4efe4;font:700 40px sans-serif"><div id="to-rieng" style="padding:60px">TỜ RIÊNG CỦA TẤM HOẠT ĐỘNG</div></body></html>', ten: 'Chữa câu khó · tờ chiếu', dong: () => { g.unmount(); k.remove() } }))
     }
+    // TỜ RIÊNG THẬT (12/11 chiều — lỗi toạ độ bút khi đổi Học ⇄ Bảng): đúng loại tờ mà tấm «Chữa câu khó» tự mở — tờ chiếu thật (bút, phần live, khay), dựng
+    // bằng `dungToChieuBpu` nhưng gắn trong <KhungXemPhieu> RIÊNG (không qua gan-gv `ganTo`) ⇒ bảng coi là «chưa có tờ của bảng».
+    ;(window as unknown as { __chieuToRiengThat: () => Promise<void> }).__chieuToRiengThat = async () => {
+      const [{ default: Khung }, { createRoot }, React, { dungToChieuBpu }] = await Promise.all([import('../../src/components/KhungXemPhieu'), import('react-dom/client'), import('react'), import('../../src/lib/bpu/to-chieu-bpu')])
+      const html = await dungToChieuBpu([cauGia('Q1', 'Alcohol nào sau đây là alcohol bậc II?', ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'])] as never, 'Chữa câu khó · thử')
+      const k = document.createElement('div'); k.setAttribute('data-to-rieng-that', ''); document.body.appendChild(k)
+      const g = createRoot(k)
+      ;(window as unknown as { __dongToRiengThat: () => void }).__dongToRiengThat = () => { g.unmount(); k.remove() }
+      g.render(React.createElement(Khung, { html, ten: 'Chữa câu khó · tờ chiếu thật', dong: () => { g.unmount(); k.remove() } }))
+    }
     ;(window as unknown as { __sanSang: boolean }).__sanSang = true
   })
 } else if (vai === 'em') {

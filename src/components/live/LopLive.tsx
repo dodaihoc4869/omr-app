@@ -42,7 +42,7 @@ import { DOI_BPU, kyHieu, tenNgan } from '../../lib/bpu/phong'
 import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '../../lib/live'
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
-import { anToanHinh, canXoayCss, giaiTrang, giuKhoaNgang } from './bo-cuc'
+import { anToanHinh, canXoayCss, giaiTrang } from './bo-cuc'
 import { laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
 import { DauDat, TamTra, type DuLieuTra } from './TamTra'
 import ChonLoa from './ChonLoa'
@@ -177,8 +177,6 @@ function BaoMatMang({ layLuc }: { layLuc: () => number }) {
 
 const mayYeu = (): boolean => typeof document !== 'undefined' && document.documentElement.classList.contains('may-yeu')
 const giamDong = (): boolean => mayYeu() || (typeof matchMedia !== 'undefined' && matchMedia('(prefers-reduced-motion: reduce)').matches)
-type HuongMan = { lock?: (h: string) => Promise<void>; unlock?: () => void; type?: string }
-const huongMan = (): HuongMan | null => (typeof screen !== 'undefined' ? ((screen as Screen & { orientation?: HuongMan }).orientation ?? null) : null)
 
 /** Dấu trạng thái rất nhỏ trên tay nắm (khay đóng vẫn biết): `nhan` = chữ cho trình đọc màn (nối vào nhãn của tay nắm). */
 export interface DauNam { loai: 'tieng' | 'mic' | 'tay' | 'mang' | 'tin' | 'loa'; nhan: string }
@@ -299,7 +297,7 @@ function useTinLk(): number {
   return n
 }
 
-export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so, lenBang, giuNgang, xoayDau, tra, onGui }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so, lenBang, xoayDau, tra, onGui }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -376,31 +374,9 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   /** Khay đã tự mở giới thiệu nút «Tiếng» trong buổi này chưa (một lần mỗi buổi, dù ở màn câu hỏi hay bảng live). */
   const daGioiThieu = useRef(false)
   const khiGioiThieu = useCallback(() => { daGioiThieu.current = true }, [])
-  // XOAY NGANG ở lớp NGOÀI (11/11 tối, thầy «khi chuyển câu thì máy hs đang ở màn hình ngang live thì câu hiện luôn theo kiểu xoay ngang không về dạng dọc
-  // nữa»): trước đây lớp bảng tự khoá rồi gỡ là NHẢ ⇒ thầy chuyển câu, máy khoá xoay hệ thống quay về dọc. Nay khoá từ lúc vào bảng tới hết live (`giuKhoaNgang`).
-  // Android khoá sau khi đã toàn màn hình; không khoá được ⇒ bảng xoay hình bằng CSS (`canXoayCss`), màn câu hỏi xoay theo (luat-man-live.tsx). Mọi lần
-  // khoá / nhả ⇒ «khoá xoay» 600 ms để bộ bắt rời màn không báo nhầm chia đôi (tat-man.ts).
-  const [daKhoa, setDaKhoa] = useState(false)
-  const canKhoa = giuKhoaNgang(che, !!giuNgang)
-  useEffect(() => {
-    if (!canKhoa) return
-    let song = true, khoaRoi = false
-    const khoa = () => {
-      const o = huongMan()
-      if (!o?.lock || !document.fullscreenElement) { khoaRoi = false; setDaKhoa(false); return }
-      khoaXoay()
-      // CHỈ ÉP NGANG, không khoá một chiều (thầy 12/11 lần 2 «chỉ ép ngang không khóa theo chiều cố định nào cả»): em cầm ngang bên nào máy tự theo bên ấy.
-      void o.lock('landscape').then(() => { if (song) { khoaRoi = true; khoaXoay(); setDaKhoa(true) } }, () => { if (song) { khoaRoi = false; setDaKhoa(false) } })
-    }
-    khoa()
-    document.addEventListener('fullscreenchange', khoa)
-    return () => {
-      song = false
-      document.removeEventListener('fullscreenchange', khoa)
-      if (khoaRoi) { khoaXoay(); try { huongMan()?.unlock?.() } catch { /* không hỗ trợ */ } }
-      setDaKhoa(false)
-    }
-  }, [canKhoa])
+  // (thầy 12/11 lần 3 «vẫn bắt xoay màn hình, khi vào live màn hình học sinh vẫn tự quay một lần, bỏ triệt để — ép ngang nhưng không khoá xoay»): KHÔNG gọi
+  // khoá xoay của hệ điều hành nữa (chính lệnh khoá làm máy tự quay). Máy cầm dọc ⇒ bảng xoay hình bằng CSS; em xoay máy thế nào tuỳ em.
+  const daKhoa = false
 
   const tinLk = useTinLk()
   // LIVE THEO KHỐI — lúc em ở bảng danh sách (lớp nổi che màn live): lớp nổi vẽ nút Giơ tay / tấm mời / mic và báo sang đây bằng sự kiện `ddh-lk`;

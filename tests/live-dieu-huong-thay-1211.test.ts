@@ -56,6 +56,7 @@ describe('Live theo khối — chữ đề trên máy em to hơn', () => {
     expect(ham).toContain("sz.value = luu || (parseFloat(sz.value) > 1.2 ? sz.value : '1.2')")
     expect(ham).toContain("localStorage.setItem('mc-lk-scale', sz.value)")
     expect(ham).toContain("localStorage.setItem('mc-projector-scale', goc)")
+    expect(ham).toContain("window.addEventListener('resize', tra);") // đổi Học ⇄ Bảng (đổi cỡ) không được ghi đè cỡ chữ buổi trên lớp
     expect(to).toContain('if (!trang) lvCoChu();')
   })
   it('đang chọn đáp án NGAY TRÊN ĐỀ (thầy 12/11 chiều, bản vẽ 23–25): ưu tiên giấy 78 %, em kéo vạch chia tới 90 %', () => {
@@ -100,8 +101,9 @@ describe('Live theo khối — toàn màn hình máy thầy và chiều xoay má
     expect(ganGv).toContain("boQid = ''; khoaToanMan(false)")
     expect(doc('src/lib/live-khoi-to-chieu.ts')).toContain("if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation();")
   })
-  it('máy em: chỉ ép NGANG (cầm bên nào cũng được), không khoá một chiều', () => {
-    for (const t of ['src/components/live/LopLive.tsx', 'src/components/live-khoi/LopNoiEm.tsx']) { expect(doc(t)).toMatch(/lock\??\.?\('landscape'\)/); expect(doc(t)).not.toContain("('landscape-primary')") }
+  it('máy em: chỉ ép NGANG bằng xoay hình trong app, KHÔNG khoá xoay của hệ điều hành', () => {
+    // (lần 3: «vẫn bắt xoay màn hình, khi vào live màn hình học sinh vẫn tự quay một lần, bỏ triệt để — ép ngang nhưng không khoá xoay») không còn lệnh khoá xoay nào
+    for (const t of ['src/components/live/LopLive.tsx', 'src/components/live-khoi/LopNoiEm.tsx']) { expect(doc(t)).not.toMatch(/\.lock\??\.?\(/); expect(doc(t)).not.toContain('landscape-primary') }
   })
   it('chế độ Bảng: thẻ tên em vừa lên bảng cũng ẩn', () => {
     expect(doc('src/lib/live-to-chieu.ts')).toContain('body.mc-che-bang .mc-em.bpu-the:not([hidden]){display:none!important}')

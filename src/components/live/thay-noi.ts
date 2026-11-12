@@ -240,6 +240,20 @@ function giuBang(ca = false): void {
   if (ca && !guong.net.length && bangLuu?.buoi === b && bangLuu.goi.net.length) return
   bangLuu = { buoi: b, goi: { v: 1, tiLe: guong.tiLe, net: guong.net.slice() } }
 }
+// MỘT NGUỒN DUY NHẤT (thầy 12/11 «khi chuyển qua lại hai chế độ thì bị lỗi tọa độ bút … phải cực kì mượt mà chuẩn xác»). Buổi live theo khối có thể có HAI tờ
+// cùng sống (tờ bài / tờ riêng của tấm hoạt động + bảng trắng đang bị che): trước đây tờ nào gửi tin sau cùng thì thành nguồn ⇒ nét và ô bảng của hai tờ lẫn
+// vào nhau trên máy em. Nay nguồn = tờ ĐANG HIỆN TRÊN CÙNG (lớp phủ `.lop-xem-phieu` cuối cùng không bị ẩn); tờ bị che gửi gì cũng bỏ; đổi nguồn ⇒ xin tờ mới
+// gửi lại toàn bộ bảng (`live-anh`).
+function toTren(): Window | null {
+  let t: Window | null = null
+  try { for (const k of Array.from(document.querySelectorAll<HTMLElement>('.lop-xem-phieu'))) { if (getComputedStyle(k).visibility === 'hidden') continue; const w = k.querySelector('iframe')?.contentWindow; if (w) t = w } } catch { /* test */ }
+  return t
+}
+function chonTo(): void {
+  if (!view?.live?.khoi) return
+  const tr = toTren()
+  if (tr && tr !== to) { to = tr; ttCu = ''; nopCu = ''; bangSan = false; guiTo({ lenh: 'live-anh' }) }
+}
 function guiTo(tin: Record<string, unknown>): void { try { to?.postMessage({ nguon: 'bpu-bang', ...tin }, '*') } catch { /* tờ đã đóng */ } }
 let ttCu = '', coEmNoi = false
 // XEM LẠI LIVE (11/11): máy ghi là mảnh nạp lười riêng, chỉ tải khi máy này đang giữ live; tự chạy khi live bật, tự dừng khi live tắt. Lỗi ghi không chặn live.
@@ -264,6 +278,7 @@ async function napLoa(): Promise<void> {
   bao()
 }
 function bao(): void {
+  chonTo()
   const tt = trangThai()
   soatGhi()
   // Nút Live trên bảng Bình Phản Ứng + thẻ gọn thay viền đỏ toàn màn khi đang giảng trên tờ.
@@ -331,6 +346,7 @@ function huy(): void {
 function nghe(): void {
   if (daNghe) return
   daNghe = true
+  for (const t of ['bpu-hd-tren', 'bpu-hd', 'bpu-to']) window.addEventListener(t, () => { setTimeout(() => { bao(); guiNop() }, 0); setTimeout(bao, 350) })
   ngheTin((tin) => {
     if (tin && typeof tin === 'object' && !(tin instanceof ArrayBuffer)) {
       const m = tin as { t?: string }
@@ -430,7 +446,8 @@ const vungCua = (v: unknown) => (v && typeof v === 'object' ? (v as { giay?: num
 export function nhanTinTo(d: unknown, nguon: Window | null): void {
   const m = (d ?? {}) as TinTo
   nghe()
-  if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false }
+  if (view?.live?.khoi && nguon) { const tr = toTren(); if (tr && tr !== nguon) return } // tờ đang bị che: không cho chen vào gương bảng
+  if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false; if (view?.live?.khoi && m.viec !== 'chao') guiTo({ lenh: 'live-anh' }) }
   switch (m.viec) {
     case 'chao': bangSan = false; nopCu = ''; bao(); guiNop(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); break
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break

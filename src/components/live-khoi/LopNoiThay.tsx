@@ -6,7 +6,7 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toLenTren } from '../bpu/gan-gv'
+import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toDangHien, toLenTren } from '../bpu/gan-gv'
 import { batTiengLai, dangKy, datKhoi, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
@@ -88,8 +88,10 @@ export default function LopNoiThay() {
       if (coBai) toLenTren(); else hienHoatDong()
       setSanh(false); setChon(false); datKhoi({ ...k, che: 'hoc' })
     } else {
-      toLenTren(); setSanh(false); setChon(false); datKhoi({ ...k, che: 'bang' })
-      if (!coTo()) dungBangTrang()
+      setSanh(false); setChon(false); datKhoi({ ...k, che: 'bang' })
+      // Tờ đang hiện (bài của bảng, tờ riêng của tấm hoạt động) ⇒ CHÍNH tờ ấy sang chế độ Bảng (trang bút riêng): không dựng tờ thứ hai, đổi tức thì, một nguồn nét.
+      if (toDangHien()) return
+      toLenTren(); if (!coTo()) dungBangTrang()
     }
   }
   const [moi, setMoi] = useState(0)
@@ -101,6 +103,18 @@ export default function LopNoiThay() {
   const lenhTo = useRef<(v: string) => void>(() => {})
   lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'khay' || v === 'ngoai') setChat(false) }
   useEffect(() => { const f = (e: Event) => lenhTo.current(String((e as CustomEvent<string>).detail)); window.addEventListener('ddh-lkt', f); return () => window.removeEventListener('ddh-lkt', f) }, [])
+  // PHÍM TAB ở cửa sổ app (tấm hoạt động, lúc tiêu điểm không nằm trong tờ) = đổi Học ⇄ Bảng; trong tờ thì tờ tự nghe (live-khoi-to-chieu.ts). Bảng danh sách /
+  // bảng chọn / đang gõ tin nhắn: Tab giữ nghĩa thường.
+  const tabDuoc = dang && !sanh && !chon
+  useEffect(() => {
+    if (!tabDuoc) return
+    const f = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || e.ctrlKey || e.metaKey || e.altKey || e.shiftKey || (e.target as HTMLElement | null)?.closest?.('input,textarea,select,[contenteditable]')) return
+      e.preventDefault(); lenhTo.current(layView()?.live?.khoi?.che === 'bang' ? 'hoc' : 'bang')
+    }
+    window.addEventListener('keydown', f, true)
+    return () => window.removeEventListener('keydown', f, true)
+  }, [tabDuoc])
   const moiBao = chat ? 0 : moi
   useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lkt-moi', { detail: { moi: moiBao, chat } })) }, [moiBao, chat])
   // BẤM RA NGOÀI ⇒ cột tin nhắn tự thu (thầy 12/11): bấm trong app (ngoài cột, ngoài cụm nút) thì thu tại đây; bấm vào tờ thì tờ báo về (`ngoai`).

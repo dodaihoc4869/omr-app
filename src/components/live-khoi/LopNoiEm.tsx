@@ -55,11 +55,11 @@ export default function LopNoiEm() {
   if (lamCu !== lamCau) { setLamCu(lamCau); if (lamCau) setChatMo(false) }
   const [sanhCu, setSanhCu] = useState(sanh)
   if (sanhCu !== sanh) { setSanhCu(sanh); if (!sanh) setBonDoi(null) }
-  // Phòng chờ: xin toàn màn hình + khoá ngang ở lần chạm đầu (trình duyệt chỉ cho sau thao tác của em); không được thì xoay hình.
+  // Phòng chờ: xin toàn màn hình ở lần chạm đầu (trình duyệt chỉ cho sau thao tác của em). KHÔNG khoá xoay hệ thống (thầy 12/11 lần 3) — máy dọc thì xoay hình.
   useEffect(() => {
     if (!cho) return
     const f = () => {
-      try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().then(() => (screen.orientation as unknown as { lock?: (o: string) => Promise<void> }).lock?.('landscape')).catch(() => {}) } catch { /* không hỗ trợ */ }
+      try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
     }
     window.addEventListener('pointerdown', f, { once: true })
     return () => window.removeEventListener('pointerdown', f)
