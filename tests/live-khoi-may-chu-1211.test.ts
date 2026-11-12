@@ -12,6 +12,7 @@ const lich = (o: Partial<LichLiveMc>): LichLiveMc => ({ id: 'a', khoi: 12, batDa
 describe('lịch live theo khối', () => {
   it('khối đọc từ lớp của em', () => {
     expect(khoiTuLop('12')).toBe(12); expect(khoiTuLop('11A2')).toBe(11); expect(khoiTuLop('Lớp 10 chuyên')).toBe(10)
+    expect(khoiTuLop('12 - Lớp Thường')).toBe(12); expect(khoiTuLop('11 - Tinh Hoa')).toBe(11)
     expect(khoiTuLop('')).toBeNull(); expect(khoiTuLop('9A')).toBeNull(); expect(khoiTuLop('112')).toBeNull()
   })
   it('đọc JSON hỏng / sai dạng ⇒ bỏ dòng sai, không ném lỗi', () => {

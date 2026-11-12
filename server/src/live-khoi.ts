@@ -64,8 +64,9 @@ const ghi = (env: Env, ds: readonly LichLiveMc[], nay: number) =>
 /** Sĩ số + số báo danh từng khối (em chưa khoá). Một lệnh D1. */
 async function emTheoKhoi(env: Env): Promise<Record<10 | 11 | 12, string[]>> {
   const ra: Record<10 | 11 | 12, string[]> = { 10: [], 11: [], 12: [] }
-  const r = await env.DB.prepare("SELECT sbd, lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'").all<Row>().then((x) => x.results ?? []).catch(() => [] as Row[])
-  for (const h of r) { const k = khoiTuLop(h.lop); if (k && str(h.sbd)) ra[k].push(str(h.sbd)) }
+  const r = await env.DB.prepare("SELECT sbd, lop, ten_lop FROM hoc_sinh WHERE COALESCE(trang_thai, '') <> 'khoa'").all<Row>().then((x) => x.results ?? []).catch(() => [] as Row[])
+  // Hồ sơ trống ô lớp nhưng có tên lớp («12 - Lớp Thường») ⇒ lấy khối từ tên lớp (soi 12/11: 3 em như vậy).
+  for (const h of r) { const k = khoiTuLop(h.lop) ?? khoiTuLop(h.ten_lop); if (k && str(h.sbd)) ra[k].push(str(h.sbd)) }
   return ra
 }
 const traDs = (ds: readonly LichLiveMc[], em: Record<10 | 11 | 12, string[]>): Row => ({ ok: true, lich: ds.map(raLich), soEm: { 10: em[10].length, 11: em[11].length, 12: em[12].length } })
@@ -162,11 +163,11 @@ export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), 
   } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
   const ds = donLich(await dsGoc, nay)
   if (!ds.length) return p.endsWith('khoi-vao') ? { ok: false, error: 'Thầy chưa mở live.' } : { ok: true, trangThai: 'khong' }
-  const h = await env.DB.prepare("SELECT lop, ho_ten FROM hoc_sinh WHERE sbd = ? AND COALESCE(trang_thai, '') <> 'khoa' LIMIT 1").bind(sbd).first<Row>().catch(() => null)
+  const h = await env.DB.prepare("SELECT lop, ten_lop, ho_ten FROM hoc_sinh WHERE sbd = ? AND COALESCE(trang_thai, '') <> 'khoa' LIMIT 1").bind(sbd).first<Row>().catch(() => null)
   // Hồ sơ không có lớp ⇒ đọc lớp ở danh sách cổng (em mới chỉ có trong danh sách đăng nhập).
   const thu = SBD_THU.has(sbd)
   const lopCong = h?.lop || thu ? null : await env.DB.prepare('SELECT lop FROM danh_sach WHERE sbd = ? LIMIT 1').bind(sbd).first<Row>().catch(() => null)
-  const khoi = khoiTuLop(h?.lop) ?? khoiTuLop(lopCong?.lop), x = thu ? lichChoEm(ds, null, nay) : khoi ? lichChoEm(ds, khoi, nay) : null
+  const khoi = khoiTuLop(h?.lop) ?? khoiTuLop(h?.ten_lop) ?? khoiTuLop(lopCong?.lop), x = thu ? lichChoEm(ds, null, nay) : khoi ? lichChoEm(ds, khoi, nay) : null
   if (p === '/hs/bpu/khoi-cua-em') return x ? { ok: true, trangThai: x.trangThai, khoi: x.khoi, ten: x.ten, batDau: x.batDau } : { ok: true, trangThai: 'khong' }
   if (p === '/hs/bpu/khoi-vao') {
     if (!x || x.trangThai === 'hen' || !x.buoiId) return { ok: false, error: x ? 'Chưa tới giờ. Thầy mở phòng là em vào được.' : 'Không có live cho khối của em.' }
