@@ -292,6 +292,7 @@ html.may-yeu .bpu-gui-noi.quang::after { animation: none; }
 .bpu-tra { display: flex; flex: none; flex-direction: column; gap: 12px; min-width: 0; }
 /* Vách kéo giữa cột đề và cột chọn (thầy 12/11 «có thể di chuyển cửa sổ đề và chọn ý») — chỉ có ở khổ ngang; dọc thì ẩn. */
 .bpu-vach { display: none; }
+.bpu-hs-than { --bpu-trai: 1fr; --bpu-phai: 1fr; }
 /* Xoay ngang: đề (giám thị) cột trái · phần trả lời cột phải; nhãn loại câu nằm trên, trọn bề ngang. */
 @media (orientation: landscape) and (min-width: 640px) {
   .bpu-hs-than > .bpu-chip { grid-column: 1 / -1; justify-self: start; }

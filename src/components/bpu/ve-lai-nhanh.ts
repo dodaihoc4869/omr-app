@@ -16,10 +16,12 @@ export function ngheVeLai(o: { ws: () => WebSocket | null; noiNgay: () => void; 
     if (w.readyState !== 1) return // đang nối dở
     let song = false
     const nghe = (): void => { song = true }
-    w.addEventListener('message', nghe, { once: true })
-    try { w.send('{"t":"chao"}') } catch { w.removeEventListener('message', nghe); o.boNoiChet(); return }
+    // kết nối không nghe thêm được (trình duyệt rất cũ, kết nối giả của bộ test) ⇒ không dò, để nhịp nối lại sẵn có lo
+    try { w.addEventListener('message', nghe, { once: true }) } catch { return }
+    const thoi = (): void => { try { w.removeEventListener('message', nghe) } catch { /* đã gỡ */ } }
+    try { w.send('{"t":"chao"}') } catch { thoi(); o.boNoiChet(); return }
     clearTimeout(hen)
-    hen = setTimeout(() => { w.removeEventListener('message', nghe); if (!song && o.ws() === w) o.boNoiChet() }, 900)
+    hen = setTimeout(() => { thoi(); if (!song && o.ws() === w) o.boNoiChet() }, 900)
   }
   document.addEventListener('visibilitychange', ve)
   window.addEventListener('pageshow', ve)

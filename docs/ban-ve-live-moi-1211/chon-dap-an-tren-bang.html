@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: chọn đáp án ngay trên bảng (máy em, live theo khối)</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --mat: #202f36; --mat2: #263840; --vien: #37464f; --chu: #f1f7fb; --chu2: #c4d0d6; --giay: #f4efe4; --muc: #1f2429; --hs: #7772ff; --hs-go: #3f00dc; --dung: #00d497; --sai: #f7498f; --vang: #e8a13a; --nhan: #0b57d0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; }
+.man { position: fixed; inset: 0; display: grid; grid-template-columns: 56fr 44fr; gap: 6px; padding: 6px 14px 6px 6px; }
+.giay { background: var(--giay); color: var(--muc); border-radius: 12px; padding: 12px 16px; overflow: hidden; font-size: 15.5px; line-height: 1.5; }
+.chip { display: inline-flex; gap: 8px; margin-bottom: 8px; }
+.chip b { padding: 3px 10px; border-radius: 99px; background: #d3e3fd; color: #041e49; font-size: 12.5px; }
+.chip span { padding: 3px 10px; border-radius: 99px; background: #e6e1d3; color: #5b6168; font-size: 12.5px; font-weight: 700; }
+.de { margin: 0 0 8px; font-weight: 500; }
+.pa { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 18px; margin: 0; padding: 0; list-style: none; }
+.pa li b, .y li b { color: var(--nhan); margin-right: 8px; font-weight: 800; }
+.y { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+.bang { position: relative; border-radius: 12px; background: var(--nen); box-shadow: inset 0 0 0 2px rgba(244,239,228,.22); overflow: hidden; }
+.bang .mo { position: absolute; left: 0; right: 0; top: 16px; text-align: center; color: rgba(244,239,228,.38); font-size: 12.5px; font-weight: 600; }
+.nam { position: fixed; right: 4px; top: 50%; width: 5px; height: 42px; margin-top: -21px; border-radius: 4px; background: var(--vang); }
+/* ── TẤM CHỌN ĐÁP ÁN: neo đáy bảng, cao theo nội dung — phần trên của bảng vẫn thấy nét thầy viết ── */
+.tra { position: absolute; left: 8px; right: 8px; bottom: 8px; display: grid; gap: 8px; padding: 10px; border-radius: 16px; background: var(--mat); box-shadow: inset 0 0 0 1.5px var(--vien), 0 -10px 30px rgba(8,14,17,.5); }
+.tra-dau { display: flex; align-items: center; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--chu2); padding: 0 2px; }
+.tra-dau em { font-style: normal; color: var(--vang); }
+.nut { height: 46px; border: 0; border-radius: 13px; background: var(--mat2); box-shadow: inset 0 0 0 1.5px var(--vien); color: var(--chu); font: 800 19px 'DDH', sans-serif; }
+.tn { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.tn .nut.chon { background: var(--hs); box-shadow: 0 3px 0 var(--hs-go); }
+.ds { display: grid; gap: 6px; }
+.ds .hang { display: grid; grid-template-columns: 30px 1fr 1fr; gap: 6px; align-items: center; }
+.ds .hang > b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--mat2); color: var(--chu2); font-size: 14px; }
+.ds .nut { height: 40px; font-size: 15px; }
+.ds .nut.d.chon { background: var(--dung); color: var(--nen); box-shadow: none; }
+.ds .nut.s.chon { background: var(--sai); color: #fff; box-shadow: none; }
+.so { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+.so .o { height: 44px; display: flex; align-items: center; padding: 0 14px; border-radius: 13px; background: var(--nen); box-shadow: inset 0 0 0 2px var(--hs); font: 800 22px 'DDH', sans-serif; letter-spacing: .04em; }
+.so .o i { width: 2px; height: 22px; margin-left: 3px; background: var(--hs); }
+.so .xoa { height: 44px; padding: 0 14px; font-size: 14px; }
+.phim { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.phim .nut { height: 38px; font-size: 17px; }
+.gui { height: 46px; border: 0; border-radius: 13px; background: var(--hs); box-shadow: 0 3px 0 var(--hs-go); color: #fff; font: 800 16px 'DDH', sans-serif; margin-bottom: 3px; }
+.gui[disabled] { background: var(--mat2); box-shadow: inset 0 0 0 1.5px var(--vien); color: rgba(241,247,251,.38); }
+.da-gui { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 99px; background: var(--mat); box-shadow: inset 0 0 0 1.5px var(--vien); font-size: 13.5px; font-weight: 700; color: var(--chu2); }
+.da-gui i { width: 9px; height: 9px; border-radius: 50%; background: var(--dung); }
+.net { position: absolute; left: 22px; top: 54px; width: 62%; height: 60px; }
+.nhan { position: fixed; left: 10px; bottom: 8px; padding: 3px 9px; border-radius: 8px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; }
+</style></head><body>
+<div class="man" id="man"></div><div class="nam"></div>
+<script>
+const q = new URLSearchParams(location.search), k = q.get('k') || 'tn'
+const GIAY = {
+  tn: `<div class="chip"><b>Câu 1</b><span>Phần I · Trắc nghiệm</span></div><p class="de">Alcohol nào sau đây là alcohol bậc II?</p><ul class="pa"><li><b>A.</b>CH₃–CH₂–OH</li><li><b>B.</b>CH₃–CH(OH)–CH₃</li><li><b>C.</b>(CH₃)₃C–OH</li><li><b>D.</b>CH₃–OH</li></ul>`,
+  ds: `<div class="chip"><b>Câu 2</b><span>Phần II · Đúng–sai</span></div><p class="de">Peptide X có cấu trúc: H₂N–CH(CH₃)–CO–NH–CH(CH₂CH₂COOH)–CO–NH–CH₂–COOH. Mỗi phát biểu sau là đúng hay sai?</p><ul class="y"><li><b>a)</b>X là một tetrapeptide.</li><li><b>b)</b>Trong phân tử X có 3 liên kết peptide.</li><li><b>c)</b>Tên viết tắt của X là Ala-Val-Gly.</li><li><b>d)</b>Amino acid đầu N của X là alanine.</li></ul>`,
+  so: `<div class="chip"><b>Câu 3</b><span>Phần III · Trả lời ngắn</span></div><p class="de">Cho 4,6 gam ethanol tác dụng hết với Na dư, thu được V lít khí H₂ (đkc). Giá trị của V là bao nhiêu? (Làm tròn kết quả đến hàng phần trăm.)</p>`,
+}
+GIAY.gui = GIAY.tn
+const NET = `<svg class="net" viewBox="0 0 300 60" fill="none" stroke="#f1f7fb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 40c18-30 30-30 44-8s26 20 40-6 28-22 42 2 30 26 46-2 34-20 52 4"/></svg>`
+const TRA = {
+  tn: `<div class="tra"><div class="tra-dau"><span>Câu 1 · chọn một đáp án</span><em>còn 0:42</em></div><div class="tn"><button class="nut">A</button><button class="nut chon">B</button><button class="nut">C</button><button class="nut">D</button></div><button class="gui">Gửi đáp án B</button></div>`,
+  ds: `<div class="tra"><div class="tra-dau"><span>Câu 2 · chọn Đúng / Sai cho từng ý</span><em>3/4 ý</em></div><div class="ds">${[['a', 's'], ['b', 's'], ['c', 's'], ['d', '']].map(([c, v]) => `<div class="hang"><b>${c}</b><button class="nut d${v === 'd' ? ' chon' : ''}">Đúng</button><button class="nut s${v === 's' ? ' chon' : ''}">Sai</button></div>`).join('')}</div><button class="gui" disabled>Chọn đủ 4 ý rồi gửi</button></div>`,
+  so: `<div class="tra"><div class="tra-dau"><span>Câu 3 · nhập đáp số</span><em>còn 1:15</em></div><div class="so"><div class="o">1,24<i></i></div><button class="nut xoa">Xoá</button></div><div class="phim">${['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ',', '−'].map((p) => `<button class="nut">${p}</button>`).join('')}</div><button class="gui">Gửi đáp số</button></div>`,
+  gui: `<div class="da-gui"><i></i>Đã gửi · B</div>`,
+}
+const MO = { tn: 'Thầy chuyển câu ⇒ nút chọn hiện ngay trên bảng', ds: '', so: '', gui: 'Gửi xong (hoặc thầy bấm Lên bảng) ⇒ tấm chọn tự ẩn, trả lại bảng' }
+document.getElementById('man').innerHTML = `<div class="giay">${GIAY[k]}</div><div class="bang">${k === 'gui' ? NET : ''}<div class="mo">${MO[k] || ''}</div>${TRA[k]}</div>`
+</script></body></html>
