@@ -1,0 +1,29 @@
+[
+  {
+    "i": 335,
+    "hash": "3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5",
+    "fileNguon": "anh/3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5.png",
+    "svg": "detergent376-native-ddh-585f5ac751594f5b78c43b66d41798fd5dabfaebd50ee8c29a5e239ec698656f.svg",
+    "hashSvg": "585f5ac751594f5b78c43b66d41798fd5dabfaebd50ee8c29a5e239ec698656f",
+    "byteSvg": 35775,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B2-II-2",
+        "de": "Cho cấu tạo của hai chất tẩy rửa thông dụng X (sodium stearate), Y (sodium 4-dodecylbenzenesulfonate) như hình dưới.",
+        "refs": [
+          {
+            "hash": "3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5",
+            "where": "VIP27-C1-B2-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "68aa541bd84c2b50b13fd6f2128f8da9ca7ead4a7b5548e93a21fdfab4892bac"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "36C5O1S2Na/X18bareC1COdouble2splitfeetCONTACT2slopes-nativeV-NOcrossbar/Y12chainC6ringC1innerCIRCLE-NO3Phdouble/EXACTOminus-NaPLUS-and-SO2Ominus-NaPLUS-SUB2-SUPcharges-NOcovalentO-Na/2whiteXYboxes1px/ALLregularUPRIGHT-2captionsEXACTsodium stearate-sodium 4-dodecylbenzenesulfonate/0arrows-stereo-noaddedH-expandedSO-SO3formulaanswer-alias",
+    "hashSvgDaSoat": "585f5ac751594f5b78c43b66d41798fd5dabfaebd50ee8c29a5e239ec698656f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

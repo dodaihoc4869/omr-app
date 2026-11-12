@@ -1,0 +1,476 @@
+{
+  "i": 335,
+  "assetIndexProvided": 1279,
+  "hash": "3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5.png",
+  "size": [
+    1153,
+    411
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B2-II-2",
+      "de": "Cho cấu tạo của hai chất tẩy rửa thông dụng X (sodium stearate), Y (sodium 4-dodecylbenzenesulfonate) như hình dưới.",
+      "allHinh": [
+        {
+          "hash": "3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5",
+          "where": "VIP27-C1-B2-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "68aa541bd84c2b50b13fd6f2128f8da9ca7ead4a7b5548e93a21fdfab4892bac"
+        }
+      ],
+      "missingHashes": [
+        "3afa2bcf3d3837eafffe40efbc7ae3d272c6876db4d2dd0876da225644cf20b5"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownSoap5xOpened": true,
+    "ownSulfonate7xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativevertices/bboxes/radiiapprox1px; literalchargepositionsverifiedownmacros. Countsfromverticesnotchemicalnames. Contactfeetcomputedstoredslopestoavoidfalsegapsnotrasterprecisionclaim.",
+  "geometry": {
+    "X": {
+      "orderedBareC": [
+        [
+          156,
+          112
+        ],
+        [
+          208,
+          60
+        ],
+        [
+          260,
+          112
+        ],
+        [
+          312,
+          60
+        ],
+        [
+          364,
+          112
+        ],
+        [
+          415,
+          60
+        ],
+        [
+          466,
+          112
+        ],
+        [
+          518,
+          60
+        ],
+        [
+          568,
+          112
+        ],
+        [
+          620,
+          60
+        ],
+        [
+          671,
+          112
+        ],
+        [
+          722,
+          60
+        ],
+        [
+          774,
+          112
+        ],
+        [
+          825,
+          60
+        ],
+        [
+          877,
+          112
+        ],
+        [
+          928,
+          60
+        ],
+        [
+          980,
+          112
+        ],
+        [
+          1032,
+          62
+        ]
+      ],
+      "carbonyl": {
+        "C": [
+          1032,
+          62
+        ],
+        "Olabel": {
+          "text": "O",
+          "bbox": [
+            1021,
+            2,
+            1044,
+            26
+          ]
+        },
+        "rays": [
+          [
+            [
+              1029,
+              29
+            ],
+            [
+              1029,
+              64.88
+            ]
+          ],
+          [
+            [
+              1035,
+              29
+            ],
+            [
+              1035,
+              65.23
+            ]
+          ]
+        ],
+        "apexJoin": [
+          [
+            1029,
+            64.88
+          ],
+          [
+            1032,
+            62
+          ],
+          [
+            1035,
+            65.23
+          ]
+        ],
+        "feet": "BOTHCONTACT2slopes/nativeapexVjoin, nofootwhitegap"
+      },
+      "saltLabel": {
+        "text": "O⁻ Na⁺",
+        "bbox": [
+          1072,
+          91,
+          1148,
+          119
+        ],
+        "bond": [
+          [
+            1032,
+            62
+          ],
+          [
+            1070,
+            101
+          ]
+        ],
+        "anchor": "FIRSTO",
+        "minusSupBBox": [
+          1092,
+          94,
+          1102,
+          100
+        ],
+        "NaBBox": [
+          1108,
+          95,
+          1137,
+          118
+        ],
+        "plusSupBBox": [
+          1138,
+          90,
+          1149,
+          101
+        ],
+        "note": "O/NaSAMEbaseline;minusPLUSSUP,nocovalentO-Nabond"
+      },
+      "caption": {
+        "text": "sodium stearate",
+        "bbox": [
+          152,
+          145,
+          366,
+          177
+        ],
+        "font": "regularuprightserif"
+      },
+      "box": {
+        "rect": [
+          6,
+          70,
+          126,
+          131
+        ],
+        "fill": "white",
+        "stroke": "black1px",
+        "label": {
+          "text": "X",
+          "bbox": [
+            52,
+            86,
+            76,
+            114
+          ],
+          "font": "regularuprightserif"
+        }
+      },
+      "count": {
+        "C": 18,
+        "O": 2,
+        "Na": 1,
+        "COdouble": 1,
+        "CCdouble": 0
+      }
+    },
+    "Y": {
+      "orderedChainBareC": [
+        [
+          158,
+          320
+        ],
+        [
+          211,
+          269
+        ],
+        [
+          264,
+          320
+        ],
+        [
+          316,
+          269
+        ],
+        [
+          369,
+          320
+        ],
+        [
+          421,
+          269
+        ],
+        [
+          473,
+          320
+        ],
+        [
+          526,
+          269
+        ],
+        [
+          578,
+          320
+        ],
+        [
+          631,
+          269
+        ],
+        [
+          684,
+          320
+        ],
+        [
+          737,
+          270
+        ]
+      ],
+      "ringVertices": [
+        [
+          816,
+          270
+        ],
+        [
+          851,
+          212
+        ],
+        [
+          926,
+          213
+        ],
+        [
+          961,
+          270
+        ],
+        [
+          927,
+          332
+        ],
+        [
+          852,
+          332
+        ]
+      ],
+      "chainRingBond": [
+        [
+          737,
+          270
+        ],
+        [
+          816,
+          270
+        ]
+      ],
+      "innerCircle": {
+        "center": [
+          888,
+          271
+        ],
+        "rx": 46,
+        "ry": 45.5,
+        "fill": "none"
+      },
+      "ringHeadBond": [
+        [
+          961,
+          270
+        ],
+        [
+          1019,
+          270
+        ]
+      ],
+      "headLabel": {
+        "text": "SO₂O⁻ Na⁺",
+        "bbox": [
+          1023,
+          255,
+          1147,
+          287
+        ],
+        "anchor": "FIRSTS",
+        "sub2BBox": [
+          1054,
+          274,
+          1068,
+          289
+        ],
+        "minusSupBBox": [
+          1085,
+          257,
+          1097,
+          264
+        ],
+        "NaBBox": [
+          1103,
+          260,
+          1134,
+          282
+        ],
+        "plusSupBBox": [
+          1134,
+          254,
+          1147,
+          266
+        ],
+        "note": "SO2Ocondensedliteral;SUB2afterfirstO, OminusSUP thenNaPLUSSUP. NoexpandedS=O/covalentO-Na."
+      },
+      "caption": {
+        "text": "sodium 4-dodecylbenzenesulfonate",
+        "bbox": [
+          152,
+          373,
+          619,
+          403
+        ],
+        "font": "regularuprightserif",
+        "note": "ONEspaceafter sodium;ASCIIhyphenbetween4anddodecyl;nootherwordspaceswithinname"
+      },
+      "box": {
+        "rect": [
+          6,
+          273,
+          126,
+          333
+        ],
+        "fill": "white",
+        "stroke": "black1px",
+        "label": {
+          "text": "Y",
+          "bbox": [
+            52,
+            289,
+            76,
+            316
+          ],
+          "font": "regularuprightserif"
+        }
+      },
+      "count": {
+        "chainC": 12,
+        "ringC": 6,
+        "totalC": 18,
+        "O": 3,
+        "S": 1,
+        "Na": 1,
+        "ringInnerCircles": 1,
+        "alternatingDoubles": 0
+      }
+    },
+    "font": "Allmoleculelabelsregularuprightsans; captionsandXYregularuprightserif, nottruebold/italic. Bondsblackuniform~2px/outerboxes1px. ChargesSUP/sub2literal.",
+    "countsTotal": {
+      "C": 36,
+      "O": 5,
+      "Na": 2,
+      "S": 1,
+      "COdouble": 1,
+      "rings": 1,
+      "innerCircle": 1,
+      "whiteBoxes": 2,
+      "captions": 2,
+      "arrows": 0
+    },
+    "noAdded": [
+      "threePhdoublebonds",
+      "SO3formulaanswer",
+      "explicitSdoubleO",
+      "hydrogens",
+      "boldcaptions",
+      "extraO-Nabond",
+      "chargesbaseline",
+      "aliases"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "corrections": [
+    {
+      "field": "assetIndexProvided",
+      "initial": 1268,
+      "correct": 1279,
+      "evidence": "Root đọc inventory assets[1279].hash khớp exactsource;1268 là e428... nguồn khác; sửa trước builder, không đổi geometry/hash/i."
+    }
+  ],
+  "rootReview": {
+    "nativeFullOpened": true,
+    "ownNativeTopBottom2xAndCOHeadMacrosOpened": true,
+    "allPublicDeRefsRead": true,
+    "freshChromium3xFullOpened": true,
+    "actualCOHeadCaptionMacrosOpened": true,
+    "hashSvg": "585f5ac751594f5b78c43b66d41798fd5dabfaebd50ee8c29a5e239ec698656f",
+    "rightmostColumnMin": 255,
+    "verdict": "Đạt:36C5O1S2Na, vòng tròn thơm, SO₂Ominus NaPLUS cô đọng, tất cả điện tích SUP/chỉ2SUB; caption nguyên văn, mọi chữ DDHregularupright; không O-Na bond/không3Phdouble/noanswer."
+  },
+  "independentRuntime": {
+    "sha256": "02d6850bffb14247c55fd9d724c69fd9baa21edf30e052dea869cd3a71ddb175",
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/detergent376-native-ddh-585f5ac751594f5b78c43b66d41798fd5dabfaebd50ee8c29a5e239ec698656f.svg 585f5ac751594f5b78c43b66d41798fd5dabfaebd50ee8c29a5e239ec698656f\n335 { x: 0, y: 0, width: 1153, height: 411 }\n"
+  }
+}
