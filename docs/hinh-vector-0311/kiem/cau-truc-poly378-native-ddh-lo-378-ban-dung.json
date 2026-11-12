@@ -1,0 +1,29 @@
+[
+  {
+    "i": 122,
+    "hash": "17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df",
+    "fileNguon": "anh/17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df.png",
+    "svg": "poly378-native-ddh-fd45d483e3770814abf3e82e2e92f2bab90f694d2dbfd57b74e8025f79e3c46f.svg",
+    "hashSvg": "fd45d483e3770814abf3e82e2e92f2bab90f694d2dbfd57b74e8025f79e3c46f",
+    "byteSvg": 21061,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-HC11-D1-III-3",
+        "de": "Hình dưới đây biểu diễn cấu trúc một đoạn mạch polymer A, được tạo thành từ phản ứng trùng hợp một alkene.\nMonomer tạo thành A có chứa bao nhiêu nguyên tử carbon?",
+        "refs": [
+          {
+            "hash": "17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df",
+            "where": "VIP27-C1-HC11-D1-III-3.hinh.0.du_lieu",
+            "hashDataUrl": "f734d8806a80c1b64b2d0eb9b5933f56d4fa63ceae16db090cc3046b3ab668cf"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "8explicitbackboneC-4topC2H5FIRSTCanchors-4topH-8bottomH/16knownC12standaloneH-EXCLHwithinC2H5/9horizontalincl2freeends16vertical/ALLregularUPRIGHT-SUB25/upper4thx310.5-lower4th311.5nativeDRIFTkeep/individualnonperiodicstrokes-glyphWHITEgaps/0double-stereo-arrows-captions-brackets-n/NOmonomeranswer-polymername-addedrepeat-noalias738739714",
+    "hashSvgDaSoat": "fd45d483e3770814abf3e82e2e92f2bab90f694d2dbfd57b74e8025f79e3c46f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

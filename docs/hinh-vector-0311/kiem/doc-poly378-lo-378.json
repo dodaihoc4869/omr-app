@@ -1,0 +1,719 @@
+{
+  "i": 122,
+  "assetIndexProvided": 1283,
+  "hash": "17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df.png",
+  "size": [
+    700,
+    176
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-HC11-D1-III-3",
+      "de": "Hình dưới đây biểu diễn cấu trúc một đoạn mạch polymer A, được tạo thành từ phản ứng trùng hợp một alkene.\nMonomer tạo thành A có chứa bao nhiêu nguyên tử carbon?",
+      "allHinh": [
+        {
+          "hash": "17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df",
+          "where": "VIP27-C1-HC11-D1-III-3.hinh.0.du_lieu",
+          "hashDataUrl": "f734d8806a80c1b64b2d0eb9b5933f56d4fa63ceae16db090cc3046b3ab668cf"
+        }
+      ],
+      "missingHashes": [
+        "17025f6b9be2fe1f398bb4f9a4bc679db0507916f0f64b298edc6f6c904029df"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownNativePixelLineRunsChecked": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Eachlineposition/endpointsindependentlysamplednativegray<100;bboxesapprox1px. No uniformnormalization/no monomeranswerinference.",
+  "geometry": {
+    "backboneC": [
+      {
+        "text": "C",
+        "bbox": [
+          57,
+          74,
+          84,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          138,
+          74,
+          165,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          217,
+          74,
+          244,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          298,
+          74,
+          325,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          378,
+          74,
+          405,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          458,
+          74,
+          485,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          539,
+          74,
+          566,
+          105
+        ]
+      },
+      {
+        "text": "C",
+        "bbox": [
+          620,
+          74,
+          647,
+          105
+        ]
+      }
+    ],
+    "topLabels": [
+      {
+        "text": "C₂H₅",
+        "bbox": [
+          57,
+          5,
+          137,
+          43
+        ],
+        "atBackbone": 1,
+        "anchor": "FIRSTC"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          138,
+          5,
+          165,
+          36
+        ],
+        "atBackbone": 2,
+        "anchor": "H"
+      },
+      {
+        "text": "C₂H₅",
+        "bbox": [
+          212,
+          5,
+          292,
+          43
+        ],
+        "atBackbone": 3,
+        "anchor": "FIRSTC"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          298,
+          5,
+          325,
+          36
+        ],
+        "atBackbone": 4,
+        "anchor": "H"
+      },
+      {
+        "text": "C₂H₅",
+        "bbox": [
+          377,
+          5,
+          457,
+          43
+        ],
+        "atBackbone": 5,
+        "anchor": "FIRSTC"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          459,
+          5,
+          486,
+          36
+        ],
+        "atBackbone": 6,
+        "anchor": "H"
+      },
+      {
+        "text": "C₂H₅",
+        "bbox": [
+          535,
+          5,
+          615,
+          43
+        ],
+        "atBackbone": 7,
+        "anchor": "FIRSTC"
+      },
+      {
+        "text": "H",
+        "bbox": [
+          620,
+          5,
+          647,
+          36
+        ],
+        "atBackbone": 8,
+        "anchor": "H"
+      }
+    ],
+    "bottomH": [
+      {
+        "text": "H",
+        "bbox": [
+          57.0,
+          141,
+          84.0,
+          172
+        ],
+        "atBackbone": 1
+      },
+      {
+        "text": "H",
+        "bbox": [
+          137.0,
+          141,
+          164.0,
+          172
+        ],
+        "atBackbone": 2
+      },
+      {
+        "text": "H",
+        "bbox": [
+          217.0,
+          141,
+          244.0,
+          172
+        ],
+        "atBackbone": 3
+      },
+      {
+        "text": "H",
+        "bbox": [
+          298.0,
+          141,
+          325.0,
+          172
+        ],
+        "atBackbone": 4
+      },
+      {
+        "text": "H",
+        "bbox": [
+          378.0,
+          141,
+          405.0,
+          172
+        ],
+        "atBackbone": 5
+      },
+      {
+        "text": "H",
+        "bbox": [
+          459.0,
+          141,
+          486.0,
+          172
+        ],
+        "atBackbone": 6
+      },
+      {
+        "text": "H",
+        "bbox": [
+          539.0,
+          141,
+          566.0,
+          172
+        ],
+        "atBackbone": 7
+      },
+      {
+        "text": "H",
+        "bbox": [
+          620.0,
+          141,
+          647.0,
+          172
+        ],
+        "atBackbone": 8
+      }
+    ],
+    "upperBonds": [
+      [
+        [
+          70.5,
+          41
+        ],
+        [
+          70.5,
+          68
+        ]
+      ],
+      [
+        [
+          150.5,
+          41
+        ],
+        [
+          150.5,
+          68
+        ]
+      ],
+      [
+        [
+          230.5,
+          41
+        ],
+        [
+          230.5,
+          68
+        ]
+      ],
+      [
+        [
+          310.5,
+          41
+        ],
+        [
+          310.5,
+          68
+        ]
+      ],
+      [
+        [
+          391.5,
+          42
+        ],
+        [
+          391.5,
+          68
+        ]
+      ],
+      [
+        [
+          472.5,
+          42
+        ],
+        [
+          472.5,
+          68
+        ]
+      ],
+      [
+        [
+          552.5,
+          41
+        ],
+        [
+          552.5,
+          68
+        ]
+      ],
+      [
+        [
+          633.5,
+          42
+        ],
+        [
+          633.5,
+          68
+        ]
+      ]
+    ],
+    "lowerBonds": [
+      [
+        [
+          70.5,
+          110
+        ],
+        [
+          70.5,
+          135
+        ]
+      ],
+      [
+        [
+          150.5,
+          110
+        ],
+        [
+          150.5,
+          135
+        ]
+      ],
+      [
+        [
+          230.5,
+          110
+        ],
+        [
+          230.5,
+          135
+        ]
+      ],
+      [
+        [
+          311.5,
+          110
+        ],
+        [
+          311.5,
+          135
+        ]
+      ],
+      [
+        [
+          391.5,
+          110
+        ],
+        [
+          391.5,
+          135
+        ]
+      ],
+      [
+        [
+          472.5,
+          110
+        ],
+        [
+          472.5,
+          135
+        ]
+      ],
+      [
+        [
+          552.5,
+          110
+        ],
+        [
+          552.5,
+          135
+        ]
+      ],
+      [
+        [
+          633.5,
+          110
+        ],
+        [
+          633.5,
+          135
+        ]
+      ]
+    ],
+    "horizontalBonds": [
+      [
+        [
+          7,
+          88.5
+        ],
+        [
+          51,
+          88.5
+        ]
+      ],
+      [
+        [
+          89,
+          88.5
+        ],
+        [
+          132,
+          88.5
+        ]
+      ],
+      [
+        [
+          169,
+          88.5
+        ],
+        [
+          212,
+          88.5
+        ]
+      ],
+      [
+        [
+          249,
+          88.5
+        ],
+        [
+          292,
+          88.5
+        ]
+      ],
+      [
+        [
+          329,
+          88.5
+        ],
+        [
+          373,
+          88.5
+        ]
+      ],
+      [
+        [
+          410,
+          88.5
+        ],
+        [
+          454,
+          88.5
+        ]
+      ],
+      [
+        [
+          491,
+          88.5
+        ],
+        [
+          534,
+          88.5
+        ]
+      ],
+      [
+        [
+          571,
+          88.5
+        ],
+        [
+          614,
+          88.5
+        ]
+      ],
+      [
+        [
+          651,
+          88.5
+        ],
+        [
+          696,
+          88.5
+        ]
+      ]
+    ],
+    "nativeHorizontalPixelRunsY88": [
+      [
+        7,
+        51
+      ],
+      [
+        89,
+        132
+      ],
+      [
+        169,
+        212
+      ],
+      [
+        249,
+        292
+      ],
+      [
+        329,
+        373
+      ],
+      [
+        410,
+        454
+      ],
+      [
+        491,
+        534
+      ],
+      [
+        571,
+        614
+      ],
+      [
+        651,
+        696
+      ]
+    ],
+    "nativeHorizontalPixelRunsY89": [
+      [
+        7,
+        50
+      ],
+      [
+        89,
+        132
+      ],
+      [
+        169,
+        212
+      ],
+      [
+        249,
+        292
+      ],
+      [
+        330,
+        372
+      ],
+      [
+        410,
+        453
+      ],
+      [
+        491,
+        533
+      ],
+      [
+        571,
+        614
+      ],
+      [
+        652,
+        695
+      ]
+    ],
+    "nativeVerticalRunsY50": [
+      [
+        70,
+        71
+      ],
+      [
+        150,
+        151
+      ],
+      [
+        230,
+        231
+      ],
+      [
+        310,
+        311
+      ],
+      [
+        391,
+        392
+      ],
+      [
+        472,
+        473
+      ],
+      [
+        552,
+        553
+      ],
+      [
+        633,
+        634
+      ]
+    ],
+    "nativeVerticalRunsY120": [
+      [
+        70,
+        71
+      ],
+      [
+        150,
+        151
+      ],
+      [
+        230,
+        231
+      ],
+      [
+        311,
+        312
+      ],
+      [
+        391,
+        392
+      ],
+      [
+        472,
+        473
+      ],
+      [
+        552,
+        553
+      ],
+      [
+        633,
+        634
+      ]
+    ],
+    "font": "ALLregularuprightsansblack, notbold/italic; 2and5SUBinC2H5.",
+    "gapRule": "Upperlinesend68,backboneCinkstarts74;lowerstart110afterCinkends105,lowerends135beforeHink141. Keepallglyphgaps. Eachhorizontalendpointmeasuredabove, notuniform. Upper4thx310.5/lower4thx311.5native1pxoffset. TopC2H5adjacentHstringsnotbonded.",
+    "countsObserved": {
+      "backboneExplicitC": 8,
+      "topC2H5": 4,
+      "topH": 4,
+      "bottomH": 8,
+      "upperVerticalBonds": 8,
+      "lowerVerticalBonds": 8,
+      "horizontalBondsIncludingFreeEnds": 9,
+      "captions": 0,
+      "brackets": 0
+    },
+    "noAdded": [
+      "monomeranswer",
+      "polymername",
+      "repeatn",
+      "brackets",
+      "doubles",
+      "uniformspacing",
+      "aliases738/739/714"
+    ]
+  },
+  "actualSvgReviewed": true,
+  "status": "Final fd45 independently passed",
+  "rootNativeFullAndAllPublicDeOpened": true,
+  "rootFreshActualFull3xAndThreeMacrosOpened": {
+    "hashSvg": "fd45d483e3770814abf3e82e2e92f2bab90f694d2dbfd57b74e8025f79e3c46f",
+    "bytes": 21061,
+    "full": "/workspace/scratch/root378-122.png",
+    "note": "8C/4C2H5/12standaloneH,9H16V,allregularUPRIGHT/SUB25; đặt riêng glyphnhómC2H5 để giữFIRSTC vàkhe5-H kếbên; lower4thstem1pxdriftgiữ; nativeapproxnotSubpixel."
+  },
+  "readonlyFinalRuntime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/poly378-native-ddh-fd45d483e3770814abf3e82e2e92f2bab90f694d2dbfd57b74e8025f79e3c46f.svg fd45d483e3770814abf3e82e2e92f2bab90f694d2dbfd57b74e8025f79e3c46f\n122 { x: 0, y: 0, width: 700, height: 176 }\n"
+}
