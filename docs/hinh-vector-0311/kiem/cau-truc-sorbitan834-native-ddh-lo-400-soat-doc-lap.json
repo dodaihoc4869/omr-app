@@ -1,0 +1,20 @@
+[
+  {
+    "i": 834,
+    "hashSvg": "f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-ESTER-TN-III-15.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và CO-chain/stereomacros. Đếm24C6O/3OH tự do/1H tường minh, một vòng5/Ovòng/một CO không CCdouble. Hai tia CO contact đúng hai nhánh; stereogiữ2solid (OHup/HOdownleft) và2hashed:6Hbars/6OHbars, tinygrayterminal riêng giữ chưa gán nghĩa không gọi bar7. O/OH/HO/H thường thẳng, anchors/kheglyph rõ, không thấy cắt/chạm/tràn hoặc H/tên/formula/đápán thêm. Giao điểm tính từ approximatearm không coi native subpixel.",
+    "render": "/workspace/scratch/soat400-834-fresh.png",
+    "macro": [
+      "/workspace/scratch/sorbitan834-co.png",
+      "/workspace/scratch/sorbitan834-stereo.png",
+      "/workspace/scratch/sorbitan834-chain.png"
+    ],
+    "hash": "9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450",
+    "hashSvgDaSoat": "f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee",
+    "runtimeProof": {
+      "sha256": "2cc56b3f30f3d29f51ef52b1439eff18505f30b50d9bf94b9aca3038168db12f",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/sorbitan834-native-ddh-f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee.svg f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee\n834 { x: 0, y: 0, width: 834, height: 182 }\nPOSTSHOT_SHA f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee\n"
+    }
+  }
+]

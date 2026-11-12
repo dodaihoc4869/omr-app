@@ -1,0 +1,783 @@
+{
+  "i": 834,
+  "assetIndexProvided": 1416,
+  "hash": "9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450.png",
+  "size": [
+    834,
+    182
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-III-15",
+      "de": "Sorbitan monostearate (thường được gọi là Span 60) là một chất nhũ hóa được sử dụng rộng rãi trong sản xuất thực phẩm và mỹ phẩm (công thức như hình: Sorbitan-O-CO-R).\nTrong công nghiệp, sorbitan monostearate được điều chế theo phản ứng sau:\nSorbitan + R-COOH ⇌ Sorbitan-O-CO-R + $\\ce{H2O}$ (t°, xt)\nMột cơ sở sản xuất tiến hành phản ứng giữa 16,4 kg Sorbitan và 25,56 kg Stearic acid. Hiệu suất của quá trình sản xuất đạt 70%. Khối lượng Sorbitan monostearate thu được là a kg. Giá trị của a bằng bao nhiêu? (Không làm tròn các phép tính trung gian, làm tròn kết quả cuối cùng đến hàng phần mười).",
+      "allHinh": [
+        {
+          "hash": "9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450",
+          "where": "VIP27-CDK-ESTER-TN-III-15.hinh.0.du_lieu",
+          "hashDataUrl": "fdb03816c2cada057d2e563314046579d57447c9ae744a0c229e0d32eb4dc187"
+        }
+      ],
+      "missingHashes": [
+        "9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/400-full4x.png",
+      "/workspace/scratch/400-sugar6x.png",
+      "/workspace/scratch/400-Hhash6x.png",
+      "/workspace/scratch/400-OHhash6x.png",
+      "/workspace/scratch/400-co6x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "acylC": 18,
+      "sorbitanC": 6,
+      "totalC": 24,
+      "totalO": 6,
+      "explicitHLabels": 1,
+      "OHgroups": 3,
+      "COdoublePairs": 1,
+      "CCdouble": 0,
+      "solidWedges": 2,
+      "hashedWedges": 2,
+      "HhashedClearBars": 6,
+      "OHhashedClearBars": 6,
+      "additionalGrayTerminalMark": 1
+    },
+    "font": "All atom O/OH/HO/H regular upright sans. No captions/title/charge. Do not infer bold from black solid stereo wedges.",
+    "acylOrderedVertices": [
+      [
+        9.5,
+        63.5
+      ],
+      [
+        44,
+        83.5
+      ],
+      [
+        78.5,
+        63.5
+      ],
+      [
+        112.5,
+        83.5
+      ],
+      [
+        146.5,
+        63.5
+      ],
+      [
+        181.5,
+        83.5
+      ],
+      [
+        215.5,
+        63.5
+      ],
+      [
+        250,
+        83.5
+      ],
+      [
+        284.5,
+        63.5
+      ],
+      [
+        318.5,
+        83.5
+      ],
+      [
+        353,
+        63.5
+      ],
+      [
+        387,
+        83.5
+      ],
+      [
+        421.5,
+        63.5
+      ],
+      [
+        456,
+        83.5
+      ],
+      [
+        490.5,
+        63.5
+      ],
+      [
+        524.5,
+        83.5
+      ],
+      [
+        558.5,
+        63.5
+      ],
+      [
+        594,
+        83.5
+      ]
+    ],
+    "carbonyl": {
+      "bareC": [
+        594,
+        84
+      ],
+      "rays": [
+        [
+          [
+            591,
+            82.5
+          ],
+          [
+            591,
+            110
+          ]
+        ],
+        [
+          [
+            598,
+            82.5
+          ],
+          [
+            598,
+            110
+          ]
+        ]
+      ],
+      "contact": "Own6x confirms each upperfoot contacts a different incoming/outgoing slope atnativeVjoin. No white disconnect; explicit lowerO glyph gap retained.",
+      "ObboxApprox": [
+        584,
+        115,
+        602,
+        132
+      ],
+      "rootRays": [
+        [
+          [
+            589.5,
+            80.96478873239437
+          ],
+          [
+            589.5,
+            109.5
+          ]
+        ],
+        [
+          [
+            597,
+            81.6086956521739
+          ],
+          [
+            597,
+            109.5
+          ]
+        ]
+      ]
+    },
+    "esterO": {
+      "bboxApprox": [
+        619,
+        55,
+        638,
+        73
+      ],
+      "leftArm": [
+        [
+          598,
+          82.5
+        ],
+        [
+          617,
+          69
+        ]
+      ],
+      "rightArm": [
+        [
+          639,
+          70
+        ],
+        [
+          662,
+          84
+        ]
+      ]
+    },
+    "sideChain": {
+      "vertices": [
+        [
+          662,
+          84
+        ],
+        [
+          696,
+          64
+        ],
+        [
+          730,
+          84
+        ]
+      ],
+      "bonds": [
+        [
+          [
+            662,
+            84
+          ],
+          [
+            696,
+            64
+          ]
+        ],
+        [
+          [
+            696,
+            64
+          ],
+          [
+            730,
+            84
+          ]
+        ]
+      ]
+    },
+    "ring": {
+      "orderedNodes": [
+        {
+          "kind": "C",
+          "at": [
+            730,
+            84
+          ]
+        },
+        {
+          "kind": "O",
+          "bboxApprox": [
+            753,
+            51,
+            772,
+            70
+          ]
+        },
+        {
+          "kind": "C",
+          "at": [
+            795,
+            84
+          ]
+        },
+        {
+          "kind": "C",
+          "at": [
+            783,
+            121
+          ]
+        },
+        {
+          "kind": "C",
+          "at": [
+            743,
+            121
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            730,
+            84
+          ],
+          [
+            752,
+            67
+          ]
+        ],
+        [
+          [
+            773,
+            69
+          ],
+          [
+            795,
+            84
+          ]
+        ],
+        [
+          [
+            795,
+            84
+          ],
+          [
+            783,
+            121
+          ]
+        ],
+        [
+          [
+            783,
+            121
+          ],
+          [
+            743,
+            121
+          ]
+        ],
+        [
+          [
+            743,
+            121
+          ],
+          [
+            730,
+            84
+          ]
+        ]
+      ],
+      "noRingDouble": true
+    },
+    "solidWedges": [
+      {
+        "tipAtC": [
+          696,
+          64
+        ],
+        "broadEndApprox": [
+          [
+            694,
+            38
+          ],
+          [
+            699,
+            39
+          ]
+        ],
+        "label": {
+          "literal": "OH",
+          "bboxApprox": [
+            688,
+            15,
+            723,
+            33
+          ],
+          "anchor": "FIRST O near697"
+        }
+      },
+      {
+        "tipAtC": [
+          743,
+          121
+        ],
+        "broadEndApprox": [
+          [
+            725,
+            141
+          ],
+          [
+            730,
+            144
+          ]
+        ],
+        "label": {
+          "literal": "HO",
+          "bboxApprox": [
+            693,
+            145,
+            728,
+            163
+          ],
+          "anchor": "LAST O near718"
+        }
+      }
+    ],
+    "hashedH": {
+      "carbon": [
+        730,
+        84
+      ],
+      "label": {
+        "literal": "H",
+        "bboxApprox": [
+          722,
+          36,
+          738,
+          53
+        ]
+      },
+      "individualSegmentsApprox": [
+        [
+          [
+            727,
+            59
+          ],
+          [
+            733,
+            59
+          ]
+        ],
+        [
+          [
+            727.5,
+            63
+          ],
+          [
+            732.5,
+            63
+          ]
+        ],
+        [
+          [
+            728,
+            67
+          ],
+          [
+            732,
+            67
+          ]
+        ],
+        [
+          [
+            728.5,
+            71
+          ],
+          [
+            731.5,
+            71
+          ]
+        ],
+        [
+          [
+            729,
+            75
+          ],
+          [
+            731,
+            75
+          ]
+        ],
+        [
+          [
+            729.5,
+            79
+          ],
+          [
+            730.5,
+            79
+          ]
+        ]
+      ],
+      "description": "Six separate horizontal bars get wider awayfromcarbon/upward, no added seventh. Lowestbar has whitegap fromcarbon."
+    },
+    "hashedOH": {
+      "carbon": [
+        783,
+        121
+      ],
+      "label": {
+        "literal": "OH",
+        "bboxApprox": [
+          798,
+          145,
+          832,
+          163
+        ],
+        "anchor": "FIRST O near807"
+      },
+      "individualSegmentsApprox": [
+        [
+          [
+            785,
+            125
+          ],
+          [
+            786,
+            124
+          ]
+        ],
+        [
+          [
+            786,
+            129
+          ],
+          [
+            789,
+            127
+          ]
+        ],
+        [
+          [
+            788,
+            132
+          ],
+          [
+            791,
+            130
+          ]
+        ],
+        [
+          [
+            790,
+            135
+          ],
+          [
+            794,
+            133
+          ]
+        ],
+        [
+          [
+            793,
+            139
+          ],
+          [
+            797,
+            136
+          ]
+        ],
+        [
+          [
+            794,
+            142
+          ],
+          [
+            799,
+            139
+          ]
+        ]
+      ],
+      "tinyTerminalMark": {
+        "centerApprox": [
+          796.5,
+          145
+        ],
+        "pixelsAtGrayThreshold180": [
+          [
+            796,
+            145
+          ],
+          [
+            797,
+            145
+          ]
+        ],
+        "classification": "Tiny faint isolatednativeink alignedwithhashdirection; retain mark separately, intentUNKNOWN, do not force clearseventhfullbar."
+      },
+      "nearCarbonPixel": {
+        "at": [
+          783,
+          122
+        ],
+        "classification": "Single dark pixel adjacentcarbon/nativebond, not independentlycountedseparatehashsegment"
+      },
+      "macroEvidence": "OwnOHhash6x visually six clear oblique bars plus faintterminalfleck; pixelcomponents confirm bbox listed, threshold only supports sourceinspection, not autonomous acceptance."
+    },
+    "noAdded": [
+      "No complete chemicalformula inferred",
+      "No extra explicit H at othercenters",
+      "No wedge orientation normalization",
+      "No carbonnumbers",
+      "No caption Sorbitan",
+      "No hidden particles/charge"
+    ]
+  },
+  "measurementLimits": "Native approximate centerlines/bboxes ±1–2px. All stereobars inspected own6x; faintterminalmark retained uncertainty. Ccount fromvisible18acylvertices+6sugarvertices. No total implicitH formula inferred. Full4x viewer downscaled, separate sugar/stereo macros opened natively.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootSourceAudit": {
+    "oldAgentVertices": [
+      [
+        10,
+        64
+      ],
+      [
+        44,
+        84
+      ],
+      [
+        79,
+        64
+      ],
+      [
+        113,
+        84
+      ],
+      [
+        147,
+        64
+      ],
+      [
+        182,
+        84
+      ],
+      [
+        216,
+        64
+      ],
+      [
+        250,
+        84
+      ],
+      [
+        285,
+        64
+      ],
+      [
+        319,
+        84
+      ],
+      [
+        354,
+        64
+      ],
+      [
+        388,
+        84
+      ],
+      [
+        422,
+        64
+      ],
+      [
+        457,
+        84
+      ],
+      [
+        491,
+        64
+      ],
+      [
+        525,
+        84
+      ],
+      [
+        559,
+        64
+      ],
+      [
+        594,
+        84
+      ]
+    ],
+    "oldAgentCarbonylRays": [
+      [
+        [
+          591,
+          82.5
+        ],
+        [
+          591,
+          110
+        ]
+      ],
+      [
+        [
+          598,
+          82.5
+        ],
+        [
+          598,
+          110
+        ]
+      ]
+    ],
+    "sourceRowsOwn": {
+      "63": [
+        [
+          9,
+          10
+        ],
+        [
+          78,
+          79
+        ],
+        [
+          146,
+          147
+        ],
+        [
+          215,
+          216
+        ],
+        [
+          284,
+          285
+        ],
+        [
+          352,
+          353
+        ],
+        [
+          421,
+          422
+        ],
+        [
+          490,
+          491
+        ],
+        [
+          558,
+          559
+        ]
+      ],
+      "83": [
+        [
+          43,
+          45
+        ],
+        [
+          111,
+          113
+        ],
+        [
+          180,
+          182
+        ],
+        [
+          249,
+          251
+        ],
+        [
+          317,
+          319
+        ],
+        [
+          386,
+          388
+        ],
+        [
+          455,
+          457
+        ],
+        [
+          524,
+          525
+        ],
+        [
+          589,
+          590
+        ],
+        [
+          592,
+          594
+        ],
+        [
+          597,
+          597
+        ]
+      ]
+    },
+    "correction": "Root own FULL2x/CO8x/stereo6x before first builder: individual centerlines approximate, CO rayx589.5/597 not agent591/598; feet calculated on respective incoming slopes, not native subpixel measurement. No SVG negative for source-only correction."
+  }
+}

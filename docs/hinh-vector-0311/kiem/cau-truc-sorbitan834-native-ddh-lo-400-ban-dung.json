@@ -1,0 +1,29 @@
+[
+  {
+    "i": 834,
+    "hash": "9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450",
+    "fileNguon": "anh/9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450.png",
+    "svg": "sorbitan834-native-ddh-f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee.svg",
+    "hashSvg": "f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee",
+    "byteSvg": 7706,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-III-15",
+        "de": "Sorbitan monostearate (thường được gọi là Span 60) là một chất nhũ hóa được sử dụng rộng rãi trong sản xuất thực phẩm và mỹ phẩm (công thức như hình: Sorbitan-O-CO-R).\nTrong công nghiệp, sorbitan monostearate được điều chế theo phản ứng sau:\nSorbitan + R-COOH ⇌ Sorbitan-O-CO-R + $\\ce{H2O}$ (t°, xt)\nMột cơ sở sản xuất tiến hành phản ứng giữa 16,4 kg Sorbitan và 25,56 kg Stearic acid. Hiệu suất của quá trình sản xuất đạt 70%. Khối lượng Sorbitan monostearate thu được là a kg. Giá trị của a bằng bao nhiêu? (Không làm tròn các phép tính trung gian, làm tròn kết quả cuối cùng đến hàng phần mười).",
+        "refs": [
+          {
+            "hash": "9a478a8b538632b57f6d1a12983b7030e0d53ffde36fc5a04218d4aa6a79c450",
+            "where": "VIP27-CDK-ESTER-TN-III-15.hinh.0.du_lieu",
+            "hashDataUrl": "fdb03816c2cada057d2e563314046579d57447c9ae744a0c229e0d32eb4dc187"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "24C6O=18acyl+6sugarC/3freeOH-1explicitH/1CO2splitraysCONTACTrespectivearms/0CCdouble/1fiveRing1ringO/2SOLIDwedgesOHup-HOdownleft/2HASHEDwedges6Hhorizontalbars-6OHobliquebars+1tinyGRAYterminalmarkUNKNOWNretainedNOTseventhbar/ALLregularUPRIGHT-FIRSTOandLASTOanchors/individualnonperiodicchainvertices/NOaddedH-formula-caption-name-arrow-charge-answer-alias",
+    "hashSvgDaSoat": "f3a3581e86a5c770e426a0b26ae4a8d0c25f7cb9cb661f708cb3bd297d7692ee",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
