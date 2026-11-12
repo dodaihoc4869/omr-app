@@ -49,6 +49,8 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   // 11/11 (hoá đơn Cloudflare — D1 hàng đọc): cron gói sửa MỖI PHÚT (goi-sua-dem.ts cronGoiSuaDem) quét cả bảng chua_loi_dot (~98 nghìn hàng/lượt,
   // 133 triệu hàng/ngày) chỉ để tìm em còn đợt MỞ ⇒ chỉ mục bộ phận chỉ chứa đợt mở, theo em (đủ cột cho GROUP BY sbd + MAX(cap_nhat_luc)).
   "CREATE INDEX IF NOT EXISTS idx_cld_mo_em ON chua_loi_dot(sbd, cap_nhat_luc) WHERE dong_luc IS NULL AND trang_thai_day<>'da_tu_sua'",
+  // 12/11 (hoá đơn D1 hàng đọc, ~300 triệu/ngày): nhánh NHÓM của «đợt của em cho câu hoặc cùng nhóm» (chua-dot-nhom-sql.ts). Bản sao server/migration-1211-chua-dot-nhom.sql.
+  'CREATE INDEX IF NOT EXISTS idx_cld_sbd_nhom ON chua_loi_dot(sbd, content_group, dong_luc)',
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {
