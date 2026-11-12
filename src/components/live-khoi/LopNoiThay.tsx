@@ -6,7 +6,7 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { chieuBangTrang, chieuCau, coToChieu, datEscLive, dongHoatDong, ketThucBuoiHoc, laToBang, moHoatDong } from '../bpu/gan-gv'
+import { chieuBangTrang, chieuCau, coToChieu, datEscLive, dongHoatDong, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong } from '../bpu/gan-gv'
 import { batTiengLai, dangKy, datKhoi, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
@@ -59,6 +59,12 @@ export default function LopNoiThay() {
     const kk = layView()?.live?.khoi
     if (moi && kk && kk.gd === 'dang' && kk.che !== 'hoc') { setChon(false); setSanh(false); datKhoi({ ...kk, che: 'hoc' }) }
   }, [luotSo])
+  // Tờ BÀI vừa được chiếu (từ bảng chọn, từ tấm hoạt động «Gọi lên bảng» / «Chiếu lên bảng») mà phòng chưa ở «hoc» ⇒ sang «hoc»: máy em vào màn chiếu.
+  useEffect(() => {
+    const f = (e: Event) => { const kk = layView()?.live?.khoi; if ((e as CustomEvent<boolean>).detail !== true && kk && kk.gd === 'dang' && kk.che !== 'hoc') { setChon(false); setSanh(false); datKhoi({ ...kk, che: 'hoc' }) } }
+    window.addEventListener('bpu-to', f)
+    return () => window.removeEventListener('bpu-to', f)
+  }, [])
   /** Bài đã chiếu / hoạt động đã mở ⇒ BÂY GIỜ mới báo phòng sang «Học» (máy em ở nguyên màn đang xem tới lúc có bài). */
   const sangHoc = (): void => { setChon(false); setSanh(false); if (k) datKhoi({ ...k, che: 'hoc' }) }
   const doiChe = (c: 'hoc' | 'bang'): void => {
@@ -101,7 +107,8 @@ export default function LopNoiThay() {
     if (!dang) return false
     if (chat) { setChat(false); return true }
     if (chon) { setChon(false); return true }
-    if (hdMo) { dongHoatDong(); return true }
+    // tấm hoạt động đang nằm DƯỚI tờ vừa chiếu ⇒ Esc đưa tấm lên lại (lùi một màn: về danh sách câu của hoạt động); đang ở trên ⇒ đóng tấm
+    if (hdMo) { if (hdDuoi()) hienHoatDong(); else dongHoatDong(); return true }
     if (sanh) return false
     setSanh(true)
     return true

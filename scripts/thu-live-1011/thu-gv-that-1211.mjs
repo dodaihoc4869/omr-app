@@ -92,6 +92,21 @@ await chup(gv, '3-hoat-dong')
 await gv.keyboard.press('Escape'); await ngu(800)
 kiem('3h Esc: đóng tấm hoạt động ⇒ về bảng đang dạy, không kẹt màn trống', (await gv.locator('.thd').count()) === 0 && (await trenCung(gv)) === 'to' && st()?.live?.khoi?.che === 'bang', await trenCung(gv))
 
+// ── 3C. (thầy 12/11 «bấm lên bảng thì lại quay ra đây không vào màn chiếu») chiếu câu TỪ tấm hoạt động ⇒ màn chiếu lên TRÊN tấm, máy em vào nhận đề;
+//        Esc ⇒ quay lại tấm hoạt động (chọn câu kế); Esc lần nữa ⇒ đóng tấm ──
+const trenHd = (p) => p.evaluate(() => { const e = document.elementFromPoint(innerWidth * 0.4, innerHeight * 0.45); return !e ? 'không' : e.closest('.thd') ? 'thd' : e.closest('.bpu-bang') ? 'bang-bpu' : e.closest('.lop-xem-phieu') ? 'to' : e.closest('[data-live-khoi-thay]') ? 'lop-noi' : 'khác' })
+await lk('hoc'); await ngu(800)
+await gv.locator('.lkt-chon .bcc-hd-the').nth(2).click(); await ngu(2200)
+kiem('3i mở «Chữa câu khó» từ bảng trắng: tấm hoạt động ở trên', (await trenHd(gv)) === 'thd', await trenHd(gv))
+const loiHd = await gv.evaluate(() => window.__chieuCauGia()); await ngu(3500)
+kiem('3k chiếu câu TỪ tấm hoạt động: tấm KHÔNG còn che màn chiếu; phòng sang «hoc»', loiHd === '' && ['bang-bpu', 'to'].includes(await trenHd(gv)) && st()?.live?.khoi?.che === 'hoc', `${await trenHd(gv)} · che ${st()?.live?.khoi?.che}`)
+kiem('3l máy em vào nhận đề (không còn ở bảng danh sách / bảng trắng)', (await em1.locator('.lke .bd').count()) === 0 && await em1.locator('.bpu-hs').isVisible())
+await chup(gv, '3-chieu-tu-hoat-dong')
+await gv.keyboard.press('Escape'); await ngu(800)
+kiem('3m Esc: quay lại tấm hoạt động để chọn câu kế', (await trenHd(gv)) === 'thd', await trenHd(gv))
+await gv.keyboard.press('Escape'); await ngu(800)
+kiem('3n Esc lần nữa: đóng tấm, về bài đang dạy (không ra sảnh, không kẹt)', (await gv.locator('.thd').count()) === 0 && ['bang-bpu', 'to'].includes(await trenHd(gv)), await trenHd(gv))
+
 // ── 4. Chọn bài (chiếu bằng hàm thật) rồi «Học» ⇒ tờ giảng + bảng đua như buổi trên lớp; máy em vào câu ──
 const loiChieu = await gv.evaluate(() => window.__chieuCauGia()); await ngu(3500)
 kiem('4a chiếu được bài', loiChieu === '', loiChieu)

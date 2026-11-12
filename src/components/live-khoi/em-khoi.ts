@@ -40,14 +40,15 @@ function nhanTinPhongEm(d: unknown): void {
   let j: Record<string, unknown>
   try { j = JSON.parse(d) as Record<string, unknown> } catch { return }
   if (j.t === 'em') {
-    const live = j.live as { khoi?: KhoEm['khoi'] } | null, e = j.em as { sbd?: string; ten?: string; doi?: number; vao?: boolean } | null
+    const live = j.live as { khoi?: KhoEm['khoi']; giay?: unknown } | null, e = j.em as { sbd?: string; ten?: string; doi?: number; vao?: boolean } | null
     const khoi = !j.ketThuc && live?.khoi && e?.vao ? live.khoi : null
     const toi = e?.sbd ? { sbd: e.sbd, ten: e.ten ?? e.sbd, doi: e.doi ?? 0 } : null
     const doi = JSON.stringify(khoi) !== JSON.stringify(kho.khoi) || JSON.stringify(toi) !== JSON.stringify(kho.toi)
     if (j.ketThuc && kho.khoi?.gd === 'dang' && kho.toi) { dat({ xong: true, khoi: null }); return }
     if (kho.xong) return
     if (khoi && !kho.khoi) guiTho({ t: 'lop-xin' })
-    const coLuot = !!j.luot
+    // có lượt câu HOẶC thầy đang chiếu một tờ có giấy đề (chữa câu / gọi lên bảng từ tấm hoạt động — không mở lượt) ⇒ em vào màn chiếu
+    const coLuot = !!j.luot || !!live?.giay
     if (doi || coLuot !== !!kho.coLuot || (khoi && kho.dangVao)) dat({ khoi, toi, coLuot, ...(khoi ? { dangVao: false } : {}) })
     if (khoi || kho.dangVao) gan(); else if (khung) go()
   } else if (j.t === 'lop-ds') {

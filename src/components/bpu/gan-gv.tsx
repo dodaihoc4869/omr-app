@@ -279,11 +279,20 @@ export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | 
 
 // TẤM BUỔI DẠY (09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong … bỏ hẳn hành trình cũ»): Kiểm tra đầu giờ · Chữa câu khó
 // & tính toán · Kiểm tra ôn tập mở trên tấm riêng (dưới tờ chiếu, dưới bảng). Mở từ bảng ⇒ bảng lui (ẩn, giữ nối); khối chiếu câu ⇒ bảng hiện lại.
+// TẤM HOẠT ĐỘNG ⇄ TỜ trong buổi live theo khối (thầy 12/11: «bấm lên bảng thì lại quay ra đây không vào màn chiếu»): tấm hoạt động và tờ đều phủ kín màn —
+// CÁI MỞ SAU NẰM TRÊN. Cờ `html[data-hd-tren]` (thay-khoi.css nâng `.thd` lên trên tờ): mở tấm ⇒ bật; chiếu tờ ⇒ tắt (tờ lên trên, tấm vẫn giữ bên dưới);
+// Esc ở tờ ⇒ `hienHoatDong` đưa tấm lên lại (thầy chọn câu kế). Buổi trên lớp không có cờ gốc `data-live-khoi` nên không đổi gì.
+let hdTren = false
+function datHdTren(v: boolean): void { hdTren = v; try { document.documentElement.toggleAttribute('data-hd-tren', v) } catch { /* test */ } }
+/** Tấm hoạt động đang mở nhưng nằm DƯỚI tờ vừa chiếu. */
+export function hdDuoi(): boolean { return !!hdKhung && !hdTren }
+export function hienHoatDong(): void { if (!hdKhung) return; datHdTren(true); if (khung && !bangAn()) { anViHd = true; anBang() } }
 export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
   const { default: Tam } = await import('./TamHoatDong')
   if (!hdKhung) { hdKhung = document.createElement('div'); hdKhung.setAttribute('data-bpu-hd', ''); document.body.appendChild(hdKhung); hdGoc = createRoot(hdKhung) }
   ngheEsc()
   hdGoc!.render(<Tam key={hd} hd={hd} coBang={!!khung} onDong={dongHoatDong} />)
+  datHdTren(true)
   try { window.dispatchEvent(new CustomEvent('bpu-hd', { detail: true })) } catch { /* test */ }
   if (khung && !bangAn()) { anViHd = true; anBang() }
 }
@@ -302,6 +311,7 @@ export async function ketThucBuoiHoc(buoiId: string): Promise<string> {
 }
 export function dongHoatDong(): void {
   const coHd = !!hdKhung
+  datHdTren(false)
   hdGoc?.unmount(); hdGoc = null; hdKhung?.remove(); hdKhung = null
   if (coHd) { try { window.dispatchEvent(new CustomEvent('bpu-hd', { detail: false })) } catch { /* test */ } }
   if (anViHd) { anViHd = false; hienBang() }
@@ -315,6 +325,9 @@ function dongTo(): void { toGoc?.unmount(); toGoc = null; toKhung?.remove(); toK
 /** Gắn tờ chiếu (khung trong app) dưới bảng. */
 function ganTo(html: string, KhungXemPhieu: typeof import('../KhungXemPhieu').default, bangTrang = false): string {
   toBangTrang = bangTrang
+  // Tờ vừa được chiếu (kể cả chiếu TỪ tấm hoạt động: «Gọi lên bảng», «Chiếu lên bảng») ⇒ tờ nằm trên tấm hoạt động — cái mở sau nằm trên.
+  datHdTren(false)
+  try { window.dispatchEvent(new CustomEvent('bpu-to', { detail: bangTrang })) } catch { /* test */ }
   if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
   // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
   // Che TRƯỚC khi khung tờ gắn vào trang ⇒ khung đầu tiên của tờ (cả dải xám 48 px trên cùng) đã ẩn.
