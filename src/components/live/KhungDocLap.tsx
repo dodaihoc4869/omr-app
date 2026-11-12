@@ -98,7 +98,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const { vung } = giaiTrang(tr.trang), kc = khungChieu(vung, tr.tiLe)
     const moc = mocChia(hinh.w, hinh.h, hinh.at, kc, q.tiLeChu === undefined ? TI_LE_CHU_MAC_DINH : q.tiLeChu)
     // `coTra` (live theo khối: tấm chọn đáp án đang hiện trong khung bảng) ⇒ bảng phải đủ rộng cho tấm (≥ ~330 px), bất kể em / máy đang ưu tiên giấy
-    const chia = q.coTra ? Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, hinh.w))) : s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
+    // (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn»): màn rộng (máy tính bảng, máy tính) ⇒ lúc em đọc đề + chọn đáp án giấy nới tới 70 %, bảng còn ≥ 420 px cho tấm chọn
+    const chia = q.coTra ? Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, hinh.w)), Math.min(0.7, 1 - 420 / Math.max(1, hinh.w))) : s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
     const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong, dauBang: q.dauBang ? DAU_BANG : 0, vua: q.epPhong === 'bang' })
     const cu = s.bc
     s.cho = dong && q.dong && cu && cu.w === moi.w && cu.h === moi.h && (cu.sG !== moi.sG || cu.sB !== moi.sB || cu.giay.x !== moi.giay.x || cu.bang.x !== moi.bang.x) ? cu : null

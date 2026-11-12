@@ -541,10 +541,26 @@ export const JS_LIVE_TO_CHIEU = `
   }
   // Cột tin nhắn của app đang mở mà thầy bấm vào tờ (ngoài khay nút bốn ô) ⇒ báo app thu cột (app không thấy được cú bấm trong tờ).
   document.addEventListener('pointerdown', function (e) { var t = e.target; if (!LV.lkChat || (t && t.closest && t.closest('#mc-khay,#mc-them'))) return; LV.lkChat = false; lvGui('lk', { v: 'ngoai' }); }, true);
+  // CỠ CHỮ ĐỀ CỦA BUỔI LIVE (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá»): máy em soi ĐÚNG cách xuống dòng của giấy thầy (để nét
+  // gạch chân khớp chữ) nên chữ máy em to theo chữ của tờ. Buổi live mặc định «Chữ rất lớn» (1,2); thầy đổi trong Cài đặt của tờ thì máy em theo ngay và
+  // nhớ RIÊNG cho live (mc-lk-scale) — cỡ chữ buổi trên lớp (mc-projector-scale) giữ nguyên.
+  function lvCoChu() {
+    var sz = document.getElementById('mc-size'), goc = null, luu = null;
+    if (!sz || LV.coChu) return;
+    LV.coChu = 1;
+    try { goc = localStorage.getItem('mc-projector-scale'); luu = localStorage.getItem('mc-lk-scale'); } catch (e) {}
+    sz.value = luu || (parseFloat(sz.value) > 1.2 ? sz.value : '1.2');
+    if (!sz.value) sz.value = '1.2';
+    document.documentElement.style.setProperty('--mc-scale', sz.value);
+    if (window.__mcFitOptions) window.__mcFitOptions();
+    if (window.__mcBoCuc) window.__mcBoCuc.doiLai();
+    sz.addEventListener('change', function () { try { localStorage.setItem('mc-lk-scale', sz.value); if (goc === null) localStorage.removeItem('mc-projector-scale'); else localStorage.setItem('mc-projector-scale', goc); } catch (e) {} });
+  }
   function lvCheBang() {
     var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb;
     if (!trang && !(LV.tt && LV.tt.khoi)) return;
     b.classList.add('mc-lk');
+    if (!trang) lvCoChu();
     cb = trang || !!(LV.tt && LV.tt.cheBang);
     // BẢNG CÓ TRANG RIÊNG (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang bl của bộ máy bút, tách khỏi nét của từng câu;
     // app giữ bản sao suốt buổi và trả lại khi tờ mới xin (đổi bài, bảng trắng ⇄ bài) — lệnh live-bang-nhap.

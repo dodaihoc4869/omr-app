@@ -106,7 +106,7 @@ export interface PropsLopLive {
  *  chiều cao khung — chữ to tự nhiên theo khổ máy (hệ số phóng kẹp theo bề ngang khung), đề dài ⇒ cỡ nhỏ nhất + cuộn dọc. */
 const GiayDe = memo(function GiayDe({ de, khoa, rong, cao, q, Chu, tuLuan, so }: { de: ReactNode | null; khoa: string; rong: number; cao: number; q?: CauGiay | null; Chu?: BoChu; tuLuan?: boolean; so?: number | null }) {
   const trong = useRef<HTMLDivElement>(null)
-  const kMin = Math.max(1, Math.min(1.6, rong / 480)), kMax = Math.max(1.25, Math.min(2.6, rong / 340))
+  const kMin = Math.max(1, Math.min(1.9, rong / 420)), kMax = Math.max(1.3, Math.min(3.2, rong / 300))
   const [k, setK] = useState(kMin)
   const coDe = de != null
   const da = useRef(0)

@@ -62,7 +62,7 @@ kiem('1a bấm mở: lớp live hiện NGAY (không lộ Hôm nay, không lộ b
 await ngu(2600)
 kiem('1b phòng chờ: phòng mang cờ khối, máy thầy ở phòng chờ', st()?.live?.khoi?.gd === 'cho' && (await trenCung(gv, 0.8, 0.5)) === 'phong-cho')
 kiem('1c bảng Bình Phản Ứng có gắn (giữ nối phòng) nhưng ẨN', (await bangBpu(gv)) === 'hidden', await bangBpu(gv))
-kiem('1d máy em: trò Giữ Lửa', await em1.locator('.lke.cho .gl canvas').isVisible())
+kiem('1d máy em: trò Giữ Lửa', await em1.locator('.lke.cho .gl canvas').first().isVisible())
 await chup(gv, '1-phong-cho')
 
 // ── 2. Bắt đầu live ⇒ sảnh cả hai phía, tiếng tự bật ──
@@ -173,6 +173,20 @@ kiem('4g em chọn B: nút gửi sáng «Gửi đáp án B»', await em1.locator
 await em1.locator('.lv-tra-gui').click(); await ngu(900)
 kiem('4h gửi xong: tấm chọn TỰ ẨN, phòng nhận đáp án của em; máy em vẫn ở màn chiếu', (await em1.locator('.lv-tra').count()) === 0 && !!st()?.luot?.tra?.S1 && await em1.locator('.lv-bang').isVisible(), JSON.stringify(st()?.luot?.tra?.S1 ?? null))
 await chup(gv, '4-hoc-bang-dua'); await chup(em1, '4-em-cau-hoi'); await chup(em2, '4-em-doc-cau-hoi')
+// (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá») buổi live: tờ mặc định «Chữ rất lớn» (1,2), máy em soi theo ⇒ chữ to theo;
+// thầy đổi cỡ trong Cài đặt của tờ ⇒ máy em theo ngay; nhớ riêng cho live, không đụng cỡ chữ buổi trên lớp
+const toHoc = gv.frameLocator('.lop-xem-phieu iframe')
+const coTo = () => toHoc.locator('body').evaluate(() => ({ chon: document.getElementById('mc-size')?.value, bien: document.documentElement.style.getPropertyValue('--mc-scale'), de: parseFloat(getComputedStyle(document.querySelector('.mc-vung-de .mc-de')).fontSize), lop: localStorage.getItem('mc-projector-scale'), live: localStorage.getItem('mc-lk-scale') }))
+const chuEm = (p) => p.evaluate(() => { const g = document.querySelector('.lv-gt'), c = g?.querySelector('.lv-gt-chu'); if (!g || !c) return null; const k = g.getBoundingClientRect().width / (g.offsetWidth || 1); return { khop: g.hasAttribute('data-khop'), px: Math.round(parseFloat(getComputedStyle(c).fontSize) * k * 10) / 10 } })
+const co1 = await coTo(), chu1 = await chuEm(em1)
+kiem('4i buổi live: tờ của thầy tự để «Chữ rất lớn» (1,2); cỡ chữ buổi trên lớp không bị ghi đè', co1.chon === '1.2' && co1.bien === '1.2' && co1.lop !== '1.2', JSON.stringify(co1))
+kiem('4j máy em soi khớp giấy thầy, chữ đề to theo', !!chu1 && chu1.khop && chu1.px > 0, JSON.stringify(chu1))
+await toHoc.locator('body').evaluate(() => { const s = document.getElementById('mc-size'); s.value = '1.4'; s.dispatchEvent(new Event('change', { bubbles: true })) }); await ngu(2600)
+const co2 = await coTo(), chu2 = await chuEm(em1)
+kiem('4k thầy chọn «Chữ cực lớn» trên tờ ⇒ máy em to theo ngay (≈ ×1,17), vẫn khớp; nhớ riêng cho live', co2.live === '1.4' && co2.lop === co1.lop && co2.de > co1.de * 1.1 && !!chu2 && chu2.khop && chu2.px > chu1.px * 1.1, JSON.stringify({ to: [co1.de, co2.de], em: [chu1, chu2], nho: [co2.lop, co2.live] }))
+await chup(em1, '4-em-chu-cuc-lon')
+await toHoc.locator('body').evaluate(() => { const s = document.getElementById('mc-size'); s.value = '1.2'; s.dispatchEvent(new Event('change', { bubbles: true })); localStorage.removeItem('mc-lk-scale') }); await ngu(2600)
+console.log('   cỡ chữ đề (px): tờ thầy', co1.de, '· máy em 844×390', chu1?.px, '· «cực lớn»', chu2?.px)
 
 // ── 5. Esc ở «Học» ⇒ về sảnh; «Quay lại bài» ──
 await gv.keyboard.press('Escape'); await ngu(500)

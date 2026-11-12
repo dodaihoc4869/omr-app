@@ -45,3 +45,27 @@ describe('Live theo khối — máy thầy: một luật điều hướng', () =
     expect(lop).not.toContain('bangHien')
   })
 })
+
+// Thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá». Máy em soi đúng cách xuống dòng của giấy thầy ⇒ chữ to theo tờ + bề ngang giấy.
+describe('Live theo khối — chữ đề trên máy em to hơn', () => {
+  const to = doc('src/lib/live-to-chieu.ts')
+  it('buổi live: tờ mặc định «Chữ rất lớn» (1,2), nhớ riêng cho live, trả lại cỡ chữ buổi trên lớp', () => {
+    const ham = doan(to, 'function lvCoChu()', '\n  }\n')
+    expect(ham).toContain("sz.value = luu || (parseFloat(sz.value) > 1.2 ? sz.value : '1.2')")
+    expect(ham).toContain("localStorage.setItem('mc-lk-scale', sz.value)")
+    expect(ham).toContain("localStorage.setItem('mc-projector-scale', goc)")
+    expect(to).toContain('if (!trang) lvCoChu();')
+  })
+  it('đang chọn đáp án: màn rộng thì giấy nới tới 70 %, điện thoại không hẹp hơn trước', () => {
+    const chia = (w: number) => Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, w)), Math.min(0.7, 1 - 420 / Math.max(1, w)))
+    expect(doc('src/components/live/KhungDocLap.tsx')).toContain('q.coTra ? Math.max(0.35, Math.min(0.6, 1 - 330 / Math.max(1, hinh.w)), Math.min(0.7, 1 - 420 / Math.max(1, hinh.w)))')
+    expect(chia(844)).toBeCloseTo(0.6, 2)
+    expect(chia(1280)).toBeGreaterThan(0.66)
+    expect(chia(1971)).toBe(0.7)
+    expect(chia(480)).toBe(0.35)
+  })
+  it('đề dựng riêng trên máy em (câu có hình / bảng): hệ số phóng lớn hơn bản trước', () => {
+    expect(doc('src/components/live/LopLive.tsx')).toContain('const kMin = Math.max(1, Math.min(1.9, rong / 420)), kMax = Math.max(1.3, Math.min(3.2, rong / 300))')
+  })
+})
+

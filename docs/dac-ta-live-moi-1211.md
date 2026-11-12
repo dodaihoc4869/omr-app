@@ -121,3 +121,8 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - **«Học» ở bảng danh sách = mở bảng chọn** (một lần bấm, mảnh nạp sẵn); trong khay nút bốn ô: đang có bài ⇒ về bài, chưa có ⇒ bảng chọn. Chọn hoạt động từ bảng danh sách ⇒ tấm hiện ngay dù phòng còn «sanh».
     - **Đạt / Chưa đạt:** chỉ ghi kết quả + mở đáp án + con dấu máy em; máy thầy Ở NGUYÊN màn chiếu (không phóng bảng đua, không che tờ).
     - **Không tự toàn màn hình** trong buổi live; bỏ hẳn cụm nút nổi của app (`.lkt-vien`).
+28. **Chữ đề trên máy em to hơn** (thầy 12/11 «chữ hiện tại nhỏ quá»). Máy em soi ĐÚNG cách xuống dòng của giấy thầy (để nét gạch chân khớp chữ) ⇒ cỡ chữ máy em = cỡ chữ tờ × bề ngang giấy. Ba việc:
+    - Buổi live: tờ của thầy mặc định **«Chữ rất lớn» (1,2)**; thầy đổi ở Cài đặt của tờ («Cỡ chữ đề») thì máy em theo ngay; nhớ riêng cho live (`mc-lk-scale`), cỡ chữ buổi trên lớp không đổi (`src/lib/live-to-chieu.ts` `lvCoChu`).
+    - Đang chọn đáp án: màn rộng (máy tính bảng, máy tính) giấy nới tới 70 % bề ngang, bảng còn ≥ 420 px cho tấm chọn; điện thoại giữ 60 % (`KhungDocLap.tsx`).
+    - Câu có hình / bảng (máy em dựng riêng, `GiayDe`): hệ số phóng 1–1,9 … 1,3–3,2 (trước 1–1,6 … 1,25–2,6).
+    - Giới hạn nói thẳng: muốn to hơn nữa thì chọn «Chữ cực lớn»; đề dài khi ấy tờ thầy phải lật trang / cuộn.
