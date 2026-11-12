@@ -26,6 +26,7 @@ import { SQL_LUOT_GOI7, sqlTenLopHs } from './goi-bai-7'
 import { SQL_KHONG_LAM_LAI, SQL_KHONG_TU_SUA, SQL_LA_LUOT_CHANG } from './chuoi-ngay-bai'
 import { SO_XEM_RONG, SQL_NO_XEM, gomDongNo, xemNoEm, type NoCauXem } from './no-cau-xem'
 import { sqlEmDangNhan7 } from './goi-bai-7-quyen'
+import { SQL_EM_NHAN7, docEmNhan7Cron } from './goi-bai-7-em-nhan'
 import { mucUocGoi7 } from './goi-bai-7-loi'
 import { SQL_TC } from './lam-lai-so'
 import { idDaLam } from './hanh-trinh-nguon-cau'
@@ -335,10 +336,14 @@ async function docCoGoi7(env: Env): Promise<boolean> {
 // "12 - Lớp Thường" bị tính theo Hành trình phía thầy trong khi máy em đang ở Gói 7.
 const SQL_GOI7_EM = `SELECT e.sbd AS sbd, MIN(e.bat_dau) AS bat_dau FROM goi_bai_7_em e JOIN goi_bai_7 g ON g.id = e.goi_id
   JOIN hoc_sinh h ON h.sbd = e.sbd AND ${sqlTenLopHs('h')} = g.lop JOIN bai_da_day b ON b.id = g.tick_id AND b.bo_tick_luc IS NULL AND ${sqlEmDangNhan7('e','g','h')}`
-/** sbd → ngày bắt đầu Gói 7 sớm nhất (đúng điều kiện `docGoiCuaEm7`). Cờ tắt ⇒ rỗng. Lỗi đọc ⇒ null. */
-async function docGoi7Em(env: Env, sbd?: string): Promise<Map<string, string> | null> {
+/** sbd → ngày bắt đầu Gói 7 sớm nhất (đúng điều kiện `docGoiCuaEm7`). Cờ tắt ⇒ rỗng. Lỗi đọc ⇒ null.
+ *  Cả lớp (12/11): `SQL_EM_NHAN7` — cùng kết quả, cùng thứ tự sbd, nhưng chỉ đi qua gói còn hoạt động và bung danh sách tick một lần (~28 nghìn ⇒ ~3 nghìn dòng/lượt).
+ *  Một em: câu cũ theo chỉ mục sbd (vài chục dòng). */
+async function docGoi7Em(env: Env, sbd?: string, cronNow?: number): Promise<Map<string, string> | null> {
   if (!(await docCoGoi7(env))) return new Map()
-  const r = sbd ? await hoi(env, `${SQL_GOI7_EM} WHERE e.sbd = ? GROUP BY e.sbd`, sbd) : await hoi(env, `${SQL_GOI7_EM} GROUP BY e.sbd`)
+  const r = sbd ? await hoi(env, `${SQL_GOI7_EM} WHERE e.sbd = ? GROUP BY e.sbd`, sbd)
+    : cronNow !== undefined ? await docEmNhan7Cron(env, cronNow).catch(() => null) // CHỈ cron (bản dùng chung ≤ 5 phút, goi-bai-7-em-nhan.ts)
+    : await hoi(env, SQL_EM_NHAN7)
   if (!r) return null
   return new Map(r.filter((x) => NGAY_RE.test(str(x.bat_dau))).map((x) => [str(x.sbd), str(x.bat_dau)]))
 }
@@ -350,11 +355,12 @@ async function docHoSoLop(env: Env): Promise<{ hs: Row[]; ds: Row[] } | null> {
   return { hs: hs ?? [], ds: ds ?? [] }
 }
 
-export async function docDanhSachEm(env: Env, canhBao: string[]): Promise<EmGoc[] | null> {
+/** `cronNow` — CHỈ cron nền (Bốn bảng): danh sách Gói 7 lấy bản dùng chung ≤ 5 phút (goi-bai-7-em-nhan.ts); lệnh thầy / phụ huynh không truyền ⇒ đọc thẳng. */
+export async function docDanhSachEm(env: Env, canhBao: string[], cronNow?: number): Promise<EmGoc[] | null> {
   const [lop, cd, goi7] = await Promise.all([
     docHoSoLop(env),
     hoi(env, "SELECT id, sbd_json FROM chien_dich WHERE trang_thai = 'dang_chay' AND id LIKE 'hanh-trinh-v3-khoi-%'"),
-    docGoi7Em(env),
+    docGoi7Em(env, undefined, cronNow),
   ])
   if (!lop) return null
   if (!goi7) canhBao.push('Chưa đọc được Gói bài 7 ngày — các em tính theo kế hoạch Hành trình.')
