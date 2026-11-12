@@ -3,17 +3,20 @@
 // cho hiện nút luôn lên đề để hs chọn cho tiện, bỏ đáp án ở bên bảng đen để hs kéo được đề to nhất có thể.»
 // Hành vi thật thử trên trình duyệt: scripts/thu-live-1011/thu-gv-that-1211.mjs (4e, 4f, 4o2, 4r, 4r2, 7d, 7i).
 import { readFileSync } from 'node:fs'
-import { render } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { act, fireEvent, render } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { daiLuot } from '../src/components/live/DaiLuot'
 import { DauDat, TamTra } from '../src/components/live/TamTra'
 
 const doc = (p: string) => readFileSync(p, 'utf8')
 const tra = { chon: 'D S ', dat: () => {}, phim: () => {} }
+/** Dựng dải rồi chạm thanh xám cho dải hiện (mặc định dải thu về thanh xám). */
+const moDai = (ui: Parameters<typeof render>[0]) => { const r = render(ui); fireEvent.click(r.container.querySelector('.lv-tra-nam')!); return r }
+afterEach(() => { vi.useRealTimers() })
 
 describe('dải chọn đáp án ngay trên đề', () => {
   it('Đúng–sai: bốn nhóm a–d, nút Đúng / Sai giữ lựa chọn, ghi «n/4 ý» và «x/y bạn đã gửi»; chưa đủ 4 ý thì chưa gửi được', () => {
-    const { container } = render(<TamTra so={2} phan="II" tuLuan={false} tra={tra} dem="0/1" />)
+    const { container } = moDai(<TamTra so={2} phan="II" tuLuan={false} tra={tra} dem="0/1" />)
     expect(container.querySelectorAll('.lv-tra-hang').length).toBe(4)
     expect(container.querySelector('.lv-tra-hang [data-v="D"]')?.getAttribute('aria-pressed')).toBe('true')
     expect(container.querySelector('.lv-tra-dau')?.textContent).toContain('2/4 ý')
@@ -21,8 +24,34 @@ describe('dải chọn đáp án ngay trên đề', () => {
     expect((container.querySelector('.lv-tra-gui') as HTMLButtonElement).disabled).toBe(true)
   })
   it('trắc nghiệm và trả lời ngắn: A B C D · ô số + 12 phím', () => {
-    expect(render(<TamTra so={1} phan="I" tuLuan={false} tra={{ ...tra, chon: 'B' }} onGui={() => {}} />).container.querySelector('.lv-tra-gui')?.textContent).toBe('Gửi đáp án B')
-    expect(render(<TamTra so={5} phan="III" tuLuan={false} tra={{ ...tra, chon: '6.72' }} onGui={() => {}} />).container.querySelectorAll('.lv-tra-phim .lv-tra-nut').length).toBe(12)
+    expect(moDai(<TamTra so={1} phan="I" tuLuan={false} tra={{ ...tra, chon: 'B' }} onGui={() => {}} />).container.querySelector('.lv-tra-gui')?.textContent).toBe('Gửi đáp án B')
+    expect(moDai(<TamTra so={5} phan="III" tuLuan={false} tra={{ ...tra, chon: '6.72' }} onGui={() => {}} />).container.querySelectorAll('.lv-tra-phim .lv-tra-nut').length).toBe(12)
+  })
+  it('(thầy 12/11 tối, bản vẽ 28–30) thu về THANH XÁM: câu mới chỉ có thanh + dòng nhắc 5 giây; chạm ⇒ dải hiện; 6 giây không chạm ⇒ tự thu, lựa chọn dở có chấm nhắc; sang câu mới ⇒ thu lại + nhắc lại', () => {
+    vi.useFakeTimers()
+    const { container, rerender } = render(<TamTra so={2} phan="II" tuLuan={false} tra={{ ...tra, chon: '' }} />)
+    const q = (s: string) => container.querySelector(s)
+    expect(q('.lv-tra')).toBeNull()
+    expect(q('.lv-tra-nhac')?.textContent).toBe('Chạm thanh xám để chọn đáp án')
+    expect(q('.lv-tra-nam')?.hasAttribute('data-do')).toBe(false)
+    act(() => { vi.advanceTimersByTime(5100) })
+    expect(q('.lv-tra-nhac')).toBeNull()
+    expect(q('.lv-tra-nam')).not.toBeNull()
+    fireEvent.click(q('.lv-tra-nam')!)
+    expect(q('.lv-tra')).not.toBeNull()
+    act(() => { vi.advanceTimersByTime(5000) })
+    expect(q('.lv-tra')).not.toBeNull() // chưa đủ 6 giây
+    fireEvent.pointerDown(q('.lv-tra')!) // em chạm ⇒ đếm lại
+    act(() => { vi.advanceTimersByTime(5000) })
+    expect(q('.lv-tra')).not.toBeNull()
+    rerender(<TamTra so={2} phan="II" tuLuan={false} tra={tra} />) // em vừa chọn thêm ⇒ đếm lại
+    act(() => { vi.advanceTimersByTime(6100) })
+    expect(q('.lv-tra')).toBeNull()
+    expect(q('.lv-tra-nam')?.hasAttribute('data-do')).toBe(true) // còn lựa chọn dở
+    expect(q('.lv-tra-nhac')).toBeNull()
+    rerender(<TamTra so={3} phan="I" tuLuan={false} tra={{ ...tra, chon: '' }} />) // câu mới
+    expect(q('.lv-tra')).toBeNull()
+    expect(q('.lv-tra-nhac')).not.toBeNull()
   })
   it('dải nằm trong KHUNG GIẤY (không còn trong khung bảng); vùng đọc đề dừng trên dải; dải thấp trên điện thoại ngang', () => {
     const k = doc('src/components/live/KhungDocLap.tsx'), l = doc('src/components/live/LopLive.tsx'), css = doc('src/components/live/live-em.css')

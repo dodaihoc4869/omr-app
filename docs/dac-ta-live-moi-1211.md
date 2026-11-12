@@ -148,3 +148,7 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Tờ đổi bố cục TRƯỚC rồi mới đổi trang bút ⇒ ô giấy / ô bảng gửi máy em đúng ngay từ sự kiện đầu (`live-to-chieu.ts` `lvCheBang`); thầy bấm thì tờ đổi NGAY, phòng xác nhận sau (`lvDoiChe`).
     - **Phím Tab** = đổi Học ⇄ Bảng (trong tờ và ở cửa sổ app khi đang ở tấm hoạt động); khay ghi «phím Tab đổi Học ⇄ Bảng».
 36. **Máy em không còn lệnh khoá xoay của hệ điều hành** (thầy 12/11 lần 3 «khi vào live màn hình học sinh vẫn tự quay một lần, bỏ triệt để — ép ngang nhưng không khoá xoay»): máy dọc ⇒ xoay hình trong app (`chieu-xoay.ts`); em xoay máy tự do.
+37. **Dải chọn đáp án thu về THANH XÁM ở mép dưới đề** (thầy 12/11 tối, bản vẽ `docs/ban-ve-live-moi-1211/28–30` «chốt build rồi đẩy luôn»; `TamTra.tsx`):
+    - Câu mới ⇒ chỉ có thanh xám nhỏ giữa mép dưới đề + dòng «Chạm thanh xám để chọn đáp án» hiện 5 giây rồi tự ẩn; cả trang đề để đọc.
+    - Chạm thanh ⇒ dải chọn hiện (mục 33); 6 giây không chạm / không đổi lựa chọn ⇒ dải tự thu. Lựa chọn dở vẫn giữ, cạnh thanh có chấm nhắc. Trên đầu dải có thanh nhỏ để chạm thu lại.
+    - Gửi xong / thầy bấm «Lên bảng» ⇒ ẩn hẳn như cũ.

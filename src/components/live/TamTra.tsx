@@ -3,6 +3,9 @@
 //  · DẢI NGANG neo đáy khung GIẤY ĐỀ (KhungDocLap `duoiGiay`), tự xuống hàng theo bề ngang giấy; đề đọc / cuộn ở phía trên dải. Bảng đen để trống cho thầy viết.
 //  · Trắc nghiệm: A B C D · Đúng–sai: bốn nhóm a–d, mỗi nhóm Đúng | Sai · Trả lời ngắn: ô số + phím số · Tự luận: «Em làm xong».
 //  · Lựa chọn vẫn là trạng thái của màn Bình Phản Ứng (`chon`, `dat`, `phim`, `onGui` truyền xuống) ⇒ luật gửi / khoá / chấm giữ nguyên.
+//  · THU VỀ THANH XÁM (thầy 12/11 tối, bản vẽ 28–30 «chốt build rồi đẩy luôn»: «bảng chọn đáp án có thể ẩn xuống mép dưới của đề vào một thanh màu xám nhỏ rồi
+//    bấm vào sẽ hiện ra, nếu không bấm sẽ tự ẩn» · «chữ chạm thanh xám để chọn đáp án hiện tầm 5 giây rồi tự ẩn»): câu mới ⇒ chỉ có thanh xám + dòng nhắc 5 giây;
+//    chạm thanh ⇒ dải hiện; 6 giây không chạm gì ⇒ dải tự thu (lựa chọn dở vẫn giữ, cạnh thanh có chấm nhắc). Cả trang đề trống để đọc.
 // + CON DẤU «ĐẠT» / «KHÔNG ĐẠT» đóng giữa CẢ MÀN — đè cả sang phần đề — trong 3 giây khi thầy chấm em lên bảng («chữ không đạt và đạt cho triện đè luôn cả sang
 //   phần đề»), kèm tên em lên bảng.
 // AN TOÀN ĐÁP ÁN: không nhận đáp án / lời giải — chỉ số ý, số phương án và lựa chọn của chính em.
@@ -22,8 +25,23 @@ export function TamTra({ so, phan, tuLuan, soPa = 4, tra, onGui, dem }: { so: nu
   const { chon, dat, phim } = tra
   const ds = chon.padEnd(4, ' ')
   const daChon = phan === 'II' ? [...ds.slice(0, 4)].filter((c) => c === 'D' || c === 'S').length : 0
+  // THU / HIỆN: câu mới (số lượt đổi) ⇒ thu về thanh xám + nhắc 5 giây; đang hiện mà 6 giây không chạm (không đổi lựa chọn) ⇒ tự thu
+  const [mo, setMo] = useState(false)
+  const [nhac, setNhac] = useState(true)
+  const [cham, setCham] = useState(0)
+  const [soCu, setSoCu] = useState(so)
+  if (soCu !== so) { setSoCu(so); setMo(false); setNhac(true) }
+  useEffect(() => { if (!nhac) return; const h = setTimeout(() => setNhac(false), 5000); return () => clearTimeout(h) }, [nhac, so])
+  useEffect(() => { if (!mo) return; const h = setTimeout(() => setMo(false), 6000); return () => clearTimeout(h) }, [mo, cham, chon])
+  if (!mo) return (
+    <div className="lv-tra-thu" onPointerDown={dung} onPointerUp={dung} onClick={dung} onDoubleClick={dung}>
+      {nhac ? <span className="lv-tra-nhac" role="status">Chạm thanh xám để chọn đáp án</span> : null}
+      <button type="button" className="lv-tra-nam" data-do={chon.trim() ? '' : undefined} aria-expanded={false} aria-label={`Mở phần chọn đáp án câu ${so}`} onClick={() => { setNhac(false); setMo(true) }}><i aria-hidden="true" /></button>
+    </div>
+  )
   return (
-    <div className="lv-tra" role="group" aria-label={`Trả lời câu ${so}`} onPointerDown={dung} onPointerMove={dung} onPointerUp={dung} onWheel={dung} onClick={dung} onDoubleClick={dung}>
+    <div className="lv-tra" role="group" aria-label={`Trả lời câu ${so}`} onPointerDown={(e) => { dung(e); setCham((n) => n + 1) }} onPointerMove={dung} onPointerUp={dung} onWheel={dung} onClick={dung} onDoubleClick={dung}>
+      <button type="button" className="lv-tra-nam trong" aria-expanded aria-label="Thu phần chọn đáp án" onClick={() => setMo(false)}><i aria-hidden="true" /></button>
       <div className="lv-tra-dau">
         <span>Câu {so} · {tuLuan ? 'em làm ra giấy' : phan === 'I' ? 'chọn một đáp án' : phan === 'II' ? 'chọn Đúng / Sai cho từng ý' : 'nhập đáp số'}</span>
         {phan === 'II' && !tuLuan ? <em>{daChon}/4 ý</em> : null}
