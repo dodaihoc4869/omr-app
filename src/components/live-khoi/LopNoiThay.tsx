@@ -86,10 +86,17 @@ export default function LopNoiThay() {
   // Cụm điều khiển nằm trong khay nút bốn ô của TỜ (thầy 12/11 «phần nút này bị rối, chuyển nó vào trong cái 4 nút»): tờ báo bấm bằng sự kiện `ddh-lkt`
   // (qua thay-noi.ts); số tin mới báo ngược lại bằng `ddh-lkt-moi`. Cụm nổi của app chỉ còn lúc BẢNG ĐUA đang hiện (tờ bị che, không có nút bốn ô).
   const lenhTo = useRef<(v: string) => void>(() => {})
-  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'khay') setChat(false) }
+  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'khay' || v === 'ngoai') setChat(false) }
   useEffect(() => { const f = (e: Event) => lenhTo.current(String((e as CustomEvent<string>).detail)); window.addEventListener('ddh-lkt', f); return () => window.removeEventListener('ddh-lkt', f) }, [])
   const moiBao = chat ? 0 : moi
-  useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lkt-moi', { detail: moiBao })) }, [moiBao])
+  useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lkt-moi', { detail: { moi: moiBao, chat } })) }, [moiBao, chat])
+  // BẤM RA NGOÀI ⇒ cột tin nhắn tự thu (thầy 12/11): bấm trong app (ngoài cột, ngoài cụm nút) thì thu tại đây; bấm vào tờ thì tờ báo về (`ngoai`).
+  useEffect(() => {
+    if (!chat) return
+    const f = (e: PointerEvent) => { if (!(e.target as Element | null)?.closest?.('.lkt-chat, .lkt-vien')) setChat(false) }
+    window.addEventListener('pointerdown', f, true)
+    return () => window.removeEventListener('pointerdown', f, true)
+  }, [chat])
   // Phím M đóng / mở cột tin nhắn (không khi thầy đang gõ chữ).
   useEffect(() => {
     if (!dang) return

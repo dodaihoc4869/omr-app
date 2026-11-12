@@ -1,26 +1,33 @@
 // «VÌ SAO EM SAI?» trên máy em — khối B đợt 2 (thầy 09/11 duyệt bản vẽ docs/ban-ve-moi-on-sua-0911 ảnh dt-sang-2b, «làm hết sạch đẩy luôn lên bản sống»).
 // Khoá: câu sai hiện 3 ô lý do, chưa chạm ⇒ «Tiếp tục» chờ (choLyDoSai); chạm ⇒ xếp hàng trên máy (sống qua tải lại), gửi KÈM lệnh nộp câu kế (`ly`),
 // máy chủ nhận ⇒ bỏ khỏi hàng (đổi ý sau lúc gửi ⇒ giữ bản mới); câu làm lại không hỏi; dòng «vào lịch ôn 1 · 3 · 7 ngày» đã thay bằng nhóm sửa.
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { act, cleanup, fireEvent, render } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
-import { CHU_CHO_LY_DO, bacBoTu, choLyDoSai, chonLyDoSai, daGuiLyDoSai, thanLyDoSai } from '../src/components/hoc-tap/vi-sao-sai'
+import { CHU_CHO_LY_DO, GOI_Y_LY_DO, KHOA_TIEP_MS, bacBoTu, choLyDoSai, chonLyDoSai, daGuiLyDoSai, thanLyDoSai } from '../src/components/hoc-tap/vi-sao-sai'
 import { KetSai } from '../src/components/hoc-tap/KetSaiDuo'
 
-afterEach(() => { cleanup(); const g = thanLyDoSai(); daGuiLyDoSai(g); localStorage.clear() })
+beforeEach(() => { vi.useFakeTimers({ toFake: ['Date'] }) })
+afterEach(() => { cleanup(); const g = thanLyDoSai(); daGuiLyDoSai(g); localStorage.clear(); vi.useRealTimers() })
+const quaKhoa = () => vi.setSystemTime(Date.now() + KHOA_TIEP_MS + 50) // 12/11: «Tiếp tục» bỏ mọi chạm trong 600 ms đầu (chống lướt)
 
 describe('KetSai', () => {
   it('3 ô lý do, bắt buộc chạm, chạm lại đổi ý, xếp hàng gửi kèm lệnh kế', () => {
     const { container, getByRole } = render(<KetSai qid="q1" dap="Đáp án đúng: B. Methylamine" giai="Methylamine có tính base mạnh hơn ammonia." laLamLai={false} tenDang="Tính base của amine" />)
-    const o = [...container.querySelectorAll('.o-ly button')].map(b => b.textContent)
+    const o = [...container.querySelectorAll('.o-ly button .chu b')].map(b => b.textContent)
     expect(o).toEqual(['Tính / đọc đề sai', 'Chưa biết cách', 'Hiểu nhầm'])
+    expect([...container.querySelectorAll('.o-ly button small')].map(b => b.textContent)).toEqual([GOI_Y_LY_DO.tinh, GOI_Y_LY_DO.cach, GOI_Y_LY_DO.nham])
+    expect(container.querySelector('.ly-trang')!.textContent).toBe('Chọn 1 ý')
     expect(container.querySelector('.ly-do h3')!.textContent).toBe('Vì sao em sai?')
     expect(container.textContent).toContain('Câu này vào nhóm sửa «Tính base của amine».')
     expect(container.textContent).not.toContain('1 · 3 · 7')
     expect(choLyDoSai()).toBe(true)
     expect(thanLyDoSai()).toEqual({})
     act(() => { fireEvent.click(getByRole('button', { name: 'Chưa biết cách' })) })
+    expect(choLyDoSai()).toBe(true) // đã chọn nhưng còn trong 600 ms đầu ⇒ chưa đi (chạm đúp từ «Kiểm tra» không lướt qua)
+    quaKhoa()
     expect(choLyDoSai()).toBe(false)
+    expect(container.querySelector('.ly-trang')!.textContent).toBe('✓ Đã ghi')
     expect(getByRole('button', { name: 'Chưa biết cách' }).getAttribute('aria-pressed')).toBe('true')
     act(() => { fireEvent.click(getByRole('button', { name: 'Hiểu nhầm' })) })
     expect(getByRole('button', { name: 'Chưa biết cách' }).getAttribute('aria-pressed')).toBe('false')
@@ -39,6 +46,7 @@ describe('KetSai', () => {
     const { unmount } = render(<KetSai qid="q2" dap="x" giai="" laLamLai={false} />)
     expect(choLyDoSai()).toBe(true)
     unmount()
+    quaKhoa()
     expect(choLyDoSai()).toBe(false)
     const { container } = render(<KetSai qid="q3" dap="x" giai="" laLamLai />)
     expect(container.querySelector('.o-ly')).toBeNull()
@@ -58,7 +66,7 @@ describe('màn làm bài nối đúng chỗ', () => {
     expect(src).toMatch(/const ly = thanLyDoSai\(q\.qid\), than = \{[^}]*\.\.\.ly,/)
     expect(src).toContain('daGuiLyDoSai(ly)')
     expect(src).not.toContain('1 · 3 · 7')
-    expect(CHU_CHO_LY_DO).toBe('Chọn một lý do để tiếp tục')
+    expect(CHU_CHO_LY_DO).toBe('Chọn 1 ý để tiếp tục')
   })
 })
 

@@ -10,6 +10,7 @@
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { taoLoiBut, type SuKienBut } from '../../lib/but-bang-loi'
+import { toaDoXoay } from './chieu-xoay'
 import { giaiTrang, khungChieu, type AnToan, type KhungChieu, type VungChieu } from './bo-cuc'
 import { DAU_BANG, DAU_DU, NHUONG_MS, NO_MS, TI_LE_CHU_MAC_DINH, boCucDocLap, buocTroi, chuyenKhung, docChia, ghiChia, khungVeDL, mocChia, netOBang, oDauBang, taoUuTien, troiGiay, vungBut, type BoCucDL, type Vung } from './bo-cuc-doc-lap'
 import { taoVeBang, type VeBang } from './ve-bang'
@@ -160,7 +161,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   const toaDo = (e: { clientX: number; clientY: number }): { x: number; y: number } => {
     const r = goc.current?.getBoundingClientRect()
     if (!r) return { x: e.clientX, y: e.clientY }
-    return P.current.layHinh().xoay ? { x: e.clientY - r.top, y: r.right - e.clientX } : { x: e.clientX - r.left, y: e.clientY - r.top }
+    return P.current.layHinh().xoay ? toaDoXoay(e, r) : { x: e.clientX - r.left, y: e.clientY - r.top }
   }
   const epPhong = p.epPhong
   useEffect(() => { if (epPhong === undefined || S.current.phong === epPhong) return; S.current.phong = epPhong; P.current.khiPhong?.(epPhong); xep(true) }, [epPhong, xep])

@@ -4,6 +4,7 @@
 // Máy yếu / giảm chuyển động ⇒ 30 khung / giây, bỏ quầng sáng. Màu đọc từ biến CSS của app. Lượt hạ trong trò KHÔNG cộng vào kJ buổi học.
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as SuKienTro } from 'react'
 import { DOI_BPU } from '../../lib/bpu/phong'
+import { toaDoXoay } from '../live/chieu-xoay'
 import type { KenhLop, NguoiLop, SinhTonAnh, SinhTonGui, TinLop } from '../../lib/live-khoi/kieu'
 import {
   ANH_MS, CAP_TOI_DA, HOP_BK, MAU_DAY, NHIP_GUI_MS, NHIP_NHAC_MS, SUNG_TEN, buocToi, chonMucTieu, anVoi, conLai, dangAn, dangChet, dangNghi, docDong, hopSo, laMay, ngoaiVong,
@@ -20,7 +21,7 @@ export interface TroSinhTonProps {
   kenh: KenhLop
   soEm: number
   mayYeu?: boolean
-  /** Khung cha đang bị XOAY HÌNH bằng CSS `rotate(90deg) translateY(-100%)` gốc 0 0 (iPhone cầm dọc) ⇒ đổi toạ độ con trỏ về hệ của khung. */ xoay?: boolean
+  /** Khung cha đang bị XOAY HÌNH bằng CSS (điện thoại cầm dọc; chiều xoay theo src/components/live/chieu-xoay.ts) ⇒ đổi toạ độ con trỏ về hệ của khung. */ xoay?: boolean
   /** Máy thầy xem trận: thấy CẢ sân, không có bé ma của mình, không gửi gì. */ xemThoi?: boolean
 }
 
@@ -429,7 +430,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
   // ── Cử chỉ: VUỐT ở đâu cũng là cần ảo vô hình; CHẠM nhanh một điểm = chạy tới đó. Toạ độ đổi về hệ của KHUNG (lớp live có thể xoay 90° bằng CSS). ──
   const toaDo = (e: SuKienTro) => {
     const r = (vaiRef.current ?? e.currentTarget).getBoundingClientRect()
-    return xoay ? { x: e.clientY - r.top, y: r.right - e.clientX } : { x: e.clientX - r.left, y: e.clientY - r.top }
+    return xoay ? toaDoXoay(e, r) : { x: e.clientX - r.left, y: e.clientY - r.top }
   }
   const xuong = (e: SuKienTro<HTMLDivElement>) => {
     const i = vao.current

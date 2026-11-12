@@ -42,7 +42,12 @@ export function useChatLop(kenh: KenhLop | null): ChatLop {
       if (Date.now() < hetLichSu) setDocLuc((cu) => Math.max(cu, tin.l))
     })
     if (daXin.current !== kenh) { daXin.current = kenh; kenh.gui('chat', { xin: 1 } satisfies ChatGui) }
-    return bo
+    // EM QUAY LẠI APP / CÓ MẠNG LẠI (thầy 12/11 «thầy nhắn mà hs không thấy»): tin chỉ được phát cho máy ĐANG nối — em vừa rời app hay rớt mạng là lỡ. Xin lại
+    // lịch sử (phòng giữ 200 tin gần nhất; tin trùng mã bị bỏ) ⇒ tin lỡ hiện lại thành bong bóng + số tin mới. Hai nhịp: ngay và sau khi kết nối kịp nối lại.
+    let h1: ReturnType<typeof setTimeout> | undefined, h2: ReturnType<typeof setTimeout> | undefined
+    const xinLai = () => { if (document.hidden) return; clearTimeout(h1); clearTimeout(h2); const x = () => kenh.gui('chat', { xin: 1 } satisfies ChatGui); h1 = setTimeout(x, 400); h2 = setTimeout(x, 2500) }
+    document.addEventListener('visibilitychange', xinLai); window.addEventListener('pageshow', xinLai); window.addEventListener('online', xinLai)
+    return () => { bo(); clearTimeout(h1); clearTimeout(h2); document.removeEventListener('visibilitychange', xinLai); window.removeEventListener('pageshow', xinLai); window.removeEventListener('online', xinLai) }
   }, [kenh])
 
   const gui = useCallback((chu: string): KetQuaGui => {
@@ -136,7 +141,7 @@ export function BongTinMoi({ tin }: { tin: TinChat | null }) {
   return (
     <div className="lc-goc lc-bong-cho" aria-live="polite">
       {tin && daMo !== tin.id && (
-        <div key={tin.id} className="lc-bong-noi" style={mauDoi(tin.doi)} onAnimationEnd={() => setDaMo(tin.id)}>
+        <div key={tin.id} className={`lc-bong-noi${tin.thay ? ' thay' : ''}`} style={mauDoi(tin.doi)} onAnimationEnd={() => setDaMo(tin.id)}>
           <b>{tin.thay ? 'Thầy' : ky ? `${tin.ten} · ${ky}` : tin.ten}</b>
           <ChuTin chu={tin.chu} />
         </div>

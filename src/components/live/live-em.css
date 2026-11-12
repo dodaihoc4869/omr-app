@@ -7,6 +7,8 @@
 .bpu-hs.live-bang > :not(.lv) { content-visibility: hidden; visibility: hidden; }
 /* iPhone / máy không khoá ngang được, đang cầm dọc: xoay HÌNH 90° (đỉnh máy thành mép trái hình) */
 .lv[data-xoay] { transform-origin: 0 0; transform: rotate(90deg) translateY(-100%); }
+/* xoay NGƯỢC: em đang cầm máy theo chiều ngang kia (chieu-xoay.ts) ⇒ hình xoay về phía đó, không bao giờ lộn ngược so với tay cầm */
+.lv[data-xoay="nguoc"] { transform: rotate(-90deg) translateX(-100%); }
 /* thước đo vùng an toàn của MÁY (tai thỏ, thanh home) — đọc bằng getComputedStyle */
 .lv-thuoc { position: absolute; left: 0; top: 0; width: 0; height: 0; visibility: hidden; pointer-events: none;
   padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
@@ -73,7 +75,7 @@
 /* khay đang mở (nằm trên tay nắm) ⇒ ẩn dấu, khỏi ló nửa vời sau mép khay */
 .lv-nam[aria-expanded="true"] .lv-nam-dau { visibility: hidden; }
 .lv-nam-dau b[data-dau="tieng"], .lv-nam-dau b[data-dau="mang"] { color: var(--p-cam); box-shadow: inset 0 0 0 1px var(--p-cam); }
-.lv-nam-dau b[data-dau="mic"], .lv-nam-dau b[data-dau="tay"] { background: var(--doi); color: var(--p-muc); box-shadow: none; }
+.lv-nam-dau b[data-dau="mic"], .lv-nam-dau b[data-dau="tay"], .lv-nam-dau b[data-dau="tin"] { background: var(--doi); color: var(--p-muc); box-shadow: none; }
 /* (GIỮ KHAI BÁO CŨ — luật giữ màu; từ 11/11 lần 3 không còn dựng: huy hiệu tròn cạnh tay nắm `.lv-nam-hh`, viên «Tiếng đang tắt» nổi `.lv-tieng-tat`.) */
 .lv-nam-hh { position: absolute; left: calc(50% + 30px); top: 2px; width: 34px; height: 34px; margin-top: 0; border-radius: 50%; display: grid; place-items: center; background: var(--doi); color: var(--p-muc); pointer-events: none;
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--doi) 28%, transparent), 0 6px 18px color-mix(in srgb, var(--tr-chieu-bang) 50%, transparent); }

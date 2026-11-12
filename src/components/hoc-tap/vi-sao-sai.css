@@ -1,21 +1,47 @@
 /* «Vì sao em sai?» (khối B đợt 2 — bản vẽ docs/ban-ve-moi-on-sua-0911 ảnh dt-sang-2b, thầy duyệt 09/11). Phẳng như dải kết quả; chỉ biến màu Trong đã có. */
 [data-trong] .duo-ket .ly-do { margin-top: 10px; }
+[data-trong] .duo-ket .ly-dau { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
 [data-trong] .duo-ket .ly-do h3 { margin: 0; font-size: 15px; font-weight: 800; line-height: 1.3; color: var(--tr-chu); }
-[data-trong] .duo-ket .ly-goi-y { margin: 2px 0 0; font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--tr-chu-3); }
+[data-trong] .duo-ket .ly-trang { font-size: 12.5px; font-weight: 700; color: var(--tr-chu-3); white-space: nowrap; }
+[data-trong] .duo-ket .ly-trang[data-xong] { color: var(--tr-dung-chu); }
+/* 12/11 (bản vẽ docs/ban-ve-vi-sao-sai-1211): A.I chỉ gợi ý bằng nhãn «A.I đoán»; câu đầy đủ giữ cho trình đọc màn hình */
+[data-trong] .duo-ket .ly-goi-y { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
 [data-trong] .duo-ket .o-ly { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
 [data-trong] .duo-ket .o-ly button {
   min-height: 48px; padding: 6px; border: 0; border-radius: 14px; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien);
   font: inherit; font-size: 13.5px; font-weight: 800; line-height: 1.2; color: var(--tr-chu-2); cursor: pointer; touch-action: manipulation;
 }
 [data-trong] .duo-ket .o-ly button[aria-pressed='true'] { background: var(--tr-sai-chu); box-shadow: none; color: var(--tr-trang); }
+/* KHỔ NGANG / MÁY TÍNH / FOLD MỞ — giữ ô Duolingo (thầy 12/11): chỉ tên lý do, không vòng tròn, không dòng giải thích */
+[data-trong] .duo-ket .o-ly .tron, [data-trong] .duo-ket .o-ly small { display: none; }
+[data-trong] .duo-ket .o-ly .chu b { font-size: inherit; font-weight: 800; }
+[data-trong] .duo-ket .o-ly .ai { display: inline-block; margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--tr-hs-nhat); color: var(--tr-hs-chu); font-size: 11px; font-weight: 800; vertical-align: 1px; }
+/* ĐIỆN THOẠI DỌC (thầy 12/11 «đẹp và gọn hơn ở màn dọc»): thẻ trắng, BA HÀNG chọn một — vòng tròn + tên lý do + một dòng giải thích; hàng ≥ 48 px */
+@media (max-width: 699.98px) and (min-height: 501px) {
+  [data-trong] .duo-ket .ly-do { padding: 10px; border-radius: 16px; background: var(--tr-mat); }
+  [data-trong] .duo-ket .ly-dau { padding: 0 4px 6px; }
+  [data-trong] .duo-ket .o-ly { display: block; margin-top: 0; }
+  [data-trong] .duo-ket .o-ly button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 6px 10px; border-radius: 12px; background: transparent; box-shadow: none; text-align: left; }
+  [data-trong] .duo-ket .o-ly button + button { margin-top: 2px; }
+  [data-trong] .duo-ket .o-ly .tron { display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 2px var(--tr-vien); }
+  [data-trong] .duo-ket .o-ly .chu { flex: 1; min-width: 0; }
+  [data-trong] .duo-ket .o-ly .chu b { display: block; font-size: 14.5px; line-height: 1.25; color: var(--tr-chu); }
+  [data-trong] .duo-ket .o-ly small { display: block; font-size: 12.5px; font-weight: 500; line-height: 1.3; color: var(--tr-chu-3); }
+  [data-trong] .duo-ket .o-ly .ai { flex: none; margin-left: 0; padding: 2px 8px; font-size: 11.5px; }
+  [data-trong] .duo-ket .o-ly button[aria-pressed='true'] { background: var(--tr-sai-nhat); box-shadow: inset 0 0 0 2px var(--tr-sai); color: var(--tr-chu-2); }
+  [data-trong] .duo-ket .o-ly button[aria-pressed='true'] .tron { background: var(--tr-sai); box-shadow: none; }
+  [data-trong] .duo-ket .o-ly button[aria-pressed='true'] .tron::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--tr-trang); }
+}
 [data-trong] .duo-ket .o-ly button:focus-visible { outline: 2px solid var(--tr-sai); outline-offset: 2px; }
-/* Nút chính khi em chưa chạm lý do («Chọn một lý do để tiếp tục»): tắt, phẳng xám như bản vẽ — đè màu nút sai của phang-hs.css. */
+/* Nút chính khi em chưa chạm lý do («Chọn 1 ý để tiếp tục»): tắt, phẳng xám như bản vẽ — đè màu nút sai của phang-hs.css. */
 html[data-trong]:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-nut:disabled { background: var(--tr-mat) !important; box-shadow: inset 0 0 0 1.5px var(--tr-vien) !important; color: var(--tr-chu-2) !important; cursor: default; transform: none !important; }
+/* 12/11: chữ chờ dài hơn «Tiếp tục» ⇒ nhỏ lại cho vừa một dòng cạnh nút «Hỏi thầy» */
+html[data-trong]:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-nut:disabled { font-size: 13px !important; letter-spacing: .01em !important; line-height: 1.2; }
 /* ĐIỆN THOẠI XOAY NGANG (khung thấp ≤ 500 px): dải gọn một hàng ẩn phần chữ (trong-lam-ngang.css) — ô lý do PHẢI hiện và chạm được (không thì kẹt câu):
    hàng 3 ô ngay dưới tiêu đề; tiêu đề «Vì sao em sai?» + lời gợi ý chỉ còn cho trình đọc màn hình. */
 @media (orientation: landscape) and (max-height: 500px) {
   :root[data-trong] .duo:not([data-xong]) .duo-ket .duo-kq-chu > .ly-do.ly-do { position: static; width: auto; height: auto; margin: 4px 0 0; overflow: visible; clip-path: none; }
-  :root[data-trong] .duo:not([data-xong]) .duo-ket .ly-do > :is(h3, .ly-goi-y) { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
+  :root[data-trong] .duo:not([data-xong]) .duo-ket .ly-do > .ly-dau { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); }
   :root[data-trong] .duo:not([data-xong]) .duo-ket .ly-do .o-ly { margin-top: 0; gap: 6px; }
   :root[data-trong] .duo:not([data-xong]) .duo-ket .ly-do .o-ly button { min-height: 44px; font-size: 13px; }
 }
@@ -30,3 +56,5 @@ html[data-trong]:not(#_):not(#_) .duo-ket[data-tt=sai] .duo-nut:disabled { backg
 [data-trong] .duo-ket .bac-bo { margin-top: 8px; padding: 10px 12px; border-radius: 14px; background: var(--tr-mat); box-shadow: inset 0 0 0 1.5px var(--tr-vien); }
 [data-trong] .duo-ket .bac-bo p { margin: 2px 0; font-size: 14px; font-weight: 500; line-height: 1.5; color: var(--tr-chu-2); }
 [data-trong] .duo-ket .bac-bo b { font-weight: 800; color: var(--tr-chu); }
+/* 12/11: chữ đậm chung của dải (22 px / 17 px !important ở trong-lam-bai.css, phang-hs.css) không áp vào nhãn «Em chọn · Chỗ chưa đúng · Đúng là» — giữ cỡ dòng */
+html[data-trong]:not(#_):not(#_) .duo-ket[data-tt] .duo-kq-chu .bac-bo p > b { font-size: inherit !important; line-height: inherit !important; }
