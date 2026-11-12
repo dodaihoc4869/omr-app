@@ -30,6 +30,9 @@
 //   đợt 2 · giơ tay: thẻ gọn trung tính (không đỏ — giơ tay không phải báo động) + hàng chờ; em đang nói có sóng âm
 //   dòng chẩn đoán mic: chữ nhỏ, chọn / chụp được
 //   11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh). Dáng nút lưới «thêm» (.mc-lv-gon) khai ở đây từ bản K5; nút + khay nay dựng ở thanh-day-to-chieu.ts cho MỌI trạng thái
+// 12/11 · BẢNG MIC GỌN (thầy: «làm cái bảng này gọn lại, bỏ hết mấy chỗ giải thích đi, trực quan dễ dùng»): mỗi cài đặt MỘT hàng — cột nhãn · thanh phân đoạn
+// (nút ≥ 40 px); chữ chỉ khi có vấn đề (.mc-lv-canh); «Chi tiết» thu gọn ở cuối. Luật CSS mới CHỈ trong .mc-lv-the: .mc-lv-n.nho / .mc-lv-dong của thẻ «Đang nói»
+// giữ nguyên. Bảng cao quá màn (khổ thấp) ⇒ tự cuộn trong khung, không tràn mép trên.
 export const CSS_LIVE_TO_CHIEU = `
 body.mc-che-bang .mc-vung-de,body.mc-che-bang .mc-trang{display:none!important}
 body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai{display:block!important;grid-column:1/-1!important;grid-row:1/-1!important}
@@ -127,9 +130,6 @@ body.mc .mc-thanh .mc-lv-gon{flex:none;display:inline-grid;place-items:center;wi
 @media (prefers-reduced-motion:reduce){.mc-lv-gon svg{transition:none}}
 @media (prefers-reduced-motion:reduce){.mc-lv-vien.nhay,.mc-lv-cum .im{animation:none}.mc-lv-thuoc i{transition:none}}
 html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
-/* 12/11 · BẢNG MIC GỌN (thầy: «gọn lại, bỏ hết mấy chỗ giải thích, trực quan dễ dùng»): mỗi cài đặt MỘT hàng — cột nhãn · thanh phân đoạn (nút ≥ 40 px);
-   chữ chỉ khi có vấn đề (.mc-lv-canh); «Chi tiết» thu gọn ở cuối. Mọi luật ở đây CHỈ trong .mc-lv-the: .mc-lv-n.nho / .mc-lv-dong của thẻ «Đang nói» giữ nguyên.
-   Bảng cao quá màn (khổ thấp) ⇒ tự cuộn trong khung, không tràn mép trên. */
 .mc-lv-the{max-height:calc(100vh - var(--u)*6);overflow-y:auto;overscroll-behavior:contain}
 .mc-lv-the .mc-lv-chon{margin-top:calc(var(--u)*.6)}
 .mc-lv-cai{display:grid;grid-template-columns:calc(var(--u)*7.6) minmax(0,1fr);align-items:center;gap:calc(var(--u)*.6);margin-top:calc(var(--u)*.6)}
@@ -361,8 +361,8 @@ export const JS_LIVE_TO_CHIEU = `
         h += '</select></label><button type="button" class="mc-lv-n" data-lv="thu-loa"' + (t.loa.thu === 'dang' ? ' aria-busy="true"' : '') + '>Thử loa</button></div>';
         if (t.loa.thu === 'loi') h += lvCanh('Chưa phát được ra loa này — chọn loa khác');
       }
-      // tiếng trên máy em: «Em ở xa» / «Tất cả» (mặc định); đang live ⇒ số em đang nghe qua máy cạnh nhãn
-      h += lvCai('Máy em', lvChon('tieng-lop', 'v', '0', 'Em ở xa', !t.tiengLop) + lvChon('tieng-lop', 'v', '1', 'Tất cả', !!t.tiengLop), false, LV.tt.pha === 'live' ? '<small>' + (LV.tt.nghe || 0) + ' em nghe</small>' : '');
+      // tiếng trên máy em: «Em ở xa» / «Tất cả» (mặc định); đang live ⇒ số em nghe tiếng thầy qua máy đứng cạnh nhãn
+      h += lvCai('Máy em', lvChon('tieng-lop', 'v', '0', 'Em ở xa', !t.tiengLop) + lvChon('tieng-lop', 'v', '1', 'Tất cả', !!t.tiengLop), false, LV.tt.pha === 'live' ? '<small> ' + (LV.tt.nghe || 0) + ' em nghe</small>' : '');
     }
     // điểm quyết 4: mặc định TẮT, thầy bật từng buổi — chỉ em có tên trong lớp, đã đăng nhập; không điểm danh, không đội, không kJ
     if (LV.tt.dot2) h += lvCai('Cho em ở xa vào xem', lvChon('xa', 'v', t.xa ? '0' : '1', t.xa ? 'Đang bật' : 'Đang tắt', !!t.xa));
