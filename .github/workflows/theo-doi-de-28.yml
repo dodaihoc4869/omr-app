@@ -30,7 +30,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
           CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
         run: |
-          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j[0]:j).results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const x=Array.isArray(j)?j[0]:j;if(!x||x.error||x.success===false){console.log('LỖI (D1 không trả kết quả — thường là 7429 quá tải; lượt sau đo lại): '+JSON.stringify((x&&x.error)||x).slice(0,300));return}const r=x.results||[];for(const x of r)console.log(JSON.stringify(x));console.log('('+r.length+' dòng)')}catch(e){console.log('LỖI: '+s.slice(0,400))}})"; sleep 4; }
           GOC="CASE WHEN instr(qid,'~')>0 THEN substr(qid,1,instr(qid,'~')-1) ELSE qid END"
           LAM="ket_qua IS NOT NULL AND COALESCE(purpose,'') NOT IN ('xem_loi_giai','luot','chan_doan','chua_buoc')"
           PHAN="(SELECT json_extract(q.json,'\$.phan') FROM game_v2_question q WHERE q.qid=x.goc LIMIT 1)"

@@ -5,10 +5,8 @@
 # Tự chạy 00:20 giờ VN mỗi ngày (ngoài giờ học); mỗi câu cách nhau 4 giây (D1 từng 429 khi dồn lệnh). Đặc tả: docs/de-xuat-28-cau-v6-1011.md.
 name: Soi 18/4/6 ngày 11/11 (chỉ đọc)
 on:
+  # 12/11: chỉ chạy tay NGOÀI GIỜ HỌC (câu K/K2 đọc ~3 triệu hàng; 07:23 VN đã gặp D1 7429 quá tải).
   workflow_dispatch:
-  push:
-    branches: [claude/trusting-ritchie-xo0ipg]
-    paths: ['.github/workflows/soi-18-4-6-1211.yml']
 permissions:
   contents: read
 concurrency:
