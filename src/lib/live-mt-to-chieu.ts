@@ -31,4 +31,10 @@ export const JS_LIVE_MT = `
     if (m.lenh !== 'live-mt') return;
     MT.mo = m.mo === true; n = mtNut(); if (n) n.setAttribute('aria-pressed', MT.mo ? 'true' : 'false');
   });
+  // PHÍM / (thầy 12/11): hỏi nhanh cả lớp «Hiểu chưa?» — báo app (việc lk, v = 'hieu'); bấm lần nữa là đóng. Đang gõ chữ thì / vẫn là chữ.
+  document.addEventListener('keydown', function (e) {
+    var t = e.target;
+    if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey || e.repeat || !(LV.tt && LV.tt.khoi) || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return;
+    e.preventDefault(); e.stopImmediatePropagation(); lvGui('lk', { v: 'hieu' });
+  }, true);
 `

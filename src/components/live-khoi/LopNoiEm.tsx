@@ -13,6 +13,7 @@ const NutChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.NutCha
 const BongTinMoi = lazy(() => import('./ChatEm').then((m) => ({ default: m.BongTinMoi })))
 const CuaChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.CuaChatEm })))
 const MayTinhEm = lazy(() => import('../may-tinh/MayTinhEm'))
+const HoiHieuEm = lazy(() => import('./HoiHieuEm'))
 
 /** ÉP NGANG suốt buổi live (thầy 12/11): trang đang dọc (máy không khoá ngang được) ⇒ xoay hình 90° như `.bpu-hs[data-xoay]`; trang đã ngang ⇒ thôi. */
 function useXoay(): { xoay: boolean; style: CSSProperties } {
@@ -90,6 +91,7 @@ export default function LopNoiEm() {
         {cho ? <TroSinhTon toi={s.toi} ds={s.ds} kenh={kenh} soEm={Math.max(1, s.ds.length)} mayYeu={mayYeu()} xoay={xoay} /> : null}
         {cho ? <button type="button" className="lke-roi" onClick={() => { setRoiCho(true); try { if (document.fullscreenElement) void document.exitFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ } }}>Rời phòng chờ</button> : null}
         {!cho && !sanh && !bonDoi ? <MayTinhEm kenh={kenh} /> : null}
+        {!cho ? <HoiHieuEm kenh={kenh} /> : null}
         {!cho && (sanh || bonDoi) ? <ManBonDoi ds={s.ds} toi={s.toi} kj={s.kj} onDong={() => setBonDoi(null)} /> : null}
         {!cho && (sanh || !bonDoi) ? (
           <>
