@@ -167,6 +167,87 @@ describe('Q5 cron làm mới đề: chỉ mục lịch chưa mở, chưa nộp',
   })
 })
 
+// ------------------------------------------------------------------ Q6 · hồ sơ câu khi lập kế hoạch (ke-hoach-ngay-d1.ts docHoSoD1)
+const IN_EM = 'sbd IN (SELECT value FROM json_each(?))'
+const hoSoSql = (n: string) => `SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau
+        WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?
+       UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN (${n}) GROUP BY sbd
+       UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE ${IN_EM}`
+const HO_SO_CU = hoSoSql("'moi_sai','dang_on'"), HO_SO_MOI = hoSoSql("'dang_on','moi_sai'")
+const Q_ON_THI = `SELECT sbd, qid, lan_sai, trang_thai FROM nam_kt_cau WHERE sbd IN (SELECT value FROM json_each(?)) AND trang_thai IN ('moi_sai','dang_on') AND can_day_lai = 0`
+function napHoSo(sql: any) {
+  const ins = sql.prepare("INSERT INTO nam_kt_cau(khoa,sbd,qid,ma_dang,lan_gap,lan_sai,lan_trong,dung_lien_tiep,ngay_dung_khac_nhau,nguon_cuoi,luc_cuoi,moc_on_ke,trang_thai,can_day_lai,cap_nhat_luc) VALUES(?,?,?,?,1,?,0,0,0,'x',?,?,?,?,'x')")
+  const TT = ['moi_sai', 'dang_on', 'da_khac_phuc', 'chua_thay_sai', 'da_vung', 'moi_sai']
+  const MOC = [null, '2026-11-01', '2026-11-12', '2026-11-12', '2026-11-13', '2026-10-30', '']
+  // Thứ tự chèn xáo trộn ⇒ rowid KHÔNG trùng thứ tự qid — thứ tự dòng của nhánh 'c' (hoà moc_on_ke) phải giữ y như chỉ mục cũ.
+  for (let i = 0; i < 160; i++) {
+    const j = (i * 37) % 160, sbd = `E${j % 4}`
+    ins.run(`${sbd}|q${j}`, sbd, `q${j}`, j % 5 ? `d${j % 3}` : null, j % 4, `2026-11-${String(1 + (j % 12)).padStart(2, '0')}T01:00:00.000Z`, MOC[j % MOC.length], TT[j % TT.length], j % 9 === 0 ? 1 : 0)
+  }
+  const dang = sql.prepare("INSERT INTO nam_kt_dang(khoa,sbd,ma_dang,so_gap,so_sai,so_da_khac_phuc,so_moi_sai,so_chua_thay_sai,bac,moc_on_ke,moc_moi_sai,cap_nhat_luc) VALUES(?,?,?,3,2,1,1,0,1,'2026-11-02',NULL,'x')")
+  for (const s of ['E0', 'E1', 'E3']) for (const d of ['d0', 'd1']) dang.run(`${s}|${d}`, s, d)
+}
+
+describe('Q6 hồ sơ câu: chỉ mục bộ phận, cùng dòng cùng thứ tự', () => {
+  const XOA = ['DROP INDEX nkc_em_toi_han', 'DROP INDEX nkc_em_chua_kp']
+  it('câu trong mã khớp hằng của test', async () => {
+    const { readFileSync } = await import('node:fs')
+    const ma = readFileSync('server/src/ke-hoach-ngay-d1.ts', 'utf8')
+    expect(ma).toContain(HO_SO_MOI.replaceAll(IN_EM, '${IN_EM}'))
+    expect(ma).toContain(Q_ON_THI)
+  })
+  it('mới (chỉ mục bộ phận) ↔ cũ (không chỉ mục, danh sách IN cũ): y hệt kể cả thứ tự', () => {
+    const d = taoD1That(); napHoSo(d.sql)
+    const ds = JSON.stringify(['E2', 'E0', 'E9', 'E1', 'E3'])
+    const moi = ['2026-11-12', '2026-11-01', '2026-12-31'].map((h) => d.sql.prepare(HO_SO_MOI).all(ds, h, ds, ds))
+    const onThiMoi = d.sql.prepare(Q_ON_THI).all(ds)
+    for (const x of XOA) d.sql.exec(x)
+    const cu = ['2026-11-12', '2026-11-01', '2026-12-31'].map((h) => d.sql.prepare(HO_SO_CU).all(ds, h, ds, ds))
+    expect(moi).toEqual(cu)
+    expect(onThiMoi).toEqual(d.sql.prepare(Q_ON_THI).all(ds))
+    expect(cu[0]!.filter((x: any) => x.k === 'c').length).toBeGreaterThan(10)
+    expect(cu[0]!.filter((x: any) => x.k === 'n').length).toBe(4)
+  })
+  it('kế hoạch: nhánh c / n dùng chỉ mục bộ phận (n không chạm bảng); câu khác giữ kế hoạch cũ', () => {
+    const d = taoD1That()
+    const ke = keHoach(d.sql, HO_SO_MOI)
+    expect(ke).toContain('SEARCH nam_kt_cau USING INDEX nkc_em_toi_han (sbd=? AND moc_on_ke>? AND moc_on_ke<?)')
+    expect(ke).toContain('SEARCH nam_kt_cau USING COVERING INDEX nkc_em_chua_kp (sbd=? AND trang_thai=?)')
+    expect(keHoach(d.sql, Q_ON_THI)).toContain('SEARCH nam_kt_cau USING INDEX idx_nkc_em_dang (sbd=?)')
+    expect(keHoach(d.sql, HO_SO_CU).join('\n')).not.toMatch(/nkc_em_chua_kp/) // danh sách IN cũ không khớp điều kiện chỉ mục
+  })
+})
+
+// ------------------------------------------------------------------ Q7 · tổng EXP mùa (exp-d1.ts lenhTongSo / dieuKienTongSo / docTongSoSom) + EXP dòng thời gian
+const Q_TONG_EXP = 'SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e'
+const Q_EXP_NGAY = `SELECT MAX(luc), 'exp', ngay_vn, '', SUM(exp), COUNT(*), 0, 0, '' FROM (SELECT luc, ngay_vn, exp FROM exp_so WHERE sbd = ? UNION ALL SELECT created_at, date(created_at, '+7 hours'), amount FROM game_v2_reward WHERE sbd = ? AND amount > 0) GROUP BY ngay_vn`
+describe('Q7 tổng EXP: chỉ mục phủ (sbd, luc, exp, ngay_vn)', () => {
+  it('có ↔ không chỉ mục: cùng tổng, cùng dòng EXP theo ngày', () => {
+    const d = taoD1That()
+    const ins = d.sql.prepare('INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,exp,luc) VALUES(?,?,?,?,?,?)')
+    for (let i = 0; i < 120; i++) { const j = (i * 53) % 120; ins.run(`k${j}`, `E${j % 3}`, `2026-11-${String(1 + (j % 10)).padStart(2, '0')}`, 'cau', j % 7 - 1, `2026-11-${String(1 + (j % 10)).padStart(2, '0')}T0${j % 10}:00:00.000Z`) }
+    const chay = () => ['E0', 'E1', 'E2', 'E9'].flatMap((s) => [...['', '2026-11-04', '2026-11-04T05:00:00.000Z', '2027'].map((m) => d.sql.prepare(Q_TONG_EXP).get(s, m)), d.sql.prepare(Q_EXP_NGAY).all(s, s)])
+    const moi = chay()
+    expect(keHoach(d.sql, Q_TONG_EXP)).toContain('SEARCH exp_so USING COVERING INDEX exp_so_em_luc (sbd=? AND luc>?)')
+    expect(keHoach(d.sql, Q_EXP_NGAY)).toContain('SEARCH exp_so USING COVERING INDEX exp_so_em_luc (sbd=?)')
+    d.sql.exec('DROP INDEX exp_so_em_luc')
+    expect(moi).toEqual(chay())
+    expect(moi.some((x: any) => x?.e > 0)).toBe(true)
+  })
+  it('câu trong mã còn đúng dạng (lệnh đọc + điều kiện CAS + đọc sớm)', async () => {
+    const { readFileSync } = await import('node:fs')
+    const ma = readFileSync('server/src/exp-d1.ts', 'utf8')
+    expect(ma).toContain('(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) AS e')
+    expect(ma).toContain('(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) = ?')
+    expect(ma).toContain('(SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= mua.s) AS e')
+    const d = taoD1That()
+    expect(keHoach(d.sql, "UPDATE game_v2_profile SET revision = revision + 1 WHERE sbd = ? AND (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= ?) = ?").join('\n'))
+      .toMatch(/SEARCH exp_so USING COVERING INDEX exp_so_em_luc \(sbd=\? AND luc>\?\)/)
+    expect(keHoach(d.sql, "WITH mua AS (SELECT '2026-11-01' AS s) SELECT (SELECT COALESCE(SUM(exp), 0) FROM exp_so WHERE sbd = ? AND luc >= mua.s) AS e FROM mua").join('\n'))
+      .toMatch(/SEARCH exp_so USING COVERING INDEX exp_so_em_luc \(sbd=\? AND luc>\?\)/)
+  })
+})
+
 describe('Q3 bù số tính sẵn: mỗi giờ một lần', () => {
   it('phút khác ⇒ không dò; đúng phút ⇒ bù như cũ', async () => {
     const d = taoD1That(); for (const q of SQL_KT_CN) d.sql.exec(q)
