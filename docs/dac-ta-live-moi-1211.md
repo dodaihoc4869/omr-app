@@ -115,4 +115,9 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 24. **Xoay:** chỉ ĐIỆN THOẠI (chạm, cạnh ngắn < 600 px) mới xoay hình khi trang dọc; xoay về đúng phía em đang cầm (`src/components/live/chieu-xoay.ts`).
 25. **Em quay lại app nối ngay** (`src/components/bpu/ve-lai-nhanh.ts`); tin nhắn lỡ được xin lại; tin của thầy hiện 12 giây; máy thầy bấm ra ngoài thì cột tin nhắn tự thu.
 26. **Bút tự nắn khi nhấc bút** (`src/lib/but-bang-loi.ts` `nanHinh`, cả buổi trên lớp): đường kẻ ≥ 9 % bề dọc bảng và gần thẳng ⇒ đoạn thẳng (lệch < 6° ⇒ ngang / dọc hẳn); hình khép kín ≥ 9 % ⇒ tròn / elip, tam giác, chữ nhật ngay ngắn. Chữ viết, gạch ngắn, vòng khoanh nhỏ không bị đụng. Tắt: `taoSo({ nan: false })`.
-
+27. **MỘT LUẬT ĐIỀU HƯỚNG MÁY THẦY** (thầy 12/11 «làm chuẩn logic đi, esc thì lùi lại, khi lùi lại rồi thì phải có nút về màn chiếu lưu lại mọi thứ tức thì»):
+    - **Esc chỉ LÙI một màn, không đóng / huỷ gì:** tin nhắn → bảng chọn → (tờ chiếu từ tấm hoạt động ⇒ tấm) → bảng danh sách → Hôm nay. Tấm hoạt động chỉ đóng bằng nút của chính nó.
+    - **«Về màn chiếu»:** ở bảng danh sách (khi đang có tờ / tấm) ⇒ về đúng màn trước khi lùi; nổi ở đáy tấm hoạt động (khi có tờ bên dưới) ⇒ tờ lên lại. Nét, lượt, đáp án em còn nguyên.
+    - **«Học» ở bảng danh sách = mở bảng chọn** (một lần bấm, mảnh nạp sẵn); trong khay nút bốn ô: đang có bài ⇒ về bài, chưa có ⇒ bảng chọn. Chọn hoạt động từ bảng danh sách ⇒ tấm hiện ngay dù phòng còn «sanh».
+    - **Đạt / Chưa đạt:** chỉ ghi kết quả + mở đáp án + con dấu máy em; máy thầy Ở NGUYÊN màn chiếu (không phóng bảng đua, không che tờ).
+    - **Không tự toàn màn hình** trong buổi live; bỏ hẳn cụm nút nổi của app (`.lkt-vien`).

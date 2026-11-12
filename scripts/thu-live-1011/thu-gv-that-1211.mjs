@@ -44,7 +44,6 @@ const netA = { gv: [0.18, 0.21, 0.37, 0.31], em: [0.17, 0.2, 0.42, 0.4] }
 const gv = await mo('vai=gv', 1366, 768)
 /** Bấm một nút của buổi live (thầy 12/11: cụm Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm TRONG khay nút bốn ô của tờ; lúc bảng đua hiện thì còn cụm nổi của app). */
 const lk = async (v) => {
-  if (await gv.locator('.lkt-vien').count()) { if (v === 'hoc' || v === 'bang') await gv.locator('.lkt-che button').nth(v === 'hoc' ? 0 : 1).click(); else await gv.locator('.lkt-nut-chat').last().click(); return }
   const f = gv.frameLocator('.lop-xem-phieu iframe')
   if ((await f.locator('#mc-them').getAttribute('aria-expanded')) !== 'true') { await f.locator('#mc-them').click(); await ngu(300) }
   await f.locator(`.mc-khay-lk [data-lk="${v}"]`).click()
@@ -53,6 +52,9 @@ const em1 = await mo('vai=em&sbd=S1', 844, 390)
 const em2 = await mo('vai=em&sbd=S2', 390, 844, true) // em cầm DỌC, điện thoại
 const em3 = await mo('vai=em&sbd=S3', 500, 800) // cửa sổ DỌC trên máy tính (chuột)
 await gv.waitForFunction(() => window.__sanSang); await ngu(400)
+// (thầy 12/11 «màn giáo viên không cần full màn hình») đếm mọi lời xin toàn màn hình của máy thầy suốt buổi thử
+await gv.evaluate(() => { window.__fs = 0; Element.prototype.requestFullscreen = function () { window.__fs++; return Promise.resolve() } })
+const veMan = gv.locator('.lkt-cho.sanh .lkt-ve.chinh')
 
 // ── 1. Mở phòng chờ ──
 await gv.evaluate(() => { void window.__moLive() }); await ngu(250)
@@ -79,6 +81,21 @@ kiem('3b máy em chưa đổi (thầy chưa chọn xong bài)', st()?.live?.khoi
 await chup(gv, '3-chon-bai')
 await gv.keyboard.press('Escape'); await ngu(500)
 kiem('3c Esc: lùi MỘT màn về sảnh (không ra Hôm nay)', (await trenCung(gv)) === 'sanh')
+kiem('3c2 sảnh chưa có gì đang chiếu ⇒ KHÔNG có nút «Về màn chiếu»', (await veMan.count()) === 0)
+// (thầy 12/11 «nút học phải bấm 2 lần mới chọn được bài») từ sảnh: «Học» MỘT lần ⇒ bảng chọn; chọn hoạt động ⇒ tấm hiện NGAY (không bị sảnh che dù phòng còn «sanh»)
+const laThd = (p) => p.evaluate(() => !!document.elementFromPoint(innerWidth * 0.4, innerHeight * 0.4)?.closest('.thd'))
+await gv.locator('.lkt-che-to').nth(0).click(); await ngu(700)
+await gv.locator('.lkt-chon .bcc-hd-the').nth(2).click(); await ngu(2200)
+kiem('3c3 từ sảnh: «Học» một lần → chọn «Chữa câu khó» ⇒ tấm hoạt động hiện ngay; máy em vẫn ở danh sách', (await laThd(gv)) && st()?.live?.khoi?.che === 'sanh' && (await em1.locator('.lke .bd').count()) === 1, await trenCung(gv))
+kiem('3c4 không còn cụm nút nổi đè lên đầu tấm hoạt động', (await gv.locator('.lkt-vien, .lkt-che').count()) === 0)
+await chup(gv, '3-hoat-dong-tu-sanh')
+await gv.keyboard.press('Escape'); await ngu(500)
+kiem('3c5 Esc ở tấm hoạt động: LÙI về sảnh, tấm KHÔNG bị đóng; sảnh có nút «Về màn chiếu»', (await trenCung(gv)) === 'sanh' && (await gv.locator('.thd').count()) === 1 && await veMan.isVisible(), await trenCung(gv))
+await chup(gv, '3-sanh-co-ve-man-chieu')
+await veMan.click(); await ngu(400)
+kiem('3c6 «Về màn chiếu»: về đúng tấm đang mở, tức thì', await laThd(gv))
+await gv.locator('.thd-ve').click(); await ngu(600)
+kiem('3c7 đóng tấm bằng nút của tấm khi chưa có tờ nào ⇒ về sảnh (không kẹt màn trống, không ra Hôm nay)', (await gv.locator('.thd').count()) === 0 && (await trenCung(gv)) === 'sanh' && (await veMan.count()) === 0, await trenCung(gv))
 
 // ── 3B. (thầy 12/11 «chọn sang học mà không chọn được bài», «chuyển đi chuyển lại phải lưu trước đó») «Bảng» TRƯỚC khi có bài ⇒ bảng trắng, viết;
 //        «Học» ⇒ bảng chọn; chọn một HOẠT ĐỘNG ⇒ tấm hoạt động hiện TRÊN tờ; Esc đóng tấm ⇒ về bảng chọn (không kẹt màn trống) ──
@@ -92,8 +109,16 @@ kiem('3f «Học» khi mới có bảng trắng: bảng chọn hiện, phòng CH
 await gv.locator('.lkt-chon .bcc-hd-the').nth(1).click(); await ngu(2200)
 kiem('3g chọn hoạt động «Kiểm tra đầu giờ»: tấm hoạt động hiện TRÊN tờ; phòng CHƯA đổi chế độ, máy em ở nguyên bảng (chưa có câu nào được chiếu)', await gv.evaluate(() => !!document.elementFromPoint(innerWidth * 0.4, innerHeight * 0.4)?.closest('.thd')) && st()?.live?.khoi?.che === 'bang' && (await mucVung(em1, ...netA.em)) > 30, `che ${st()?.live?.khoi?.che}`)
 await chup(gv, '3-hoat-dong')
-await gv.keyboard.press('Escape'); await ngu(800)
-kiem('3h Esc: đóng tấm hoạt động ⇒ về bảng đang dạy, không kẹt màn trống', (await gv.locator('.thd').count()) === 0 && (await trenCung(gv)) === 'to' && st()?.live?.khoi?.che === 'bang', await trenCung(gv))
+kiem('3g2 tấm nằm trên bảng trắng ⇒ có nút nổi «Về màn chiếu» ở đáy (không đè đầu tấm)', await gv.evaluate(() => { const n = document.querySelector('.lkt-ve-noi'), d = document.querySelector('.thd-dau'); if (!n || !d) return false; const a = n.getBoundingClientRect(), b = d.getBoundingClientRect(); return a.top > b.bottom + 100 && a.width > 60 }))
+await gv.locator('.lkt-ve-noi').click(); await ngu(500)
+kiem('3g3 bấm «Về màn chiếu» trên tấm: bảng trắng lên lại, nét A còn nguyên, tấm vẫn mở bên dưới', (await trenCung(gv)) === 'to' && (await mucVung(gv, ...netA.gv)) > 60 && (await gv.locator('.thd').count()) === 1, await trenCung(gv))
+await gv.keyboard.press('Escape'); await ngu(500)
+kiem('3g4 Esc ở màn chiếu (tấm còn bên dưới): lùi về tấm', await laThd(gv))
+await gv.keyboard.press('Escape'); await ngu(500)
+kiem('3g5 Esc lần nữa: lùi về sảnh; tấm và bảng KHÔNG bị đóng', (await trenCung(gv)) === 'sanh' && (await gv.locator('.thd').count()) === 1 && (await gv.locator('.lop-xem-phieu').count()) === 1)
+await veMan.click(); await ngu(400)
+await gv.locator('.thd-ve').click(); await ngu(800)
+kiem('3h đóng tấm bằng nút của tấm ⇒ về bảng đang dạy, không kẹt màn trống', (await gv.locator('.thd').count()) === 0 && (await trenCung(gv)) === 'to' && st()?.live?.khoi?.che === 'bang', await trenCung(gv))
 
 // ── 3C. (thầy 12/11 «bấm lên bảng thì lại quay ra đây không vào màn chiếu») chiếu câu TỪ tấm hoạt động ⇒ màn chiếu lên TRÊN tấm, máy em vào nhận đề;
 //        Esc ⇒ quay lại tấm hoạt động (chọn câu kế); Esc lần nữa ⇒ đóng tấm ──
@@ -106,6 +131,16 @@ await gv.evaluate(() => window.__chieuToRieng()); await ngu(1200)
 const trenRieng = await gv.evaluate(() => { const e = document.elementFromPoint(innerWidth * 0.4, innerHeight * 0.45); const k = e?.closest('.lop-xem-phieu'); return k ? `to:${k.getAttribute('aria-label')}` : e?.closest('.thd') ? 'thd' : 'khác' })
 kiem('3j tấm hoạt động tự mở tờ riêng («Chiếu lên bảng»): tờ nằm TRÊN tấm, có nút đóng để quay lại', trenRieng === 'to:Chữa câu khó · tờ chiếu' && await gv.locator('.lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu"] .khung-phieu-thanh, .lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu"] .nut-dong-phieu').first().isVisible(), trenRieng)
 await chup(gv, '3-to-rieng-tren-tam')
+// (thầy 12/11 «bấm đạt với chưa đạt thì lại out ra màn chọn đề chiếu lên bảng») đúng trạng thái thật: em đang lên bảng (bảng đã thu `data-an`), tờ báo chấm
+const toRiengTren = () => gv.evaluate(() => { const e = document.elementFromPoint(innerWidth * 0.4, innerHeight * 0.45); return e?.closest('.lop-xem-phieu')?.getAttribute('aria-label') === 'Chữa câu khó · tờ chiếu' && !document.documentElement.hasAttribute('data-bpu-che-to') })
+await gv.evaluate(() => { document.querySelector('[data-bpu-bang]')?.setAttribute('data-an', ''); window.postMessage({ nguon: 'to-chieu', loai: 'bpu-cham', dat: true }, '*') }); await ngu(900)
+kiem('3j3 bấm ĐẠT trên tờ: VẪN ở màn chiếu (tờ không bị che, không văng ra tấm chọn đề)', await toRiengTren(), await trenHd(gv))
+await gv.evaluate(() => { document.querySelector('[data-bpu-bang]')?.setAttribute('data-an', ''); window.postMessage({ nguon: 'to-chieu', loai: 'bpu-cham', dat: false }, '*') }); await ngu(900)
+kiem('3j4 bấm CHƯA ĐẠT trên tờ: cũng vẫn ở màn chiếu', await toRiengTren(), await trenHd(gv))
+await gv.keyboard.press('Escape'); await ngu(500)
+kiem('3j5 Esc ở màn chiếu của tấm: lùi về sảnh, tờ KHÔNG bị đóng; có «Về màn chiếu»', (await trenCung(gv)) === 'sanh' && (await gv.locator('.lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu"]').count()) === 1 && await veMan.isVisible(), await trenCung(gv))
+await veMan.click(); await ngu(400)
+kiem('3j6 «Về màn chiếu»: đúng tờ cũ còn nguyên (không dựng lại), tức thì', (await toRiengTren()) && await gv.frameLocator('.lop-xem-phieu[aria-label="Chữa câu khó · tờ chiếu"] iframe').locator('#to-rieng').isVisible())
 await gv.evaluate(() => window.__dongToRieng()); await ngu(400)
 kiem('3j2 đóng tờ riêng ⇒ về tấm hoạt động', (await trenHd(gv)) === 'thd', await trenHd(gv))
 const loiHd = await gv.evaluate(() => window.__chieuCauGia()); await ngu(3500)
@@ -114,8 +149,12 @@ kiem('3l máy em vào nhận đề (không còn ở bảng danh sách / bảng t
 await chup(gv, '3-chieu-tu-hoat-dong')
 await gv.keyboard.press('Escape'); await ngu(800)
 kiem('3m Esc: quay lại tấm hoạt động để chọn câu kế', (await trenHd(gv)) === 'thd', await trenHd(gv))
-await gv.keyboard.press('Escape'); await ngu(800)
-kiem('3n Esc lần nữa: đóng tấm, về bài đang dạy (không ra sảnh, không kẹt)', (await gv.locator('.thd').count()) === 0 && ['bang-bpu', 'to'].includes(await trenHd(gv)), await trenHd(gv))
+kiem('3m2 tấm ở trên tờ bài ⇒ có nút nổi «Về màn chiếu»', await gv.locator('.lkt-ve-noi').isVisible())
+await gv.locator('.lkt-ve-noi').click(); await ngu(500)
+kiem('3m3 «Về màn chiếu»: tờ bài lên lại, máy em vẫn ở màn nhận đề', (await trenHd(gv)) === 'to' && await em1.locator('.lv-bang').isVisible(), await trenHd(gv))
+await gv.keyboard.press('Escape'); await ngu(500)
+await gv.locator('.thd-ve').click(); await ngu(800)
+kiem('3n đóng tấm bằng nút của tấm: về bài đang dạy (không ra sảnh, không kẹt)', (await gv.locator('.thd').count()) === 0 && (await trenHd(gv)) === 'to', await trenHd(gv))
 
 // ── 4. Chọn bài (chiếu bằng hàm thật) rồi «Học» ⇒ tờ giảng + bảng đua như buổi trên lớp; máy em vào câu ──
 const loiChieu = await gv.evaluate(() => window.__chieuCauGia()); await ngu(3500)
@@ -139,7 +178,14 @@ await chup(gv, '4-hoc-bang-dua'); await chup(em1, '4-em-cau-hoi'); await chup(em
 await gv.keyboard.press('Escape'); await ngu(500)
 kiem('5a Esc: lùi về sảnh', (await trenCung(gv)) === 'sanh')
 await gv.locator('.lkt-cho.sanh .lkt-ve').last().click(); await ngu(500)
-kiem('5b «Quay lại bài»: về màn chiếu đang dạy', (await trenCung(gv)) === 'to')
+kiem('5b «Về màn chiếu»: về màn chiếu đang dạy', (await trenCung(gv)) === 'to')
+// đang có bài: Esc → sảnh → «Học» MỘT lần ⇒ bảng chọn bài (đổi bài); Esc → sảnh → «Về màn chiếu» ⇒ bài cũ còn nguyên, phòng vẫn «hoc»
+await gv.keyboard.press('Escape'); await ngu(400)
+await gv.locator('.lkt-che-to').nth(0).click(); await ngu(700)
+kiem('5c đang có bài: ở sảnh bấm «Học» MỘT lần ⇒ bảng chọn bài hiện', (await trenCung(gv)) === 'chon-bai')
+await gv.keyboard.press('Escape'); await ngu(400)
+await veMan.click(); await ngu(400)
+kiem('5d Esc rồi «Về màn chiếu»: bài cũ còn nguyên trên màn chiếu, phòng vẫn «hoc», lượt không đổi', (await trenCung(gv)) === 'to' && st()?.live?.khoi?.che === 'hoc' && !!st()?.luot)
 
 // ── 6. Sang «Bảng» ⇒ bảng xanh than kín màn cả hai phía, viết được ở MỌI chỗ ──
 await lk('bang'); await ngu(2200)
@@ -244,6 +290,8 @@ kiem('9c ở Hôm nay có viên «Đang live · Vào lại»', await gv.locator(
 await chup(gv, '9-ra-hom-nay')
 await gv.locator('[data-live-khoi-ngoai] button').click(); await ngu(900)
 kiem('9d «Vào lại»: về đúng buổi live (sảnh / bài), không lộ điểm danh', ['sanh', 'to'].includes(await trenCung(gv)), await trenCung(gv))
+
+kiem('9z suốt buổi live máy thầy KHÔNG lần nào tự xin toàn màn hình (giữ nguyên cỡ cửa sổ trình duyệt)', (await gv.evaluate(() => window.__fs)) === 0, String(await gv.evaluate(() => window.__fs)))
 
 // ── 10. Kết thúc ⇒ máy thầy ra Hôm nay sạch, máy em vinh danh ──
 if ((await trenCung(gv)) !== 'sanh') { await gv.keyboard.press('Escape'); await ngu(400) }

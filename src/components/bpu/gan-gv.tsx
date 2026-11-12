@@ -271,7 +271,8 @@ function hienLaiTatCa(): void {
   const dangLenBang = !!khung?.hasAttribute('data-an')
   if (khung && !dangLenBang) { khung.style.visibility = ''; khung.style.pointerEvents = ''; baoAnHien(false); khung.querySelector<HTMLElement>('.bpu-bang')?.focus() }
   if (dangLenBang) window.addEventListener('keydown', phimKhiAn, true)
-  try { if (!document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
+  // buổi live theo khối: máy thầy GIỮ cỡ cửa sổ trình duyệt, không tự toàn màn hình (thầy 12/11)
+  try { if (!phienLive && !document.fullscreenElement) void document.documentElement.requestFullscreen?.().catch(() => {}) } catch { /* không hỗ trợ */ }
   phatPhien()
 }
 /** Mã điểm danh đổi mỗi phút ⇒ chỉ gộp mã + QR (không đụng câu / lượt đang chiếu). */
@@ -287,9 +288,13 @@ export function capNhatMa(buoiId: string, ma?: string | null, linkQr?: string | 
 // CÁI MỞ SAU NẰM TRÊN. Cờ `html[data-hd-tren]` (thay-khoi.css nâng `.thd` lên trên tờ): mở tấm ⇒ bật; chiếu tờ ⇒ tắt (tờ lên trên, tấm vẫn giữ bên dưới);
 // Esc ở tờ ⇒ `hienHoatDong` đưa tấm lên lại (thầy chọn câu kế). Buổi trên lớp không có cờ gốc `data-live-khoi` nên không đổi gì.
 let hdTren = false
-function datHdTren(v: boolean): void { hdTren = v; try { document.documentElement.toggleAttribute('data-hd-tren', v) } catch { /* test */ } }
+function datHdTren(v: boolean): void { if (hdTren === v) return; hdTren = v; try { document.documentElement.toggleAttribute('data-hd-tren', v); window.dispatchEvent(new CustomEvent('bpu-hd-tren', { detail: v })) } catch { /* test */ } }
 /** Tấm hoạt động đang mở nhưng nằm DƯỚI tờ vừa chiếu. */
 export function hdDuoi(): boolean { return !!hdKhung && !hdTren }
+/** Có tờ CỦA BẢNG (bảng trắng / bài chiếu qua bảng) — không tính tấm hoạt động. */
+export function coTo(): boolean { return !!toKhung }
+/** Đưa tờ của bảng lên trên tấm hoạt động (thầy chọn «Bảng» / về bài lúc tấm hoạt động còn mở bên dưới). */
+export function toLenTren(): void { datHdTren(false) }
 export function hienHoatDong(): void { if (!hdKhung) return; datHdTren(true); if (khung && !bangAn()) { anViHd = true; anBang() } }
 export async function moHoatDong(hd: 'dau-gio' | 'chua-cau' | 'on-tap'): Promise<void> {
   const { default: Tam } = await import('./TamHoatDong')
@@ -454,7 +459,7 @@ function hienBang(): void {
   baoAnHien(false)
   // 10/11 (lần 3): che tờ NGAY và bảng kín màn từ khung đầu (trước đây bảng mờ dần 0 → 1 trên tờ ~0,5 s ⇒ tờ cũ lẫn dưới thẻ kết quả); chỉ còn nhịp
   // «đáp xuống» nhẹ bằng transform (bpu-no), thẻ kết quả nảy lên trên.
-  if (!tamAn) cheTo(true)
+  if (!tamAn && !phienLive) cheTo(true) // buổi live: bảng không bao giờ hiện ⇒ không che tờ
   if (!giamChuyenDong()) { el.classList.add('bpu-san', 'bpu-no'); const bo = () => el.classList.remove('bpu-no', 'bpu-san'); el.addEventListener('animationend', bo, { once: true }); setTimeout(bo, 700) }
   hienHan(el)
   el.querySelector<HTMLElement>('.bpu-bang')?.focus()
@@ -464,6 +469,7 @@ function phimKhiAn(e: KeyboardEvent): void {
   if (!bangAn() || (e.target as HTMLElement | null)?.closest?.('input,textarea')) return
   const k = e.key.toLowerCase()
   if (!anViLive && (k === 'd' || k === 'k' || k === 'f')) { e.preventDefault(); e.stopImmediatePropagation(); chamTuTo(k === 'd'); return }
+  if (phienLive) return // buổi live: không có màn đua để «đưa bảng về» — Esc đi tiếp tới luật lùi màn của buổi live
   if (k === 'escape' || k === 'p') { e.preventDefault(); e.stopImmediatePropagation(); hienBang() }
 }
 /** LÊN BẢNG BẰNG TỜ CŨ (thầy 08/11 «gọi hs lên bảng thì chuyển về màn chiếu cũ … bấm đạt hoặc ko đạt thì tự động chuyển sang bình phản ứng»):
@@ -480,6 +486,9 @@ export function lenBangTo(em: { sbd: string; ten: string; goiNgay?: boolean; mau
  *  10/11 (thầy «hiện KẾT QUẢ khoảng 3 giây rồi mới chuyển mượt về màn đua top»): thẻ kết quả nổi trên bảng đang phóng (TheKetQuaLenBang). */
 export function chamTuTo(dat: boolean): void {
   if (!bangAn() || anViLive) return
+  // Buổi live theo khối: KHÔNG có màn đua — chấm xong vẫn ở màn chiếu (thầy 12/11: «bấm đạt với chưa đạt thì lại out ra màn chọn đề»: `hienBang` che tờ
+  // để nhường bảng đua, mà bảng đua đã ẩn ⇒ lộ tấm hoạt động bên dưới). Chỉ ghi kết quả + mở đáp án; máy em có con dấu Đạt / Không đạt.
+  if (phienLive) { nhanCham?.(dat); return }
   hienKetQua(dat)
   hienBang()
   nhanCham?.(dat)
