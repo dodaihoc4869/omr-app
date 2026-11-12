@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1366,
+    "hash": "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+    "fileNguon": "anh/f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6.png",
+    "svg": "open1366-native-ddh-2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b.svg",
+    "hashSvg": "2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b",
+    "byteSvg": 15249,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C2-B5-I-9",
+        "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+        "refs": [
+          {
+            "hash": "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+            "where": "VIP27-C2-B5-I-9.hinh.1.du_lieu",
+            "hashDataUrl": "9f40eac1d85527e9ee1ca7d2e29ab08584177ba1d3562f7b9022014c4f67ff63"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12C11O/6freeOH+2CH2OH=8hydroxylO/LEFT1Haworth5bareC1ringO-RIGHTopen4bareC+literalCH=O-FIRSTC/1bridgeO/4TAPER2boldfront6px-VERTICALfeet/ALLregularUPRIGHT-SUB2-CH2OH-FIRSTC/OH-firstO/0arrows-captions-nums/NOtheorynormalize-PAanswer-addedH-rightRing-alias/ONLY1of4sameqidNOnewfull",
+    "hashSvgDaSoat": "2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

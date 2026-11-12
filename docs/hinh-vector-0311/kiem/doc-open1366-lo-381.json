@@ -1,0 +1,497 @@
+{
+  "i": 1366,
+  "assetIndexProvided": 1308,
+  "hash": "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6.png",
+  "size": [
+    527,
+    191
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C2-B5-I-9",
+      "de": "Cấu trúc dạng mạch hở nào sau đây đúng với maltose?",
+      "allHinh": [
+        {
+          "hash": "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+          "where": "VIP27-C2-B5-I-9.hinh.0.du_lieu",
+          "hashDataUrl": "f401228a4d5a04ab985f6d2a7988adbf3b88136a1b57c38567699da0e484ad73"
+        },
+        {
+          "hash": "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+          "where": "VIP27-C2-B5-I-9.hinh.1.du_lieu",
+          "hashDataUrl": "9f40eac1d85527e9ee1ca7d2e29ab08584177ba1d3562f7b9022014c4f67ff63"
+        },
+        {
+          "hash": "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+          "where": "VIP27-C2-B5-I-9.hinh.2.du_lieu",
+          "hashDataUrl": "26df8961e75a2eddf095d6e6e4a17a88121328f5f9f0455d30707ad075e86993"
+        },
+        {
+          "hash": "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a",
+          "where": "VIP27-C2-B5-I-9.hinh.3.du_lieu",
+          "hashDataUrl": "371261f4d0bc0699cf566dea57cadfa2302aab7b235311fa6938fb819f00bad5"
+        }
+      ],
+      "missingHashes": [
+        "11343f2eae5666d1f6fe24cfc98d5be5f0de9de18165326a0ac5f474816d9f74",
+        "f7065881c24f8dd2f1630d435015c69f207f50cbd88c32a7e71cc39a246831a6",
+        "885a3a6d66427372da1d670e1ee2023dc6fce53dc7afea9cb34dbe5defe14c84",
+        "674df438475ad67fcf90c4230047ee4089e93a0424479187cf37568bad199b5a"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfONLYThisAdmitted": 0,
+    "partialOnly": true,
+    "otherMissingI": [
+      85,
+      728,
+      550
+    ],
+    "note": "All4sourceoptionsabsentmanifest; keepquestionpartialuntilall4pass."
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativepixelcenterline/bbox/taperfeetapprox1px, independentfrommaltosename/optionanswer. Ocountsfromeachprintedlabel. No symmetricnormalization.",
+  "geometry": {
+    "leftRing": {
+      "bareVertices": {
+        "C5": [
+          76,
+          68
+        ],
+        "C4": [
+          19,
+          103
+        ],
+        "C3": [
+          69,
+          134
+        ],
+        "C2": [
+          153,
+          134
+        ],
+        "C1": [
+          208,
+          100
+        ]
+      },
+      "ringO": {
+        "text": "O",
+        "bbox": [
+          141,
+          57,
+          160,
+          77
+        ]
+      },
+      "thinBonds": [
+        [
+          [
+            76,
+            68
+          ],
+          [
+            19,
+            103
+          ]
+        ],
+        [
+          [
+            76,
+            68
+          ],
+          [
+            138,
+            68
+          ]
+        ],
+        [
+          [
+            162,
+            74
+          ],
+          [
+            208,
+            100
+          ]
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            19,
+            103
+          ],
+          [
+            69,
+            137
+          ],
+          [
+            69,
+            131
+          ]
+        ],
+        [
+          [
+            208,
+            100
+          ],
+          [
+            153,
+            137
+          ],
+          [
+            153,
+            131
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          69,
+          134
+        ],
+        [
+          153,
+          134
+        ]
+      ],
+      "frontWidth": 6,
+      "CH2OH": {
+        "text": "CH₂OH",
+        "bbox": [
+          68,
+          19,
+          143,
+          41
+        ],
+        "bond": [
+          [
+            76,
+            68
+          ],
+          [
+            76,
+            42
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "freeOH": [
+        {
+          "text": "OH",
+          "bbox": [
+            10,
+            54,
+            46,
+            76
+          ],
+          "bond": [
+            [
+              19,
+              103
+            ],
+            [
+              19,
+              77
+            ]
+          ],
+          "orientation": "UP"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            59,
+            161,
+            97,
+            183
+          ],
+          "bond": [
+            [
+              69,
+              134
+            ],
+            [
+              69,
+              159
+            ]
+          ],
+          "orientation": "DOWN"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            143,
+            161,
+            181,
+            183
+          ],
+          "bond": [
+            [
+              153,
+              134
+            ],
+            [
+              153,
+              159
+            ]
+          ],
+          "orientation": "DOWN"
+        }
+      ]
+    },
+    "bridgeO": {
+      "text": "O",
+      "bbox": [
+        226,
+        116,
+        245,
+        137
+      ],
+      "bonds": [
+        [
+          [
+            208,
+            100
+          ],
+          [
+            225,
+            116
+          ]
+        ],
+        [
+          [
+            247,
+            116
+          ],
+          [
+            272,
+            103
+          ]
+        ]
+      ]
+    },
+    "rightOpenChain": {
+      "bareVertices": {
+        "C5": [
+          327,
+          68
+        ],
+        "C4": [
+          272,
+          103
+        ],
+        "C3": [
+          320,
+          134
+        ],
+        "C2": [
+          404,
+          134
+        ]
+      },
+      "thinBond": [
+        [
+          327,
+          68
+        ],
+        [
+          272,
+          103
+        ]
+      ],
+      "frontTapers": [
+        [
+          [
+            272,
+            103
+          ],
+          [
+            320,
+            137
+          ],
+          [
+            320,
+            131
+          ]
+        ],
+        [
+          [
+            447,
+            108
+          ],
+          [
+            404,
+            137
+          ],
+          [
+            404,
+            131
+          ]
+        ]
+      ],
+      "boldFront": [
+        [
+          320,
+          134
+        ],
+        [
+          404,
+          134
+        ]
+      ],
+      "frontWidth": 6,
+      "CH2OH": {
+        "text": "CH₂OH",
+        "bbox": [
+          319,
+          19,
+          395,
+          41
+        ],
+        "bond": [
+          [
+            327,
+            68
+          ],
+          [
+            327,
+            42
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "freeOH": [
+        {
+          "text": "OH",
+          "bbox": [
+            370,
+            57,
+            406,
+            79
+          ],
+          "bond": [
+            [
+              327,
+              68
+            ],
+            [
+              366,
+              68
+            ]
+          ],
+          "orientation": "RIGHT"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            310,
+            161,
+            348,
+            183
+          ],
+          "bond": [
+            [
+              320,
+              134
+            ],
+            [
+              320,
+              159
+            ]
+          ],
+          "orientation": "DOWN"
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            394,
+            85,
+            430,
+            107
+          ],
+          "bond": [
+            [
+              404,
+              134
+            ],
+            [
+              404,
+              109
+            ]
+          ],
+          "orientation": "UP"
+        }
+      ],
+      "aldehyde": {
+        "text": "CH=O",
+        "bbox": [
+          451,
+          90,
+          514,
+          111
+        ],
+        "anchor": "FIRSTC",
+        "bondEndpointFromTaper": [
+          447,
+          108
+        ],
+        "note": "TextCH=OliteralincludesH,noexpandedaldehydeC/O,noextraCvertex447108."
+      },
+      "note": "RIGHTchainopenwithC5RIGHTOH, notringO/closure. KeepPAasprinted."
+    },
+    "font": "ALLregularuprightserifblack, noactualbold/italiclabels. CH2OH2SUB. Bondboldfront/taperonly—notboldtext.",
+    "counts": {
+      "C": 12,
+      "leftBareRingC": 5,
+      "rightBareC": 4,
+      "textCH2OHC": 2,
+      "textCHOC": 1,
+      "O": 11,
+      "freeOHExcludingCH2OH": 6,
+      "CH2OHO": 2,
+      "hydroxylOIncludingCH2OH": 8,
+      "ringO": 1,
+      "bridgeO": 1,
+      "aldehydeO": 1,
+      "taperTriangles": 4,
+      "boldFront": 2,
+      "actualClosedRings": 1,
+      "captions": 0
+    },
+    "negativeNoTheoryNormalize": [
+      "Noanswercorrectnessclaim",
+      "DoNOTcloserightchain",
+      "NoOHcount7includingCH2OH",
+      "DoNOTdeleteOHtogettheoryname",
+      "NoHaworthringright",
+      "NoaddedCnums",
+      "NoextraCattapertexttip",
+      "Noaliasotheroptions"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFull4xOpened": true,
+    "allPublicDeRead": true,
+    "counts": "12C11O/6freeOH+2CH2OH=8hydroxylO",
+    "labelInkPixelCheck": "O14359..15874/bridge228119..242134/CHO45392..512107/bottomOH62164..93179; bboxagentgenerousnotink; rootbaselineschosenfromnativeink",
+    "nativeApproxNotSubpixel": true
+  },
+  "sourceStageStatus": "source-only/noSVG/noCount",
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b",
+    "readonlyProof": "cau-truc-open1366-native-ddh-lo-381-soat-doc-lap.json",
+    "runtime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/open1366-native-ddh-2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b.svg 2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b\n1366 { x: 0, y: 0, width: 527, height: 191 }\nPOSTSHOT_SHA 2ae69a57b791be07d8f74104ca0843d2cc176cd3db809b04974bb92b420e6a6b\n",
+    "newFull": 0
+  }
+}
