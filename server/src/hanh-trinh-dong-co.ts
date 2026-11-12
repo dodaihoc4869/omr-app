@@ -31,6 +31,8 @@ export { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 import { SQL_DONG_CO_HANH_TRINH } from './hanh-trinh-dong-co-schema'
 
 const KHONG_CA="NOT EXISTS(SELECT 1 FROM ca WHERE trang_thai='mo')"
+/** 13/11: đưa về 0 cạnh CÒN SỐ của em đã rời đồ thị mới (?1 lúc, ?2 sbd, ?3 mốc cũ, ?4 JSON khoá `tu\u001fden` của đồ thị mới). */
+export const SQL_XOA_CANH_ROI=`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=?1 WHERE sbd=?2 AND cap_nhat_luc<=?3 AND n_co+n_chua+dung_co+dung_chua>0 AND tu||char(31)||den NOT IN (SELECT value FROM json_each(?4)) AND ${KHONG_CA}`
 export interface DongCoHanhTrinh {
   v5?:BoChonV5; chan:Set<string>; hen:Map<string,string>; trongSo:Record<string,number>; canThiep?:{qid:string;nhom:string;kn:string;context:string;cach:CachCuu;xacSuat:number}; soQuanSat:number; soHalfLife:number; soCanhHoc:number; p8:number
   /** 26/10 (bài 6 câu kiểu Duolingo, bai-6-cau.ts): xác suất em làm đúng từng câu (OMNI) — để xếp chặng quanh ~80% đúng. Chỉ đọc, không vào lịch. */
@@ -265,7 +267,9 @@ export async function dongCoHanhTrinh(env:Env,sbd:string,now:number,hs:HoSo2,cha
   const commands=[
     ...ghiTruoc,
     ...ghiTre,
-    ...(giuCanh?[]:[env.DB.prepare(`UPDATE hanh_trinh_v4_canh SET n_co=0,dung_co=0,n_chua=0,dung_chua=0,cap_nhat_luc=? WHERE sbd=? AND cap_nhat_luc<=? AND ${KHONG_CA}`).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now))]),
+    // 13/11 (giảm GHI D1 — số đo 24 giờ: câu này 326 nghìn dòng ghi/ngày): chỉ đưa về 0 cạnh CÒN SỐ mà KHÔNG còn trong đồ thị mới. Cạnh còn trong đồ thị do
+    // câu chèn dưới ghi đè (cùng số, cùng mốc như trước); cạnh đã bằng 0 thì mọi nơi đọc đều bỏ (`n_co+n_chua>0`) ⇒ kết quả đọc y hệt, bớt ghi đúp.
+    ...(giuCanh?[]:[env.DB.prepare(SQL_XOA_CANH_ROI).bind(now,sbd,Math.min(old?.cap_nhat_luc??now,now),JSON.stringify(rows.map(c=>`${c.tu}\u001f${c.den}`)))]),
     env.DB.prepare(`INSERT INTO hanh_trinh_v4_em SELECT ?,?,?,?,? WHERE ${KHONG_CA} ON CONFLICT(sbd) DO UPDATE SET cursor=excluded.cursor,phien_ban=excluded.phien_ban,mo_hinh_json=excluded.mo_hinh_json,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_em.cap_nhat_luc`).bind(sbd,cursor,'ht4-0910-v1',JSON.stringify(snapshot),now),
     ...(giuCanh?[]:[env.DB.prepare(`INSERT INTO hanh_trinh_v4_canh SELECT ?,json_extract(value,'$.tu'),json_extract(value,'$.den'),json_extract(value,'$.nCo'),json_extract(value,'$.dungCo'),json_extract(value,'$.nChua'),json_extract(value,'$.dungChua'),? FROM json_each(?) WHERE ${KHONG_CA} ON CONFLICT(sbd,tu,den) DO UPDATE SET n_co=excluded.n_co,dung_co=excluded.dung_co,n_chua=excluded.n_chua,dung_chua=excluded.dung_chua,cap_nhat_luc=excluded.cap_nhat_luc WHERE excluded.cap_nhat_luc>=hanh_trinh_v4_canh.cap_nhat_luc`).bind(sbd,now,JSON.stringify(rows))]),
   ]
