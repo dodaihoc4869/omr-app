@@ -62,7 +62,7 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'live_buoi', 'live_doan',
   // Hỏi thầy: bằng chứng học tập và biên nhận, luôn bảo toàn.
   'hoi_thay_kiem', 'hoi_thay_can_giup', 'hoi_thay_ho_tro_receipt',
-  'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_dieu_phoi',
+  'kiem_tra_ca_nhan', 'kiem_tra_ca_nhan_chang', 'kiem_tra_ca_nhan_mo_lai', 'kiem_tra_ca_nhan_dieu_phoi',
   // Tài khoản, lớp, phụ huynh (tài khoản giữ để khôi phục được dù bỏ app PH), kho đề, chỉ mục game, cấu hình, cài đặt em, đăng ký đẩy, thống kê dùng app, mã đã dùng.
   'hoc_sinh', 'danh_sach', 'phu_huynh', 'de_kho', 'cau_hoi', 'game_v2_question', 'game_v2_index', 'cau_meta', 'cau_meta_to', 'cau_doc_giay', 'cau_hinh', 'game_v2_settings', 'game_v2_scope',
   'dap_an_kho_sua', // 26/10: nhật ký TỰ SỬA ĐÁP ÁN KHO (đáp án cũ ⇒ mới, để lùi) — vận hành kho câu ⇒ GIỮ
