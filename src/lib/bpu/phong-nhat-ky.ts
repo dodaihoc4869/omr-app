@@ -13,7 +13,7 @@ import type { BangVangLive } from '../live/xem-lai-kieu'
 export type TrangThaiGhi = 'dang-ghi' | 'loi' | 'tat'
 export const laTrangThaiGhi = (v: unknown): v is TrangThaiGhi => v === 'dang-ghi' || v === 'loi' || v === 'tat'
 
-export interface DauVet { bat: boolean; luot: string; so: number; pha: string; goi: string; dat: boolean | null; bang: boolean; mic: string; /** Dấu của ảnh chụp kín gần nhất. */ kin?: string }
+export interface DauVet { bat: boolean; luot: string; so: number; pha: string; goi: string; dat: boolean | null; bang: boolean; mic: string; /** Dấu của ảnh chụp kín gần nhất. */ kin?: string; /** Chế độ live theo khối đang ghi ('' = không phải buổi khối / live đang tắt). */ che?: string }
 export const vetRong = (): DauVet => ({ bat: false, luot: '', so: 0, pha: '', goi: '', dat: null, bang: false, mic: '' })
 
 /** Ảnh chụp lượt lúc mở đáp án: đề công khai, đáp án, lời giải kho, tỉ lệ lớp, ai lên bảng. KHÔNG mang kết quả từng em. */
@@ -37,6 +37,10 @@ export function soVet(st: TrangThaiPhong, cu: DauVet, nay: number): { vet: DauVe
   const lv = st.live, bat = !!lv?.bat && !st.ketThuc
   let v = { ...cu }
   if (bat && !v.bat) { sk.push({ k: 'bat', t: nay }); v = { ...vetRong(), bat: true } }
+  // LIVE THEO KHỐI (13/11, thầy «lưu chế độ bảng chế độ học chuẩn xác … chuyển đổi 2 chế độ trong 1 live cũng phải chuẩn xác»): mỗi lần thầy đổi Học ⇄ Bảng ⇄ danh sách
+  // lúc đang live ⇒ một dòng `che` đúng giờ phòng; bật live ⇒ ghi lại chế độ đang có (vết vừa được đặt lại ở trên).
+  const che = bat ? (lv?.khoi?.che ?? '') : ''
+  if (che !== (v.che ?? '')) { if (che) sk.push({ k: 'che', t: nay, c: che }); v.che = che }
   const l = st.luot, khoa = l ? `${l.so}:${l.batDau}` : ''
   if (khoa !== v.luot) {
     if (v.luot && v.pha !== 'mo') sk.push({ k: 'bo', t: nay, so: v.so })

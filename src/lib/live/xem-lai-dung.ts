@@ -11,13 +11,13 @@ import { giaiSo, maBangMoi, maNetXong, type MucSo } from './ma-net'
 import { apMuc, datLai, taoBang } from './so-net'
 import { catDoan, chonDangXem, type LuotCat } from './xem-lai-cat'
 import { MUC_MS, mucTuDb, type DauKhuc } from './xem-lai-khuc'
-import { DAU_BAN_GHI_NET, ghiNetBin, type BangVangLive, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs, type LyDoKhongDoan } from './xem-lai-kieu'
+import { DAU_BAN_GHI_NET, ghiNetBin, type BangVangLive, type BuoiLiveJson, type CauBuoiLive, type DoanBuoiLive, type KhoangMs, type LyDoKhongDoan, type MocChe } from './xem-lai-kieu'
 import { BYTE_MOI_KHUNG, MS_MOI_KHUNG } from './xem-lai-mp3'
 import { tenBaiTuDong, tenDoan, tenGoi } from './xem-lai-ten'
 
 /** Một dòng nhật ký sự kiện của phòng (giờ `t` = đồng hồ PHÒNG, ms). Thêm loại mới thì bộ dựng bỏ qua loại lạ. */
 export interface SuKienXl {
-  k: 'bat' | 'tat' | 'luot' | 'bo' | 'goi' | 'cham' | 'mo' | 'bang' | 'mic' | 'dh' | 'ghi'
+  k: 'bat' | 'tat' | 'luot' | 'bo' | 'goi' | 'cham' | 'mo' | 'bang' | 'mic' | 'dh' | 'ghi' | 'che'
   t: number
   so?: number
   /** `luot`: giờ bắt đầu lượt (phân biệt hai lượt trùng số). */
@@ -30,6 +30,8 @@ export interface SuKienXl {
   m?: number
   p?: string
   tt?: string
+  /** `che` (live theo khối, 13/11): chế độ thầy vừa chuyển sang — 'hoc' | 'bang' | 'sanh'. */
+  c?: string
 }
 /** Một bản ghi nhật ký nét của phòng: 0 = khung sổ nét thầy gửi lúc live · 1 = mốc «làm lại» (đầu mỗi lần bật live) · 2 = khung ẢNH sổ nét lúc bật live. */
 export interface NetXl { loai: 0 | 1 | 2; luc: number; khung: Uint8Array }
@@ -365,12 +367,22 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
     }
     for (const s of [...dangMo.keys()]) dong(s, v.nay) }
 
+  // ── 10. Dòng thời gian chế độ Học / Bảng (live theo khối) — giờ phòng ⇒ trục tiếng; bảng danh sách («sanh») không phải chế độ dạy ⇒ giữ chế độ trước ──
+  const che: MocChe[] = []
+  for (const e of sk) {
+    if (e.k !== 'che' || (e.c !== 'hoc' && e.c !== 'bang') || !trongLive(e.t)) continue
+    const t = F(e.t), cuoi = che[che.length - 1]
+    if (cuoi && cuoi.v === e.c) continue
+    if (cuoi && cuoi.t >= t) { cuoi.v = e.c; if (che.length > 1 && che[che.length - 2]!.v === e.c) che.pop() } else che.push({ t, v: e.c })
+  }
+
   const batLuc = khoang.length ? khoang[0]![0] : v.nay, tatLuc = khoang.length ? khoang[khoang.length - 1]![1] : null
   const buoi: BuoiLiveJson = {
     v: 1, id: v.id, ban: v.ban, ngay: ngayVn(batLuc), lop: v.lop, batLuc: new Date(batLuc).toISOString(), tatLuc: tatLuc == null ? null : new Date(tatLuc).toISOString(),
     tenTuDong: tenBaiTuDong(cau, v.lop), tenThay: v.tenThay, giayToi: /~t$/.test(sim.trang), coTieng,
     msLive: Math.round(msLive), msDoan: doan.reduce((s, d) => s + d.t1 - d.t0, 0), byteTieng: coTieng ? tongKhung * BYTE_MOI_KHUNG : 0, byteNet: netBin.length,
     cau, doan, lang, emNoi, mocBang, bangVang: v.bangVang,
+    ...(che.length ? { che } : {}),
   }
   // `ngan` tính trên thời lượng live THẬT (trước khi cắt câu chưa chữa) để lý do hiện cho thầy nói đúng việc đã xảy ra.
   const lyDo: KetQuaDung['lyDo'] = !khoang.length ? 'khong-live' : tongTho < LIVE_TOI_THIEU_MS ? 'ngan' : !cau.length ? 'khong-cau' : doan.length ? '' : !coTieng && !netViet.length ? 'khong-tieng-net' : 'khong-doan'
