@@ -55,9 +55,10 @@ function nhanTinPhongEm(d: unknown): void {
   } else if (j.t === 'lop' && typeof j.k === 'string') for (const f of tai.get(j.k as LoaiTinLop) ?? []) { try { f(j as unknown as TinLop) } catch { /* nơi nghe lỗi */ } }
 }
 /** Màn Bình Phản Ứng gọi ngay sau khi tạo WebSocket của phòng. */
-export function noiKhoi(w: WebSocket): void {
+export function noiKhoi(w: WebSocket, tinDau?: string): void {
   if (typeof w.addEventListener !== 'function') return
   ws = w
+  if (tinDau !== undefined) { if (w.readyState === 1) dat({ noi: true }); nhanTinPhongEm(tinDau) } // nạp lười: phòng đã mở, tin báo đầu phát lại tại đây
   w.addEventListener('open', () => { if (ws === w) dat({ noi: true }) })
   w.addEventListener('message', (e: MessageEvent) => { if (ws === w) nhanTinPhongEm(e.data) })
   // Rớt mà 8 giây không có kết nối mới (em đóng màn, thầy kết thúc) ⇒ gỡ lớp nổi; màn tự nối lại thì `noiKhoi` chạy với kết nối mới.
