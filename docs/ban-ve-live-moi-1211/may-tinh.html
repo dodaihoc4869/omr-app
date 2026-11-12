@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bản vẽ: máy tính khoa học trên màn chiếu, đồng bộ sang máy em (live theo khối)</title>
+<style>
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 100 549; src: url('../../src/styles/phong-ddh/ddh-rounded-de-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-vietnamese.woff2') format('woff2'), url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); }
+@font-face { font-family: 'DDH'; font-weight: 550 1000; src: url('../../src/styles/phong-ddh/ddh-rounded-dam-latin.woff2') format('woff2'); unicode-range: U+0000-00FF, U+2000-206F, U+2070-208F; }
+:root { --nen: #131f24; --giay: #f4efe4; --muc: #1f2429; --chu: #f1f7fb; --chu3: #8fa1ab; --vang: #f5a524; --nhan: #0b57d0; --k: calc(100vw / 1366); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH', 'Be Vietnam Pro', system-ui, sans-serif; color: var(--chu); -webkit-font-smoothing: antialiased; overflow: hidden; }
+.man { position: fixed; inset: 0; display: grid; grid-template-columns: 2fr 1fr; grid-template-rows: 1fr calc(56 * var(--k)); gap: calc(10 * var(--k)); padding: calc(10 * var(--k)); }
+.man.em { grid-template-columns: 66fr 34fr; grid-template-rows: 1fr; padding: calc(8 * var(--k)) calc(26 * var(--k)) calc(8 * var(--k)) calc(8 * var(--k)); }
+.giay { background: var(--giay); color: var(--muc); border-radius: calc(18 * var(--k)); padding: calc(22 * var(--k)) calc(34 * var(--k)); font-size: calc(30 * var(--k)); line-height: 1.5; min-width: 0; }
+.chip { display: flex; gap: calc(10 * var(--k)); margin-bottom: calc(12 * var(--k)); font-size: calc(16 * var(--k)); font-weight: 800; }
+.chip b { background: #d9e4fb; padding: calc(4 * var(--k)) calc(14 * var(--k)); border-radius: 99px; }
+.chip span { background: #e6e0d2; color: #5d6770; padding: calc(4 * var(--k)) calc(14 * var(--k)); border-radius: 99px; }
+.bang { position: relative; border-radius: calc(18 * var(--k)); min-width: 0; }
+.man.em .bang { border: 2px solid #33434c; }
+.viet { position: absolute; left: 6%; top: 6%; width: 86%; }
+.thanh { grid-column: 1 / -1; background: #1a262c; border-radius: calc(16 * var(--k)); display: flex; align-items: center; gap: calc(14 * var(--k)); padding: 0 calc(10 * var(--k)); font-weight: 800; }
+.live { background: #c8262b; border-radius: 99px; padding: calc(7 * var(--k)) calc(16 * var(--k)); font-size: calc(15 * var(--k)); }
+.dot { color: var(--vang); font-size: calc(17 * var(--k)); }
+.pha { background: #cfe3ff; color: #12325f; font-size: calc(14 * var(--k)); padding: calc(5 * var(--k)) calc(12 * var(--k)); border-radius: 99px; }
+.gian { flex: 1; }
+.nut-tron { width: calc(40 * var(--k)); height: calc(40 * var(--k)); border-radius: 50%; display: grid; place-items: center; flex: none; background: #2c3a42; border: 1.5px solid #4a5a63; color: var(--chu); }
+.nut-tron.bat { background: var(--vang); border-color: #ffd27a; color: #2a1a00; box-shadow: 0 0 0 calc(3 * var(--k)) rgba(245,165,36,.2), 0 0 calc(20 * var(--k)) rgba(245,165,36,.45); }
+.nut-tron svg { width: 54%; height: 54%; }
+.ong { height: calc(38 * var(--k)); padding: 0 calc(14 * var(--k)); border-radius: 99px; display: flex; align-items: center; gap: calc(8 * var(--k)); background: #2c3a42; border: 1.5px solid #4a5a63; font-size: calc(15 * var(--k)); }
+.o4 { width: calc(28 * var(--k)); height: calc(28 * var(--k)); border-radius: 30%; background: #2c3a42; border: 1.5px solid #4a5a63; display: grid; place-items: center; }
+.nam { position: fixed; right: calc(8 * var(--k)); top: 46%; width: calc(8 * var(--k)); height: calc(84 * var(--k)); border-radius: 99px; background: #e8a13a; }
+/* ── MÁY TÍNH ── */
+.mt { --u: calc(1 * var(--k) * var(--z, 1)); position: fixed; width: calc(318 * var(--u)); padding: calc(12 * var(--u)) calc(14 * var(--u)) calc(16 * var(--u)); border-radius: calc(26 * var(--u)); color: #eef3f6;
+  background: linear-gradient(160deg, #3a4650 0%, #232c33 45%, #171d22 100%);
+  box-shadow: 0 calc(26 * var(--u)) calc(60 * var(--u)) rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.1) inset, 0 1px 0 rgba(255,255,255,.22) inset, 0 calc(-3 * var(--u)) calc(8 * var(--u)) rgba(0,0,0,.35) inset; }
+.mt .keo { display: flex; align-items: center; justify-content: space-between; height: calc(22 * var(--u)); margin-bottom: calc(8 * var(--u)); font-size: calc(11.5 * var(--u)); font-weight: 800; letter-spacing: .1em; color: #a9b6be; cursor: grab; }
+.mt .keo i { width: calc(46 * var(--u)); height: calc(5 * var(--u)); border-radius: 99px; background: #5b6973; }
+.mt .keo span { display: flex; gap: calc(6 * var(--u)); align-items: center; }
+.pin { width: calc(52 * var(--u)); height: calc(12 * var(--u)); border-radius: calc(3 * var(--u)); background: repeating-linear-gradient(90deg, #2a1d12 0 calc(8 * var(--u)), #4a3320 calc(8 * var(--u)) calc(9 * var(--u))); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
+.lcd { border-radius: calc(12 * var(--u)); padding: calc(8 * var(--u)) calc(12 * var(--u)) calc(10 * var(--u)); background: linear-gradient(180deg, #c9d6c3, #b7c7b2); color: #1b2a22; box-shadow: inset 0 calc(3 * var(--u)) calc(8 * var(--u)) rgba(0,0,0,.35), 0 0 0 calc(3 * var(--u)) #0f1418; font-variant-numeric: tabular-nums; }
+.lcd .tt { display: flex; gap: calc(8 * var(--u)); font-size: calc(10 * var(--u)); font-weight: 800; letter-spacing: .06em; opacity: .75; }
+.lcd .bt { margin-top: calc(4 * var(--u)); min-height: calc(26 * var(--u)); font-size: calc(19 * var(--u)); font-weight: 600; letter-spacing: .02em; display: flex; align-items: center; gap: calc(4 * var(--u)); flex-wrap: wrap; }
+.lcd .kq { text-align: right; font-size: calc(34 * var(--u)); font-weight: 800; line-height: 1.15; letter-spacing: .01em; }
+.ps { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; font-size: .86em; vertical-align: middle; }
+.ps b { font-weight: 600; padding: 0 .25em; } .ps b + b { border-top: calc(1.6 * var(--u)) solid currentColor; }
+.hang { display: grid; gap: calc(6 * var(--u)); margin-top: calc(7 * var(--u)); }
+.h6 { grid-template-columns: repeat(6, 1fr); } .h5 { grid-template-columns: repeat(5, 1fr); gap: calc(7 * var(--u)); }
+.dau-phim { display: grid; grid-template-columns: 1fr 1fr calc(92 * var(--u)) 1fr 1fr; gap: calc(6 * var(--u)); align-items: center; margin-top: calc(12 * var(--u)); }
+.p { position: relative; height: calc(27 * var(--u)); border-radius: calc(8 * var(--u)); display: grid; place-items: center; font-size: calc(12.5 * var(--u)); font-weight: 800; color: #e9eff3;
+  background: linear-gradient(180deg, #56636d, #3b464f); box-shadow: 0 calc(2.5 * var(--u)) 0 #12171b, 0 1px 0 rgba(255,255,255,.25) inset; }
+.p small { position: absolute; left: 0; right: 0; top: calc(-11 * var(--u)); text-align: center; font-size: calc(8 * var(--u)); font-weight: 800; color: #f5c451; letter-spacing: .02em; }
+.p.sh { background: linear-gradient(180deg, #f7c456, #e39a16); color: #2a1a00; } .p.al { background: linear-gradient(180deg, #ff7b8f, #e23b5a); color: #fff; }
+.p.so { height: calc(38 * var(--u)); font-size: calc(19 * var(--u)); border-radius: calc(10 * var(--u)); background: linear-gradient(180deg, #f3f6f8, #cfd8de); color: #18222a; box-shadow: 0 calc(3 * var(--u)) 0 #7c8a94, 0 1px 0 #fff inset; }
+.p.pt { height: calc(38 * var(--u)); font-size: calc(19 * var(--u)); border-radius: calc(10 * var(--u)); background: linear-gradient(180deg, #6f7d88, #4b5761); }
+.p.xoa { height: calc(38 * var(--u)); font-size: calc(15 * var(--u)); border-radius: calc(10 * var(--u)); background: linear-gradient(180deg, #ff9a52, #ea6a12); color: #fff; box-shadow: 0 calc(3 * var(--u)) 0 #8f3c05, 0 1px 0 rgba(255,255,255,.45) inset; }
+.p.bang { height: calc(38 * var(--u)); font-size: calc(21 * var(--u)); border-radius: calc(10 * var(--u)); background: linear-gradient(180deg, #8a84ff, #5a4ff0); color: #fff; box-shadow: 0 calc(3 * var(--u)) 0 #2c1fb5, 0 1px 0 rgba(255,255,255,.45) inset; }
+.p.nhan { transform: translateY(calc(2.5 * var(--u))); box-shadow: 0 0 0 calc(2.5 * var(--u)) #f5a524, 0 0 calc(16 * var(--u)) rgba(245,165,36,.7); }
+.dpad { height: calc(60 * var(--u)); border-radius: 50%; background: radial-gradient(circle at 50% 40%, #6a7782, #39444d); box-shadow: 0 calc(3 * var(--u)) 0 #12171b, 0 1px 0 rgba(255,255,255,.3) inset; position: relative; }
+.dpad::after { content: '▲'; position: absolute; left: 0; right: 0; top: 8%; text-align: center; font-size: calc(9 * var(--u)); color: #dfe7ec; }
+.dpad::before { content: '◀            ▶'; position: absolute; left: 0; right: 0; top: 38%; text-align: center; font-size: calc(9 * var(--u)); color: #dfe7ec; white-space: pre; }
+.dpad i { position: absolute; left: 0; right: 0; bottom: 8%; text-align: center; font-size: calc(9 * var(--u)); color: #dfe7ec; font-style: normal; }
+.mt.em-xem { pointer-events: none; }
+.mt .nhan-em { position: absolute; left: 50%; top: calc(-13 * var(--u)); transform: translateX(-50%); background: #f5a524; color: #2a1a00; font-size: calc(11 * var(--u)); font-weight: 800; padding: calc(3 * var(--u)) calc(12 * var(--u)); border-radius: 99px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.bong { position: fixed; border: calc(2.5 * var(--k)) dashed rgba(245,165,36,.75); border-radius: calc(26 * var(--k)); }
+.mui-keo { position: fixed; color: #f5a524; font-size: calc(15 * var(--k)); font-weight: 800; white-space: nowrap; }
+</style></head><body>
+<div id="goc"></div>
+<script>
+var k = new URLSearchParams(location.search).get('k') || 'thay'
+var P = function (c, t, s) { return '<span class="p ' + (c || '') + '">' + (s ? '<small>' + s + '</small>' : '') + t + '</span>' }
+function mayTinh(o) {
+  var nh = o.nhan || ''
+  var h = '<div class="mt ' + (o.lop || '') + '" style="' + o.kieu + '">' + (o.em ? '<span class="nhan-em">Máy tính của thầy · em xem</span>' : '')
+    + '<div class="keo"><span><i></i>KÉO ĐỂ DỜI</span><span>fx · THPT<b class="pin"></b></span></div>'
+    + '<div class="lcd"><div class="tt"><span>D</span><span>Math</span><span>▲</span><span style="margin-left:auto">Ans = 0,25</span></div>'
+    + '<div class="bt">' + o.bt + '</div><div class="kq">' + o.kq + '</div></div>'
+    + '<div class="dau-phim">' + P('sh', 'SHIFT') + P('al', 'ALPHA') + '<span class="dpad"><i>▼</i></span>' + P('', 'MENU') + P('', 'ON') + '</div>'
+    + '<div class="hang h6" style="margin-top:calc(16 * var(--u))">' + P('', 'x⁻¹', 'x!') + P('', '√▫', '∛▫') + P('', 'x²', 'x³') + P('', 'x▫', 'ʸ√▫') + P('', 'log', '10ˣ') + P('', 'ln', 'eˣ') + '</div>'
+    + '<div class="hang h6" style="margin-top:calc(15 * var(--u))">' + P('', '(−)', 'A') + P('', '° ′ ″', 'B') + P('', 'sin', 'sin⁻¹') + P('', 'cos', 'cos⁻¹') + P('', 'tan', 'tan⁻¹') + P('', 'S⇔D', 'a b/c') + '</div>'
+    + '<div class="hang h6" style="margin-top:calc(15 * var(--u))">' + P('', 'STO', 'RCL') + P('', 'ENG', '∠') + P('', '(', '%') + P('', ')', ',') + P('', '▫/▫', 'hỗn số') + P('', 'M+', 'M−') + '</div>'
+    + '<div class="hang h5" style="margin-top:calc(13 * var(--u))">' + P('so', '7') + P('so', '8') + P('so' + (nh === '9' ? ' nhan' : ''), '9') + P('xoa', 'DEL') + P('xoa', 'AC') + '</div>'
+    + '<div class="hang h5">' + P('so', '4') + P('so', '5') + P('so', '6') + P('pt', '×') + P('pt', '÷') + '</div>'
+    + '<div class="hang h5">' + P('so', '1') + P('so', '2') + P('so', '3') + P('pt', '+') + P('pt', '−') + '</div>'
+    + '<div class="hang h5">' + P('so', '0') + P('so', ',') + P('pt', '×10ˣ') + P('pt', 'Ans') + P('bang' + (nh === '=' ? ' nhan' : ''), '=') + '</div></div>'
+  return h
+}
+var PS = function (a, b) { return '<span class="ps"><b>' + a + '</b><b>' + b + '</b></span>' }
+var giay = '<section class="giay"><div class="chip"><b>Câu 3</b><span>Phần III · Trả lời ngắn</span></div>Hoà tan hoàn toàn 5,6 gam Fe trong dung dịch H₂SO₄ loãng, dư. Thể tích khí H₂ thu được ở đkc là bao nhiêu lít? (làm tròn đến hàng phần trăm)</section>'
+var viet = '<svg class="viet" viewBox="0 0 300 120" fill="none" stroke="#e8eef2" stroke-width="2.2" stroke-linecap="round"><path d="M8 22 q10 -14 20 0 t20 0 M56 22 h34 M100 14 v16 M108 22 h40"/><path d="M8 60 h60 M78 52 l12 16 M90 52 l-12 16 M100 60 h70"/></svg>'
+var bieu = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2.8" width="14" height="18.4" rx="2.6"/><rect x="8" y="5.8" width="8" height="3.6" rx="1"/><path d="M8.4 13h.1M12 13h.1M15.6 13h.1M8.4 16.6h.1M12 16.6h.1M15.6 16.6h.1"/></svg>'
+function thanh(bat) { return '<footer class="thanh"><span class="live">● LIVE 21:05</span><span class="dot">◂ &nbsp;Câu 3/5&nbsp; ▸</span><span class="pha">ĐANG CHỮA</span><span class="gian"></span><span class="nut-tron' + (bat ? ' bat' : '') + '">' + bieu + '</span><span class="ong">🧪 6/8 <span style="color:#8fa1ab;font-weight:600">đã nộp</span></span><span class="o4"><svg width="60%" height="60%" viewBox="0 0 20 20"><rect x="2" y="2" width="6.6" height="6.6" rx="2" fill="#f1f7fb"/><rect x="11.4" y="2" width="6.6" height="6.6" rx="2" fill="#f1f7fb"/><rect x="2" y="11.4" width="6.6" height="6.6" rx="2" fill="#f1f7fb"/><rect x="11.4" y="11.4" width="6.6" height="6.6" rx="2" fill="#f1f7fb"/></svg></span></footer>' }
+var bt1 = PS('5,6', '56') + '× 24,79', kq1 = '2,479'
+var h = ''
+if (k === 'thay') h = '<div class="man">' + giay + '<section class="bang">' + viet + '</section>' + thanh(true) + '</div>' + mayTinh({ kieu: '--z:.9;right:calc(26 * var(--k));top:calc(190 * var(--k));', bt: bt1, kq: kq1, nhan: '=' })
+if (k === 'keo') h = '<div class="man">' + giay + '<section class="bang">' + viet + '</section>' + thanh(true) + '</div><i class="bong" style="right:calc(26 * var(--k));top:calc(190 * var(--k));width:calc(286 * var(--k));height:calc(498 * var(--k))"></i><span class="mui-keo" style="left:calc(610 * var(--k));top:calc(158 * var(--k))">⟵ nắm thanh trên cùng để kéo đi bất cứ đâu</span>' + mayTinh({ kieu: '--z:.9;left:calc(300 * var(--k));top:calc(150 * var(--k));', bt: bt1, kq: kq1 })
+if (k === 'an') h = '<div class="man">' + giay + '<section class="bang">' + viet + '</section>' + thanh(false) + '</div>'
+if (k === 'em') h = '<div class="man em">' + giay.replace('font-size', 'x') + '<section class="bang">' + viet + '</section></div><i class="nam"></i>' + mayTinh({ lop: 'em-xem', em: true, kieu: '--z:' + (innerWidth < 900 ? 1.02 : .92) + ';right:calc(' + (innerWidth < 900 ? 60 : 40) + ' * var(--k));top:calc(' + (innerWidth < 900 ? 34 : 150) + ' * var(--k));', bt: bt1, kq: kq1, nhan: '=' })
+document.getElementById('goc').innerHTML = h
+</script>
+</body></html>
