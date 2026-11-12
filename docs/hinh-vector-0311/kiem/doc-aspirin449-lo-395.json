@@ -1,0 +1,403 @@
+{
+  "i": 449,
+  "assetIndexProvided": 1390,
+  "hash": "50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94.png",
+  "size": [
+    1007,
+    210
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-14",
+      "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt được điều chế theo sơ đồ (hình).\nKhi uống aspirin, phản ứng thủy phân trong môi trường acid tạo ra salicylic acid. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường). Hiện nay có nhiều nghiên cứu tập trung vào phản ứng thủy phân này và các yếu tố ảnh hưởng đến tốc độ phản ứng. Dữ liệu về quá trình thủy phân của một mẫu aspirin trong nước (môi trường trung tính) ở 37 °C thể hiện trong bảng:",
+      "allHinh": [
+        {
+          "hash": "50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94",
+          "where": "VIP27-CDK-ESTER-TN-II-14.hinh.0.du_lieu",
+          "hashDataUrl": "f0b9c8f93b5540f776d667eb83618e4c7dd77a50c42276c727bd974ee930940f"
+        }
+      ],
+      "missingHashes": [
+        "50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "note": "Inventory lists only this single hinh; public stem mentions a table, but do not invent another image."
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/395-full3x.png",
+      "/workspace/scratch/395-left4x.png",
+      "/workspace/scratch/395-right4x.png",
+      "/workspace/scratch/395-head4x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "knownPrintedC": 22,
+      "knownPrintedO": 12,
+      "reagentAnhydride": {
+        "C": 4,
+        "O": 3
+      },
+      "salicylicAcid": {
+        "C": 7,
+        "O": 3
+      },
+      "aspirin": {
+        "C": 9,
+        "O": 4
+      },
+      "aceticAcid": {
+        "C": 2,
+        "O": 2
+      },
+      "phenylRings": 2,
+      "innerDoubleRays": 6,
+      "plusSigns": 2,
+      "rightFilledHeads": 1
+    },
+    "font": {
+      "chemicals": "Regular upright serif; subscripts smaller lowered",
+      "captions": "Regular italic serif, lowercase exactly",
+      "noTrueBoldLabels": true
+    },
+    "salicylic": {
+      "ringVerticesClockwiseApprox": [
+        [
+          303.5,
+          67.5
+        ],
+        [
+          343.5,
+          89.5
+        ],
+        [
+          343.5,
+          135.5
+        ],
+        [
+          303.5,
+          158.5
+        ],
+        [
+          263.5,
+          135.5
+        ],
+        [
+          263.5,
+          89.5
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            274.5,
+            92.5
+          ],
+          [
+            302,
+            77.5
+          ]
+        ],
+        [
+          [
+            335.5,
+            98
+          ],
+          [
+            335.5,
+            129
+          ]
+        ],
+        [
+          [
+            274.5,
+            126.5
+          ],
+          [
+            302,
+            142
+          ]
+        ]
+      ],
+      "substituentBonds": {
+        "upCOOH": [
+          [
+            303.5,
+            67.5
+          ],
+          [
+            303.5,
+            34.5
+          ]
+        ],
+        "upLeftHO": [
+          [
+            263.5,
+            89.5
+          ],
+          [
+            237.5,
+            75
+          ]
+        ]
+      },
+      "COOH": {
+        "literal": "COOH",
+        "bboxApprox": [
+          295,
+          11,
+          372,
+          30
+        ],
+        "anchor": "FIRST C center~305, not middle of text"
+      },
+      "HO": {
+        "literal": "HO",
+        "bboxApprox": [
+          192,
+          57,
+          231,
+          75
+        ],
+        "anchor": "LAST O center~221; bond stops237.5 leaving glyph gap"
+      },
+      "caption": {
+        "literal": "salicylic acid",
+        "bboxApprox": [
+          202,
+          173,
+          382,
+          203
+        ],
+        "baselineApprox": 195
+      }
+    },
+    "aspirin": {
+      "ringVerticesClockwiseApprox": [
+        [
+          745.5,
+          69
+        ],
+        [
+          785.5,
+          91
+        ],
+        [
+          785.5,
+          137.5
+        ],
+        [
+          745.5,
+          159.5
+        ],
+        [
+          705.5,
+          137.5
+        ],
+        [
+          705.5,
+          91
+        ]
+      ],
+      "innerDoubleRays": [
+        [
+          [
+            716,
+            94.5
+          ],
+          [
+            742.5,
+            79.5
+          ]
+        ],
+        [
+          [
+            777.5,
+            99.5
+          ],
+          [
+            777.5,
+            130.5
+          ]
+        ],
+        [
+          [
+            716,
+            128.5
+          ],
+          [
+            742.5,
+            144.5
+          ]
+        ]
+      ],
+      "substituentBonds": {
+        "upCOOH": [
+          [
+            745.5,
+            69
+          ],
+          [
+            745.5,
+            36.5
+          ]
+        ],
+        "upLeftAcetoxy": [
+          [
+            705.5,
+            91
+          ],
+          [
+            679,
+            76.5
+          ]
+        ]
+      },
+      "COOH": {
+        "literal": "COOH",
+        "bboxApprox": [
+          736,
+          12,
+          815,
+          31
+        ],
+        "anchor": "FIRST C center~746"
+      },
+      "acetoxy": {
+        "literal": "CH₃COO",
+        "bboxApprox": [
+          568,
+          58,
+          675,
+          80
+        ],
+        "anchor": "LAST O near662, not FIRST C; preserve text left-to-right CH3COO, do not reverse to OOCCH3"
+      },
+      "caption": {
+        "literal": "aspirin",
+        "bboxApprox": [
+          699,
+          173,
+          793,
+          202
+        ],
+        "baselineApprox": 195
+      }
+    },
+    "anhydride": {
+      "literal": "(CH₃CO)₂O",
+      "bboxApprox": [
+        5,
+        96,
+        140,
+        123
+      ],
+      "baselineApprox": 115,
+      "noExpandedCO": true
+    },
+    "byproduct": {
+      "literal": "CH₃COOH",
+      "bboxApprox": [
+        868,
+        106,
+        998,
+        129
+      ],
+      "baselineApprox": 124,
+      "noExpandedCO": true
+    },
+    "plusSigns": [
+      {
+        "centerApprox": [
+          169,
+          107
+        ],
+        "bboxApprox": [
+          162,
+          100,
+          176,
+          114
+        ]
+      },
+      {
+        "centerApprox": [
+          834,
+          117
+        ],
+        "bboxApprox": [
+          826,
+          109,
+          842,
+          125
+        ]
+      }
+    ],
+    "arrow": {
+      "shaft": [
+        [
+          385,
+          112.5
+        ],
+        [
+          545,
+          112.5
+        ]
+      ],
+      "tipApprox": [
+        548,
+        112.5
+      ],
+      "filledHeadApprox": [
+        [
+          530,
+          107.5
+        ],
+        [
+          548,
+          112.5
+        ],
+        [
+          530,
+          118
+        ],
+        [
+          533,
+          112.5
+        ]
+      ],
+      "classification": "FULL filled right head with concave rear notch, not openV; own4x head inspected",
+      "strokeApprox": 1.6,
+      "noConditions": true
+    },
+    "noAdded": [
+      "No H2O",
+      "No catalyst/temperature/yield",
+      "No expanded carbonyl strokes for condensed formulas",
+      "No additional answer or mechanism"
+    ]
+  },
+  "measurementLimits": "Each ring read separately from own native macro; approximate native pixel centers usually ±1px, label boxes ±2px. No affine-copy claim and no chemistry normalization. Native full displayed3x downscaled by viewer but separate4x ring/head macros also opened.",
+  "actualSvgReviewed": true,
+  "status": "root+readonly finalpassed",
+  "rootOwnReview": {
+    "nativeFull3x": true,
+    "nativeTwoRings4xAndReagentMacro": true,
+    "allPublicDe": true,
+    "CH3COOLiteralLastOConfirmed": true,
+    "knownPrintedC22O12": true,
+    "nativeApproxNotSubpixel": true,
+    "noTableCheckedClaim": true,
+    "actualFull3x": true,
+    "actualTwoRingsCaptionsHeadReagentsByproductMacros": true,
+    "actualFinalSHA": "6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c"
+  }
+}

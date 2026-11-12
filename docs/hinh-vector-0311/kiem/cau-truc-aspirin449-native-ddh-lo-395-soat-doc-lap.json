@@ -1,0 +1,20 @@
+[
+  {
+    "i": 449,
+    "hashSvg": "6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-ESTER-TN-II-14.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và macro hai vòng/captions/head/reagents. Đúng22knownC12O kể anhydride/aceticacid, hai vòng6C/sáu innerdouble riêng đúng hướng, không circle. Literal(CH₃CO)₂O/CH₃COO/CH₃COOH đúng thứ tự, không OOCCH₃; COOHneoCđầu/HOvàCH₃COOneoOcuối đúng. Một đầu đặc concavebase/hai plus, hóa học thường thẳng/chỉsố2-3 và lowercase captions thường nghiêng đúng. Không thấy chạm/cắt/tràn/điều kiện/nước/đápán thêm. De nhắc bảng nhưng inventory1hinh; chỉ so hình này, không tuyên bố so bảng.",
+    "render": "/workspace/scratch/soat395-449-fresh.png",
+    "macro": [
+      "/workspace/scratch/aspirin449-left.png",
+      "/workspace/scratch/aspirin449-head.png",
+      "/workspace/scratch/aspirin449-right.png"
+    ],
+    "hash": "50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94",
+    "hashSvgDaSoat": "6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c",
+    "runtimeLog": {
+      "sha256": "a76acf831a11aa50d93ea1931c6adca98a2e46611d8481993bdcdbaae1526ca5",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/aspirin449-native-ddh-6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c.svg 6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c\n449 { x: 0, y: 0, width: 1007, height: 210 }\nPOSTSHOT_SHA 6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c\n"
+    }
+  }
+]

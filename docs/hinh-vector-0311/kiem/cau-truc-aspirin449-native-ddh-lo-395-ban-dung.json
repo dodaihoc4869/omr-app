@@ -1,0 +1,29 @@
+[
+  {
+    "i": 449,
+    "hash": "50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94",
+    "fileNguon": "anh/50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94.png",
+    "svg": "aspirin449-native-ddh-6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c.svg",
+    "hashSvg": "6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c",
+    "byteSvg": 30071,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-14",
+        "de": "Aspirin là một hợp chất được sử dụng làm giảm đau, hạ sốt được điều chế theo sơ đồ (hình).\nKhi uống aspirin, phản ứng thủy phân trong môi trường acid tạo ra salicylic acid. Salicylic acid ức chế quá trình sinh tổng hợp prostaglandin (chất gây đau, sốt và viêm khi nồng độ trong máu cao hơn mức bình thường). Hiện nay có nhiều nghiên cứu tập trung vào phản ứng thủy phân này và các yếu tố ảnh hưởng đến tốc độ phản ứng. Dữ liệu về quá trình thủy phân của một mẫu aspirin trong nước (môi trường trung tính) ở 37 °C thể hiện trong bảng:",
+        "refs": [
+          {
+            "hash": "50ddda66982a9277c814da0f224179a7050d7107d21f8960c8a2b19155ad4d94",
+            "where": "VIP27-CDK-ESTER-TN-II-14.hinh.0.du_lieu",
+            "hashDataUrl": "f0b9c8f93b5540f776d667eb83618e4c7dd77a50c42276c727bd974ee930940f"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "22knownC12Oincludinganhydrideandaceticacid/2Ph12bareC6innerCCdouble-individualnonperiodicvertices/EXACT(CH3CO)2O-CH3COO-NOTOOCCH3-CH3COOH/2COOH-FIRSTCanchors-HOandCH3COOLASTOanchors/1FILLEDrightheadconcavebase-2plus/ALLchemicalregularUPRIGHT-SUB23/2regularITALIClowercasecaptionssalicylic acid-aspirin/0expandedCO-stereo-charge/NOaddedH-water-catalyst-temperature-yield-answer-alias451608",
+    "hashSvgDaSoat": "6b701351106dbc501d7ecd7e1c04f9080f55909eb4532c3fd19b343a359e264c",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
