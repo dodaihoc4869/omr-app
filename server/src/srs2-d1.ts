@@ -10,7 +10,7 @@ import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
 //   {"bat":true,"sbd":["12001","12002"]} ⇒ chỉ các em này (chạy thử)
 import { docNhipKenh, onVaoDaoRieng, tiLeNoRieng } from './ca-nhan-hoa-v2'
 import { docThamSo } from './tu-hoan-thien'
-import { apLuatChung, chonBanSongSinh, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2 } from './hang-chua-loi'
+import { apLuatChung, chonBanSongSinh, CHI_MUC_CHUA_DUNG, DK_CHUA_DUNG, docBoTroLoi, docMocDocLoiGiai, docQidSaiV2, quaChiMucChuaDung } from './hang-chua-loi'
 import { canThanTu, nhanMocDuyTri } from './omni-can-than'
 import { cacQidSongSinh, CHO_SONG_SINH, tachSongSinh, thamSoTheoLyDo, TU_NGAY, type KetQuaLoi } from './loi-hoc-luat'
 import { docThamSoEmVaLyDo, lyDoHieuLuc } from './ly-do-sai'
@@ -721,12 +721,15 @@ export function theLucChienDichVuaDong(ds: readonly ChienDich[], homNay: string)
 export async function docQidSaiTaiLop(env: Env, sbd: string, hoiThay?: { now: number; nhan: (qid: string[]) => void }): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
   const cu = `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND nguon IN ('len_bang','dau_gio') AND ket_qua = 0 AND COALESCE(qid,'') <> '' GROUP BY qid`
-  const docCu = () => env.DB.prepare(cu).bind(sbd).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // H1 (12/11): chỉ mục bộ phận lượt chưa đúng — dò (sbd, nguon, ket_qua = 0), phủ qid/luc ⇒ chỉ đọc dòng sai tại lớp (trước: mọi dòng sổ của em). Thiếu chỉ mục ⇒ câu cũ.
+  const cm = cu.replace('su_kien_hoc WHERE', `su_kien_hoc ${CHI_MUC_CHUA_DUNG} WHERE ${DK_CHUA_DUNG} AND`)
+  const docCu = () => quaChiMucChuaDung(() => env.DB.prepare(cm).bind(sbd).all<Row>(), () => env.DB.prepare(cu).bind(sbd).all<Row>()).catch(() => ({ results: [] as Row[] }))
   // Một hàng phụ tối đa12 mã, cùng truy vấn đã có trên bảng sổ luôn tồn tại.
   // Không thêm đợt D1; thiếu schema mới thì đọc lại query cũ, không mất nợ tại lớp.
-  const r = hoiThay ? await env.DB.prepare(`${cu} UNION ALL SELECT NULL,
+  const hop = (q: string) => env.DB.prepare(`${q} UNION ALL SELECT NULL,
     (SELECT json_group_array(qid_goc) FROM (${sqlCauHoiThayDenHan('x.sbd', 'x.now')}))
-    FROM (SELECT ? AS sbd,? AS now) x`).bind(sbd, sbd, hoiThay.now).all<Row>().catch(docCu) : await docCu()
+    FROM (SELECT ? AS sbd,? AS now) x`).bind(sbd, sbd, hoiThay!.now).all<Row>()
+  const r = hoiThay ? await quaChiMucChuaDung(() => hop(cm), () => hop(cu)).catch(docCu) : await docCu()
   if (hoiThay) hoiThay.nhan(parseMang((r.results ?? []).find(x => x.qid == null)?.luc))
   const rows = (r.results ?? []).filter(x => x.qid != null)
   if (!rows.length) return ra
@@ -756,14 +759,15 @@ async function cauKhoKhongTuLuan(env: Env, qids: readonly string[]): Promise<Set
  */
 export async function docQidSaiCaDaCongBo(env: Env, sbd: string): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  const cau = (coVis: boolean) =>
-    `SELECT s.qid, MIN(s.luc) AS luc FROM su_kien_hoc s JOIN ca c ON c.ma_ca = s.ma_nguon
-      WHERE s.sbd = ? AND s.nguon = 'thi' AND COALESCE(s.ket_qua, 0) <> 1 AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}
+  // H1 (12/11): `cm` ⇒ chỉ mục bộ phận lượt chưa đúng — dò (sbd, nguon = 'thi'), chỉ dòng sai / trống. Thiếu chỉ mục ⇒ lỗi ⇒ câu cũ.
+  const cau = (coVis: boolean, cm = false) =>
+    `SELECT s.qid, MIN(s.luc) AS luc FROM su_kien_hoc s${cm ? ` ${CHI_MUC_CHUA_DUNG}` : ''} JOIN ca c ON c.ma_ca = s.ma_nguon
+      WHERE s.sbd = ? AND s.nguon = 'thi' AND ${cm ? `s.${DK_CHUA_DUNG} AND ` : ''}COALESCE(s.ket_qua, 0) <> 1 AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}
         ${coVis ? "AND COALESCE(s.visibility, '') <> 'embargoed'" : ''}
       GROUP BY s.qid`
   let rows: Row[]
   try {
-    rows = (await env.DB.prepare(cau(true)).bind(sbd).all<Row>()).results ?? []
+    rows = (await quaChiMucChuaDung(() => env.DB.prepare(cau(true, true)).bind(sbd).all<Row>(), () => env.DB.prepare(cau(true)).bind(sbd).all<Row>())).results ?? []
   } catch {
     try {
       rows = (await env.DB.prepare(cau(false)).bind(sbd).all<Row>()).results ?? []

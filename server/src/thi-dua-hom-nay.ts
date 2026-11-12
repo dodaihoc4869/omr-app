@@ -273,10 +273,12 @@ async function soLieuCuaLop(env: Env, cungLop: [string, EmTrongTruong][], sbdThe
  *     (quét theo thời gian cả trường); so sánh chữ y như cũ (cột TEXT với tham số chữ). Cùng tập ngày ⇒ cùng chuỗi (test thi-dua-qua-ngay-1510).
  *   KHÔNG đệm ngày đã qua tới nửa đêm: lượt nộp bù mang giờ cũ phải nối chuỗi NGAY như bản cũ (đệm 30 giây của lớp giữ nguyên).
  * Hàng trả: (sbd, ngay_vn, n, luc) — ngày đã qua có n = 1, luc NULL (chỉ hôm nay dùng hai cột ấy, như trước).
+ * H1 (12/11, hoá đơn D1 — 137 lượt × ~92 nghìn hàng/ngày): phần HÔM NAY dò (sbd, luc) từ max(mốc, ?2 − 2 ngày) thay vì từ mốc (cả sổ từ mốc). Dòng có
+ *   ngay_vn = ?2 (ngày VN của `luc`) luôn có `luc` ≥ chuỗi ngày ?2 − 2 ⇒ cùng tập dòng (test thi-dua-qua-ngay-1510 + h1-so-em-1211).
  */
 export const SQL_SO_CAU_LOP = `SELECT sbd, ngay_vn, COUNT(*) AS n, MAX(luc1) AS luc FROM (
          SELECT sbd, ngay_vn, qid, MIN(luc) AS luc1 FROM su_kien_hoc
-          WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn = ?2 AND luc >= ?3 AND ket_qua IS NOT NULL
+          WHERE sbd IN (SELECT value FROM json_each(?1)) AND ngay_vn = ?2 AND luc >= max(?3, date(?2, '-2 days')) AND ket_qua IS NOT NULL
           GROUP BY sbd, ngay_vn, qid
        ) GROUP BY sbd, ngay_vn
        UNION ALL

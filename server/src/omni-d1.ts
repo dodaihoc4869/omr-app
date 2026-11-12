@@ -38,7 +38,7 @@ import { congNgay, soNgayGiua } from './srs2-loi'
 import { ngayVn, phanTuQid } from './su-kien-hoc'
 import { cacQidSongSinh, tachSongSinh } from './loi-hoc-luat'
 import { docCauHinhDem } from './cau-hinh-dem'
-import { DemTTL } from './dem-chung'
+import { DemTTL, dangKyXoaDem } from './dem-chung'
 import { daNho, envGhiRieng, laBanGop, nhoTheoLuot } from './doc-d1-theo-luot'
 import { chayDdlMotLan } from './ddl-mot-lan'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
@@ -998,6 +998,16 @@ async function priorChoNhieuEm(env: Env, sbds: readonly string[], homNay: string
 
 // ---------------------------------------------------------------- hồ sơ trực tiếp (đệm 60 s)
 const khoaDemSo = (sbds: readonly string[]): string => `omni_dem_so|${dsJson(sbds)}`
+/** Đếm sổ CŨ (đường lùi khi D1 chưa có bảng `so_em_dem`): đọc mọi dòng chỉ mục (sbd, received_at) của em. */
+export const SQL_DEM_SO_CU = 'SELECT sbd, COUNT(*) AS n, MAX(COALESCE(received_at, 0)) AS r FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd'
+// H1 (12/11, hoá đơn D1: câu cũ ~1,8 nghìn hàng × 23,6 nghìn lượt/ngày ≈ 42,5 triệu): đọc (n, r) TÍNH SẴN ở `so_em_dem` (trigger trên sổ giữ đúng =
+// COUNT / MAX(COALESCE(received_at,0)) — server/migration-z-1211-a-so-em-dem.sql) khi có DẤU đã nạp (sbd '*'); chưa có dấu ⇒ CÙNG lệnh đếm thẳng từ sổ như cũ.
+// Dấu nằm trong TẬP dò (`IN (… WHERE dấu)`): nhánh không dùng có tập rỗng ⇒ không đọc dòng nào. `n > 0` ⇒ em không còn dòng sổ vắng mặt như câu cũ.
+const DAU_SO_EM = "EXISTS (SELECT 1 FROM so_em_dem WHERE sbd = '*')"
+export const SQL_DEM_SO = `SELECT sbd, n, r FROM so_em_dem WHERE sbd IN (SELECT value FROM json_each(?1) WHERE ${DAU_SO_EM}) AND n > 0
+  UNION ALL SELECT sbd, COUNT(*) AS n, MAX(COALESCE(received_at, 0)) AS r FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?1) WHERE NOT ${DAU_SO_EM}) GROUP BY sbd`
+let soEmDemLoiLuc = 0
+dangKyXoaDem(() => { soEmDemLoiLuc = 0 })
 async function demSoDong(env: Env, sbds: readonly string[]): Promise<Map<string, DemSo>> {
   const ra = new Map<string, DemSo>()
   if (!sbds.length) return ra
@@ -1005,8 +1015,11 @@ async function demSoDong(env: Env, sbds: readonly string[]): Promise<Map<string,
   // Nhớ theo lượt (tối ưu 05/10): MỘT request hỏi số đếm sổ của cùng (các) em nhiều lần (đoán trước lúc trả lời, Sảnh: lập kế hoạch rồi phần OMNI) ⇒ một lượt đọc;
   // lượt ghi `su_kien_hoc` của chính request ⇒ đếm lại.
   const rows = await nhoTheoLuot(env.DB, khoaDemSo(sbds), async () => {
+    const q = (s: string) => env.DB.prepare(s).bind(ds).all<Row>().then((r) => r.results ?? [])
     try {
-      return (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(COALESCE(received_at, 0)) AS r FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []
+      // H1 (12/11): bảng tính sẵn `so_em_dem` (một dòng mỗi em) — bảng chưa có ⇒ câu đếm cũ, nhớ 10 phút mỗi isolate (không thử lại mỗi lượt).
+      if (Date.now() - soEmDemLoiLuc > 600_000) return await q(SQL_DEM_SO).catch((e: unknown) => { if (!/so_em_dem/.test(String(e))) throw e; soEmDemLoiLuc = Date.now(); return q(SQL_DEM_SO_CU) })
+      return await q(SQL_DEM_SO_CU)
     } catch {
       // D1 cũ chưa có `received_at`: khoá theo số dòng + giờ học lớn nhất (đệm dòng sổ không dùng — r âm không bao giờ khớp)
       const cu = (await env.DB.prepare('SELECT sbd, COUNT(*) AS n, MAX(luc) AS l FROM su_kien_hoc WHERE sbd IN (SELECT value FROM json_each(?)) GROUP BY sbd').bind(ds).all<Row>()).results ?? []

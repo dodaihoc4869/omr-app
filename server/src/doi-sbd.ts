@@ -25,8 +25,8 @@ export function thayTrongChuoi(s: string, cu: string, moi: string): string {
 async function cacCot(env: Env, chiBang?: string): Promise<{ bang: string; cot: string }[]> {
   // MỘT câu cho cả kho (dữ liệu thật ~250 bảng / 845 cột: gọi pragma từng bảng mất 2–3 phút); hỏng ⇒ lùi về từng bảng.
   // G5 12/11: bỏ bảng DẪN XUẤT do trigger trên sổ giữ (`cau_lam_cuoi`, WITHOUT ROWID — không có rowid cho đường «thay trong chuỗi»): đổi sbd ở su_kien_hoc ⇒ trigger
-  // tự chuyển dòng của em sang số mới, cùng giao dịch.
-  const loc = "m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%' AND m.name NOT LIKE 'd1_%' AND m.name <> 'cau_lam_cuoi'" + (chiBang ? ' AND m.name = ?' : '')
+  // tự chuyển dòng của em sang số mới, cùng giao dịch. H1 12/11: `so_em_dem` (số dòng sổ từng em, trigger trên sổ) — cùng lý do.
+  const loc = "m.type = 'table' AND m.name NOT LIKE 'sqlite_%' AND m.name NOT LIKE '_cf_%' AND m.name NOT LIKE 'd1_%' AND m.name NOT IN ('cau_lam_cuoi', 'so_em_dem')" + (chiBang ? ' AND m.name = ?' : '')
   const ra: { bang: string; cot: string }[] = []
   const nhan = (rows: Obj[]) => { for (const r of rows) { const t = String(r.bang ?? ''), n = String(r.cot ?? ''); if (tenAnToan(t) && tenAnToan(n) && cotChu(String(r.kieu ?? ''))) ra.push({ bang: t, cot: n }) } }
   try {

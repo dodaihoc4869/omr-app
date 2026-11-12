@@ -4,6 +4,7 @@ import type { Env, D1PreparedStatement } from './kieu'
 import { chayDdlMotLan, ddlDaXong } from './ddl-mot-lan'
 import { SQL_GOI7 } from './goi-bai-7-schema'
 import { docChanCauMoiGoi7 } from './goi-bai-7-chan-moi'
+import { docXemGan7 } from './goi-bai-7-xem-gan'
 import { sqlEmDangNhan7, sqlQuyetDinhNhan7, sqlCacGoiConNhan7, sqlThemEmGoi7 } from './goi-bai-7-quyen'
 import { chonGoi7, congNgay7, ngayVn7, quotaGoi7, soNgayCon7, diemConDungNguon7, mucNgayGoi7, type CauGoi7, type ViecGoi7, type LoaiNgay7 } from './goi-bai-7-loi'
 import { docMucLoai7, loaiNgayEm7, noCau7 } from './goi-bai-7-loai-ngay'
@@ -366,7 +367,7 @@ function batDauSom7(env: Env, sbd: string, now: number, ngay: string, goi: reado
   const khoiSom = som(docKhoiEm(env, sbd))
   const daLamSom = som(docDaLamVaVuaLam7(env, sbd, ngay, now))
   const xemChuaSom = som(Promise.all([
-    env.DB.prepare('SELECT DISTINCT qid FROM loi_giai_hoi WHERE sbd=? AND julianday(luc)>=julianday(?)-0.5').bind(sbd,new Date(now).toISOString()).all<{qid:string}>(),
+    docXemGan7(env,sbd,now),
     env.DB.prepare('SELECT goi_id,qid,version FROM goi_bai_7_chua WHERE goi_id IN(SELECT value FROM json_each(?))').bind(JSON.stringify(goi.map(g=>g.id))).all<Row>(),
   ]))
   const kiemSom = som(env.DB.prepare('SELECT goi_id,ma_de,diem,nop_luc,json FROM goi_bai_7_kiem WHERE sbd=? AND nop_luc IS NOT NULL ORDER BY nop_luc DESC LIMIT 30').bind(sbd).all<Row>())

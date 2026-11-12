@@ -14,24 +14,39 @@ import { boTroTheoQid } from './song-sinh-game'
 import type { BoTro } from './cau-bo-tro'
 import { apSongSinh } from './song-sinh-game'
 import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
+import { dangKyXoaDem } from './dem-chung'
 
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
 
+/** H1 (12/11, hoá đơn D1): chỉ mục bộ phận «lượt CHƯA ĐÚNG» (server/migration-z-1211-skh-chua-dung.sql: (sbd, nguon, ket_qua, qid, luc, ma_nguon)
+ *  WHERE ket_qua IS NOT 1). SQLite chỉ dùng chỉ mục bộ phận khi câu có ĐÚNG điều kiện `DK_CHUA_DUNG` ⇒ câu đọc ghi thêm nó (điều kiện cũ đã kéo theo
+ *  nó — kết quả không đổi). Không thống kê (D1 không có sqlite_stat1) bộ lập kế hoạch chọn (sbd, qid) vì GROUP BY ⇒ chỉ định thẳng; thiếu chỉ mục ⇒ lỗi ⇒ câu cũ. */
+export const CHI_MUC_CHUA_DUNG = 'INDEXED BY idx_skh_em_chua_dung'
+export const DK_CHUA_DUNG = 'ket_qua IS NOT 1'
+let thieuChiMucLuc = 0
+dangKyXoaDem(() => { thieuChiMucLuc = 0 })
+/** Câu MỚI (chỉ mục bộ phận) rồi câu CŨ khi lỗi. D1 chưa có chỉ mục («no such index») ⇒ nhớ 10 phút mỗi isolate, đi thẳng câu cũ (không thêm lượt chờ mỗi lần). */
+export function quaChiMucChuaDung<T>(moi: () => Promise<T>, cu: () => Promise<T>): Promise<T> {
+  if (Date.now() - thieuChiMucLuc < 600_000) return cu()
+  return moi().catch((e: unknown) => { if (/idx_skh_em_chua_dung/.test(String(e))) thieuChiMucLuc = Date.now(); return cu() })
+}
 /**
  * NGUỒN THỨ 4: qid → lúc sai TỰ LÀM sớm nhất từ 29/09, mọi kênh. Bỏ: sự kiện đọc lời giải, lượt lướt (OMNI 3), lượt có hỗ trợ, sự kiện bị che (ca chưa công bố —
  * công bố xong mới kéo, như nguồn ca; câu ca thi chỉ tính khi ca ĐÃ công bố — không lộ câu thi). Bỏ trống chỉ tính sai ở ca thi (kênh khác NULL có thể là "chưa làm"). Lỗi đọc ⇒ rỗng.
  */
 export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  const sql = (moi: boolean) => `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ?
+  // H1 (12/11): `cm` ⇒ chỉ mục bộ phận lượt chưa đúng (`CHI_MUC_CHUA_DUNG`) — chỉ đọc dòng sai / trống của em, không đọc cả sổ. D1 chưa có chỉ mục ⇒ lỗi ⇒ câu cũ.
+  const sql = (moi: boolean, cm = false) => `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc${cm ? ` ${CHI_MUC_CHUA_DUNG}` : ''} WHERE sbd = ? AND ngay_vn >= ?${cm ? ` AND ${DK_CHUA_DUNG}` : ''}
       AND (ket_qua = 0 OR (ket_qua IS NULL AND nguon = 'thi')) AND COALESCE(qid, '') <> ''
       AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))
       ${moi ? `AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed'` : ''}
     GROUP BY qid`
   let rows: Row[]
-  try { rows = (await env.DB.prepare(sql(true)).bind(sbd, TU_NGAY).all<Row>()).results ?? [] } catch {
-    try { rows = (await env.DB.prepare(sql(false)).bind(sbd, TU_NGAY).all<Row>()).results ?? [] } catch { return ra }
+  const doc = (q: string) => env.DB.prepare(q).bind(sbd, TU_NGAY).all<Row>().then((r) => r.results ?? [])
+  try { rows = await quaChiMucChuaDung(() => doc(sql(true, true)), () => doc(sql(true))) } catch {
+    try { rows = await doc(sql(false)) } catch { return ra }
   }
   for (const x of rows) {
     const q = tachSongSinh(str(x.qid)).goc, luc = str(x.luc)

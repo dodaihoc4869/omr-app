@@ -125,6 +125,8 @@ export const BANG_GIU_HOA2: readonly string[] = [
   'nhip_hoc_doi_pho_ngay',
   // «Lần cuối em làm mỗi câu» tính sẵn (G5 12/11, migration-z-1211-cau-lam-cuoi.sql): dẫn xuất từ sổ (GIỮ), trigger giữ đúng ⇒ GIỮ (xoá dữ liệu mà còn dấu ⇒ sai).
   'cau_lam_cuoi',
+  // Số dòng sổ của từng em tính sẵn (H1 12/11, migration-z-1211-a-so-em-dem.sql): dẫn xuất từ sổ (GIỮ), trigger giữ đúng ⇒ GIỮ (không DROP khi còn trigger).
+  'so_em_dem',
 ]
 
 /** Có ca thi đang mở (`trang_thai = 'mo'`, trừ ca đo tải)? MỘT truy vấn. Không đọc được bảng `ca` ⇒ HOÃN cho chắc (không chắc là không có ca mở). */
