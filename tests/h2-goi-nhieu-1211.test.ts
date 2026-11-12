@@ -12,6 +12,7 @@ import { SQL_NHAN_NEN_LUI } from '../server/src/omni-d1'
 import { docNoiDung, docNoiDungGon, SQL_NOI_DUNG, SQL_NOI_DUNG_GON } from '../server/src/tu-luyen-cau-sai'
 import { SQL_CAU_GON } from '../server/src/cau-gon'
 import { dsXep } from '../server/src/ds-xep'
+import { chepTenDinhKy } from '../server/src/chi-muc-luc-chay'
 import type { Env } from '../server/src/kieu'
 
 type Row = Record<string, unknown>
@@ -137,6 +138,13 @@ describe('(4) ddl-mot-lan: danh sách tên đối tượng dùng chung (ddl_ten_
     expect(b.dem.lo).toBe(0)
     expect(await lamMoiTenDoiTuongChung(d.env, 3)).toBe(true)
     expect((d.sql.prepare(SQL_TEN_DOI_TUONG).all() as { k: number }[]).map((x) => x.k)).toEqual([1])
+  })
+  it('cron: chỉ phút x7 (mỗi 10 phút) mới chép', async () => {
+    const d = taoD1That()
+    expect(await chepTenDinhKy(d.env, Date.parse('2026-11-12T12:08:00Z'))).toBe(false)
+    expect(d.sql.prepare('SELECT COUNT(*) n FROM ddl_ten_chung').get()).toEqual({ n: 0 })
+    expect(await chepTenDinhKy(d.env, Date.parse('2026-11-12T12:17:00Z'))).toBe(true)
+    expect(d.sql.prepare('SELECT COUNT(*) n FROM ddl_ten_chung').get()).toEqual({ n: 1 })
   })
 })
 

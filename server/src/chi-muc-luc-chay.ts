@@ -3,6 +3,7 @@
 // Lỗi (bảng chưa có ở D1 mới…) chỉ ghi log; KHÔNG thử lại trong cùng isolate (tránh dội D1 mỗi lượt).
 // Chỉ thêm chỉ mục cho bảng NHỎ (≤ vài chục nghìn dòng). Bảng lớn (> vài trăm nghìn dòng) chỉ đưa vào migration để Boss chạy tay.
 import type { Env } from './kieu'
+import { lamMoiTenDoiTuongChung } from './ddl-mot-lan'
 
 export const CHI_MUC_LUC_CHAY: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS game_v2_attempt_session ON game_v2_attempt(session, sbd)',
@@ -55,6 +56,11 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   // 12/11 (hoá đơn D1 hàng đọc, ~300 triệu/ngày): nhánh NHÓM của «đợt của em cho câu hoặc cùng nhóm» (chua-dot-nhom-sql.ts). Bản sao server/migration-1211-chua-dot-nhom.sql.
   'CREATE INDEX IF NOT EXISTS idx_cld_sbd_nhom ON chua_loi_dot(sbd, content_group, dong_luc)',
 ]
+/** 12/11 (H2): cron mỗi phút gọi — phút x7 (mỗi 10 phút) chép danh sách tên đối tượng lược đồ cho mọi isolate (ddl-mot-lan.ts `ddl_ten_chung`): một lần đọc
+ *  sqlite_master thay cho mỗi isolate mới (~760 hàng). Không ném. */
+export async function chepTenDinhKy(env: Env, now = Date.now()): Promise<boolean> {
+  return new Date(now).getUTCMinutes() % 10 === 7 ? lamMoiTenDoiTuongChung(env, now) : false
+}
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {
   let loi = 0
