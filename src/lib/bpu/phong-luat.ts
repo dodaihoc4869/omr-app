@@ -91,12 +91,3 @@ export function viewLuatBang(st: TrangThaiPhong) {
 export type LuatBang = NonNullable<ReturnType<typeof viewLuatBang>>
 /** Giờ Việt Nam «HH:MM» của một mốc giờ phòng. */
 export const gioVnLuat = (ms: number): string => new Date(ms + 7 * 3_600_000).toISOString().slice(11, 16)
-/** Tin thầy dán cho Javis DDH (nội bộ) để văn phòng trực live nhắn Zalo cho phụ huynh: ai bị mời ra, lúc nào, rời mấy lần, ai thầy không cho vào lại. Không có ai ⇒ ''. */
-export function tinBaoVanPhong(luat: Pick<LuatBang, 'so'> & { cam?: LuatBang['cam'] }, ten: (sbd: string) => string): string {
-  const so = luat.so, cam = luat.cam ?? [], moc = so[0]?.luc ?? cam[0]?.luc
-  if (moc == null) return ''
-  const d = new Date(moc + 7 * 3_600_000).toISOString(), ds = so.map((x) => `${ten(x.sbd)} (${gioVnLuat(x.luc)}, rời ${x.lan} lần)`).join('; ')
-  const dau = so.length ? `có ${so.length} lượt em bị mời ra khỏi lớp vì rời màn hình: ${ds}.` : 'có em bị mời ra khỏi lớp vì rời màn hình.'
-  const tu = cam.length ? ` Thầy không cho vào lại tới hết buổi: ${cam.map((x) => ten(x.sbd)).join(', ')}.` : ''
-  return `Javis, buổi live Hoá ${d.slice(8, 10)}/${d.slice(5, 7)} ${dau}${tu} Văn phòng nhắn Zalo cho phụ huynh các em theo mẫu đã thống nhất, nhắn xong báo lại Thầy.`
-}

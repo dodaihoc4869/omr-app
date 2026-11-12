@@ -3,7 +3,7 @@
 // động bị đuổi ra khỏi phòng, học sinh bấm tham gia lại gv duyệt mới cho vào», «số lần có thể chỉnh được», «thầy có nút duyệt và từ chối».
 import { describe, expect, it } from 'vitest'
 import { duocXemLive, liveBat, liveDat, liveTat, viewLiveEm } from '../src/lib/bpu/phong-live'
-import { biCam, biMoiRa, datLuat, luatDuyet, luatXin, tinBaoVanPhong } from '../src/lib/bpu/phong-luat'
+import { biCam, biMoiRa, datLuat, luatDuyet, luatXin } from '../src/lib/bpu/phong-luat'
 import { KJ, roiMan, taoPhong, vaoLop, veMan, viewBang, viewEm, type TrangThaiPhong } from '../src/lib/bpu/phong'
 
 const NAY = 1_700_000_000_000
@@ -95,7 +95,6 @@ describe('luật rời màn — đếm, mời ra, xin vào lại, duyệt / từ
     const lv = viewLiveEm(st, 'S1')!
     expect(lv).toMatchObject({ duocXem: false, bat: false, ss: null }); expect(lv).not.toHaveProperty('khoi') // mất cờ khối ⇒ lớp nổi live trên máy em tự gỡ
     expect(viewBang(st).luat).toMatchObject({ ra: [], cam: [{ sbd: 'S1', luc: NAY + 2000 }], so: [{ sbd: 'S1', lan: 2 }] })
-    expect(tinBaoVanPhong(viewBang(st).luat!, (s) => `Em ${s}`)).toMatch(/Thầy không cho vào lại tới hết buổi: Em S1\./)
     const kj = st.ds[0].kj
     expect(roiMan(st, 'S1', NAY + 4000)).toBe(false); expect(st.ds[0].kj).toBe(kj) // đã ở ngoài: rời thêm không đếm, không trừ kJ
     // thầy tắt luật: em đang CHỜ được vào lại, em bị TỪ CHỐI vẫn bị cấm

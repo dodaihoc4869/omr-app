@@ -1,21 +1,14 @@
 // LUẬT RỜI MÀN — MÁY THẦY (bản vẽ 53): thẻ «Xin vào lại» — từng em bị mời ra (đội, số lần, giờ) với hai nút «Duyệt» / «Từ chối»; dòng các em đang bị
-// nhắc (k/n); nút «Chép tin báo văn phòng» chép sẵn tin gửi Javis DDH để văn phòng trực live nhắn Zalo cho phụ huynh (app KHÔNG tự nhắn phụ huynh).
-import { useState } from 'react'
+// nhắc (k/n). Thầy 13/11: «bỏ phần chép tin báo văn phòng … văn phòng tự biết, tôi tập trung live» ⇒ không còn nút chép; phòng tự ghi sổ `live_moi_ra`,
+// văn phòng (Javis DDH) tự đọc qua `/gv/bpu/moi-ra` rồi nhắn Zalo cho phụ huynh (app KHÔNG tự nhắn phụ huynh).
 import { DOI_BPU } from '../../lib/bpu/phong'
-import { gioVnLuat as gioVn, tinBaoVanPhong, type LuatBang } from '../../lib/bpu/phong-luat'
+import { gioVnLuat as gioVn, type LuatBang } from '../../lib/bpu/phong-luat'
 import './luat-roi.css'
 
 export default function LuatRoiThay({ luat, ds, onDuyet }: { luat: LuatBang; ds: readonly { sbd: string; ten: string; doi: number }[]; onDuyet: (sbd: string, ok: boolean) => void }) {
-  const [daChep, setDaChep] = useState(false)
   const em = new Map(ds.map((e) => [e.sbd, e])), ten = (s: string): string => em.get(s)?.ten ?? s
   const nhac = Object.entries(luat.dem)
-  if (!luat.ra.length && !luat.cam.length && !nhac.length && !luat.so.length) return null
-  const chep = (): void => {
-    const t = tinBaoVanPhong(luat, ten)
-    const xong = (): void => { setDaChep(true); setTimeout(() => setDaChep(false), 2200) }
-    const duPhong = (): void => { const o = document.createElement('textarea'); o.value = t; o.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(o); o.select(); try { if (document.execCommand('copy')) xong() } catch { /* máy không cho chép */ } o.remove() }
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(t).then(xong, duPhong); else duPhong()
-  }
+  if (!luat.ra.length && !luat.cam.length && !nhac.length) return null
   const doi = (s: string): string => { const e = em.get(s); return e && DOI_BPU[e.doi] ? `${DOI_BPU[e.doi]!.ten} · ` : '' }
   return (
     <section className="lr-thay" aria-label="Luật rời màn" data-luat-roi="thay">
@@ -34,7 +27,6 @@ export default function LuatRoiThay({ luat, ds, onDuyet }: { luat: LuatBang; ds:
         </div>
       ))}
       {nhac.length ? <p className="lr-nhac" style={{ margin: 0 }}>Đang bị nhắc: {nhac.map(([s, k], i) => <span key={s}>{i ? ' · ' : ''}{ten(s)} <u>{k}/{luat.n}</u></span>)}</p> : null}
-      {luat.so.length || luat.cam.length ? <button type="button" className="chep" onClick={chep}>{daChep ? 'Đã chép' : `Chép tin báo văn phòng${luat.so.length ? ` (${luat.so.length} lượt)` : ''}`}</button> : null}
     </section>
   )
 }
