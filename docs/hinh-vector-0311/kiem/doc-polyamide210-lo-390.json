@@ -1,0 +1,651 @@
+{
+  "i": 210,
+  "assetIndexProvided": 1364,
+  "hash": "235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf.png",
+  "size": [
+    622,
+    160
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B14-D2-I-11",
+      "de": "Tơ nylon-6,6 dùng để dệt vải may mặc, vải lót săm lốp xe, dệt bít tất, bện làm dây cáp, dây dù, đan lưới,… Công thức cấu tạo của tơ nylon-6,6 được biểu diễn ở hình bên.\nPhát biểu nào sau đây là đúng khi nói về tơ nylon-6,6?",
+      "allHinh": [
+        {
+          "hash": "235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf",
+          "where": "VIP27-C4-B14-D2-I-11.hinh.0.du_lieu",
+          "hashDataUrl": "bf1e4e1dfd92e83b4b7e52d45c500dba938eb08a1178446f19de04464419a36f"
+        }
+      ],
+      "missingHashes": [
+        "235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull4xOpened": true,
+    "ownBothCO12xOpened": true,
+    "ownUpCOGrayPixelBridgeChecked": true,
+    "ownLeftEnd12xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxvertices/bboxes. Nonperiodicvertexlistsnative, noaffinecopy/nylonformulaassumption. UPleftCOantialiasgraybridgeisNOTwhitegap. Wholepolymernunknown/outsideendsunknown.",
+  "geometry": {
+    "leftNH": {
+      "text": "NH",
+      "bbox": [
+        31,
+        85,
+        75,
+        108
+      ],
+      "entryBond": [
+        [
+          1,
+          64
+        ],
+        [
+          29,
+          81
+        ]
+      ],
+      "exitBond": [
+        [
+          77,
+          83
+        ],
+        [
+          99,
+          70
+        ]
+      ],
+      "note": "GroupNHliteralnotHN;preservenativetextedgewhitespace, dontpullallbondsNcenter"
+    },
+    "firstChainBareC": [
+      [
+        99,
+        70
+      ],
+      [
+        139,
+        92
+      ],
+      [
+        178,
+        70
+      ],
+      [
+        218,
+        92
+      ],
+      [
+        257,
+        70
+      ],
+      [
+        297,
+        92
+      ]
+    ],
+    "firstChainBonds": [
+      [
+        [
+          99,
+          70
+        ],
+        [
+          139,
+          92
+        ]
+      ],
+      [
+        [
+          139,
+          92
+        ],
+        [
+          178,
+          70
+        ]
+      ],
+      [
+        [
+          178,
+          70
+        ],
+        [
+          218,
+          92
+        ]
+      ],
+      [
+        [
+          218,
+          92
+        ],
+        [
+          257,
+          70
+        ]
+      ],
+      [
+        [
+          257,
+          70
+        ],
+        [
+          297,
+          92
+        ]
+      ]
+    ],
+    "centralNH": {
+      "text": "NH",
+      "bbox": [
+        314,
+        58,
+        356,
+        82
+      ],
+      "entryBond": [
+        [
+          297,
+          92
+        ],
+        [
+          311,
+          84
+        ]
+      ],
+      "exitBond": [
+        [
+          359,
+          84
+        ],
+        [
+          371,
+          92
+        ]
+      ]
+    },
+    "secondChainBareC": [
+      [
+        375,
+        92
+      ],
+      [
+        413,
+        70
+      ],
+      [
+        453,
+        92
+      ],
+      [
+        493,
+        70
+      ],
+      [
+        532,
+        92
+      ],
+      [
+        573,
+        70
+      ]
+    ],
+    "secondChainBonds": [
+      [
+        [
+          378,
+          92
+        ],
+        [
+          413,
+          70
+        ]
+      ],
+      [
+        [
+          413,
+          70
+        ],
+        [
+          453,
+          92
+        ]
+      ],
+      [
+        [
+          453,
+          92
+        ],
+        [
+          493,
+          70
+        ]
+      ],
+      [
+        [
+          493,
+          70
+        ],
+        [
+          532,
+          92
+        ]
+      ],
+      [
+        [
+          532,
+          92
+        ],
+        [
+          568,
+          70
+        ]
+      ]
+    ],
+    "rightFreeBond": [
+      [
+        574,
+        70
+      ],
+      [
+        611,
+        93
+      ]
+    ],
+    "COdown": {
+      "C": [
+        375,
+        92
+      ],
+      "rays": [
+        [
+          [
+            371,
+            92
+          ],
+          [
+            371,
+            123
+          ]
+        ],
+        [
+          [
+            378,
+            92
+          ],
+          [
+            378,
+            123
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          364,
+          127,
+          386,
+          151
+        ]
+      },
+      "topology": "NativeSHORT HORIZONTALjoin371..378aty92. IncomingNHarmjoinsLEFTend37192;outgoingchainarmjoinsRIGHTend37892. DOWNparallelraysstarttheseends. NOTVapex/NOTtwofeetindependentlyonslopes.",
+      "nativeHorizontalJoin": [
+        [
+          371,
+          92
+        ],
+        [
+          378,
+          92
+        ]
+      ]
+    },
+    "COup": {
+      "C": [
+        573,
+        70
+      ],
+      "rays": [
+        [
+          [
+            568,
+            39
+          ],
+          [
+            568,
+            70
+          ]
+        ],
+        [
+          [
+            574,
+            39
+          ],
+          [
+            574,
+            70
+          ]
+        ]
+      ],
+      "Olabel": {
+        "text": "O",
+        "bbox": [
+          562,
+          13,
+          583,
+          35
+        ]
+      },
+      "topology": "NativeSHORT HORIZONTALjoin568..574aty70, left/rightarmsjoineachEND. UPparallelraysendtheseends. NoVapex/noverticalbridge. Graypixelconnectionrealnotwhitegap.",
+      "pixelGrayAtX567": {
+        "y68": 0,
+        "y69": 0,
+        "y70": 131,
+        "y71": 133,
+        "y72": 0
+      },
+      "nativeHorizontalJoin": [
+        [
+          568,
+          70
+        ],
+        [
+          574,
+          70
+        ]
+      ]
+    },
+    "parentheses": {
+      "leftCurveGuides": [
+        [
+          22,
+          16
+        ],
+        [
+          17,
+          39
+        ],
+        [
+          15,
+          73
+        ],
+        [
+          16,
+          105
+        ],
+        [
+          22,
+          135
+        ]
+      ],
+      "rightCurveGuides": [
+        [
+          590,
+          16
+        ],
+        [
+          595,
+          40
+        ],
+        [
+          597,
+          76
+        ],
+        [
+          596,
+          108
+        ],
+        [
+          590,
+          135
+        ]
+      ],
+      "nSub": {
+        "text": "n",
+        "bbox": [
+          599,
+          109,
+          613,
+          131
+        ]
+      },
+      "note": "ROUNDpairnotSQUARE. FreecutbondsCoutsidebracketsnotextraatomendpoints. Noarrowhead."
+    },
+    "font": "ALLNH/O/nregularuprightserifblackgray, noactualbold/italic. Thinuniformbonds~1.5px.",
+    "countsPrinted": {
+      "bareC": 12,
+      "N": 2,
+      "O": 2,
+      "NH": 2,
+      "COdouble": 2,
+      "CCdouble": 0,
+      "roundParenPairs": 1,
+      "nSub": 1,
+      "arrows": 0,
+      "captions": 0,
+      "outsideUnknownPolymerAtoms": "UNKNOWN"
+    },
+    "noAdded": [
+      "alias1358/1376",
+      "theoryperiodicnormalize",
+      "explicitH/separateNHglyph",
+      "repeatedsegmentrestoration",
+      "squarebrackets",
+      "COfootwhitegap",
+      "polymernamecaption",
+      "answer"
+    ],
+    "bareCListsAreCountCentersNotJoinStrokeEndpoints": true
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "corrections": [
+    {
+      "field": "geometry.COdown/COup nativefootjoins",
+      "oldIncorrectVInterpretation": {
+        "COdown": {
+          "C": [
+            375,
+            92
+          ],
+          "rays": [
+            [
+              [
+                371,
+                90
+              ],
+              [
+                371,
+                123
+              ]
+            ],
+            [
+              [
+                379,
+                89.68
+              ],
+              [
+                379,
+                123
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              364,
+              127,
+              386,
+              151
+            ]
+          },
+          "topology": "BothUPPERfeetcontactincomingNHarm/outgoingchainslope. Shortnativemainpathjoinbetweenfeet, nofalsegap/addedverticalbridge."
+        },
+        "COup": {
+          "C": [
+            573,
+            70
+          ],
+          "rays": [
+            [
+              [
+                567,
+                39
+              ],
+              [
+                567,
+                73.22
+              ]
+            ],
+            [
+              [
+                575,
+                39
+              ],
+              [
+                575,
+                71.21
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              562,
+              13,
+              583,
+              35
+            ]
+          },
+          "topology": "BothLOWERfeetCONTACT2slopes/nativeapexjoin. LEFTstemendsblack69butgraybridge70/71connects incomingarm72, doNOTconvertwhitewedgeintofootgap.",
+          "pixelGrayAtX567": {
+            "y68": 0,
+            "y69": 0,
+            "y70": 131,
+            "y71": 133,
+            "y72": 0
+          }
+        }
+      },
+      "new": {
+        "COdown": {
+          "C": [
+            375,
+            92
+          ],
+          "rays": [
+            [
+              [
+                371,
+                92
+              ],
+              [
+                371,
+                123
+              ]
+            ],
+            [
+              [
+                378,
+                92
+              ],
+              [
+                378,
+                123
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              364,
+              127,
+              386,
+              151
+            ]
+          },
+          "topology": "NativeSHORT HORIZONTALjoin371..378aty92. IncomingNHarmjoinsLEFTend37192;outgoingchainarmjoinsRIGHTend37892. DOWNparallelraysstarttheseends. NOTVapex/NOTtwofeetindependentlyonslopes.",
+          "nativeHorizontalJoin": [
+            [
+              371,
+              92
+            ],
+            [
+              378,
+              92
+            ]
+          ]
+        },
+        "COup": {
+          "C": [
+            573,
+            70
+          ],
+          "rays": [
+            [
+              [
+                568,
+                39
+              ],
+              [
+                568,
+                70
+              ]
+            ],
+            [
+              [
+                574,
+                39
+              ],
+              [
+                574,
+                70
+              ]
+            ]
+          ],
+          "Olabel": {
+            "text": "O",
+            "bbox": [
+              562,
+              13,
+              583,
+              35
+            ]
+          },
+          "topology": "NativeSHORT HORIZONTALjoin568..574aty70, left/rightarmsjoineachEND. UPparallelraysendtheseends. NoVapex/noverticalbridge. Graypixelconnectionrealnotwhitegap.",
+          "pixelGrayAtX567": {
+            "y68": 0,
+            "y69": 0,
+            "y70": 131,
+            "y71": 133,
+            "y72": 0
+          },
+          "nativeHorizontalJoin": [
+            [
+              568,
+              70
+            ],
+            [
+              574,
+              70
+            ]
+          ]
+        }
+      },
+      "reason": "Ownreopened30xnativejoincropconfirmsSHORT HORIZONTALjoins/down371..378y92/up568..574y70 witharmsarrivingeachend. PriorVinterpretationincorrectsourcegeometry. Beforefirstbuilder/source-only/noSVGnegative.",
+      "evidence": "/workspace/scratch/native390-pa-cojoin.png"
+    }
+  ]
+}

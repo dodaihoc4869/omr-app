@@ -1,0 +1,29 @@
+[
+  {
+    "i": 210,
+    "hash": "235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf",
+    "fileNguon": "anh/235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf.png",
+    "svg": "polyamide210-native-ddh-8229cc325aea7c054239b0769500767555279f5fd32cc0f8a7b20c5b60d2ef0a.svg",
+    "hashSvg": "8229cc325aea7c054239b0769500767555279f5fd32cc0f8a7b20c5b60d2ef0a",
+    "byteSvg": 6029,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D2-I-11",
+        "de": "Tơ nylon-6,6 dùng để dệt vải may mặc, vải lót săm lốp xe, dệt bít tất, bện làm dây cáp, dây dù, đan lưới,… Công thức cấu tạo của tơ nylon-6,6 được biểu diễn ở hình bên.\nPhát biểu nào sau đây là đúng khi nói về tơ nylon-6,6?",
+        "refs": [
+          {
+            "hash": "235b884c5821ddba0c9768d2572d42f308e5e2a660b76c848e10111a83ec2acf",
+            "where": "VIP27-C4-B14-D2-I-11.hinh.0.du_lieu",
+            "hashDataUrl": "bf1e4e1dfd92e83b4b7e52d45c500dba938eb08a1178446f19de04464419a36f"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "12visibleC2N2O-2NH/2COUPDOWN2separatedraysEACH/2SHORTnativeHORIZONTALjoins-NHarmLEFTchainRIGHT-COupchainLEFTfreeRIGHT/NOtheoryVfeet/2ROUND+nSUB/2freecutendsUNKNOWNnotextraC/ALLregularUPRIGHT-NHliteralgroupedges/individualnonperiodicvertices/0arrow-caption-charge-CCdouble/NOaddedH-name-formula-answer-noalias13581376",
+    "hashSvgDaSoat": "8229cc325aea7c054239b0769500767555279f5fd32cc0f8a7b20c5b60d2ef0a",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

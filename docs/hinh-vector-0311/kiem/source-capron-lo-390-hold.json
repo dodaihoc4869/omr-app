@@ -1,0 +1,497 @@
+{
+  "i": 257,
+  "assetIndexProvided": 1362,
+  "hash": "2c26f3e9da186291e89f3e4f2d912f74e2b7874b37b521e9e085d3f7325c0517",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/2c26f3e9da186291e89f3e4f2d912f74e2b7874b37b521e9e085d3f7325c0517.png",
+  "size": [
+    637,
+    182
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B14-D2-I-4",
+      "de": "Capron được tổng hợp từ caprolactam theo phương trình hoá học ở hình bên. Phản ứng điều chế capron từ caprolactam thuộc loại phản ứng",
+      "allHinh": [
+        {
+          "hash": "2c26f3e9da186291e89f3e4f2d912f74e2b7874b37b521e9e085d3f7325c0517",
+          "where": "VIP27-C4-B14-D2-I-4.hinh.0.du_lieu",
+          "hashDataUrl": "b2f6db02e165c034b11bf1224350fa8021dc9223d7b8def286e3a9a8ed37bc73"
+        }
+      ],
+      "missingHashes": [
+        "2c26f3e9da186291e89f3e4f2d912f74e2b7874b37b521e9e085d3f7325c0517"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": [],
+    "note": "Noapproval/countuntilarrowuncertaintyresolved."
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownLeftRightArrow5xOpened": true,
+    "ownNearestHead20xOpened": true,
+    "ownHeadPixelRowsChecked": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxvertices/bboxes; ARROWHEADTOPOLOGYUNCERTAINduesmallblurred15x9pxsource. NoassumedOPENV/closed/solidhead. Otheratoms/bondsvisible.",
+  "geometry": {
+    "left": {
+      "bareRingC": [
+        [
+          115,
+          54
+        ],
+        [
+          146,
+          69
+        ],
+        [
+          153,
+          104
+        ],
+        [
+          132,
+          131
+        ],
+        [
+          97,
+          131
+        ],
+        [
+          76,
+          104
+        ]
+      ],
+      "ringBonds": [
+        [
+          [
+            115,
+            54
+          ],
+          [
+            146,
+            69
+          ]
+        ],
+        [
+          [
+            146,
+            69
+          ],
+          [
+            153,
+            104
+          ]
+        ],
+        [
+          [
+            153,
+            104
+          ],
+          [
+            132,
+            131
+          ]
+        ],
+        [
+          [
+            132,
+            131
+          ],
+          [
+            97,
+            131
+          ]
+        ],
+        [
+          [
+            97,
+            131
+          ],
+          [
+            76,
+            104
+          ]
+        ],
+        [
+          [
+            76,
+            104
+          ],
+          [
+            82,
+            83
+          ]
+        ],
+        [
+          [
+            94,
+            64
+          ],
+          [
+            115,
+            54
+          ]
+        ]
+      ],
+      "HN": {
+        "text": "HN",
+        "bbox": [
+          58,
+          56,
+          94,
+          80
+        ],
+        "anchor": "LASTN",
+        "note": "LiteralHNnotNH;noN-Hlineadded"
+      },
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          105,
+          6,
+          126,
+          29
+        ]
+      },
+      "COdoubleRays": [
+        [
+          [
+            111,
+            33
+          ],
+          [
+            111,
+            55.9
+          ]
+        ],
+        [
+          [
+            118,
+            33
+          ],
+          [
+            118,
+            55.45
+          ]
+        ]
+      ],
+      "COFootTopology": "SourcebothverticalfeetcontactsleftHN/rightCarm+apexjoin; noforcedgap. Fractionscontactguidesnotpixelprecision.",
+      "coefficient": {
+        "text": "n",
+        "bbox": [
+          38,
+          83,
+          52,
+          103
+        ]
+      },
+      "caption": {
+        "text": "caprolactam",
+        "bbox": [
+          31,
+          147,
+          175,
+          173
+        ],
+        "font": "regularuprightsans"
+      },
+      "count": {
+        "C": 6,
+        "N": 1,
+        "O": 1,
+        "sevenMemberRing": 1
+      }
+    },
+    "right": {
+      "N": {
+        "text": "N",
+        "bbox": [
+          400,
+          82,
+          417,
+          104
+        ]
+      },
+      "H": {
+        "text": "H",
+        "bbox": [
+          400,
+          47,
+          417,
+          68
+        ]
+      },
+      "NHbond": [
+        [
+          408,
+          68
+        ],
+        [
+          408,
+          80
+        ]
+      ],
+      "leftFreeBond": [
+        [
+          365,
+          115
+        ],
+        [
+          394,
+          103
+        ]
+      ],
+      "NtoCH2": [
+        [
+          420,
+          103
+        ],
+        [
+          437,
+          113
+        ]
+      ],
+      "bareCChain": [
+        [
+          437,
+          113
+        ],
+        [
+          467,
+          97
+        ],
+        [
+          497,
+          113
+        ],
+        [
+          527,
+          97
+        ],
+        [
+          557,
+          113
+        ],
+        [
+          587,
+          97
+        ]
+      ],
+      "rightFreeBond": [
+        [
+          587,
+          97
+        ],
+        [
+          628,
+          116
+        ]
+      ],
+      "carbonylO": {
+        "text": "O",
+        "bbox": [
+          578,
+          50,
+          598,
+          72
+        ]
+      },
+      "COdoubleRays": [
+        [
+          [
+            584,
+            76
+          ],
+          [
+            584,
+            98.6
+          ]
+        ],
+        [
+          [
+            590,
+            76
+          ],
+          [
+            590,
+            98.39
+          ]
+        ]
+      ],
+      "COFootTopology": "Bothfeetcontactsleft/rightslopesaroundbareC58797, nativeapexV; whitegapbeforeOink.",
+      "parentheses": {
+        "leftGuides": [
+          [
+            388,
+            76
+          ],
+          [
+            382,
+            89
+          ],
+          [
+            380,
+            103
+          ],
+          [
+            382,
+            117
+          ],
+          [
+            388,
+            128
+          ]
+        ],
+        "rightGuides": [
+          [
+            607,
+            77
+          ],
+          [
+            612,
+            90
+          ],
+          [
+            614,
+            104
+          ],
+          [
+            612,
+            119
+          ],
+          [
+            607,
+            128
+          ]
+        ],
+        "nSub": {
+          "text": "n",
+          "bbox": [
+            614,
+            116,
+            628,
+            135
+          ]
+        }
+      },
+      "caption": {
+        "text": "capron",
+        "bbox": [
+          455,
+          147,
+          542,
+          173
+        ],
+        "font": "regularuprightsans"
+      },
+      "count": {
+        "C": 6,
+        "N": 1,
+        "O": 1
+      },
+      "freeEnds": "Outsiderepeatleft/rightcutbondsnotaddedbareCendpoints."
+    },
+    "arrow": {
+      "shaft": [
+        [
+          202,
+          99
+        ],
+        [
+          318,
+          99
+        ]
+      ],
+      "condition": {
+        "text": "tᵒ",
+        "bbox": [
+          250,
+          68,
+          267,
+          89
+        ],
+        "font": "regularuprightsans"
+      },
+      "nativeHeadInkBBox": [
+        303,
+        94,
+        318,
+        103
+      ],
+      "darkApexApprox": [
+        312,
+        98
+      ],
+      "shaftOvershoot": "Visibleto31898beyonddarkapex31298",
+      "topology": "UNCERTAIN:OPENVvsclosedhollowvsgrayfilledcannotdecidefromblur, doNOTautofillassumption.",
+      "upperInkGuide": [
+        [
+          304,
+          95
+        ],
+        [
+          312,
+          98
+        ]
+      ],
+      "lowerInkGuide": [
+        [
+          305,
+          101
+        ],
+        [
+          312,
+          98
+        ]
+      ],
+      "grayEvidence": {
+        "y95": "30466/30569",
+        "y98": "304122/305115/306104/307106/308111/30995/31055/31120/3124/31320/31461",
+        "y100": "30485/30542/30665/30782/308100",
+        "note": "Grayinteriornotwhiteholeproof; blurshaftmixingpreventsrobustheadtopologyclaim."
+      },
+      "evidence": "/workspace/scratch/257-head20x-nearest.png"
+    },
+    "font": "AllchemHN/N/H/O/n/conditions/captionsregularuprightsans, noactualbold/italic. HNleftvsN+Hrightpreserved.",
+    "countsPrinted": {
+      "C": 12,
+      "N": 2,
+      "O": 2,
+      "COdouble": 2,
+      "CCdouble": 0,
+      "leftSevenRing": 1,
+      "repeatParenthesesPairs": 1,
+      "nTokens": 2,
+      "captions": 2,
+      "outsideUnknownPolymerAtoms": "UNKNOWN"
+    },
+    "noAdded": [
+      "alias685/940/1376",
+      "formulaNHleftcorrection",
+      "H2Obyproduct",
+      "extraCfreeends",
+      "guessedarrowtopology",
+      "ringclosureproduct",
+      "numericn",
+      "answer"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only-HOLD-head-topology-UNKNOWN/noSVG/noCount",
+  "rootOwnArrow10xOpened": true,
+  "sourceEvidence": [
+    {
+      "file": "source-capron-arrow-lo-390-0.jpg",
+      "sha256": "5e059b779876da2a376a0bfa20a873d787317b24accfb0cc7b3d721ae541345d"
+    },
+    {
+      "file": "source-capron-arrow-lo-390-1.jpg",
+      "sha256": "1b7639f0986d263361de6f1c06d0c4e4f7cf7aada16fda44c5281eaa93d5291e"
+    }
+  ]
+}
