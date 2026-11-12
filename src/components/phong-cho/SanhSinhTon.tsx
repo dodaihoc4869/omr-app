@@ -77,7 +77,7 @@ function ManTro({ toi, ds, kenh, onThoat }: ManTroProps) {
   return createPortal(
     <div className="sst-man" role="dialog" aria-modal="true" aria-label="Trò Sinh Tồn bốn đội" data-xoay={xoay ? thuocTinhXoay() : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>
       <Suspense fallback={<p className="sst-tai" role="status">Đang mở trò…</p>}>
-        <TroSinhTon toi={toi} ds={ds} kenh={kenh} soEm={Math.max(1, ds.length)} mayYeu={mayYeu()} xoay={xoay} />
+        <TroSinhTon toi={toi} ds={ds} kenh={kenh} soEm={Math.max(1, ds.length)} mayYeu={mayYeu()} xoay={xoay} imLang />
       </Suspense>
       <button type="button" className="sst-thoat" onClick={onThoat}>Thoát trò</button>
     </div>,

@@ -25,6 +25,7 @@ export interface TroSinhTonProps {
   mayYeu?: boolean
   /** Khung cha đang bị XOAY HÌNH bằng CSS (điện thoại cầm dọc; chiều xoay theo src/components/live/chieu-xoay.ts) ⇒ đổi toạ độ con trỏ về hệ của khung. */ xoay?: boolean
   /** Máy thầy xem trận: thấy CẢ sân, không có bé ma của mình, không gửi gì. */ xemThoi?: boolean
+  /** Phòng chờ CA KIỂM TRA: tiếng trò mặc định TẮT (thầy 27/10: màn kiểm tra tự tắt âm thanh); em bấm nút loa thì bật cho lượt chơi này. */ imLang?: boolean
 }
 
 interface ManhTin { c: string; doi?: number }
@@ -107,7 +108,7 @@ function AnhMa({ bang, doi }: { bang: BangMau; doi: number }) {
   return <canvas ref={ref} className="st-ma" aria-hidden="true" />
 }
 
-export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay = false, xemThoi = false }: TroSinhTonProps) {
+export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay = false, xemThoi = false, imLang = false }: TroSinhTonProps) {
   const xem = xemThoi || !toi
   const sbd = toi?.sbd ?? ''
   const doiToi = kepDoi(toi?.doi ?? 0)
@@ -125,7 +126,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
   const [biHa, setBiHa] = useState<BiHa | null>(null)
   const [ketQua, setKetQua] = useState<KetQua | null>(null)
   const [bang, setBang] = useState<BangMau | null>(null)
-  const [tatTieng, setTatTieng] = useState(docTat)
+  const [tatTieng, setTatTieng] = useState(() => { if (!imLang) return docTat(); datTat(true, false); return true })
 
   useEffect(() => { dsRef.current = ds }, [ds])
 
@@ -547,7 +548,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         </div>
       )}
       {xem ? null : (
-        <button type="button" className="st-am" aria-pressed={!tatTieng} aria-label={tatTieng ? 'Bật tiếng trò chơi' : 'Tắt tiếng trò chơi'} onClick={() => { const v = !tatTieng; datTat(v); setTatTieng(v); if (!v) moAm() }}>
+        <button type="button" className="st-am" aria-pressed={!tatTieng} aria-label={tatTieng ? 'Bật tiếng trò chơi' : 'Tắt tiếng trò chơi'} onClick={() => { const v = !tatTieng; datTat(v, !imLang); setTatTieng(v); if (!v) moAm() }}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4z" />{tatTieng ? <path d="M16 9.5l5 5m0-5l-5 5" /> : <path d="M15.5 9a4.2 4.2 0 0 1 0 6m2.6-8.6a8 8 0 0 1 0 11.2" />}</svg>
         </button>
       )}

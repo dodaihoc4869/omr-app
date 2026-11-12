@@ -14,8 +14,10 @@ export function docTat(): boolean {
   try { tat = localStorage.getItem(KHOA_TAT) === 'tat' } catch { /* không có kho */ }
   return tat
 }
-export function datTat(v: boolean): void {
+/** `luu = false`: chỉ tắt / bật cho lượt mở này (phòng chờ ca kiểm tra mặc định im lặng), không đụng lựa chọn em đã lưu. */
+export function datTat(v: boolean, luu = true): void {
   tat = v
+  if (!luu) return
   try { if (v) localStorage.setItem(KHOA_TAT, 'tat'); else localStorage.removeItem(KHOA_TAT) } catch { /* không có kho */ }
 }
 /** Gọi trong một lần CHẠM của em: tạo / đánh thức AudioContext. */
