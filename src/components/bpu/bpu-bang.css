@@ -400,3 +400,5 @@ html[data-bpu-che-to] .lop-xem-phieu { visibility: hidden; }
 .bpu-bang .bb-live.bat { background: var(--tr-sai); color: var(--tr-chieu-giay); box-shadow: none; }
 .bpu-bang .bb-live.bat i { background: currentColor; }
 html[data-bpu-live-gon] .bpu-bao-chay { display: none; }
+/* Live theo khối (12/11): bảng ẩn theo luật của buổi live (gan-gv `apAnLive`) — vẫn gắn để giữ nối phòng. */
+[data-bpu-bang][data-an-live]{ visibility: hidden !important; pointer-events: none !important; }

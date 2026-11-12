@@ -24,7 +24,7 @@ import KetQuaLenBangEm from './KetQuaLenBangEm'
 import type { Question } from '../../game/than-thu-v2/core'
 // Phần hiện câu của chặng nạp ĐỘNG qua mảnh chặng (đã tải sẵn ở Lộ trình) — nhập tĩnh làm bộ đóng gói chia lại mảnh dùng chung (precache + byte mở tăng).
 type MangChang = typeof import('../hoc-tap/ManLamBaiTap')['PHAN_CAU_CHANG']
-import { noiKhoi } from '../live-khoi/em-khoi'
+import { noiKhoi } from '../live-khoi/noi-khoi-luoi'
 import './bpu-hs.css'
 // LỜI GIẢI SAU KHI MỞ ĐÁP ÁN (thầy 07/11): đúng khối lời giải của màn làm bài — có bản Kính ⇒ Kính + nút «Lời giải thu gọn»; chưa có ⇒ lời giải thu gọn đầy đủ.
 const LoiGiaiKinhHs = lazy(() => import('../loi-giai-kinh/LoiGiaiKinhHs'))
@@ -659,7 +659,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const liveBat = !!lv?.bat && !v?.ketThuc
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
   const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !!l && l.pha === 'tra-loi' && !che && !hetGio })
-  const hl = useHuongLive(cheLive, liveBat)
+  const hl = useHuongLive(cheLive, liveBat, lv?.khoi?.gd === 'dang')
   const thanNgang = useThanNgang(gocRef, laCau ? q : null, !!l?.tuLuan, `${khoaLuot}|${LC ? 1 : 0}|${hl.the.style?.width}x${hl.the.style?.height}`)
   // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<LC.DeCau q={q} stt={l.so} />) : null

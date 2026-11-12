@@ -92,3 +92,4 @@ html.may-yeu .bcc-hd-the { transition: none; }
 .bcc-ket-thuc button[data-xac-nhan] { box-shadow: 0 0 0 5px var(--tr-chieu-giay), 0 0 34px var(--tr-sai); animation: bcc-xn 0.8s ease-in-out infinite alternate; }
 @keyframes bcc-xn { to { box-shadow: 0 0 0 5px var(--tr-chieu-giay), 0 0 60px var(--tr-sai); } }
 @media (prefers-reduced-motion: reduce) { .bcc-ket-thuc button[data-xac-nhan] { animation: none; } }
+.bcc-ket-thuc.gon { justify-content: flex-end; padding: 0; background: none; box-shadow: none; border: 0; }

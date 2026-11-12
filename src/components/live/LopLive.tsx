@@ -210,6 +210,8 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiTh
   const hanThu = useRef(THU_MS)
   const hoanThu = useCallback(() => { clearTimeout(henThu.current); henThu.current = setTimeout(() => datMo(false), hanThu.current) }, [datMo])
   useEffect(() => { if (mo) hoanThu(); else { clearTimeout(henThu.current); hanThu.current = THU_MS } return () => clearTimeout(henThu.current) }, [mo, hoanThu])
+  // Live theo khối: em bấm «Nhắn cả lớp» / «Bốn đội» trong khay ⇒ khay thu ngay cho khỏi đè cửa vừa mở.
+  useEffect(() => { const f = () => datMo(false); window.addEventListener('ddh-lk', f); return () => window.removeEventListener('ddh-lk', f) }, [datMo])
   // Lần đầu vào live mà tiếng đang tắt: tự mở 3 giây (em thấy nút «Tiếng»), không lặp lại trong buổi.
   const baoGioiThieu = useRef(khiGioiThieu)
   baoGioiThieu.current = khiGioiThieu
@@ -279,6 +281,15 @@ function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
     return () => clearTimeout(hen)
   }, [le])
   return ms == null ? null : <small className="lv-tre" title="Ước tính, chưa gồm loa / tai nghe">Trễ ~{Math.round(ms / 5) * 5} ms</small>
+}
+
+// Live theo khối: hai nút khay «Nhắn cả lớp» / «Bốn đội» báo sang lớp nổi (LopNoiEm) bằng sự kiện cửa sổ — hai mảnh không nhập nhau.
+const phatLk = (d: 'chat' | 'doi'): void => { window.dispatchEvent(new CustomEvent('ddh-lk', { detail: d })) }
+const BtLk = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
+function useTinLk(): number {
+  const [n, setN] = useState(0)
+  useEffect(() => { const f = (e: Event) => setN(Number((e as CustomEvent<number>).detail) || 0); window.addEventListener('ddh-lk-tin', f); return () => window.removeEventListener('ddh-lk-tin', f) }, [])
+  return n
 }
 
 export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so, lenBang, giuNgang, xoayDau }: PropsLopLive) {
@@ -371,7 +382,9 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       const o = huongMan()
       if (!o?.lock || !document.fullscreenElement) { khoaRoi = false; setDaKhoa(false); return }
       khoaXoay()
-      void o.lock('landscape').then(() => { if (song) { khoaRoi = true; khoaXoay(); setDaKhoa(true) } }, () => { if (song) { khoaRoi = false; setDaKhoa(false) } })
+      // MỘT chiều ngang (thầy 12/11 «chỉ giữ xoay ngang, đang làm máy hs lại xoay ngang lộn lại»): `landscape` cho máy tự lật giữa hai chiều ngang theo cảm
+      // biến, và có thể ngược với chiều xoay hình CSS (rotate 90°) của màn câu hỏi. `landscape-primary` = đúng chiều của xoay hình ⇒ không bao giờ lộn.
+      void o.lock('landscape-primary').then(() => { if (song) { khoaRoi = true; khoaXoay(); setDaKhoa(true) } }, () => { if (song) { khoaRoi = false; setDaKhoa(false) } })
     }
     khoa()
     document.addEventListener('fullscreenchange', khoa)
@@ -383,6 +396,17 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     }
   }, [canKhoa])
 
+  const tinLk = useTinLk()
+  // LIVE THEO KHỐI — lúc em ở bảng danh sách (lớp nổi che màn live): lớp nổi vẽ nút Giơ tay / tấm mời / mic và báo sang đây bằng sự kiện `ddh-lk`;
+  // đây báo lại trạng thái bằng `ddh-lk-mic`. Chạy NGAY trong cú chạm của em (trình duyệt chỉ cho mở mic khi có thao tác).
+  const coKhoi = !!view.khoi, tayNay = !!tt?.tay, hangNay = tt?.hangTay ?? null, micNay = tt?.mic === 'dang-phat' || tt?.mic === 'dang-noi' ? 'mo' : tt?.mic === 'xin-quyen' ? 'xin' : ''
+  useEffect(() => {
+    if (!coKhoi) return
+    const f = (e: Event) => { const d = (e as CustomEvent<string>).detail; if (d === 'tay') doiTay(); else if (d === 'mic-bat') batMicMoi(); else if (d === 'mic-tat') tatMic(); else if (d === 'de-sau') deSau() }
+    window.addEventListener('ddh-lk', f)
+    return () => window.removeEventListener('ddh-lk', f)
+  }, [coKhoi, doiTay, batMicMoi, tatMic, deSau])
+  useEffect(() => { if (coKhoi) window.dispatchEvent(new CustomEvent('ddh-lk-mic', { detail: { tay: tayNay, hang: hangNay, moi: duocMoi, mic: micNay } })) }, [coKhoi, tayNay, hangNay, duocMoi, micNay])
   if (!tt || che === 'an') return null
   const nghe = tt.nghe && tt.tieng !== 'chua-cau-hinh'
   const coTieng = tt.tieng !== 'chua-cau-hinh'
@@ -416,7 +440,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       {/* tiếng thầy ĐÃ tới máy (giải mã > −50 dBFS) mà em chưa chạm từ lúc vào live: một chạm = play() + AudioContext.resume() */}
       {tt.chamNghe && !tt.nghi ? <button type="button" className="lv-vua" style={{ minHeight: 64, fontSize: 18, width: '100%' }} onClick={() => { void le.current?.moKhoaTieng() }}><BtLoa />Chạm để nghe<b>Tiếng thầy đã tới máy</b></button> : null}
       <div className="lv-khay-dau">{tt.nghi ? <span>Thầy tạm dừng live</span> : dau}{nghe && !tt.nghi ? <TreTieng le={le} /> : null}</div>
-      {GIAO_DIEN_DOT_2 ? (
+      {GIAO_DIEN_DOT_2 || view.khoi ? (
         // Nút chính màu đội: «Giơ tay» ⇄ «Đang giơ tay · Em thứ N trong hàng · chạm để hạ tay» (ảnh 28)
         <button type="button" className={`lv-tay${tt.tay ? ' gio' : ''}`} aria-pressed={tt.tay} disabled={!tayDuoc || matMang} onClick={doiTay}>
           <BtTay />{tt.tay ? <span>Đang giơ tay<small>{tt.hangTay ? `Em thứ ${tt.hangTay} trong hàng · ` : ''}chạm để hạ tay</small></span> : <span>Giơ tay</span>}
@@ -433,8 +457,19 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
         <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} aria-label={micMo ? 'Mic của em: đang bật. Chạm để tắt mic' : 'Mic của em: đang tắt. Chạm để bật mic lại'} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMic}>
           <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : 'Đang tắt'}</b></button>
       ) : null}
+      {/* LIVE THEO KHỐI (thầy 12/11 «cài mic của hs vào», bản vẽ 12): «Mic của em» LUÔN có trong khay — tắt sẵn; giơ tay, thầy mời thì chạm để nói. */}
+      {view.khoi && !micBang ? (
+        <button type="button" className={`lv-vua mic${micMo ? '' : ' tat'}`} aria-pressed={micMo} disabled={!micMo && tt.mic !== 'xin-quyen' && !duocMoi} onClick={micMo || tt.mic === 'xin-quyen' ? tatMic : batMicMoi}>
+          <BtMic />Mic của em<b>{micMo ? 'Đang bật' : tt.mic === 'xin-quyen' ? 'Đang bật…' : duocMoi ? 'Chạm để nói' : 'Đang tắt'}</b></button>
+      ) : null}
+      {view.khoi && !micBang && !micMo && !duocMoi ? <p className="lv-ghi">Muốn nói: bấm Giơ tay, thầy mời thì mic của em mới bật.</p> : null}
       {micBang && micMo ? <p className="lv-ghi">Thầy và cả lớp đang nghe em.{view.ghi ? ' Đang ghi để lớp xem lại.' : ''}</p> : null}
       {khoaChuaGui ? <p className="lv-ghi">Thầy đã gọi bạn lên bảng — câu này đã khoá, em chưa gửi nên để trống.</p> : null}
+      {/* LIVE THEO KHỐI (thầy 12/11 «ẩn cả cái chat với ngọn lửa vào thanh màu vàng»): nhắn cả lớp + bốn đội nằm trong khay này; lớp nổi (live-khoi) nghe sự kiện. */}
+      {view.khoi ? <>
+        <button type="button" className="lv-vua" onClick={() => phatLk('chat')}><BtLk d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" />Nhắn cả lớp<b>{tinLk ? `${tinLk} tin mới` : 'Mở'}</b></button>
+        <button type="button" className="lv-vua" onClick={() => phatLk('doi')}><BtLk d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-5 1 2 2 2 2 2 0-3 0-5 1-8z" />Bốn đội<b>Xem</b></button>
+      </> : null}
       {them}
       {doi ? <div className="lv-doi"><span className="ky" aria-hidden="true">{doi.ky}</span><span>{doi.ten}</span><b>{doi.kj.toLocaleString('vi-VN')} kJ</b></div> : null}
     </>
@@ -452,6 +487,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
 }
 
+// Live theo khối: khay báo lớp nổi mở nhắn tin / bốn đội; lớp nổi báo lại số tin chưa đọc.
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
@@ -600,14 +636,14 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
         <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
           bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
-          dauBang={lenBang ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
+          dauBang={lenBang && epPhong !== 'bang' ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}
       {lenBang && phaBang ? <TamLenBang key={lenBang.khoa} em={lenBang} pha={phaBang} rong={bc?.w ?? 0} dau={dauBang} dong={!giamDong()} /> : null}
       {matMang ? <BaoMatMang layLuc={layLuc} />
         : tt.nghi ? <div className="lv-bao nho" role="status">Thầy tạm dừng live</div>
         : tt.tieng === 'loi' ? <BaoTam ms={6000}>Mạng này chặn tiếng trực tiếp · bảng vẫn chạy</BaoTam>
-        : phongTo ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
+        : phongTo && epPhong === undefined ? <div className="lv-bao nho duoi" role="status">Chạm hai lần để về toàn cảnh</div> : null}
       {luot && !phongTo ? <div className="lv-luot" onPointerDown={(e) => e.stopPropagation()}>{luot}</div> : null}
       {/* Không còn nút nổi trên bảng (thầy 11/11): mic của em lên bảng điều khiển TRONG khay (tay nắm mang dấu mic rất nhỏ). Chỉ còn tấm mời / viên «Em đang
           nói» của em ĐƯỢC MỜI (đợt 2), dòng báo lỗi mic và dải «Bạn … đang nói». */}

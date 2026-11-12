@@ -173,10 +173,13 @@ describe('doCotTra — kiểu phiếu khi (và chỉ khi) cột trả lời đ�
     vi.spyOn(document.querySelector<HTMLElement>('.bpu-cot-de')!, 'getClientRects').mockImplementation(() => (luoi ? [new DOMRect(0, 0, 300, 300)] : []) as unknown as DOMRectList)
     return document.querySelector<HTMLElement>('.bpu-hs')!
   }
-  it('ngang (cột đề có hộp) + cột tràn ⇒ data-gon; vừa ⇒ gỡ; dọc (cột đề display: contents) ⇒ không bao giờ; câu không có phương án / ý ⇒ không', () => {
+  // 12/11: thầy đổi sang «hiển thị giống phần chặng xoay ngang» ⇒ kiểu phiếu TẮT (hằng KIEU_PHIEU ở bo-cuc-ngang-do.ts): cột tràn cũng KHÔNG đặt data-gon,
+  // cột trả lời hiện đủ chữ và tự cuộn. Cờ cũ còn sót thì vẫn được gỡ.
+  it('kiểu phiếu đã tắt: ngang + cột tràn ⇒ KHÔNG data-gon (cờ cũ bị gỡ); vừa / dọc / câu không có phương án ⇒ không', () => {
     const g = dung(true, 520, 300)
+    g.querySelector('.bpu-cau')!.setAttribute('data-gon', '')
     doCotTra(g)
-    expect(g.querySelector('.bpu-cau')!.hasAttribute('data-gon')).toBe(true)
+    expect(g.querySelector('.bpu-cau')!.hasAttribute('data-gon')).toBe(false)
     Object.defineProperty(g.querySelector('.bpu-tra')!, 'clientHeight', { configurable: true, value: 600 })
     doCotTra(g)
     expect(g.querySelector('.bpu-cau')!.hasAttribute('data-gon')).toBe(false)

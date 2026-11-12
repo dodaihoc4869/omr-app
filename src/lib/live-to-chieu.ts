@@ -31,7 +31,13 @@
 //   dòng chẩn đoán mic: chữ nhỏ, chọn / chụp được
 //   11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh). Dáng nút lưới «thêm» (.mc-lv-gon) khai ở đây từ bản K5; nút + khay nay dựng ở thanh-day-to-chieu.ts cho MỌI trạng thái
 export const CSS_LIVE_TO_CHIEU = `
-body.mc-che-bang .mc-vung-de{display:none!important}
+body.mc-che-bang .mc-vung-de,body.mc-che-bang .mc-trang{display:none!important}
+body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai{display:block!important;grid-column:1/-1!important;grid-row:1/-1!important}
+body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai::after{content:""!important;display:block!important;position:absolute;left:66.667%;top:0;bottom:0;width:2px;background:var(--mc-bang-nut);pointer-events:none}
+body.mc-lk{--mc-den:var(--mc-bang)}
+body.mc-lk .mc-thanh .mc-lv-nut{display:none!important}
+body.mc-che-bang .mc-buoc,body.mc-che-bang #mc-pha,body.mc-che-bang #mc-len-bang,body.mc-che-bang #mc-phim-nhom>:not(.mc-khay),body.mc-che-bang #mc-tiep,body.mc-che-bang .mc-em{display:none!important}
+body.mc-che-bang .mc-khay-nhom:not(.mc-khay-lk){display:none}
 body.mc .mc-thanh .mc-lv-nut,body.mc .mc-thanh .mc-lv-tat{flex:none;display:inline-flex;align-items:center;gap:.5em;min-height:calc(var(--u)*2.5);padding:0 1em 0 .8em;border:0;border-radius:999px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);font:800 max(13px,calc(var(--u)*1.15)) var(--mc-sans);white-space:nowrap;cursor:pointer}
 .mc-lv-nut i{display:block;width:.68em;height:.68em;border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 .22em color-mix(in srgb,var(--mc-do) 30%,transparent)}
 body.mc .mc-thanh .mc-lv-tat{padding:0 1em;background:transparent;box-shadow:inset 0 0 0 1.5px var(--mc-bang-vien);font-weight:700}
@@ -144,7 +150,13 @@ export const JS_LIVE_TO_CHIEU = `
     try { d.postMessage(m, '*'); return true; } catch (e) { return false; }
   }
   function lvGiay() { return document.documentElement.getAttribute('data-projector') !== 'matte-light'; }
-  function lvVung() { return window.__mcBut && window.__mcBut.vung ? window.__mcBut.vung() : {}; }
+  // Chế độ Bảng (live theo khối): giấy đề ẩn ⇒ không có ô giấy ⇒ máy em mất luôn ô bảng (mã trang cần đủ hai ô). Báo một dải giấy mỏng NGAY DƯỚI bảng
+  // (vùng thanh đáy, thầy không viết tới) để máy em dựng đúng ô bảng và phủ kín màn.
+  function lvVung() {
+    var v = window.__mcBut && window.__mcBut.vung ? window.__mcBut.vung() : {}, b = v.bang, y;
+    if (b && !v.giay && document.body.classList.contains('mc-che-bang')) { y = b[3] < 0.97 ? b[3] + 0.003 : 0.972; v.giay = [b[0], y, b[2], y + 0.025]; }
+    return v;
+  }
   function lvDongHo(tu) { var s = Math.max(0, Math.floor((Date.now() - tu) / 1000)), p = Math.floor(s / 60); s = s % 60; return (p < 10 ? '0' : '') + p + ':' + (s < 10 ? '0' : '') + s; }
   function lvLau(luc) { var s = Math.max(0, Math.floor((Date.now() - luc) / 1000)); return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
   lvNut.type = lvCum.type = 'button';
@@ -295,8 +307,9 @@ export const JS_LIVE_TO_CHIEU = `
         if (mi.khac) h += '<p class="loi" role="alert">Không mở được «' + lvSach(mi.khac) + '» — lớp đang nghe ' + lvSach(mi.ten || 'mic mặc định của máy') + '. Cắm lại bộ thu là app tự về mic ấy.</p>';
         // khử vọng + lọc ồn làm đục giọng ⇒ «Tự động» chỉ bật khi có đường vọng (loa máy thầy đang phát tiếng em nói); thầy ép tay được
         // LỌC ỒN RIÊNG (11/11): ba mức, tách khỏi khử vọng. Máy không chạy được bộ lọc riêng ⇒ nói rõ, nút vẫn ghi nhớ lựa chọn.
-        h += '<div class="mc-lv-dong"><span><b>Lọc ồn</b><br>' + (mi.locOnChay === 'khong' ? 'Máy này chưa chạy được bộ lọc riêng' : mi.locOnChay === 'loi' ? 'Chưa tải được bộ lọc — đang không lọc' : mi.locOnChay === 'tai' ? 'Đang tải bộ lọc…' : mi.locOn === 'manh' ? 'Mạnh — phòng ồn; lúc im lọc sâu hơn' : mi.locOn === 'tat' ? 'Tắt — giữ nguyên tiếng mic' : 'Vừa — bớt ồn nền, giữ giọng tự nhiên') + '</span><span style="display:inline-flex;gap:.3em">'
-          + '<button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="manh" aria-pressed="' + (mi.locOn === 'manh') + '">Mạnh</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="vua" aria-pressed="' + (mi.locOn !== 'manh' && mi.locOn !== 'tat') + '">Vừa</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="tat" aria-pressed="' + (mi.locOn === 'tat') + '">Tắt</button></span></div>';
+        h += '<div class="mc-lv-dong"><span><b>Lọc ồn</b><br>' + (mi.locOnChay === 'khong' ? 'Máy này chưa chạy được bộ lọc riêng' : mi.locOn === 'thay' ? 'Chỉ giọng thầy — hạ giọng người khác' + (mi.tg ? '<br>' + lvSach(mi.tg) : '') : mi.locOnChay === 'loi' ? 'Chưa tải được bộ lọc — đang không lọc' : mi.locOnChay === 'tai' ? 'Đang tải bộ lọc…' : mi.locOn === 'manh' ? 'Mạnh — phòng ồn; lúc im lọc sâu hơn' : mi.locOn === 'tat' ? 'Tắt — giữ nguyên tiếng mic' : 'Vừa — bớt ồn nền, giữ giọng tự nhiên') + '</span><span style="display:inline-flex;gap:.3em' + (mi.coThay ? ';flex-wrap:wrap' : '') + '">'
+          + '<button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="manh" aria-pressed="' + (mi.locOn === 'manh') + '">Mạnh</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="vua" aria-pressed="' + (mi.locOn !== 'manh' && mi.locOn !== 'tat' && mi.locOn !== 'thay') + '">Vừa</button><button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="tat" aria-pressed="' + (mi.locOn === 'tat') + '">Tắt</button>'
+          + (mi.coThay ? '<button type="button" class="mc-lv-n nho" data-lv="loc-on" data-c="thay" aria-pressed="' + (mi.locOn === 'thay') + '">Chỉ giọng thầy</button>' : '') + '</span></div>';
         // 11/11 tối · HÀNG DỰ PHÒNG: «Chuẩn trình duyệt» = gửi thẳng mic với khử vọng + lọc ồn + tự chỉnh âm lượng của trình duyệt (như Meet), bỏ chuỗi làm rõ
         h += '<div class="mc-lv-dong"><span><b>Tiếng</b><br>' + (mi.kieuTieng === 'chuan' ? 'Chuẩn trình duyệt — như Meet (khử vọng, lọc ồn, tự chỉnh của trình duyệt)' : 'Làm rõ — chuỗi làm rõ tiếng + lọc ồn bên dưới') + '</span><span style="display:inline-flex;gap:.3em">'
           + '<button type="button" class="mc-lv-n nho" data-lv="kieu-tieng" data-c="lam-ro" aria-pressed="' + (mi.kieuTieng !== 'chuan') + '">Làm rõ</button><button type="button" class="mc-lv-n nho" data-lv="kieu-tieng" data-c="chuan" aria-pressed="' + (mi.kieuTieng === 'chuan') + '">Chuẩn trình duyệt</button></span></div>';
@@ -447,9 +460,11 @@ export const JS_LIVE_TO_CHIEU = `
     var m = e.data, truoc;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
+    if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
+    if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl') { LV.bangNhap = 1; if (m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); } return; }
     if (m.lenh !== 'live-tt') return;
     truoc = LV.tt; LV.tt = m.tt || null;
-    if (document.body.classList.contains('mc-che-bang') !== !!(LV.tt && LV.tt.cheBang)) { document.body.classList.toggle('mc-che-bang', !!(LV.tt && LV.tt.cheBang)); if (window.__mcBut) setTimeout(lvAnh, 80); }
+    lvCheBang();
     if (LV.tt && LV.tt.co && !LV.anhXong) lvAnh();
     // vừa vào live ⇒ bút bật sẵn trên bảng đen
     if (LV.tt && LV.tt.pha === 'live' && !(truoc && truoc.pha === 'live') && window.__mcBut) window.__mcBut.bat(true);
@@ -457,6 +472,48 @@ export const JS_LIVE_TO_CHIEU = `
     if (LV.tt && LV.tt.pha === 'live' && !(truoc && truoc.pha === 'live')) { LV.giayCu = ''; setTimeout(lvBaoGiay, 60); }
     lvVe();
   });
+  // LIVE THEO KHỐI (12/11). Chỉ đổi khi phòng BÁO RÕ đây là buổi live theo khối (tt.khoi): phòng chớp mất nối ⇒ GIỮ nguyên (trước đây giấy đề nảy ra
+  // giữa lúc thầy đang viết). Tờ BẢNG TRẮNG (body[data-bang-trang]) luôn là bảng kín màn. Vào «Bảng» ⇒ bút bật sẵn, bố cục + ô bảng đo lại.
+  // NHÓM «BUỔI LIVE» TRONG KHAY NÚT BỐN Ô (thầy 12/11 «phần nút này bị rối, chuyển nó vào trong cái 4 nút»): Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm
+  // đầu khay của thanh đáy thay cho cụm nổi đè lên nút của tờ. Bấm ⇒ báo app (việc lk); app báo số tin mới bằng lệnh live-lk.
+  function lvLk(cb) {
+    var k = document.getElementById('mc-khay'), g = LV.lk, ds, i, b, x, moi = LV.lkMoi || 0;
+    if (!k) return;
+    if (!g) {
+      g = LV.lk = document.createElement('div'); g.className = 'mc-khay-nhom mc-khay-lk'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Buổi live');
+      g.innerHTML = '<span class="mc-khay-ten" aria-hidden="true">Buổi live</span>';
+      ds = [['hoc', 'Học'], ['bang', 'Bảng'], ['lop', 'Lớp'], ['chon', 'Chọn bài'], ['chat', 'Tin nhắn']];
+      for (i = 0; i < ds.length; i++) { b = document.createElement('button'); b.type = 'button'; b.className = 'mc-nut-phim'; b.setAttribute('data-lk', ds[i][0]); b.innerHTML = '<span class="mc-nut-chu">' + ds[i][1] + '</span>'; g.appendChild(b); }
+      g.addEventListener('click', function (e) { var n = e.target.closest ? e.target.closest('[data-lk]') : null; if (n) lvGui('lk', { v: n.getAttribute('data-lk') }); });
+      k.insertBefore(g, k.firstChild);
+      // khay vừa mở ⇒ báo app thu cột tin nhắn (cột nằm ngay trên thanh đáy bên phải, đè đúng chỗ khay; tờ nằm dưới lớp của app nên không tự nổi lên được)
+      if (window.MutationObserver) new MutationObserver(function () { var mo = document.body.classList.contains('mc-khay-mo'); if (mo && !LV.lkMo) lvGui('lk', { v: 'khay' }); LV.lkMo = mo; }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
+    ds = g.querySelectorAll('[data-lk]');
+    for (i = 0; i < ds.length; i++) {
+      x = ds[i].getAttribute('data-lk');
+      if (x === 'hoc' || x === 'bang') ds[i].setAttribute('aria-pressed', (x === 'bang') === cb ? 'true' : 'false');
+      else if (x === 'chon') ds[i].hidden = cb;
+      else if (x === 'chat') { ds[i].firstChild.textContent = moi > 0 ? 'Tin nhắn · ' + (moi > 99 ? '99+' : moi) + ' mới' : 'Tin nhắn'; ds[i].classList.toggle('mc-bat', moi > 0); }
+    }
+  }
+  function lvCheBang() {
+    var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb;
+    if (!trang && !(LV.tt && LV.tt.khoi)) return;
+    b.classList.add('mc-lk');
+    cb = trang || !!(LV.tt && LV.tt.cheBang);
+    // BẢNG CÓ TRANG RIÊNG (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang bl của bộ máy bút, tách khỏi nét của từng câu;
+    // app giữ bản sao suốt buổi và trả lại khi tờ mới xin (đổi bài, bảng trắng ⇄ bài) — lệnh live-bang-nhap.
+    if (window.__mcBut && window.__mcBut.rieng) window.__mcBut.rieng(cb ? 'bl' : '');
+    lvLk(cb);
+    // xin lại tới khi NHẬN được lúc đang ở trang bl (tờ bài vừa mở có thể còn «Bảng» một nhịp rồi sang «Học»: câu trả lời tới lúc đã rời trang bl ⇒ lần sau xin lại)
+    if (cb && window.__mcBut && !LV.bangNhap && !LV.bangHen) LV.bangHen = setTimeout(function () { LV.bangHen = 0; lvGui('bang-xin'); }, 80);
+    if (b.classList.contains('mc-che-bang') === cb) return;
+    b.classList.toggle('mc-che-bang', cb);
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+    if (window.__mcBut) { if (cb) window.__mcBut.bat(true); setTimeout(lvAnh, 150); }
+  }
+  lvCheBang();
   window.__mcLive = { tt: function () { return LV.tt; }, bam: lvBam };
   lvGui('chao');
 `

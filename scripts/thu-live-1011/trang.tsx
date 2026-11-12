@@ -66,7 +66,31 @@ const vai = ts.get('vai') ?? 'em'
 const noop = () => {}
 const goc = document.getElementById('root')!
 
-if (vai === 'em') {
+if (vai === 'gv') {
+  // APP THẦY THẬT cho Live theo khối (12/11): nền «Hôm nay» giả + ĐÚNG đường mã thật — gan-gv (bảng Bình Phản Ứng thật, ẩn), thay-khoi (lớp nổi), tờ chiếu
+  // dựng bằng chieuCau / chieuBangTrang, phần live máy thầy. Bộ thử gọi window.__moLive() như nút «Mở phòng chờ».
+  document.body.style.margin = '0'
+  goc.innerHTML = '<div id="hom-nay" style="padding:60px;font:700 44px sans-serif;background:white;color:black;min-height:100vh">MÀN HÔM NAY (giả)</div>'
+  void layDiaChiMayChu(location.origin).then(() => {
+    ;(window as unknown as { __moLive: () => Promise<void> }).__moLive = () => import('../../src/components/bpu/gan-gv').then((m) => m.moBangLiveKhoi({ lich: { id: 'l1', khoi: 12, batDau: Date.now(), ten: '', trangThai: 'cho', buoiId: 'b1' }, buoiId: 'b1', ma: '' }))
+    // Thay cho bước «chọn bài trong kho» (trang thử không có kho đề): chiếu thẳng hai câu bằng ĐÚNG hàm thật `chieuCau` của bảng chọn bài.
+    const cauGia = (id: string, text: string, choices: string[]) => ({ khoa: id, qid: id, phan: 'I', q: { id, text, choices, correct: 'B' }, maDe: 'm', tenDe: 'Bài thử Alcohol – Phenol', chuyenDe: 'Alcohol', maDang: null, tenDang: null, mucDo: '', tuLuan: false })
+    ;(window as unknown as { __chieuCauGia: () => Promise<string> }).__chieuCauGia = () => import('../../src/components/bpu/gan-gv').then((m) => m.chieuCau([
+      cauGia('Q1', 'Alcohol nào sau đây là alcohol bậc II?', ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH']),
+      cauGia('Q2', 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', ['NaCl', 'NaOH', 'HCl', 'NaHCO₃']),
+    ] as never))
+    // Tấm hoạt động thật (Chữa câu khó, Kiểm tra đầu giờ…) KHÔNG chiếu qua gan-gv: nó tự dựng <KhungXemPhieu> của riêng mình (cổng ra <body>, z 99999).
+    // Hàm này dựng đúng một tờ như vậy (tên khác tờ của bảng) để kiểm «bấm Chiếu lên bảng ở tấm hoạt động ⇒ tờ nằm TRÊN tấm».
+    ;(window as unknown as { __chieuToRieng: () => Promise<void> }).__chieuToRieng = async () => {
+      const [{ default: Khung }, { createRoot }, React] = await Promise.all([import('../../src/components/KhungXemPhieu'), import('react-dom/client'), import('react')])
+      const k = document.createElement('div'); k.setAttribute('data-to-rieng', ''); document.body.appendChild(k)
+      const g = createRoot(k)
+      ;(window as unknown as { __dongToRieng: () => void }).__dongToRieng = () => { g.unmount(); k.remove() }
+      g.render(React.createElement(Khung, { html: '<!doctype html><html><body style="margin:0;background:#f4efe4;font:700 40px sans-serif"><div id="to-rieng" style="padding:60px">TỜ RIÊNG CỦA TẤM HOẠT ĐỘNG</div></body></html>', ten: 'Chữa câu khó · tờ chiếu', dong: () => { g.unmount(); k.remove() } }))
+    }
+    ;(window as unknown as { __sanSang: boolean }).__sanSang = true
+  })
+} else if (vai === 'em') {
   void layDiaChiMayChu(location.origin).then(() => {
     createRoot(goc).render(h(ManBinhPhanUng, { token: `tk-${ts.get('sbd') ?? 'S1'}`, buoiId: 'b1', onDong: noop }))
   })

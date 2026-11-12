@@ -374,6 +374,7 @@ export default defineConfig({
           // Live theo khối (12/11): mọi mảnh của tính năng (bảng Live máy thầy, thẻ Live, lớp nổi, trò Giữ Lửa, chat, màn bốn đội) chỉ dùng khi ĐANG có mạng
           // (live) ⇒ kho chạy-lúc, không vào precache (giữ trần 170 tệp).
           '**/{BangLiveThay,ChatEm,ChatThay,LopNoiEm,LopNoiThay,ManBonDoi,TheLiveEm,TroGiuLua,chu-gio,em-khoi,thay-khoi,kieu,ManVinhDanh,vinh-danh}-*.{js,css}', // `kieu-*` = hằng dùng chung của src/lib/live-khoi/kieu.ts
+          '**/mau-????????.js', // bảng màu xanh than của live theo khối (src/lib/live-khoi/mau.ts) — 8 dấu ? = đúng mã băm, không bắt nhầm `mau-chieu-*`
           // Bình Phản Ứng (06/11): bảng chiếu + bộ nghe phím P chỉ máy thầy dùng ⇒ kho chạy-lúc (precache giữ trần 170 tệp). Màn máy em vẫn precache bình thường.
           '**/BangBinhPhanUng-*.{js,css}',
           '**/DangChieuBpu-*.{js,css}', // bước «Đang chiếu» của Hành trình (07/11) — mảnh lười máy thầy, ngoài precache
@@ -589,6 +590,9 @@ export default defineConfig({
           // Gọi lên bảng, Lên bảng chiến dịch, Cài đặt, Chiến dịch, Mở ca, danh sách chiến dịch đã giao — đều đã ngoài precache): phần tính chiến dịch `tinh`
           // (nay gộp cả bộ chọn em), Sửa chiến dịch, API OMNI của thầy, cây thư mục mục đích, Bài hôm nay, đồng bộ thư mục ⇒ kho chạy-lúc.
           '**/{tinh,SuaEmNhanBai,api-omni,cay-muc-dich,bai-hom-nay,dong-bo-thu-muc}-*.{js,css}',
+          // «Chỉ giọng thầy» của Live (12/11, đường thử chỉ-thầy, mặc định tắt): cờ / tải mô hình + lõi tách CHỈ máy thầy nạp khi chọn mức này (mô hình luôn cần mạng)
+          // ⇒ kho chạy-lúc, không thêm tệp precache.
+          '**/{chi-thay,tach-giong-thay}-*.js',
           // Bù chỗ cho phần OMNI của Sảnh em (≈ 14 KB, mảnh khởi động): "Làm câu ôn" (bảng nhiệm vụ cũ) nạp LƯỜI khi em bấm và mọi việc của nó cần máy chủ
           // (tải câu, chấm) — mở lần đầu là đang có mạng; tải một lần rồi cất ở kho chạy-lúc (như Tu luyện 30/09).
           '**/LamCauOn-*.{js,css}',

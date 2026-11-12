@@ -76,17 +76,19 @@ export interface BoCucDL {
 }
 export interface DauVaoDL { w: number; h: number; at: AnToan; kc: KhungChieu; chia: number; phong?: Vung | null
   /** Bề cao (px) nhường cho dải thẻ tên phía trên khung bảng; 0 / vắng = không có dải. */
-  dauBang?: number }
+  dauBang?: number
+  /** Live theo khối, chế độ Bảng: bảng đang phóng co VỪA TRỌN khung (cả ngang lẫn dọc) — em thấy hết bảng của thầy, không phải cuộn. */
+  vua?: boolean }
 
 /** HAI KHUNG ĐỘC LẬP. Giấy bên trái bảng (mọi bố cục tờ hiện có); tờ lạ có giấy bên phải ⇒ hai khung đổi bên. */
-export function boCucDocLap({ w, h, at, kc, chia, phong = null, dauBang = 0 }: DauVaoDL): BoCucDL {
+export function boCucDocLap({ w, h, at, kc, chia, phong = null, dauBang = 0, vua = false }: DauVaoDL): BoCucDL {
   const A = khungDung(w, h, at), Wd = A.x1 - A.x0, H = A.y1 - A.y0, W = Math.max(1, Wd - KHE_GIUA)
   const p = kep(chia, 0.2, 0.9), trai = kc.giay.x <= kc.bang.x
   const wG0 = Math.round(W * p), wB0 = W - wG0
   const wG = phong === 'giay' ? Wd : wG0, wB = phong === 'bang' ? Wd : wB0
   // dải thẻ tên chỉ lấy chỗ của khung BẢNG (không quá 1/5 chiều cao); bảng vốn co theo bề ngang nên nét không nhỏ đi, chỉ bớt phần thấy được
   const dau = kep(dauBang, 0, H * 0.2), HB = H - dau
-  const sG = Math.min(wG / kc.giay.w, Math.max(H / kc.giay.h, S_TRAN)), sB = Math.min(wB / kc.bang.w, Math.max(HB / kc.bang.h, S_TRAN))
+  const sG = Math.min(wG / kc.giay.w, Math.max(H / kc.giay.h, S_TRAN)), sB = Math.min(wB / kc.bang.w, vua && phong === 'bang' ? HB / kc.bang.h : Math.max(HB / kc.bang.h, S_TRAN))
   // chỗ đứng: bình thường xếp cạnh nhau; khung đang phóng phủ cả bề ngang, khung kia đứng ngoài màn về phía của nó
   const xT = A.x0, xP = (rong: number): number => A.x1 - rong
   let xG: number, xB: number

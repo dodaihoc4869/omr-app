@@ -23,7 +23,7 @@ export function napSan(): void { void napGan().catch(() => {}) }
 /** Buổi đang mở gần đây (≤ 3 giờ) — nút «Kết thúc» cạnh Điểm danh ở Hôm nay. */
 export async function buoiMoGanDay(): Promise<string | null> {
   const r = await hoiSom()
-  return r.ok ? r.du.find((b) => Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id ?? null : null
+  return r.ok ? r.du.find((b) => !(b.lop ?? '').startsWith('Live Khối ') && Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id ?? null : null
 }
 /** Hỏi sớm buổi đang mở (chạm / rê vào nút) — lần bấm ngay sau dùng lại kết quả (≤ 20 giây). */
 export function hoiSom(): Promise<KetQuaLenh<BuoiHoc[]>> {
@@ -31,17 +31,18 @@ export function hoiSom(): Promise<KetQuaLenh<BuoiHoc[]>> {
   return som.p
 }
 
+// Buổi LIVE THEO KHỐI (12/11): máy chủ đặt lớp «Live Khối N» ⇒ nút «Lên bảng» bỏ qua buổi này (live có lối vào riêng ở nút Live).
 export type KetQuaDiemDanh = { loai: 'chieu' } | { loai: 'loi'; chu: string }
 
 export async function batDauDiemDanh(): Promise<KetQuaDiemDanh> {
   // Đang có phiên (Esc ra Hôm nay) ⇒ vào lại ĐÚNG chỗ dở NGAY, không hỏi máy chủ (thầy 09/11 «bấm vào điểm danh thì vào đúng chỗ đang dở»).
   const g0 = await napGan()
   const p = g0.phienDangCo()
-  if (p) { g0.moBangDiemDanh({ buoiId: p.buoiId }); return { loai: 'chieu' } }
+  if (p) { g0.moBangDiemDanh({ buoiId: p.buoiId }); return { loai: 'chieu' } } // (đang có phòng live tạm ẩn ⇒ vào lại đúng phòng đó)
   const [dm, g] = await Promise.all([hoiSom(), napGan()])
   som = null
   if (!dm.ok) return { loai: 'loi', chu: dm.chu }
-  const mo = dm.du.find((b) => Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS) ?? null
+  const mo = dm.du.find((b) => !(b.lop ?? '').startsWith('Live Khối ') && Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS) ?? null
   const goc = window.location.origin
   const lk = (ma: string | null) => (ma ? linkDiemDanh(goc, ma) : null)
   let id = '', ma: string | null = null

@@ -84,5 +84,27 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 - **Buổi dạy trên lớp («Lên bảng», trước là «Điểm danh»):** không còn nút Live trên bảng và trên tờ (cờ `co` chỉ bật khi phòng có `live.khoi`).
 - **Nền bảng đen** của tờ chiếu, bảng Bình Phản Ứng và bảng live máy em: `#15181c` → xanh than `#131f24` (áp cho cả buổi trên lớp).
 - **Chat:** 1 tin / 2 giây / em, 200 ký tự, phòng giữ 200 tin trong RAM, hết buổi là mất. **Trò Giữ Lửa:** máy em gửi ≤ 4 gói / giây, phòng phát một ảnh chụp / 250 ms, chỉ chạy ở phòng chờ; kJ của trò không vào kJ buổi học.
-- Bộ thử trình duyệt thật: `scripts/thu-live-1011/thu-khoi-1211.mjs` (21 kiểm; ảnh `that-*.jpg` trong thư mục bản vẽ).
+- Bộ thử trình duyệt thật: `scripts/thu-live-1011/thu-gv-that-1211.mjs` (37 kiểm, chạy ĐÚNG bảng Bình Phản Ứng + tờ chiếu thật của máy thầy, hai máy em ngang / dọc). Bộ cũ `thu-khoi-1211.mjs` thiếu bảng thật, chỉ còn để tham khảo.
 - **Chưa thử:** lớp thật nhiều máy, tiếng thật qua SFU ở buổi live theo khối, iPhone thật (xoay hình), tải 80–100 em trong phòng chờ.
+
+## Luồng chốt 12/11 (sau khi thầy thử bản sống) — bản này thay các mục trái với nó ở trên
+
+1. **«Bắt đầu live»** ⇒ thầy và em CÙNG vào bảng danh sách bốn đội (sảnh). Tiếng thầy tự bật (không có nút Live nào phải bấm; thử lại mỗi 2 giây, tối đa 8 lần; có nút «Bật tiếng lại»). Máy em ép ngang suốt buổi (xoay hình nếu máy không khoá ngang được), mic em tắt.
+2. Thầy chọn **Học** (chọn bài ⇒ bê nguyên buổi «Lên bảng»: bảng đua + tờ chiếu, máy em làm câu) hoặc **Bảng** (bảng xanh than kín màn). Máy em tự chuyển theo, không phải bấm gì.
+3. **Chế độ Bảng:** giấy đề ẩn, cột bảng phủ kín tờ; máy em co bảng VỪA TRỌN màn (thấy hết bảng của thầy, không cuộn), khoá cứng ở bảng (không «chạm hai lần»). Bảng có một đường kẻ trắng mờ chia 2/3 trái · 1/3 phải, cùng chỗ trên máy thầy và máy em. Tờ báo một dải «giấy» mỏng dưới bảng để mã trang đủ hai ô (`lvVung` trong `src/lib/live-to-chieu.ts`).
+4. **Esc** luôn lùi MỘT màn: nhắn tin → chọn bài → bài đang dạy → sảnh → Hôm nay. Ở Hôm nay nút Live thành «Kết thúc buổi» (bấm là kết thúc) + viên «Đang live · Vào lại».
+5. **Máy thầy:** cụm Học | Bảng · Lớp · Tin nhắn ở thanh đáy (lên thanh trên khi bảng đua hiện); cột tin nhắn cao 1/3. Trong buổi live bảng đua không có nút «Đóng» và viên «Live».
+6. **Máy em:** «Nhắn cả lớp» và «Bốn đội» nằm trong khay của thanh vàng (sự kiện cửa sổ `ddh-lk`); cửa nhắn tin cao 1/3 sát mép phải, tự đóng khi em vào làm câu. Danh sách bốn đội hiện ĐỦ tên, không cắt «…».
+7. **Chưa thử:** lớp thật nhiều máy, tiếng thật qua SFU, iPhone thật.
+8. **Bảng có trang riêng, giữ nét suốt buổi (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»):** chế độ Bảng viết vào trang `bl` của bộ máy bút, tách khỏi nét của từng câu. App giữ bản sao nét theo mã buổi (`thay-noi.ts` `giuBang`) và trả lại khi tờ mới xin (`bang-xin` → `live-bang-nhap`) — bảng trắng ⇄ bài, đổi bài đều không mất. Tải lại trang thì mất bản sao (phòng vẫn còn sổ nét cho máy em).
+9. **«Học» khi chưa có bài:** mở bảng chọn; chọn hoạt động (đầu giờ / chữa câu / ôn tập) ⇒ tấm hoạt động nổi TRÊN tờ; Esc đóng tấm ⇒ về bảng chọn.
+10. **Mic của em (bản vẽ 05 + 12):** khay thanh vàng máy em có «Giơ tay» và «Mic của em» (tắt sẵn); ở bảng danh sách có nút giơ tay + tấm «Thầy mời em nói». Máy thầy: thẻ góc dưới-trái «N em giơ tay · Mời nói · Hạ hết tay», em đang nói có «Tắt mic em». Dùng nguyên luật đàm thoại đợt 2 của phòng (mỗi lúc một em nói, cả lớp nghe); cờ `GIAO_DIEN_DOT_2` của buổi trên lớp vẫn tắt.
+11. **Bong bóng tin mới máy em:** gọn ở góc trên-phải (trong phần bảng), tối đa 30% bề ngang.
+12. **Máy em chỉ vào «Học» khi có câu được CHIẾU (thầy 12/11):** thầy bấm «Học», mở bảng chọn, mở hoạt động — phòng chưa đổi chế độ, máy em ở nguyên màn đang xem. Phòng mở lượt mới (bất kể chiếu bằng đường nào) ⇒ app thầy mới báo «hoc». Phòng báo «hoc» mà chưa có lượt ⇒ máy em ở bảng danh sách. Em gửi xong / thầy gọi lên bảng ⇒ ép vào màn chiếu (luật sẵn có `cheLiveCua`).
+13. **Cụm Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm trong khay nút bốn ô của tờ** (nhóm «Buổi live», `lvLk` ở `src/lib/live-to-chieu.ts`; tờ báo bấm bằng việc `lk` → sự kiện `ddh-lkt`; số tin mới đi ngược bằng `ddh-lkt-moi` → lệnh `live-lk`). Cụm nổi của app chỉ còn lúc bảng đua đang hiện. Mở khay ⇒ cột tin nhắn tự thu.
+14. **Chế độ Bảng ẩn thẻ tên** (thẻ em trên tờ, dải thẻ tên máy em) và ẩn các nhóm nút của câu trong khay.
+15. **Màn câu hỏi khổ ngang giống chặng (áp cho cả buổi trên lớp):** kiểu phiếu rút gọn TẮT (`KIEU_PHIEU` ở `src/components/bpu/bo-cuc-ngang-do.ts`); cột trả lời hiện đủ chữ, Đúng–sai có nút Đúng | Sai đứng cạnh ý, cột tự cuộn.
+16. **Tấm hoạt động ⇄ tờ: cái mở sau nằm trên** (`html[data-hd-tren]`, `gan-gv.tsx` `datHdTren`). Chiếu câu / gọi lên bảng TỪ tấm hoạt động ⇒ tờ lên trên, phòng sang «hoc», máy em vào màn chiếu; Esc ở tờ ⇒ tấm lên lại để chọn câu kế; Esc lần nữa ⇒ đóng tấm.
+17. **Tấm hoạt động tự mở tờ RIÊNG** (Chữa câu khó, Kiểm tra đầu giờ… dựng `KhungXemPhieu` của mình, không qua `ganTo`): mục 16 sửa lại — KHÔNG nâng tấm lên trên tờ; lúc tấm ở trên thì ẩn tờ của bảng (`html[data-hd-tren] .lop-xem-phieu[aria-label="Tờ chiếu Bình Phản Ứng"]`), tờ riêng (z 99999) nằm trên tấm (z 99990) và giữ nút đóng. Tờ của bảng trong buổi live bỏ qua lệnh đóng khi tấm đang ở trên (sự kiện `popstate` do tờ riêng đóng).
+18. **Một chiều ngang:** khoá `landscape-primary` (trùng chiều xoay hình CSS rotate 90°) — máy em không lật giữa hai chiều ngang.
+19. **Mở phòng chờ tức thì:** `/gv/bpu/khoi-mo` = một đợt đọc song song + một batch ghi (chèn buổi + ghi lịch); app hỏi lại lịch khi máy chủ trả lời chậm và vào đúng phòng đã mở.

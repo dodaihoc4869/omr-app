@@ -22,10 +22,11 @@
 }
 .bd-cot h3 { flex: none; max-width: 100%; margin: 4px 0 0; overflow: hidden; color: color-mix(in srgb, var(--doi) 78%, var(--giay)); font-size: 17px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .bd-cot > p { flex: none; margin: 0 0 4px; color: var(--bd-mo); font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.bd-cot ul { flex: 1 1 0; align-self: stretch; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: min-content; align-content: start; gap: 4px; min-height: 0; margin: 0; padding: 0 2px 2px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; list-style: none; scrollbar-width: thin; scrollbar-color: var(--bd-mat) transparent; }
+.bd-cot ul { flex: 1 1 0; align-self: stretch; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: min-content; align-content: start; gap: 4px; min-height: 0; margin: 0; padding: 0 2px 2px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; list-style: none; scrollbar-width: thin; scrollbar-color: var(--bd-mat) transparent; }
 .bd-cot li { display: flex; align-items: center; gap: 6px; min-width: 0; min-height: 26px; padding: 3px 8px; border-radius: 9px; background: var(--bd-mat); font-size: 13px; font-weight: 700; }
 .bd-cot li i { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--doi); }
-.bd-cot li span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Thầy 12/11: hiện ĐỦ tên học sinh, không cắt «…» — mỗi em một dòng, tên dài tự xuống dòng. */
+.bd-cot li span { min-width: 0; overflow-wrap: anywhere; line-height: 1.25; }
 .bd-cot li[data-toi] { grid-column: 1 / -1; background: color-mix(in srgb, var(--doi) 46%, var(--p-muc)); box-shadow: inset 0 0 0 2px var(--doi); }
 .bd-chan { flex: none; margin: 0; color: var(--bd-mo); font-size: 12px; text-align: center; }
 .bd:focus-visible { box-shadow: inset 0 0 0 3px var(--giay); }

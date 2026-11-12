@@ -8,7 +8,11 @@
 .lke-mep:hover, .lke-mep:focus-within { opacity: 1; }
 .lke-doi { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 12px; background: transparent; color: var(--lk-chu-2); cursor: pointer; }
 .lke-doi svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.lke-bong { position: absolute; right: calc(56px + env(safe-area-inset-right, 0px)); top: 50%; max-width: min(280px, 46%); pointer-events: none; }
+/* Bong bóng tin mới (thầy 12/11 «hiện vừa với phần bảng xanh đen thôi, tinh tế»): nằm gọn góc trên-phải — luôn trong phần bảng, không ra giữa màn; bề ngang
+   theo chữ, tối đa 30% màn (bảng của chế độ Học hẹp nhất cũng rộng hơn). Trước đây khung cha rộng 0 ⇒ chữ bị bóp mỗi dòng một chữ cái. */
+.lke-bong { position: absolute; right: calc(56px + env(safe-area-inset-right, 0px)); top: 14px; width: max-content; max-width: min(260px, 30%); pointer-events: none; }
+.lke-bong .lc-bong-cho { position: static; max-width: none; }
+.lke-bong .lc-bong-noi { font-size: 12.5px; padding: 6px 10px; border-width: 1.5px; }
 /* Các mảnh con luôn xanh than: chat (--lc-*) và màn bốn đội đọc bảng cố định của gốc. */
 .lke .lc-goc, .lkt .lc-goc { --lc-nen: var(--lk-nen); --lc-mat: var(--lk-mat); --lc-mat-2: var(--lk-mat-2); --lc-vien: var(--lk-vien); --lc-chu: var(--lk-chu); --lc-chu-2: var(--lk-chu-2); --lc-chu-3: var(--lk-chu-3); --lc-nhan: var(--lk-nhan); --lc-nhan-go: var(--lk-nhan-go); --lc-sai: var(--lk-sai); --lc-chu-y: var(--lk-chu-y); }
 .lke .bd { background: radial-gradient(90% 70% at 50% 0%, var(--lk-mat), var(--lk-nen)); color: var(--lk-chu); }
@@ -17,3 +21,20 @@
 html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus-visible { background: transparent; border: 0; border-radius: 0; box-shadow: none; outline: 0; padding: 0; min-height: 0; color: var(--lk-chu); }
 .lke-roi { position: absolute; left: max(8px, env(safe-area-inset-left, 0px)); top: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--lk-mat) 80%, transparent); color: var(--lk-chu-3); font: inherit; font-size: 12.5px; cursor: pointer; opacity: .8; }
 .lke.xong { pointer-events: auto; }
+.lke.dang-vao { display: grid; place-items: center; }
+.lke.dang-vao p { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 17px; font-weight: 800; color: var(--lk-chu-2); }
+.lke.dang-vao i { width: 14px; height: 14px; border-radius: 50%; background: var(--lk-chu-y); animation: lke-nhip 1s ease-in-out infinite alternate; }
+@keyframes lke-nhip { from { opacity: .35; transform: scale(.8); } to { opacity: 1; transform: scale(1.15); } }
+.lkt-dang-mo { position: absolute; inset: 0; pointer-events: auto; display: grid; place-items: center; background: var(--lk-nen); color: var(--lk-chu-2); font-size: 20px; font-weight: 800; }
+.lke-mep { z-index: 35; } .lke-bong, .lke .lc-goc { z-index: 36; }
+/* Thầy 12/11: cửa nhắn tin máy em cao khoảng 1/3 màn, nằm sát mép phải (cạnh nút nhắn tin), không che đề. */
+.lke .lc-cua { top: auto; bottom: 8px; height: max(210px, 34%); width: min(320px, 46%); }
+
+/* Mic của em ở bảng danh sách: nút Giơ tay trong cụm mép + tấm «Thầy mời em nói». */
+.lke-tay.gio { background: var(--tr-chu-y); color: var(--tr-nen); }
+.lke-tay:disabled { opacity: 0.45; }
+.lke-moi { position: absolute; left: 50%; bottom: 40px; z-index: 37; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; max-width: min(560px, 92%); padding: 10px 12px 10px 16px; border-radius: 18px; background: var(--tr-mat); box-shadow: inset 0 0 0 2px var(--tr-vien), 0 16px 40px color-mix(in srgb, var(--tr-nen) 70%, transparent); color: var(--tr-chu); pointer-events: auto; }
+.lke-moi p { flex: 1; min-width: 0; margin: 0; font-size: 13px; line-height: 1.35; color: var(--tr-chu-2); }
+.lke-moi p b { display: block; font-size: 15px; color: var(--tr-chu); }
+.lke-moi button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 13px; background: var(--tr-mat-3); color: var(--tr-chu); font: inherit; font-weight: 800; }
+.lke-moi button.chinh { background: var(--tr-dung); color: var(--tr-nen); }

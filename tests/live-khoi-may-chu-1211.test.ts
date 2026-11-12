@@ -12,6 +12,7 @@ const lich = (o: Partial<LichLiveMc>): LichLiveMc => ({ id: 'a', khoi: 12, batDa
 describe('lịch live theo khối', () => {
   it('khối đọc từ lớp của em', () => {
     expect(khoiTuLop('12')).toBe(12); expect(khoiTuLop('11A2')).toBe(11); expect(khoiTuLop('Lớp 10 chuyên')).toBe(10)
+    expect(khoiTuLop('12 - Lớp Thường')).toBe(12); expect(khoiTuLop('11 - Tinh Hoa')).toBe(11)
     expect(khoiTuLop('')).toBeNull(); expect(khoiTuLop('9A')).toBeNull(); expect(khoiTuLop('112')).toBeNull()
   })
   it('đọc JSON hỏng / sai dạng ⇒ bỏ dòng sai, không ném lỗi', () => {
@@ -26,6 +27,8 @@ describe('lịch live theo khối', () => {
     const ds = [lich({ id: 'h12', batDau: NAY + 3_600_000 }), lich({ id: 'c12', trangThai: 'cho', buoiId: 'b' }), lich({ id: 'h11', khoi: 11, batDau: NAY - 31 * 60_000 })]
     expect(lichChoEm(ds, 12, NAY)?.id).toBe('c12')
     expect(lichChoEm(ds, 10, NAY)).toBeNull()
+    expect(lichChoEm(ds, null, NAY)?.id).toBe('c12') // tài khoản thử của thầy: mọi khối
+    expect(lichChoEm([lich({ id: 'c10', khoi: 10, trangThai: 'dang', buoiId: 'b' })], null, NAY)?.id).toBe('c10')
     expect(lichChoEm(ds, 11, NAY)).toBeNull()
     expect(lichChoEm([lich({ id: 'h11', khoi: 11, batDau: NAY - 29 * 60_000 })], 11, NAY)?.id).toBe('h11')
   })
