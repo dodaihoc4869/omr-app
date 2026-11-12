@@ -13,7 +13,7 @@ import { Suspense, lazy, startTransition, useCallback, useEffect, useLayoutEffec
 import { createPortal } from 'react-dom'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
 import { DOI_BPU, KJ, kyHieu, type BienDong, type KieuRoi, type ViewEm } from '../../lib/bpu/phong'
-import { cheLiveCua, manEmXa, useHuongLive } from './luat-man-live'
+import { cheLiveCua, manEmXa, useHuongLive, useVaoLai } from './luat-man-live'
 import { ngheVeLai } from './ve-lai-nhanh'
 import { YDeNgang, VachChia } from './bo-cuc-ngang'
 import { useThanNgang } from './bo-cuc-ngang-do'
@@ -661,6 +661,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
   const coBang = (lv as { bang?: boolean } | null)?.bang ?? !!l?.goi
   const cheLive = cheLiveCua({ liveBat, vuaRoi, xaEm, coBang, dangLam: !lv?.khoi && !!l && l.pha === 'tra-loi' && !che && !hetGio })
   const hl = useHuongLive(cheLive, liveBat, lv?.khoi?.gd === 'dang')
+  useVaoLai(!!v?.em?.luat?.ra, setVuaRoi)
   const thanNgang = useThanNgang(gocRef, laCau ? q : null, !!l?.tuLuan, `${khoaLuot}|${LC ? 1 : 0}|${hl.the.style?.width}x${hl.the.style?.height}`)
   // bảng live chỉ nhận THÂN ĐỀ; phương án / ý là chữ đề (live/GiayDung.tsx), không nút trả lời
   const deLive = cheLive === 'bang' && q && l && LC ? boChang(<LC.DeCau q={q} stt={l.so} />) : null
@@ -673,7 +674,7 @@ export default function ManBinhPhanUng({ token, buoiId, onDong, giuNoi = false, 
     </Suspense>
   ) : null
 
-  if (an) return null
+  if (an || v?.em?.luat?.cam) return null // bị thầy từ chối (luật rời màn): ra hẳn màn Hôm nay tới hết buổi live
   return createPortal(
     <div ref={gocRef} {...hl.the} className={`bpu-hs m3${dangBay ? ' dang-bay' : ''}${nutGui ? ' co-gui' : ''}${cheLive === 'bang' ? ' live-bang' : ''}`} role="dialog" aria-modal="true" aria-label="Bình Phản Ứng" onClick={chamDau} style={{ ...hl.the.style, ['--doi' as string]: `var(${(xaEm ? null : DOI_BPU[doi]?.mau) ?? '--tr-tin'})` }}>
       {tren(xaEm ? 'Em đang xem từ xa' : e ? nhanDoi : 'Cả lớp cùng làm câu thầy chiếu')}

@@ -58,5 +58,7 @@ export async function bpuGv(env: Env, p: string, b: Row, ctx?: ExecutionContext)
   if (p === '/gv/bpu/mo') return gvBpuMo(env, b)
   if (p === '/gv/bpu/luot') return gvBpuLuot(env, b)
   if (p.startsWith('/gv/bpu/khoi-')) return (await import('./live-khoi')).gvLiveKhoi(env, p, b, Date.now(), ctx)
+  // Sổ «mời ra khỏi lớp» của buổi live (luật rời màn 13/11): văn phòng trực live đọc để nhắn Zalo phụ huynh. ĐỌC-CHỈ, một lệnh D1.
+  if (p === '/gv/bpu/moi-ra') return (await import('./live-moi-ra')).gvLiveMoiRa(env, b)
   return { ok: false, error: 'Không có lệnh này.' }
 }

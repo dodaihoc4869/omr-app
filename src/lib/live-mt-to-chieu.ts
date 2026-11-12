@@ -8,6 +8,19 @@ export const CSS_LIVE_MT = `
 .mc-mt-nut[aria-pressed="true"]{background:var(--mc-vang-noi);color:var(--mc-thanh2);box-shadow:0 0 0 calc(var(--n)*.16) color-mix(in srgb,var(--mc-vang-noi) 22%,transparent),0 0 calc(var(--n)*1.1) color-mix(in srgb,var(--mc-vang-noi) 45%,transparent)}
 body.mc .mc-thanh .mc-mt-nut:not([hidden])~.mc-nop-nut{margin-left:calc(var(--u)*.35)}
 body.mc .mc-thanh .mc-mt-nut:not([hidden])~.mc-td-them{margin-left:calc(var(--u)*.35)}
+body.mc.mc-che-bang .mc-khay-nhom.mc-khay-luat{display:flex}
+.mc-luat{display:flex;align-items:center;gap:calc(var(--u)*.6);width:100%;box-sizing:border-box;padding:calc(var(--u)*.55) calc(var(--u)*.7);border-radius:calc(var(--u)*.8);box-shadow:inset 0 0 0 1.5px var(--mc-bang-vien);color:var(--mc-bang-chu)}
+.mc-luat.mc-bat{background:color-mix(in srgb,var(--mc-do) 12%,transparent);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--mc-do) 60%,transparent)}
+.mc-luat-ten{flex:1;min-width:0}
+.mc-luat-ten b{display:block;font:800 calc(var(--u)*.95)/1.2 var(--mc-sans)}
+.mc-luat-ten small{display:block;margin-top:calc(var(--u)*.15);font:600 calc(var(--u)*.74)/1.3 var(--mc-sans);color:var(--mc-bang-phu)}
+.mc-luat-buoc{flex:none;display:flex;align-items:center;gap:calc(var(--u)*.25);font:800 calc(var(--u)*.95)/1 var(--mc-sans)}
+.mc-luat-buoc output{min-width:calc(var(--u)*3);text-align:center}
+.mc-luat-buoc button{width:calc(var(--u)*1.9);height:calc(var(--u)*1.9);padding:0;border:0;border-radius:calc(var(--u)*.55);background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);font:inherit;cursor:pointer}
+.mc-luat-cong{position:relative;flex:none;width:calc(var(--u)*3.3);height:calc(var(--u)*1.9);padding:0;border:0;border-radius:999px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);cursor:pointer}
+.mc-luat-cong::after{content:"";position:absolute;left:calc(var(--u)*.2);top:calc(var(--u)*.2);width:calc(var(--u)*1.5);height:calc(var(--u)*1.5);border-radius:50%;background:var(--mc-bang-phu);transition:transform .15s}
+.mc-luat-cong[aria-checked="true"]{background:var(--mc-do);box-shadow:none}
+.mc-luat-cong[aria-checked="true"]::after{transform:translateX(calc(var(--u)*1.4));background:var(--mc-bang-chu)}
 `
 export const JS_LIVE_MT = `
   var MT = { nut: null, mo: false, thu: 0 };
@@ -24,10 +37,37 @@ export const JS_LIVE_MT = `
     n.addEventListener('click', function () { lvGui('lk', { v: 'mt' }); });
     return n;
   }
+  // LUẬT «RỜI MÀN N LẦN ⇒ BỊ MỜI RA» (thầy 13/11, bản vẽ 48): một hàng trong khay nút bốn ô — công tắc bật / tắt + nút − / + chỉnh số lần (1–9).
+  // Bấm ⇒ báo app (việc lk, v = 'luat:<0|1>:<số lần>') ⇒ app gửi phòng; phòng đổi ⇒ app báo lại bằng lệnh live-luat.
+  var LU = { g: null, bat: false, n: 3 };
+  function luVe() {
+    var k = document.getElementById('mc-khay'), g = LU.g, lk, c;
+    if (!k || !(LV.tt && LV.tt.khoi)) return;
+    if (!g) {
+      g = LU.g = document.createElement('div'); g.className = 'mc-khay-nhom mc-khay-luat'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Luật của buổi');
+      g.innerHTML = '<span class="mc-khay-ten" aria-hidden="true">Luật của buổi</span><div class="mc-luat"><span class="mc-luat-ten"><b>Rời màn bị mời ra</b><small>Em rời app đủ số lần thì ra khỏi lớp, xin vào lại phải chờ thầy duyệt</small></span>'
+        + '<span class="mc-luat-buoc"><button type="button" data-lu="-" aria-label="Giảm số lần">−</button><output></output><button type="button" data-lu="+" aria-label="Tăng số lần">+</button></span><button type="button" class="mc-luat-cong" data-lu="bat" role="switch"></button></div>';
+      g.addEventListener('click', function (e) {
+        var n = e.target.closest ? e.target.closest('[data-lu]') : null, v = n ? n.getAttribute('data-lu') : '';
+        e.stopPropagation(); // khay không tự đóng khi thầy đang chỉnh số lần / gạt công tắc
+        if (!v) return;
+        if (v === 'bat') LU.bat = !LU.bat; else LU.n = Math.max(1, Math.min(9, LU.n + (v === '+' ? 1 : -1)));
+        luVe(); lvGui('lk', { v: 'luat:' + (LU.bat ? 1 : 0) + ':' + LU.n });
+      });
+      lk = k.querySelector('.mc-khay-lk');
+      if (lk && lk.nextSibling) k.insertBefore(g, lk.nextSibling); else if (lk) k.appendChild(g); else k.insertBefore(g, k.firstChild);
+    }
+    g.querySelector('output').textContent = LU.n + ' lần';
+    c = g.querySelector('.mc-luat-cong'); c.setAttribute('aria-checked', LU.bat ? 'true' : 'false'); c.setAttribute('aria-label', LU.bat ? 'Tắt luật rời màn' : 'Bật luật rời màn');
+    g.querySelector('.mc-luat').className = 'mc-luat' + (LU.bat ? ' mc-bat' : '');
+  }
+  // khay được dựng / mở muộn ⇒ mỗi lần khay mở thì soát lại hàng luật
+  if (window.MutationObserver) new MutationObserver(function () { if (document.body.classList.contains('mc-khay-mo')) luVe(); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   window.addEventListener('message', function (e) {
     var m = e.data, n;
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
-    if (m.lenh === 'live-tt') { setTimeout(mtNut, 0); return; }
+    if (m.lenh === 'live-tt') { setTimeout(mtNut, 0); setTimeout(luVe, 0); return; }
+    if (m.lenh === 'live-luat') { LU.bat = m.bat === true; if (LU.bat && +m.n) LU.n = +m.n; luVe(); return; }
     if (m.lenh !== 'live-mt') return;
     MT.mo = m.mo === true; n = mtNut(); if (n) n.setAttribute('aria-pressed', MT.mo ? 'true' : 'false');
   });

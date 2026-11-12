@@ -135,6 +135,13 @@ const anh = () => ({ trang: ma(guong.khoa), tiLe: guong.tiLe, net: guong.net })
 const mauDoi = (d: number): string => { try { return getComputedStyle(document.documentElement).getPropertyValue(DOI_BPU[d]?.mau ?? '').trim() } catch { return '' } }
 // NÚT ỐNG NGHIỆM «AI ĐÃ NỘP» (thầy 12/11, bản vẽ 19–22): chỉ ở buổi live theo khối đang «Học» và đang có câu ⇒ gửi tờ danh sách đã nộp (nhanh nhất trước:
 // sbd, tên, màu đội, kết quả, giây, đáp án) + em có mặt chưa nộp. Chỉ gửi khi khác lần trước. Tờ vẽ: src/lib/live-nop-to-chieu.ts. Không đi qua phòng ⇒ máy em không nhận.
+// LUẬT RỜI MÀN (13/11): phòng đang bật luật hay không + số lần ⇒ lệnh `live-luat` xuống tờ để hàng «Luật» trong nút bốn ô hiện đúng. Chỉ gửi khi đổi.
+let luatCu = ''
+function guiLuat(): void {
+  if (!view?.live?.khoi) return
+  const u = (view as { luat?: { bat: boolean; n: number } | null }).luat ?? null, bat = !!u?.bat, k = bat ? `1:${u!.n}` : '0'
+  if (k !== luatCu) { luatCu = k; guiTo({ lenh: 'live-luat', bat, n: bat ? u!.n : 0 }) }
+}
 let nopCu = ''
 function guiNop(): void {
   const l = view?.luot, kh = view?.live?.khoi
@@ -349,11 +356,11 @@ function huy(): void {
 function nghe(): void {
   if (daNghe) return
   daNghe = true
-  for (const t of ['bpu-hd-tren', 'bpu-hd', 'bpu-to']) window.addEventListener(t, () => { setTimeout(() => { bao(); guiNop() }, 0); setTimeout(bao, 350) })
+  for (const t of ['bpu-hd-tren', 'bpu-hd', 'bpu-to']) window.addEventListener(t, () => { setTimeout(() => { bao(); guiNop(); guiLuat() }, 0); setTimeout(bao, 350) })
   ngheTin((tin) => {
     if (tin && typeof tin === 'object' && !(tin instanceof ArrayBuffer)) {
       const m = tin as { t?: string }
-      if (m.t === 'bang') { view = tin as ViewBang; void dam(); guiNop() }
+      if (m.t === 'bang') { view = tin as ViewBang; void dam(); guiNop(); guiLuat() }
       lt?.nhanTinPhong(tin)
       if (m.t === 'bang' || m.t === 'live-xem' || m.t === 'live-kq' || m.t === 'live-do') bao()
     }
@@ -452,7 +459,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
   if (view?.live?.khoi && nguon) { const tr = toTren(); if (tr && tr !== nguon) return } // tờ đang bị che: không cho chen vào gương bảng
   if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false; if (view?.live?.khoi && m.viec !== 'chao') guiTo({ lenh: 'live-anh' }) }
   switch (m.viec) {
-    case 'chao': bangSan = false; nopCu = ''; bao(); guiNop(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); if (mtMo) guiTo({ lenh: 'live-mt', mo: true }); break
+    case 'chao': bangSan = false; nopCu = ''; luatCu = ''; bao(); guiNop(); guiLuat(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); if (mtMo) guiTo({ lenh: 'live-mt', mo: true }); break
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
     case 'bang-xin': { const co = !!bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length > 0; bangSan = true; guiTo({ lenh: 'live-bang-nhap', goi: co ? bangLuu!.goi : { v: 1, tiLe: 0, net: [] } }); if (!co) giuBang(true); break }
     case 'bam': bam(); break

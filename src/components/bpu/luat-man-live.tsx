@@ -71,3 +71,10 @@ export function manEmXa(dangLive: boolean, duocXem: boolean, onDong: () => void)
     dangLive ? null : <button type="button" className="bpu-nut phu" onClick={onDong}>Đóng</button>,
   ]
 }
+
+/** LUẬT RỜI MÀN (13/11): em bị mời ra thì màn phủ che nút «Quay lại lượt đang làm»; thầy vừa DUYỆT / «Cho vào lại» (`ra` true → false) ⇒ tự bỏ màn
+ *  «em vừa rời» để em vào thẳng lại live, không phải bấm thêm. Trạng thái suy ra lúc vẽ (không setState trong effect). */
+export function useVaoLai(ra: boolean, datVuaRoi: (v: boolean) => void): void {
+  const [cu, setCu] = useState(ra)
+  if (ra !== cu) { setCu(ra); if (!ra) datVuaRoi(false) }
+}

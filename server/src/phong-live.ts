@@ -11,6 +11,7 @@
 import type { DurableObjectState, WsMayChu } from './kieu'
 import type { TrangThaiPhong } from '../../src/lib/bpu/phong'
 import * as LL from '../../src/lib/bpu/phong-live'
+import * as LU from '../../src/lib/bpu/phong-luat'
 import { sachTieng, type SoTieng } from '../../src/lib/live/so-tieng'
 
 type Row = Record<string, unknown>
@@ -230,6 +231,7 @@ export class LiveMay {
       else if (t === 'live-dat') {
         const xaTruoc = l.xa
         doi = LL.liveDat(st, { xa: j.xa, tiengLop: j.tiengLop, bang: j.bang, giay: j.giay, nghi: j.nghi, khoi: j.khoi }, nay)
+        if (j.luat !== undefined && LU.datLuat(st, j.luat, nay)) doi = true // luật «rời màn N lần ⇒ mời ra» (13/11)
         if (l.xa && !xaTruoc) this.goiXa(st, nay) // vừa bật «Cho em ở xa vào xem» ⇒ gọi máy các em ở xa
       }
       else if (t === 'live-ghi') doi = !!this.chu.xl?.tinGhi(st, j, nay)
@@ -238,6 +240,7 @@ export class LiveMay {
       else if (t === 'live-thu-mic') doi = LL.liveThu(st, nay, typeof j.sbd === 'string' && j.sbd ? j.sbd : undefined)
       else if (t === 'live-moi') doi = LL.liveMoi(st, String(j.sbd ?? ''), nay)
       else if (t === 'live-ha-tay') doi = LL.liveHaTay(st, nay, typeof j.sbd === 'string' && j.sbd ? j.sbd : undefined)
+      else if (t === 'live-luat-duyet') doi = LU.luatDuyet(st, String(j.sbd ?? ''), j.ok === true, nay) // thầy «Duyệt» / «Từ chối» em xin vào lại
       else if (t === 'live-nhip') {
         LL.liveNhip(st, nay)
         if (l.bat && l.xa && nay - this.lucGoiXa > NHIP_GOI_XA_MS) this.goiXa(st, nay)
@@ -248,6 +251,7 @@ export class LiveMay {
       return true
     }
     if (!a.s) return true
+    if (t === 'live-luat-xin') { if (LU.luatXin(st, a.s, nay)) { await this.chu.luu(false); this.chu.phat() } return true } // em bị mời ra bấm «Xin vào lại»
     if (t === 'live-bu') { await this.guiBu(st, ws, j.net); return true }
     // Em tự tắt mic (bấm «Xong, tắt mic», mất quyền mic): chỉ gỡ được mic / lời mời của CHÍNH mình.
     if (t === 'live-mic-tat') { if (LL.liveEmTatMic(st, a.s, nay)) { await this.chu.luu(false); this.chu.phat() } return true }

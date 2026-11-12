@@ -4,6 +4,7 @@
 // BẤT BIẾN AN TOÀN: `viewEm` không bao giờ mang đáp án (`dung`) khi lượt chưa mở đáp án — test tests/bpu-phong-0611.test.ts khoá.
 // Điểm trong buổi là «kJ» (năng lượng) — KHÔNG phải «tinh thể» (tinh thể là phần thưởng tích luỹ sẵn có của app học sinh).
 import { laEmXaDangLive, liveKhiGoi, liveKhiLuotMoi, liveKhiRoi, liveTat, liveThuMic, viewLiveBang, viewLiveEm, type LivePhong } from './phong-live'
+import { biMoiRa, luatKhiRoi, viewLuatBang, viewLuatEm } from './phong-luat'
 
 export type PhanCau = 'I' | 'II' | 'III'
 export type PhaLuot = 'tra-loi' | 'goi' | 'lam-bang' | 'mo'
@@ -341,7 +342,7 @@ function ghiKieuRoi(st: TrangThaiPhong, sbd: string, kieu: KieuRoi | null | unde
 export function roiMan(st: TrangThaiPhong, sbd: string, nay: number, kieu?: KieuRoi | null): boolean {
   const e = em(st, sbd)
   // 09/11 (lần 3): rời màn tính MỌI LÚC trong buổi (cả lúc chờ giữa lượt, sau mở đáp án) — em chỉ thoát khi thầy kết thúc buổi.
-  if (!e || st.ketThuc) return false
+  if (!e || st.ketThuc || biMoiRa(st, sbd)) return false // em đã bị mời ra (luật rời màn): không đếm thêm
   // PHÒNG CHỜ live theo khối (thầy 12/11 tối «bỏ luôn cảnh báo lúc học sinh đang chơi game trong phòng chờ, bắt đầu vào live bảng hoặc học mới bật cảnh báo»):
   // chỉ NHỚ em đang ở ngoài (để lúc bắt đầu live em còn ở ngoài thì tên mới hiện) — không đếm lần rời, không trừ kJ, không biến động, bảng không báo.
   if (st.live?.khoi?.gd === 'cho') {
@@ -354,6 +355,7 @@ export function roiMan(st: TrangThaiPhong, sbd: string, nay: number, kieu?: Kieu
     if (!laEmXaDangLive(st, sbd)) return false
     e.roi += 1
     liveKhiRoi(st, sbd, nay); ghiKieuRoi(st, sbd, kieu)
+    if (!st.roiNay?.includes(sbd)) luatKhiRoi(st, sbd, nay)
     st.roiNay = [...(st.roiNay ?? []).filter((s) => s !== sbd), sbd]
     st.capNhat = nay
     return true
@@ -366,6 +368,7 @@ export function roiMan(st: TrangThaiPhong, sbd: string, nay: number, kieu?: Kieu
     const kjEm = congEm(e, -KJ.roiMan)
     st.doiThuong[e.doi] = (st.doiThuong[e.doi] ?? 0) - KJ.roiMan
     ghiBienDong(st, [{ sbd, doi: e.doi, kjEm, kjDoi: -KJ.roiMan, lyDo: 'Rời màn hình' }], nay)
+    luatKhiRoi(st, sbd, nay) // luật «rời N lần ⇒ mời ra» (phong-luat.ts): chỉ đếm LẦN RỜI MỚI
   }
   st.roiNay = [...(st.roiNay ?? []).filter((s) => s !== sbd), sbd]
   st.capNhat = nay
@@ -521,6 +524,7 @@ export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: st
     buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, soDoi: soDoiCua(st), vuaVao: st.vuaVao, lichSu: st.lichSu,
     /** Em đang ở ngoài app trong lượt chưa mở đáp án (thầy 09/11) — bảng vẽ viền đỏ nhấp nháy + thẻ tên khi mảng khác rỗng. */
     roiNay: st.live?.khoi?.gd === 'cho' ? [] : st.roiNay ?? [], // phòng chờ live khối: chưa báo rời màn (12/11)
+    ...(st.live?.luat || st.live?.camLive ? { luat: viewLuatBang(st) } : {}),
     /** Kiểu rời của từng em đang rời (máy em báo; em báo bằng bản cũ ⇒ không có). */
     roiKieu: st.roiKieu ?? {},
     /** Biến động kJ mới nhất (thầy 09/11): mỗi `id` mới ⇒ số kJ bay vào ống đội + lý do. */
@@ -554,7 +558,7 @@ export function viewEm(st: TrangThaiPhong, sbd: string) {
     /** LIVE BẢNG (10/11): thầy có đang live không, phiên SFU để kéo tiếng, tiếng mặc định bật / tắt. KHÔNG mang gì về đáp án. Công tắc tắt ⇒ null. */
     live: viewLiveEm(st, sbd),
     // `dangRoi` (10/11): phòng CÒN ghi em «đang rời» ⇒ máy em đã về mà cờ này còn bật thì gửi lại `ve` (tin `ve` trước có thể mất trong kết nối chết).
-    em: e ? { sbd: e.sbd, ten: e.ten, doi: d, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, roi: e.roi, dangRoi: !!st.roiNay?.includes(e.sbd), hang, soEm: xep.length } : null,
+    em: e ? { sbd: e.sbd, ten: e.ten, doi: d, vao: e.vao, luc: e.luc, kj: e.kj, dungSo: e.dungSo, roi: e.roi, dangRoi: !!st.roiNay?.includes(e.sbd), hang, soEm: xep.length, ...(st.live?.luat || st.live?.camLive ? { luat: viewLuatEm(st, e.sbd) } : {}) } : null,
     doi: { so: st.ds.filter((x) => x.doi === d && x.vao).length, tong: st.ds.filter((x) => x.doi === d).length, kj: diemDoi(st, d) },
     /** Biến động kJ của CHÍNH em (5 mục mới nhất, `id` tăng dần) — máy em hiện thẻ nhỏ bay lên khi có `id` mới. */
     bienDongEm: (st.bienDong ?? []).filter((x) => x.sbd === sbd).slice(-5),

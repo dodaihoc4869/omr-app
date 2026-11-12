@@ -5,6 +5,8 @@
 // VAI: quyết định bằng VÉ (HMAC tiền tố riêng `bpu|`): vé thầy chỉ phát ở `/gv/bpu/mo` (sau chốt mã bí mật), vé em ở `/hs/bpu/ve` (token em). Cửa WebSocket
 // `/bpu/phong?ve=` nằm NGOÀI `/hs/` (như `/dau-ion/`), Worker kiểm vé rồi mới chuyển vào phòng ⇒ em không thể nhận vai thầy.
 // D1: mở phòng 1 đợt chờ (batch ∥ năng lực chia đội), mỗi lượt đọc câu + kiểm câu bảo vệ song song, KẾT THÚC buổi 1 batch ghi `bpu_luot` (bảng tạo lười). Công tắc: `TAT_BPU`.
+import { ghiMoiRa } from './live-moi-ra'
+import { layChoGhiLuat } from '../../src/lib/bpu/phong-luat'
 import type { DurableObjectState, Env, WsMayChu } from './kieu'
 import * as L from '../../src/lib/bpu/phong'
 import { grade, type PrivateQuestion } from '../../src/game/than-thu-v2/core'
@@ -308,6 +310,9 @@ export class PhongBinhPhanUng {
    *  Việc của em (gửi, rời màn, tiếp sức) KHÔNG kéo dài phòng. */
   private async luu(henNghi = true): Promise<void> {
     if (!this.st) return
+    // Luật rời màn (13/11): việc mời ra / từ chối / cho vào lại ⇒ ghi sổ cho văn phòng trực live đọc; ngoài đường nóng, không chờ D1.
+    const sk = layChoGhiLuat(this.st)
+    if (sk.length) { const st = this.st; this.ctx.waitUntil(ghiMoiRa(this.env, { buoiId: st.buoiId, phong: st.lop, khoi: st.live?.khoi?.k ?? 0, ten: (s) => st.ds.find((e) => e.sbd === s)?.ten ?? s }, sk).catch((e) => console.error('[bpu] ghi sổ mời ra lỗi:', e instanceof Error ? e.message : e))) }
     await this.ctx.storage.put('st', this.st)
     if (henNghi && !this.st.ketThuc) await this.ctx.storage.setAlarm(this.st.luot && this.st.luot.pha !== 'mo' ? mocTuMo(this.st.luot) : Date.now() + NGHI_MS)
   }
