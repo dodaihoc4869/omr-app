@@ -1,7 +1,7 @@
 import type { Env } from '../server/src/kieu'
 import { execFileSync } from 'node:child_process'
 import { dongBoGoi7, SQL_LUOT_GOI7, duNguonGoi7, mang7, sqlTenLopHs } from '../server/src/goi-bai-7'
-import { SQL_TE7, sqlEmDangNhan7Te } from '../server/src/goi-bai-7-quyen'
+import { sqlEmDangNhan7 } from '../server/src/goi-bai-7-quyen'
 import { sqlChotQuotaNgay7, SQL_QUOTA0_NGAY7, SQL_CHUA_NHAN7 } from '../server/src/goi-bai-7-em-nhan'
 import { ngayVn7 } from '../server/src/goi-bai-7-loi'
 import { phanLai0911 } from './phan-lai-0911'
@@ -44,8 +44,8 @@ console.log(JSON.stringify(await phanLai0911(env as unknown as Env,now)))
 // 12/11 (đo D1 thật: 72 lượt × ~317 nghìn dòng): câu ở goi-bai-7-em-nhan.ts — bỏ cặp (gói, em) đã có dòng hôm nay trước khi đếm câu, danh sách tick bung một lần.
 await db.prepare(sqlChotQuotaNgay7(SQL_LUOT_GOI7)).bind(ngay).run()
 await db.prepare(SQL_QUOTA0_NGAY7).bind(ngay).run()
-const stats=(await query(`WITH ${SQL_TE7}, goi AS (SELECT g.* FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL),
-  em AS (SELECT e.goi_id,e.sbd FROM goi_bai_7_em e JOIN goi g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop WHERE ${sqlEmDangNhan7Te('e','g','h')})
+const stats=(await query(`WITH goi AS (SELECT g.* FROM goi_bai_7 g JOIN bai_da_day b ON b.id=g.tick_id AND b.bo_tick_luc IS NULL),
+  em AS (SELECT e.goi_id,e.sbd FROM goi_bai_7_em e JOIN goi g ON g.id=e.goi_id JOIN hoc_sinh h ON h.sbd=e.sbd AND ${sqlTenLopHs('h')}=g.lop WHERE ${sqlEmDangNhan7('e','g','h')})
   SELECT (SELECT COUNT(*) FROM goi) soGoi,(SELECT COUNT(DISTINCT sbd) FROM em) soEm,
     (SELECT COUNT(DISTINCT sbd) FROM goi_bai_7_em) soEmDaTungNhan,
     (SELECT COUNT(*) FROM goi_bai_7_cau c JOIN goi g ON g.id=c.goi_id) soCau,
