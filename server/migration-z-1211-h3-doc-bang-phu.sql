@@ -14,3 +14,7 @@ CREATE INDEX IF NOT EXISTS nkc_em_chua_kp ON nam_kt_cau(sbd, trang_thai) WHERE t
 -- (Q7) Tổng EXP mùa của em (server/src/exp-d1.ts lenhTongSo, điều kiện CAS dieuKienTongSo, docTongSoSom) + nhánh EXP dòng thời gian em (gv-hom-nay-v2.ts):
 -- đo 24h 7.429 lượt × ~1.449 hàng — trước đọc mọi dòng của em qua (sbd, ngay_vn) rồi tra bảng. Chỉ mục PHỦ: chỉ đọc dòng từ đầu mùa, không chạm bảng.
 CREATE INDEX IF NOT EXISTS exp_so_em_luc ON exp_so(sbd, luc, exp, ngay_vn);
+-- (Q8) Dòng thời gian em ở màn thầy (server/src/gv-hom-nay-v2.ts DONG_THOI_GIAN): đo 24h 1.308 lượt × ~6.494 hàng — nhánh sổ học đọc mọi dòng su_kien_hoc của em
+-- qua chỉ mục rồi tra bảng. Chỉ mục PHỦ BỘ PHẬN: GROUP BY theo thứ tự chỉ mục, không chạm bảng. Điều kiện `nguon NOT IN ('thi','len_bang')` chỉ câu này có ⇒ câu khác
+-- trên su_kien_hoc không đổi kế hoạch. Ghi thêm: một dòng chỉ mục cho mỗi dòng sổ học (trừ thi / lên bảng).
+CREATE INDEX IF NOT EXISTS skh_em_dong_tg ON su_kien_hoc(sbd, nguon, ma_nguon, ngay_vn, luc, ket_qua, giay) WHERE nguon NOT IN ('thi','len_bang');

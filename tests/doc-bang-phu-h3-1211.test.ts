@@ -9,6 +9,7 @@ import { SQL_KT_CN } from '../server/src/kiem-tra-ca-nhan-schema'
 import { ngayKt, congNgayKt, dauNgayKt } from '../server/src/kiem-tra-ca-nhan-loi'
 import { sqlTenLopHs } from '../server/src/goi-bai-7'
 import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
+import { DONG_THOI_GIAN } from '../server/src/gv-hom-nay-v2'
 import { SQL_SAN_SANG, BANG_SAN_SANG, SQL_SAN_SANG_LECH } from '../server/src/san-sang'
 
 const NGAY = 86_400_000
@@ -283,6 +284,37 @@ describe('Q1 lập sẵn Sảnh: «gói mới» đi từ gói tạo sau lúc l�
     expect(ke.some((x) => /SEARCH g2 USING (COVERING )?INDEX goi_bai_7_tao \(tao_luc>\?\)/.test(x))).toBe(true)
     expect(ke.some((x) => /SEARCH e2 USING COVERING INDEX sqlite_autoindex_goi_bai_7_em_1 \(goi_id=\? AND sbd=\?\)/.test(x))).toBe(true)
     expect(ke.join('\n')).not.toMatch(/goi_bai_7_em_sbd/)
+  })
+})
+
+// ------------------------------------------------------------------ Q8 · dòng thời gian em ở màn thầy (gv-hom-nay-v2.ts)
+describe('Q8 dòng thời gian em: chỉ mục phủ bộ phận sổ học + chỉ mục phủ EXP', () => {
+  const ngoai = (cb: boolean) => `SELECT * FROM (${DONG_THOI_GIAN(cb)}) WHERE luc IS NOT NULL AND luc <> '' AND luc < ? AND loai IN (SELECT value FROM json_each(?)) ORDER BY luc DESC LIMIT 31`
+  it('có ↔ không chỉ mục mới: y hệt (mọi trang, mọi bộ lọc loại)', () => {
+    const d = taoD1That()
+    const sk = d.sql.prepare('INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,ket_qua,giay,luc,ngay_vn) VALUES(?,?,?,?,?,?,?,?,?)')
+    const NG = ['btvn', 'btvn_lo', 'on_lai', 'game', 'thi', 'len_bang', 'goi7', 'tu_luyen']
+    for (let i = 0; i < 300; i++) {
+      const j = (i * 71) % 300, ngay = `2026-11-${String(1 + (j % 11)).padStart(2, '0')}`
+      sk.run(`k${j}`, j % 5 === 0 ? 'E1' : 'E0', `q${j % 13}`, NG[j % NG.length], `m${j % 4}`, j % 3 === 0 ? null : j % 2, j % 6 ? j : null, `${ngay}T${String(j % 17).padStart(2, '0')}:00:00.000Z`, ngay)
+    }
+    const ex = d.sql.prepare('INSERT INTO exp_so(khoa,sbd,ngay_vn,loai,exp,luc) VALUES(?,?,?,?,?,?)')
+    for (let i = 0; i < 40; i++) ex.run(`x${i}`, 'E0', `2026-11-${String(1 + (i % 11)).padStart(2, '0')}`, 'cau', i % 5, `2026-11-${String(1 + (i % 11)).padStart(2, '0')}T05:00:00.000Z`)
+    const LOAI = [JSON.stringify(['ca', 'btvn', 'on_lai', 'bai_rieng', 'len_bang', 'game', 'exp', 'canh_bao']), JSON.stringify(['btvn', 'game']), JSON.stringify(['exp'])]
+    const chay = () => ['E0', 'E1', 'E9'].flatMap((s) => LOAI.flatMap((l) => ['9999-12-31T00:00:00.000Z', '2026-11-06T03:00:00.000Z'].flatMap((truoc) =>
+      [true, false].map((cb) => d.sql.prepare(ngoai(cb)).all(...[s, s, s, s, s, ...(cb ? [s] : [])], truoc, l)))))
+    const moi = chay()
+    const ke = keHoach(d.sql, ngoai(true))
+    expect(ke).toContain('SEARCH s USING COVERING INDEX skh_em_dong_tg (sbd=?)')
+    expect(ke).toContain('SEARCH exp_so USING COVERING INDEX exp_so_em_luc (sbd=?)')
+    d.sql.exec('DROP INDEX skh_em_dong_tg'); d.sql.exec('DROP INDEX exp_so_em_luc')
+    expect(moi).toEqual(chay())
+    expect(moi[0]!.length).toBe(31)
+  })
+  it('câu khác trên su_kien_hoc không dùng chỉ mục bộ phận mới', () => {
+    const d = taoD1That()
+    for (const q of ["SELECT nguon, ma_nguon, ngay_vn, luc FROM su_kien_hoc WHERE sbd = ? AND nguon = 'btvn'", 'SELECT nguon, ma_nguon, COUNT(*) FROM su_kien_hoc WHERE sbd = ? GROUP BY nguon, ma_nguon',
+      "SELECT qid FROM su_kien_hoc WHERE sbd = ? AND nguon <> 'thi'"]) expect(keHoach(d.sql, q).join('\n')).not.toMatch(/skh_em_dong_tg/)
   })
 })
 
