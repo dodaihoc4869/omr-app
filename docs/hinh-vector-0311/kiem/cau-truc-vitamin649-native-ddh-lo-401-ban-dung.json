@@ -1,0 +1,29 @@
+[
+  {
+    "i": 649,
+    "hash": "79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc",
+    "fileNguon": "anh/79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc.png",
+    "svg": "vitamin649-native-ddh-df9a8b6ee067b44315f0bea7608b45272e42a1eacc70f9f4ad6226d9766b0b6b.svg",
+    "hashSvg": "df9a8b6ee067b44315f0bea7608b45272e42a1eacc70f9f4ad6226d9766b0b6b",
+    "byteSvg": 14665,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-18",
+        "de": "Vitamin E acetate là một chất lỏng quánh, được thêm vào tinh dầu thuốc lá điện tử như một chất làm đặc. Khi bị nung nóng ở nhiệt độ cao, nó có thể phân hủy thành các chất gây tổn thương phổi, gây ra tình trạng viêm phổi nghiêm trọng, tổn thương phế nang, dẫn đến các triệu chứng như ho, khó thở, đau ngực, sốt và tử vong. Công thức cấu tạo của vitamin E acetate như hình.",
+        "refs": [
+          {
+            "hash": "79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc",
+            "where": "VIP27-CDK-ESTER-TN-II-18.hinh.0.du_lieu",
+            "hashDataUrl": "6f5afcd8a2acaa1d7904c6990984666fb928629c8d402211bbd8b436f0140280"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "31C3O=9ringC+3aromaticMethyl+1qMethyl+13sidePathC+3sideMethyl+2acetyl/2fusedsixRings1ringO1Ph3innerCCdouble/1CO2splitraysCONTACTrespectivearms/3OregularUPRIGHT/EXACTVitamin E acetateTRUEdamUPRIGHT/individualnonperiodicvertices-3rdsideMethylSHORTER/RIGHTblankto817KEEP/0H-stereo-arrow-charge/NOaddedformula-name-answer-alias",
+    "hashSvgDaSoat": "df9a8b6ee067b44315f0bea7608b45272e42a1eacc70f9f4ad6226d9766b0b6b",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

@@ -1,0 +1,966 @@
+{
+  "i": 649,
+  "assetIndexProvided": 1394,
+  "hash": "79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc.png",
+  "size": [
+    817,
+    202
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-CDK-ESTER-TN-II-18",
+      "de": "Vitamin E acetate là một chất lỏng quánh, được thêm vào tinh dầu thuốc lá điện tử như một chất làm đặc. Khi bị nung nóng ở nhiệt độ cao, nó có thể phân hủy thành các chất gây tổn thương phổi, gây ra tình trạng viêm phổi nghiêm trọng, tổn thương phế nang, dẫn đến các triệu chứng như ho, khó thở, đau ngực, sốt và tử vong. Công thức cấu tạo của vitamin E acetate như hình.",
+      "allHinh": [
+        {
+          "hash": "79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc",
+          "where": "VIP27-CDK-ESTER-TN-II-18.hinh.0.du_lieu",
+          "hashDataUrl": "6f5afcd8a2acaa1d7904c6990984666fb928629c8d402211bbd8b436f0140280"
+        }
+      ],
+      "missingHashes": [
+        "79320dd3c3a920ff011d982563295c862d2fe323de08367f6238ad80118e70cc"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "futureFullIfPassed": 1,
+    "onlyThisHinh": true
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownMacrosOpened": [
+      "/workspace/scratch/401-full3x.png",
+      "/workspace/scratch/401-rings5x.png",
+      "/workspace/scratch/401-co5x.png",
+      "/workspace/scratch/401-caption5x.png"
+    ],
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "geometry": {
+    "counts": {
+      "ringKnownC": 9,
+      "aromaticMethylC": 3,
+      "quaternaryMethylC": 1,
+      "sidePathNewCExcludingRingC": 13,
+      "sideMethylC": 3,
+      "acetylC": 2,
+      "totalC": 31,
+      "totalO": 3,
+      "aromaticDoubleRays": 3,
+      "CODoublePairs": 1,
+      "externalCCDouble": 0,
+      "solidWedges": 0,
+      "hashWedges": 0,
+      "explicitH": 0
+    },
+    "font": {
+      "chemical": "Regular upright sans O; no H/CH3 label added",
+      "caption": "TRUEBOLD UPRIGHT serif, exactVitamin E acetate"
+    },
+    "aromaticRing": {
+      "orderedVertices": [
+        [
+          109,
+          61.5
+        ],
+        [
+          142,
+          42.5
+        ],
+        [
+          175,
+          61.5
+        ],
+        [
+          175,
+          99.5
+        ],
+        [
+          142,
+          118.5
+        ],
+        [
+          109,
+          99.5
+        ]
+      ],
+      "innerRays": [
+        [
+          [
+            113,
+            65
+          ],
+          [
+            113,
+            97
+          ]
+        ],
+        [
+          [
+            142,
+            48
+          ],
+          [
+            171,
+            65
+          ]
+        ],
+        [
+          [
+            142,
+            114
+          ],
+          [
+            171,
+            97
+          ]
+        ]
+      ],
+      "methylBranches": [
+        [
+          [
+            142,
+            42.5
+          ],
+          [
+            142,
+            4
+          ]
+        ],
+        [
+          [
+            109,
+            99.5
+          ],
+          [
+            76,
+            118.5
+          ]
+        ],
+        [
+          [
+            142,
+            118.5
+          ],
+          [
+            142,
+            157
+          ]
+        ]
+      ]
+    },
+    "heteroRing": {
+      "orderedNodes": [
+        {
+          "kind": "Cshared",
+          "at": [
+            175,
+            62
+          ]
+        },
+        {
+          "kind": "C",
+          "at": [
+            208,
+            43
+          ]
+        },
+        {
+          "kind": "C",
+          "at": [
+            241,
+            62
+          ]
+        },
+        {
+          "kind": "C",
+          "at": [
+            241,
+            100
+          ]
+        },
+        {
+          "kind": "O",
+          "bboxApprox": [
+            202,
+            113,
+            214,
+            126
+          ]
+        },
+        {
+          "kind": "Cshared",
+          "at": [
+            175,
+            100
+          ]
+        }
+      ],
+      "bonds": [
+        [
+          [
+            175,
+            61.5
+          ],
+          [
+            208,
+            42.5
+          ],
+          [
+            241,
+            61.5
+          ],
+          [
+            241,
+            99.5
+          ],
+          [
+            217,
+            113.5
+          ]
+        ],
+        [
+          [
+            199,
+            113.5
+          ],
+          [
+            175,
+            99.5
+          ]
+        ]
+      ],
+      "qMethylBranch": [
+        [
+          241,
+          99.5
+        ],
+        [
+          265.5,
+          142
+        ]
+      ],
+      "warning": "No wedge at quaternaryjunction, downwarddiagonal methyl is ordinary thinbond."
+    },
+    "sideChain": {
+      "orderedVerticesIncludingInitialRingC": [
+        [
+          241,
+          99.5
+        ],
+        [
+          274,
+          118.5
+        ],
+        [
+          306.5,
+          99.5
+        ],
+        [
+          339.5,
+          118.5
+        ],
+        [
+          372.5,
+          99.5
+        ],
+        [
+          405.5,
+          118.5
+        ],
+        [
+          438.5,
+          99.5
+        ],
+        [
+          471.5,
+          118.5
+        ],
+        [
+          504.5,
+          99.5
+        ],
+        [
+          537.5,
+          118.5
+        ],
+        [
+          570.5,
+          99.5
+        ],
+        [
+          603.5,
+          118.5
+        ],
+        [
+          636.5,
+          99.5
+        ],
+        [
+          669.5,
+          118.5
+        ]
+      ],
+      "methylBranches": [
+        [
+          [
+            372.5,
+            99.5
+          ],
+          [
+            372.5,
+            50.5
+          ]
+        ],
+        [
+          [
+            504.5,
+            99.5
+          ],
+          [
+            504.5,
+            50.5
+          ]
+        ],
+        [
+          [
+            636.5,
+            99.5
+          ],
+          [
+            636.5,
+            61.5
+          ]
+        ]
+      ],
+      "nativeEnds": "Lastfreeendpoint670,119, no extrapolation to blankright817. Thirdmethyl shorterupwardthanfirsttwo, preserve native length."
+    },
+    "acetate": {
+      "methylEndpoint": [
+        10,
+        43
+      ],
+      "carbonylBareC": [
+        43,
+        62
+      ],
+      "leftArm": [
+        [
+          10,
+          43
+        ],
+        [
+          43,
+          62
+        ]
+      ],
+      "esterO": {
+        "bboxApprox": [
+          70,
+          37,
+          82,
+          50
+        ],
+        "leftArm": [
+          [
+            46,
+            60.5
+          ],
+          [
+            68,
+            47
+          ]
+        ],
+        "rightArm": [
+          [
+            84,
+            47
+          ],
+          [
+            109,
+            62
+          ]
+        ]
+      },
+      "carbonylRays": [
+        [
+          [
+            40.5,
+            60.5
+          ],
+          [
+            40.5,
+            91
+          ]
+        ],
+        [
+          [
+            45.5,
+            60.5
+          ],
+          [
+            45.5,
+            91
+          ]
+        ]
+      ],
+      "carbonylO": {
+        "bboxApprox": [
+          37,
+          94,
+          49,
+          107
+        ]
+      },
+      "footContact": "OwnCO5x: both upperfeet meet respectiveleft/rightarms atnativeV/smalljoin, no white disconnect. Keep glyph whitespace below rays.",
+      "rootBareC": [
+        43,
+        61.5
+      ],
+      "rootLeft": [
+        [
+          10,
+          42.5
+        ],
+        [
+          43,
+          61.5
+        ],
+        [
+          68,
+          47
+        ]
+      ],
+      "rootRight": [
+        [
+          84,
+          47
+        ],
+        [
+          109,
+          61.5
+        ]
+      ],
+      "rootRays": [
+        [
+          [
+            40.5,
+            60.06060606060606
+          ],
+          [
+            40.5,
+            91
+          ]
+        ],
+        [
+          [
+            45.5,
+            60.05
+          ],
+          [
+            45.5,
+            91
+          ]
+        ]
+      ]
+    },
+    "caption": {
+      "literal": "Vitamin E acetate",
+      "bboxApprox": [
+        253,
+        170,
+        427,
+        188
+      ],
+      "baselineApprox": 186
+    },
+    "nativeCanvas": "817×202 haslargeblankright; figureendsnear670,119, do not stretch figureto817. Topmethylx142y4 insideframe, no restore/crop issue inferred.",
+    "noAdded": [
+      "No molecularformula",
+      "No extra radical/charge",
+      "No stereobonds",
+      "No caption italicization",
+      "No hydrogens on barevertices"
+    ]
+  },
+  "measurementLimits": "Approxnativecenterlines ±1–2px; rings/CO/caption openedindependently. Sidevertexguides preserve observedup/downpositions and shorterthirdmethyl; no exactperiodicityclaim. Counts fromvisiblepaths not vitaminname.",
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootSourceAudit": {
+    "oldAgentGuides": {
+      "counts": {
+        "ringKnownC": 9,
+        "aromaticMethylC": 3,
+        "quaternaryMethylC": 1,
+        "sidePathNewCExcludingRingC": 13,
+        "sideMethylC": 3,
+        "acetylC": 2,
+        "totalC": 31,
+        "totalO": 3,
+        "aromaticDoubleRays": 3,
+        "CODoublePairs": 1,
+        "externalCCDouble": 0,
+        "solidWedges": 0,
+        "hashWedges": 0,
+        "explicitH": 0
+      },
+      "font": {
+        "chemical": "Regular upright sans O; no H/CH3 label added",
+        "caption": "TRUEBOLD UPRIGHT serif, exactVitamin E acetate"
+      },
+      "aromaticRing": {
+        "orderedVertices": [
+          [
+            109,
+            62
+          ],
+          [
+            142,
+            43
+          ],
+          [
+            175,
+            62
+          ],
+          [
+            175,
+            100
+          ],
+          [
+            142,
+            119
+          ],
+          [
+            109,
+            100
+          ]
+        ],
+        "innerRays": [
+          [
+            [
+              113,
+              65
+            ],
+            [
+              113,
+              97
+            ]
+          ],
+          [
+            [
+              142,
+              48
+            ],
+            [
+              171,
+              65
+            ]
+          ],
+          [
+            [
+              142,
+              114
+            ],
+            [
+              171,
+              97
+            ]
+          ]
+        ],
+        "methylBranches": [
+          [
+            [
+              142,
+              43
+            ],
+            [
+              142,
+              4
+            ]
+          ],
+          [
+            [
+              109,
+              100
+            ],
+            [
+              76,
+              119
+            ]
+          ],
+          [
+            [
+              142,
+              119
+            ],
+            [
+              142,
+              157
+            ]
+          ]
+        ]
+      },
+      "heteroRing": {
+        "orderedNodes": [
+          {
+            "kind": "Cshared",
+            "at": [
+              175,
+              62
+            ]
+          },
+          {
+            "kind": "C",
+            "at": [
+              208,
+              43
+            ]
+          },
+          {
+            "kind": "C",
+            "at": [
+              241,
+              62
+            ]
+          },
+          {
+            "kind": "C",
+            "at": [
+              241,
+              100
+            ]
+          },
+          {
+            "kind": "O",
+            "bboxApprox": [
+              202,
+              113,
+              214,
+              126
+            ]
+          },
+          {
+            "kind": "Cshared",
+            "at": [
+              175,
+              100
+            ]
+          }
+        ],
+        "bonds": [
+          [
+            [
+              175,
+              62
+            ],
+            [
+              208,
+              43
+            ]
+          ],
+          [
+            [
+              208,
+              43
+            ],
+            [
+              241,
+              62
+            ]
+          ],
+          [
+            [
+              241,
+              62
+            ],
+            [
+              241,
+              100
+            ]
+          ],
+          [
+            [
+              241,
+              100
+            ],
+            [
+              218,
+              114
+            ]
+          ],
+          [
+            [
+              200,
+              114
+            ],
+            [
+              175,
+              100
+            ]
+          ]
+        ],
+        "qMethylBranch": [
+          [
+            241,
+            100
+          ],
+          [
+            266,
+            142
+          ]
+        ],
+        "warning": "No wedge at quaternaryjunction, downwarddiagonal methyl is ordinary thinbond."
+      },
+      "sideChain": {
+        "orderedVerticesIncludingInitialRingC": [
+          [
+            241,
+            100
+          ],
+          [
+            274,
+            119
+          ],
+          [
+            307,
+            100
+          ],
+          [
+            340,
+            119
+          ],
+          [
+            373,
+            100
+          ],
+          [
+            406,
+            119
+          ],
+          [
+            439,
+            100
+          ],
+          [
+            472,
+            119
+          ],
+          [
+            505,
+            100
+          ],
+          [
+            538,
+            119
+          ],
+          [
+            571,
+            100
+          ],
+          [
+            604,
+            119
+          ],
+          [
+            637,
+            100
+          ],
+          [
+            670,
+            119
+          ]
+        ],
+        "methylBranches": [
+          [
+            [
+              373,
+              100
+            ],
+            [
+              373,
+              51
+            ]
+          ],
+          [
+            [
+              505,
+              100
+            ],
+            [
+              505,
+              51
+            ]
+          ],
+          [
+            [
+              637,
+              100
+            ],
+            [
+              637,
+              62
+            ]
+          ]
+        ],
+        "nativeEnds": "Lastfreeendpoint670,119, no extrapolation to blankright817. Thirdmethyl shorterupwardthanfirsttwo, preserve native length."
+      },
+      "acetate": {
+        "methylEndpoint": [
+          10,
+          43
+        ],
+        "carbonylBareC": [
+          43,
+          62
+        ],
+        "leftArm": [
+          [
+            10,
+            43
+          ],
+          [
+            43,
+            62
+          ]
+        ],
+        "esterO": {
+          "bboxApprox": [
+            70,
+            37,
+            82,
+            50
+          ],
+          "leftArm": [
+            [
+              46,
+              60.5
+            ],
+            [
+              68,
+              47
+            ]
+          ],
+          "rightArm": [
+            [
+              84,
+              47
+            ],
+            [
+              109,
+              62
+            ]
+          ]
+        },
+        "carbonylRays": [
+          [
+            [
+              40.5,
+              60.5
+            ],
+            [
+              40.5,
+              91
+            ]
+          ],
+          [
+            [
+              45.5,
+              60.5
+            ],
+            [
+              45.5,
+              91
+            ]
+          ]
+        ],
+        "carbonylO": {
+          "bboxApprox": [
+            37,
+            94,
+            49,
+            107
+          ]
+        },
+        "footContact": "OwnCO5x: both upperfeet meet respectiveleft/rightarms atnativeV/smalljoin, no white disconnect. Keep glyph whitespace below rays."
+      },
+      "caption": {
+        "literal": "Vitamin E acetate",
+        "bboxApprox": [
+          253,
+          170,
+          427,
+          188
+        ],
+        "baselineApprox": 186
+      },
+      "nativeCanvas": "817×202 haslargeblankright; figureendsnear670,119, do not stretch figureto817. Topmethylx142y4 insideframe, no restore/crop issue inferred.",
+      "noAdded": [
+        "No molecularformula",
+        "No extra radical/charge",
+        "No stereobonds",
+        "No caption italicization",
+        "No hydrogens on barevertices"
+      ]
+    },
+    "rootCorrectionsBeforeBuilder": "Own FULL2x/rings4x/CO8x+native rows42/43/61/62/99/100/118/119: troughs118.5, crest99.5, separate individual sidevertices preserve halfpixel drift not repeat33px template. COfeet calculated from approx incoming arms, not native subpixel measured. Source-only correction before first builder; no SVG negative.",
+    "nativeRow118DarkRuns": [
+      [
+        273,
+        275
+      ],
+      [
+        338,
+        341
+      ],
+      [
+        404,
+        406
+      ],
+      [
+        470,
+        472
+      ],
+      [
+        536,
+        538
+      ],
+      [
+        602,
+        604
+      ],
+      [
+        668,
+        669
+      ]
+    ],
+    "nativeRow99DarkRuns": [
+      [
+        306,
+        307
+      ],
+      [
+        372,
+        373
+      ],
+      [
+        437,
+        439
+      ],
+      [
+        503,
+        505
+      ],
+      [
+        569,
+        571
+      ],
+      [
+        635,
+        637
+      ]
+    ]
+  }
+}
