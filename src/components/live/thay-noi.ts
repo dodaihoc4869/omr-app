@@ -151,7 +151,7 @@ function trangThai(): TtLiveTo {
   else if (micLoiThay?.khoa !== `${ml.sbd}:${ml.luc}`) { micLoiThay = { khoa: `${ml.sbd}:${ml.luc}`, luc: Date.now() }; clearTimeout(henMicLoi); henMicLoi = setTimeout(bao, 15_200) }
   const micLoi = ml && micLoiThay && Date.now() - micLoiThay.luc < 15_000 ? em(ml.sbd).ten : ''
   return {
-    co: !!l && (!!p || live) && (live || !!l.khoi), cheBang: live && l?.khoi?.che === 'bang', pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
+    co: !!l && (!!p || live) && (live || !!l.khoi), cheBang: l?.khoi?.che === 'bang', pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
     xem: ttLt?.xem ?? l?.xem ?? 0, nghe: ttLt?.xemNghe ?? l?.nghe ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
     coTieng: l?.tieng !== 'chua-cau-hinh', khongTieng: ttLt?.tieng === 'khong' || ttLt?.tieng === 'loi', micIm: !!ttLt?.micIm,
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,

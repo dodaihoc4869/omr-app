@@ -21,13 +21,14 @@ export type ViThoi = 'thay' | 'em' | 'moi-khac' | 'roi' | 'mat' | 'luot' | 'tat'
  *  (bảng số liệu, sơ đồ thí nghiệm…), `o` = các khối: [loại, thứ tự, x, y, rộng, cao, cỡ chữ × 10, cao dòng × 10, độ đậm / 100, x cuối chữ, y cuối chữ].
  *  Loại: 0 số câu · 1 tên phần · 2 đề · 3 chữ phương án · 4 ký hiệu phương án · 5 khung phương án · 6 dòng trả lời ngắn · 7 ảnh. Chỉ là SỐ ĐO — không chữ, không đáp án. */
 export interface GiayThay { k: string; w: number; h: number; la: boolean; o: number[][] }
-export interface KhoiPhong { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' }
+/** `che = 'sanh'` (thầy 12/11): thầy vừa bấm Bắt đầu, CHƯA chọn chế độ ⇒ máy em ở bảng danh sách bốn đội, đã nghe được thầy. */
+export interface KhoiPhong { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }
 /** Chuẩn hoá `khoi` máy thầy gửi; sai dạng ⇒ undefined (giữ cái đang có), null ⇒ gỡ. */
 export function chuanKhoi(v: unknown): KhoiPhong | null | undefined {
   if (v === null) return null
   const x = (v ?? null) as Record<string, unknown> | null, k = Number(x?.k)
   if (!x || typeof x !== 'object' || ![10, 11, 12].includes(k)) return undefined
-  return { k, gd: x.gd === 'dang' ? 'dang' : 'cho', che: x.che === 'bang' ? 'bang' : 'hoc' }
+  return { k, gd: x.gd === 'dang' ? 'dang' : 'cho', che: x.che === 'bang' ? 'bang' : x.che === 'sanh' ? 'sanh' : 'hoc' }
 }
 export interface LivePhong {
   /** Công tắc `cau_hinh.live_bang` (máy chủ nạp mỗi lần thầy mở phòng). Tắt ⇒ view không có khối `live`, mọi tin `live-*` bị bỏ. */

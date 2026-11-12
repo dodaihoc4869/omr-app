@@ -22,6 +22,6 @@ export function taiSanThay(): void {
   daThay = true
   ranh(() => {
     im(import('../bpu/gan-gv')); im(import('./thay-khoi')); im(import('./LopNoiThay')); im(import('./TroGiuLua'))
-    ranh(() => { im(import('./ChatThay')); im(import('./ManVinhDanh')); im(import('../bpu/ChonCauBpu')) })
+    ranh(() => { im(import('./ChatThay')); im(import('../bpu/ChonCauBpu')) })
   })
 }

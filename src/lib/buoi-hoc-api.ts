@@ -100,7 +100,7 @@ async function lenhBuoi(body: Record<string, unknown>): Promise<KetQuaLenh<Trang
 }
 
 /** Buổi LIVE THEO KHỐI (12/11): máy chủ đặt lớp «Live Khối N» ⇒ nút «Lên bảng» và tin tự động của tờ chiếu bỏ qua buổi này. */
-export const laBuoiLive = (b: { lop: string }): boolean => b.lop.startsWith('Live Khối ')
+export const laBuoiLive = (b: { lop?: string | null }): boolean => (b.lop ?? '').startsWith('Live Khối ')
 export const moBuoiHoc = (lop: string, ten = '') => lenhBuoi({ action: 'mo', lop, ten, kemLop: true })
 export const xemBuoiHoc = (id: string, kemLop = false) => lenhBuoi({ action: 'xem', id, kemLop })
 export const themEmBuoi = (id: string, sbd: string[]) => lenhBuoi({ action: 'them-em', id, sbd })

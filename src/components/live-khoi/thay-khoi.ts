@@ -6,7 +6,7 @@ import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { ViewBang } from '../../lib/bpu/phong'
 import { xongLiveKhoi } from '../../lib/live-khoi/api'
-import type { KenhLop, KhoiLive, LichLive, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
+import type { KenhLop, KhoiLive, LichLive, LoaiTinLop, TinLop } from '../../lib/live-khoi/kieu'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
 import './thay-khoi.css'
 
@@ -32,21 +32,17 @@ let view: ViewBang | null = null
 let dangMo: number | null = null
 let henMo: ReturnType<typeof setTimeout> | undefined
 export const layDangMo = (): number | null => dangMo
-let ketQua: { ds: NguoiLop[]; kj: number[] } | null = null
-export const layKetQua = () => ketQua
-/** Thầy đóng màn vinh danh. */
-export function dongVinhDanh(): void { ketQua = null; go() }
 export const layView = (): ViewBang | null => view
 const nghe = new Set<() => void>()
 const phatDoi = (): void => { for (const f of nghe) f() }
 function go(): void { goc?.unmount(); khung?.remove(); goc = null; khung = null }
-function datDangMo(k: number | null): void { clearTimeout(henMo); dangMo = k; if (k != null) henMo = setTimeout(() => { datDangMo(null); if (!view?.live?.khoi && !ketQua) go() }, 15_000); phatDoi() }
+function datDangMo(k: number | null): void { clearTimeout(henMo); dangMo = k; if (k != null) henMo = setTimeout(() => { datDangMo(null); if (!view?.live?.khoi) go() }, 15_000); phatDoi() }
 const tai = new Map<LoaiTinLop, Set<(t: TinLop) => void>>()
 export const kenh: KenhLop = {
   gui: (k, x) => layPhong()?.gui({ t: 'lop', k, x }),
   nghe: (k, f) => { let s = tai.get(k); if (!s) { s = new Set(); tai.set(k, s) } s.add(f); return () => { s.delete(f) } },
 }
-export const datKhoi = (k: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' }): void => layPhong()?.gui({ t: 'live-dat', khoi: k })
+export const datKhoi = (k: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }): void => layPhong()?.gui({ t: 'live-dat', khoi: k })
 /** Phòng vừa nối / vừa có bản xem: buổi của phiên mà phòng chưa mang cờ khối ⇒ đặt «phòng chờ». */
 function soat(): void {
   const l = view?.live, p = view ? phienCua(view.buoiId) : null
@@ -55,7 +51,7 @@ function soat(): void {
 function nhan(tin: unknown): void {
   const j = tin as { t?: string; k?: LoaiTinLop } | null
   if (!j || typeof j !== 'object' || tin instanceof ArrayBuffer) return
-  if (j.t === 'bang') { view = tin as ViewBang; soat(); if (view.live?.khoi && dangMo != null) datDangMo(null); gan(); phatDoi() }
+  if (j.t === 'bang') { view = tin as ViewBang; if (view.ketThuc) { go(); phatDoi(); return } soat(); if (view.live?.khoi && dangMo != null) datDangMo(null); gan(); phatDoi() }
   else if (j.t === 'lop' && j.k) for (const f of tai.get(j.k) ?? []) { try { f(tin as TinLop) } catch { /* nơi nghe lỗi */ } }
 }
 let daNghe = false
@@ -68,7 +64,7 @@ function batNghe(): void {
   if (b) nhan(b)
 }
 function gan(): void {
-  if (khung || (!view?.live?.khoi && !dangMo)) return
+  if (khung || view?.ketThuc || (!view?.live?.khoi && !dangMo)) return
   khung = document.createElement('div')
   khung.setAttribute('data-live-khoi-thay', '')
   document.body.appendChild(khung)
@@ -88,10 +84,9 @@ export async function moBangLiveKhoi(o: { lich: LichLive; buoiId: string; ma: st
 export function ngheBangKhoi(): void { batNghe() }
 /** Thầy kết thúc buổi học ⇒ đóng lịch live của khối (máy em tắt thẻ Live). */
 export function khiKetThucBuoi(buoiId: string): void {
-  const p = phienCua(buoiId), v = view
-  // Buổi live theo khối ⇒ giữ lớp nổi để vinh danh đội thắng (kJ chốt lấy từ bản xem cuối); thầy đóng thì gỡ.
-  const kjDoi = v ? [0, 1, 2, 3].map((d) => v.ds.reduce((s, e) => s + (e.vao && e.doi === d ? e.kj : 0), 0) + (v.doiThuong[d] ?? 0)) : []
-  if (v?.live?.khoi?.gd === 'dang' && v.buoiId === buoiId && khung && v.ds.some((e) => e.vao) && kjDoi.some((x) => x > 0)) { ketQua = { ds: v.ds.filter((e) => e.vao).map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, kj: e.kj })), kj: kjDoi }; phatDoi() } else go()
+  // Thầy 12/11: «bấm vào cái là kết thúc hẳn, out ra màn Hôm nay luôn» ⇒ máy thầy gỡ lớp nổi ngay (màn vinh danh chỉ hiện ở máy em).
+  const p = phienCua(buoiId)
+  go()
   view = null
   if (!p) return
   ghiPhien(null)

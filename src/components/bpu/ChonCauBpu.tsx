@@ -26,6 +26,8 @@ export interface PropsChonCau {
   buocDau?: 'hd' | 'cau' | false
   /** Kiểm tra đầu giờ / Chữa câu khó / Kiểm tra ôn tập ⇒ tấm buổi dạy. */
   onHoatDong?: (hd: 'dau-gio' | 'chua-cau' | 'on-tap') => void
+  /** LIVE THEO KHỐI (12/11): bảng chọn nằm trong buổi live (không có điểm danh, không có màn đua) ⇒ chữ nói theo buổi live. */
+  live?: boolean
   /** Kết thúc buổi học (trả câu báo lỗi, rỗng = xong). */
   onKetThuc?: () => Promise<string>
 }
@@ -34,8 +36,8 @@ export interface PropsChonCau {
 // Bảng chọn dùng ngoài gốc bảng chung (gan-gv không có phiên) ⇒ chỉ đóng bảng chọn.
 const raHomNay = (onDong: () => void) => { void import('./gan-gv').then((m) => { if (!m.escRaHomNay()) onDong() }, onDong) }
 /** Nút quay về: có lượt đang chiếu ⇒ «Về màn đua» (phím C — cùng phím mở bảng chọn); mở từ điểm danh ⇒ «Về điểm danh». */
-function NutVe({ ve, onDong }: { ve: 'dua' | 'dd'; onDong: () => void }) {
-  return <button type="button" className="bcc-dong bcc-ve" onClick={onDong}>{ve === 'dua' ? <><kbd>C</kbd>Về màn đua</> : 'Về điểm danh'}</button>
+function NutVe({ ve, onDong, live }: { ve: 'dua' | 'dd'; onDong: () => void; live?: boolean }) {
+  return <button type="button" className="bcc-dong bcc-ve" onClick={onDong}>{live ? 'Quay lại' : ve === 'dua' ? <><kbd>C</kbd>Về màn đua</> : 'Về điểm danh'}</button>
 }
 
 // «HÔM NAY LÀM GÌ?» (thầy 09/11 «cho nguyên hành trình dạy học vào chỗ chọn sau khi điểm danh xong tinh tế đẹp mắt hiệu quả»): bốn thẻ lớn trên bảng.
@@ -45,7 +47,7 @@ const HD: { id: 'day-hoc' | 'dau-gio' | 'chua-cau' | 'on-tap'; ten: string; mo: 
   { id: 'chua-cau', ten: 'Chữa câu khó & tính toán', mo: 'Câu nhiều em sai nhất và câu tính toán thầy chọn; mỗi câu gọi một em làm sai lên chữa.', Icon: Flame, phim: '3' },
   { id: 'on-tap', ten: 'Kiểm tra ôn tập', mo: 'Ngoài buổi dạy · lịch và đề dành riêng cho từng em.', Icon: CalendarCheck, phim: '4' },
 ]
-function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[number]['id']) => void; onDong: () => void; onKetThuc?: () => Promise<string> }) {
+function HomNayLamGi({ onChon, onDong, onKetThuc, live }: { onChon: (id: (typeof HD)[number]['id']) => void; onDong: () => void; onKetThuc?: () => Promise<string>; live?: boolean }) {
   const goc = useRef<HTMLDivElement>(null)
   // Kết thúc buổi — SỬA CÓ CHỦ ĐÍCH 10/11 (thầy «nút bấm kết thúc bấm 1 lần là kết thúc luôn nhé»): bấm MỘT lần ⇒ đóng buổi, bảng đóng, về Hôm nay.
   const [dangKt, setDangKt] = useState('')
@@ -60,8 +62,8 @@ function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[n
     <div className="bcc bcc-hd" role="dialog" aria-label="Hôm nay làm gì?" ref={goc}>
       <div className="bcc-dau">
         <h2>Hôm nay làm gì?</h2>
-        <p>Điểm danh xong. Chọn một hoạt động — xong quay lại chọn hoạt động khác.</p>
-        <NutVe ve="dd" onDong={onDong} />
+        <p>{live ? 'Chọn một hoạt động cho buổi live — xong quay lại chọn hoạt động khác.' : 'Điểm danh xong. Chọn một hoạt động — xong quay lại chọn hoạt động khác.'}</p>
+        <NutVe ve="dd" onDong={onDong} live={live} />
         <button type="button" className="bcc-dong" onClick={() => raHomNay(onDong)}><kbd>Esc</kbd>Đóng</button>
       </div>
       <div className="bcc-hd-luoi">
@@ -73,10 +75,11 @@ function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[n
         ))}
       </div>
       {onKetThuc ? (
-        <div className="bcc-ket-thuc">
-          <span>{dangKt && dangKt !== '…' ? dangKt : 'Xong cả buổi? Kết thúc để các em thoát Bình Phản Ứng.'}</span>
+        // Thầy 12/11: «bỏ dòng chữ đi, chỉ hiện nút kết thúc» ⇒ chỉ còn nút; dòng chữ chỉ hiện khi kết thúc bị lỗi.
+        <div className={`bcc-ket-thuc${dangKt && dangKt !== '…' ? '' : ' gon'}`}>
+          {dangKt && dangKt !== '…' ? <span role="alert">{dangKt}</span> : null}
           <button type="button" disabled={dangKt === '…'} onClick={() => void ketThuc()}>
-            <Power size={26} aria-hidden="true" />{dangKt === '…' ? 'Đang kết thúc…' : 'Kết thúc buổi học'}
+            <Power size={26} aria-hidden="true" />{dangKt === '…' ? 'Đang kết thúc…' : live ? 'Kết thúc live' : 'Kết thúc buổi học'}
           </button>
         </div>
       ) : null}
@@ -86,11 +89,11 @@ function HomNayLamGi({ onChon, onDong, onKetThuc }: { onChon: (id: (typeof HD)[n
 
 export default function ChonCauBpu(p: PropsChonCau) {
   const [buoc, setBuoc] = useState<'hd' | 'cau'>(p.buocDau === 'hd' && p.onHoatDong ? 'hd' : 'cau')
-  if (buoc === 'hd') return <HomNayLamGi onDong={p.onDong} onKetThuc={p.onKetThuc} onChon={(id) => { if (id === 'day-hoc') setBuoc('cau'); else p.onHoatDong?.(id) }} />
+  if (buoc === 'hd') return <HomNayLamGi live={p.live} onDong={p.onDong} onKetThuc={p.onKetThuc} onChon={(id) => { if (id === 'day-hoc') setBuoc('cau'); else p.onHoatDong?.(id) }} />
   return <ChonCau {...p} />
 }
 
-function ChonCau({ buoiId, lop, onChieu, onDong, buocDau }: PropsChonCau) {
+function ChonCau({ buoiId, lop, onChieu, onDong, buocDau, live }: PropsChonCau) {
   const veDua = buocDau === 'cau'
   // Phím C: về màn đua (bảng chọn mở từ màn đua). Gõ trong ô tìm thì thôi.
   useEffect(() => {
@@ -150,7 +153,7 @@ function ChonCau({ buoiId, lop, onChieu, onDong, buocDau }: PropsChonCau) {
       <div className="bcc-dau">
         <h2>Chọn câu chiếu</h2>
         <p>Bấm một câu: câu lên bảng, tự gửi xuống máy các em có mặt.</p>
-        <NutVe ve={veDua ? 'dua' : 'dd'} onDong={onDong} />
+        <NutVe ve={veDua ? 'dua' : 'dd'} onDong={onDong} live={live} />
         <button type="button" className="bcc-dong" onClick={() => raHomNay(onDong)}><kbd>Esc</kbd>Đóng</button>
       </div>
       <div className="bcc-trai">

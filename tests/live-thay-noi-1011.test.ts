@@ -78,7 +78,7 @@ describe('phần nối live của máy thầy', () => {
     const st = phong()
     st.live!.khoi = { k: 12, gd: 'dang', che: 'bang' }
     ws.nhan(viewBang(st)); await cho()
-    expect(ttCuoi()).toMatchObject({ co: true, cheBang: false })
+    expect(ttCuoi()).toMatchObject({ co: true, cheBang: true }) // bảng kín màn ngay cả khi chưa bật tiếng (thầy 12/11)
     liveSan(st, { san: true, ss: null }, T0); liveBat(st, T0 + 1); ws.nhan(viewBang(st)); await cho()
     expect(ttCuoi()).toMatchObject({ co: true, pha: 'live', cheBang: true })
   })

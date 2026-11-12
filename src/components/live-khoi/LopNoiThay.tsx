@@ -4,7 +4,7 @@ import { DOI_BPU, type ViewBang } from '../../lib/bpu/phong'
 import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
-import { dangKy, datKhoi, dongVinhDanh, kenh, layDangMo, layKetQua, layView, phienCua } from './thay-khoi'
+import { dangKy, datKhoi, kenh, layDangMo, layView, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
@@ -14,13 +14,11 @@ const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 /** Tờ đang mở là tờ BẢNG TRẮNG (chưa chọn bài) ⇒ sang «Học» thì mở chọn bài. */
 let toBangTrang = false
 const chuaCoTo = (): boolean => !document.querySelector('.lop-xem-phieu, [data-bpu-hd]')
-const ManVinhDanh = lazy(() => import('./ManVinhDanh'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 
 export default function LopNoiThay() {
   const v = useSyncExternalStore(dangKy, layView)
   const k = v?.live?.khoi ?? null
-  const kq = useSyncExternalStore(dangKy, layKetQua)
   const dangMo = useSyncExternalStore(dangKy, layDangMo)
   const [chat, setChat] = useState(false)
   // CHỌN BÀI của riêng buổi live (không qua màn điểm danh / màn đua của bảng): mở sẵn khi chưa có tờ giảng; thầy mở lại bằng nút «Chọn bài».
@@ -52,7 +50,6 @@ export default function LopNoiThay() {
     window.addEventListener('keydown', f, true)
     return () => window.removeEventListener('keydown', f, true)
   }, [k?.gd])
-  if (kq) return <div className="lkt" style={{ ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties}><Suspense fallback={null}><ManVinhDanh ds={kq.ds} kj={kq.kj} toi={null} onDong={dongVinhDanh} /></Suspense></div>
   if (!k && dangMo != null) return <div className="lkt" style={{ ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties}><div className="lkt-dang-mo" role="status">Đang mở phòng chờ Khối {dangMo}…</div></div>
   if (!v || !k || v.ketThuc) return null
   return (
@@ -78,14 +75,14 @@ export default function LopNoiThay() {
             <div className="lkt-chon"><div className="lkt-san-khau" style={{ ['--k' as string]: k1 }}>
               <div className="lkt-chon-dau"><i aria-hidden="true" />Live Khối {k.k}<small>{v.ds.filter((e) => e.vao).length} em trong phòng</small></div>
               <Suspense fallback={null}>
-                <ChonCauBpu buoiId={v.buoiId} lop={v.lop} buocDau="hd" onDong={() => setChon(false)}
+                <ChonCauBpu live buoiId={v.buoiId} lop={v.lop} buocDau="hd" onDong={() => setChon(false)}
                   onChieu={async (ds) => { const m = await import('../bpu/gan-gv'), l = await m.chieuCau(ds); if (!l) { toBangTrang = false; setChon(false) } return l }}
                   onHoatDong={(hd) => { toBangTrang = false; setChon(false); void import('../bpu/gan-gv').then((m) => m.moHoatDong(hd)) }}
                   onKetThuc={async () => (await import('../bpu/gan-gv')).ketThucBuoiHoc(v.buoiId)} />
               </Suspense>
             </div></div>
           ) : null}
-          {chat ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} onDong={() => setChat(false)} /></Suspense></div> : null}
+          {chat ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
         </>
       )}
     </div>
