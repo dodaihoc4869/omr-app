@@ -35,7 +35,7 @@ describe('rời màn lúc live', () => {
     expect((b.doiThuong as number[]).reduce((a, c) => a + c, 0)).toBe(doiTruoc - L.KJ.roiMan)
     expect(b.bienDong.at(-1)).toMatchObject({ sbd: 'S1', kjEm: -50, kjDoi: -50, lyDo: 'Rời màn hình' })
     expect(viewCuoi(e1).em.dangRoi).toBe(true)
-    expect(viewCuoi(e1).live.bat).toBe(true) // live vẫn chạy; máy em tự ngừng tiếng (thư viện `datRoiMan`)
+    expect(viewCuoi(e1).live.bat).toBe(true) // live vẫn chạy; máy em vẫn phát tiếng thầy (12/11), chỉ tắt mic (thư viện `datRoiMan`)
     await ph.gui(e1, { t: 'roi' }) // máy em báo trùng trước khi về
     b = viewCuoi(gv)
     expect(b.ds.find((x: { sbd: string }) => x.sbd === 'S1').kj).toBe(kjTruoc - L.KJ.roiMan)

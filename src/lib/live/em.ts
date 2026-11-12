@@ -3,7 +3,7 @@
 // (2) nối ngầm tới Cloudflare Realtime SFU khi phòng báo có phiên của thầy: kéo track tiếng (đệm jitter thấp nhất), mở kênh điểm đang viết;
 //     SFU chưa cấu hình / nối hỏng ⇒ điểm đang viết đến qua WebSocket của phòng, hình vẫn chạy;
 // (3) đệm phát + nội suy nét (noi-suy.ts), đồng bộ tiếng–nét, trả ra đúng SỰ KIỆN của bộ máy bút ⇒ lớp vẽ chỉ việc `taoLoiBut().apSuKien(ds, sk)`;
-// (4) mở khoá phát tiếng ở lần chạm đầu; rời màn ⇒ ngừng tiếng; (5) số đo `live-do` 10 giây một lần.
+// (4) mở khoá phát tiếng ở lần chạm đầu; rời màn ⇒ tiếng VẪN phát, chỉ tắt mic (12/11); (5) số đo `live-do` 10 giây một lần.
 // AN TOÀN: thư viện này không nhận, không giữ gì về đáp án — đề trên máy em vẫn dựng từ `viewEm.luot.cau` như cũ.
 import type { NetBut, SuKienBut } from '../but-bang-loi'
 import { nhomKhung, type ViewLiveEm } from '../bpu/phong-live'
@@ -11,6 +11,7 @@ import { giaiGoi, giaiSo } from './ma-net'
 import { taoDemPhat, type ButThay } from './noi-suy'
 import { apMuc, datLai, taoBang, type BangNet } from './so-net'
 import { taoSoDo, TRE_CO_DINH_EM, treKhungOpus, treTiengUocTinh } from './so-do'
+import { giuTiengNen, ngheBiDung } from './giu-nen'
 import { boLoa, theAmLoa } from './loa'
 import { taoLuoiPhat } from './luoi-tieng'
 import { chamNghe, nhoWa, taoNgheWa } from './nghe-wa'
@@ -100,7 +101,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   let live: ViewLiveEm = null
   let huyRoi = false, roiMan = false, ngheDat: boolean | null = null, daCham = false, hienBang: boolean | null = null
   let pc: RTCPeerConnection | null = null, dc: RTCDataChannel | null = null, nguonNoi = '', doi = 0, henNoi: unknown = null
-  let am: HTMLAudioElement | null = null, thu: RTCRtpReceiver | null = null
+  let am: HTMLAudioElement | null = null, thu: RTCRtpReceiver | null = null, goNen: (() => void) | null = null
   // Mic của em được gọi lên bảng + tiếng của bạn đang phát mic.
   let phienCuaEm = '', hangSfu: Promise<unknown> = Promise.resolve(), trackSapToi: 'thay' | 'ban' = 'thay'
   let micLuong: MediaStream | null = null, micTx: RTCRtpTransceiver | null = null, dangXinMic = false, hetXinMic = -1e9
@@ -127,31 +128,33 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   const dcMo = (): boolean => !!dc && dc.readyState === 'open'
 
   // ── TIẾNG ──
-  /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe / rời màn. Em ĐANG PHÁT MIC ⇒ âm lượng theo `amLuongKhiNoi` (có khử vọng ⇒ 1, không ⇒ 0,6). */
-  /** Loa máy em ĐANG PHÁT tiếng thầy thật: có luồng, em không tắt tiếng, trình duyệt không chặn phát, em không rời màn. */
-  const dangNghe = (): boolean => !!am && !!am.srcObject && tt.nghe && tt.tieng === 'co' && !roiMan
+  /** Tiếng thầy + tiếng bạn: tắt khi em tắt nghe (rời màn / ẩn app KHÔNG tắt — thầy 12/11 tối). Em ĐANG PHÁT MIC ⇒ âm lượng theo `amLuongKhiNoi` (có khử vọng ⇒ 1, không ⇒ 0,6). */
+  /** Loa máy em ĐANG PHÁT tiếng thầy thật: có luồng, em không tắt tiếng, trình duyệt không chặn phát (em ẩn app vẫn tính là đang nghe). */
+  const dangNghe = (): boolean => !!am && !!am.srcObject && tt.nghe && tt.tieng === 'co'
   const ngheWa = taoNgheWa()
   const capNhatTieng = (): void => {
     // 11/11 tối (thầy: em lên bảng không nghe thầy): bản cũ hạ còn 0,25 — trên điện thoại (trình duyệt chuyển tiếng sang loa thoại khi mic mở) gần như câm.
     // Khử vọng của trình duyệt ĐANG chạy trên mic em ⇒ để nguyên 1; không có khử vọng ⇒ 0,6 (vẫn nghe rõ, bớt phần lọt vào mic).
     // «Thử cách khác»: tiếng đi qua WebAudio ⇒ thẻ <audio> tắt tiếng (không nghe đôi), mức phát đặt ở nút khuếch đại
     const vol = tt.mic === 'dang-phat' || tt.mic === 'dang-noi' ? amLuongKhiNoi(micLuong) : 1, wa = ngheWa.bat()
-    if (am) { am.muted = wa || !tt.nghe || roiMan; try { am.volume = vol } catch { /* iPhone */ } }
-    if (amBan) amBan.muted = wa || !tt.nghe || roiMan
-    ngheWa.capNhat([thu?.track, thuBan?.track], !tt.nghe || roiMan ? 0 : vol)
+    if (am) { am.muted = wa || !tt.nghe; try { am.volume = vol } catch { /* iPhone */ } }
+    if (amBan) amBan.muted = wa || !tt.nghe
+    ngheWa.capNhat([thu?.track, thuBan?.track], !tt.nghe ? 0 : vol)
   }
   /** Mọi thay đổi trên phiên SFU của máy em đi NỐI TIẾP (một phiên chỉ có một máy trạng thái lời mời / trả lời — tài liệu «Serialize mutations per session»). */
   const xepSfu = <T,>(f: () => Promise<T>): Promise<T> => { const p = hangSfu.then(f, f); hangSfu = p.catch(() => undefined); return p }
   function phatTieng(): void {
     if (!am || !am.srcObject) return
     capNhatTieng()
-    void am.play().then(() => { dat({ tieng: 'co' }) }, () => { dat({ tieng: 'bi-chan' }) })
+    void am.play().then(() => { dat({ tieng: 'co' }); goNen = goNen ?? giuTiengNen(phatTieng) }, () => { dat({ tieng: 'bi-chan' }) })
   }
+  /** Thẻ tiếng thầy: bị hệ thống dừng giữa buổi (cuộc gọi, app khác chiếm loa, em đang ẩn app) ⇒ tự phát lại. */
+  const taoAm = (): HTMLAudioElement => { const t = theAmLoa(); ngheBiDung(t, mt.hen, () => { if (am === t && t.srcObject && t.paused && !huyRoi && live?.bat && tt.nghe) phatTieng() }); return t }
   /** GỌI TRONG LẦN CHẠM ĐẦU của em trong buổi (vd. cú chạm vào toàn màn hình): mở khoá phát tiếng ⇒ sau này có tiếng thật không cần chạm nữa. */
   async function moKhoaTieng(): Promise<boolean> {
     daCham = true; ngheWa.moKhoa(); dat({ chamNghe: false })
     try {
-      am = am ?? theAmLoa()
+      am = am ?? taoAm()
       am.autoplay = true
       am.setAttribute('playsinline', '')
       if (amBan?.srcObject) void amBan.play().catch(() => undefined)
@@ -164,12 +167,14 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
   }
   /** Em bật / tắt nghe tiếng thầy (nút «Tiếng: Đang bật / Đang tắt»). */
   function datTieng(nghe: boolean): void { ngheDat = nghe; dat({ nghe }); capNhatTieng(); if (nghe) { phatTieng(); soatMic() } }
-  /** Rời màn (đặc tả 4.7): tiếng NGỪNG trong lúc em ở app khác; về lại nghe tiếp từ hiện tại, không phát bù. */
+  /** Rời màn / ẩn app: tiếng thầy VẪN PHÁT, kết nối giữ nguyên (thầy 12/11 tối — thay luật cũ 4.7 «tiếng ngừng»); chỉ tắt mic của em và thôi vẽ điểm
+   *  đang viết (nét xong vẫn tới qua sổ). Về lại: xoá đệm nét, phát lại tiếng phòng khi hệ thống đã dừng thẻ. */
   function datRoiMan(roi: boolean): void { roiMan = roi; if (roi) tatMic(); capNhatTieng(); baoOk(); if (!roi) { dem.xoa(); phatTieng(); soatMic() } }
 
   // ── SFU ──
   function dongSfu(): void {
     doi += 1
+    goNen?.(); goNen = null
     mt.huyHen(henNoi); henNoi = null
     try { dc?.close() } catch { /* đã đóng */ }
     try { pc?.close() } catch { /* đã đóng */ }
@@ -208,7 +213,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
         // Đệm jitter thấp nhất, để trình duyệt tự thích ứng (đặc tả 4.2).
         try { (e.receiver as unknown as { jitterBufferTarget?: number }).jitterBufferTarget = 0 } catch { /* không hỗ trợ */ }
         try { (e.receiver as unknown as { playoutDelayHint?: number }).playoutDelayHint = 0 } catch { /* không hỗ trợ */ }
-        am = am ?? theAmLoa()
+        am = am ?? taoAm()
         am.autoplay = true
         am.setAttribute('playsinline', '')
         am.removeAttribute('src')
@@ -493,7 +498,7 @@ export function taoLiveEm(tuy: TuyChonLiveEm) {
       void doTieng(() => ({ pc, n: { thu, the: am }, b: { thu: thuBan, the: amBan }, g: micTx?.sender ?? null }), mt.dongHo, (ms) => new Promise<void>((r) => { mt.hen(r, ms) }))
         .then((t) => {
           if (ngheWa.bat() && t.n?.pt) t.n.pt.m = 0 // đang phát qua WebAudio: thẻ tắt tiếng là chủ ý, không phải câm
-          tiNay = t; dat({ chamNghe: chamNghe({ nghe: tt.nghe && !roiMan, daCham, db: t.n?.db }) }); const ng = ngheThat(t.n); if (ng !== ngheTi) { ngheTi = ng; baoOk() } }, () => undefined).finally(() => { dangDoTi = false })
+          tiNay = t; dat({ chamNghe: chamNghe({ nghe: tt.nghe, daCham, db: t.n?.db }) }); const ng = ngheThat(t.n); if (ng !== ngheTi) { ngheTi = ng; baoOk() } }, () => undefined).finally(() => { dangDoTi = false })
     }
     const xong = (): void => {
       const s = dem.soDo(nay)

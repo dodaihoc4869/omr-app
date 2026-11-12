@@ -152,3 +152,8 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Câu mới ⇒ chỉ có thanh xám nhỏ giữa mép dưới đề + dòng «Chạm thanh xám để chọn đáp án» hiện 5 giây rồi tự ẩn; cả trang đề để đọc.
     - Chạm thanh ⇒ dải chọn hiện (mục 33); 6 giây không chạm / không đổi lựa chọn ⇒ dải tự thu. Lựa chọn dở vẫn giữ, cạnh thanh có chấm nhắc. Trên đầu dải có thanh nhỏ để chạm thu lại.
     - Gửi xong / thầy bấm «Lên bảng» ⇒ ẩn hẳn như cũ.
+38. **Em ẩn app / sang app khác / tắt màn VẪN NGHE tiếng thầy, kết nối giữ tới hết live** (thầy 12/11 tối «học sinh thoát app ẩn vẫn phải nghe thấy tiếng của thầy, giữ kết nối tới lúc kết thúc live»; `src/lib/live/em.ts`, `src/lib/live/giu-nen.ts`):
+    - Bỏ luật cũ ở đặc tả live bảng 4.7 «rời màn ⇒ tiếng ngừng»: tiếng thầy / tiếng bạn không còn tắt theo cờ rời màn. Rời màn chỉ còn: tắt mic của em, thôi vẽ điểm đang viết (nét xong vẫn tới qua sổ), tên em hiện ở máy thầy như cũ.
+    - Khai buổi đang phát với hệ điều hành (thẻ ở màn khoá / tai nghe ghi «Thầy đang live»); nút tạm dừng ở đó KHÔNG dừng được tiếng. Thẻ tiếng bị hệ thống dừng (cuộc gọi, app khác chiếm loa) ⇒ 0,8 giây sau tự phát lại.
+    - Kết nối phòng và đường tiếng vẫn tự nối lại như cũ khi rớt (không phụ thuộc trang đang hiện hay ẩn).
+    - GIỚI HẠN không sửa được bằng mã: em VUỐT TẮT HẲN app / đóng thẻ trình duyệt thì hết tiếng; iPhone bật «Chế độ nguồn điện thấp» hoặc app cài ra màn hình chính đời iOS cũ có thể bị hệ thống treo trang nền.

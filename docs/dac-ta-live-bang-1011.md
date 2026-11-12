@@ -378,7 +378,7 @@ Thầy: «đang bị giật khựng ở máy hs, phải đồng bộ nét bút t
 
 - Dùng nguyên bộ bắt của Bình Phản Ứng (`ManBinhPhanUng.tsx`, `tat-man.ts`): thoát app / chuyển app, cửa sổ nổi, chia đôi màn hình; iPhone khoá màn cũng tính; Android có quyền IdleDetector thì khoá màn không tính.
 - Em rời ⇒ gửi `roi` ngay ⇒ thầy thấy tên trên màn chiếu đang live (mục 2.1). Em về ⇒ `ve` có xác nhận ⇒ tên tự tắt.
-- Rời màn thì tiếng trên máy em NGỪNG (không nghe live trong lúc dùng app khác). Về lại nghe tiếp từ hiện tại, không phát bù.
+- ~~Rời màn thì tiếng trên máy em NGỪNG.~~ **ĐỔI 12/11 tối (thầy):** rời màn / ẩn app tiếng thầy VẪN PHÁT, kết nối giữ tới hết live; chỉ tắt mic của em — xem `docs/dac-ta-live-moi-1211.md` mục 38.
 - **Không báo nhầm chia đôi khi xoay.** `dangChiaDoi()` so khung trang với cỡ màn theo hướng MÁY (`screen.orientation.type`), không theo CSS:
   - iPhone máy dọc, hình xoay CSS: máy vẫn dọc, khung trang vẫn đầy ⇒ đúng là không chia đôi.
   - Android khoá ngang: hướng máy và khung trang cùng ngang ⇒ không chia đôi.

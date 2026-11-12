@@ -75,7 +75,7 @@ export interface PropsLopLive {
   /** Em ở xa (không đội) ⇒ null: tay nắm màu trung tính, khay ẩn dòng đội + kJ. */
   doi: { ten: string; ky: string; kj: number } | null
   matMang: boolean
-  /** Phòng đang ghi em «rời màn» ⇒ tiếng ngừng (đặc tả 4.7). */
+  /** Phòng đang ghi em «rời màn» ⇒ tắt mic của em, tiếng thầy vẫn phát (12/11 thay đặc tả 4.7). */
   roi: boolean
   /** Câu công khai của lượt (không đáp án) — để dựng giấy đề GIỐNG giấy của thầy (GiayThay.tsx); null ⇒ chỉ có cách dựng thường `de`. */
   q?: CauGiay | null
@@ -323,7 +323,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
     window.addEventListener('click', cham, { capture: true, once: true })
     return () => { window.removeEventListener('click', cham, true); dangKy({ tin: null, noiLai: null }); datKiemQuyenNgoai(null); le.current = null; l.huy() }
   }, [ve, goc, dangKy])
-  // Rời màn ⇒ tiếng ngừng; về ⇒ nghe tiếp từ hiện tại.
+  // Rời màn / ẩn app ⇒ tiếng thầy VẪN PHÁT (thầy 12/11 tối), chỉ tắt mic của em + thôi vẽ điểm đang viết; về ⇒ vẽ tiếp từ hiện tại.
   useEffect(() => {
     const dat = () => le.current?.datRoiMan(roi || document.hidden)
     dat()
