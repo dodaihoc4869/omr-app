@@ -3,7 +3,7 @@
 //  (2) "Giao bài riêng" ở hồ sơ một em → màn Giao BTVN mở sẵn chế độ chọn từng em, đã tick em ấy.
 //  (3) Sáu tệp hết mã hex (83 chỗ): màu đi qua token M3, chữ trên nền đặc đi cặp on-*.
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { useAppStore } from '../src/store/appStore'

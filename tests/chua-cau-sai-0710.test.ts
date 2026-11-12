@@ -3,7 +3,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   KHOA_CHUA_CAU_SAI, COHORT_PILOT, CAU_HINH_MAC_DINH,
-  type TrangThaiDay, type HocLieuChua, type BuocChua, type CauHinhChuaCauSai,
+  type TrangThaiDay, type HocLieuChua, type BuocChua,
 } from '../server/src/chua-cau-sai-kieu'
 import {
   chuyenTrang, khoiTaoTienDo, tinhTienDo, xayPhanHoi,

@@ -1,7 +1,7 @@
 // @vitest-environment node
 // OSoTraLoi (30/09, trước là ONhapDapSo) ở TỪNG NƠI DÙNG (Chromium thật, CSS thật của từng nơi, markup React thật): thẻ câu thi (TheCau — cũng là Đảo / Võ đài / BTVN), Đoàn (DoanCau), ôn câu (LamCauOn), mở bài (MomM3):
 // ở 320/360/390 px, sáng + tối: hai nút "±" "," ≥ 36 px NẰM TRONG ô (mép phải), ô đủ rộng, chữ không chui dưới nút, 0 tràn ngang.
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, expect, it } from 'vitest'
 import { chromium, type Browser } from 'playwright'
 import { renderToStaticMarkup } from 'react-dom/server'
 import fs from 'node:fs'

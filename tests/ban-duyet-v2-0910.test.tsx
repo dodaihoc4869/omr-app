@@ -13,7 +13,7 @@
 //     tầng chung + chặng thành thanh bậc 4 tầng + ô số "3/5 · chặng · còn 6 câu" + "5/8 · dạng vững" (trước là câu "Hôm nay: Chặng …").
 //   · Của em: thẻ Thần thú là MỘT nút lớn (tên truy cập bắt đầu bằng "Thần thú của em", kèm biệt danh + loài · hệ · cấp).
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { docBaiHanhTrinh, docSanh, type KetQuaSanh, type SanhHoa2 } from '../src/components/hoa2/api'
 import CauDaLam from '../src/components/hoa2/CauDaLam'

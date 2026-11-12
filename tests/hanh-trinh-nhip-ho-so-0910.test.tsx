@@ -7,7 +7,7 @@
 //     toàn bộ lịch sử gom theo ngày, lọc "Chỉ lần sai", 100 lần đầu + "Xem thêm"; Esc đóng, focus về dòng; lỗi ⇒ câu dễ hiểu + Thử lại.
 // SỐ TỪ MÁY CHỦ GIẢ (không số bịa); tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { choTamXong, moGap } from './_ho-so-6-muc'
 import type { BangChienDich, ChienDichTom } from '../src/components/chien-dich/api'
 import type { KetQuaLichSuLamCau, LanLamCau } from '../src/lib/lich-su-lam-cau-api'
@@ -23,7 +23,7 @@ import { useCoHoa2 } from '../src/components/chien-dich/co-hoa2'
 import { useSoDemGv } from '../src/lib/so-dem-gv'
 import { useAppStore } from '../src/store/appStore'
 import { khopTim, xepNhomNhip } from '../src/components/chien-dich/nhip-hanh-trinh'
-import { chuGiay, doiGiay, GIOI_HAN_KHUNG_DAU, giayCacLanSai, gomTheoNgay, tenMucDo, xoaDemHoSoLamCau } from '../src/components/chien-dich/HoSoLamCauEm'
+import { chuGiay, doiGiay, giayCacLanSai, gomTheoNgay, tenMucDo, xoaDemHoSoLamCau } from '../src/components/chien-dich/HoSoLamCauEm'
 const { default: HanhTrinhV2 } = await import('../src/components/chien-dich/HanhTrinhV2')
 const { default: ChienDichScreen } = await import('../src/screens/ChienDichScreen')
 

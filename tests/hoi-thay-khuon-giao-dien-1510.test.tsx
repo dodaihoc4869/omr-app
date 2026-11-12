@@ -1,7 +1,7 @@
 // HỎI THẦY v3 · giao diện KHUÔN (bản vẽ docs/ban-ve-hoi-thay-v3-1510, thầy chốt 15/10): Chỉ chỗ sai (so bài, dòng lệch) · Gợi ý từng nấc (em tự mở,
 // khối gắn vào nấc, đáp án khoá) · Giải thích (thang dọc có ngưỡng, hình vẽ sẵn, đối chiếu gập) · Từng ý a–d (Em đúng x/4) · Tính từng bước (em thử,
 // đúng mới mở bước sau); chung: Thầy hỏi lại 1 câu, "Em chưa hiểu chỗ nào?", "Giải thích dễ hơn"; câu trả lời cũ không có khuôn vẽ như v2.
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may-thu' }))

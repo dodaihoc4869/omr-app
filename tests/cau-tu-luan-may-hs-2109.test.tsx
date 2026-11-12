@@ -3,7 +3,7 @@
 // ở MỌI kênh máy em: game Đảo thần thú / Võ đài (cùng cổng `request` của Game.tsx), Đoàn Hộ Tống, ôn lại (/hs/cau-theo-qid), bộ lọc rút của phiếu (`hopLeDeRut`).
 // Gọi lên bảng của thầy KHÔNG nằm trong src của em và không dùng lớp này (khoá bằng test nguồn cuối tệp).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, configure, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, configure } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 vi.mock('../src/lib/dia-chi-may-chu', () => ({ layDiaChiMayChu: async () => 'https://may.test' }))

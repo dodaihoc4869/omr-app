@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { mulberry32 } from '../src/lib/exam-shuffle'
 import {
   DAY, NGAY_NGHI_CAU_DUNG, SO_CAU_MOI_LUOT, TRAN_LUOT_NGAY, advance, chooseLuotMoi, chooseSessionWithRoles, luotHomNay, dauVaoLuotTuSo, targetLevel, tranCauDaiTheoCap,
-  type Attempt, type CauLuot, type Evidence, type Mastery, type OptLuot, type PrivateQuestion,
+  type Attempt, type Evidence, type Mastery, type OptLuot, type PrivateQuestion,
 } from '../src/game/than-thu-v2/core'
 
 const GIO_VN = 7 * 3600_000

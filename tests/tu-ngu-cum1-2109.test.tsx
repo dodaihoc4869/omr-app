@@ -1,7 +1,7 @@
 // CHUẨN HOÁ TỪ NGỮ · CỤM 1 "Máu + thần thú" (Boss duyệt bảng docs/ra-soat-tu-ngu-2109-code2.md 21/09; thầy: "Mập Địch 100 là gì").
 // Luật 1: con số nào cũng có nhãn + đơn vị. Luật 2: tên riêng (biệt danh thần thú) đi SAU danh từ chung. Sửa chữ CÓ CHỦ Ý — aria-label cũ GIỮ nguyên.
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { cleanup } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { tuKeHoachNgay, type DuLieuBangNhiemVu, type KeHoachNgayMayChu, type TrangThaiThanThu } from '../src/lib/nhiem-vu-adapter'

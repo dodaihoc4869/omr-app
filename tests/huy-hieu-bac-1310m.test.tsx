@@ -10,7 +10,7 @@
 //   · vắng bacCham ⇒ không có nút;
 //   · thầy: bấm ô dải đếm ⇒ tấm "Bậc N · Tên · K em" đúng danh sách em (điểm chăm thấp → cao), ô 0 em không bấm được; bấm em ⇒ mở hồ sơ.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 
 const ph = vi.hoisted(() => ({ nhip: vi.fn() }))
@@ -25,7 +25,7 @@ import type { EmNhipHoc, KetQuaNhipHoc } from '../server/src/nhip-hoc-kieu'
 import { demTheoBac, phanNhomEm, xepTheoBac } from '../src/lib/nhip-hoc-thay'
 import { nhipTheoSbd, thongKeBuoi } from '../src/lib/diem-danh-nhip'
 import type { TrangThaiBuoi } from '../src/lib/buoi-hoc-api'
-import { bacTheoSanh, chuKhoangDiem } from '../src/components/bac-cham-chi/bac'
+import { chuKhoangDiem } from '../src/components/bac-cham-chi/bac'
 import HuyHieuBac from '../src/components/bac-cham-chi/HuyHieuBac'
 import ChipBac from '../src/components/bac-cham-chi/ChipBac'
 import ThangBac from '../src/components/bac-cham-chi/ThangBac'

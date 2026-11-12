@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { ghiSuKien } from '../server/src/su-kien-hoc'
 import { khongDau, mucNhip, xuHuong7 } from '../server/src/gv-hom-nay-v2'
-import { NGUONG_DANG_YEU, SO_CAU_DU_TIN } from '../server/src/ho-so-cau-hinh'
+import { SO_CAU_DU_TIN } from '../server/src/ho-so-cau-hinh'
 import { goiWorker, taoD1That, type D1That } from './_d1-that'
 import { BAY_GIO, cauThay, dung, giao, gio, maBtvn, mo } from './_btvn-nang-do-mau'
 

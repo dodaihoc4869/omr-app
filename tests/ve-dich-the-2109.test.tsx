@@ -1,7 +1,7 @@
 // THẺ "ĐƯỜNG VỀ ĐÍCH" (Dồn về đích; thầy chốt mẫu 21/09: docs/ban-ve-don-ve-dich-2109/; Boss 2 sửa: nộp trễ, ảnh thú ở lời chào [đã có ở DauTrang]): đọc CHẶT `veDich` + `no`; bốn trạng thái + qua hạn; đồng hồ đếm ngược
 // theo giờ LUÔN hiện khi có nợ; "Tối nay: …"; MỘT nút ⇒ việc chưa xong đầu tiên; khối "Còn lại từ các ngày trước"; gạch tên ngày vừa trả; thiếu `veDich` ⇒ không dựng; phụ huynh không thấy; không "lười"/game.
 // 27/10: thẻ `bang-nhiem-vu/TheVeDich` (+ ve-dich.css) đã gỡ khỏi src/ vì không màn nào dùng ⇒ các phép vẽ thẻ và khoá nguồn của nó bỏ theo; lớp đọc ve-dich-hien-thi còn sống nên giữ.
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'

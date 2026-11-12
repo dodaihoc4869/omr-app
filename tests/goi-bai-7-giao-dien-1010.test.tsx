@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach,expect,it,vi } from 'vitest'
-import { cleanup,fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { cleanup,fireEvent,render,screen } from '@testing-library/react'
 import HocTapHomNay from '../src/components/hoc-tap/HocTapHomNay'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { docSanh,goiHoa2 } from '../src/components/hoa2/api'

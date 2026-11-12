@@ -2,7 +2,7 @@
 // Điểm ngắt `(min-width: 1024px), (orientation: landscape) and (min-width: 700px)`; điện thoại dọc giữ nguyên bản dọc.
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import CauDaLam from '../src/components/hoa2/CauDaLam'
 import { docSanh, type KetQuaSanh } from '../src/components/hoa2/api'

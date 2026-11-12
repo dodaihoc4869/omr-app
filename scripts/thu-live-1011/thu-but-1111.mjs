@@ -259,7 +259,7 @@ for (const cpu of [1, 4, 6]) {
   const X = await em.evaluate(() => { window.__do.bat = false; window.__do.nhe = false; window.__do.ganBoc(); return { cach: window.__do.cach, xl: window.__do.xl } })
   const c1 = await docCdp(), th1 = await docCdp(cdpThay), giay = (performance.now() - t0) / 1000
   if (process.env.VET && cpu === 4) {
-    const ev = JSON.parse((await trinh.stopTracing()).toString()).traceEvents, ten = {}, luong = {}
+    const ev = JSON.parse((await trinh.stopTracing()).toString()).traceEvents, luong = {}
     for (const e of ev) if (e.ph === 'M' && e.name === 'thread_name') luong[e.pid + ':' + e.tid] = e.args.name
     const theo = {}
     for (const e of ev) if (e.ph === 'X' && e.dur) { const l0 = luong[e.pid + ':' + e.tid] || '?'; if (l0 !== 'CrRendererMain') continue; const l = l0 + e.pid; (theo[l] ||= {}); (theo[l][e.name] ||= [0, 0]); theo[l][e.name][0] += e.dur / 1000; theo[l][e.name][1]++ }

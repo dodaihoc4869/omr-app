@@ -1,7 +1,7 @@
 // LỜI GIẢI KIỂU SƠ ĐỒ (làn B, 26/10): kết quả nộp có `soDo` ⇒ THAY lời giải chữ / bước / kết quả bằng sơ đồ của thầy (lý do từng phương án giữ);
 // không có `soDo` hoặc bản hỏng ⇒ lời giải cũ như cũ.
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { cleanup, render, screen } from '@testing-library/react'
 import KhoiLoiGiaiChuan from '../src/components/loi-giai/KhoiLoiGiaiChuan'
 import { KhoiLoiGiaiCoSoDo } from '../src/components/goi-y-cham/thay-bang-so-do'
 import { BAN_PYRITE } from './_goi-y-cham-gia'

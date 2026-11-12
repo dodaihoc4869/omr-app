@@ -175,10 +175,6 @@ function giuPho(y, s, tre) {
   return db((a * a * ss) / e)
 }
 function timTre(y, s) { let lon = -1e99, tre = 0; for (let lag = 0; lag <= 2400; lag++) { let c = 0; for (let i = HZ; i < HZ * 4; i += 3) c += s[i] * y[i + lag]; if (c > lon) { lon = c; tre = lag } } return tre }
-/** Năng lượng từng băng (24 băng trên thang log 100 Hz – 12 kHz) của một khung 1024 mẫu — biến đổi Fourier thẳng trên vài tần số mỗi băng là đủ cho «tiếng nước». */
-function bang(m, d) { const r = []; for (let b = 0; b < 24; b++) { const f = 100 * Math.pow(120, (b + 0.5) / 24), w = (2 * Math.PI * f) / HZ; let re = 0, im = 0; for (let i = 0; i < 1024; i++) { const v = m[d + i] * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / 1023)); re += v * Math.cos(w * i); im -= v * Math.sin(w * i) } r.push(re * re + im * im) } return r }
-/** «Tiếng nước»: trong các đoạn im, độ lệch chuẩn theo thời gian (dB) của năng lượng từng băng, trung bình các băng. Ồn đều ⇒ nhỏ; ồn dư lập loè ⇒ lớn. */
-function tiengNuoc(y, noi, tre) { const ds = []; for (let d = HZ; d + 1024 + tre < y.length; d += 2048) { let im = true; for (let i = -4800; i < 1024 + 4800; i += 240) if (noi[d + i]) { im = false; break } if (im) ds.push(bang(y, d + tre).map((v) => db(v))) } if (ds.length < 4) return null; let tong = 0; for (let b = 0; b < 24; b++) { const a = ds.map((x) => x[b]), tb = a.reduce((s, v) => s + v, 0) / a.length; tong += Math.sqrt(a.reduce((s, v) => s + (v - tb) ** 2, 0) / a.length) } return tong / 24 }
 /** Ồn ở đoạn im (xa tiếng nói ≥ 100 ms). */
 function onIm(y, noi, tre) { const xa = new Uint8Array(noi.length); for (let i = 4800; i < noi.length - 4800; i += 480) { let im = 1; for (let j = -4800; j <= 4800; j += 480) if (noi[i + j]) { im = 0; break } if (im) xa.fill(1, i, i + 480) } let e = 0, c = 0; for (let i = HZ; i + tre < y.length; i++) if (xa[i]) { e += y[i + tre] ** 2; c++ } return e / Math.max(1, c) }
 /** Dải tần còn lại của giọng sạch sau lọc: tần số cao nhất mà phổ dài hạn còn trong −3 dB so với trước lọc. */

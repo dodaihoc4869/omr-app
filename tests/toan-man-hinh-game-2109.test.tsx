@@ -1,7 +1,7 @@
 // GAME TỰ VÀO TOÀN MÀN HÌNH (thầy lệnh 21/09) — không nút; xin ngay trong cú chạm mở game; vào thẳng/lazy mất cử chỉ ⇒ xin ở lần chạm đầu tiên (một lần/lượt);
 // từ chối/không API ⇒ im lặng; em tự thoát ⇒ không ép lại; Về app học sinh / rời game ⇒ thoát. Không đụng ExamTakeScreen.
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { act, cleanup } from '@testing-library/react'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'

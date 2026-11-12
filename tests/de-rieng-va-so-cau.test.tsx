@@ -1,7 +1,7 @@
 // Phụ huynh tự chọn 10..40 câu cho con; số câu đi theo link `~<n>` (thầy chốt 04-09 tối).
 // Kèm: ảnh lời giải gốc chỉ hiện TRONG ô lời giải, không hiện cùng đề.
 // (21/09: phần "Tải đề riêng của một em" khoá `NutTaiDeCa` đã bỏ cùng thẻ — 0 nơi nhập, dọn D4.)
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { chanSoCau, sanSoCau, docLinkPhieu, docMaTuHash, SO_CAU_MAX, SO_CAU_MIN, taoLinkPhieu } from '../src/lib/phieu-link'
 import { oGiaiHtml, theCauHtml } from '../src/lib/html-phieu'
 import type { CauLuyen } from '../src/lib/bai-tap-pdf'

@@ -2,7 +2,7 @@
 // vẽ bằng <sub>/<sup> CÙNG phông (luật thầy 28/09, "Câu đã làm" đã làm) ở MỌI chỗ game Hoá 2.0 hiện đề, phương án, ý, lời giải: thẻ câu Đảo 2.0 khi làm,
 // khối LỜI GIẢI (kiến thức cốt lõi + từng phương án), Đoàn (đề, phương án, ý, lời giải câu vừa làm), xem lại chuẩn Đoàn. Chỉ đổi cách vẽ.
 import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, render } from '@testing-library/react'
+import { cleanup } from '@testing-library/react'
 import { chiSoRo, chiSoRoSau } from '../src/lib/chi-so-ro'
 
 const UNICODE = /[₀-₉⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]/

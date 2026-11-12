@@ -2,7 +2,7 @@
 // Vòng học v2 — GĐ5 tự hoàn thiện hằng tuần: hiệu chỉnh luật theo tỉ lệ sai lại; câu nghi sai đáp án.
 // 14/10: gỡ lệnh chết /gv/v2/tong — bỏ phần gọi lệnh ấy.
 import { describe, expect, it } from 'vitest'
-import { taoD1That, goiWorker } from './_d1-that'
+import { taoD1That } from './_d1-that'
 import worker from '../server/src/index'
 import type { Env } from '../server/src/kieu'
 import { chayTuHoanThien, chuanThamSo, deXuatThamSo, docThamSo, luotKiemDuyTri, timCauNghi } from '../server/src/tu-hoan-thien'

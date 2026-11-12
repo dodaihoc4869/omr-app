@@ -1,7 +1,7 @@
 // BẢNG TIN THẦY · "Chưa học hôm nay" (Boss chuyển lệnh thầy 21/09): thần thú mỗi ngày Điều 8 — app học sinh KHÔNG nêu tên em ít học, tên các em CHƯA HỌC theo lớp chỉ hiện ở Bảng tin của thầy.
 // Khối `chuaHocHomNay` (Code 3, đúng thân `gvChuaHocHomNay`): một dòng 48 px dưới "Em cần thầy để ý" + tấm bên có tên từng lớp; chạm tên ⇒ Toàn cảnh một em. Chỉ ĐỌC: không nút việc, không thêm cuộn ở trang chính.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, within } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { MAU_DAY } from './fixtures/bang-tin-mau'

@@ -31,7 +31,7 @@ const docThe = () => the
 const dangKy = (f: () => void) => { nghe.add(f); return () => { nghe.delete(f) } }
 
 /** Phần lên bảng trong mục biến động của em: đội = `kjDoi` (chỉ lên bảng đổi kJ đội), em suy từ đúng mục ấy. */
-export function soLenBang(kjDoi: number): { em: number; doi: number } { return { em: kjDoi > 0 ? KJ.lenBangDatEm : kjDoi, doi: kjDoi } }
+function soLenBang(kjDoi: number): { em: number; doi: number } { return { em: kjDoi > 0 ? KJ.lenBangDatEm : kjDoi, doi: kjDoi } }
 const dau = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0')
 
 export default function TheKetQuaLenBang({ v, an }: { v: ViewBang | null; an: boolean }) {

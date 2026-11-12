@@ -10,7 +10,7 @@ import * as L from '../src/lib/bpu/phong'
 import * as LL from '../src/lib/bpu/phong-live'
 import { datWebSocketPairGia, taoPhongGia, viewCuoi } from './_live-phong-gia'
 import { cheLiveCua } from '../src/components/bpu/luat-man-live'
-import { khoiKhop, soiDuoc } from '../src/components/live/GiayThay'
+import { khoiKhop, soiDuoc } from '../src/components/live/giay-thay-do'
 
 const SS = { id: 'a1b2c3d4e5f60718293a4b5c6d7e8f90', tieng: 'thay', kenh: 'net' }
 const PHIEN_EM = 'e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1', DAP_AN = 'ĐÁP-ÁN-BÍ-MẬT-XYZ'

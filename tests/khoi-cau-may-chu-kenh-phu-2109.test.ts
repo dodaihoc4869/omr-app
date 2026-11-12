@@ -12,7 +12,7 @@ import { phGiaoThem } from '../server/src/ph-giao-them'
 import { chonCauBaiHangNgay } from '../server/src/parent-news-nguon-cau'
 import { lapVaLuuKeHoach } from '../server/src/ke-hoach-ngay-d1'
 import { ngayVn } from '../server/src/su-kien-hoc'
-import { goiWorker, taoD1That, type D1That } from './_d1-that'
+import { taoD1That, type D1That } from './_d1-that'
 import type { Khoi } from '../src/lib/khoi-cau'
 
 vi.mock('../server/src/game-v2-auth', async (orig) => ({

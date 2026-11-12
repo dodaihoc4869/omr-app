@@ -5,8 +5,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import worker from '../server/src/index'
 import { boDapAn, chotBoChoEm, docCoCaNhan, moLucChang, trangThaiCacChang } from '../server/src/btvn-nang-do-d1'
-import { goiWorker, taoD1That, type D1That } from './_d1-that'
-import { BAY_GIO, HAN, NGAY_MAI_0H_VN, toKho, DAP_AN_DUNG, TAT_CA_QID, cauThay, dung, giao, maBtvn, mo, nopChang, boCuaEm, gio, loiThieuKhongThay } from './_btvn-nang-do-mau'
+import { goiWorker, type D1That } from './_d1-that'
+import { BAY_GIO, HAN, NGAY_MAI_0H_VN, DAP_AN_DUNG, TAT_CA_QID, cauThay, dung, giao, maBtvn, mo, nopChang, boCuaEm, gio, loiThieuKhongThay } from './_btvn-nang-do-mau'
 
 afterEach(() => vi.useRealTimers())
 

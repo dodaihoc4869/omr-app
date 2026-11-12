@@ -11,26 +11,17 @@
 // TRÊN GIẤY (nét trên bảng đen không bị ảnh hưởng) + số đo `live-do` mang cờ `gl`.
 import { Fragment, memo, useLayoutEffect, useMemo, useRef, useState, type ComponentType, type CSSProperties, type ReactNode } from 'react'
 import type { GiayThay as BoCucGiay } from '../../lib/bpu/phong-live'
-import { TEN_PHAN } from './GiayDung'
+import { CO, DAM, DONG, H, LOAI, TT, W, X, Y, khoiKhop } from './giay-thay-do'
+import { TEN_PHAN } from './ten-phan-giay'
 
 /** Phần câu công khai giấy soi cần (không có đáp án). */
 export interface CauGiay { phan: string; text?: string; choices?: readonly string[]; ideas?: readonly string[] }
-/** Chỉ số trong một khối của bố cục (xem `GiayThay` ở phong-live.ts). */
-const LOAI = 0, TT = 1, X = 2, Y = 3, W = 4, H = 5, CO = 6, DONG = 7, DAM = 8, HET_X = 9, HET_Y = 10
 /** Bộ dựng chữ có công thức Hoá của màn làm bài (`ChemText`). */
 export type BoChu = ComponentType<{ text: string }>
 /** Như `chuDeChieu` của tờ chiếu: giữ dấu xuống dòng của người soạn, mỗi dòng dựng riêng. */
 const dongChu = (s: string | undefined): string[] => String(s ?? '').replace(/\r\n?/g, '\n').replace(/<br\s*\/?\s*>/gi, '\n').split('\n')
 
-/** So số đo của máy em với của thầy cho MỘT khối chữ: chiều cao lệch dưới 0,4 dòng, chỗ hết chữ lệch ngang dưới 1,2 % bề rộng (ít nhất 3 px), dọc dưới 0,3 dòng. */
-export function khoiKhop(thay: readonly number[], em: { cao: number; hetX: number; hetY: number }): boolean {
-  const dong = Math.max(8, thay[DONG]! / 10)
-  return Math.abs(em.cao - thay[H]!) <= dong * 0.4 && Math.abs(em.hetX - thay[HET_X]!) <= Math.max(3, thay[W]! * 0.012) && Math.abs(em.hetY - thay[HET_Y]!) <= dong * 0.3
-}
-/** Bố cục này máy em soi được không: đúng trang đang chiếu, không có khối lạ, có khối đề. */
-export function soiDuoc(g: BoCucGiay | null | undefined, khoaTrang: string): g is BoCucGiay {
-  return !!g && !g.la && g.k === khoaTrang && g.o.some((b) => b[LOAI] === 2)
-}
+// So số đo (`khoiKhop`) + bố cục soi được không (`soiDuoc`) + chỉ số khối: giay-thay-do.ts (12/11 — tệp component chỉ xuất component).
 
 /** Đặt dấu «hết chữ» (phần tử rỗng) ngay sau ký tự cuối của khối ⇒ `offsetLeft` / `offsetTop` của nó = chỗ hết chữ, không phụ thuộc phép co / xoay của lớp bảng. */
 function datDauHet(el: HTMLElement): HTMLElement | null {

@@ -3,7 +3,7 @@
 // được xin NGAY (em đang đọc lời giải), «Làm lại câu sai» có câu tức thì — trước: ~1,2 s trắng sau khi bấm. Đúng hết ⇒ không xin. Mỗi chặng một lần; lệnh xin sớm lỗi ⇒ xin lại một lần.
 // khi đang xin không kết chặng giữa chừng, không gọi hai lần. Giao diện cũ (tắt «Trong») cùng luồng.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import ManLamBaiTap from '../src/components/hoc-tap/ManLamBaiTap'
 import { goiHoa2 } from '../src/components/hoa2/api'
 import type { TomTatGoi7 } from '../src/lib/goi-bai-7'

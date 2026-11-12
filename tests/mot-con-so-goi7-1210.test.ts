@@ -12,7 +12,7 @@
 // Thêm: `chonGoi7` có trần ⇒ đúng M − đã làm câu · hai phép đếm "đã làm" (máy em / máy thầy) cho cùng số · ngày cũ chưa chốt ⇒ `uoc-goi7` ·
 // luật Lười dùng M mới (28/28 thành đủ mức, không còn 28/36 "thiếu 8"). Tên em là tên giả.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { taoKhoOmni, themChienDich, lam, lucVn, type KhoOmni } from './omni-3-ke-hoach-chung'
+import { taoKhoOmni, themChienDich, lam, type KhoOmni } from './omni-3-ke-hoach-chung'
 import { taoD1That } from './_d1-that'
 import { dongBoGoi7, lapGoi7 } from '../server/src/goi-bai-7'
 import { chonGoi7, mucNgayGoi7, quotaGoi7, type CauGoi7 } from '../server/src/goi-bai-7-loi'

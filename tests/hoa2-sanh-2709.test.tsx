@@ -2,7 +2,7 @@
 // Hợp đồng: docs/hop-dong-game-hoa-2.md · bản vẽ: docs/ban-ve-game-hoa-2-2709/Moi-SanhBanDo.dc.html, HS-HuyetChien, HS-XongHomNay.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { docNhoKetQuaSanh, docSanh, ghiNhoKetQuaSanh, type KetQuaSanh } from '../src/components/hoa2/api'
+import { docNhoKetQuaSanh, docSanh, ghiNhoKetQuaSanh } from '../src/components/hoa2/api'
 import { chuHanNop, thuNgayThang } from '../src/components/hoa2/thoi-gian'
 import StudentPortalScreen from '../src/screens/StudentPortalScreen'
 

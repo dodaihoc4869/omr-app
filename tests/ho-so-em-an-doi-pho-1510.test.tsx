@@ -2,7 +2,7 @@
 // A4 (quét 15/10): tấm hồ sơ mở trong app HỌC SINH hiện chip "Có dấu hiệu đối phó" — nhãn chấm thái độ, chuẩn A1.7 không cho hiện với em.
 // Luật: chế độ 'hoc-sinh' ẩn chip; thầy và phụ huynh giữ nguyên (phụ huynh đọc CHUNG bản dữ liệu của em nên KHÔNG lọc ở máy chủ).
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { choTamXong, moGap } from './_ho-so-6-muc'
 import type { KetQuaLichSuLamCau } from '../server/src/lich-su-lam-cau-kieu'
 import { hoSoThaiDoGia } from '../scripts/chup-v2/gia/bai-hang-ngay'

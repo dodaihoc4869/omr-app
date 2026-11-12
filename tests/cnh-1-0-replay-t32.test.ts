@@ -7,11 +7,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   anhChupTuSuKien, apDungSuaDiem, gopTangDan, phatLaiNangLuc,
-  type AnhChupNangLuc, type BangNangLuc, type SuKienNL,
+  type BangNangLuc, type SuKienNL,
 } from '../server/src/nang-luc'
-import { docAnhChup, docSuKienNL, dungLaiNangLuc, ghiAnhChup, bamSo, xoaBietCotChuanNL, xoaDemNangLuc } from '../server/src/nang-luc-d1'
+import { docAnhChup, docSuKienNL, dungLaiNangLuc, bamSo, xoaBietCotChuanNL, xoaDemNangLuc } from '../server/src/nang-luc-d1'
 import { ghiSuKien, xoaBietCotChuan } from '../server/src/su-kien-hoc'
-import { taoD1That, type D1That } from './_d1-that'
+import { taoD1That } from './_d1-that'
 
 beforeEach(() => { xoaBietCotChuan(); xoaBietCotChuanNL(); xoaDemNangLuc(); vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(Date.parse('2026-09-25T10:00:00+07:00')) })
 

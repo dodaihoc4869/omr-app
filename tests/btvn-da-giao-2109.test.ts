@@ -5,7 +5,7 @@ import type { DongTheoDoiBtvn } from '../src/lib/btvn-may-chu-moi'
 import { nhomBtvn } from '../src/lib/nhom-btvn'
 import {
   baiChoThe, chuHanNop, chuHocGanNhat, chuNopTre, chuTienDoEm, daiCanYNhu, demEmTheoNhom, demNguocHan, docChang, docNhomBai, duongChang, emKhopTim, emTheoNhom, locBai, lopCuaCacBai,
-  chuaNopQuaHan, laChuaNop, mucCanYCuaNhom, NGUONG_DOAN_HEP, sapXepThe, soEmCanY, thanhNhom, type NhomBai, type TheBai,
+  chuaNopQuaHan, laChuaNop, mucCanYCuaNhom, NGUONG_DOAN_HEP, sapXepThe, soEmCanY, thanhNhom, type NhomBai,
 } from '../src/lib/btvn-da-giao'
 
 const vn = (s: string) => Date.parse(`${s}:00+07:00`)

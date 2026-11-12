@@ -2,7 +2,7 @@
 // LUẬT THẦY 05/10 ("chặn chuẩn 100% không được rút nhầm kho khác khối"): kênh tự động chỉ phát câu ĐÚNG khối em; em/câu KHÔNG RÕ khối ⇒ chặn ⇒ em giả ghi lớp 12, câu giả ghi khối `lop` 12 (như `de_kho.lop`).
 // Hợp đồng máy chủ cho ĐẢO THẦN THÚ bản mới (Code 6): `start` trả `role` từng câu, `answer` trả `lyDoThuong`. KHÔNG đổi cách chọn câu / chấm / thưởng.
 import { describe, it, expect } from 'vitest'
-import { chooseSession, chooseSessionWithRoles, DAY, type Attempt, type Evidence, type PrivateQuestion } from '../src/game/than-thu-v2/core'
+import { chooseSession, chooseSessionWithRoles, DAY, type Evidence, type PrivateQuestion } from '../src/game/than-thu-v2/core'
 import { lyDoThuong } from '../src/game/than-thu-v2/ly-do-thuong'
 import { gameV2 } from '../server/src/game-v2'
 import { gameToken } from '../server/src/game-v2-auth'

@@ -4,7 +4,7 @@
 //     thật, không quay; tải xong mà lỗi mạng → chỉ dải cảnh báo; đang tải lần đầu → vòng quay, xưng đúng người (HS "em", PH "con").
 // (2) Bảng vinh danh trong Bảng tin: dải 4 màu Google + chữ "DẤU ẤN MỖI NGÀY" (--vd-vang = #fbbc04 trên nền sáng 1,71:1) — chỉ ở bản M3.
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import fs from 'node:fs'
 import path from 'node:path'
 import BangTinPhuHuynh from '../src/components/BangTinPhuHuynh'
