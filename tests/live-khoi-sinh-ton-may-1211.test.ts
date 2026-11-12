@@ -80,6 +80,12 @@ describe('một nhịp của máy', () => {
     for (let i = 0; i < 8; i++) buocMay(bd, n, [], cuoi + i * 250, 250, rnd)
     expect(Math.hypot(n.x - 800, n.y - 500)).toBeLessThan(dau - 150)
   })
+  it('máy không bắn đồng đội và không bị đồng đội hạ (thầy 12/11)', () => {
+    const m = { ...taoMay(bd, '~0', 0, T0, 0), x: 800, y: 700, batTuDen: 0, mau: 5, lucTrung: T0 } // lucTrung = T0 ⇒ 3 giây đầu chưa hồi máu
+    const ds = [nv({ id: 'S1', x: 860, y: 700, doi: 0, cap: 4, t: '~0' }), nv({ id: '~1', x: 760, y: 700, doi: 0, cap: 2, t: '~0' })]
+    for (let i = 0; i < 6; i++) expect(buocMay(bd, m, ds, T0 + i * 250, 250, rnd)).toBe('')
+    expect(m.mau).toBe(5); expect(m.t).toBe('')
+  })
   it('súng của máy tối đa cấp 2 ⇒ các em luôn có cửa thắng', () => {
     const m = taoMay(bd, '~0', 0, T0, 0)
     mayLenCap(m); mayLenCap(m); mayLenCap(m)

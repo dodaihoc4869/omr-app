@@ -1,7 +1,7 @@
 // TRÒ «SINH TỒN» phòng chờ Live theo khối (thầy chốt 12/11, đặc tả docs/dac-ta-sinh-ton-1211.md mục 4, 7) — lõi thuần src/lib/live-khoi/sinh-ton-loi.ts.
 import { describe, expect, it } from 'vitest'
 import {
-  AN_YEN_MS, BAT_TU_MS, BK_NV, HOI_CHO_MS, HOI_SINH_MS, LO_GAN, MAU_DAY, TAM_BAN, TOC_DO, VAN_CHOI_MS, VAN_MS, anVoi, buocToi, capBanDo, chanDuong, chonMucTieu, conLai, dangAn, dangChet,
+  AN_YEN_MS, BAT_TU_MS, BK_NV, HOI_CHO_MS, HOI_SINH_MS, LO_GAN, MAU_DAY, TAM_NHIN_X, TAM_NHIN_Y, TAM_XA, TOC_DO, VAN_CHOI_MS, VAN_MS, anVoi, buocToi, capBanDo, chanDuong, chonMucTieu, conLai, dangAn, dangChet,
   dangNghi, diChuyen, docDong, laMay, ngoaiVong, nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type NhanVat,
 } from '../src/lib/live-khoi/sinh-ton-loi'
 
@@ -64,10 +64,18 @@ describe('tường, thùng, bụi', () => {
 
 describe('súng tự bắn đối thủ gần nhất', () => {
   const toi = { x: 800, y: 700, doi: 0 }
-  it('gần nhất, còn máu, khác đội, trong tầm', () => {
+  it('gần nhất, còn máu, khác đội, nằm trong khung nhìn — thấy là bắn, không cần tới sát', () => {
     const ds = [nv({ id: 'xa', x: 800 + 200, y: 700 }), nv({ id: 'gan', x: 800 - 120, y: 700 }), nv({ id: 'dongDoi', x: 810, y: 700, doi: 0 }), nv({ id: 'daHa', x: 805, y: 700, mau: 0 })]
     expect(chonMucTieu(bd, toi, ds)).toBe('gan')
-    expect(chonMucTieu(bd, toi, [nv({ id: 'ngoaiTam', x: 800 + TAM_BAN + 5, y: 700 })])).toBe('')
+    // Thấy ở mép màn (cách 480) vẫn bắn; ra khỏi khung nhìn thì thôi.
+    expect(chonMucTieu(bd, toi, [nv({ id: 'mepMan', x: 800 + TAM_NHIN_X - 20, y: 600 })])).toBe('mepMan')
+    expect(chonMucTieu(bd, toi, [nv({ id: 'ngoaiNgang', x: 800 + TAM_NHIN_X + 5, y: 700 })])).toBe('')
+    expect(chonMucTieu(bd, toi, [nv({ id: 'ngoaiDoc', x: 800, y: 700 - TAM_NHIN_Y - 5 })])).toBe('')
+    // Máy em truyền đúng khung màn của mình: ngoài khung ⇒ không bắn, trong khung ⇒ bắn.
+    const khung = { x0: 500, y0: 600, x1: 1100, y1: 900 }
+    expect(chonMucTieu(bd, toi, [nv({ id: 'trenMan', x: 1090, y: 610 })], khung)).toBe('trenMan')
+    expect(chonMucTieu(bd, toi, [nv({ id: 'ngoaiMan', x: 1110, y: 700 })], khung)).toBe('')
+    expect(TAM_XA).toBeGreaterThan(Math.hypot(TAM_NHIN_X, TAM_NHIN_Y))
   })
   it('tường chắn ⇒ không bắn; đối thủ ẩn trong bụi ⇒ không bắn', () => {
     expect(chonMucTieu(bd, { x: 535, y: 330, doi: 0 }, [nv({ id: 'sauTuong', x: 535, y: 240 })])).toBe('')
@@ -84,6 +92,17 @@ describe('sát thương (bên bị bắn tự tính từ ảnh chụp)', () => {
     expect(mat({ id: '~3', cap: 1 })).toBeCloseTo(20.1, 1)
     expect(laMay('~3')).toBe(true); expect(laMay('S3')).toBe(false)
     expect(mat({ id: 'A', doi: 0 })).toBe(0); expect(mat({ id: 'A', mau: 0 })).toBe(0); expect(mat({ id: 'A', t: 'nguoi-khac' })).toBe(0)
+  })
+  it('ĐỒNG ĐỘI KHÔNG HẠ ĐƯỢC NHAU (thầy 12/11): không ngắm, không trúng đạn thẳng, không dính tia nảy hay nổ lan của đồng đội', () => {
+    const dongDoi = (cap: number, t: string) => nv({ id: 'D', x: 860, y: 700, doi: 0, cap, t })
+    // Súng không bao giờ chọn đồng đội, kể cả khi đứng sát và không có ai khác.
+    expect(chonMucTieu(bd, toi, [nv({ id: 'D', x: 820, y: 700, doi: 0 })])).toBe('')
+    // Đồng đội có khai nhầm đang bắn mình (gói sai / máy lệch đội) thì vẫn không mất máu, ở mọi cấp súng.
+    for (const cap of [1, 2, 3, 4]) expect(satThuong(toi, [dongDoi(cap, 'T')], 1)).toEqual({ tong: 0, ai: '' })
+    // Đồng đội bắn Súng Sấm / Pháo Sao vào đối thủ đứng sát mình: tia nảy và nổ lan không chạm mình.
+    const doiThu = nv({ id: 'X', x: 830, y: 700, doi: 2 })
+    expect(satThuong(toi, [dongDoi(3, 'X'), doiThu], 1).tong).toBe(0)
+    expect(satThuong(toi, [dongDoi(4, 'X'), doiThu], 1).tong).toBe(0)
   })
   it('nhiều kẻ cùng bắn ⇒ cộng dồn; `ai` = kẻ gây nhiều nhất', () => {
     const kq = satThuong(toi, [nv({ id: 'A', x: 900, y: 700, t: 'T', cap: 1 }), nv({ id: 'B', x: 700, y: 700, t: 'T', cap: 3, doi: 2 })], 0.25)

@@ -4,8 +4,8 @@
 import type { BanDo, ChuNhat, Diem, Vong } from '../../lib/live-khoi/sinh-ton-loi'
 import { KHOP, SUNG_HE, SUNG_NONG, mau, pha, type BangMau, type BoHinh } from './sinh-ton-hinh'
 
-/** Cỡ bé ma trên sân (thầy 12/11: người bé, súng to). */
-export const K_NV = 0.86
+/** Cỡ bé ma trên sân (thầy 12/11 chiều: «cho con ma nhỏ hơn chút nữa»; trước là 0,86). */
+export const K_NV = 0.74
 const TAU = Math.PI * 2
 /** Ba path ngọn lửa — đúng `NgonLua` ở src/components/bpu/ManBinhPhanUng.tsx (viewBox 64 × 80). */
 const LUA = ['M32 4C35 17 50 25 54 40c4 17-7 34-22 34S6 57 10 40c2-8 7-12 9-19 3 7 6 10 9 11-1-10 1-19 4-28z', 'M32 28c2 9 12 14 14 24 2 12-5 21-14 21s-16-9-14-21c1-5 4-9 6-13 1 4 3 7 6 8-1-7 0-13 2-19z', 'M32 47c2 6 8 9 8 16a8 8 0 0 1-16 0c0-7 6-10 8-16z']

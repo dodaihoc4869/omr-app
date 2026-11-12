@@ -7,8 +7,14 @@ import type { SinhTonDong } from './kieu'
 export const VAN_CHOI_MS = 90_000
 export const VAN_MS = 95_000
 export const MAU_DAY = 100
-/** Tầm súng tự bắn (đơn vị sân). */
-export const TAM_BAN = 240
+/** TẦM NHÌN = tầm súng (thầy 12/11 chiều: «tự bắn khi thấy đối thủ gần nhất», không phải tới sát mới bắn): súng bắn đối thủ gần nhất nằm trong khung nhìn.
+ *  Máy em truyền đúng khung màn hình của mình; không truyền (máy bù chỗ) thì dùng khung mặc định nửa rộng × nửa cao dưới đây — cỡ màn điện thoại ngang. */
+export const TAM_NHIN_X = 500
+export const TAM_NHIN_Y = 240
+/** Xa hơn mức này thì chắc chắn không ai thấy ai (chặn gói khai mục tiêu sai). */
+export const TAM_XA = 660
+/** Khung nhìn trên sân: đối thủ phải nằm trong khung mới bị bắn. */
+export interface KhungNhin { x0: number; y0: number; x1: number; y1: number }
 /** Bán kính va chạm của một bé ma. */
 export const BK_NV = 18
 export const TOC_DO = 190
@@ -222,11 +228,12 @@ export function timDuong(bd: BanDo, x1: number, y1: number, x2: number, y2: numb
 export function anVoi(bd: BanDo, nv: NhanVat, x: number, y: number, doi: number): boolean {
   return nv.doi !== doi && !nv.t && trongBui(bd, nv.x, nv.y) && Math.hypot(nv.x - x, nv.y - y) > LO_GAN
 }
-/** Súng tự chọn: đối thủ GẦN NHẤT còn máu, trong tầm, đang nhìn thấy, không bị tường chắn. '' = không có ai. */
-export function chonMucTieu(bd: BanDo, toi: { x: number; y: number; doi: number }, ds: readonly NhanVat[], tam = TAM_BAN): string {
-  let gan = tam, id = ''
+/** Súng tự chọn: đối thủ GẦN NHẤT còn máu, nằm trong khung nhìn, không ẩn trong bụi, không bị tường chắn. '' = không thấy ai. */
+export function chonMucTieu(bd: BanDo, toi: { x: number; y: number; doi: number }, ds: readonly NhanVat[], khung?: KhungNhin): string {
+  const k = khung ?? { x0: toi.x - TAM_NHIN_X, y0: toi.y - TAM_NHIN_Y, x1: toi.x + TAM_NHIN_X, y1: toi.y + TAM_NHIN_Y }
+  let gan = TAM_XA, id = ''
   for (const nv of ds) {
-    if (nv.doi === toi.doi || nv.mau <= 0) continue
+    if (nv.doi === toi.doi || nv.mau <= 0 || nv.x < k.x0 || nv.x > k.x1 || nv.y < k.y0 || nv.y > k.y1) continue
     const d = Math.hypot(nv.x - toi.x, nv.y - toi.y)
     if (d >= gan || anVoi(bd, nv, toi.x, toi.y, toi.doi) || chanDuong(bd, toi.x, toi.y, nv.x, nv.y)) continue
     gan = d; id = nv.id
@@ -240,7 +247,7 @@ export function satThuong(toi: { id: string; x: number; y: number; doi: number }
   for (const e of ds) {
     if (e.doi === toi.doi || e.mau <= 0 || !e.t || e.id === toi.id) continue
     let he = 0
-    if (e.t === toi.id) he = Math.hypot(e.x - toi.x, e.y - toi.y) <= TAM_BAN * 1.6 ? 1 : 0
+    if (e.t === toi.id) he = Math.hypot(e.x - toi.x, e.y - toi.y) <= TAM_XA ? 1 : 0
     else if (e.cap >= 3) {
       const mt = ds.find((n) => n.id === e.t)
       if (!mt || mt.doi === e.doi || mt.mau <= 0) continue

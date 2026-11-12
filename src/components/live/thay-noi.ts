@@ -351,9 +351,32 @@ async function moThe(): Promise<void> {
   if (!the) { lt.thaMic(); return }
   loiMic = kq.ok ? '' : kq.lyDo
   if (!kq.ok) the = { ...the, loi: kq.lyDo }
-  else the = { ...the, loi: '', ds: await lt.dsMic().catch(() => []) }
+  else { the = { ...the, loi: '', ds: await lt.dsMic().catch(() => []) }; void tuChonKrisp() }
   void napLoa() // ô «Loa» (sau khi có quyền mic thì trình duyệt mới cho tên thiết bị)
   bao()
+}
+/** Chọn mic (nút «Mic» của tờ chiếu / tự chọn Krisp): nhớ ở máy, mở mic ấy cho cả vạch đo lẫn luồng đang gửi. */
+async function chonMic(id: string): Promise<void> {
+  if (!the) return
+  the = { ...the, chon: id }; ghi(KHOA_MIC, id); bao()
+  const kq = await lt?.moMic(id)
+  if (!kq) return
+  loiMic = kq.ok ? '' : kq.lyDo
+  if (the && !kq.ok) the = { ...the, loi: kq.lyDo }
+  bao()
+}
+/** KRISP (12/11 chiều, thầy: «cấu hình luôn mic trên app chọn Krisp tự động và tự động tắt lọc ồn các thứ»): lần ĐẦU máy thầy thấy mic ảo Krisp (tên có
+ *  «krisp») lúc CHƯA live ⇒ chọn mic ấy + «Lọc ồn» Tắt + «Tiếng» Chuẩn trình duyệt — đi đúng đường các nút sẵn có (chon-mic / loc-on / kieu-tieng), không thêm
+ *  ràng buộc mic mới. MỘT lần mỗi máy (cờ `KHOA_KRISP`): sau đó thầy chọn lại BOYALINK thì app giữ lựa chọn của thầy. Không có Krisp ⇒ không đổi gì.
+ *  Chọn lúc chưa live để thầy nói thử thấy vạch mức âm ngay (Krisp chưa chạy ⇒ mic ảo im ⇒ thầy chọn lại BOYALINK). Khử vọng giữ nguyên (loa phát tiếng em). */
+export const KHOA_KRISP = 'ddh.live.krisp-da-chon'
+async function tuChonKrisp(): Promise<void> {
+  if (!the || !lt || nho(KHOA_KRISP) || ttLt?.pha === 'live' || view?.live?.bat) return
+  const k = the.ds.find((d) => /krisp/i.test(d.ten))
+  if (!k) return
+  ghi(KHOA_KRISP, '1'); ghi('ddh.live.loc-on', 'tat'); ghi('ddh.live.kieu-tieng', '')
+  if (the.chon !== k.id) await chonMic(k.id)
+  lt?.datLocOn('tat'); lt?.datKieuTieng(true); bao()
 }
 async function bat(khongTieng: boolean): Promise<void> {
   await dam()
@@ -373,8 +396,15 @@ function bam(): void {
   if (!l || !layPhong()) return
   if (l.bat) { if (the) { the = null; bao() } else void moThe(); return }
   if (the) { the = null; bao(); return }
-  if (nho(KHOA_DA_BAT) && l.tieng !== 'chua-cau-hinh') void bat(false)
+  if (nho(KHOA_DA_BAT) && l.tieng !== 'chua-cau-hinh') void (nho(KHOA_KRISP) ? bat(false) : batHoacKrisp())
   else void moThe()
+}
+/** Máy đã từng live (bấm là live ngay) nhưng CHƯA tự chọn Krisp lần nào: có mic Krisp ⇒ mở thẻ mic một lần (tự chọn Krisp, thầy nói thử thấy vạch) thay vì live ngay. */
+async function batHoacKrisp(): Promise<void> {
+  await dam()
+  const ds = lt ? await lt.dsMic().catch(() => []) : []
+  if (ds.some((d) => /krisp/i.test(d.ten))) await moThe()
+  else await bat(false)
 }
 
 type TinTo = { viec?: unknown; id?: unknown; v?: unknown; sk?: unknown; trang?: unknown; tiLe?: unknown; net?: unknown; vung?: unknown; giayToi?: unknown; sbd?: unknown; giay?: unknown }
@@ -405,7 +435,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
     case 'chon-loa': if (the?.loa && typeof m.id === 'string') { the = { ...the, loa: { ...the.loa, chon: m.id, thu: undefined } }; bao(); void lt?.datLoa(m.id).then(() => napLoa()) } break
     case 'thu-loa': if (the?.loa && lt) { the = { ...the, loa: { ...the.loa, thu: 'dang' } }; bao(); void lt.thuLoa().then((ok) => { if (the?.loa) { the = { ...the, loa: { ...the.loa, thu: ok ? 'ok' : 'loi' } }; bao() } }) } break
     // chọn mic ⇒ áp NGAY cho cả vạch đo lẫn luồng đang gửi (thư viện gắn luồng mới vào bộ gửi), nhớ cho lần sau
-    case 'chon-mic': if (the && typeof m.id === 'string') { the = { ...the, chon: m.id }; ghi(KHOA_MIC, m.id); bao(); void lt?.moMic(m.id).then((kq) => { loiMic = kq.ok ? '' : kq.lyDo; if (the && !kq.ok) the = { ...the, loi: kq.lyDo }; bao() }) } break
+    case 'chon-mic': if (the && typeof m.id === 'string') void chonMic(m.id); break
     // «Lọc tiếng ồn + khử vọng»: tự động / luôn bật / luôn tắt
     case 'loc-on': { const v: MucLocOn = m.v === 'manh' || m.v === 'tat' ? m.v : m.v === 'thay' && chiThayCo() ? 'thay' : 'vua'; ghi('ddh.live.loc-on', v === 'vua' ? '' : v); lt?.datLocOn(v); bao(); setTimeout(bao, 900); break }
     case 'loc': { const v: CheDoLoc = m.v === 'bat' || m.v === 'tat' ? m.v : 'tu'; ghi(KHOA_LOC, v === 'tu' ? '' : v); lt?.datLoc(v); bao(); break }

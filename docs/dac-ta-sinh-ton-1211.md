@@ -104,3 +104,7 @@ Phòng chờ máy em luôn nằm ngang, luôn nền xanh than ⇒ bản vẽ ch�
 - **Chạy thử bản thật ngoài app:** `npx vite --port 5199 --strictPort` rồi mở `/docs/ban-ve-sinh-ton-1211/that/` (`?ban=5` số bạn giả · `?xem=1` máy thầy · `?yeu=1` máy yếu). Trang này gắn `TroSinhTon.tsx` thật với lớp `KenhLopMay` THẬT của máy chủ chạy trong trình duyệt. Chụp: `CHROMIUM=<đường dẫn> node docs/ban-ve-sinh-ton-1211/that/chup-that.mjs` ⇒ ảnh `that/that-*.jpg`.
 - **Đã đo (Chromium, bản dev):** 58–62 khung / giây ở 844 × 390 · 667 × 375 · 1180 × 820 và ở sân 40 em; 0 lỗi trang, 0 lớp phủ đè / tràn; chạy trọn một ván: hạ máy ⇒ súng lên cấp 2, 3; bị hạ ⇒ đếm ngược; hết ván ⇒ bảng xếp hạng.
 - **CHƯA thử:** lớp thật nhiều máy qua mạng thật, iPhone thật (màn xoay bằng CSS), 80–100 em cùng lúc, máy yếu thật.
+
+## Chỉnh sau khi thầy chơi thử bản sống (12/11 chiều)
+- **«Tự bắn phải gần quá mới bắn, tôi muốn tự bắn khi thấy đối thủ gần nhất»:** bỏ tầm bắn 240. Súng bắn đối thủ gần nhất ĐANG HIỆN TRÊN MÀN của em (lùi mép 24 px), vẫn theo luật tường chắn và bụi ẩn. Máy bù chỗ dùng khung mặc định nửa rộng 500 × nửa cao 240 (cỡ màn điện thoại ngang). Phòng nhận sát thương trong 660 đơn vị.
+- **«Cho con ma nhỏ hơn chút nữa, súng nhỏ hơn phù hợp với con ma»:** cỡ bé ma 0,86 → 0,74; cỡ súng 1,12 → 0,9 nét gốc.
