@@ -28,6 +28,7 @@ html[data-bpu-an] [data-live-khoi-thay] { display: none; }
 .lkt-doi h3 small { margin-left: auto; font-size: 14px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent); }
 .lkt-doi ul { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 6px; }
 .lkt-doi li { min-height: 26px; padding: 5px 8px; border-radius: 8px; background: var(--tr-chieu-mat-2); font-size: 13px; line-height: 1.25; overflow-wrap: anywhere; }
+.lkt-doi li.may { background: transparent; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-chieu-giay) 28%, transparent); color: color-mix(in srgb, var(--tr-chieu-giay) 62%, transparent); }
 .lkt-doi li.rong { grid-column: 1 / -1; background: transparent; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); }
 .lkt-cho footer p { flex: 1; margin: 0; color: color-mix(in srgb, var(--tr-chieu-giay) 72%, transparent); }
 .lkt-cho footer strong { color: var(--p-cam); }

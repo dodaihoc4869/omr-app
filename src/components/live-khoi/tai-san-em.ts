@@ -7,12 +7,12 @@ const ranh = (f: () => void): void => {
 }
 const im = (p: Promise<unknown>): void => { void p.catch(() => {}) }
 let daEm = false
-/** Máy em: màn phòng (Bình Phản Ứng), lớp nổi, trò Giữ Lửa, chat, màn bốn đội, bảng live, màn vinh danh. */
+/** Máy em: màn phòng (Bình Phản Ứng), lớp nổi, trò Sinh Tồn, chat, màn bốn đội, bảng live, màn vinh danh. */
 export function taiSanEm(): void {
   if (daEm) return
   daEm = true
   ranh(() => {
-    im(import('../bpu/gan-hs')); im(import('./LopNoiEm')); im(import('./TroGiuLua')); im(import('./ChatEm')); im(import('./ManBonDoi'))
+    im(import('../bpu/gan-hs')); im(import('./LopNoiEm')); im(import('./TroSinhTon')); im(import('./ChatEm')); im(import('./ManBonDoi'))
     // Bảng live (LopLive) không tải ở đây: màn phòng tự nạp nó ngay khi thầy sẵn sàng tiếng (`live.san`), và nhập ở đây làm tách thêm một mảnh dùng chung vào precache.
     ranh(() => { im(import('./ManVinhDanh')) })
   })

@@ -24,7 +24,7 @@ const DS = [
   ['10-thay-xem-tran', 'gv', [[1366, 768]]],
 ]
 const loc = process.argv[2]
-const b = await chromium.launch()
+const b = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {})
 let loi = 0
 for (const [ten, man, kho] of DS) for (const [w, h] of kho) {
   if (loc && !ten.includes(loc)) continue

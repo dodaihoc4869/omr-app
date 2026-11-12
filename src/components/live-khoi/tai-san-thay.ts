@@ -12,7 +12,7 @@ export function taiSanThay(): void {
   if (daThay) return
   daThay = true
   ranh(() => {
-    im(import('../bpu/gan-gv')); im(import('./thay-khoi')); im(import('./LopNoiThay')); im(import('./TroGiuLua'))
+    im(import('../bpu/gan-gv')); im(import('./thay-khoi')); im(import('./LopNoiThay')); im(import('./TroSinhTon'))
     ranh(() => { im(import('./ChatThay')); im(import('../bpu/ChonCauBpu')) })
   })
 }

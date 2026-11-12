@@ -1,4 +1,4 @@
-# Đặc tả trò «Sinh Tồn» ở phòng chờ Live theo khối — BƯỚC 2 (12/11/2026), CHỜ THẦY DUYỆT ẢNH
+# Đặc tả trò «Sinh Tồn» ở phòng chờ Live theo khối — thầy CHỐT 12/11/2026 «chốt build đẩy luôn lên», ĐÃ BUILD (mục «Bản thật» cuối tệp)
 
 Thay trò «Giữ Lửa» (`src/components/live-khoi/TroGiuLua.tsx`). Giữ nguyên bốn đội Natri · Kali · Đồng · Canxi, khung phòng chờ, nút «Rời phòng chờ», nút «Bắt đầu live» của thầy.
 Bản vẽ: `docs/ban-ve-sinh-ton-1211/` (16 ảnh Chromium thật; `mo-phong.html` + `chup.mjs` để vẽ lại). Chưa tham vấn được cố vấn (phiên này không có cố vấn).
@@ -92,3 +92,15 @@ Phòng chờ máy em luôn nằm ngang, luôn nền xanh than ⇒ bản vẽ ch�
 
 ## Danh sách ảnh
 `01-em-giao-tranh-{844,667,1180}` · `02-bon-nhan-vat-1366` · `11-bon-cap-sung-1366` · `12-em-sung-len-cap-844` · `03-em-dau-van-huong-dan-{844,667}` · `04-em-cham-de-toi-844` · `05-em-an-trong-bui-844` · `06-em-bi-ha-hoi-sinh-844` · `07-em-ban-moi-thay-ban-may-844` · `08-em-het-van-{844,667}` · `09-em-mat-ket-noi-844` · `10-thay-xem-tran-1366`.
+
+## Bản thật (bước 4, build 12/11 chiều)
+- **Mã:** lõi thuần `src/lib/live-khoi/sinh-ton-loi.ts` (bản đồ, đường ngắm, sát thương, tìm đường, bé ma của em) + `sinh-ton-may.ts` (máy bù chỗ); hình nét `src/components/live-khoi/sinh-ton-hinh.ts`; vẽ khung `sinh-ton-ve.ts`; màn `TroSinhTon.tsx` + `tro-sinh-ton.css`; phòng `server/src/kenh-lop-may.ts`; hợp đồng `src/lib/live-khoi/kieu.ts`. Gỡ `TroGiuLua.tsx`, `tro-loi.ts` (giữ `tro-giu-lua.css`: khung `.gl`, bảng điểm, tin trận dùng lại + luật giữ màu).
+- **Khác bản vẽ / đặc tả, đã chọn khi build:**
+  - Bụi: đứng YÊN trong bụi 0,4 giây thì súng NGỪNG bắn ⇒ ẩn hẳn và máu hồi; hễ di chuyển là súng bắn lại (lộ). Nhờ vậy «nấp để hồi» mới dùng được.
+  - Bên bắn khai mục tiêu (`t`) trong gói; bên bị bắn tự trừ máu theo ảnh chụp. Phòng đếm lượt hạ khi bên bị hạ báo (`a`), mỗi em tối đa một lượt / 2,5 giây.
+  - Số ván trên màn = số thứ tự ván của phòng (`v`), mọi máy thấy cùng một số.
+  - Tin trận không hiện «Máy hạ Máy». Bảng hết ván ghi «hoà» khi hai đội đầu bằng điểm.
+  - Máy thầy: ô «Máy» viền mảnh trong danh sách đội; huy hiệu đội giữ kiểu chữ ký hiệu (Na · K · Cu · Ca) như cũ.
+- **Chạy thử bản thật ngoài app:** `npx vite --port 5199 --strictPort` rồi mở `/docs/ban-ve-sinh-ton-1211/that/` (`?ban=5` số bạn giả · `?xem=1` máy thầy · `?yeu=1` máy yếu). Trang này gắn `TroSinhTon.tsx` thật với lớp `KenhLopMay` THẬT của máy chủ chạy trong trình duyệt. Chụp: `CHROMIUM=<đường dẫn> node docs/ban-ve-sinh-ton-1211/that/chup-that.mjs` ⇒ ảnh `that/that-*.jpg`.
+- **Đã đo (Chromium, bản dev):** 58–62 khung / giây ở 844 × 390 · 667 × 375 · 1180 × 820 và ở sân 40 em; 0 lỗi trang, 0 lớp phủ đè / tràn; chạy trọn một ván: hạ máy ⇒ súng lên cấp 2, 3; bị hạ ⇒ đếm ngược; hết ván ⇒ bảng xếp hạng.
+- **CHƯA thử:** lớp thật nhiều máy qua mạng thật, iPhone thật (màn xoay bằng CSS), 80–100 em cùng lúc, máy yếu thật.
