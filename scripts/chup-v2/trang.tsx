@@ -570,7 +570,8 @@ if (LA_LAM13 && ['duo', 'duo-nc', 'duo-bang', 'duo-pt', 'duo-tn', 'chang-ngang']
 // HỆ KÍNH 02/11: màn con mở từ Hôm nay (Tự sửa lỗi, Tu luyện, Chữa câu sai…) — app thật luôn có Hôm nay (TrongHs + ba tờ kiểu của nó) nằm dưới ⇒ trang chụp
 // nạp đúng ba tờ ấy + .ht2 ẩn, nếu không ảnh thiếu mọi lớp kính (nền trắng) — không giống app thật.
 if ((man.startsWith('hs12-') || ['tp', 'duo-kt', 'duo-sua', 'hs-ng', 'lam13'].includes(man)) && document.documentElement.dataset.trong === 'hs') { // màn con mở trên Hôm nay (cổng học sinh)
-  void import('../../src/styles/trong-hs.css').then(() => import('../../src/styles/trong-hs-ngang.css')).then(() => import('../../src/styles/trong-kinh.css'))
+  // 12/11: + bo-cuc-hn.css (mang @import phang-hs.css — app học sinh PHẲNG 07/11) như bản sống; thiếu tờ này ảnh còn kính / bóng cũ, không giống app thật.
+  void import('../../src/styles/trong-hs.css').then(() => import('../../src/styles/trong-hs-ngang.css')).then(() => import('../../src/styles/trong-kinh.css')).then(() => import('../../src/styles/bo-cuc-hn.css'))
   document.body.insertAdjacentHTML('beforeend', '<div class="ht2" hidden></div>'); document.documentElement.setAttribute('data-ht2', '')
 }
 // ═══ hết DUO APP 26/10
