@@ -40,21 +40,23 @@ export const CAO_KHUNG_THAP = 500
  *  hình đầu tiên đã xoay, không nháy dọc. Chỉ nghe đổi cỡ khi đang live. Trả: `giu` = giữ khoá ngang (LopLive) · `xoay` = gốc màn đang xoay hình ·
  *  `the` = thuộc tính + kiểu cho gốc `.bpu-hs` (`data-xoay`; `data-ngang` / `data-thap` = điều kiện @media ngang mà HÌNH thoả — trang dọc nên @media
  *  không khớp, bpu-hs.css nhắc lại đúng các luật ấy; khổ HÌNH = trang đổi trục). */
-export function useHuongLive(che: 'an' | 'dau' | 'bang', liveBat: boolean): { giu: boolean; xoay: boolean; the: { 'data-xoay'?: ''; 'data-ngang'?: ''; 'data-thap'?: ''; style?: CSSProperties } } {
+export function useHuongLive(che: 'an' | 'dau' | 'bang', liveBat: boolean, ep = false): { giu: boolean; xoay: boolean; the: { 'data-xoay'?: ''; 'data-ngang'?: ''; 'data-thap'?: ''; style?: CSSProperties } } {
   const [kho, setKho] = useState<readonly [number, number]>(() => [window.innerWidth, window.innerHeight])
   useEffect(() => {
-    if (!liveBat) return
+    if (!liveBat && !ep) return
     const doi = () => setKho((c) => (c[0] === window.innerWidth && c[1] === window.innerHeight ? c : [window.innerWidth, window.innerHeight]))
     doi()
     window.addEventListener('resize', doi)
     window.addEventListener('orientationchange', doi)
     return () => { window.removeEventListener('resize', doi); window.removeEventListener('orientationchange', doi) }
-  }, [liveBat])
+  }, [liveBat, ep])
   const doc = kho[1] > kho[0]
   const [huong, setHuong] = useState<HuongLive>(null)
-  const moi = buocHuongLive(huong, che, liveBat, doc)
+  // `ep` (LIVE THEO KHỐI, thầy 12/11 «ép xoay ngang hết khi hs vào live»): suốt buổi live máy em luôn NGANG — trang dọc thì xoay hình mọi màn
+  // (danh sách, câu hỏi, kết quả); riêng lớp bảng live tự xoay lấy nên gốc màn không xoay chồng.
+  const moi = ep ? (doc ? 'xoay' : 'ngang') : buocHuongLive(huong, che, liveBat, doc)
   if (moi !== huong) setHuong(moi)
-  const xoay = xoayManCau(moi, che, doc)
+  const xoay = ep ? che !== 'bang' && doc : xoayManCau(moi, che, doc)
   if (!xoay) return { giu: moi !== null, xoay, the: {} }
   return { giu: true, xoay, the: { 'data-xoay': '', ...(kho[1] >= RONG_HAI_COT ? { 'data-ngang': '' } : {}), ...(kho[0] <= CAO_KHUNG_THAP ? { 'data-thap': '' } : {}), style: { width: kho[1], height: kho[0] } } }
 }

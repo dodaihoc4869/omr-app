@@ -38,6 +38,12 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
   const phong = new PhongBinhPhanUng(ctx, { MA_BI_MAT: 'thu' })
   const post = (duong, b) => phong.fetch(new Request(`https://bpu${duong}`, { method: 'POST', body: JSON.stringify(b) })).then((r) => r.json())
 
+  const EM = [['S1', 'Nguyễn Thị Hà'], ['S2', 'Lê Gia Huy'], ['S3', 'Phạm Khánh Vy'], ['S4', 'Đỗ Hoàng Nam'], ['S5', 'Trần Minh Anh'], ['S6', 'Ngô Gia Bảo'], ['S7', 'Vũ Ngọc Lan'], ['S8', 'Bùi Đức Anh']]
+  // Hai câu của vai app thầy thật (12/11): cùng mã với tờ dựng bằng `chieuCau` ở trang thử (?vai=gv).
+  const CAU_GV = [
+    { qid: 'Q1', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Alcohol nào sau đây là alcohol bậc II?', choices: ['CH₃–CH₂–OH', 'CH₃–CH(OH)–CH₃', '(CH₃)₃C–OH', 'CH₃–OH'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Bậc alcohol', mucDo: 'hieu', sao: 2, kienThuc: [] },
+    { qid: 'Q2', maDe: 'm', version: '1', group: 'g', phan: 'I', text: 'Phenol (C₆H₅OH) tác dụng được với dung dịch nào sau đây?', choices: ['NaCl', 'NaOH', 'HCl', 'NaHCO₃'], ideas: [], hinhAnh: [], dang: null, tenDang: 'Phenol', mucDo: 'hieu', sao: 2, kienThuc: [] },
+  ]
   const PUB = join(GOC, 'public')
   const http = createServer(async (req, res) => {
     const u = new URL(req.url, 'http://x'), d = decodeURIComponent(u.pathname)
@@ -50,6 +56,11 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
       try { b = JSON.parse(than || '{}') } catch { /* bỏ qua */ }
       const tra = (o) => { res.writeHead(200, { 'content-type': 'application/json' }); res.end(JSON.stringify(o)) }
       if (d.endsWith('/hs/bpu/ve') || d.endsWith('/hs/bpu/cua-em')) return tra({ ok: true, ve: `hs.${String(b.token ?? '').replace(/^tk-/, '') || 'S1'}`, buoiId: 'b1' })
+      // 12/11 Live theo khối — vai app thầy THẬT (?vai=gv): bảng gọi /gv/bpu/mo (dựng lại phòng như máy chủ thật), kết thúc buổi, lệnh lịch.
+      if (d.endsWith('/gv/bpu/mo')) { await post('/khoi', { buoiId: 'b1', lop: 'Live Khối 12', ds: EM.map(([sbd, ten], i) => ({ sbd, ten, coMat: true, luc: Date.now() + i })), live: { cho: true, sfu } }); return tra({ ok: true, buoiId: 'b1', ve: 'gv', soEm: EM.length }) }
+      if (d.endsWith('/gv/bpu/luot')) { const c = CAU_GV.find((x) => x.qid === b.qid); if (!c) return tra({ ok: false, lyDo: 'khong-co', error: 'Câu này không có trong kho của app nên chưa gửi xuống máy em được.' }); const r = await post('/luot', { qid: c.qid, phan: 'I', tuLuan: false, cau: c, dung: 'B', hanGiay: 0, giai: null, bo: b.bo === true }); return tra({ ok: r.ok !== false, so: r.so, tuLuan: false, daBao: EM.length }) }
+      if (d.endsWith('/gv/buoi-hoc')) { if (b.action === 'dong') await post('/dong', {}); return tra({ ok: true, buoi: b.action === 'dang-mo' ? [] : { id: 'b1', ten: 'Live', lop: 'Live Khối 12' } }) }
+      if (d.includes('/gv/bpu/khoi-')) return tra({ ok: true, lich: [], soEm: { 10: 0, 11: 0, 12: 8 } })
       if (d.startsWith('/bpu/live/')) return tra(cuaLive ? await cuaLive(d, b, phong).catch((e) => ({ ok: false, lyDo: 'cua-thu', loi: String(e?.message ?? e).slice(0, 80) })) : { ok: false, lyDo: 'chua-cau-hinh' })
       return tra({ ok: false })
     }
@@ -73,7 +84,6 @@ export async function moMayChu({ dist, sfu = true, cuaLive = null, gocPhong = GO
   })
   await new Promise((r) => http.listen(0, '127.0.0.1', r))
   const goc = `http://127.0.0.1:${http.address().port}`
-  const EM = [['S1', 'Nguyễn Thị Hà'], ['S2', 'Lê Gia Huy'], ['S3', 'Phạm Khánh Vy'], ['S4', 'Đỗ Hoàng Nam'], ['S5', 'Trần Minh Anh'], ['S6', 'Ngô Gia Bảo'], ['S7', 'Vũ Ngọc Lan'], ['S8', 'Bùi Đức Anh']]
   await post('/khoi', { buoiId: 'b1', lop: '12A1', ds: EM.map(([sbd, ten], i) => ({ sbd, ten, coMat: true, luc: Date.now() + i })), live: { cho: true, sfu } })
   return {
     goc, phong, post,

@@ -27,7 +27,7 @@ html[data-bpu-an] [data-live-khoi-thay] { display: none; }
 .lkt-doi h3 b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--doi); color: var(--tr-chieu-bang); font-size: 15px; }
 .lkt-doi h3 small { margin-left: auto; font-size: 14px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent); }
 .lkt-doi ul { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 6px; }
-.lkt-doi li { height: 26px; padding: 0 8px; border-radius: 8px; background: var(--tr-chieu-mat-2); font-size: 13px; line-height: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lkt-doi li { min-height: 26px; padding: 5px 8px; border-radius: 8px; background: var(--tr-chieu-mat-2); font-size: 13px; line-height: 1.25; overflow-wrap: anywhere; }
 .lkt-doi li.rong { grid-column: 1 / -1; background: transparent; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); }
 .lkt-cho footer p { flex: 1; margin: 0; color: color-mix(in srgb, var(--tr-chieu-giay) 72%, transparent); }
 .lkt-cho footer strong { color: var(--p-cam); }
@@ -52,3 +52,18 @@ html[data-bpu-an] [data-live-khoi-thay] { display: none; }
 @media (max-width: 1100px) { .lkt-cho.sanh footer { flex-wrap: wrap; } .lkt-che-to { min-width: 0; flex: 1; } }
 @media (prefers-reduced-motion: reduce) { .lkt-cho.sanh, .lkt-chon { animation: none; } }
 .lkt-the[data-tieng='bat'] { color: var(--lk-dung); } .lkt-the[data-tieng='cho'] { color: var(--lk-chu-3); }
+/* NỀN + TỜ CỦA BUỔI LIVE: tấm nền xanh than che app bên dưới (không bao giờ lộ màn Hôm nay giữa buổi); tờ giảng kín màn — bỏ dải đầu + nút đóng của khung
+   (thoát bằng Esc lùi từng màn), không chừa thanh bên. Ra Hôm nay (html[data-bpu-an]) ⇒ nền ẩn. */
+[data-live-khoi-nen] { position: fixed; inset: 0; z-index: 99980; background: var(--tr-chieu-bang); }
+html[data-bpu-an] [data-live-khoi-nen] { display: none; }
+html[data-live-khoi] .lop-xem-phieu { left: 0 !important; padding-top: 0 !important; }
+html[data-live-khoi] .lop-xem-phieu .khung-phieu-thanh, html[data-live-khoi] .lop-xem-phieu .nut-dong-phieu { display: none !important; }
+.lkt-nut-chat.canh { box-shadow: inset 0 0 0 2px var(--lk-chu-y); color: var(--lk-chu-y) !important; }
+/* Viên «Đang live · Vào lại» ở Hôm nay khi thầy Esc ra ngoài giữa buổi. */
+[data-live-khoi-ngoai] { position: fixed; right: 18px; bottom: 18px; z-index: 2147483000; display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 16px; border-radius: 99px; background: var(--tr-chieu-bang); color: var(--tr-chieu-giay); font: 700 14px/1 var(--sans, system-ui, sans-serif); box-shadow: 0 10px 30px color-mix(in srgb, var(--tr-chieu-bang) 45%, transparent); }
+[data-live-khoi-ngoai] span::before { content: ''; display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: var(--p-do); }
+[data-live-khoi-ngoai] button { height: 40px; padding: 0 16px; border: 0; border-radius: 99px; background: var(--tr-chieu-nhan-toi); color: var(--tr-chieu-bang); font: inherit; font-weight: 800; cursor: pointer; }
+.lkt-vien[data-tren] { bottom: auto; right: auto; top: calc(26px * var(--k-bang, 1)); left: 50%; transform: translateX(-50%); }
+
+/* Buổi live theo khối: bảng đua KHÔNG có nút «Đóng» (Esc lùi về sảnh, kết thúc ở sảnh / nút Kết thúc buổi) — thầy 12/11 «không hiện nút Đóng trơ trọi». */
+html[data-live-khoi] .bpu-bang .bb-dong { display: none; }

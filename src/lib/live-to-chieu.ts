@@ -31,7 +31,12 @@
 //   dòng chẩn đoán mic: chữ nhỏ, chọn / chụp được
 //   11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh). Dáng nút lưới «thêm» (.mc-lv-gon) khai ở đây từ bản K5; nút + khay nay dựng ở thanh-day-to-chieu.ts cho MỌI trạng thái
 export const CSS_LIVE_TO_CHIEU = `
-body.mc-che-bang .mc-vung-de{display:none!important}
+body.mc-che-bang .mc-vung-de,body.mc-che-bang .mc-trang{display:none!important}
+body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai{display:block!important;grid-column:1/-1!important;grid-row:1/-1!important}
+body.mc-che-bang.mc-bc .mc-dot-don .mc-cot-lam-bai::after{content:""!important;display:block!important;position:absolute;left:66.667%;top:0;bottom:0;width:2px;background:var(--mc-bang-nut);pointer-events:none}
+body.mc-lk{--mc-den:var(--mc-bang)}
+body.mc-lk .mc-thanh .mc-lv-nut{display:none!important}
+body.mc-che-bang .mc-buoc,body.mc-che-bang #mc-pha,body.mc-che-bang #mc-len-bang,body.mc-che-bang #mc-phim-nhom,body.mc-che-bang #mc-tiep{display:none!important}
 body.mc .mc-thanh .mc-lv-nut,body.mc .mc-thanh .mc-lv-tat{flex:none;display:inline-flex;align-items:center;gap:.5em;min-height:calc(var(--u)*2.5);padding:0 1em 0 .8em;border:0;border-radius:999px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);font:800 max(13px,calc(var(--u)*1.15)) var(--mc-sans);white-space:nowrap;cursor:pointer}
 .mc-lv-nut i{display:block;width:.68em;height:.68em;border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 .22em color-mix(in srgb,var(--mc-do) 30%,transparent)}
 body.mc .mc-thanh .mc-lv-tat{padding:0 1em;background:transparent;box-shadow:inset 0 0 0 1.5px var(--mc-bang-vien);font-weight:700}
@@ -144,7 +149,13 @@ export const JS_LIVE_TO_CHIEU = `
     try { d.postMessage(m, '*'); return true; } catch (e) { return false; }
   }
   function lvGiay() { return document.documentElement.getAttribute('data-projector') !== 'matte-light'; }
-  function lvVung() { return window.__mcBut && window.__mcBut.vung ? window.__mcBut.vung() : {}; }
+  // Chế độ Bảng (live theo khối): giấy đề ẩn ⇒ không có ô giấy ⇒ máy em mất luôn ô bảng (mã trang cần đủ hai ô). Báo một dải giấy mỏng NGAY DƯỚI bảng
+  // (vùng thanh đáy, thầy không viết tới) để máy em dựng đúng ô bảng và phủ kín màn.
+  function lvVung() {
+    var v = window.__mcBut && window.__mcBut.vung ? window.__mcBut.vung() : {}, b = v.bang, y;
+    if (b && !v.giay && document.body.classList.contains('mc-che-bang')) { y = b[3] < 0.97 ? b[3] + 0.003 : 0.972; v.giay = [b[0], y, b[2], y + 0.025]; }
+    return v;
+  }
   function lvDongHo(tu) { var s = Math.max(0, Math.floor((Date.now() - tu) / 1000)), p = Math.floor(s / 60); s = s % 60; return (p < 10 ? '0' : '') + p + ':' + (s < 10 ? '0' : '') + s; }
   function lvLau(luc) { var s = Math.max(0, Math.floor((Date.now() - luc) / 1000)); return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60); }
   lvNut.type = lvCum.type = 'button';
@@ -450,7 +461,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
     if (m.lenh !== 'live-tt') return;
     truoc = LV.tt; LV.tt = m.tt || null;
-    if (document.body.classList.contains('mc-che-bang') !== !!(LV.tt && LV.tt.cheBang)) { document.body.classList.toggle('mc-che-bang', !!(LV.tt && LV.tt.cheBang)); if (window.__mcBut) setTimeout(lvAnh, 80); }
+    lvCheBang();
     if (LV.tt && LV.tt.co && !LV.anhXong) lvAnh();
     // vừa vào live ⇒ bút bật sẵn trên bảng đen
     if (LV.tt && LV.tt.pha === 'live' && !(truoc && truoc.pha === 'live') && window.__mcBut) window.__mcBut.bat(true);
@@ -458,6 +469,19 @@ export const JS_LIVE_TO_CHIEU = `
     if (LV.tt && LV.tt.pha === 'live' && !(truoc && truoc.pha === 'live')) { LV.giayCu = ''; setTimeout(lvBaoGiay, 60); }
     lvVe();
   });
+  // LIVE THEO KHỐI (12/11). Chỉ đổi khi phòng BÁO RÕ đây là buổi live theo khối (tt.khoi): phòng chớp mất nối ⇒ GIỮ nguyên (trước đây giấy đề nảy ra
+  // giữa lúc thầy đang viết). Tờ BẢNG TRẮNG (body[data-bang-trang]) luôn là bảng kín màn. Vào «Bảng» ⇒ bút bật sẵn, bố cục + ô bảng đo lại.
+  function lvCheBang() {
+    var b = document.body, trang = b.hasAttribute('data-bang-trang'), cb;
+    if (!trang && !(LV.tt && LV.tt.khoi)) return;
+    b.classList.add('mc-lk');
+    cb = trang || !!(LV.tt && LV.tt.cheBang);
+    if (b.classList.contains('mc-che-bang') === cb) return;
+    b.classList.toggle('mc-che-bang', cb);
+    try { window.dispatchEvent(new Event('resize')); } catch (e) {}
+    if (window.__mcBut) { if (cb) window.__mcBut.bat(true); setTimeout(lvAnh, 150); }
+  }
+  lvCheBang();
   window.__mcLive = { tt: function () { return LV.tt; }, bam: lvBam };
   lvGui('chao');
 `

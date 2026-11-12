@@ -18,6 +18,7 @@
 .lv-de-trong .ht-app.ht2-lam.duo.bpu-de-chang { display: flex; flex-direction: column; gap: 10px; min-height: 0; max-width: none; margin: 0; padding: 0; background: none; overflow: visible; }
 .lv-giay-trong { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; text-align: center; font-size: 34px; font-weight: 700; color: var(--tr-chu-2); }
 .lv-bang { position: absolute; border-radius: 12px; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); }
+.lv-bang .lv-ke { position: absolute; top: 0; width: 2px; background: color-mix(in srgb, var(--tr-chieu-giay) 14%, transparent); pointer-events: none; }
 .lv-bang p { position: absolute; left: 8px; right: 8px; top: 40%; margin: 0; text-align: center; font-size: clamp(13px, calc(2.4vmin + 6px), 22px); line-height: 1.5; font-weight: 600; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); pointer-events: none; }
 .lv-cv { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
 /* lớp «đang viết»: canvas nhỏ đi theo đầu bút (cỡ + chỗ do ve-bang.ts đặt) */

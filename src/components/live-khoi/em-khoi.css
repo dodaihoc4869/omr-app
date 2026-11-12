@@ -23,3 +23,5 @@ html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt
 @keyframes lke-nhip { from { opacity: .35; transform: scale(.8); } to { opacity: 1; transform: scale(1.15); } }
 .lkt-dang-mo { position: absolute; inset: 0; pointer-events: auto; display: grid; place-items: center; background: var(--lk-nen); color: var(--lk-chu-2); font-size: 20px; font-weight: 800; }
 .lke-mep { z-index: 35; } .lke-bong, .lke .lc-goc { z-index: 36; }
+/* Thầy 12/11: cửa nhắn tin máy em cao khoảng 1/3 màn, nằm sát mép phải (cạnh nút nhắn tin), không che đề. */
+.lke .lc-cua { top: auto; bottom: 8px; height: max(210px, 34%); width: min(320px, 46%); }

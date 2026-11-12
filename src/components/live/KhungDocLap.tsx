@@ -95,7 +95,7 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
     const { vung } = giaiTrang(tr.trang), kc = khungChieu(vung, tr.tiLe)
     const moc = mocChia(hinh.w, hinh.h, hinh.at, kc, q.tiLeChu === undefined ? TI_LE_CHU_MAC_DINH : q.tiLeChu)
     const chia = s.tay ?? (q.tuUuTien ? (s.uu.dang() === 'giay' ? moc.giay : moc.bang) : moc.giua)
-    const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong, dauBang: q.dauBang ? DAU_BANG : 0 })
+    const moi = boCucDocLap({ w: hinh.w, h: hinh.h, at: hinh.at, kc, chia, phong: s.phong, dauBang: q.dauBang ? DAU_BANG : 0, vua: q.epPhong === 'bang' })
     const cu = s.bc
     s.cho = dong && q.dong && cu && cu.w === moi.w && cu.h === moi.h && (cu.sG !== moi.sG || cu.sB !== moi.sB || cu.giay.x !== moi.giay.x || cu.bang.x !== moi.bang.x) ? cu : null
     s.bc = moi; s.kc = kc; s.vung = vung
@@ -167,6 +167,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
   /** Chạm hai lần vào khung nào ⇒ khung đó phủ kín; hai lần nữa ⇒ về hai khung. */
   const cham = (v: Vung, luc: number): void => {
     const s = S.current
+    // Live theo khối (thầy 12/11: «khóa cứng học sinh chỉ được ở bảng xanh đen», «bỏ chạm hai lần về toàn cảnh»): khung do THẦY quyết, em không chạm hai lần đổi khung.
+    if (P.current.epPhong !== undefined) return
     if (P.current.khiCham?.()) { s.chamCuoi[v] = -1e9; return }
     if (luc - s.chamCuoi[v] < 320) {
       s.chamCuoi[v] = -1e9
@@ -325,6 +327,8 @@ export default forwardRef<TayKhungDL, PropsKhungDL>(function KhungDocLap(p, ref)
         {/* chỗ lớp vẽ gắn khung cuộn của bảng (nút ngoài React, để riêng một hộp) */}
         <div ref={noiB} style={{ position: 'absolute', left: 0, top: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
         {p.bangTrong}
+        {/* Chế độ Bảng (live theo khối, thầy 12/11): đường kẻ mờ chia bảng 2/3 trái · 1/3 phải — đúng chỗ đường kẻ trên bảng của thầy */}
+        {p.epPhong === 'bang' && bc ? <i className={`${L}-ke`} aria-hidden="true" style={{ left: bc.oBang.x + (bc.oBang.w * 2) / 3, height: Math.min(bc.oBang.h, bc.bang.h) }} /> : null}
         <button type="button" className={`${L}-ve`} onPointerDown={(e) => e.stopPropagation()} onClick={veThay}>Về chỗ thầy đang viết</button>
       </div>
       {oDau ? <div ref={dauB} className={`${L}-dau-bang`} data-hep={oDau.w < DAU_DU || undefined} style={{ position: 'absolute', left: oDau.x, top: oDau.y, width: oDau.w, height: oDau.h, pointerEvents: 'none' }}>{p.dauBang}</div> : null}

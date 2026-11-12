@@ -9,7 +9,7 @@ import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { KenhLop, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
 
-export interface KhoEm { /** Em vừa bấm «Tham gia»: hiện màn phòng NGAY, chờ phòng trả bản xem. */ dangVao?: boolean; /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
+export interface KhoEm { /** Phòng đang có lượt câu (em làm bài / thầy chữa) ⇒ ẩn nút nhắn tin và ngọn lửa cho khỏi vướng. */ coLuot?: boolean; /** Em vừa bấm «Tham gia»: hiện màn phòng NGAY, chờ phòng trả bản xem. */ dangVao?: boolean; /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
 let kho: KhoEm = { khoi: null, toi: null, ds: [], kj: [0, 0, 0, 0], noi: false }
 let ws: WebSocket | null = null
 let goc: Root | null = null
@@ -47,7 +47,8 @@ function nhanTinPhongEm(d: unknown): void {
     if (j.ketThuc && kho.khoi?.gd === 'dang' && kho.toi) { dat({ xong: true, khoi: null }); return }
     if (kho.xong) return
     if (khoi && !kho.khoi) guiTho({ t: 'lop-xin' })
-    if (doi || (khoi && kho.dangVao)) dat({ khoi, toi, ...(khoi ? { dangVao: false } : {}) })
+    const coLuot = !!j.luot
+    if (doi || coLuot !== !!kho.coLuot || (khoi && kho.dangVao)) dat({ khoi, toi, coLuot, ...(khoi ? { dangVao: false } : {}) })
     if (khoi || kho.dangVao) gan(); else if (khung) go()
   } else if (j.t === 'lop-ds') {
     const ds = (Array.isArray(j.ds) ? j.ds : []).flatMap((x) => (Array.isArray(x) && typeof x[0] === 'string' ? [{ sbd: x[0], ten: String(x[1] ?? x[0]), doi: Number(x[2]) || 0, kj: Number(x[3]) || 0 }] : []))

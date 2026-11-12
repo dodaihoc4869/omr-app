@@ -152,6 +152,19 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), 
   return { ok: false, error: 'Không có lệnh này.' }
 }
 
+/** Buổi học vừa đóng (thầy kết thúc ở bất kỳ đâu) ⇒ lịch live gắn với buổi đó chuyển «xong», máy các em tắt thẻ Live. Không có lịch nào ⇒ không ghi gì. */
+export async function khiDongBuoi(env: Env, buoiId: unknown, nay = Date.now(), ctx?: ExecutionContext): Promise<void> {
+  const id = str(buoiId)
+  if (!id) return
+  const ds = donLich(await doc(env), nay), x = ds.find((y) => y.buoiId === id)
+  if (!x) return
+  x.trangThai = 'xong'
+  await ghi(env, donLich(ds, nay), nay)
+  const v = emTheoKhoi(env).then((em) => baoMayCacEm(env, em[x.khoi], 'live')).catch(() => 0)
+  if (ctx) { try { ctx.waitUntil(v); return } catch { /* không có ctx thật */ } }
+  await v
+}
+
 /** `/hs/bpu/khoi-cua-em` · `/hs/bpu/khoi-vao` (token em). */
 export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), _ctx?: ExecutionContext): Promise<Row> {
   // Đọc lịch (cau_hinh) chạy CÙNG đợt với kiểm mật khẩu (D1) — một đợt chờ thay vì hai; token sai vẫn ném trước, không tốn lượt đọc nào.

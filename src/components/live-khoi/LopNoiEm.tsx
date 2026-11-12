@@ -12,19 +12,17 @@ const NutChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.NutCha
 const BongTinMoi = lazy(() => import('./ChatEm').then((m) => ({ default: m.BongTinMoi })))
 const CuaChatEm = lazy(() => import('./ChatEm').then((m) => ({ default: m.CuaChatEm })))
 
-/** Trang đang dọc ⇒ xoay hình 90° (như `.bpu-hs[data-xoay]`); `theoMan` = chỉ xoay khi màn Bình Phản Ứng / bảng live bên dưới đang xoay. */
-function useXoay(theoMan: boolean): { xoay: boolean; style: CSSProperties } {
-  const [k, setK] = useState<readonly [number, number, boolean]>(() => [window.innerWidth, window.innerHeight, false])
+/** ÉP NGANG suốt buổi live (thầy 12/11): trang đang dọc (máy không khoá ngang được) ⇒ xoay hình 90° như `.bpu-hs[data-xoay]`; trang đã ngang ⇒ thôi. */
+function useXoay(): { xoay: boolean; style: CSSProperties } {
+  const [k, setK] = useState<readonly [number, number]>(() => [window.innerWidth, window.innerHeight])
   useEffect(() => {
-    const doi = () => { const x = !!document.querySelector('.bpu-hs[data-xoay], .lv[data-xoay]'); setK((c) => (c[0] === window.innerWidth && c[1] === window.innerHeight && c[2] === x ? c : [window.innerWidth, window.innerHeight, x])) }
+    const doi = () => setK((c) => (c[0] === window.innerWidth && c[1] === window.innerHeight ? c : [window.innerWidth, window.innerHeight]))
     doi()
     window.addEventListener('resize', doi)
     window.addEventListener('orientationchange', doi)
-    const mo = theoMan ? new MutationObserver(doi) : null
-    mo?.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['data-xoay'] })
-    return () => { window.removeEventListener('resize', doi); window.removeEventListener('orientationchange', doi); mo?.disconnect() }
-  }, [theoMan])
-  const xoay = theoMan ? k[2] : k[1] > k[0]
+    return () => { window.removeEventListener('resize', doi); window.removeEventListener('orientationchange', doi) }
+  }, [])
+  const xoay = k[1] > k[0]
   return { xoay, style: xoay ? { width: k[1], height: k[0] } : {} }
 }
 const mayYeu = (): boolean => { try { return localStorage.getItem('ddh.mayYeu') === '1' } catch { return false } }
@@ -34,7 +32,7 @@ export default function LopNoiEm() {
   const gd = s.khoi?.gd ?? null
   const dangVao = !s.khoi && !!s.dangVao && !s.xong
   const cho = gd === 'cho' || dangVao
-  const { xoay, style } = useXoay(!cho)
+  const { xoay, style } = useXoay()
   const [bonDoi, setBonDoi] = useState<'xem' | null>(null)
   const [chatMo, setChatMo] = useState(false)
   /** Em tự rời phòng chờ (về màn Bình Phản Ứng bên dưới, đóng được như thường); thầy bấm Bắt đầu thì vẫn vào live. */
@@ -43,6 +41,15 @@ export default function LopNoiEm() {
   // SẢNH (thầy 12/11): thầy đã bấm Bắt đầu mà chưa chọn chế độ ⇒ máy em ở bảng danh sách bốn đội (đã nghe được thầy) tới khi thầy chọn Học / Bảng.
   const sanh = gd === 'dang' && s.khoi?.che === 'sanh'
   useEffect(() => { if (gd === 'dang' && gdCu.current !== 'dang') guiTho({ t: 'lop-xin' }); gdCu.current = gd }, [gd])
+  // Thầy 12/11: nút nhắn tin + ngọn lửa ẨN lúc em làm bài / thầy chữa bài (chế độ «Học» đang có câu); hiện ở danh sách, ở chế độ «Bảng», và lúc chờ câu.
+  // Ngoài sảnh, hai nút này nằm trong khay của thanh vàng (màn live sẵn có — LopLive) và báo sang đây bằng sự kiện `ddh-lk`.
+  const hienMep = sanh
+  const [mepCu, setMepCu] = useState(hienMep)
+  if (mepCu !== hienMep) setMepCu(hienMep)
+  // Em vừa vào làm câu ⇒ cửa nhắn tin tự đóng cho khỏi che đề.
+  const lamCau = s.khoi?.che === 'hoc' && !!s.coLuot
+  const [lamCu, setLamCu] = useState(lamCau)
+  if (lamCu !== lamCau) { setLamCu(lamCau); if (lamCau) setChatMo(false) }
   const [sanhCu, setSanhCu] = useState(sanh)
   if (sanhCu !== sanh) { setSanhCu(sanh); if (!sanh) setBonDoi(null) }
   // Phòng chờ: xin toàn màn hình + khoá ngang ở lần chạm đầu (trình duyệt chỉ cho sau thao tác của em); không được thì xoay hình.
@@ -55,6 +62,12 @@ export default function LopNoiEm() {
     return () => window.removeEventListener('pointerdown', f)
   }, [cho])
   const chat = useChatLop(gd === 'dang' ? kenh : null)
+  useEffect(() => {
+    const f = (e: Event) => { const d = (e as CustomEvent<string>).detail; if (d === 'chat') setChatMo(true); else if (d === 'doi') { guiTho({ t: 'lop-xin' }); setBonDoi('xem') } }
+    window.addEventListener('ddh-lk', f)
+    return () => window.removeEventListener('ddh-lk', f)
+  }, [])
+  useEffect(() => { window.dispatchEvent(new CustomEvent('ddh-lk-tin', { detail: chat.moi })) }, [chat.moi])
   useEffect(() => { if (chatMo) chat.danhDauDoc() }, [chatMo, chat.ds.length]) // eslint-disable-line react-hooks/exhaustive-deps
   if (s.xong && s.toi) return <div className="lke xong" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}><Suspense fallback={null}><ManVinhDanh ds={s.ds} kj={s.kj} toi={s.toi} onDong={dongKhoi} /></Suspense></div>
   if (dangVao) return <div className="lke cho dang-vao" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }} role="status"><p><i aria-hidden="true" />Đang vào phòng live…</p></div>
@@ -68,12 +81,14 @@ export default function LopNoiEm() {
         {!cho && (sanh || !bonDoi) ? (
           <>
             {chatMo ? <CuaChatEm chat={chat} toiSbd={s.toi.sbd} onDong={() => setChatMo(false)} /> : <div className="lke-bong"><BongTinMoi tin={chat.tinMoi} /></div>}
-            <div className="lke-mep" role="group" aria-label="Live theo khối">
-              <NutChatEm moi={chat.moi} onMo={() => setChatMo((c) => !c)} />
-              <button type="button" className="lke-doi" aria-label="Bốn đội" title="Bốn đội" onClick={() => { guiTho({ t: 'lop-xin' }); setBonDoi('xem') }}>
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-5 1 2 2 2 2 2 0-3 0-5 1-8z" /></svg>
-              </button>
-            </div>
+            {hienMep ? (
+              <div className="lke-mep" role="group" aria-label="Live theo khối">
+                <NutChatEm moi={chat.moi} onMo={() => setChatMo((c) => !c)} />
+                <button type="button" className="lke-doi" aria-label="Bốn đội" title="Bốn đội" onClick={() => { guiTho({ t: 'lop-xin' }); setBonDoi('xem') }}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-5 1 2 2 2 2 2 0-3 0-5 1-8z" /></svg>
+                </button>
+              </div>
+            ) : null}
           </>
         ) : null}
       </Suspense>

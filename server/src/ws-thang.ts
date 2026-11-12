@@ -43,6 +43,7 @@ export async function hsDiemDanhBao(env: Env, b: Row, ctx?: ExecutionContext): P
 export async function gvBuoiHocBpu(env: Env, b: Row): Promise<Row> {
   const r = await gvBuoiHoc(env, b)
   if (String(b.action ?? '') === 'dong' && r.ok !== false) await dongPhongBpu(env, b.id).catch(() => undefined)
+  if (String(b.action ?? '') === 'dong' && r.ok !== false) await import('./live-khoi').then((m) => m.khiDongBuoi(env, b.id)).catch(() => undefined)
   return r
 }
 /** `/hs/bpu/*` (token em). */

@@ -84,5 +84,15 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
 - **Buổi dạy trên lớp («Lên bảng», trước là «Điểm danh»):** không còn nút Live trên bảng và trên tờ (cờ `co` chỉ bật khi phòng có `live.khoi`).
 - **Nền bảng đen** của tờ chiếu, bảng Bình Phản Ứng và bảng live máy em: `#15181c` → xanh than `#131f24` (áp cho cả buổi trên lớp).
 - **Chat:** 1 tin / 2 giây / em, 200 ký tự, phòng giữ 200 tin trong RAM, hết buổi là mất. **Trò Giữ Lửa:** máy em gửi ≤ 4 gói / giây, phòng phát một ảnh chụp / 250 ms, chỉ chạy ở phòng chờ; kJ của trò không vào kJ buổi học.
-- Bộ thử trình duyệt thật: `scripts/thu-live-1011/thu-khoi-1211.mjs` (21 kiểm; ảnh `that-*.jpg` trong thư mục bản vẽ).
+- Bộ thử trình duyệt thật: `scripts/thu-live-1011/thu-gv-that-1211.mjs` (37 kiểm, chạy ĐÚNG bảng Bình Phản Ứng + tờ chiếu thật của máy thầy, hai máy em ngang / dọc). Bộ cũ `thu-khoi-1211.mjs` thiếu bảng thật, chỉ còn để tham khảo.
 - **Chưa thử:** lớp thật nhiều máy, tiếng thật qua SFU ở buổi live theo khối, iPhone thật (xoay hình), tải 80–100 em trong phòng chờ.
+
+## Luồng chốt 12/11 (sau khi thầy thử bản sống) — bản này thay các mục trái với nó ở trên
+
+1. **«Bắt đầu live»** ⇒ thầy và em CÙNG vào bảng danh sách bốn đội (sảnh). Tiếng thầy tự bật (không có nút Live nào phải bấm; thử lại mỗi 2 giây, tối đa 8 lần; có nút «Bật tiếng lại»). Máy em ép ngang suốt buổi (xoay hình nếu máy không khoá ngang được), mic em tắt.
+2. Thầy chọn **Học** (chọn bài ⇒ bê nguyên buổi «Lên bảng»: bảng đua + tờ chiếu, máy em làm câu) hoặc **Bảng** (bảng xanh than kín màn). Máy em tự chuyển theo, không phải bấm gì.
+3. **Chế độ Bảng:** giấy đề ẩn, cột bảng phủ kín tờ; máy em co bảng VỪA TRỌN màn (thấy hết bảng của thầy, không cuộn), khoá cứng ở bảng (không «chạm hai lần»). Bảng có một đường kẻ trắng mờ chia 2/3 trái · 1/3 phải, cùng chỗ trên máy thầy và máy em. Tờ báo một dải «giấy» mỏng dưới bảng để mã trang đủ hai ô (`lvVung` trong `src/lib/live-to-chieu.ts`).
+4. **Esc** luôn lùi MỘT màn: nhắn tin → chọn bài → bài đang dạy → sảnh → Hôm nay. Ở Hôm nay nút Live thành «Kết thúc buổi» (bấm là kết thúc) + viên «Đang live · Vào lại».
+5. **Máy thầy:** cụm Học | Bảng · Lớp · Tin nhắn ở thanh đáy (lên thanh trên khi bảng đua hiện); cột tin nhắn cao 1/3. Trong buổi live bảng đua không có nút «Đóng» và viên «Live».
+6. **Máy em:** «Nhắn cả lớp» và «Bốn đội» nằm trong khay của thanh vàng (sự kiện cửa sổ `ddh-lk`); cửa nhắn tin cao 1/3 sát mép phải, tự đóng khi em vào làm câu. Danh sách bốn đội hiện ĐỦ tên, không cắt «…».
+7. **Chưa thử:** lớp thật nhiều máy, tiếng thật qua SFU, iPhone thật.

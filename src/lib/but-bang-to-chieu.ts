@@ -121,7 +121,7 @@ ${JS_LOI_BUT}
 ` + /* Ô bảng đen của đợt đang chiếu, đo SO VỚI ĐỢT (đợt đang trượt vào vẫn ra đúng số). Trả true nếu ô đổi. */ `
   function datBang() {
     var d = dot(), c = d && d.querySelector ? d.querySelector('.mc-cot-lam-bai') : null, r = c ? c.getBoundingClientRect() : null, g = r ? d.getBoundingClientRect() : null, W = window.innerWidth, H = window.innerHeight, m = null;
-    if (r && r.width > 40 && r.left - g.left > W * 0.4 && r.left - g.left < W) m = [(r.left - g.left) / W, (r.top - g.top) / H, (r.right - g.left) / W, (r.bottom - g.top) / H];
+    if (r && r.width > 40 && (r.left - g.left > W * 0.4 || document.body.classList.contains('mc-che-bang')) && r.left - g.left < W) m = [(r.left - g.left) / W, (r.top - g.top) / H, (r.right - g.left) / W, (r.bottom - g.top) / H];
     var khoa = m && nhDuoc && gC ? kieuBang(c) : '';
     if (String(m) === String(B) && khoa === khoaB && (!khoa || (cotB === c && cvB.parentNode === c))) return false;
     B = m; khoaB = khoa; NH = !!khoa;

@@ -20,6 +20,8 @@ export interface TtLiveTo {
   co: boolean
   /** Live theo khối, thầy đang ở chế độ «Bảng» ⇒ tờ ẩn giấy đề, bảng kín màn. */
   cheBang?: boolean
+  /** Phòng đang là buổi live theo khối (tờ: nền bảng xanh than, không cần nút «Live» — tiếng tự bật). Chỉ có khi phòng CÒN NỐI và báo rõ. */
+  khoi?: boolean
   pha: 'tat' | 'dang-bat' | 'live'
   tu: number | null
   xem: number
@@ -162,7 +164,7 @@ function trangThai(): TtLiveTo {
   else if (micLoiThay?.khoa !== `${ml.sbd}:${ml.luc}`) { micLoiThay = { khoa: `${ml.sbd}:${ml.luc}`, luc: Date.now() }; clearTimeout(henMicLoi); henMicLoi = setTimeout(bao, 15_200) }
   const micLoi = ml && micLoiThay && Date.now() - micLoiThay.luc < 15_000 ? em(ml.sbd).ten : ''
   return {
-    co: !!l && (!!p || live) && (live || !!l.khoi), cheBang: l?.khoi?.che === 'bang', pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
+    co: !!l && (!!p || live) && (live || !!l.khoi), cheBang: l?.khoi?.che === 'bang', khoi: !!l?.khoi, pha: live ? 'live' : dangBat ? 'dang-bat' : 'tat', tu: l?.tu ?? null,
     xem: ttLt?.xem ?? l?.xem ?? 0, nghe: ttLt?.xemNghe ?? l?.nghe ?? 0, tong: ds.filter((e) => e.vao).length, lop: view?.lop ?? '',
     coTieng: l?.tieng !== 'chua-cau-hinh', khongTieng: ttLt?.tieng === 'khong' || ttLt?.tieng === 'loi', micIm: !!ttLt?.micIm,
     noiLai: live && !p, mayKhac: !!ttLt?.mayKhacLive,
@@ -425,6 +427,15 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
 }
 /** Nút «Live» trên bảng Bình Phản Ứng (màn đua). Live = TIẾNG chạy suốt buổi nên bảng KHÔNG cần lui: đã từng bật (mic đã nhớ) ⇒ live ngay tại chỗ.
  *  Trả true khi phải lui về tờ chiếu: lần đầu (thẻ chọn mic nằm trên tờ), hoặc đang live (cụm điều khiển: mic, «Bảng → máy em», «Tắt live» ở tờ). */
+/** LIVE THEO KHỐI (thầy 12/11: «đang live … lại phải bấm live ở đây»): bật tiếng NGAY khi thầy bấm «Bắt đầu live» — không cần tờ, không cần thẻ chọn mic
+ *  (mic đã nhớ, chưa nhớ thì mic mặc định; trình duyệt tự hỏi quyền lần đầu). Trả 'cho' nếu chưa nối phòng (nơi gọi thử lại), 'dang' = đang bật / đã bật. */
+export function batLiveKhoi(): 'cho' | 'dang' {
+  nghe()
+  const l = view?.live
+  if (!l || !layPhong()) return 'cho'
+  if (!l.bat && !dangBat) void bat(l.tieng === 'chua-cau-hinh')
+  return 'dang'
+}
 export function bamTuBang(): boolean {
   nghe()
   const l = view?.live
