@@ -18,20 +18,27 @@ import type { PrivateQuestion } from '../../src/game/than-thu-v2/core'
 type Row = Record<string, unknown>
 const str = (v: unknown) => (v == null ? '' : String(v))
 
+/** H1 (12/11, hoá đơn D1): chỉ mục bộ phận «lượt CHƯA ĐÚNG» (server/migration-z-1211-skh-chua-dung.sql: (sbd, nguon, ket_qua, qid, luc, ma_nguon)
+ *  WHERE ket_qua IS NOT 1). SQLite chỉ dùng chỉ mục bộ phận khi câu có ĐÚNG điều kiện `DK_CHUA_DUNG` ⇒ câu đọc ghi thêm nó (điều kiện cũ đã kéo theo
+ *  nó — kết quả không đổi). Không thống kê (D1 không có sqlite_stat1) bộ lập kế hoạch chọn (sbd, qid) vì GROUP BY ⇒ chỉ định thẳng; thiếu chỉ mục ⇒ lỗi ⇒ câu cũ. */
+export const CHI_MUC_CHUA_DUNG = 'INDEXED BY idx_skh_em_chua_dung'
+export const DK_CHUA_DUNG = 'ket_qua IS NOT 1'
 /**
  * NGUỒN THỨ 4: qid → lúc sai TỰ LÀM sớm nhất từ 29/09, mọi kênh. Bỏ: sự kiện đọc lời giải, lượt lướt (OMNI 3), lượt có hỗ trợ, sự kiện bị che (ca chưa công bố —
  * công bố xong mới kéo, như nguồn ca; câu ca thi chỉ tính khi ca ĐÃ công bố — không lộ câu thi). Bỏ trống chỉ tính sai ở ca thi (kênh khác NULL có thể là "chưa làm"). Lỗi đọc ⇒ rỗng.
  */
 export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, string>> {
   const ra = new Map<string, string>()
-  const sql = (moi: boolean) => `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc WHERE sbd = ? AND ngay_vn >= ?
+  // H1 (12/11): `cm` ⇒ chỉ mục bộ phận lượt chưa đúng (`CHI_MUC_CHUA_DUNG`) — chỉ đọc dòng sai / trống của em, không đọc cả sổ. D1 chưa có chỉ mục ⇒ lỗi ⇒ câu cũ.
+  const sql = (moi: boolean, cm = false) => `SELECT qid, MIN(luc) AS luc FROM su_kien_hoc${cm ? ` ${CHI_MUC_CHUA_DUNG}` : ''} WHERE sbd = ? AND ngay_vn >= ?${cm ? ` AND ${DK_CHUA_DUNG}` : ''}
       AND (ket_qua = 0 OR (ket_qua IS NULL AND nguon = 'thi')) AND COALESCE(qid, '') <> ''
       AND (nguon <> 'thi' OR EXISTS (SELECT 1 FROM ca c WHERE c.ma_ca = su_kien_hoc.ma_nguon AND c.trang_thai <> 'da_xoa' AND ${SQL_DA_CONG_BO('c')}))
       ${moi ? `AND ${SQL_LA_LAN_LAM} AND COALESCE(assistance, '') <> 'assisted' AND COALESCE(visibility, '') <> 'embargoed'` : ''}
     GROUP BY qid`
   let rows: Row[]
-  try { rows = (await env.DB.prepare(sql(true)).bind(sbd, TU_NGAY).all<Row>()).results ?? [] } catch {
-    try { rows = (await env.DB.prepare(sql(false)).bind(sbd, TU_NGAY).all<Row>()).results ?? [] } catch { return ra }
+  const doc = (q: string) => env.DB.prepare(q).bind(sbd, TU_NGAY).all<Row>().then((r) => r.results ?? [])
+  try { rows = await doc(sql(true, true)).catch(() => doc(sql(true))) } catch {
+    try { rows = await doc(sql(false)) } catch { return ra }
   }
   for (const x of rows) {
     const q = tachSongSinh(str(x.qid)).goc, luc = str(x.luc)
@@ -40,10 +47,13 @@ export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, st
   return ra
 }
 
+export const SQL_MOC_DOC_LOI_GIAI = 'SELECT qid, luc FROM loi_giai_hoi WHERE sbd = ? AND +luc >= ?'
 /** Mốc em đọc lời giải (Hỏi thầy) từ 29/09: qid → [ISO]. Lượt làm trong 12 giờ sau mốc đọc không tính tự làm. */
 export async function docMocDocLoiGiai(env: Env, sbd: string): Promise<Map<string, string[]>> {
   const ra = new Map<string, string[]>()
-  const r = await env.DB.prepare('SELECT qid, luc FROM loi_giai_hoi WHERE sbd = ? AND luc >= ?').bind(sbd, `${TU_NGAY}T00:00:00`).all<Row>().catch(() => ({ results: [] as Row[] }))
+  // H1 (12/11, hoá đơn D1): `+luc` ⇒ đi chỉ mục PHỦ (sbd, qid, luc) — chỉ đọc chỉ mục, không tra bảng từng dòng (trước: (sbd, luc) + tra bảng lấy qid ⇒
+  //  gấp đôi hàng đọc; mốc TU_NGAY = cả sổ nên khoảng luc không bớt dòng nào). Mỗi qid vẫn ra các mốc theo luc tăng dần (y như cũ).
+  const r = await env.DB.prepare(SQL_MOC_DOC_LOI_GIAI).bind(sbd, `${TU_NGAY}T00:00:00`).all<Row>().catch(() => ({ results: [] as Row[] }))
   for (const x of r.results ?? []) { const q = str(x.qid); ra.set(q, [...(ra.get(q) ?? []), str(x.luc)]) }
   return ra
 }

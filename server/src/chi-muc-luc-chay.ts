@@ -51,6 +51,8 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   "CREATE INDEX IF NOT EXISTS idx_cld_mo_em ON chua_loi_dot(sbd, cap_nhat_luc) WHERE dong_luc IS NULL AND trang_thai_day<>'da_tu_sua'",
   // 12/11 (hoá đơn D1 hàng đọc, ~300 triệu/ngày): nhánh NHÓM của «đợt của em cho câu hoặc cùng nhóm» (chua-dot-nhom-sql.ts). Bản sao server/migration-1211-chua-dot-nhom.sql.
   'CREATE INDEX IF NOT EXISTS idx_cld_sbd_nhom ON chua_loi_dot(sbd, content_group, dong_luc)',
+  // 12/11 đợt 3 H1: chỉ mục bộ phận lượt CHƯA ĐÚNG của sổ (ba câu nợ của kế hoạch ngày — hang-chua-loi.ts CHI_MUC_CHUA_DUNG). Bản sao server/migration-z-1211-skh-chua-dung.sql.
+  'CREATE INDEX IF NOT EXISTS idx_skh_em_chua_dung ON su_kien_hoc(sbd, nguon, ket_qua, qid, luc, ma_nguon) WHERE ket_qua IS NOT 1',
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {

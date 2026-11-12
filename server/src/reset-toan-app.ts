@@ -228,6 +228,9 @@ export const BANG_GIU: readonly string[] = [
   // «Lần cuối em làm mỗi câu» tính sẵn (G5 12/11, migration-z-1211-cau-lam-cuoi.sql): dẫn xuất từ sổ su_kien_hoc (GIỮ), trigger giữ đúng ⇒ GIỮ.
   // KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `cau_lam_cuoi_sau_*`.
   'cau_lam_cuoi',
+  // Số dòng sổ + mốc tiếp nhận của từng em tính sẵn (H1 12/11, migration-z-1211-a-so-em-dem.sql): dẫn xuất từ sổ (GIỮ), trigger giữ đúng ⇒ GIỮ.
+  // KHÔNG BAO GIỜ DROP bảng khi chưa DROP ba trigger `so_em_dem_sau_*`.
+  'so_em_dem',
 ]
 
 /** Cấu hình của lần reset 21/09 (đã xong): nạp mã BTVN + bài Mẹ giao, KHÔNG nạp mã ca (ca được giữ), không hoãn, xoá ngay khi giành khoá. */
