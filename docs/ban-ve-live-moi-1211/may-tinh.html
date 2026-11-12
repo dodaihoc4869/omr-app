@@ -34,7 +34,9 @@ html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH'
   background: linear-gradient(160deg, #3a4650 0%, #232c33 45%, #171d22 100%);
   box-shadow: 0 calc(26 * var(--u)) calc(60 * var(--u)) rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.1) inset, 0 1px 0 rgba(255,255,255,.22) inset, 0 calc(-3 * var(--u)) calc(8 * var(--u)) rgba(0,0,0,.35) inset; }
 .mt .keo { display: flex; align-items: center; justify-content: space-between; height: calc(22 * var(--u)); margin-bottom: calc(8 * var(--u)); font-size: calc(11.5 * var(--u)); font-weight: 800; letter-spacing: .1em; color: #a9b6be; cursor: grab; }
-.mt .keo i { width: calc(46 * var(--u)); height: calc(5 * var(--u)); border-radius: 99px; background: #5b6973; }
+.mt .keo .ten { font-size: calc(12.5 * var(--u)); font-weight: 800; letter-spacing: .04em; color: #dfe7ec; white-space: nowrap; }
+.mt .keo .ten em { font-style: normal; color: #f5c451; letter-spacing: .08em; }
+.mt .keo i { width: calc(30 * var(--u)); height: calc(5 * var(--u)); border-radius: 99px; background: #5b6973; }
 .mt .keo span { display: flex; gap: calc(6 * var(--u)); align-items: center; }
 .pin { width: calc(52 * var(--u)); height: calc(12 * var(--u)); border-radius: calc(3 * var(--u)); background: repeating-linear-gradient(90deg, #2a1d12 0 calc(8 * var(--u)), #4a3320 calc(8 * var(--u)) calc(9 * var(--u))); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12); }
 .lcd { border-radius: calc(12 * var(--u)); padding: calc(8 * var(--u)) calc(12 * var(--u)) calc(10 * var(--u)); background: linear-gradient(180deg, #c9d6c3, #b7c7b2); color: #1b2a22; box-shadow: inset 0 calc(3 * var(--u)) calc(8 * var(--u)) rgba(0,0,0,.35), 0 0 0 calc(3 * var(--u)) #0f1418; font-variant-numeric: tabular-nums; }
@@ -73,8 +75,8 @@ var k = new URLSearchParams(location.search).get('k') || 'thay'
 var P = function (c, t, s) { return '<span class="p ' + (c || '') + '">' + (s ? '<small>' + s + '</small>' : '') + t + '</span>' }
 function mayTinh(o) {
   var nh = o.nhan || ''
-  var h = '<div class="mt ' + (o.lop || '') + '" style="' + o.kieu + '">' + (o.em ? '<span class="nhan-em">Máy tính của thầy · em xem</span>' : '')
-    + '<div class="keo"><span><i></i>KÉO ĐỂ DỜI</span><span>fx · THPT<b class="pin"></b></span></div>'
+  var h = '<div class="mt ' + (o.lop || '') + '" style="' + o.kieu + '">' + ''
+    + '<div class="keo"><span><i></i><b class="ten">Đỗ Đại Học <em>FX4869</em></b></span><span><b class="pin"></b></span></div>'
     + '<div class="lcd"><div class="tt"><span>D</span><span>Math</span><span>▲</span><span style="margin-left:auto">Ans = 0,25</span></div>'
     + '<div class="bt">' + o.bt + '</div><div class="kq">' + o.kq + '</div></div>'
     + '<div class="dau-phim">' + P('sh', 'SHIFT') + P('al', 'ALPHA') + '<span class="dpad"><i class="t"></i><i class="d"></i><i class="tr"></i><i class="ph"></i></span>' + P('', 'MENU') + P('', 'ON') + '</div>'
