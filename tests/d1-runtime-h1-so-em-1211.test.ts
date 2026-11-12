@@ -1,9 +1,10 @@
 // Runtime workerd/D1 cục bộ (Miniflare), dữ liệu TỔNG HỢP; không kết nối production. Chạy: npx vitest run --config vitest.config.d1.ts tests/d1-runtime-h1-so-em-1211.test.ts
 // H1 (12/11, hoá đơn D1 đợt 3): ĐO `meta.rows_read` (đúng bộ đếm D1 tính tiền) câu CŨ ↔ MỚI của nhóm sổ học theo em, trên lược đồ tối thiểu tự dựng
 // (không phụ thuộc LUOC_DO_SQL): một em ~1.500 dòng sổ / 45 ngày + 40 em khác, ~700 dòng xem lời giải. Kết quả hai câu phải bằng nhau.
-import { beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { env } from 'cloudflare:test'
 import type { Env } from '../server/src/kieu'
+import { xoaMoiDem } from '../server/src/dem-chung'
 import { SQL_DEM_SO, SQL_DEM_SO_CU } from '../server/src/omni-d1'
 import { docQidSaiV2 } from '../server/src/hang-chua-loi'
 import { docQidSaiCaDaCongBo, docQidSaiTaiLop } from '../server/src/srs2-d1'
@@ -87,6 +88,11 @@ beforeAll(async () => {
   await E.DB.prepare("INSERT INTO so_em_dem (sbd, n, r) VALUES ('*', 0, 0)").run()
 }, 120_000)
 
+// Bộ test runtime dùng CHUNG một D1 (isolatedStorage: false) ⇒ xoá các bảng tối thiểu vừa dựng để tệp sau tự dựng lại lược đồ đủ cột.
+afterAll(async () => {
+  for (const t of ['su_kien_hoc', 'loi_giai_hoi', 'so_em_dem', 'ca', 'luot']) await E.DB.prepare(`DROP TABLE IF EXISTS ${t}`).run()
+})
+
 describe('H1 — rows_read D1 thật (Miniflare) câu cũ ↔ mới, một em ~1.500 dòng sổ', () => {
   it('đếm sổ OMNI (so_em_dem)', async () => {
     const ds = '["H1"]'
@@ -103,6 +109,7 @@ describe('H1 — rows_read D1 thật (Miniflare) câu cũ ↔ mới, một em ~1
       await E.DB.prepare('DROP INDEX idx_skh_em_chua_dung').run()
       const b = dem(); const kqCu = await f(b.env)
       await E.DB.prepare(CHI_MUC).run()
+      xoaMoiDem() // quên dấu «thiếu chỉ mục» (nhớ 10 phút) của lượt đo câu cũ
       const sCu = b.tong.cau.filter((x) => /su_kien_hoc/.test(x.q) && !/INDEXED BY/.test(x.q))
       expect(kqMoi).toEqual(kqCu)
       KQ.push(`${ten}: ${sCu.reduce((s, x) => s + x.rows, 0)} → ${sMoi[0]!.rows}`)
