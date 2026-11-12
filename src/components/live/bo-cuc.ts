@@ -30,6 +30,10 @@ export function maTrang(khoa: string, vung: { giay?: readonly number[] | null; b
   const so = [...g, ...b].map((v) => Math.round(v * 1000)).join(',')
   return `${k}~${so}~${giayToi ? 't' : 's'}`
 }
+/** Khoá trang bút của chế độ «Bảng» trong live theo khối (bảng kín màn) — máy thầy đặt ở tờ chiếu (`__mcBut.rieng('bl')`), `thay-noi.ts` `TRANG_BANG`. */
+export const KHOA_TRANG_BANG = 'bl'
+/** Trang đang phát là trang «Bảng» kín màn? (trình phát xem lại dùng để xếp hình đúng như lúc live) */
+export const laTrangBang = (trang: string): boolean => String(trang ?? '').split('~')[0] === KHOA_TRANG_BANG
 /** Tách khoá trang (máy em). Phần ô vắng / hỏng ⇒ ô mặc định. */
 export function giaiTrang(trang: string): { khoa: string; vung: VungChieu } {
   const [khoa = '', so = '', giay = ''] = String(trang ?? '').split('~')

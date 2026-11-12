@@ -25,10 +25,10 @@ await build({ entryPoints: [join(GOC, 'tests/_live-xem-lai-hs-gia.ts')], bundle:
 const gia = await import(pathToFileURL(join(tam, 'gia.mjs')).href)
 const kho = new Map()
 /** Bộ tệp của buổi giả theo (giấy tối, có tiếng). Tệp tiếng là WAV 8 kHz (máy chủ thật trả MP3). */
-function buoiGia(giayToi, coTieng) {
-  const k = `${giayToi}|${coTieng}`
+function buoiGia(giayToi, coTieng, bang = false) {
+  const k = `${giayToi}|${coTieng}|${bang}`
   if (!kho.has(k)) {
-    const b = gia.taoBuoiGia({ giayToi, coTieng })
+    const b = gia.taoBuoiGia({ giayToi, coTieng, ...(bang ? { khoaTrang: 'bl' } : {}) })
     kho.set(k, { buoi: b.buoi, net: Buffer.from(b.net), tieng: coTieng ? Buffer.from(gia.taoTiengGia(b.buoi.msLive, b.coTieng)) : null })
   }
   return kho.get(k)
@@ -57,7 +57,7 @@ async function ganMayChu(ctx, c) {
     const req = route.request(), u = new URL(req.url())
     st.goi.push(`${req.method()} ${u.pathname}${req.headers().range ? ` [${req.headers().range}]` : ''}`)
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS })
-    const d = buoiGia(c.giay === 'toi', c.tieng !== 0)
+    const d = buoiGia(c.giay === 'toi', c.tieng !== 0, c.bang === true)
     const json = (o, status = 200) => route.fulfill({ status, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify(o) })
     if (st.tt === 'mat') return route.abort('internetdisconnected')
     if (u.pathname === '/hs/live-ds') {
@@ -127,6 +127,9 @@ const CANH = [
   { ten: '22-phat-844-giay-toi-dang-phat', url: '?man=buoi', w: 844, h: 390, giay: 'toi', lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '23-phat-844-tam-dung', url: '?man=buoi', w: 844, h: 390, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.4); await cho(t, 1500); await t.getByRole('button', { name: 'Tạm dừng' }).click(); await cho(t, 300) } },
   { ten: '24-phat-844-an-dieu-khien-luoc-lang', url: '?man=buoi', w: 844, h: 390, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, truocLang(3)); await t.locator('.xp-luoc').waitFor({ timeout: 30000 }); await t.mouse.move(420, 120); await t.locator('.xp[data-an]').waitFor({ timeout: 8000 }); await cho(t, 300) } },
+  // 13/11: thầy giảng ở chế độ «Bảng» (live theo khối) ⇒ trình phát xếp BẢNG KÍN MÀN như lúc live, không dựng giấy đề
+  { ten: '26-phat-844-che-do-bang-kin-man', url: '?man=buoi', w: 844, h: 390, bang: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
+  { ten: '27-phat-390-doc-che-do-bang-kin-man', url: '?man=buoi', w: 390, h: 844, bang: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '25-phat-390-iphone-doc-xoay', url: '?man=buoi', w: 390, h: 844, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '26-phat-1180-may-bang', url: '?man=buoi', w: 1180, h: 820, mayBang: true, lam: async (t) => { await choBuoi(t); await t.locator('.xl-doan').first().click(); await t.locator('.xp').waitFor(); await cho(t, 900); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '27-phat-844-khong-tieng', url: '?man=buoi', w: 844, h: 390, tieng: 0, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.3); await cho(t, 2600) } },
