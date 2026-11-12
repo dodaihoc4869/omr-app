@@ -693,3 +693,76 @@ E đã tự dừng ở 40 000 (06:08). Đang chạy: F (tới 40 000 rồi tự 
 Dừng: `pkill -f "ma/luyen.py du-lieu-f ck-f"` · `pkill -f "ma/luyen.py du-lieu-f ck-g"` · `pkill -f ma/canh-ck.sh` (E nếu chạy lại: `pkill -f "ma/luyen.py du-lieu ck-e"`).
 `canh-buoi-moi.sh` vẫn TẮT. Checkpoint giữ riêng (không bị xoay vòng): `ck-giu/` (e-28000 / 29000 / 30000, c-29000, f-33000 / 35000 / 37000).
 Bản đo 18 s một checkpoint: `bash lv3/do18.sh ck-x-NNNNN` (thư mục tạm) ⇒ `lv3/do18-ck-x-NNNNN.json`, rồi `tom-do18.py`.
+
+### 11.8 Lượt H (12/11, 06:49–11:18 giờ VN) — 12,8 phút giọng thầy từ bài giảng YouTube thầy gửi — giữ thầy tốt hẳn, nói chồng đỡ hại, giọng khác VẪN chưa giảm đủ — CHƯA ĐẠT, KHÔNG PHÁT HÀNH
+Mã: `luyen/loc-yt.py`, `luyen/cat-yt.py` (mới), `luyen/chuan-bi-yt.py` (đã có), `luyen/luyen.py` thêm `TG_YT_TI`, `luyen/chay-h.sh` (khởi / khởi lại H an toàn). Tiếng, checkpoint,
+trọng số chỉ ở thư mục tạm của phiên (`du-lieu-f/yt/`, `ck-h/`, `mh/ck-h-*.tgt`) — không vào kho. Trọng số `ckpt/thay-ck1-2000.tgt` lỡ vào kho ở 130fc02ae: đã GỠ khỏi đầu
+nhánh (không viết lại lịch sử; không script / test nào cần tệp đó).
+
+#### (1) Dữ liệu mới — bài giảng YouTube thầy gửi
+- Tệp mp3 20,5 phút ⇒ **16 phút giọng thầy**. Bước 1 `loc-yt.py`: cửa sổ 1,5 s bước 0,5 s ⇒ mức dBFS + cos CAM++ với tâm thầy. Bước 2 `cat-yt.py`: ô 0,5 s «tốt» khi
+  **≥ 2 cửa sổ phủ nó đạt** (cos ≥ **0,494** — cùng ngưỡng mức khung ở 11.7 (2) — và mức > −45 dBFS); đoạn = chuỗi ô tốt liền, **gọt 0,25 s** mỗi đầu, **bỏ đoạn < 2 s**.
+- **12,8 phút (766 s) để luyện; 2,5 phút giữ riêng** — khối liền ở **520–700 s** (đoạn chạm vùng đệm ± 10 s bỏ hẳn) ⇒ `yt-iBs8-giu.flac`; tệp chấm 30 s `thay-yt.wav` lấy từ đó.
+  Giữ riêng là KHÁC ĐOẠN nhưng CÙNG buổi giảng (cùng mic, phòng) với phần luyện ⇒ số trên `thay-yt` lạc quan hơn số trên giọng Live giữ riêng (`thay-that`, 75f8acfc).
+- Chất tiếng: sàn ồn −50…−54 dBFS, không nhạc nền, dải ≈ 15,5 kHz. `chuan-bi-yt.py` ⇒ `du-lieu-f/yt/sach/` (24 kHz không nén thêm) + `yt/mp3/` (qua MP3 24 kHz 48 kb/s
+  — miền «Xem lại Live»). Giọng thầy luyện: 55,2 s (11.7) ⇒ ≈ 14 phút.
+
+#### (2) Tham số và diễn biến
+- Từ **F-40000** (`ck-h/ck-040000.pkl` = F-40000), cấu hình G + dữ liệu YouTube, tới 60 000 bước, 0,6–0,7 s / bước:
+  `TG_TAM=<thư mục tạm> bash luyen/chay-h.sh` ≡ `TG_DL=du-lieu-f TG_L2=4 TG_LOT=0.05 TG_IM0=0.1 TG_IM1=0.1 TG_GIA=0.05 TG_LUOT=0.3 TG_XON=0.15 TG_GIAY=4 TG_YT_TI=…
+  bash luyen/chay-luyen.sh ck-h 60000`. `TG_YT_TI` = tỉ lệ mẫu lấy giọng thầy YouTube SẠCH; phần còn lại chia đôi YouTube-MP3 / thầy Live (mặc định 0,6 = như trước).
+- **Luật đổi một lần (đặt trước khi chạy):** ≥ 2 điểm đo nhanh từ 41 000 mà khác thật hoặc VCTK nam thấp hơn F-40000 quá 3 dB ở CẢ hai điểm gần nhất ⇒ `TG_YT_TI` 0,6 ⇒ 0,35.
+  41 000 / 42 000: khác thật hạ 21,1 / 20,1 dB (F-40000 33,8) ⇒ **đổi lúc 07:53 (≈ bước 42 100), khởi lại từ ck-042000 với `TG_YT_TI=0.35`**. Sau đổi, khác thật (đo nhanh)
+  vẫn 15–22 dB tới 60 000 ⇒ bớt mẫu YouTube KHÔNG kéo lại được.
+- Sự cố máy: chết ở ≈ 40 600 (phiên rảnh ⇒ máy bị thu hồi) ⇒ khởi lại từ 40 000; máy khởi động lại 10:42 (≈ 57 700) ⇒ khởi lại từ 57 000; xong 60 000 lúc 11:18.
+
+#### (3) Đo nhanh (`do-nhanh.mjs`, dB hạ; «thay», «thay-yt», «thay-to» càng THẤP càng tốt, giọng khác càng CAO càng tốt)
+| bản | thay | thay-yt | thay-to | khác thật | VCTK nam | LJ nữ | libri |
+|---|---|---|---|---|---|---|---|
+| F-40000 (mốc) | 1,8 | 3,4 | 3,1 | 33,8 | 13,9 | 13,4 | 19,7 |
+| H-42000 (trước đổi) | 1,9 | 0,7 | 2,7 | 20,1 | 12,4 | 6,5 | 15,5 |
+| H-45000 | 2,0 | 0,5 | 3,7 | 20,7 | 14,5 | 5,4 | 34,6 |
+| H-48000 | 1,8 | 0,6 | 3,7 | 17,6 | 13,5 | 6,5 | 18,8 |
+| H-51000 | 2,1 | 0,5 | 3,7 | 22,2 | 19,3 | 6,0 | 26,5 |
+| H-55000 | 2,6 | 0,5 | 4,1 | 20,4 | 23,7 | 6,5 | 26,0 |
+| H-58000 | 2,5 | 0,4 | 3,6 | 19,1 | 21,0 | 5,9 | 23,4 |
+| H-60000 | 2,3 | 0,4 | 3,9 | 18,7 | 22,8 | 5,6 | 22,9 |
+
+⇒ H học được giọng YouTube (thay-yt 3,4 ⇒ 0,4–0,6) nhưng KHÔNG giữ giọng Live tốt hơn F theo đo nhanh (thay 1,8–2,6; thầy nói to từ 43 000: 3,5–4,1 > 3,1); LJ nữ tệ hẳn
+(13,4 ⇒ 4,6–7,3), khác thật 33,8 ⇒ 15–22, VCTK nam từ 51 000 dao động 15–24 (F 13,9). (F-40000 thay-yt đo lại bằng đúng `do-nhanh.mjs` đó: 3,4.)
+
+#### (4) Bốn tiêu chí — bản đo 18 s (bản đã sửa của 11.7, `do-tach-giong.mjs` không đổi từ 115fd78b5), F-40000 làm mốc đo lại trên cùng bản đo
+`LV_CHI_MH=1 LV_THAY=cham/thay-that.wav LV_KHAC=cham/khac-that.wav LV_MH=mh/<bản>.tgt node scripts/thu-live-1011/do-tach-giong.mjs <ra.json>`, tóm bằng `luyen/tom-do18.py`.
+Ứng viên theo đo nhanh: H-51000, H-55000, H-60000 (bước cuối). Bốn bản đo liền sau khi H dừng (máy phiên, Node 1 luồng). Giọng thầy = Live giữ riêng (`thay-that`).
+
+| tiêu chí (10.5) | F-40000 (mốc) | H-51000 | H-55000 | H-60000 | đạt? |
+|---|---|---|---|---|---|
+| mở sau ≤ 50 ms | 0–30 | 0–30 | 0 | 0 | ĐẠT |
+| nói chồng không giảm SI-SDR thầy: 0 / 2 dB (8 ca) · 10 dB (4 ca), dB đổi | tăng 8 / 8 · −2,0…−0,1 | tăng 8 / 8 · −1,0…+0,2 | tăng 8 / 8 · −1,0…+0,1 | tăng 8 / 8 · −1,1…−0,1 | 0 / 2 dB ĐẠT; 10 dB KHÔNG (hại giảm từ 2 còn ≈ 1 dB, VCTK nam 11 → 10) |
+| giọng khác giảm ≥ 20 dB (một mình, 0 / 2 / 10 dB): VCTK nam · LJ nữ · em thật · xôn xao | 7,0–8,8 · 16,1–24 · 13,8–21,7 · **3,5** | 11–16,7 · 12–22 · 17,3–27,8 · **4,5–7,9** | 10,8–12,8 · 11,5–22,2 · 20,8–29 · **5,6–8,6** | 11–12,2 · 10,2–20 · 19,8–27,4 · **5,6–8,2** | KHÔNG |
+| hệ số thời gian thực ≤ 0,6 | 0,096–0,126 | 0,096–0,123 | 0,095–0,120 | 0,095–0,121 | ĐẠT (máy phiên) |
+| thầy bị hạ, đoạn thầy một mình (mong ≤ 0,5 dB) | 1,0–1,1 | **0,4–0,5** | 0,5–0,6 | 0,5–0,6 | H-51000 ĐẠT |
+| SI-SDR thầy một mình (dB) | 7,6–8,6 | 14,7–16,8 | 13,8–15,8 | 13,9–15,5 | — |
+| giữ dải (dB): 0,1–1 / 1–3 / 3–6 / 6–11 / 11–24 kHz | −1,1 / −0,6 / −1,2 / −1,4 / −5,1 | −0,4 / −0,1 / −0,5 / −0,7 / −2,8 | −0,5 / −0,2 / −0,5 / −0,8 / −3,6 | −0,6 / −0,2 / −0,5 / −0,7 / −3,5 | — |
+| giọng khác giảm sau thầy / sau nói chồng (TB, dB) | 12,4 / 13,9 | 15,4 / 13,8 | 16,3 / 13,6 | 15,5 / 13,3 | — |
+
+Cùng bản đo, giọng thầy = YouTube giữ riêng (`LV_THAY=cham/thay-yt.wav`; cùng buổi với dữ liệu luyện ⇒ lạc quan):
+| | F-40000 | H-51000 | H-55000 | H-60000 |
+|---|---|---|---|---|
+| mở sau (ms) | 0 | 0 | 0 | 0 |
+| nói chồng 0 / 2 dB · 10 dB (SI-SDR thầy đổi) | tăng 2 / 8, giảm tới 6,1 · −10,1…−4,3 | tăng 6 / 8 (LJ nữ −3,0 / −3,9) · −2,5…+0,2 | tăng 6 / 8 (LJ nữ −2,9 / −3,4) · −1,7…+0,6 | tăng 6 / 8 (LJ nữ −2,9 / −3,3) · −1,4…+0,3 |
+| giọng khác giảm: VCTK nam · LJ nữ · em thật · xôn xao | 7,7–10,3 · 20,8–33,8 · 14,2–23,7 · 3,9–4,1 | 9,6–11,3 · 8,1–19,4 · 13,6–27,2 · 5,3–6,6 | 9,5–10 · 10–18,6 · 18,5–27,9 · 5,8–6,3 | 9–9,8 · 8,1–16,4 · 16,1–26,5 · 5,6–6 |
+| thầy bị hạ (dB) · SI-SDR thầy một mình | 2,6–3,0 · 4,3–6,3 | 0,2 · 29,5–31,1 | 0,2–0,6 · 20,9–29,5 | 0,2–0,3 · 27,4–30,2 |
+| hệ số thời gian thực | 0,098–0,133 | 0,098–0,130 | 0,098–0,125 | 0,097–0,130 |
+
+#### (5) Kết luận
+- **Đạt:** mở sau ≤ 50 ms (cả 3 bản H); hệ số thời gian thực 0,095–0,13 (máy phiên). **Chưa đạt:** nói chồng ở 10 dB (hại thầy còn ≈ 1 dB, F 2 dB; với giọng thầy YouTube,
+  LJ nữ chồng 0 / 2 dB hạ SI-SDR thầy ≈ 3 dB); giọng khác giảm ≥ 20 dB (VCTK nam 11–17, LJ nữ 10–22, xôn xao 4,5–8,6 dB; chỉ em thật gần đạt: 17–29).
+- So F-40000, H **giữ thầy tốt hẳn** (thầy bị hạ 1,0 ⇒ 0,4–0,6 dB, SI-SDR thầy một mình 8 ⇒ 15 dB, dải 11–24 kHz −5,1 ⇒ −2,8…−3,6) và **chặn khá hơn VCTK nam (+4…+8 dB),
+  em thật (+3…+7), xôn xao (+1…+5)**, nhưng **LJ nữ kém đi 2–6 dB** (đo nhanh: 13,4 ⇒ 4,6–7,3). Hai thước đo lệch nhau ở «thay» (đo nhanh 1,8 ⇒ 2,1–2,6, bản 18 s thầy bị hạ 1,0 ⇒ 0,4–0,6)
+  và «khác thật» (đo nhanh 33,8 ⇒ ~20, bản 18 s em thật 14–22 ⇒ 17–29): đo nhanh cho mỗi tệp đứng riêng qua bộ tách mới, bản 18 s đo từng khúc trong cảnh có thầy
+  ⇒ xét tiêu chí theo bản 18 s.
+- Bản nên dùng thử: **H-51000** (giữ thầy tốt nhất, dải tốt nhất, VCTK nam tốt nhất ở 10 dB); thay thế: H-55000 (em thật 20,8–29, mở sau 0; thầy bị hạ 0,5–0,6).
+  H-60000 không hơn hai bản trên. Mức «Chỉ giọng thầy» vẫn CHƯA đạt chuẩn phát hành; đường thử trong app (phiên chính) không thay mô hình tự động.
+- Đề xuất (chưa thử): thêm giọng nữ (kho mở) vào mẫu luyện để kéo LJ nữ lại; xôn xao vẫn 4,5–8,6 dB ⇒ tăng mẫu 3–5 người (`TG_XON` > 0,15); nguồn giọng
+  thầy dài hơn vẫn là nút thắt (11.5) — lượt này mới có MỘT bài giảng.
