@@ -158,17 +158,21 @@ export function ngoaiVong(v: Vong, x: number, y: number): boolean {
   const dx = (x - v.cx) / v.rx, dy = (y - v.cy) / v.ry
   return dx * dx + dy * dy > 1
 }
-/** Đoạn thẳng có cắt hình chữ nhật (đã nới `noi`) không — phép cắt theo tấm. */
+/** Đoạn thẳng có cắt hình chữ nhật (đã nới `noi`) không — phép cắt theo tấm. Không cấp phát mảng: sân ghép có tới 300 vật chặn, bước kéo thẳng đường gọi hàm này hàng trăm nghìn lần. */
+let T0 = 0, T1 = 1
+function tam(p: number, q: number): boolean {
+  if (p === 0) return q >= 0
+  const r = q / p
+  if (p < 0) { if (r > T1) return false; if (r > T0) T0 = r } else { if (r < T0) return false; if (r < T1) T1 = r }
+  return true
+}
 function catHop(c: ChuNhat, x1: number, y1: number, x2: number, y2: number, noi: number): boolean {
-  let t0 = 0, t1 = 1
+  const xa = c.x - noi, xb = c.x + c.w + noi, ya = c.y - noi, yb = c.y + c.h + noi
+  // Cả hai đầu cùng một phía ngoài hộp ⇒ không cắt (loại nhanh, cùng kết quả với phép cắt theo tấm).
+  if ((x1 < xa && x2 < xa) || (x1 > xb && x2 > xb) || (y1 < ya && y2 < ya) || (y1 > yb && y2 > yb)) return false
+  T0 = 0; T1 = 1
   const dx = x2 - x1, dy = y2 - y1
-  const tam: [number, number, number, number][] = [[-dx, x1 - (c.x - noi), dx, c.x + c.w + noi - x1], [-dy, y1 - (c.y - noi), dy, c.y + c.h + noi - y1]]
-  for (const [p1, q1, p2, q2] of tam) for (const [p, q] of [[p1, q1], [p2, q2]]) {
-    if (p === 0) { if (q < 0) return false; continue }
-    const r = q / p
-    if (p < 0) { if (r > t1) return false; if (r > t0) t0 = r } else { if (r < t0) return false; if (r < t1) t1 = r }
-  }
-  return t0 <= t1
+  return tam(-dx, x1 - xa) && tam(dx, xb - x1) && tam(-dy, y1 - ya) && tam(dy, yb - y1) && T0 <= T1
 }
 /** Tường / thùng chắn đường NGẮM giữa hai điểm? */
 export const chanDuong = (bd: BanDo, x1: number, y1: number, x2: number, y2: number): boolean => bd.chan.some((c) => catHop(c, x1, y1, x2, y2, 0))
