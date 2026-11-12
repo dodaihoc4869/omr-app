@@ -52,7 +52,7 @@ describe('mic của em lên bảng', () => {
     expect(nutMic()!.textContent).toContain('Mic của em'); expect(nutMic()!.textContent).toContain('Đang bật')
     expect(nutMic()!.getAttribute('aria-pressed')).toBe('true')
     expect(screen.getByText('Thầy và cả lớp đang nghe em.')).toBeTruthy()
-    expect(document.querySelector('.lv-nam .lv-nam-dau [data-dau="mic"]')!.getAttribute('title')).toBe('mic của em đang bật') // khay đóng vẫn biết mic đang mở
+    expect(document.querySelector('.lv-nam .lv-nam-cham.mic')).toBeTruthy() // khay đóng vẫn biết mic đang mở: chấm sáng nhấp nháy dưới thanh (thầy 12/11)
     expect(document.querySelector('.lv-nam')!.getAttribute('aria-label')).toContain('mic của em đang bật')
     expect(document.querySelector('.lv-nam-hh')).toBeNull() // hết huy hiệu tròn nổi
     expect(document.querySelector('.lv > .lv-noi, .lv > .lv-bat-tieng')).toBeNull() // không còn thẻ / nút nổi riêng trên bảng

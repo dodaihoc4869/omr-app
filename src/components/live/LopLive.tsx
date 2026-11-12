@@ -44,6 +44,7 @@ import { taoLiveEm, type LiveEm, type TrangThaiLiveEm, type ViewLiveEm } from '.
 import { datKiemQuyenNgoai, khoaXoay } from '../bpu/tat-man'
 import { anToanHinh, canXoayCss, giaiTrang, giuKhoaNgang } from './bo-cuc'
 import { laDienThoai, thuocTinhXoay, toaDoXoay } from './chieu-xoay'
+import { DauDat, TamTra, type DuLieuTra } from './TamTra'
 import ChonLoa from './ChonLoa'
 import type { Vung } from './bo-cuc-doc-lap'
 import { daiLuot, type DuLieuLuot } from './DaiLuot'
@@ -95,6 +96,10 @@ export interface PropsLopLive {
   giuNgang?: boolean
   /** Màn câu hỏi đang xoay hình 90° bằng CSS (em cầm ngang, máy không khoá được) ⇒ tay nắm / khay ở màn câu hỏi đổi trục con trỏ như bảng. */
   xoayDau?: boolean
+  /** LIVE THEO KHỐI (thầy 12/11): em chọn đáp án NGAY TRÊN BẢNG (không đổi màn khi thầy chuyển câu). null = không hiện (đã gửi / hết giờ / đã mở đáp án). */
+  tra?: DuLieuTra | null
+  /** Gửi đáp án; vắng = chưa chọn đủ. */
+  onGui?: () => void
 }
 
 /** Tấm giấy đề DỰNG THƯỜNG (câu có ảnh / bảng / sơ đồ, giấy lệch giấy thầy): khối đề dùng chung dựng theo bề ngang khung giấy của EM rồi phóng cho vừa
@@ -134,7 +139,6 @@ const bt = (d: ReactNode) => <svg width="22" height="22" viewBox="0 0 24 24" fil
 const BtLoa = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></>)
 const BtMic = () => bt(<><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></>)
 const BtLoaTat = () => bt(<><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z" /><path d="M16 9.5l5 5m0-5l-5 5" /></>)
-const BtMang = () => bt(<path d="M5 20v-4M12 20v-9M19 20V5" />)
 const BtChia = () => bt(<path d="M12 4v16M8 9l-3.5 3L8 15M16 9l3.5 3L16 15" />)
 const BtTay = () => bt(<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V11m0-6.5V4a1.5 1.5 0 0 1 3 0v7m0-5.5a1.5 1.5 0 0 1 3 0V12m0-3a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1.6a6 6 0 0 1-4.8-2.4L4.5 14.4a1.6 1.6 0 0 1 2.4-2.1L8 13.4" />)
 
@@ -177,9 +181,8 @@ type HuongMan = { lock?: (h: string) => Promise<void>; unlock?: () => void; type
 const huongMan = (): HuongMan | null => (typeof screen !== 'undefined' ? ((screen as Screen & { orientation?: HuongMan }).orientation ?? null) : null)
 
 /** Dấu trạng thái rất nhỏ trên tay nắm (khay đóng vẫn biết): `nhan` = chữ cho trình đọc màn (nối vào nhãn của tay nắm). */
-export interface DauNam { loai: 'tieng' | 'mic' | 'tay' | 'mang' | 'tin'; nhan: string }
-const BtTin = () => <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" /></svg>
-const BT_DAU: Record<DauNam['loai'], () => ReactNode> = { tieng: BtLoaTat, mic: BtMic, tay: BtTay, mang: BtMang, tin: BtTin }
+export interface DauNam { loai: 'tieng' | 'mic' | 'tay' | 'mang' | 'tin' | 'loa'; nhan: string }
+
 /** Khay tự thu sau ngần này ms không chạm; lần tự mở đầu buổi (tiếng đang tắt) thì ngắn hơn. */
 const THU_MS = 4000, GIOI_THIEU_MS = 3000
 
@@ -261,12 +264,13 @@ function Khay({ mo, datMo, xoay, cao, namRef, khayRef, namY, lopNam, dau, gioiTh
     if (k.kieu === 'ngang') datMo(k.x0 - p.x > quang() * 0.3)
     else if (!k.kieu) datMo((m) => !m)
   }
-  const ds = dau ?? []
+  const het = dau ?? [], ds = het.filter((d) => d.loai !== 'loa') // «loa đang bật» = trạng thái thường: chỉ là chấm sáng, không đọc thành dấu
   return (
     <>
-      <button ref={nam} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={`${mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'}${ds.length ? ` · ${ds.map((d) => d.nhan).join(' · ')}` : ''}`} aria-expanded={mo}
+      <button ref={nam} type="button" className={`lv-nam${lopNam ? ` ${lopNam}` : ''}`} aria-label={`${mo ? 'Thu khay điều khiển' : 'Mở khay điều khiển'}${ds.length ? ` · ${ds.map((d) => d.nhan).join(' · ')}` : ''}`} aria-expanded={mo} data-dau={ds.length ? ds.map((d) => d.loai).join(' ') : undefined}
         onPointerDown={namXuong} onPointerMove={namDi} onPointerUp={namNha} onPointerCancel={namNha}>
-        <i />{!ds.length ? null : <span className="lv-nam-dau" aria-hidden="true">{ds.map((d) => { const Bt = BT_DAU[d.loai]; return <b key={d.loai} data-dau={d.loai} title={d.nhan}><Bt /></b> })}</span>}
+        {/* thầy 12/11: chỉ còn HAI chấm sáng — loa đang bật (trên thanh), mic của em đang bật (dưới thanh, nhấp nháy); các dấu khác nằm trong khay + nhãn đọc màn hình */}
+        <i />{het.some((d) => d.loai === 'loa') ? <span className="lv-nam-cham loa" aria-hidden="true" /> : null}{ds.some((d) => d.loai === 'mic') ? <span className="lv-nam-cham mic" aria-hidden="true" /> : null}
       </button>
       <div ref={khay} className="lv-khay" data-mo={mo || undefined} inert={!mo} role="group" aria-label="Điều khiển live" onPointerDown={() => { hanThu.current = THU_MS; hoanThu() }}>{children}</div>
     </>
@@ -287,6 +291,7 @@ function TreTieng({ le }: { le: MutableRefObject<LiveEm | null> }) {
 
 // Live theo khối: hai nút khay «Nhắn cả lớp» / «Bốn đội» báo sang lớp nổi (LopNoiEm) bằng sự kiện cửa sổ — hai mảnh không nhập nhau.
 const phatLk = (d: 'chat' | 'doi'): void => { window.dispatchEvent(new CustomEvent('ddh-lk', { detail: d })) }
+const BtTin = () => <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" /></svg>
 const BtLk = ({ d }: { d: string }) => <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d={d} /></svg>
 function useTinLk(): number {
   const [n, setN] = useState(0)
@@ -294,7 +299,7 @@ function useTinLk(): number {
   return n
 }
 
-export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so, lenBang, giuNgang, xoayDau }: PropsLopLive) {
+export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe, doi, matMang, roi, q, Chu, tuLuan, luot, xa, so, lenBang, giuNgang, xoayDau, tra, onGui }: PropsLopLive) {
   const [tt, setTt] = useState<TrangThaiLiveEm | null>(null)
   const le = useRef<LiveEm | null>(null)
   /** Lớp bảng (khi đang hiện) nhận sự kiện bút ở đây. */
@@ -429,6 +434,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
   const dauNam = (mangYeu: boolean): DauNam[] => {
     const ds: DauNam[] = []
     if (tiengTat) ds.push({ loai: 'tieng', nhan: nghe ? 'máy chưa phát được tiếng thầy' : 'tiếng đang tắt' })
+    else if (tt.bat && !tt.nghi && nghe) ds.push({ loai: 'loa', nhan: 'loa đang bật' })
     if (micMo) ds.push({ loai: 'mic', nhan: 'mic của em đang bật' })
     if (tt.tay) ds.push({ loai: 'tay', nhan: `em đang giơ tay${tt.hangTay ? `, thứ ${tt.hangTay} trong hàng` : ''}` })
     if (mangYeu) ds.push({ loai: 'mang', nhan: 'mạng yếu' })
@@ -470,7 +476,7 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
       {khoaChuaGui ? <p className="lv-ghi">Thầy đã gọi bạn lên bảng — câu này đã khoá, em chưa gửi nên để trống.</p> : null}
       {/* LIVE THEO KHỐI (thầy 12/11 «ẩn cả cái chat với ngọn lửa vào thanh màu vàng»): nhắn cả lớp + bốn đội nằm trong khay này; lớp nổi (live-khoi) nghe sự kiện. */}
       {view.khoi ? <>
-        <button type="button" className="lv-vua" onClick={() => phatLk('chat')}><BtLk d="M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z" />Nhắn cả lớp<b>{tinLk ? `${tinLk} tin mới` : 'Mở'}</b></button>
+        <button type="button" className="lv-vua" onClick={() => phatLk('chat')}><BtTin />Nhắn cả lớp<b>{tinLk ? `${tinLk} tin mới` : 'Mở'}</b></button>
         <button type="button" className="lv-vua" onClick={() => phatLk('doi')}><BtLk d="M12 3c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3 2-5 1 2 2 2 2 2 0-3 0-5 1-8z" />Bốn đội<b>Xem</b></button>
       </> : null}
       {them}
@@ -486,14 +492,21 @@ export default function LopLive({ ve, goc, guiTho, dangKy, view, che, de, khoaDe
         : duocMoi && (micMo || tt.mic === 'xin-quyen') ? <VienNoi dangMo={micMo} lenBang={false} onTat={tatMic} ghi={!!view.ghi} /> : null)}
     </div>
   )
-  return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500}
-    epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot(luot) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
+  // LIVE THEO KHỐI: tấm chọn đáp án hiện trong khung bảng khi lượt đang nhận trả lời (thầy bấm «Lên bảng» — cờ phòng `bang` / đã gọi em — thì ẩn dù em chưa gửi);
+  // con dấu Đạt / Không đạt 3 giây khi thầy chấm em lên bảng.
+  const l0 = luot?.l, goi0 = lenBang?.goi
+  const bangTra = view.khoi && tra && l0 && l0.pha === 'tra-loi' && !tt.bang && !l0.goi ? <TamTra so={l0.so} phan={l0.phan} tuLuan={!!l0.tuLuan} soPa={q?.choices?.length || 4} tra={tra} onGui={onGui} /> : null
+  const dauDat = view.khoi ? <DauDat khoa={lenBang && goi0 ? `${lenBang.so}:${goi0.sbd}` : ''} dat={goi0?.dat} /> : null
+  return <BangLive le={le} datNhanBut={datNhanBut} tt={tt} de={de} khoaDe={khoaDe} matMang={matMang} tatMic={tatMic} vaoMoi={Date.now() - lucBat.current < 1500} bangTra={bangTra} dauDat={dauDat}
+    epPhong={view.khoi ? (view.khoi.che === 'bang' ? 'bang' : null) : undefined} tamMoi={tamMoi} giay={view.giay ?? null} q={q ?? null} Chu={Chu} tuLuan={!!tuLuan} so={so ?? null} luot={luot ? daiLuot({ ...luot, conLam: !!bangTra }) : null} coDoi={!!doi} dauNam={dauNam} gioiThieu={gioiThieu} khiGioiThieu={khiGioiThieu} dongKhay={dongKhay} ghi={!!view.ghi} lenBang={emBang} lucBang={lucBang} daKhoa={daKhoa} />
 }
 
 // Live theo khối: khay báo lớp nổi mở nhắn tin / bốn đội; lớp nổi báo lại số tin chưa đọc.
 interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk: SuKienBut) => void) | null) => void; tt: TrangThaiLiveEm; de: ReactNode | null; khoaDe: string; matMang: boolean; tatMic: () => void
   /** Thầy vừa bật live (≤ 1,5 giây) ⇒ có viên «Thầy đang live» + bảng nở ra; các lần vào bảng sau (em gửi xong, thầy gọi lên bảng) hiện tức thì. */
   vaoMoi: boolean
+  /** Live theo khối: tấm chọn đáp án + con dấu Đạt / Không đạt, vẽ TRONG khung bảng (TamTra.tsx). */
+  bangTra?: ReactNode; dauDat?: ReactNode
   tamMoi: ReactNode; giay: NonNullable<ViewLiveEm>['giay']; q: CauGiay | null; Chu?: BoChu; tuLuan: boolean; so: number | null; luot: ReactNode; coDoi: boolean; dauNam: (mangYeu: boolean) => DauNam[]; gioiThieu: boolean; khiGioiThieu: () => void
   dongKhay: (dau: ReactNode, them?: ReactNode) => ReactNode; ghi?: boolean
   /** Live theo khối: chế độ «Bảng» ⇒ `'bang'` (khung bảng phủ kín), «Học» ⇒ null; buổi thường ⇒ undefined. */
@@ -505,7 +518,7 @@ interface PropsBang { le: MutableRefObject<LiveEm | null>; datNhanBut: (f: ((sk:
 /** Khổ HÌNH (đã xoay nếu có) + kiểu giấy của thầy. */
 interface KhoHinh { xoay: boolean; w: number; h: number; giayToi: boolean }
 
-function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi, lenBang, lucBang, daKhoa, epPhong }: PropsBang) {
+function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tamMoi, giay, q, Chu, tuLuan, so, luot, coDoi, dauNam, gioiThieu, khiGioiThieu, dongKhay, ghi, lenBang, lucBang, daKhoa, epPhong, bangTra, dauDat }: PropsBang) {
   const goc = useRef<HTMLDivElement>(null), kdl = useRef<TayKhungDL>(null)
   const nam = useRef<HTMLButtonElement>(null), khay = useRef<HTMLDivElement>(null), thuoc = useRef<HTMLDivElement>(null), theMic = useRef<HTMLDivElement>(null), daiBan = useRef<HTMLDivElement>(null)
   const trang = useRef({ trang: '', tiLe: 16 / 9 })
@@ -638,7 +651,7 @@ function BangLive({ le, datNhanBut, tt, de, khoaDe, matMang, tatMic, vaoMoi, tam
       <div className="lv-nen">
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập (giấy soi `.lv-gt` nằm trên tấm giấy = đúng ô giấy của thầy đã co) */}
         <KhungDocLap ref={kdl} lop="lv" epPhong={epPhong} layHinh={layHinh} layTrang={layTrang} netGiay={netGiay} tiLeChu={tiLeChu} tuUuTien={!yeu} dong={!giamDong()} giay={dungGiay} tamGoc={soi && giay ? { rong: giay.w, cao: giay.h } : null}
-          bangTrong={coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
+          coTra={!!bangTra} bangTrong={<>{dauDat}{bangTra ?? (coNet ? null : <p>Bảng đen<br />Thầy viết gì, em thấy ngay ở đây</p>)}</>} khiCham={khiCham} khiPhong={setPhongTo} khiTay={setTayChia} khiNet={khiNet}
           dauBang={lenBang && epPhong !== 'bang' ? <TheLenBang em={lenBang} cho={phaBang === 'giua'} dau={dauBang} /> : null} />
       </div>
       {vao ? <div className="lv-vao" role="status"><i aria-hidden="true" />Thầy đang live</div> : null}

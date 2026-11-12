@@ -333,3 +333,45 @@ html.may-yeu .lv-bao { -webkit-backdrop-filter: none; backdrop-filter: none; bac
 html.may-yeu .lv[data-vao] .lv-nen, html.may-yeu .lv-vao, html.may-yeu .lv-bao .quay { animation: none; }
 html.may-yeu .lv-tro, html.may-yeu .lv-nam i, html.may-yeu .lv-nam.noi i { box-shadow: none; }
 html.may-yeu .lv-song i { transition: none; }
+
+/* ── CHỌN ĐÁP ÁN NGAY TRÊN BẢNG (live theo khối, TamTra.tsx — bản vẽ 15–18 đã duyệt 12/11): tấm tối neo đáy khung bảng, chỉ chữ cái + nút ── */
+/* lề phải 46 px: chừa vùng chạm của tay nắm vàng (44 px sát mép phải) — không thì tay nắm đè lên nút «Sai» / phím số cột cuối */
+.lv-bang .lv-tra { position: absolute; left: 8px; right: 46px; bottom: 8px; z-index: 4; display: grid; gap: 8px; max-height: calc(100% - 16px); padding: 10px; border-radius: 16px; overflow-y: auto; overscroll-behavior: contain; background: var(--tr-chieu-mat); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent), 0 -10px 30px color-mix(in srgb, var(--tr-chieu-bang) 60%, transparent); color: var(--tr-chieu-giay); pointer-events: auto; touch-action: manipulation; animation: lv-tra-vao 0.18s cubic-bezier(0.05, 0.7, 0.1, 1) both; }
+@keyframes lv-tra-vao { from { opacity: 0; transform: translateY(10px); } }
+.lv-tra-dau { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 2px; font-size: 12.5px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 72%, transparent); }
+.lv-tra-dau em { font-style: normal; color: var(--doi); }
+.lv-tra-ghi { margin: 0; font-size: 13.5px; line-height: 1.4; color: color-mix(in srgb, var(--tr-chieu-giay) 80%, transparent); }
+.lv-tra .lv-tra-nut { min-height: 46px; padding: 0 8px; border: 0; border-radius: 13px; background: var(--tr-chieu-mat-2); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); color: var(--tr-chieu-giay); font: inherit; font-size: 19px; font-weight: 800; }
+.lv-tra .lv-tra-nut:active { transform: scale(0.96); }
+.lv-tra-tn { display: grid; gap: 8px; }
+.lv-tra-tn .lv-tra-nut[aria-pressed="true"] { background: var(--tr-hs); box-shadow: 0 3px 0 var(--tr-hs-go); color: var(--tr-trang); }
+.lv-tra-ds { display: grid; gap: 6px; }
+.lv-tra-hang { display: grid; grid-template-columns: 30px 1fr 1fr; align-items: center; gap: 6px; }
+.lv-tra-hang > b { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--tr-chieu-mat-2); font-size: 14px; color: color-mix(in srgb, var(--tr-chieu-giay) 80%, transparent); }
+.lv-tra-hang .lv-tra-nut { min-height: 40px; font-size: 15px; }
+.lv-tra-hang .lv-tra-nut[data-v="D"][aria-pressed="true"] { background: var(--tr-dung); box-shadow: none; color: var(--tr-chieu-bang); }
+.lv-tra-hang .lv-tra-nut[data-v="S"][aria-pressed="true"] { background: var(--tr-sai); box-shadow: none; color: var(--tr-trang); }
+.lv-tra-so { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; }
+.lv-tra-so output { display: flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 13px; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px var(--tr-hs); font-size: 22px; font-weight: 800; letter-spacing: 0.04em; }
+.lv-tra-so output i { width: 2px; height: 22px; margin-left: 3px; background: var(--tr-hs); animation: lv-tra-nhay 1s steps(2) infinite; }
+@keyframes lv-tra-nhay { 50% { opacity: 0; } }
+.lv-tra-so .lv-tra-nut { min-height: 44px; padding: 0 14px; font-size: 14px; }
+.lv-tra-phim { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.lv-tra-phim .lv-tra-nut { min-height: 38px; font-size: 17px; }
+.lv-tra .lv-tra-gui { min-height: 46px; margin-bottom: 3px; border: 0; border-radius: 13px; background: var(--tr-hs); box-shadow: 0 3px 0 var(--tr-hs-go); color: var(--tr-trang); font: inherit; font-size: 16px; font-weight: 800; }
+.lv-tra .lv-tra-gui:disabled { background: var(--tr-chieu-mat-2); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-chieu-giay) 22%, transparent); color: color-mix(in srgb, var(--tr-chieu-giay) 38%, transparent); }
+/* Con dấu Đạt / Không đạt giữa bảng, 3 giây */
+.lv-bang .lv-dau-dat ~ p { visibility: hidden; } /* đang đóng dấu ⇒ ẩn dòng chữ chờ của bảng cho khỏi chồng chữ */
+.lv-bang .lv-dau-dat { position: absolute; left: 50%; top: 50%; z-index: 5; padding: 0.18em 0.6em; border: 0.11em solid currentColor; border-radius: 0.3em; outline: 0.04em solid currentColor; outline-offset: 0.12em; background: color-mix(in srgb, currentColor 10%, transparent); text-transform: uppercase; color: var(--tr-sai); font-size: clamp(28px, 9vmin, 76px); font-weight: 900; letter-spacing: 0.06em; white-space: nowrap; pointer-events: none; transform: translate(-50%, -50%) rotate(-10deg); animation: lv-dau-dong 3s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.lv-bang .lv-dau-dat[data-dat] { color: var(--tr-dung); }
+/* ĐÓNG DẤU: rơi từ trên xuống rất to → dập (nhỏ hơn cỡ thật một nhịp) → nảy về cỡ thật, rung nhẹ một cái; giữ; rồi mờ đi. */
+@keyframes lv-dau-dong { 0% { opacity: 0; transform: translate(-50%, -58%) rotate(-16deg) scale(3); } 7% { opacity: 1; transform: translate(-50%, -50%) rotate(-10deg) scale(0.9); } 10% { transform: translate(-50%, -50%) rotate(-8deg) scale(1.06); } 13% { transform: translate(-50%, -50%) rotate(-11deg) scale(0.98); } 16%, 86% { opacity: 1; transform: translate(-50%, -50%) rotate(-10deg) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) rotate(-10deg) scale(1.03); } }
+/* Tay nắm vàng (thầy 12/11): LOA đang bật ⇒ chấm sáng ngay TRÊN thanh (màu khác thanh), tắt thì ẩn; MIC của em đang bật ⇒ chấm sáng NHẤP NHÁY ngay DƯỚI thanh.
+   Hai chấm rộng bằng thanh. Mọi dấu khác (tay, mạng, tin mới) nằm trong khay. */
+.lv-nam-cham { position: absolute; right: 3px; width: 5px; height: 5px; border-radius: 50%; pointer-events: none; }
+.lv-nam-cham.loa { bottom: calc(50% + 25px); background: var(--tr-dung); box-shadow: 0 0 6px var(--tr-dung); }
+.lv-nam-cham.mic { top: calc(50% + 25px); background: var(--tr-sai); box-shadow: 0 0 6px var(--tr-sai); animation: lv-cham-nhay 0.9s ease-in-out infinite; }
+@keyframes lv-cham-nhay { 50% { opacity: 0.2; } }
+.lv-nam[aria-expanded="true"] .lv-nam-cham { visibility: hidden; }
+@media (prefers-reduced-motion: reduce) { .lv-bang .lv-tra, .lv-nam-cham.mic, .lv-tra-so output i { animation: none; } }
+
