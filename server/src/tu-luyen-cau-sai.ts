@@ -19,6 +19,7 @@ import type { CauLuyen } from '../../src/lib/bai-tap-pdf'
 import { cauLuyenTuBoCau } from '../../src/lib/bai-tap-pdf'
 import { laCauTuLuan } from './cam-tu-luan'
 import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
+import { dsXep } from './ds-xep'
 import { SQL_DA_CONG_BO } from './cong-bo-diem'
 import { docBaoVeKho, LOI_CHUA_KIEM_BAO_VE } from './bao-ve-kho-cong-khai'
 import { chanKhacKhoiEm } from './chan-khac-khoi'
@@ -312,13 +313,19 @@ async function docTenChienDich(env: Env, sbd: string): Promise<Map<string, strin
   return ra
 }
 
+export const SQL_NOI_DUNG = `SELECT q.qid, q.content_group, q.json FROM json_each(?) j CROSS JOIN game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
+        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+       WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid = j.value`
+export const SQL_NOI_DUNG_GON = `SELECT game_v2_question.qid AS qid, game_v2_question.content_group AS content_group, ${SQL_CAU_GON}
+        FROM json_each(?) j CROSS JOIN game_v2_question JOIN de_kho d ON d.ma_de = game_v2_question.ma_de
+        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
+       WHERE COALESCE(d.da_xoa, 0) = 0 AND game_v2_question.qid = j.value AND json_valid(game_v2_question.json)`
 /** Nội dung câu từ chỉ mục game (tờ còn, chỉ mục khớp nguồn). Câu vắng = đã đổi/rút khỏi kho ⇒ bỏ. */
 export async function docNoiDung(env: Env, qids: string[]): Promise<Map<string, { group: string; q: PrivateQuestion }>> {
   const ra = new Map<string, { group: string; q: PrivateQuestion }>()
   for (let i = 0; i < qids.length; i += 800) {
-    const r = await env.DB.prepare(`SELECT q.qid, q.content_group, q.json FROM game_v2_question q JOIN de_kho d ON d.ma_de = q.ma_de
-        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
-       WHERE COALESCE(d.da_xoa, 0) = 0 AND q.qid IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(qids.slice(i, i + 800))).all<Row>()
+    // 12/11 (H2, 3.196 lượt/ngày × 2.873 hàng): nối thẳng danh sách đã xếp (ds-xep.ts) thay `IN (json_each)` — cùng dòng, cùng thứ tự; D1 khỏi đọc danh sách lần hai.
+    const r = await env.DB.prepare(SQL_NOI_DUNG).bind(dsXep(qids.slice(i, i + 800))).all<Row>()
     for (const x of r.results ?? []) {
       const qid = str(x.qid)
       if (ra.has(qid)) continue
@@ -336,11 +343,7 @@ export async function docNoiDung(env: Env, qids: string[]): Promise<Map<string, 
 export async function docNoiDungGon(env: Env, qids: string[]): Promise<Map<string, { group: string; q: PrivateQuestion }>> {
   const ra = new Map<string, { group: string; q: PrivateQuestion }>()
   for (let i = 0; i < qids.length; i += 800) {
-    const r = await env.DB.prepare(`SELECT game_v2_question.qid AS qid, game_v2_question.content_group AS content_group, ${SQL_CAU_GON}
-        FROM game_v2_question JOIN de_kho d ON d.ma_de = game_v2_question.ma_de
-        JOIN game_v2_index g ON g.ma_de = d.ma_de AND g.source_version = d.cap_nhat_luc
-       WHERE COALESCE(d.da_xoa, 0) = 0 AND game_v2_question.qid IN (SELECT value FROM json_each(?)) AND json_valid(game_v2_question.json)`)
-      .bind(JSON.stringify(qids.slice(i, i + 800))).all<Row>()
+    const r = await env.DB.prepare(SQL_NOI_DUNG_GON).bind(dsXep(qids.slice(i, i + 800))).all<Row>() // 12/11 (H2): như `docNoiDung`
     for (const x of r.results ?? []) {
       const qid = str(x.qid)
       if (ra.has(qid)) continue

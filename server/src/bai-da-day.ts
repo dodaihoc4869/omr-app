@@ -23,6 +23,7 @@ import { chayDdlMotLan } from './ddl-mot-lan'
 import { laCauTuLuan } from './cam-tu-luan'
 import { cauGonTuDong, SQL_CAU_GON } from './cau-gon'
 import { DemTheoKho } from './dau-kho-cau'
+import { docChung } from './bang-tinh-chung'
 import { laMaDeTuLuan } from '../../src/lib/cau-tu-luan'
 import { tenLopCuaEm } from './ten-lop'
 import { cauCuaToChiTiet, gvChienDich, maGocCuaTo, tachMaTo, THE_LUC_TOI_DA, trangThaiLop } from './srs2-gv'
@@ -435,10 +436,13 @@ async function docCauBai(env: Env, maDe: readonly string[]): Promise<{ soTuLuan:
   const v = await demCauBai.lay(env, JSON.stringify(maDe), Date.now(), () => docCauBaiD1(env, maDe), (x) => x.kienThuc.length + 1)
   return { soTuLuan: v.soTuLuan, kienThuc: [...v.kienThuc] }
 }
+const SQL_CAU_BAI = `SELECT ma_de, qid, ${SQL_CAU_GON}, CASE WHEN json_type(json,'$.kienThuc')='array' THEN json_extract(json,'$.kienThuc') END AS kien_thuc FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`
 async function docCauBaiD1(env: Env, maDe: readonly string[]): Promise<{ soTuLuan: number; kienThuc: string[] }> {
   const goc = [...new Set(maDe.map((m) => tachMaTo(m).goc))]
   // 14/10: câu RÚT GỌN (cau-gon.ts) + nhãn kiến thức riêng — không nạp ảnh/lời giải của cả tờ (~6× nhẹ hơn JSON đầy đủ). Dòng JSON hỏng bị bỏ như cũ.
-  const r = await env.DB.prepare(`SELECT ma_de, qid, ${SQL_CAU_GON}, CASE WHEN json_type(json,'$.kienThuc')='array' THEN json_extract(json,'$.kienThuc') END AS kien_thuc FROM game_v2_question WHERE ma_de IN (SELECT value FROM json_each(?)) AND json_valid(json) ORDER BY rowid`).bind(JSON.stringify(goc)).all<Row>()
+  // 12/11 (H2): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) — cùng dòng câu cũ.
+  const thamSo = JSON.stringify(goc)
+  const r = await docChung<Row>(env, 'cbd', SQL_CAU_BAI, thamSo, ['game_v2_index'], () => env.DB.prepare(SQL_CAU_BAI).bind(thamSo))
   const theoGoc = new Map<string, { qid: string; q: Record<string, unknown> }[]>()
   for (const x of r.results ?? []) {
     const gon = cauGonTuDong(x)

@@ -3,6 +3,8 @@
 // Lỗi (bảng chưa có ở D1 mới…) chỉ ghi log; KHÔNG thử lại trong cùng isolate (tránh dội D1 mỗi lượt).
 // Chỉ thêm chỉ mục cho bảng NHỎ (≤ vài chục nghìn dòng). Bảng lớn (> vài trăm nghìn dòng) chỉ đưa vào migration để Boss chạy tay.
 import type { Env } from './kieu'
+import { lamMoiTenDoiTuongChung } from './ddl-mot-lan'
+import { donBangTinhChung } from './bang-tinh-chung'
 
 export const CHI_MUC_LUC_CHAY: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS game_v2_attempt_session ON game_v2_attempt(session, sbd)',
@@ -29,6 +31,9 @@ export function damBaoChiMuc(env: Env): Promise<void> {
  */
 export const CHI_MUC_CRON_DEM: readonly string[] = [
   'CREATE INDEX IF NOT EXISTS idx_luot_ca_tt ON luot(ma_ca, trang_thai, het_gio_luc)',
+  // 12/11 (H2, bản sao server/migration-z-1211-h2-goi-nhieu.sql): bảng `ca` nhỏ — đếm/kiểm ca đang mở (493 nghìn lượt/ngày) và ca còn bảo vệ đề (caDangBaoVe).
+  'CREATE INDEX IF NOT EXISTS idx_ca_trang_thai ON ca(trang_thai)',
+  "CREATE INDEX IF NOT EXISTS idx_ca_bao_ve ON ca(ma_ca) WHERE trang_thai<>'da_xoa' AND (trang_thai<>'dong' OR COALESCE(cong_bo,'') NOT IN ('ngay','ca_lop_xong'))",
   // Quét tối ưu 30/09 (bản sao server/migration-3009-chi-muc-quet-cuoi.sql; EXPLAIN trước = "SCAN <bảng>"):
   //  · EXP hôm nay (`docExpHomNay`, mỗi lần em mở app qua /hs/ke-hoach-ngay) lọc game_v2_reward theo sbd + ngày — bảng ≈ một dòng mỗi câu game.
   'CREATE INDEX IF NOT EXISTS idx_game_v2_reward_sbd ON game_v2_reward(sbd, created_at)',
@@ -59,6 +64,13 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   // 12/11 đợt 3 H1: chỉ mục bộ phận lượt CHƯA ĐÚNG của sổ (ba câu nợ của kế hoạch ngày — hang-chua-loi.ts CHI_MUC_CHUA_DUNG). Bản sao server/migration-z-1211-skh-chua-dung.sql.
   'CREATE INDEX IF NOT EXISTS idx_skh_em_chua_dung ON su_kien_hoc(sbd, nguon, ket_qua, qid, luc, ma_nguon) WHERE ket_qua IS NOT 1',
 ]
+/** 12/11 (H2): cron mỗi phút gọi — phút x7 (mỗi 10 phút) chép danh sách tên đối tượng lược đồ cho mọi isolate (ddl-mot-lan.ts `ddl_ten_chung`): một lần đọc
+ *  sqlite_master thay cho mỗi isolate mới (~760 hàng). Không ném. */
+export async function chepTenDinhKy(env: Env, now = Date.now()): Promise<boolean> {
+  const phut = new Date(now).getUTCMinutes()
+  if (phut === 7) await donBangTinhChung(env, now) // mỗi giờ: bỏ dòng tính sẵn quá tuổi (không còn dùng được) — bảng không phình
+  return phut % 10 === 7 ? lamMoiTenDoiTuongChung(env, now) : false
+}
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {
   let loi = 0

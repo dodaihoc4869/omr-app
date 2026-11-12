@@ -116,7 +116,7 @@ import { chayOmniDem, docCoOmni, hieuChinhOmniTuan } from './omni-d1'
 import { viecPhu } from './viec-phu'
 import { gan } from './cau-hinh-dem'
 import { gvKhoDeGiao } from './gv-kho-de-giao'
-import { damBaoChiMuc, dungChiMucCronDem } from './chi-muc-luc-chay'
+import { damBaoChiMuc, dungChiMucCronDem, chepTenDinhKy } from './chi-muc-luc-chay'
 import { khoaLuot, mocHetGio, quyetDinhVaoThi } from './luat-vao-thi'
 import { docGoiDeDem, docKeyBankDem, ghiKeyBank, doanCongBoNgay, layDemHetGioLuot, nhoCongBo, nhoHetGioLuot } from './dem-ca-thi'
 import { chiaGoiDe, dongGoiDe, dungGoiDe } from './khoa-de-thi'
@@ -3437,6 +3437,7 @@ const boXuLy = {
       // CHẤM BÙ (30/10, cham-bu.ts): lượt ĐÃ NỘP ≥ 2 phút mà chưa có điểm (3 giờ gần nhất) ⇒ chấm bằng lõi máy chủ, ghi qua `chamDiem`. Không có việc ⇒ một câu đọc nhỏ.
       {const p=cronChamBu(env,Date.now(),chamDiem).then(r=>{if(r.soLuot)console.log('[cham-bu] cron',JSON.stringify(r))}).catch(e=>console.error('[cham-bu] cron lỗi:',e))
       if(ctx?.waitUntil)ctx.waitUntil(p);else await p}
+      await chepTenDinhKy(env)
       await import('./kiem-tra-ca-nhan').then(m=>m.dongBoKtCn(env,Date.now(),2,true,new Date(Date.now()+7*3600000).getUTCHours()<19)).catch(e=>console.error('[kiem-tra-ca-nhan] cron',e))
       await import('./goi-bai-7').then(m=>m.dongBoGoi7(env,Date.now())).catch(e=>console.error('[goi7] đồng bộ',e))
       // KHO CÂU LUYỆN TỰ CẬP NHẬT (01/11, game-v2-bank.ts `dongBoKhoLech`): tờ thầy vừa nạp / sửa vào kho câu trong ≤ 1 phút (trước chỉ khi em mở Đảo — đã gỡ 27/10

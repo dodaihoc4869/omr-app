@@ -36,6 +36,7 @@ import { quotaHocKt, quotaCacGoiHocKt } from './kiem-tra-ca-nhan-loi'
 import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { envGhiRieng, lenhTrong } from './doc-d1-theo-luot'
 import { dauKhoCau, dauTruocLucDoc } from './dau-kho-cau'
+import { docChung } from './bang-tinh-chung'
 import { soSanhOnHoiThay } from './hoi-thay-lich-on'
 import { cungTap, layKeHoach7, nhoKeHoach7, xemKeHoach7 } from './goi-bai-7-nho'
 import { dangKyKichThuoc } from './dem-chung'
@@ -460,7 +461,8 @@ export async function docMaTranCu7(env: Env, sbd: string, maCu: readonly string[
   }
   if (!e) {
     // Cùng nhịp với lượt đọc điểm (không `await` nào trước) ⇒ lớp gom lệnh gửi chung một lô như hai câu cũ.
-    const r = await env.DB.prepare(SQL_KN_TINH).bind(thamSo).all<Row>()
+    // 12/11 (H2: 5.553 lượt/ngày × 4.502 hàng): qua bản tính sẵn DÙNG CHUNG (bang-tinh-chung.ts) theo dấu kho (game_v2_index — câu chỉ ghi cùng lô với nó) + omni_q — cùng dòng câu cũ.
+    const r = await docChung<Row>(env, 'kn7', SQL_KN_TINH, khoa, ['game_v2_index', 'omni_q'], () => env.DB.prepare(SQL_KN_TINH).bind(thamSo))
     e = { luc: now, kiem: now, dau: '', tinh: gonKnTinh(r.results ?? []) }
     bang.delete(khoa); bang.set(khoa, e)
     let tong = 0; for (const v of bang.values()) tong += v.tinh.ba.length / 3

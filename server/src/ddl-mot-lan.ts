@@ -26,16 +26,40 @@ function tenTao(lenh: readonly string[]): string[] | null {
 }
 const HAN_DOI_TUONG_MS = 10 * 60_000
 const doiTuongTheoDb = new WeakMap<object, { luc: number; p: Promise<Set<string> | null> }>()
+// 12/11 (H2, hoá đơn D1 hàng đọc): đọc `sqlite_master` = MỌI đối tượng lược đồ (~760 hàng) mỗi isolate mới / 10 phút — 17 nghìn lượt × 758 hàng = 13 triệu hàng/ngày.
+// Nay: BẢN SAO DÙNG CHUNG danh sách tên trong MỘT dòng (`ddl_ten_chung`, cron mỗi 10 phút chép lại — `lamMoiTenDoiTuongChung`). Đúng vì không mã nào DROP
+// đối tượng: tên đã có thì mãi có; bản sao CŨ chỉ có thể THIẾU tên mới ⇒ nhóm ấy chạy lô `IF NOT EXISTS` như trước 31/10 (vô hại) cho tới lần chép sau.
+// MỘT câu: có dòng chép ⇒ đọc 2 hàng (nhánh sqlite_master bị LIMIT 0, không quét — đo miniflare 663 → 2); chưa có ⇒ tên từ sqlite_master như cũ.
+// Bảng chưa có (D1 chưa chạy migration-z-1211-h2-goi-nhieu.sql) ⇒ lỗi ⇒ đọc sqlite_master như cũ.
+const DK_TEN = "type IN ('table', 'index', 'trigger', 'view')"
+export const SQL_TEN_DOI_TUONG_CU = `SELECT name FROM sqlite_master WHERE ${DK_TEN}`
+export const SQL_TEN_DOI_TUONG = `SELECT 1 AS k, ten_json AS t FROM ddl_ten_chung WHERE id = 1 UNION ALL SELECT * FROM (SELECT 0, name FROM sqlite_master WHERE ${DK_TEN}
+  LIMIT (SELECT CASE WHEN EXISTS (SELECT 1 FROM ddl_ten_chung WHERE id = 1) THEN 0 ELSE -1 END))`
+export const LENH_TEN_CHUNG = ['CREATE TABLE IF NOT EXISTS ddl_ten_chung (id INTEGER PRIMARY KEY CHECK (id = 1), ten_json TEXT NOT NULL, luc INTEGER NOT NULL)'] as const
+const SQL_CHEP_TEN = `INSERT INTO ddl_ten_chung (id, ten_json, luc) SELECT 1, json_group_array(name), ? FROM sqlite_master WHERE ${DK_TEN}
+  ON CONFLICT(id) DO UPDATE SET ten_json = excluded.ten_json, luc = excluded.luc WHERE ten_json <> excluded.ten_json` // không đổi ⇒ không ghi (GHI đắt gấp 1.000 ĐỌC)
+function tapTen(rows: readonly { k?: unknown; t?: unknown }[]): Set<string> | null {
+  const chep = rows.find((x) => Number(x.k) === 1)
+  if (!chep) return new Set(rows.map((x) => String(x.t)))
+  try { const a: unknown = JSON.parse(String(chep.t)); return Array.isArray(a) ? new Set(a.map(String)) : null } catch { return null }
+}
 function docDoiTuong(env: Env, goc: object): Promise<Set<string> | null> {
   const now = Date.now(), co = doiTuongTheoDb.get(goc)
   if (co && now - co.luc >= 0 && now - co.luc < HAN_DOI_TUONG_MS) return co.p
   let p: Promise<Set<string> | null>
   try {
-    p = env.DB.prepare("SELECT name FROM sqlite_master WHERE type IN ('table', 'index', 'trigger', 'view')").all<{ name: string }>()
-      .then((r) => new Set((r.results ?? []).map((x) => String(x.name))), () => null)
+    const cu = () => env.DB.prepare(SQL_TEN_DOI_TUONG_CU).all<{ name: string }>().then((r) => new Set((r.results ?? []).map((x) => String(x.name))), () => null)
+    p = env.DB.prepare(SQL_TEN_DOI_TUONG).all<{ k: number; t: string }>().then((r) => tapTen(r.results ?? []), cu)
   } catch { p = Promise.resolve(null) } // D1 lạ (không có `all`) ⇒ chạy lô như cũ
   doiTuongTheoDb.set(goc, { luc: now, p })
   return p
+}
+/** Cron (mỗi 10 phút): chép danh sách tên đối tượng lược đồ vào `ddl_ten_chung` (đọc sqlite_master MỘT lần cho mọi isolate). Bảng chưa có ⇒ tạo rồi chép. Không ném. */
+export async function lamMoiTenDoiTuongChung(env: Env, now: number): Promise<boolean> {
+  try { await env.DB.prepare(SQL_CHEP_TEN).bind(now).run(); return true } catch { /* bảng chưa có */ }
+  try { await env.DB.batch([...LENH_TEN_CHUNG.map((s) => env.DB.prepare(s)), env.DB.prepare(SQL_CHEP_TEN).bind(now)]); return true } catch (e) {
+    console.error('[ddl] chép tên đối tượng lỗi:', e instanceof Error ? e.message : e); return false
+  }
 }
 export function chayDdlMotLan(env: Env, nhom: string, lenh: readonly string[]): Promise<void> {
   const goc = dbGoc(env.DB as unknown as object)

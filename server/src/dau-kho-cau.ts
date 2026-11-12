@@ -7,12 +7,21 @@ import type { Env } from './kieu'
  * thay cho đọc lại hàng nghìn câu kèm JSON mỗi khi đệm trong isolate vừa hết hạn mà kho không đổi (số đo 13/10: danh mục Hành trình 524 lần/3 giờ ×
  * 57 ms, câu của các tờ trong phạm vi 444 lần/3 giờ × 65 ms). Đệm dùng dấu này vẫn giữ HẠN TỐI ĐA riêng để chắc chắn tự làm mới.
  */
-export const SQL_DAU_KHO_CAU = `SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') d FROM game_v2_index`
+export const SQL_DAU_KHO_CAU_CU = `SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') d FROM game_v2_index`
+/** Biểu thức dấu kho (12/11 H2): đọc dòng `dau_bang` do trigger giữ ĐÚNG chuỗi cũ (một hàng theo khoá chính — trước: đếm mọi dòng game_v2_index mỗi lần);
+ *  dòng vắng ⇒ tính như cũ (COALESCE chỉ chạy vế sau khi vế đầu NULL — đo miniflare). Bảng `dau_bang` chưa có ⇒ câu lỗi ⇒ nơi gọi lùi `SQL_DAU_KHO_CAU_CU`. */
+export const BT_DAU_KHO = `COALESCE((SELECT dau FROM dau_bang WHERE ten = 'game_v2_index'), (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index))`
+export const SQL_DAU_KHO_CAU = `SELECT ${BT_DAU_KHO} d`
+/** Tăng số phiên dấu một bảng ghi theo lô (omni_q, omni_beta_cau — bang-tinh-chung.ts): nơi ghi chạy ngay sau / cùng lô ghi. */
+export const SQL_TANG_PHIEN = 'UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = ?'
 
 /** Dấu kho hiện tại; lỗi đọc ⇒ '' (nơi gọi coi như "không chắc" ⇒ đọc lại đầy đủ như cũ). */
+let cuDen = 0 // câu dấu mới lỗi (D1 chưa chạy migration-z-1211-h2-goi-nhieu.sql) ⇒ một phút đi thẳng câu cũ, khỏi thêm một câu hỏng mỗi lượt
 export async function dauKhoCau(env: Env): Promise<string> {
   try {
-    const r = await env.DB.prepare(SQL_DAU_KHO_CAU).first<{ d: string | null }>()
+    const r = Date.now() < cuDen ? await env.DB.prepare(SQL_DAU_KHO_CAU_CU).first<{ d: string | null }>()
+      : await env.DB.prepare(SQL_DAU_KHO_CAU).first<{ d: string | null }>()
+        .catch(() => { cuDen = Date.now() + 60_000; return env.DB.prepare(SQL_DAU_KHO_CAU_CU).first<{ d: string | null }>() })
     return String(r?.d ?? '')
   } catch {
     return ''
