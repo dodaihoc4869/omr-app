@@ -4,13 +4,13 @@
 //       đổi sbd, đổi mốc, xoá, mốc NULL, mốc lùi); câu đọc `SQL_DEM_SO` = câu cũ, có dấu lẫn không dấu; nhánh không dùng không đọc dòng nào.
 //   (b) chỉ mục bộ phận lượt chưa đúng: ba câu nợ (docQidSaiV2, docQidSaiTaiLop, docQidSaiCaDaCongBo) trả CÙNG dòng như câu cũ (đường lùi khi thiếu chỉ mục)
 //       và kế hoạch dùng idx_skh_em_chua_dung.
-//   (c) loi_giai_hoi: mốc đọc lời giải (chỉ mục phủ) và «xem trong 12 giờ» (mốc chữ + julianday) y hệt câu cũ.
+//   (c) loi_giai_hoi: «xem trong 12 giờ» (mốc chữ + julianday) y hệt câu cũ.
 //   (d) Thi đua hôm nay: phần hôm nay dò (sbd, luc) từ max(mốc, ngày − 2) — cùng dòng như câu cũ.
 import { describe, expect, it } from 'vitest'
 import { taoD1That, type D1That } from './_d1-that'
 import type { Env } from '../server/src/kieu'
 import { SQL_DEM_SO, SQL_DEM_SO_CU } from '../server/src/omni-d1'
-import { docQidSaiV2, SQL_MOC_DOC_LOI_GIAI } from '../server/src/hang-chua-loi'
+import { docQidSaiV2 } from '../server/src/hang-chua-loi'
 import { docQidSaiCaDaCongBo, docQidSaiTaiLop } from '../server/src/srs2-d1'
 import { mocXemGan7, SQL_XEM_GAN_7, SQL_XEM_GAN_7_CU } from '../server/src/goi-bai-7-xem-gan'
 import { ngayTruocCuaChuoi, SQL_SO_CAU_LOP } from '../server/src/thi-dua-hom-nay'
@@ -141,7 +141,7 @@ describe('H1 (b) — chỉ mục bộ phận lượt chưa đúng: ba câu nợ 
 })
 
 // ------------------------------------------------------------------------------------------------ (c)
-describe('H1 (c) — loi_giai_hoi: mốc đọc lời giải + xem trong 12 giờ', () => {
+describe('H1 (c) — loi_giai_hoi: xem trong 12 giờ', () => {
   it('y hệt câu cũ trên nhiều dạng `luc` và kế hoạch không tra bảng / dò khoảng', () => {
     const d = taoD1That(), r = ngauNhien(5)
     const them = d.sql.prepare('INSERT OR IGNORE INTO loi_giai_hoi(sbd,qid,nguon,luc,co_ho_so) VALUES(?,?,?,?,0)')
@@ -153,8 +153,6 @@ describe('H1 (c) — loi_giai_hoi: mốc đọc lời giải + xem trong 12 gi�
       them.run(chon(r, ['E1', 'E2']), `Q${Math.floor(r() * 30)}`, 'x', luc)
     }
     for (const sbd of ['E1', 'E2', 'E9']) {
-      const moc = '2026-09-29T00:00:00'
-      expect(xep(d.sql.prepare(SQL_MOC_DOC_LOI_GIAI).all(sbd, moc))).toEqual(xep(d.sql.prepare('SELECT qid, luc FROM loi_giai_hoi WHERE sbd = ? AND luc >= ?').all(sbd, moc)))
       for (const now of [NOW, NOW - 86_400_000, NOW - 5 * 3_600_000]) {
         const iso = new Date(now).toISOString()
         const moi = d.sql.prepare(SQL_XEM_GAN_7).all(sbd, mocXemGan7(now), iso), cu = d.sql.prepare(SQL_XEM_GAN_7_CU).all(sbd, iso)
@@ -162,7 +160,6 @@ describe('H1 (c) — loi_giai_hoi: mốc đọc lời giải + xem trong 12 gi�
         if (sbd !== 'E9') expect(moi.length).toBeGreaterThan(0)
       }
     }
-    expect(plan(d.sql, SQL_MOC_DOC_LOI_GIAI)).toMatch(/USING COVERING INDEX/)
     expect(plan(d.sql, SQL_XEM_GAN_7)).toMatch(/USING INDEX idx_lg_hoi_em_luc \(sbd=\? AND luc>\?\)/)
   })
 })

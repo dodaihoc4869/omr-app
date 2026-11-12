@@ -47,13 +47,10 @@ export async function docQidSaiV2(env: Env, sbd: string): Promise<Map<string, st
   return ra
 }
 
-export const SQL_MOC_DOC_LOI_GIAI = 'SELECT qid, luc FROM loi_giai_hoi WHERE sbd = ? AND +luc >= ?'
 /** Mốc em đọc lời giải (Hỏi thầy) từ 29/09: qid → [ISO]. Lượt làm trong 12 giờ sau mốc đọc không tính tự làm. */
 export async function docMocDocLoiGiai(env: Env, sbd: string): Promise<Map<string, string[]>> {
   const ra = new Map<string, string[]>()
-  // H1 (12/11, hoá đơn D1): `+luc` ⇒ đi chỉ mục PHỦ (sbd, qid, luc) — chỉ đọc chỉ mục, không tra bảng từng dòng (trước: (sbd, luc) + tra bảng lấy qid ⇒
-  //  gấp đôi hàng đọc; mốc TU_NGAY = cả sổ nên khoảng luc không bớt dòng nào). Mỗi qid vẫn ra các mốc theo luc tăng dần (y như cũ).
-  const r = await env.DB.prepare(SQL_MOC_DOC_LOI_GIAI).bind(sbd, `${TU_NGAY}T00:00:00`).all<Row>().catch(() => ({ results: [] as Row[] }))
+  const r = await env.DB.prepare('SELECT qid, luc FROM loi_giai_hoi WHERE sbd = ? AND luc >= ?').bind(sbd, `${TU_NGAY}T00:00:00`).all<Row>().catch(() => ({ results: [] as Row[] }))
   for (const x of r.results ?? []) { const q = str(x.qid); ra.set(q, [...(ra.get(q) ?? []), str(x.luc)]) }
   return ra
 }
