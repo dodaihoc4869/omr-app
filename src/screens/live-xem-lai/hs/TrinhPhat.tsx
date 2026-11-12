@@ -17,7 +17,7 @@ import { DauGiay, PhuongAnTinh } from '../../../components/live/GiayDung'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
 import { chonHeSoGiay } from '../../../components/live/vua-giay'
 import type { SuKienBut } from '../../../lib/but-bang-loi'
-import { TEP_LIVE, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
+import { TEP_LIVE, cheTai, type BuoiLiveJson, type DoanBuoiLive } from '../../../lib/live/xem-lai-kieu'
 import { BtDong, BtDung, BtLui10, BtPhat, BtToi10 } from './bieu-tuong'
 import { nhayLang, taoDongHoRieng, taoLamMuot, tongHang, tuViTriHang, viTriHang } from './dong-ho'
 import { taoKhoNet, type KhoNet } from './kho-net'
@@ -108,7 +108,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   /** Trạng thái chạy (không gây vẽ lại): mọi thứ vòng khung hình đọc. */
   const S = useRef({
     vt: Math.max(0, Math.min(batDau, hang.length - 1)), phat: false, tocDo: 1, boLang: true, luot: 0, daNap: -1, dangNapKe: false, dangDung: false, matMang: false,
-    luoc: 0, daBaoXem: -1, gioCuoi: 0, gioMuon: -1, trang: { trang: '', tiLe: 16 / 9 }, giayCu: -1, het: false, lucHien: 0,
+    luoc: 0, daBaoXem: -1, gioCuoi: 0, gioMuon: -1, trang: { trang: '', tiLe: 16 / 9 }, giayCu: -1, het: false, lucHien: 0, che: '' as '' | 'hoc' | 'bang',
   })
   const [rieng] = useState(taoDongHoRieng), [muot] = useState(taoLamMuot)
   const hangRef = useRef(hang)
@@ -235,7 +235,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       if (sk.loai === 'trang') {
         const doi = sk.trang !== S.current.trang.trang || sk.tiLe !== S.current.trang.tiLe; S.current.trang = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep()
         // Thầy đang ở chế độ «Bảng» (bảng kín màn, không có giấy đề) hay «Học»: xếp hình ĐÚNG như lúc live (thầy 13/11: «giảng trên bảng xanh hoàn toàn mà»).
-        const b = laTrangBang(sk.trang); setEp((c) => (b ? 'bang' : c === undefined ? undefined : null))
+        // Buổi có DÒNG THỜI GIAN CHẾ ĐỘ (`buoi.che`, dựng từ 13/11) ⇒ vòng khung hình bên dưới quyết theo giờ; buổi cũ ⇒ suy từ khoá trang bút.
+        if (!buoi.che?.length) { const b = laTrangBang(sk.trang); setEp((c) => (b ? 'bang' : c === undefined ? undefined : null)) }
       }
       v.ap(sk)
     }
@@ -254,6 +255,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       if (!d || !m || !k) return
       const nay = performance.now()
       let t = docGio(nay)
+      // Chế độ Học / Bảng tại đúng giờ đang phát (kể cả lúc tạm dừng, tua): đổi là xếp lại hình ngay, y như máy em lúc live.
+      { const c = cheTai(buoi.che, t); if (c && c !== S.current.che) { S.current.che = c; setEp(c === 'bang' ? 'bang' : null) } }
       if (dangChay() && !S.current.dangDung) {
         S.current.gioCuoi = t
         if (S.current.boLang) { const den = nhayLang(t, buoi.lang, d); if (den != null) { S.current.luoc += den - t; setLuoc(S.current.luoc); datGio(den); t = den } }
