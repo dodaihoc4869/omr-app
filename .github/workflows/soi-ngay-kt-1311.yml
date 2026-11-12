@@ -1,0 +1,47 @@
+# SOI NGÀY KIỂM TRA ÔN TẬP (CHỈ ĐỌC, 13/11 — em báo «đi học về không cho làm chặng 3, 4»). Chỉ SELECT, không ghi, không export, không in tên em.
+name: Soi ngày Kiểm tra ôn tập (chỉ đọc)
+on:
+  workflow_dispatch:
+    inputs:
+      sbd:
+        description: 'SBD em cần soi'
+        required: true
+      tu:
+        description: 'Từ ngày (YYYY-MM-DD)'
+        default: '2026-11-11'
+      den:
+        description: 'Đến ngày (YYYY-MM-DD)'
+        default: '2026-11-13'
+permissions:
+  contents: read
+jobs:
+  do:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Làm sạch khoá Cloudflare
+        env:
+          T: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          A: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: bash scripts/lam-sach-khoa-cf.sh
+      - name: Soi (chỉ đọc)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ env.CF_TOKEN_SACH }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ env.CF_ACC_SACH }}
+          SBD: ${{ inputs.sbd }}
+          TU: ${{ inputs.tu }}
+          DEN: ${{ inputs.den }}
+        run: |
+          case "$SBD$TU$DEN" in *[!0-9A-Za-z-]*) echo "đầu vào lạ"; exit 1;; esac
+          q() { echo "## $1"; npx -y wrangler@4 d1 execute omr --remote --json --command "$2" 2>/dev/null | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{try{const j=JSON.parse(s);const r=(Array.isArray(j)?j:[j]).flatMap(x=>x.results??[]);for(const x of r)console.log(JSON.stringify(x))}catch{console.log('(lỗi đọc)',s.slice(0,300))}})"; }
+          q "Lịch KT của em" "SELECT ngay,trang_thai,mo_luc,han_luc,nop_luc,diem,cap_nhat_luc,json_extract(json,'$.chuKyNgay') chu_ky,json_extract(json,'$.phienBan') pb FROM kiem_tra_ca_nhan WHERE sbd='$SBD' AND ngay BETWEEN date('$TU','-3 day') AND date('$DEN','+3 day') ORDER BY ngay"
+          q "Sổ học của em theo ngày × nguồn" "SELECT ngay_vn,nguon,substr(ma_nguon,1,12) mn,COUNT(*) n,COUNT(DISTINCT qid) cau,MIN(luc) dau,MAX(luc) cuoi FROM su_kien_hoc WHERE sbd='$SBD' AND ngay_vn BETWEEN '$TU' AND '$DEN' GROUP BY ngay_vn,nguon,substr(ma_nguon,1,12) ORDER BY ngay_vn,dau"
+          q "Mức / loại ngày Gói 7" "SELECT 'muc' k,ngay,muc v,luc FROM goi_bai_7_muc_ngay WHERE sbd='$SBD' AND ngay BETWEEN '$TU' AND '$DEN' UNION ALL SELECT 'loai',ngay,loai,luc FROM goi_bai_7_loai_ngay WHERE sbd='$SBD' AND ngay BETWEEN '$TU' AND '$DEN' ORDER BY 2,1"
+          q "Sẵn sàng đêm" "SELECT ngay,luc,length(sanh_json) ls,length(chang_json) lc FROM hoc_tap_san_sang WHERE sbd='$SBD'"
+          q "Chặng KT đã chốt" "SELECT c.* FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id IN (SELECT id FROM kiem_tra_ca_nhan WHERE sbd='$SBD' AND ngay BETWEEN '$TU' AND '$DEN')"
+          q "Nguồn sổ học cả trường theo ngày" "SELECT ngay_vn,nguon,COUNT(*) n,COUNT(DISTINCT sbd) em FROM su_kien_hoc WHERE ngay_vn BETWEEN '$TU' AND '$DEN' GROUP BY ngay_vn,nguon ORDER BY ngay_vn,n DESC"
+          q "Lịch KT cả trường theo ngày × trạng thái" "SELECT ngay,trang_thai,COUNT(*) n,SUM(nop_luc IS NOT NULL) nop FROM kiem_tra_ca_nhan WHERE ngay BETWEEN '$TU' AND '$DEN' GROUP BY ngay,trang_thai ORDER BY ngay"

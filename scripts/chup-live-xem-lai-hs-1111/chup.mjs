@@ -25,10 +25,12 @@ await build({ entryPoints: [join(GOC, 'tests/_live-xem-lai-hs-gia.ts')], bundle:
 const gia = await import(pathToFileURL(join(tam, 'gia.mjs')).href)
 const kho = new Map()
 /** Bộ tệp của buổi giả theo (giấy tối, có tiếng). Tệp tiếng là WAV 8 kHz (máy chủ thật trả MP3). */
-function buoiGia(giayToi, coTieng) {
-  const k = `${giayToi}|${coTieng}`
+function buoiGia(giayToi, coTieng, bang = false, doiChe = false) {
+  const k = `${giayToi}|${coTieng}|${bang}|${doiChe}`
   if (!kho.has(k)) {
-    const b = gia.taoBuoiGia({ giayToi, coTieng })
+    const b = gia.taoBuoiGia({ giayToi, coTieng, ...(bang ? { khoaTrang: 'bl' } : {}) })
+    // 13/11: buổi có DÒNG THỜI GIAN CHẾ ĐỘ — đoạn 3: nửa đầu thầy ở «Bảng», giữa đoạn chuyển sang «Học», hết đoạn về «Bảng»
+    if (doiChe) { const d = b.buoi.doan[2]; b.buoi.che = [{ t: 0, v: 'bang' }, { t: Math.round(d.t0 + (d.t1 - d.t0) * 0.5), v: 'hoc' }, { t: d.t1, v: 'bang' }] }
     kho.set(k, { buoi: b.buoi, net: Buffer.from(b.net), tieng: coTieng ? Buffer.from(gia.taoTiengGia(b.buoi.msLive, b.coTieng)) : null })
   }
   return kho.get(k)
@@ -57,7 +59,7 @@ async function ganMayChu(ctx, c) {
     const req = route.request(), u = new URL(req.url())
     st.goi.push(`${req.method()} ${u.pathname}${req.headers().range ? ` [${req.headers().range}]` : ''}`)
     if (req.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS })
-    const d = buoiGia(c.giay === 'toi', c.tieng !== 0)
+    const d = buoiGia(c.giay === 'toi', c.tieng !== 0, c.bang === true, c.doiChe === true)
     const json = (o, status = 200) => route.fulfill({ status, headers: { ...CORS, 'content-type': 'application/json' }, body: JSON.stringify(o) })
     if (st.tt === 'mat') return route.abort('internetdisconnected')
     if (u.pathname === '/hs/live-ds') {
@@ -127,6 +129,22 @@ const CANH = [
   { ten: '22-phat-844-giay-toi-dang-phat', url: '?man=buoi', w: 844, h: 390, giay: 'toi', lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '23-phat-844-tam-dung', url: '?man=buoi', w: 844, h: 390, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.4); await cho(t, 1500); await t.getByRole('button', { name: 'Tạm dừng' }).click(); await cho(t, 300) } },
   { ten: '24-phat-844-an-dieu-khien-luoc-lang', url: '?man=buoi', w: 844, h: 390, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, truocLang(3)); await t.locator('.xp-luoc').waitFor({ timeout: 30000 }); await t.mouse.move(420, 120); await t.locator('.xp[data-an]').waitFor({ timeout: 8000 }); await cho(t, 300) } },
+  // 13/11: thầy giảng ở chế độ «Bảng» (live theo khối) ⇒ trình phát xếp BẢNG KÍN MÀN như lúc live, không dựng giấy đề
+  { ten: '26-phat-844-che-do-bang-kin-man', url: '?man=buoi', w: 844, h: 390, bang: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
+  { ten: '27-phat-390-doc-che-do-bang-kin-man', url: '?man=buoi', w: 390, h: 844, bang: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
+  // 13/11: dòng thời gian chế độ — cùng một đoạn: trước mốc là «Bảng» kín màn, sau mốc là «Học» (giấy đề + bảng), tua ngược lại về «Bảng»
+  { ten: '28-phat-844-doi-che-1-dang-bang', url: '?man=buoi', w: 844, h: 390, doiChe: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.3); await cho(t, 2200) } },
+  { ten: '29-phat-844-doi-che-2-sang-hoc', url: '?man=buoi', w: 844, h: 390, doiChe: true, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.3); await cho(t, 1200); await tuaToi(t, 2, 0.62); await cho(t, 2200) } },
+  { ten: '30-phat-844-doi-che-3-tua-nguoc-ve-bang', url: '?man=buoi', w: 844, h: 390, doiChe: true, lam: async (t) => {
+    await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.62); await cho(t, 1200)
+    const gio = () => t.locator('.xp').evaluate((e) => (e.textContent.match(/(\d+:\d+) \/ \d+:\d+/) || ['', ''])[1])
+    const giay = () => t.locator('.xp').evaluate((e) => [...e.querySelectorAll('*')].some((x) => /Cho 9,3 gam/.test(x.textContent || '') && x.children.length === 0 && x.getBoundingClientRect().width > 40))
+    const truoc = `${await gio()} giấy đề ${await giay() ? 'CÓ' : 'không'}`
+    await t.mouse.move(420, 119); await t.getByText('Bỏ khoảng lặng').click(); await cho(t, 200) // tắt «Bỏ khoảng lặng» để lùi được qua khoảng lặng giữa đoạn
+    for (let k = 0; k < 9; k++) { await t.mouse.move(420, 120 + k); await t.getByRole('button', { name: 'Lùi 10 giây' }).click(); await cho(t, 120) }
+    await cho(t, 1500); await t.mouse.move(420, 140)
+    console.log(`   cảnh 30 · trước khi lùi: ${truoc} → sau khi lùi 90 giây: ${await gio()} giấy đề ${await giay() ? 'CÓ' : 'không'}`)
+  } },
   { ten: '25-phat-390-iphone-doc-xoay', url: '?man=buoi', w: 390, h: 844, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '26-phat-1180-may-bang', url: '?man=buoi', w: 1180, h: 820, mayBang: true, lam: async (t) => { await choBuoi(t); await t.locator('.xl-doan').first().click(); await t.locator('.xp').waitFor(); await cho(t, 900); await tuaToi(t, 2, 0.36); await cho(t, 2600) } },
   { ten: '27-phat-844-khong-tieng', url: '?man=buoi', w: 844, h: 390, tieng: 0, lam: async (t) => { await choBuoi(t); await moPhat(t); await tuaToi(t, 2, 0.3); await cho(t, 2600) } },

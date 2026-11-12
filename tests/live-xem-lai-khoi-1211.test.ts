@@ -64,3 +64,76 @@ describe('xem lại live — buổi live theo khối', () => {
     expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'khong-cau' })
   })
 })
+
+// 13/11 — thầy mở bản dựng lại: «Giảng trên bảng xanh hoàn toàn mà. Dựng lại chính xác đi» (ảnh: trình phát vẫn xếp giấy đề 2/3 + bảng 1/3, nét dồn vào góc).
+// Trình phát phải xếp hình ĐÚNG chế độ lúc live: trang bút của chế độ «Bảng» mang khoá 'bl' ⇒ bảng kín màn, không giấy đề (như máy em lúc live).
+describe('xem lại live — trình phát đi theo chế độ Bảng / Học lúc live', () => {
+  it('khoá trang «bl» (có hoặc không kèm ô vùng) là chế độ Bảng; trang câu / trang mở đầu thì không', async () => {
+    const { KHOA_TRANG_BANG, laTrangBang, maTrang, VUNG_MAC_DINH } = await import('../src/components/live/bo-cuc')
+    expect(KHOA_TRANG_BANG).toBe('bl')
+    expect(laTrangBang('bl')).toBe(true)
+    expect(laTrangBang(maTrang('bl', VUNG_MAC_DINH, true))).toBe(true)
+    expect(laTrangBang(maTrang('cau-3', VUNG_MAC_DINH, false))).toBe(false)
+    expect(laTrangBang('bl2')).toBe(false)
+    expect(laTrangBang('')).toBe(false)
+  })
+  it('trình phát ép «bảng kín màn» khi trang đang phát là trang Bảng, về trang khác thì trả bố cục giấy + bảng; máy thầy và trình phát dùng CHUNG một hằng', async () => {
+    const { readFileSync } = await import('node:fs')
+    const phat = readFileSync('src/screens/live-xem-lai/hs/TrinhPhat.tsx', 'utf8'), noi = readFileSync('src/components/live/thay-noi.ts', 'utf8')
+    expect(phat).toContain("const b = laTrangBang(sk.trang); setEp((c) => (b ? 'bang' : c === undefined ? undefined : null))")
+    expect(phat).toContain('<KhungDocLap ref={kdl} lop="xp" epPhong={ep} ')
+    expect(noi).toContain('const TRANG_BANG = KHOA_TRANG_BANG')
+  })
+})
+
+// 13/11 — thầy: «Sửa chính xác để từ live lần sau lưu chế độ bảng chế độ học chuẩn xác … khi chuyển đổi 2 chế độ trong 1 live cũng phải chuẩn xác mượt mà».
+// Phòng ghi MỖI lần đổi chế độ đúng giờ ⇒ bản dựng mang dòng thời gian `che` ⇒ trình phát xếp hình theo giờ đang phát (không còn suy đoán).
+describe('xem lại live — dòng thời gian chế độ Học / Bảng', () => {
+  it('thầy đổi Bảng → Học → danh sách → Bảng trong một buổi ⇒ `buoi.che` ghi đúng thứ tự, đúng giờ (lệch dưới 1 giây); danh sách không tính là chế độ dạy', async () => {
+    const r2 = taoR2Gia(), d1 = taoD1That(), b = await taoBuoiGia({ r2, DB: d1.env.DB }); dong.push(b)
+    const { ph, gv } = b
+    const dat = (che: string) => ph.gui(gv, { t: 'live-dat', khoi: { k: 10, gd: 'dang', che } })
+    await guiBangMoi(ph, gv)
+    luc(0); await ph.gui(gv, { t: 'live-bat' }); await dat('bang')
+    await ph.gui(gv, { t: 'live-ghi', tt: 'dang-ghi', dh: T0 - LECH, p: 'p1' })
+    const moc: [string, number][] = []
+    const viet = async (ten: string, tu: number) => { for (let i = 0; i < 6; i++) { const t = tu + i * 3000; luc(t + 500); await guiNet(ph, gv, netGia(`${ten}-${i}`)); moc.push([`${ten}-${i}`, t]) } }
+    await viet('a', 5000)
+    luc(40_000); await dat('hoc')
+    await viet('b', 45_000)
+    luc(70_000); await dat('sanh')
+    luc(80_000); await dat('bang')
+    await viet('c', 85_000)
+    luc(100_000); await dat('bang') // gửi lặp cùng chế độ ⇒ không thêm mốc
+    const net: Record<number, [string, number][]> = {}
+    for (const [id, t] of moc) { const k = Math.floor(t / MS_KHUC); (net[k] ??= []).push([id, t - k * MS_KHUC]) }
+    for (let i = 0; i < Math.ceil(120_000 / MS_KHUC); i++) await datKhuc(r2, 'b1', 'p1', i, khucGia({ t0: T0 - LECH + i * MS_KHUC, soDau: i * 417 + 1, net: net[i] }))
+    luc(120_000); await ph.gui(gv, { t: 'live-tat' })
+    expect(await chot(b.ph)).toMatchObject({ ok: true, du: true })
+    const che = docJson(r2).che!
+    expect(che.map((c) => c.v)).toEqual(['bang', 'hoc', 'bang'])
+    expect(che[0]!.t).toBeLessThan(1000)
+    expect(Math.abs(che[1]!.t - 40_000)).toBeLessThan(1000)
+    expect(Math.abs(che[2]!.t - 80_000)).toBeLessThan(1000)
+  })
+  it('trình phát: chế độ tại giờ đang phát lấy theo mốc gần nhất phía trước (tua tới đâu đúng tới đó); buổi không có dòng thời gian ⇒ null (suy từ trang bút như cũ)', async () => {
+    const { cheTai } = await import('../src/lib/live/xem-lai-kieu')
+    const che = [{ t: 0, v: 'bang' as const }, { t: 40_000, v: 'hoc' as const }, { t: 80_000, v: 'bang' as const }]
+    expect([0, 39_999, 40_000, 79_999, 80_000, 500_000].map((t) => cheTai(che, t))).toEqual(['bang', 'bang', 'hoc', 'hoc', 'bang', 'bang'])
+    expect(cheTai([{ t: 5000, v: 'hoc' }], 0)).toBe('hoc')
+    expect(cheTai(undefined, 10)).toBeNull()
+    expect(cheTai([], 10)).toBeNull()
+    const { readFileSync } = await import('node:fs')
+    const phat = readFileSync('src/screens/live-xem-lai/hs/TrinhPhat.tsx', 'utf8')
+    expect(phat).toContain("const c = cheTai(buoi.che, t); if (c && c !== S.current.che) { S.current.che = c; setEp(c === 'bang' ? 'bang' : null) }")
+    expect(phat).toContain('if (!buoi.che?.length) { const b = laTrangBang(sk.trang);')
+  })
+  it('buổi trên lớp (không phải live theo khối) không sinh mốc chế độ', async () => {
+    const { b, r2 } = await buoiGiang({ khoi: true })
+    await chot(b.ph)
+    expect(docJson(r2).che!.map((c) => c.v)).toEqual(['bang'])
+    const { soVet, vetRong } = await import('../src/lib/bpu/phong-nhat-ky')
+    const st = { ketThuc: false, live: { bat: true, bang: false, mic: null }, luot: null } as never
+    expect(soVet(st, vetRong(), 1).suKien.map((e) => e.k)).toEqual(['bat'])
+  })
+})

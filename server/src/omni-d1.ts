@@ -959,7 +959,7 @@ async function thoCuaLop(env: Env, lop: string, homNay: string, ts: ThamSoOmni, 
     }
     const [emAnh, pAnh] = await Promise.all([
       env.DB.prepare('SELECT sbd FROM omni_em WHERE sbd IN (SELECT value FROM json_each(?)) AND cap_nhat_luc = ? AND phien_ban = ?').bind(JSON.stringify(ban), moc, PHIEN_BAN_OMNI).all<Row>().catch(() => ({ results: [] as Row[] })),
-      env.DB.prepare('SELECT sbd, vkn_id, p, n_tu_lam FROM omni_p_vkn WHERE sbd IN (SELECT value FROM json_each(?)) AND cap_nhat_luc = ? AND phien_ban = ?').bind(JSON.stringify(ban), moc, PHIEN_BAN_OMNI).all<Row>().catch(() => ({ results: [] as Row[] })),
+      env.DB.prepare('SELECT p.sbd, p.vkn_id, p.p, p.n_tu_lam FROM omni_p_vkn p JOIN omni_em e ON e.sbd = p.sbd AND e.cap_nhat_luc = ?2 AND e.phien_ban = ?3 WHERE p.sbd IN (SELECT value FROM json_each(?1))').bind(JSON.stringify(ban), moc, PHIEN_BAN_OMNI).all<Row>().catch(() => ({ results: [] as Row[] })),
     ])
     const coAnh = new Set((emAnh.results ?? []).map((x) => str(x.sbd)))
     for (const s of coAnh) ra.set(s, new Map())
@@ -1004,6 +1004,8 @@ async function priorChoNhieuEm(env: Env, sbds: readonly string[], homNay: string
 // ---------------------------------------------------------------- hồ sơ trực tiếp (đệm 60 s)
 const khoaDemSo = (sbds: readonly string[]): string => `omni_dem_so|${dsJson(sbds)}`
 import { SQL_DEM_SO, SQL_DEM_SO_CU } from './omni-d1-so-em'
+import { SQL_GHI_NHAN_DOI, SQL_XOA_NHAN_ROI } from './omni-d1-chup'
+export { SQL_GHI_NHAN_DOI, SQL_XOA_NHAN_ROI }
 export { SQL_DEM_SO, SQL_DEM_SO_CU }
 let soEmDemLoiLuc = 0
 dangKyXoaDem(() => { soEmDemLoiLuc = 0 })
@@ -1605,18 +1607,18 @@ export async function chupHoSoTho(env: Env, sbds: readonly string[], homNay: str
   const moc = dauNgayVn(homNay)
   const m = await dungHoSoNoi(env, sbds, { truocMs: Date.parse(moc), coPrior: false, homNay, ts })
   const lenh: ReturnType<Env['DB']['prepare']>[] = [
-    env.DB.prepare('DELETE FROM omni_p_vkn WHERE sbd IN (SELECT value FROM json_each(?))').bind(dsJson(sbds)),
     env.DB.prepare('DELETE FROM omni_em WHERE sbd IN (SELECT value FROM json_each(?))').bind(dsJson(sbds)),
   ]
   for (const s of sbds) {
     const hs = m.get(s)?.hs ?? hoSoRong(s, homNay, ts)
     lenh.push(env.DB.prepare(`INSERT OR REPLACE INTO omni_em (sbd, n_vung, n_sai_vung, s_uoc, tau, n_tau, khung_gio_json, gio_hoc, muc_tieu, cursor, phien_ban, cap_nhat_luc)
         VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).bind(s, hs.nVung, hs.nSaiVung, hs.sEm, hs.tau, hs.nTau, JSON.stringify(hs.khungGio), gioHocTu(hs), ts.MUC_TIEU, hs.cursor || null, hs.phienBan || PHIEN_BAN_OMNI, moc))
-    for (const k of Object.keys(hs.vkn).sort()) {
-      const v = hs.vkn[k]!
-      lenh.push(env.DB.prepare(`INSERT OR REPLACE INTO omni_p_vkn (sbd, vkn_id, p, n_tu_lam, n_cau, n_ngay, n_troi_chay, n_cau_la_dung, diem_sprt, trang_thai, day_lai, phien_ban, cap_nhat_luc)
-          VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(s, k, v.p, v.nTuLam, v.nCau, v.nNgay, v.nTroiChay, v.nCauLaDung, v.diemSprt, v.trangThai, v.dayLai ? 1 : 0, hs.phienBan || PHIEN_BAN_OMNI, moc))
-    }
+    // 13/11 (GHI D1 — số đo 24 giờ: câu chèn từng nhãn 339 nghìn lượt × 2 = 679 nghìn dòng ghi/đêm, ~20 USD/tháng): MỘT câu/em qua json_each, chỉ ghi
+    // nhãn ĐỔI SỐ (em không làm câu mới ⇒ điểm y hệt ⇒ 0 dòng ghi); xoá đúng nhãn đã rời hồ sơ. `cap_nhat_luc` của dòng nay = mốc lần đổi gần nhất;
+    // mốc ảnh chụp của em là `omni_em.cap_nhat_luc` (nơi đọc ảnh theo mốc — prior lớp — nối omni_em).
+    const ks = Object.keys(hs.vkn).sort()
+    lenh.push(env.DB.prepare(SQL_XOA_NHAN_ROI).bind(s, JSON.stringify(ks)))
+    lenh.push(env.DB.prepare(SQL_GHI_NHAN_DOI).bind(s, JSON.stringify(ks.map((k) => { const v = hs.vkn[k]!; return [k, v.p, v.nTuLam, v.nCau, v.nNgay, v.nTroiChay, v.nCauLaDung, v.diemSprt, v.trangThai, v.dayLai ? 1 : 0] })), hs.phienBan || PHIEN_BAN_OMNI, moc))
   }
   // 28/10: bản gọn điểm kỹ năng (diem-gon.ts) ghi CÙNG lượt chụp — nơi đọc thấy cùng mốc với omni_em ⇒ một dòng.
   await chayDdlMotLan(env, 'omni_p_gon_2810', LENH_BANG_DIEM_GON)

@@ -94,6 +94,11 @@ if (!top.length) bangTop.push(`(không đọc được: ${String((jq?.errors ?? 
   const theoGio = new Map(); for (const x of acc?.w ?? []) { const kk = `${String(x.dimensions.datetimeHour).slice(5, 13)} ${x.dimensions.status}`; theoGio.set(kk, (theoGio.get(kk) ?? 0) + x.sum.requests) }
   bangTop.push('', '#### __unknown__ theo giờ UTC · trạng thái · lượt', ...[...theoGio].sort().map(([kk, n]) => `- ${kk} · ${so(n)}`))
   bangTop.push(`- Pages Functions 24 giờ: ${so((acc?.p ?? []).reduce((t, x) => t + x.sum.requests, 0))} lượt`)
+  // Danh sách Worker trong tài khoản (tên · sửa lần cuối) — «__unknown__» có thể là Worker khác / đã xoá.
+  const sc = await fetch(`https://api.cloudflare.com/client/v4/accounts/${ACC}/workers/scripts`, { headers: H }).then((r) => r.json()).catch(() => null)
+  bangTop.push(`- Worker trong tài khoản: ${(sc?.result ?? []).map((x) => `${x.id} (sửa ${String(x.modified_on).slice(0, 10)}${x.usage_model ? ', ' + x.usage_model : ''})`).join(' · ') || 'không đọc được'}`)
+  const zn = await fetch('https://api.cloudflare.com/client/v4/zones?per_page=50', { headers: H }).then((r) => r.json()).catch(() => null)
+  bangTop.push(`- Số zone: ${(zn?.result ?? []).length}`)
   if (u?.errors?.length) bangTop.push(`(lỗi soi: ${String(u.errors.map((x) => x.message).join(' | ')).split(ACC).join('<tk>').slice(0, 300)})`) }
 // 13/11: THEO GIỜ 50 giờ qua (giờ VN) — mọi khoản tính tiền, để so cùng khung giờ trước / sau một lượt phát hành (dự báo cả kỳ tuyến tính nên trễ).
 { const tu50 = new Date(now - 50 * 3600e3).toISOString(), den = now.toISOString()

@@ -12,7 +12,7 @@ import { dongMay, viSaoCam } from '../../lib/live/so-tieng'
 import { GIAO_DIEN_DOT_2 } from '../../lib/bpu/phong-live'
 import { chiThayCo } from '../../lib/live/chi-thay'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
-import { maTrang } from './bo-cuc'
+import { KHOA_TRANG_BANG, maTrang } from './bo-cuc'
 
 /** Trạng thái gửi sang tờ để vẽ (tờ không tự suy gì). */
 export interface TtLiveTo {
@@ -226,7 +226,7 @@ function guiGiay(lai = false): void {
 // BẢNG CỦA BUỔI LIVE THEO KHỐI (thầy 12/11 «chuyển đi chuyển lại phải lưu trước đó»): chế độ Bảng viết vào trang riêng `bl` của tờ; app giữ bản sao nét
 // suốt buổi (theo mã buổi) và trả lại cho tờ MỚI khi tờ xin (`bang-xin`) — đổi bài, bảng trắng ⇄ bài đều không mất nét. `bangSan` = tờ hiện tại đã xin xong
 // (trước đó trang `bl` của tờ mới còn rỗng — không được ghi đè bản đang giữ).
-const TRANG_BANG = 'bl'
+const TRANG_BANG = KHOA_TRANG_BANG
 // LIVE THEO KHỐI: cụm Học | Bảng · Lớp · Chọn bài · Tin nhắn nằm trong khay nút bốn ô của tờ (thầy 12/11). Tờ bấm ⇒ việc `lk` ⇒ sự kiện cửa sổ `ddh-lkt` cho lớp
 // nổi (LopNoiThay); lớp nổi báo số tin nhắn mới bằng sự kiện `ddh-lkt-moi` ⇒ lệnh `live-lk` xuống tờ.
 let lkMoi = 0, lkChat = false

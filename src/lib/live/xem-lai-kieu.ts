@@ -112,6 +112,17 @@ export interface BuoiLiveJson {
   /** Mốc «bảng mới» / «xoá hết» trong `net.bin`: giờ + vị trí byte của bản ghi ⇒ tua thì tải và dựng lại từ mốc gần nhất phía trước. Luôn có mốc đầu `{ t: 0, byte: 0 }`. */
   mocBang: { t: number; byte: number }[]
   bangVang: BangVangLive | null
+  /** LIVE THEO KHỐI (13/11): dòng thời gian CHẾ ĐỘ thầy đang dạy — `bang` = bảng kín màn, `hoc` = giấy đề + bảng — theo trục tiếng (ms), tăng dần, không lặp giá trị
+   *  liền nhau. Trình phát xếp hình đúng theo đó, kể cả khi thầy đổi qua lại trong một buổi. Vắng (buổi trên lớp / buổi dựng trước 13/11) ⇒ trình phát suy từ trang bút. */
+  che?: MocChe[]
+}
+export interface MocChe { t: number; v: 'hoc' | 'bang' }
+/** Chế độ tại giờ `t` của trục tiếng: mốc cuối cùng có `t` ≤ giờ đang phát (trước mốc đầu ⇒ lấy mốc đầu). Không có dòng thời gian ⇒ null. */
+export function cheTai(che: readonly MocChe[] | undefined, t: number): 'hoc' | 'bang' | null {
+  if (!che?.length) return null
+  let lo = 0, hi = che.length - 1, k = 0
+  while (lo <= hi) { const g = (lo + hi) >> 1; if (che[g]!.t <= t) { k = g; lo = g + 1 } else hi = g - 1 }
+  return che[k]!.v
 }
 
 // ───────────────────────── net.bin ─────────────────────────

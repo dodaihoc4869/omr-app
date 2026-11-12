@@ -91,7 +91,7 @@ export const ID_BUOI_GIA = 'buoi-gia-1011'
 
 export interface BuoiGia { buoi: BuoiLiveJson; net: Uint8Array<ArrayBuffer>; /** Khoảng CÓ tiếng (ms) — bộ sinh tệp tiếng giả phát tiếng ở các khoảng này, im ở khoảng lặng. */ coTieng: KhoangMs[] }
 /** Một buổi live giả trọn vẹn: `buoi.json` + `net.bin` khớp nhau (mốc bảng trỏ đúng byte). `giayToi` = giấy đề tối. */
-export function taoBuoiGia(tuy: { giayToi?: boolean; coTieng?: boolean; id?: string; ban?: number } = {}): BuoiGia {
+export function taoBuoiGia(tuy: { giayToi?: boolean; coTieng?: boolean; id?: string; ban?: number; /** mọi trang dùng khoá này (vd. 'bl' = thầy giảng ở chế độ Bảng kín màn) */ khoaTrang?: string } = {}): BuoiGia {
   const rng = taoRng(20261110), giayToi = !!tuy.giayToi
   type Muc = { t: number; khung: Uint8Array }
   const muc: Muc[] = [], moc: Muc[] = []
@@ -104,7 +104,7 @@ export function taoBuoiGia(tuy: { giayToi?: boolean; coTieng?: boolean; id?: str
     const so = k + 1, luot = so + 2 // (số lượt của phòng không trùng số câu: hai lượt đầu buổi thầy bỏ)
     const t0Cau = t, lamBai = 171_000
     // thầy mở câu ⇒ «bảng mới»
-    mocMoi(t0Cau, maBangMoi(maTrang(`cau-${so}`, VUNG_MAC_DINH, giayToi), 16 / 9))
+    mocMoi(t0Cau, maBangMoi(maTrang(tuy.khoaTrang ?? `cau-${so}`, VUNG_MAC_DINH, giayToi), 16 / 9))
     const t0 = t0Cau + lamBai, t1 = t0 + c.giay * 1000
     // nét của đoạn chữa: rải đều trong đoạn, chừa một khoảng lặng dài ở giữa (câu 3: 43 giây ⇒ «Đã lược 0:42 khoảng lặng»)
     const net = baiChua(`c${so}`, c.net, rng)
