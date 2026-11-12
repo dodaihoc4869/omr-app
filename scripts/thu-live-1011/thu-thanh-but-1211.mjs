@@ -81,7 +81,7 @@ try {
   kiem('B bật bút ⇒ thanh hiện ở mép TRÊN, vừa bật thì sáng', d.hien && d.mep === 'tren' && d.huong === 'row' && d.sang && d.mo >= 0.95 && Math.abs(d.y - 6) <= 1, { mep: d.mep, y: d.y, mo: d.mo })
   kiem('bút giữ nguyên: 14 nút (5 màu · 4 cỡ · tẩy · hoàn tác · làm lại · xoá hết · tắt), không còn chữ thừa', d.soNut === 14 && d.chu === '', `chữ «${d.chu}»`)
   kiem('mọi đích bấm ≥ 32 px', d.nutNho >= 32, `nhỏ nhất ${d.nutNho} px`)
-  kiem('thanh gọn: dài ≤ 500 px, dày ≤ 34 px (bản cũ ≈ 580 × 36)', d.w <= 500 && d.h <= 34, `${d.w} × ${d.h}`)
+  kiem('thanh gọn: dài ≤ 500 px, dày ≤ 34 px (bản cũ đo được 568 × 37, đích bấm 24–27 px)', d.w <= 500 && d.h <= 34, `${d.w} × ${d.h}`)
   kiem('thanh nằm trọn trong màn', d.x >= 0 && d.phai <= W && d.y >= 0)
   const macDinh = d
   await re(d.x + d.w / 2, d.y + d.h / 2); await ngu(300)
