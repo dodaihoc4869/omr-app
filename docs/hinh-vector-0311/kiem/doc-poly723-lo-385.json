@@ -1,0 +1,1143 @@
+{
+  "i": 723,
+  "hash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503.png",
+  "size": [
+    698,
+    174
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B13-II-3",
+      "de": "Cao su thiên nhiên là một loại polymer được tạo bởi các mắt xích isoprene. Cấu trúc của một đoạn mạch cao su thiên nhiên như hình thứ nhất.\nMuốn sử dụng được trong thực tế, người ta phải thực hiện quá trình lưu hóa cao su thiên nhiên để tạo ra cao su lưu hóa theo sơ đồ ở hình thứ hai.\nQuá trình lưu hóa cao su là quá trình thay thế hai nguyên tử H ở hai nhóm $\\ce{CH2}$ trong các mạch polymer bằng cầu disulfide ($\\ce{-S-S-}$).",
+      "allHinh": [
+        {
+          "hash": "5c9a883925f510724263de76113c585134b2750ba84769b77099ecc2e9a2d2f1",
+          "where": "VIP27-C4-B13-II-3.hinh.0.du_lieu",
+          "hashDataUrl": "4343bc98b7a53321330a94eb06a31a776e3d26c4f97e642d89a1821f477873a6"
+        },
+        {
+          "hash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503",
+          "where": "VIP27-C4-B13-II-3.hinh.1.du_lieu",
+          "hashDataUrl": "40a1e6cbea0171b9b3e68c8696110bbb772a194e0cbb4066857be9b86c3b75eb"
+        }
+      ],
+      "missingHashes": [
+        "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "alreadyAdmittedPartnerI": 502,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownSS12xOpened": true,
+    "ownArrow10xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Curvesorderednativeapprox1pxsampledturns/controlguides for smoothmanualinterpolation, NOTexactscientificpositions/automatictracing. DoNOTaddcarbonverticesatthecurvepoints. SSglyphrotationapprox−20degfromownmacro, buildermustinkreviewgaps.",
+  "geometry": {
+    "leftCurves": [
+      [
+        [
+          61,
+          21
+        ],
+        [
+          88,
+          20
+        ],
+        [
+          116,
+          22
+        ],
+        [
+          143,
+          27
+        ],
+        [
+          167,
+          35
+        ],
+        [
+          185,
+          40
+        ],
+        [
+          190,
+          38
+        ],
+        [
+          189,
+          25
+        ],
+        [
+          194,
+          21
+        ],
+        [
+          209,
+          21
+        ],
+        [
+          231,
+          23
+        ],
+        [
+          246,
+          22
+        ]
+      ],
+      [
+        [
+          97,
+          71
+        ],
+        [
+          124,
+          64
+        ],
+        [
+          154,
+          58
+        ],
+        [
+          176,
+          54
+        ],
+        [
+          186,
+          56
+        ],
+        [
+          190,
+          61
+        ],
+        [
+          190,
+          68
+        ],
+        [
+          199,
+          71
+        ],
+        [
+          222,
+          70
+        ],
+        [
+          246,
+          65
+        ],
+        [
+          267,
+          59
+        ],
+        [
+          279,
+          57
+        ],
+        [
+          287,
+          60
+        ]
+      ],
+      [
+        [
+          44,
+          77
+        ],
+        [
+          60,
+          90
+        ],
+        [
+          79,
+          102
+        ],
+        [
+          98,
+          108
+        ],
+        [
+          116,
+          105
+        ],
+        [
+          130,
+          97
+        ],
+        [
+          137,
+          90
+        ],
+        [
+          145,
+          91
+        ],
+        [
+          160,
+          101
+        ],
+        [
+          180,
+          108
+        ],
+        [
+          197,
+          109
+        ],
+        [
+          204,
+          107
+        ],
+        [
+          207,
+          102
+        ],
+        [
+          207,
+          96
+        ],
+        [
+          213,
+          95
+        ],
+        [
+          225,
+          102
+        ],
+        [
+          232,
+          102
+        ],
+        [
+          244,
+          96
+        ],
+        [
+          251,
+          96
+        ],
+        [
+          267,
+          107
+        ],
+        [
+          278,
+          102
+        ],
+        [
+          285,
+          101
+        ],
+        [
+          291,
+          103
+        ]
+      ],
+      [
+        [
+          97,
+          123
+        ],
+        [
+          120,
+          121
+        ],
+        [
+          136,
+          124
+        ],
+        [
+          146,
+          133
+        ],
+        [
+          153,
+          148
+        ],
+        [
+          153,
+          154
+        ],
+        [
+          145,
+          158
+        ],
+        [
+          117,
+          160
+        ],
+        [
+          133,
+          168
+        ],
+        [
+          151,
+          172
+        ],
+        [
+          161,
+          171
+        ],
+        [
+          167,
+          164
+        ],
+        [
+          168,
+          151
+        ],
+        [
+          173,
+          143
+        ],
+        [
+          181,
+          143
+        ],
+        [
+          192,
+          151
+        ],
+        [
+          209,
+          146
+        ],
+        [
+          225,
+          142
+        ],
+        [
+          241,
+          143
+        ],
+        [
+          248,
+          144
+        ],
+        [
+          258,
+          140
+        ],
+        [
+          269,
+          134
+        ]
+      ]
+    ],
+    "rightCurves": [
+      [
+        [
+          414,
+          24
+        ],
+        [
+          432,
+          20
+        ],
+        [
+          448,
+          19
+        ],
+        [
+          469,
+          22
+        ],
+        [
+          488,
+          25
+        ],
+        [
+          511,
+          22
+        ],
+        [
+          526,
+          20
+        ],
+        [
+          535,
+          22
+        ],
+        [
+          552,
+          27
+        ],
+        [
+          573,
+          30
+        ],
+        [
+          588,
+          28
+        ],
+        [
+          601,
+          23
+        ],
+        [
+          611,
+          16
+        ],
+        [
+          620,
+          9
+        ],
+        [
+          626,
+          9
+        ]
+      ],
+      [
+        [
+          393,
+          55
+        ],
+        [
+          410,
+          58
+        ],
+        [
+          431,
+          58
+        ],
+        [
+          455,
+          56
+        ],
+        [
+          478,
+          59
+        ],
+        [
+          503,
+          62
+        ],
+        [
+          529,
+          65
+        ],
+        [
+          554,
+          70
+        ],
+        [
+          560,
+          70
+        ],
+        [
+          571,
+          65
+        ],
+        [
+          589,
+          62
+        ],
+        [
+          616,
+          62
+        ],
+        [
+          636,
+          61
+        ],
+        [
+          647,
+          58
+        ],
+        [
+          650,
+          56
+        ],
+        [
+          650,
+          45
+        ],
+        [
+          654,
+          39
+        ],
+        [
+          659,
+          39
+        ]
+      ],
+      [
+        [
+          384,
+          94
+        ],
+        [
+          385,
+          102
+        ],
+        [
+          391,
+          107
+        ],
+        [
+          402,
+          110
+        ],
+        [
+          409,
+          110
+        ],
+        [
+          404,
+          104
+        ],
+        [
+          404,
+          109
+        ],
+        [
+          420,
+          110
+        ],
+        [
+          444,
+          110
+        ],
+        [
+          463,
+          109
+        ],
+        [
+          480,
+          111
+        ],
+        [
+          498,
+          116
+        ],
+        [
+          513,
+          117
+        ],
+        [
+          529,
+          113
+        ],
+        [
+          548,
+          106
+        ],
+        [
+          559,
+          104
+        ],
+        [
+          570,
+          107
+        ],
+        [
+          584,
+          112
+        ],
+        [
+          604,
+          114
+        ],
+        [
+          624,
+          110
+        ],
+        [
+          644,
+          104
+        ],
+        [
+          653,
+          104
+        ]
+      ],
+      [
+        [
+          384,
+          156
+        ],
+        [
+          400,
+          158
+        ],
+        [
+          413,
+          158
+        ],
+        [
+          415,
+          148
+        ],
+        [
+          420,
+          144
+        ],
+        [
+          440,
+          144
+        ],
+        [
+          464,
+          146
+        ],
+        [
+          492,
+          148
+        ],
+        [
+          520,
+          149
+        ],
+        [
+          548,
+          150
+        ],
+        [
+          571,
+          153
+        ],
+        [
+          591,
+          158
+        ],
+        [
+          603,
+          158
+        ],
+        [
+          618,
+          152
+        ],
+        [
+          638,
+          144
+        ],
+        [
+          652,
+          141
+        ],
+        [
+          670,
+          141
+        ],
+        [
+          669,
+          136
+        ],
+        [
+          673,
+          132
+        ],
+        [
+          682,
+          131
+        ]
+      ]
+    ],
+    "curveStyle": "blackthinuniform~1.8px, smoothorganicirregularcontinuouschains. NOwaveperiodicnormalization. Noendcaps/extraheads.",
+    "rightRow3TinyHook": {
+      "path": [
+        [
+          402,
+          110
+        ],
+        [
+          404,
+          104
+        ],
+        [
+          404,
+          109
+        ],
+        [
+          409,
+          110
+        ]
+      ],
+      "note": "Retainliteralhook/kink, NOTarrowhead/electronflow/data."
+    },
+    "SSbridges": [
+      {
+        "centers": [
+          [
+            438,
+            27
+          ],
+          [
+            450,
+            46
+          ]
+        ],
+        "chainAnchors": [
+          [
+            433,
+            20
+          ],
+          [
+            457,
+            56
+          ]
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "center": [
+              438,
+              27
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          },
+          {
+            "text": "S",
+            "center": [
+              450,
+              46
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          }
+        ],
+        "shortBonds": [
+          [
+            [
+              433,
+              20
+            ],
+            [
+              436,
+              21
+            ]
+          ],
+          [
+            [
+              441,
+              33
+            ],
+            [
+              447,
+              40
+            ]
+          ],
+          [
+            [
+              453,
+              52
+            ],
+            [
+              457,
+              56
+            ]
+          ]
+        ]
+      },
+      {
+        "centers": [
+          [
+            582,
+            39
+          ],
+          [
+            592,
+            54
+          ]
+        ],
+        "chainAnchors": [
+          [
+            576,
+            29
+          ],
+          [
+            598,
+            62
+          ]
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "center": [
+              582,
+              39
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          },
+          {
+            "text": "S",
+            "center": [
+              592,
+              54
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          }
+        ],
+        "shortBonds": [
+          [
+            [
+              576,
+              29
+            ],
+            [
+              580,
+              33
+            ]
+          ],
+          [
+            [
+              585,
+              45
+            ],
+            [
+              589,
+              48
+            ]
+          ],
+          [
+            [
+              595,
+              60
+            ],
+            [
+              598,
+              62
+            ]
+          ]
+        ]
+      },
+      {
+        "centers": [
+          [
+            534,
+            80
+          ],
+          [
+            547,
+            96
+          ]
+        ],
+        "chainAnchors": [
+          [
+            528,
+            65
+          ],
+          [
+            553,
+            105
+          ]
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "center": [
+              534,
+              80
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          },
+          {
+            "text": "S",
+            "center": [
+              547,
+              96
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          }
+        ],
+        "shortBonds": [
+          [
+            [
+              528,
+              65
+            ],
+            [
+              532,
+              74
+            ]
+          ],
+          [
+            [
+              537,
+              86
+            ],
+            [
+              544,
+              90
+            ]
+          ],
+          [
+            [
+              550,
+              102
+            ],
+            [
+              553,
+              105
+            ]
+          ]
+        ]
+      },
+      {
+        "centers": [
+          [
+            469,
+            120
+          ],
+          [
+            481,
+            138
+          ]
+        ],
+        "chainAnchors": [
+          [
+            463,
+            109
+          ],
+          [
+            487,
+            147
+          ]
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "center": [
+              469,
+              120
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          },
+          {
+            "text": "S",
+            "center": [
+              481,
+              138
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          }
+        ],
+        "shortBonds": [
+          [
+            [
+              463,
+              109
+            ],
+            [
+              467,
+              114
+            ]
+          ],
+          [
+            [
+              472,
+              126
+            ],
+            [
+              478,
+              132
+            ]
+          ],
+          [
+            [
+              484,
+              144
+            ],
+            [
+              487,
+              147
+            ]
+          ]
+        ]
+      },
+      {
+        "centers": [
+          [
+            607,
+            125
+          ],
+          [
+            619,
+            142
+          ]
+        ],
+        "chainAnchors": [
+          [
+            601,
+            114
+          ],
+          [
+            625,
+            150
+          ]
+        ],
+        "labels": [
+          {
+            "text": "S",
+            "center": [
+              607,
+              125
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          },
+          {
+            "text": "S",
+            "center": [
+              619,
+              142
+            ],
+            "sizeApprox": 13,
+            "rotationDegrees": -20
+          }
+        ],
+        "shortBonds": [
+          [
+            [
+              601,
+              114
+            ],
+            [
+              605,
+              119
+            ]
+          ],
+          [
+            [
+              610,
+              131
+            ],
+            [
+              616,
+              136
+            ]
+          ],
+          [
+            [
+              622,
+              148
+            ],
+            [
+              625,
+              150
+            ]
+          ]
+        ]
+      }
+    ],
+    "arrow": {
+      "shaft": [
+        [
+          318,
+          92
+        ],
+        [
+          359,
+          92
+        ]
+      ],
+      "openVLegs": [
+        [
+          [
+            353,
+            87
+          ],
+          [
+            359,
+            92
+          ]
+        ],
+        [
+          [
+            353,
+            97
+          ],
+          [
+            359,
+            92
+          ]
+        ]
+      ],
+      "above": {
+        "text": "nS",
+        "bbox": [
+          330,
+          77,
+          349,
+          91
+        ]
+      },
+      "below": {
+        "text": "tᵒ",
+        "bbox": [
+          334,
+          97,
+          346,
+          111
+        ]
+      },
+      "note": "NOliteral+before nS. OPENV3strokesnotfilledtriangle; tsmallroundoSUP."
+    },
+    "font": "All10S+conditionregularuprightsansblack, Srotatedapprox−20°baselineup-right; nlowercase/Suppercase. Noactualbold/captions.",
+    "countsVisible": {
+      "leftCurves": 4,
+      "rightCurves": 4,
+      "SSbridges": 5,
+      "Sletters": 10,
+      "shortSSbondShafts": 15,
+      "openVHeads": 1,
+      "knownC": "UNKNOWNpolymercurvesnotatomistic",
+      "captions": 0
+    },
+    "noAdded": [
+      "carbonsatcurvepoints",
+      "periodicwaves",
+      "extradisulfides",
+      "filledarrowhead",
+      "polymernamecaption",
+      "literalplusnS",
+      "unknownchainendatomicrestoration",
+      "answer"
+    ],
+    "manualPaths": [
+      "M61 21 C104 17 139 22 167 35 C177 38 184 41 188 39 C193 38 186 27 190 23 C193 17 221 25 246 22",
+      "M97 71 C123 64 157 55 176 54 C196 52 186 68 193 70 C214 74 249 63 267 59 C277 56 282 57 287 60",
+      "M44 77 C67 98 88 113 110 107 C122 105 129 98 134 92 C143 82 152 100 167 105 C177 109 193 110 201 108 C210 107 203 94 211 95 C218 95 224 103 231 103 C238 103 242 93 250 96 C258 98 264 108 268 107 C277 103 283 99 291 103",
+      "M97 123 C117 119 136 118 146 133 C151 141 157 153 151 156 C144 161 124 158 117 160 C129 168 148 175 160 171 C173 167 162 147 174 143 C179 139 187 148 192 151 C211 144 226 140 242 143 C253 148 261 136 269 134",
+      "M414 24 C440 15 458 19 478 24 C498 29 515 18 529 20 C541 22 562 33 582 29 C600 27 611 17 620 9 L626 9",
+      "M393 55 C409 60 437 58 455 56 C480 59 508 63 529 65 L560 70 C574 60 588 62 608 62 C626 62 639 62 647 58 C654 61 646 43 654 39 C656 38 658 39 659 39",
+      "M384 94 C382 107 393 110 409 110 L404 104 L404 109 C423 112 449 109 463 109 C482 108 495 119 513 117 C530 115 548 103 559 104 C570 103 575 112 591 113 C611 117 632 107 644 104 C648 103 651 103 653 104",
+      "M384 156 C396 157 404 159 413 158 L415 148 C416 141 432 144 440 144 C470 147 495 149 520 149 C550 148 569 152 591 158 C603 162 615 153 638 144 C651 140 658 141 670 141 C665 132 675 132 682 131"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "rootReview": {
+    "nativeFull": true,
+    "ownFull4x": true,
+    "ownRightSs5x": true,
+    "allPublicDeAndRefs": true,
+    "geometryNativeApproxNotSubpixel": true,
+    "actualFull3x": true,
+    "actualLeftRightArrowMacros": true
+  },
+  "sourceStageStatus": "source-only/noSVG/noCount",
+  "finalStage": {
+    "actualSvgReviewed": true,
+    "hashSvg": "bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f",
+    "readonlyProof": "/workspace/scratch/soat-poly723-lo385.json",
+    "runtime": "/workspace/scratch/poly723-runtime.log",
+    "newFull": 1
+  }
+}

@@ -3097,6 +3097,15 @@
       "canNenSang": true,
       "font": "DDH Rounded"
     },
+    "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503": {
+      "tep": "poly723-native-ddh-bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f.svg",
+      "hashSvg": "bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f",
+      "byteSvg": 12386,
+      "byteGzip": 2142,
+      "trangThai": "cau-truc-da-soat-doc-lap",
+      "canNenSang": true,
+      "font": "DDH Rounded"
+    },
     "8bc777193598ac8f00477a916f4b80e671cba65edb5d5590f984a3afc7490869": {
       "tep": "dha751-native-ddh-272551b1ba8e612337e51302fb70da5785a506ed3f7d0e31dd21a65097090dc2.svg",
       "hashSvg": "272551b1ba8e612337e51302fb70da5785a506ed3f7d0e31dd21a65097090dc2",
@@ -30778,15 +30787,21 @@
     },
     {
       "qid": "VIP27-C4-B13-II-3",
-      "duMoiHinh": false,
+      "duMoiHinh": true,
       "soHinhNguon": 2,
-      "soHinhDaKiem": 1,
+      "soHinhDaKiem": 2,
       "hinh": [
         {
           "hash": "5c9a883925f510724263de76113c585134b2750ba84769b77099ecc2e9a2d2f1",
           "where": "VIP27-C4-B13-II-3.hinh.0.du_lieu",
           "hashDataUrl": "4343bc98b7a53321330a94eb06a31a776e3d26c4f97e642d89a1821f477873a6",
           "vector": "poly502-native-ddh-3e38a4c4091bae7b0823c31b7a138ba62572563691a208017ac22dc72ba8a091.svg"
+        },
+        {
+          "hash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503",
+          "where": "VIP27-C4-B13-II-3.hinh.1.du_lieu",
+          "hashDataUrl": "40a1e6cbea0171b9b3e68c8696110bbb772a194e0cbb4066857be9b86c3b75eb",
+          "vector": "poly723-native-ddh-bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f.svg"
         }
       ]
     },
@@ -32498,6 +32513,7 @@
     "VIP27-C3-B9-II-3",
     "VIP27-C4-B13-I-3",
     "VIP27-C4-B13-I-5",
+    "VIP27-C4-B13-II-3",
     "VIP27-C5-B17-D1-I-9",
     "VIP27-C5-B17-D1-I-15",
     "VIP27-C5-B15-I-17",
@@ -32528,8 +32544,7 @@
     "DH-12-C1-B1-P1-III-10",
     "DH-12-C1-B1-P1-III-42",
     "DH-12-C1-B3-D1-III-5",
-    "VIP27-BDT-KTTX-601-I-2",
-    "VIP27-C4-B13-II-3"
+    "VIP27-BDT-KTTX-601-I-2"
   ],
   "bienTheKhacDaSoat": {
     "0221fbc67e2428efcf900364916a9d651a11a869d0ee40e1af07276f0d9f31f8": [

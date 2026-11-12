@@ -1,0 +1,29 @@
+[
+  {
+    "i": 723,
+    "hash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503",
+    "fileNguon": "anh/873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503.png",
+    "svg": "poly723-native-ddh-bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f.svg",
+    "hashSvg": "bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f",
+    "byteSvg": 12386,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B13-II-3",
+        "de": "Cao su thiên nhiên là một loại polymer được tạo bởi các mắt xích isoprene. Cấu trúc của một đoạn mạch cao su thiên nhiên như hình thứ nhất.\nMuốn sử dụng được trong thực tế, người ta phải thực hiện quá trình lưu hóa cao su thiên nhiên để tạo ra cao su lưu hóa theo sơ đồ ở hình thứ hai.\nQuá trình lưu hóa cao su là quá trình thay thế hai nguyên tử H ở hai nhóm $\\ce{CH2}$ trong các mạch polymer bằng cầu disulfide ($\\ce{-S-S-}$).",
+        "refs": [
+          {
+            "hash": "873a05d1ad9a0f51f3389ec45cff0815e96d7f6abb1db7765b82257468d11503",
+            "where": "VIP27-C4-B13-II-3.hinh.1.du_lieu",
+            "hashDataUrl": "40a1e6cbea0171b9b3e68c8696110bbb772a194e0cbb4066857be9b86c3b75eb"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "4LEFT4RIGHTindividualorganiccurves-UNKNOWNpolymerC-NOatomvertices/5SS10S15shortshafts/ALLregular-SrotateMINUS20/1OPENVrighthead/literalnS-NOplus-tSUPo/tinyRIGHTrow3LEFThookUNKNOWNretain/0H-caption-ring-repeatbracket/NOaddedname-answer-alias/502partner384passed-thisONLYnewfull",
+    "hashSvgDaSoat": "bc5e640cb7e8d7e17aa35502715b0334a36e7b6fa2325d2c06778e1bed11f32f",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
