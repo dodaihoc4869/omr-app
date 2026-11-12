@@ -1,0 +1,29 @@
+[
+  {
+    "i": 1257,
+    "hash": "e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b",
+    "fileNguon": "anh/e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b.png",
+    "svg": "five375-native-ddh-31278f1b561fd099899d9bba8a96e2d87b44dc0ac8e4345427656500827938e5.svg",
+    "hashSvg": "31278f1b561fd099899d9bba8a96e2d87b44dc0ac8e4345427656500827938e5",
+    "byteSvg": 16601,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B1-LIPID-III-2",
+        "de": "Cho một số acid béo thường gặp như hình dưới.\nLiệt kê theo trình tự từ nhỏ đến lớn các số ứng với acid béo thuộc nhóm omega-6 (ví dụ: 124, 345, ...).",
+        "refs": [
+          {
+            "hash": "e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b",
+            "where": "VIP27-C1-B1-LIPID-III-2.hinh.0.du_lieu",
+            "hashDataUrl": "561573c4db9499e82646abe669e0c6fb52493b2be8f8ebb697e912b2ef45b553"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "5OPENchains19-13-17-19-18bareC+COOHfirstC=20-14-18-20-19C/91C10O/CCdouble5-1-2-3-1/5literalcondensedCOOH-FIRSTCanchors/ALLregularUPRIGHT5numsNOTdam/row3COOHUP-othersDOWN/row5nonperiodic18bareC-startLEFTUP-keeps231vs232Ydrift/0expandedCOdouble-arrows-stereo/no18Cnormalize-H-names-omega6answer-noalias321",
+    "hashSvgDaSoat": "31278f1b561fd099899d9bba8a96e2d87b44dc0ac8e4345427656500827938e5",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

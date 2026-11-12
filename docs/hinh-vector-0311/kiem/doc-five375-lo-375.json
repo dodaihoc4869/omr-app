@@ -1,0 +1,831 @@
+{
+  "i": 1257,
+  "assetIndexProvided": 1268,
+  "hash": "e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b.png",
+  "size": [
+    1115,
+    280
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B1-LIPID-III-2",
+      "de": "Cho một số acid béo thường gặp như hình dưới.\nLiệt kê theo trình tự từ nhỏ đến lớn các số ứng với acid béo thuộc nhóm omega-6 (ví dụ: 124, 345, ...).",
+      "allHinh": [
+        {
+          "hash": "e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b",
+          "where": "VIP27-C1-B1-LIPID-III-2.hinh.0.du_lieu",
+          "hashDataUrl": "561573c4db9499e82646abe669e0c6fb52493b2be8f8ebb697e912b2ef45b553"
+        }
+      ],
+      "missingHashes": [
+        "e428b0c522bbbb529f8cb5bd24510a4d649b35a242393c2d08575794f2c2200b"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownEachFiveRow2xMacroOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxvertices/rays/bboxes; countsfromeachvisibleturn/freeend notfattyacidnames. LastbondtipsbeforeCOOHnotCvertices. Row5serif/rasterwavinessdifferentfromotherrowsnotalias321.",
+  "geometry": {
+    "rows": [
+      {
+        "orderedBareC": [
+          [
+            51,
+            32
+          ],
+          [
+            98,
+            5
+          ],
+          [
+            145,
+            32
+          ],
+          [
+            199,
+            32
+          ],
+          [
+            245,
+            5
+          ],
+          [
+            293,
+            32
+          ],
+          [
+            346,
+            32
+          ],
+          [
+            392,
+            5
+          ],
+          [
+            439,
+            32
+          ],
+          [
+            491,
+            32
+          ],
+          [
+            539,
+            5
+          ],
+          [
+            586,
+            32
+          ],
+          [
+            639,
+            32
+          ],
+          [
+            685,
+            5
+          ],
+          [
+            732,
+            32
+          ],
+          [
+            785,
+            32
+          ],
+          [
+            832,
+            5
+          ],
+          [
+            879,
+            32
+          ],
+          [
+            925,
+            5
+          ]
+        ],
+        "bareCCount": 19,
+        "CIncludingCOOHfirstC": 20,
+        "innerDoubleRays": [
+          [
+            [
+              147,
+              26
+            ],
+            [
+              197,
+              26
+            ]
+          ],
+          [
+            [
+              294,
+              26
+            ],
+            [
+              344,
+              26
+            ]
+          ],
+          [
+            [
+              441,
+              26
+            ],
+            [
+              489,
+              26
+            ]
+          ],
+          [
+            [
+              587,
+              26
+            ],
+            [
+              637,
+              26
+            ]
+          ],
+          [
+            [
+              734,
+              26
+            ],
+            [
+              783,
+              26
+            ]
+          ]
+        ],
+        "CCDoubleVertexPairs1Based": [
+          [
+            3,
+            4
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ],
+          [
+            15,
+            16
+          ]
+        ],
+        "CCdoubleCount": 5,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            963,
+            24,
+            1034,
+            43
+          ],
+          "bond": [
+            [
+              925,
+              5
+            ],
+            [
+              961,
+              25
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "font": "regularuprightsans",
+          "note": "BondtipbeforelabelnotextraC; keepcondensednoexpandedCO."
+        },
+        "rowLabel": {
+          "text": "(1)",
+          "bbox": [
+            4,
+            26,
+            40,
+            54
+          ],
+          "font": "regularuprightserifnottruebold"
+        },
+        "rasterNote": "Nativecenterlinenearest1pxapprox."
+      },
+      {
+        "orderedBareC": [
+          [
+            51,
+            86
+          ],
+          [
+            101,
+            57
+          ],
+          [
+            150,
+            86
+          ],
+          [
+            199,
+            57
+          ],
+          [
+            248,
+            86
+          ],
+          [
+            297,
+            57
+          ],
+          [
+            354,
+            57
+          ],
+          [
+            404,
+            86
+          ],
+          [
+            452,
+            57
+          ],
+          [
+            501,
+            86
+          ],
+          [
+            551,
+            57
+          ],
+          [
+            600,
+            86
+          ],
+          [
+            649,
+            57
+          ]
+        ],
+        "bareCCount": 13,
+        "CIncludingCOOHfirstC": 14,
+        "innerDoubleRays": [
+          [
+            [
+              300,
+              64
+            ],
+            [
+              351,
+              64
+            ]
+          ]
+        ],
+        "CCDoubleVertexPairs1Based": [
+          [
+            6,
+            7
+          ]
+        ],
+        "CCdoubleCount": 1,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            690,
+            78,
+            763,
+            98
+          ],
+          "bond": [
+            [
+              649,
+              57
+            ],
+            [
+              688,
+              79
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "font": "regularuprightsans",
+          "note": "BondtipbeforelabelnotextraC; keepcondensednoexpandedCO."
+        },
+        "rowLabel": {
+          "text": "(2)",
+          "bbox": [
+            4,
+            80,
+            40,
+            108
+          ],
+          "font": "regularuprightserifnottruebold"
+        },
+        "rasterNote": "Nativecenterlinenearest1pxapprox."
+      },
+      {
+        "orderedBareC": [
+          [
+            51,
+            154
+          ],
+          [
+            104,
+            124
+          ],
+          [
+            157,
+            154
+          ],
+          [
+            210,
+            124
+          ],
+          [
+            262,
+            154
+          ],
+          [
+            315,
+            124
+          ],
+          [
+            375,
+            124
+          ],
+          [
+            428,
+            154
+          ],
+          [
+            480,
+            124
+          ],
+          [
+            541,
+            124
+          ],
+          [
+            594,
+            154
+          ],
+          [
+            647,
+            124
+          ],
+          [
+            699,
+            154
+          ],
+          [
+            751,
+            124
+          ],
+          [
+            804,
+            154
+          ],
+          [
+            856,
+            124
+          ],
+          [
+            909,
+            154
+          ]
+        ],
+        "bareCCount": 17,
+        "CIncludingCOOHfirstC": 18,
+        "innerDoubleRays": [
+          [
+            [
+              317,
+              131
+            ],
+            [
+              373,
+              131
+            ]
+          ],
+          [
+            [
+              482,
+              131
+            ],
+            [
+              539,
+              131
+            ]
+          ]
+        ],
+        "CCDoubleVertexPairs1Based": [
+          [
+            6,
+            7
+          ],
+          [
+            9,
+            10
+          ]
+        ],
+        "CCdoubleCount": 2,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            952,
+            113,
+            1032,
+            135
+          ],
+          "bond": [
+            [
+              909,
+              154
+            ],
+            [
+              949,
+              132
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "font": "regularuprightsans",
+          "note": "BondtipbeforelabelnotextraC; keepcondensednoexpandedCO."
+        },
+        "rowLabel": {
+          "text": "(3)",
+          "bbox": [
+            4,
+            141,
+            40,
+            169
+          ],
+          "font": "regularuprightserifnottruebold"
+        },
+        "rasterNote": "Nativecenterlinenearest1pxapprox."
+      },
+      {
+        "orderedBareC": [
+          [
+            51,
+            202
+          ],
+          [
+            103,
+            173
+          ],
+          [
+            154,
+            202
+          ],
+          [
+            205,
+            173
+          ],
+          [
+            256,
+            202
+          ],
+          [
+            307,
+            173
+          ],
+          [
+            366,
+            173
+          ],
+          [
+            417,
+            202
+          ],
+          [
+            468,
+            173
+          ],
+          [
+            527,
+            173
+          ],
+          [
+            578,
+            202
+          ],
+          [
+            629,
+            173
+          ],
+          [
+            687,
+            173
+          ],
+          [
+            738,
+            202
+          ],
+          [
+            789,
+            173
+          ],
+          [
+            840,
+            202
+          ],
+          [
+            891,
+            173
+          ],
+          [
+            942,
+            202
+          ],
+          [
+            993,
+            173
+          ]
+        ],
+        "bareCCount": 19,
+        "CIncludingCOOHfirstC": 20,
+        "innerDoubleRays": [
+          [
+            [
+              309,
+              180
+            ],
+            [
+              364,
+              180
+            ]
+          ],
+          [
+            [
+              470,
+              180
+            ],
+            [
+              525,
+              180
+            ]
+          ],
+          [
+            [
+              631,
+              180
+            ],
+            [
+              685,
+              180
+            ]
+          ]
+        ],
+        "CCDoubleVertexPairs1Based": [
+          [
+            6,
+            7
+          ],
+          [
+            9,
+            10
+          ],
+          [
+            12,
+            13
+          ]
+        ],
+        "CCdoubleCount": 3,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            1036,
+            192,
+            1113,
+            215
+          ],
+          "bond": [
+            [
+              993,
+              173
+            ],
+            [
+              1034,
+              196
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "font": "regularuprightsans",
+          "note": "BondtipbeforelabelnotextraC; keepcondensednoexpandedCO."
+        },
+        "rowLabel": {
+          "text": "(4)",
+          "bbox": [
+            4,
+            198,
+            40,
+            226
+          ],
+          "font": "regularuprightserifnottruebold"
+        },
+        "rasterNote": "Nativecenterlinenearest1pxapprox."
+      },
+      {
+        "orderedBareC": [
+          [
+            48,
+            231
+          ],
+          [
+            86,
+            252
+          ],
+          [
+            124,
+            232
+          ],
+          [
+            163,
+            252
+          ],
+          [
+            202,
+            232
+          ],
+          [
+            240,
+            252
+          ],
+          [
+            278,
+            232
+          ],
+          [
+            317,
+            252
+          ],
+          [
+            356,
+            231
+          ],
+          [
+            398,
+            231
+          ],
+          [
+            437,
+            252
+          ],
+          [
+            475,
+            231
+          ],
+          [
+            514,
+            252
+          ],
+          [
+            553,
+            232
+          ],
+          [
+            591,
+            252
+          ],
+          [
+            630,
+            232
+          ],
+          [
+            669,
+            252
+          ],
+          [
+            707,
+            232
+          ]
+        ],
+        "bareCCount": 18,
+        "CIncludingCOOHfirstC": 19,
+        "innerDoubleRays": [
+          [
+            [
+              363,
+              238
+            ],
+            [
+              392,
+              238
+            ]
+          ]
+        ],
+        "CCDoubleVertexPairs1Based": [
+          [
+            9,
+            10
+          ]
+        ],
+        "CCdoubleCount": 1,
+        "COOH": {
+          "text": "COOH",
+          "bbox": [
+            735,
+            240,
+            815,
+            264
+          ],
+          "bond": [
+            [
+              707,
+              232
+            ],
+            [
+              731,
+              245
+            ]
+          ],
+          "anchor": "FIRSTC",
+          "font": "regularuprightserif",
+          "note": "BondtipbeforelabelnotextraC; keepcondensednoexpandedCO."
+        },
+        "rowLabel": {
+          "text": "(5)",
+          "bbox": [
+            4,
+            247,
+            40,
+            275
+          ],
+          "font": "regularuprightserifnottruebold"
+        },
+        "rasterNote": "Row5wavyirregularstroke/alternatingy231/232/252andfirstfreeendUPretained, doNOTnormalizechainperiodicity."
+      }
+    ],
+    "counts": {
+      "bareCByRow": [
+        19,
+        13,
+        17,
+        19,
+        18
+      ],
+      "CIncludingCOOHByRow": [
+        20,
+        14,
+        18,
+        20,
+        19
+      ],
+      "CCdoubleByRow": [
+        5,
+        1,
+        2,
+        3,
+        1
+      ],
+      "condensedCOOH": 5,
+      "O": 10,
+      "expandedCOdouble": 0,
+      "rowLabels": 5,
+      "arrows": 0
+    },
+    "style": "Thinblackuniform~1.5pxsourcefirst4rows;row5slightlywavy/jittergrayblackraster~1.5px. NObold/italictext. Row1..4COOHsansregular,row5serifregular.",
+    "crop": "All5labels/structuresfullyvisible;nativebottommarginnearrow5labelbutnochainrestorationneeded.",
+    "noAdded": [
+      "18Callrows",
+      "omega6answer",
+      "acidnames",
+      "expandedCOOH",
+      "periodicnormalize5",
+      "Hlabels",
+      "aliases321",
+      "boldnums",
+      "charges"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "rootReview": {
+    "nativeFullOpened": true,
+    "nativeFiveRowsOwn2xOpened": true,
+    "allPublicDeRefsRead": true,
+    "freshChromium3xFullOpened": true,
+    "actualRow5RightEdgeNumsMacrosOpened": true,
+    "hashSvg": "31278f1b561fd099899d9bba8a96e2d87b44dc0ac8e4345427656500827938e5",
+    "verdict": "Đạt riêng hình này; 5literalCOOH91C10O/CC5-1-2-3-1, hàng5 giữ18bareC/231vs232Ydrift, không18Cnormalize; mọi chữ DDHregularupright, không đậm; FIRSTCanchors/khe endpoint sạch.",
+    "rightmostColumnMin": 255
+  },
+  "independentRuntime": {
+    "sha256": "4d8ec09c61dce19a6eb2c1917efcdf6ac7f48c68e29ca4c79857eec187918b66",
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/five375-native-ddh-31278f1b561fd099899d9bba8a96e2d87b44dc0ac8e4345427656500827938e5.svg 31278f1b561fd099899d9bba8a96e2d87b44dc0ac8e4345427656500827938e5\n1257 { x: 0, y: 0, width: 1115, height: 280 }\n"
+  }
+}

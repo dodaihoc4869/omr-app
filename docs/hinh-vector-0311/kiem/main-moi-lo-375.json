@@ -1,0 +1,12 @@
+{
+  "lo": 375,
+  "main": "fc49b7b3d9be2474ff883c40f0d90bfe1aff06d2",
+  "previousMain": "c0ee847818b5e90edad2bc6017101a13737b615b",
+  "merged": false,
+  "summary": "Main mới live-khoi server: tài khoản thử thấy mọi khối, hồ sơ thiếu lớp đọc danh sách cổng; workflow soi chỉ đọc và test. App/Vite/font/mốc nguyên byte so374; chưa gộp/latestmain full theo tên/build-speed bắt buộc trước merge-release.",
+  "files": [
+    ".github/workflows/soi-live-khoi-1211.yml",
+    "server/src/live-khoi.ts",
+    "tests/live-khoi-may-chu-1211.test.ts"
+  ]
+}
