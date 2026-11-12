@@ -17,7 +17,7 @@ Trước đợt này: Theo dõi ca là `setInterval` trần 20 s (không đợi 
 ## Vòng dùng chung, KHÔNG phải của tôi (đã đúng luật hoặc không chạm D1)
 | Vòng | Tệp | Ghi chú |
 |---|---|---|
-| Hiện diện (`/presence`) | `lib/app-presence.ts` (Boss / Code 2) | 60 s ± 10 s, cả vai gv — đã dùng `batNhipBenVung` (không chồng, lùi dần, tab ẩn dừng). Chờ Code 3 nới cửa sổ "online 90 s" mới giãn thêm |
+| Hiện diện (`/presence`) | `lib/app-presence.ts` (Boss / Code 2) | 120 s ± 30 s (12/11 giảm chi phí; trước 60 s ± 10 s), cả vai gv — `batNhipBenVung` (không chồng, lùi dần, tab ẩn dừng). Máy chủ coi "online" trong 180 s (`CUA_SO_ONLINE_MS`, teacher-news.ts; trước 90 s) |
 | Hỏi bản mới | `lib/cap-nhat-app.ts` | `registration.update()` mỗi 30 phút + khi quay lại tab (chặn ≥ 60 s) — tệp tĩnh trên Pages, KHÔNG chạm Worker/D1 |
 | Bảo hiểm bản mới | `lib/bao-hiem-ban-moi.ts` | 10 phút, tải tệp tĩnh của bản mới — không chạm D1 |
 
@@ -30,6 +30,9 @@ Trước đợt này: Theo dõi ca là `setInterval` trần 20 s (không đợi 
 
 ## Nhịp sống Theo dõi ca — thêm 29/09 (thầy: "phần trên cho đồng bộ trực tiếp thời gian thực luôn")
 - `POST /ca/nhip` (server/src/nhip-ca.ts, chỉ đọc, đòi mã bí mật, 1 `DB.batch` 4 câu) mỗi **3 s** khi ca đang chạy + tab đang xem (`NHIP_SONG_CA_MS`, `TUY_CHON_NHIP_THAY.songCa`: máy chủ bận tối đa 6 s; lỗi lùi 10 → 20 s). Trả tiến độ từng em (bảng `trang_thai`) ĐỔI từ mốc `sau` + dấu vết; dấu vết đổi ⇒ tải đầy `/ca/chi-tiet` (cách nhau ≥ 4 s). Vòng 20 s tải đầy giữ nguyên làm lưới an toàn. Ước tải 100 em, 1 máy thầy: 80 câu D1/phút (so với ~600 lần ghi trang_thai/phút của chính các em). Đồng hồ vòng ở đầu màn tự nhích 1 s theo `gioMayChu()` (TheoDoiCa), giờ máy chủ nạp từ `gioMayChu` của lệnh này.
+
+## Máy để yên — thêm 12/11 (giảm chi phí Cloudflare, thầy «chỉ 5 đô một tháng»)
+- `chamKhiRanh` trong `TUY_CHON_NHIP_THAY` (src/lib/nhip-may-thay.ts): Bảng tin sàn, Bảng tin bản 3, chip sức khoẻ — máy thầy KHÔNG chạm / gõ / di chuột ≥ 3 phút (`RANH_SAU_MS`) ⇒ hỏi theo TRẦN đã duyệt của vòng (sàn 30 s · bản 3 120 s · chip 20 s); chạm lại ⇒ hỏi ngay (chặn dội như cũ) rồi về nhịp thường. Máy thầy mở Hôm nay cả ngày: sàn 8.640 → 2.880 lượt / 24 giờ hiện, chip 8.640 → 4.320. Theo dõi ca / phòng chờ / nhịp sống ca KHÔNG đổi.
 
 ## Còn chờ
 - Không còn việc treo của kế hoạch giờ cao điểm phía app thầy. Thêm vòng tự gọi mới ⇒ dòng ở bảng trên + `BANG_NHIP_THAY` + trần trong `TUY_CHON_NHIP_THAY`.

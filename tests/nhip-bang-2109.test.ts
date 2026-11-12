@@ -123,8 +123,11 @@ describe('mọi vòng GỌI MÁY CHỦ của app HS/PH/game đi qua nhip-ben-vun
     expect(doc('src/lib/ph-moi/use-tat-ca-ve-con.ts')).toMatch(/NHIP_PH_MOI_MS = 180_000/)
     expect(doc('src/lib/nhip-ben-vung.ts')).toMatch(/NHIP_NEN_MS = 180_000/)
   })
-  it('hiện diện: 60 s ± 10 s (máy chủ coi online trong 90 s — chậm hơn nữa là hiện "offline" oan)', () => {
-    expect(doc('src/lib/app-presence.ts')).toMatch(/coSoMs:\s*60_000,\s*lechMs:\s*10_000/)
+  // SỬA CÓ CHỦ Ý 12/11 giảm chi phí: máy chủ nới cửa sổ online 90 → 180 s (teacher-news.ts) ⇒ hiện diện 120 s ± 30 s (lệch mặc định; tối đa 150 s < 180 s).
+  it('hiện diện: 120 s ± 30 s (máy chủ coi online trong 180 s — chậm hơn nữa là hiện "offline" oan)', () => {
+    expect(doc('src/lib/app-presence.ts')).toMatch(/coSoMs:\s*120_000,\s*heSoToiDa:\s*1\}/)
+    expect(doc('src/lib/nhip-ben-vung.ts')).toMatch(/LECH_NHIP_MS = 30_000/)
+    expect(doc('server/src/teacher-news.ts')).toMatch(/CUA_SO_ONLINE_MS\s*=\s*180_000/)
   })
 })
 
