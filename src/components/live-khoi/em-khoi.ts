@@ -39,7 +39,7 @@ function baoBiTuChoi(): void {
   const b = document.createElement('div')
   b.setAttribute('role', 'alert'); b.setAttribute('data-luat-roi', 'cam')
   b.textContent = 'Thầy không duyệt cho em vào lại. Em không vào được buổi live này nữa. Đã gửi thông báo cho phụ huynh.'
-  b.style.cssText = 'position:fixed;left:50%;top:max(14px,env(safe-area-inset-top));transform:translateX(-50%);z-index:2147483640;max-width:min(92vw,520px);padding:11px 16px;border-radius:14px;background:var(--tr-chu,CanvasText);color:var(--tr-nen,Canvas);font-weight:700;font-size:14.5px;line-height:1.4;box-shadow:0 12px 36px rgb(0 0 0 / .35);text-align:center'
+  b.style.cssText = 'position:fixed;left:50%;top:max(14px,env(safe-area-inset-top));transform:translateX(-50%);z-index:2147483640;max-width:min(92vw,520px);padding:11px 16px;border-radius:14px;background:var(--tr-chu,CanvasText);color:var(--tr-nen,Canvas);font-weight:700;font-size:14.5px;line-height:1.4;box-shadow:0 12px 36px color-mix(in srgb, var(--p-muc) 35%, transparent);text-align:center'
   document.body.appendChild(b)
   setTimeout(() => b.remove(), 6000)
 }

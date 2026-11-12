@@ -2,8 +2,8 @@
    (--p-*, --tr-sai, bảng xanh than --lk-* của lớp nổi máy em, bảng màn chiếu --tr-chieu-* của lớp nổi máy thầy). */
 /* ── MÁY EM ── */
 .lr-bao { position: absolute; right: max(10px, 1.2%); top: 10px; z-index: 40; width: min(31%, 340px); min-width: 230px; display: flex; gap: 10px; align-items: flex-start; padding: 10px 13px; border-radius: 16px; pointer-events: none !important;
-  background: color-mix(in srgb, var(--lk-nen, var(--p-muc)) 94%, transparent); color: var(--p-trang); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-sai) 60%, transparent), 0 12px 34px rgb(0 0 0 / .45); animation: lr-vao 0.35s cubic-bezier(.2, 1.3, .4, 1) both; }
-.lr-bao.lan { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--p-cam) 75%, transparent), 0 12px 34px rgb(0 0 0 / .45); }
+  background: color-mix(in srgb, var(--lk-nen, var(--p-muc)) 94%, transparent); color: var(--p-trang); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-sai) 60%, transparent), 0 12px 34px color-mix(in srgb, var(--p-muc) 45%, transparent); animation: lr-vao 0.35s cubic-bezier(.2, 1.3, .4, 1) both; }
+.lr-bao.lan { box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--p-cam) 75%, transparent), 0 12px 34px color-mix(in srgb, var(--p-muc) 45%, transparent); }
 .lr-bao > i { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-style: normal; font-size: 15px; font-weight: 800; background: color-mix(in srgb, var(--tr-sai) 18%, transparent); color: color-mix(in srgb, var(--tr-sai) 70%, var(--p-trang)); }
 .lr-bao.lan > i { background: color-mix(in srgb, var(--p-cam) 20%, transparent); color: var(--p-cam); }
 .lr-bao b { display: block; font-size: 14.5px; font-weight: 800; line-height: 1.25; }
@@ -14,20 +14,20 @@
 @keyframes lr-vao { from { opacity: 0; transform: translateY(-10px) scale(0.96); } to { opacity: 1; transform: none; } }
 .lr-phu { position: absolute; inset: 0; z-index: 60; display: grid; place-items: center; padding: 14px; pointer-events: auto !important; background: color-mix(in srgb, var(--lk-nen, var(--p-muc)) 92%, transparent); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); color: var(--p-trang); }
 .lr-the { width: min(92%, 440px); padding: 20px 20px 22px; border-radius: 24px; text-align: center; background: linear-gradient(160deg, color-mix(in srgb, var(--lk-mat, var(--p-muc)) 88%, var(--p-trang)), var(--lk-nen, var(--p-muc)));
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-sai) 55%, transparent), 0 24px 70px rgb(0 0 0 / .6); animation: lr-vao 0.35s ease-out both; }
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--tr-sai) 55%, transparent), 0 24px 70px color-mix(in srgb, var(--p-muc) 60%, transparent); animation: lr-vao 0.35s ease-out both; }
 .lr-the > i { display: grid; place-items: center; width: 50px; height: 50px; margin: 0 auto 8px; border-radius: 50%; font-style: normal; font-size: 24px; font-weight: 800; background: color-mix(in srgb, var(--tr-sai) 16%, transparent); color: color-mix(in srgb, var(--tr-sai) 70%, var(--p-trang)); }
 .lr-the h3 { margin: 0; font-size: 20px; font-weight: 800; }
 .lr-the p { margin: 7px 0 0; font-size: 14px; line-height: 1.45; font-weight: 600; opacity: 0.84; }
 .lr-the p.ph { opacity: 1; font-weight: 800; color: color-mix(in srgb, var(--p-cam) 80%, var(--p-trang)); }
 .lr-the button { min-height: 46px; margin-top: 14px; padding: 0 28px; border: 0; border-radius: 14px; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; touch-action: manipulation; color: var(--p-muc);
-  background: color-mix(in srgb, var(--p-xanh) 62%, var(--p-trang)); box-shadow: 0 4px 0 color-mix(in srgb, var(--p-xanh) 70%, black); }
-.lr-the button:active { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--p-xanh) 70%, black); }
+  background: color-mix(in srgb, var(--p-xanh) 62%, var(--p-trang)); box-shadow: 0 4px 0 color-mix(in srgb, var(--p-xanh) 70%, var(--p-muc)); }
+.lr-the button:active { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--p-xanh) 70%, var(--p-muc)); }
 .lr-cho { display: inline-flex; align-items: center; gap: 9px; margin-top: 14px; padding: 9px 20px; border-radius: 99px; font-size: 15px; font-weight: 800; background: color-mix(in srgb, var(--p-trang) 9%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--p-trang) 22%, transparent); }
 .lr-cho s { width: 14px; height: 14px; border-radius: 50%; border: 2.5px solid color-mix(in srgb, var(--p-trang) 60%, transparent); border-top-color: transparent; animation: lr-quay 0.9s linear infinite; }
 @keyframes lr-quay { to { transform: rotate(360deg); } }
 /* ── MÁY THẦY: thẻ «Xin vào lại» (cạnh thẻ giơ tay, trên thanh đáy) ── */
 .lr-thay { position: fixed; left: calc(24px + min(300px, 44vw)); bottom: 66px; z-index: 6; width: min(400px, 46vw); max-height: min(60vh, 460px); overflow: auto; padding: 12px; border-radius: 18px; pointer-events: auto;
-  background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3), 0 18px 50px rgb(0 0 0 / .5); }
+  background: var(--tr-chieu-mat); color: var(--tr-chieu-giay); font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3), 0 18px 50px color-mix(in srgb, var(--p-muc) 50%, transparent); }
 .lr-thay h4 { margin: 0 0 6px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; color: color-mix(in srgb, var(--tr-chieu-giay) 62%, transparent); }
 .lr-thay h4 em { margin-left: auto; padding: 2px 9px; border-radius: 99px; font-style: normal; letter-spacing: 0; background: var(--tr-sai); color: var(--tr-chieu-giay); }
 .lr-dong { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--tr-chieu-mat-3); }
