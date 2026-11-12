@@ -9,7 +9,7 @@ import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { KenhLop, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
 
-export interface KhoEm { /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
+export interface KhoEm { /** Em vừa bấm «Tham gia»: hiện màn phòng NGAY, chờ phòng trả bản xem. */ dangVao?: boolean; /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
 let kho: KhoEm = { khoi: null, toi: null, ds: [], kj: [0, 0, 0, 0], noi: false }
 let ws: WebSocket | null = null
 let goc: Root | null = null
@@ -44,15 +44,22 @@ function nhanTinPhongEm(d: unknown): void {
     const khoi = !j.ketThuc && live?.khoi && e?.vao ? live.khoi : null
     const toi = e?.sbd ? { sbd: e.sbd, ten: e.ten ?? e.sbd, doi: e.doi ?? 0 } : null
     const doi = JSON.stringify(khoi) !== JSON.stringify(kho.khoi) || JSON.stringify(toi) !== JSON.stringify(kho.toi)
-    if (j.ketThuc && kho.khoi && kho.toi) { dat({ xong: true, khoi: null }); return }
+    if (j.ketThuc && kho.khoi?.gd === 'dang' && kho.toi) { dat({ xong: true, khoi: null }); return }
     if (kho.xong) return
     if (khoi && !kho.khoi) guiTho({ t: 'lop-xin' })
-    if (doi) dat({ khoi, toi })
-    if (khoi) gan(); else if (khung) go()
+    if (doi || (khoi && kho.dangVao)) dat({ khoi, toi, ...(khoi ? { dangVao: false } : {}) })
+    if (khoi || kho.dangVao) gan(); else if (khung) go()
   } else if (j.t === 'lop-ds') {
     const ds = (Array.isArray(j.ds) ? j.ds : []).flatMap((x) => (Array.isArray(x) && typeof x[0] === 'string' ? [{ sbd: x[0], ten: String(x[1] ?? x[0]), doi: Number(x[2]) || 0, kj: Number(x[3]) || 0 }] : []))
     dat({ ds, kj: [0, 1, 2, 3].map((i) => Number((j.kj as unknown[] | undefined)?.[i]) || 0) })
   } else if (j.t === 'lop' && typeof j.k === 'string') for (const f of tai.get(j.k as LoaiTinLop) ?? []) { try { f(j as unknown as TinLop) } catch { /* nơi nghe lỗi */ } }
+}
+let henVao: ReturnType<typeof setTimeout> | undefined
+/** Thẻ Live gọi lúc em bấm «Tham gia» (true) và khi vào hỏng (false). Quá 15 giây phòng chưa trả lời ⇒ tự gỡ màn chờ. */
+export function baoDangVao(co: boolean): void {
+  clearTimeout(henVao)
+  if (co) { dat({ dangVao: true }); gan(); henVao = setTimeout(() => baoDangVao(false), 15_000) }
+  else if (kho.dangVao) { dat({ dangVao: false }); if (!kho.khoi && !kho.xong) go() }
 }
 /** Màn Bình Phản Ứng gọi ngay sau khi tạo WebSocket của phòng. */
 export function noiKhoi(w: WebSocket): void {

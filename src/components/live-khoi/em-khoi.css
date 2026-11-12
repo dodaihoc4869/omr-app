@@ -17,3 +17,8 @@
 html[data-trong] :is(.lke, .lkt) .lc-nhap input, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus, html[data-trong] :is(.lke, .lkt) .lc-nhap input:focus-visible { background: transparent; border: 0; border-radius: 0; box-shadow: none; outline: 0; padding: 0; min-height: 0; color: var(--lk-chu); }
 .lke-roi { position: absolute; left: max(8px, env(safe-area-inset-left, 0px)); top: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: color-mix(in srgb, var(--lk-mat) 80%, transparent); color: var(--lk-chu-3); font: inherit; font-size: 12.5px; cursor: pointer; opacity: .8; }
 .lke.xong { pointer-events: auto; }
+.lke.dang-vao { display: grid; place-items: center; }
+.lke.dang-vao p { display: flex; align-items: center; gap: 12px; margin: 0; font-size: 17px; font-weight: 800; color: var(--lk-chu-2); }
+.lke.dang-vao i { width: 14px; height: 14px; border-radius: 50%; background: var(--lk-chu-y); animation: lke-nhip 1s ease-in-out infinite alternate; }
+@keyframes lke-nhip { from { opacity: .35; transform: scale(.8); } to { opacity: 1; transform: scale(1.15); } }
+.lkt-dang-mo { position: absolute; inset: 0; pointer-events: auto; display: grid; place-items: center; background: var(--lk-nen); color: var(--lk-chu-2); font-size: 20px; font-weight: 800; }

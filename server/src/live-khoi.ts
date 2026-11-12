@@ -2,7 +2,7 @@
 // Lịch live nằm trong MỘT dòng `cau_hinh` (khoá `live_khoi`, JSON ≤ 30 buổi) ⇒ không bảng mới, không migration. Mỗi buổi live của khối dùng chính
 // buổi học + phòng Bình Phản Ứng sẵn có: em bấm «Tham gia» ⇒ ghi điểm danh `cach = 'live'` + báo phòng ⇒ em vào phòng như em có mặt (đội, kJ, trả lời).
 // Chi phí: thẻ Live máy em = 1 lệnh đọc khoá chính (+1 lệnh đọc khối của em CHỈ khi đang có lịch); thầy bấm = 1 đọc + 1 ghi.
-import type { Env } from './kieu'
+import type { Env, ExecutionContext } from './kieu'
 type Row = Record<string, unknown>
 import { gameIdentity } from './game-v2-auth'
 import { gvBuoiHoc } from './buoi-hoc'
@@ -10,6 +10,7 @@ import { baoPhongVaoLop } from './phong-binh-phan-ung'
 import { baoMayCacEm } from './ngan-hoc-sinh'
 
 export const KHOA_LIVE_KHOI = 'live_khoi'
+const LOP_LIVE = 'Live Khối '
 const TOI_DA_LICH = 30
 /** TÀI KHOẢN THỬ của thầy (thầy 12/11: «cho sbd này test mọi lớp»): thấy và vào được live của MỌI khối, kể cả khi hồ sơ không có lớp. */
 const SBD_THU = new Set(['12121212'])
@@ -71,8 +72,12 @@ const traDs = (ds: readonly LichLiveMc[], em: Record<10 | 11 | 12, string[]>): R
 const taoId = (nay: number): string => `lk${nay.toString(36)}${Math.floor(Math.random() * 1e6).toString(36)}`
 
 /** `/gv/bpu/khoi-*` (sau chốt mã bí mật của thầy). */
-export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()): Promise<Row> {
-  const [tho, em] = await Promise.all([doc(env), emTheoKhoi(env)])
+export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), ctx?: ExecutionContext): Promise<Row> {
+  // TỨC THÌ (thầy 12/11 «mở phòng live chưa tức thì»): mọi lệnh đọc đi MỘT đợt song song (ca đang mở chỉ đọc khi mở phòng); việc báo máy các em chạy SAU
+  // câu trả lời (`ctx.waitUntil`) ⇒ thầy không chờ 80–100 lượt gọi ngăn.
+  const docCa = p === '/gv/bpu/khoi-mo' ? env.DB.prepare("SELECT ma_ca, TRIM(COALESCE(lop, '')) AS lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi'").all<Row>().then((r) => r.results ?? []).catch(() => [] as Row[]) : Promise.resolve([] as Row[])
+  const [tho, em, ca] = await Promise.all([doc(env), emTheoKhoi(env), docCa])
+  const bao = async (sbds: readonly string[]): Promise<void> => { const v = baoMayCacEm(env, sbds, 'live').catch(() => 0); if (ctx) { try { ctx.waitUntil(v); return } catch { /* không có ctx thật */ } } await v }
   let ds = donLich(tho, nay)
   if (p === '/gv/bpu/khoi-ds') return traDs(ds, em)
   if (p === '/gv/bpu/khoi-hen') {
@@ -88,7 +93,7 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
     }
     ds = donLich(ds, nay)
     await ghi(env, ds, nay)
-    await baoMayCacEm(env, em[khoi], 'live').catch(() => 0)
+    await bao(em[khoi])
     return traDs(ds, em)
   }
   if (p === '/gv/bpu/khoi-huy') {
@@ -97,7 +102,7 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
     if (x.trangThai !== 'hen') return { ok: false, error: 'Phòng đang mở. Thầy bấm Kết thúc live để đóng.' }
     ds = ds.filter((y) => y !== x)
     await ghi(env, ds, nay)
-    await baoMayCacEm(env, em[x.khoi], 'live').catch(() => 0)
+    await bao(em[x.khoi])
     return traDs(ds, em)
   }
   if (p === '/gv/bpu/khoi-mo') {
@@ -110,14 +115,15 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
     if (dangMo && dangMo.khoi !== khoi) return { ok: false, error: `Đang có phòng live Khối ${dangMo.khoi}. Thầy kết thúc phòng đó trước.` }
     if (dangMo) x = dangMo
     // Khối đang có ca kiểm tra mở ⇒ không mở live (CLAUDE.md «đang có ca thi mở»).
-    const ca = await env.DB.prepare("SELECT ma_ca, TRIM(COALESCE(lop, '')) AS lop FROM ca WHERE trang_thai = 'mo' AND COALESCE(loai, 'thi') = 'thi'").all<Row>().then((r) => r.results ?? []).catch(() => [] as Row[])
     const caMo = ca.find((c) => khoiTuLop(c.lop) === khoi)
     if (caMo) return { ok: false, lyDo: 'ca-mo', error: `Khối ${khoi} đang có ca kiểm tra mở (${str(caMo.ma_ca)}). Ca đóng xong thầy mở live.` }
     let ma = ''
     if (!x?.buoiId) {
       const ngay = new Date(nay + 7 * 3_600_000).toISOString().slice(5, 10).split('-').reverse().join('/')
       const ten = (x?.ten || str(b.ten).trim().slice(0, 60)) || `Live Khối ${khoi}`
-      const r = await gvBuoiHoc(env, { action: 'mo', lop: '', ten: `${ten} · ${ngay}`.slice(0, 80) }, nay)
+      // `lop = «Live Khối N»` (không lớp thật nào tên vậy): đánh dấu buổi LIVE ⇒ nút «Lên bảng» / điểm danh trên lớp không nhận nhầm buổi này;
+      // danh sách phòng chỉ gồm em đã bấm «Tham gia».
+      const r = await gvBuoiHoc(env, { action: 'mo', lop: `${LOP_LIVE}${khoi}`, ten: `${ten} · ${ngay}`.slice(0, 80) }, nay)
       const buoi = (r.buoi ?? null) as Row | null
       if (r.ok !== true || !buoi || !str(buoi.id)) return { ok: false, error: str(r.error) || 'Chưa mở được buổi live. Thầy thử lại.' }
       ma = str(buoi.ma)
@@ -128,7 +134,7 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
     x.luc = nay
     ds = donLich(ds, nay)
     await ghi(env, ds, nay)
-    await baoMayCacEm(env, em[khoi], 'live').catch(() => 0)
+    await bao(em[khoi])
     return { ...traDs(ds, em), lich: raLich(x), buoiId: x.buoiId, ma }
   }
   if (p === '/gv/bpu/khoi-bat-dau' || p === '/gv/bpu/khoi-xong') {
@@ -139,14 +145,14 @@ export async function gvLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
     const khoi = x.khoi
     ds = donLich(ds, nay)
     await ghi(env, ds, nay)
-    await baoMayCacEm(env, em[khoi], 'live').catch(() => 0)
+    await bao(em[khoi])
     return traDs(ds, em)
   }
   return { ok: false, error: 'Không có lệnh này.' }
 }
 
 /** `/hs/bpu/khoi-cua-em` · `/hs/bpu/khoi-vao` (token em). */
-export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()): Promise<Row> {
+export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now(), _ctx?: ExecutionContext): Promise<Row> {
   let sbd: string
   try { sbd = await gameIdentity(env, b) } catch (e) { return { ok: false, error: e instanceof Error ? e.message : 'Em đăng nhập lại.' } }
   const ds = donLich(await doc(env), nay)
@@ -161,9 +167,10 @@ export async function hsLiveKhoi(env: Env, p: string, b: Row, nay = Date.now()):
     if (!x || x.trangThai === 'hen' || !x.buoiId) return { ok: false, error: x ? 'Chưa tới giờ. Thầy mở phòng là em vào được.' : 'Không có live cho khối của em.' }
     const gio = new Date(nay).toISOString()
     // Thầy đã bỏ tên em khỏi buổi ⇒ giữ nguyên (không tự thêm lại); còn lại ⇒ có mặt.
-    await env.DB.prepare("INSERT INTO buoi_hoc_diem_danh (buoi_id, sbd, luc, cach, trang_thai, cap_nhat_luc) VALUES (?,?,?,'live','co_mat',?) ON CONFLICT(buoi_id, sbd) DO UPDATE SET trang_thai = CASE WHEN buoi_hoc_diem_danh.trang_thai = 'bo' THEN 'bo' ELSE 'co_mat' END, cap_nhat_luc = excluded.cap_nhat_luc")
+    // Ghi điểm danh và báo phòng SONG SONG (một đợt chờ); phòng báo xong em mới nhận vé ⇒ nối vào là đã có tên trong đội.
+    const ghiDd = env.DB.prepare("INSERT INTO buoi_hoc_diem_danh (buoi_id, sbd, luc, cach, trang_thai, cap_nhat_luc) VALUES (?,?,?,'live','co_mat',?) ON CONFLICT(buoi_id, sbd) DO UPDATE SET trang_thai = CASE WHEN buoi_hoc_diem_danh.trang_thai = 'bo' THEN 'bo' ELSE 'co_mat' END, cap_nhat_luc = excluded.cap_nhat_luc")
       .bind(x.buoiId, sbd, gio, gio).run()
-    await baoPhongVaoLop(env, x.buoiId, sbd)
+    await Promise.all([ghiDd, baoPhongVaoLop(env, x.buoiId, sbd)])
     return { ok: true, buoiId: x.buoiId, trangThai: x.trangThai }
   }
   return { ok: false, error: 'Không có lệnh này.' }

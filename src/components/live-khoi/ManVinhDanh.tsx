@@ -21,7 +21,9 @@ export default function ManVinhDanh({ ds, kj, toi, onDong }: { ds: readonly Nguo
   const sao = useMemo(() => saoBuoi(ds), [ds])
   useEffect(() => { const f = (e: KeyboardEvent) => { if (e.key === 'Escape' || e.key === 'Enter') onDong() }; window.addEventListener('keydown', f); return () => window.removeEventListener('keydown', f) }, [onDong])
   const nhat = hang.filter((x) => x.hang === 1), dau = nhat[0]
-  if (!dau) return <div className="vd" role="dialog" aria-modal="true" aria-label="Kết thúc buổi live"><div className="vd-than"><h2>Buổi live đã kết thúc</h2><button type="button" className="vd-nut" onClick={onDong}>Đóng</button></div></div>
+  const khongCo = !dau || dau.kj <= 0
+  useEffect(() => { if (khongCo) onDong() }, [khongCo, onDong])
+  if (khongCo) return null
   const hoa = nhat.length > 1, toiHang = toi ? hang.find((x) => x.doi === toi.doi) : null
   const toiThang = !!toiHang && toiHang.hang === 1
   const cao = Math.max(1, dau.kj)

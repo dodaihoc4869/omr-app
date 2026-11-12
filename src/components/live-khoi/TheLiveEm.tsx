@@ -3,6 +3,7 @@
 // Hỏi máy chủ: lúc gắn, khoảng 60 giây một lần khi tab đang hiện (qua nhip-ben-vung), ngay khi em quay lại tab, và ngay khi kênh đẩy phát sự kiện cửa sổ `ddh-live-khoi`.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { liveCuaEm, vaoLiveKhoi } from '../../lib/live-khoi/api'
+import { taiSanEm } from './tai-san'
 import { batNhipBenVung } from '../../lib/nhip-ben-vung'
 import type { LiveCuaEm } from '../../lib/live-khoi/kieu'
 import { chuConLai, chuGioLive } from './chu-gio'
@@ -51,6 +52,9 @@ export default function TheLiveEm({ token }: { token: string }) {
 
   // Đếm ngược chỉ chạy khi đang có lịch hẹn.
   const coHen = tt.trangThai === 'hen'
+  // Có buổi cho khối em (hẹn / phòng chờ / đang live) ⇒ tải sẵn mọi mảnh của live lúc máy rảnh: bấm «Tham gia» là vào ngay.
+  const coBuoi = tt.trangThai !== 'khong'
+  useEffect(() => { if (coBuoi) taiSanEm() }, [coBuoi])
   useEffect(() => {
     if (!coHen) return
     const h = window.setInterval(() => setNay(Date.now()), DEM_MS)
@@ -60,12 +64,15 @@ export default function TheLiveEm({ token }: { token: string }) {
   const thamGia = useCallback(async () => {
     if (dangGoi.current) return
     dangGoi.current = true; setDangVao(true); setLoi('')
+    // Màn phòng hiện NGAY lúc bấm (mảnh đã tải sẵn); máy chủ + phòng trả lời sau.
+    const baoVao = (co: boolean): void => { void import('./em-khoi').then((m) => m.baoDangVao(co)).catch(() => {}) }
+    baoVao(true)
     try {
       const r = await vaoLiveKhoi(token)
-      if (!r.ok) { setLoi(r.chu); return }
+      if (!r.ok) { baoVao(false); setLoi(r.chu); return }
       const m = await import('../bpu/gan-hs')
-      if (!m.moBpuHs(token, r.buoiId)) setLoi('Em đang làm bài thi. Nộp bài xong rồi bấm «Tham gia» nhé.')
-    } catch { setLoi('Chưa mở được màn live. Em kiểm tra mạng rồi thử lại.') } finally { dangGoi.current = false; setDangVao(false) }
+      if (!m.moBpuHs(token, r.buoiId)) { baoVao(false); setLoi('Em đang làm bài thi. Nộp bài xong rồi bấm «Tham gia» nhé.') }
+    } catch { baoVao(false); setLoi('Chưa mở được màn live. Em kiểm tra mạng rồi thử lại.') } finally { dangGoi.current = false; setDangVao(false) }
   }, [token])
 
   if (tt.trangThai === 'khong') return null

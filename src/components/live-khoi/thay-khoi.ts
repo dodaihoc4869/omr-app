@@ -8,6 +8,7 @@ import type { ViewBang } from '../../lib/bpu/phong'
 import { xongLiveKhoi } from '../../lib/live-khoi/api'
 import type { KenhLop, KhoiLive, LichLive, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
 import { layBangCuoi, layPhong, nghePhong, ngheTin } from '../bpu/cau-live'
+import './thay-khoi.css'
 
 const KHOA = 'ddh.gv.live-khoi'
 export interface PhienKhoi { id: string; khoi: KhoiLive; buoiId: string }
@@ -27,6 +28,10 @@ export function phienCua(buoiId: string): PhienKhoi | null { const p = phien ?? 
 
 // ── Kho nhỏ: bản xem mới nhất của bảng + kênh lớp ──
 let view: ViewBang | null = null
+/** Thầy vừa bấm «Mở phòng chờ»: khối đang mở ⇒ lớp nổi hiện NGAY («Đang mở phòng chờ…»), không chờ bảng nối phòng. Phòng trả bản xem có cờ khối / 15 giây ⇒ thôi. */
+let dangMo: number | null = null
+let henMo: ReturnType<typeof setTimeout> | undefined
+export const layDangMo = (): number | null => dangMo
 let ketQua: { ds: NguoiLop[]; kj: number[] } | null = null
 export const layKetQua = () => ketQua
 /** Thầy đóng màn vinh danh. */
@@ -34,6 +39,8 @@ export function dongVinhDanh(): void { ketQua = null; go() }
 export const layView = (): ViewBang | null => view
 const nghe = new Set<() => void>()
 const phatDoi = (): void => { for (const f of nghe) f() }
+function go(): void { goc?.unmount(); khung?.remove(); goc = null; khung = null }
+function datDangMo(k: number | null): void { clearTimeout(henMo); dangMo = k; if (k != null) henMo = setTimeout(() => { datDangMo(null); if (!view?.live?.khoi && !ketQua) go() }, 15_000); phatDoi() }
 const tai = new Map<LoaiTinLop, Set<(t: TinLop) => void>>()
 export const kenh: KenhLop = {
   gui: (k, x) => layPhong()?.gui({ t: 'lop', k, x }),
@@ -48,7 +55,7 @@ function soat(): void {
 function nhan(tin: unknown): void {
   const j = tin as { t?: string; k?: LoaiTinLop } | null
   if (!j || typeof j !== 'object' || tin instanceof ArrayBuffer) return
-  if (j.t === 'bang') { view = tin as ViewBang; soat(); gan(); phatDoi() }
+  if (j.t === 'bang') { view = tin as ViewBang; soat(); if (view.live?.khoi && dangMo != null) datDangMo(null); gan(); phatDoi() }
   else if (j.t === 'lop' && j.k) for (const f of tai.get(j.k) ?? []) { try { f(tin as TinLop) } catch { /* nơi nghe lỗi */ } }
 }
 let daNghe = false
@@ -61,21 +68,21 @@ function batNghe(): void {
   if (b) nhan(b)
 }
 function gan(): void {
-  if (khung || !view?.live?.khoi) return
+  if (khung || (!view?.live?.khoi && !dangMo)) return
   khung = document.createElement('div')
   khung.setAttribute('data-live-khoi-thay', '')
   document.body.appendChild(khung)
   const g = (goc = createRoot(khung))
   void import('./LopNoiThay').then((m) => { if (goc === g) g.render(createElement(m.default)) }).catch(() => {})
 }
-function go(): void { goc?.unmount(); khung?.remove(); goc = null; khung = null }
 
 /** Thầy bấm «Mở phòng chờ» / «Vào lại phòng» ở nút Live: nhớ phiên rồi mở bảng của buổi (bảng tự nối phòng; phòng nối xong ⇒ `soat` đặt cờ khối). */
 export async function moBangLiveKhoi(o: { lich: LichLive; buoiId: string; ma: string }): Promise<void> {
   ghiPhien({ id: o.lich.id, khoi: o.lich.khoi, buoiId: o.buoiId })
   batNghe()
+  if (!view?.live?.khoi) { datDangMo(o.lich.khoi); gan() }
   const m = await import('../bpu/gan-gv')
-  m.moBangDiemDanh({ buoiId: o.buoiId, ma: o.ma || undefined })
+  m.moBangDiemDanh({ buoiId: o.buoiId, live: true })
 }
 /** Bảng của một buổi vừa mở (kể cả sau tải lại trang) ⇒ bắt đầu nghe để dựng lớp nổi nếu đó là buổi live theo khối. */
 export function ngheBangKhoi(): void { batNghe() }
@@ -83,7 +90,8 @@ export function ngheBangKhoi(): void { batNghe() }
 export function khiKetThucBuoi(buoiId: string): void {
   const p = phienCua(buoiId), v = view
   // Buổi live theo khối ⇒ giữ lớp nổi để vinh danh đội thắng (kJ chốt lấy từ bản xem cuối); thầy đóng thì gỡ.
-  if (v?.live?.khoi && v.buoiId === buoiId && khung) { ketQua = { ds: v.ds.filter((e) => e.vao).map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, kj: e.kj })), kj: [0, 1, 2, 3].map((d) => v.ds.reduce((s, e) => s + (e.doi === d ? e.kj : 0), 0) + (v.doiThuong[d] ?? 0)) }; phatDoi() } else go()
+  const kjDoi = v ? [0, 1, 2, 3].map((d) => v.ds.reduce((s, e) => s + (e.vao && e.doi === d ? e.kj : 0), 0) + (v.doiThuong[d] ?? 0)) : []
+  if (v?.live?.khoi?.gd === 'dang' && v.buoiId === buoiId && khung && v.ds.some((e) => e.vao) && kjDoi.some((x) => x > 0)) { ketQua = { ds: v.ds.filter((e) => e.vao).map((e) => ({ sbd: e.sbd, ten: e.ten, doi: e.doi, kj: e.kj })), kj: kjDoi }; phatDoi() } else go()
   view = null
   if (!p) return
   ghiPhien(null)

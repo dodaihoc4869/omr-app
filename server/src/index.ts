@@ -3956,7 +3956,7 @@ const boXuLy = {
       // ĐIỂM DANH BUỔI HỌC (bảng DẠY HỌC của mục Lên bảng, 28/09 — server/src/buoi-hoc.ts): em chỉ điểm danh CHO MÌNH (SBD từ token), mã đổi mỗi 60 giây.
       if (p === '/hs/buoi-hoc') return ra(await hsBuoiHocDangMo(env, b))
       if (p === '/hs/diem-danh') return ra(await hsDiemDanhBao(env, b, ctx))
-      if (p.startsWith('/hs/bpu/')) return ra(await bpuHs(env, p, b))
+      if (p.startsWith('/hs/bpu/')) return ra(await bpuHs(env, p, b, ctx))
       // Vé kênh đẩy hai thiết bị (kenh-day.ts): kiểm chữ ký token, 0 lệnh D1.
       if (p === DUONG_VE_KENH) return ra(await kenhVe(env, b))
 
@@ -3967,7 +3967,7 @@ const boXuLy = {
 
       // Lệnh của THẦY — đòi mã bí mật.
       if (!laThay(req, env, b)) return ra({ ok: false, error: 'Sai mã bí mật' }, 403)
-      if (p.startsWith('/gv/bpu/')) return ra(await bpuGv(env, p, b))
+      if (p.startsWith('/gv/bpu/')) return ra(await bpuGv(env, p, b, ctx))
       if (p === '/anh/co') return anhCo(env, b)
       if (p === '/anh/day') return anhDay(env, b)
             if (p === '/teacher-news') return ra(await teacherNews(env,b))

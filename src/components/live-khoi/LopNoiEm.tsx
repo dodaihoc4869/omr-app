@@ -32,7 +32,8 @@ const mayYeu = (): boolean => { try { return localStorage.getItem('ddh.mayYeu') 
 export default function LopNoiEm() {
   const s = useSyncExternalStore(dangKy, layKho)
   const gd = s.khoi?.gd ?? null
-  const cho = gd === 'cho'
+  const dangVao = !s.khoi && !!s.dangVao && !s.xong
+  const cho = gd === 'cho' || dangVao
   const { xoay, style } = useXoay(!cho)
   const [bonDoi, setBonDoi] = useState<'chao' | 'xem' | null>(null)
   const [chatMo, setChatMo] = useState(false)
@@ -53,6 +54,7 @@ export default function LopNoiEm() {
   const chat = useChatLop(gd === 'dang' ? kenh : null)
   useEffect(() => { if (chatMo) chat.danhDauDoc() }, [chatMo, chat.ds.length]) // eslint-disable-line react-hooks/exhaustive-deps
   if (s.xong && s.toi) return <div className="lke xong" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}><Suspense fallback={null}><ManVinhDanh ds={s.ds} kj={s.kj} toi={s.toi} onDong={dongKhoi} /></Suspense></div>
+  if (dangVao) return <div className="lke cho dang-vao" data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }} role="status"><p><i aria-hidden="true" />Đang vào phòng live…</p></div>
   if (!s.khoi || !s.toi || (cho && roiCho)) return null
   return (
     <div className={`lke${cho ? ' cho' : ''}`} data-xoay={xoay ? '' : undefined} style={{ ...(MAU_XANH_THAN as CSSProperties), ...style }}>

@@ -5,7 +5,7 @@
 // 09/11 (thầy «trùng tu lại toàn bộ màn này»): MỘT gốc bảng cho cả điểm danh lẫn các lượt (`moBangDiemDanh` → «Xong điểm danh» → chọn câu ngay trên bảng
 // `chieuCau` ⇒ tờ chiếu dựng sẵn nằm dưới bảng); gọi lên bảng ⇒ bảng THU NHỎ vào tờ cũ, chấm Đạt / Chưa đạt ⇒ bảng PHÓNG LẠI.
 import { createRoot, type Root } from 'react-dom/client'
-import { buoiDangMo, type BuoiHoc } from '../../lib/buoi-hoc-api'
+import { buoiDangMo, laBuoiLive, type BuoiHoc } from '../../lib/buoi-hoc-api'
 import { useAppStore } from '../../store/appStore'
 import type { CauDayHoc } from '../../lib/day-hoc-len-bang'
 import BangBinhPhanUng from './BangBinhPhanUng'
@@ -60,6 +60,7 @@ async function layBuoi(tuDong: boolean): Promise<string | null> {
   // Tin TỰ ĐỘNG chỉ theo buổi mở trong 4 giờ gần nhất HOẶC buổi máy này đang xem hôm nay (bước Điểm danh nhớ `ddh.gv.buoi-xem`): thầy quên kết thúc
   // buổi sáng thì tối chiếu lớp khác KHÔNG đẩy câu xuống máy các em lớp sáng (đang ở nhà); buổi dài hơn 4 giờ mà thầy vẫn đang dạy thì vẫn chạy.
   const nho = buoiDangXem()
+  ds = ds.filter((b) => !laBuoiLive(b)) // buổi live theo khối có bảng riêng (mở từ nút Live), không nhận tin của tờ chiếu buổi trên lớp
   const id = (tuDong ? ds.find((b) => b.id === nho || Date.now() - Date.parse(b.moLuc) < GAN_DAY_MS)?.id : ds[0]?.id) ?? null
   if (!id && !tuDong) useAppStore.getState().showToast('Chưa có buổi điểm danh đang mở. Thầy mở Điểm danh trước, các em vào lớp bằng mã.', 'warn')
   return id
@@ -72,8 +73,11 @@ let henTu: ReturnType<typeof setTimeout> | null = null
 let tiepNgay = false
 /** Cho test: đổi thời gian chờ. */
 export function datChoTuDong(ms: number): void { choTuDongMs = ms }
+const QID_BANG = '@bang'
 type TuyChonMo = { giay?: number; tuDong?: boolean; nguon?: Window | null }
 export function moBangTuToChieu(qid: string, o: TuyChonMo = {}): Promise<void> {
+  // Tờ bảng trắng của live: chỉ ghi nhận cửa sổ tờ (để bật Live), không mở lượt.
+  if (qid === QID_BANG) { if (o.nguon) nguonTo = o.nguon; return Promise.resolve() }
   if (o.tuDong !== true) return moThat(qid, o)
   // Tờ VỪA MỞ (cửa sổ tờ mới) ⇒ vào thẳng Bình Phản Ứng gần như ngay (thầy 07/11 «bấm mở tờ chiếu load luôn vào bình phản ứng»);
   // mở lại đúng câu đang chạy thì bảng nối lại lượt cũ (BangBinhPhanUng), không đẻ lượt mới.
@@ -111,6 +115,7 @@ export function escRaHomNay(): boolean {
 // (lần đầu) hoặc khi đang live mà thầy bấm «Đang live» (cụm điều khiển — mic, «Bảng → máy em», «Tắt live» — nằm trên tờ). Esc / P đưa bảng về, live vẫn chạy.
 // Đang live mà bảng đang lui (thầy giảng trên tờ) ⇒ ẩn viền đỏ toàn màn «Rời màn hình» (bpu-bang.css) — tờ có thẻ gọn «N em rời màn» không che bảng.
 let liveTt = { co: false, bat: false }
+let phienLive = false
 let daTuBat = false
 /** LIVE THEO KHỐI (12/11): nút Live ở Hôm nay mở phòng chờ của khối — lớp nổi máy thầy nạp lười (src/components/live-khoi/thay-khoi.tsx). */
 export const moBangLiveKhoi = (o: { lich: LichLive; buoiId: string; ma: string }): Promise<void> => import('../live-khoi/thay-khoi').then((m) => m.moBangLiveKhoi(o))
@@ -139,6 +144,7 @@ function veBang(): void {
   if (!hien) return
   ngheEsc()
   if (!khung) { khung = document.createElement('div'); khung.setAttribute('data-bpu-bang', ''); document.body.appendChild(khung); goc = createRoot(khung) }
+  if (phienLive && !khung.hasAttribute('data-an')) { khung.setAttribute('data-an', ''); anHan(khung); baoAnHien(true) }
   cheTo(!tamAn && !bangAn()) // bảng ở trên (kể cả đang phóng lại — kín màn từ khung đầu) ⇒ tờ ẩn
   goc!.render(
     <BangBinhPhanUng
@@ -181,7 +187,7 @@ async function moThat(qid: string, o: TuyChonMo): Promise<void> {
   try { window.dispatchEvent(new CustomEvent('bpu-dang-chieu', { detail: { buoiId } })) } catch { /* trình duyệt cũ */ }
 }
 /** CHIẾU ĐIỂM DANH = MỞ MÀN Bình Phản Ứng (bước Điểm danh của app thầy). Bảng đang mở cho đúng buổi ⇒ chỉ cập nhật mã, giữ câu đang chiếu. */
-export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?: string | null; onDong?: () => void }): void {
+export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?: string | null; onDong?: () => void; live?: boolean }): void {
   dongNgoai = o.onDong ?? dongNgoai
   if (hien?.buoiId === o.buoiId && khung) {
     // Đang tạm ẩn (Esc ra Hôm nay) ⇒ hiện lại ĐÚNG chỗ dở (bảng / tờ / tấm như lúc ra). Đang hiện ⇒ chỉ cập nhật mã (em có thể đang trên bảng).
@@ -190,6 +196,7 @@ export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?:
     return
   }
   if (khung) { dongBang(); dongTo() } // buổi khác ⇒ đóng phiên cũ
+  phienLive = !!o.live
   // Mở mới ⇒ LUÔN màn điểm danh (thầy 09/11 «thoát ra hẳn thì không có chỗ vào lại màn điểm danh»), kể cả phòng còn lượt cũ; chọn câu ⇒ hết cờ.
   hien = { buoiId: o.buoiId, ma: o.ma, linkQr: o.linkQr, diemDanh: true }
   veBang()
@@ -200,7 +207,10 @@ export function moBangDiemDanh(o: { buoiId: string; ma?: string | null; linkQr?:
 // tấm (không gỡ — nối phòng, câu, em đang lên bảng giữ nguyên), thoát toàn màn hình, trả cuộn cho Hôm nay. Nút Điểm danh ⇒ `moBangDiemDanh` cùng buổi ⇒ hiện lại.
 /** Phiên Bình Phản Ứng đang có trên máy này (hiện hoặc tạm ẩn) — nút Điểm danh / Kết thúc ở Hôm nay đọc. */
 export function phienDangCo(): { buoiId: string; tamAn: boolean } | null { return hien && khung ? { buoiId: hien.buoiId, tamAn } : null }
-function phatPhien(): void { try { window.dispatchEvent(new CustomEvent('bpu-phien', { detail: phienDangCo() })) } catch { /* trình duyệt cũ */ } }
+/** Phiên đang có là buổi LIVE THEO KHỐI (thầy 12/11 «tách hẳn hai cái ra»): bảng Bình Phản Ứng vẫn gắn để giữ nối phòng + mở lượt cho câu tờ chiếu, nhưng
+ *  ẨN SUỐT BUỔI (không điểm danh, không màn đua) — mặt của buổi live là lớp nổi src/components/live-khoi (phòng chờ → chọn bài → tờ giảng). Nút «Lên bảng»
+ *  ở Hôm nay không sáng, không hiện «Kết thúc buổi». */
+function phatPhien(): void { try { window.dispatchEvent(new CustomEvent('bpu-phien', { detail: phienLive ? null : phienDangCo() })) } catch { /* trình duyệt cũ */ } }
 const caKhung = () => [khung, toKhung, hdKhung].filter((x): x is HTMLDivElement => !!x)
 const TEN_TO = 'Tờ chiếu Bình Phản Ứng'
 /** Mọi lớp phủ tờ chiếu đang có (KhungXemPhieu cổng thẳng vào body): tờ dựng từ bảng chọn câu + tờ của màn khác đang nối bảng. */
@@ -277,6 +287,25 @@ export function dongHoatDong(): void {
 // TỜ CHIẾU CỦA CÂU THẦY CHỌN TRÊN BẢNG: khung xem tờ (KhungXemPhieu, cùng khung bảng Dạy học dùng) nằm DƯỚI bảng. Tờ vào đợt ⇒ tự báo câu ⇒ bảng mở lượt.
 function dongTo(): void { toGoc?.unmount(); toGoc = null; toKhung?.remove(); toKhung = null; nguonTo = null; if (hien) veBang() }
 /** Dựng tờ từ câu đã chọn (câu bấm đứng đầu) rồi chiếu. Trả lời báo lỗi (rỗng = đã chiếu). */
+/** Gắn tờ chiếu (khung trong app) dưới bảng. */
+function ganTo(html: string, KhungXemPhieu: typeof import('../KhungXemPhieu').default): string {
+  if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
+  // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
+  // Che TRƯỚC khi khung tờ gắn vào trang ⇒ khung đầu tiên của tờ (cả dải xám 48 px trên cùng) đã ẩn.
+  if (khung && !bangAn() && !tamAn) cheTo(true)
+  toGoc!.render(<KhungXemPhieu html={html} ten={TEN_TO} dong={() => (khung ? tamAnTatCa() : dongTo())} />)
+  requestAnimationFrame(() => { if (khung && !bangAn()) khung.querySelector<HTMLElement>('.bpu-bang')?.focus() })
+  return ''
+}
+/** LIVE THEO KHỐI — chế độ «Bảng» khi chưa chọn bài (thầy 12/11): tờ BẢNG TRẮNG (không câu, mã `@bang` ⇒ không mở lượt, không gửi gì xuống máy em) để thầy
+ *  có bút + bảng + nút Live ngay. Trả câu báo lỗi (rỗng = đã có tờ). */
+export async function chieuBangTrang(): Promise<string> {
+  try {
+    const [{ taoHtmlMayChieu }, { default: KhungXemPhieu }] = await Promise.all([import('../../lib/html-may-chieu'), import('../KhungXemPhieu')])
+    const cau = { phan: 'I', id: QID_BANG, maDe: '', chuyenDe: '', dang: '', sao: 1, mucDo: '', text: '', luaChon: [], dapAn: '', chot: '', lyDo: [] }
+    return ganTo(taoHtmlMayChieu([{ sbd: '', hoTen: 'Cả lớp', qid: QID_BANG, soCau: 1, sao: 1, bacUoc: 1, cau }] as never, { tenBuoi: 'Live · Bảng', nutAiSai: false } as never), KhungXemPhieu)
+  } catch (e) { return e instanceof Error ? e.message : 'Chưa dựng được bảng.' }
+}
 export async function chieuCau(ds: CauDayHoc[], moi = false): Promise<string> {
   if (!ds.length) return 'Chưa chọn câu nào.'
   let html = ''
@@ -290,13 +319,7 @@ export async function chieuCau(ds: CauDayHoc[], moi = false): Promise<string> {
   // 10/11 thầy «chọn câu khác ⇒ bắt đầu lượt mới và xoá lượt câu cũ»: đang có lượt ⇒ lượt mới của câu này bỏ lượt dở (máy chủ giữ lượt đã mở đáp án).
   // `moi` (bảng báo): phòng có lượt câu này đã mở đáp án ⇒ hỏi lại cả lớp (lượt mới), không nối lại màn mở đáp án cũ.
   boQid = hien?.qid || moi ? ds[0]!.qid : ''
-  if (!toKhung) { toKhung = document.createElement('div'); toKhung.setAttribute('data-bpu-to', ''); document.body.appendChild(toKhung); toGoc = createRoot(toKhung) }
-  // Tờ nạp NGẦM dưới bảng, ẩn hẳn (html[data-bpu-che-to]) ⇒ chọn câu xong hiện ngay màn đua, không lộ tờ (thầy 10/11). Tiêu điểm giữ ở bảng (phím C L →).
-  // Che TRƯỚC khi khung tờ gắn vào trang ⇒ khung đầu tiên của tờ (cả dải xám 48 px trên cùng) đã ẩn.
-  if (khung && !bangAn() && !tamAn) cheTo(true)
-  toGoc!.render(<KhungXemPhieu html={html} ten={TEN_TO} dong={() => (khung ? tamAnTatCa() : dongTo())} />)
-  requestAnimationFrame(() => { if (khung && !bangAn()) khung.querySelector<HTMLElement>('.bpu-bang')?.focus() })
-  return ''
+  return ganTo(html, KhungXemPhieu)
 }
 /** Phím G trên bảng: đóng bảng, tờ mở lời giải thu gọn của câu đang chiếu (bảng che tờ nên phím không tới được tờ). */
 export function giaiTrenTo(): void {
@@ -374,7 +397,7 @@ function anBang(): void {
 }
 function hienBang(): void {
   const el = khung
-  if (!el || !el.hasAttribute('data-an')) return
+  if (!el || !el.hasAttribute('data-an') || phienLive) return
   el.removeAttribute('data-an')
   anViLive = false
   capLiveGon()
