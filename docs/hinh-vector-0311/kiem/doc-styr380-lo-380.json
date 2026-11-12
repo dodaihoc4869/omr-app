@@ -1,0 +1,391 @@
+{
+  "i": 156,
+  "assetIndexProvided": 1299,
+  "hash": "1af1be957b722838d1ab3538bc4b4da295b551d576fa0becb59a89fe1393de8c",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/1af1be957b722838d1ab3538bc4b4da295b551d576fa0becb59a89fe1393de8c.png",
+  "size": [
+    700,
+    172
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-HC11-D2-III-5",
+      "de": "Một nhà máy sản xuất styrene từ benzene và ethylene qua hai giai đoạn theo sơ đồ chuyển hóa như hình. Biết hiệu suất các giai đoạn lần lượt là 90% và h%.\nTrong một mẻ sản xuất, nhà máy sử dụng 1,6 tấn benzene và lượng dư ethylene. Sau khi kết thúc quá trình, người ta thu được 1,5 tấn styrene. Giá trị của h bằng bao nhiêu? (Không làm tròn kết quả các phép tính trung gian, chỉ làm tròn kết quả cuối cùng đến hàng phần mười).",
+      "allHinh": [
+        {
+          "hash": "1af1be957b722838d1ab3538bc4b4da295b551d576fa0becb59a89fe1393de8c",
+          "where": "VIP27-C1-HC11-D2-III-5.hinh.0.du_lieu",
+          "hashDataUrl": "9b1b4cf30d2d6c05cf0e5415a22750ab1eb3f1250a7228a08d5ec452938d4eba"
+        }
+      ],
+      "missingHashes": [
+        "1af1be957b722838d1ab3538bc4b4da295b551d576fa0becb59a89fe1393de8c"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownEachThreeRings5xOpened": true,
+    "ownArrows5xOpened": true,
+    "ownEthylGlyph8xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Eachringindependentlyopened/nativepixelcoordinateapproxnearest1px,noaffinetranslation/uniformnormalize. Subscripts/headshapes/literalspacesreadmacros. No productyieldanswerinference.",
+  "geometry": {
+    "rings": [
+      {
+        "vertices": [
+          [
+            28,
+            82
+          ],
+          [
+            65,
+            60
+          ],
+          [
+            103,
+            82
+          ],
+          [
+            103,
+            125
+          ],
+          [
+            65,
+            146.5
+          ],
+          [
+            28,
+            125
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              33,
+              87
+            ],
+            [
+              33,
+              121
+            ]
+          ],
+          [
+            [
+              66,
+              67
+            ],
+            [
+              97,
+              85
+            ]
+          ],
+          [
+            [
+              66,
+              139
+            ],
+            [
+              97,
+              121
+            ]
+          ]
+        ],
+        "bareC": 6
+      },
+      {
+        "vertices": [
+          [
+            311,
+            94
+          ],
+          [
+            348,
+            72
+          ],
+          [
+            386,
+            94
+          ],
+          [
+            386,
+            137
+          ],
+          [
+            348,
+            158.5
+          ],
+          [
+            311,
+            137
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              316,
+              99
+            ],
+            [
+              316,
+              133
+            ]
+          ],
+          [
+            [
+              349,
+              79
+            ],
+            [
+              380,
+              97
+            ]
+          ],
+          [
+            [
+              349,
+              151
+            ],
+            [
+              380,
+              133
+            ]
+          ]
+        ],
+        "bareC": 6
+      },
+      {
+        "vertices": [
+          [
+            581,
+            89
+          ],
+          [
+            618,
+            67
+          ],
+          [
+            656,
+            89
+          ],
+          [
+            656,
+            132
+          ],
+          [
+            618,
+            153.5
+          ],
+          [
+            581,
+            132
+          ]
+        ],
+        "innerDoubleRays": [
+          [
+            [
+              586,
+              94
+            ],
+            [
+              586,
+              128
+            ]
+          ],
+          [
+            [
+              619,
+              74
+            ],
+            [
+              650,
+              92
+            ]
+          ],
+          [
+            [
+              619,
+              146
+            ],
+            [
+              650,
+              128
+            ]
+          ]
+        ],
+        "bareC": 6
+      }
+    ],
+    "ethylBranch": {
+      "text": "CH₂ - CH₃",
+      "bbox": [
+        342,
+        22,
+        416,
+        39
+      ],
+      "bond": [
+        [
+          348,
+          72
+        ],
+        [
+          348,
+          38
+        ]
+      ],
+      "anchor": "FIRSTCcenter348,NOTH/sub2/hyphen",
+      "note": "Nativehyphenwithvisiblegapsonbothsides; doNOTremovethespacesascondensedCH2CH3."
+    },
+    "vinylBranch": {
+      "text": "CH = CH₂",
+      "bbox": [
+        612,
+        17,
+        683,
+        34
+      ],
+      "bond": [
+        [
+          618,
+          67
+        ],
+        [
+          618,
+          33
+        ]
+      ],
+      "anchor": "FIRSTCcenter618",
+      "note": "Equalsliteral2parallelshortstrokes, noexpandedvinylvertices."
+    },
+    "arrows": [
+      {
+        "shaft": [
+          [
+            141,
+            113
+          ],
+          [
+            290,
+            113
+          ]
+        ],
+        "filledTriangle": [
+          [
+            290,
+            113
+          ],
+          [
+            276,
+            108
+          ],
+          [
+            276,
+            118
+          ]
+        ],
+        "above": {
+          "text": "+ CH₂ = CH₂",
+          "bbox": [
+            154,
+            89,
+            255,
+            108
+          ]
+        },
+        "below": {
+          "text": "xt, tᵒ",
+          "bbox": [
+            197,
+            122,
+            235,
+            138
+          ]
+        }
+      },
+      {
+        "shaft": [
+          [
+            406,
+            112
+          ],
+          [
+            562,
+            112
+          ]
+        ],
+        "filledTriangle": [
+          [
+            562,
+            112
+          ],
+          [
+            549,
+            107
+          ],
+          [
+            549,
+            117
+          ]
+        ],
+        "above": {
+          "text": "xt, tᵒ",
+          "bbox": [
+            462,
+            90,
+            497,
+            106
+          ]
+        },
+        "below": {
+          "text": "- H₂",
+          "bbox": [
+            464,
+            119,
+            496,
+            138
+          ]
+        }
+      }
+    ],
+    "font": "ALLregularuprightsansblackgray, noactualbold/italic. CH2/3digitsSUB;smallroundoSUPaftert;minus/hyphenliteral.",
+    "countsKnown": {
+      "structuralC": 22,
+      "ringBareC": 18,
+      "ethylTextC": 2,
+      "vinylTextC": 2,
+      "phenylRings": 3,
+      "innerCCdouble": 9,
+      "condensedVinylDouble": 1,
+      "filledHeads": 2,
+      "captions": 0
+    },
+    "noAdded": [
+      "alias845",
+      "ringcircles",
+      "conditionsp",
+      "H2coefficient",
+      "yield90%fromstem",
+      "stereo",
+      "styrenename",
+      "captionAB",
+      "answer"
+    ]
+  },
+  "actualSvgReviewed": true,
+  "status": "Finalef5c4 independently passed",
+  "rootNativeFull3xAllPublicDeAndFreshActualFull3xThreeMacrosOpened": {
+    "hashSvg": "ef5c4ee5fc4e9b019088fceaf3fd60d979af9d58f9f5b01959e5e7444dd6e8ff",
+    "bytes": 17369,
+    "full": "/workspace/scratch/root380-156.png",
+    "note": "3rings9innerCCdouble; FIRSTC348/618; 2FILLEDheads; allregularUPRIGHT/sub23/smallSUPo; nativegapsspaces-hyphen-equals maintained, no90percent/h/name/addedp/captions/answer. NativecoordinatesapproxNOTsubpixel."
+  },
+  "readonlyFinalRuntime": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/styr380-native-ddh-ef5c4ee5fc4e9b019088fceaf3fd60d979af9d58f9f5b01959e5e7444dd6e8ff.svg ef5c4ee5fc4e9b019088fceaf3fd60d979af9d58f9f5b01959e5e7444dd6e8ff\n156 { x: 0, y: 0, width: 700, height: 172 }\n"
+}
