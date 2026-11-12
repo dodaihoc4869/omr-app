@@ -13,7 +13,7 @@ CREATE INDEX IF NOT EXISTS idx_ca_bao_ve ON ca(ma_ca) WHERE trang_thai<>'da_xoa'
 --     Cron mỗi 10 phút chép lại (`lamMoiTenDoiTuongChung`); chưa có dòng ⇒ đọc sqlite_master như cũ (không chép ở đây: D1 giả của test dựng bảng sau migration).
 CREATE TABLE IF NOT EXISTS ddl_ten_chung (id INTEGER PRIMARY KEY CHECK (id = 1), ten_json TEXT NOT NULL, luc INTEGER NOT NULL);
 
--- (11)(7)(9)(12)(1) DẤU BẢNG do TRIGGER giữ (server/src/dau-bang.ts): đọc «bảng X đã đổi chưa» = MỘT hàng theo khoá chính, thay cho COUNT(*)/MAX(...) quét cả bảng
+-- (11)(9)(12)(1) DẤU BẢNG do TRIGGER giữ (server/src/dau-bang.ts): đọc «bảng X đã đổi chưa» = MỘT hàng theo khoá chính, thay cho COUNT(*)/MAX(...) quét cả bảng
 --     (dấu kho `COUNT(*)||'|'||MAX(indexed_at)` đọc mọi dòng game_v2_index; vân tay Hành trình đọc cả cau_hoi + chien_dich: 11.604 hàng/lượt).
 --  · game_v2_index: dấu = ĐÚNG chuỗi cũ `COUNT(*)||'|'||COALESCE(MAX(indexed_at),'')`, tính lại trong trigger (bảng nhỏ, chỉ ghi khi lập chỉ mục tờ) ⇒ mọi nơi
 --    so dấu kho / dauTruocLucDoc / kho_chup giữ nguyên giá trị.
@@ -37,5 +37,5 @@ CREATE TRIGGER IF NOT EXISTS dau_bang_cd_xoa AFTER DELETE ON chien_dich BEGIN UP
 INSERT OR REPLACE INTO dau_bang (ten, dau) SELECT 'game_v2_index', COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index;
 INSERT OR IGNORE INTO dau_bang (ten, dau) SELECT x.value, CAST(CAST(strftime('%s','now') AS INTEGER) * 1000 AS TEXT) FROM json_each('["cau_hoi","chien_dich","omni_q","omni_beta_cau"]') x;
 
--- (9)(1)(12)(7) BẢN TÍNH SẴN DÙNG CHUNG (server/src/bang-tinh-chung.ts): kết quả thô của câu đọc kho, một dòng mỗi (câu, tham số), gắn dấu các bảng nguồn ở trên.
+-- (9)(1)(12) BẢN TÍNH SẴN DÙNG CHUNG (server/src/bang-tinh-chung.ts): kết quả thô của câu đọc kho, một dòng mỗi (câu, tham số), gắn dấu các bảng nguồn ở trên.
 CREATE TABLE IF NOT EXISTS bang_tinh_chung (khoa TEXT PRIMARY KEY, dau TEXT NOT NULL, json TEXT NOT NULL, luc INTEGER NOT NULL);
