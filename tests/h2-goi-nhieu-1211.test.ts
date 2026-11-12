@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { caDangBaoVe } from '../server/src/game-v2-bank'
+import { chayDdlMotLan, lamMoiTenDoiTuongChung, SQL_TEN_DOI_TUONG, SQL_TEN_DOI_TUONG_CU } from '../server/src/ddl-mot-lan'
 import type { Env } from '../server/src/kieu'
 
 type Row = Record<string, unknown>
@@ -70,5 +71,64 @@ describe('(2)(3) bảng ca — chỉ mục trạng thái + chỉ mục bộ ph�
       const k = keHoach(d.sql, q)
       expect(k.some((x) => /^SEARCH ca USING COVERING INDEX idx_ca_trang_thai \(trang_thai=\?\)/.test(x)), `${q}\n${k.join('\n')}`).toBe(true)
     }
+  })
+})
+
+// ---------------------------------------------------------------- (4) tên đối tượng lược đồ — bản sao dùng chung
+describe('(4) ddl-mot-lan: danh sách tên đối tượng dùng chung (ddl_ten_chung) thay cho đọc sqlite_master mỗi isolate', () => {
+  const LENH = ['CREATE TABLE IF NOT EXISTS h2_thu (id TEXT PRIMARY KEY, x TEXT)', 'CREATE INDEX IF NOT EXISTS idx_h2_thu_x ON h2_thu(x)']
+  /** Isolate mới = D1 gốc mới (đối tượng khác) trên cùng dữ liệu; đếm lô ghi + câu đọc. */
+  const isolate = (d: ReturnType<typeof taoD1That>) => {
+    const goc = d.env.DB as unknown as { prepare(q: string): unknown; batch(x: unknown[]): unknown }
+    const dem = { lo: 0, doc: [] as string[] }
+    const env = { ...d.env, DB: { prepare: (q: string) => { dem.doc.push(q); return goc.prepare(q) }, batch: (x: unknown[]) => { dem.lo++; return goc.batch(x) } } } as unknown as Env
+    return { env, dem }
+  }
+  it('chưa có dòng chép ⇒ tên đọc từ sqlite_master (MỘT câu, như cũ); có dòng chép ⇒ dùng bản chép; bảng đã có ⇒ không lô ghi', async () => {
+    const d = taoD1That()
+    const a = isolate(d)
+    await chayDdlMotLan(a.env, 'h2_thu', LENH)
+    expect(a.dem.lo).toBe(1) // bảng chưa có ⇒ một lô tạo
+    expect(a.dem.doc.filter((q) => q === SQL_TEN_DOI_TUONG)).toHaveLength(1)
+    // isolate mới, chưa có bản chép ⇒ nhánh sqlite_master thấy bảng ⇒ không lô
+    const b = isolate(d)
+    await chayDdlMotLan(b.env, 'h2_thu', LENH)
+    expect(b.dem.lo).toBe(0)
+    expect(b.dem.doc).toEqual([SQL_TEN_DOI_TUONG])
+    // cron chép ⇒ bản chép đủ tên; câu đọc trả MỘT dòng (k = 1), nhánh sqlite_master không trả gì
+    expect(await lamMoiTenDoiTuongChung(d.env, 1)).toBe(true)
+    const r = d.sql.prepare(SQL_TEN_DOI_TUONG).all() as { k: number; t: string }[]
+    expect(r).toHaveLength(1)
+    expect(r[0]!.k).toBe(1)
+    const ten = new Set(JSON.parse(r[0]!.t) as string[])
+    const that = new Set((d.sql.prepare(SQL_TEN_DOI_TUONG_CU).all() as { name: string }[]).map((x) => x.name))
+    expect(ten).toEqual(that)
+    const c = isolate(d)
+    await chayDdlMotLan(c.env, 'h2_thu', LENH)
+    expect(c.dem.lo).toBe(0)
+    // bản chép CŨ thiếu tên mới (bảng tạo sau lần chép) ⇒ chạy lô IF NOT EXISTS như trước 31/10 (vô hại), lần chép sau có tên
+    const LENH2 = ['CREATE TABLE IF NOT EXISTS h2_thu_2 (id TEXT PRIMARY KEY)']
+    d.sql.exec(LENH2[0]!)
+    const e = isolate(d)
+    await chayDdlMotLan(e.env, 'h2_thu_2', LENH2)
+    expect(e.dem.lo).toBe(1)
+    await lamMoiTenDoiTuongChung(d.env, 2)
+    const f = isolate(d)
+    await chayDdlMotLan(f.env, 'h2_thu_2', LENH2)
+    expect(f.dem.lo).toBe(0)
+  })
+  it('EXPLAIN: nhánh sqlite_master bị chặn bằng LIMIT khi có dòng chép (đo miniflare 663 → 2 hàng); bảng chép chưa có ⇒ lùi câu cũ, cron tự tạo bảng', async () => {
+    const d = taoD1That()
+    const kh = keHoach(d.sql, SQL_TEN_DOI_TUONG)
+    expect(kh.filter((x) => /^SEARCH ddl_ten_chung USING INTEGER PRIMARY KEY/.test(x)).length, kh.join('\n')).toBeGreaterThanOrEqual(2)
+    d.sql.exec('DROP TABLE ddl_ten_chung')
+    const a = isolate(d)
+    await chayDdlMotLan(a.env, 'h2_thu', LENH)
+    expect(a.dem.doc.slice(0, 2)).toEqual([SQL_TEN_DOI_TUONG, SQL_TEN_DOI_TUONG_CU])
+    const b = isolate(d)
+    await chayDdlMotLan(b.env, 'h2_thu', LENH)
+    expect(b.dem.lo).toBe(0)
+    expect(await lamMoiTenDoiTuongChung(d.env, 3)).toBe(true)
+    expect((d.sql.prepare(SQL_TEN_DOI_TUONG).all() as { k: number }[]).map((x) => x.k)).toEqual([1])
   })
 })

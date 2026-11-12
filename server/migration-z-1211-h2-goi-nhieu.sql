@@ -8,3 +8,7 @@ CREATE INDEX IF NOT EXISTS idx_ca_trang_thai ON ca(trang_thai);
 -- (3) caDangBaoVe (game-v2-bank.ts, 371 nghìn lượt × 41 hàng): chỉ mục BỘ PHẬN chỉ chứa ca CÓ THỂ còn bảo vệ đề — bỏ ca đã xoá và ca ĐÃ ĐÓNG đã công bố
 --     (cong_bo ngay / ca_lop_xong — đúng nhánh `released` của bộ lọc JS, ca đóng thì canStillTest=false). Câu SQL chép NGUYÊN VĂN hai điều kiện này.
 CREATE INDEX IF NOT EXISTS idx_ca_bao_ve ON ca(ma_ca) WHERE trang_thai<>'da_xoa' AND (trang_thai<>'dong' OR COALESCE(cong_bo,'') NOT IN ('ngay','ca_lop_xong'));
+
+-- (4) ddl-mot-lan.ts: bản sao DÙNG CHUNG danh sách tên đối tượng lược đồ (một dòng) — thay cho mỗi isolate mới đọc cả sqlite_master (~760 hàng).
+--     Cron mỗi 10 phút chép lại (`lamMoiTenDoiTuongChung`); chưa có dòng ⇒ đọc sqlite_master như cũ (không chép ở đây: D1 giả của test dựng bảng sau migration).
+CREATE TABLE IF NOT EXISTS ddl_ten_chung (id INTEGER PRIMARY KEY CHECK (id = 1), ten_json TEXT NOT NULL, luc INTEGER NOT NULL);
