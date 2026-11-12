@@ -96,6 +96,9 @@ export const kenh: KenhLop = {
 }
 /** Đàm thoại hai chiều (giơ tay ⇒ thầy mời ⇒ em bật mic): lệnh của thầy tới phòng — luật có sẵn ở phong-live.ts (`liveMoi`, `liveHaTay`, `liveThu`). */
 export const lenhMic = (t: 'live-moi' | 'live-ha-tay' | 'live-thu-mic', sbd?: string): void => layPhong()?.gui(sbd ? { t, sbd } : { t })
+/** Luật «rời màn N lần ⇒ bị mời ra» (13/11): bật / tắt + số lần; thầy «Duyệt» / «Từ chối» em xin vào lại. */
+export const datLuat = (bat: boolean, n: number): void => layPhong()?.gui({ t: 'live-dat', luat: { bat, n } })
+export const duyetLuat = (sbd: string, ok: boolean): void => layPhong()?.gui({ t: 'live-luat-duyet', sbd, ok })
 export const datKhoi = (k: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' }): void => layPhong()?.gui({ t: 'live-dat', khoi: k })
 // TỰ BẬT TIẾNG (thầy 12/11): buổi đã «Bắt đầu live» (`gd = dang`) mà phòng chưa ghi nhận live ⇒ bật qua phần live máy thầy (thay-noi.ts), thử lại mỗi
 // 2 giây tới khi phòng báo `bat` (tối đa 8 lần). Đã bật được MỘT lần trong buổi ⇒ thôi tự bật (thầy tự «Kết thúc live» / «Tạm dừng» trên tờ được tôn trọng).

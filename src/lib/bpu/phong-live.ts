@@ -6,6 +6,7 @@
 // ĐỢT 2 (11/11, đặc tả 4.8 — đàm thoại hai chiều): hàng giơ tay `tay`, lời mời `moi` (MỘT em), em không bật được mic `micLoi`, nhật ký `nk` (ai giơ tay,
 // được mời, nói từ giờ nào tới giờ nào, bị thu mic — phòng rút ra kho của Durable Object, KHÔNG D1), bố cục giấy đề của thầy `giay` (máy em soi đúng giấy).
 import type { TrangThaiPhong } from './phong'
+import { biCam, biMoiRa, luatKhiTat, type LuatPhong, type SuKienLuat } from './phong-luat'
 
 /** Phiên SFU của thầy cho máy em kéo về: `id` = mã phiên, `tieng` = tên track tiếng, `kenh` = tên DataChannel điểm đang viết (null ⇒ điểm đi WebSocket). Không phải bí mật. */
 export interface PhienSfuThay { id: string; tieng: string | null; kenh: string | null }
@@ -76,6 +77,12 @@ export interface LivePhong {
   /** LIVE THEO KHỐI (12/11, docs/dac-ta-live-moi-1211.md): buổi này là live cho cả khối `k`; `gd` = `cho` (phòng chờ, em chơi Sinh Tồn) | `dang` (thầy đã bấm
    *  Bắt đầu); `che` = `hoc` (màn live như cũ) | `bang` (bảng kín màn máy em). Thầy đặt bằng `live-dat { khoi }`. Vắng ⇒ buổi trên lớp như trước. */
   khoi?: KhoiPhong | null
+  /** Luật «rời màn N lần ⇒ bị mời ra khỏi lớp» (13/11, `phong-luat.ts`). Vắng / null = tắt. */
+  luat?: LuatPhong | null
+  /** Em thầy đã TỪ CHỐI cho vào lại (số báo danh ⇒ giờ): cấm tới hết buổi live, kể cả khi thầy tắt luật. */
+  camLive?: Record<string, number>
+  /** Việc của luật rời màn chờ máy chủ ghi sổ cho văn phòng (phòng lấy ra ở mỗi lần lưu). */
+  choGhi?: SuKienLuat[]
   /** Bố cục giấy đề thầy đang chiếu (máy thầy gửi qua `live-dat { giay }`). */
   giay?: GiayThay | null
   /** TẠM DỪNG (thầy 11/11 «cần thêm nút tạm dừng live»): live vẫn `bat`, phiên SFU giữ nguyên; máy thầy tắt tiếng + ngừng gửi nét, máy em hiện «Thầy tạm dừng live».
@@ -192,6 +199,7 @@ export function liveTat(st: TrangThaiPhong, nay: number): boolean {
   const l = st.live
   if (!l || !l.bat) return false
   l.bat = false; l.tu = null; l.bang = false
+  luatKhiTat(st)
   thuMic(l, nay, 'tat'); donDamThoai(l)
   st.capNhat = nay
   return true
@@ -408,7 +416,7 @@ export const liveHetHan = (st: TrangThaiPhong, nay: number): boolean => !!st.liv
 /** AI XEM ĐƯỢC (mục 4.9): em đã vào phòng buổi học; em thuộc lớp CHƯA điểm danh chỉ khi thầy bật «cho em ở xa»; em lạ không bao giờ. */
 export function duocXemLive(st: TrangThaiPhong, sbd: string): boolean {
   const l = liveMo(st), e = st.ds.find((x) => x.sbd === sbd)
-  return !!l && !!e && (e.vao || l.xa)
+  return !!l && !!e && (e.vao || l.xa) && !biMoiRa(st, sbd) // em bị mời ra (luật rời màn) không còn được xem live
 }
 /** Em ở xa đang xem live (thuộc lớp, chưa điểm danh, thầy bật «cho em ở xa») — rời màn chỉ bị cảnh báo tên, không trừ kJ (điểm quyết 2). */
 export function laEmXaDangLive(st: TrangThaiPhong, sbd: string): boolean {
@@ -448,7 +456,7 @@ function viewNoi(st: TrangThaiPhong, l: LivePhong): { sbd: string; ten: string; 
 export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
   const l = liveCua(st)
   if (!l || !l.cho) return null
-  const e = st.ds.find((x) => x.sbd === sbd), duoc = !st.ketThuc && !!e && (e.vao || l.xa)
+  const ra = biMoiRa(st, sbd), e = st.ds.find((x) => x.sbd === sbd), duoc = !st.ketThuc && !!e && (e.vao || l.xa) && !ra
   const hang = l.tay.findIndex((x) => x.sbd === sbd)
   // Điểm quyết 3 (thầy 11/11 lần 4): em trong lớp mặc định BẬT tiếng; thầy chọn «Em ở xa» (`tiengLop: false`) ⇒ tắt, em đeo tai nghe tự bật lại được. Em ở xa luôn bật.
   const tieng: TiengLive = !l.sfu ? 'chua-cau-hinh' : e?.vao && !l.tiengLop ? 'tat' : 'bat'
@@ -457,7 +465,7 @@ export function viewLiveEm(st: TrangThaiPhong, sbd: string) {
     /** Máy em có hiện BẢNG LIVE không (false ⇒ giữ màn câu hỏi bình thường, tiếng vẫn chạy khi `bat`). Em Ở XA không có màn câu hỏi ⇒ luôn xem bảng khi live. */
     bang: duoc && l.bat && (!!l.bang || !e!.vao || l.khoi?.che === 'bang'),
     /** Live theo khối: giai đoạn + chế độ (máy em: phòng chờ / màn bốn đội / bảng kín màn). Chỉ có ở buổi live theo khối. */
-    ...(duoc && l.khoi ? { khoi: l.khoi } : {}),
+    ...((duoc || (ra && !biCam(st, sbd))) && l.khoi ? { khoi: l.khoi } : {}), // em bị mời ra (đang chờ thầy quyết) vẫn nhận cờ khối để lớp nổi hiện màn «bị mời ra»; em bị từ chối thì không
     /** Thầy đang TẠM DỪNG live ⇒ máy em hiện «Thầy tạm dừng live» (tiếng và nét ngừng tới, phiên giữ nguyên). */
     nghi: duoc && l.bat && !!l.nghi,
     /** Em Ở XA (thuộc lớp, chưa điểm danh, thầy bật «Cho em ở xa vào xem»): không đội, không kJ — khay ẩn dòng đội. */

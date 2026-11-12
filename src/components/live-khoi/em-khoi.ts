@@ -8,8 +8,9 @@
 import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import type { KenhLop, LoaiTinLop, NguoiLop, TinLop } from '../../lib/live-khoi/kieu'
+import type { LuatEm } from '../../lib/bpu/phong-luat'
 
-export interface KhoEm { /** Phòng đang có lượt câu (em làm bài / thầy chữa) ⇒ ẩn nút nhắn tin và ngọn lửa cho khỏi vướng. */ coLuot?: boolean; /** Em vừa bấm «Tham gia»: hiện màn phòng NGAY, chờ phòng trả bản xem. */ dangVao?: boolean; /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
+export interface KhoEm { /** Luật «rời màn N lần ⇒ bị mời ra» của buổi, phần của CHÍNH em (null = luật tắt). */ luat?: LuatEm | null; /** Phòng đang có lượt câu (em làm bài / thầy chữa) ⇒ ẩn nút nhắn tin và ngọn lửa cho khỏi vướng. */ coLuot?: boolean; /** Em vừa bấm «Tham gia»: hiện màn phòng NGAY, chờ phòng trả bản xem. */ dangVao?: boolean; /** Thầy vừa kết thúc buổi live ⇒ màn vinh danh (tới khi em đóng). */ xong?: boolean; khoi: { k: number; gd: 'cho' | 'dang'; che: 'hoc' | 'bang' | 'sanh' } | null; toi: NguoiLop | null; ds: NguoiLop[]; kj: number[]; noi: boolean }
 let kho: KhoEm = { khoi: null, toi: null, ds: [], kj: [0, 0, 0, 0], noi: false }
 let ws: WebSocket | null = null
 let goc: Root | null = null
@@ -32,6 +33,16 @@ function gan(): void {
 }
 function go(): void { goc?.unmount(); khung?.remove(); goc = null; khung = null }
 
+/** Thầy vừa TỪ CHỐI cho em vào lại (luật rời màn): lớp nổi live gỡ, màn Bình Phản Ứng tự ẩn ⇒ em về Hôm nay; báo MỘT dòng 6 giây để em biết vì sao. */
+function baoBiTuChoi(): void {
+  if (typeof document === 'undefined') return
+  const b = document.createElement('div')
+  b.setAttribute('role', 'alert'); b.setAttribute('data-luat-roi', 'cam')
+  b.textContent = 'Thầy không duyệt cho em vào lại. Em không vào được buổi live này nữa. Đã gửi thông báo cho phụ huynh.'
+  b.style.cssText = 'position:fixed;left:50%;top:max(14px,env(safe-area-inset-top));transform:translateX(-50%);z-index:2147483640;max-width:min(92vw,520px);padding:11px 16px;border-radius:14px;background:var(--tr-chu,CanvasText);color:var(--tr-nen,Canvas);font-weight:700;font-size:14.5px;line-height:1.4;box-shadow:0 12px 36px color-mix(in srgb, var(--p-muc) 35%, transparent);text-align:center'
+  document.body.appendChild(b)
+  setTimeout(() => b.remove(), 6000)
+}
 /** Đọc tin chữ của phòng: bản xem của em (`t: 'em'`), danh sách lớp (`lop-ds`), tin kênh lớp (`lop`). Xuất cho test. */
 function nhanTinPhongEm(d: unknown): void {
   if (typeof d !== 'string' || d.length < 8) return
@@ -43,6 +54,9 @@ function nhanTinPhongEm(d: unknown): void {
     const live = j.live as { khoi?: KhoEm['khoi']; giay?: unknown } | null, e = j.em as { sbd?: string; ten?: string; doi?: number; vao?: boolean } | null
     const khoi = !j.ketThuc && live?.khoi && e?.vao ? live.khoi : null
     const toi = e?.sbd ? { sbd: e.sbd, ten: e.ten ?? e.sbd, doi: e.doi ?? 0 } : null
+    const luat = (e as { luat?: LuatEm | null } | null)?.luat ?? null
+    if (luat?.cam && !kho.luat?.cam) baoBiTuChoi()
+    if (JSON.stringify(luat) !== JSON.stringify(kho.luat ?? null)) dat({ luat })
     const doi = JSON.stringify(khoi) !== JSON.stringify(kho.khoi) || JSON.stringify(toi) !== JSON.stringify(kho.toi)
     if (j.ketThuc && kho.khoi?.gd === 'dang' && kho.toi) { dat({ xong: true, khoi: null }); return }
     if (kho.xong) return

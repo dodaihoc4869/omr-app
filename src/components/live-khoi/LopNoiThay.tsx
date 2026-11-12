@@ -7,7 +7,7 @@ import { MAU_CHIEU } from '../../lib/bpu/mau-chieu'
 import { MAU_XANH_THAN } from '../../lib/live-khoi/mau'
 import { batDauLiveKhoi } from '../../lib/live-khoi/api'
 import { chieuBangTrang, chieuCau, coTo, coToChieu, datEscLive, hdDuoi, hienHoatDong, ketThucBuoiHoc, laToBang, moHoatDong, toDangHien, toLenTren } from '../bpu/gan-gv'
-import { batTiengLai, dangKy, datKhoi, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
+import { batTiengLai, dangKy, datKhoi, datLuat, duyetLuat, kenh, layDangMo, layView, lenhMic, phienCua } from './thay-khoi'
 import './thay-khoi.css'
 import './em-khoi.css'
 
@@ -16,8 +16,12 @@ const ChonCauBpu = lazy(() => import('../bpu/ChonCauBpu'))
 const CotChatThay = lazy(() => import('./ChatThay').then((m) => ({ default: m.CotChatThay })))
 const MayTinhThay = lazy(() => import('../may-tinh/MayTinhThay'))
 const HoiHieuThay = lazy(() => import('./HoiHieuThay'))
+const LuatRoiThay = lazy(() => import('./LuatRoiThay'))
 const KIEU = { ...MAU_CHIEU, ...MAU_XANH_THAN } as CSSProperties
 
+/** Có tờ RIÊNG đang mở (lớp phủ tờ chiếu không phải tờ Bình Phản Ứng)? Lớp phủ là cổng gắn thẳng vào <body> ⇒ chỉ theo dõi con trực tiếp của body. */
+const coToRieng = (): boolean => !!document.querySelector('.lop-xem-phieu:not([aria-label="Tờ chiếu Bình Phản Ứng"])')
+const ngheToRieng = (f: () => void): (() => void) => { const mo = new MutationObserver(f); mo.observe(document.body, { childList: true }); return () => mo.disconnect() }
 export default function LopNoiThay() {
   const v = useSyncExternalStore(dangKy, layView)
   const k = v?.live?.khoi ?? null
@@ -46,6 +50,7 @@ export default function LopNoiThay() {
   }, [])
   // Tấm hoạt động đang nằm TRÊN tờ của bảng (thầy Esc từ màn chiếu về tấm để chọn câu kế) ⇒ một nút «Về màn chiếu»: tờ lên lại nguyên trạng, tấm vẫn mở bên dưới.
   const [hdTren, setHdTren] = useState(false)
+  const toRieng = useSyncExternalStore(ngheToRieng, coToRieng) // tờ riêng của tấm hoạt động đang mở ⇒ ẩn nút nổi «Về màn chiếu»
   useEffect(() => { const f = (e: Event) => setHdTren((e as CustomEvent<boolean>).detail === true); window.addEventListener('bpu-hd-tren', f); return () => window.removeEventListener('bpu-hd-tren', f) }, [])
   const sanh = dang && (sanhTay ?? k.che === 'sanh')
   const [k1, setK1] = useState(() => Math.min(window.innerWidth / 1920, window.innerHeight / 1080))
@@ -107,7 +112,7 @@ export default function LopNoiThay() {
   // Cụm điều khiển nằm trong khay nút bốn ô của TỜ (thầy 12/11 «phần nút này bị rối, chuyển nó vào trong cái 4 nút»): tờ báo bấm bằng sự kiện `ddh-lkt`
   // (qua thay-noi.ts); số tin mới báo ngược lại bằng `ddh-lkt-moi`. Cụm nổi của app chỉ còn lúc BẢNG ĐUA đang hiện (tờ bị che, không có nút bốn ô).
   const lenhTo = useRef<(v: string) => void>(() => {})
-  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'mt') setMt((c) => !c); else if (v === 'hieu') setHieu((c) => !c); else if (v === 'khay' || v === 'ngoai') setChat(false) }
+  lenhTo.current = (v) => { if (v === 'hoc' || v === 'bang') doiChe(v); else if (v === 'lop') { setChon(false); setSanh(true) } else if (v === 'chon') setChon(true); else if (v === 'chat') doiChat(); else if (v === 'mt') setMt((c) => !c); else if (v === 'hieu') setHieu((c) => !c); else if (v.startsWith('luat:')) { const [, b, n] = v.split(':'); datLuat(b === '1', Number(n) || 3) } else if (v === 'khay' || v === 'ngoai') setChat(false) }
   useEffect(() => { const f = (e: Event) => lenhTo.current(String((e as CustomEvent<string>).detail)); window.addEventListener('ddh-lkt', f); return () => window.removeEventListener('ddh-lkt', f) }, [])
   // PHÍM / ở cửa sổ app = hỏi nhanh «Hiểu chưa?» (cùng chỗ nghe với Tab). PHÍM TAB ở cửa sổ app (tấm hoạt động, lúc tiêu điểm không nằm trong tờ) = đổi Học ⇄ Bảng; trong tờ thì tờ tự nghe (live-khoi-to-chieu.ts). Bảng danh sách /
   // bảng chọn / đang gõ tin nhắn: Tab giữ nghĩa thường.
@@ -164,7 +169,7 @@ export default function LopNoiThay() {
   if (k.gd === 'cho') return <div className="lkt" style={KIEU}><PhongChoThay v={v} khoi={k.k} /></div>
   return (
     <div className="lkt" style={KIEU}>
-      {!sanh && !chon && hdMo && hdTren && coTo() ? <button type="button" className="lkt-ve chinh lkt-ve-noi" onClick={toLenTren}>Về màn chiếu</button> : null}
+      {!sanh && !chon && hdMo && hdTren && !toRieng && coTo() ? <button type="button" className="lkt-ve chinh lkt-ve-noi" onClick={toLenTren}>Về màn chiếu</button> : null}
       {sanh ? <SanhLive v={v} khoi={k.k} che={k.che} loi={loi} coVe={coToChieu()} onChe={(c) => doiChe(c, true)} onDong={() => setSanh(false)} /> : null}
       {chon ? (
         <div className="lkt-chon"><div className="lkt-san-khau" style={{ ['--k' as string]: k1 }}>
@@ -180,6 +185,7 @@ export default function LopNoiThay() {
       <HangTay v={v} />
       {chat ? <div className="lkt-chat"><Suspense fallback={null}><CotChatThay kenh={kenh} /></Suspense></div> : null}
       {mtHien ? <Suspense fallback={null}><MayTinhThay kenh={kenh} /></Suspense> : null}
+      {dang && v.luat ? <Suspense fallback={null}><LuatRoiThay luat={v.luat} ds={v.ds} onDuyet={duyetLuat} /></Suspense> : null}
       {hieu && dang && !sanh && !chon ? <Suspense fallback={null}><HoiHieuThay kenh={kenh} tong={v.live?.xem || v.ds.filter((e) => e.vao).length} /></Suspense> : null}
     </div>
   )
