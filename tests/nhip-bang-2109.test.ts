@@ -14,6 +14,7 @@ const doc = (p: string) => fs.readFileSync(path.join(process.cwd(), p), 'utf8')
 const KHONG_GOI_MAY_CHU: Record<string, number> = {
   'src/components/hoc-tap/ManKiemTraCaNhan.tsx': 0, // 1 s vẽ giờ máy chủ; hết giờ chốt một lần qua tuNop, không vòng hỏi D1.
   'src/components/KhoiKhacPhuc3CheDo.tsx': 1,
+  'src/components/live-khoi/thay-khoi.ts': 1, // 12/11 live theo khối: 600 ms giữ nút «Kết thúc buổi» + viên «Vào lại» ở Hôm nay khi thầy Esc ra ngoài lúc đang live — chỉ đụng DOM, không gọi máy chủ; hết buổi là dừng
   'src/components/KhoiThoiGianCa.tsx': 1,
   'src/components/ca-thi/ThemGioEm.tsx': 1, // 08/11: 1 s đồng hồ «Còn mm:ss» trong tấm Thêm giờ cho riêng em, theo gioMayChu() — không gọi máy chủ
   'src/components/ca-thi/TheoDoiCa.tsx': 1, // 1 s đồng hồ vòng "phút còn lại" theo gioMayChu() (29/09) — vòng HỎI là /ca/nhip ở màn cha qua useNhipThay

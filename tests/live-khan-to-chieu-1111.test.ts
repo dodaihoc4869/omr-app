@@ -88,7 +88,8 @@ describe('K4 · K5 · nút Live đầu thanh, cửa sổ neo trái; nút lưới
     expect(document.body.classList.contains('mc-live')).toBe(true)
     expect(t.thanh.querySelector('.mc-lv-gon')).toBeNull() // nút «thêm» do thanh-day-to-chieu.ts dựng, không phải mặt live
     expect(JS_LIVE_TO_CHIEU).not.toMatch(/lvGon|lvXoe|mc-lv-xoe/)
-    expect(CSS_LIVE_TO_CHIEU).not.toMatch(/mc-lv-xoe|#mc-len-bang|#mc-phim-nhom|#mc-cai-btn/)
+    // 12/11 live theo khối: riêng CHẾ ĐỘ BẢNG (`body.mc-che-bang`, bảng xanh than kín màn) được ẩn «Lên bảng» / nhóm phím — không phải gom thanh lúc live thường.
+    expect(CSS_LIVE_TO_CHIEU.replace(/^body\.mc-che-bang[^\n]*$/gm, '')).not.toMatch(/mc-lv-xoe|#mc-len-bang|#mc-phim-nhom|#mc-cai-btn/)
     // nhãn chữ của nút không còn bị ẩn riêng lúc live (trước: «T», «Tab», «P» trơ trọi; «?» biến mất)
     expect(CSS_LIVE_TO_CHIEU).not.toMatch(/mc-live[^{]*\.mc-nut-chu|mc-live[^{]*\[data-k="\?"\]/)
     // dáng nút lưới vẫn khai ở đây (cổng giữ màu so theo tệp) — thanh-day-to-chieu.ts dùng lại lớp .mc-lv-gon
