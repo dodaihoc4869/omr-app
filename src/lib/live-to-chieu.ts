@@ -209,7 +209,7 @@ export const JS_LIVE_TO_CHIEU = `
     k.mo(!k.dangMo());
   }
   lvThe.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-lv]'); if (b) lvGui(b.getAttribute('data-lv'), b.hasAttribute('data-c') ? { v: b.getAttribute('data-c') } : b.hasAttribute('data-v') ? { v: b.getAttribute('data-v') === '1' } : null); });
-  lvThe.addEventListener('change', function (e) { if (e.target && e.target.tagName === 'SELECT') lvGui(e.target.getAttribute('data-c') === 'loa' ? 'chon-loa' : 'chon-mic', { id: e.target.value }); });
+  lvThe.addEventListener('change', function (e) { if (e.target && e.target.tagName === 'SELECT') LV.heThe = ''; if (e.target && e.target.tagName === 'SELECT') lvGui(e.target.getAttribute('data-c') === 'loa' ? 'chon-loa' : 'chon-mic', { id: e.target.value }); });
   // bấm trong thẻ «Đang nói» / hàng giơ tay: MỘT bộ nghe cho thẻ ở góc (lvRoi) lẫn khối trong khay (lvVeKhoi). Trả true khi đã xử lý.
   function lvBamThe(e) {
     var b = e.target.closest && e.target.closest('[data-thu]');
@@ -320,11 +320,11 @@ export const JS_LIVE_TO_CHIEU = `
   // «Microphone (BOYALINK)» ⇒ «BOYALINK»: tên trong ngoặc là tên thiết bị thầy nhận ra
   function lvTenMic(s) { s = String(s || ''); var a = s.indexOf('('), b = s.lastIndexOf(')'); return a > 0 && b > a + 1 ? s.slice(a + 1, b) : s; }
   function lvVeThe() {
-    var t = LV.tt && LV.tt.the, h, i, m, loi, mi = null, ly, ct = lvThe.querySelector('.mc-lv-ct'), cd = document.getElementById('mc-lv-cd');
+    var t = LV.tt && LV.tt.the, h, i, m, loi, mi = null, ly, cdEl, ct = lvThe.querySelector('.mc-lv-ct'), cd = document.getElementById('mc-lv-cd');
     LV.ctMo = !!(t && ct && !lvThe.hidden && ct.open);
     cd = cd ? cd.textContent : '';
     lvThe.hidden = !t;
-    if (!t) return;
+    if (!t) { LV.heThe = ''; return; }
     loi = t.loi === 'mic-tu-choi' ? 'trình duyệt chưa cho dùng mic' : t.loi === 'khong-mic' ? 'máy này không thấy mic nào' : t.loi === 'mic-ban' ? 'mic đang bị ứng dụng khác giữ (Zoom, OBS…) — tắt ứng dụng ấy hoặc cắm lại bộ thu' : t.loi ? 'mic chưa mở được' : '';
     h = '<h3>' + (LV.tt.pha === 'live' ? (LV.tt.nghi ? 'Đang tạm dừng live' : 'Đang live') : 'Bật live cho ' + (LV.tt.lop ? 'lớp ' + lvSach(LV.tt.lop) : 'cả lớp')) + '</h3>';
     if (!LV.tt.coTieng) h += lvCanh('Buổi này live chưa có tiếng trên máy em');
@@ -381,9 +381,13 @@ export const JS_LIVE_TO_CHIEU = `
     // đứng đầu) · dòng chẩn đoán mic app gửi ≈ 1 lần / giây (#mc-lv-cd) — thầy mở ra chụp gửi khi còn lỗi tiếng
     if (LV.tt.coTieng) {
       m = (mi && mi.khac ? ['Đã chọn «' + lvSach(mi.khac) + '» · lớp đang nghe ' + lvSach(mi.ten || 'mic mặc định của máy')] : []).concat(mi && mi.tg ? [lvSach(mi.tg)] : [], (LV.tt.doTieng || []).map(lvSach));
-      h += '<details class="mc-lv-ct"' + (LV.ctMo ? ' open' : '') + '><summary>Chi tiết</summary>' + (m.length ? '<p class="mc-lv-cd" role="status">' + m.join('<br>') + '</p>' : '') + '<p class="mc-lv-cd" id="mc-lv-cd">' + lvSach(cd) + '</p></details>';
+      h += '<details class="mc-lv-ct"' + (LV.ctMo ? ' open' : '') + '><summary>Chi tiết</summary>' + (m.length ? '<p class="mc-lv-cd" role="status">' + m.join('<br>') + '</p>' : '') + '<p class="mc-lv-cd" id="mc-lv-cd"></p></details>';
     }
-    lvThe.innerHTML = h;
+    // app gửi live-tt ≈ 1 giây / lần dù thẻ không đổi gì: HTML giống hệt lần vẽ trước ⇒ KHÔNG dựng lại cây (giữ ô chọn đang mở, vạch mức, không nháy);
+    // dòng chẩn đoán (#mc-lv-cd) đổi từng giây nên nằm NGOÀI phép so, chỉ gán chữ.
+    if (h !== LV.heThe) { LV.heThe = h; lvThe.innerHTML = h; }
+    cdEl = document.getElementById('mc-lv-cd');
+    if (cdEl && cdEl.textContent !== cd) cdEl.textContent = cd;
   }
   var LV_MIC = {
     'bi-tat': 'Mic đang bị tắt tiếng — bật lại trên mic / bộ thu hoặc trong Windows',
