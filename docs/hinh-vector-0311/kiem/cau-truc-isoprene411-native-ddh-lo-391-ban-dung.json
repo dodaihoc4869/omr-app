@@ -1,0 +1,29 @@
+[
+  {
+    "i": 411,
+    "hash": "486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95",
+    "fileNguon": "anh/486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95.png",
+    "svg": "isoprene411-native-ddh-41ce7c1c72c9ea488c9c021ec2b33b61a47a1fd1ffa05d6a2bb659772b8ae055.svg",
+    "hashSvg": "41ce7c1c72c9ea488c9c021ec2b33b61a47a1fd1ffa05d6a2bb659772b8ae055",
+    "byteSvg": 19654,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C4-B14-D2-I-7",
+        "de": "Cho phản ứng trùng hợp isoprene tạo thành polyisoprene như hình.\nPhản ứng trùng hợp trên xảy ra kèm theo",
+        "refs": [
+          {
+            "hash": "486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95",
+            "where": "VIP27-C4-B14-D2-I-7.hinh.0.du_lieu",
+            "hashDataUrl": "745f53eb5fd176db90ae64d7d497e696963785facd140041d7fa6b15efd9adf7"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "LEFTn-H2C=C(CH3)-CH=CH2-RIGHTCH2-C(CH3)=CH-CH2/10printedC-16printedH-UNKNOWNn/2CCdoubleLEFT1RIGHT2raysEACH/2CH3DOWN-FIRSTCanchors137676/2ROUND+nSUB/1FILLEDrightheadconcavebase/EXACTxt,tSUPo,p/2nums(1)(2)differentbaseline30-35/ALLregularUPRIGHT-SUB23-leftnBASELINE/0stereo-charge-caption/NOaddedH-name-answer-conditions-alias",
+    "hashSvgDaSoat": "41ce7c1c72c9ea488c9c021ec2b33b61a47a1fd1ffa05d6a2bb659772b8ae055",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]

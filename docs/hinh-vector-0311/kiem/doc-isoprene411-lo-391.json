@@ -1,0 +1,445 @@
+{
+  "i": 411,
+  "assetIndexProvided": 1363,
+  "hash": "486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95.png",
+  "size": [
+    920,
+    135
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C4-B14-D2-I-7",
+      "de": "Cho phản ứng trùng hợp isoprene tạo thành polyisoprene như hình.\nPhản ứng trùng hợp trên xảy ra kèm theo",
+      "allHinh": [
+        {
+          "hash": "486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95",
+          "where": "VIP27-C4-B14-D2-I-7.hinh.0.du_lieu",
+          "hashDataUrl": "745f53eb5fd176db90ae64d7d497e696963785facd140041d7fa6b15efd9adf7"
+        }
+      ],
+      "missingHashes": [
+        "486dc0d8db73279c528263d27f05d8da63396da4d94f56f13bcd70c78b5bec95"
+      ]
+    }
+  ],
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull3xOpened": true,
+    "ownNumberLabels5xOpened": true,
+    "ownArrow5xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false
+  },
+  "measurementLimits": "Nativeapprox1pxglyphbboxes/lines, nofontadvanceassumption. EachC/CH2orientationliteral. ncoefficientunknownwholepolymercounts; noanswerinference.",
+  "geometry": {
+    "left": {
+      "coefficient": {
+        "text": "n",
+        "bbox": [
+          10,
+          44,
+          27,
+          69
+        ]
+      },
+      "labels": [
+        {
+          "text": "H₂C",
+          "bbox": [
+            31,
+            42,
+            84,
+            69
+          ],
+          "anchor": "LASTC"
+        },
+        {
+          "text": "C",
+          "bbox": [
+            127,
+            42,
+            148,
+            67
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            190,
+            42,
+            230,
+            67
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            275,
+            42,
+            327,
+            70
+          ]
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            126,
+            92,
+            179,
+            120
+          ],
+          "anchor": "FIRSTC"
+        }
+      ],
+      "doubleBonds": [
+        [
+          [
+            [
+              88,
+              51
+            ],
+            [
+              122,
+              51
+            ]
+          ],
+          [
+            [
+              88,
+              59
+            ],
+            [
+              122,
+              59
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              234,
+              51
+            ],
+            [
+              270,
+              51
+            ]
+          ],
+          [
+            [
+              234,
+              59
+            ],
+            [
+              270,
+              59
+            ]
+          ]
+        ]
+      ],
+      "singleBonds": [
+        [
+          [
+            150,
+            55
+          ],
+          [
+            185,
+            55
+          ]
+        ],
+        [
+          [
+            137,
+            69
+          ],
+          [
+            137,
+            88
+          ]
+        ]
+      ],
+      "numberLabels": [
+        {
+          "text": "(1)",
+          "bbox": [
+            92,
+            9,
+            129,
+            37
+          ],
+          "font": "regularuprightserif"
+        },
+        {
+          "text": "(2)",
+          "bbox": [
+            239,
+            14,
+            275,
+            42
+          ],
+          "font": "regularuprightserif"
+        }
+      ],
+      "countPerMonomer": {
+        "C": 5,
+        "H": 8
+      }
+    },
+    "right": {
+      "labels": [
+        {
+          "text": "CH₂",
+          "bbox": [
+            573,
+            49,
+            625,
+            77
+          ],
+          "anchor": "FIRSTC"
+        },
+        {
+          "text": "C",
+          "bbox": [
+            667,
+            49,
+            688,
+            75
+          ]
+        },
+        {
+          "text": "CH",
+          "bbox": [
+            729,
+            49,
+            770,
+            75
+          ]
+        },
+        {
+          "text": "CH₂",
+          "bbox": [
+            803,
+            49,
+            855,
+            77
+          ],
+          "anchor": "FIRSTC"
+        },
+        {
+          "text": "CH₃",
+          "bbox": [
+            666,
+            98,
+            719,
+            126
+          ],
+          "anchor": "FIRSTC"
+        }
+      ],
+      "doubleBonds": [
+        [
+          [
+            [
+              690,
+              57
+            ],
+            [
+              725,
+              57
+            ]
+          ],
+          [
+            [
+              690,
+              64
+            ],
+            [
+              725,
+              64
+            ]
+          ]
+        ]
+      ],
+      "singleBonds": [
+        [
+          [
+            534,
+            60
+          ],
+          [
+            570,
+            60
+          ]
+        ],
+        [
+          [
+            627,
+            60
+          ],
+          [
+            662,
+            60
+          ]
+        ],
+        [
+          [
+            773,
+            60
+          ],
+          [
+            799,
+            60
+          ]
+        ],
+        [
+          [
+            856,
+            60
+          ],
+          [
+            902,
+            60
+          ]
+        ],
+        [
+          [
+            676,
+            78
+          ],
+          [
+            676,
+            95
+          ]
+        ]
+      ],
+      "roundParentheses": {
+        "leftGuides": [
+          [
+            562,
+            36
+          ],
+          [
+            556,
+            45
+          ],
+          [
+            553,
+            60
+          ],
+          [
+            556,
+            76
+          ],
+          [
+            562,
+            86
+          ]
+        ],
+        "rightGuides": [
+          [
+            873,
+            36
+          ],
+          [
+            880,
+            46
+          ],
+          [
+            883,
+            60
+          ],
+          [
+            880,
+            76
+          ],
+          [
+            873,
+            86
+          ]
+        ],
+        "nSub": {
+          "text": "n",
+          "bbox": [
+            886,
+            74,
+            903,
+            95
+          ]
+        }
+      },
+      "countPerPrintedUnit": {
+        "C": 5,
+        "H": 8
+      },
+      "freeEnds": "BothhorizontaloutsidecutendsNOTextraatoms. Noaddedbracketsquare."
+    },
+    "arrow": {
+      "shaft": [
+        [
+          351,
+          60
+        ],
+        [
+          501,
+          60
+        ]
+      ],
+      "filledTriangleApprox": [
+        [
+          501,
+          60
+        ],
+        [
+          483,
+          55
+        ],
+        [
+          483,
+          65
+        ]
+      ],
+      "above": {
+        "text": "xt, tᵒ, p",
+        "bbox": [
+          384,
+          27,
+          475,
+          54
+        ]
+      },
+      "note": "FULLfilledblackskinnyhead(nativeconcavebase), notOPENV;smallroundoSUPaftert."
+    },
+    "font": "ALLregularuprightserifblack, noactualbold/italic. (1)/(2)uprightTimes-like; ordinary2diagonaldoesnotimplyitalic. CHdigitsSUB/nSUBright;reactantnBASELINEcoefficient.",
+    "countsPrintedUnits": {
+      "C": 10,
+      "H": 16,
+      "leftCCdouble": 2,
+      "rightCCdouble": 1,
+      "CH3DownBranches": 2,
+      "filledHeads": 1,
+      "roundParenPairs": 1,
+      "numberLabels": 2,
+      "wholePolymerAtomCount": "UNKNOWNn"
+    },
+    "noAdded": [
+      "monomeranswer",
+      "CH2reversetoleftCH2",
+      "H2Crightreplacement",
+      "repeatnvalue",
+      "squarebrackets",
+      "stereowedges",
+      "aliases",
+      "newconditions",
+      "captions"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount"
+}
