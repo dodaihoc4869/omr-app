@@ -37,6 +37,8 @@ html, body { margin: 0; height: 100%; background: var(--nen); font-family: 'DDH'
 .nut.mo { opacity: .28; filter: saturate(.4); box-shadow: none; }
 .nut.chon { transform: translateY(calc(3 * var(--k))); box-shadow: 0 calc(2 * var(--k)) 0 #129267, 0 0 0 calc(4 * var(--k)) rgba(255,255,255,.9), 0 0 calc(60 * var(--k)) rgba(52,227,164,.8); }
 .nut.chon::after { content: '✓'; position: absolute; right: calc(-8 * var(--k)); top: calc(-10 * var(--k)); width: calc(28 * var(--k) * var(--z, 1)); height: calc(28 * var(--k) * var(--z, 1)); border-radius: 50%; background: #fff; color: #129267; display: grid; place-items: center; font-size: calc(17 * var(--k) * var(--z, 1)); box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+.da-gui { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; gap: calc(9 * var(--k) * 1.25); padding: calc(9 * var(--k) * 1.25) calc(18 * var(--k) * 1.25) calc(9 * var(--k) * 1.25) calc(10 * var(--k) * 1.25); border-radius: 99px; font-size: calc(17 * var(--k) * 1.25); font-weight: 800; white-space: nowrap; background: rgba(24,36,43,.9); border: 1.5px solid rgba(52,227,164,.6); box-shadow: 0 0 calc(40 * var(--k)) rgba(52,227,164,.35); opacity: .92; }
+.da-gui b { display: grid; place-items: center; width: calc(26 * var(--k) * 1.25); height: calc(26 * var(--k) * 1.25); border-radius: 50%; background: var(--xanh); color: #0d2b20; }
 .hoi small { display: block; margin-top: calc(13 * var(--k) * var(--z, 1)); font-size: calc(12.5 * var(--k) * var(--z, 1)); color: var(--chu3); font-weight: 600; }
 /* ── MÁY THẦY: «bầu trời» kết quả — mỗi em là một đốm sáng bay về phía Hiểu / Chưa hiểu ── */
 .troi { position: absolute; inset: calc(6 * var(--k)); border-radius: calc(22 * var(--k)); overflow: hidden; border: 1.5px solid rgba(255,255,255,.12);
@@ -91,7 +93,8 @@ var cumB = [['b', 66, 48, 22], ['b', 74, 52, 26], ['b', 82, 47, 18], ['b', 70, 5
 var bay = [['a', 44, 70, 18, -152, 46], ['a', 6, 72, 16, -40, 40], ['b', 92, 70, 18, -138, 44], ['a', 50, 60, 14, -168, 38]]
 var h = ''
 if (k === 'em') h = '<div class="man em">' + giay + '<section class="bang">' + viet + hoi(0, innerWidth < 900 ? 1.25 : 1) + '</section></div><i class="nam"></i>'
-if (k === 'em-da') h = '<div class="man em">' + giay + '<section class="bang">' + viet + hoi(1, innerWidth < 900 ? 1.25 : 1) + '</section></div><i class="nam"></i>'
+// (thầy 12/11 «học sinh chọn xong tự ẩn luôn») em vừa chạm: hai phím biến mất ngay, chỉ còn dấu báo nhỏ «Đã gửi thầy» hiện chừng 1 giây rồi tự tắt
+if (k === 'em-da') h = '<div class="man em">' + giay + '<section class="bang">' + viet + '<div class="da-gui"><b>✓</b>Đã gửi thầy</div></section></div><i class="nam"></i>'
 if (k === 'thay') h = '<div class="man">' + giay + '<section class="bang">' + troi(12, 5, 30, cumA.concat(cumB, bay), ['Trần Gia Bảo', 'Lê Minh Khôi', 'Ngô Thu Hà', 'Phạm Đức Anh', 'Vũ Hải Yến'], false) + '</section>' + thanh(true) + '</div>'
 if (k === 'thay-kq') h = '<div class="man">' + giay + '<section class="bang">' + troi(23, 7, 30, cumA.concat([['a', 9, 47, 18], ['a', 29, 51, 16], ['a', 37, 59, 18], ['a', 13, 59, 14], ['a', 26, 63, 16], ['a', 41, 53, 15], ['a', 19, 46, 15], ['a', 32, 66, 15], ['a', 8, 62, 15], ['a', 43, 62, 14], ['a', 36, 43, 14]], cumB, [['b', 86, 55, 20], ['b', 76, 44, 16]]), ['Trần Gia Bảo', 'Lê Minh Khôi', 'Ngô Thu Hà', 'Phạm Đức Anh', 'Vũ Hải Yến', 'Đỗ Quang Huy', 'Bùi Lan Chi'], true) + '</section>' + thanh(true) + '</div>'
 document.getElementById('goc').innerHTML = h

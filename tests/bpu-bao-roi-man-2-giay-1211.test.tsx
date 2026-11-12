@@ -2,48 +2,44 @@
 // Thầy 12/11 tối: «cảnh báo này chỉ hiện 2 giây rồi ẩn xuống dưới nhấp nháy, khi ẩn xuống bỏ hiệu ứng nhấp nháy xung quanh màn hình».
 // + «Màn hình trên máy tính học sinh không có nút vàng bên phải để bấm» (thanh cuộn của bảng đè lên tay nắm).
 import { readFileSync } from 'node:fs'
-import { act, cleanup, render } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { BAO_TO_MS, BaoRoiMan } from '../src/components/bpu/BaoRoiMan'
+import { cleanup, render } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+import { BaoRoiMan } from '../src/components/bpu/BaoRoiMan'
 
 const q = (s: string) => document.querySelector(s)
-describe('cảnh báo «Rời màn hình» trên màn thầy', () => {
-  beforeEach(() => { vi.useFakeTimers() })
-  afterEach(() => { cleanup(); vi.useRealTimers() })
+// Lần 2 cùng tối: «bỏ luôn cảnh báo to đùng đó, hiện cảnh báo tinh tế gọn gàng».
+describe('cảnh báo «Rời màn hình» trên màn thầy — bản gọn', () => {
+  afterEach(() => { cleanup() })
 
-  it('em vừa rời ⇒ thẻ to + viền; đúng 2 giây sau thu thành viên nhỏ ở đáy, không còn viền quanh màn', () => {
+  it('em rời ⇒ CHỈ có viên nhỏ ở đáy (không thẻ to, không viền quanh màn), nằm ngoài khung bảng', () => {
     render(<BaoRoiMan sbd={['S1']} ten={['Dương Thị Ngọc Ánh']} />)
-    expect(BAO_TO_MS).toBe(2000)
     expect(q('.bpu-bao-chay')!.parentElement).toBe(document.body)
-    expect(q('.bpu-bao-chay')!.classList.contains('gon')).toBe(false)
-    expect(q('.bpu-bao-chay-the strong')!.textContent).toBe('Dương Thị Ngọc Ánh')
-    act(() => { vi.advanceTimersByTime(1900) })
-    expect(q('.bpu-bao-chay-the')).not.toBeNull()
-    act(() => { vi.advanceTimersByTime(200) })
+    expect(q('.bpu-bao-chay')!.classList.contains('nhe')).toBe(true)
     expect(q('.bpu-bao-chay-the')).toBeNull()
-    expect(q('.bpu-bao-chay')!.classList.contains('gon')).toBe(true)
-    expect(q('.bpu-bao-chay-gon')!.textContent).toBe('Rời màn hìnhDương Thị Ngọc Ánh')
+    expect(q('.bpu-roi-gon')!.textContent).toBe('Rời màn hìnhDương Thị Ngọc Ánh')
+    expect(q('[role="alert"]')).not.toBeNull()
   })
-  it('đang thu gọn mà có em MỚI rời ⇒ thẻ to lại 2 giây; em quay lại bớt thì KHÔNG bật to lại; về hết ⇒ mất', () => {
+  it('có em MỚI rời ⇒ viên dựng lại (nảy một lần); em quay lại bớt ⇒ chỉ đổi tên, không nảy; về hết ⇒ mất', () => {
     const r = render(<BaoRoiMan sbd={['S1']} ten={['A']} />)
-    act(() => { vi.advanceTimersByTime(2100) })
-    expect(q('.bpu-bao-chay.gon')).not.toBeNull()
+    const dau = q('.bpu-roi-gon')
     r.rerender(<BaoRoiMan sbd={['S1', 'S2']} ten={['A', 'B']} />)
-    expect(q('.bpu-bao-chay-the strong')!.textContent).toBe('A · B')
-    act(() => { vi.advanceTimersByTime(2100) })
-    expect(q('.bpu-bao-chay-gon span')!.textContent).toBe('A · B')
+    const hai = q('.bpu-roi-gon')
+    expect(hai).not.toBe(dau)
+    expect(hai!.querySelector('span')!.textContent).toBe('A · B')
     r.rerender(<BaoRoiMan sbd={['S2']} ten={['B']} />)
-    expect(q('.bpu-bao-chay-the')).toBeNull()
-    expect(q('.bpu-bao-chay-gon span')!.textContent).toBe('B')
+    expect(q('.bpu-roi-gon')).toBe(hai)
+    expect(q('.bpu-roi-gon span')!.textContent).toBe('B')
     r.rerender(<BaoRoiMan sbd={[]} ten={[]} />)
     expect(q('.bpu-bao-chay')).toBeNull()
   })
-  it('CSS: thu gọn ⇒ tắt viền quanh màn, viên nằm đáy và tự nhấp nháy; máy yếu / giảm chuyển động đứng yên', () => {
-    const css = readFileSync('src/components/bpu/bpu-bang.css', 'utf8')
-    expect(css).toContain('.bpu-bao-chay.gon::before { display: none; }')
-    expect(css).toContain('.bpu-bao-chay.gon { place-items: end center; }')
-    expect(css).toMatch(/\.bpu-bao-chay-gon \{[^}]*animation: bpu-bao-chay-gon 0\.9s ease-in-out infinite alternate;/)
-    expect(css).toContain('html.may-yeu .bpu-bao-chay-gon { animation: none; }')
+  it('CSS: tắt viền quanh màn, viên nằm đáy, không bắt chạm; máy yếu / giảm chuyển động đứng yên; mã không còn dựng thẻ to', () => {
+    const css = readFileSync('src/components/bpu/bpu-bang.css', 'utf8'), ma = readFileSync('src/components/bpu/BaoRoiMan.tsx', 'utf8')
+    expect(css).toContain('.bpu-bao-chay.nhe::before { display: none; }')
+    expect(css).toContain('.bpu-bao-chay.nhe { place-items: end center; }')
+    expect(css).toMatch(/\.bpu-bao-chay \{[^}]*pointer-events: none;/)
+    expect(css).toContain('html.may-yeu .bpu-roi-gon i::after { animation: none; }')
+    expect(ma).not.toContain('bpu-bao-chay-the')
+    expect(ma).not.toContain('setTimeout')
     expect(readFileSync('src/components/bpu/BangBinhPhanUng.tsx', 'utf8')).toContain('<BaoRoiMan sbd={roiNay}')
   })
 })
