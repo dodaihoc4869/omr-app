@@ -694,7 +694,7 @@ Dừng: `pkill -f "ma/luyen.py du-lieu-f ck-f"` · `pkill -f "ma/luyen.py du-lie
 `canh-buoi-moi.sh` vẫn TẮT. Checkpoint giữ riêng (không bị xoay vòng): `ck-giu/` (e-28000 / 29000 / 30000, c-29000, f-33000 / 35000 / 37000).
 Bản đo 18 s một checkpoint: `bash lv3/do18.sh ck-x-NNNNN` (thư mục tạm) ⇒ `lv3/do18-ck-x-NNNNN.json`, rồi `tom-do18.py`.
 
-### 11.8 Lượt H (12/11, 06:49–11:18 giờ VN) — 12,8 phút giọng thầy từ bài giảng YouTube thầy gửi — giữ thầy tốt hẳn, nói chồng đỡ hại, giọng khác VẪN chưa giảm đủ — CHƯA ĐẠT, KHÔNG PHÁT HÀNH
+### 11.8 Lượt H (12/11, 06:49–11:18 giờ VN) — 12,8 phút giọng thầy từ bài giảng YouTube thầy gửi — bản đo 18 s: giữ thầy tốt hơn, nói chồng đỡ hại; đo nhanh: thầy / thầy nói to bị hạ NHIỀU hơn F; giọng khác VẪN chưa giảm đủ — CHƯA ĐẠT, KHÔNG PHÁT HÀNH
 Mã: `luyen/loc-yt.py`, `luyen/cat-yt.py` (mới), `luyen/chuan-bi-yt.py` (đã có), `luyen/luyen.py` thêm `TG_YT_TI`, `luyen/chay-h.sh` (khởi / khởi lại H an toàn). Tiếng, checkpoint,
 trọng số chỉ ở thư mục tạm của phiên (`du-lieu-f/yt/`, `ck-h/`, `mh/ck-h-*.tgt`) — không vào kho. Trọng số `ckpt/thay-ck1-2000.tgt` lỡ vào kho ở 130fc02ae: đã GỠ khỏi đầu
 nhánh (không viết lại lịch sử; không script / test nào cần tệp đó).
@@ -758,10 +758,11 @@ Cùng bản đo, giọng thầy = YouTube giữ riêng (`LV_THAY=cham/thay-yt.wa
 #### (5) Kết luận
 - **Đạt:** mở sau ≤ 50 ms (cả 3 bản H); hệ số thời gian thực 0,095–0,13 (máy phiên). **Chưa đạt:** nói chồng ở 10 dB (hại thầy còn ≈ 1 dB, F 2 dB; với giọng thầy YouTube,
   LJ nữ chồng 0 / 2 dB hạ SI-SDR thầy ≈ 3 dB); giọng khác giảm ≥ 20 dB (VCTK nam 11–17, LJ nữ 10–22, xôn xao 4,5–8,6 dB; chỉ em thật gần đạt: 17–29).
-- So F-40000, H **giữ thầy tốt hẳn** (thầy bị hạ 1,0 ⇒ 0,4–0,6 dB, SI-SDR thầy một mình 8 ⇒ 15 dB, dải 11–24 kHz −5,1 ⇒ −2,8…−3,6) và **chặn khá hơn VCTK nam (+4…+8 dB),
+- So F-40000, theo bản đo 18 s H **giữ thầy tốt hơn** (thầy bị hạ 1,0 ⇒ 0,4–0,6 dB, SI-SDR thầy một mình 8 ⇒ 15 dB, dải 11–24 kHz −5,1 ⇒ −2,8…−3,6) và **chặn khá hơn VCTK nam (+4…+8 dB),
   em thật (+3…+7), xôn xao (+1…+5)**, nhưng **LJ nữ kém đi 2–6 dB** (đo nhanh: 13,4 ⇒ 4,6–7,3). Hai thước đo lệch nhau ở «thay» (đo nhanh 1,8 ⇒ 2,1–2,6, bản 18 s thầy bị hạ 1,0 ⇒ 0,4–0,6)
   và «khác thật» (đo nhanh 33,8 ⇒ ~20, bản 18 s em thật 14–22 ⇒ 17–29): đo nhanh cho mỗi tệp đứng riêng qua bộ tách mới, bản 18 s đo từng khúc trong cảnh có thầy
-  ⇒ xét tiêu chí theo bản 18 s.
+  ⇒ xét tiêu chí theo bản 18 s. NHƯNG «thầy nói to» (`thay-to`, chỉ đo nhanh có) xấu đi 3,1 ⇒ 3,5–4,1 dB ở mọi bản H từ 43 000 — cần nghe thử
+  đoạn thầy nói to trước khi tin «giữ thầy tốt hơn».
 - Bản nên dùng thử: **H-51000** (giữ thầy tốt nhất, dải tốt nhất, VCTK nam tốt nhất ở 10 dB); thay thế: H-55000 (em thật 20,8–29, mở sau 0; thầy bị hạ 0,5–0,6).
   H-60000 không hơn hai bản trên. Mức «Chỉ giọng thầy» vẫn CHƯA đạt chuẩn phát hành; đường thử trong app (phiên chính) không thay mô hình tự động.
 - Đề xuất (chưa thử): thêm giọng nữ (kho mở) vào mẫu luyện để kéo LJ nữ lại; xôn xao vẫn 4,5–8,6 dB ⇒ tăng mẫu 3–5 người (`TG_XON` > 0,15); nguồn giọng
