@@ -1,0 +1,22 @@
+[
+  {
+    "i": 482,
+    "hashSvg": "713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2",
+    "nguoiSoat": "soat_hinh_vector",
+    "ketQua": "Đạt: tự native FULL/publicde-ref VIP27-CDK-ESTER-TN-II-37.hinh.0.du_lieu, fresh Chromium3× FULL/SHA trước-sau và macro3CO/từng ba mạch. Đếm57C6O=3glyceroltrần+18/18/18acyl, không CCdouble/3CO. Ba carbonyl hai tia contact đúng nhánh: top/bottomchéo+đứng, giữa hai nhánh nghiêng có nối tròn ngắn nguồn không ép thành V/crossbar. FirstbottomCCđứng giữ đúng, đáy chain cắt sát native193 như nguồn; sáu O thường thẳng/nét mảnh, không H₂C-HC labels. Không thấy chạm glyph/cắt thêm/tràn/captionX/công thức/đápán thêm; không alias.",
+    "render": "/workspace/scratch/soat398-482-fresh.png",
+    "macro": [
+      "/workspace/scratch/triester482-co.png",
+      "/workspace/scratch/triester482-topchain.png",
+      "/workspace/scratch/triester482-midchain.png",
+      "/workspace/scratch/triester482-bottomchain.png"
+    ],
+    "hash": "58ae74164129bbac730dbd35969f8c637c24039516fe3fa15e8fa8a1cb9ce4fa",
+    "hashSvgDaSoat": "713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2",
+    "runtimeProof": {
+      "file": "/workspace/scratch/triester482-runtime.log",
+      "sha256": "ec6a8a2d23d62c7acb6c5ca8f0affca6e361f084b20efef68db902ababbd884f",
+      "content": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/triester482-native-ddh-713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2.svg 713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2\n482 { x: 0, y: 0, width: 551, height: 194 }\nPOSTSHOT_SHA 713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2\nCOMMAND node /workspace/scratch/agent-render398.cjs; content fs.readFileSync(actual SVG) via page.setContent\n"
+    }
+  }
+]

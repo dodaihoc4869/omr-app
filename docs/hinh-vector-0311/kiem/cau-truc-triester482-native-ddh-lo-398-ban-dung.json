@@ -1,0 +1,29 @@
+[
+  {
+    "i": 482,
+    "hash": "58ae74164129bbac730dbd35969f8c637c24039516fe3fa15e8fa8a1cb9ce4fa",
+    "fileNguon": "anh/58ae74164129bbac730dbd35969f8c637c24039516fe3fa15e8fa8a1cb9ce4fa.png",
+    "svg": "triester482-native-ddh-713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2.svg",
+    "hashSvg": "713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2",
+    "byteSvg": 5497,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-CDK-ESTER-TN-II-37",
+        "de": "Trigyceride X có công thức cấu tạo như hình bên. Cho 5 gam X vào một bát sứ và thêm 15 mL dung dịch KOH 30% (dùng dư), sau đó đun nóng và khuấy một thời gian để phản ứng xảy ra. Sau khi kết thúc phản ứng, thêm dung dịch NaCl bão hòa vào thu được chất rắn màu trắng.",
+        "refs": [
+          {
+            "hash": "58ae74164129bbac730dbd35969f8c637c24039516fe3fa15e8fa8a1cb9ce4fa",
+            "where": "VIP27-CDK-ESTER-TN-II-37.hinh.0.du_lieu",
+            "hashDataUrl": "5f6b9bb9a8849447954692f8ebe58fc30841e238db1680dde94a4aa09aaa0cd0"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "57C6O=3glycerol+18-18-18acyl/0CCdouble3COdouble/3CO2splitraysCONTACTnativearms-topandbottomdiag+vertical-middle2slopesSHORTroundedjunction/6OregularUPRIGHT-ALLthinblack/3bareglycerolC-NOH2C-HC/eachnonperiodicchainvertices/BOTTOMFIRSTCCVERTICAL31-151to31-179/nativeBOTTOMcrop193KEEP/0H-stereo-arrows-caption/NOaddedX-formula-answer-alias1342490801460591996",
+    "hashSvgDaSoat": "713141693938a9c143bdb946516eb5a1b4735f73a40e78789c3145b0f9a83da2",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
