@@ -64,3 +64,24 @@ describe('xem lại live — buổi live theo khối', () => {
     expect(await chot(b.ph)).toMatchObject({ ok: true, du: false, lyDo: 'khong-cau' })
   })
 })
+
+// 13/11 — thầy mở bản dựng lại: «Giảng trên bảng xanh hoàn toàn mà. Dựng lại chính xác đi» (ảnh: trình phát vẫn xếp giấy đề 2/3 + bảng 1/3, nét dồn vào góc).
+// Trình phát phải xếp hình ĐÚNG chế độ lúc live: trang bút của chế độ «Bảng» mang khoá 'bl' ⇒ bảng kín màn, không giấy đề (như máy em lúc live).
+describe('xem lại live — trình phát đi theo chế độ Bảng / Học lúc live', () => {
+  it('khoá trang «bl» (có hoặc không kèm ô vùng) là chế độ Bảng; trang câu / trang mở đầu thì không', async () => {
+    const { KHOA_TRANG_BANG, laTrangBang, maTrang, VUNG_MAC_DINH } = await import('../src/components/live/bo-cuc')
+    expect(KHOA_TRANG_BANG).toBe('bl')
+    expect(laTrangBang('bl')).toBe(true)
+    expect(laTrangBang(maTrang('bl', VUNG_MAC_DINH, true))).toBe(true)
+    expect(laTrangBang(maTrang('cau-3', VUNG_MAC_DINH, false))).toBe(false)
+    expect(laTrangBang('bl2')).toBe(false)
+    expect(laTrangBang('')).toBe(false)
+  })
+  it('trình phát ép «bảng kín màn» khi trang đang phát là trang Bảng, về trang khác thì trả bố cục giấy + bảng; máy thầy và trình phát dùng CHUNG một hằng', async () => {
+    const { readFileSync } = await import('node:fs')
+    const phat = readFileSync('src/screens/live-xem-lai/hs/TrinhPhat.tsx', 'utf8'), noi = readFileSync('src/components/live/thay-noi.ts', 'utf8')
+    expect(phat).toContain("const b = laTrangBang(sk.trang); setEp((c) => (b ? 'bang' : c === undefined ? undefined : null))")
+    expect(phat).toContain('<KhungDocLap ref={kdl} lop="xp" epPhong={ep} ')
+    expect(noi).toContain('const TRANG_BANG = KHOA_TRANG_BANG')
+  })
+})

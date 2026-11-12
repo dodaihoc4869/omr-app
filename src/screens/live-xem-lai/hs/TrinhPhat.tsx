@@ -11,7 +11,7 @@
 // AN TOÀN: chỉ đọc ba tệp của buổi qua vé; đề trên giấy là câu trong `buoi.json`.
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { anToanHinh, canXoayCss, giaiTrang, khungChieu } from '../../../components/live/bo-cuc'
+import { anToanHinh, canXoayCss, giaiTrang, khungChieu, laTrangBang } from '../../../components/live/bo-cuc'
 import KhungDocLap, { type HinhDL, type TayKhungDL } from '../../../components/live/KhungDocLap'
 import { DauGiay, PhuongAnTinh } from '../../../components/live/GiayDung'
 import { MAU_CHIEU } from '../../../lib/bpu/mau-chieu'
@@ -99,6 +99,8 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
   const [cho, setCho] = useState(true)
   const [matMang, setMatMang] = useState(false)
   const [het, setHet] = useState(false)
+  /** 'bang' = thầy đang ở chế độ «Bảng» (bảng kín màn) tại chỗ đang phát; null = đã từng ở Bảng, nay về bố cục giấy + bảng; undefined = buổi chưa hề có chế độ Bảng (em tự phóng như cũ). */
+  const [ep, setEp] = useState<'bang' | null | undefined>(undefined)
   const [tocDo, setTocDo] = useState(1)
   const [boLang, setBoLang] = useState(true)
   const [hien, setHien] = useState(true)
@@ -230,7 +232,11 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
     const v = kdl.current
     if (!v) return
     const ap = (sk: SuKienBut) => {
-      if (sk.loai === 'trang') { const doi = sk.trang !== S.current.trang.trang || sk.tiLe !== S.current.trang.tiLe; S.current.trang = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep() }
+      if (sk.loai === 'trang') {
+        const doi = sk.trang !== S.current.trang.trang || sk.tiLe !== S.current.trang.tiLe; S.current.trang = { trang: sk.trang, tiLe: sk.tiLe }; if (doi) xep()
+        // Thầy đang ở chế độ «Bảng» (bảng kín màn, không có giấy đề) hay «Học»: xếp hình ĐÚNG như lúc live (thầy 13/11: «giảng trên bảng xanh hoàn toàn mà»).
+        const b = laTrangBang(sk.trang); setEp((c) => (b ? 'bang' : c === undefined ? undefined : null))
+      }
       v.ap(sk)
     }
     may.current = taoMayPhat(ap)
@@ -398,7 +404,7 @@ export default function TrinhPhat({ goc, buoi, ve, hang, batDau, tuPhat, nhung, 
       {coTieng ? <audio ref={am} src={duongTep(goc, buoi.id, TEP_LIVE.tieng, ve)} preload="metadata" /> : null}
       <div ref={nen} className="xp-nen" style={nhung && bc ? { height: bc.h } : undefined} onClick={chamNen}>
         {/* GIẤY ĐỀ + BẢNG ĐEN: hai khung co giãn độc lập như bảng live (giấy ở đây dựng theo khối đề của chặng ⇒ `tiLeChu` null: chữ không phụ thuộc bề ngang khung) */}
-        <KhungDocLap ref={kdl} lop="xp" layHinh={layHinh} layTrang={layTrang} netGiay tiLeChu={null} tuUuTien={!mayYeu()} dong={!giamDong()} giay={dungGiay} />
+        <KhungDocLap ref={kdl} lop="xp" epPhong={ep} layHinh={layHinh} layTrang={layTrang} netGiay tiLeChu={null} tuUuTien={!mayYeu()} dong={!giamDong()} giay={dungGiay} />
         {!dangPhat && !cho && !matMang ? <button type="button" className="xp-giua" onClick={(e) => { e.stopPropagation(); bamPhat() }} aria-label={het ? 'Phát lại từ đầu' : 'Phát'}><BtPhat s={38} /></button> : null}
         {luoc >= 1000 && boLang ? <div className="xp-luoc so" role="status">Đã lược {gioPhat(Math.round(luoc / 1000) * 1000)} khoảng lặng</div> : null}
         {matMang ? <div className="xp-mat" role="status"><i aria-hidden="true" />Mất mạng · đang nối lại…</div> : null}
