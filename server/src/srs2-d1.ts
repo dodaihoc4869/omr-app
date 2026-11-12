@@ -1,4 +1,4 @@
-import { docDongLop, gopDocD1 } from './doc-d1-theo-luot'
+import { daNho, docDongLop, gopDocD1, nhoTheoLuot } from './doc-d1-theo-luot'
 import { laHanhTrinh, ungVienHanhTrinh } from './hanh-trinh-hop-nhat'
 import { coLoThuSucHanhTrinh, tienDoHanhTrinh, type TienDoHanhTrinh } from './hanh-trinh-ngay'
 import { idDaLam,laBanBu } from './hanh-trinh-nguon-cau'
@@ -443,14 +443,16 @@ export async function docMetaCau(env: Env, qids: readonly string[], uuTienMaDe: 
  * Câu SQL đọc siêu dữ liệu câu từ D1 (`qids` đã khử trùng, khác rỗng). B2 (15/10): bảng tính sẵn `cau_meta` khớp kho ⇒ đọc bảng ấy; lệch ⇒ CÙNG câu
  * đọc thẳng `game_v2_question` như cũ (cau-meta.ts). Thứ tự: mã câu tăng dần, các dòng cùng câu theo `rowid` (`thu_tu`) — đúng thứ tự dò chỉ mục
  * `game_v2_question_qid` của câu cũ.
+ * G5 12/11: điều kiện khớp đặt TRONG danh sách qid (`json_each … WHERE KHOP`) — nhánh không dùng có danh sách rỗng ⇒ không dò dòng nào (trước: điều kiện
+ * kiểm SAU mỗi lượt dò chỉ mục ⇒ nhánh thừa vẫn đọc mọi dòng của các qid ấy).
  */
 function docMetaCauD1(env: Env, qids: readonly string[]): Promise<Row[]> {
   return env.DB.prepare(`SELECT qid, ma_de, version, content_group, dang, phan, muc_do, ten_dang, sao, lop_json, gon, anh_pa, anh_y, hinh_gon, j_qid, j_version, thu_tu
-      FROM cau_meta WHERE ${KHOP} AND qid IN (SELECT value FROM json_each(?1))
+      FROM cau_meta WHERE qid IN (SELECT value FROM json_each(?1) WHERE ${KHOP})
       UNION ALL
       SELECT qid, ma_de, version, content_group, dang, json_extract(json,'$.phan') AS phan, json_extract(json,'$.mucDo') AS muc_do, json_extract(json,'$.tenDang') AS ten_dang, json_extract(json,'$.sao') AS sao, COALESCE(json_extract(json,'$.lop'), json_extract(json,'$.khoi')) AS lop_json,
         ${SQL_CAU_GON}, json_extract(json,'$.qid') AS j_qid, json_extract(json,'$.version') AS j_version, rowid AS thu_tu
-      FROM game_v2_question WHERE NOT ${KHOP} AND qid IN (SELECT value FROM json_each(?1)) AND json_valid(json)
+      FROM game_v2_question WHERE qid IN (SELECT value FROM json_each(?1) WHERE NOT ${KHOP}) AND json_valid(json)
       ORDER BY qid, thu_tu`).bind(JSON.stringify(qids)).all<Row>().then((r) => (r.results ?? []).map(({ thu_tu: _t, ...x }) => x))
 }
 /** Dòng đệm: tính sẵn cờ tự luận (đúng `tuLuanTuMeta`) rồi bỏ JSON câu rút gọn / cờ ảnh — đệm nhẹ, `metaCauTuDong` dùng `tu_luan`. */
@@ -578,11 +580,18 @@ export async function docLanLam(env: Env, sbd: string, qids: readonly string[], 
       .sort((a, b) => (str(a.luc) < str(b.luc) ? -1 : str(a.luc) > str(b.luc) ? 1 : str(a.khoa) < str(b.khoa) ? -1 : str(a.khoa) > str(b.khoa) ? 1 : 0))
   } else if (goc.length > 200) {
     const sql = (coVis: boolean) => `SELECT qid, ngay_vn, luc, ket_qua, ${coVis ? 'assistance, visibility, purpose,' : ''} nguon, ${SQL_TC} AS tc FROM su_kien_hoc WHERE sbd = ? AND luc >= ? ${coVis ? `AND (${SQL_LA_LAN_LAM_GIU_CHAN_DOAN})` : ''}`
-    try {
-      rows = (await env.DB.prepare(sql(true)).bind(sbd, tuLuc).all<Row>()).results ?? []
-    } catch {
-      rows = (await env.DB.prepare(sql(false)).bind(sbd, tuLuc).all<Row>()).results ?? []
-    }
+    // G5 12/11 (hoá đơn D1: câu này ~3.386 hàng × 18 nghìn lượt/ngày): kết quả KHÔNG phụ thuộc tập câu (lọc theo câu ở dưới) ⇒ trong CÙNG một lượt, các lần gọi
+    // cùng em + cùng mốc dùng chung MỘT lần đọc (hồ sơ: lượt chính + ôn bài cũ, nhiều nơi cùng dựng hồ sơ một em); đã có lần đọc từ mốc rỗng (cả sổ) ⇒ lọc
+    // `luc >= mốc` tại chỗ (cùng thứ tự, đúng điều kiện SQL). Lệnh ghi sổ trong lượt xoá bản nhớ. Ngoài bản gộp ⇒ đọc như cũ.
+    const khoaSo = (moc: string) => `srs2_lan_lam_tu_moc|${sbd}|${moc}`
+    const docTu = (moc: string) => nhoTheoLuot(env.DB, khoaSo(moc), async (): Promise<Row[]> => {
+      try {
+        return (await env.DB.prepare(sql(true)).bind(sbd, moc).all<Row>()).results ?? []
+      } catch {
+        return (await env.DB.prepare(sql(false)).bind(sbd, moc).all<Row>()).results ?? []
+      }
+    }, ['su_kien_hoc'])
+    rows = tuLuc && daNho(env.DB, khoaSo('')) ? (await docTu('')).filter((x) => str(x.luc) >= tuLuc) : await docTu(tuLuc)
   } else {
     try {
       // OMNI 3: bỏ cả dòng "đọc lời giải trước khi làm" lẫn dòng LƯỚT — lướt không phải một lần làm (chỉ có khi OMNI bật lúc làm).
