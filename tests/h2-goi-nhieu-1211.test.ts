@@ -54,7 +54,7 @@ describe('(2)(3) bảng ca — chỉ mục trạng thái + chỉ mục bộ ph�
     const moi = await caDangBaoVe(d.env, now)
     const goc = d.env.DB
     let thay = 0
-    const envCu = { ...d.env, DB: { ...goc, prepare: (s: string) => { thay++; return goc.prepare(SQL_CA_BAO_VE_CU) } } } as unknown as Env
+    const envCu = { ...d.env, DB: { ...goc, prepare: (_s: string) => { thay++; return goc.prepare(SQL_CA_BAO_VE_CU) } } } as unknown as Env
     const cu = await caDangBaoVe(envCu, now)
     expect(thay).toBe(1)
     expect(cu.length).toBeGreaterThan(50)
