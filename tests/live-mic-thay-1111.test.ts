@@ -612,6 +612,8 @@ describe('«Chỉ giọng thầy» — mặc định không đổi (12/11, đư�
     return { ws, blob, tra: () => { U.createObjectURL = cu[0]; U.revokeObjectURL = cu[1] } }
   }
   const micGoc = (b: ReturnType<typeof dung>) => b.lt.luongMic()!.getAudioTracks()[0]
+  /** Chờ chuỗi nạp lười xong (import() lõi ⇒ tải mô hình ⇒ gửi Worker { tachMa, tach }) — máy bận thì vài vòng vi điều phối. */
+  const choLoi = (tin: unknown[]) => vi.waitFor(async () => { await vi.dynamicImportSettled(); if (!tin.some((t) => typeof t === 'object' && t !== null && 'tachMa' in t)) throw new Error('chưa nạp xong') }, { timeout: 8000, interval: 20 })
 
   for (const kieuTieng of ['lam-ro', 'chuan'] as const) for (const locOn of ['vua', 'manh', 'tat'] as const) {
     it(`Tiếng «${kieuTieng}» · Lọc ồn «${locOn}»: một Worker chỉ có mã khung, tin gửi Worker đúng dạng cũ, track gửi như cũ, không nạp lõi tách`, async () => {
@@ -659,7 +661,7 @@ describe('«Chỉ giọng thầy» — mặc định không đổi (12/11, đư�
       expect(b.boGui().track).toBe(micGoc(b))
       b.lt.datLocOn('thay')
       expect(tin[tin.length - 1]).toEqual({ muc: null, chiThay: true, chiTach: true })
-      for (let i = 0; i < 5; i++) { await vi.dynamicImportSettled(); await troi(10) }
+      await choLoi(tin)
       expect(tachGiong.nap).toBeGreaterThanOrEqual(1)
       const gui = tin.find((t) => 'tachMa' in t)!
       expect(gui.tach).toBeInstanceOf(ArrayBuffer)
@@ -669,9 +671,10 @@ describe('«Chỉ giọng thầy» — mặc định không đổi (12/11, đư�
       expect(b.lt.chanDoan()).toMatchObject({ locOn: 'thay', locOnChay: 'chay', tg: 'chay', tgTin: { ban: 'thu', ngay: '2026-11-11' } })
       // đổi kiểu tiếng khi đang chạy ⇒ báo Worker đường mới (đổi ràng buộc mic có thể mở lại mic ⇒ chuỗi MỚI cũng tự bật lại «Chỉ giọng thầy»)
       b.lt.datKieuTieng(false); expect(tin[tin.length - 1]).toEqual({ chiTach: false })
-      await troi(2000); for (let i = 0; i < 5; i++) { await vi.dynamicImportSettled(); await troi(10) }
-      b.lt.datKieuTieng(true); await troi(2000); for (let i = 0; i < 5; i++) { await vi.dynamicImportSettled(); await troi(10) }
+      await troi(2000)
+      b.lt.datKieuTieng(true); await troi(2000)
       const w2 = g.ws[g.ws.length - 1]!, tin2 = w2.tin as Record<string, unknown>[]
+      await choLoi(tin2) // chuỗi mới (nếu mở lại mic) cũng nạp xong lõi + mô hình
       if (w2 !== w) expect(tin2).toContainEqual({ muc: null, chiThay: true, chiTach: true })
       else expect(tin2[tin2.length - 1]).toEqual({ chiTach: true })
       w2.onmessage!({ data: { tg: 'chay', h: { ban: 'thu', ngay: '2026-11-11' } } }); await troi(10)
