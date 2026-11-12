@@ -20,8 +20,18 @@
 // ⇒ máy em dựng đúng bố cục (src/components/live/bo-cuc.ts). Bấm Live ⇒ bút bật sẵn.
 // Màu: chỉ biến sẵn có của tờ (--mc-*); màu đội của em rời màn là dữ liệu app gửi sang (đặt vào biến --doi sau khi lọc ký tự).
 
+// Chú thích từng khối CSS bên dưới (dời khỏi chuỗi 12/11 để không xuống máy):
+//   Live theo khối 12/11: chế độ «Bảng» ⇒ ẩn giấy đề, bảng kín màn
+//   7c · live 10/11: nút Live, viên đỏ ba ngăn, thẻ mic, thẻ gọn em rời màn
+//   Xem lại Live (11/11): ngăn «Đang ghi để xem lại» trong viên Live; chưa ghi được ⇒ ngăn vàng, live vẫn chạy. Thẻ nhắc một lần dùng lại khung .mc-lv-noi.
+//   màn chiếu hẹp (1366): cụm Live gọn lại để «Tắt live» + «Cài đặt» không bị đẩy khỏi thanh
+//   thẻ nổi neo trên thanh
+//   em rời màn: viền đỏ mảnh đứng yên (nháy 2 nhịp khi có em MỚI rời) + thẻ gọn ở góc phải, bấm / có em mới ⇒ mở tên, 4 giây tự thu
+//   đợt 2 · giơ tay: thẻ gọn trung tính (không đỏ — giơ tay không phải báo động) + hàng chờ; em đang nói có sóng âm
+//   dòng chẩn đoán mic: chữ nhỏ, chọn / chụp được
+//   11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh). Dáng nút lưới «thêm» (.mc-lv-gon) khai ở đây từ bản K5; nút + khay nay dựng ở thanh-day-to-chieu.ts cho MỌI trạng thái
 export const CSS_LIVE_TO_CHIEU = `
-/* 7c · live 10/11: nút Live, viên đỏ ba ngăn, thẻ mic, thẻ gọn em rời màn */
+body.mc-che-bang .mc-vung-de{display:none!important}
 body.mc .mc-thanh .mc-lv-nut,body.mc .mc-thanh .mc-lv-tat{flex:none;display:inline-flex;align-items:center;gap:.5em;min-height:calc(var(--u)*2.5);padding:0 1em 0 .8em;border:0;border-radius:999px;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);font:800 max(13px,calc(var(--u)*1.15)) var(--mc-sans);white-space:nowrap;cursor:pointer}
 .mc-lv-nut i{display:block;width:.68em;height:.68em;border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 .22em color-mix(in srgb,var(--mc-do) 30%,transparent)}
 body.mc .mc-thanh .mc-lv-tat{padding:0 1em;background:transparent;box-shadow:inset 0 0 0 1.5px var(--mc-bang-vien);font-weight:700}
@@ -35,7 +45,6 @@ body.mc .mc-thanh .mc-lv-cum{flex:none;display:inline-flex;align-items:stretch;m
 .mc-lv-muc i{display:block;width:.28em;border-radius:.1em;background:color-mix(in srgb,var(--mc-bang-chu) 35%,transparent)}
 .mc-lv-muc i.b{background:var(--mc-bang-chu)}
 .mc-lv-cum.vang{background:var(--mc-qua-nen);color:var(--mc-qua-chu);box-shadow:none}
-/* Xem lại Live (11/11): ngăn «Đang ghi để xem lại» trong viên Live; chưa ghi được ⇒ ngăn vàng, live vẫn chạy. Thẻ nhắc một lần dùng lại khung .mc-lv-noi. */
 .mc-lv-cum>span.ghi-loi{background:var(--mc-qua-nen);color:var(--mc-qua-chu)}
 .mc-lv-ghi-nhac h3{display:flex;align-items:center;gap:.4em}
 .mc-lv-ghi-nhac p{margin:calc(var(--u)*.3) 0 0;color:var(--mc-bang-phu);font:500 calc(var(--u)*.9)/1.45 var(--mc-sans)}
@@ -47,11 +56,9 @@ body.mc .mc-thanh .mc-lv-bg{gap:.45em;padding:0 .8em}
 .mc-lv-bg i{display:block;width:.62em;height:.62em;border-radius:50%;box-shadow:inset 0 0 0 1.5px currentColor}
 .mc-lv-bg[aria-pressed="true"]{background:var(--mc-bang-chu)!important;color:var(--mc-bang)!important;box-shadow:none!important}
 .mc-lv-bg[aria-pressed="true"] i{background:var(--mc-do);box-shadow:none}
-/* màn chiếu hẹp (1366): cụm Live gọn lại để «Tắt live» + «Cài đặt» không bị đẩy khỏi thanh */
 @media (max-width:1500px){.mc-lv-cum small,.mc-lv-bg span{display:none}body.mc-live .mc-thanh{gap:calc(var(--u)*.3)}.mc-lv-cum>span{padding:0 .6em}}
 body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
 .mc-lv-nhac{display:inline-flex;align-items:center;height:calc(var(--u)*2.3);padding:0 1em;border-radius:999px;background:var(--mc-thanh-nen);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-phu);font:600 calc(var(--u)*.9) var(--mc-sans);white-space:nowrap;font-variant-numeric:tabular-nums}
-/* thẻ nổi neo trên thanh */
 .mc-lv-the,.mc-lv-roi{position:fixed;right:calc(var(--u)*.75);bottom:calc(var(--u)*5);z-index:45;font-family:var(--mc-sans);color:var(--mc-bang-chu)}
 .mc-lv-roi{display:flex;flex-direction:column;align-items:flex-end;gap:calc(var(--u)*.6)}
 .mc-lv-noi{width:calc(var(--u)*23);padding:calc(var(--u)*.9) calc(var(--u)*1.1);border-radius:calc(var(--u)*1.5);background:var(--mc-thanh-nen);box-shadow:0 calc(var(--u)*1.4) calc(var(--u)*3.75) color-mix(in srgb,var(--mc-bang) 55%,transparent),inset 0 0 0 1px var(--mc-bang-vien)}
@@ -76,7 +83,6 @@ body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
 .mc-lv-n.nho{height:calc(var(--u)*2.3);font-size:calc(var(--u)*.9);font-weight:700}
 .mc-lv-n[aria-pressed="true"]{background:var(--mc-bang-chu);color:var(--mc-bang);box-shadow:none}
 .mc-lv-n:focus-visible,.mc-lv-nut:focus-visible,.mc-lv-tat:focus-visible,.mc-lv-cum:focus-visible,.mc-lv-roi-gon:focus-visible{outline:3px solid var(--mc-vang-noi);outline-offset:2px}
-/* em rời màn: viền đỏ mảnh đứng yên (nháy 2 nhịp khi có em MỚI rời) + thẻ gọn ở góc phải, bấm / có em mới ⇒ mở tên, 4 giây tự thu */
 .mc-lv-vien{position:fixed;inset:0;z-index:38;pointer-events:none;border:calc(var(--u)*.3) solid var(--mc-do);border-radius:calc(var(--u)*.4);box-shadow:inset 0 0 calc(var(--u)*2.5) color-mix(in srgb,var(--mc-do) 35%,transparent)}
 .mc-lv-vien.nhay{animation:mcLvVien .5s ease-in-out 2}
 @keyframes mcLvVien{50%{opacity:.25}}
@@ -92,7 +98,6 @@ body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
 .mc-lv-em .mc-lv-ky{width:calc(var(--u)*2.5);height:calc(var(--u)*2.5);font-size:calc(var(--u)*.92)}
 .mc-lv-em span{flex:1;min-width:0;font:700 calc(var(--u)*1.12)/1.2 var(--mc-sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .mc-lv-em small{display:block;margin-top:.15em;color:var(--mc-bang-phu);font:500 calc(var(--u)*.85) var(--mc-sans);font-variant-numeric:tabular-nums}
-/* đợt 2 · giơ tay: thẻ gọn trung tính (không đỏ — giơ tay không phải báo động) + hàng chờ; em đang nói có sóng âm */
 .mc-lv-roi-gon.mc-lv-tay-gon{background:var(--mc-thanh-nen);color:var(--mc-bang-chu);box-shadow:0 calc(var(--u)*.75) calc(var(--u)*2.1) color-mix(in srgb,var(--mc-bang) 50%,transparent),inset 0 0 0 1.5px var(--mc-vang-noi)}
 .mc-lv-roi-gon.mc-lv-tay-gon svg{color:var(--mc-vang-noi)}
 .mc-lv-roi-gon.mc-lv-tay-gon .mc-lv-ky{box-shadow:0 0 0 2px var(--mc-thanh-nen)}
@@ -104,10 +109,8 @@ body.mc-live .mc-thanh{gap:calc(var(--u)*.4)}
 .mc-lv-noi p.loi{color:var(--mc-vang-noi);font-weight:700}
 .mc-lv-em .mc-lv-muc{flex:none;height:calc(var(--u)*1.5);color:var(--mc-bang-chu)}
 .mc-lv-em .mc-lv-muc i{width:calc(var(--u)*.26)}
-/* dòng chẩn đoán mic: chữ nhỏ, chọn / chụp được */
 .mc-lv-the .mc-lv-cd{margin-top:calc(var(--u)*.6);font:500 calc(var(--u)*.72)/1.4 var(--mc-sans);color:var(--mc-bang-phu);opacity:.85;user-select:text;overflow-wrap:anywhere}
 .mc-lv-the .mc-lv-cd:empty{display:none}
-/* 11/11 · cửa sổ nút Live neo MÉP TRÁI (nút Live đứng đầu thanh). Dáng nút lưới «thêm» (.mc-lv-gon) khai ở đây từ bản K5; nút + khay nay dựng ở thanh-day-to-chieu.ts cho MỌI trạng thái */
 .mc-lv-the{right:auto;left:calc(var(--u)*.75)}
 body.mc .mc-thanh .mc-lv-gon{flex:none;display:inline-grid;place-items:center;width:calc(var(--u)*2.5);height:calc(var(--u)*2.5);padding:0;border:0;border-radius:50%;background:var(--mc-bang-nut);box-shadow:inset 0 0 0 1px var(--mc-bang-vien);color:var(--mc-bang-chu);cursor:pointer}
 .mc-lv-gon[hidden]{display:none!important}
@@ -447,6 +450,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
     if (m.lenh !== 'live-tt') return;
     truoc = LV.tt; LV.tt = m.tt || null;
+    if (document.body.classList.contains('mc-che-bang') !== !!(LV.tt && LV.tt.cheBang)) { document.body.classList.toggle('mc-che-bang', !!(LV.tt && LV.tt.cheBang)); if (window.__mcBut) setTimeout(lvAnh, 80); }
     if (LV.tt && LV.tt.co && !LV.anhXong) lvAnh();
     // vừa vào live ⇒ bút bật sẵn trên bảng đen
     if (LV.tt && LV.tt.pha === 'live' && !(truoc && truoc.pha === 'live') && window.__mcBut) window.__mcBut.bat(true);

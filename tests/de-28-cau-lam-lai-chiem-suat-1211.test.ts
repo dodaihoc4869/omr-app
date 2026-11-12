@@ -43,6 +43,20 @@ describe('đề 28: câu làm lại cuối chặng không chiếm suất (12/11)
     expect(cu).toEqual({ n: 28, I: 18, II: 7, III: 3 }) // đúng kiểu lệch đo được 11/11: thiếu câu trả lời ngắn
     expect(deCuaNgay('2026-11-12', false)).toEqual(cu) // không có daTinh ⇒ như cũ
   })
+  it('câu làm lại của CÂU TRẢ LỜI NGẮN chiếm thẳng suất phần III (không cần tràn) — đường thứ hai của cùng lỗi; nay không chiếm', () => {
+    const tinh = ['I|biet#sai0', 'III|hieu#sai0'], lamLai = Array.from({ length: 3 }, (_, i) => `III|hieu#sai${i}~ss1`)
+    const meta2 = new Map([...SAI, ...lamLai].map((q) => { const [phan, muc] = q.split('#')[0]!.split('|') as [string, string]; return [q, { phan, mucDo: muc, dang: null, tenDang: null }] as const }))
+    const chay = (ngay: string) => {
+      const daLam = new Set([...tinh, ...lamLai])
+      const vao: Parameters<typeof chonGoi7>[0] = { cau: KHO, daGap: new Set(), daLamNgay: daLam, quotaCon: 0, chan: new Set(), sua: SAI.filter((q) => !daLam.has(q)), on: [],
+        sanSang: new Set([...KHO.map((c) => c.qid), ...SAI]), mucTieuNgay: 28 - tinh.length, chiTrongMuc: true, loaiNgay: 'sua', ngay, nhomPhu: [{ qids: KHO.map((c) => c.qid), quota: 0 }] }
+      apSuat7(vao, { meta: meta2, tt: new Map() }, KHO, daLam, ngay, new Set(), null, new Set(tinh))
+      const ca28 = [...tinh, ...chonGoi7(vao).viec.map((v) => v.qid)], phan = (p: string) => ca28.filter((q) => q.startsWith(`${p}|`)).length
+      return [phan('I'), phan('II'), phan('III')]
+    }
+    expect(chay(NGAY_O_CHI_CAU_TINH)).toEqual([18, 4, 6])
+    expect(chay('2026-11-12')[2]).toBeLessThan(6)
+  })
   it('docDaLamVaVuaLam7: `daTinh` không gồm câu làm lại cuối chặng / tự luyện; `daLam` vẫn gồm (không phát lại)', async () => {
     const d = taoD1That(), ngay = '2026-11-13'
     const them = d.sql.prepare(`INSERT INTO su_kien_hoc(khoa,sbd,qid,nguon,ma_nguon,ket_qua,luc,ngay_vn,raw_json) VALUES(?,?,?,?,?,?,?,?,?)`)

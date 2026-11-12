@@ -1,0 +1,55 @@
+/* TRÒ «GIỮ LỬA» ở phòng chờ Live theo khối (thầy duyệt bản vẽ 12/11: docs/ban-ve-live-moi-1211/08-em-phong-cho-giu-lua-844.jpg).
+   Sân vẽ trên MỘT canvas; tệp này chỉ lo các lớp DOM phủ trên: bảng điểm, tin trận, dải phòng chờ, cần ảo, nút «Tăng tốc».
+   Màu: chỉ biến có sẵn (--tr-*, --p-*), pha bằng color-mix. `--gl-le` (lề cần / nút) do TroGiuLua.tsx đặt theo khung để không đè ngọn lửa góc. */
+.gl { container: gl / inline-size; position: absolute; inset: 0; overflow: hidden; background: var(--tr-nen); color: var(--tr-chu); touch-action: none; user-select: none; -webkit-user-select: none;
+  -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; overscroll-behavior: contain; font-weight: 700; --gl-le: 16px;
+  --gl-kinh: color-mix(in srgb, var(--tr-nen) 86%, transparent); }
+.gl-san { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* Nửa trái: chạm đâu cần hiện đó. */
+.gl-vung { position: absolute; left: 0; top: 0; bottom: 0; width: 50%; touch-action: none; }
+
+.gl-can { position: absolute; left: calc(var(--gl-le) + 52px); bottom: 18px; width: 104px; height: 104px; margin: 0 0 0 -52px; border-radius: 50%; pointer-events: none;
+  border: 2px solid color-mix(in srgb, var(--tr-chu) 22%, transparent); background: color-mix(in srgb, var(--tr-chu) 5%, transparent); display: grid; place-items: center; }
+.gl-can[data-giu] { bottom: auto; margin: -52px 0 0 -52px; border-color: color-mix(in srgb, var(--tr-chu) 40%, transparent); }
+.gl-can i { width: 44px; height: 44px; border-radius: 50%; background: color-mix(in srgb, var(--tr-chu) 34%, transparent); will-change: transform; }
+
+.gl-tang { position: absolute; right: var(--gl-le); bottom: 26px; width: 76px; height: 76px; padding: 0; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  font: inherit; font-size: 12.5px; font-weight: 800; line-height: 1.15; color: var(--tr-chu); touch-action: none; --gl-hoi: 1;
+  border: 2px solid var(--doi, var(--tr-tin)); background: color-mix(in srgb, var(--doi, var(--tr-tin)) 30%, transparent); }
+.gl-tang::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none; opacity: 0;
+  background: conic-gradient(var(--doi, var(--tr-tin)) calc(var(--gl-hoi) * 360deg), transparent 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), var(--tr-chu) calc(100% - 3px)); mask: radial-gradient(farthest-side, transparent calc(100% - 4px), var(--tr-chu) calc(100% - 3px)); }
+.gl-tang[data-hoi] { border-color: color-mix(in srgb, var(--tr-chu) 22%, transparent); background: color-mix(in srgb, var(--tr-chu) 6%, transparent); color: color-mix(in srgb, var(--tr-chu) 55%, transparent); }
+.gl-tang[data-hoi]::before { opacity: 1; }
+.gl-tang:active:not([data-hoi]) { transform: scale(0.94); }
+.gl-tang:focus-visible { outline: 2px solid var(--tr-chu); outline-offset: 3px; }
+
+.gl-bang, .gl-cho, .gl-tin li, .gl-bao { background: var(--gl-kinh); border: 2px solid var(--tr-vien); white-space: nowrap; pointer-events: none; }
+.gl-bang { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 5px 10px; border-radius: 14px;
+  font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; max-width: calc(100% - 16px); }
+.gl-o { display: inline-flex; align-items: center; gap: 5px; }
+.gl-o i { width: 10px; height: 10px; border-radius: 50%; background: var(--doi); flex: none; }
+.gl-o[data-toi] { text-decoration: underline; text-decoration-color: var(--doi); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.gl-mo { color: var(--tr-chu-3); font-weight: 700; }
+
+.gl-tin { position: absolute; right: 8px; top: 8px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; max-width: 46%; pointer-events: none; }
+.gl-tin li { padding: 3px 9px; border-radius: 99px; border-width: 0; font-size: 11.5px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.gl-tin b { font-weight: 800; color: color-mix(in srgb, var(--doi, var(--tr-chu)) 78%, var(--tr-chu)); }
+
+.gl-cho { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); padding: 6px 14px; border-radius: 99px; font-size: 12.5px; font-weight: 700;
+  max-width: calc(100% - 2 * var(--gl-le) - 220px); overflow: hidden; text-overflow: ellipsis; }
+.gl-cham { display: inline-block; width: 9px; height: 9px; margin-right: 8px; border-radius: 50%; background: var(--tr-chu-y); }
+
+.gl-bao { position: absolute; left: 50%; top: 46px; transform: translateX(-50%); padding: 5px 12px; border-radius: 99px; font-size: 12.5px; font-weight: 800;
+  border-color: color-mix(in srgb, var(--tr-tin) 60%, var(--tr-vien)); max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; }
+.gl-bao[data-kieu='thu'] { border-color: color-mix(in srgb, var(--p-do) 60%, var(--tr-vien)); }
+.gl-bao[data-kieu='meo'] { border-color: var(--tr-vien); font-weight: 700; color: var(--tr-chu-2); }
+
+/* Khung hẹp (điện thoại dọc, khung nhỏ): bớt chữ, giữ đủ số + nhãn. Hỏi theo bề ngang KHUNG (không theo màn hình: khung có thể đang xoay 90° bằng CSS). */
+@container gl (max-width: 560px) {
+  .gl-bang { gap: 8px; font-size: 11.5px; padding: 4px 8px; }
+  .gl-tin { top: 78px; max-width: 70%; }
+  .gl-bao { top: 42px; font-size: 11.5px; }
+  .gl-cho { bottom: 132px; max-width: calc(100% - 16px); font-size: 11.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .gl-tang:active:not([data-hoi]) { transform: none; } }

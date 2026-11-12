@@ -41,7 +41,7 @@ export function noiLive(w: WebSocket, ve: string, goc: string): void {
     if (!taiTin.size) return
     let tin: unknown = e.data
     if (typeof tin === 'string') {
-      if (!tin.includes('"bang"') && !tin.includes('"live')) return
+      if (!tin.includes('"bang"') && !tin.includes('"live') && !tin.includes('"t":"lop')) return
       try { tin = JSON.parse(tin) } catch { return }
     }
     for (const f of taiTin) { try { f(tin) } catch { /* nơi nghe lỗi không làm rớt phòng */ } }

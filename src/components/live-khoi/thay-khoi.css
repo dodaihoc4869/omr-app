@@ -1,0 +1,35 @@
+/* LIVE THEO KHỐI — lớp nổi máy thầy. Màu: bảng màu màn chiếu cố định (MAU_CHIEU gắn ở gốc .lkt: --tr-chieu-*) + màu đội --p-*; không mã màu thô. */
+[data-live-khoi-thay] { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; }
+html[data-bpu-an] [data-live-khoi-thay] { display: none; }
+.lkt { position: absolute; inset: 0; font: 600 15px/1.35 var(--sans, 'Be Vietnam Pro', system-ui, sans-serif); color: var(--tr-chieu-giay); }
+.lkt button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+.lkt-vien { position: absolute; top: 10px; right: 76px; display: flex; align-items: center; gap: 8px; pointer-events: auto; }
+.lkt-che { display: inline-flex; padding: 3px; border-radius: 14px; background: color-mix(in srgb, var(--tr-chieu-mat) 92%, transparent); box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3); }
+.lkt-che button { min-width: 76px; height: 44px; padding: 0 16px; border-radius: 11px; background: transparent; color: color-mix(in srgb, var(--tr-chieu-giay) 62%, transparent); font-weight: 800; transition: background-color .25s, color .25s; }
+.lkt-che button.chon { background: var(--tr-chieu-nhan-toi); color: var(--tr-chieu-bang); }
+.lkt-nut-chat { position: relative; display: inline-flex; align-items: center; gap: 8px; height: 50px; padding: 0 14px; border-radius: 14px; background: color-mix(in srgb, var(--tr-chieu-mat) 92%, transparent); box-shadow: inset 0 0 0 1.5px var(--tr-chieu-mat-3); font-weight: 700; }
+.lkt-nut-chat.chon { box-shadow: inset 0 0 0 2px var(--tr-chieu-nhan-toi); }
+.lkt-nut-chat svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lkt-nut-chat em { position: absolute; top: -6px; right: -6px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--p-do); color: var(--tr-chieu-giay); font: 800 11px/20px inherit; font-style: normal; text-align: center; }
+.lkt-chat { position: absolute; top: 70px; right: 10px; bottom: 64px; width: min(340px, 34vw); border-radius: 18px; overflow: hidden; pointer-events: auto; background: var(--tr-chieu-bang); box-shadow: inset 0 0 0 2px var(--tr-chieu-mat-3), 0 16px 40px color-mix(in srgb, var(--tr-chieu-bang) 70%, transparent); animation: lkt-vao .25s ease-out; }
+@keyframes lkt-vao { from { opacity: 0; transform: translateX(16px); } }
+.lkt-cho { position: absolute; inset: 0; pointer-events: auto; display: grid; grid-template-columns: 1fr min(360px, 32vw); grid-template-rows: auto 1fr auto; gap: 14px 16px; padding: 18px 24px 22px; background: radial-gradient(90% 70% at 50% 0%, var(--tr-chieu-mat), var(--tr-chieu-bang)); }
+.lkt-cho header, .lkt-cho footer { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+.lkt-san { position: relative; min-height: 0; border-radius: 18px; overflow: hidden; box-shadow: inset 0 0 0 2px var(--lk-vien); }
+.lkt-cho .gian { flex: 1; }
+.lkt-the { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 99px; background: var(--tr-chieu-mat-2); font-weight: 800; }
+.lkt-the.cho i { width: 9px; height: 9px; border-radius: 50%; background: var(--p-cam); }
+.lkt-dong { height: 44px; padding: 0 18px; border-radius: 14px; background: transparent; box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--p-do) 60%, transparent); color: color-mix(in srgb, var(--p-do) 60%, var(--tr-chieu-giay)) !important; font-weight: 800; }
+.lkt-doi { min-height: 0; display: grid; grid-template-rows: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.lkt-doi section { min-height: 0; display: flex; flex-direction: column; border-radius: 16px; padding: 10px 12px; background: linear-gradient(color-mix(in srgb, var(--doi) 16%, transparent), transparent 60%), var(--tr-chieu-mat); box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--doi) 45%, transparent); }
+.lkt-doi h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font-size: 16px; font-weight: 800; color: color-mix(in srgb, var(--doi) 70%, var(--tr-chieu-giay)); }
+.lkt-doi h3 b { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--doi); color: var(--tr-chieu-bang); font-size: 15px; }
+.lkt-doi h3 small { margin-left: auto; font-size: 14px; font-weight: 700; color: color-mix(in srgb, var(--tr-chieu-giay) 70%, transparent); }
+.lkt-doi ul { flex: 1; min-height: 0; overflow-y: auto; margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; align-content: start; gap: 6px; }
+.lkt-doi li { height: 26px; padding: 0 8px; border-radius: 8px; background: var(--tr-chieu-mat-2); font-size: 13px; line-height: 26px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lkt-doi li.rong { grid-column: 1 / -1; background: transparent; color: color-mix(in srgb, var(--tr-chieu-giay) 55%, transparent); }
+.lkt-cho footer p { flex: 1; margin: 0; color: color-mix(in srgb, var(--tr-chieu-giay) 72%, transparent); }
+.lkt-cho footer strong { color: var(--p-cam); }
+.lkt-bat-dau { height: 60px; padding: 0 40px; border-radius: 18px; background: var(--p-xanh); color: var(--tr-chieu-bang) !important; font-size: 19px; font-weight: 800; box-shadow: 0 5px 0 var(--p-xanh-dam); }
+.lkt-bat-dau:disabled, .lkt-dong:disabled { opacity: .6; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .lkt-chat { animation: none; } .lkt-che button { transition: none; } }

@@ -1,0 +1,206 @@
+// CHAT TRONG LIVE THEO KHỐI — MÁY EM (thầy chốt build 12/11; bản vẽ docs/ban-ve-live-moi-1211 ảnh 10 · 11 · 13). Tin đi qua kênh lớp sẵn có của
+// phòng (`KenhLop`), phòng đóng dấu người gửi và phát lại cho mọi máy ⇒ máy chỉ hiện tin phòng phát về (không tự chèn tin vừa gõ).
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import { DOI_BPU } from '../../lib/bpu/phong'
+import { chuCongThuc, chuanGui, docKhoa, docTin, duocGui, gioHien, nhanTin, tenTat, type TinChat } from '../../lib/live-khoi/chat-loi'
+import { CHAT_DAI, CHAT_NHIP_MS, type ChatGui, type KenhLop } from '../../lib/live-khoi/kieu'
+import './chat.css'
+
+type KetQuaGui = 'ok' | 'nhanh-qua' | 'rong' | 'khoa'
+export interface ChatLop {
+  ds: TinChat[]
+  /** Thầy đang tắt nhắn tin cả lớp. */
+  khoa: boolean
+  /** Số tin chưa đọc. */
+  moi: number
+  /** Tin cuối chưa đọc (để làm bong bóng); đọc hết ⇒ null. */
+  tinMoi: TinChat | null
+  gui(chu: string): KetQuaGui
+  danhDauDoc(): void
+}
+
+/** Loạt tin cũ phòng gửi lại ngay sau `{ xin: 1 }` coi như ĐÃ ĐỌC (không nổ số đỏ, không nổi bong bóng khi em vừa vào). */
+const LICH_SU_MS = 1500
+
+/** Nghe kênh 'chat' của phòng: danh sách tin, trạng thái khoá, số tin chưa đọc, gửi theo nhịp. Hook ở cùng tệp component theo đề bài ghép (một điểm nhập). */
+// oxlint-disable-next-line react/only-export-components
+export function useChatLop(kenh: KenhLop | null): ChatLop {
+  const [ds, setDs] = useState<TinChat[]>([])
+  const [khoa, setKhoa] = useState(false)
+  const [docLuc, setDocLuc] = useState(0)
+  const lucGui = useRef(0), cuoiLuc = useRef(0), daXin = useRef<KenhLop | null>(null)
+
+  useEffect(() => {
+    if (!kenh) return
+    const hetLichSu = Date.now() + LICH_SU_MS
+    const bo = kenh.nghe('chat', (tin) => {
+      const k = docKhoa(tin)
+      if (k !== null) { setKhoa(k); return }
+      if (!docTin(tin)) return
+      cuoiLuc.current = Math.max(cuoiLuc.current, tin.l)
+      setDs((cu) => nhanTin(cu, tin))
+      if (Date.now() < hetLichSu) setDocLuc((cu) => Math.max(cu, tin.l))
+    })
+    if (daXin.current !== kenh) { daXin.current = kenh; kenh.gui('chat', { xin: 1 } satisfies ChatGui) }
+    return bo
+  }, [kenh])
+
+  const gui = useCallback((chu: string): KetQuaGui => {
+    if (khoa) return 'khoa'
+    const c = chuanGui(chu)
+    if (!c || !kenh) return 'rong'
+    const nay = Date.now()
+    if (!duocGui(lucGui.current, nay)) return 'nhanh-qua'
+    lucGui.current = nay
+    kenh.gui('chat', { c } satisfies ChatGui)
+    return 'ok'
+  }, [kenh, khoa])
+  const danhDauDoc = useCallback(() => setDocLuc((cu) => Math.max(cu, cuoiLuc.current)), [])
+
+  return useMemo(() => {
+    let moi = 0
+    for (let i = ds.length - 1; i >= 0 && ds[i].luc > docLuc; i--) moi++
+    return { ds, khoa, moi, tinMoi: moi ? ds[ds.length - 1] : null, gui, danhDauDoc }
+  }, [ds, khoa, docLuc, gui, danhDauDoc])
+}
+
+// ── MẢNH DÙNG CHUNG VỚI CỘT MÁY THẦY ──
+const DUONG_BT = {
+  chat: 'M5 6.5A2.5 2.5 0 0 1 7.5 4h9A2.5 2.5 0 0 1 19 6.5v6a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 4V15A2.5 2.5 0 0 1 5 12.5z',
+  x: 'M6 6l12 12M18 6L6 18',
+  gui: 'M5 12h14M13 6l6 6-6 6',
+} as const
+export function BieuTuongChat({ ten, co = 20 }: { ten: keyof typeof DUONG_BT; co?: number }) {
+  return <svg className="lc-bt" width={co} height={co} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={DUONG_BT[ten]} /></svg>
+}
+/** Màu đội (biến CSS của DOI_BPU) gắn vào --lc-doi; thầy / không đội ⇒ để mặc định của chat.css. */
+const mauDoi = (doi: number): CSSProperties | undefined => (DOI_BPU[doi] ? ({ '--lc-doi': `var(${DOI_BPU[doi].mau})` } as CSSProperties) : undefined)
+/** Chữ tin nhắn, công thức hoá gõ thường hiện chỉ số dưới. */
+function ChuTin({ chu }: { chu: string }) {
+  return <>{chuCongThuc(chu).map((m, i) => (m.duoi ? <sub key={i}>{m.t}</sub> : m.t))}</>
+}
+/** Một dòng tin: ô tròn chữ tắt màu đội · tên · nhãn (Thầy / Em / ký hiệu đội) · giờ · chữ. Câu hỏi của em viền màu chú ý. */
+const DongTin = memo(function DongTin({ tin, toi = false }: { tin: TinChat; toi?: boolean }) {
+  const ky = DOI_BPU[tin.doi]?.ky
+  const nhan = tin.thay ? 'Thầy' : [toi ? 'Em' : '', ky ?? ''].filter(Boolean).join(' · ')
+  return (
+    <div className="lc-tn" style={mauDoi(tin.doi)} data-thay={tin.thay || undefined} data-hoi={tin.hoi || undefined} data-toi={toi || undefined}>
+      <span className="lc-av" aria-hidden="true">{tin.thay ? 'T' : tenTat(tin.ten)}</span>
+      <div className="lc-tn-bong">
+        <div className="lc-tn-dau">
+          <span className="lc-tn-ten">{tin.ten}</span>
+          <span className="lc-tn-phu">{nhan ? `${nhan} · ` : ''}{gioHien(tin.luc)}{tin.hoi ? ' · Câu hỏi' : ''}</span>
+        </div>
+        <div className="lc-tn-chu"><ChuTin chu={tin.chu} /></div>
+      </div>
+    </div>
+  )
+})
+
+/** Danh sách tin tự cuộn xuống tin mới; người xem đang kéo lên đọc thì giữ nguyên vị trí. `rong` hiện khi chưa có tin. */
+export function DanhSachTin({ ds, toiSbd, rong, veCuoi }: { ds: TinChat[]; toiSbd?: string; rong: string; /** Đổi số này ⇒ ép cuộn về cuối (vừa gửi tin). */ veCuoi?: number }) {
+  const khung = useRef<HTMLDivElement>(null), oDay = useRef(true)
+  useLayoutEffect(() => { oDay.current = true }, [veCuoi])
+  useLayoutEffect(() => { const el = khung.current; if (el && oDay.current) el.scrollTop = el.scrollHeight }, [ds, veCuoi])
+  // Khung đổi cỡ (bàn phím máy em bật lên, dòng báo hiện ra) mà đang ở cuối ⇒ vẫn bám tin mới nhất.
+  useEffect(() => {
+    const el = khung.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+    const mat = new ResizeObserver(() => { if (oDay.current) el.scrollTop = el.scrollHeight })
+    mat.observe(el)
+    return () => mat.disconnect()
+  }, [])
+  const khiCuon = () => { const el = khung.current; if (el) oDay.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48 }
+  return (
+    <div className="lc-ds" ref={khung} onScroll={khiCuon} role="log" aria-label="Tin nhắn lớp" tabIndex={0}>
+      {ds.length ? ds.map((t) => <DongTin key={t.id} tin={t} toi={!!toiSbd && t.sbd === toiSbd} />) : <p className="lc-rong">{rong}</p>}
+    </div>
+  )
+}
+
+// ── MÁY EM ──
+/** Nút 44 × 44 trong thanh ẩn mép phải: bong bóng chat + số tin mới. */
+export function NutChatEm({ moi, onMo }: { moi: number; onMo: () => void }) {
+  return (
+    <button type="button" className="lc-goc lc-nut" onClick={onMo} aria-label={moi ? `Nhắn cả lớp, ${moi} tin mới` : 'Nhắn cả lớp'}>
+      <BieuTuongChat ten="chat" />
+      {moi > 0 && <span className="lc-nut-so" aria-hidden="true">{moi > 99 ? '99+' : moi}</span>}
+    </button>
+  )
+}
+
+/** Bong bóng nhỏ cạnh thanh ẩn: tên (màu đội) + chữ của tin mới, hiện 4 giây rồi tự mờ. Cha cần `position: relative`. */
+export function BongTinMoi({ tin }: { tin: TinChat | null }) {
+  const [daMo, setDaMo] = useState<string | null>(null)
+  const ky = tin ? DOI_BPU[tin.doi]?.ky : undefined
+  return (
+    <div className="lc-goc lc-bong-cho" aria-live="polite">
+      {tin && daMo !== tin.id && (
+        <div key={tin.id} className="lc-bong-noi" style={mauDoi(tin.doi)} onAnimationEnd={() => setDaMo(tin.id)}>
+          <b>{tin.thay ? 'Thầy' : ky ? `${tin.ten} · ${ky}` : tin.ten}</b>
+          <ChuTin chu={tin.chu} />
+        </div>
+      )}
+    </div>
+  )
+}
+
+const NHAN_NHANH = [
+  { chu: 'Em hiểu rồi ạ' },
+  { chu: 'Thầy giảng lại ạ' },
+  { chu: '🔥', doc: 'Gửi lửa cổ vũ' },
+  { chu: '👏', doc: 'Gửi vỗ tay' },
+] as const
+
+/** Cửa nổi «Nhắn cả lớp» bên phải máy em. Cha cần `position: relative`; lề phải chỉnh bằng biến `--lc-cach-phai` (mặc định 52 px = thanh ẩn 44 + 8). */
+export function CuaChatEm({ chat, toiSbd, onDong }: { chat: ChatLop; toiSbd: string; onDong: () => void }) {
+  const [chu, setChu] = useState('')
+  const [nhanhQua, setNhanhQua] = useState(false)
+  const [veCuoi, setVeCuoi] = useState(0)
+  const cua = useRef<HTMLDivElement>(null)
+  const { ds, khoa, danhDauDoc } = chat
+
+  // Cửa đang mở ⇒ tin tới là đã đọc.
+  useEffect(() => { danhDauDoc() }, [ds, danhDauDoc])
+  useEffect(() => { cua.current?.focus({ preventScroll: true }) }, [])
+  useEffect(() => {
+    const khiPhim = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); onDong() } }
+    window.addEventListener('keydown', khiPhim)
+    return () => window.removeEventListener('keydown', khiPhim)
+  }, [onDong])
+  useEffect(() => {
+    if (!nhanhQua) return
+    const hen = window.setTimeout(() => setNhanhQua(false), CHAT_NHIP_MS)
+    return () => window.clearTimeout(hen)
+  }, [nhanhQua])
+
+  /** Gửi; trả true khi tin đã đi. */
+  const gui = (c: string) => {
+    const kq = chat.gui(c)
+    setNhanhQua(kq === 'nhanh-qua')
+    if (kq === 'ok') setVeCuoi((n) => n + 1)
+    return kq === 'ok'
+  }
+  const khiGui = (e: FormEvent) => { e.preventDefault(); if (gui(chu)) setChu('') }
+
+  return (
+    <div className="lc-goc lc-khung lc-cua" ref={cua} role="dialog" aria-label="Nhắn cả lớp" tabIndex={-1}>
+      <div className="lc-dau">
+        <BieuTuongChat ten="chat" co={18} />
+        <span className="lc-dau-ten">Nhắn cả lớp</span>
+        <button type="button" className="lc-o44" onClick={onDong} aria-label="Đóng nhắn tin"><BieuTuongChat ten="x" co={18} /></button>
+      </div>
+      <DanhSachTin ds={ds} toiSbd={toiSbd} rong="Chưa có tin nhắn nào" veCuoi={veCuoi} />
+      <div className="lc-nhanh">
+        {NHAN_NHANH.map((n) => (
+          <button key={n.chu} type="button" className="lc-vien-bam" disabled={khoa} onClick={() => gui(n.chu)} aria-label={'doc' in n ? n.doc : undefined}><span>{n.chu}</span></button>
+        ))}
+      </div>
+      <p className="lc-bao" role="status" data-loai={khoa ? 'khoa' : 'nhanh'}>{khoa ? 'Thầy đang tắt nhắn tin' : nhanhQua ? 'Chờ 2 giây rồi gửi tiếp' : ''}</p>
+      <form className="lc-nhap" onSubmit={khiGui}>
+        <input value={chu} onChange={(e) => setChu(e.target.value)} maxLength={CHAT_DAI} disabled={khoa} placeholder="Nhắn thầy và cả lớp…" aria-label="Nhắn thầy và cả lớp" enterKeyHint="send" autoComplete="off" />
+        <button type="submit" className="lc-gui" disabled={khoa || !chu.trim()} aria-label="Gửi tin"><BieuTuongChat ten="gui" co={18} /></button>
+      </form>
+    </div>
+  )
+}

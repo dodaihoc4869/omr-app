@@ -1,0 +1,96 @@
+/* CHAT TRONG LIVE THEO KHỐI (thầy chốt build 12/11; bản vẽ docs/ban-ve-live-moi-1211 ảnh 04 · 05 · 10 · 11 · 13). Tiền tố .lc-.
+   NỀN LUÔN TỐI: cột máy thầy và cửa máy em nằm trên màn live xanh than kể cả khi máy đang ở chế độ sáng, kể cả trên app thầy (không có data-trong)
+   ⇒ mọi luật bên dưới chỉ đọc biến cục bộ --lc-*. Mặc định --lc-* lấy từ các biến CỐ ĐỊNH (không đổi theo sáng / tối) gần xanh than nhất của
+   tokens.css: bảng slate ấm, --chu-o-gio-toi, nhóm --p-*. Riêng app học sinh đang ở nền tối thì dùng ĐÚNG bảng xanh than --tr-* (khối @media). */
+.lc-goc {
+  --lc-nen: var(--slate-950); --lc-mat: var(--slate-900); --lc-mat-2: var(--slate-800); --lc-vien: var(--slate-700);
+  --lc-chu: var(--chu-o-gio-toi); --lc-chu-2: var(--slate-200); --lc-chu-3: var(--slate-300);
+  --lc-nhan: var(--p-tim); --lc-nhan-go: color-mix(in srgb, var(--p-tim) 62%, var(--slate-950)); --lc-tren: var(--p-trang);
+  --lc-sai: var(--p-do-dam); --lc-chu-y: var(--p-cam); --lc-doi: var(--lc-chu-3);
+  --lc-nen-2: color-mix(in srgb, var(--lc-nen) 55%, var(--lc-mat));
+  --lc-bong: 0 16px 40px color-mix(in srgb, var(--slate-950) 60%, transparent);
+  color: var(--lc-chu); color-scheme: dark; box-sizing: border-box;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-trong='hs'] .lc-goc {
+    --lc-nen: var(--tr-nen); --lc-mat: var(--tr-mat); --lc-mat-2: var(--tr-mat-2); --lc-vien: var(--tr-vien);
+    --lc-chu: var(--tr-chu); --lc-chu-2: var(--tr-chu-2); --lc-chu-3: var(--tr-chu-3);
+    --lc-nhan: var(--tr-hs); --lc-nhan-go: var(--tr-hs-go); --lc-chu-y: var(--tr-chu-y);
+  }
+}
+.lc-goc *, .lc-goc *::before { box-sizing: border-box; }
+.lc-goc button { font: inherit; color: inherit; border: 0; background: none; padding: 0; margin: 0; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.lc-goc button:focus-visible, button.lc-goc:focus-visible { outline: 2px solid var(--lc-chu); outline-offset: 2px; }
+.lc-goc button:disabled { cursor: default; opacity: 0.5; }
+.lc-bt { flex: none; display: block; }
+
+/* ── KHUNG CHUNG: đầu · danh sách · báo · ô nhập ── */
+.lc-khung { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--lc-nen-2); font-size: 15px; line-height: 1.35; }
+.lc-dau { flex: none; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 2px 0 14px; border-bottom: 2px solid var(--lc-vien); font-weight: 800; }
+.lc-dau-ten { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-o44 { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; color: var(--lc-chu-2); }
+.lc-ds { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; scrollbar-width: thin; scrollbar-color: var(--lc-vien) transparent; }
+.lc-ds > :first-child { margin-top: auto; }
+.lc-rong { margin: auto; padding: 16px; text-align: center; color: var(--lc-chu-3); font-size: 14px; }
+
+.lc-tn { display: flex; align-items: flex-start; gap: 8px; min-width: 0; }
+.lc-av { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--lc-doi); color: var(--lc-nen); font-weight: 800; font-size: 12px; }
+.lc-tn-bong { min-width: 0; max-width: 100%; padding: 6px 10px; border: 2px solid var(--lc-vien); border-radius: 4px 14px 14px 14px; background: var(--lc-mat); overflow-wrap: anywhere; }
+.lc-tn-dau { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; }
+.lc-tn-ten { font-weight: 800; font-size: 13px; color: color-mix(in srgb, var(--lc-doi) 70%, var(--lc-chu)); }
+.lc-tn-phu { font-size: 12px; color: var(--lc-chu-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lc-tn-chu sub { font-size: 0.72em; line-height: 0; }
+.lc-tn[data-thay] .lc-av { background: var(--lc-nhan); color: var(--lc-tren); }
+.lc-tn[data-thay] .lc-tn-ten { color: color-mix(in srgb, var(--lc-nhan) 45%, var(--lc-chu)); }
+.lc-tn[data-hoi] .lc-tn-bong { border-color: var(--lc-chu-y); background: color-mix(in srgb, var(--lc-chu-y) 12%, var(--lc-mat)); }
+.lc-tn[data-toi] .lc-tn-bong { background: var(--lc-mat-2); }
+
+.lc-bao { flex: none; margin: 0; padding: 4px 14px 0; font-size: 13px; color: var(--lc-chu-2); }
+.lc-bao[data-loai='nhanh'] { color: color-mix(in srgb, var(--lc-chu-y) 70%, var(--lc-chu)); }
+.lc-nhap { flex: none; display: flex; align-items: center; height: 48px; margin: 8px 12px 12px; padding-left: 12px; border: 2px solid var(--lc-vien); border-radius: 14px; background: var(--lc-mat); }
+.lc-nhap:focus-within { border-color: var(--lc-nhan); }
+.lc-nhap input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; color: var(--lc-chu); font: inherit; font-size: 16px; }
+.lc-nhap input::placeholder { color: var(--lc-chu-3); opacity: 1; }
+.lc-goc .lc-gui { flex: none; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--lc-nhan); color: var(--lc-tren); box-shadow: inset 0 -3px 0 var(--lc-nhan-go); }
+.lc-goc .lc-gui:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+
+/* Viên bấm: đích chạm 44 px, phần nhìn thấy là viên 32 px ở giữa. */
+.lc-goc .lc-vien-bam { flex: none; height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.lc-vien-bam > span { height: 32px; padding: 0 11px; display: inline-flex; align-items: center; gap: 6px; border: 2px solid var(--lc-vien); border-radius: 999px; background: var(--lc-mat); font-size: 13px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lc-vien-bam[aria-pressed='true'] > span { border-color: var(--lc-nhan); background: color-mix(in srgb, var(--lc-nhan) 22%, var(--lc-mat)); }
+.lc-vien-bam[data-canh] > span { border-color: var(--lc-chu-y); color: color-mix(in srgb, var(--lc-chu-y) 60%, var(--lc-chu)); }
+
+/* ── MÁY EM: nút trong thanh ẩn · bong bóng tin mới · cửa nổi ── */
+.lc-goc.lc-nut { position: relative; border: 0; padding: 0; background: none; font: inherit; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; width: 44px; height: 44px; display: grid; place-items: center; color: var(--lc-chu-2); border-radius: 12px; }
+.lc-nut-so { position: absolute; top: 5px; right: 3px; min-width: 16px; height: 16px; padding: 0 4px; display: grid; place-items: center; border-radius: 8px; background: var(--lc-sai); color: var(--lc-tren); font-size: 10.5px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+
+.lc-bong-cho { position: absolute; right: var(--lc-cach-phai, 52px); top: 44px; z-index: 4; max-width: min(250px, 60%); pointer-events: none; }
+.lc-bong-noi { padding: 7px 12px; border: 2px solid var(--lc-vien); border-radius: 14px 14px 4px 14px; background: var(--lc-mat); box-shadow: var(--lc-bong); font-size: 13.5px; line-height: 1.35; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; animation: lc-bong-hien 4.3s linear both; }
+.lc-bong-noi b { margin-right: 6px; color: color-mix(in srgb, var(--lc-doi) 70%, var(--lc-chu)); }
+.lc-bong-noi sub { font-size: 0.72em; line-height: 0; }
+@keyframes lc-bong-hien { 0% { opacity: 0; transform: translateY(6px); } 5%, 93% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px); } }
+
+.lc-cua { position: absolute; right: var(--lc-cach-phai, 52px); top: 8px; bottom: 8px; z-index: 5; width: min(340px, 52%); border: 2px solid var(--lc-vien); border-radius: 20px; overflow: hidden; box-shadow: var(--lc-bong); animation: lc-cua-vao 0.18s cubic-bezier(0.05, 0.7, 0.1, 1) both; }
+.lc-cua:focus { outline: 0; }
+@keyframes lc-cua-vao { from { opacity: 0; transform: translateX(12px); } }
+.lc-cua .lc-ds { padding: 8px 10px; gap: 7px; }
+.lc-cua .lc-av { width: 26px; height: 26px; font-size: 10.5px; }
+.lc-cua .lc-tn-bong { padding: 4px 9px; }
+.lc-nhanh .lc-vien-bam > span { padding: 0 8px; font-size: 12.5px; }
+.lc-nhanh { flex: none; display: flex; gap: 3px; padding: 0 4px; overflow-x: auto; scrollbar-width: none; overscroll-behavior: contain; }
+.lc-nhanh::-webkit-scrollbar { display: none; }
+.lc-cua .lc-nhap { margin: 2px 10px 8px; }
+
+/* ── MÁY THẦY: cột «Tin nhắn lớp» kín chiều cao cha ── */
+.lc-cot { height: 100%; width: 100%; }
+.lc-cot .lc-dau { min-height: 48px; }
+.lc-loc { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 0 8px; padding: 0 12px; border-bottom: 2px solid var(--lc-vien); }
+.lc-loc-gian { flex: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-cua { animation: none; }
+  .lc-bong-noi { animation-name: lc-bong-mo; }
+  .lc-goc .lc-gui:active:not(:disabled) { transform: none; }
+}
+html.may-yeu .lc-cua { animation: none; }
+@keyframes lc-bong-mo { 0%, 93% { opacity: 1; } 100% { opacity: 0; } }
