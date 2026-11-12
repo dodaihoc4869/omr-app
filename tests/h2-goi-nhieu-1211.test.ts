@@ -5,6 +5,8 @@ import { describe, expect, it } from 'vitest'
 import { taoD1That } from './_d1-that'
 import { caDangBaoVe } from '../server/src/game-v2-bank'
 import { chayDdlMotLan, lamMoiTenDoiTuongChung, SQL_TEN_DOI_TUONG, SQL_TEN_DOI_TUONG_CU } from '../server/src/ddl-mot-lan'
+import { dauKhoCau, SQL_DAU_KHO_CAU_CU } from '../server/src/dau-kho-cau'
+import { SQL_VAN_TAY, SQL_VAN_TAY_CU } from '../server/src/hanh-trinh-hop-nhat'
 import type { Env } from '../server/src/kieu'
 
 type Row = Record<string, unknown>
@@ -130,5 +132,84 @@ describe('(4) ddl-mot-lan: danh sách tên đối tượng dùng chung (ddl_ten_
     expect(b.dem.lo).toBe(0)
     expect(await lamMoiTenDoiTuongChung(d.env, 3)).toBe(true)
     expect((d.sql.prepare(SQL_TEN_DOI_TUONG).all() as { k: number }[]).map((x) => x.k)).toEqual([1])
+  })
+})
+
+// ---------------------------------------------------------------- dấu bảng do trigger giữ (11) + dấu kho
+describe('dấu bảng (dau_bang) — trigger giữ dấu đúng mọi kiểu ghi', () => {
+  const dau = (d: ReturnType<typeof taoD1That>, ten: string) => (d.sql.prepare('SELECT dau FROM dau_bang WHERE ten = ?').get(ten) as { dau: string } | undefined)?.dau
+  it('game_v2_index: dấu luôn BẰNG ĐÚNG chuỗi cũ COUNT|MAX(indexed_at) qua thêm / thay (OR REPLACE, UPSERT) / sửa / xoá / xoá hết; dauKhoCau = câu cũ', async () => {
+    const d = taoD1That()
+    const cu = () => (d.sql.prepare(SQL_DAU_KHO_CAU_CU).get() as { d: string }).d
+    const buoc = [
+      "INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('A','v1','2026-11-01T00:00:00.000Z'),('B','v1','2026-11-02T00:00:00.000Z')",
+      "INSERT OR REPLACE INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('A','v2','2026-11-03T00:00:00.000Z')",
+      "INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('C','v1','2026-10-01T00:00:00.000Z') ON CONFLICT(ma_de) DO UPDATE SET indexed_at=excluded.indexed_at",
+      "INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('B','v9','2026-11-05T00:00:00.000Z') ON CONFLICT(ma_de) DO UPDATE SET indexed_at=excluded.indexed_at",
+      "UPDATE game_v2_index SET indexed_at='2026-11-09T00:00:00.000Z' WHERE ma_de='C'",
+      "DELETE FROM game_v2_index WHERE ma_de='C'",
+      'DELETE FROM game_v2_index',
+      "INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('Z','v1','2026-11-10T00:00:00.000Z')",
+    ]
+    expect(dau(d, 'game_v2_index')).toBe(cu())
+    for (const s of buoc) {
+      d.sql.exec(s)
+      expect(dau(d, 'game_v2_index'), s).toBe(cu())
+      expect(await dauKhoCau(d.env)).toBe(cu())
+    }
+    // dòng dấu vắng ⇒ COALESCE tính như cũ; bảng dau_bang chưa có ⇒ lùi câu cũ
+    d.sql.exec("DELETE FROM dau_bang WHERE ten='game_v2_index'")
+    expect(await dauKhoCau(d.env)).toBe(cu())
+    d.sql.exec('DROP TABLE dau_bang')
+    for (const t of ['them', 'sua', 'xoa']) d.sql.exec(`DROP TRIGGER dau_bang_gvi_${t}`)
+    expect(await dauKhoCau(d.env)).toBe(cu())
+  })
+  it('số phiên: MỖI lượt ghi (thêm / OR REPLACE / UPSERT / sửa / xoá) đổi dấu, không lặp lại; chiến dịch chỉ theo đúng cột vân tay', () => {
+    const d = taoD1That()
+    const lenh: Record<string, string[]> = {
+      cau_hoi: ["INSERT INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','x')", "INSERT OR REPLACE INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','y')",
+        "INSERT INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','z') ON CONFLICT(qid) DO UPDATE SET cap_nhat_luc=excluded.cap_nhat_luc", "UPDATE cau_hoi SET muc_do='NB'", "DELETE FROM cau_hoi"],
+      game_v2_question: ["INSERT INTO game_v2_question(ma_de,qid,version,content_group,dang,json) VALUES('A','q1','1','g','d','{}')",
+        "UPDATE game_v2_question SET json='{\"reviewed\":true}'", "DELETE FROM game_v2_question"],
+      omni_q: ["INSERT INTO omni_q(qid,y,vkn_json,nguon) VALUES('q1',-1,'[]','thay')", "INSERT OR REPLACE INTO omni_q(qid,y,vkn_json,nguon) VALUES('q1',-1,'[\"a\"]','thay')",
+        "UPDATE omni_q SET duyet_luc='x'", "DELETE FROM omni_q"],
+      omni_beta_cau: ["INSERT INTO omni_beta_cau(qid,beta,n,cap_nhat_luc) VALUES('q1',1.5,3,'d')", "INSERT OR REPLACE INTO omni_beta_cau(qid,beta,n,cap_nhat_luc) VALUES('q1',2,3,'d')",
+        'UPDATE omni_beta_cau SET n=4', 'DELETE FROM omni_beta_cau'],
+      chien_dich: ["INSERT INTO chien_dich(id,ten,sbd_json,ma_de_json,qid_json,han_nop,tao_luc) VALUES('c1','T','[]','[]','[]','2026-12-01','x')",
+        "UPDATE chien_dich SET trang_thai='da_dong'", "UPDATE chien_dich SET han_nop='2026-12-09'", 'UPDATE chien_dich SET the_luc_ngay=36', 'UPDATE chien_dich SET huyet_chien=0',
+        "UPDATE chien_dich SET tao_luc='y'", "DELETE FROM chien_dich"],
+    }
+    for (const [ten, ds] of Object.entries(lenh)) {
+      const da = new Set([dau(d, ten)])
+      expect(Number(dau(d, ten))).toBeGreaterThan(1.7e12) // mồi bằng mốc ms
+      for (const s of ds) { d.sql.exec(s); const v = dau(d, ten); expect(da.has(v), `${ten}: ${s}`).toBe(false); da.add(v) }
+    }
+    d.sql.exec("INSERT INTO chien_dich(id,ten,sbd_json,ma_de_json,qid_json,han_nop,tao_luc) VALUES('c2','T','[]','[]','[]','2026-12-01','x')")
+    const v = dau(d, 'chien_dich')
+    d.sql.exec("UPDATE chien_dich SET ten='T2', sbd_json='[\"E1\"]', qid_json='[\"q\"]', dong_luc='z'") // cột KHÔNG thuộc vân tay ⇒ dấu giữ nguyên (như chuỗi cũ)
+    expect(dau(d, 'chien_dich')).toBe(v)
+  })
+  it('vân tay Hành trình: chuỗi cũ đổi ⇒ chuỗi mới đổi (không bỏ sót lượt gộp); phần kho y hệt; EXPLAIN chỉ SEARCH dau_bang', () => {
+    const d = taoD1That()
+    const doc = (q: string) => d.sql.prepare(q).get('hanh_trinh_v3_van_tay') as { kho: string; ch: string; cd: string }
+    const ops = [
+      "INSERT INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q1','A','2026-11-01')", "INSERT INTO cau_hoi(qid,ma_de,cap_nhat_luc) VALUES('q2','A','2026-11-02')",
+      "UPDATE cau_hoi SET cap_nhat_luc='2026-11-05' WHERE qid='q1'", "DELETE FROM cau_hoi WHERE qid='q2'",
+      "INSERT INTO chien_dich(id,ten,sbd_json,ma_de_json,qid_json,han_nop,tao_luc) VALUES('c1','T','[]','[]','[]','2026-12-01','x')",
+      "UPDATE chien_dich SET trang_thai='da_huy'", "UPDATE chien_dich SET trang_thai='dang_chay', han_nop='2027-01-01'", "UPDATE chien_dich SET huyet_chien=5",
+      "INSERT INTO game_v2_index(ma_de,source_version,indexed_at) VALUES('A','v1','2026-11-01T00:00:00.000Z')", "UPDATE game_v2_index SET indexed_at='2026-11-07T00:00:00.000Z'",
+      "UPDATE chien_dich SET ten='khong-doi'", "UPDATE cau_hoi SET muc_do='VD'",
+    ]
+    let a = doc(SQL_VAN_TAY_CU), b = doc(SQL_VAN_TAY)
+    for (const s of ops) {
+      d.sql.exec(s)
+      const a2 = doc(SQL_VAN_TAY_CU), b2 = doc(SQL_VAN_TAY)
+      expect(b2.kho, s).toBe(a2.kho)
+      if (a2.ch !== a.ch) expect(b2.ch, s).not.toBe(b.ch)
+      if (a2.cd !== a.cd) expect(b2.cd, s).not.toBe(b.cd)
+      a = a2; b = b2
+    }
+    const kh = keHoach(d.sql, SQL_VAN_TAY, 'x')
+    for (const t of ['dau_bang']) expect(kh.filter((x) => x.startsWith(`SEARCH ${t} USING INDEX sqlite_autoindex_${t}_1 (ten=?)`)).length, kh.join('\n')).toBe(3)
   })
 })

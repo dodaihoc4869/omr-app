@@ -10,6 +10,7 @@ import { dbGoc, docCauHinhDem } from './cau-hinh-dem'
 import { SQL_LA_LAN_LAM } from './omni-kieu'
 import { SQL_TC } from './lam-lai-so'
 import { tachSongSinh } from './loi-hoc-luat'
+import { BT_DAU_KHO } from './dau-kho-cau'
 
 type Row = Record<string, unknown>
 export const KHOA_HANH_TRINH = 'hanh_trinh_3_0910_v1'
@@ -23,8 +24,16 @@ const kiemVanTay = new WeakMap<object, number>()
 const SQL_CD_VT = `COALESCE((SELECT group_concat(id||'~'||trang_thai||'~'||COALESCE(tao_luc,'')||'~'||COALESCE(han_nop,'')||'~'||COALESCE(the_luc_ngay,'')||'~'||COALESCE(huyet_chien,''),'|')
     FROM (SELECT id,trang_thai,tao_luc,han_nop,the_luc_ngay,huyet_chien FROM chien_dich WHERE trang_thai <> 'da_huy' ORDER BY id)),'')`
 /** MỘT lệnh: mốc kho câu (chỉ đổi qua lapChiMucTo) + mốc cau_hoi + trạng thái chiến dịch + vân tay đã lưu. */
-const SQL_VAN_TAY = `SELECT (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index) kho,(SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hoi) ch,
+export const SQL_VAN_TAY_CU = `SELECT (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index) kho,(SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hoi) ch,
   ${SQL_CD_VT} cd,(SELECT gia_tri FROM cau_hinh WHERE khoa=?) vt`
+// 12/11 (H2, hoá đơn D1: câu trên 1.142 lượt/ngày × 11.604 hàng — đếm cả cau_hoi + đọc mọi chiến dịch mỗi lần kiểm): ba phần đọc DẤU BẢNG do trigger giữ
+// (migration-z-1211-h2-goi-nhieu.sql, MỘT hàng mỗi phần). Kho: đúng chuỗi cũ. cau_hoi / chiến dịch: SỐ PHIÊN tăng mỗi lần ghi (chiến dịch: đúng các cột của
+// SQL_CD_VT) ⇒ đổi khi nào chuỗi cũ có thể đổi ⇒ không bỏ sót lượt gộp. Phần chiến dịch của vân tay lưu cũng tính bằng biểu thức này, CUỐI lô ghi (sau khi
+// lượt gộp tự ghi chiến dịch) như cũ. Dòng dấu vắng ⇒ COALESCE tính như cũ; bảng dau_bang chưa có ⇒ cả câu lỗi ⇒ dùng bộ câu CŨ cho cả lượt (đọc + ghi).
+// Lần đầu sau khi đổi: phần cau_hoi/chiến dịch khác giá trị cũ ⇒ MỘT lượt gộp lại đầy đủ (kết quả như cũ), sau đó trùng khớp.
+const SQL_CD_VT_DAU = `COALESCE((SELECT 'v'||dau FROM dau_bang WHERE ten='chien_dich'),${SQL_CD_VT})`
+export const SQL_VAN_TAY = `SELECT ${BT_DAU_KHO} kho,COALESCE((SELECT 'v'||dau FROM dau_bang WHERE ten='cau_hoi'),(SELECT COUNT(*)||'|'||COALESCE(MAX(cap_nhat_luc),'') FROM cau_hoi)) ch,
+  ${SQL_CD_VT_DAU} cd,(SELECT gia_tri FROM cau_hinh WHERE khoa=?) vt`
 /** Vân tay = băm(mốc kho, mốc câu, danh sách em) + '#' + trạng thái chiến dịch. */
 const dauVanTay = (r: Row | null, hs: readonly Row[]) => String(bam(JSON.stringify([r?.kho, r?.ch, hs])))
 const mang = (v: unknown): string[] => { try { const a: unknown = JSON.parse(String(v ?? '[]')); return Array.isArray(a) ? a.filter((x): x is string => typeof x === 'string') : [] } catch { return [] } }
@@ -98,8 +107,9 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
   // (không đọc kho, không ghi). Mỗi isolate kiểm tối đa một lần mỗi chu kỳ (không thêm truy vấn mỗi phút).
   kiemVanTay.set(goc, nowMs)
   // MỘT lệnh cho mốc kho + mốc câu + chiến dịch + vân tay cũ (giữ ngân sách lệnh D1 của lượt gộp đầy đủ); danh sách em đọc riêng (lượt gộp dùng lại).
+  let cdVt = SQL_CD_VT_DAU
   const [vtMoi, hs] = await Promise.all([
-    env.DB.prepare(SQL_VAN_TAY).bind(KHOA_VAN_TAY).first<Row>(),
+    env.DB.prepare(SQL_VAN_TAY).bind(KHOA_VAN_TAY).first<Row>().catch(() => { cdVt = SQL_CD_VT; return env.DB.prepare(SQL_VAN_TAY_CU).bind(KHOA_VAN_TAY).first<Row>() }),
     env.DB.prepare('SELECT sbd,lop,ten_lop,trang_thai FROM hoc_sinh ORDER BY sbd').all<Row>(),
   ])
   const dau = dauVanTay(vtMoi, hs.results ?? [])
@@ -167,7 +177,7 @@ export async function dongBoBaHanhTrinh(env: Env, nowMs: number): Promise<{ tran
   else lenh.push(env.DB.prepare('UPDATE cau_hinh SET cap_nhat_luc=? WHERE khoa=?').bind(luc, KHOA_HANH_TRINH))
   // Vân tay CUỐI lô (nguyên tử): phần chiến dịch tính bằng SQL SAU các lệnh ghi trên (lượt gộp tự tạo/cập nhật ba hành trình, đóng nguồn) ⇒ lượt sau
   // không đổi gì thì trùng khớp. Có người ghi chen giữa ⇒ lượt sau thấy khác ⇒ gộp lại (an toàn, chỉ tốn một lượt).
-  lenh.push(env.DB.prepare(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) SELECT ?1,?2||'#'||${SQL_CD_VT},?3 WHERE 1
+  lenh.push(env.DB.prepare(`INSERT INTO cau_hinh(khoa,gia_tri,cap_nhat_luc) SELECT ?1,?2||'#'||${cdVt},?3 WHERE 1
     ON CONFLICT(khoa) DO UPDATE SET gia_tri=excluded.gia_tri,cap_nhat_luc=excluded.cap_nhat_luc`).bind(KHOA_VAN_TAY, dau, luc))
   await env.DB.batch(lenh)
   // Import sau để tránh vòng phụ thuộc srs2-d1 → hành trình → srs2-d1.

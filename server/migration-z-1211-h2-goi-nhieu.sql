@@ -12,3 +12,33 @@ CREATE INDEX IF NOT EXISTS idx_ca_bao_ve ON ca(ma_ca) WHERE trang_thai<>'da_xoa'
 -- (4) ddl-mot-lan.ts: bản sao DÙNG CHUNG danh sách tên đối tượng lược đồ (một dòng) — thay cho mỗi isolate mới đọc cả sqlite_master (~760 hàng).
 --     Cron mỗi 10 phút chép lại (`lamMoiTenDoiTuongChung`); chưa có dòng ⇒ đọc sqlite_master như cũ (không chép ở đây: D1 giả của test dựng bảng sau migration).
 CREATE TABLE IF NOT EXISTS ddl_ten_chung (id INTEGER PRIMARY KEY CHECK (id = 1), ten_json TEXT NOT NULL, luc INTEGER NOT NULL);
+
+-- (11)(7)(9)(12)(1) DẤU BẢNG do TRIGGER giữ (server/src/dau-bang.ts): đọc «bảng X đã đổi chưa» = MỘT hàng theo khoá chính, thay cho COUNT(*)/MAX(...) quét cả bảng
+--     (dấu kho `COUNT(*)||'|'||MAX(indexed_at)` đọc mọi dòng game_v2_index; vân tay Hành trình đọc cả cau_hoi + chien_dich: 11.604 hàng/lượt).
+--  · game_v2_index: dấu = ĐÚNG chuỗi cũ `COUNT(*)||'|'||COALESCE(MAX(indexed_at),'')`, tính lại trong trigger (bảng nhỏ, chỉ ghi khi lập chỉ mục tờ) ⇒ mọi nơi
+--    so dấu kho / dauTruocLucDoc / kho_chup giữ nguyên giá trị.
+--  · bảng khác: SỐ PHIÊN tăng 1 mỗi dòng ghi (mồi bằng mốc ms ⇒ xoá dòng dấu rồi mồi lại không bao giờ trùng số cũ). Dấu tăng ⇔ có ghi ⇒ bản tính sẵn theo dấu
+--    không bao giờ cũ. chien_dich chỉ theo đúng các cột vân tay Hành trình đọc (SQL_CD_VT) + thêm/xoá dòng.
+--  TRIGGER TẠO TRƯỚC, MỒI SAU: lượt ghi chen giữa hai bước chỉ cập nhật 0 dòng, rồi phần mồi tính từ dữ liệu hiện tại ⇒ không lỡ thay đổi nào.
+--  Mã không bao giờ tự tạo trigger (thiếu bảng dau_bang mà có trigger ⇒ mọi lượt ghi bảng nguồn lỗi): bảng + trigger + mồi chỉ ở tệp này.
+CREATE TABLE IF NOT EXISTS dau_bang (ten TEXT PRIMARY KEY, dau TEXT NOT NULL);
+CREATE TRIGGER IF NOT EXISTS dau_bang_gvi_them AFTER INSERT ON game_v2_index BEGIN UPDATE dau_bang SET dau = (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index) WHERE ten = 'game_v2_index'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_gvi_sua AFTER UPDATE ON game_v2_index BEGIN UPDATE dau_bang SET dau = (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index) WHERE ten = 'game_v2_index'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_gvi_xoa AFTER DELETE ON game_v2_index BEGIN UPDATE dau_bang SET dau = (SELECT COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index) WHERE ten = 'game_v2_index'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_ch_them AFTER INSERT ON cau_hoi BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'cau_hoi'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_ch_sua AFTER UPDATE ON cau_hoi BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'cau_hoi'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_ch_xoa AFTER DELETE ON cau_hoi BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'cau_hoi'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_cd_them AFTER INSERT ON chien_dich BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'chien_dich'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_cd_sua AFTER UPDATE OF id, trang_thai, tao_luc, han_nop, the_luc_ngay, huyet_chien ON chien_dich BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'chien_dich'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_cd_xoa AFTER DELETE ON chien_dich BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'chien_dich'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_gvq_them AFTER INSERT ON game_v2_question BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'game_v2_question'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_gvq_sua AFTER UPDATE ON game_v2_question BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'game_v2_question'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_gvq_xoa AFTER DELETE ON game_v2_question BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'game_v2_question'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_oq_them AFTER INSERT ON omni_q BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_q'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_oq_sua AFTER UPDATE ON omni_q BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_q'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_oq_xoa AFTER DELETE ON omni_q BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_q'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_ob_them AFTER INSERT ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_ob_sua AFTER UPDATE ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
+CREATE TRIGGER IF NOT EXISTS dau_bang_ob_xoa AFTER DELETE ON omni_beta_cau BEGIN UPDATE dau_bang SET dau = CAST(dau AS INTEGER) + 1 WHERE ten = 'omni_beta_cau'; END;
+INSERT OR REPLACE INTO dau_bang (ten, dau) SELECT 'game_v2_index', COUNT(*)||'|'||COALESCE(MAX(indexed_at),'') FROM game_v2_index;
+INSERT OR IGNORE INTO dau_bang (ten, dau) SELECT x.value, CAST(CAST(strftime('%s','now') AS INTEGER) * 1000 AS TEXT) FROM json_each('["cau_hoi","chien_dich","game_v2_question","omni_q","omni_beta_cau"]') x;
