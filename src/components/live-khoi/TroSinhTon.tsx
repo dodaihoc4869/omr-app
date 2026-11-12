@@ -84,6 +84,13 @@ function docBangMau(goc: HTMLElement): BangMau {
   return bang
 }
 
+/** Máy này vừa vẽ không kịp bản có bóng + ánh sáng ⇒ nhớ 1 ngày để lần sau vào là kiểu phẳng ngay (không phải chịu vài giây đầu giật); hết hạn thì thử lại. */
+const KHOA_PHANG = 'ddh.sinhton.phang'
+function docPhang(): boolean {
+  try { const luc = Number(localStorage.getItem(KHOA_PHANG)); return luc > 0 && Date.now() - luc < 86_400_000 } catch { return false }
+}
+function ghiPhang(): void { try { localStorage.setItem(KHOA_PHANG, String(Date.now())) } catch { /* không có kho */ } }
+
 /** Hình bé ma nhỏ của một đội (bảng hết ván). */
 function AnhMa({ bang, doi }: { bang: BangMau; doi: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -165,9 +172,10 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     let hinh: BoHinh = taoBoHinh(bm, 1, nhe)
     let san: BoSan = taoBoSan(bm, 1)
     /** KIỂU PHẲNG: máy yếu ngay từ đầu, hoặc TỰ HẠ khi máy vẽ không kịp (xem `doNhip`) ⇒ bỏ bóng đổ + ánh sáng, về đúng mức vẽ của bản trước. */
-    let phang = nhe
-    /** Đếm khung chậm trong cửa sổ 120 khung (bỏ 60 khung đầu lúc còn nướng ảnh). */
-    let soKhung = 0, soCham = 0
+    let phang = nhe || docPhang()
+    if (phang) goc.setAttribute('data-phang', '1')
+    /** Đo theo từng cửa sổ 0,6 giây (bỏ 1 giây đầu lúc còn nướng ảnh, app còn bận việc mở phòng): `cuaXau` = số cửa sổ liền nhau dưới 48 khung / giây. */
+    let lucDauVe = 0, cuaTu = 0, cuaKhung = 0, cuaXau = 0
     setBang(bm)
     const doKhung = () => {
       W = goc.clientWidth; H = goc.clientHeight
@@ -279,12 +287,18 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       const dt = luc - lucTruoc
       if (nhipKhung && dt < nhipKhung - 3) return
       lucTruoc = luc
-      // TỰ HẠ: hơn 1/4 số khung trong cửa sổ 120 khung chậm hơn 19 ms (dưới ~48 khung / giây) ⇒ chuyển hẳn sang kiểu phẳng cho tới khi rời phòng chờ.
-      if (!phang && dt < 250 && ++soKhung > 60) {
-        if (dt > 19) soCham++
-        if (soKhung >= 180) {
-          if (soCham > 30) { phang = true; goc.setAttribute('data-phang', '1'); doKhung() }
-          soKhung = 60; soCham = 0
+      // TỰ HẠ (tác tử tốc độ 13/11: màn lớn trên máy yếu tụt 27 khung / giây suốt 4 giây đầu ⇒ phát hiện nhanh hơn + nhớ lại): HAI cửa sổ 0,6 giây liền nhau
+      // dưới 48 khung / giây ⇒ chuyển hẳn sang kiểu phẳng (≈ 2,2 giây kể từ khung đầu) và GHI NHỚ ở máy 1 ngày ⇒ lần sau phẳng ngay từ khung đầu.
+      if (!phang) {
+        if (!lucDauVe) lucDauVe = luc
+        if (luc - lucDauVe > 1000) {
+          if (!cuaTu) { cuaTu = luc; cuaKhung = 0 }
+          cuaKhung++
+          if (luc - cuaTu >= 600) {
+            cuaXau = cuaKhung / ((luc - cuaTu) / 1000) < 48 ? cuaXau + 1 : 0
+            cuaTu = luc; cuaKhung = 0
+            if (cuaXau >= 2) { phang = true; ghiPhang(); goc.setAttribute('data-phang', '1'); doKhung() }
+          }
         }
       }
       const nay = Date.now() + lech
@@ -433,7 +447,8 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         veBanDoNho(gn, r, c, d2, bd, bm, v, nvVe, doiEm)
       }
     }
-    const chay = () => { if (!rafId && !document.hidden) { lucTruoc = 0; rafId = requestAnimationFrame(khung) } }
+    // Tab vừa hiện lại ⇒ đo lại từ đầu (khung đầu sau khi ẩn không phản ánh sức máy).
+    const chay = () => { if (!rafId && !document.hidden) { lucTruoc = 0; lucDauVe = 0; cuaTu = 0; cuaXau = 0; rafId = requestAnimationFrame(khung) } }
     const dung = () => { if (rafId) cancelAnimationFrame(rafId); rafId = 0 }
     const doiHien = () => { if (document.hidden) dung(); else chay() }
 
