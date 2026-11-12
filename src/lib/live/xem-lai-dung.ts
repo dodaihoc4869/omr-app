@@ -65,6 +65,9 @@ export interface DauVaoDung {
   tenThay: string | null
   /** Giờ phòng lúc chốt (đóng lần live còn dang dở). */
   nay: number
+  /** Buổi LIVE THEO KHỐI (12/11): thầy giảng trên bảng / tờ cả buổi, có thể không chiếu câu nào ⇒ phần live TRƯỚC câu đầu tiên thành chương «Thầy giảng»,
+   *  và mọi câu đã chiếu đều được giữ như câu «chữa trên bảng» (chưa mở đáp án thì vẫn KHÔNG mang đáp án / lời giải). */
+  khoi?: boolean
 }
 /** Kế hoạch ghép `tieng.mp3`: theo thứ tự, mỗi mục là một khúc R2 (giữ các khoảng khung `giu`) hoặc `kh` khung câm. */
 export type MucTieng = { loai: 'khuc'; khoa: string; giu: [number, number][] } | { loai: 'cam'; kh: number }
@@ -92,6 +95,8 @@ export const LIVE_TOI_THIEU_MS = 15_000
 /** Buổi «có tiếng» khi có ít nhất một ô 0,5 giây từ −70 dBFS trở lên; mic câm cả buổi (mức 0) ⇒ coi như không có tiếng (không dựng `tieng.mp3`, đoạn tính theo nét). */
 export const NGUONG_CO_AM = mucTuDb(-70)
 const K = MS_MOI_KHUNG
+/** Tên chương / đề của phần thầy giảng trong buổi live theo khối (không gắn câu nào trong kho). */
+export const CHU_GIANG = 'Thầy giảng trên bảng'
 const sanK = (ms: number): number => Math.floor(ms / K) * K
 const tranK = (ms: number): number => Math.ceil(ms / K) * K
 const ngayVn = (ms: number): string => new Date(ms + 7 * 3_600_000).toISOString().slice(0, 10)
@@ -154,7 +159,7 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
   // 11/11 (thầy: «kết thúc live chưa thấy có bản ghi» — thầy chữa trên bảng mà không bấm mở đáp án): câu vào trang xem lại khi ĐÃ MỞ ĐÁP ÁN (`mo`), HOẶC
   // khi thầy đã gọi em lên bảng / bảng live đã bật trong lúc câu ấy đang chiếu (`bang`). Câu `bang` mà chưa mở đáp án: KHÔNG mang đáp án, KHÔNG mang lời giải
   // (ép `dung` = '' và `giai` = null ngay tại đây, dù ảnh chụp có gì). Câu không `mo` cũng không `bang` ⇒ vẫn bị loại và cắt khỏi tiếng + nét như cũ.
-  interface Chuong { so: number; bd: number; qid: string; w: number; wKet: number; a0: number; a1: number; mo: boolean; bang: boolean; bangSan: boolean; chup: LuotChup | null }
+  interface Chuong { so: number; bd: number; qid: string; w: number; wKet: number; a0: number; a1: number; mo: boolean; bang: boolean; bangSan: boolean; chup: LuotChup | null; giang?: true }
   /** Các khoảng bảng live đang bật (giờ phòng). */
   const bangBat: [number, number][] = []
   { let tu: number | null = null
@@ -171,11 +176,19 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
     if (truoc) { truoc.wKet = e.t; truoc.a1 = W2A(e.t) }
     chuong.push({ so: e.so, bd: e.bd ?? 0, qid: e.qid ?? '', w: e.t, wKet: Infinity, a0: W2A(e.t), a1: tongTho, mo: false, bang: false, bangSan: false, chup: null })
   }
+  // LIVE THEO KHỐI (thầy 12/11 tối: buổi 39 phút giảng trên bảng ra «0 đoạn · chưa câu nào được chữa»): phần live trước câu đầu tiên (hoặc cả buổi khi
+  // không chiếu câu nào) là chương «Thầy giảng» — lượt số 0, không đề, không đáp án; cửa «thầy chữa» mở từ đầu chương.
+  if (v.khoi && khoang.length) {
+    const dau = khoang[0]![0], ket = chuong[0]?.w ?? Infinity, a1 = Number.isFinite(ket) ? W2A(ket) : tongTho
+    if (ket > dau && a1 >= LIVE_TOI_THIEU_MS) chuong.unshift({ so: 0, bd: 0, qid: '', w: dau, wKet: ket, a0: 0, a1, mo: false, bang: true, bangSan: true, giang: true,
+      chup: { mo: false, so: 0, bd: 0, qid: '', phan: 'III', tuLuan: true, cau: { text: CHU_GIANG }, dung: '', giai: null, soDung: 0, soGui: 0, goi: null } })
+  }
   for (const c of chuong) {
+    if (c.giang) continue
     const chup = v.luot[c.so], khop = !!chup && (chup.bd === c.bd || !chup.bd || !c.bd), ket = Math.min(c.wKet, v.nay)
     c.mo = khop && chup!.mo !== false && sk.some((e) => e.k === 'mo' && e.so === c.so && e.t >= c.w && e.t < c.wKet)
-    c.bangSan = bangBat.some(([x, y]) => x <= c.w && y > c.w) && trongLive(c.w)
-    c.bang = khop && !c.mo && (sk.some((e) => e.k === 'goi' && e.so === c.so && e.t >= c.w && e.t < c.wKet && trongLive(e.t)) || bangBat.some(([x, y]) => Math.min(y, ket) > Math.max(x, c.w)))
+    c.bangSan = (!!v.khoi || bangBat.some(([x, y]) => x <= c.w && y > c.w)) && trongLive(c.w)
+    c.bang = khop && !c.mo && (sk.some((e) => e.k === 'goi' && e.so === c.so && e.t >= c.w && e.t < c.wKet && trongLive(e.t)) || bangBat.some(([x, y]) => Math.min(y, ket) > Math.max(x, c.w)) || !!v.khoi)
     c.chup = c.mo || c.bang ? chup! : null
   }
   const cat: [number, number][] = []
@@ -299,7 +312,7 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
   const mo = chuong.filter((c) => (c.mo || c.bang) && c.chup && R2F(c.a1) > R2F(c.a0))
   const cau: CauBuoiLive[] = mo.map((c, i) => {
     const ch = c.chup!, ten = v.ten[ch.qid], kin = !c.mo
-    return { so: i + 1, luot: c.so, qid: ch.qid, phan: ch.phan, tuLuan: ch.tuLuan, dang: ten?.dang ?? '', bai: ten?.bai ?? '', cau: ch.cau, dung: kin ? '' : ch.dung, giai: kin ? null : ch.giai ?? null,
+    return { so: i + 1, luot: c.so, qid: ch.qid, phan: ch.phan, tuLuan: ch.tuLuan, dang: c.giang ? CHU_GIANG : ten?.dang ?? '', bai: ten?.bai ?? '', cau: ch.cau, dung: kin ? '' : ch.dung, giai: kin ? null : ch.giai ?? null,
       soDung: ch.soDung, soGui: ch.soGui, t0: Math.round(R2F(c.a0)), t1: Math.round(R2F(c.a1)), ...(kin ? { moDapAn: false } : {}) }
   })
   const F = (w: number): number => Math.round(R2F(W2A(w)))
@@ -326,7 +339,8 @@ export function dungBuoi(v: DauVaoDung): KetQuaDung {
     cau.map((c) => ({ luot: c.luot, soDung: c.soDung, soGui: c.soGui, tuLuan: c.tuLuan })))
   const doan: DoanBuoiLive[] = doanTho.map((d) => {
     const c = soCuaLuot.get(d.luot)!, e = d.sbd ? tenEm.get(d.sbd) : undefined
-    return { stt: d.stt, loai: d.loai, cau: c.so, luot: d.luot, ten: tenDoan({ so: c.so, dang: c.dang, loai: d.loai, tenEm: d.sbd ? (e?.ten ?? d.sbd) : null, phan: d.phan }),
+    const laGiang = d.luot === 0 && c.qid === '' && d.loai === 'thay_chua'
+    return { stt: d.stt, loai: d.loai, cau: c.so, luot: d.luot, ten: laGiang ? `Câu ${c.so} · ${CHU_GIANG}${(d.phan ?? 1) >= 2 ? ` (phần ${d.phan})` : ''}` : tenDoan({ so: c.so, dang: c.dang, loai: d.loai, tenEm: d.sbd ? (e?.ten ?? d.sbd) : null, phan: d.phan }),
       lenBang: d.loai === 'len_bang' && d.sbd ? { sbd: d.sbd, ten: tenGoi(e?.ten ?? d.sbd), doi: e?.doi ?? 0, dat: d.dat } : null,
       t0: d.t0, t1: d.t1, giayCoTieng: d.giayCoTieng, soNet: d.soNet, dangXem: dangXem.get(d.stt)?.lyDo ?? null, phan: d.phan }
   })

@@ -203,7 +203,7 @@ export default function LichSuLive({ onDong }: { onDong: () => void }) {
                   <span className="lsl-s gvv2-so">{b.trangThai === 'xong' ? b.soDoan : '–'}</span>
                   <span className="lsl-s gvv2-so">{duoc && b.byte ? chuDungLuong(b.byte) : '–'}</span>
                   <span className="lsl-nut">
-                    {b.trangThai === 'loi' && <button type="button" className="lsl-mo" disabled={dangDung === b.id} onClick={() => void dungLai(b)}>{dangDung === b.id ? 'Đang dựng…' : 'Dựng lại'}</button>}
+                    {(b.trangThai === 'loi' || (duoc && khongDoan(b) && b.giayLive >= 15)) && <button type="button" className="lsl-mo" disabled={dangDung === b.id} onClick={() => void dungLai(b)}>{dangDung === b.id ? 'Đang dựng…' : 'Dựng lại'}</button>}
                     {b.trangThai === 'xong' && b.soDoan > 0 && coManXemLai && b.ve && <button type="button" className="lsl-mo" onClick={() => void moBuoi(b)} aria-label={`Mở buổi ${ten}`}>Mở</button>}
                     {b.trangThai === 'xong' && !khongDoan(b) && <button type="button" className="lsl-bt" onClick={() => moDoiTen(b)} aria-label={`Đổi tên buổi ${ten}`}><Pencil size={18} aria-hidden="true" /></button>}
                     {duoc && <button type="button" className="lsl-bt lsl-chi-rong" onClick={() => setHopXoa([b])} aria-label={`Xoá buổi ${ten}`}><Trash2 size={18} aria-hidden="true" /></button>}
