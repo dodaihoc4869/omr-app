@@ -21,10 +21,14 @@ export const CSS_THANH_DAY = `
 body.mc .mc-thanh{--td-cao:max(40px,calc(var(--u)*2.6))}
 body.mc .mc-thanh #mc-len-bang,body.mc .mc-thanh .mc-lv-nut,body.mc .mc-thanh .mc-lv-cum{min-height:var(--td-cao)}
 body.mc .mc-thanh .mc-phim-nhom>.mc-nut-phim{height:var(--td-cao)}
-body.mc .mc-thanh .mc-td-them{position:relative;width:var(--td-cao);height:var(--td-cao);margin-left:auto;touch-action:manipulation}
-.mc-td-them::after{content:"";position:absolute;top:6%;right:6%;display:none;width:max(9px,calc(var(--u)*.7));height:max(9px,calc(var(--u)*.7));border-radius:50%;background:var(--mc-vang-noi);box-shadow:0 0 0 2px var(--mc-thanh-nen)}
+body.mc .mc-thanh .mc-td-them{position:relative;width:var(--td-cao);height:var(--td-cao);margin-left:auto;touch-action:manipulation;background:none;box-shadow:none}
+.mc-td-vien{display:grid;place-items:center;width:64%;height:64%;border-radius:30%;background:color-mix(in srgb,var(--mc-bang-chu) 8%,var(--mc-bang-nut));box-shadow:inset 0 0 0 1px var(--mc-bang-vien),inset 0 1px 0 color-mix(in srgb,var(--mc-bang-chu) 18%,transparent);transition:transform .14s}
+.mc-td-them:hover .mc-td-vien{transform:scale(1.07)}
+body.mc .mc-thanh .mc-td-them svg{width:62%;height:62%}
+.mc-td-them::after{content:"";position:absolute;top:11%;right:11%;display:none;width:max(9px,calc(var(--u)*.7));height:max(9px,calc(var(--u)*.7));border-radius:50%;background:var(--mc-vang-noi);box-shadow:0 0 0 2px var(--mc-thanh-nen)}
 .mc-td-them[data-bat]::after{display:block}
-body.mc .mc-thanh .mc-td-them[aria-expanded="true"]{background:var(--mc-bang-chu);box-shadow:none;color:var(--mc-thanh2)}
+body.mc .mc-thanh .mc-td-them[aria-expanded="true"]{background:none;box-shadow:none}
+body.mc .mc-thanh .mc-td-them[aria-expanded="true"] .mc-td-vien{background:var(--mc-bang-chu);box-shadow:none;color:var(--mc-thanh2)}
 body.mc-khay-mo .mc-thanh{z-index:46}
 /* «Đã gọi lên bảng» (nút đã khoá) lặp lại đúng điều viên trạng thái «ĐANG CHỮA» / «MỜI LÊN BẢNG» đang nói ⇒ nhường chỗ cho nút dùng được */
 body.mc .mc-thanh #mc-len-bang:disabled{display:none}
@@ -53,7 +57,7 @@ body.mc .mc-phim-nhom .mc-khay .mc-nut-phim.mc-bat kbd,body.mc .mc-phim-nhom .mc
 /* hộp Cài đặt mở đúng chỗ khay vừa thu (trước neo cứng 58 px: màn rộng thì đè lên thanh) */
 #mc-cai-dat{bottom:calc(8px + max(44px,calc(var(--u)*3.6)) + var(--u)*.6)}
 /* 11/11 tối · dấu «có em nói» ở góc TRÁI nút «thêm» (chấm vàng «đang bật» ở góc phải): đặc đỏ = em đang nói / đã mời; vòng đỏ = chỉ có em giơ tay */
-.mc-td-them::before{content:"";position:absolute;top:4%;left:4%;display:none;width:max(10px,calc(var(--u)*.78));height:max(10px,calc(var(--u)*.78));border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 2px var(--mc-thanh-nen)}
+.mc-td-them::before{content:"";position:absolute;top:10%;left:10%;display:none;width:max(10px,calc(var(--u)*.78));height:max(10px,calc(var(--u)*.78));border-radius:50%;background:var(--mc-do);box-shadow:0 0 0 2px var(--mc-thanh-nen)}
 .mc-td-them[data-noi]::before{display:block}
 .mc-td-them[data-noi="tay"]::before{background:var(--mc-thanh-nen);box-shadow:inset 0 0 0 2.5px var(--mc-do),0 0 0 2px var(--mc-thanh-nen)}
 /* dải «Đang nói» bản 11/11 (đã thay bằng khối đầy đủ bên dưới): giữ khai báo màu theo cổng kiem:mau-giu; .mc-khay-noi .mc-lv-n vẫn dùng (nút ≥ 40 px) */
@@ -109,7 +113,8 @@ export const JS_THANH_DAY = `
     nut.type = 'button'; nut.id = 'mc-them'; nut.className = 'mc-lv-gon mc-td-them';
     nut.setAttribute('aria-expanded', 'false'); nut.setAttribute('aria-controls', 'mc-khay');
     nut.title = 'Thêm nút điều khiển (phím tắt vẫn dùng được)';
-    nut.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></svg>';
+    // (thầy 12/11 «cái nút này làm nhỏ lại, đẹp hơn nữa») viên bo góc nhỏ gọn nằm giữa vùng bấm (vùng bấm vẫn đủ --td-cao), bốn ô nhỏ bo tròn
+    nut.innerHTML = '<span class="mc-td-vien"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7.6" height="7.6" rx="2.4"/><rect x="13.4" y="3" width="7.6" height="7.6" rx="2.4"/><rect x="3" y="13.4" width="7.6" height="7.6" rx="2.4"/><rect x="13.4" y="13.4" width="7.6" height="7.6" rx="2.4"/></svg></span>';
     thanh.appendChild(nut);
     // các nút đang bấm được của khay (bỏ nút ẩn, nhóm ẩn)
     function ds() { return Array.prototype.filter.call(khay.querySelectorAll('button'), function (x) { return !x.hidden && !x.disabled && !x.parentNode.hidden; }); }

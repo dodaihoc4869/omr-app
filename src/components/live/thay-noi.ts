@@ -133,6 +133,21 @@ let daNghe = false
 const ma = (khoa: string): string => maCua.get(khoa) ?? maTrang(khoa, null, false)
 const anh = () => ({ trang: ma(guong.khoa), tiLe: guong.tiLe, net: guong.net })
 const mauDoi = (d: number): string => { try { return getComputedStyle(document.documentElement).getPropertyValue(DOI_BPU[d]?.mau ?? '').trim() } catch { return '' } }
+// NÚT ỐNG NGHIỆM «AI ĐÃ NỘP» (thầy 12/11, bản vẽ 19–22): chỉ ở buổi live theo khối đang «Học» và đang có câu ⇒ gửi tờ danh sách đã nộp (nhanh nhất trước:
+// sbd, tên, màu đội, kết quả, giây, đáp án) + em có mặt chưa nộp. Chỉ gửi khi khác lần trước. Tờ vẽ: src/lib/live-nop-to-chieu.ts. Không đi qua phòng ⇒ máy em không nhận.
+let nopCu = ''
+function guiNop(): void {
+  const l = view?.luot, kh = view?.live?.khoi
+  let tin: Record<string, unknown> = { lenh: 'live-nop', so: 0 }
+  if (view && l && kh && kh.gd === 'dang' && kh.che === 'hoc') {
+    const nop = (l as { nop?: Record<string, [number, number, string]> }).nop ?? {}, em = new Map(view.ds.map((e) => [e.sbd, e]))
+    const ds = Object.entries(nop).sort((a, b) => a[1][1] - b[1][1]).map(([s, [kq, g, c]]) => { const e = em.get(s); return [s, e?.ten ?? s, e ? mauDoi(e.doi) : '', kq, g, c] })
+    const chua = view.ds.filter((e) => e.vao && !(e.sbd in nop)).map((e) => [e.sbd, e.ten, mauDoi(e.doi)])
+    tin = { lenh: 'live-nop', so: l.so, phan: l.phan, tong: ds.length + chua.length, nop: ds, chua }
+  }
+  const k = JSON.stringify(tin)
+  if (k !== nopCu) { nopCu = k; guiTo(tin) }
+}
 
 let nhacGhiDen = 0
 /** Thẻ nhắc một lần: lần đầu thấy «đang ghi» trên máy này ⇒ hiện 9 giây rồi thôi mãi (nhớ ở máy). */
@@ -319,7 +334,7 @@ function nghe(): void {
   ngheTin((tin) => {
     if (tin && typeof tin === 'object' && !(tin instanceof ArrayBuffer)) {
       const m = tin as { t?: string }
-      if (m.t === 'bang') { view = tin as ViewBang; void dam() }
+      if (m.t === 'bang') { view = tin as ViewBang; void dam(); guiNop() }
       lt?.nhanTinPhong(tin)
       if (m.t === 'bang' || m.t === 'live-xem' || m.t === 'live-kq' || m.t === 'live-do') bao()
     }
@@ -416,7 +431,7 @@ export function nhanTinTo(d: unknown, nguon: Window | null): void {
   nghe()
   if (nguon && nguon !== to) { to = nguon; ttCu = ''; bangSan = false }
   switch (m.viec) {
-    case 'chao': bangSan = false; bao(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); break
+    case 'chao': bangSan = false; nopCu = ''; bao(); guiNop(); if (lkMoi || lkChat) guiTo({ lenh: 'live-lk', moi: lkMoi, chat: lkChat }); break
     case 'lk': try { window.dispatchEvent(new CustomEvent('ddh-lkt', { detail: String(m.v ?? '') })) } catch { /* test */ } break
     case 'bang-xin': { const co = !!bangLuu && bangLuu.buoi === (view?.buoiId ?? '') && bangLuu.goi.net.length > 0; bangSan = true; guiTo({ lenh: 'live-bang-nhap', goi: co ? bangLuu!.goi : { v: 1, tiLe: 0, net: [] } }); if (!co) giuBang(true); break }
     case 'bam': bam(); break

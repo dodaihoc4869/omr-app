@@ -506,11 +506,11 @@ export const xepEm = (st: TrangThaiPhong): EmPhong[] => [...st.ds].filter((e) =>
  *  `chamSo` (máy chủ truyền, 10/11): lượt trắc nghiệm đang «tra-loi» ⇒ thêm `kiem` {sbd: [đúng 1/0, giây gửi]} CHỈ cho bộ chọn em lên bảng (ưu tiên em đúng
  *  trên máy để kiểm thật, có lượt chọn em sai để chữa). KHÔNG vẽ, KHÔNG vào lý do (lộ đúng/sai làm hỏng trò đoán của lớp), không bao giờ ra `viewEm`. */
 export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: string) => boolean, demLive?: { xem: number; ws: number }) {
-  const l = st.luot
+  const l = st.luot, live = viewLiveBang(st, demLive)
   return {
     t: 'bang' as const,
     /** LIVE BẢNG (10/11): trạng thái live của buổi + số em đang xem (`demLive` do phòng đếm); công tắc tắt / phòng đời cũ ⇒ null. */
-    live: viewLiveBang(st, demLive),
+    live,
     buoiId: st.buoiId, lop: st.lop, soLuot: st.soLuot, ketThuc: st.ketThuc, doiThuong: st.doiThuong, doiDu: st.doiDu, soDoi: soDoiCua(st), vuaVao: st.vuaVao, lichSu: st.lichSu,
     /** Em đang ở ngoài app trong lượt chưa mở đáp án (thầy 09/11) — bảng vẽ viền đỏ nhấp nháy + thẻ tên khi mảng khác rỗng. */
     roiNay: st.roiNay ?? [],
@@ -524,6 +524,9 @@ export function viewBang(st: TrangThaiPhong, chamSo?: (traLoi: string, dapAn: st
       daGui: Object.keys(l.tra),
       chuaBiet: Object.entries(l.tra).filter(([, t]) => t.kb).map(([s]) => s),
       ...(chamSo && l.pha === 'tra-loi' && !l.tuLuan ? { kiem: Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, [chamTra(l, t.chon, chamSo).dung ? 1 : 0, Math.max(1, Math.round(t.t / 1000))] as [0 | 1, number]])) } : {}),
+      // (12/11, nút ống nghiệm «Ai đã nộp» trên màn chiếu của buổi LIVE THEO KHỐI — chỉ view của THẦY, mọi pha) em đã gửi ⇒ [kết quả, giây, đáp án em chọn];
+      // kết quả 1 đúng · 0 sai · 2 không chấm tự động (tự luận / phòng không có bộ chấm) · 3 em báo «chưa biết làm». Buổi trên lớp không gửi (bảng đua đã có).
+      ...(live?.khoi ? { nop: Object.fromEntries(Object.entries(l.tra).map(([s, t]) => [s, [t.kb ? 3 : l.tuLuan || !chamSo ? 2 : chamTra(l, t.chon, chamSo).dung ? 1 : 0, Math.max(1, Math.round(t.t / 1000)), t.kb ? '' : String(t.chon).slice(0, 24)] as [0 | 1 | 2 | 3, number, string]])) } : {}),
       goi: l.goi ? { sbd: l.goi.sbd, lyDo: l.goi.lyDo, dat: l.goi.dat, doanDung: Object.values(l.goi.duDoan).filter((v) => v === 1).length, doanSai: Object.values(l.goi.duDoan).filter((v) => v === 0).length, tiep: tongTiep(l.goi) } : null,
       ...(l.pha === 'mo' ? { dung: l.dung, chon: Object.fromEntries(Object.entries(l.tra).filter(([, t]) => !t.kb).map(([s, t]) => [s, t.chon])), ketQua: l.ketQua } : {}),
     } : null,

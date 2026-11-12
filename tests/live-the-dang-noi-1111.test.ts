@@ -267,10 +267,11 @@ describe('B · tờ thật', () => {
 
 describe('C · CSS + cú pháp', () => {
   it('dấu «có em nói» ở góc TRÁI, màu đỏ của tờ (chấm vàng «đang bật» ở góc phải giữ nguyên); vòng khi chỉ có em giơ tay', () => {
-    expect(CSS_THANH_DAY).toMatch(/\.mc-td-them::before\{[^}]*left:4%[^}]*background:var\(--mc-do\)/)
+    // SỬA CÓ CHỦ ĐÍCH 12/11 — thầy «cái nút này làm nhỏ lại, đẹp hơn nữa»: viên bốn ô nay nằm giữa vùng bấm (64 %) ⇒ dấu «có em nói» dời từ 4 % vào 10 % cho sát góc viên.
+    expect(CSS_THANH_DAY).toMatch(/\.mc-td-them::before\{[^}]*left:10%[^}]*background:var\(--mc-do\)/)
     expect(CSS_THANH_DAY).toContain('.mc-td-them[data-noi]::before{display:block}')
     expect(CSS_THANH_DAY).toMatch(/\.mc-td-them\[data-noi="tay"\]::before\{[^}]*inset 0 0 0 2\.5px var\(--mc-do\)/)
-    expect(CSS_THANH_DAY).toContain('.mc-td-them::after{content:"";position:absolute;top:6%;right:6%') // chấm vàng cũ không đổi
+    expect(CSS_THANH_DAY).toContain('.mc-td-them::after{content:"";position:absolute;top:11%;right:11%') // chấm vàng cũ không đổi
   })
   it('khối đầu khay trọn một hàng, không làm khay rộng ra; khay cao quá màn ⇒ cuộn; màn hẹp xếp dọc; nút trong khối ≥ 40 px; không chuyển động riêng', () => {
     expect(CSS_THANH_DAY).toMatch(/\.mc-khay\{flex-wrap:wrap;max-height:calc\(100vh[^}]*overflow-y:auto/)

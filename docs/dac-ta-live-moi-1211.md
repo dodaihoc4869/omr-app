@@ -132,3 +132,8 @@ Bản vẽ: `docs/ban-ve-live-moi-1211/` (28 ảnh Chromium, `mo-phong.html` + `
     - Chấm (nút, D / K) ⇒ phòng ghi + mở đáp án ⇒ máy em hiện con dấu; máy thầy ở nguyên màn chiếu.
 30. **«Học» trong khay khi màn Học là tấm hoạt động:** về đúng tấm (và tờ của nó), không ra bảng chọn. Bảng chọn «Hôm nay làm gì?» có nút «Về màn chiếu». Chế độ Bảng ẩn cả thẻ tên em vừa lên bảng.
 31. **Toàn màn hình máy thầy chặn tại gốc** suốt phiên live (`gan-gv.tsx` `khoaToanMan`), phím F trên tờ không bật toàn màn hình; nút «Toàn màn hình» trong Cài đặt của tờ còn cho lúc thầy chủ động. **Máy em chỉ ép ngang** (`lock('landscape')`), cầm bên nào cũng được.
+32. **Nút ống nghiệm «Ai đã nộp»** (thầy 12/11, bản vẽ `docs/ban-ve-live-moi-1211/19–22` duyệt «ok chốt build»): trên thanh đáy của tờ, ngay cạnh nút bốn ô, CHỈ ở buổi live theo khối đang «Học» và đang có câu.
+    - Nút: ống nghiệm (mực dâng theo tỉ lệ đã nộp) + «N/tổng đã nộp». Có em vừa gửi ⇒ tia lửa xoắn ốc từ đáy lên quá miệng ống + nháy viền + dòng «Tên vừa gửi · m:ss» (máy yếu / giảm chuyển động: chỉ nháy viền).
+    - Bấm ⇒ tấm chỉ phủ CỘT BẢNG ĐEN (giấy đề, thanh đáy giữ nguyên): số đã nộp, thanh đúng / sai, «Đã nộp» xếp nhanh nhất trước (hạng · màu đội · tên đủ · giây · đáp án · đúng / sai; tự luận không chấm; em báo «chưa biết làm» ghi rõ), «Chưa nộp» = em có mặt chưa gửi. Bấm lần nữa để đóng.
+    - Dữ liệu: view của THẦY thêm `luot.nop` (chỉ khi phòng có cờ khối — `src/lib/bpu/phong.ts`); app gửi tờ lệnh `live-nop` (`thay-noi.ts` `guiNop`); tờ vẽ `src/lib/live-nop-to-chieu.ts`. Máy em không bao giờ nhận.
+    - Viên nhắc cũ «Lượt đang mở · N em chưa gửi» không hiện ở buổi live theo khối (nút đã đếm). Nút bốn ô nay là viên bo góc 64 % nằm giữa vùng bấm (vùng bấm giữ nguyên).

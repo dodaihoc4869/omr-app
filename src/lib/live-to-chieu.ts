@@ -34,6 +34,7 @@
 // (nút ≥ 40 px); chữ chỉ khi có vấn đề (.mc-lv-canh); «Chi tiết» thu gọn ở cuối. Luật CSS mới CHỈ trong .mc-lv-the: .mc-lv-n.nho / .mc-lv-dong của thẻ «Đang nói»
 // giữ nguyên. Bảng cao quá màn (khổ thấp) ⇒ tự cuộn trong khung, không tràn mép trên.
 import { JS_LIVE_KHOI_TO_CHIEU } from './live-khoi-to-chieu'
+import { CSS_LIVE_NOP } from './live-nop-to-chieu'
 
 export const CSS_LIVE_TO_CHIEU = `
 body.mc-che-bang .mc-vung-de,body.mc-che-bang .mc-trang{display:none!important}
@@ -155,7 +156,7 @@ html.may-yeu .mc-lv-vien.nhay,html.may-yeu .mc-lv-cum .im{animation:none}
 .mc-lv-ct[open]>summary::before{transform:rotate(45deg)}
 .mc-lv-ct summary:focus-visible{outline:3px solid var(--mc-vang-noi);outline-offset:2px}
 .mc-lv-ct .mc-lv-cd{margin-top:0}
-`
+${CSS_LIVE_NOP}`
 
 export const JS_LIVE_TO_CHIEU = `
   // ── V · live bảng (thầy 10/11) — mặt của tờ; máy chạy ở app: src/components/live/thay-noi.ts ──
@@ -251,7 +252,7 @@ export const JS_LIVE_TO_CHIEU = `
       for (i = 0; i < Math.min(3, n); i++) { e = ds[i]; h += '<div class="mc-lv-em">' + lvKy(e) + '<span>' + lvSach(e.ten) + '<small>' + (e.doi ? lvSach(e.doi) + ' · ' : '') + (e.kieu ? lvSach(e.kieu) : 'rời màn') + ' · ' + lvLau(e.luc) + '</small></span></div>'; }
       if (n > 3) h += '<p>+' + (n - 3) + ' em nữa</p>';
       h += '<p>Em quay lại thì tên tự mất.</p></div>';
-    } else if (live && LV.tt.chuaGui && !hien) {
+    } else if (live && LV.tt.chuaGui && !hien && !LV.tt.khoi) { // buổi live theo khối: nút ống nghiệm «Ai đã nộp» đã đếm ⇒ không nhắc trùng (và không đè lên tấm)
       // không em nào rời: chỗ này nhắc «Lượt đang mở · N em chưa gửi» (thầy viết lời giải khi lượt chưa mở đáp án — đặc tả mục 5)
       h += '<span class="mc-lv-nhac" role="status">Lượt đang mở · ' + LV.tt.chuaGui + ' em chưa gửi</span>';
     }
@@ -505,6 +506,7 @@ export const JS_LIVE_TO_CHIEU = `
     if (!m || m.nguon !== 'bpu-bang' || e.source !== dichApp()) return;
     if (m.lenh === 'live-muc') { lvVeMuc(+m.v || 0, +m.em || 0); if (typeof m.cd === 'string' && document.getElementById('mc-lv-cd')) document.getElementById('mc-lv-cd').textContent = m.cd; return; }
     if (m.lenh === 'live-bao') { baoNhanh(String(m.chu || ''), 4200); return; }
+    if (m.lenh === 'live-nop') { lvNop(m); return; }
     if (m.lenh === 'live-lk') { LV.lkMoi = +m.moi || 0; LV.lkChat = m.chat === true; if (LV.lk) lvLk(document.body.classList.contains('mc-che-bang')); return; }
     if (m.lenh === 'live-bang-nhap') { if (window.__mcBut && window.__mcBut.trang() === 'bl') { LV.bangNhap = 1; if (m.goi && m.goi.net && m.goi.net.length) window.__mcBut.nhap(m.goi); } return; }
     if (m.lenh !== 'live-tt') return;

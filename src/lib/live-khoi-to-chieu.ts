@@ -1,6 +1,8 @@
 // LIVE THEO KHỐI — PHẦN CHỈ CỦA BUỔI LIVE THEO KHỐI TRÊN TỜ CHIẾU (12/11): cỡ chữ đề của buổi live + nối «Lên bảng» / Đạt / Chưa đạt của tờ vào phòng.
 // Đoạn JS (ES5) chèn vào cuối JS_LIVE_TO_CHIEU (cùng phạm vi: LV · lvGui · body · dot · pha · S · dauKq · baoNhanh). Tách tệp riêng vì cổng cỡ tệp.
 // Tin ra: { nguon:'to-chieu', loai:'live', viec:'len', sbd? } · { …, viec:'cham', dat }   ·   tin vào: { nguon:'bpu-bang', lenh:'live-bao', chu } (live-to-chieu.ts).
+import { JS_LIVE_NOP } from './live-nop-to-chieu'
+
 export const JS_LIVE_KHOI_TO_CHIEU = `
   // CỠ CHỮ ĐỀ CỦA BUỔI LIVE (thầy 12/11 «cỡ chữ đề trên máy học sinh to hơn … chữ hiện tại nhỏ quá»): máy em soi ĐÚNG cách xuống dòng của giấy thầy (để nét
   // gạch chân khớp chữ) nên chữ máy em to theo chữ của tờ. Buổi live mặc định «Chữ rất lớn» (1,2); thầy đổi trong Cài đặt của tờ thì máy em theo ngay và
@@ -47,4 +49,4 @@ export const JS_LIVE_KHOI_TO_CHIEU = `
   // Buổi live: phím F của tờ KHÔNG bật toàn màn hình nữa (thầy 12/11 «màn giáo viên không cần full màn hình … vẫn có một chỗ bấm vào full màn hình»); nút «Toàn màn hình» trong Cài đặt vẫn còn cho lúc thầy chủ động cần.
   window.addEventListener('keydown', function (e) { if ((e.key === 'f' || e.key === 'F') && LV.tt && LV.tt.khoi && !e.ctrlKey && !e.metaKey && !e.altKey) e.stopImmediatePropagation(); }, true);
   document.addEventListener('keydown', function (e) { var t = e.target; if ((e.key !== 'l' && e.key !== 'L') || e.ctrlKey || e.metaKey || e.altKey || (t && t.closest && t.closest('input,textarea,select,[contenteditable]'))) return; lvXinGoi(e); }, true);
-`
+${JS_LIVE_NOP}`
