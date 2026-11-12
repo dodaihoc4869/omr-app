@@ -222,7 +222,7 @@ export const BANG_GIU: readonly string[] = [
   'hanh_trinh_nguon_cau', 'hanh_trinh_v6_chon','hanh_trinh_v6_do','hanh_trinh_v6_fit', 'hanh_trinh_v5_muc', 'hanh_trinh_v5_phan_nhom', 'hanh_trinh_v5_quyet_dinh', 'hanh_trinh_v5_de_thu',
   'hanh_trinh_v4_em', 'hanh_trinh_v4_canh', 'hanh_trinh_v4_chot', 'hanh_trinh_v4_can_thiep',
   // Cạnh cả lớp cộng sẵn (12/11, hanh-trinh-canh-lop.ts): dẫn xuất từ hanh_trinh_v4_canh (GIỮ) ⇒ GIỮ cho nhất quán; cron dựng lại ≤ 2 giờ.
-  'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc',
+  'hanh_trinh_v4_canh_lop', 'hanh_trinh_v4_canh_lop_moc', 'hanh_trinh_v4_bandit_lop', 'hanh_trinh_v4_bandit_lop_moc',
   // ĐỆM THEO NGÀY cờ đối phó Nhịp học (nhip-hoc-dem.ts, B3 15/10) — sinh sau lần 21/09: GIỮ = không đụng. Dẫn xuất từ sổ su_kien_hoc (GIỮ).
   'nhip_hoc_doi_pho_ngay',
   // «Lần cuối em làm mỗi câu» tính sẵn (G5 12/11, migration-z-1211-cau-lam-cuoi.sql): dẫn xuất từ sổ su_kien_hoc (GIỮ), trigger giữ đúng ⇒ GIỮ.

@@ -276,13 +276,15 @@ export async function docDauVao(env: Env, dsSbd: string[], now: number, bo: DauV
   const pPhamViBat = chan(phamViBat(env))
   const pKhoiLop = chan(docKhoiVaLopCacEm(env, em).catch(() => ({ khoi: new Map<string, Khoi | null>(), lop: new Map<string, string>() })))
   // 28/10 tối: BA lượt đọc hồ sơ (câu tới hạn · dạng · số câu chưa khắc phục) gộp MỘT lệnh UNION ALL (cột chung c1…c9, `k` phân loại) — cùng điều kiện, cùng dòng.
+  // 12/11 (H3): hai chỉ mục BỘ PHẬN (migration-z-1211-h3-doc-bang-phu.sql) — 'c' đọc đúng câu tới hạn (cùng thứ tự sbd, moc_on_ke như cũ), 'n' đếm trên chỉ mục.
+  // Danh sách IN của 'n' viết ('dang_on','moi_sai') CỐ Ý: khớp đúng điều kiện chỉ mục nkc_em_chua_kp, để câu khác ghi ('moi_sai','dang_on') không đổi kế hoạch / thứ tự dòng.
   const docHoSoD1 = (ds: string[], kemChiMuc = false) => {
     const rong = () => Promise.resolve(trong<Record<string, unknown>>()), a = json(ds)
     if (ds.length === 0) return { rc: rong(), rd: rong(), rn: rong(), chiMuc: null }
     const hoi = (kem: boolean) => tat(() => env.DB.prepare(
       `SELECT 'c' AS k, sbd, qid AS c1, ma_dang AS c2, moc_on_ke AS c3, lan_sai AS c4, luc_cuoi AS c5, NULL AS c6, NULL AS c7, NULL AS c8, NULL AS c9 FROM nam_kt_cau
         WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?
-       UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('moi_sai','dang_on') GROUP BY sbd
+       UNION ALL SELECT 'n', sbd, COUNT(*), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL FROM nam_kt_cau WHERE ${IN_EM} AND trang_thai IN ('dang_on','moi_sai') GROUP BY sbd
        UNION ALL SELECT 'd', sbd, ma_dang, so_gap, so_sai, so_da_khac_phuc, so_moi_sai, so_chua_thay_sai, bac, moc_on_ke, moc_moi_sai FROM nam_kt_dang WHERE ${IN_EM}${kem ? `
        UNION ALL SELECT 'x', NULL, (SELECT 1 FROM game_v2_index LIMIT 1), NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL` : ''}`,
     ).bind(a, homNay, a, a).all<Record<string, unknown>>(), null)

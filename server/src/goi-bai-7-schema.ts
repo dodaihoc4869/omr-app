@@ -1,6 +1,8 @@
 export const SQL_GOI7: readonly string[] = [
   `CREATE TABLE IF NOT EXISTS goi_bai_7 (id TEXT PRIMARY KEY,tick_id TEXT NOT NULL UNIQUE,lop TEXT NOT NULL,khoa_bai TEXT NOT NULL,ten TEXT NOT NULL,bat_dau TEXT NOT NULL,han TEXT NOT NULL,tao_luc TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS goi_bai_7_lop ON goi_bai_7(lop,bat_dau)`,
+  // 12/11 tối (H3): cron lập sẵn Sảnh (san-sang.ts SQL_SAN_SANG_LECH) dò «gói tạo sau lúc lập bản» theo lúc tạo — không đọc mọi gói của từng em.
+  `CREATE INDEX IF NOT EXISTS goi_bai_7_tao ON goi_bai_7(tao_luc)`,
   `CREATE TABLE IF NOT EXISTS goi_bai_7_cau (goi_id TEXT NOT NULL,qid TEXT NOT NULL,version TEXT NOT NULL,ma_de TEXT NOT NULL,meta_json TEXT NOT NULL,PRIMARY KEY(goi_id,qid))`,
   `CREATE TABLE IF NOT EXISTS goi_bai_7_em (goi_id TEXT NOT NULL,sbd TEXT NOT NULL,bat_dau TEXT NOT NULL,han TEXT NOT NULL,PRIMARY KEY(goi_id,sbd))`,
   `CREATE INDEX IF NOT EXISTS goi_bai_7_em_sbd ON goi_bai_7_em(sbd,han)`,

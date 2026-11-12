@@ -46,6 +46,8 @@ export function metaKt(d: DeKt): MetaKt {
 }
 const SQL_GHI_META_KT = `INSERT INTO kiem_tra_ca_nhan_meta(id,meta_json) SELECT ?1,?2 WHERE EXISTS(SELECT 1 FROM kiem_tra_ca_nhan WHERE id=?1 AND cap_nhat_luc=?3) ON CONFLICT(id) DO UPDATE SET meta_json=excluded.meta_json`
 /** Bù số tính sẵn cho lịch lập trước bản vá 13/10 (mỗi lượt ≤ tran dòng). Chỉ ghi khi đề chưa đổi kể từ lúc đọc (cap_nhat_luc khớp). */
+/** Phút (UTC) trong giờ cron gọi `buMetaKt` (12/11 H3). */
+export const PHUT_BU_META_KT = 23
 export async function buMetaKt(env: Env, tran = 10): Promise<number> {
   const r = await env.DB.prepare(`SELECT k.id,k.json,k.cap_nhat_luc FROM kiem_tra_ca_nhan k WHERE NOT EXISTS(SELECT 1 FROM kiem_tra_ca_nhan_meta km WHERE km.id=k.id) LIMIT ?`).bind(tran).all<Row>()
   if (!r.results.length) return 0
@@ -74,9 +76,16 @@ export const COT_META_KT = `k.id,k.sbd,k.lop,k.ngay,k.mo_luc,k.han_luc,k.trang_t
 /** Số chặng ĐÃ CHỐT (em bấm chốt, hoặc hết giờ chặng) — CHỈ-THÊM 28/10 (thầy: «có 3 phần đã làm nhưng vòng xung quanh không tính vẫn màu xám»): nút Kiểm tra
  *  ôn tập trên Lộ trình tô vòng theo đúng số này, cùng nguồn với màn bài («3/5 chặng đã chốt»). Dò khoá chính (bai_id, stt) trong CÙNG câu đọc, không thêm lượt D1. */
 const COT_CHANG_CHOT_KT = `(SELECT COUNT(*) FROM kiem_tra_ca_nhan_chang c WHERE c.bai_id=k.id AND (c.chot_luc IS NOT NULL OR c.han<=?3)) AS chang_chot`
+const TU_DOC_KT_CN = `FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} WHERE k.sbd=?1 AND k.ngay>=?2 AND COALESCE(h.trang_thai,'')<>'khoa' ORDER BY (k.trang_thai='cho_nguon'),k.ngay LIMIT 1`
+const SQL_DOC_KT_CN_DU = `SELECT k.* ${TU_DOC_KT_CN}`
+/** 12/11 (H3, đo 24h: 36.863 lượt × ~228 hàng): CHỌN dòng trước (cùng điều kiện, cùng thứ tự — (sbd, ngay) là khoá duy nhất nên không có hoà), RỒI mới tính các
+ *  cột nặng (số tính sẵn + đếm "đã trả lời" + chặng đã chốt) cho ĐÚNG dòng đó. Trước: SQLite tính cột cho MỌI lịch từ hôm nay của em rồi mới xếp lấy một. Tham số y hệt. */
+export const sqlDocKtCnMeta = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT} FROM kiem_tra_ca_nhan k WHERE k.id=(SELECT k.id ${TU_DOC_KT_CN})`
+/** Câu CŨ (trước 12/11) — chỉ để test so cũ↔mới. */
+export const sqlDocKtCnMetaCu = (): string => `SELECT ${COT_META_KT},${COT_CHANG_CHOT_KT} ${TU_DOC_KT_CN}`
 export async function docKtCn(env: Env, sbd: string, now: number, chiMeta=false): Promise<Row | null> {
   if (!await coKtCn(env)) return null
-  const r = await env.DB.prepare(`SELECT ${chiMeta?`${COT_META_KT},${COT_CHANG_CHOT_KT}`:'k.*'} FROM kiem_tra_ca_nhan k JOIN hoc_sinh h ON h.sbd=k.sbd AND k.lop=${sqlTenLopHs('h')} WHERE k.sbd=?1 AND k.ngay>=?2 AND COALESCE(h.trang_thai,'')<>'khoa' ORDER BY (k.trang_thai='cho_nguon'),k.ngay LIMIT 1`).bind(...(chiMeta ? [sbd, ngayKt(now), now] : [sbd, ngayKt(now)])).first<Row>()
+  const r = await env.DB.prepare(chiMeta ? sqlDocKtCnMeta() : SQL_DOC_KT_CN_DU).bind(...(chiMeta ? [sbd, ngayKt(now), now] : [sbd, ngayKt(now)])).first<Row>()
   if (!r) return null
   return r
 }
@@ -450,7 +459,9 @@ export async function dongBoKtCn(env: Env, now: number, tran=2,dungKhung2026=tru
   if (await env.DB.prepare("SELECT 1 FROM ca WHERE trang_thai='mo' LIMIT 1").first()) return {soEm:0,soMoi:0,hoan:true}
   // Chấm lại MỘT LẦN các bài em bị kẹt câu tạm giữ (thầy cho phép 04/11) — chỉ trong Worker (có kho R2 để biết câu đang giữ), ngoài giờ học tối. Lỗi ⇒ thử lại phút sau.
   if ((env as {DE?:unknown}).DE && !daChamLai0411 && new Date(now+7*3600000).getUTCHours()<18) await chamLaiCauGiu0411(env,now).catch(e=>console.error('[ktcn] chấm lại câu giữ',e))
-  await buMetaKt(env,10)
+  // 12/11 (H3): bù số tính sẵn MỖI GIỜ một lần (phút 23 UTC) thay vì mỗi phút — câu dò quét cả bảng (đo 24h: 1.957 lượt × ~7.007 hàng) mà mọi đường lập đề
+  // đã ghi số tính sẵn cùng lô; dòng thiếu số vẫn đọc đúng nhờ nhánh tính lại (COT_META_KT) ⇒ kết quả app không đổi.
+  if (new Date(now).getUTCMinutes() === PHUT_BU_META_KT) await buMetaKt(env,10)
   const cfg=JSON.parse((await docCauHinhDem(env,'kiem_tra_ca_nhan_v1'))??'{}'),batLuc=Date.parse(s(cfg.batLuc))||0
   const het=bat?await env.DB.prepare(`SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>? AND ngay NOT IN(${SQL_DS_BAO_TRI})) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?`).bind(now,batLuc,tran).all<Row>():{results:[] as Row[]}
   for (const r of het.results) await chotKtCn(env,r,now,true)
