@@ -1,0 +1,1175 @@
+{
+  "i": 374,
+  "hash": "426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075",
+  "source": "/workspace/omr-vector/docs/hinh-vector-0311/nguon/anh/426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075.png",
+  "size": [
+    1175,
+    291
+  ],
+  "manifestPresent": false,
+  "publicQuestions": [
+    {
+      "qid": "VIP27-C1-B3-D1-II-2",
+      "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học như hình dưới.\nTrong đó Y là glycerol, Z và T là các muối sodium của acid béo. Cho biết chất Z và chất T đều có tính chất giặt rửa.",
+      "allHinh": [
+        {
+          "hash": "426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075",
+          "where": "VIP27-C1-B3-D1-II-2.hinh.0.du_lieu",
+          "hashDataUrl": "0083bf6c18ca5fe7f39bef558cfd00f9981b2d4acac79da927c971157cab9f2c"
+        }
+      ],
+      "missingHashes": [
+        "426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075"
+      ]
+    }
+  ],
+  "review": {
+    "nativeFullOpened": true,
+    "ownFull2xOpened": true,
+    "ownCO4xOpened": true,
+    "ownMidBottomSaltT4xOpened": true,
+    "allPublicDeRead": true,
+    "answersRead": false,
+    "ownSaltTMacro4xAndRootTMacroIndependentlyOpened": true
+  },
+  "fullClosure": {
+    "newFullIfAdmitted": 1,
+    "otherMissingHashes": []
+  },
+  "measurementLimits": "Approx1pxnativecoords; literalvisiblevertexcounts NOTbalancedreaction/theory. No restoringextraCtomakebalancesmatch. SaltTtinykinkpreserved.",
+  "geometry": {
+    "reactantGlycerol": {
+      "vertices": [
+        [
+          8,
+          97
+        ],
+        [
+          8,
+          145
+        ],
+        [
+          8,
+          194
+        ]
+      ],
+      "bonds": [
+        [
+          [
+            8,
+            97
+          ],
+          [
+            8,
+            194
+          ]
+        ],
+        [
+          [
+            8,
+            97
+          ],
+          [
+            28,
+            78
+          ]
+        ],
+        [
+          [
+            8,
+            145
+          ],
+          [
+            48,
+            145
+          ]
+        ],
+        [
+          [
+            8,
+            194
+          ],
+          [
+            26,
+            211
+          ]
+        ]
+      ]
+    },
+    "esterO": [
+      {
+        "text": "O",
+        "bbox": [
+          29,
+          58,
+          48,
+          80
+        ],
+        "bond": [
+          [
+            49,
+            65
+          ],
+          [
+            77,
+            53
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          51,
+          134,
+          69,
+          156
+        ],
+        "bond": [
+          [
+            73,
+            143
+          ],
+          [
+            106,
+            137
+          ]
+        ]
+      },
+      {
+        "text": "O",
+        "bbox": [
+          27,
+          211,
+          46,
+          234
+        ],
+        "bond": [
+          [
+            49,
+            223
+          ],
+          [
+            55,
+            223
+          ]
+        ]
+      }
+    ],
+    "chains": [
+      {
+        "vertices": [
+          [
+            77,
+            53
+          ],
+          [
+            111,
+            71
+          ],
+          [
+            143,
+            52
+          ],
+          [
+            174,
+            71
+          ],
+          [
+            204,
+            52
+          ],
+          [
+            233,
+            71
+          ],
+          [
+            263,
+            52
+          ],
+          [
+            292,
+            71
+          ],
+          [
+            321,
+            52
+          ],
+          [
+            350,
+            71
+          ],
+          [
+            379,
+            52
+          ],
+          [
+            408,
+            71
+          ],
+          [
+            438,
+            52
+          ],
+          [
+            465,
+            70
+          ]
+        ],
+        "CCdouble": []
+      },
+      {
+        "vertices": [
+          [
+            106,
+            137
+          ],
+          [
+            136,
+            153
+          ],
+          [
+            165,
+            135
+          ],
+          [
+            194,
+            153
+          ],
+          [
+            221,
+            135
+          ],
+          [
+            249,
+            153
+          ],
+          [
+            276,
+            136
+          ],
+          [
+            302,
+            136
+          ],
+          [
+            324,
+            153
+          ],
+          [
+            352,
+            135
+          ],
+          [
+            379,
+            153
+          ],
+          [
+            407,
+            135
+          ],
+          [
+            435,
+            153
+          ]
+        ],
+        "CCdoublePairs1Based": [
+          [
+            7,
+            8
+          ]
+        ],
+        "innerRay": [
+          [
+            273,
+            143
+          ],
+          [
+            298,
+            143
+          ]
+        ]
+      },
+      {
+        "vertices": [
+          [
+            55,
+            223
+          ],
+          [
+            79,
+            204
+          ],
+          [
+            109,
+            223
+          ],
+          [
+            138,
+            204
+          ],
+          [
+            168,
+            223
+          ],
+          [
+            197,
+            204
+          ],
+          [
+            227,
+            223
+          ],
+          [
+            256,
+            204
+          ],
+          [
+            286,
+            223
+          ],
+          [
+            315,
+            204
+          ],
+          [
+            345,
+            223
+          ],
+          [
+            374,
+            204
+          ],
+          [
+            404,
+            223
+          ],
+          [
+            433,
+            204
+          ],
+          [
+            462,
+            223
+          ]
+        ],
+        "CCdouble": []
+      }
+    ],
+    "carbonyls": [
+      {
+        "apex": [
+          77,
+          53
+        ],
+        "OlabelBBox": [
+          68,
+          5,
+          87,
+          28
+        ],
+        "rays": [
+          [
+            [
+              74,
+              29
+            ],
+            [
+              74,
+              54.3
+            ]
+          ],
+          [
+            [
+              81,
+              29
+            ],
+            [
+              81,
+              55.12
+            ]
+          ]
+        ],
+        "footTopology": "Bothcontact2slopes/nativeapexV"
+      },
+      {
+        "apex": [
+          106,
+          137
+        ],
+        "OlabelBBox": [
+          97,
+          90,
+          115,
+          113
+        ],
+        "rays": [
+          [
+            [
+              102,
+              114
+            ],
+            [
+              102,
+              137.73
+            ]
+          ],
+          [
+            [
+              110,
+              114
+            ],
+            [
+              110,
+              139.13
+            ]
+          ]
+        ],
+        "footTopology": "Bothcontactsourceleftshallowslope/rightchainarm, nofalsegap"
+      },
+      {
+        "apex": [
+          55,
+          223
+        ],
+        "OlabelBBox": [
+          46,
+          249,
+          65,
+          271
+        ],
+        "rays": [
+          [
+            [
+              51,
+              223
+            ],
+            [
+              51,
+              247
+            ]
+          ],
+          [
+            [
+              59,
+              219.83
+            ],
+            [
+              59,
+              247
+            ]
+          ]
+        ],
+        "footTopology": "DOWNraysLEFTfootonhorizontalOstem;RIGHTfootonupslope, tinyjoinpartofmainpath. RootmacroopenedindependentlyconfirmsownCO4x."
+      }
+    ],
+    "NaOH": {
+      "text": "3NaOH",
+      "bbox": [
+        502,
+        130,
+        577,
+        153
+      ]
+    },
+    "plusSigns": [
+      {
+        "text": "+",
+        "bbox": [
+          473,
+          130,
+          489,
+          151
+        ]
+      },
+      {
+        "text": "+",
+        "bbox": [
+          777,
+          127,
+          793,
+          149
+        ]
+      }
+    ],
+    "arrow": {
+      "shaft": [
+        [
+          588,
+          142
+        ],
+        [
+          655,
+          142
+        ]
+      ],
+      "filledHead": [
+        [
+          655,
+          142
+        ],
+        [
+          641,
+          137
+        ],
+        [
+          641,
+          147
+        ]
+      ],
+      "condition": {
+        "text": "tᵒ",
+        "bbox": [
+          611,
+          111,
+          628,
+          131
+        ],
+        "note": "smallosup,noaddedtemp"
+      }
+    },
+    "productGlycerol": {
+      "bareC": [
+        [
+          674,
+          105
+        ],
+        [
+          688,
+          136
+        ],
+        [
+          675,
+          175
+        ]
+      ],
+      "bonds": [
+        [
+          [
+            674,
+            105
+          ],
+          [
+            688,
+            136
+          ]
+        ],
+        [
+          [
+            688,
+            136
+          ],
+          [
+            675,
+            175
+          ]
+        ],
+        [
+          [
+            674,
+            105
+          ],
+          [
+            682,
+            76
+          ]
+        ],
+        [
+          [
+            688,
+            136
+          ],
+          [
+            717,
+            136
+          ]
+        ],
+        [
+          [
+            675,
+            175
+          ],
+          [
+            684,
+            200
+          ]
+        ]
+      ],
+      "OHlabels": [
+        {
+          "text": "OH",
+          "bbox": [
+            677,
+            51,
+            711,
+            74
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            721,
+            125,
+            755,
+            148
+          ]
+        },
+        {
+          "text": "OH",
+          "bbox": [
+            678,
+            201,
+            712,
+            224
+          ]
+        }
+      ],
+      "anchor": "FIRSTOeach"
+    },
+    "saltZ": {
+      "bareVertices": [
+        [
+          814,
+          82
+        ],
+        [
+          834,
+          66
+        ],
+        [
+          855,
+          82
+        ],
+        [
+          875,
+          66
+        ],
+        [
+          896,
+          82
+        ],
+        [
+          916,
+          66
+        ],
+        [
+          937,
+          82
+        ],
+        [
+          957,
+          66
+        ],
+        [
+          978,
+          82
+        ],
+        [
+          998,
+          66
+        ],
+        [
+          1019,
+          82
+        ],
+        [
+          1039,
+          66
+        ],
+        [
+          1060,
+          82
+        ]
+      ],
+      "COONa": {
+        "text": "COONa",
+        "bbox": [
+          1084,
+          64,
+          1167,
+          84
+        ],
+        "bond": [
+          [
+            1060,
+            82
+          ],
+          [
+            1078,
+            74
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "coefficient": {
+        "text": "2",
+        "bbox": [
+          787,
+          67,
+          801,
+          87
+        ]
+      },
+      "caption": {
+        "text": "(Z)",
+        "bbox": [
+          947,
+          104,
+          985,
+          133
+        ]
+      }
+    },
+    "saltT": {
+      "bareVertices": [
+        [
+          808,
+          200
+        ],
+        [
+          830,
+          183
+        ],
+        [
+          851,
+          200
+        ],
+        [
+          873,
+          183
+        ],
+        [
+          894,
+          200
+        ],
+        [
+          916,
+          183
+        ],
+        [
+          937,
+          198
+        ],
+        [
+          945,
+          184
+        ],
+        [
+          971,
+          184
+        ],
+        [
+          991,
+          200
+        ],
+        [
+          1015,
+          183
+        ],
+        [
+          1036,
+          200
+        ],
+        [
+          1059,
+          183
+        ],
+        [
+          1080,
+          200
+        ]
+      ],
+      "CCDoublePairs1Based": [
+        [
+          8,
+          9
+        ]
+      ],
+      "tinyKink": "LOWERrayconnectedtoLEFTtrough937198viashortUPRIGHTkink945191thenhorizontalto968191FREErightend. UPPERrayleftFREE945184→971184thenconnectedtoRIGHTdownslope991200. Noverticalbridge, noforcingtop-main+bottom-inner.",
+      "COONa": {
+        "text": "COONa",
+        "bbox": [
+          1091,
+          181,
+          1174,
+          204
+        ],
+        "bond": [
+          [
+            1080,
+            200
+          ],
+          [
+            1089,
+            193
+          ]
+        ],
+        "anchor": "FIRSTC"
+      },
+      "caption": {
+        "text": "(T)",
+        "bbox": [
+          945,
+          230,
+          983,
+          259
+        ]
+      },
+      "nativeStrokePaths": [
+        [
+          [
+            808,
+            200
+          ],
+          [
+            830,
+            183
+          ],
+          [
+            851,
+            200
+          ],
+          [
+            873,
+            183
+          ],
+          [
+            894,
+            200
+          ],
+          [
+            916,
+            183
+          ],
+          [
+            937,
+            198
+          ],
+          [
+            945,
+            191
+          ],
+          [
+            968,
+            191
+          ]
+        ],
+        [
+          [
+            945,
+            184
+          ],
+          [
+            971,
+            184
+          ],
+          [
+            991,
+            200
+          ],
+          [
+            1015,
+            183
+          ],
+          [
+            1036,
+            200
+          ],
+          [
+            1059,
+            183
+          ],
+          [
+            1080,
+            200
+          ]
+        ]
+      ],
+      "bareVerticesAreConceptualCountLocationsNotContinuousStroke": true
+    },
+    "captions": [
+      {
+        "text": "(X)",
+        "bbox": [
+          235,
+          260,
+          276,
+          290
+        ]
+      },
+      {
+        "text": "(Y)",
+        "bbox": [
+          676,
+          240,
+          714,
+          270
+        ]
+      }
+    ],
+    "font": "AllchemicalO/OH/NaOH/COONa/tcondition/2coefficientregularuprightsans; all(X)(Y)(Z)(T)TRUEBOLDuprightserif. Noitalic.",
+    "countsVisible": {
+      "reactantAcylC": [
+        14,
+        13,
+        15
+      ],
+      "reactantGlycerolBareC": 3,
+      "reactantTotalC": 45,
+      "reactantO": 6,
+      "reactantCCdoubleByChain": [
+        0,
+        1,
+        0
+      ],
+      "saltZBareC": 13,
+      "saltZIncludingCOONaC": 14,
+      "saltTBareC": 14,
+      "saltTIncludingCOONaC": 15,
+      "note": "Sourcecountsnotbalancedonpurpose; doNOTtheoryfix. Publicstemproductnamesnotbasisforalteringvertices."
+    },
+    "noAdded": [
+      "balancedCnormalization",
+      "acidnames",
+      "hydrogenlabels",
+      "saltOcharges",
+      "captionanswer",
+      "aliases"
+    ]
+  },
+  "actualSvgReviewed": false,
+  "status": "source-only/noSVG/noCount",
+  "corrections": [
+    {
+      "field": "geometry.saltT.nativeStrokePaths",
+      "oldIncorrectContinuousTopMain": {
+        "bareVertices": [
+          [
+            808,
+            200
+          ],
+          [
+            830,
+            183
+          ],
+          [
+            851,
+            200
+          ],
+          [
+            873,
+            183
+          ],
+          [
+            894,
+            200
+          ],
+          [
+            916,
+            183
+          ],
+          [
+            937,
+            198
+          ],
+          [
+            945,
+            184
+          ],
+          [
+            971,
+            184
+          ],
+          [
+            991,
+            200
+          ],
+          [
+            1015,
+            183
+          ],
+          [
+            1036,
+            200
+          ],
+          [
+            1059,
+            183
+          ],
+          [
+            1080,
+            200
+          ]
+        ],
+        "CCDoublePairs1Based": [
+          [
+            8,
+            9
+          ]
+        ],
+        "innerRay": [
+          [
+            946,
+            191
+          ],
+          [
+            968,
+            191
+          ]
+        ],
+        "tinyKink": "937198→945184 beforehorizontal945184→971184, keepstub/notstraightnormalize",
+        "COONa": {
+          "text": "COONa",
+          "bbox": [
+            1091,
+            181,
+            1174,
+            204
+          ],
+          "bond": [
+            [
+              1080,
+              200
+            ],
+            [
+              1089,
+              193
+            ]
+          ],
+          "anchor": "FIRSTC"
+        },
+        "caption": {
+          "text": "(T)",
+          "bbox": [
+            945,
+            230,
+            983,
+            259
+          ]
+        }
+      },
+      "new": [
+        [
+          [
+            808,
+            200
+          ],
+          [
+            830,
+            183
+          ],
+          [
+            851,
+            200
+          ],
+          [
+            873,
+            183
+          ],
+          [
+            894,
+            200
+          ],
+          [
+            916,
+            183
+          ],
+          [
+            937,
+            198
+          ],
+          [
+            945,
+            191
+          ],
+          [
+            968,
+            191
+          ]
+        ],
+        [
+          [
+            945,
+            184
+          ],
+          [
+            971,
+            184
+          ],
+          [
+            991,
+            200
+          ],
+          [
+            1015,
+            183
+          ],
+          [
+            1036,
+            200
+          ],
+          [
+            1059,
+            183
+          ],
+          [
+            1080,
+            200
+          ]
+        ]
+      ],
+      "reason": "OwnreopenedTmacroshows2separatedsourcepaths:lowerleftconnected,upperrightconnected. Initialgenericmainpaththroughupperleft945184waswrong. Preservefreeends/gaps; no chemistryfix.",
+      "evidence": [
+        "/workspace/scratch/374-saltT4x.png",
+        "/workspace/scratch/root374-Tnative.png"
+      ]
+    },
+    {
+      "field": "geometry.saltZ.COONa/coefficient bbox",
+      "old": {
+        "COONa": [
+          1084,
+          95,
+          1167,
+          118
+        ],
+        "coefficient": [
+          787,
+          99,
+          801,
+          120
+        ]
+      },
+      "new": {
+        "COONa": [
+          1084,
+          64,
+          1167,
+          84
+        ],
+        "coefficient": [
+          787,
+          67,
+          801,
+          87
+        ]
+      },
+      "reason": "InitialsaltZbboxhad+31pxyoffsetmistake; correctednativeFULLcoordinates. Otherlabelsreviewedagainstnative. SaltZchainy66..82—not98..114."
+    }
+  ],
+  "rootReview": {
+    "nativeFullOpened": true,
+    "nativeTCC6xOpened": true,
+    "nativeBottomCO6xOpened": true,
+    "nativeZ4xOpened": true,
+    "nativeTcaption10xOpened": true,
+    "allPublicDeAndRefsRead": true,
+    "freshChromium3xFullOpened": true,
+    "freshActualLeftAllCO_Salts_Y_MacrosOpened": true,
+    "hashSvg": "51927c9281893977b3192112316cb0f3f5e58fa9a33f08c314712259108485a8",
+    "verdict": "Đạt riêng phần nhìn thấy; giữ reactant3+14/13/15C, CC0/1/0, Tsplitrays+shortkink literal, không cân bằng theo lý thuyết; labelsregular và4captionsdamupright; chânCOcontact/KheO/khung291 không cắt thêm."
+  },
+  "independentRuntime": {
+    "sha256": "7905a1931517ade04ebd12bb167b72e6e3336a0fa3bc09a0d7e1ed2faa0437b9",
+    "log": "ACTUALREAD /workspace/omr-vector/docs/hinh-vector-0311/kiem/lipid374-native-ddh-51927c9281893977b3192112316cb0f3f5e58fa9a33f08c314712259108485a8.svg 51927c9281893977b3192112316cb0f3f5e58fa9a33f08c314712259108485a8\n374 { x: 0, y: 0, width: 1175, height: 291 }\n"
+  }
+}

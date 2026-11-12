@@ -1,0 +1,29 @@
+[
+  {
+    "i": 374,
+    "hash": "426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075",
+    "fileNguon": "anh/426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075.png",
+    "svg": "lipid374-native-ddh-51927c9281893977b3192112316cb0f3f5e58fa9a33f08c314712259108485a8.svg",
+    "hashSvg": "51927c9281893977b3192112316cb0f3f5e58fa9a33f08c314712259108485a8",
+    "byteSvg": 26160,
+    "font": "DDH Rounded",
+    "hashPhong": "b9627f488db2bf00a5a70f4afd85188972f51cb296ce0fd6f052d4c4a9e4bdd8",
+    "trangThai": "da-soat-doc-lap",
+    "questions": [
+      {
+        "qid": "VIP27-C1-B3-D1-II-2",
+        "de": "Chất béo X có trong thành phần dầu cá. Thuỷ phân X bằng dung dịch NaOH đun nóng, thu được các sản phẩm hữu cơ Y, Z, T theo phương trình hoá học như hình dưới.\nTrong đó Y là glycerol, Z và T là các muối sodium của acid béo. Cho biết chất Z và chất T đều có tính chất giặt rửa.",
+        "refs": [
+          {
+            "hash": "426617d48ed37b245878fd1aebd3e3edb27c239b30a2343a657e7126a8ef8075",
+            "where": "VIP27-C1-B3-D1-II-2.hinh.0.du_lieu",
+            "hashDataUrl": "0083bf6c18ca5fe7f39bef558cfd00f9981b2d4acac79da927c971157cab9f2c"
+          }
+        ]
+      }
+    ],
+    "ghiChuDung": "45reactantC6O=3glycerol+14-13-15acyl/CCdouble0-1-0/3COdouble2splitfeetCONTACT-topmid2slopes-bottomLEFThorizontalRIGHTupslope-NOcrossbar/productY3C3OH-Z13bareC+COONaC14-T14locations+COONaC15/KEEPunbalancedliteral-NOtheorynormalize/1FILLEDrighthead-3NaOH-2Z-tSUPo/chemregularUPRIGHT-4captionsXYZTtrueDAMUPRIGHT/TCCupperLEFTfreeRIGHTcontact-lowerLEFTshortkink937198-945191-contactRIGHTfree968191/0stereo-noaddedH-acidnames-charges-yield-answer-noalias",
+    "hashSvgDaSoat": "51927c9281893977b3192112316cb0f3f5e58fa9a33f08c314712259108485a8",
+    "nguoiSoat": "soat_hinh_vector"
+  }
+]
