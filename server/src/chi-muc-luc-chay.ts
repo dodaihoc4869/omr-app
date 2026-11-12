@@ -51,6 +51,14 @@ export const CHI_MUC_CRON_DEM: readonly string[] = [
   "CREATE INDEX IF NOT EXISTS idx_cld_mo_em ON chua_loi_dot(sbd, cap_nhat_luc) WHERE dong_luc IS NULL AND trang_thai_day<>'da_tu_sua'",
   // 12/11 (hoá đơn D1 hàng đọc, ~300 triệu/ngày): nhánh NHÓM của «đợt của em cho câu hoặc cùng nhóm» (chua-dot-nhom-sql.ts). Bản sao server/migration-1211-chua-dot-nhom.sql.
   'CREATE INDEX IF NOT EXISTS idx_cld_sbd_nhom ON chua_loi_dot(sbd, content_group, dong_luc)',
+  // 12/11 tối (H3 đợt 3, hoá đơn D1 hàng đọc): bảng LỚN ⇒ dựng 00:01 VN. Bản sao server/migration-z-1211-h3-doc-bang-phu.sql (+ -h3-skh-dong-tg.sql).
+  //  · hồ sơ câu khi lập kế hoạch (ke-hoach-ngay-d1.ts docHoSoD1): câu tới hạn / đếm câu chưa khắc phục chỉ đọc đúng dòng cần.
+  "CREATE INDEX IF NOT EXISTS nkc_em_toi_han ON nam_kt_cau(sbd, moc_on_ke) WHERE trang_thai IN ('moi_sai','dang_on','da_khac_phuc','chua_thay_sai') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL",
+  "CREATE INDEX IF NOT EXISTS nkc_em_chua_kp ON nam_kt_cau(sbd, trang_thai) WHERE trang_thai IN ('dang_on','moi_sai')",
+  //  · tổng EXP mùa của em (exp-d1.ts lenhTongSo / CAS / đọc sớm) + EXP dòng thời gian: chỉ mục phủ.
+  'CREATE INDEX IF NOT EXISTS exp_so_em_luc ON exp_so(sbd, luc, exp, ngay_vn)',
+  //  · dòng thời gian em ở màn thầy (gv-hom-nay-v2.ts): chỉ mục phủ bộ phận của nhánh sổ học.
+  "CREATE INDEX IF NOT EXISTS skh_em_dong_tg ON su_kien_hoc(sbd, nguon, ma_nguon, ngay_vn, luc, ket_qua, giay) WHERE nguon NOT IN ('thi','len_bang')",
 ]
 /** Chạy từng câu riêng (một câu lỗi không chặn câu khác). Trả số câu lỗi; nơi gọi ghi nhật ký máy. */
 export async function dungChiMucCronDem(env: Env): Promise<number> {

@@ -10,6 +10,8 @@ import { ngayKt, congNgayKt, dauNgayKt } from '../server/src/kiem-tra-ca-nhan-lo
 import { sqlTenLopHs } from '../server/src/goi-bai-7'
 import { SQL_GOI7 } from '../server/src/goi-bai-7-schema'
 import { DONG_THOI_GIAN } from '../server/src/gv-hom-nay-v2'
+import { CHI_MUC_CRON_DEM } from '../server/src/chi-muc-luc-chay'
+import { sqlKhongBaoTriBo } from '../server/src/ngay-bao-tri'
 import { SQL_SAN_SANG, BANG_SAN_SANG, SQL_SAN_SANG_LECH } from '../server/src/san-sang'
 
 const NGAY = 86_400_000
@@ -323,6 +325,35 @@ describe('Q8 dòng thời gian em: chỉ mục phủ bộ phận sổ học + ch
     const d = taoD1That()
     for (const q of ["SELECT nguon, ma_nguon, ngay_vn, luc FROM su_kien_hoc WHERE sbd = ? AND nguon = 'btvn'", 'SELECT nguon, ma_nguon, COUNT(*) FROM su_kien_hoc WHERE sbd = ? GROUP BY nguon, ma_nguon',
       "SELECT qid FROM su_kien_hoc WHERE sbd = ? AND nguon <> 'thi'"]) expect(keHoach(d.sql, q).join('\n')).not.toMatch(/skh_em_dong_tg/)
+  })
+})
+
+// ------------------------------------------------------------------ Chỉ mục mới không đổi kế hoạch câu khác trên cùng bảng + có trong cron đêm
+describe('chỉ mục H3: câu khác trên cùng bảng giữ kế hoạch; bảng lớn có trong CHI_MUC_CRON_DEM', () => {
+  const MOI = ['ktcn_chua_mo', 'nkc_em_toi_han', 'nkc_em_chua_kp', 'exp_so_em_luc', 'skh_em_dong_tg', 'goi_bai_7_tao']
+  const CAU_KHAC: string[] = [
+    `SELECT json FROM kiem_tra_ca_nhan k WHERE sbd = ? AND nop_luc IS NULL AND ${sqlKhongBaoTriBo('k', T)}`, // ai-ddh.ts
+    "SELECT * FROM kiem_tra_ca_nhan WHERE trang_thai<>'cho_nguon' AND ((nop_luc IS NULL AND han_luc<=? AND han_luc>?) OR (nop_luc IS NOT NULL AND da_ghi=0)) ORDER BY han_luc LIMIT ?", // cron chốt hết hạn
+    `SELECT sbd, d FROM (SELECT sbd, ngay_vn AS d FROM exp_so WHERE sbd IN (SELECT value FROM json_each(?)) AND ngay_vn >= ? UNION SELECT sbd, date(created_at, '+7 hours') AS d FROM game_v2_attempt WHERE sbd IN (SELECT value FROM json_each(?)) AND created_at >= ?)`, // game-v2-hap-thu.ts
+    "SELECT sbd, ngay_vn FROM exp_so WHERE sbd IN (SELECT value FROM json_each(?)) AND loai = 'dat_ngay' AND ngay_vn >= ? AND ngay_vn < ?",
+    "SELECT ma_dang, qid, luc, nguon FROM su_kien_hoc WHERE sbd = ? AND ket_qua = 0 AND ma_dang IN (SELECT value FROM json_each(?)) ORDER BY luc DESC LIMIT 400", // gv-hom-nay-v2.ts
+    "SELECT sbd, qid FROM nam_kt_cau WHERE trang_thai IN ('moi_sai','dang_on','da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke <= ?", // cau-theo-qid.ts
+    "SELECT qid FROM nam_kt_cau WHERE sbd = ? AND trang_thai IN ('moi_sai', 'dang_on', 'da_khac_phuc') AND can_day_lai = 0 AND moc_on_ke IS NOT NULL AND moc_on_ke < ?", // ve-dich-d1.ts
+  ]
+  it('kế hoạch câu khác y như khi chưa có chỉ mục mới', () => {
+    const d = taoD1That(); for (const q of SQL_KT_CN) d.sql.exec(q); for (const q of SQL_GOI7) d.sql.exec(q); for (const q of CHI_MUC_CRON_DEM) d.sql.exec(q)
+    const sau = CAU_KHAC.map((q) => keHoach(d.sql, q))
+    for (const i of MOI) d.sql.exec(`DROP INDEX IF EXISTS ${i}`)
+    expect(sau).toEqual(CAU_KHAC.map((q) => keHoach(d.sql, q)))
+  })
+  it('chỉ mục bảng lớn: migration ↔ CHI_MUC_CRON_DEM giống hệt câu', async () => {
+    const { readFileSync } = await import('node:fs')
+    const mig = readFileSync('server/migration-z-1211-h3-doc-bang-phu.sql', 'utf8') + readFileSync('server/migration-z-1211-h3-skh-dong-tg.sql', 'utf8')
+    for (const ten of ['nkc_em_toi_han', 'nkc_em_chua_kp', 'exp_so_em_luc', 'skh_em_dong_tg']) {
+      const cron = CHI_MUC_CRON_DEM.find((s) => s.includes(` ${ten} `))
+      expect(cron).toBeTruthy()
+      expect(mig).toContain(cron! + ';')
+    }
   })
 })
 
