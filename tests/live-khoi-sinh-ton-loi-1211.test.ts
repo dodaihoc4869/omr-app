@@ -26,8 +26,9 @@ describe('bản đồ', () => {
     expect([to.rong, to.cao, to.tuong.length]).toEqual([3200, 2000, bd.tuong.length])
     expect(taoBanDo(7).cap).toBe(0)
   })
-  it('ván 90 giây + 5 giây bảng kết quả; vòng an toàn co dần', () => {
-    expect(vanSo(T0)).toBe(1000); expect(dangNghi(T0)).toBe(false); expect(conLai(T0)).toBe(80_000)
+  it('ván 2 phút + 5 giây bảng kết quả; vòng an toàn co dần', () => {
+    expect([VAN_CHOI_MS, VAN_MS]).toEqual([120_000, 125_000])
+    expect(vanSo(T0)).toBe(1000); expect(dangNghi(T0)).toBe(false); expect(conLai(T0)).toBe(110_000)
     expect(dangNghi(1000 * VAN_MS + VAN_CHOI_MS)).toBe(true); expect(conLai(1000 * VAN_MS + VAN_CHOI_MS + 1000)).toBe(0)
     const dau = vong(bd, 1000 * VAN_MS), cuoi = vong(bd, 1000 * VAN_MS + VAN_CHOI_MS)
     expect(ngoaiVong(dau, 20, 20)).toBe(false)

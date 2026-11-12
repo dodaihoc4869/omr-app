@@ -1,6 +1,6 @@
 // MÁY BÙ CHỖ của trò «Sinh Tồn» (thầy chốt 12/11, đặc tả docs/dac-ta-sinh-ton-1211.md mục 4) — lõi thuần src/lib/live-khoi/sinh-ton-may.ts.
 import { describe, expect, it } from 'vitest'
-import { CAP_MAY_TOI_DA, HOI_SINH_MS, MAU_DAY, VAN_MS, laMay, taoBanDo, trongBui, type NhanVat } from '../src/lib/live-khoi/sinh-ton-loi'
+import { CAP_MAY_TOI_DA, HOI_SINH_MS, MAU_DAY, VAN_CHOI_MS, VAN_MS, laMay, taoBanDo, trongBui, type NhanVat } from '../src/lib/live-khoi/sinh-ton-loi'
 import { buocMay, khopMay, mayLenCap, mayThanh, soMayCan, taoMay } from '../src/lib/live-khoi/sinh-ton-may'
 
 const T0 = 1000 * VAN_MS + 10_000
@@ -74,7 +74,7 @@ describe('một nhịp của máy', () => {
     for (let i = 0; i < 8; i++) buocMay(bd, m, [ban], T0 + i * 250, 250, rnd)
     expect(Math.hypot(m.x - ban.x, m.y - ban.y)).toBeLessThan(xa - 100)
     // Cuối ván vòng co về giữa: máy ở trại chạy về phía giữa sân.
-    const cuoi = 1000 * VAN_MS + 80_000
+    const cuoi = 1000 * VAN_MS + VAN_CHOI_MS - 10_000
     const n = { ...taoMay(bd, '~1', 0, cuoi, 0), batTuDen: 0 }
     const dau = Math.hypot(n.x - 800, n.y - 500)
     for (let i = 0; i < 8; i++) buocMay(bd, n, [], cuoi + i * 250, 250, rnd)

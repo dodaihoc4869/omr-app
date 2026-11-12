@@ -10,6 +10,7 @@ import {
   ANH_MS, CAP_TOI_DA, HOP_BK, MAU_DAY, NHIP_GUI_MS, NHIP_NHAC_MS, SUNG_TEN, buocToi, chonMucTieu, anVoi, conLai, dangAn, dangChet, dangNghi, docDong, hopSo, laMay, ngoaiVong,
   nhanDon, satThuong, taoBanDo, taoToi, timDuong, trongBui, vanSo, vong, type BanDo, type Diem, type NhanVat, type Toi,
 } from '../../lib/live-khoi/sinh-ton-loi'
+import { datTat, docTat, moAm, tieng, tiengBan } from './sinh-ton-am'
 import { pha, taoBoHinh, type BangMau, type BoHinh, type Rgb } from './sinh-ton-hinh'
 import { K_NV, veBanDoNho, veKhung, type NvVe, type SoBay } from './sinh-ton-ve'
 import './tro-giu-lua.css'
@@ -116,6 +117,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
   const [biHa, setBiHa] = useState<BiHa | null>(null)
   const [ketQua, setKetQua] = useState<KetQua | null>(null)
   const [bang, setBang] = useState<BangMau | null>(null)
+  const [tatTieng, setTatTieng] = useState(docTat)
 
   useEffect(() => { dsRef.current = ds }, [ds])
 
@@ -152,6 +154,9 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     const lucMo = performance.now()
     const khac: NhanVat[] = []
     const nvVe: NvVe[] = []
+    /** Nhịp bắn gần nhất đã kêu của từng nhân vật (tiếng súng đi cùng nhịp đạn trên màn). */
+    const nhipBan = new Map<string, number>()
+    let lucTrungTieng = 0
 
     // ── Khung vẽ ──
     let W = 0, H = 0, ti = 1, dpr = 1
@@ -185,6 +190,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     const lenCap = (luc: number) => {
       if (tt.cap >= CAP_TOI_DA) return
       tt = { ...tt, cap: tt.cap + 1 }
+      tieng('lenCap')
       baoVui(`Súng lên cấp ${tt.cap} · ${SUNG_TEN[tt.cap - 1]}`, luc)
     }
 
@@ -234,7 +240,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         soHa.set(dong[0], (soHa.get(dong[0]) ?? 0) + 1)
         // Máy hạ máy thì không báo (đỡ rối tin trận); có em thật ở một trong hai phía mới hiện.
         if (!laMay(dong[0]) || !laMay(dong[1])) themTin([{ c: tenCua(dong[0]), doi: doiCua(dong[0]) }, { c: ' hạ ' }, { c: tenCua(dong[1]), doi: doiCua(dong[1]) }], luc)
-        if (!xem && dong[0] === sbd && !dangChet(tt, nay)) lenCap(luc)
+        if (!xem && dong[0] === sbd) { tieng('ha'); if (!dangChet(tt, nay)) lenCap(luc) }
       }
       if (typeof anh.v === 'number' && anh.v > 0) vanHien = anh.v
       if (Array.isArray(anh.d) && anh.d.length === 4 && anh.d.join() !== diemCu) { diemCu = anh.d.join(); setDiem([anh.d[0], anh.d[1], anh.d[2], anh.d[3]]) }
@@ -242,7 +248,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         hop = [anh.h[0], typeof anh.h[1] === 'string' ? anh.h[1] : '']
         if (!xem && hop[1] === sbd && hop[0] !== hopNhan) {
           hopNhan = hop[0]
-          if (!dangChet(tt, nay)) { tt = { ...tt, mau: MAU_DAY }; lenCap(luc); if (tt.cap >= CAP_TOI_DA) baoVui('Hộp tiếp tế · đầy máu', luc) }
+          if (!dangChet(tt, nay)) { tt = { ...tt, mau: MAU_DAY }; tieng('hop'); lenCap(luc); if (tt.cap >= CAP_TOI_DA) baoVui('Hộp tiếp tế · đầy máu', luc) }
         }
       }
       if (xem) return
@@ -252,7 +258,8 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
       const don = satThuong({ id: sbd, x: tt.x, y: tt.y, doi: doiEm }, quanh, ANH_MS / 1000)
       const song = !dangChet(tt, nay)
       tt = nhanDon(tt, don.tong, nay)
-      if (song && dangChet(tt, nay)) { choA = don.ai; keHa = don.ai }
+      if (song && dangChet(tt, nay)) { choA = don.ai; keHa = don.ai; tieng('biHa') }
+      else if (don.tong > 0 && song && luc - lucTrungTieng > 240 && nay >= tt.batTuDen) { lucTrungTieng = luc; tieng('trung') }
     })
 
     // ── Vòng khung hình ──
@@ -291,7 +298,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         i.cham = null
         const xCu = tt.x, yCu = tt.y, songTruoc = !dangChet(tt, nay)
         tt = buocToi(bd, tt, { dx, dy }, dt, nay, hat)
-        if (songTruoc && dangChet(tt, nay)) keHa = ''
+        if (songTruoc && dangChet(tt, nay)) { keHa = ''; tieng('biHa') }
         if (tt.x !== xCu || tt.y !== yCu) huong = Math.atan2(tt.y - yCu, tt.x - xCu)
         const chet = dangChet(tt, nay)
         // Súng bắn đối thủ gần nhất ĐANG HIỆN TRÊN MÀN của em (lùi mép 24 px để thấy rõ bé ma, không chỉ thấy mép áo).
@@ -343,6 +350,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         nghiCu = nghi
         if (nghi && vanKq !== van) {
           vanKq = van
+          if (!xem) tieng('hetVan')
           const d = diemCu ? diemCu.split(',').map(Number) : [0, 0, 0, 0]
           const hang = [0, 1, 2, 3].map((doi) => {
             let nhat = '', nhieu = 0
@@ -391,6 +399,15 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         if (tt.duong.length) duong = [{ x: tt.x, y: tt.y }, ...tt.duong]
       }
       nvVe.length = m
+      // Tiếng súng đi cùng nhịp đạn trên màn (cùng công thức nhịp với sinh-ton-ve.ts); chỉ máy em đang chơi mới kêu.
+      if (!xem) for (const e of nvVe) {
+        if (!e.ban) continue
+        const nhip = Math.floor((luc + bamSo(e.id) * 37) / (e.cap === 4 ? 1000 : 333))
+        if (nhipBan.get(e.id) === nhip) continue
+        nhipBan.set(e.id, nhip)
+        tiengBan(e.cap, e.toi, e.toi ? 1 : Math.max(0, 1 - Math.hypot(e.x - tt.x, e.y - tt.y) / 620))
+      }
+      if (nhipBan.size > 160) nhipBan.clear()
       veKhung({ g, W, H, dpr, ti, cx: camX, cy: camY, bd, bang: bm, hinh, nhe, luc, vong: v, nv: nvVe, hopCo: !nghi && hop[0] !== hopSo(nay), nghi, duong, so })
       const nho = nhoRef.current, gn = nho?.getContext('2d')
       if (nho && gn && luc - lucNho >= 500) {
@@ -411,7 +428,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     }
     const phimXuong = (e: KeyboardEvent) => {
       if (dangGo(e) || e.ctrlKey || e.metaKey || e.altKey) return
-      if (PHIM[e.code]) { vao.current.phim[e.code] = true; e.preventDefault() }
+      if (PHIM[e.code]) { vao.current.phim[e.code] = true; moAm(); e.preventDefault() }
     }
     const phimLen = (e: KeyboardEvent) => { if (PHIM[e.code]) vao.current.phim[e.code] = false }
     const buongPhim = () => { vao.current.phim = {} }
@@ -450,6 +467,7 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
     if (i.id !== -1) return
     const p = toaDo(e)
     i.id = e.pointerId; i.gx = p.x; i.gy = p.y; i.cx = 0; i.cy = 0; i.keo = false; i.t0 = performance.now()
+    moAm()
     try { e.currentTarget.setPointerCapture(e.pointerId) } catch { /* trình duyệt cũ: vẫn nhận sự kiện trong vùng */ }
     e.preventDefault()
   }
@@ -495,6 +513,11 @@ export default function TroSinhTon({ toi, ds, kenh, soEm, mayYeu = false, xoay =
         <div className="st-sung" aria-label={`Súng của em: cấp ${cap} trên ${CAP_TOI_DA}, ${SUNG_TEN[cap - 1]}`}>
           {[1, 2, 3, 4].map((i) => <i key={i} data-co={i <= cap ? '1' : undefined} />)}Súng cấp {cap} · {SUNG_TEN[cap - 1]}
         </div>
+      )}
+      {xem ? null : (
+        <button type="button" className="st-am" aria-pressed={!tatTieng} aria-label={tatTieng ? 'Bật tiếng trò chơi' : 'Tắt tiếng trò chơi'} onClick={() => { const v = !tatTieng; datTat(v); setTatTieng(v); if (!v) moAm() }}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5v5h3.5l4.5 4v-13l-4.5 4z" />{tatTieng ? <path d="M16 9.5l5 5m0-5l-5 5" /> : <path d="M15.5 9a4.2 4.2 0 0 1 0 6m2.6-8.6a8 8 0 0 1 0 11.2" />}</svg>
+        </button>
       )}
       {xem ? null : <div className="st-bd"><canvas ref={nhoRef} aria-hidden="true" /><span>Bản đồ · vòng an toàn</span></div>}
       {xem ? null : <div className="st-cho"><i />Phòng chờ · {soEm} em đã vào · chờ thầy bấm Bắt đầu</div>}

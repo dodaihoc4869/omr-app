@@ -22,6 +22,13 @@
 .st-cho { left: 50%; bottom: 8px; transform: translateX(-50%); }
 .st-cho i { display: inline-block; width: 7px; height: 7px; margin-right: 7px; border-radius: 50%; background: var(--tr-chu-y); }
 
+/* Nút tắt / bật tiếng trò (thầy 12/11 tối thêm âm thanh bắn súng): dưới nút «Rời phòng chờ». */
+.st-am { position: absolute; left: max(8px, env(safe-area-inset-left, 0px)); top: 56px; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 12px; display: grid; place-items: center; cursor: pointer;
+  background: color-mix(in srgb, var(--tr-mat) 70%, transparent); color: var(--tr-chu-2); touch-action: manipulation; }
+.st-am svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.st-am[aria-pressed='false'] { color: var(--tr-chu-3); }
+.st-am:focus-visible { outline: 2px solid var(--tr-chu); outline-offset: 2px; }
+
 .st-bd { position: absolute; right: 8px; bottom: 8px; width: 138px; padding: 4px 4px 2px; border-radius: 12px; background: var(--st-kinh); border: 2px solid var(--tr-vien); pointer-events: none; }
 .st-bd canvas { display: block; width: 130px; aspect-ratio: 8 / 5; border-radius: 8px; }
 .st-bd span { display: block; text-align: center; font-size: 12px; font-weight: 500; line-height: 1.5; color: var(--tr-chu-3); white-space: nowrap; }
@@ -58,7 +65,7 @@
   .st .st-bang { left: auto; right: 8px; transform: none; gap: 9px; padding: 5px 10px; }
   .st-gio { padding-left: 9px; }
   .st .st-tin { top: 48px; max-width: 46%; }
-  .st-bao { top: 58px; left: 8px; transform: none; max-width: 52%; }
+  .st-bao { top: 58px; left: 60px; transform: none; max-width: 48%; }
   .st-cho { left: 8px; bottom: 30px; transform: none; max-width: calc(100% - 162px); }
   .st-sung { max-width: calc(100% - 162px); }
 }

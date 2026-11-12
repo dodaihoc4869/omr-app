@@ -5,6 +5,7 @@ import { KenhLopMay } from '../server/src/kenh-lop-may'
 import { chuanKhoi, liveDat, viewLiveBang, viewLiveEm } from '../src/lib/bpu/phong-live'
 import { taoPhong, vaoLop, type TrangThaiPhong } from '../src/lib/bpu/phong'
 import { saoBuoi, xepHangDoi } from '../src/lib/live-khoi/vinh-danh'
+import { VAN_MS } from '../src/lib/live-khoi/sinh-ton-loi'
 
 const NAY = Date.UTC(2026, 10, 12, 12, 0, 0)
 const lich = (o: Partial<LichLiveMc>): LichLiveMc => ({ id: 'a', khoi: 12, batDau: NAY, ten: '', trangThai: 'hen', luc: NAY, ...o })
@@ -130,7 +131,7 @@ describe('kênh lớp', () => {
     expect(hs2.tin).toHaveLength(0)
   })
   // Giây thứ 10 của một ván (không rơi vào 5 giây bảng kết quả, không sát mép ván).
-  const T0 = Math.ceil(NAY / 95_000) * 95_000 + 10_000
+  const T0 = Math.ceil(NAY / VAN_MS) * VAN_MS + 10_000
   it('trò Sinh Tồn: chỉ chạy ở phòng chờ; phòng gom vị trí, phát MỘT ảnh chụp mỗi 250 ms, kẹp trong sân, máy bù đủ 4 mỗi đội, ghi lượt hạ khác đội', () => {
     vi.useFakeTimers()
     try {
