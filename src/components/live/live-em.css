@@ -184,6 +184,14 @@
 /* ── HAI KHUNG ĐỘC LẬP (11/11 chiều, KhungDocLap.tsx; đặc tả 4.3h): khung giấy `.lv-giay` + khung bảng `.lv-bang` mỗi khung một phép co; vị trí / khổ đặt
    bằng `style`, ở đây chỉ có màu + dáng. Khung nở / thu chỉ bằng transform (KhungDocLap đặt), máy yếu / giảm chuyển động ⇒ đổi tức thì. ── */
 .lv-kg-cuon { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--tr-chieu-chu) 30%, transparent) transparent; }
+/* 12/11 tối (ảnh thầy: máy tính học sinh «không có nút vàng bên phải để bấm»): trên máy tính (Windows) thanh cuộn của bảng chiếm đúng mép phải, đè lên
+   tay nắm 5 px ⇒ ẩn thanh cuộn (lăn chuột / kéo / «Về chỗ thầy đang viết» vẫn cuộn được, như trên điện thoại); máy dùng CHUỘT thì tay nắm to và rõ hẳn. */
+.lv .lv-kg-cuon { scrollbar-width: none; }
+.lv .lv-kg-cuon::-webkit-scrollbar { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .lv .lv-nam i, .lv-phu .lv-nam i { width: 8px; height: 64px; border-radius: 4px; opacity: 0.95; }
+  .lv .lv-nam:hover i, .lv-phu .lv-nam:hover i { opacity: 1; transform: scaleX(1.25); }
+}
 /* vạch chia giữa giấy và bảng: vùng chạm 30 px, viên mảnh ở giữa; đang kéo ⇒ thành một vạch dọc màu đội suốt chiều cao */
 .lv-vach-chia { z-index: 2; display: grid; place-items: center; cursor: col-resize; -webkit-tap-highlight-color: transparent; }
 .lv-vach-chia i { display: block; width: 5px; height: 40px; border-radius: 3px; background: var(--tr-chieu-giay); opacity: 0.5; box-shadow: 0 0 0 1px color-mix(in srgb, var(--tr-chieu-bang) 45%, transparent); transition: opacity 0.15s, height 0.15s; }

@@ -4,6 +4,7 @@
 // từ dữ liệu thật (src/lib/bpu/ly-do.ts). TỰ ĐỘNG (07/11): tờ chuyển câu ⇒ lượt mới, giờ theo câu (máy chủ kẹp 60–180 s); bảng → / «Câu tiếp» ⇒ tờ sang câu sau.
 // Phím: → ← · Space · Enter · D · F · N · M · K · V · H · ? · Esc. Mảnh chỉ máy thầy ⇒ nằm ngoài precache (vite.config globIgnores).
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { BaoRoiMan } from './BaoRoiMan'
 import { createPortal } from 'react-dom'
 import { goiLenh } from '../../lib/goi-lenh-thay'
 import { layDiaChiMayChu } from '../../lib/dia-chi-may-chu'
@@ -631,9 +632,8 @@ export default function BangBinhPhanUng({ buoiId, ma, linkQr, qid, luot = 0, tuD
         <canvas ref={cvTren} className="bb-ve tren" aria-hidden="true" />
       </div>
       <button type="button" className="bb-dong" onClick={onDong} aria-label="Đóng bảng Bình Phản Ứng">Đóng</button>
-      {/* RỜI MÀN — BÁO CHÁY (thầy 09/11 «viền đỏ nhấp nháy xung quanh màn chiếu hiện tên ở giữa bảng to như báo cháy để hs không dám tái phạm»): em đang ở
-          ngoài app (phòng giữ `roiNay` tới khi em quay lại) ⇒ lớp phủ NGOÀI khung bảng (nổi cả khi bảng đang thu vào tờ cũ lúc em lên bảng). */}
-      {roiNay.length ? createPortal(<div className="bpu-bao-chay" role="alert" style={MAU_CHIEU}><div className="bpu-bao-chay-the"><span className="coi" aria-hidden="true" /><b>Rời màn hình</b><strong>{roiNay.map((s) => { const e = ds.find((x) => x.sbd === s); return e ? (an ? `Em số ${ds.indexOf(e) + 1}` : e.ten) : s }).join(' · ')}</strong><span>Quay lại Bình Phản Ứng ngay</span></div></div>, document.body) : null}
+      {/* RỜI MÀN (BaoRoiMan.tsx): thẻ đỏ to 2 giây rồi thu xuống đáy — lớp phủ NGOÀI khung bảng (nổi cả khi bảng đang thu vào tờ lúc em lên bảng). */}
+      <BaoRoiMan sbd={roiNay} ten={roiNay.map((s) => { const e = ds.find((x) => x.sbd === s); return e ? (an ? `Em số ${ds.indexOf(e) + 1}` : e.ten) : s })} />
     </div>,
     gocPortal ?? document.body,
   )

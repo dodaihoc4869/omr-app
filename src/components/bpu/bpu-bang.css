@@ -383,6 +383,18 @@ html.may-yeu .bpu-bang .bb-canh{ animation: none; }
 @keyframes bpu-bao-chay-rung { 0%, 100% { transform: none; } 10% { transform: translateX(-0.6vmin) rotate(-1deg); } 20% { transform: translateX(0.6vmin) rotate(1deg); } 30% { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .bpu-bao-chay::before, .bpu-bao-chay-the, .bpu-bao-chay-the .coi { animation: none; } }
 html.may-yeu .bpu-bao-chay::before, html.may-yeu .bpu-bao-chay-the, html.may-yeu .bpu-bao-chay-the .coi { animation: none; }
+/* 12/11 tối (thầy «chỉ hiện 2 giây rồi ẩn xuống dưới nhấp nháy, khi ẩn xuống bỏ hiệu ứng nhấp nháy xung quanh màn hình»): sau 2 giây lớp phủ thu thành
+   viên nhỏ ở mép dưới — KHÔNG viền quanh màn, chỉ viên tự nhấp nháy. */
+.bpu-bao-chay.gon { place-items: end center; }
+.bpu-bao-chay.gon::before { display: none; }
+.bpu-bao-chay-gon { display: flex; align-items: center; gap: 0.6em; max-width: min(86vw, 1100px); margin-bottom: max(74px, 10.5vh); padding: 0.5em 1.1em 0.5em 0.8em; border-radius: 999px; background: var(--tr-sai); color: var(--tr-chieu-giay);
+  font: 600 clamp(15px, 1.45vw, 28px)/1.25 'Be Vietnam Pro', 'Noto Sans', sans-serif; box-shadow: 0 0.4em 1.4em color-mix(in srgb, var(--tr-sai) 45%, transparent); animation: bpu-bao-chay-gon 0.9s ease-in-out infinite alternate; }
+.bpu-bao-chay-gon i { flex: none; width: 0.7em; height: 0.7em; border-radius: 50%; background: currentColor; }
+.bpu-bao-chay-gon b { flex: none; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.82em; }
+.bpu-bao-chay-gon span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@keyframes bpu-bao-chay-gon { from { opacity: 1; } to { opacity: 0.42; } }
+@media (prefers-reduced-motion: reduce) { .bpu-bao-chay-gon { animation: none; } }
+html.may-yeu .bpu-bao-chay-gon { animation: none; }
 /* Ô tên em đang rời màn: quầng đỏ (cùng màu báo cháy) — cả lớp thấy ngay trên dải tên. */
 .bpu-bang .bb-o.roi { box-shadow: 0 12px 40px color-mix(in srgb, var(--tr-sai) 45%, transparent); }
 .bpu-bang .bb-o.roi .nhan-roi { background: var(--tr-sai); color: var(--giay); }
